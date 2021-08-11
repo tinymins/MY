@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Love'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -74,7 +45,7 @@ function D.RefreshPS()
 		MY.SwitchTab('MY_Love', true)
 	end
 end
-LIB.RegisterEvent('MY_LOVE_UPDATE', 'MY_Love__PS', D.RefreshPS)
+X.RegisterEvent('MY_LOVE_UPDATE', 'MY_Love__PS', D.RefreshPS)
 
 -------------------------------------
 -- ÉèÖÃ½çÃæ
@@ -85,12 +56,12 @@ local PS = { IsRestricted = MY_Love.IsShielded }
 function D.GetLoverMenu(nType)
 	local me, m0 = GetClientPlayer(), {}
 	local aGroup = me.GetFellowshipGroupInfo() or {}
-	insert(aGroup, 1, {id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND})
+	table.insert(aGroup, 1, {id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND})
 	for _, v in ipairs(aGroup) do
 		local aFriend = me.GetFellowshipInfo(v.id) or {}
 		for _, vv in ipairs(aFriend) do
 			if vv.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or vv.attraction >= MY_Love.nDoubleLoveAttraction) then
-				insert(m0, {
+				table.insert(m0, {
 					szOption = vv.name,
 					fnDisable = function() return not vv.isonline end,
 					fnAction = function()
@@ -101,7 +72,7 @@ function D.GetLoverMenu(nType)
 		end
 	end
 	if #m0 == 0 then
-		insert(m0, { szOption = _L['<Non-avaiable>'] })
+		table.insert(m0, { szOption = _L['<Non-avaiable>'] })
 	end
 	return m0
 end
@@ -117,7 +88,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('Text', { text = _L['Heart lover'], x = nPaddingX, y = nY, font = 27 })
 	-- lover info
 	nY = nY + 36
-	if not LIB.CanUseOnlineRemoteStorage() then
+	if not X.CanUseOnlineRemoteStorage() then
 		nX = nPaddingX + 10
 		nY = nY + ui:Append('Text', {
 			x = nX, y = nY, w = nW - nX, h = 120,
@@ -141,7 +112,7 @@ function PS.OnPanelActive(wnd)
 					local szFilePath = GetOpenFileName(
 						_L['Please select lover backup data file:'],
 						'JX3 Lover File(*.lover.jx3dat)\0*.jx3dat\0JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
-						LIB.FormatPath({ 'export/lover_backup/', PATH_TYPE.GLOBAL })
+						X.FormatPath({ 'export/lover_backup/', X.PATH_TYPE.GLOBAL })
 					)
 					if szFilePath == '' then
 						return
@@ -175,8 +146,8 @@ function PS.OnPanelActive(wnd)
 			-- show lover
 			nX = nPaddingX + 10
 			nX = ui:Append('Text', { text = lover.szName, font = 19, x = nX, y = nY, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')
-			local map = lover.bOnline and LIB.GetMapInfo(lover.dwMapID)
-			if not IsEmpty(lover.szLoverTitle) then
+			local map = lover.bOnline and X.GetMapInfo(lover.dwMapID)
+			if not X.IsEmpty(lover.szLoverTitle) then
 				nX = ui:Append('Text', { text = '<' .. lover.szLoverTitle .. '>', x = nX, y = nY, font = 80, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')
 			end
 			if map and map.szName then
@@ -244,7 +215,7 @@ function PS.OnPanelActive(wnd)
 			limit = 42,  multi = true,
 			text = MY_Love.szSign,
 			onchange = function(szText)
-				MY_Love.szSign = LIB.ReplaceSensitiveWord(szText)
+				MY_Love.szSign = X.ReplaceSensitiveWord(szText)
 			end,
 		})
 		nY = nY + 54
@@ -305,4 +276,4 @@ function PS.OnPanelDeactive()
 	O.bPanelActive = false
 end
 
-LIB.RegisterPanel(_L['Target'], 'MY_Love', _L['MY_Love'], 329, PS)
+X.RegisterPanel(_L['Target'], 'MY_Love', _L['MY_Love'], 329, PS)

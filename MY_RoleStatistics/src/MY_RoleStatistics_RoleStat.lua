@@ -10,58 +10,29 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_RoleStat'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
+CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_RoleStat'], {'userdata/role_statistics/role_stat.v3.db', PATH_TYPE.GLOBAL})
+local DB = X.SQLiteConnect(_L['MY_RoleStatistics_RoleStat'], {'userdata/role_statistics/role_stat.v3.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return LIB.Sysmsg(_L['MY_RoleStatistics_RoleStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return X.Sysmsg(_L['MY_RoleStatistics_RoleStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
-local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_RoleStat.ini'
+local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_RoleStat.ini'
 
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS RoleInfo (
@@ -123,11 +94,11 @@ local DB_RoleInfoG = DB:Prepare('SELECT * FROM RoleInfo WHERE guid = ?')
 local DB_RoleInfoR = DB:Prepare('SELECT * FROM RoleInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_RoleInfoD = DB:Prepare('DELETE FROM RoleInfo WHERE guid = ?')
 
-local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General'], {
 	aColumn = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Collection(Schema.String),
+		xSchema = X.Schema.Collection(X.Schema.String),
 		xDefaultValue = {
 			'name',
 			'force',
@@ -143,21 +114,21 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General
 		},
 	},
 	szSort = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = 'time_days',
 	},
 	szSortOrder = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = 'desc',
 	},
 	aAlertColumn = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Collection(Schema.String),
+		xSchema = X.Schema.Collection(X.Schema.String),
 		xDefaultValue = {
 			'money',
 			'achievement_score',
@@ -172,37 +143,37 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General
 		},
 	},
 	tAlertTodayVal = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		bUserData = true,
-		xSchema = Schema.Any,
+		xSchema = X.Schema.Any,
 		xDefaultValue = nil,
 	},
 	tSummaryIgnoreGUID = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Any,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Any,
 		xDefaultValue = {},
 	},
 	bFloatEntry = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceFloatEntry = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSaveDB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 })
@@ -227,7 +198,7 @@ local function GeneCommonSummaryFormatText(id)
 	return function(rs)
 		local v = 0
 		for _, r in ipairs(rs) do
-			if IsNumber(r[id]) then
+			if X.IsNumber(r[id]) then
 				v = v + r[id]
 			end
 		end
@@ -244,7 +215,7 @@ local function GeneCommonCompare(id)
 end
 local function GeneWeeklyFormatText(id)
 	return function(r)
-		local nNextTime, nCircle = LIB.GetRefreshTime('weekly')
+		local nNextTime, nCircle = X.GetRefreshTime('weekly')
 		local szText = (nNextTime - nCircle < r.time and r[id] and r[id] >= 0)
 			and r[id]
 			or _L['--']
@@ -253,10 +224,10 @@ local function GeneWeeklyFormatText(id)
 end
 local function GeneWeeklySummaryFormatText(id)
 	return function(rs)
-		local nNextTime, nCircle = LIB.GetRefreshTime('weekly')
+		local nNextTime, nCircle = X.GetRefreshTime('weekly')
 		local v = nil
 		for _, r in ipairs(rs) do
-			if nNextTime - nCircle < r.time and IsNumber(r[id]) and r[id] >= 0 then
+			if nNextTime - nCircle < r.time and X.IsNumber(r[id]) and r[id] >= 0 then
 				if not v then
 					v = 0
 				end
@@ -268,7 +239,7 @@ local function GeneWeeklySummaryFormatText(id)
 end
 local function GeneWeeklyCompare(id)
 	return function(r1, r2)
-		local nNextTime, nCircle = LIB.GetRefreshTime('weekly')
+		local nNextTime, nCircle = X.GetRefreshTime('weekly')
 		local v1 = nNextTime - nCircle < r1.time
 			and r1[id]
 			or -1
@@ -307,7 +278,7 @@ local COLUMN_LIST = lodash.filter({
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
-			return GetFormatText(name, 162, LIB.GetForceColor(rec.force, 'foreground'))
+			return GetFormatText(name, 162, X.GetForceColor(rec.force, 'foreground'))
 		end,
 		Compare = GeneCommonCompare('name'),
 	},
@@ -575,7 +546,7 @@ local COLUMN_LIST = lodash.filter({
 		GetSummaryFormatText = function(recs)
 			local tAccount, nCoin = {}, 0
 			for _, rec in ipairs(recs) do
-				if not tAccount[rec.account] and IsNumber(rec.coin) then
+				if not tAccount[rec.account] and X.IsNumber(rec.coin) then
 					nCoin = nCoin + rec.coin
 					tAccount[rec.account] = true
 				end
@@ -597,7 +568,7 @@ local COLUMN_LIST = lodash.filter({
 		szTitle = _L['Cache time'],
 		nMinWidth = 165, nMaxWidth = 200,
 		GetFormatText = function(rec)
-			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
+			return GetFormatText(X.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
@@ -607,11 +578,11 @@ local COLUMN_LIST = lodash.filter({
 		nMinWidth = 120, nMaxWidth = 120,
 		GetFormatText = function(rec)
 			local nTime = GetCurrentTime() - rec.time
-			local nSeconds = floor(nTime)
-			local nMinutes = floor(nSeconds / 60)
-			local nHours   = floor(nMinutes / 60)
-			local nDays    = floor(nHours / 24)
-			local nYears   = floor(nDays / 365)
+			local nSeconds = math.floor(nTime)
+			local nMinutes = math.floor(nSeconds / 60)
+			local nHours   = math.floor(nMinutes / 60)
+			local nDays    = math.floor(nHours / 24)
+			local nYears   = math.floor(nDays / 365)
 			local nDay     = nDays % 365
 			local nHour    = nHours % 24
 			local nMinute  = nMinutes % 60
@@ -663,7 +634,7 @@ local function GeneCommonCompareText(id, szTitle)
 		local szOp = r1[id] <= r2[id]
 			and ' increased by %s'
 			or ' decreased by %s'
-		return GetFormatSysmsgText(_L(szTitle .. szOp, abs(r2[id] - r1[id])))
+		return GetFormatSysmsgText(_L(szTitle .. szOp, math.abs(r2[id] - r1[id])))
 	end
 end
 local ALERT_COLUMN = {
@@ -700,7 +671,7 @@ local ALERT_COLUMN = {
 			local r, g, b = GetMsgFontColor('MSG_SYS')
 			local szExtra = 'font=' .. f .. ' r=' .. r .. ' g=' .. g .. ' b=' .. b
 			return GetFormatSysmsgText(nCompare >= 0 and _L['Money increased by '] or _L['Money decreased by '])
-				.. GetMoneyText({ nGold = abs(money.nGold), nSilver = abs(money.nSilver), nCopper = abs(money.nCopper) }, szExtra)
+				.. GetMoneyText({ nGold = math.abs(money.nGold), nSilver = math.abs(money.nSilver), nCopper = math.abs(money.nCopper) }, szExtra)
 		end,
 	},
 	{ -- 江贡
@@ -723,8 +694,8 @@ local ALERT_COLUMN = {
 		id = 'starve',
 		szTitle = _L['Starve'],
 		GetValue = function(me)
-			return LIB.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 34797, true)
-				+ LIB.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 40259, true)
+			return X.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 34797, true)
+				+ X.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 40259, true)
 		end,
 		GetCompareText = GeneCommonCompareText('starve', 'Starve'),
 	},
@@ -790,7 +761,7 @@ end
 
 do
 local INFO_CACHE = {}
-LIB.RegisterFrameCreate('regionPQreward', 'MY_RoleStatistics_RoleStat', function()
+X.RegisterFrameCreate('regionPQreward', 'MY_RoleStatistics_RoleStat', function()
 	local frame = arg0
 	if not frame then
 		return
@@ -825,7 +796,7 @@ function D.GetClientPlayerRec()
 		local result = DB_RoleInfoG:GetAll()
 		DB_RoleInfoG:Reset()
 		if result and result[1] and result[1].time then
-			local dwTime, dwCircle = LIB.GetRefreshTime('weekly')
+			local dwTime, dwCircle = X.GetRefreshTime('weekly')
 			if dwTime - dwCircle < result[1].time then
 				rec.starve_remain = result[1].starve_remain
 			end
@@ -835,9 +806,9 @@ function D.GetClientPlayerRec()
 
 	-- 基础信息
 	rec.guid = guid
-	rec.account = LIB.GetAccount() or ''
-	rec.region = LIB.GetRealServer(1)
-	rec.server = LIB.GetRealServer(2)
+	rec.account = X.GetAccount() or ''
+	rec.region = X.GetRealServer(1)
+	rec.server = X.GetRealServer(2)
 	rec.name = me.szName
 	rec.force = me.dwForceID
 	rec.level = me.nLevel
@@ -876,11 +847,11 @@ function D.GetClientPlayerRec()
 	rec.exam_print_remain = me.GetExamPrintRemainSpace()
 	rec.achievement_score = me.GetAchievementRecord()
 	rec.architecture = me.nArchitecture or 0
-	rec.architecture_remain = IsFunction(me.GetArchitectureRemainSpace) and me.GetArchitectureRemainSpace() or 0
+	rec.architecture_remain = X.IsFunction(me.GetArchitectureRemainSpace) and me.GetArchitectureRemainSpace() or 0
 	rec.coin = me.nCoin
 	rec.mentor_score = me.dwTAEquipsScore
-	rec.starve = LIB.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 34797, true)
-		+ LIB.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 40259, true)
+	rec.starve = X.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 34797, true)
+		+ X.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 40259, true)
 	rec.time = GetCurrentTime()
 
 	for k, v in pairs(INFO_CACHE) do
@@ -891,11 +862,11 @@ end
 end
 
 function D.Migration()
-	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/role_stat.v2.db', PATH_TYPE.GLOBAL})
+	local DB_V2_PATH = X.FormatPath({'userdata/role_statistics/role_stat.v2.db', X.PATH_TYPE.GLOBAL})
 	if not IsLocalFileExist(DB_V2_PATH) then
 		return
 	end
-	LIB.Confirm(
+	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
 			-- 转移V2旧版数据
@@ -956,10 +927,10 @@ function D.Migration()
 					DB:Execute('END TRANSACTION')
 					DB_V2:Release()
 				end
-				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			FireUIEvent('MY_ROLE_STAT_ROLE_UPDATE')
-			LIB.Alert(_L['Migrate succeed!'])
+			X.Alert(_L['Migrate succeed!'])
 		end)
 end
 
@@ -971,7 +942,7 @@ function D.FlushDB()
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
 
-	local rec = Clone(D.GetClientPlayerRec())
+	local rec = X.Clone(D.GetClientPlayerRec())
 	D.EncodeRow(rec)
 
 	DB:Execute('BEGIN TRANSACTION')
@@ -999,10 +970,10 @@ function D.FlushDB()
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	LIB.Debug('MY_RoleStatistics_RoleStat', _L('Flushing to database costs %dms...', nTickCount), DEBUG_LEVEL.LOG)
+	X.Debug('MY_RoleStatistics_RoleStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterFlush('MY_RoleStatistics_RoleStat', D.FlushDB)
+X.RegisterFlush('MY_RoleStatistics_RoleStat', D.FlushDB)
 
 do local INIT = false
 function D.UpdateSaveDB()
@@ -1015,19 +986,19 @@ function D.UpdateSaveDB()
 	end
 	if not O.bSaveDB then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_RoleStatistics_RoleStat', 'Remove from database...', DEBUG_LEVEL.LOG)
+		X.Debug('MY_RoleStatistics_RoleStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB_RoleInfoD:ClearBindings()
 		DB_RoleInfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		DB_RoleInfoD:Execute()
 		DB_RoleInfoD:Reset()
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_RoleStatistics_RoleStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
+		X.Debug('MY_RoleStatistics_RoleStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_ROLE_UPDATE')
 end
-LIB.RegisterInit('MY_RoleStatistics_RoleUpdateSaveDB', function() INIT = true end)
+X.RegisterInit('MY_RoleStatistics_RoleUpdateSaveDB', function() INIT = true end)
 end
 
 function D.GetColumns()
@@ -1035,7 +1006,7 @@ function D.GetColumns()
 	for _, id in ipairs(O.aColumn) do
 		local col = COLUMN_DICT[id]
 		if col then
-			insert(aCol, col)
+			table.insert(aCol, col)
 		end
 	end
 	return aCol
@@ -1057,7 +1028,7 @@ function D.UpdateUI(page)
 		local imgDesc = hCol:Lookup('Image_RoleStat_Desc')
 		local nWidth = i == #aCol
 			and (EXCEL_WIDTH - nX)
-			or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
+			or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
 		local nSortDelta = nWidth > 70 and 25 or 15
 		if i == 0 then
 			hCol:Lookup('Image_RoleStat_Break'):Hide()
@@ -1097,7 +1068,7 @@ function D.UpdateUI(page)
 	end
 
 	if Sorter then
-		sort(result, Sorter)
+		table.sort(result, Sorter)
 	end
 
 	local aCol = D.GetColumns()
@@ -1119,7 +1090,7 @@ function D.UpdateUI(page)
 			hItemContent:SetSizeByAllItemSize()
 			local nWidth = j == #aCol
 				and (EXCEL_WIDTH - nX)
-				or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
+				or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
 			if j == #aCol then
 				nWidth = EXCEL_WIDTH - nX
 			end
@@ -1132,7 +1103,7 @@ function D.UpdateUI(page)
 		-- 绘制复选框
 		UI(hRow):Append('CheckBox', {
 			x = 5, y = 2, w = EXCEL_WIDTH - 10,
-			checked = IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] or false,
+			checked = X.IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] or false,
 			oncheck = function(bCheck)
 				O.tSummaryIgnoreGUID[rec.guid] = not bCheck or nil
 				O.tSummaryIgnoreGUID = O.tSummaryIgnoreGUID
@@ -1148,8 +1119,8 @@ function D.UpdateUI(page)
 	-- 汇总
 	local aSum = {}
 	for _, rec in ipairs(result) do
-		if IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] then
-			insert(aSum, rec)
+		if X.IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] then
+			table.insert(aSum, rec)
 		end
 	end
 	local hSum = page:Lookup('Wnd_Total/WndScroll_RoleStat', 'Handle_Sum')
@@ -1166,7 +1137,7 @@ function D.UpdateUI(page)
 		hItemContent:SetSizeByAllItemSize()
 		local nWidth = j == #aCol
 			and (EXCEL_WIDTH - nX)
-			or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
+			or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
 		if j == #aCol then
 			nWidth = EXCEL_WIDTH - nX
 		end
@@ -1199,16 +1170,16 @@ function D.OutputRowTip(this, rec)
 	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
 	for _, col in ipairs(COLUMN_LIST) do
 		if not bFloat or not col.bHideInFloat then
-			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-			insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-			insert(aXml, col.GetFormatText(rec))
-			insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+			table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+			table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+			table.insert(aXml, col.GetFormatText(rec))
+			table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 		end
 	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	local nPosType = bFloat and UI.TIP_POSITION.TOP_BOTTOM or UI.TIP_POSITION.RIGHT_LEFT
-	OutputTip(concat(aXml), 450, {x, y, w, h}, nPosType)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, nPosType)
 end
 
 function D.CloseRowTip()
@@ -1231,7 +1202,7 @@ function D.OnInitPage()
 			for i, id in ipairs(O.aColumn) do
 				local col = COLUMN_DICT[id]
 				if col then
-					insert(t, {
+					table.insert(t, {
 						szOption = col.szTitle,
 						{
 							szOption = _L['Move up'],
@@ -1258,7 +1229,7 @@ function D.OnInitPage()
 						{
 							szOption = _L['Delete'],
 							fnAction = function()
-								remove(O.aColumn, i)
+								table.remove(O.aColumn, i)
 								O.aColumn = O.aColumn
 								D.UpdateUI(page)
 								UI.ClosePopupMenu()
@@ -1271,13 +1242,13 @@ function D.OnInitPage()
 			end
 			for _, col in ipairs(COLUMN_LIST) do
 				if not c[col.id] then
-					insert(t, {
+					table.insert(t, {
 						szOption = col.szTitle,
 						fnAction = function()
 							if nMinW + col.nMinWidth > EXCEL_WIDTH then
-								LIB.Alert(_L['Too many column selected, width overflow, please delete some!'])
+								X.Alert(_L['Too many column selected, width overflow, please delete some!'])
 							else
-								insert(O.aColumn, col.id)
+								table.insert(O.aColumn, col.id)
 								O.aColumn = O.aColumn
 							end
 							D.UpdateUI(page)
@@ -1299,7 +1270,7 @@ function D.OnInitPage()
 			for i, id in ipairs(O.aAlertColumn) do
 				local col = ALERT_COLUMN_DICT[id]
 				if col then
-					insert(t, {
+					table.insert(t, {
 						szOption = col.szTitle,
 						{
 							szOption = _L['Move up'],
@@ -1324,7 +1295,7 @@ function D.OnInitPage()
 						{
 							szOption = _L['Delete'],
 							fnAction = function()
-								remove(O.aAlertColumn, i)
+								table.remove(O.aAlertColumn, i)
 								O.aAlertColumn = O.aAlertColumn
 								UI.ClosePopupMenu()
 							end,
@@ -1335,10 +1306,10 @@ function D.OnInitPage()
 			end
 			for _, col in ipairs(ALERT_COLUMN) do
 				if not c[col.id] then
-					insert(t, {
+					table.insert(t, {
 						szOption = col.szTitle,
 						fnAction = function()
-							insert(O.aAlertColumn, col.id)
+							table.insert(O.aAlertColumn, col.id)
 							O.aAlertColumn = O.aAlertColumn
 							UI.ClosePopupMenu()
 						end,
@@ -1377,7 +1348,7 @@ function D.CheckAdvice()
 		-- },
 	}) do
 		if not O[p.szAdviceKey] and not O[p.szSetKey] then
-			LIB.Confirm(p.szMsg, function()
+			X.Confirm(p.szMsg, function()
 				MY_RoleStatistics_RoleStat[p.szSetKey] = true
 				MY_RoleStatistics_RoleStat[p.szAdviceKey] = true
 				D.CheckAdvice()
@@ -1411,7 +1382,7 @@ function D.OnLButtonClick()
 	if name == 'Btn_Delete' then
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
+		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
 			DB_RoleInfoD:ClearBindings()
 			DB_RoleInfoD:BindAll(AnsiToUTF8(wnd.guid))
 			DB_RoleInfoD:Execute()
@@ -1491,13 +1462,13 @@ function D.OnItemMouseLeave()
 end
 
 local ALERT_INIT_VAL = {}
-LIB.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
+X.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
 	local me = GetClientPlayer()
 	for _, col in ipairs(ALERT_COLUMN) do
 		ALERT_INIT_VAL[col.id] = col.GetValue(me)
 	end
-	if not IsTable(O.tAlertTodayVal) or not IsNumber(O.tAlertTodayVal.nTime)
-	or not LIB.IsInSameRefreshTime('daily', O.tAlertTodayVal.nTime) then
+	if not X.IsTable(O.tAlertTodayVal) or not X.IsNumber(O.tAlertTodayVal.nTime)
+	or not X.IsInSameRefreshTime('daily', O.tAlertTodayVal.nTime) then
 		O.tAlertTodayVal = {}
 		for _, col in ipairs(ALERT_COLUMN) do
 			O.tAlertTodayVal[col.id] = col.GetValue(me)
@@ -1506,7 +1477,7 @@ LIB.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
 		O.tAlertTodayVal = O.tAlertTodayVal
 	end
 end)
-LIB.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', function()
+X.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', function()
 	local me = GetClientPlayer()
 	local tVal = {}
 	for _, col in ipairs(ALERT_COLUMN) do
@@ -1517,17 +1488,17 @@ LIB.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', f
 	for _, id in ipairs(O.aAlertColumn) do
 		local col = ALERT_COLUMN_DICT[id]
 		if col then
-			insert(aText, (col.GetCompareText(ALERT_INIT_VAL, tVal)))
-			insert(aDailyText, (col.GetCompareText(O.tAlertTodayVal, tVal)))
+			table.insert(aText, (col.GetCompareText(ALERT_INIT_VAL, tVal)))
+			table.insert(aDailyText, (col.GetCompareText(O.tAlertTodayVal, tVal)))
 		end
 	end
-	local szText, szDailyText = concat(aText, GetFormatSysmsgText(_L[','])), concat(aDailyText, GetFormatSysmsgText(_L[',']))
+	local szText, szDailyText = table.concat(aText, GetFormatSysmsgText(_L[','])), table.concat(aDailyText, GetFormatSysmsgText(_L[',']))
 	if GetTime() - D.dwLastAlertTime > 10000 or D.szLastAlert ~= szText or D.szLastDailyAlert ~= szDailyText then
-		if not IsEmpty(szText) and szText ~= szDailyText then
-			LIB.Sysmsg({ GetFormatSysmsgText(_L['Current online ']) .. szText .. GetFormatSysmsgText(_L['.']), rich = true })
+		if not X.IsEmpty(szText) and szText ~= szDailyText then
+			X.Sysmsg({ GetFormatSysmsgText(_L['Current online ']) .. szText .. GetFormatSysmsgText(_L['.']), rich = true })
 		end
-		if not IsEmpty(szDailyText) then
-			LIB.Sysmsg({ GetFormatSysmsgText(_L['Today online ']) .. szDailyText .. GetFormatSysmsgText(_L['.']), rich = true })
+		if not X.IsEmpty(szDailyText) then
+			X.Sysmsg({ GetFormatSysmsgText(_L['Today online ']) .. szDailyText .. GetFormatSysmsgText(_L['.']), rich = true })
 		end
 		D.dwLastAlertTime = GetTime()
 		D.szLastAlert = szText
@@ -1542,7 +1513,7 @@ function D.ApplyFloatEntry(bFloatEntry)
 		return
 	end
 	local btn = frame:Lookup('Btn_MY_RoleStatistics_RoleEntry')
-	if IsNil(bFloatEntry) then
+	if X.IsNil(bFloatEntry) then
 		bFloatEntry = O.bFloatEntry
 	end
 	if bFloatEntry then
@@ -1580,14 +1551,14 @@ function D.UpdateFloatEntry()
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_RoleStat', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_RoleStat', function()
 	D.bReady = true
 	D.UpdateSaveDB()
 	D.FlushDB()
 	D.UpdateFloatEntry()
 end)
-LIB.RegisterReload('MY_RoleStatistics_RoleEntry', function() D.ApplyFloatEntry(false) end)
-LIB.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_RoleEntry', D.UpdateFloatEntry)
+X.RegisterReload('MY_RoleStatistics_RoleEntry', function() D.ApplyFloatEntry(false) end)
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_RoleEntry', D.UpdateFloatEntry)
 
 -- Module exports
 do
@@ -1605,7 +1576,7 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics.RegisterModule('RoleStat', _L['MY_RoleStatistics_RoleStat'], LIB.CreateModule(settings))
+MY_RoleStatistics.RegisterModule('RoleStat', _L['MY_RoleStatistics_RoleStat'], X.CreateModule(settings))
 end
 
 -- Global exports
@@ -1652,5 +1623,5 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics_RoleStat = LIB.CreateModule(settings)
+MY_RoleStatistics_RoleStat = X.CreateModule(settings)
 end

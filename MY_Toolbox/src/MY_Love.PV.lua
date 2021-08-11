@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Love'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -108,7 +79,7 @@ function D.UpdatePage()
 	txt.szPlayer = szName
 	-- lover title
 	local ttl = h:Lookup('Text_LoverTitle')
-	if bNoData or IsEmpty(szLoverTitle) then
+	if bNoData or X.IsEmpty(szLoverTitle) then
 		ttl:SetText('')
 	else
 		ttl:SetFontColor(255, 128, 255)
@@ -122,9 +93,9 @@ function D.UpdatePage()
 		inf:SetText('')
 	end
 	-- avatar
-	local szFile, nFrame, bAnimate = LIB.GetPlayerAvatar(dwForceID, nRoleType, dwAvatar)
+	local szFile, nFrame, bAnimate = X.GetPlayerAvatar(dwForceID, nRoleType, dwAvatar)
 	local img, ani = h:Lookup('Image_Lover'), h:Lookup('Animate_Lover')
-	if IsEmpty(dwID) or IsEmpty(szFile) then
+	if X.IsEmpty(dwID) or X.IsEmpty(szFile) then
 		img:Hide()
 		ani:Hide()
 		txt:SetRelPos(42, 92)
@@ -150,7 +121,7 @@ function D.UpdatePage()
 			ani:Hide()
 			img:Show()
 		end
-		if bNoData or IsEmpty(szLoverTitle) then
+		if bNoData or X.IsEmpty(szLoverTitle) then
 			txt:SetRelPos(130, 92)
 			inf:SetRelPos(130, 115)
 		else
@@ -185,7 +156,7 @@ function D.UpdatePage()
 	end
 	h:FormatAllItemPos()
 end
-LIB.RegisterEvent('MY_LOVE_OTHER_UPDATE', D.UpdatePage)
+X.RegisterEvent('MY_LOVE_OTHER_UPDATE', D.UpdatePage)
 
 -- 查看别人装备、情缘
 function D.HookPlayerViewPanel()
@@ -228,7 +199,7 @@ function D.HookPlayerViewPanel()
 				if D.GetOtherLover(mp.dwPlayer) then
 					local tar = D.GetPlayerInfo(mp.dwPlayer)
 					if tar then
-						LIB.SendChat(tar.szName, MY_Love.szJabber)
+						X.SendChat(tar.szName, MY_Love.szJabber)
 					end
 				else
 					D.PvRequestOtherLover(this:GetRoot())
@@ -247,7 +218,7 @@ function D.HookPlayerViewPanel()
 						InsertTeammateLeaderMenu(m0, tar.dwID)
 					end
 					if #m0 > 0 then
-						insert(m0, { bDevide = true })
+						table.insert(m0, { bDevide = true })
 					end
 					InsertPlayerCommonMenu(m0, tar.dwID, tar.szName)
 					PopupMenu(m0)
@@ -299,17 +270,17 @@ function D.OnPeekOtherPlayer()
 	O.tID2Name[tar.szName] = arg1
 	D.HookPlayerViewPanel()
 end
-LIB.RegisterEvent('PEEK_OTHER_PLAYER', 'MY_Love__PV', D.OnPeekOtherPlayer)
+X.RegisterEvent('PEEK_OTHER_PLAYER', 'MY_Love__PV', D.OnPeekOtherPlayer)
 
 function D.OnActiveLoveChange()
 	O.tActiveLove[arg0] = arg1 and true or nil
 end
-LIB.RegisterEvent('MY_LOVE_PV_ACTIVE_CHANGE', D.OnActiveLoveChange)
+X.RegisterEvent('MY_LOVE_PV_ACTIVE_CHANGE', D.OnActiveLoveChange)
 
 function D.OnPVHookChange()
 	D.HookPlayerViewPanel()
 end
-LIB.RegisterEvent('MY_LOVE_PV_HOOK', D.OnPVHookChange)
+X.RegisterEvent('MY_LOVE_PV_HOOK', D.OnPVHookChange)
 
 -- view other lover by dwID
 function D.PeekOther(dwID)
@@ -332,8 +303,8 @@ local function onMenu(dwTarType, dwTarID)
 		fnAction = function() D.PeekOther(dwTarID) end
 	}}
 end
-LIB.RegisterTargetAddonMenu('MY_Love', onMenu)
+X.RegisterTargetAddonMenu('MY_Love', onMenu)
 end
 
 -- close player view when reload
-LIB.RegisterReload('MY_Love', function() Wnd.CloseWindow('PlayerView') end)
+X.RegisterReload('MY_Love', function() Wnd.CloseWindow('PlayerView') end)

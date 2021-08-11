@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -88,13 +59,13 @@ end
 
 -- 注册子模块
 function D.RegisterModule(szID, szName, env)
-	for i, v in ipairs_r(O.aModule) do
+	for i, v in X.ipairs_r(O.aModule) do
 		if v.szID == szID then
-			remove(O.aModule, i)
+			table.remove(O.aModule, i)
 		end
 	end
 	if szName and env then
-		insert(O.aModule, {
+		table.insert(O.aModule, {
 			szID = szID,
 			szName = szName,
 			env = env,
@@ -158,43 +129,43 @@ function Framework.OnLButtonClick()
 		D.Close()
 	elseif name == 'Btn_Option' then
 		local menu = {}
-		insert(menu, {
+		table.insert(menu, {
 			szOption = _L['Option'],
 			fnAction = function()
-				LIB.ShowPanel()
-				LIB.FocusPanel()
-				LIB.SwitchTab('MY_TeamTools')
+				X.ShowPanel()
+				X.FocusPanel()
+				X.SwitchTab('MY_TeamTools')
 			end,
 		})
 		local tFloatEntryMenu = { szOption = _L['Float panel'] }
 		for _, m in ipairs(O.aModule) do
 			if m and m.env.szFloatEntry then
-				insert(tFloatEntryMenu, {
+				table.insert(tFloatEntryMenu, {
 					szOption = m.szName,
-					bCheck = true, bChecked = Get(_G, m.env.szFloatEntry),
+					bCheck = true, bChecked = X.Get(_G, m.env.szFloatEntry),
 					fnAction = function()
-						Set(_G, m.env.szFloatEntry, not Get(_G, m.env.szFloatEntry))
+						X.Set(_G, m.env.szFloatEntry, not X.Get(_G, m.env.szFloatEntry))
 					end,
 				})
 			end
 		end
 		if #tFloatEntryMenu > 0 then
-			insert(menu, tFloatEntryMenu)
+			table.insert(menu, tFloatEntryMenu)
 		end
 		local tSaveDBMenu = { szOption = _L['Save DB'] }
 		for _, m in ipairs(O.aModule) do
 			if m and m.env.szSaveDB then
-				insert(tSaveDBMenu, {
+				table.insert(tSaveDBMenu, {
 					szOption = m.szName,
-					bCheck = true, bChecked = Get(_G, m.env.szSaveDB),
+					bCheck = true, bChecked = X.Get(_G, m.env.szSaveDB),
 					fnAction = function()
-						Set(_G, m.env.szSaveDB, not Get(_G, m.env.szSaveDB))
+						X.Set(_G, m.env.szSaveDB, not X.Get(_G, m.env.szSaveDB))
 					end,
 				})
 			end
 		end
 		if #tSaveDBMenu > 0 then
-			insert(menu, tSaveDBMenu)
+			table.insert(menu, tSaveDBMenu)
 		end
 		if #menu > 0 then
 			local nX, nY = this:GetAbsPos()
@@ -216,7 +187,7 @@ function Framework.OnActivePage()
 	if name == 'PageSet_All' then
 		local page = this:GetActivePage()
 		if page.nIndex then
-			if IsElement(frame.pActivePage) then
+			if X.IsElement(frame.pActivePage) then
 				local m = O.aModule[frame.pActivePage.nIndex]
 				if m and m.env.OnDeactivePage then
 					local _this = this
@@ -255,20 +226,20 @@ function Framework.OnFrameCreate()
 	this:RegisterEvent('TEAM_AUTHORITY_CHANGED')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	-- 标题修改
-	local szTitle = PACKET_INFO.NAME .. ' - ' .. _L['MY_TeamTools']
-	if LIB.IsInParty() then
+	local szTitle = X.PACKET_INFO.NAME .. ' - ' .. _L['MY_TeamTools']
+	if X.IsInParty() then
 		local team = GetClientTeam()
 		local info = team.GetMemberInfo(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
 		szTitle = _L('%s\'s Team', info.szName) .. ' (' .. team.GetTeamSize() .. '/' .. team.nGroupNum * 5  .. ')'
 	end
 	this:Lookup('', 'Text_Title'):SetText(szTitle)
 	-- 注册关闭
-	LIB.RegisterEsc('MY_TeamTools', D.IsOpened, D.Close)
+	X.RegisterEsc('MY_TeamTools', D.IsOpened, D.Close)
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
 
 function Framework.OnFrameDestroy()
-	if IsElement(this.pActivePage) then
+	if X.IsElement(this.pActivePage) then
 		local m = O.aModule[this.pActivePage.nIndex]
 		if m and m.env.OnDeactivePage then
 			local _this = this
@@ -278,7 +249,7 @@ function Framework.OnFrameDestroy()
 		end
 	end
 	PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-	LIB.RegisterEsc('MY_TeamTools')
+	X.RegisterEsc('MY_TeamTools')
 end
 
 function Framework.OnEvent(event)
@@ -410,7 +381,7 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools = LIB.CreateModule(settings)
+MY_TeamTools = X.CreateModule(settings)
 end
 
 do
@@ -418,6 +389,6 @@ local menu = {
 	szOption = _L['MY_TeamTools'],
 	fnAction = function() D.Toggle() end,
 }
-LIB.RegisterAddonMenu('MY_TeamTools', menu)
+X.RegisterAddonMenu('MY_TeamTools', menu)
 end
-LIB.RegisterHotKey('MY_RaidTools', _L['Open/Close MY_TeamTools'], D.Toggle, nil)
+X.RegisterHotKey('MY_RaidTools', _L['Open/Close MY_TeamTools'], D.Toggle, nil)

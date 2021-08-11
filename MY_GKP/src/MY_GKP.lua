@@ -10,104 +10,75 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule('MY_GKP', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_GKP', _L['General'], {
 	bOn = { -- enable
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bMoneyTalk = { -- 金钱变动喊话
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAlertMessage = { -- 进入秘境提醒清空数据
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bMoneySystem = { -- 记录系统金钱变动
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDisplayEmptyRecords = { -- show 0 record
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoSync = { -- 自动接收分配者的同步信息
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowGoldBrick = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	aSubsidies = { -- 补贴方案
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_GKP'],
-		xSchema = Schema.Collection(Schema.Tuple(
-			Schema.String,
-			Schema.OneOf(Schema.String, Schema.Number),
-			Schema.Boolean
+		xSchema = X.Schema.Collection(X.Schema.Tuple(
+			X.Schema.String,
+			X.Schema.OneOf(X.Schema.String, X.Schema.Number),
+			X.Schema.Boolean
 		)),
 		xDefaultValue = {
 			{ _L['Treasure Chests'], '', true},
-			-- { LIB.GetItemNameByUIID(73214), '', true},
+			-- { X.GetItemNameByUIID(73214), '', true},
 			{ _L['Boss'], '', true},
 			{ _L['Banquet Allowance'], -1000, true},
 			{ _L['Fines'], '', true},
@@ -115,12 +86,12 @@ local O = LIB.CreateUserSettingsModule('MY_GKP', _L['General'], {
 		},
 	},
 	aScheme = { -- 拍卖方案
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_GKP'],
-		xSchema = Schema.Collection(Schema.Tuple(
-			Schema.Number,
-			Schema.Number,
-			Schema.Boolean
+		xSchema = X.Schema.Collection(X.Schema.Tuple(
+			X.Schema.Number,
+			X.Schema.Number,
+			X.Schema.Boolean
 		)),
 		xDefaultValue = {
 			{ 100, 100, true },
@@ -140,15 +111,15 @@ local O = LIB.CreateUserSettingsModule('MY_GKP', _L['General'], {
 		},
 	},
 	bSyncSystem = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bNewBidding = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
@@ -158,17 +129,17 @@ local D = {}
 -- 数据处理
 ----------------------------------------------------------------------<
 function D.LoadConfig()
-	local szPath = LIB.FormatPath({'config/gkp.cfg.jx3dat', PATH_TYPE.GLOBAL})
-	local Config = LIB.LoadLUAData(szPath)
+	local szPath = X.FormatPath({'config/gkp.cfg.jx3dat', X.PATH_TYPE.GLOBAL})
+	local Config = X.LoadLUAData(szPath)
 	if Config then
 		CPath.DelFile(szPath)
-		SafeCall(Set, O, 'aSubsidies', Config.Subsidies)
-		SafeCall(Set, O, 'aScheme', Config.Scheme2 or O.aScheme)
+		X.SafeCall(Set, O, 'aSubsidies', Config.Subsidies)
+		X.SafeCall(Set, O, 'aScheme', Config.Scheme2 or O.aScheme)
 	end
 end
 
 function D.Sysmsg(szMsg)
-	LIB.Sysmsg(_L['MY GKP'], szMsg)
+	X.Sysmsg(_L['MY GKP'], szMsg)
 end
 
 function D.GetTimeString(nTime, year)
@@ -223,10 +194,10 @@ function D.GetMoneyTipText(nGold)
 	local r, g, b = D.GetMoneyCol(nGold)
 	if MY_GKP.bShowGoldBrick then
 		if nGold >= 0 then
-			return GetFormatText(floor(nGold / 10000), 41, r, g, b) .. GetFormatImage(szUitex, 27) .. GetFormatText(floor(nGold % 10000), 41, r, g, b) .. GetFormatImage(szUitex, 0)
+			return GetFormatText(math.floor(nGold / 10000), 41, r, g, b) .. GetFormatImage(szUitex, 27) .. GetFormatText(math.floor(nGold % 10000), 41, r, g, b) .. GetFormatImage(szUitex, 0)
 		else
 			nGold = nGold * -1
-			return GetFormatText('-' .. floor(nGold / 10000), 41, r, g, b) .. GetFormatImage(szUitex, 27) .. GetFormatText(floor(nGold % 10000), 41, r, g, b) .. GetFormatImage(szUitex, 0)
+			return GetFormatText('-' .. math.floor(nGold / 10000), 41, r, g, b) .. GetFormatImage(szUitex, 27) .. GetFormatText(math.floor(nGold % 10000), 41, r, g, b) .. GetFormatImage(szUitex, 0)
 		end
 	else
 		return GetFormatText(nGold, 41, r, g, b) .. GetFormatImage(szUitex, 0)
@@ -236,12 +207,12 @@ end
 -- 发放工资
 function D.Bidding(nMoney)
 	local team = GetClientTeam()
-	if not LIB.IsDistributer() then
-		return LIB.Alert(_L['You are not the distrubutor.'])
+	if not X.IsDistributer() then
+		return X.Alert(_L['You are not the distrubutor.'])
 	end
 	local nGold = nMoney
 	if nGold <= 0 then
-		return LIB.Alert(_L['Auction Money <=0.'])
+		return X.Alert(_L['Auction Money <=0.'])
 	end
 	local t, fnAction = {}, nil
 	InsertDistributeMenu(t, false)
@@ -256,7 +227,7 @@ function D.Bidding(nMoney)
 	local fx, fy = Station.GetClientSize()
 	local w2, h2 = LeaderAddMoney:GetSize()
 	LeaderAddMoney:SetAbsPos((fx - w2) / 2, (fy - h2) / 2)
-	LeaderAddMoney:Lookup('Edit_PriceB'):SetText(floor(nGold / 10000))
+	LeaderAddMoney:Lookup('Edit_PriceB'):SetText(math.floor(nGold / 10000))
 	LeaderAddMoney:Lookup('Edit_Price'):SetText(nGold % 10000)
 	LeaderAddMoney:Lookup('Edit_Reason'):SetText(_L['Auto append'])
 	LeaderAddMoney:Lookup('Btn_Ok').OnLButtonUp = function()
@@ -271,20 +242,20 @@ function D.GetTeamMemberMenu(fnAction, bDisable, bSelf)
 	local tTeam, menu = {}, {}
 	for _, v in ipairs(GetClientTeam().GetTeamMemberList()) do
 		local info = GetClientTeam().GetMemberInfo(v)
-		insert(tTeam, { szName = info.szName, dwID = v, dwForce = info.dwForceID, bIsOnLine = info.bIsOnLine})
+		table.insert(tTeam, { szName = info.szName, dwID = v, dwForce = info.dwForceID, bIsOnLine = info.bIsOnLine})
 	end
 	local dwID = UI_GetClientPlayerID()
-	sort(tTeam, function(a, b) return a.dwForce < b.dwForce end)
+	table.sort(tTeam, function(a, b) return a.dwForce < b.dwForce end)
 	for _, v in ipairs(tTeam) do
 		if v.dwID ~= dwID or bSelf then
 			local szIcon, nFrame = GetForceImage(v.dwForce)
-			insert(menu, {
+			table.insert(menu, {
 				szOption = v.szName,
 				szLayer  = 'ICON_RIGHTMOST',
 				bDisable = bDisable and not v.bIsOnLine,
 				szIcon   = szIcon,
 				nFrame   = nFrame,
-				rgb      = { LIB.GetForceColor(v.dwForce) },
+				rgb      = { X.GetForceColor(v.dwForce) },
 				fnAction = function()
 					fnAction(v)
 					UI.ClosePopupMenu()
@@ -297,7 +268,7 @@ end
 
 function D.GetHistoryFiles()
 	local aFiles = {}
-	local szPath = LIB.FormatPath({'userdata/gkp/', PATH_TYPE.ROLE}):gsub('/', '\\')
+	local szPath = X.FormatPath({'userdata/gkp/', X.PATH_TYPE.ROLE}):gsub('/', '\\')
 	for _, filename in ipairs(CPath.GetFileList(szPath)) do
 		local year, month, day, hour, minute, second, index = filename:match('^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+).-%.gkp.jx3dat')
 		if not year then
@@ -328,7 +299,7 @@ function D.GetHistoryFiles()
 			if index then
 				index = tonumber(index)
 			end
-			insert(aFiles, {
+			table.insert(aFiles, {
 				year, month, day, hour, minute, second, index,
 				filename = filename:sub(1, -12),
 				fullname = filename,
@@ -337,7 +308,7 @@ function D.GetHistoryFiles()
 		end
 	end
 	local function sortFile(a, b)
-		local n = max(#a, #b)
+		local n = math.max(#a, #b)
 		for i = 1, n do
 			if not a[i] then
 				return true
@@ -349,7 +320,7 @@ function D.GetHistoryFiles()
 		end
 		return false
 	end
-	sort(aFiles, sortFile)
+	table.sort(aFiles, sortFile)
 	return aFiles
 end
 
@@ -357,12 +328,12 @@ function D.LimitHistoryFile()
 	local aFiles = D.GetHistoryFiles()
 	for i = 22, #aFiles do
 		local szFile = aFiles[i].fullname
-		local szPath = LIB.FormatPath({'userdata/gkp/' .. szFile, PATH_TYPE.ROLE}):gsub('/', '\\')
+		local szPath = X.FormatPath({'userdata/gkp/' .. szFile, X.PATH_TYPE.ROLE}):gsub('/', '\\')
 		CPath.DelFile(szPath)
 	end
 end
 
-LIB.RegisterInit('MY_GKP', function()
+X.RegisterInit('MY_GKP', function()
 	D.LoadConfig()
 end)
 
@@ -439,5 +410,5 @@ local settings = {
 		},
 	},
 }
-MY_GKP = LIB.CreateModule(settings)
+MY_GKP = X.CreateModule(settings)
 end

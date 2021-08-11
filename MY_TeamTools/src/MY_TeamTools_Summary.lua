@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_Summary'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -59,8 +30,8 @@ local D = {
 	tDamage = {},
 	tDeath  = {},
 }
-local SZ_INI = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_TeamTools_Summary.ini'
-local MY_IsParty, MY_GetSkillName, MY_GetBuffName = LIB.IsParty, LIB.GetSkillName, LIB.GetBuffName
+local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_TeamTools_Summary.ini'
+local MY_IsParty, MY_GetSkillName, MY_GetBuffName = X.IsParty, X.GetSkillName, X.GetBuffName
 
 local RT_EQUIP_TOTAL = {
 	'MELEE_WEAPON', -- 轻剑 藏剑取 BIG_SWORD 重剑
@@ -155,10 +126,10 @@ local RT_SCORE_FULL = 30000
 function D.UpdateDungeonInfo(hDungeon)
 	local me = GetClientPlayer()
 	local szText = Table_GetMapName(RT_MAPID)
-	if me.GetMapID() == RT_MAPID and LIB.IsDungeonMap(RT_MAPID) then
+	if me.GetMapID() == RT_MAPID and X.IsDungeonMap(RT_MAPID) then
 		szText = szText .. '\n' .. 'ID:(' .. me.GetScene().nCopyIndex  ..')'
 	else
-		local tCD = LIB.GetMapSaveCopy()
+		local tCD = X.GetMapSaveCopy()
 		if tCD and tCD[RT_MAPID] then
 			szText = szText .. '\n' .. 'ID:(' .. tCD[RT_MAPID][1]  ..')'
 		end
@@ -200,7 +171,7 @@ end
 function D.CalculateSort(tInfo)
 	local nCount = -2
 	if RT_SORT_FIELD == 'tBossKill' then
-		if LIB.IsDungeonRoleProgressMap(RT_MAPID) then
+		if X.IsDungeonRoleProgressMap(RT_MAPID) then
 			nCount = 0
 			for _, p in ipairs(tInfo[RT_SORT_FIELD]) do
 				if p then
@@ -210,7 +181,7 @@ function D.CalculateSort(tInfo)
 				end
 			end
 		else
-			nCount = tInfo.nCopyID or HUGE
+			nCount = tInfo.nCopyID or math.huge
 		end
 	elseif tInfo[RT_SORT_FIELD] then
 		if type(tInfo[RT_SORT_FIELD]) == 'table' then
@@ -246,12 +217,12 @@ function D.UpdateList(page)
 		Enchant = 0,
 		Special = 0,
 	}
-	sort(aTeam, D.Sorter)
+	table.sort(aTeam, D.Sorter)
 
 	for k, v in ipairs(aTeam) do
 		-- 心法统计
 		tKungfu[v.dwMountKungfuID] = tKungfu[v.dwMountKungfuID] or {}
-		insert(tKungfu[v.dwMountKungfuID], v)
+		table.insert(tKungfu[v.dwMountKungfuID], v)
 		D.CountScore(v, tScore)
 		if not RT_SELECT_KUNGFU or (RT_SELECT_KUNGFU and v.dwMountKungfuID == RT_SELECT_KUNGFU) then
 			local szName = 'P' .. v.dwID
@@ -271,7 +242,7 @@ function D.UpdateList(page)
 				h:Lookup('Image_Icon'):FromUITex(GetForceImage(v.dwForceID))
 			end
 			h:Lookup('Text_Name'):SetText(v.szName)
-			h:Lookup('Text_Name'):SetFontColor(LIB.GetForceColor(v.dwForceID))
+			h:Lookup('Text_Name'):SetFontColor(X.GetForceColor(v.dwForceID))
 			-- 药品和BUFF
 			if not h['hHandle_Food'] then
 				h['hHandle_Food'] = {
@@ -321,7 +292,7 @@ function D.UpdateList(page)
 						local nTime = (nEndFrame - GetLogicFrameCount()) / 16
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
-						LIB.OutputBuffTip({ x, y, w, h }, dwID, nLevel, nTime)
+						X.OutputBuffTip({ x, y, w, h }, dwID, nLevel, nTime)
 					end
 					local nTime = (vv.nEndFrame - GetLogicFrameCount()) / 16
 					if nTime < 480 then
@@ -336,7 +307,7 @@ function D.UpdateList(page)
 					if item and not item.bFree then
 						local dwID, nLevel, nEndFrame = select(2, item:GetObject())
 						if dwID and nLevel then
-							if not LIB.GetBuff(v.KPlayer, dwID, nLevel) then
+							if not X.GetBuff(v.KPlayer, dwID, nLevel) then
 								h.hHandle_Food.Pool:Remove(item)
 							end
 						end
@@ -357,9 +328,9 @@ function D.UpdateList(page)
 							local nIcon = select(2, MY_GetBuffName(v.dwID, v.nLevel))
 							local nTime = (v.nEndFrame - GetLogicFrameCount()) / 16
 							local nAlpha = nTime < 600 and 80 or 255
-							insert(xml, '<image> path="fromiconid" frame=' .. nIcon ..' alpha=' .. nAlpha ..  ' w=30 h=30 </image>')
+							table.insert(xml, '<image> path="fromiconid" frame=' .. nIcon ..' alpha=' .. nAlpha ..  ' w=30 h=30 </image>')
 						end
-						OutputTip(concat(xml), 250, { x, y, w, h })
+						OutputTip(table.concat(xml), 250, { x, y, w, h })
 					end
 				else
 					hBuff:SetOverText(1, '')
@@ -370,9 +341,9 @@ function D.UpdateList(page)
 					hBox.OnItemMouseEnter = function()
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
-						local kBuff = LIB.GetBuff(v.KPlayer, RT_GONGZHAN_ID)
+						local kBuff = X.GetBuff(v.KPlayer, RT_GONGZHAN_ID)
 						if kBuff then
-							LIB.OutputBuffTip({ x, y, w, h }, kBuff.dwID, kBuff.nLevel)
+							X.OutputBuffTip({ x, y, w, h }, kBuff.dwID, kBuff.nLevel)
 						end
 					end
 				end
@@ -393,7 +364,7 @@ function D.UpdateList(page)
 					local w, h = this:GetSize()
 					local desc = ''
 					if vv.CommonEnchant then
-						desc = LIB.Table_GetCommonEnchantDesc(vv.dwTemporaryEnchantID)
+						desc = X.Table_GetCommonEnchantDesc(vv.dwTemporaryEnchantID)
 					else
 						-- ... 官方搞的太麻烦了
 						local tEnchant = GetItemEnchantAttrib(vv.dwTemporaryEnchantID)
@@ -443,7 +414,7 @@ function D.UpdateList(page)
 					local box = handle_equip:Lookup(szName)
 					if not box then
 						box = h.hHandle_Equip.Pool:New()
-						LIB.UpdateItemBoxExtend(box, vv.nQuality)
+						X.UpdateItemBoxExtend(box, vv.nQuality)
 					end
 					box:SetName(szName)
 					box:SetObject(UI_OBJECT_OTER_PLAYER_ITEM, vv.nUiId, vv.dwBox, vv.dwX, v.dwID)
@@ -501,7 +472,7 @@ function D.UpdateList(page)
 			end
 			local hCopyID = h:Lookup('Text_CopyID')
 			local hBossKills = h:Lookup('Handle_BossKills')
-			if LIB.IsDungeonRoleProgressMap(RT_MAPID) then
+			if X.IsDungeonRoleProgressMap(RT_MAPID) then
 				for nIndex, bKill in ipairs(v.tBossKill) do
 					local szName = tostring(nIndex)
 					local hBossKill = hBossKills:Lookup(szName)
@@ -516,9 +487,9 @@ function D.UpdateList(page)
 						local w, h = this:GetSize()
 						local texts = {}
 						for i, boss in ipairs(Table_GetCDProcessBoss(RT_MAPID)) do
-							insert(texts, boss.szName .. '\t' .. _L[v.tBossKill[i] and 'x' or 'r'])
+							table.insert(texts, boss.szName .. '\t' .. _L[v.tBossKill[i] and 'x' or 'r'])
 						end
-						OutputTip(GetFormatText(concat(texts, '\n')), 400, { x, y, w, h })
+						OutputTip(GetFormatText(table.concat(texts, '\n')), 400, { x, y, w, h })
 					end
 					hBossKill:Show()
 				end
@@ -562,13 +533,13 @@ function D.UpdateList(page)
 	for k, v in pairs(tScore) do
 		nScore = nScore + v
 	end
-	page.hTotalScore:SetText(floor(nScore))
+	page.hTotalScore:SetText(math.floor(nScore))
 	local nNum      = #D.GetTeamMemberList(true)
 	local nAvgScore = nScore / nNum
 	page.hProgress:Lookup('Image_Progress'):SetPercentage(nAvgScore / RT_SCORE_FULL)
-	page.hProgress:Lookup('Text_Progress'):SetText(_L('Team strength(%d/%d)', floor(nAvgScore), RT_SCORE_FULL))
+	page.hProgress:Lookup('Text_Progress'):SetText(_L('Team strength(%d/%d)', math.floor(nAvgScore), RT_SCORE_FULL))
 	-- 心法统计
-	for k, dwKungfuID in pairs(LIB.GetKungfuIDS()) do
+	for k, dwKungfuID in pairs(X.GetKungfuIDS()) do
 		local h = page.hKungfuList:Lookup(k - 1)
 		local img = h:Lookup('Image_Force')
 		local nCount = 0
@@ -586,22 +557,22 @@ function D.UpdateList(page)
 			h.OnItemMouseEnter = function()
 				this:Lookup('Text_Num'):SetFontScheme(101)
 				local xml = {}
-				insert(xml, GetFormatText(szName .. g_tStrings.STR_COLON .. nCount .. g_tStrings.STR_PERSON ..'\n', 157))
-				sort(tKungfu[dwKungfuID], function(a, b)
+				table.insert(xml, GetFormatText(szName .. g_tStrings.STR_COLON .. nCount .. g_tStrings.STR_PERSON ..'\n', 157))
+				table.sort(tKungfu[dwKungfuID], function(a, b)
 					local nCountA = a.nEquipScore or -1
 					local nCountB = b.nEquipScore or -1
 					return nCountA > nCountB
 				end)
 				for k, v in ipairs(tKungfu[dwKungfuID]) do
 					if v.nEquipScore then
-						insert(xml, GetFormatText(v.szName .. g_tStrings.STR_COLON ..  v.nEquipScore  ..'\n', 106))
+						table.insert(xml, GetFormatText(v.szName .. g_tStrings.STR_COLON ..  v.nEquipScore  ..'\n', 106))
 					else
-						insert(xml, GetFormatText(v.szName ..'\n', 106))
+						table.insert(xml, GetFormatText(v.szName ..'\n', 106))
 					end
 				end
 				local x, y = img:GetAbsPos()
 				local w, h = img:GetSize()
-				OutputTip(concat(xml), 400, { x, y, w, h })
+				OutputTip(table.concat(xml), 400, { x, y, w, h })
 			end
 		end
 	end
@@ -609,10 +580,10 @@ end
 
 local function CreateItemTable(item, dwBox, dwX)
 	return {
-		nIcon     = LIB.GetItemIconByUIID(item.nUiId),
+		nIcon     = X.GetItemIconByUIID(item.nUiId),
 		dwID      = item.dwID,
 		nLevel    = item.nLevel,
-		szName    = LIB.GetItemNameByUIID(item.nUiId),
+		szName    = X.GetItemNameByUIID(item.nUiId),
 		nUiId     = item.nUiId,
 		nVersion  = item.nVersion,
 		dwTabType = item.dwTabType,
@@ -647,16 +618,16 @@ function D.GetEquipCache(page, KPlayer)
 				if equip == 'PENDANT' then
 					local desc = Table_GetItemDesc(item.nUiId)
 					if desc and (desc:find(_L['use'] .. g_tStrings.STR_COLON) or desc:find(_L['Use:']) or desc:find('15' .. g_tStrings.STR_TIME_SECOND)) then
-						insert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
+						table.insert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
 					end
 				-- elseif item.nQuality == 5 then -- 橙色装备
-				-- 	insert(aInfo.tEquip, CreateItemTable(item))
+				-- 	table.insert(aInfo.tEquip, CreateItemTable(item))
 				else
 					-- 黄字装备
 					local aMagicAttrib = item.GetMagicAttrib()
 					for _, tAttrib in ipairs(aMagicAttrib) do
 						if tAttrib.nID == ATTRIBUTE_TYPE.SKILL_EVENT_HANDLER then
-							insert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
+							table.insert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
 							break
 						end
 					end
@@ -664,7 +635,7 @@ function D.GetEquipCache(page, KPlayer)
 			end
 			-- 永久的附魔 用于评分
 			if item.dwPermanentEnchantID and item.dwPermanentEnchantID ~= 0 then
-				insert(aInfo.tPermanentEnchant, {
+				table.insert(aInfo.tPermanentEnchant, {
 					dwPermanentEnchantID = item.dwPermanentEnchantID,
 				})
 			end
@@ -674,10 +645,10 @@ function D.GetEquipCache(page, KPlayer)
 					dwTemporaryEnchantID         = item.dwTemporaryEnchantID,
 					nTemporaryEnchantLeftSeconds = item.GetTemporaryEnchantLeftSeconds()
 				}
-				if LIB.Table_GetCommonEnchantDesc(item.dwTemporaryEnchantID) then
+				if X.Table_GetCommonEnchantDesc(item.dwTemporaryEnchantID) then
 					dat.CommonEnchant = true
 				end
-				insert(aInfo.tTemporaryEnchant, dat)
+				table.insert(aInfo.tTemporaryEnchant, dat)
 			end
 		end
 	end
@@ -689,7 +660,7 @@ function D.GetEquipCache(page, KPlayer)
 		nEquipScore       = KPlayer.GetTotalEquipScore()
 	}
 	page.tViewInvite[KPlayer.dwID] = nil
-	if IsEmpty(page.tViewInvite) then
+	if X.IsEmpty(page.tViewInvite) then
 		if KPlayer.dwID ~= me.dwID then
 			FireUIEvent('MY_RAIDTOOLS_SUCCESS') -- 装备请求完毕
 		end
@@ -713,10 +684,10 @@ function D.UpdateSelfData()
 		if not RT_PLAYER_MAP_COPYID[dwID] then
 			RT_PLAYER_MAP_COPYID[dwID] = {}
 		end
-		RT_PLAYER_MAP_COPYID[dwID][dwMapID] = IsTable(aCopyID) and aCopyID[1] or -1
+		RT_PLAYER_MAP_COPYID[dwID][dwMapID] = X.IsTable(aCopyID) and aCopyID[1] or -1
 		FireUIEvent('MY_TEAMTOOLS_SUMMARY')
 	end
-	LIB.GetMapSaveCopy(fnAction)
+	X.GetMapSaveCopy(fnAction)
 end
 
 function D.RequestTeamData()
@@ -725,11 +696,11 @@ function D.RequestTeamData()
 		return
 	end
 	local aRequestID, aRefreshID = {}, {}
-	local bDungeonMap = LIB.IsDungeonMap(RT_MAPID)
-	local bIsDungeonRoleProgressMap = LIB.IsDungeonRoleProgressMap(RT_MAPID)
+	local bDungeonMap = X.IsDungeonMap(RT_MAPID)
+	local bIsDungeonRoleProgressMap = X.IsDungeonRoleProgressMap(RT_MAPID)
 	--[[#DEBUG BEGIN]]
 	if bIsDungeonRoleProgressMap then
-		LIB.Debug(PACKET_INFO.NAME_SPACE, 'Update team map progress.', DEBUG_LEVEL.LOG)
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Update team map progress.', X.DEBUG_LEVEL.LOG)
 	end
 	--[[#DEBUG END]]
 	local aTeamMemberList = D.GetTeamMemberList(true)
@@ -741,23 +712,23 @@ function D.RequestTeamData()
 				RT_PLAYER_MAP_COPYID[dwID] = {}
 			end
 			if RT_PLAYER_MAP_COPYID[dwID][RT_MAPID] then
-				insert(aRefreshID, dwID)
+				table.insert(aRefreshID, dwID)
 			else
-				insert(aRequestID, dwID)
+				table.insert(aRequestID, dwID)
 			end
 		end
 	end
-	if not IsEmpty(aRequestID) or not IsEmpty(aRefreshID) then
+	if not X.IsEmpty(aRequestID) or not X.IsEmpty(aRefreshID) then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(PACKET_INFO.NAME_SPACE, 'Request team map copy id.', DEBUG_LEVEL.LOG)
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Request team map copy id.', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		if #aRequestID == #aTeamMemberList then
 			aRequestID = nil
 		end
-		if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-			LIB.Systopmsg(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
+		if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+			X.Systopmsg(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
 		else
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID, aRequestID, nil})
+			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID, aRequestID, nil})
 		end
 	end
 	-- 刷新自己的
@@ -769,8 +740,8 @@ function D.GetTeam(page)
 	local me    = GetClientPlayer()
 	local team  = GetClientTeam()
 	local aList = {}
-	local bIsInParty = LIB.IsInParty()
-	local bIsDungeonRoleProgressMap = LIB.IsDungeonRoleProgressMap(RT_MAPID)
+	local bIsInParty = X.IsInParty()
+	local bIsDungeonRoleProgressMap = X.IsDungeonRoleProgressMap(RT_MAPID)
 	local aProgressMapBoss = bIsDungeonRoleProgressMap and Table_GetCDProcessBoss(RT_MAPID)
 	local aRequestMapCopyID = {}
 	local aTeamMemberList = D.GetTeamMemberList()
@@ -800,15 +771,15 @@ function D.GetTeam(page)
 		end
 		if KPlayer then
 			-- 小吃和buff
-			local aBuff, nCount, buff, nType = LIB.GetBuffList(KPlayer)
+			local aBuff, nCount, buff, nType = X.GetBuffList(KPlayer)
 			for i = 1, nCount do
 				buff = aBuff[i]
 				nType = GetBuffInfo(buff.dwID, buff.nLevel, {}).nDetachType or 0
 				if RT_FOOD_TYPE[nType] then
-					insert(aInfo.tFood, buff)
+					table.insert(aInfo.tFood, buff)
 				end
 				if RT_BUFF_ID[buff.dwID] then
-					insert(aInfo.tBuff, buff)
+					table.insert(aInfo.tBuff, buff)
 				end
 				if buff.dwID == RT_GONGZHAN_ID then -- grandpa
 					aInfo.bGrandpa = true
@@ -825,7 +796,7 @@ function D.GetTeam(page)
 			end
 		end
 		setmetatable(aInfo, { __index = page.tDataCache[dwID] })
-		insert(aList, aInfo)
+		table.insert(aList, aInfo)
 	end
 	return aList
 end
@@ -860,7 +831,7 @@ function D.GetTeamMemberList(bIsOnLine)
 			for k, v in ipairs(team.GetTeamMemberList()) do
 				local info = team.GetMemberInfo(v)
 				if info and info.bIsOnLine then
-					insert(tTeam, v)
+					table.insert(tTeam, v)
 				end
 			end
 			return tTeam
@@ -880,16 +851,16 @@ function D.SetMapID(dwMapID)
 	FireUIEvent('MY_RAIDTOOLS_MAPID_CHANGE')
 end
 
-LIB.RegisterEvent('LOADING_END', function()
+X.RegisterEvent('LOADING_END', function()
 	D.SetMapID(GetClientPlayer().GetMapID())
 end)
 
-LIB.RegisterBgMsg('MY_MAP_COPY_ID', function(_, data, nChannel, dwID, szName, bIsSelf)
+X.RegisterBgMsg('MY_MAP_COPY_ID', function(_, data, nChannel, dwID, szName, bIsSelf)
 	local dwMapID, aCopyID = data[1], data[2]
 	if not RT_PLAYER_MAP_COPYID[dwID] then
 		RT_PLAYER_MAP_COPYID[dwID] = {}
 	end
-	RT_PLAYER_MAP_COPYID[dwID][dwMapID] = IsTable(aCopyID) and aCopyID[1] or -1
+	RT_PLAYER_MAP_COPYID[dwID][dwMapID] = X.IsTable(aCopyID) and aCopyID[1] or -1
 	FireUIEvent('MY_TEAMTOOLS_SUMMARY')
 end)
 
@@ -955,7 +926,7 @@ function D.OnInitPage()
 	this.hKungfuList = page:Lookup('Wnd_Summary', 'Handle_Kungfu/Handle_Kungfu_List')
 	this.hKungfu     = frame:CreateItemData(SZ_INI, 'Handle_Kungfu_Item')
 	this.hKungfuList:Clear()
-	for k, dwKungfuID in pairs(LIB.GetKungfuIDS()) do
+	for k, dwKungfuID in pairs(X.GetKungfuIDS()) do
 		local h = this.hKungfuList:AppendItemFromData(this.hKungfu, dwKungfuID)
 		local img = h:Lookup('Image_Force')
 		img:FromIconID(select(2, MY_GetSkillName(dwKungfuID)))
@@ -1005,15 +976,15 @@ function D.OnActivePage()
 	if hView and hView:IsVisible() then
 		hView:Hide()
 	end
-	LIB.BreatheCall('MY_RaidTools_Draw', 1000, D.UpdateList, this)
-	LIB.BreatheCall('MY_RaidTools_GetEquip', 3000, D.GetEquip, this)
-	LIB.BreatheCall('MY_RaidTools_RequestTeamData', 30000, D.RequestTeamData, this)
+	X.BreatheCall('MY_RaidTools_Draw', 1000, D.UpdateList, this)
+	X.BreatheCall('MY_RaidTools_GetEquip', 3000, D.GetEquip, this)
+	X.BreatheCall('MY_RaidTools_RequestTeamData', 30000, D.RequestTeamData, this)
 end
 
 function D.OnDeactivePage()
-	LIB.BreatheCall('MY_RaidTools_Draw', false)
-	LIB.BreatheCall('MY_RaidTools_GetEquip', false)
-	LIB.BreatheCall('MY_RaidTools_RequestTeamData', false)
+	X.BreatheCall('MY_RaidTools_Draw', false)
+	X.BreatheCall('MY_RaidTools_GetEquip', false)
+	X.BreatheCall('MY_RaidTools_RequestTeamData', false)
 end
 
 function D.OnEvent(szEvent)
@@ -1075,14 +1046,14 @@ function D.OnItemMouseEnter()
 		img:SetFrame(23)
 		local nScore = this:Lookup('Text_TotalScore'):GetText()
 		local xml = {}
-		insert(xml, GetFormatText(g_tStrings.STR_SCORE .. g_tStrings.STR_COLON .. nScore ..'\n', 65))
+		table.insert(xml, GetFormatText(g_tStrings.STR_SCORE .. g_tStrings.STR_COLON .. nScore ..'\n', 65))
 		for k, v in pairs(this:GetParent():GetParent():GetParent().tScore) do
-			insert(xml, GetFormatText(RT_SCORE[k] .. g_tStrings.STR_COLON, 67))
-			insert(xml, GetFormatText(v ..'\n', 44))
+			table.insert(xml, GetFormatText(RT_SCORE[k] .. g_tStrings.STR_COLON, 67))
+			table.insert(xml, GetFormatText(v ..'\n', 44))
 		end
 		local x, y = img:GetAbsPos()
 		local w, h = img:GetSize()
-		OutputTip(concat(xml), 400, { x, y, w, h })
+		OutputTip(table.concat(xml), 400, { x, y, w, h })
 	end
 end
 
@@ -1099,13 +1070,13 @@ end
 function D.OnItemLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Handle_Dungeon' then
-		local menu = LIB.GetDungeonMenu(function(p) D.SetMapID(p.dwID) end)
+		local menu = X.GetDungeonMenu(function(p) D.SetMapID(p.dwID) end)
 		menu.x, menu.y = Cursor.GetPos(true)
 		PopupMenu(menu)
 	elseif tonumber(szName:find('P(%d+)')) then
 		local dwID = tonumber(szName:match('P(%d+)'))
 		if IsCtrlKeyDown() then
-			LIB.EditBox_AppendLinkPlayer(this.szName)
+			X.EditBox_AppendLinkPlayer(this.szName)
 		else
 			D.ViewInviteToPlayer(this:GetParent():GetParent():GetParent():GetParent(), dwID)
 		end
@@ -1134,7 +1105,7 @@ function D.OnItemRButtonClick()
 			if v.szOption == g_tStrings.LOOKUP_INFO then
 				for _, vv in ipairs(v) do
 					if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then
-						insert(menu, vv)
+						table.insert(menu, vv)
 						break
 					end
 				end
@@ -1167,5 +1138,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools.RegisterModule('Summary', _L['MY_TeamTools_Summary'], LIB.CreateModule(settings))
+MY_TeamTools.RegisterModule('Summary', _L['MY_TeamTools_Summary'], X.CreateModule(settings))
 end

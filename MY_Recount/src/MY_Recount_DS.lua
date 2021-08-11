@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -419,53 +390,53 @@ local VERSION = 2
 local D = {
 	bRecEverything = false, -- ¼ÆËã³öÀ´µÄÊÇ·ñ²É¼¯¸´ÅÌÊý¾Ý¿ª¹Ø£¬¹ýÍ¼ÖØËã
 }
-local O = LIB.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
 	bEnable = { -- Êý¾Ý¼ÇÂ¼×Ü¿ª¹Ø ·ÀÖ¹¹Ù·½SB¼¼ÄÜBUFF½Å±¾Ï¹¼¸°ÑÐ´³¬¸ßÆµÌ«¿¨Ë¦¹ø¸ø½çÃæÂß¼­
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSaveHistoryOnExit = { -- ÍË³öÓÎÏ·Ê±±£´æÀúÊ·Êý¾Ý
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSaveHistoryOnExFi = { -- ÍÑÀëÕ½¶·Ê±±£´æÀúÊ·Êý¾Ý
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nMaxHistory = { -- ×î´óÀúÊ·Êý¾ÝÊýÁ¿
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 10,
 	},
 	nMinFightTime = { -- ×îÐ¡Õ½¶·Ê±¼ä
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},
 	bRecEverything = { -- ÊÇ·ñ²É¼¯¸´ÅÌÊý¾Ý
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount_FP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bREOnlyDungeon = { -- ½öÔÚÃØ¾³ÖÐÆôÓÃ
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount_FP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSaveEverything = { -- ±£´æÕ½¶·¼ÇÂ¼Ê±ÊÇ·ñ´æ´¢¸´ÅÌÊý¾Ý
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount_FP'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 })
@@ -474,8 +445,8 @@ local HISTORY_CACHE = setmetatable({}, { __mode = 'v' }) -- ÀúÊ·Õ½¶·¼ÇÂ¼»º´æ { [
 local KEPT_CACHE = {} -- ±£´æÁËµ«ÊÇÌÞ³ýÁË¸´ÅÌ¼ÇÂ¼µÄÕ½¶·¼ÇÂ¼»º´æ { [szFile] = Data }
 local UNSAVED_CACHE = {} -- Î´±£´æµÄÕ½¶·¼ÇÂ¼»º´æ { [szFile] = Data }
 local DS_DATA_CONFIG = { passphrase = false, crc = false }
-local DS_ROOT = {'userdata/fight_stat/', PATH_TYPE.ROLE}
-local SZ_CFG_FILE = {'userdata/fight_stat/config.jx3dat', PATH_TYPE.ROLE}
+local DS_ROOT = {'userdata/fight_stat/', X.PATH_TYPE.ROLE}
+local SZ_CFG_FILE = {'userdata/fight_stat/config.jx3dat', X.PATH_TYPE.ROLE}
 local SKILL_EFFECT_CACHE = {} -- ×î½üµÄ¼¼ÄÜÐ§¹û»º´æ £¨½øÕ½Ê±ºò½«×î½üµÄÊý¾ÝÑ¹½øÀ´£©
 local BUFF_UPDATE_CACHE = {} -- ×î½üµÄBUFFÐ§¹û»º´æ £¨½øÕ½Ê±ºò½«×î½üµÄÊý¾ÝÑ¹½øÀ´£©
 local ABSORB_CACHE = {} -- Ä¿±ê¶ÜÀ´Ô´Óë×´Ì¬»º´æ±í
@@ -490,7 +461,7 @@ local function Min(a, b)
 	if b == -1 then
 		return a
 	end
-	return min(a, b)
+	return math.min(a, b)
 end
 
 local AsyncSaveLuaData = _G.AsyncSaveLuaData or SaveLUAData
@@ -511,22 +482,22 @@ local AsyncSaveLuaData = _G.AsyncSaveLuaData or SaveLUAData
 -- ##################################################################################################
 -- µÇÂ¼ÓÎÏ·¼ÓÔØ±£´æµÄÊý¾Ý
 function D.LoadData()
-	local data = LIB.LoadLUAData(SZ_CFG_FILE, DS_DATA_CONFIG)
+	local data = X.LoadLUAData(SZ_CFG_FILE, DS_DATA_CONFIG)
 	if data then
-		if IsTable(data.History) then
+		if X.IsTable(data.History) then
 			for _, data in ipairs(data.History) do
-				UNSAVED_CACHE[LIB.FormatPath(DS_ROOT) .. D.GetDataFileName(data)] = data
+				UNSAVED_CACHE[X.FormatPath(DS_ROOT) .. D.GetDataFileName(data)] = data
 			end
 			D.SaveHistory()
 		end
-		O.bEnable            = Get(data, 'bEnable', false)
-		O.bSaveHistoryOnExit = Get(data, 'bSaveHistoryOnExit', false)
-		O.bSaveHistoryOnExFi = Get(data, 'bSaveHistoryOnExFi', false)
-		O.nMaxHistory        = Get(data, 'nMaxHistory', 10)
-		O.nMinFightTime      = Get(data, 'nMinFightTime', 30)
-		O.bRecEverything     = false -- Get(data, 'bRecEverything', false)
-		O.bREOnlyDungeon     = Get(data, 'bREOnlyDungeon', true)
-		O.bSaveEverything    = false -- Get(data, 'bSaveEverything', false)
+		O.bEnable            = X.Get(data, 'bEnable', false)
+		O.bSaveHistoryOnExit = X.Get(data, 'bSaveHistoryOnExit', false)
+		O.bSaveHistoryOnExFi = X.Get(data, 'bSaveHistoryOnExFi', false)
+		O.nMaxHistory        = X.Get(data, 'nMaxHistory', 10)
+		O.nMinFightTime      = X.Get(data, 'nMinFightTime', 30)
+		O.bRecEverything     = false -- X.Get(data, 'bRecEverything', false)
+		O.bREOnlyDungeon     = X.Get(data, 'bREOnlyDungeon', true)
+		O.bSaveEverything    = false -- X.Get(data, 'bSaveEverything', false)
 		MY_Recount_UI.CheckOpen()
 	end
 	D.InitData()
@@ -534,26 +505,26 @@ end
 
 -- ÍË³öÓÎÏ·±£´æÊý¾Ý
 function D.SaveData()
-	LIB.SaveLUAData(SZ_CFG_FILE, nil, DS_DATA_CONFIG)
+	X.SaveLUAData(SZ_CFG_FILE, nil, DS_DATA_CONFIG)
 end
 
 -- ¼ÓÔØÀúÊ·Êý¾ÝÁÐ±í
 function D.GetHistoryFiles()
 	local aFiles = {}
 	local aFileName, tFileName = {}, {}
-	local szRoot = LIB.FormatPath(DS_ROOT)
+	local szRoot = X.FormatPath(DS_ROOT)
 	for k, _ in pairs(HISTORY_CACHE) do
-		if wfind(k, szRoot) == 1 then
+		if wstring.find(k, szRoot) == 1 then
 			k = k:sub(#szRoot + 1)
 			if not tFileName[k] then
-				insert(aFileName, k)
+				table.insert(aFileName, k)
 				tFileName[k] = true
 			end
 		end
 	end
 	for _, v in ipairs(CPath.GetFileList(szRoot)) do
 		if not tFileName[v] then
-			insert(aFileName, v)
+			table.insert(aFileName, v)
 			tFileName[v] = true
 		end
 	end
@@ -567,7 +538,7 @@ function D.GetHistoryFiles()
 			minute = tonumber(minute)
 			second = tonumber(second)
 			during = tonumber(during)
-			insert(aFiles, {
+			table.insert(aFiles, {
 				year, month, day, hour, minute, second,
 				bossname = bossname,
 				during = during,
@@ -586,7 +557,7 @@ function D.GetHistoryFiles()
 		end
 	end
 	local function sortFile(a, b)
-		local n = max(#a, #b)
+		local n = math.max(#a, #b)
 		for i = 1, n do
 			if not a[i] then
 				return true
@@ -598,7 +569,7 @@ function D.GetHistoryFiles()
 		end
 		return false
 	end
-	sort(aFiles, sortFile)
+	table.sort(aFiles, sortFile)
 	return aFiles
 end
 
@@ -615,9 +586,9 @@ end
 
 -- ¸ù¾ÝÒ»¸öÊý¾ÝÉú³ÉÎÄ¼þÃû
 function D.GetDataFileName(data)
-	return LIB.FormatTime(data[DK.TIME_BEGIN], '%yyyy-%MM-%dd-%hh-%mm-%ss')
+	return X.FormatTime(data[DK.TIME_BEGIN], '%yyyy-%MM-%dd-%hh-%mm-%ss')
 			.. '_' .. (data[DK.BOSSNAME] or g_tStrings.STR_NAME_UNKNOWN)
-			.. '_' .. ceil(data[DK.TIME_DURING])
+			.. '_' .. math.ceil(data[DK.TIME_DURING])
 			.. '.fstt.jx3dat'
 end
 
@@ -625,12 +596,12 @@ end
 function D.SaveHistory()
 	for szFilePath, data in pairs(UNSAVED_CACHE) do
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_Recount_DS.SaveHistory: ' .. szFilePath, DEBUG_LEVEL.LOG)
+		X.Debug('MY_Recount_DS.SaveHistory: ' .. szFilePath, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local saveData = data
 		if not O.bSaveEverything then -- ±£´æÊý¾ÝÊ±ÌÞ³ý¸´ÅÌÊý¾Ý£¨·ÀÖ¹¿¨£©
 			--[[#DEBUG BEGIN]]
-			LIB.Debug('MY_Recount_DS.SaveHistoryWithoutEverything: ' .. szFilePath, DEBUG_LEVEL.LOG)
+			X.Debug('MY_Recount_DS.SaveHistoryWithoutEverything: ' .. szFilePath, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			saveData = {}
 			for k, v in pairs(data) do
@@ -647,11 +618,11 @@ function D.SaveHistory()
 end
 
 function D.UpdateIsRecEverything()
-	D.bRecEverything = O.bRecEverything and (not O.bREOnlyDungeon or LIB.IsInDungeon())
+	D.bRecEverything = O.bRecEverything and (not O.bREOnlyDungeon or X.IsInDungeon())
 end
 
 -- ¹ýÍ¼Çå³ýµ±Ç°Õ½¶·Êý¾Ý
-LIB.RegisterEvent({'LOADING_ENDING', 'RELOAD_UI_ADDON_END', 'BATTLE_FIELD_END', 'ARENA_END', 'MY_CLIENT_PLAYER_LEAVE_SCENE'}, function()
+X.RegisterEvent({'LOADING_ENDING', 'RELOAD_UI_ADDON_END', 'BATTLE_FIELD_END', 'ARENA_END', 'MY_CLIENT_PLAYER_LEAVE_SCENE'}, function()
 	D.FlushData()
 	SKILL_EFFECT_CACHE = {}
 	BUFF_UPDATE_CACHE = {}
@@ -662,7 +633,7 @@ LIB.RegisterEvent({'LOADING_ENDING', 'RELOAD_UI_ADDON_END', 'BATTLE_FIELD_END', 
 end)
 
 -- ÍË³öÕ½¶· ±£´æÊý¾Ý
-LIB.RegisterEvent('MY_FIGHT_HINT', function()
+X.RegisterEvent('MY_FIGHT_HINT', function()
 	if not D.bReady or not O.bEnable then
 		return
 	end
@@ -697,9 +668,9 @@ function D.GetPlayer(dwID)
 	end
 	if info then
 		if player then
-			info.fCurrentLife64, info.fMaxLife64 = LIB.GetObjectLife(player)
+			info.fCurrentLife64, info.fMaxLife64 = X.GetObjectLife(player)
 		else
-			info.fCurrentLife64, info.fMaxLife64 = LIB.GetObjectLife(info)
+			info.fCurrentLife64, info.fMaxLife64 = X.GetObjectLife(info)
 		end
 	end
 	return player, info
@@ -728,9 +699,9 @@ function D.Get(szFilePath)
 	end
 	if not HISTORY_CACHE[szFilePath] then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_Recount_DS.CacheMiss: ' .. szFilePath, DEBUG_LEVEL.LOG)
+		X.Debug('MY_Recount_DS.CacheMiss: ' .. szFilePath, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		HISTORY_CACHE[szFilePath] = LIB.LoadLUAData(szFilePath, DS_DATA_CONFIG)
+		HISTORY_CACHE[szFilePath] = X.LoadLUAData(szFilePath, DS_DATA_CONFIG)
 	end
 	return HISTORY_CACHE[szFilePath]
 end
@@ -740,7 +711,7 @@ end
 --     (string)szFilePath: ÀúÊ·¼ÇÂ¼ÎÄ¼þÈ«Â·¾¶
 -- (void) D.Del(data)       -- É¾³ýÖ¸¶¨¼ÇÂ¼
 function D.Del(data)
-	if IsString(data) then
+	if X.IsString(data) then
 		CPath.DelFile(data)
 		HISTORY_CACHE[data] = nil
 		UNSAVED_CACHE[data] = nil
@@ -779,7 +750,7 @@ function D.GeneAwayTime(data, dwID, szRecordType)
 	else
 		nAwayTime = data[DK.TIME_DURING] - nFightTime
 	end
-	return max(nAwayTime, 0)
+	return math.max(nAwayTime, 0)
 end
 end
 
@@ -795,14 +766,14 @@ function D.GeneFightTime(data, szRecordType, dwID)
 	nTimeDuring = data[DK.TIME_DURING]
 	nTimeBegin  = data[DK.TIME_BEGIN]
 	if nTimeDuring < 0 then
-		nTimeDuring = floor(LIB.GetFightTime() / 1000) + nTimeDuring + 1
+		nTimeDuring = math.floor(X.GetFightTime() / 1000) + nTimeDuring + 1
 	end
 	if szRecordType and data[szRecordType] and data[szRecordType][DK_REC.TIME_DURING] then
 		nTimeDuring = data[szRecordType][DK_REC.TIME_DURING]
 	end
 	if dwID and data[DK.AWAYTIME] and data[DK.AWAYTIME][dwID] then
 		for _, rec in ipairs(data[DK.AWAYTIME][dwID]) do
-			nAwayBegin = max(rec[1], nTimeBegin)
+			nAwayBegin = math.max(rec[1], nTimeBegin)
 			nAwayEnd   = rec[2]
 			if nAwayEnd then -- ÍêÕûµÄÀë¿ª¼ÇÂ¼
 				nTimeDuring = nTimeDuring - (nAwayEnd - nAwayBegin)
@@ -812,7 +783,7 @@ function D.GeneFightTime(data, szRecordType, dwID)
 			end
 		end
 	end
-	return max(nTimeDuring, 0)
+	return math.max(nTimeDuring, 0)
 end
 end
 
@@ -843,11 +814,11 @@ end
 do local KCaster, KTarget, dwTargetEmployer, me, szEffectID, nTherapy, nEffectTherapy, nDamage, nEffectDamage, szType
 function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	-- »ñÈ¡ÊÍ·Å¶ÔÏóºÍ³ÐÊÜ¶ÔÏó
-	KCaster = LIB.GetObject(dwCaster)
+	KCaster = X.GetObject(dwCaster)
 	if KCaster and not IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- ³èÎïµÄÊý¾ÝËãÔÚÖ÷ÈËÍ³¼ÆÖÐ
-		KCaster = LIB.GetObject(KCaster.dwEmployer)
+		KCaster = X.GetObject(KCaster.dwEmployer)
 	end
-	KTarget, dwTargetEmployer = LIB.GetObject(dwTarget), nil
+	KTarget, dwTargetEmployer = X.GetObject(dwTarget), nil
 	if KTarget and not IsPlayer(dwTarget) and KTarget.dwEmployer and KTarget.dwEmployer ~= 0 then
 		dwTargetEmployer = KTarget.dwEmployer
 	end
@@ -862,8 +833,8 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 	if dwCaster ~= me.dwID                 -- ÊÍ·ÅÕß²»ÊÇ×Ô¼º
 	and dwTarget ~= me.dwID                -- ³ÐÊÜÕß²»ÊÇ×Ô¼º
 	and dwTargetEmployer ~= me.dwID        -- ³ÐÊÜÕßÖ÷ÈË²»ÊÇ×Ô¼º
-	and not LIB.IsInArena()                -- ²»ÔÚÃû½£´ó»á
-	and not LIB.IsInBattleField()          -- ²»ÔÚÕ½³¡
+	and not X.IsInArena()                -- ²»ÔÚÃû½£´ó»á
+	and not X.IsInBattleField()          -- ²»ÔÚÕ½³¡
 	and not me.IsPlayerInMyParty(dwCaster) -- ÇÒÊÍ·ÅÕß²»ÊÇ¶ÓÓÑ
 	and not me.IsPlayerInMyParty(dwTarget) -- ÇÒ³ÐÊÜÕß²»ÊÇ¶ÓÓÑ
 	and not (dwTargetEmployer and me.IsPlayerInMyParty(dwTargetEmployer)) -- ÇÒ³ÐÊÜÕßÖ÷ÈË²»ÊÇ¶ÓÓÑ
@@ -872,7 +843,7 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 	end
 
 	-- Î´½øÕ½Ôò³õÊ¼»¯Í³¼ÆÊý¾Ý£¨¼´Ä¬ÈÏµ±Ç°Ö¡ËùÓÐµÄ¼¼ÄÜÈÕÖ¾Îª½øÕ½¼¼ÄÜ£©
-	if not LIB.GetFightUUID() and D.nLastAutoInitFrame ~= GetLogicFrameCount() then
+	if not X.GetFightUUID() and D.nLastAutoInitFrame ~= GetLogicFrameCount() then
 		D.nLastAutoInitFrame = GetLogicFrameCount()
 		D.InitData()
 	end
@@ -929,16 +900,16 @@ do local nLFC, nTime, nTick
 function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 	while SKILL_EFFECT_CACHE[1] and nLFC - SKILL_EFFECT_CACHE[1][1] > LOG_REPLAY_FRAME do
-		remove(SKILL_EFFECT_CACHE, 1)
+		table.remove(SKILL_EFFECT_CACHE, 1)
 	end
-	insert(SKILL_EFFECT_CACHE, {nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult})
+	table.insert(SKILL_EFFECT_CACHE, {nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult})
 	D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 end
 end
 
 do local KCaster, szEffectID
 function D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
-	KCaster = LIB.GetObject(dwCaster)
+	KCaster = X.GetObject(dwCaster)
 	if KCaster and not IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- ³èÎïµÄÊý¾ÝËãÔÚÖ÷ÈËÍ³¼ÆÖÐ
 		dwCaster = KCaster.dwEmployer
 	end
@@ -960,9 +931,9 @@ function D.OnBuffUpdate(dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bD
 	end
 	nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 	while BUFF_UPDATE_CACHE[1] and nLFC - BUFF_UPDATE_CACHE[1][1] > LOG_REPLAY_FRAME do
-		remove(BUFF_UPDATE_CACHE, 1)
+		table.remove(BUFF_UPDATE_CACHE, 1)
 	end
-	insert(BUFF_UPDATE_CACHE, {nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel})
+	table.insert(BUFF_UPDATE_CACHE, {nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel})
 	D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
 end
 end
@@ -1018,7 +989,7 @@ function D.GetEffectNameAusID(data, szChannel, szEffectID)
 		return
 	end
 	info = data[DK.EFFECT_LIST][szEffectID]
-	if info and not IsEmpty(info[1]) then
+	if info and not X.IsEmpty(info[1]) then
 		if info[3] == SKILL_EFFECT_TYPE.BUFF then
 			if szChannel == DK.HEAL or szChannel == DK.BE_HEAL then
 				return info[1] .. '(HOT)'
@@ -1054,7 +1025,7 @@ function D.InsertEverything(data, nLFC, nTime, nTick, szName, ...)
 	if not D.bRecEverything then
 		return
 	end
-	insert(data[DK.EVERYTHING], {nLFC, nTime, nTick, szName, ...})
+	table.insert(data[DK.EVERYTHING], {nLFC, nTime, nTick, szName, ...})
 end
 
 -- ½«Ò»Ìõ¼ÇÂ¼²åÈëÊý×é
@@ -1100,20 +1071,20 @@ function D.InsertRecord(data, szRecordType, dwOwnerID, dwTargetID, szEffectID, n
 	end
 	tResult = tRecord[DK_REC_STAT.DETAIL][nSkillResult]
 	tResult[DK_REC_STAT_DETAIL.COUNT     ] = tResult[DK_REC_STAT_DETAIL.COUNT] + 1 -- ÃüÖÐ´ÎÊý£¨¼ÙÉènSkillResultÊÇÃüÖÐ£©
-	tResult[DK_REC_STAT_DETAIL.MAX       ] = max(tResult[DK_REC_STAT_DETAIL.MAX], nValue) -- µ¥´ÎÃüÖÐ×î´óÖµ
-	tResult[DK_REC_STAT_DETAIL.MAX_EFFECT] = max(tResult[DK_REC_STAT_DETAIL.MAX_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×î´óÓÐÐ§Öµ
+	tResult[DK_REC_STAT_DETAIL.MAX       ] = math.max(tResult[DK_REC_STAT_DETAIL.MAX], nValue) -- µ¥´ÎÃüÖÐ×î´óÖµ
+	tResult[DK_REC_STAT_DETAIL.MAX_EFFECT] = math.max(tResult[DK_REC_STAT_DETAIL.MAX_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×î´óÓÐÐ§Öµ
 	tResult[DK_REC_STAT_DETAIL.MIN       ] = Min(tResult[DK_REC_STAT_DETAIL.MIN], nValue) -- µ¥´ÎÃüÖÐ×îÐ¡Öµ
 	tResult[DK_REC_STAT_DETAIL.MIN_EFFECT] = Min(tResult[DK_REC_STAT_DETAIL.MIN_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×îÐ¡ÓÐÐ§Öµ
 	tResult[DK_REC_STAT_DETAIL.TOTAL       ] = tResult[DK_REC_STAT_DETAIL.TOTAL] + nValue -- ËùÒÔÃüÖÐ×ÜÉËº¦
 	tResult[DK_REC_STAT_DETAIL.TOTAL_EFFECT] = tResult[DK_REC_STAT_DETAIL.TOTAL_EFFECT] + nEffectValue -- ËùÓÐÃüÖÐ×ÜÓÐÐ§ÉËº¦
-	tResult[DK_REC_STAT_DETAIL.AVG         ] = floor(tResult[DK_REC_STAT_DETAIL.TOTAL] / tResult[DK_REC_STAT_DETAIL.COUNT]) -- µ¥´ÎÃüÖÐÆ½¾ùÖµ
-	tResult[DK_REC_STAT_DETAIL.AVG_EFFECT  ] = floor(tResult[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_DETAIL.COUNT]) -- µ¥´ÎÃüÖÐÆ½¾ùÓÐÐ§Öµ
+	tResult[DK_REC_STAT_DETAIL.AVG         ] = math.floor(tResult[DK_REC_STAT_DETAIL.TOTAL] / tResult[DK_REC_STAT_DETAIL.COUNT]) -- µ¥´ÎÃüÖÐÆ½¾ùÖµ
+	tResult[DK_REC_STAT_DETAIL.AVG_EFFECT  ] = math.floor(tResult[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_DETAIL.COUNT]) -- µ¥´ÎÃüÖÐÆ½¾ùÓÐÐ§Öµ
 	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
 		tResult[DK_REC_STAT_DETAIL.NZ_COUNT] = tResult[DK_REC_STAT_DETAIL.NZ_COUNT] + 1 -- ÃüÖÐ´ÎÊý£¨¼ÙÉènSkillResultÊÇÃüÖÐ£©
 		tResult[DK_REC_STAT_DETAIL.NZ_MIN  ] = Min(tResult[DK_REC_STAT_DETAIL.NZ_MIN], nValue) -- µ¥´ÎÃüÖÐ×îÐ¡Öµ
 		tResult[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT] = Min(tResult[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×îÐ¡ÓÐÐ§Öµ
-		tResult[DK_REC_STAT_DETAIL.NZ_AVG       ] = floor(tResult[DK_REC_STAT_DETAIL.TOTAL] / tResult[DK_REC_STAT_DETAIL.NZ_COUNT]) -- µ¥´ÎÃüÖÐÆ½¾ùÖµ
-		tResult[DK_REC_STAT_DETAIL.NZ_AVG_EFFECT] = floor(tResult[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_DETAIL.NZ_COUNT]) -- µ¥´ÎÃüÖÐÆ½¾ùÓÐÐ§Öµ
+		tResult[DK_REC_STAT_DETAIL.NZ_AVG       ] = math.floor(tResult[DK_REC_STAT_DETAIL.TOTAL] / tResult[DK_REC_STAT_DETAIL.NZ_COUNT]) -- µ¥´ÎÃüÖÐÆ½¾ùÖµ
+		tResult[DK_REC_STAT_DETAIL.NZ_AVG_EFFECT] = math.floor(tResult[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_DETAIL.NZ_COUNT]) -- µ¥´ÎÃüÖÐÆ½¾ùÓÐÐ§Öµ
 	end
 
 	------------------------
@@ -1138,16 +1109,16 @@ function D.InsertRecord(data, szRecordType, dwOwnerID, dwTargetID, szEffectID, n
 	end
 	tSkillRecord = tRecord[DK_REC_STAT.SKILL][szEffectID]
 	tSkillRecord[DK_REC_STAT_SKILL.COUNT       ] = tSkillRecord[DK_REC_STAT_SKILL.COUNT] + 1
-	tSkillRecord[DK_REC_STAT_SKILL.MAX         ] = max(tSkillRecord[DK_REC_STAT_SKILL.MAX], nValue)
-	tSkillRecord[DK_REC_STAT_SKILL.MAX_EFFECT  ] = max(tSkillRecord[DK_REC_STAT_SKILL.MAX_EFFECT], nEffectValue)
+	tSkillRecord[DK_REC_STAT_SKILL.MAX         ] = math.max(tSkillRecord[DK_REC_STAT_SKILL.MAX], nValue)
+	tSkillRecord[DK_REC_STAT_SKILL.MAX_EFFECT  ] = math.max(tSkillRecord[DK_REC_STAT_SKILL.MAX_EFFECT], nEffectValue)
 	tSkillRecord[DK_REC_STAT_SKILL.TOTAL       ] = tSkillRecord[DK_REC_STAT_SKILL.TOTAL] + nValue
 	tSkillRecord[DK_REC_STAT_SKILL.TOTAL_EFFECT] = tSkillRecord[DK_REC_STAT_SKILL.TOTAL_EFFECT] + nEffectValue
-	tSkillRecord[DK_REC_STAT_SKILL.AVG         ] = floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL] / tSkillRecord[DK_REC_STAT_SKILL.COUNT])
-	tSkillRecord[DK_REC_STAT_SKILL.AVG_EFFECT  ] = floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tSkillRecord[DK_REC_STAT_SKILL.COUNT])
+	tSkillRecord[DK_REC_STAT_SKILL.AVG         ] = math.floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL] / tSkillRecord[DK_REC_STAT_SKILL.COUNT])
+	tSkillRecord[DK_REC_STAT_SKILL.AVG_EFFECT  ] = math.floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tSkillRecord[DK_REC_STAT_SKILL.COUNT])
 	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
 		tSkillRecord[DK_REC_STAT_SKILL.NZ_COUNT]     = tSkillRecord[DK_REC_STAT_SKILL.NZ_COUNT] + 1
-		tSkillRecord[DK_REC_STAT_SKILL.NZ_AVG]       = floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL] / tSkillRecord[DK_REC_STAT_SKILL.NZ_COUNT])
-		tSkillRecord[DK_REC_STAT_SKILL.NZ_AVG_EFFECT] = floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tSkillRecord[DK_REC_STAT_SKILL.NZ_COUNT])
+		tSkillRecord[DK_REC_STAT_SKILL.NZ_AVG]       = math.floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL] / tSkillRecord[DK_REC_STAT_SKILL.NZ_COUNT])
+		tSkillRecord[DK_REC_STAT_SKILL.NZ_AVG_EFFECT] = math.floor(tSkillRecord[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tSkillRecord[DK_REC_STAT_SKILL.NZ_COUNT])
 	end
 
 	---------------------------------
@@ -1174,20 +1145,20 @@ function D.InsertRecord(data, szRecordType, dwOwnerID, dwTargetID, szEffectID, n
 	end
 	tResult = tSkillRecord[DK_REC_STAT_SKILL.DETAIL][nSkillResult]
 	tResult[DK_REC_STAT_SKILL_DETAIL.COUNT       ] = tResult[DK_REC_STAT_SKILL_DETAIL.COUNT] + 1 -- ÃüÖÐ´ÎÊý£¨¼ÙÉènSkillResultÊÇÃüÖÐ£©
-	tResult[DK_REC_STAT_SKILL_DETAIL.MAX         ] = max(tResult[DK_REC_STAT_SKILL_DETAIL.MAX], nValue) -- µ¥´ÎÃüÖÐ×î´óÖµ
-	tResult[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT  ] = max(tResult[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×î´óÓÐÐ§Öµ
+	tResult[DK_REC_STAT_SKILL_DETAIL.MAX         ] = math.max(tResult[DK_REC_STAT_SKILL_DETAIL.MAX], nValue) -- µ¥´ÎÃüÖÐ×î´óÖµ
+	tResult[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT  ] = math.max(tResult[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×î´óÓÐÐ§Öµ
 	tResult[DK_REC_STAT_SKILL_DETAIL.MIN         ] = Min(tResult[DK_REC_STAT_SKILL_DETAIL.MIN], nValue) -- µ¥´ÎÃüÖÐ×îÐ¡Öµ
 	tResult[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT  ] = Min(tResult[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×îÐ¡ÓÐÐ§Öµ
 	tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL       ] = tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL] + nValue -- ËùÒÔÃüÖÐ×ÜÉËº¦
 	tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] = tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] + nEffectValue -- ËùÓÐÃüÖÐ×ÜÓÐÐ§ÉËº¦
-	tResult[DK_REC_STAT_SKILL_DETAIL.AVG         ] = floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tResult[DK_REC_STAT_SKILL_DETAIL.COUNT])
-	tResult[DK_REC_STAT_SKILL_DETAIL.AVG_EFFECT  ] = floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_SKILL_DETAIL.COUNT])
+	tResult[DK_REC_STAT_SKILL_DETAIL.AVG         ] = math.floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tResult[DK_REC_STAT_SKILL_DETAIL.COUNT])
+	tResult[DK_REC_STAT_SKILL_DETAIL.AVG_EFFECT  ] = math.floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_SKILL_DETAIL.COUNT])
 	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
 		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT     ] = tResult[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT] + 1 -- ÃüÖÐ´ÎÊý£¨¼ÙÉènSkillResultÊÇÃüÖÐ£©
 		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_MIN       ] = Min(tResult[DK_REC_STAT_SKILL_DETAIL.NZ_MIN], nValue) -- µ¥´ÎÃüÖÐ×îÐ¡Öµ
 		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT] = Min(tResult[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×îÐ¡ÓÐÐ§Öµ
-		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_AVG       ] = floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tResult[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
-		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_AVG_EFFECT] = floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
+		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_AVG       ] = math.floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tResult[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
+		tResult[DK_REC_STAT_SKILL_DETAIL.NZ_AVG_EFFECT] = math.floor(tResult[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
 	end
 
 	------------------------------
@@ -1213,8 +1184,8 @@ function D.InsertRecord(data, szRecordType, dwOwnerID, dwTargetID, szEffectID, n
 		}
 	end
 	tSkillTargetData = tSkillRecord[DK_REC_STAT_SKILL.TARGET][dwTargetID]
-	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX         ] = max(tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX], nValue)
-	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT  ] = max(tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT], nEffectValue)
+	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX         ] = math.max(tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX], nValue)
+	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT  ] = math.max(tSkillTargetData[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT], nEffectValue)
 	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.TOTAL       ] = tSkillTargetData[DK_REC_STAT_SKILL_TARGET.TOTAL] + nValue
 	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.TOTAL_EFFECT] = tSkillTargetData[DK_REC_STAT_SKILL_TARGET.TOTAL_EFFECT] + nEffectValue
 	tSkillTargetData[DK_REC_STAT_SKILL_TARGET.COUNT][nSkillResult] = (tSkillTargetData[DK_REC_STAT_SKILL_TARGET.COUNT][nSkillResult] or 0) + 1
@@ -1244,16 +1215,16 @@ function D.InsertRecord(data, szRecordType, dwOwnerID, dwTargetID, szEffectID, n
 	end
 	tTargetRecord = tRecord[DK_REC_STAT.TARGET][dwTargetID]
 	tTargetRecord[DK_REC_STAT_TARGET.COUNT       ] = tTargetRecord[DK_REC_STAT_TARGET.COUNT] + 1
-	tTargetRecord[DK_REC_STAT_TARGET.MAX         ] = max(tTargetRecord[DK_REC_STAT_TARGET.MAX], nValue)
-	tTargetRecord[DK_REC_STAT_TARGET.MAX_EFFECT  ] = max(tTargetRecord[DK_REC_STAT_TARGET.MAX_EFFECT], nEffectValue)
+	tTargetRecord[DK_REC_STAT_TARGET.MAX         ] = math.max(tTargetRecord[DK_REC_STAT_TARGET.MAX], nValue)
+	tTargetRecord[DK_REC_STAT_TARGET.MAX_EFFECT  ] = math.max(tTargetRecord[DK_REC_STAT_TARGET.MAX_EFFECT], nEffectValue)
 	tTargetRecord[DK_REC_STAT_TARGET.TOTAL       ] = tTargetRecord[DK_REC_STAT_TARGET.TOTAL] + nValue
 	tTargetRecord[DK_REC_STAT_TARGET.TOTAL_EFFECT] = tTargetRecord[DK_REC_STAT_TARGET.TOTAL_EFFECT] + nEffectValue
-	tTargetRecord[DK_REC_STAT_TARGET.AVG         ] = floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL] / tTargetRecord[DK_REC_STAT_TARGET.COUNT])
-	tTargetRecord[DK_REC_STAT_TARGET.AVG_EFFECT  ] = floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tTargetRecord[DK_REC_STAT_TARGET.COUNT])
+	tTargetRecord[DK_REC_STAT_TARGET.AVG         ] = math.floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL] / tTargetRecord[DK_REC_STAT_TARGET.COUNT])
+	tTargetRecord[DK_REC_STAT_TARGET.AVG_EFFECT  ] = math.floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tTargetRecord[DK_REC_STAT_TARGET.COUNT])
 	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
 		tTargetRecord[DK_REC_STAT_TARGET.NZ_COUNT     ] = tTargetRecord[DK_REC_STAT_TARGET.NZ_COUNT] + 1
-		tTargetRecord[DK_REC_STAT_TARGET.NZ_AVG       ] = floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL] / tTargetRecord[DK_REC_STAT_TARGET.NZ_COUNT])
-		tTargetRecord[DK_REC_STAT_TARGET.NZ_AVG_EFFECT] = floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tTargetRecord[DK_REC_STAT_TARGET.NZ_COUNT])
+		tTargetRecord[DK_REC_STAT_TARGET.NZ_AVG       ] = math.floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL] / tTargetRecord[DK_REC_STAT_TARGET.NZ_COUNT])
+		tTargetRecord[DK_REC_STAT_TARGET.NZ_AVG_EFFECT] = math.floor(tTargetRecord[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tTargetRecord[DK_REC_STAT_TARGET.NZ_COUNT])
 	end
 
 	----------------------------------
@@ -1280,20 +1251,20 @@ function D.InsertRecord(data, szRecordType, dwOwnerID, dwTargetID, szEffectID, n
 	end
 	tResult = tTargetRecord[DK_REC_STAT_TARGET.DETAIL][nSkillResult]
 	tResult[DK_REC_STAT_TARGET_DETAIL.COUNT       ] = tResult[DK_REC_STAT_TARGET_DETAIL.COUNT] + 1 -- ÃüÖÐ´ÎÊý£¨¼ÙÉènSkillResultÊÇÃüÖÐ£©
-	tResult[DK_REC_STAT_TARGET_DETAIL.MAX         ] = max(tResult[DK_REC_STAT_TARGET_DETAIL.MAX], nValue) -- µ¥´ÎÃüÖÐ×î´óÖµ
-	tResult[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT  ] = max(tResult[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×î´óÓÐÐ§Öµ
+	tResult[DK_REC_STAT_TARGET_DETAIL.MAX         ] = math.max(tResult[DK_REC_STAT_TARGET_DETAIL.MAX], nValue) -- µ¥´ÎÃüÖÐ×î´óÖµ
+	tResult[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT  ] = math.max(tResult[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×î´óÓÐÐ§Öµ
 	tResult[DK_REC_STAT_TARGET_DETAIL.MIN         ] = Min(tResult[DK_REC_STAT_TARGET_DETAIL.MIN], nValue) -- µ¥´ÎÃüÖÐ×îÐ¡Öµ
 	tResult[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT  ] = Min(tResult[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×îÐ¡ÓÐÐ§Öµ
 	tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL       ] = tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL] + nValue -- ËùÒÔÃüÖÐ×ÜÉËº¦
 	tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] = tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] + nEffectValue -- ËùÓÐÃüÖÐ×ÜÓÐÐ§ÉËº¦
-	tResult[DK_REC_STAT_TARGET_DETAIL.AVG         ] = floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tResult[DK_REC_STAT_TARGET_DETAIL.COUNT])
-	tResult[DK_REC_STAT_TARGET_DETAIL.AVG_EFFECT  ] = floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_TARGET_DETAIL.COUNT])
+	tResult[DK_REC_STAT_TARGET_DETAIL.AVG         ] = math.floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tResult[DK_REC_STAT_TARGET_DETAIL.COUNT])
+	tResult[DK_REC_STAT_TARGET_DETAIL.AVG_EFFECT  ] = math.floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_TARGET_DETAIL.COUNT])
 	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
 		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT     ] = tResult[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT] + 1 -- ÃüÖÐ´ÎÊý£¨¼ÙÉènSkillResultÊÇÃüÖÐ£©
 		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_MIN       ] = Min(tResult[DK_REC_STAT_TARGET_DETAIL.NZ_MIN], nValue) -- µ¥´ÎÃüÖÐ×îÐ¡Öµ
 		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT] = Min(tResult[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT], nEffectValue) -- µ¥´ÎÃüÖÐ×îÐ¡ÓÐÐ§Öµ
-		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_AVG       ] = floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tResult[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
-		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_AVG_EFFECT] = floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
+		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_AVG       ] = math.floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tResult[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
+		tResult[DK_REC_STAT_TARGET_DETAIL.NZ_AVG_EFFECT] = math.floor(tResult[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tResult[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
 	end
 
 	---------------------------------
@@ -1319,8 +1290,8 @@ function D.InsertRecord(data, szRecordType, dwOwnerID, dwTargetID, szEffectID, n
 		}
 	end
 	tTargetSkillData = tTargetRecord[DK_REC_STAT_TARGET.SKILL][szEffectID]
-	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX         ] = max(tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX], nValue)
-	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = max(tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT], nEffectValue)
+	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX         ] = math.max(tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX], nValue)
+	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = math.max(tTargetSkillData[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT], nEffectValue)
 	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.TOTAL       ] = tTargetSkillData[DK_REC_STAT_TARGET_SKILL.TOTAL] + nValue
 	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] = tTargetSkillData[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] + nEffectValue
 	tTargetSkillData[DK_REC_STAT_TARGET_SKILL.COUNT][nSkillResult] = (tTargetSkillData[DK_REC_STAT_TARGET_SKILL.COUNT][nSkillResult] or 0) + 1
@@ -1362,10 +1333,10 @@ end
 function D.SavePlayerInfo(data, dwID, bRefresh)
 	if (bRefresh or not data[DK.PLAYER_LIST][dwID]) and IsPlayer(dwID) then
 		local player, info = D.GetPlayer(dwID)
-		if player and info and not IsEmpty(info.dwMountKungfuID) then
+		if player and info and not X.IsEmpty(info.dwMountKungfuID) then
 			local aEquip, nEquipScore = {}, player.GetTotalEquipScore()
-			for nEquipIndex, tEquipInfo in pairs(LIB.GetPlayerEquipInfo(player)) do
-				insert(aEquip, {
+			for nEquipIndex, tEquipInfo in pairs(X.GetPlayerEquipInfo(player)) do
+				table.insert(aEquip, {
 					nEquipIndex,
 					tEquipInfo.dwTabType,
 					tEquipInfo.dwTabIndex,
@@ -1376,7 +1347,7 @@ function D.SavePlayerInfo(data, dwID, bRefresh)
 					tEquipInfo.dwTemporaryEnchantLeftSeconds,
 				})
 			end
-			if not IsEmpty(aEquip) and not IsEmpty(nEquipScore) then
+			if not X.IsEmpty(aEquip) and not X.IsEmpty(nEquipScore) then
 				local aInfo = {
 					info.dwMountKungfuID,
 					player.GetTotalEquipScore(),
@@ -1392,7 +1363,7 @@ end
 function D.InitObjectData(data, dwID, szChannel)
 	-- Ãû³Æ»º´æ
 	if not data[DK.NAME_LIST][dwID] then
-		data[DK.NAME_LIST][dwID] = LIB.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, 'never') -- Ãû³Æ»º´æ
+		data[DK.NAME_LIST][dwID] = X.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, 'never') -- Ãû³Æ»º´æ
 	end
 	-- ÊÆÁ¦»º´æ
 	if not data[DK.FORCE_LIST][dwID] then
@@ -1450,13 +1421,13 @@ local function GeneTypeNS()
 	}
 end
 function D.InitData()
-	local bFighting = LIB.IsFighting()
-	local nFightTick = bFighting and LIB.GetFightTime() or 0
+	local bFighting = X.IsFighting()
+	local nFightTick = bFighting and X.GetFightTime() or 0
 	Data = {
-		[DK.UUID       ] = LIB.GetFightUUID(),                -- Õ½¶·Î¨Ò»±êÊ¶
+		[DK.UUID       ] = X.GetFightUUID(),                -- Õ½¶·Î¨Ò»±êÊ¶
 		[DK.VERSION    ] = VERSION,                           -- Êý¾Ý°æ±¾ºÅ
-		[DK.SERVER     ] = LIB.GetRealServer(2),              -- ËùÔÚ·þÎñÆ÷
-		[DK.MAP        ] = LIB.GetMapID(),                    -- ËùÔÚµØÍ¼
+		[DK.SERVER     ] = X.GetRealServer(2),              -- ËùÔÚ·þÎñÆ÷
+		[DK.MAP        ] = X.GetMapID(),                    -- ËùÔÚµØÍ¼
 		[DK.TIME_BEGIN ] = GetCurrentTime(),                  -- Õ½¶·¿ªÊ¼Ê±¼ä
 		[DK.TICK_BEGIN ] = GetTime(),                         -- Õ½¶·¿ªÊ¼ºÁÃëÊ±¼ä
 		[DK.TIME_DURING] = - (nFightTick / 1000) - 1,         -- Õ½¶·³ÖÐøÊ±¼ä ¸ºÊý±íÊ¾±¾´ÎÕ½¶·ÉÐÎ´½áÊø ÆäÊýÖµÎª¼ÇÂ¼¿ªÊ¼Ê±¸ºµÄÕ½¶·ÃëÊý¼õÒ»
@@ -1482,10 +1453,10 @@ function D.FlushData()
 	if not Data or not Data[DK.UUID] then
 		return
 	end
-	if IsEmpty(Data[DK.BE_DAMAGE][DK_REC.STAT])
-	and IsEmpty(Data[DK.DAMAGE][DK_REC.STAT])
-	and IsEmpty(Data[DK.HEAL][DK_REC.STAT])
-	and IsEmpty(Data[DK.BE_HEAL][DK_REC.STAT]) then
+	if X.IsEmpty(Data[DK.BE_DAMAGE][DK_REC.STAT])
+	and X.IsEmpty(Data[DK.DAMAGE][DK_REC.STAT])
+	and X.IsEmpty(Data[DK.HEAL][DK_REC.STAT])
+	and X.IsEmpty(Data[DK.BE_HEAL][DK_REC.STAT]) then
 		return
 	end
 
@@ -1517,12 +1488,12 @@ function D.FlushData()
 	end
 	Data[DK.BOSSNAME] = szEnemyBossName or szBossName or g_tStrings.STR_NAME_UNKNOWN
 
-	local nFightTick = LIB.GetFightTime() or 0
-	Data[DK.TIME_DURING] = floor(nFightTick / 1000) + Data[DK.TIME_DURING] + 1
+	local nFightTick = X.GetFightTime() or 0
+	Data[DK.TIME_DURING] = math.floor(nFightTick / 1000) + Data[DK.TIME_DURING] + 1
 	Data[DK.TICK_DURING] = nFightTick + Data[DK.TICK_DURING] + 1
 
 	if Data[DK.TIME_DURING] > O.nMinFightTime then
-		local szFilePath = LIB.FormatPath(DS_ROOT) .. D.GetDataFileName(Data)
+		local szFilePath = X.FormatPath(DS_ROOT) .. D.GetDataFileName(Data)
 		HISTORY_CACHE[szFilePath] = Data
 		UNSAVED_CACHE[szFilePath] = Data
 		if O.bSaveHistoryOnExFi then
@@ -1539,7 +1510,7 @@ end
 
 -- ÏµÍ³ÈÕÖ¾¼à¿Ø£¨Êý¾ÝÔ´£©
 do local aAbsorbInfo, nLFC
-LIB.RegisterEvent('SYS_MSG', function()
+X.RegisterEvent('SYS_MSG', function()
 	if not D.bReady or not O.bEnable then
 		return
 	end
@@ -1553,7 +1524,7 @@ LIB.RegisterEvent('SYS_MSG', function()
 		-- (arg3)dwLevel£º¼¼ÄÜµÈ¼¶ (arg4)nRespond£º¼ûÃ¶¾ÙÐÍ[[SKILL_RESULT_CODE]]
 		-- D.OnSkillCastRespond(arg1, arg2, arg3, arg4)
 	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
-		-- if not LIB.IsInArena() then
+		-- if not X.IsInArena() then
 		-- ¼¼ÄÜ×îÖÕ²úÉúµÄÐ§¹û£¨ÉúÃüÖµµÄ±ä»¯£©£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê (arg3)bReact£ºÊÇ·ñÎª·´»÷ (arg4)nType£ºEffectÀàÐÍ (arg5)dwID:EffectµÄID
 		-- (arg6)dwLevel£ºEffectµÄµÈ¼¶ (arg7)bCriticalStrike£ºÊÇ·ñ»áÐÄ (arg8)nCount£ºtResultCountÊý¾Ý±íÖÐÔªËØ¸öÊý (arg9)tResultCount£ºÊýÖµ¼¯ºÏ
@@ -1619,8 +1590,8 @@ end)
 end
 
 -- JJCÖÐÊ¹ÓÃµÄÊý¾ÝÔ´£¨²»ÄÜ¼ÇÂ¼Òç³öÊý¾Ý£©
--- LIB.RegisterEvent('SKILL_EFFECT_TEXT', function(event)
---     if LIB.IsInArena() then
+-- X.RegisterEvent('SKILL_EFFECT_TEXT', function(event)
+--     if X.IsInArena() then
 --         local dwCasterID      = arg0
 --         local dwTargetID      = arg1
 --         local bCriticalStrike = arg2
@@ -1682,7 +1653,7 @@ local function AbsorbSorter(p1, p2)
 	end
 	return p1.nPriority > p2.nPriority
 end
-LIB.RegisterEvent('BUFF_UPDATE', function()
+X.RegisterEvent('BUFF_UPDATE', function()
 	-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
 	--     = arg0 , arg1   , arg2 , arg3     , arg4, arg5    , arg6    , arg7 , arg8 , arg9 , arg10  , arg11
 	if not D.bReady or not O.bEnable then
@@ -1714,12 +1685,12 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 					dwViaID = arg4,
 					dwInitTime = nLFC,
 				}
-				insert(aAbsorbInfo, tAbsorbInfo)
-				sort(aAbsorbInfo, AbsorbSorter)
+				table.insert(aAbsorbInfo, tAbsorbInfo)
+				table.sort(aAbsorbInfo, AbsorbSorter)
 			end
 			if arg7 then
 				tAbsorbInfo.dwInitTime = nLFC
-				sort(aAbsorbInfo, AbsorbSorter)
+				table.sort(aAbsorbInfo, AbsorbSorter)
 			end
 			tAbsorbInfo.dwSrcID = arg9
 			tAbsorbInfo.nEffectType = SKILL_EFFECT_TYPE.BUFF
@@ -1762,16 +1733,16 @@ function D.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
 	end
 	-- ²åÈëÊý¾Ýµ½¼ÇÂ¼
 	if bLeave then -- ÔÝÀë¿ªÊ¼
-		insert(rec, { GetCurrentTime(), nil, nAwayType })
+		table.insert(rec, { GetCurrentTime(), nil, nAwayType })
 	else -- ÔÝÀë»ØÀ´
 		if #rec == 0 then -- Ã»¼ÇÂ¼µ½ÔÝÀë¿ªÊ¼ ´´½¨Ò»¸ö´Ó±¾´ÎÕ½¶·¿ªÊ¼µÄÔÝÀë£¨Ë×³Æ»¹Ã»¿ª´òÄã¾ÍËÀÁË¡£¡££©
-			insert(rec, { Data[DK.TIME_BEGIN], GetCurrentTime(), nAwayType })
+			table.insert(rec, { Data[DK.TIME_BEGIN], GetCurrentTime(), nAwayType })
 		elseif not rec[#rec][2] then -- Èç¹û×îºóÒ»´ÎÔÝÀë»¹Ã»»ØÀ´ ÔòÍê³É×îºóÒ»´ÎÔÝÀëµÄ¼ÇÂ¼
 			rec[#rec][2] = GetCurrentTime()
 		end
 	end
 end
-LIB.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
+X.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
 	if not D.bReady or not O.bEnable then
 		return
 	end
@@ -1790,17 +1761,17 @@ for _, v in ipairs({
 	{'PLAYER_LEAVE_SCENE', TARGET.PLAYER, 0},
 }) do
 	local szEvent, dwType, nEnter = unpack(v)
-	LIB.RegisterEvent(szEvent, function()
+	X.RegisterEvent(szEvent, function()
 		if not D.bReady or not O.bEnable then
 			return
 		end
 		-- ²åÈëÊý¾Ýµ½ÈÕÖ¾
 		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 		local dwID, dwTemplateID = arg0, 0
-		local KObject = LIB.GetObject(dwType, dwID)
+		local KObject = X.GetObject(dwType, dwID)
 		local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = 0, 0
 		if KObject and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) then
-			fCurrentLife, fMaxLife = LIB.GetObjectLife(KObject)
+			fCurrentLife, fMaxLife = X.GetObjectLife(KObject)
 			nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 		end
 		if dwType == TARGET.NPC or dwType == TARGET.DOODAD then
@@ -1808,7 +1779,7 @@ for _, v in ipairs({
 				dwTemplateID = KObject.dwTemplateID
 			end
 		elseif dwType == TARGET.PLAYER then
-			if not LIB.IsParty(dwID) then
+			if not X.IsParty(dwID) then
 				return
 			end
 			D.SavePlayerInfo(Data, dwID, true)
@@ -1817,18 +1788,18 @@ for _, v in ipairs({
 			Data, nLFC, nTime, nTick,
 			EVERYTHING_TYPE.ENTER_LEAVE_SCENE, nEnter,
 			TARGET.NPC, dwID,
-			LIB.GetObjectName(TARGET.NPC, dwID, 'never'), dwTemplateID,
+			X.GetObjectName(TARGET.NPC, dwID, 'never'), dwTemplateID,
 			fCurrentLife, fMaxLife, nCurrentMana, nMaxMana
 		)
 	end)
 end
 -- ÏµÍ³ÏûÏ¢ÈÕÖ¾
-LIB.RegisterMsgMonitor('MSG_SYS', 'MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
+X.RegisterMsgMonitor('MSG_SYS', 'MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
 	if not D.bReady or not O.bEnable then
 		return
 	end
 	if bRich then
-		szMsg = LIB.GetPureText(szMsg)
+		szMsg = X.GetPureText(szMsg)
 	end
 	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 	D.InsertEverything(
@@ -1837,12 +1808,12 @@ LIB.RegisterMsgMonitor('MSG_SYS', 'MY_Recount_DS_Everything', function(szChannel
 	)
 end)
 -- ½ÇÉ«º°»°ÈÕÖ¾
-LIB.RegisterEvent('PLAYER_SAY', function()
+X.RegisterEvent('PLAYER_SAY', function()
 	if not D.bReady or not O.bEnable then
 		return
 	end
 	if not IsPlayer(arg1) then
-		local szText = LIB.GetPureText(arg0)
+		local szText = X.GetPureText(arg0)
 		if szText and szText ~= '' then
 			local npc = GetNpc(arg1)
 			local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
@@ -1856,7 +1827,7 @@ LIB.RegisterEvent('PLAYER_SAY', function()
 	end
 end)
 -- ÏµÍ³¾¯¸æ¿òÈÕÖ¾
-LIB.RegisterEvent('ON_WARNING_MESSAGE', function()
+X.RegisterEvent('ON_WARNING_MESSAGE', function()
 	if not D.bReady or not O.bEnable then
 		return
 	end
@@ -1869,18 +1840,18 @@ LIB.RegisterEvent('ON_WARNING_MESSAGE', function()
 	)
 end)
 -- ½øÈëÍË³öÕ½¶·ÈÕÖ¾
-LIB.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
+X.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
 	if not D.bReady or not O.bEnable then
 		return
 	end
 	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 	local dwType = e == 'MY_NPC_FIGHT_HINT' and TARGET.NPC or TARGET.PLAYER
 	local dwID, bFight, dwTemplateID = arg0, arg1, 0
-	local KObject = LIB.GetObject(dwType, dwID)
-	local szName = LIB.GetObjectName(KObject, 'never') or ''
+	local KObject = X.GetObject(dwType, dwID)
+	local szName = X.GetObjectName(KObject, 'never') or ''
 	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = 0, 0
 	if KObject then
-		fCurrentLife, fMaxLife = LIB.GetObjectLife(KObject)
+		fCurrentLife, fMaxLife = X.GetObjectLife(KObject)
 		nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 	end
 	if dwType == TARGET.NPC or dwType == TARGET.DOODAD then
@@ -1888,7 +1859,7 @@ LIB.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
 			dwTemplateID = KObject.dwTemplateID
 		end
 	elseif dwType == TARGET.PLAYER then
-		if not LIB.IsParty(dwID) then
+		if not X.IsParty(dwID) then
 			return
 		end
 		D.SavePlayerInfo(Data, dwID, true)
@@ -1902,7 +1873,7 @@ LIB.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
 	)
 end)
 -- ËÀÍöÈÕÖ¾
-LIB.RegisterEvent('SYS_MSG', function()
+X.RegisterEvent('SYS_MSG', function()
 	if not D.bReady or not O.bEnable then
 		return
 	end
@@ -1912,26 +1883,26 @@ LIB.RegisterEvent('SYS_MSG', function()
 	-- ²åÈëÊý¾Ýµ½ÈÕÖ¾
 	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 	local dwID, dwKiller = arg1, arg2
-	if LIB.IsParty(dwID) or LIB.IsParty(dwKiller) then
+	if X.IsParty(dwID) or X.IsParty(dwKiller) then
 		D.InsertEverything(
 			Data, nLFC, nTime, nTick,
 			EVERYTHING_TYPE.DEATH, dwID, dwKiller,
-			LIB.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID),
-			LIB.GetObjectName(IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller)
+			X.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID),
+			X.GetObjectName(IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller)
 		)
 	end
 end)
 -- ÉÏÏßÏÂÏßÈÕÖ¾
-LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
+X.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 	if not D.bReady or not O.bEnable then
 		return
 	end
-	if LIB.IsParty(arg1) then
+	if X.IsParty(arg1) then
 		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 		D.InsertEverything(
 			Data, nLFC, nTime, nTick,
 			EVERYTHING_TYPE.ONLINE, arg1, arg2,
-			LIB.GetObjectName(TARGET.PLAYER, arg1)
+			X.GetObjectName(TARGET.PLAYER, arg1)
 		)
 	end
 	if arg2 == 0 then -- ÓÐÈËµôÏß
@@ -1946,7 +1917,7 @@ LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 	end
 end)
 -- ½ø³öÕ½¶·ÔÝÀë¼ÇÂ¼
-LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµô/µôÏßµÄÈË
+X.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµô/µôÏßµÄÈË
 	if not D.bReady or not O.bEnable then
 		return
 	end
@@ -1966,7 +1937,7 @@ LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍË
 	end
 end)
 -- ÖÐÍ¾ÓÐÈË½ø¶Ó ²¹ÉÏÔÝÀë¼ÇÂ¼
-LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
+X.RegisterEvent('PARTY_ADD_MEMBER', function()
 	if not D.bReady or not O.bEnable then
 		return
 	end
@@ -1980,22 +1951,22 @@ LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
 	end
 end)
 
-LIB.RegisterInit('MY_Recount_DS', function()
+X.RegisterInit('MY_Recount_DS', function()
 	D.LoadData()
 end)
 
-LIB.RegisterFlush('MY_Recount_DS', function()
+X.RegisterFlush('MY_Recount_DS', function()
 	D.SaveData()
 	if O.bSaveHistoryOnExit then
 		D.SaveHistory()
 	end
 end)
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', function()
 	D.bReady = true
 end)
 
-LIB.RegisterUserSettingsUpdate('@@UNINIT@@', function()
+X.RegisterUserSettingsUpdate('@@UNINIT@@', function()
 	D.bReady = false
 end)
 
@@ -2035,18 +2006,18 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 		end
 		tDstDetail[DK_REC_STAT_DETAIL.COUNT        ] = tDstDetail[DK_REC_STAT_DETAIL.COUNT] + tSrcDetail[DK_REC_STAT_DETAIL.COUNT]
 		tDstDetail[DK_REC_STAT_DETAIL.NZ_COUNT     ] = tDstDetail[DK_REC_STAT_DETAIL.NZ_COUNT] + tSrcDetail[DK_REC_STAT_DETAIL.NZ_COUNT]
-		tDstDetail[DK_REC_STAT_DETAIL.MAX          ] = max(tDstDetail[DK_REC_STAT_DETAIL.MAX], tSrcDetail[DK_REC_STAT_DETAIL.MAX])
-		tDstDetail[DK_REC_STAT_DETAIL.MAX_EFFECT   ] = max(tDstDetail[DK_REC_STAT_DETAIL.MAX_EFFECT], tSrcDetail[DK_REC_STAT_DETAIL.MAX_EFFECT])
+		tDstDetail[DK_REC_STAT_DETAIL.MAX          ] = math.max(tDstDetail[DK_REC_STAT_DETAIL.MAX], tSrcDetail[DK_REC_STAT_DETAIL.MAX])
+		tDstDetail[DK_REC_STAT_DETAIL.MAX_EFFECT   ] = math.max(tDstDetail[DK_REC_STAT_DETAIL.MAX_EFFECT], tSrcDetail[DK_REC_STAT_DETAIL.MAX_EFFECT])
 		tDstDetail[DK_REC_STAT_DETAIL.MIN          ] = Min(tDstDetail[DK_REC_STAT_DETAIL.MIN], tSrcDetail[DK_REC_STAT_DETAIL.MIN])
 		tDstDetail[DK_REC_STAT_DETAIL.NZ_MIN       ] = Min(tDstDetail[DK_REC_STAT_DETAIL.NZ_MIN], tSrcDetail[DK_REC_STAT_DETAIL.NZ_MIN])
 		tDstDetail[DK_REC_STAT_DETAIL.MIN_EFFECT   ] = Min(tDstDetail[DK_REC_STAT_DETAIL.MIN_EFFECT], tSrcDetail[DK_REC_STAT_DETAIL.MIN_EFFECT])
 		tDstDetail[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT] = Min(tDstDetail[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT], tSrcDetail[DK_REC_STAT_DETAIL.NZ_MIN_EFFECT])
 		tDstDetail[DK_REC_STAT_DETAIL.TOTAL        ] = tDstDetail[DK_REC_STAT_DETAIL.TOTAL] + tSrcDetail[DK_REC_STAT_DETAIL.TOTAL]
 		tDstDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT ] = tDstDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT] + tSrcDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT]
-		tDstDetail[DK_REC_STAT_DETAIL.AVG          ] = floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL] / tDstDetail[DK_REC_STAT_DETAIL.COUNT])
-		tDstDetail[DK_REC_STAT_DETAIL.NZ_AVG       ] = floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL] / tDstDetail[DK_REC_STAT_DETAIL.NZ_COUNT])
-		tDstDetail[DK_REC_STAT_DETAIL.AVG_EFFECT   ] = floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tDstDetail[DK_REC_STAT_DETAIL.COUNT])
-		tDstDetail[DK_REC_STAT_DETAIL.NZ_AVG_EFFECT] = floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tDstDetail[DK_REC_STAT_DETAIL.NZ_COUNT])
+		tDstDetail[DK_REC_STAT_DETAIL.AVG          ] = math.floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL] / tDstDetail[DK_REC_STAT_DETAIL.COUNT])
+		tDstDetail[DK_REC_STAT_DETAIL.NZ_AVG       ] = math.floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL] / tDstDetail[DK_REC_STAT_DETAIL.NZ_COUNT])
+		tDstDetail[DK_REC_STAT_DETAIL.AVG_EFFECT   ] = math.floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tDstDetail[DK_REC_STAT_DETAIL.COUNT])
+		tDstDetail[DK_REC_STAT_DETAIL.NZ_AVG_EFFECT] = math.floor(tDstDetail[DK_REC_STAT_DETAIL.TOTAL_EFFECT] / tDstDetail[DK_REC_STAT_DETAIL.NZ_COUNT])
 	end
 	------------------------
 	-- # ½Ú£º tRecord.Skill
@@ -2079,14 +2050,14 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 			tDstSkill.tEffectID[szEffectID] = true
 			tDstSkill[DK_REC_STAT_SKILL.COUNT        ] = tDstSkill[DK_REC_STAT_SKILL.COUNT] + tSrcSkill[DK_REC_STAT_SKILL.COUNT]
 			tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT     ] = tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT] + tSrcSkill[DK_REC_STAT_SKILL.NZ_COUNT]
-			tDstSkill[DK_REC_STAT_SKILL.MAX          ] = max(tDstSkill[DK_REC_STAT_SKILL.MAX], tSrcSkill[DK_REC_STAT_SKILL.MAX])
-			tDstSkill[DK_REC_STAT_SKILL.MAX_EFFECT   ] = max(tDstSkill[DK_REC_STAT_SKILL.MAX_EFFECT], tSrcSkill[DK_REC_STAT_SKILL.MAX_EFFECT])
+			tDstSkill[DK_REC_STAT_SKILL.MAX          ] = math.max(tDstSkill[DK_REC_STAT_SKILL.MAX], tSrcSkill[DK_REC_STAT_SKILL.MAX])
+			tDstSkill[DK_REC_STAT_SKILL.MAX_EFFECT   ] = math.max(tDstSkill[DK_REC_STAT_SKILL.MAX_EFFECT], tSrcSkill[DK_REC_STAT_SKILL.MAX_EFFECT])
 			tDstSkill[DK_REC_STAT_SKILL.TOTAL        ] = tDstSkill[DK_REC_STAT_SKILL.TOTAL] + tSrcSkill[DK_REC_STAT_SKILL.TOTAL]
 			tDstSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT ] = tDstSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT] + tSrcSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT]
-			tDstSkill[DK_REC_STAT_SKILL.AVG          ] = floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL] / tDstSkill[DK_REC_STAT_SKILL.COUNT])
-			tDstSkill[DK_REC_STAT_SKILL.AVG_EFFECT   ] = floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tDstSkill[DK_REC_STAT_SKILL.COUNT])
-			tDstSkill[DK_REC_STAT_SKILL.NZ_AVG       ] = floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL] / tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT])
-			tDstSkill[DK_REC_STAT_SKILL.NZ_AVG_EFFECT] = floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT])
+			tDstSkill[DK_REC_STAT_SKILL.AVG          ] = math.floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL] / tDstSkill[DK_REC_STAT_SKILL.COUNT])
+			tDstSkill[DK_REC_STAT_SKILL.AVG_EFFECT   ] = math.floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tDstSkill[DK_REC_STAT_SKILL.COUNT])
+			tDstSkill[DK_REC_STAT_SKILL.NZ_AVG       ] = math.floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL] / tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT])
+			tDstSkill[DK_REC_STAT_SKILL.NZ_AVG_EFFECT] = math.floor(tDstSkill[DK_REC_STAT_SKILL.TOTAL_EFFECT] / tDstSkill[DK_REC_STAT_SKILL.NZ_COUNT])
 			---------------------------------
 			-- # ½Ú£º tRecord.Skill[x].Detail
 			---------------------------------
@@ -2114,18 +2085,18 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 				end
 				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT        ] = tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT] + tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT]
 				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT     ] = tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT] + tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT]
-				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX          ] = max(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX])
-				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT   ] = max(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX          ] = math.max(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT   ] = math.max(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.MAX_EFFECT])
 				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN          ] = Min(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN])
 				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN       ] = Min(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN])
 				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT   ] = Min(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.MIN_EFFECT])
 				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT] = Min(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT], tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_MIN_EFFECT])
 				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL        ] = tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL] + tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL]
 				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT ] = tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] + tSrcSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT]
-				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.AVG          ] = floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT])
-				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_AVG       ] = floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
-				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.AVG_EFFECT   ] = floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT])
-				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_AVG_EFFECT] = floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.AVG          ] = math.floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_AVG       ] = math.floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.AVG_EFFECT   ] = math.floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.COUNT])
+				tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_AVG_EFFECT] = math.floor(tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.TOTAL_EFFECT] / tDstSkillDetail[DK_REC_STAT_SKILL_DETAIL.NZ_COUNT])
 			end
 			------------------------------
 			-- # ½Ú£º tRecord.Skill.Target
@@ -2184,14 +2155,14 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 		end
 		tDstTarget[DK_REC_STAT_TARGET.COUNT        ] = tDstTarget[DK_REC_STAT_TARGET.COUNT] + tSrcTarget[DK_REC_STAT_TARGET.COUNT]
 		tDstTarget[DK_REC_STAT_TARGET.NZ_COUNT     ] = tDstTarget[DK_REC_STAT_TARGET.NZ_COUNT] + tSrcTarget[DK_REC_STAT_TARGET.NZ_COUNT]
-		tDstTarget[DK_REC_STAT_TARGET.MAX          ] = max(tDstTarget[DK_REC_STAT_TARGET.MAX], tSrcTarget[DK_REC_STAT_TARGET.MAX])
-		tDstTarget[DK_REC_STAT_TARGET.MAX_EFFECT   ] = max(tDstTarget[DK_REC_STAT_TARGET.MAX_EFFECT], tSrcTarget[DK_REC_STAT_TARGET.MAX_EFFECT])
+		tDstTarget[DK_REC_STAT_TARGET.MAX          ] = math.max(tDstTarget[DK_REC_STAT_TARGET.MAX], tSrcTarget[DK_REC_STAT_TARGET.MAX])
+		tDstTarget[DK_REC_STAT_TARGET.MAX_EFFECT   ] = math.max(tDstTarget[DK_REC_STAT_TARGET.MAX_EFFECT], tSrcTarget[DK_REC_STAT_TARGET.MAX_EFFECT])
 		tDstTarget[DK_REC_STAT_TARGET.TOTAL        ] = tDstTarget[DK_REC_STAT_TARGET.TOTAL] + tSrcTarget[DK_REC_STAT_TARGET.TOTAL]
 		tDstTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT ] = tDstTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT] + tSrcTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT]
-		tDstTarget[DK_REC_STAT_TARGET.AVG          ] = floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL] / tDstTarget[DK_REC_STAT_TARGET.COUNT])
-		tDstTarget[DK_REC_STAT_TARGET.AVG_EFFECT   ] = floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tDstTarget[DK_REC_STAT_TARGET.COUNT])
-		tDstTarget[DK_REC_STAT_TARGET.NZ_AVG       ] = floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL] / tDstTarget[DK_REC_STAT_TARGET.NZ_COUNT])
-		tDstTarget[DK_REC_STAT_TARGET.NZ_AVG_EFFECT] = floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tDstTarget[DK_REC_STAT_TARGET.NZ_COUNT])
+		tDstTarget[DK_REC_STAT_TARGET.AVG          ] = math.floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL] / tDstTarget[DK_REC_STAT_TARGET.COUNT])
+		tDstTarget[DK_REC_STAT_TARGET.AVG_EFFECT   ] = math.floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tDstTarget[DK_REC_STAT_TARGET.COUNT])
+		tDstTarget[DK_REC_STAT_TARGET.NZ_AVG       ] = math.floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL] / tDstTarget[DK_REC_STAT_TARGET.NZ_COUNT])
+		tDstTarget[DK_REC_STAT_TARGET.NZ_AVG_EFFECT] = math.floor(tDstTarget[DK_REC_STAT_TARGET.TOTAL_EFFECT] / tDstTarget[DK_REC_STAT_TARGET.NZ_COUNT])
 		----------------------------------
 		-- # ½Ú£º tRecord.Target[x].Detail
 		----------------------------------
@@ -2219,18 +2190,18 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 			end
 			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT        ] = tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT] + tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT]
 			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT     ] = tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT] + tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT]
-			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX          ] = max(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX])
-			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT   ] = max(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX          ] = math.max(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT   ] = math.max(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.MAX_EFFECT])
 			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN          ] = Min(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN])
 			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN       ] = Min(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN])
 			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT   ] = Min(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.MIN_EFFECT])
 			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT] = Min(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT], tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_MIN_EFFECT])
 			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL        ] = tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL] + tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL]
 			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT ] = tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] + tSrcTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT]
-			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.AVG          ] = floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT])
-			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_AVG       ] = floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
-			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.AVG_EFFECT   ] = floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT])
-			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_AVG_EFFECT] = floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.AVG          ] = math.floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_AVG       ] = math.floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.AVG_EFFECT   ] = math.floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.COUNT])
+			tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_AVG_EFFECT] = math.floor(tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.TOTAL_EFFECT] / tDstTargetDetail[DK_REC_STAT_TARGET_DETAIL.NZ_COUNT])
 		end
 		---------------------------------
 		-- # ½Ú£º tRecord.Target[x].Skill
@@ -2255,8 +2226,8 @@ function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect,
 					tDstTarget[DK_REC_STAT_TARGET.SKILL][id] = tDstTargetSkill
 				end
 				tDstTargetSkill.tEffectID[szEffectID] = true
-				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX         ] = max(tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX], tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX])
-				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = max(tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT], tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT])
+				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX         ] = math.max(tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX], tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX])
+				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT  ] = math.max(tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT], tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.MAX_EFFECT])
 				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL       ] = tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL] + tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL]
 				tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] = tDstTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT] + tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.TOTAL_EFFECT]
 				for k, v in pairs(tSrcTargetSkill[DK_REC_STAT_TARGET_SKILL.COUNT]) do
@@ -2376,5 +2347,5 @@ local settings = {
 		},
 	},
 }
-MY_Recount_DS = LIB.CreateModule(settings)
+MY_Recount_DS = X.CreateModule(settings)
 end

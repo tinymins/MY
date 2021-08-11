@@ -10,69 +10,40 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_ShenxingHelper', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_ShenxingHelper', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_ShenxingHelper', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_ShenxingHelper', _L['General'], {
 	bAncientMap = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bOpenAllMap = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAvoidBlackCD = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
@@ -158,13 +129,13 @@ function D.UnhookNonwarMap()
 end
 
 function D.CheckNonwarMapEnable()
-	if D.bReady and O.bAncientMap and not LIB.IsRestricted('MY_ShenxingHelper') then
+	if D.bReady and O.bAncientMap and not X.IsRestricted('MY_ShenxingHelper') then
 		D.HookNonwarMap()
 	else
 		D.UnhookNonwarMap()
 	end
 end
-LIB.RegisterFrameCreate('WorldMap', 'MY_ShenxingHelper__NonwarMap', D.CheckNonwarMapEnable)
+X.RegisterFrameCreate('WorldMap', 'MY_ShenxingHelper__NonwarMap', D.CheckNonwarMapEnable)
 
 --------------------------------------------------------------------------
 -- 【台服用】强开所有地图
@@ -222,8 +193,8 @@ function D.UnhookOpenAllMap()
 end
 
 function D.CheckOpenAllMapEnable()
-	if D.bReady and O.bOpenAllMap and not LIB.IsRestricted('MY_ShenxingHelper') then
-		LIB.RegisterEvent({
+	if D.bReady and O.bOpenAllMap and not X.IsRestricted('MY_ShenxingHelper') then
+		X.RegisterEvent({
 			'LOADING_END',
 			'UPDATE_ROAD_TRACK_FORCE',
 			'UPDATE_ROUTE_NODE_OPEN_LIST',
@@ -231,10 +202,10 @@ function D.CheckOpenAllMapEnable()
 			'SYNC_ROLE_DATA_END',
 			'PLAYER_LEVEL_UPDATE',
 		}, 'MY_AutoMemorizeBook', D.HookOpenAllMap)
-		LIB.DelayCall('MY_ShenxingHelper__HookOpenAllMap', 200, D.HookOpenAllMap)
+		X.DelayCall('MY_ShenxingHelper__HookOpenAllMap', 200, D.HookOpenAllMap)
 		D.HookOpenAllMap()
 	else
-		LIB.RegisterEvent({
+		X.RegisterEvent({
 			'LOADING_END',
 			'UPDATE_ROAD_TRACK_FORCE',
 			'UPDATE_ROUTE_NODE_OPEN_LIST',
@@ -242,18 +213,18 @@ function D.CheckOpenAllMapEnable()
 			'SYNC_ROLE_DATA_END',
 			'PLAYER_LEVEL_UPDATE',
 		}, 'MY_ShenxingHelper__OpenAllMap', false)
-		LIB.DelayCall('MY_ShenxingHelper__HookOpenAllMap', false)
+		X.DelayCall('MY_ShenxingHelper__HookOpenAllMap', false)
 		D.UnhookOpenAllMap()
 	end
 end
-LIB.RegisterFrameCreate('WorldMap', 'MY_ShenxingHelper__OpenAllMap', D.CheckOpenAllMapEnable)
+X.RegisterFrameCreate('WorldMap', 'MY_ShenxingHelper__OpenAllMap', D.CheckOpenAllMapEnable)
 
 --------------------------------------------------------------------------
 -- 防止神行CD被黑
 --------------------------------------------------------------------------
 function D.CheckAvoidBlackShenxingEnable()
 	if D.bReady and O.bAvoidBlackCD then
-		LIB.RegisterEvent('DO_SKILL_CAST', 'MY_AvoidBlackShenxingCD', function()
+		X.RegisterEvent('DO_SKILL_CAST', 'MY_AvoidBlackShenxingCD', function()
 			local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 			if not(UI_GetClientPlayerID() == dwID and
 			Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)) then
@@ -264,7 +235,7 @@ function D.CheckAvoidBlackShenxingEnable()
 				return
 			end
 
-			local nType, dwSkillID, dwSkillLevel, fProgress = LIB.GetOTActionState(player)
+			local nType, dwSkillID, dwSkillLevel, fProgress = X.GetOTActionState(player)
 			if not ((
 				nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 				or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
@@ -272,11 +243,11 @@ function D.CheckAvoidBlackShenxingEnable()
 			) and dwSkillID == 3691) then
 				return
 			end
-			LIB.Sysmsg(_L['Shenxing has been cancelled, cause you got the zhenyan.'])
+			X.Sysmsg(_L['Shenxing has been cancelled, cause you got the zhenyan.'])
 			player.StopCurrentAction()
 		end)
 	else
-		LIB.RegisterEvent('DO_SKILL_CAST', 'MY_AvoidBlackShenxingCD')
+		X.RegisterEvent('DO_SKILL_CAST', 'MY_AvoidBlackShenxingCD')
 	end
 end
 
@@ -294,24 +265,24 @@ function D.RemoveHook()
 	D.UnhookOpenAllMap()
 end
 
-LIB.RegisterEvent('MY_RESTRICTION', 'MY_ShenxingHelper', function()
+X.RegisterEvent('MY_RESTRICTION', 'MY_ShenxingHelper', function()
 	if arg0 and arg0 ~= 'MY_ShenxingHelper' then
 		return
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ShenxingHelper', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ShenxingHelper', function()
 	D.bReady = true
 	D.CheckEnable()
 end)
-LIB.RegisterReload('MY_ShenxingHelper', D.RemoveHook)
+X.RegisterReload('MY_ShenxingHelper', D.RemoveHook)
 
 --------------------------------------------------------------------------
 -- 设置界面
 --------------------------------------------------------------------------
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Avoid blacking shenxing cd'],
 		tip = _L['Got zhenyan wen shenxing, your shengxing will be blacked.'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
@@ -321,9 +292,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 	}):Width() + 5
 
-	if not LIB.IsRestricted('MY_ShenxingHelper') then
-		x = x + ui:Append('WndCheckBox', {
-			x = x, y = y, w = 'auto',
+	if not X.IsRestricted('MY_ShenxingHelper') then
+		nX = nX + ui:Append('WndCheckBox', {
+			x = nX, y = nY, w = 'auto',
 			text = _L['Shenxing to ancient maps'],
 			checked = MY_ShenxingHelper.bAncientMap,
 			oncheck = function(bChecked)
@@ -331,8 +302,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 			end,
 		}):Width() + 5
 
-		x = x + ui:Append('WndCheckBox', {
-			x = x, y = y, w = 'auto',
+		nX = nX + ui:Append('WndCheckBox', {
+			x = nX, y = nY, w = 'auto',
 			text = _L['Force open all map shenxing'],
 			tip = _L['Shenxing can fly to undiscovered maps'],
 			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
@@ -343,9 +314,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		}):Width() + 5
 	end
 
-	x = X
-	y = y + deltaY
-	return x, y
+	nX = nPaddingX
+	nY = nY + nLH
+	return nX, nY
 end
 
 -- Global exports
@@ -384,5 +355,5 @@ local settings = {
 		},
 	},
 }
-MY_ShenxingHelper = LIB.CreateModule(settings)
+MY_ShenxingHelper = X.CreateModule(settings)
 end

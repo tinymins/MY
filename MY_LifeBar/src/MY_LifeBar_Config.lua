@@ -10,63 +10,34 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_LifeBar'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
 local function SchemaRelationForce(itemschema)
-	return Schema.Map(
-		Schema.OneOf('Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe'),
+	return X.Schema.Map(
+		X.Schema.OneOf('Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe'),
 		function(obj, path)
-			if not IsTable(obj) then
-				return Schema.Error('Invalid value: '..path..' must be table', path)
+			if not X.IsTable(obj) then
+				return X.Schema.Error('Invalid value: '..path..' must be table', path)
 			end
 			for k, v in pairs(obj) do
 				path:push(k)
 				if k == 'DifferentiateForce' then
-					if not IsBoolean(v) then
-						return Schema.Error('Invalid value: ' .. path .. ' must be boolean', path)
+					if not X.IsBoolean(v) then
+						return X.Schema.Error('Invalid value: ' .. path .. ' must be boolean', path)
 					end
 				else
 					local err = itemschema(v, path)
@@ -80,299 +51,299 @@ local function SchemaRelationForce(itemschema)
 		end
 	)
 end
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
+local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	eCss = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	fDesignUIScale = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nDesignFontOffset = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 
 	nCamp = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = -1,
 	},
 	bOnlyInArena = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOnlyInDungeon = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOnlyInBattleField = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 
 	nTextOffsetY = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 38,
 	},
 	nTextLineHeight = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 20,
 	},
 	fTextScale = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1.2,
 	},
 	fTextSpacing = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 
 	bShowSpecialNpc = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowSpecialNpcOnlyEnemy = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowObjectID = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowObjectIDOnlyUnnamed = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowKungfu = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowDistance = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowDistanceOnlyTarget = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nDistanceDecimal = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 
 	nLifeWidth = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 52,
 	},
 	nLifeHeight = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	nLifePadding = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nLifeOffsetX = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nLifeOffsetY = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 12,
 	},
 	nLifeBorder = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	nLifeBorderR = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nLifeBorderG = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nLifeBorderB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	szLifeDirection = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = 'LEFT_RIGHT',
 	},
 
 	nLifePerOffsetX = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nLifePerOffsetY = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 8,
 	},
 
 	fTitleEffectScale = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0.7,
 	},
 	nTitleEffectOffsetY = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nBalloonOffsetY = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = -20,
 	},
 
 	nAlpha = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 255,
 	},
 	nFont = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 7,
 	},
 	nDistance = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 80 * 80 * 64 * 64,
 	},
 	nVerticalDistance = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 50 * 8 * 64,
 	},
 
 	bHideLifePercentageWhenFight = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bHideLifePercentageDecimal = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 
 	fGlobalUIScale = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	bSystemUIScale = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowWhenUIHide = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bMineOnTop = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bTargetOnTop = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bScreenPosSort = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 
 	Color = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = SchemaRelationForce(Schema.Tuple(Schema.Number, Schema.Number, Schema.Number)),
+		xSchema = SchemaRelationForce(X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {
-			Self = LIB.KvpToObject({ -- 自己
+			Self = X.KvpToObject({ -- 自己
 				{'DifferentiateForce', false},
 				{'Player', { 26, 156, 227 }},
 				{'Npc', { 26, 156, 227 }},
@@ -391,7 +362,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 长歌
 				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
 			}),
-			Party = LIB.KvpToObject({ -- 团队
+			Party = X.KvpToObject({ -- 团队
 				{'DifferentiateForce', false},
 				{'Player', { 23, 133, 194 }},
 				{'Npc', { 23, 133, 194 }},
@@ -410,7 +381,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 长歌
 				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
 			}),
-			Enemy = LIB.KvpToObject({ -- 敌对
+			Enemy = X.KvpToObject({ -- 敌对
 				{'DifferentiateForce', false},
 				{'Player', { 203, 53, 9 }},
 				{'Npc', { 203, 53, 9 }},
@@ -429,7 +400,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 长歌
 				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
 			}),
-			Neutrality = LIB.KvpToObject({ -- 中立
+			Neutrality = X.KvpToObject({ -- 中立
 				{'DifferentiateForce', false},
 				{'Player', { 238, 238, 15 }},
 				{'Npc', { 238, 238, 15 }},
@@ -448,7 +419,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 长歌
 				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
 			}),
-			Ally = LIB.KvpToObject({ -- 相同阵营
+			Ally = X.KvpToObject({ -- 相同阵营
 				{'DifferentiateForce', false},
 				{'Player', { 63 , 210, 94 }},
 				{'Npc', { 63 , 210, 94 }},
@@ -467,7 +438,7 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 				{FORCE_TYPE.CHANG_GE , { 100, 250, 180 }}, -- 长歌
 				{FORCE_TYPE.BA_DAO   , { 106, 108, 189 }}, -- 霸刀
 			}),
-			Foe = LIB.KvpToObject({ -- 仇人
+			Foe = X.KvpToObject({ -- 仇人
 				{'DifferentiateForce', false},
 				{'Player', { 197, 26, 201 }},
 				{FORCE_TYPE.JIANG_HU , { 255, 255, 255 }}, -- 江湖
@@ -488,13 +459,13 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		},
 	},
 	ShowName = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = SchemaRelationForce(Schema.Record({
-			bEnable = Schema.Boolean,
-			bOnlyFighting = Schema.Boolean,
-			bHideInDungeon = Schema.Optional(Schema.Boolean),
-			bHidePets = Schema.Optional(Schema.Boolean),
+		xSchema = SchemaRelationForce(X.Schema.Record({
+			bEnable = X.Schema.Boolean,
+			bOnlyFighting = X.Schema.Boolean,
+			bHideInDungeon = X.Schema.Optional(X.Schema.Boolean),
+			bHidePets = X.Schema.Optional(X.Schema.Boolean),
 		})),
 		xDefaultValue = {
 			Self = {
@@ -521,13 +492,13 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		},
 	},
 	ShowTong = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = SchemaRelationForce(Schema.Record({
-			bEnable = Schema.Boolean,
-			bOnlyFighting = Schema.Boolean,
-			bHideInDungeon = Schema.Optional(Schema.Boolean),
-			bHidePets = Schema.Optional(Schema.Boolean),
+		xSchema = SchemaRelationForce(X.Schema.Record({
+			bEnable = X.Schema.Boolean,
+			bOnlyFighting = X.Schema.Boolean,
+			bHideInDungeon = X.Schema.Optional(X.Schema.Boolean),
+			bHidePets = X.Schema.Optional(X.Schema.Boolean),
 		})),
 		xDefaultValue = {
 			Self = {
@@ -542,13 +513,13 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		},
 	},
 	ShowTitle = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = SchemaRelationForce(Schema.Record({
-			bEnable = Schema.Boolean,
-			bOnlyFighting = Schema.Boolean,
-			bHideInDungeon = Schema.Optional(Schema.Boolean),
-			bHidePets = Schema.Optional(Schema.Boolean),
+		xSchema = SchemaRelationForce(X.Schema.Record({
+			bEnable = X.Schema.Boolean,
+			bOnlyFighting = X.Schema.Boolean,
+			bHideInDungeon = X.Schema.Optional(X.Schema.Boolean),
+			bHidePets = X.Schema.Optional(X.Schema.Boolean),
 		})),
 		xDefaultValue = {
 			Self = {
@@ -575,13 +546,13 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		},
 	},
 	ShowLife = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = SchemaRelationForce(Schema.Record({
-			bEnable = Schema.Boolean,
-			bOnlyFighting = Schema.Boolean,
-			bHideInDungeon = Schema.Optional(Schema.Boolean),
-			bHidePets = Schema.Optional(Schema.Boolean),
+		xSchema = SchemaRelationForce(X.Schema.Record({
+			bEnable = X.Schema.Boolean,
+			bOnlyFighting = X.Schema.Boolean,
+			bHideInDungeon = X.Schema.Optional(X.Schema.Boolean),
+			bHidePets = X.Schema.Optional(X.Schema.Boolean),
 		})),
 		xDefaultValue = {
 			Self = {
@@ -608,13 +579,13 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		},
 	},
 	ShowLifePer = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = SchemaRelationForce(Schema.Record({
-			bEnable = Schema.Boolean,
-			bOnlyFighting = Schema.Boolean,
-			bHideInDungeon = Schema.Optional(Schema.Boolean),
-			bHidePets = Schema.Optional(Schema.Boolean),
+		xSchema = SchemaRelationForce(X.Schema.Record({
+			bEnable = X.Schema.Boolean,
+			bOnlyFighting = X.Schema.Boolean,
+			bHideInDungeon = X.Schema.Optional(X.Schema.Boolean),
+			bHidePets = X.Schema.Optional(X.Schema.Boolean),
 		})),
 		xDefaultValue = {
 			Self = {
@@ -641,10 +612,10 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		},
 	},
 	ShowBalloon = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = SchemaRelationForce(Schema.Record({
-			bEnable = Schema.Boolean,
+		xSchema = SchemaRelationForce(X.Schema.Record({
+			bEnable = X.Schema.Boolean,
 		})),
 		xDefaultValue = {
 			Self = {
@@ -671,13 +642,13 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		},
 	},
 	BalloonChannel = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
-		xSchema = Schema.Map(
-			Schema.String,
-			Schema.Record({
-				bEnable = Schema.Boolean,
-				nDuring = Schema.Number,
+		xSchema = X.Schema.Map(
+			X.Schema.String,
+			X.Schema.Record({
+				bEnable = X.Schema.Boolean,
+				nDuring = X.Schema.Number,
 			})
 		),
 		xDefaultValue = {
@@ -700,15 +671,15 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 local D = {}
 
 local function LoadDefaultTemplate(szStyle)
-	local template = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_LifeBar/config/' .. szStyle .. '/{$lang}.jx3dat')
+	local template = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_LifeBar/config/' .. szStyle .. '/{$lang}.jx3dat')
 	if not template then
 		return
 	end
 	for _, szRelation in ipairs({ 'Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe' }) do
-		local tVal = LIB.KvpToObject(template[1].Color[szRelation].__VALUE__)
-		for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
+		local tVal = X.KvpToObject(template[1].Color[szRelation].__VALUE__)
+		for _, dwForceID in X.pairs_c(CONSTANT.FORCE_TYPE) do
 			if not tVal[dwForceID] then
-				tVal[dwForceID] = { LIB.GetForceColor(dwForceID, 'foreground') }
+				tVal[dwForceID] = { X.GetForceColor(dwForceID, 'foreground') }
 			end
 		end
 		template[1].Color[szRelation].__VALUE__ = tVal
@@ -731,7 +702,7 @@ local CONFIG_DEFAULTS = setmetatable({}, {
 
 local function FormatConfigData(szStyle, d)
 	local template = CONFIG_DEFAULTS[szStyle]
-	return LIB.FormatDataStructure(d, template[1], true, template[2])
+	return X.FormatDataStructure(d, template[1], true, template[2])
 end
 
 local Config = O
@@ -746,7 +717,7 @@ function D.Init()
 	}) do
 		local config = LoadDefaultTemplate(p.name)
 		if not config then
-			LIB.Debug(_L['MY_LifeBar'], _L['Default config cannot be loaded, please reinstall!!!'] .. ' (' .. p.name .. ')', DEBUG_LEVEL.ERROR)
+			X.Debug(_L['MY_LifeBar'], _L['Default config cannot be loaded, please reinstall!!!'] .. ' (' .. p.name .. ')', X.DEBUG_LEVEL.ERROR)
 		end
 		CONFIG_DEFAULTS[p.key] = config
 	end
@@ -755,7 +726,7 @@ end
 -- 根据玩家自定义界面缩放设置反向缩放 实现默认设置不受用户缩放影响
 function D.AutoAdjustScale()
 	Config('reload', {'fDesignUIScale', 'fGlobalUIScale'})
-	local fUIScale = LIB.GetUIScale()
+	local fUIScale = X.GetUIScale()
 	if Config.fDesignUIScale ~= fUIScale then
 		Config.fGlobalUIScale = Config.fGlobalUIScale * Config.fDesignUIScale / fUIScale
 		Config.fDesignUIScale = fUIScale
@@ -763,7 +734,7 @@ function D.AutoAdjustScale()
 	Config('reload', {'nDesignFontOffset', 'fTextScale'})
 	local nFontOffset = Font.GetOffset()
 	if Config.nDesignFontOffset ~= nFontOffset then
-		Config.fTextScale = Config.fTextScale * LIB.GetFontScale(Config.nDesignFontOffset) / LIB.GetFontScale()
+		Config.fTextScale = Config.fTextScale * X.GetFontScale(Config.nDesignFontOffset) / X.GetFontScale()
 		Config.nDesignFontOffset = nFontOffset
 	end
 end
@@ -776,45 +747,45 @@ local function onUIScaled()
 	D.AutoAdjustScale()
 	FireUIEvent('MY_LIFEBAR_CONFIG_UPDATE')
 end
-LIB.RegisterEvent('UI_SCALED', 'MY_LifeBar_Config', onUIScaled)
+X.RegisterEvent('UI_SCALED', 'MY_LifeBar_Config', onUIScaled)
 end
 
 function D.LoadConfig(szConfig)
 	local tConfig
-	if IsTable(szConfig) then
+	if X.IsTable(szConfig) then
 		tConfig = szConfig
-	elseif IsString(szConfig) then
-		tConfig = LIB.LoadLUAData({ 'config/xlifebar/' .. szConfig .. '.jx3dat', PATH_TYPE.GLOBAL })
+	elseif X.IsString(szConfig) then
+		tConfig = X.LoadLUAData({ 'config/xlifebar/' .. szConfig .. '.jx3dat', X.PATH_TYPE.GLOBAL })
 	end
 	if tConfig then
 		if not tConfig.fDesignUIScale then -- 兼容老数据
 			for _, key in ipairs({'ShowName', 'ShowTong', 'ShowTitle', 'ShowLife', 'ShowLifePer'}) do
 				for _, relation in ipairs({'Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe'}) do
 					for _, tartype in ipairs({'Npc', 'Player'}) do
-						if tConfig[key] and IsTable(tConfig[key][relation]) and IsBoolean(tConfig[key][relation][tartype]) then
+						if tConfig[key] and X.IsTable(tConfig[key][relation]) and X.IsBoolean(tConfig[key][relation][tartype]) then
 							tConfig[key][relation][tartype] = { bEnable = tConfig[key][relation][tartype] }
 						end
 					end
 				end
 			end
-			tConfig.fDesignUIScale = LIB.GetUIScale()
+			tConfig.fDesignUIScale = X.GetUIScale()
 			tConfig.fMatchedFontOffset = Font.GetOffset()
 		end
 		tConfig = FormatConfigData(tConfig.eCss or 'DEFAULT', tConfig)
 		for k, v in pairs(tConfig) do
-			Call(Set, Config, {k}, v)
+			X.Call(Set, Config, {k}, v)
 		end
 	end
 	ConfigLoaded = true
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar_Config', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar_Config', function()
 	D.Init()
 	D.LoadConfig()
 end)
 
-LIB.RegisterInit('MY_LifeBar_Config', function()
+X.RegisterInit('MY_LifeBar_Config', function()
 	D.AutoAdjustScale()
 end)
 
@@ -825,7 +796,7 @@ MY_LifeBar_Config = setmetatable({}, {
 		if op == 'get' then
 			local config = Config
 			for i = 1, argc do
-				if not IsTable(config) then
+				if not X.IsTable(config) then
 					return
 				end
 				config = config[argv[i]]
@@ -834,12 +805,12 @@ MY_LifeBar_Config = setmetatable({}, {
 		elseif op == 'set' then
 			local config = Config
 			for i = 1, argc - 2 do
-				if not IsTable(config) then
+				if not X.IsTable(config) then
 					return
 				end
 				config = config[argv[i]]
 			end
-			if not IsTable(config) then
+			if not X.IsTable(config) then
 				return
 			end
 			config[argv[argc - 1]] = argv[argc]

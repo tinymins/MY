@@ -10,80 +10,51 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatFilter'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
+local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	bFilterDuplicate = { -- 屏蔽重复聊天
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatFilter'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bFilterDuplicateIgnoreID = { -- 不同玩家重复聊天也屏蔽
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatFilter'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFilterDuplicateContinuous = { -- 仅屏蔽连续的重复聊天
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatFilter'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bFilterDuplicateAddonTalk = { -- 屏蔽UUID相同的插件消息
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatFilter'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	tApplyDuplicateChannels = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatFilter'],
-		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {
 			['MSG_SYS'           ] = false,
 			['MSG_NORMAL'        ] = true,
@@ -124,20 +95,20 @@ local l_tChannelHeader = {
 	['MSG_NPC_PARTY'] = g_tStrings.STR_TALK_HEAD_SAY1,
 }
 
-LIB.HookChatPanel('FILTER', 'MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
+X.HookChatPanel('FILTER', 'MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	local aXMLNode, aSay
 	-- 插件消息UUID过滤
 	if D.bReady and O.bFilterDuplicateAddonTalk then
 		if not aXMLNode then
-			aXMLNode = LIB.XMLDecode(szMsg)
-			aSay = LIB.ParseChatData(aXMLNode)
+			aXMLNode = X.XMLDecode(szMsg)
+			aSay = X.ParseChatData(aXMLNode)
 		end
 		if not h.MY_tDuplicateUUID then
 			h.MY_tDuplicateUUID = {}
 		end
 		for _, element in ipairs(aSay) do
 			if element.type == 'eventlink' and element.name == '' then
-				local data = LIB.JsonDecode(element.linkinfo)
+				local data = X.JsonDecode(element.linkinfo)
 				if data and data.uuid then
 					local szUUID = data.uuid
 					if szUUID then
@@ -146,11 +117,11 @@ LIB.HookChatPanel('FILTER', 'MY_ChatFilter', function(h, szMsg, szChannel, dwTim
 								return false
 							end
 						end
-						insert(h.MY_tDuplicateUUID, 1, szUUID)
+						table.insert(h.MY_tDuplicateUUID, 1, szUUID)
 						local nCount = #h.MY_tDuplicateUUID - MAX_UUID_RECORD
 						if nCount > 0 then
 							for i = nCount, 1, -1 do
-								remove(h.MY_tDuplicateUUID)
+								table.remove(h.MY_tDuplicateUUID)
 							end
 						end
 					end
@@ -159,27 +130,27 @@ LIB.HookChatPanel('FILTER', 'MY_ChatFilter', function(h, szMsg, szChannel, dwTim
 		end
 	end
 	-- 重复内容刷屏屏蔽（系统频道除外）
-	if szChannel == 'MSG_SYS' and LIB.ContainsEchoMsgHeader(szMsg) then
+	if szChannel == 'MSG_SYS' and X.ContainsEchoMsgHeader(szMsg) then
 		if not aXMLNode then
-			aXMLNode = LIB.XMLDecode(szMsg)
-			aSay = LIB.ParseChatData(aXMLNode)
+			aXMLNode = X.XMLDecode(szMsg)
+			aSay = X.ParseChatData(aXMLNode)
 		end
-		local bHasEcho, szEchoChannel = LIB.DecodeEchoMsgHeader(aXMLNode)
+		local bHasEcho, szEchoChannel = X.DecodeEchoMsgHeader(aXMLNode)
 		if bHasEcho and szEchoChannel then
 			szChannel = szEchoChannel
 		end
 	end
 	if D.bReady and O.bFilterDuplicate and O.tApplyDuplicateChannels[szChannel] then
 		if not aXMLNode then
-			aXMLNode = LIB.XMLDecode(szMsg)
-			aSay = LIB.ParseChatData(aXMLNode)
+			aXMLNode = X.XMLDecode(szMsg)
+			aSay = X.ParseChatData(aXMLNode)
 		end
 		-- 解析聊天纯字符串
-		local szText = LIB.StringifyChatText(aSay)
+		local szText = X.StringifyChatText(aSay)
 		-- 解析发言人名字
 		local szName = ''
 		if l_tChannelHeader[szChannel] then
-			local nS, nE = wfind(szText, l_tChannelHeader[szChannel])
+			local nS, nE = wstring.find(szText, l_tChannelHeader[szChannel])
 			if nS and nE then
 				szName = ''
 				szText:sub(1, nE):gsub('(%[[^%[%]]-%])', function(s)
@@ -207,18 +178,18 @@ LIB.HookChatPanel('FILTER', 'MY_ChatFilter', function(h, szMsg, szChannel, dwTim
 					return false
 				end
 			end
-			insert(h.MY_tDuplicateLog, 1, szText)
+			table.insert(h.MY_tDuplicateLog, 1, szText)
 			local nCount = #h.MY_tDuplicateLog - MAX_CHAT_RECORD
 			if nCount > 0 then
 				for i = nCount, 1, -1 do
-					remove(h.MY_tDuplicateLog)
+					table.remove(h.MY_tDuplicateLog)
 				end
 			end
 		end
 	end
 	return true
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatFilter', function() D.bReady = true end)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatFilter', function() D.bReady = true end)
 
 local PS = {}
 
@@ -262,7 +233,7 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local t = {}
 			for szChannelID, bFilter in pairs(O.tApplyDuplicateChannels) do
-				insert(t, {
+				table.insert(t, {
 					szOption = g_tStrings.tChannelName[szChannelID],
 					bCheck = true, bChecked = bFilter,
 					rgb = GetMsgFontColor(szChannelID, true),
@@ -289,4 +260,4 @@ function PS.OnPanelActive(wnd)
 	y = y + 30
 end
 
-LIB.RegisterPanel(_L['Chat'], 'MY_DuplicateChatFilter', _L['duplicate chat filter'], 'ui/Image/UICommon/yirong3.UITex|104', PS)
+X.RegisterPanel(_L['Chat'], 'MY_DuplicateChatFilter', _L['duplicate chat filter'], 'ui/Image/UICommon/yirong3.UITex|104', PS)

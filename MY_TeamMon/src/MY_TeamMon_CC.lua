@@ -11,53 +11,24 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon_CC'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_TeamMon_CC', { ['*'] = true })
+X.RegisterRestriction('MY_TeamMon_CC', { ['*'] = true })
 --------------------------------------------------------------------------
 local TARGET = TARGET
-local INI_SHADOW          = PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini'
+local INI_SHADOW          = X.PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini'
 local CIRCLE_MAX_RADIUS   = 30    -- 最大的半径
 local CIRCLE_LINE_ALPHA   = 165   -- 线和边框最大透明度
 local CIRCLE_MAX_CIRCLE   = 2
@@ -76,17 +47,17 @@ local H_CIRCLE = UI.GetShadowHandle('Handle_Shadow_Circle')
 local H_LINE = UI.GetShadowHandle('Handle_Shadow_Line')
 local H_NAME = UI.GetShadowHandle('Handle_Shadow_Name')
 
-local O = LIB.CreateUserSettingsModule('MY_TeamMon_CC', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_TeamMon_CC', _L['Raid'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBorder = { -- 全局的边框模式 边框会造成卡
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
@@ -101,7 +72,7 @@ function D.UpdateRule()
 			{ szType = 'DOODAD', dwType = TARGET.DOODAD},
 		}) do
 			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(ds.szType), 0, true) do
-				if not IsEmpty(data.aCircle) or data.bDrawLine then
+				if not X.IsEmpty(data.aCircle) or data.bDrawLine then
 					CIRCLE_RULE[ds.dwType][data.dwID] = data
 				end
 			end
@@ -127,16 +98,16 @@ end
 
 function D.DrawShape(dwType, tar, sha, nAngle, nRadius, col, nAlpha)
 	local nRadius = nRadius * 64
-	local nFace = ceil(128 * nAngle / 360)
-	local dwRad1 = PI * (tar.nFaceDirection - nFace) / 128
+	local nFace = math.ceil(128 * nAngle / 360)
+	local dwRad1 = math.pi * (tar.nFaceDirection - nFace) / 128
 	if tar.nFaceDirection > (256 - nFace) then
-		dwRad1 = dwRad1 - PI - PI
+		dwRad1 = dwRad1 - math.pi - math.pi
 	end
-	local dwRad2 = dwRad1 + (nAngle / 180 * PI)
+	local dwRad2 = dwRad1 + (nAngle / 180 * math.pi)
 	local nStep = 16
 	if nAngle <= 45 then nStep = 180 end
 	if nAngle == 360 then
-		dwRad2 = dwRad2 + PI / 20
+		dwRad2 = dwRad2 + math.pi / 20
 	end
 	-- nAlpha 补偿
 	if not nAlpha then
@@ -163,29 +134,29 @@ function D.DrawShape(dwType, tar, sha, nAngle, nRadius, col, nAlpha)
 	-- relative points
 	local sX, sZ = Scene_PlaneGameWorldPosToScene(tar.nX, tar.nY)
 	repeat
-		local sX_, sZ_ = Scene_PlaneGameWorldPosToScene(tar.nX + cos(dwRad1) * nRadius, tar.nY + sin(dwRad1) * nRadius)
+		local sX_, sZ_ = Scene_PlaneGameWorldPosToScene(tar.nX + math.cos(dwRad1) * nRadius, tar.nY + math.sin(dwRad1) * nRadius)
 		if dwType == TARGET.DOODAD then
 			sha:AppendDoodadID(tar.dwID, r, g, b, nAlpha, { sX_ - sX, 0, sZ_ - sZ })
 		else
 			sha:AppendCharacterID(tar.dwID, false, r, g, b, nAlpha, { sX_ - sX, 0, sZ_ - sZ })
 		end
-		dwRad1 = dwRad1 + PI / nStep
+		dwRad1 = dwRad1 + math.pi / nStep
 	until dwRad1 > dwRad2
 end
 
 function D.DrawBorder(dwType, tar, sha, nAngle, nRadius, col)
 	local nRadius = nRadius * 64
 	local nThick = 1 + (5 * nRadius / 64 / 20)
-	local nFace = ceil(128 * nAngle / 360)
-	local dwRad1 = PI * (tar.nFaceDirection - nFace) / 128
+	local nFace = math.ceil(128 * nAngle / 360)
+	local dwRad1 = math.pi * (tar.nFaceDirection - nFace) / 128
 	if tar.nFaceDirection > (256 - nFace) then
-		dwRad1 = dwRad1 - PI - PI
+		dwRad1 = dwRad1 - math.pi - math.pi
 	end
-	local dwRad2 = dwRad1 + (nAngle / 180 * PI)
+	local dwRad2 = dwRad1 + (nAngle / 180 * math.pi)
 	local nStep = 16
 	if nAngle <= 45 then nStep = 180 end
 	if nAngle == 360 then
-		dwRad2 = dwRad2 + PI / 20
+		dwRad2 = dwRad2 + math.pi / 20
 	end
 	local sX, sZ = Scene_PlaneGameWorldPosToScene(tar.nX, tar.nY)
 	local r, g, b = unpack(col)
@@ -195,14 +166,14 @@ function D.DrawBorder(dwType, tar, sha, nAngle, nRadius, col)
 	repeat
 		local tRad = { nRadius, nRadius - nThick }
 		for _, v in ipairs(tRad) do
-			local sX_, sZ_ = Scene_PlaneGameWorldPosToScene(tar.nX + cos(dwRad1) * v , tar.nY + sin(dwRad1) * v)
+			local sX_, sZ_ = Scene_PlaneGameWorldPosToScene(tar.nX + math.cos(dwRad1) * v , tar.nY + math.sin(dwRad1) * v)
 			if dwType == TARGET.DOODAD then
 				sha:AppendDoodadID(tar.dwID, r, g, b, CIRCLE_LINE_ALPHA, { sX_ - sX, 0, sZ_ - sZ })
 			else
 				sha:AppendCharacterID(tar.dwID, false, r, g, b, CIRCLE_LINE_ALPHA, { sX_ - sX, 0, sZ_ - sZ })
 			end
 		end
-		dwRad1 = dwRad1 + PI / nStep
+		dwRad1 = dwRad1 + math.pi / nStep
 	until dwRad1 > dwRad2
 end
 
@@ -212,7 +183,7 @@ function D.DrawObject(dwType, dwID, KObject)
 		return
 	end
 	if not KObject then
-		KObject = LIB.GetObject(dwType, dwID)
+		KObject = X.GetObject(dwType, dwID)
 	end
 	if not KObject then
 		return
@@ -242,7 +213,7 @@ function D.DrawObject(dwType, dwID, KObject)
 		if dwType == TARGET.NPC then
 			dwTarType, dwTarID = KObject.GetTarget()
 		end
-		local tar = LIB.GetObject(dwTarType, dwTarID)
+		local tar = X.GetObject(dwTarType, dwTarID)
 		if tar and dwTarType == TARGET.PLAYER and dwTarID ~= 0
 		and (not cache.bDrawLineOnlyStareMe or dwTarID == UI_GetClientPlayerID()) then
 			if not cache.shaLine or cache.shaLine.dwTarID ~= dwTarID then
@@ -269,7 +240,7 @@ function D.DrawObject(dwType, dwID, KObject)
 		end
 	end
 	if cache.bDrawName then
-		local szText = cache.szNote or LIB.GetObjectName(KObject)
+		local szText = cache.szNote or X.GetObjectName(KObject)
 		if not cache.shaName or cache.shaName.szText ~= szText then
 			if not cache.shaName then
 				cache.shaName = H_NAME:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Name')
@@ -287,14 +258,14 @@ function D.DrawObject(dwType, dwID, KObject)
 end
 
 function D.OnObjectEnterScene(dwType, dwID)
-	local tar = LIB.GetObject(dwType, dwID)
+	local tar = X.GetObject(dwType, dwID)
 	local rule = CIRCLE_RULE[dwType][tar.dwTemplateID]
 	if rule and (not rule.bDrawOnlyMyEmployer or dwType ~= TARGET.NPC or tar.dwEmployer == UI_GetClientPlayerID()) then
 		local cache = setmetatable({}, { __index = rule })
 		if rule.aCircle then
 			local aCircle = {}
 			for _, rule in ipairs(rule.aCircle) do
-				insert(aCircle, setmetatable({}, { __index = rule }))
+				table.insert(aCircle, setmetatable({}, { __index = rule }))
 			end
 			cache.aCircle = aCircle
 		end
@@ -360,13 +331,13 @@ function D.RescanNearby()
 	H_CIRCLE:Clear()
 	H_LINE:Clear()
 	H_NAME:Clear()
-	if LIB.IsRestricted('MY_TeamMon_CC') then
+	if X.IsRestricted('MY_TeamMon_CC') then
 		return
 	end
-	for _, dwID in pairs(LIB.GetNearNpcID()) do
+	for _, dwID in pairs(X.GetNearNpcID()) do
 		D.OnObjectEnterScene(TARGET.NPC, dwID)
 	end
-	for _, dwID in pairs(LIB.GetNearDoodadID()) do
+	for _, dwID in pairs(X.GetNearDoodadID()) do
 		D.OnObjectEnterScene(TARGET.DOODAD, dwID)
 	end
 end
@@ -379,8 +350,8 @@ function D.OnTMDataReload()
 end
 
 function D.CheckEnable()
-	if D.bReady and O.bEnable and not LIB.IsRestricted('MY_TeamMon_CC') then
-		LIB.RegisterModuleEvent('MY_TeamMon_CC', {
+	if D.bReady and O.bEnable and not X.IsRestricted('MY_TeamMon_CC') then
+		X.RegisterModuleEvent('MY_TeamMon_CC', {
 			{ '#BREATHE', D.OnBreathe },
 			{ 'NPC_ENTER_SCENE', function() D.OnObjectEnterScene(TARGET.NPC, arg0) end },
 			{ 'NPC_LEAVE_SCENE', function() D.OnObjectLeaveScene(TARGET.NPC, arg0) end },
@@ -393,17 +364,17 @@ function D.CheckEnable()
 		})
 		D.UpdateRule()
 	else
-		LIB.RegisterModuleEvent('MY_TeamMon_CC', false)
+		X.RegisterModuleEvent('MY_TeamMon_CC', false)
 	end
 end
 
-LIB.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_CC', function()
+X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_CC', function()
 	if arg0 and arg0 ~= 'MY_TeamMon_CC' then
 		return
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_CC', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_CC', function()
 	D.bReady = true
 	D.CheckEnable()
 end)
@@ -434,5 +405,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_CC = LIB.CreateModule(settings)
+MY_TeamMon_CC = X.CreateModule(settings)
 end

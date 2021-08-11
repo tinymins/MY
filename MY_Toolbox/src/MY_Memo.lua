@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -78,7 +49,7 @@ function D.Reload(bGlobal)
 		__index = CFG_O,
 		__newindex = function(t, k, v)
 			CFG_O[k] = v
-			LIB.DelayCall('MY_Memo_SaveConfig', D.SaveConfig)
+			X.DelayCall('MY_Memo_SaveConfig', D.SaveConfig)
 		end,
 	})
 	local NAME = bGlobal and 'MY_MemoGlobal' or 'MY_MemoRole'
@@ -121,14 +92,14 @@ function D.Reload(bGlobal)
 end
 
 function D.LoadConfig()
-	local CFG = LIB.LoadLUAData({'config/memo.jx3dat', PATH_TYPE.GLOBAL})
+	local CFG = X.LoadLUAData({'config/memo.jx3dat', X.PATH_TYPE.GLOBAL})
 	if CFG then
 		for k, v in pairs(CFG) do
 			GLOBAL_MEMO[k] = v
 		end
 	end
 
-	local CFG = LIB.LoadLUAData({'config/memo.jx3dat', PATH_TYPE.ROLE})
+	local CFG = X.LoadLUAData({'config/memo.jx3dat', X.PATH_TYPE.ROLE})
 	if CFG then
 		for k, v in pairs(CFG) do
 			ROLE_MEMO[k] = v
@@ -144,14 +115,14 @@ function D.SaveConfig()
 		CFG[k] = v
 	end
 	CFG.bEnableGlobal = GLOBAL_MEMO.bEnable
-	LIB.SaveLUAData({'config/memo.jx3dat', PATH_TYPE.ROLE}, CFG)
+	X.SaveLUAData({'config/memo.jx3dat', X.PATH_TYPE.ROLE}, CFG)
 
 	local CFG = {}
 	for k, v in pairs(GLOBAL_MEMO) do
 		CFG[k] = v
 	end
 	CFG.bEnable = nil
-	LIB.SaveLUAData({'config/memo.jx3dat', PATH_TYPE.GLOBAL}, CFG)
+	X.SaveLUAData({'config/memo.jx3dat', X.PATH_TYPE.GLOBAL}, CFG)
 end
 
 function D.IsEnable(bGlobal)
@@ -186,12 +157,12 @@ local function onInit()
 	D.Reload(true)
 	D.Reload(false)
 end
-LIB.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', onInit)
+X.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', onInit)
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y,
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['Memo (Role)'],
 		checked = D.IsEnable(false),
 		oncheck = function(bChecked)
@@ -199,8 +170,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndButton', {
-		x = x, y = y,
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY,
 		text = _L['Font'],
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
@@ -209,8 +180,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y,
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['Memo (Global)'],
 		checked = D.IsEnable(true),
 		oncheck = function(bChecked)
@@ -218,8 +189,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndButton', {
-		x = x, y = y,
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY,
 		text = _L['Font'],
 		onclick = function()
 			UI.OpenFontPicker(function(nFont)
@@ -227,9 +198,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 			end)
 		end,
 	}):AutoWidth():Width() + 5
-	y = y + deltaY
-	x = X
-	return x, y
+	nY = nY + nLH
+	nX = nPaddingX
+	return nX, nY
 end
 
 ---------------------------------------------------------------------
@@ -246,5 +217,5 @@ local settings = {
 		},
 	},
 }
-MY_Memo = LIB.CreateModule(settings)
+MY_Memo = X.CreateModule(settings)
 end

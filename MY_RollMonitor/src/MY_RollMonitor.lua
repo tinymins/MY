@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RollMonitor'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RollMonitor'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -84,7 +55,7 @@ local SORT_TYPE_INFO = {
 		fnCalc = function(aRecord, nIndex1, nIndex2)
 			local nRoll = 0
 			for i = nIndex1, nIndex2 do
-				nRoll = max(nRoll, aRecord[i].nRoll)
+				nRoll = math.max(nRoll, aRecord[i].nRoll)
 			end
 			return nRoll
 		end
@@ -94,7 +65,7 @@ local SORT_TYPE_INFO = {
 		fnCalc = function(aRecord, nIndex1, nIndex2)
 			local nRoll = 0
 			for i = nIndex1, nIndex2 do
-				nRoll = min(nRoll, aRecord[i].nRoll)
+				nRoll = math.min(nRoll, aRecord[i].nRoll)
 			end
 			return nRoll
 		end
@@ -116,8 +87,8 @@ local SORT_TYPE_INFO = {
 			local nCount = nIndex2 - nIndex1 + 1
 			for i = nIndex1, nIndex2 do
 				local nRoll = aRecord[i].nRoll
-				nMin = min(nMin, nRoll)
-				nMax = max(nMax, nRoll)
+				nMin = math.min(nMin, nRoll)
+				nMax = math.max(nMax, nRoll)
 				nTotal = nTotal + nRoll
 			end
 			if nCount > 2 then
@@ -158,41 +129,41 @@ m_tRecords = {
 	}, ...
 }
 ]]
-local O = LIB.CreateUserSettingsModule('MY_RollMonitor', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_RollMonitor', _L['General'], {
 	nSortType = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nTimeLimit = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = -1,
 	},
 	nPublish = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nPublishChannel = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = PLAYER_TALK_CHANNEL.RAID,
 	},
 	bPublishUnroll = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bPublishRestart = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
@@ -202,9 +173,9 @@ local D = {}
 -- 打开面板
 -- (void) D.OpenPanel()
 function D.OpenPanel()
-	LIB.ShowPanel()
-	LIB.FocusPanel()
-	LIB.SwitchTab('RollMonitor')
+	X.ShowPanel()
+	X.FocusPanel()
+	X.SwitchTab('RollMonitor')
 end
 
 -- 清空ROLL点
@@ -217,7 +188,7 @@ function D.Clear(bEcho, nChannel)
 	end
 	if bEcho then
 		nChannel = nChannel or O.nPublishChannel
-		LIB.SendChat(nChannel, _L['----------- roll restart -----------'] .. '\n')
+		X.SendChat(nChannel, _L['----------- roll restart -----------'] .. '\n')
 	end
 	m_tRecords = {}
 	D.DrawBoard()
@@ -251,7 +222,7 @@ function D.GetPersonResult(szName, nSortType, nTimeLimit)
 		if rec.nTime < nStartTime then
 			nIndex1 = i
 		else
-			insert(aTime, rec.nTime)
+			table.insert(aTime, rec.nTime)
 		end
 	end
 	nIndex1 = nIndex1 + 1
@@ -280,10 +251,10 @@ function D.GetResult(nSortType, nTimeLimit)
 	for _, aRecord in pairs(m_tRecords) do
 		aRecord = D.GetPersonResult(aRecord, nSortType, nTimeLimit)
 		if aRecord then
-			insert(t, aRecord)
+			table.insert(t, aRecord)
 		end
 	end
-	sort(t, function(v1, v2) return v1.nRoll > v2.nRoll end)
+	table.sort(t, function(v1, v2) return v1.nRoll > v2.nRoll end)
 	return t
 end
 
@@ -301,16 +272,16 @@ function D.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 	nLimit    = nLimit    or O.nPublish
 	nChannel  = nChannel  or O.nPublishChannel
 
-	LIB.SendChat(nChannel, ('[%s][%s][%s]%s\n'):format(
-		PACKET_INFO.SHORT_NAME, _L['roll monitor'],
+	X.SendChat(nChannel, ('[%s][%s][%s]%s\n'):format(
+		X.PACKET_INFO.SHORT_NAME, _L['roll monitor'],
 		TIME_LIMIT_TITLE[O.nTimeLimit],
 		SORT_TYPE_INFO[nSortType].szName
 	), { parsers = { name = false } })
-	LIB.SendChat(nChannel, _L['-------------------------------'] .. '\n')
+	X.SendChat(nChannel, _L['-------------------------------'] .. '\n')
 	local tNames = {}
 	for i, aRecord in ipairs(D.GetResult(nSortType)) do
 		if nLimit <= 0 or i <= nLimit then
-			LIB.SendChat(nChannel, _L('[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, gsub(aRecord.nRoll, '(%d+%.%d%d)%d+','%1')) .. '\n')
+			X.SendChat(nChannel, _L('[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, string.gsub(aRecord.nRoll, '(%d+%.%d%d)%d+','%1')) .. '\n')
 		end
 		tNames[aRecord.szName] = true
 	end
@@ -324,10 +295,10 @@ function D.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 			end
 		end
 		if szUnrolledNames~='' then
-			LIB.SendChat(nChannel, szUnrolledNames .. _L['haven\'t roll yet.']..'\n')
+			X.SendChat(nChannel, szUnrolledNames .. _L['haven\'t roll yet.']..'\n')
 		end
 	end
-	LIB.SendChat(nChannel, _L['-------------------------------'] .. '\n')
+	X.SendChat(nChannel, _L['-------------------------------'] .. '\n')
 end
 
 -- 重新绘制结果显示区域
@@ -342,15 +313,15 @@ function D.DrawBoard(ui)
 		local tNames = {}
 		for _, aRecord in ipairs(D.GetResult()) do
 			szHTML = szHTML ..
-				LIB.GetChatCopyXML() ..
+				X.GetChatCopyXML() ..
 				GetFormatText('['..aRecord.szName..']', nil, nil, nil, nil, 515, nil, 'namelink_0') ..
-				GetFormatText(_L( ' rolls for %d times, valid score is %s.', aRecord.nCount, (gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n')
+				GetFormatText(_L( ' rolls for %d times, valid score is %s.', aRecord.nCount, (string.gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n')
 			for _, nTime in ipairs(aRecord.aTime) do
-				insert(m_aRecTime, nTime)
+				table.insert(m_aRecTime, nTime)
 			end
 			tNames[aRecord.szName] = true
 		end
-		sort(m_aRecTime)
+		table.sort(m_aRecTime)
 		local team = GetClientTeam()
 		if team then
 			local szUnrolledNames = ''
@@ -362,11 +333,11 @@ function D.DrawBoard(ui)
 			end
 			if szUnrolledNames ~= '' then
 				szHTML = szHTML ..
-				LIB.GetChatCopyXML() ..
+				X.GetChatCopyXML() ..
 				szUnrolledNames .. GetFormatText(_L['haven\'t roll yet.'])
 			end
 		end
-		szHTML = LIB.RenderChatLink(szHTML)
+		szHTML = X.RenderChatLink(szHTML)
 		if MY_Farbnamen and MY_Farbnamen.Render then
 			szHTML = MY_Farbnamen.Render(szHTML)
 		end
@@ -385,7 +356,7 @@ end
 -- 系统频道监控处理函数
 local function OnMsgArrive(szMsg, nFont, bRich, r, g, b)
 	local isRoll = false
-	for szName, nRoll in gmatch(szMsg, _L['ROLL_MONITOR_EXP'] ) do
+	for szName, nRoll in string.gmatch(szMsg, _L['ROLL_MONITOR_EXP'] ) do
 		-- 格式化数值
 		nRoll = tonumber(nRoll)
 		if not nRoll then
@@ -398,8 +369,8 @@ local function OnMsgArrive(szMsg, nFont, bRich, r, g, b)
 		end
 		local aRecord = m_tRecords[szName]
 		-- 格式化数组 更新各数值
-		insert(m_aRecTime, GetCurrentTime())
-		insert(aRecord, {nTime = GetCurrentTime(), nRoll = nRoll})
+		table.insert(m_aRecTime, GetCurrentTime())
+		table.insert(aRecord, {nTime = GetCurrentTime(), nRoll = nRoll})
 	end
 	if not isRoll then
 		return
@@ -422,7 +393,7 @@ local settings = {
 		},
 	},
 }
-MY_RollMonitor = LIB.CreateModule(settings)
+MY_RollMonitor = X.CreateModule(settings)
 end
 
 
@@ -437,7 +408,7 @@ function PS.OnPanelActive(wnd)
 		menu = function(raw)
 			local t = {}
 			for _, nSortType in ipairs(SORT_TYPE_LIST) do
-				insert(t, {
+				table.insert(t, {
 					szOption = SORT_TYPE_INFO[nSortType].szName,
 					fnAction = function()
 						O.nSortType = nSortType
@@ -457,7 +428,7 @@ function PS.OnPanelActive(wnd)
 		menu = function(raw)
 			local t = {}
 			for _, nSec in ipairs(TIME_LIMIT) do
-				insert(t, {
+				table.insert(t, {
 					szOption = TIME_LIMIT_TITLE[nSec],
 					fnAction = function()
 						UI(raw):Text(TIME_LIMIT_TITLE[nSec])
@@ -481,7 +452,7 @@ function PS.OnPanelActive(wnd)
 				fnAction = function() O.bPublishRestart = not O.bPublishRestart end,
 			}, { bDevide = true }}
 			for _, tChannel in ipairs(PUBLISH_CHANNELS) do
-				insert(t, {
+				table.insert(t, {
 					szOption = tChannel.szName,
 					rgb = tChannel.rgb,
 					bCheck = true, bMCheck = true, bChecked = O.nPublishChannel == tChannel.nChannel,
@@ -524,7 +495,7 @@ function PS.OnPanelActive(wnd)
 				}
 			}, { bDevide = true } }
 			for _, tChannel in ipairs(PUBLISH_CHANNELS) do
-				insert( t, {
+				table.insert( t, {
 					szOption = tChannel.szName,
 					rgb = tChannel.rgb,
 					bCheck = true, bMCheck = true, bChecked = O.nPublishChannel == tChannel.nChannel,
@@ -545,12 +516,12 @@ function PS.OnPanelActive(wnd)
 		handlestyle = 3, text = _L['average score with out pole']
 	})
 	D.DrawBoard()
-	LIB.BreatheCall('MY_RollMonitorRedraw', 1000, CheckBoardRedraw)
+	X.BreatheCall('MY_RollMonitorRedraw', 1000, CheckBoardRedraw)
 end
 
 function PS.OnPanelDeactive()
 	m_uiBoard = nil
-	LIB.BreatheCall('MY_RollMonitorRedraw', false)
+	X.BreatheCall('MY_RollMonitorRedraw', false)
 end
 
-LIB.RegisterPanel(_L['General'], 'RollMonitor', _L['roll monitor'], 287, PS)
+X.RegisterPanel(_L['General'], 'RollMonitor', _L['roll monitor'], 287, PS)

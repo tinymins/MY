@@ -10,92 +10,63 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_Domesticate', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_Domesticate', _L['General'], {
 	bAlert = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nAlertNum = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 100,
 	},
 	dwAutoFeedCubTabType = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Optional(Schema.Number),
+		xSchema = X.Schema.Optional(X.Schema.Number),
 		xDefaultValue = nil,
 	},
 	dwAutoFeedCubTabIndex = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Optional(Schema.Number),
+		xSchema = X.Schema.Optional(X.Schema.Number),
 		xDefaultValue = nil,
 	},
 	dwAutoFeedFoodTabType = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Optional(Schema.Number),
+		xSchema = X.Schema.Optional(X.Schema.Number),
 		xDefaultValue = nil,
 	},
 	dwAutoFeedFoodTabIndex = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Optional(Schema.Number),
+		xSchema = X.Schema.Optional(X.Schema.Number),
 		xDefaultValue = nil,
 	},
 	nAutoFeedFoodMeasure = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Optional(Schema.Number),
+		xSchema = X.Schema.Optional(X.Schema.Number),
 		xDefaultValue = nil,
 	},
 })
@@ -163,7 +134,7 @@ function D.HookDomesticatePanel()
 					fnAction = function()
 						if D.IsAutoFeedValid(me) then
 							D.SetAutoFeed()
-							LIB.Systopmsg(_L['Auto feed domesticate cancelled.'])
+							X.Systopmsg(_L['Auto feed domesticate cancelled.'])
 						else
 							local domesticate = GetClientPlayer().GetDomesticate()
 							local dwCubTabType, dwCubTabIndex = domesticate.dwCubTabType, domesticate.dwCubTabIndex
@@ -173,15 +144,15 @@ function D.HookDomesticatePanel()
 							end
 							D.SetAutoFeed(dwCubTabType, dwCubTabIndex, dwFoodTabType, dwFoodTabIndex)
 
-							local szFoodName = LIB.GetObjectName('ITEM_INFO', dwFoodTabType, dwFoodTabIndex)
-							local szDomesticateName = LIB.GetObjectName('ITEM_INFO', dwCubTabType, dwCubTabIndex)
+							local szFoodName = X.GetObjectName('ITEM_INFO', dwFoodTabType, dwFoodTabIndex)
+							local szDomesticateName = X.GetObjectName('ITEM_INFO', dwCubTabType, dwCubTabIndex)
 							if D.IsAutoFeedValid(me) then
-								LIB.Systopmsg(_L('Set domesticate auto feed %s to %s succeed, will auto feed when hunger point reach %d.',
+								X.Systopmsg(_L('Set domesticate auto feed %s to %s succeed, will auto feed when hunger point reach %d.',
 									szFoodName,
 									szDomesticateName,
 									O.nAutoFeedFoodMeasure))
 							else
-								LIB.Systopmsg(_L('Set domesticate auto feed %s to %s failed.', szFoodName, szDomesticateName))
+								X.Systopmsg(_L('Set domesticate auto feed %s to %s failed.', szFoodName, szDomesticateName))
 							end
 						end
 					end,
@@ -201,7 +172,7 @@ end
 
 function D.CheckAutoFeedEnable()
 	if D.bReady and D.IsAutoFeedValid(GetClientPlayer()) then
-		LIB.BreatheCall('MY_Domesticate__AutoFeed', 30000, function()
+		X.BreatheCall('MY_Domesticate__AutoFeed', 30000, function()
 			local me = GetClientPlayer()
 			if not me then
 				return
@@ -217,15 +188,15 @@ function D.CheckAutoFeedEnable()
 				return
 			end
 			if domesticate.nGrowthLevel >= domesticate.nMaxGrowthLevel then
-				local szDomesticate = LIB.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
-				LIB.Systopmsg(_L('Your domesticate %s is growth up!', szDomesticate))
+				local szDomesticate = X.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+				X.Systopmsg(_L('Your domesticate %s is growth up!', szDomesticate))
 				return
 			end
 			local nMeasure = domesticate.nMaxFullMeasure - domesticate.nFullMeasure
-			local nRound = floor(nMeasure / O.nAutoFeedFoodMeasure)
+			local nRound = math.floor(nMeasure / O.nAutoFeedFoodMeasure)
 			local bFeed = false
 			for _ = 1, nRound do
-				LIB.WalkBagItem(function(item, dwBox, dwX)
+				X.WalkBagItem(function(item, dwBox, dwX)
 					if item.dwTabType == O.dwAutoFeedFoodTabType and item.dwIndex == O.dwAutoFeedFoodTabIndex then
 						domesticate.Feed(dwBox, dwX)
 						bFeed = true
@@ -234,19 +205,19 @@ function D.CheckAutoFeedEnable()
 				end)
 			end
 			if nRound > 0 and not bFeed then
-				local szFood = LIB.GetObjectName('ITEM_INFO', O.dwAutoFeedFoodTabType, O.dwAutoFeedFoodTabIndex)
-				local szDomesticate = LIB.GetObjectName('ITEM_INFO', O.dwAutoFeedCubTabType, O.dwAutoFeedCubTabIndex)
-				LIB.Systopmsg(_L('No enough %s to feed %s!', szFood, szDomesticate))
+				local szFood = X.GetObjectName('ITEM_INFO', O.dwAutoFeedFoodTabType, O.dwAutoFeedFoodTabIndex)
+				local szDomesticate = X.GetObjectName('ITEM_INFO', O.dwAutoFeedCubTabType, O.dwAutoFeedCubTabIndex)
+				X.Systopmsg(_L('No enough %s to feed %s!', szFood, szDomesticate))
 			end
 		end)
 	else
-		LIB.BreatheCall('MY_Domesticate__AutoFeed', false)
+		X.BreatheCall('MY_Domesticate__AutoFeed', false)
 	end
 end
 
 function D.CheckAlertEnable()
 	if D.bReady and O.bAlert then
-		LIB.BreatheCall('MY_Domesticate__Alert', 60000, function()
+		X.BreatheCall('MY_Domesticate__Alert', 60000, function()
 			local me = GetClientPlayer()
 			if not me then
 				return
@@ -259,42 +230,42 @@ function D.CheckAlertEnable()
 				return
 			end
 			if domesticate.nGrowthLevel >= domesticate.nMaxGrowthLevel then
-				local szDomesticate = LIB.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+				local szDomesticate = X.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
 				OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s is growth up!', szDomesticate))
 				PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 				return
 			end
 			if O.nAlertNum == 0 then
 				if domesticate.nFullMeasure == 0 and domesticate.nGrowthLevel < domesticate.nMaxGrowthLevel then
-					local szDomesticate = LIB.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+					local szDomesticate = X.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
 					OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s is hungery!', szDomesticate))
 					PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 				end
 			else
 				local nMeasure = domesticate.nMaxFullMeasure - domesticate.nFullMeasure
 				if nMeasure >= O.nAlertNum and domesticate.nGrowthLevel < domesticate.nMaxGrowthLevel then
-					local szDomesticate = LIB.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+					local szDomesticate = X.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
 					OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s available measure is %d point!', szDomesticate, nMeasure))
 					PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 				end
 			end
 		end)
 	else
-		LIB.BreatheCall('MY_Domesticate__Alert', false)
+		X.BreatheCall('MY_Domesticate__Alert', false)
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Domesticate', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Domesticate', function()
 	D.bReady = true
 	D.CheckAutoFeedEnable()
 	D.CheckAlertEnable()
 end)
-LIB.RegisterFrameCreate('DomesticatePanel', 'MY_Domesticate', D.HookDomesticatePanel)
-LIB.RegisterReload('MY_Domesticate', D.UnHookDomesticatePanel)
+X.RegisterFrameCreate('DomesticatePanel', 'MY_Domesticate', D.HookDomesticatePanel)
+X.RegisterReload('MY_Domesticate', D.UnHookDomesticatePanel)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Domesticate feed alert'],
 		checked = O.bAlert,
 		oncheck = function(bChecked)
@@ -302,7 +273,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 	}):Width() + 5
 	ui:Append('WndTrackbar', {
-		x = x, y = y, w = 130,
+		x = nX, y = nY, w = 130,
 		value = O.nAlertNum,
 		range = {0, 1000},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
@@ -317,9 +288,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 		autoenable = function() return MY_Domesticate.bAlert end,
 	})
-	x = X
-	y = y + deltaY
-	return x, y
+	nX = nPaddingX
+	nY = nY + nLH
+	return nX, nY
 end
 
 -- Global exports
@@ -364,5 +335,5 @@ local settings = {
 		},
 	},
 }
-MY_Domesticate = LIB.CreateModule(settings)
+MY_Domesticate = X.CreateModule(settings)
 end

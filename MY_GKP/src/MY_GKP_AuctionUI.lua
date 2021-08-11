@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -63,15 +34,15 @@ local D = {
 
 function D.Open(ds, tab, szMode)
 	-- CreateFrame
-	local szKey = IsTable(tab) and tab.key or LIB.GetUUID()
+	local szKey = X.IsTable(tab) and tab.key or X.GetUUID()
 	local ui = UI.CreateFrame('MY_GKP_Record#' .. GetStringCRC(szKey), { h = 380, w = 400, text = _L['GKP Golden Team Record'], close = true, focus = true })
 	local x, y = 10, 55
 	local nAuto = 0
 	local dwForceID, item
 	local bProcessed = false -- 是否已处理 没处理自动设为0价发布
 
-	if IsTable(tab) then
-		if not IsEmpty(tab.dwID) then
+	if X.IsTable(tab) then
+		if not X.IsEmpty(tab.dwID) then
 			item = GetItem(tab.dwID)
 		end
 		if not item and tab.dwTabType and tab.dwIndex then
@@ -103,7 +74,7 @@ function D.Open(ds, tab, szMode)
 		menu = function()
 			return MY_GKP.GetTeamMemberMenu(function(v)
 				local hTeamList = ui:Children('#PlayerList')
-				hTeamList:Text(v.szName):Color(LIB.GetForceColor(v.dwForce))
+				hTeamList:Text(v.szName):Color(X.GetForceColor(v.dwForce))
 				dwForceID = v.dwForce
 			end, false, true)
 		end,
@@ -117,7 +88,7 @@ function D.Open(ds, tab, szMode)
 					local source = {}
 					for k, v in ipairs(MY_GKP.aSubsidies) do
 						if v[3] then
-							insert(source, v[1])
+							table.insert(source, v[1])
 						end
 					end
 					UI(this):Autocomplete('option', 'source', source)
@@ -153,17 +124,17 @@ function D.Open(ds, tab, szMode)
 					if tonumber(text) then
 						if tonumber(text) < 100 and tonumber(text) > -100 and tonumber(text) ~= 0 then
 							for k, v in ipairs({2, 3, 4}) do
-								local szMoney = format('%0.'.. v ..'f', text):gsub('%.', '')
-								insert(source, {
+								local szMoney = string.format('%0.'.. v ..'f', text):gsub('%.', '')
+								table.insert(source, {
 									text     = szMoney,
 									keyword  = text,
 									display  = D.GetMoneyTipText(tonumber(szMoney)),
 									richtext = true,
 								})
 							end
-							insert(source, { divide = true, keyword = text })
+							table.insert(source, { divide = true, keyword = text })
 						end
-						insert(source, {
+						table.insert(source, {
 							text     = text,
 							keyword  = text,
 							display  = D.GetMoneyTipText(tonumber(text)),
@@ -180,14 +151,14 @@ function D.Open(ds, tab, szMode)
 				this.szText = szText
 				ui:Color(D.GetMoneyCol(szText))
 			else
-				LIB.Sysmsg(_L['Please enter numbers'])
+				X.Sysmsg(_L['Please enter numbers'])
 				ui:Text(this.szText or '')
 			end
 		end,
 	})
 	-- set frame
 	if tab and type(item) == 'userdata' then
-		hPlayer:Text(tab.szPlayer):Color(LIB.GetForceColor(tab.dwForceID))
+		hPlayer:Text(tab.szPlayer):Color(X.GetForceColor(tab.dwForceID))
 		hName:Text(tab.szName):Enable(false)
 		hSource:Text(tab.szNpcName):Enable(false)
 		ui[1].userdata = true
@@ -196,9 +167,9 @@ function D.Open(ds, tab, szMode)
 		hSource:Text(_L['Add Manually']):Enable(false)
 	end
 	if tab and tab.key then -- 编辑
-		hPlayer:Text(tab.szPlayer):Color(LIB.GetForceColor(tab.dwForceID))
+		hPlayer:Text(tab.szPlayer):Color(X.GetForceColor(tab.dwForceID))
 		dwForceID = tab.dwForceID
-		hName:Text(tab.szName or LIB.GetItemNameByUIID(tab.nUiId))
+		hName:Text(tab.szName or X.GetItemNameByUIID(tab.nUiId))
 		hMoney:Text(tab.nMoney)
 		hSource:Text(tab.szNpcName)
 	end
@@ -236,10 +207,10 @@ function D.Open(ds, tab, szMode)
 		local nMoney = tonumber(hMoney:Text()) or 0
 		local szPlayer = hPlayer:Text()
 		if hName:Text() == '' then
-			return LIB.Alert(_L['Please entry the name of the item'])
+			return X.Alert(_L['Please entry the name of the item'])
 		end
 		if szPlayer == g_tStrings.PLAYER_NOT_EMPTY then
-			return LIB.Alert(_L['Select a member who is in charge of account and put money in his account.'])
+			return X.Alert(_L['Select a member who is in charge of account and put money in his account.'])
 		end
 		tab.key       = szKey
 		tab.szNpcName = hSource:Text()
@@ -247,49 +218,49 @@ function D.Open(ds, tab, szMode)
 		tab.szPlayer  = szPlayer
 		tab.dwForceID = dwForceID or tab.dwForceID or 0
 		if tab and type(item) == 'userdata' and szMode ~= 'EDIT' then
-			if LIB.IsDistributer() then
-				if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-					LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+			if X.IsDistributer() then
+				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+					X.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else
-					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
+					X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 						D.GetFormatLink(tab),
 						D.GetFormatLink(' '.. nMoney .. g_tStrings.STR_GOLD),
 						D.GetFormatLink(_L[' Distribute to ']),
 						D.GetFormatLink(tab.szPlayer, true)
 					})
 				end
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'add', tab}, true)
+				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'add', tab}, true)
 			end
 		elseif tab and szMode == 'EDIT' then
 			tab.szName = hName:Text()
 			tab.dwForceID = dwForceID or tab.dwForceID or 0
 			tab.bEdit = true
-			if LIB.IsDistributer() then
-				if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-					LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+			if X.IsDistributer() then
+				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+					X.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else
-					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
+					X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 						D.GetFormatLink(tab.szPlayer, true),
 						D.GetFormatLink(' '.. tab.szName),
 						D.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
 						D.GetFormatLink(_L['Make changes to the record.']),
 					})
 				end
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'edit', tab}, true)
+				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'edit', tab}, true)
 			end
 		else
-			if LIB.IsDistributer() then
-				if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-					LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+			if X.IsDistributer() then
+				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+					X.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else
-					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
+					X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 						D.GetFormatLink(tab.szName),
 						D.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
 						D.GetFormatLink(_L['Manually make record to']),
 						D.GetFormatLink(tab.szPlayer, true)
 					})
 				end
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'add', tab}, true)
+				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'add', tab}, true)
 			end
 		end
 		if ui:Children('#WndCheckBox'):Check() then
@@ -315,5 +286,5 @@ local settings = {
 		},
 	},
 }
-MY_GKP_AuctionUI = LIB.CreateModule(settings)
+MY_GKP_AuctionUI = X.CreateModule(settings)
 end

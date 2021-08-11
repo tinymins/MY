@@ -10,108 +10,79 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 local D = {}
-local PR_INI_PATH = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
+local PR_INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
 local PR_EQUIP_REQUEST = {}
 local PR_PARTY_REQUEST = {}
 
-local O = LIB.CreateUserSettingsModule('MY_PartyRequest', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_PartyRequest', _L['Raid'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bRefuseLowLv = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bRefuseRobot = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptTong = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptCamp = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptFriend = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptAll = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptCustom = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAcceptCustom = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 })
@@ -193,7 +164,7 @@ function D.GetMenu()
 		fnDisable = function() return not O.bEnable end,
 	}
 	for szName, bEnable in pairs(O.tAcceptCustom) do
-		insert(t, {
+		table.insert(t, {
 			szOption = szName,
 			bCheck = true, bChecked = bEnable,
 			fnAction = function()
@@ -215,13 +186,13 @@ function D.GetMenu()
 		})
 	end
 	if #t ~= 0 then
-		insert(t, CONSTANT.MENU_DIVIDER)
+		table.insert(t, CONSTANT.MENU_DIVIDER)
 	end
-	insert(t, {
+	table.insert(t, {
 		szOption = _L['Add'],
 		fnAction = function()
 			GetUserInput(_L['Please input custom name, multiple split with ",[]":'], function(val)
-				for _, v in ipairs(LIB.SplitString(val, {',', '[', ']'}, true)) do
+				for _, v in ipairs(X.SplitString(val, {',', '[', ']'}, true)) do
 					O.tAcceptCustom[v] = true
 					O.tAcceptCustom = O.tAcceptCustom
 				end
@@ -229,7 +200,7 @@ function D.GetMenu()
 		end,
 		fnDisable = function() return not O.bEnable or not O.bAcceptCustom end,
 	})
-	insert(menu, t)
+	table.insert(menu, t)
 	return menu
 end
 
@@ -242,19 +213,19 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_Lookup' then
 		local info = this:GetParent().info
 		if not info.dwID or (not info.bDetail and IsCtrlKeyDown()) then
-			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-				return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
-			LIB.SendBgMsg(info.szName, 'RL', {'ASK'})
+			X.SendBgMsg(info.szName, 'RL', {'ASK'})
 			this:Enable(false)
 			this:Lookup('', 'Text_Lookup'):SetText(_L['loading...'])
-			LIB.Sysmsg(_L['If it is always loading, the target may not install plugin or refuse.'])
+			X.Sysmsg(_L['If it is always loading, the target may not install plugin or refuse.'])
 		elseif info.dwID then
 			ViewInviteToPlayer(info.dwID)
 		end
 	elseif this.info then
 		if IsCtrlKeyDown() then
-			LIB.EditBox_AppendLinkPlayer(this.info.szName)
+			X.EditBox_AppendLinkPlayer(this.info.szName)
 		elseif IsAltKeyDown() and this.info.dwID then
 			ViewInviteToPlayer(this.info.dwID)
 		end
@@ -263,7 +234,7 @@ end
 
 function D.OnRButtonClick()
 	if this.info then
-		PopupMenu(LIB.GetTargetContextMenu(TARGET.PLAYER, this.info.szName, this.info.dwID))
+		PopupMenu(X.GetTargetContextMenu(TARGET.PLAYER, this.info.szName, this.info.dwID))
 	end
 end
 
@@ -318,8 +289,8 @@ function D.OnPeekPlayer()
 		if arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 			local me = GetClientPlayer()
 			local dwType, dwID = me.GetTarget()
-			LIB.SetTarget(TARGET.PLAYER, arg1)
-			LIB.SetTarget(dwType, dwID)
+			X.SetTarget(TARGET.PLAYER, arg1)
+			X.SetTarget(dwType, dwID)
 			local p = GetPlayer(arg1)
 			if p then
 				local mnt = p.GetKungfuMount()
@@ -372,7 +343,7 @@ function D.GetRequestStatus(info)
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 	end
 	if szStatus == 'normal' and not info.bFriend and not info.bTongMember then
-		if O.bRefuseRobot and info.dwID and info.nLevel == PACKET_INFO.MAX_PLAYER_LEVEL then
+		if O.bRefuseRobot and info.dwID and info.nLevel == X.PACKET_INFO.MAX_PLAYER_LEVEL then
 			local me = GetClientPlayer()
 			local tar = GetPlayer(info.dwID)
 			if tar then
@@ -386,7 +357,7 @@ function D.GetRequestStatus(info)
 				end
 			end
 		end
-		if O.bRefuseLowLv and info.nLevel < PACKET_INFO.MAX_PLAYER_LEVEL then
+		if O.bRefuseLowLv and info.nLevel < X.PACKET_INFO.MAX_PLAYER_LEVEL then
 			szStatus = 'refuse'
 			szMsg = _L('Auto refuse %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
@@ -407,7 +378,7 @@ function D.DoAutoAction(info)
 			D.AcceptRequest(info)
 		end
 		if szMsg then
-			LIB.Sysmsg(szMsg)
+			X.Sysmsg(szMsg)
 		end
 	end
 	return bAction, szStatus, szMsg
@@ -415,12 +386,12 @@ end
 
 function D.OnMessageBoxOpen()
 	local szMsgName, frame = arg0, arg1
-	local szPrefix, szName = unpack(LIB.SplitString(szMsgName, '_', true, 2))
+	local szPrefix, szName = unpack(X.SplitString(szMsgName, '_', true, 2))
 	if not O.bEnable or not frame or not frame:IsValid() or (szPrefix ~= 'ATMP' and szPrefix ~= 'IMTP') then
 		return
 	end
-	local fnAccept = Get(frame:Lookup('Wnd_All/Btn_Option1'), 'fnAction')
-	local fnRefuse = Get(frame:Lookup('Wnd_All/Btn_Option2'), 'fnAction')
+	local fnAccept = X.Get(frame:Lookup('Wnd_All/Btn_Option1'), 'fnAction')
+	local fnRefuse = X.Get(frame:Lookup('Wnd_All/Btn_Option2'), 'fnAction')
 	if fnAccept and fnRefuse then
 		-- 获取组队方法
 		local info = PR_PARTY_REQUEST[szName]
@@ -430,11 +401,11 @@ function D.OnMessageBoxOpen()
 		end
 		info.fnAccept = function()
 			PR_PARTY_REQUEST[szName] = nil
-			Call(fnAccept)
+			X.Call(fnAccept)
 		end
 		info.fnRefuse = function()
 			PR_PARTY_REQUEST[szName] = nil
-			Call(fnRefuse)
+			X.Call(fnRefuse)
 		end
 		D.DoAutoAction(info)
 		-- 关闭对话框
@@ -455,19 +426,19 @@ function D.OnApplyRequest(event)
 		info = {}
 		PR_PARTY_REQUEST[szName] = info
 	end
-	local me = LIB.GetClientInfo()
+	local me = X.GetClientInfo()
 	-- 判断对方是否已在进组列表中
 	info.szType      = event == 'PARTY_INVITE_REQUEST' and 'invite' or 'request'
 	info.szName      = szName
 	info.nCamp       = nCamp
 	info.dwForce     = dwForce
 	info.nLevel      = nLevel
-	info.bFriend     = LIB.IsFriend(szName)
-	info.bTongMember = LIB.IsTongMember(szName)
+	info.bFriend     = X.IsFriend(szName)
+	info.bTongMember = X.IsTongMember(szName)
 	info.bSameCamp   = info.nCamp == me.nCamp
 	info.dwDelayTime = nil
 	-- 获取dwID
-	local tar = LIB.GetObject(TARGET.PLAYER, szName)
+	local tar = X.GetObject(TARGET.PLAYER, szName)
 	if not info.dwID and tar then
 		info.dwID = tar.dwID
 	end
@@ -495,12 +466,12 @@ function D.DelayInterval()
 	local dwTime, dwDelayTime = GetTime(), nil
 	for _, info in pairs(PR_PARTY_REQUEST) do
 		if info.dwDelayTime and info.dwDelayTime > dwTime then
-			dwDelayTime = min(dwDelayTime or HUGE, info.dwDelayTime + 75)
+			dwDelayTime = math.min(dwDelayTime or math.huge, info.dwDelayTime + 75)
 		end
 		D.CheckRequestUpdate(info)
 	end
 	if dwDelayTime then
-		LIB.DelayCall('MY_PartyRequest', dwDelayTime - dwTime, D.DelayInterval)
+		X.DelayCall('MY_PartyRequest', dwDelayTime - dwTime, D.DelayInterval)
 	end
 end
 
@@ -517,21 +488,21 @@ function D.Feedback(szName, data, bDetail)
 	D.DelayInterval()
 end
 
-LIB.RegisterEvent('PEEK_OTHER_PLAYER', 'MY_PartyRequest'   , D.OnPeekPlayer  )
-LIB.RegisterEvent('PARTY_INVITE_REQUEST', 'MY_PartyRequest', D.OnApplyRequest)
-LIB.RegisterEvent('PARTY_APPLY_REQUEST', 'MY_PartyRequest' , D.OnApplyRequest)
-LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN', 'MY_PartyRequest' , D.OnMessageBoxOpen)
+X.RegisterEvent('PEEK_OTHER_PLAYER', 'MY_PartyRequest'   , D.OnPeekPlayer  )
+X.RegisterEvent('PARTY_INVITE_REQUEST', 'MY_PartyRequest', D.OnApplyRequest)
+X.RegisterEvent('PARTY_APPLY_REQUEST', 'MY_PartyRequest' , D.OnApplyRequest)
+X.RegisterEvent('ON_MESSAGE_BOX_OPEN', 'MY_PartyRequest' , D.OnMessageBoxOpen)
 
-LIB.RegisterInit('MY_PartyRequest', function()
+X.RegisterInit('MY_PartyRequest', function()
 	for _, k in ipairs({'tAcceptCustom'}) do
 		if D[k] then
-			SafeCall(Set, O, k, D[k])
+			X.SafeCall(Set, O, k, D[k])
 			D[k] = nil
 		end
 	end
 end)
 
-LIB.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
+X.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
 	if not bIsSelf then
 		if data[1] == 'Feedback' then
 			D.Feedback(szName, data, true)
@@ -539,13 +510,13 @@ LIB.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
 	end
 end)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x = x + ui:Append('WndComboBox', {
-		x = x, y = y, w = 120,
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX = nX + ui:Append('WndComboBox', {
+		x = nX, y = nY, w = 120,
 		text = _L['MY_PartyRequest'],
 		menu = D.GetMenu,
 	}):Width() + 5
-	return x, y
+	return nX, nY
 end
 
 -- Global exports
@@ -570,7 +541,7 @@ local settings = {
 		},
 	},
 }
-MY_PartyRequest = LIB.CreateModule(settings)
+MY_PartyRequest = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
@@ -597,7 +568,7 @@ function R.Drawer(container, info)
 	end
 	hItem:Lookup('Handle_Status/Handle_Gongzhan'):SetVisible(info.nGongZhan == 1)
 
-	local szCampImg, nCampFrame = LIB.GetCampImage(info.nCamp)
+	local szCampImg, nCampFrame = X.GetCampImage(info.nCamp)
 	if szCampImg then
 		hItem:Lookup('Handle_Status/Handle_Camp/Image_Camp'):FromUITex(szCampImg, nCampFrame)
 	end

@@ -10,52 +10,23 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_InfoTip'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local CONFIG_FILE_PATH = {'config/infotip.jx3dat', PATH_TYPE.ROLE}
+local CONFIG_FILE_PATH = {'config/infotip.jx3dat', X.PATH_TYPE.ROLE}
 local INFO_TIP_LIST = {
 	-- 网络延迟
 	{
@@ -63,41 +34,41 @@ local INFO_TIP_LIST = {
 		i18n = {
 			name = _L['Ping monitor'], prefix = _L['Ping: '], content = '%d',
 		},
-		config = LIB.CreateUserSettingsModule('MY_InfoTip__Ping', _L['System'], {
+		config = X.CreateUserSettingsModule('MY_InfoTip__Ping', _L['System'], {
 			bEnable = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowBg = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowTitle = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			rgb = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+				xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 				xDefaultValue = { 95, 255, 95 },
 			},
 			nFont = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Number,
+				xSchema = X.Schema.Number,
 				xDefaultValue = 48,
 			},
 			anchor = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.FrameAnchor,
+				xSchema = X.Schema.FrameAnchor,
 				xDefaultValue = { x = -133, y = -111, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
 			},
 		}),
@@ -106,7 +77,7 @@ local INFO_TIP_LIST = {
 		},
 		cache = {},
 		GetFormatString = function(data)
-			return format(data.cache.formatString, GetPingValue() / 2)
+			return string.format(data.cache.formatString, GetPingValue() / 2)
 		end,
 	},
 	-- 倍速显示（显示服务器有多卡……）
@@ -115,41 +86,41 @@ local INFO_TIP_LIST = {
 		i18n = {
 			name = _L['Time machine'], prefix = _L['Rate: '], content = 'x%.2f',
 		},
-		config = LIB.CreateUserSettingsModule('MY_InfoTip__TimeMachine', _L['System'], {
+		config = X.CreateUserSettingsModule('MY_InfoTip__TimeMachine', _L['System'], {
 			bEnable = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowBg = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowTitle = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = true,
 			},
 			rgb = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+				xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 				xDefaultValue = { 31, 255, 31 },
 			},
 			nFont = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Number,
+				xSchema = X.Schema.Number,
 				xDefaultValue = 0,
 			},
 			anchor = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.FrameAnchor,
+				xSchema = X.Schema.FrameAnchor,
 				xDefaultValue = { x = -276, y = -111, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
 			},
 		}),
@@ -176,7 +147,7 @@ local INFO_TIP_LIST = {
 			if tm then
 				s = 1000 * (GetLogicFrameCount() - tm.frame) / GLOBAL.GAME_FPS / (GetTickCount() - tm.tick)
 			end
-			return format(data.cache.formatString, s)
+			return string.format(data.cache.formatString, s)
 		end,
 	},
 	-- 目标距离
@@ -185,47 +156,47 @@ local INFO_TIP_LIST = {
 		i18n = {
 			name = _L['Target distance'], prefix = _L['Distance: '], content = _L['%.1f Foot'],
 		},
-		config = LIB.CreateUserSettingsModule('MY_InfoTip__Distance', _L['System'], {
+		config = X.CreateUserSettingsModule('MY_InfoTip__Distance', _L['System'], {
 			bEnable = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowBg = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowTitle = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bPlaceholder = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = true,
 			},
 			rgb = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+				xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 				xDefaultValue = { 255, 255, 0 },
 			},
 			nFont = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Number,
+				xSchema = X.Schema.Number,
 				xDefaultValue = 209,
 			},
 			anchor = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.FrameAnchor,
+				xSchema = X.Schema.FrameAnchor,
 				xDefaultValue = { x = 203, y = -106, s = 'CENTER', r = 'CENTER' },
 			},
 		}),
@@ -234,9 +205,9 @@ local INFO_TIP_LIST = {
 		},
 		cache = {},
 		GetFormatString = function(data)
-			local p, s = LIB.GetObject(LIB.GetTarget()), data.config.bPlaceholder and _L['No Target'] or ''
+			local p, s = X.GetObject(X.GetTarget()), data.config.bPlaceholder and _L['No Target'] or ''
 			if p then
-				s = format(data.cache.formatString, LIB.GetDistance(p))
+				s = string.format(data.cache.formatString, X.GetDistance(p))
 			end
 			return s
 		end,
@@ -247,41 +218,41 @@ local INFO_TIP_LIST = {
 		i18n = {
 			name = _L['System time'], prefix = _L['Time: '], content = '%02d:%02d:%02d',
 		},
-		config = LIB.CreateUserSettingsModule('MY_InfoTip__SysTime', _L['System'], {
+		config = X.CreateUserSettingsModule('MY_InfoTip__SysTime', _L['System'], {
 			bEnable = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowBg = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = true,
 			},
 			bShowTitle = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = true,
 			},
 			rgb = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+				xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 				xDefaultValue = { 255, 255, 255 },
 			},
 			nFont = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Number,
+				xSchema = X.Schema.Number,
 				xDefaultValue = 0,
 			},
 			anchor = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.FrameAnchor,
+				xSchema = X.Schema.FrameAnchor,
 				xDefaultValue = { x = 285, y = -18, s = 'BOTTOMLEFT', r = 'BOTTOMLEFT' },
 			},
 		}),
@@ -291,7 +262,7 @@ local INFO_TIP_LIST = {
 		cache = {},
 		GetFormatString = function(data)
 			local tDateTime = TimeToDate(GetCurrentTime())
-			return format(data.cache.formatString, tDateTime.hour, tDateTime.minute, tDateTime.second)
+			return string.format(data.cache.formatString, tDateTime.hour, tDateTime.minute, tDateTime.second)
 		end,
 	},
 	-- 战斗计时
@@ -300,47 +271,47 @@ local INFO_TIP_LIST = {
 		i18n = {
 			name = _L['Fight clock'], prefix = _L['Fight Clock: '], content = '',
 		},
-		config = LIB.CreateUserSettingsModule('MY_InfoTip__FightTime', _L['System'], {
+		config = X.CreateUserSettingsModule('MY_InfoTip__FightTime', _L['System'], {
 			bEnable = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowBg = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowTitle = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bPlaceholder = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = true,
 			},
 			rgb = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+				xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 				xDefaultValue = { 255, 0, 128 },
 			},
 			nFont = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Number,
+				xSchema = X.Schema.Number,
 				xDefaultValue = 199,
 			},
 			anchor = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.FrameAnchor,
+				xSchema = X.Schema.FrameAnchor,
 				xDefaultValue = { x = 353, y = -117, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
 			},
 		}),
@@ -349,8 +320,8 @@ local INFO_TIP_LIST = {
 		},
 		cache = {},
 		GetFormatString = function(data)
-			if LIB.GetFightUUID() or LIB.GetLastFightUUID() then
-				return data.cache.formatString .. LIB.GetFightTime('H:mm:ss')
+			if X.GetFightUUID() or X.GetLastFightUUID() then
+				return data.cache.formatString .. X.GetFightTime('H:mm:ss')
 			end
 			return data.config.bPlaceholder and _L['Never Fight'] or ''
 		end,
@@ -361,41 +332,41 @@ local INFO_TIP_LIST = {
 		i18n = {
 			name = _L['Lotus clock'], prefix = _L['Lotus Clock: '], content = '%d:%d:%d',
 		},
-		config = LIB.CreateUserSettingsModule('MY_InfoTip__LotusTime', _L['System'], {
+		config = X.CreateUserSettingsModule('MY_InfoTip__LotusTime', _L['System'], {
 			bEnable = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowBg = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = true,
 			},
 			bShowTitle = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = true,
 			},
 			rgb = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+				xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 				xDefaultValue = { 255, 255, 255 },
 			},
 			nFont = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Number,
+				xSchema = X.Schema.Number,
 				xDefaultValue = 0,
 			},
 			anchor = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.FrameAnchor,
+				xSchema = X.Schema.FrameAnchor,
 				xDefaultValue = { x = -290, y = -38, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
 			},
 		}),
@@ -405,7 +376,7 @@ local INFO_TIP_LIST = {
 		cache = {},
 		GetFormatString = function(data)
 			local nTotal = 6 * 60 * 60 - GetLogicFrameCount() / 16 % (6 * 60 * 60)
-			return format(data.cache.formatString, floor(nTotal / (60 * 60)), floor(nTotal / 60 % 60), floor(nTotal % 60))
+			return string.format(data.cache.formatString, math.floor(nTotal / (60 * 60)), math.floor(nTotal / 60 % 60), math.floor(nTotal % 60))
 		end,
 	},
 	-- 角色坐标
@@ -414,41 +385,41 @@ local INFO_TIP_LIST = {
 		i18n = {
 			name = _L['GPS'], prefix = _L['Location: '], content = '[%d]%d,%d,%d',
 		},
-		config = LIB.CreateUserSettingsModule('MY_InfoTip__GPS', _L['System'], {
+		config = X.CreateUserSettingsModule('MY_InfoTip__GPS', _L['System'], {
 			bEnable = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowBg = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = true,
 			},
 			bShowTitle = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			rgb = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+				xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 				xDefaultValue = { 255, 255, 255 },
 			},
 			nFont = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Number,
+				xSchema = X.Schema.Number,
 				xDefaultValue = 0,
 			},
 			anchor = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.FrameAnchor,
+				xSchema = X.Schema.FrameAnchor,
 				xDefaultValue = { x = -21, y = 250, s = 'TOPRIGHT', r = 'TOPRIGHT' },
 			},
 		}),
@@ -459,7 +430,7 @@ local INFO_TIP_LIST = {
 		GetFormatString = function(data)
 			local player, text = GetClientPlayer(), ''
 			if player then
-				text = format(data.cache.formatString, player.GetMapID(), player.nX, player.nY, player.nZ)
+				text = string.format(data.cache.formatString, player.GetMapID(), player.nX, player.nY, player.nZ)
 			end
 			return text
 		end,
@@ -470,41 +441,41 @@ local INFO_TIP_LIST = {
 		i18n = {
 			name = _L['Speedometer'], prefix = _L['Speed: '], content = _L['%.2f f/s'],
 		},
-		config = LIB.CreateUserSettingsModule('MY_InfoTip__Speedometer', _L['System'], {
+		config = X.CreateUserSettingsModule('MY_InfoTip__Speedometer', _L['System'], {
 			bEnable = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowBg = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			bShowTitle = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Boolean,
+				xSchema = X.Schema.Boolean,
 				xDefaultValue = false,
 			},
 			rgb = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+				xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 				xDefaultValue = { 255, 255, 255 },
 			},
 			nFont = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.Number,
+				xSchema = X.Schema.Number,
 				xDefaultValue = 0,
 			},
 			anchor = {
-				ePathType = PATH_TYPE.ROLE,
+				ePathType = X.PATH_TYPE.ROLE,
 				szLabel = _L['MY_InfoTip'],
-				xSchema = Schema.FrameAnchor,
+				xSchema = X.Schema.FrameAnchor,
 				xDefaultValue = { x = -10, y = 210, s = 'TOPRIGHT', r = 'TOPRIGHT' },
 			},
 		}),
@@ -530,16 +501,16 @@ local INFO_TIP_LIST = {
 			end
 			local sm = data.cache.tSpeedometerRec[GLOBAL.GAME_FPS]
 			if sm and me then
-				s = sqrt(pow(me.nX - sm.x, 2) + pow(me.nY - sm.y, 2) + pow((me.nZ - sm.z) / 8, 2)) / 64
+				s = math.sqrt(math.pow(me.nX - sm.x, 2) + math.pow(me.nY - sm.y, 2) + math.pow((me.nZ - sm.z) / 8, 2)) / 64
 					/ (GetLogicFrameCount() - sm.framecount) * GLOBAL.GAME_FPS
 			end
-			return format(data.cache.formatString, s)
+			return string.format(data.cache.formatString, s)
 		end
 	},
 }
 local D = {}
 
-LIB.RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT', function()
+X.RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT', function()
 	for _, v in ipairs(INFO_TIP_LIST) do
 		v.config('reset', {'anchor'})
 	end
@@ -599,7 +570,7 @@ function D.ReinitUI()
 end
 
 -- 注册INIT事件
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_INFOTIP', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_INFOTIP', function()
 	D.ReinitUI()
 end)
 
@@ -699,4 +670,4 @@ function PS.OnPanelActive(wnd)
 		})
 	end
 end
-LIB.RegisterPanel(_L['System'], 'MY_InfoTip', _L['MY_InfoTip'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', PS)
+X.RegisterPanel(_L['System'], 'MY_InfoTip', _L['MY_InfoTip'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', PS)

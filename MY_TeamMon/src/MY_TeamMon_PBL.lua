@@ -11,65 +11,36 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon_PBL'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local GetBuff = LIB.GetBuff
+local GetBuff = X.GetBuff
 
 -- 这个需要重写 构思已有 就是没时间。。
-local O = LIB.CreateUserSettingsModule('MY_TeamMon_PBL', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_TeamMon_PBL', _L['Raid'], {
 	bHoverSelect = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAnchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 400, y = 0 },
 	},
 })
@@ -77,7 +48,7 @@ local D = {}
 
 local TEMP_TARGET_TYPE, TEMP_TARGET_ID
 local CACHE_LIST = setmetatable({}, { __mode = 'v' })
-local PBL_INI_FILE = PACKET_INFO.ROOT ..  'MY_TeamMon/ui/MY_TeamMon_PBL.ini'
+local PBL_INI_FILE = X.PACKET_INFO.ROOT ..  'MY_TeamMon/ui/MY_TeamMon_PBL.ini'
 
 function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
@@ -133,8 +104,8 @@ function D.OnFrameBreathe()
 				buff = GetBuff(p, data.dwBuffID)
 			end
 			if p and info and buff then
-				local nDistance = LIB.GetDistance(p)
-				h:Lookup('Image_life'):SetPercentage(info.fCurrentLife64 / max(info.fMaxLife64, 1))
+				local nDistance = X.GetDistance(p)
+				h:Lookup('Image_life'):SetPercentage(info.fCurrentLife64 / math.max(info.fMaxLife64, 1))
 				h:Lookup('Text_Name'):SetText(i + 1 .. ' ' .. info.szName)
 				if nDistance > DISTANCE then
 					h:Lookup('Image_life'):SetAlpha(150)
@@ -142,9 +113,9 @@ function D.OnFrameBreathe()
 					h:Lookup('Image_life'):SetAlpha(255)
 				end
 				local box = h:Lookup('Box_Icon')
-				local nSec = LIB.GetEndTime(buff.nEndFrame)
+				local nSec = X.GetEndTime(buff.nEndFrame)
 				if nSec < 60 then
-					box:SetOverText(1, LIB.FormatTimeCounter(min(nSec, 5999), 1))
+					box:SetOverText(1, X.FormatTimeCounter(math.min(nSec, 5999), 1))
 				else
 					box:SetOverText(1, '')
 				end
@@ -180,14 +151,14 @@ function D.OnItemLButtonDown()
 		if O.bHoverSelect then
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 		end
-		LIB.SetTarget(TARGET.PLAYER, this.data.dwID)
+		X.SetTarget(TARGET.PLAYER, this.data.dwID)
 	end
 end
 
 function D.OnItemMouseLeave()
 	if this:GetName() == 'Handle_Item' then
 		if O.bHoverSelect and TEMP_TARGET_TYPE and TEMP_TARGET_ID then
-			LIB.SetTarget(TEMP_TARGET_TYPE, TEMP_TARGET_ID)
+			X.SetTarget(TEMP_TARGET_TYPE, TEMP_TARGET_ID)
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 		end
 		HideTip()
@@ -197,10 +168,10 @@ end
 function D.OnItemMouseEnter()
 	if this:GetName() == 'Handle_Item' then
 		if O.bHoverSelect then
-			TEMP_TARGET_TYPE, TEMP_TARGET_ID = LIB.GetTarget()
-			LIB.SetTarget(TARGET.PLAYER, this.data.dwID)
+			TEMP_TARGET_TYPE, TEMP_TARGET_ID = X.GetTarget()
+			X.SetTarget(TARGET.PLAYER, this.data.dwID)
 		end
-		LIB.OutputBuffTip(this, this.data.dwBuffID, this.data.nLevel)
+		X.OutputBuffTip(this, this.data.dwBuffID, this.data.nLevel)
 	end
 end
 
@@ -269,9 +240,9 @@ function D.GetPlayer(dwID)
 	end
 	if info then
 		if player then
-			info.fCurrentLife64, info.fMaxLife64 = LIB.GetObjectLife(player)
+			info.fCurrentLife64, info.fMaxLife64 = X.GetObjectLife(player)
 		else
-			info.fCurrentLife64, info.fMaxLife64 = LIB.GetObjectLife(info)
+			info.fCurrentLife64, info.fMaxLife64 = X.GetObjectLife(info)
 		end
 	end
 	return player, info
@@ -310,9 +281,9 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	h:SetUserData(nSortLFC * 1000 + dwID % 1000)
 	h:Lookup('Image_KungFu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID) or 1435)
 	h:Lookup('Text_Name'):SetText(nCount .. ' ' .. info.szName)
-	h:Lookup('Image_life'):SetPercentage(info.fCurrentLife64 / max(info.fMaxLife64, 1))
+	h:Lookup('Image_life'):SetPercentage(info.fCurrentLife64 / math.max(info.fMaxLife64, 1))
 	local box = h:Lookup('Box_Icon')
-	local _, icon = LIB.GetBuffName(dwBuffID, nLevel)
+	local _, icon = X.GetBuffName(dwBuffID, nLevel)
 	if nIcon then
 		icon = nIcon
 	end
@@ -323,9 +294,9 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	box:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
 	box:SetOverTextFontScheme(1, 8)
 	box:SetOverTextFontScheme(0, 7)
-	local nSec = LIB.GetEndTime(buff.nEndFrame)
+	local nSec = X.GetEndTime(buff.nEndFrame)
 	if nSec < 60 then
-		box:SetOverText(1, floor(nSec) .. '\'')
+		box:SetOverText(1, math.floor(nSec) .. '\'')
 	end
 	if buff.nStackNum > 1 then
 		box:SetOverText(0, buff.nStackNum)
@@ -340,7 +311,7 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	CACHE_LIST[key] = h
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_PBL', D.Init)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_PBL', D.Init)
 
 -- Global exports
 do
@@ -369,5 +340,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_PBL = LIB.CreateModule(settings)
+MY_TeamMon_PBL = X.CreateModule(settings)
 end

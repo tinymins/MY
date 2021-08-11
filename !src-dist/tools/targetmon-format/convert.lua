@@ -63,28 +63,28 @@ local function table_r(var, level, indent)
 	local t = {}
 	local szType = type(var)
 	if szType == 'nil' then
-		insert(t, 'nil')
+		table.insert(t, 'nil')
 	elseif szType == 'number' then
-		insert(t, tostring(var))
+		table.insert(t, tostring(var))
 	elseif szType == 'string' then
-		insert(t, string.format('%q', var))
+		table.insert(t, string.format('%q', var))
 	elseif szType == 'function' then
 		local s = string.dump(var)
-		insert(t, 'loadstring("')
+		table.insert(t, 'loadstring("')
 		-- 'string slice too long'
 		for i = 1, #s, 2000 do
-			insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
+			table.insert(t, table.concat({'', string.byte(s, i, i + 2000 - 1)}, '\\'))
 		end
-		insert(t, '")')
+		table.insert(t, '")')
 	elseif szType == 'boolean' then
-		insert(t, tostring(var))
+		table.insert(t, tostring(var))
 	elseif szType == 'table' then
-		insert(t, '{')
+		table.insert(t, '{')
 		local s_tab_equ = '='
 		if indent then
 			s_tab_equ = ' = '
 			if not empty(var) then
-				insert(t, '\n')
+				table.insert(t, '\n')
 			end
 		end
 		local nohash = true
@@ -104,36 +104,36 @@ local function table_r(var, level, indent)
 				-- process to insert to table
 				if nohash then -- pure list table
 					if indent then
-						insert(t, rep(indent, level + 1))
+						table.insert(t, string.rep(indent, level + 1))
 					end
-					insert(t, table_r(val, level + 1, indent))
-					insert(t, ',')
+					table.insert(t, table_r(val, level + 1, indent))
+					table.insert(t, ',')
 					if indent then
-						insert(t, '\n')
+						table.insert(t, '\n')
 					end
 				elseif type(key) == 'string' and key:find('^[a-zA-Z_][a-zA-Z0-9_]*$') then -- a = val
 					if indent then
-						insert(t, rep(indent, level + 1))
+						table.insert(t, string.rep(indent, level + 1))
 					end
-					insert(t, key)
-					insert(t, s_tab_equ) --' = '
-					insert(t, table_r(val, level + 1, indent))
-					insert(t, ',')
+					table.insert(t, key)
+					table.insert(t, s_tab_equ) --' = '
+					table.insert(t, table_r(val, level + 1, indent))
+					table.insert(t, ',')
 					if indent then
-						insert(t, '\n')
+						table.insert(t, '\n')
 					end
 				else -- [10010] = val -- ['.start with or contains special char'] = val
 					if indent then
-						insert(t, rep(indent, level + 1))
+						table.insert(t, string.rep(indent, level + 1))
 					end
-					insert(t, '[')
-					insert(t, table_r(key, level + 1, indent))
-					insert(t, ']')
-					insert(t, s_tab_equ) --' = '
-					insert(t, table_r(val, level + 1, indent))
-					insert(t, ',')
+					table.insert(t, '[')
+					table.insert(t, table_r(key, level + 1, indent))
+					table.insert(t, ']')
+					table.insert(t, s_tab_equ) --' = '
+					table.insert(t, table_r(val, level + 1, indent))
+					table.insert(t, ',')
 					if indent then
-						insert(t, '\n')
+						table.insert(t, '\n')
 					end
 				end
 				lastkey, lastval = key, val
@@ -141,18 +141,18 @@ local function table_r(var, level, indent)
 		until not key
 		if not empty(var) then
 			if indent then -- insert `}` with indent
-				insert(t, rep(indent, level))
+				table.insert(t, string.rep(indent, level))
 			else -- remove last comma when no indent
-				remove(t)
+				table.remove(t)
 			end
 		end
-		insert(t, '}')
+		table.insert(t, '}')
 	else --if (szType == 'userdata') then
-		insert(t, '"')
-		insert(t, tostring(var))
-		insert(t, '"')
+		table.insert(t, '"')
+		table.insert(t, tostring(var))
+		table.insert(t, '"')
 	end
-	return concat(t)
+	return table.concat(t)
 end
 
 function var2str(var, indent, level)
@@ -185,7 +185,7 @@ function str2var(str, env)
 		if bdata then
 			datalist = {env.data}
 		else
-			remove(datalist, 1)
+			table.remove(datalist, 1)
 		end
 	else
 		Log('[CALL ERROR]str2var("' .. str .. '"): \nERROR:' .. datalist[2])

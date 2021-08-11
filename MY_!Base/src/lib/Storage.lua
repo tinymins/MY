@@ -1137,7 +1137,7 @@ local function FormatStorageData(me, d)
 		n = X.GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
 		S = X.GetRealServer(1), s = X.GetRealServer(2), r = me.nRoleType,
 		_ = GetCurrentTime(), t = X.GetTongName(), d = d,
-		m = GLOBAL.GAME_PROVIDER == 'remote' and 1 or 0, v = PACKET_INFO.VERSION,
+		m = GLOBAL.GAME_PROVIDER == 'remote' and 1 or 0, v = X.PACKET_INFO.VERSION,
 	})))
 end
 -- 个人数据版本号

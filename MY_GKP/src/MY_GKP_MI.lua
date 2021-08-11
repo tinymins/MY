@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -67,14 +38,14 @@ local O = {
 	bSync       = {},
 	nSyncLen    = 0,
 }
-local DS_ROOT = {'userdata/gkp/', PATH_TYPE.ROLE}
-local DS_PATH = {'userdata/gkp/current.gkp', PATH_TYPE.ROLE}
+local DS_ROOT = {'userdata/gkp/', X.PATH_TYPE.ROLE}
+local DS_PATH = {'userdata/gkp/current.gkp', X.PATH_TYPE.ROLE}
 
 function D.Init()
 	if O.ds then
 		return
 	end
-	O.ds = MY_GKP_DS(LIB.FormatPath(DS_PATH), true)
+	O.ds = MY_GKP_DS(X.FormatPath(DS_PATH), true)
 end
 
 function D.GetDS()
@@ -85,17 +56,17 @@ end
 function D.NewDS(bSilent)
 	local ds = D.GetDS()
 	if not ds:IsEmpty() then
-		if not IsEmpty(ds:GetTime()) and not IsEmpty(ds:GetMap()) then
-			local szRoot = LIB.FormatPath(DS_ROOT)
+		if not X.IsEmpty(ds:GetTime()) and not X.IsEmpty(ds:GetMap()) then
+			local szRoot = X.FormatPath(DS_ROOT)
 			local i, szNewPath = 0
 			repeat
 				szNewPath = szRoot
-					.. LIB.FormatTime(ds:GetTime(), '%yyyy-%MM-%dd-%hh-%mm-%ss')
+					.. X.FormatTime(ds:GetTime(), '%yyyy-%MM-%dd-%hh-%mm-%ss')
 					.. (i == 0 and '' or ('-' .. i))
 					.. '_' .. ds:GetMap()
 					.. '.gkp.jx3dat'
 				i = i + 1
-			until not IsLocalFileExist(LIB.FormatPath(szNewPath))
+			until not IsLocalFileExist(X.FormatPath(szNewPath))
 			local dsNew = MY_GKP_DS(szNewPath, true)
 			dsNew:SetTime(ds:GetTime())
 			dsNew:SetMap(ds:GetMap())
@@ -106,7 +77,7 @@ function D.NewDS(bSilent)
 	end
 	D.UpdateDSMeta()
 	if not bSilent then
-		LIB.Alert(_L['Records are wiped'])
+		X.Alert(_L['Records are wiped'])
 	end
 	FireUIEvent('MY_GKP_LOOT_BOSS')
 end
@@ -131,9 +102,9 @@ function D.NewAuction(tab, bSkipPanel)
 end
 
 function D.SyncSend(dwID, bSilent)
-	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		if not bSilent then
-			LIB.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+			X.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 		end
 		return
 	end
@@ -143,24 +114,24 @@ function D.SyncSend(dwID, bSilent)
 		GKP_Account = ds:GetPaymentList(),
 	}
 	-- 密聊频道限制了字数 发起来太慢了
-	local szKey = LIB.GetUUID():sub(1, 8)
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP_SYNC_START', {dwID, szKey})
-	LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP_SYNC_CONTENT_' .. szKey, {dwID, tab})
+	local szKey = X.GetUUID():sub(1, 8)
+	X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP_SYNC_START', {dwID, szKey})
+	X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP_SYNC_CONTENT_' .. szKey, {dwID, tab})
 end
 
-LIB.RegisterInit('MY_GKP_MI', function()
+X.RegisterInit('MY_GKP_MI', function()
 	D.Init()
 end)
 
-LIB.RegisterBgMsg('MY_GKP_SYNC_START', function(_, aData, nChannel, dwID, szName, bIsSelf)
+X.RegisterBgMsg('MY_GKP_SYNC_START', function(_, aData, nChannel, dwID, szName, bIsSelf)
 	local dwID, szKey = aData[1], aData[2]
 	if dwID == UI_GetClientPlayerID() or dwID == 0 then
-		LIB.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, function(_, aData, nChannel, dwID, szName, bIsSelf)
+		X.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, function(_, aData, nChannel, dwID, szName, bIsSelf)
 			local dwID, tab = aData[1], aData[2]
 			if dwID == UI_GetClientPlayerID() or dwID == 0 then
-				LIB.Topmsg(_L['Sychoronization Complete'])
+				X.Topmsg(_L['Sychoronization Complete'])
 				if tab then
-					LIB.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tab.GKP_Record, #tab.GKP_Account), function()
+					X.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tab.GKP_Record, #tab.GKP_Account), function()
 						local ds = D.GetDS()
 						ds:SetAuctionList(tab.GKP_Record)
 						ds:SetPaymentList(tab.GKP_Account)
@@ -169,16 +140,16 @@ LIB.RegisterBgMsg('MY_GKP_SYNC_START', function(_, aData, nChannel, dwID, szName
 					D.Sysmsg(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
 				end
 			end
-			LIB.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, false)
+			X.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, false)
 		end, function(szMsgID, nSegCount, nSegRecv, nSegIndex, nChannel, dwID, szName, bIsSelf)
 			local fPercent = nSegRecv / nSegCount
-			LIB.Topmsg(_L('Sychoronizing data please wait %d%% loaded.', fPercent * 100))
+			X.Topmsg(_L('Sychoronizing data please wait %d%% loaded.', fPercent * 100))
 		end)
 	end
 end)
 
 
-LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
+X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 	local ds = D.GetDS()
 	local me = GetClientPlayer()
 	local team = GetClientTeam()
@@ -191,7 +162,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 				tab.bSync = true
 				ds:SetAuctionRec(tab)
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MY_GKP', '#MY_GKP# Sync Success', DEBUG_LEVEL.LOG)
+				X.Debug('MY_GKP', '#MY_GKP# Sync Success', X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			end
 		end
@@ -210,12 +181,12 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 					local width, height = ui:Size()
 					local right, bottom = left + width, top + height
 					local btn           = this
-					local path          = GetRootPath() .. format('\\ScreenShot\\GKP_Ticket_%s.png', FormatTime('%Y-%m-%d_%H.%M.%S', GetCurrentTime()))
+					local path          = GetRootPath() .. string.format('\\ScreenShot\\GKP_Ticket_%s.png', FormatTime('%Y-%m-%d_%H.%M.%S', GetCurrentTime()))
 					btn:Hide()
-					LIB.DelayCall(function()
+					X.DelayCall(function()
 						ScreenShot(path, 100, scale * left, scale * top, scale * right, scale * bottom)
-						LIB.DelayCall(function()
-							LIB.Alert(_L('Shot screen succeed, file saved as %s .', path))
+						X.DelayCall(function()
+							X.Alert(_L('Shot screen succeed, file saved as %s .', path))
 							btn:Show()
 						end)
 					end, 50)
@@ -225,7 +196,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 			end
 			if data[2] == 'Info' then
 				if data[3] == me.szName and tonumber(data[4]) and tonumber(data[4]) < 0 then
-					LIB.OutputWhisper(data[3] .. g_tStrings.STR_COLON .. data[4] .. g_tStrings.STR_GOLD, _L['MY_GKP'])
+					X.OutputWhisper(data[3] .. g_tStrings.STR_COLON .. data[4] .. g_tStrings.STR_GOLD, _L['MY_GKP'])
 				end
 				local frm = Station.Lookup('Normal/GKP_info')
 				if frm and frm.done then
@@ -255,13 +226,13 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 							if dwForceID == -1 then
 								dwForceID = v.dwForceID
 							end
-							insert(tBox, v)
+							table.insert(tBox, v)
 						end
 					end
 					if dwForceID ~= -1 then
 						ui:Append('Image', { w = 28, h = 28, x = x + 30, y = y + 71 + 30 * n }):Image(GetForceImage(dwForceID))
 					end
-					ui:Append('Text', { w = 140, h = 30, x = x + 60, y = y + 70 + 30 * n, text = data[3], color = { LIB.GetForceColor(dwForceID) } })
+					ui:Append('Text', { w = 140, h = 30, x = x + 60, y = y + 70 + 30 * n, text = data[3], color = { X.GetForceColor(dwForceID) } })
 					local handle = ui:Append('Handle', { w = 130, h = 20, x = x + 200, y = y + 70 + 30 * n, handlestyle = 3 })[1]
 					handle:AppendItemFromString(D.GetMoneyTipText(tonumber(data[4])))
 					handle:FormatAllItemPos()
@@ -303,12 +274,12 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 						local handle = ui:Append('Handle', { w = 230, h = 20, x = x + 30, y = y + 70 + 30 * n + 5, handlestyle = 3 })[1]
 						handle:AppendItemFromString(GetFormatText(_L['Total Auction:'], 41) .. D.GetMoneyTipText(nMoney))
 						handle:FormatAllItemPos()
-						if LIB.IsDistributer() then
+						if X.IsDistributer() then
 							ui:Append('WndButton', {
 								w = 91, h = 26, x = x + 620, y = y + 70 + 30 * n + 5, text = _L['salary'],
 								buttonstyle = 'SKEUOMORPHISM',
 								onclick = function()
-									LIB.Confirm(_L['Confirm?'], function()
+									X.Confirm(_L['Confirm?'], function()
 										MY_GKP.Bidding(nMoney)
 									end)
 								end,
@@ -337,7 +308,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 							end
 							local img = ui:Append('Image', {
 								x = x + 590, y = y + n * 30 - 30, w = 150, h = 150, alpha = 180,
-								image = PACKET_INFO.ROOT .. 'MY_GKP/img/GKPSeal.uitex', imageframe = nFrame,
+								image = X.PACKET_INFO.ROOT .. 'MY_GKP/img/GKPSeal.uitex', imageframe = nFrame,
 								onhover = function(bHover)
 									if bHover then
 										this:SetAlpha(30)
@@ -359,7 +330,7 @@ LIB.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 	end
 end)
 
-LIB.RegisterEvent('ON_BG_CHANNEL_MSG', 'LR_GKP', function()
+X.RegisterEvent('ON_BG_CHANNEL_MSG', 'LR_GKP', function()
 	local szMsgID, nChannel, dwID, szName, data, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
 	if szMsgID ~= 'LR_GKP' or bSelf then
 		return
@@ -392,16 +363,16 @@ LIB.RegisterEvent('ON_BG_CHANNEL_MSG', 'LR_GKP', function()
 		}
 		ds:SetAuctionRec(tab)
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_GKP', '#MY_GKP# Sync From LR Success', DEBUG_LEVEL.LOG)
+		X.Debug('MY_GKP', '#MY_GKP# Sync From LR Success', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 end)
 
-LIB.RegisterEvent('LOADING_END',function()
+X.RegisterEvent('LOADING_END',function()
 	local ds = D.GetDS()
 	if not ds:IsEmpty() then
-		if LIB.IsInDungeon() and MY_GKP.bAlertMessage then
-			LIB.Confirm(_L['Do you want to wipe the previous data when you enter the dungeon\'s map?'], D.NewDS)
+		if X.IsInDungeon() and MY_GKP.bAlertMessage then
+			X.Confirm(_L['Do you want to wipe the previous data when you enter the dungeon\'s map?'], D.NewDS)
 		end
 	else
 		D.UpdateDSMeta()
@@ -433,13 +404,13 @@ function D.MoneyUpdate(nGold, nSilver, nCopper)
 	})
 	if D.TradingTarget.szName and MY_GKP.bMoneyTalk then
 		if nGold > 0 then
-			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
+			X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 				D.GetFormatLink(_L['Received']),
 				D.GetFormatLink(D.TradingTarget.szName, true),
 				D.GetFormatLink(_L['The'] .. nGold ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),
 			})
 		else
-			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
+			X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 				D.GetFormatLink(_L['Pay to']),
 				D.GetFormatLink(D.TradingTarget.szName, true),
 				D.GetFormatLink(' ' .. nGold * -1 ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),
@@ -448,13 +419,13 @@ function D.MoneyUpdate(nGold, nSilver, nCopper)
 	end
 end
 
-LIB.RegisterEvent('TRADING_OPEN_NOTIFY',function() -- 交易开始
+X.RegisterEvent('TRADING_OPEN_NOTIFY',function() -- 交易开始
 	D.TradingTarget = GetPlayer(arg0)
 end)
-LIB.RegisterEvent('TRADING_CLOSE',function() -- 交易结束
+X.RegisterEvent('TRADING_CLOSE',function() -- 交易结束
 	D.TradingTarget = {}
 end)
-LIB.RegisterEvent('MONEY_UPDATE',function() --金钱变动
+X.RegisterEvent('MONEY_UPDATE',function() --金钱变动
 	D.MoneyUpdate(arg0, arg1, arg2)
 end)
 
@@ -465,7 +436,7 @@ function D.SyncSystemGKP()
 	if not MY_GKP.bSyncSystem then
 		return
 	end
-	local GetInfo = GetGameAPI('GoldTeamBase_GetAllBiddingInfos')
+	local GetInfo = X.GetGameAPI('GoldTeamBase_GetAllBiddingInfos')
 	local aInfo = GetInfo and GetInfo()
 	if not aInfo then
 		return
@@ -475,7 +446,7 @@ function D.SyncSystemGKP()
 	--[[#DEBUG END]]
 	local ds = D.GetDS()
 	for _, v in ipairs(aInfo) do
-		local szKey = concat({
+		local szKey = table.concat({
 			tostring(v.nBiddingInfoIndex),
 			tostring(v.dwItemTabType),
 			tostring(v.dwItemTabIndex),
@@ -485,8 +456,8 @@ function D.SyncSystemGKP()
 			tostring(v.nStartTime),
 		}, ',')
 		-- 拍卖记录
-		local item = not IsEmpty(v.dwItemID) and GetItem(v.dwItemID)
-		local itemInfo = not IsEmpty(v.dwItemTabType) and not IsEmpty(v.dwItemTabIndex) and GetItemInfo(v.dwItemTabType, v.dwItemTabIndex)
+		local item = not X.IsEmpty(v.dwItemID) and GetItem(v.dwItemID)
+		local itemInfo = not X.IsEmpty(v.dwItemTabType) and not X.IsEmpty(v.dwItemTabIndex) and GetItemInfo(v.dwItemTabType, v.dwItemTabIndex)
 		local player = GetPlayer(v.dwDestPlayerID)
 		local dwForceID = player and player.dwForceID
 		if not dwForceID then
@@ -509,10 +480,10 @@ function D.SyncSystemGKP()
 			dwForceID  = dwForceID or 0,
 			szPlayer   = v.szDestPlayerName or 0,
 			nMoney     = v.nPrice or 0,
-			szNpcName  = IsEmpty(v.dwNpcTemplateID) and _L['Add Manually'] or LIB.GetTemplateName(TARGET.NPC, v.dwNpcTemplateID),
+			szNpcName  = X.IsEmpty(v.dwNpcTemplateID) and _L['Add Manually'] or X.GetTemplateName(TARGET.NPC, v.dwNpcTemplateID),
 		}
 		if item then
-			local szName = LIB.GetObjectName('ITEM', v.dwItemID, 'never')
+			local szName = X.GetObjectName('ITEM', v.dwItemID, 'never')
 			if szName then
 				tab.szName = szName
 			end
@@ -522,7 +493,7 @@ function D.SyncSystemGKP()
 			tab.nUiId = item.nUiId
 			tab.nQuality = item.nQuality
 		elseif itemInfo then
-			local szName = LIB.GetObjectName('ITEM_INFO', v.dwItemTabType, v.dwItemTabIndex, 'never')
+			local szName = X.GetObjectName('ITEM_INFO', v.dwItemTabType, v.dwItemTabIndex, 'never')
 			if szName then
 				tab.szName = szName
 			end
@@ -532,14 +503,14 @@ function D.SyncSystemGKP()
 		if not tab.szName then
 			tab.szName = v.szComment
 		end
-		if IsEmpty(tab.dwForceID) and not IsEmpty(dwForceID) then
+		if X.IsEmpty(tab.dwForceID) and not X.IsEmpty(dwForceID) then
 			tab.dwForceID = dwForceID
 		end
 		tab.bDelete = v.nState == 0
 		tab.bSystem = true
 		ds:SetAuctionRec(tab)
 		-- 付款记录
-		if not IsEmpty(v.dwPayerID) and not IsEmpty(v.nPrice) then
+		if not X.IsEmpty(v.dwPayerID) and not X.IsEmpty(v.nPrice) then
 			local player = GetPlayer(v.dwDestPlayerID) -- 记账到欠款人头上方便统计
 			local dwForceID = player and player.dwForceID
 			if not dwForceID then
@@ -558,7 +529,7 @@ function D.SyncSystemGKP()
 				dwMapID = 0,
 				nTime = v.nStartTime or 0,
 			}
-			if IsEmpty(tab.dwForceID) and not IsEmpty(dwForceID) then
+			if X.IsEmpty(tab.dwForceID) and not X.IsEmpty(dwForceID) then
 				tab.dwForceID = dwForceID
 			end
 			tab.bSystem = true
@@ -567,19 +538,19 @@ function D.SyncSystemGKP()
 	end
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	LIB.Debug(
+	X.Debug(
 		_L['PMTool'],
 		_L('MY_GKP_MI SyncSystemGKP in %dms.', nTickCount),
-		DEBUG_LEVEL.PMLOG)
+		X.DEBUG_LEVEL.PMLOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterEvent('BIDDING_OPERATION', function()
+X.RegisterEvent('BIDDING_OPERATION', function()
 	if not MY_GKP.bSyncSystem then
 		return
 	end
-	LIB.DelayCall('MY_GKP_MI__SyncSystemGKP', 150, D.SyncSystemGKP)
+	X.DelayCall('MY_GKP_MI__SyncSystemGKP', 150, D.SyncSystemGKP)
 end)
-LIB.RegisterInit('MY_GKP_MI__SyncSystemGKP', D.SyncSystemGKP)
+X.RegisterInit('MY_GKP_MI__SyncSystemGKP', D.SyncSystemGKP)
 
 ---------------------------------------------------------------------->
 -- 主界面
@@ -621,8 +592,8 @@ function D.LoadHistory(szFilePath)
 	end
 end
 
-LIB.RegisterHotKey('MY_GKP', _L['Open/Close Golden Team Record'], D.TogglePanel)
-LIB.RegisterAddonMenu({ szOption = _L['Golden Team Record'], fnAction = D.OpenPanel })
+X.RegisterHotKey('MY_GKP', _L['Open/Close Golden Team Record'], D.TogglePanel)
+X.RegisterAddonMenu({ szOption = _L['Golden Team Record'], fnAction = D.OpenPanel })
 
 -- Global exports
 do
@@ -644,5 +615,5 @@ local settings = {
 		},
 	},
 }
-MY_GKP_MI = LIB.CreateModule(settings)
+MY_GKP_MI = X.CreateModule(settings)
 end

@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Taoguan'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -62,147 +33,147 @@ end
 -- 醉生 -- 下一次砸年兽陶罐失败则不损失积分
 
 local FILTER_ITEM = {
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6072), bFilter = true }, -- 鞭炮
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6069), bFilter = true }, -- 火树银花
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6068), bFilter = true }, -- 龙凤呈祥
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6067), bFilter = true }, -- 彩云逐月
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6076), bFilter = true }, -- 熠熠生辉
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6073), bFilter = true }, -- 焰火棒
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6070), bFilter = true }, -- 窜天猴
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6077), bFilter = true }, -- 彩云逐月
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 8025, 1168), bFilter = true }, -- 剪纸：龙腾
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 8025, 1170), bFilter = true }, -- 剪纸：凤舞
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6066), bFilter = true }, -- 元宝灯
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6067), bFilter = true }, -- 桃花灯
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6024), bFilter = true }, -- 年年有鱼灯
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6048), bFilter = false }, -- 桃木牌·马
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6049), bFilter = true }, -- 桃木牌·年
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6050), bFilter = true }, -- 桃木牌·吉
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6051), bFilter = true }, -- 桃木牌·祥
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6200), bFilter = true }, -- 图样：彩云逐月
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6203), bFilter = true }, -- 图样：熠熠生辉
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6258), bFilter = false }, -- 监本印文兑换券
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 31599), bFilter = false }, -- 战魂佩
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 30692), bFilter = false }, -- 豪侠贡
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 20959), bFilter = false }, -- 年兽陶罐
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6027), bFilter = false }, -- 幸运香囊
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6030), bFilter = false }, -- 幸运锦囊
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6028), bFilter = false }, -- 如意香囊
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6031), bFilter = false }, -- 如意锦囊
-	{ szName = LIB.GetObjectName('ITEM_INFO', 5, 6043), bFilter = false }, -- 锁住的月光宝盒
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6072), bFilter = true }, -- 鞭炮
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6069), bFilter = true }, -- 火树银花
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6068), bFilter = true }, -- 龙凤呈祥
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6067), bFilter = true }, -- 彩云逐月
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6076), bFilter = true }, -- 熠熠生辉
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6073), bFilter = true }, -- 焰火棒
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6070), bFilter = true }, -- 窜天猴
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6077), bFilter = true }, -- 彩云逐月
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 8025, 1168), bFilter = true }, -- 剪纸：龙腾
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 8025, 1170), bFilter = true }, -- 剪纸：凤舞
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6066), bFilter = true }, -- 元宝灯
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6067), bFilter = true }, -- 桃花灯
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6024), bFilter = true }, -- 年年有鱼灯
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6048), bFilter = false }, -- 桃木牌·马
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6049), bFilter = true }, -- 桃木牌·年
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6050), bFilter = true }, -- 桃木牌·吉
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6051), bFilter = true }, -- 桃木牌·祥
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6200), bFilter = true }, -- 图样：彩云逐月
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6203), bFilter = true }, -- 图样：熠熠生辉
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6258), bFilter = false }, -- 监本印文兑换券
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 31599), bFilter = false }, -- 战魂佩
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 30692), bFilter = false }, -- 豪侠贡
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 20959), bFilter = false }, -- 年兽陶罐
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6027), bFilter = false }, -- 幸运香囊
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6030), bFilter = false }, -- 幸运锦囊
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6028), bFilter = false }, -- 如意香囊
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6031), bFilter = false }, -- 如意锦囊
+	{ szName = X.GetObjectName('ITEM_INFO', 5, 6043), bFilter = false }, -- 锁住的月光宝盒
 }
 local FILTER_ITEM_DEFAULT = {}
 for _, p in ipairs(FILTER_ITEM) do
 	FILTER_ITEM_DEFAULT[p.szName] = p.bFilter
 end
 
-local O = LIB.CreateUserSettingsModule('MY_Taoguan', _L['Target'], {
+local O = X.CreateUserSettingsModule('MY_Taoguan', _L['Target'], {
 	nPausePoint = { -- 停砸分数线
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 327680,
 	},
 	bUseTaoguan = { -- 必要时使用背包的陶罐
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bNoYinchuiUseJinchui = { -- 没小银锤时使用小金锤
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nUseXiaojinchui = { -- 优先使用小金锤的分数
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 320,
 	},
 	bPauseNoXiaojinchui = { -- 缺少小金锤时停砸
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nUseXingyunXiangnang = { -- 开始吃幸运香囊的分数
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},
 	bPauseNoXingyunXiangnang = { -- 缺少幸运香囊时停砸
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nUseXingyunJinnang = { -- 开始吃幸运锦囊的分数
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},
 	bPauseNoXingyunJinnang = { -- 缺少幸运锦囊时停砸
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nUseRuyiXiangnang = { -- 开始吃如意香囊的分数
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},
 	bPauseNoRuyiXiangnang = { -- 缺少如意香囊时停砸
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nUseRuyiJinnang = { -- 开始吃如意锦囊的分数
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},
 	bPauseNoRuyiJinnang = { -- 缺少如意锦囊时停砸
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nUseJiyougu = { -- 开始吃寄忧谷的分数
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1280,
 	},
 	bPauseNoJiyougu = { -- 缺少寄忧谷时停砸
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nUseZuisheng = { -- 开始吃醉生的分数
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1280,
 	},
 	bPauseNoZuisheng = { -- 缺少醉生时停砸
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	tFilterItem = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
-		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = FILTER_ITEM_DEFAULT,
 	},
 })
@@ -210,16 +181,16 @@ local O = LIB.CreateUserSettingsModule('MY_Taoguan', _L['Target'], {
 ---------------------------------------------------------------------
 -- 本地函数和变量
 ---------------------------------------------------------------------
-local TAOGUAN = LIB.GetItemNameByUIID(74224) -- 年兽陶罐
-local XIAOJINCHUI = LIB.GetItemNameByUIID(65611) -- 小金锤
-local XIAOYINCHUI = LIB.GetItemNameByUIID(65609) -- 小银锤
-local MEILIANGYUQIAN = LIB.GetItemNameByUIID(65589) -- 梅良玉签
-local XINGYUNXIANGNANG = LIB.GetItemNameByUIID(65578) -- 幸运香囊
-local XINGYUNJINNANG = LIB.GetItemNameByUIID(65581) -- 幸运锦囊
-local RUYIXIANGNANG = LIB.GetItemNameByUIID(65579) -- 如意香囊
-local RUYIJINNANG = LIB.GetItemNameByUIID(65582) -- 如意锦囊
-local JIYOUGU = LIB.GetItemNameByUIID(65580) -- 寄忧谷
-local ZUISHENG = LIB.GetItemNameByUIID(65583) -- 醉生
+local TAOGUAN = X.GetItemNameByUIID(74224) -- 年兽陶罐
+local XIAOJINCHUI = X.GetItemNameByUIID(65611) -- 小金锤
+local XIAOYINCHUI = X.GetItemNameByUIID(65609) -- 小银锤
+local MEILIANGYUQIAN = X.GetItemNameByUIID(65589) -- 梅良玉签
+local XINGYUNXIANGNANG = X.GetItemNameByUIID(65578) -- 幸运香囊
+local XINGYUNJINNANG = X.GetItemNameByUIID(65581) -- 幸运锦囊
+local RUYIXIANGNANG = X.GetItemNameByUIID(65579) -- 如意香囊
+local RUYIJINNANG = X.GetItemNameByUIID(65582) -- 如意锦囊
+local JIYOUGU = X.GetItemNameByUIID(65580) -- 寄忧谷
+local ZUISHENG = X.GetItemNameByUIID(65583) -- 醉生
 local ITEM_CD = 1 * GLOBAL.GAME_FPS + 8 -- 吃药CD
 local HAMMER_CD = 5 * GLOBAL.GAME_FPS + 8 -- 锤子CD
 local MAX_POINT_POW = 16 -- 分数最高倍数（2^n）
@@ -261,7 +232,7 @@ function D.UseBagItem(szName, bWarn)
 		local it = GetPlayerItem(me, i, j)
 			if it and it.szName == szName then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MY_Taoguan', 'UseItem: ' .. i .. ',' .. j .. ' ' .. szName, DEBUG_LEVEL.LOG)
+				X.Debug('MY_Taoguan', 'UseItem: ' .. i .. ',' .. j .. ' ' .. szName, X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				OnUseItem(i, j)
 				return true
@@ -269,7 +240,7 @@ function D.UseBagItem(szName, bWarn)
 		end
 	end
 	if bWarn then
-		LIB.Systopmsg(_L('Auto taoguan: missing [%s]!', szName))
+		X.Systopmsg(_L('Auto taoguan: missing [%s]!', szName))
 	end
 end
 
@@ -281,7 +252,7 @@ function D.BreakCanStateTransfer()
 	end
 	local nLFC = GetLogicFrameCount()
 	-- 确认掉砸金蛋确认框
-	LIB.DoMessageBox('PlayerMessageBoxCommon')
+	X.DoMessageBox('PlayerMessageBoxCommon')
 	-- 吃药还在CD则等待
 	if nLFC - D.nUseItemLFC < ITEM_CD then
 		return
@@ -293,7 +264,7 @@ function D.BreakCanStateTransfer()
 			-- 符合吃药分数条件
 			if D.nPoint >= O['nUse' .. item.szID] then
 				-- 如果已经有BUFF，即吃过药了，则跳出循环
-				if LIB.GetBuff(me, item.dwBuffID, item.nBuffLevel) then
+				if X.GetBuff(me, item.dwBuffID, item.nBuffLevel) then
 					break
 				end
 				-- 否则尝试吃药
@@ -316,9 +287,9 @@ function D.BreakCanStateTransfer()
 	end
 	-- 寻找能砸的陶罐
 	local npcTaoguan
-	for _, npc in ipairs(LIB.GetNearNpc()) do
+	for _, npc in ipairs(X.GetNearNpc()) do
 		if npc and npc.dwTemplateID == 6820 then
-			if LIB.GetDistance(npc) < 4 then
+			if X.GetDistance(npc) < 4 then
 				npcTaoguan = npc
 				break
 			end
@@ -335,7 +306,7 @@ function D.BreakCanStateTransfer()
 		return
 	end
 	-- 找到罐子了，设为目标
-	LIB.SetTarget(TARGET.NPC, npcTaoguan.dwID)
+	X.SetTarget(TARGET.NPC, npcTaoguan.dwID)
 	-- 需要用小金锤，砸他丫的
 	if D.nPoint >= O.nUseXiaojinchui then
 		if D.UseBagItem(XIAOJINCHUI, O.bPauseNoXiaojinchui) then
@@ -370,13 +341,13 @@ end
 -- 事件处理
 -------------------------------------
 function D.MonitorZP(szChannel, szMsg)
-	local _, _, nP = find(szMsg, _L['Current total score:(%d+)'])
+	local _, _, nP = string.find(szMsg, _L['Current total score:(%d+)'])
 	if nP then
 		D.nPoint = tonumber(nP)
 		if D.nPoint >= O.nPausePoint then
 			D.Stop()
 			D.bReachLimit = true
-			LIB.Systopmsg(_L['Auto taoguan: reach limit!'])
+			X.Systopmsg(_L['Auto taoguan: reach limit!'])
 		end
 		D.nUseHammerLFC = GetLogicFrameCount()
 	end
@@ -385,7 +356,7 @@ end
 function D.OnLootItem()
 	if arg0 == GetClientPlayer().dwID and arg2 > 2 and GetItem(arg1).szName == MEILIANGYUQIAN then
 		D.nPoint = 0
-		LIB.Systopmsg(_L['Auto taoguan: score clear!'])
+		X.Systopmsg(_L['Auto taoguan: score clear!'])
 	end
 end
 
@@ -393,11 +364,11 @@ function D.OnDoodadEnter()
 	if D.bEnable or D.bReachLimit then
 		local d = GetDoodad(arg0)
 		if d and d.szName == TAOGUAN and d.CanDialog(GetClientPlayer())
-			and LIB.GetDistance(d) < 4.1
+			and X.GetDistance(d) < 4.1
 		then
 			D.dwDoodadID = arg0
-			LIB.DelayCall(520, function()
-				LIB.InteractDoodad(D.dwDoodadID)
+			X.DelayCall(520, function()
+				X.InteractDoodad(D.dwDoodadID)
 			end)
 		end
 	end
@@ -422,7 +393,7 @@ function D.OnOpenDoodad()
 				then
 					LootItem(d.dwID, it.dwID)
 				else
-					LIB.Systopmsg(_L('Auto taoguan: filter item [%s].', szName))
+					X.Systopmsg(_L('Auto taoguan: filter item [%s].', szName))
 				end
 			end
 			local hL = Station.Lookup('Normal/LootList', 'Handle_LootList')
@@ -440,11 +411,11 @@ function D.Start()
 		return
 	end
 	D.bEnable = true
-	LIB.RegisterMsgMonitor('MSG_SYS', 'MY_Taoguan', D.MonitorZP)
-	LIB.BreatheCall('MY_Taoguan', D.BreakCanStateTransfer)
-	LIB.RegisterEvent('LOOT_ITEM', 'MY_Taoguan', D.OnLootItem)
-	LIB.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_Taoguan', D.OnDoodadEnter)
-	LIB.RegisterEvent('HELP_EVENT', 'MY_Taoguan', function()
+	X.RegisterMsgMonitor('MSG_SYS', 'MY_Taoguan', D.MonitorZP)
+	X.BreatheCall('MY_Taoguan', D.BreakCanStateTransfer)
+	X.RegisterEvent('LOOT_ITEM', 'MY_Taoguan', D.OnLootItem)
+	X.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_Taoguan', D.OnDoodadEnter)
+	X.RegisterEvent('HELP_EVENT', 'MY_Taoguan', function()
 		if arg0 == 'OnOpenpanel' and arg1 == 'LOOT'
 			and D.bEnable and D.dwDoodadID ~= 0
 		then
@@ -452,7 +423,7 @@ function D.Start()
 			D.dwDoodadID = 0
 		end
 	end)
-	LIB.Systopmsg(_L['Auto taoguan: on.'])
+	X.Systopmsg(_L['Auto taoguan: on.'])
 end
 
 -- 砸罐子关闭（注销事件）
@@ -461,13 +432,13 @@ function D.Stop()
 		return
 	end
 	D.bEnable = false
-	LIB.RegisterMsgMonitor('MSG_SYS', 'MY_Taoguan', false)
-	LIB.BreatheCall('MY_Taoguan', false)
-	LIB.RegisterEvent('NPC_ENTER_SCENE', 'MY_Taoguan', false)
-	LIB.RegisterEvent('LOOT_ITEM', 'MY_Taoguan', false)
-	LIB.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_Taoguan', false)
-	LIB.RegisterEvent('HELP_EVENT', 'MY_Taoguan', false)
-	LIB.Systopmsg(_L['Auto taoguan: off.'])
+	X.RegisterMsgMonitor('MSG_SYS', 'MY_Taoguan', false)
+	X.BreatheCall('MY_Taoguan', false)
+	X.RegisterEvent('NPC_ENTER_SCENE', 'MY_Taoguan', false)
+	X.RegisterEvent('LOOT_ITEM', 'MY_Taoguan', false)
+	X.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_Taoguan', false)
+	X.RegisterEvent('HELP_EVENT', 'MY_Taoguan', false)
+	X.Systopmsg(_L['Auto taoguan: off.'])
 end
 
 -- 砸罐子开关
@@ -503,7 +474,7 @@ function PS.OnPanelActive(wnd)
 			local m0 = {}
 			for i = 2, MAX_POINT_POW do
 				local v = 10 * 2 ^ i
-				insert(m0, { szOption = tostring(v), fnAction = function()
+				table.insert(m0, { szOption = tostring(v), fnAction = function()
 					O.nPausePoint = v
 					ui:Text(tostring(v))
 				end })
@@ -531,14 +502,14 @@ function PS.OnPanelActive(wnd)
 	-- 各种东西使用分数和缺少停砸
 	local nMaxItemNameLen = 0
 	for _, p in ipairs(D.aUseItemPS) do
-		nMaxItemNameLen = max(nMaxItemNameLen, wlen(p.szName))
+		nMaxItemNameLen = math.max(nMaxItemNameLen, wstring.len(p.szName))
 	end
 	for _, p in ipairs(D.aUseItemPS) do
 		nX = nPaddingX + 10
 		nY = nY + 28
 		nX = ui:Append('Text', {
 			x = nX, y = nY,
-			text = _L('Use %s when score reaches', p.szName .. rep(g_tStrings.STR_ONE_CHINESE_SPACE, nMaxItemNameLen - wlen(p.szName))),
+			text = _L('Use %s when score reaches', p.szName .. string.rep(g_tStrings.STR_ONE_CHINESE_SPACE, nMaxItemNameLen - wstring.len(p.szName))),
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		nX = ui:Append('WndComboBox', {
 			x = nX, y = nY, w = 100, h = 25,
@@ -548,7 +519,7 @@ function PS.OnPanelActive(wnd)
 				local m0 = {}
 				for i = 2, MAX_POINT_POW - 1 do
 					local v = 10 * 2 ^ i
-					insert(m0, { szOption = tostring(v), fnAction = function()
+					table.insert(m0, { szOption = tostring(v), fnAction = function()
 						O['nUse' .. p.szID] = v
 						ui:Text(tostring(v))
 					end })
@@ -575,7 +546,7 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local m0 = {}
 			for _, p in ipairs(FILTER_ITEM) do
-				insert(m0, {
+				table.insert(m0, {
 					szOption = p.szName,
 					bCheck = true, bChecked = O.tFilterItem[p.szName],
 					fnAction = function(d, b)
@@ -586,7 +557,7 @@ function PS.OnPanelActive(wnd)
 			end
 			for k, v in pairs(O.tFilterItem) do
 				if FILTER_ITEM_DEFAULT[k] == nil then
-					insert(m0, {
+					table.insert(m0, {
 						szOption = k,
 						bCheck = true, bChecked = v,
 						fnAction = function(d, b)
@@ -608,9 +579,9 @@ function PS.OnPanelActive(wnd)
 				end
 			end
 			if #m0 > 0 then
-				insert(m0, CONSTANT.MENU_DIVIDER)
+				table.insert(m0, CONSTANT.MENU_DIVIDER)
 			end
-			insert(m0, {
+			table.insert(m0, {
 				szOption = _L['Custom add'],
 				fnAction = function()
 					local function fnConfirm(szText)
@@ -638,8 +609,8 @@ function PS.OnPanelActive(wnd)
 		text = _L['Restore default config'],
 		onclick = function()
 			O('reset')
-			LIB.SwitchTab('MY_Taoguan', true)
+			X.SwitchTab('MY_Taoguan', true)
 		end,
 	}):Pos('BOTTOMRIGHT')
 end
-LIB.RegisterPanel(_L['Target'], 'MY_Taoguan', _L[MODULE_NAME], 119, PS)
+X.RegisterPanel(_L['Target'], 'MY_Taoguan', _L[MODULE_NAME], 119, PS)

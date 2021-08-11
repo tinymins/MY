@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_CombatText'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_CombatText'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -68,13 +39,13 @@ local Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible = Table_GetBuff
 	-------------------------------------------------------------------------------
 	初始坐标类型：分为 顶部 左 右 左下 右下 中心
 	顶部：
-		Y轴轨迹数 以 floor(3.5 / UI缩放) 决定，其初始Y轴高度不同。
+		Y轴轨迹数 以 math.floor(3.5 / UI缩放) 决定，其初始Y轴高度不同。
 		在轨迹全部被占用后会随机分摊到屏幕顶部左右两边。
 	其他类型：使用轨迹合并16-32帧，后来的文本会顶走前面的文本，从而跳过这部分停留的帧数。
 ]]
 
-local COMBAT_TEXT_INIFILE        = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
-local COMBAT_TEXT_CONFIG         = LIB.FormatPath({'config/CombatText.jx3dat', PATH_TYPE.GLOBAL})
+local COMBAT_TEXT_INIFILE        = X.PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
+local COMBAT_TEXT_CONFIG         = X.FormatPath({'config/CombatText.jx3dat', X.PATH_TYPE.GLOBAL})
 local COMBAT_TEXT_PLAYERID       = 0
 local COMBAT_TEXT_TOTAL          = 32
 local COMBAT_TEXT_UI_SCALE       = 1
@@ -215,132 +186,132 @@ local COMBAT_TEXT_CACHE  = { -- buff的名字cache
 }
 local CombatText = {}
 
-local O = LIB.CreateUserSettingsModule('MY_CombatText', _L['System'], {
+local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bRender = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	fScale = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nStyle = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nMaxAlpha = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 240,
 	},
 	nTime = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 40,
 	},
 	nFadeIn = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 4,
 	},
 	nFadeOut = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 8,
 	},
 	nFont = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 19,
 	},
 	bImmunity = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bCritical = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tCriticalC = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 255, 255, 255 },
 	},
 	tCriticalH = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 0, 255, 0 },
 	},
 	tCriticalB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = GLOBAL.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 },
 	},
 	-- $name 名字 $sn   技能名 $crit 会心 $val  数值
 	szSkill = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = '$sn' .. g_tStrings.STR_COLON .. '$crit $val',
 	},
 	szTherapy = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = '$sn' .. g_tStrings.STR_COLON .. '$crit +$val',
 	},
 	szDamage = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = '$sn' .. g_tStrings.STR_COLON .. '$crit -$val',
 	},
 	bCasterNotI = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSnShorten2 = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTherEffOnly = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	col = { -- 颜色呗
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
-		xSchema = Schema.Map(Schema.OneOf(Schema.String, Schema.Number), Schema.Tuple(Schema.Number, Schema.Number, Schema.Number)),
+		xSchema = X.Schema.Map(X.Schema.OneOf(X.Schema.String, X.Schema.Number), X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {
 			['DAMAGE']                               = GLOBAL.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
 			[SKILL_RESULT_TYPE.THERAPY]              = { 0,   255, 0   }, -- 治疗
@@ -397,7 +368,7 @@ function D.OnFrameCreate()
 	CombatText.FreeQueue()
 	COMBAT_TEXT_UI_SCALE   = Station.GetUIScale()
 	COMBAT_TEXT_TRAJECTORY = CombatText.TrajectoryCount()
-	LIB.BreatheCall('COMBAT_TEXT_CACHE', 1000 * 60 * 5, function()
+	X.BreatheCall('COMBAT_TEXT_CACHE', 1000 * 60 * 5, function()
 		local count = 0
 		for k, v in pairs(COMBAT_TEXT_LEAVE) do
 			count = count + 1
@@ -509,8 +480,8 @@ function CombatText.OnFrameRender()
 	local g_fScale  = O.fScale
 	for k, v in pairs(COMBAT_TEXT_SHADOW) do
 		local nFrame = (nTime - v.nTime) / nDelay + 1 -- 每一帧是多少毫秒 这里越小 动画越快
-		local nBefore = floor(nFrame)
-		local nAfter  = ceil(nFrame)
+		local nBefore = math.floor(nFrame)
+		local nAfter  = math.ceil(nFrame)
 		local fDiff   = nFrame - nBefore
 		local nTotal  = COMBAT_TEXT_POINT[v.szPoint] and #COMBAT_TEXT_POINT[v.szPoint] or COMBAT_TEXT_TOTAL
 		k:ClearTriangleFanPoint()
@@ -568,7 +539,7 @@ function CombatText.OnFrameRender()
 				end
 				if v.nType == SKILL_RESULT_TYPE.THERAPY then -- 治疗缩小
 					if v.bCriticalStrike then
-						fScale = max(fScale * 0.7, COMBAT_TEXT_SCALE.NORMAL[#COMBAT_TEXT_SCALE.NORMAL] + 0.1)
+						fScale = math.max(fScale * 0.7, COMBAT_TEXT_SCALE.NORMAL[#COMBAT_TEXT_SCALE.NORMAL] + 0.1)
 					end
 					if v.dwTargetID == COMBAT_TEXT_PLAYERID then
 						fScale = fScale * 0.95
@@ -627,7 +598,7 @@ function CombatText.OnFrameRender()
 	for k, v in pairs(COMBAT_TEXT_QUEUE) do
 		for kk, vv in pairs(v) do
 			if #vv > 0 then
-				local dat = remove(vv, 1)
+				local dat = table.remove(vv, 1)
 				if dat.dat.szPoint == 'TOP' then
 					local nSort, szPoint = CombatText.GetTrajectory(dat.dat.dwTargetID)
 					dat.dat.nSort   = nSort
@@ -647,9 +618,9 @@ D.OnFrameRender  = CombatText.OnFrameRender
 
 function CombatText.TrajectoryCount()
 	if O.fScale < 1.5 then
-		return floor(3.5 / COMBAT_TEXT_UI_SCALE / O.fScale)
+		return math.floor(3.5 / COMBAT_TEXT_UI_SCALE / O.fScale)
 	else
-		return floor(3.5 / COMBAT_TEXT_UI_SCALE)
+		return math.floor(3.5 / COMBAT_TEXT_UI_SCALE)
 	end
 end
 
@@ -674,7 +645,7 @@ function CombatText.GetTrajectory(dwTargetID, bCriticalStrike)
 			and v.szPoint == 'TOP'
 			and v.nFrame < 15
 		then
-			local fSort = (COMBAT_TEXT_POINT.TOP[floor(v.nFrame) + 1] + v.nSort * fRange * COMBAT_TEXT_POINT.TOP[COMBAT_TEXT_TOTAL]) / COMBAT_TEXT_POINT.TOP[COMBAT_TEXT_TOTAL]
+			local fSort = (COMBAT_TEXT_POINT.TOP[math.floor(v.nFrame) + 1] + v.nSort * fRange * COMBAT_TEXT_POINT.TOP[COMBAT_TEXT_TOTAL]) / COMBAT_TEXT_POINT.TOP[COMBAT_TEXT_TOTAL]
 			for i = 1, COMBAT_TEXT_TRAJECTORY do
 				if fSort < tSort[i].fRange then
 					tSort[i].nCount = tSort[i].nCount + 1
@@ -683,7 +654,7 @@ function CombatText.GetTrajectory(dwTargetID, bCriticalStrike)
 			end
 		end
 	end
-	sort(tSort, TrajectorySort)
+	table.sort(tSort, TrajectorySort)
 	local nSort = tSort[1].nSort - 1
 	local szPoint = 'TOP'
 	if tSort[1].nCount == 1 then
@@ -724,7 +695,7 @@ function CombatText.CreateText(shadow, dwTargetID, szText, szPoint, nType, bCrit
 		COMBAT_TEXT_SHADOW[shadow] = dat
 	else
 		COMBAT_TEXT_QUEUE[szPoint][dwTargetID] = COMBAT_TEXT_QUEUE[szPoint][dwTargetID] or {}
-		insert(COMBAT_TEXT_QUEUE[szPoint][dwTargetID], { shadow = shadow, dat = dat })
+		table.insert(COMBAT_TEXT_QUEUE[szPoint][dwTargetID], { shadow = shadow, dat = dat })
 	end
 end
 
@@ -842,7 +813,7 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 			szCasterName = ''
 		end
 		if O.bSnShorten2 then
-			szName = wsub(szName, 1, 2) -- wstring是兼容台服的 台服utf-8
+			szName = wstring.sub(szName, 1, 2) -- wstring是兼容台服的 台服utf-8
 		end
 		szText = szReplaceText
 		szText = szText:gsub('(%s?)$crit(%s?)', (bCriticalStrike and '%1'.. g_tStrings.STR_CS_NAME .. '%2' or ''))
@@ -953,7 +924,7 @@ function CombatText.GetFreeShadow()
 		local sha = handle:AppendItemFromIni(COMBAT_TEXT_INIFILE, 'Shadow_Content')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
-		insert(COMBAT_TEXT_FREE, sha)
+		table.insert(COMBAT_TEXT_FREE, sha)
 		return sha
 	end
 	Log('[MY] CombatText Get Free Item Failed!!!')
@@ -971,9 +942,9 @@ function CombatText.LoadConfig()
 			COMBAT_TEXT_EVENT       = data.COMBAT_TEXT_EVENT       or COMBAT_TEXT_EVENT
 			COMBAT_TEXT_IGNORE_TYPE = data.COMBAT_TEXT_IGNORE_TYPE or {}
 			COMBAT_TEXT_IGNORE      = data.COMBAT_TEXT_IGNORE      or {}
-			LIB.Sysmsg(_L['CombatText Config loaded'])
+			X.Sysmsg(_L['CombatText Config loaded'])
 		else
-			LIB.Sysmsg(_L['CombatText Config failed'])
+			X.Sysmsg(_L['CombatText Config failed'])
 		end
 	end
 end
@@ -982,9 +953,9 @@ function CombatText.CheckEnable()
 	local ui = Station.Lookup('Lowest/MY_CombatText')
 	if IsEnabled() then
 		if O.bRender then
-			COMBAT_TEXT_INIFILE = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
+			COMBAT_TEXT_INIFILE = X.PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
 		else
-			COMBAT_TEXT_INIFILE = PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText.ini'
+			COMBAT_TEXT_INIFILE = X.PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText.ini'
 		end
 		COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[O.nStyle] and COMBAT_TEXT_STYLES[O.nStyle] or COMBAT_TEXT_STYLES[0]
 		CombatText.LoadConfig()
@@ -997,7 +968,7 @@ function CombatText.CheckEnable()
 		if ui then
 			CombatText.FreeQueue()
 			Wnd.CloseWindow(ui)
-			LIB.BreatheCall('COMBAT_TEXT_CACHE', false)
+			X.BreatheCall('COMBAT_TEXT_CACHE', false)
 			collectgarbage('collect')
 		end
 		D.ShowOfficialCombat()
@@ -1029,7 +1000,7 @@ local settings = {
 		},
 	},
 }
-MY_CombatText = LIB.CreateModule(settings)
+MY_CombatText = X.CreateModule(settings)
 end
 
 
@@ -1348,9 +1319,9 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, text = _L['Critical Color'], checked = O.bCritical and true or false,
 		oncheck = function(bCheck)
 			O.bCritical = bCheck
-			LIB.ShowPanel()
-			LIB.FocusPanel()
-			LIB.SwitchTab('MY_CombatText', true)
+			X.ShowPanel()
+			X.FocusPanel()
+			X.SwitchTab('MY_CombatText', true)
 		end,
 		autoenable = IsEnabled,
 	})
@@ -1360,9 +1331,9 @@ function PS.OnPanelActive(frame)
 	local i = 0
 	for k, v in pairs(O.col) do
 		if k ~= SKILL_RESULT_TYPE.EFFECTIVE_THERAPY then
-			ui:Append('Text', { x = x + (i % 8) * 65, y = y + 30 * floor(i / 8), text = _L['CombatText Color ' .. k], autoenable = IsEnabled })
+			ui:Append('Text', { x = x + (i % 8) * 65, y = y + 30 * math.floor(i / 8), text = _L['CombatText Color ' .. k], autoenable = IsEnabled })
 			ui:Append('Shadow', {
-				x = x + (i % 8) * 65 + 35, y = y + 30 * floor(i / 8) + 8, color = v, w = 15, h = 15,
+				x = x + (i % 8) * 65 + 35, y = y + 30 * math.floor(i / 8) + 8, color = v, w = 15, h = 15,
 				onclick = function()
 					local this = this
 					UI.OpenColorPicker(function(r, g, b)
@@ -1386,33 +1357,33 @@ function PS.OnPanelActive(frame)
 		})
 	end
 end
-LIB.RegisterPanel(_L['System'], 'MY_CombatText', _L['CombatText'], 2041, PS)
+X.RegisterPanel(_L['System'], 'MY_CombatText', _L['CombatText'], 2041, PS)
 
 local function GetPlayerID()
 	local me = GetControlPlayer()
 	if me then
 		COMBAT_TEXT_PLAYERID = me.dwID
 		--[[#DEBUG BEGIN]]
-		-- LIB.Debug('CombatText get player id ' .. me.dwID, DEBUG_LEVEL.LOG)
+		-- X.Debug('CombatText get player id ' .. me.dwID, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	else
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('CombatText get player id failed!!! try again', DEBUG_LEVEL.ERROR)
+		X.Debug('CombatText get player id failed!!! try again', X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
-		LIB.DelayCall(1000, GetPlayerID)
+		X.DelayCall(1000, GetPlayerID)
 	end
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CombatText', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CombatText', function()
 	D.bReady = true
 	CombatText.CheckEnable()
 end)
-LIB.RegisterEvent('LOADING_END', 'MY_CombatText', GetPlayerID) -- 很重要的优化
-LIB.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
-LIB.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
-LIB.RegisterEvent('ON_PVP_SHOW_SELECT_PLAYER', 'MY_CombatText', function()
+X.RegisterEvent('LOADING_END', 'MY_CombatText', GetPlayerID) -- 很重要的优化
+X.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
+X.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
+X.RegisterEvent('ON_PVP_SHOW_SELECT_PLAYER', 'MY_CombatText', function()
 	COMBAT_TEXT_PLAYERID = arg0
 end)
-LIB.RegisterEvent('MY_COMBATTEXT_MSG', 'MY_CombatText', function()
+X.RegisterEvent('MY_COMBATTEXT_MSG', 'MY_CombatText', function()
 	CombatText.OnCenterMsg(arg0, arg1, arg2)
 end)
-LIB.RegisterEvent('FIRST_LOADING_END', 'MY_CombatText', CombatText.CheckEnable)
+X.RegisterEvent('FIRST_LOADING_END', 'MY_CombatText', CombatText.CheckEnable)

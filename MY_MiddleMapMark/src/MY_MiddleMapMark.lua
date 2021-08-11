@@ -10,56 +10,27 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_MiddleMapMark'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_MiddleMapMark'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_MiddleMapMark.MapRestriction', { ['*'] = true })
+X.RegisterRestriction('MY_MiddleMapMark.MapRestriction', { ['*'] = true })
 --------------------------------------------------------------------------
-LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
+X.CreateDataRoot(X.PATH_TYPE.GLOBAL)
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
-local DB = LIB.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v4.db', PATH_TYPE.GLOBAL})
+local DB = X.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v4.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return LIB.Sysmsg(_L['MY_MiddleMapMark'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return X.Sysmsg(_L['MY_MiddleMapMark'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS NpcInfo (
@@ -118,30 +89,30 @@ local DOODAD_MAX_DISTINCT_DISTANCE = 2 * 64
 -- 31 - 16 位 x
 -- 15 -  0 位 y
 local function GeneNpcInfoPosKey(mapid, x, y)
-	return mapid * L32 + floor(x / NPC_MAX_DISTINCT_DISTANCE) * L16 + floor(y / NPC_MAX_DISTINCT_DISTANCE)
+	return mapid * L32 + math.floor(x / NPC_MAX_DISTINCT_DISTANCE) * L16 + math.floor(y / NPC_MAX_DISTINCT_DISTANCE)
 end
 local function GeneDoodadInfoPosKey(mapid, x, y)
-	return mapid * L32 + floor(x / DOODAD_MAX_DISTINCT_DISTANCE) * L16 + floor(y / DOODAD_MAX_DISTINCT_DISTANCE)
+	return mapid * L32 + math.floor(x / DOODAD_MAX_DISTINCT_DISTANCE) * L16 + math.floor(y / DOODAD_MAX_DISTINCT_DISTANCE)
 end
 
 function D.Migration()
 	local DB_V1_ROOT = 'cache/NPC_DOODAD_REC/'
-	local DB_V1_PATH = LIB.FormatPath({DB_V1_ROOT, PATH_TYPE.DATA})
-	local DB_V2_PATH = LIB.FormatPath({'cache/npc_doodad_rec.v2.db', PATH_TYPE.GLOBAL})
-	local DB_V3_PATH = LIB.FormatPath({'cache/npc_doodad_rec.v3.db', PATH_TYPE.GLOBAL})
+	local DB_V1_PATH = X.FormatPath({DB_V1_ROOT, X.PATH_TYPE.DATA})
+	local DB_V2_PATH = X.FormatPath({'cache/npc_doodad_rec.v2.db', X.PATH_TYPE.GLOBAL})
+	local DB_V3_PATH = X.FormatPath({'cache/npc_doodad_rec.v3.db', X.PATH_TYPE.GLOBAL})
 	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
 		return
 	end
-	LIB.Confirm(
+	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
 			-- 转移V1旧版数据
 			if IsLocalFileExist(DB_V1_PATH) then
 				DB:Execute('BEGIN TRANSACTION')
 				for _, dwMapID in ipairs(GetMapList()) do
-					local data = LIB.LoadLUAData({DB_V1_ROOT .. dwMapID .. '.{$lang}.jx3dat', PATH_TYPE.DATA})
+					local data = X.LoadLUAData({DB_V1_ROOT .. dwMapID .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 					if type(data) == 'string' then
-						data = LIB.JsonDecode(data)
+						data = X.JsonDecode(data)
 					end
 					if data then
 						for _, p in ipairs(data.Npc) do
@@ -157,12 +128,12 @@ function D.Migration()
 						end
 						DBD_W:Reset()
 						--[[#DEBUG BEGIN]]
-						LIB.Debug('MY_MiddleMapMark', 'MiddleMapMark cache trans from file to sqlite finished!', DEBUG_LEVEL.LOG)
+						X.Debug('MY_MiddleMapMark', 'MiddleMapMark cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 					end
 				end
 				DB:Execute('END TRANSACTION')
-				CPath.DelDir(LIB.FormatPath({DB_V1_ROOT, PATH_TYPE.DATA}))
+				CPath.DelDir(X.FormatPath({DB_V1_ROOT, X.PATH_TYPE.DATA}))
 			end
 			-- 转移V2旧版数据
 			if IsLocalFileExist(DB_V2_PATH) then
@@ -212,7 +183,7 @@ function D.Migration()
 					DB:Execute('END TRANSACTION')
 					DB_V2:Release()
 				end
-				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			-- 转移V3旧版数据
 			if IsLocalFileExist(DB_V3_PATH) then
@@ -262,9 +233,9 @@ function D.Migration()
 					DB:Execute('END TRANSACTION')
 					DB_V3:Release()
 				end
-				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
-			LIB.Alert(_L['Migrate succeed!'])
+			X.Alert(_L['Migrate succeed!'])
 		end)
 end
 ---------------------------------------------------------------
@@ -275,7 +246,7 @@ local l_doodad = {}
 local l_tempMap = false
 local MAX_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
 local function FlushDB()
-	if IsEmpty(l_npc) and IsEmpty(l_doodad) then
+	if X.IsEmpty(l_npc) and X.IsEmpty(l_doodad) then
 		return
 	end
 	DB:Execute('BEGIN TRANSACTION')
@@ -303,7 +274,7 @@ local function FlushDB()
 	DB:Execute('END TRANSACTION')
 end
 local function onLoadingEnding()
-	l_tempMap = LIB.IsInZombieMap() or LIB.IsInPubg() or LIB.IsInArena() or LIB.IsInBattleField() or false
+	l_tempMap = X.IsInZombieMap() or X.IsInPubg() or X.IsInArena() or X.IsInBattleField() or false
 	if l_tempMap then
 		local dwMapID = GetClientPlayer().GetMapID()
 		DBN_DM:ClearBindings()
@@ -317,17 +288,17 @@ local function onLoadingEnding()
 	end
 	FlushDB()
 end
-LIB.RegisterEvent('LOADING_ENDING', 'MY_MiddleMapMark', onLoadingEnding)
+X.RegisterEvent('LOADING_ENDING', 'MY_MiddleMapMark', onLoadingEnding)
 
 local function Flush()
 	FlushDB()
 end
-LIB.RegisterFlush('MY_MiddleMapMark_Save', Flush)
+X.RegisterFlush('MY_MiddleMapMark_Save', Flush)
 
 local function OnExit()
 	DB:Release()
 end
-LIB.RegisterExit('MY_MiddleMapMark_Save', OnExit)
+X.RegisterExit('MY_MiddleMapMark_Save', OnExit)
 
 local function Rerender()
 	D.Search(true)
@@ -336,15 +307,15 @@ end
 local function AutomaticRerender()
 	if GetTime() - l_renderTime > MAX_RENDER_INTERVAL then
 		Rerender()
-	elseif not LIB.DelayCall('MY_MiddleMapMark_Refresh') then
-		LIB.DelayCall('MY_MiddleMapMark_Refresh', MAX_RENDER_INTERVAL, Rerender)
+	elseif not X.DelayCall('MY_MiddleMapMark_Refresh') then
+		X.DelayCall('MY_MiddleMapMark_Refresh', MAX_RENDER_INTERVAL, Rerender)
 	end
 end
 
-local NpcTpl = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/npc/{$lang}.jx3dat')
-local DoodadTpl = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/doodad/{$lang}.jx3dat')
+local NpcTpl = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/npc/{$lang}.jx3dat')
+local DoodadTpl = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_MiddleMapMark/data/doodad/{$lang}.jx3dat')
 local function OnNpcEnterScene()
-	if l_tempMap and LIB.IsRestricted('MY_MiddleMapMark.MapRestriction') then
+	if l_tempMap and X.IsRestricted('MY_MiddleMapMark.MapRestriction') then
 		return
 	end
 	local npc = GetNpc(arg0)
@@ -361,8 +332,8 @@ local function OnNpcEnterScene()
 		return
 	end
 	-- avoid full number named npc
-	local szName = LIB.GetObjectName(npc, 'never')
-	if not szName or LIB.TrimString(szName) == '' then
+	local szName = X.GetObjectName(npc, 'never')
+	if not szName or X.TrimString(szName) == '' then
 		return
 	end
 	-- switch map
@@ -385,7 +356,7 @@ local function OnNpcEnterScene()
 	-- redraw ui
 	AutomaticRerender()
 end
-LIB.RegisterEvent('NPC_ENTER_SCENE', 'MY_MIDDLEMAPMARK', OnNpcEnterScene)
+X.RegisterEvent('NPC_ENTER_SCENE', 'MY_MIDDLEMAPMARK', OnNpcEnterScene)
 
 local REC_DOODAD_TYPES = {
 	[DOODAD_KIND.INVALID     ] = false,
@@ -406,7 +377,7 @@ local REC_DOODAD_TYPES = {
 	[DOODAD_KIND.SPRINT      ] = false, -- 轻功落脚点
 }
 local function OnDoodadEnterScene()
-	if l_tempMap and LIB.IsRestricted('MY_MiddleMapMark.MapRestriction') then
+	if l_tempMap and X.IsRestricted('MY_MiddleMapMark.MapRestriction') then
 		return
 	end
 	local doodad = GetDoodad(arg0)
@@ -422,8 +393,8 @@ local function OnDoodadEnterScene()
 		return
 	end
 	-- avoid full number named doodad
-	local szName = LIB.GetObjectName(doodad, 'never')
-	if not szName or LIB.TrimString(szName) == '' then
+	local szName = X.GetObjectName(doodad, 'never')
+	if not szName or X.TrimString(szName) == '' then
 		return
 	end
 	-- switch map
@@ -444,7 +415,7 @@ local function OnDoodadEnterScene()
 	-- redraw ui
 	AutomaticRerender()
 end
-LIB.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_MIDDLEMAPMARK', OnDoodadEnterScene)
+X.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_MIDDLEMAPMARK', OnDoodadEnterScene)
 
 function D.SearchNpc(szText, dwMapID)
 	local aInfos
@@ -464,13 +435,13 @@ function D.SearchNpc(szText, dwMapID)
 		local p = aInfos[i]
 		if (not dwMapID or p.mapid == dwMapID)
 		and l_npc[p.templateid .. ',' .. p.poskey] then
-			remove(aInfos, i)
+			table.remove(aInfos, i)
 		end
 	end
 	for _, info in pairs(l_npc) do
 		if (not dwMapID or info.mapid == dwMapID)
-		and (wfind(info.name, szText) or wfind(info.title, szText)) then
-			insert(aInfos, 1, info)
+		and (wstring.find(info.name, szText) or wstring.find(info.title, szText)) then
+			table.insert(aInfos, 1, info)
 		end
 	end
 	return aInfos
@@ -494,13 +465,13 @@ function D.SearchDoodad(szText, dwMapID)
 		local p = aInfos[i]
 		if (not dwMapID or p.mapid == dwMapID)
 		and l_doodad[p.templateid .. ',' .. p.poskey] then
-			remove(aInfos, i)
+			table.remove(aInfos, i)
 		end
 	end
 	for _, info in pairs(l_doodad) do
 		if (not dwMapID or info.mapid == dwMapID)
-		and (wfind(info.name, szText)) then
-			insert(aInfos, 1, info)
+		and (wstring.find(info.name, szText)) then
+			table.insert(aInfos, 1, info)
 		end
 	end
 	return aInfos
@@ -521,7 +492,7 @@ end
 -- HOOK OnEditChanged
 function D.OnEditChanged()
 	if this:GetName() == 'Edit_Search' then
-		LIB.DelayCall('MY_MiddleMapMark__EditChanged', 500, D.Search)
+		X.DelayCall('MY_MiddleMapMark__EditChanged', 500, D.Search)
 	end
 end
 
@@ -553,7 +524,7 @@ function D.Hook()
 	HookTableFunc(MiddleMap, 'OnMouseEnter', D.OnMouseEnter, { bAfterOrigin = true })
 	HookTableFunc(MiddleMap, 'OnMouseLeave', D.OnMouseLeave, { bAfterOrigin = true })
 end
-LIB.RegisterInit('MY_MiddleMapMark', D.Hook)
+X.RegisterInit('MY_MiddleMapMark', D.Hook)
 
 function D.Unhook()
 	local h = Station.Lookup('Topmost1/MiddleMap', 'Handle_Inner/Handle_MY_MMM')
@@ -566,7 +537,7 @@ function D.Unhook()
 	UnhookTableFunc(MiddleMap, 'OnMouseEnter', D.OnMouseEnter)
 	UnhookTableFunc(MiddleMap, 'OnMouseLeave', D.OnMouseLeave)
 end
-LIB.RegisterReload('MY_MiddleMapMark', D.Unhook)
+X.RegisterReload('MY_MiddleMapMark', D.Unhook)
 
 function D.GetEditSearch()
 	return Station.Lookup('Topmost1/MiddleMap/Wnd_NormalMap/Wnd_Tool/Edit_Search')
@@ -583,9 +554,9 @@ local function OnMMMItemMouseEnter()
 		.. (this.level and this.level > 0 and (' lv.' .. this.level) or '')
 		.. (this.title and this.title ~= '' and ('\n<' .. (this.decoded and this.title or UTF8ToAnsi(this.title)) .. '>') or '')
 	if this.type == 'Doodad' then
-		local dwRecipeID = me and LIB.GetDoodadBookRecipeID(this.templateid)
+		local dwRecipeID = me and X.GetDoodadBookRecipeID(this.templateid)
 		if dwRecipeID then
-			local dwBookID, dwSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
+			local dwBookID, dwSegmentID = X.RecipeToSegmentID(dwRecipeID)
 			if dwBookID and dwSegmentID then
 				if me.IsBookMemorized(dwBookID, dwSegmentID) then
 					szTip = szTip .. '\n' .. _L['[Read]']
@@ -638,8 +609,8 @@ function D.Search(bForce)
 	local aKeywords = {}
 	do
 		local i = 1
-		for _, szSearch in ipairs(LIB.SplitString(szKeyword, ',')) do
-			szSearch = LIB.TrimString(szSearch)
+		for _, szSearch in ipairs(X.SplitString(szKeyword, ',')) do
+			szSearch = X.TrimString(szSearch)
 			if szSearch ~= '' then
 				aKeywords[i] = szSearch
 				i = i + 1
@@ -725,7 +696,7 @@ function PS.OnPanelActive(wnd)
 
 	local list, muProgress
 	local function UpdateList(szText)
-		if IsEmpty(szText) then
+		if X.IsEmpty(szText) then
 			list:ListBox('clear')
 			for i, s in ipairs(_L['MY_MiddleMapMark TIPS']) do
 				list:ListBox('insert', { id = 'TIP' .. i, text = s, r = 255, g = 255, b = 0 })
@@ -802,7 +773,7 @@ function PS.OnPanelActive(wnd)
 			{
 				'onhover',
 				function(id, text, data)
-					if IsString(id) and id:sub(1, 3) == 'TIP' then
+					if X.IsString(id) and id:sub(1, 3) == 'TIP' then
 						return false
 					end
 				end,
@@ -810,11 +781,11 @@ function PS.OnPanelActive(wnd)
 			{
 				'onlclick',
 				function(id, text, data, selected)
-					if IsString(id) and id:sub(1, 3) == 'TIP' then
+					if X.IsString(id) and id:sub(1, 3) == 'TIP' then
 						return false
 					end
 					OpenMiddleMap(data.dwMapID, 0)
-					UI(D.GetEditSearch()):Text(LIB.EscapeString(data.szName))
+					UI(D.GetEditSearch()):Text(X.EscapeString(data.szName))
 					Station.SetFocusWindow('Topmost1/MiddleMap')
 					if not selected then -- avoid unselect
 						return false
@@ -837,4 +808,4 @@ function PS.OnPanelResize(wnd)
 	ui:Children('#WndEdit_Search'):Size(w - 26, 25)
 end
 
-LIB.RegisterPanel(_L['General'], 'MY_MiddleMapMark', _L['middle map mark'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)
+X.RegisterPanel(_L['General'], 'MY_MiddleMapMark', _L['middle map mark'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)

@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_LifeBar'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -70,7 +41,7 @@ local D = {
 
 local PS = { nPriority = 1, szRestriction = 'MY_LifeBar' }
 local function LoadUI(ui)
-	ui:Children('#WndTrackbar_GlobalUIScale'):Value(Config.fGlobalUIScale * 100 * LIB.GetUIScale())
+	ui:Children('#WndTrackbar_GlobalUIScale'):Value(Config.fGlobalUIScale * 100 * X.GetUIScale())
 	ui:Children('#WndTrackbar_LifeBarWidth'):Value(Config.nLifeWidth)
 	ui:Children('#WndTrackbar_LifeBarHeight'):Value(Config.nLifeHeight)
 	ui:Children('#WndTrackbar_LifeBarOffsetX'):Value(Config.nLifeOffsetX)
@@ -87,7 +58,7 @@ local function LoadUI(ui)
 	ui:Children('#WndTrackbar_BalloonOffsetY'):Value(Config.nBalloonOffsetY)
 	ui:Children('#WndTrackbar_LifePerOffsetX'):Value(Config.nLifePerOffsetX)
 	ui:Children('#WndTrackbar_LifePerOffsetY'):Value(Config.nLifePerOffsetY)
-	ui:Children('#WndTrackbar_Distance'):Value(sqrt(Config.nDistance) / 64)
+	ui:Children('#WndTrackbar_Distance'):Value(math.sqrt(Config.nDistance) / 64)
 	ui:Children('#WndTrackbar_VerticalDistance'):Value(Config.nVerticalDistance / 8 / 64)
 	ui:Children('#WndTrackbar_Alpha'):Value(Config.nAlpha)
 	ui:Children('#WndCheckBox_IgnoreUIScale'):Check(not Config.bSystemUIScale)
@@ -133,7 +104,7 @@ function PS.OnPanelActive(wnd)
 		onclick = function()
 			GetUserInput(_L['Please input ancient config name:'], function(szText)
 				Config('load', szText)
-				LIB.SwitchTab('MY_LifeBar', true)
+				X.SwitchTab('MY_LifeBar', true)
 			end, nil, nil, nil, 'common')
 		end,
 		autoenable = function() return D.IsEnabled() end,
@@ -376,7 +347,7 @@ function PS.OnPanelActive(wnd)
 		name = 'WndTrackbar_Distance',
 		x = nX, y = nY, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
 		text = function(value) return value == 0 and _L['Max Distance: Unlimited.'] or _L('Max Distance: %s foot.', value) end,
-		value = sqrt(Config.nDistance) / 64,
+		value = math.sqrt(Config.nDistance) / 64,
 		onchange = function(value)
 			Config.nDistance = value * value * 64 * 64
 		end,
@@ -412,9 +383,9 @@ function PS.OnPanelActive(wnd)
 		name = 'WndTrackbar_GlobalUIScale',
 		x = nX, y = nY, trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 1, 200 },
 		text = function(value) return _L('Global UI scale: %.2f.', value / 100) end, -- 字缩放
-		value = Config.fGlobalUIScale * 100 * LIB.GetUIScale(),
+		value = Config.fGlobalUIScale * 100 * X.GetUIScale(),
 		onchange = function(value)
-			Config.fGlobalUIScale = value / 100 / LIB.GetUIScale()
+			Config.fGlobalUIScale = value / 100 / X.GetUIScale()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -432,7 +403,7 @@ function PS.OnPanelActive(wnd)
 			local t = {}
 			local tColor = Config.Color
 			-- 玩家颜色设置
-			insert(t, { szOption = _L['Player color config'], bDisable = true } )
+			table.insert(t, { szOption = _L['Player color config'], bDisable = true } )
 			for relation, cfg in pairs(tColor) do
 				if cfg.Player then
 					local opt = {}
@@ -449,7 +420,7 @@ function PS.OnPanelActive(wnd)
 							Config.Color = tColor
 						end)
 					end
-					insert(opt, {
+					table.insert(opt, {
 						szOption = _L['Unified force color'],
 						bCheck = true, bMCheck = true,
 						bChecked = not cfg.DifferentiateForce,
@@ -464,7 +435,7 @@ function PS.OnPanelActive(wnd)
 							Config.Color = tColor
 						end,
 					})
-					insert(opt, {
+					table.insert(opt, {
 						szOption = _L['Differentiate force color'],
 						bCheck = true, bMCheck = true,
 						bChecked = cfg.DifferentiateForce,
@@ -473,9 +444,9 @@ function PS.OnPanelActive(wnd)
 							Config.Color = tColor
 						end,
 					})
-					insert(opt, { bDevide = true })
+					table.insert(opt, { bDevide = true })
 					for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
-						insert(opt, {
+						table.insert(opt, {
 							szOption = szForceTitle,
 							rgb = cfg[dwForceID],
 							fnChangeColor = function(_, r, g, b)
@@ -487,12 +458,12 @@ function PS.OnPanelActive(wnd)
 							end,
 						})
 					end
-					insert(t, opt)
+					table.insert(t, opt)
 				end
 			end
-			insert(t, { bDevide = true } )
+			table.insert(t, { bDevide = true } )
 			-- NCP颜色设置
-			insert(t, { szOption = _L['Npc color config'], bDisable = true } )
+			table.insert(t, { szOption = _L['Npc color config'], bDisable = true } )
 			for relation, cfg in pairs(tColor) do
 				if cfg.Npc then
 					local opt = {}
@@ -509,7 +480,7 @@ function PS.OnPanelActive(wnd)
 							Config.Color = tColor
 						end)
 					end
-					insert(t, opt)
+					table.insert(t, opt)
 				end
 			end
 			return t
@@ -522,10 +493,10 @@ function PS.OnPanelActive(wnd)
 		local t = {}
 		local tRelationCfg = Config[szKey]
 		if szPlayerTip then
-			insert(t, { szOption = szPlayerTip, bDisable = true } )
+			table.insert(t, { szOption = szPlayerTip, bDisable = true } )
 			for relation, cfg in pairs(tRelationCfg) do
 				if cfg.Player then
-					insert(t, {
+					table.insert(t, {
 						szOption = _L[relation],
 						rgb = Config.Color[relation].Player,
 						bCheck = true,
@@ -558,13 +529,13 @@ function PS.OnPanelActive(wnd)
 			end
 		end
 		if szPlayerTip and szNpcTip then
-			insert(t, { bDevide = true })
+			table.insert(t, { bDevide = true })
 		end
 		if szNpcTip then
-			insert(t, { szOption = szNpcTip, bDisable = true } )
+			table.insert(t, { szOption = szNpcTip, bDisable = true } )
 			for relation, cfg in pairs(tRelationCfg) do
 				if cfg.Npc then
-					insert(t, {
+					table.insert(t, {
 						szOption = _L[relation],
 						rgb = Config.Color[relation].Npc,
 						bCheck = true,
@@ -643,12 +614,12 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, text = _L['Lifebar display config'],
 		menu = function()
 			local t = GeneBooleanPopupMenu('ShowLife', _L['Player lifebar display'], _L['Npc lifebar display'])
-			insert(t, { bDevide = true })
+			table.insert(t, { bDevide = true })
 			local t1 = {
 				szOption = _L['Draw direction'],
 			}
 			for _, szDirection in ipairs({ 'LEFT_RIGHT', 'RIGHT_LEFT', 'TOP_BOTTOM', 'BOTTOM_TOP' }) do
-				insert(t1, {
+				table.insert(t1, {
 					szOption = _L.DIRECTION[szDirection],
 					bCheck = true, bMCheck = true,
 					bChecked = Config.szLifeDirection == szDirection,
@@ -657,7 +628,7 @@ function PS.OnPanelActive(wnd)
 					end,
 				})
 			end
-			insert(t, t1)
+			table.insert(t, t1)
 			return t
 		end,
 		autoenable = function() return D.IsEnabled() end,
@@ -669,8 +640,8 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, text = _L['Lifepercentage display config'],
 		menu = function()
 			local t = GeneBooleanPopupMenu('ShowLifePer', _L['Player lifepercentage display'], _L['Npc lifepercentage display'])
-			insert(t, { bDevide = true })
-			insert(t, {
+			table.insert(t, { bDevide = true })
+			table.insert(t, {
 				szOption = _L['Hide decimal'],
 				bCheck = true,
 				bChecked = Config.bHideLifePercentageDecimal,
@@ -690,10 +661,10 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local t = {}
 			local tShowBalloon = Config.ShowBalloon
-			insert(t, { szOption = _L['Player balloon display'], bDisable = true } )
+			table.insert(t, { szOption = _L['Player balloon display'], bDisable = true } )
 			for relation, cfg in pairs(tShowBalloon) do
 				if cfg.Player then
-					insert(t, {
+					table.insert(t, {
 						szOption = _L[relation],
 						rgb = Config.Color[relation].Player,
 						bCheck = true,
@@ -706,11 +677,11 @@ function PS.OnPanelActive(wnd)
 					})
 				end
 			end
-			insert(t, { bDevide = true })
-			insert(t, { szOption = _L['Npc balloon display'], bDisable = true } )
+			table.insert(t, { bDevide = true })
+			table.insert(t, { szOption = _L['Npc balloon display'], bDisable = true } )
 			for relation, cfg in pairs(tShowBalloon) do
 				if cfg.Npc then
-					insert(t, {
+					table.insert(t, {
 						szOption = _L[relation],
 						rgb = Config.Color[relation].Npc,
 						bCheck = true,
@@ -723,9 +694,9 @@ function PS.OnPanelActive(wnd)
 					})
 				end
 			end
-			insert(t, { bDevide = true })
+			table.insert(t, { bDevide = true })
 			local tBalloonChannel = Config.BalloonChannel
-			insert(t, { szOption = _L['Balloon channel config'], bDisable = true } )
+			table.insert(t, { szOption = _L['Balloon channel config'], bDisable = true } )
 			for szMsgType, cfg in pairs(tBalloonChannel) do
 				if g_tStrings.tChannelName[szMsgType] then
 					local t1 = {
@@ -733,7 +704,7 @@ function PS.OnPanelActive(wnd)
 						fnDisable = function() return not cfg.bEnable end,
 					}
 					for _, nDuring in ipairs({ 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 15000, 20000 }) do
-						insert(t1, {
+						table.insert(t1, {
 							szOption = nDuring .. 'ms',
 							bCheck = true, bMCheck = true,
 							bChecked = cfg.nDuring == nDuring,
@@ -745,7 +716,7 @@ function PS.OnPanelActive(wnd)
 							fnDisable = function() return not cfg.bEnable end,
 						})
 					end
-					insert(t, {
+					table.insert(t, {
 						szOption = g_tStrings.tChannelName[szMsgType],
 						rgb = GetMsgFontColor(szMsgType, true),
 						bCheck = true, bChecked = cfg.bEnable,
@@ -869,7 +840,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() and Config.bShowObjectID end,
 	}):AutoWidth():Width()
 
-	if not LIB.IsRestricted('MY_LifeBar.SpecialNpc') then
+	if not X.IsRestricted('MY_LifeBar.SpecialNpc') then
 		nX = nPaddingX
 		nY = nY + nLH - 10
 		nX = nX + ui:Append('WndCheckBox', {
@@ -929,7 +900,7 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local m = { szOption = _L['Decimal number'] }
 			for i = 0, 2 do
-				insert(m, {
+				table.insert(m, {
 					szOption = i,
 					bCheck = true, bMCheck = true,
 					bChecked = Config.nDistanceDecimal == i,
@@ -1014,12 +985,12 @@ function PS.OnPanelActive(wnd)
 	local function onReset()
 		LoadUI(ui)
 	end
-	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', 'MY_LifeBarPS', onReset)
-	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE', 'MY_LifeBarPS', onReset)
+	X.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', 'MY_LifeBarPS', onReset)
+	X.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE', 'MY_LifeBarPS', onReset)
 end
 
 function PS.OnPanelDeactive()
-	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', 'MY_LifeBarPS')
-	LIB.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE', 'MY_LifeBarPS')
+	X.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', 'MY_LifeBarPS')
+	X.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE', 'MY_LifeBarPS')
 end
-LIB.RegisterPanel(_L['General'], 'MY_LifeBar', _L['MY_LifeBar'], 2148, PS)
+X.RegisterPanel(_L['General'], 'MY_LifeBar', _L['MY_LifeBar'], 2148, PS)

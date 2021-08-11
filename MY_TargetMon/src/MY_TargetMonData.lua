@@ -10,51 +10,22 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
 local PLUGIN_NAME = 'MY_TargetMon'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetMon'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_TargetMon.MapRestriction', { ['*'] = true })
+X.RegisterRestriction('MY_TargetMon.MapRestriction', { ['*'] = true })
 --------------------------------------------------------------------------
 local C, D = {}, {
 	GetTargetTypeList = MY_TargetMonConfig.GetTargetTypeList,
@@ -81,7 +52,7 @@ local function FilterMonitors(monitors, dwMapID, dwKungfuID)
 		if mon.enable
 		and (not next(mon.maps) or mon.maps.all or mon.maps[dwMapID])
 		and (not next(mon.kungfus) or mon.kungfus.all or mon.kungfus[dwKungfuID]) then
-			insert(ret, mon)
+			table.insert(ret, mon)
 		end
 	end
 	return ret
@@ -109,16 +80,16 @@ end
 local function onFilterChange()
 	CACHE_CONFIG = nil
 end
-LIB.RegisterEvent('LOADING_END', 'MY_TargetMonData', onFilterChange)
-LIB.RegisterEvent('SKILL_MOUNT_KUNG_FU', 'MY_TargetMonData', onFilterChange)
-LIB.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', 'MY_TargetMonData', onFilterChange)
-LIB.RegisterEvent('MY_TARGET_MON_MONITOR_CHANGE', 'MY_TargetMonData', onFilterChange)
+X.RegisterEvent('LOADING_END', 'MY_TargetMonData', onFilterChange)
+X.RegisterEvent('SKILL_MOUNT_KUNG_FU', 'MY_TargetMonData', onFilterChange)
+X.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', 'MY_TargetMonData', onFilterChange)
+X.RegisterEvent('MY_TARGET_MON_MONITOR_CHANGE', 'MY_TargetMonData', onFilterChange)
 
 local function onTargetMonReload()
 	onFilterChange()
 	D.OnTargetMonReload()
 end
-LIB.RegisterEvent('MY_TARGET_MON_CONFIG_INIT', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG_INIT', 'MY_TargetMonData', onTargetMonReload)
 end
 
 do
@@ -140,11 +111,11 @@ function D.GetTarget(eTarType, eMonType)
 	elseif eTarType == 'CLIENT_PLAYER' then
 		return TARGET.PLAYER, UI_GetClientPlayerID()
 	elseif eTarType == 'TARGET' then
-		return LIB.GetTarget()
+		return X.GetTarget()
 	elseif eTarType == 'TTARGET' then
-		local KTarget = LIB.GetObject(LIB.GetTarget())
+		local KTarget = X.GetObject(X.GetTarget())
 		if KTarget then
-			return LIB.GetTarget(KTarget)
+			return X.GetTarget(KTarget)
 		end
 	elseif TEAM_MARK[eTarType] then
 		local mark = GetClientTeam().GetTeamMark()
@@ -181,7 +152,7 @@ do
 local SHIELDED
 function D.IsShielded()
 	if SHIELDED == nil then
-		SHIELDED = LIB.IsRestricted('MY_TargetMon.MapRestriction') and LIB.IsInArena()
+		SHIELDED = X.IsRestricted('MY_TargetMon.MapRestriction') and X.IsInArena()
 	end
 	return SHIELDED
 end
@@ -189,13 +160,13 @@ end
 local function onShieldedReset()
 	SHIELDED = nil
 end
-LIB.RegisterEvent('MY_RESTRICTION', 'MY_TargetMonData_Shield', function()
+X.RegisterEvent('MY_RESTRICTION', 'MY_TargetMonData_Shield', function()
 	if arg0 and arg0 ~= 'MY_TargetMon.MapRestriction' then
 		return
 	end
 	onShieldedReset()
 end)
-LIB.RegisterEvent('LOADING_END', 'MY_TargetMonData_Shield', onShieldedReset)
+X.RegisterEvent('LOADING_END', 'MY_TargetMonData_Shield', onShieldedReset)
 end
 
 do
@@ -235,7 +206,7 @@ local function OnSysMsg(event)
 		OnSkill(arg5, arg6)
 	end
 end
-LIB.RegisterEvent('SYS_MSG', 'MY_TargetMon_SKILL', OnSysMsg)
+X.RegisterEvent('SYS_MSG', 'MY_TargetMon_SKILL', OnSysMsg)
 end
 
 -- 更新BUFF数据 更新监控条
@@ -263,7 +234,7 @@ local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist
 				else
 					szTimeLeft = '%d\'%d'
 				end
-				szTimeLeft = szTimeLeft:format(floor(nTimeLeft / 60), nTimeLeft % 60)
+				szTimeLeft = szTimeLeft:format(math.floor(nTimeLeft / 60), nTimeLeft % 60)
 			else
 				if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
 					szTimeLeft = '%.1f'
@@ -305,11 +276,11 @@ local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist
 	end
 	if info and info.bCool then
 		if tMonLast and not tMonLast[mon.uuid] and config.playSound then
-			local dwSoundID = RandomChild(mon.soundAppear)
+			local dwSoundID = X.RandomChild(mon.soundAppear)
 			if dwSoundID then
-				local szSoundPath = LIB.GetSoundPath(dwSoundID)
+				local szSoundPath = X.GetSoundPath(dwSoundID)
 				if szSoundPath then
-					LIB.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
+					X.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
 				end
 			end
 		end
@@ -317,7 +288,7 @@ local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist
 	end
 end
 local function Buff_CaptureMon(mon)
-	for _, buff in spairs(BUFF_INFO[mon.name]) do
+	for _, buff in X.spairs(BUFF_INFO[mon.name]) do
 		if not mon.iconid then
 			D.ModifyMonitor(mon, 'iconid', buff.nIcon)
 		end
@@ -441,7 +412,7 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 	Base_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist, tMonLast)
 end
 local function Skill_CaptureMon(mon)
-	for _, skill in spairs(SKILL_INFO[mon.name]) do
+	for _, skill in X.spairs(SKILL_INFO[mon.name]) do
 		if not mon.iconid then
 			D.ModifyMonitor(mon, 'iconid', skill.nIcon)
 		end
@@ -555,7 +526,7 @@ function UpdateView()
 	for _, config in ipairs(D.GetConfigList()) do
 		if config.enable then
 			local dwTarType, dwTarID = D.GetTarget(config.target, config.type)
-			local KObject = LIB.GetObject(dwTarType, dwTarID)
+			local KObject = X.GetObject(dwTarType, dwTarID)
 			local dwTarKungfuID = KObject
 				and (dwTarType == TARGET.PLAYER
 					and (KObject.GetKungfuMountID() or 0)
@@ -568,7 +539,7 @@ function UpdateView()
 				VIEW_LIST[nViewIndex] = view
 			end
 			fUIScale = (config.ignoreSystemUIScale and 1 or Station.GetUIScale()) * config.scale
-			fFontScaleBase = fUIScale * LIB.GetFontScale() * config.scale
+			fFontScaleBase = fUIScale * X.GetFontScale() * config.scale
 			view.szUuid               = config.uuid
 			view.szType               = config.type
 			view.szTarget             = config.target
@@ -646,11 +617,11 @@ function UpdateView()
 			if tMonLast then
 				for uuid, mon in pairs(tMonLast) do
 					if not tMonExist[uuid] and config.playSound then
-						local dwSoundID = RandomChild(mon.soundDisappear)
+						local dwSoundID = X.RandomChild(mon.soundDisappear)
 						if dwSoundID then
-							local szSoundPath = LIB.GetSoundPath(dwSoundID)
+							local szSoundPath = X.GetSoundPath(dwSoundID)
 							if szSoundPath then
-								LIB.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
+								X.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
 							end
 						end
 					end
@@ -671,7 +642,7 @@ local function OnBreathe()
 	-- 更新各目标BUFF数据
 	local nLogicFrame = GetLogicFrameCount()
 	for _, eType in ipairs(D.GetTargetTypeList('BUFF')) do
-		local KObject = LIB.GetObject(D.GetTarget(eType, 'BUFF'))
+		local KObject = X.GetObject(D.GetTarget(eType, 'BUFF'))
 		if KObject then
 			local tCache = BUFF_CACHE[KObject.dwID]
 			if not tCache then
@@ -679,7 +650,7 @@ local function OnBreathe()
 				BUFF_CACHE[KObject.dwID] = tCache
 			end
 			-- 当前身上的buff
-			local aBuff, nCount, buff, info = LIB.GetBuffList(KObject)
+			local aBuff, nCount, buff, info = X.GetBuffList(KObject)
 			for i = 1, nCount do -- 缓存时必须复制buff表 否则buff过期后表会被回收导致显示错误的BUFF
 				buff = aBuff[i]
 				-- 正向索引用于监控
@@ -691,8 +662,8 @@ local function OnBreathe()
 					info = {}
 					tCache[buff.dwID][buff.szKey] = info
 				end
-				LIB.CloneBuff(buff, info)
-				info.nLeft = max(buff.nEndFrame - nLogicFrame, 0)
+				X.CloneBuff(buff, info)
+				info.nLeft = math.max(buff.nEndFrame - nLogicFrame, 0)
 				info.bCool = true
 				info.nRenderFrame = nLogicFrame
 				-- 反向索引用于捕获
@@ -724,17 +695,17 @@ local function OnBreathe()
 		end
 	end
 	for _, eType in ipairs(D.GetTargetTypeList('SKILL')) do
-		local KObject = LIB.GetObject(D.GetTarget(eType, 'SKILL'))
+		local KObject = X.GetObject(D.GetTarget(eType, 'SKILL'))
 		if KObject then
 			local tSkill = {}
-			local aSkill = LIB.GetSkillMountList()
+			local aSkill = X.GetSkillMountList()
 			-- 遍历所有技能 生成反向索引
-			for _, dwID in spairs(aSkill, SKILL_EXTRA) do
+			for _, dwID in X.spairs(aSkill, SKILL_EXTRA) do
 				if not tSkill[dwID] then
 					local nLevel = KObject.GetSkillLevel(dwID)
-					local KSkill, info = LIB.GetSkill(dwID, nLevel)
+					local KSkill, info = X.GetSkill(dwID, nLevel)
 					if KSkill and info then
-						local szKey, szName = dwID, LIB.GetSkillName(dwID)
+						local szKey, szName = dwID, X.GetSkillName(dwID)
 						if not SKILL_INFO[szName] then
 							SKILL_INFO[szName] = {}
 						end
@@ -742,7 +713,7 @@ local function OnBreathe()
 							SKILL_INFO[szName][szKey] = {}
 						end
 						local skill = SKILL_INFO[szName][szKey]
-						local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum = LIB.GetSkillCDProgress(KObject, dwID, nLevel, true)
+						local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum = X.GetSkillCDProgress(KObject, dwID, nLevel, true)
 						skill.szKey = szKey
 						skill.dwID = dwID
 						skill.nLevel = info.nLevel
@@ -755,7 +726,7 @@ local function OnBreathe()
 						skill.nCdMaxCount = nMaxCount
 						skill.nSurfaceNum = nSurfaceNum
 						skill.nIcon = info.nIcon
-						skill.szName = LIB.GetSkillName(dwID)
+						skill.szName = X.GetSkillName(dwID)
 						tSkill[szKey] = skill
 						tSkill[dwID] = skill
 						tSkill[szName] = skill
@@ -785,7 +756,7 @@ end
 function D.OnTargetMonReload()
 	OnBreathe()
 	FireUIEvent('MY_TARGET_MON_DATA_INIT')
-	LIB.BreatheCall('MY_TargetMonData', OnBreathe)
+	X.BreatheCall('MY_TargetMonData', OnBreathe)
 end
 end
 
@@ -806,7 +777,7 @@ for i = 1, 5 do
 			'MY_TargetMon_' .. i .. '_' .. j, _L('Cancel buff %d - %d', i, j),
 			i == 1 and j == 1 and _L['MY Buff Monitor'] or '',
 			function()
-				if LIB.IsRestricted('MY_TargetMon.MapRestriction') and not LIB.IsInDungeon() then
+				if X.IsRestricted('MY_TargetMon.MapRestriction') and not X.IsInDungeon() then
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Cancel buff is disabled outside dungeon.'])
 					return
 				end
@@ -815,7 +786,7 @@ for i = 1, 5 do
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Hotkey cancel is only allowed for buff.'])
 					return
 				end
-				local KTarget = LIB.GetObject(D.GetTarget(tViewData.szTarget, tViewData.szType))
+				local KTarget = X.GetObject(D.GetTarget(tViewData.szTarget, tViewData.szType))
 				if not KTarget then
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Cannot find target to cancel buff.'])
 					return
@@ -825,7 +796,7 @@ for i = 1, 5 do
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Cannot find buff to cancel.'])
 					return
 				end
-				LIB.CancelBuff(KTarget, item.dwID, item.nLevel)
+				X.CancelBuff(KTarget, item.dwID, item.nLevel)
 			end, nil)
 	end
 end
@@ -845,5 +816,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetMonData = LIB.CreateModule(settings)
+MY_TargetMonData = X.CreateModule(settings)
 end

@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_ChatLog'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatLog'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -86,7 +57,7 @@ local CHANNELS = {
 	[22] = 'MSG_MY_MONITOR',
 	[23] = 'MSG_SSG_WHISPER',
 }
-local CHANNELS_R = LIB.FlipObjectKV(CHANNELS)
+local CHANNELS_R = X.FlipObjectKV(CHANNELS)
 
 local function SToNChannel(aChannel)
 	if not aChannel then
@@ -94,7 +65,7 @@ local function SToNChannel(aChannel)
 	end
 	local aNChannel = {}
 	for _, szChannel in ipairs(aChannel) do
-		insert(aNChannel, CHANNELS_R[szChannel])
+		table.insert(aNChannel, CHANNELS_R[szChannel])
 	end
 	return aNChannel
 end
@@ -107,13 +78,13 @@ local function FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
 		nMinTime = 0
 	end
 	if not nMaxTime then
-		nMaxTime = HUGE
+		nMaxTime = math.huge
 	end
 	if not nOffset then
 		nOffset = 0
 	end
 	if not nLimit then
-		nLimit = HUGE
+		nLimit = math.huge
 	end
 	return szSearch, nMinTime, nMaxTime, nOffset, nLimit
 end
@@ -121,7 +92,7 @@ end
 local function NewDB(szRoot, nMinTime, nMaxTime)
 	local szPath
 	repeat
-		szPath = szRoot .. ('chatlog_%x'):format(random(0x100000, 0xFFFFFF)) .. '.db'
+		szPath = szRoot .. ('chatlog_%x'):format(math.random(0x100000, 0xFFFFFF)) .. '.db'
 	until not IsLocalFileExist(szPath)
 	local db = MY_ChatLog_DB(szPath)
 	db:SetMinTime(nMinTime)
@@ -131,7 +102,7 @@ local function NewDB(szRoot, nMinTime, nMaxTime)
 end
 
 local function SortDB(aDB)
-	sort(aDB, function(a, b) return a:GetMinTime() < b:GetMinTime() end)
+	table.sort(aDB, function(a, b) return a:GetMinTime() < b:GetMinTime() end)
 end
 
 local DS = class()
@@ -150,7 +121,7 @@ function DS:InitDB(bFixProblem)
 		-- 初始化数据库集群列表
 		local aDB = {}
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(_L['MY_ChatLog'], 'Init node list...', DEBUG_LEVEL.LOG)
+		X.Debug(_L['MY_ChatLog'], 'Init node list...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, szName in ipairs(CPath.GetFileList(self.szRoot) or {}) do
 			local db, bConn = szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.db$') and MY_ChatLog_DB(self.szRoot .. szName)
@@ -159,38 +130,38 @@ function DS:InitDB(bFixProblem)
 					bConn = db:Connect(true)
 					if bConn then
 						--[[#DEBUG BEGIN]]
-						LIB.Debug(_L['MY_ChatLog'], 'Checking malformed node ' .. db:ToString(), DEBUG_LEVEL.LOG)
+						X.Debug(_L['MY_ChatLog'], 'Checking malformed node ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 						local nMinTime, nMinRecTime = db:GetMinTime(), db:GetMinRecTime()
 						if nMinRecTime < nMinTime then
 							--[[#DEBUG BEGIN]]
-							LIB.Debug(_L['MY_ChatLog'], 'Fix min time of ' .. db:ToString() .. ' from ' .. nMinTime .. ' to ' .. nMinRecTime, DEBUG_LEVEL.WARNING)
+							X.Debug(_L['MY_ChatLog'], 'Fix min time of ' .. db:ToString() .. ' from ' .. nMinTime .. ' to ' .. nMinRecTime, X.DEBUG_LEVEL.WARNING)
 							--[[#DEBUG END]]
 							db:SetMinTime(nMinRecTime)
 						end
 						local nMaxTime, nMaxRecTime = db:GetMaxTime(), db:GetMaxRecTime()
 						if nMaxRecTime > nMaxTime then
 							--[[#DEBUG BEGIN]]
-							LIB.Debug(_L['MY_ChatLog'], 'Fix max time of ' .. db:ToString() .. ' from ' .. nMaxTime .. ' to ' .. nMaxRecTime, DEBUG_LEVEL.WARNING)
+							X.Debug(_L['MY_ChatLog'], 'Fix max time of ' .. db:ToString() .. ' from ' .. nMaxTime .. ' to ' .. nMaxRecTime, X.DEBUG_LEVEL.WARNING)
 							--[[#DEBUG END]]
 							db:SetMaxTime(nMaxRecTime)
 						end
 					else
 						--[[#DEBUG BEGIN]]
-						LIB.Debug(_L['MY_ChatLog'], 'Connect failed for checking malformed node ' .. db:ToString(), DEBUG_LEVEL.WARNING)
+						X.Debug(_L['MY_ChatLog'], 'Connect failed for checking malformed node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 						--[[#DEBUG END]]
 					end
 				else
 					bConn = db:Connect()
 				end
 				if bConn and db:GetInfo('user_global_id') == GetClientPlayer().GetGlobalID() then
-					insert(aDB, db)
+					table.insert(aDB, db)
 				else
 					--[[#DEBUG BEGIN]]
 					if bConn then
-						LIB.Debug(_L['MY_ChatLog'], 'Ignore foreign node ' .. db:ToString(), DEBUG_LEVEL.WARNING)
+						X.Debug(_L['MY_ChatLog'], 'Ignore foreign node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 					else
-						LIB.Debug(_L['MY_ChatLog'], 'Ignore unconnectable node ' .. db:ToString(), DEBUG_LEVEL.WARNING)
+						X.Debug(_L['MY_ChatLog'], 'Ignore unconnectable node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 					end
 					--[[#DEBUG END]]
 					db:Disconnect()
@@ -200,42 +171,42 @@ function DS:InitDB(bFixProblem)
 		SortDB(aDB)
 		-- 删除集群中错误的空节点
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(_L['MY_ChatLog'], 'Check empty node...', DEBUG_LEVEL.LOG)
+		X.Debug(_L['MY_ChatLog'], 'Check empty node...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		for i, db in ipairs_r(aDB) do
-			if not (i == #aDB and IsHugeNumber(db:GetMaxTime())) and db:CountMsg() == 0 then
+		for i, db in X.ipairs_r(aDB) do
+			if not (i == #aDB and X.IsHugeNumber(db:GetMaxTime())) and db:CountMsg() == 0 then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(_L['MY_ChatLog'], 'Removing unexpected empty node: ' .. db:ToString(), DEBUG_LEVEL.WARNING)
+				X.Debug(_L['MY_ChatLog'], 'Removing unexpected empty node: ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				db:DeleteDB()
-				remove(aDB, i)
+				table.remove(aDB, i)
 			end
 		end
 		-- 修复覆盖区域不连续的节点（覆盖区中断问题、分段冲突问题）
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(_L['MY_ChatLog'], 'Check node continuously...', DEBUG_LEVEL.LOG)
+		X.Debug(_L['MY_ChatLog'], 'Check node continuously...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		do
 			local i = 1
 			while i < #aDB do
 				local db1, db2 = aDB[i], aDB[i + 1]
 				-- 检测中间节点最大值
-				if IsHugeNumber(db1:GetMaxTime()) then
+				if X.IsHugeNumber(db1:GetMaxTime()) then
 					--[[#DEBUG BEGIN]]
-					LIB.Debug(_L['MY_ChatLog'], 'Unexpected huge MaxTime: ' .. db1:ToString(), DEBUG_LEVEL.WARNING)
+					X.Debug(_L['MY_ChatLog'], 'Unexpected huge MaxTime: ' .. db1:ToString(), X.DEBUG_LEVEL.WARNING)
 					--[[#DEBUG END]]
 					if not bFixProblem then
 						return false
 					end
 					db1:SetMaxTime(db1:GetMaxRecTime())
 					--[[#DEBUG BEGIN]]
-					LIB.Debug(_L['MY_ChatLog'], 'Fix unexpected huge MaxTime: ' .. db1:ToString(), DEBUG_LEVEL.LOG)
+					X.Debug(_L['MY_ChatLog'], 'Fix unexpected huge MaxTime: ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 				end
 				-- 检测区域连续性
 				if db1:GetMaxTime() ~= db2:GetMinTime() then
 					--[[#DEBUG BEGIN]]
-					LIB.Debug(_L['MY_ChatLog'], 'Unexpected noncontinuously time between ' .. db1:ToString() .. ' and ' .. db2:ToString(), DEBUG_LEVEL.WARNING)
+					X.Debug(_L['MY_ChatLog'], 'Unexpected noncontinuously time between ' .. db1:ToString() .. ' and ' .. db2:ToString(), X.DEBUG_LEVEL.WARNING)
 					--[[#DEBUG END]]
 					if not bFixProblem then
 						return false
@@ -243,12 +214,12 @@ function DS:InitDB(bFixProblem)
 					if db1:GetMaxRecTime() <= db2:GetMinTime() then -- 覆盖区中断 扩充左侧区域
 						db1:SetMaxTime(db2:GetMinTime())
 						--[[#DEBUG BEGIN]]
-						LIB.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by modify ' .. db1:ToString(), DEBUG_LEVEL.LOG)
+						X.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by modify ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 					elseif db1:GetMaxTime() <= db2:GetMinRecTime() then -- 覆盖区中断 扩充右侧区域
 						db2:SetMinTime(db1:GetMaxTime())
 						--[[#DEBUG BEGIN]]
-						LIB.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by modify ' .. db2:ToString(), DEBUG_LEVEL.LOG)
+						X.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by modify ' .. db2:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 					elseif db1:GetMaxTime() >= db2:GetMaxTime() then -- 覆盖区冲突 右侧区域完全被左侧区域包裹 将右侧节点并入左侧节点中
 						for _, rec in ipairs(db2:SelectMsg()) do
@@ -257,9 +228,9 @@ function DS:InitDB(bFixProblem)
 						db1:Flush()
 						db2:DeleteDB()
 						--[[#DEBUG BEGIN]]
-						LIB.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by merge ' .. db2:ToString() .. ' to ' .. db1:ToString(), DEBUG_LEVEL.LOG)
+						X.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by merge ' .. db2:ToString() .. ' to ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
-						remove(aDB, i + 1)
+						table.remove(aDB, i + 1)
 						i = i - 1
 					else -- 覆盖区域冲突 将右侧节点的冲突区域数据移动到左侧节点中
 						db1:SetMaxTime(db1:GetMaxRecTime())
@@ -270,7 +241,7 @@ function DS:InitDB(bFixProblem)
 						db2:DeleteMsgInterval(nil, nil, 0, db1:GetMaxTime())
 						db2:SetMinTime(db1:GetMaxTime())
 						--[[#DEBUG BEGIN]]
-						LIB.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by moving data from ' .. db2:ToString() .. ' to ' .. db1:ToString(), DEBUG_LEVEL.LOG)
+						X.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by moving data from ' .. db2:ToString() .. ' to ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 					end
 				end
@@ -279,16 +250,16 @@ function DS:InitDB(bFixProblem)
 		end
 		-- 检查集群最新活跃节点是否存在
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(_L['MY_ChatLog'], 'Check latest node...', DEBUG_LEVEL.LOG)
+		X.Debug(_L['MY_ChatLog'], 'Check latest node...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local db = aDB[#aDB]
-		if db and IsHugeNumber(db:GetMaxTime()) then -- 存在： 检查集群最新活跃节点压力是否超限
+		if db and X.IsHugeNumber(db:GetMaxTime()) then -- 存在： 检查集群最新活跃节点压力是否超限
 			if db:CountMsg() > SINGLE_DB_AMOUNT then
 				db:SetMaxTime(db:GetMaxRecTime())
-				local dbNew = NewDB(self.szRoot, db:GetMaxTime(), HUGE)
-				insert(aDB, dbNew)
+				local dbNew = NewDB(self.szRoot, db:GetMaxTime(), math.huge)
+				table.insert(aDB, dbNew)
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(_L['MY_ChatLog'], 'Create new empty active node ' .. dbNew:ToString() .. ' after ' .. db:ToString(), DEBUG_LEVEL.LOG)
+				X.Debug(_L['MY_ChatLog'], 'Create new empty active node ' .. dbNew:ToString() .. ' after ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			end
 		else -- 不存在： 创建
@@ -298,24 +269,24 @@ function DS:InitDB(bFixProblem)
 				db:SetMaxTime(nMaxTime)
 				nMinTime = nMaxTime
 			end
-			local dbNew = NewDB(self.szRoot, nMinTime, HUGE)
-			insert(aDB, dbNew)
+			local dbNew = NewDB(self.szRoot, nMinTime, math.huge)
+			table.insert(aDB, dbNew)
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(_L['MY_ChatLog'], 'Create new empty active node ' .. dbNew:ToString(), DEBUG_LEVEL.LOG)
+			X.Debug(_L['MY_ChatLog'], 'Create new empty active node ' .. dbNew:ToString(), X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 		-- 检查集群最久远节点开始时间是否为0
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(_L['MY_ChatLog'], 'Check oldest node...', DEBUG_LEVEL.LOG)
+		X.Debug(_L['MY_ChatLog'], 'Check oldest node...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local db = aDB[1]
 		if db:GetMinTime() ~= 0 then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(_L['MY_ChatLog'], 'Unexpected MinTime for first DB: ' .. db:ToString(), DEBUG_LEVEL.WARNING)
+			X.Debug(_L['MY_ChatLog'], 'Unexpected MinTime for first DB: ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			db:SetMinTime(0)
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(_L['MY_ChatLog'], 'Fix unexpected MinTime for first DB: ' .. db:ToString(), DEBUG_LEVEL.LOG)
+			X.Debug(_L['MY_ChatLog'], 'Fix unexpected MinTime for first DB: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 		self.aDB = aDB
@@ -332,31 +303,31 @@ end
 
 function DS:OptimizeDB()
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(_L['MY_ChatLog'], 'OptimizeDB Start!', DEBUG_LEVEL.LOG)
+	X.Debug(_L['MY_ChatLog'], 'OptimizeDB Start!', X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	if self:ReinitDB(true) then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(_L['MY_ChatLog'], 'Checking node time zone overflow...', DEBUG_LEVEL.LOG)
+		X.Debug(_L['MY_ChatLog'], 'Checking node time zone overflow...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, db in ipairs(self.aDB) do
 			local nMinTime, nMinRecTime = db:GetMinTime(), db:GetMinRecTime()
 			if nMinTime > nMinRecTime then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(_L['MY_ChatLog'], 'Node logic error detected: MinTime > MinRecTime in ' .. db:ToString(), DEBUG_LEVEL.WARNING)
+				X.Debug(_L['MY_ChatLog'], 'Node logic error detected: MinTime > MinRecTime in ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				db:SetMinTime(nMinRecTime)
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(_L['MY_ChatLog'], 'Fix logic error: ' .. db:ToString(), DEBUG_LEVEL.LOG)
+				X.Debug(_L['MY_ChatLog'], 'Fix logic error: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			end
 			local nMaxTime, nMaxRecTime = db:GetMaxTime(), db:GetMaxRecTime()
 			if nMaxTime < nMaxRecTime then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(_L['MY_ChatLog'], 'Node logic error detected: MaxTime < MaxRecTime in ' .. db:ToString(), DEBUG_LEVEL.WARNING)
+				X.Debug(_L['MY_ChatLog'], 'Node logic error detected: MaxTime < MaxRecTime in ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				db:SetMaxTime(nMaxRecTime)
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(_L['MY_ChatLog'], 'Fix logic error: ' .. db:ToString(), DEBUG_LEVEL.LOG)
+				X.Debug(_L['MY_ChatLog'], 'Fix logic error: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			end
 		end
@@ -366,7 +337,7 @@ function DS:OptimizeDB()
 			local db = self.aDB[i]
 			if db:CountMsg() > SINGLE_DB_AMOUNT then -- 单个节点压力过大 转移超出部分到下一个节点
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(_L['MY_ChatLog'], 'Node count exceed limit: ' .. db:ToString() .. ' ' .. db:CountMsg(), DEBUG_LEVEL.WARNING)
+				X.Debug(_L['MY_ChatLog'], 'Node count exceed limit: ' .. db:ToString() .. ' ' .. db:CountMsg(), X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				local aRec = db:SelectMsg(nil, nil, nil, nil, SINGLE_DB_AMOUNT)
 				local nMaxTime, nMinTime = aRec[1].nTime, aRec[#aRec].nTime
@@ -385,29 +356,29 @@ function DS:OptimizeDB()
 					dbNew:Flush()
 					nOffset = nOffset + SINGLE_DB_AMOUNT
 					i = i + 1
-					insert(self.aDB, i, dbNew)
+					table.insert(self.aDB, i, dbNew)
 					--[[#DEBUG BEGIN]]
-					LIB.Debug(_L['MY_ChatLog'], 'Moving ' .. SINGLE_DB_AMOUNT .. ' records from ' .. db:ToString() .. ' to ' .. dbNew:ToString(), DEBUG_LEVEL.LOG)
+					X.Debug(_L['MY_ChatLog'], 'Moving ' .. SINGLE_DB_AMOUNT .. ' records from ' .. db:ToString() .. ' to ' .. dbNew:ToString(), X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 				end
 				-- 处理剩下不超过单个节点最大负载的结果
 				if nCount - nOffset == 0 then
 					-- 刚好没有了 且当前是活跃节点 则创建新的活跃节点
 					if i == #self.aDB then
-						local dbNew = NewDB(self.szRoot, nMinTime, HUGE)
+						local dbNew = NewDB(self.szRoot, nMinTime, math.huge)
 						i = i + 1
-						insert(self.aDB, i, dbNew)
+						table.insert(self.aDB, i, dbNew)
 						--[[#DEBUG BEGIN]]
-						LIB.Debug(_L['MY_ChatLog'], 'Create new active node: ' .. dbNew:ToString(), DEBUG_LEVEL.LOG)
+						X.Debug(_L['MY_ChatLog'], 'Create new active node: ' .. dbNew:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 					end
 				else
 					-- 还有则合并到下一个节点
 					local dbNext, rec
 					if i == #self.aDB then
-						dbNext = NewDB(self.szRoot, aRec[nOffset + 1].nTime, HUGE)
+						dbNext = NewDB(self.szRoot, aRec[nOffset + 1].nTime, math.huge)
 						i = i + 1
-						insert(self.aDB, i, dbNext)
+						table.insert(self.aDB, i, dbNext)
 					else
 						dbNext = self.aDB[i + 1]
 						dbNext:SetMinTime(aRec[nOffset + 1].nTime)
@@ -419,23 +390,23 @@ function DS:OptimizeDB()
 					end
 					dbNext:Flush()
 					--[[#DEBUG BEGIN]]
-					LIB.Debug(_L['MY_ChatLog'], 'Moving ' .. #aRec .. ' records from ' .. db:ToString() .. ' to ' .. dbNext:ToString(), DEBUG_LEVEL.LOG)
+					X.Debug(_L['MY_ChatLog'], 'Moving ' .. #aRec .. ' records from ' .. db:ToString() .. ' to ' .. dbNext:ToString(), X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 				end
 				db:Flush()
 				db:SetMaxTime(nMaxTime)
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(_L['MY_ChatLog'], 'Modify node property: ' .. db:ToString(), DEBUG_LEVEL.LOG)
+				X.Debug(_L['MY_ChatLog'], 'Modify node property: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				-- 压缩数据库
 				db:GarbageCollection()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(_L['MY_ChatLog'], 'Node GarbageCollection: ' .. db:ToString(), DEBUG_LEVEL.LOG)
+				X.Debug(_L['MY_ChatLog'], 'Node GarbageCollection: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			elseif db:CountMsg() < SINGLE_DB_AMOUNT then -- 单个节点压力过小 与下个节点合并
 				if i < #self.aDB then
 					--[[#DEBUG BEGIN]]
-					LIB.Debug(_L['MY_ChatLog'], 'Node count insufficient: ' .. db:ToString() .. ' ' .. db:CountMsg(), DEBUG_LEVEL.WARNING)
+					X.Debug(_L['MY_ChatLog'], 'Node count insufficient: ' .. db:ToString() .. ' ' .. db:CountMsg(), X.DEBUG_LEVEL.WARNING)
 					--[[#DEBUG END]]
 					local dbNext = self.aDB[i + 1]
 					dbNext:SetMinTime(db:GetMinTime())
@@ -444,19 +415,19 @@ function DS:OptimizeDB()
 					end
 					dbNext:Flush()
 					--[[#DEBUG BEGIN]]
-					LIB.Debug(_L['MY_ChatLog'], 'Merge node ' .. db:ToString() .. ' to ' .. dbNext:ToString(), DEBUG_LEVEL.LOG)
+					X.Debug(_L['MY_ChatLog'], 'Merge node ' .. db:ToString() .. ' to ' .. dbNext:ToString(), X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					db:DeleteDB()
-					remove(self.aDB, i)
+					table.remove(self.aDB, i)
 					i = i - 1
 				end
 			end
 			i = i + 1
 		end
 	--[[#DEBUG BEGIN]]
-		LIB.Debug(_L['MY_ChatLog'], 'OptimizeDB Finished!', DEBUG_LEVEL.LOG)
+		X.Debug(_L['MY_ChatLog'], 'OptimizeDB Finished!', X.DEBUG_LEVEL.LOG)
 	else
-		LIB.Debug(_L['MY_ChatLog'], 'OptimizeDB Failed! ReinitDB Failed!', DEBUG_LEVEL.WARNING)
+		X.Debug(_L['MY_ChatLog'], 'OptimizeDB Failed! ReinitDB Failed!', X.DEBUG_LEVEL.WARNING)
 	--[[#DEBUG END]]
 	end
 	return self
@@ -472,9 +443,9 @@ function DS:InsertMsg(szChannel, szText, szMsg, szTalker, nTime)
 		local szHash    = GetStringCRC(szMsg)
 		local szuTalker = AnsiToUTF8(szTalker)
 		local nChannel  = CHANNELS_R[szChannel]
-		if nChannel and nTime and not IsEmpty(szMsg) and szText and not IsEmpty(szHash) then
-			insert(self.aInsertQueue, {szHash = szHash, nChannel = nChannel, nTime = nTime, szTalker = szuTalker, szText = szuText, szMsg = szuMsg})
-			insert(self.aInsertQueueAnsi, {szHash = szHash, szChannel = szChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
+		if nChannel and nTime and not X.IsEmpty(szMsg) and szText and not X.IsEmpty(szHash) then
+			table.insert(self.aInsertQueue, {szHash = szHash, nChannel = nChannel, nTime = nTime, szTalker = szuTalker, szText = szuText, szMsg = szuMsg})
+			table.insert(self.aInsertQueueAnsi, {szHash = szHash, szChannel = szChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
 		end
 	end
 	FireUIEvent('ON_MY_CHATLOG_INSERT_MSG', self.szRoot)
@@ -482,22 +453,22 @@ function DS:InsertMsg(szChannel, szText, szMsg, szTalker, nTime)
 end
 
 function DS:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
-	if IsTable(aChannel) and IsEmpty(aChannel) then
+	if X.IsTable(aChannel) and X.IsEmpty(aChannel) then
 		return 0
 	end
 	if not self:InitDB() then
 		return 0
 	end
 	szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
-	local szuSearch = IsEmpty(szSearch) and '' or AnsiToUTF8('%' .. szSearch .. '%')
+	local szuSearch = X.IsEmpty(szSearch) and '' or AnsiToUTF8('%' .. szSearch .. '%')
 	local aNChannel, nCount = SToNChannel(aChannel), 0
 	for _, db in ipairs(self.aDB) do
 		nCount = nCount + db:CountMsg(aNChannel, szuSearch, nMinTime, nMaxTime)
 	end
-	local tChannel = aChannel and LIB.FlipObjectKV(aChannel)
+	local tChannel = aChannel and X.FlipObjectKV(aChannel)
 	for _, rec in ipairs(self.aInsertQueueAnsi) do
 		if (not tChannel or tChannel[rec.szChannel])
-		and (wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch)) then
+		and (wstring.find(rec.szText, szSearch) or wstring.find(rec.szTalker, szSearch)) then
 			nCount = nCount + 1
 		end
 	end
@@ -505,14 +476,14 @@ function DS:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 end
 
 function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, bUTF8)
-	if IsTable(aChannel) and IsEmpty(aChannel) then
+	if X.IsTable(aChannel) and X.IsEmpty(aChannel) then
 		return {}
 	end
 	if not self:InitDB() then
 		return {}
 	end
 	szSearch, nMinTime, nMaxTime, nOffset, nLimit = FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
-	local szuSearch = IsEmpty(szSearch) and '' or AnsiToUTF8('%' .. szSearch .. '%')
+	local szuSearch = X.IsEmpty(szSearch) and '' or AnsiToUTF8('%' .. szSearch .. '%')
 	local aNChannel, aResult = SToNChannel(aChannel), {}
 	for _, db in ipairs(self.aDB) do
 		if nLimit == 0 then
@@ -523,7 +494,7 @@ function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, b
 			local res = db:SelectMsg(aNChannel, szuSearch, nMinTime, nMaxTime, nOffset, nLimit)
 			if bUTF8 then
 				for _, p in ipairs(res) do
-					insert(aResult, p)
+					table.insert(aResult, p)
 				end
 			else
 				for _, p in ipairs(res) do
@@ -532,32 +503,32 @@ function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, b
 					p.szTalker = UTF8ToAnsi(p.szTalker)
 					p.szText = UTF8ToAnsi(p.szText)
 					p.szMsg = UTF8ToAnsi(p.szMsg)
-					insert(aResult, p)
+					table.insert(aResult, p)
 				end
 			end
-			if not IsHugeNumber(nLimit) then
-				nLimit = max(nLimit - nCount + nOffset, 0)
+			if not X.IsHugeNumber(nLimit) then
+				nLimit = math.max(nLimit - nCount + nOffset, 0)
 			end
 		end
-		nOffset = max(nOffset - nCount, 0)
+		nOffset = math.max(nOffset - nCount, 0)
 	end
-	if IsHugeNumber(nLimit) or nLimit > 0 then
-		local tChannel = aChannel and LIB.FlipObjectKV(aChannel)
+	if X.IsHugeNumber(nLimit) or nLimit > 0 then
+		local tChannel = aChannel and X.FlipObjectKV(aChannel)
 		for i, rec in ipairs(self.aInsertQueueAnsi) do
 			if nLimit == 0 then
 				break
 			end
 			if (not tChannel or tChannel[rec.szChannel])
-			and (wfind(rec.szText, szSearch) or wfind(rec.szTalker, szSearch)) then
+			and (wstring.find(rec.szText, szSearch) or wstring.find(rec.szTalker, szSearch)) then
 				if nOffset > 0 then
 					nOffset = nOffset - 1
 				else
 					if bUTF8 then
-						insert(aResult, Clone(self.aInsertQueue[i]))
+						table.insert(aResult, X.Clone(self.aInsertQueue[i]))
 					else
-						insert(aResult, Clone(rec))
+						table.insert(aResult, X.Clone(rec))
 					end
-					if not IsHugeNumber(nLimit) then
+					if not X.IsHugeNumber(nLimit) then
 						nLimit = nLimit - 1
 					end
 				end
@@ -568,8 +539,8 @@ function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, b
 end
 
 function DS:DeleteMsg(szHash, nTime)
-	if nTime and not IsEmpty(szHash) then
-		insert(self.aDeleteQueue, {szHash = szHash, nTime = nTime})
+	if nTime and not X.IsEmpty(szHash) then
+		table.insert(self.aDeleteQueue, {szHash = szHash, nTime = nTime})
 	end
 	return self
 end
@@ -578,11 +549,11 @@ function DS:DeleteMsgInterval(aChannel, szSearch, nMinTime, nMaxTime)
 	if self:InitDB() then
 		self:FlushDB()
 		szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
-		local szuSearch = IsEmpty(szSearch) and '' or AnsiToUTF8('%' .. szSearch .. '%')
+		local szuSearch = X.IsEmpty(szSearch) and '' or AnsiToUTF8('%' .. szSearch .. '%')
 		local aNChannel = SToNChannel(aChannel)
 		for _, db in ipairs(self.aDB) do
-			if (IsEmpty(nMaxTime) or IsHugeNumber(nMaxTime) or db:GetMinTime() <= nMaxTime)
-			and (IsEmpty(nMinTime) or db:GetMaxTime() >= nMinTime) then
+			if (X.IsEmpty(nMaxTime) or X.IsHugeNumber(nMaxTime) or db:GetMinTime() <= nMaxTime)
+			and (X.IsEmpty(nMinTime) or db:GetMaxTime() >= nMinTime) then
 				db:DeleteMsgInterval(aNChannel, szuSearch, nMinTime, nMaxTime)
 			end
 		end
@@ -591,9 +562,9 @@ function DS:DeleteMsgInterval(aChannel, szSearch, nMinTime, nMaxTime)
 end
 
 function DS:FlushDB()
-	if (not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue)) and self:InitDB() then
+	if (not X.IsEmpty(self.aInsertQueue) or not X.IsEmpty(self.aDeleteQueue)) and self:InitDB() then
 		-- 插入记录
-		sort(self.aInsertQueue, function(a, b) return a.nTime < b.nTime end)
+		table.sort(self.aInsertQueue, function(a, b) return a.nTime < b.nTime end)
 		local i, db = 1, self.aDB[1]
 		for _, p in ipairs(self.aInsertQueue) do
 			while db and p.nTime > db:GetMaxTime() do
@@ -606,7 +577,7 @@ function DS:FlushDB()
 		self.aInsertQueue = {}
 		self.aInsertQueueAnsi = {}
 		-- 删除记录
-		sort(self.aDeleteQueue, function(a, b) return a.nTime < b.nTime end)
+		table.sort(self.aDeleteQueue, function(a, b) return a.nTime < b.nTime end)
 		local i, db = 1, self.aDB[1]
 		for _, p in ipairs(self.aDeleteQueue) do
 			while db and p.nTime > db:GetMaxTime() do

@@ -10,50 +10,21 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Anmerkungen'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_Anmerkungen.Export', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_Anmerkungen.Export', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 local _C = {}
 local LOADED = false
@@ -67,7 +38,7 @@ MY_Anmerkungen = MY_Anmerkungen or {}
 -- 打开一个玩家的记录编辑器
 function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	if not MY_Farbnamen then
-		return LIB.Alert(_L['MY_Farbnamen not detected! Please check addon load!'])
+		return X.Alert(_L['MY_Farbnamen not detected! Please check addon load!'])
 	end
 	local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
 
@@ -84,10 +55,10 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 		ui:Remove()
 		return true
 	end
-	LIB.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel', IsValid, RemoveFrame)
+	X.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel', IsValid, RemoveFrame)
 
 	local function onRemove()
-		LIB.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel')
+		X.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel')
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
 	ui:Remove(onRemove)
@@ -191,32 +162,32 @@ end
 
 do
 local function onMenu()
-	local dwType, dwID = LIB.GetTarget()
+	local dwType, dwID = X.GetTarget()
 	if dwType == TARGET.PLAYER then
-		local p = LIB.GetObject(dwType, dwID)
+		local p = X.GetObject(dwType, dwID)
 		return {
 			szOption = _L['Edit player note'],
 			fnAction = function()
-				LIB.DelayCall(1, function()
+				X.DelayCall(1, function()
 					MY_Anmerkungen.OpenPlayerNoteEditPanel(p.dwID, p.szName)
 				end)
 			end
 		}
 	end
 end
-LIB.RegisterTargetAddonMenu('MY_Anmerkungen_PlayerNotes', onMenu)
+X.RegisterTargetAddonMenu('MY_Anmerkungen_PlayerNotes', onMenu)
 end
 
 do
 local menu = {
 	szOption = _L['View anmerkungen'],
 	fnAction = function()
-		LIB.ShowPanel()
-		LIB.FocusPanel()
-		LIB.SwitchTab('MY_Anmerkungen_Player_Note')
+		X.ShowPanel()
+		X.FocusPanel()
+		X.SwitchTab('MY_Anmerkungen_Player_Note')
 	end,
 }
-LIB.RegisterAddonMenu('MY_Anmerkungen_PlayerNotes', menu)
+X.RegisterAddonMenu('MY_Anmerkungen_PlayerNotes', menu)
 end
 
 -- 获取一个玩家的记录
@@ -229,13 +200,13 @@ function MY_Anmerkungen.GetPlayerNote(dwID)
 	local t, rec
 	rec = PRIVATE_PLAYER_NOTES[PRIVATE_PLAYER_IDS[dwID] or dwID]
 	if rec then
-		t = Clone(rec)
+		t = X.Clone(rec)
 		t.bPrivate = true
 		return t
 	end
 	rec = PUBLIC_PLAYER_NOTES[PUBLIC_PLAYER_IDS[dwID] or dwID]
 	if rec then
-		t = Clone(rec)
+		t = X.Clone(rec)
 		t.bPrivate = false
 		return t
 	end
@@ -304,7 +275,7 @@ local function CheckPartyPlayer(dwID)
 			})
 		end
 		if t.bTipWhenGroup then
-			LIB.Sysmsg(_L('Tip: [%s] is in your team.\nNote: %s', t.szName, t.szContent))
+			X.Sysmsg(_L('Tip: [%s] is in your team.\nNote: %s', t.szName, t.szContent))
 		end
 	end
 end
@@ -313,8 +284,8 @@ do
 local function OnPartyAddMember()
 	CheckPartyPlayer(arg1)
 end
-LIB.RegisterEvent('PARTY_ADD_MEMBER', OnPartyAddMember)
--- LIB.RegisterEvent('PARTY_SYNC_MEMBER_DATA', OnPartyAddMember)
+X.RegisterEvent('PARTY_ADD_MEMBER', OnPartyAddMember)
+-- X.RegisterEvent('PARTY_SYNC_MEMBER_DATA', OnPartyAddMember)
 end
 
 -- 当进队时
@@ -328,7 +299,7 @@ local function OnEnterParty()
 		CheckPartyPlayer(dwID)
 	end
 end
-LIB.RegisterEvent('PARTY_UPDATE_BASE_INFO', 'MY_Anmerkungen', OnEnterParty)
+X.RegisterEvent('PARTY_UPDATE_BASE_INFO', 'MY_Anmerkungen', OnEnterParty)
 end
 end
 
@@ -336,25 +307,25 @@ end
 function MY_Anmerkungen.LoadConfig()
 	if not GetClientPlayer() then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_Anmerkungen.LoadConfig', 'Client player not exist! Cannot load config!', DEBUG_LEVEL.ERROR)
+		X.Debug('MY_Anmerkungen.LoadConfig', 'Client player not exist! Cannot load config!', X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end
 
-	local data = LIB.LoadLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.SERVER})
+	local data = X.LoadLUAData({'config/anmerkungen.jx3dat', X.PATH_TYPE.SERVER})
 	if data then
 		PUBLIC_PLAYER_IDS = data.ids or {}
 		PUBLIC_PLAYER_NOTES = data.data or {}
 	end
-	local szOrgFile = LIB.GetLUADataPath({'config/PLAYER_NOTES/{$relserver}.{$lang}.jx3dat', PATH_TYPE.DATA})
-	local szFilePath = LIB.GetLUADataPath({'config/playernotes.jx3dat', PATH_TYPE.SERVER})
+	local szOrgFile = X.GetLUADataPath({'config/PLAYER_NOTES/{$relserver}.{$lang}.jx3dat', X.PATH_TYPE.DATA})
+	local szFilePath = X.GetLUADataPath({'config/playernotes.jx3dat', X.PATH_TYPE.SERVER})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
 	if IsLocalFileExist(szFilePath) then
-		local data = LIB.LoadLUAData(szFilePath) or {}
+		local data = X.LoadLUAData(szFilePath) or {}
 		if type(data) == 'string' then
-			data = LIB.JsonDecode(data)
+			data = X.JsonDecode(data)
 		end
 		for k, v in pairs(data) do
 			if type(v) == 'table' then
@@ -371,20 +342,20 @@ function MY_Anmerkungen.LoadConfig()
 		MY_Anmerkungen.SaveConfig()
 	end
 
-	local data = LIB.LoadLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.ROLE})
+	local data = X.LoadLUAData({'config/anmerkungen.jx3dat', X.PATH_TYPE.ROLE})
 	if data then
 		PRIVATE_PLAYER_IDS = data.ids or {}
 		PRIVATE_PLAYER_NOTES = data.data or {}
 	end
-	local szOrgFile = LIB.GetLUADataPath({'config/PLAYER_NOTES/{$uid}.{$lang}.jx3dat', PATH_TYPE.DATA})
-	local szFilePath = LIB.GetLUADataPath({'config/playernotes.jx3dat', PATH_TYPE.ROLE})
+	local szOrgFile = X.GetLUADataPath({'config/PLAYER_NOTES/{$uid}.{$lang}.jx3dat', X.PATH_TYPE.DATA})
+	local szFilePath = X.GetLUADataPath({'config/playernotes.jx3dat', X.PATH_TYPE.ROLE})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
 	if IsLocalFileExist(szFilePath) then
-		local data = LIB.LoadLUAData(szFilePath) or {}
+		local data = X.LoadLUAData(szFilePath) or {}
 		if type(data) == 'string' then
-			data = LIB.JsonDecode(data)
+			data = X.JsonDecode(data)
 		end
 		for k, v in pairs(data) do
 			if type(v) == 'table' then
@@ -408,15 +379,15 @@ function MY_Anmerkungen.SaveConfig()
 		ids = PUBLIC_PLAYER_IDS,
 		data = PUBLIC_PLAYER_NOTES,
 	}
-	LIB.SaveLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.SERVER}, data)
+	X.SaveLUAData({'config/anmerkungen.jx3dat', X.PATH_TYPE.SERVER}, data)
 
 	local data = {
 		ids = PRIVATE_PLAYER_IDS,
 		data = PRIVATE_PLAYER_NOTES,
 	}
-	LIB.SaveLUAData({'config/anmerkungen.jx3dat', PATH_TYPE.ROLE}, data)
+	X.SaveLUAData({'config/anmerkungen.jx3dat', X.PATH_TYPE.ROLE}, data)
 end
-LIB.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
+X.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
 
 local PS = {}
 function PS.OnPanelActive(wnd)
@@ -440,10 +411,10 @@ function PS.OnPanelActive(wnd)
 			buttonstyle = 'FLAT',
 			onclick = function()
 				GetUserInput(_L['Please input import data:'], function(szVal)
-					local config = DecodeLUAData(szVal)
+					local config = X.DecodeLUAData(szVal)
 					if config and config.server and config.public and config.private then
-						if config.server ~= LIB.GetRealServer() then
-							return LIB.Alert(_L['Server not match!'])
+						if config.server ~= X.GetRealServer() then
+							return X.Alert(_L['Server not match!'])
 						end
 						local function Next(usenew)
 							for k, v in pairs(config.public) do
@@ -491,14 +462,14 @@ function PS.OnPanelActive(wnd)
 								end
 							end
 							MY_Anmerkungen.SaveConfig()
-							LIB.SwitchTab('MY_Anmerkungen_Player_Note', true)
+							X.SwitchTab('MY_Anmerkungen_Player_Note', true)
 						end
-						LIB.Dialog(_L['Prefer old data or new data?'], {
+						X.Dialog(_L['Prefer old data or new data?'], {
 							{ szOption = _L['Old data'], fnAction = function() Next(false) end },
 							{ szOption = _L['New data'], fnAction = function() Next(true) end },
 						})
 					else
-						LIB.Alert(_L['Decode data failed!'])
+						X.Alert(_L['Decode data failed!'])
 					end
 				end, function() end, function() end, nil, '' )
 			end,
@@ -509,8 +480,8 @@ function PS.OnPanelActive(wnd)
 			text = _L['Export'],
 			buttonstyle = 'FLAT',
 			onclick = function()
-				UI.OpenTextEditor(EncodeLUAData({
-					server   = LIB.GetRealServer(),
+				UI.OpenTextEditor(X.EncodeLUAData({
+					server   = X.GetRealServer(),
 					publici  = PUBLIC_PLAYER_IDS,
 					publicd  = PUBLIC_PLAYER_NOTES,
 					privatei = PRIVATE_PLAYER_IDS,
@@ -542,4 +513,4 @@ end
 function PS.OnPanelDeactive()
 	_C.list = nil
 end
-LIB.RegisterPanel(_L['Target'], 'MY_Anmerkungen_Player_Note', _L['Player note'], 'ui/Image/button/ShopButton.UITex|12', PS)
+X.RegisterPanel(_L['Target'], 'MY_Anmerkungen_Player_Note', _L['Player note'], 'ui/Image/button/ShopButton.UITex|12', PS)

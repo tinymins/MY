@@ -10,179 +10,150 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKPDoodad'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_GKPDoodad.HeadName', { ['*'] = false, classic = true })
-LIB.RegisterRestriction('MY_GKPDoodad.AutoInteract', { ['*'] = true, intl = false })
-LIB.RegisterRestriction('MY_GKPDoodad.MapRestriction', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_GKPDoodad.HeadName', { ['*'] = false, classic = true })
+X.RegisterRestriction('MY_GKPDoodad.AutoInteract', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_GKPDoodad.MapRestriction', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_GKPDoodad', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_GKPDoodad', _L['General'], {
 	bOpenLoot = { -- 自动打开掉落
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOpenLootEvenFight = { -- 战斗中也打开
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowName = { -- 显示物品名称
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tNameColor = { -- 头顶名称颜色
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 196, 64, 255 },
 	},
 	nNameFont = { -- 头顶名称字体
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 40,
 	},
 	fNameScale = { -- 头顶名称缩放
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	bMiniFlag = { -- 显示小地图标记
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bInteract = { -- 自动采集
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bInteractEvenFight = { -- 战斗中也采集
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tCraft = { -- 草药、矿石列表
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Map(Schema.Number, Schema.Boolean),
+		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 	bMiningDoodad = { -- 采金物品
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bHerbalismDoodad = { -- 神农物品
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSkinningDoodad = { -- 庖丁物品
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bQuestDoodad = { -- 任务物品
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bReadInscriptionDoodad = { -- 已读碑铭
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bUnreadInscriptionDoodad = { -- 未读碑铭
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOtherDoodad = { -- 其它物品
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAllDoodad = { -- 全部
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bCustom = { -- 启用自定义
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	szCustom = { -- 自定义列表
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	bRecent = { -- 启用自动最近5分钟采集
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
@@ -194,7 +165,7 @@ RegisterCustomData('MY_GKPDoodad.szCustom')
 ---------------------------------------------------------------------
 -- 本地函数和变量
 ---------------------------------------------------------------------
-local INI_SHADOW = PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini'
+local INI_SHADOW = X.PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini'
 local DOODAD_TYPE_VISIBLE = {
 	[DOODAD_KIND.INVALID     ] = false,
 	[DOODAD_KIND.NORMAL      ] = false, -- 普通的Doodad,有Tip,不能操作
@@ -223,17 +194,17 @@ local function GetDoodadTemplateName(dwID)
 end
 
 local function IsShowNameDisabled()
-	if LIB.IsRestricted('MY_GKPDoodad.HeadName') then
+	if X.IsRestricted('MY_GKPDoodad.HeadName') then
 		return true
 	end
-	if LIB.IsInShieldedMap() and LIB.IsRestricted('MY_GKPDoodad.MapRestriction') then
+	if X.IsInShieldedMap() and X.IsRestricted('MY_GKPDoodad.MapRestriction') then
 		return true
 	end
 	return false
 end
 
 local function IsAutoInteractDisabled()
-	return not O.bInteract or IsShiftKeyDown() or Station.Lookup('Normal/MY_GKPLoot') or LIB.IsRestricted('MY_GKPDoodad.AutoInteract')
+	return not O.bInteract or IsShiftKeyDown() or Station.Lookup('Normal/MY_GKPLoot') or X.IsRestricted('MY_GKPDoodad.AutoInteract')
 end
 
 local D = {
@@ -334,9 +305,9 @@ function D.GetDoodadInfo(dwID)
 		return info
 	end
 	-- 碑铭
-	local dwRecipeID = LIB.GetDoodadBookRecipeID(doodad.dwTemplateID), false
+	local dwRecipeID = X.GetDoodadBookRecipeID(doodad.dwTemplateID), false
 	if dwRecipeID then
-		local dwBookID, dwSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
+		local dwBookID, dwSegmentID = X.RecipeToSegmentID(dwRecipeID)
 		if dwBookID and dwSegmentID then
 			info.eDoodadType = 'inscription'
 			info.eActionType = 'other'
@@ -359,7 +330,7 @@ end
 -- try to add
 function D.TryAdd(dwID, bDelay)
 	if bDelay then
-		return LIB.DelayCall('MY_GKPDoodad__DelayTryAdd' .. dwID, 500, function() D.TryAdd(dwID) end)
+		return X.DelayCall('MY_GKPDoodad__DelayTryAdd' .. dwID, 500, function() D.TryAdd(dwID) end)
 	end
 	local info = D.GetDoodadInfo(dwID)
 	if info then
@@ -418,7 +389,7 @@ end
 -- reload doodad
 function D.RescanNearby(dwTemplateID)
 	if dwTemplateID then
-		for _, d in ipairs(LIB.GetNearDoodad()) do
+		for _, d in ipairs(X.GetNearDoodad()) do
 			if d.dwTemplateID == dwTemplateID then
 				D.Remove(d.dwID)
 				D.TryAdd(d.dwID)
@@ -427,7 +398,7 @@ function D.RescanNearby(dwTemplateID)
 		end
 	else
 		D.tDoodad = {}
-		for _, k in ipairs(LIB.GetNearDoodadID()) do
+		for _, k in ipairs(X.GetNearDoodadID()) do
 			D.TryAdd(k)
 		end
 		D.bUpdateLabel = true
@@ -437,8 +408,8 @@ end
 function D.ReloadCustom()
 	local t = {}
 	local szText = StringReplaceW(O.szCustom, _L['|'], '|')
-	for _, v in ipairs(LIB.SplitString(szText, '|')) do
-		v = LIB.TrimString(v)
+	for _, v in ipairs(X.SplitString(szText, '|')) do
+		v = X.TrimString(v)
 		if v ~= '' then
 			t[v] = true
 		end
@@ -471,7 +442,7 @@ function D.OnPickPrepareStop(doodad)
 	if dwTemplateID then
 		local bSuccess = doodad
 			and doodad.dwID == D.dwPickPrepareDoodadID
-			and abs(GetLogicFrameCount() - D.nPickPrepareFinishLFC) < GLOBAL.GAME_FPS / 2
+			and math.abs(GetLogicFrameCount() - D.nPickPrepareFinishLFC) < GLOBAL.GAME_FPS / 2
 		D.nPickPrepareFinishLFC = nil
 		D.dwPickPrepareDoodadID = nil
 		D.dwPickPrepareDoodadTemplateID = nil
@@ -480,23 +451,23 @@ function D.OnPickPrepareStop(doodad)
 	end
 end
 
-LIB.RegisterInit('MY_GKPDoodad', function()
+X.RegisterInit('MY_GKPDoodad', function()
 	for _, k in ipairs({'tNameColor', 'tCraft', 'szCustom'}) do
 		if O2[k] then
-			SafeCall(Set, O, k, O2[k])
+			X.SafeCall(Set, O, k, O2[k])
 			O2[k] = nil
 		end
 	end
 	-- 粮草堆，散落的镖银，阵营首领战利品、押运奖赏
-	if IsEmpty(O.szCustom) then
+	if X.IsEmpty(O.szCustom) then
 		local t = {}
 		for _, v in ipairs({ 3874, 4255, 4315, 5622, 5732 }) do
 			local szName = GetDoodadTemplateName(v)
 			if szName then
-				insert(t, szName)
+				table.insert(t, szName)
 			end
 		end
-		O.szCustom = concat(t, '|')
+		O.szCustom = table.concat(t, '|')
 		D.ReloadCustom()
 	end
 end)
@@ -507,7 +478,7 @@ function D.CheckShowName()
 	local bShowName = O.bShowName and not IsShowNameDisabled()
 	if bShowName and not D.pLabel then
 		D.pLabel = hName:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Name')
-		LIB.BreatheCall('MY_GKPDoodad__HeadName', function()
+		X.BreatheCall('MY_GKPDoodad__HeadName', function()
 			if D.bUpdateLabel then
 				D.bUpdateLabel = false
 				D.UpdateHeadName()
@@ -517,7 +488,7 @@ function D.CheckShowName()
 	elseif not bShowName and D.pLabel then
 		hName:Clear()
 		D.pLabel = nil
-		LIB.BreatheCall('MY_GKPDoodad__HeadName', false)
+		X.BreatheCall('MY_GKPDoodad__HeadName', false)
 	end
 end
 
@@ -536,7 +507,7 @@ function D.UpdateHeadName()
 	for dwID, info in pairs(D.tDoodad) do
 		local tar = GetDoodad(dwID)
 		if info.eRuleType ~= 'loot' or info.bCustom or info.bRecent then
-			local szName = LIB.GetObjectName(TARGET.DOODAD, dwID, 'never') or ''
+			local szName = X.GetObjectName(TARGET.DOODAD, dwID, 'never') or ''
 			local fYDelta = 128
 			local nR, nG, nB, nA, bDarken = r, g, b, 255, false
 			-- 将不可自动交互的颜色变暗
@@ -577,7 +548,7 @@ end
 function D.AutoInteractDoodad()
 	local me = GetClientPlayer()
 	-- auto interact
-	if not me or LIB.GetOTActionState(me) ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
+	if not me or X.GetOTActionState(me) ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
 		or (me.nMoveState ~= MOVE_STATE.ON_STAND and me.nMoveState ~= MOVE_STATE.ON_FLOAT)
 		-- or IsDialoguePanelOpened()
 	then
@@ -609,7 +580,7 @@ function D.AutoInteractDoodad()
 			then -- 任务和普通道具尝试 5 次
 				bIntr = bAllowAutoIntr
 				-- 宴席只能吃队友的
-				if doodad.dwOwnerID ~= 0 and IsPlayer(doodad.dwOwnerID) and not LIB.IsParty(doodad.dwOwnerID) then
+				if doodad.dwOwnerID ~= 0 and IsPlayer(doodad.dwOwnerID) and not X.IsParty(doodad.dwOwnerID) then
 					bIntr = false
 				end
 				if bIntr then
@@ -625,28 +596,28 @@ function D.AutoInteractDoodad()
 		end
 		if bOpen and doodad.CanLoot(me.dwID) then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(_L['MY_GKPDoodad'], 'Auto open [' .. doodad.szName .. '].', DEBUG_LEVEL.LOG)
+			X.Debug(_L['MY_GKPDoodad'], 'Auto open [' .. doodad.szName .. '].', X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			D.dwOpenDoodadID = dwID
 			D.bUpdateLabel = true
 			D.dwAutoInteractDoodadTime = GetTime() + 500
 			-- 掉落只摸一次
 			D.tLooted[doodad.dwID] = true
-			return LIB.OpenDoodad(me, doodad)
+			return X.OpenDoodad(me, doodad)
 		end
 		if bIntr and not doodad.CanLoot(me.dwID) then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(_L['MY_GKPDoodad'], 'Auto interact [' .. doodad.szName .. '].', DEBUG_LEVEL.LOG)
+			X.Debug(_L['MY_GKPDoodad'], 'Auto interact [' .. doodad.szName .. '].', X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			D.dwAutoInteractDoodadTime = GetTime() + 500
-			return LIB.InteractDoodad(dwID)
+			return X.InteractDoodad(dwID)
 		end
 	end
 end
 
 function D.CloseLootWindow()
 	local me = GetClientPlayer()
-	if me and LIB.GetOTActionState(me) == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
+	if me and X.GetOTActionState(me) == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
 		me.OnCloseLootWindow()
 	end
 end
@@ -658,9 +629,9 @@ function D.OnOpenDoodad(dwID)
 	if info then
 		-- 摸掉落且开了插件拾取框 可以安全的起身
 		if info.eActionType == 'loot' and MY_GKPLoot.IsEnabled() then
-			LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad_1',  150, D.CloseLootWindow)
-			LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad_2',  300, D.CloseLootWindow)
-			LIB.DelayCall('MY_GKPDoodad__OnOpenDoodad_3', 1000, D.CloseLootWindow)
+			X.DelayCall('MY_GKPDoodad__OnOpenDoodad_1',  150, D.CloseLootWindow)
+			X.DelayCall('MY_GKPDoodad__OnOpenDoodad_2',  300, D.CloseLootWindow)
+			X.DelayCall('MY_GKPDoodad__OnOpenDoodad_3', 1000, D.CloseLootWindow)
 		end
 		-- 从列表删除
 		D.Remove(dwID)
@@ -669,7 +640,7 @@ function D.OnOpenDoodad(dwID)
 	if doodad and (info.eRuleType ~= 'loot' or D.IsCustomDoodad(doodad) or D.IsRecentDoodad(doodad)) then
 		D.TryAdd(dwID)
 	end
-	LIB.Debug(_L['MY_GKPDoodad'], 'OnOpenDoodad [' .. LIB.GetObjectName(TARGET.DOODAD, dwID, 'always') .. ']', DEBUG_LEVEL.LOG)
+	X.Debug(_L['MY_GKPDoodad'], 'OnOpenDoodad [' .. X.GetObjectName(TARGET.DOODAD, dwID, 'always') .. ']', X.DEBUG_LEVEL.LOG)
 end
 
 -- save manual doodad
@@ -707,7 +678,7 @@ function D.UpdateMiniFlag()
 			elseif info.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM then -- 神农类
 				nF1 = 2
 			end
-			LIB.UpdateMiniFlag(dwType, doodad, nF1, nF2)
+			X.UpdateMiniFlag(dwType, doodad, nF1, nF2)
 		end
 	end
 end
@@ -740,24 +711,24 @@ end
 ---------------------------------------------------------------------
 -- 注册事件、初始化
 ---------------------------------------------------------------------
-LIB.RegisterEvent('LOADING_ENDING', function()
+X.RegisterEvent('LOADING_ENDING', function()
 	D.tLooted = {}
 	D.CheckShowName()
 end)
-LIB.RegisterEvent('DOODAD_ENTER_SCENE', function()
+X.RegisterEvent('DOODAD_ENTER_SCENE', function()
 	if not D.bReady then
 		return
 	end
 	D.TryAdd(arg0, true)
 end)
-LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function()
+X.RegisterEvent('DOODAD_LEAVE_SCENE', function()
 	if not D.bReady then
 		return
 	end
 	D.Remove(arg0)
 end)
-LIB.RegisterEvent('OPEN_DOODAD', D.OnLootDoodad)
-LIB.RegisterEvent('HELP_EVENT', function()
+X.RegisterEvent('OPEN_DOODAD', D.OnLootDoodad)
+X.RegisterEvent('HELP_EVENT', function()
 	if arg0 == 'OnOpenpanel' and arg1 == 'LOOT' and O.bOpenLoot then
 		local dwOpenDoodadID =  D.dwOpenDoodadID
 		if dwOpenDoodadID then
@@ -766,18 +737,18 @@ LIB.RegisterEvent('HELP_EVENT', function()
 		end
 	end
 end)
-LIB.RegisterEvent('QUEST_ACCEPTED', function()
+X.RegisterEvent('QUEST_ACCEPTED', function()
 	if D.bReady and O.bQuestDoodad then
 		D.RescanNearby()
 	end
 end)
-LIB.RegisterEvent('SYS_MSG', function()
+X.RegisterEvent('SYS_MSG', function()
 	if arg0 == 'UI_OME_CRAFT_RESPOND' and arg1 == CRAFT_RESULT_CODE.SUCCESS
 	and D.bReady and (O.bReadInscriptionDoodad or O.bUnreadInscriptionDoodad) then
 		D.RescanNearby()
 	end
 end)
-LIB.RegisterEvent('DO_PICK_PREPARE_PROGRESS', function()
+X.RegisterEvent('DO_PICK_PREPARE_PROGRESS', function()
     local nTotalFrame, dwDoodadID = arg0, arg1
 	if nTotalFrame == 0 then
 		return
@@ -787,25 +758,25 @@ LIB.RegisterEvent('DO_PICK_PREPARE_PROGRESS', function()
 		D.OnPickPrepare(doodad, GetLogicFrameCount() + nTotalFrame)
 	end
 end)
-LIB.RegisterEvent('OT_ACTION_PROGRESS_BREAK', function()
+X.RegisterEvent('OT_ACTION_PROGRESS_BREAK', function()
     local dwID = arg0
 	if dwID == UI_GetClientPlayerID() then
 		D.OnPickPrepareStop(false)
 	end
 end)
-LIB.RegisterInit('MY_GKPDoodad__BC', function()
-	LIB.BreatheCall('MY_GKPDoodad', D.OnBreatheCall)
+X.RegisterInit('MY_GKPDoodad__BC', function()
+	X.BreatheCall('MY_GKPDoodad', D.OnBreatheCall)
 end)
-LIB.RegisterExit('MY_GKPDoodad__BC', function()
-	LIB.BreatheCall('MY_GKPDoodad', false)
+X.RegisterExit('MY_GKPDoodad__BC', function()
+	X.BreatheCall('MY_GKPDoodad', false)
 end)
-LIB.RegisterEvent('MY_RESTRICTION', function()
+X.RegisterEvent('MY_RESTRICTION', function()
 	D.CheckShowName()
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_GKPDoodad', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_GKPDoodad', function()
 	for _, dwID in ipairs(D.aCraft) do
 		if dwID ~= 0 then
-			if not IsBoolean(O.tCraft[dwID]) then
+			if not X.IsBoolean(O.tCraft[dwID]) then
 				O.tCraft[dwID] = true
 			end
 		end
@@ -813,7 +784,7 @@ LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_GKPDoodad', function()
 	D.RescanNearby()
 	D.bReady = true
 end)
-LIB.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_GKPDoodad', function()
+X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_GKPDoodad', function()
 	D.bReady = false
 end)
 
@@ -862,7 +833,7 @@ function PS.OnPanelActive(frame)
 	nX, nY, nLFY = MY_GKPLoot.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLineHeightM, nX, nY, nLFY)
 
 	-- doodad
-	if not LIB.IsRestricted('MY_GKPDoodad.HeadName') then
+	if not X.IsRestricted('MY_GKPDoodad.HeadName') then
 		nX, nY = nPaddingX, nY + nLineHeightL
 		ui:Append('Text', { text = _L['Craft assit'], x = nX, y = nY, font = 27 })
 
@@ -927,7 +898,7 @@ function PS.OnPanelActive(frame)
 			autoenable = function() return O.bShowName end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
-		if not LIB.IsRestricted('MY_GKPDoodad.AutoInteract') then
+		if not X.IsRestricted('MY_GKPDoodad.AutoInteract') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX, y = nY,
 				text = _L['Auto craft'],
@@ -952,7 +923,7 @@ function PS.OnPanelActive(frame)
 		end
 
 		--[[#DEBUG BEGIN]]
-		if LIB.IsDebugClient() then
+		if X.IsDebugClient() then
 			nX = ui:Append('WndCheckBox', {
 				x = nX, y = nY,
 				text = _L['Debug'],
@@ -1132,7 +1103,7 @@ function PS.OnPanelActive(frame)
 				D.ReloadCustom()
 			end,
 			tip = function()
-				if LIB.IsRestricted('MY_GKPDoodad.AutoInteract') then
+				if X.IsRestricted('MY_GKPDoodad.AutoInteract') then
 					return
 				end
 				return _L['Tip: Enter the name of dead animals can be automatically Paoding!']
@@ -1142,7 +1113,7 @@ function PS.OnPanelActive(frame)
 		})
 	end
 end
-LIB.RegisterPanel(_L['General'], 'MY_GKPDoodad', _L['MY_GKPLoot'], 90, PS)
+X.RegisterPanel(_L['General'], 'MY_GKPDoodad', _L['MY_GKPLoot'], 90, PS)
 
 -- Global exports
 do
@@ -1165,5 +1136,5 @@ local settings = {
 		},
 	},
 }
-MY_GKPDoodad = LIB.CreateModule(settings)
+MY_GKPDoodad = X.CreateModule(settings)
 end

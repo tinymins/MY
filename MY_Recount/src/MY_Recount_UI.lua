@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -83,8 +54,8 @@ local RANK_FRAME  = {
 	169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182,
 	183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193
 }
-local FORCE_BAR_CSS = LIB.LoadLUAData({'config/recount/barcss.jx3dat', PATH_TYPE.GLOBAL}, { passphrase = false }) or {
-	LIB.KvpToObject({
+local FORCE_BAR_CSS = X.LoadLUAData({'config/recount/barcss.jx3dat', X.PATH_TYPE.GLOBAL}, { passphrase = false }) or {
+	X.KvpToObject({
 		{-1                           , { r = 255, g = 255, b = 255, a = 150 }}, -- NPC
 		{CONSTANT.FORCE_TYPE.JIANG_HU , { r = 255, g = 255, b = 255, a = 255 }}, -- 江湖
 		{CONSTANT.FORCE_TYPE.SHAO_LIN , { r = 210, g = 180, b = 0  , a = 144 }}, -- 少林
@@ -102,7 +73,7 @@ local FORCE_BAR_CSS = LIB.LoadLUAData({'config/recount/barcss.jx3dat', PATH_TYPE
 		{CONSTANT.FORCE_TYPE.BA_DAO   , { r = 71 , g = 73 , b = 166, a = 128 }}, -- 霸刀
 		{CONSTANT.FORCE_TYPE.PENG_LAI , { r = 195, g = 171, b = 227, a = 250 }}, -- 蓬莱
 	}),
-	LIB.KvpToObject({
+	X.KvpToObject({
 		{-1                           , { r = 255, g = 255, b = 255, a = 150 }}, -- NPC
 		{CONSTANT.FORCE_TYPE.JIANG_HU , { r = 255, g = 255, b = 255, a = 255 }}, -- 江湖
 		{CONSTANT.FORCE_TYPE.SHAO_LIN , { r = 210, g = 180, b = 0  , a = 144 }}, -- 少林
@@ -120,7 +91,7 @@ local FORCE_BAR_CSS = LIB.LoadLUAData({'config/recount/barcss.jx3dat', PATH_TYPE
 		{CONSTANT.FORCE_TYPE.BA_DAO   , { r = 71 , g = 73 , b = 166, a = 128 }}, -- 霸刀
 		{CONSTANT.FORCE_TYPE.PENG_LAI , { r = 195, g = 171, b = 227, a = 250 }}, -- 蓬莱
 	}),
-	LIB.KvpToObject({
+	X.KvpToObject({
 		{-1                           , { image = 'ui/Image/Common/Money.UITex', frame = 215 }}, -- NPC
 		{CONSTANT.FORCE_TYPE.JIANG_HU , { image = 'ui/Image/Common/Money.UITex', frame = 210 }}, -- 大侠
 		{CONSTANT.FORCE_TYPE.SHAO_LIN , { image = 'ui/Image/Common/Money.UITex', frame = 203 }}, -- 少林
@@ -138,7 +109,7 @@ local FORCE_BAR_CSS = LIB.LoadLUAData({'config/recount/barcss.jx3dat', PATH_TYPE
 		{CONSTANT.FORCE_TYPE.BA_DAO   , { image = 'ui/Image/Common/Money.UITex', frame = 35  }}, -- 霸刀
 		{CONSTANT.FORCE_TYPE.PENG_LAI , { image = 'ui/Image/Common/Money.UITex', frame = 42  }}, -- 蓬莱
 	}),
-	LIB.KvpToObject({
+	X.KvpToObject({
 		{-1                           , { image = 'ui/Image/Common/Money.UITex', frame = 220 }}, -- NPC
 		{CONSTANT.FORCE_TYPE.JIANG_HU , { image = 'ui/Image/Common/Money.UITex', frame = 220 }}, -- 大侠
 		{CONSTANT.FORCE_TYPE.SHAO_LIN , { image = 'ui/Image/Common/Money.UITex', frame = 216 }}, -- 少林
@@ -157,97 +128,97 @@ local FORCE_BAR_CSS = LIB.LoadLUAData({'config/recount/barcss.jx3dat', PATH_TYPE
 		{CONSTANT.FORCE_TYPE.PENG_LAI , { image = 'ui/Image/Common/Money.UITex', frame = 42  }}, -- 蓬莱
 	}),
 }
-insert(FORCE_BAR_CSS, { [-1] = { r = 255, g = 255, b = 255 } }) -- GLOBAL
+table.insert(FORCE_BAR_CSS, { [-1] = { r = 255, g = 255, b = 255 } }) -- GLOBAL
 
-local O = LIB.CreateUserSettingsModule('MY_Recount_UI', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_Recount_UI', _L['Raid'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	anchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = 0, y = -70, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
 	},
 	nCss = { -- 当前样式表
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nChannel = { -- 当前显示的统计模式
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = STAT_TYPE.DPS,
 	},
 	bAwayMode = { -- 计算DPS时是否减去暂离时间
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSysTimeMode = { -- 使用官方战斗统计计时方式
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bGroupSameNpc = { -- 是否合并同名NPC数据
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bGroupSameEffect = { -- 是否合并同名效果
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bHideAnonymous = { -- 隐藏没名字的数据
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowPerSec = { -- 显示为每秒数据（反之显示总和）
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowEffect = { -- 显示有效伤害/治疗
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowZeroVal = { -- 显示零值记录
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nDisplayMode = { -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = DISPLAY_MODE.BOTH,
 	},
 	nDrawInterval = { -- UI重绘周期（帧）
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = GLOBAL.GAME_FPS / 2,
 	},
 	bShowNodataTeammate = { -- 显示没有数据的队友
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 })
@@ -257,15 +228,15 @@ local D = {}
 do
 local function onForceColorUpdate()
 	local tCss = FORCE_BAR_CSS[1]
-	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
-		local r, g, b = LIB.GetForceColor(dwForceID, 'background')
+	for _, dwForceID in X.pairs_c(CONSTANT.FORCE_TYPE) do
+		local r, g, b = X.GetForceColor(dwForceID, 'background')
 		tCss[dwForceID] = { r = r, g = g, b = b, a = 255 }
 	end
-	local r, g, b = LIB.GetForceColor(-1, 'background')
+	local r, g, b = X.GetForceColor(-1, 'background')
 	tCss[-1] = { r = r, g = g, b = b, a = 255 }
 	FireUIEvent('MY_RECOUNT_CSS_UPDATE')
 end
-LIB.RegisterEvent('MY_FORCE_COLOR_UPDATE', onForceColorUpdate)
+X.RegisterEvent('MY_FORCE_COLOR_UPDATE', onForceColorUpdate)
 end
 
 function D.Open()
@@ -319,9 +290,9 @@ function D.UpdateUI(frame)
 	-- 计算战斗时间
 	local eTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
 	local nTimeCount = MY_Recount_DS.GeneFightTime(data, eTimeChannel)
-	local szTimeCount = LIB.FormatTimeCounter(nTimeCount, '%M:%ss')
-	if LIB.IsInArena() then
-		szTimeCount = LIB.GetFightTime('M:ss')
+	local szTimeCount = X.FormatTimeCounter(nTimeCount, '%M:%ss')
+	if X.IsInArena() then
+		szTimeCount = X.GetFightTime('M:ss')
 	end
 	-- 自己的记录
 	local tMyRec
@@ -352,30 +323,30 @@ function D.UpdateUI(frame)
 					dwForceID    = MY_Recount_DS.GetForceAusID(data, dwID) ,
 					nValue       = rec[DK_REC_STAT.TOTAL] or 0             ,
 					nEffectValue = rec[DK_REC_STAT.TOTAL_EFFECT] or 0      ,
-					nTimeCount   = max( -- 计算战斗时间 防止计算DPS时除以0
+					nTimeCount   = math.max( -- 计算战斗时间 防止计算DPS时除以0
 						MY_Recount_UI.bAwayMode
 							and MY_Recount_DS.GeneFightTime(data, eTimeChannel, dwID) -- 删去死亡时间
 							or nTimeCount,
 						1), -- 不删去暂离时间
 				}
 				tResult[id] = tRec
-				insert(aResult, tRec)
+				table.insert(aResult, tRec)
 			end
 		end
 	end
 	-- 全程没数据的队友
-	if LIB.IsInParty() and MY_Recount_UI.bShowNodataTeammate then
+	if X.IsInParty() and MY_Recount_UI.bShowNodataTeammate then
 		local list = GetClientTeam().GetTeamMemberList()
 		for _, dwID in ipairs(list) do
 			local info = GetClientTeam().GetMemberInfo(dwID)
 			if not tResult[dwID] then
-				insert(aResult, {
+				table.insert(aResult, {
 					id             = dwID              ,
 					szName         = info.szName       ,
 					dwForceID      = info.dwForceID    ,
 					nValue         = 0                 ,
 					nEffectValue   = 0                 ,
-					nTimeCount     = max(nTimeCount, 1),
+					nTimeCount     = math.max(nTimeCount, 1),
 				})
 				tResult[dwID] = aResult
 			end
@@ -387,9 +358,9 @@ function D.UpdateUI(frame)
 		if MY_Recount_UI.bShowPerSec then -- 计算平均值
 			tRec.nValuePS       = tRec.nValue / tRec.nTimeCount
 			tRec.nEffectValuePS = tRec.nEffectValue / tRec.nTimeCount
-			nMaxValue = max(nMaxValue, tRec.nValuePS, tRec.nEffectValuePS)
+			nMaxValue = math.max(nMaxValue, tRec.nValuePS, tRec.nEffectValuePS)
 		else
-			nMaxValue = max(nMaxValue, tRec.nValue, tRec.nEffectValue)
+			nMaxValue = math.max(nMaxValue, tRec.nValue, tRec.nEffectValue)
 		end
 	end
 
@@ -402,7 +373,7 @@ function D.UpdateUI(frame)
 	elseif MY_Recount_UI.bShowPerSec then
 		szSortKey = 'nValuePS'
 	end
-	sort(aResult, function(p1, p2)
+	table.sort(aResult, function(p1, p2)
 		return p1[szSortKey] > p2[szSortKey]
 	end)
 
@@ -481,13 +452,13 @@ function D.UpdateUI(frame)
 		-- 数值显示
 		if MY_Recount_UI.bShowEffect then
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_R'):SetText(floor(p.nEffectValue / p.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_R'):SetText(math.floor(p.nEffectValue / p.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_R'):SetText(p.nEffectValue)
 			end
 		else
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_R'):SetText(floor(p.nValue / p.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_R'):SetText(math.floor(p.nValue / p.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_R'):SetText(p.nValue)
 			end
@@ -503,7 +474,7 @@ function D.UpdateUI(frame)
 	-- 初始化颜色
 	if not hItem.bInited then
 		hItem.OnItemRefreshTip = D.OnItemRefreshTip
-		local dwForceID = (LIB.GetClientInfo() or {}).dwForceID
+		local dwForceID = (X.GetClientInfo() or {}).dwForceID
 		if dwForceID then
 			local css = FORCE_BAR_CSS[O.nCss][dwForceID] or {}
 			if css.image and css.frame then -- uitex, frame
@@ -553,13 +524,13 @@ function D.UpdateUI(frame)
 		-- 右侧文字
 		if MY_Recount_UI.bShowEffect then
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_Me_R'):SetText(floor(tMyRec.nEffectValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nEffectValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_Me_R'):SetText(tMyRec.nEffectValue)
 			end
 		else
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_Me_R'):SetText(floor(tMyRec.nValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_Me_R'):SetText(tMyRec.nValue)
 			end
@@ -619,7 +590,7 @@ function D.OnFrameBreathe()
 	this.nLastRedrawFrame = GetLogicFrameCount()
 
 	-- 查看历史、不进战时不需要刷新UI
-	if select(2, MY_Recount.GetDisplayData()) or not LIB.GetFightUUID() then
+	if select(2, MY_Recount.GetDisplayData()) or not X.GetFightUUID() then
 		return
 	end
 	D.UpdateUI(this)
@@ -668,14 +639,14 @@ function D.OnItemRefreshTip()
 			local t = {}
 			for szEffectID, p in pairs(tRec[DK_REC_STAT.SKILL]) do
 				local szName = MY_Recount_DS.GetEffectNameAusID(DataDisplay, szChannel, szEffectID) or szEffectID
-				insert(t, {
+				table.insert(t, {
 					szEffectID = szEffectID,
 					szName = szName,
 					rec = p,
-					bAnonymous = IsEmpty(szName) or szName:sub(1, 1) == '#',
+					bAnonymous = X.IsEmpty(szName) or szName:sub(1, 1) == '#',
 				})
 			end
-			sort(t, function(p1, p2)
+			table.sort(t, function(p1, p2)
 				return p1.rec[DK_REC_STAT_SKILL.TOTAL] > p2.rec[DK_REC_STAT_SKILL.TOTAL]
 			end)
 			for _, p in ipairs(t) do
@@ -698,7 +669,7 @@ function D.OnItemRefreshTip()
 						SKILL_RESULT.CRITICAL,
 						SKILL_RESULT.MISS    ,
 					}) do
-						if IsTable(nSkillResult) then
+						if X.IsTable(nSkillResult) then
 							for i, v in ipairs(nSkillResult) do
 								if p.rec[DK_REC_STAT_SKILL.DETAIL][v] or i == #nSkillResult then
 									nSkillResult = v
@@ -713,7 +684,7 @@ function D.OnItemRefreshTip()
 								or p.rec[DK_REC_STAT_SKILL.DETAIL][nSkillResult][DK_REC_STAT_SKILL_DETAIL.COUNT]
 						end
 						szXml = szXml .. GetFormatText(SKILL_RESULT_NAME[nSkillResult] .. szColon, nil, 255, 202, 126)
-						szXml = szXml .. GetFormatText(format('%2d', nCount) .. ' ')
+						szXml = szXml .. GetFormatText(string.format('%2d', nCount) .. ' ')
 					end
 					szXml = szXml .. GetFormatText('\n')
 				end
@@ -783,7 +754,7 @@ function D.OnCheckBoxUncheck()
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Recount_UI', D.CheckOpen)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Recount_UI', D.CheckOpen)
 
 -- Global exports
 do
@@ -859,5 +830,5 @@ local settings = {
 		},
 	},
 }
-MY_Recount_UI = LIB.CreateModule(settings)
+MY_Recount_UI = X.CreateModule(settings)
 end

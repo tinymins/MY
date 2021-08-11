@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -73,7 +44,7 @@ local PAGE_SIZE = 300
 local PAGE_DISPLAY = 19
 
 local function GeneCommonFormatText(szType, nIndex)
-	local tIndex = IsTable(szType)
+	local tIndex = X.IsTable(szType)
 		and szType
 		or {[szType] = nIndex}
 	return function(r)
@@ -85,7 +56,7 @@ local function GeneCommonFormatText(szType, nIndex)
 	end
 end
 local function GeneCommonCompare(szType, nIndex)
-	local tIndex = IsTable(szType)
+	local tIndex = X.IsTable(szType)
 		and szType
 		or {[szType] = nIndex}
 	return function(r1, r2)
@@ -176,14 +147,14 @@ local COLUMN_LIST = {
 			end
 			if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 				local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
-				if IsEmpty(szName) or bAnonymous then
+				if X.IsEmpty(szName) or bAnonymous then
 					szName = rec[8] .. ',' .. rec[9]
 				end
 				return GetFormatText(szName)
 			end
 			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
 				local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[9])
-				if IsEmpty(szName) or bAnonymous then
+				if X.IsEmpty(szName) or bAnonymous then
 					szName = rec[7] .. ',' .. rec[8]
 				end
 				return GetFormatText(szName)
@@ -333,18 +304,18 @@ local COLUMN_LIST = {
 							rec[13]
 								and 'Remain time %s, cancellable.'
 								or 'Remain time %s, uncancellable.',
-							LIB.FormatTimeCounter((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 2, 2)))
+							X.FormatTimeCounter((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 2, 2)))
 					end
 					return GetFormatText(_L(
 						rec[13]
 							and 'Stacknum %d, remain time %s, cancellable.'
 							or 'Stacknum %d, remain time %s, uncancellable.',
-						rec[11], LIB.FormatTimeCounter((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 2, 2)))
+						rec[11], X.FormatTimeCounter((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 2, 2)))
 				end
 			end
 			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then
 				return GetFormatText(
-					'[' .. (rec[8] or LIB.GetObjectName(rec[6], rec[7])) .. ']'
+					'[' .. (rec[8] or X.GetObjectName(rec[6], rec[7])) .. ']'
 					.. _L.TARGET[rec[6]]
 					.. (rec[5] == 1 and _L['Appear'] or _L['Disappear'])
 					.. _L['.'])
@@ -430,16 +401,16 @@ function D.MatchRecSearch(data, rec, szSearch, nSearch, bEffectName, bCaster, bT
 		or (szSearch == _L['Warning'] and rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE)
 		or (szSearch == _L['Fight hint'] and rec[4] == EVERYTHING_TYPE.FIGHT_HINT)
 		or (rec[4] == EVERYTHING_TYPE.DEATH and (
-			wfind(rec[7] or '', szSearch)
-			or wfind(rec[8] or '', szSearch)
+			wstring.find(rec[7] or '', szSearch)
+			or wstring.find(rec[8] or '', szSearch)
 		))
 		or (rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and (
 			nSearch == rec[8]
 			or (bCaster and nSearch == rec[5])
-			or (bCaster and wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch))
+			or (bCaster and wstring.find(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch))
 			or (bTarget and nSearch == rec[6])
-			or (bTarget and wfind(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch))
-			or (bEffectName and wfind(MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or '', szSearch))
+			or (bTarget and wstring.find(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch))
+			or (bEffectName and wstring.find(MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or '', szSearch))
 			or (bEffectName and szSearch == MY_Recount.SKILL_RESULT_NAME[rec[11]])
 			or (szSearch == _L['Therapy'] and rec[12] > 0)
 			or (szSearch == _L['EffectTherapy'] and rec[13] > 0)
@@ -449,23 +420,23 @@ function D.MatchRecSearch(data, rec, szSearch, nSearch, bEffectName, bCaster, bT
 		or (rec[4] == EVERYTHING_TYPE.BUFF_UPDATE and (
 			nSearch == rec[7]
 			or (bCaster and nSearch == rec[5])
-			or (bCaster and wfind(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch))
+			or (bCaster and wstring.find(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch))
 			or (bTarget and nSearch == rec[6])
-			or (bTarget and wfind(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch))
-			or (bEffectName and wfind(MY_Recount_DS.GetEffectInfoAusID(data, rec[9]) or '', szSearch))
+			or (bTarget and wstring.find(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch))
+			or (bEffectName and wstring.find(MY_Recount_DS.GetEffectInfoAusID(data, rec[9]) or '', szSearch))
 		))
 		or (rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE and (
 			nSearch == rec[7]
-			or wfind(rec[8] or '', szSearch))
+			or wstring.find(rec[8] or '', szSearch))
 		)
-		or (rec[4] == EVERYTHING_TYPE.PLAYER_SAY and wfind(rec[6] or '', szSearch))
+		or (rec[4] == EVERYTHING_TYPE.PLAYER_SAY and wstring.find(rec[6] or '', szSearch))
 		or ((rec[4] == EVERYTHING_TYPE.SYS_MSG
 				or rec[4] == EVERYTHING_TYPE.PLAYER_SAY
 				or rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE)
-			and wfind(rec[5], szSearch))
+			and wstring.find(rec[5], szSearch))
 		or (rec[4] == EVERYTHING_TYPE.FIGHT_HINT and (
 			nSearch == rec[6]
-			or wfind(rec[8], szSearch)
+			or wstring.find(rec[8], szSearch)
 		))
 	) then
 		return true
@@ -475,7 +446,7 @@ end
 
 -- 根据搜索和配置过滤生成显示列表
 function D.UpdateData(frame)
-	local aSearch = LIB.SplitString(frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText(), ' ', true)
+	local aSearch = X.SplitString(frame:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText(), ' ', true)
 	local bEffectName = frame:Lookup('Wnd_Total/WndCheckBox_EffectName'):IsCheckBoxChecked()
 	local bCaster = frame:Lookup('Wnd_Total/WndCheckBox_Caster'):IsCheckBoxChecked()
 	local bTarget = frame:Lookup('Wnd_Total/WndCheckBox_Target'):IsCheckBoxChecked()
@@ -483,7 +454,7 @@ function D.UpdateData(frame)
 	for i, v in ipairs(aSearch) do
 		aSearch[i] = { v, tonumber(v) }
 	end
-	if IsEmpty(aSearch) then
+	if X.IsEmpty(aSearch) then
 		aSearch = nil
 	end
 	local data, aRec = frame.data, {}
@@ -507,7 +478,7 @@ function D.UpdateData(frame)
 			if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE and select(2, MY_Recount_DS.GetEffectInfoAusID(data, rec[9])) then
 				bMatch = false
 			end
-			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE and IsEmpty(rec[8]) then
+			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE and X.IsEmpty(rec[8]) then
 				bMatch = false
 			end
 		end
@@ -530,7 +501,7 @@ function D.UpdateData(frame)
 			end
 		end
 		if bMatch then
-			insert(aRec, rec)
+			table.insert(aRec, rec)
 		end
 	end
 	local szSortKey, szSortOrder = frame.szSortKey, frame.szSortOrder
@@ -547,7 +518,7 @@ function D.UpdateData(frame)
 		end
 	end
 	if Sorter then
-		sort(aRec, Sorter)
+		table.sort(aRec, Sorter)
 	end
 	frame.disp = aRec
 end
@@ -594,7 +565,7 @@ function D.DrawData(frame)
 	end
 	hList:FormatAllItemPos()
 
-	local nPageCount = ceil(#aRec / PAGE_SIZE)
+	local nPageCount = math.ceil(#aRec / PAGE_SIZE)
 	local hOuter = frame:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexesOuter')
 	local handle = hOuter:Lookup('Handle_Indexes')
 	if nPageCount <= PAGE_DISPLAY then
@@ -619,12 +590,12 @@ function D.DrawData(frame)
 		hItem:Show()
 
 		local nStartPage
-		if nPage + ceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
+		if nPage + math.ceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
 			nStartPage = nPageCount - (PAGE_DISPLAY - 2)
-		elseif nPage - ceil((PAGE_DISPLAY - 2) / 2) < 2 then
+		elseif nPage - math.ceil((PAGE_DISPLAY - 2) / 2) < 2 then
 			nStartPage = 2
 		else
-			nStartPage = nPage - ceil((PAGE_DISPLAY - 2) / 2)
+			nStartPage = nPage - math.ceil((PAGE_DISPLAY - 2) / 2)
 		end
 		for i = 1, PAGE_DISPLAY - 2 do
 			local hItem = handle:Lookup(i)
@@ -651,55 +622,55 @@ function D.OutputTip(this, rec)
 	local aXml = {}
 	local data = this:GetRoot().data
 	-- 时间
-	insert(aXml, GetFormatText(_L['Time']))
-	insert(aXml, GetFormatText(':  '))
-	insert(aXml, GetFormatText(LIB.FormatTime(rec[2], '%yyyy/%MM/%dd %hh:%mm:%ss')))
-	insert(aXml, GetFormatText('\n'))
+	table.insert(aXml, GetFormatText(_L['Time']))
+	table.insert(aXml, GetFormatText(':  '))
+	table.insert(aXml, GetFormatText(X.FormatTime(rec[2], '%yyyy/%MM/%dd %hh:%mm:%ss')))
+	table.insert(aXml, GetFormatText('\n'))
 	-- 逻辑帧
-	insert(aXml, GetFormatText(_L['Framecount']))
-	insert(aXml, GetFormatText(':  '))
-	insert(aXml, GetFormatText(rec[1]))
-	insert(aXml, GetFormatText('\n'))
+	table.insert(aXml, GetFormatText(_L['Framecount']))
+	table.insert(aXml, GetFormatText(':  '))
+	table.insert(aXml, GetFormatText(rec[1]))
+	table.insert(aXml, GetFormatText('\n'))
 	-- 毫秒时间
-	insert(aXml, GetFormatText(_L['Tick']))
-	insert(aXml, GetFormatText(':  '))
-	insert(aXml, GetFormatText(rec[3]))
-	insert(aXml, GetFormatText('\n'))
+	table.insert(aXml, GetFormatText(_L['Tick']))
+	table.insert(aXml, GetFormatText(':  '))
+	table.insert(aXml, GetFormatText(rec[3]))
+	table.insert(aXml, GetFormatText('\n'))
 	-- 事件
 	local col = COLUMN_DICT['type']
-	insert(aXml, GetFormatText(col.szTitle))
-	insert(aXml, GetFormatText(':  '))
-	insert(aXml, col.GetFormatText(rec))
-	insert(aXml, GetFormatText('\n'))
+	table.insert(aXml, GetFormatText(col.szTitle))
+	table.insert(aXml, GetFormatText(':  '))
+	table.insert(aXml, col.GetFormatText(rec))
+	table.insert(aXml, GetFormatText('\n'))
 	if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 		-- 名称
 		local col = COLUMN_DICT['effectname']
 		local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
-		if IsEmpty(szName) or bAnonymous then
+		if X.IsEmpty(szName) or bAnonymous then
 			szName = rec[8] .. ',' .. rec[9]
 		else
 			szName = szName .. ' (' .. rec[8] .. ',' .. rec[9] .. ')'
 		end
-		insert(aXml, GetFormatText(col.szTitle))
-		insert(aXml, GetFormatText(':  '))
-		insert(aXml, GetFormatText(szName))
-		insert(aXml, GetFormatText('\n'))
+		table.insert(aXml, GetFormatText(col.szTitle))
+		table.insert(aXml, GetFormatText(':  '))
+		table.insert(aXml, GetFormatText(szName))
+		table.insert(aXml, GetFormatText('\n'))
 		-- 释放者
 		local col = COLUMN_DICT['caster']
 		local dwID = rec[5]
 		local szName = MY_Recount_DS.GetNameAusID(data, rec[5])
-		insert(aXml, GetFormatText(col.szTitle))
-		insert(aXml, GetFormatText(':  '))
-		insert(aXml, GetFormatText(szName and (szName .. ' (' .. dwID .. ')') or dwID))
-		insert(aXml, GetFormatText('\n'))
+		table.insert(aXml, GetFormatText(col.szTitle))
+		table.insert(aXml, GetFormatText(':  '))
+		table.insert(aXml, GetFormatText(szName and (szName .. ' (' .. dwID .. ')') or dwID))
+		table.insert(aXml, GetFormatText('\n'))
 		-- 目标
 		local col = COLUMN_DICT['target']
 		local dwID = rec[6]
 		local szName = MY_Recount_DS.GetNameAusID(data, rec[6])
-		insert(aXml, GetFormatText(col.szTitle))
-		insert(aXml, GetFormatText(':  '))
-		insert(aXml, GetFormatText(szName and (szName .. ' (' .. dwID .. ')') or dwID))
-		insert(aXml, GetFormatText('\n'))
+		table.insert(aXml, GetFormatText(col.szTitle))
+		table.insert(aXml, GetFormatText(':  '))
+		table.insert(aXml, GetFormatText(szName and (szName .. ' (' .. dwID .. ')') or dwID))
+		table.insert(aXml, GetFormatText('\n'))
 		-- 数值们
 		for _, id in ipairs({
 			'skillresult',
@@ -709,94 +680,94 @@ function D.OutputTip(this, rec)
 			'effectdamage',
 		}) do
 			local col = COLUMN_DICT[id]
-			insert(aXml, GetFormatText(col.szTitle))
-			insert(aXml, GetFormatText(':  '))
-			insert(aXml, col.GetFormatText(rec))
-			insert(aXml, GetFormatText('\n'))
+			table.insert(aXml, GetFormatText(col.szTitle))
+			table.insert(aXml, GetFormatText(':  '))
+			table.insert(aXml, col.GetFormatText(rec))
+			table.insert(aXml, GetFormatText('\n'))
 		end
 	end
 	if rec[4] == EVERYTHING_TYPE.BUFF_UPDATE then
 		-- 名称
 		local col = COLUMN_DICT['effectname']
 		local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[9])
-		if IsEmpty(szName) or bAnonymous then
+		if X.IsEmpty(szName) or bAnonymous then
 			szName = rec[7] .. ',' .. rec[8]
 		else
 			szName = szName .. ' (' .. rec[7] .. ',' .. rec[8] .. ')'
 		end
-		insert(aXml, GetFormatText(col.szTitle))
-		insert(aXml, GetFormatText(':  '))
-		insert(aXml, GetFormatText(szName))
-		insert(aXml, GetFormatText('\n'))
+		table.insert(aXml, GetFormatText(col.szTitle))
+		table.insert(aXml, GetFormatText(':  '))
+		table.insert(aXml, GetFormatText(szName))
+		table.insert(aXml, GetFormatText('\n'))
 		-- 释放者
 		local col = COLUMN_DICT['caster']
 		local dwID = rec[5]
 		local szName = MY_Recount_DS.GetNameAusID(data, rec[5])
-		insert(aXml, GetFormatText(col.szTitle))
-		insert(aXml, GetFormatText(':  '))
-		insert(aXml, GetFormatText(szName and (szName .. ' (' .. dwID .. ')') or dwID))
-		insert(aXml, GetFormatText('\n'))
+		table.insert(aXml, GetFormatText(col.szTitle))
+		table.insert(aXml, GetFormatText(':  '))
+		table.insert(aXml, GetFormatText(szName and (szName .. ' (' .. dwID .. ')') or dwID))
+		table.insert(aXml, GetFormatText('\n'))
 		-- 目标
 		local col = COLUMN_DICT['target']
 		local dwID = rec[6]
 		local szName = MY_Recount_DS.GetNameAusID(data, rec[6])
-		insert(aXml, GetFormatText(col.szTitle))
-		insert(aXml, GetFormatText(':  '))
-		insert(aXml, GetFormatText(szName and (szName .. ' (' .. dwID .. ')') or dwID))
-		insert(aXml, GetFormatText('\n'))
+		table.insert(aXml, GetFormatText(col.szTitle))
+		table.insert(aXml, GetFormatText(':  '))
+		table.insert(aXml, GetFormatText(szName and (szName .. ' (' .. dwID .. ')') or dwID))
+		table.insert(aXml, GetFormatText('\n'))
 	end
 	if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then
 		-- 模板ID
 		if rec[6] == TARGET.NPC or rec[6] == TARGET.DOODAD then
-			insert(aXml, GetFormatText(_L['TemplateID']))
-			insert(aXml, GetFormatText(':  '))
-			insert(aXml, GetFormatText(rec[9]))
-			insert(aXml, GetFormatText('\n'))
+			table.insert(aXml, GetFormatText(_L['TemplateID']))
+			table.insert(aXml, GetFormatText(':  '))
+			table.insert(aXml, GetFormatText(rec[9]))
+			table.insert(aXml, GetFormatText('\n'))
 		end
 		-- 血量
-		insert(aXml, GetFormatText(_L['Life']))
-		insert(aXml, GetFormatText(':  '))
-		insert(aXml, GetFormatText(rec[10] .. '/' .. rec[11]))
-		insert(aXml, GetFormatText('\n'))
+		table.insert(aXml, GetFormatText(_L['Life']))
+		table.insert(aXml, GetFormatText(':  '))
+		table.insert(aXml, GetFormatText(rec[10] .. '/' .. rec[11]))
+		table.insert(aXml, GetFormatText('\n'))
 		-- 内力
-		insert(aXml, GetFormatText(_L['Mana']))
-		insert(aXml, GetFormatText(':  '))
-		insert(aXml, GetFormatText(rec[12] .. '/' .. rec[13]))
-		insert(aXml, GetFormatText('\n'))
+		table.insert(aXml, GetFormatText(_L['Mana']))
+		table.insert(aXml, GetFormatText(':  '))
+		table.insert(aXml, GetFormatText(rec[12] .. '/' .. rec[13]))
+		table.insert(aXml, GetFormatText('\n'))
 	end
 	if rec[4] == EVERYTHING_TYPE.FIGHT_HINT then
 		-- 模板ID
 		if rec[5] == TARGET.NPC then
-			insert(aXml, GetFormatText(_L['TemplateID']))
-			insert(aXml, GetFormatText(':  '))
-			insert(aXml, GetFormatText(rec[9]))
-			insert(aXml, GetFormatText('\n'))
+			table.insert(aXml, GetFormatText(_L['TemplateID']))
+			table.insert(aXml, GetFormatText(':  '))
+			table.insert(aXml, GetFormatText(rec[9]))
+			table.insert(aXml, GetFormatText('\n'))
 		end
 		-- 血量
-		insert(aXml, GetFormatText(_L['Life']))
-		insert(aXml, GetFormatText(':  '))
-		insert(aXml, GetFormatText(rec[10] .. '/' .. rec[11]))
-		insert(aXml, GetFormatText('\n'))
+		table.insert(aXml, GetFormatText(_L['Life']))
+		table.insert(aXml, GetFormatText(':  '))
+		table.insert(aXml, GetFormatText(rec[10] .. '/' .. rec[11]))
+		table.insert(aXml, GetFormatText('\n'))
 		-- 内力
-		insert(aXml, GetFormatText(_L['Mana']))
-		insert(aXml, GetFormatText(':  '))
-		insert(aXml, GetFormatText(rec[12] .. '/' .. rec[13]))
-		insert(aXml, GetFormatText('\n'))
+		table.insert(aXml, GetFormatText(_L['Mana']))
+		table.insert(aXml, GetFormatText(':  '))
+		table.insert(aXml, GetFormatText(rec[12] .. '/' .. rec[13]))
+		table.insert(aXml, GetFormatText('\n'))
 	end
 	-- 描述
 	local col = COLUMN_DICT['description']
-	insert(aXml, GetFormatText(col.szTitle))
-	insert(aXml, GetFormatText(':  '))
-	insert(aXml, col.GetFormatText(rec))
-	insert(aXml, GetFormatText('\n'))
+	table.insert(aXml, GetFormatText(col.szTitle))
+	table.insert(aXml, GetFormatText(':  '))
+	table.insert(aXml, col.GetFormatText(rec))
+	table.insert(aXml, GetFormatText('\n'))
 
 	if IsCtrlKeyDown() then
-		insert(aXml, GetFormatText(EncodeLUAData(rec, '  ')))
+		table.insert(aXml, GetFormatText(X.EncodeLUAData(rec, '  ')))
 	end
 
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
 end
 
 function D.PopupRowMenu(frame, rec)
@@ -809,11 +780,11 @@ function D.PopupRowMenu(frame, rec)
 		[PLAYER_TALK_CHANNEL.TEAM] = 'MSG_PARTY',
 		[PLAYER_TALK_CHANNEL.TONG] = 'MSG_GUILD',
 	}) do
-		insert(t, {
+		table.insert(t, {
 			szOption = g_tStrings.tChannelName[szChannel],
 			rgb = GetMsgFontColor(szChannel, true),
 			fnAction = function()
-				local szText = LIB.FormatTime(rec[2], '[%hh:%mm:%ss] ')
+				local szText = X.FormatTime(rec[2], '[%hh:%mm:%ss] ')
 				if rec[4] == EVERYTHING_TYPE.FIGHT_TIME then
 					if rec[5] then
 						szText = szText .. _L('Fighting for %ds.', rec[7] / 1000)
@@ -844,7 +815,7 @@ function D.PopupRowMenu(frame, rec)
 					end
 				elseif rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 					local szName, bAnonymous = MY_Recount_DS.GetEffectInfoAusID(data, rec[10])
-					if IsEmpty(szName) or bAnonymous then
+					if X.IsEmpty(szName) or bAnonymous then
 						szName = rec[8] .. ',' .. rec[9]
 					end
 					local szCaster = MY_Recount_DS.GetNameAusID(data, rec[5]) or rec[5]
@@ -887,11 +858,11 @@ function D.PopupRowMenu(frame, rec)
 				else
 					szText = szText .. '-'
 				end
-				LIB.SendChat(nChannel, szText)
+				X.SendChat(nChannel, szText)
 			end,
 		})
 	end
-	insert(menu, t)
+	table.insert(menu, t)
 	-- 搜索
 	local dwCaster, szCaster, dwTarget, szTarget
 	if rec[4] == EVERYTHING_TYPE.DEATH then
@@ -903,7 +874,7 @@ function D.PopupRowMenu(frame, rec)
 		szTarget = MY_Recount_DS.GetNameAusID(data, rec[6]) or rec[6]
 	end
 	if dwCaster then
-		insert(menu, {
+		table.insert(menu, {
 			szOption = _L('Search for %s', szCaster),
 			fnAction = function()
 				D.SetSearch(frame, dwCaster)
@@ -911,7 +882,7 @@ function D.PopupRowMenu(frame, rec)
 		})
 	end
 	if dwTarget then
-		insert(menu, {
+		table.insert(menu, {
 			szOption = _L('Search for %s', szTarget),
 			fnAction = function()
 				D.SetSearch(frame, dwTarget)
@@ -920,7 +891,7 @@ function D.PopupRowMenu(frame, rec)
 	end
 	if rec[4] == EVERYTHING_TYPE.SKILL_EFFECT then
 		local szName = MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or rec[10]
-		insert(menu, {
+		table.insert(menu, {
 			szOption = _L('Search for %s', szName),
 			fnAction = function()
 				D.SetSearch(frame, szName)

@@ -10,48 +10,19 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
 local PLUGIN_NAME = 'MY_TargetMon'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetMon'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -157,9 +128,9 @@ local function DrawDetail(ui)
 		list:ListBox('clear')
 		for i, mon in ipairs(l_config.monitors) do
 			if not l_search or l_search == ''
-			or (mon.name and wfind(mon.name, l_search))
-			or (mon.longAlias and wfind(mon.longAlias, l_search))
-			or (mon.shortAlias and wfind(mon.shortAlias, l_search)) then
+			or (mon.name and wstring.find(mon.name, l_search))
+			or (mon.longAlias and wstring.find(mon.longAlias, l_search))
+			or (mon.shortAlias and wstring.find(mon.shortAlias, l_search)) then
 				list:ListBox('insert', {
 					text = mon.name or mon.id,
 					id = mon,
@@ -171,7 +142,7 @@ local function DrawDetail(ui)
 
 	local function InsertMonitor(index)
 		GetUserInput(_L['Please input name/id:'], function(szVal)
-			szVal = (gsub(szVal, '^%s*(.-)%s*$', '%1'))
+			szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 			if szVal ~= '' then
 				local mon = D.CreateMonitor(l_config, szVal)
 				local id = tonumber(szVal)
@@ -235,7 +206,7 @@ local function DrawDetail(ui)
 				szOption = _L['Insert'],
 				fnAction = function()
 					local index = #l_config.monitors
-					for i, m in ipairs_r(l_config.monitors) do
+					for i, m in X.ipairs_r(l_config.monitors) do
 						if m == mon then
 							index = i
 						end
@@ -249,7 +220,7 @@ local function DrawDetail(ui)
 				szOption = _L['Move up'],
 				fnAction = function()
 					local index = #l_config.monitors
-					for i, m in ipairs_r(l_config.monitors) do
+					for i, m in X.ipairs_r(l_config.monitors) do
 						if m == mon then
 							index = i
 						end
@@ -266,7 +237,7 @@ local function DrawDetail(ui)
 				szOption = _L['Move down'],
 				fnAction = function()
 					local index = #l_config.monitors
-					for i, m in ipairs_r(l_config.monitors) do
+					for i, m in X.ipairs_r(l_config.monitors) do
 						if m == mon then
 							index = i
 						end
@@ -283,7 +254,7 @@ local function DrawDetail(ui)
 				szOption = _L['Rename'],
 				fnAction = function()
 					GetUserInput(_L['Please input name/id:'], function(szVal)
-						szVal = (gsub(szVal, '^%s*(.-)%s*$', '%1'))
+						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 						if szVal ~= '' then
 							list:ListBox(
 								'update',
@@ -308,7 +279,7 @@ local function DrawDetail(ui)
 				szOption = _L('Long alias: %s', mon.longAlias or _L['Not set']),
 				fnAction = function()
 					GetUserInput(_L['Please input long alias:'], function(szVal)
-						szVal = (gsub(szVal, '^%s*(.-)%s*$', '%1'))
+						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 						if szVal == '' then
 							szVal = nil
 						end
@@ -325,7 +296,7 @@ local function DrawDetail(ui)
 				szOption = _L('Short alias: %s', mon.shortAlias or _L['Not set']),
 				fnAction = function()
 					GetUserInput(_L['Please input short alias:'], function(szVal)
-						szVal = (gsub(szVal, '^%s*(.-)%s*$', '%1'))
+						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 						if szVal == '' then
 							szVal = nil
 						end
@@ -346,27 +317,27 @@ local function DrawDetail(ui)
 				szOption = _L['All kungfus'],
 				rgb = {255, 255, 0},
 				bCheck = true,
-				bChecked = mon.kungfus.all or IsEmpty(mon.kungfus),
+				bChecked = mon.kungfus.all or X.IsEmpty(mon.kungfus),
 				fnAction = function(_, bChecked)
 					D.ModifyMonitor(mon, 'kungfus.all', bChecked)
 				end,
 			},
 		}
-		for _, dwForceID in ipairs(LIB.GetForceIDS()) do
-			for i, dwKungfuID in ipairs(LIB.GetForceKungfuIDS(dwForceID) or {}) do
-				insert(t2, {
-					szOption = LIB.GetSkillName(dwKungfuID, 1),
-					rgb = {LIB.GetForceColor(dwForceID, 'foreground')},
+		for _, dwForceID in ipairs(X.GetForceIDS()) do
+			for i, dwKungfuID in ipairs(X.GetForceKungfuIDS(dwForceID) or {}) do
+				table.insert(t2, {
+					szOption = X.GetSkillName(dwKungfuID, 1),
+					rgb = {X.GetForceColor(dwForceID, 'foreground')},
 					bCheck = true,
 					bChecked = mon.kungfus[dwKungfuID],
 					fnAction = function()
 						D.ModifyMonitor(mon, {'kungfus', dwKungfuID}, not mon.kungfus[dwKungfuID])
 					end,
-					fnDisable = function() return mon.kungfus.all or IsEmpty(mon.kungfus) end,
+					fnDisable = function() return mon.kungfus.all or X.IsEmpty(mon.kungfus) end,
 				})
 			end
 		end
-		insert(t1, t2)
+		table.insert(t1, t2)
 		-- 目标心法
 		local t2 = {
 			szOption = _L['Target kungfu'],
@@ -374,7 +345,7 @@ local function DrawDetail(ui)
 				szOption = _L['All kungfus'],
 				rgb = {255, 255, 0},
 				bCheck = true,
-				bChecked = mon.tarkungfus.all or IsEmpty(mon.tarkungfus),
+				bChecked = mon.tarkungfus.all or X.IsEmpty(mon.tarkungfus),
 				fnAction = function(_, bChecked)
 					D.ModifyMonitor(mon, 'tarkungfus.all', bChecked)
 				end,
@@ -387,43 +358,43 @@ local function DrawDetail(ui)
 				fnAction = function()
 					D.ModifyMonitor(mon, 'tarkungfus.npc', not mon.tarkungfus.npc)
 				end,
-				fnDisable = function() return mon.tarkungfus.all or IsEmpty(mon.tarkungfus) end,
+				fnDisable = function() return mon.tarkungfus.all or X.IsEmpty(mon.tarkungfus) end,
 			},
 		}
-		for _, dwForceID in ipairs(LIB.GetForceIDS()) do
-			for i, dwKungfuID in ipairs(LIB.GetForceKungfuIDS(dwForceID) or {}) do
-				insert(t2, {
-					szOption = LIB.GetSkillName(dwKungfuID, 1),
-					rgb = {LIB.GetForceColor(dwForceID, 'foreground')},
+		for _, dwForceID in ipairs(X.GetForceIDS()) do
+			for i, dwKungfuID in ipairs(X.GetForceKungfuIDS(dwForceID) or {}) do
+				table.insert(t2, {
+					szOption = X.GetSkillName(dwKungfuID, 1),
+					rgb = {X.GetForceColor(dwForceID, 'foreground')},
 					bCheck = true,
 					bChecked = mon.tarkungfus[dwKungfuID],
 					fnAction = function()
 						D.ModifyMonitor(mon, {'tarkungfus', dwKungfuID}, not mon.tarkungfus[dwKungfuID])
 					end,
-					fnDisable = function() return mon.tarkungfus.all or IsEmpty(mon.tarkungfus) end,
+					fnDisable = function() return mon.tarkungfus.all or X.IsEmpty(mon.tarkungfus) end,
 				})
 			end
 		end
-		insert(t1, t2)
+		table.insert(t1, t2)
 		-- 地图要求
-		local t2 = LIB.GetDungeonMenu(function(p)
+		local t2 = X.GetDungeonMenu(function(p)
 			D.ModifyMonitor(mon, {'maps', p.dwID}, not mon.maps[p.dwID])
 		end, false, mon.maps)
 		for i, p in ipairs(t2) do
-			p.fnDisable = function() return mon.maps.all or IsEmpty(mon.maps) end
+			p.fnDisable = function() return mon.maps.all or X.IsEmpty(mon.maps) end
 		end
 		t2.szOption = _L['Map filter']
-		insert(t2, 1, {
+		table.insert(t2, 1, {
 			szOption = _L['All maps'],
 			bCheck = true,
-			bChecked = mon.maps.all or IsEmpty(mon.maps),
+			bChecked = mon.maps.all or X.IsEmpty(mon.maps),
 			fnAction = function(_, bChecked)
 				D.ModifyMonitor(mon, 'maps.all', bChecked)
 			end,
 		})
-		insert(t1, t2)
+		table.insert(t1, t2)
 		-- 隐藏消失的
-		insert(t1, {
+		table.insert(t1, {
 			szOption = l_config.hideVoid and _L['Show even void'] or _L['Hide if void'],
 			bCheck = true,
 			bChecked = mon.rHideVoid,
@@ -433,7 +404,7 @@ local function DrawDetail(ui)
 		})
 		-- 隐藏他人的
 		if l_config.type == 'BUFF' then
-			insert(t1, {
+			table.insert(t1, {
 				szOption = l_config.hideOthers and _L['Show even others'] or _L['Hide if others'],
 				bCheck = true,
 				bChecked = mon.rHideOthers,
@@ -443,35 +414,35 @@ local function DrawDetail(ui)
 			})
 		end
 		-- 出现声音
-		local t2 = LIB.GetSoundMenu(function(dwID, bCheck)
+		local t2 = X.GetSoundMenu(function(dwID, bCheck)
 			if not bCheck then
-				for i, v in ipairs_r(mon.soundAppear) do
+				for i, v in X.ipairs_r(mon.soundAppear) do
 					if v == dwID then
-						remove(mon.soundAppear, i)
+						table.remove(mon.soundAppear, i)
 					end
 				end
 			else
-				insert(mon.soundAppear, dwID)
+				table.insert(mon.soundAppear, dwID)
 			end
 			D.ModifyMonitor(mon, 'soundAppear', mon.soundAppear)
-		end, LIB.ArrayToObject(mon.soundAppear), true)
+		end, X.ArrayToObject(mon.soundAppear), true)
 		t2.szOption = _L['Play sound when appear']
-		insert(t1, t2)
+		table.insert(t1, t2)
 		-- 消失声音
-		local t2 = LIB.GetSoundMenu(function(dwID, bCheck)
+		local t2 = X.GetSoundMenu(function(dwID, bCheck)
 			if not bCheck then
-				for i, v in ipairs_r(mon.soundDisappear) do
+				for i, v in X.ipairs_r(mon.soundDisappear) do
 					if v == dwID then
-						remove(mon.soundDisappear, i)
+						table.remove(mon.soundDisappear, i)
 					end
 				end
 			else
-				insert(mon.soundDisappear, dwID)
+				table.insert(mon.soundDisappear, dwID)
 			end
 			D.ModifyMonitor(mon, 'soundDisappear', mon.soundDisappear)
-		end, LIB.ArrayToObject(mon.soundDisappear), true)
+		end, X.ArrayToObject(mon.soundDisappear), true)
 		t2.szOption = _L['Play sound when disappear']
-		insert(t1, t2)
+		table.insert(t1, t2)
 		-- 显示特效框
 		local t2 = { szOption = _L['Active extent animate'] }
 		for _, p in ipairs(CUSTOM_BOX_EXTENT_ANIMATE) do
@@ -489,14 +460,14 @@ local function DrawDetail(ui)
 			if p[1] then
 				t3.szIcon, t3.nFrame = unpack(p[1]:split('|'))
 			end
-			insert(t2, t3)
+			table.insert(t2, t3)
 		end
-		insert(t1, t2)
+		table.insert(t1, t2)
 		-- ID设置
-		if not IsEmpty(mon.ids) then
-			insert(t1, { bDevide = true })
-			insert(t1, { szOption = _L['Ids'], bDisable = true })
-			insert(t1, {
+		if not X.IsEmpty(mon.ids) then
+			table.insert(t1, { bDevide = true })
+			table.insert(t1, { szOption = _L['Ids'], bDisable = true })
+			table.insert(t1, {
 				szOption = _L['All ids'],
 				bCheck = true,
 				bChecked = mon.ignoreId,
@@ -541,10 +512,10 @@ local function DrawDetail(ui)
 						UI.ClosePopupMenu()
 					end,
 				}
-				if not IsEmpty(info.levels) then
-					insert(t2, { szOption = _L['Levels'], bDisable = true })
-					insert(t2, CONSTANT.MENU_DIVIDER)
-					insert(t2, {
+				if not X.IsEmpty(info.levels) then
+					table.insert(t2, { szOption = _L['Levels'], bDisable = true })
+					table.insert(t2, CONSTANT.MENU_DIVIDER)
+					table.insert(t2, {
 						szOption = _L['All levels'],
 						bCheck = true,
 						bChecked = info.ignoreLevel,
@@ -568,7 +539,7 @@ local function DrawDetail(ui)
 					})
 					local tLevels = {}
 					for nLevel, infoLevel in pairs(info.levels) do
-						insert(tLevels, {
+						table.insert(tLevels, {
 							nLevel, {
 								szOption = nLevel,
 								bCheck = true,
@@ -593,17 +564,17 @@ local function DrawDetail(ui)
 							}
 						})
 					end
-					sort(tLevels, function(a, b) return a[1] < b[1] end)
+					table.sort(tLevels, function(a, b) return a[1] < b[1] end)
 					for _, p in ipairs(tLevels) do
-						insert(t2, p[2])
+						table.insert(t2, p[2])
 					end
-					insert(t2, CONSTANT.MENU_DIVIDER)
+					table.insert(t2, CONSTANT.MENU_DIVIDER)
 				end
-				insert(t2, {
+				table.insert(t2, {
 					szOption = _L['Manual add level'],
 					fnAction = function()
 						GetUserInput(_L['Please input level:'], function(szVal)
-							local nLevel = tonumber(gsub(szVal, '^%s*(.-)%s*$', '%1'), 10)
+							local nLevel = tonumber(string.gsub(szVal, '^%s*(.-)%s*$', '%1'), 10)
 							if nLevel then
 								if info.levels[nLevel] then
 									return
@@ -620,29 +591,29 @@ local function DrawDetail(ui)
 						end, function() end, function() end, nil, nil)
 					end,
 				})
-				insert(t2, {
+				table.insert(t2, {
 					szOption = _L['Delete'],
 					fnAction = function()
 						D.DeleteMonitorId(mon, dwID)
 						UI.ClosePopupMenu()
 					end,
 				})
-				insert(t1, t2)
+				table.insert(t1, t2)
 			end
 		end
-		insert(t1, { bDevide = true })
-		insert(t1, {
+		table.insert(t1, { bDevide = true })
+		table.insert(t1, {
 			szOption = _L['Auto capture by name'],
 			bCheck = true, bChecked = mon.capture,
 			fnAction = function()
 				D.ModifyMonitor(mon, 'capture', not mon.capture)
 			end,
 		})
-		insert(t1, {
+		table.insert(t1, {
 			szOption = _L['Manual add id'],
 			fnAction = function()
 				GetUserInput(_L['Please input id:'], function(szVal)
-					local dwID = tonumber(gsub(szVal, '^%s*(.-)%s*$', '%1'), 10)
+					local dwID = tonumber(string.gsub(szVal, '^%s*(.-)%s*$', '%1'), 10)
 					if dwID then
 						if mon.ids[dwID] then
 							return
@@ -719,7 +690,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		buttonstyle = 'FLAT',
 		onclick = function()
 			D.MoveConfig(config, -1)
-			LIB.SwitchTab('MY_TargetMon', true)
+			X.SwitchTab('MY_TargetMon', true)
 		end,
 	})
 	uiWnd:Append('WndButton', {
@@ -729,7 +700,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		buttonstyle = 'FLAT',
 		onclick = function()
 			D.MoveConfig(config, 1)
-			LIB.SwitchTab('MY_TargetMon', true)
+			X.SwitchTab('MY_TargetMon', true)
 		end,
 	})
 	uiWnd:Append('WndButton', {
@@ -739,7 +710,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		buttonstyle = 'FLAT',
 		onclick = function()
 			D.DeleteConfig(config, IsCtrlKeyDown())
-			LIB.SwitchTab('MY_TargetMon', true)
+			X.SwitchTab('MY_TargetMon', true)
 		end,
 		tip = config.embedded and _L['Press ctrl to delete embedded data permanently.'] or nil,
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
@@ -911,7 +882,7 @@ local function DrawPreview(ui, config, OpenDetail)
 				if p[1] == config.boxBgUITex then
 					subt.rgb = {255, 255, 0}
 				end
-				insert(t, subt)
+				table.insert(t, subt)
 			end
 			return t
 		end,
@@ -937,7 +908,7 @@ local function DrawPreview(ui, config, OpenDetail)
 				if text == config.cdBarUITex then
 					subt.rgb = {255, 255, 0}
 				end
-				insert(t, subt)
+				table.insert(t, subt)
 			end
 			return t
 		end,
@@ -954,7 +925,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		menu = function()
 			local t = {}
 			for _, eType in ipairs(D.GetTargetTypeList()) do
-				insert(t, {
+				table.insert(t, {
 					szOption = _L.TARGET[eType],
 					bCheck = true, bMCheck = true,
 					bChecked = eType == (config.type == 'SKILL' and 'CONTROL_PLAYER' or config.target),
@@ -966,9 +937,9 @@ local function DrawPreview(ui, config, OpenDetail)
 					end,
 				})
 			end
-			insert(t, { bDevide = true })
+			table.insert(t, { bDevide = true })
 			for _, eType in ipairs({'BUFF', 'SKILL'}) do
-				insert(t, {
+				table.insert(t, {
 					szOption = _L.TYPE[eType],
 					bCheck = true, bMCheck = true, bChecked = eType == config.type,
 					fnAction = function()
@@ -976,9 +947,9 @@ local function DrawPreview(ui, config, OpenDetail)
 					end,
 				})
 			end
-			insert(t, { bDevide = true })
+			table.insert(t, { bDevide = true })
 			for _, eType in ipairs({'LEFT', 'RIGHT', 'CENTER'}) do
-				insert(t, {
+				table.insert(t, {
 					szOption = _L.ALIGNMENT[eType],
 					bCheck = true, bMCheck = true, bChecked = eType == config.alignment,
 					fnAction = function()
@@ -1115,7 +1086,7 @@ local function DrawControls(ui, OpenDetail)
 			local file = GetOpenFileName(
 				_L['Please select import target monitor data file.'],
 				'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
-				LIB.FormatPath({ 'export/TargetMon', PATH_TYPE.GLOBAL })
+				X.FormatPath({ 'export/TargetMon', X.PATH_TYPE.GLOBAL })
 			)
 			if file == '' then
 				return
@@ -1124,13 +1095,13 @@ local function DrawControls(ui, OpenDetail)
 			local szTip
 			if nImportCount then
 				if nImportCount > 0 then
-					LIB.SwitchTab('MY_TargetMon', true)
+					X.SwitchTab('MY_TargetMon', true)
 				end
 				szTip = _L('Import successed, %d imported and %d replaced.', nImportCount, nReplaceCount)
 			else
 				szTip = _L['Import failed, cannot decode file.']
 			end
-			LIB.Sysmsg(szTip)
+			X.Sysmsg(szTip)
 			OutputMessage('MSG_ANNOUNCE_YELLOW', szTip)
 		end,
 	})
@@ -1148,42 +1119,42 @@ local function DrawControls(ui, OpenDetail)
 			local bAsEmbedded = IsAltKeyDown()
 			local szIndent = not bAsEmbedded and IsCtrlKeyDown() and '\t' or nil
 			for _, config in ipairs(D.GetConfigList(bAsEmbedded)) do
-				insert(menu, {
+				table.insert(menu, {
 					bCheck = true,
 					szOption = D.GetConfigCaption(config),
 					fnAction = function()
-						for i, uuid in ipairs_r(aUUID) do
+						for i, uuid in X.ipairs_r(aUUID) do
 							if uuid == config.uuid then
-								remove(aUUID, i)
+								table.remove(aUUID, i)
 								return
 							end
 						end
-						insert(aUUID, config.uuid)
+						table.insert(aUUID, config.uuid)
 					end,
 				})
 			end
 			if #menu > 0 then
-				insert(menu, CONSTANT.MENU_DIVIDER)
+				table.insert(menu, CONSTANT.MENU_DIVIDER)
 			end
-			insert(menu, {
+			table.insert(menu, {
 				szOption = bAsEmbedded
 					and _L['Ensure export (as embedded)']
 					or (szIndent and _L['Ensure export (with indent)'] or _L['Ensure export']),
 				fnAction = function()
 					if GLOBAL.GAME_PROVIDER == 'remote' then
-						return LIB.Alert(_L['Streaming client does not support export!'])
+						return X.Alert(_L['Streaming client does not support export!'])
 					end
-					local file = LIB.FormatPath({
+					local file = X.FormatPath({
 						'export/TargetMon/'
 							.. (bAsEmbedded and 'embedded/' or '')
 							.. '{$name}@{$server}@'
-							.. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss')
+							.. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss')
 							.. (bAsEmbedded and '.{$lang}' or '')
 							.. '.jx3dat',
-						PATH_TYPE.GLOBAL,
+						X.PATH_TYPE.GLOBAL,
 					})
 					D.ExportPatchFile(file, aUUID, szIndent, bAsEmbedded)
-					LIB.Sysmsg(_L('Data exported, file saved at %s.', file))
+					X.Sysmsg(_L('Data exported, file saved at %s.', file))
 					OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Data exported, file saved at %s.', file))
 				end,
 				fnDisable = function()
@@ -1200,7 +1171,7 @@ local function DrawControls(ui, OpenDetail)
 		text = _L['Save As Default'],
 		buttonstyle = 'FLAT',
 		onclick = function()
-			LIB.Confirm(_L['Sure to save as default?'], function()
+			X.Confirm(_L['Sure to save as default?'], function()
 				D.SaveConfig(true)
 			end)
 		end,
@@ -1212,19 +1183,19 @@ local function DrawControls(ui, OpenDetail)
 		text = _L['Reset Default'],
 		buttonstyle = 'FLAT',
 		onclick = function()
-			LIB.Dialog(_L['Sure to reset default?'], {
+			X.Dialog(_L['Sure to reset default?'], {
 				{
 					szOption = _L['Origin config'],
 					fnAction = function()
 						D.LoadConfig(true, true)
-						LIB.SwitchTab('MY_TargetMon', true)
+						X.SwitchTab('MY_TargetMon', true)
 					end,
 				},
 				{
 					szOption = _L['Default config'],
 					fnAction = function()
 						D.LoadConfig(true, false)
-						LIB.SwitchTab('MY_TargetMon', true)
+						X.SwitchTab('MY_TargetMon', true)
 					end,
 				},
 				{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
@@ -1254,4 +1225,4 @@ end
 function PS.OnPanelScroll(wnd, scrollX, scrollY)
 	wnd:Lookup('WndWindow_Wrapper'):SetRelPos(scrollX, scrollY)
 end
-LIB.RegisterPanel(_L['Target'], 'MY_TargetMon', _L['Target monitor'], 'ui/Image/ChannelsPanel/NewChannels.UITex|141', PS)
+X.RegisterPanel(_L['Target'], 'MY_TargetMon', _L['Target monitor'], 'ui/Image/ChannelsPanel/NewChannels.UITex|141', PS)

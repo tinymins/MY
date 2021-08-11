@@ -10,128 +10,99 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_ThreatRank'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ThreatRank'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_ThreatRank', _L['Target'], {
+local O = X.CreateUserSettingsModule('MY_ThreatRank', _L['Target'], {
 	bEnable = { -- 开启
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bInDungeon = { -- 只有秘境内才开启
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nBGAlpha = { -- 背景透明度
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},
 	nMaxBarCount = { -- 最大列表
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 7,
 	},
 	bForceColor = { -- 根据门派着色
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bForceIcon = { -- 显示门派图标 团队时显示心法
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nOTAlertLevel = { -- OT提醒
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	bOTAlertSound = { -- OT 播放声音
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSpecialSelf = { -- 特殊颜色显示自己
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bTopTarget = { -- 置顶当前目标
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowPercent = { -- 是否为显示百分比模式
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	tAnchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'TOPRIGHT', r = 'TOPRIGHT', x = -300, y = 300 },
 	},
 	nStyle = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 })
@@ -142,15 +113,15 @@ local GetPlayer, GetNpc, IsPlayer, ApplyCharacterThreatRankList = GetPlayer, Get
 local GetClientPlayer, GetClientTeam = GetClientPlayer, GetClientTeam
 local UI_GetClientPlayerID, GetTime = UI_GetClientPlayerID, GetTime
 local HATRED_COLLECT = g_tStrings.HATRED_COLLECT
-local MY_GetObjName, MY_GetForceColor = LIB.GetObjectName, LIB.GetForceColor
-local MY_GetBuff, MY_GetBuffName, MY_GetEndTime = LIB.GetBuff, LIB.GetBuffName, LIB.GetEndTime
+local MY_GetObjName, MY_GetForceColor = X.GetObjectName, X.GetForceColor
+local MY_GetBuff, MY_GetBuffName, MY_GetEndTime = X.GetBuff, X.GetBuffName, X.GetEndTime
 local GetNpcIntensity = GetNpcIntensity
 local GetTime = GetTime
 
-local TS_INIFILE = PACKET_INFO.ROOT .. 'MY_ThreatRank/ui/MY_ThreatRank.ini'
+local TS_INIFILE = X.PACKET_INFO.ROOT .. 'MY_ThreatRank/ui/MY_ThreatRank.ini'
 
 local _TS = {
-	tStyle = LoadLUAData(PACKET_INFO.ROOT .. 'MY_ThreatRank/data/style.jx3dat'),
+	tStyle = LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_ThreatRank/data/style.jx3dat'),
 }
 local function IsEnabled() return O.bEnable end
 
@@ -160,7 +131,7 @@ function TS.OnFrameCreate()
 	this:RegisterEvent('TARGET_CHANGE')
 	this:RegisterEvent('FIGHT_HINT')
 	this:RegisterEvent('LOADING_END')
-	this.hItemData      = this:CreateItemData(PACKET_INFO.ROOT .. 'MY_ThreatRank/ui/Handle_ThreatBar.ini', 'Handle_ThreatBar')
+	this.hItemData      = this:CreateItemData(X.PACKET_INFO.ROOT .. 'MY_ThreatRank/ui/Handle_ThreatBar.ini', 'Handle_ThreatBar')
 	this.dwTargetID     = 0
 	this.nTime          = 0
 	this.bSelfTreatRank = 0
@@ -220,19 +191,19 @@ function TS.OnFrameBreathe()
 	local p = GetNpc(this.dwTargetID)
 	if p then
 		ApplyCharacterThreatRankList(this.dwTargetID)
-		local nType, dwSkillID, dwSkillLevel, fCastPercent = LIB.GetOTActionState(p)
-		local fCurrentLife, fMaxLife = LIB.GetObjectLife(p)
+		local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(p)
+		local fCurrentLife, fMaxLife = X.GetObjectLife(p)
 		if nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 		or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
 		or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then
 			this.CastBar:Show()
 			this.CastBar:SetPercentage(fCastPercent)
-			local szName = LIB.GetSkillName(dwSkillID, dwSkillLevel)
+			local szName = X.GetSkillName(dwSkillID, dwSkillLevel)
 			this.txt:SetText(szName)
 		else
 			local lifeper = fCurrentLife / fMaxLife
 			this.CastBar:Hide()
-			this.txt:SetText(MY_GetObjName(p) .. format(' (%0.1f%%)', lifeper * 100))
+			this.txt:SetText(MY_GetObjName(p) .. string.format(' (%0.1f%%)', lifeper * 100))
 			this.Life:SetPercentage(lifeper)
 		end
 
@@ -249,7 +220,7 @@ function TS.OnFrameBreathe()
 		local szText = hText.szText or ''
 		if buff then
 			local szName = MY_GetBuffName(buff.dwID, buff.nLevel)
-			hText:SetText(format('%s (%ds)', szName, floor(MY_GetEndTime(buff.nEndFrame))) .. szText)
+			hText:SetText(string.format('%s (%ds)', szName, math.floor(MY_GetEndTime(buff.nEndFrame))) .. szText)
 			hText:SetFontColor(0, 255, 0)
 		else
 			hText:SetText(HATRED_COLLECT .. szText)
@@ -262,7 +233,7 @@ function TS.OnFrameBreathe()
 			local me = GetClientPlayer()
 			if not me.bFightState then return end
 			this.nTime = -1
-			LIB.DelayCall(1000, function()
+			X.DelayCall(1000, function()
 				if not me.IsInParty() then return end
 				if p and p.dwDropTargetPlayerID and p.dwDropTargetPlayerID ~= 0 then
 					if IsParty(me.dwID, p.dwDropTargetPlayerID) or me.dwID == p.dwDropTargetPlayerID then
@@ -272,7 +243,7 @@ function TS.OnFrameBreathe()
 						local name = MY_GetObjName(p)
 						local oContent = {_L('Well done! %s in %d group first to attack %s!!', nGroup, szMember, name), r = 150, g = 250, b = 230}
 						local oTitile = {g_tStrings.HATRED_COLLECT, r = 150, g = 250, b = 230}
-						LIB.Sysmsg(oTitile, oContent)
+						X.Sysmsg(oTitile, oContent)
 					end
 				end
 			end)
@@ -285,9 +256,9 @@ end
 function TS.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Setting' then
-		LIB.ShowPanel()
-		LIB.FocusPanel()
-		LIB.SwitchTab('MY_ThreatRank')
+		X.ShowPanel()
+		X.FocusPanel()
+		X.SwitchTab('MY_ThreatRank')
 	end
 end
 
@@ -326,7 +297,7 @@ end
 function _TS.CheckOpen()
 	if O.bEnable then
 		if O.bInDungeon then
-			if LIB.IsInDungeon() then
+			if X.IsInDungeon() then
 				_TS.OpenPanel()
 			else
 				_TS.ClosePanel()
@@ -395,16 +366,16 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 	end
 	-- 重构用于排序
 	for k, v in pairs(tList) do
-		insert(tThreat, { id = k, val = v })
+		table.insert(tThreat, { id = k, val = v })
 	end
-	sort(tThreat, function(a, b) return a.val > b.val end) -- 进行排序
+	table.sort(tThreat, function(a, b) return a.val > b.val end) -- 进行排序
 	for k, v in ipairs(tThreat) do
 		v.sort = k
 		if v.id == UI_GetClientPlayerID() then
 			tMyRank = v
 		end
 	end
-	this.bg:SetH(55 + 24 * min(#tThreat, O.nMaxBarCount))
+	this.bg:SetH(55 + 24 * math.min(#tThreat, O.nMaxBarCount))
 	this.handle:Clear()
 	local KGnpc = GetNpc(dwApplyID)
 	if #tThreat > 0 and KGnpc then
@@ -413,7 +384,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			if O.bTopTarget and tList[dwTargetID] then
 				for k, v in ipairs(tThreat) do
 					if v.id == dwTargetID then
-						insert(tThreat, 1, remove(tThreat, k))
+						table.insert(tThreat, 1, table.remove(tThreat, k))
 						break
 					end
 				end
@@ -433,7 +404,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			if UI_GetClientPlayerID() == v.id then
 				if O.nOTAlertLevel > 0 and GetNpcIntensity(KGnpc) > 2 then
 					if this.bSelfTreatRank < O.nOTAlertLevel and v.val / nTopRank >= O.nOTAlertLevel then
-						LIB.Topmsg(_L('** You Threat more than %d, 120% is Out of Taunt! **', O.nOTAlertLevel * 100))
+						X.Topmsg(_L('** You Threat more than %d, 120% is Out of Taunt! **', O.nOTAlertLevel * 100))
 						if O.bOTAlertSound then
 							PlaySound(SOUND.UI_SOUND, _L['SOUND_nat_view2'])
 						end
@@ -451,7 +422,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 				if v.val ~= 0 then
 					fDiff = v.val / nTopRank
 					nThreatPercentage = fDiff * (100 / 120)
-					item:Lookup('Text_ThreatValue'):SetText(floor(100 * fDiff) .. '%')
+					item:Lookup('Text_ThreatValue'):SetText(math.floor(100 * fDiff) .. '%')
 				else
 					item:Lookup('Text_ThreatValue'):SetText('0%')
 				end
@@ -491,14 +462,14 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			else
 				local p = GetNpc(v.id)
 				if p then
-					szName = LIB.GetObjectName(p)
+					szName = X.GetObjectName(p)
 				end
 			end
 			item:Lookup('Text_ThreatName'):SetText(v.sort .. '.' .. szName)
 			item:Lookup('Text_ThreatName'):SetFontScheme(dat[6][1])
 			item:Lookup('Text_ThreatName'):SetFontColor(r, g, b)
 			if O.bForceIcon then
-				local info = LIB.IsParty(v.id) and IsPlayer(v.id) and team.GetMemberInfo(v.id)
+				local info = X.IsParty(v.id) and IsPlayer(v.id) and team.GetMemberInfo(v.id)
 				if info then
 					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 				elseif IsPlayer(v.id) then
@@ -644,7 +615,7 @@ function PS.OnPanelActive(frame)
 		menu = function()
 			local t = {}
 			for k, v in ipairs(_TS.tStyle) do
-				insert(t, {
+				table.insert(t, {
 					szOption = _L('Style %d', k),
 					bMCheck = true,
 					bChecked = O.nStyle == k,
@@ -664,7 +635,7 @@ function PS.OnPanelActive(frame)
 		menu = function()
 			local t = {}
 			for k, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 50}) do -- 其实服务器最大反馈不到50个
-				insert(t, {
+				table.insert(t, {
 					szOption = v,
 					bMCheck = true,
 					bChecked = O.nMaxBarCount == v,
@@ -697,7 +668,7 @@ function PS.OnPanelActive(frame)
 		autoenable = IsEnabled,
 	})
 end
-LIB.RegisterPanel(_L['Target'], 'MY_ThreatRank', g_tStrings.HATRED_COLLECT, 632, PS)
+X.RegisterPanel(_L['Target'], 'MY_ThreatRank', g_tStrings.HATRED_COLLECT, 632, PS)
 
 do
 local function GetMenu()
@@ -715,10 +686,10 @@ local function GetMenu()
 		end
 	}
 end
-LIB.RegisterAddonMenu(GetMenu)
+X.RegisterAddonMenu(GetMenu)
 end
-LIB.RegisterEvent('LOADING_END', _TS.CheckOpen)
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ThreatRank', _TS.CheckOpen)
+X.RegisterEvent('LOADING_END', _TS.CheckOpen)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ThreatRank', _TS.CheckOpen)
 
 -- Global exports
 do
@@ -731,5 +702,5 @@ local settings = {
 		},
 	},
 }
-MY_ThreatRank = LIB.CreateModule(settings)
+MY_ThreatRank = X.CreateModule(settings)
 end

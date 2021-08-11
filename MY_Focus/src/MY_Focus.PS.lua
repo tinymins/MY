@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Focus'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Focus'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -59,7 +30,7 @@ local PS = { szRestriction = 'MY_Focus' }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w  = ui:Width()
-	local h  = max(ui:Height(), 440)
+	local h  = math.max(ui:Height(), 440)
 	local xr, yr, wr = w - 260, 5, 260
 	local xl, yl, wl = 5,  5, w - wr -15
 
@@ -114,7 +85,7 @@ function PS.OnPanelActive(wnd)
 		-- 匹配方式
 		local t1 = { szOption = _L['Judge method'] }
 		for _, eType in ipairs({ 'NAME', 'NAME_PATT', 'ID', 'TEMPLATE_ID', 'TONG_NAME', 'TONG_NAME_PATT' }) do
-			insert(t1, {
+			table.insert(t1, {
 				szOption = _L.JUDGE_METHOD[eType],
 				bCheck = true, bMCheck = true,
 				bChecked = tData.szMethod == eType,
@@ -124,7 +95,7 @@ function PS.OnPanelActive(wnd)
 				end,
 			})
 		end
-		insert(t, t1)
+		table.insert(t, t1)
 		-- 目标类型
 		local t1 = {
 			szOption = _L['Target type'], {
@@ -138,7 +109,7 @@ function PS.OnPanelActive(wnd)
 			}
 		}
 		for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
-			insert(t1, {
+			table.insert(t1, {
 				szOption = _L.TARGET[eType],
 				bCheck = true, bChecked = tData.tType[eType],
 				fnAction = function()
@@ -151,7 +122,7 @@ function PS.OnPanelActive(wnd)
 				end,
 			})
 		end
-		insert(t, t1)
+		table.insert(t, t1)
 		-- 目标关系
 		local t1 = {
 			szOption = _L['Target relation'], {
@@ -165,7 +136,7 @@ function PS.OnPanelActive(wnd)
 			}
 		}
 		for _, szRelation in ipairs({ 'Enemy', 'Ally' }) do
-			insert(t1, {
+			table.insert(t1, {
 				szOption = _L.RELATION[szRelation],
 				bCheck = true, bChecked = tData.tRelation['b' .. szRelation],
 				fnAction = function()
@@ -178,7 +149,7 @@ function PS.OnPanelActive(wnd)
 				end,
 			})
 		end
-		insert(t, t1)
+		table.insert(t, t1)
 		-- 目标血量百分比
 		local t1 = {
 			szOption = _L['Target life percentage'], {
@@ -188,7 +159,7 @@ function PS.OnPanelActive(wnd)
 					tData.tLife.bEnable = not tData.tLife.bEnable
 				end,
 			},
-			LIB.InsertOperatorMenu({
+			X.InsertOperatorMenu({
 				szOption = _L['Operator'],
 				fnDisable = function() return not tData.tLife.bEnable end,
 			}, tData.tLife.szOperator, function(op)
@@ -206,12 +177,12 @@ function PS.OnPanelActive(wnd)
 					GetUserInputNumber(tData.tLife.nValue, 100, nil, function(val)
 						tData.tLife.nValue = val
 						MY_Focus.SetFocusPattern(tData.szPattern, tData)
-					end, nil, function() return not LIB.IsPanelVisible() end)
+					end, nil, function() return not X.IsPanelVisible() end)
 				end,
 				fnDisable = function() return not tData.tLife.bEnable end,
 			},
 		}
-		insert(t, t1)
+		table.insert(t, t1)
 		-- 最远距离
 		local t1 = {
 			szOption = _L['Max distance'],
@@ -228,10 +199,10 @@ function PS.OnPanelActive(wnd)
 				GetUserInput(_L['Please input max distance, leave blank to disable:'], function(val)
 					tData.nMaxDistance = tonumber(val) or 0
 					MY_Focus.SetFocusPattern(tData.szPattern, tData)
-				end, nil, function() return not LIB.IsPanelVisible() end, nil, tData.nMaxDistance)
+				end, nil, function() return not X.IsPanelVisible() end, nil, tData.nMaxDistance)
 			end,
 		}
-		insert(t, t1)
+		table.insert(t, t1)
 		-- 名称显示
 		local t1 = {
 			szOption = _L['Name display'],
@@ -248,10 +219,10 @@ function PS.OnPanelActive(wnd)
 				GetUserInput(_L['Please input display name, leave blank to use its own name:'], function(val)
 					tData.szDisplay = val
 					MY_Focus.SetFocusPattern(tData.szPattern, tData)
-				end, nil, function() return not LIB.IsPanelVisible() end, nil, tData.szDisplay)
+				end, nil, function() return not X.IsPanelVisible() end, nil, tData.szDisplay)
 			end,
 		}
-		insert(t, t1)
+		table.insert(t, t1)
 		return t
 	end)
 	-- add
@@ -487,7 +458,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = x, y = y, w = wr, text = _L['Distance type'],
 		menu = function()
-			return LIB.GetDistanceTypeMenu(true, MY_Focus.szDistanceType, function(p)
+			return X.GetDistanceTypeMenu(true, MY_Focus.szDistanceType, function(p)
 				MY_Focus.szDistanceType = p.szType
 			end)
 		end,
@@ -536,4 +507,4 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 end
-LIB.RegisterPanel(_L['Target'], 'MY_Focus', _L['Focus list'], 'ui/Image/button/SystemButton_1.UITex|9', PS)
+X.RegisterPanel(_L['Target'], 'MY_Focus', _L['Focus list'], 'ui/Image/button/SystemButton_1.UITex|9', PS)

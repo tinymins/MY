@@ -10,105 +10,76 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MYDev_VarWatch'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_VarWatch'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 local _C = {}
-local DATA_PATH = {'config/dev_varwatch.jx3dat', PATH_TYPE.GLOBAL}
-_C.tVarList = LIB.LoadLUAData(DATA_PATH) or {}
+local DATA_PATH = {'config/dev_varwatch.jx3dat', X.PATH_TYPE.GLOBAL}
+_C.tVarList = X.LoadLUAData(DATA_PATH) or {}
 
 local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 	local function table_r(var, level, indent)
 		local t = {}
 		local szType = type(var)
 		if szType == 'nil' then
-			insert(t, 'nil')
+			table.insert(t, 'nil')
 		elseif szType == 'number' then
-			insert(t, tostring(var))
+			table.insert(t, tostring(var))
 		elseif szType == 'string' then
-			insert(t, format('%q', var))
+			table.insert(t, string.format('%q', var))
 		elseif szType == 'boolean' then
-			insert(t, tostring(var))
+			table.insert(t, tostring(var))
 		elseif szType == 'table' then
-			insert(t, '{')
+			table.insert(t, '{')
 			local s_tab_equ = ']='
 			if indent then
 				s_tab_equ = '] = '
-				if not IsEmpty(var) then
-					insert(t, '\n')
+				if not X.IsEmpty(var) then
+					table.insert(t, '\n')
 				end
 			end
 			for key, val in pairs(var) do
 				if indent then
-					insert(t, rep(indent, level + 1))
+					table.insert(t, string.rep(indent, level + 1))
 				end
-				insert(t, '[')
-				insert(t, tostring(key))
-				insert(t, s_tab_equ) --'] = '
-				insert(t, tostring(val))
-				insert(t, ',')
+				table.insert(t, '[')
+				table.insert(t, tostring(key))
+				table.insert(t, s_tab_equ) --'] = '
+				table.insert(t, tostring(val))
+				table.insert(t, ',')
 				if indent then
-					insert(t, '\n')
+					table.insert(t, '\n')
 				end
 			end
-			if indent and not IsEmpty(var) then
-				insert(t, rep(indent, level))
+			if indent and not X.IsEmpty(var) then
+				table.insert(t, string.rep(indent, level))
 			end
-			insert(t, '}')
+			table.insert(t, '}')
 		else --if (szType == 'userdata') then
-			insert(t, '"')
-			insert(t, tostring(var))
-			insert(t, '"')
+			table.insert(t, '"')
+			table.insert(t, tostring(var))
+			table.insert(t, '"')
 		end
-		return concat(t)
+		return table.concat(t)
 	end
 	return table_r(var, level or 0, indent)
 end
 
-LIB.RegisterPanel(_L['Development'], 'Dev_VarWatch', _L['VarWatch'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
+X.RegisterPanel(_L['Development'], 'Dev_VarWatch', _L['VarWatch'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
 	IsRestricted = function()
-		return not LIB.IsDebugClient('Dev_VarWatch')
+		return not X.IsDebugClient('Dev_VarWatch')
 	end,
 	OnPanelActive = function(wnd)
 		local ui = UI(wnd)
@@ -127,8 +98,8 @@ LIB.RegisterPanel(_L['Development'], 'Dev_VarWatch', _L['VarWatch'], 'ui/Image/U
 				w = 150, h = 25,
 				color = {255, 255, 255},
 				onchange = function(text)
-					_C.tVarList[i] = LIB.TrimString(text)
-					LIB.SaveLUAData(DATA_PATH, _C.tVarList)
+					_C.tVarList[i] = X.TrimString(text)
+					X.SaveLUAData(DATA_PATH, _C.tVarList)
 				end,
 			})
 
@@ -140,11 +111,11 @@ LIB.RegisterPanel(_L['Development'], 'Dev_VarWatch', _L['VarWatch'], 'ui/Image/U
 			})
 		end
 
-		LIB.BreatheCall('DEV_VARWATCH', function()
+		X.BreatheCall('DEV_VARWATCH', function()
 			for i = 1, nLimit do
 				local szKey = _C.tVarList[i]
 				local hFocus = Station.GetFocusWindow()
-				if not IsEmpty(szKey) and -- 忽略空白的Key
+				if not X.IsEmpty(szKey) and -- 忽略空白的Key
 				wnd:GetRoot():IsVisible() and ( -- 主界面隐藏了就不要解析了
 					not hFocus or (
 						not hFocus:GetTreePath():find(tWndEditK[i]:Name()) and  -- 忽略K编辑中的
@@ -152,19 +123,19 @@ LIB.RegisterPanel(_L['Development'], 'Dev_VarWatch', _L['VarWatch'], 'ui/Image/U
 					)
 				) then
 					if loadstring then
-						local t = {select(2, XpCall(loadstring('return ' .. szKey)))}
+						local t = {select(2, X.XpCall(loadstring('return ' .. szKey)))}
 						for k, v in pairs(t) do
 							t[k] = tostring(v)
 						end
-						tWndEditV[i]:Text(concat(t, ', '))
+						tWndEditV[i]:Text(table.concat(t, ', '))
 					else
-						tWndEditV[i]:Text(var2str_x(LIB.GetGlobalValue(szKey)))
+						tWndEditV[i]:Text(var2str_x(X.GetGlobalValue(szKey)))
 					end
 				end
 			end
 		end)
 	end,
 	OnPanelDeactive = function()
-		LIB.BreatheCall('DEV_VARWATCH', false)
+		X.BreatheCall('DEV_VARWATCH', false)
 	end,
 })

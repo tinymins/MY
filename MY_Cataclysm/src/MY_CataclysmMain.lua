@@ -10,68 +10,39 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local Station, MY_IsVisibleBuff, MY_GetBuffName = Station, LIB.IsVisibleBuff,  LIB.GetBuffName
+local Station, MY_IsVisibleBuff, MY_GetBuffName = Station, X.IsVisibleBuff,  X.GetBuffName
 ---------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Cataclysm'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 local D = {}
-local INI_ROOT = PACKET_INFO.ROOT .. 'MY_Cataclysm/ui/'
+local INI_ROOT = X.PACKET_INFO.ROOT .. 'MY_Cataclysm/ui/'
 local CFG = MY_Cataclysm.CFG
-local CTM_CONFIG_DEFAULT = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Cataclysm/config/default/{$lang}.jx3dat')
-local CTM_CONFIG_OFFICIAL = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Cataclysm/config/official/{$lang}.jx3dat')
-local CTM_CONFIG_CATACLYSM = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Cataclysm/config/cataclysm/{$lang}.jx3dat')
+local CTM_CONFIG_DEFAULT = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_Cataclysm/config/default/{$lang}.jx3dat')
+local CTM_CONFIG_OFFICIAL = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_Cataclysm/config/official/{$lang}.jx3dat')
+local CTM_CONFIG_CATACLYSM = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_Cataclysm/config/cataclysm/{$lang}.jx3dat')
 
 local PASSPHRASE
 do
 local a, b = {111, 198, 5}, 31
 for i = 0, 50 do
 	for j, v in ipairs({ 23, 112, 234, 156 }) do
-		insert(a, (i * j * ((b * v) % 256)) % 256)
+		table.insert(a, (i * j * ((b * v) % 256)) % 256)
 	end
 end
-PASSPHRASE = char(unpack(a))
+PASSPHRASE = string.char(unpack(a))
 end
 
 local TEAM_VOTE_REQUEST = {}
@@ -88,13 +59,13 @@ local function InsertBuffListCache(aBuffList, szVia)
 		if id then
 			for iid, aList in pairs(BUFF_LIST) do
 				if iid == id or (tab.szName and type(iid) == 'number' and Table_GetBuffName(iid, 1) == tab.szName) then
-					for i, p in ipairs_r(aList) do
+					for i, p in X.ipairs_r(aList) do
 						if (not tab.nLevel or p.nLevel == tab.nLevel)
 						and (not tab.szStackOp or p.szStackOp == tab.szStackOp)
 						and (not tab.nStackNum or p.nStackNum == tab.nStackNum)
 						and (not tab.bOnlyMe or p.bOnlyMe == tab.bOnlyMe)
 						and (not tab.bOnlyMine or p.bOnlyMine == tab.bOnlyMine) then
-							remove(aList, i)
+							table.remove(aList, i)
 						end
 					end
 					if #aList == 0 then
@@ -106,7 +77,7 @@ local function InsertBuffListCache(aBuffList, szVia)
 				if not BUFF_LIST[id] then
 					BUFF_LIST[id] = {}
 				end
-				insert(BUFF_LIST[id], 1, setmetatable({ szVia = szVia }, { __index = tab }))
+				table.insert(BUFF_LIST[id], 1, setmetatable({ szVia = szVia }, { __index = tab }))
 			end
 		end
 	end
@@ -122,8 +93,8 @@ function D.UpdateBuffListCache()
 	if CFG.bBuffPushToOfficial then
 		local aBuff = {}
 		for _, dwID in pairs(BUFF_LIST) do
-			if IsNumber(dwID) then
-				insert(aBuff, dwID)
+			if X.IsNumber(dwID) then
+				table.insert(aBuff, dwID)
 			end
 		end
 		Raid_MonitorBuffs(aBuff)
@@ -140,13 +111,13 @@ local function UpdateTeamMonData()
 			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(szType), 0, true) do
 				if data.aCataclysmBuff then
 					for _, v in ipairs(data.aCataclysmBuff) do
-						v = Clone(v)
+						v = X.Clone(v)
 						v.dwID = data.dwID
 						if data.bCheckLevel then
 							v.nLevel = data.nLevel
 						end
 						v.nIcon = data.nIcon
-						insert(aBuff, v)
+						table.insert(aBuff, v)
 					end
 				end
 			end
@@ -155,14 +126,14 @@ local function UpdateTeamMonData()
 		D.UpdateBuffListCache()
 	end
 end
-LIB.RegisterEvent('LOADING_ENDING', 'MY_CataclysmMain', UpdateTeamMonData)
+X.RegisterEvent('LOADING_ENDING', 'MY_CataclysmMain', UpdateTeamMonData)
 local function onTeamMonUpdate()
 	if arg0 and not arg0['BUFF'] and not arg0['DEBUFF'] then
 		return
 	end
 	UpdateTeamMonData()
 end
-LIB.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_CataclysmMain', onTeamMonUpdate)
+X.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_CataclysmMain', onTeamMonUpdate)
 end
 
 function D.SetConfig(Config, bKeepBuff)
@@ -177,7 +148,7 @@ function D.SetConfig(Config, bKeepBuff)
 			if not v.dwID then
 				v.szName = k
 			end
-			insert(Config.aBuffList, v)
+			table.insert(Config.aBuffList, v)
 		end
 		Config.tBuffList = nil
 	end
@@ -203,15 +174,15 @@ function D.SetConfig(Config, bKeepBuff)
 	end
 	-- Config.bFasterHP = false
 	for k, v in pairs(Config) do
-		Call(Set, CFG, {k}, v)
+		X.Call(Set, CFG, {k}, v)
 	end
 	D.UpdateBuffListCache()
 	D.ReloadCataclysmPanel()
 end
 
 function D.LoadAncientConfigure(szConfigName)
-	local xData = LIB.LoadLUAData({'config/cataclysm/' .. szConfigName .. '.jx3dat', PATH_TYPE.GLOBAL})
-	if IsTable(xData) then
+	local xData = X.LoadLUAData({'config/cataclysm/' .. szConfigName .. '.jx3dat', X.PATH_TYPE.GLOBAL})
+	if X.IsTable(xData) then
 		D.SetConfig(xData)
 	end
 end
@@ -220,7 +191,7 @@ function D.GetFrame()
 	return Station.Lookup('Normal/MY_CataclysmMain')
 end
 
-local CTM_LOOT_MODE = LIB.KvpToObject({
+local CTM_LOOT_MODE = X.KvpToObject({
 	{PARTY_LOOT_MODE.FREE_FOR_ALL, {'ui/Image/TargetPanel/Target.UITex'   , 60}},
 	{PARTY_LOOT_MODE.DISTRIBUTE  , {'ui/Image/UICommon/CommonPanel2.UITex', 92}},
 	{PARTY_LOOT_MODE.GROUP_LOOT  , {'ui/Image/UICommon/LoginCommon.UITex' , 29}},
@@ -255,38 +226,38 @@ function D.InsertForceCountMenu(tMenu)
 	}
 	for dwForceID, nCount in pairs(tForceList) do
 		local szPath, nFrame = GetForceImage(dwForceID)
-		insert(tSubMenu, {
+		table.insert(tSubMenu, {
 			szOption = g_tStrings.tForceTitle[dwForceID] .. '   ' .. nCount,
-			rgb = { LIB.GetForceColor(dwForceID) },
+			rgb = { X.GetForceColor(dwForceID) },
 			szIcon = szPath,
 			nFrame = nFrame,
 			szLayer = 'ICON_LEFT'
 		})
 	end
-	insert(tMenu, tSubMenu)
+	table.insert(tMenu, tSubMenu)
 end
 
 function D.InsertDistributeMenu(tMenu)
 	local aDistributeMenu = {}
-	InsertDistributeMenu(aDistributeMenu, not LIB.IsDistributer())
+	InsertDistributeMenu(aDistributeMenu, not X.IsDistributer())
 	for _, menu in ipairs(aDistributeMenu) do
 		if menu.szOption == g_tStrings.STR_LOOT_LEVEL then
-			insert(menu, 1, {
-				bDisable = not LIB.IsDistributer(),
+			table.insert(menu, 1, {
+				bDisable = not X.IsDistributer(),
 				szOption = g_tStrings.STR_WHITE,
 				nFont = 79, rgb = {GetItemFontColorByQuality(1)},
 				bMCheck = true, bChecked = GetClientTeam().nRollQuality == 1,
 				fnAction = function() GetClientTeam().SetTeamRollQuality(1) end,
 			})
-			insert(menu, 1, {
-				bDisable = not LIB.IsDistributer(),
+			table.insert(menu, 1, {
+				bDisable = not X.IsDistributer(),
 				szOption = g_tStrings.STR_GRAY,
 				nFont = 79, rgb = {GetItemFontColorByQuality(0)},
 				bMCheck = true, bChecked = GetClientTeam().nRollQuality == 0,
 				fnAction = function() GetClientTeam().SetTeamRollQuality(0) end,
 			})
 		end
-		insert(tMenu, menu)
+		table.insert(tMenu, menu)
 	end
 end
 
@@ -378,13 +349,13 @@ function D.SetFrameSize(bEnter)
 		local container = wrapper:Lookup('WndContainer_Main')
 		local nItemW = frame:Lookup('', 'Handle_ListW'):GetW() * CFG.fScaleX
 		local nMinW = wrapper:GetRelX() + container:GetW()
-		local nDragW = max(nItemW * nGroupEx, nMinW + 30)
+		local nDragW = math.max(nItemW * nGroupEx, nMinW + 30)
 		local nDragH = select(2, frame:GetSize())
 		frame:SetW(nDragW)
 		frame:SetDragArea(0, 0, nDragW, nDragH)
-		local nBgW, nWrapperW = max(nItemW * nGroupEx, nMinW + 5), container:GetW()
+		local nBgW, nWrapperW = math.max(nItemW * nGroupEx, nMinW + 5), container:GetW()
 		if not bEnter then
-			nBgW = min(nItemW * nGroupEx, nMinW + 5)
+			nBgW = math.min(nItemW * nGroupEx, nMinW + 5)
 			nWrapperW = nBgW - wrapper:GetRelX() - 5
 		end
 		local nBgSW = frame:Lookup('', 'Handle_BG/Image_Title_BG'):GetW()
@@ -396,9 +367,9 @@ function D.SetFrameSize(bEnter)
 			and 100
 			or 200
 		local bContinue, nTick, fPer
-		LIB.RenderCall('MY_CataclysmMain_WAni', function()
+		X.RenderCall('MY_CataclysmMain_WAni', function()
 			bContinue = false
-			if IsElement(wrapper) then
+			if X.IsElement(wrapper) then
 				nTick = GetTime()
 				if nTick < nSTick then
 					return
@@ -427,7 +398,7 @@ function D.CreateControlBar()
 	local szIniFile    = INI_ROOT .. 'MY_CataclysmMain_Button.ini'
 	container:Clear()
 	-- 团队工具 团队告示
-	if LIB.IsInParty() then
+	if X.IsInParty() then
 		container:AppendContentFromIni(szIniFile, 'Wnd_TeamTools')
 		container:AppendContentFromIni(szIniFile, 'Wnd_TeamNotice')
 	end
@@ -443,19 +414,19 @@ function D.CreateControlBar()
 		container:AppendContentFromIni(szIniFile, 'WndButton_GKP')
 	end
 	-- 世界标记
-	if LIB.IsLeader() then
+	if X.IsLeader() then
 		container:AppendContentFromIni(szIniFile, 'WndButton_WorldMark')
 	end
 	-- 语音按钮
-	if LIB.GVoiceBase_IsOpen() then --LIB.IsInBattleField() or LIB.IsInArena() or LIB.IsInPubg() or LIB.IsInDungeon() then
-		local nSpeakerState = LIB.GVoiceBase_GetSpeakerState()
+	if X.GVoiceBase_IsOpen() then --X.IsInBattleField() or X.IsInArena() or X.IsInPubg() or X.IsInDungeon() then
+		local nSpeakerState = X.GVoiceBase_GetSpeakerState()
 		container:AppendContentFromIni(szIniFile, 'Wnd_Speaker')
 			:Lookup('WndButton_Speaker').nSpeakerState = nSpeakerState
 		container:Lookup('Wnd_Speaker/WndButton_Speaker', 'Image_Normal')
 			:SetVisible(nSpeakerState == CONSTANT.SPEAKER_STATE.OPEN)
 		container:Lookup('Wnd_Speaker/WndButton_Speaker', 'Image_Close_Speaker')
 			:SetVisible(nSpeakerState == CONSTANT.SPEAKER_STATE.CLOSE)
-		local nMicState = LIB.GVoiceBase_GetMicState()
+		local nMicState = X.GVoiceBase_GetMicState()
 		container:AppendContentFromIni(szIniFile, 'Wnd_Microphone')
 			:Lookup('WndButton_Microphone').nMicState = nMicState
 		container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Animate_Input_Mic')
@@ -557,7 +528,7 @@ end
 
 function D.UpdateAnchor(frame)
 	local a = CFG.tAnchor
-	if not IsEmpty(a) then
+	if not X.IsEmpty(a) then
 		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	else
 		frame:SetPoint('LEFTCENTER', 0, 0, 'LEFTCENTER', 100, -200)
@@ -571,13 +542,13 @@ function D.OnWageStart()
 		D.SetFrameCaption(_L('Wage await %ds...', 30 - (GetCurrentTime() - nTime)))
 	end
 	fnAction()
-	LIB.BreatheCall('MY_Cataclysm_Wage', 1000, fnAction)
+	X.BreatheCall('MY_Cataclysm_Wage', 1000, fnAction)
 end
 
 function D.OnWageFinish()
 	MY_CataclysmParty:ClearTeamVote('wage_agree')
 	D.SetFrameCaption('')
-	LIB.BreatheCall('MY_Cataclysm_Wage', false)
+	X.BreatheCall('MY_Cataclysm_Wage', false)
 end
 
 -------------------------------------------------
@@ -670,7 +641,7 @@ local function RecBuffWithTabs(tabs, dwOwnerID, dwBuffID, dwSrcID)
 	end
 end
 local function OnBuffUpdate(dwOwnerID, dwID, nLevel, nStackNum, dwSrcID)
-	if LIB.IsBossFocusBuff(dwID, nLevel, nStackNum) then
+	if X.IsBossFocusBuff(dwID, nLevel, nStackNum) then
 		MY_CataclysmParty:RecBossFocusBuff(dwOwnerID, {
 			dwID      = dwID     ,
 			nLevel    = nLevel   ,
@@ -742,11 +713,11 @@ function D.OnEvent(szEvent)
 		MY_CataclysmParty:CallRefreshImages(arg1, false, true, nil, true)
 		MY_CataclysmParty:CallDrawHPMP(arg1, true)
 	elseif szEvent == 'UPDATE_PLAYER_SCHOOL_ID' then
-		if LIB.IsParty(arg0) then
+		if X.IsParty(arg0) then
 			MY_CataclysmParty:CallRefreshImages(arg0, false, true)
 		end
 	elseif szEvent == 'PLAYER_STATE_UPDATE' then
-		if LIB.IsParty(arg0) then
+		if X.IsParty(arg0) then
 			MY_CataclysmParty:CallDrawHPMP(arg0, true)
 		end
 	elseif szEvent == 'PARTY_SET_MEMBER_ONLINE_FLAG' then
@@ -839,16 +810,16 @@ function D.OnEvent(szEvent)
 			if not tar then
 				return
 			end
-			local aList, nCount, buff = LIB.GetBuffList(tar)
+			local aList, nCount, buff = X.GetBuffList(tar)
 			if nCount == 0 then
-				return LIB.DelayCall(update, 75)
+				return X.DelayCall(update, 75)
 			end
 			for i = 1, nCount do
 				buff = aList[i]
 				OnBuffUpdate(dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
 			end
 		end
-		LIB.DelayCall(update, 75)
+		X.DelayCall(update, 75)
 	elseif szEvent == 'CTM_BUFF_LIST_CACHE_UPDATE' then
 		local team = GetClientTeam()
 		if not team then
@@ -858,7 +829,7 @@ function D.OnEvent(szEvent)
 		for _, dwID in ipairs(team.GetTeamMemberList()) do
 			local tar = GetPlayer(dwID)
 			if tar then
-				local aBuff, nCount, buff = LIB.GetBuffList(tar)
+				local aBuff, nCount, buff = X.GetBuffList(tar)
 				for i = 1, nCount do
 					buff = aBuff[i]
 					OnBuffUpdate(dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
@@ -906,7 +877,7 @@ function D.FrameBuffRefreshCall()
 	end
 	local tar = GetPlayer(aList[i])
 	if tar then
-		local aBuff, nCount, buff = LIB.GetBuffList(tar)
+		local aBuff, nCount, buff = X.GetBuffList(tar)
 		for i = 1, nCount do
 			buff = aBuff[i]
 			OnBuffUpdate(tar.dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
@@ -979,7 +950,7 @@ function D.OnFrameBreathe()
 		MY_CataclysmParty:RefreshGVoice()
 		this.nBreatheTime = GetTime()
 	end
-	LIB.GVoiceBase_CheckMicState()
+	X.GVoiceBase_CheckMicState()
 end
 end
 
@@ -990,11 +961,11 @@ function D.OnLButtonClick()
 		local menu = {}
 		if me.IsInRaid() then
 			-- 团队就位
-			insert(menu, {
+			table.insert(menu, {
 				szOption = g_tStrings.STR_RAID_MENU_READY_CONFIRM,
 				{
 					szOption = g_tStrings.STR_RAID_READY_CONFIRM_START,
-					bDisable = not LIB.IsLeader(),
+					bDisable = not X.IsLeader(),
 					fnAction = function()
 						Send_RaidReadyConfirm()
 						MY_CataclysmParty:StartTeamVote('raid_ready')
@@ -1005,39 +976,39 @@ function D.OnLButtonClick()
 					fnAction = function() MY_CataclysmParty:ClearTeamVote('raid_ready') end,
 				}
 			})
-			insert(menu, { bDevide = true })
+			table.insert(menu, { bDevide = true })
 		end
 		-- 分配
-		D.InsertDistributeMenu(menu, not LIB.IsDistributer())
-		insert(menu, { bDevide = true })
+		D.InsertDistributeMenu(menu, not X.IsDistributer())
+		table.insert(menu, { bDevide = true })
 		if me.IsInRaid() then
 			-- 编辑模式
-			insert(menu, { szOption = gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt'), bDisable = not LIB.IsLeader() or not me.IsInRaid(), bCheck = true, bChecked = CFG.bEditMode, fnAction = function()
+			table.insert(menu, { szOption = string.gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt'), bDisable = not X.IsLeader() or not me.IsInRaid(), bCheck = true, bChecked = CFG.bEditMode, fnAction = function()
 				CFG.bEditMode = not CFG.bEditMode
 				UI.ClosePopupMenu()
 			end })
 			-- 人数统计
-			insert(menu, { bDevide = true })
+			table.insert(menu, { bDevide = true })
 			D.InsertForceCountMenu(menu)
 			-- 团队快照上传
-			if LIB.IsLeader() and IsTable(MY_JBTeamSnapshot) and IsFunction(MY_JBTeamSnapshot.CreateSnapshot) then
-				insert(menu, {
+			if X.IsLeader() and X.IsTable(MY_JBTeamSnapshot) and X.IsFunction(MY_JBTeamSnapshot.CreateSnapshot) then
+				table.insert(menu, {
 					szOption = _L['Upload team snapshot'],
 					fnAction = function()
 						MY_JBTeamSnapshot.CreateSnapshot()
 					end,
 				})
 			end
-			insert(menu, { bDevide = true })
+			table.insert(menu, { bDevide = true })
 		end
-		insert(menu, { szOption = _L['Interface settings'], rgb = { 255, 255, 0 }, fnAction = function()
-			LIB.ShowPanel()
-			LIB.FocusPanel()
-			LIB.SwitchTab('MY_Cataclysm')
+		table.insert(menu, { szOption = _L['Interface settings'], rgb = { 255, 255, 0 }, fnAction = function()
+			X.ShowPanel()
+			X.FocusPanel()
+			X.SwitchTab('MY_Cataclysm')
 		end })
-		if LIB.IsDebugClient(true) then
-			insert(menu, { bDevide = true })
-			insert(menu, { szOption = 'DEBUG', bCheck = true, bChecked = DEBUG, fnAction = function()
+		if X.IsDebugClient(true) then
+			table.insert(menu, { bDevide = true })
+			table.insert(menu, { szOption = 'DEBUG', bCheck = true, bChecked = DEBUG, fnAction = function()
 				DEBUG = not DEBUG
 			end	})
 		end
@@ -1060,36 +1031,36 @@ function D.OnLButtonClick()
 			return OpenGoldTeam()
 		end
 		if not MY_GKP_MI then
-			return LIB.Alert(_L['Please install and load GKP addon first.'])
+			return X.Alert(_L['Please install and load GKP addon first.'])
 		end
 		return MY_GKP_MI.TogglePanel()
 	elseif szName == 'Wnd_TeamTools' then
 		if not MY_TeamTools then
-			return LIB.Alert(_L['Please install and load MY_TeamTools addon first.'])
+			return X.Alert(_L['Please install and load MY_TeamTools addon first.'])
 		end
 		MY_TeamTools.Toggle()
 	elseif szName == 'Wnd_TeamNotice' then
 		if not MY_TeamNotice then
-			return LIB.Alert(_L['Please install and load MY_TeamNotice addon first.'])
+			return X.Alert(_L['Please install and load MY_TeamNotice addon first.'])
 		end
 		MY_TeamNotice.OpenFrame()
 	elseif szName == 'WndButton_LootMode' or szName == 'WndButton_LootQuality' then
-		if LIB.IsDistributer() then
+		if X.IsDistributer() then
 			local menu = {}
 			if szName == 'WndButton_LootMode' then
-				D.InsertDistributeMenu(menu, not LIB.IsDistributer())
+				D.InsertDistributeMenu(menu, not X.IsDistributer())
 				PopupMenu(menu[1])
 			elseif szName == 'WndButton_LootQuality' then
-				D.InsertDistributeMenu(menu, not LIB.IsDistributer())
+				D.InsertDistributeMenu(menu, not X.IsDistributer())
 				PopupMenu(menu[2])
 			end
 		else
-			return LIB.Sysmsg(_L['You are not the distrubutor.'])
+			return X.Sysmsg(_L['You are not the distrubutor.'])
 		end
 	elseif szName == 'WndButton_Speaker' then
-		LIB.GVoiceBase_SwitchSpeakerState()
+		X.GVoiceBase_SwitchSpeakerState()
 	elseif szName == 'WndButton_Microphone' then
-		LIB.GVoiceBase_SwitchMicState()
+		X.GVoiceBase_SwitchMicState()
 	end
 end
 
@@ -1144,9 +1115,9 @@ local MIC_TIP = setmetatable({
 }, {
 	__index = function(t, k)
 		if k == CONSTANT.MIC_STATE.KEY then
-			if LIB.GetHotKey('TOGGLE_GVOCIE_SAY') then
+			if X.GetHotKey('TOGGLE_GVOCIE_SAY') then
 				return (g_tStrings.GVOICE_MIC_FREE_STATE_TIP
-					:format(LIB.GetHotKeyDisplay('TOGGLE_GVOCIE_SAY')))
+					:format(X.GetHotKeyDisplay('TOGGLE_GVOCIE_SAY')))
 			else
 				return g_tStrings.GVOICE_MIC_FREE_STATE_TIP2
 			end
@@ -1202,17 +1173,17 @@ function D.ConfirmRestoreConfig()
 		{
 			szOption = _L['Official style'],
 			fnAction = function()
-				D.SetConfig(Clone(CTM_CONFIG_OFFICIAL), true)
+				D.SetConfig(X.Clone(CTM_CONFIG_OFFICIAL), true)
 				D.CheckEnableTeamPanel()
-				LIB.SwitchTab('MY_Cataclysm', true)
+				X.SwitchTab('MY_Cataclysm', true)
 			end,
 		},
 		{
 			szOption = _L['Cataclysm style'],
 			fnAction = function()
-				D.SetConfig(Clone(CTM_CONFIG_CATACLYSM), true)
+				D.SetConfig(X.Clone(CTM_CONFIG_CATACLYSM), true)
 				D.CheckEnableTeamPanel()
-				LIB.SwitchTab('MY_Cataclysm', true)
+				X.SwitchTab('MY_Cataclysm', true)
 			end,
 		},
 		{
@@ -1252,13 +1223,13 @@ local settings = {
 		},
 	},
 }
-MY_CataclysmMain = LIB.CreateModule(settings)
+MY_CataclysmMain = X.CreateModule(settings)
 end
 
-LIB.RegisterEvent('CTM_PANEL_TEAMATE', function()
+X.RegisterEvent('CTM_PANEL_TEAMATE', function()
 	D.TeammatePanel_Switch(arg0)
 end)
-LIB.RegisterEvent('CTM_PANEL_RAID', function()
+X.RegisterEvent('CTM_PANEL_RAID', function()
 	D.RaidPanel_Switch(arg0)
 end)
 
@@ -1276,30 +1247,30 @@ end)
 --    利用UI注册的[LOADING_END]来刷新
 --    避免多次重复刷新面板浪费开销
 
-LIB.RegisterEvent('PARTY_UPDATE_BASE_INFO', function()
+X.RegisterEvent('PARTY_UPDATE_BASE_INFO', function()
 	D.CheckCataclysmEnable()
 	D.ReloadCataclysmPanel()
 	PlaySound(SOUND.UI_SOUND, g_sound.Gift)
 end)
 
-LIB.RegisterEvent('PARTY_LEVEL_UP_RAID', function()
+X.RegisterEvent('PARTY_LEVEL_UP_RAID', function()
 	D.CheckCataclysmEnable()
 	D.ReloadCataclysmPanel()
 end)
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', function()
 	D.CheckCataclysmEnable()
 	D.UpdateBuffListCache()
 	D.ReloadCataclysmPanel()
 end)
 
-LIB.RegisterEvent('LOADING_END', D.CheckCataclysmEnable)
+X.RegisterEvent('LOADING_END', D.CheckCataclysmEnable)
 
-LIB.RegisterAddonMenu(function()
+X.RegisterAddonMenu(function()
 	return { szOption = _L['Cataclysm Team Panel'], bCheck = true, bChecked = MY_Cataclysm.bEnable, fnAction = D.ToggleTeamPanel }
 end)
 
-LIB.RegisterTutorial({
+X.RegisterTutorial({
 	szKey = 'MY_Cataclysm',
 	szMessage = _L['Would you like to use MY cataclysm?'],
 	fnRequire = function() return not MY_Cataclysm.bEnable end,
@@ -1309,7 +1280,7 @@ LIB.RegisterTutorial({
 		fnAction = function()
 			MY_Cataclysm.bEnable = true
 			D.CheckEnableTeamPanel()
-			LIB.RedrawTab('MY_Cataclysm')
+			X.RedrawTab('MY_Cataclysm')
 		end,
 	},
 	{
@@ -1317,7 +1288,7 @@ LIB.RegisterTutorial({
 		fnAction = function()
 			MY_Cataclysm.bEnable = false
 			D.CheckEnableTeamPanel()
-			LIB.RedrawTab('MY_Cataclysm')
+			X.RedrawTab('MY_Cataclysm')
 		end,
 	},
 })

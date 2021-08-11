@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -115,11 +86,11 @@ local PUBLISH_MODE = {
 	BOTH   = 3, -- 同时显示有效和总数
 }
 
-local O = LIB.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
 	nPublishMode = { -- 发布模式
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = PUBLISH_MODE.EFFECT,
 	},
 })
@@ -138,7 +109,7 @@ function D.IsImportantEffect(v)
 	if not v then
 		return false
 	end
-	if IsTable(v) then
+	if X.IsTable(v) then
 		for k, v in pairs(v) do
 			if IMPORTANT_EFFECT[k] or IMPORTANT_EFFECT[v] then
 				return true
@@ -179,10 +150,10 @@ end
 -- D.SetDisplayData(string szFilePath): 显示指定文件的历史记录 传'CURRENT'时显示当前记录
 -- D.SetDisplayData(table  data): 显示数据为data的历史记录
 function D.SetDisplayData(szFilePath)
-	local data = IsTable(szFilePath)
+	local data = X.IsTable(szFilePath)
 		and szFilePath
 		or MY_Recount_DS.Get(szFilePath)
-	if not IsTable(data) then
+	if not X.IsTable(data) then
 		return
 	end
 	D.bHistoryMode = szFilePath ~= 'CURRENT'
@@ -355,7 +326,7 @@ function D.GetMenu()
 		else
 			szOption = _L('Less than %d minute', i / 60)
 		end
-		insert(t1, {
+		table.insert(t1, {
 			szOption = szOption,
 			bCheck = true, bMCheck = true,
 			bChecked = MY_Recount_DS.nMinFightTime == i,
@@ -365,7 +336,7 @@ function D.GetMenu()
 			fnDisable = function() return not MY_Recount_DS.bEnable end,
 		})
 	end
-	insert(t, t1)
+	table.insert(t, t1)
 
 	-- 风格选择
 	local t1 = {
@@ -389,14 +360,14 @@ function D.GetMenu()
 			t2.nMouseOverFrame = 106
 			t2.szLayer = 'ICON_RIGHT'
 			t2.fnClickIcon = function()
-				LIB.ShowPanel()
-				LIB.FocusPanel()
-				LIB.SwitchTab('GlobalColor')
+				X.ShowPanel()
+				X.FocusPanel()
+				X.SwitchTab('GlobalColor')
 			end
 		end
-		insert(t1, t2)
+		table.insert(t1, t2)
 	end
-	insert(t, t1)
+	table.insert(t, t1)
 
 	-- 数值刷新周期
 	local t1 = {
@@ -410,7 +381,7 @@ function D.GetMenu()
 		else
 			szOption = _L('Every %.1f second', i / GLOBAL.GAME_FPS)
 		end
-		insert(t1, {
+		table.insert(t1, {
 			szOption = szOption,
 			bCheck = true, bMCheck = true,
 			bChecked = MY_Recount_UI.nDrawInterval == i,
@@ -420,7 +391,7 @@ function D.GetMenu()
 			fnDisable = IsUIDisabled,
 		})
 	end
-	insert(t, t1)
+	table.insert(t, t1)
 
 	-- 最大历史记录
 	local t1 = {
@@ -429,7 +400,7 @@ function D.GetMenu()
 		fnDisable = function() return not MY_Recount_DS.bEnable end,
 	}
 	for _, i in ipairs({ 5, 10, 20, 30, 50, 100, 200, 500, 1000 }) do
-		insert(t1, {
+		table.insert(t1, {
 			szOption = i,
 			bCheck = true, bMCheck = true,
 			bChecked = MY_Recount_DS.nMaxHistory == i,
@@ -439,7 +410,7 @@ function D.GetMenu()
 			fnDisable = function() return not MY_Recount_DS.bEnable end,
 		})
 	end
-	insert(t, t1)
+	table.insert(t, t1)
 
 	return t
 end
@@ -476,7 +447,7 @@ function D.GetHistoryMenu()
 			break
 		end
 		local t1 = {
-			szOption = file.bossname .. ' (' .. LIB.FormatTimeCounter(file.during, '%M:%ss') .. ')',
+			szOption = file.bossname .. ' (' .. X.FormatTimeCounter(file.during, '%M:%ss') .. ')',
 			rgb = (file.time == DataDisplay[DK.TIME_BEGIN] and {255, 255, 0}) or nil,
 			fnAction = function()
 				local data = MY_Recount_DS.Get(file.fullpath)
@@ -499,27 +470,27 @@ function D.GetHistoryMenu()
 			end,
 			fnMouseEnter = function()
 				local aXml = {}
-				insert(aXml, GetFormatText(file.bossname .. '(' .. LIB.FormatTimeCounter(file.during, '%M:%ss') .. ')\n', nil, 255, 255, 255))
-				insert(aXml, GetFormatText(LIB.FormatTime(file.time, '%yyyy/%MM/%dd %hh:%mm:%ss\n'), nil, 255, 255, 255))
+				table.insert(aXml, GetFormatText(file.bossname .. '(' .. X.FormatTimeCounter(file.during, '%M:%ss') .. ')\n', nil, 255, 255, 255))
+				table.insert(aXml, GetFormatText(X.FormatTime(file.time, '%yyyy/%MM/%dd %hh:%mm:%ss\n'), nil, 255, 255, 255))
 				if MY_Recount_DS.bRecEverything then
-					insert(aXml, GetFormatText('\n' .. _L['Hold ctrl click to review whole fight'], nil, 255, 255, 0))
+					table.insert(aXml, GetFormatText('\n' .. _L['Hold ctrl click to review whole fight'], nil, 255, 255, 0))
 				end
 				local nX, nY = this:GetAbsX(), this:GetAbsY()
 				local nW, nH = this:GetW(), this:GetH()
-				OutputTip(concat(aXml), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
+				OutputTip(table.concat(aXml), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
 			end,
 			fnMouseLeave = function()
 				HideTip()
 			end,
 		}
-		insert(tt, t1)
+		table.insert(tt, t1)
 		nCount = nCount + 1
 	end
-	insert(t, tt)
+	table.insert(t, tt)
 
-	insert(t, { bDevide = true })
+	table.insert(t, { bDevide = true })
 	if MY_Recount_DS.bRecEverything and (not MY_Recount_DS.bREOnlyDungeon or IsShiftKeyDown()) then
-		insert(t, {
+		table.insert(t, {
 			szOption = _L['Rec everything only in dungeon'],
 			bCheck = true,
 			bChecked = MY_Recount_DS.bREOnlyDungeon,
@@ -529,14 +500,14 @@ function D.GetHistoryMenu()
 			fnDisable = function() return not MY_Recount_DS.bRecEverything end,
 		})
 	end
-	insert(t, {
+	table.insert(t, {
 		szOption = _L['Save history on exit'],
 		bCheck = true, bChecked = MY_Recount_DS.bSaveHistoryOnExit,
 		fnAction = function()
 			MY_Recount_DS.bSaveHistoryOnExit = not MY_Recount_DS.bSaveHistoryOnExit
 		end,
 	})
-	insert(t, {
+	table.insert(t, {
 		szOption = _L['Save history immediately'],
 		bCheck = true,
 		bChecked = MY_Recount_DS.bSaveHistoryOnExFi,
@@ -545,7 +516,7 @@ function D.GetHistoryMenu()
 		end,
 	})
 	if MY_Recount_DS.bSaveEverything or IsShiftKeyDown() then
-		insert(t, {
+		table.insert(t, {
 			szOption = _L['Do not save history everything'],
 			bCheck = true,
 			bChecked = not MY_Recount_DS.bSaveEverything,
@@ -566,7 +537,7 @@ function D.GetPublishMenu()
 	local t = {}
 
 	-- 发布类型
-	insert(t, {
+	table.insert(t, {
 		szOption = _L['Publish mode'],
 		{
 			szOption = _L['Only effect value'],
@@ -599,25 +570,25 @@ function D.GetPublishMenu()
 		end
 		local DataDisplay = MY_Recount.GetDisplayData()
 		local eTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
-		LIB.SendChat(
+		X.SendChat(
 			nChannel,
-			'[' .. PACKET_INFO.SHORT_NAME .. ']'
+			'[' .. X.PACKET_INFO.SHORT_NAME .. ']'
 			.. _L['Fight recount'] .. ' - '
 			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
 			.. ' ' .. ((DataDisplay[DK.BOSSNAME] and ' - ' .. DataDisplay[DK.BOSSNAME]) or '')
-			.. '(' .. LIB.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
+			.. '(' .. X.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
 			{ parsers = { name = false } }
 		)
-		LIB.SendChat(nChannel, '------------------------')
+		X.SendChat(nChannel, '------------------------')
 		local hList      = frame:Lookup('Wnd_Main', 'Handle_List')
 		local szUnit     = (' ' .. hList.szUnit) or ''
 		local nTimeCount = hList.nTimeCount or 0
 		local aResult = {} -- 收集数据
 		local nMaxNameLen = 0
-		for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
+		for i = 0, math.min(hList:GetItemCount(), nLimit) - 1 do
 			local hItem = hList:Lookup(i)
-			insert(aResult, hItem.data)
-			nMaxNameLen = max(nMaxNameLen, wlen(hItem.data.szName))
+			table.insert(aResult, hItem.data)
+			nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
 		end
 		if not MY_Recount_UI.bShowPerSec then
 			nTimeCount = 1
@@ -625,8 +596,8 @@ function D.GetPublishMenu()
 		end
 		-- 发布数据
 		for i, p in ipairs(aResult) do
-			local szText = format('%02d', i) .. '.[' .. p.szName .. ']'
-			for i = wlen(p.szName), nMaxNameLen - 1 do
+			local szText = string.format('%02d', i) .. '.[' .. p.szName .. ']'
+			for i = wstring.len(p.szName), nMaxNameLen - 1 do
 				szText = szText .. g_tStrings.STR_ONE_CHINESE_SPACE
 			end
 			if MY_Recount.nPublishMode == PUBLISH_MODE.BOTH then
@@ -644,10 +615,10 @@ function D.GetPublishMenu()
 				)
 			end
 
-			LIB.SendChat(nChannel, szText)
+			X.SendChat(nChannel, szText)
 		end
 
-		LIB.SendChat(nChannel, '------------------------')
+		X.SendChat(nChannel, '------------------------')
 	end
 	for nChannel, szChannel in pairs({
 		[PLAYER_TALK_CHANNEL.RAID] = 'MSG_TEAM',
@@ -658,27 +629,27 @@ function D.GetPublishMenu()
 			szOption = g_tStrings.tChannelName[szChannel],
 			bCheck = true, -- 不设置成可选框不能点╭∩╮(︶︿︶）╭∩╮垃圾
 			fnAction = function()
-				Publish(nChannel, HUGE)
+				Publish(nChannel, math.huge)
 				UI.ClosePopupMenu()
 			end,
 			rgb = GetMsgFontColor(szChannel, true),
 		}
 		for _, nLimit in ipairs({1, 2, 3, 4, 5, 8, 10, 15, 20, 30, 50, 100}) do
-			insert(t1, {
+			table.insert(t1, {
 				szOption = _L('Top %d', nLimit),
 				fnAction = function() Publish(nChannel, nLimit) end,
 			})
 		end
-		insert(t, t1)
+		table.insert(t, t1)
 	end
 
 	return t
 end
 
-LIB.RegisterAddonMenu('MY_RECOUNT_MENU', D.GetMenu)
+X.RegisterAddonMenu('MY_RECOUNT_MENU', D.GetMenu)
 
 -- 新的战斗数据时
-LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
+X.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
 	if not D.bHistoryMode then
 		D.SetDisplayData('CURRENT')
 	end
@@ -728,5 +699,5 @@ local settings = {
 		},
 	},
 }
-MY_Recount = LIB.CreateModule(settings)
+MY_Recount = X.CreateModule(settings)
 end

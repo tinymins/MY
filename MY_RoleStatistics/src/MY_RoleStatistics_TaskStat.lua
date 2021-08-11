@@ -10,58 +10,29 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_TaskStat'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
+CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_TaskStat'], {'userdata/role_statistics/task_stat.v3.db', PATH_TYPE.GLOBAL})
+local DB = X.SQLiteConnect(_L['MY_RoleStatistics_TaskStat'], {'userdata/role_statistics/task_stat.v3.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return LIB.Sysmsg(_L['MY_RoleStatistics_TaskStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return X.Sysmsg(_L['MY_RoleStatistics_TaskStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
-local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_TaskStat.ini'
+local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_TaskStat.ini'
 
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS Task (
@@ -97,11 +68,11 @@ local DB_TaskInfoG = DB:Prepare('SELECT * FROM TaskInfo WHERE guid = ?')
 local DB_TaskInfoR = DB:Prepare('SELECT * FROM TaskInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_TaskInfoD = DB:Prepare('DELETE FROM TaskInfo WHERE guid = ?')
 
-local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_TaskStat', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_RoleStatistics_TaskStat', _L['General'], {
 	aColumn = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Collection(Schema.String),
+		xSchema = X.Schema.Collection(X.Schema.String),
 		xDefaultValue = {
 			'name',
 			'force',
@@ -125,38 +96,38 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_TaskStat', _L['General
 		},
 	},
 	szSort = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = 'time_days',
 	},
 	szSortOrder = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = 'desc',
 	},
 	bFloatEntry = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceFloatEntry = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSaveDB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 })
@@ -184,11 +155,11 @@ local function IsInSamePeriod(dwTime, eType)
 	end
 	local nNextTime, nCircle
 	if eType == TASK_TYPE.DAILY then
-		nNextTime, nCircle = LIB.GetRefreshTime('daily')
+		nNextTime, nCircle = X.GetRefreshTime('daily')
 	elseif eType == TASK_TYPE.WEEKLY then
-		nNextTime, nCircle = LIB.GetRefreshTime('weekly')
+		nNextTime, nCircle = X.GetRefreshTime('weekly')
 	elseif eType == TASK_TYPE.HALF_WEEKLY then
-		nNextTime, nCircle = LIB.GetRefreshTime('half-weekly')
+		nNextTime, nCircle = X.GetRefreshTime('half-weekly')
 	end
 	return dwTime >= nNextTime - nCircle
 end
@@ -283,7 +254,7 @@ local COLUMN_LIST = {
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
-			return GetFormatText(name, 162, LIB.GetForceColor(rec.force, 'foreground'))
+			return GetFormatText(name, 162, X.GetForceColor(rec.force, 'foreground'))
 		end,
 		Compare = GeneCommonCompare('name'),
 	},
@@ -321,7 +292,7 @@ local COLUMN_LIST = {
 		szTitle = _L['Cache time'],
 		nMinWidth = 165, nMaxWidth = 200,
 		GetFormatText = function(rec)
-			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
+			return GetFormatText(X.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
@@ -332,11 +303,11 @@ local COLUMN_LIST = {
 		nMinWidth = 120, nMaxWidth = 120,
 		GetFormatText = function(rec)
 			local nTime = GetCurrentTime() - rec.time
-			local nSeconds = floor(nTime)
-			local nMinutes = floor(nSeconds / 60)
-			local nHours   = floor(nMinutes / 60)
-			local nDays    = floor(nHours / 24)
-			local nYears   = floor(nDays / 365)
+			local nSeconds = math.floor(nTime)
+			local nMinutes = math.floor(nSeconds / 60)
+			local nHours   = math.floor(nMinutes / 60)
+			local nDays    = math.floor(nHours / 24)
+			local nYears   = math.floor(nDays / 365)
 			local nDay     = nDays % 365
 			local nHour    = nHours % 24
 			local nMinute  = nMinutes % 60
@@ -369,28 +340,28 @@ local function InitTaskList(bReload)
 	local aTask = {}
 	-- 内嵌数据
 	-- 大战
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'big_war',
 		szTitle = _L['Big war'],
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.BIG_WARS,
 	})
 	-- 茶馆
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'teahouse',
 		szTitle = _L['Teahouse'],
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.TEAHOUSE_ROUTINE,
 	})
 	-- 勤修不辍
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'force_routine',
 		szTitle = _L['Force routine'],
 		eType = TASK_TYPE.DAILY,
 		tForceQuestInfo = CONSTANT.QUEST_INFO.FORCE_ROUTINE,
 	})
 	-- 浪客行
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'rookie_routine',
 		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Rookie routine'],
@@ -398,7 +369,7 @@ local function InitTaskList(bReload)
 		aQuestInfo = CONSTANT.QUEST_INFO.ROOKIE_ROUTINE,
 	})
 	-- 晶矿争夺
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'crystal_scramble',
 		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Crystal scramble'],
@@ -406,7 +377,7 @@ local function InitTaskList(bReload)
 		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_CRYSTAL_SCRAMBLE,
 	})
 	-- 据点贸易
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'stronghold_trade',
 		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Stronghold trade'],
@@ -414,7 +385,7 @@ local function InitTaskList(bReload)
 		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_STRONGHOLD_TRADE,
 	})
 	-- 龙门绝境
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'dragon_gate_despair',
 		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Dragon gate despair'],
@@ -422,7 +393,7 @@ local function InitTaskList(bReload)
 		aQuestInfo = CONSTANT.QUEST_INFO.DRAGON_GATE_DESPAIR,
 	})
 	-- 列星虚境
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'lexus_reality',
 		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Lexus reality'],
@@ -430,7 +401,7 @@ local function InitTaskList(bReload)
 		aQuestInfo = CONSTANT.QUEST_INFO.LEXUS_REALITY,
 	})
 	-- 李渡鬼城
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'lidu_ghost_town',
 		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Lidu ghost town'],
@@ -438,21 +409,21 @@ local function InitTaskList(bReload)
 		aQuestInfo = CONSTANT.QUEST_INFO.LIDU_GHOST_TOWN,
 	})
 	-- 公共日常
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'public_routine',
 		szTitle = _L['Public routine'],
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.PUBLIC_ROUTINE,
 	})
 	-- 采仙草
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'picking_fairy_grass',
 		szTitle = _L['Picking fairy grass'],
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.PICKING_FAIRY_GRASS,
 	})
 	-- 寻龙脉
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'find_dragon_veins',
 		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Find dragon veins'],
@@ -460,28 +431,28 @@ local function InitTaskList(bReload)
 		aQuestInfo = CONSTANT.QUEST_INFO.FIND_DRAGON_VEINS,
 	})
 	-- 美人图
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'illustration_routine',
 		szTitle = _L['Illustration routine'],
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.ILLUSTRATION_ROUTINE,
 	})
 	-- 美人图潜行
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'sneak_routine',
 		szTitle = _L['Sneak routine'],
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.SNEAK_ROUTINE,
 	})
 	-- 省试
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'exam_sheng',
 		szTitle = _L['Exam sheng'],
 		eType = TASK_TYPE.WEEKLY,
 		aBuffInfo = CONSTANT.BUFF_INFO.EXAM_SHENG,
 	})
 	-- 会试
-	insert(aTask, {
+	table.insert(aTask, {
 		id = 'exam_hui',
 		szTitle = _L['Exam hui'],
 		eType = TASK_TYPE.WEEKLY,
@@ -493,8 +464,8 @@ local function InitTaskList(bReload)
 	local aRes = DB_TaskR:GetAll()
 	DB_TaskR:Reset()
 	for _, v in ipairs(aRes) do
-		local tTaskInfo = DecodeLUAData(v.task_info) or {}
-		insert(aTask, {
+		local tTaskInfo = X.DecodeLUAData(v.task_info) or {}
+		table.insert(aTask, {
 			id = v.guid,
 			szTitle = v.name,
 			eType = tTaskInfo.type or TASK_TYPE.DAILY,
@@ -519,21 +490,21 @@ local function InitTaskList(bReload)
 					id = id,
 					szTitle = _L.ACTIVITY_WEEK_TEAM_DUNGEON,
 					eType = TASK_TYPE.WEEKLY,
-					aQuestInfo = LIB.GetActivityQuest('WEEK_TEAM_DUNGEON'),
+					aQuestInfo = X.GetActivityQuest('WEEK_TEAM_DUNGEON'),
 				}
 			elseif id == 'week_raid_dungeon' then
 				return {
 					id = id,
 					szTitle = _L.ACTIVITY_WEEK_RAID_DUNGEON,
 					eType = TASK_TYPE.WEEKLY,
-					aQuestInfo = LIB.GetActivityQuest('WEEK_RAID_DUNGEON'),
+					aQuestInfo = X.GetActivityQuest('WEEK_RAID_DUNGEON'),
 				}
 			elseif id == 'week_public_quest' then
 				return {
 					id = id,
 					szTitle = _L.ACTIVITY_WEEK_PUBLIC_QUEST,
 					eType = TASK_TYPE.WEEKLY,
-					aQuestInfo = LIB.GetActivityQuest('WEEK_PUBLIC_QUEST'),
+					aQuestInfo = X.GetActivityQuest('WEEK_PUBLIC_QUEST'),
 				}
 			end
 		end,
@@ -565,9 +536,9 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 				local info = Table_GetQuestStringInfo(aInfo[1])
 				if info then
 					if IsCtrlKeyDown() then
-						insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
+						table.insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
 					end
-					insert(aTitleTipXml, GetFormatText('[' .. info.szName .. ']\n', 162, 255, 255, 0))
+					table.insert(aTitleTipXml, GetFormatText('[' .. info.szName .. ']\n', 162, 255, 255, 0))
 				end
 			end
 			if task.aQuestInfo then
@@ -589,7 +560,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					end
 				end
 			end
-			return concat(aTitleTipXml)
+			return table.concat(aTitleTipXml)
 		end
 		col.GetFormatText = function(rec)
 			local tTaskState = {}
@@ -641,21 +612,21 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			local aXml = {}
 			local function InsertTaskState(aInfo)
 				if IsCtrlKeyDown() then
-					insert(aXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
+					table.insert(aXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
 				end
-				insert(aXml, GetFormatText('[' .. Get(Table_GetQuestStringInfo(aInfo[1]), 'szName', '') .. ']: ', 162, 255, 255, 0))
+				table.insert(aXml, GetFormatText('[' .. X.Get(Table_GetQuestStringInfo(aInfo[1]), 'szName', '') .. ']: ', 162, 255, 255, 0))
 				if rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTABLE then
-					insert(aXml, GetFormatText(_L['Acceptable'] .. '\n', 162, 255, 255, 255))
+					table.insert(aXml, GetFormatText(_L['Acceptable'] .. '\n', 162, 255, 255, 255))
 				elseif rec.task_info[aInfo[1]] == TASK_STATE.UNACCEPTABLE then
-					insert(aXml, GetFormatText(_L['Unacceptable'] .. '\n', 162, 255, 255, 255))
+					table.insert(aXml, GetFormatText(_L['Unacceptable'] .. '\n', 162, 255, 255, 255))
 				elseif rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTED then
-					insert(aXml, GetFormatText(_L['Accepted'] .. '\n', 162, 255, 255, 255))
+					table.insert(aXml, GetFormatText(_L['Accepted'] .. '\n', 162, 255, 255, 255))
 				elseif rec.task_info[aInfo[1]] == TASK_STATE.FINISHED then
-					insert(aXml, GetFormatText(_L['Finished'] .. '\n', 162, 255, 255, 255))
+					table.insert(aXml, GetFormatText(_L['Finished'] .. '\n', 162, 255, 255, 255))
 				elseif rec.task_info[aInfo[1]] == TASK_STATE.FINISHABLE then
-					insert(aXml, GetFormatText(_L['Finishable'] .. '\n', 162, 255, 255, 255))
+					table.insert(aXml, GetFormatText(_L['Finishable'] .. '\n', 162, 255, 255, 255))
 				else
-					insert(aXml, GetFormatText(_L['Unknown'] .. '\n', 162, 255, 255, 255))
+					table.insert(aXml, GetFormatText(_L['Unknown'] .. '\n', 162, 255, 255, 255))
 				end
 			end
 			if task.aQuestInfo then
@@ -673,7 +644,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					InsertTaskState(aInfo)
 				end
 			end
-			return concat(aXml)
+			return table.concat(aXml)
 		end
 		col.Compare = function(r1, r2)
 			local k1, k2 = 0, 0
@@ -764,9 +735,9 @@ function D.GetClientPlayerRec()
 
 	-- 基础信息
 	rec.guid = guid
-	rec.account = LIB.GetAccount() or ''
-	rec.region = LIB.GetRealServer(1)
-	rec.server = LIB.GetRealServer(2)
+	rec.account = X.GetAccount() or ''
+	rec.region = X.GetRealServer(1)
+	rec.server = X.GetRealServer(2)
 	rec.name = me.szName
 	rec.force = me.dwForceID
 	rec.camp = me.nCamp
@@ -778,11 +749,11 @@ function D.GetClientPlayerRec()
 	local aTask = {}
 	-- 任务选项
 	for _, task in ipairs(TASK_LIST) do
-		insert(aTask, task)
+		table.insert(aTask, task)
 	end
 	-- 动态活动秘境选项
 	for _, szType in ipairs(ACTIVITY_LIST) do
-		insert(aTask, TASK_HASH[szType])
+		table.insert(aTask, TASK_HASH[szType])
 	end
 
 	for _, task in ipairs(aTask) do
@@ -818,11 +789,11 @@ end
 end
 
 function D.Migration()
-	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/task_stat.v2.db', PATH_TYPE.GLOBAL})
+	local DB_V2_PATH = X.FormatPath({'userdata/role_statistics/task_stat.v2.db', X.PATH_TYPE.GLOBAL})
 	if not IsLocalFileExist(DB_V2_PATH) then
 		return
 	end
-	LIB.Confirm(
+	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
 			-- 转移V2旧版数据
@@ -869,10 +840,10 @@ function D.Migration()
 					DB:Execute('END TRANSACTION')
 					DB_V2:Release()
 				end
-				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			FireUIEvent('MY_ROLE_STAT_TASK_UPDATE')
-			LIB.Alert(_L['Migrate succeed!'])
+			X.Alert(_L['Migrate succeed!'])
 		end)
 end
 
@@ -883,7 +854,7 @@ function D.FlushDB()
 	--[[#DEBUG BEGIN]]
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
-	local rec = Clone(D.GetClientPlayerRec())
+	local rec = X.Clone(D.GetClientPlayerRec())
 	D.EncodeRow(rec)
 
 	DB:Execute('BEGIN TRANSACTION')
@@ -897,10 +868,10 @@ function D.FlushDB()
 
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	LIB.Debug('MY_RoleStatistics_TaskStat', _L('Flushing to database costs %dms...', nTickCount), DEBUG_LEVEL.LOG)
+	X.Debug('MY_RoleStatistics_TaskStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterFlush('MY_RoleStatistics_TaskStat', D.FlushDB)
+X.RegisterFlush('MY_RoleStatistics_TaskStat', D.FlushDB)
 
 do local INIT = false
 function D.UpdateSaveDB()
@@ -913,18 +884,18 @@ function D.UpdateSaveDB()
 	end
 	if not O.bSaveDB then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_RoleStatistics_TaskStat', 'Remove from database...', DEBUG_LEVEL.LOG)
+		X.Debug('MY_RoleStatistics_TaskStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB_TaskInfoD:ClearBindings()
 		DB_TaskInfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		DB_TaskInfoD:Execute()
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_RoleStatistics_TaskStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
+		X.Debug('MY_RoleStatistics_TaskStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_TASK_UPDATE')
 end
-LIB.RegisterInit('MY_RoleStatistics_TaskUpdateSaveDB', function() INIT = true end)
+X.RegisterInit('MY_RoleStatistics_TaskUpdateSaveDB', function() INIT = true end)
 end
 
 function D.GetColumns()
@@ -932,7 +903,7 @@ function D.GetColumns()
 	for _, id in ipairs(O.aColumn) do
 		local col = COLUMN_DICT[id]
 		if col then
-			insert(aCol, col)
+			table.insert(aCol, col)
 		end
 	end
 	return aCol
@@ -954,7 +925,7 @@ function D.UpdateUI(page)
 		local imgDesc = hCol:Lookup('Image_TaskStat_Desc')
 		local nWidth = i == #aCol
 			and (EXCEL_WIDTH - nX)
-			or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
+			or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
 		local nSortDelta = nWidth > 70 and 25 or 15
 		if i == 0 then
 			hCol:Lookup('Image_TaskStat_Break'):Hide()
@@ -993,7 +964,7 @@ function D.UpdateUI(page)
 	end
 
 	if Sorter then
-		sort(result, Sorter)
+		table.sort(result, Sorter)
 	end
 
 	local aCol = D.GetColumns()
@@ -1017,7 +988,7 @@ function D.UpdateUI(page)
 			hItemContent:SetSizeByAllItemSize()
 			local nWidth = j == #aCol
 				and (EXCEL_WIDTH - nX)
-				or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
+				or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
 			hItem:SetRelX(nX)
 			hItem:SetW(nWidth)
 			hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
@@ -1034,8 +1005,8 @@ function D.EncodeRow(rec)
 	rec.name   = AnsiToUTF8(rec.name)
 	rec.region = AnsiToUTF8(rec.region)
 	rec.server = AnsiToUTF8(rec.server)
-	rec.task_info = EncodeLUAData(rec.task_info)
-	rec.buff_info = EncodeLUAData(rec.buff_info)
+	rec.task_info = X.EncodeLUAData(rec.task_info)
+	rec.buff_info = X.EncodeLUAData(rec.buff_info)
 end
 
 function D.DecodeRow(rec)
@@ -1043,48 +1014,48 @@ function D.DecodeRow(rec)
 	rec.name   = UTF8ToAnsi(rec.name)
 	rec.region = UTF8ToAnsi(rec.region)
 	rec.server = UTF8ToAnsi(rec.server)
-	rec.task_info = DecodeLUAData(rec.task_info or '') or {}
-	rec.buff_info = DecodeLUAData(rec.buff_info or '') or {}
+	rec.task_info = X.DecodeLUAData(rec.task_info or '') or {}
+	rec.buff_info = X.DecodeLUAData(rec.buff_info or '') or {}
 end
 
 function D.OutputRowTip(this, rec)
 	local aXml = {}
 	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
-	local tActivity = LIB.FlipObjectKV(ACTIVITY_LIST)
+	local tActivity = X.FlipObjectKV(ACTIVITY_LIST)
 	for _, id in ipairs(TIP_COLUMN) do
 		if id == 'TASK' then
 			for _, col in ipairs(D.GetColumns()) do
 				if TASK_HASH[col.id] and not tActivity[col.id] then
-					insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-					insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-					insert(aXml, col.GetFormatText(rec))
-					insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+					table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+					table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+					table.insert(aXml, col.GetFormatText(rec))
+					table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 				end
 			end
 		elseif id == 'ACTIVITY' then
 			for _, szType in ipairs(ACTIVITY_LIST) do
 				local col = COLUMN_DICT[szType]
 				if col and (not bFloat or not col.bHideInFloat) then
-					insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-					insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-					insert(aXml, col.GetFormatText(rec))
-					insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+					table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+					table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+					table.insert(aXml, col.GetFormatText(rec))
+					table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 				end
 			end
 		else
 			local col = COLUMN_DICT[id]
 			if col and (not bFloat or not col.bHideInFloat) then
-				insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-				insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-				insert(aXml, col.GetFormatText(rec))
-				insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+				table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+				table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+				table.insert(aXml, col.GetFormatText(rec))
+				table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 			end
 		end
 	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	local nPosType = bFloat and UI.TIP_POSITION.TOP_BOTTOM or UI.TIP_POSITION.RIGHT_LEFT
-	OutputTip(concat(aXml), 450, {x, y, w, h}, nPosType)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, nPosType)
 end
 
 function D.CloseRowTip()
@@ -1107,7 +1078,7 @@ function D.OnInitPage()
 			for i, id in ipairs(aColumn) do
 				local col = COLUMN_DICT[id]
 				if col then
-					insert(t, {
+					table.insert(t, {
 						szOption = col.szTitle,
 						{
 							szOption = _L['Move up'],
@@ -1134,7 +1105,7 @@ function D.OnInitPage()
 						{
 							szOption = _L['Delete'],
 							fnAction = function()
-								remove(aColumn, i)
+								table.remove(aColumn, i)
 								O.aColumn = aColumn
 								D.UpdateUI(page)
 								UI.ClosePopupMenu()
@@ -1150,7 +1121,7 @@ function D.OnInitPage()
 				local bExist = false
 				for i, v in ipairs(aColumn) do
 					if v == id then
-						remove(aColumn, i)
+						table.remove(aColumn, i)
 						O.aColumn = aColumn
 						bExist = true
 						break
@@ -1158,9 +1129,9 @@ function D.OnInitPage()
 				end
 				if not bExist then
 					if nMinW + nWidth > EXCEL_WIDTH then
-						LIB.Alert(_L['Too many column selected, width overflow, please delete some!'])
+						X.Alert(_L['Too many column selected, width overflow, please delete some!'])
 					else
-						insert(aColumn, id)
+						table.insert(aColumn, id)
 						O.aColumn = aColumn
 					end
 				end
@@ -1171,7 +1142,7 @@ function D.OnInitPage()
 			-- 普通选项
 			for _, col in ipairs(COLUMN_LIST) do
 				if not tChecked[col.id] then
-					insert(t, {
+					table.insert(t, {
 						szOption = col.szTitle,
 						fnAction = function()
 							fnAction(col.id, col.nMinWidth)
@@ -1184,7 +1155,7 @@ function D.OnInitPage()
 				if not tChecked[task.id] then
 					local col = COLUMN_DICT[task.id]
 					if col then
-						insert(t, {
+						table.insert(t, {
 							szOption = col.szTitle,
 							bCheck = true, bChecked = tChecked[col.id],
 							fnAction = function()
@@ -1200,7 +1171,7 @@ function D.OnInitPage()
 				if not tChecked[szType] then
 					local col = COLUMN_DICT[szType]
 					if col then
-						insert(t, {
+						table.insert(t, {
 							szOption = col.szTitle,
 							bCheck = true, bChecked = tChecked[col.id],
 							fnAction = function()
@@ -1238,7 +1209,7 @@ function D.CheckAdvice()
 		-- },
 	}) do
 		if not O[p.szAdviceKey] and not O[p.szSetKey] then
-			LIB.Confirm(p.szMsg, function()
+			X.Confirm(p.szMsg, function()
 				MY_RoleStatistics_TaskStat[p.szSetKey] = true
 				MY_RoleStatistics_TaskStat[p.szAdviceKey] = true
 				D.CheckAdvice()
@@ -1276,7 +1247,7 @@ function D.OnLButtonClick()
 	if name == 'Btn_Delete' then
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
+		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
 			DB_TaskInfoD:ClearBindings()
 			DB_TaskInfoD:BindAll(AnsiToUTF8(wnd.guid))
 			DB_TaskInfoD:Execute()
@@ -1351,7 +1322,7 @@ function D.OnItemMouseEnter()
 			local x, y = this:GetAbsPos()
 			local w, h = this:GetSize()
 			local szXml = col.GetFormatTip(rec)
-			if not IsEmpty(szXml) then
+			if not X.IsEmpty(szXml) then
 				OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 			end
 		end
@@ -1409,14 +1380,14 @@ function D.UpdateFloatEntry()
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_TaskStat', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_TaskStat', function()
 	D.bReady = true
 	D.UpdateSaveDB()
 	D.FlushDB()
 	D.UpdateFloatEntry()
 end)
-LIB.RegisterReload('MY_RoleStatistics_TaskEntry', function() D.ApplyFloatEntry(false) end)
-LIB.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_TaskEntry', D.UpdateFloatEntry)
+X.RegisterReload('MY_RoleStatistics_TaskEntry', function() D.ApplyFloatEntry(false) end)
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_TaskEntry', D.UpdateFloatEntry)
 
 -- Module exports
 do
@@ -1434,7 +1405,7 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics.RegisterModule('TaskStat', _L['MY_RoleStatistics_TaskStat'], LIB.CreateModule(settings))
+MY_RoleStatistics.RegisterModule('TaskStat', _L['MY_RoleStatistics_TaskStat'], X.CreateModule(settings))
 end
 
 -- Global exports
@@ -1476,5 +1447,5 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics_TaskStat = LIB.CreateModule(settings)
+MY_RoleStatistics_TaskStat = X.CreateModule(settings)
 end

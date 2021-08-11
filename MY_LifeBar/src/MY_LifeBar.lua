@@ -10,52 +10,23 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_LifeBar'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_LifeBar', { ['*'] = false, classic = true })
-LIB.RegisterRestriction('MY_LifeBar.MapRestriction', { ['*'] = true })
-LIB.RegisterRestriction('MY_LifeBar.SpecialNpc', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_LifeBar', { ['*'] = false, classic = true })
+X.RegisterRestriction('MY_LifeBar.MapRestriction', { ['*'] = true })
+X.RegisterRestriction('MY_LifeBar.SpecialNpc', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local Config = MY_LifeBar_Config
@@ -99,8 +70,8 @@ function GetConfigComputeValue(key, relation, force, bFight, bPet)
 	end
 	return true
 end
-LIB.RegisterEvent('LOADING_ENDING', 'MY_LifeBar__GetConfigComputeValue', function()
-	bInDungeon = LIB.IsInDungeon()
+X.RegisterEvent('LOADING_ENDING', 'MY_LifeBar__GetConfigComputeValue', function()
+	bInDungeon = X.IsInDungeon()
 end)
 end
 -----------------------------------------------------------------------------------------
@@ -139,7 +110,7 @@ local QUEST_TITLE_EFFECT = {
 local function UpdateTitleEffect(dwType, dwID)
 	local nEffectID = nil
 	if dwType == TARGET.PLAYER then
-		local nMark = LIB.GetMarkIndex(dwID)
+		local nMark = X.GetMarkIndex(dwID)
 		if nMark and PARTY_TITLE_MARK_EFFECT_LIST[nMark] then
 			nEffectID = PARTY_TITLE_MARK_EFFECT_LIST[nMark]
 		end
@@ -169,8 +140,8 @@ local function UpdateTitleEffect(dwType, dwID)
 			-- or aQuestState.normal_notneedaccept_low or aQuestState.normal_notneedaccept_lower
 			-- or aQuestState.normal_notneedaccept_high or aQuestState.normal_notneedaccept_higher
 				nEffectID = QUEST_TITLE_EFFECT.normal_notneedaccept
-			elseif LIB.GetMarkIndex(dwID) and PARTY_TITLE_MARK_EFFECT_LIST[LIB.GetMarkIndex(dwID)] then -- party mark
-				nEffectID = PARTY_TITLE_MARK_EFFECT_LIST[LIB.GetMarkIndex(dwID)]
+			elseif X.GetMarkIndex(dwID) and PARTY_TITLE_MARK_EFFECT_LIST[X.GetMarkIndex(dwID)] then -- party mark
+				nEffectID = PARTY_TITLE_MARK_EFFECT_LIST[X.GetMarkIndex(dwID)]
 			elseif aQuestState.normal_unaccept_high or aQuestState.repeat_unaccept_high or aQuestState.activity_unaccept_high then
 				nEffectID = QUEST_TITLE_EFFECT.unaccept_high
 			elseif aQuestState.normal_unaccept_low or aQuestState.repeat_unaccept_low or aQuestState.activity_unaccept_low then
@@ -186,27 +157,27 @@ local function UpdateTitleEffect(dwType, dwID)
 			end
 		end
 	end
-	OBJECT_TITLE_EFFECT[dwID] = nEffectID and LIB.GetGlobalEffect(nEffectID)
+	OBJECT_TITLE_EFFECT[dwID] = nEffectID and X.GetGlobalEffect(nEffectID)
 	OVERWRITE_TITLE_EFFECT[dwID] = not OBJECT_TITLE_EFFECT[dwID] -- 强刷系统头顶
 end
 local function onPlayerStateUpdate()
 	UpdateTitleEffect(TARGET.PLAYER, arg0)
 end
-LIB.RegisterEvent('PLAYER_STATE_UPDATE', 'MY_LifeBar', onPlayerStateUpdate)
+X.RegisterEvent('PLAYER_STATE_UPDATE', 'MY_LifeBar', onPlayerStateUpdate)
 
 local function onNpcQuestMarkUpdate()
 	UpdateTitleEffect(TARGET.NPC, arg0)
 end
-LIB.RegisterEvent('QUEST_MARK_UPDATE', 'MY_LifeBar', onNpcQuestMarkUpdate)
-LIB.RegisterEvent('NPC_DISPLAY_DATA_UPDATE', 'MY_LifeBar', onNpcQuestMarkUpdate)
+X.RegisterEvent('QUEST_MARK_UPDATE', 'MY_LifeBar', onNpcQuestMarkUpdate)
+X.RegisterEvent('NPC_DISPLAY_DATA_UPDATE', 'MY_LifeBar', onNpcQuestMarkUpdate)
 
 local function onNpcQuestMarkUpdateAll()
-	for _, dwID in ipairs(LIB.GetNearNpcID()) do
+	for _, dwID in ipairs(X.GetNearNpcID()) do
 		UpdateTitleEffect(TARGET.NPC, dwID)
 	end
 end
-LIB.RegisterEvent('LEAVE_STORY_MODE', 'MY_LifeBar', onNpcQuestMarkUpdateAll)
-LIB.RegisterInit('MY_LifeBar_onNpcQuestMarkUpdateAll', onNpcQuestMarkUpdateAll)
+X.RegisterEvent('LEAVE_STORY_MODE', 'MY_LifeBar', onNpcQuestMarkUpdateAll)
+X.RegisterInit('MY_LifeBar_onNpcQuestMarkUpdateAll', onNpcQuestMarkUpdateAll)
 
 local function onPartySetMark()
 	local tID = {}
@@ -221,44 +192,44 @@ local function onPartySetMark()
 	end
 	OVERWRITE_TITLE_EFFECT = {}
 end
-LIB.RegisterInit('MY_LifeBar_onPartySetMark', onPartySetMark)
-LIB.RegisterEvent('PARTY_SET_MARK', 'MY_LifeBar', onPartySetMark)
-LIB.RegisterEvent('PARTY_DELETE_MEMBER', 'MY_LifeBar', function()
+X.RegisterInit('MY_LifeBar_onPartySetMark', onPartySetMark)
+X.RegisterEvent('PARTY_SET_MARK', 'MY_LifeBar', onPartySetMark)
+X.RegisterEvent('PARTY_DELETE_MEMBER', 'MY_LifeBar', function()
 	local me = GetClientPlayer()
 	if me.dwID == arg1 then
 		onPartySetMark()
 	end
 end)
-LIB.RegisterEvent('PARTY_DISBAND', 'MY_LifeBar', onPartySetMark)
-LIB.RegisterEvent('PARTY_UPDATE_BASE_INFO', 'MY_LifeBar', onPartySetMark)
+X.RegisterEvent('PARTY_DISBAND', 'MY_LifeBar', onPartySetMark)
+X.RegisterEvent('PARTY_UPDATE_BASE_INFO', 'MY_LifeBar', onPartySetMark)
 
 local function onLoadingEnd()
 	OVERWRITE_TITLE_EFFECT = {}
 end
-LIB.RegisterEvent('LOADING_END', onLoadingEnd)
+X.RegisterEvent('LOADING_END', onLoadingEnd)
 end
 
-local O = LIB.CreateUserSettingsModule('MY_LifeBar', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_LifeBar', _L['General'], {
 	bEnabled = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoHideSysHeadtop = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
 local D = {}
 
 function D.IsShielded()
-	if LIB.IsRestricted('MY_LifeBar') then
+	if X.IsRestricted('MY_LifeBar') then
 		return true
 	end
-	return LIB.IsRestricted('MY_LifeBar.MapRestriction') and LIB.IsInShieldedMap()
+	return X.IsRestricted('MY_LifeBar.MapRestriction') and X.IsInShieldedMap()
 end
 
 function D.IsEnabled()
@@ -272,20 +243,20 @@ function D.IsMapEnabled()
 			Config.bOnlyInArena or
 			Config.bOnlyInBattleField
 		) or (
-			(Config.bOnlyInDungeon     and LIB.IsInDungeon()) or
-			(Config.bOnlyInArena       and LIB.IsInArena()) or
-			(Config.bOnlyInBattleField and (LIB.IsInBattleField() or LIB.IsInPubg() or LIB.IsInZombieMap()))
+			(Config.bOnlyInDungeon     and X.IsInDungeon()) or
+			(Config.bOnlyInArena       and X.IsInArena()) or
+			(Config.bOnlyInBattleField and (X.IsInBattleField() or X.IsInPubg() or X.IsInZombieMap()))
 		)
 	)
 end
 
 function D.GetNz(nZ,nZ2)
-	return floor(((nZ/8 - nZ2/8) ^ 2) ^ 0.5)/64
+	return math.floor(((nZ/8 - nZ2/8) ^ 2) ^ 0.5)/64
 end
 
 function D.GetRelation(dwSrcID, dwTarID, KSrc, KTar)
 	if Config.nCamp == -1 or not IsPlayer(dwTarID) then
-		return LIB.GetRelation(dwSrcID, dwTarID)
+		return X.GetRelation(dwSrcID, dwTarID)
 	else
 		if not KTar then
 			return 'Neutrality'
@@ -293,7 +264,7 @@ function D.GetRelation(dwSrcID, dwTarID, KSrc, KTar)
 			return 'Self'
 		elseif IsParty(dwSrcID, dwTarID) then
 			return 'Party'
-		elseif LIB.GetFoe(dwTarID) then
+		elseif X.GetFoe(dwTarID) then
 			return 'Foe'
 		elseif KTar.nCamp == Config.nCamp then
 			return 'Ally'
@@ -317,7 +288,7 @@ function D.GetForce(dwType, dwID, KObject)
 end
 
 function D.GetTongName(dwTongID)
-	if not IsNumber(dwTongID) or dwTongID == 0 then
+	if not X.IsNumber(dwTongID) or dwTongID == 0 then
 		return
 	end
 	if not TONG_NAME_CACHE[dwTongID] then
@@ -354,9 +325,9 @@ function D.HideSysHeadTop()
 	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.TITLE, false)
 	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.LIFE , false)
 	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, false)
-	SafeCall(_G.SetGlobalTopIntelligenceLife, false)
-	SafeCall(_G.Addon_ShowNpcBalloon, false)
-	SafeCall(_G.Addon_ShowPlayerBalloon, false)
+	X.SafeCall(_G.SetGlobalTopIntelligenceLife, false)
+	X.SafeCall(_G.Addon_ShowNpcBalloon, false)
+	X.SafeCall(_G.Addon_ShowPlayerBalloon, false)
 end
 function D.SaveSysHeadTop()
 	if SYS_HEAD_TOP_STATE then
@@ -374,9 +345,9 @@ function D.SaveSysHeadTop()
 		['CLIENTPLAYER_TITLE'] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.TITLE),
 		['CLIENTPLAYER_LIFE' ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.LIFE ),
 		['CLIENTPLAYER_GUILD'] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD),
-		['INTELLIGENCE_LIFE' ] = select(2, SafeCall(_G.GetGlobalTopIntelligenceLife)),
-		['NPC_BALLOON'       ] = select(2, SafeCall(_G.Addon_IsNpcBalloon)),
-		['PLAYER_BALLOON'    ] = select(2, SafeCall(_G.Addon_IsPlayerBalloon)),
+		['INTELLIGENCE_LIFE' ] = select(2, X.SafeCall(_G.GetGlobalTopIntelligenceLife)),
+		['NPC_BALLOON'       ] = select(2, X.SafeCall(_G.Addon_IsNpcBalloon)),
+		['PLAYER_BALLOON'    ] = select(2, X.SafeCall(_G.Addon_IsPlayerBalloon)),
 	}
 end
 function D.ResumeSysHeadTop()
@@ -394,19 +365,19 @@ function D.ResumeSysHeadTop()
 	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.TITLE, SYS_HEAD_TOP_STATE['CLIENTPLAYER_TITLE'])
 	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.LIFE , SYS_HEAD_TOP_STATE['CLIENTPLAYER_LIFE'])
 	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, SYS_HEAD_TOP_STATE['CLIENTPLAYER_GUILD'])
-	SafeCall(_G.SetGlobalTopIntelligenceLife, SYS_HEAD_TOP_STATE['INTELLIGENCE_LIFE'])
-	SafeCall(_G.Addon_ShowNpcBalloon, SYS_HEAD_TOP_STATE['NPC_BALLOON'])
-	SafeCall(_G.Addon_ShowPlayerBalloon, SYS_HEAD_TOP_STATE['PLAYER_BALLOON'])
+	X.SafeCall(_G.SetGlobalTopIntelligenceLife, SYS_HEAD_TOP_STATE['INTELLIGENCE_LIFE'])
+	X.SafeCall(_G.Addon_ShowNpcBalloon, SYS_HEAD_TOP_STATE['NPC_BALLOON'])
+	X.SafeCall(_G.Addon_ShowPlayerBalloon, SYS_HEAD_TOP_STATE['PLAYER_BALLOON'])
 	SYS_HEAD_TOP_STATE = nil
 end
-LIB.RegisterExit(D.ResumeSysHeadTop)
+X.RegisterExit(D.ResumeSysHeadTop)
 
 function D.Repaint()
 	for _, lb in pairs(LB_CACHE) do
 		lb:Paint(true)
 	end
 end
-LIB.RegisterEvent('UI_SCALED', D.Repaint)
+X.RegisterEvent('UI_SCALED', D.Repaint)
 
 function D.UpdateShadowHandleParam()
 	UI.SetShadowHandleParam('MY_LifeBar', { bShowWhenUIHide = Config.bShowWhenUIHide })
@@ -444,40 +415,40 @@ function D.Reset()
 			until nCount > 30 or LB_ADJUST_INDEX_ID == dwLastID
 			dwLastID = LB_ADJUST_INDEX_ID
 		end
-		LIB.BreatheCall('MY_LifeBar_ScreenPosSort', onBreathe)
+		X.BreatheCall('MY_LifeBar_ScreenPosSort', onBreathe)
 	else
-		LIB.BreatheCall('MY_LifeBar_ScreenPosSort', false)
+		X.BreatheCall('MY_LifeBar_ScreenPosSort', false)
 	end
 	D.AutoSwitchSysHeadTop()
 end
-LIB.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', D.Reset)
-LIB.RegisterEvent('LOADING_END', D.AutoSwitchSysHeadTop)
-LIB.RegisterEvent('MY_RESTRICTION', D.Reset)
-LIB.RegisterEvent('COINSHOP_ON_CLOSE', D.AutoSwitchSysHeadTop)
+X.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', D.Reset)
+X.RegisterEvent('LOADING_END', D.AutoSwitchSysHeadTop)
+X.RegisterEvent('MY_RESTRICTION', D.Reset)
+X.RegisterEvent('COINSHOP_ON_CLOSE', D.AutoSwitchSysHeadTop)
 
 do
 local CheckInvalidRect
 do
-local bRestrictedVersion = LIB.IsRestricted('MY_LifeBar.SpecialNpc')
-LIB.RegisterEvent('MY_RESTRICTION', function()
+local bRestrictedVersion = X.IsRestricted('MY_LifeBar.SpecialNpc')
+X.RegisterEvent('MY_RESTRICTION', function()
 	if arg0 and arg0 ~= 'MY_LifeBar.SpecialNpc' then
 		return
 	end
-	bRestrictedVersion = LIB.IsRestricted('MY_LifeBar.SpecialNpc')
+	bRestrictedVersion = X.IsRestricted('MY_LifeBar.SpecialNpc')
 end)
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
-local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end
-local function fxDeathTarget(r, g, b, a) return ceil(r * 0.45), ceil(g * 0.45), ceil(b * 0.45), a end
+local function fxDeath(r, g, b, a) return math.ceil(r * 0.4), math.ceil(g * 0.4), math.ceil(b * 0.4), a end
+local function fxDeathTarget(r, g, b, a) return math.ceil(r * 0.45), math.ceil(g * 0.45), math.ceil(b * 0.45), a end
 local lb, info, bVisible, bFight, nDisX, nDisY, nDisZ, fTextScale, dwTarType, dwTarID, relation, force, nPriority, szName, szTongName, r, g, b
 local aCountDown, szCountDown, bPet, bShowName, bShowKungfu, kunfu, bShowTong, bShowTitle, bShowLife, bShowLifePercent, tEffect, fCurrentLife, fMaxLife
 local bSpecialNpcVisible, bShowDistance
 local function IsSpecialNpcVisible(dwID, me, object)
-	if not IsBoolean(bSpecialNpcVisible) then
+	if not X.IsBoolean(bSpecialNpcVisible) then
 		bSpecialNpcVisible = false
 		if object.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID and (not bRestrictedVersion or not IsEnemy(me.dwID, dwID)) then
 			bSpecialNpcVisible = true
 		elseif not bRestrictedVersion
-		and Config.bShowSpecialNpc and (not bRestrictedVersion or LIB.IsInDungeon())
+		and Config.bShowSpecialNpc and (not bRestrictedVersion or X.IsInDungeon())
 		and (not Config.bShowSpecialNpcOnlyEnemy or IsEnemy(me.dwID, dwID)) then
 			bSpecialNpcVisible = true
 		end
@@ -497,7 +468,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 	bVisible = true
 	bSpecialNpcVisible = nil
 	-- 显示标记判断
-	if bVisible and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and LIB.IsIsolated(me) ~= LIB.IsIsolated(object) then
+	if bVisible and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and X.IsIsolated(me) ~= X.IsIsolated(object) then
 		bVisible = false
 	end
 	-- 距离判断
@@ -524,7 +495,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 			lb:SetDistance(0)
 			LB_CACHE[dwID] = lb
 		end
-		bFight = LIB.IsFighting()
+		bFight = X.IsFighting()
 		fTextScale = Config.fTextScale
 		dwTarType, dwTarID = me.GetTarget()
 		relation = D.GetRelation(me.dwID, dwID, me, object)
@@ -536,7 +507,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		if Config.bTargetOnTop and dwID == dwTarID then -- 目标永远最前
 			nPriority = nPriority + 10000
 		end
-		szName = LIB.GetObjectName(object, (Config.bShowObjectID and (Config.bShowObjectIDOnlyUnnamed and 'auto' or 'always') or 'never'))
+		szName = X.GetObjectName(object, (Config.bShowObjectID and (Config.bShowObjectIDOnlyUnnamed and 'auto' or 'always') or 'never'))
 		bPet = dwType == TARGET.NPC and object.dwEmployer ~= 0 and IsPlayer(object.dwEmployer)
 		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString and szName and (dwType == TARGET.PLAYER or bPet) then
 			szName = MY_ChatMosaics.MosaicsString(szName)
@@ -551,13 +522,13 @@ function CheckInvalidRect(dwType, dwID, me, object)
 				local KBuff = object.GetBuff(tData.dwBuffID, 0)
 				if KBuff then
 					nSec = (KBuff.GetEndTime() - GetLogicFrameCount()) / GLOBAL.GAME_FPS
-					szText = tData.szText or LIB.GetBuffName(KBuff.dwID, KBuff.nLevel)
+					szText = tData.szText or X.GetBuffName(KBuff.dwID, KBuff.nLevel)
 					if KBuff.nStackNum > 1 then
 						szText = szText .. 'x' .. KBuff.nStackNum
 					end
 				end
 			elseif tData.szType == 'CASTING' then
-				local nType, dwSkillID, dwSkillLevel, fCastPercent = LIB.GetOTActionState(object)
+				local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(object)
 				if dwSkillID == tData.dwSkillID
 				and (
 					nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
@@ -565,7 +536,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 					or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE
 				) then
 					fPer = fCastPercent
-					szText = tData.szText or LIB.GetSkillName(dwSkillID, dwSkillLevel)
+					szText = tData.szText or X.GetSkillName(dwSkillID, dwSkillLevel)
 				end
 			elseif tData.szType == 'NPC' or tData.szType == 'DOODAD' then
 				szText = tData.szText or ''
@@ -591,17 +562,17 @@ function CheckInvalidRect(dwType, dwID, me, object)
 				end
 				nPriority = nPriority + 100000
 				fTextScale = fTextScale * 1.15
-				if not IsEmpty(szText) and not tData.bHideProgress then
+				if not X.IsEmpty(szText) and not tData.bHideProgress then
 					if nSec then
-						szCountDown = LIB.FormatTimeCounter(min(nSec, 5999), 1)
+						szCountDown = X.FormatTimeCounter(math.min(nSec, 5999), 1)
 					elseif fPer then
-						szCountDown = floor(fPer * 100) .. '%'
+						szCountDown = math.floor(fPer * 100) .. '%'
 					end
 					szCountDown = szText .. '_' .. szCountDown
 				end
 				break
 			else
-				remove(aCountDown, 1)
+				table.remove(aCountDown, 1)
 			end
 		end
 		lb:SetCD(szCountDown)
@@ -619,7 +590,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		if bShowKungfu then
 			kunfu = object.GetKungfuMount()
 			if kunfu and kunfu.dwSkillID and kunfu.dwSkillID ~= 0 then
-				lb:SetKungfu(LIB.GetKungfuName(kunfu.dwSkillID, 'short'))
+				lb:SetKungfu(X.GetKungfuName(kunfu.dwSkillID, 'short'))
 			else
 				lb:SetKungfu(g_tStrings.tForceTitle[object.dwForceID])
 			end
@@ -628,7 +599,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		-- 距离
 		bShowDistance = Config.bShowDistance and (not Config.bShowDistanceOnlyTarget or dwID == dwTarID)
 		if bShowDistance then
-			lb:SetDistance(LIB.GetDistance(object))
+			lb:SetDistance(X.GetDistance(object))
 		end
 		lb:SetDistanceVisible(bShowDistance)
 		-- 帮会
@@ -648,9 +619,9 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetTitleVisible(bShowTitle)
 		-- 血条部分
-		fCurrentLife, fMaxLife = LIB.GetObjectLife(info)
+		fCurrentLife, fMaxLife = X.GetObjectLife(info)
 		if not fCurrentLife or fMaxLife == 0 then
-			fCurrentLife, fMaxLife = LIB.GetObjectLife(object)
+			fCurrentLife, fMaxLife = X.GetObjectLife(object)
 		end
 		lb:SetLife(fCurrentLife, fMaxLife)
 		bShowLife = szName ~= '' and GetConfigComputeValue('ShowLife', relation, force, bFight, bPet)
@@ -679,7 +650,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 			lb:ClearSFX()
 		end
 		-- 各种数据生效
-		lb:SetScale(LIB.GetUIScale() * (Config.bSystemUIScale and LIB.GetUIScale() or 1) * Config.fGlobalUIScale)
+		lb:SetScale(X.GetUIScale() * (Config.bSystemUIScale and X.GetUIScale() or 1) * Config.fGlobalUIScale)
 		lb:SetColor(r, g, b, Config.nAlpha)
 		lb:SetColorFx(
 			object.nMoveState == MOVE_STATE.ON_DEATH
@@ -688,7 +659,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		)
 		lb:SetFont(Config.nFont)
 		lb:SetTextsPos(Config.nTextOffsetY, Config.nTextLineHeight)
-		lb:SetTextsScale((Config.bSystemUIScale and LIB.GetFontScale() or 1) * fTextScale)
+		lb:SetTextsScale((Config.bSystemUIScale and X.GetFontScale() or 1) * fTextScale)
 		lb:SetTextsSpacing(Config.fTextSpacing)
 		lb:SetPriority(nPriority)
 		lb:Create():Paint()
@@ -725,7 +696,7 @@ local function onBreathe()
 	CheckInvalidRect(TARGET.PLAYER, me.dwID, me, me)
 	dwTarType, dwTarID = me.GetTarget()
 	if dwTarType == TARGET.PLAYER or dwTarType == TARGET.NPC then
-		KTar = LIB.GetObject(dwTarType, dwTarID)
+		KTar = X.GetObject(dwTarType, dwTarID)
 		if KTar then
 			CheckInvalidRect(dwTarType, dwTarID, me, KTar)
 		end
@@ -764,15 +735,15 @@ local function onBreathe()
 	end
 	dwLastType, dwLastID = DRAW_TARGET_TYPE, DRAW_TARGET_ID
 end
-LIB.FrameCall('MY_LifeBar', onBreathe)
+X.FrameCall('MY_LifeBar', onBreathe)
 end
 end
 
-LIB.RegisterEvent('NPC_ENTER_SCENE',function()
+X.RegisterEvent('NPC_ENTER_SCENE',function()
 	NPC_CACHE[arg0] = GetNpc(arg0)
 end)
 
-LIB.RegisterEvent('NPC_LEAVE_SCENE',function()
+X.RegisterEvent('NPC_LEAVE_SCENE',function()
 	local lb = LB_CACHE[arg0]
 	if lb then
 		if LB_ADJUST_INDEX_ID == arg0 then
@@ -790,11 +761,11 @@ LIB.RegisterEvent('NPC_LEAVE_SCENE',function()
 	NPC_CACHE[arg0] = nil
 end)
 
-LIB.RegisterEvent('PLAYER_ENTER_SCENE',function()
+X.RegisterEvent('PLAYER_ENTER_SCENE',function()
 	PLAYER_CACHE[arg0] = GetPlayer(arg0)
 end)
 
-LIB.RegisterEvent('PLAYER_LEAVE_SCENE',function()
+X.RegisterEvent('PLAYER_LEAVE_SCENE',function()
 	local lb = LB_CACHE[arg0]
 	if lb then
 		if LB_ADJUST_INDEX_ID == arg0 then
@@ -812,20 +783,20 @@ LIB.RegisterEvent('PLAYER_LEAVE_SCENE',function()
 	PLAYER_CACHE[arg0] = nil
 end)
 
-LIB.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
+X.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
 	local dwID, szType, szKey, tData = arg0, arg1, arg2, arg3
 	if not COUNTDOWN_CACHE[dwID] then
 		COUNTDOWN_CACHE[dwID] = {}
 	end
-	for i, p in ipairs_r(COUNTDOWN_CACHE[dwID]) do
+	for i, p in X.ipairs_r(COUNTDOWN_CACHE[dwID]) do
 		if p.szType == szType and p.szKey == szKey then
-			remove(COUNTDOWN_CACHE[dwID], i)
+			table.remove(COUNTDOWN_CACHE[dwID], i)
 		end
 	end
 	if tData then
-		local tData = Clone(tData)
+		local tData = X.Clone(tData)
 		if tData.col then
-			local r, g, b = LIB.HumanColor2RGB(tData.col)
+			local r, g, b = X.HumanColor2RGB(tData.col)
 			if r and g and b then
 				tData.tColor = {r, g, b}
 			end
@@ -833,7 +804,7 @@ LIB.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
 		end
 		tData.szType = szType
 		tData.szKey = szKey
-		insert(COUNTDOWN_CACHE[dwID], 1, tData)
+		table.insert(COUNTDOWN_CACHE[dwID], 1, tData)
 	elseif #COUNTDOWN_CACHE[dwID] == 0 then
 		COUNTDOWN_CACHE[dwID] = nil
 	end
@@ -852,7 +823,7 @@ local function OnCharacterSay(dwID, nChannel, szText)
 		return
 	end
 	local dwType = IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
-	local object = LIB.GetObject(dwType, dwID)
+	local object = X.GetObject(dwType, dwID)
 	if not object then
 		return
 	end
@@ -862,7 +833,7 @@ local function OnCharacterSay(dwID, nChannel, szText)
 	end
 	local me = GetClientPlayer()
 	local scene = me.GetScene()
-	if dwType == TARGET.PLAYER and IsEnemy(me.dwID, dwID) and (scene.bIsArenaMap or LIB.IsShieldedMap(scene.dwMapID)) then
+	if dwType == TARGET.PLAYER and IsEnemy(me.dwID, dwID) and (scene.bIsArenaMap or X.IsShieldedMap(scene.dwMapID)) then
 		return
 	end
 	local relation = D.GetRelation(me.dwID, dwID, me, object)
@@ -874,13 +845,13 @@ local function OnCharacterSay(dwID, nChannel, szText)
 	lb:SetBalloon(szText, GetTime(), bc.nDuring, Config.nBalloonOffsetY)
 end
 
-LIB.RegisterEvent('CHARACTER_SAY', function()
+X.RegisterEvent('CHARACTER_SAY', function()
 	local szText = Table_GetSmartDialog(arg3, arg0)
 	szText = GetFormatText(szText)
 	OnCharacterSay(arg1, arg2, szText)
 end)
 
-LIB.RegisterEvent('PLAYER_SAY', function()
+X.RegisterEvent('PLAYER_SAY', function()
 	OnCharacterSay(arg1, arg2, arg0)
 end)
 
@@ -888,9 +859,9 @@ local function onSwitch()
 	O.bEnabled = not O.bEnabled
 	D.Reset()
 end
-LIB.RegisterHotKey('MY_LifeBar_S', _L['MY_LifeBar'], onSwitch)
+X.RegisterHotKey('MY_LifeBar_S', _L['MY_LifeBar'], onSwitch)
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar', function()
 	D.bReady = true
 	D.Reset()
 end)
@@ -930,5 +901,5 @@ local settings = {
 		},
 	},
 }
-MY_LifeBar = LIB.CreateModule(settings)
+MY_LifeBar = X.CreateModule(settings)
 end

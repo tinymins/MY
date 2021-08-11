@@ -10,73 +10,44 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamRestore'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local DATA_PATH = {'userdata/team_restore.jx3dat', PATH_TYPE.SERVER}
+local DATA_PATH = {'userdata/team_restore.jx3dat', X.PATH_TYPE.SERVER}
 local D = {}
 local O = {
 	bKeepMark = true,
 	bKeepForm = true,
-	SaveList = LIB.LoadLUAData(DATA_PATH) or {},
+	SaveList = X.LoadLUAData(DATA_PATH) or {},
 	szMarkImage = PARTY_MARK_ICON_PATH,
 	tMarkFrame = PARTY_MARK_ICON_FRAME_LIST,
 }
 
 function D.LoadLUAData()
-	O.SaveList = LIB.LoadLUAData(DATA_PATH) or {}
+	O.SaveList = X.LoadLUAData(DATA_PATH) or {}
 end
 
 function D.SaveLUAData()
-	LIB.SaveLUAData(DATA_PATH, O.SaveList)
+	X.SaveLUAData(DATA_PATH, O.SaveList)
 end
 
 function D.Save(nIndex, szName)
 	local tList, tList2, me, team = {}, {}, GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
-		return LIB.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
 	end
 	local tSave = {}
 	tSave.szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
@@ -96,7 +67,7 @@ function D.Save(nIndex, szName)
 				item.nMark = tMark[dwID]
 				item.bForm = dwID == tGroupInfo.dwFormationLeader
 				tList[szName] = item
-				insert(tList2[nGroup], {
+				table.insert(tList2[nGroup], {
 					dwMountKungfuID = info.dwMountKungfuID,
 					nMark = tMark[dwID],
 					bForm = dwID == tGroupInfo.dwFormationLeader,
@@ -105,9 +76,9 @@ function D.Save(nIndex, szName)
 			end
 		end
 	end
-	szName = LIB.TrimString(szName)
-	if IsEmpty(szName) then
-		szName = LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss')
+	szName = X.TrimString(szName)
+	if X.IsEmpty(szName) then
+		szName = X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss')
 	end
 	tSave.name = szName
 	tSave.data = tList
@@ -118,20 +89,20 @@ function D.Save(nIndex, szName)
 	end
 	O.SaveList[nIndex] = tSave
 	D.SaveLUAData()
-	LIB.Sysmsg(_L['Team list data saved'])
+	X.Sysmsg(_L['Team list data saved'])
 end
 function D.Delete(nIndex)
-	remove(O.SaveList, nIndex)
+	table.remove(O.SaveList, nIndex)
 	D.SaveLUAData()
 end
 function D.SyncMember(team, dwID, szName, state)
 	if O.bKeepForm and state.bForm then --如果这货之前有阵眼
 		team.SetTeamFormationLeader(dwID, state.nGroup) -- 阵眼给他
-		LIB.Sysmsg(_L('Restore formation of %d group: %s', state.nGroup + 1, szName))
+		X.Sysmsg(_L('Restore formation of %d group: %s', state.nGroup + 1, szName))
 	end
 	if O.bKeepMark and state.nMark then -- 如果这货之前有标记
 		team.SetTeamMark(state.nMark, dwID) -- 标记给他
-		LIB.Sysmsg(_L('Restore player marked as [%s]: %s', LIB.GetMarkName(state.nMark), szName))
+		X.Sysmsg(_L('Restore player marked as [%s]: %s', X.GetMarkName(state.nMark), szName))
 	end
 end
 
@@ -150,15 +121,15 @@ function D.Restore(n)
 	D.LoadLUAData()
 
 	if not me or not me.IsInParty() then
-		return LIB.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
 	elseif not O.SaveList[n] then
-		return LIB.Sysmsg(_L['You have not saved team list data'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You have not saved team list data'], CONSTANT.MSG_THEME.ERROR)
 	end
 	-- get perm
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) ~= me.dwID then
 		local nGroup = team.GetMemberGroupIndex(me.dwID) + 1
 		local szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
-		return LIB.Sysmsg(_L['You are not team leader, permission denied'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You are not team leader, permission denied'], CONSTANT.MSG_THEME.ERROR)
 	end
 
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) ~= me.dwID then
@@ -173,20 +144,20 @@ function D.Restore(n)
 		for _, dwID in pairs(tGroupInfo.MemberList) do
 			local szName = team.GetClientTeamMemberName(dwID)
 			if not szName then
-				LIB.Sysmsg(_L('Unable get player of %d group: #%d', nGroup + 1, dwID), CONSTANT.MSG_THEME.ERROR)
+				X.Sysmsg(_L('Unable get player of %d group: #%d', nGroup + 1, dwID), CONSTANT.MSG_THEME.ERROR)
 			else
 				if not tSaved[szName] then
-					szName = gsub(szName, '@.*', '')
+					szName = string.gsub(szName, '@.*', '')
 				end
 				local state = tSaved[szName]
 				if not state then
-					insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = nil })
-					LIB.Sysmsg(_L('Unknown status: %s', szName))
+					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = nil })
+					X.Sysmsg(_L('Unknown status: %s', szName))
 				elseif state.nGroup == nGroup then
 					D.SyncMember(team, dwID, szName, state)
-					LIB.Sysmsg(_L('Need not adjust: %s', szName))
+					X.Sysmsg(_L('Need not adjust: %s', szName))
 				else
-					insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = state })
+					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = state })
 				end
 				if szName == O.SaveList[n].szLeader then
 					dwLeader = dwID
@@ -196,7 +167,7 @@ function D.Restore(n)
 				end
 				if szName == O.SaveList[n].szDistribute and dwID ~= team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) then
 					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE,dwID)
-					LIB.Sysmsg(_L('Restore distributor: %s', szName))
+					X.Sysmsg(_L('Restore distributor: %s', szName))
 				end
 			end
 		end
@@ -208,22 +179,22 @@ function D.Restore(n)
 			-- wrong user to be adjusted
 			local src = tWrong[nGroup][nIndex]
 			local dIndex = D.GetWrongIndex(tWrong[src.state.nGroup], false)
-			remove(tWrong[nGroup], nIndex)
+			table.remove(tWrong[nGroup], nIndex)
 			-- do adjust
 			if not dIndex then
 				team.ChangeMemberGroup(src.dwID, src.state.nGroup, 0) -- 直接丢过去
 			else
 				local dst = tWrong[src.state.nGroup][dIndex]
-				remove(tWrong[src.state.nGroup], dIndex)
+				table.remove(tWrong[src.state.nGroup], dIndex)
 				team.ChangeMemberGroup(src.dwID, src.state.nGroup, dst.dwID)
 				if not dst.state or dst.state.nGroup ~= nGroup then
-					insert(tWrong[nGroup], dst)
+					table.insert(tWrong[nGroup], dst)
 				else -- bingo
-					LIB.Sysmsg(_L('Change group of [%s] to %d', dst.szName, nGroup + 1))
+					X.Sysmsg(_L('Change group of [%s] to %d', dst.szName, nGroup + 1))
 					D.SyncMember(team, dst.dwID, dst.szName, dst.state)
 				end
 			end
-			LIB.Sysmsg(_L('Change group of [%s] to %d', src.szName, src.state.nGroup + 1))
+			X.Sysmsg(_L('Change group of [%s] to %d', src.szName, src.state.nGroup + 1))
 			D.SyncMember(team, src.dwID, src.szName, src.state)
 			nIndex = D.GetWrongIndex(tWrong[nGroup], true) -- update nIndex
 		end
@@ -234,28 +205,28 @@ function D.Restore(n)
 	end
 	if dwMark ~= 0 and dwMark ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwMark)
-		LIB.Sysmsg(_L('Restore team marker: %s', O.SaveList[n].szMark))
+		X.Sysmsg(_L('Restore team marker: %s', O.SaveList[n].szMark))
 	end
 	if dwLeader ~= 0 and dwLeader ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwLeader)
-		LIB.Sysmsg(_L('Restore team leader: %s', O.SaveList[n].szLeader))
+		X.Sysmsg(_L('Restore team leader: %s', O.SaveList[n].szLeader))
 	end
-	LIB.Sysmsg(_L['Team list restored'])
+	X.Sysmsg(_L['Team list restored'])
 end
 
 function D.Restore2(n)
 	D.LoadLUAData()
 	local me, team = GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
-		return LIB.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
 	elseif not O.SaveList[n] then
-		return LIB.Sysmsg(_L['You have not saved team list data'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You have not saved team list data'], CONSTANT.MSG_THEME.ERROR)
 	end
 	-- get perm
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) ~= me.dwID then
 		local nGroup = team.GetMemberGroupIndex(me.dwID) + 1
 		local szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
-		return LIB.Sysmsg(_L['You are not team leader, permission denied'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You are not team leader, permission denied'], CONSTANT.MSG_THEME.ERROR)
 	end
 
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) ~= me.dwID then
@@ -290,13 +261,13 @@ function D.Restore2(n)
 				local info = team.GetMemberInfo(dwID)
 				if nGroup == tab.nGroup then
 					tWrong[dwID] = nil
-					LIB.Sysmsg(_L('Need not adjust: %s', info.szName))
+					X.Sysmsg(_L('Need not adjust: %s', info.szName))
 					D.SyncMember(team, dwID, info.szName, v)
 				else
 					if #tGroupInfo.MemberList < 5 then
 						team.ChangeMemberGroup(dwID,nGroup,0)
 						tWrong[dwID] = nil
-						LIB.Sysmsg(_L('Change group of [%s] to %d', info.szName, nGroup + 1))
+						X.Sysmsg(_L('Change group of [%s] to %d', info.szName, nGroup + 1))
 						D.SyncMember(team, dwID, info.szName, v)
 					else
 						local ddwID,dtab = fnAction(false,nGroup,dwID)
@@ -304,7 +275,7 @@ function D.Restore2(n)
 							team.ChangeMemberGroup(dwID,nGroup,ddwID)
 							tWrong[ddwID].nGroup = tab.nGroup -- update
 							tWrong[dwID] = nil
-							LIB.Sysmsg(_L('Change group of [%s] to %d', info.szName, nGroup + 1))
+							X.Sysmsg(_L('Change group of [%s] to %d', info.szName, nGroup + 1))
 							D.SyncMember(team, dwID, info.szName, v)
 						end
 					end
@@ -318,20 +289,20 @@ function D.Restore2(n)
 	end
 	if dwMark ~= 0 and dwMark ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwMark)
-		LIB.Sysmsg(_L('Restore team marker: %s', O.SaveList[n].szMark))
+		X.Sysmsg(_L('Restore team marker: %s', O.SaveList[n].szMark))
 	end
 	if dwLeader ~= 0 and dwLeader ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwLeader)
-		LIB.Sysmsg(_L('Restore team leader: %s', O.SaveList[n].szLeader))
+		X.Sysmsg(_L('Restore team leader: %s', O.SaveList[n].szLeader))
 	end
-	LIB.Sysmsg(_L['Team list restored'])
+	X.Sysmsg(_L['Team list restored'])
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-	nX = X
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX = nPaddingX
 	nX, nY = ui:Append('Text', { x = nX, y = nY + 15, text = _L['MY_TeamRestore'], font = 27 }):Pos('BOTTOMRIGHT')
 
-	nX = X + 10
+	nX = nPaddingX + 10
 	nY = nY + 5
 	for i, v in ipairs(O.SaveList) do
 		nX = ui:Append('WndButton', {
@@ -364,18 +335,18 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 						szOption = _L['Delete'],
 						fnAction = function()
 							D.Delete(i)
-							LIB.SwitchTab('MY_TeamTools', true)
+							X.SwitchTab('MY_TeamTools', true)
 						end,
 					},
 					{
 						szOption = _L['Rename'],
 						fnAction = function()
 							GetUserInput(_L['Save team name'], function(text)
-								text = LIB.TrimString(text)
-								if not IsEmpty(text) then
+								text = X.TrimString(text)
+								if not X.IsEmpty(text) then
 									v.name = text
 									D.SaveLUAData()
-									LIB.SwitchTab('MY_TeamTools', true)
+									X.SwitchTab('MY_TeamTools', true)
 								end
 							end, nil, nil, nil, nil, 50)
 						end,
@@ -388,22 +359,22 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 					},
 				}
 				local menu1 = { szOption = _L['Detail'] }
-				insert(menu1, { szOption = _L('Leader:%s', v['szLeader']) })
-				insert(menu1, { szOption = _L('Distribute:%s', v['szDistribute']) })
-				insert(menu1, { szOption = _L('Mark:%s', v['szMark']) })
-				insert(menu1, { bDevide = true })
+				table.insert(menu1, { szOption = _L('Leader:%s', v['szLeader']) })
+				table.insert(menu1, { szOption = _L('Distribute:%s', v['szDistribute']) })
+				table.insert(menu1, { szOption = _L('Mark:%s', v['szMark']) })
+				table.insert(menu1, { bDevide = true })
 				for i = 1, 5 do
-					insert(menu1, { szOption = _L('Party %d', i) })
+					table.insert(menu1, { szOption = _L('Party %d', i) })
 				end
 				for kk, vv in pairs(v['data']) do
-					insert(menu1[5 + vv.nGroup], { szOption = kk })
+					table.insert(menu1[5 + vv.nGroup], { szOption = kk })
 				end
-				insert(menu, menu1)
+				table.insert(menu, menu1)
 				return menu
 			end,
 		}):Pos('BOTTOMRIGHT') + 10
-		if nX + 80 > W then
-			nX = X + 10
+		if nX + 80 > nW then
+			nX = nPaddingX + 10
 			nY = nY + 28
 		end
 	end
@@ -414,7 +385,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
 		onclick = function()
 			GetUserInput(_L['Save team name'], function(text)
 				D.Save(nil, text)
-				LIB.SwitchTab('MY_TeamTools', true)
+				X.SwitchTab('MY_TeamTools', true)
 			end, nil, nil, nil, nil, 50)
 		end,
 	}):Pos('BOTTOMRIGHT')
@@ -435,5 +406,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamRestore = LIB.CreateModule(settings)
+MY_TeamRestore = X.CreateModule(settings)
 end

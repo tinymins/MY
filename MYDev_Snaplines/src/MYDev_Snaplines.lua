@@ -10,116 +10,87 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MYDev_Snaplines'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_Snaplines'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 -- 数据存储
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule('MYDev_Snaplines', {
+local O = X.CreateUserSettingsModule('MYDev_Snaplines', {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDetectBox = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowWndSnaplines = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowWndTip = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowItemTip = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowItemSnaplines = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowTip = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowData = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	rgbWndSnaplines = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = {0, 0, 0},
 	},
 	rgbItemSnaplines = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = {0, 255, 0},
 	},
 	rgbTip = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = {255, 255, 0},
 	},
 	nTipFont = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Number,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 40,
 	},
 	bAutoScale = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
@@ -133,53 +104,53 @@ local function var2str(var, indent, level)
 		local t = {}
 		local szType = type(var)
 		if szType == 'nil' then
-			insert(t, 'nil')
+			table.insert(t, 'nil')
 		elseif szType == 'number' then
-			insert(t, tostring(var))
+			table.insert(t, tostring(var))
 		elseif szType == 'string' then
-			insert(t, format('%q', var))
+			table.insert(t, string.format('%q', var))
 		-- elseif szType == 'function' then
-			-- local s = dump(var)
-			-- insert(t, 'loadstring('')
+			-- local s = string.dump(var)
+			-- table.insert(t, 'loadstring('')
 			-- -- 'string slice too long'
 			-- for i = 1, #s, 2000 do
-			--	 insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
+			--	 table.insert(t, table.concat({'', string.byte(s, i, i + 2000 - 1)}, '\\'))
 			-- end
-			-- insert(t, '')')
+			-- table.insert(t, '')')
 		elseif szType == 'boolean' then
-			insert(t, tostring(var))
+			table.insert(t, tostring(var))
 		elseif szType == 'table' then
-			insert(t, '{')
+			table.insert(t, '{')
 			local s_tab_equ = ']='
 			if indent then
 				s_tab_equ = '] = '
-				if not IsEmpty(var) then
-					insert(t, '\n')
+				if not X.IsEmpty(var) then
+					table.insert(t, '\n')
 				end
 			end
 			for key, val in pairs(var) do
 				if indent then
-					insert(t, rep(indent, level + 1))
+					table.insert(t, string.rep(indent, level + 1))
 				end
-				insert(t, '[')
-				insert(t, table_r(key, level + 1, indent))
-				insert(t, s_tab_equ) --'] = '
-				insert(t, table_r(val, level + 1, indent))
-				insert(t, ',')
+				table.insert(t, '[')
+				table.insert(t, table_r(key, level + 1, indent))
+				table.insert(t, s_tab_equ) --'] = '
+				table.insert(t, table_r(val, level + 1, indent))
+				table.insert(t, ',')
 				if indent then
-					insert(t, '\n')
+					table.insert(t, '\n')
 				end
 			end
-			if indent and not IsEmpty(var) then
-				insert(t, rep(indent, level))
+			if indent and not X.IsEmpty(var) then
+				table.insert(t, string.rep(indent, level))
 			end
-			insert(t, '}')
+			table.insert(t, '}')
 		else --if (szType == 'userdata') then
-			insert(t, '"')
-			insert(t, tostring(var))
-			insert(t, '"')
+			table.insert(t, '"')
+			table.insert(t, tostring(var))
+			table.insert(t, '"')
 		end
-		return concat(t)
+		return table.concat(t)
 	end
 	return table_r(var, level or 0, indent)
 end
@@ -189,80 +160,80 @@ local function InsertElementBasicTip(hElem, tTip)
 	local nRelX, nRelY = hElem:GetRelPos()
 	local nW, nH = hElem:GetSize()
 
-	insert(tTip, _L('Name: %s', hElem:GetName()))
-	insert(tTip, _L('Type: %s', hElem:GetType()))
-	insert(tTip, _L('Path: %s', UI.GetTreePath(hElem)))
-	insert(tTip, _L('X: %s, %s', nRelX, nAbsX))
-	insert(tTip, _L('Y: %s, %s', nRelY, nAbsY))
-	insert(tTip, _L('W: %s', nW))
-	insert(tTip, _L('H: %s', nH))
+	table.insert(tTip, _L('Name: %s', hElem:GetName()))
+	table.insert(tTip, _L('Type: %s', hElem:GetType()))
+	table.insert(tTip, _L('Path: %s', UI.GetTreePath(hElem)))
+	table.insert(tTip, _L('X: %s, %s', nRelX, nAbsX))
+	table.insert(tTip, _L('Y: %s, %s', nRelY, nAbsY))
+	table.insert(tTip, _L('W: %s', nW))
+	table.insert(tTip, _L('H: %s', nH))
 end
 
 local function InsertElementDetailTip(hElem, tTip)
 	local szType = hElem:GetType()
 	if szType == 'Text' then
-		insert(tTip, _L('FontScheme: %s', hElem:GetFontScheme()))
-		insert(tTip, _L('Text: %s', hElem:GetText()))
-		insert(tTip, _L('TextLen: %s', hElem:GetTextLen()))
-		insert(tTip, _L('VAlign: %s', hElem:GetVAlign()))
-		insert(tTip, _L('HAlign: %s', hElem:GetHAlign()))
-		insert(tTip, _L('RowSpacing: %s', hElem:GetRowSpacing()))
-		insert(tTip, _L('IsMultiLine: %s', tostring(hElem:IsMultiLine())))
-		insert(tTip, _L('IsCenterEachLine: %s', tostring(hElem:IsCenterEachLine())))
-		insert(tTip, _L('FontSpacing: %s', hElem:GetFontSpacing()))
-		insert(tTip, _L('IsRichText: %s', tostring(hElem:IsRichText())))
-		insert(tTip, _L('FontScale: %s', hElem:GetFontScale()))
-		insert(tTip, _L('FontID: %s', hElem:GetFontID()))
-		insert(tTip, _L('FontColor: %s', hElem:GetFontColor()))
-		insert(tTip, _L('FontBoder: %s', hElem:GetFontBoder()))
-		insert(tTip, _L('FontProjection: %s', hElem:GetFontProjection()))
-		insert(tTip, _L('TextExtent: %s', hElem:GetTextExtent()))
-		insert(tTip, _L('TextPosExtent: %s', hElem:GetTextPosExtent()))
-		insert(tTip, _L('Index: %s', hElem:GetIndex()))
+		table.insert(tTip, _L('FontScheme: %s', hElem:GetFontScheme()))
+		table.insert(tTip, _L('Text: %s', hElem:GetText()))
+		table.insert(tTip, _L('TextLen: %s', hElem:GetTextLen()))
+		table.insert(tTip, _L('VAlign: %s', hElem:GetVAlign()))
+		table.insert(tTip, _L('HAlign: %s', hElem:GetHAlign()))
+		table.insert(tTip, _L('RowSpacing: %s', hElem:GetRowSpacing()))
+		table.insert(tTip, _L('IsMultiLine: %s', tostring(hElem:IsMultiLine())))
+		table.insert(tTip, _L('IsCenterEachLine: %s', tostring(hElem:IsCenterEachLine())))
+		table.insert(tTip, _L('FontSpacing: %s', hElem:GetFontSpacing()))
+		table.insert(tTip, _L('IsRichText: %s', tostring(hElem:IsRichText())))
+		table.insert(tTip, _L('FontScale: %s', hElem:GetFontScale()))
+		table.insert(tTip, _L('FontID: %s', hElem:GetFontID()))
+		table.insert(tTip, _L('FontColor: %s', hElem:GetFontColor()))
+		table.insert(tTip, _L('FontBoder: %s', hElem:GetFontBoder()))
+		table.insert(tTip, _L('FontProjection: %s', hElem:GetFontProjection()))
+		table.insert(tTip, _L('TextExtent: %s', hElem:GetTextExtent()))
+		table.insert(tTip, _L('TextPosExtent: %s', hElem:GetTextPosExtent()))
+		table.insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'Image' then
 		local szPath, nFrame = hElem:GetImagePath()
-		insert(tTip, _L('Image: %s', szPath or ''))
+		table.insert(tTip, _L('Image: %s', szPath or ''))
 		if nFrame then
-			insert(tTip, _L('Frame: %s', nFrame))
+			table.insert(tTip, _L('Frame: %s', nFrame))
 		end
-		insert(tTip, _L('ImageType: %s', hElem:GetImageType()))
-		insert(tTip, _L('ImageID: %s', hElem:GetImageID()))
-		insert(tTip, _L('Index: %s', hElem:GetIndex()))
+		table.insert(tTip, _L('ImageType: %s', hElem:GetImageType()))
+		table.insert(tTip, _L('ImageID: %s', hElem:GetImageID()))
+		table.insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'Shadow' then
-		insert(tTip, _L('ShadowColor: %s', hElem:GetShadowColor()))
-		insert(tTip, _L('ColorRGB: %s, %s, %s', hElem:GetColorRGB()))
-		insert(tTip, _L('IsTriangleFan: %s', tostring(hElem:IsTriangleFan())))
-		insert(tTip, _L('Index: %s', hElem:GetIndex()))
+		table.insert(tTip, _L('ShadowColor: %s', hElem:GetShadowColor()))
+		table.insert(tTip, _L('ColorRGB: %s, %s, %s', hElem:GetColorRGB()))
+		table.insert(tTip, _L('IsTriangleFan: %s', tostring(hElem:IsTriangleFan())))
+		table.insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'Animate' then
-		insert(tTip, _L('IsFinished: %s', tostring(hElem:IsFinished())))
-		insert(tTip, _L('Index: %s', hElem:GetIndex()))
+		table.insert(tTip, _L('IsFinished: %s', tostring(hElem:IsFinished())))
+		table.insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'Box' then
-		insert(tTip, _L('BoxIndex: %s', hElem:GetBoxIndex()))
-		-- insert(tTip, _L('Object: %s', hElem:GetObject()))
-		insert(tTip, _L('ObjectType: %s', hElem:GetObjectType()))
-		insert(tTip, _L('ObjectData: %s', concat({hElem:GetObjectData()}, ', ')))
-		insert(tTip, _L('IsEmpty: %s', tostring(hElem:IsEmpty())))
+		table.insert(tTip, _L('BoxIndex: %s', hElem:GetBoxIndex()))
+		-- table.insert(tTip, _L('Object: %s', hElem:GetObject()))
+		table.insert(tTip, _L('ObjectType: %s', hElem:GetObjectType()))
+		table.insert(tTip, _L('ObjectData: %s', table.concat({hElem:GetObjectData()}, ', ')))
+		table.insert(tTip, _L('IsEmpty: %s', tostring(hElem:IsEmpty())))
 		if not hElem:IsEmpty() then
-			insert(tTip, _L('IsObjectEnable: %s', tostring(hElem:IsObjectEnable())))
-			insert(tTip, _L('IsObjectCoolDown: %s', tostring(hElem:IsObjectCoolDown())))
-			insert(tTip, _L('IsObjectSelected: %s', tostring(hElem:IsObjectSelected())))
-			insert(tTip, _L('IsObjectMouseOver: %s', tostring(hElem:IsObjectMouseOver())))
-			insert(tTip, _L('IsObjectPressed: %s', tostring(hElem:IsObjectPressed())))
-			insert(tTip, _L('CoolDownPercentage: %s', hElem:GetCoolDownPercentage()))
-			insert(tTip, _L('ObjectIcon: %s', hElem:GetObjectIcon()))
-			insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 0, hElem:GetOverTextFontScheme(0), hElem:GetOverTextPosition(0), hElem:GetOverText(0)))
-			insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 1, hElem:GetOverTextFontScheme(1), hElem:GetOverTextPosition(1), hElem:GetOverText(1)))
-			insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 2, hElem:GetOverTextFontScheme(2), hElem:GetOverTextPosition(2), hElem:GetOverText(2)))
-			insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 3, hElem:GetOverTextFontScheme(3), hElem:GetOverTextPosition(3), hElem:GetOverText(3)))
-			insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 4, hElem:GetOverTextFontScheme(4), hElem:GetOverTextPosition(4), hElem:GetOverText(4)))
+			table.insert(tTip, _L('IsObjectEnable: %s', tostring(hElem:IsObjectEnable())))
+			table.insert(tTip, _L('IsObjectCoolDown: %s', tostring(hElem:IsObjectCoolDown())))
+			table.insert(tTip, _L('IsObjectSelected: %s', tostring(hElem:IsObjectSelected())))
+			table.insert(tTip, _L('IsObjectMouseOver: %s', tostring(hElem:IsObjectMouseOver())))
+			table.insert(tTip, _L('IsObjectPressed: %s', tostring(hElem:IsObjectPressed())))
+			table.insert(tTip, _L('CoolDownPercentage: %s', hElem:GetCoolDownPercentage()))
+			table.insert(tTip, _L('ObjectIcon: %s', hElem:GetObjectIcon()))
+			table.insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 0, hElem:GetOverTextFontScheme(0), hElem:GetOverTextPosition(0), hElem:GetOverText(0)))
+			table.insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 1, hElem:GetOverTextFontScheme(1), hElem:GetOverTextPosition(1), hElem:GetOverText(1)))
+			table.insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 2, hElem:GetOverTextFontScheme(2), hElem:GetOverTextPosition(2), hElem:GetOverText(2)))
+			table.insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 3, hElem:GetOverTextFontScheme(3), hElem:GetOverTextPosition(3), hElem:GetOverText(3)))
+			table.insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 4, hElem:GetOverTextFontScheme(4), hElem:GetOverTextPosition(4), hElem:GetOverText(4)))
 		end
-		insert(tTip, _L('Index: %s', hElem:GetIndex()))
+		table.insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'WndButton' then
-		insert(tTip, _L('ImagePath: %s', hElem:GetAnimatePath()))
-		insert(tTip, _L('Normal: %d', hElem:GetAnimateGroupNormal()))
-		insert(tTip, _L('Over: %d', hElem:GetAnimateGroupMouseOver()))
-		insert(tTip, _L('Down: %d', hElem:GetAnimateGroupMouseDown()))
-		insert(tTip, _L('Disable: %d', hElem:GetAnimateGroupDisable()))
+		table.insert(tTip, _L('ImagePath: %s', hElem:GetAnimatePath()))
+		table.insert(tTip, _L('Normal: %d', hElem:GetAnimateGroupNormal()))
+		table.insert(tTip, _L('Over: %d', hElem:GetAnimateGroupMouseOver()))
+		table.insert(tTip, _L('Down: %d', hElem:GetAnimateGroupMouseDown()))
+		table.insert(tTip, _L('Disable: %d', hElem:GetAnimateGroupDisable()))
 	end
 end
 
@@ -273,7 +244,7 @@ local function InsertElementDataTip(hElem, tTip)
 			data[k] = v
 		end
 	end
-	insert(tTip, _L('data: %s', var2str(data, '  ')))
+	table.insert(tTip, _L('data: %s', var2str(data, '  ')))
 end
 
 local function InsertElementTip(hElem, tTip)
@@ -330,8 +301,8 @@ function MYDev_Snaplines.OnFrameBreathe()
 		local hText = this:Lookup('', 'Handle_Tip/Text_HoverTip')
 		-- Wnd信息
 		local tTip = {}
-		insert(tTip, _L('CursorX: %s', nCursorX))
-		insert(tTip, _L('CursorY: %s', nCursorY))
+		table.insert(tTip, _L('CursorX: %s', nCursorX))
+		table.insert(tTip, _L('CursorY: %s', nCursorY))
 		if O.bShowWndTip then
 			InsertElementTip(hWnd, tTip)
 		end
@@ -346,7 +317,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 		if O.bDetectBox and not (hItem and hItem:GetType() == 'Box') then
 			UI(hWnd):Find('.Box'):Each(function()
 				if this:PtInItem(nCursorX, nCursorY) then
-					insert(tTip, '---------------------')
+					table.insert(tTip, '---------------------')
 					InsertElementTip(this, tTip)
 				end
 			end)
@@ -356,7 +327,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 			-- Item信息
 			local nItemX, nItemY = hItem:GetAbsPos()
 			local nItemW, nItemH = hItem:GetSize()
-			insert(tTip, _L['-------------------'])
+			table.insert(tTip, _L['-------------------'])
 			if O.bShowItemTip then
 				InsertElementTip(hItem, tTip)
 			end
@@ -371,7 +342,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 		else
 			this:Lookup('', 'Handle_Snaplines_Item'):Hide()
 		end
-		hText:SetText(concat(tTip, '\n'))
+		hText:SetText(table.concat(tTip, '\n'))
 
 		-- 缩放
 		if O.bAutoScale then
@@ -379,7 +350,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 			hText:SetFontScale(1)
 			hText:AutoSize()
 			local nTextW, nTextH = hText:GetSize()
-			local fScale = min( nClientW / nTextW, nClientH / nTextH )
+			local fScale = math.min( nClientW / nTextW, nClientH / nTextH )
 			if fScale < 1 then
 				hText:SetFontScale(fScale)
 				hText:AutoSize()
@@ -441,15 +412,15 @@ end
 MYDev_Snaplines.ReloadUI = function()
 	Wnd.CloseWindow('MYDev_Snaplines')
 	if O.bEnable then
-		Wnd.OpenWindow(PACKET_INFO.ROOT .. 'MYDev_Snaplines/ui/MYDev_Snaplines.ini', 'MYDev_Snaplines')
+		Wnd.OpenWindow(X.PACKET_INFO.ROOT .. 'MYDev_Snaplines/ui/MYDev_Snaplines.ini', 'MYDev_Snaplines')
 	end
 end
-LIB.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
+X.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
 
 -- 注册面板
-LIB.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/UICommon/PlugIn.UITex|1', {
+X.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/UICommon/PlugIn.UITex|1', {
 	IsRestricted = function()
-		return not LIB.IsDebugClient('Dev_Snaplines')
+		return not X.IsDebugClient('Dev_Snaplines')
 	end,
 	OnPanelActive = function(wnd)
 		local ui = UI(wnd)
@@ -578,18 +549,18 @@ LIB.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image
 
 		ui:Append('Text', 'Text_SetHotkey'):Pos(nW-140, 20):Color(255,255,0)
 		  :Text(_L['>> set hotkey <<'])
-		  :Click(function() LIB.SetHotKey() end)
+		  :Click(function() X.SetHotKey() end)
 	end
 })
 -- 注册快捷键
-LIB.RegisterHotKey('MY_Dev_Snaplines'         , _L['Snaplines']           , function() O.bEnable   = not O.bEnable   MYDev_Snaplines.ReloadUI() end, nil)
-LIB.RegisterHotKey('MY_Dev_Snaplines_ShowTip' , _L['Snaplines - ShowTip'] , function() O.bShowTip  = not O.bShowTip  MYDev_Snaplines.ReloadUI() end, nil)
-LIB.RegisterHotKey('MY_Dev_Snaplines_ShowData', _L['Snaplines - ShowData'], function() O.bShowData = not O.bShowData MYDev_Snaplines.ReloadUI() end, nil)
+X.RegisterHotKey('MY_Dev_Snaplines'         , _L['Snaplines']           , function() O.bEnable   = not O.bEnable   MYDev_Snaplines.ReloadUI() end, nil)
+X.RegisterHotKey('MY_Dev_Snaplines_ShowTip' , _L['Snaplines - ShowTip'] , function() O.bShowTip  = not O.bShowTip  MYDev_Snaplines.ReloadUI() end, nil)
+X.RegisterHotKey('MY_Dev_Snaplines_ShowData', _L['Snaplines - ShowData'], function() O.bShowData = not O.bShowData MYDev_Snaplines.ReloadUI() end, nil)
 -- For Debug
 if IsDebugClient and IsDebugClient() then
-	LIB.RegisterInit('Dev_Snaplines_Hotkey', function()
-		LIB.SetHotKey('MY_Dev_Snaplines', 121)
-		LIB.SetHotKey('MY_Dev_Snaplines_ShowTip', 122)
-		LIB.SetHotKey('MY_Dev_Snaplines_ShowData', 123)
+	X.RegisterInit('Dev_Snaplines_Hotkey', function()
+		X.SetHotKey('MY_Dev_Snaplines', 121)
+		X.SetHotKey('MY_Dev_Snaplines_ShowTip', 122)
+		X.SetHotKey('MY_Dev_Snaplines_ShowData', 123)
 	end)
 end

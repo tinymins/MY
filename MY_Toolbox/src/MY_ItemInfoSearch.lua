@@ -2,48 +2,19 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ItemInfoSearch'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -68,14 +39,14 @@ function D.Init()
 					while true do
 						if nMaxL < 1 then
 							--[[#DEBUG BEGIN]]
-							LIB.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (TOO SMALL)', DEBUG_LEVEL.ERROR)
+							X.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (TOO SMALL)', X.DEBUG_LEVEL.ERROR)
 							--[[#DEBUG END]]
 							break
 						elseif bMaxL and bMaxR then
 							nMaxR = nMaxR * 2
 							bMaxR = GetItemInfo(dwTabType, nMaxR)
 						elseif not bMaxL and not bMaxR then
-							nMaxL = floor(nMaxL / 2)
+							nMaxL = math.floor(nMaxL / 2)
 							bMaxL = GetItemInfo(dwTabType, nMaxL)
 						else
 							if bMaxL and not bMaxR then
@@ -83,7 +54,7 @@ function D.Init()
 									ITEM_TYPE_MAX[dwTabType] = nMaxL
 									break
 								else
-									local nCur = floor(nMaxR - (nMaxR - nMaxL) / 2)
+									local nCur = math.floor(nMaxR - (nMaxR - nMaxL) / 2)
 									local bCur = GetItemInfo(dwTabType, nCur)
 									if bCur then
 										nMaxL = nCur
@@ -93,14 +64,14 @@ function D.Init()
 								end
 							elseif not bMaxL and bMaxR then
 								--[[#DEBUG BEGIN]]
-								LIB.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (NOT EXIST)', DEBUG_LEVEL.ERROR)
+								X.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (NOT EXIST)', X.DEBUG_LEVEL.ERROR)
 								--[[#DEBUG END]]
 								break
 							end
 						end
 						if nCount >= nMaxCount then
 							--[[#DEBUG BEGIN]]
-							LIB.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (OVERFLOW)', DEBUG_LEVEL.ERROR)
+							X.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (OVERFLOW)', X.DEBUG_LEVEL.ERROR)
 							--[[#DEBUG END]]
 							break
 						end
@@ -123,7 +94,7 @@ function D.Init()
 end
 
 function D.StopSearch()
-	LIB.BreatheCall('MY_ItemInfoSearch', false)
+	X.BreatheCall('MY_ItemInfoSearch', false)
 end
 
 function D.DoRawSearch(szSearch, fnProgress, fnCallback)
@@ -141,10 +112,10 @@ function D.DoRawSearch(szSearch, fnProgress, fnCallback)
 			local itemInfo = GetItemInfo(dwTabType, dwIndex)
 			if itemInfo and (
 				dwIndex == dwID
-				or (itemInfo.nGenre ~= ITEM_GENRE.BOOK and wfind(LIB.GetItemNameByItemInfo(itemInfo), szSearch))
-				or wfind(itemInfo.szName, szSearch)
+				or (itemInfo.nGenre ~= ITEM_GENRE.BOOK and wstring.find(X.GetItemNameByItemInfo(itemInfo), szSearch))
+				or wstring.find(itemInfo.szName, szSearch)
 			) then
-				insert(aResult, {
+				table.insert(aResult, {
 					dwTabType = dwTabType,
 					dwIndex = dwIndex,
 					itemInfo = itemInfo,
@@ -161,15 +132,15 @@ function D.DoRawSearch(szSearch, fnProgress, fnCallback)
 			end
 		else
 			local row = g_tTable.BookSegment:GetRow(dwIndex)
-			local dwRecipeID = row and LIB.SegmentToRecipeID(row.dwBookID, row.dwSegmentID)
-			if dwRecipeID and LIB.RecipeToSegmentID(dwRecipeID) then
+			local dwRecipeID = row and X.SegmentToRecipeID(row.dwBookID, row.dwSegmentID)
+			if dwRecipeID and X.RecipeToSegmentID(dwRecipeID) then
 				local itemInfo = GetItemInfo(5, row.dwBookItemIndex)
 				if itemInfo and (
 					dwID == itemInfo.dwID or dwID == dwRecipeID
 					or dwID == row.dwBookID or dwID == row.dwSegmentID
-					or wfind(LIB.GetItemNameByItemInfo(itemInfo, dwRecipeID), szSearch)
+					or wstring.find(X.GetItemNameByItemInfo(itemInfo, dwRecipeID), szSearch)
 				) then
-					insert(aResult, {
+					table.insert(aResult, {
 						dwTabType = 5,
 						dwIndex = row.dwBookItemIndex,
 						itemInfo = itemInfo,
@@ -200,7 +171,7 @@ function D.DoRawSearch(szSearch, fnProgress, fnCallback)
 			fnProgress(nRound / SEARCH_STEP_COUNT)
 		end
 	end
-	LIB.BreatheCall('MY_ItemInfoSearch', SearchBreathe)
+	X.BreatheCall('MY_ItemInfoSearch', SearchBreathe)
 end
 
 function D.Search(szSearch, fnProgress, fnCallback)
@@ -214,9 +185,9 @@ function D.Search(szSearch, fnProgress, fnCallback)
 	-- ¼ÆËã½á¹û
 	D.DoRawSearch(szSearch, fnProgress, function(aResult)
 		if #CACHE > 20 then
-			remove(CACHE, 1)
+			table.remove(CACHE, 1)
 		end
-		insert(CACHE, { szSearch = szSearch, aResult = aResult })
+		table.insert(CACHE, { szSearch = szSearch, aResult = aResult })
 		fnCallback(aResult)
 	end)
 end
@@ -232,7 +203,7 @@ function PS.OnPanelActive(wnd)
 	local list, muProgress
 	local function UpdateList()
 		list:ListBox('clear')
-		if IsEmpty(SEARCH) then
+		if X.IsEmpty(SEARCH) then
 			for i, s in ipairs(_L['MY_ItemInfoSearch TIPS']) do
 				list:ListBox('insert', { id = 'TIP' .. i, text = s, r = 255, g = 255, b = 0 })
 			end
@@ -240,7 +211,7 @@ function PS.OnPanelActive(wnd)
 			for _, item in ipairs(RESULT) do
 				local opt = {
 					id = item,
-					text = ' [' .. LIB.GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName,
+					text = ' [' .. X.GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName,
 					data = item,
 				}
 				opt.r, opt.g, opt.b = GetItemFontColorByQuality(item.itemInfo.nQuality, false)
@@ -255,7 +226,7 @@ function PS.OnPanelActive(wnd)
 		text = SEARCH,
 		placeholder = _L['Please input item name or item index number'],
 		onchange = function(szSearch)
-			LIB.DelayCall('MY_ItemInfoSearch', 200, function()
+			X.DelayCall('MY_ItemInfoSearch', 200, function()
 				D.Search(szSearch,
 					function(fPer)
 						muProgress:Width(nW * fPer)
@@ -284,13 +255,13 @@ function PS.OnPanelActive(wnd)
 			{
 				'onhover',
 				function(id, text, data)
-					if id == 'count' or (IsString(id) and id:sub(1, 3) == 'TIP') then
+					if id == 'count' or (X.IsString(id) and id:sub(1, 3) == 'TIP') then
 						return false
 					end
 					if IsCtrlKeyDown() and IsShiftKeyDown() then
-						LIB.OutputTip(this, EncodeLUAData(data, '  '))
+						X.OutputTip(this, X.EncodeLUAData(data, '  '))
 					elseif data and (data.itemInfo.nGenre ~= ITEM_GENRE.BOOK or data.dwRecipeID) then
-						LIB.OutputItemInfoTip(data.dwTabType, data.dwIndex, data.dwRecipeID)
+						X.OutputItemInfoTip(data.dwTabType, data.dwIndex, data.dwRecipeID)
 					else
 						HideTip()
 					end
@@ -306,7 +277,7 @@ function PS.OnPanelActive(wnd)
 				'onlclick',
 				function(id, text, data)
 					if data and IsCtrlKeyDown() then
-						LIB.InsertChatInput('iteminfo', data.dwTabType, data.dwIndex, data.dwRecipeID)
+						X.InsertChatInput('iteminfo', data.dwTabType, data.dwIndex, data.dwRecipeID)
 					end
 					return false
 				end
@@ -328,4 +299,4 @@ function PS.OnPanelDeactive()
 	D.StopSearch()
 end
 
-LIB.RegisterPanel(_L['General'], 'MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)
+X.RegisterPanel(_L['General'], 'MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)

@@ -10,58 +10,29 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_EquipStat'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
+CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_EquipStat'], {'userdata/role_statistics/equip_stat.v3.db', PATH_TYPE.GLOBAL})
+local DB = X.SQLiteConnect(_L['MY_RoleStatistics_EquipStat'], {'userdata/role_statistics/equip_stat.v3.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return LIB.Sysmsg(_L['MY_RoleStatistics_EquipStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return X.Sysmsg(_L['MY_RoleStatistics_EquipStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
-local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_EquipStat.ini'
+local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_EquipStat.ini'
 
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS EquipItems (
@@ -215,34 +186,34 @@ local EQUIPMENT_EXTRA_ITEM_LIST = {
 	{ key = 'penpet'   , box = 'Handle_Equip/Box_PendantPet'       }, --
 }
 
-local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_EquipStat', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_RoleStatistics_EquipStat', _L['General'], {
 	bCompactMode = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFloatEntry = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceFloatEntry = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSaveDB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 })
@@ -281,11 +252,11 @@ function D.FormatEnchantAttribText(v)
 end
 
 function D.Migration()
-	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/equip_stat.v2.db', PATH_TYPE.GLOBAL})
+	local DB_V2_PATH = X.FormatPath({'userdata/role_statistics/equip_stat.v2.db', X.PATH_TYPE.GLOBAL})
 	if not IsLocalFileExist(DB_V2_PATH) then
 		return
 	end
-	LIB.Confirm(
+	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
 			-- 转移V2旧版数据
@@ -345,16 +316,16 @@ function D.Migration()
 					DB:Execute('END TRANSACTION')
 					DB_V2:Release()
 				end
-				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			FireUIEvent('MY_ROLE_STAT_EQUIP_UPDATE')
-			LIB.Alert(_L['Migrate succeed!'])
+			X.Alert(_L['Migrate succeed!'])
 		end)
 end
 
 local REC_CACHE
-LIB.RegisterEvent({'EQUIP_CHANGE', 'EQUIP_ITEM_UPDATE'}, 'MY_RoleStatistics_EquipStat', function()
-	LIB.DelayCall('MY_RoleStatistics_EquipStat_GetScore', 100, function()
+X.RegisterEvent({'EQUIP_CHANGE', 'EQUIP_ITEM_UPDATE'}, 'MY_RoleStatistics_EquipStat', function()
+	X.DelayCall('MY_RoleStatistics_EquipStat_GetScore', 100, function()
 		if not REC_CACHE then
 			return
 		end
@@ -375,7 +346,7 @@ function D.FlushDB()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(D.GetPlayerGUID(me))
 	local ownername = AnsiToUTF8(me.szName)
-	local servername = AnsiToUTF8(LIB.GetRealServer(2))
+	local servername = AnsiToUTF8(X.GetRealServer(2))
 	local rec = REC_CACHE
 	if not rec then
 		rec = {
@@ -386,8 +357,8 @@ function D.FlushDB()
 		local result = DB_OwnerInfoG:GetAll()
 		DB_OwnerInfoG:Reset()
 		if result and result[1] and result[1].ownerscore then
-			local d = DecodeLUAData(result[1].ownerscore)
-			if IsTable(d) then
+			local d = X.DecodeLUAData(result[1].ownerscore)
+			if X.IsTable(d) then
 				rec.ownerscore = d
 			end
 		end
@@ -429,10 +400,10 @@ function D.FlushDB()
 					uiid = KItem.nUiId
 					strength = KItem.nStrengthLevel
 					durability = KItem.nCurrentDurability
-					diamond_enchant = AnsiToUTF8(LIB.JsonEncode(aDiamondEnchant)) -- 五行石
+					diamond_enchant = AnsiToUTF8(X.JsonEncode(aDiamondEnchant)) -- 五行石
 					fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and KItem.GetMountFEAEnchantID() or 0 -- 五彩石
 					permanent_enchant = KItem.dwPermanentEnchantID -- 附魔
-					desc = AnsiToUTF8(LIB.GetItemTip(KItem) or '')
+					desc = AnsiToUTF8(X.GetItemTip(KItem) or '')
 				end
 				DB_ItemsW:BindAll(
 					ownerkey, suitindex, boxtype, boxindex, itemid,
@@ -454,7 +425,7 @@ function D.FlushDB()
 	ownerlevel = me.nLevel
 	ownersuitindex = me.GetEquipIDArray(0) + 1
 	ownerscore[ownersuitindex] = me.GetTotalEquipScore() or 0
-	ownerextra = AnsiToUTF8(LIB.JsonEncode({
+	ownerextra = AnsiToUTF8(X.JsonEncode({
 		waist = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwWaistItemIndex) },
 		back = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwBackItemIndex) },
 		face = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwFaceItemIndex) },
@@ -469,17 +440,17 @@ function D.FlushDB()
 	}))
 
 	DB_OwnerInfoW:ClearBindings()
-	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, EncodeLUAData(ownerscore), ownersuitindex, time, ownerextra)
+	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, X.EncodeLUAData(ownerscore), ownersuitindex, time, ownerextra)
 	DB_OwnerInfoW:Execute()
 	DB_OwnerInfoW:Reset()
 
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	LIB.Debug('MY_RoleStatistics_EquipStat', _L('Flushing to database costs %dms...', nTickCount), DEBUG_LEVEL.LOG)
+	X.Debug('MY_RoleStatistics_EquipStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterFlush('MY_RoleStatistics_EquipStat', D.FlushDB)
+X.RegisterFlush('MY_RoleStatistics_EquipStat', D.FlushDB)
 
 do local INIT = false
 function D.UpdateSaveDB()
@@ -492,7 +463,7 @@ function D.UpdateSaveDB()
 	end
 	if not O.bSaveDB then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_RoleStatistics_EquipStat', 'Remove from database...', DEBUG_LEVEL.LOG)
+		X.Debug('MY_RoleStatistics_EquipStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local guid = AnsiToUTF8(D.GetPlayerGUID(me))
 		DB_ItemsDA:ClearBindings()
@@ -504,12 +475,12 @@ function D.UpdateSaveDB()
 		DB_OwnerInfoD:Execute()
 		DB_OwnerInfoD:Reset()
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_RoleStatistics_EquipStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
+		X.Debug('MY_RoleStatistics_EquipStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_EQUIP_UPDATE')
 end
-LIB.RegisterInit('MY_RoleStatistics_EquipUpdateSaveDB', function() INIT = true end)
+X.RegisterInit('MY_RoleStatistics_EquipUpdateSaveDB', function() INIT = true end)
 end
 
 function D.UpdateNames(page)
@@ -523,11 +494,11 @@ function D.UpdateNames(page)
 	container:Clear()
 	for _, rec in ipairs(result) do
 		for k, v in pairs(rec) do
-			if IsString(v) then
+			if X.IsString(v) then
 				rec[k] = UTF8ToAnsi(v)
 			end
 		end
-		rec.ownerextra = LIB.JsonDecode(rec.extra or '') or {}
+		rec.ownerextra = X.JsonDecode(rec.extra or '') or {}
 	end
 	if result[1] and not lodash.some(result, function(r) return r.ownerkey == D.szCurrentOwnerKey end) then
 		D.szCurrentOwnerKey = result[1].ownerkey
@@ -572,8 +543,8 @@ function D.UpdateItems(page)
 			ownerforce = wnd.ownerinfo.ownerforce
 			ownerrole = wnd.ownerinfo.ownerrole
 			ownerlevel = wnd.ownerinfo.ownerlevel
-			ownerscore = DecodeLUAData(wnd.ownerinfo.ownerscore)
-			if not IsTable(ownerscore) then
+			ownerscore = X.DecodeLUAData(wnd.ownerinfo.ownerscore)
+			if not X.IsTable(ownerscore) then
 				ownerscore = {}
 			end
 			ownersuitindex = wnd.ownerinfo.ownersuitindex
@@ -595,17 +566,17 @@ function D.UpdateItems(page)
 	DB_ItemsR:Reset()
 	for _, rec in ipairs(aRes) do
 		for k, v in pairs(rec) do
-			if IsString(v) then
+			if X.IsString(v) then
 				rec[k] = UTF8ToAnsi(v)
 			end
-			rec.diamond_enchant = LIB.JsonDecode(rec.diamond_enchant) or {}
+			rec.diamond_enchant = X.JsonDecode(rec.diamond_enchant) or {}
 		end
 		tResult[rec.boxindex] = rec
 	end
 	local handle = page:Lookup('Wnd_Total/Wnd_ItemPage', '')
 	-- local nTitleLen = 0
 	-- for _, info in ipairs(EQUIPMENT_ITEM_LIST) do
-	-- 	nTitleLen = max(wlen(info.label or '') + 1, nTitleLen)
+	-- 	nTitleLen = math.max(wstring.len(info.label or '') + 1, nTitleLen)
 	-- end
 	for _, info in ipairs(EQUIPMENT_ITEM_LIST) do
 		local visible = info.label and (not info.force or info.force == ownerforce) and true or false
@@ -616,8 +587,8 @@ function D.UpdateItems(page)
 		if visible then
 			local szPos = info.label or ''
 			szPos = szPos .. g_tStrings.STR_COLON
-			-- szPos = szPos .. rep(g_tStrings.STR_ONE_CHINESE_SPACE, nTitleLen - wlen(szPos))
-			insert(aXml, GetFormatText(szPos, 162))
+			-- szPos = szPos .. string.rep(g_tStrings.STR_ONE_CHINESE_SPACE, nTitleLen - wstring.len(szPos))
+			table.insert(aXml, GetFormatText(szPos, 162))
 		end
 		if box then
 			box:SetVisible(visible)
@@ -640,7 +611,7 @@ function D.UpdateItems(page)
 					box.tip = rec.desc
 				end
 				if txtDurability then
-					local nDurability = floor(rec.durability / KItemInfo.nMaxDurability * 100)
+					local nDurability = math.floor(rec.durability / KItemInfo.nMaxDurability * 100)
 					local nFont = 167
 					if nDurability < 30 then
 						nFont = 159
@@ -650,19 +621,19 @@ function D.UpdateItems(page)
 					txtDurability:SetFontScheme(nFont)
 					txtDurability:SetText(nDurability .. '%')
 				end
-				insert(aXml, GetFormatText('[' .. KItemInfo.szName .. ']', 162, GetItemFontColorByQuality(KItemInfo.nQuality)))
+				table.insert(aXml, GetFormatText('[' .. KItemInfo.szName .. ']', 162, GetItemFontColorByQuality(KItemInfo.nQuality)))
 				-- 强化等级
 				for _ = 1, rec.strength do
-					insert(aXml, '<image>w=16 h=16 path="ui/Image/UICommon/FEPanel.UITex" frame=39 </image>')
+					table.insert(aXml, '<image>w=16 h=16 path="ui/Image/UICommon/FEPanel.UITex" frame=39 </image>')
 				end
 				-- 五行石
 				for _, nEnchantID in ipairs(rec.diamond_enchant) do
 					local nType, nTabIndex = GetDiamondInfoFromEnchantID(nEnchantID)
 					local diamon = nType and nTabIndex and GetItemInfo(nType, nTabIndex)
 					if diamon then
-						insert(aXml, '<image>w=24 h=24 path="fromiconid" frame=' .. Table_GetItemIconID(diamon.nUiId) .. '</image>')
+						table.insert(aXml, '<image>w=24 h=24 path="fromiconid" frame=' .. Table_GetItemIconID(diamon.nUiId) .. '</image>')
 					else
-						insert(aXml, '<image>w=24 h=24 path="ui/Image/UICommon/FEPanel.UITex" frame=5 </image>')
+						table.insert(aXml, '<image>w=24 h=24 path="ui/Image/UICommon/FEPanel.UITex" frame=5 </image>')
 					end
 				end
 				-- 附魔
@@ -671,24 +642,24 @@ function D.UpdateItems(page)
 					local nFrame = 41
 					local szText = Table_GetCommonEnchantDesc(rec.permanent_enchant)
 					if szText then
-						szText = gsub(szText, 'font=%d+', 'font=113')
-						insert(aXml, CONSTANT.XML_LINE_BREAKER)
-						insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 113))
-						insert(aXml, GetFormatImage(szImagePath, nFrame, 20, 20))
-						insert(aXml, GetFormatText(' ', 113))
-						insert(aXml, szText)
+						szText = string.gsub(szText, 'font=%d+', 'font=113')
+						table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+						table.insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 113))
+						table.insert(aXml, GetFormatImage(szImagePath, nFrame, 20, 20))
+						table.insert(aXml, GetFormatText(' ', 113))
+						table.insert(aXml, szText)
 					else
 						local enchantAttrib = GetItemEnchantAttrib(rec.permanent_enchant);
 						if enchantAttrib then
 							for k, v in pairs(enchantAttrib) do
 								szText = D.FormatEnchantAttribText(v)
 								if szText ~= '' then
-									szText = gsub(szText, 'font=%d+', 'font=113')
-									insert(aXml, CONSTANT.XML_LINE_BREAKER)
-									insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 113))
-									insert(aXml, GetFormatImage(szImagePath, nFrame, 20, 20))
-									insert(aXml, GetFormatText(' ', 113))
-									insert(aXml, szText)
+									szText = string.gsub(szText, 'font=%d+', 'font=113')
+									table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+									table.insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 113))
+									table.insert(aXml, GetFormatImage(szImagePath, nFrame, 20, 20))
+									table.insert(aXml, GetFormatText(' ', 113))
+									table.insert(aXml, szText)
 								end
 							end
 						end
@@ -696,23 +667,23 @@ function D.UpdateItems(page)
 				end
 				-- 五彩石
 				if KItemInfo.nSub == EQUIPMENT_SUB.MELEE_WEAPON then
-					insert(aXml, CONSTANT.XML_LINE_BREAKER)
-					-- insert(aXml, GetFormatText(rep(g_tStrings.STR_ONE_CHINESE_SPACE, nTitleLen) .. ' ', 162))
-					-- insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 162))
-					insert(aXml, GetFormatText(g_tStrings.STR_COLOR_DIAMOND .. g_tStrings.STR_COLON, 162))
+					table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+					-- table.insert(aXml, GetFormatText(string.rep(g_tStrings.STR_ONE_CHINESE_SPACE, nTitleLen) .. ' ', 162))
+					-- table.insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 162))
+					table.insert(aXml, GetFormatText(g_tStrings.STR_COLOR_DIAMOND .. g_tStrings.STR_COLON, 162))
 					if rec.fea_enchant == 0 then
-						insert(aXml, '<image>w=20 h=20 path="ui/Image/UICommon/FEPanel.UITex" frame=5 </image>')
-						insert(aXml, '<text>text=' .. EncodeComponentsString(' ' .. g_tStrings.STR_ITEM_H_COLOR_DIAMOND) .. ' font=161 valign=1 h=24 richtext=0 </text>')
+						table.insert(aXml, '<image>w=20 h=20 path="ui/Image/UICommon/FEPanel.UITex" frame=5 </image>')
+						table.insert(aXml, '<text>text=' .. EncodeComponentsString(' ' .. g_tStrings.STR_ITEM_H_COLOR_DIAMOND) .. ' font=161 valign=1 h=24 richtext=0 </text>')
 					else
 						local dwTabType, dwIndex = GetColorDiamondInfoFromEnchantID(rec.fea_enchant)
 						local diamon = GetItemInfo(dwTabType, dwIndex)
-						insert(aXml, '<image>w=20 h=20 path="fromiconid" frame=' .. Table_GetItemIconID(diamon.nUiId) .. '</image>')
-						insert(aXml, GetFormatText(' [' .. diamon.szName .. ']', 162, GetItemFontColorByQuality(diamon.nQuality)))
+						table.insert(aXml, '<image>w=20 h=20 path="fromiconid" frame=' .. Table_GetItemIconID(diamon.nUiId) .. '</image>')
+						table.insert(aXml, GetFormatText(' [' .. diamon.szName .. ']', 162, GetItemFontColorByQuality(diamon.nQuality)))
 					end
 				end
 			--[[#DEBUG BEGIN]]
 			else
-				LIB.Debug('MY_RoleStatistics_EquipStat', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, DEBUG_LEVEL.WARNING)
+				X.Debug('MY_RoleStatistics_EquipStat', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			end
 		else
@@ -723,11 +694,11 @@ function D.UpdateItems(page)
 				txtDurability:SetText('')
 			end
 			if visible then
-				insert(aXml, GetFormatText(_L['None'], 162))
+				table.insert(aXml, GetFormatText(_L['None'], 162))
 			end
 		end
 		if visible then
-			insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
 		end
 	end
 
@@ -735,7 +706,7 @@ function D.UpdateItems(page)
 	for _, info in ipairs(EQUIPMENT_EXTRA_ITEM_LIST) do
 		local aItemData = ownerextra[info.key] or {}
 		local dwTabType, dwTabIndex = aItemData[1], aItemData[2]
-		local KItemInfo = not IsEmpty(dwTabIndex) and GetItemInfo(ITEM_TABLE_TYPE.CUST_TRINKET, dwTabIndex)
+		local KItemInfo = not X.IsEmpty(dwTabIndex) and GetItemInfo(ITEM_TABLE_TYPE.CUST_TRINKET, dwTabIndex)
 		local box = info.box and handle:Lookup(info.box)
 		if KItemInfo then
 			if box then
@@ -755,7 +726,7 @@ function D.UpdateItems(page)
 	-- 绘制详情
 	local txtName = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_RoleName')
 	txtName:SetText(_L('%s (Lv%d)', ownername, ownerlevel))
-	txtName:SetFontColor(LIB.GetForceColor(ownerforce, 'foreground'))
+	txtName:SetFontColor(X.GetForceColor(ownerforce, 'foreground'))
 	local txtRoleInfo = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_RoleInfo')
 	txtRoleInfo:SetText(_L('%s * %s', CONSTANT.FORCE_TYPE_LABEL[ownerforce] or '', CONSTANT.ROLE_TYPE_LABEL[ownerrole] or ''))
 	local txtEquipScore = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_EquipScore')
@@ -763,7 +734,7 @@ function D.UpdateItems(page)
 	txtEquipScore:SetText(_L('Equip score: %s', ownerscore[D.dwCurrentSuitIndex] or _L['Unknown']))
 	local hBoard = page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', 'Handle_EquipInfo')
 	hBoard:Clear()
-	hBoard:AppendItemFromString(concat(aXml))
+	hBoard:AppendItemFromString(table.concat(aXml))
 	hBoard:FormatAllItemPos()
 end
 
@@ -790,7 +761,7 @@ end
 function D.OnActivePage()
 	D.Migration()
 	if not O.bAdviceSaveDB and not O.bSaveDB then
-		LIB.Confirm(_L('%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]), function()
+		X.Confirm(_L('%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]), function()
 			MY_RoleStatistics_EquipStat.bSaveDB = true
 			MY_RoleStatistics_EquipStat.bAdviceSaveDB = true
 		end, function()
@@ -841,7 +812,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_Delete' then
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.ownerinfo.ownername), function()
+		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.ownerinfo.ownername), function()
 			DB_ItemsDA:ClearBindings()
 			DB_ItemsDA:BindAll(wnd.ownerinfo.ownerkey)
 			DB_ItemsDA:Execute()
@@ -864,7 +835,7 @@ function D.OnItemMouseEnter()
 		local w, h = this:GetSize()
 		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)
 	elseif this.bItemInfo then
-		LIB.OutputItemInfoTip(this, this.dwTabType, this.dwTabIndex)
+		X.OutputItemInfoTip(this, this.dwTabType, this.dwTabIndex)
 	end
 end
 D.OnItemRefreshTip = D.OnItemMouseEnter
@@ -887,7 +858,7 @@ function D.OnMouseEnter()
 				or 'Character: %s\nServer: %s\nSnapshot Time: %s',
 			this.ownerinfo.ownername,
 			this.ownerinfo.servername,
-			LIB.FormatTime(this.ownerinfo.time, '%yyyy-%MM-%dd %hh:%mm:%ss')), nil, 255, 255, 0), 400, {x, y, w, h, false}, ALW.RIGHT_LEFT_AND_BOTTOM_TOP, false)
+			X.FormatTime(this.ownerinfo.time, '%yyyy-%MM-%dd %hh:%mm:%ss')), nil, 255, 255, 0), 400, {x, y, w, h, false}, ALW.RIGHT_LEFT_AND_BOTTOM_TOP, false)
 	end
 end
 
@@ -925,14 +896,14 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_EquipStat', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_EquipStat', function()
 	D.bReady = true
 	D.UpdateSaveDB()
 	D.FlushDB()
 	D.UpdateFloatEntry()
 end)
-LIB.RegisterReload('MY_RoleStatistics_EquipStat', function() D.ApplyFloatEntry(false) end)
-LIB.RegisterFrameCreate('CharacterPanel', 'MY_RoleStatistics_EquipStat', D.UpdateFloatEntry)
+X.RegisterReload('MY_RoleStatistics_EquipStat', function() D.ApplyFloatEntry(false) end)
+X.RegisterFrameCreate('CharacterPanel', 'MY_RoleStatistics_EquipStat', D.UpdateFloatEntry)
 
 -- function D.OnMouseLeave()
 -- 	HideTip()
@@ -954,7 +925,7 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics.RegisterModule('EquipStat', _L['MY_RoleStatistics_EquipStat'], LIB.CreateModule(settings))
+MY_RoleStatistics.RegisterModule('EquipStat', _L['MY_RoleStatistics_EquipStat'], X.CreateModule(settings))
 end
 
 -- Global exports
@@ -990,5 +961,5 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics_EquipStat = LIB.CreateModule(settings)
+MY_RoleStatistics_EquipStat = X.CreateModule(settings)
 end

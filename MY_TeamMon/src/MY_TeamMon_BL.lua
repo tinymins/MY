@@ -11,72 +11,43 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon_BL'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local GetBuff = LIB.GetBuff
+local GetBuff = X.GetBuff
 local FilterCustomText = MY_TeamMon.FilterCustomText
 
-local BL_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_BL.ini'
-local O = LIB.CreateUserSettingsModule('MY_TeamMon_BL', _L['Raid'], {
+local BL_INIFILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_BL.ini'
+local O = X.CreateUserSettingsModule('MY_TeamMon_BL', _L['Raid'], {
 	tAnchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'TOPLEFT', r = 'CENTER', x = 300, y = -200 },
 	},
 	nCount = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 8,
 	},
 	fScale = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 })
@@ -102,7 +73,7 @@ local function CreateBuffList(dwID, nLevel, col, tArgs, szSender, szReceiver)
 			ui = D.handle:AppendItemFromData(D.hItem, key)
 			bScale = true
 		end
-		local szName, nIcon = LIB.GetBuffName(dwID, nLevel)
+		local szName, nIcon = X.GetBuffName(dwID, nLevel)
 		ui.dwID = dwID
 		ui.nLevel = level
 		ui:Lookup('Text_Name'):SetText(FilterCustomText(tArgs.szName, szSender, szReceiver) or szName)
@@ -156,13 +127,13 @@ function D.OnItemMouseEnter()
 		this:SetObjectMouseOver(true)
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		LIB.OutputBuffTip({ x, y, w, h }, buff.dwID, buff.nLevel, LIB.GetEndTime(buff.nEndFrame))
+		X.OutputBuffTip({ x, y, w, h }, buff.dwID, buff.nLevel, X.GetEndTime(buff.nEndFrame))
 	end
 end
 
 function D.OnItemRButtonClick()
 	local h = this:GetParent()
-	LIB.CancelBuff(GetClientPlayer(), h.dwID, h.nLevel)
+	X.CancelBuff(GetClientPlayer(), h.dwID, h.nLevel)
 end
 
 function D.OnItemMouseLeave()
@@ -184,21 +155,21 @@ function D.OnFrameBreathe()
 					D.handle:RemoveItem(h)
 					D.handle:FormatAllItemPos()
 				else
-					h:SetAlpha(max(0, nAlpha - 30))
+					h:SetAlpha(math.max(0, nAlpha - 30))
 					h:Lookup('Animate_Update'):SetAlpha(0)
 				end
 			else
 				local buff = GetBuff(me, h.dwID, h.nLevel)
 				if buff then
-					local nSec = LIB.GetEndTime(buff.nEndFrame)
+					local nSec = X.GetEndTime(buff.nEndFrame)
 					if nSec > 24 * 60 * 60 then
 						h:Lookup('Text_Time'):SetText('')
 					else
-						h:Lookup('Text_Time'):SetText(LIB.FormatTimeCounter(nSec, 1))
+						h:Lookup('Text_Time'):SetText(X.FormatTimeCounter(nSec, 1))
 					end
 					local nAlpha = h:Lookup('Animate_Update'):GetAlpha()
 					if nAlpha > 0 then
-						h:Lookup('Animate_Update'):SetAlpha(max(0, nAlpha - 8))
+						h:Lookup('Animate_Update'):SetAlpha(math.max(0, nAlpha - 8))
 					end
 					if buff.nStackNum > 1 then
 						h:Lookup('Box'):SetOverText(0, buff.nStackNum)
@@ -211,7 +182,7 @@ function D.OnFrameBreathe()
 			end
 		end
 	end
-	if not LIB.IsInCustomUIMode() then
+	if not X.IsInCustomUIMode() then
 		this:SetMousePenetrable(not IsCtrlKeyDown())
 	else
 		this:SetMousePenetrable(false)
@@ -245,7 +216,7 @@ function D.Init()
 	Wnd.OpenWindow(BL_INIFILE, 'MY_TeamMon_BL')
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_BL', D.Init)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_BL', D.Init)
 
 -- Global exports
 do
@@ -280,5 +251,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_BL = LIB.CreateModule(settings)
+MY_TeamMon_BL = X.CreateModule(settings)
 end

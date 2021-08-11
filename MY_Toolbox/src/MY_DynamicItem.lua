@@ -10,82 +10,53 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_DynamicItem'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_DynamicItem.ini'
 
-local O = LIB.CreateUserSettingsModule('MY_DynamicItem', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_DynamicItem', _L['General'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowBg = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nNum = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 16,
 	},
 	nCol = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 16,
 	},
 	anchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'BOTTOMCENTER', r = 'BOTTOMCENTER', x = 26, y = -226 },
 	},
 })
@@ -121,17 +92,17 @@ function D.GetMapID()
 end
 
 function D.SaveMapConfig()
-	LIB.SaveLUAData(
-		{'userdata/dynamic_item/' .. D.GetMapID() .. '.jx3dat', PATH_TYPE.GLOBAL},
+	X.SaveLUAData(
+		{'userdata/dynamic_item/' .. D.GetMapID() .. '.jx3dat', X.PATH_TYPE.GLOBAL},
 		D.aList,
 		{ passphrase = false, crc = false })
 end
 
 function D.LoadMapConfig()
-	D.aList = LIB.LoadLUAData(
-		{'userdata/dynamic_item/' .. D.GetMapID() .. '.jx3dat', PATH_TYPE.GLOBAL},
+	D.aList = X.LoadLUAData(
+		{'userdata/dynamic_item/' .. D.GetMapID() .. '.jx3dat', X.PATH_TYPE.GLOBAL},
 		{ passphrase = false })
-		or LIB.LoadLUAData(PLUGIN_ROOT .. '/data/dynamic_item/{$branch}/' .. D.GetMapID() .. '.jx3dat')
+		or X.LoadLUAData(PLUGIN_ROOT .. '/data/dynamic_item/{$branch}/' .. D.GetMapID() .. '.jx3dat')
 		or {}
 end
 
@@ -185,7 +156,7 @@ function D.InitList(frame)
 	-- ×óÓÒ·Ö¸ô·û
 	local hSplits = hTotal:Lookup('Handle_Splits')
 	hSplits:Clear()
-	for _ = 1, ceil(O.nNum / O.nCol) do
+	for _ = 1, math.ceil(O.nNum / O.nCol) do
 		local hSplit = hSplits:AppendItemFromIni(SZ_INI, 'Handle_Split')
 		hSplit:SetW(nListW + hList:GetRelX() * 2)
 		hSplit:Lookup('Image_SplitR'):SetRelX(nListW + hList:GetRelX())
@@ -203,12 +174,12 @@ function D.UpdateCDText(txt, nTime)
 	if txt.nTime == nTime then
 		return
 	end
-	local nSec, szTime, nR, nG, nB = floor(nTime / GLOBAL.GAME_FPS)
+	local nSec, szTime, nR, nG, nB = math.floor(nTime / GLOBAL.GAME_FPS)
 	if nSec == 0 then
 		szTime, nR, nG, nB = '', 255, 255, 255
 	else
-		local nH = floor(nSec / 3600)
-		local nM = floor(nSec / 60) % 60
+		local nH = math.floor(nSec / 3600)
+		local nM = math.floor(nSec / 60) % 60
 		local nS = nSec % 60
 		if nH > 0 then
 			if nM > 0 or nS > 0 then
@@ -250,7 +221,7 @@ function D.UpdateListCD(frame)
 	if not me then
 		return
 	end
-	local bShowCD = LIB.GetNumberBit(GetUserPreferences(4380, 'c'), 2) == 1
+	local bShowCD = X.GetNumberBit(GetUserPreferences(4380, 'c'), 2) == 1
 	local hList = frame:Lookup('', 'Handle_List')
 	for i = 1, O.nNum do
 		local hItem = hList:Lookup(i - 1)
@@ -275,7 +246,7 @@ function D.UpdateList(frame)
 		local data = D.aList[i]
 		if data then
 			if data[1] == UI_OBJECT.ITEM_INFO then
-				local nAmount = LIB.GetItemAmount(data[2], data[3], data[4])
+				local nAmount = X.GetItemAmount(data[2], data[3], data[4])
 				UpdateBoxObject(box, UI_OBJECT.ITEM_INFO, nil, data[2], data[3], data[4] or nAmount)
 				box:EnableObject(nAmount > 0)
 			elseif data[1] == UI_OBJECT.ITEM then
@@ -410,7 +381,7 @@ function D.OnItemLButtonClick()
 			local data = {this:GetObject()}
 			if data[1] == UI_OBJECT.ITEM_INFO then
 				local dwTabType, dwIndex, nBookID = data[4], data[5], data[7]
-				LIB.WalkBagItem(function(item, dwBox, dwX)
+				X.WalkBagItem(function(item, dwBox, dwX)
 					if item.dwTabType == dwTabType and item.dwIndex == dwIndex then
 						if item.nGenre == ITEM_GENRE.BOOK and item.nBookID ~= nBookID then
 							return
@@ -424,7 +395,7 @@ function D.OnItemLButtonClick()
 				OnUseItem(dwBox, dwX)
 			end
 		else
-			LIB.ExecuteWithThis(this, D.OnItemLButtonDragEnd)
+			X.ExecuteWithThis(this, D.OnItemLButtonDragEnd)
 		end
 	end
 end
@@ -445,7 +416,7 @@ function D.OnItemLButtonDrag()
 		if Hand_IsEmpty() and not this:IsEmpty() then
 			if IsCursorInExclusiveMode() then
 				OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.SRT_ERROR_CANCEL_CURSOR_STATE)
-			elseif LIB.GetNumberBit(GetUserPreferences(2145, 'c'), 8) == 1 and not IsShiftKeyDown() then
+			elseif X.GetNumberBit(GetUserPreferences(2145, 'c'), 8) == 1 and not IsShiftKeyDown() then
 				OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.SRT_ERROR_LOCK_ACTIONBAR_WHEN_DRAG)
 			else
 				Hand_Pick(this)
@@ -464,7 +435,7 @@ function D.OnItemLButtonDragEnd()
 		if not wnd or wnd:GetRoot() ~= this:GetRoot() then
 			return
 		end
-		if not this:IsEmpty() and LIB.GetNumberBit(GetUserPreferences(2145, 'c'), 8) == 1 and not IsShiftKeyDown() then
+		if not this:IsEmpty() and X.GetNumberBit(GetUserPreferences(2145, 'c'), 8) == 1 and not IsShiftKeyDown() then
 			OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.SRT_ERROR_LOCK_ACTIONBAR_WHEN_DRAG)
 		else
 			this.__OnItemLButtonDragEnd()
@@ -497,18 +468,18 @@ for i = 1, 32 do
 				return
 			end
 			hItem:Lookup('Box_Item'):SetObjectPressed(0)
-			LIB.ExecuteWithThis(hItem:Lookup('Box_Item'), D.OnItemLButtonClick)
+			X.ExecuteWithThis(hItem:Lookup('Box_Item'), D.OnItemLButtonClick)
 		end)
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', MODULE_NAME, function()
+X.RegisterUserSettingsUpdate('@@INIT@@', MODULE_NAME, function()
 	D.bReady = true
 	D.CheckEnable()
 end)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L[MODULE_NAME],
 		checked = MY_DynamicItem.bEnable,
 		oncheck = function(bChecked)
@@ -518,8 +489,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Show background'],
 		checked = MY_DynamicItem.bShowBg,
 		oncheck = function(bChecked)
@@ -528,29 +499,29 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		autoenable = function() return MY_DynamicItem.bEnable end,
 	}):Width() + 5
 
-	x = x + ui:Append('WndTrackbar', {
-		x = x, y = y, h = 25, w = 220,
+	nX = nX + ui:Append('WndTrackbar', {
+		x = nX, y = nY, h = 25, w = 220,
 		range = {1, 32}, value = MY_DynamicItem.nNum,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textfmt = function(v) return _L('Box number: %d', v) end,
 		onchange = function(nVal)
-			LIB.DelayCall(function() MY_DynamicItem.nNum = nVal end)
+			X.DelayCall(function() MY_DynamicItem.nNum = nVal end)
 		end,
 		autoenable = function() return MY_DynamicItem.bEnable end,
 	}):Width() + 5
 
-	x = x + ui:Append('WndTrackbar', {
-		x = x, y = y, h = 25, w = 220,
+	nX = nX + ui:Append('WndTrackbar', {
+		x = nX, y = nY, h = 25, w = 220,
 		range = {1, 32}, value = MY_DynamicItem.nCol,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textfmt = function(v) return _L('Col number: %d', v) end,
 		onchange = function(nVal)
-			LIB.DelayCall(function() MY_DynamicItem.nCol = nVal end)
+			X.DelayCall(function() MY_DynamicItem.nCol = nVal end)
 		end,
 		autoenable = function() return MY_DynamicItem.bEnable end,
 	}):Width() + 5
 
-	return x, y
+	return nX, nY
 end
 
 -- Global exports
@@ -596,5 +567,5 @@ local settings = {
 		},
 	},
 }
-MY_DynamicItem = LIB.CreateModule(settings)
+MY_DynamicItem = X.CreateModule(settings)
 end

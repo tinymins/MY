@@ -10,58 +10,29 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_BagStat'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
+CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_BagStat'], {'userdata/role_statistics/bag_stat.v4.db', PATH_TYPE.GLOBAL})
+local DB = X.SQLiteConnect(_L['MY_RoleStatistics_BagStat'], {'userdata/role_statistics/bag_stat.v4.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return LIB.Sysmsg(_L['MY_RoleStatistics_BagStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return X.Sysmsg(_L['MY_RoleStatistics_BagStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
-local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_BagStat.ini'
+local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_BagStat.ini'
 local PAGE_DISPLAY = 15
 local NORMAL_MODE_PAGE_SIZE = 50
 local COMPACT_MODE_PAGE_SIZE = 150
@@ -132,7 +103,7 @@ DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_name_idx ON ItemInfo(name)')
 DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_desc_idx ON ItemInfo(desc)')
 local DB_ItemInfoW = DB:Prepare('REPLACE INTO ItemInfo (tabtype, tabindex, tabsubindex, name, genre, quality, exist_type, desc, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
 
-local BOX_TYPE = LIB.KvpToObject({
+local BOX_TYPE = X.KvpToObject({
 	-- 100 - 199: Equip
 	{CONSTANT.INVENTORY_INDEX.EQUIP, 100},
 	{CONSTANT.INVENTORY_INDEX.EQUIP_BACKUP1, 101},
@@ -156,45 +127,45 @@ local BOX_TYPE = LIB.KvpToObject({
 	{CONSTANT.INVENTORY_GUILD_BANK, 400}
 })
 
-local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'], {
 	bCompactMode = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bHideEquipped = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tUncheckedNames = {
-		ePathType = PATH_TYPE.GLOBAL,
-		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		ePathType = X.PATH_TYPE.GLOBAL,
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 	bFloatEntry = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceFloatEntry = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSaveDB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 })
@@ -229,7 +200,7 @@ function GetItemText(KItem)
 			local nBookID = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
 			local szKey = KItem.dwTabType .. ',' .. KItem.dwIndex .. ',' .. nBookID
 			if not l_tItemText[szKey] then
-				l_tItemText[szKey] = LIB.GetPureText(LIB.GetItemTip(KItem), 'LUA') or ''
+				l_tItemText[szKey] = X.GetPureText(X.GetItemTip(KItem), 'LUA') or ''
 			end
 			return l_tItemText[szKey]
 		else
@@ -245,8 +216,8 @@ local l_guildcache = {}
 local function UpdateTongRepertoryPage()
 	local nPage = arg0
 	local me = GetClientPlayer()
-	for nIndex = 1, LIB.GetGuildBankBagSize(nPage) do
-		local boxtype, boxindex = LIB.GetGuildBankBagPos(nPage, nIndex)
+	for nIndex = 1, X.GetGuildBankBagSize(nPage) do
+		local boxtype, boxindex = X.GetGuildBankBagPos(nPage, nIndex)
 		local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex), 'BANK')
 		l_guildcache[boxtype .. ',' .. boxindex] = {
 			boxtype = boxtype,
@@ -256,15 +227,15 @@ local function UpdateTongRepertoryPage()
 		}
 	end
 end
-LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_RoleStatistics_BagStat', UpdateTongRepertoryPage)
+X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_RoleStatistics_BagStat', UpdateTongRepertoryPage)
 
 function D.Migration()
-	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/bag_stat.v2.db', PATH_TYPE.GLOBAL})
-	local DB_V3_PATH = LIB.FormatPath({'userdata/role_statistics/bag_stat.v3.db', PATH_TYPE.GLOBAL})
+	local DB_V2_PATH = X.FormatPath({'userdata/role_statistics/bag_stat.v2.db', X.PATH_TYPE.GLOBAL})
+	local DB_V3_PATH = X.FormatPath({'userdata/role_statistics/bag_stat.v3.db', X.PATH_TYPE.GLOBAL})
 	if not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
 		return
 	end
-	LIB.Confirm(
+	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
 			-- 转移V2旧版数据
@@ -341,7 +312,7 @@ function D.Migration()
 					DB:Execute('END TRANSACTION')
 					DB_V2:Release()
 				end
-				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			-- 转移V3旧版数据
 			if IsLocalFileExist(DB_V3_PATH) then
@@ -417,10 +388,10 @@ function D.Migration()
 					DB:Execute('END TRANSACTION')
 					DB_V3:Release()
 				end
-				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			FireUIEvent('MY_ROLE_STAT_BAG_UPDATE')
-			LIB.Alert(_L['Migrate succeed!'])
+			X.Alert(_L['Migrate succeed!'])
 		end)
 end
 
@@ -463,10 +434,10 @@ function D.ItemToData(KItem, szBagType)
 		uiid = KItem.nUiId
 		strength = KItem.nStrengthLevel
 		durability = KItem.nCurrentDurability
-		diamond_enchant = AnsiToUTF8(LIB.JsonEncode(aDiamondEnchant)) -- 五行石
+		diamond_enchant = AnsiToUTF8(X.JsonEncode(aDiamondEnchant)) -- 五行石
 		fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and KItem.GetMountFEAEnchantID() or 0 -- 五彩石
 		permanent_enchant = KItem.dwPermanentEnchantID -- 附魔
-		desc = AnsiToUTF8(LIB.GetItemTip(KItem) or '')
+		desc = AnsiToUTF8(X.GetItemTip(KItem) or '')
 	end
 	local aItemData = {
 		tabtype, tabindex, tabsubindex, bagcount, bankcount,
@@ -487,16 +458,16 @@ function D.FlushDB()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(D.GetPlayerGUID(me))
 	local ownername = AnsiToUTF8(me.szName)
-	local servername = AnsiToUTF8(LIB.GetRealServer(2))
+	local servername = AnsiToUTF8(X.GetRealServer(2))
 	DB:Execute('BEGIN TRANSACTION')
 
 	-- 背包
 	local aPackageBoxType = {}
 	for _, v in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
-		insert(aPackageBoxType, v)
+		table.insert(aPackageBoxType, v)
 	end
 	for _, v in ipairs(CONSTANT.INVENTORY_PACKAGE_LIST) do
-		insert(aPackageBoxType, v)
+		table.insert(aPackageBoxType, v)
 	end
 	for _, boxtype in ipairs(aPackageBoxType) do
 		local sboxtype = BOX_TYPE[boxtype]
@@ -518,7 +489,7 @@ function D.FlushDB()
 			DB_ItemsDL:Execute()
 			--[[#DEBUG BEGIN]]
 		else
-			LIB.Debug('MY_RoleStatistics_BagStat', 'bag boxtype not in static map: ' .. boxtype, DEBUG_LEVEL.WARNING)
+			X.Debug('MY_RoleStatistics_BagStat', 'bag boxtype not in static map: ' .. boxtype, X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 		end
 	end
@@ -552,7 +523,7 @@ function D.FlushDB()
 			DB_ItemsDL:Execute()
 			--[[#DEBUG BEGIN]]
 		else
-			LIB.Debug('MY_RoleStatistics_BagStat', 'bank boxtype not in static map: ' .. boxtype, DEBUG_LEVEL.WARNING)
+			X.Debug('MY_RoleStatistics_BagStat', 'bank boxtype not in static map: ' .. boxtype, X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 		end
 	end
@@ -561,9 +532,9 @@ function D.FlushDB()
 	DB_ItemsDL:Reset()
 
 	-- 帮会仓库
-	if not IsEmpty(l_guildcache) then
+	if not X.IsEmpty(l_guildcache) then
 		local ownerkey = 'tong' .. me.dwTongID
-		local ownername = AnsiToUTF8('[' .. LIB.GetTongName(me.dwTongID) .. ']')
+		local ownername = AnsiToUTF8('[' .. X.GetTongName(me.dwTongID) .. ']')
 		for _, info in pairs(l_guildcache) do
 			local sboxtype = BOX_TYPE[info.boxtype]
 			if sboxtype then
@@ -577,7 +548,7 @@ function D.FlushDB()
 				DB_ItemsW:Execute()
 				--[[#DEBUG BEGIN]]
 			else
-				LIB.Debug('MY_RoleStatistics_BagStat', 'guild bank boxtype not in static map: ' .. info.boxtype, DEBUG_LEVEL.WARNING)
+				X.Debug('MY_RoleStatistics_BagStat', 'guild bank boxtype not in static map: ' .. info.boxtype, X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 			end
 		end
@@ -593,10 +564,10 @@ function D.FlushDB()
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	LIB.Debug('MY_RoleStatistics_BagStat', _L('Flushing to database costs %dms...', nTickCount), DEBUG_LEVEL.LOG)
+	X.Debug('MY_RoleStatistics_BagStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterFlush('MY_RoleStatistics_BagStat', D.FlushDB)
+X.RegisterFlush('MY_RoleStatistics_BagStat', D.FlushDB)
 end
 
 do local INIT = false
@@ -610,7 +581,7 @@ function D.UpdateSaveDB()
 	end
 	if not O.bSaveDB then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_RoleStatistics_BagStat', 'Remove from database...', DEBUG_LEVEL.LOG)
+		X.Debug('MY_RoleStatistics_BagStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, guid in ipairs({
 			AnsiToUTF8(D.GetPlayerGUID(me)),
@@ -626,12 +597,12 @@ function D.UpdateSaveDB()
 		DB_ItemsDA:Reset()
 		DB_OwnerInfoD:Reset()
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_RoleStatistics_BagStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
+		X.Debug('MY_RoleStatistics_BagStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_BAG_UPDATE')
 end
-LIB.RegisterInit('MY_RoleStatistics_BagUpdateSaveDB', function()
+X.RegisterInit('MY_RoleStatistics_BagUpdateSaveDB', function()
 	D.tCheckedNames[D.GetPlayerGUID(GetClientPlayer())] = true
 	INIT = true
 end)
@@ -681,7 +652,7 @@ function D.UpdateItems(page)
 	local searchitem = AnsiToUTF8('%' .. page:Lookup('Wnd_Total/Wnd_SearchItem/Edit_SearchItem'):GetText():gsub('%s+', '%%') .. '%')
 	local sqlfilter = ''
 	for _, p in ipairs(FILTER_LIST) do
-		if p.name == D.szFilterType and not IsEmpty(p.where) then
+		if p.name == D.szFilterType and not X.IsEmpty(p.where) then
 			sqlfilter = sqlfilter .. ' AND (' .. p.where .. ') '
 		end
 	end
@@ -730,11 +701,11 @@ function D.UpdateItems(page)
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
 		if wnd:Lookup('CheckBox_Name'):IsCheckBoxChecked() then
-			insert(wheres, 'O.ownerkey = ?')
-			insert(ownerkeys, AnsiToUTF8(wnd.ownerkey))
+			table.insert(wheres, 'O.ownerkey = ?')
+			table.insert(ownerkeys, AnsiToUTF8(wnd.ownerkey))
 		end
 	end
-	local sqlwhere = ((#wheres == 0 and ' 1 = 0 ') or ('(' .. concat(wheres, ' OR ') .. ')'))
+	local sqlwhere = ((#wheres == 0 and ' 1 = 0 ') or ('(' .. table.concat(wheres, ' OR ') .. ')'))
 	local sqlgroup = ' GROUP BY C.tabtype, C.tabindex'
 	sql  = sql  .. sqlwhere .. sqlgroup .. ' ORDER BY C.tabtype ASC, C.tabindex ASC ' .. ' LIMIT ' .. nPageSize .. ' OFFSET ' .. ((page.nCurrentPage - 1) * nPageSize)
 	sqlc = sqlc .. sqlwhere .. sqlgroup
@@ -745,7 +716,7 @@ function D.UpdateItems(page)
 	DB_CountR:BindAll(searchitem, searchitem, unpack(ownerkeys))
 	local nCount = #DB_CountR:GetAll()
 	DB_CountR:Reset()
-	local nPageCount = floor(nCount / nPageSize) + 1
+	local nPageCount = math.floor(nCount / nPageSize) + 1
 	page:Lookup('Wnd_Total/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(page.nCurrentPage)
 	page:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['%d pages'], nPageCount)
 	page:Lookup('Wnd_Total/WndScroll_Name/Wnd_SearchInfo', 'Text_SearchInfo'):SprintfText(_L['%d results'], nCount)
@@ -767,12 +738,12 @@ function D.UpdateItems(page)
 		hItem:Lookup('Text_IndexUnderline'):SetVisible(1 == page.nCurrentPage)
 
 		local nStartPage
-		if page.nCurrentPage + ceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
+		if page.nCurrentPage + math.ceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
 			nStartPage = nPageCount - (PAGE_DISPLAY - 2)
-		elseif page.nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2) < 2 then
+		elseif page.nCurrentPage - math.ceil((PAGE_DISPLAY - 2) / 2) < 2 then
 			nStartPage = 2
 		else
-			nStartPage = page.nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2)
+			nStartPage = page.nCurrentPage - math.ceil((PAGE_DISPLAY - 2) / 2)
 		end
 		for i = 1, PAGE_DISPLAY - 2 do
 			local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Index')
@@ -799,7 +770,7 @@ function D.UpdateItems(page)
 	DB_ItemInfoR:Reset()
 
 	local sqlbelongs = 'SELECT * FROM (SELECT ownerkey, SUM(bagcount) AS bagcount, SUM(bankcount) AS bankcount FROM BagItems WHERE tabtype = ? AND tabindex = ? AND tabsubindex = ? GROUP BY ownerkey) AS B LEFT JOIN OwnerInfo AS O ON B.ownerkey = O.ownerkey WHERE '
-	sqlbelongs = sqlbelongs .. ((#wheres == 0 and ' 1 = 0 ') or ('(' .. concat(wheres, ' OR ') .. ')'))
+	sqlbelongs = sqlbelongs .. ((#wheres == 0 and ' 1 = 0 ') or ('(' .. table.concat(wheres, ' OR ') .. ')'))
 	local DB_BelongsR = DB:Prepare(sqlbelongs)
 
 	local handle = page:Lookup('Wnd_Total/WndScroll_Item', 'Handle_Items')
@@ -858,7 +829,7 @@ function D.UpdateItems(page)
 			end
 		--[[#DEBUG BEGIN]]
 		else
-			LIB.Debug('MY_RoleStatistics_BagStat', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, DEBUG_LEVEL.WARNING)
+			X.Debug('MY_RoleStatistics_BagStat', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, X.DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		end
 	end
@@ -883,7 +854,7 @@ function D.OnActivePage()
 	D.Migration()
 
 	if not O.bAdviceSaveDB and not O.bSaveDB then
-		LIB.Confirm(_L('%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]), function()
+		X.Confirm(_L('%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.', _L[MODULE_NAME]), function()
 			MY_RoleStatistics_BagStat.bSaveDB = true
 			MY_RoleStatistics_BagStat.bAdviceSaveDB = true
 		end, function()
@@ -974,7 +945,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_Delete' then
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.ownername), function()
+		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.ownername), function()
 			DB_ItemsDA:ClearBindings()
 			DB_ItemsDA:BindAll(wnd.ownerkey)
 			DB_ItemsDA:Execute()
@@ -1033,35 +1004,35 @@ function D.OnItemMouseEnter()
 		local rec = this.itemdata
 		local aXml = {}
 
-		if IsEmpty(rec.itemtip) then
-			insert(aXml, GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex) or '')
+		if X.IsEmpty(rec.itemtip) then
+			table.insert(aXml, GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex) or '')
 		else
-			insert(aXml, UTF8ToAnsi(rec.itemtip) or '')
+			table.insert(aXml, UTF8ToAnsi(rec.itemtip) or '')
 		end
 
 		if IsCtrlKeyDown() then
-			insert(aXml, CONSTANT.XML_LINE_BREAKER)
-			insert(aXml, GetFormatText('ItemInfo: ' .. rec.tabtype .. ', ' .. rec.tabindex, 102))
+			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, GetFormatText('ItemInfo: ' .. rec.tabtype .. ', ' .. rec.tabindex, 102))
 			if rec.tabsubindex ~= -1 then
-				insert(aXml, GetFormatText('ItemInfo: ' .. rec.tabsubindex, 102))
+				table.insert(aXml, GetFormatText('ItemInfo: ' .. rec.tabsubindex, 102))
 			end
-			insert(aXml, CONSTANT.XML_LINE_BREAKER)
-			insert(aXml, GetFormatText('Box: ' .. rec.boxtype .. ', ' .. rec.boxindex, 102))
-			insert(aXml, CONSTANT.XML_LINE_BREAKER)
-			insert(aXml, GetFormatText('IconID: ' .. (Table_GetItemIconID(rec.uiid) or ''), 102))
-			insert(aXml, CONSTANT.XML_LINE_BREAKER)
-			insert(aXml, GetFormatText('Strength: ' .. rec.strength, 102))
-			insert(aXml, CONSTANT.XML_LINE_BREAKER)
-			insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, GetFormatText('Box: ' .. rec.boxtype .. ', ' .. rec.boxindex, 102))
+			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, GetFormatText('IconID: ' .. (Table_GetItemIconID(rec.uiid) or ''), 102))
+			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, GetFormatText('Strength: ' .. rec.strength, 102))
+			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
 		end
 
 		local aBelongsTip = {}
 		for _, rec in ipairs(this.belongsdata) do
-			insert(aBelongsTip, _L('%s (%s)\tBankx%d Bagx%d Totalx%d\n', UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount))
+			table.insert(aBelongsTip, _L('%s (%s)\tBankx%d Bagx%d Totalx%d\n', UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount))
 		end
-		insert(aXml, GetFormatText(concat(aBelongsTip)))
+		table.insert(aXml, GetFormatText(table.concat(aBelongsTip)))
 
-		OutputTip(concat(aXml), 400, {x, y, w, h, false}, nil, false)
+		OutputTip(table.concat(aXml), 400, {x, y, w, h, false}, nil, false)
 	end
 end
 D.OnItemRefreshTip = D.OnItemMouseEnter
@@ -1081,9 +1052,9 @@ function D.OnMouseEnter()
 				or 'Character: %s\nServer: %s\nSnapshot Time: %s',
 			this.ownername,
 			this.servername,
-			LIB.FormatTime(this.time, '%yyyy-%MM-%dd %hh:%mm:%ss')), nil, 255, 255, 0), 400, {x, y, w, h, false}, nil, false)
+			X.FormatTime(this.time, '%yyyy-%MM-%dd %hh:%mm:%ss')), nil, 255, 255, 0), 400, {x, y, w, h, false}, nil, false)
 	elseif name == 'CheckBox_Name' then
-		LIB.ExecuteWithThis(this:GetParent(), D.OnMouseEnter)
+		X.ExecuteWithThis(this:GetParent(), D.OnMouseEnter)
 	end
 end
 
@@ -1121,14 +1092,14 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_BagStat', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_BagStat', function()
 	D.bReady = true
 	D.UpdateSaveDB()
 	D.FlushDB()
 	D.UpdateFloatEntry()
 end)
-LIB.RegisterReload('MY_RoleStatistics_BagStat', function() D.ApplyFloatEntry(false) end)
-LIB.RegisterFrameCreate('BigBagPanel', 'MY_RoleStatistics_BagStat', D.UpdateFloatEntry)
+X.RegisterReload('MY_RoleStatistics_BagStat', function() D.ApplyFloatEntry(false) end)
+X.RegisterFrameCreate('BigBagPanel', 'MY_RoleStatistics_BagStat', D.UpdateFloatEntry)
 
 -- function D.OnMouseLeave()
 -- 	HideTip()
@@ -1150,7 +1121,7 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics.RegisterModule('BagStat', _L['MY_RoleStatistics_BagStat'], LIB.CreateModule(settings))
+MY_RoleStatistics.RegisterModule('BagStat', _L['MY_RoleStatistics_BagStat'], X.CreateModule(settings))
 end
 
 -- Global exports
@@ -1198,5 +1169,5 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics_BagStat = LIB.CreateModule(settings)
+MY_RoleStatistics_BagStat = X.CreateModule(settings)
 end

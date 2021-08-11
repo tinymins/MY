@@ -10,58 +10,29 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_DungeonStat'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-CPath.MakeDir(LIB.FormatPath({'userdata/role_statistics', PATH_TYPE.GLOBAL}))
+CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
-local DB = LIB.SQLiteConnect(_L['MY_RoleStatistics_DungeonStat'], {'userdata/role_statistics/dungeon_stat.v3.db', PATH_TYPE.GLOBAL})
+local DB = X.SQLiteConnect(_L['MY_RoleStatistics_DungeonStat'], {'userdata/role_statistics/dungeon_stat.v3.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return LIB.Sysmsg(_L['MY_RoleStatistics_DungeonStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return X.Sysmsg(_L['MY_RoleStatistics_DungeonStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
-local SZ_INI = PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_DungeonStat.ini'
+local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_DungeonStat.ini'
 
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS DungeonInfo (
@@ -85,11 +56,11 @@ local DB_DungeonInfoG = DB:Prepare('SELECT * FROM DungeonInfo WHERE guid = ?')
 local DB_DungeonInfoR = DB:Prepare('SELECT * FROM DungeonInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
 local DB_DungeonInfoD = DB:Prepare('DELETE FROM DungeonInfo WHERE guid = ?')
 
-local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['General'], {
 	aColumn = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Collection(Schema.String),
+		xSchema = X.Schema.Collection(X.Schema.String),
 		xDefaultValue = {
 			'name',
 			'force',
@@ -101,38 +72,38 @@ local O = LIB.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['Gene
 		},
 	},
 	szSort = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = 'time_days',
 	},
 	szSortOrder = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = 'desc',
 	},
 	bFloatEntry = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceFloatEntry = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.Boolean,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSaveDB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 })
@@ -190,7 +161,7 @@ local COLUMN_LIST = {
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
-			return GetFormatText(name, 162, LIB.GetForceColor(rec.force, 'foreground'))
+			return GetFormatText(name, 162, X.GetForceColor(rec.force, 'foreground'))
 		end,
 		Compare = GeneCommonCompare('name'),
 	},
@@ -225,7 +196,7 @@ local COLUMN_LIST = {
 		szTitle = _L['Cache time'],
 		nMinWidth = 165, nMaxWidth = 200,
 		GetFormatText = function(rec)
-			return GetFormatText(LIB.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
+			return GetFormatText(X.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
 		end,
 		Compare = GeneCommonCompare('time'),
 	},
@@ -236,11 +207,11 @@ local COLUMN_LIST = {
 		nMinWidth = 120, nMaxWidth = 120,
 		GetFormatText = function(rec)
 			local nTime = GetCurrentTime() - rec.time
-			local nSeconds = floor(nTime)
-			local nMinutes = floor(nSeconds / 60)
-			local nHours   = floor(nMinutes / 60)
-			local nDays    = floor(nHours / 24)
-			local nYears   = floor(nDays / 365)
+			local nSeconds = math.floor(nTime)
+			local nMinutes = math.floor(nSeconds / 60)
+			local nHours   = math.floor(nMinutes / 60)
+			local nDays    = math.floor(nHours / 24)
+			local nYears   = math.floor(nDays / 365)
 			local nDay     = nDays % 365
 			local nHour    = nHours % 24
 			local nMinute  = nMinutes % 60
@@ -271,7 +242,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			return {
 				id = id,
 				szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_TEAM_DUNGEON,
-				nMinWidth = DUNGEON_MIN_WIDTH * #LIB.GetActivityMap('WEEK_TEAM_DUNGEON'),
+				nMinWidth = DUNGEON_MIN_WIDTH * #X.GetActivityMap('WEEK_TEAM_DUNGEON'),
 			}
 		end
 	elseif id == 'week_raid_dungeon' then
@@ -279,18 +250,18 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			return {
 				id = id,
 				szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_RAID_DUNGEON,
-				nMinWidth = DUNGEON_MIN_WIDTH * #LIB.GetActivityMap('WEEK_RAID_DUNGEON'),
+				nMinWidth = DUNGEON_MIN_WIDTH * #X.GetActivityMap('WEEK_RAID_DUNGEON'),
 			}
 		end
-	elseif wfind(id, 'dungeon_') then
-		local id, via = wgsub(id, 'dungeon_', ''), ''
-		if wfind(id, '@') then
-			local ids = LIB.SplitString(id, '@')
+	elseif wstring.find(id, 'dungeon_') then
+		local id, via = wstring.gsub(id, 'dungeon_', ''), ''
+		if wstring.find(id, '@') then
+			local ids = X.SplitString(id, '@')
 			id, via = tonumber(ids[1]), ids[2]
 		else
 			id = tonumber(id)
 		end
-		local map = id and LIB.GetMapInfo(id)
+		local map = id and X.GetMapInfo(id)
 		if map then
 			local col = { -- 秘境CD
 				id = 'dungeon_' .. id,
@@ -303,23 +274,23 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					col.szTitleTip = col.szTitle .. ' (' .. colVia.szTitle .. ')'
 				end
 			end
-			if LIB.IsDungeonRoleProgressMap(map.dwID) then
+			if X.IsDungeonRoleProgressMap(map.dwID) then
 				col.GetFormatText = function(rec)
 					local aCopyID = rec.copy_info[map.dwID]
 					local aBossKill = rec.progress_info[map.dwID]
-					local nNextTime, nCircle = LIB.GetDungeonRefreshTime(map.dwID)
+					local nNextTime, nCircle = X.GetDungeonRefreshTime(map.dwID)
 					if not aBossKill or nNextTime - nCircle > rec.time then
 						return GetFormatText(_L['--'], 162, 255, 255, 255)
 					end
 					local aXml = {}
 					if IsCtrlKeyDown() and aCopyID then
-						insert(aXml, GetFormatText(concat(aCopyID, ',') .. ' '))
+						table.insert(aXml, GetFormatText(table.concat(aCopyID, ',') .. ' '))
 					end
 					for _, bKill in ipairs(aBossKill) do
-						insert(aXml, '<image>path="' .. PLUGIN_ROOT .. '/img/MY_RoleStatistics.UITex" name="Image_ProgressBoss" eventid=786 frame='
+						table.insert(aXml, '<image>path="' .. PLUGIN_ROOT .. '/img/MY_RoleStatistics.UITex" name="Image_ProgressBoss" eventid=786 frame='
 							.. (bKill and 1 or 0) .. ' w=12 h=12 script="this.mapid=' .. map.dwID .. '"</image>')
 					end
-					return concat(aXml)
+					return table.concat(aXml)
 				end
 				col.Compare = function(r1, r2)
 					local k1 = r1.progress_info[map.dwID]
@@ -349,7 +320,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			else
 				col.GetFormatText = function(rec)
 					local aCopyID = rec.copy_info[map.dwID]
-					local nNextTime, nCircle = LIB.GetDungeonRefreshTime(map.dwID)
+					local nNextTime, nCircle = X.GetDungeonRefreshTime(map.dwID)
 					local szText = nNextTime - nCircle < rec.time
 						and (aCopyID and aCopyID[1] or _L['None'])
 						or (_L['--'])
@@ -418,9 +389,9 @@ function D.GetClientPlayerRec(bForceUpdate)
 
 	-- 基础信息
 	rec.guid = guid
-	rec.account = LIB.GetAccount() or ''
-	rec.region = LIB.GetRealServer(1)
-	rec.server = LIB.GetRealServer(2)
+	rec.account = X.GetAccount() or ''
+	rec.region = X.GetRealServer(1)
+	rec.server = X.GetRealServer(2)
 	rec.name = me.szName
 	rec.force = me.dwForceID
 	rec.level = me.nLevel
@@ -435,32 +406,32 @@ end
 function D.ProcessProgressRequestQueue()
 	local szKey = 'MY_RoleStatistics_DungeonStat__ProcessProgressRequestQueue'
 	if #D.aMapProgressRequestQueue > 0 then
-		LIB.BreatheCall(szKey, function()
-			local dwID = remove(D.aMapProgressRequestQueue)
+		X.BreatheCall(szKey, function()
+			local dwID = table.remove(D.aMapProgressRequestQueue)
 			if dwID then
 				D.tMapProgressRequestTime[dwID] = GetTime()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(
+				X.Debug(
 					_L['PMTool'],
 					_L('[MY_RoleStatistics_DungeonStat] ApplyDungeonRoleProgress: %d.', dwID),
-					DEBUG_LEVEL.PMLOG)
+					X.DEBUG_LEVEL.PMLOG)
 				--[[#DEBUG END]]
 				ApplyDungeonRoleProgress(dwID, UI_GetClientPlayerID())
 			else
-				LIB.BreatheCall(szKey, false)
+				X.BreatheCall(szKey, false)
 			end
 		end)
 	else
-		LIB.BreatheCall(szKey, false)
+		X.BreatheCall(szKey, false)
 	end
 end
 
 function D.Migration()
-	local DB_V2_PATH = LIB.FormatPath({'userdata/role_statistics/dungeon_stat.v2.db', PATH_TYPE.GLOBAL})
+	local DB_V2_PATH = X.FormatPath({'userdata/role_statistics/dungeon_stat.v2.db', X.PATH_TYPE.GLOBAL})
 	if not IsLocalFileExist(DB_V2_PATH) then
 		return
 	end
-	LIB.Confirm(
+	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
 			-- 转移V2旧版数据
@@ -493,10 +464,10 @@ function D.Migration()
 					DB:Execute('END TRANSACTION')
 					DB_V2:Release()
 				end
-				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			FireUIEvent('MY_ROLE_STAT_DUNGEON_UPDATE')
-			LIB.Alert(_L['Migrate succeed!'])
+			X.Alert(_L['Migrate succeed!'])
 		end)
 end
 
@@ -508,7 +479,7 @@ function D.FlushDB(bForceUpdate)
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
 
-	local rec = Clone(D.GetClientPlayerRec(bForceUpdate))
+	local rec = X.Clone(D.GetClientPlayerRec(bForceUpdate))
 	D.EncodeRow(rec)
 
 	DB:Execute('BEGIN TRANSACTION')
@@ -523,10 +494,10 @@ function D.FlushDB(bForceUpdate)
 
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	LIB.Debug('MY_RoleStatistics_DungeonStat', _L('Flushing to database costs %dms...', nTickCount), DEBUG_LEVEL.LOG)
+	X.Debug('MY_RoleStatistics_DungeonStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-LIB.RegisterFlush('MY_RoleStatistics_DungeonStat', function() D.FlushDB() end)
+X.RegisterFlush('MY_RoleStatistics_DungeonStat', function() D.FlushDB() end)
 
 function D.InitDB()
 	local me = GetClientPlayer()
@@ -538,12 +509,12 @@ function D.InitDB()
 		local rec = result[1]
 		if rec then
 			D.DecodeRow(rec)
-			D.tMapSaveCopy = DecodeLUAData(rec.copy_info) or {}
-			D.tMapProgress = DecodeLUAData(rec.progress_info) or {}
+			D.tMapSaveCopy = X.DecodeLUAData(rec.copy_info) or {}
+			D.tMapProgress = X.DecodeLUAData(rec.progress_info) or {}
 		end
 	end
 end
-LIB.RegisterInit('MY_RoleStatistics_DungeonStat', D.InitDB)
+X.RegisterInit('MY_RoleStatistics_DungeonStat', D.InitDB)
 
 function D.UpdateSaveDB()
 	if not D.bReady then
@@ -555,14 +526,14 @@ function D.UpdateSaveDB()
 	end
 	if not O.bSaveDB then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database...', DEBUG_LEVEL.LOG)
+		X.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB_DungeonInfoD:ClearBindings()
 		DB_DungeonInfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
 		DB_DungeonInfoD:Execute()
 		DB_DungeonInfoD:Reset()
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database finished...', DEBUG_LEVEL.LOG)
+		X.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_DUNGEON_UPDATE')
@@ -572,23 +543,23 @@ function D.GetColumns()
 	local aCol = {}
 	for _, id in ipairs(O.aColumn) do
 		if id == 'week_team_dungeon' then
-			for _, map in ipairs(LIB.GetActivityMap('WEEK_TEAM_DUNGEON')) do
+			for _, map in ipairs(X.GetActivityMap('WEEK_TEAM_DUNGEON')) do
 				local col = COLUMN_DICT['dungeon_' .. map.dwID .. '@' .. id]
 				if col then
-					insert(aCol, col)
+					table.insert(aCol, col)
 				end
 			end
 		elseif id == 'week_raid_dungeon' then
-			for _, map in ipairs(LIB.GetActivityMap('WEEK_RAID_DUNGEON')) do
+			for _, map in ipairs(X.GetActivityMap('WEEK_RAID_DUNGEON')) do
 				local col = COLUMN_DICT['dungeon_' .. map.dwID .. '@' .. id]
 				if col then
-					insert(aCol, col)
+					table.insert(aCol, col)
 				end
 			end
 		else
 			local col = COLUMN_DICT[id]
 			if col then
-				insert(aCol, col)
+				table.insert(aCol, col)
 			end
 		end
 	end
@@ -611,7 +582,7 @@ function D.UpdateUI(page)
 		local imgDesc = hCol:Lookup('Image_DungeonStat_Desc')
 		local nWidth = i == #aCol
 			and (EXCEL_WIDTH - nX)
-			or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
+			or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
 		local nSortDelta = nWidth > 70 and 25 or 15
 		if i == 0 then
 			hCol:Lookup('Image_DungeonStat_Break'):Hide()
@@ -652,7 +623,7 @@ function D.UpdateUI(page)
 	end
 
 	if Sorter then
-		sort(result, Sorter)
+		table.sort(result, Sorter)
 	end
 
 	local aCol = D.GetColumns()
@@ -672,7 +643,7 @@ function D.UpdateUI(page)
 			hItemContent:SetSizeByAllItemSize()
 			local nWidth = j == #aCol
 				and (EXCEL_WIDTH - nX)
-				or min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or HUGE)
+				or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
 			if j == #aCol then
 				nWidth = EXCEL_WIDTH - nX
 			end
@@ -695,7 +666,7 @@ function D.UpdateMapProgress(bForceUpdate)
 	local tProgressBossMapID = {}
 	-- 监控数据里的地图 ID
 	for _, col in ipairs(D.GetColumns()) do
-		local szID = wfind(col.id, 'dungeon_') and wgsub(col.id, 'dungeon_', '')
+		local szID = wstring.find(col.id, 'dungeon_') and wstring.gsub(col.id, 'dungeon_', '')
 		local dwID = szID and tonumber(szID)
 		if dwID then
 			tProgressBossMapID[dwID] = true
@@ -709,12 +680,12 @@ function D.UpdateMapProgress(bForceUpdate)
 	end
 	-- 获取这些地图的进度
 	for dwID, _ in pairs(tProgressBossMapID) do
-		local aProgressBoss = dwID and LIB.IsDungeonRoleProgressMap(dwID) and Table_GetCDProcessBoss(dwID)
+		local aProgressBoss = dwID and X.IsDungeonRoleProgressMap(dwID) and Table_GetCDProcessBoss(dwID)
 		if aProgressBoss then
 			-- 强制刷新秘境进度，或者进度数据已过期并且5秒内未请求过，则发起请求
 			if bForceUpdate or (not D.tMapProgressValid[dwID] and GetTime() - D.tMapProgressRequestTime[dwID] > 5000) then
 				if not lodash.includes(D.aMapProgressRequestQueue, dwID) then
-					insert(D.aMapProgressRequestQueue, dwID)
+					table.insert(D.aMapProgressRequestQueue, dwID)
 				end
 			end
 			-- 检测是否有进度数据（修正脏数据标记位）
@@ -750,8 +721,8 @@ function D.EncodeRow(rec)
 	rec.name   = AnsiToUTF8(rec.name)
 	rec.region = AnsiToUTF8(rec.region)
 	rec.server = AnsiToUTF8(rec.server)
-	rec.copy_info = EncodeLUAData(rec.copy_info)
-	rec.progress_info = EncodeLUAData(rec.progress_info)
+	rec.copy_info = X.EncodeLUAData(rec.copy_info)
+	rec.progress_info = X.EncodeLUAData(rec.progress_info)
 end
 
 function D.DecodeRow(rec)
@@ -759,8 +730,8 @@ function D.DecodeRow(rec)
 	rec.name   = UTF8ToAnsi(rec.name)
 	rec.region = UTF8ToAnsi(rec.region)
 	rec.server = UTF8ToAnsi(rec.server)
-	rec.copy_info = DecodeLUAData(rec.copy_info or '') or {}
-	rec.progress_info = DecodeLUAData(rec.progress_info or '') or {}
+	rec.copy_info = X.DecodeLUAData(rec.copy_info or '') or {}
+	rec.progress_info = X.DecodeLUAData(rec.progress_info or '') or {}
 end
 
 function D.GetDungeonRecTipInfo(rec, dwMapID)
@@ -768,22 +739,22 @@ function D.GetDungeonRecTipInfo(rec, dwMapID)
 	if col then
 		local a = {}
 		local nMaxPlayerCount = select(3, GetMapParams(dwMapID))
-		insert(a, GetFormatText(col.szTitle, 162, 255, 255, 0))
-		insert(a, GetFormatText(':  ', 162, 255, 255, 0))
-		insert(a, col.GetFormatText(rec))
-		insert(a, GetFormatText('\n', 162, 255, 255, 255))
-		return { dwMapID = dwMapID, nMaxPlayerCount = nMaxPlayerCount, szXml = concat(a) }
+		table.insert(a, GetFormatText(col.szTitle, 162, 255, 255, 0))
+		table.insert(a, GetFormatText(':  ', 162, 255, 255, 0))
+		table.insert(a, col.GetFormatText(rec))
+		table.insert(a, GetFormatText('\n', 162, 255, 255, 255))
+		return { dwMapID = dwMapID, nMaxPlayerCount = nMaxPlayerCount, szXml = table.concat(a) }
 	else
-		local map = LIB.GetMapInfo(dwMapID)
+		local map = X.GetMapInfo(dwMapID)
 		local aCopyID = rec.copy_info[dwMapID]
 		if map and aCopyID then
 			local a = {}
 			local nMaxPlayerCount = select(3, GetMapParams(dwMapID))
-			insert(a, GetFormatText(map.szName, 162, 255, 255, 0))
-			insert(a, GetFormatText(':  ', 162, 255, 255, 0))
-			insert(a, GetFormatText(concat(aCopyID, ',')))
-			insert(a, GetFormatText('\n', 162, 255, 255, 255))
-			return { dwMapID = dwMapID, nMaxPlayerCount = nMaxPlayerCount, szXml = concat(a) }
+			table.insert(a, GetFormatText(map.szName, 162, 255, 255, 0))
+			table.insert(a, GetFormatText(':  ', 162, 255, 255, 0))
+			table.insert(a, GetFormatText(table.concat(aCopyID, ',')))
+			table.insert(a, GetFormatText('\n', 162, 255, 255, 255))
+			return { dwMapID = dwMapID, nMaxPlayerCount = nMaxPlayerCount, szXml = table.concat(a) }
 		end
 	end
 end
@@ -795,23 +766,23 @@ function D.OutputRowTip(this, rec)
 		if id == 'DUNGEON' then
 			local aMapID = {}
 			for _, col in ipairs(D.GetColumns()) do
-				local dwMapID = wfind(col.id, 'dungeon_')
+				local dwMapID = wstring.find(col.id, 'dungeon_')
 					and tonumber(col.id:sub(#'dungeon_' + 1))
 					or nil
-				insert(aMapID, dwMapID)
+				table.insert(aMapID, dwMapID)
 			end
 			for dwMapID, _ in pairs(rec.copy_info) do
-				insert(aMapID, dwMapID)
+				table.insert(aMapID, dwMapID)
 			end
 			local tDungeon, aDungeon = {}, {}
 			for _, dwMapID in ipairs(aMapID) do
 				local info = dwMapID and not tDungeon[dwMapID] and D.GetDungeonRecTipInfo(rec, dwMapID)
 				if info then
-					insert(aDungeon, info)
+					table.insert(aDungeon, info)
 					tDungeon[dwMapID] = true
 				end
 			end
-			sort(aDungeon, function(p1, p2)
+			table.sort(aDungeon, function(p1, p2)
 				if p1.nMaxPlayerCount == p2.nMaxPlayerCount then
 					return p1.dwMapID < p2.dwMapID
 				end
@@ -821,24 +792,24 @@ function D.OutputRowTip(this, rec)
 			for _, p in ipairs(aDungeon) do
 				if nMaxPlayerCount ~= p.nMaxPlayerCount then
 					nMaxPlayerCount = p.nMaxPlayerCount
-					insert(aXml, GetFormatText(_L('---- %d players dungeon ----', nMaxPlayerCount) .. '\n', 162, 255, 255, 0))
+					table.insert(aXml, GetFormatText(_L('---- %d players dungeon ----', nMaxPlayerCount) .. '\n', 162, 255, 255, 0))
 				end
-				insert(aXml, p.szXml)
+				table.insert(aXml, p.szXml)
 			end
 		else
 			local col = COLUMN_DICT[id]
 			if col and (not bFloat or not col.bHideInFloat) then
-				insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-				insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-				insert(aXml, col.GetFormatText(rec))
-				insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+				table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+				table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+				table.insert(aXml, col.GetFormatText(rec))
+				table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 			end
 		end
 	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	local nPosType = bFloat and UI.TIP_POSITION.TOP_BOTTOM or UI.TIP_POSITION.RIGHT_LEFT
-	OutputTip(concat(aXml), 450, {x, y, w, h}, nPosType)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, nPosType)
 end
 
 function D.CloseRowTip()
@@ -861,7 +832,7 @@ function D.OnInitPage()
 			for i, id in ipairs(aColumn) do
 				local col = COLUMN_DICT[id]
 				if col then
-					insert(t, {
+					table.insert(t, {
 						szOption = col.szTitle,
 						{
 							szOption = _L['Move up'],
@@ -888,7 +859,7 @@ function D.OnInitPage()
 						{
 							szOption = _L['Delete'],
 							fnAction = function()
-								remove(aColumn, i)
+								table.remove(aColumn, i)
 								O.aColumn = aColumn
 								D.UpdateUI(page)
 								UI.ClosePopupMenu()
@@ -904,7 +875,7 @@ function D.OnInitPage()
 				local bExist = false
 				for i, v in ipairs(aColumn) do
 					if v == id then
-						remove(aColumn, i)
+						table.remove(aColumn, i)
 						O.aColumn = aColumn
 						bExist = true
 						break
@@ -912,9 +883,9 @@ function D.OnInitPage()
 				end
 				if not bExist then
 					if nMinW + nWidth > EXCEL_WIDTH then
-						LIB.Alert(_L['Too many column selected, width overflow, please delete some!'])
+						X.Alert(_L['Too many column selected, width overflow, please delete some!'])
 					else
-						insert(aColumn, id)
+						table.insert(aColumn, id)
 						O.aColumn = aColumn
 					end
 				end
@@ -925,7 +896,7 @@ function D.OnInitPage()
 			-- 普通选项
 			for _, col in ipairs(COLUMN_LIST) do
 				if not tChecked[col.id] then
-					insert(t, {
+					table.insert(t, {
 						szOption = col.szTitle,
 						fnAction = function()
 							fnAction(col.id, col.nMinWidth)
@@ -936,13 +907,13 @@ function D.OnInitPage()
 			-- 秘境选项
 			local tDungeonChecked = {}
 			for _, id in ipairs(aColumn) do
-				local szID = wfind(id, 'dungeon_') and wgsub(id, 'dungeon_', '')
+				local szID = wstring.find(id, 'dungeon_') and wstring.gsub(id, 'dungeon_', '')
 				local dwID = szID and tonumber(szID)
 				if dwID then
 					tDungeonChecked[dwID] = true
 				end
 			end
-			local tDungeonMenu = LIB.GetDungeonMenu(function(info)
+			local tDungeonMenu = X.GetDungeonMenu(function(info)
 				fnAction('dungeon_' .. info.dwID, DUNGEON_MIN_WIDTH)
 			end, nil, tDungeonChecked)
 			-- 动态活动秘境选项
@@ -952,7 +923,7 @@ function D.OnInitPage()
 			}) do
 				local col = COLUMN_DICT[szType]
 				if col then
-					insert(tDungeonMenu, {
+					table.insert(tDungeonMenu, {
 						szOption = col.szTitle,
 						bCheck = true, bChecked = tChecked[col.id],
 						fnAction = function()
@@ -963,7 +934,7 @@ function D.OnInitPage()
 			end
 			-- 子菜单标题
 			tDungeonMenu.szOption = _L['Dungeon copy']
-			insert(t, tDungeonMenu)
+			table.insert(t, tDungeonMenu)
 			return t
 		end,
 	})
@@ -989,7 +960,7 @@ function D.CheckAdvice()
 		-- },
 	}) do
 		if not O[p.szAdviceKey] and not O[p.szSetKey] then
-			LIB.Confirm(p.szMsg, function()
+			X.Confirm(p.szMsg, function()
 				MY_RoleStatistics_DungeonStat[p.szSetKey] = true
 				MY_RoleStatistics_DungeonStat[p.szAdviceKey] = true
 				D.CheckAdvice()
@@ -1026,7 +997,7 @@ function D.OnLButtonClick()
 	if name == 'Btn_Delete' then
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		LIB.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
+		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
 			DB_DungeonInfoD:ClearBindings()
 			DB_DungeonInfoD:BindAll(AnsiToUTF8(wnd.guid))
 			DB_DungeonInfoD:Execute()
@@ -1092,26 +1063,26 @@ function D.OnItemMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local aText = {}
-		local map = LIB.GetMapInfo(this.mapid)
+		local map = X.GetMapInfo(this.mapid)
 		if map then
 			local szName = map.szName
 			local aCD = D.tMapSaveCopy[map.dwID]
-			if not IsEmpty(aCD) then
-				szName = szName .. ' (' .. concat(aCD, ', ') .. ')'
+			if not X.IsEmpty(aCD) then
+				szName = szName .. ' (' .. table.concat(aCD, ', ') .. ')'
 			end
-			insert(aText, szName)
+			table.insert(aText, szName)
 		end
 		if name == 'Image_ProgressBoss' then
-			insert(aText, '')
+			table.insert(aText, '')
 			local rec = this:GetParent():GetParent():GetParent().rec
 			for i, boss in ipairs(Table_GetCDProcessBoss(this.mapid)) do
-				insert(aText, boss.szName .. '\t' .. _L[rec.progress_info[this.mapid][i] and 'x' or 'r'])
+				table.insert(aText, boss.szName .. '\t' .. _L[rec.progress_info[this.mapid][i] and 'x' or 'r'])
 			end
 		end
-		insert(aText, '')
-		local nTime = LIB.GetDungeonRefreshTime(this.mapid) - GetCurrentTime()
-		insert(aText, _L('Refresh: %s', LIB.FormatTimeCounter(nTime, 2, 2)))
-		OutputTip(GetFormatText(concat(aText, '\n'), 162, 255, 255, 255), 400, { x, y, w, h })
+		table.insert(aText, '')
+		local nTime = X.GetDungeonRefreshTime(this.mapid) - GetCurrentTime()
+		table.insert(aText, _L('Refresh: %s', X.FormatTimeCounter(nTime, 2, 2)))
+		OutputTip(GetFormatText(table.concat(aText, '\n'), 162, 255, 255, 255), 400, { x, y, w, h })
 	elseif name == 'Handle_DungeonStatColumn' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
@@ -1177,8 +1148,8 @@ function D.UpdateFloatEntry()
 end
 
 -- 首领死亡刷新秘境进度（秘境内同步拾取则视为进度更新）
-LIB.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
-	if not D.bReady or not LIB.IsInDungeon() then
+X.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
+	if not D.bReady or not X.IsInDungeon() then
 		return
 	end
 	local me = GetClientPlayer()
@@ -1186,9 +1157,9 @@ LIB.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCop
 		D.bMapSaveCopyValid = false
 		D.tMapProgressValid[me.GetMapID()] = false
 	end
-	LIB.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
+	X.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
 end)
-LIB.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
+X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
 	local dwMapID, dwPlayerID = arg0, arg1
 	if dwPlayerID ~= UI_GetClientPlayerID() then
 		return
@@ -1196,23 +1167,23 @@ LIB.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
 	D.tMapProgressValid[dwMapID] = true
 	D.FlushDB()
 end)
-LIB.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', function()
+X.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', function()
 	local tMapCopy = arg0
 	D.tMapSaveCopy = tMapCopy
 	D.bMapSaveCopyValid = true
 	D.FlushDB()
 end)
-LIB.RegisterInit('MY_RoleStatistics_DungeonEntry', function()
+X.RegisterInit('MY_RoleStatistics_DungeonEntry', function()
 	D.UpdateMapProgress()
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonStat', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonStat', function()
 	D.bReady = true
 	D.UpdateSaveDB()
 	D.FlushDB()
 	D.UpdateFloatEntry()
 end)
-LIB.RegisterReload('MY_RoleStatistics_DungeonEntry', function() D.ApplyFloatEntry(false) end)
-LIB.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry)
+X.RegisterReload('MY_RoleStatistics_DungeonEntry', function() D.ApplyFloatEntry(false) end)
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry)
 
 -- Module exports
 do
@@ -1230,7 +1201,7 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics.RegisterModule('DungeonStat', _L['MY_RoleStatistics_DungeonStat'], LIB.CreateModule(settings))
+MY_RoleStatistics.RegisterModule('DungeonStat', _L['MY_RoleStatistics_DungeonStat'], X.CreateModule(settings))
 end
 
 -- Global exports
@@ -1272,5 +1243,5 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics_DungeonStat = LIB.CreateModule(settings)
+MY_RoleStatistics_DungeonStat = X.CreateModule(settings)
 end

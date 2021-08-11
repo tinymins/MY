@@ -11,65 +11,36 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon_ST'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local SplitString, TrimString, FormatTimeCounter = LIB.SplitString, LIB.TrimString, LIB.FormatTimeCounter
+local SplitString, TrimString, FormatTimeCounter = X.SplitString, X.TrimString, X.FormatTimeCounter
 local FilterCustomText = MY_TeamMon.FilterCustomText
 
-local O = LIB.CreateUserSettingsModule('MY_TeamMon_ST', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_TeamMon_ST', _L['Raid'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	tAnchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'TOPRIGHT', r = 'CENTER', x = -250, y = -300 },
 	},
 })
@@ -82,7 +53,7 @@ local ST = {}
 ST.__index = ST
 
 local MY_TM_TYPE = MY_TeamMon.MY_TM_TYPE
-local ST_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_ST.ini'
+local ST_INIFILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_ST.ini'
 local ST_UI_NOMAL   = 5
 local ST_UI_WARNING = 2
 local ST_UI_ALPHA   = 180
@@ -102,13 +73,13 @@ local function GetCountdown(tTime, szSender, szReceiver)
 	for k, v in ipairs(t) do
 		local time = SplitString(v, ',')
 		if time[1] and time[2] and tonumber(TrimString(time[1])) and time[2] ~= '' then
-			insert(tab, { nTime = tonumber(time[1]), szName = FilterCustomText(time[2], szSender, szReceiver) })
+			table.insert(tab, { nTime = tonumber(time[1]), szName = FilterCustomText(time[2], szSender, szReceiver) })
 		end
 	end
-	if IsEmpty(tab) then
+	if X.IsEmpty(tab) then
 		return nil
 	else
-		sort(tab, function(a, b) return a.nTime < b.nTime end)
+		table.sort(tab, function(a, b) return a.nTime < b.nTime end)
 		return tab
 	end
 end
@@ -137,7 +108,7 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 			tParam.nTime = tCountdown
 			tParam.nRefresh = tParam.nRefresh or tCountdown[#tCountdown].nTime - 3 -- 最大时间内防止重复刷新 但是脱离战斗的NPC需要手动删除
 		else
-			return LIB.Sysmsg(
+			return X.Sysmsg(
 				_L['MY_TeamMon'],
 				_L['Countdown format error']
 					.. ' TYPE: ' .. _L['Countdown TYPE ' .. nType]
@@ -222,19 +193,19 @@ local function SetSTAction(ui, nLeft, nPer)
 	if nLeft < 5 then
 		local nTimeLeft = nLeft * 1000 % 1000
 		local nAlpha = 255 * nTimeLeft / 1000
-		if floor(nLeft / 1) % 2 == 1 then
+		if math.floor(nLeft / 1) % 2 == 1 then
 			nAlpha = 255 - nAlpha
 		end
 		obj:SetInfo({ nTime = nLeft }):SetPercentage(nPer):Switch(true):SetAlpha(100 + nAlpha)
 		if ui.bTalk and me.IsInParty() then
-			if not ui.szTalk or ui.szTalk ~= floor(nLeft) then
-				ui.szTalk = floor(nLeft)
-				LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('[%s] remaining %ds.', obj:GetName(), floor(nLeft)))
+			if not ui.szTalk or ui.szTalk ~= math.floor(nLeft) then
+				ui.szTalk = math.floor(nLeft)
+				X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('[%s] remaining %ds.', obj:GetName(), math.floor(nLeft)))
 			end
 		end
 	else
 		if ui.nAlpha < ST_UI_ALPHA then
-			ui.nAlpha = min(ST_UI_ALPHA, ui.nAlpha + 15)
+			ui.nAlpha = math.min(ST_UI_ALPHA, ui.nAlpha + 15)
 			obj:SetInfo({ nTime = nLeft }):SetPercentage(nPer):SetAlpha(ui.nAlpha)
 		else
 			obj:SetInfo({ nTime = nLeft }):SetPercentage(nPer)
@@ -267,7 +238,7 @@ function MY_TeamMon_ST.OnFrameBreathe()
 						else
 							local nATime = (nNow - vv.nCreate) / 1000
 							vv.nLeft = nNow
-							remove(vv.countdown, 1)
+							table.remove(vv.countdown, 1)
 							local time = vv.countdown[1]
 							time.nTime = time.nTime - nATime
 							vv.obj:SetInfo(time):Switch(false)
@@ -333,7 +304,7 @@ function ST:ctor(nType, szKey, tParam)
 		oo.ui.obj            = oo
 		ST_CACHE[nType][szKey] = oo.ui
 		oo.ui:Show()
-		oo.ui.sfx:Set2DRotation(PI / 2)
+		oo.ui.sfx:Set2DRotation(math.pi / 2)
 		D.handle:FormatAllItemPos()
 	end
 	return oo
@@ -347,7 +318,7 @@ function ST:SetInfo(tTime, nIcon)
 		self.ui.time:SetText((tTime.nTime >= 1 or tTime.nTime < 0.1)
 			and FormatTimeCounter(tTime.nTime)
 			or ('%.1f'):format(tTime.nTime) .. 's')
-		self.ui:SetUserData(floor(tTime.nTime))
+		self.ui:SetUserData(math.floor(tTime.nTime))
 	end
 	if nIcon then
 		local box = self.ui:Lookup('Box')
@@ -398,4 +369,4 @@ function ST:RemoveItem()
 	D.handle:FormatAllItemPos()
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_ST', D.Init)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_ST', D.Init)

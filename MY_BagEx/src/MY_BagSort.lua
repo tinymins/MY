@@ -10,56 +10,27 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_BagEx'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_BagSort'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
+local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	bGuildBank = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
@@ -94,14 +65,14 @@ function D.StackGuildBank()
 			btn:Enable(1)
 			Station.Lookup('Normal/GuildBankPanel/Btn_MY_Sort'):Enable(1)
 		end
-		LIB.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Stack', false)
-		LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Stack', false)
+		X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Stack', false)
+		X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Stack', false)
 	end
 	local function fnLoop()
 		local me, tList = GetClientPlayer(), {}
 		bTrigger = true
-		for i = 1, LIB.GetGuildBankBagSize(nPage) do
-			local dwPos, dwX = LIB.GetGuildBankBagPos(nPage, i)
+		for i = 1, X.GetGuildBankBagSize(nPage) do
+			local dwPos, dwX = X.GetGuildBankBagPos(nPage, i)
 			local item = GetPlayerItem(me, dwPos, dwX)
 			if item and item.bCanStack and item.nStackNum < item.nMaxStackNum then
 				local szKey = tostring(item.dwTabType) .. '_' .. tostring(item.dwIndex)
@@ -118,14 +89,14 @@ function D.StackGuildBank()
 	end
 	frame:Lookup('Btn_MY_Stack'):Enable(0)
 	frame:Lookup('Btn_MY_Sort'):Enable(0)
-	LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Stack', fnLoop)
-	LIB.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Stack', function()
+	X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Stack', fnLoop)
+	X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Stack', function()
 		-- TONG_EVENT_CODE.TAKE_REPERTORY_ITEM_PERMISSION_DENY_ERROR
 		if arg0 == TONG_EVENT_CODE.PUT_ITEM_IN_REPERTORY_SUCCESS then
 			fnFinish()
 		end
 	end)
-	LIB.DelayCall(1000, function()
+	X.DelayCall(1000, function()
 		if not bTrigger then
 			fnFinish()
 		end
@@ -192,11 +163,11 @@ function D.SortGuildBank()
 	local nPage, szState = frame.nPage or 0, 'Idle'
 	-- 加载格子列表
 	local me, aInfo, nItemCount = GetClientPlayer(), {}, 0
-	for i = 1, LIB.GetGuildBankBagSize(nPage) do
-		local dwPos, dwX = LIB.GetGuildBankBagPos(nPage, i)
+	for i = 1, X.GetGuildBankBagSize(nPage) do
+		local dwPos, dwX = X.GetGuildBankBagPos(nPage, i)
 		local item = GetPlayerItem(me, dwPos, dwX)
 		if item then
-			insert(aInfo, {
+			table.insert(aInfo, {
 				dwID = item.dwID,
 				nUiId = item.nUiId,
 				dwTabType = item.dwTabType,
@@ -208,11 +179,11 @@ function D.SortGuildBank()
 				bCanStack = item.bCanStack,
 				nStackNum = item.nStackNum,
 				nCurrentDurability = item.nCurrentDurability,
-				szName = LIB.GetObjectName('ITEM', item),
+				szName = X.GetObjectName('ITEM', item),
 			})
 			nItemCount = nItemCount + 1
 		else
-			insert(aInfo, CONSTANT.EMPTY_TABLE)
+			table.insert(aInfo, CONSTANT.EMPTY_TABLE)
 		end
 	end
 	if nItemCount == 0 then
@@ -221,13 +192,13 @@ function D.SortGuildBank()
 	-- 排序格子列表
 	if IsShiftKeyDown() then
 		for i = 1, #aInfo do
-			local j = random(1, #aInfo)
+			local j = math.random(1, #aInfo)
 			if i ~= j then
 				aInfo[i], aInfo[j] = aInfo[j], aInfo[i]
 			end
 		end
 	else
-		sort(aInfo, D.ItemSorter)
+		table.sort(aInfo, D.ItemSorter)
 	end
 	-- 结束清理环境、恢复控件状态
 	local function fnFinish()
@@ -237,70 +208,70 @@ function D.SortGuildBank()
 			btn:Enable(1)
 			Station.Lookup('Normal/GuildBankPanel/Btn_MY_Stack'):Enable(1)
 		end
-		LIB.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Sort', false)
-		LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Sort', false)
+		X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Sort', false)
+		X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Sort', false)
 	end
 	-- 根据排序结果与当前状态交换物品
 	local function fnNext()
 		if not frame or (frame.nPage or 0) ~= nPage then
-			LIB.Systopmsg(_L['Guild box closed or page changed, sort exited!'], CONSTANT.MSG_THEME.ERROR)
+			X.Systopmsg(_L['Guild box closed or page changed, sort exited!'], CONSTANT.MSG_THEME.ERROR)
 			return fnFinish()
 		end
 		if szState == 'Exchanging' or szState == 'Refreshing' then
 			return
 		end
 		for i, info in ipairs(aInfo) do
-			local dwPos, dwX = LIB.GetGuildBankBagPos(nPage, i)
+			local dwPos, dwX = X.GetGuildBankBagPos(nPage, i)
 			local item = GetPlayerItem(me, dwPos, dwX)
 			-- 当前格子和预期不符 需要交换
 			if not D.IsSameItem(item, info) then
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
 				if item and info.dwID and item.nUiId == info.nUiId and item.bCanStack and item.nStackNum ~= info.nStackNum then
-					for j = LIB.GetGuildBankBagSize(nPage), i + 1, -1 do
-						local dwPos1, dwX1 = LIB.GetGuildBankBagPos(nPage, j)
+					for j = X.GetGuildBankBagSize(nPage), i + 1, -1 do
+						local dwPos1, dwX1 = X.GetGuildBankBagPos(nPage, j)
 						local item1 = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwX1)
 						-- 匹配到用于交换的格子
 						if not item1 or item1.nUiId ~= item.nUiId then
 							szState = 'Exchanging'
 							if item then
 								--[[#DEBUG BEGIN]]
-								LIB.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <T1>', DEBUG_LEVEL.LOG)
+								X.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
 								OnExchangeItem(dwPos, dwX, dwPos1, dwX1)
 							else
 								--[[#DEBUG BEGIN]]
-								LIB.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', DEBUG_LEVEL.LOG)
+								X.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
 								OnExchangeItem(dwPos1, dwX1, dwPos, dwX)
 							end
 							return
 						end
 					end
-					LIB.Systopmsg(_L['Cannot find item temp position, guild bag is full, sort exited!'], CONSTANT.MSG_THEME.ERROR)
+					X.Systopmsg(_L['Cannot find item temp position, guild bag is full, sort exited!'], CONSTANT.MSG_THEME.ERROR)
 					return
 				end
 				-- 寻找预期物品所在位置
-				for j = LIB.GetGuildBankBagSize(nPage), i + 1, -1 do
-					local dwPos1, dwX1 = LIB.GetGuildBankBagPos(nPage, j)
+				for j = X.GetGuildBankBagSize(nPage), i + 1, -1 do
+					local dwPos1, dwX1 = X.GetGuildBankBagPos(nPage, j)
 					local item1 = GetPlayerItem(me, dwPos1, dwX1)
 					-- 匹配到预期物品所在位置
 					if D.IsSameItem(item1, info) then
 						szState = 'Exchanging'
 						if item then
 							--[[#DEBUG BEGIN]]
-							LIB.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <N1>', DEBUG_LEVEL.LOG)
+							X.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <N1>', X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
 							OnExchangeItem(dwPos, dwX, dwPos1, dwX1)
 						else
 							--[[#DEBUG BEGIN]]
-							LIB.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N1>', DEBUG_LEVEL.LOG)
+							X.Debug('MY_BagSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N1>', X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
 							OnExchangeItem(dwPos1, dwX1, dwPos, dwX)
 						end
 						return
 					end
 				end
-				LIB.Systopmsg(_L['Exchange item match failed, guild bag may changed, sort exited!'], CONSTANT.MSG_THEME.ERROR)
+				X.Systopmsg(_L['Exchange item match failed, guild bag may changed, sort exited!'], CONSTANT.MSG_THEME.ERROR)
 				return
 			end
 		end
@@ -308,24 +279,24 @@ function D.SortGuildBank()
 	end
 	frame:Lookup('Btn_MY_Sort'):Enable(0)
 	frame:Lookup('Btn_MY_Stack'):Enable(0)
-	LIB.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Sort', function()
+	X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Sort', function()
 		if szState == 'Refreshing' then
 			szState = 'Idle'
 			fnNext()
 		end
 	end)
-	LIB.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Sort', function()
+	X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagSort__Sort', function()
 		-- TONG_EVENT_CODE.TAKE_REPERTORY_ITEM_PERMISSION_DENY_ERROR
 		if arg0 == TONG_EVENT_CODE.EXCHANGE_REPERTORY_ITEM_SUCCESS then
 			szState = 'Refreshing'
 		elseif arg0 == TONG_EVENT_CODE.PUT_ITEM_IN_REPERTORY_SUCCESS then
-			LIB.Systopmsg(_L['Put item in guild detected, sort exited!'], CONSTANT.MSG_THEME.ERROR)
+			X.Systopmsg(_L['Put item in guild detected, sort exited!'], CONSTANT.MSG_THEME.ERROR)
 			fnFinish()
 		else
-			LIB.Systopmsg(_L['Unknown exception occured, sort exited!'], CONSTANT.MSG_THEME.ERROR)
+			X.Systopmsg(_L['Unknown exception occured, sort exited!'], CONSTANT.MSG_THEME.ERROR)
 			fnFinish()
 			--[[#DEBUG BEGIN]]
-			LIB.Debug('MY_BagSort', 'TONG_EVENT_NOTIFY: ' .. arg0, DEBUG_LEVEL.LOG)
+			X.Debug('MY_BagSort', 'TONG_EVENT_NOTIFY: ' .. arg0, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 	end)
@@ -380,9 +351,9 @@ function D.CheckInjection()
 	end
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 200,
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200,
 		text = _L['Guild package sort and stack'],
 		checked = O.bGuildBank,
 		oncheck = function(bChecked)
@@ -390,14 +361,14 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 			D.CheckInjection()
 		end,
 	}):AutoWidth():Width() + 5
-	x = X
-	y = y + deltaY
-	return x, y
+	nX = nPaddingX
+	nY = nY + nLH
+	return nX, nY
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_BagSort', D.CheckInjection)
-LIB.RegisterFrameCreate('GuildBankPanel', 'MY_BagSort', D.CheckInjection)
-LIB.RegisterReload('MY_BagSort', D.RemoveInjection)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_BagSort', D.CheckInjection)
+X.RegisterFrameCreate('GuildBankPanel', 'MY_BagSort', D.CheckInjection)
+X.RegisterReload('MY_BagSort', D.RemoveInjection)
 
 ---------------------------------------------------------------------
 -- Global exports
@@ -413,5 +384,5 @@ local settings = {
 		},
 	},
 }
-MY_BagSort = LIB.CreateModule(settings)
+MY_BagSort = X.CreateModule(settings)
 end

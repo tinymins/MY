@@ -10,74 +10,45 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_FooterTip', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_FooterTip', _L['General'], {
 	bFriend = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFriendNav = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTongMember = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTongMemberNav = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 })
@@ -88,7 +59,7 @@ function D.Apply()
 	if Navigator_Remove then
 		Navigator_Remove('MY_FRIEND_TIP')
 	end
-	if D.bReady and O.bFriend and not LIB.IsInShieldedMap() then
+	if D.bReady and O.bFriend and not X.IsInShieldedMap() then
 		local hShaList = UI.GetShadowHandle('MY_FriendHeadTip')
 		if not hShaList.freeShadows then
 			hShaList.freeShadows = {}
@@ -98,10 +69,10 @@ function D.Apply()
 			local tar = GetPlayer(dwID)
 			local me = GetClientPlayer()
 			if not tar or not me
-			or LIB.IsIsolated(tar) ~= LIB.IsIsolated(me) then
+			or X.IsIsolated(tar) ~= X.IsIsolated(me) then
 				return
 			end
-			local p = LIB.GetFriend(dwID)
+			local p = X.GetFriend(dwID)
 			if p then
 				if O.bFriendNav and Navigator_SetID then
 					Navigator_SetID('MY_FRIEND_TIP.' .. dwID, TARGET.PLAYER, dwID, p.name)
@@ -127,22 +98,22 @@ function D.Apply()
 				local sha = hShaList:Lookup(tostring(dwID))
 				if sha then
 					sha:Hide()
-					insert(hShaList.freeShadows, sha)
+					table.insert(hShaList.freeShadows, sha)
 				end
 			end
 		end
 		local function RescanNearby()
-			for _, p in ipairs(LIB.GetNearPlayer()) do
+			for _, p in ipairs(X.GetNearPlayer()) do
 				OnPlayerEnter(p.dwID)
 			end
 		end
 		RescanNearby()
-		LIB.RegisterEvent('ON_ISOLATED', 'MY_FRIEND_TIP', function(event)
+		X.RegisterEvent('ON_ISOLATED', 'MY_FRIEND_TIP', function(event)
 			-- dwCharacterID, nIsolated
 			local me = GetClientPlayer()
 			if arg0 == UI_GetClientPlayerID() then
-				for _, p in ipairs(LIB.GetNearPlayer()) do
-					if LIB.IsIsolated(p) == LIB.IsIsolated(me) then
+				for _, p in ipairs(X.GetNearPlayer()) do
+					if X.IsIsolated(p) == X.IsIsolated(me) then
 						OnPlayerEnter(p.dwID)
 					else
 						OnPlayerLeave(p.dwID)
@@ -151,7 +122,7 @@ function D.Apply()
 			else
 				local tar = GetPlayer(arg0)
 				if tar then
-					if LIB.IsIsolated(tar) == LIB.IsIsolated(me) then
+					if X.IsIsolated(tar) == X.IsIsolated(me) then
 						OnPlayerEnter(arg0)
 					else
 						OnPlayerLeave(arg0)
@@ -159,25 +130,25 @@ function D.Apply()
 				end
 			end
 		end)
-		LIB.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_FRIEND_TIP', function(event) OnPlayerEnter(arg0) end)
-		LIB.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_FRIEND_TIP', function(event) OnPlayerLeave(arg0) end)
-		LIB.RegisterEvent('DELETE_FELLOWSHIP', 'MY_FRIEND_TIP', function(event) RescanNearby() end)
-		LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE', 'MY_FRIEND_TIP', function(event) RescanNearby() end)
-		LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE', 'MY_FRIEND_TIP', function(event) RescanNearby() end)
+		X.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_FRIEND_TIP', function(event) OnPlayerEnter(arg0) end)
+		X.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_FRIEND_TIP', function(event) OnPlayerLeave(arg0) end)
+		X.RegisterEvent('DELETE_FELLOWSHIP', 'MY_FRIEND_TIP', function(event) RescanNearby() end)
+		X.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE', 'MY_FRIEND_TIP', function(event) RescanNearby() end)
+		X.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE', 'MY_FRIEND_TIP', function(event) RescanNearby() end)
 	else
-		LIB.RegisterEvent('ON_ISOLATED', 'MY_FRIEND_TIP', false)
-		LIB.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_FRIEND_TIP', false)
-		LIB.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_FRIEND_TIP', false)
-		LIB.RegisterEvent('DELETE_FELLOWSHIP', 'MY_FRIEND_TIP', false)
-		LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE', 'MY_FRIEND_TIP', false)
-		LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE', 'MY_FRIEND_TIP', false)
+		X.RegisterEvent('ON_ISOLATED', 'MY_FRIEND_TIP', false)
+		X.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_FRIEND_TIP', false)
+		X.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_FRIEND_TIP', false)
+		X.RegisterEvent('DELETE_FELLOWSHIP', 'MY_FRIEND_TIP', false)
+		X.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE', 'MY_FRIEND_TIP', false)
+		X.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE', 'MY_FRIEND_TIP', false)
 		UI.GetShadowHandle('MY_FriendHeadTip'):Hide()
 	end
 	-- 帮会成员高亮
 	if Navigator_Remove then
 		Navigator_Remove('MY_GUILDMEMBER_TIP')
 	end
-	if D.bReady and O.bTongMember and not LIB.IsInShieldedMap() then
+	if D.bReady and O.bTongMember and not X.IsInShieldedMap() then
 		local hShaList = UI.GetShadowHandle('MY_TongMemberHeadTip')
 		if not hShaList.freeShadows then
 			hShaList.freeShadows = {}
@@ -194,11 +165,11 @@ function D.Apply()
 			or me.dwTongID == 0
 			or me.dwID == tar.dwID
 			or tar.dwTongID ~= me.dwTongID
-			or LIB.IsIsolated(tar) ~= LIB.IsIsolated(me) then
+			or X.IsIsolated(tar) ~= X.IsIsolated(me) then
 				return
 			end
 			if tar.szName == '' then
-				LIB.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount + 1) end)
+				X.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount + 1) end)
 				return
 			end
 			if O.bTongMemberNav and Navigator_SetID then
@@ -224,19 +195,19 @@ function D.Apply()
 				local sha = hShaList:IsValid() and hShaList:Lookup(tostring(dwID))
 				if sha then
 					sha:Hide()
-					insert(hShaList.freeShadows, sha)
+					table.insert(hShaList.freeShadows, sha)
 				end
 			end
 		end
-		for _, p in ipairs(LIB.GetNearPlayer()) do
+		for _, p in ipairs(X.GetNearPlayer()) do
 			OnPlayerEnter(p.dwID)
 		end
-		LIB.RegisterEvent('ON_ISOLATED', 'MY_GUILDMEMBER_TIP', function(event)
+		X.RegisterEvent('ON_ISOLATED', 'MY_GUILDMEMBER_TIP', function(event)
 			-- dwCharacterID, nIsolated
 			local me = GetClientPlayer()
 			if arg0 == UI_GetClientPlayerID() then
-				for _, p in ipairs(LIB.GetNearPlayer()) do
-					if LIB.IsIsolated(p) == LIB.IsIsolated(me) then
+				for _, p in ipairs(X.GetNearPlayer()) do
+					if X.IsIsolated(p) == X.IsIsolated(me) then
 						OnPlayerEnter(p.dwID)
 					else
 						OnPlayerLeave(p.dwID)
@@ -245,7 +216,7 @@ function D.Apply()
 			else
 				local tar = GetPlayer(arg0)
 				if tar then
-					if LIB.IsIsolated(tar) == LIB.IsIsolated(me) then
+					if X.IsIsolated(tar) == X.IsIsolated(me) then
 						OnPlayerEnter(arg0)
 					else
 						OnPlayerLeave(arg0)
@@ -253,26 +224,26 @@ function D.Apply()
 				end
 			end
 		end)
-		LIB.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_GUILDMEMBER_TIP', function(event) OnPlayerEnter(arg0) end)
-		LIB.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_GUILDMEMBER_TIP', function(event) OnPlayerLeave(arg0) end)
+		X.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_GUILDMEMBER_TIP', function(event) OnPlayerEnter(arg0) end)
+		X.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_GUILDMEMBER_TIP', function(event) OnPlayerLeave(arg0) end)
 	else
-		LIB.RegisterEvent('ON_ISOLATED', 'MY_GUILDMEMBER_TIP', false)
-		LIB.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_GUILDMEMBER_TIP', false)
-		LIB.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_GUILDMEMBER_TIP', false)
+		X.RegisterEvent('ON_ISOLATED', 'MY_GUILDMEMBER_TIP', false)
+		X.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_GUILDMEMBER_TIP', false)
+		X.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_GUILDMEMBER_TIP', false)
 		UI.GetShadowHandle('MY_TongMemberHeadTip'):Hide()
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_FooterTip', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_FooterTip', function()
 	D.bReady = true
 	D.Apply()
 end)
-LIB.RegisterEvent('LOADING_ENDING', 'MY_FooterTip', D.Apply)
+X.RegisterEvent('LOADING_ENDING', 'MY_FooterTip', D.Apply)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	-- 好友高亮
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 180,
+		x = nX, y = nY, w = 180,
 		text = _L['Friend headtop tips'],
 		checked = MY_FooterTip.bFriend,
 		oncheck = function(bCheck)
@@ -280,7 +251,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 	})
 	ui:Append('WndCheckBox', {
-		x = x + 180, y = y, w = 180,
+		x = nX + 180, y = nY, w = 180,
 		text = _L['Friend headtop tips nav'],
 		checked = MY_FooterTip.bFriendNav,
 		oncheck = function(bCheck)
@@ -288,11 +259,11 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 		autoenable = function() return MY_FooterTip.bFriend end,
 	})
-	y = y + deltaY
+	nY = nY + nLH
 
 	-- 帮会高亮
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 180,
+		x = nX, y = nY, w = 180,
 		text = _L['Tong member headtop tips'],
 		checked = MY_FooterTip.bTongMember,
 		oncheck = function(bCheck)
@@ -300,7 +271,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 	})
 	ui:Append('WndCheckBox', {
-		x = x + 180, y = y, w = 180,
+		x = nX + 180, y = nY, w = 180,
 		text = _L['Tong member headtop tips nav'],
 		checked = MY_FooterTip.bTongMemberNav,
 		oncheck = function(bCheck)
@@ -308,8 +279,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 		autoenable = function() return MY_FooterTip.bTongMember end,
 	})
-	y = y + deltaY
-	return x, y
+	nY = nY + nLH
+	return nX, nY
 end
 
 -- Global exports
@@ -351,5 +322,5 @@ local settings = {
 		},
 	},
 }
-MY_FooterTip = LIB.CreateModule(settings)
+MY_FooterTip = X.CreateModule(settings)
 end

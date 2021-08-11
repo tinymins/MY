@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_ChatLog'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatLog'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -67,13 +38,13 @@ local function FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
 		nMinTime = 0
 	end
 	if not nMaxTime then
-		nMaxTime = HUGE
+		nMaxTime = math.huge
 	end
 	if not nOffset then
 		nOffset = 0
 	end
 	if not nLimit then
-		nLimit = HUGE
+		nLimit = math.huge
 	end
 	return szSearch, nMinTime, nMaxTime, nOffset, nLimit
 end
@@ -83,40 +54,40 @@ local function AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nM
 	local aWhere = {}
 	if aChannel then
 		for _, nChannel in ipairs(aChannel) do
-			insert(aWhere, 'channel = ?')
-			insert(aValue, nChannel)
+			table.insert(aWhere, 'channel = ?')
+			table.insert(aValue, nChannel)
 		end
 	end
 	if #aWhere > 0 then
 		if #szWhere > 0 then
 			szWhere = szWhere .. ' AND'
 		end
-		szWhere = szWhere .. ' (' .. concat(aWhere, ' OR ') .. ')'
+		szWhere = szWhere .. ' (' .. table.concat(aWhere, ' OR ') .. ')'
 	end
-	if not IsEmpty(nMinTime) then
+	if not X.IsEmpty(nMinTime) then
 		if #szWhere > 0 then
 			szWhere = szWhere .. ' AND'
 		end
 		szWhere = szWhere .. ' (time >= ?)'
-		insert(aValue, nMinTime)
+		table.insert(aValue, nMinTime)
 	end
-	if not IsEmpty(nMaxTime) and not IsHugeNumber(nMaxTime) then
+	if not X.IsEmpty(nMaxTime) and not X.IsHugeNumber(nMaxTime) then
 		if #szWhere > 0 then
 			szWhere = szWhere .. ' AND'
 		end
 		szWhere = szWhere .. ' (time <= ?)'
-		insert(aValue, nMaxTime)
+		table.insert(aValue, nMaxTime)
 	end
-	if not IsEmpty(szSearch) then
+	if not X.IsEmpty(szSearch) then
 		if #szWhere > 0 then
 			szWhere = szWhere .. ' AND'
 		end
 		szWhere = szWhere .. ' (talker LIKE ? OR text LIKE ?)'
-		insert(aValue, szSearch)
-		insert(aValue, szSearch)
+		table.insert(aValue, szSearch)
+		table.insert(aValue, szSearch)
 	end
 	if #szWhere > 0 then
-		if wfind(szSQL, ' WHERE ') then
+		if wstring.find(szSQL, ' WHERE ') then
 			szSQL = szSQL .. ' AND' .. szWhere
 		else
 			szSQL = szSQL .. ' WHERE' .. szWhere
@@ -126,16 +97,16 @@ local function AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nM
 end
 
 local function AppendCommonLimit(szSQL, aValue, nOffset, nLimit)
-	if (nOffset and not nLimit) or IsHugeNumber(nLimit) then
+	if (nOffset and not nLimit) or X.IsHugeNumber(nLimit) then
 		nLimit = -1
 	end
 	if nLimit then
 		szSQL = szSQL .. ' LIMIT ?'
-		insert(aValue, nLimit)
+		table.insert(aValue, nLimit)
 	end
 	if nOffset then
 		szSQL = szSQL .. ' OFFSET ?'
-		insert(aValue, nOffset)
+		table.insert(aValue, nOffset)
 	end
 	return szSQL
 end
@@ -158,15 +129,15 @@ end
 function DB:Connect(bCheck)
 	if not self:IsConnected() then
 		if bCheck then
-			self.db = LIB.SQLiteConnect(_L['MY_ChatLog'], self.szFilePath)
+			self.db = X.SQLiteConnect(_L['MY_ChatLog'], self.szFilePath)
 		else
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(_L['MY_ChatLog'], 'Quick connect database: ' .. self.szFilePath, DEBUG_LEVEL.LOG)
+			X.Debug(_L['MY_ChatLog'], 'Quick connect database: ' .. self.szFilePath, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			self.db = SQLite3_Open(self.szFilePath)
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(_L['MY_ChatLog'], 'Init database with STMT', DEBUG_LEVEL.LOG)
+		X.Debug(_L['MY_ChatLog'], 'Init database with STMT', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		if self.db then
 			self.db:Execute([[
@@ -198,12 +169,12 @@ function DB:Connect(bCheck)
 		end
 		if self:IsConnected() then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(_L['MY_ChatLog'], 'Init database finished: ' .. self.szFilePath, DEBUG_LEVEL.LOG)
+			X.Debug(_L['MY_ChatLog'], 'Init database finished: ' .. self.szFilePath, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			return true
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(_L['MY_ChatLog'], 'Init database failed: ' .. self.szFilePath, DEBUG_LEVEL.WARNING)
+		X.Debug(_L['MY_ChatLog'], 'Init database failed: ' .. self.szFilePath, X.DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		self:Disconnect()
 		return false
@@ -252,7 +223,7 @@ function DB:SetInfo(szKey, oValue)
 		return false
 	end
 	self.stmtInfoSet:ClearBindings()
-	self.stmtInfoSet:BindAll(szKey, EncodeLUAData(oValue))
+	self.stmtInfoSet:BindAll(szKey, X.EncodeLUAData(oValue))
 	self.stmtInfoSet:GetAll()
 	self.stmtInfoSet:Reset()
 	return true
@@ -264,10 +235,10 @@ function DB:GetInfo(szKey)
 	end
 	self.stmtInfoGet:ClearBindings()
 	self.stmtInfoGet:BindAll(szKey)
-	local res, success = Get(self.stmtInfoGet:GetAll(), {1, 'value'})
+	local res, success = X.Get(self.stmtInfoGet:GetAll(), {1, 'value'})
 	self.stmtInfoGet:Reset()
 	if success then
-		res = DecodeLUAData(res)
+		res = X.DecodeLUAData(res)
 	end
 	return res, success
 end
@@ -297,11 +268,11 @@ function DB:SetMaxTime(nMaxTime)
 	end
 	self:Flush()
 	if nMaxTime <= 0 then
-		nMaxTime = HUGE
+		nMaxTime = math.huge
 	end
 	local nMaxRecTime = self:GetMaxRecTime()
 	assert(nMaxRecTime <= nMaxTime, '[MY_ChatLog_DB:SetMaxTime] MaxTime cannot be smaller than MaxRecTime.')
-	self:SetInfo('max_time', IsHugeNumber(nMaxTime) and 0 or nMaxTime)
+	self:SetInfo('max_time', X.IsHugeNumber(nMaxTime) and 0 or nMaxTime)
 	self._nMaxTime = nMaxTime
 	return true
 end
@@ -310,7 +281,7 @@ function DB:GetMaxTime()
 	if not self._nMaxTime then
 		self._nMaxTime = self:GetInfo('max_time') or 0
 		if self._nMaxTime == 0 then
-			self._nMaxTime = HUGE
+			self._nMaxTime = math.huge
 		end
 	end
 	return self._nMaxTime
@@ -320,10 +291,10 @@ function DB:InsertMsg(nChannel, szText, szMsg, szTalker, nTime, szHash)
 	local nMinTime, nMaxTime = self:GetMinTime(), self:GetMaxTime()
 	assert(nTime >= nMinTime and nTime <= nMaxTime,
 		'[MY_ChatLog_DB:InsertMsg] Time(' ..nTime .. ') must between MinTime(' .. nMinTime .. ') and MaxTime(' .. nMaxTime .. ').')
-	if not nChannel or not nTime or IsEmpty(szMsg) or not szText or IsEmpty(szHash) then
+	if not nChannel or not nTime or X.IsEmpty(szMsg) or not szText or X.IsEmpty(szHash) then
 		return
 	end
-	insert(self.aInsertQueue, {szHash = szHash, nChannel = nChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
+	table.insert(self.aInsertQueue, {szHash = szHash, nChannel = nChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
 end
 
 function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
@@ -331,15 +302,15 @@ function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 		return false
 	end
 	self:Flush()
-	if IsTable(aChannel) and IsEmpty(aChannel) then
+	if X.IsTable(aChannel) and X.IsEmpty(aChannel) then
 		return 0
 	end
 	szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
-	local bMinTime = not IsEmpty(nMinTime) and self:GetMinTime() >= nMinTime
-	local bMaxTime = not IsEmpty(nMaxTime) and not IsHugeNumber(nMaxTime) and self:GetMaxTime() >= nMaxTime
-	if not aChannel and IsEmpty(szSearch) and not bMinTime and not bMaxTime then
+	local bMinTime = not X.IsEmpty(nMinTime) and self:GetMinTime() >= nMinTime
+	local bMaxTime = not X.IsEmpty(nMaxTime) and not X.IsHugeNumber(nMaxTime) and self:GetMaxTime() >= nMaxTime
+	if not aChannel and X.IsEmpty(szSearch) and not bMinTime and not bMaxTime then
 		if not self.nCountCache then
-			self.nCountCache = Get(self.db:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
+			self.nCountCache = X.Get(self.db:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 		end
 		return self.nCountCache
 	end
@@ -352,7 +323,7 @@ function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 	local tCount = self.tCountCache[szKey]
 	if not tCount then
 		local aResult
-		if IsEmpty(szSearch) then
+		if X.IsEmpty(szSearch) then
 			aResult = self.db:Execute('SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog GROUP BY channel')
 		elseif bMinTime or bMaxTime then
 			local szSQL = 'SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog'
@@ -393,7 +364,7 @@ function DB:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit)
 		return false
 	end
 	self:Flush()
-	if IsTable(aChannel) and IsEmpty(aChannel) then
+	if X.IsTable(aChannel) and X.IsEmpty(aChannel) then
 		return {}
 	end
 	szSearch, nMinTime, nMaxTime, nOffset, nLimit = FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
@@ -428,8 +399,8 @@ function DB:GetMaxRecTime()
 end
 
 function DB:DeleteMsg(szHash, nTime)
-	if nTime and not IsEmpty(szHash) then
-		insert(self.aDeleteQueue, {szHash = szHash, nTime = nTime})
+	if nTime and not X.IsEmpty(szHash) then
+		table.insert(self.aDeleteQueue, {szHash = szHash, nTime = nTime})
 	end
 end
 
@@ -438,7 +409,7 @@ function DB:DeleteMsgInterval(aChannel, szSearch, nMinTime, nMaxTime)
 		return false
 	end
 	self:Flush()
-	if IsTable(aChannel) and IsEmpty(aChannel) then
+	if X.IsTable(aChannel) and X.IsEmpty(aChannel) then
 		return true
 	end
 	szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
@@ -456,7 +427,7 @@ function DB:DeleteMsgInterval(aChannel, szSearch, nMinTime, nMaxTime)
 end
 
 function DB:Flush()
-	if not IsEmpty(self.aInsertQueue) or not IsEmpty(self.aDeleteQueue) then
+	if not X.IsEmpty(self.aInsertQueue) or not X.IsEmpty(self.aDeleteQueue) then
 		if not self:Connect() then
 			return false
 		end

@@ -10,86 +10,57 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Farbnamen'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Farbnamen'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 ---------------------------------------------------------------
 -- 设置和数据
 ---------------------------------------------------------------
-LIB.CreateDataRoot(PATH_TYPE.SERVER)
+X.CreateDataRoot(X.PATH_TYPE.SERVER)
 
-local O = LIB.CreateUserSettingsModule('MY_Farbnamen', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_Farbnamen', _L['General'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Farbnamen'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bInsertIcon = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Farbnamen'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nInsertIconSize = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Farbnamen'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 20,
 	},
 })
 local D = {}
 
 local _MY_Farbnamen = {
-	tForceString = Clone(g_tStrings.tForceTitle),
+	tForceString = X.Clone(g_tStrings.tForceTitle),
 	tRoleType    = {
 		[ROLE_TYPE.STANDARD_MALE  ] = _L['Man'],
 		[ROLE_TYPE.STANDARD_FEMALE] = _L['Woman'],
 		[ROLE_TYPE.LITTLE_BOY     ] = _L['Boy'],
 		[ROLE_TYPE.LITTLE_GIRL    ] = _L['Girl'],
 	},
-	tCampString  = Clone(g_tStrings.STR_GUILD_CAMP_NAME),
+	tCampString  = X.Clone(g_tStrings.STR_GUILD_CAMP_NAME),
 	aPlayerQueu = {},
 }
 local HEADER_XML = {}
@@ -112,14 +83,14 @@ local function InitDB()
 	if DB_ERR_COUNT > DB_MAX_ERR_COUNT then
 		return false
 	end
-	DB = LIB.SQLiteConnect(_L['MY_Farbnamen'], {'cache/farbnamen.v4.db', PATH_TYPE.SERVER})
+	DB = X.SQLiteConnect(_L['MY_Farbnamen'], {'cache/farbnamen.v4.db', X.PATH_TYPE.SERVER})
 	if not DB then
 		local szMsg = _L['Cannot connect to database!!!']
 		if DB_ERR_COUNT > 0 then
 			szMsg = szMsg .. _L(' Retry time: %d', DB_ERR_COUNT)
 		end
 		DB_ERR_COUNT = DB_ERR_COUNT + 1
-		LIB.Sysmsg(_L['MY_Farbnamen'], szMsg, CONSTANT.MSG_THEME.ERROR)
+		X.Sysmsg(_L['MY_Farbnamen'], szMsg, CONSTANT.MSG_THEME.ERROR)
 		return false
 	end
 	DB:Execute([[
@@ -152,14 +123,14 @@ local function InitDB()
 	DBT_RI = DB:Prepare('SELECT id, name FROM TongCache WHERE id = ?')
 
 	-- 旧版文件缓存转换
-	local SZ_IC_PATH = LIB.FormatPath({'cache/PLAYER_INFO/{$relserver}/', PATH_TYPE.DATA})
+	local SZ_IC_PATH = X.FormatPath({'cache/PLAYER_INFO/{$relserver}/', X.PATH_TYPE.DATA})
 	if IsLocalFileExist(SZ_IC_PATH) then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite start!', DEBUG_LEVEL.LOG)
+		X.Debug('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite start!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 999 do
-			local data = LIB.LoadLUAData({'cache/PLAYER_INFO/{$relserver}/DAT2/' .. i .. '.{$lang}.jx3dat', PATH_TYPE.DATA})
+			local data = X.LoadLUAData({'cache/PLAYER_INFO/{$relserver}/DAT2/' .. i .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 			if data then
 				for id, p in pairs(data) do
 					DBI_W:ClearBindings()
@@ -171,16 +142,16 @@ local function InitDB()
 		DBI_W:Reset()
 		DB:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite finished!', DEBUG_LEVEL.LOG)
+		X.Debug('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite start!', DEBUG_LEVEL.LOG)
+		X.Debug('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite start!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 128 do
 			for j = 0, 128 do
-				local data = LIB.LoadLUAData({'cache/PLAYER_INFO/{$relserver}/TONG/' .. i .. '-' .. j .. '.{$lang}.jx3dat', PATH_TYPE.DATA})
+				local data = X.LoadLUAData({'cache/PLAYER_INFO/{$relserver}/TONG/' .. i .. '-' .. j .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 				if data then
 					for id, name in pairs(data) do
 						DBT_W:ClearBindings()
@@ -193,15 +164,15 @@ local function InitDB()
 		DBT_W:Reset()
 		DB:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite finished!', DEBUG_LEVEL.LOG)
+		X.Debug('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_Farbnamen', 'Farbnamen cleaning file cache start: ' .. SZ_IC_PATH, DEBUG_LEVEL.LOG)
+		X.Debug('MY_Farbnamen', 'Farbnamen cleaning file cache start: ' .. SZ_IC_PATH, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		CPath.DelDir(SZ_IC_PATH)
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_Farbnamen', 'Farbnamen cleaning file cache finished!', DEBUG_LEVEL.LOG)
+		X.Debug('MY_Farbnamen', 'Farbnamen cleaning file cache finished!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	return true
@@ -209,13 +180,13 @@ end
 InitDB()
 
 function D.Migration()
-	local DB_V1_PATH = LIB.FormatPath({'cache/player_info.db', PATH_TYPE.SERVER})
-	local DB_V2_PATH = LIB.FormatPath({'cache/player_info.v2.db', PATH_TYPE.SERVER})
-	local DB_V3_PATH = LIB.FormatPath({'cache/farbnamen.v3.db', PATH_TYPE.SERVER})
+	local DB_V1_PATH = X.FormatPath({'cache/player_info.db', X.PATH_TYPE.SERVER})
+	local DB_V2_PATH = X.FormatPath({'cache/player_info.v2.db', X.PATH_TYPE.SERVER})
+	local DB_V3_PATH = X.FormatPath({'cache/farbnamen.v3.db', X.PATH_TYPE.SERVER})
 	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
 		return
 	end
-	LIB.Confirm(
+	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
 			-- 转移V1旧版数据
@@ -223,7 +194,7 @@ function D.Migration()
 				local DB_V1 = SQLite3_Open(DB_V1_PATH)
 				if DB_V1 then
 					-- 角色缓存
-					local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM InfoCache'), {1, 'count'}, 0), 10000
+					local nCount, nPageSize = X.Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM InfoCache'), {1, 'count'}, 0), 10000
 					DB:Execute('BEGIN TRANSACTION')
 					for i = 0, nCount / nPageSize do
 						for _, p in ipairs(DB_V1:Execute('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
@@ -245,7 +216,7 @@ function D.Migration()
 					DBI_W:Reset()
 					DB:Execute('END TRANSACTION')
 					-- 帮会缓存
-					local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM TongCache'), {1, 'count'}, 0), 10000
+					local nCount, nPageSize = X.Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM TongCache'), {1, 'count'}, 0), 10000
 					DB:Execute('BEGIN TRANSACTION')
 					for i = 0, nCount / nPageSize do
 						for _, p in ipairs(DB_V1:Execute('SELECT id, name FROM TongCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
@@ -262,14 +233,14 @@ function D.Migration()
 					DB:Execute('END TRANSACTION')
 					DB_V1:Release()
 				end
-				CPath.Move(DB_V1_PATH, DB_V1_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+				CPath.Move(DB_V1_PATH, DB_V1_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			-- 转移V2旧版数据
 			if IsLocalFileExist(DB_V2_PATH) then
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
 				if DB_V2 then
 					DB:Execute('BEGIN TRANSACTION')
-					local nCount, nPageSize = Get(DB_V2:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					local nCount, nPageSize = X.Get(DB_V2:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
 					for i = 0, nCount / nPageSize do
 						local aInfoCache = DB_V2:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
 						if aInfoCache then
@@ -293,7 +264,7 @@ function D.Migration()
 							DBI_W:Reset()
 						end
 					end
-					local nCount, nPageSize = Get(DB_V2:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					local nCount, nPageSize = X.Get(DB_V2:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
 					for i = 0, nCount / nPageSize do
 						local aTongCache = DB_V2:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
 						if aTongCache then
@@ -314,14 +285,14 @@ function D.Migration()
 					DB:Execute('END TRANSACTION')
 					DB_V2:Release()
 				end
-				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			-- 转移V3旧版数据
 			if IsLocalFileExist(DB_V3_PATH) then
 				local DB_V3 = SQLite3_Open(DB_V3_PATH)
 				if DB_V3 then
 					DB:Execute('BEGIN TRANSACTION')
-					local nCount, nPageSize = Get(DB_V3:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					local nCount, nPageSize = X.Get(DB_V3:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
 					for i = 0, nCount / nPageSize do
 						local aInfoCache = DB_V3:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
 						if aInfoCache then
@@ -345,7 +316,7 @@ function D.Migration()
 							DBI_W:Reset()
 						end
 					end
-					local nCount, nPageSize = Get(DB_V3:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					local nCount, nPageSize = X.Get(DB_V3:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
 					for i = 0, nCount / nPageSize do
 						local aTongCache = DB_V3:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
 						if aTongCache then
@@ -366,9 +337,9 @@ function D.Migration()
 					DB:Execute('END TRANSACTION')
 					DB_V3:Release()
 				end
-				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
-			LIB.Alert(_L['Migrate succeed!'])
+			X.Alert(_L['Migrate succeed!'])
 		end)
 end
 
@@ -377,56 +348,56 @@ end
 ---------------------------------------------------------------
 function D.RenderXml(szMsg, tOption)
 	-- <text>text='[就是个阵眼]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=515</text><text>text='说：' font=10 r=255 g=255 b=255 </text><text>text='[茗伊]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=771</text><text>text='\n' font=10 r=255 g=255 b=255 </text>
-	local aXMLNode = LIB.XMLDecode(szMsg)
+	local aXMLNode = X.XMLDecode(szMsg)
 	if aXMLNode then
 		local i, node, name = 1, nil, nil
 		while i <= #aXMLNode do
 			node = aXMLNode[i]
-			name = LIB.XMLIsNode(node) and LIB.XMLGetNodeData(node, 'name')
+			name = X.XMLIsNode(node) and X.XMLGetNodeData(node, 'name')
 			if name and name:sub(1, 9) == 'namelink_' then
 				if tOption.bColor or tOption.bInsertIcon then
-					local szName = gsub(LIB.XMLGetNodeData(node, 'text'), '[%[%]]', '')
+					local szName = string.gsub(X.XMLGetNodeData(node, 'text'), '[%[%]]', '')
 					local tInfo = D.GetAusName(szName)
 					if tInfo then
 						if tOption.bColor then
-							LIB.XMLSetNodeData(node, 'r', tInfo.rgb[1])
-							LIB.XMLSetNodeData(node, 'g', tInfo.rgb[2])
-							LIB.XMLSetNodeData(node, 'b', tInfo.rgb[3])
+							X.XMLSetNodeData(node, 'r', tInfo.rgb[1])
+							X.XMLSetNodeData(node, 'g', tInfo.rgb[2])
+							X.XMLSetNodeData(node, 'b', tInfo.rgb[3])
 						end
 						if tOption.bInsertIcon then
 							local szIcon, nFrame = GetForceImage(tInfo.dwForceID)
 							if szIcon and nFrame then
-								local nodeImage = LIB.XMLCreateNode('image')
-								LIB.XMLSetNodeData(nodeImage, 'w', tOption.nInsertIconSize)
-								LIB.XMLSetNodeData(nodeImage, 'h', tOption.nInsertIconSize)
-								LIB.XMLSetNodeData(nodeImage, 'path', szIcon)
-								LIB.XMLSetNodeData(nodeImage, 'frame', nFrame)
-								insert(aXMLNode, i, nodeImage)
+								local nodeImage = X.XMLCreateNode('image')
+								X.XMLSetNodeData(nodeImage, 'w', tOption.nInsertIconSize)
+								X.XMLSetNodeData(nodeImage, 'h', tOption.nInsertIconSize)
+								X.XMLSetNodeData(nodeImage, 'path', szIcon)
+								X.XMLSetNodeData(nodeImage, 'frame', nFrame)
+								table.insert(aXMLNode, i, nodeImage)
 								i = i + 1
 							end
 						end
 					end
 				end
 				if tOption.bTip then
-					LIB.XMLSetNodeData(node, 'eventid', 82803)
-					LIB.XMLSetNodeData(node, 'script', (LIB.XMLGetNodeData(node, 'script') or '')
+					X.XMLSetNodeData(node, 'eventid', 82803)
+					X.XMLSetNodeData(node, 'script', (X.XMLGetNodeData(node, 'script') or '')
 						.. '\nthis.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end'
 						.. '\nthis.OnItemMouseLeave=function() HideTip() end')
 				end
 			end
 			i = i + 1
 		end
-		szMsg = LIB.XMLEncode(aXMLNode)
+		szMsg = X.XMLEncode(aXMLNode)
 	end
-	-- szMsg = gsub( szMsg, '<text>([^<]-)text='([^<]-)'([^<]-name='namelink_%d-'[^<]-)</text>', function (szExtra1, szName, szExtra2)
-	--     szName = gsub(szName, '[%[%]]', '')
+	-- szMsg = string.gsub( szMsg, '<text>([^<]-)text='([^<]-)'([^<]-name='namelink_%d-'[^<]-)</text>', function (szExtra1, szName, szExtra2)
+	--     szName = string.gsub(szName, '[%[%]]', '')
 	--     local tInfo = D.GetAusName(szName)
 	--     if tInfo then
-	--         szExtra1 = gsub(szExtra1, '[rgb]=%d+', '')
-	--         szExtra2 = gsub(szExtra2, '[rgb]=%d+', '')
-	--         szExtra1 = gsub(szExtra1, 'eventid=%d+', '')
-	--         szExtra2 = gsub(szExtra2, 'eventid=%d+', '')
-	--         return format(
+	--         szExtra1 = string.gsub(szExtra1, '[rgb]=%d+', '')
+	--         szExtra2 = string.gsub(szExtra2, '[rgb]=%d+', '')
+	--         szExtra1 = string.gsub(szExtra1, 'eventid=%d+', '')
+	--         szExtra2 = string.gsub(szExtra2, 'eventid=%d+', '')
+	--         return string.format(
 	--             '<text>%stext='[%s]'%s eventid=883 script='this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end' r=%d g=%d b=%d</text>',
 	--             szExtra1, szName, szExtra2, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
 	--         )
@@ -438,7 +409,7 @@ end
 function D.RenderNamelink(namelink, tOption)
 	local ui, nNumOffset = UI(namelink), 0
 	if tOption.bColor or tOption.bInsertIcon then
-		local szName = gsub(namelink:GetText(), '[%[%]]', '')
+		local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
 		local tInfo = D.GetAusName(szName)
 		if tInfo then
 			if tOption.bColor then
@@ -488,9 +459,9 @@ function D.RenderEl(el, tOption, bIgnoreRange)
 end
 
 function D.MergeOption(dst, src)
-	if IsTable(src) then
+	if X.IsTable(src) then
 		for k, _ in pairs(dst) do
-			if not IsNil(src[k]) then
+			if not X.IsNil(src[k]) then
 				dst[k] = src[k]
 			end
 		end
@@ -510,16 +481,16 @@ function D.Render(szMsg, tOption)
 			nInsertIconSize = O.nInsertIconSize or 23,
 		},
 		tOption)
-	if IsString(szMsg) then
+	if X.IsString(szMsg) then
 		szMsg = D.RenderXml(szMsg, tOption)
-	elseif IsElement(szMsg) then
+	elseif X.IsElement(szMsg) then
 		szMsg = D.RenderEl(szMsg, tOption)
 	end
 	return szMsg
 end
 
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
-LIB.HookChatPanel('BEFORE', 'MY_FARBNAMEN', function(h, szMsg, ...)
+X.HookChatPanel('BEFORE', 'MY_FARBNAMEN', function(h, szMsg, ...)
 	if D.bReady and O.bEnable then
 		szMsg = D.Render(szMsg, true)
 	end
@@ -531,7 +502,7 @@ function D.RegisterHeader(szName, dwID, szHeaderXml)
 		HEADER_XML[szName] = {}
 	end
 	if HEADER_XML[szName][dwID] then
-		return LIB.Debug('ERROR', 'MY_Farbnamen Conflicted Name-ID: ' .. szName .. '(' .. dwID .. ')', DEBUG_LEVEL.ERROR)
+		return X.Debug('ERROR', 'MY_Farbnamen Conflicted Name-ID: ' .. szName .. '(' .. dwID .. ')', X.DEBUG_LEVEL.ERROR)
 	end
 	if dwID == '*' then
 		szName = GetRealName(szName)
@@ -547,56 +518,56 @@ function D.GetTip(szName)
 		if tInfo.dwID and tInfo.szName then
 			local szHeaderXml = HEADER_XML[tInfo.szName] and HEADER_XML[tInfo.szName][tInfo.dwID]
 			if szHeaderXml then
-				insert(tTip, szHeaderXml)
-				insert(tTip, CONSTANT.XML_LINE_BREAKER)
+				table.insert(tTip, szHeaderXml)
+				table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
 			elseif tInfo.dwID ~= UI_GetClientPlayerID() then
 				local szName = GetRealName(tInfo.szName)
 				local szHeaderXml = HEADER_XML[szName] and HEADER_XML[szName]['*']
 				if szHeaderXml then
-					insert(tTip, szHeaderXml)
-					insert(tTip, CONSTANT.XML_LINE_BREAKER)
+					table.insert(tTip, szHeaderXml)
+					table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
 				end
 			end
 		end
 		-- 名称 等级
-		insert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
+		table.insert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
 		-- 是否同队伍
-		if UI_GetClientPlayerID() ~= tInfo.dwID and LIB.IsParty(tInfo.dwID) then
-			insert(tTip, GetFormatText(_L['[Teammate]'], nil, 0, 255, 0))
+		if UI_GetClientPlayerID() ~= tInfo.dwID and X.IsParty(tInfo.dwID) then
+			table.insert(tTip, GetFormatText(_L['[Teammate]'], nil, 0, 255, 0))
 		end
-		insert(tTip, CONSTANT.XML_LINE_BREAKER)
+		table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
 		-- 称号
 		if tInfo.szTitle and #tInfo.szTitle > 0 then
-			insert(tTip, GetFormatText('<' .. tInfo.szTitle .. '>', 136))
-			insert(tTip, CONSTANT.XML_LINE_BREAKER)
+			table.insert(tTip, GetFormatText('<' .. tInfo.szTitle .. '>', 136))
+			table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
 		end
 		-- 帮会
 		if tInfo.szTongID and #tInfo.szTongID > 0 then
-			insert(tTip, GetFormatText('[' .. tInfo.szTongID .. ']', 136))
-			insert(tTip, CONSTANT.XML_LINE_BREAKER)
+			table.insert(tTip, GetFormatText('[' .. tInfo.szTongID .. ']', 136))
+			table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
 		end
 		-- 门派 体型 阵营
-		insert(tTip, GetFormatText(
+		table.insert(tTip, GetFormatText(
 			(_MY_Farbnamen.tForceString[tInfo.dwForceID] or tInfo.dwForceID or _L['Unknown force']) .. _L.SPLIT_DOT ..
 			(_MY_Farbnamen.tRoleType[tInfo.nRoleType] or tInfo.nRoleType or  _L['Unknown gender'])    .. _L.SPLIT_DOT ..
 			(_MY_Farbnamen.tCampString[tInfo.nCamp] or tInfo.nCamp or  _L['Unknown camp']), 136
 		))
-		insert(tTip, CONSTANT.XML_LINE_BREAKER)
+		table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
 		-- 随身便笺
 		if MY_Anmerkungen and MY_Anmerkungen.GetPlayerNote then
 			local note = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
 			if note and note.szContent ~= '' then
-				insert(tTip, GetFormatText(note.szContent, 0))
-				insert(tTip, CONSTANT.XML_LINE_BREAKER)
+				table.insert(tTip, GetFormatText(note.szContent, 0))
+				table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
 			end
 		end
 		-- 调试信息
 		if IsCtrlKeyDown() then
-			insert(tTip, CONSTANT.XML_LINE_BREAKER)
-			insert(tTip, GetFormatText(_L('Player ID: %d', tInfo.dwID), 102))
+			table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
+			table.insert(tTip, GetFormatText(_L('Player ID: %d', tInfo.dwID), 102))
 		end
 		-- 组装Tip
-		return concat(tTip)
+		return table.concat(tTip)
 	end
 end
 
@@ -607,7 +578,7 @@ function D.ShowTip(namelink)
 	if not namelink then
 		return
 	end
-	local szName = gsub(namelink:GetText(), '[%[%]]', '')
+	local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
 	local x, y = namelink:GetAbsPos()
 	local w, h = namelink:GetSize()
 
@@ -668,7 +639,7 @@ local function Flush()
 		DB:Execute('END TRANSACTION')
 	end
 end
-LIB.RegisterFlush('MY_Farbnamen_Save', Flush)
+X.RegisterFlush('MY_Farbnamen_Save', Flush)
 end
 
 do
@@ -678,7 +649,7 @@ local function OnExit()
 	end
 	DB:Release()
 end
-LIB.RegisterExit('MY_Farbnamen_Save', OnExit)
+X.RegisterExit('MY_Farbnamen_Save', OnExit)
 end
 
 -- 通过szName获取信息
@@ -717,7 +688,7 @@ function D.Get(szKey)
 			szTitle   = info.title,
 			nCamp     = info.camp,
 			szTongID  = GetTongName(info.tong) or '',
-			rgb       = IsNumber(info.force) and { LIB.GetForceColor(info.force, 'foreground') } or { 255, 255, 255 },
+			rgb       = X.IsNumber(info.force) and { X.GetForceColor(info.force, 'foreground') } or { 255, 255, 255 },
 		}
 	end
 end
@@ -759,7 +730,7 @@ function D.AddAusID(dwID)
 			end
 			l_infocache[info.id] = info
 			l_infocache[info.name] = info
-			local infow = Clone(info)
+			local infow = X.Clone(info)
 			infow.name = AnsiToUTF8(info.name)
 			infow.title = AnsiToUTF8(info.title)
 			l_infocache_w[info.id] = infow
@@ -768,16 +739,16 @@ function D.AddAusID(dwID)
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Farbnamen', function() D.bReady = true end)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Farbnamen', function() D.bReady = true end)
 
 --------------------------------------------------------------
 -- 菜单
 --------------------------------------------------------------
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	D.Migration()
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Enable MY_Farbnamen'],
 		checked = O.bEnable,
 		oncheck = function()
@@ -785,10 +756,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 		end,
 	}):Width() + 5
 
-	x = X + 25
-	y = y + lineHeight
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+	nX = nPaddingX + 25
+	nY = nY + nLH
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Insert force icon'],
 		checked = O.bInsertIcon,
 		oncheck = function()
@@ -799,8 +770,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 		end,
 	}):Width() + 5
 
-	x = x + ui:Append('WndTrackbar', {
-		x = x, y = y, w = 100, h = 25,
+	nX = nX + ui:Append('WndTrackbar', {
+		x = nX, y = nY, w = 100, h = 25,
 		value = O.nInsertIconSize,
 		range = {1, 300},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
@@ -811,34 +782,34 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 		autoenable = function() return O.bInsertIcon end,
 	}):AutoWidth():Width() + 5
 
-	x = X + 25
-	y = y + lineHeight
+	nX = nPaddingX + 25
+	nY = nY + nLH
 
-	x = x + ui:Append('WndButton', {
-		x = x, y = y, w = 'auto',
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY, w = 'auto',
 		buttonstyle = 'FLAT',
 		text = _L['Customize color'],
 		onclick = function()
-			LIB.ShowPanel()
-			LIB.FocusPanel()
-			LIB.SwitchTab('GlobalColor')
+			X.ShowPanel()
+			X.FocusPanel()
+			X.SwitchTab('GlobalColor')
 		end,
 		autoenable = function()
 			return O.bEnable
 		end,
 	}):Width() + 5
 
-	x = x + ui:Append('WndButton', {
-		x = x, y = y, w = 'auto',
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY, w = 'auto',
 		buttonstyle = 'FLAT',
 		text = _L['Reset data'],
 		onclick = function()
-			LIB.Confirm(_L['Are you sure to reset farbnamen data? All character\'s data cache will be removed.'], function()
+			X.Confirm(_L['Are you sure to reset farbnamen data? All character\'s data cache will be removed.'], function()
 				if not InitDB() then
 					return
 				end
 				DB:Execute('DELETE FROM InfoCache')
-				LIB.Sysmsg(_L['MY_Farbnamen'], _L['Cache data deleted.'])
+				X.Sysmsg(_L['MY_Farbnamen'], _L['Cache data deleted.'])
 			end)
 		end,
 		autoenable = function()
@@ -846,11 +817,11 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 		end,
 	}):Width() + 5
 
-	y = y + lineHeight
+	nY = nY + nLH
 
-	return x, y
+	return nX, nY
 end
-LIB.RegisterAddonMenu('MY_Farbenamen', D.GetMenu)
+X.RegisterAddonMenu('MY_Farbenamen', D.GetMenu)
 --------------------------------------------------------------
 -- 注册事件
 --------------------------------------------------------------
@@ -865,16 +836,16 @@ local function onBreathe()
 		end
 	end
 end
-LIB.BreatheCall(250, onBreathe)
+X.BreatheCall(250, onBreathe)
 
 local function OnPeekPlayer()
 	if arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 		l_peeklist[arg1] = 0
 	end
 end
-LIB.RegisterEvent('PEEK_OTHER_PLAYER', OnPeekPlayer)
-LIB.RegisterEvent('PLAYER_ENTER_SCENE', function() l_peeklist[arg0] = 0 end)
-LIB.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() l_tongnames[arg1], l_tongnames_w[arg1] = arg2, AnsiToUTF8(arg2) end)
+X.RegisterEvent('PEEK_OTHER_PLAYER', OnPeekPlayer)
+X.RegisterEvent('PLAYER_ENTER_SCENE', function() l_peeklist[arg0] = 0 end)
+X.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() l_tongnames[arg1], l_tongnames_w[arg1] = arg2, AnsiToUTF8(arg2) end)
 end
 
 --------------------------------------------------------------------------
@@ -898,5 +869,5 @@ local settings = {
 		},
 	},
 }
-MY_Farbnamen = LIB.CreateModule(settings)
+MY_Farbnamen = X.CreateModule(settings)
 end

@@ -10,50 +10,21 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_ExamTip', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_ExamTip', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 local LOCAL_DATA_CACHE -- 本地题库
 local INPUT_DATA_CACHE = {} -- 玩家答题缓存
@@ -62,7 +33,7 @@ local LAST_REMOTE_QUERY -- 最后一次网络查询的题目（防止重查）
 local D = {}
 
 local function DisplayMessage(szText)
-	LIB.Sysmsg(_L['Exam tip'], szText)
+	X.Sysmsg(_L['Exam tip'], szText)
 end
 
 local function IsCurrentQuestion(szQues)
@@ -102,8 +73,8 @@ local function QueryData(szQues)
 	DisplayMessage(_L['Querying, please wait...'])
 
 	if not LOCAL_DATA_CACHE then
-		LOCAL_DATA_CACHE = LIB.LoadLUAData({'config/examtip.jx3dat', PATH_TYPE.GLOBAL}, { passphrase = false })
-			or LIB.LoadLUAData({'config/examtip.jx3dat', PATH_TYPE.GLOBAL})
+		LOCAL_DATA_CACHE = X.LoadLUAData({'config/examtip.jx3dat', X.PATH_TYPE.GLOBAL}, { passphrase = false })
+			or X.LoadLUAData({'config/examtip.jx3dat', X.PATH_TYPE.GLOBAL})
 			or {}
 	end
 	if LOCAL_DATA_CACHE[szQues] then
@@ -114,16 +85,16 @@ local function QueryData(szQues)
 		end
 	end
 
-	LIB.Ajax({
+	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/exam?'
-			.. LIB.EncodePostData(LIB.UrlEncode({
+			.. X.EncodePostData(X.UrlEncode({
 				l = AnsiToUTF8(GLOBAL.GAME_LANG),
 				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 				q = AnsiToUTF8(szQues),
 			})),
 		success = function(html, status)
-			local res = LIB.JsonDecode(html)
+			local res = X.JsonDecode(html)
 			if not res or not IsCurrentQuestion(res.ques) then
 				return
 			end
@@ -159,34 +130,34 @@ local function QueryData(szQues)
 end
 
 function D.SubmitData(tExamData, bAllRight)
-	if LIB.IsDebugServer() or not MY_Serendipity.bEnable then
+	if X.IsDebugServer() or not MY_Serendipity.bEnable then
 		return
 	end
 	local data = {}
 	for szQues, aBody in pairs(tExamData) do
 		if not REMOTE_DATA_CACHE[szQues] then
-			insert(aBody, 1, szQues)
-			insert(data, LIB.ConvertToUTF8(aBody))
+			table.insert(aBody, 1, szQues)
+			table.insert(data, X.ConvertToUTF8(aBody))
 		end
 	end
 	if #data == 0 then
 		return
 	end
-	LIB.Ajax({
+	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/api/exam/uploads?'
-			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+			.. X.EncodePostData(X.UrlEncode(X.SignPostData({
 				l = AnsiToUTF8(GLOBAL.GAME_LANG),
 				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-				data = LIB.JsonEncode(data),
+				data = X.JsonEncode(data),
 				perfect = bAllRight and 1 or 0,
 			}, 'idiadoHUiogyui()&*hHUO'))),
 		success = function(html, status)
-			local res = LIB.JsonDecode(html)
-			if LIB.IsRestricted('MY_ExamTip') or not res then
+			local res = X.JsonDecode(html)
+			if X.IsRestricted('MY_ExamTip') or not res then
 				return
 			end
-			LIB.Sysmsg(_L['Exam tip'], _L('%s record(s) commited, %s record(s) accepted!', res.received, res.accepted))
+			X.Sysmsg(_L['Exam tip'], _L('%s record(s) commited, %s record(s) accepted!', res.received, res.accepted))
 		end,
 	})
 end
@@ -210,9 +181,9 @@ function D.GatherDataFromPanel()
 				local chk = wnd:Lookup('CheckBox_T1No' .. i)
 				if chk and chk:IsVisible() then
 					if chk:IsCheckBoxChecked() then
-						insert(aChoosed, #aChoise)
+						table.insert(aChoosed, #aChoise)
 					end
-					insert(aChoise, chk:Lookup('', 'Text_T1No' .. i):GetText())
+					table.insert(aChoise, chk:Lookup('', 'Text_T1No' .. i):GetText())
 				end
 			end
 			aBody = { 1, aChoise, aChoosed }
@@ -227,9 +198,9 @@ function D.GatherDataFromPanel()
 				local chk = wnd:Lookup('CheckBox_T2No' .. i)
 				if chk and chk:IsVisible() then
 					if chk:IsCheckBoxChecked() then
-						insert(aChoosed, #aChoise)
+						table.insert(aChoosed, #aChoise)
 					end
-					insert(aChoise, chk:Lookup('Text_T2No' .. i):GetText())
+					table.insert(aChoise, chk:Lookup('Text_T2No' .. i):GetText())
 				end
 			end
 			aBody = { 2, aChoise, aChoosed }
@@ -252,9 +223,9 @@ function D.GatherDataFromPanel()
 				local chk = wnd:Lookup('CheckBox_T4No' .. i)
 				if chk and chk:IsVisible() then
 					if chk:IsCheckBoxChecked() then
-						insert(aChoosed, #aChoise)
+						table.insert(aChoosed, #aChoise)
 					end
-					insert(aChoise, chk:Lookup('Text_T4No' .. i):GetText())
+					table.insert(aChoise, chk:Lookup('Text_T4No' .. i):GetText())
 				end
 			end
 			aBody = { 4, aChoise, aChoosed }
@@ -267,7 +238,7 @@ do
 local l_nExamPrintRemainSpace = 0
 local function OnFrameBreathe()
 	local szQues, aBody = D.GatherDataFromPanel()
-	if not LIB.IsRestricted('MY_ExamTip') then
+	if not X.IsRestricted('MY_ExamTip') then
 		QueryData(szQues)
 	end
 	if szQues and aBody then
@@ -276,20 +247,20 @@ local function OnFrameBreathe()
 	l_nExamPrintRemainSpace = GetClientPlayer().GetExamPrintRemainSpace()
 end
 
-LIB.RegisterFrameCreate('ExaminationPanel', 'EXAM_TIP', function(name, frame)
+X.RegisterFrameCreate('ExaminationPanel', 'EXAM_TIP', function(name, frame)
 	frame.OnFrameBreathe = OnFrameBreathe
 end)
 
-LIB.RegisterEvent('LOOT_ITEM', 'MY_EXAMTIP', function()
-	if IsEmpty(INPUT_DATA_CACHE) then
+X.RegisterEvent('LOOT_ITEM', 'MY_EXAMTIP', function()
+	if X.IsEmpty(INPUT_DATA_CACHE) then
 		return
 	end
 	local item = GetItem(arg1)
 	if item and item.nUiId == 65814 then
 		local nBeforeExamPrintRemainSpace = l_nExamPrintRemainSpace
-		local tExamData = Clone(INPUT_DATA_CACHE)
+		local tExamData = X.Clone(INPUT_DATA_CACHE)
 		INPUT_DATA_CACHE = {}
-		LIB.DelayCall(2000, function()
+		X.DelayCall(2000, function()
 			local bAllRight = nBeforeExamPrintRemainSpace - GetClientPlayer().GetExamPrintRemainSpace() == 100
 			D.SubmitData(tExamData, bAllRight)
 		end)
@@ -297,17 +268,17 @@ LIB.RegisterEvent('LOOT_ITEM', 'MY_EXAMTIP', function()
 end)
 end
 
-LIB.RegisterEvent('OPEN_WINDOW', 'MY_EXAMTIP', function()
-	if IsEmpty(INPUT_DATA_CACHE) then
+X.RegisterEvent('OPEN_WINDOW', 'MY_EXAMTIP', function()
+	if X.IsEmpty(INPUT_DATA_CACHE) then
 		return
 	end
-	if wfind(arg1, _L['<G>Congratulations you finished the exam, please visit Yangzhou next monday for result.']) then
-		local tExamData = Clone(INPUT_DATA_CACHE)
+	if wstring.find(arg1, _L['<G>Congratulations you finished the exam, please visit Yangzhou next monday for result.']) then
+		local tExamData = X.Clone(INPUT_DATA_CACHE)
 		INPUT_DATA_CACHE = {}
 		D.SubmitData(tExamData, false)
 	end
 end)
 
-LIB.RegisterReload('MY_ExamTip', function()
+X.RegisterReload('MY_ExamTip', function()
 	Wnd.CloseWindow('ExaminationPanel')
 end)

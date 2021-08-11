@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -84,10 +55,10 @@ function D.InsertFromText(aTabTalk, h)
 	for i = 0, h:GetItemCount() - 1 do
 		local p = h:Lookup(i)
 		if p:GetType() == 'Text' then
-			insert(aText, p:GetText())
+			table.insert(aText, p:GetText())
 		end
 	end
-	insert(aTabTalk, aText)
+	table.insert(aTabTalk, aText)
 end
 
 function D.GetDetailMenu(frame)
@@ -96,16 +67,16 @@ function D.GetDetailMenu(frame)
 	local eTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
 	local function Publish(nChannel, nLimit)
 		local bDetail = frame:Lookup('', 'Handle_Spliter'):IsVisible()
-		LIB.SendChat(
+		X.SendChat(
 			nChannel,
-			'[' .. PACKET_INFO.SHORT_NAME .. ']'
+			'[' .. X.PACKET_INFO.SHORT_NAME .. ']'
 			.. _L['Fight recount'] .. ' - '
 			.. frame:Lookup('', 'Text_Default'):GetText()
 			.. ' ' .. ((DataDisplay[DK.BOSSNAME] and ' - ' .. DataDisplay[DK.BOSSNAME]) or '')
-			.. '(' .. LIB.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
+			.. '(' .. X.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
 			{ parsers = { name = false } }
 		)
-		LIB.SendChat(nChannel, '------------------------------')
+		X.SendChat(nChannel, '------------------------------')
 
 		local aTabTalk = {}
 		D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Skill', 'Handle_SkillTitle'))
@@ -119,12 +90,12 @@ function D.GetDetailMenu(frame)
 				end
 			end
 		else
-			for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
+			for i = 0, math.min(hList:GetItemCount(), nLimit) - 1 do
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
 		end
-		LIB.SendTabChat(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R'})
-		LIB.SendChat(nChannel, '------------------------------')
+		X.SendTabChat(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R'})
+		X.SendChat(nChannel, '------------------------------')
 
 		if bDetail then
 			local aTabTalk = {}
@@ -133,17 +104,17 @@ function D.GetDetailMenu(frame)
 			for i = 0, hList:GetItemCount() - 1 do
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
-			LIB.SendTabChat(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R'})
-			LIB.SendChat(nChannel, '------------------------------')
+			X.SendTabChat(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R'})
+			X.SendChat(nChannel, '------------------------------')
 
 			local aTabTalk = {}
 			D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Target', 'Handle_TargetTitle'))
 			local hList = frame:Lookup('WndScroll_Target', 'Handle_TargetList')
-			for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
+			for i = 0, math.min(hList:GetItemCount(), nLimit) - 1 do
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
-			LIB.SendTabChat(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R'})
-			LIB.SendChat(nChannel, '------------------------------')
+			X.SendTabChat(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R'})
+			X.SendChat(nChannel, '------------------------------')
 		end
 	end
 	for nChannel, szChannel in pairs({
@@ -155,18 +126,18 @@ function D.GetDetailMenu(frame)
 			szOption = g_tStrings.tChannelName[szChannel],
 			bCheck = true, -- 不设置成可选框不能点╭∩╮(︶︿︶）╭∩╮垃圾
 			fnAction = function()
-				Publish(nChannel, HUGE)
+				Publish(nChannel, math.huge)
 				UI.ClosePopupMenu()
 			end,
 			rgb = GetMsgFontColor(szChannel, true),
 		}
 		for _, nLimit in ipairs({1, 2, 3, 4, 5, 8, 10, 15, 20, 30, 50, 100}) do
-			insert(t1, {
+			table.insert(t1, {
 				szOption = _L('Top %d', nLimit),
 				fnAction = function() Publish(nChannel, nLimit) end,
 			})
 		end
-		insert(t, t1)
+		table.insert(t, t1)
 	end
 
 	return t
@@ -190,7 +161,7 @@ function MY_Recount_DT.OnFrameCreate()
 		if frame and frame:IsValid() then
 			return true
 		else
-			LIB.RegisterEsc(frame:GetName())
+			X.RegisterEsc(frame:GetName())
 		end
 	end
 	local function onEsc()
@@ -198,11 +169,11 @@ function MY_Recount_DT.OnFrameCreate()
 			frame.szSelectedSkill  = nil
 			frame.szSelectedTarget = nil
 		else
-			LIB.RegisterEsc(frame:GetName())
+			X.RegisterEsc(frame:GetName())
 			Wnd.CloseWindow(frame)
 		end
 	end
-	LIB.RegisterEsc(frame:GetName(), canEsc, onEsc)
+	X.RegisterEsc(frame:GetName(), canEsc, onEsc)
 end
 
 function MY_Recount_DT.OnFrameBreathe()
@@ -221,7 +192,7 @@ function MY_Recount_DT.OnFrameBreathe()
 	end
 
 	-- 更新标题
-	local szName = IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id)
+	local szName = X.IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id)
 	this:Lookup('', 'Text_Default'):SetText(szName .. ' ' .. STAT_TYPE_NAME[this.nChannel])
 
 	-- 获取数据
@@ -251,7 +222,7 @@ function MY_Recount_DT.OnFrameBreathe()
 			}
 			if (bShowZeroVal or rec.nTotal > 0)
 			and (not MY_Recount_UI.bHideAnonymous or rec.szName:sub(1, 1) ~= '#') then
-				insert(aResult, rec)
+				table.insert(aResult, rec)
 			end
 		end
 	else
@@ -260,16 +231,16 @@ function MY_Recount_DT.OnFrameBreathe()
 				or MY_Recount.StatTargetContainsImportantEffect(p)
 			local rec = {
 				szKey  = id                              ,
-				szName = IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id),
+				szName = X.IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id),
 				nCount = not bShowZeroVal and p[DK_REC_STAT_TARGET.NZ_COUNT] or p[DK_REC_STAT_TARGET.COUNT],
 				nTotal = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_TARGET.TOTAL_EFFECT] or p[DK_REC_STAT_TARGET.TOTAL],
 			}
 			if bShowZeroVal or rec.nTotal > 0 then
-				insert(aResult, rec)
+				table.insert(aResult, rec)
 			end
 		end
 	end
-	sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
+	table.sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
 	-- 默认选中第一个
 	if this.bFirstRendering then
 		if aResult[1] then
@@ -343,7 +314,7 @@ function MY_Recount_DT.OnFrameBreathe()
 					szSkillResult = SKILL_RESULT_NAME[nSkillResult],
 				}
 				if res.nCount > 0 then
-					insert(aResult, res)
+					table.insert(aResult, res)
 				end
 			end
 		else
@@ -366,11 +337,11 @@ function MY_Recount_DT.OnFrameBreathe()
 					szSkillResult = SKILL_RESULT_NAME[nSkillResult],
 				}
 				if res.nCount > 0 then
-					insert(aResult, res)
+					table.insert(aResult, res)
 				end
 			end
 		end
-		sort(aResult, function(p1, p2) return p1.nAvg > p2.nAvg end)
+		table.sort(aResult, function(p1, p2) return p1.nAvg > p2.nAvg end)
 		-- 界面重绘
 		this:Lookup('WndScroll_Detail'):Show()
 		local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
@@ -395,7 +366,7 @@ function MY_Recount_DT.OnFrameBreathe()
 		if hSelectedItem and not this:Lookup('WndScroll_Target'):IsVisible() then
 			-- 说明是刚从未选择状态切换过来 滚动条滚动到选中项
 			local hScroll = this:Lookup('WndScroll_Skill/Scroll_Skill_List')
-			hScroll:SetScrollPos(ceil(hScroll:GetStepCount() * hSelectedItem:GetIndex() / hSelectedItem:GetParent():GetItemCount()))
+			hScroll:SetScrollPos(math.ceil(hScroll:GetStepCount() * hSelectedItem:GetIndex() / hSelectedItem:GetParent():GetItemCount()))
 		end
 
 		--------------- 三、技能释放结果列表更新 -----------------
@@ -424,10 +395,10 @@ function MY_Recount_DT.OnFrameBreathe()
 						or p[DK_REC_STAT_SKILL_TARGET.NZ_COUNT][SKILL_RESULT.CRITICAL] or 0,
 					nMax           = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_SKILL_TARGET.MAX_EFFECT] or p[DK_REC_STAT_SKILL_TARGET.MAX],
 					nTotal         = MY_Recount_UI.bShowEffect and p[DK_REC_STAT_SKILL_TARGET.TOTAL_EFFECT] or p[DK_REC_STAT_SKILL_TARGET.TOTAL],
-					szName         = IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id),
+					szName         = X.IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id),
 				}
 				if bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
-					insert(aResult, rec)
+					table.insert(aResult, rec)
 				end
 			end
 			nTotal = tData[DK_REC_STAT.SKILL][szSelected][MY_Recount_UI.bShowEffect and DK_REC_STAT_SKILL.TOTAL_EFFECT or DK_REC_STAT_SKILL.TOTAL]
@@ -451,12 +422,12 @@ function MY_Recount_DT.OnFrameBreathe()
 				}
 				if (bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0)
 				and (not MY_Recount_UI.bHideAnonymous or rec.szName:sub(1, 1) ~= '#') then
-					insert(aResult, rec)
+					table.insert(aResult, rec)
 				end
 			end
 			nTotal = tData[DK_REC_STAT.TARGET][szSelected][MY_Recount_UI.bShowEffect and DK_REC_STAT_TARGET.TOTAL_EFFECT or DK_REC_STAT_TARGET.TOTAL]
 		end
-		sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
+		table.sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
 		-- 界面重绘
 		this:Lookup('WndScroll_Target'):Show()
 		local hList = this:Lookup('WndScroll_Target', 'Handle_TargetList')
@@ -498,7 +469,7 @@ end
 function MY_Recount_DT.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
-		LIB.RegisterEsc(this:GetRoot():GetTreePath())
+		X.RegisterEsc(this:GetRoot():GetTreePath())
 		Wnd.CloseWindow(this:GetRoot())
 	elseif name == 'Btn_Switch' then
 		if this:GetRoot().szPrimarySort == DK_REC_STAT.SKILL then
@@ -536,7 +507,7 @@ function MY_Recount_DT.OnItemRButtonClick()
 		local menu = {}
 		menu.x, menu.y = Cursor.GetPos(true)
 		for _, k in ipairs(STAT_TYPE_LIST) do
-			insert(menu, {
+			table.insert(menu, {
 				szOption = STAT_TYPE_NAME[STAT_TYPE[k]],
 				fnAction = function()
 					Wnd.OpenWindow(SZ_INI, 'MY_Recount_DT#' .. szKey .. '_' .. STAT_TYPE[k])

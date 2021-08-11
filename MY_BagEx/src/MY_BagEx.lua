@@ -10,56 +10,27 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_BagEx'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_BagEx'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
+local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
@@ -82,7 +53,7 @@ local function GetItemText(item)
 			local szKey = item.dwTabType .. ',' .. item.dwIndex
 			if not l_tItemText[szKey] then
 				l_tItemText[szKey] = ''
-				l_tItemText[szKey] = LIB.GetPureText(LIB.GetItemTip(item), 'LUA')
+				l_tItemText[szKey] = X.GetPureText(X.GetItemTip(item), 'LUA')
 			end
 			return l_tItemText[szKey]
 		else
@@ -93,7 +64,7 @@ local function GetItemText(item)
 	end
 end
 
-local SimpleMatch = LIB.StringSimpleMatch
+local SimpleMatch = X.StringSimpleMatch
 local function FilterBags(szTreePath, szFilter, bTimeLtd)
 	if szFilter then
 		szFilter = szFilter:gsub('[%[%]]', '')
@@ -254,8 +225,8 @@ local function Hook()
 			placeholder = _L['Search'],
 			onchange = function(txt)
 				local nLen = txt:len()
-				nLen = max(nLen, 10)
-				nLen = min(nLen, 20)
+				nLen = math.max(nLen, 10)
+				nLen = math.min(nLen, 20)
 				UI(this):Width(nLen * 10)
 				l_szBagFilter = txt
 				DoFilterBag()
@@ -275,8 +246,8 @@ local function Hook()
 			placeholder = _L['Search'],
 			onchange = function(txt)
 				local nLen = txt:len()
-				nLen = max(nLen, 15)
-				nLen = min(nLen, 25)
+				nLen = math.max(nLen, 15)
+				nLen = math.min(nLen, 25)
 				UI(this):Width(nLen * 10)
 				l_szBankFilter = txt
 				DoFilterBank(true)
@@ -324,8 +295,8 @@ local function Hook()
 			placeholder = _L['Search'],
 			onchange = function(txt)
 				local nLen = txt:len()
-				nLen = max(nLen, 10)
-				nLen = min(nLen, 25)
+				nLen = math.max(nLen, 10)
+				nLen = math.min(nLen, 25)
 				UI(this):Width(nLen * 10)
 				l_szGuildBankFilter = txt
 				DoFilterGuildBank(true)
@@ -346,7 +317,7 @@ local function Hook()
 		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, { bHookReturn = true })
 	end
 
-	LIB.RegisterEvent('EXECUTE_BINDING', 'MY_BAGEX', function(e)
+	X.RegisterEvent('EXECUTE_BINDING', 'MY_BAGEX', function(e)
 		local szName, bDown = arg0, arg1
 		if Cursor.IsVisible()
 		and szName == 'OPENORCLOSEALLBAGS' and not bDown then
@@ -388,20 +359,20 @@ local function Unhook()
 		UnhookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown)
 	end
 
-	LIB.RegisterEvent('EXECUTE_BINDING', 'MY_BAGEX')
+	X.RegisterEvent('EXECUTE_BINDING', 'MY_BAGEX')
 end
 
 local function Apply(bEnable)
 	if bEnable then
 		Hook()
-		LIB.RegisterFrameCreate('BigBagPanel', 'MY_BAGEX', Hook)
-		LIB.RegisterFrameCreate('BigBankPanel', 'MY_BAGEX', Hook)
-		LIB.RegisterFrameCreate('GuildBankPanel', 'MY_BAGEX', Hook)
+		X.RegisterFrameCreate('BigBagPanel', 'MY_BAGEX', Hook)
+		X.RegisterFrameCreate('BigBankPanel', 'MY_BAGEX', Hook)
+		X.RegisterFrameCreate('GuildBankPanel', 'MY_BAGEX', Hook)
 	else
 		Unhook()
-		LIB.RegisterFrameCreate('BigBagPanel', 'MY_BAGEX', false)
-		LIB.RegisterFrameCreate('BigBankPanel', 'MY_BAGEX', false)
-		LIB.RegisterFrameCreate('GuildBankPanel', 'MY_BAGEX', false)
+		X.RegisterFrameCreate('BigBagPanel', 'MY_BAGEX', false)
+		X.RegisterFrameCreate('BigBankPanel', 'MY_BAGEX', false)
+		X.RegisterFrameCreate('GuildBankPanel', 'MY_BAGEX', false)
 	end
 end
 
@@ -422,22 +393,22 @@ local function OnBagItemUpdate()
 		DoFilterGuildBank()
 	end
 end
-LIB.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE', 'LOADING_END'}, function()
+X.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE', 'LOADING_END'}, function()
 	if not O.bEnable then
 		return
 	end
-	LIB.DelayCall('MY_BagEx', 100, OnBagItemUpdate)
+	X.DelayCall('MY_BagEx', 100, OnBagItemUpdate)
 end)
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_BAGEX', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_BAGEX', function()
 	Apply(O.bEnable)
 end)
-LIB.RegisterReload('MY_BAGEX', function() Apply(false) end)
+X.RegisterReload('MY_BAGEX', function() Apply(false) end)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 200,
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200,
 		text = _L['Package searcher'],
 		checked = O.bEnable,
 		oncheck = function(bChecked)
@@ -445,7 +416,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, deltaY)
 		end,
 	}):AutoWidth():Width() + 5
 	-- y = y + 25
-	return x, y
+	return nX, nY
 end
 
 -- Global exports
@@ -460,5 +431,5 @@ local settings = {
 		},
 	},
 }
-MY_BagEx = LIB.CreateModule(settings)
+MY_BagEx = X.CreateModule(settings)
 end

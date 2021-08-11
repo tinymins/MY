@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -66,25 +37,25 @@ local tChannels = {
 	{ nChannel = PLAYER_TALK_CHANNEL.RAID     , szName = _L['PTC_RAID_CHANNEL'  ], rgb = GetMsgFontColor('MSG_TEAM'  , true) },
 	{ nChannel = PLAYER_TALK_CHANNEL.TONG     , szName = _L['PTC_TONG_CHANNEL'  ], rgb = GetMsgFontColor('MSG_GUILD' , true) },
 }
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	ui:Append('WndButton', {
-		x = W - 130, y = 30, w = 120,
+		x = nW - 130, y = 30, w = 120,
 		text = _L['Check nearby gongzhan'],
 		onlclick = function()
-			if LIB.BreatheCall('MY_GongzhanCheck') then
-				LIB.BreatheCall('MY_GongzhanCheck', false)
+			if X.BreatheCall('MY_GongzhanCheck') then
+				X.BreatheCall('MY_GongzhanCheck', false)
 			else
 				-- 逻辑：两次遍历附近的人 第一次同步数据 第二次输出数据
 				local nChannel = O.nGongzhanPublishChannel or PLAYER_TALK_CHANNEL.LOCAL_SYS
-				local dwTarType, dwTarID = LIB.GetTarget()
-				local aPendingID = LIB.GetNearPlayerID() -- 等待扫描的玩家
-				local aProcessID = Clone(aPendingID) -- 等待输出的玩家
+				local dwTarType, dwTarID = X.GetTarget()
+				local aPendingID = X.GetNearPlayerID() -- 等待扫描的玩家
+				local aProcessID = X.Clone(aPendingID) -- 等待输出的玩家
 				local aGongZhan = {} -- 扫描到的共战数据
 				local nCount, nIndex = #aPendingID, 1
 				local function Echo(nIndex, nCount)
-					LIB.Topmsg(_L('Scanning gongzhan: %d/%d', nIndex, nCount))
+					X.Topmsg(_L('Scanning gongzhan: %d/%d', nIndex, nCount))
 				end
-				LIB.RenderCall('MY_GongzhanCheck', function()
+				X.RenderCall('MY_GongzhanCheck', function()
 					local bTermial, bStep
 					if nIndex <= nCount then -- 获取下一个有效的扫描目标
 						local dwID = aPendingID[nIndex]
@@ -96,9 +67,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 							tar = GetPlayer(dwID)
 						end
 						if tar then
-							local dwType, dwID = LIB.GetTarget()
+							local dwType, dwID = X.GetTarget()
 							if dwType ~= TARGET.PLAYER or dwID ~= tar.dwID then -- 设置目标同步BUFF数据
-								LIB.SetTarget(TARGET.PLAYER, tar.dwID)
+								X.SetTarget(TARGET.PLAYER, tar.dwID)
 							else
 								Echo(nIndex, nCount * 2 + 1)
 								nIndex = nIndex + 1
@@ -114,18 +85,18 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 							tar = GetPlayer(dwID)
 						end
 						if tar then
-							local dwType, dwID = LIB.GetTarget()
+							local dwType, dwID = X.GetTarget()
 							if dwType ~= TARGET.PLAYER or dwID ~= tar.dwID then -- 先设置目标才能获取BUFF数据
-								LIB.SetTarget(TARGET.PLAYER, tar.dwID)
+								X.SetTarget(TARGET.PLAYER, tar.dwID)
 							else
 								-- 检测是否有共战
-								local aBuff, nBuffCount, buff = LIB.GetBuffList(tar)
+								local aBuff, nBuffCount, buff = X.GetBuffList(tar)
 								for i = 1, nBuffCount do
 									buff = aBuff[i]
-									if (not buff.bCanCancel) and find(Table_GetBuffName(buff.dwID, buff.nLevel), _L['GongZhan']) ~= nil then
+									if (not buff.bCanCancel) and string.find(Table_GetBuffName(buff.dwID, buff.nLevel), _L['GongZhan']) ~= nil then
 										local info = Table_GetBuff(buff.dwID, buff.nLevel)
 										if info and info.bShow ~= 0 then
-											insert(aGongZhan, { szName = tar.szName, nTime = (buff.nEndFrame - GetLogicFrameCount()) / 16 })
+											table.insert(aGongZhan, { szName = tar.szName, nTime = (buff.nEndFrame - GetLogicFrameCount()) / 16 })
 										end
 									end
 								end
@@ -135,13 +106,13 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 						end
 					else
 						Echo(nIndex, nCount * 2 + 1)
-						LIB.SendChat(nChannel, _L['------------------------------------'])
+						X.SendChat(nChannel, _L['------------------------------------'])
 						for _, r in ipairs(aGongZhan) do
-							LIB.SendChat(nChannel, _L('Detected [%s] has GongZhan buff for %s.', r.szName, LIB.FormatTimeCounter(r.nTime, nil, 2)))
+							X.SendChat(nChannel, _L('Detected [%s] has GongZhan buff for %s.', r.szName, X.FormatTimeCounter(r.nTime, nil, 2)))
 						end
-						LIB.SendChat(nChannel, _L('Nearby GongZhan Total Count: %d.', #aGongZhan))
-						LIB.SendChat(nChannel, _L['------------------------------------'])
-						LIB.SetTarget(dwTarType, dwTarID)
+						X.SendChat(nChannel, _L('Nearby GongZhan Total Count: %d.', #aGongZhan))
+						X.SendChat(nChannel, _L['------------------------------------'])
+						X.SetTarget(dwTarType, dwTarID)
 						return 0
 					end
 				end)
@@ -150,7 +121,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 		rmenu = function()
 			local t = { { szOption = _L['send to ...'], bDisable = true }, { bDevide = true } }
 			for _, tChannel in ipairs(tChannels) do
-				insert( t, {
+				table.insert( t, {
 					szOption = tChannel.szName,
 					rgb = tChannel.rgb,
 					bCheck = true, bMCheck = true, bChecked = O.nGongzhanPublishChannel == tChannel.nChannel,
@@ -162,7 +133,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			return t
 		end,
 	})
-	return x, y
+	return nX, nY
 end
 
 -- Global exports
@@ -177,5 +148,5 @@ local settings = {
 		},
 	},
 }
-MY_GongzhanCheck = LIB.CreateModule(settings)
+MY_GongzhanCheck = X.CreateModule(settings)
 end

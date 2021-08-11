@@ -10,50 +10,21 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_ChatLog'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatLog'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_ChatLog.RealtimeCommit', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_ChatLog.RealtimeCommit', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local D = {}
@@ -94,7 +65,7 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 ]]
 
 	for k, v in pairs(g_tStrings.tForceTitle) do
-		szHeader = szHeader .. ('.force-%s{color:#%02X%02X%02X}'):format(k, LIB.GetForceColor(k, 'foreground'))
+		szHeader = szHeader .. ('.force-%s{color:#%02X%02X%02X}'):format(k, X.GetForceColor(k, 'foreground'))
 	end
 
 	szHeader = szHeader .. [[
@@ -157,8 +128,8 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 	})();
 </script>
 <div>
-<a style='color: #fff;margin: 0 10px'>]] .. GetClientPlayer().szName .. ' @ ' .. LIB.GetServer() ..
-' Exported at ' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd %hh:%mm:%ss') .. '</a><hr />'
+<a style='color: #fff;margin: 0 10px'>]] .. GetClientPlayer().szName .. ' @ ' .. X.GetServer() ..
+' Exported at ' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd %hh:%mm:%ss') .. '</a><hr />'
 
 	return szHeader
 end
@@ -179,52 +150,52 @@ local function getDateTitle(szDate)
 end
 
 local function convertXml2Html(szXml)
-	local aXMLNode = LIB.XMLDecode(szXml)
+	local aXMLNode = X.XMLDecode(szXml)
 	local t = {}
 	if aXMLNode then
 		local text, name, force, r, g, b
 		for _, node in ipairs(aXMLNode) do
-			text = LIB.XMLGetNodeData(node, 'text')
-			name = LIB.XMLGetNodeData(node, 'name')
+			text = X.XMLGetNodeData(node, 'text')
+			name = X.XMLGetNodeData(node, 'name')
 			if text then
 				text = htmlEncode(text)
 				force = nil
-				insert(t, '<a')
+				table.insert(t, '<a')
 				if name and name:sub(1, 9) == 'namelink_' then
-					insert(t, ' class="namelink')
+					table.insert(t, ' class="namelink')
 					if MY_Farbnamen and MY_Farbnamen.Get then
 						local info = MY_Farbnamen.Get((text:gsub('[%[%]]', '')))
 						if info then
 							force = info.dwForceID
-							insert(t, ' force-')
-							insert(t, info.dwForceID)
+							table.insert(t, ' force-')
+							table.insert(t, info.dwForceID)
 						end
 					end
-					insert(t, '"')
+					table.insert(t, '"')
 				end
-				r = LIB.XMLGetNodeData(node, 'r')
-				g = LIB.XMLGetNodeData(node, 'g')
-				b = LIB.XMLGetNodeData(node, 'b')
+				r = X.XMLGetNodeData(node, 'r')
+				g = X.XMLGetNodeData(node, 'g')
+				b = X.XMLGetNodeData(node, 'b')
 				if not force and r and g and b then
-					insert(t, (' style="color:#%02X%02X%02X"'):format(r, g, b))
+					table.insert(t, (' style="color:#%02X%02X%02X"'):format(r, g, b))
 				end
-				insert(t, '>')
-				insert(t, text)
-				insert(t, '</a>')
+				table.insert(t, '>')
+				table.insert(t, text)
+				table.insert(t, '</a>')
 			elseif name and name:sub(1, 8) == 'emotion_' then
-				insert(t, '<span class="')
-				insert(t, name)
-				insert(t, '"></span>')
+				table.insert(t, '<span class="')
+				table.insert(t, name)
+				table.insert(t, '"></span>')
 			end
 		end
 	end
-	return concat(t)
+	return table.concat(t)
 end
 
 local l_bExporting
 function D.ExportConfirm()
 	if l_bExporting then
-		return LIB.Sysmsg(_L['Already exporting, please wait.'])
+		return X.Sysmsg(_L['Already exporting, please wait.'])
 	end
 	local ui = UI.CreateFrame('MY_ChatLog_Export', {
 		simple = true, esc = true, close = true, w = 140,
@@ -254,7 +225,7 @@ function D.ExportConfirm()
 				btnSure:Enable(bEnable)
 			end,
 		}):AutoWidth():Width()
-		nMaxWidth = max(nMaxWidth, x + nPaddingX)
+		nMaxWidth = math.max(nMaxWidth, x + nPaddingX)
 		if nGroup % 2 == 0 or nGroup == #LOG_TYPE then
 			x = nPaddingX
 			y = y + 30
@@ -271,19 +242,19 @@ function D.ExportConfirm()
 		text = _L['Export chatlog'],
 		onclick = function()
 			if GLOBAL.GAME_PROVIDER == 'remote' then
-				return LIB.Alert(_L['Streaming client does not support export!'])
+				return X.Alert(_L['Streaming client does not support export!'])
 			end
 			local function doExport(szSuffix)
 				local aChannels = {}
 				for nGroup, info in ipairs(LOG_TYPE) do
 					if tChannels[nGroup] then
 						for _, szChannel in ipairs(info.aChannel) do
-							insert(aChannels, szChannel)
+							table.insert(aChannels, szChannel)
 						end
 					end
 				end
 				D.Export(
-					LIB.FormatPath({'export/ChatLog/{$name}@{$server}@' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. szSuffix, PATH_TYPE.ROLE}),
+					X.FormatPath({'export/ChatLog/{$name}@{$server}@' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. szSuffix, X.PATH_TYPE.ROLE}),
 					aChannels, 10,
 					function(title, progress)
 						OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Exporting chatlog: %s, %.2f%%.', title, progress * 100))
@@ -291,7 +262,7 @@ function D.ExportConfirm()
 				)
 				ui:Remove()
 			end
-			LIB.Dialog(
+			X.Dialog(
 				_L['Please choose export mode.\nHTML mode will export chatlog to human-readable file.\nDB mode will export chatlog to re-importable backup file.'], {
 					{ szOption = _L['HTML mode'], fnAction = function() doExport('.html') end },
 					{ szOption = _L['DB mode'], fnAction = function() doExport('.db') end },
@@ -305,7 +276,7 @@ end
 
 function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 	if l_bExporting then
-		return LIB.Sysmsg(_L['Already exporting, please wait.'])
+		return X.Sysmsg(_L['Already exporting, please wait.'])
 	end
 	local ds = MY_ChatLog_DS(MY_ChatLog.GetRoot())
 	if not ds then
@@ -320,18 +291,18 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 			return
 		end
 		db:SetMinTime(0)
-		db:SetMaxTime(HUGE)
+		db:SetMaxTime(math.huge)
 		db:SetInfo('user_global_id', GetClientPlayer().GetGlobalID())
 		l_bExporting = true
 
-		local nPage, nPageCount = 0, ceil(ds:CountMsg(aChannels, '') / EXPORT_SLICE)
+		local nPage, nPageCount = 0, math.ceil(ds:CountMsg(aChannels, '') / EXPORT_SLICE)
 		local function Export()
 			if nPage > nPageCount then
 				l_bExporting = false
 				db:Disconnect()
 				local szFile = GetRootPath() .. szExportFile:gsub('/', '\\')
-				LIB.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
-				LIB.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
+				X.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
+				X.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0
 			end
 			local data = ds:SelectMsg(aChannels, '', nil, nil, nPage * EXPORT_SLICE, EXPORT_SLICE, true)
@@ -344,15 +315,15 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 			db:Flush()
 			nPage = nPage + 1
 		end
-		LIB.BreatheCall('MY_ChatLog_Export', Export)
+		X.BreatheCall('MY_ChatLog_Export', Export)
 	elseif szExportFile:sub(-5) == '.html' then
 		local status = Log(szExportFile, getHeader(), 'clear')
 		if status ~= 'SUCCEED' then
-			return LIB.Sysmsg(_L('Error: open file error %s [%s]', szExportFile, status))
+			return X.Sysmsg(_L('Error: open file error %s [%s]', szExportFile, status))
 		end
 		l_bExporting = true
 
-		local nPage, nPageCount = 0, ceil(ds:CountMsg(aChannels, '') / EXPORT_SLICE)
+		local nPage, nPageCount = 0, math.ceil(ds:CountMsg(aChannels, '') / EXPORT_SLICE)
 		local function Export()
 			if nPage > nPageCount then
 				l_bExporting = false
@@ -361,15 +332,15 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 					onProgress(_L['Export succeed'], 1)
 				end
 				local szFile = GetRootPath() .. szExportFile:gsub('/', '\\')
-				LIB.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
-				LIB.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
+				X.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
+				X.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0
 			end
 			local data = ds:SelectMsg(aChannels, '', nil, nil, nPage * EXPORT_SLICE, EXPORT_SLICE)
 			for i, rec in ipairs(data) do
 				local f = GetMsgFont(rec.szChannel)
 				local r, g, b = unpack(MSGTYPE_COLOR[rec.szChannel])
-				Log(szExportFile, convertXml2Html(LIB.GetChatTimeXML(rec.nTime, {r=r, g=g, b=b, f=f, s='[%yyyy/%MM/%dd][%hh:%mm:%ss]'})))
+				Log(szExportFile, convertXml2Html(X.GetChatTimeXML(rec.nTime, {r=r, g=g, b=b, f=f, s='[%yyyy/%MM/%dd][%hh:%mm:%ss]'})))
 				Log(szExportFile, convertXml2Html(rec.szMsg))
 			end
 			if onProgress then
@@ -377,7 +348,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 			end
 			nPage = nPage + 1
 		end
-		LIB.BreatheCall('MY_ChatLog_Export', Export)
+		X.BreatheCall('MY_ChatLog_Export', Export)
 	else
 		onProgress(_L['Export failed, unknown suffix.'], 1)
 	end
@@ -421,7 +392,7 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + dy
 
-	if not LIB.IsRestricted('MY_ChatLog.RealtimeCommit') then
+	if not X.IsRestricted('MY_ChatLog.RealtimeCommit') then
 		ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = wr,
 			text = _L['Realtime database commit'],
@@ -475,10 +446,10 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = 125, h = 35,
 		text = _L['Optimize datebase'],
 		onclick = function()
-			LIB.Confirm(_L['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
-				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+			X.Confirm(_L['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
+				X.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 					MY_ChatLog.OptimizeDB()
-					LIB.Alert(_L['Optimize finished!'])
+					X.Alert(_L['Optimize finished!'])
 				end)
 			end)
 		end,
@@ -489,21 +460,21 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = 125, h = 35,
 		text = _L['Import chatlog'],
 		onclick = function()
-			local szRoot = LIB.FormatPath({'export/ChatLog', PATH_TYPE.ROLE})
+			local szRoot = X.FormatPath({'export/ChatLog', X.PATH_TYPE.ROLE})
 			if not IsLocalFileExist(szRoot) then
-				szRoot = LIB.FormatPath({'export/', PATH_TYPE.ROLE})
+				szRoot = X.FormatPath({'export/', X.PATH_TYPE.ROLE})
 			end
 			if not IsLocalFileExist(szRoot) then
-				szRoot = LIB.FormatPath({'userdata/', PATH_TYPE.ROLE})
+				szRoot = X.FormatPath({'userdata/', X.PATH_TYPE.ROLE})
 			end
 			local file = GetOpenFileName(_L['Please select your chatlog database file.'], 'Database File(*.db)\0*.db\0\0', szRoot)
-			if not IsEmpty(file) then
-				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
-						LIB.Alert(_L('%d chatlogs imported!', MY_ChatLog.ImportDB(file)))
+			if not X.IsEmpty(file) then
+				X.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+						X.Alert(_L('%d chatlogs imported!', MY_ChatLog.ImportDB(file)))
 				end)
 			end
 		end,
 	})
 	nY = nY + dy
 end
-LIB.RegisterPanel(_L['Chat'], 'ChatLog', _L['MY_ChatLog'], 'ui/Image/button/SystemButton.UITex|43', PS)
+X.RegisterPanel(_L['Chat'], 'ChatLog', _L['MY_ChatLog'], 'ui/Image/button/SystemButton.UITex|43', PS)

@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -87,13 +58,13 @@ end
 
 -- 注册子模块
 function D.RegisterModule(szID, szName, env)
-	for i, v in ipairs_r(D.aModule) do
+	for i, v in X.ipairs_r(D.aModule) do
 		if v.szID == szID then
-			remove(D.aModule, i)
+			table.remove(D.aModule, i)
 		end
 	end
 	if szName and env then
-		insert(D.aModule, {
+		table.insert(D.aModule, {
 			szID = szID,
 			szName = szName,
 			env = env,
@@ -169,32 +140,32 @@ function Framework.OnLButtonClick()
 		}
 		for _, m in ipairs(D.aModule) do
 			if m and m.env.szFloatEntry then
-				insert(tFloatEntryMenu, {
+				table.insert(tFloatEntryMenu, {
 					szOption = m.szName,
-					bCheck = true, bChecked = Get(_G, m.env.szFloatEntry),
+					bCheck = true, bChecked = X.Get(_G, m.env.szFloatEntry),
 					fnAction = function()
-						Set(_G, m.env.szFloatEntry, not Get(_G, m.env.szFloatEntry))
+						X.Set(_G, m.env.szFloatEntry, not X.Get(_G, m.env.szFloatEntry))
 					end,
 				})
 			end
 		end
 		if #tFloatEntryMenu > 0 then
-			insert(menu, tFloatEntryMenu)
+			table.insert(menu, tFloatEntryMenu)
 		end
 		local tSaveDBMenu = { szOption = _L['Save DB'] }
 		for _, m in ipairs(D.aModule) do
 			if m and m.env.szSaveDB then
-				insert(tSaveDBMenu, {
+				table.insert(tSaveDBMenu, {
 					szOption = m.szName,
-					bCheck = true, bChecked = Get(_G, m.env.szSaveDB),
+					bCheck = true, bChecked = X.Get(_G, m.env.szSaveDB),
 					fnAction = function()
-						Set(_G, m.env.szSaveDB, not Get(_G, m.env.szSaveDB))
+						X.Set(_G, m.env.szSaveDB, not X.Get(_G, m.env.szSaveDB))
 					end,
 				})
 			end
 		end
 		if #tSaveDBMenu > 0 then
-			insert(menu, tSaveDBMenu)
+			table.insert(menu, tSaveDBMenu)
 		end
 		if #menu > 0 then
 			local nX, nY = this:GetAbsPos()
@@ -239,7 +210,7 @@ function Framework.OnFrameCreate()
 	D.InitPageSet(this)
 	this:BringToTop()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' - ' .. _L['MY_RoleStatistics'])
+	this:Lookup('', 'Text_Title'):SetText(X.PACKET_INFO.NAME .. ' - ' .. _L['MY_RoleStatistics'])
 	PlaySound(SOUND.UI_SOUND,g_sound.OpenFrame)
 end
 
@@ -361,7 +332,7 @@ local settings = {
 		},
 	},
 }
-MY_RoleStatistics = LIB.CreateModule(settings)
+MY_RoleStatistics = X.CreateModule(settings)
 end
 
 do
@@ -369,9 +340,9 @@ local menu = {
 	szOption = _L['MY_RoleStatistics'],
 	fnAction = function() D.Toggle() end,
 }
-LIB.RegisterAddonMenu('MY_RoleStatistics', menu)
+X.RegisterAddonMenu('MY_RoleStatistics', menu)
 end
-LIB.RegisterHotKey('MY_RoleStatistics', _L['Open/Close MY_RoleStatistics'], D.Toggle, nil)
+X.RegisterHotKey('MY_RoleStatistics', _L['Open/Close MY_RoleStatistics'], D.Toggle, nil)
 
 --------------------------------------------------------------------------
 -- 设置界面
@@ -393,10 +364,10 @@ function PS.OnPanelActive(wnd)
 	local aFloatEntry, aSaveDB = {}, {}
 	for _, m in ipairs(D.aModule) do
 		if m and m.env.szFloatEntry then
-			insert(aFloatEntry, { szName = m.szName, szKey = m.env.szFloatEntry })
+			table.insert(aFloatEntry, { szName = m.szName, szKey = m.env.szFloatEntry })
 		end
 		if m and m.env.szSaveDB then
-			insert(aSaveDB, { szName = m.szName, szKey = m.env.szSaveDB })
+			table.insert(aSaveDB, { szName = m.szName, szKey = m.env.szSaveDB })
 		end
 	end
 	if #aFloatEntry > 0 then
@@ -408,9 +379,9 @@ function PS.OnPanelActive(wnd)
 		for _, p in ipairs(aFloatEntry) do
 			nX = nX + ui:Append('WndCheckBox', {
 				x = nX, y = nY, w = 200,
-				text = p.szName, checked = Get(_G, p.szKey),
+				text = p.szName, checked = X.Get(_G, p.szKey),
 				oncheck = function(bChecked)
-					Set(_G, p.szKey, bChecked)
+					X.Set(_G, p.szKey, bChecked)
 				end,
 			}):AutoWidth():Width() + 5
 		end
@@ -425,9 +396,9 @@ function PS.OnPanelActive(wnd)
 		for _, p in ipairs(aSaveDB) do
 			nX = nX + ui:Append('WndCheckBox', {
 				x = nX, y = nY, w = 200,
-				text = p.szName, checked = Get(_G, p.szKey),
+				text = p.szName, checked = X.Get(_G, p.szKey),
 				oncheck = function(bChecked)
-					Set(_G, p.szKey, bChecked)
+					X.Set(_G, p.szKey, bChecked)
 				end,
 			}):AutoWidth():Width() + 5
 		end
@@ -440,4 +411,4 @@ function PS.OnPanelActive(wnd)
 	nX = nPaddingX + 10
 	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['MY_RoleStatistics TIPS'], font = 27, multiline = true, valign = 0 })
 end
-LIB.RegisterPanel(_L['General'], 'MY_RoleStatistics', _L['MY_RoleStatistics'], 13491, PS)
+X.RegisterPanel(_L['General'], 'MY_RoleStatistics', _L['MY_RoleStatistics'], 13491, PS)

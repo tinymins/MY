@@ -10,470 +10,441 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Cataclysm'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	eCss = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	eFrameStyle = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = 'CATACLYSM',
 	},
 	bDrag = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowInRaid = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bEditMode = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowAllGrid = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAnchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'LEFTCENTER', r = 'LEFTCENTER', x = 100, y = -200 },
 	},
 	nAutoLinkMode = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 5,
 	},
 	nBGColorMode = { -- 0 不着色 1 根据距离 2 根据门派
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nColoredName = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nNameVAlignment = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nNameHAlignment = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nHPShownMode2 = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	nHPShownNumMode = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 3,
 	},
 	nHPVAlignment = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	nHPHAlignment = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	bShowHPDecimal = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBuffAboveMana = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nShowMP = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bHPHitAlert = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nShowIcon = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	bShowDistance = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowBossTarget = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowBossFocus = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bEnableDistance = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowTargetTargetAni = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nNameFont = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 40,
 	},
 	nLifeFont = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 15,
 	},
 	nManaFont = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 190,
 	},
 	fNameFontScale = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1.05,
 	},
 	fLifeFontScale = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1.05,
 	},
 	fManaFontScale = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nMaxShowBuff = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 4,
 	},
 	bLifeGradient = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bManaGradient = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nAlpha = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 220,
 	},
 	fBuffScale = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	bAutoBuffSize = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAltView = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAltViewInFight = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bHideTipInFight = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowTipAtRightBottom = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTempTargetEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nTempTargetDelay = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	fScaleX = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1.1,
 	},
 	fScaleY = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1.0,
 	},
 	bFasterHP = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bStaring = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowBuffTime = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowBuffNum = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowBuffReminder = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBuffAltPublish = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBuffPushToOfficial = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBuffDataTeamMon = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowAttention = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowCaution = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowScreenHead = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowGroupNumber = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowEffect = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false, -- 五毒醉舞提示 万花距离提示 晚点做
 	},
 	bShowSputtering = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tSputteringFontColor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 79, 255, 108 },
 	},
 	nSputteringFontAlpha = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 192,
 	},
 	tSputteringShadowColor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 79, 255, 108 },
 	},
 	nSputteringShadowAlpha = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 192,
 	},
 	nSputteringDistance = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 15,
 	},
 	aBuffList = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Map(Schema.Number, Schema.Any),
+		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Any),
 		xDefaultValue = {},
 	},
 	tDistanceLevel = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Map(Schema.Number, Schema.Number),
+		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 20, 22, 200 },
 	},
 	tManaColor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 0, 96, 255 },
 	},
 	tDistanceCol = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Map(Schema.Number, Schema.Tuple(Schema.Number, Schema.Number, Schema.Number)),
+		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {
 			{ 0,   180, 52  }, -- 绿
 			{ 0,   180, 52  }, -- 绿
@@ -484,9 +455,9 @@ local O = LIB.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 		},
 	},
 	tOtherCol = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Map(Schema.Number, Schema.Tuple(Schema.Number, Schema.Number, Schema.Number)),
+		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {
 			{ 255, 255, 255 },
 			{ 110, 110, 110 },
@@ -494,9 +465,9 @@ local O = LIB.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 		},
 	},
 	tDistanceAlpha = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Map(Schema.Number, Schema.Number),
+		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Number),
 		xDefaultValue = {
 			255,
 			255,
@@ -504,9 +475,9 @@ local O = LIB.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 		},
 	},
 	tOtherAlpha = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = {
 			0,
 			255, -- 不在线
@@ -529,64 +500,64 @@ local D = {
 function D.EncodeBuffRule(v, bNoBasic)
 	local a = {}
 	if not bNoBasic then
-		insert(a, v.szName or v.dwID)
+		table.insert(a, v.szName or v.dwID)
 		if v.nLevel then
-			insert(a, 'lv' .. v.nLevel)
+			table.insert(a, 'lv' .. v.nLevel)
 		end
 	end
 	if v.nStackNum then
-		insert(a, 'sn' .. (v.szStackOp or '>=') .. v.nStackNum)
+		table.insert(a, 'sn' .. (v.szStackOp or '>=') .. v.nStackNum)
 	end
 	if v.bOnlyMe then
-		insert(a, 'me')
+		table.insert(a, 'me')
 	end
 	if v.bOnlyMine or v.bOnlySelf or v.bSelf then
-		insert(a, 'mine')
+		table.insert(a, 'mine')
 	end
-	a = { concat(a, '|') }
+	a = { table.concat(a, '|') }
 
 	if v.col then
 		local cols = { v.col }
 		if v.nColAlpha and v.col:sub(1, 1) ~= '#' then
-			insert(cols, v.nColAlpha)
+			table.insert(cols, v.nColAlpha)
 		end
-		insert(a, '[' .. concat(cols, '|') .. ']')
+		table.insert(a, '[' .. table.concat(cols, '|') .. ']')
 	end
-	if not IsEmpty(v.szReminder) then
-		insert(a, '(' .. v.szReminder .. ')')
+	if not X.IsEmpty(v.szReminder) then
+		table.insert(a, '(' .. v.szReminder .. ')')
 	end
 	if v.nPriority then
-		insert(a, '#' .. v.nPriority)
+		table.insert(a, '#' .. v.nPriority)
 	end
 	if v.bAttention then
-		insert(a, '!!')
+		table.insert(a, '!!')
 	end
 	if v.bCaution then
-		insert(a, '!!!')
+		table.insert(a, '!!!')
 	end
 	if v.bScreenHead then
 		if v.colScreenHead then
-			insert(a, '!!!!|[' .. v.colScreenHead .. ']')
+			table.insert(a, '!!!!|[' .. v.colScreenHead .. ']')
 		else
-			insert(a, '!!!!')
+			table.insert(a, '!!!!')
 		end
 	end
 	if v.bDelete then
-		insert(a, '-')
+		table.insert(a, '-')
 	end
-	return concat(a, ',')
+	return table.concat(a, ',')
 end
 
 function D.DecodeBuffRule(line)
-	line = LIB.TrimString(line)
+	line = X.TrimString(line)
 	if line ~= '' then
 		local tab = {}
-		local vals = LIB.SplitString(line, ',')
+		local vals = X.SplitString(line, ',')
 		for i, val in ipairs(vals) do
 			if i == 1 then
-				local vs = LIB.SplitString(val, '|')
+				local vs = X.SplitString(val, '|')
 				for j, v in ipairs(vs) do
-					v = LIB.TrimString(v)
+					v = X.TrimString(v)
 					if v ~= '' then
 						if j == 1 then
 							tab.dwID = tonumber(v)
@@ -614,7 +585,7 @@ function D.DecodeBuffRule(line)
 				tab.bCaution = true
 			elseif val == '!!!!' or val:sub(1, 5) == '!!!!|' then
 				tab.bScreenHead = true
-				local vs = LIB.SplitString(val, '|')
+				local vs = X.SplitString(val, '|')
 				for _, v in ipairs(vs) do
 					if v:sub(1, 1) == '[' and v:sub(-1, -1) == ']' then
 						tab.colScreenHead = v:sub(2, -2)
@@ -629,7 +600,7 @@ function D.DecodeBuffRule(line)
 				if val:sub(1, 1) == '#' then
 					tab.col = val
 				else
-					local vs = LIB.SplitString(val, '|')
+					local vs = X.SplitString(val, '|')
 					tab.col = vs[1]
 					tab.nColAlpha = vs[2] and tonumber(vs[2])
 				end
@@ -653,7 +624,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		if not bHideBase and not rec.dwID and (not rec.szName or rec.szName == '') then
 			onChangeNotify()
 		end
-		SafeCall(onCloseNotify)
+		X.SafeCall(onCloseNotify)
 	end)
 	local nPaddingX, nPaddingY = 25, 60
 	local x, y = nPaddingX, nPaddingY
@@ -715,7 +686,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 				end,
 			}}
 			for _, op in ipairs({ '>=', '=', '!=', '<', '<=', '>', '>=' }) do
-				insert(menu, {
+				table.insert(menu, {
 					szOption = op,
 					fnAction = function()
 						rec.szStackOp = op
@@ -818,13 +789,13 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('Shadow', {
 		x = x, y = y + 2, w = 22, h = 22,
-		color = rec.col and {LIB.HumanColor2RGB(rec.col)} or {255, 255, 0},
+		color = rec.col and {X.HumanColor2RGB(rec.col)} or {255, 255, 0},
 		onlclick = function()
 			local this = this
 			UI.OpenColorPicker(function(r, g, b)
-				local a = rec.col and select(4, LIB.Hex2RGB(rec.col)) or 255
+				local a = rec.col and select(4, X.Hex2RGB(rec.col)) or 255
 				rec.nColAlpha = a
-				rec.col = LIB.RGB2Hex(r, g, b, a)
+				rec.col = X.RGB2Hex(r, g, b, a)
 				UI(this):Color(r, g, b)
 				onChangeNotify(rec)
 			end)
@@ -840,11 +811,11 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	}):Width() + 5
 	x = x + ui:Append('Shadow', {
 		x = x, y = y + 2, w = 22, h = 22,
-		color = rec.colScreenHead and {LIB.HumanColor2RGB(rec.colScreenHead)} or {255, 255, 0},
+		color = rec.colScreenHead and {X.HumanColor2RGB(rec.colScreenHead)} or {255, 255, 0},
 		onlclick = function()
 			local this = this
 			UI.OpenColorPicker(function(r, g, b)
-				rec.colScreenHead = LIB.RGB2Hex(r, g, b)
+				rec.colScreenHead = X.RGB2Hex(r, g, b)
 				UI(this):Color(r, g, b)
 				onChangeNotify(rec)
 			end)
@@ -870,12 +841,12 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		x = x, y = y, text = '',
 		range = {0, 255},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		value = rec.col and select(4, LIB.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
+		value = rec.col and select(4, X.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
 		onchange = function(nVal)
 			if rec.col then
-				local r, g, b = LIB.Hex2RGB(rec.col)
+				local r, g, b = X.Hex2RGB(rec.col)
 				if r and g and b then
-					rec.col = LIB.RGB2Hex(r, g, b, nVal)
+					rec.col = X.RGB2Hex(r, g, b, nVal)
 				end
 			end
 			rec.nColAlpha = nVal
@@ -929,7 +900,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 				ui:Remove()
 			end
 			if rec.dwID or (rec.szName and rec.szName ~= '') then
-				LIB.Confirm(_L('Delete [%s]?', rec.szName or rec.dwID), fnAction)
+				X.Confirm(_L('Delete [%s]?', rec.szName or rec.dwID), fnAction)
 			else
 				fnAction()
 			end
@@ -983,5 +954,5 @@ local settings = {
 		},
 	},
 }
-MY_Cataclysm = LIB.CreateModule(settings)
+MY_Cataclysm = X.CreateModule(settings)
 end

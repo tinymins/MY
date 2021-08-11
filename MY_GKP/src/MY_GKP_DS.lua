@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -81,7 +52,7 @@ local function GetCache(DATA)
 end
 
 function DS:ctor(szFilePath)
-	local t = LIB.LoadLUAData(szFilePath)
+	local t = X.LoadLUAData(szFilePath)
 	if t then
 		self.DATA = {
 			GKP_Map = t.GKP_Map or '',
@@ -117,7 +88,7 @@ end
 
 -- 数据存盘
 function DS:SaveData()
-	LIB.SaveLUAData(self:GetFilePath(), {
+	X.SaveLUAData(self:GetFilePath(), {
 		GKP_Map = self.DATA.GKP_Map,
 		GKP_Time = self.DATA.GKP_Time,
 		GKP_Record = self.DATA.GKP_Record,
@@ -127,14 +98,14 @@ end
 
 -- 下一帧存盘
 function DS:DelaySaveData()
-	LIB.DelayCall('MY_GKP_DS__DelaySaveData#' .. self:GetFilePath(), function()
+	X.DelayCall('MY_GKP_DS__DelaySaveData#' .. self:GetFilePath(), function()
 		self:SaveData()
 	end)
 end
 
 -- 下一帧发送更新事件
 function DS:DelayFireUpdate(szType)
-	LIB.DelayCall('MY_GKP_DS__DelayFireUpdate#' .. self:GetFilePath() .. '#' .. szType, function()
+	X.DelayCall('MY_GKP_DS__DelayFireUpdate#' .. self:GetFilePath() .. '#' .. szType, function()
 		FireUIEvent('MY_GKP_DATA_UPDATE', self:GetFilePath(), szType)
 	end)
 end
@@ -146,7 +117,7 @@ end
 
 -- 设置时间
 function DS:SetTime(nTime)
-	if IsNumber(nTime) and nTime ~= self.DATA.GKP_Time then
+	if X.IsNumber(nTime) and nTime ~= self.DATA.GKP_Time then
 		self.DATA.GKP_Time = nTime
 		self:DelaySaveData()
 		self:DelayFireUpdate('TIME')
@@ -160,7 +131,7 @@ end
 
 -- 设置地图
 function DS:SetMap(szMap)
-	if IsString(szMap) and szMap ~= self.DATA.GKP_Map then
+	if X.IsString(szMap) and szMap ~= self.DATA.GKP_Map then
 		self.DATA.GKP_Map = szMap
 		self:DelaySaveData()
 		self:DelayFireUpdate('MAP')
@@ -174,9 +145,9 @@ end
 
 -- 设置、修改拍卖记录
 function DS:SetAuctionRec(rec)
-	local rec = Clone(rec)
+	local rec = X.Clone(rec)
 	if not rec.key then
-		rec.key = LIB.GetUUID()
+		rec.key = X.GetUUID()
 	end
 	local nIndex = self.CACHE.GKP_Record_Index[rec.key]
 		or (#self.DATA.GKP_Record + 1)
@@ -196,10 +167,10 @@ end
 
 -- 替换拍卖记录
 function DS:SetAuctionList(aList)
-	local aList = Clone(aList)
+	local aList = X.Clone(aList)
 	for _, rec in ipairs(aList) do
 		if not rec.key then
-			rec.key = LIB.GetUUID()
+			rec.key = X.GetUUID()
 		end
 	end
 	self.DATA.GKP_Record = aList
@@ -227,7 +198,7 @@ function DS:GetAuctionPlayerSum(bAccurate)
 			local nMoney = tonumber(v.nMoney)
 			if nMoney > 0 then
 				if v.bSystem and v.dwIndex == 0 and tArrears[v.szPlayer] then -- 系统金团同步来的追加 优先抵冲分配者记录欠款投币
-					local nOffset = min(tArrears[v.szPlayer], nMoney)
+					local nOffset = math.min(tArrears[v.szPlayer], nMoney)
 					nMoney = nMoney - nOffset
 					tArrears[v.szPlayer] = tArrears[v.szPlayer] - nOffset
 				end
@@ -295,9 +266,9 @@ function DS:GetAuctionList(szKey, szSort)
 	end
 	local aList = {}
 	for _, v in ipairs(self.DATA.GKP_Record) do
-		insert(aList, v)
+		table.insert(aList, v)
 	end
-	sort(aList, function(a, b)
+	table.sort(aList, function(a, b)
 		if a[szKey] and b[szKey] then
 			if szSort == 'asc' then
 				if a[szKey] ~= b[szKey] then
@@ -325,9 +296,9 @@ end
 
 -- 设置、修改收钱记录
 function DS:SetPaymentRec(rec)
-	local rec = Clone(rec)
+	local rec = X.Clone(rec)
 	if not rec.key then
-		rec.key = LIB.GetUUID()
+		rec.key = X.GetUUID()
 	end
 	local nIndex = self.CACHE.GKP_Account_Index[rec.key]
 		or (#self.DATA.GKP_Account + 1)
@@ -347,10 +318,10 @@ end
 
 -- 替换收钱记录
 function DS:SetPaymentList(aList)
-	local aList = Clone(aList)
+	local aList = X.Clone(aList)
 	for _, rec in ipairs(aList) do
 		if not rec.key then
-			rec.key = LIB.GetUUID()
+			rec.key = X.GetUUID()
 		end
 	end
 	self.DATA.GKP_Account = aList
@@ -369,9 +340,9 @@ function DS:GetPaymentList(szKey, szSort)
 	end
 	local aList = {}
 	for _, v in ipairs(self.DATA.GKP_Account) do
-		insert(aList, v)
+		table.insert(aList, v)
 	end
-	sort(aList, function(a, b)
+	table.sort(aList, function(a, b)
 		if a[szKey] and b[szKey] then
 			if szSort == 'asc' then
 				if a[szKey] ~= b[szKey] then
@@ -461,7 +432,7 @@ end
 -- 数据操作对象获取入口
 function MY_GKP_DS(szFilePath, bCreate)
 	szFilePath = szFilePath:lower():gsub('/', '\\')
-	if not wfind(szFilePath:sub(-7):lower(), '.jx3dat') then
+	if not wstring.find(szFilePath:sub(-7):lower(), '.jx3dat') then
 		szFilePath = szFilePath .. '.jx3dat'
 	end
 	if not DS_CACHE[szFilePath] then

@@ -10,51 +10,22 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_GKPLoot.FastLoot', { ['*'] = true })
-LIB.RegisterRestriction('MY_GKPLoot.ForceLoot', { ['*'] = true })
+X.RegisterRestriction('MY_GKPLoot.FastLoot', { ['*'] = true })
+X.RegisterRestriction('MY_GKPLoot.ForceLoot', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local DEBUG_LOOT = false -- 测试拾取分配 强制进入分配模式并最终不调用分配接口
@@ -76,64 +47,64 @@ local GKP_ITEM_QUALITIES = {
 	{ nQuality = CONSTANT.ITEM_QUALITY.NACARAT, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
 }
 
-local O = LIB.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 	bOn = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOnlyInTeamDungeon = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOnlyInRaidDungeon = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOnlyInBattlefield = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	anchor = {
-		ePathType = PATH_TYPE.ROLE,
-		xSchema = Schema.FrameAnchor,
+		ePathType = X.PATH_TYPE.ROLE,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = 0, y = 0, s = 'CENTER', r = 'CENTER' },
 	},
 	bVertical = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSetColor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nConfirmQuality = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 3,
 	},
 	bShow2ndKungfuLoot = { -- 显示第二心法装备推荐提示图标
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	tConfirm = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {
 			Huangbaba  = true,
 			Book       = true,
@@ -145,75 +116,75 @@ local O = LIB.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 		},
 	},
 	tFilterQuality = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Map(Schema.Number, Schema.Boolean),
+		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 	bFilterGrayItem = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bNameFilter = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tNameFilter = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 	bFilterBookRead = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFilterBookHave = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoPickupFilterBookRead = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoPickupFilterBookHave = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoPickupTaskItem = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoPickupBook = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoPickupQuality = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAutoPickupQuality = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Map(Schema.Number, Schema.Boolean),
+		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Boolean),
 		xDefaultValue = (function()
 			local t = {}
 			for _, p in ipairs(GKP_ITEM_QUALITIES) do
@@ -223,15 +194,15 @@ local O = LIB.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 		end)(),
 	},
 	tAutoPickupNames = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 	tAutoPickupFilters = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
-		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 })
@@ -287,35 +258,35 @@ RegisterCustomData('MY_GKP_Loot.tConfirm')
 RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
 function D.UpdateShielded()
-	GKP_AUTO_LOOT_DEBOUNCE_TIME = LIB.IsRestricted('MY_GKPLoot.FastLoot')
+	GKP_AUTO_LOOT_DEBOUNCE_TIME = X.IsRestricted('MY_GKPLoot.FastLoot')
 		and GLOBAL.GAME_FPS / 2
 		or 0
 end
 
-LIB.RegisterEvent('MY_RESTRICTION', 'MY_GKPLoot', function()
+X.RegisterEvent('MY_RESTRICTION', 'MY_GKPLoot', function()
 	if arg0 and arg0 ~= 'MY_GKPLoot.FastLoot' then
 		return
 	end
 	D.UpdateShielded()
 end)
 
-LIB.RegisterEvent('LOADING_END', 'MY_GKPLoot', function()
+X.RegisterEvent('LOADING_END', 'MY_GKPLoot', function()
 	D.UpdateShielded()
 	D.aDoodadID = {}
 	ITEM_CONFIG.tFilterQuality = {}
 	ITEM_CONFIG.bNameFilter = false
 end)
 
-LIB.RegisterInit('MY_GKPLoot', function()
+X.RegisterInit('MY_GKPLoot', function()
 	for _, k in ipairs({'tConfirm'}) do
 		if D[k] then
-			SafeCall(Set, O, k, D[k])
+			X.SafeCall(Set, O, k, D[k])
 			D[k] = nil
 		end
 	end
-	if D.tItemConfig and IsTable(D.tItemConfig) then
+	if D.tItemConfig and X.IsTable(D.tItemConfig) then
 		for k, v in pairs(D.tItemConfig) do
-			SafeCall(Set, O, k, v)
+			X.SafeCall(Set, O, k, v)
 		end
 		D.tItemConfig = nil
 	end
@@ -332,13 +303,13 @@ function D.IsEnabled()
 	if not O.bOnlyInTeamDungeon and not O.bOnlyInRaidDungeon and not O.bOnlyInBattlefield then
 		return true
 	end
-	if O.bOnlyInTeamDungeon and LIB.IsInDungeon(false) then
+	if O.bOnlyInTeamDungeon and X.IsInDungeon(false) then
 		return true
 	end
-	if O.bOnlyInRaidDungeon and LIB.IsInDungeon(true) then
+	if O.bOnlyInRaidDungeon and X.IsInDungeon(true) then
 		return true
 	end
-	if O.bOnlyInBattlefield and (LIB.IsInBattleField() or LIB.IsInPubg() or LIB.IsInZombieMap()) then
+	if O.bOnlyInBattlefield and (X.IsInBattleField() or X.IsInPubg() or X.IsInZombieMap()) then
 		return true
 	end
 	return false
@@ -349,7 +320,7 @@ function D.CanDialog(tar, doodad)
 end
 
 function D.IsItemDisplay(itemData, config)
-	if IsTable(config.tFilterQuality) and config.tFilterQuality[itemData.nQuality] then
+	if X.IsTable(config.tFilterQuality) and config.tFilterQuality[itemData.nQuality] then
 		return false
 	end
 	-- 名称过滤
@@ -360,13 +331,13 @@ function D.IsItemDisplay(itemData, config)
 	if (config.bFilterBookRead or config.bFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
 		local me = GetClientPlayer()
 		if config.bFilterBookRead then
-			local nBookID, nSegmentID = LIB.RecipeToSegmentID(itemData.nBookID)
+			local nBookID, nSegmentID = X.RecipeToSegmentID(itemData.nBookID)
 			if me and me.IsBookMemorized(nBookID, nSegmentID) then
 				return false
 			end
 		end
 		if config.bFilterBookHave then
-			if LIB.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) > 0 then
+			if X.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) > 0 then
 				return false
 			end
 		end
@@ -385,20 +356,20 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 	-- 超过可拾取上限则不捡
 	local itemInfo = GetItemInfo(itemData.dwTabType, itemData.dwIndex)
 	if itemInfo and itemInfo.nMaxExistAmount > 0
-	and LIB.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) + itemData.nStackNum > itemInfo.nMaxExistAmount then
+	and X.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) + itemData.nStackNum > itemInfo.nMaxExistAmount then
 		return false
 	end
 	-- 不拾取已读、已有书籍
 	if (config.bAutoPickupFilterBookRead or config.bAutoPickupFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
 		local me = GetClientPlayer()
 		if config.bAutoPickupFilterBookRead then
-			local nBookID, nSegmentID = LIB.RecipeToSegmentID(itemData.nBookID)
+			local nBookID, nSegmentID = X.RecipeToSegmentID(itemData.nBookID)
 			if me and me.IsBookMemorized(nBookID, nSegmentID) then
 				return false
 			end
 		end
 		if config.bAutoPickupFilterBookHave then
-			if LIB.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) > 0 then
+			if X.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) > 0 then
 				return false
 			end
 		end
@@ -428,7 +399,7 @@ end
 
 function D.CloseLootWindow()
 	local me = GetClientPlayer()
-	if me and LIB.GetOTActionState(me) == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
+	if me and X.GetOTActionState(me) == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
 		me.OnCloseLootWindow()
 	end
 end
@@ -461,7 +432,7 @@ function D.OnFrameBreathe()
 			if (not hItem.nAutoLootLFC or nLFC - hItem.nAutoLootLFC >= GKP_AUTO_LOOT_DEBOUNCE_TIME)
 			and D.IsItemAutoPickup(hItem.itemData, ITEM_CONFIG, doodad, bCanDialog)
 			and not hItem.itemData.bDist and not hItem.itemData.bNeedRoll and not hItem.itemData.bBidding then
-				LIB.ExecuteWithThis(hItem, D.OnItemLButtonClick)
+				X.ExecuteWithThis(hItem, D.OnItemLButtonClick)
 				hItem.nAutoLootLFC = nLFC
 			end
 		end
@@ -469,13 +440,13 @@ function D.OnFrameBreathe()
 		-- 目标距离
 		local nDistance = 0
 		if me and doodad then
-			nDistance = floor(sqrt(pow(me.nX - doodad.nX, 2) + pow(me.nY - doodad.nY, 2)) * 10 / 64) / 10
+			nDistance = math.floor(math.sqrt(math.pow(me.nX - doodad.nX, 2) + math.pow(me.nY - doodad.nY, 2)) * 10 / 64) / 10
 		end
 		wnd:Lookup('', 'Handle_Compass/Compass_Distance'):SetText(nDistance < 4 and '' or nDistance .. '"')
 		-- 自身面向
 		if me then
 			wnd:Lookup('', 'Handle_Compass/Image_Player'):Show()
-			wnd:Lookup('', 'Handle_Compass/Image_Player'):SetRotate( - me.nFaceDirection / 128 * PI)
+			wnd:Lookup('', 'Handle_Compass/Image_Player'):SetRotate( - me.nFaceDirection / 128 * math.pi)
 		end
 		-- 物品位置
 		local nRotate, nRadius = 0, 10.125
@@ -483,22 +454,22 @@ function D.OnFrameBreathe()
 			-- 特判角度
 			if me.nX == doodad.nX then
 				if me.nY > doodad.nY then
-					nRotate = PI / 2
+					nRotate = math.pi / 2
 				else
-					nRotate = - PI / 2
+					nRotate = - math.pi / 2
 				end
 			else
-				nRotate = atan((me.nY - doodad.nY) / (me.nX - doodad.nX))
+				nRotate = math.atan((me.nY - doodad.nY) / (me.nX - doodad.nX))
 			end
 			if nRotate < 0 then
-				nRotate = nRotate + PI
+				nRotate = nRotate + math.pi
 			end
 			if doodad.nY < me.nY then
-				nRotate = PI + nRotate
+				nRotate = math.pi + nRotate
 			end
 		end
-		local nX = nRadius + nRadius * cos(nRotate) + 2
-		local nY = nRadius - 3 - nRadius * sin(nRotate)
+		local nX = nRadius + nRadius * math.cos(nRotate) + 2
+		local nY = nRadius - 3 - nRadius * math.sin(nRotate)
 		wnd:Lookup('', 'Handle_Compass/Image_PointGreen'):SetRelPos(nX, nY)
 		wnd:Lookup('', 'Handle_Compass'):FormatAllItemPos()
 		wnd = wnd:GetNext()
@@ -561,7 +532,7 @@ function D.OnMouseEnter()
 		local aPartyMember = D.GetaPartyMember(dwDoodadID)
 		local p = MY_GKP_LOOT_BOSS and aPartyMember(MY_GKP_LOOT_BOSS)
 		if p then
-			local r, g, b = LIB.GetForceColor(p.dwForceID)
+			local r, g, b = X.GetForceColor(p.dwForceID)
 			szXml = szXml .. GetFormatText(_L['LClick to distrubute all equipment to '], 136)
 			szXml = szXml .. GetFormatText('['.. p.szName ..']', 162, r, g, b)
 			szXml = szXml .. GetFormatText(_L['.'] .. '\n' .. _L['Ctrl + LClick to distrubute all lootable items to '], 136)
@@ -613,9 +584,9 @@ function D.OnLButtonClick()
 					local aItemData = D.GetDoodadLootInfo(dwDoodadID)
 					local t = {}
 					for k, v in ipairs(aItemData) do
-						insert(t, MY_GKP.GetFormatLink(v.item))
+						table.insert(t, MY_GKP.GetFormatLink(v.item))
 					end
-					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, t)
+					X.SendChat(PLAYER_TALK_CHANNEL.RAID, t)
 				end,
 			},
 			{ bDevide = true },
@@ -630,27 +601,27 @@ function D.OnLButtonClick()
 			{
 				szOption = _L['Config'],
 				fnAction = function()
-					LIB.ShowPanel()
-					LIB.SwitchTab('MY_GKPDoodad')
+					X.ShowPanel()
+					X.SwitchTab('MY_GKPDoodad')
 				end,
 			},
 			{
 				szOption = _L['About'],
 				fnAction = function()
-					LIB.Alert(_L['GKP_TIPS'])
+					X.Alert(_L['GKP_TIPS'])
 				end,
 			},
 		}
 		if IsCtrlKeyDown() then
-			insert(menu, 1, { szOption = dwDoodadID, bDisable = true })
+			table.insert(menu, 1, { szOption = dwDoodadID, bDisable = true })
 		end
-		insert(menu, CONSTANT.MENU_DIVIDER)
-		insert(menu, D.GetFilterMenu())
-		insert(menu, D.GetAutoPickupMenu())
+		table.insert(menu, CONSTANT.MENU_DIVIDER)
+		table.insert(menu, D.GetFilterMenu())
+		table.insert(menu, D.GetAutoPickupMenu())
 		UI.PopupMenu(menu)
 	elseif szName == 'Btn_Boss' then
 		if not D.AuthCheck(this:GetParent().dwDoodadID) then
-			return LIB.Topmsg(_L['You are not the distrubutor.'])
+			return X.Topmsg(_L['You are not the distrubutor.'])
 		end
 		D.GetBossAction(this:GetParent().dwDoodadID, type(MY_GKP_LOOT_BOSS) == 'nil')
 	end
@@ -685,7 +656,7 @@ function D.OnItemMouseEnter()
 		local hItem = szName == 'Handle_Item' and this or this:GetParent()
 		local box   = hItem:Lookup('Box_Item')
 		if IsAltKeyDown() and not IsCtrlKeyDown() and not IsShiftKeyDown() then
-			LIB.OutputTip(this, EncodeLUAData(hItem.itemData, '  ') .. '\n' .. EncodeLUAData({
+			X.OutputTip(this, X.EncodeLUAData(hItem.itemData, '  ') .. '\n' .. X.EncodeLUAData({
 				nUiId = hItem.itemData.item.nUiId,
 				dwID = hItem.itemData.item.dwID,
 				nGenre = hItem.itemData.item.nGenre,
@@ -702,7 +673,7 @@ function D.OnItemMouseEnter()
 				szName = hItem.itemData.item.szName,
 			}, '  '))
 		elseif szName == 'Handle_Item' then
-			LIB.ExecuteWithThis(box, box.OnItemMouseEnter)
+			X.ExecuteWithThis(box, box.OnItemMouseEnter)
 		end
 		-- local item = hItem.itemData.item
 		-- if itme and item.nGenre == ITEM_GENRE.EQUIPMENT then
@@ -719,7 +690,7 @@ function D.OnItemMouseEnter()
 			local h = hList:Lookup(i)
 			h:Lookup('Shadow_Highlight'):SetVisible(h.itemData.szType == hItem.itemData.szType)
 		end
-		LIB.OutputTip(hItem, GetFormatText(_L['Onekey distrib this group'], 136), true)
+		X.OutputTip(hItem, GetFormatText(_L['Onekey distrib this group'], 136), true)
 	end
 end
 
@@ -729,7 +700,7 @@ function D.OnItemMouseLeave()
 		if szName == 'Handle_Item' then
 			local box = this:Lookup('Box_Item')
 			if box and box.OnItemMouseLeave then
-				LIB.ExecuteWithThis(box, box.OnItemMouseLeave)
+				X.ExecuteWithThis(box, box.OnItemMouseLeave)
 			end
 		end
 		-- if this and this:IsValid() and this.SetOverText then
@@ -760,15 +731,15 @@ function D.OnItemLButtonClick()
 		local doodad     = GetDoodad(dwDoodadID)
 		if not data.bDist and not data.bNeedRoll and not data.bBidding then
 			if doodad.CanLoot(me.dwID) then
-				LIB.OpenDoodad(me, doodad)
+				X.OpenDoodad(me, doodad)
 			elseif not doodad.CanDialog(me) then
-				LIB.Topmsg(g_tStrings.TIP_TOO_FAR)
+				X.Topmsg(g_tStrings.TIP_TOO_FAR)
 			end
 		end
 		if data.bDist then
 			if not doodad then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
+				X.Debug('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				return D.RemoveLootList(dwDoodadID)
 			end
@@ -780,13 +751,13 @@ function D.OnItemLButtonClick()
 			if team.nLootMode ~= PARTY_LOOT_MODE.BIDDING then
 				return OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_BID_LOOT)
 			end
-			LIB.Sysmsg(_L['GKP does not support bidding, please re open loot list.'])
+			X.Sysmsg(_L['GKP does not support bidding, please re open loot list.'])
 		elseif data.bNeedRoll then
-			LIB.Topmsg(g_tStrings.ERROR_LOOT_ROLL)
+			X.Topmsg(g_tStrings.ERROR_LOOT_ROLL)
 		else -- 左键摸走
 			LootItem(dwDoodadID, data.dwID)
 		end
-		LIB.DelayCall('MY_GKPLoot__LootDoodad', 150, D.CloseLootWindow)
+		X.DelayCall('MY_GKPLoot__LootDoodad', 150, D.CloseLootWindow)
 	elseif szName == 'Image_GroupDistrib' then
 		local hItem     = this:GetParent()
 		local hList     = hItem:GetParent()
@@ -794,7 +765,7 @@ function D.OnItemLButtonClick()
 		for i = 0, hList:GetItemCount() - 1 do
 			local h = hList:Lookup(i)
 			if h.itemData.szType == hItem.itemData.szType then
-				insert(aItemData, h.itemData)
+				table.insert(aItemData, h.itemData)
 			end
 		end
 		for _, data in ipairs(aItemData) do
@@ -802,12 +773,12 @@ function D.OnItemLButtonClick()
 			local doodad     = GetDoodad(dwDoodadID)
 			if not doodad then
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
+				X.Debug('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				return D.RemoveLootList(dwDoodadID)
 			end
 			if not D.AuthCheck(dwDoodadID) then
-				return LIB.Topmsg(_L['You are not the distrubutor.'])
+				return X.Topmsg(_L['You are not the distrubutor.'])
 			end
 		end
 		return UI.PopupMenu(D.GetDistributeMenu(aItemData, hItem.itemData.szType))
@@ -877,7 +848,7 @@ function D.GetFilterMenu()
 		CONSTANT.MENU_DIVIDER,
 	}
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
-		insert(t1, {
+		table.insert(t1, {
 			szOption = p.szTitle,
 			rgb = { GetItemFontColorByQuality(p.nQuality) },
 			bCheck = true,
@@ -888,7 +859,7 @@ function D.GetFilterMenu()
 			end,
 		})
 	end
-	insert(t, t1)
+	table.insert(t, t1)
 	-- 名称过滤
 	local t1 = {
 		szOption = _L['Name filter'],
@@ -907,7 +878,7 @@ function D.GetFilterMenu()
 		CONSTANT.MENU_DIVIDER,
 	}
 	for szName, bEnable in pairs(O.tNameFilter) do
-		insert(t1, {
+		table.insert(t1, {
 			szOption = szName,
 			bCheck = true,
 			bChecked = bEnable,
@@ -931,10 +902,10 @@ function D.GetFilterMenu()
 			fnDisable = function() return not ITEM_CONFIG.bNameFilter end,
 		})
 	end
-	if not IsEmpty(O.tNameFilter) then
-		insert(t1, CONSTANT.MENU_DIVIDER)
+	if not X.IsEmpty(O.tNameFilter) then
+		table.insert(t1, CONSTANT.MENU_DIVIDER)
 	end
-	insert(t1, {
+	table.insert(t1, {
 		szOption = _L['Add'],
 		fnAction = function()
 			GetUserInput(_L['Please input filter name'], function(szText)
@@ -945,16 +916,16 @@ function D.GetFilterMenu()
 		end,
 		fnDisable = function() return not ITEM_CONFIG.bNameFilter end,
 	})
-	insert(t, t1)
+	table.insert(t, t1)
 	return t
 end
 
 function D.GetAutoPickupMenu()
 	local t = { szOption = _L['Auto pickup'] }
-	insert(t, { szOption = _L['Filters have higher priority'], bDisable = true })
+	table.insert(t, { szOption = _L['Filters have higher priority'], bDisable = true })
 	-- 拾取过滤
 	-- 过滤已读书籍
-	insert(t, {
+	table.insert(t, {
 		szOption = _L['Filter book read'],
 		bCheck = true,
 		bChecked = O.bAutoPickupFilterBookRead,
@@ -963,7 +934,7 @@ function D.GetAutoPickupMenu()
 		end,
 	})
 	-- 过滤已有书籍
-	insert(t, {
+	table.insert(t, {
 		szOption = _L['Filter book have'],
 		bCheck = true,
 		bChecked = O.bAutoPickupFilterBookHave,
@@ -974,7 +945,7 @@ function D.GetAutoPickupMenu()
 	-- 自动拾取物品过滤
 	local t1 = { szOption = _L['Auto pickup filters'] }
 	for s, b in pairs(O.tAutoPickupFilters or {}) do
-		insert(t1, {
+		table.insert(t1, {
 			szOption = s,
 			bCheck = true, bChecked = b,
 			fnAction = function()
@@ -995,9 +966,9 @@ function D.GetAutoPickupMenu()
 		})
 	end
 	if #t1 > 0 then
-		insert(t1, CONSTANT.MENU_DIVIDER)
+		table.insert(t1, CONSTANT.MENU_DIVIDER)
 	end
-	insert(t1, {
+	table.insert(t1, {
 		szOption = _L['Add new'],
 		fnAction = function()
 			GetUserInput(_L['Please input new auto pickup filter:'], function(text)
@@ -1006,11 +977,11 @@ function D.GetAutoPickupMenu()
 			end)
 		end,
 	})
-	insert(t, t1)
+	table.insert(t, t1)
 	-- 自动拾取
-	insert(t, CONSTANT.MENU_DIVIDER)
+	table.insert(t, CONSTANT.MENU_DIVIDER)
 	-- 自动拾取任务物品
-	insert(t, {
+	table.insert(t, {
 		szOption = _L['Auto pickup quest item'],
 		bCheck = true, bChecked = O.bAutoPickupTaskItem,
 		fnAction = function()
@@ -1018,7 +989,7 @@ function D.GetAutoPickupMenu()
 		end,
 	})
 	-- 自动拾取书籍
-	insert(t, {
+	table.insert(t, {
 		szOption = _L['Auto pickup book'],
 		bCheck = true, bChecked = O.bAutoPickupBook,
 		fnAction = function()
@@ -1039,7 +1010,7 @@ function D.GetAutoPickupMenu()
 		CONSTANT.MENU_DIVIDER,
 	}
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
-		insert(t1, {
+		table.insert(t1, {
 			szOption = p.szTitle,
 			rgb = { GetItemFontColorByQuality(p.nQuality) },
 			bCheck = true,
@@ -1051,11 +1022,11 @@ function D.GetAutoPickupMenu()
 			fnDisable = function() return not O.bAutoPickupQuality end,
 		})
 	end
-	insert(t, t1)
+	table.insert(t, t1)
 	-- 自动拾取物品名称
 	local t1 = { szOption = _L['Auto pickup names'] }
 	for s, b in pairs(O.tAutoPickupNames or {}) do
-		insert(t1, {
+		table.insert(t1, {
 			szOption = s,
 			bCheck = true, bChecked = b,
 			fnAction = function()
@@ -1076,9 +1047,9 @@ function D.GetAutoPickupMenu()
 		})
 	end
 	if #t1 > 0 then
-		insert(t1, CONSTANT.MENU_DIVIDER)
+		table.insert(t1, CONSTANT.MENU_DIVIDER)
 	end
-	insert(t1, {
+	table.insert(t1, {
 		szOption = _L['Add new'],
 		fnAction = function()
 			GetUserInput(_L['Please input new auto pickup name:'], function(text)
@@ -1087,7 +1058,7 @@ function D.GetAutoPickupMenu()
 			end)
 		end,
 	})
-	insert(t, t1)
+	table.insert(t, t1)
 	return t
 end
 
@@ -1116,20 +1087,20 @@ function D.GetBossAction(dwDoodadID, bMenu)
 				))
 				or IsCtrlKeyDown()
 			) and v.bDist then -- 按住Ctrl的情况下 无视分类 否则只给装备
-				insert(aEquipmentItemData, v)
+				table.insert(aEquipmentItemData, v)
 			end
 		end
 		if #aEquipmentItemData == 0 then
-			return LIB.Alert(_L['No Equiptment left for Equiptment Boss'])
+			return X.Alert(_L['No Equiptment left for Equiptment Boss'])
 		end
 		local aPartyMember = D.GetaPartyMember(dwDoodadID)
 		local p = aPartyMember(MY_GKP_LOOT_BOSS)
 		if p and p.bOnlineFlag then  -- 这个人存在团队的情况下
 			local szXml = GetFormatText(_L['Are you sure you want the following item\n'], 162, 255, 255, 255)
-			local r, g, b = LIB.GetForceColor(p.dwForceID)
+			local r, g, b = X.GetForceColor(p.dwForceID)
 			for k, v in ipairs(aEquipmentItemData) do
 				local r, g, b = GetItemFontColorByQuality(v.item.nQuality)
-				szXml = szXml .. GetFormatText('['.. LIB.GetItemNameByItem(v.item) ..']\n', 166, r, g, b)
+				szXml = szXml .. GetFormatText('['.. X.GetItemNameByItem(v.item) ..']\n', 166, r, g, b)
 			end
 			szXml = szXml .. GetFormatText(_L['All distrubute to'], 162, 255, 255, 255)
 			szXml = szXml .. GetFormatText('['.. p.szName ..']', 162, r, g, b)
@@ -1150,7 +1121,7 @@ function D.GetBossAction(dwDoodadID, bMenu)
 			}
 			MessageBox(msg)
 		else
-			return LIB.Alert(_L['Cannot distrubute items to Equipment Boss, may due to Equipment Boss is too far away or got dropline when looting.'])
+			return X.Alert(_L['Cannot distrubute items to Equipment Boss, may due to Equipment Boss is too far away or got dropline when looting.'])
 		end
 	end
 	if bMenu then
@@ -1158,8 +1129,8 @@ function D.GetBossAction(dwDoodadID, bMenu)
 			MY_GKP_LOOT_BOSS = v.dwID
 			fnAction()
 		end, false, true)
-		insert(menu, 1, { bDevide = true })
-		insert(menu, 1, { szOption = _L['select equip boss'], bDisable = true })
+		table.insert(menu, 1, { bDevide = true })
+		table.insert(menu, 1, { szOption = _L['select equip boss'], bDisable = true })
 		UI.PopupMenu(menu)
 	else
 		fnAction()
@@ -1171,17 +1142,17 @@ function D.AuthCheck(dwID)
 	local doodad         = GetDoodad(dwID)
 	if not doodad then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_GKPLoot:AuthCheck', 'Doodad does not exist!', DEBUG_LEVEL.WARNING)
+		X.Debug('MY_GKPLoot:AuthCheck', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		return
 	end
 	local nLootMode      = team.nLootMode
 	local dwBelongTeamID = doodad.GetBelongTeamID()
-	if nLootMode ~= PARTY_LOOT_MODE.DISTRIBUTE and not LIB.IsDebugClient('MY_GKP') then -- 需要分配者模式
+	if nLootMode ~= PARTY_LOOT_MODE.DISTRIBUTE and not X.IsDebugClient('MY_GKP') then -- 需要分配者模式
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_DISTRIBUTE_LOOT)
 		return false
 	end
-	if not LIB.IsDistributer() and not LIB.IsDebugClient('MY_GKP') then -- 需要自己是分配者
+	if not X.IsDistributer() and not X.IsDebugClient('MY_GKP') then -- 需要自己是分配者
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.ERROR_LOOT_DISTRIBUTE)
 		return false
 	end
@@ -1194,7 +1165,7 @@ end
 
 -- 拾取对象
 function D.GetaPartyMember(aDoodadID)
-	if not IsTable(aDoodadID) then
+	if not X.IsTable(aDoodadID) then
 		aDoodadID = {aDoodadID}
 	end
 	local team = GetClientTeam()
@@ -1209,12 +1180,12 @@ function D.GetaPartyMember(aDoodadID)
 				if aLooterList then
 					for _, p in ipairs(aLooterList) do
 						if not tPartyMember[p.dwID] then
-							insert(aPartyMember, p)
+							table.insert(aPartyMember, p)
 							tPartyMember[p.dwID] = true
 						end
 					end
 				else
-					LIB.Sysmsg(_L['Pick up time limit exceeded, please try again.'])
+					X.Sysmsg(_L['Pick up time limit exceeded, please try again.'])
 				end
 			end
 			tDoodadID[dwDoodadID] = true
@@ -1237,7 +1208,7 @@ end
 
 -- 严格判断
 function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
-	if IsArray(info) then
+	if X.IsArray(info) then
 		for _, p in ipairs(info) do
 			D.DistributeItem(dwID, p, szAutoDistType, bSkipRecordPanel)
 		end
@@ -1251,14 +1222,14 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 	local item = GetItem(info.dwID)
 	if not item then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_GKPLoot', 'Item does not exist, check!!', DEBUG_LEVEL.WARNING)
+		X.Debug('MY_GKPLoot', 'Item does not exist, check!!', X.DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		local aItemData = D.GetDoodadLootInfo(info.dwDoodadID)
 		for k, v in ipairs(aItemData) do
-			if v.nQuality == info.nQuality and LIB.GetItemNameByItem(v.item) == info.szName then
+			if v.nQuality == info.nQuality and X.GetItemNameByItem(v.item) == info.szName then
 				info.dwID = v.item.dwID
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MY_GKPLoot', 'Item matching, ' .. LIB.GetItemNameByItem(v.item), DEBUG_LEVEL.LOG)
+				X.Debug('MY_GKPLoot', 'Item matching, ' .. X.GetItemNameByItem(v.item), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				break
 			end
@@ -1270,13 +1241,13 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 	local aPartyMember = D.GetaPartyMember(info.dwDoodadID)
 	if item then
 		if not player or (player and not player.bIsOnLine) then -- 不在线
-			return LIB.Alert(_L['No Pick up Object, may due to Network off - line'])
+			return X.Alert(_L['No Pick up Object, may due to Network off - line'])
 		end
 		if not aPartyMember(dwID) then -- 给不了
-			return LIB.Alert(_L['No Pick up Object, may due to Network off - line'])
+			return X.Alert(_L['No Pick up Object, may due to Network off - line'])
 		end
 		if player.dwMapID ~= me.GetMapID() then -- 不在同一地图
-			return LIB.Alert(_L['No Pick up Object, Please confirm that in the Dungeon.'])
+			return X.Alert(_L['No Pick up Object, Please confirm that in the Dungeon.'])
 		end
 		local tab = {
 			szPlayer   = player.szName,
@@ -1290,7 +1261,7 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 			nTime      = GetCurrentTime(),
 			nQuality   = item.nQuality,
 			dwForceID  = player.dwForceID,
-			szName     = LIB.GetItemNameByItem(item),
+			szName     = X.GetItemNameByItem(item),
 			nGenre     = item.nGenre,
 		}
 		if item.bCanStack and item.nStackNum > 1 then
@@ -1304,31 +1275,31 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 			GKP_LOOT_RECENT[szAutoDistType] = dwID
 		end
 		if DEBUG_LOOT then
-			return LIB.Sysmsg('LOOT: ' .. info.dwID .. '->' .. dwID) -- !!! Debug
+			return X.Sysmsg('LOOT: ' .. info.dwID .. '->' .. dwID) -- !!! Debug
 		end
 		doodad.DistributeItem(info.dwID, dwID)
 	else
-		LIB.Sysmsg(_L['Userdata is overdue, distribut failed, please try again.'])
+		X.Sysmsg(_L['Userdata is overdue, distribut failed, please try again.'])
 	end
 end
 
 function D.GetMessageBox(dwID, aItemData, szAutoDistType, bSkipRecordPanel)
-	if not IsArray(aItemData) then
+	if not X.IsArray(aItemData) then
 		aItemData = {aItemData}
 	end
 	local team = GetClientTeam()
 	local info = team.GetMemberInfo(dwID)
-	local fr, fg, fb = LIB.GetForceColor(info.dwForceID)
+	local fr, fg, fb = X.GetForceColor(info.dwForceID)
 	local aItemName = {}
 	for _, data in ipairs(aItemData) do
 		local ir, ig, ib = GetItemFontColorByQuality(data.nQuality)
-		insert(aItemName, GetFormatText('['.. data.szName .. ']', 166, ir, ig, ib))
+		table.insert(aItemName, GetFormatText('['.. data.szName .. ']', 166, ir, ig, ib))
 	end
 	local msg = {
 		szMessage = FormatLinkString(
 			g_tStrings.PARTY_DISTRIBUTE_ITEM_SURE,
 			'font=162',
-			concat(aItemName, GetFormatText(g_tStrings.STR_PAUSE)),
+			table.concat(aItemName, GetFormatText(g_tStrings.STR_PAUSE)),
 			GetFormatText('['.. info.szName .. ']', 162, fr, fg, fb)
 		),
 		szName = 'GKP_Distribute',
@@ -1349,7 +1320,7 @@ local function IsItemRequireConfirm(data)
 	if data.nQuality >= O.nConfirmQuality
 	or (O.tConfirm.Huangbaba -- 玄晶
 		and data.item.nQuality == GKP_LOOT_HUANGBABA_QUALITY
-		and LIB.GetItemIconByUIID(data.item.nUiId) == GKP_LOOT_HUANGBABA_ICON
+		and X.GetItemIconByUIID(data.item.nUiId) == GKP_LOOT_HUANGBABA_ICON
 	)
 	or (O.tConfirm.Book and data.item.nGenre == ITEM_GENRE.BOOK) -- 书籍
 	or (O.tConfirm.Pendant and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- 挂件
@@ -1384,7 +1355,7 @@ local function GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID)
 	return {
 		szOption = szOption,
 		bDisable = not member.bOnlineFlag,
-		rgb = { LIB.GetForceColor(member.dwForceID) },
+		rgb = { X.GetForceColor(member.dwForceID) },
 		szIcon = szIcon, nFrame = nFrame,
 		fnAutoClose = function()
 			for _, v in ipairs(aDoodadID) do
@@ -1410,7 +1381,7 @@ local function GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID)
 			end
 		end,
 		fnMouseEnter = function()
-			LIB.OutputTip(_L['Hold shift click to skip gkp record panel'], 136)
+			X.OutputTip(_L['Hold shift click to skip gkp record panel'], 136)
 		end,
 		fnMouseLeave = function()
 			HideTip()
@@ -1418,27 +1389,27 @@ local function GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID)
 	}
 end
 function D.GetDistributeMenu(aItemData, szAutoDistType)
-	if not IsArray(aItemData) then
+	if not X.IsArray(aItemData) then
 		aItemData = {aItemData}
 	end
 	local aDoodadID = {}
 	for _, p in ipairs(aItemData) do
 		if p.bDist then
-			insert(aDoodadID, p.dwDoodadID)
+			table.insert(aDoodadID, p.dwDoodadID)
 		end
 	end
 	local me, team     = GetClientPlayer(), GetClientTeam()
 	local dwMapID      = me.GetMapID()
 	local aPartyMember = D.GetaPartyMember(aDoodadID)
-	sort(aPartyMember, function(a, b)
+	table.sort(aPartyMember, function(a, b)
 		return a.dwForceID < b.dwForceID
 	end)
 	local aItemName = {}
 	for _, p in ipairs(aItemData) do
-		insert(aItemName, p.szName)
+		table.insert(aItemName, p.szName)
 	end
 	local menu = {
-		{ szOption = concat(aItemName, g_tStrings.STR_PAUSE), bDisable = true },
+		{ szOption = table.concat(aItemName, g_tStrings.STR_PAUSE), bDisable = true },
 		{ bDevide = true }
 	}
 	local dwAutoDistID
@@ -1447,13 +1418,13 @@ function D.GetDistributeMenu(aItemData, szAutoDistType)
 		if dwAutoDistID then
 			local member = aPartyMember(dwAutoDistID)
 			if member then
-				insert(menu, GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID))
-				insert(menu, { bDevide = true })
+				table.insert(menu, GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID))
+				table.insert(menu, { bDevide = true })
 			end
 		end
 	end
 	for _, member in ipairs(aPartyMember) do
-		insert(menu, GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID))
+		table.insert(menu, GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID))
 	end
 	return menu
 end
@@ -1461,9 +1432,9 @@ end
 
 function D.GetItemBiddingMenu(dwDoodadID, data)
 	local menu = {}
-	insert(menu, { szOption = data.szName , bDisable = true })
-	insert(menu, { bDevide = true })
-	insert(menu, {
+	table.insert(menu, { szOption = data.szName , bDisable = true })
+	table.insert(menu, { bDevide = true })
+	table.insert(menu, {
 		szOption = 'Roll',
 		fnAction = function()
 			if MY_RollMonitor then
@@ -1472,14 +1443,14 @@ function D.GetItemBiddingMenu(dwDoodadID, data)
 					MY_RollMonitor.Clear({echo=false})
 				end
 			end
-			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L['Roll the dice if you wang']) })
+			X.SendChat(PLAYER_TALK_CHANNEL.RAID, { MY_GKP.GetFormatLink(data.item), MY_GKP.GetFormatLink(_L['Roll the dice if you wang']) })
 			return 0
 		end
 	})
-	insert(menu, { bDevide = true })
+	table.insert(menu, { bDevide = true })
 	for k, v in ipairs(MY_GKP.aScheme) do
 		if v[3] then
-			insert(menu, {
+			table.insert(menu, {
 				szOption = v[1] .. ',' .. v[2],
 				fnAction = function()
 					local bNewBidding = MY_GKP.bNewBidding == not IsShiftKeyDown()
@@ -1498,7 +1469,7 @@ function D.GetItemBiddingMenu(dwDoodadID, data)
 						dwDoodadID = dwDoodadID,
 						data = data,
 					})
-					LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, {
+					X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 						MY_GKP.GetFormatLink(data.item),
 						MY_GKP.GetFormatLink(_L(' %d Gold Start Bidding, off a price if you want.', v[1])),
 					})
@@ -1532,7 +1503,7 @@ function D.AdjustFrame(frame)
 		nH = nH + wnd:GetH()
 		wnd = wnd:GetNext()
 	end
-	nH = min(nH, select(2, Station.GetClientSize()) * 4 / 5)
+	nH = math.min(nH, select(2, Station.GetClientSize()) * 4 / 5)
 	scroll:SetSize(nW, nH)
 	scrollbar:SetH(nH)
 	scrollbar:SetRelX(nW - 8)
@@ -1584,31 +1555,31 @@ local function IsItemDataSuitable(data)
 	if not me then
 		return 'NOT_SUITABLE'
 	end
-	local aKungfu = LIB.ForceIDToKungfuIDs(me.dwForceID)
+	local aKungfu = X.ForceIDToKungfuIDs(me.dwForceID)
 	if data.szType == 'BOOK' then
-		local nBookID, nSegmentID = LIB.RecipeToSegmentID(data.item.nBookID)
+		local nBookID, nSegmentID = X.RecipeToSegmentID(data.item.nBookID)
 		if me.IsBookMemorized(nBookID, nSegmentID) then
 			return 'NOT_SUITABLE'
 		end
 		return 'SUITABLE'
 	else
-		local szSuit = LIB.DoesEquipmentSuit(data.item, true) and 'SUITABLE' or 'NOT_SUITABLE'
+		local szSuit = X.DoesEquipmentSuit(data.item, true) and 'SUITABLE' or 'NOT_SUITABLE'
 		if szSuit == 'SUITABLE' then
 			if data.szType == 'EQUIPMENT' or data.szType == 'WEAPON' then
-				szSuit = LIB.IsItemFitKungfu(data.item) and 'SUITABLE' or 'NOT_SUITABLE'
+				szSuit = X.IsItemFitKungfu(data.item) and 'SUITABLE' or 'NOT_SUITABLE'
 				if szSuit == 'NOT_SUITABLE' and O.bShow2ndKungfuLoot then
 					for _, dwKungfuID in ipairs(aKungfu) do
-						if LIB.IsItemFitKungfu(data.item, dwKungfuID) then
+						if X.IsItemFitKungfu(data.item, dwKungfuID) then
 							szSuit = 'MAYBE_SUITABLE'
 							break
 						end
 					end
 				end
 			elseif data.szType == 'EQUIPMENT_SIGN' then
-				szSuit = wfind(data.item.szName, g_tStrings.tForceTitle[me.dwForceID]) and 'SUITABLE' or 'NOT_SUITABLE'
+				szSuit = wstring.find(data.item.szName, g_tStrings.tForceTitle[me.dwForceID]) and 'SUITABLE' or 'NOT_SUITABLE'
 			end
 		end
-		if szSuit == 'SUITABLE' and LIB.IsBetterEquipment(data.item) then
+		if szSuit == 'SUITABLE' and X.IsBetterEquipment(data.item) then
 			return 'BETTER'
 		end
 		return szSuit
@@ -1624,7 +1595,7 @@ function D.InsertLootList(dwID)
 		end
 	end
 	if not bExist then
-		insert(D.aDoodadID, dwID)
+		table.insert(D.aDoodadID, dwID)
 	end
 	D.DrawLootList(dwID)
 end
@@ -1654,7 +1625,7 @@ function D.DrawLootList(dwID, bRemove)
 			LootMoney(dwID)
 		end
 		local nCount = #aItemData
-		if not IsEmpty(config.tFilterQuality) or config.bFilterBookRead or config.bFilterBookHave or config.bFilterGrayItem then
+		if not X.IsEmpty(config.tFilterQuality) or config.bFilterBookRead or config.bFilterBookHave or config.bFilterGrayItem then
 			nCount = 0
 			for i, v in ipairs(aItemData) do
 				if D.IsItemDisplay(v, config) then
@@ -1663,14 +1634,14 @@ function D.DrawLootList(dwID, bRemove)
 			end
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_GKPLoot', ('Doodad %d, items %d, display %d.'):format(dwID, #aItemData, nCount), DEBUG_LEVEL.LOG)
+		X.Debug('MY_GKPLoot', ('Doodad %d, items %d, display %d.'):format(dwID, #aItemData, nCount), X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 
 		if not szName or nCount == 0 then
 			if not szName then
 				D.RemoveLootList(dwID)
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('MY_GKPLoot:DrawLootList', 'Doodad does not exist!', DEBUG_LEVEL.LOG)
+				X.Debug('MY_GKPLoot:DrawLootList', 'Doodad does not exist!', X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			elseif frame then
 				D.DrawLootList(dwID, true)
@@ -1694,7 +1665,7 @@ function D.DrawLootList(dwID, bRemove)
 		for i, itemData in ipairs(aItemData) do
 			local item = itemData.item
 			if D.IsItemDisplay(itemData, config) then
-				local szName = LIB.GetItemNameByItem(item)
+				local szName = X.GetItemNameByItem(item)
 				local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, 'Handle_Item')
 				local box = h:Lookup('Box_Item')
 				local txt = h:Lookup('Text_Item')
@@ -1703,7 +1674,7 @@ function D.DrawLootList(dwID, bRemove)
 				if O.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
 					for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
 						if szName:find(szForceTitle) then
-							txt:SetFontColor(LIB.GetForceColor(dwForceID))
+							txt:SetFontColor(X.GetForceColor(dwForceID))
 							break
 						end
 					end
@@ -1754,13 +1725,13 @@ function D.DrawLootList(dwID, bRemove)
 		D.AdjustFrame(frame)
 
 		-- 立即自动拾取一次
-		LIB.ExecuteWithThis(frame, D.OnFrameBreathe)
+		X.ExecuteWithThis(frame, D.OnFrameBreathe)
 		--[[#DEBUG BEGIN]]
 		nTickCount = GetTickCount() - nTickCount
-		LIB.Debug(
+		X.Debug(
 			_L['PMTool'],
 			_L('DrawLootList %d in %dms.', dwID, nTickCount),
-			DEBUG_LEVEL.PMLOG)
+			X.DEBUG_LEVEL.PMLOG)
 		--[[#DEBUG END]]
 	end
 end
@@ -1768,7 +1739,7 @@ end
 function D.RemoveLootList(dwID)
 	for i, v in ipairs(D.aDoodadID) do
 		if dwID == v then
-			remove(D.aDoodadID, i)
+			table.remove(D.aDoodadID, i)
 			break
 		end
 	end
@@ -1879,7 +1850,7 @@ local function GetItemDataType(data)
 	-- 材料
 	if data.item.nGenre == ITEM_GENRE.MATERIAL then
 		-- 小铁
-		if data.item.nQuality == GKP_LOOT_ZIBABA_QUALITY and LIB.GetItemIconByUIID(data.item.nUiId) == GKP_LOOT_ZIBABA_ICON then
+		if data.item.nQuality == GKP_LOOT_ZIBABA_QUALITY and X.GetItemIconByUIID(data.item.nUiId) == GKP_LOOT_ZIBABA_ICON then
 			return 'ZIBABA'
 		end
 		-- 材料
@@ -1908,7 +1879,7 @@ function D.GetItemData(me, d, i)
 			dwDoodadID   = d.dwID        ,
 			szDoodadName = d.szName      ,
 			item         = item          ,
-			szName       = LIB.GetItemNameByItem(item),
+			szName       = X.GetItemNameByItem(item),
 			dwID         = item.dwID     ,
 			dwTabType    = item.dwTabType,
 			dwIndex      = item.dwIndex  ,
@@ -1921,7 +1892,7 @@ function D.GetItemData(me, d, i)
 			bBidding     = bBidding      ,
 			nStackNum    = item.bCanStack and item.nStackNum or 1,
 			bSpecial     = item.nQuality == GKP_LOOT_HUANGBABA_QUALITY
-				and LIB.GetItemIconByUIID(item.nUiId) == GKP_LOOT_HUANGBABA_ICON,
+				and X.GetItemIconByUIID(item.nUiId) == GKP_LOOT_HUANGBABA_ICON,
 		}
 		if DEBUG_LOOT then
 			data.bDist = true -- !!! Debug
@@ -1954,13 +1925,13 @@ function D.GetDoodadLootInfo(dwID)
 				if data.bSpecial then
 					bSpecial = true
 				end
-				insert(aItemData, data)
+				table.insert(aItemData, data)
 			end
 		end
 		nMoney = d.GetLootMoney() or 0
 		szName = d.szName
 	end
-	sort(aItemData, LootItemSorter)
+	table.sort(aItemData, LootItemSorter)
 	return aItemData, nMoney, szName, bSpecial
 end
 
@@ -1994,24 +1965,24 @@ function D.AutoSetSystemLootVisible()
 	end
 end
 
-LIB.RegisterFrameCreate('LootList', 'MY_GKPLoot', function()
+X.RegisterFrameCreate('LootList', 'MY_GKPLoot', function()
 	HookTableFunc(arg0, 'SetPoint', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'SetRelPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'SetAbsPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'CorrectPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 end)
 
-LIB.RegisterFrameCreate('GoldTeamLootList', 'MY_GKPLoot', function()
+X.RegisterFrameCreate('GoldTeamLootList', 'MY_GKPLoot', function()
 	HookTableFunc(arg0, 'SetPoint', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'SetRelPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'SetAbsPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 	HookTableFunc(arg0, 'CorrectPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
 end)
 
-LIB.RegisterEvent('TEAM_AUTHORITY_CHANGED', 'MY_GKPLoot', D.AutoSetSystemLootVisible)
+X.RegisterEvent('TEAM_AUTHORITY_CHANGED', 'MY_GKPLoot', D.AutoSetSystemLootVisible)
 
 -- 摸箱子
-LIB.RegisterEvent('OPEN_DOODAD', function()
+X.RegisterEvent('OPEN_DOODAD', function()
 	if not D.IsEnabled() then
 		return
 	end
@@ -2029,25 +2000,25 @@ LIB.RegisterEvent('OPEN_DOODAD', function()
 		return D.DrawLootList(arg0, true)
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('MY_GKPLoot', 'Open Doodad: ' .. arg0, DEBUG_LEVEL.LOG)
+	X.Debug('MY_GKPLoot', 'Open Doodad: ' .. arg0, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	D.InsertLootList(arg0)
 	D.HideSystemLoot()
 end)
 
 -- 刷新箱子
-LIB.RegisterEvent('SYNC_LOOT_LIST', function()
+X.RegisterEvent('SYNC_LOOT_LIST', function()
 	if not D.IsEnabled() then
 		return
 	end
 	local frame = D.GetFrame()
 	local wnd = D.GetDoodadWnd(frame, arg0)
-	if not wnd and LIB.IsRestricted('MY_GKPLoot.ForceLoot') then
+	if not wnd and X.IsRestricted('MY_GKPLoot.ForceLoot') then
 		local bDungeonTreasure = false
 		local aItemData = D.GetDoodadLootInfo(arg0)
 		for _, v in ipairs(aItemData) do
-			if wfind(v.szName, _L['Dungeon treasure']) == 1 -- 秘境宝箱
-			or v.szName == LIB.GetObjectName('ITEM_INFO', 5, 33011) then -- 砥砺同心礼盒
+			if wstring.find(v.szName, _L['Dungeon treasure']) == 1 -- 秘境宝箱
+			or v.szName == X.GetObjectName('ITEM_INFO', 5, 33011) then -- 砥砺同心礼盒
 				bDungeonTreasure = true
 				break
 			end
@@ -2059,7 +2030,7 @@ LIB.RegisterEvent('SYNC_LOOT_LIST', function()
 	D.InsertLootList(arg0)
 end)
 
-LIB.RegisterEvent('MY_GKP_LOOT_BOSS', function()
+X.RegisterEvent('MY_GKP_LOOT_BOSS', function()
 	if not arg0 then
 		MY_GKP_LOOT_BOSS = nil
 		GKP_LOOT_RECENT = {}
@@ -2077,11 +2048,11 @@ LIB.RegisterEvent('MY_GKP_LOOT_BOSS', function()
 	end
 end)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
-	nX, nY = X, nLFY
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)
+	nX, nY = nPaddingX, nLFY
 	ui:Append('Text', { text = _L['GKP Doodad helper'], x = nX, y = nY, font = 27 })
 
-	nX, nY = X + 10, nY + LH
+	nX, nY = nPaddingX + 10, nY + nLH
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Enable MY_GKPLoot'],
@@ -2124,7 +2095,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		autoenable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
-	nX, nY = X + 10, nY + LH
+	nX, nY = nPaddingX + 10, nY + nLH
 
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY,
@@ -2137,13 +2108,13 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		autoenable = function() return O.bOn end,
 	}):AutoWidth():Width() + 10
 
-	nX, nY = X + 10, nY + LH
+	nX, nY = nPaddingX + 10, nY + nLH
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Confirm when distribute'],
 		lmenu = function()
 			local t = {}
-			insert(t, { szOption = _L['Category'], bDisable = true })
+			table.insert(t, { szOption = _L['Category'], bDisable = true })
 			for _, szKey in ipairs({
 				'Huangbaba',
 				'Book',
@@ -2153,7 +2124,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 				'Horse',
 				'HorseEquip',
 			}) do
-				insert(t, {
+				table.insert(t, {
 					szOption = _L[szKey],
 					bCheck = true,
 					bChecked = O.tConfirm[szKey],
@@ -2163,8 +2134,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 					end,
 				})
 			end
-			insert(t, CONSTANT.MENU_DIVIDER)
-			insert(t, { szOption = _L['Quality'], bDisable = true })
+			table.insert(t, CONSTANT.MENU_DIVIDER)
+			table.insert(t, { szOption = _L['Quality'], bDisable = true })
 			for i, s in ipairs({
 				[1] = g_tStrings.STR_WHITE,
 				[2] = g_tStrings.STR_ROLLQUALITY_GREEN,
@@ -2172,7 +2143,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 				[4] = g_tStrings.STR_ROLLQUALITY_PURPLE,
 				[5] = g_tStrings.STR_ROLLQUALITY_NACARAT,
 			}) do
-				insert(t, {
+				table.insert(t, {
 					szOption = _L('Reach %s', s),
 					rgb = i == -1 and {255, 255, 255} or { GetItemFontColorByQuality(i) },
 					bCheck = true, bMCheck = true,
@@ -2216,7 +2187,7 @@ local settings = {
 		},
 	},
 }
-MY_GKP_Loot = LIB.CreateModule(settings)
+MY_GKP_Loot = X.CreateModule(settings)
 end
 
 -- Global exports
@@ -2264,5 +2235,5 @@ local settings = {
 		},
 	},
 }
-MY_GKPLoot = LIB.CreateModule(settings)
+MY_GKPLoot = X.CreateModule(settings)
 end

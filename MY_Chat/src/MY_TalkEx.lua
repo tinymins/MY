@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TalkEx'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -58,53 +29,53 @@ local D = {
 	dwTalkTick = 0,
 	dwTalkCDTime = 0,
 }
-local O = LIB.CreateUserSettingsModule('MY_TalkEx', _L['Chat'], {
+local O = X.CreateUserSettingsModule('MY_TalkEx', _L['Chat'], {
 	szTalkText = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	aTalkChannel = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
-		xSchema = Schema.Collection(Schema.Number),
+		xSchema = X.Schema.Collection(X.Schema.Number),
 		xDefaultValue = {},
 	},
 	nTrickChannel = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = PLAYER_TALK_CHANNEL.RAID,
 	},
 	szTrickFilter = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = 'RAID',
 	},
 	nTrickForce = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = CONSTANT.FORCE_TYPE.CHUN_YANG,
 	},
 	szTrickTextBegin = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = _L['$zj look around and have a little thought.'],
 	},
 	szTrickText = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = _L['$zj epilate $mb\'s feather clearly.'],
 	},
 	szTrickTextEnd = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = _L['$zj collected the feather epilated just now and wanted it sold well.'],
 	},
 })
@@ -123,9 +94,9 @@ local FORCE_LIST = {
 	-- { dwForceID = -1, szLabel = _L['Everyone'] },
 }
 for i, v in pairs(g_tStrings.tForceTitle) do
-	insert(FORCE_LIST, { dwForceID = i, szLabel = v })
+	table.insert(FORCE_LIST, { dwForceID = i, szLabel = v })
 end
-sort(FORCE_LIST, function(a, b) return a.dwForceID < b.dwForceID end)
+table.sort(FORCE_LIST, function(a, b) return a.dwForceID < b.dwForceID end)
 
 local TRICK_FILTER_LIST = {
 	-- { szKey = 'NEARBY', szLabel = _L['Nearby players where'] },
@@ -143,12 +114,12 @@ local TRICK_CHANNEL_LIST = {
 
 function D.Talk()
 	if #O.szTalkText == 0 then
-		return LIB.Systopmsg(_L['Please input something.'], CONSTANT.MSG_THEME.ERROR)
+		return X.Systopmsg(_L['Please input something.'], CONSTANT.MSG_THEME.ERROR)
 	end
 	-- 调试工具
-	if LIB.ProcessCommand and sub(O.szTalkText, 1, 8) == '/script ' then
-		local szCommand = sub(O.szTalkText, 9)
-		return LIB.ProcessCommand(szCommand)
+	if X.ProcessCommand and string.sub(O.szTalkText, 1, 8) == '/script ' then
+		local szCommand = string.sub(O.szTalkText, 9)
+		return X.ProcessCommand(szCommand)
 	end
 	-- 防止刷屏
 	if GetTime() - D.dwTalkTick < 1000 then
@@ -157,20 +128,20 @@ function D.Talk()
 	D.dwTalkTick = GetTime()
 	-- 近聊不放在第一个会导致发不出去
 	if lodash.includes(O.aTalkChannel, PLAYER_TALK_CHANNEL.NEARBY) then
-		LIB.SendChat(PLAYER_TALK_CHANNEL.NEARBY, O.szTalkText)
+		X.SendChat(PLAYER_TALK_CHANNEL.NEARBY, O.szTalkText)
 	end
 	-- 遍历发送队列
 	for _, nChannel in ipairs(O.aTalkChannel) do
 		if nChannel ~= PLAYER_TALK_CHANNEL.NEARBY then
-			LIB.SendChat(nChannel, O.szTalkText)
+			X.SendChat(nChannel, O.szTalkText)
 		end
 	end
 end
-LIB.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], D.Talk, nil)
+X.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], D.Talk, nil)
 
 function D.Trick()
 	if #O.szTrickText == 0 then
-		return LIB.Sysmsg(_L['Please input something.'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['Please input something.'], CONSTANT.MSG_THEME.ERROR)
 	end
 	local t = {}
 	local me = GetClientPlayer()
@@ -183,40 +154,40 @@ function D.Trick()
 			for _, dwID in ipairs(team.GetTeamMemberList()) do
 				local info = team.GetMemberInfo(dwID)
 				if info and (O.nTrickForce == -1 or O.nTrickForce == info.dwForceID) then
-					insert(t, info.szName)
+					table.insert(t, info.szName)
 				end
 			end
 		end
 	elseif O.szTrickFilter == 'NEARBY' then
-		for _, p in ipairs(LIB.GetNearPlayer()) do
+		for _, p in ipairs(X.GetNearPlayer()) do
 			if O.nTrickForce == -1 or O.nTrickForce == p.dwForceID then
-				insert(t, p.szName)
+				table.insert(t, p.szName)
 			end
 		end
 	end
 	-- 去掉自己 _(:з」∠)_调侃自己是闹哪样
 	for i = #t, 1, -1 do
 		if t[i] == me.szName then
-			remove(t, i)
+			table.remove(t, i)
 		end
 	end
 	-- none target
 	if #t == 0 then
-		return LIB.Systopmsg(_L['No trick target found.'], CONSTANT.MSG_THEME.ERROR)
+		return X.Systopmsg(_L['No trick target found.'], CONSTANT.MSG_THEME.ERROR)
 	end
 	-- start tricking
 	if #O.szTrickTextBegin > 0 then
-		LIB.SendChat(O.nTrickChannel, O.szTrickTextBegin)
+		X.SendChat(O.nTrickChannel, O.szTrickTextBegin)
 	end
 	-- for _, szName in ipairs(t) do
-	-- 	LIB.SendChat(O.nTrickChannel, (O.szTrickText:gsub('%$mb', '[' .. szName .. ']')))
+	-- 	X.SendChat(O.nTrickChannel, (O.szTrickText:gsub('%$mb', '[' .. szName .. ']')))
 	-- end
 	for i, szName in ipairs(t) do
 		t[i] = '[' .. szName .. ']'
 	end
-	LIB.SendChat(O.nTrickChannel, (O.szTrickText:gsub('%$mb', concat(t, _L.SLIGHT_PAUSE_MARK))))
+	X.SendChat(O.nTrickChannel, (O.szTrickText:gsub('%$mb', table.concat(t, _L.SLIGHT_PAUSE_MARK))))
 	if #O.szTrickTextEnd > 0 then
-		LIB.SendChat(O.nTrickChannel, O.szTrickTextEnd)
+		X.SendChat(O.nTrickChannel, O.szTrickTextEnd)
 	end
 	D.dwTalkCDTime = GetTime()
 end
@@ -250,13 +221,13 @@ function PS.OnPanelActive(wnd)
 			color = GetMsgFontColor(p.szID, true),
 			checked = lodash.includes(O.aTalkChannel, p.nChannel),
 			oncheck = function(bCheck)
-				for i, v in ipairs_r(O.aTalkChannel) do
+				for i, v in X.ipairs_r(O.aTalkChannel) do
 					if v == p.nChannel then
-						remove(O.aTalkChannel, i)
+						table.remove(O.aTalkChannel, i)
 					end
 				end
 				if bCheck then
-					insert(O.aTalkChannel, p.nChannel)
+					table.insert(O.aTalkChannel, p.nChannel)
 				end
 				O.aTalkChannel = O.aTalkChannel
 			end,
@@ -269,15 +240,15 @@ function PS.OnPanelActive(wnd)
 		text = _L['Send'],
 		onlclick = function()
 			if IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown() then
-				LIB.SetChatInput(O.szTalkText)
-				LIB.FocusChatInput()
+				X.SetChatInput(O.szTalkText)
+				X.FocusChatInput()
 			else
 				D.Talk()
 			end
 		end,
 		onrclick = function()
-			LIB.SetChatInput(O.szTalkText)
-			LIB.FocusChatInput()
+			X.SetChatInput(O.szTalkText)
+			X.FocusChatInput()
 		end,
 	})
 
@@ -308,17 +279,17 @@ function PS.OnPanelActive(wnd)
 		w = 50, h = 25,
 		text = _L['Search'],
 		onclick = function()
-			LIB.Ajax({
+			X.Ajax({
 				driver = 'auto', mode = 'auto', method = 'auto',
 				url = 'https://pull.j3cx.com/joke/random?'
-					.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+					.. X.EncodePostData(X.UrlEncode(X.SignPostData({
 						l = AnsiToUTF8(GLOBAL.GAME_LANG),
 						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 						q = AnsiToUTF8(D.szJokeSearch or ''),
 					}, 'c7355a0b-0d97-4ae1-b417-43a5c4e562ec'))),
 				success = function(html, status)
-					local res = LIB.JsonDecode(html)
-					if IsTable(res) then
+					local res = X.JsonDecode(html)
+					if X.IsTable(res) then
 						ui:Fetch('WndEditBox_JokeText'):Text(res.data.content)
 					end
 				end,
@@ -333,10 +304,10 @@ function PS.OnPanelActive(wnd)
 		w = 50, h = 25,
 		text = _L['Copy'],
 		onclick = function()
-			LIB.SetChatInput(D.szJokeText)
-			LIB.FocusChatInput()
+			X.SetChatInput(D.szJokeText)
+			X.FocusChatInput()
 		end,
-		autoenable = function() return not IsEmpty(D.szJokeText) end,
+		autoenable = function() return not X.IsEmpty(D.szJokeText) end,
 		tip = _L['Click to copy joke to chat panel.'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Pos('BOTTOMRIGHT') + 5
@@ -347,24 +318,24 @@ function PS.OnPanelActive(wnd)
 		text = _L['Share'],
 		onclick = function()
 			local function fnAction(bAnonymous)
-				LIB.Ajax({
+				X.Ajax({
 					driver = 'auto', mode = 'auto', method = 'auto',
 					url = 'https://push.j3cx.com/joke?'
-						.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+						.. X.EncodePostData(X.UrlEncode(X.SignPostData({
 							l = AnsiToUTF8(GLOBAL.GAME_LANG),
 							L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 							content = AnsiToUTF8(D.szJokeText or ''),
-							server = AnsiToUTF8(LIB.GetRealServer(2)),
-							role = bAnonymous and '' or AnsiToUTF8(LIB.GetUserRoleName()),
+							server = AnsiToUTF8(X.GetRealServer(2)),
+							role = bAnonymous and '' or AnsiToUTF8(X.GetUserRoleName()),
 							id = bAnonymous and '' or AnsiToUTF8(UI_GetClientPlayerID()),
-							jx3id = bAnonymous and '' or AnsiToUTF8(LIB.GetClientUUID()),
+							jx3id = bAnonymous and '' or AnsiToUTF8(X.GetClientUUID()),
 						}, 'c7355a0b-0d97-4ae1-b417-43a5c4e562ec'))),
 					success = function(html, status)
-						local res = LIB.JsonDecode(html)
-						if IsTable(res) then
-							LIB.Alert(LIB.ReplaceSensitiveWord(res.msg))
+						local res = X.JsonDecode(html)
+						if X.IsTable(res) then
+							X.Alert(X.ReplaceSensitiveWord(res.msg))
 						else
-							LIB.Systopmsg(_L['Share error: server error.'], CONSTANT.MSG_THEME.ERROR)
+							X.Systopmsg(_L['Share error: server error.'], CONSTANT.MSG_THEME.ERROR)
 						end
 					end,
 				})
@@ -381,7 +352,7 @@ function PS.OnPanelActive(wnd)
 			}
 			MessageBox(tMsg)
 		end,
-		autoenable = function() return not IsEmpty(D.szJokeText) end,
+		autoenable = function() return not X.IsEmpty(D.szJokeText) end,
 		tip = _L['Click to share your joke to remote.'],
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Pos('BOTTOMRIGHT') + 5
@@ -414,12 +385,12 @@ function PS.OnPanelActive(wnd)
 	-- 调侃对象范围过滤器
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 100, h = 25,
-		text = Get(lodash.find(TRICK_FILTER_LIST, function(p) return p.szKey == O.szTrickFilter end), 'szLabel', '???'),
+		text = X.Get(lodash.find(TRICK_FILTER_LIST, function(p) return p.szKey == O.szTrickFilter end), 'szLabel', '???'),
 		menu = function()
 			local ui = UI(this)
 			local t = {}
 			for _, p in ipairs(TRICK_FILTER_LIST) do
-				insert(t, {
+				table.insert(t, {
 					szOption = p.szLabel,
 					fnAction = function()
 						ui:Text(p.szLabel)
@@ -434,12 +405,12 @@ function PS.OnPanelActive(wnd)
 	-- 调侃门派过滤器
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 80, h = 25,
-		text = Get(lodash.find(FORCE_LIST, function(p) return p.dwForceID == O.nTrickForce end), 'szLabel', '???'),
+		text = X.Get(lodash.find(FORCE_LIST, function(p) return p.dwForceID == O.nTrickForce end), 'szLabel', '???'),
 		menu = function()
 			local ui = UI(this)
 			local t = {}
 			for _, p in ipairs(FORCE_LIST) do
-				insert(t, {
+				table.insert(t, {
 					szOption = p.szLabel,
 					fnAction = function()
 						ui:Text(p.szLabel)
@@ -484,13 +455,13 @@ function PS.OnPanelActive(wnd)
 	-- 调侃发送频道
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 100, h = 25,
-		text = Get(lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'szName', '???'),
-		color = Get(lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'tCol'),
+		text = X.Get(lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'szName', '???'),
+		color = X.Get(lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'tCol'),
 		menu = function()
 			local ui = UI(this)
 			local t = {}
 			for _, p in ipairs(TRICK_CHANNEL_LIST) do
-				insert(t, {
+				table.insert(t, {
 					rgb = p.tCol,
 					szOption = p.szName,
 					fnAction = function()
@@ -511,20 +482,20 @@ function PS.OnPanelActive(wnd)
 		text = _L['Trick'],
 		onclick = D.Trick,
 	})
-	LIB.BreatheCall('MY_TalkEx__Enable', function()
+	X.BreatheCall('MY_TalkEx__Enable', function()
 		local dwTime = GetTime() - D.dwTalkCDTime
 		if dwTime > 10000 then
 			uiBtn:Enable(true)
 			uiBtn:Text(_L['Trick'])
 		else
 			uiBtn:Enable(false)
-			uiBtn:Text(_L['Trick'] .. '(' .. ceil((10000 - dwTime) / 1000) .. ')')
+			uiBtn:Text(_L['Trick'] .. '(' .. math.ceil((10000 - dwTime) / 1000) .. ')')
 		end
 	end)
 end
 
 function PS.OnPanelDeactive()
-	LIB.BreatheCall('MY_TalkEx__Enable', false)
+	X.BreatheCall('MY_TalkEx__Enable', false)
 end
 
-LIB.RegisterPanel(_L['Chat'], 'TalkEx', _L['MY_TalkEx'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', PS)
+X.RegisterPanel(_L['Chat'], 'TalkEx', _L['MY_TalkEx'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', PS)

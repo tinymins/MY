@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Chat'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -62,11 +33,11 @@ local STATE = {
 	HIDDING = 4, -- 渐变隐藏中
 }
 local m_nState = STATE.SHOW
-local O = LIB.CreateUserSettingsModule('MY_Chat', _L['Chat'], {
+local O = X.CreateUserSettingsModule('MY_Chat', _L['Chat'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 })
@@ -91,7 +62,7 @@ function D.ShowChatPanel(nShowFrame, nDelayFrame, callback)
 	if m_nState == STATE.SHOW then
 		-- return when chat panel is visible
 		if callback then
-			Call(callback)
+			X.Call(callback)
 		end
 		return
 	elseif m_nState == STATE.SHOWING then
@@ -106,7 +77,7 @@ function D.ShowChatPanel(nShowFrame, nDelayFrame, callback)
 		end
 	elseif m_nState == STATE.HIDDING then
 		-- unregister hide animate
-		LIB.BreatheCall('MY_AutoHideChat_Hide', false)
+		X.BreatheCall('MY_AutoHideChat_Hide', false)
 	end
 	m_nState = STATE.SHOWING
 
@@ -114,14 +85,14 @@ function D.ShowChatPanel(nShowFrame, nDelayFrame, callback)
 	local nStartAlpha = Station.Lookup('Lowest1/ChatTitleBG'):GetAlpha()
 	local nStartFrame = GetLogicFrameCount()
 	-- register animate breathe call
-	LIB.BreatheCall('MY_AutoHideChat_Show', function()
+	X.BreatheCall('MY_AutoHideChat_Show', function()
 		local nFrame = GetLogicFrameCount()
 		if nFrame - nDelayFrame < nStartFrame then
 			D.fAhBgAlpha = D.GetBgAlpha()
 			return
 		end
 		-- calc new alpha
-		local nAlpha = min(ceil((nFrame - nDelayFrame - nStartFrame) / nShowFrame * (255 - nStartAlpha) + nStartAlpha), 255)
+		local nAlpha = math.min(math.ceil((nFrame - nDelayFrame - nStartFrame) / nShowFrame * (255 - nStartAlpha) + nStartAlpha), 255)
 		-- alpha each panel
 		for i = 1, 10 do
 			local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
@@ -135,7 +106,7 @@ function D.ShowChatPanel(nShowFrame, nDelayFrame, callback)
 		if nAlpha == 255 then
 			m_nState = STATE.SHOW
 			if callback then
-				Call(callback)
+				X.Call(callback)
 			end
 			return 0
 		end
@@ -161,12 +132,12 @@ function D.HideChatPanel(nHideFrame, nDelayFrame, callback)
 	elseif m_nState == STATE.HIDE then
 		-- return when chat panel is not visible
 		if callback then
-			Call(callback)
+			X.Call(callback)
 		end
 		return
 	elseif m_nState == STATE.HIDDING then
 		-- unregister hide animate
-		LIB.BreatheCall('MY_AutoHideChat_Hide', false)
+		X.BreatheCall('MY_AutoHideChat_Hide', false)
 	end
 	m_nState = STATE.HIDDING
 
@@ -174,14 +145,14 @@ function D.HideChatPanel(nHideFrame, nDelayFrame, callback)
 	local nStartAlpha = Station.Lookup('Lowest1/ChatTitleBG'):GetAlpha()
 	local nStartFrame = GetLogicFrameCount()
 	-- register animate breathe call
-	LIB.BreatheCall('MY_AutoHideChat_Hide', function()
+	X.BreatheCall('MY_AutoHideChat_Hide', function()
 		local nFrame = GetLogicFrameCount()
 		if nFrame - nDelayFrame < nStartFrame then
 			D.fAhBgAlpha = D.GetBgAlpha()
 			return
 		end
 		-- calc new alpha
-		local nAlpha = max(ceil((1 - (nFrame - nDelayFrame - nStartFrame) / nHideFrame) * nStartAlpha), 0)
+		local nAlpha = math.max(math.ceil((1 - (nFrame - nDelayFrame - nStartFrame) / nHideFrame) * nStartAlpha), 0)
 		-- if panel setting panel is opened then delay again
 		local hPanelSettingFrame = Station.Lookup('Normal/ChatSettingPanel')
 		if hPanelSettingFrame and hPanelSettingFrame:IsVisible() then
@@ -211,7 +182,7 @@ function D.HideChatPanel(nHideFrame, nDelayFrame, callback)
 		if nAlpha == 0 then
 			m_nState = STATE.HIDE
 			if callback then
-				Call(callback)
+				X.Call(callback)
 			end
 			return 0
 		end
@@ -221,7 +192,7 @@ end
 -- 初始化/生效 设置
 function D.Apply()
 	local shaBack = Station.Lookup('Lowest2/ChatPanel1/Wnd_Message', 'Shadow_Back')
-	local editInput = LIB.GetChatInput()
+	local editInput = X.GetChatInput()
 	if not shaBack or not editInput then
 		return
 	end
@@ -232,10 +203,10 @@ function D.Apply()
 			D.bAhAnimate = D.bAhAnimate or false
 		end
 		-- hook chat panel as event listener
-		LIB.HookChatPanel('AFTER', 'MY_AutoHideChat', function(h)
+		X.HookChatPanel('AFTER', 'MY_AutoHideChat', function(h)
 			-- if input box get focus then return
 			local focus = Station.GetFocusWindow()
-			if focus and focus == LIB.GetChatInput() then
+			if focus and focus == X.GetChatInput() then
 				return
 			end
 			-- show when new msg
@@ -282,17 +253,17 @@ function D.Apply()
 			editInput.OnKillFocus = nil
 		end
 		editInput._MY_T_AHCP_OnKillFocus = nil
-		LIB.HookChatPanel('AFTER', 'MY_AutoHideChat', false)
+		X.HookChatPanel('AFTER', 'MY_AutoHideChat', false)
 
 		D.ShowChatPanel()
 	end
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoHideChat', D.Apply)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoHideChat', D.Apply)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x = X
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
+	nX = nPaddingX
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Auto hide chat panel'],
 		checked = O.bEnable,
 		oncheck = function(bChecked)
@@ -300,8 +271,8 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			D.Apply()
 		end,
 	}):Width()
-	y = y + lineHeight
-	return x, y
+	nY = nY + nLH
+	return nX, nY
 end
 
 -- Global exports
@@ -316,5 +287,5 @@ local settings = {
 		},
 	},
 }
-MY_AutoHideChat = LIB.CreateModule(settings)
+MY_AutoHideChat = X.CreateModule(settings)
 end

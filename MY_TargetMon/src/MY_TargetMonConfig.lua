@@ -10,60 +10,31 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
 local PLUGIN_NAME = 'MY_TargetMon'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetMon'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_TargetMon', { ['*'] = false, classic = true })
-LIB.RegisterRestriction('MY_TargetMon.ShieldedUUID', { ['*'] = true })
+X.RegisterRestriction('MY_TargetMon', { ['*'] = false, classic = true })
+X.RegisterRestriction('MY_TargetMon.ShieldedUUID', { ['*'] = true })
 --------------------------------------------------------------------------
 local LANG = GLOBAL.GAME_LANG
 local INIT_STATE = 'NONE'
 local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }, {}
-local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.ROLE}
+local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', X.PATH_TYPE.ROLE}
 local EMBEDDED_ENCRYPTED = false
-local CUSTOM_EMBEDDED_CONFIG_ROOT = LIB.FormatPath({'userdata/TargetMon/', PATH_TYPE.GLOBAL})
-local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', PATH_TYPE.GLOBAL}
+local CUSTOM_EMBEDDED_CONFIG_ROOT = X.FormatPath({'userdata/TargetMon/', X.PATH_TYPE.GLOBAL})
+local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', X.PATH_TYPE.GLOBAL}
 local TARGET_TYPE_LIST = {
 	'CLIENT_PLAYER'  ,
 	'CONTROL_PLAYER' ,
@@ -81,7 +52,7 @@ local TARGET_TYPE_LIST = {
 	'TEAM_MARK_FAN'  ,
 }
 local CONFIG, CONFIG_CHANGED, CONFIG_BUFF_TARGET_LIST, CONFIG_SKILL_TARGET_LIST
-local CONFIG_TEMPLATE = LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_TargetMon/data/template/{$lang}.jx3dat')
+local CONFIG_TEMPLATE = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_TargetMon/data/template/{$lang}.jx3dat')
 local MON_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__
 local MONID_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__
 local MONLEVEL_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__
@@ -98,7 +69,7 @@ function D.GetTargetTypeList(szType)
 end
 
 function D.GeneUUID()
-	return LIB.GetUUID():gsub('-', '')
+	return X.GetUUID():gsub('-', '')
 end
 
 function D.GetConfigCaption(config)
@@ -111,22 +82,22 @@ end
 
 -- 格式化监控项数据
 function D.FormatConfig(config, bCoroutine)
-	return LIB.FormatDataStructure(config, CONFIG_TEMPLATE, nil, nil, bCoroutine)
+	return X.FormatDataStructure(config, CONFIG_TEMPLATE, nil, nil, bCoroutine)
 end
 
 function D.LoadEmbeddedConfig(bCoroutine)
-	if not IsString(C.PASSPHRASE) or not IsString(C.PASSPHRASE_EMBEDDED) then
+	if not X.IsString(C.PASSPHRASE) or not X.IsString(C.PASSPHRASE_EMBEDDED) then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('MY_TargetMonConfig', 'Passphrase cannot be empty!', DEBUG_LEVEL.ERROR)
+		X.Debug('MY_TargetMonConfig', 'Passphrase cannot be empty!', X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end
 	if not EMBEDDED_ENCRYPTED then
 		-- 自动生成内置加密数据
 		local DAT_ROOT = 'MY_Resource/data/targetmon/'
-		local SRC_ROOT = PACKET_INFO.ROOT .. '!src-dist/data/' .. DAT_ROOT
+		local SRC_ROOT = X.PACKET_INFO.ROOT .. '!src-dist/data/' .. DAT_ROOT
 		for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
-			LIB.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
+			X.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
 			local uuid = szFile:sub(1, -13)
 			local lang = szFile:sub(-11, -8)
 			if lang == 'zhcn' or lang == 'zhtw' then
@@ -135,18 +106,18 @@ function D.LoadEmbeddedConfig(bCoroutine)
 					data = DecodeData(data)
 				end
 				if lang == 'zhcn' then
-					data = DecodeLUAData(data)
-					if IsArray(data) then
+					data = X.DecodeLUAData(data)
+					if X.IsArray(data) then
 						for k, p in ipairs(data) do
 							data[k] = D.FormatConfig(p, bCoroutine)
 						end
 					else
 						data = D.FormatConfig(data, bCoroutine)
 					end
-					data = 'return ' .. EncodeLUAData(data)
+					data = 'return ' .. X.EncodeLUAData(data)
 				end
 				data = EncodeData(data, true, true)
-				SaveDataToFile(data, LIB.FormatPath({'userdata/TargetMon/' .. uuid .. '.jx3dat', PATH_TYPE.GLOBAL}, {lang = lang}), C.PASSPHRASE_EMBEDDED)
+				SaveDataToFile(data, X.FormatPath({'userdata/TargetMon/' .. uuid .. '.jx3dat', X.PATH_TYPE.GLOBAL}, {lang = lang}), C.PASSPHRASE_EMBEDDED)
 			end
 		end
 		EMBEDDED_ENCRYPTED = true
@@ -154,13 +125,13 @@ function D.LoadEmbeddedConfig(bCoroutine)
 	-- 加载内置数据
 	local aConfig = {}
 	for _, szFile in ipairs(CPath.GetFileList(CUSTOM_EMBEDDED_CONFIG_ROOT) or {}) do
-		local config = LIB.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
-			or LIB.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile)
-		if IsTable(config) and config.uuid and szFile:sub(1, -#'.jx3dat' - 1) == config.uuid and config.group and config.sort and config.monitors then
-			insert(aConfig, config)
+		local config = X.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
+			or X.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile)
+		if X.IsTable(config) and config.uuid and szFile:sub(1, -#'.jx3dat' - 1) == config.uuid and config.group and config.sort and config.monitors then
+			table.insert(aConfig, config)
 		end
 	end
-	sort(aConfig, function(a, b)
+	table.sort(aConfig, function(a, b)
 		if a.group == b.group then
 			return b.sort > a.sort
 		end
@@ -186,14 +157,14 @@ function D.LoadEmbeddedConfig(bCoroutine)
 				-- 插入结果集
 				tEmbedded[embedded.uuid] = embedded
 				tEmbeddedMon[embedded.uuid] = tMon
-				insert(aEmbedded, embedded)
+				table.insert(aEmbedded, embedded)
 			end
 		end
 	end
 	EMBEDDED_CONFIG_LIST, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH = aEmbedded, tEmbedded, tEmbeddedMon
 end
 
-local SHIELDED_UUID = LIB.ArrayToObject({
+local SHIELDED_UUID = X.ArrayToObject({
 	'00000223B5B291D0',
 	'00000223B5FD2010',
 	'00mu02rong04youMB',
@@ -212,7 +183,7 @@ local SHIELDED_UUID = LIB.ArrayToObject({
 -- 通过内嵌数据将监控项转为Patch
 function D.PatchToConfig(patch, bCoroutine)
 	-- 处理用户删除的内建数据和不合法的数据
-	if patch.delete or not patch.uuid or (LIB.IsRestricted('MY_TargetMon.ShieldedUUID') and not IsDebugClient() and SHIELDED_UUID[patch.uuid]) then
+	if patch.delete or not patch.uuid or (X.IsRestricted('MY_TargetMon.ShieldedUUID') and not IsDebugClient() and SHIELDED_UUID[patch.uuid]) then
 		return
 	end
 	-- 合并未修改的内嵌数据
@@ -222,14 +193,14 @@ function D.PatchToConfig(patch, bCoroutine)
 		for k, v in pairs(embedded) do
 			if k ~= 'monitors' then
 				if patch[k] == nil then
-					config[k] = Clone(v)
+					config[k] = X.Clone(v)
 				end
 			end
 		end
 		-- 设置改变过的数据
 		for k, v in pairs(patch) do
 			if k ~= 'monitors' then
-				config[k] = Clone(v)
+				config[k] = X.Clone(v)
 			end
 		end
 		-- 设置监控项内嵌数据删除项和自定义项
@@ -241,12 +212,12 @@ function D.PatchToConfig(patch, bCoroutine)
 					local monEmbedded = EMBEDDED_MONITOR_HASH[patch.uuid][mon.uuid]
 					if monEmbedded then -- 复制内嵌数据
 						if mon.patch then
-							insert(monitors, ApplyPatch(monEmbedded, mon.patch))
+							table.insert(monitors, X.ApplyPatch(monEmbedded, mon.patch))
 						else
-							insert(monitors, Clone(monEmbedded))
+							table.insert(monitors, X.Clone(monEmbedded))
 						end
 					elseif not mon.embedded and not mon.patch and mon.manually ~= false then -- 删除当前版本不存在的内嵌数据
-						insert(monitors, Clone(mon))
+						table.insert(monitors, X.Clone(mon))
 					end
 				end
 				existMon[mon.uuid] = true
@@ -265,9 +236,9 @@ function D.PatchToConfig(patch, bCoroutine)
 					end
 				end
 				if nIndex then
-					insert(monitors, nIndex, Clone(monEmbedded))
+					table.insert(monitors, nIndex, X.Clone(monEmbedded))
 				else
-					insert(monitors, Clone(monEmbedded))
+					table.insert(monitors, X.Clone(monEmbedded))
 				end
 				existMon[monEmbedded.uuid] = true
 			end
@@ -282,7 +253,7 @@ function D.PatchToConfig(patch, bCoroutine)
 			return
 		end
 		for k, v in pairs(patch) do
-			config[k] = Clone(v)
+			config[k] = X.Clone(v)
 		end
 	end
 	return D.FormatConfig(config, bCoroutine)
@@ -299,8 +270,8 @@ function D.ConfigToPatch(config)
 	if embedded then
 		-- 保存修改的全局属性
 		for k, v in pairs(config) do
-			if k ~= 'monitors' and not IsEquals(v, embedded[k]) then
-				patch[k] = Clone(v)
+			if k ~= 'monitors' and not X.IsEquals(v, embedded[k]) then
+				patch[k] = X.Clone(v)
 			end
 		end
 		-- 保存监控项添加以及排序修改的部分
@@ -310,21 +281,21 @@ function D.ConfigToPatch(config)
 			local monEmbedded = EMBEDDED_MONITOR_HASH[embedded.uuid][mon.uuid]
 			if monEmbedded then
 				-- 内嵌的监控计算Patch
-				insert(monitors, {
+				table.insert(monitors, {
 					embedded = true,
 					uuid = monEmbedded.uuid,
-					patch = GetPatch(monEmbedded, mon),
+					patch = X.GetPatch(monEmbedded, mon),
 				})
 			else
 				-- 自己添加的监控
-				insert(monitors, Clone(mon))
+				table.insert(monitors, X.Clone(mon))
 			end
 			existMon[mon.uuid] = true
 		end
 		-- 保存删减的部分
 		for _, monEmbedded in ipairs(embedded.monitors) do
 			if not existMon[monEmbedded.uuid] then
-				insert(monitors, { uuid = monEmbedded.uuid, delete = true })
+				table.insert(monitors, { uuid = monEmbedded.uuid, delete = true })
 			end
 			existMon[monEmbedded.uuid] = true
 		end
@@ -333,7 +304,7 @@ function D.ConfigToPatch(config)
 		patch.monitors = monitors
 	else
 		for k, v in pairs(config) do
-			patch[k] = Clone(v)
+			patch[k] = X.Clone(v)
 		end
 	end
 	return patch
@@ -361,10 +332,10 @@ function D.UpdateTargetList()
 	local aBuffTarget, aSkillTarget = {}, {}
 	for _, szType in ipairs(TARGET_TYPE_LIST) do
 		if tBuffTargetExist[szType] then
-			insert(aBuffTarget, szType)
+			table.insert(aBuffTarget, szType)
 		end
 		if tSkillTargetExist[szType] then
-			insert(aSkillTarget, szType)
+			table.insert(aSkillTarget, szType)
 		end
 	end
 	CONFIG_BUFF_TARGET_LIST, CONFIG_SKILL_TARGET_LIST = aBuffTarget, aSkillTarget
@@ -373,10 +344,10 @@ end
 function D.LoadConfig(bDefault, bOriginal, bCoroutine)
 	local aPatch
 	if not bDefault then
-		aPatch = LIB.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or LIB.LoadLUAData(ROLE_CONFIG_FILE)
+		aPatch = X.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or X.LoadLUAData(ROLE_CONFIG_FILE)
 	end
 	if not aPatch and not bOriginal then
-		aPatch = LIB.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or LIB.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
+		aPatch = X.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or X.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
 	end
 	if not aPatch then
 		aPatch = {}
@@ -386,20 +357,20 @@ function D.LoadConfig(bDefault, bOriginal, bCoroutine)
 		if patch.uuid and not tLoaded[patch.uuid] then
 			local config = D.PatchToConfig(patch)
 			if config then
-				insert(aConfig, config)
+				table.insert(aConfig, config)
 			end
 			tLoaded[patch.uuid] = true
 		end
 	end
 	for i, embedded in ipairs(EMBEDDED_CONFIG_LIST) do
 		if embedded.uuid and not tLoaded[embedded.uuid] then
-			local config = Clone(embedded)
+			local config = X.Clone(embedded)
 			if LANG ~= 'zhcn' then
 				config = D.FormatConfig(config, bCoroutine)
 			end
 			if config then
 				config.embedded = true
-				insert(aConfig, config)
+				table.insert(aConfig, config)
 			end
 			tLoaded[config.uuid] = true
 		end
@@ -417,13 +388,13 @@ function D.SaveConfig(bDefault)
 	for i, config in ipairs(CONFIG) do
 		local patch = D.ConfigToPatch(config)
 		if patch then
-			insert(aPatch, patch)
+			table.insert(aPatch, patch)
 		end
 		tLoaded[config.uuid] = true
 	end
 	for i, embedded in ipairs(EMBEDDED_CONFIG_LIST) do
 		if not tLoaded[embedded.uuid] then
-			insert(aPatch, {
+			table.insert(aPatch, {
 				uuid = embedded.uuid,
 				delete = true,
 			})
@@ -431,9 +402,9 @@ function D.SaveConfig(bDefault)
 		end
 	end
 	if bDefault then
-		LIB.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
+		X.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
 	else
-		LIB.SaveLUAData(ROLE_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
+		X.SaveLUAData(ROLE_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
 		CONFIG_CHANGED = false
 	end
 end
@@ -449,7 +420,7 @@ function D.ImportPatches(aPatch, bAsEmbedded)
 					nReplaceCount = nReplaceCount + 1
 				end
 				nImportCount = nImportCount + 1
-				LIB.SaveLUAData(szFile, embedded, { passphrase = C.PASSPHRASE_EMBEDDED })
+				X.SaveLUAData(szFile, embedded, { passphrase = C.PASSPHRASE_EMBEDDED })
 			end
 		end
 		if nImportCount > 0 then
@@ -461,14 +432,14 @@ function D.ImportPatches(aPatch, bAsEmbedded)
 		for _, patch in ipairs(aPatch) do
 			local config = D.PatchToConfig(patch)
 			if config then
-				for i, cfg in ipairs_r(CONFIG) do
+				for i, cfg in X.ipairs_r(CONFIG) do
 					if config.uuid and config.uuid == cfg.uuid then
-						remove(CONFIG, i)
+						table.remove(CONFIG, i)
 						nReplaceCount = nReplaceCount + 1
 					end
 				end
 				nImportCount = nImportCount + 1
-				insert(CONFIG, config)
+				table.insert(CONFIG, config)
 			end
 		end
 		if nImportCount > 0 then
@@ -489,7 +460,7 @@ function D.ExportPatches(aUUID, bAsEmbedded)
 				if bAsEmbedded then
 					patch.uuid = 'DT' .. patch.uuid
 				end
-				insert(aPatch, patch)
+				table.insert(aPatch, patch)
 			end
 		end
 	end
@@ -497,9 +468,9 @@ function D.ExportPatches(aUUID, bAsEmbedded)
 end
 
 function D.ImportPatchFile(oFilePath)
-	local aPatch, bAsEmbedded = LIB.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE }) or LIB.LoadLUAData(oFilePath), false
+	local aPatch, bAsEmbedded = X.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE }) or X.LoadLUAData(oFilePath), false
 	if not aPatch then
-		aPatch, bAsEmbedded = LIB.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE_EMBEDDED }), true
+		aPatch, bAsEmbedded = X.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE_EMBEDDED }), true
 	end
 	if not aPatch then
 		return
@@ -518,33 +489,33 @@ function D.ExportPatchFile(oFilePath, aUUID, szIndent, bAsEmbedded)
 		szPassphrase = C.PASSPHRASE
 	end
 	local aPatch = D.ExportPatches(aUUID, bAsEmbedded)
-	LIB.SaveLUAData(oFilePath, aPatch, { indent = szIndent, crc = not szIndent, passphrase = szPassphrase })
+	X.SaveLUAData(oFilePath, aPatch, { indent = szIndent, crc = not szIndent, passphrase = szPassphrase })
 end
 
 function D.Init(bNoCoroutine)
 	if INIT_STATE == 'NONE' then
-		local k = char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69)
-		if IsTable(C[k]) then
+		local k = string.char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69)
+		if X.IsTable(C[k]) then
 			for i = 0, 50 do
 				for j, v in ipairs({ 253, 12, 34, 56 }) do
-					insert(C[k], (i * j * ((3 * v) % 256)) % 256)
+					table.insert(C[k], (i * j * ((3 * v) % 256)) % 256)
 				end
 			end
-			C[k] = char(unpack(C[k]))
+			C[k] = string.char(unpack(C[k]))
 		end
-		local k = char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69, 95, 69, 77, 66, 69, 68, 68, 69, 68)
-		if IsTable(C[k]) then
+		local k = string.char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69, 95, 69, 77, 66, 69, 68, 68, 69, 68)
+		if X.IsTable(C[k]) then
 			for i = 0, 50 do
 				for j, v in ipairs({ 253, 12, 34, 56 }) do
-					insert(C[k], (i * j * ((15 * v) % 256)) % 256)
+					table.insert(C[k], (i * j * ((15 * v) % 256)) % 256)
 				end
 			end
-			C[k] = char(unpack(C[k]))
+			C[k] = string.char(unpack(C[k]))
 		end
 		INIT_STATE = 'WAIT_CONFIG'
 	end
 	if INIT_STATE == 'WAIT_CONFIG' then
-		LIB.RegisterCoroutine('MY_TargetMonConfig', function()
+		X.RegisterCoroutine('MY_TargetMonConfig', function()
 			D.LoadEmbeddedConfig(true)
 			D.LoadConfig(nil, nil, true)
 			INIT_STATE = 'DONE'
@@ -553,11 +524,11 @@ function D.Init(bNoCoroutine)
 		INIT_STATE = 'LOADING_CONFIG'
 	end
 	if INIT_STATE == 'LOADING_CONFIG' and bNoCoroutine then
-		LIB.FlushCoroutine('MY_TargetMonConfig')
+		X.FlushCoroutine('MY_TargetMonConfig')
 	end
 	return INIT_STATE == 'DONE'
 end
-LIB.RegisterInit('MY_TargetMonConfig', D.Init)
+X.RegisterInit('MY_TargetMonConfig', D.Init)
 
 do
 local function Flush()
@@ -566,7 +537,7 @@ local function Flush()
 	end
 	D.SaveConfig()
 end
-LIB.RegisterFlush('MY_TargetMonConfig', Flush)
+X.RegisterFlush('MY_TargetMonConfig', Flush)
 end
 
 function D.GetConfig(nIndex)
@@ -579,7 +550,7 @@ function D.GetConfigList(bNoEmbedded)
 		local a = {}
 		for _, config in ipairs(CONFIG) do
 			if not EMBEDDED_CONFIG_HASH[config.uuid] then
-				insert(a, config)
+				table.insert(a, config)
 			end
 		end
 		return a
@@ -591,10 +562,10 @@ end
 -- 监控设置条操作
 ------------------------------------------------------------------------------------------------------
 function D.CreateConfig()
-	local config = LIB.FormatDataStructure({
+	local config = X.FormatDataStructure({
 		uuid = D.GeneUUID(),
 	}, CONFIG_TEMPLATE)
-	insert(CONFIG, config)
+	table.insert(CONFIG, config)
 	D.UpdateTargetList()
 	D.MarkConfigChanged()
 	FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
@@ -604,10 +575,10 @@ end
 function D.MoveConfig(config, offset)
 	for i, v in ipairs(CONFIG) do
 		if v == config then
-			local j = min(max(i + offset, 1), #CONFIG)
+			local j = math.min(math.max(i + offset, 1), #CONFIG)
 			if j ~= i then
-				remove(CONFIG, i)
-				insert(CONFIG, j, config)
+				table.remove(CONFIG, i)
+				table.insert(CONFIG, j, config)
 			end
 			D.MarkConfigChanged()
 			FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
@@ -617,7 +588,7 @@ function D.MoveConfig(config, offset)
 end
 
 function D.ModifyConfig(config, szKey, oVal)
-	if IsString(config) then
+	if X.IsString(config) then
 		for _, v in ipairs(CONFIG) do
 			if v.uuid == config then
 				config = v
@@ -625,7 +596,7 @@ function D.ModifyConfig(config, szKey, oVal)
 			end
 		end
 	end
-	if not Set(config, szKey, oVal) then
+	if not X.Set(config, szKey, oVal) then
 		return
 	end
 	if szKey == 'enable' or szKey == 'target' or szKey == 'type' then
@@ -638,9 +609,9 @@ function D.ModifyConfig(config, szKey, oVal)
 end
 
 function D.DeleteConfig(config, bAsEmbedded)
-	for i, v in ipairs_r(CONFIG) do
+	for i, v in X.ipairs_r(CONFIG) do
 		if v == config then
-			remove(CONFIG, i)
+			table.remove(CONFIG, i)
 			D.UpdateTargetList()
 			D.MarkConfigChanged()
 			FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
@@ -659,11 +630,11 @@ end
 -- 监控内容数据项操作
 ------------------------------------------------------------------------------------------------------
 function D.CreateMonitor(config, name)
-	local mon = LIB.FormatDataStructure({
+	local mon = X.FormatDataStructure({
 		name = name,
 		uuid = D.GeneUUID(),
 	}, MON_TEMPLATE)
-	insert(config.monitors, mon)
+	table.insert(config.monitors, mon)
 	D.MarkConfigChanged()
 	FireUIEvent('MY_TARGET_MON_MONITOR_CHANGE')
 	return mon
@@ -672,10 +643,10 @@ end
 function D.MoveMonitor(config, mon, offset)
 	for i, v in ipairs(config.monitors) do
 		if v == mon then
-			local j = min(max(i + offset, 1), #config.monitors)
+			local j = math.min(math.max(i + offset, 1), #config.monitors)
 			if j ~= i then
-				remove(config.monitors, i)
-				insert(config.monitors, j, mon)
+				table.remove(config.monitors, i)
+				table.insert(config.monitors, j, mon)
 			end
 			D.MarkConfigChanged()
 			FireUIEvent('MY_TARGET_MON_MONITOR_CHANGE')
@@ -685,7 +656,7 @@ function D.MoveMonitor(config, mon, offset)
 end
 
 function D.ModifyMonitor(mon, szKey, oVal)
-	if not Set(mon, szKey, oVal) then
+	if not X.Set(mon, szKey, oVal) then
 		return
 	end
 	D.MarkConfigChanged()
@@ -695,7 +666,7 @@ end
 function D.DeleteMonitor(config, mon)
 	for i, v in ipairs(config.monitors) do
 		if v == mon then
-			remove(config.monitors, i)
+			table.remove(config.monitors, i)
 			D.MarkConfigChanged()
 			FireUIEvent('MY_TARGET_MON_MONITOR_CHANGE')
 			break
@@ -707,14 +678,14 @@ end
 -- 监控内容数据项ID列表
 ------------------------------------------------------------------------------------------------------
 function D.CreateMonitorId(mon, dwID)
-	local monid = LIB.FormatDataStructure(nil, MONID_TEMPLATE)
+	local monid = X.FormatDataStructure(nil, MONID_TEMPLATE)
 	mon.ids[dwID] = monid
 	D.MarkConfigChanged()
 	return monid
 end
 
 function D.ModifyMonitorId(monid, szKey, oVal)
-	if not Set(monid, szKey, oVal) then
+	if not X.Set(monid, szKey, oVal) then
 		return
 	end
 	D.MarkConfigChanged()
@@ -729,14 +700,14 @@ end
 -- 监控内容数据项ID等级列表
 ------------------------------------------------------------------------------------------------------
 function D.CreateMonitorLevel(monid, nLevel)
-	local monlevel = LIB.FormatDataStructure(nil, MONLEVEL_TEMPLATE)
+	local monlevel = X.FormatDataStructure(nil, MONLEVEL_TEMPLATE)
 	monid.levels[nLevel] = monlevel
 	D.MarkConfigChanged()
 	return monlevel
 end
 
 function D.ModifyMonitorLevel(monlevel, szKey, oVal)
-	if not Set(monlevel, szKey, oVal) then
+	if not X.Set(monlevel, szKey, oVal) then
 		return
 	end
 	D.MarkConfigChanged()
@@ -783,5 +754,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetMonConfig = LIB.CreateModule(settings)
+MY_TargetMonConfig = X.CreateModule(settings)
 end

@@ -10,68 +10,39 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_AchievementWiki', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_AchievementWiki', _L['General'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nW = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 850,
 	},
 	nH = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 610,
 	},
 })
@@ -82,12 +53,12 @@ function D.OnWebSizeChange()
 end
 
 function D.Open(dwAchievement)
-	local achi = LIB.GetAchievement(dwAchievement)
+	local achi = X.GetAchievement(dwAchievement)
 	if not achi then
 		return
 	end
 	local szURL = 'https://page.j3cx.com/wiki/' .. dwAchievement .. '?'
-		.. LIB.EncodePostData(LIB.UrlEncode({
+		.. X.EncodePostData(X.UrlEncode({
 			l = AnsiToUTF8(GLOBAL.GAME_LANG),
 			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 			player = AnsiToUTF8(GetUserRoleName()),
@@ -109,19 +80,19 @@ function D.OnAchieveItemMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local xml = {}
-		insert(xml, GetFormatText(_L['Click for achievement wiki'], 41))
+		table.insert(xml, GetFormatText(_L['Click for achievement wiki'], 41))
 		if IsCtrlKeyDown() then
 			local h = this:GetParent()
 			local t = {}
 			for k, v in pairs(h) do
 				if k ~= '___id' and k ~= '___type' then
-					insert(t, k .. ': ' .. EncodeLUAData(v, '  '))
+					table.insert(t, k .. ': ' .. X.EncodeLUAData(v, '  '))
 				end
 			end
-			insert(xml, GetFormatText('\n\n' .. g_tStrings.DEBUG_INFO_ITEM_TIP .. '\n', 102))
-			insert(xml, GetFormatText(concat(t, '\n'), 102))
+			table.insert(xml, GetFormatText('\n\n' .. g_tStrings.DEBUG_INFO_ITEM_TIP .. '\n', 102))
+			table.insert(xml, GetFormatText(table.concat(t, '\n'), 102))
 		end
-		OutputTip(concat(xml), 300, { x, y, w, h })
+		OutputTip(table.concat(xml), 300, { x, y, w, h })
 	end
 end
 
@@ -177,7 +148,7 @@ function D.HookAchieveFrame(frame)
 	D.HookAchieveHandle(frame:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_AlmostFinish', ''))
 end
 
-LIB.RegisterInit('MY_AchievementWiki', function()
+X.RegisterInit('MY_AchievementWiki', function()
 	local frame = Station.Lookup('Normal/AchievementPanel')
 	if not frame then
 		return
@@ -185,13 +156,13 @@ LIB.RegisterInit('MY_AchievementWiki', function()
 	D.HookAchieveFrame(frame)
 end)
 
-LIB.RegisterFrameCreate('AchievementPanel', 'MY_AchievementWiki', function(name, frame)
+X.RegisterFrameCreate('AchievementPanel', 'MY_AchievementWiki', function(name, frame)
 	D.HookAchieveFrame(frame)
 end)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Achievement wiki'],
 		tip = _L['Click icon on achievemnt panel to view achievement wiki'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
@@ -200,7 +171,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			MY_AchievementWiki.bEnable = bChecked
 		end,
 	}):Width() + 5
-	return x, y
+	return nX, nY
 end
 
 -- Global exports
@@ -235,5 +206,5 @@ local settings = {
 		},
 	},
 }
-MY_AchievementWiki = LIB.CreateModule(settings)
+MY_AchievementWiki = X.CreateModule(settings)
 end

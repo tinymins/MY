@@ -10,51 +10,22 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Focus'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Focus'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local INI_PATH = PACKET_INFO.ROOT .. 'MY_Focus/ui/MY_Focus.ini'
+local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_Focus/ui/MY_Focus.ini'
 local D = {
 	GetDisplayList     = MY_Focus.GetDisplayList    ,
 	IsShielded         = MY_Focus.IsShielded        ,
@@ -175,10 +146,10 @@ function D.UpdateItem(hItem, p)
 	local dwType, dwID = p.dwType, p.dwID
 	local szVia, tRule = p.szVia, p.tRule
 	local bDeletable = p.bDeletable
-	local KObject, info, bInfo = LIB.GetObject(dwType, dwID)
-	local szName = tRule and LIB.ReplaceSensitiveWord(tRule.szDisplay)
+	local KObject, info, bInfo = X.GetObject(dwType, dwID)
+	local szName = tRule and X.ReplaceSensitiveWord(tRule.szDisplay)
 	if not szName or szName == '' then
-		szName = LIB.GetObjectName(KObject)
+		szName = X.GetObjectName(KObject)
 	end
 	local player = GetClientPlayer()
 	if not KObject then
@@ -202,13 +173,13 @@ function D.UpdateItem(hItem, p)
 	hInfoList:Lookup('Handle_Kungfu'):Hide()
 	if dwType == TARGET.PLAYER then
 		if bInfo and info.dwMountKungfuID then
-			hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(LIB.GetKungfuName(info.dwMountKungfuID))
+			hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(X.GetKungfuName(info.dwMountKungfuID))
 			hInfoList:Lookup('Handle_Kungfu'):Show()
 			hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 		else
 			local kungfu = KObject.GetKungfuMount()
 			if kungfu then
-				hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(LIB.GetKungfuName(kungfu.dwSkillID))
+				hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(X.GetKungfuName(kungfu.dwSkillID))
 				hInfoList:Lookup('Handle_Kungfu'):Show()
 				hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
 			else
@@ -223,7 +194,7 @@ function D.UpdateItem(hItem, p)
 	-- 阵营
 	hInfoList:Lookup('Handle_Camp'):Hide()
 	if dwType == TARGET.PLAYER then
-		local szCampImg, nCampFrame = LIB.GetCampImage(KObject.nCamp, KObject.bCampFlag)
+		local szCampImg, nCampFrame = X.GetCampImage(KObject.nCamp, KObject.bCampFlag)
 		if szCampImg then
 			hInfoList:Lookup('Handle_Camp'):Show()
 			hInfoList:Lookup('Handle_Camp/Image_Camp'):FromUITex(szCampImg, nCampFrame)
@@ -232,7 +203,7 @@ function D.UpdateItem(hItem, p)
 	-- 标记
 	hInfoList:Lookup('Handle_Mark'):Hide()
 	local KTeam = GetClientTeam()
-	if KTeam and LIB.IsInParty() and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) then
+	if KTeam and X.IsInParty() and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) then
 		local tMark = KTeam.GetTeamMark()
 		if tMark then
 			local nMarkID = tMark[dwID]
@@ -249,14 +220,14 @@ function D.UpdateItem(hItem, p)
 	-- 目标距离
 	local nDistance = 0
 	if player then
-		nDistance = floor(LIB.GetDistance(player, KObject, MY_Focus.szDistanceType) * 10) / 10
+		nDistance = math.floor(X.GetDistance(player, KObject, MY_Focus.szDistanceType) * 10) / 10
 	end
 	hItem:Lookup('Handle_L/Handle_Compass/Compass_Distance'):SetText(nDistance)
 	hItem:Lookup('Handle_L/Handle_School/School_Distance'):SetText(nDistance)
 	-- 自身面向
 	if player then
 		hItem:Lookup('Handle_L/Handle_Compass/Image_Player'):Show()
-		hItem:Lookup('Handle_L/Handle_Compass/Image_Player'):SetRotate( - player.nFaceDirection / 128 * PI)
+		hItem:Lookup('Handle_L/Handle_Compass/Image_Player'):SetRotate( - player.nFaceDirection / 128 * math.pi)
 	end
 	-- 左侧主要部分
 	if MY_Focus.bDisplayKungfuIcon and dwType == TARGET.PLAYER then
@@ -281,7 +252,7 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen'):Hide()
 		if player and nDistance > 0 then
 			local h
-			if (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and LIB.IsEnemy(UI_GetClientPlayerID(), dwID) then
+			if (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and X.IsEnemy(UI_GetClientPlayerID(), dwID) then
 				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointRed')
 			else
 				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen')
@@ -291,21 +262,21 @@ function D.UpdateItem(hItem, p)
 			-- 特判角度
 			if player.nX == KObject.nX then
 				if player.nY > KObject.nY then
-					nRotate = PI / 2
+					nRotate = math.pi / 2
 				else
-					nRotate = - PI / 2
+					nRotate = - math.pi / 2
 				end
 			else
-				nRotate = atan((player.nY - KObject.nY) / (player.nX - KObject.nX))
+				nRotate = math.atan((player.nY - KObject.nY) / (player.nX - KObject.nX))
 			end
 			if nRotate < 0 then
-				nRotate = nRotate + PI
+				nRotate = nRotate + math.pi
 			end
 			if KObject.nY < player.nY then
-				nRotate = PI + nRotate
+				nRotate = math.pi + nRotate
 			end
 			local nRadius = 13.5
-			h:SetRelPos((nRadius + nRadius * cos(nRotate) + 2) * MY_Focus.fScaleY, (nRadius - 3 - 13.5 * sin(nRotate)) * MY_Focus.fScaleY)
+			h:SetRelPos((nRadius + nRadius * math.cos(nRotate) + 2) * MY_Focus.fScaleY, (nRadius - 3 - 13.5 * math.sin(nRotate)) * MY_Focus.fScaleY)
 			h:GetParent():FormatAllItemPos()
 		end
 	end
@@ -319,11 +290,11 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_R/Handle_LMN/Image_Mana'):SetPercentage(1)
 		hItem:Lookup('Handle_R/Handle_LMN/Text_Mana'):SetText('')
 	else
-		local fCurrentLife, fMaxLife = LIB.GetObjectLife(info)
+		local fCurrentLife, fMaxLife = X.GetObjectLife(info)
 		local nCurrentMana, nMaxMana = info.nCurrentMana, info.nMaxMana
-		local szLife = LIB.FormatNumberDot(fCurrentLife, 1, false, true)
+		local szLife = X.FormatNumberDot(fCurrentLife, 1, false, true)
 		if fMaxLife > 0 then
-			local nPercent = floor(fCurrentLife / fMaxLife * 100)
+			local nPercent = math.floor(fCurrentLife / fMaxLife * 100)
 			if nPercent > 100 then
 				nPercent = 100
 			end
@@ -333,18 +304,18 @@ function D.UpdateItem(hItem, p)
 		end
 		if nMaxMana > 0 then
 			hItem:Lookup('Handle_R/Handle_LMN/Image_Mana'):SetPercentage(nCurrentMana / nMaxMana)
-			hItem:Lookup('Handle_R/Handle_LMN/Text_Mana'):SetText(LIB.FormatNumberDot(nCurrentMana, 1, false, true) .. '/' .. LIB.FormatNumberDot(nMaxMana, 1, false, true))
+			hItem:Lookup('Handle_R/Handle_LMN/Text_Mana'):SetText(X.FormatNumberDot(nCurrentMana, 1, false, true) .. '/' .. X.FormatNumberDot(nMaxMana, 1, false, true))
 		end
 	end
 	-- 读条
 	if dwType ~= TARGET.DOODAD then
-		local nType, dwSkillID, dwSkillLevel, fProgress = LIB.GetOTActionState(KObject)
+		local nType, dwSkillID, dwSkillLevel, fProgress = X.GetOTActionState(KObject)
 		if (nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
 			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE)
 		and dwSkillID and dwSkillLevel then
 			hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress or 0)
-			hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText(LIB.GetSkillName(dwSkillID, dwSkillLevel) or '')
+			hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText(X.GetSkillName(dwSkillID, dwSkillLevel) or '')
 		else
 			hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(0)
 			hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText('')
@@ -353,9 +324,9 @@ function D.UpdateItem(hItem, p)
 	-- 目标的目标
 	if MY_Focus.bShowTarget and dwType ~= TARGET.DOODAD then
 		local tp, id = KObject.GetTarget()
-		local tar = LIB.GetObject(tp, id)
+		local tar = X.GetObject(tp, id)
 		if tar then
-			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText(LIB.GetObjectName(tar))
+			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText(X.GetObjectName(tar))
 		else
 			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText('')
 		end
@@ -389,7 +360,7 @@ function D.UpdateList(frame)
 			D.UpdateItem(hItem, p)
 			if MY_Focus.bEnableSceneNavi and Navigator_SetID then
 				local szKey = 'MY_FOCUS.' .. p.dwType .. '_' .. p.dwID
-				local szText = p.tRule and p.tRule.szDisplay ~= '' and LIB.ReplaceSensitiveWord(p.tRule.szDisplay) or p.szName
+				local szText = p.tRule and p.tRule.szDisplay ~= '' and X.ReplaceSensitiveWord(p.tRule.szDisplay) or p.szName
 				if NAVIGATOR_CACHE[szKey] ~= szText then
 					Navigator_SetID(szKey, p.dwType, p.dwID, szText)
 				end
@@ -432,9 +403,9 @@ end
 function D.OnFrameBreathe()
 	if not D.IsShielded() then
 		if l_dwLockType and l_dwLockID and l_lockInDisplay then
-			local dwType, dwID = LIB.GetTarget()
+			local dwType, dwID = X.GetTarget()
 			if dwType ~= l_dwLockType or dwID ~= l_dwLockID then
-				LIB.SetTarget(l_dwLockType, l_dwLockID)
+				X.SetTarget(l_dwLockType, l_dwLockID)
 			end
 		end
 		if MY_Focus.bSortByDistance then
@@ -522,8 +493,8 @@ function D.OnItemMouseEnter()
 	if name == 'Handle_Info' then
 		this:Lookup('Image_Hover'):Show()
 		if MY_Focus.bHealHelper then
-			TEMP_TARGET_TYPE, TEMP_TARGET_ID = LIB.GetTarget()
-			LIB.SetTarget(this.dwType, this.dwID)
+			TEMP_TARGET_TYPE, TEMP_TARGET_ID = X.GetTarget()
+			X.SetTarget(this.dwType, this.dwID)
 		end
 		D.OnItemRefreshTip()
 	end
@@ -538,7 +509,7 @@ function D.OnItemRefreshTip()
 			local w, h = this:GetSize()
 			Rect = { x, y, w, h }
 		end
-		LIB.OutputObjectTip(Rect, this.dwType, this.dwID, GetFormatText(_L['Via:'] .. this.szVia .. '\n', 82))
+		X.OutputObjectTip(Rect, this.dwType, this.dwID, GetFormatText(_L['Via:'] .. this.szVia .. '\n', 82))
 	end
 end
 
@@ -547,7 +518,7 @@ function D.OnItemMouseLeave()
 	if name == 'Handle_Info' then
 		if this:Lookup('Image_Hover') then
 			if MY_Focus.bHealHelper and TEMP_TARGET_TYPE and TEMP_TARGET_ID then
-				LIB.SetTarget(TEMP_TARGET_TYPE, TEMP_TARGET_ID)
+				X.SetTarget(TEMP_TARGET_TYPE, TEMP_TARGET_ID)
 				TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 			end
 			this:Lookup('Image_Hover'):Hide()
@@ -561,7 +532,7 @@ function D.OnItemLButtonClick()
 		if MY_Focus.bHealHelper then
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 		end
-		LIB.SetTarget(this.dwType, this.dwID)
+		X.SetTarget(this.dwType, this.dwID)
 	end
 end
 
@@ -569,9 +540,9 @@ function D.OnItemRButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		local dwType, dwID = this.dwType, this.dwID
-		local t = LIB.GetTargetContextMenu(dwType, this:Lookup('Handle_R/Handle_LMN/Text_Name'):GetText(), dwID)
+		local t = X.GetTargetContextMenu(dwType, this:Lookup('Handle_R/Handle_LMN/Text_Name'):GetText(), dwID)
 		if this.bDeletable then
-			insert(t, 1, {
+			table.insert(t, 1, {
 				szOption = _L['Delete focus'],
 				fnAction = function()
 					if l_dwLockType == dwType and l_dwLockID == dwID then
@@ -582,33 +553,33 @@ function D.OnItemRButtonClick()
 				end,
 			})
 		else
-			insert(t, 1, {
+			table.insert(t, 1, {
 				szOption = _L['Option'],
 				fnAction = function()
-					LIB.ShowPanel()
-					LIB.FocusPanel()
-					LIB.SwitchTab('MY_Focus')
+					X.ShowPanel()
+					X.FocusPanel()
+					X.SwitchTab('MY_Focus')
 				end,
 			})
 		end
-		insert(t, {
+		table.insert(t, {
 			szOption = _L['Copy information'],
 			fnAction = function()
 				local aText = {
 					'Type: ' .. dwType,
 					'ID: ' .. dwID,
 				}
-				local obj = LIB.GetObject(dwType, dwID)
+				local obj = X.GetObject(dwType, dwID)
 				if obj then
-					insert(aText, 'Name: ' .. LIB.GetObjectName(obj))
-					insert(aText, 'TemplateID: ' .. obj.dwTemplateID)
-					insert(aText, 'Pos: ' .. '[' .. LIB.GetMapID() .. '] ' .. obj.nX .. ', ' .. obj.nY .. ', ' .. obj.nZ)
+					table.insert(aText, 'Name: ' .. X.GetObjectName(obj))
+					table.insert(aText, 'TemplateID: ' .. obj.dwTemplateID)
+					table.insert(aText, 'Pos: ' .. '[' .. X.GetMapID() .. '] ' .. obj.nX .. ', ' .. obj.nY .. ', ' .. obj.nZ)
 				end
-				UI.OpenTextEditor((concat(aText, '\n')))
+				UI.OpenTextEditor((table.concat(aText, '\n')))
 			end,
 		})
 		local bLock = dwType == l_dwLockType and dwID == l_dwLockID
-		insert(t, {
+		table.insert(t, {
 			szOption = bLock and _L['Unlock focus'] or _L['Lock focus'],
 			fnAction = function()
 				if bLock then
@@ -617,7 +588,7 @@ function D.OnItemRButtonClick()
 				else
 					l_dwLockID = dwID
 					l_dwLockType = dwType
-					LIB.SetTarget(dwType, dwID)
+					X.SetTarget(dwType, dwID)
 				end
 				FireUIEvent('MY_FOCUS_LOCK_UPDATE')
 			end,
@@ -629,9 +600,9 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Setting' then
-		LIB.ShowPanel()
-		LIB.FocusPanel()
-		LIB.SwitchTab('MY_Focus')
+		X.ShowPanel()
+		X.FocusPanel()
+		X.SwitchTab('MY_Focus')
 	elseif name == 'Btn_Close' then
 		D.Close()
 	end
@@ -653,7 +624,7 @@ function D.OnCheckBoxUncheck()
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_FOCUS', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_FOCUS', function()
 	if MY_Focus.bEnable then
 		D.Open()
 	else
@@ -676,5 +647,5 @@ local settings = {
 		},
 	},
 }
-MY_FocusUI = LIB.CreateModule(settings)
+MY_FocusUI = X.CreateModule(settings)
 end

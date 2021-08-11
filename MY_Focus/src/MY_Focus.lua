@@ -10,53 +10,24 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Focus'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Focus'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_Focus', { ['*'] = false, classic = true })
-LIB.RegisterRestriction('MY_Focus.MapRestriction', { ['*'] = true })
-LIB.RegisterRestriction('MY_Focus.SHILDED_NPC', { ['*'] = true })
-LIB.RegisterRestriction('MY_Focus.CHANGGE_SHADOW', { ['*'] = true })
+X.RegisterRestriction('MY_Focus', { ['*'] = false, classic = true })
+X.RegisterRestriction('MY_Focus.MapRestriction', { ['*'] = true })
+X.RegisterRestriction('MY_Focus.SHILDED_NPC', { ['*'] = true })
+X.RegisterRestriction('MY_Focus.CHANGGE_SHADOW', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
@@ -67,194 +38,194 @@ local l_tTempFocusList = {
 	[TARGET.NPC]    = {},   -- dwTemplateID
 	[TARGET.DOODAD] = {},   -- dwTemplateID
 }
-local O = LIB.CreateUserSettingsModule('MY_Focus', _L['Target'], {
+local O = X.CreateUserSettingsModule('MY_Focus', _L['Target'], {
 	bEnable = { -- 是否启用
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bMinimize = { -- 是否最小化
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoHide = { -- 无焦点时隐藏
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nMaxDisplay = { -- 最大显示数量
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 5,
 	},
 	fScaleX = { -- 缩放比例
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	fScaleY = { -- 缩放比例
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	anchor = { -- 默认坐标
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' },
 	},
 
 	bFocusINpc = { -- 焦点重要NPC
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bFocusFriend = { -- 焦点附近好友
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFocusTong = { -- 焦点帮会成员
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOnlyPublicMap = { -- 仅在公共地图焦点好友帮会成员
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSortByDistance = { -- 优先焦点近距离目标
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFocusEnemy = { -- 焦点敌对玩家
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFocusAnmerkungen = { -- 焦点记在小本本里的玩家
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoFocus = { -- 启用默认焦点
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bTeamMonFocus = { -- 启用团队监控焦点
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bHideDeath = { -- 隐藏死亡目标
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDisplayKungfuIcon = { -- 显示心法图标
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFocusJJCParty = { -- 焦点名剑大会队友
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFocusJJCEnemy = { -- 焦点名剑大会敌队
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowTarget = { -- 显示目标目标
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	szDistanceType = { -- 坐标距离计算方式
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = 'global',
 	},
 	bHealHelper = { -- 辅助治疗模式
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowTipRB = { -- 在屏幕右下角显示信息
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bEnableSceneNavi = { -- 场景追踪点
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	aPatternFocus = { -- 默认焦点
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.Collection(Schema.Record({
-			szMethod = Schema.String,
-			szPattern = Schema.String,
-			szDisplay = Schema.String,
-			dwMapID = Schema.Number,
-			tType = Schema.MixedTable({
-				bAll = Schema.Optional(Schema.Boolean),
-				[TARGET.NPC] = Schema.Optional(Schema.Boolean),
-				[TARGET.PLAYER] = Schema.Optional(Schema.Boolean),
-				[TARGET.DOODAD] = Schema.Optional(Schema.Boolean),
+		xSchema = X.Schema.Collection(X.Schema.Record({
+			szMethod = X.Schema.String,
+			szPattern = X.Schema.String,
+			szDisplay = X.Schema.String,
+			dwMapID = X.Schema.Number,
+			tType = X.Schema.MixedTable({
+				bAll = X.Schema.Optional(X.Schema.Boolean),
+				[TARGET.NPC] = X.Schema.Optional(X.Schema.Boolean),
+				[TARGET.PLAYER] = X.Schema.Optional(X.Schema.Boolean),
+				[TARGET.DOODAD] = X.Schema.Optional(X.Schema.Boolean),
 			}),
-			tRelation = Schema.Record({
-				bAll = Schema.Optional(Schema.Boolean),
-				bEnemy = Schema.Optional(Schema.Boolean),
-				bAlly = Schema.Optional(Schema.Boolean),
+			tRelation = X.Schema.Record({
+				bAll = X.Schema.Optional(X.Schema.Boolean),
+				bEnemy = X.Schema.Optional(X.Schema.Boolean),
+				bAlly = X.Schema.Optional(X.Schema.Boolean),
 			}),
-			tLife = Schema.Record({
-				bEnable = Schema.Boolean,
-				szOperator = Schema.String,
-				nValue = Schema.Number,
+			tLife = X.Schema.Record({
+				bEnable = X.Schema.Boolean,
+				szOperator = X.Schema.String,
+				nValue = X.Schema.Number,
 			}),
-			nMaxDistance = Schema.Number,
+			nMaxDistance = X.Schema.Number,
 		})),
 		xDefaultValue = {},
 	},
 
 	tStaticFocus = { -- 永久焦点
-		ePathType = PATH_TYPE.SERVER,
+		ePathType = X.PATH_TYPE.SERVER,
 		szLabel = _L['MY_Focus'],
-		xSchema = Schema.MixedTable({
-			[TARGET.PLAYER] = Schema.Map(Schema.Number, Schema.Boolean), -- dwID
-			[TARGET.NPC]    = Schema.Map(Schema.Number, Schema.Boolean), -- dwTemplateID
-			[TARGET.DOODAD] = Schema.Map(Schema.Number, Schema.Boolean), -- dwTemplateID
+		xSchema = X.Schema.MixedTable({
+			[TARGET.PLAYER] = X.Schema.Map(X.Schema.Number, X.Schema.Boolean), -- dwID
+			[TARGET.NPC]    = X.Schema.Map(X.Schema.Number, X.Schema.Boolean), -- dwTemplateID
+			[TARGET.DOODAD] = X.Schema.Map(X.Schema.Number, X.Schema.Boolean), -- dwTemplateID
 		}),
 		xDefaultValue = {
 			[TARGET.PLAYER] = {}, -- dwID
@@ -266,10 +237,10 @@ local O = LIB.CreateUserSettingsModule('MY_Focus', _L['Target'], {
 local D = {}
 
 function D.IsShielded()
-	if LIB.IsRestricted('MY_Focus') then
+	if X.IsRestricted('MY_Focus') then
 		return true
 	end
-	return LIB.IsRestricted('MY_Focus.MapRestriction') and LIB.IsInShieldedMap()
+	return X.IsRestricted('MY_Focus.MapRestriction') and X.IsInShieldedMap()
 end
 
 function D.IsEnabled()
@@ -301,7 +272,7 @@ local ds = {
 	nMaxDistance = 0,
 }
 function D.FormatAutoFocusData(data)
-	return LIB.FormatDataStructure(data, ds)
+	return X.FormatDataStructure(data, ds)
 end
 local dsl = {
 	'__META__',
@@ -309,7 +280,7 @@ local dsl = {
 	__CHILD_TEMPLATE__ = ds,
 }
 function D.FormatAutoFocusDataList(datalist)
-	return LIB.FormatDataStructure(datalist, dsl)
+	return X.FormatDataStructure(datalist, dsl)
 end
 end
 
@@ -325,26 +296,26 @@ function D.CheckFrameOpen(bForceReload)
 end
 
 function D.LoadConfig()
-	local szRolePath = LIB.FormatPath({'config/focus.jx3dat', PATH_TYPE.ROLE})
-	local szGlobalPath = LIB.FormatPath({'config/focus/', PATH_TYPE.GLOBAL})
-	local szServerPath = LIB.FormatPath({'config/focus/', PATH_TYPE.SERVER})
+	local szRolePath = X.FormatPath({'config/focus.jx3dat', X.PATH_TYPE.ROLE})
+	local szGlobalPath = X.FormatPath({'config/focus/', X.PATH_TYPE.GLOBAL})
+	local szServerPath = X.FormatPath({'config/focus/', X.PATH_TYPE.SERVER})
 	local aPath = {}
 	for _, szPath in ipairs(CPath.GetFileList(szGlobalPath)) do
-		insert(aPath, szGlobalPath .. szPath)
+		table.insert(aPath, szGlobalPath .. szPath)
 	end
 	for _, szPath in ipairs(CPath.GetFileList(szServerPath)) do
-		insert(aPath, szServerPath .. szPath)
+		table.insert(aPath, szServerPath .. szPath)
 	end
-	insert(aPath, szRolePath)
+	table.insert(aPath, szRolePath)
 	for _, szPath in ipairs(aPath) do
-		local config = LIB.LoadLUAData(szPath)
+		local config = X.LoadLUAData(szPath)
 		CPath.DelFile(szPath)
 		if config then
 			for k, v in pairs(config) do
 				-- 永久焦点与默认焦点数据需要合并处理
 				if k == 'tStaticFocus' then
 					for _, eType in ipairs({ TARGET.PLAYER, TARGET.NPC, TARGET.DOODAD }) do
-						if not IsTable(v[eType]) then
+						if not X.IsTable(v[eType]) then
 							v[eType] = {}
 						end
 						for kk, vv in pairs(O.tStaticFocus[eType]) do
@@ -377,31 +348,31 @@ function D.OnConfigChange(k, v)
 end
 
 function D.GetAllFocusPattern()
-	return Clone(O.aPatternFocus)
+	return X.Clone(O.aPatternFocus)
 end
 
 -- 添加、修改默认焦点
 function D.SetFocusPattern(szPattern, tData)
 	local nIndex
-	szPattern = LIB.TrimString(szPattern)
-	for i, v in ipairs_r(O.aPatternFocus) do
+	szPattern = X.TrimString(szPattern)
+	for i, v in X.ipairs_r(O.aPatternFocus) do
 		if v.szPattern == szPattern then
 			nIndex = i
-			remove(O.aPatternFocus, i)
+			table.remove(O.aPatternFocus, i)
 			O.aPatternFocus = O.aPatternFocus
 		end
 	end
 	-- 格式化数据
-	if not IsTable(tData) then
+	if not X.IsTable(tData) then
 		tData = { szPattern = szPattern }
 	end
 	tData = D.FormatAutoFocusData(tData)
 	-- 更新焦点列表
 	if nIndex then
-		insert(O.aPatternFocus, nIndex, tData)
+		table.insert(O.aPatternFocus, nIndex, tData)
 		O.aPatternFocus = O.aPatternFocus
 	else
-		insert(O.aPatternFocus, tData)
+		table.insert(O.aPatternFocus, tData)
 		O.aPatternFocus = O.aPatternFocus
 	end
 	D.RescanNearby()
@@ -414,7 +385,7 @@ function D.RemoveFocusPattern(szPattern)
 	for i = #O.aPatternFocus, 1, -1 do
 		if O.aPatternFocus[i].szPattern == szPattern then
 			p = O.aPatternFocus[i]
-			remove(O.aPatternFocus, i)
+			table.remove(O.aPatternFocus, i)
 			O.aPatternFocus = O.aPatternFocus
 		end
 	end
@@ -426,9 +397,9 @@ function D.RemoveFocusPattern(szPattern)
 		-- 全字符匹配模式：检查是否在永久焦点中 没有则删除Handle （节约性能）
 		for i = #FOCUS_LIST, 1, -1 do
 			local p = FOCUS_LIST[i]
-			local KObject = LIB.GetObject(p.dwType, p.dwID)
+			local KObject = X.GetObject(p.dwType, p.dwID)
 			local dwTemplateID = p.dwType == TARGET.PLAYER and p.dwID or KObject.dwTemplateID
-			if KObject and LIB.GetObjectName(KObject, 'never') == szPattern
+			if KObject and X.GetObjectName(KObject, 'never') == szPattern
 			and not l_tTempFocusList[p.dwType][p.dwID]
 			and not O.tStaticFocus[p.dwType][dwTemplateID] then
 				D.OnObjectLeaveScene(p.dwType, p.dwID)
@@ -444,7 +415,7 @@ end
 function D.SetFocusID(dwType, dwID, bSave)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
 	if bSave then
-		local KObject = LIB.GetObject(dwType, dwID)
+		local KObject = X.GetObject(dwType, dwID)
 		local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
 		if O.tStaticFocus[dwType][dwTemplateID] then
 			return
@@ -468,7 +439,7 @@ function D.RemoveFocusID(dwType, dwID)
 		l_tTempFocusList[dwType][dwID] = nil
 		D.OnObjectLeaveScene(dwType, dwID)
 	end
-	local KObject = LIB.GetObject(dwType, dwID)
+	local KObject = X.GetObject(dwType, dwID)
 	local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
 	if O.tStaticFocus[dwType][dwTemplateID] then
 		O.tStaticFocus[dwType][dwTemplateID] = nil
@@ -485,13 +456,13 @@ end
 
 -- 重新扫描附近对象更新焦点列表（只增不减）
 function D.ScanNearby()
-	for _, dwID in ipairs(LIB.GetNearPlayerID()) do
+	for _, dwID in ipairs(X.GetNearPlayerID()) do
 		D.OnObjectEnterScene(TARGET.PLAYER, dwID)
 	end
-	for _, dwID in ipairs(LIB.GetNearNpcID()) do
+	for _, dwID in ipairs(X.GetNearNpcID()) do
 		D.OnObjectEnterScene(TARGET.NPC, dwID)
 	end
-	for _, dwID in ipairs(LIB.GetNearDoodadID()) do
+	for _, dwID in ipairs(X.GetNearDoodadID()) do
 		D.OnObjectEnterScene(TARGET.DOODAD, dwID)
 	end
 end
@@ -501,7 +472,7 @@ function D.RescanNearby()
 	D.ClearFocus()
 	D.ScanNearby()
 end
-LIB.RegisterEvent('MY_ANMERKUNGEN_UPDATE', 'MY_Focus', D.RescanNearby)
+X.RegisterEvent('MY_ANMERKUNGEN_UPDATE', 'MY_Focus', D.RescanNearby)
 
 function D.GetEligibleRules(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 	local aRule = {}
@@ -516,7 +487,7 @@ function D.GetEligibleRules(tRules, dwMapID, dwType, dwID, dwTemplateID, szName,
 			or (v.szMethod == 'TONG_NAME' and v.szPattern == szTong)
 			or (v.szMethod == 'TONG_NAME_PATT' and szTong:find(v.szPattern))
 		) then
-			insert(aRule, v)
+			table.insert(aRule, v)
 		end
 	end
 	return aRule
@@ -529,31 +500,31 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 	end
 	local me = GetClientPlayer()
 	if not me then
-		return LIB.DelayCall(5000, function() D.OnObjectEnterScene(dwType, dwID) end)
+		return X.DelayCall(5000, function() D.OnObjectEnterScene(dwType, dwID) end)
 	end
-	local KObject = LIB.GetObject(dwType, dwID)
+	local KObject = X.GetObject(dwType, dwID)
 	if not KObject then
 		return
 	end
 
-	local szName = LIB.GetObjectName(KObject, 'never')
+	local szName = X.GetObjectName(KObject, 'never')
 	-- 解决玩家刚进入视野时名字为空的问题
 	if (dwType == TARGET.PLAYER and not szName) or not me then -- 解决自身刚进入场景的时候的问题
-		LIB.DelayCall(300, function()
+		X.DelayCall(300, function()
 			D.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
 		end)
 	else-- if szName then -- 判断是否需要焦点
 		if not szName then
-			szName = LIB.GetObjectName(KObject, 'auto')
+			szName = X.GetObjectName(KObject, 'auto')
 		end
 		local bFocus, aVia = false, {}
-		local dwMapID = LIB.GetMapID(true)
+		local dwMapID = X.GetMapID(true)
 		local dwTemplateID, szTong = -1, ''
 		if dwType == TARGET.PLAYER then
 			if KObject.dwTongID ~= 0 then
 				szTong = GetTongClient().ApplyGetTongName(KObject.dwTongID, 253)
 				if not szTong or szTong == '' then -- 解决目标刚进入场景的时候帮会获取不到的问题
-					LIB.DelayCall(300, function()
+					X.DelayCall(300, function()
 						D.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
 					end)
 				end
@@ -563,7 +534,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 		-- 判断临时焦点
 		if l_tTempFocusList[dwType][dwID] then
-			insert(aVia, {
+			table.insert(aVia, {
 				bDeletable = true,
 				szVia = _L['Temp focus'],
 			})
@@ -577,9 +548,9 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				dwType == TARGET.NPC
 				and dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 				and IsEnemy(UI_GetClientPlayerID(), dwID)
-				and LIB.IsRestricted('MY_Focus.CHANGGE_SHADOW')
+				and X.IsRestricted('MY_Focus.CHANGGE_SHADOW')
 			) then
-				insert(aVia, {
+				table.insert(aVia, {
 					bDeletable = true,
 					szVia = _L['Static focus'],
 				})
@@ -590,7 +561,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		if not bFocus and O.bAutoFocus then
 			local aRule = D.GetEligibleRules(O.aPatternFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			for _, tRule in ipairs(aRule) do
-				insert(aVia, {
+				table.insert(aVia, {
 					tRule = tRule,
 					bDeletable = false,
 					szVia = _L['Auto focus'] .. ' ' .. tRule.szPattern,
@@ -602,7 +573,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		if not bFocus and O.bTeamMonFocus then
 			local aRule = D.GetEligibleRules(TEAMMON_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			for _, tRule in ipairs(aRule) do
-				insert(aVia, {
+				table.insert(aVia, {
 					tRule = tRule,
 					bDeletable = false,
 					szVia = _L['TeamMon focus'] .. ' ' .. tRule.szPattern,
@@ -613,17 +584,17 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 
 		-- 判断名剑大会
 		if not bFocus then
-			if LIB.IsInArena() or LIB.IsInPubg() or LIB.IsInZombieMap() then
+			if X.IsInArena() or X.IsInPubg() or X.IsInZombieMap() then
 				if dwType == TARGET.PLAYER then
 					if O.bFocusJJCEnemy and O.bFocusJJCParty then
-						insert(aVia, {
+						table.insert(aVia, {
 							bDeletable = false,
 							szVia = _L['Auto focus in arena'],
 						})
 						bFocus = true
 					elseif O.bFocusJJCParty then
 						if not IsEnemy(UI_GetClientPlayerID(), dwID) then
-							insert(aVia, {
+							table.insert(aVia, {
 								bDeletable = false,
 								szVia = _L['Auto focus party in arena'],
 							})
@@ -631,7 +602,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 						end
 					elseif O.bFocusJJCEnemy then
 						if IsEnemy(UI_GetClientPlayerID(), dwID) then
-							insert(aVia, {
+							table.insert(aVia, {
 								bDeletable = false,
 								szVia = _L['Auto focus enemy in arena'],
 							})
@@ -641,9 +612,9 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				elseif dwType == TARGET.NPC then
 					if O.bFocusJJCParty
 					and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
-					and not (IsEnemy(UI_GetClientPlayerID(), dwID) and LIB.IsRestricted('MY_Focus.CHANGGE_SHADOW')) then
+					and not (IsEnemy(UI_GetClientPlayerID(), dwID) and X.IsRestricted('MY_Focus.CHANGGE_SHADOW')) then
 						D.OnRemoveFocus(TARGET.PLAYER, KObject.dwEmployer)
-						insert(aVia, {
+						table.insert(aVia, {
 							bDeletable = false,
 							szVia = _L['Auto focus party in arena'],
 						})
@@ -651,12 +622,12 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					end
 				end
 			else
-				if not O.bOnlyPublicMap or (not LIB.IsInBattleField() and not LIB.IsInDungeon() and not LIB.IsInArena()) then
+				if not O.bOnlyPublicMap or (not X.IsInBattleField() and not X.IsInDungeon() and not X.IsInArena()) then
 					-- 判断好友
 					if dwType == TARGET.PLAYER
 					and O.bFocusFriend
-					and LIB.GetFriend(dwID) then
-						insert(aVia, {
+					and X.GetFriend(dwID) then
+						table.insert(aVia, {
 							bDeletable = false,
 							szVia = _L['Friend focus'],
 						})
@@ -665,9 +636,9 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					-- 判断同帮会
 					if dwType == TARGET.PLAYER
 					and O.bFocusTong
-					and dwID ~= LIB.GetClientInfo().dwID
-					and LIB.GetTongMember(dwID) then
-						insert(aVia, {
+					and dwID ~= X.GetClientInfo().dwID
+					and X.GetTongMember(dwID) then
+						table.insert(aVia, {
 							bDeletable = false,
 							szVia = _L['Tong member focus'],
 						})
@@ -678,7 +649,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				if dwType == TARGET.PLAYER
 				and O.bFocusEnemy
 				and IsEnemy(UI_GetClientPlayerID(), dwID) then
-					insert(aVia, {
+					table.insert(aVia, {
 						bDeletable = false,
 						szVia = _L['Enemy focus'],
 					})
@@ -690,8 +661,8 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		-- 判断重要NPC
 		if not bFocus and O.bFocusINpc
 		and dwType == TARGET.NPC
-		and LIB.IsImportantNpc(dwMapID, KObject.dwTemplateID) then
-			insert(aVia, {
+		and X.IsImportantNpc(dwMapID, KObject.dwTemplateID) then
+			table.insert(aVia, {
 				bDeletable = false,
 				szVia = _L['Important npc focus'],
 			})
@@ -703,7 +674,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		and dwType == TARGET.PLAYER
 		and MY_Anmerkungen
 		and MY_Anmerkungen.GetPlayerNote(dwID) then
-			insert(aVia, {
+			table.insert(aVia, {
 				bDeletable = false,
 				szVia = _L['Anmerkungen'],
 			})
@@ -711,7 +682,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 
 		-- 判断屏蔽的NPC
-		if bFocus and dwType == TARGET.NPC and LIB.IsShieldedNpc(dwTemplateID, 'FOCUS') and LIB.IsRestricted('MY_Focus.SHILDED_NPC') then
+		if bFocus and dwType == TARGET.NPC and X.IsShieldedNpc(dwTemplateID, 'FOCUS') and X.IsRestricted('MY_Focus.SHILDED_NPC') then
 			bFocus = false
 		end
 
@@ -724,13 +695,13 @@ end
 
 -- 对象离开视野
 function D.OnObjectLeaveScene(dwType, dwID)
-	local KObject = LIB.GetObject(dwType, dwID)
+	local KObject = X.GetObject(dwType, dwID)
 	if KObject then
 		if dwType == TARGET.NPC then
 			if D.bReady and O.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
-			and LIB.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and LIB.IsRestricted('MY_Focus.SHILDED_NPC')) then
-				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, LIB.GetObjectName(KObject, 'never'), _L['Auto focus party in arena'])
+			and X.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and X.IsRestricted('MY_Focus.SHILDED_NPC')) then
+				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, X.GetObjectName(KObject, 'never'), _L['Auto focus party in arena'])
 			end
 		end
 	end
@@ -747,7 +718,7 @@ function D.OnSetFocus(dwType, dwID, szName, aVia)
 		end
 	end
 	if not nIndex then
-		insert(FOCUS_LIST, {
+		table.insert(FOCUS_LIST, {
 			dwType = dwType,
 			dwID = dwID,
 			szName = szName,
@@ -764,7 +735,7 @@ function D.OnRemoveFocus(dwType, dwID)
 	for i = #FOCUS_LIST, 1, -1 do
 		local p = FOCUS_LIST[i]
 		if p.dwType == dwType and p.dwID == dwID then
-			remove(FOCUS_LIST, i)
+			table.remove(FOCUS_LIST, i)
 			break
 		end
 	end
@@ -775,21 +746,21 @@ end
 function D.SortFocus(fn)
 	local p = GetClientPlayer()
 	fn = fn or function(p1, p2)
-		p1 = LIB.GetObject(p1.dwType, p1.dwID)
-		p2 = LIB.GetObject(p2.dwType, p2.dwID)
+		p1 = X.GetObject(p1.dwType, p1.dwID)
+		p2 = X.GetObject(p2.dwType, p2.dwID)
 		if p1 and p2 then
-			return pow(p.nX - p1.nX, 2) + pow(p.nY - p1.nY, 2) < pow(p.nX - p2.nX, 2) + pow(p.nY - p2.nY, 2)
+			return math.pow(p.nX - p1.nX, 2) + math.pow(p.nY - p1.nY, 2) < math.pow(p.nX - p2.nX, 2) + math.pow(p.nY - p2.nY, 2)
 		end
 		return true
 	end
-	sort(FOCUS_LIST, fn)
+	table.sort(FOCUS_LIST, fn)
 end
 
 -- 获取焦点列表
 function D.GetFocusList()
 	local t = {}
 	for _, v in ipairs(FOCUS_LIST) do
-		insert(t, v)
+		table.insert(t, v)
 	end
 	return t
 end
@@ -803,11 +774,11 @@ function D.GetDisplayList()
 			if #t >= O.nMaxDisplay then
 				break
 			end
-			local KObject = LIB.GetObject(p.dwType, p.dwID)
+			local KObject = X.GetObject(p.dwType, p.dwID)
 			if KObject then
 				local fCurrentLife, fMaxLife
 				if p.dwType == TARGET.PLAYER or p.dwType == TARGET.NPC then
-					fCurrentLife, fMaxLife = LIB.GetObjectLife(KObject)
+					fCurrentLife, fMaxLife = X.GetObjectLife(KObject)
 				end
 				local bFocus, tRule, szVia, bDeletable = false
 				for _, via in ipairs(p.aVia) do
@@ -815,15 +786,15 @@ function D.GetDisplayList()
 						local bRuleFocus = true
 						if bRuleFocus and via.tRule.tLife.bEnable
 						and fCurrentLife and fMaxLife
-						and not LIB.JudgeOperator(via.tRule.tLife.szOperator, fCurrentLife / fMaxLife * 100, via.tRule.tLife.nValue) then
+						and not X.JudgeOperator(via.tRule.tLife.szOperator, fCurrentLife / fMaxLife * 100, via.tRule.tLife.nValue) then
 							bRuleFocus = false
 						end
 						if bRuleFocus and via.tRule.nMaxDistance ~= 0
-						and LIB.GetDistance(me, KObject, O.szDistanceType) > via.tRule.nMaxDistance then
+						and X.GetDistance(me, KObject, O.szDistanceType) > via.tRule.nMaxDistance then
 							bRuleFocus = false
 						end
 						if bRuleFocus and not via.tRule.tRelation.bAll then
-							if LIB.IsEnemy(me.dwID, KObject.dwID) then
+							if X.IsEnemy(me.dwID, KObject.dwID) then
 								bRuleFocus = via.tRule.tRelation.bEnemy
 							else
 								bRuleFocus = via.tRule.tRelation.bAlly
@@ -842,7 +813,7 @@ function D.GetDisplayList()
 						bDeletable = via.bDeletable
 					end
 				end
-				if bFocus and (p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER) and LIB.IsIsolated(me) ~= LIB.IsIsolated(KObject) then
+				if bFocus and (p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER) and X.IsIsolated(me) ~= X.IsIsolated(KObject) then
 					bFocus = false
 				end
 				if bFocus and O.bHideDeath then
@@ -853,7 +824,7 @@ function D.GetDisplayList()
 					end
 				end
 				if bFocus then
-					insert(t, setmetatable({
+					table.insert(t, setmetatable({
 						tRule = tRule,
 						szVia = szVia,
 						bDeletable = bDeletable,
@@ -891,32 +862,32 @@ function D.FormatRuleText(v, bNoBasic)
 	local aText = {}
 	if not bNoBasic then
 		if not v.tType or v.tType.bAll then
-			insert(aText, _L['All type'])
+			table.insert(aText, _L['All type'])
 		else
 			local aSub = {}
 			for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
 				if v.tType[eType] then
-					insert(aSub, _L.TARGET[eType])
+					table.insert(aSub, _L.TARGET[eType])
 				end
 			end
-			insert(aText, #aSub == 0 and _L['None type'] or concat(aSub, '|'))
+			table.insert(aText, #aSub == 0 and _L['None type'] or table.concat(aSub, '|'))
 		end
 	end
 	if not v.tRelation or v.tRelation.bAll then
-		insert(aText, _L['All relation'])
+		table.insert(aText, _L['All relation'])
 	else
 		local aSub = {}
 		for _, szRelation in ipairs({ 'Enemy', 'Ally' }) do
 			if v.tRelation['b' .. szRelation] then
-				insert(aSub, _L.RELATION[szRelation])
+				table.insert(aSub, _L.RELATION[szRelation])
 			end
 		end
-		insert(aText, #aSub == 0 and _L['None relation'] or concat(aSub, '|'))
+		table.insert(aText, #aSub == 0 and _L['None relation'] or table.concat(aSub, '|'))
 	end
 	if not bNoBasic and v.szPattern then
-		return v.szPattern .. ' (' .. concat(aText, ',') .. ')'
+		return v.szPattern .. ' (' .. table.concat(aText, ',') .. ')'
 	end
-	return concat(aText, ',')
+	return table.concat(aText, ',')
 end
 
 function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
@@ -1014,7 +985,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 		x = nX, y = nY, w = 200,
 		text = _L['Operator'],
 		menu = function()
-			return LIB.InsertOperatorMenu({}, tData.tLife.szOperator, function(op)
+			return X.InsertOperatorMenu({}, tData.tLife.szOperator, function(op)
 				tData.tLife.szOperator = op
 				onChangeNotify(tData)
 			end)
@@ -1064,7 +1035,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 		text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
 		buttonstyle = 'FLAT',
 		onclick = function()
-			LIB.Confirm(_L['Sure to delete?'], function()
+			X.Confirm(_L['Sure to delete?'], function()
 				onChangeNotify()
 				ui:Remove()
 			end)
@@ -1086,7 +1057,7 @@ local function UpdateTeamMonData()
 			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(ds.szType), 0, true) do
 				if data.aFocus then
 					for _, p in ipairs(data.aFocus) do
-						local rule = Clone(p)
+						local rule = X.Clone(p)
 						rule.szMethod = 'TEMPLATE_ID'
 						rule.szPattern = tostring(data.dwID)
 						rule.tType = {
@@ -1096,7 +1067,7 @@ local function UpdateTeamMonData()
 							[TARGET.DOODAD] = false,
 						}
 						rule.tType[ds.dwType] = true
-						insert(aFocus, D.FormatAutoFocusData(rule))
+						table.insert(aFocus, D.FormatAutoFocusData(rule))
 					end
 				end
 			end
@@ -1105,14 +1076,14 @@ local function UpdateTeamMonData()
 		D.RescanNearby()
 	end
 end
-LIB.RegisterEvent('LOADING_ENDING', 'MY_Focus', UpdateTeamMonData)
+X.RegisterEvent('LOADING_ENDING', 'MY_Focus', UpdateTeamMonData)
 local function onTeamMonUpdate()
 	if arg0 and not arg0['NPC'] and not arg0['DOODAD'] then
 		return
 	end
 	UpdateTeamMonData()
 end
-LIB.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_Focus', onTeamMonUpdate)
+X.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_Focus', onTeamMonUpdate)
 end
 
 do
@@ -1122,7 +1093,7 @@ local function onInit()
 	D.CheckFrameOpen()
 	D.RescanNearby()
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Focus', onInit)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Focus', onInit)
 end
 
 do
@@ -1130,12 +1101,12 @@ local function onMenu()
 	local dwType, dwID = GetClientPlayer().GetTarget()
 	return D.GetTargetMenu(dwType, dwID)
 end
-LIB.RegisterTargetAddonMenu('MY_Focus', onMenu)
+X.RegisterTargetAddonMenu('MY_Focus', onMenu)
 end
 
 do
 local function onHotKey()
-	local dwType, dwID = LIB.GetTarget()
+	local dwType, dwID = X.GetTarget()
 	local aList = D.GetDisplayList()
 	local t = aList[1]
 	if not t then
@@ -1146,12 +1117,12 @@ local function onHotKey()
 			t = aList[i + 1] or t
 		end
 	end
-	LIB.SetTarget(t.dwType, t.dwID)
+	X.SetTarget(t.dwType, t.dwID)
 end
-LIB.RegisterHotKey('MY_Focus_LoopTarget', _L['Loop target in focus'], onHotKey)
+X.RegisterHotKey('MY_Focus_LoopTarget', _L['Loop target in focus'], onHotKey)
 end
 
-LIB.RegisterTutorial({
+X.RegisterTutorial({
 	szKey = 'MY_Focus',
 	szMessage = _L['Would you like to use MY focus?'],
 	fnRequire = function() return not O.bEnable end,
@@ -1161,7 +1132,7 @@ LIB.RegisterTutorial({
 		fnAction = function()
 			O.bEnable = true
 			MY_FocusUI.Open()
-			LIB.RedrawTab('MY_Focus')
+			X.RedrawTab('MY_Focus')
 		end,
 	},
 	{
@@ -1169,7 +1140,7 @@ LIB.RegisterTutorial({
 		fnAction = function()
 			O.bEnable = false
 			MY_FocusUI.Close()
-			LIB.RedrawTab('MY_Focus')
+			X.RedrawTab('MY_Focus')
 		end,
 	},
 })
@@ -1290,5 +1261,5 @@ local settings = {
 		},
 	},
 }
-MY_Focus = LIB.CreateModule(settings)
+MY_Focus = X.CreateModule(settings)
 end

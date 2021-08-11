@@ -11,129 +11,100 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Target'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetFace'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_TargetFace', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_TargetFace', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_TargetFace', _L['Target'], {
+local O = X.CreateUserSettingsModule('MY_TargetFace', _L['Target'], {
 	bTargetFace = { -- 是否画出目标面向
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTTargetFace = { -- 是否画出目标的目标的面向
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nSectorDegree = { -- 扇形角度
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 110,
 	},
 	nSectorRadius = { -- 扇形半径（尺）
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 6,
 	},
 	nSectorAlpha = { -- 扇形透明度
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},
 	tTargetFaceColor = { -- 目标面向颜色
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 255, 0, 128 },
 	},
 	tTTargetFaceColor = { -- 目标的目标面向颜色
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 0, 128, 255 },
 	},
 	bTargetShape = { -- 目标脚底圈圈
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTTargetShape = { -- 目标的目标脚底圈圈
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nShapeRadius = { -- 脚底圈圈半径
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	nShapeAlpha = { -- 脚底圈圈透明度
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 100,
 	},
 	tTargetShapeColor = { -- 目标脚底圈圈颜色
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 255, 0, 0 },
 	},
 	tTTargetShapeColor = { -- 目标的目标脚底圈圈颜色
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 0, 0, 255 },
 	},
 })
@@ -146,16 +117,16 @@ end
 do
 local function DrawShape(tar, sha, nDegree, nRadius, nAlpha, col)
 	nRadius = nRadius * 64
-	local nFace = ceil(128 * nDegree / 360)
-	local dwRad1 = PI * (tar.nFaceDirection - nFace) / 128
+	local nFace = math.ceil(128 * nDegree / 360)
+	local dwRad1 = math.pi * (tar.nFaceDirection - nFace) / 128
 	if tar.nFaceDirection > (256 - nFace) then
-		dwRad1 = dwRad1 - PI - PI
+		dwRad1 = dwRad1 - math.pi - math.pi
 	end
-	local dwRad2 = dwRad1 + (nDegree / 180 * PI)
+	local dwRad2 = dwRad1 + (nDegree / 180 * math.pi)
 	local nAlpha2 = 0
 	if nDegree == 360 then
 		nAlpha, nAlpha2 = nAlpha2, nAlpha
-		dwRad2 = dwRad2 + PI / 16
+		dwRad2 = dwRad2 + math.pi / 16
 	end
 	-- orgina point
 	sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
@@ -166,16 +137,16 @@ local function DrawShape(tar, sha, nDegree, nRadius, nAlpha, col)
 	-- relative points
 	local sX, sZ = Scene_PlaneGameWorldPosToScene(tar.nX, tar.nY)
 	repeat
-		local sX_, sZ_ = Scene_PlaneGameWorldPosToScene(tar.nX + cos(dwRad1) * nRadius, tar.nY + sin(dwRad1) * nRadius)
+		local sX_, sZ_ = Scene_PlaneGameWorldPosToScene(tar.nX + math.cos(dwRad1) * nRadius, tar.nY + math.sin(dwRad1) * nRadius)
 		sha:AppendCharacterID(tar.dwID, false, col[1], col[2], col[3], nAlpha2, { sX_ - sX, 0, sZ_ - sZ })
-		dwRad1 = dwRad1 + PI / 16
+		dwRad1 = dwRad1 + math.pi / 16
 	until dwRad1 >= dwRad2
 end
 
 local function onBreathe()
 	-- target face
-	local dwTarType, dwTarID = LIB.GetTarget()
-	local tar = LIB.GetObject(dwTarType, dwTarID)
+	local dwTarType, dwTarID = X.GetTarget()
+	local tar = X.GetObject(dwTarType, dwTarID)
 	if O.bTargetFace and tar then
 		DrawShape(tar, C.shaTargetFace, O.nSectorDegree, O.nSectorRadius, O.nSectorAlpha, O.tTargetFaceColor)
 	elseif C.shaTargetFace and C.shaTargetFace:IsValid() then
@@ -190,8 +161,8 @@ local function onBreathe()
 		end
 	end
 	-- target target face
-	local dwTTarType, dwTTarID = LIB.GetTarget(tar)
-	local ttar = LIB.GetObject(dwTTarType, dwTTarID)
+	local dwTTarType, dwTTarID = X.GetTarget(tar)
+	local ttar = X.GetObject(dwTTarType, dwTTarID)
 	local bIsTarget = tar and dwTarID == dwTTarID
 	if O.bTTargetFace and ttar and (not O.bTargetFace or not bIsTarget) then
 		DrawShape(ttar, C.shaTTargetFace, O.nSectorDegree, O.nSectorRadius, O.nSectorAlpha, O.tTTargetFaceColor)
@@ -210,7 +181,7 @@ local function onBreathe()
 end
 
 function D.CheckEnable()
-	if D.bReady and not LIB.IsRestricted('MY_TargetFace') and (O.bTargetFace or O.bTTargetFace or O.bTargetShape or O.bTTargetShape) then
+	if D.bReady and not X.IsRestricted('MY_TargetFace') and (O.bTargetFace or O.bTTargetFace or O.bTargetShape or O.bTTargetShape) then
 		local hShaList = UI.GetShadowHandle('MY_TargetFace')
 		for _, v in ipairs({'TargetFace', 'TargetShape', 'TTargetFace', 'TTargetShape'}) do
 			local sha = hShaList:Lookup(v)
@@ -220,7 +191,7 @@ function D.CheckEnable()
 			end
 			C['sha' .. v] = sha
 		end
-		LIB.BreatheCall('MY_TargetFace', onBreathe)
+		X.BreatheCall('MY_TargetFace', onBreathe)
 	else
 		for _, v in ipairs({'TargetFace', 'TargetShape', 'TTargetFace', 'TTargetShape'}) do
 			local sha = C['sha' .. v]
@@ -229,18 +200,18 @@ function D.CheckEnable()
 			end
 			C['sha' .. v] = nil
 		end
-		LIB.BreatheCall('MY_TargetFace', false)
+		X.BreatheCall('MY_TargetFace', false)
 	end
 	D.RequireRerender()
 end
 
-LIB.RegisterEvent('MY_RESTRICTION', 'MY_TargetFace', function()
+X.RegisterEvent('MY_RESTRICTION', 'MY_TargetFace', function()
 	if arg0 and arg0 ~= 'MY_TargetFace' then
 		return
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TargetFace', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TargetFace', function()
 	D.bReady = true
 	D.CheckEnable()
 end)
@@ -306,5 +277,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetFace = LIB.CreateModule(settings)
+MY_TargetFace = X.CreateModule(settings)
 end

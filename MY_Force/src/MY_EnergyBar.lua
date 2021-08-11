@@ -11,47 +11,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Force'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_EnergyBar'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -61,17 +32,17 @@ end
 ---------------------------------------------------------------------
 local INI_PATH = PLUGIN_ROOT .. '/ui/PlayerBar.ini'
 
-local O = LIB.CreateUserSettingsModule('MY_EnergyBar', _L['Target'], {
+local O = X.CreateUserSettingsModule('MY_EnergyBar', _L['Target'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAnchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = 65, y = 250, s = 'CENTER', r = 'CENTER' },
 	},
 })
@@ -247,11 +218,11 @@ function D.UpdateMingJiao(frame)
 	hImageMoonEnergy:SetPercentage(moonPer)
 
 	hMingJiao:Lookup('Text_Sun'):Show(me.nSunPowerValue == 0 and me.nCurrentSunEnergy ~= me.nMaxSunEnergy and me.nCurrentSunEnergy ~= 0)
-	local nInteger = modf(sunPer * 100)
+	local nInteger = math.modf(sunPer * 100)
 	if nInteger > 100 then nInteger = 100 end
 	hMingJiao:Lookup('Text_Sun'):SetText(tostring(nInteger))
 	hMingJiao:Lookup('Text_Moon'):Show(me.nMoonPowerValue == 0 and me.nCurrentMoonEnergy ~= me.nMaxMoonEnergy and me.nCurrentMoonEnergy ~= 0)
-	nInteger = modf(moonPer * 100)
+	nInteger = math.modf(moonPer * 100)
 	if nInteger > 100 then nInteger = 100 end
 	hMingJiao:Lookup('Text_Moon'):SetText(tostring(nInteger))
 
@@ -331,9 +302,9 @@ function D.UpdateBomb(frame)
 		for i, nBuffID in ipairs(tBuffList) do
 			local bExist = me.IsHaveBuff(nBuffID, 1)
 			if bExist then
-				local buff = LIB.GetBuff(me, nBuffID)
+				local buff = X.GetBuff(me, nBuffID)
 				if buff then
-					local nLeftTime = floor((buff.nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS)
+					local nLeftTime = math.floor((buff.nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS)
 					if D.tBombMsg[i] and D.tBombMsg[i].nTime >= nLeftTime then
 						D.tBombMsg[i].nTime = nLeftTime
 					else
@@ -378,7 +349,7 @@ function D.UpdateBomb(frame)
 				hBomb:Lookup(2):SetText(tostring(D.tBombMsg[i].nTime))
 				if D.tBombMsg[i].nBombNpcID then
 					local npc = GetNpc(D.tBombMsg[i].nBombNpcID)
-					local nDistance = npc and LIB.GetDistance(npc, 'plane')
+					local nDistance = npc and X.GetDistance(npc, 'plane')
 					if nDistance and nDistance <= 30 then
 						hBomb:SetAlpha(255)
 					else
@@ -562,7 +533,7 @@ end
 -- macro command
 function D.Apply()
 	if not GetClientPlayer() then
-		return LIB.DelayCall('MY_EnergyBar#Apply', 300, D.Apply)
+		return X.DelayCall('MY_EnergyBar#Apply', 300, D.Apply)
 	end
 	if not O.bEnable then
 		Wnd.CloseWindow('MY_EnergyBar')
@@ -573,12 +544,12 @@ function D.Apply()
 		end
 	end
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_EnergyBar', D.Apply)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_EnergyBar', D.Apply)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	if GLOBAL.GAME_BRANCH ~= 'classic' then
-		x = x + ui:Append('WndCheckBox', {
-			x = x, y = y,
+		nX = nX + ui:Append('WndCheckBox', {
+			x = nX, y = nY,
 			text = _L['Enable MY_EnergyBar'],
 			checked = O.bEnable,
 			oncheck = function(bChecked)
@@ -587,10 +558,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y)
 			end,
 		}):AutoWidth():Width() + 5
 		-- crlf
-		x = X + 10
-		y = y + 28
+		nX = nPaddingX + 10
+		nY = nY + 28
 	end
-	return x, y
+	return nX, nY
 end
 
 -- Global exports
@@ -609,5 +580,5 @@ local settings = {
 		},
 	},
 }
-MY_EnergyBar = LIB.CreateModule(settings)
+MY_EnergyBar = X.CreateModule(settings)
 end

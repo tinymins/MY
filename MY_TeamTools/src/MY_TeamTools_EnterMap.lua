@@ -10,52 +10,23 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_EnterMap'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 local D = {}
-local SZ_INI = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_TeamTools_EnterMap.ini'
+local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_TeamTools_EnterMap.ini'
 
 local PLAYER_ID  = 0
 local ENTER_MAP_LOG = {}
@@ -68,11 +39,11 @@ function D.ClearEnterMapLog()
 	FireUIEvent('MY_TEAMTOOLS_ENTERMAP')
 end
 
-LIB.RegisterEvent('LOADING_END', function()
+X.RegisterEvent('LOADING_END', function()
 	PLAYER_ID = UI_GetClientPlayerID()
 end)
 
-LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
+X.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 	local dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime, nCopyIndex = aData[1], aData[2], aData[3], aData[4], aData[5], aData[6]
 	local key = dwTalkerID == PLAYER_ID
 		and 'self'
@@ -106,12 +77,12 @@ LIB.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTal
 	if not nCopyIndex then
 		nCopyIndex = 0
 	end
-	for i, v in ipairs_r(ENTER_MAP_LOG) do -- 删除重复发送的过图
+	for i, v in X.ipairs_r(ENTER_MAP_LOG) do -- 删除重复发送的过图
 		if v.dwID == key and v.dwMapID == dwMapID and v.dwSubID == dwSubID and v.dwTime == dwTime then
-			remove(ENTER_MAP_LOG, i)
+			table.remove(ENTER_MAP_LOG, i)
 		end
 	end
-	insert(ENTER_MAP_LOG, {
+	table.insert(ENTER_MAP_LOG, {
 		dwID = key,
 		szName = szTalkerName,
 		dwMapID = dwMapID,
@@ -132,17 +103,17 @@ function D.UpdatePage(page)
 		if tList[v.dwMapID] then
 			tList[v.dwMapID].nCount = tList[v.dwMapID].nCount + 1
 		else
-			insert(aList, {
+			table.insert(aList, {
 				dwMapID = v.dwMapID,
 				nCount = 1,
 			})
 			tList[v.dwMapID] = aList[#aList]
 		end
 	end
-	sort(aList, function(a, b) return a.nCount > b.nCount end)
+	table.sort(aList, function(a, b) return a.nCount > b.nCount end)
 	hDeathList:Clear()
 	for _, v in ipairs(aList) do
-		local map = LIB.GetMapInfo(v.dwMapID)
+		local map = X.GetMapInfo(v.dwMapID)
 		if map then
 			local h = hDeathList:AppendItemFromData(page.hEnterMap, 'Handle_EnterMap')
 			h.dwID = v.dwMapID
@@ -157,7 +128,7 @@ end
 
 function D.OnAppendEdit()
 	local handle = this:GetParent()
-	local edit = LIB.GetChatInput()
+	local edit = X.GetChatInput()
 	edit:ClearText()
 	for i = this:GetIndex(), handle:GetItemCount() do
 		local h = handle:Lookup(i)
@@ -166,7 +137,7 @@ function D.OnAppendEdit()
 			break
 		end
 		if h:GetName() == 'namelink' then
-			edit:InsertObj(szText, { type = 'name', text = szText, name = sub(szText, 2, -2) })
+			edit:InsertObj(szText, { type = 'name', text = szText, name = string.sub(szText, 2, -2) })
 		else
 			edit:InsertObj(szText, { type = 'text', text = szText })
 		end
@@ -179,38 +150,38 @@ function D.UpdateList(page, dwMapID)
 	local me = GetClientPlayer()
 	local team = GetClientTeam()
 	local aRec = {}
-	local aEnterMapLog = Clone(ENTER_MAP_LOG)
+	local aEnterMapLog = X.Clone(ENTER_MAP_LOG)
 	for _, v in ipairs(aEnterMapLog) do
 		if not dwMapID or v.dwMapID == dwMapID then
 			if v.dwID == 'self' then
 				v.dwID = me.dwID
 			end
-			insert(aRec, v)
+			table.insert(aRec, v)
 		end
 	end
-	sort(aRec, function(a, b) return a.dwSwitchTime < b.dwSwitchTime end)
+	table.sort(aRec, function(a, b) return a.dwSwitchTime < b.dwSwitchTime end)
 	hDeathMsg:Clear()
 	for _, data in ipairs(aRec) do
 		local info = INFO_CACHE[data.dwID]
-		local map = LIB.GetMapInfo(data.dwMapID)
+		local map = X.GetMapInfo(data.dwMapID)
 		if map then
 			local aXml = {}
 			local t = TimeToDate(data.dwSwitchTime or data.dwTime)
-			insert(aXml, GetFormatText(_L[' * '] .. format('[%02d:%02d:%02d]', t.hour, t.minute, t.second), 10, 255, 255, 255, 16, 'this.OnItemLButtonClick = MY_TeamTools_EnterMap.OnAppendEdit'))
-			local r, g, b = LIB.GetForceColor(info.dwForceID)
-			insert(aXml, GetFormatText('[' .. data.szName ..']', 10, r, g, b, 16, 'this.OnItemLButtonClick = function() OnItemLinkDown(this) end', 'namelink'))
-			insert(aXml, GetFormatText(_L(' enter map %s', map.szName)))
-			if LIB.IsDungeonMap(data.dwMapID) then
-				if not IsEmpty(data.nCopyIndex) then
-					insert(aXml, GetFormatText(_L(', copy id is %s', data.nCopyIndex)))
+			table.insert(aXml, GetFormatText(_L[' * '] .. string.format('[%02d:%02d:%02d]', t.hour, t.minute, t.second), 10, 255, 255, 255, 16, 'this.OnItemLButtonClick = MY_TeamTools_EnterMap.OnAppendEdit'))
+			local r, g, b = X.GetForceColor(info.dwForceID)
+			table.insert(aXml, GetFormatText('[' .. data.szName ..']', 10, r, g, b, 16, 'this.OnItemLButtonClick = function() OnItemLinkDown(this) end', 'namelink'))
+			table.insert(aXml, GetFormatText(_L(' enter map %s', map.szName)))
+			if X.IsDungeonMap(data.dwMapID) then
+				if not X.IsEmpty(data.nCopyIndex) then
+					table.insert(aXml, GetFormatText(_L(', copy id is %s', data.nCopyIndex)))
 				end
-				if not IsEmpty(data.aMapCopy) then
-					insert(aXml, GetFormatText(_L(', copy cd is %s', concat(data.aMapCopy, ','))))
+				if not X.IsEmpty(data.aMapCopy) then
+					table.insert(aXml, GetFormatText(_L(', copy cd is %s', table.concat(data.aMapCopy, ','))))
 				end
 			end
-			insert(aXml, GetFormatText(_L['.']))
-			insert(aXml, GetFormatText('\n'))
-			hDeathMsg:AppendItemFromString(concat(aXml))
+			table.insert(aXml, GetFormatText(_L['.']))
+			table.insert(aXml, GetFormatText('\n'))
+			hDeathMsg:AppendItemFromString(table.concat(aXml))
 		end
 	end
 	hDeathMsg:FormatAllItemPos()
@@ -246,13 +217,13 @@ function D.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_All' then
 		if IsCtrlKeyDown() or IsShiftKeyDown() then
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP_REQ', nil, true)
+			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP_REQ', nil, true)
 		else
 			RT_SELECT_MAP = nil
 			D.UpdatePage(this:GetParent():GetParent())
 		end
 	elseif szName == 'Btn_Clear' then
-		LIB.Confirm(_L['Clear record'], D.ClearEnterMapLog)
+		X.Confirm(_L['Clear record'], D.ClearEnterMapLog)
 	end
 end
 
@@ -289,7 +260,7 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools.RegisterModule('EnterMap', _L['MY_TeamTools_EnterMap'], LIB.CreateModule(settings))
+MY_TeamTools.RegisterModule('EnterMap', _L['MY_TeamTools_EnterMap'], X.CreateModule(settings))
 end
 
 -- Global exports
@@ -306,5 +277,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools_EnterMap = LIB.CreateModule(settings)
+MY_TeamTools_EnterMap = X.CreateModule(settings)
 end

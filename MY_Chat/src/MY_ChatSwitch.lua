@@ -10,85 +10,56 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatSwitch'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
+local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	bDisplayPanel = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	anchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = 10, y = -60, s = 'BOTTOMLEFT', r = 'BOTTOMLEFT' },
 	},
 	bLockPostion = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tChennalVisible = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
-		xSchema = Schema.Map(Schema.String, Schema.Boolean),
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 	aWhisper = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		bUserData = true,
-		xSchema = Schema.Collection(
-			Schema.Tuple(
-				Schema.String, -- szName
-				Schema.Collection( -- aHistory
-					Schema.OneOf(
-						Schema.String, -- szMsg
-						Schema.Tuple(Schema.String, Schema.Number) -- szMsg, nTime
+		xSchema = X.Schema.Collection(
+			X.Schema.Tuple(
+				X.Schema.String, -- szName
+				X.Schema.Collection( -- aHistory
+					X.Schema.OneOf(
+						X.Schema.String, -- szMsg
+						X.Schema.Tuple(X.Schema.String, X.Schema.Number) -- szMsg, nTime
 					)
 				)
 			)
@@ -96,23 +67,23 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 		xDefaultValue = {},
 	},
 	szAway = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	szBusy = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	tChannelCount = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		bUserData = true,
-		xSchema = Schema.Record({
-			szDate = Schema.String,
-			tCount = Schema.Map(Schema.Number, Schema.Number),
+		xSchema = X.Schema.Record({
+			szDate = X.Schema.String,
+			tCount = X.Schema.Map(X.Schema.Number, X.Schema.Number),
 		}),
 		xDefaultValue = {
 			szDate = '',
@@ -120,21 +91,21 @@ local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 		},
 	},
 	bAlertBeforeClear = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoSwitchBfChannel = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
 local D = {}
 
-local INI_PATH = PACKET_INFO.ROOT .. 'MY_Chat/ui/MY_ChatSwitch.ini'
+local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_Chat/ui/MY_ChatSwitch.ini'
 local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7点更新CD
 
 local function UpdateChannelDailyLimit(hRadio, bPlus)
@@ -148,7 +119,7 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local info = hRadio.info
 	local nChannel = info.channel
 	if nChannel then
-		local szDate = LIB.FormatTime(GetCurrentTime() - CD_REFRESH_OFFSET, '%yyyy%MM%dd')
+		local szDate = X.FormatTime(GetCurrentTime() - CD_REFRESH_OFFSET, '%yyyy%MM%dd')
 		local tChannelCount = D.tChannelCount
 		if tChannelCount.szDate ~= szDate then
 			tChannelCount = {
@@ -163,7 +134,7 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 			tChannelCount.tCount[nChannel] = nDailyCount
 			D.bChannelCountChanged = true
 		end
-		local nDailyLimit = LIB.GetChatChannelDailyLimit(me.nLevel, nChannel)
+		local nDailyLimit = X.GetChatChannelDailyLimit(me.nLevel, nChannel)
 		if nDailyLimit then
 			if nDailyLimit > 0 then
 				dwPercent = (nDailyLimit - nDailyCount) / nDailyLimit
@@ -173,7 +144,7 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 			end
 		end
 	end
-	UI(shaCount):DrawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, PI / 2, PI * 2 * dwPercent)
+	UI(shaCount):DrawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, math.pi / 2, math.pi * 2 * dwPercent)
 end
 
 local CHANNEL_LIST = {
@@ -274,12 +245,12 @@ local CHANNEL_LIST = {
 			local t = {}
 			for i, whisper in ipairs(D.aWhisper) do
 				local info = MY_Farbnamen and MY_Farbnamen.Get(whisper[1])
-				insert(t, {
+				table.insert(t, {
 					szOption = whisper[1],
 					rgb = info and info.rgb or {202, 126, 255},
 					fnAction = function()
-						LIB.SwitchChatChannel(whisper[1])
-						LIB.DelayCall(LIB.FocusChatInput)
+						X.SwitchChatChannel(whisper[1])
+						X.DelayCall(X.FocusChatInput)
 					end,
 					szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 					nFrame = 49,
@@ -290,7 +261,7 @@ local CHANNEL_LIST = {
 					fnClickIcon = function()
 						for i = #D.aWhisper, 1, -1 do
 							if D.aWhisper[i][1] == whisper[1] then
-								remove(D.aWhisper, i)
+								table.remove(D.aWhisper, i)
 								UI.ClosePopupMenu()
 							end
 						end
@@ -299,20 +270,20 @@ local CHANNEL_LIST = {
 					end,
 					fnMouseEnter = function()
 						local t = {}
-						local today = LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd')
+						local today = X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd')
 						local r, g, b = GetMsgFontColor('MSG_WHISPER')
 						for _, v in ipairs(whisper[2]) do
-							if IsString(v) then
-								insert(t, v)
-							elseif IsTable(v) and IsString(v[1]) then
-								if today == LIB.FormatTime(v[2], '%yyyy%MM%dd') then
-									insert(t, LIB.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}) .. v[1])
+							if X.IsString(v) then
+								table.insert(t, v)
+							elseif X.IsTable(v) and X.IsString(v[1]) then
+								if today == X.FormatTime(v[2], '%yyyy%MM%dd') then
+									table.insert(t, X.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}) .. v[1])
 								else
-									insert(t, LIB.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}) .. v[1])
+									table.insert(t, X.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}) .. v[1])
 								end
 							end
 						end
-						local szMsg = concat(t, '')
+						local szMsg = table.concat(t, '')
 						if MY_Farbnamen then
 							szMsg = MY_Farbnamen.Render(szMsg)
 						end
@@ -324,18 +295,18 @@ local CHANNEL_LIST = {
 			t.x = x
 			t.y = y - #D.aWhisper * 24 - 24 - 20 - 8
 			if #t > 0 then
-				insert(t, 1, CONSTANT.MENU_DIVIDER)
-				insert(t, 1, {
+				table.insert(t, 1, CONSTANT.MENU_DIVIDER)
+				table.insert(t, 1, {
 					szOption = g_tStrings.CHANNEL_WHISPER_SIGN,
 					rgb = {202, 126, 255},
 					fnAction = function()
-						LIB.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
-						LIB.DelayCall(LIB.FocusChatInput)
+						X.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
+						X.DelayCall(X.FocusChatInput)
 					end,
 				})
 				PopupMenu(t)
 			else
-				LIB.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
+				X.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
 			end
 			this:Check(false)
 		end,
@@ -384,13 +355,13 @@ local CHANNEL_LIST = {
 		id = 'away',
 		title = _L['AWAY'],
 		oncheck = function()
-			LIB.SwitchChatChannel('/afk')
-			local edit = LIB.GetChatInput()
+			X.SwitchChatChannel('/afk')
+			local edit = X.GetChatInput()
 			if edit then
 				edit:GetRoot():Show()
 				if edit:GetText() == '' then
 					edit:InsertText(
-						IsEmpty(O.szAway)
+						X.IsEmpty(O.szAway)
 							and g_tStrings.STR_AUTO_REPLAY_LEAVE
 							or O.szAway
 					)
@@ -400,10 +371,10 @@ local CHANNEL_LIST = {
 			end
 		end,
 		onuncheck = function()
-			LIB.SwitchChatChannel('/cafk')
+			X.SwitchChatChannel('/cafk')
 		end,
 		tip = function()
-			return IsEmpty(O.szAway)
+			return X.IsEmpty(O.szAway)
 				and g_tStrings.STR_AUTO_REPLAY_LEAVE
 				or O.szAway
 		end,
@@ -413,13 +384,13 @@ local CHANNEL_LIST = {
 		id = 'busy',
 		title = _L['BUSY'],
 		oncheck = function()
-			LIB.SwitchChatChannel('/atr')
-			local edit = LIB.GetChatInput()
+			X.SwitchChatChannel('/atr')
+			local edit = X.GetChatInput()
 			if edit then
 				edit:GetRoot():Show()
 				if edit:GetText() == '' then
 					edit:InsertText(
-						IsEmpty(O.szBusy)
+						X.IsEmpty(O.szBusy)
 							and g_tStrings.STR_AUTO_REPLAY_LEAVE
 							or O.szBusy
 					)
@@ -429,10 +400,10 @@ local CHANNEL_LIST = {
 			end
 		end,
 		onuncheck = function()
-			LIB.SwitchChatChannel('/catr')
+			X.SwitchChatChannel('/catr')
 		end,
 		tip = function()
-			return IsEmpty(O.szBusy)
+			return X.IsEmpty(O.szBusy)
 				and g_tStrings.STR_AUTO_REPLAY_LEAVE
 				or O.szBusy
 		end,
@@ -460,8 +431,8 @@ end
 local m_tChannelTime = {}
 
 local function OnChannelCheck()
-	LIB.SwitchChatChannel(this.info.channel)
-	local edit = LIB.GetChatInput()
+	X.SwitchChatChannel(this.info.channel)
+	local edit = X.GetChatInput()
 	if edit then
 		edit:GetRoot():Show()
 		Station.SetFocusWindow(edit)
@@ -472,28 +443,28 @@ end
 function D.ApplyBattlefieldChannelSwitch()
 	-- 名剑大会自动切换团队频道
 	if O.bAutoSwitchBfChannel then
-		LIB.RegisterEvent('LOADING_ENDING', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
+		X.RegisterEvent('LOADING_ENDING', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
 			local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
 			local nChannel, szName = EditBox_GetChannel()
 			if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
 				O.JJCAutoSwitchChatChannel_OrgChannel = nChannel
-				LIB.SwitchChatChannel(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
+				X.SwitchChatChannel(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
 			elseif not bIsBattleField and nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
-				LIB.SwitchChatChannel(O.JJCAutoSwitchChatChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
+				X.SwitchChatChannel(O.JJCAutoSwitchChatChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
 			end
 		end)
 	else
-		LIB.RegisterEvent('LOADING_ENDING', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel')
+		X.RegisterEvent('LOADING_ENDING', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel')
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
 	D.aWhisper = O.aWhisper
 	D.tChannelCount = O.tChannelCount
 	D.ApplyBattlefieldChannelSwitch()
 end)
 
-LIB.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
+X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
 	if D.bWhisperChanged then
 		O.aWhisper = D.aWhisper
 	end
@@ -537,8 +508,8 @@ function D.OnFrameCreate()
 				chk.OnCheckBoxUncheck = v.onuncheck
 			end
 			wnd:SetRelX(nWidth)
-			nWidth = nWidth + ceil(wnd:GetW())
-			nHeight = max(nHeight, ceil(wnd:GetH()))
+			nWidth = nWidth + math.ceil(wnd:GetW())
+			nHeight = math.max(nHeight, math.ceil(wnd:GetH()))
 			chk.txtTitle = txtTitle
 			chk.txtCooldown = txtCooldown
 			chk.shaCount = shaCount
@@ -575,29 +546,29 @@ end
 function D.OnEvent(event)
 	if event == 'PLAYER_SAY' then
 		local szContent, dwTalkerID, nChannel, szName, szMsg = arg0, arg1, arg2, arg3, arg9
-		if not IsString(arg9) then
+		if not X.IsString(arg9) then
 			szMsg = arg11
-		elseif IsString(arg11) then
+		elseif X.IsString(arg11) then
 			szMsg = #arg9 > #arg11 and arg9 or arg11
 		end
 		if nChannel == PLAYER_TALK_CHANNEL.WHISPER then
 			local t
 			for i = #D.aWhisper, 1, -1 do
 				if D.aWhisper[i][1] == szName then
-					t = remove(D.aWhisper, i)
+					t = table.remove(D.aWhisper, i)
 				end
 			end
 			while #D.aWhisper > 20 do
-				remove(D.aWhisper, 1)
+				table.remove(D.aWhisper, 1)
 			end
 			if not t then
 				t = {szName, {}}
 			end
 			while #t[2] > 20 do
-				remove(t[2], 1)
+				table.remove(t[2], 1)
 			end
-			insert(t[2], {szMsg, GetCurrentTime()})
-			insert(D.aWhisper, t)
+			table.insert(t[2], {szMsg, GetCurrentTime()})
+			table.insert(D.aWhisper, t)
 			D.bWhisperChanged = true
 		end
 		if dwTalkerID ~= UI_GetClientPlayerID() then
@@ -647,9 +618,9 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Option' then
-		LIB.ShowPanel()
-		LIB.FocusPanel()
-		LIB.SwitchTab('MY_ChatSwitch')
+		X.ShowPanel()
+		X.FocusPanel()
+		X.SwitchTab('MY_ChatSwitch')
 	end
 end
 
@@ -670,21 +641,21 @@ end
 
 local function OnChatSetAFK()
 	if type(arg0) == 'table' then
-		O.szAway = LIB.StringifyChatText(arg0)
+		O.szAway = X.StringifyChatText(arg0)
 	else
 		O.szAway = arg0 and tostring(arg0) or ''
 	end
 end
-LIB.RegisterEvent('ON_CHAT_SET_AFK', OnChatSetAFK)
+X.RegisterEvent('ON_CHAT_SET_AFK', OnChatSetAFK)
 
 local function OnChatSetATR()
 	if type(arg0) == 'table' then
-		O.szBusy = LIB.StringifyChatText(arg0):sub(4)
+		O.szBusy = X.StringifyChatText(arg0):sub(4)
 	else
 		O.szBusy = arg0 and tostring(arg0) or ''
 	end
 end
-LIB.RegisterEvent('ON_CHAT_SET_ATR', OnChatSetATR)
+X.RegisterEvent('ON_CHAT_SET_ATR', OnChatSetATR)
 
 function D.ReInitUI()
 	Wnd.CloseWindow('MY_ChatSwitch')
@@ -693,12 +664,12 @@ function D.ReInitUI()
 	end
 	Wnd.OpenWindow(INI_PATH, 'MY_ChatSwitch')
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatSwitch__UI', D.ReInitUI)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatSwitch__UI', D.ReInitUI)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x = X
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
+	nX = nPaddingX
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 250,
+		x = nX, y = nY, w = 250,
 		text = _L['display panel'],
 		checked = O.bDisplayPanel,
 		oncheck = function(bChecked)
@@ -706,12 +677,12 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			D.ReInitUI()
 		end,
 	})
-	y = y + lineHeight
+	nY = nY + nLH
 
-	x = x + 25
+	nX = nX + 25
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 250,
+		x = nX, y = nY, w = 250,
 		text = _L['lock postion'],
 		checked = O.bLockPostion,
 		oncheck = function(bChecked)
@@ -722,10 +693,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			return not O.bDisplayPanel
 		end,
 	})
-	y = y + lineHeight
+	nY = nY + nLH
 
 	ui:Append('WndComboBox', {
-		x = x, y = y, w = 150, h = 25,
+		x = nX, y = nY, w = 150, h = 25,
 		text = _L['channel setting'],
 		menu = function()
 			local t = {
@@ -735,7 +706,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 				end,
 			}
 			for i, v in ipairs(CHANNEL_LIST) do
-				insert(t, {
+				table.insert(t, {
 					szOption = v.title, rgb = v.color,
 					bCheck = true, bChecked = O.tChennalVisible[v.id] ~= false,
 					fnAction = function()
@@ -751,12 +722,12 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			return not O.bDisplayPanel
 		end,
 	})
-	y = y + lineHeight
+	nY = nY + nLH
 
-	x = X
+	nX = nPaddingX
 	-- 名剑大会频道切换
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+		x = nX, y = nY, w = 'auto',
 		text = _L['Auto switch talk channel when into battle field'],
 		checked = O.bAutoSwitchBfChannel,
 		oncheck = function(bChecked)
@@ -764,9 +735,9 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
 			D.ApplyBattlefieldChannelSwitch()
 		end,
 	})
-	y = y + lineHeight
+	nY = nY + nLH
 
-	return x, y
+	return nX, nY
 end
 
 --------------------------------------------------------------------------
@@ -785,5 +756,5 @@ local settings = {
 		},
 	},
 }
-MY_ChatSwitch = LIB.CreateModule(settings)
+MY_ChatSwitch = X.CreateModule(settings)
 end

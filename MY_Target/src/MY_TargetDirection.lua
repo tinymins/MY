@@ -10,71 +10,42 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Target'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetDirection'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local INI_PATH = PACKET_INFO.ROOT .. 'MY_Target/ui/MY_TargetDirection.ini'
-local IMG_PATH = PACKET_INFO.ROOT .. 'MY_Target/img/MY_TargetDirection.uitex'
+local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_Target/ui/MY_TargetDirection.ini'
+local IMG_PATH = X.PACKET_INFO.ROOT .. 'MY_Target/img/MY_TargetDirection.uitex'
 
-local O = LIB.CreateUserSettingsModule('MY_TargetDirection', _L['Target'], {
+local O = X.CreateUserSettingsModule('MY_TargetDirection', _L['Target'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAnchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 250, y = 100 },
 	},
 	eDistanceType = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = 'global',
 	},
 })
@@ -107,7 +78,7 @@ function D.UpdateAnchor()
 end
 
 function D.CheckEnable()
-	if D.bReady and O.bEnable and not LIB.IsRestricted('MY_Target') then
+	if D.bReady and O.bEnable and not X.IsRestricted('MY_Target') then
 		D.OpenPanel()
 	else
 		D.ClosePanel()
@@ -176,20 +147,20 @@ end
 
 function D.OnFrameBreathe()
 	local me = GetClientPlayer()
-	local dwType, dwID = LIB.GetTarget()
-	local tar, info, bInfo = LIB.GetObject(dwType, dwID)
+	local dwType, dwID = X.GetTarget()
+	local tar, info, bInfo = X.GetObject(dwType, dwID)
 	if tar and tar.dwID ~= me.dwID then
 		-- 头像
 		SetObjectAvatar(this:Lookup('', 'Handle_Main/Image_Force'), tar, info, bInfo)
 		-- 方位
-		local dwRad1 = atan2(tar.nY - me.nY, tar.nX - me.nX)
-		local dwRad2 = me.nFaceDirection / 128 * PI
-		this:Lookup('', 'Handle_Main/Image_Arrow'):SetRotate(1.5 * PI + dwRad2 - dwRad1)
+		local dwRad1 = math.atan2(tar.nY - me.nY, tar.nX - me.nX)
+		local dwRad2 = me.nFaceDirection / 128 * math.pi
+		this:Lookup('', 'Handle_Main/Image_Arrow'):SetRotate(1.5 * math.pi + dwRad2 - dwRad1)
 		-- 颜色
 		local nFrame = 4
-		if me.IsInParty() and LIB.IsParty(tar.dwID) then
+		if me.IsInParty() and X.IsParty(tar.dwID) then
 			nFrame = 3
-		elseif LIB.IsEnemy(me.dwID, tar.dwID) then
+		elseif X.IsEnemy(me.dwID, tar.dwID) then
 			nFrame = 1
 		elseif IsAlly(me.dwID, tar.dwID) then
 			nFrame = 2
@@ -206,7 +177,7 @@ function D.OnFrameBreathe()
 		end
 		txtState:SetText(szState or '')
 		-- 距离
-		this:Lookup('', 'Handle_Main/Text_Distance'):SetText(_L('%.1f feet', LIB.GetDistance(me, tar, O.eDistanceType)))
+		this:Lookup('', 'Handle_Main/Text_Distance'):SetText(_L('%.1f feet', X.GetDistance(me, tar, O.eDistanceType)))
 		this:Show()
 	else
 		this:Hide()
@@ -227,13 +198,13 @@ function D.OnFrameDragEnd()
 	O.tAnchor = GetFrameAnchor(this)
 end
 
-LIB.RegisterEvent('MY_RESTRICTION', 'MY_Target', function()
+X.RegisterEvent('MY_RESTRICTION', 'MY_Target', function()
 	if arg0 and arg0 ~= 'MY_Target' then
 		return
 	end
 	D.CheckEnable()
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TargetDirection', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TargetDirection', function()
 	D.bReady = true
 	D.CheckEnable()
 	D.UpdateAnchor()
@@ -272,5 +243,5 @@ local settings = {
 		},
 	},
 }
-MY_TargetDirection = LIB.CreateModule(settings)
+MY_TargetDirection = X.CreateModule(settings)
 end

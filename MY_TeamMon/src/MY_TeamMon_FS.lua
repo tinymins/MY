@@ -11,53 +11,24 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_TeamMon_FS', { ['*'] = true })
+X.RegisterRestriction('MY_TeamMon_FS', { ['*'] = true })
 --------------------------------------------------------------------------
 
-local GetBuff = LIB.GetBuff
+local GetBuff = X.GetBuff
 
 local D = {}
 local FS = {}
@@ -65,11 +36,11 @@ FS.__index = FS
 
 local FS_HANDLE, FS_FRAME
 local FS_CACHE   = setmetatable({}, { __mode = 'v' })
-local FS_INIFILE = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_FS.ini'
+local FS_INIFILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_FS.ini'
 
 -- FireUIEvent('MY_TM_FS_CREATE', Random(50, 255), { col = { Random(50, 255), Random(50, 255), Random(50, 255) }, bFlash = true})
 local function CreateFullScreen(szKey, tArgs)
-	if LIB.IsRestricted('MY_TeamMon_FS') then
+	if X.IsRestricted('MY_TeamMon_FS') then
 		return
 	end
 	assert(type(tArgs) == 'table', 'CreateFullScreen failed!')
@@ -121,10 +92,10 @@ function D.OnFrameRender()
 				if v.bFlash then
 					local nTimeLeft = nTime * 1000 % 750
 					local nAlpha = 150 * nTimeLeft / 750
-					if floor(nTime / 0.75) % 2 == 1 then
+					if math.floor(nTime / 0.75) % 2 == 1 then
 						nAlpha = 150 - nAlpha
 					end
-					v.obj:DrawFullScreen(floor(nAlpha))
+					v.obj:DrawFullScreen(math.floor(nAlpha))
 				else
 					local nAlpha = 150 - 150 * nTime / v.nTime
 					v.obj:DrawFullScreen(nAlpha)
@@ -161,7 +132,7 @@ function FS:ctor(szKey, tArgs)
 	if el.sha1 and el.sha1:IsValid() then
 		el.sha1 = el.sha1
 	else
-		el.sha1 = el:AppendItemFromIni(PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini', 'Shadow')
+		el.sha1 = el:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini', 'Shadow')
 		el.sha1:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 		el.sha1:SetD3DPT(D3DPT.TRIANGLESTRIP)
 	end
@@ -173,7 +144,7 @@ function FS:ctor(szKey, tArgs)
 		if el.sha2 and el.sha2:IsValid() then
 			el.sha2 = el.sha2
 		else
-			el.sha2 = el:AppendItemFromIni(PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini', 'Shadow')
+			el.sha2 = el:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini', 'Shadow')
 			el.sha2:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 			el.sha2:SetD3DPT(D3DPT.TRIANGLESTRIP)
 		end
@@ -229,7 +200,7 @@ function FS:RemoveItem()
 	end
 end
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_FS', D.Init)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_FS', D.Init)
 
 -- Global exports
 do
@@ -242,5 +213,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_FS = LIB.CreateModule(settings)
+MY_TeamMon_FS = X.CreateModule(settings)
 end

@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatMonitor'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -76,81 +47,81 @@ local DEFAULE_CHANNEL = {
 	['MSG_NORMAL'] = true, ['MSG_CAMP' ] = true, ['MSG_WORLD' ] = true, ['MSG_MAP'     ] = true,
 	['MSG_SCHOOL'] = true, ['MSG_GUILD'] = true, ['MSG_FRIEND'] = true, ['MSG_IDENTITY'] = true,
 }
-local O = LIB.CreateUserSettingsModule('MY_ChatMonitor', _L['Chat'], {
+local O = X.CreateUserSettingsModule('MY_ChatMonitor', _L['Chat'], {
 	aKeyword = {
-		ePathType = PATH_TYPE.GLOBAL,
+		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_ChatMonitor'],
-		xSchema = Schema.Collection(Schema.Record({
-			szKeyword = Schema.String,
-			bEnable = Schema.Boolean,
-			bIsRegexp = Schema.Boolean,
-			tChannel = Schema.Map(Schema.String, Schema.Boolean),
+		xSchema = X.Schema.Collection(X.Schema.Record({
+			szKeyword = X.Schema.String,
+			bEnable = X.Schema.Boolean,
+			bIsRegexp = X.Schema.Boolean,
+			tChannel = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		})),
 		xDefaultValue = {{
 			szKeyword = _L.CHAT_MONITOR_KEYWORDS_SAMPLE,
 			bEnable = true,
 			bIsRegexp = false,
-			tChannel = Clone(DEFAULE_CHANNEL),
+			tChannel = X.Clone(DEFAULE_CHANNEL),
 		}},
 	},
 	bCapture = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nMaxRecord = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},
 	bShowPreview = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bPlaySound = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bRedirectSysChannel = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bIgnoreSame = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	-- bRealtimeSave = {
-	-- 	ePathType = PATH_TYPE.ROLE,
+	-- 	ePathType = X.PATH_TYPE.ROLE,
 	-- 	szLabel = _L['MY_ChatMonitor'],
-	-- 	xSchema = Schema.Boolean,
+	-- 	xSchema = X.Schema.Boolean,
 	-- 	xDefaultValue = false,
 	-- },
 	bDistinctServer = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	szTimestrap = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
-		xSchema = Schema.String,
+		xSchema = X.Schema.String,
 		xDefaultValue = '[%hh:%mm:%ss]',
 	},
 	anchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
 	},
 })
@@ -159,18 +130,18 @@ local D = {}
 local l_uiBtn, l_uiBoard
 
 function D.LoadConfig()
-	local szPath = LIB.FormatPath({CONFIG_FILE, PATH_TYPE.GLOBAL})
-	local aKeyword = LIB.LoadLUAData(szPath)
+	local szPath = X.FormatPath({CONFIG_FILE, X.PATH_TYPE.GLOBAL})
+	local aKeyword = X.LoadLUAData(szPath)
 	if aKeyword then
 		CPath.DelFile(szPath)
 		-- 兼容保留
 		for i, p in ipairs(aKeyword) do
-			if IsString(p) then
+			if X.IsString(p) then
 				aKeyword[i] = {
 					szKeyword = p,
 					bEnable = true,
 					bIsRegexp = false,
-					tChannel = Clone(DEFAULE_CHANNEL),
+					tChannel = X.Clone(DEFAULE_CHANNEL),
 				}
 			end
 		end
@@ -180,26 +151,26 @@ end
 
 function D.SaveData()
 	local TYPE = O.bDistinctServer
-		and PATH_TYPE.SERVER or PATH_TYPE.ROLE
-	LIB.SaveLUAData({DATA_FILE, TYPE}, {list = RECORD_LIST, hash = RECORD_HASH})
+		and X.PATH_TYPE.SERVER or X.PATH_TYPE.ROLE
+	X.SaveLUAData({DATA_FILE, TYPE}, {list = RECORD_LIST, hash = RECORD_HASH})
 end
 
 function D.LoadData()
 	local data = O.bDistinctServer
-		and (LIB.LoadLUAData({DATA_FILE, PATH_TYPE.SERVER}) or {})
-		or (LIB.LoadLUAData({DATA_FILE, PATH_TYPE.ROLE}) or {})
+		and (X.LoadLUAData({DATA_FILE, X.PATH_TYPE.SERVER}) or {})
+		or (X.LoadLUAData({DATA_FILE, X.PATH_TYPE.ROLE}) or {})
 	RECORD_LIST = data.list or {}
 	RECORD_HASH = data.hash or {}
 end
 
 function D.GetHTML(rec)
 	-- render link event
-	local html = LIB.RenderChatLink(rec.html)
+	local html = X.RenderChatLink(rec.html)
 	-- render player name color
 	if MY_Farbnamen and MY_Farbnamen.Render then
 		html = MY_Farbnamen.Render(html)
 	end
-	html = LIB.GetChatTimeXML(rec.time, {
+	html = X.GetChatTimeXML(rec.time, {
 		r = rec.r, g = rec.g, b = rec.b,
 		f = rec.font, s = O.szTimestrap,
 		richtext = html,
@@ -208,10 +179,10 @@ function D.GetHTML(rec)
 end
 
 function D.OnNotifyCB()
-	LIB.ShowPanel()
-	LIB.FocusPanel()
-	LIB.SwitchTab('MY_ChatMonitor')
-	LIB.DismissNotify('MY_ChatMonitor')
+	X.ShowPanel()
+	X.FocusPanel()
+	X.SwitchTab('MY_ChatMonitor')
+	X.DismissNotify('MY_ChatMonitor')
 end
 
 -- 插入聊天内容时监控聊天信息
@@ -227,7 +198,7 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
 	if bRich then
 		rec.html = szMsg
 		-- 格式化消息
-		local tMsgContent = LIB.ParseChatData(szMsg)
+		local tMsgContent = X.ParseChatData(szMsg)
 		-- 拼接消息
 		if szChannel == 'MSG_SYS' then -- 系统消息
 			for i, v in ipairs(tMsgContent) do
@@ -269,19 +240,19 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
 	end
 	rec.fuzzy_text = StringLowerW(rec.fuzzy_text)
 
-	rec.hash = gsub(rec.hash, '[\n%s]+', '')
+	rec.hash = string.gsub(rec.hash, '[\n%s]+', '')
 	--------------------------------------------------------------------------------------
 	-- 开始计算是否符合过滤器要求
 	local bMatch = false
 	for _, p in ipairs(O.aKeyword) do
 		if p.bEnable and p.tChannel[szChannel] then
 			if p.bIsRegexp then -- regexp
-				if find(rec.text, p.szKeyword) then
+				if string.find(rec.text, p.szKeyword) then
 					bMatch = true
 					break
 				end
 			else -- normal
-				if LIB.StringSimpleMatch(rec.text, p.szKeyword) then
+				if X.StringSimpleMatch(rec.text, p.szKeyword) then
 					bMatch = true
 					break
 				end
@@ -304,7 +275,7 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
 	local html = D.GetHTML(rec)
 	-- 如果设置重定向到系统消息则输出（输出时加个标记防止又被自己捕捉了死循环）
 	if O.bRedirectSysChannel and szChannel ~= 'MSG_SYS' then
-		OutputMessage('MSG_SYS', LIB.EncodeEchoMsgHeader(szChannel) .. szMsg, true)
+		OutputMessage('MSG_SYS', X.EncodeEchoMsgHeader(szChannel) .. szMsg, true)
 	end
 	-- 广播消息
 	OutputMessage('MSG_MY_MONITOR', szMsg, true, nil, nil, dwTalkerID, szName)
@@ -316,7 +287,7 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
 			l_uiBoard:Scroll(100)
 		end
 	end
-	LIB.CreateNotify({
+	X.CreateNotify({
 		szKey = 'MY_ChatMonitor',
 		szMsg = html,
 		fnAction = D.OnNotifyCB,
@@ -328,7 +299,7 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
 	--------------------------------------------------------------------------------------
 	-- 开始处理记录的数据保存
 	-- 更新缓存数组 哈希表
-	insert(RECORD_LIST, rec)
+	table.insert(RECORD_LIST, rec)
 	RECORD_HASH[rec.hash] = (RECORD_HASH[rec.hash] or 0) + 1
 	-- 验证记录是否超过限制条数
 	local nOverflowed = #RECORD_LIST - O.nMaxRecord
@@ -345,7 +316,7 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
 			if l_uiBoard then
 				l_uiBoard:RemoveItemUntilNewLine()
 			end
-			remove(RECORD_LIST, 1)
+			table.remove(RECORD_LIST, 1)
 		end
 	end
 	-- if O.bRealtimeSave then
@@ -358,16 +329,16 @@ function D.Init()
 	D.LoadData()
 	D.RegisterMsgMonitor()
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CHATMONITOR', D.Init)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CHATMONITOR', D.Init)
 
 function D.Exit()
 	D.SaveData()
 end
-LIB.RegisterExit('MY_ChatMonitor', D.Exit)
+X.RegisterExit('MY_ChatMonitor', D.Exit)
 
 function D.RegisterMsgMonitor()
 	for _, szChannel in ipairs(D.aCurrentChannel or CONSTANT.EMPTY_TABLE) do
-		LIB.RegisterMsgMonitor(szChannel, 'MY_ChatMonitor', false)
+		X.RegisterMsgMonitor(szChannel, 'MY_ChatMonitor', false)
 	end
 	local tChannel = {}
 	for _, p in ipairs(O.aKeyword) do
@@ -381,10 +352,10 @@ function D.RegisterMsgMonitor()
 	end
 	local aChannel = {}
 	for szChannel, _ in pairs(tChannel) do
-		insert(aChannel, szChannel)
+		table.insert(aChannel, szChannel)
 	end
 	for _, szChannel in ipairs(aChannel) do
-		LIB.RegisterMsgMonitor(szChannel, 'MY_ChatMonitor', D.OnMsgArrive)
+		X.RegisterMsgMonitor(szChannel, 'MY_ChatMonitor', D.OnMsgArrive)
 	end
 	D.aCurrentChannel = aChannel
 end
@@ -392,7 +363,7 @@ end
 -------------------------------------------------------------------------------------------------------
 -- 快捷键设置
 -------------------------------------------------------------------------------------------------------
-LIB.RegisterHotKey('MY_ChatMonitor_Hotkey', _L['MY_ChatMonitor'], function()
+X.RegisterHotKey('MY_ChatMonitor_Hotkey', _L['MY_ChatMonitor'], function()
 	if O.bCapture then
 		if l_uiBtn then
 			l_uiBtn:Text(_L['start'])
@@ -424,7 +395,7 @@ function PS.OnPanelActive(wnd)
 			local aKeyword = O.aKeyword
 			local menu = { bAlignWidth = true }
 			for i, p in ipairs(aKeyword) do
-				local m = LIB.GetMsgTypeMenu(function(szChannel)
+				local m = X.GetMsgTypeMenu(function(szChannel)
 					p.tChannel[szChannel] = not p.tChannel[szChannel]
 					O.aKeyword = aKeyword
 					D.RegisterMsgMonitor()
@@ -434,13 +405,13 @@ function PS.OnPanelActive(wnd)
 						return not p.bEnable
 					end
 				end
-				insert(m, 1, CONSTANT.MENU_DIVIDER)
-				insert(m, 1, {
+				table.insert(m, 1, CONSTANT.MENU_DIVIDER)
+				table.insert(m, 1, {
 					szOption = _L['Edit'],
 					fnAction = function()
 						GetUserInput(_L['Please input keyword:'], function(szText)
-							szText = LIB.TrimString(szText)
-							if IsEmpty(szText) then
+							szText = X.TrimString(szText)
+							if X.IsEmpty(szText) then
 								return
 							end
 							p.szKeyword = szText
@@ -449,8 +420,8 @@ function PS.OnPanelActive(wnd)
 						end, nil, nil, nil, p.szKeyword)
 					end,
 				})
-				insert(m, 1, CONSTANT.MENU_DIVIDER)
-				insert(m, 1, {
+				table.insert(m, 1, CONSTANT.MENU_DIVIDER)
+				table.insert(m, 1, {
 					szOption = _L['Enable'],
 					bCheck = true, bChecked = p.bEnable,
 					fnAction = function()
@@ -459,8 +430,8 @@ function PS.OnPanelActive(wnd)
 						D.RegisterMsgMonitor()
 					end,
 				})
-				insert(m, CONSTANT.MENU_DIVIDER)
-				insert(m, {
+				table.insert(m, CONSTANT.MENU_DIVIDER)
+				table.insert(m, {
 					szOption = _L['regular expression'],
 					bCheck = true, bChecked = p.bIsRegexp,
 					fnAction = function()
@@ -484,11 +455,11 @@ function PS.OnPanelActive(wnd)
 					end,
 					fnDisable = function() return not p.bEnable end,
 				})
-				insert(m, CONSTANT.MENU_DIVIDER)
-				insert(m, {
+				table.insert(m, CONSTANT.MENU_DIVIDER)
+				table.insert(m, {
 					szOption = _L['Delete'],
 					fnAction = function()
-						remove(aKeyword, i)
+						table.remove(aKeyword, i)
 						O.aKeyword = aKeyword
 						O.aKeyword = aKeyword
 						D.RegisterMsgMonitor()
@@ -496,24 +467,24 @@ function PS.OnPanelActive(wnd)
 					end,
 				})
 				m.szOption = p.szKeyword
-				insert(menu, m)
+				table.insert(menu, m)
 			end
 			if #menu > 0 then
-				insert(menu, CONSTANT.MENU_DIVIDER)
+				table.insert(menu, CONSTANT.MENU_DIVIDER)
 			end
-			insert(menu, {
+			table.insert(menu, {
 				szOption = _L['Add'],
 				fnAction = function()
 					GetUserInput(_L['Please input keyword:'], function(szText)
-						szText = LIB.TrimString(szText)
-						if IsEmpty(szText) then
+						szText = X.TrimString(szText)
+						if X.IsEmpty(szText) then
 							return
 						end
-						insert(aKeyword, {
+						table.insert(aKeyword, {
 							szKeyword = szText,
 							bEnable = true,
 							bIsRegexp = false,
-							tChannel = Clone(DEFAULE_CHANNEL),
+							tChannel = X.Clone(DEFAULE_CHANNEL),
 						})
 						O.aKeyword = aKeyword
 						O.aKeyword = aKeyword
@@ -571,7 +542,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						GetUserInputNumber(O.nMaxRecord, 1000, nil, function(val)
 							O.nMaxRecord = val or O.nMaxRecord
-						end, nil, function() return not LIB.IsPanelVisible() end)
+						end, nil, function() return not X.IsPanelVisible() end)
 					end,
 				},
 				{
@@ -608,7 +579,7 @@ function PS.OnPanelActive(wnd)
 				}
 			}
 			if IsShiftKeyDown() then
-				-- insert(t, {
+				-- table.insert(t, {
 				--     szOption = _L['Realtime save'],
 				--     fnAction = function()
 				--         O.bRealtimeSave = not O.bRealtimeSave
@@ -616,12 +587,12 @@ function PS.OnPanelActive(wnd)
 				--     bCheck = true,
 				--     bChecked = O.bRealtimeSave
 				-- })
-				insert(t, {
+				table.insert(t, {
 					szOption = _L['Distinct server'],
 					fnAction = function()
 						O.bDistinctServer = not O.bDistinctServer
 						D.LoadData()
-						LIB.SwitchTab('MY_ChatMonitor', true)
+						X.SwitchTab('MY_ChatMonitor', true)
 					end,
 					bCheck = true,
 					bChecked = O.bDistinctServer
@@ -672,4 +643,4 @@ function PS.OnPanelDeactive()
 	l_uiBoard = nil
 end
 
-LIB.RegisterPanel(_L['Chat'], 'MY_ChatMonitor', _L['MY_ChatMonitor'], 'UI/Image/Minimap/Minimap.UITex|197', PS)
+X.RegisterPanel(_L['Chat'], 'MY_ChatMonitor', _L['MY_ChatMonitor'], 'UI/Image/Minimap/Minimap.UITex|197', PS)

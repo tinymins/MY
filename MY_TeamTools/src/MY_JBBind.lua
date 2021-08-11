@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_JBBind'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/jx3box/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/jx3box/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -61,70 +32,70 @@ local O = {
 }
 
 function D.FetchBindStatus(resolve, reject)
-	if IsNil(O.uid) then
+	if X.IsNil(O.uid) then
 		local szURL = 'https://pull.j3cx.com/role/query?'
-			.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+			.. X.EncodePostData(X.UrlEncode(X.SignPostData({
 				l = AnsiToUTF8(GLOBAL.GAME_LANG),
 				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-				jx3id = AnsiToUTF8(LIB.GetClientUUID()),
+				jx3id = AnsiToUTF8(X.GetClientUUID()),
 			}, '7228b445-14cb-465f-8dd2-019cbbbb2ce7')))
 		O.pending = true
-		LIB.Ajax({
+		X.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
 			url = szURL,
 			charset = 'utf8',
 			success = function(szHTML)
 				O.pending = false
-				local res = LIB.JsonDecode(szHTML)
-				if Get(res, {'code'}) == 0 then
-					O.uid = Get(res, {'data', 'uid'})
-					SafeCall(resolve, O.uid)
+				local res = X.JsonDecode(szHTML)
+				if X.Get(res, {'code'}) == 0 then
+					O.uid = X.Get(res, {'data', 'uid'})
+					X.SafeCall(resolve, O.uid)
 				else
-					SafeCall(reject)
+					X.SafeCall(reject)
 				end
 			end,
 			error = function()
 				O.pending = false
-				SafeCall(reject)
+				X.SafeCall(reject)
 			end,
 		})
 	else
-		SafeCall(resolve, O.uid)
+		X.SafeCall(resolve, O.uid)
 	end
 end
 
 function D.Bind(szToken, resolve, reject)
 	local dwID = UI_GetClientPlayerID()
 	if IsRemotePlayer(dwID) then
-		LIB.Alert(_L['You are crossing server, please do this after backing.'])
+		X.Alert(_L['You are crossing server, please do this after backing.'])
 		return
 	end
 	local me = GetClientPlayer()
 	local szURL = 'https://push.j3cx.com/role/bind?'
-		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+		.. X.EncodePostData(X.UrlEncode(X.SignPostData({
 			l = AnsiToUTF8(GLOBAL.GAME_LANG),
 			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 			token = AnsiToUTF8(szToken),
-			cguid = LIB.GetClientGUID(),
-			jx3id = AnsiToUTF8(LIB.GetClientUUID()),
-			server = AnsiToUTF8(LIB.GetRealServer(2)),
+			cguid = X.GetClientGUID(),
+			jx3id = AnsiToUTF8(X.GetClientUUID()),
+			server = AnsiToUTF8(X.GetRealServer(2)),
 			id = AnsiToUTF8(dwID),
-			name = AnsiToUTF8(LIB.GetUserRoleName()),
+			name = AnsiToUTF8(X.GetUserRoleName()),
 			mount = me.GetKungfuMount().dwMountType,
 			type = me.nRoleType,
 		}, '7228b445-14cb-465f-8dd2-019cbbbb2ce7')))
-	LIB.Ajax({
+	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = szURL,
 		charset = 'utf8',
 		success = function(szHTML)
-			local res = LIB.JsonDecode(szHTML)
-			if Get(res, {'code'}) == 0 then
+			local res = X.JsonDecode(szHTML)
+			if X.Get(res, {'code'}) == 0 then
 				O.uid = nil
-				SafeCall(resolve, O.uid)
+				X.SafeCall(resolve, O.uid)
 			else
-				LIB.Alert((Get(res, {'msg'}, _L['Request failed.'])))
-				SafeCall(reject)
+				X.Alert((X.Get(res, {'msg'}, _L['Request failed.'])))
+				X.SafeCall(reject)
 			end
 		end,
 	})
@@ -132,29 +103,29 @@ end
 
 function D.Unbind(resolve, reject)
 	local szURL = 'https://push.j3cx.com/role/unbind?'
-		.. LIB.EncodePostData(LIB.UrlEncode(LIB.SignPostData({
+		.. X.EncodePostData(X.UrlEncode(X.SignPostData({
 			l = AnsiToUTF8(GLOBAL.GAME_LANG),
 			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-			jx3id = AnsiToUTF8(LIB.GetClientUUID()),
+			jx3id = AnsiToUTF8(X.GetClientUUID()),
 		}, '7228b445-14cb-465f-8dd2-019cbbbb2ce7')))
-	LIB.Ajax({
+	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = szURL,
 		charset = 'utf8',
 		success = function(szHTML)
-			local res = LIB.JsonDecode(szHTML)
-			if Get(res, {'code'}) == 0 then
+			local res = X.JsonDecode(szHTML)
+			if X.Get(res, {'code'}) == 0 then
 				O.uid = nil
-				SafeCall(resolve)
+				X.SafeCall(resolve)
 			else
-				LIB.Alert((Get(res, {'msg'}, _L['Request failed.'])))
-				SafeCall(reject)
+				X.Alert((X.Get(res, {'msg'}, _L['Request failed.'])))
+				X.SafeCall(reject)
 			end
 		end,
 	})
 end
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)
 	-- ╫ги╚хож╓
 	local uiCCStatus, uiBtnCCStatus, uiBtnCCLink
 	local function UpdateUI()
@@ -164,10 +135,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		if O.pending then
 			uiCCStatus:Text(_L['Loading'])
 			uiBtnCCStatus:Text(_L['Click fetch'])
-		elseif IsNil(O.uid) then
+		elseif X.IsNil(O.uid) then
 			uiCCStatus:Text(_L['Unknown'])
 			uiBtnCCStatus:Text(_L['Click fetch'])
-		elseif IsEmpty(O.uid) then
+		elseif X.IsEmpty(O.uid) then
 			uiCCStatus:Text(_L['Not bind'])
 			uiBtnCCStatus:Text(_L['Click bind'])
 		else
@@ -180,11 +151,11 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		uiBtnCCLink:Left(uiBtnCCStatus:Left() + uiBtnCCStatus:Width() + 10)
 	end
 
-	nX = X
+	nX = nPaddingX
 	nY = nLFY
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Character Certification'], font = 27 }):Height() + 2
 
-	nX = X + 10
+	nX = nPaddingX + 10
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L('Current character: %s', GetUserRoleName()) }):Width() + 20
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Status: '] }):Width()
 	uiCCStatus = ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Loading'] })
@@ -195,27 +166,27 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		onclick = function()
 			if O.pending then
 				D.FetchBindStatus(UpdateUI, UpdateUI)
-			elseif IsEmpty(O.uid) then
+			elseif X.IsEmpty(O.uid) then
 				GetUserInput(_L['Please input certification code:'], function(szText)
 					uiBtnCCStatus:Enable(false)
 					D.Bind(
 						szText,
 						function()
-							LIB.Alert(_L['Bind succeed!'])
+							X.Alert(_L['Bind succeed!'])
 							D.FetchBindStatus(UpdateUI, UpdateUI)
 						end,
 						function()
 							D.FetchBindStatus(UpdateUI, UpdateUI)
 						end)
 				end)
-			elseif LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
-				LIB.Topmsg(_L['Please unlock equip lock first!'], CONSTANT.MSG_THEME.ERROR)
+			elseif X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
+				X.Topmsg(_L['Please unlock equip lock first!'], CONSTANT.MSG_THEME.ERROR)
 			else
-				LIB.Confirm(_L['Sure to unbind character certification?'], function()
+				X.Confirm(_L['Sure to unbind character certification?'], function()
 					uiBtnCCStatus:Enable(false)
 					D.Unbind(
 						function()
-							LIB.Alert(_L['Unbind succeed!'])
+							X.Alert(_L['Unbind succeed!'])
 							D.FetchBindStatus(UpdateUI, UpdateUI)
 						end,
 						function()
@@ -230,7 +201,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		x = nX, y = nY + 2, w = 120,
 		buttonstyle = 'FLAT', text = _L['Login team platform'],
 		onclick = function()
-			LIB.OpenBrowser('https://page.j3cx.com/jx3box/team/platform')
+			X.OpenBrowser('https://page.j3cx.com/jx3box/team/platform')
 		end,
 	})
 	nX = nX + uiBtnCCLink:Width()
@@ -238,7 +209,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 	UpdateUI()
 	D.FetchBindStatus(UpdateUI, UpdateUI)
 
-	nLFY = nY + LH
+	nLFY = nY + nLH
 	return nX, nY, nLFY
 end
 
@@ -254,5 +225,5 @@ local settings = {
 		},
 	},
 }
-MY_JBBind = LIB.CreateModule(settings)
+MY_JBBind = X.CreateModule(settings)
 end

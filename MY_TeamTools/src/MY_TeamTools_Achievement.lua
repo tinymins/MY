@@ -10,56 +10,27 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_Achievement'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
-local SZ_INI = PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_TeamTools_Achievement.ini'
-local O = LIB.CreateUserSettingsModule('MY_TeamTools_Achievement', _L['Raid'], {
+local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_TeamTools_Achievement.ini'
+local O = X.CreateUserSettingsModule('MY_TeamTools_Achievement', _L['Raid'], {
 	bIntelligentHide = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
@@ -77,7 +48,7 @@ local ACHIEVE_CACHE = {}
 local COUNTER_CACHE = {}
 local EXCEL_WIDTH = 1056
 local ACHI_MIN_WIDTH = 15
-local ACHI_MAX_WIDTH = HUGE
+local ACHI_MAX_WIDTH = math.huge
 local STAT_SORT = setmetatable({
 	['FINISH'] = 3,
 	['PROGRESS'] = 2,
@@ -109,15 +80,15 @@ function D.GetColumns()
 				if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 					name = MY_ChatMosaics.MosaicsString(name)
 				end
-				return GetFormatText(name, 162, LIB.GetForceColor(rec.force, 'foreground'))
+				return GetFormatText(name, 162, X.GetForceColor(rec.force, 'foreground'))
 			end,
 			Compare = GeneCommonCompare('name'),
 		},
 	}
 	for _, dwAchieveID in ipairs(D.aAchievement) do
-		local achi = LIB.GetAchievement(dwAchieveID)
+		local achi = X.GetAchievement(dwAchieveID)
 		if achi then
-			insert(aCol, {
+			table.insert(aCol, {
 				id = 'achievement_' .. dwAchieveID,
 				dwAchieveID = dwAchieveID,
 				szTitle = achi.szName,
@@ -169,17 +140,17 @@ function D.GetDispColumns()
 		if nExtraWidth < col.nMinWidth then
 			break
 		end
-		col.nFlexWidth = (col.nMaxWidth and not IsHugeNumber(col.nMaxWidth)
+		col.nFlexWidth = (col.nMaxWidth and not X.IsHugeNumber(col.nMaxWidth)
 			and col.nMaxWidth
 			or EXCEL_WIDTH) - col.nMinWidth
-		insert(aCol, col)
+		table.insert(aCol, col)
 		nFlexWidth = nFlexWidth + col.nFlexWidth
 		nExtraWidth = nExtraWidth - col.nMinWidth
 	end
 	for i, col in ipairs(aCol) do
 		col.nWidth = i == #aCol
 			and (EXCEL_WIDTH - nW)
-			or min(nExtraWidth * col.nFlexWidth / nFlexWidth + col.nMinWidth, col.nMaxWidth or HUGE)
+			or math.min(nExtraWidth * col.nFlexWidth / nFlexWidth + col.nMinWidth, col.nMaxWidth or math.huge)
 		nW = nW + col.nWidth
 	end
 	return aCol
@@ -188,7 +159,7 @@ end
 function D.UpdateSearchAC()
 	local info = g_tTable.DungeonInfo:Search(D.dwMapID)
 	D.aSearchAC = info
-		and LIB.SplitString(info.szBossInfo, ' ', true)
+		and X.SplitString(info.szBossInfo, ' ', true)
 		or {}
 	FireUIEvent('MY_TEAMTOOLS_ACHI_SEARCH_AC')
 end
@@ -214,24 +185,24 @@ function D.UpdateAchievementID()
 			local achi = g_tTable.Achievement:GetRow(i)
 			if achi and achi.nVisible == 1 and achi.dwGeneral == 1
 			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
-			and (IsEmpty(D.szSearch) or wfind(achi.szName, D.szSearch) or wfind(achi.szDesc, D.szSearch)) then
-				insert(aAchievement, achi)
+			and (X.IsEmpty(D.szSearch) or wstring.find(achi.szName, D.szSearch) or wstring.find(achi.szDesc, D.szSearch)) then
+				table.insert(aAchievement, achi)
 				if #aAchievement >= MAX_ALL_MAP_ACHI then
 					break
 				end
 			end
 		end
 	else
-		for _, dwAchieveID in ipairs(LIB.GetMapAchievements(D.dwMapID) or CONSTANT.EMPTY_TABLE) do
-			local achi = LIB.GetAchievement(dwAchieveID)
+		for _, dwAchieveID in ipairs(X.GetMapAchievements(D.dwMapID) or CONSTANT.EMPTY_TABLE) do
+			local achi = X.GetAchievement(dwAchieveID)
 			if achi
 			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
-			and (IsEmpty(D.szSearch) or wfind(achi.szName, D.szSearch) or wfind(achi.szDesc, D.szSearch)) then
-				insert(aAchievement, achi)
+			and (X.IsEmpty(D.szSearch) or wstring.find(achi.szName, D.szSearch) or wstring.find(achi.szDesc, D.szSearch)) then
+				table.insert(aAchievement, achi)
 			end
 		end
 	end
-	sort(aAchievement, D.AchievementSorter)
+	table.sort(aAchievement, D.AchievementSorter)
 	for i, achi in ipairs(aAchievement) do
 		aAchievement[i] = achi.dwID
 	end
@@ -239,7 +210,7 @@ function D.UpdateAchievementID()
 	FireUIEvent('MY_TEAMTOOLS_ACHI')
 end
 
-LIB.RegisterEvent('LOADING_ENDING', function()
+X.RegisterEvent('LOADING_ENDING', function()
 	if MY_TeamTools.IsOpened() then
 		return
 	end
@@ -259,7 +230,7 @@ function D.GetTeamMemberList(bIsOnLine)
 			for k, v in ipairs(team.GetTeamMemberList()) do
 				local info = team.GetMemberInfo(v)
 				if info and info.bIsOnLine then
-					insert(tTeam, v)
+					table.insert(tTeam, v)
 				end
 			end
 			return tTeam
@@ -272,18 +243,18 @@ function D.GetTeamMemberList(bIsOnLine)
 end
 
 function D.GetPlayerAchievementStat(dwID, dwAchieveID)
-	if ACHIEVE_CACHE[dwID] and IsBoolean(ACHIEVE_CACHE[dwID][dwAchieveID]) then
+	if ACHIEVE_CACHE[dwID] and X.IsBoolean(ACHIEVE_CACHE[dwID][dwAchieveID]) then
 		if ACHIEVE_CACHE[dwID][dwAchieveID] then
 			return 'FINISH'
 		end
-		local achi = LIB.GetAchievement(dwAchieveID)
+		local achi = X.GetAchievement(dwAchieveID)
 		if achi then
 			local aProgressCounter = {}
 			if COUNTER_CACHE[dwID] then
-				for _, s in ipairs(LIB.SplitString(achi.szCounters, '|', true)) do
+				for _, s in ipairs(X.SplitString(achi.szCounters, '|', true)) do
 					local dwCounter = tonumber(s)
 					if dwCounter and COUNTER_CACHE[dwID][dwCounter] then
-						insert(aProgressCounter, {
+						table.insert(aProgressCounter, {
 							dwCounter = dwCounter,
 							nNumber = COUNTER_CACHE[dwID][dwCounter],
 						})
@@ -299,13 +270,13 @@ end
 do local ACHIEVE_POINT_CACHE = {}
 function D.GetAchievementPoint(dwAchieveID)
 	if not ACHIEVE_POINT_CACHE[dwAchieveID] then
-		local nAchievePoint = Get(LIB.GetAchievementInfo(dwAchieveID), {'nPoint'}, 0)
-		local achi = LIB.GetAchievement(dwAchieveID)
+		local nAchievePoint = X.Get(X.GetAchievementInfo(dwAchieveID), {'nPoint'}, 0)
+		local achi = X.GetAchievement(dwAchieveID)
 		if achi then
-			for _, s in ipairs(LIB.SplitString(achi.szCounters, '|', true)) do
+			for _, s in ipairs(X.SplitString(achi.szCounters, '|', true)) do
 				local dwCounter = tonumber(s)
 				if dwCounter then
-					nAchievePoint = nAchievePoint + Get(LIB.GetAchievementInfo(dwCounter), {'nPoint'}, 0)
+					nAchievePoint = nAchievePoint + X.Get(X.GetAchievementInfo(dwCounter), {'nPoint'}, 0)
 				end
 			end
 		end
@@ -317,22 +288,22 @@ end
 
 do
 local function AnalysisAchievementRequest(dwAchieveID, tAchieveID, tCounterID)
-	local info = LIB.GetAchievement(dwAchieveID)
+	local info = X.GetAchievement(dwAchieveID)
 	if info then
 		tAchieveID[dwAchieveID] = true
-		for _, s in ipairs(LIB.SplitString(info.szCounters, '|', true)) do
+		for _, s in ipairs(X.SplitString(info.szCounters, '|', true)) do
 			local dwCounter = tonumber(s)
 			if dwCounter then
 				tCounterID[dwCounter] = true
 			end
 		end
-		for _, s in ipairs(LIB.SplitString(info.szSeries, '|', true)) do
+		for _, s in ipairs(X.SplitString(info.szSeries, '|', true)) do
 			local dwSerie = tonumber(s)
 			if dwSerie and not tAchieveID[dwSerie] then
 				AnalysisAchievementRequest(dwSerie, tAchieveID, tCounterID)
 			end
 		end
-		for _, s in ipairs(LIB.SplitString(info.szSubAchievements, '|', true)) do
+		for _, s in ipairs(X.SplitString(info.szSubAchievements, '|', true)) do
 			local dwSubAchieve = tonumber(s)
 			if dwSubAchieve and not tAchieveID[dwSubAchieve] then
 				AnalysisAchievementRequest(dwSubAchieve, tAchieveID, tCounterID)
@@ -348,10 +319,10 @@ function D.AnalysisAchievementRequest(aAchievement)
 	end
 	local aAchieveID, aCounterID = {}, {}
 	for dwAchieveID, _ in pairs(tAchieveID) do
-		insert(aAchieveID, dwAchieveID)
+		table.insert(aAchieveID, dwAchieveID)
 	end
 	for dwCounterID, _ in pairs(tCounterID) do
-		insert(aCounterID, dwCounterID)
+		table.insert(aCounterID, dwCounterID)
 	end
 	return aAchieveID, aCounterID
 end
@@ -382,12 +353,12 @@ function D.RequestTeamData()
 	local aTeamMemberList = D.GetTeamMemberList(true)
 	for _, dwID in ipairs(aTeamMemberList) do
 		for _, dwAchieveID in ipairs(aAchieveID) do
-			if not ACHIEVE_CACHE[dwID] or IsNil(ACHIEVE_CACHE[dwID][dwAchieveID]) then
+			if not ACHIEVE_CACHE[dwID] or X.IsNil(ACHIEVE_CACHE[dwID][dwAchieveID]) then
 				tRequestID[dwID] = true
 			end
 		end
 		for _, dwCounterID in ipairs(aCounterID) do
-			if not COUNTER_CACHE[dwID] or IsNil(COUNTER_CACHE[dwID][dwCounterID]) then
+			if not COUNTER_CACHE[dwID] or X.IsNil(COUNTER_CACHE[dwID][dwCounterID]) then
 				tRequestID[dwID] = true
 			end
 		end
@@ -395,20 +366,20 @@ function D.RequestTeamData()
 	for _, dwID in ipairs(aTeamMemberList) do
 		if dwID ~= UI_GetClientPlayerID() then
 			if tRequestID[dwID] then
-				insert(aRequestID, dwID)
+				table.insert(aRequestID, dwID)
 			else
-				insert(aRefreshID, dwID)
+				table.insert(aRefreshID, dwID)
 			end
 		end
 	end
-	if (not IsEmpty(aAchieveID) or not IsEmpty(aCounterID)) and (not IsEmpty(aRequestID) or not IsEmpty(aRefreshID)) then
+	if (not X.IsEmpty(aAchieveID) or not X.IsEmpty(aCounterID)) and (not X.IsEmpty(aRequestID) or not X.IsEmpty(aRefreshID)) then
 		if #aRequestID == #aTeamMemberList - 1 then
 			aRequestID = nil
 		end
-		if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-			LIB.Systopmsg(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
+		if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+			X.Systopmsg(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
 		else
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aRequestID, nil})
+			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aRequestID, nil})
 		end
 	end
 	-- 刷新自己的
@@ -416,10 +387,10 @@ function D.RequestTeamData()
 end
 
 function D.DelayRequestTeamData()
-	LIB.DelayCall('MY_TeamTools_Achievement_DelayReq', 1000, D.RequestTeamData)
+	X.DelayCall('MY_TeamTools_Achievement_DelayReq', 1000, D.RequestTeamData)
 end
 
-LIB.RegisterBgMsg('MY_TEAMTOOLS_ACHI_RES', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+X.RegisterBgMsg('MY_TEAMTOOLS_ACHI_RES', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	local aAchieveRes, aCounterRes = data[1], data[2]
 	if not ACHIEVE_CACHE[dwTalkerID] then
 		ACHIEVE_CACHE[dwTalkerID] = {}
@@ -442,112 +413,112 @@ function D.OutputRowTip(this, rec)
 	local nLen = 0
 	for _, col in ipairs(aCol) do
 		if col.dwAchieveID then
-			nLen = max(nLen, wlen(col.szTitle))
+			nLen = math.max(nLen, wstring.len(col.szTitle))
 		end
 	end
 	for _, col in ipairs(aCol) do
 		if col.dwAchieveID then
 			local nPoint = D.GetAchievementPoint(col.dwAchieveID)
-			local szSpace = g_tStrings.STR_ONE_CHINESE_SPACE:rep(nLen - wlen(col.szTitle))
+			local szSpace = g_tStrings.STR_ONE_CHINESE_SPACE:rep(nLen - wstring.len(col.szTitle))
 			if D.GetPlayerAchievementStat(rec.id, col.dwAchieveID) == 'FINISH' then
 				nAciquiePoint = nAciquiePoint + nPoint
 			end
 			nAchievePoint = nAchievePoint + nPoint
-			insert(aXml, GetFormatText('[' .. col.szTitle .. ']' .. szSpace .. '  ', 162, 255, 255, 0))
-			insert(aXml, col.GetFormatText(rec))
-			insert(aXml, GetFormatText(' (+' .. nPoint .. ')', 162, 255, 128, 0))
+			table.insert(aXml, GetFormatText('[' .. col.szTitle .. ']' .. szSpace .. '  ', 162, 255, 255, 0))
+			table.insert(aXml, col.GetFormatText(rec))
+			table.insert(aXml, GetFormatText(' (+' .. nPoint .. ')', 162, 255, 128, 0))
 		else
-			insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-			insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-			insert(aXml, col.GetFormatText(rec))
+			table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+			table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+			table.insert(aXml, col.GetFormatText(rec))
 		end
 		if IsCtrlKeyDown() then
-			insert(aXml, GetFormatText('\t' .. col.id, 162, 255, 0, 0))
+			table.insert(aXml, GetFormatText('\t' .. col.id, 162, 255, 0, 0))
 		else
-			insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+			table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 		end
 	end
-	insert(aXml, 5, GetFormatText(_L('Achievement point: %d / %d', nAciquiePoint, nAchievePoint) .. '\n', 162, 255, 128, 0))
+	table.insert(aXml, 5, GetFormatText(_L('Achievement point: %d / %d', nAciquiePoint, nAchievePoint) .. '\n', 162, 255, 128, 0))
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	local nPosType = UI.TIP_POSITION.RIGHT_LEFT
-	OutputTip(concat(aXml), 450, {x, y, w, h}, nPosType)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, nPosType)
 end
 
 function D.OutputAchieveTip(dwAchieveID, dwID)
-	local achi = LIB.GetAchievement(dwAchieveID)
+	local achi = X.GetAchievement(dwAchieveID)
 	if not achi then
 		return
 	end
 	local aXml = {}
 	-- 成就名称
-	insert(aXml, GetFormatText('[' .. achi.szName .. ']', 162, 255, 255, 0))
+	table.insert(aXml, GetFormatText('[' .. achi.szName .. ']', 162, 255, 255, 0))
 	-- 完成状态
 	if dwID then
-		insert(aXml, GetFormatText(' ', 162, 255, 255, 255))
+		table.insert(aXml, GetFormatText(' ', 162, 255, 255, 255))
 		local szStat, aProgressCounter = D.GetPlayerAchievementStat(dwID, dwAchieveID)
 		if szStat == 'FINISH' then
-			insert(aXml, GetFormatText(_L['(Finished)'] .. '\n', 162, 255, 255, 255))
+			table.insert(aXml, GetFormatText(_L['(Finished)'] .. '\n', 162, 255, 255, 255))
 		elseif szStat == 'PROGRESS' then
-			if IsEmpty(aProgressCounter) then
-				insert(aXml, GetFormatText(_L['(Progress)'] .. '\n', 162, 173, 173, 173))
+			if X.IsEmpty(aProgressCounter) then
+				table.insert(aXml, GetFormatText(_L['(Progress)'] .. '\n', 162, 173, 173, 173))
 			else
-				insert(aXml, GetFormatText('(', 162, 255, 255, 255))
+				table.insert(aXml, GetFormatText('(', 162, 255, 255, 255))
 				for i, progress in ipairs(aProgressCounter) do
-					local nTriggerVal = Get(LIB.GetAchievementInfo(progress.dwCounter), {'nTriggerVal'}, 1)
+					local nTriggerVal = X.Get(X.GetAchievementInfo(progress.dwCounter), {'nTriggerVal'}, 1)
 					if i ~= 1 then
-						insert(aXml, GetFormatText(', ', 162, 255, 255, 255))
+						table.insert(aXml, GetFormatText(', ', 162, 255, 255, 255))
 					end
-					insert(aXml, GetFormatText(progress.nNumber .. '/' .. nTriggerVal, 162, 255, 255, 255))
+					table.insert(aXml, GetFormatText(progress.nNumber .. '/' .. nTriggerVal, 162, 255, 255, 255))
 				end
-				insert(aXml, GetFormatText(')\n', 162, 255, 255, 255))
+				table.insert(aXml, GetFormatText(')\n', 162, 255, 255, 255))
 			end
 		else --if szStat == 'UNKNOWN' then
-			insert(aXml, GetFormatText(_L['(Unknown)'] .. '\n', 162, 255, 255, 255))
+			table.insert(aXml, GetFormatText(_L['(Unknown)'] .. '\n', 162, 255, 255, 255))
 		end
 	else
-		insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+		table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 	end
-	insert(aXml, GetFormatText(_L('Achievement point: %d', D.GetAchievementPoint(dwAchieveID)) .. '\n', 162, 255, 128, 0))
-	insert(aXml, GetFormatText(achi.szDesc .. '\n', 162, 255, 255, 255))
+	table.insert(aXml, GetFormatText(_L('Achievement point: %d', D.GetAchievementPoint(dwAchieveID)) .. '\n', 162, 255, 128, 0))
+	table.insert(aXml, GetFormatText(achi.szDesc .. '\n', 162, 255, 255, 255))
 	-- 子成就
-	for _, s in ipairs(LIB.SplitString(achi.szSubAchievements, '|', true)) do
+	for _, s in ipairs(X.SplitString(achi.szSubAchievements, '|', true)) do
 		local dwSubAchieveID = tonumber(s)
 		if dwSubAchieveID then
-			local achi = LIB.GetAchievement(dwSubAchieveID)
+			local achi = X.GetAchievement(dwSubAchieveID)
 			if dwID then
 				local szStat, aProgressCounter = D.GetPlayerAchievementStat(dwID, dwSubAchieveID)
 				if achi then
 					if szStat == 'FINISH' then
-						insert(aXml, GetFormatText(_L['r'], 162, 128, 255, 128))
+						table.insert(aXml, GetFormatText(_L['r'], 162, 128, 255, 128))
 					elseif szStat == 'PROGRESS' then
-						insert(aXml, GetFormatText(_L['x'], 162, 173, 173, 173))
+						table.insert(aXml, GetFormatText(_L['x'], 162, 173, 173, 173))
 					else --if szStat == 'UNKNOWN' then
-						insert(aXml, GetFormatText(_L['?'], 162, 173, 173, 173))
+						table.insert(aXml, GetFormatText(_L['?'], 162, 173, 173, 173))
 					end
-					insert(aXml, GetFormatText(' ', 162, 255, 255, 255))
+					table.insert(aXml, GetFormatText(' ', 162, 255, 255, 255))
 				end
-				insert(aXml, GetFormatText(achi.szName, 162, 255, 255, 255))
-				if not IsEmpty(aProgressCounter) then
-					insert(aXml, GetFormatText(' (', 162, 255, 255, 255))
+				table.insert(aXml, GetFormatText(achi.szName, 162, 255, 255, 255))
+				if not X.IsEmpty(aProgressCounter) then
+					table.insert(aXml, GetFormatText(' (', 162, 255, 255, 255))
 					for i, progress in ipairs(aProgressCounter) do
-						local nTriggerVal = Get(LIB.GetAchievementInfo(progress.dwCounter), {'nTriggerVal'}, 1)
+						local nTriggerVal = X.Get(X.GetAchievementInfo(progress.dwCounter), {'nTriggerVal'}, 1)
 						if i ~= 1 then
-							insert(aXml, GetFormatText(', ', 162, 255, 255, 255))
+							table.insert(aXml, GetFormatText(', ', 162, 255, 255, 255))
 						end
-						insert(aXml, GetFormatText(progress.nNumber .. '/' .. nTriggerVal, 162, 255, 255, 255))
+						table.insert(aXml, GetFormatText(progress.nNumber .. '/' .. nTriggerVal, 162, 255, 255, 255))
 					end
-					insert(aXml, GetFormatText(')', 162, 255, 255, 255))
+					table.insert(aXml, GetFormatText(')', 162, 255, 255, 255))
 				end
-				insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+				table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 			else
-				insert(aXml, GetFormatText(_L[' '] .. achi.szName .. '\n', 162, 255, 255, 255))
+				table.insert(aXml, GetFormatText(_L[' '] .. achi.szName .. '\n', 162, 255, 255, 255))
 			end
 		end
 	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	OutputTip(concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 end
 
 function D.UpdatePage(page)
@@ -602,13 +573,13 @@ function D.UpdatePage(page)
 
 	local me = GetClientPlayer()
 	local team = GetClientTeam()
-	local bIsInParty = LIB.IsInParty()
+	local bIsInParty = X.IsInParty()
 	local aRec = {}
 	local aTeamMemberList = D.GetTeamMemberList()
 	for _, dwID in ipairs(aTeamMemberList) do
 		local info = bIsInParty and team.GetMemberInfo(dwID)
 		if info or dwID == me.dwID then
-			insert(aRec, {
+			table.insert(aRec, {
 				id = dwID,
 				name = info and info.szName or me.szName,
 				force = info and info.dwForceID or me.dwForceID,
@@ -618,7 +589,7 @@ function D.UpdatePage(page)
 	end
 
 	if Sorter then
-		sort(aRec, Sorter)
+		table.sort(aRec, Sorter)
 	end
 
 	local aCol = D.GetDispColumns()
@@ -649,8 +620,8 @@ function D.UpdatePage(page)
 end
 
 function D.DelayUpdatePage(page)
-	LIB.DelayCall('MY_TeamTools_Achievement__DelayUpdatePage', 200, function()
-		if IsElement(page) then
+	X.DelayCall('MY_TeamTools_Achievement__DelayUpdatePage', 200, function()
+		if X.IsElement(page) then
 			D.UpdatePage(page)
 		end
 	end)
@@ -664,7 +635,7 @@ end
 function D.OnInitPage()
 	if not D.tMapMenu or not D.tMapName or not D.aMapName or not D.tMapID then
 		local tMapMenu, tMapName, aMapName = {}, {}, {}
-		insert(tMapMenu, {
+		table.insert(tMapMenu, {
 			szOption = _L['All map'],
 			fnAction = function()
 				D.dwMapID = 0
@@ -675,8 +646,8 @@ function D.OnInitPage()
 			end,
 		})
 		tMapName[0] = _L['All map']
-		insert(aMapName, _L['All map'])
-		insert(tMapMenu, {
+		table.insert(aMapName, _L['All map'])
+		table.insert(tMapMenu, {
 			szOption = _L['Current map'],
 			fnAction = function()
 				D.dwMapID = GetClientPlayer().GetMapID()
@@ -686,10 +657,10 @@ function D.OnInitPage()
 				UI.ClosePopupMenu()
 			end,
 		})
-		for _, group in ipairs(LIB.GetTypeGroupMap()) do
+		for _, group in ipairs(X.GetTypeGroupMap()) do
 			local tSub = { szOption = group.szGroup }
 			for _, info in ipairs(group.aMapInfo) do
-				insert(tSub, {
+				table.insert(tSub, {
 					szOption = info.szName,
 					fnAction = function()
 						D.dwMapID = info.dwID
@@ -700,14 +671,14 @@ function D.OnInitPage()
 					end
 				})
 				tMapName[info.dwID] = info.szName
-				insert(aMapName, info.szName)
+				table.insert(aMapName, info.szName)
 			end
-			insert(tMapMenu, tSub)
+			table.insert(tMapMenu, tSub)
 		end
 		D.tMapMenu = tMapMenu
 		D.aMapName = aMapName
 		D.tMapName = tMapName
-		D.tMapID = LIB.FlipObjectKV(tMapName)
+		D.tMapID = X.FlipObjectKV(tMapName)
 	end
 	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_TeamTools_Achievement')
 	local wnd = frameTemp:Lookup('Wnd_Total')
@@ -736,18 +707,18 @@ function D.OnInitPage()
 		text = D.szSearch,
 		placeholder = _L['Search'],
 		onchange = function(szText)
-			LIB.Debounce(
+			X.Debounce(
 				'MY_TeamTools_Achievement_Search',
 				500,
 				D.SetSearch,
 				szText)
-			LIB.Debounce('MY_TeamTools_Achievement_RequestTeamData', 2000, D.RequestTeamData)
+			X.Debounce('MY_TeamTools_Achievement_RequestTeamData', 2000, D.RequestTeamData)
 		end,
 		autocomplete = {{'option', 'source', D.aSearchAC}},
 		onclick = function() UI(this):Autocomplete('search', '') end,
 		onblur = function()
 			D.RequestTeamData()
-			LIB.Debounce('MY_TeamTools_Achievement_RequestTeamData', false)
+			X.Debounce('MY_TeamTools_Achievement_RequestTeamData', false)
 		end,
 	}):Width() + 5
 
@@ -768,7 +739,7 @@ function D.OnInitPage()
 		text = _L['Refresh'],
 		onclick = function()
 			D.RequestTeamData()
-			LIB.Systopmsg(_L['Team achievement request sent.'])
+			X.Systopmsg(_L['Team achievement request sent.'])
 		end,
 	})
 
@@ -811,7 +782,7 @@ end
 function D.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Clear' then
-		LIB.Confirm(_L['Clear record'], D.ClearAchievementLog)
+		X.Confirm(_L['Clear record'], D.ClearAchievementLog)
 	end
 end
 
@@ -825,7 +796,7 @@ function D.OnItemLButtonClick()
 	elseif name == 'Handle_StatColumn' then
 		if IsCtrlKeyDown() then
 			if this.achieveid then
-				LIB.InsertChatInput('achievement', this.achieveid)
+				X.InsertChatInput('achievement', this.achieveid)
 			end
 		elseif this.col.id then
 			local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
@@ -842,7 +813,7 @@ function D.OnItemLButtonClick()
 		end
 		if IsCtrlKeyDown() then
 			if this.achieveid then
-				LIB.InsertChatInput('achievement', this.achieveid)
+				X.InsertChatInput('achievement', this.achieveid)
 			end
 		else
 			local AchievementPanel = _G.AchievementPanel or GetInsideEnv().AchievementPanel
@@ -890,7 +861,7 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools.RegisterModule('Achievement', _L['MY_TeamTools_Achievement'], LIB.CreateModule(settings))
+MY_TeamTools.RegisterModule('Achievement', _L['MY_TeamTools_Achievement'], X.CreateModule(settings))
 end
 
 -- Global exports
@@ -918,5 +889,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamTools_Achievement = LIB.CreateModule(settings)
+MY_TeamTools_Achievement = X.CreateModule(settings)
 end

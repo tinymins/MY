@@ -10,47 +10,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -62,21 +33,21 @@ local D = {}
 ----------------------------------------------------------------------<
 function D.GetSubsidiesMenu()
 	local menu = { szOption = _L['Edit Allowance Protocols'], rgb = { 255, 0, 0 } }
-	insert(menu, {
+	table.insert(menu, {
 		szOption = _L['Add New Protocols'],
 		rgb = { 255, 255, 0 },
 		fnAction = function()
 			GetUserInput(_L['New Protocol  Format: Protocol\'s Name, Money'], function(txt)
-				local t = LIB.SplitString(txt, ',')
+				local t = X.SplitString(txt, ',')
 				local aSubsidies = MY_GKP.aSubsidies
-				insert(aSubsidies, { t[1], tonumber(t[2]) or '', true })
+				table.insert(aSubsidies, { t[1], tonumber(t[2]) or '', true })
 				MY_GKP.aSubsidies = aSubsidies
 			end)
 		end,
 	})
-	insert(menu, { bDevide = true})
+	table.insert(menu, { bDevide = true})
 	for k, v in ipairs(MY_GKP.aSubsidies) do
-		insert(menu, {
+		table.insert(menu, {
 			szOption = v[1],
 			bCheck = true,
 			bChecked = v[3],
@@ -94,7 +65,7 @@ function D.GetSubsidiesMenu()
 				local aSubsidies = MY_GKP.aSubsidies
 				for ii, vv in ipairs(aSubsidies) do
 					if v == vv then
-						remove(aSubsidies, ii)
+						table.remove(aSubsidies, ii)
 					end
 				end
 				MY_GKP.aSubsidies = aSubsidies
@@ -109,36 +80,36 @@ end
 ----------------------------------------------------------------------<
 function D.GetSchemeMenu()
 	local menu = { szOption = _L['Edit Auction Protocols'], rgb = { 255, 0, 0 } }
-	insert(menu,{
+	table.insert(menu,{
 		szOption = _L['Edit All Protocols'],
 		rgb = { 255, 255, 0 },
 		fnAction = function()
 			local a = {}
-			if IsTable(MY_GKP.aScheme) then
+			if X.IsTable(MY_GKP.aScheme) then
 				for k, v in ipairs(MY_GKP.aScheme) do
-					insert(a, tostring(v[1]) .. ',' .. tostring(v[2]))
+					table.insert(a, tostring(v[1]) .. ',' .. tostring(v[2]))
 				end
 			end
 			GetUserInput(_L['New Protocol Format: Money, Step; Money, Step'], function(txt)
-				local t = LIB.SplitString(txt, ';')
+				local t = X.SplitString(txt, ';')
 				local aScheme = {}
 				for k, v in ipairs(t) do
-					local a = LIB.SplitString(v, ',')
+					local a = X.SplitString(v, ',')
 					if a[1] and a[2] then
 						a[1] = tonumber(a[1])
 						a[2] = tonumber(a[2])
 					end
-					if not IsEmpty(a[1]) and not IsEmpty(a[2]) then
-						insert(aScheme, { a[1], a[2], true })
+					if not X.IsEmpty(a[1]) and not X.IsEmpty(a[2]) then
+						table.insert(aScheme, { a[1], a[2], true })
 					end
 				end
 				MY_GKP.aScheme = aScheme
-			end, nil, nil, nil, concat(a, ';'))
+			end, nil, nil, nil, table.concat(a, ';'))
 		end
 	})
-	insert(menu, { bDevide = true })
+	table.insert(menu, { bDevide = true })
 	for k, v in ipairs(MY_GKP.aScheme) do
-		insert(menu,{
+		table.insert(menu,{
 			szOption = v[1] .. ',' .. v[2],
 			bCheck = true,
 			bChecked = v[3],
@@ -156,7 +127,7 @@ function D.GetSchemeMenu()
 				local aScheme = MY_GKP.aScheme
 				for ii, vv in ipairs(aScheme) do
 					if v == vv then
-						remove(aScheme, ii)
+						table.remove(aScheme, ii)
 					end
 				end
 				MY_GKP.aScheme = aScheme
@@ -275,4 +246,4 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + 28
 end
-LIB.RegisterPanel(_L['General'], 'MY_GKP', _L['GKP Golden Team Record'], 2490, PS)
+X.RegisterPanel(_L['General'], 'MY_GKP', _L['GKP Golden Team Record'], 2490, PS)

@@ -11,47 +11,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -62,11 +33,11 @@ local MY_TM_TYPE             = MY_TeamMon.MY_TM_TYPE
 local MY_TM_SCRUTINY_TYPE    = MY_TeamMon.MY_TM_SCRUTINY_TYPE
 local MY_TM_REMOTE_DATA_ROOT = MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
 local MY_TM_SPECIAL_MAP      = MY_TeamMon.MY_TM_SPECIAL_MAP
-local MY_TMUI_INIFILE        = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI.ini'
-local MY_TMUI_ITEM_L         = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_L.ini'
-local MY_TMUI_TALK_L         = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
-local MY_TMUI_ITEM_R         = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_R.ini'
-local MY_TMUI_TALK_R         = PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_R.ini'
+local MY_TMUI_INIFILE        = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI.ini'
+local MY_TMUI_ITEM_L         = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_L.ini'
+local MY_TMUI_TALK_L         = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
+local MY_TMUI_ITEM_R         = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_R.ini'
+local MY_TMUI_TALK_R         = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_R.ini'
 local MY_TMUI_TYPE           = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
 local MY_TMUI_SELECT_TYPE    = MY_TMUI_TYPE[1]
 local MY_TMUI_SELECT_MAP     = _L['All data']
@@ -102,13 +73,13 @@ local MY_TMUI_DOODAD_ICON = {
 }
 setmetatable(MY_TMUI_DOODAD_ICON, { __index = function(me, key)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(_L['MY_TeamMon'], 'Unknown Kind: ' .. key, DEBUG_LEVEL.WARNING)
+	X.Debug(_L['MY_TeamMon'], 'Unknown Kind: ' .. key, X.DEBUG_LEVEL.WARNING)
 	--[[#DEBUG END]]
 	return 369
 end })
 
 local function OpenDragPanel(el)
-	local frame = Wnd.OpenWindow(PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_DRAG.ini', 'MY_TeamMon_DRAG')
+	local frame = Wnd.OpenWindow(X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_DRAG.ini', 'MY_TeamMon_DRAG')
 	local x, y = Cursor.GetPos()
 	local w, h = el:GetSize()
 	-- local x, y = el:GetAbsPos()
@@ -146,7 +117,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('MY_TMUI_SELECT_MAP')
 	this:RegisterEvent('UI_SCALED')
 	-- Esc
-	LIB.RegisterEsc('MY_TeamMon', D.IsOpened, D.ClosePanel)
+	X.RegisterEsc('MY_TeamMon', D.IsOpened, D.ClosePanel)
 	-- CreateItemData
 	this.hItemL = this:CreateItemData(MY_TMUI_ITEM_L, 'Handle_L')
 	this.hTalkL = this:CreateItemData(MY_TMUI_TALK_L, 'Handle_TALK_L')
@@ -179,28 +150,28 @@ function D.OnFrameCreate()
 		buttonstyle = 'FLAT_LACE_BORDER',
 		menu = function()
 			local menu = {}
-			insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
+			table.insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
 			local szLang = GLOBAL.GAME_LANG
 			if szLang == 'zhcn' or szLang == 'zhtw' then
-				insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
+				table.insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
 			end
-			insert(menu, {
+			table.insert(menu, {
 				szOption = _L['Clear data'],
 				fnAction = function()
 					D.RemoveData(nil, nil, _L['All data'])
 				end,
 			})
-			insert(menu, { szOption = _L['Export data'], fnAction = D.OpenExportPanel })
-			insert(menu, { szOption = _L['Open data folder'], fnAction = function()
-				local szRoot = LIB.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT):gsub('/', '\\')
-				LIB.OpenFolder(szRoot)
+			table.insert(menu, { szOption = _L['Export data'], fnAction = D.OpenExportPanel })
+			table.insert(menu, { szOption = _L['Open data folder'], fnAction = function()
+				local szRoot = X.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT):gsub('/', '\\')
+				X.OpenFolder(szRoot)
 				UI.OpenTextEditor(szRoot)
 			end })
 			return menu
 		end,
 	})
 	-- debug
-	if LIB.IsDebugClient(true) then
+	if X.IsDebugClient(true) then
 		ui:Append('WndButton', { text = 'Reload', x = 10, y = 10, onclick = ReloadUIAddon })
 		ui:Append('WndButton', {
 			name = 'On', text = 'Enable', x = 110, y = 10, enable = not MY_TeamMon.bEnable,
@@ -233,7 +204,7 @@ function D.OnFrameCreate()
 		text = _L['Clear record'],
 		buttonstyle = 'FLAT',
 		onclick = function()
-			LIB.Confirm(_L['Confirm?'], function()
+			X.Confirm(_L['Confirm?'], function()
 				MY_TeamMon.ClearTemp(MY_TMUI_SELECT_TYPE)
 			end)
 		end,
@@ -283,9 +254,9 @@ end
 -- 用于刷新滚动条 来刷新内容
 function D.RefreshScroll(szRefresh)
 	local frame = D.GetFrame()
-	local szName = format('WndScroll_%s_%s/Btn_%s_%s_ALL', MY_TMUI_SELECT_TYPE, szRefresh, MY_TMUI_SELECT_TYPE, szRefresh)
+	local szName = string.format('WndScroll_%s_%s/Btn_%s_%s_ALL', MY_TMUI_SELECT_TYPE, szRefresh, MY_TMUI_SELECT_TYPE, szRefresh)
 	local hWndScroll = frame.hPageSet:GetActivePage():Lookup(szName)
-	LIB.ExecuteWithThis(hWndScroll, D.OnScrollBarPosChanged)
+	X.ExecuteWithThis(hWndScroll, D.OnScrollBarPosChanged)
 end
 
 function D.ConflictCheck()
@@ -297,14 +268,14 @@ function D.ConflictCheck()
 				local tTemp = {}
 				for kk, vv in ipairs(v) do
 					tTemp[vv.dwID] = tTemp[vv.dwID] or {}
-					insert(tTemp[vv.dwID], vv)
+					table.insert(tTemp[vv.dwID], vv)
 				end
 				for kk, vv in pairs(tTemp) do
 					if #vv > 1 then
 						for kkk, vvv in ipairs(vv) do
 							if not vvv.bCheckLevel then
 								bMsg = true
-								LIB.Sysmsg(
+								X.Sysmsg(
 									_L['MY_TeamMon'],
 									_L['Data conflict'] .. ' ' .. _L[MY_TMUI_SELECT_TYPE] .. ' '
 										.. MY_TeamMon.GetMapName(k) .. ' :: ' .. vvv.dwID .. ' :: '
@@ -318,7 +289,7 @@ function D.ConflictCheck()
 			end
 		end
 		if bMsg then
-			LIB.Sysmsg(_L['MY_TeamMon'], _L['Data conflict, please check.'], CONSTANT.MSG_THEME.ERROR)
+			X.Sysmsg(_L['MY_TeamMon'], _L['Data conflict, please check.'], CONSTANT.MSG_THEME.ERROR)
 		end
 	end
 end
@@ -337,7 +308,7 @@ end
 function D.UpdateBG()
 	-- background
 	local frame = D.GetFrame()
-	local info = IsNumber(MY_TMUI_SELECT_MAP) and g_tTable.DungeonInfo:Search(MY_TMUI_SELECT_MAP)
+	local info = X.IsNumber(MY_TMUI_SELECT_MAP) and g_tTable.DungeonInfo:Search(MY_TMUI_SELECT_MAP)
 	if MY_TMUI_SELECT_TYPE ~= 'TALK' and MY_TMUI_SELECT_TYPE ~= 'CHAT' and info and info.szDungeonImage2 then
 		frame:Lookup('', 'Handle_BG'):Show()
 		frame:Lookup('', 'Handle_BG/Image_BG'):FromUITex(info.szDungeonImage2, 0)
@@ -348,7 +319,7 @@ function D.UpdateBG()
 end
 
 function D.UpdateMapList(frame)
-	local dwCurrentMapID, dwSelectMapID = LIB.GetMapID(), MY_TMUI_SELECT_MAP
+	local dwCurrentMapID, dwSelectMapID = X.GetMapID(), MY_TMUI_SELECT_MAP
 	local hList, hTreeNode, hTreeItem = frame.hTreeH, nil
 	for i = 0, hList:GetItemCount() - 1 do
 		local el = hList:Lookup(i)
@@ -387,7 +358,7 @@ function D.RedrawMapList(frame)
 			_L['All data'], -- 全部
 		},
 	}
-	insert(aGroupMap, tAll)
+	table.insert(aGroupMap, tAll)
 	-- 全部/其他
 	local tCommon = {
 		szGroup = _L['Common / uncategorized'],
@@ -400,13 +371,13 @@ function D.RedrawMapList(frame)
 			MY_TM_SPECIAL_MAP.STARVE, -- 浪客行
 		},
 	}
-	insert(aGroupMap, tCommon)
+	table.insert(aGroupMap, tCommon)
 	-- 秘境
-	for _, v in ipairs(LIB.GetTypeGroupMap()) do
-		insert(aGroupMap, v)
+	for _, v in ipairs(X.GetTypeGroupMap()) do
+		table.insert(aGroupMap, v)
 	end
 	-- 回收站
-	insert(aGroupMap, {
+	table.insert(aGroupMap, {
 		szGroup = _L['Recycle bin'],
 		aMapInfo = { MY_TM_SPECIAL_MAP.RECYCLE_BIN },
 	})
@@ -414,21 +385,21 @@ function D.RedrawMapList(frame)
 	local tMapExist = {}
 	for _, v in ipairs(aGroupMap) do
 		for _, vv in ipairs(v.aMapInfo) do
-			if IsTable(vv) then
+			if X.IsTable(vv) then
 				vv = vv.dwID
 			end
 			tMapExist[vv] = true
 		end
 	end
 	for k, v in pairs(data) do
-		if IsNumber(k) and not tMapExist[k] then
-			insert(tCommon.aMapInfo, k)
+		if X.IsNumber(k) and not tMapExist[k] then
+			table.insert(tCommon.aMapInfo, k)
 		end
 	end
 	-- 格式化
 	for _, v in ipairs(aGroupMap) do
 		for i, vv in ipairs(v.aMapInfo) do
-			if not IsTable(vv) then
+			if not X.IsTable(vv) then
 				v.aMapInfo[i] = {
 					dwID = vv,
 					szName = MY_TeamMon.GetMapName(vv) or tostring(vv),
@@ -438,15 +409,15 @@ function D.RedrawMapList(frame)
 	end
 	-- 搜索
 	if MY_TMUI_MAP_SEARCH then
-		for i, v in ipairs_r(aGroupMap) do
-			if not wfind(v.szGroup, MY_TMUI_MAP_SEARCH) then
-				for i, vv in ipairs_r(v.aMapInfo) do
-					if not wfind(vv.szName, MY_TMUI_MAP_SEARCH) then
-						remove(v.aMapInfo, i)
+		for i, v in X.ipairs_r(aGroupMap) do
+			if not wstring.find(v.szGroup, MY_TMUI_MAP_SEARCH) then
+				for i, vv in X.ipairs_r(v.aMapInfo) do
+					if not wstring.find(vv.szName, MY_TMUI_MAP_SEARCH) then
+						table.remove(v.aMapInfo, i)
 					end
 				end
 				if #v.aMapInfo == 0 then
-					remove(aGroupMap, i)
+					table.remove(aGroupMap, i)
 				end
 			end
 		end
@@ -543,7 +514,7 @@ function D.OnItemLButtonDown()
 				data   = { type = 'text', text = szName }
 			end
 			if szName then
-				local edit = LIB.GetChatInput()
+				local edit = X.GetChatInput()
 				edit:InsertObj(szName, data)
 				Station.SetFocusWindow(edit)
 			end
@@ -596,11 +567,11 @@ function D.OnItemRButtonClick()
 			dwMapID = nil
 		end
 		local menu = {}
-		insert(menu, { szOption = this:Lookup('Text_TreeItem'):GetText(), bDisable = true })
-		insert(menu, { bDevide = true })
-		insert(menu, { szOption = _L['Clear this map data'], rgb = { 255, 0, 0 }, fnAction = function()
+		table.insert(menu, { szOption = this:Lookup('Text_TreeItem'):GetText(), bDisable = true })
+		table.insert(menu, { bDevide = true })
+		table.insert(menu, { szOption = _L['Clear this map data'], rgb = { 255, 0, 0 }, fnAction = function()
 			D.RemoveData(dwMapID, nil, dwMapID
-				and Get(MY_TeamMon.GetMapInfo(dwMapID), 'szName', _L['This data'])
+				and X.Get(MY_TeamMon.GetMapInfo(dwMapID), 'szName', _L['This data'])
 				or _L['All data'])
 		end })
 		PopupMenu(menu)
@@ -609,38 +580,38 @@ function D.OnItemRButtonClick()
 		local menu = {}
 		local name = this:Lookup('Text') and this:Lookup('Text'):GetText() or t.szContent
 		if MY_TMUI_SELECT_TYPE ~= 'TALK' and MY_TMUI_SELECT_TYPE ~= 'CHAT' then -- 太长
-			insert(menu, { szOption = g_tStrings.CHAT_NAME .. g_tStrings.STR_COLON .. name, bDisable = true })
+			table.insert(menu, { szOption = g_tStrings.CHAT_NAME .. g_tStrings.STR_COLON .. name, bDisable = true })
 		end
-		insert(menu, { szOption = _L['Class'] .. g_tStrings.STR_COLON .. MY_TeamMon.GetMapName(t.dwMapID), bDisable = true })
-		insert(menu, { bDevide = true })
-		insert(menu, { szOption = g_tStrings.STR_FRIEND_MOVE_TO })
-		insert(menu[#menu], { szOption = _L['Manual input'], fnAction = function()
+		table.insert(menu, { szOption = _L['Class'] .. g_tStrings.STR_COLON .. MY_TeamMon.GetMapName(t.dwMapID), bDisable = true })
+		table.insert(menu, { bDevide = true })
+		table.insert(menu, { szOption = g_tStrings.STR_FRIEND_MOVE_TO })
+		table.insert(menu[#menu], { szOption = _L['Manual input'], fnAction = function()
 			GetUserInput(g_tStrings.MSG_INPUT_MAP_NAME, function(szText)
 				local map = MY_TeamMon.GetMapInfo(szText)
 				if map then
 					return D.MoveData(t.dwMapID, t.nIndex, map, IsCtrlKeyDown())
 				end
-				return LIB.Alert(_L['The map does not exist'])
+				return X.Alert(_L['The map does not exist'])
 			end)
 		end })
-		insert(menu[#menu], { bDevide = true })
+		table.insert(menu[#menu], { bDevide = true })
 		D.InsertDungeonMenu(menu[#menu], function(dwMapID)
 			D.MoveData(t.dwMapID, t.nIndex, dwMapID, IsCtrlKeyDown())
 		end)
-		insert(menu, { bDevide = true })
-		insert(menu, { szOption = _L['Share data'], bDisable = not LIB.IsInParty(), fnAction = function()
-			if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-				return LIB.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
+		table.insert(menu, { bDevide = true })
+		table.insert(menu, { szOption = _L['Share data'], bDisable = not X.IsInParty(), fnAction = function()
+			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
-			if LIB.IsLeader() or LIB.IsDebugClient(true) then
-				LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TM_SHARE', {MY_TMUI_SELECT_TYPE, t.dwMapID, t})
-				LIB.Topmsg(g_tStrings.STR_MAIL_SUCCEED)
+			if X.IsLeader() or X.IsDebugClient(true) then
+				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TM_SHARE', {MY_TMUI_SELECT_TYPE, t.dwMapID, t})
+				X.Topmsg(g_tStrings.STR_MAIL_SUCCEED)
 			else
-				return LIB.Alert(_L['You are not team leader.'])
+				return X.Alert(_L['You are not team leader.'])
 			end
 		end })
-		insert(menu, { bDevide = true })
-		insert(menu, { szOption = g_tStrings.STR_FRIEND_DEL, rgb = { 255, 0, 0 }, fnAction = function()
+		table.insert(menu, { bDevide = true })
+		table.insert(menu, { szOption = g_tStrings.STR_FRIEND_DEL, rgb = { 255, 0, 0 }, fnAction = function()
 			D.RemoveData(t.dwMapID, t.nIndex, name)
 		end })
 		PopupMenu(menu)
@@ -648,15 +619,15 @@ function D.OnItemRButtonClick()
 		local menu = {}
 		local t = this.dat
 		local szName = D.GetDataName(MY_TMUI_SELECT_TYPE, t)
-		-- insert(menu, { szOption = _L['Add to monitor list'], fnAction = function() D.OpenAddPanel(MY_TMUI_SELECT_TYPE, t) end })
-		-- insert(menu, { bDevide = true })
-		insert(menu, { szOption = g_tStrings.STR_DATE .. g_tStrings.STR_COLON .. FormatTime('%Y%m%d %H:%M:%S',t.nCurrentTime) , bDisable = true })
+		-- table.insert(menu, { szOption = _L['Add to monitor list'], fnAction = function() D.OpenAddPanel(MY_TMUI_SELECT_TYPE, t) end })
+		-- table.insert(menu, { bDevide = true })
+		table.insert(menu, { szOption = g_tStrings.STR_DATE .. g_tStrings.STR_COLON .. FormatTime('%Y%m%d %H:%M:%S',t.nCurrentTime) , bDisable = true })
 		if MY_TMUI_SELECT_TYPE ~= 'TALK' and MY_TMUI_SELECT_TYPE ~= 'CHAT' then
-			insert(menu, { szOption = g_tStrings.CHAT_NAME .. g_tStrings.STR_COLON .. szName, bDisable = true })
+			table.insert(menu, { szOption = g_tStrings.CHAT_NAME .. g_tStrings.STR_COLON .. szName, bDisable = true })
 		end
-		insert(menu, { szOption = g_tStrings.MAP_TALK .. g_tStrings.STR_COLON .. Table_GetMapName(t.dwMapID), bDisable = true })
+		table.insert(menu, { szOption = g_tStrings.MAP_TALK .. g_tStrings.STR_COLON .. Table_GetMapName(t.dwMapID), bDisable = true })
 		if MY_TMUI_SELECT_TYPE ~= 'NPC' and MY_TMUI_SELECT_TYPE ~= 'TALK' and MY_TMUI_SELECT_TYPE ~= 'DOODAD' then
-			insert(menu, { szOption = g_tStrings.STR_SKILL_H_CAST_TIME .. (t.szSrcName or g_tStrings.STR_CRAFT_NONE) .. (t.bIsPlayer and _L['(player)'] or ''), bDisable = true })
+			table.insert(menu, { szOption = g_tStrings.STR_SKILL_H_CAST_TIME .. (t.szSrcName or g_tStrings.STR_CRAFT_NONE) .. (t.bIsPlayer and _L['(player)'] or ''), bDisable = true })
 		end
 		if MY_TMUI_SELECT_TYPE ~= 'TALK' and MY_TMUI_SELECT_TYPE ~= 'CHAT' then
 			local cmenu = { szOption = _L['Interval time'] }
@@ -669,16 +640,16 @@ function D.OnItemRButtonClick()
 
 			if tInterval and #tInterval > 1 then
 				local nTime = tInterval[#tInterval]
-				for k, v in ipairs_r(tInterval) do
+				for k, v in X.ipairs_r(tInterval) do
 					if #cmenu == 16 then break end
-					insert(cmenu, { szOption = format('%.1f', (nTime - v) / 1000) .. g_tStrings.STR_TIME_SECOND })
+					table.insert(cmenu, { szOption = string.format('%.1f', (nTime - v) / 1000) .. g_tStrings.STR_TIME_SECOND })
 					nTime = v
 				end
-				remove(cmenu, 1)
+				table.remove(cmenu, 1)
 			else
-				insert(cmenu, { szOption = g_tStrings.STR_FIGHT_NORECORD, bDisable = true })
+				table.insert(cmenu, { szOption = g_tStrings.STR_FIGHT_NORECORD, bDisable = true })
 			end
-			insert(menu, cmenu)
+			table.insert(menu, cmenu)
 		end
 		PopupMenu(menu)
 	end
@@ -691,12 +662,12 @@ function D.OnItemMouseEnter()
 	if szName == 'Handle_TreeNode' then
 		D.UpdateMapNodeMouseState(this)
 	elseif szName == 'Handle_TreeItem' then
-		local info = IsNumber(this.dwMapID) and g_tTable.DungeonInfo:Search(this.dwMapID)
+		local info = X.IsNumber(this.dwMapID) and g_tTable.DungeonInfo:Search(this.dwMapID)
 		local szXml = GetFormatText(MY_TeamMon.GetMapName(this.dwMapID) ..' (' .. this.nCount ..  ')\n', 47, 255, 255, 0)
-		if info and LIB.TrimString(info.szBossInfo) ~= '' then
-			local tBoss = LIB.SplitString(info.szBossInfo, ' ')
+		if info and X.TrimString(info.szBossInfo) ~= '' then
+			local tBoss = X.SplitString(info.szBossInfo, ' ')
 			for k, v in ipairs(tBoss or {}) do
-				if LIB.TrimString(v) ~= '' then
+				if X.TrimString(v) ~= '' then
 					szXml = szXml .. GetFormatText(k .. ') ' .. v .. '\n', 47, 255, 255, 255)
 				end
 			end
@@ -776,7 +747,7 @@ function D.OnItemLButtonDragEnd()
 			D.OpenAddPanel(MY_TMUI_SELECT_TYPE, data)
 		end
 	end
-	LIB.DelayCall(50, function() -- 由于 click在 dragend 之后
+	X.DelayCall(50, function() -- 由于 click在 dragend 之后
 		MY_TMUI_DRAG = false
 	end)
 end
@@ -784,7 +755,7 @@ end
 function D.OnEditChanged()
 	local name = this:GetName()
 	if name == 'Edit_SearchMap' then
-		local szText = LIB.TrimString(this:GetText())
+		local szText = X.TrimString(this:GetText())
 		if szText == '' then
 			MY_TMUI_MAP_SEARCH = nil
 		else
@@ -792,7 +763,7 @@ function D.OnEditChanged()
 		end
 		D.RedrawMapList(this:GetRoot())
 	elseif name == 'Edit_SearchContent' then
-		local szText = LIB.TrimString(this:GetText())
+		local szText = X.TrimString(this:GetText())
 		if szText == '' then
 			MY_TMUI_SEARCH = nil
 		else
@@ -817,10 +788,10 @@ function D.OnScrollBarPosChanged()
 	local szName = hWndScroll:GetName()
 	local dir = szName:match('WndScroll_' .. MY_TMUI_SELECT_TYPE .. '_(.*)')
 	if dir then
-		local handle = hWndScroll:Lookup('', format('Handle_%s_List_%s', MY_TMUI_SELECT_TYPE, dir))
-		local nPer = this:GetScrollPos() / max(1, this:GetStepCount())
-		local nCount = ceil(handle:GetItemCount() * nPer)
-		for i = max(0, nCount - MY_TMUI_ITEM_PER_PAGE), nCount + MY_TMUI_ITEM_PER_PAGE, 1 do -- 每次渲染两页
+		local handle = hWndScroll:Lookup('', string.format('Handle_%s_List_%s', MY_TMUI_SELECT_TYPE, dir))
+		local nPer = this:GetScrollPos() / math.max(1, this:GetStepCount())
+		local nCount = math.ceil(handle:GetItemCount() * nPer)
+		for i = math.max(0, nCount - MY_TMUI_ITEM_PER_PAGE), nCount + MY_TMUI_ITEM_PER_PAGE, 1 do -- 每次渲染两页
 			local h = handle:Lookup(i)
 			if h then
 				if not h.bDraw then
@@ -847,13 +818,13 @@ end
 
 function D.OutputTip(szType, data, rect)
 	if szType == 'BUFF' or szType == 'DEBUFF' then
-		LIB.OutputBuffTip(rect, data.dwID, data.nLevel)
+		X.OutputBuffTip(rect, data.dwID, data.nLevel)
 	elseif szType == 'CASTING' then
 		OutputSkillTip(data.dwID, data.nLevel, rect)
 	elseif szType == 'NPC' then
-		LIB.OutputNpcTemplateTip(rect, data.dwID)
+		X.OutputNpcTemplateTip(rect, data.dwID)
 	elseif szType == 'DOODAD' then
-		LIB.OutputDoodadTemplateTip(rect, data.dwID)
+		X.OutputDoodadTemplateTip(rect, data.dwID)
 	elseif szType == 'TALK' then
 		OutputTip(GetFormatText((data.szTarget or _L['Warning box']) .. '\t', 41, 255, 255, 0) .. GetFormatText(MY_TeamMon.GetMapName(data.dwMapID) .. '\n', 41, 255, 255, 255) .. GetFormatText(data.szContent, 41, 255, 255, 255), 300, rect)
 	elseif szType == 'CHAT' then
@@ -862,10 +833,10 @@ function D.OutputTip(szType, data, rect)
 end
 
 function D.InsertDungeonMenu(menu, fnAction)
-	local dwMapID = LIB.GetMapID()
-	local aDungeon =  LIB.GetTypeGroupMap()
+	local dwMapID = X.GetMapID()
+	local aDungeon =  X.GetTypeGroupMap()
 	local data = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE)
-	insert(menu, {
+	table.insert(menu, {
 		szOption = g_tStrings.CHANNEL_COMMON
 			.. ' (' .. (data[MY_TM_SPECIAL_MAP.COMMON] and #data[MY_TM_SPECIAL_MAP.COMMON] or 0) .. ')',
 		fnAction = function()
@@ -874,11 +845,11 @@ function D.InsertDungeonMenu(menu, fnAction)
 			end
 		end,
 	})
-	insert(menu, { bDevide = true })
+	table.insert(menu, { bDevide = true })
 	for k, v in ipairs(aDungeon) do
 		local tMenu = { szOption = v.szGroup }
 		for _, vv in ipairs(v.aMapInfo) do
-			insert(tMenu, {
+			table.insert(tMenu, {
 				szOption = Table_GetMapName(vv.dwID) .. ' (' .. (data[vv.dwID] and #data[vv.dwID] or 0) .. ')',
 				rgb      = { 255, 128, 0 },
 				szIcon   = dwMapID == vv.dwID and 'ui/Image/Minimap/Minimap.uitex',
@@ -891,7 +862,7 @@ function D.InsertDungeonMenu(menu, fnAction)
 				end
 			})
 		end
-		insert(menu, tMenu)
+		table.insert(menu, tMenu)
 	end
 end
 
@@ -916,7 +887,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 				'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
 				MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
 			)
-			if not IsEmpty(szFile) then
+			if not X.IsEmpty(szFile) then
 				ui:Children('#FilePtah'):Text(szFile)
 			end
 		end,
@@ -954,7 +925,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 			local aType      = {}
 			for k, v in ipairs(MY_TMUI_TYPE) do
 				if ui:Children('#' .. v):Check() then
-					insert(aType, v)
+					table.insert(aType, v)
 				end
 			end
 			MY_TeamMon.ImportDataFromFile(
@@ -964,18 +935,18 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 				function(bStatus, ...)
 					if bStatus then
 						local szFilePath, aType, szMode, tMeta = ...
-						LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szFilePath)), CONSTANT.MSG_THEME.SUCCESS)
+						X.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szFilePath)), CONSTANT.MSG_THEME.SUCCESS)
 						-- local function fnAlert2()
-						-- 	local szAuthor = tMeta and LIB.ReplaceSensitiveWord(tostring(tMeta.szAuthor)) or _L['Unknown author']
-						-- 	LIB.Alert(
+						-- 	local szAuthor = tMeta and X.ReplaceSensitiveWord(tostring(tMeta.szAuthor)) or _L['Unknown author']
+						-- 	X.Alert(
 						-- 		_L('Plugin is plugin, data is data, plugin author is plugin author, data author is data author..\nYou just loaded data\'s author is %s, it works on mingyi plugin team monitor addon.\n%s is data author, do not response for plugin problems. MingYi is plugin author, do not response for data problems.\n\nIf there is some strange headtop, focus, buff or talk, please try to use other author\'s data, and response to current author %s, plugin author MingYi does not response for this.', szAuthor, szAuthor, szAuthor),
 						-- 		nil,
 						-- 		nil,
 						-- 		'FORBIDDEN',
 						-- 		2)
 						-- end
-						-- LIB.Alert(_L('Import success: %s', szTitle or szFilePath), fnAlert2, nil, fnAlert2)
-						LIB.Alert(_L('Import success: %s', szTitle or szFilePath))
+						-- X.Alert(_L('Import success: %s', szTitle or szFilePath), fnAlert2, nil, fnAlert2)
+						X.Alert(_L('Import success: %s', szTitle or szFilePath))
 						ui:Remove()
 						if MY_LifeBar and not MY_LifeBar.bEnabled then
 							MY_LifeBar.bEnabled = true
@@ -986,13 +957,13 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 						if MY_Focus and not MY_Focus.bEnable then
 							MY_Focus.bEnable = true
 						end
-						SafeCall(fnAction, bStatus, szFilePath, aType, szMode, tMeta)
+						X.SafeCall(fnAction, bStatus, szFilePath, aType, szMode, tMeta)
 					else
 						-- bStatus, szMsg
 						local szMsg = ...
-						LIB.Sysmsg(_L['MY_TeamMon'], _L('Load config failed: %s', _L[szMsg]), CONSTANT.MSG_THEME.ERROR)
-						LIB.Alert(_L('Import failed: %s', szTitle or _L[szMsg]))
-						SafeCall(fnAction, bStatus, szMsg)
+						X.Sysmsg(_L['MY_TeamMon'], _L('Load config failed: %s', _L[szMsg]), CONSTANT.MSG_THEME.ERROR)
+						X.Alert(_L('Import failed: %s', szTitle or _L[szMsg]))
+						X.SafeCall(fnAction, bStatus, szMsg)
 					end
 				end)
 		end,
@@ -1014,7 +985,7 @@ function D.OpenExportPanel()
 		text = szAuthor,
 		limit = 6,
 		onchange = function(szText)
-			szAuthor = LIB.TrimString(szText)
+			szAuthor = X.TrimString(szText)
 		end,
 	}):Pos('BOTTOMRIGHT')
 	nY = nY + 10
@@ -1077,7 +1048,7 @@ function D.OpenExportPanel()
 			local aType = {}
 			for _, v in ipairs(MY_TMUI_TYPE) do
 				if ui:Children('#' .. v):Check() then
-					insert(aType, v)
+					table.insert(aType, v)
 				end
 			end
 			MY_TeamMon.ExportDataToFile(
@@ -1087,8 +1058,8 @@ function D.OpenExportPanel()
 				szAuthor,
 				function(szPath)
 					local szMsg = _L('Export success: %s', szPath)
-					LIB.Alert(szMsg)
-					LIB.Sysmsg(szMsg)
+					X.Alert(szMsg)
+					X.Sysmsg(szMsg)
 					ui:Remove()
 				end)
 		end,
@@ -1108,7 +1079,7 @@ function D.RemoveData(dwMapID, nIndex, szMsg)
 		MY_TeamMon.RemoveData(MY_TMUI_SELECT_TYPE, dwMapID, nIndex)
 	end
 	if not nIndex then
-		LIB.Confirm(FormatString(g_tStrings.MSG_DELETE_NAME, szMsg), fnAction)
+		X.Confirm(FormatString(g_tStrings.MSG_DELETE_NAME, szMsg), fnAction)
 	else
 		fnAction()
 	end
@@ -1134,11 +1105,11 @@ function D.GetSearchCache(data)
 			if tParsedData.szName then
 				tParsedData.szName = ParseCustomText(tParsedData.szName)
 			end
-			szString = EncodeLUAData(data) .. EncodeLUAData(tParsedData)
+			szString = X.EncodeLUAData(data) .. X.EncodeLUAData(tParsedData)
 			cache[data.dwMapID][data.nIndex] = szString
 		end
 	else -- 临时记录 暂时还不做缓存处理
-		szString = EncodeLUAData(data)
+		szString = X.EncodeLUAData(data)
 	end
 	return szString
 end
@@ -1166,20 +1137,20 @@ end
 function D.GetDataName(szType, data)
 	local szName, nIcon
 	if szType == 'CASTING' then
-		szName, nIcon = LIB.GetSkillName(data.dwID, data.nLevel)
+		szName, nIcon = X.GetSkillName(data.dwID, data.nLevel)
 	elseif szType == 'NPC' then
 		if data.dwID then
-			szName = LIB.GetTemplateName(TARGET.NPC, data.dwID) or data.dwID
+			szName = X.GetTemplateName(TARGET.NPC, data.dwID) or data.dwID
 			nIcon = data.nFrame
 		end
 	elseif szType == 'DOODAD' then
 		local doodad = GetDoodadTemplate(data.dwID)
-		szName = LIB.GetTemplateName(TARGET.DOODAD, data.dwID) or data.dwID
+		szName = X.GetTemplateName(TARGET.DOODAD, data.dwID) or data.dwID
 		nIcon  = MY_TMUI_DOODAD_ICON[doodad.nKind]
 	elseif szType == 'TALK' or szType == 'CHAT' then
 		szName = data.szContent
 	else
-		szName, nIcon = LIB.GetBuffName(data.dwID, data.nLevel)
+		szName, nIcon = X.GetBuffName(data.dwID, data.nLevel)
 	end
 	if data.nIcon then
 		nIcon = data.nIcon
@@ -1204,7 +1175,7 @@ function D.SetBuffItemAction(h)
 		h:Lookup('Text_R'):SetText(_L['INFINITE'])
 	else
 		nSec = nSec / GLOBAL.GAME_FPS
-		h:Lookup('Text_R'):SetText(LIB.FormatTimeCounter(nSec, 1))
+		h:Lookup('Text_R'):SetText(X.FormatTimeCounter(nSec, 1))
 	end
 	h:Lookup('Image_RBg'):Show()
 	local box = h:Lookup('Box')
@@ -1293,7 +1264,7 @@ function D.UpdateLList()
 		if MY_TMUI_SEARCH then
 			for k, v in ipairs(dat) do
 				if D.CheckSearch(MY_TMUI_SELECT_TYPE, v) then
-					insert(dat2, v)
+					table.insert(dat2, v)
 				end
 			end
 		else
@@ -1310,7 +1281,7 @@ function D.DrawTableL(data)
 	local hItemData = (MY_TMUI_SELECT_TYPE == 'TALK' or MY_TMUI_SELECT_TYPE == 'CHAT') and frame.hTalkL or frame.hItemL
 	handle:Clear()
 	if #data > 0 then
-		for k, v in ipairs_r(data) do
+		for k, v in X.ipairs_r(data) do
 			local h = handle:AppendItemFromData(hItemData, 'Handle_L')
 			h.dat = v
 		end
@@ -1329,7 +1300,7 @@ function D.UpdateRList(data)
 			if MY_TMUI_SEARCH then
 				for k, v in ipairs(tab) do
 					if D.CheckSearch(MY_TMUI_SELECT_TYPE, v) then
-						insert(tab2, v)
+						table.insert(tab2, v)
 					end
 				end
 			else
@@ -1348,7 +1319,7 @@ function D.DrawTableR(data, bInsert)
 		handle:Clear()
 		local hItemData = (MY_TMUI_SELECT_TYPE == 'TALK' or MY_TMUI_SELECT_TYPE == 'CHAT') and frame.hTalkR or frame.hItemR
 		if #data > 0 then
-			for k, v in ipairs_r(data) do
+			for k, v in X.ipairs_r(data) do
 				local h = handle:AppendItemFromData(hItemData, 'Handle_R')
 				h.dat = v
 			end
@@ -1382,7 +1353,7 @@ function D.ScrollMapIntoView(frame)
 		return
 	end
 	if hNode and not MY_TMUI_TREE_EXPAND[hNode.szKey] then
-		LIB.ExecuteWithThis(hNode, D.OnItemLButtonClick)
+		X.ExecuteWithThis(hNode, D.OnItemLButtonClick)
 	end
 	UI.ScrollIntoView(hItem, frame.hTreeS)
 end
@@ -1420,7 +1391,7 @@ function D.OpenAddPanel(szType, data)
 		text = MY_TMUI_SELECT_MAP ~= _L['All data']
 			and MY_TeamMon.GetMapName(MY_TMUI_SELECT_MAP)
 			or MY_TeamMon.GetMapName(data.dwMapID),
-		autocomplete = {{'option', 'source', LIB.GetMapNameList()}},
+		autocomplete = {{'option', 'source', X.GetMapNameList()}},
 		onchange = function()
 			local el = this
 			local ui = UI(el)
@@ -1448,11 +1419,11 @@ function D.OpenAddPanel(szType, data)
 			local txt = ui:Children('#map'):Text()
 			local map = MY_TeamMon.GetMapInfo(txt)
 			if not map then
-				return LIB.Alert(_L['The map does not exist'])
+				return X.Alert(_L['The map does not exist'])
 			end
 			local tab = select(2, MY_TeamMon.CheckSameData(szType, map.dwID, data.dwID or data.szContent, data.nLevel or data.szTarget))
 			if tab then
-				return LIB.Confirm(_L['Data exists, editor?'], function()
+				return X.Confirm(_L['Data exists, editor?'], function()
 					FireUIEvent('MY_TMUI_SELECT_MAP', map.dwID)
 					D.OpenSettingPanel(tab, szType)
 					ui:Remove()
@@ -1479,11 +1450,11 @@ function D.OpenJsonPanel(data, fnAction)
 	ui:Append('WndEditBox', {
 		name = 'CODE', w = 660, h = 350, x = 30, y = 60,
 		color = { 255, 255, 0 },
-		text = EncodeLUAData(data, '\t'),
+		text = X.EncodeLUAData(data, '\t'),
 		multiline = true, limit = 999999,
 		onchange = function()
 			local code = ui:Children('#CODE')
-			local dat  = DecodeLUAData(code:Text())
+			local dat  = X.DecodeLUAData(code:Text())
 			if dat then
 				code:Color(255, 255, 0)
 				else
@@ -1496,8 +1467,8 @@ function D.OpenJsonPanel(data, fnAction)
 		text = g_tStrings.STR_HOTKEY_SURE,
 		buttonstyle = 'FLAT_LACE_BORDER',
 		onclick = function()
-			LIB.Confirm(_L['Confirm?'], function()
-				local dat = DecodeLUAData(ui:Children('#CODE'):Text())
+			X.Confirm(_L['Confirm?'], function()
+				local dat = X.DecodeLUAData(ui:Children('#CODE'):Text())
 				if fnAction and dat then
 					ui:Remove()
 					return fnAction(dat)
@@ -1572,14 +1543,14 @@ function D.OpenSettingPanel(data, szType)
 	local function GetKungFuMenu()
 		local menu = {}
 		if data.tKungFu then
-			insert(menu, { szOption = _L['No request'], bCheck = true, bChecked = type(data.tKungFu) == 'nil', fnAction = function()
+			table.insert(menu, { szOption = _L['No request'], bCheck = true, bChecked = type(data.tKungFu) == 'nil', fnAction = function()
 				data.tKungFu = nil
 				UI.ClosePopupMenu()
 			end })
 		end
 		for k, v in ipairs(CONSTANT.KUNGFU_LIST) do
-			insert(menu, {
-				szOption = LIB.GetSkillName(v.dwID, 1),
+			table.insert(menu, {
+				szOption = X.GetSkillName(v.dwID, 1),
 				bCheck   = true,
 				bChecked = data.tKungFu and data.tKungFu['SKILL#' .. v.dwID],
 				szIcon   = v.szUITex,
@@ -1591,7 +1562,7 @@ function D.OpenSettingPanel(data, szType)
 						data.tKungFu['SKILL#' .. v.dwID] = true
 					else
 						data.tKungFu['SKILL#' .. v.dwID] = nil
-						if IsEmpty(data.tKungFu) then
+						if X.IsEmpty(data.tKungFu) then
 							data.tKungFu = nil
 						end
 					end
@@ -1602,9 +1573,9 @@ function D.OpenSettingPanel(data, szType)
 	end
 	local function GetMarkMenu(nClass)
 		local menu = {}
-		for k, v in ipairs_c(PARTY_MARK_ICON_FRAME_LIST) do
-			insert(menu, {
-				szOption = LIB.GetMarkName(k),
+		for k, v in X.ipairs_c(PARTY_MARK_ICON_FRAME_LIST) do
+			table.insert(menu, {
+				szOption = X.GetMarkName(k),
 				szIcon = PARTY_MARK_ICON_PATH,
 				nFrame = v, szLayer = 'ICON_RIGHT',
 				bCheck = true, bChecked = data[nClass] and data[nClass].tMark and data[nClass].tMark[k],
@@ -1613,7 +1584,7 @@ function D.OpenSettingPanel(data, szType)
 						data[nClass] = data[nClass] or {}
 						if not data[nClass].tMark then
 							data[nClass].tMark = {}
-							for kk, vv in ipairs_c(PARTY_MARK_ICON_FRAME_LIST) do
+							for kk, vv in X.ipairs_c(PARTY_MARK_ICON_FRAME_LIST) do
 								data[nClass].tMark[kk] = false
 							end
 						end
@@ -1630,7 +1601,7 @@ function D.OpenSettingPanel(data, szType)
 						if bDelete then
 							data[nClass].tMark = nil
 						end
-						if IsEmpty(data[nClass]) then data[nClass] = nil end
+						if X.IsEmpty(data[nClass]) then data[nClass] = nil end
 					end
 				end,
 			})
@@ -1643,7 +1614,7 @@ function D.OpenSettingPanel(data, szType)
 			data[nClass][key] = value
 		else
 			data[nClass][key] = nil
-			if IsEmpty(data[nClass]) then
+			if X.IsEmpty(data[nClass]) then
 				data[nClass] = nil
 			end
 		end
@@ -1651,7 +1622,7 @@ function D.OpenSettingPanel(data, szType)
 
 	local function FormatElPosByCountdownType(dat, ui, i)
 		local bSimple = dat.nClass ~= MY_TM_TYPE.NPC_LIFE and dat.nClass ~= MY_TM_TYPE.NPC_MANA
-			and (IsEmpty(dat.nTime) or tonumber(dat.nTime)) and true or false
+			and (X.IsEmpty(dat.nTime) or tonumber(dat.nTime)) and true or false
 		ui:Children('#CountdownTime' .. i):Width(bSimple and 100 or 400)
 		ui:Children('#CountdownName' .. i):Visible(bSimple)
 	end
@@ -1668,21 +1639,21 @@ function D.OpenSettingPanel(data, szType)
 			return true
 		else
 			local tab = {}
-			local t = LIB.SplitString(tTime, ';')
+			local t = X.SplitString(tTime, ';')
 			for k, v in ipairs(t) do
-				local time = LIB.SplitString(v, ',')
-				if time[1] and time[2] and tonumber(LIB.TrimString(time[1])) and time[2] ~= '' then
-					insert(tab, { nTime = tonumber(time[1]), szName = time[2] })
-				elseif LIB.TrimString(time[1]) ~= '' and not tonumber(time[1]) then
+				local time = X.SplitString(v, ',')
+				if time[1] and time[2] and tonumber(X.TrimString(time[1])) and time[2] ~= '' then
+					table.insert(tab, { nTime = tonumber(time[1]), szName = time[2] })
+				elseif X.TrimString(time[1]) ~= '' and not tonumber(time[1]) then
 					return false
-				elseif tonumber(time[1]) and (not time[2] or LIB.TrimString(time[2]) == '') then
+				elseif tonumber(time[1]) and (not time[2] or X.TrimString(time[2]) == '') then
 					return false
 				end
 			end
-			if IsEmpty(tab) then
+			if X.IsEmpty(tab) then
 				return false
 			else
-				sort(tab, function(a, b)
+				table.sort(tab, function(a, b)
 					return a.nTime < b.nTime
 				end)
 				return tab
@@ -1710,14 +1681,14 @@ function D.OpenSettingPanel(data, szType)
 	local function fnClickBox()
 		local menu, box = {}, this
 		if szType ~= 'TALK' and szType ~= 'CHAT' then
-			insert(menu, { szOption = _L['Edit name'], fnAction = function()
-				local szKey = LIB.Alert(_L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'])
+			table.insert(menu, { szOption = _L['Edit name'], fnAction = function()
+				local szKey = X.Alert(_L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'])
 				local function CloseHelp()
-					LIB.DoMessageBox(szKey)
+					X.DoMessageBox(szKey)
 				end
 				local szDefault = data.szName or GetPatternName() or szName
 				GetUserInput(_L['Edit name'], function(szText)
-					szText = LIB.TrimString(szText)
+					szText = X.TrimString(szText)
 					if szText == '' or szText == szName or szText == GetPatternName() then
 						data.szName = nil
 						ui:Text(szName)
@@ -1728,19 +1699,19 @@ function D.OpenSettingPanel(data, szType)
 					CloseHelp()
 				end, CloseHelp, function() return not frame or not frame:IsValid() end, nil, szDefault)
 			end})
-			insert(menu, { bDevide = true })
+			table.insert(menu, { bDevide = true })
 		end
 		if szType ~= 'NPC' and szType ~= 'TALK' and szType ~= 'CHAT' then
-			insert(menu, { szOption = _L['Edit icon'], fnAction = function()
+			table.insert(menu, { szOption = _L['Edit icon'], fnAction = function()
 				UI.OpenIconPicker(function(nNewIcon)
 					nIcon = nNewIcon
 					data.nIcon = nNewIcon
 					box:SetObjectIcon(nNewIcon)
 				end)
 			end})
-			insert(menu, { bDevide = true })
+			table.insert(menu, { bDevide = true })
 		end
-		insert(menu, {
+		table.insert(menu, {
 			szOption = _L['Edit color'],
 			szLayer = 'ICON_RIGHT',
 			szIcon = 'ui/Image/UICommon/Feedanimials.uitex',
@@ -1757,8 +1728,8 @@ function D.OpenSettingPanel(data, szType)
 				end)
 			end
 		})
-		insert(menu, { bDevide = true })
-		insert(menu, { szOption = _L['Raw data, please be careful'], color = { 255, 255, 0 }, fnAction = function()
+		table.insert(menu, { bDevide = true })
+		table.insert(menu, { szOption = _L['Raw data, please be careful'], color = { 255, 255, 0 }, fnAction = function()
 			D.OpenJsonPanel(data, function(dat)
 				local file = MY_TeamMon.GetTable(MY_TMUI_SELECT_TYPE)
 				if file and file[MY_TMUI_SELECT_MAP] and file[data.dwMapID][data.nIndex] then
@@ -1852,7 +1823,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -1867,7 +1838,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_FS') then
+		if not X.IsRestricted('MY_TeamMon_FS') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -1906,7 +1877,7 @@ function D.OpenSettingPanel(data, szType)
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nY = nY + CHECKBOX_HEIGHT
 
-		if not LIB.IsRestricted('MY_TeamMon.AutoSelect') then
+		if not X.IsRestricted('MY_TeamMon.AutoSelect') then
 			local _ui = ui:Append('WndCheckBox', {
 				x = 30, y = nY, checked = cfg.bSelect, text = _L['Auto Select'],
 				oncheck = function(bCheck)
@@ -1946,7 +1917,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.BUFF_LOSE, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2009,7 +1980,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.SKILL_END, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2053,7 +2024,7 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bCenterAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
-			if not LIB.IsRestricted('MY_TeamMon_LT') then
+			if not X.IsRestricted('MY_TeamMon_LT') then
 				nX = ui:Append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 					oncheck = function(bCheck)
@@ -2068,7 +2039,7 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bScreenHead', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
-			if not LIB.IsRestricted('MY_TeamMon_FS') then
+			if not X.IsRestricted('MY_TeamMon_FS') then
 				nX = ui:Append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 					oncheck = function(bCheck)
@@ -2136,7 +2107,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2151,7 +2122,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_FS') then
+		if not X.IsRestricted('MY_TeamMon_FS') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -2183,7 +2154,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2241,7 +2212,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2256,7 +2227,7 @@ function D.OpenSettingPanel(data, szType)
 			-- 		SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
 			-- 	end,
 			-- }):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_FS') then
+		if not X.IsRestricted('MY_TeamMon_FS') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -2288,7 +2259,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2302,7 +2273,7 @@ function D.OpenSettingPanel(data, szType)
 		nX, nY = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY + 8, text = data.szNote, w = 650, h = 25,
 			onchange = function(text)
-				local szText = LIB.TrimString(text)
+				local szText = X.TrimString(text)
 				if szText == '' then
 					data.szNote = nil
 				else
@@ -2316,7 +2287,7 @@ function D.OpenSettingPanel(data, szType)
 		nX, nY = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY + 8, text = data.szTarget or _L['Warning box'], w = 650, h = 25,
 			onchange = function(text)
-				local szText = LIB.TrimString(text)
+				local szText = X.TrimString(text)
 				if szText == '' or szText == _L['Warning box'] then
 					data.szTarget = nil
 				else
@@ -2329,7 +2300,7 @@ function D.OpenSettingPanel(data, szType)
 		_, nY = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY + 8, text = data.szContent, w = 650, h = 55, multiline = true,
 			onchange = function(text)
-				data.szContent = LIB.TrimString(text)
+				data.szContent = X.TrimString(text)
 				FireUIEvent('MY_TM_CREATE_CACHE')
 			end,
 		}):Pos('BOTTOMRIGHT')
@@ -2372,7 +2343,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2387,7 +2358,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_FS') then
+		if not X.IsRestricted('MY_TeamMon_FS') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -2401,7 +2372,7 @@ function D.OpenSettingPanel(data, szType)
 		nX, nY = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY + 8, text = data.szNote, w = 650, h = 25,
 			onchange = function(text)
-				local szText = LIB.TrimString(text)
+				local szText = X.TrimString(text)
 				if szText == '' then
 					data.szNote = nil
 				else
@@ -2458,7 +2429,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				oncheck = function(bCheck)
@@ -2473,7 +2444,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not LIB.IsRestricted('MY_TeamMon_FS') then
+		if not X.IsRestricted('MY_TeamMon_FS') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				oncheck = function(bCheck)
@@ -2489,7 +2460,7 @@ function D.OpenSettingPanel(data, szType)
 		nX, nY = ui:Append('WndEditBox', {
 			x = 30, y = nY, text = data.szNote, w = 650, h = 25, limit = 10,
 			onchange = function(text)
-				local szText = LIB.TrimString(text)
+				local szText = X.TrimString(text)
 				if szText == '' then
 					data.szNote = nil
 				else
@@ -2509,31 +2480,31 @@ function D.OpenSettingPanel(data, szType)
 			menu = function()
 				local menu = {}
 				if IsCtrlKeyDown() then
-					insert(menu, { szOption = _L['Set countdown key'], rgb = { 255, 255, 0 } , fnAction = function()
+					table.insert(menu, { szOption = _L['Set countdown key'], rgb = { 255, 255, 0 } , fnAction = function()
 						GetUserInput(_L['Countdown key'], function(szKey)
-							if LIB.TrimString(szKey) == '' then
+							if X.TrimString(szKey) == '' then
 								v.key = nil
 							else
-								v.key = LIB.TrimString(szKey)
+								v.key = X.TrimString(szKey)
 							end
 							D.OpenSettingPanel(data, szType)
 						end, nil, nil, nil, v.key)
 					end })
-					insert(menu, { bDevide = true })
-					insert(menu, { szOption = _L['Hold countdown when crossmap'], bCheck = true, bChecked = v.bHold, fnAction = function()
+					table.insert(menu, { bDevide = true })
+					table.insert(menu, { szOption = _L['Hold countdown when crossmap'], bCheck = true, bChecked = v.bHold, fnAction = function()
 						v.bHold = not v.bHold
 					end })
 					if v.nClass == MY_TM_TYPE.NPC_FIGHT then
-						insert(menu, { szOption = _L['Hold countdown when unfight'], bCheck = true, bChecked = v.bFightHold, fnAction = function()
+						table.insert(menu, { szOption = _L['Hold countdown when unfight'], bCheck = true, bChecked = v.bFightHold, fnAction = function()
 							v.bFightHold = not v.bFightHold
 						end })
 					end
 
-					insert(menu, { bDevide = true })
-					insert(menu, { szOption = _L['Color Picker'], bDisable = true })
+					table.insert(menu, { bDevide = true })
+					table.insert(menu, { szOption = _L['Color Picker'], bDisable = true })
 					-- Color Picker
 					for i = 0, 8 do
-						insert(menu, {
+						table.insert(menu, {
 							bMCheck = true,
 							bChecked = v.nFrame == i,
 							fnAction = function()
@@ -2546,41 +2517,41 @@ function D.OpenSettingPanel(data, szType)
 						})
 					end
 				else
-					insert(menu, { szOption = _L['Please select type'], bDisable = true, bChecked = v.nClass == -1 })
-					insert(menu, { bDevide = true })
+					table.insert(menu, { szOption = _L['Please select type'], bDisable = true, bChecked = v.nClass == -1 })
+					table.insert(menu, { bDevide = true })
 					if szType == 'BUFF' or szType == 'DEBUFF' then
 						for kk, vv in ipairs({ MY_TM_TYPE.BUFF_GET, MY_TM_TYPE.BUFF_LOSE }) do
-							insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
+							table.insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
 								SetCountdownType(v, vv, ui, k)
 							end })
 						end
 					elseif szType == 'CASTING' then
-						insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.SKILL_END], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.SKILL_END, fnAction = function()
+						table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.SKILL_END], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.SKILL_END, fnAction = function()
 							SetCountdownType(v, MY_TM_TYPE.SKILL_END, ui, k)
 						end })
 						-- if tSkillInfo and tSkillInfo.CastTime ~= 0 then
-							insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.SKILL_BEGIN], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.SKILL_BEGIN, fnAction = function()
+							table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.SKILL_BEGIN], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.SKILL_BEGIN, fnAction = function()
 								SetCountdownType(v, MY_TM_TYPE.SKILL_BEGIN, ui, k)
 							end })
 						-- end
 					elseif szType == 'NPC' then
 						for kk, vv in ipairs({ MY_TM_TYPE.NPC_ENTER, MY_TM_TYPE.NPC_LEAVE, MY_TM_TYPE.NPC_ALLLEAVE, MY_TM_TYPE.NPC_FIGHT, MY_TM_TYPE.NPC_DEATH, MY_TM_TYPE.NPC_ALLDEATH, MY_TM_TYPE.NPC_LIFE, MY_TM_TYPE.NPC_MANA }) do
-							insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
+							table.insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
 								SetCountdownType(v, vv, ui, k)
 							end })
 						end
 					elseif szType == 'DOODAD' then
 						for kk, vv in ipairs({ MY_TM_TYPE.DOODAD_ENTER, MY_TM_TYPE.DOODAD_LEAVE, MY_TM_TYPE.DOODAD_ALLLEAVE }) do
-							insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
+							table.insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
 								SetCountdownType(v, vv, ui, k)
 							end })
 						end
 					elseif szType == 'TALK' then
-						insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.TALK_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.TALK_MONITOR, fnAction = function()
+						table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.TALK_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.TALK_MONITOR, fnAction = function()
 							SetCountdownType(v, MY_TM_TYPE.TALK_MONITOR, ui, k)
 						end })
 					elseif szType == 'CHAT' then
-						insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.CHAT_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.CHAT_MONITOR, fnAction = function()
+						table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TM_TYPE.CHAT_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TM_TYPE.CHAT_MONITOR, fnAction = function()
 							SetCountdownType(v, MY_TM_TYPE.CHAT_MONITOR, ui, k)
 						end })
 					end
@@ -2637,10 +2608,10 @@ function D.OpenSettingPanel(data, szType)
 							local w, h = this:GetSize()
 							local xml = { GetFormatText(_L['Countdown preview'] .. '\n', 0, 255, 255, 0) }
 							for k, v in ipairs(CheckCountdown(szNum)) do
-								insert(xml, GetFormatText(v.nTime .. ' - ' .. FilterCustomText(v.szName, '{$sender}', '{$receiver}') .. '\n'))
+								table.insert(xml, GetFormatText(v.nTime .. ' - ' .. FilterCustomText(v.szName, '{$sender}', '{$receiver}') .. '\n'))
 							end
 							edit:Color(255, 255, 255)
-							LIB.OutputTip(this, concat(xml), true)
+							X.OutputTip(this, table.concat(xml), true)
 						else
 							HideTip()
 							edit:Color(255, 0, 0)
@@ -2707,7 +2678,7 @@ function D.OpenSettingPanel(data, szType)
 				if #data.tCountdown == 1 then
 					data.tCountdown = nil
 				else
-					remove(data.tCountdown, k)
+					table.remove(data.tCountdown, k)
 				end
 				D.OpenSettingPanel(data, szType)
 			end,
@@ -2728,7 +2699,7 @@ function D.OpenSettingPanel(data, szType)
 			if szPattern then
 				szCountdown = szCountdown .. ' ' .. szPattern
 			end
-			insert(data.tCountdown, {
+			table.insert(data.tCountdown, {
 				nTime = 10,
 				szName = szCountdown,
 				nClass = -1,
@@ -2739,7 +2710,7 @@ function D.OpenSettingPanel(data, szType)
 	}):Pos('BOTTOMRIGHT')
 	nY = nY + 35
 	-- 圈圈连线
-	if (szType == 'NPC' or szType == 'DOODAD') and not LIB.IsRestricted('MY_TeamMon_CC') then
+	if (szType == 'NPC' or szType == 'DOODAD') and not X.IsRestricted('MY_TeamMon_CC') then
 		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Circle and line'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = 30, nY + 5
 		if szType == 'NPC' then
@@ -2841,7 +2812,7 @@ function D.OpenSettingPanel(data, szType)
 						if #data.aCircle == 1 then
 							data.aCircle = nil
 						else
-							remove(data.aCircle, k)
+							table.remove(data.aCircle, k)
 						end
 						FireUIEvent('MY_TM_CC_RELOAD')
 						D.OpenSettingPanel(data, szType)
@@ -2860,7 +2831,7 @@ function D.OpenSettingPanel(data, szType)
 				if not data.aCircle then
 					data.aCircle = {}
 				end
-				insert(data.aCircle, {
+				table.insert(data.aCircle, {
 					nAngle = 80,
 					nRadius = 4,
 					col = {0, 255, 0},
@@ -2895,7 +2866,7 @@ function D.OpenSettingPanel(data, szType)
 							else
 								for k, v in ipairs(data.aFocus) do
 									if v == p then
-										remove(data.aFocus, k)
+										table.remove(data.aFocus, k)
 										break
 									end
 								end
@@ -2918,7 +2889,7 @@ function D.OpenSettingPanel(data, szType)
 					if not data.aFocus then
 						data.aFocus = {}
 					end
-					insert(data.aFocus, {})
+					table.insert(data.aFocus, {})
 					D.OpenSettingPanel(data, szType)
 					FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 				end,
@@ -2949,7 +2920,7 @@ function D.OpenSettingPanel(data, szType)
 							else
 								for k, v in ipairs(data.aCataclysmBuff) do
 									if v == p then
-										remove(data.aCataclysmBuff, k)
+										table.remove(data.aCataclysmBuff, k)
 										break
 									end
 								end
@@ -2972,7 +2943,7 @@ function D.OpenSettingPanel(data, szType)
 					if not data.aCataclysmBuff then
 						data.aCataclysmBuff = {}
 					end
-					insert(data.aCataclysmBuff, {})
+					table.insert(data.aCataclysmBuff, {})
 					D.OpenSettingPanel(data, szType)
 					FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 				end,
@@ -2992,7 +2963,7 @@ function D.OpenSettingPanel(data, szType)
 		text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
 		buttonstyle = 'FLAT',
 		onclick = function()
-			LIB.Confirm(_L['Sure to delete?'], function()
+			X.Confirm(_L['Sure to delete?'], function()
 				D.RemoveData(data.dwMapID, data.nIndex, szName or _L['This data'])
 			end)
 		end,
@@ -3003,7 +2974,7 @@ end
 
 function D.UpdateAnchor(frame)
 	local a = MY_TMUI_ANCHOR
-	if not IsEmpty(a) then
+	if not X.IsEmpty(a) then
 		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	else
 		frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
@@ -3038,15 +3009,15 @@ function D.ClosePanel()
 		FireUIEvent('MY_TMUI_FREECACHE')
 		Wnd.CloseWindow(D.GetFrame())
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-		LIB.RegisterEsc('MY_TeamMon')
+		X.RegisterEsc('MY_TeamMon')
 	end
 end
 
-LIB.RegisterEvent('MY_TMUI_FREECACHE', function()
+X.RegisterEvent('MY_TMUI_FREECACHE', function()
 	MY_TMUI_SEARCH_CACHE = {}
 end)
-LIB.RegisterAddonMenu({ szOption = _L['MY_TeamMon'], fnAction = D.TogglePanel })
-LIB.RegisterHotKey('MY_TeamMon_UI', _L['Open/close MY_TeamMon'], D.TogglePanel)
+X.RegisterAddonMenu({ szOption = _L['MY_TeamMon'], fnAction = D.TogglePanel })
+X.RegisterHotKey('MY_TeamMon_UI', _L['Open/close MY_TeamMon'], D.TogglePanel)
 
 -- Global exports
 do
@@ -3069,5 +3040,5 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_UI = LIB.CreateModule(settings)
+MY_TeamMon_UI = X.CreateModule(settings)
 end

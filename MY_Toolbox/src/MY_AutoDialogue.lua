@@ -10,96 +10,67 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
-LIB.RegisterRestriction('MY_AutoDialogue', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_AutoDialogue', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 local DIALOGUE
 local CURRENT_WINDOW
 local CURRENT_CONTENTS
 
-local O = LIB.CreateUserSettingsModule('MY_AutoDialogue', _L['General'], {
+local O = X.CreateUserSettingsModule('MY_AutoDialogue', _L['General'], {
 	bEnable = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bEchoOn = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoClose = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bEnableShift = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoSelectSg = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoSelectSp = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSkipQuestTalk = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 })
@@ -109,8 +80,8 @@ local D = {}
 -- 数据存储
 ---------------------------------------------------------------------------
 function D.LoadData()
-	DIALOGUE = LIB.LoadLUAData({'config/auto_dialogue.jx3dat', PATH_TYPE.GLOBAL})
-		or LIB.LoadLUAData(PACKET_INFO.ROOT .. 'MY_Toolbox/data/auto_dialogue/{$lang}.jx3dat')
+	DIALOGUE = X.LoadLUAData({'config/auto_dialogue.jx3dat', X.PATH_TYPE.GLOBAL})
+		or X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_Toolbox/data/auto_dialogue/{$lang}.jx3dat')
 		or {}
 end
 
@@ -118,34 +89,34 @@ function D.SaveData()
 	if not DIALOGUE then
 		return
 	end
-	LIB.SaveLUAData({'config/auto_dialogue.jx3dat', PATH_TYPE.GLOBAL}, DIALOGUE)
+	X.SaveLUAData({'config/auto_dialogue.jx3dat', X.PATH_TYPE.GLOBAL}, DIALOGUE)
 end
 
 function D.EnableDialogueData(szMap, szName, szContext, szKey)
-	Set(DIALOGUE, {szMap, szName, szContext, szKey}, 1)
+	X.Set(DIALOGUE, {szMap, szName, szContext, szKey}, 1)
 	D.SaveData()
 	D.AutoDialogue()
 end
 
 function D.DisableDialogueData(szMap, szName, szContext, szKey)
-	if Get(DIALOGUE, {szMap, szName, szContext, szKey}) then
-		Set(DIALOGUE, {szMap, szName, szContext, szKey}, 0)
+	if X.Get(DIALOGUE, {szMap, szName, szContext, szKey}) then
+		X.Set(DIALOGUE, {szMap, szName, szContext, szKey}, 0)
 	end
 	D.SaveData()
 end
 
 function D.RemoveDialogueData(szMap, szName, szContext, szKey)
-	if Get(DIALOGUE, {szMap, szName, szContext, szKey}) then
-		Set(DIALOGUE, {szMap, szName, szContext, szKey}, nil)
+	if X.Get(DIALOGUE, {szMap, szName, szContext, szKey}) then
+		X.Set(DIALOGUE, {szMap, szName, szContext, szKey}, nil)
 	end
-	if IsEmpty(Get(DIALOGUE, {szMap, szName, szContext})) then
-		Set(DIALOGUE, {szMap, szName, szContext}, nil)
+	if X.IsEmpty(X.Get(DIALOGUE, {szMap, szName, szContext})) then
+		X.Set(DIALOGUE, {szMap, szName, szContext}, nil)
 	end
-	if IsEmpty(Get(DIALOGUE, {szMap, szName})) then
-		Set(DIALOGUE, {szMap, szName}, nil)
+	if X.IsEmpty(X.Get(DIALOGUE, {szMap, szName})) then
+		X.Set(DIALOGUE, {szMap, szName}, nil)
 	end
-	if IsEmpty(Get(DIALOGUE, {szMap})) then
-		Set(DIALOGUE, {szMap}, nil)
+	if X.IsEmpty(X.Get(DIALOGUE, {szMap})) then
+		X.Set(DIALOGUE, {szMap}, nil)
 	end
 	D.SaveData()
 end
@@ -158,7 +129,7 @@ do
 function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 	local szName, szMap = _L['Common'], _L['Common']
 	if dwTarID ~= UI_GetClientPlayerID() then
-		szName = LIB.GetObjectName(LIB.GetObject(dwTarType, dwTarID), 'never') or _L['Common']
+		szName = X.GetObjectName(X.GetObject(dwTarType, dwTarID), 'never') or _L['Common']
 		if dwTarType ~= TARGET.ITEM then
 			szMap = Table_GetMapName(GetClientPlayer().GetMapID())
 		end
@@ -170,21 +141,21 @@ function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 		or v.name == 'W' then  -- 需要确认的选项
 			local szImage, nImageFrame
 			if v.name == 'T' then
-				for iconid in gmatch(v.context, '%$ (%d+)') do
+				for iconid in string.gmatch(v.context, '%$ (%d+)') do
 					szImage = 'fromiconid'
 					nImageFrame = iconid
 				end
 			end
-			insert(dialog.aOptions, { dwID = tonumber(v.attribute.id) or 0, szContext = v.context })
+			table.insert(dialog.aOptions, { dwID = tonumber(v.attribute.id) or 0, szContext = v.context })
 		elseif v.name == 'T' then -- 图片
 			local szImage, nImageFrame
-			for iconid in gmatch(v.context, '%$ (%d+)') do
+			for iconid in string.gmatch(v.context, '%$ (%d+)') do
 				szImage = 'fromiconid'
 				nImageFrame = iconid
 			end
-			insert(dialog.aOptions, { dwID = tonumber(v.attribute.id) or 0, szContext = v.context, szImage = szImage, nImageFrame = nImageFrame })
+			table.insert(dialog.aOptions, { dwID = tonumber(v.attribute.id) or 0, szContext = v.context, szImage = szImage, nImageFrame = nImageFrame })
 		elseif v.name == 'M' then -- 商店
-			insert(dialog.aOptions, { szContext = v.context })
+			table.insert(dialog.aOptions, { szContext = v.context })
 		elseif v.name == 'Q' then -- 任务对话
 			local dwQuestId = tonumber(v.attribute.questid)
 			local tQuestInfo = Table_GetQuestStringInfo(dwQuestId)
@@ -197,7 +168,7 @@ function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 				or eQuestState == QUEST_STATE_BLUE_EXCLAMATION
 				or eQuestState == QUEST_STATE_WHITE_QUESTION
 				or eQuestState == QUEST_STATE_DUN_DIA then
-					insert(dialog.aOptions, { szContext = tQuestInfo.szName })
+					table.insert(dialog.aOptions, { szContext = tQuestInfo.szName })
 				end
 			end
 		elseif v.name == 'F' then -- 字体
@@ -205,9 +176,9 @@ function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 		elseif v.name == 'text' then -- 文本
 			dialog.szContext = dialog.szContext .. v.context
 		elseif v.name == 'MT' then -- 交通
-			insert(dialog.aOptions, { szContext = v.context })
+			table.insert(dialog.aOptions, { szContext = v.context })
 		elseif v.name == 'U' then -- 跨地图交通
-			insert(dialog.aOptions, { szContext = v.context })
+			table.insert(dialog.aOptions, { szContext = v.context })
 		end
 	end
 	return dialog
@@ -219,7 +190,7 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 		return
 	end
 	local option, nRepeat
-	local tChat = Get(DIALOGUE, {dialog.szMap, dialog.szName, dialog.szContext})
+	local tChat = X.Get(DIALOGUE, {dialog.szMap, dialog.szName, dialog.szContext})
 	if tChat then
 		for i, p in ipairs(dialog.aOptions) do
 			if p.dwID and tChat[p.szContext] and tChat[p.szContext] > 0 then
@@ -229,7 +200,7 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 			end
 		end
 	end
-	if not LIB.IsInDungeon() then
+	if not X.IsInDungeon() then
 		if not option and O.bAutoSelectSp and #dialog.aOptions == 1 and dialog.aOptions[1].szContext == '' then
 			option = dialog.aOptions[1]
 			nRepeat = 1
@@ -249,13 +220,13 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 			GetClientPlayer().WindowSelect(dwIndex, option.dwID)
 		end
 		if O.bEchoOn then
-			LIB.Sysmsg(_L('Conversation with [%s]: %s', dialog.szName, dialog.szContext:gsub('%s', '')))
+			X.Sysmsg(_L('Conversation with [%s]: %s', dialog.szName, dialog.szContext:gsub('%s', '')))
 			if option.szContext and option.szContext ~= '' then
-				LIB.Sysmsg(_L('Conversation with [%s] auto chose: %s', dialog.szName, option.szContext))
+				X.Sysmsg(_L('Conversation with [%s] auto chose: %s', dialog.szName, option.szContext))
 			end
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('AUTO_CHAT', 'WindowSelect ' .. dwIndex .. ',' .. option.dwID .. 'x' .. nRepeat, DEBUG_LEVEL.LOG)
+		X.Debug('AUTO_CHAT', 'WindowSelect ' .. dwIndex .. ',' .. option.dwID .. 'x' .. nRepeat, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		return true
 	end
@@ -267,7 +238,7 @@ function D.AutoDialogue()
 		D.LoadData()
 	end
 	if O.bEnableShift and IsShiftKeyDown() then
-		LIB.Sysmsg(_L['Auto interact disabled due to SHIFT key pressed.'])
+		X.Sysmsg(_L['Auto interact disabled due to SHIFT key pressed.'])
 		return
 	end
 	local frame = Station.Lookup('Normal/DialoguePanel')
@@ -283,12 +254,12 @@ end
 local function onOpenWindow()
 	CURRENT_WINDOW = arg0
 	CURRENT_CONTENTS = arg1
-	if not O.bEnable or LIB.IsRestricted('MY_AutoDialogue') then
+	if not O.bEnable or X.IsRestricted('MY_AutoDialogue') then
 		return
 	end
-	LIB.DelayCall('MY_AutoDialogue__AutoDialogue', D.AutoDialogue)
+	X.DelayCall('MY_AutoDialogue__AutoDialogue', D.AutoDialogue)
 end
-LIB.RegisterEvent('OPEN_WINDOW', 'MY_AutoDialogue', onOpenWindow)
+X.RegisterEvent('OPEN_WINDOW', 'MY_AutoDialogue', onOpenWindow)
 end
 
 ---------------------------------------------------------------------------
@@ -304,7 +275,7 @@ local function UnhookSkipQuestTalk()
 	frame.__SkipQuestHackEl:Destroy()
 	frame.__SkipQuestHackEl = nil
 end
-LIB.RegisterReload('MY_AutoDialogue#SkipQuestTalk', UnhookSkipQuestTalk)
+X.RegisterReload('MY_AutoDialogue#SkipQuestTalk', UnhookSkipQuestTalk)
 
 local function HookSkipQuestTalk()
 	local frame = Station.Lookup('Lowest2/QuestAcceptPanel')
@@ -320,7 +291,7 @@ local function HookSkipQuestTalk()
 				x = 0, y = 0, w = w, h = h,
 			}):Raw()
 		end
-		if frame.dwShowIndex == 1 and IsTable(frame.tQuestRpg) then
+		if frame.dwShowIndex == 1 and X.IsTable(frame.tQuestRpg) then
 			local nCount = 2
 			while frame.tQuestRpg['szText' .. nCount] and frame.tQuestRpg[nCount] ~= '' do
 				nCount = nCount + 1
@@ -334,14 +305,14 @@ local function HookSkipQuestTalk()
 end
 
 local function onInit()
-	LIB.BreatheCall('MY_AutoDialogue#SkipQuestTalk', HookSkipQuestTalk)
+	X.BreatheCall('MY_AutoDialogue#SkipQuestTalk', HookSkipQuestTalk)
 end
-LIB.RegisterInit('MY_AutoDialogue#SkipQuestTalk', onInit)
+X.RegisterInit('MY_AutoDialogue#SkipQuestTalk', onInit)
 
 local function onFrameCreate()
-	LIB.BreatheCall('MY_AutoDialogue#SkipQuestTalk', HookSkipQuestTalk)
+	X.BreatheCall('MY_AutoDialogue#SkipQuestTalk', HookSkipQuestTalk)
 end
-LIB.RegisterFrameCreate('QuestAcceptPanel', 'MY_AutoDialogue#SkipQuestTalk', onFrameCreate)
+X.RegisterFrameCreate('QuestAcceptPanel', 'MY_AutoDialogue#SkipQuestTalk', onFrameCreate)
 end
 
 ---------------------------------------------------------------------------
@@ -358,8 +329,8 @@ function D.GetDialogueMenu(aInfo, dwTargetType, dwTargetID, dwIndex)
 	-- 显示标题
 	local szCaption = dialog.szName
 	if dialog.szContext ~= '' then
-		szCaption = szCaption .. '(' .. wsub(dialog.szContext:gsub('%s', ''), 1, 8)
-		if wlen(dialog.szContext) > 8 then
+		szCaption = szCaption .. '(' .. wstring.sub(dialog.szContext:gsub('%s', ''), 1, 8)
+		if wstring.len(dialog.szContext) > 8 then
 			szCaption = szCaption .. '...'
 		end
 		szCaption = szCaption .. ')'
@@ -371,15 +342,15 @@ function D.GetDialogueMenu(aInfo, dwTargetType, dwTargetID, dwIndex)
 	local tOption, aOption = {}, {}
 	for i, option in ipairs(dialog.aOptions) do -- 面板上的对话
 		if option.dwID then
-			insert(aOption, option)
+			table.insert(aOption, option)
 			tOption[option.szContext] = true
 		end
 	end
-	local aList = Get(DIALOGUE, {dialog.szMap, dialog.szName, dialog.szContext}) -- 保存的自动对话
+	local aList = X.Get(DIALOGUE, {dialog.szMap, dialog.szName, dialog.szContext}) -- 保存的自动对话
 	if aList then
 		for szContext, nCount in pairs(aList) do
 			if not tOption[szContext] then
-				insert(aOption, { szContext = szContext })
+				table.insert(aOption, { szContext = szContext })
 				tOption[szContext] = true
 			end
 		end
@@ -392,7 +363,7 @@ function D.GetDialogueMenu(aInfo, dwTargetType, dwTargetID, dwIndex)
 			szCaption = '(' .. option.dwID .. ') ' .. szCaption
 		end
 		local menuSub = { szOption = szCaption, r = 255, g = 255, b = 255 }
-		local nRepeat = Get(DIALOGUE, {dialog.szMap, dialog.szName, dialog.szContext, option.szContext})
+		local nRepeat = X.Get(DIALOGUE, {dialog.szMap, dialog.szName, dialog.szContext, option.szContext})
 		if nRepeat then
 			menuSub.szIcon = 'ui/Image/UICommon/Feedanimials.UITex'
 			menuSub.nFrame = 86
@@ -421,7 +392,7 @@ function D.GetDialogueMenu(aInfo, dwTargetType, dwTargetID, dwIndex)
 			menuSub.nFrame = option.nImageFrame
 			menuSub.szLayer = 'ICON_RIGHT'
 		end
-		insert(menu, menuSub)
+		table.insert(menu, menuSub)
 	end
 	return menu
 end
@@ -444,7 +415,7 @@ local ENTRY_LIST = {
 	},
 }
 function D.CreateEntry()
-	if LIB.IsRestricted('MY_AutoDialogue') then
+	if X.IsRestricted('MY_AutoDialogue') then
 		return
 	end
 	for _, p in ipairs(ENTRY_LIST) do
@@ -469,12 +440,12 @@ function D.CreateEntry()
 	D.UpdateEntryPos()
 end
 for _, p in ipairs(ENTRY_LIST) do
-	LIB.RegisterFrameCreate(p.name, 'MY_AutoDialogue#ENTRY', D.CreateEntry)
+	X.RegisterFrameCreate(p.name, 'MY_AutoDialogue#ENTRY', D.CreateEntry)
 end
-LIB.RegisterInit('MY_AutoDialogue', D.CreateEntry)
+X.RegisterInit('MY_AutoDialogue', D.CreateEntry)
 
 function D.UpdateEntryPos()
-	if LIB.IsRestricted('MY_AutoDialogue') then
+	if X.IsRestricted('MY_AutoDialogue') then
 		return
 	end
 	for _, p in ipairs(ENTRY_LIST) do
@@ -501,7 +472,7 @@ function D.UpdateEntryPos()
 		end
 	end
 end
-LIB.RegisterEvent('UI_SCALED', 'MY_AutoDialogue#ENTRY', D.UpdateEntryPos)
+X.RegisterEvent('UI_SCALED', 'MY_AutoDialogue#ENTRY', D.UpdateEntryPos)
 
 function D.RemoveEntry()
 	for i, p in ipairs(ENTRY_LIST) do
@@ -511,21 +482,21 @@ function D.RemoveEntry()
 		p.el = nil
 	end
 end
-LIB.RegisterReload('MY_AutoDialogue#ENTRY', D.RemoveEntry)
+X.RegisterReload('MY_AutoDialogue#ENTRY', D.RemoveEntry)
 
 local function onOpenWindow()
-	if LIB.IsRestricted('MY_AutoDialogue') then
+	if X.IsRestricted('MY_AutoDialogue') then
 		return
 	end
 	D.CreateEntry()
 end
-LIB.RegisterEvent('OPEN_WINDOW', 'MY_AutoDialogue#ENTRY', onOpenWindow)
+X.RegisterEvent('OPEN_WINDOW', 'MY_AutoDialogue#ENTRY', onOpenWindow)
 
-LIB.RegisterEvent('MY_RESTRICTION', 'MY_AutoDialogue#ENTRY', function()
+X.RegisterEvent('MY_RESTRICTION', 'MY_AutoDialogue#ENTRY', function()
 	if arg0 and arg0 ~= 'MY_AutoDialogue' then
 		return
 	end
-	if LIB.IsRestricted('MY_AutoDialogue') then
+	if X.IsRestricted('MY_AutoDialogue') then
 		D.RemoveEntry()
 	else
 		D.CreateEntry()
@@ -584,8 +555,8 @@ function D.GetConfigMenu()
 	}
 end
 
-LIB.RegisterAddonMenu('MY_AutoDialogue', function()
-	if LIB.IsRestricted('MY_AutoDialogue') then
+X.RegisterAddonMenu('MY_AutoDialogue', function()
+	if X.IsRestricted('MY_AutoDialogue') then
 		return
 	end
 	return D.GetConfigMenu()

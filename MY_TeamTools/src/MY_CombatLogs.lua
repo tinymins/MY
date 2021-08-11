@@ -10,85 +10,56 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-local O = LIB.CreateUserSettingsModule('MY_CombatLogs', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_CombatLogs', _L['Raid'], {
 	bEnable = { -- Êý¾Ý¼ÇÂ¼×Ü¿ª¹Ø
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nMaxHistory = { -- ×î´óÀúÊ·Êý¾ÝÊýÁ¿
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 300,
 	},
 	nMinFightTime = { -- ×îÐ¡Õ½¶·Ê±¼ä
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Number,
+		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},
 	bOnlyDungeon = { -- ½öÔÚÃØ¾³ÖÐÆôÓÃ
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bOnlySelf = { -- ½ö¼ÇÂ¼ºÍ×Ô¼ºÓÐ¹ØµÄ
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 })
 local D = {}
-local DS_ROOT = {'userdata/combat_logs/', PATH_TYPE.ROLE}
+local DS_ROOT = {'userdata/combat_logs/', X.PATH_TYPE.ROLE}
 
 local LOG_ENABLE = false -- ¼ÆËã³öÀ´µÄ×Ü¿ª¹Ø£¬°´Ìõ¼þËæÊ±ÖØËã
 local LOG_TIME = 0
@@ -138,26 +109,26 @@ local LOG_TYPE = {
 
 -- ¸üÐÂÆôÓÃ×´Ì¬
 function D.UpdateEnable()
-	local bEnable = D.bReady and O.bEnable and (not O.bOnlyDungeon or LIB.IsInDungeon())
+	local bEnable = D.bReady and O.bEnable and (not O.bOnlyDungeon or X.IsInDungeon())
 	if not bEnable and LOG_ENABLE then
 		D.CloseCombatLogs()
-	elseif bEnable and not LOG_ENABLE and LIB.IsFighting() then
+	elseif bEnable and not LOG_ENABLE and X.IsFighting() then
 		D.OpenCombatLogs()
 	end
 	LOG_ENABLE = bEnable
 end
-LIB.RegisterEvent('LOADING_ENDING', D.UpdateEnable)
+X.RegisterEvent('LOADING_ENDING', D.UpdateEnable)
 
 -- ¼ÓÔØÀúÊ·Êý¾ÝÁÐ±í
 function D.GetHistoryFiles()
 	local aFiles = {}
-	local szRoot = LIB.FormatPath(DS_ROOT)
+	local szRoot = X.FormatPath(DS_ROOT)
 	for _, v in ipairs(CPath.GetFileList(szRoot)) do
 		if v:find('.jcl.tsv$') then
-			insert(aFiles, v)
+			table.insert(aFiles, v)
 		end
 	end
-	sort(aFiles, function(a, b) return a > b end)
+	table.sort(aFiles, function(a, b) return a > b end)
 	for k, v in ipairs(aFiles) do
 		aFiles[k] = szRoot .. v
 	end
@@ -175,13 +146,13 @@ end
 -- Á¬½Óµ½ÐÂµÄÈÕÖ¾ÎÄ¼þ
 function D.OpenCombatLogs()
 	D.CloseCombatLogs()
-	local szRoot = LIB.FormatPath(DS_ROOT)
+	local szRoot = X.FormatPath(DS_ROOT)
 	CPath.MakeDir(szRoot)
-	local szTime = LIB.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd-%hh-%mm-%ss')
+	local szTime = X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd-%hh-%mm-%ss')
 	local szMapName = ''
 	local me = GetClientPlayer()
 	if me then
-		local map = LIB.GetMapInfo(me.GetMapID())
+		local map = X.GetMapInfo(me.GetMapID())
 		if map then
 			szMapName = '-' .. map.szName
 		end
@@ -213,11 +184,11 @@ function D.CloseCombatLogs()
 				szName = '-' .. p.szName
 			end
 		end
-		CPath.Move(LOG_FILE, wsub(LOG_FILE, 1, -9) .. szName .. '.jcl')
+		CPath.Move(LOG_FILE, wstring.sub(LOG_FILE, 1, -9) .. szName .. '.jcl')
 	end
 	LOG_FILE = nil
 end
-LIB.RegisterReload('MY_CombatLogs', D.CloseCombatLogs)
+X.RegisterReload('MY_CombatLogs', D.CloseCombatLogs)
 
 -- ½«»º´æÊý¾ÝÐ´Èë´ÅÅÌ
 function D.FlushLogs(bForce)
@@ -245,16 +216,16 @@ function D.InsertLog(szEvent, oData, bReplay)
 		.. '\t' .. GetCurrentTime()
 		.. '\t' .. GetTime()
 		.. '\t' .. szEvent
-		.. '\t' .. wgsub(wgsub(LIB.EncodeLUAData(oData), '\\\n', '\\n'), '\t', '\\t')
+		.. '\t' .. wstring.gsub(wgsub(X.EncodeLUAData(oData), '\\\n', '\\n'), '\t', '\\t')
 	local nCRC = GetStringCRC(LOG_CRC .. szLog .. 'c910e9b9-8359-4531-85e0-6897d8c129f7')
 	-- ²åÈë»º´æ
-	insert(LOG_CACHE, nCRC .. '\t' .. szLog .. '\n')
+	table.insert(LOG_CACHE, nCRC .. '\t' .. szLog .. '\n')
 	-- ²åÈë×î½üÊÂ¼þ±í
 	if bReplay ~= false then
 		while LOG_REPLAY[1] and nLFC - LOG_REPLAY[1].nLFC > LOG_REPLAY_FRAME do
-			remove(LOG_REPLAY, 1)
+			table.remove(LOG_REPLAY, 1)
 		end
-		insert(LOG_REPLAY, { nLFC = nLFC, szLog = szLog })
+		table.insert(LOG_REPLAY, { nLFC = nLFC, szLog = szLog })
 	end
 	-- ¸üÐÂÁ÷Ê½Ð£ÑéÂë
 	LOG_CRC = nCRC
@@ -269,7 +240,7 @@ function D.ImportRecentLogs()
 	for _, v in ipairs(LOG_REPLAY) do
 		if nLFC - v.nLFC <= LOG_REPLAY_FRAME then
 			nCRC = GetStringCRC(nCRC .. v.szLog .. 'c910e9b9-8359-4531-85e0-6897d8c129f7')
-			insert(LOG_CACHE, nCRC .. '\t' .. v.szLog .. '\n')
+			table.insert(LOG_CACHE, nCRC .. '\t' .. v.szLog .. '\n')
 		end
 	end
 	-- ¸üÐÂÁ÷Ê½Ð£ÑéÂë
@@ -279,12 +250,12 @@ function D.ImportRecentLogs()
 end
 
 -- ¹ýÍ¼Çå³ýµ±Ç°Õ½¶·Êý¾Ý
-LIB.RegisterEvent({ 'LOADING_ENDING', 'RELOAD_UI_ADDON_END', 'BATTLE_FIELD_END', 'ARENA_END', 'MY_CLIENT_PLAYER_LEAVE_SCENE' }, function()
+X.RegisterEvent({ 'LOADING_ENDING', 'RELOAD_UI_ADDON_END', 'BATTLE_FIELD_END', 'ARENA_END', 'MY_CLIENT_PLAYER_LEAVE_SCENE' }, function()
 	D.FlushLogs(true)
 end)
 
 -- ÍË³öÕ½¶· ±£´æÊý¾Ý
-LIB.RegisterEvent('MY_FIGHT_HINT', function()
+X.RegisterEvent('MY_FIGHT_HINT', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -318,7 +289,7 @@ end
 
 -- ±£´æÄ¿±êÐÅÏ¢
 function D.OnTargetUpdate(dwID, bForce)
-	if not IsNumber(dwID) then
+	if not X.IsNumber(dwID) then
 		return
 	end
 	local bIsPlayer = IsPlayer(dwID)
@@ -346,7 +317,7 @@ function D.OnTargetUpdate(dwID, bForce)
 			dwMountKungfuID = UI_GetPlayerMountKungfuID()
 		else
 			local info = GetClientTeam().GetMemberInfo(dwID)
-			if info and not IsEmpty(info.dwMountKungfuID) then
+			if info and not X.IsEmpty(info.dwMountKungfuID) then
 				dwMountKungfuID = info.dwMountKungfuID
 			else
 				local kungfu = player.GetKungfuMount()
@@ -356,8 +327,8 @@ function D.OnTargetUpdate(dwID, bForce)
 			end
 		end
 		local aEquip, nEquipScore = {}, player.GetTotalEquipScore()
-		for nEquipIndex, tEquipInfo in pairs(LIB.GetPlayerEquipInfo(player)) do
-			insert(aEquip, {
+		for nEquipIndex, tEquipInfo in pairs(X.GetPlayerEquipInfo(player)) do
+			table.insert(aEquip, {
 				nEquipIndex,
 				tEquipInfo.dwTabType,
 				tEquipInfo.dwTabIndex,
@@ -368,8 +339,8 @@ function D.OnTargetUpdate(dwID, bForce)
 				tEquipInfo.dwTemporaryEnchantLeftSeconds,
 			})
 		end
-		local szGUID = LIB.GetPlayerGUID(dwID) or ''
-		local aTalent = LIB.GetPlayerTalentInfo(player)
+		local szGUID = X.GetPlayerGUID(dwID) or ''
+		local aTalent = X.GetPlayerTalentInfo(player)
 		if aTalent then
 			for i, p in ipairs(aTalent) do
 				aTalent[i] = {
@@ -385,7 +356,7 @@ function D.OnTargetUpdate(dwID, bForce)
 		if not npc then
 			return
 		end
-		local szName = LIB.GetObjectName(npc, 'never') or ''
+		local szName = X.GetObjectName(npc, 'never') or ''
 		LOG_NAMING_COUNT[dwID].szName = szName
 		D.InsertLog(LOG_TYPE.NPC_INFO, { dwID, szName, npc.dwTemplateID, npc.dwEmployer, npc.nX, npc.nY, npc.nZ })
 	end
@@ -406,7 +377,7 @@ function D.OnDoodadUpdate(dwID, bForce)
 end
 
 -- ÏµÍ³ÈÕÖ¾¼à¿Ø£¨Êý¾ÝÔ´£©
-LIB.RegisterEvent('SYS_MSG', function()
+X.RegisterEvent('SYS_MSG', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -428,7 +399,7 @@ LIB.RegisterEvent('SYS_MSG', function()
 			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG, { arg1, arg2, arg3, arg4 })
 		end
 	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
-		-- if not LIB.IsInArena() then
+		-- if not X.IsInArena() then
 		-- ¼¼ÄÜ×îÖÕ²úÉúµÄÐ§¹û£¨ÉúÃüÖµµÄ±ä»¯£©£»
 		-- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê (arg3)bReact£ºÊÇ·ñÎª·´»÷ (arg4)nType£ºEffectÀàÐÍ (arg5)dwID:EffectµÄID
 		-- (arg6)dwLevel£ºEffectµÄµÈ¼¶ (arg7)bCriticalStrike£ºÊÇ·ñ»áÐÄ (arg8)nCount£ºtResultCountÊý¾Ý±íÖÐÔªËØ¸öÊý (arg9)tResultCount£ºÊýÖµ¼¯ºÏ
@@ -502,7 +473,7 @@ LIB.RegisterEvent('SYS_MSG', function()
 end)
 
 -- ÏµÍ³BUFF¼à¿Ø£¨Êý¾ÝÔ´£©
-LIB.RegisterEvent('BUFF_UPDATE', function()
+X.RegisterEvent('BUFF_UPDATE', function()
 	-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
 	--     = arg0 , arg1   , arg2 , arg3     , arg4, arg5    , arg6    , arg7 , arg8 , arg9 , arg10  , arg11
 	if not LOG_ENABLE then
@@ -518,7 +489,7 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 	end
 end)
 
-LIB.RegisterEvent('PLAYER_ENTER_SCENE', function()
+X.RegisterEvent('PLAYER_ENTER_SCENE', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -528,7 +499,7 @@ LIB.RegisterEvent('PLAYER_ENTER_SCENE', function()
 	end
 end)
 
-LIB.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -538,7 +509,7 @@ LIB.RegisterEvent('PLAYER_LEAVE_SCENE', function()
 	end
 end)
 
-LIB.RegisterEvent('NPC_ENTER_SCENE', function()
+X.RegisterEvent('NPC_ENTER_SCENE', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -548,7 +519,7 @@ LIB.RegisterEvent('NPC_ENTER_SCENE', function()
 	end
 end)
 
-LIB.RegisterEvent('NPC_LEAVE_SCENE', function()
+X.RegisterEvent('NPC_LEAVE_SCENE', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -558,7 +529,7 @@ LIB.RegisterEvent('NPC_LEAVE_SCENE', function()
 	end
 end)
 
-LIB.RegisterEvent('DOODAD_ENTER_SCENE', function()
+X.RegisterEvent('DOODAD_ENTER_SCENE', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -566,7 +537,7 @@ LIB.RegisterEvent('DOODAD_ENTER_SCENE', function()
 	D.InsertLog(LOG_TYPE.DOODAD_ENTER_SCENE, { arg0 })
 end)
 
-LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function()
+X.RegisterEvent('DOODAD_LEAVE_SCENE', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -575,30 +546,30 @@ LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function()
 end)
 
 -- ÏµÍ³ÏûÏ¢ÈÕÖ¾
-LIB.RegisterMsgMonitor('MSG_SYS', 'MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
+X.RegisterMsgMonitor('MSG_SYS', 'MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
 	if not LOG_ENABLE then
 		return
 	end
 	local szText = szMsg
 	if bRich then
-		if LIB.ContainsEchoMsgHeader(szMsg) then
+		if X.ContainsEchoMsgHeader(szMsg) then
 			return
 		end
-		szText = LIB.GetPureText(szMsg)
+		szText = X.GetPureText(szMsg)
 	end
 	szText = szText:gsub('\r', '')
 	D.InsertLog(LOG_TYPE.MSG_SYS, { szText, szChannel })
 end)
 
 -- ½ÇÉ«º°»°ÈÕÖ¾
-LIB.RegisterEvent('PLAYER_SAY', function()
+X.RegisterEvent('PLAYER_SAY', function()
 	if not LOG_ENABLE then
 		return
 	end
 	-- arg0: szContent, arg1: dwTalkerID, arg2: nChannel, arg3: szName, arg4: bOnlyShowBallon
 	-- arg5: bSecurity, arg6: bGMAccount, arg7: bCheater, arg8: dwTitleID, arg9: szMsg
 	if not IsPlayer(arg1) and D.WillRecID(arg1) then
-		local szText = LIB.GetPureText(arg0)
+		local szText = X.GetPureText(arg0)
 		if szText and szText ~= '' then
 			D.OnTargetUpdate(arg1)
 			D.InsertLog(LOG_TYPE.PLAYER_SAY, { szText, arg1, arg2, arg3 })
@@ -607,7 +578,7 @@ LIB.RegisterEvent('PLAYER_SAY', function()
 end)
 
 -- ÏµÍ³¾¯¸æ¿òÈÕÖ¾
-LIB.RegisterEvent('ON_WARNING_MESSAGE', function()
+X.RegisterEvent('ON_WARNING_MESSAGE', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -616,7 +587,7 @@ LIB.RegisterEvent('ON_WARNING_MESSAGE', function()
 end)
 
 -- Íæ¼Ò½øÈëÍË³öÕ½¶·ÈÕÖ¾
-LIB.RegisterEvent('MY_PLAYER_FIGHT_HINT', function()
+X.RegisterEvent('MY_PLAYER_FIGHT_HINT', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -624,10 +595,10 @@ LIB.RegisterEvent('MY_PLAYER_FIGHT_HINT', function()
 	if not D.WillRecID(dwID) then
 		return
 	end
-	local KObject = LIB.GetObject(TARGET.PLAYER, dwID)
+	local KObject = X.GetObject(TARGET.PLAYER, dwID)
 	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = -1, -1, -1, -1
 	if KObject then
-		fCurrentLife, fMaxLife = LIB.GetObjectLife(KObject)
+		fCurrentLife, fMaxLife = X.GetObjectLife(KObject)
 		nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 	end
 	D.OnTargetUpdate(dwID, true)
@@ -635,7 +606,7 @@ LIB.RegisterEvent('MY_PLAYER_FIGHT_HINT', function()
 end)
 
 -- NPC ½øÈëÍË³öÕ½¶·ÈÕÖ¾
-LIB.RegisterEvent('MY_NPC_FIGHT_HINT', function()
+X.RegisterEvent('MY_NPC_FIGHT_HINT', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -643,10 +614,10 @@ LIB.RegisterEvent('MY_NPC_FIGHT_HINT', function()
 	if not D.WillRecID(dwID) then
 		return
 	end
-	local KObject = LIB.GetObject(TARGET.NPC, dwID)
+	local KObject = X.GetObject(TARGET.NPC, dwID)
 	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = -1, -1, -1, -1
 	if KObject then
-		fCurrentLife, fMaxLife = LIB.GetObjectLife(KObject)
+		fCurrentLife, fMaxLife = X.GetObjectLife(KObject)
 		nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 	end
 	D.OnTargetUpdate(dwID, true)
@@ -654,7 +625,7 @@ LIB.RegisterEvent('MY_NPC_FIGHT_HINT', function()
 end)
 
 -- ÉÏÏßÏÂÏßÈÕÖ¾
-LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
+X.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -667,7 +638,7 @@ LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 end)
 
 -- ½ø³öÕ½¶·ÔÝÀë¼ÇÂ¼
-LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµô/µôÏßµÄÈË
+X.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµô/µôÏßµÄÈË
 	if not LOG_ENABLE then
 		return
 	end
@@ -690,7 +661,7 @@ LIB.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍË
 end)
 
 -- ÖÐÍ¾ÓÐÈË½ø¶Ó ²¹ÉÏÔÝÀë¼ÇÂ¼
-LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
+X.RegisterEvent('PARTY_ADD_MEMBER', function()
 	if not LOG_ENABLE then
 		return
 	end
@@ -701,12 +672,12 @@ LIB.RegisterEvent('PARTY_ADD_MEMBER', function()
 	end
 end)
 
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CombatLogs', function()
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CombatLogs', function()
 	D.bReady = true
 	D.UpdateEnable()
 end)
 
-function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['MY_CombatLogs'],
@@ -722,7 +693,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		autoenable = function() return MY_CombatLogs.bEnable end,
 		menu = function()
 			local menu = {}
-			insert(menu, {
+			table.insert(menu, {
 				szOption = _L['Only in dungeon'],
 				bCheck = true,
 				bChecked = MY_CombatLogs.bOnlyDungeon,
@@ -730,7 +701,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 					MY_CombatLogs.bOnlyDungeon = not MY_CombatLogs.bOnlyDungeon
 				end,
 			})
-			insert(menu, {
+			table.insert(menu, {
 				szOption = _L['Only self related'],
 				bCheck = true,
 				bChecked = MY_CombatLogs.bOnlySelf,
@@ -740,7 +711,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 			})
 			local m0 = { szOption = _L['Max history'] }
 			for _, i in ipairs({10, 20, 30, 50, 100, 200, 300, 500, 1000, 2000, 5000}) do
-				insert(m0, {
+				table.insert(m0, {
 					szOption = tostring(i),
 					fnAction = function()
 						MY_CombatLogs.nMaxHistory = i
@@ -750,10 +721,10 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 					bChecked = MY_CombatLogs.nMaxHistory == i,
 				})
 			end
-			insert(menu, m0)
+			table.insert(menu, m0)
 			local m0 = { szOption = _L['Min fight time'] }
 			for _, i in ipairs({10, 20, 30, 60, 90, 120, 180, 240}) do
-				insert(m0, {
+				table.insert(m0, {
 					szOption = _L('%s second(s)', i),
 					fnAction = function()
 						MY_CombatLogs.nMinFightTime = i
@@ -763,12 +734,12 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 					bChecked = MY_CombatLogs.nMinFightTime == i,
 				})
 			end
-			insert(menu, m0)
-			insert(menu, {
+			table.insert(menu, m0)
+			table.insert(menu, {
 				szOption = _L['Show data files'],
 				fnAction = function()
-					local szRoot = LIB.GetAbsolutePath(DS_ROOT)
-					LIB.OpenFolder(szRoot)
+					local szRoot = X.GetAbsolutePath(DS_ROOT)
+					X.OpenFolder(szRoot)
 					UI.OpenTextEditor(szRoot)
 				end,
 			})
@@ -776,7 +747,7 @@ function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
 		end,
 	}):AutoWidth():Width() + 5
 
-	nLFY = nY + LH
+	nLFY = nY + nLH
 	return nX, nY, nLFY
 end
 
@@ -821,5 +792,5 @@ local settings = {
 		},
 	},
 }
-MY_CombatLogs = LIB.CreateModule(settings)
+MY_CombatLogs = X.CreateModule(settings)
 end

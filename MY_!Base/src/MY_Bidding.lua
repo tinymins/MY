@@ -10,51 +10,22 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/my_bidding/')
-local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_Bidding.ini'
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/my_bidding/')
+local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_Bidding.ini'
 local D = {}
 local O = {}
 local BIDDING_CACHE = {}
 
 function D.CheckChatLock()
-	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-		LIB.Systopmsg(_L['Please unlock safety talk lock first!'])
+	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+		X.Systopmsg(_L['Please unlock safety talk lock first!'])
 		return false
 	end
 	return true
@@ -65,10 +36,10 @@ function D.Open(tConfig)
 		tConfig = {}
 	end
 	if not tConfig.szKey then
-		tConfig.szKey = LIB.GetUUID()
+		tConfig.szKey = X.GetUUID()
 	end
-	if not LIB.IsDistributer() then
-		return LIB.Systopmsg(_L['You are not distributer!'])
+	if not X.IsDistributer() then
+		return X.Systopmsg(_L['You are not distributer!'])
 	end
 	if not D.CheckChatLock() then
 		return
@@ -83,12 +54,12 @@ function D.Open(tConfig)
 			return
 		end
 		frame.bWaitInit = true
-		frame.tUnsavedConfig = Clone(tConfig)
+		frame.tUnsavedConfig = X.Clone(tConfig)
 		D.UpdateConfig(frame)
 		D.SwitchConfig(frame, true)
 		D.UpdateAuthourize(frame)
 	else
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_START', tConfig)
+		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_START', tConfig)
 		D.PublishConfig(tConfig, true)
 	end
 end
@@ -142,7 +113,7 @@ function D.EditToConfig(edit, tConfig)
 	if tCount and tCount.type == 'text' then
 		local nCount = tonumber(tCount.text:gsub('.*x', ''), 10)
 		if nCount then
-			tConfig.nCount = max(floor(nCount), 1)
+			tConfig.nCount = math.max(math.floor(nCount), 1)
 		end
 	end
 end
@@ -150,36 +121,36 @@ end
 function D.ConfigToEditStruct(tConfig)
 	local aStruct = {}
 	if tConfig.nBookID then
-		insert(aStruct, {
+		table.insert(aStruct, {
 			type = 'book',
 			version = 0,
-			text = '[' .. LIB.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID) .. ']',
+			text = '[' .. X.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID) .. ']',
 			tabtype = tConfig.dwTabType,
 			index = tConfig.dwTabIndex,
 			bookinfo = tConfig.nBookID,
 		})
 		if tConfig.nCount and tConfig.nCount > 1 then
-			insert(aStruct, {
+			table.insert(aStruct, {
 				type = 'text',
 				text = ' x' .. tConfig.nCount,
 			})
 		end
 	elseif tConfig.dwTabType then
-		insert(aStruct, {
+		table.insert(aStruct, {
 			type = 'iteminfo',
 			version = 0,
-			text = '[' .. LIB.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex) .. ']',
+			text = '[' .. X.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex) .. ']',
 			tabtype = tConfig.dwTabType,
 			index = tConfig.dwTabIndex,
 		})
 		if tConfig.nCount and tConfig.nCount > 1 then
-			insert(aStruct, {
+			table.insert(aStruct, {
 				type = 'text',
 				text = ' x' .. tConfig.nCount,
 			})
 		end
 	elseif tConfig.szItem then
-		insert(aStruct, {
+		table.insert(aStruct, {
 			type = 'text',
 			text = tConfig.szItem,
 		})
@@ -239,7 +210,7 @@ function D.UpdateConfig(frame)
 	local h = wnd:Lookup('', '')
 	if tConfig.dwTabType and tConfig.dwTabIndex then
 		-- dwTabType, dwTabIndex, nBookID
-		local szItem = LIB.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID)
+		local szItem = X.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID)
 		if tConfig.nCount and tConfig.nCount > 1 then
 			szItem = szItem .. ' x' .. (tConfig.nCount or 1)
 		end
@@ -285,7 +256,7 @@ function D.SwitchCustomBidding(frame, bCustom)
 end
 
 function D.UpdateAuthourize(frame)
-	local bDistributer = LIB.IsDistributer()
+	local bDistributer = X.IsDistributer()
 	if not bDistributer then
 		D.SwitchConfig(frame, false)
 	end
@@ -310,10 +281,10 @@ function D.GetRankRecord(aRecord)
 	end
 	local aRes = {}
 	for _, v in pairs(tRes) do
-		insert(aRes, v)
+		table.insert(aRes, v)
 	end
 	if #aRes > 0 then
-		sort(aRes, D.RecordSorter)
+		table.sort(aRes, D.RecordSorter)
 	end
 	return aRes
 end
@@ -331,7 +302,7 @@ function D.UpdateList(frame)
 		hItem:Lookup('Handle_RowItem/Image_RowItemKungfu'):FromIconID(Table_GetSkillIconID(rec.dwKungfu, 1))
 		hItem:Lookup('Handle_RowItem/Text_RowItemName'):SetText(rec.szTalkerName)
 		D.DrawPrice(hItem:Lookup('Handle_RowItem/Handle_RowItemPrice'), rec.nPrice)
-		hItem:Lookup('Handle_RowItem/Text_RowItemTime'):SetText(LIB.FormatTime(rec.dwTime, '%hh:%mm:%ss'))
+		hItem:Lookup('Handle_RowItem/Text_RowItemTime'):SetText(X.FormatTime(rec.dwTime, '%hh:%mm:%ss'))
 		hItem:Lookup('Handle_RowItem/Text_RowItemP'):SetVisible(rec.bP)
 		hItem:SetAlpha(tConfig.nNumber < i and 100 or 255)
 	end
@@ -341,22 +312,22 @@ end
 function D.PublishConfig(tConfig, bInit)
 	local aSay = D.ConfigToEditStruct(tConfig)
 	if bInit then
-		insert(aSay, 1, { type = 'text', text = _L['Raise bidding for '] })
+		table.insert(aSay, 1, { type = 'text', text = _L['Raise bidding for '] })
 	else
-		insert(aSay, 1, { type = 'text', text = _L['Modify bidding for '] })
+		table.insert(aSay, 1, { type = 'text', text = _L['Modify bidding for '] })
 	end
-	insert(aSay, {
+	table.insert(aSay, {
 		type = 'text',
 		text = _L(', min price is %s, bidding step is %s.',
 			D.GetMoneyChatText(tConfig.nPriceMin),
 			D.GetMoneyChatText(tConfig.nPriceStep)),
 		})
-	LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+	X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 end
 
 function D.GetMoneyChatText(nGold)
 	if nGold >= 10000 then
-		local nBrick = floor(nGold / 10000)
+		local nBrick = math.floor(nGold / 10000)
 		local nGold = nGold % 10000
 		if nGold == 0 then
 			return _L('%d brick', nBrick)
@@ -379,13 +350,13 @@ local settings = {
 		},
 	},
 }
-MY_Bidding = LIB.CreateModule(settings)
+MY_Bidding = X.CreateModule(settings)
 end
 
 -------------------------------------------------------------------------------------------------------
 -- ±³¾°Í¨ÐÅ
 -------------------------------------------------------------------------------------------------------
-LIB.RegisterBgMsg('MY_BIDDING_START', function(_, tConfig, nChannel, dwTalkerID, szTalkerName, bSelf)
+X.RegisterBgMsg('MY_BIDDING_START', function(_, tConfig, nChannel, dwTalkerID, szTalkerName, bSelf)
 	BIDDING_CACHE[tConfig.szKey] = {
 		tConfig = tConfig,
 		aRecord = {},
@@ -397,7 +368,7 @@ LIB.RegisterBgMsg('MY_BIDDING_START', function(_, tConfig, nChannel, dwTalkerID,
 	D.UpdateConfig(frame)
 end)
 
-LIB.RegisterBgMsg('MY_BIDDING_CONFIG', function(_, tConfig, nChannel, dwTalkerID, szTalkerName, bSelf)
+X.RegisterBgMsg('MY_BIDDING_CONFIG', function(_, tConfig, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if BIDDING_CACHE[tConfig.szKey] then
 		BIDDING_CACHE[tConfig.szKey].tConfig = tConfig
 	end
@@ -408,11 +379,11 @@ LIB.RegisterBgMsg('MY_BIDDING_CONFIG', function(_, tConfig, nChannel, dwTalkerID
 	D.UpdateConfig(frame)
 end)
 
-LIB.RegisterBgMsg('MY_BIDDING_ACTION', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+X.RegisterBgMsg('MY_BIDDING_ACTION', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if not BIDDING_CACHE[data.szKey] then
 		return
 	end
-	insert(BIDDING_CACHE[data.szKey].aRecord, {
+	table.insert(BIDDING_CACHE[data.szKey].aRecord, {
 		dwTalkerID = dwTalkerID,
 		szTalkerName = szTalkerName,
 		nPrice = data.nPrice,
@@ -427,7 +398,7 @@ LIB.RegisterBgMsg('MY_BIDDING_ACTION', function(_, data, nChannel, dwTalkerID, s
 	D.UpdateList(frame)
 end)
 
-LIB.RegisterBgMsg('MY_BIDDING_P', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+X.RegisterBgMsg('MY_BIDDING_P', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if not BIDDING_CACHE[data.szKey] then
 		return
 	end
@@ -443,14 +414,14 @@ LIB.RegisterBgMsg('MY_BIDDING_P', function(_, data, nChannel, dwTalkerID, szTalk
 	D.UpdateList(frame)
 end)
 
-LIB.RegisterBgMsg('MY_BIDDING_DELETE', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+X.RegisterBgMsg('MY_BIDDING_DELETE', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if not BIDDING_CACHE[data.szKey] then
 		return
 	end
 	local aRecord = BIDDING_CACHE[data.szKey].aRecord
-	for i, p in ipairs_r(aRecord) do
+	for i, p in X.ipairs_r(aRecord) do
 		if p.dwTalkerID == data.dwTalkerID then
-			remove(aRecord, i)
+			table.remove(aRecord, i)
 		end
 	end
 	local frame = D.GetFrame(data.szKey)
@@ -460,7 +431,7 @@ LIB.RegisterBgMsg('MY_BIDDING_DELETE', function(_, data, nChannel, dwTalkerID, s
 	D.UpdateList(frame)
 end)
 
-LIB.RegisterBgMsg('MY_BIDDING_FINISH', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+X.RegisterBgMsg('MY_BIDDING_FINISH', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if not BIDDING_CACHE[data.szKey] then
 		return
 	end
@@ -514,18 +485,18 @@ function MY_BiddingBase.OnLButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
 	if name == 'Btn_Close' then
-		if LIB.IsDistributer() then
-			return LIB.Systopmsg(_L['You are distributer, Please finish this bidding!'])
+		if X.IsDistributer() then
+			return X.Systopmsg(_L['You are distributer, Please finish this bidding!'])
 		end
-		LIB.Confirm(_L['Sure cancel this bidding? You will not able to bidding this item.'], function()
+		X.Confirm(_L['Sure cancel this bidding? You will not able to bidding this item.'], function()
 			Wnd.CloseWindow(frame)
 		end)
 	elseif name == 'Btn_Option' then
-		if not LIB.IsDistributer() then
-			return LIB.Systopmsg(_L['You are not distributer!'])
+		if not X.IsDistributer() then
+			return X.Systopmsg(_L['You are not distributer!'])
 		end
 		local szKey = D.GetKey(frame)
-		frame.tUnsavedConfig = Clone(BIDDING_CACHE[szKey].tConfig)
+		frame.tUnsavedConfig = X.Clone(BIDDING_CACHE[szKey].tConfig)
 		D.UpdateConfig(frame)
 		D.SwitchConfig(frame, true)
 	elseif name == 'Btn_Number' then
@@ -533,7 +504,7 @@ function MY_BiddingBase.OnLButtonClick()
 		local txt = this:GetParent():Lookup('', 'Text_Number')
 		local menu = {}
 		for i = 1, 24 do
-			insert(menu, {
+			table.insert(menu, {
 				szOption = i,
 				fnAction = function()
 					frame.tUnsavedConfig.nNumber = i
@@ -548,8 +519,8 @@ function MY_BiddingBase.OnLButtonClick()
 		menu.nMinWidth = wnd:GetW()
 		UI.PopupMenu(menu)
 	elseif name == 'WndButton_ConfigSubmit' then
-		if not LIB.IsDistributer() then
-			return LIB.Systopmsg(_L['You are not distributer!'])
+		if not X.IsDistributer() then
+			return X.Systopmsg(_L['You are not distributer!'])
 		end
 		if not D.CheckChatLock() then
 			return
@@ -560,7 +531,7 @@ function MY_BiddingBase.OnLButtonClick()
 		tConfig.nPriceMin = tonumber(wnd:Lookup('WndEditBox_PriceMin/WndEdit_PriceMin'):GetText()) or 2000
 		tConfig.nPriceStep = tonumber(wnd:Lookup('WndEditBox_PriceStep/WndEdit_PriceStep'):GetText()) or 1000
 		tConfig.nNumber = tConfig.nNumber or 1
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, frame.bWaitInit and 'MY_BIDDING_START' or 'MY_BIDDING_CONFIG', tConfig)
+		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, frame.bWaitInit and 'MY_BIDDING_START' or 'MY_BIDDING_CONFIG', tConfig)
 		D.PublishConfig(tConfig, frame.bWaitInit)
 		frame.bWaitInit = nil
 		D.SwitchConfig(frame, false)
@@ -587,37 +558,37 @@ function MY_BiddingBase.OnLButtonClick()
 			end
 		end
 		if not bExist then
-			return LIB.Systopmsg(_L['You have not bidding a price yet.'])
+			return X.Systopmsg(_L['You have not bidding a price yet.'])
 		end
 		if bP then
-			return LIB.Systopmsg(_L['You have already p.'])
+			return X.Systopmsg(_L['You have already p.'])
 		end
 		if bValid then
-			return LIB.Systopmsg(_L['You cannot p cause you have a vaild price.'])
+			return X.Systopmsg(_L['You cannot p cause you have a vaild price.'])
 		end
 		local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
-		insert(aSay, 1, { type = 'text', text = _L['Exit from bidding '] })
-		insert(aSay, { type = 'text', text = _L[', P.'] })
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_P', { szKey = szKey })
-		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+		table.insert(aSay, 1, { type = 'text', text = _L['Exit from bidding '] })
+		table.insert(aSay, { type = 'text', text = _L[', P.'] })
+		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_P', { szKey = szKey })
+		X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 	elseif name == 'WndButton_Bidding' then
 		local szKey = D.GetKey(frame)
 		local nPrice, nPriceSelf, bP = D.GetQuickBiddingPrice(szKey)
 		if bP then
-			return LIB.Systopmsg(_L['You have already p.'])
+			return X.Systopmsg(_L['You have already p.'])
 		end
 		if IsShiftKeyDown() then
 			if not D.CheckChatLock() then
 				return
 			end
 			if nPriceSelf then
-				return LIB.Systopmsg(_L('You already have a vaild price at %s.', D.GetMoneyChatText(nPriceSelf)))
+				return X.Systopmsg(_L('You already have a vaild price at %s.', D.GetMoneyChatText(nPriceSelf)))
 			end
 			local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
-			insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
-			insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyChatText(nPrice)) })
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
-			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+			table.insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
+			table.insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyChatText(nPrice)) })
+			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
+			X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 		else
 			this:GetParent():GetParent()
 				:Lookup('Wnd_CustomBidding/WndEditBox_CustomBidding/WndEdit_CustomBidding')
@@ -631,7 +602,7 @@ function MY_BiddingBase.OnLButtonClick()
 		local edit = this:GetParent():Lookup('WndEditBox_CustomBidding/WndEdit_CustomBidding')
 		local nPriceMin = D.GetQuickBiddingPrice(szKey)
 		local nPrice = tonumber(edit:GetText()) or 0
-		nPrice = max(nPriceMin, floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep) - 1) * tConfig.nPriceStep + tConfig.nPriceMin)
+		nPrice = math.max(nPriceMin, math.floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep) - 1) * tConfig.nPriceStep + tConfig.nPriceMin)
 		edit:SetText(nPrice)
 	elseif name == 'WndButton_CustomBiddingUp' then
 		local szKey = D.GetKey(frame)
@@ -640,7 +611,7 @@ function MY_BiddingBase.OnLButtonClick()
 		local edit = this:GetParent():Lookup('WndEditBox_CustomBidding/WndEdit_CustomBidding')
 		local nPriceMin = D.GetQuickBiddingPrice(szKey)
 		local nPrice = tonumber(edit:GetText()) or 0
-		nPrice = max(nPriceMin, floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep) + 1) * tConfig.nPriceStep + tConfig.nPriceMin)
+		nPrice = math.max(nPriceMin, math.floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep) + 1) * tConfig.nPriceStep + tConfig.nPriceMin)
 		edit:SetText(nPrice)
 	elseif name == 'WndButton_CustomBiddingSure' then
 		local szKey = D.GetKey(frame)
@@ -649,23 +620,23 @@ function MY_BiddingBase.OnLButtonClick()
 		local edit = this:GetParent():Lookup('WndEditBox_CustomBidding/WndEdit_CustomBidding')
 		local nPriceMin, _, bP = D.GetQuickBiddingPrice(szKey)
 		if bP then
-			return LIB.Systopmsg(_L['You have already p.'])
+			return X.Systopmsg(_L['You have already p.'])
 		end
 		local nPrice = tonumber(edit:GetText()) or 0
-		local nPriceNear = max(nPriceMin, floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep)) * tConfig.nPriceStep + tConfig.nPriceMin)
+		local nPriceNear = math.max(nPriceMin, math.floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep)) * tConfig.nPriceStep + tConfig.nPriceMin)
 		if nPrice ~= nPriceNear then
-			LIB.Systopmsg(_L['Not a valid price'])
-			LIB.Systopmsg(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceMin))
+			X.Systopmsg(_L['Not a valid price'])
+			X.Systopmsg(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceMin))
 			return
 		end
 		if not D.CheckChatLock() then
 			return
 		end
 		local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
-		insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
-		insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyChatText(nPrice)) })
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
-		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+		table.insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
+		table.insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyChatText(nPrice)) })
+		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
+		X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 		D.SwitchCustomBidding(frame, false)
 	elseif name == 'WndButton_CustomBiddingCancel' then
 		D.SwitchCustomBidding(frame, false)
@@ -678,21 +649,21 @@ function MY_BiddingBase.OnLButtonClick()
 		local tConfig = cache.tConfig
 		local aRecord = D.GetRankRecord(cache.aRecord)
 		local aSay = D.ConfigToEditStruct(tConfig)
-		insert(aSay, 1, { type = 'text', text = _L['Bidding'] })
+		table.insert(aSay, 1, { type = 'text', text = _L['Bidding'] })
 		if #aRecord == 0 then
-			insert(aSay, { type = 'text', text = _L[', no vaild price'] })
+			table.insert(aSay, { type = 'text', text = _L[', no vaild price'] })
 		else
-			insert(aSay, { type = 'text', text = _L[', current valid prices: '] })
-			for i = 1, min(#aRecord, tConfig.nNumber) do
+			table.insert(aSay, { type = 'text', text = _L[', current valid prices: '] })
+			for i = 1, math.min(#aRecord, tConfig.nNumber) do
 				if i > 1 then
-					insert(aSay, { type = 'text', text = _L[','] })
+					table.insert(aSay, { type = 'text', text = _L[','] })
 				end
-				insert(aSay, { type = 'name', name = aRecord[i].szTalkerName })
-				insert(aSay, { type = 'text', text = aRecord[i].nPrice .. _L[' gold'] })
+				table.insert(aSay, { type = 'name', name = aRecord[i].szTalkerName })
+				table.insert(aSay, { type = 'text', text = aRecord[i].nPrice .. _L[' gold'] })
 			end
 		end
-		insert(aSay, { type = 'text', text = _L['.'] })
-		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+		table.insert(aSay, { type = 'text', text = _L['.'] })
+		X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 	elseif name == 'WndButton_Finish' then
 		if not D.CheckChatLock() then
 			return
@@ -702,22 +673,22 @@ function MY_BiddingBase.OnLButtonClick()
 		local tConfig = cache.tConfig
 		local aRecord = D.GetRankRecord(cache.aRecord)
 		local aSay = D.ConfigToEditStruct(tConfig)
-		insert(aSay, 1, { type = 'text', text = _L['Bidding'] })
+		table.insert(aSay, 1, { type = 'text', text = _L['Bidding'] })
 		if #aRecord == 0 then
-			insert(aSay, { type = 'text', text = _L[', nobody would buy it'] })
+			table.insert(aSay, { type = 'text', text = _L[', nobody would buy it'] })
 		else
-			insert(aSay, { type = 'text', text = _L[', finally bidding valid prices: '] })
-			for i = 1, min(#aRecord, tConfig.nNumber) do
+			table.insert(aSay, { type = 'text', text = _L[', finally bidding valid prices: '] })
+			for i = 1, math.min(#aRecord, tConfig.nNumber) do
 				if i > 1 then
-					insert(aSay, { type = 'text', text = _L[','] })
+					table.insert(aSay, { type = 'text', text = _L[','] })
 				end
-				insert(aSay, { type = 'name', name = aRecord[i].szTalkerName })
-				insert(aSay, { type = 'text', text = aRecord[i].nPrice .. _L[' gold'] })
+				table.insert(aSay, { type = 'name', name = aRecord[i].szTalkerName })
+				table.insert(aSay, { type = 'text', text = aRecord[i].nPrice .. _L[' gold'] })
 			end
 		end
-		insert(aSay, { type = 'text', text = _L[', bidding finished.'] })
-		LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_FINISH', { szKey = szKey })
-		LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+		table.insert(aSay, { type = 'text', text = _L[', bidding finished.'] })
+		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_FINISH', { szKey = szKey })
+		X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 	end
 end
 
@@ -736,7 +707,7 @@ function MY_BiddingBase.OnItemRefreshTip()
 					or GetFormatText('\n' .. _L['Hold SHIFT when click to quick bidding at price '])
 						.. GetMoneyText({ nGold = nPrice }, 'font=162', 'all2'))
 				.. GetFormatText(_L['.']))
-		LIB.OutputTip(this, szXml, true, ALW.TOP_BOTTOM)
+		X.OutputTip(this, szXml, true, ALW.TOP_BOTTOM)
 	end
 end
 
@@ -750,8 +721,8 @@ end
 function MY_BiddingBase.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_RowItemDelete' then
-		if not LIB.IsDistributer() then
-			return LIB.Systopmsg(_L['You are not distributer!'])
+		if not X.IsDistributer() then
+			return X.Systopmsg(_L['You are not distributer!'])
 		end
 		if not D.CheckChatLock() then
 			return
@@ -762,18 +733,18 @@ function MY_BiddingBase.OnItemLButtonClick()
 		local tConfig = cache.tConfig
 		local aSay = D.ConfigToEditStruct(tConfig)
 		local rec = this:GetParent().rec
-		insert(aSay, 1, { type = 'text', text = _L['Modify bidding for '] })
-		insert(aSay, { type = 'text', text = _L['\'s record, delete '] })
-		insert(aSay, { type = 'name', name = rec.szTalkerName })
-		insert(aSay, { type = 'text', text = _L[' \'s invalid price .'] })
-		LIB.Confirm(_L('Sure to delete %s\'s bidding record?', rec.szTalkerName), function()
-			if not LIB.IsDistributer() then
-				return LIB.Systopmsg(_L['You are not distributer!'])
+		table.insert(aSay, 1, { type = 'text', text = _L['Modify bidding for '] })
+		table.insert(aSay, { type = 'text', text = _L['\'s record, delete '] })
+		table.insert(aSay, { type = 'name', name = rec.szTalkerName })
+		table.insert(aSay, { type = 'text', text = _L[' \'s invalid price .'] })
+		X.Confirm(_L('Sure to delete %s\'s bidding record?', rec.szTalkerName), function()
+			if not X.IsDistributer() then
+				return X.Systopmsg(_L['You are not distributer!'])
 			end
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_DELETE', { szKey = szKey, dwTalkerID = rec.dwTalkerID })
-			LIB.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_DELETE', { szKey = szKey, dwTalkerID = rec.dwTalkerID })
+			X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 		end)
 	end
 end
 
-LIB.RegisterAddonMenu('MY_Bidding', { szOption = _L['Create bidding'], fnAction = D.Open })
+X.RegisterAddonMenu('MY_Bidding', { szOption = _L['Create bidding'], fnAction = D.Open })
