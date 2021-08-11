@@ -486,13 +486,13 @@ local PS = {}
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 20, 20
-	local nX, nY = X, Y
+	local nPaddingX, nPaddingY = 20, 20
+	local nX, nY = nPaddingX, nPaddingY
 
 	ui:Append('Text', { text = _L['Feature setting'], x = nX, y = nY, font = 27 })
 
 	-- 分数达到多少停砸
-	nX = X + 10
+	nX = nPaddingX + 10
 	nY = nY + 28
 	nX = ui:Append('Text', { text = _L['Stop simple broken can when score reaches'], x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	nX = ui:Append('WndComboBox', {
@@ -534,7 +534,7 @@ function PS.OnPanelActive(wnd)
 		nMaxItemNameLen = max(nMaxItemNameLen, wlen(p.szName))
 	end
 	for _, p in ipairs(D.aUseItemPS) do
-		nX = X + 10
+		nX = nPaddingX + 10
 		nY = nY + 28
 		nX = ui:Append('Text', {
 			x = nX, y = nY,
@@ -567,7 +567,7 @@ function PS.OnPanelActive(wnd)
 	end
 
 	-- 拾取过滤
-	nX = X + 10
+	nX = nPaddingX + 10
 	nY = nY + 38
 	nX = ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 150,
@@ -626,7 +626,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('Text', { x = nX, y = nY, text = _L['(Checked will not be picked up, if still pick please check system auto pick config)'] })
 
 	-- 控制按钮
-	nX = X + 10
+	nX = nPaddingX + 10
 	nY = nY + 36
 	nX = ui:Append('WndButton', {
 		x = nX, y = nY, w = 130, h = 30,

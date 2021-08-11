@@ -108,11 +108,11 @@ end
 
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local X, Y = 10, 10
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 10, 10
+	local x, y = nPaddingX, nPaddingY
 	local w, h = ui:Size()
 
-	x = X
+	x = nPaddingX
 	x = x + ui:Append('WndButton', {
 		x = x, y = y, w = 100,
 		buttonstyle = 'FLAT',
@@ -134,8 +134,7 @@ function PS.OnPanelActive(frame)
 				text = _L['Edit buff'],
 				close = true, anchor = 'CENTER',
 			})
-			local X, Y = 20, 60
-			local x, y = X, Y
+			local x, y = 20, 60
 			local edit = ui:Append('WndEditBox',{
 				x = x, y = y, w = 310, h = 440,
 				limit = -1, multiline = true,
@@ -157,7 +156,7 @@ function PS.OnPanelActive(frame)
 			})
 		end,
 	}):AutoHeight():Width() + 5
-	x = X
+	x = nPaddingX
 	y = y + 30
 
 	l_list = ui:Append('WndListBox', {
@@ -176,9 +175,9 @@ function PS.OnPanelActive(frame)
 	end
 	y = h
 
-	X = w - 240
-	x = X
-	y = Y + 25
+	nPaddingX = w - 240
+	x = nPaddingX
+	y = nPaddingY + 25
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Auto scale'],
@@ -202,7 +201,7 @@ function PS.OnPanelActive(frame)
 		textfmt = function(val) return _L('%d%%', val) end,
 	}):AutoWidth():Width() + 10
 
-	x = X
+	x = nPaddingX
 	y = y + 30
 	x = x + ui:Append('Text', { x = x, y = y, text = _L['Max count']}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndTrackbar', {
@@ -216,7 +215,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 8
 
-	x = X
+	x = nPaddingX
 	y = y + 30
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Push buff to official'],
@@ -236,7 +235,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = X
+	x = nPaddingX
 	y = y + 30
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Buff Time'],
@@ -256,7 +255,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = X
+	x = nPaddingX
 	y = y + 30
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Buff Num'],
@@ -275,7 +274,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = X
+	x = nPaddingX
 	y = y + 30
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Alt Click Publish'],
@@ -286,7 +285,7 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Width() + 5
 	y = y + 30
 
-	x = X
+	x = nPaddingX
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Enable MY_TeamMon data'],

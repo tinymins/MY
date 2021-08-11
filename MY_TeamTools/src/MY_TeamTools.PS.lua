@@ -58,20 +58,20 @@ LIB.RegisterRestriction('MY_WorldMark', { ['*'] = true, intl = false })
 local PS = { nPriority = 0 }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 20, 30
-	local nX, nY, nLFY = X, Y, Y
-	local W, H = ui:Size()
-	local LH = 25
+	local nPaddingX, nPaddingY = 20, 30
+	local nX, nY, nLFY = nPaddingX, nPaddingY, nPaddingY
+	local nW, nH = ui:Size()
+	local nLH = 25
 
 	ui:Append('WndButton', {
-		x = W - 165, y = nY, w = 150, h = 38,
+		x = nW - 165, y = nY, w = 150, h = 38,
 		text = _L['Open Panel'],
 		buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
 		onclick = MY_TeamTools.Open,
 	})
 
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['MY_TeamTools'], font = 27 }):Height() + 5
-	nX = X + 10
+	nX = nPaddingX + 10
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		checked = MY_TeamNotice.bEnable,
@@ -102,17 +102,17 @@ function PS.OnPanelActive(wnd)
 		}):AutoWidth():Width() + 5
 	end
 
-	nLFY = nY + LH
-	nX, nY, nLFY = MY_CombatLogs.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	nLFY = nY + nLH
+	nX, nY, nLFY = MY_CombatLogs.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)
 
-	nX = X
+	nX = nPaddingX
 	nY = nY + 30
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Party Request'], font = 27 }):Height() + 5
-	nX = X + 10
-	nX, nY = MY_PartyRequest.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-	nX, nY = MY_RideRequest.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-	nX, nY = MY_EvokeRequest.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-	nX, nY = MY_SocialRequest.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
-	nX, nY = MY_TeamRestore.OnPanelActivePartial(ui, X, Y, W, H, nX, nY)
+	nX = nPaddingX + 10
+	nX, nY = MY_PartyRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX, nY = MY_RideRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX, nY = MY_EvokeRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX, nY = MY_SocialRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX, nY = MY_TeamRestore.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 end
 LIB.RegisterPanel(_L['Raid'], 'MY_TeamTools', _L['MY_TeamTools'], 5962, PS)

@@ -688,8 +688,8 @@ end
 
 -- 绘制总览界面
 local function DrawPreview(ui, config, OpenDetail)
-	local X, Y = 10, 10
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 10, 10
+	local x, y = nPaddingX, nPaddingY
 	local w, h = ui:Size()
 	local uiWnd = ui:Append('WndWindow', { w = w, h = 190 })
 	uiWnd:Append('Text', {
@@ -747,7 +747,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + 30
 
 	local deltaY = 31
-	x = X + 20
+	x = nPaddingX + 20
 	uiWnd:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Enable'],
@@ -782,7 +782,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	x = X + 20
+	x = nPaddingX + 20
 	uiWnd:Append('WndCheckBox', {
 		x = x, y = y, w = 90,
 		text = _L['Penetrable'],
@@ -814,7 +814,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	x = X + 20
+	x = nPaddingX + 20
 	uiWnd:Append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['Show cd circle'],
@@ -846,7 +846,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	x = X + 20
+	x = nPaddingX + 20
 	uiWnd:Append('WndCheckBox', {
 		x = x, y = y, w = 120,
 		text = _L['Show cd bar'],
@@ -878,7 +878,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + deltaY
 
-	x = X + 20
+	x = nPaddingX + 20
 	uiWnd:Append('WndCheckBox', {
 		x = x, y = y, w = 90,
 		text = _L['Play sound'],
@@ -945,7 +945,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + 30
 
-	y = Y + 30
+	y = nPaddingY + 30
 	local deltaY = 21
 	local xr = w - 280
 	uiWnd:Append('WndComboBox', {
@@ -1238,9 +1238,9 @@ end
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:Size()
-	local X, Y = 20, 20
-	local x, y = X, Y
+	local nW, nH = ui:Size()
+	local nPaddingX, nPaddingY = 20, 20
+	local nX, nY = nPaddingX, nPaddingY
 	ui:ContainerType(UI.WND_CONTAINER_STYLE.LEFT_TOP)
 
 	local OpenDetail = DrawDetail(ui)

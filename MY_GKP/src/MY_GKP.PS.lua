@@ -172,107 +172,107 @@ local PS = { nPriority = 2 }
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 25, 25
-	local x, y = X, Y
-	local w, h = ui:Size()
+	local nPaddingX, nPaddingY = 25, 25
+	local nX, nY = nPaddingX, nPaddingY
+	local nW, nH = ui:Size()
 
-	ui:Append('Text', { x = x, y = y, text = _L['Preference Setting'], font = 27 })
+	ui:Append('Text', { x = nX, y = nY, text = _L['Preference Setting'], font = 27 })
 	ui:Append('WndButton', {
-		x = w - 165, y = y, w = 150, h = 38,
+		x = nW - 165, y = nY, w = 150, h = 38,
 		text = _L['Open Panel'],
 		buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
 		onclick = MY_GKP_MI.OpenPanel,
 	})
-	y = y + 28
+	nY = nY + 28
 
-	x = x + 10
+	nX = nX + 10
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 200,
+		x = nX, y = nY, w = 200,
 		text = _L['Popup Record for Distributor'], checked = MY_GKP.bOn,
 		oncheck = function(bChecked)
 			MY_GKP.bOn = bChecked
 		end,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 200,
+		x = nX, y = nY, w = 200,
 		text = _L['Clause with 0 Gold as Record'], checked = MY_GKP.bDisplayEmptyRecords,
 		oncheck = function(bChecked)
 			MY_GKP.bDisplayEmptyRecords = bChecked
 		end,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 200,
+		x = nX, y = nY, w = 200,
 		color = { 255, 128, 0 } , text = _L['Show Gold Brick'], checked = MY_GKP.bShowGoldBrick,
 		oncheck = function(bChecked)
 			MY_GKP.bShowGoldBrick = bChecked
 		end,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 200,
+		x = nX, y = nY, w = 200,
 		text = _L['Remind Wipe Data When Enter Dungeon'], checked = MY_GKP.bAlertMessage,
 		oncheck = function(bChecked)
 			MY_GKP.bAlertMessage = bChecked
 		end,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 250,
+		x = nX, y = nY, w = 250,
 		text = _L['Automatic Reception with Record From Distributor'], checked = MY_GKP.bAutoSync,
 		oncheck = function(bChecked)
 			MY_GKP.bAutoSync = bChecked
 		end,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 250,
+		x = nX, y = nY, w = 250,
 		text = _L['Sync system reception'], checked = MY_GKP.bSyncSystem,
 		oncheck = function(bChecked)
 			MY_GKP.bSyncSystem = bChecked
 		end,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 250,
+		x = nX, y = nY, w = 250,
 		text = _L['Prefer use new bidding panel'], checked = MY_GKP.bNewBidding,
 		oncheck = function(bChecked)
 			MY_GKP.bSyncSystem = bChecked
 		end,
 	})
-	y = y + 28
+	nY = nY + 28
 
-	y = y + 5
-	ui:Append('WndComboBox', { x = x, y = y, w = 150, text = _L['Edit Allowance Protocols'], menu = D.GetSubsidiesMenu })
-	ui:Append('WndComboBox', { x = x + 160, y = y, text = _L['Edit Auction Protocols'], menu = D.GetSchemeMenu })
-	y = y + 28
+	nY = nY + 5
+	ui:Append('WndComboBox', { x = nX, y = nY, w = 150, text = _L['Edit Allowance Protocols'], menu = D.GetSubsidiesMenu })
+	ui:Append('WndComboBox', { x = nX + 160, y = nY, text = _L['Edit Auction Protocols'], menu = D.GetSchemeMenu })
+	nY = nY + 28
 
-	x = X
-	ui:Append('Text', { x = x, y = y, text = _L['Money Record'], font = 27 })
-	y = y + 28
+	nX = nPaddingX
+	ui:Append('Text', { x = nX, y = nY, text = _L['Money Record'], font = 27 })
+	nY = nY + 28
 
-	x = x + 10
+	nX = nX + 10
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 150, checked = MY_GKP.bMoneySystem, text = _L['Track Money Trend in the System'],
+		x = nX, y = nY, w = 150, checked = MY_GKP.bMoneySystem, text = _L['Track Money Trend in the System'],
 		oncheck = function(bChecked)
 			MY_GKP.bMoneySystem = bChecked
 		end,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 150, text = _L['Enable Money Trend'], checked = MY_GKP.bMoneyTalk,
+		x = nX, y = nY, w = 150, text = _L['Enable Money Trend'], checked = MY_GKP.bMoneyTalk,
 		oncheck = function(bChecked)
 			MY_GKP.bMoneyTalk = bChecked
 		end,
 	})
-	y = y + 28
+	nY = nY + 28
 end
 LIB.RegisterPanel(_L['General'], 'MY_GKP', _L['GKP Golden Team Record'], 2490, PS)

@@ -58,14 +58,14 @@ local CFG, PS = MY_Cataclysm.CFG, { nPriority = 2 }
 
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local X, Y = 20, 20
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 20, 20
+	local x, y = nPaddingX, nPaddingY
 
 	y = y + ui:Append('Text', { x = x, y = y, text = _L['Grid Style'], font = 27 }):Height()
 
 	y = y + 5
 
-	x = X + 10
+	x = nPaddingX + 10
 	y = y + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show AllGrid'],
 		checked = CFG.bShowAllGrid,
@@ -75,15 +75,15 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Height() + 5
 
-	x = X
+	x = nPaddingX
 	y = y + 10
 
 	-- 名字、图标、内力和血量显示方案
-	x = X
+	x = nPaddingX
 	y = y + ui:Append('Text', { x = x, y = y, text = _L['Name/Icon/Mana/Life Display'], font = 27 }):Height()
 
 	-- 名字
-	x = X + 10
+	x = nPaddingX + 10
 	y = y + 5
 	for _, p in ipairs({
 		{ 1, _L['Name colored by force'] },
@@ -117,7 +117,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):Height()
 
-	x = X + 10
+	x = nPaddingX + 10
 	for _, p in ipairs({
 		{ 0, _L['Top'] },
 		{ 1, _L['Middle'] },
@@ -164,7 +164,7 @@ function PS.OnPanelActive(frame)
 	y = y + 25
 
 	-- 血量显示方式
-	x = X + 10
+	x = nPaddingX + 10
 	y = y + 10
 	for _, p in ipairs({
 		{ 2, g_tStrings.STR_RAID_LIFE_LEFT },
@@ -200,7 +200,7 @@ function PS.OnPanelActive(frame)
 	y = y + 25
 
 	-- 血量数值显示方案
-	x = X + 10
+	x = nPaddingX + 10
 	for _, p in ipairs({
 		{ 1, _L['Show Format value'] },
 		{ 2, _L['Show Percentage value'] },
@@ -231,7 +231,7 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Width() + 5
 	y = y + 25
 
-	x = X + 10
+	x = nPaddingX + 10
 	for _, p in ipairs({
 		{ 0, _L['Top'] },
 		{ 1, _L['Middle'] },
@@ -279,7 +279,7 @@ function PS.OnPanelActive(frame)
 	y = y + 25
 
 	-- 图标显示方案
-	x = X + 10
+	x = nPaddingX + 10
 	y = y + 10
 	for _, p in ipairs({
 		{ 1, _L['Show Force Icon'] },
@@ -302,7 +302,7 @@ function PS.OnPanelActive(frame)
 	y = y + 25
 
 	-- 内力显示
-	x = X + 10
+	x = nPaddingX + 10
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show ManaCount'],
 		checked = CFG.nShowMP,

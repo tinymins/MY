@@ -84,15 +84,15 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 20, 20
-	local W, H = ui:Size()
-	local nX, nY = X, Y
+	local nPaddingX, nPaddingY = 20, 20
+	local nW, nH = ui:Size()
+	local nX, nY = nPaddingX, nPaddingY
 	D.LoadLUAData()
 
-	nX = X
+	nX = nPaddingX
 	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['Save Talk'], font = 27 }):Pos('BOTTOMRIGHT')
 
-	nX = X + 10
+	nX = nPaddingX + 10
 	nX = ui:Append('WndButton', { x = nX, y = nY + 10, text = _L['Save Advertising'], buttonstyle = 'FLAT' }):Click(function(bChecked)
 		local edit = LIB.GetChatInput()
 		local txt, data = edit:GetText(), edit:GetTextStruct()
@@ -108,23 +108,23 @@ function PS.OnPanelActive(wnd)
 	end):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('Text', { x = nX + 5, y = nY + 10, text = _L['Advertising Tips'] }):Pos('BOTTOMRIGHT')
 
-	nX = X
+	nX = nPaddingX
 	nX, nY = ui:Append('Text', { x = nX, y = nY + 5, text = _L['Gadgets'], font = 27 }):Pos('BOTTOMRIGHT')
 	for k, v in ipairs(O.tItem) do
 		if GetItemInfo(v.dwTabType, v.dwIndex) then
-			nX = ui:Append('Box', { x = (k - 1) * 48 + X + 10, y = nY + 10, w = 38, h = 38 }):ItemInfo(GLOBAL.CURRENT_ITEM_VERSION, v.dwTabType, v.dwIndex):Pos('BOTTOMRIGHT')
+			nX = ui:Append('Box', { x = (k - 1) * 48 + nPaddingX + 10, y = nY + 10, w = 38, h = 38 }):ItemInfo(GLOBAL.CURRENT_ITEM_VERSION, v.dwTabType, v.dwIndex):Pos('BOTTOMRIGHT')
 		end
 	end
 
-	nX = X
+	nX = nPaddingX
 	nY = nY + 58
 	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['Advertising List'], font = 27 }):Pos('BOTTOMRIGHT')
 
-	nX = X + 10
+	nX = nPaddingX + 10
 	nY = nY + 10
 	for k, v in ipairs(O.tADList) do
-		if nX + 80 > W then
-			nX = X + 10
+		if nX + 80 > nW then
+			nX = nPaddingX + 10
 			nY = nY + 28
 		end
 		nX = ui:Append('WndButton', {

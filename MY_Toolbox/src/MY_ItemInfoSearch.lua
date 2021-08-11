@@ -225,9 +225,9 @@ local PS = { nPriority = 4 }
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 0, 0
-	local x, y = X, Y
-	local w, h = ui:Size()
+	local nPaddingX, nPaddingY = 0, 0
+	local nX, nY = nPaddingX, nPaddingY
+	local nW, nH = ui:Size()
 
 	local list, muProgress
 	local function UpdateList()
@@ -250,18 +250,18 @@ function PS.OnPanelActive(wnd)
 		end
 	end
 
-	y = y + ui:Append('WndEditBox', {
-		x = x, y = y, w = w - x, h = 25,
+	nY = nY + ui:Append('WndEditBox', {
+		x = nX, y = nY, w = nW - nX, h = 25,
 		text = SEARCH,
 		placeholder = _L['Please input item name or item index number'],
 		onchange = function(szSearch)
 			LIB.DelayCall('MY_ItemInfoSearch', 200, function()
 				D.Search(szSearch,
 					function(fPer)
-						muProgress:Width(w * fPer)
+						muProgress:Width(nW * fPer)
 					end,
 					function(aResult)
-						muProgress:Width(w)
+						muProgress:Width(nW)
 						SEARCH = szSearch
 						RESULT = aResult
 						UpdateList()
@@ -272,14 +272,14 @@ function PS.OnPanelActive(wnd)
 
 	muProgress = ui:Append('Image', {
 		name = 'Image_Progress',
-		x = x, y = y,
-		w = w, h = 4,
+		x = nX, y = nY,
+		w = nW, h = 4,
 		image = 'ui/Image/UICommon/RaidTotal.UITex|45',
 	})
-	y = y + 4
+	nY = nY + 4
 
 	list = ui:Append('WndListBox', {
-		x = x, y = y, w = w - x, h = h - y,
+		x = nX, y = nY, w = nW - nX, h = nH - nY,
 		listbox = {
 			{
 				'onhover',

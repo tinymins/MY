@@ -59,18 +59,18 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local W, H = ui:Size()
-	local X, Y = 20, 20
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 20, 20
+	local x, y = nPaddingX, nPaddingY
 	local lineHeight = 29
 
 	if MY_Farbnamen and MY_Farbnamen.OnPanelActivePartial then
-		x, y = MY_Farbnamen.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+		x, y = MY_Farbnamen.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y, lineHeight)
 	end
-	x, y = MY_ChatSwitch.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x, y = MY_TeamBalloon.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x, y = MY_ChatCopy.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x, y = MY_AutoHideChat.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x, y = MY_WhisperMetion.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
-	x, y = MY_ChatEmotion.OnPanelActivePartial(ui, X, Y, W, H, x, y, lineHeight)
+	x, y = MY_ChatSwitch.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y, lineHeight)
+	x, y = MY_TeamBalloon.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y, lineHeight)
+	x, y = MY_ChatCopy.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y, lineHeight)
+	x, y = MY_AutoHideChat.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y, lineHeight)
+	x, y = MY_WhisperMetion.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y, lineHeight)
+	x, y = MY_ChatEmotion.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y, lineHeight)
 end
 LIB.RegisterPanel(_L['Chat'], 'MY_ChatSwitch', _L['chat helper'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', PS)

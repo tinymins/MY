@@ -535,24 +535,24 @@ end
 local PS = {}
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local X, Y = 20, 20
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 20, 20
+	local nX, nY = nPaddingX, nPaddingY
 
-	ui:Append('Text', { x = x, y = y, text = g_tStrings.HATRED_COLLECT, font = 27 })
-	x = x + 10
-	y = y + 28
+	ui:Append('Text', { x = nX, y = nY, text = g_tStrings.HATRED_COLLECT, font = 27 })
+	nX = nX + 10
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 130, checked = O.bEnable, text = _L['Enable ThreatScrutiny'],
+		x = nX, y = nY, w = 130, checked = O.bEnable, text = _L['Enable ThreatScrutiny'],
 		oncheck = function(bChecked)
 			O.bEnable = bChecked
 			_TS.CheckOpen()
 		end,
 	})
-	x = x + 130
+	nX = nX + 130
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 250, checked = O.bInDungeon,
+		x = nX, y = nY, w = 250, checked = O.bInDungeon,
 		enable = O.bEnable,
 		text = _L['Only in the map type is Dungeon Enable plug-in'],
 		oncheck = function(bChecked)
@@ -561,14 +561,14 @@ function PS.OnPanelActive(frame)
 		end,
 		autoenable = IsEnabled,
 	})
-	y = y + 28
+	nY = nY + 28
 
-	x = X
-	ui:Append('Text', { x = x, y = y, text = _L['Alert Setting'], font = 27, autoenable = IsEnabled })
-	x = x + 10
-	y = y + 28
+	nX = nPaddingX
+	ui:Append('Text', { x = nX, y = nY, text = _L['Alert Setting'], font = 27, autoenable = IsEnabled })
+	nX = nX + 10
+	nY = nY + 28
 	ui:Append('WndCheckBox', {
-		x = x, y = y, checked = O.nOTAlertLevel == 1, text = _L['OT Alert'],
+		x = nX, y = nY, checked = O.nOTAlertLevel == 1, text = _L['OT Alert'],
 		oncheck = function(bChecked)
 			if bChecked then -- 以后可以做% 暂时先不管
 				O.nOTAlertLevel = 1
@@ -578,69 +578,69 @@ function PS.OnPanelActive(frame)
 		end,
 		autoenable = IsEnabled,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, checked = O.bOTAlertSound, text = _L['OT Alert Sound'],
+		x = nX, y = nY, checked = O.bOTAlertSound, text = _L['OT Alert Sound'],
 		oncheck = function(bChecked)
 			O.bOTAlertSound = bChecked
 		end,
 		autoenable = function() return IsEnabled() and O.nOTAlertLevel == 1 end,
 	})
-	y = y + 28
+	nY = nY + 28
 
-	x = X
-	ui:Append('Text', { x = x, y = y, text = _L['Style Setting'], font = 27, autoenable = IsEnabled })
-	y = y + 28
+	nX = nPaddingX
+	ui:Append('Text', { x = nX, y = nY, text = _L['Style Setting'], font = 27, autoenable = IsEnabled })
+	nY = nY + 28
 
-	x = x + 10
+	nX = nX + 10
 	ui:Append('WndCheckBox', {
-		x = x , y = y, checked = O.bShowPercent, text = _L['Show percent'],
+		x = nX , y = nY, checked = O.bShowPercent, text = _L['Show percent'],
 		oncheck = function(bChecked)
 			O.bShowPercent = bChecked
 		end,
 		autoenable = IsEnabled,
 	})
 
-	y = y + 28
+	nY = nY + 28
 	ui:Append('WndCheckBox', {
-		x = x , y = y, checked = O.bTopTarget, text = _L['Top Target'],
+		x = nX , y = nY, checked = O.bTopTarget, text = _L['Top Target'],
 		oncheck = function(bChecked)
 			O.bTopTarget = bChecked
 		end,
 		autoenable = IsEnabled,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x , y = y, checked = O.bForceColor, text = g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
+		x = nX , y = nY, checked = O.bForceColor, text = g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
 		oncheck = function(bChecked)
 			O.bForceColor = bChecked
 		end,
 		autoenable = IsEnabled,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x , y = y, checked = O.bForceIcon, text = g_tStrings.STR_SHOW_KUNGFU,
+		x = nX , y = nY, checked = O.bForceIcon, text = g_tStrings.STR_SHOW_KUNGFU,
 		oncheck = function(bChecked)
 			O.bForceIcon = bChecked
 		end,
 		autoenable = IsEnabled,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
-		x = x , y = y, w = 200, checked = O.bSpecialSelf, text = _L['Special Self'],
+		x = nX , y = nY, w = 200, checked = O.bSpecialSelf, text = _L['Special Self'],
 		oncheck = function(bChecked)
 			O.bSpecialSelf = bChecked
 		end,
 		autoenable = IsEnabled,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndComboBox', {
-		x = x, y = y, text = _L['Style Select'],
+		x = nX, y = nY, text = _L['Style Select'],
 		menu = function()
 			local t = {}
 			for k, v in ipairs(_TS.tStyle) do
@@ -657,10 +657,10 @@ function PS.OnPanelActive(frame)
 		end,
 		autoenable = IsEnabled,
 	})
-	y = y + 28
+	nY = nY + 28
 
 	ui:Append('WndComboBox', {
-		x = x, y = y, text = g_tStrings.STR_SHOW_HATRE_COUNTS,
+		x = nX, y = nY, text = g_tStrings.STR_SHOW_HATRE_COUNTS,
 		menu = function()
 			local t = {}
 			for k, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 50}) do -- 其实服务器最大反馈不到50个
@@ -677,14 +677,14 @@ function PS.OnPanelActive(frame)
 		end,
 		autoenable = IsEnabled,
 	})
-	y = y + 28
+	nY = nY + 28
 
-	x = X
-	ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_RAID_MENU_BG_ALPHA, autoenable = IsEnabled })
-	x = x + 5
-	y = y + 28
+	nX = nPaddingX
+	ui:Append('Text', { x = nX, y = nY, text = g_tStrings.STR_RAID_MENU_BG_ALPHA, autoenable = IsEnabled })
+	nX = nX + 5
+	nY = nY + 28
 	ui:Append('WndTrackbar', {
-		x = x, y = y, text = '',
+		x = nX, y = nY, text = '',
 		range = {0, 100},
 		value = O.nBGAlpha,
 		onchange = function(nVal)

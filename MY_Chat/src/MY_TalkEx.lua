@@ -225,8 +225,8 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
-	local X, Y, LH = 25, 20, 30
-	local nX, nY, nLFY = X, Y, Y
+	local nPaddingX, nPaddingY, LH = 25, 20, 30
+	local nX, nY, nLFY = nPaddingX, nPaddingY, nPaddingY
 
 	-------------------------------------
 	-- 喊话部分
@@ -241,7 +241,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	-- 喊话频道
-	nY = Y
+	nY = nPaddingY
 	local nChannelCount = #TALK_CHANNEL_LIST
 	for i, p in ipairs(TALK_CHANNEL_LIST) do
 		ui:Append('WndCheckBox', {
@@ -285,14 +285,14 @@ function PS.OnPanelActive(wnd)
 	-- 骚话部分
 	-------------------------------------
 	-- <hr />
-	nX = X
+	nX = nPaddingX
 	nY = nY + 40
-	ui:Append('Shadow', { x = X, y = nY, w = w - X * 2, h = 1, color = {255, 255, 255}, alpha = 128 })
+	ui:Append('Shadow', { x = nPaddingX, y = nY, w = w - nPaddingX * 2, h = 1, color = {255, 255, 255}, alpha = 128 })
 	-- 文本标题
 	nY = nY + 5
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', h = 25, text = _L['Joke talk'] }):Width() + 5
 	-- 骚话内容搜索输入框
-	nX = X
+	nX = nPaddingX
 	nY = nY + LH
 	nX = ui:Append('WndEditBox', {
 		x = nX, y = nY,
@@ -386,12 +386,12 @@ function PS.OnPanelActive(wnd)
 		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Pos('BOTTOMRIGHT') + 5
 	-- 骚话输入框
-	nX = X
+	nX = nPaddingX
 	nY = nY + LH
 	nX = nX + ui:Append('WndEditBox', {
 		name = 'WndEditBox_JokeText',
 		x = nX, y = nY,
-		w = w - X * 2, h = 75,
+		w = w - nPaddingX * 2, h = 75,
 		multiline = true,
 		text = D.szJokeText,
 		onchange = function(szText)
@@ -406,8 +406,8 @@ function PS.OnPanelActive(wnd)
 	-- 调侃部分
 	-------------------------------------
 	-- <hr />
-	nX = X
-	ui:Append('Shadow', { x = X, y = nY, w = w - X * 2, h = 1, color = {255, 255, 255}, alpha = 128 })
+	nX = nPaddingX
+	ui:Append('Shadow', { x = nPaddingX, y = nY, w = w - nPaddingX * 2, h = 1, color = {255, 255, 255}, alpha = 128 })
 	-- 文本标题
 	nY = nY + 10
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', h = 25, text = _L['Have a trick with'] }):Width() + 5
@@ -451,13 +451,13 @@ function PS.OnPanelActive(wnd)
 			return t
 		end,
 	}):Width() + 5
-	nX = X
+	nX = nPaddingX
 	nY = nY + LH
 
 	-- 调侃内容输入框：第一句
 	nY = nY + ui:Append('WndEditBox', {
 		x = nX, y = nY,
-		w = w - X * 2, h = 25,
+		w = w - nPaddingX * 2, h = 25,
 		text = O.szTrickTextBegin,
 		onchange = function(szText)
 			O.szTrickTextBegin = szText
@@ -465,7 +465,7 @@ function PS.OnPanelActive(wnd)
 	}):Height() + 5
 	-- 调侃内容输入框：调侃内容
 	nY = nY + ui:Append('WndEditBox', {
-		x = nX, y = nY, w = w - X * 2, h = 55,
+		x = nX, y = nY, w = w - nPaddingX * 2, h = 55,
 		multiline = true, text = O.szTrickText,
 		onchange = function(szText)
 			O.szTrickText = szText
@@ -473,7 +473,7 @@ function PS.OnPanelActive(wnd)
 	}):Height() + 5
 	-- 调侃内容输入框：最后一句
 	nY = nY + ui:Append('WndEditBox', {
-		x = nX, y = nY, w = w - X * 2, h = 25,
+		x = nX, y = nY, w = w - nPaddingX * 2, h = 25,
 		text = O.szTrickTextEnd,
 		onchange = function(szText)
 			O.szTrickTextEnd = szText
@@ -506,7 +506,7 @@ function PS.OnPanelActive(wnd)
 	}):Width() + 5
 	-- 调侃按钮
 	local uiBtn = ui:Append('WndButton', {
-		x = w - X - 100, y = nY, w = 100,
+		x = w - nPaddingX - 100, y = nY, w = 100,
 		color = {255, 255, 255},
 		text = _L['Trick'],
 		onclick = D.Trick,

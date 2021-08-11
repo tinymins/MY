@@ -59,8 +59,8 @@ local CTM_BG_COLOR_MODE = MY_Cataclysm.BG_COLOR_MODE
 
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local X, Y = 20, 20
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 20, 20
+	local x, y = nPaddingX, nPaddingY
 
 	local tDistanceLevel = CFG.tDistanceLevel
 	local tDistanceCol = CFG.tDistanceCol
@@ -146,7 +146,7 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Height() + 5
 
 	-- 设置分段距离等级
-	x = X + 10
+	x = nPaddingX + 10
 	if CFG.bEnableDistance then
 		y = y + ui:Append('WndButton', {
 			x = x, y = y, w = 150, h = 35,
@@ -182,7 +182,7 @@ function PS.OnPanelActive(frame)
 	-- 统一背景
 	if not CFG.bEnableDistance
 	or CFG.nBGColorMode == CTM_BG_COLOR_MODE.SAME_COLOR then
-		x = X + 20
+		x = nPaddingX + 20
 		ui:Append('Text', { x = x, y = y, text = g_tStrings.BACK_COLOR }):AutoWidth()
 		x = 280
 		x = x + ui:Append('Shadow', {
@@ -204,7 +204,7 @@ function PS.OnPanelActive(frame)
 
 	-- 分段距离背景
 	if CFG.bEnableDistance then
-		x = X + 20
+		x = nPaddingX + 20
 		for i = 1, #tDistanceLevel do
 			local n = tDistanceLevel[i - 1] or 0
 			local text = n .. g_tStrings.STR_METER .. ' - '
@@ -248,7 +248,7 @@ function PS.OnPanelActive(frame)
 	end
 
 	-- 出同步范围背景
-	x = X + 20
+	x = nPaddingX + 20
 	ui:Append('Text', {
 		x = x, y = y,
 		text = CFG.bEnableDistance
@@ -294,7 +294,7 @@ function PS.OnPanelActive(frame)
 	y = y + 30
 
 	-- 离线背景
-	x = X + 20
+	x = nPaddingX + 20
 	ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_GUILD_OFFLINE .. g_tStrings.BACK_COLOR }):AutoWidth()
 	x = 280
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
@@ -332,7 +332,7 @@ function PS.OnPanelActive(frame)
 	y = y + 30
 
 	-- 内力
-	x = X + 20
+	x = nPaddingX + 20
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
 		ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }):AutoWidth()
 		y = y + ui:Append('Shadow', {
@@ -352,7 +352,7 @@ function PS.OnPanelActive(frame)
 	end
 
 	-- 血条蓝条渐变色
-	x = X + 10
+	x = nPaddingX + 10
 	y = y + 5
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
 		x = x + ui:Append('WndCheckBox', {

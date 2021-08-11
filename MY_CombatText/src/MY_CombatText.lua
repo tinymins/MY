@@ -1037,8 +1037,8 @@ local PS = {}
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
 	local W, H = ui:Size()
-	local X, Y = 20, 10
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 20, 10
+	local x, y = nPaddingX, nPaddingY
 	local deltaY = 28
 
 	ui:Append('Text', { x = x, y = y, text = _L['CombatText'], font = 27 })
@@ -1076,7 +1076,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + deltaY
 
-	x = X + 10
+	x = nPaddingX + 10
 	ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_QUESTTRACE_CHANGE_ALPHA, color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
 	ui:Append('WndTrackbar', {
@@ -1105,7 +1105,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + deltaY
 
-	x = X + 10
+	x = nPaddingX + 10
 	ui:Append('Text', { x = x, y = y, text = _L['FadeIn time'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
 	ui:Append('WndTrackbar', {
@@ -1134,7 +1134,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + deltaY
 
-	x = X + 10
+	x = nPaddingX + 10
 	ui:Append('Text', { x = x, y = y, text = _L['Font Size'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
 	ui:Append('WndTrackbar', {
@@ -1150,11 +1150,11 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + deltaY
 
-	x = X
+	x = nPaddingX
 	ui:Append('Text', { x = x, y = y, text = _L['Circle Style'], font = 27, autoenable = IsEnabled })
 	y = y + deltaY
 
-	x = X + 10
+	x = nPaddingX + 10
 	ui:Append('WndRadioBox', {
 		x = x, y = y + 5, text = _L['hit feel'],
 		group = 'style',
@@ -1204,11 +1204,11 @@ function PS.OnPanelActive(frame)
 	x = x + 90
 	y = y + deltaY
 
-	x = X
+	x = nPaddingX
 	ui:Append('Text', { x = x, y = y, text = _L['Text Style'], font = 27, autoenable = IsEnabled })
 	y = y + deltaY
 
-	x = X + 10
+	x = nPaddingX + 10
 	ui:Append('Text', { x = x, y = y, text = _L['Skill Style'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 110
 	ui:Append('WndEditBox', {
@@ -1237,7 +1237,7 @@ function PS.OnPanelActive(frame)
 	end
 	y = y + deltaY
 
-	x = X + 10
+	x = nPaddingX + 10
 	ui:Append('Text', { x = x, y = y, text = _L['Damage Style'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 110
 	ui:Append('WndEditBox', {
@@ -1266,7 +1266,7 @@ function PS.OnPanelActive(frame)
 	end
 	y = y + deltaY
 
-	x = X + 10
+	x = nPaddingX + 10
 	ui:Append('Text', { x = x, y = y, text = _L['Therapy Style'], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 110
 	ui:Append('WndEditBox', {
@@ -1295,7 +1295,7 @@ function PS.OnPanelActive(frame)
 	end
 	y = y + deltaY
 
-	x = X + 10
+	x = nPaddingX + 10
 	ui:Append('Text', { x = x, y = y, text = _L['CombatText Tips'], color = { 196, 196, 196 }, autoenable = IsEnabled })
 	y = y + deltaY
 
@@ -1339,7 +1339,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + deltaY
 
-	x = X
+	x = nPaddingX
 	ui:Append('Text', { x = x, y = y, text = _L['Color edit'], font = 27, autoenable = IsEnabled })
 	x = x + 10
 	y = y + deltaY
@@ -1356,7 +1356,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + deltaY
 
-	x = X + 10
+	x = nPaddingX + 10
 	local i = 0
 	for k, v in pairs(O.col) do
 		if k ~= SKILL_RESULT_TYPE.EFFECTIVE_THERAPY then
@@ -1379,7 +1379,7 @@ function PS.OnPanelActive(frame)
 
 	if IsFileExist(COMBAT_TEXT_CONFIG) then
 		ui:Append('WndButton', {
-			x = W - 120 - X, y = 15, w = 120, h = 40,
+			x = W - 120 - nPaddingX, y = 15, w = 120, h = 40,
 			text = _L['Load CombatText Config'],
 			buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
 			onclick = CombatText.CheckEnable,

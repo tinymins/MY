@@ -59,12 +59,12 @@ local CTM_BG_COLOR_MODE = MY_Cataclysm.BG_COLOR_MODE
 
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local X, Y = 20, 20
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 20, 20
+	local x, y = nPaddingX, nPaddingY
 
 	y = y + ui:Append('Text', { x = x, y = y, text = _L['Interface settings'], font = 27 }):Height()
 
-	x = X + 10
+	x = nPaddingX + 10
 	y = y + 3
 	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Official team frame style'],
@@ -90,7 +90,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Height()
 
-	x = X + 10
+	x = nPaddingX + 10
 	x = x + ui:Append('Text', { x = x, y = y, text = _L['Interface Width']}):AutoWidth():Width() + 5
 	y = y + ui:Append('WndTrackbar', {
 		x = x, y = y + 3, h = 25, w = 250,
@@ -108,7 +108,7 @@ function PS.OnPanelActive(frame)
 		textfmt = function(val) return _L('%d%%', val) end,
 	}):Height()
 
-	x = X + 10
+	x = nPaddingX + 10
 	x = x + ui:Append('Text', { x = x, y = y, text = _L['Interface Height']}):AutoWidth():Width() + 5
 	y = y + ui:Append('WndTrackbar', {
 		x = x, y = y + 3, h = 25, w = 250,
@@ -126,7 +126,7 @@ function PS.OnPanelActive(frame)
 		textfmt = function(val) return _L('%d%%', val) end,
 	}):Height()
 
-	x = X
+	x = nPaddingX
 	y = y + 10
 	y = y + ui:Append('Text', { x = x, y = y, text = g_tStrings.OTHER, font = 27 }):Height()
 
@@ -157,7 +157,7 @@ function PS.OnPanelActive(frame)
 		}):Height()
 	end
 
-	x = X
+	x = nPaddingX
 	y = y + 10
 	y = y + ui:Append('Text', { x = x, y = y, text = _L['Arrangement'], font = 27 }):Height()
 

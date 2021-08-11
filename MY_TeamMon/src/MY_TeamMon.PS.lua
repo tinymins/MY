@@ -62,8 +62,8 @@ local PS = {}
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y = 20, 20
-	local nX, nY = X, Y
+	local nPaddingX, nPaddingY = 20, 20
+	local nX, nY = nPaddingX, nPaddingY
 	local nLineH = 22
 
 	-- ui:Append('WndButton', {
@@ -74,9 +74,9 @@ function PS.OnPanelActive(wnd)
 	-- 	end,
 	-- })
 
-	nX, nY = ui:Append('Text', { x = X, y = Y, text = _L['Master switch'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = nPaddingX, y = nPaddingY, text = _L['Master switch'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndCheckBox', {
-		x = X + 10, y = nY, text = _L['Enable MY_TeamMon'],
+		x = nPaddingX + 10, y = nY, text = _L['Enable MY_TeamMon'],
 		checked = MY_TeamMon.bEnable,
 		oncheck = function(bCheck)
 			MY_TeamMon.bEnable = bCheck
@@ -100,9 +100,9 @@ function PS.OnPanelActive(wnd)
 	end
 	nY = nY + nLineH
 
-	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Enable alarm (master switch)'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Enable alarm (master switch)'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndCheckBox', {
-		x = X + 10, y = nY,
+		x = nPaddingX + 10, y = nY,
 		text = _L['Team channel alarm'],
 		color = GetMsgFontColor('MSG_TEAM', true),
 		checked = MY_TeamMon.bPushTeamChannel,
@@ -132,7 +132,7 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bPushCenterAlarm = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = X + 5
+	nX = nPaddingX + 5
 	if not LIB.IsRestricted('MY_TeamMon_LT') then
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Large text alarm'],
@@ -167,18 +167,18 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bPushScreenHead = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
-		x = X + 10, y = nY, text = _L['Team panel bind show buff'],
+		x = nPaddingX + 10, y = nY, text = _L['Team panel bind show buff'],
 		checked = MY_TeamMon.bPushTeamPanel,
 		oncheck = function(bCheck)
 			MY_TeamMon.bPushTeamPanel = bCheck
 			FireUIEvent('MY_TM_CREATE_CACHE')
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Buff list'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Buff list'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndComboBox', {
-		x = X + 10, y = nY, text = _L['Max buff count'],
+		x = nPaddingX + 10, y = nY, text = _L['Max buff count'],
 		menu = function()
 			local menu = {}
 			for k, v in ipairs({ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }) do
@@ -201,16 +201,16 @@ function PS.OnPanelActive(wnd)
 			return menu
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('Text', { x = X, y = nY + 5, text = _L['Data save mode'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Data save mode'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
-		x = X + 10, y = nY, text = _L['Use common data'],
+		x = nPaddingX + 10, y = nY, text = _L['Use common data'],
 		checked = MY_TeamMon.bCommon,
 		oncheck = function(bCheck)
 			MY_TeamMon.bCommon = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
-		x = X + 5, y = nY + 15, text = _L['Data panel'],
+		x = nPaddingX + 5, y = nY + 15, text = _L['Data panel'],
 		buttonstyle = 'FLAT',
 		onclick = MY_TeamMon_UI.TogglePanel,
 	}):AutoWidth():Pos('BOTTOMRIGHT')

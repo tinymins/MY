@@ -825,15 +825,15 @@ local PS = { nPriority = 2.1 }
 
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local W, H = ui:Size()
-	local X, Y = 40, 10
-	local nX, nY, nLFY = X, Y, Y
+	local nW, nH = ui:Size()
+	local nPaddingX, nPaddingY = 40, 10
+	local nX, nY, nLFY = nPaddingX, nPaddingY, nPaddingY
 	local nLineHeightS, nLineHeightM, nLineHeightL = 22, 28, 32
 
 	-- loot
 	ui:Append('Text', { text = _L['Pickup helper'], x = nX, y = nY, font = 27 })
 
-	nX, nY = X + 10, Y + nLineHeightM
+	nX, nY = nPaddingX + 10, nPaddingY + nLineHeightM
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Enable auto pickup'],
@@ -856,17 +856,17 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
-	nX, nY = X + 10, nY + nLineHeightM
+	nX, nY = nPaddingX + 10, nY + nLineHeightM
 	nLFY = nY
 
-	nX, nY, nLFY = MY_GKPLoot.OnPanelActivePartial(ui, X, Y, W, H, nLineHeightM, nX, nY, nLFY)
+	nX, nY, nLFY = MY_GKPLoot.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLineHeightM, nX, nY, nLFY)
 
 	-- doodad
 	if not LIB.IsRestricted('MY_GKPDoodad.HeadName') then
-		nX, nY = X, nY + nLineHeightL
+		nX, nY = nPaddingX, nY + nLineHeightL
 		ui:Append('Text', { text = _L['Craft assit'], x = nX, y = nY, font = 27 })
 
-		nX, nY = X + 10, nY + nLineHeightM
+		nX, nY = nPaddingX + 10, nY + nLineHeightM
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Show the head name'],
@@ -915,7 +915,7 @@ function PS.OnPanelActive(frame)
 			autoenable = function() return O.bShowName end,
 		}):Width() + 5
 
-		nX, nY = X + 10, nY + nLineHeightM
+		nX, nY = nPaddingX + 10, nY + nLineHeightM
 		nX = ui:Append('WndCheckBox', {
 			text = _L['Display minimap flag'],
 			x = nX, y = nY,
@@ -966,19 +966,19 @@ function PS.OnPanelActive(frame)
 		--[[#DEBUG END]]
 
 		-- craft
-		nX, nY = X + 10, nY + nLineHeightM
+		nX, nY = nPaddingX + 10, nY + nLineHeightM
 		for _, v in ipairs(D.aCraft) do
 			if v == 0 then
 				nY = nY + 8
 				if nX ~= 10 then
 					nY = nY + nLineHeightS
-					nX = X + 10
+					nX = nPaddingX + 10
 				end
 			else
 				local szName = GetDoodadTemplateName(v)
 				if szName then
-					if nX + 90 > W - (X + 10) then
-						nX = X + 10
+					if nX + 90 > nW - (nPaddingX + 10) then
+						nX = nPaddingX + 10
 						nY = nY + nLineHeightS
 					end
 					ui:Append('WndCheckBox', {
@@ -1000,10 +1000,10 @@ function PS.OnPanelActive(frame)
 				end
 			end
 		end
-		nX = X
+		nX = nPaddingX
 		nY = nY + nLineHeightM
 
-		nX = X + 10
+		nX = nPaddingX + 10
 		nY = nY + 3
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
@@ -1083,7 +1083,7 @@ function PS.OnPanelActive(frame)
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 		-- recent / all
-		nX, nY = X + 10, nY + nLineHeightM
+		nX, nY = nPaddingX + 10, nY + nLineHeightM
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Recent doodad'],
@@ -1109,7 +1109,7 @@ function PS.OnPanelActive(frame)
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
 		-- custom
-		nX, nY = X + 10, nY + nLineHeightM
+		nX, nY = nPaddingX + 10, nY + nLineHeightM
 		nX = ui:Append('WndCheckBox', {
 			text = _L['Customs (split by | )'],
 			x = nX, y = nY,

@@ -109,23 +109,23 @@ end
 -- init
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local W, H = ui:Size()
-	local X, Y = 20, 10
-	local nX, nY = X, Y
+	local nW, nH = ui:Size()
+	local nPaddingX, nPaddingY = 20, 10
+	local nX, nY = nPaddingX, nPaddingY
 	local lover = D.GetLover()
 
-	ui:Append('Text', { text = _L['Heart lover'], x = X, y = nY, font = 27 })
+	ui:Append('Text', { text = _L['Heart lover'], x = nPaddingX, y = nY, font = 27 })
 	-- lover info
 	nY = nY + 36
 	if not LIB.CanUseOnlineRemoteStorage() then
-		nX = X + 10
+		nX = nPaddingX + 10
 		nY = nY + ui:Append('Text', {
-			x = nX, y = nY, w = W - nX, h = 120,
+			x = nX, y = nY, w = nW - nX, h = 120,
 			text = _L['Please enable sync common ui config first'],
 			font = 19, r = 255, g = 255, b = 0, multiline = true,
 		}):AutoHeight():Height() + 25
 		nY = nY + ui:Append('WndButton', {
-			x = (W - 100) / 2, y = nY, w = 100, h = 30,
+			x = (nW - 100) / 2, y = nY, w = 100, h = 30,
 			text = _L['Refresh'],
 			onclick = function()
 				D.RefreshPS()
@@ -133,7 +133,7 @@ function PS.OnPanelActive(wnd)
 		}):Height() + 20
 	else
 		if not lover or not lover.dwID or lover.dwID == 0 then
-			nX = X + 10
+			nX = nPaddingX + 10
 			nX = ui:Append('Text', { text = _L['No lover :-('], font = 19, x = nX, y = nY }):Pos('BOTTOMRIGHT')
 			nX = ui:Append('Text', {
 				text = _L['[Restore]'], x = nX + 10, y = nY,
@@ -150,7 +150,7 @@ function PS.OnPanelActive(wnd)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 			-- create lover
-			nX = X + 10
+			nX = nPaddingX + 10
 			nY = nY + 36
 			nX = ui:Append('Text', { text = _L['Mutual love friend Lv.6: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
 			nX = ui:Append('WndComboBox', {
@@ -159,7 +159,7 @@ function PS.OnPanelActive(wnd)
 				menu = function() return D.GetLoverMenu(1) end,
 			}):Pos('BOTTOMRIGHT')
 			ui:Append('Text', { text = _L['(4-feets, with specific fireworks)'], x = nX + 5, y = nY })
-			nX = X + 10
+			nX = nPaddingX + 10
 			nY = nY + 28
 			nX = ui:Append('Text', { text = _L['Blind love friend Lv.2: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
 			nX = ui:Append('WndComboBox', {
@@ -173,7 +173,7 @@ function PS.OnPanelActive(wnd)
 			Wnd.OpenWindow('SocialPanel')
 			Wnd.CloseWindow('SocialPanel')
 			-- show lover
-			nX = X + 10
+			nX = nPaddingX + 10
 			nX = ui:Append('Text', { text = lover.szName, font = 19, x = nX, y = nY, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')
 			local map = lover.bOnline and LIB.GetMapInfo(lover.dwMapID)
 			if not IsEmpty(lover.szLoverTitle) then
@@ -184,7 +184,7 @@ function PS.OnPanelActive(wnd)
 			else
 				ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_OFFLINE .. ')', font = 62, x = nX + 10, y = nY })
 			end
-			nX = X + 10
+			nX = nPaddingX + 10
 			nY = nY + 36
 			nX = ui:Append('Text', { text = D.FormatLoverString('{$type}{$time}', lover), font = 2, x = nX, y = nY }):AutoWidth():Pos('BOTTOMRIGHT')
 			if lover.nLoverType == 1 then
@@ -212,7 +212,7 @@ function PS.OnPanelActive(wnd)
 			nY = nY + 10
 		end
 		-- local setting
-		nX = X + 10
+		nX = nPaddingX + 10
 		nY = nY + 28
 		nX = ui:Append('Text', { text = _L['Non-love display: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndEditBox', {
@@ -227,7 +227,7 @@ function PS.OnPanelActive(wnd)
 			oncheck = function(bChecked) MY_Love.bQuiet = bChecked end,
 		})
 		-- jabber
-		nX = X + 10
+		nX = nPaddingX + 10
 		nY = nY + 28
 		nX = ui:Append('Text', { text = _L['Quick to accost text: '], x = nX, y = nY }):Pos('BOTTOMRIGHT')
 		ui:Append('WndEditBox', {
@@ -236,7 +236,7 @@ function PS.OnPanelActive(wnd)
 			onchange = function(szText) MY_Love.szJabber = szText end,
 		})
 		-- signature
-		nX = X + 10
+		nX = nPaddingX + 10
 		nY = nY + 36
 		nX = ui:Append('Text', { text = _L['Love signature: '], x = nX, y = nY, font = 27 }):Pos('BOTTOMRIGHT')
 		ui:Append('WndEditBox', {
@@ -265,36 +265,36 @@ function PS.OnPanelActive(wnd)
 
 	-- tips
 	nY = nY + 10
-	ui:Append('Text', { text = _L['Tips'], x = X, y = nY, font = 27 })
-	nX = X + 10
+	ui:Append('Text', { text = _L['Tips'], x = nPaddingX, y = nY, font = 27 })
+	nX = nPaddingX + 10
 	nY = nY + 35
 
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
 		text = _L['1. You can break love one-sided.'],
 	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
 		text = _L['2. Data was stored in official data segment.'],
 	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
 		text = _L['3. Please do not enable config async, that may cause data lose.'],
 		}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
 		text = _L['4. To recove lover data, please ask you lover click fix button.'],
 	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
 		text = _L['5. Lover must be toway friend, so delete friend will cause both side none-lover.'],
 	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
 		text = _L['6. Lover can see each other\'s location, delete friend can prevent this.'],
 	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = W - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
 		text = _L['7. Backup lover requires both online and teamed up, backup data can be used to restore data while server merge or player crossing server.'],
 	}):AutoHeight():Height() + 1
 	O.bPanelActive = true

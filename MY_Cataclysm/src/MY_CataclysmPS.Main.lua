@@ -58,15 +58,15 @@ local CFG, PS = MY_Cataclysm.CFG, { nPriority = 1 }
 
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local X, Y = 20, 20
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 20, 20
+	local nX, nY = nPaddingX, nPaddingY
 
-	x = X
-	y = y + ui:Append('Text', { x = x, y = y, text = _L['configure'], font = 27 }):Height()
+	nX = nPaddingX
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['configure'], font = 27 }):Height()
 
-	x = X + 10
-	x = x + ui:Append('WndButton', {
-		x = x, y = y + 3, w = 120, h = 25,
+	nX = nPaddingX + 10
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY + 3, w = 120, h = 25,
 		buttonstyle = 'FLAT',
 		text = _L['Load ancient config'],
 		onclick = function()
@@ -79,8 +79,8 @@ function PS.OnPanelActive(frame)
 	}):Width() + 5
 
 	-- 恢复默认
-	y = y + ui:Append('WndButton', {
-		x = x, y = y + 3, w = 100,
+	nY = nY + ui:Append('WndButton', {
+		x = nX, y = nY + 3, w = 100,
 		text = _L['Restore default'],
 		buttonstyle = 'FLAT',
 		onclick = function()
@@ -88,17 +88,17 @@ function PS.OnPanelActive(frame)
 		end,
 	}):Height() + 20
 
-	x = X
-	y = y + ui:Append('Text', { x = x, y = y, text = _L['Cataclysm Team Panel'], font = 27 }):AutoWidth():Height()
+	nX = nPaddingX
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Cataclysm Team Panel'], font = 27 }):AutoWidth():Height()
 
-	x = x + 10
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Enable Cataclysm Team Panel'],
+	nX = nX + 10
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Enable Cataclysm Team Panel'],
 		oncheck = MY_CataclysmMain.ToggleTeamPanel, checked = MY_Cataclysm.bEnable,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Only in team'],
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Only in team'],
 		checked = CFG.bShowInRaid,
 		oncheck = function(bCheck)
 			CFG.bShowInRaid = bCheck
@@ -112,8 +112,8 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	y = y + ui:Append('WndCheckBox', {
-		x = x, y = y, text = g_tStrings.WINDOW_LOCK,
+	nY = nY + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = g_tStrings.WINDOW_LOCK,
 		checked = not CFG.bDrag,
 		oncheck = function(bCheck)
 			CFG.bDrag = not bCheck
@@ -124,28 +124,28 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Height() + 5
 
 	-- 提醒框
-	x = X
-	y = y + ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_RAID_TIP_IMAGE, font = 27 }):Height()
+	nX = nPaddingX
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = g_tStrings.STR_RAID_TIP_IMAGE, font = 27 }):Height()
 
-	x = X + 10
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show attention shadow'],
+	nX = nPaddingX + 10
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show attention shadow'],
 		checked = CFG.bShowAttention,
 		oncheck = function(bCheck)
 			CFG.bShowAttention = bCheck
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show caution animate'],
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show caution animate'],
 		checked = CFG.bShowCaution,
 		oncheck = function(bCheck)
 			CFG.bShowCaution = bCheck
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show screen head'],
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show screen head'],
 		checked = CFG.bShowScreenHead,
 		oncheck = function(bCheck)
 			CFG.bShowScreenHead = bCheck
@@ -153,10 +153,10 @@ function PS.OnPanelActive(frame)
 		tip = _L['Requires MY_LifeBar loaded.'],
 	}):AutoWidth():Width() + 5
 
-	x = X + 10
-	y = y + 25
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Attack Warning'],
+	nX = nPaddingX + 10
+	nY = nY + 25
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Attack Warning'],
 		checked = CFG.bHPHitAlert,
 		oncheck = function(bCheck)
 			CFG.bHPHitAlert = bCheck
@@ -166,16 +166,16 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show distance'],
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show distance'],
 		checked = CFG.bShowDistance,
 		oncheck = function(bCheck)
 			CFG.bShowDistance = bCheck
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['ZuiWu Effect'],
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['ZuiWu Effect'],
 		checked = CFG.bShowEffect,
 		oncheck = function(bCheck)
 			CFG.bShowEffect = bCheck
@@ -184,8 +184,8 @@ function PS.OnPanelActive(frame)
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show central party member tag'],
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show central party member tag'],
 		checked = CFG.bShowSputtering,
 		oncheck = function(bCheck)
 			CFG.bShowSputtering = bCheck
@@ -193,8 +193,8 @@ function PS.OnPanelActive(frame)
 		tip = _L['Show color on right top pos of central member of each party'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndButton', {
-		x = x, y = y, w = 25, h = 25,
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY, w = 25, h = 25,
 		buttonstyle = 'OPTION',
 		menu = function()
 			return {
@@ -249,10 +249,10 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return CFG.bShowSputtering end,
 	}):Width() + 5
 
-	x = X + 10
-	y = y + 25
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show target\'s target'],
+	nX = nPaddingX + 10
+	nY = nY + 25
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show target\'s target'],
 		checked = CFG.bShowTargetTargetAni,
 		oncheck = function(bCheck)
 			CFG.bShowTargetTargetAni = bCheck
@@ -262,16 +262,16 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show Boss target'],
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show Boss target'],
 		checked = CFG.bShowBossTarget,
 		oncheck = function(bCheck)
 			CFG.bShowBossTarget = bCheck
 		end,
 	}):AutoWidth():Width() + 5
 
-	y = y + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show Boss focus'],
+	nY = nY + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show Boss focus'],
 		checked = CFG.bShowBossFocus,
 		oncheck = function(bCheck)
 			CFG.bShowBossFocus = bCheck
@@ -279,39 +279,39 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Height()
 
 	-- 其他
-	x = X
-	y = y + 4
-	y = y + ui:Append('Text', { x = x, y = y, text = g_tStrings.OTHER, font = 27 }):Height()
+	nX = nPaddingX
+	nY = nY + 4
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = g_tStrings.OTHER, font = 27 }):Height()
 
-	x = X + 10
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show tip at right bottom'],
+	nX = nPaddingX + 10
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show tip at right bottom'],
 		checked = CFG.bShowTipAtRightBottom,
 		oncheck = function(bCheck)
 			CFG.bShowTipAtRightBottom = bCheck
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Don\'t show tip in fight'],
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Don\'t show tip in fight'],
 		checked = CFG.bHideTipInFight,
 		oncheck = function(bCheck)
 			CFG.bHideTipInFight = bCheck
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = X + 10
-	y = y + 25
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = g_tStrings.STR_RAID_TARGET_ASSIST,
+	nX = nPaddingX + 10
+	nY = nY + 25
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = g_tStrings.STR_RAID_TARGET_ASSIST,
 		checked = CFG.bTempTargetEnable,
 		oncheck = function(bCheck)
 			CFG.bTempTargetEnable = bCheck
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = x + ui:Append('WndTrackbar', {
-		x = x, y = y - 1,
+	nX = nX + ui:Append('WndTrackbar', {
+		x = nX, y = nY - 1,
 		value = CFG.nTempTargetDelay / 75,
 		range = {0, 8},
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
@@ -326,17 +326,17 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return CFG.bTempTargetEnable end,
 	}):AutoWidth():Width()
 
-	x = X + 10
-	y = y + 25
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Alt view player'],
+	nX = nPaddingX + 10
+	nY = nY + 25
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Alt view player'],
 		checked = CFG.bAltView,
 		oncheck = function(bCheck)
 			CFG.bAltView = bCheck
 		end,
 	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Disable in fight'],
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Disable in fight'],
 		checked = not CFG.bAltViewInFight,
 		oncheck = function(bCheck)
 			CFG.bAltViewInFight = not bCheck
@@ -344,10 +344,10 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return CFG.bAltView end,
 	}):AutoWidth():Width() + 5
 
-	x = X + 10
-	y = y + 25
-	y = y + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+	nX = nPaddingX + 10
+	nY = nY + 25
+	nY = nY + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Faster Refresh HP (Greater performance loss)'],
 		checked = CFG.bFasterHP,
 		oncheck = function(bCheck)
@@ -361,6 +361,6 @@ function PS.OnPanelActive(frame)
 			end
 		end,
 	}):Pos('BOTTOMRIGHT')
-	y = y + 25
+	nY = nY + 25
 end
 LIB.RegisterPanel(_L['Raid'], 'MY_Cataclysm', _L['Cataclysm'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)

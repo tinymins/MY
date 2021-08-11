@@ -174,11 +174,11 @@ LIB.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_LT', D.Init)
 local PS = { szRestriction = 'MY_TeamMon_LT' }
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local X, Y = 20, 20
-	local nX, nY = X, Y
+	local nPaddingX, nPaddingY = 20, 20
+	local nX, nY = nPaddingX, nPaddingY
 
 	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['MY_TeamMon_LT'], font = 27 }):Pos('BOTTOMRIGHT')
-	nX = ui:Append('Text', { text = _L['Font scale'], x = X + 10, y = nY + 10 }):Pos('BOTTOMRIGHT')
+	nX = ui:Append('Text', { text = _L['Font scale'], x = nPaddingX + 10, y = nY + 10 }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 13, text = '',
 		range = {1, 2, 10}, value = O.fScale,
@@ -188,7 +188,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):Pos('BOTTOMRIGHT')
 
-	nX = ui:Append('Text', { text = _L['Pause time'], x = X + 10, y = nY }):Pos('BOTTOMRIGHT')
+	nX = ui:Append('Text', { text = _L['Pause time'], x = nPaddingX + 10, y = nY }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0.5, 3, 25}, value = O.fPause,
@@ -197,7 +197,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):Pos('BOTTOMRIGHT')
 
-	nX = ui:Append('Text', { text = _L['FadeOut time'], x = X + 10, y = nY }):Pos('BOTTOMRIGHT')
+	nX = ui:Append('Text', { text = _L['FadeOut time'], x = nPaddingX + 10, y = nY }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0, 3, 30}, value = O.fFadeOut,
@@ -208,7 +208,7 @@ function PS.OnPanelActive(frame)
 
 	nY = nY + 10
 	nX = ui:Append('WndButton', {
-		x = X + 10, y = nY + 5,
+		x = nPaddingX + 10, y = nY + 5,
 		text = g_tStrings.FONT,
 		buttonstyle = 'FLAT',
 		onclick = function()

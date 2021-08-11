@@ -63,33 +63,33 @@ local PS = {
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local X, Y, LH = 20, 20, 30
-	local W, H = ui:Size()
-	local nX, nY, nLFY = X, Y, Y
+	local nPaddingX, nPaddingY, LH = 20, 20, 30
+	local nW, nH = ui:Size()
+	local nX, nY, nLFY = nPaddingX, nPaddingY, nPaddingY
 
 	-- 角色认证
-	nX, nY, nLFY = MY_JBBind.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	nX, nY, nLFY = MY_JBBind.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
 
 	-- 快捷入团
-	nX = X
+	nX = nPaddingX
 	nLFY = nLFY + 5
-	nX, nY, nLFY = MY_JBTeam.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	nX, nY, nLFY = MY_JBTeam.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
 
 	-- 赛事上报
-	nX = X
+	nX = nPaddingX
 	nLFY = nLFY + 5
-	nX, nY, nLFY = MY_JBAchievementRank.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
-	nX, nY, nLFY = MY_CombatLogs.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	nX, nY, nLFY = MY_JBAchievementRank.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
+	nX, nY, nLFY = MY_CombatLogs.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
 
 	-- 赛事投票
-	nX = X
+	nX = nPaddingX
 	nLFY = nLFY + 5
-	nX, nY, nLFY = MY_JBEventVote.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	nX, nY, nLFY = MY_JBEventVote.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
 
 	-- 团队快照
-	nX = X
+	nX = nPaddingX
 	nLFY = nLFY + 5
-	nX, nY, nLFY = MY_JBTeamSnapshot.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
+	nX, nY, nLFY = MY_JBTeamSnapshot.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
 end
 
 LIB.RegisterPanel(_L['Raid'], 'MY_JX3BOX', _L['Team Platform'], 5962, PS)

@@ -301,15 +301,15 @@ end)
 local PS = { szRestriction = 'MY_Force' }
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local X, Y = 25, 25
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 25, 25
+	local x, y = nPaddingX, nPaddingY
 	local W, H = ui:Size()
 	-- wu du
 	---------------
 	ui:Append('Text', { text = g_tStrings.tForceTitle[CONSTANT.FORCE_TYPE.WU_DU], x = x, y = y, font = 27 })
 	if GLOBAL.GAME_BRANCH ~= 'classic' then
 		-- crlf
-		x = X + 10
+		x = nPaddingX + 10
 		y = y + 28
 		-- disappear
 		x = ui:Append('WndCheckBox', {
@@ -332,7 +332,7 @@ function PS.OnPanelActive(frame)
 			end,
 		}):AutoWidth()
 		-- crlf
-		x = X + 10
+		x = nPaddingX + 10
 		y = y + 28
 		-- guding
 		x = ui:Append('WndCheckBox', {
@@ -363,7 +363,7 @@ function PS.OnPanelActive(frame)
 				MY_ForceGuding.bAutoSay = bChecked
 			end,
 		})
-		x = X + 10
+		x = nPaddingX + 10
 		y = y + 28
 		ui:Append('WndEditBox', {
 			x = x, y = y, w = W - x * 2, h = 50,
@@ -378,7 +378,7 @@ function PS.OnPanelActive(frame)
 		y = y + 54
 		if not LIB.IsRestricted('MY_ForceGuding') then
 			-- crlf
-			x = X + 10
+			x = nPaddingX + 10
 			x = ui:Append('WndCheckBox', {
 				x = x, y = y,
 				checked = MY_ForceGuding.bUseMana,
@@ -410,12 +410,12 @@ function PS.OnPanelActive(frame)
 	end
 	-- other
 	---------------
-	x = X
+	x = nPaddingX
 	ui:Append('Text', { text = _L['Others'], x = x, y = y, font = 27 })
 	-- crlf
-	x = X + 10
+	x = nPaddingX + 10
 	y = y + 28
-	x, y = MY_EnergyBar.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_EnergyBar.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y)
 	-- hungry
 	x = ui:Append('WndCheckBox', {
 		x = x, y = y,
@@ -427,7 +427,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	-- crlf
-	x = X + 10
+	x = nPaddingX + 10
 	y = y + 28
 	-- be wanted alert
 	ui:Append('WndCheckBox', {
@@ -440,7 +440,7 @@ function PS.OnPanelActive(frame)
 		end,
 	})
 	-- crlf
-	x = X + 10
+	x = nPaddingX + 10
 	y = y + 28
 	-- debuff type num
 	x = ui:Append('WndCheckBox', {
@@ -472,8 +472,8 @@ function PS.OnPanelActive(frame)
 		end,
 	})
 	-- crlf
-	x = X + 10
+	x = nPaddingX + 10
 	y = y + 28
-	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, X, Y, W, H, x, y)
+	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y)
 end
 LIB.RegisterPanel(_L['Target'], 'MY_Force', _L['MY_Force'], 327, PS)

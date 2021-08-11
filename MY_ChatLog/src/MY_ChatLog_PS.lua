@@ -232,8 +232,8 @@ function D.ExportConfirm()
 	})
 	local btnSure
 	local tChannels = {}
-	local X, Y = 10, 10
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 10, 10
+	local x, y = nPaddingX, nPaddingY
 	local nMaxWidth = 0
 	for nGroup, info in ipairs(LOG_TYPE) do
 		x = x + ui:Append('WndCheckBox', {
@@ -254,9 +254,9 @@ function D.ExportConfirm()
 				btnSure:Enable(bEnable)
 			end,
 		}):AutoWidth():Width()
-		nMaxWidth = max(nMaxWidth, x + X)
+		nMaxWidth = max(nMaxWidth, x + nPaddingX)
 		if nGroup % 2 == 0 or nGroup == #LOG_TYPE then
-			x = X
+			x = nPaddingX
 			y = y + 30
 		else
 			x = x + 5
@@ -265,7 +265,7 @@ function D.ExportConfirm()
 	end
 	y = y + 10
 
-	x = X + 20
+	x = nPaddingX + 20
 	btnSure = ui:Append('WndButton', {
 		x = x, y = y, w = nMaxWidth - x * 2, h = 35,
 		text = _L['Export chatlog'],
@@ -389,90 +389,90 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
-	local w, h = ui:Size()
-	local X, Y = 25, 25
-	local x, y = X, Y
+	local nW, nH = ui:Size()
+	local nPaddingX, nPaddingY = 25, 25
+	local nX, nY = nPaddingX, nPaddingY
 	local dy = 35
 	local wr = 200
 
 	-- ×ó²à
-	x = X
-	ui:Append('Text', { x = x, y = y, text = _L['Settings'], font = 27 })
-	y = y + dy
-	x = X + 10
+	nX = nPaddingX
+	ui:Append('Text', { x = nX, y = nY, text = _L['Settings'], font = 27 })
+	nY = nY + dy
+	nX = nPaddingX + 10
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = wr,
+		x = nX, y = nY, w = wr,
 		text = _L['Filter tong member log message'],
 		checked = MY_ChatLog.bIgnoreTongMemberLogMsg,
 		oncheck = function(bChecked)
 			MY_ChatLog.bIgnoreTongMemberLogMsg = bChecked
 		end
 	})
-	y = y + dy
+	nY = nY + dy
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = wr,
+		x = nX, y = nY, w = wr,
 		text = _L['Filter tong online message'],
 		checked = MY_ChatLog.bIgnoreTongOnlineMsg,
 		oncheck = function(bChecked)
 			MY_ChatLog.bIgnoreTongOnlineMsg = bChecked
 		end
 	})
-	y = y + dy
+	nY = nY + dy
 
 	if not LIB.IsRestricted('MY_ChatLog.RealtimeCommit') then
 		ui:Append('WndCheckBox', {
-			x = x, y = y, w = wr,
+			x = nX, y = nY, w = wr,
 			text = _L['Realtime database commit'],
 			checked = MY_ChatLog.bRealtimeCommit,
 			oncheck = function(bChecked)
 				MY_ChatLog.bRealtimeCommit = bChecked
 			end
 		})
-		y = y + dy
+		nY = nY + dy
 	end
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = wr,
+		x = nX, y = nY, w = wr,
 		text = _L['Auto connect database'],
 		checked = MY_ChatLog.bAutoConnectDB,
 		oncheck = function(bChecked)
 			MY_ChatLog.bAutoConnectDB = bChecked
 		end
 	})
-	y = y + dy
+	nY = nY + dy
 
-	x = X
-	ui:Append('Text', { x = x, y = y, w = w, text = _L['Tips'], font = 27, multiline = true, valign = 0 })
-	y = y + 30
-	x = X + 10
-	ui:Append('Text', { x = x, y = y, w = w, text = _L['MY_ChatLog TIPS'], font = 27, multiline = true, valign = 0 })
+	nX = nPaddingX
+	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['Tips'], font = 27, multiline = true, valign = 0 })
+	nY = nY + 30
+	nX = nPaddingX + 10
+	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['MY_ChatLog TIPS'], font = 27, multiline = true, valign = 0 })
 
 	-- ÓÒ²à
-	x = w - 150
-	y = Y
+	nX = nW - 150
+	nY = nPaddingY
 	dy = 40
 	ui:Append('WndButton', {
-		x = x, y = y, w = 125, h = 35,
+		x = nX, y = nY, w = 125, h = 35,
 		text = _L['Open chatlog'],
 		onclick = function()
 			MY_ChatLog.Open()
 		end,
 	})
-	y = y + dy
+	nY = nY + dy
 
 	ui:Append('WndButton', {
-		x = x, y = y, w = 125, h = 35,
+		x = nX, y = nY, w = 125, h = 35,
 		text = _L['Export chatlog'],
 		onclick = function()
 			D.ExportConfirm()
 		end,
 	})
-	y = y + dy
+	nY = nY + dy
 
 	ui:Append('WndButton', {
-		x = x, y = y, w = 125, h = 35,
+		x = nX, y = nY, w = 125, h = 35,
 		text = _L['Optimize datebase'],
 		onclick = function()
 			LIB.Confirm(_L['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
@@ -483,10 +483,10 @@ function PS.OnPanelActive(wnd)
 			end)
 		end,
 	})
-	y = y + dy
+	nY = nY + dy
 
 	ui:Append('WndButton', {
-		x = x, y = y, w = 125, h = 35,
+		x = nX, y = nY, w = 125, h = 35,
 		text = _L['Import chatlog'],
 		onclick = function()
 			local szRoot = LIB.FormatPath({'export/ChatLog', PATH_TYPE.ROLE})
@@ -504,6 +504,6 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 	})
-	y = y + dy
+	nY = nY + dy
 end
 LIB.RegisterPanel(_L['Chat'], 'ChatLog', _L['MY_ChatLog'], 'ui/Image/button/SystemButton.UITex|43', PS)

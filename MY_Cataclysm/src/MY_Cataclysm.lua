@@ -655,8 +655,8 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		end
 		SafeCall(onCloseNotify)
 	end)
-	local X, Y = 25, 60
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 25, 60
+	local x, y = nPaddingX, nPaddingY
 	if not bHideBase then
 		x = x + ui:Append('Text', {
 			x = x, y = y, h = 25,
@@ -694,7 +694,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		y = y + 10
 	end
 
-	x = X
+	x = nPaddingX
 	x = x + ui:Append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Stacknum'],
@@ -766,7 +766,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	y = y + 10
 
 	if not bHideBase then
-		x = X
+		x = nPaddingX
 		y = y + 10
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y,
@@ -781,7 +781,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		y = y + 10
 	end
 
-	x = X
+	x = nPaddingX
 	x = x + ui:Append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Reminder'],
@@ -860,7 +860,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	}):Width() + 5
 	y = y + 30
 
-	x = X
+	x = nPaddingX
 	x = x + ui:Append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Border alpha'],
@@ -885,7 +885,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	}):AutoWidth():Width() + 5
 	y = y + 30
 
-	x = X
+	x = nPaddingX
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Attention'],

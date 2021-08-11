@@ -923,17 +923,17 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	local tData = D.FormatAutoFocusData(tData)
 	local frame = UI.CreateFrame('MY_Focus_Editor', { close = true, text = _L['Focus rule editor'] })
 	local ui = UI(frame)
-	local X, Y, W = 30, 50, 350
-	local nX, nY = X, Y
+	local nPaddingX, nPaddingY, W = 30, 50, 350
+	local nX, nY = nPaddingX, nPaddingY
 	local dY = 27
 	if not bHideBase then
 		W = 450
 		-- 匹配方式
 		ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Judge method'] }):AutoWidth()
-		nX, nY = X + 10, nY + dY
+		nX, nY = nPaddingX + 10, nY + dY
 		for i, eType in ipairs({ 'NAME', 'NAME_PATT', 'ID', 'TEMPLATE_ID', 'TONG_NAME', 'TONG_NAME_PATT' }) do
 			if i == 5 then
-				nX, nY = X + 10, nY + dY
+				nX, nY = nPaddingX + 10, nY + dY
 			end
 			nX = ui:Append('WndRadioBox', {
 				x = nX, y = nY,
@@ -946,10 +946,10 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		end
-		nX, nY = X, nY + dY
+		nX, nY = nPaddingX, nY + dY
 		-- 目标类型
 		ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target type'] }):AutoWidth()
-		nX, nY = X + 10, nY + dY
+		nX, nY = nPaddingX + 10, nY + dY
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['All'],
@@ -971,11 +971,11 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 				autoenable = function() return not tData.tType.bAll end,
 			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		end
-		nX, nY = X, nY + dY
+		nX, nY = nPaddingX, nY + dY
 	end
 	-- 目标关系
 	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target relation'] }):AutoWidth()
-	nX, nY = X + 10, nY + dY
+	nX, nY = nPaddingX + 10, nY + dY
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['All'],
@@ -997,10 +997,10 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			autoenable = function() return not tData.tRelation.bAll end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	end
-	nX, nY = X, nY + dY
+	nX, nY = nPaddingX, nY + dY
 	-- 目标血量百分比
 	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Target life percentage'] }):AutoWidth()
-	nX, nY = X + 10, nY + dY
+	nX, nY = nPaddingX + 10, nY + dY
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 100, h = 25,
 		text = _L['Enable'],
@@ -1031,10 +1031,10 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 		end,
 		autoenable = function() return tData.tLife.bEnable end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
-	nX, nY = X, nY + dY
+	nX, nY = nPaddingX, nY + dY
 	-- 最远距离
 	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Max distance'] }):AutoWidth()
-	nX, nY = X + 10, nY + dY
+	nX, nY = nPaddingX + 10, nY + dY
 	nX = ui:Append('WndEditBox', {
 		x = nX, y = nY, w = 200, h = 25,
 		text = tData.nMaxDistance,
@@ -1044,10 +1044,10 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			onChangeNotify(tData)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
-	nX, nY = X, nY + dY
+	nX, nY = nPaddingX, nY + dY
 	-- 名称显示
 	ui:Append('Text', { x = nX, y = nY, color = {255, 255, 0}, text = _L['Name display'] }):AutoWidth()
-	nX, nY = X + 10, nY + dY
+	nX, nY = nPaddingX + 10, nY + dY
 	nX = ui:Append('WndEditBox', {
 		x = nX, y = nY, w = 200, h = 25,
 		text = tData.szDisplay,
@@ -1056,7 +1056,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			onChangeNotify(tData)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
-	nX, nY = X, nY + dY
+	nX, nY = nPaddingX, nY + dY
 
 	nY = nY + 20
 	ui:Append('WndButton', {
@@ -1070,7 +1070,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			end)
 		end,
 	})
-	nX, nY = X, nY + dY
+	nX, nY = nPaddingX, nY + dY
 
 	ui:Size(W, nY + 40):Anchor('CENTER')
 end
