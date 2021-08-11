@@ -164,8 +164,8 @@ end
 
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
-	local X, Y = 20, 20
-	local x, y = X, Y
+	local nPaddingX, nPaddingY = 20, 20
+	local x, y = nPaddingX, nPaddingY
 	local w, h = ui:Size()
 
 	ui:Append('Text', { x = x, y = y, text = _L['Find component'], font = 27 })
@@ -181,7 +181,7 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth()
 	ui:Append('Text', { x = x + 0, y = y + 92, text = _L['Find by text'], font = 27 })
 
-	local nX = X + 10
+	local nX = nPaddingX + 10
 	nX = nX + ui:Append('Text', {
 		x = nX, y = y + 120,
 		text = _L['Keyword: '],
