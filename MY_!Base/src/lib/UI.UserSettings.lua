@@ -7,55 +7,26 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 local D = {}
-local FRAME_NAME = NSFormatString('{$NS}_UserSettings')
+local FRAME_NAME = X.NSFormatString('{$NS}_UserSettings')
 
 function D.Open(bImport)
 	local tSettings = {}
 	if bImport then
-		local szRoot = LIB.FormatPath({'export/settings', PATH_TYPE.GLOBAL})
+		local szRoot = X.FormatPath({'export/settings', X.PATH_TYPE.GLOBAL})
 		local szPath = GetOpenFileName(_L['Please select import user settings file.'], 'User Settings File(*.us.jx3dat)\0*.us.jx3dat\0\0', szRoot)
-		if IsEmpty(szPath) then
+		if X.IsEmpty(szPath) then
 			return
 		end
-		tSettings = LIB.LoadLUAData(szPath, { passphrase = false }) or {}
+		tSettings = X.LoadLUAData(szPath, { passphrase = false }) or {}
 	end
 	Wnd.CloseWindow(FRAME_NAME)
 	local W, H = 400, 600
@@ -73,7 +44,7 @@ function D.Open(bImport)
 	})
 	local nW = select(2, uiContainer:Width())
 	local aGroup, tItemAll = {}, {}
-	for _, us in ipairs(LIB.GetRegisterUserSettingsList()) do
+	for _, us in ipairs(X.GetRegisterUserSettingsList()) do
 		if us.szGroup and us.szLabel and (not bImport or tSettings[us.szKey]) then
 			local tGroup = lodash.find(aGroup, function(p) return p.szGroup == us.szGroup end)
 			if not tGroup then
@@ -81,27 +52,27 @@ function D.Open(bImport)
 					szGroup = us.szGroup,
 					aItem = {},
 				}
-				insert(aGroup, tGroup)
+				table.insert(aGroup, tGroup)
 			end
 			local tItem = lodash.find(tGroup.aItem, function(p) return p.szLabel == us.szLabel end)
 			if not tItem then
 				tItem = {
-					szID = wgsub(LIB.GetUUID(), '-', ''),
+					szID = wstring.gsub(X.GetUUID(), '-', ''),
 					szLabel = us.szLabel,
 					aKey = {},
 				}
-				insert(tGroup.aItem, tItem)
+				table.insert(tGroup.aItem, tItem)
 				tItemAll[tItem.szID] = tItem
 			end
-			insert(tItem.aKey, us.szKey)
+			table.insert(tItem.aKey, us.szKey)
 		end
 	end
 	-- ≈≈–Ú
 	local tGroupRank = {}
-	for i, category in ipairs(LIB.GetPanelCategoryList()) do
+	for i, category in ipairs(X.GetPanelCategoryList()) do
 		tGroupRank[category.szName] = i
 	end
-	sort(aGroup, function(g1, g2) return (tGroupRank[g1.szGroup] or HUGE) < (tGroupRank[g2.szGroup] or HUGE) end)
+	table.sort(aGroup, function(g1, g2) return (tGroupRank[g1.szGroup] or math.huge) < (tGroupRank[g2.szGroup] or math.huge) end)
 	-- ªÊ÷∆
 	local tItemChecked = {}
 	for _, tGroup in ipairs(aGroup) do
@@ -156,28 +127,28 @@ function D.Open(bImport)
 				if bCheck then
 					local tItem = tItemAll[szID]
 					for _, szKey in ipairs(tItem.aKey) do
-						insert(aKey, szKey)
+						table.insert(aKey, szKey)
 						tKvp[szKey] = tSettings[szKey]
 					end
 				end
 			end
 			if bImport then
-				local nSuccess = LIB.ImportUserSettings(tKvp)
-				LIB.Systopmsg(_L('%d settings imported.', nSuccess))
+				local nSuccess = X.ImportUserSettings(tKvp)
+				X.Systopmsg(_L('%d settings imported.', nSuccess))
 			else
 				if #aKey == 0 then
-					LIB.Systopmsg(_L['No custom setting selected, nothing to export.'], CONSTANT.MSG_THEME.ERROR)
+					X.Systopmsg(_L['No custom setting selected, nothing to export.'], CONSTANT.MSG_THEME.ERROR)
 					return
 				end
-				tKvp = LIB.ExportUserSettings(aKey)
+				tKvp = X.ExportUserSettings(aKey)
 				local nExport = lodash.size(tKvp)
 				if nExport == 0 then
-					LIB.Systopmsg(_L['No custom setting found, nothing to export.'], CONSTANT.MSG_THEME.ERROR)
+					X.Systopmsg(_L['No custom setting found, nothing to export.'], CONSTANT.MSG_THEME.ERROR)
 					return
 				end
-				local szPath = LIB.FormatPath({'export/settings/' .. LIB.GetUserRoleName() .. '_' .. LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. '.us.jx3dat', PATH_TYPE.GLOBAL})
-				LIB.SaveLUAData(szPath, tKvp, { compress = false, crc = false, passphrase = false })
-				LIB.Systopmsg(_L('%d settings exported, file saved in %s.', nExport, szPath))
+				local szPath = X.FormatPath({'export/settings/' .. X.GetUserRoleName() .. '_' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. '.us.jx3dat', X.PATH_TYPE.GLOBAL})
+				X.SaveLUAData(szPath, tKvp, { compress = false, crc = false, passphrase = false })
+				X.Systopmsg(_L('%d settings exported, file saved in %s.', nExport, szPath))
 			end
 			uiFrame:Remove()
 		end,
@@ -199,13 +170,13 @@ local settings = {
 		},
 	},
 }
-_G[FRAME_NAME] = LIB.CreateModule(settings)
+_G[FRAME_NAME] = X.CreateModule(settings)
 end
 
-function LIB.OpenUserSettingsExportPanel()
+function X.OpenUserSettingsExportPanel()
 	D.Open()
 end
 
-function LIB.OpenUserSettingsImportPanel()
+function X.OpenUserSettingsImportPanel()
 	D.Open(true)
 end

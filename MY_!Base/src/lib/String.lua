@@ -7,40 +7,11 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local AnsiToUTF8 = AnsiToUTF8 or _G.ansi_to_utf8
 --------------------------------------------
@@ -48,15 +19,15 @@ local AnsiToUTF8 = AnsiToUTF8 or _G.ansi_to_utf8
 --------------------------------------------
 
 -- 分隔字符串
--- (table) LIB.SplitString(string szText, table aSpliter, bool bIgnoreEmptyPart)
--- (table) LIB.SplitString(string szText, string szSpliter, bool bIgnoreEmptyPart)
+-- (table) X.SplitString(string szText, table aSpliter, bool bIgnoreEmptyPart)
+-- (table) X.SplitString(string szText, string szSpliter, bool bIgnoreEmptyPart)
 -- szText           原始字符串
 -- szSpliter        分隔符
 -- aSpliter         多个分隔符
 -- bIgnoreEmptyPart 是否忽略空字符串，即'123;234;'被';'分成{'123','234'}还是{'123','234',''}
 -- nMaxPart         最多分成几份，即'1;2;3;4'被';'分隔时，如果最多三份则得到{'1','2','3;4'}
-function LIB.SplitString(szText, aSpliter, bIgnoreEmptyPart, nMaxPart)
-	if IsString(aSpliter) then
+function X.SplitString(szText, aSpliter, bIgnoreEmptyPart, nMaxPart)
+	if X.IsString(aSpliter) then
 		aSpliter = {aSpliter}
 	end
 	local nOff, nLen, aResult, nResult, szPart, nEnd, szEnd, nPos = 1, #szText, {}, 0, nil, nil, nil, nil
@@ -65,7 +36,7 @@ function LIB.SplitString(szText, aSpliter, bIgnoreEmptyPart, nMaxPart)
 		if not nMaxPart or nMaxPart > nResult + 1 then
 			for _, szSpliter in ipairs(aSpliter) do
 				if szSpliter == '' then
-					nPos = #wsub(sub(szText, nOff), 1, 1)
+					nPos = #wstring.sub(string.sub(szText, nOff), 1, 1)
 					if nPos == 0 then
 						nPos = nil
 					else
@@ -80,19 +51,19 @@ function LIB.SplitString(szText, aSpliter, bIgnoreEmptyPart, nMaxPart)
 			end
 		end
 		if not nEnd then
-			szPart = sub(szText, nOff, len(szText))
+			szPart = string.sub(szText, nOff, string.len(szText))
 			if not bIgnoreEmptyPart or szPart ~= '' then
 				nResult = nResult + 1
-				insert(aResult, szPart)
+				table.insert(aResult, szPart)
 			end
 			break
 		end
-		szPart = sub(szText, nOff, nEnd - 1)
+		szPart = string.sub(szText, nOff, nEnd - 1)
 		if not bIgnoreEmptyPart or szPart ~= '' then
 			nResult = nResult + 1
-			insert(aResult, szPart)
+			table.insert(aResult, szPart)
 		end
-		nOff = nEnd + len(szEnd)
+		nOff = nEnd + string.len(szEnd)
 		if nOff > nLen then
 			break
 		end
@@ -100,42 +71,42 @@ function LIB.SplitString(szText, aSpliter, bIgnoreEmptyPart, nMaxPart)
 	return aResult
 end
 
-function LIB.EscapeString(s)
-	return (gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1'))
+function X.EscapeString(s)
+	return (string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1'))
 end
 
-function LIB.TrimString(szText)
+function X.TrimString(szText)
 	if not szText or szText == '' then
 		return ''
 	end
-	return (gsub(szText, '^%s*(.-)%s*$', '%1'))
+	return (string.gsub(szText, '^%s*(.-)%s*$', '%1'))
 end
 
-function LIB.EncryptString(szText)
-	return szText:gsub('.', function (c) return format ('%02X', (byte(c) + 13) % 256) end):gsub(' ', '+')
+function X.EncryptString(szText)
+	return szText:gsub('.', function (c) return format ('%02X', (string.byte(c) + 13) % 256) end):gsub(' ', '+')
 end
 
-function LIB.SimpleEncryptString(szText)
+function X.SimpleEncryptString(szText)
 	local a = {}
 	for i = 1, #szText do
-		a[i] = char((szText:byte(i) + 13) % 256)
+		a[i] = string.char((szText:byte(i) + 13) % 256)
 	end
-	return (LIB.Base64Encode(concat(a)):gsub('/', '-'):gsub('+', '_'):gsub('=', '.'))
+	return (X.Base64Encode(table.concat(a)):gsub('/', '-'):gsub('+', '_'):gsub('=', '.'))
 end
 
-function LIB.SimpleDecryptString(szCipher)
-	local szBin = LIB.Base64Decode((szCipher:gsub('-', '/'):gsub('_', '+'):gsub('%.', '=')))
+function X.SimpleDecryptString(szCipher)
+	local szBin = X.Base64Decode((szCipher:gsub('-', '/'):gsub('_', '+'):gsub('%.', '=')))
 	if not szBin then
 		return
 	end
 	local a = {}
 	for i = 1, #szBin do
-		a[i] = char((szBin:byte(i) - 13 + 256) % 256)
+		a[i] = string.char((szBin:byte(i) - 13 + 256) % 256)
 	end
-	return concat(a)
+	return table.concat(a)
 end
 
-function LIB.SimpleDecodeString(szCipher, bTripSlashes)
+function X.SimpleDecodeString(szCipher, bTripSlashes)
 	local aPhrase = {'v', 'u', 'S', 'r', 'q', '9', 'O', 'b'}
 	local nPhrase = #aPhrase
 	for i, v in ipairs(aPhrase) do
@@ -146,10 +117,10 @@ function LIB.SimpleDecodeString(szCipher, bTripSlashes)
 	for i = 1, #szCipher, 2 do
 		ch1 = szCipher:byte(i) - 65;
 		ch2 = szCipher:byte(i + 1) - 65;
-		ch1 = LIB.NumberBitOr(LIB.NumberBitShl(ch1, 4, 64), ch2)
-		aText[(i + 1) / 2] = char(LIB.NumberBitXor(ch1, aPhrase[(((i + 1) / 2) - 1) % nPhrase + 1]))
+		ch1 = X.NumberBitOr(X.NumberBitShl(ch1, 4, 64), ch2)
+		aText[(i + 1) / 2] = string.char(X.NumberBitXor(ch1, aPhrase[(((i + 1) / 2) - 1) % nPhrase + 1]))
 	end
-	return concat(aText)
+	return table.concat(aText)
 end
 
 local function EncodePostData(data, t, prefix)
@@ -159,7 +130,7 @@ local function EncodePostData(data, t, prefix)
 			if first then
 				first = false
 			else
-				insert(t, '&')
+				table.insert(t, '&')
 			end
 			if prefix == '' then
 				EncodePostData(v, t, k)
@@ -169,17 +140,17 @@ local function EncodePostData(data, t, prefix)
 		end
 	else
 		if prefix ~= '' then
-			insert(t, prefix)
-			insert(t, '=')
+			table.insert(t, prefix)
+			table.insert(t, '=')
 		end
-		insert(t, tostring(data))
+		table.insert(t, tostring(data))
 	end
 end
 
-function LIB.EncodePostData(data)
+function X.EncodePostData(data)
 	local t = {}
 	EncodePostData(data, t, '')
-	local text = concat(t)
+	local text = table.concat(t)
 	return text
 end
 
@@ -200,7 +171,7 @@ local function ConvertToUTF8(data)
 		return data
 	end
 end
-LIB.ConvertToUTF8 = ConvertToUTF8
+X.ConvertToUTF8 = ConvertToUTF8
 
 local function ConvertToAnsi(data)
 	if type(data) == 'table' then
@@ -219,14 +190,14 @@ local function ConvertToAnsi(data)
 		return data
 	end
 end
-LIB.ConvertToAnsi = ConvertToAnsi
+X.ConvertToAnsi = ConvertToAnsi
 
 local function UrlEncodeString(szText)
-	return szText:gsub('([^0-9a-zA-Z ])', function (c) return format ('%%%02X', byte(c)) end):gsub(' ', '+')
+	return szText:gsub('([^0-9a-zA-Z ])', function (c) return format ('%%%02X', string.byte(c)) end):gsub(' ', '+')
 end
 
 local function UrlDecodeString(szText)
-	return szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return char(tonumber(h, 16)) end)
+	return szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end)
 end
 
 local function UrlEncode(data)
@@ -246,7 +217,7 @@ local function UrlEncode(data)
 		return data
 	end
 end
-LIB.UrlEncode = UrlEncode
+X.UrlEncode = UrlEncode
 
 local function UrlDecode(data)
 	if type(data) == 'table' then
@@ -265,10 +236,10 @@ local function UrlDecode(data)
 		return data
 	end
 end
-LIB.UrlDecode = UrlDecode
+X.UrlDecode = UrlDecode
 
 local m_simpleMatchCache = setmetatable({}, { __mode = 'v' })
-function LIB.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgnoreSpace)
+function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgnoreSpace)
 	if not bDistinctCase then
 		szFind = StringLowerW(szFind)
 		szText = StringLowerW(szText)
@@ -277,10 +248,10 @@ function LIB.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 		szText = StringEnerW(szText)
 	end
 	if bIgnoreSpace then
-		szFind = wgsub(szFind, ' ', '')
-		szFind = wgsub(szFind, g_tStrings.STR_ONE_CHINESE_SPACE, '')
-		szText = wgsub(szText, ' ', '')
-		szText = wgsub(szText, g_tStrings.STR_ONE_CHINESE_SPACE, '')
+		szFind = wstring.gsub(szFind, ' ', '')
+		szFind = wstring.gsub(szFind, g_tStrings.STR_ONE_CHINESE_SPACE, '')
+		szText = wstring.gsub(szText, ' ', '')
+		szText = wstring.gsub(szText, g_tStrings.STR_ONE_CHINESE_SPACE, '')
 	end
 	local me = GetClientPlayer()
 	if me then
@@ -296,11 +267,11 @@ function LIB.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 	local tFind = m_simpleMatchCache[szFind]
 	if not tFind then
 		tFind = {}
-		for _, szKeywordsLine in ipairs(LIB.SplitString(szFind, ';', true)) do
+		for _, szKeywordsLine in ipairs(X.SplitString(szFind, ';', true)) do
 			local tKeyWordsLine = {}
-			for _, szKeywords in ipairs(LIB.SplitString(szKeywordsLine, ',', true)) do
+			for _, szKeywords in ipairs(X.SplitString(szKeywordsLine, ',', true)) do
 				local tKeyWords = {}
-				for _, szKeyword in ipairs(LIB.SplitString(szKeywords, '|', true)) do
+				for _, szKeyword in ipairs(X.SplitString(szKeywords, '|', true)) do
 					local bNegative = szKeyword:sub(1, 1) == '!'
 					if bNegative then
 						szKeyword = szKeyword:sub(2)
@@ -308,11 +279,11 @@ function LIB.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 					if not bDistinctEnEm then
 						szKeyword = StringEnerW(szKeyword)
 					end
-					insert(tKeyWords, { szKeyword = szKeyword, bNegative = bNegative })
+					table.insert(tKeyWords, { szKeyword = szKeyword, bNegative = bNegative })
 				end
-				insert(tKeyWordsLine, tKeyWords)
+				table.insert(tKeyWordsLine, tKeyWords)
 			end
-			insert(tFind, tKeyWordsLine)
+			table.insert(tFind, tKeyWordsLine)
 		end
 		m_simpleMatchCache[szFind] = tFind
 	end
@@ -325,13 +296,13 @@ function LIB.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 			-- 10|十人
 			local bKeyWord = false
 			for _, info in ipairs(tKeyWords) do      -- 符合一个即可
-				-- szKeyword = LIB.EscapeString(szKeyword) -- 用了wstring还Escape个捷豹
+				-- szKeyword = X.EscapeString(szKeyword) -- 用了wstring还Escape个捷豹
 				if info.bNegative then               -- !小铁被吃了
-					if not wfind(szText, info.szKeyword) then
+					if not wstring.find(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				else                                                    -- 十人   -- 10
-					if wfind(szText, info.szKeyword) then
+					if wstring.find(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				end
@@ -352,14 +323,14 @@ function LIB.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 	return bKeyWordsLine
 end
 
-function LIB.IsSensitiveWord(szText)
+function X.IsSensitiveWord(szText)
 	if not _G.TextFilterCheck then
 		return false
 	end
 	return not _G.TextFilterCheck(szText)
 end
 
-function LIB.ReplaceSensitiveWord(szText)
+function X.ReplaceSensitiveWord(szText)
 	if not _G.TextFilterReplace then
 		return szText
 	end
@@ -372,8 +343,8 @@ end
 
 do
 local CACHE = setmetatable({}, { __mode = 'v' })
-function LIB.GetFormatText(...)
-	local szKey = EncodeLUAData({...})
+function X.GetFormatText(...)
+	local szKey = X.EncodeLUAData({...})
 	if not CACHE[szKey] then
 		CACHE[szKey] = {GetFormatText(...)}
 	end
@@ -383,7 +354,7 @@ end
 
 do
 local CACHE = setmetatable({}, { __mode = 'v' })
-function LIB.GetPureText(szXml, szDriver)
+function X.GetPureText(szXml, szDriver)
 	if not szDriver then
 		szDriver = 'AUTO'
 	end
@@ -392,14 +363,14 @@ function LIB.GetPureText(szXml, szDriver)
 		cache = {}
 		CACHE[szXml] = cache
 	end
-	if IsNil(cache.c) and (szDriver == 'CPP' or szDriver == 'AUTO') then
+	if X.IsNil(cache.c) and (szDriver == 'CPP' or szDriver == 'AUTO') then
 		cache.c = GetPureText
 			and GetPureText(szXml)
 			or false
 	end
-	if IsNil(cache.l) and (szDriver == 'LUA' or (szDriver == 'AUTO' and not cache.c)) then
-		local aXMLNode = LIB.XMLDecode(szXml)
-		cache.l = LIB.XMLGetPureText(aXMLNode) or false
+	if X.IsNil(cache.l) and (szDriver == 'LUA' or (szDriver == 'AUTO' and not cache.c)) then
+		local aXMLNode = X.XMLDecode(szXml)
+		cache.l = X.XMLGetPureText(aXMLNode) or false
 	end
 	if szDriver == 'CPP' then
 		return cache.c

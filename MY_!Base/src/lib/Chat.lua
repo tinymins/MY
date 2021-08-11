@@ -7,73 +7,44 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
-local RENDERED_FLAG_KEY = NSFormatString('b{$NS}ChatRendered')
+local RENDERED_FLAG_KEY = X.NSFormatString('b{$NS}ChatRendered')
 
 -- 获取聊天输入框
--- (WndEdit?) LIB.GetChatInput()
-function LIB.GetChatInput()
+-- (WndEdit?) X.GetChatInput()
+function X.GetChatInput()
 	local frame = Station.SearchFrame('EditBox')
 	return frame and frame:Lookup('Edit_Input')
 end
 
 -- 海鳗里面抠出来的
 -- 聊天复制并发布
-function LIB.RepeatChatLine(hTime)
-	local edit = LIB.GetChatInput()
+function X.RepeatChatLine(hTime)
+	local edit = X.GetChatInput()
 	if not edit then
 		return
 	end
-	LIB.CopyChatLine(hTime)
+	X.CopyChatLine(hTime)
 	local tMsg = edit:GetTextStruct()
 	if #tMsg == 0 then
 		return
 	end
 	local nChannel, szName = EditBox_GetChannel()
-	if LIB.CanUseChatChannel(nChannel) then
+	if X.CanUseChatChannel(nChannel) then
 		GetClientPlayer().Talk(nChannel, szName or '', tMsg)
 		edit:ClearText()
 	end
 end
 
 -- 聊天删除行
-function LIB.RemoveChatLine(hTime)
+function X.RemoveChatLine(hTime)
 	local nIndex   = hTime:GetIndex()
 	local hHandle  = hTime:GetParent()
 	local nCount   = hHandle:GetItemCount()
@@ -98,13 +69,13 @@ function LIB.RemoveChatLine(hTime)
 end
 
 local function GetCopyLinkScript(opt)
-	local handlerEntry = NSFormatString('{$NS}.ChatLinkEventHandlers')
-	local szScript = NSFormatString('this[\'b{$NS}ChatRendered\']=true;this.OnItemMouseEnter=')
+	local handlerEntry = X.NSFormatString('{$NS}.ChatLinkEventHandlers')
+	local szScript = X.NSFormatString('this[\'b{$NS}ChatRendered\']=true;this.OnItemMouseEnter=')
 		.. handlerEntry .. '.OnCopyMouseEnter;this.OnItemMouseLeave=' .. handlerEntry .. '.OnCopyMouseLeave;'
 	if opt.lclick ~= false then
 		szScript = szScript .. 'this.bLButton=true;this.OnItemLButtonDown='.. handlerEntry .. '.OnCopyLClick;'
-		if opt.richtext and not LIB.ContainsEchoMsgHeader(opt.richtext) then
-			szScript = szScript .. 'this.szRichText=' .. EncodeLUAData(opt.richtext or '') .. ';'
+		if opt.richtext and not X.ContainsEchoMsgHeader(opt.richtext) then
+			szScript = szScript .. 'this.szRichText=' .. X.EncodeLUAData(opt.richtext or '') .. ';'
 		end
 	end
 	if opt.mclick then
@@ -117,56 +88,56 @@ local function GetCopyLinkScript(opt)
 end
 
 -- 获取复制聊天行字符串
--- (string) LIB.GetChatCopyXML(szText: string, opt?: table)
-function LIB.GetChatCopyXML(szText, opt)
-	if not IsString(szText) then
+-- (string) X.GetChatCopyXML(szText: string, opt?: table)
+function X.GetChatCopyXML(szText, opt)
+	if not X.IsString(szText) then
 		szText = _L[' * ']
 	end
-	if not IsTable(opt) then
+	if not X.IsTable(opt) then
 		opt = { f = 10 }
 	end
 	return GetFormatText(szText, opt.f, opt.r, opt.g, opt.b, 82691, GetCopyLinkScript(opt), 'copylink')
 end
 
 -- 获取复制聊天行时间串
--- (string) LIB.GetChatTimeXML(szText: string, opt?: table)
-function LIB.GetChatTimeXML(dwTime, opt)
-	if not IsTable(opt) then
+-- (string) X.GetChatTimeXML(szText: string, opt?: table)
+function X.GetChatTimeXML(dwTime, opt)
+	if not X.IsTable(opt) then
 		opt = { f = 10 }
 	end
-	local szText = LIB.FormatTime(dwTime, opt.s or '[%hh:%mm:%ss]')
+	local szText = X.FormatTime(dwTime, opt.s or '[%hh:%mm:%ss]')
 	return GetFormatText(szText, opt.f, opt.r, opt.g, opt.b, 82691, GetCopyLinkScript(opt), 'timelink')
 end
 
 -- 将焦点设置到聊天栏
--- (void) LIB.FocusChatInput()
-function LIB.FocusChatInput()
-	local edit = LIB.GetChatInput()
+-- (void) X.FocusChatInput()
+function X.FocusChatInput()
+	local edit = X.GetChatInput()
 	if edit then
 		Station.SetFocusWindow(edit)
 	end
 end
 
 -- 清空聊天栏
--- (void) LIB.ClearChatInput()
-function LIB.ClearChatInput()
-	local edit = LIB.GetChatInput()
+-- (void) X.ClearChatInput()
+function X.ClearChatInput()
+	local edit = X.GetChatInput()
 	if not edit then
 		return
 	end
 	edit:ClearText()
 end
 
--- LIB.InsertChatInput(szType, ...data)
-function LIB.InsertChatInput(szType, ...)
-	local edit = LIB.GetChatInput()
+-- X.InsertChatInput(szType, ...data)
+function X.InsertChatInput(szType, ...)
+	local edit = X.GetChatInput()
 	if not edit then
 		return
 	end
 	local szText, data
 	if szType == 'achievement' then
 		local dwAchieve = ...
-		local achi = LIB.GetAchievement(dwAchieve)
+		local achi = X.GetAchievement(dwAchieve)
 		if not achi then
 			return
 		end
@@ -185,7 +156,7 @@ function LIB.InsertChatInput(szType, ...)
 			end
 			if itemInfo.nGenre == ITEM_GENRE.BOOK then
 				if nBookInfo then
-					local nBookID, nSegmentID = LIB.RecipeToSegmentID(nBookInfo)
+					local nBookID, nSegmentID = X.RecipeToSegmentID(nBookInfo)
 					if nBookID then
 						szText = '[' .. Table_GetSegmentName(nBookID, nSegmentID) .. ']'
 						data = {
@@ -199,7 +170,7 @@ function LIB.InsertChatInput(szType, ...)
 					end
 				end
 			else
-				szText = '[' .. LIB.GetItemNameByItemInfo(itemInfo) .. ']'
+				szText = '[' .. X.GetItemNameByItemInfo(itemInfo) .. ']'
 				data = {
 					type = 'iteminfo',
 					text = szText,
@@ -219,8 +190,8 @@ function LIB.InsertChatInput(szType, ...)
 end
 
 -- 复制聊天行
-function LIB.CopyChatLine(hTime, bTextEditor, bRichText)
-	local edit = LIB.GetChatInput()
+function X.CopyChatLine(hTime, bTextEditor, bRichText)
+	local edit = X.GetChatInput()
 	if bTextEditor then
 		edit = UI.OpenTextEditor():Find('.WndEdit')[1]
 	end
@@ -241,7 +212,7 @@ function LIB.CopyChatLine(hTime, bTextEditor, bRichText)
 				if szName ~= 'timelink' and szName ~= 'copylink' and szName ~= 'msglink' and szName ~= 'time' then
 					local szText, bEnd = p:GetText(), false
 					if not bTextEditor and StringFindW(szText, '\n') then
-						szText = wgsub(szText, '\n', '')
+						szText = wstring.gsub(szText, '\n', '')
 						bEnd = true
 					end
 					bContent = true
@@ -249,11 +220,11 @@ function LIB.CopyChatLine(hTime, bTextEditor, bRichText)
 						edit:InsertObj(szText, { type = 'item', text = szText, item = p:GetUserData() })
 					elseif szName == 'iteminfolink' then
 						edit:InsertObj(szText, { type = 'iteminfo', text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
-					elseif szName == 'namelink' or sub(szName, 1, 9) == 'namelink_' then
+					elseif szName == 'namelink' or string.sub(szName, 1, 9) == 'namelink_' then
 						if bBegin == nil then
 							bBegin = false
 						end
-						edit:InsertObj(szText, { type = 'name', text = szText, name = match(szText, '%[(.*)%]') })
+						edit:InsertObj(szText, { type = 'name', text = szText, name = string.match(szText, '%[(.*)%]') })
 					elseif szName == 'questlink' then
 						edit:InsertObj(szText, { type = 'quest', text = szText, questid = p:GetUserData() })
 					elseif szName == 'recipelink' then
@@ -261,7 +232,7 @@ function LIB.CopyChatLine(hTime, bTextEditor, bRichText)
 					elseif szName == 'enchantlink' then
 						edit:InsertObj(szText, { type = 'enchant', text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
 					elseif szName == 'skilllink' then
-						local o = Clone(p.skillKey)
+						local o = X.Clone(p.skillKey)
 						o.type, o.text = 'skill', szText
 						edit:InsertObj(szText, o)
 					elseif szName =='skillrecipelink' then
@@ -281,12 +252,12 @@ function LIB.CopyChatLine(hTime, bTextEditor, bRichText)
 							for _, v in ipairs({g_tStrings.STR_TALK_HEAD_WHISPER, g_tStrings.STR_TALK_HEAD_SAY, g_tStrings.STR_TALK_HEAD_SAY1, g_tStrings.STR_TALK_HEAD_SAY2 }) do
 								local nB, nE = StringFindW(szText, v)
 								if nB then
-									szText, bBegin = sub(szText, nB + nE), true
+									szText, bBegin = string.sub(szText, nB + nE), true
 									edit:ClearText()
 								end
 							end
 						end
-						if szText ~= '' and (getn(edit:GetTextStruct()) > 0 or szText ~= g_tStrings.STR_FACE) then
+						if szText ~= '' and (table.getn(edit:GetTextStruct()) > 0 or szText ~= g_tStrings.STR_FACE) then
 							edit:InsertText(szText)
 						end
 					end
@@ -299,7 +270,7 @@ function LIB.CopyChatLine(hTime, bTextEditor, bRichText)
 			elseif p:GetType() == 'Image' or p:GetType() == 'Animate' then
 				local dwID = tonumber((p:GetName():gsub('^emotion_', '')))
 				if dwID then
-					local emo = LIB.GetChatEmotion(dwID)
+					local emo = X.GetChatEmotion(dwID)
 					if emo then
 						edit:InsertObj(emo.szCmd, { type = 'emotion', text = emo.szCmd, id = emo.dwID })
 					end
@@ -323,7 +294,7 @@ end
 
 -- 聊天界面元素通用事件查看角色装备标记位
 local PEEK_PLAYER = {}
-LIB.RegisterEvent('PEEK_OTHER_PLAYER', function()
+X.RegisterEvent('PEEK_OTHER_PLAYER', function()
 	if not PEEK_PLAYER[arg1] then
 		return
 	end
@@ -350,9 +321,9 @@ local ChatLinkEvents = {
 			InsertInviteTeamMenu(menu, (UI(link):Text():gsub('[%[%]]', '')))
 			menu[1].fnAction()
 		elseif IsCtrlKeyDown() then
-			LIB.CopyChatItem(link)
+			X.CopyChatItem(link)
 		elseif IsShiftKeyDown() then
-			LIB.SetTarget(TARGET.PLAYER, UI(link):Text())
+			X.SetTarget(TARGET.PLAYER, UI(link):Text())
 		elseif IsAltKeyDown() then
 			if _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
 				local info = _G.MY_Farbnamen.Get((UI(link):Text():gsub('[%[%]]', '')))
@@ -362,8 +333,8 @@ local ChatLinkEvents = {
 				end
 			end
 		else
-			LIB.SwitchChatChannel(UI(link):Text())
-			local edit = LIB.GetChatInput()
+			X.SwitchChatChannel(UI(link):Text())
+			local edit = X.GetChatInput()
 			if edit then
 				Station.SetFocusWindow(edit)
 			end
@@ -373,25 +344,25 @@ local ChatLinkEvents = {
 		if not link then
 			link = element
 		end
-		PopupMenu(LIB.GetTargetContextMenu(TARGET.PLAYER, (UI(link):Text():gsub('[%[%]]', ''))))
+		PopupMenu(X.GetTargetContextMenu(TARGET.PLAYER, (UI(link):Text():gsub('[%[%]]', ''))))
 	end,
 	OnCopyLClick = function(element, link)
 		if not link then
 			link = element
 		end
-		LIB.CopyChatLine(link, IsCtrlKeyDown(), IsCtrlKeyDown() and IsShiftKeyDown())
+		X.CopyChatLine(link, IsCtrlKeyDown(), IsCtrlKeyDown() and IsShiftKeyDown())
 	end,
 	OnCopyMClick = function(element, link)
 		if not link then
 			link = element
 		end
-		LIB.RemoveChatLine(link)
+		X.RemoveChatLine(link)
 	end,
 	OnCopyRClick = function(element, link)
 		if not link then
 			link = element
 		end
-		LIB.RepeatChatLine(link)
+		X.RepeatChatLine(link)
 	end,
 	OnCopyMouseEnter = function(el, link)
 		if not link then
@@ -429,11 +400,11 @@ local ChatLinkEvents = {
 			link = element
 		end
 		if IsCtrlKeyDown() then
-			LIB.CopyChatItem(link)
+			X.CopyChatItem(link)
 		end
 	end,
 }
-LIB.ChatLinkEvents = LIB.SetmetaReadonly(ChatLinkEvents)
+X.ChatLinkEvents = X.SetmetaReadonly(ChatLinkEvents)
 
 -- 聊天界面元素通用事件绑定函数（this）
 local ChatLinkEventHandlers = {}
@@ -442,30 +413,30 @@ for k, f in pairs(ChatLinkEvents) do
 		f(this)
 	end
 end
-LIB.ChatLinkEventHandlers = LIB.SetmetaReadonly(ChatLinkEventHandlers)
+X.ChatLinkEventHandlers = X.SetmetaReadonly(ChatLinkEventHandlers)
 
 -- 绑定link事件响应
--- (userdata) LIB.RenderChatLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
--- (userdata) LIB.RenderChatLink(userdata element, userdata link) 处理element的各种事件绑定 数据源是link
--- (string) LIB.RenderChatLink(string szMsg)                      格式化szMsg 处理里面的超链接 添加时间相应
+-- (userdata) X.RenderChatLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
+-- (userdata) X.RenderChatLink(userdata element, userdata link) 处理element的各种事件绑定 数据源是link
+-- (string) X.RenderChatLink(string szMsg)                      格式化szMsg 处理里面的超链接 添加时间相应
 -- link   : 一个超链接Text元素
 -- element: 一个可以挂鼠标消息响应的UI元素
 -- szMsg  : 格式化的UIXML消息
-function LIB.RenderChatLink(arg1, arg2)
-	if IsString(arg1) then -- szMsg
+function X.RenderChatLink(arg1, arg2)
+	if X.IsString(arg1) then -- szMsg
 		local szMsg = arg1
-		local aXMLNode = LIB.XMLDecode(szMsg)
+		local aXMLNode = X.XMLDecode(szMsg)
 		if aXMLNode then
 			for _, node in ipairs(aXMLNode) do
-				if LIB.XMLIsNode(node) and LIB.XMLGetNodeType(node) == 'text' and LIB.XMLGetNodeData(node, 'name') then
-					local name, script = LIB.XMLGetNodeData(node, 'name'), LIB.XMLGetNodeData(node, 'script')
+				if X.XMLIsNode(node) and X.XMLGetNodeType(node) == 'text' and X.XMLGetNodeData(node, 'name') then
+					local name, script = X.XMLGetNodeData(node, 'name'), X.XMLGetNodeData(node, 'script')
 					if script then
 						script = script .. '\n'
 					else
 						script = ''
 					end
 
-					local handlerEntry = NSFormatString('{$NS}.ChatLinkEventHandlers')
+					local handlerEntry = X.NSFormatString('{$NS}.ChatLinkEventHandlers')
 					if name == 'namelink' or name:sub(1, 9) == 'namelink_' then
 						script = script .. 'this.' .. RENDERED_FLAG_KEY .. '=true;this.OnItemLButtonDown='
 							.. handlerEntry .. '.OnNameLClick;this.OnItemRButtonDown='
@@ -484,15 +455,15 @@ function LIB.RenderChatLink(arg1, arg2)
 					end
 
 					if #script > 0 then
-						LIB.XMLSetNodeData(node, 'eventid', 82803)
-						LIB.XMLSetNodeData(node, 'script', script)
+						X.XMLSetNodeData(node, 'eventid', 82803)
+						X.XMLSetNodeData(node, 'script', script)
 					end
 				end
 			end
-			szMsg = LIB.XMLEncode(aXMLNode)
+			szMsg = X.XMLEncode(aXMLNode)
 		end
 		return szMsg
-	elseif IsElement(arg1) then
+	elseif X.IsElement(arg1) then
 		local element = arg1
 		local link = arg2 or arg1
 		if element[RENDERED_FLAG_KEY] then
@@ -517,8 +488,8 @@ function LIB.RenderChatLink(arg1, arg2)
 end
 
 -- 复制Item到输入框
-function LIB.CopyChatItem(p)
-	local edit = LIB.GetChatInput()
+function X.CopyChatItem(p)
+	local edit = X.GetChatInput()
 	if not edit then
 		return
 	end
@@ -528,8 +499,8 @@ function LIB.CopyChatItem(p)
 			edit:InsertObj(szText, { type = 'item', text = szText, item = p:GetUserData() })
 		elseif szName == 'iteminfolink' then
 			edit:InsertObj(szText, { type = 'iteminfo', text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
-		elseif szName == 'namelink' or sub(szName, 1, 9) == 'namelink_' then
-			edit:InsertObj(szText, { type = 'name', text = szText, name = match(szText, '%[(.*)%]') })
+		elseif szName == 'namelink' or string.sub(szName, 1, 9) == 'namelink_' then
+			edit:InsertObj(szText, { type = 'name', text = szText, name = string.match(szText, '%[(.*)%]') })
 		elseif szName == 'questlink' then
 			edit:InsertObj(szText, { type = 'quest', text = szText, questid = p:GetUserData() })
 		elseif szName == 'recipelink' then
@@ -537,7 +508,7 @@ function LIB.CopyChatItem(p)
 		elseif szName == 'enchantlink' then
 			edit:InsertObj(szText, { type = 'enchant', text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
 		elseif szName == 'skilllink' then
-			local o = Clone(p.skillKey)
+			local o = X.Clone(p.skillKey)
 			o.type, o.text = 'skill', szText
 			edit:InsertObj(szText, o)
 		elseif szName =='skillrecipelink' then
@@ -556,27 +527,27 @@ function LIB.CopyChatItem(p)
 end
 
 -- 从界面聊天元素解析原始聊天消息数据
--- (aSay: table) LIB.ParseChatData(oData: Element, tOption: table)
--- (aSay: table) LIB.ParseChatData(oData: XMLString, tOption: table)
--- (aSay: table) LIB.ParseChatData(oData: XMLNode, tOption: table)
+-- (aSay: table) X.ParseChatData(oData: Element, tOption: table)
+-- (aSay: table) X.ParseChatData(oData: XMLString, tOption: table)
+-- (aSay: table) X.ParseChatData(oData: XMLNode, tOption: table)
 do
 local function ParseChatData(oData, tOption, aContent, bIgnoreRange)
-	if IsString(oData) then
-		local aXMLNode = LIB.XMLDecode(oData)
+	if X.IsString(oData) then
+		local aXMLNode = X.XMLDecode(oData)
 		if aXMLNode then
 			for _, node in ipairs(aXMLNode) do
 				ParseChatData(node, tOption, aContent, true)
 			end
 		end
-	elseif LIB.XMLIsNode(oData) then
+	elseif X.XMLIsNode(oData) then
 		local node = oData
-		local nodeType = LIB.XMLGetNodeType(node)
-		local nodeName = LIB.XMLGetNodeData(node, 'name') or ''
-		local nodeText = LIB.XMLGetNodeData(node, 'text')
-		local nodeScript = LIB.XMLGetNodeData(node, 'script')
-		local nodeUserdata = LIB.XMLGetNodeData(node, 'userdata')
+		local nodeType = X.XMLGetNodeType(node)
+		local nodeName = X.XMLGetNodeData(node, 'name') or ''
+		local nodeText = X.XMLGetNodeData(node, 'text')
+		local nodeScript = X.XMLGetNodeData(node, 'script')
+		local nodeUserdata = X.XMLGetNodeData(node, 'userdata')
 		if nodeType == 'handle' then -- 子元素递归
-			local children = LIB.XMLGetNodeChildren(node)
+			local children = X.XMLGetNodeChildren(node)
 			local nStartIndex = not bIgnoreRange and tOption.nStartIndex or 0
 			local nEndIndex = not bIgnoreRange and tOption.nEndIndex or (#children - 1)
 			for nIndex = nStartIndex, nEndIndex do
@@ -584,133 +555,133 @@ local function ParseChatData(oData, tOption, aContent, bIgnoreRange)
 			end
 		elseif nodeType == 'text' then -- 文字内容
 			if nodeName == 'itemlink' then -- 物品链接
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'item',
 					text = nodeText, innerText = nodeText:sub(2, -2), item = nodeUserdata,
 				})
 			elseif nodeName == 'iteminfolink' then -- 物品信息
-				local version, tab, index = match(nodeScript, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)')
-				insert(aContent, {
+				local version, tab, index = string.match(nodeScript, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)')
+				table.insert(aContent, {
 					type = 'iteminfo',
 					text = nodeText, innerText = nodeText:sub(2, -2),
 					version = version, tabtype = tab, index = index,
 				})
 			elseif nodeName:sub(1, 9) == 'namelink_' then -- 姓名
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'name',
 					text = nodeText, innerText = nodeText,
 					name = nodeText:sub(2, -2), id = nodeName:sub(10),
 				})
 			elseif nodeName == 'questlink' then -- 任务
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'quest',
 					text = nodeText, innerText = nodeText:sub(2, -2), questid = nodeUserdata,
 				})
 			elseif nodeName == 'recipelink' then -- 生活技艺
-				local craft, recipe = match(nodeScript, 'this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
-				insert(aContent, {
+				local craft, recipe = string.match(nodeScript, 'this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
+				table.insert(aContent, {
 					type = 'recipe',
 					text = nodeText, innerText = nodeText:sub(2, -2),
 					craftid = craft, recipeid = recipe,
 				})
 			elseif nodeName == 'skilllink' then -- 技能
-				local skillinfo = match(nodeScript, 'this.skillKey=%{(.-)%}')
+				local skillinfo = string.match(nodeScript, 'this.skillKey=%{(.-)%}')
 				local skillKey = {}
-				for w in gmatch(skillinfo, '(.-)%,') do
-					local k, v  = match(w, '(.-)=(%w+)')
+				for w in string.gmatch(skillinfo, '(.-)%,') do
+					local k, v  = string.match(w, '(.-)=(%w+)')
 					skillKey[k] = v
 				end
 				skillKey.type = 'skill'
 				skillKey.text = nodeText
 				skillKey.innerText = nodeText:sub(2, -2)
-				insert(aContent, skillKey)
+				table.insert(aContent, skillKey)
 			elseif nodeName == 'designationlink' then -- 称号
-				local id, fix = match(nodeScript, 'this.dwID=(%d+)%s*this.bPrefix=(.-)')
-				insert(aContent, {
+				local id, fix = string.match(nodeScript, 'this.dwID=(%d+)%s*this.bPrefix=(.-)')
+				table.insert(aContent, {
 					type = 'designation',
 					text = nodeText, innerText = nodeText:sub(2, -2), id = id, prefix = fix,
 				})
 			elseif nodeName == 'skillrecipelink' then -- 技能秘籍
-				local id, level = match(nodeScript, 'this.dwID=(%d+)%s*this.dwLevel=(%d+)')
-				insert(aContent, {
+				local id, level = string.match(nodeScript, 'this.dwID=(%d+)%s*this.dwLevel=(%d+)')
+				table.insert(aContent, {
 					type = 'skillrecipe',
 					text = nodeText, innerText = nodeText:sub(2, -2), id = id, level = level,
 				})
 			elseif nodeName == 'booklink' then -- 书籍
-				local version, tab, index, id = match(nodeScript, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)%s*this.nBookRecipeID=(%d+)')
-				insert(aContent, {
+				local version, tab, index, id = string.match(nodeScript, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)%s*this.nBookRecipeID=(%d+)')
+				table.insert(aContent, {
 					type = 'book',
 					text = nodeText, innerText = nodeText:sub(2, -2),
 					version = version, tabtype = tab, index = index, bookinfo = id,
 				})
 			elseif nodeName == 'achievementlink' then -- 成就
-				local id = match(nodeScript, 'this.dwID=(%d+)')
-				insert(aContent, {
+				local id = string.match(nodeScript, 'this.dwID=(%d+)')
+				table.insert(aContent, {
 					type = 'achievement',
 					text = nodeText, innerText = nodeText:sub(2, -2), id = id,
 				})
 			elseif nodeName == 'enchantlink' then -- 强化
-				local pro, craft, recipe = match(nodeScript, 'this.dwProID=(%d+)%s*this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
-				insert(aContent, {
+				local pro, craft, recipe = string.match(nodeScript, 'this.dwProID=(%d+)%s*this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
+				table.insert(aContent, {
 					type = 'enchant',
 					text = nodeText, innerText = nodeText:sub(2, -2),
 					proid = pro, craftid = craft, recipeid = recipe,
 				})
 			elseif nodeName == 'eventlink' then -- 事件
-				local eventname, linkinfo = match(nodeScript, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"$')
+				local eventname, linkinfo = string.match(nodeScript, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"$')
 				if not eventname then
-					eventname, linkinfo = match(nodeScript, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"')
+					eventname, linkinfo = string.match(nodeScript, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"')
 				end
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'eventlink',
 					text = nodeText, innerText = nodeText:sub(2, -2),
 					name = eventname, linkinfo = linkinfo:gsub('\\(.)', '%1'),
 				})
-			elseif not IsEmpty(nodeText) then -- 未知类型的字符串、普通文本
-				insert(aContent, {
+			elseif not X.IsEmpty(nodeText) then -- 未知类型的字符串、普通文本
+				table.insert(aContent, {
 					type = 'text',
 					text = nodeText, innerText = nodeText,
 				})
 			end
 		elseif nodeType == 'image' or nodeType == 'animate' then -- 表情
-			if sub(nodeName, 1, 8) == 'emotion_' then -- 表情
+			if string.sub(nodeName, 1, 8) == 'emotion_' then -- 表情
 				local dwID = tonumber((nodeName:sub(9)))
 				if dwID then
-					local emo = LIB.GetChatEmotion(dwID)
+					local emo = X.GetChatEmotion(dwID)
 					if emo then
-						insert(aContent, {
+						table.insert(aContent, {
 							type = 'emotion',
 							text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID,
 						})
 					end
 				end
 			else -- 货币单位
-				local path = LIB.XMLGetNodeData(node, 'path')
-				local frame = LIB.XMLGetNodeData(node, 'frame')
+				local path = X.XMLGetNodeData(node, 'path')
+				local frame = X.XMLGetNodeData(node, 'frame')
 				if path == 'ui\\image\\common\\money.uitex' and frame == 0 then
-					insert(aContent, {
+					table.insert(aContent, {
 						type = 'text',
 						text = _L['Gold'], innerText = _L['Gold'],
 					})
 				elseif path == 'ui\\image\\common\\money.uitex' and frame == 2 then
-					insert(aContent, {
+					table.insert(aContent, {
 						type = 'text',
 						text = _L['Silver'], innerText = _L['Silver'],
 					})
 				elseif path == 'ui\\image\\common\\money.uitex' and frame == 1 then
-					insert(aContent, {
+					table.insert(aContent, {
 						type = 'text',
 						text = _L['Copper'], innerText = _L['Copper'],
 					})
 				elseif path == 'ui\\image\\common\\money.uitex' and (frame == 31 or frame == 32 or frame == 33 or frame == 34) then
-					insert(aContent, {
+					table.insert(aContent, {
 						type = 'text',
 						text = _L['Brics'], innerText = _L['Brics'],
 					})
 				end
 			end
 		end
-	elseif IsElement(oData) then
+	elseif X.IsElement(oData) then
 		local elem = oData
 		local elemType = elem:GetType()
 		local elemName = elem:GetName()
@@ -724,85 +695,85 @@ local function ParseChatData(oData, tOption, aContent, bIgnoreRange)
 			local elemText = elem:GetText()
 			local elemUserdata = elem:GetUserData()
 			if elemName == 'itemlink' then -- 物品链接
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'item',
 					text = elemText, innerText = elemText:sub(2, -2), item = elemUserdata,
 				})
 			elseif elemName == 'iteminfolink' then -- 物品信息
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'iteminfo',
 					text = elemText, innerText = elemText:sub(2, -2),
 					version = elem.nVersion, tabtype = elem.dwTabType, index = elem.dwIndex,
 				})
-			elseif sub(elemName, 1, 9) == 'namelink_' then -- 姓名
-				insert(aContent, {
+			elseif string.sub(elemName, 1, 9) == 'namelink_' then -- 姓名
+				table.insert(aContent, {
 					type = 'name',
 					text = elemText, innerText = elemText,
-					name = match(elemText, '%[(.*)%]'), id = elemName:sub(10),
+					name = string.match(elemText, '%[(.*)%]'), id = elemName:sub(10),
 				})
 			elseif elemName == 'questlink' then -- 任务
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'quest',
 					text = elemText, innerText = elemText:sub(2, -2), questid = elemUserdata,
 				})
 			elseif elemName == 'recipelink' then -- 生活技艺
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'recipe',
 					text = elemText, innerText = elemText:sub(2, -2),
 					craftid = elem.dwCraftID, recipeid = elem.dwRecipeID,
 				})
 			elseif elemName == 'skilllink' then -- 技能
-				local skillKey = Clone(elem.skillKey)
+				local skillKey = X.Clone(elem.skillKey)
 				skillKey.type = 'skill'
 				skillKey.text = elemText
 				skillKey.innerText = elemText:sub(2, -2)
-				insert(aContent, skillKey)
+				table.insert(aContent, skillKey)
 			elseif elemName =='designationlink' then -- 称号
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'designation',
 					text = elemText, innerText = elemText:sub(2, -2), id = elem.dwID, prefix = elem.bPrefix,
 				})
 			elseif elemName =='skillrecipelink' then -- 技能秘籍
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'skillrecipe',
 					text = elemText, innerText = elemText:sub(2, -2), id = elem.dwID, level = elem.dwLevelD,
 				})
 			elseif elemName =='booklink' then -- 书籍
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'book',
 					text = elemText, innerText = elemText:sub(2, -2),
 					version = elem.nVersion, tabtype = elem.dwTabType, index = elem.dwIndex, bookinfo = elem.nBookRecipeID,
 				})
 			elseif elemName =='achievementlink' then -- 成就
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'achievement',
 					text = elemText, innerText = elemText:sub(2, -2), id = elem.dwID,
 				})
 			elseif elemName == 'enchantlink' then -- 强化
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'enchant',
 					text = elemText, innerText = elemText:sub(2, -2),
 					proid = elem.dwProID, craftid = elem.dwCraftID, recipeid = elem.dwRecipeID,
 				})
 			elseif elemName =='eventlink' then -- 事件
-				insert(aContent, {
+				table.insert(aContent, {
 					type = 'eventlink',
 					text = elemText, innerText = elemText:sub(2, -2),
 					name = elem.szName, linkinfo = elem.szLinkInfo,
 				})
-			elseif not IsEmpty(elemText) then -- 未知类型的字符串、普通文本
-				insert(aContent, {
+			elseif not X.IsEmpty(elemText) then -- 未知类型的字符串、普通文本
+				table.insert(aContent, {
 					type = 'text',
 					text = elemText, innerText = elemText,
 				})
 			end
 		elseif elemType == 'Image' or elemType == 'Animate' then
-			if sub(elemName, 1, 8) == 'emotion_' then -- 表情
+			if string.sub(elemName, 1, 8) == 'emotion_' then -- 表情
 				local dwID = tonumber((elemName:sub(9)))
 				if dwID then
-					local emo = LIB.GetChatEmotion(dwID)
+					local emo = X.GetChatEmotion(dwID)
 					if emo then
-						insert(aContent, {
+						table.insert(aContent, {
 							type = 'emotion',
 							text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID,
 						})
@@ -811,74 +782,74 @@ local function ParseChatData(oData, tOption, aContent, bIgnoreRange)
 			else -- 货币单位
 				local path, frame = elem:GetImagePath()
 				if path == 'ui\\image\\common\\money.uitex' and frame == 0 then
-					insert(aContent, {
+					table.insert(aContent, {
 						type = 'text',
 						text = _L['Gold'], innerText = _L['Gold'],
 					})
 				elseif path == 'ui\\image\\common\\money.uitex' and frame == 2 then
-					insert(aContent, {
+					table.insert(aContent, {
 						type = 'text',
 						text = _L['Silver'], innerText = _L['Silver'],
 					})
 				elseif path == 'ui\\image\\common\\money.uitex' and frame == 1 then
-					insert(aContent, {
+					table.insert(aContent, {
 						type = 'text',
 						text = _L['Copper'], innerText = _L['Copper'],
 					})
 				elseif path == 'ui\\image\\common\\money.uitex' and (frame == 31 or frame == 32 or frame == 33 or frame == 34) then
-					insert(aContent, {
+					table.insert(aContent, {
 						type = 'text',
 						text = _L['Brics'], innerText = _L['Brics'],
 					})
 				end
 			end
 		end
-	elseif IsArray(oData) then
+	elseif X.IsArray(oData) then
 		for _, node in ipairs(oData) do
 			ParseChatData(node, tOption, aContent, true)
 		end
 	end
 	return aContent
 end
-function LIB.ParseChatData(oData, tOption)
+function X.ParseChatData(oData, tOption)
 	return ParseChatData(oData, tOption, {}, false)
 end
 end
 
 -- 从原始聊天消息数据构建界面元素富文本字符串
--- (aSay: table) LIB.XmlifyChatData(aSay: table, r?: number, g?: number, b?: number, font?: number)
-function LIB.XmlifyChatData(t, r, g, b, f)
+-- (aSay: table) X.XmlifyChatData(aSay: table, r?: number, g?: number, b?: number, font?: number)
+function X.XmlifyChatData(t, r, g, b, f)
 	local aXML = {}
 	for _, v in ipairs(t) do
 		if v.type == 'text' then
-			insert(aXML, GetFormatText(v.text, f, r, g, b))
+			table.insert(aXML, GetFormatText(v.text, f, r, g, b))
 		elseif v.type == 'name' then
-			insert(aXML, GetFormatText(v.text, f, r, g, b, 515, nil, 'namelink_' .. (v.id or 0)))
+			table.insert(aXML, GetFormatText(v.text, f, r, g, b, 515, nil, 'namelink_' .. (v.id or 0)))
 		end
 	end
-	return concat(aXML)
+	return table.concat(aXML)
 end
 
 -- 从原始聊天消息数据构建纯阅读字符串
--- (string) LIB.StringifyChatText(aSay: table)
-function LIB.StringifyChatText(t)
+-- (string) X.StringifyChatText(aSay: table)
+function X.StringifyChatText(t)
 	local aText = {}
 	for _, v in ipairs(t) do
 		if v.text then -- v.type == 'text' or v.type == 'name'
-			insert(aText, v.text)
+			table.insert(aText, v.text)
 		elseif v.type == 'emotion' then
-			local emo = LIB.GetChatEmotion(v.id)
+			local emo = X.GetChatEmotion(v.id)
 			if emo then
-				insert(aText, emo.szCmd)
+				table.insert(aText, emo.szCmd)
 			end
 		end
 	end
-	return concat(aText)
+	return table.concat(aText)
 end
 
 -- 判断某个频道能否发言
--- (bool) LIB.CanUseChatChannel(number nChannel)
-function LIB.CanUseChatChannel(nChannel)
+-- (bool) X.CanUseChatChannel(number nChannel)
+function X.CanUseChatChannel(nChannel)
 	for _, v in ipairs({'WHISPER', 'TEAM', 'RAID', 'BATTLE_FIELD', 'NEARBY', 'TONG', 'TONG_ALLIANCE'}) do
 		if nChannel == PLAYER_TALK_CHANNEL[v] then
 			return true
@@ -888,9 +859,9 @@ function LIB.CanUseChatChannel(nChannel)
 end
 
 -- 切换聊天频道
--- (void) LIB.SwitchChatChannel(number nChannel)
--- (void) LIB.SwitchChatChannel(string szHeader)
--- (void) LIB.SwitchChatChannel(string szName)
+-- (void) X.SwitchChatChannel(number nChannel)
+-- (void) X.SwitchChatChannel(string szHeader)
+-- (void) X.SwitchChatChannel(string szName)
 do
 local TALK_CHANNEL_HEADER = {
 	[PLAYER_TALK_CHANNEL.NEARBY] = '/s ',
@@ -905,21 +876,21 @@ local TALK_CHANNEL_HEADER = {
 	[PLAYER_TALK_CHANNEL.CAMP] = '/c ',
 	[PLAYER_TALK_CHANNEL.WORLD] = '/h ',
 }
-function LIB.SwitchChatChannel(nChannel)
+function X.SwitchChatChannel(nChannel)
 	local szHeader = TALK_CHANNEL_HEADER[nChannel]
 	if szHeader then
 		SwitchChatChannel(szHeader)
 	elseif nChannel == PLAYER_TALK_CHANNEL.WHISPER then
-		local edit = LIB.GetChatInput()
+		local edit = X.GetChatInput()
 		if edit then
 			edit:GetRoot():Show()
 			edit:SetText('/w ')
 			Station.SetFocusWindow(edit)
 		end
 	elseif type(nChannel) == 'string' then
-		if sub(nChannel, 1, 1) == '/' then
+		if string.sub(nChannel, 1, 1) == '/' then
 			if nChannel == '/cafk' or nChannel == '/catr' then
-				local edit = LIB.GetChatInput()
+				local edit = X.GetChatInput()
 				if edit then
 					edit:ClearText()
 					for _, v in ipairs({{ type = 'text', text = nChannel }}) do
@@ -930,7 +901,7 @@ function LIB.SwitchChatChannel(nChannel)
 				SwitchChatChannel(nChannel..' ')
 			end
 		else
-			SwitchChatChannel('/w ' .. gsub(nChannel,'[%[%]]','') .. ' ')
+			SwitchChatChannel('/w ' .. string.gsub(nChannel,'[%[%]]','') .. ' ')
 		end
 	end
 end
@@ -954,17 +925,17 @@ local function InitEmotion()
 			t[t1.dwID] = t1
 			t[t1.szCmd] = t1
 			t[t1.szImageFile..','..t1.nFrame..','..t1.szType] = t1
-			MAX_EMOTION_LEN = max(MAX_EMOTION_LEN, wlen(t1.szCmd))
+			MAX_EMOTION_LEN = math.max(MAX_EMOTION_LEN, wstring.len(t1.szCmd))
 		end
 		EMOTION_CACHE = t
 	end
 end
 -- 获取聊天表情列表
 -- typedef emo table
--- (emo[]) LIB.GetChatEmotion()                             -- 返回所有表情列表
--- (emo)   LIB.GetChatEmotion(szCommand)                    -- 返回指定Cmd的表情
--- (emo)   LIB.GetChatEmotion(szImageFile, nFrame, szType)  -- 返回指定图标的表情
-function LIB.GetChatEmotion(arg0, arg1, arg2)
+-- (emo[]) X.GetChatEmotion()                             -- 返回所有表情列表
+-- (emo)   X.GetChatEmotion(szCommand)                    -- 返回指定Cmd的表情
+-- (emo)   X.GetChatEmotion(szImageFile, nFrame, szType)  -- 返回指定图标的表情
+function X.GetChatEmotion(arg0, arg1, arg2)
 	InitEmotion()
 	local t
 	if not arg0 then
@@ -972,10 +943,10 @@ function LIB.GetChatEmotion(arg0, arg1, arg2)
 	elseif not arg1 then
 		t = EMOTION_CACHE[arg0]
 	elseif arg2 then
-		arg0 = gsub(arg0, '\\\\', '\\')
+		arg0 = string.gsub(arg0, '\\\\', '\\')
 		t = EMOTION_CACHE[arg0..','..arg1..','..arg2]
 	end
-	return Clone(t)
+	return X.Clone(t)
 end
 -- parse faceicon in talking message
 local function ParseFaceIcon(t)
@@ -986,7 +957,7 @@ local function ParseFaceIcon(t)
 			-- if v.type == 'emotion' then
 			-- 	v.type = 'text'
 			-- end
-			insert(t2, v)
+			table.insert(t2, v)
 		else
 			local szText = v.text
 			local szLeft = ''
@@ -997,11 +968,11 @@ local function ParseFaceIcon(t)
 					szLeft = szLeft .. szText
 					szText = ''
 				else
-					szLeft = szLeft .. sub(szText, 1, nPos - 1)
-					szText = sub(szText, nPos)
-					for i = min(MAX_EMOTION_LEN, wlen(szText)), 2, -1 do
-						local szTest = wsub(szText, 1, i)
-						local emo = LIB.GetChatEmotion(szTest)
+					szLeft = szLeft .. string.sub(szText, 1, nPos - 1)
+					szText = string.sub(szText, nPos)
+					for i = math.min(MAX_EMOTION_LEN, wstring.len(szText)), 2, -1 do
+						local szTest = wstring.sub(szText, 1, i)
+						local emo = X.GetChatEmotion(szTest)
 						if emo then
 							szFace, dwFaceID = szTest, emo.dwID
 							szText = szText:sub(szFace:len() + 1)
@@ -1010,10 +981,10 @@ local function ParseFaceIcon(t)
 					end
 					if szFace then -- emotion cmd matched
 						if #szLeft > 0 then
-							insert(t2, { type = 'text', text = szLeft })
+							table.insert(t2, { type = 'text', text = szLeft })
 							szLeft = ''
 						end
-						insert(t2, { type = 'emotion', text = szFace, id = dwFaceID })
+						table.insert(t2, { type = 'emotion', text = szFace, id = dwFaceID })
 					elseif nPos then -- find '#' but not match emotion
 						szLeft = szLeft .. szText:sub(1, 1)
 						szText = szText:sub(2)
@@ -1021,7 +992,7 @@ local function ParseFaceIcon(t)
 				end
 			end
 			if #szLeft > 0 then
-				insert(t2, { type = 'text', text = szLeft })
+				table.insert(t2, { type = 'text', text = szLeft })
 				szLeft = ''
 			end
 		end
@@ -1031,12 +1002,12 @@ end
 -- parse name in talking message
 local function ParseName(t)
 	local me = GetClientPlayer()
-	local tar = LIB.GetObject(me.GetTarget())
+	local tar = X.GetObject(me.GetTarget())
 	for i, v in ipairs(t) do
 		if v.type == 'text' then
-			v.text = gsub(v.text, '%$zj', '[' .. me.szName .. ']')
+			v.text = string.gsub(v.text, '%$zj', '[' .. me.szName .. ']')
 			if tar then
-				v.text = gsub(v.text, '%$mb', '[' .. tar.szName .. ']')
+				v.text = string.gsub(v.text, '%$mb', '[' .. tar.szName .. ']')
 			end
 		end
 	end
@@ -1046,24 +1017,24 @@ local function ParseName(t)
 			-- if v.type == 'name' then
 			-- 	v = { type = 'text', text = '['..v.name..']' }
 			-- end
-			insert(t2, v)
+			table.insert(t2, v)
 		else
-			local nOff, nLen = 1, len(v.text)
+			local nOff, nLen = 1, string.len(v.text)
 			while nOff <= nLen do
 				local szName = nil
-				local nPos1, nPos2 = find(v.text, '%[[^%[%]]+%]', nOff)
+				local nPos1, nPos2 = string.find(v.text, '%[[^%[%]]+%]', nOff)
 				if not nPos1 then
 					nPos1 = nLen
 				else
-					szName = sub(v.text, nPos1 + 1, nPos2 - 1)
+					szName = string.sub(v.text, nPos1 + 1, nPos2 - 1)
 					nPos1 = nPos1 - 1
 				end
 				if nPos1 >= nOff then
-					insert(t2, { type = 'text', text = sub(v.text, nOff, nPos1) })
+					table.insert(t2, { type = 'text', text = string.sub(v.text, nOff, nPos1) })
 					nOff = nPos1 + 1
 				end
 				if szName then
-					insert(t2, { type = 'name', text = '[' .. szName .. ']', name = szName })
+					table.insert(t2, { type = 'name', text = '[' .. szName .. ']', name = szName })
 					nOff = nPos2 + 1
 				end
 			end
@@ -1091,22 +1062,22 @@ local function ParseAntiSWS(t)
 				local nSensitiveWordEndLen = 1 -- 最后一个字符（要裁剪掉的字符）大小
 				local nSensitiveWordEndPos = #szText + 1
 				for _, szSensitiveWord in ipairs(SENSITIVE_WORD) do
-					local _, nEndPos = wfind(szText, szSensitiveWord)
+					local _, nEndPos = wstring.find(szText, szSensitiveWord)
 					if nEndPos and nEndPos < nSensitiveWordEndPos then
-						local nSensitiveWordLenW = wlen(szSensitiveWord)
-						nSensitiveWordEndLen = len(wsub(szSensitiveWord, nSensitiveWordLenW, nSensitiveWordLenW))
+						local nSensitiveWordLenW = wstring.len(szSensitiveWord)
+						nSensitiveWordEndLen = string.len(wstring.sub(szSensitiveWord, nSensitiveWordLenW, nSensitiveWordLenW))
 						nSensitiveWordEndPos = nEndPos
 					end
 				end
 
-				insert(t2, {
+				table.insert(t2, {
 					type = 'text',
-					text = sub(szText, 1, nSensitiveWordEndPos - nSensitiveWordEndLen)
+					text = string.sub(szText, 1, nSensitiveWordEndPos - nSensitiveWordEndLen)
 				})
-				szText = sub(szText, nSensitiveWordEndPos + 1 - nSensitiveWordEndLen)
+				szText = string.sub(szText, nSensitiveWordEndPos + 1 - nSensitiveWordEndLen)
 			end
 		else
-			insert(t2, v)
+			table.insert(t2, v)
 		end
 	end
 	return t2
@@ -1120,19 +1091,19 @@ end
 -- parserOptions.len     (boolean)        聊天最大长度限制校验，默认不校验
 local StandardizeParserOptions
 do
-local DEFAULT_PARSER_OPTIONS = LIB.SetmetaReadonly({
+local DEFAULT_PARSER_OPTIONS = X.SetmetaReadonly({
 	name = true,
 	emotion = true,
 	sws = false,
 	len = true,
 })
-local FULL_PARSER_OPTIONS = LIB.SetmetaReadonly({
+local FULL_PARSER_OPTIONS = X.SetmetaReadonly({
 	name = true,
 	emotion = true,
 	sws = true,
 	len = true,
 })
-local NULL_PARSER_OPTIONS = LIB.SetmetaReadonly({
+local NULL_PARSER_OPTIONS = X.SetmetaReadonly({
 	name = false,
 	emotion = false,
 	sws = false,
@@ -1143,13 +1114,13 @@ function StandardizeParserOptions(parsers)
 		parsers = FULL_PARSER_OPTIONS
 	elseif parsers == false then
 		parsers = NULL_PARSER_OPTIONS
-	elseif not IsTable(parsers) then
+	elseif not X.IsTable(parsers) then
 		parsers = DEFAULT_PARSER_OPTIONS
 	end
 	local mt = {
 		__index = function(_, k)
 			local v = parsers[k]
-			if IsNil(v) then
+			if X.IsNil(v) then
 				v = DEFAULT_PARSER_OPTIONS[k]
 			end
 			return v
@@ -1159,8 +1130,8 @@ function StandardizeParserOptions(parsers)
 end
 end
 
-LIB.RegisterRestriction('LIB.CHAT_CRLF', { ['*'] = true })
-LIB.RegisterRestriction('LIB.CHAT_LEN', { ['*'] = true })
+X.RegisterRestriction('X.CHAT_CRLF', { ['*'] = true })
+X.RegisterRestriction('X.CHAT_LEN', { ['*'] = true })
 
 -- 格式化聊天内容
 -- szText        -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
@@ -1168,19 +1139,19 @@ LIB.RegisterRestriction('LIB.CHAT_LEN', { ['*'] = true })
 local function StandardizeChatData(szText, parserOptions)
 	-- 聊天内容格式标准化
 	local aSay = nil
-	if IsTable(szText) then
-		aSay = Clone(szText)
+	if X.IsTable(szText) then
+		aSay = X.Clone(szText)
 	else
 		aSay = {{ type = 'text', text = szText }}
 	end
 	-- 过滤换行符
-	if LIB.IsRestricted('LIB.CHAT_CRLF') then
+	if X.IsRestricted('X.CHAT_CRLF') then
 		for _, v in ipairs(aSay) do
 			if v.text then
-				v.text = wgsub(v.text, '\n', ' ')
+				v.text = wstring.gsub(v.text, '\n', ' ')
 			end
 			if v.name then
-				v.name = wgsub(v.name, '\n', ' ')
+				v.name = wstring.gsub(v.name, '\n', ' ')
 			end
 		end
 	end
@@ -1196,20 +1167,20 @@ local function StandardizeChatData(szText, parserOptions)
 	if parserOptions.sws then
 		aSay = ParseAntiSWS(aSay)
 	end
-	if parserOptions.len and LIB.IsRestricted('LIB.CHAT_LEN') then
+	if parserOptions.len and X.IsRestricted('X.CHAT_LEN') then
 		local nLen = 0
 		for i, v in ipairs(aSay) do
 			if nLen <= 64 then
-				nLen = nLen + wlen(v.text or v.name or '')
+				nLen = nLen + wstring.len(v.text or v.name or '')
 				if nLen > 64 then
 					if v.text then
-						v.text = wsub(v.text, 1, 64 - nLen)
+						v.text = wstring.sub(v.text, 1, 64 - nLen)
 					end
 					if v.name then
-						v.name = wsub(v.name, 1, 64 - nLen)
+						v.name = wstring.sub(v.name, 1, 64 - nLen)
 					end
 					for j = #aSay, i + 1, -1 do
-						remove(aSay, j)
+						table.remove(aSay, j)
 					end
 				end
 			end
@@ -1224,15 +1195,15 @@ end
 -- me          -- 玩家自身角色对象
 local function SignChatData(aSay, uuid, me)
 	if not aSay[1] or aSay[1].name ~= '' or aSay[1].type ~= 'eventlink' then
-		insert(aSay, 1, { type = 'eventlink', name = '', text = '' })
+		table.insert(aSay, 1, { type = 'eventlink', name = '', text = '' })
 	end
 	local dwTime = GetCurrentTime()
-	local szLinkInfo = LIB.JsonEncode({
+	local szLinkInfo = X.JsonEncode({
 		_ = dwTime,
-		c = LIB.IsDebugClient(true)
+		c = X.IsDebugClient(true)
 			and GetStringCRC(me.szName .. dwTime .. '8545ada2-f687-4c95-8558-27cbf823745a')
 			or nil,
-		via = PACKET_INFO.NAME_SPACE,
+		via = X.PACKET_INFO.NAME_SPACE,
 		uuid = uuid and tostring(uuid),
 	})
 	aSay[1].linkinfo = szLinkInfo
@@ -1240,13 +1211,13 @@ local function SignChatData(aSay, uuid, me)
 end
 
 -- 设置聊天内容
--- (void) LIB.SetChatInput(string szText[, table parsers, [string uuid]])
+-- (void) X.SetChatInput(string szText[, table parsers, [string uuid]])
 -- szText    -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
--- parsers   -- *可选* 解析器参数，参见 LIB.SendChat: tOptions.parsers
--- uuid      -- *可选* 消息唯一标识符，参见 LIB.SendChat: tOptions.uuid
-function LIB.SetChatInput(szText, parsers, uuid)
+-- parsers   -- *可选* 解析器参数，参见 X.SendChat: tOptions.parsers
+-- uuid      -- *可选* 消息唯一标识符，参见 X.SendChat: tOptions.uuid
+function X.SetChatInput(szText, parsers, uuid)
 	local me = GetClientPlayer()
-	local edit = LIB.GetChatInput()
+	local edit = X.GetChatInput()
 	if me and edit then
 		local parserOptions = StandardizeParserOptions(parsers)
 		local aSay = StandardizeChatData(szText, parserOptions)
@@ -1259,7 +1230,7 @@ function LIB.SetChatInput(szText, parsers, uuid)
 end
 
 -- 发布聊天内容
--- (void) LIB.SendChat(mixed uTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny] ])
+-- (void) X.SendChat(mixed uTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny] ])
 -- uTarget   -- 聊天目标：
 --              1、(number) PLAYER_TALK_CHANNLE.* 战场/团队聊天频道可智能切换
 --              2、(string) 密聊的目标角色名
@@ -1270,20 +1241,20 @@ end
 --              tOptions.parsers.name    (boolean)        解析聊天内容中的名字，默认解析
 --              tOptions.parsers.emotion (boolean)        解析聊天内容中的表情图片和名字，默认解析
 --              tOptions.save            (boolean)        在聊天输入栏保留不可发言的频道内容，默认为 false
-function LIB.SendChat(nChannel, szText, tOptions)
+function X.SendChat(nChannel, szText, tOptions)
 	if not tOptions then
 		tOptions = {}
 	end
 	-- 检查是否转向设置输入框
-	if tOptions.save and not LIB.CanUseChatChannel(nChannel) then
-		LIB.SetChatInput(szText, tOptions.parsers)
-		LIB.SwitchChatChannel(nChannel)
-		LIB.FocusChatInput()
+	if tOptions.save and not X.CanUseChatChannel(nChannel) then
+		X.SetChatInput(szText, tOptions.parsers)
+		X.SwitchChatChannel(nChannel)
+		X.FocusChatInput()
 		return
 	end
 	-- 初始化参数
 	local szTarget, me = '', GetClientPlayer()
-	if IsString(nChannel) then
+	if X.IsString(nChannel) then
 		szTarget = nChannel
 		nChannel = PLAYER_TALK_CHANNEL.WHISPER
 	elseif nChannel == PLAYER_TALK_CHANNEL.RAID and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD then
@@ -1298,8 +1269,8 @@ function LIB.SendChat(nChannel, szText, tOptions)
 	end
 	local aSay = StandardizeChatData(szText, parserOptions)
 	if bSystem then
-		local szXml = LIB.XmlifyChatData(aSay, GetMsgFontColor('MSG_SYS'))
-		return LIB.Sysmsg({ szXml, rich = true })
+		local szXml = X.XmlifyChatData(aSay, GetMsgFontColor('MSG_SYS'))
+		return X.Sysmsg({ szXml, rich = true })
 	end
 	-- 签名并发送
 	local aSignSay = SignChatData(aSay, tOptions.uuid, me)
@@ -1314,13 +1285,13 @@ local metaAlignment = { __index = function() return 'L' end }
 local function MergeHW(s)
 	return s:gsub(W_SPACE, 'W'):gsub(' (W*) ', W_SPACE .. '%1'):gsub('W', W_SPACE)
 end
-function LIB.SendTabChat(nChannel, aTable, aAlignment)
+function X.SendTabChat(nChannel, aTable, aAlignment)
 	local aLenHW, aMaxLenHW = {}, {}
 	for i, aText in ipairs(aTable) do
 		aLenHW[i] = {}
 		for j, szText in ipairs(aText) do
 			aLenHW[i][j] = #szText
-			aMaxLenHW[j] = max(aLenHW[i][j], aMaxLenHW[j] or 0)
+			aMaxLenHW[j] = math.max(aLenHW[i][j], aMaxLenHW[j] or 0)
 		end
 	end
 	local aAlignment = setmetatable(aAlignment or {}, metaAlignment)
@@ -1328,13 +1299,13 @@ function LIB.SendTabChat(nChannel, aTable, aAlignment)
 		local aSay, szFixL, szFixR = {}, nil, nil
 		local nFixLenFW, nFixLenHW
 		for j, szText in ipairs(aText) do
-			nFixLenFW = floor(max(0, aMaxLenHW[j] - aLenHW[i][j]) / 2)
+			nFixLenFW = math.floor(math.max(0, aMaxLenHW[j] - aLenHW[i][j]) / 2)
 			if nFixLenFW % 2 == 1 then
 				nFixLenFW = nFixLenFW - 1
 			end
 			nFixLenHW = aMaxLenHW[j] - (aLenHW[i][j] + nFixLenFW * 2)
-			szFixL = W_SPACE:rep(ceil(nFixLenFW / 2)) .. SPACE:rep(ceil(nFixLenHW / 2))
-			szFixR = W_SPACE:rep(floor(nFixLenFW / 2)) .. SPACE:rep(floor(nFixLenHW / 2))
+			szFixL = W_SPACE:rep(math.ceil(nFixLenFW / 2)) .. SPACE:rep(math.ceil(nFixLenHW / 2))
+			szFixR = W_SPACE:rep(math.floor(nFixLenFW / 2)) .. SPACE:rep(math.floor(nFixLenHW / 2))
 			if aAlignment[j] == 'M' then
 				aSay[j] = szFixL .. szText .. szFixR
 			elseif aAlignment[j] == 'R' then
@@ -1343,8 +1314,8 @@ function LIB.SendTabChat(nChannel, aTable, aAlignment)
 				aSay[j] = szText .. MergeHW(szFixL .. szFixR)
 			end
 		end
-		-- LIB.Sysmsg(concat(aSay, '|'))
-		LIB.SendChat(nChannel, (concat(aSay, ' ')))
+		-- X.Sysmsg(table.concat(aSay, '|'))
+		X.SendChat(nChannel, (table.concat(aSay, ' ')))
 	end
 end
 end
@@ -1429,7 +1400,7 @@ local DAILY_LIMIT_TABLE_KEY = {
 	[PLAYER_TALK_CHANNEL.NEARBY ] = 'NearbyChannelDailyLimit',
 	[PLAYER_TALK_CHANNEL.WHISPER] = 'WhisperDailyLimit',
 }
-function LIB.GetChatChannelDailyLimit(nLevel, nChannel)
+function X.GetChatChannelDailyLimit(nLevel, nChannel)
 	local LevelUpData = GetRegisterChannelLimitTable()
 	if not LevelUpData then
 		return false
@@ -1446,13 +1417,13 @@ function LIB.GetChatChannelDailyLimit(nLevel, nChannel)
 end
 end
 
-function LIB.GetMsgTypeMenu(fnAction, tChecked)
+function X.GetMsgTypeMenu(fnAction, tChecked)
 	local t = {}
 	for _, cg in ipairs(CONSTANT.MSG_TYPE_MENU) do
 		local t1 = { szOption = cg.szCaption }
 		if cg.tChannels[1] then
 			for _, szChannel in ipairs(cg.tChannels) do
-				insert(t1,{
+				table.insert(t1,{
 					szOption = g_tStrings.tChannelName[szChannel],
 					rgb = GetMsgFontColor(szChannel, true),
 					UserData = szChannel,
@@ -1464,11 +1435,11 @@ function LIB.GetMsgTypeMenu(fnAction, tChecked)
 		else
 			for szPrefix, tChannels in pairs(cg.tChannels) do
 				if #t1 > 0 then
-					insert(t1,{ bDevide = true })
+					table.insert(t1,{ bDevide = true })
 				end
-				insert(t1,{ szOption = szPrefix, bDisable = true })
+				table.insert(t1,{ szOption = szPrefix, bDisable = true })
 				for _, szChannel in ipairs(tChannels) do
-					insert(t1,{
+					table.insert(t1,{
 						szOption = g_tStrings.tChannelName[szChannel],
 						rgb = GetMsgFontColor(szChannel, true),
 						UserData = szChannel,
@@ -1479,7 +1450,7 @@ function LIB.GetMsgTypeMenu(fnAction, tChecked)
 				end
 			end
 		end
-		insert(t, t1)
+		table.insert(t, t1)
 	end
 	return t
 end
@@ -1494,8 +1465,8 @@ local CHAT_HOOK = {
 	AFTER = {},
 	FILTER = {},
 }
-function LIB.HookChatPanel(szType, szKey, fnAction)
-	if IsFunction(szKey) then
+function X.HookChatPanel(szType, szKey, fnAction)
+	if X.IsFunction(szKey) then
 		szKey, fnAction = nil, szKey
 	end
 	if not CHAT_HOOK[szType] then
@@ -1508,10 +1479,10 @@ function LIB.HookChatPanel(szType, szKey, fnAction)
 		end
 		szKey = tostring(szKey)
 	end
-	if IsNil(fnAction) then
+	if X.IsNil(fnAction) then
 		return CHAT_HOOK[szType][szKey]
 	end
-	if not IsFunction(fnAction) then
+	if not X.IsFunction(fnAction) then
 		fnAction = nil
 	end
 	CHAT_HOOK[szType][szKey] = fnAction
@@ -1521,26 +1492,26 @@ end
 local l_hPrevItem
 local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChannel, dwTime, nR, nG, nB, ...
 	for szKey, fnAction in pairs(CHAT_HOOK.FILTER) do
-		local res, err, trace = XpCall(fnAction, h, szMsg, ...)
+		local res, err, trace = X.XpCall(fnAction, h, szMsg, ...)
 		if res then
 			if not err then
 				return h, '', ...
 			end
 		--[[#DEBUG BEGIN]]
 		else
-			LIB.ErrorLog(err, 'HookChatPanel.FILTER: ' .. szKey, trace)
+			X.ErrorLog(err, 'HookChatPanel.FILTER: ' .. szKey, trace)
 		--[[#DEBUG END]]
 		end
 	end
 	for szKey, fnAction in pairs(CHAT_HOOK.BEFORE) do
-		local res, err, trace = XpCall(fnAction, h, szMsg, ...)
+		local res, err, trace = X.XpCall(fnAction, h, szMsg, ...)
 		if res then
-			if IsString(err) then
+			if X.IsString(err) then
 				szMsg = err
 			end
 		--[[#DEBUG BEGIN]]
 		else
-			LIB.ErrorLog(err, 'HookChatPanel.BEFORE: ' .. szKey, trace)
+			X.ErrorLog(err, 'HookChatPanel.BEFORE: ' .. szKey, trace)
 		--[[#DEBUG END]]
 		end
 	end
@@ -1564,9 +1535,9 @@ local function AfterChatAppendItemFromString(h, ...)
 		end
 		if nStart >= 0 and nStart < nCount then
 			for szKey, fnAction in pairs(CHAT_HOOK.AFTER) do
-				local res, err, trace = XpCall(fnAction, h, nStart, ...)
+				local res, err, trace = X.XpCall(fnAction, h, nStart, ...)
 				if not res then
-					LIB.ErrorLog(err, 'HookChatPanel.AFTER: ' .. szKey, trace)
+					X.ErrorLog(err, 'HookChatPanel.AFTER: ' .. szKey, trace)
 				end
 			end
 		end
@@ -1585,7 +1556,7 @@ local function Hook(i)
 		HookTableFunc(h, 'AppendItemFromString', AfterChatAppendItemFromString, { bAfterOrigin = true, bHookParams = true })
 	end
 end
-LIB.RegisterEvent('CHAT_PANEL_OPEN', 'ChatPanelHook', function(event) Hook(arg0) end)
+X.RegisterEvent('CHAT_PANEL_OPEN', 'ChatPanelHook', function(event) Hook(arg0) end)
 
 local function Unhook(i)
 	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
@@ -1602,16 +1573,16 @@ local function HookAll()
 		Hook(i)
 	end
 end
-LIB.RegisterInit('LIB#ChatPanelHook', HookAll)
-LIB.RegisterEvent('CHAT_PANEL_INIT', 'ChatPanelHook', HookAll)
+X.RegisterInit('LIB#ChatPanelHook', HookAll)
+X.RegisterEvent('CHAT_PANEL_INIT', 'ChatPanelHook', HookAll)
 
 local function UnhookAll()
 	for i = 1, 10 do
 		Unhook(i)
 	end
 end
-LIB.RegisterExit('LIB#ChatPanelHook', UnhookAll)
-LIB.RegisterReload('LIB#ChatPanelHook', UnhookAll)
+X.RegisterExit('LIB#ChatPanelHook', UnhookAll)
+X.RegisterReload('LIB#ChatPanelHook', UnhookAll)
 end
 
 -- 防止山寨
@@ -1626,12 +1597,12 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 	end
 	local p = aSay[1]
 	if p and p.type == 'eventlink' and p.name == '' then
-		local data = LIB.JsonDecode(p.linkinfo)
+		local data = X.JsonDecode(p.linkinfo)
 		if data and data._ and data.c and data.c == GetStringCRC(szName .. data._ .. '8545ada2-f687-4c95-8558-27cbf823745a') then
 			return
 		end
 	end
-	if UI_GetClientPlayerID() ~= dwTalkerID and PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName] and PACKET_INFO.AUTHOR_ROLES[dwTalkerID] ~= szName then
+	if UI_GetClientPlayerID() ~= dwTalkerID and X.PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName] and X.PACKET_INFO.AUTHOR_ROLES[dwTalkerID] ~= szName then
 		return true
 	end
 end, {

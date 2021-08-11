@@ -7,49 +7,20 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
-UI.MOUSE_EVENT = LIB.SetmetaReadonly({
+UI.MOUSE_EVENT = X.SetmetaReadonly({
 	LBUTTON = 1,
 	MBUTTON = 0,
 	RBUTTON = -1,
 })
-UI.TIP_POSITION = LIB.SetmetaReadonly({
+UI.TIP_POSITION = X.SetmetaReadonly({
 	FOLLOW_MOUSE              = -1,
 	CENTER                    = ALW.CENTER,
 	LEFT_RIGHT                = ALW.LEFT_RIGHT,
@@ -58,16 +29,16 @@ UI.TIP_POSITION = LIB.SetmetaReadonly({
 	BOTTOM_TOP                = ALW.BOTTOM_TOP,
 	RIGHT_LEFT_AND_BOTTOM_TOP = ALW.RIGHT_LEFT_AND_BOTTOM_TOP,
 })
-UI.TIP_HIDEWAY = LIB.SetmetaReadonly({
+UI.TIP_HIDEWAY = X.SetmetaReadonly({
 	NO_HIDE      = 100,
 	HIDE         = 101,
 	ANIMATE_HIDE = 102,
 })
-UI.TRACKBAR_STYLE = LIB.SetmetaReadonly({
+UI.TRACKBAR_STYLE = X.SetmetaReadonly({
 	SHOW_VALUE    = false,
 	SHOW_PERCENT  = true,
 })
-UI.WND_SIDE = LIB.SetmetaReadonly({
+UI.WND_SIDE = X.SetmetaReadonly({
 	TOP          = 0,
 	BOTTOM       = 1,
 	LEFT         = 2,
@@ -82,12 +53,12 @@ UI.WND_SIDE = LIB.SetmetaReadonly({
 	TOPCENTER    = 1,
 	BOTTOMCENTER = 1,
 })
-UI.EDIT_TYPE = LIB.SetmetaReadonly({
+UI.EDIT_TYPE = X.SetmetaReadonly({
 	NUMBER = 0, -- 数字
 	ASCII = 1, -- 英文
 	WIDE_CHAR = 2, -- 中英文
 })
-UI.WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or LIB.SetmetaReadonly({
+UI.WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or X.SetmetaReadonly({
 	CUSTOM = 0,
 	LEFT_TOP = 1,
 	LEFT_BOTTOM = 2,
@@ -113,13 +84,13 @@ local BUTTON_STYLE_CONFIG = {
 		nHeight = 23,
 		nMarginBottom = 0,
 		nPaddingBottom = 0,
-		szImage = PACKET_INFO.FRAMEWORK_ROOT .. 'img/UIComponents.UITex',
+		szImage = X.PACKET_INFO.FRAMEWORK_ROOT .. 'img/UIComponents.UITex',
 		nNormalGroup = 0,
 		nMouseOverGroup = 1,
 		nMouseDownGroup = 2,
 		nDisableGroup = 3,
 	},
-	LINK = LIB.SetmetaReadonly({
+	LINK = X.SetmetaReadonly({
 		nWidth = 60,
 		nHeight = 25,
 		szImage = 'ui/Image/UICommon/CommonPanel.UITex',
@@ -143,34 +114,26 @@ local BUTTON_STYLE_CONFIG = {
 	},
 }
 local function GetButtonStyleName(raw)
-	local szImage = wlower(raw:GetAnimatePath())
+	local szImage = wstring.lower(raw:GetAnimatePath())
 	local nNormalGroup = raw:GetAnimateGroupNormal()
-	local GetStyleName = Get(_G, {NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleName'})
-	if IsFunction(GetStyleName) then
+	local GetStyleName = X.Get(_G, {X.NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleName'})
+	if X.IsFunction(GetStyleName) then
 		local eStyle = GetStyleName(szImage, nNormalGroup)
 		if eStyle then
 			return eStyle
 		end
 	end
 	for e, p in pairs(BUTTON_STYLE_CONFIG) do
-		if wlower(LIB.NormalizePath(p.szImage)) == szImage and p.nNormalGroup == nNormalGroup then
+		if wstring.lower(X.NormalizePath(p.szImage)) == szImage and p.nNormalGroup == nNormalGroup then
 			return e
 		end
 	end
 end
 local function GetButtonStyleConfig(eButtonStyle)
-	local GetStyleConfig = Get(_G, {NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleConfig'})
-	return IsFunction(GetStyleConfig)
+	local GetStyleConfig = X.Get(_G, {X.NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleConfig'})
+	return X.IsFunction(GetStyleConfig)
 		and GetStyleConfig(eButtonStyle)
 		or BUTTON_STYLE_CONFIG[eButtonStyle]
-end
-
-local function CallWithThis(context, fn, ...)
-	local _this = this
-	this = context
-	local rtc = {Call(fn, ...)}
-	this = _this
-	return unpack(rtc)
 end
 
 -----------------------------------------------------------
@@ -457,7 +420,7 @@ local function InitComponent(raw, szType)
 		SetComponentProp(raw, 'onChangeEvents', {})
 		SetComponentProp(raw, 'FormatText', function(value, bPercentage)
 			if bPercentage then
-				return format('%.2f%%', value)
+				return string.format('%.2f%%', value)
 			else
 				return value
 			end
@@ -473,13 +436,13 @@ local function InitComponent(raw, szType)
 			local bShowPercentage = GetComponentProp(raw, 'bShowPercentage')
 			if bShowPercentage then
 				local nMax = GetComponentProp(raw, 'nTrackbarMax')
-				nCurrentValue = floor((nCurrentValue * 100 / nMax) * 100) / 100
+				nCurrentValue = math.floor((nCurrentValue * 100 / nMax) * 100) / 100
 			end
 			local szText = GetComponentProp(raw, 'FormatText')(nCurrentValue, bShowPercentage)
 			raw:Lookup('', 'Text_Default'):SetText(szText)
 			if not bOnlyUI then
 				for _, fn in ipairs(GetComponentProp(raw, 'onChangeEvents')) do
-					LIB.ExecuteWithThis(raw, fn, nCurrentValue)
+					X.ExecuteWithThis(raw, fn, nCurrentValue)
 				end
 			end
 			this = _this
@@ -525,7 +488,7 @@ local function InitComponent(raw, szType)
 			-- min search length
 			if len >= opt.minLength then
 				-- delay search
-				LIB.DelayCall(opt.delay, function()
+				X.DelayCall(opt.delay, function()
 					UI(raw):Autocomplete('search')
 					-- for compatible
 					Station.SetFocusWindow(edt)
@@ -535,10 +498,10 @@ local function InitComponent(raw, szType)
 			end
 		end
 		edt.OnKillFocus = function()
-			LIB.DelayCall(function()
+			X.DelayCall(function()
 				local wnd = Station.GetFocusWindow()
 				local frame = wnd and wnd:GetRoot()
-				if not frame or frame:GetName() ~= NSFormatString('{$NS}_PopupMenu') then
+				if not frame or frame:GetName() ~= X.NSFormatString('{$NS}_PopupMenu') then
 					UI.ClosePopupMenu()
 				end
 			end)
@@ -598,7 +561,7 @@ local function InitComponent(raw, szType)
 			local data = GetComponentProp(this, 'listboxItemData')
 			local onHoverIn = GetComponentProp(raw, 'OnListItemHandleCustomHoverIn')
 			if onHoverIn then
-				local bStatus, bRet = CallWithThis(raw, onHoverIn, data.id, data.text, data.data, not data.selected)
+				local bStatus, bRet = X.CallWithThis(raw, onHoverIn, data.id, data.text, data.data, not data.selected)
 				if bStatus and bRet == false then
 					return
 				end
@@ -609,7 +572,7 @@ local function InitComponent(raw, szType)
 			local data = GetComponentProp(this, 'listboxItemData')
 			local onHoverOut = GetComponentProp(raw, 'OnListItemHandleCustomHoverOut')
 			if onHoverOut then
-				local bStatus, bRet = CallWithThis(raw, onHoverOut, data.id, data.text, data.data, not data.selected)
+				local bStatus, bRet = X.CallWithThis(raw, onHoverOut, data.id, data.text, data.data, not data.selected)
 				if bStatus and bRet == false then
 					return
 				end
@@ -620,7 +583,7 @@ local function InitComponent(raw, szType)
 			local data = GetComponentProp(this, 'listboxItemData')
 			local onItemLClick = GetComponentProp(raw, 'OnListItemHandleCustomLButtonClick')
 			if onItemLClick then
-				local bStatus, bRet = CallWithThis(raw, onItemLClick, data.id, data.text, data.data, not data.selected)
+				local bStatus, bRet = X.CallWithThis(raw, onItemLClick, data.id, data.text, data.data, not data.selected)
 				if bStatus and bRet == false then
 					return
 				end
@@ -647,7 +610,7 @@ local function InitComponent(raw, szType)
 			local data = GetComponentProp(this, 'listboxItemData')
 			local onItemRClick = GetComponentProp(raw, 'OnListItemHandleCustomRButtonClick')
 			if onItemRClick then
-				local bStatus, bRet = CallWithThis(raw, onItemRClick, data.id, data.text, data.data, not data.selected)
+				local bStatus, bRet = X.CallWithThis(raw, onItemRClick, data.id, data.text, data.data, not data.selected)
 				if bStatus and bRet == false then
 					return
 				end
@@ -669,7 +632,7 @@ local function InitComponent(raw, szType)
 			end
 			local GetMenu = GetComponentProp(raw, 'GetListItemHandleMenu')
 			if GetMenu then
-				local status, menu = CallWithThis(raw, GetMenu, data.id, data.text, data.data, data.selected)
+				local status, menu = X.CallWithThis(raw, GetMenu, data.id, data.text, data.data, data.selected)
 				if status and menu then
 					UI.PopupMenu(menu)
 				end
@@ -679,11 +642,11 @@ local function InitComponent(raw, szType)
 	elseif szType == 'CheckBox' then
 		raw:RegisterEvent(831)
 		local function UpdateCheckState(raw)
-			if not IsElement(raw) then
+			if not X.IsElement(raw) then
 				return
 			end
 			local img = raw:Lookup('Image_Default')
-			if not IsElement(img) then
+			if not X.IsElement(img) then
 				return
 			end
 			if GetComponentProp(raw, 'bDisabled') then
@@ -756,7 +719,7 @@ local function InitComponent(raw, szType)
 			-- 颜色组件，无论是否注册过都弹框
 			UI.OpenColorPicker(function(r, g, b)
 				for _, cb in ipairs(GetComponentProp(raw, 'OnColorPickCBs')) do
-					CallWithThis(raw, cb, r, g, b)
+					X.CallWithThis(raw, cb, r, g, b)
 				end
 				UI(raw):Color(r, g, b)
 			end)
@@ -782,31 +745,31 @@ local OO = {}
 function OO:ctor(mixed)
 	local raws = {}
 	local oo = {}
-	if IsTable(mixed) then
-		if IsTable(mixed.raws) then
+	if X.IsTable(mixed) then
+		if X.IsTable(mixed.raws) then
 			for _, raw in ipairs(mixed.raws) do
-				insert(raws, raw)
+				table.insert(raws, raw)
 			end
-		elseif IsElement(mixed) then
-			insert(raws, mixed)
+		elseif X.IsElement(mixed) then
+			table.insert(raws, mixed)
 		else
 			for _, raw in ipairs(mixed) do
-				if IsElement(raw) then
-					insert(raws, raw)
+				if X.IsElement(raw) then
+					table.insert(raws, raw)
 				end
 			end
 		end
-	elseif IsString(mixed) then
+	elseif X.IsString(mixed) then
 		local raw = Station.Lookup(mixed)
-		if IsElement(raw) then
-			insert(raws, raw)
+		if X.IsElement(raw) then
+			table.insert(raws, raw)
 		end
 	end
 	return setmetatable(oo, {
 		__index = function(t, k)
 			if k == 'raws' then
 				return raws
-			elseif IsNumber(k) then
+			elseif X.IsNumber(k) then
 				if k < 0 then
 					k = #raws + k + 1
 				end
@@ -816,22 +779,22 @@ function OO:ctor(mixed)
 			end
 		end,
 		__newindex = function(t, k, v)
-			if IsNumber(k) then
+			if X.IsNumber(k) then
 				assert(false, 'Elements are readonly!')
 			else
-				assert(false, NSFormatString('{$NS}_UI (class instance) is readonly!'))
+				assert(false, X.NSFormatString('{$NS}_UI (class instance) is readonly!'))
 			end
 		end,
-		__tostring = function(t) return NSFormatString('{$NS}_UI (class instance)') end,
+		__tostring = function(t) return X.NSFormatString('{$NS}_UI (class instance)') end,
 	})
 end
 
 --  del bad raws
 -- (self) _checksum()
 function OO:_checksum()
-	for i, raw in ipairs_r(self.raws) do
-		if not IsElement(raw) then
-			remove(self.raws, i)
+	for i, raw in X.ipairs_r(self.raws) do
+		if not X.IsElement(raw) then
+			table.remove(self.raws, i)
 		end
 	end
 	return self
@@ -843,17 +806,17 @@ function OO:Add(mixed)
 	self:_checksum()
 	local raws = {}
 	for i, raw in ipairs(self.raws) do
-		insert(raws, raw)
+		table.insert(raws, raw)
 	end
-	if IsString(mixed) then
+	if X.IsString(mixed) then
 		mixed = Station.Lookup(mixed)
 	end
-	if IsElement(mixed) then
-		insert(raws, mixed)
+	if X.IsElement(mixed) then
+		table.insert(raws, mixed)
 	end
-	if IsTable(mixed) and tostring(mixed) == NSFormatString('{$NS}_UI (class instance)') then
+	if X.IsTable(mixed) and tostring(mixed) == X.NSFormatString('{$NS}_UI (class instance)') then
 		for i = 1, mixed:Count() do
-			insert(raws, mixed[i])
+			table.insert(raws, mixed[i])
 		end
 	end
 	return UI(raws)
@@ -865,51 +828,51 @@ function OO:Del(mixed)
 	self:_checksum()
 	local raws = {}
 	for i, raw in ipairs(self.raws) do
-		insert(raws, raw)
+		table.insert(raws, raw)
 	end
-	if IsString(mixed) then
+	if X.IsString(mixed) then
 		-- delete raws those id/class fits filter: mixed
-		if sub(mixed, 1, 1) == '#' then
-			mixed = sub(mixed, 2)
-			if sub(mixed, 1, 1) == '^' then
+		if string.sub(mixed, 1, 1) == '#' then
+			mixed = string.sub(mixed, 2)
+			if string.sub(mixed, 1, 1) == '^' then
 				-- regexp
-				for i, raw in ipairs_r(raws) do
-					if find(raw:GetName(), mixed) then
-						remove(raws, i)
+				for i, raw in X.ipairs_r(raws) do
+					if string.find(raw:GetName(), mixed) then
+						table.remove(raws, i)
 					end
 				end
 			else
 				-- normal
-				for i, raw in ipairs_r(raws) do
+				for i, raw in X.ipairs_r(raws) do
 					if raw:GetName() == mixed then
-						remove(raws, i)
+						table.remove(raws, i)
 					end
 				end
 			end
-		elseif sub(mixed, 1, 1) == '.' then
-			mixed = sub(mixed, 2)
-			if sub(mixed, 1, 1) == '^' then
+		elseif string.sub(mixed, 1, 1) == '.' then
+			mixed = string.sub(mixed, 2)
+			if string.sub(mixed, 1, 1) == '^' then
 				-- regexp
-				for i, raw in ipairs_r(raws) do
-					if find(GetComponentType(raw), mixed) then
-						remove(raws, i)
+				for i, raw in X.ipairs_r(raws) do
+					if string.find(GetComponentType(raw), mixed) then
+						table.remove(raws, i)
 					end
 				end
 			else
 				-- normal
-				for i, raw in ipairs_r(raws) do
+				for i, raw in X.ipairs_r(raws) do
 					if GetComponentType(raw) == mixed then
-						remove(raws, i)
+						table.remove(raws, i)
 					end
 				end
 			end
 		end
-	elseif IsElement(mixed) then
+	elseif X.IsElement(mixed) then
 		-- delete raws those treepath is the same as mixed
-		mixed = concat({ mixed:GetTreePath() })
-		for i, raw in ipairs_r(raws) do
-			if concat({ raw:GetTreePath() }) == mixed then
-				remove(raws, i)
+		mixed = table.concat({ mixed:GetTreePath() })
+		for i, raw in X.ipairs_r(raws) do
+			if table.concat({ raw:GetTreePath() }) == mixed then
+				table.remove(raws, i)
 			end
 		end
 	end
@@ -922,51 +885,51 @@ function OO:Filter(mixed)
 	self:_checksum()
 	local raws = {}
 	for i, raw in ipairs(self.raws) do
-		insert(raws, raw)
+		table.insert(raws, raw)
 	end
-	if IsString(mixed) then
+	if X.IsString(mixed) then
 		-- delete raws those id/class not fits filter:mixed
-		if sub(mixed, 1, 1) == '#' then
-			mixed = sub(mixed, 2)
-			if sub(mixed, 1, 1) == '^' then
+		if string.sub(mixed, 1, 1) == '#' then
+			mixed = string.sub(mixed, 2)
+			if string.sub(mixed, 1, 1) == '^' then
 				-- regexp
-				for i, raw in ipairs_r(raws) do
-					if not find(raw:GetName(), mixed) then
-						remove(raws, i)
+				for i, raw in X.ipairs_r(raws) do
+					if not string.find(raw:GetName(), mixed) then
+						table.remove(raws, i)
 					end
 				end
 			else
 				-- normal
-				for i, raw in ipairs_r(raws) do
+				for i, raw in X.ipairs_r(raws) do
 					if raw:GetName() ~= mixed then
-						remove(raws, i)
+						table.remove(raws, i)
 					end
 				end
 			end
-		elseif sub(mixed, 1, 1) == '.' then
-			mixed = sub(mixed, 2)
-			if sub(mixed, 1, 1) == '^' then
+		elseif string.sub(mixed, 1, 1) == '.' then
+			mixed = string.sub(mixed, 2)
+			if string.sub(mixed, 1, 1) == '^' then
 				-- regexp
-				for i, raw in ipairs_r(raws) do
-					if not find(GetComponentType(raw), mixed) then
-						remove(raws, i)
+				for i, raw in X.ipairs_r(raws) do
+					if not string.find(GetComponentType(raw), mixed) then
+						table.remove(raws, i)
 					end
 				end
 			else
 				-- normal
-				for i, raw in ipairs_r(raws) do
+				for i, raw in X.ipairs_r(raws) do
 					if GetComponentType(raw) ~= mixed then
-						remove(raws, i)
+						table.remove(raws, i)
 					end
 				end
 			end
 		end
-	elseif IsElement(mixed) then
+	elseif X.IsElement(mixed) then
 		-- delete raws those treepath is not the same as mixed
-		mixed = concat({ mixed:GetTreePath() })
-		for i, raw in ipairs_r(raws) do
-			if concat({ raw:GetTreePath() }) ~= mixed then
-				remove(raws, i)
+		mixed = table.concat({ mixed:GetTreePath() })
+		for i, raw in X.ipairs_r(raws) do
+			if table.concat({ raw:GetTreePath() }) ~= mixed then
+				table.remove(raws, i)
 			end
 		end
 	end
@@ -981,9 +944,9 @@ function OO:Parent()
 	for _, raw in ipairs(self.raws) do
 		parent = raw:GetParent()
 		if parent then
-			path = concat({ parent:GetTreePath() })
+			path = table.concat({ parent:GetTreePath() })
 			if not hash[path] then
-				insert(raws, parent)
+				table.insert(raws, parent)
 				hash[path] = true
 			end
 		end
@@ -1010,7 +973,7 @@ function OO:Fetch(szName, szSubName)
 			end
 		end
 		if el then
-			insert(raws, el)
+			table.insert(raws, el)
 		end
 	end
 	return UI(raws)
@@ -1020,15 +983,15 @@ end
 -- same as jQuery.children()
 function OO:Children(filter)
 	self:_checksum()
-	if IsString(filter) and sub(filter, 1, 1) == '#' and sub(filter, 2, 2) ~= '^' then
-		local raws, hash, name, child, path = {}, {}, sub(filter, 2)
+	if X.IsString(filter) and string.sub(filter, 1, 1) == '#' and string.sub(filter, 2, 2) ~= '^' then
+		local raws, hash, name, child, path = {}, {}, string.sub(filter, 2)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'MAIN_WINDOW') or raw
 			child = raw:Lookup(name)
 			if child then
-				path = concat({ child:GetTreePath() })
+				path = table.concat({ child:GetTreePath() })
 				if not hash[path] then
-					insert(raws, child)
+					table.insert(raws, child)
 					hash[path] = true
 				end
 			end
@@ -1036,9 +999,9 @@ function OO:Children(filter)
 				child = GetComponentElement(raw, 'MAIN_HANDLE')
 				child = child and child:Lookup(name)
 				if child then
-					path = concat({ child:GetTreePath() })
+					path = table.concat({ child:GetTreePath() })
 					if not hash[path] then
-						insert(raws, child)
+						table.insert(raws, child)
 						hash[path] = true
 					end
 				end
@@ -1052,9 +1015,9 @@ function OO:Children(filter)
 			if raw:GetBaseType() == 'Wnd' then
 				child = raw:GetFirstChild()
 				while child do
-					path = concat({ child:GetTreePath() })
+					path = table.concat({ child:GetTreePath() })
 					if not hash[path] then
-						insert(raws, child)
+						table.insert(raws, child)
 						hash[path] = true
 					end
 					child = child:GetNext()
@@ -1063,9 +1026,9 @@ function OO:Children(filter)
 				if h then
 					for i = 0, h:GetItemCount() - 1 do
 						child = h:Lookup(i)
-						path = concat({ child:GetTreePath() })
+						path = table.concat({ child:GetTreePath() })
 						if not hash[path] then
-							insert(raws, child)
+							table.insert(raws, child)
 							hash[path] = true
 						end
 					end
@@ -1073,9 +1036,9 @@ function OO:Children(filter)
 			elseif raw:GetType() == 'Handle' then
 				for i = 0, raw:GetItemCount() - 1 do
 					child = raw:Lookup(i)
-					path = concat({ child:GetTreePath() })
+					path = table.concat({ child:GetTreePath() })
 					if not hash[path] then
-						insert(raws, child)
+						table.insert(raws, child)
 						hash[path] = true
 					end
 				end
@@ -1093,15 +1056,15 @@ function OO:Find(filter)
 	local raws, hash, stack, children = {}, {}, {}, {}
 	for _, root in ipairs(self.raws) do
 		top = #raws
-		insert(stack, root)
+		table.insert(stack, root)
 		while #stack > 0 do
 			--### 弹出栈顶元素准备处理
-			raw = remove(stack, #stack)
+			raw = table.remove(stack, #stack)
 			ruid = tostring(raw)
 			--### 判断不在结果集中则处理
 			if not hash[ruid] then
 				--## 将自身加入结果队列
-				insert(raws, raw)
+				table.insert(raws, raw)
 				hash[ruid] = true
 				--## 计算所有子元素并将子元素压栈准备下次循环处理
 				--## 注意要逆序压入栈中以保证最终结果是稳定排序的
@@ -1109,31 +1072,31 @@ function OO:Find(filter)
 					child = raw:Lookup('', '')
 					if child then
 						for i = 0, child:GetItemCount() - 1 do
-							insert(children, child:Lookup(i))
+							table.insert(children, child:Lookup(i))
 						end
 					end
 					child = raw:GetFirstChild()
 					while child do
-						insert(children, child)
+						table.insert(children, child)
 						child = child:GetNext()
 					end
 					repeat
-						child = remove(children)
-						insert(stack, child)
+						child = table.remove(children)
+						table.insert(stack, child)
 					until not child
 				elseif raw:GetType() == 'Handle' then
 					for i = 0, raw:GetItemCount() - 1 do
-						insert(children, raw:Lookup(i))
+						table.insert(children, raw:Lookup(i))
 					end
 					repeat
-						child = remove(children)
-						insert(stack, child)
+						child = table.remove(children)
+						table.insert(stack, child)
 					until not child
 				end
 			end
 		end
 		-- 因为是求子元素 所以移除第一个压栈的元素（父元素）
-		remove(raws, top + 1)
+		table.remove(raws, top + 1)
 	end
 	return UI(raws):Filter(filter)
 end
@@ -1151,11 +1114,11 @@ function OO:PtIn()
 	for _, raw in pairs(self.raws) do
 		if raw:GetBaseType() == 'Wnd' then
 			if raw:PtInItem(cX, cY) then
-				insert(raws, raw)
+				table.insert(raws, raw)
 			end
 		else
 			if raw:PtInWindow(cX, cY) then
-				insert(raws, raw)
+				table.insert(raws, raw)
 			end
 		end
 	end
@@ -1168,7 +1131,7 @@ end
 function OO:Each(fn)
 	self:_checksum()
 	for _, raw in pairs(self.raws) do
-		LIB.ExecuteWithThis(raw, fn, UI(raw))
+		X.ExecuteWithThis(raw, fn, UI(raw))
 	end
 	return self
 end
@@ -1187,7 +1150,7 @@ function OO:Slice(startpos, endpos)
 	end
 	local raws = {}
 	for i = startpos, endpos, 1 do
-		insert(raws, self.raws[i])
+		table.insert(raws, self.raws[i])
 	end
 	return UI(raws)
 end
@@ -1265,12 +1228,12 @@ local function OnCommonComponentMouseEnter()
 	end
 
 	local szText = hText:GetText()
-	if IsEmpty(szText) then
+	if X.IsEmpty(szText) then
 		return
 	end
 
 	local nDisLen = hText:GetTextPosExtent()
-	local nLen = wlen(hText:GetText())
+	local nLen = wstring.len(hText:GetText())
 	if nDisLen == nLen then
 		return
 	end
@@ -1298,7 +1261,7 @@ local _nTempWndCount = 0
 -- Instance:Append(szXml)
 -- Instance:Append(szType[, tArg | szName])
 function OO:Append(arg0, arg1)
-	assert(IsString(arg0))
+	assert(X.IsString(arg0))
 	if #arg0 == 0 then
 		return
 	end
@@ -1310,9 +1273,9 @@ function OO:Append(arg0, arg1)
 	else
 		szType = arg0
 		szXml = _tItemXML[szType]
-		if IsTable(arg1) then
+		if X.IsTable(arg1) then
 			tArg = arg1
-		elseif IsString(arg1) then
+		elseif X.IsString(arg1) then
 			tArg = { name = arg1 }
 		end
 	end
@@ -1338,16 +1301,16 @@ function OO:Append(arg0, arg1)
 			local parentWnd = GetComponentElement(raw, 'MAIN_WINDOW')
 			local parentHandle = GetComponentElement(raw, 'MAIN_HANDLE')
 			local szFile, szComponent = szType, szType
-			if find(szFile, '^[^<>?:]*%.ini:%w+$') then
-				szType = gsub(szFile, '^[^<>?]*%.ini:', '')
-				szFile = sub(szFile, 0, -#szType - 2)
+			if string.find(szFile, '^[^<>?:]*%.ini:%w+$') then
+				szType = string.gsub(szFile, '^[^<>?]*%.ini:', '')
+				szFile = string.sub(szFile, 0, -#szType - 2)
 				szComponent = szFile:gsub('$.*[/\\]', ''):gsub('^[^<>?]*[/\\]', ''):sub(0, -5)
 			else
-				szFile = PACKET_INFO.UICOMPONENT_ROOT .. szFile .. '.ini'
+				szFile = X.PACKET_INFO.UICOMPONENT_ROOT .. szFile .. '.ini'
 			end
-			local frame = Wnd.OpenWindow(szFile, NSFormatString('{$NS}_TempWnd#') .. _nTempWndCount)
+			local frame = Wnd.OpenWindow(szFile, X.NSFormatString('{$NS}_TempWnd#') .. _nTempWndCount)
 			if not frame then
-				return LIB.Debug(NSFormatString('{$NS}#UI#Append'), _L('Unable to open ini file [%s]', szFile), DEBUG_LEVEL.ERROR)
+				return X.Debug(X.NSFormatString('{$NS}#UI#Append'), _L('Unable to open ini file [%s]', szFile), X.DEBUG_LEVEL.ERROR)
 			end
 			_nTempWndCount = _nTempWndCount + 1
 			-- start ui append
@@ -1376,7 +1339,7 @@ function OO:Append(arg0, arg1)
 				ui = ui:Add(raw)
 				UI(raw):Hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):Change(OnCommonComponentMouseEnter)
 			else
-				LIB.Debug(NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), DEBUG_LEVEL.ERROR)
+				X.Debug(X.NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), X.DEBUG_LEVEL.ERROR)
 			end
 			Wnd.CloseWindow(frame)
 		end
@@ -1465,13 +1428,13 @@ end
 -- visible
 function OO:Visible(bVisible)
 	self:_checksum()
-	if IsBoolean(bVisible) then
+	if X.IsBoolean(bVisible) then
 		return self:Toggle(bVisible)
-	elseif IsFunction(bVisible) then
+	elseif X.IsFunction(bVisible) then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
-			LIB.BreatheCall(NSFormatString('{$NS}_UI_VISIBLE_CHECK#') .. tostring(raw), function()
-				if IsElement(raw) then
+			X.BreatheCall(X.NSFormatString('{$NS}_UI_VISIBLE_CHECK#') .. tostring(raw), function()
+				if X.IsElement(raw) then
 					raw:SetVisible(bVisible())
 				else
 					return 0
@@ -1508,20 +1471,20 @@ local function SetComponentEnable(raw, bEnable)
 	if txt then
 		local r, g, b = txt:GetFontColor()
 		local ratio = bEnable and 2.2 or (1 / 2.2)
-		if max(r, g, b) * ratio > 255 then
-			ratio = 255 / max(r, g, b)
+		if math.max(r, g, b) * ratio > 255 then
+			ratio = 255 / math.max(r, g, b)
 		end
-		txt:SetFontColor(ceil(r * ratio), ceil(g * ratio), ceil(b * ratio))
+		txt:SetFontColor(math.ceil(r * ratio), math.ceil(g * ratio), math.ceil(b * ratio))
 	end
 	-- make gray
 	local sha = GetComponentElement(raw, 'SHADOW')
 	if sha then
 		local r, g, b = sha:GetColorRGB()
 		local ratio = bEnable and 2.2 or (1 / 2.2)
-		if max(r, g, b) * ratio > 255 then
-			ratio = 255 / max(r, g, b)
+		if math.max(r, g, b) * ratio > 255 then
+			ratio = 255 / math.max(r, g, b)
 		end
-		sha:SetColorRGB(ceil(r * ratio), ceil(g * ratio), ceil(b * ratio))
+		sha:SetColorRGB(math.ceil(r * ratio), math.ceil(g * ratio), math.ceil(b * ratio))
 	end
 	-- set sub elements enable
 	local combo = GetComponentElement(raw, 'COMBOBOX')
@@ -1550,9 +1513,9 @@ function OO:Enable(...)
 		local bEnable = select(1, ...)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
-			if IsFunction(bEnable) then
-				LIB.BreatheCall(NSFormatString('{$NS}_UI_ENABLE_CHECK#') .. tostring(raw), function()
-					if IsElement(raw) then
+			if X.IsFunction(bEnable) then
+				X.BreatheCall(X.NSFormatString('{$NS}_UI_ENABLE_CHECK#') .. tostring(raw), function()
+					if X.IsElement(raw) then
 						SetComponentEnable(raw, bEnable())
 					else
 						return 0
@@ -1599,7 +1562,7 @@ function OO:Drag(...)
 	local argc = select('#', ...)
 	local arg0, arg1, arg2, arg3 = ...
 	if argc == 0 then
-	elseif IsBoolean(arg0) then
+	elseif X.IsBoolean(arg0) then
 		local bDrag = arg0
 		for _, raw in ipairs(self.raws) do
 			if raw.EnableDrag then
@@ -1607,7 +1570,7 @@ function OO:Drag(...)
 			end
 		end
 		return self
-	elseif IsNumber(arg0) or IsNumber(arg1) or IsNumber(arg2) or IsNumber(arg3) then
+	elseif X.IsNumber(arg0) or X.IsNumber(arg1) or X.IsNumber(arg2) or X.IsNumber(arg3) then
 		local nX, nY, nW, nH = arg0 or 0, arg1 or 0, arg2, arg3
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
@@ -1615,7 +1578,7 @@ function OO:Drag(...)
 			end
 		end
 		return self
-	elseif IsFunction(arg0) or IsFunction(arg1) then
+	elseif X.IsFunction(arg0) or X.IsFunction(arg1) then
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
 				if arg0 then
@@ -1645,16 +1608,16 @@ end
 -- get/set ui object text
 function OO:Text(arg0, arg1)
 	self:_checksum()
-	if not IsNil(arg0) and not IsBoolean(arg0) then
+	if not X.IsNil(arg0) and not X.IsBoolean(arg0) then
 		local componentType, element
 		for _, raw in ipairs(self.raws) do
 			componentType = GetComponentType(raw)
-			if IsFunction(arg0) then
+			if X.IsFunction(arg0) then
 				if componentType == 'WndTrackbar' then
 					SetComponentProp(raw, 'FormatText', arg0)
 					GetComponentProp(raw, 'ResponseUpdateScroll')(true)
 				end
-			elseif IsTable(arg0) then
+			elseif X.IsTable(arg0) then
 				if componentType == 'WndEditBox' or componentType == 'WndAutocomplete' then
 					element = GetComponentElement(raw, 'EDIT')
 					SetComponentProp(element, 'WNDEVENT_FIRETYPE', arg1)
@@ -1667,7 +1630,7 @@ function OO:Text(arg0, arg1)
 					end
 				end
 			else
-				if not IsString(arg0) then
+				if not X.IsString(arg0) then
 					arg0 = tostring(arg0)
 				end
 				if componentType == 'WndScrollHandleBox' then
@@ -1739,20 +1702,20 @@ end
 -- ui autocomplete interface
 function OO:Autocomplete(method, arg1, arg2)
 	self:_checksum()
-	if method == 'option' and (IsNil(arg1) or (IsString(arg1) and IsNil(arg2))) then -- get
+	if method == 'option' and (X.IsNil(arg1) or (X.IsString(arg1) and X.IsNil(arg2))) then -- get
 		-- try to get its option
 		local raw = self.raws[1]
 		if raw then
-			return Clone(GetComponentProp(raw, 'autocompleteOptions'))
+			return X.Clone(GetComponentProp(raw, 'autocompleteOptions'))
 		end
 	else -- set
 		if method == 'option' then
-			if IsString(arg1) then
+			if X.IsString(arg1) then
 				arg1 = {
 					[arg1] = arg2
 				}
 			end
-			if IsTable(arg1) then
+			if X.IsTable(arg1) then
 				for _, raw in ipairs(self.raws) do
 					if GetComponentType(raw) == 'WndAutocomplete' then
 						for k, v in pairs(arg1) do
@@ -1777,8 +1740,8 @@ function OO:Autocomplete(method, arg1, arg2)
 				local opt = GetComponentProp(raw, 'autocompleteOptions')
 				if opt then
 					local text = arg1 or raw:Lookup('WndEdit_Default'):GetText()
-					if IsFunction(opt.beforeSearch) then
-						LIB.ExecuteWithThis(raw, opt.beforeSearch, text)
+					if X.IsFunction(opt.beforeSearch) then
+						X.ExecuteWithThis(raw, opt.beforeSearch, text)
 					end
 					local needle = opt.ignoreCase and StringLowerW(text) or text
 					local aSrc = {}
@@ -1788,15 +1751,15 @@ function OO:Autocomplete(method, arg1, arg2)
 						if opt.ignoreCase then
 							haystack = StringLowerW(haystack)
 						end
-						local pos = wfind(haystack, needle)
+						local pos = wstring.find(haystack, needle)
 						if pos and pos > 0 and not opt.anyMatch then
 							pos = nil
 						end
 						if not pos then
-							local aPinyin, aPinyinConsonant = LIB.Han2Pinyin(haystack)
+							local aPinyin, aPinyinConsonant = X.Han2Pinyin(haystack)
 							if not pos then
 								for _, s in ipairs(aPinyin) do
-									pos = wfind(s, needle)
+									pos = wstring.find(s, needle)
 									if pos and pos > 0 and not opt.anyMatch then
 										pos = nil
 									end
@@ -1807,7 +1770,7 @@ function OO:Autocomplete(method, arg1, arg2)
 							end
 							if not pos then
 								for _, s in ipairs(aPinyinConsonant) do
-									pos = wfind(s, needle)
+									pos = wstring.find(s, needle)
 									if pos and pos > 0 and not opt.anyMatch then
 										pos = nil
 									end
@@ -1818,7 +1781,7 @@ function OO:Autocomplete(method, arg1, arg2)
 							end
 						end
 						if pos then
-							insert(aSrc, src)
+							table.insert(aSrc, src)
 						end
 					end
 
@@ -1854,7 +1817,7 @@ function OO:Autocomplete(method, arg1, arg2)
 								fnAction = function()
 									opt.disabledTmp = true
 									raw:Lookup('WndEdit_Default'):SetText(szText)
-									if IsFunction(opt.afterComplete) then
+									if X.IsFunction(opt.afterComplete) then
 										opt.afterComplete(raw, opt, text, src)
 									end
 									UI.ClosePopupMenu()
@@ -1873,25 +1836,25 @@ function OO:Autocomplete(method, arg1, arg2)
 									local fnDoDelete = function()
 										for i = #opt.source, 1, -1 do
 											if opt.source[i] == src then
-												remove(opt.source, i)
+												table.remove(opt.source, i)
 											end
 										end
 										UI(raw):Autocomplete('search')
 									end
 									if opt.beforeDelete then
-										bSure = LIB.ExecuteWithThis(raw, opt.beforeDelete, src)
+										bSure = X.ExecuteWithThis(raw, opt.beforeDelete, src)
 									end
 									if bSure ~= false then
 										fnDoDelete()
 									end
 									if opt.afterDelete then
-										LIB.ExecuteWithThis(raw, opt.afterDelete, src)
+										X.ExecuteWithThis(raw, opt.afterDelete, src)
 									end
 								end
 							end
 						end
 						if t then
-							insert(menu, t)
+							table.insert(menu, t)
 						end
 					end
 					local nX, nY = raw:GetAbsPos()
@@ -1902,10 +1865,10 @@ function OO:Autocomplete(method, arg1, arg2)
 					menu.x, menu.y = nX, nY + nH
 					menu.bDisableSound = true
 					menu.bShowKillFocus = true
-					menu.nMaxHeight = min(select(2, Station.GetClientSize()) - raw:GetAbsY() - raw:GetH(), 600)
+					menu.nMaxHeight = math.min(select(2, Station.GetClientSize()) - raw:GetAbsY() - raw:GetH(), 600)
 
-					if IsFunction(opt.beforePopup) then
-						LIB.ExecuteWithThis(raw, opt.beforePopup, menu)
+					if X.IsFunction(opt.beforePopup) then
+						X.ExecuteWithThis(raw, opt.beforePopup, menu)
 					end
 					-- popup menu
 					if #menu > 0 then
@@ -1919,36 +1882,36 @@ function OO:Autocomplete(method, arg1, arg2)
 				end
 			end
 		elseif method == 'insert' then
-			if IsString(arg1) then
+			if X.IsString(arg1) then
 				arg1 = { arg1 }
 			end
-			if IsTable(arg1) then
+			if X.IsTable(arg1) then
 				for _, src in ipairs(arg1) do
-					if IsString(src) then
+					if X.IsString(src) then
 						for _, raw in ipairs(self.raws) do
 							local opt = GetComponentProp(raw, 'autocompleteOptions')
 							for i = #opt.source, 1, -1 do
 								if opt.source[i] == src then
-									remove(opt.source, i)
+									table.remove(opt.source, i)
 								end
 							end
-							insert(opt.source, src)
+							table.insert(opt.source, src)
 						end
 					end
 				end
 			end
 		elseif method == 'delete' then
-			if IsString(arg1) then
+			if X.IsString(arg1) then
 				arg1 = { arg1 }
 			end
-			if IsTable(arg1) then
+			if X.IsTable(arg1) then
 				for _, src in ipairs(arg1) do
-					if IsString(src) then
+					if X.IsString(src) then
 						for _, raw in ipairs(self.raws) do
 							local opt = GetComponentProp(raw, 'autocompleteOptions')
 							for i=#opt.source, 1, -1 do
 								if opt.source[i] == arg1 then
-									remove(opt.source, i)
+									table.remove(opt.source, i)
 								end
 							end
 						end
@@ -1977,20 +1940,20 @@ end
 -- (set) list:ListBox('onhover', function(id, text, data, selected) end, function(id, text, data, selected) end)
 function OO:ListBox(method, arg1, arg2, arg3, arg4)
 	self:_checksum()
-	if method == 'option' and (IsNil(arg1) or (IsString(arg1) and IsNil(arg2))) then -- get
+	if method == 'option' and (X.IsNil(arg1) or (X.IsString(arg1) and X.IsNil(arg2))) then -- get
 		-- try to get its option
 		local raw = self.raws[1]
 		if raw then
-			return Clone(GetComponentProp(raw, 'listboxOptions'))
+			return X.Clone(GetComponentProp(raw, 'listboxOptions'))
 		end
 	else -- set
 		if method == 'option' then
-			if IsString(arg1) then
+			if X.IsString(arg1) then
 				arg1 = {
 					[arg1] = arg2
 				}
 			end
-			if IsTable(arg1) then
+			if X.IsTable(arg1) then
 				for _, raw in ipairs(self.raws) do
 					for k, v in pairs(arg1) do
 						SetComponentProp(raw, 'listboxOptions', k, v)
@@ -2007,7 +1970,7 @@ function OO:ListBox(method, arg1, arg2, arg3, arg4)
 						if arg1 == 'all'
 						or (arg1 == 'unselected' and not data.selected)
 						or (arg1 == 'selected' and data.selected) then
-							insert(tData, data)
+							table.insert(tData, data)
 						end
 					end
 				end
@@ -2136,7 +2099,7 @@ function OO:ListBox(method, arg1, arg2, arg3, arg4)
 				end
 			end
 		elseif method == 'onmenu' then
-			if IsFunction(arg1) then
+			if X.IsFunction(arg1) then
 				for _, raw in ipairs(self.raws) do
 					if GetComponentType(raw) == 'WndListBox' then
 						SetComponentProp(raw, 'GetListItemHandleMenu', arg1)
@@ -2144,7 +2107,7 @@ function OO:ListBox(method, arg1, arg2, arg3, arg4)
 				end
 			end
 		elseif method == 'onlclick' then
-			if IsFunction(arg1) then
+			if X.IsFunction(arg1) then
 				for _, raw in ipairs(self.raws) do
 					if GetComponentType(raw) == 'WndListBox' then
 						SetComponentProp(raw, 'OnListItemHandleCustomLButtonClick', arg1)
@@ -2152,7 +2115,7 @@ function OO:ListBox(method, arg1, arg2, arg3, arg4)
 				end
 			end
 		elseif method == 'onrclick' then
-			if IsFunction(arg1) then
+			if X.IsFunction(arg1) then
 				for _, raw in ipairs(self.raws) do
 					if GetComponentType(raw) == 'WndListBox' then
 						SetComponentProp(raw, 'OnListItemHandleCustomRButtonClick', arg1)
@@ -2160,14 +2123,14 @@ function OO:ListBox(method, arg1, arg2, arg3, arg4)
 				end
 			end
 		elseif method == 'onhover' then
-			if IsFunction(arg1) then
+			if X.IsFunction(arg1) then
 				for _, raw in ipairs(self.raws) do
 					if GetComponentType(raw) == 'WndListBox' then
 						SetComponentProp(raw, 'OnListItemHandleCustomHoverIn', arg1)
 					end
 				end
 			end
-			if IsFunction(arg2) then
+			if X.IsFunction(arg2) then
 				for _, raw in ipairs(self.raws) do
 					if GetComponentType(raw) == 'WndListBox' then
 						SetComponentProp(raw, 'OnListItemHandleCustomHoverOut', arg2)
@@ -2214,7 +2177,7 @@ end
 -- set ui penetrable
 function OO:Penetrable(bPenetrable)
 	self:_checksum()
-	if IsBoolean(bPenetrable) then -- set penetrable
+	if X.IsBoolean(bPenetrable) then -- set penetrable
 		for _, raw in ipairs(self.raws) do
 			SetComponentProp(raw, 'bPenetrable', bPenetrable)
 			if raw.SetMousePenetrable then
@@ -2260,17 +2223,17 @@ function OO:FadeTo(nTime, nOpacity, callback)
 			if not ui:Visible() then
 				ui:Alpha(0):Toggle(true)
 			end
-			LIB.BreatheCall(NSFormatString('{$NS}_FADE_') .. tostring(ui[1]), function()
+			X.BreatheCall(X.NSFormatString('{$NS}_FADE_') .. tostring(ui[1]), function()
 				ui:Show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime() - nStartTime)
 				ui:Alpha(nCurrentAlpha)
 				--[[#DEBUG BEGIN]]
-				-- LIB.Debug('fade', format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), DEBUG_LEVEL.LOG)
+				-- X.Debug('fade', string.format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
 					ui:Alpha(nOpacity)
 					if callback then
-						CallWithThis(raw, callback, ui)
+						X.CallWithThis(raw, callback, ui)
 					end
 					return 0
 				end
@@ -2304,7 +2267,7 @@ function OO:FadeOut(nTime, callback)
 		local ui = UI(this)
 		ui:Toggle(false)
 		if callback then
-			CallWithThis(this, callback)
+			X.CallWithThis(this, callback)
 		end
 	end)
 	return self
@@ -2324,17 +2287,17 @@ function OO:SlideTo(nTime, nHeight, callback)
 			if not ui:Visible() then
 				ui:Height(0):Toggle(true)
 			end
-			LIB.BreatheCall(function()
+			X.BreatheCall(function()
 				ui:Show()
 				local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
 				ui:Height(nCurrentValue)
 				--[[#DEBUG BEGIN]]
-				-- LIB.Debug('slide', format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), DEBUG_LEVEL.LOG)
+				-- X.Debug('slide', string.format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
 					ui:Height(nHeight):Toggle( nHeight ~= 0 )
 					if callback then
-						CallWithThis(raw, callback)
+						X.CallWithThis(raw, callback)
 					end
 					return 0
 				end
@@ -2407,7 +2370,7 @@ end
 -- (self) Instance:Color(number r, number g, number b)
 function OO:Color(r, g, b)
 	self:_checksum()
-	if IsTable(r) then
+	if X.IsTable(r) then
 		r, g, b = unpack(r)
 	end
 	if b then
@@ -2445,12 +2408,12 @@ end
 -- (self) Instance:ColorPick((r: number r, g: number, b: number) => void)
 function OO:ColorPick(cb)
 	self:_checksum()
-	if IsFunction(cb) then
+	if X.IsFunction(cb) then
 		local element
 		for _, raw in ipairs(self.raws) do
 			local aOnColorPickCBs = GetComponentProp(raw, 'OnColorPickCBs')
 			if aOnColorPickCBs then
-				insert(aOnColorPickCBs, cb)
+				table.insert(aOnColorPickCBs, cb)
 			end
 		end
 	else
@@ -2461,9 +2424,9 @@ end
 
 function OO:DrawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRotate, dwPitch, dwRad, nAccuracy)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
-	dwRotate, dwPitch, dwRad = dwRotate or 0, dwPitch or 0, dwRad or (2 * PI)
+	dwRotate, dwPitch, dwRad = dwRotate or 0, dwPitch or 0, dwRad or (2 * math.pi)
 	nAccuracy = nAccuracy or 32
-	local deltaRad = (2 * PI) / nAccuracy
+	local deltaRad = (2 * math.pi) / nAccuracy
 	local sha, nX1, nY1, nMajorAxis1, nMinorAxis1, dwRad1, dwRad2, nDis
 	for _, raw in ipairs(self.raws) do
 		sha = GetComponentElement(raw, 'SHADOW')
@@ -2480,15 +2443,15 @@ function OO:DrawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRotate
 			sha:AppendTriangleFanPoint(nX ,nY, nR, nG, nB, nA)
 			sha:Show()
 			repeat
-				nDis = nMajorAxis * nMinorAxis / sqrt(pow(nMinorAxis * cos(dwRad1 - dwRotate), 2) + pow(nMajorAxis * sin(dwRad1 - dwRotate), 2))
+				nDis = nMajorAxis * nMinorAxis / math.sqrt(math.pow(nMinorAxis * math.cos(dwRad1 - dwRotate), 2) + math.pow(nMajorAxis * math.sin(dwRad1 - dwRotate), 2))
 				sha:AppendTriangleFanPoint(
-					nX + nDis * cos(dwRad1),
-					nY - nDis * sin(dwRad1),
+					nX + nDis * math.cos(dwRad1),
+					nY - nDis * math.sin(dwRad1),
 					nR, nG, nB, nA
 				)
 				-- sha:AppendTriangleFanPoint(
-				-- 	nX + (nMajorAxis * cos(dwRotate) * cos(dwRad1 - dwRotate) - nMinorAxis * sin(dwRotate) * sin(dwRad1 - dwRotate)),
-				-- 	nY - (nMinorAxis * cos(dwRotate) * sin(dwRad1 - dwRotate) + nMajorAxis * sin(dwRotate) * cos(dwRad1 - dwRotate)),
+				-- 	nX + (nMajorAxis * math.cos(dwRotate) * math.cos(dwRad1 - dwRotate) - nMinorAxis * math.sin(dwRotate) * math.sin(dwRad1 - dwRotate)),
+				-- 	nY - (nMinorAxis * math.cos(dwRotate) * math.sin(dwRad1 - dwRotate) + nMajorAxis * math.sin(dwRotate) * math.cos(dwRad1 - dwRotate)),
 				-- 	nR, nG, nB, nA
 				-- )
 				dwRad1 = (dwRad1 < dwRad2 and dwRad1 + deltaRad > dwRad2) and dwRad2 or (dwRad1 + deltaRad)
@@ -2500,9 +2463,9 @@ end
 
 function OO:DrawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccuracy)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
-	dwPitch, dwRad = dwPitch or 0, dwRad or (2 * PI)
+	dwPitch, dwRad = dwPitch or 0, dwRad or (2 * math.pi)
 	nAccuracy = nAccuracy or 32
-	local deltaRad = (2 * PI) / nAccuracy
+	local deltaRad = (2 * math.pi) / nAccuracy
 	local sha, nX1, nY1, nRadius1, dwRad1, dwRad2
 	for _, raw in ipairs(self.raws) do
 		sha = GetComponentElement(raw, 'SHADOW')
@@ -2511,14 +2474,14 @@ function OO:DrawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccurac
 			dwRad2 = dwPitch + dwRad
 			nX1 = nX or (sha:GetW() / 2)
 			nY1 = nY or (sha:GetH() / 2)
-			nRadius1 = nRadius or min(nX1, nY1)
+			nRadius1 = nRadius or math.min(nX1, nY1)
 			sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 			sha:SetD3DPT(D3DPT.TRIANGLEFAN)
 			sha:ClearTriangleFanPoint()
 			sha:AppendTriangleFanPoint(nX1, nY1, nR, nG, nB, nA)
 			sha:Show()
 			repeat
-				sha:AppendTriangleFanPoint(nX1 + cos(dwRad1) * nRadius1, nY1 - sin(dwRad1) * nRadius1, nR, nG, nB, nA)
+				sha:AppendTriangleFanPoint(nX1 + math.cos(dwRad1) * nRadius1, nY1 - math.sin(dwRad1) * nRadius1, nR, nG, nB, nA)
 				dwRad1 = (dwRad1 < dwRad2 and dwRad1 + deltaRad > dwRad2) and dwRad2 or (dwRad1 + deltaRad)
 			until dwRad1 > dwRad2
 		end
@@ -2549,7 +2512,7 @@ function OO:DrawGwText(szText, nX ,nY, nZ, nR, nG, nB, nA, nFont, fFontScale, fS
 end
 
 function OO:DrawGwCircle(nX, nY, nZ, nRadius, nR, nG, nB, nA, dwPitch, dwRad)
-	nRadius, dwPitch, dwRad = nRadius or (64 * 3), dwPitch or 0, dwRad or (2 * PI)
+	nRadius, dwPitch, dwRad = nRadius or (64 * 3), dwPitch or 0, dwRad or (2 * math.pi)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 120
 	local sha, dwRad1, dwRad2, nSceneX, nSceneZ, nSceneXD, nSceneZD
 	for _, raw in ipairs(self.raws) do
@@ -2563,9 +2526,9 @@ function OO:DrawGwCircle(nX, nY, nZ, nRadius, nR, nG, nB, nA, dwPitch, dwRad)
 			sha:Show()
 			nSceneX, nSceneZ, nSceneXD, nSceneZD = Scene_PlaneGameWorldPosToScene(nX, nY)
 			repeat
-				nSceneXD, nSceneZD = Scene_PlaneGameWorldPosToScene(nX + cos(dwRad1) * nRadius, nY + sin(dwRad1) * nRadius)
+				nSceneXD, nSceneZD = Scene_PlaneGameWorldPosToScene(nX + math.cos(dwRad1) * nRadius, nY + math.sin(dwRad1) * nRadius)
 				sha:AppendTriangleFan3DPoint(nX ,nY, nZ, nR, nG, nB, nA, { nSceneXD - nSceneX, 0, nSceneZD - nSceneZ })
-				dwRad1 = dwRad1 + PI / 16
+				dwRad1 = dwRad1 + math.pi / 16
 			until dwRad1 > dwRad2
 		end
 	end
@@ -2598,7 +2561,7 @@ end
 -- (self) Instance:Pos(nLeft, nTop)
 function OO:Pos(nLeft, nTop)
 	self:_checksum()
-	if IsNumber(nLeft) or IsNumber(nTop) then
+	if X.IsNumber(nLeft) or X.IsNumber(nTop) then
 		for _, raw in ipairs(self.raws) do
 			local nLeft, nTop = nLeft or raw:GetRelX(), nTop or raw:GetRelY()
 			raw:SetRelPos(nLeft, nTop)
@@ -2612,7 +2575,7 @@ function OO:Pos(nLeft, nTop)
 		return self
 	else
 		local szType = 'TOPLEFT'
-		if IsString(nLeft) then
+		if X.IsString(nLeft) then
 			szType = nLeft
 		end
 		local raw = self.raws[1]
@@ -2639,28 +2602,28 @@ function OO:Shake(xrange, yrange, maxspeed, time)
 		for _, raw in ipairs(self.raws) do
 			local ui = UI(raw)
 			local xoffset, yoffset = 0, 0
-			LIB.RenderCall(tostring(raw) .. ' shake', function()
+			X.RenderCall(tostring(raw) .. ' shake', function()
 				if ui:Count() == 0 then
 					return 0
 				elseif GetTime() - starttime < time then
 					local x, y = ui:Pos()
 					x, y = x - xoffset, y - yoffset
 
-					xoffset = xoffset + random(xspeed > 0 and 0 or xspeed, xspeed > 0 and xspeed or 0)
+					xoffset = xoffset + math.random(xspeed > 0 and 0 or xspeed, xspeed > 0 and xspeed or 0)
 					if xoffset < - xhalfrange then
-						xoffset = min(- xrange - xoffset, xhalfrange)
+						xoffset = math.min(- xrange - xoffset, xhalfrange)
 						xspeed = - xspeed
 					elseif xoffset > xhalfrange then
-						xoffset = max(xrange - xoffset, - xhalfrange)
+						xoffset = math.max(xrange - xoffset, - xhalfrange)
 						xspeed = - xspeed
 					end
 
-					yoffset = yoffset + random(yspeed > 0 and 0 or yspeed, yspeed > 0 and yspeed or 0)
+					yoffset = yoffset + math.random(yspeed > 0 and 0 or yspeed, yspeed > 0 and yspeed or 0)
 					if yoffset < - yhalfrange then
-						yoffset =  min(- yrange - yoffset, yhalfrange)
+						yoffset =  math.min(- yrange - yoffset, yhalfrange)
 						yspeed = - yspeed
 					elseif yoffset > yhalfrange then
-						yoffset = max(yrange - yoffset, - yhalfrange)
+						yoffset = math.max(yrange - yoffset, - yhalfrange)
 						yspeed = - yspeed
 					end
 
@@ -2674,7 +2637,7 @@ function OO:Shake(xrange, yrange, maxspeed, time)
 		end
 	else
 		for _, raw in ipairs(self.raws) do
-			LIB.RenderCall(tostring(raw) .. ' shake', false)
+			X.RenderCall(tostring(raw) .. ' shake', false)
 		end
 	end
 end
@@ -2688,7 +2651,7 @@ function OO:Anchor(anchor)
 	if anchor == 'CENTER' then
 		anchor = CENTER
 	end
-	if IsTable(anchor) then
+	if X.IsTable(anchor) then
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
 				raw:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
@@ -2762,18 +2725,18 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			local nTConnerW = 213 * fScale
 			imgBgTLConner:SetSize(nTConnerW, nTH)
 			imgBgTRConner:SetSize(nTConnerW, nTH)
-			local nTFlexW = max(0, (nWidth - (nWidth >= 674 and 674 or 426)) / 2)
+			local nTFlexW = math.max(0, (nWidth - (nWidth >= 674 and 674 or 426)) / 2)
 			imgBgTLFlex:SetSize(nTFlexW, nTH)
 			imgBgTRFlex:SetSize(nTFlexW, nTH)
 			local nTCenterW = nWidth >= 674 and (124 * fScale) or 0
 			imgBgTLCenter:SetSize(nTCenterW, nTH)
 			imgBgTRCenter:SetSize(nTCenterW, nTH)
-			local nBLW, nBRW = ceil(124 * fScale), ceil(8 * fScale)
+			local nBLW, nBRW = math.ceil(124 * fScale), math.ceil(8 * fScale)
 			local nBCW, nBH = nWidth - nBLW - nBRW + 1, 85 * fScale -- 不知道为什么差一像素 但是加上就好了
 			imgBgBL:SetSize(nBLW, nBH)
 			imgBgBC:SetSize(nBCW, nBH)
 			imgBgBR:SetSize(nBRW, nBH)
-			local nCEdgeW = ceil(8 * fScale)
+			local nCEdgeW = math.ceil(8 * fScale)
 			local nCCW, nCH = nWidth - 2 * nCEdgeW + 1, nHeight - nTH - nBH -- 不知道为什么差一像素 但是加上就好了
 			imgBgCL:SetSize(nCEdgeW, nCH)
 			imgBgCC:SetSize(nCCW, nCH)
@@ -2800,7 +2763,7 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			raw:SetDragArea(0, 0, nWidth, 30)
 			hnd:SetSize(nWidth, nHeight)
 			wnd:SetSize(nWidth, nHeight - 30)
-		elseif GetComponentProp(raw, 'intact') or raw == LIB.GetFrame() then
+		elseif GetComponentProp(raw, 'intact') or raw == X.GetFrame() then
 			hnd:SetSize(nWidth, nHeight)
 			hnd:Lookup('Text_Title'):SetW(nWidth - 90)
 			hnd:Lookup('Text_Author'):SetW(nWidth - 31)
@@ -2913,8 +2876,8 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 		if not nInnerHeight then
 			nInnerHeight = nHeight
 		end
-		local nGap = min(nInnerWidth * 0.3, 8)
-		nWidth = max(nWidth, nInnerWidth + nGap)
+		local nGap = math.min(nInnerWidth * 0.3, 8)
+		nWidth = math.max(nWidth, nInnerWidth + nGap)
 		sha:SetSize(nInnerWidth, nInnerHeight)
 		sha:SetRelPos(0, (nHeight - nInnerHeight) / 2)
 		txt:SetSize(nWidth - nInnerWidth - nGap, nHeight)
@@ -3013,13 +2976,13 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local sld = GetComponentElement(raw, 'TRACKBAR')
 		local txt = GetComponentElement(raw, 'TEXT')
-		local nWidth = nOuterWidth or max(nWidth, (nInnerWidth or 0) + 5)
-		local nHeight = nOuterHeight or max(nHeight, (nInnerHeight or 0) + 5)
-		local nRawWidth = min(nWidth, nInnerWidth or sld:GetW())
-		local nRawHeight = min(nHeight, nInnerHeight or sld:GetH())
+		local nWidth = nOuterWidth or math.max(nWidth, (nInnerWidth or 0) + 5)
+		local nHeight = nOuterHeight or math.max(nHeight, (nInnerHeight or 0) + 5)
+		local nRawWidth = math.min(nWidth, nInnerWidth or sld:GetW())
+		local nRawHeight = math.min(nHeight, nInnerHeight or sld:GetH())
 		wnd:SetSize(nWidth, nHeight)
 		sld:SetSize(nRawWidth, nRawHeight)
-		local nBtnWidth = min(34, nRawWidth * 0.6)
+		local nBtnWidth = math.min(34, nRawWidth * 0.6)
 		sld:Lookup('Btn_Track'):SetSize(nBtnWidth, nRawHeight)
 		sld:Lookup('Btn_Track'):SetRelX((nRawWidth - nBtnWidth) * sld:GetScrollPos() / sld:GetStepCount())
 		hdl:SetSize(nWidth, nHeight)
@@ -3047,7 +3010,7 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			h:FormatAllItemPos()
 		end
 	end
-	LIB.ExecuteWithThis(raw, raw.OnSizeChanged)
+	X.ExecuteWithThis(raw, raw.OnSizeChanged)
 end
 
 -- (number, number) Instance:Size(bInnerSize)
@@ -3057,7 +3020,7 @@ function OO:Size(...)
 	self:_checksum()
 	if select('#', ...) > 0 then
 		local arg0, arg1, arg2, arg3 = ...
-		if IsFunction(arg0) then
+		if X.IsFunction(arg0) then
 			for _, raw in ipairs(self.raws) do
 				UI(raw):UIEvent('OnSizeChanged', arg0)
 			end
@@ -3072,7 +3035,7 @@ function OO:Size(...)
 			if bAutoHeight then
 				nHeight = nil
 			end
-			if IsNumber(nWidth) or IsNumber(nHeight) or IsNumber(nRawWidth) or IsNumber(nRawHeight) then
+			if X.IsNumber(nWidth) or X.IsNumber(nHeight) or X.IsNumber(nRawWidth) or X.IsNumber(nRawHeight) then
 				for _, raw in ipairs(self.raws) do
 					SetComponentSize(raw, nWidth or raw:GetW(), nHeight or raw:GetH(), nRawWidth, nRawHeight)
 				end
@@ -3111,18 +3074,18 @@ end
 -- (self) Instance:MinSize(number nW, number nH) -- Set element min size
 function OO:MinSize(nW, nH)
 	self:_checksum()
-	if IsNumber(nW) or IsNumber(nH) then -- set
+	if X.IsNumber(nW) or X.IsNumber(nH) then -- set
 		for _, raw in ipairs(self.raws) do
 			SetComponentProp(raw, 'minWidth', nW)
 			SetComponentProp(raw, 'minHeight', nH)
 		end
 		return self
-	elseif IsNumber(nW) then -- set
+	elseif X.IsNumber(nW) then -- set
 		for _, raw in ipairs(self.raws) do
 			SetComponentProp(raw, 'minWidth', nW)
 		end
 		return self
-	elseif IsNumber(nH) then -- set
+	elseif X.IsNumber(nH) then -- set
 		for _, raw in ipairs(self.raws) do
 			SetComponentProp(raw, 'minHeight', nH)
 		end
@@ -3139,7 +3102,7 @@ end
 -- (self) Instance:MinWidth(number nW) -- Set element min width
 function OO:MinWidth(nW)
 	self:_checksum()
-	if IsNumber(nW) then -- set
+	if X.IsNumber(nW) then -- set
 		for _, raw in ipairs(self.raws) do
 			SetComponentProp(raw, 'minWidth', nW)
 		end
@@ -3156,7 +3119,7 @@ end
 -- (self) Instance:MinHeight(number nH) -- Set element min height
 function OO:MinHeight(nH)
 	self:_checksum()
-	if IsNumber(nH) then -- set
+	if X.IsNumber(nH) then -- set
 		for _, raw in ipairs(self.raws) do
 			SetComponentProp(raw, 'minHeight', nH)
 		end
@@ -3243,11 +3206,11 @@ end
 -- (self) Instance:AutoSize(bool bAutoSize) -- set if Text is autoSize
 function OO:AutoSize(arg0, arg1)
 	self:_checksum()
-	if IsNil(arg0) then
+	if X.IsNil(arg0) then
 		for _, raw in ipairs(self.raws) do
 			AutoSize(raw, true, true)
 		end
-	elseif IsBoolean(arg0) then
+	elseif X.IsBoolean(arg0) then
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'Text' then
 				raw.bAutoSize = arg0
@@ -3262,7 +3225,7 @@ end
 -- (self) Instance:FontScale(bool nScale)
 function OO:FontScale(nScale)
 	self:_checksum()
-	if IsNumber(nScale) then
+	if X.IsNumber(nScale) then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'TEXT')
 			if raw then
@@ -3287,14 +3250,14 @@ end
 function OO:Scroll(mixed)
 	self:_checksum()
 	if mixed then -- set
-		if IsNumber(mixed) then
+		if X.IsNumber(mixed) then
 			for _, raw in ipairs(self.raws) do
 				raw = raw:Lookup('WndScrollBar')
 				if raw and raw.GetStepCount and raw.SetScrollPos then
 					raw:SetScrollPos(raw:GetStepCount() * mixed / 100)
 				end
 			end
-		elseif IsFunction(mixed) then
+		elseif X.IsFunction(mixed) then
 			for _, raw in ipairs(self.raws) do
 				local raw = raw:Lookup('WndScrollBar')
 				if raw then
@@ -3331,7 +3294,7 @@ end
 -- (self) Instance:Range(nMin, nMax, nStep)
 function OO:Range(nMin, nMax, nStep)
 	self:_checksum()
-	if IsNumber(nMin) and IsNumber(nMax) and nMax > nMin then
+	if X.IsNumber(nMin) and X.IsNumber(nMax) and nMax > nMin then
 		nStep = nStep or nMax - nMin
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTrackbar' then
@@ -3382,7 +3345,7 @@ end
 -- (self) Instance:Multiline(bMultiLine)
 function OO:Multiline(bMultiLine)
 	self:_checksum()
-	if IsBoolean(bMultiLine) then
+	if X.IsBoolean(bMultiLine) then
 		local element
 		for _, raw in ipairs(self.raws) do
 			element = GetComponentElement(raw, 'EDIT')
@@ -3411,13 +3374,13 @@ end
 -- (self) Instance:Image(szImage, nFrame)
 function OO:Image(szImage, nFrame, nOverFrame, nDownFrame, nDisableFrame)
 	self:_checksum()
-	if IsString(szImage) and IsNil(nFrame) then
-		nFrame = tonumber((gsub(szImage, '.*%|(%d+)', '%1')))
-		szImage = gsub(szImage, '%|.*', '')
+	if X.IsString(szImage) and X.IsNil(nFrame) then
+		nFrame = tonumber((string.gsub(szImage, '.*%|(%d+)', '%1')))
+		szImage = string.gsub(szImage, '%|.*', '')
 	end
-	if IsString(szImage) then
-		szImage = wgsub(szImage, '/', '\\')
-		if IsNumber(nFrame) and IsNumber(nOverFrame) and IsNumber(nDownFrame) and IsNumber(nDisableFrame) then
+	if X.IsString(szImage) then
+		szImage = wstring.gsub(szImage, '/', '\\')
+		if X.IsNumber(nFrame) and X.IsNumber(nOverFrame) and X.IsNumber(nDownFrame) and X.IsNumber(nDisableFrame) then
 			for _, raw in ipairs(self.raws) do
 				raw = GetComponentElement(raw, 'BUTTON')
 				if raw then
@@ -3428,7 +3391,7 @@ function OO:Image(szImage, nFrame, nOverFrame, nDownFrame, nDisableFrame)
 					raw:SetAnimateGroupDisable(nDisableFrame)
 				end
 			end
-		elseif IsString(szImage) and IsNumber(nFrame) then
+		elseif X.IsString(szImage) and X.IsNumber(nFrame) then
 			for _, raw in ipairs(self.raws) do
 				local el = GetComponentElement(raw, 'IMAGE')
 				if el then
@@ -3482,16 +3445,16 @@ function OO:ItemInfo(...)
 	for _, raw in ipairs(self.raws) do
 		raw = GetComponentElement(raw, 'BOX')
 		if raw then
-			if IsEmpty(data) then
+			if X.IsEmpty(data) then
 				UpdataItemBoxObject(raw)
 			else
 				local KItemInfo = GetItemInfo(data[2], data[3])
 				if KItemInfo and KItemInfo.nGenre == ITEM_GENRE.BOOK and #data == 4 then -- 西山居BUG
-					insert(data, 4, 99999)
+					table.insert(data, 4, 99999)
 				end
-				local res, err, trace = XpCall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
+				local res, err, trace = X.XpCall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
 				if not res then
-					LIB.ErrorLog(err, NSFormatString('{$NS}#UI:ItemInfo'), trace)
+					X.ErrorLog(err, X.NSFormatString('{$NS}#UI:ItemInfo'), trace)
 				end
 			end
 		end
@@ -3505,12 +3468,12 @@ function OO:BoxInfo(nType, ...)
 	for _, raw in ipairs(self.raws) do
 		raw = GetComponentElement(raw, 'BOX')
 		if raw then
-			if IsEmpty({ ... }) then
+			if X.IsEmpty({ ... }) then
 				UpdataItemBoxObject(raw)
 			else
-				local res, err, trace = XpCall(UpdateBoxObject, raw, nType, ...) -- 防止itemtab内外网不一样
+				local res, err, trace = X.XpCall(UpdateBoxObject, raw, nType, ...) -- 防止itemtab内外网不一样
 				if not res then
-					LIB.ErrorLog(err, NSFormatString('{$NS}#UI:BoxInfo'), trace)
+					X.ErrorLog(err, X.NSFormatString('{$NS}#UI:BoxInfo'), trace)
 				end
 			end
 		end
@@ -3523,7 +3486,7 @@ end
 -- NOTICE：only for Box
 function OO:Icon(dwIconID)
 	self:_checksum()
-	if IsNumber(dwIconID) then
+	if X.IsNumber(dwIconID) then
 		local element
 		for _, raw in ipairs(self.raws) do
 			element = GetComponentElement(raw, 'BOX')
@@ -3694,25 +3657,25 @@ function OO:ButtonStyle(...)
 		for _, raw in ipairs(self.raws) do
 			local btn = GetComponentElement(raw, 'BUTTON')
 			if btn then
-				btn:SetAnimatePath((wgsub(tStyle.szImage, '/', '\\')))
+				btn:SetAnimatePath((wstring.gsub(tStyle.szImage, '/', '\\')))
 				btn:SetAnimateGroupNormal(tStyle.nNormalGroup)
 				btn:SetAnimateGroupMouseOver(tStyle.nMouseOverGroup)
 				btn:SetAnimateGroupMouseDown(tStyle.nMouseDownGroup)
 				btn:SetAnimateGroupDisable(tStyle.nDisableGroup)
 				UI(btn)
-					:UIEvent(NSFormatString('OnMouseIn.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent(X.NSFormatString('OnMouseIn.{$NS}_UI_BUTTON_EVENT'), function()
 						SetComponentProp(raw, 'bIn', true)
 						UpdateButtonBoxFont(raw)
 					end)
-					:UIEvent(NSFormatString('OnMouseOut.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent(X.NSFormatString('OnMouseOut.{$NS}_UI_BUTTON_EVENT'), function()
 						SetComponentProp(raw, 'bIn', false)
 						UpdateButtonBoxFont(raw)
 					end)
-					:UIEvent(NSFormatString('OnLButtonDown.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent(X.NSFormatString('OnLButtonDown.{$NS}_UI_BUTTON_EVENT'), function()
 						SetComponentProp(raw, 'bDown', true)
 						UpdateButtonBoxFont(raw)
 					end)
-					:UIEvent(NSFormatString('OnLButtonUp.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent(X.NSFormatString('OnLButtonUp.{$NS}_UI_BUTTON_EVENT'), function()
 						SetComponentProp(raw, 'bDown', false)
 						UpdateButtonBoxFont(raw)
 					end)
@@ -3773,19 +3736,19 @@ end
 -- 绑定Frame的事件
 function OO:Event(szEvent, fnEvent)
 	self:_checksum()
-	if IsString(szEvent) then
+	if X.IsString(szEvent) then
 		local nPos, szKey = (StringFindW(szEvent, '.')), nil
 		if nPos then
-			szKey = sub(szEvent, nPos + 1)
-			szEvent = sub(szEvent, 1, nPos - 1)
+			szKey = string.sub(szEvent, nPos + 1)
+			szEvent = string.sub(szEvent, 1, nPos - 1)
 		end
-		if IsFunction(fnEvent) then
+		if X.IsFunction(fnEvent) then
 			for _, raw in ipairs(self.raws) do
 				if raw:GetType() == 'WndFrame' then
 					local events = GetComponentProp(raw, 'onEvents')
 					if not events then
 						events = {}
-						local onEvent = IsFunction(raw.OnEvent) and raw.OnEvent
+						local onEvent = X.IsFunction(raw.OnEvent) and raw.OnEvent
 						raw.OnEvent = function(e, ...)
 							if onEvent then
 								onEvent(e, ...)
@@ -3803,13 +3766,13 @@ function OO:Event(szEvent, fnEvent)
 						events[szEvent] = {}
 					end
 					if szKey then
-						for i, p in ipairs_r(events[szEvent]) do
+						for i, p in X.ipairs_r(events[szEvent]) do
 							if p.id == szKey then
-								remove(events[szEvent], i)
+								table.remove(events[szEvent], i)
 							end
 						end
 					end
-					insert(events[szEvent], { id = szKey, fn = fnEvent })
+					table.insert(events[szEvent], { id = szKey, fn = fnEvent })
 				end
 			end
 		else
@@ -3822,9 +3785,9 @@ function OO:Event(szEvent, fnEvent)
 								events[e] = {}
 							end
 						elseif events[szEvent] then
-							for i, p in ipairs_r(events[szEvent]) do
+							for i, p in X.ipairs_r(events[szEvent]) do
 								if p.id == szKey then
-									remove(events[szEvent], i)
+									table.remove(events[szEvent], i)
 								end
 							end
 						end
@@ -3839,13 +3802,13 @@ end
 -- 绑定ele的UI事件
 function OO:UIEvent(szEvent, fnEvent)
 	self:_checksum()
-	if IsString(szEvent) then
+	if X.IsString(szEvent) then
 		local nPos, szKey = (StringFindW(szEvent, '.')), nil
 		if nPos then
-			szKey = sub(szEvent, nPos + 1)
-			szEvent = sub(szEvent, 1, nPos - 1)
+			szKey = string.sub(szEvent, nPos + 1)
+			szEvent = string.sub(szEvent, 1, nPos - 1)
 		end
-		if IsFunction(fnEvent) then
+		if X.IsFunction(fnEvent) then
 			for _, raw in ipairs(self.raws) do
 				local uievents = GetComponentProp(raw, 'uievents')
 				if not uievents then
@@ -3854,7 +3817,7 @@ function OO:UIEvent(szEvent, fnEvent)
 				end
 				if not uievents[szEvent] then
 					uievents[szEvent] = {}
-					local onEvent = IsFunction(raw[szEvent]) and raw[szEvent]
+					local onEvent = X.IsFunction(raw[szEvent]) and raw[szEvent]
 					raw[szEvent] = function(...)
 						if onEvent then
 							onEvent(...)
@@ -3867,10 +3830,10 @@ function OO:UIEvent(szEvent, fnEvent)
 									rets = res
 								--[[#DEBUG BEGIN]]
 								else
-									LIB.Debug(
+									X.Debug(
 										'UI:UIEvent#' .. szEvent .. ':' .. (p.id or 'Unnamed'),
 										_L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', UI.GetTreePath(raw)),
-										DEBUG_LEVEL.WARNING
+										X.DEBUG_LEVEL.WARNING
 									)
 								--[[#DEBUG END]]
 								end
@@ -3894,7 +3857,7 @@ function OO:UIEvent(szEvent, fnEvent)
 						end
 					end
 				end
-				insert(uievents[szEvent], { id = szKey, fn = fnEvent })
+				table.insert(uievents[szEvent], { id = szKey, fn = fnEvent })
 			end
 		else
 			for _, raw in ipairs(self.raws) do
@@ -3905,9 +3868,9 @@ function OO:UIEvent(szEvent, fnEvent)
 							uievents[e] = {}
 						end
 					elseif uievents[szEvent] then
-						for i, p in ipairs_r(uievents[szEvent]) do
+						for i, p in X.ipairs_r(uievents[szEvent]) do
 							if p.id == szKey then
-								remove(uievents[szEvent], i)
+								table.remove(uievents[szEvent], i)
 							end
 						end
 					end
@@ -3923,12 +3886,12 @@ end
 -- (self) Instance:CustomLayout(function fnOnCustomLayout, string szPointType)
 function OO:CustomLayout(arg0, arg1)
 	self:_checksum()
-	if IsString(arg0) then
+	if X.IsString(arg0) then
 		self:Filter('.WndFrame')
 			:Event('ON_ENTER_CUSTOM_UI_MODE', function() UpdateCustomModeWindow(this, arg0, GetComponentProp(this, 'bPenetrable')) end)
 			:Event('ON_LEAVE_CUSTOM_UI_MODE', function() UpdateCustomModeWindow(this, arg0, GetComponentProp(this, 'bPenetrable')) end)
 	end
-	if IsFunction(arg0) then
+	if X.IsFunction(arg0) then
 		self:Filter('.WndFrame')
 			:Event('ON_ENTER_CUSTOM_UI_MODE', function() arg0(true , GetFrameAnchor(this, arg1)) end)
 			:Event('ON_LEAVE_CUSTOM_UI_MODE', function() arg0(false, GetFrameAnchor(this, arg1)) end)
@@ -3940,7 +3903,7 @@ end
 -- (self) Instance:Breathe(function fnOnFrameBreathe)
 function OO:Breathe(fnOnFrameBreathe)
 	self:_checksum()
-	if IsFunction(fnOnFrameBreathe) then
+	if X.IsFunction(fnOnFrameBreathe) then
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
 				UI(raw):UIEvent('OnFrameBreathe', fnOnFrameBreathe)
@@ -3963,7 +3926,7 @@ function OO:Menu(lmenu, rmenu, bNoAutoBind)
 		local h = raw:Lookup('', '') or raw
 		local nX, nY = h:GetAbsPos()
 		local nW, nH = h:GetSize()
-		if IsFunction(menu) then
+		if X.IsFunction(menu) then
 			menu = menu(raw)
 		end
 		if type(menu) ~= 'table' then
@@ -4017,18 +3980,18 @@ end
 --   -1    右键
 function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 	self:_checksum()
-	if IsFunction(fnLClick) or IsFunction(fnMClick) or IsFunction(fnRClick) then
+	if X.IsFunction(fnLClick) or X.IsFunction(fnMClick) or X.IsFunction(fnRClick) then
 		if not bNoAutoBind then
 			fnMClick = fnMClick or fnLClick
 			fnRClick = fnRClick or fnLClick
 		end
 		for _, raw in ipairs(self.raws) do
-			if IsFunction(fnLClick) then
+			if X.IsFunction(fnLClick) then
 				local fnAction = function()
 					if GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					LIB.ExecuteWithThis(raw, fnLClick, UI.MOUSE_EVENT.LBUTTON)
+					X.ExecuteWithThis(raw, fnLClick, UI.MOUSE_EVENT.LBUTTON)
 				end
 				if GetComponentType(raw) == 'WndScrollHandleBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemLButtonClick', fnAction)
@@ -4050,15 +4013,15 @@ function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					end
 				end
 			end
-			if IsFunction(fnMClick) then
+			if X.IsFunction(fnMClick) then
 
 			end
-			if IsFunction(fnRClick) then
+			if X.IsFunction(fnRClick) then
 				local fnAction = function()
 					if GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					LIB.ExecuteWithThis(raw, fnRClick, UI.MOUSE_EVENT.RBUTTON)
+					X.ExecuteWithThis(raw, fnRClick, UI.MOUSE_EVENT.RBUTTON)
 				end
 				if GetComponentType(raw) == 'WndScrollHandleBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemRButtonClick', fnAction)
@@ -4088,10 +4051,10 @@ function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
 				if wnd and wnd.OnLButtonClick then
-					CallWithThis(wnd, wnd.OnLButtonClick)
+					X.CallWithThis(wnd, wnd.OnLButtonClick)
 				end
 				if itm and itm.OnItemLButtonClick then
-					CallWithThis(itm, itm.OnItemLButtonClick)
+					X.CallWithThis(itm, itm.OnItemLButtonClick)
 				end
 			end
 		elseif nFlag==UI.MOUSE_EVENT.MBUTTON then
@@ -4101,10 +4064,10 @@ function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
 				if wnd and wnd.OnRButtonClick then
-					CallWithThis(wnd, wnd.OnRButtonClick)
+					X.CallWithThis(wnd, wnd.OnRButtonClick)
 				end
 				if itm and itm.OnItemRButtonClick then
-					CallWithThis(itm, itm.OnItemRButtonClick)
+					X.CallWithThis(itm, itm.OnItemRButtonClick)
 				end
 			end
 		end
@@ -4213,10 +4176,10 @@ function OO:Tip(tip, nPosType, tOffset, bNoEncode)
 		end
 		x, y = x + tOffset.x, y + tOffset.y
 		local szTip = tip
-		if IsFunction(szTip) then
+		if X.IsFunction(szTip) then
 			szTip = szTip(self)
 		end
-		if IsEmpty(szTip) then
+		if X.IsEmpty(szTip) then
 			return
 		end
 		if not bNoEncode then
@@ -4241,20 +4204,20 @@ function OO:Check(fnCheck, fnUncheck, bNoAutoBind)
 	if not bNoAutoBind then
 		fnUncheck = fnUncheck or fnCheck
 	end
-	if IsFunction(fnCheck) or IsFunction(fnUncheck) then
+	if X.IsFunction(fnCheck) or X.IsFunction(fnUncheck) then
 		for _, raw in ipairs(self.raws) do
 			local chk = GetComponentElement(raw, 'CHECKBOX')
 			if chk then
-				if IsFunction(fnCheck) then
+				if X.IsFunction(fnCheck) then
 					UI(chk):UIEvent('OnCheckBoxCheck', function() fnCheck(true) end)
 				end
-				if IsFunction(fnUncheck) then
+				if X.IsFunction(fnUncheck) then
 					UI(chk):UIEvent('OnCheckBoxUncheck', function() fnUncheck(false) end)
 				end
 			end
 		end
 		return self
-	elseif IsBoolean(fnCheck) then
+	elseif X.IsBoolean(fnCheck) then
 		for _, raw in ipairs(self.raws) do
 			local chk = GetComponentElement(raw, 'CHECKBOX')
 			if chk then
@@ -4276,7 +4239,7 @@ function OO:Check(fnCheck, fnUncheck, bNoAutoBind)
 		end
 	--[[#DEBUG BEGIN]]
 	else
-		LIB.Debug('ERROR UI:Check', 'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck), DEBUG_LEVEL.ERROR)
+		X.Debug('ERROR UI:Check', 'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck), X.DEBUG_LEVEL.ERROR)
 	--[[#DEBUG END]]
 	end
 end
@@ -4286,14 +4249,14 @@ end
 -- :Change()   调用处理函数
 function OO:Change(fnOnChange)
 	self:_checksum()
-	if IsFunction(fnOnChange) then
+	if X.IsFunction(fnOnChange) then
 		for _, raw in ipairs(self.raws) do
 			local edt = GetComponentElement(raw, 'EDIT')
 			if edt then
-				UI(edt):UIEvent('OnEditChanged', function() LIB.ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
+				UI(edt):UIEvent('OnEditChanged', function() X.ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
 			end
 			if GetComponentType(raw) == 'WndTrackbar' then
-				insert(GetComponentProp(raw, 'onChangeEvents'), fnOnChange)
+				table.insert(GetComponentProp(raw, 'onChangeEvents'), fnOnChange)
 			end
 		end
 		return self
@@ -4301,12 +4264,12 @@ function OO:Change(fnOnChange)
 		for _, raw in ipairs(self.raws) do
 			local edt = GetComponentElement(raw, 'EDIT')
 			if edt and edt.OnEditChanged then
-				CallWithThis(edt, edt.OnEditChanged, raw)
+				X.CallWithThis(edt, edt.OnEditChanged, raw)
 			end
 			if GetComponentType(raw) == 'WndTrackbar' then
 				local sld = GetComponentElement(raw, 'TRACKBAR')
 				if sld and sld.OnScrollBarPosChanged then
-					CallWithThis(sld, sld.OnScrollBarPosChanged, raw)
+					X.CallWithThis(sld, sld.OnScrollBarPosChanged, raw)
 				end
 			end
 		end
@@ -4335,7 +4298,7 @@ function OO:Focus(fnOnSetFocus)
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
 				UI(raw):UIEvent('OnSetFocus', function()
-					CallWithThis(raw, fnOnSetFocus)
+					X.CallWithThis(raw, fnOnSetFocus)
 				end)
 			end
 		end
@@ -4361,7 +4324,7 @@ function OO:Blur(fnOnKillFocus)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
-				UI(raw):UIEvent('OnKillFocus', function() LIB.ExecuteWithThis(raw, fnOnKillFocus) end)
+				UI(raw):UIEvent('OnKillFocus', function() X.ExecuteWithThis(raw, fnOnKillFocus) end)
 			end
 		end
 		return self
@@ -4382,9 +4345,9 @@ end
 -------------------------------------
 setmetatable(UI, {
 	__call = function (t, ...) return OO:ctor(...) end,
-	__tostring = function(t) return NSFormatString('{$NS}_UI (class prototype)') end,
+	__tostring = function(t) return X.NSFormatString('{$NS}_UI (class prototype)') end,
 })
-LIB.RegisterEvent(NSFormatString('{$NS}_BASE_LOADING_END'), function()
+X.RegisterEvent(X.NSFormatString('{$NS}_BASE_LOADING_END'), function()
 	local PROXY = {}
 	for k, v in pairs(UI) do
 		PROXY[k] = v
@@ -4394,8 +4357,8 @@ LIB.RegisterEvent(NSFormatString('{$NS}_BASE_LOADING_END'), function()
 		__metatable = true,
 		__call = function (t, ...) return OO:ctor(...) end,
 		__index = PROXY,
-		__newindex = function() assert(false, NSFormatString('DO NOT modify {$NS}.UI after initialized!!!')) end,
-		__tostring = function(t) return NSFormatString('{$NS}_UI (class prototype)') end,
+		__newindex = function() assert(false, X.NSFormatString('DO NOT modify {$NS}.UI after initialized!!!')) end,
+		__tostring = function(t) return X.NSFormatString('{$NS}_UI (class prototype)') end,
 	})
 end)
 
@@ -4406,7 +4369,7 @@ end)
 -- @param table  opt   : options
 ---------------------------------------------------
 function UI.CreateFrame(szName, opt)
-	if not IsTable(opt) then
+	if not X.IsTable(opt) then
 		opt = {}
 	end
 	if not (
@@ -4417,11 +4380,11 @@ function UI.CreateFrame(szName, opt)
 		opt.level = 'Normal'
 	end
 	-- calc ini file path
-	local szIniFile = PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrame.ini'
+	local szIniFile = X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrame.ini'
 	if opt.simple then
-		szIniFile = PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameSimple.ini'
+		szIniFile = X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameSimple.ini'
 	elseif opt.empty then
-		szIniFile = PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameEmpty.ini'
+		szIniFile = X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameEmpty.ini'
 	end
 
 	-- close and reopen exist frame
@@ -4431,25 +4394,25 @@ function UI.CreateFrame(szName, opt)
 	end
 	frm = Wnd.OpenWindow(szIniFile, szName)
 	if not opt.simple and not opt.empty then
-		frm:Lookup('', 'Image_Icon'):FromUITex(PACKET_INFO.LOGO_UITEX, PACKET_INFO.LOGO_MAIN_FRAME)
+		frm:Lookup('', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_UITEX, X.PACKET_INFO.LOGO_MAIN_FRAME)
 	end
 	frm:ChangeRelation(opt.level)
 	frm:Show()
 	local ui = UI(frm)
 	-- init frame
 	if opt.esc then
-		LIB.RegisterEsc('Frame_Close_' .. szName, function()
+		X.RegisterEsc('Frame_Close_' .. szName, function()
 			return true
 		end, function()
 			if frm.OnCloseButtonClick then
-				local status, res = CallWithThis(frm, frm.OnCloseButtonClick)
+				local status, res = X.CallWithThis(frm, frm.OnCloseButtonClick)
 				if status and res then
 					return
 				end
 			end
 			Wnd.CloseWindow(frm)
 			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-			LIB.RegisterEsc('Frame_Close_' .. szName)
+			X.RegisterEsc('Frame_Close_' .. szName)
 		end)
 	end
 	if opt.simple then
@@ -4491,7 +4454,7 @@ function UI.CreateFrame(szName, opt)
 				if chkMax then
 					chkMax:Enable(false)
 				end
-				if select(2, LIB.ExecuteWithThis(frm, frm.OnMinimize, frm:Lookup('Wnd_Total'))) then
+				if select(2, X.ExecuteWithThis(frm, frm.OnMinimize, frm:Lookup('Wnd_Total'))) then
 					return
 				end
 				if opt.dragresize then
@@ -4511,7 +4474,7 @@ function UI.CreateFrame(szName, opt)
 					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMinimize = false
-				LIB.ExecuteWithThis(frm, frm.OnRestore, frm:Lookup('Wnd_Total'))
+				X.ExecuteWithThis(frm, frm.OnRestore, frm:Lookup('Wnd_Total'))
 			end
 		end
 		if not opt.maximize then
@@ -4535,7 +4498,7 @@ function UI.CreateFrame(szName, opt)
 					local w, h = Station.GetClientSize()
 					UI(frm):Pos(0, 0):Size(w, h)
 				end)
-				if select(2, LIB.ExecuteWithThis(frm, frm.OnMaximize, frm:Lookup('Wnd_Total'))) then
+				if select(2, X.ExecuteWithThis(frm, frm.OnMaximize, frm:Lookup('Wnd_Total'))) then
 					return
 				end
 				if opt.dragresize then
@@ -4553,7 +4516,7 @@ function UI.CreateFrame(szName, opt)
 					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMaximize = false
-				LIB.ExecuteWithThis(frm, frm.OnRestore, frm:Lookup('Wnd_Total'))
+				X.ExecuteWithThis(frm, frm.OnRestore, frm:Lookup('Wnd_Total'))
 			end
 		end
 		-- drag resize button
@@ -4570,10 +4533,10 @@ function UI.CreateFrame(szName, opt)
 				local W, H = Station.GetClientSize()
 				local X, Y = frm:GetRelPos()
 				local w, h = x - X, y - Y
-				w = min(w, W - X) -- frame size should not larger than client size
-				h = min(h, H - Y)
-				w = max(w, opt.minwidth) -- frame size must larger than setted min size
-				h = max(h, opt.minheight)
+				w = math.min(w, W - X) -- frame size should not larger than client size
+				h = math.min(h, H - Y)
+				w = math.max(w, opt.minwidth) -- frame size must larger than setted min size
+				h = math.max(h, opt.minheight)
 				frm:Lookup('Btn_Drag'):SetRelPos(w - 16, h - 16)
 				frm:Lookup('', 'Shadow_Bg'):SetSize(w, h)
 			end
@@ -4591,13 +4554,13 @@ function UI.CreateFrame(szName, opt)
 				frm:Lookup('WndContainer_TitleBtnL'):Show()
 				frm:Lookup('WndContainer_TitleBtnR'):Show()
 				local w, h = this:GetRelPos()
-				w = max(w + 16, opt.minwidth)
-				h = max(h + 16, opt.minheight)
+				w = math.max(w + 16, opt.minwidth)
+				h = math.max(h + 16, opt.minheight)
 				UI(frm):Size(w, h)
 				if frm.OnDragResize then
-					local res, err, trace = XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
+					local res, err, trace = X.XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
 					if not res then
-						LIB.ErrorLog(err, NSFormatString('{$NS}#UI:CreateFrame#OnDragResize'), trace)
+						X.ErrorLog(err, X.NSFormatString('{$NS}#UI:CreateFrame#OnDragResize'), trace)
 					end
 				end
 			end

@@ -7,97 +7,68 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
-local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT ..'ui/PS.ini'
-local IMG_PATH = PACKET_INFO.FRAMEWORK_ROOT ..'img/PS.UITex'
-local FRAME_NAME = NSFormatString('{$NS}_PS')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT ..'ui/PS.ini'
+local IMG_PATH = X.PACKET_INFO.FRAMEWORK_ROOT ..'img/PS.UITex'
+local FRAME_NAME = X.NSFormatString('{$NS}_PS')
 
 local D = {}
 ---------------------------------------------------------------------------------------------
 -- 界面开关
 ---------------------------------------------------------------------------------------------
-function LIB.GetFrame()
+function X.GetFrame()
 	return Station.SearchFrame(FRAME_NAME)
 end
 
-function LIB.OpenPanel()
-	if not LIB.AssertVersion('', '', '*') then
+function X.OpenPanel()
+	if not X.AssertVersion('', '', '*') then
 		return
 	end
-	if not LIB.IsInitialized() then
+	if not X.IsInitialized() then
 		return
 	end
-	local frame = LIB.GetFrame()
+	local frame = X.GetFrame()
 	if not frame then
 		frame = Wnd.OpenWindow(INI_PATH, FRAME_NAME)
 		frame:Hide()
 		frame.bVisible = false
-		LIB.CheckTutorial()
+		X.CheckTutorial()
 	end
 	return frame
 end
 
-function LIB.ClosePanel()
-	local frame = LIB.GetFrame()
+function X.ClosePanel()
+	local frame = X.GetFrame()
 	if not frame then
 		return
 	end
-	LIB.SwitchTab('Welcome')
-	LIB.HidePanel(false, true)
+	X.SwitchTab('Welcome')
+	X.HidePanel(false, true)
 	Wnd.CloseWindow(frame)
 end
 
-function LIB.ReopenPanel()
-	if not LIB.IsPanelOpened() then
+function X.ReopenPanel()
+	if not X.IsPanelOpened() then
 		return
 	end
-	local bVisible = LIB.IsPanelVisible()
-	local szCurrentTabID = LIB.GetCurrentTabID()
-	LIB.ClosePanel()
-	LIB.OpenPanel()
+	local bVisible = X.IsPanelVisible()
+	local szCurrentTabID = X.GetCurrentTabID()
+	X.ClosePanel()
+	X.OpenPanel()
 	if szCurrentTabID then
-		LIB.SwitchTab(szCurrentTabID)
+		X.SwitchTab(szCurrentTabID)
 	end
-	LIB.TogglePanel(bVisible, true, true)
+	X.TogglePanel(bVisible, true, true)
 end
 
-function LIB.ShowPanel(bMute, bNoAnimate)
-	local frame = LIB.OpenPanel()
+function X.ShowPanel(bMute, bNoAnimate)
+	local frame = X.OpenPanel()
 	if not frame then
 		return
 	end
@@ -119,11 +90,11 @@ function LIB.ShowPanel(bMute, bNoAnimate)
 		end
 	end
 	frame:BringToTop()
-	LIB.RegisterEsc(PACKET_INFO.NAME_SPACE, LIB.IsPanelVisible, function() LIB.HidePanel() end)
+	X.RegisterEsc(X.PACKET_INFO.NAME_SPACE, X.IsPanelVisible, function() X.HidePanel() end)
 end
 
-function LIB.HidePanel(bMute, bNoAnimate)
-	local frame = LIB.GetFrame()
+function X.HidePanel(bMute, bNoAnimate)
+	local frame = X.GetFrame()
 	if not frame then
 		return
 	end
@@ -146,28 +117,28 @@ function LIB.HidePanel(bMute, bNoAnimate)
 	if not bMute then
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
-	LIB.RegisterEsc(PACKET_INFO.NAME_SPACE)
+	X.RegisterEsc(X.PACKET_INFO.NAME_SPACE)
 	UI.ClosePopupMenu()
 end
 
-function LIB.TogglePanel(bVisible, ...)
+function X.TogglePanel(bVisible, ...)
 	if bVisible == nil then
-		if LIB.IsPanelVisible() then
-			LIB.HidePanel()
+		if X.IsPanelVisible() then
+			X.HidePanel()
 		else
-			LIB.ShowPanel()
-			LIB.FocusPanel()
+			X.ShowPanel()
+			X.FocusPanel()
 		end
 	elseif bVisible then
-		LIB.ShowPanel(...)
-		LIB.FocusPanel()
+		X.ShowPanel(...)
+		X.FocusPanel()
 	else
-		LIB.HidePanel(...)
+		X.HidePanel(...)
 	end
 end
 
-function LIB.FocusPanel(bForce)
-	local frame = LIB.GetFrame()
+function X.FocusPanel(bForce)
+	local frame = X.GetFrame()
 	if not frame then
 		return
 	end
@@ -177,13 +148,13 @@ function LIB.FocusPanel(bForce)
 	Station.SetFocusWindow(frame)
 end
 
-function LIB.IsPanelVisible()
-	local frame = LIB.GetFrame()
+function X.IsPanelVisible()
+	local frame = X.GetFrame()
 	return frame and frame:IsVisible()
 end
 
-function LIB.IsPanelOpened()
-	return not not LIB.GetFrame()
+function X.IsPanelOpened()
+	return not not X.GetFrame()
 end
 
 ---------------------------------------------------------------------------------------------
@@ -201,12 +172,12 @@ local PANEL_CATEGORY_LIST = {
 }
 local PANEL_TAB_LIST = {}
 
-function LIB.GetPanelCategoryList()
-	return Clone(PANEL_CATEGORY_LIST)
+function X.GetPanelCategoryList()
+	return X.Clone(PANEL_CATEGORY_LIST)
 end
 
 local function IsTabRestricted(tTab)
-	if tTab.szRestriction and LIB.IsRestricted(tTab.szRestriction) then
+	if tTab.szRestriction and X.IsRestricted(tTab.szRestriction) then
 		return true
 	end
 	if tTab.IsRestricted then
@@ -215,9 +186,9 @@ local function IsTabRestricted(tTab)
 	return false
 end
 
--- LIB.SwitchCategory(szCategory)
-function LIB.SwitchCategory(szCategory)
-	local frame = LIB.GetFrame()
+-- X.SwitchCategory(szCategory)
+function X.SwitchCategory(szCategory)
+	local frame = X.GetFrame()
 	if not frame then
 		return
 	end
@@ -235,8 +206,8 @@ function LIB.SwitchCategory(szCategory)
 	end
 end
 
-function LIB.SwitchTab(szKey, bForceUpdate)
-	local frame = LIB.GetFrame()
+function X.SwitchTab(szKey, bForceUpdate)
+	local frame = X.GetFrame()
 	if not frame then
 		return
 	end
@@ -244,14 +215,14 @@ function LIB.SwitchTab(szKey, bForceUpdate)
 	if not tTab then
 		--[[#DEBUG BEGIN]]
 		if not tTab then
-			LIB.Debug(NSFormatString('{$NS}.SwitchTab'), _L('Cannot find tab: %s', szKey), DEBUG_LEVEL.WARNING)
+			X.Debug(X.NSFormatString('{$NS}.SwitchTab'), _L('Cannot find tab: %s', szKey), X.DEBUG_LEVEL.WARNING)
 		end
 		--[[#DEBUG END]]
 		return
 	end
 	-- 判断主分类是否正确
 	if tTab.szCategory and frame.szCurrentCategoryName ~= tTab.szCategory then
-		LIB.SwitchCategory(tTab.szCategory)
+		X.SwitchCategory(tTab.szCategory)
 	end
 	-- 判断标签页是否已激活
 	if frame.szCurrentTabKey == tTab.szKey and not bForceUpdate then
@@ -275,9 +246,9 @@ function LIB.SwitchTab(szKey, bForceUpdate)
 	local scroll = frame.MAIN_SCROLL
 	-- fire custom registered on switch event
 	if wnd.OnPanelDeactive then
-		local res, err, trace = XpCall(wnd.OnPanelDeactive, wnd)
+		local res, err, trace = X.XpCall(wnd.OnPanelDeactive, wnd)
 		if not res then
-			LIB.ErrorLog(err, NSFormatString('{$NS}#OnPanelDeactive'), trace)
+			X.ErrorLog(err, X.NSFormatString('{$NS}#OnPanelDeactive'), trace)
 		end
 	end
 	-- clear all events
@@ -293,9 +264,9 @@ function LIB.SwitchTab(szKey, bForceUpdate)
 	wnd:SetContainerType(UI.WND_CONTAINER_STYLE.CUSTOM)
 	-- ready to draw
 	if tTab.OnPanelActive then
-		local res, err, trace = XpCall(tTab.OnPanelActive, wnd)
+		local res, err, trace = X.XpCall(tTab.OnPanelActive, wnd)
 		if not res then
-			LIB.ErrorLog(err, NSFormatString('{$NS}#OnPanelActive'), trace)
+			X.ErrorLog(err, X.NSFormatString('{$NS}#OnPanelActive'), trace)
 		end
 		wnd:FormatAllContentPos()
 	end
@@ -307,14 +278,14 @@ function LIB.SwitchTab(szKey, bForceUpdate)
 	frame.szCurrentTabKey = szKey
 end
 
-function LIB.RedrawTab(szKey)
-	if LIB.GetCurrentTabID() == szKey then
-		LIB.SwitchTab(szKey, true)
+function X.RedrawTab(szKey)
+	if X.GetCurrentTabID() == szKey then
+		X.SwitchTab(szKey, true)
 	end
 end
 
-function LIB.GetCurrentTabID()
-	local frame = LIB.GetFrame()
+function X.GetCurrentTabID()
+	local frame = X.GetFrame()
 	if not frame then
 		return
 	end
@@ -322,7 +293,7 @@ function LIB.GetCurrentTabID()
 end
 
 -- 注册选项卡
--- (void) LIB.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
+-- (void) X.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 -- szCategory      选项卡所在分类
 -- szKey           选项卡唯一 KEY
 -- szName          选项卡按钮标题
@@ -333,37 +304,37 @@ end
 --   options.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
 --   options.OnPanelDeactive(wnd)    选项卡取消激活
 -- }
--- Ex： LIB.RegisterPanel('测试', 'Test', '测试标签', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd) end })
-function LIB.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
+-- Ex： X.RegisterPanel('测试', 'Test', '测试标签', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd) end })
+function X.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 	-- 分类不存在则创建
 	if not options.bHide and not lodash.find(PANEL_CATEGORY_LIST, function(tCategory) return tCategory.szName == szCategory end) then
-		insert(PANEL_CATEGORY_LIST, {
+		table.insert(PANEL_CATEGORY_LIST, {
 			szName = szCategory,
 		})
 	end
 	-- 移除已存在的
 	for i, tTab in ipairs(PANEL_TAB_LIST) do
 		if tTab.szKey == szKey then
-			remove(tTab, i)
+			table.remove(tTab, i)
 			break
 		end
 	end
 	-- 判断非注销面板调用
 	if szName ~= false then
 		-- 格式化图标信息
-		if IsNumber(szIconTex) then
+		if X.IsNumber(szIconTex) then
 			szIconTex = 'FromIconID|' .. szIconTex
-		elseif not IsString(szIconTex) then
+		elseif not X.IsString(szIconTex) then
 			szIconTex = 'UI/Image/Common/Logo.UITex|6'
 		end
-		local dwIconFrame = gsub(szIconTex, '.*%|(%d+)', '%1')
+		local dwIconFrame = string.gsub(szIconTex, '.*%|(%d+)', '%1')
 		if dwIconFrame then
 			dwIconFrame = tonumber(dwIconFrame)
-			szIconTex = gsub(szIconTex, '%|.*', '')
+			szIconTex = string.gsub(szIconTex, '%|.*', '')
 		end
 		local nPriority = options.nPriority or (GetStringCRC(szKey) + 100000)
 		-- 创建数据结构、插入数组
-		insert(PANEL_TAB_LIST, {
+		table.insert(PANEL_TAB_LIST, {
 			szKey           = szKey                  ,
 			szName          = szName                 ,
 			szCategory      = szCategory             ,
@@ -381,7 +352,7 @@ function LIB.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 			OnPanelDeactive = options.OnPanelDeactive,
 		})
 		-- 重新根据权重排序数组
-		sort(PANEL_TAB_LIST, function(t1, t2)
+		table.sort(PANEL_TAB_LIST, function(t1, t2)
 			if t1.bWelcome then
 				return true
 			elseif t2.bWelcome then
@@ -392,7 +363,7 @@ function LIB.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 		end)
 	end
 	-- 通知重绘
-	FireUIEvent(NSFormatString('{$NS}_PANEL_UPDATE'))
+	FireUIEvent(X.NSFormatString('{$NS}_PANEL_UPDATE'))
 end
 
 ---------------------------------------------------------------------------------------------
@@ -416,7 +387,7 @@ function D.RedrawCategory(frame, szCategory)
 		end
 	end
 	container:FormatAllContentPos()
-	LIB.SwitchCategory(szCategory)
+	X.SwitchCategory(szCategory)
 end
 
 function D.RedrawTabs(frame, szCategory)
@@ -443,7 +414,7 @@ function D.RedrawTabs(frame, szCategory)
 	local tWelcomeTab = lodash.find(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == szCategory and tTab.bWelcome and not IsTabRestricted(tTab) end)
 		or lodash.find(PANEL_TAB_LIST, function(tTab) return not tTab.szCategory and tTab.bWelcome and not IsTabRestricted(tTab) end)
 	if tWelcomeTab then
-		LIB.SwitchTab(tWelcomeTab.szKey)
+		X.SwitchTab(tWelcomeTab.szKey)
 	end
 end
 
@@ -490,23 +461,23 @@ function D.OnSizeChanged()
 	frame.MAIN_HANDLE:SetSize(nWidth - 201, nHeight - 100)
 	local hWndMainPanel = frame.MAIN_WND
 	if hWndMainPanel.OnPanelResize then
-		local res, err, trace = XpCall(hWndMainPanel.OnPanelResize, hWndMainPanel)
+		local res, err, trace = X.XpCall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
-			LIB.ErrorLog(err, NSFormatString('{$NS}#OnPanelResize'), trace)
+			X.ErrorLog(err, X.NSFormatString('{$NS}#OnPanelResize'), trace)
 		end
 		hWndMainPanel:FormatAllContentPos()
 	elseif hWndMainPanel.OnPanelActive then
 		if hWndMainPanel.OnPanelDeactive then
-			local res, err, trace = XpCall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
+			local res, err, trace = X.XpCall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
 			if not res then
-				LIB.ErrorLog(err, NSFormatString('{$NS}#OnPanelResize->OnPanelDeactive'), trace)
+				X.ErrorLog(err, X.NSFormatString('{$NS}#OnPanelResize->OnPanelDeactive'), trace)
 			end
 		end
 		hWndMainPanel:Clear()
 		hWndMainPanel:Lookup('', ''):Clear()
-		local res, err, trace = XpCall(hWndMainPanel.OnPanelActive, hWndMainPanel)
+		local res, err, trace = X.XpCall(hWndMainPanel.OnPanelActive, hWndMainPanel)
 		if not res then
-			LIB.ErrorLog(err, NSFormatString('{$NS}#OnPanelResize->OnPanelActive'), trace)
+			X.ErrorLog(err, X.NSFormatString('{$NS}#OnPanelResize->OnPanelActive'), trace)
 		end
 		hWndMainPanel:FormatAllContentPos()
 	end
@@ -538,16 +509,16 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
-		LIB.ClosePanel()
+		X.ClosePanel()
 	elseif name == 'Btn_Weibo' then
-		LIB.OpenBrowser(PACKET_INFO.AUTHOR_WEIBO_URL)
+		X.OpenBrowser(X.PACKET_INFO.AUTHOR_WEIBO_URL)
 	end
 end
 
 function D.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Tab' then
-		LIB.SwitchTab(this.szKey)
+		X.SwitchTab(this.szKey)
 	end
 end
 
@@ -604,8 +575,8 @@ function D.OnDragButton()
 		HideTip()
 		local nX, nY = Station.GetMessagePos()
 		local nDeltaX, nDeltaY = nX - this.fDragX, nY - this.fDragY
-		local nW = max(this.fDragW + nDeltaX, 500)
-		local nH = max(this.fDragH + nDeltaY, 300)
+		local nW = math.max(this.fDragW + nDeltaX, 500)
+		local nH = math.max(this.fDragH + nDeltaY, 300)
 		D.ResizePanel(this:GetRoot(), nW, nH)
 	end
 end
@@ -614,11 +585,11 @@ function D.OnFrameCreate()
 	this.MAIN_SCROLL = this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
 	this.MAIN_WND = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
 	this.MAIN_HANDLE = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel', '')
-	local fScale = 1 + max(Font.GetOffset() * 0.03, 0)
-	this:Lookup('', 'Text_Title'):SetText(_L('%s v%s Build %s', PACKET_INFO.NAME, PACKET_INFO.VERSION, PACKET_INFO.BUILD))
-	this:Lookup('', 'Text_Author'):SetText('-- by ' .. PACKET_INFO.AUTHOR_SIGNATURE)
-	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', PACKET_INFO.AUTHOR_WEIBO))
-	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(PACKET_INFO.LOGO_UITEX, PACKET_INFO.LOGO_MAIN_FRAME)
+	local fScale = 1 + math.max(Font.GetOffset() * 0.03, 0)
+	this:Lookup('', 'Text_Title'):SetText(_L('%s v%s Build %s', X.PACKET_INFO.NAME, X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD))
+	this:Lookup('', 'Text_Author'):SetText('-- by ' .. X.PACKET_INFO.AUTHOR_SIGNATURE)
+	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', X.PACKET_INFO.AUTHOR_WEIBO))
+	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_UITEX, X.PACKET_INFO.LOGO_MAIN_FRAME)
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
 	UI(this):Size(D.OnSizeChanged)
 	D.RedrawCategory(this)
@@ -628,15 +599,15 @@ function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
 end
 
-function LIB.OnFrameBreathe()
+function X.OnFrameBreathe()
 	if this.MAIN_WND and this.MAIN_WND.OnPanelBreathe then
-		Call(this.MAIN_WND.OnPanelBreathe, this.MAIN_WND)
+		X.Call(this.MAIN_WND.OnPanelBreathe, this.MAIN_WND)
 	end
 end
 
-function LIB.OnEvent(event)
+function X.OnEvent(event)
 	if event == 'UI_SCALED' then
-		LIB.ExecuteWithThis(this.MAIN_SCROLL, LIB.OnScrollBarPosChanged)
+		X.ExecuteWithThis(this.MAIN_SCROLL, X.OnScrollBarPosChanged)
 		D.OnSizeChanged()
 	end
 end
@@ -667,5 +638,5 @@ local settings = {
 		},
 	},
 }
-_G[FRAME_NAME] = LIB.CreateModule(settings)
+_G[FRAME_NAME] = X.CreateModule(settings)
 end

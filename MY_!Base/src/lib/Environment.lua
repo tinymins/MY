@@ -7,55 +7,26 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 ---------------------------------------------------------------------------------------------------
 
-function LIB.AssertVersion(szKey, szCaption, szRequireVersion)
-	if not IsString(szRequireVersion) then
-		LIB.Sysmsg(_L(
+function X.AssertVersion(szKey, szCaption, szRequireVersion)
+	if not X.IsString(szRequireVersion) then
+		X.Sysmsg(_L(
 			'%s requires a invalid base library version value: %s.',
-			szCaption, EncodeLUAData(szRequireVersion)))
+			szCaption, X.EncodeLUAData(szRequireVersion)))
 		return IsDebugClient() or false
 	end
-	if not (LIB.Semver(PACKET_INFO.VERSION) % szRequireVersion) then
-		LIB.Sysmsg(_L(
+	if not (X.Semver(X.PACKET_INFO.VERSION) % szRequireVersion) then
+		X.Sysmsg(_L(
 			'%s requires base library version at %s, current at %s.',
-			szCaption, szRequireVersion, PACKET_INFO.VERSION))
+			szCaption, szRequireVersion, X.PACKET_INFO.VERSION))
 		return IsDebugClient() or false
 	end
 	return true
@@ -67,19 +38,19 @@ local DELAY_EVENT = {}
 local RESTRICTION = {}
 
 -- 注册功能在不同分支下屏蔽状态
--- LIB.RegisterRestriction('SomeFunc', { ['*'] = true, intl = false })
-function LIB.RegisterRestriction(szKey, tBranchRestricted)
+-- X.RegisterRestriction('SomeFunc', { ['*'] = true, intl = false })
+function X.RegisterRestriction(szKey, tBranchRestricted)
 	local bRestricted = nil
-	if IsTable(tBranchRestricted) then
-		if IsBoolean(tBranchRestricted[GLOBAL.GAME_BRANCH]) then
+	if X.IsTable(tBranchRestricted) then
+		if X.IsBoolean(tBranchRestricted[GLOBAL.GAME_BRANCH]) then
 			bRestricted = tBranchRestricted[GLOBAL.GAME_BRANCH]
-		elseif IsBoolean(tBranchRestricted['*']) then
+		elseif X.IsBoolean(tBranchRestricted['*']) then
 			bRestricted = tBranchRestricted['*']
 		end
 	end
-	if not IsBoolean(bRestricted) then
+	if not X.IsBoolean(bRestricted) then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(PACKET_INFO.NAME_SPACE, 'Restriction should be a boolean value: ' .. szKey, DEBUG_LEVEL.ERROR)
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Restriction should be a boolean value: ' .. szKey, X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end
@@ -87,12 +58,12 @@ function LIB.RegisterRestriction(szKey, tBranchRestricted)
 end
 
 -- 获取功能在当前分支是否已屏蔽
--- LIB.IsRestricted('SomeFunc')
-function LIB.IsRestricted(szKey, ...)
+-- X.IsRestricted('SomeFunc')
+function X.IsRestricted(szKey, ...)
 	if select('#', ...) == 1 then
 		-- 设置值
 		local bRestricted = ...
-		if not IsNil(bRestricted) then
+		if not X.IsNil(bRestricted) then
 			bRestricted = not not bRestricted
 		end
 		if RESTRICTION[szKey] == bRestricted then
@@ -100,26 +71,26 @@ function LIB.IsRestricted(szKey, ...)
 		end
 		RESTRICTION[szKey] = bRestricted
 		-- 发起事件通知
-		local szEvent = NSFormatString('{$NS}.RESTRICTION')
+		local szEvent = X.NSFormatString('{$NS}.RESTRICTION')
 		if szKey == '!' then
 			for k, _ in pairs(DELAY_EVENT) do
-				LIB.DelayCall(k, false)
+				X.DelayCall(k, false)
 			end
 			DELAY_EVENT = {}
 			szKey = nil
 		else
 			szEvent = szEvent .. '.' .. szKey
 		end
-		LIB.DelayCall(szEvent, 75, function()
-			if LIB.IsPanelOpened() then
-				LIB.ReopenPanel()
+		X.DelayCall(szEvent, 75, function()
+			if X.IsPanelOpened() then
+				X.ReopenPanel()
 			end
 			DELAY_EVENT[szEvent] = nil
-			FireUIEvent(NSFormatString('{$NS}_RESTRICTION'), szKey)
+			FireUIEvent(X.NSFormatString('{$NS}_RESTRICTION'), szKey)
 		end)
 		DELAY_EVENT[szEvent] = true
 	else
-		if not IsNil(RESTRICTION['!']) then
+		if not X.IsNil(RESTRICTION['!']) then
 			return RESTRICTION['!']
 		end
 		return RESTRICTION[szKey] or false
@@ -128,19 +99,19 @@ end
 end
 
 -- 获取是否测试客户端
--- (bool) LIB.IsDebugClient()
--- (bool) LIB.IsDebugClient(bool bManually = false)
--- (bool) LIB.IsDebugClient(string szKey[, bool bDebug, bool bSet])
+-- (bool) X.IsDebugClient()
+-- (bool) X.IsDebugClient(bool bManually = false)
+-- (bool) X.IsDebugClient(string szKey[, bool bDebug, bool bSet])
 do
 local DELAY_EVENT = {}
-local DEBUG = { ['*'] = PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG }
-function LIB.IsDebugClient(szKey, bDebug, bSet)
-	if not IsString(szKey) then
+local DEBUG = { ['*'] = X.PACKET_INFO.DEBUG_LEVEL <= X.DEBUG_LEVEL.DEBUG }
+function X.IsDebugClient(szKey, bDebug, bSet)
+	if not X.IsString(szKey) then
 		szKey, bDebug, bSet = '*', szKey, bDebug
 	end
 	if bSet then
 		-- 通用禁止设为空
-		if szKey == '*' and IsNil(bDebug) then
+		if szKey == '*' and X.IsNil(bDebug) then
 			return
 		end
 		-- 设置值
@@ -149,31 +120,31 @@ function LIB.IsDebugClient(szKey, bDebug, bSet)
 		end
 		DEBUG[szKey] = bDebug
 		-- 发起事件通知
-		local szEvent = NSFormatString('{$NS}#DEBUG')
+		local szEvent = X.NSFormatString('{$NS}#DEBUG')
 		if szKey == '*' or szKey == '!' then
 			for k, _ in pairs(DELAY_EVENT) do
-				LIB.DelayCall(k, false)
+				X.DelayCall(k, false)
 			end
 			szKey = nil
 		else
 			szEvent = szEvent .. '#' .. szKey
 		end
-		LIB.DelayCall(szEvent, 75, function()
-			if LIB.IsPanelOpened() then
-				LIB.ReopenPanel()
+		X.DelayCall(szEvent, 75, function()
+			if X.IsPanelOpened() then
+				X.ReopenPanel()
 			end
 			DELAY_EVENT[szEvent] = nil
-			FireUIEvent(NSFormatString('{$NS}_DEBUG'), szKey)
+			FireUIEvent(X.NSFormatString('{$NS}_DEBUG'), szKey)
 		end)
 		DELAY_EVENT[szEvent] = true
 	else
-		if not IsNil(DEBUG['!']) then
+		if not X.IsNil(DEBUG['!']) then
 			return DEBUG['!']
 		end
 		if szKey == '*' and not bDebug then
 			return IsDebugClient()
 		end
-		if not IsNil(DEBUG[szKey]) then
+		if not X.IsNil(DEBUG[szKey]) then
 			return DEBUG[szKey]
 		end
 		return DEBUG['*']
@@ -182,7 +153,7 @@ end
 end
 
 -- 获取是否测试服务器
-function LIB.IsDebugServer()
+function X.IsDebugServer()
 	local ip = select(7, GetUserServer())
 	if ip:find('^192%.') or ip:find('^10%.') then
 		return true

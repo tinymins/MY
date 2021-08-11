@@ -7,40 +7,11 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
 local function DefaultValueComparer(v1, v2)
@@ -55,7 +26,7 @@ end
 Sample:
 	------------------
 	-- Get an instance
-	local IC = LIB.InfoCache('cache/PLAYER_INFO/{$relserver}/TONG/<SEG>.{$lang}.jx3dat', 2, 3000)
+	local IC = X.InfoCache('cache/PLAYER_INFO/{$relserver}/TONG/<SEG>.{$lang}.jx3dat', 2, 3000)
 	--------------------
 	-- Setter and Getter
 	-- Set value
@@ -71,7 +42,7 @@ Sample:
 	IC('save', 6000, 5, true)  -- Save to DB with a max unvisited time and a max saving len and release memory
 	IC('clear')                -- Delete all data
 ]]
-function LIB.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
+function X.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 	if not ValueComparer then
 		ValueComparer = DefaultValueComparer
 	end
@@ -85,9 +56,9 @@ function LIB.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 				return tCache[k]
 			end
 			-- read info from saved data
-			local szSegID = concat({byte(k, 1, SEG_LEN)}, '-')
+			local szSegID = table.concat({string.byte(k, 1, SEG_LEN)}, '-')
 			if not tInfos[szSegID] then
-				tInfos[szSegID] = LIB.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
+				tInfos[szSegID] = X.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
 			end
 			tInfoVisit[szSegID] = GetTime()
 			return tInfos[szSegID][k]
@@ -98,11 +69,11 @@ function LIB.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 			-- judge if info has been updated and need to be saved
 			-- read from L1 CACHE
 			local tInfo = tCache[k]
-			local szSegID = concat({byte(k, 1, SEG_LEN)}, '-')
+			local szSegID = table.concat({string.byte(k, 1, SEG_LEN)}, '-')
 			-- read from DataBase if L1 CACHE not hit
 			if not tInfo then
 				if not tInfos[szSegID] then
-					tInfos[szSegID] = LIB.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
+					tInfos[szSegID] = X.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
 				end
 				tInfo = tInfos[szSegID][k]
 				tInfoVisit[szSegID] = GetTime()
@@ -118,9 +89,9 @@ function LIB.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 			-- update L1 CACHE
 			if bModified or not tCache[k] then
 				if #aCache > L1_SIZE then
-					remove(aCache, 1)
+					table.remove(aCache, 1)
 				end
-				insert(aCache, v)
+				table.insert(aCache, v)
 				tCache[k] = v
 			end
 			------------------
@@ -128,7 +99,7 @@ function LIB.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 			if bModified then
 				-- save info to DataBase
 				if not tInfos[szSegID] then
-					tInfos[szSegID] = LIB.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
+					tInfos[szSegID] = X.LoadLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID))) or {}
 				end
 				tInfos[szSegID][k] = v
 				tInfoVisit[szSegID] = GetTime()
@@ -141,13 +112,13 @@ function LIB.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 				tInfos, tInfoVisit, tInfoModified = {}, {}, {}
 				local aSeg = {}
 				for i = 1, SEG_LEN do
-					insert(aSeg, 0)
+					table.insert(aSeg, 0)
 				end
 				while aSeg[SEG_LEN + 1] ~= 1 do
-					local szSegID = concat(aSeg, '-')
+					local szSegID = table.concat(aSeg, '-')
 					local szPath = SZ_DATA_PATH:gsub('<SEG>', szSegID)
-					if IsFileExist(LIB.GetLUADataPath(szPath)) then
-						LIB.SaveLUAData(szPath, nil)
+					if IsFileExist(X.GetLUADataPath(szPath)) then
+						X.SaveLUAData(szPath, nil)
 						-- Log('INFO CACHE CLEAR @' .. szSegID)
 					end
 					-- bit add one
@@ -173,10 +144,10 @@ function LIB.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 							nCount = nCount - 1
 						end
 						if tInfoModified[szSegID] then
-							LIB.SaveLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID)), tInfos[szSegID])
+							X.SaveLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID)), tInfos[szSegID])
 						--[[#DEBUG BEGIN]]
 						else
-							LIB.Debug('InfoCache', 'INFO Unloaded: ' .. szSegID, DEBUG_LEVEL.LOG)
+							X.Debug('InfoCache', 'INFO Unloaded: ' .. szSegID, X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 						end
 						if bCollect then

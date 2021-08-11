@@ -10,24 +10,8 @@ end
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -------------------------------------------------------------------------------------------------------
 local NS = 'MY'
 local D = {}
@@ -47,7 +31,7 @@ function wfind_c(s, i)
 		c[s] = {}
 	end
 	if c[s][i] == nil then
-		c[s][i] = wfind(s, i) or false
+		c[s][i] = wstring.find(s, i) or false
 	end
 	return c[s][i]
 end
@@ -166,18 +150,18 @@ function D.GetRankString(key)
 			found = false
 			for i, rid in ipairs_r(res) do
 				if time <= SUM_SORT[rid] then
-					insert(res, i + 1, id)
+					table.insert(res, i + 1, id)
 					found = true
 					count = count + 1
 					break
 				end
 			end
 			if not found then
-				insert(res, 1, id)
+				table.insert(res, 1, id)
 				count = count + 1
 			end
 			if count > MAX_COUNT then
-				remove(res)
+				table.remove(res)
 				count = count - 1
 			end
 		end
@@ -185,7 +169,7 @@ function D.GetRankString(key)
 	for i, id in ipairs(res) do
 		res[i] = i .. '. ' .. '[TIME]' .. SUM_TIME[id] .. UNIT.TIME .. ' [CALL]' .. SUM_CALL[id] .. UNIT.CALL .. ' [INFO]' .. res[i]
 	end
-	return concat(res, '\n')
+	return table.concat(res, '\n')
 end
 
 function D.SetBreathe()

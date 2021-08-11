@@ -98,39 +98,35 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -------------------------------------------------------------------------------------------------------
 -- wstring 修正
-local _wsub = wstring.sub
-local function wsub(str, s, e)
-	local nLen = wlen(str)
-	if s < 0 then
-		s = nLen + s + 1
-	end
-	if not e then
-		e = nLen
-	elseif e < 0 then
-		e = nLen + e + 1
-	end
-	return _wsub(str, s, e)
-end
+-------------------------------------------------------------------------------------------------------
+local _wstring, wstring = wstring, nil
+wstring = setmetatable(
+	{
+		len = _wstring.len,
+		find = StringFindW,
+		sub = function(str, s, e)
+			local nLen = wstring.len(str)
+			if s < 0 then
+				s = nLen + s + 1
+			end
+			if not e then
+				e = nLen
+			elseif e < 0 then
+				e = nLen + e + 1
+			end
+			return _wstring.sub(str, s, e)
+		end,
+		gsub = StringReplaceW,
+		lower = StringLowerW,
+	},
+	{ __index = _wstring })
+-------------------------------------------------------------------------------------------------------
+-- 测试等级
+-------------------------------------------------------------------------------------------------------
 local DEBUG_LEVEL = SetmetaReadonly({
 	PMLOG   = 0,
 	LOG     = 1,
@@ -146,18 +142,18 @@ local _GAME_LANG_, _GAME_BRANCH_, _GAME_EDITION_, _GAME_VERSION_
 local _GAME_PROVIDER_ = 'local'
 do
 	local szVersionLineFullName, szVersion, szVersionLineName, szVersionEx, szVersionName = GetVersion()
-	_GAME_LANG_ = lower(szVersionLineName)
+	_GAME_LANG_ = string.lower(szVersionLineName)
 	if _GAME_LANG_ == 'classic' then
 		_GAME_LANG_ = 'zhcn'
 	end
-	_GAME_BRANCH_ = lower(szVersionLineName)
+	_GAME_BRANCH_ = string.lower(szVersionLineName)
 	if _GAME_BRANCH_ == 'zhcn' then
 		_GAME_BRANCH_ = 'remake'
 	elseif _GAME_BRANCH_ == 'zhtw' then
 		_GAME_BRANCH_ = 'intl'
 	end
-	_GAME_EDITION_ = lower(szVersionLineName .. '_' .. szVersionEx)
-	_GAME_VERSION_ = lower(szVersion)
+	_GAME_EDITION_ = string.lower(szVersionLineName .. '_' .. szVersionEx)
+	_GAME_VERSION_ = string.lower(szVersion)
 
 	if SM_IsEnable then
 		local status, res = pcall(SM_IsEnable)
@@ -224,7 +220,7 @@ local function ErrorLog(...)
 		xLine = select(i, ...)
 		aLine[i] = tostring(xLine)
 	end
-	local szFull = concat(aLine, '\n') .. '\n'
+	local szFull = table.concat(aLine, '\n') .. '\n'
 	Log('MSG_SYS', szFull)
 	FireUIEvent('CALL_LUA_ERROR', szFull)
 end
@@ -256,7 +252,7 @@ local function LoadLangPack(szLangFolder)
 		t0[k] = v
 	end
 	if type(szLangFolder)=='string' then
-		szLangFolder = gsub(szLangFolder,'[/\\]+$','')
+		szLangFolder = string.gsub(szLangFolder,'[/\\]+$','')
 		local t2 = LoadLUAData(szLangFolder..'/default') or {}
 		for k, v in pairs(t2) do
 			t0[k] = v
@@ -268,7 +264,7 @@ local function LoadLangPack(szLangFolder)
 	end
 	setmetatable(t0, {
 		__index = function(t, k) return k end,
-		__call = function(t, k, ...) return format(t[k], ...) end,
+		__call = function(t, k, ...) return string.format(t[k], ...) end,
 	})
 	return t0
 end
@@ -280,25 +276,25 @@ local _AUTHOR_WEIBO_     = _L.PLUGIN_AUTHOR_WEIBO
 local _AUTHOR_WEIBO_URL_ = 'https://weibo.com/zymah'
 local _AUTHOR_SIGNATURE_ = _L.PLUGIN_AUTHOR_SIGNATURE
 local _AUTHOR_ROLES_     = {
-	[ 3007396] = char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 梦江南
-	[ 1600498] = char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 追风蹑影
-	[ 4664780] = char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 日月明尊
-	[17796954] = char(0xDC, 0xF8, 0xD2, 0xC1, 0x40, 0xB0, 0xD7, 0xB5, 0xDB, 0xB3, 0xC7), -- 茗伊@白帝城 唯我独尊->梦江南
-	[  385183] = char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A), -- 茗伊 傲血戰意
-	[ 1452025] = char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A), -- 茗伊伊 巔峰再起
-	[ 3627405] = char(0xC1, 0xFA, 0xB5, 0xA8, 0xC9, 0xDF, 0x40, 0xDD, 0xB6, 0xBB, 0xA8, 0xB9, 0xAC), -- 白帝
-	-- [4662931] = char(0xBE, 0xCD, 0xCA, 0xC7, 0xB8, 0xF6, 0xD5, 0xF3, 0xD1, 0xDB), -- 日月明尊
-	-- [3438030] = char(0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5), -- 梦江南
-	[    1028] = char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 缘起稻香@缘起一区
-	[     660] = char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 梦回长安@缘起一区
-	[     280] = char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 烟雨扬州@缘起一区
-	[     143] = char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 神都洛阳@缘起一区
-	[    1259] = char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 天宝盛世@缘起一区
+	[ 3007396] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 梦江南
+	[ 1600498] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 追风蹑影
+	[ 4664780] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 日月明尊
+	[17796954] = string.char(0xDC, 0xF8, 0xD2, 0xC1, 0x40, 0xB0, 0xD7, 0xB5, 0xDB, 0xB3, 0xC7), -- 茗伊@白帝城 唯我独尊->梦江南
+	[  385183] = string.char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A), -- 茗伊 傲血戰意
+	[ 1452025] = string.char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A), -- 茗伊伊 巔峰再起
+	[ 3627405] = string.char(0xC1, 0xFA, 0xB5, 0xA8, 0xC9, 0xDF, 0x40, 0xDD, 0xB6, 0xBB, 0xA8, 0xB9, 0xAC), -- 白帝
+	-- [4662931] = string.char(0xBE, 0xCD, 0xCA, 0xC7, 0xB8, 0xF6, 0xD5, 0xF3, 0xD1, 0xDB), -- 日月明尊
+	-- [3438030] = string.char(0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5), -- 梦江南
+	[    1028] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 缘起稻香@缘起一区
+	[     660] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 梦回长安@缘起一区
+	[     280] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 烟雨扬州@缘起一区
+	[     143] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 神都洛阳@缘起一区
+	[    1259] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 天宝盛世@缘起一区
 }
 local _AUTHOR_HEADER_ = GetFormatText(_NAME_ .. ' ' .. _L['[Author]'], 8, 89, 224, 232)
 local _AUTHOR_PROTECT_NAMES_ = {
-	[char(0xDC, 0xF8, 0xD2, 0xC1)] = true, -- 简体
-	[char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A)] = true, -- 繁体
+	[string.char(0xDC, 0xF8, 0xD2, 0xC1)] = true, -- 简体
+	[string.char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A)] = true, -- 繁体
 }
 local _AUTHOR_FAKE_HEADER_ = GetFormatText(_L['[Fake author]'], 8, 255, 95, 159)
 -------------------------------------------------------------------------------------------------------
@@ -336,7 +332,7 @@ local EncodeLUAData = _G.var2str
 -----------------------------------------------
 local DecodeLUAData = _G.str2var or function(szText)
 	local DECODE_ROOT = _DATA_ROOT_ .. '#cache/decode/'
-	local DECODE_PATH = DECODE_ROOT .. GetCurrentTime() .. GetTime() .. random(0, 999999) .. '.jx3dat'
+	local DECODE_PATH = DECODE_ROOT .. GetCurrentTime() .. GetTime() .. math.random(0, 999999) .. '.jx3dat'
 	CPath.MakeDir(DECODE_ROOT)
 	SaveDataToFile(szText, DECODE_PATH)
 	local data = LoadLUAData(DECODE_PATH)
@@ -350,8 +346,8 @@ local function Get(var, keys, dft)
 	local res = false
 	if type(keys) == 'string' then
 		local ks = {}
-		for k in gmatch(keys, '[^%.]+') do
-			insert(ks, k)
+		for k in string.gmatch(keys, '[^%.]+') do
+			table.insert(ks, k)
 		end
 		keys = ks
 	end
@@ -377,8 +373,8 @@ local function Set(var, keys, val)
 	local res = false
 	if type(keys) == 'string' then
 		local ks = {}
-		for k in gmatch(keys, '[^%.]+') do
-			insert(ks, k)
+		for k in string.gmatch(keys, '[^%.]+') do
+			table.insert(ks, k)
 		end
 		keys = ks
 	end
@@ -457,7 +453,7 @@ end
 -----------------------------------------------
 local function RandomChild(var)
 	if type(var) == 'table' and #var > 0 then
-		return var[random(1, #var)]
+		return var[math.random(1, #var)]
 	end
 end
 -----------------------------------------------
@@ -496,7 +492,7 @@ local function IsString  (var) return type(var) == 'string'   end
 local function IsBoolean (var) return type(var) == 'boolean'  end
 local function IsFunction(var) return type(var) == 'function' end
 local function IsUserdata(var) return type(var) == 'userdata' end
-local function IsHugeNumber(var) return IsNumber(var) and not (var < HUGE and var > -HUGE) end
+local function IsHugeNumber(var) return IsNumber(var) and not (var < math.huge and var > -math.huge) end
 local function IsElement(element) return type(element) == 'table' and element.IsValid and element:IsValid() or false end
 -----------------------------------------------
 -- 创建数据补丁
@@ -515,14 +511,14 @@ local function GetPatch(oBase, oData)
 			local patch = GetPatch(oBase[k], v)
 			if not IsNil(patch) then
 				bDiff = true
-				insert(oPatch, { k = k, v = patch })
+				table.insert(oPatch, { k = k, v = patch })
 			end
 			tKeys[k] = true
 		end
 		for k, v in pairs(oBase) do
 			if not tKeys[k] then
 				bDiff = true
-				insert(oPatch, { k = k, v = nil })
+				table.insert(oPatch, { k = k, v = nil })
 			end
 		end
 		if not bDiff then
@@ -641,7 +637,7 @@ function sipairs(...)
 	for i = 1, argc do
 		if IsTable(argv[i]) then
 			for j, v in ipairs(argv[i]) do
-				insert(iters, {v, argv[i], j})
+				table.insert(iters, {v, argv[i], j})
 			end
 		end
 	end
@@ -654,7 +650,7 @@ function spairs(...)
 	for i = 1, argc do
 		if IsTable(argv[i]) then
 			for j, v in pairs(argv[i]) do
-				insert(iters, {v, argv[i], j})
+				table.insert(iters, {v, argv[i], j})
 			end
 		end
 	end
@@ -673,7 +669,7 @@ function sipairs_r(...)
 	for i = 1, argc do
 		if IsTable(argv[i]) then
 			for j, v in ipairs(argv[i]) do
-				insert(iters, {v, argv[i], j})
+				table.insert(iters, {v, argv[i], j})
 			end
 		end
 	end
@@ -686,7 +682,7 @@ function spairs_r(...)
 	for i = 1, argc do
 		if IsTable(argv[i]) then
 			for j, v in pairs(argv[i]) do
-				insert(iters, {v, argv[i], j})
+				table.insert(iters, {v, argv[i], j})
 			end
 		end
 	end
@@ -815,7 +811,7 @@ local NSFormatString
 do local CACHE = {}
 function NSFormatString(s)
 	if not CACHE[s] then
-		CACHE[s] = wgsub(s, '{$NS}', _NAME_SPACE_)
+		CACHE[s] = wstring.gsub(s, '{$NS}', _NAME_SPACE_)
 	end
 	return CACHE[s]
 end
@@ -869,7 +865,7 @@ local tInfo = {
 PACKET_INFO = SetmetaReadonly(tInfo)
 -- 更新最高玩家等级数据
 local function onPlayerEnterScene()
-	_MAX_PLAYER_LEVEL_ = max(_MAX_PLAYER_LEVEL_, GetClientPlayer().nMaxLevel)
+	_MAX_PLAYER_LEVEL_ = math.max(_MAX_PLAYER_LEVEL_, GetClientPlayer().nMaxLevel)
 	tInfo.MAX_PLAYER_LEVEL = _MAX_PLAYER_LEVEL_
 end
 RegisterEvent('PLAYER_ENTER_SCENE', onPlayerEnterScene)
@@ -907,9 +903,9 @@ local PATH_TYPE = SetmetaReadonly({
 })
 
 ---------------------------------------------------------------------------------------------
-local LIB = {
+local X = {
 	UI               = {}              ,
-	wsub             = wsub            ,
+	wstring          = wstring         ,
 	count_c          = count_c         ,
 	pairs_c          = pairs_c         ,
 	ipairs_c         = ipairs_c        ,
@@ -959,5 +955,5 @@ local LIB = {
 	DEBUG_LEVEL      = DEBUG_LEVEL     ,
 	PACKET_INFO      = PACKET_INFO     ,
 }
-_G[_NAME_SPACE_] = LIB
+_G[_NAME_SPACE_] = X
 ---------------------------------------------------------------------------------------------

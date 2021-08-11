@@ -7,42 +7,13 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 ---------------------------------------------------------------------------------------------------
 
 -- #######################################################################################################
@@ -61,14 +32,14 @@ local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -- #######################################################################################################
 do local HOTKEY_CACHE = {}
 -- 增加系统快捷键
--- (void) LIB.RegisterHotKey(string szName, string szTitle, func fnDown, func fnUp)   -- 增加系统快捷键
-function LIB.RegisterHotKey(szName, szTitle, fnDown, fnUp)
-	insert(HOTKEY_CACHE, { szName = szName, szTitle = szTitle, fnDown = fnDown, fnUp = fnUp })
+-- (void) X.RegisterHotKey(string szName, string szTitle, func fnDown, func fnUp)   -- 增加系统快捷键
+function X.RegisterHotKey(szName, szTitle, fnDown, fnUp)
+	table.insert(HOTKEY_CACHE, { szName = szName, szTitle = szTitle, fnDown = fnDown, fnUp = fnUp })
 end
 
 -- 获取快捷键名称
--- (string) LIB.GetHotKeyDisplay(string szName, boolean bBracket, boolean bShort)      -- 取得快捷键名称
-function LIB.GetHotKeyDisplay(szName, bBracket, bShort)
+-- (string) X.GetHotKeyDisplay(string szName, boolean bBracket, boolean bShort)      -- 取得快捷键名称
+function X.GetHotKeyDisplay(szName, bBracket, bShort)
 	local nKey, bShift, bCtrl, bAlt = Hotkey.Get(szName)
 	local szDisplay = GetKeyShow(nKey, bShift, bCtrl, bAlt, bShort == true)
 	if szDisplay ~= '' and bBracket then
@@ -78,9 +49,9 @@ function LIB.GetHotKeyDisplay(szName, bBracket, bShort)
 end
 
 -- 获取快捷键
--- (table) LIB.GetHotKey(string szName, true , true )       -- 取得快捷键
--- (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) LIB.GetHotKey(string szName, true , fasle)        -- 取得快捷键
-function LIB.GetHotKey(szName, bBracket, bShort)
+-- (table) X.GetHotKey(string szName, true , true )       -- 取得快捷键
+-- (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) X.GetHotKey(string szName, true , fasle)        -- 取得快捷键
+function X.GetHotKey(szName, bBracket, bShort)
 	local nKey, bShift, bCtrl, bAlt = Hotkey.Get(szName)
 	if nKey==0 then return nil end
 	if bBracket then
@@ -91,18 +62,18 @@ function LIB.GetHotKey(szName, bBracket, bShort)
 end
 
 -- 设置快捷键/打开快捷键设置面板    -- HM里面抠出来的
--- (void) LIB.SetHotKey()                               -- 打开快捷键设置面板
--- (void) LIB.SetHotKey(string szGroup)     -- 打开快捷键设置面板并定位到 szGroup 分组（不可用）
--- (void) LIB.SetHotKey(string szCommand, number nKey )     -- 设置快捷键
--- (void) LIB.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])       -- 设置快捷键
-function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
+-- (void) X.SetHotKey()                               -- 打开快捷键设置面板
+-- (void) X.SetHotKey(string szGroup)     -- 打开快捷键设置面板并定位到 szGroup 分组（不可用）
+-- (void) X.SetHotKey(string szCommand, number nKey )     -- 设置快捷键
+-- (void) X.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])       -- 设置快捷键
+function X.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	if nIndex then
 		if not nKey then
 			nIndex, nKey = 1, nIndex
 		end
 		Hotkey.Set(szCommand, nIndex, nKey, bShift == true, bCtrl == true, bAlt == true)
 	else
-		local szGroup = szCommand or PACKET_INFO.NAME
+		local szGroup = szCommand or X.PACKET_INFO.NAME
 
 		local frame = Station.Lookup('Topmost/HotkeyPanel')
 		if not frame then
@@ -130,7 +101,7 @@ function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 				if not v.Hotkey2 then
 					v.Hotkey2 = {nKey = 0, bShift = false, bCtrl = false, bAlt = false}
 				end
-				insert(aKey, v)
+				table.insert(aKey, v)
 			end
 		end
 		if not aKey then return end
@@ -203,7 +174,7 @@ function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 		local wAll, hAll = hK:GetAllItemSize()
 		local w, h = hK:GetSize()
 		local scroll = frame:Lookup('Scroll_Key')
-		local nCountStep = ceil((hAll - h) / 10)
+		local nCountStep = math.ceil((hAll - h) / 10)
 		scroll:SetStepCount(nCountStep)
 		scroll:SetScrollPos(0)
 		if nCountStep > 0 then
@@ -219,7 +190,7 @@ function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 		local scroll = frame:Lookup('Scroll_List')
 		if scroll:GetStepCount() > 0 then
 			local _, nH = hI:GetSize()
-			local nStep = ceil((nI * nH) / 10)
+			local nStep = math.ceil((nI * nH) / 10)
 			if nStep > scroll:GetStepCount() then
 				nStep = scroll:GetStepCount()
 			end
@@ -228,17 +199,17 @@ function LIB.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	end
 end
 
-LIB.RegisterInit(NSFormatString('{$NS}#BIND_HOTKEY'), function()
+X.RegisterInit(X.NSFormatString('{$NS}#BIND_HOTKEY'), function()
 	-- hotkey
-	Hotkey.AddBinding(NSFormatString('{$NS}_Total'), _L['Toggle main panel'], PACKET_INFO.NAME, LIB.TogglePanel, nil)
+	Hotkey.AddBinding(X.NSFormatString('{$NS}_Total'), _L['Toggle main panel'], X.PACKET_INFO.NAME, X.TogglePanel, nil)
 	for _, v in ipairs(HOTKEY_CACHE) do
 		Hotkey.AddBinding(v.szName, v.szTitle, '', v.fnDown, v.fnUp)
 	end
 	for i = 1, 5 do
-		Hotkey.AddBinding(NSFormatString('{$NS}_HotKey_Null_')..i, _L['None-function hotkey'], '', function() end, nil)
+		Hotkey.AddBinding(X.NSFormatString('{$NS}_HotKey_Null_')..i, _L['None-function hotkey'], '', function() end, nil)
 	end
 end)
-if PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG then
+if X.PACKET_INFO.DEBUG_LEVEL <= X.DEBUG_LEVEL.DEBUG then
 	local aFrame = {
 		'Lowest2/ChatPanel1',
 		'Lowest2/ChatPanel2',
@@ -260,9 +231,9 @@ if PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG then
 		'Normal1/ChatPanel8',
 		'Normal1/ChatPanel9',
 		'Normal1/EditBox',
-		'Normal/' .. PACKET_INFO.NAME_SPACE,
+		'Normal/' .. X.PACKET_INFO.NAME_SPACE,
 	}
-	LIB.RegisterHotKey(NSFormatString('{$NS}_STAGE_CHAT'), _L['Display only chat panel'], function()
+	X.RegisterHotKey(X.NSFormatString('{$NS}_STAGE_CHAT'), _L['Display only chat panel'], function()
 		if Station.IsVisible() then
 			for _, v in ipairs(aFrame) do
 				local frame = Station.Lookup(v)
@@ -282,7 +253,7 @@ if PACKET_INFO.DEBUG_LEVEL <= DEBUG_LEVEL.DEBUG then
 		end
 	end)
 end
-LIB.RegisterHotKey(NSFormatString('{$NS}_STOP_CASTING'), _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
+X.RegisterHotKey(X.NSFormatString('{$NS}_STOP_CASTING'), _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
 end
 
 -- Format data's structure as struct descripted.
@@ -335,7 +306,7 @@ local function FormatDataStructure(data, struct, assign, metaSymbol)
 	-- 分别处理类型匹配与不匹配的情况
 	if dataTypeExists then
 		if not assign then
-			data = Clone(data, true)
+			data = X.Clone(data, true)
 		end
 		local keys, skipKeys = {}, {}
 		-- 数据类型是表且默认数据也是表 则递归检查子元素与默认子元素
@@ -408,19 +379,19 @@ local function FormatDataStructure(data, struct, assign, metaSymbol)
 				data[k] = FormatDataStructure(nil, v, true, metaSymbol)
 			end
 		else -- 默认值不是表 直接克隆数据
-			data = Clone(defaultData, true)
+			data = X.Clone(defaultData, true)
 		end
 	end
 	return data
 end
-LIB.FormatDataStructure = FormatDataStructure
+X.FormatDataStructure = FormatDataStructure
 end
 
-function LIB.SetGlobalValue(szVarPath, Val)
-	local t = LIB.SplitString(szVarPath, '.')
+function X.SetGlobalValue(szVarPath, Val)
+	local t = X.SplitString(szVarPath, '.')
 	local tab = _G
 	for k, v in ipairs(t) do
-		if not IsTable(tab) then
+		if not X.IsTable(tab) then
 			return false
 		end
 		if type(tab[v]) == 'nil' then
@@ -434,9 +405,9 @@ function LIB.SetGlobalValue(szVarPath, Val)
 	return true
 end
 
-function LIB.GetGlobalValue(szVarPath)
+function X.GetGlobalValue(szVarPath)
 	local tVariable = _G
-	for szIndex in gmatch(szVarPath, '[^%.]+') do
+	for szIndex in string.gmatch(szVarPath, '[^%.]+') do
 		if tVariable and type(tVariable) == 'table' then
 			tVariable = tVariable[szIndex]
 		else
@@ -448,7 +419,7 @@ function LIB.GetGlobalValue(szVarPath)
 end
 
 do
-local SOUND_ROOT = PACKET_INFO.FRAMEWORK_ROOT .. 'audio/'
+local SOUND_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT .. 'audio/'
 local SOUNDS = {
 	{
 		szType = _L['Default'],
@@ -460,12 +431,12 @@ local CACHE = nil
 local function GetSoundList()
 	local a = { szOption = _L['Sound'] }
 	for _, v in ipairs(SOUNDS) do
-		insert(a, v)
+		table.insert(a, v)
 	end
-	local RE = _G[NSFormatString('{$NS}_Resource')]
-	if IsTable(RE) and IsFunction(RE.GetSoundList) then
+	local RE = _G[X.NSFormatString('{$NS}_Resource')]
+	if X.IsTable(RE) and X.IsFunction(RE.GetSoundList) then
 		for _, v in ipairs(RE.GetSoundList()) do
-			insert(a, v)
+			table.insert(a, v)
 		end
 	end
 	return a
@@ -483,7 +454,7 @@ local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
 		t.fnAction = fnAction
 		t.fnMouseEnter = function()
 			if IsCtrlKeyDown() then
-				LIB.PlaySound(SOUND.UI_SOUND, tSound.szPath, '')
+				X.PlaySound(SOUND.UI_SOUND, tSound.szPath, '')
 			else
 				local szXml = GetFormatText(_L['Hold ctrl when move in to preview.'], nil, 255, 255, 0)
 				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
@@ -496,7 +467,7 @@ local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
 	for _, v in ipairs(tSound) do
 		local t1 = GetSoundMenu(v, fnAction, tCheck, bMultiple)
 		if t1 then
-			insert(t, t1)
+			table.insert(t, t1)
 		end
 	end
 	if t.dwID and not IsLocalFileExist(t.szPath) then
@@ -505,7 +476,7 @@ local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
 	return t
 end
 
-function LIB.GetSoundMenu(fnAction, tCheck, bMultiple)
+function X.GetSoundMenu(fnAction, tCheck, bMultiple)
 	local function fnMenuAction(tSound, bCheck)
 		fnAction(tSound.dwID, bCheck)
 	end
@@ -513,7 +484,7 @@ function LIB.GetSoundMenu(fnAction, tCheck, bMultiple)
 end
 
 local function Cache(tSound)
-	if not IsTable(tSound) then
+	if not X.IsTable(tSound) then
 		return
 	end
 	if tSound.dwID then
@@ -531,8 +502,8 @@ end
 local function GeneCache()
 	if not CACHE then
 		CACHE = {}
-		local RE = _G[NSFormatString('{$NS}_Resource')]
-		if IsTable(RE) and IsFunction(RE.GetSoundList) then
+		local RE = _G[X.NSFormatString('{$NS}_Resource')]
+		if X.IsTable(RE) and X.IsFunction(RE.GetSoundList) then
 			local tSound = RE.GetSoundList()
 			if tSound then
 				Cache(tSound)
@@ -543,7 +514,7 @@ local function GeneCache()
 	return true
 end
 
-function LIB.GetSoundName(dwID)
+function X.GetSoundName(dwID)
 	if not GeneCache() then
 		return
 	end
@@ -554,7 +525,7 @@ function LIB.GetSoundName(dwID)
 	return tSound.szName
 end
 
-function LIB.GetSoundPath(dwID)
+function X.GetSoundPath(dwID)
 	if not GeneCache() then
 		return
 	end
@@ -567,7 +538,7 @@ end
 end
 
 -- 播放声音
--- LIB.PlaySound([nType, ]szFilePath[, szCustomPath])
+-- X.PlaySound([nType, ]szFilePath[, szCustomPath])
 --   nType        声音类型
 --     SOUND.BG_MUSIC = 0,    // 背景音乐
 --     SOUND.UI_SOUND,        // 界面音效    -- 默认值
@@ -581,8 +552,8 @@ end
 --   szFilePath   音频文件地址
 --   szCustomPath 个性化音频文件地址
 -- 注：优先播放szCustomPath, szCustomPath不存在才会播放szFilePath
-function LIB.PlaySound(nType, szFilePath, szCustomPath)
-	if not IsNumber(nType) then
+function X.PlaySound(nType, szFilePath, szCustomPath)
+	if not X.IsNumber(nType) then
 		nType, szFilePath, szCustomPath = SOUND.UI_SOUND, nType, szFilePath
 	end
 	if not szCustomPath then
@@ -591,19 +562,19 @@ function LIB.PlaySound(nType, szFilePath, szCustomPath)
 	-- 播放自定义声音
 	if szCustomPath ~= '' then
 		for _, ePathType in ipairs({
-			PATH_TYPE.ROLE,
-			PATH_TYPE.GLOBAL,
+			X.PATH_TYPE.ROLE,
+			X.PATH_TYPE.GLOBAL,
 		}) do
-			local szPath = LIB.FormatPath({ 'audio/' .. szCustomPath, ePathType })
+			local szPath = X.FormatPath({ 'audio/' .. szCustomPath, ePathType })
 			if IsFileExist(szPath) then
 				return PlaySound(nType, szPath)
 			end
 		end
 	end
 	-- 播放默认声音
-	local szPath = wgsub(szFilePath, '\\', '/')
-	if not wfind(szPath, '/') then
-		szPath = PACKET_INFO.FRAMEWORK_ROOT .. 'audio/' .. szPath
+	local szPath = wstring.gsub(szFilePath, '\\', '/')
+	if not wstring.find(szPath, '/') then
+		szPath = X.PACKET_INFO.FRAMEWORK_ROOT .. 'audio/' .. szPath
 	end
 	if not IsFileExist(szPath) then
 		return
@@ -611,16 +582,16 @@ function LIB.PlaySound(nType, szFilePath, szCustomPath)
 	PlaySound(nType, szPath)
 end
 
-function LIB.GetFontList()
+function X.GetFontList()
 	local aList, tExist = {}, {}
 	-- 插件字体包
-	local FR = _G[NSFormatString('{$NS}_FontResource')]
-	if IsTable(FR) and IsFunction(FR.GetList) then
+	local FR = _G[X.NSFormatString('{$NS}_FontResource')]
+	if X.IsTable(FR) and X.IsFunction(FR.GetList) then
 		for _, p in ipairs(FR.GetList()) do
 			local szFile = p.szFile:gsub('/', '\\')
 			local szKey = szFile:lower()
 			if not tExist[szKey] then
-				insert(aList, {
+				table.insert(aList, {
 					szName = p.szName,
 					szFile = p.szFile,
 				})
@@ -629,11 +600,11 @@ function LIB.GetFontList()
 		end
 	end
 	-- 系统字体
-	for _, p in ipairs_r(Font.GetFontPathList() or {}) do
+	for _, p in X.ipairs_r(Font.GetFontPathList() or {}) do
 		local szFile = p.szFile:gsub('/', '\\')
 		local szKey = szFile:lower()
 		if not tExist[szKey] then
-			insert(aList, 1, {
+			table.insert(aList, 1, {
 				szName = p.szName,
 				szFile = szFile,
 			})
@@ -641,14 +612,14 @@ function LIB.GetFontList()
 		end
 	end
 	-- 按照描述文件添加字体
-	local CUSTOM_FONT_DIR = LIB.FormatPath({'font/', PATH_TYPE.GLOBAL})
+	local CUSTOM_FONT_DIR = X.FormatPath({'font/', X.PATH_TYPE.GLOBAL})
 	for _, szFile in ipairs(CPath.GetFileList(CUSTOM_FONT_DIR)) do
-		local info = szFile:lower():find('%.jx3dat$') and LIB.LoadLUAData(CUSTOM_FONT_DIR .. szFile, { passphrase = false })
+		local info = szFile:lower():find('%.jx3dat$') and X.LoadLUAData(CUSTOM_FONT_DIR .. szFile, { passphrase = false })
 		if info and info.szName and info.szFile then
 			local szFontFile = info.szFile:gsub('^%./', CUSTOM_FONT_DIR):gsub('/', '\\')
 			local szKey = szFontFile:lower()
 			if not tExist[szKey] then
-				insert(aList, {
+				table.insert(aList, {
 					szName = info.szName,
 					szFile = szFontFile,
 				})
@@ -662,7 +633,7 @@ function LIB.GetFontList()
 			local szFontFile = (CUSTOM_FONT_DIR .. szFile):gsub('/', '\\')
 			local szKey = szFontFile:lower()
 			if not tExist[szKey] then
-				insert(aList, {
+				table.insert(aList, {
 					szName = szFile,
 					szFile = szFontFile,
 				})
@@ -671,20 +642,20 @@ function LIB.GetFontList()
 		end
 	end
 	-- 删除不存在的字体
-	for i, p in ipairs_r(aList) do
+	for i, p in X.ipairs_r(aList) do
 		if not IsFileExist(p.szFile) then
-			remove(aList, i)
+			table.remove(aList, i)
 		end
 	end
 	return aList
 end
 
 -- 加载注册数据
-LIB.RegisterInit(NSFormatString('{$NS}#INITDATA'), function()
-	local t = LoadLUAData(LIB.GetLUADataPath({'config/initial.jx3dat', PATH_TYPE.GLOBAL}))
+X.RegisterInit(X.NSFormatString('{$NS}#INITDATA'), function()
+	local t = LoadLUAData(X.GetLUADataPath({'config/initial.jx3dat', X.PATH_TYPE.GLOBAL}))
 	if t then
 		for v_name, v_data in pairs(t) do
-			LIB.SetGlobalValue(v_name, v_data)
+			X.SetGlobalValue(v_name, v_data)
 		end
 	end
 end)
@@ -711,18 +682,18 @@ end
 
 local function RegisterMenu(aList, tKey, arg0, arg1)
 	local szKey, oMenu
-	if IsString(arg0) then
+	if X.IsString(arg0) then
 		szKey = arg0
-		if IsTable(arg1) or IsFunction(arg1) then
+		if X.IsTable(arg1) or X.IsFunction(arg1) then
 			oMenu = arg1
 		end
-	elseif IsTable(arg0) or IsFunction(arg0) then
+	elseif X.IsTable(arg0) or X.IsFunction(arg0) then
 		oMenu = arg0
 	end
 	if szKey then
-		for i, v in ipairs_r(aList) do
+		for i, v in X.ipairs_r(aList) do
 			if v.szKey == szKey then
-				remove(aList, i)
+				table.remove(aList, i)
 			end
 		end
 		tKey[szKey] = nil
@@ -736,34 +707,34 @@ local function RegisterMenu(aList, tKey, arg0, arg1)
 			szKey = tostring(szKey)
 		end
 		tKey[szKey] = true
-		insert(aList, { szKey = szKey, oMenu = oMenu })
+		table.insert(aList, { szKey = szKey, oMenu = oMenu })
 	end
 	return szKey
 end
 
 local function GenerateMenu(aList, bMainMenu, dwTarType, dwTarID)
-	if not LIB.AssertVersion('', '', '*') then
+	if not X.AssertVersion('', '', '*') then
 		return
 	end
 	local menu = {}
 	if bMainMenu then
 		menu = {
-			szOption = PACKET_INFO.NAME,
-			fnAction = LIB.TogglePanel,
-			rgb = PACKET_INFO.MENU_COLOR,
+			szOption = X.PACKET_INFO.NAME,
+			fnAction = X.TogglePanel,
+			rgb = X.PACKET_INFO.MENU_COLOR,
 			bCheck = true,
-			bChecked = LIB.IsPanelVisible(),
+			bChecked = X.IsPanelVisible(),
 
-			szIcon = PACKET_INFO.LOGO_UITEX,
-			nFrame = PACKET_INFO.LOGO_MENU_FRAME,
-			nMouseOverFrame = PACKET_INFO.LOGO_MENU_HOVER_FRAME,
+			szIcon = X.PACKET_INFO.LOGO_UITEX,
+			nFrame = X.PACKET_INFO.LOGO_MENU_FRAME,
+			nMouseOverFrame = X.PACKET_INFO.LOGO_MENU_HOVER_FRAME,
 			szLayer = 'ICON_RIGHT',
-			fnClickIcon = LIB.TogglePanel,
+			fnClickIcon = X.TogglePanel,
 		}
 	end
 	for _, p in ipairs(aList) do
 		local m = p.oMenu
-		if IsFunction(m) then
+		if X.IsFunction(m) then
 			m = m(dwTarType, dwTarID)
 		end
 		if not m or m.szOption then
@@ -771,12 +742,12 @@ local function GenerateMenu(aList, bMainMenu, dwTarType, dwTarID)
 		end
 		for _, v in ipairs(m) do
 			if not v.rgb and not bMainMenu then
-				v.rgb = PACKET_INFO.MENU_COLOR
+				v.rgb = X.PACKET_INFO.MENU_COLOR
 			end
-			insert(menu, v)
+			table.insert(menu, v)
 		end
 	end
-	sort(menu, menuSorter)
+	table.sort(menu, menuSorter)
 	return bMainMenu and {menu} or menu
 end
 
@@ -784,12 +755,12 @@ do
 local PLAYER_MENU, PLAYER_MENU_HASH = {}, {} -- 玩家头像菜单
 -- 注册玩家头像菜单
 -- 注册
--- (void) LIB.RegisterPlayerAddonMenu(Menu)
--- (void) LIB.RegisterPlayerAddonMenu(szName, tMenu)
--- (void) LIB.RegisterPlayerAddonMenu(szName, fnMenu)
+-- (void) X.RegisterPlayerAddonMenu(Menu)
+-- (void) X.RegisterPlayerAddonMenu(szName, tMenu)
+-- (void) X.RegisterPlayerAddonMenu(szName, fnMenu)
 -- 注销
--- (void) LIB.RegisterPlayerAddonMenu(szName, false)
-function LIB.RegisterPlayerAddonMenu(arg0, arg1)
+-- (void) X.RegisterPlayerAddonMenu(szName, false)
+function X.RegisterPlayerAddonMenu(arg0, arg1)
 	return RegisterMenu(PLAYER_MENU, PLAYER_MENU_HASH, arg0, arg1)
 end
 local function GetPlayerAddonMenu(dwTarID, dwTarType)
@@ -802,30 +773,30 @@ do
 local TRACE_MENU, TRACE_MENU_HASH = {}, {} -- 工具栏菜单
 -- 注册工具栏菜单
 -- 注册
--- (void) LIB.RegisterTraceButtonAddonMenu(Menu)
--- (void) LIB.RegisterTraceButtonAddonMenu(szName, tMenu)
--- (void) LIB.RegisterTraceButtonAddonMenu(szName, fnMenu)
+-- (void) X.RegisterTraceButtonAddonMenu(Menu)
+-- (void) X.RegisterTraceButtonAddonMenu(szName, tMenu)
+-- (void) X.RegisterTraceButtonAddonMenu(szName, fnMenu)
 -- 注销
--- (void) LIB.RegisterTraceButtonAddonMenu(szName, false)
-function LIB.RegisterTraceButtonAddonMenu(arg0, arg1)
+-- (void) X.RegisterTraceButtonAddonMenu(szName, false)
+function X.RegisterTraceButtonAddonMenu(arg0, arg1)
 	return RegisterMenu(TRACE_MENU, TRACE_MENU_HASH, arg0, arg1)
 end
-function LIB.GetTraceButtonAddonMenu(dwTarID, dwTarType)
+function X.GetTraceButtonAddonMenu(dwTarID, dwTarType)
 	return GenerateMenu(TRACE_MENU, true, dwTarType, dwTarID)
 end
-TraceButton_AppendAddonMenu({LIB.GetTraceButtonAddonMenu})
+TraceButton_AppendAddonMenu({X.GetTraceButtonAddonMenu})
 end
 
 do
 local TARGET_MENU, TARGET_MENU_HASH = {}, {} -- 目标头像菜单
 -- 注册目标头像菜单
 -- 注册
--- (void) LIB.RegisterTargetAddonMenu(Menu)
--- (void) LIB.RegisterTargetAddonMenu(szName, tMenu)
--- (void) LIB.RegisterTargetAddonMenu(szName, fnMenu)
+-- (void) X.RegisterTargetAddonMenu(Menu)
+-- (void) X.RegisterTargetAddonMenu(szName, tMenu)
+-- (void) X.RegisterTargetAddonMenu(szName, fnMenu)
 -- 注销
--- (void) LIB.RegisterTargetAddonMenu(szName, false)
-function LIB.RegisterTargetAddonMenu(arg0, arg1)
+-- (void) X.RegisterTargetAddonMenu(szName, false)
+function X.RegisterTargetAddonMenu(arg0, arg1)
 	return RegisterMenu(TARGET_MENU, TARGET_MENU_HASH, arg0, arg1)
 end
 local function GetTargetAddonMenu(dwTarID, dwTarType)
@@ -837,18 +808,18 @@ end
 
 -- 注册玩家头像和工具栏菜单
 -- 注册
--- (void) LIB.RegisterAddonMenu(Menu)
--- (void) LIB.RegisterAddonMenu(szName, tMenu)
--- (void) LIB.RegisterAddonMenu(szName, fnMenu)
+-- (void) X.RegisterAddonMenu(Menu)
+-- (void) X.RegisterAddonMenu(szName, tMenu)
+-- (void) X.RegisterAddonMenu(szName, fnMenu)
 -- 注销
--- (void) LIB.RegisterAddonMenu(szName, false)
-function LIB.RegisterAddonMenu(...)
-	LIB.RegisterPlayerAddonMenu(...)
-	LIB.RegisterTraceButtonAddonMenu(...)
+-- (void) X.RegisterAddonMenu(szName, false)
+function X.RegisterAddonMenu(...)
+	X.RegisterPlayerAddonMenu(...)
+	X.RegisterTraceButtonAddonMenu(...)
 end
 
 -- 格式化计时时间
--- (string) LIB.FormatTimeCounter(nTime, szFormat, nStyle)
+-- (string) X.FormatTimeCounter(nTime, szFormat, nStyle)
 -- szFormat  格式化字符串 可选项：
 --   %Y 总年数
 --   %D 总天数
@@ -863,35 +834,35 @@ end
 --   %hh 小时数两位对齐
 --   %mm 分钟数两位对齐
 --   %ss 秒钟数两位对齐
-function LIB.FormatTimeCounter(nTime, szFormat, nStyle)
-	local nSeconds = floor(nTime)
-	local nMinutes = floor(nSeconds / 60)
-	local nHours   = floor(nMinutes / 60)
-	local nDays    = floor(nHours / 24)
-	local nYears   = floor(nDays / 365)
+function X.FormatTimeCounter(nTime, szFormat, nStyle)
+	local nSeconds = math.floor(nTime)
+	local nMinutes = math.floor(nSeconds / 60)
+	local nHours   = math.floor(nMinutes / 60)
+	local nDays    = math.floor(nHours / 24)
+	local nYears   = math.floor(nDays / 365)
 	local nDay     = nDays % 365
 	local nHour    = nHours % 24
 	local nMinute  = nMinutes % 60
 	local nSecond  = nSeconds % 60
-	if IsString(szFormat) then
-		szFormat = wgsub(szFormat, '%Y', nYears)
-		szFormat = wgsub(szFormat, '%D', nDays)
-		szFormat = wgsub(szFormat, '%H', nHours)
-		szFormat = wgsub(szFormat, '%M', nMinutes)
-		szFormat = wgsub(szFormat, '%S', nSeconds)
-		szFormat = wgsub(szFormat, '%dd', format('%02d', nDay   ))
-		szFormat = wgsub(szFormat, '%hh', format('%02d', nHour  ))
-		szFormat = wgsub(szFormat, '%mm', format('%02d', nMinute))
-		szFormat = wgsub(szFormat, '%ss', format('%02d', nSecond))
-		szFormat = wgsub(szFormat, '%d', nDay)
-		szFormat = wgsub(szFormat, '%h', nHour)
-		szFormat = wgsub(szFormat, '%m', nMinute)
-		szFormat = wgsub(szFormat, '%s', nSecond)
+	if X.IsString(szFormat) then
+		szFormat = wstring.gsub(szFormat, '%Y', nYears)
+		szFormat = wstring.gsub(szFormat, '%D', nDays)
+		szFormat = wstring.gsub(szFormat, '%H', nHours)
+		szFormat = wstring.gsub(szFormat, '%M', nMinutes)
+		szFormat = wstring.gsub(szFormat, '%S', nSeconds)
+		szFormat = wstring.gsub(szFormat, '%dd', string.format('%02d', nDay   ))
+		szFormat = wstring.gsub(szFormat, '%hh', string.format('%02d', nHour  ))
+		szFormat = wstring.gsub(szFormat, '%mm', string.format('%02d', nMinute))
+		szFormat = wstring.gsub(szFormat, '%ss', string.format('%02d', nSecond))
+		szFormat = wstring.gsub(szFormat, '%d', nDay)
+		szFormat = wstring.gsub(szFormat, '%h', nHour)
+		szFormat = wstring.gsub(szFormat, '%m', nMinute)
+		szFormat = wstring.gsub(szFormat, '%s', nSecond)
 		return szFormat
 	end
 	if szFormat == 1 then -- M'ss" / s"
 		if nMinutes > 0 then
-			return nMinutes .. '\'' .. format('%02d', nSecond) .. '"'
+			return nMinutes .. '\'' .. string.format('%02d', nSecond) .. '"'
 		end
 		return nSeconds .. '"'
 	end
@@ -901,23 +872,23 @@ function LIB.FormatTimeCounter(nTime, szFormat, nStyle)
 			y, d, h, m, s = g_tStrings.STR_YEAR, g_tStrings.STR_BUFF_H_TIME_D_SHORT, g_tStrings.STR_TIME_HOUR, g_tStrings.STR_TIME_MINUTE, g_tStrings.STR_TIME_SECOND
 		end
 		if nYears > 0 then
-			return nYears .. y .. format('%02d', nDay) .. d .. format('%02d', nHour) .. h .. format('%02d', nMinute)  .. m .. format('%02d', nSecond) .. s
+			return nYears .. y .. string.format('%02d', nDay) .. d .. string.format('%02d', nHour) .. h .. string.format('%02d', nMinute)  .. m .. string.format('%02d', nSecond) .. s
 		end
 		if nDays > 0 then
-			return nDays .. d .. format('%02d', nHour) .. h .. format('%02d', nMinute)  .. m .. format('%02d', nSecond) .. s
+			return nDays .. d .. string.format('%02d', nHour) .. h .. string.format('%02d', nMinute)  .. m .. string.format('%02d', nSecond) .. s
 		end
 		if nHours > 0 then
-			return nHours .. h .. format('%02d', nMinute)  .. m .. format('%02d', nSecond) .. s
+			return nHours .. h .. string.format('%02d', nMinute)  .. m .. string.format('%02d', nSecond) .. s
 		end
 		if nMinutes > 0 then
-			return nMinutes .. m .. format('%02d', nSecond) .. s
+			return nMinutes .. m .. string.format('%02d', nSecond) .. s
 		end
 		return nSeconds .. s
 	end
 end
 
 -- 格式化时间
--- (string) LIB.FormatTime(nTimestamp, szFormat)
+-- (string) X.FormatTime(nTimestamp, szFormat)
 -- nTimestamp UNIX时间戳
 -- szFormat   格式化字符串
 --   %yyyy 年份四位对齐
@@ -933,40 +904,40 @@ end
 --   %h    小时
 --   %m    分钟
 --   %s    秒钟
-function LIB.FormatTime(nTimestamp, szFormat)
+function X.FormatTime(nTimestamp, szFormat)
 	local t = TimeToDate(nTimestamp)
-	szFormat = wgsub(szFormat, '%yyyy', format('%04d', t.year  ))
-	szFormat = wgsub(szFormat, '%yy'  , format('%02d', t.year % 100))
-	szFormat = wgsub(szFormat, '%MM'  , format('%02d', t.month ))
-	szFormat = wgsub(szFormat, '%dd'  , format('%02d', t.day   ))
-	szFormat = wgsub(szFormat, '%hh'  , format('%02d', t.hour  ))
-	szFormat = wgsub(szFormat, '%mm'  , format('%02d', t.minute))
-	szFormat = wgsub(szFormat, '%ss'  , format('%02d', t.second))
-	szFormat = wgsub(szFormat, '%y', t.year  )
-	szFormat = wgsub(szFormat, '%M', t.month )
-	szFormat = wgsub(szFormat, '%d', t.day   )
-	szFormat = wgsub(szFormat, '%h', t.hour  )
-	szFormat = wgsub(szFormat, '%m', t.minute)
-	szFormat = wgsub(szFormat, '%s', t.second)
+	szFormat = wstring.gsub(szFormat, '%yyyy', string.format('%04d', t.year  ))
+	szFormat = wstring.gsub(szFormat, '%yy'  , string.format('%02d', t.year % 100))
+	szFormat = wstring.gsub(szFormat, '%MM'  , string.format('%02d', t.month ))
+	szFormat = wstring.gsub(szFormat, '%dd'  , string.format('%02d', t.day   ))
+	szFormat = wstring.gsub(szFormat, '%hh'  , string.format('%02d', t.hour  ))
+	szFormat = wstring.gsub(szFormat, '%mm'  , string.format('%02d', t.minute))
+	szFormat = wstring.gsub(szFormat, '%ss'  , string.format('%02d', t.second))
+	szFormat = wstring.gsub(szFormat, '%y', t.year  )
+	szFormat = wstring.gsub(szFormat, '%M', t.month )
+	szFormat = wstring.gsub(szFormat, '%d', t.day   )
+	szFormat = wstring.gsub(szFormat, '%h', t.hour  )
+	szFormat = wstring.gsub(szFormat, '%m', t.minute)
+	szFormat = wstring.gsub(szFormat, '%s', t.second)
 	return szFormat
 end
 
-function LIB.DateToTime(nYear, nMonth, nDay, nHour, nMin, nSec)
+function X.DateToTime(nYear, nMonth, nDay, nHour, nMin, nSec)
 	return DateToTime(nYear, nMonth, nDay, nHour, nMin, nSec)
 end
 
-function LIB.TimeToDate(nTimestamp)
+function X.TimeToDate(nTimestamp)
 	local date = TimeToDate(nTimestamp)
 	return date.year, date.month, date.day, date.hour, date.minute, date.second
 end
 
 -- 格式化数字小数点
--- (string) LIB.FormatNumberDot(nValue, nDot, bDot, bSimple)
+-- (string) X.FormatNumberDot(nValue, nDot, bDot, bSimple)
 -- nValue  要格式化的数字
 -- nDot    小数点位数
 -- bDot    小数点不足补位0
 -- bSimple 是否显示精简数值
-function LIB.FormatNumberDot(nValue, nDot, bDot, bSimple)
+function X.FormatNumberDot(nValue, nDot, bDot, bSimple)
 	if not nDot then
 		nDot = 0
 	end
@@ -980,31 +951,31 @@ function LIB.FormatNumberDot(nValue, nDot, bDot, bSimple)
 			szUnit = g_tStrings.DIGTABLE.tCharDiH[2]
 		end
 	end
-	return floor(nValue * pow(2, nDot)) / pow(2, nDot) .. szUnit
+	return math.floor(nValue * math.pow(2, nDot)) / math.pow(2, nDot) .. szUnit
 end
 
 -- register global esc key down action
--- (void) LIB.RegisterEsc(szID, fnCondition, fnAction, bTopmost) -- register global esc event handle
--- (void) LIB.RegisterEsc(szID, nil, nil, bTopmost)              -- unregister global esc event handle
+-- (void) X.RegisterEsc(szID, fnCondition, fnAction, bTopmost) -- register global esc event handle
+-- (void) X.RegisterEsc(szID, nil, nil, bTopmost)              -- unregister global esc event handle
 -- (string)szID        -- an UUID (if this UUID has been register before, the old will be recovered)
 -- (function)fnCondition -- a function returns if fnAction will be execute
 -- (function)fnAction    -- inf fnCondition() is true then fnAction will be called
 -- (boolean)bTopmost    -- this param equals true will be called in high priority
-function LIB.RegisterEsc(szID, fnCondition, fnAction, bTopmost)
+function X.RegisterEsc(szID, fnCondition, fnAction, bTopmost)
 	if fnCondition and fnAction then
 		if RegisterGlobalEsc then
-			RegisterGlobalEsc(PACKET_INFO.NAME_SPACE .. '#' .. szID, fnCondition, fnAction, bTopmost)
+			RegisterGlobalEsc(X.PACKET_INFO.NAME_SPACE .. '#' .. szID, fnCondition, fnAction, bTopmost)
 		end
 	else
 		if UnRegisterGlobalEsc then
-			UnRegisterGlobalEsc(PACKET_INFO.NAME_SPACE .. '#' .. szID, bTopmost)
+			UnRegisterGlobalEsc(X.PACKET_INFO.NAME_SPACE .. '#' .. szID, bTopmost)
 		end
 	end
 end
 
 -- 测试用
 if loadstring then
-function LIB.ProcessCommand(cmd)
+function X.ProcessCommand(cmd)
 	local ls = loadstring('return ' .. cmd)
 	if ls then
 		return ls()
@@ -1014,14 +985,14 @@ end
 
 do
 local bCustomMode = false
-function LIB.IsInCustomUIMode()
+function X.IsInCustomUIMode()
 	return bCustomMode
 end
-LIB.RegisterEvent('ON_ENTER_CUSTOM_UI_MODE', function() bCustomMode = true  end)
-LIB.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE', function() bCustomMode = false end)
+X.RegisterEvent('ON_ENTER_CUSTOM_UI_MODE', function() bCustomMode = true  end)
+X.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE', function() bCustomMode = false end)
 end
 
-function LIB.DoMessageBox(szName, i)
+function X.DoMessageBox(szName, i)
 	local frame = Station.Lookup('Topmost2/MB_' .. szName) or Station.Lookup('Topmost/MB_' .. szName)
 	if frame then
 		i = i or 1
@@ -1062,12 +1033,12 @@ local function OnMessageBoxOpen()
 			local nIndex, szOption = btn.nIndex, btn.szOption
 			if btn.fnAction then
 				HookTableFunc(btn, 'fnAction', function()
-					FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'ACTION', szOption, nIndex)
+					FireUIEvent(X.NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'ACTION', szOption, nIndex)
 				end, { bAfterOrigin = true })
 			end
 			if btn.fnCountDownEnd then
 				HookTableFunc(btn, 'fnCountDownEnd', function()
-					FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'TIME_OUT', szOption, nIndex)
+					FireUIEvent(X.NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'TIME_OUT', szOption, nIndex)
 				end, { bAfterOrigin = true })
 			end
 			aMsg[i] = { nIndex = nIndex, szOption = szOption }
@@ -1079,39 +1050,39 @@ local function OnMessageBoxOpen()
 		if not msg then
 			return
 		end
-		FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'ACTION', msg.szOption, msg.nIndex)
+		FireUIEvent(X.NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'ACTION', msg.szOption, msg.nIndex)
 	end, { bAfterOrigin = true })
 
 	HookTableFunc(frame, 'fnCancelAction', function()
-		FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'CANCEL')
+		FireUIEvent(X.NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'CANCEL')
 	end, { bAfterOrigin = true })
 
 	if frame.fnAutoClose then
 		HookTableFunc(frame, 'fnAutoClose', function()
-			FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'AUTO_CLOSE')
+			FireUIEvent(X.NSFormatString('{$NS}_MESSAGE_BOX_ACTION'), szName, 'AUTO_CLOSE')
 		end, { bAfterOrigin = true })
 	end
 
-	FireUIEvent(NSFormatString('{$NS}_MESSAGE_BOX_OPEN'), arg0, arg1)
+	FireUIEvent(X.NSFormatString('{$NS}_MESSAGE_BOX_OPEN'), arg0, arg1)
 end
-LIB.RegisterEvent('ON_MESSAGE_BOX_OPEN', OnMessageBoxOpen)
+X.RegisterEvent('ON_MESSAGE_BOX_OPEN', OnMessageBoxOpen)
 end
 
 -- 弹出对话框
--- LIB.MessageBox([szKey, ]tMsg)
--- LIB.MessageBox([szKey, ]tMsg)
+-- X.MessageBox([szKey, ]tMsg)
+-- X.MessageBox([szKey, ]tMsg)
 -- 	@param szKey {string} 唯一标识符，不传自动生成
 -- 	@param tMsg {object} 更多参见官方 MessageBox 文档
 -- 	@param tMsg.fnCancelAction {function} ESC 关闭回调，可传入“FORBIDDEN”禁止手动关闭
 -- 	@return {string} 唯一标识符
-function LIB.MessageBox(szKey, tMsg)
-	if IsTable(szKey) then
+function X.MessageBox(szKey, tMsg)
+	if X.IsTable(szKey) then
 		szKey, tMsg = nil, szKey
 	end
 	if not szKey then
-		szKey = LIB.GetUUID():gsub('-', '')
+		szKey = X.GetUUID():gsub('-', '')
 	end
-	tMsg.szName = NSFormatString('{$NS}_MessageBox#') .. GetStringCRC(szKey)
+	tMsg.szName = X.NSFormatString('{$NS}_MessageBox#') .. GetStringCRC(szKey)
 	if not tMsg.x or not tMsg.y then
 		local nW, nH = Station.GetClientSize()
 		tMsg.x = nW / 2
@@ -1122,8 +1093,8 @@ function LIB.MessageBox(szKey, tMsg)
 	end
 	if tMsg.fnCancelAction == 'FORBIDDEN' then
 		tMsg.fnCancelAction = function()
-			LIB.DelayCall(function()
-				LIB.MessageBox(szKey, tMsg)
+			X.DelayCall(function()
+				X.MessageBox(szKey, tMsg)
 			end)
 		end
 	end
@@ -1132,8 +1103,8 @@ function LIB.MessageBox(szKey, tMsg)
 end
 
 -- 弹出对话框 - 单按钮确认
--- LIB.Alert([szKey, ]szMsg[, fnResolve])
--- LIB.Alert([szKey, ]szMsg[, tOpt])
+-- X.Alert([szKey, ]szMsg[, fnResolve])
+-- X.Alert([szKey, ]szMsg[, tOpt])
 -- 	@param szKey {string} 唯一标识符，不传自动生成
 -- 	@param szMsg {string} 正文
 -- 	@param tOpt.szResolve {string} 按钮文案
@@ -1141,15 +1112,15 @@ end
 -- 	@param tOpt.nResolveCountDown {number} 确定按钮倒计时
 -- 	@param tOpt.fnCancel {function} ESC 关闭回调，可传入“FORBIDDEN”禁止手动关闭
 -- 	@return {string} 唯一标识符
-function LIB.Alert(szKey, szMsg, fnResolve)
-	if not IsString(szMsg) then
+function X.Alert(szKey, szMsg, fnResolve)
+	if not X.IsString(szMsg) then
 		szKey, szMsg, fnResolve = nil, szKey, szMsg
 	end
 	local tOpt = fnResolve
-	if not IsTable(tOpt) then
+	if not X.IsTable(tOpt) then
 		tOpt = { fnResolve = fnResolve }
 	end
-	return LIB.MessageBox(szKey, {
+	return X.MessageBox(szKey, {
 		szMessage = szMsg,
 		fnCancelAction = tOpt.fnCancel,
 		{
@@ -1162,8 +1133,8 @@ function LIB.Alert(szKey, szMsg, fnResolve)
 end
 
 -- 弹出对话框 - 双按钮二次确认
--- LIB.Confirm([szKey, ]szMsg[, fnResolve[, fnReject[, fnCancel]]])
--- LIB.Confirm([szKey, ]szMsg[, tOpt])
+-- X.Confirm([szKey, ]szMsg[, fnResolve[, fnReject[, fnCancel]]])
+-- X.Confirm([szKey, ]szMsg[, tOpt])
 -- 	@param szKey {string} 唯一标识符，不传自动生成
 -- 	@param szMsg {string} 正文
 -- 	@param tOpt.szResolve {string} 确定按钮文案
@@ -1172,19 +1143,19 @@ end
 -- 	@param tOpt.fnReject {function} 取消回调
 -- 	@param tOpt.fnCancel {function} ESC 关闭回调，可传入“FORBIDDEN”禁止手动关闭
 -- 	@return {string} 唯一标识符
-function LIB.Confirm(szKey, szMsg, fnResolve, fnReject, fnCancel)
-	if not IsString(szMsg) then
+function X.Confirm(szKey, szMsg, fnResolve, fnReject, fnCancel)
+	if not X.IsString(szMsg) then
 		szKey, szMsg, fnResolve, fnReject = nil, szKey, szMsg, fnResolve
 	end
 	local tOpt = fnResolve
-	if not IsTable(tOpt) then
+	if not X.IsTable(tOpt) then
 		tOpt = {
 			fnResolve = fnResolve,
 			fnReject = fnReject,
 			fnCancel = fnCancel,
 		}
 	end
-	return LIB.MessageBox(szKey, {
+	return X.MessageBox(szKey, {
 		szMessage = szMsg,
 		fnCancelAction = tOpt.fnCancel,
 		{ szOption = tOpt.szResolve or g_tStrings.STR_HOTKEY_SURE, fnAction = tOpt.fnResolve },
@@ -1193,15 +1164,15 @@ function LIB.Confirm(szKey, szMsg, fnResolve, fnReject, fnCancel)
 end
 
 -- 弹出对话框 - 自定义按钮
--- LIB.Dialog([szKey, ]szMsg[, aOptions[, fnCancelAction]])
--- LIB.Dialog([szKey, ]szMsg[, tOpt])
+-- X.Dialog([szKey, ]szMsg[, aOptions[, fnCancelAction]])
+-- X.Dialog([szKey, ]szMsg[, tOpt])
 -- 	@param szKey {string} 唯一标识符，不传自动生成
 -- 	@param szMsg {string} 正文
 -- 	@param tOpt.aOptions {array} 按钮列表，参见 MessageBox 用法
 -- 	@param tOpt.fnCancelAction {function} ESC 关闭回调，可传入“FORBIDDEN”禁止手动关闭
 -- 	@return {string} 唯一标识符
-function LIB.Dialog(szKey, szMsg, aOptions, fnCancelAction)
-	if not IsString(szMsg) then
+function X.Dialog(szKey, szMsg, aOptions, fnCancelAction)
+	if not X.IsString(szMsg) then
 		szKey, szMsg, aOptions, fnCancelAction = nil, szKey, szMsg, aOptions
 	end
 	local tMsg = {
@@ -1220,13 +1191,13 @@ function LIB.Dialog(szKey, szMsg, aOptions, fnCancelAction)
 				tOption.szOption = g_tStrings.STR_HOTKEY_CANCEL
 			end
 		end
-		insert(tMsg, tOption)
+		table.insert(tMsg, tOption)
 	end
-	return LIB.MessageBox(szKey, tMsg)
+	return X.MessageBox(szKey, tMsg)
 end
 
 do
-function LIB.Hex2RGB(hex)
+function X.Hex2RGB(hex)
 	local s, r, g, b, a = hex:gsub('#', ''), nil, nil, nil, nil
 	if #s == 3 then
 		r, g, b = s:sub(1, 1):rep(2), s:sub(2, 2):rep(2), s:sub(3, 3):rep(2)
@@ -1252,7 +1223,7 @@ function LIB.Hex2RGB(hex)
 	return r, g, b, a
 end
 
-function LIB.RGB2Hex(r, g, b, a)
+function X.RGB2Hex(r, g, b, a)
 	if a then
 		return (('#%02X%02X%02X%02X'):format(r, g, b, a))
 	end
@@ -1261,9 +1232,9 @@ end
 
 local COLOR_NAME_RGB = {}
 do
-	local aColor = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/colors/{$lang}.jx3dat')
+	local aColor = X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/colors/{$lang}.jx3dat')
 	for szColor, aKey in ipairs(aColor) do
-		local nR, nG, nB = LIB.Hex2RGB(szColor)
+		local nR, nG, nB = X.Hex2RGB(szColor)
 		if nR then
 			for _, szKey in ipairs(aKey) do
 				COLOR_NAME_RGB[szKey] = {nR, nG, nB}
@@ -1272,7 +1243,7 @@ do
 	end
 end
 
-function LIB.ColorName2RGB(name)
+function X.ColorName2RGB(name)
 	if not COLOR_NAME_RGB[name] then
 		return
 	end
@@ -1280,15 +1251,15 @@ function LIB.ColorName2RGB(name)
 end
 
 local HUMAN_COLOR_CACHE = setmetatable({}, {__mode = 'v', __index = COLOR_NAME_RGB})
-function LIB.HumanColor2RGB(name)
-	if IsTable(name) then
+function X.HumanColor2RGB(name)
+	if X.IsTable(name) then
 		if name.r then
 			return name.r, name.g, name.b
 		end
 		return unpack(name)
 	end
 	if not HUMAN_COLOR_CACHE[name] then
-		local r, g, b, a = LIB.Hex2RGB(name)
+		local r, g, b, a = X.Hex2RGB(name)
 		HUMAN_COLOR_CACHE[name] = {r, g, b, a}
 	end
 	return unpack(HUMAN_COLOR_CACHE[name])
@@ -1296,13 +1267,13 @@ end
 end
 
 -- 获取某个字体的颜色
--- (bool) LIB.GetFontColor(number nFont)
+-- (bool) X.GetFontColor(number nFont)
 do
 local CACHE, el = {}, nil
-function LIB.GetFontColor(nFont)
+function X.GetFontColor(nFont)
 	if not CACHE[nFont] then
-		if not el or not IsElement(el) then
-			el = UI.GetTempElement(NSFormatString('Text.{$NS}Lib_GetFontColor'))
+		if not el or not X.IsElement(el) then
+			el = UI.GetTempElement(X.NSFormatString('Text.{$NS}Lib_GetFontColor'))
 		end
 		el:SetFontScheme(nFont)
 		CACHE[nFont] = {el:GetFontColor()}
@@ -1311,10 +1282,10 @@ function LIB.GetFontColor(nFont)
 end
 end
 
-function LIB.ExecuteWithThis(context, fnAction, ...)
+function X.ExecuteWithThis(context, fnAction, ...)
 	-- 界面组件支持字符串调用方法
-	if IsString(fnAction) then
-		if not IsElement(context) then
+	if X.IsString(fnAction) then
+		if not X.IsElement(context) then
 			-- Log('[UI ERROR]Invalid element on executing ui event!')
 			return false
 		end
@@ -1327,7 +1298,7 @@ function LIB.ExecuteWithThis(context, fnAction, ...)
 			end
 		end
 	end
-	if not IsFunction(fnAction) then
+	if not X.IsFunction(fnAction) then
 		-- Log('[UI ERROR]Invalid function on executing ui event! # ' .. element:GetTreePath())
 		return false
 	end
@@ -1340,45 +1311,45 @@ end
 
 do
 local HOOK = setmetatable({}, { __mode = 'k' })
--- LIB.SetMemberFunctionHook(tTable, szName, fnHook, tOption) -- hook
--- LIB.SetMemberFunctionHook(tTable, szName, szKey, fnHook, tOption) -- hook
--- LIB.SetMemberFunctionHook(tTable, szName, szKey, false) -- unhook
-function LIB.SetMemberFunctionHook(t, xArg1, xArg2, xArg3, xArg4)
+-- X.SetMemberFunctionHook(tTable, szName, fnHook, tOption) -- hook
+-- X.SetMemberFunctionHook(tTable, szName, szKey, fnHook, tOption) -- hook
+-- X.SetMemberFunctionHook(tTable, szName, szKey, false) -- unhook
+function X.SetMemberFunctionHook(t, xArg1, xArg2, xArg3, xArg4)
 	local eAction, szName, szKey, fnHook, tOption
-	if IsTable(t) and IsFunction(xArg2) then
+	if X.IsTable(t) and X.IsFunction(xArg2) then
 		eAction, szName, fnHook, tOption = 'REG', xArg1, xArg2, xArg3
-	elseif IsTable(t) and IsString(xArg2) and IsFunction(xArg3) then
+	elseif X.IsTable(t) and X.IsString(xArg2) and X.IsFunction(xArg3) then
 		eAction, szName, szKey, fnHook, tOption = 'REG', xArg1, xArg2, xArg3, xArg4
-	elseif IsTable(t) and IsString(xArg2) and xArg3 == false then
+	elseif X.IsTable(t) and X.IsString(xArg2) and xArg3 == false then
 		eAction, szName, szKey = 'UNREG', xArg1, xArg2
 	end
 	assert(eAction, 'Parameters type not recognized, cannot infer action type.')
 	-- 匿名注册分配随机标识符
-	if eAction == 'REG' and not IsString(szKey) then
+	if eAction == 'REG' and not X.IsString(szKey) then
 		szKey = GetTickCount() * 1000
-		while Get(HOOK, {t, szName, (tostring(szKey))}) do
+		while X.Get(HOOK, {t, szName, (tostring(szKey))}) do
 			szKey = szKey + 1
 		end
 		szKey = tostring(szKey)
 	end
 	if eAction == 'REG' or eAction == 'UNREG' then
-		local fnCurrentHook = Get(HOOK, {t, szName, szKey})
+		local fnCurrentHook = X.Get(HOOK, {t, szName, szKey})
 		if fnCurrentHook then
-			Set(HOOK, {t, szName, szKey}, nil)
+			X.Set(HOOK, {t, szName, szKey}, nil)
 			UnhookTableFunc(t, szName, fnCurrentHook)
 		end
 	end
 	if eAction == 'REG' then
-		Set(HOOK, {t, szName, szKey}, fnHook)
+		X.Set(HOOK, {t, szName, szKey}, fnHook)
 		HookTableFunc(t, szName, fnHook, tOption)
 	end
 	return szKey
 end
 end
 
-function LIB.InsertOperatorMenu(t, opt, action, opts, L)
+function X.InsertOperatorMenu(t, opt, action, opts, L)
 	for _, op in ipairs(opts or { '==', '!=', '<', '>=', '>', '<=' }) do
-		insert(t, {
+		table.insert(t, {
 			szOption = L and L[op] or _L.OPERATOR[op],
 			bCheck = true, bMCheck = true,
 			bChecked = opt == op,
@@ -1388,7 +1359,7 @@ function LIB.InsertOperatorMenu(t, opt, action, opts, L)
 	return t
 end
 
-function LIB.JudgeOperator(opt, lval, rval, ...)
+function X.JudgeOperator(opt, lval, rval, ...)
 	if opt == '>' then
 		return lval > rval
 	elseif opt == '>=' then
@@ -1405,15 +1376,15 @@ function LIB.JudgeOperator(opt, lval, rval, ...)
 end
 
 -- 跨线程实时获取目标界面位置
--- 注册：LIB.CThreadCoor(dwType, dwID, szKey, true)
--- 注销：LIB.CThreadCoor(dwType, dwID, szKey, false)
--- 获取：LIB.CThreadCoor(dwType, dwID) -- 必须已注册才能获取
--- 注册：LIB.CThreadCoor(dwType, nX, nY, nZ, szKey, true)
--- 注销：LIB.CThreadCoor(dwType, nX, nY, nZ, szKey, false)
--- 获取：LIB.CThreadCoor(dwType, nX, nY, nZ) -- 必须已注册才能获取
+-- 注册：X.CThreadCoor(dwType, dwID, szKey, true)
+-- 注销：X.CThreadCoor(dwType, dwID, szKey, false)
+-- 获取：X.CThreadCoor(dwType, dwID) -- 必须已注册才能获取
+-- 注册：X.CThreadCoor(dwType, nX, nY, nZ, szKey, true)
+-- 注销：X.CThreadCoor(dwType, nX, nY, nZ, szKey, false)
+-- 获取：X.CThreadCoor(dwType, nX, nY, nZ) -- 必须已注册才能获取
 do
 local CACHE = {}
-function LIB.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
+function X.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
 	local dwType, dwID, nX, nY, nZ, szCtcKey, szKey, bReg = arg0, nil, nil, nil, nil, nil, nil, nil
 	if dwType == CTCT.CHARACTER_TOP_2_SCREEN_POS or dwType == CTCT.CHARACTER_POS_2_SCREEN_POS or dwType == CTCT.DOODAD_POS_2_SCREEN_POS then
 		dwID, szKey, bReg = arg1, arg2, arg3
@@ -1448,7 +1419,7 @@ function LIB.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
 		local cache = CACHE[szCtcKey]
 		--[[#DEBUG BEGIN]]
 		if not cache then
-			LIB.Debug(NSFormatString('{$NS}#SYS'), _L('Error: `%s` has not be registed!', szCtcKey), DEBUG_LEVEL.ERROR)
+			X.Debug(X.NSFormatString('{$NS}#SYS'), _L('Error: `%s` has not be registed!', szCtcKey), X.DEBUG_LEVEL.ERROR)
 		end
 		--[[#DEBUG END]]
 		return CThreadCoor_Get(cache.ctcid) -- nX, nY, bFront
@@ -1456,11 +1427,11 @@ function LIB.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
 end
 end
 
-function LIB.GetUIScale()
+function X.GetUIScale()
 	return Station.GetUIScale()
 end
 
-function LIB.GetOriginUIScale()
+function X.GetOriginUIScale()
 	-- 线性拟合出来的公式 -- 不知道不同机器会不会不一样
 	-- 源数据
 	-- 0.63, 0.7
@@ -1469,33 +1440,33 @@ function LIB.GetOriginUIScale()
 	-- 0.756, 0.85
 	-- 0.846, 0.95
 	-- 0.89, 1
-	-- return floor((1.13726 * Station.GetUIScale() / Station.GetMaxUIScale() - 0.011) * 100 + 0.5) / 100 -- +0.5为了四舍五入
+	-- return math.floor((1.13726 * Station.GetUIScale() / Station.GetMaxUIScale() - 0.011) * 100 + 0.5) / 100 -- +0.5为了四舍五入
 	-- 不同显示器GetMaxUIScale都不一样 太麻烦了 放弃 直接读配置项
 	return GetUserPreferences(3775, 'c') / 100 -- TODO: 不同步设置就GG了 要通过实时数值反向计算 缺少API
 end
 
-function LIB.GetFontScale(nOffset)
+function X.GetFontScale(nOffset)
 	return 1 + (nOffset or Font.GetOffset()) * 0.07
 end
 
 do
 local CURRENT_ACCOUNT
-function LIB.GetAccount()
-	if IsNil(CURRENT_ACCOUNT) then
+function X.GetAccount()
+	if X.IsNil(CURRENT_ACCOUNT) then
 		if not CURRENT_ACCOUNT and Login_GetAccount then
-			local bSuccess, szAccount = XpCall(Login_GetAccount)
-			if bSuccess and not IsEmpty(szAccount) then
+			local bSuccess, szAccount = X.XpCall(Login_GetAccount)
+			if bSuccess and not X.IsEmpty(szAccount) then
 				CURRENT_ACCOUNT = szAccount
 			end
 		end
 		if not CURRENT_ACCOUNT and GetUserAccount then
-			local bSuccess, szAccount = XpCall(GetUserAccount)
-			if bSuccess and not IsEmpty(szAccount) then
+			local bSuccess, szAccount = X.XpCall(GetUserAccount)
+			if bSuccess and not X.IsEmpty(szAccount) then
 				CURRENT_ACCOUNT = szAccount
 			end
 		end
 		if not CURRENT_ACCOUNT then
-			local bSuccess, hFrame = XpCall(function() return Wnd.OpenWindow('LoginPassword') end)
+			local bSuccess, hFrame = X.XpCall(function() return Wnd.OpenWindow('LoginPassword') end)
 			if bSuccess and hFrame then
 				local hEdit = hFrame:Lookup('WndPassword/Edit_Account')
 				if hEdit then
@@ -1512,7 +1483,7 @@ function LIB.GetAccount()
 end
 end
 
-function LIB.OpenBrowser(szAddr)
+function X.OpenBrowser(szAddr)
 	if _G.OpenBrowser then
 		_G.OpenBrowser(szAddr)
 	else
@@ -1520,13 +1491,13 @@ function LIB.OpenBrowser(szAddr)
 	end
 end
 
-function LIB.ArrayToObject(arr)
+function X.ArrayToObject(arr)
 	if not arr then
 		return
 	end
 	local t = {}
 	for k, v in pairs(arr) do
-		if IsTable(v) and v[1] then
+		if X.IsTable(v) and v[1] then
 			t[v[1]] = v[2]
 		else
 			t[v] = true
@@ -1535,7 +1506,7 @@ function LIB.ArrayToObject(arr)
 	return t
 end
 
-function LIB.FlipObjectKV(obj)
+function X.FlipObjectKV(obj)
 	local t = {}
 	for k, v in pairs(obj) do
 		t[v] = k
@@ -1674,7 +1645,7 @@ local function FormatModuleProxy(options, name)
 			if option.root then
 				local presets = option.presets or {} -- presets = {"XXX"},
 				if option.preset then -- preset = "XXX",
-					insert(presets, option.preset)
+					table.insert(presets, option.preset)
 				end
 				for i, s in ipairs(presets) do
 					if PRESETS[s] then
@@ -1684,29 +1655,29 @@ local function FormatModuleProxy(options, name)
 					end
 				end
 			end
-			if IsTable(option.fields) then
+			if X.IsTable(option.fields) then
 				for k, v in pairs(option.fields) do
-					if IsNumber(k) and IsString(v) then -- "XXX",
-						if not IsTable(option.root) then
+					if X.IsNumber(k) and X.IsString(v) then -- "XXX",
+						if not X.IsTable(option.root) then
 							assert(false, 'Module `' .. name .. '`: static field `' .. v .. '` must be declared with a table root.')
 						end
 						entries[v] = option.root
-					elseif IsString(k) then -- XXX = D.XXX,
+					elseif X.IsString(k) then -- XXX = D.XXX,
 						statics[k] = v
 						entries[k] = statics
 					end
 				end
 			end
-			if IsTable(option.interceptors) then
+			if X.IsTable(option.interceptors) then
 				for k, v in pairs(option.interceptors) do
-					if IsString(k) and IsFunction(v) then -- XXX = function(k) end,
+					if X.IsString(k) and X.IsFunction(v) then -- XXX = function(k) end,
 						interceptors[k] = v
 					end
 				end
 			end
-			if IsTable(option.triggers) then
+			if X.IsTable(option.triggers) then
 				for k, v in pairs(option.triggers) do
-					if IsString(k) and IsFunction(v) then -- XXX = function(k, v) end,
+					if X.IsString(k) and X.IsFunction(v) then -- XXX = function(k, v) end,
 						triggers[k] = v
 					end
 				end
@@ -1718,13 +1689,13 @@ end
 local function ParameterCounter(...)
 	return select('#', ...), ...
 end
-function LIB.CreateModule(options)
+function X.CreateModule(options)
 	local name = options.name or 'Unnamed'
 	local exportEntries, exportInterceptors, exportTriggers = FormatModuleProxy(options.exports, name)
 	local importEntries, importInterceptors, importTriggers = FormatModuleProxy(options.imports, name)
 	local function getter(_, k)
 		if not exportEntries[k] then
-			LIB.Debug(PACKET_INFO.NAME_SPACE, 'Module `' .. name .. '`: get value failed, unregistered properity `' .. k .. '`.', DEBUG_LEVEL.WARNING)
+			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Module `' .. name .. '`: get value failed, unregistered properity `' .. k .. '`.', X.DEBUG_LEVEL.WARNING)
 			return
 		end
 		local interceptor = exportInterceptors[k]
@@ -1748,8 +1719,8 @@ function LIB.CreateModule(options)
 	local function setter(_, k, v)
 		if not importEntries[k] then
 			local errmsg = 'Module `' .. name .. '`: set value failed, unregistered properity `' .. k .. '`.'
-			if not LIB.IsDebugClient() then
-				LIB.Debug(PACKET_INFO.NAME_SPACE, errmsg, DEBUG_LEVEL.ERROR)
+			if not X.IsDebugClient() then
+				X.Debug(X.PACKET_INFO.NAME_SPACE, errmsg, X.DEBUG_LEVEL.ERROR)
 				return
 			end
 			assert(false, errmsg)
@@ -1777,20 +1748,20 @@ function LIB.CreateModule(options)
 end
 end
 
-function LIB.EditBox_AppendLinkPlayer(szName)
-	local edit = LIB.GetChatInput()
+function X.EditBox_AppendLinkPlayer(szName)
+	local edit = X.GetChatInput()
 	edit:InsertObj('['.. szName ..']', { type = 'name', text = '['.. szName ..']', name = szName })
 	Station.SetFocusWindow(edit)
 	return true
 end
 
-function LIB.EditBox_AppendLinkItem(dwID)
+function X.EditBox_AppendLinkItem(dwID)
 	local item = GetItem(dwID)
 	if not item then
 		return false
 	end
-	local szName = '[' .. LIB.GetItemNameByItem(item) ..']'
-	local edit = LIB.GetChatInput()
+	local szName = '[' .. X.GetItemNameByItem(item) ..']'
+	local edit = X.GetChatInput()
 	edit:InsertObj(szName, { type = 'item', text = szName, item = item.dwID })
 	Station.SetFocusWindow(edit)
 	return true
@@ -1800,74 +1771,74 @@ end
 -- 语音相关 API
 -------------------------------------------
 
-function LIB.GVoiceBase_IsOpen(...)
-	if IsFunction(_G.GVoiceBase_IsOpen) then
+function X.GVoiceBase_IsOpen(...)
+	if X.IsFunction(_G.GVoiceBase_IsOpen) then
 		return _G.GVoiceBase_IsOpen(...)
 	end
 	return false
 end
 
-function LIB.GVoiceBase_GetMicState(...)
-	if IsFunction(_G.GVoiceBase_GetMicState) then
+function X.GVoiceBase_GetMicState(...)
+	if X.IsFunction(_G.GVoiceBase_GetMicState) then
 		return _G.GVoiceBase_GetMicState(...)
 	end
 	return CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM
 end
 
-function LIB.GVoiceBase_SwitchMicState(...)
-	if IsFunction(_G.GVoiceBase_SwitchMicState) then
+function X.GVoiceBase_SwitchMicState(...)
+	if X.IsFunction(_G.GVoiceBase_SwitchMicState) then
 		return _G.GVoiceBase_SwitchMicState(...)
 	end
 end
 
-function LIB.GVoiceBase_CheckMicState(...)
-	if IsFunction(_G.GVoiceBase_CheckMicState) then
+function X.GVoiceBase_CheckMicState(...)
+	if X.IsFunction(_G.GVoiceBase_CheckMicState) then
 		return _G.GVoiceBase_CheckMicState(...)
 	end
 end
 
-function LIB.GVoiceBase_GetSpeakerState(...)
-	if IsFunction(_G.GVoiceBase_GetSpeakerState) then
+function X.GVoiceBase_GetSpeakerState(...)
+	if X.IsFunction(_G.GVoiceBase_GetSpeakerState) then
 		return _G.GVoiceBase_GetSpeakerState(...)
 	end
 	return CONSTANT.SPEAKER_STATE.CLOSE
 end
 
-function LIB.GVoiceBase_SwitchSpeakerState(...)
-	if IsFunction(_G.GVoiceBase_SwitchSpeakerState) then
+function X.GVoiceBase_SwitchSpeakerState(...)
+	if X.IsFunction(_G.GVoiceBase_SwitchSpeakerState) then
 		return _G.GVoiceBase_SwitchSpeakerState(...)
 	end
 end
 
-function LIB.GVoiceBase_GetSaying(...)
-	if IsFunction(_G.GVoiceBase_GetSaying) then
+function X.GVoiceBase_GetSaying(...)
+	if X.IsFunction(_G.GVoiceBase_GetSaying) then
 		return _G.GVoiceBase_GetSaying(...)
 	end
 	return {}
 end
 
-function LIB.GVoiceBase_IsMemberSaying(...)
-	if IsFunction(_G.GVoiceBase_IsMemberSaying) then
+function X.GVoiceBase_IsMemberSaying(...)
+	if X.IsFunction(_G.GVoiceBase_IsMemberSaying) then
 		return _G.GVoiceBase_IsMemberSaying(...)
 	end
 	return false
 end
 
-function LIB.GVoiceBase_IsMemberForbid(...)
-	if IsFunction(_G.GVoiceBase_IsMemberForbid) then
+function X.GVoiceBase_IsMemberForbid(...)
+	if X.IsFunction(_G.GVoiceBase_IsMemberForbid) then
 		return _G.GVoiceBase_IsMemberForbid(...)
 	end
 	return false
 end
 
-function LIB.GVoiceBase_ForbidMember(...)
-	if IsFunction(_G.GVoiceBase_ForbidMember) then
+function X.GVoiceBase_ForbidMember(...)
+	if X.IsFunction(_G.GVoiceBase_ForbidMember) then
 		return _G.GVoiceBase_ForbidMember(...)
 	end
 end
 
 if _G.Login_GetTimeOfFee then
-	function LIB.GetTimeOfFee()
+	function X.GetTimeOfFee()
 		-- [仅客户端使用]返回帐号月卡截止时间，计点剩余秒数，计天剩余秒数和总截止时间
 		local dwMonthEndTime, nPointLeftTime, nDayLeftTime, dwEndTime = _G.Login_GetTimeOfFee()
 		if dwMonthEndTime <= 1229904000 then
@@ -1878,11 +1849,11 @@ if _G.Login_GetTimeOfFee then
 else
 	local bInit, dwMonthEndTime, dwPointEndTime, dwDayEndTime = false, 0, 0, 0
 	local frame = Station.Lookup('Lowest/Scene')
-	local data = frame and frame[NSFormatString('{$NS}_TimeOfFee')]
+	local data = frame and frame[X.NSFormatString('{$NS}_TimeOfFee')]
 	if data then
 		bInit, dwMonthEndTime, dwPointEndTime, dwDayEndTime = true, unpack(data)
 	else
-		LIB.RegisterMsgMonitor('MSG_SYS', 'LIB#GetTimeOfFee', function(szChannel, szMsg)
+		X.RegisterMsgMonitor('MSG_SYS', 'LIB#GetTimeOfFee', function(szChannel, szMsg)
 			-- 点卡剩余时间为：558小时41分33秒
 			local szHour, szMinute, szSecond = szMsg:match(_L['Point left time: (%d+)h(%d+)m(%d+)s'])
 			if szHour and szMinute and szSecond then
@@ -1894,7 +1865,7 @@ else
 			local szYear, szMonth, szDay, szHour, szMinute = szMsg:match(_L['Month time to: (%d+)y(%d+)m(%d+)d (%d+)h(%d+)m'])
 			if szYear and szMonth and szDay and szHour and szMinute then
 				bInit = true
-				dwMonthEndTime = LIB.DateToTime(szYear, szMonth, szDay, szHour, szMinute, 0)
+				dwMonthEndTime = X.DateToTime(szYear, szMonth, szDay, szHour, szMinute, 0)
 			end
 			if bInit then
 				local dwTime = GetCurrentTime()
@@ -1903,69 +1874,69 @@ else
 				end
 				local frame = Station.Lookup('Lowest/Scene')
 				if frame then
-					frame[NSFormatString('{$NS}_TimeOfFee')] = {dwMonthEndTime, dwPointEndTime, dwDayEndTime}
+					frame[X.NSFormatString('{$NS}_TimeOfFee')] = {dwMonthEndTime, dwPointEndTime, dwDayEndTime}
 				end
-				LIB.RegisterMsgMonitor('MSG_SYS', 'LIB#GetTimeOfFee', false)
+				X.RegisterMsgMonitor('MSG_SYS', 'LIB#GetTimeOfFee', false)
 			end
 		end)
 	end
-	function LIB.GetTimeOfFee()
+	function X.GetTimeOfFee()
 		local dwTime = GetCurrentTime()
-		local dwEndTime = max(dwMonthEndTime, dwPointEndTime, dwDayEndTime)
-		return dwEndTime, dwMonthEndTime, max(dwPointEndTime - dwTime, 0), max(dwDayEndTime - dwTime, 0)
+		local dwEndTime = math.max(dwMonthEndTime, dwPointEndTime, dwDayEndTime)
+		return dwEndTime, dwMonthEndTime, math.max(dwPointEndTime - dwTime, 0), math.max(dwDayEndTime - dwTime, 0)
 	end
 end
 
 do
-local KEY = wgsub(PACKET_INFO.ROOT, '\\', '/'):lower()
-local FILE_PATH = {'temporary/lua_error.jx3dat', PATH_TYPE.GLOBAL}
-local LAST_ERROR_MSG = LIB.LoadLUAData(FILE_PATH, { passphrase = false }) or {}
+local KEY = wstring.gsub(X.PACKET_INFO.ROOT, '\\', '/'):lower()
+local FILE_PATH = {'temporary/lua_error.jx3dat', X.PATH_TYPE.GLOBAL}
+local LAST_ERROR_MSG = X.LoadLUAData(FILE_PATH, { passphrase = false }) or {}
 local ERROR_MSG = {}
 local function SaveErrorMessage()
-	LIB.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
+	X.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
 end
-local BROKEN_KGUI = IsDebugClient() and not LIB.IsDebugServer() and not LIB.IsDebugClient(true)
+local BROKEN_KGUI = IsDebugClient() and not X.IsDebugServer() and not X.IsDebugClient(true)
 RegisterEvent('CALL_LUA_ERROR', function()
 	local szMsg = arg0
-	local szMsgL = wgsub(arg0:lower(), '\\', '/')
-	if wfind(szMsgL, KEY) then
+	local szMsgL = wstring.gsub(arg0:lower(), '\\', '/')
+	if wstring.find(szMsgL, KEY) then
 		if BROKEN_KGUI then
 			local szMessage = 'Your KGUI is not official, please fix client and try again.'
-			LIB.ErrorLog('[' .. PACKET_INFO.NAME_SPACE .. ']' .. szMessage .. '\n' .. _L[szMessage])
+			X.ErrorLog('[' .. X.PACKET_INFO.NAME_SPACE .. ']' .. szMessage .. '\n' .. _L[szMessage])
 		end
-		insert(ERROR_MSG, szMsg)
+		table.insert(ERROR_MSG, szMsg)
 	end
 	SaveErrorMessage()
 end)
-function LIB.GetAddonErrorMessage()
-	local szMsg = concat(LAST_ERROR_MSG, '\n\n')
-	if not IsEmpty(szMsg) then
+function X.GetAddonErrorMessage()
+	local szMsg = table.concat(LAST_ERROR_MSG, '\n\n')
+	if not X.IsEmpty(szMsg) then
 		szMsg = szMsg .. '\n\n'
 	end
-	return szMsg .. concat(ERROR_MSG, '\n\n')
+	return szMsg .. table.concat(ERROR_MSG, '\n\n')
 end
-LIB.RegisterInit('LIB#AddonErrorMessage', SaveErrorMessage)
+X.RegisterInit('LIB#AddonErrorMessage', SaveErrorMessage)
 end
 
 -----------------------------------------------
 -- 事件驱动自动回收的缓存机制
 -----------------------------------------------
-function LIB.CreateCache(szNameMode, aEvent)
+function X.CreateCache(szNameMode, aEvent)
 	-- 处理参数
 	local szName, szMode
-	if IsString(szNameMode) then
+	if X.IsString(szNameMode) then
 		local nPos = StringFindW(szNameMode, '.')
 		if nPos then
-			szName = sub(szNameMode, 1, nPos - 1)
-			szMode = sub(szNameMode, nPos + 1)
+			szName = string.sub(szNameMode, 1, nPos - 1)
+			szMode = string.sub(szNameMode, nPos + 1)
 		else
 			szName = szNameMode
 		end
 	end
-	if IsString(aEvent) then
+	if X.IsString(aEvent) then
 		aEvent = {aEvent}
-	elseif IsArray(aEvent) then
-		aEvent = Clone(aEvent)
+	elseif X.IsArray(aEvent) then
+		aEvent = X.Clone(aEvent)
 	else
 		aEvent = {'LOADING_ENDING'}
 	end
@@ -1983,12 +1954,12 @@ function LIB.CreateCache(szNameMode, aEvent)
 	end
 	local function Register()
 		for _, szEvent in ipairs(aEvent) do
-			LIB.RegisterEvent(szEvent, szKey, Flush)
+			X.RegisterEvent(szEvent, szKey, Flush)
 		end
 	end
 	local function Unregister()
 		for _, szEvent in ipairs(aEvent) do
-			LIB.RegisterEvent(szEvent, szKey, false)
+			X.RegisterEvent(szEvent, szKey, false)
 		end
 	end
 	function mt.__call(_, k)
@@ -2008,12 +1979,12 @@ end
 -- 汉字转拼音
 -----------------------------------------------
 do local PINYIN, PINYIN_CONSONANT
-function LIB.Han2Pinyin(szText)
-	if not IsString(szText) then
+function X.Han2Pinyin(szText)
+	if not X.IsString(szText) then
 		return
 	end
 	if not PINYIN then
-		PINYIN = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/{$lang}.jx3dat', { passphrase = false })
+		PINYIN = X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/{$lang}.jx3dat', { passphrase = false })
 		local tPinyinConsonant = {}
 		for c, v in pairs(PINYIN) do
 			local a, t = {}, {}
@@ -2021,14 +1992,14 @@ function LIB.Han2Pinyin(szText)
 				s = s:sub(1, 1)
 				if not t[s] then
 					t[s] = true
-					insert(a, s)
+					table.insert(a, s)
 				end
 			end
 			tPinyinConsonant[c] = a
 		end
 		PINYIN_CONSONANT = tPinyinConsonant
 	end
-	local aText = LIB.SplitString(szText, '')
+	local aText = X.SplitString(szText, '')
 	local aFull, nFullCount = {''}, 1
 	local aConsonant, nConsonantCount = {''}, 1
 	for _, szChar in ipairs(aText) do
@@ -2036,7 +2007,7 @@ function LIB.Han2Pinyin(szText)
 		if aCharPinyin and #aCharPinyin > 0 then
 			for i = 2, #aCharPinyin do
 				for j = 1, nFullCount do
-					insert(aFull, aFull[j] .. aCharPinyin[i])
+					table.insert(aFull, aFull[j] .. aCharPinyin[i])
 				end
 			end
 			for j = 1, nFullCount do
@@ -2052,7 +2023,7 @@ function LIB.Han2Pinyin(szText)
 		if aCharPinyinConsonant and #aCharPinyinConsonant > 0 then
 			for i = 2, #aCharPinyinConsonant do
 				for j = 1, nConsonantCount do
-					insert(aConsonant, aConsonant[j] .. aCharPinyinConsonant[i])
+					table.insert(aConsonant, aConsonant[j] .. aCharPinyinConsonant[i])
 				end
 			end
 			for j = 1, nConsonantCount do

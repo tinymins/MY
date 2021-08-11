@@ -7,47 +7,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/ps/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/ps/')
 
 local PS = { bWelcome = true, bHide = true }
 
 local function GetMemoryText()
-	return format('Memory:%.1fMB', collectgarbage('count') / 1024)
+	return string.format('Memory:%.1fMB', collectgarbage('count') / 1024)
 end
 
 local function GetAdvText()
@@ -55,21 +26,21 @@ local function GetAdvText()
 	if not me then
 		return ''
 	end
-	return _L('%s, welcome to use %s!', me.szName, PACKET_INFO.NAME)
+	return _L('%s, welcome to use %s!', me.szName, X.PACKET_INFO.NAME)
 end
 
 local function GetSvrText()
-	local nFeeTime = LIB.GetTimeOfFee() - GetCurrentTime()
-	return LIB.GetServer() .. ' (' .. LIB.GetRealServer() .. ')'
+	local nFeeTime = X.GetTimeOfFee() - GetCurrentTime()
+	return X.GetServer() .. ' (' .. X.GetRealServer() .. ')'
 		.. g_tStrings.STR_CONNECT
-		.. (nFeeTime > 0 and LIB.FormatTimeCounter(nFeeTime, _L['Fee left %H:%mm:%ss']) or _L['Fee left unknown'])
+		.. (nFeeTime > 0 and X.FormatTimeCounter(nFeeTime, _L['Fee left %H:%mm:%ss']) or _L['Fee left unknown'])
 end
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
 	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, color = { 140, 140, 140 } })
-	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, image = PACKET_INFO.POSTER_UITEX, imageframe = GetTime() % PACKET_INFO.POSTER_FRAME_COUNT })
+	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, image = X.PACKET_INFO.POSTER_UITEX, imageframe = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT })
 	ui:Append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
 	ui:Append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), halign = 2 })
 	ui:Append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = GetSvrText(), alpha = 220 })
@@ -183,8 +154,8 @@ function PS.OnPanelActive(wnd)
 						HideTip()
 					end,
 					fnAction = function()
-						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.ROLE}):gsub('/', '\\')
-						LIB.OpenFolder(szRoot)
+						local szRoot = X.GetAbsolutePath({'', X.PATH_TYPE.ROLE}):gsub('/', '\\')
+						X.OpenFolder(szRoot)
 						UI.OpenTextEditor(szRoot)
 						UI.ClosePopupMenu()
 					end,
@@ -200,8 +171,8 @@ function PS.OnPanelActive(wnd)
 						HideTip()
 					end,
 					fnAction = function()
-						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.SERVER}):gsub('/', '\\')
-						LIB.OpenFolder(szRoot)
+						local szRoot = X.GetAbsolutePath({'', X.PATH_TYPE.SERVER}):gsub('/', '\\')
+						X.OpenFolder(szRoot)
 						UI.OpenTextEditor(szRoot)
 						UI.ClosePopupMenu()
 					end,
@@ -217,8 +188,8 @@ function PS.OnPanelActive(wnd)
 						HideTip()
 					end,
 					fnAction = function()
-						local szRoot = LIB.GetAbsolutePath({'', PATH_TYPE.GLOBAL}):gsub('/', '\\')
-						LIB.OpenFolder(szRoot)
+						local szRoot = X.GetAbsolutePath({'', X.PATH_TYPE.GLOBAL}):gsub('/', '\\')
+						X.OpenFolder(szRoot)
 						UI.OpenTextEditor(szRoot)
 						UI.ClosePopupMenu()
 					end,
@@ -235,21 +206,21 @@ function PS.OnPanelActive(wnd)
 						HideTip()
 					end,
 					fnAction = function()
-						LIB.FireFlush()
+						X.FireFlush()
 						UI.ClosePopupMenu()
 					end,
 				},
 				{
 					szOption = _L['Export data'],
 					fnAction = function()
-						LIB.OpenUserSettingsExportPanel()
+						X.OpenUserSettingsExportPanel()
 						UI.ClosePopupMenu()
 					end,
 				},
 				{
 					szOption = _L['Import data'],
 					fnAction = function()
-						LIB.OpenUserSettingsImportPanel()
+						X.OpenUserSettingsImportPanel()
 						UI.ClosePopupMenu()
 					end,
 				},
@@ -264,15 +235,15 @@ function PS.OnPanelActive(wnd)
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		onclick = function()
 			if IsCtrlKeyDown() and IsAltKeyDown() and IsShiftKeyDown() then
-				LIB.IsDebugClient('Dev_LuaWatcher', true, true)
-				LIB.IsDebugClient('Dev_UIEditor', true, true)
-				LIB.IsDebugClient('Dev_UIManager', true, true)
-				LIB.IsDebugClient('Dev_UIFindStation', true, true)
-				LIB.Systopmsg(_L['Debug tools has been enabled...'])
-				LIB.ReopenPanel()
+				X.IsDebugClient('Dev_LuaWatcher', true, true)
+				X.IsDebugClient('Dev_UIEditor', true, true)
+				X.IsDebugClient('Dev_UIManager', true, true)
+				X.IsDebugClient('Dev_UIFindStation', true, true)
+				X.Systopmsg(_L['Debug tools has been enabled...'])
+				X.ReopenPanel()
 				return
 			end
-			UI.OpenTextEditor(LIB.GetAddonErrorMessage())
+			UI.OpenTextEditor(X.GetAddonErrorMessage())
 		end,
 	}):AutoWidth():Width() + 5
 	PS.OnPanelResize(wnd)
@@ -314,4 +285,4 @@ function PS.OnPanelBreathe(wnd)
 	ui:Fetch('Text_Memory'):Text(GetMemoryText())
 end
 
-LIB.RegisterPanel(nil, 'Welcome', _L['Welcome'], '', PS)
+X.RegisterPanel(nil, 'Welcome', _L['Welcome'], '', PS)

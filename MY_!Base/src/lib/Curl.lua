@@ -7,64 +7,35 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -------------------------------------------------------------------------------------------------------------
 
--- (void) LIB.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
+-- (void) X.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
 -- szUrl        -- 请求的完整 URL（包含 http:// 或 https://）
 -- fnAction     -- 请求完成后的回调函数，回调原型：function(szTitle, szContent)]]
-function LIB.RemoteRequest(szUrl, fnSuccess, fnError, nTimeout)
+function X.RemoteRequest(szUrl, fnSuccess, fnError, nTimeout)
 	local settings = {
 		url     = szUrl,
 		success = fnSuccess,
 		error   = fnError,
 		timeout = nTimeout,
 	}
-	return LIB.Ajax(settings)
+	return X.Ajax(settings)
 end
 
 do
 local RRWP_FREE = {}
 local RRWC_FREE = {}
 local CALL_AJAX = {}
-local AJAX_TAG = NSFormatString('{$NS}_AJAX#')
+local AJAX_TAG = X.NSFormatString('{$NS}_AJAX#')
 local AJAX_BRIDGE_WAIT = 10000
-local AJAX_BRIDGE_PATH = PACKET_INFO.DATA_ROOT .. '#cache/curl/'
+local AJAX_BRIDGE_PATH = X.PACKET_INFO.DATA_ROOT .. '#cache/curl/'
 
 local function EncodePostData(data, t, prefix)
 	if type(data) == 'table' then
@@ -73,7 +44,7 @@ local function EncodePostData(data, t, prefix)
 			if first then
 				first = false
 			else
-				insert(t, '&')
+				table.insert(t, '&')
 			end
 			if prefix == '' then
 				EncodePostData(v, t, k)
@@ -83,29 +54,29 @@ local function EncodePostData(data, t, prefix)
 		end
 	else
 		if prefix ~= '' then
-			insert(t, prefix)
-			insert(t, '=')
+			table.insert(t, prefix)
+			table.insert(t, '=')
 		end
-		insert(t, data)
+		table.insert(t, data)
 	end
 end
 
 local function serialize(data)
 	local t = {}
 	EncodePostData(data, t, '')
-	local text = concat(t)
+	local text = table.concat(t)
 	return text
 end
 
 local function CreateWebPageFrame()
 	local szRequestID, hFrame
 	repeat
-		szRequestID = ('%X%X'):format(GetTickCount(), floor(random() * 0xEFFF) + 0x1000)
-	until not Station.Lookup(NSFormatString('Lowest/{$NS}RRWP_') .. szRequestID)
+		szRequestID = ('%X%X'):format(GetTickCount(), math.floor(math.random() * 0xEFFF) + 0x1000)
+	until not Station.Lookup(X.NSFormatString('Lowest/{$NS}RRWP_') .. szRequestID)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('CreateWebPageFrame: ' .. szRequestID, DEBUG_LEVEL.LOG)
+	X.Debug('CreateWebPageFrame: ' .. szRequestID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebPage.ini', NSFormatString('{$NS}RRWP_') .. szRequestID)
+	hFrame = Wnd.OpenWindow(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebPage.ini', X.NSFormatString('{$NS}RRWP_') .. szRequestID)
 	hFrame:Hide()
 	return szRequestID, hFrame
 end
@@ -116,7 +87,7 @@ local CURL_HttpPost = (pcall(_G.CURL_HttpPostEx, 'TEST', '') and _G.CURL_HttpPos
 	or (pcall(_G.CURL_HttpPost, 'TEST', '') and _G.CURL_HttpPost)
 	or nil
 
-function LIB.CanAjax(driver, method)
+function X.CanAjax(driver, method)
 	if driver == 'curl' then
 		if not Curl_Create then
 			return false, 'Curl_Create does not exist.'
@@ -143,7 +114,7 @@ function LIB.CanAjax(driver, method)
 	return true
 end
 
--- (void) LIB.Ajax(settings)       -- 发起远程 HTTP 请求
+-- (void) X.Ajax(settings)       -- 发起远程 HTTP 请求
 -- settings           -- 请求配置项
 -- settings.url       -- 请求地址
 -- settings.data      -- 请求数据
@@ -156,16 +127,16 @@ end
 -- settings.fulfilled -- 请求成功回调事件，不关心数据，回调链： complete -> fulfilled -> success
 -- settings.success   -- 请求成功回调事件，携带数据，回调链： complete -> fulfilled -> success
 -- settings.error     -- 请求失败回调事件，可能携带数据，回调链： complete -> error
-function LIB.Ajax(settings)
-	assert(IsTable(settings) and IsString(settings.url))
+function X.Ajax(settings)
+	assert(X.IsTable(settings) and X.IsString(settings.url))
 	-- standradize settings
-	local id = lower(LIB.GetUUID())
+	local id = string.lower(X.GetUUID())
 	local oncomplete, onerror = settings.complete, settings.error
 	local onfulfilled, onsuccess = settings.fulfilled, settings.success
 	local config = {
 		id      = id,
 		url     = settings.url,
-		data    = IIf(IsEmpty(settings.data), nil, settings.data),
+		data    = X.IIf(X.IsEmpty(settings.data), nil, settings.data),
 		method  = settings.method  or 'get' ,
 		payload = settings.payload or 'form',
 		driver  = settings.driver  or 'auto',
@@ -221,62 +192,62 @@ function LIB.Ajax(settings)
 		end
 		config.url, config.data = config.url .. serialize(config.data), nil
 	end
-	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', NSFormatString('[{$NS}_AJAX] Unknown http request type: ') .. method)
+	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', X.NSFormatString('[{$NS}_AJAX] Unknown http request type: ') .. method)
 
 	-------------------------------
 	-- finalize settings
 	-------------------------------
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(
+	X.Debug(
 		'AJAX',
 		config.url .. ' - ' .. config.driver .. '/' .. config.method
 			.. ' (' .. driver .. '/' .. method .. ')'
 			.. ': PREPARE READY',
-		DEBUG_LEVEL.LOG
+		X.DEBUG_LEVEL.LOG
 	)
 	--[[#DEBUG END]]
 	local bridgewait = GetTime() + AJAX_BRIDGE_WAIT
-	local bridgewaitkey = NSFormatString('{$NS}_AJAX_') .. id
+	local bridgewaitkey = X.NSFormatString('{$NS}_AJAX_') .. id
 	local fulfilled = false
 	settings.callback = function(html, status)
 		if fulfilled then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(
+			X.Debug(
 				'AJAX_DUP_CB',
 				config.url .. ' - ' .. config.driver .. '/' .. config.method
 					.. ' (' .. driver .. '/' .. method .. ')'
 					.. ': ' .. (status or '')
 					.. '\n' .. debug.traceback(),
-				DEBUG_LEVEL.WARNING
+				X.DEBUG_LEVEL.WARNING
 			)
 			--[[#DEBUG END]]
 			return
 		end
 		local connected = html and status
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(
+		X.Debug(
 			'AJAX',
 			config.url .. ' - ' .. config.driver .. '/' .. config.method
 				.. ' (' .. driver .. '/' .. method .. ')'
 				.. ': ' .. (status or 'FAILED'),
-			IIf(connected, DEBUG_LEVEL.LOG, DEBUG_LEVEL.WARNING)
+			X.IIf(connected, X.DEBUG_LEVEL.LOG, X.DEBUG_LEVEL.WARNING)
 		)
 		--[[#DEBUG END]]
 		local function resolve()
 			fulfilled = true
-			SafeCallWithThis(settings.config, oncomplete, html, status, not IsEmpty(status))
-			if IsNumber(status) and status >= 200 and status < 400 then
-				SafeCallWithThis(settings.config, onfulfilled)
-				SafeCallWithThis(settings.config, onsuccess, html, status)
+			X.SafeCallWithThis(settings.config, oncomplete, html, status, not X.IsEmpty(status))
+			if X.IsNumber(status) and status >= 200 and status < 400 then
+				X.SafeCallWithThis(settings.config, onfulfilled)
+				X.SafeCallWithThis(settings.config, onsuccess, html, status)
 			else
-				SafeCallWithThis(settings.config, onerror, html, status)
+				X.SafeCallWithThis(settings.config, onerror, html, status)
 			end
-			XpCall(settings.closebridge)
+			X.XpCall(settings.closebridge)
 		end
 		if connected then
 			resolve()
 		else
-			LIB.DelayCall(bridgewaitkey, bridgewait - GetTime(), resolve)
+			X.DelayCall(bridgewaitkey, bridgewait - GetTime(), resolve)
 		end
 	end
 
@@ -286,37 +257,37 @@ function LIB.Ajax(settings)
 	-- convert encoding
 	local xurl, xdata = config.url, config.data or ''
 	if config.charset == 'utf8' then
-		xurl  = LIB.ConvertToUTF8(xurl)
-		xdata = LIB.ConvertToUTF8(xdata) or ''
+		xurl  = X.ConvertToUTF8(xurl)
+		xdata = X.ConvertToUTF8(xdata) or ''
 	end
 	-- bridge
-	local bridgekey = NSFormatString('{$NS}RRDF_TO_') .. id
+	local bridgekey = X.NSFormatString('{$NS}RRDF_TO_') .. id
 	local bridgein = AJAX_BRIDGE_PATH .. id .. '.' .. GLOBAL.GAME_LANG .. '.jx3dat'
 	local bridgeout = AJAX_BRIDGE_PATH .. id .. '.result.' .. GLOBAL.GAME_LANG .. '.jx3dat'
 	local bridgetimeout = GetTime() + config.timeout
 	settings.closebridge = function()
 		CPath.DelFile(bridgein)
 		CPath.DelFile(bridgeout)
-		LIB.DelayCall(bridgewaitkey, false)
-		LIB.BreatheCall(bridgekey, false)
-		LIB.DelayCall(bridgekey, false)
-		LIB.RegisterExit(bridgekey, false)
+		X.DelayCall(bridgewaitkey, false)
+		X.BreatheCall(bridgekey, false)
+		X.DelayCall(bridgekey, false)
+		X.RegisterExit(bridgekey, false)
 	end
-	LIB.SaveLUAData(bridgein, config, { crc = false, passphrase = false })
-	LIB.BreatheCall(bridgekey, 200, function()
-		local data = LIB.LoadLUAData(bridgeout, { passphrase = false })
-		if IsTable(data) then
+	X.SaveLUAData(bridgein, config, { crc = false, passphrase = false })
+	X.BreatheCall(bridgekey, 200, function()
+		local data = X.LoadLUAData(bridgeout, { passphrase = false })
+		if X.IsTable(data) then
 			settings.callback(data.content, data.status)
 		elseif GetTime() > bridgetimeout then
 			settings.callback()
 		end
 	end)
-	LIB.DelayCall(bridgekey, config.timeout, settings.closebridge)
-	LIB.RegisterExit(bridgekey, settings.closebridge)
+	X.DelayCall(bridgekey, config.timeout, settings.closebridge)
+	X.RegisterExit(bridgekey, settings.closebridge)
 
-	local canajax, errmsg = LIB.CanAjax(driver, method)
+	local canajax, errmsg = X.CanAjax(driver, method)
 	if not canajax then
-		LIB.Debug(NSFormatString('{$NS}_AJAX'), errmsg, DEBUG_LEVEL.WARNING)
+		X.Debug(X.NSFormatString('{$NS}_AJAX'), errmsg, X.DEBUG_LEVEL.WARNING)
 		settings.callback()
 		return
 	end
@@ -327,10 +298,10 @@ function LIB.Ajax(settings)
 			curl:SetMethod('POST')
 			local data = config.data
 			if config.payload == 'json' then
-				data = LIB.JsonEncode(data)
+				data = X.JsonEncode(data)
 				curl:AddHeader('Content-Type: application/json')
 			else -- if config.payload == 'form' then
-				data = LIB.EncodePostData(data)
+				data = X.EncodePostData(data)
 				curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
 			end
 			curl:AddPostRawData(data)
@@ -366,13 +337,13 @@ function LIB.Ajax(settings)
 		local nFreeWebPages = #RRWC_FREE
 		if nFreeWebPages > 0 then
 			RequestID = RRWC_FREE[nFreeWebPages]
-			hFrame = Station.Lookup(NSFormatString('Lowest/{$NS}RRWC_') .. RequestID)
-			remove(RRWC_FREE)
+			hFrame = Station.Lookup(X.NSFormatString('Lowest/{$NS}RRWC_') .. RequestID)
+			table.remove(RRWC_FREE)
 		end
 		-- create page
 		if not hFrame then
-			RequestID = ('%X_%X'):format(GetTickCount(), floor(random() * 65536))
-			hFrame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebCef.ini', NSFormatString('{$NS}RRWC_') .. RequestID)
+			RequestID = ('%X_%X'):format(GetTickCount(), math.floor(math.random() * 65536))
+			hFrame = Wnd.OpenWindow(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebCef.ini', X.NSFormatString('{$NS}RRWC_') .. RequestID)
 			hFrame:Hide()
 		end
 		local wWebCef = hFrame:Lookup('WndWebCef')
@@ -382,31 +353,31 @@ function LIB.Ajax(settings)
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			local szContent = ''
 			--[[#DEBUG BEGIN]]
-			-- LIB.Debug(NSFormatString('{$NS}RRWC::OnDocumentComplete'), format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
+			-- X.Debug(X.NSFormatString('{$NS}RRWC::OnDocumentComplete'), string.format('%s - %s', szTitle, szUrl), X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			-- 注销超时处理时钟
-			LIB.DelayCall(NSFormatString('{$NS}RRWC_TO_') .. RequestID, false)
+			X.DelayCall(X.NSFormatString('{$NS}RRWC_TO_') .. RequestID, false)
 			-- 回调函数
 			settings.callback(szContent, 200)
 			-- 有宕机问题，禁用 FREE 池，直接销毁句柄
-			-- insert(RRWC_FREE, RequestID)
+			-- table.insert(RRWC_FREE, RequestID)
 			Wnd.CloseWindow(this:GetRoot())
 		end
 
 		-- do with this remote request
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(NSFormatString('{$NS}RRWC'), config.url, DEBUG_LEVEL.LOG)
+		X.Debug(X.NSFormatString('{$NS}RRWC'), config.url, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- register request timeout clock
 		if config.timeout > 0 then
-			LIB.DelayCall(NSFormatString('{$NS}RRWC_TO_') .. RequestID, config.timeout, function()
+			X.DelayCall(X.NSFormatString('{$NS}RRWC_TO_') .. RequestID, config.timeout, function()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug(NSFormatString('{$NS}RRWC::Timeout'), config.url, DEBUG_LEVEL.WARNING) -- log
+				X.Debug(X.NSFormatString('{$NS}RRWC::Timeout'), config.url, X.DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				settings.callback()
 				-- 有宕机问题，禁用 FREE 池，直接销毁句柄
-				-- insert(RRWC_FREE, RequestID)
+				-- table.insert(RRWC_FREE, RequestID)
 				Wnd.CloseWindow(hFrame)
 			end)
 		end
@@ -422,30 +393,30 @@ function LIB.Ajax(settings)
 				local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 				if szUrl ~= szTitle or szContent ~= '' then
 					--[[#DEBUG BEGIN]]
-					LIB.Debug(NSFormatString('{$NS}RRWP::OnDocumentComplete'), format('%s - %s', szTitle, szUrl), DEBUG_LEVEL.LOG)
+					X.Debug(X.NSFormatString('{$NS}RRWP::OnDocumentComplete'), string.format('%s - %s', szTitle, szUrl), X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					-- 注销超时处理时钟
-					LIB.DelayCall(NSFormatString('{$NS}RRWP_TO_') .. RequestID, false)
+					X.DelayCall(X.NSFormatString('{$NS}RRWP_TO_') .. RequestID, false)
 					-- 回调函数
 					settings.callback(szContent, 200)
 					-- 有宕机问题，禁用 FREE 池，直接销毁句柄
-					insert(RRWP_FREE, RequestID)
+					table.insert(RRWP_FREE, RequestID)
 					-- Wnd.CloseWindow(this:GetRoot())
 				end
 			end
 			-- do with this remote request
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(NSFormatString('{$NS}RRWP'), config.url, DEBUG_LEVEL.LOG)
+			X.Debug(X.NSFormatString('{$NS}RRWP'), config.url, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			-- register request timeout clock
 			if config.timeout > 0 then
-				LIB.DelayCall(NSFormatString('{$NS}RRWP_TO_') .. RequestID, config.timeout, function()
+				X.DelayCall(X.NSFormatString('{$NS}RRWP_TO_') .. RequestID, config.timeout, function()
 					--[[#DEBUG BEGIN]]
-					LIB.Debug(NSFormatString('{$NS}RRWP::Timeout'), config.url, DEBUG_LEVEL.WARNING) -- log
+					X.Debug(X.NSFormatString('{$NS}RRWP::Timeout'), config.url, X.DEBUG_LEVEL.WARNING) -- log
 					--[[#DEBUG END]]
 					settings.callback()
 					-- 有宕机问题，禁用 FREE 池，直接销毁句柄
-					insert(RRWP_FREE, RequestID)
+					table.insert(RRWP_FREE, RequestID)
 					-- Wnd.CloseWindow(hFrame)
 				end)
 			end
@@ -455,19 +426,19 @@ function LIB.Ajax(settings)
 		local nFreeWebPages = #RRWP_FREE
 		if nFreeWebPages > 0 then
 			RequestID = RRWP_FREE[nFreeWebPages]
-			hFrame = Station.Lookup(NSFormatString('Lowest/{$NS}RRWP_') .. RequestID)
-			remove(RRWP_FREE)
+			hFrame = Station.Lookup(X.NSFormatString('Lowest/{$NS}RRWP_') .. RequestID)
+			table.remove(RRWP_FREE)
 		end
 		-- create page
 		if hFrame then
 			OnWebPageFrameCreate()
 		else
-			local szKey = NSFormatString('{$NS}_AJAX#RRWP#') .. config.id
-			LIB.BreatheCall(szKey, function()
-				if LIB.IsFighting() or not Cursor.IsVisible() then
+			local szKey = X.NSFormatString('{$NS}_AJAX#RRWP#') .. config.id
+			X.BreatheCall(szKey, function()
+				if X.IsFighting() or not Cursor.IsVisible() then
 					return
 				end
-				LIB.BreatheCall(szKey, false)
+				X.BreatheCall(szKey, false)
 				RequestID, hFrame = CreateWebPageFrame()
 				OnWebPageFrameCreate()
 			end)
@@ -517,17 +488,17 @@ local function OnCurlRequestResult()
 		CALL_AJAX[k] = nil
 	end
 end
-LIB.RegisterEvent('CURL_REQUEST_RESULT', 'AJAX', OnCurlRequestResult)
+X.RegisterEvent('CURL_REQUEST_RESULT', 'AJAX', OnCurlRequestResult)
 end
 
-function LIB.DownloadFile(szPath, resolve, reject)
-	local downloader = LIB.UI.GetTempElement(NSFormatString('Image.{$NS}#DownloadFile-') .. GetStringCRC(szPath) .. '#' .. GetTime())
+function X.DownloadFile(szPath, resolve, reject)
+	local downloader = X.UI.GetTempElement(X.NSFormatString('Image.{$NS}#DownloadFile-') .. GetStringCRC(szPath) .. '#' .. GetTime())
 	downloader.FromTextureFile = function(_, szPath)
-		Call(resolve, szPath)
+		X.Call(resolve, szPath)
 	end
 	downloader:FromRemoteFile(szPath, false, function(image, szURL, szAbsPath, bSuccess)
 		if not bSuccess then
-			Call(reject)
+			X.Call(reject)
 		end
 		downloader:GetParent():RemoveItem(downloader)
 	end)
@@ -535,56 +506,56 @@ end
 
 -- 发起数据接口安全稳定的多次重试 Ajax 调用
 -- 注意该接口暂只可用于上传 因为不支持返回结果内容
-function LIB.EnsureAjax(options)
+function X.EnsureAjax(options)
 	local key = GetStringCRC(options.url)
 	local configs, i, dc = {{'curl', 'post'}, {'origin', 'post'}, {'origin', 'get'}, {'webcef', 'get'}}, 1, nil
 	-- 移除无法访问的调用方式，但至少保留一个用于尝试桥接通信
-	for i, config in ipairs_r(configs) do
-		if i >= 1 and not LIB.CanAjax(config[1], config[2]) then
-			remove(configs, i)
+	for i, config in X.ipairs_r(configs) do
+		if i >= 1 and not X.CanAjax(config[1], config[2]) then
+			table.remove(configs, i)
 		end
 	end
 	--[[#DEBUG BEGIN]]
-	LIB.Debug('Ensure ajax ' .. key .. ' preparing: ' .. options.url, DEBUG_LEVEL.LOG)
+	X.Debug('Ensure ajax ' .. key .. ' preparing: ' .. options.url, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	local function TryUploadWithNextDriver()
 		local config = configs[i]
 		if not config then
-			SafeCall(options.error)
+			X.SafeCall(options.error)
 			return 0
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Ensure ajax ' .. key .. ' try mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
+		X.Debug('Ensure ajax ' .. key .. ' try mode ' .. config[1] .. '/' .. config[2], X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		dc, i = LIB.DelayCall(30000, TryUploadWithNextDriver), i + 1 -- 必须先发起保护再请求，因为请求可能会立刻失败触发gc
+		dc, i = X.DelayCall(30000, TryUploadWithNextDriver), i + 1 -- 必须先发起保护再请求，因为请求可能会立刻失败触发gc
 		local opt = {
 			driver = config[1],
 			method = config[2],
 			url = options.url,
 			fulfilled = function(...)
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('Ensure ajax ' .. key .. ' succeed with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
+				X.Debug('Ensure ajax ' .. key .. ' succeed with mode ' .. config[1] .. '/' .. config[2], X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
-				LIB.DelayCall(dc, false)
-				SafeCall(options.fulfilled, ...)
+				X.DelayCall(dc, false)
+				X.SafeCall(options.fulfilled, ...)
 			end,
 			error = function()
 				--[[#DEBUG BEGIN]]
-				LIB.Debug('Ensure ajax ' .. key .. ' failed with mode ' .. config[1] .. '/' .. config[2], DEBUG_LEVEL.LOG)
+				X.Debug('Ensure ajax ' .. key .. ' failed with mode ' .. config[1] .. '/' .. config[2], X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
-				LIB.DelayCall(dc, false)
+				X.DelayCall(dc, false)
 				TryUploadWithNextDriver()
 			end,
 		}
-		LIB.Ajax(opt)
+		X.Ajax(opt)
 	end
 	TryUploadWithNextDriver()
 end
 
 do local function StringSorter(p1, p2)
 	local k1, k2, c1, c2 = tostring(p1.k), tostring(p2.k)
-	for i = 1, max(#k1, #k2) do
-		c1, c2 = byte(k1, i, i), byte(k2, i, i)
+	for i = 1, math.max(#k1, #k2) do
+		c1, c2 = string.byte(k1, i, i), string.byte(k2, i, i)
 		if not c1 then
 			if not c2 then
 				return false
@@ -599,27 +570,27 @@ do local function StringSorter(p1, p2)
 		end
 	end
 end
-function LIB.GetPostDataCRC(tData, szPassphrase)
+function X.GetPostDataCRC(tData, szPassphrase)
 	local a, r = {}, {}
 	for k, v in pairs(tData) do
-		insert(a, { k = k, v = v })
+		table.insert(a, { k = k, v = v })
 	end
-	sort(a, StringSorter)
+	table.sort(a, StringSorter)
 	if szPassphrase then
-		insert(r, szPassphrase)
+		table.insert(r, szPassphrase)
 	end
 	for _, v in ipairs(a) do
 		if v.k ~= '_' and v.k ~= '_c' then
-			insert(r, tostring(v.k) .. ':' .. tostring(v.v))
+			table.insert(r, tostring(v.k) .. ':' .. tostring(v.v))
 		end
 	end
-	return GetStringCRC(concat(r, ';'))
+	return GetStringCRC(table.concat(r, ';'))
 end
 end
 
-function LIB.SignPostData(tData, szPassphrase)
+function X.SignPostData(tData, szPassphrase)
 	tData._t = GetCurrentTime()
-	tData._c = LIB.GetPostDataCRC(tData, szPassphrase)
+	tData._c = X.GetPostDataCRC(tData, szPassphrase)
 	tData._ = GetCurrentTime()
 	return tData
 end

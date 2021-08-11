@@ -10,69 +10,40 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = MY
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = NSFormatString('{$NS}_Notify')
-local PLUGIN_ROOT = PACKET_INFO.FRAMEWORK_ROOT
-local MODULE_NAME = NSFormatString('{$NS}_Notify')
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/notify/')
+local PLUGIN_NAME = X.NSFormatString('{$NS}_Notify')
+local PLUGIN_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT
+local MODULE_NAME = X.NSFormatString('{$NS}_Notify')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/notify/')
 --------------------------------------------------------------------------
-local O = LIB.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
+local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	anchor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
-		xSchema = Schema.FrameAnchor,
+		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
 	},
 	bEntry = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDesc = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDisableDismiss = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
-		xSchema = Schema.Boolean,
+		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 })
@@ -82,10 +53,10 @@ local FRAME_NAME = MODULE_NAME
 local TIP_FRAME_NAME = MODULE_NAME .. 'Tip'
 
 local NOTIFY_LIST = {}
-local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Notify.ini'
+local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Notify.ini'
 
 function D.Create(opt)
-	insert(NOTIFY_LIST, {
+	table.insert(NOTIFY_LIST, {
 		bUnread = true,
 		szKey = opt.szKey,
 		szMsg = opt.szMsg,
@@ -98,16 +69,16 @@ function D.Create(opt)
 		D.ShowTip(opt.szMsg)
 	end
 	if opt.bPlaySound then
-		LIB.PlaySound(opt.szSound or 'Notify.ogg', opt.szCustomSound)
+		X.PlaySound(opt.szSound or 'Notify.ogg', opt.szCustomSound)
 	end
 	return opt.szKey
 end
-LIB.CreateNotify = D.Create
+X.CreateNotify = D.Create
 
 function D.Dismiss(szKey, bOnlyData)
-	for i, v in ipairs_r(NOTIFY_LIST) do
+	for i, v in X.ipairs_r(NOTIFY_LIST) do
 		if v.szKey == szKey then
-			remove(NOTIFY_LIST, i)
+			table.remove(NOTIFY_LIST, i)
 			FireUIEvent('MY_NOTIFY_DISMISS', szKey)
 		end
 	end
@@ -118,7 +89,7 @@ function D.Dismiss(szKey, bOnlyData)
 	D.DrawNotifies(true)
 end
 
-function LIB.DismissNotify(...)
+function X.DismissNotify(...)
 	if O.bDisableDismiss then
 		return
 	end
@@ -142,13 +113,13 @@ function D.HookEntry()
 		local szXml = GetFormatText(_L['Addon notification'], 59)
 			.. CONSTANT.XML_LINE_BREAKER
 			.. GetFormatText(_L['Click to view addon notification.'], 162)
-		LIB.OutputTip(this, szXml, true, UI.TIP_POSITION.RIGHT_LEFT_AND_BOTTOM_TOP)
+		X.OutputTip(this, szXml, true, UI.TIP_POSITION.RIGHT_LEFT_AND_BOTTOM_TOP)
 	end
 	wItem:Lookup('Btn_News_XJ').OnLButtonClick = function()
 		local menu = {}
 		for _, p in pairs(wItem.tPacket) do
 			if p.nTotal > 0 then
-				insert(menu, {
+				table.insert(menu, {
 					szOption = p.szName .. (p.nUnread and '  (' .. p.nUnread .. ')' or ''),
 					fnAction = p.fnAction,
 				})
@@ -189,14 +160,14 @@ function D.UpdateEntry()
 		wItem.tPacket = {}
 	end
 	if nTotal > 0 then
-		wItem.tPacket[PACKET_INFO.NAME_SPACE] = {
-			szName = PACKET_INFO.NAME,
+		wItem.tPacket[X.PACKET_INFO.NAME_SPACE] = {
+			szName = X.PACKET_INFO.NAME,
 			nTotal = nTotal,
 			nUnread = nUnread,
 			fnAction = D.OpenPanel,
 		}
 	else
-		wItem.tPacket[PACKET_INFO.NAME_SPACE] = nil
+		wItem.tPacket[X.PACKET_INFO.NAME_SPACE] = nil
 	end
 	-- ÖØÐÂ»æÖÆ
 	local bShow, nUnread = false, 0
@@ -268,7 +239,7 @@ function D.DrawNotifies(bAutoClose)
 		return
 	end
 	hList:Clear()
-	local nStart, nCount, nStep = 1, min(#NOTIFY_LIST, 100), 1
+	local nStart, nCount, nStep = 1, math.min(#NOTIFY_LIST, 100), 1
 	if O.bDesc then
 		nStart, nStep = #NOTIFY_LIST, -1
 	end
@@ -279,7 +250,7 @@ function D.DrawNotifies(bAutoClose)
 		local nDeltaH = hMsg:GetH()
 		hMsg:AppendItemFromString(notify.szMsg)
 		hMsg:FormatAllItemPos()
-		nDeltaH = max(select(2, hMsg:GetAllItemSize()), 25) - nDeltaH
+		nDeltaH = math.max(select(2, hMsg:GetAllItemSize()), 25) - nDeltaH
 		hMsg:SetH(hMsg:GetH() + nDeltaH)
 		hItem:SetH(hItem:GetH() + nDeltaH)
 		for _, v in ipairs({
@@ -310,7 +281,7 @@ end
 
 function D.OnFrameCreate()
 	D.DrawNotifies()
-	this:Lookup('', 'Text_Title'):SetText(PACKET_INFO.NAME .. ' - ' .. _L['Notify center'])
+	this:Lookup('', 'Text_Title'):SetText(X.PACKET_INFO.NAME .. ' - ' .. _L['Notify center'])
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 end
 
@@ -349,14 +320,14 @@ function D.OnLButtonClick()
 	end
 end
 
-LIB.RegisterInit(FRAME_NAME, function()
+X.RegisterInit(FRAME_NAME, function()
 	D.HookEntry()
 	D.UpdateEntry()
 end)
-LIB.RegisterUserSettingsUpdate('@@INIT@@', FRAME_NAME, function()
+X.RegisterUserSettingsUpdate('@@INIT@@', FRAME_NAME, function()
 	D.UpdateEntry()
 end)
-LIB.RegisterReload(FRAME_NAME, D.UnhookEntry)
+X.RegisterReload(FRAME_NAME, D.UnhookEntry)
 
 do
 local l_uiFrame, l_uiTipBoard
@@ -365,9 +336,9 @@ function D.ShowTip(szMsg)
 	l_uiFrame:FadeTo(500, 255)
 	local szHoverFrame = Station.GetMouseOverWindow() and Station.GetMouseOverWindow():GetRoot():GetName()
 	if szHoverFrame == TIP_FRAME_NAME then
-		LIB.DelayCall(TIP_FRAME_NAME .. '_Hide', 5000)
+		X.DelayCall(TIP_FRAME_NAME .. '_Hide', 5000)
 	else
-		LIB.DelayCall(TIP_FRAME_NAME .. '_Hide', 5000, function()
+		X.DelayCall(TIP_FRAME_NAME .. '_Hide', 5000, function()
 			l_uiFrame:FadeOut(500)
 		end)
 	end
@@ -386,7 +357,7 @@ local function OnInit()
 		customlayout = _L[FRAME_NAME],
 		oncustomlayout = function(bEnter, anchor)
 			if bEnter then
-				LIB.DelayCall(TIP_FRAME_NAME .. '_Hide', false)
+				X.DelayCall(TIP_FRAME_NAME .. '_Hide', false)
 				l_uiFrame:Show():Alpha(255)
 			else
 				O.anchor = l_uiFrame:Anchor()
@@ -398,28 +369,28 @@ local function OnInit()
 	l_uiTipBoard = l_uiFrame:Append('WndScrollHandleBox', {
 		handlestyle = 3, x = 0, y = 0, w = 250, h = 150,
 		onclick = function()
-			if LIB.IsInCustomUIMode() then
+			if X.IsInCustomUIMode() then
 				return
 			end
 			D.OpenPanel()
 			l_uiFrame:FadeOut(500)
 		end,
 		onhover = function(bIn)
-			if LIB.IsInCustomUIMode() then
+			if X.IsInCustomUIMode() then
 				return
 			end
 			if bIn then
-				LIB.DelayCall(TIP_FRAME_NAME .. '_Hide')
+				X.DelayCall(TIP_FRAME_NAME .. '_Hide')
 				l_uiFrame:FadeIn(500)
 			else
-				LIB.DelayCall(TIP_FRAME_NAME .. '_Hide', function()
+				X.DelayCall(TIP_FRAME_NAME .. '_Hide', function()
 					l_uiFrame:FadeOut(500)
 				end, 5000)
 			end
 		end,
 	})
 end
-LIB.RegisterInit(TIP_FRAME_NAME, OnInit)
+X.RegisterInit(TIP_FRAME_NAME, OnInit)
 end
 
 function D.OnPanelActivePartial(ui, X, Y, W, H, LH, nX, nY, nLFY)
@@ -477,5 +448,5 @@ local settings = {
 		},
 	},
 }
-_G[FRAME_NAME] = LIB.CreateModule(settings)
+_G[FRAME_NAME] = X.CreateModule(settings)
 end
