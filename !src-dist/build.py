@@ -180,7 +180,7 @@ def __7zip(file_name, base_message, base_hash, extra_ignore_file):
 
 	# Prepare for 7z compressing
 	print('zippping...')
-	os.system('start /wait /b ./!src-dist/bin/7z.exe a -t7z ' + file_name + ' -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@.7zipignore' + cmd_suffix)
+	os.system('start /wait /b ./!src-dist/bin/7z.exe a -t7z "' + file_name + '" -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@.7zipignore' + cmd_suffix)
 	print('File(s) compressing acomplished!')
 	print('Url: ' + file_name)
 	print('Based on git commit "%s(%s)".' % (base_message, base_hash) if base_hash != '' else 'Full package.')
