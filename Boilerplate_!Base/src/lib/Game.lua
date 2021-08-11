@@ -7,45 +7,16 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = Boilerplate
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 -- #######################################################################################################
 --                                 #                   # # # #   # # # #
@@ -62,7 +33,7 @@ local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --   #     # #   # #     #     #         # #           # # # #   # # # #
 -- #######################################################################################################
 -- 获取当前服务器名称
-function LIB.GetServer(nIndex)
+function X.GetServer(nIndex)
 	local display_region, display_server, region, server = GetUserServer()
 	region = region or display_region
 	server = server or display_server
@@ -76,7 +47,7 @@ function LIB.GetServer(nIndex)
 end
 
 -- 获取当前服务器显示名称
-function LIB.GetDisplayServer(nIndex)
+function X.GetDisplayServer(nIndex)
 	local display_region, display_server = GetUserServer()
 	if nIndex == 1 then
 		return display_region
@@ -88,7 +59,7 @@ function LIB.GetDisplayServer(nIndex)
 end
 
 -- 获取数据互通主服务器名称
-function LIB.GetRealServer(nIndex)
+function X.GetRealServer(nIndex)
 	local display_region, display_server, _, _, real_region, real_server = GetUserServer()
 	real_region = real_region or display_region
 	real_server = real_server or display_server
@@ -118,42 +89,42 @@ local function FindHLInfo(aList, tQuery)
 end
 
 local GetRelationCenter = _G.GetRelationCenter or _G.HomeLand_GetRelationCenter
-LIB.RegisterEvent('HOME_LAND_RESULT_CODE_INT', 'LIB#HL', function()
+X.RegisterEvent('HOME_LAND_RESULT_CODE_INT', 'LIB#HL', function()
 	local nResultType = arg0
 	if nResultType == CONSTANT.HOMELAND_RESULT_CODE.APPLY_COMMUNITY_INFO then -- 申请分线详情
 		local dwMapID, nCopyIndex, dwCenterID, nLineIndex = arg1, arg2, arg3, arg4
 		local szCenterName
-		for _, info in ipairs(IsFunction(GetRelationCenter) and GetRelationCenter(dwCenterID) or CONSTANT.EMPTY_TABLE) do
+		for _, info in ipairs(X.IsFunction(GetRelationCenter) and GetRelationCenter(dwCenterID) or CONSTANT.EMPTY_TABLE) do
 			if info.dwCenterID == dwCenterID then
 				szCenterName = info.szCenterName
 			end
 		end
-		insert(HL_INFO_CACHE, LIB.SetmetaReadonly({
+		table.insert(HL_INFO_CACHE, X.SetmetaReadonly({
 			dwMapID = dwMapID,
 			nCopyIndex = nCopyIndex,
 			dwCenterID = dwCenterID,
 			szCenterName = szCenterName,
 			nLineIndex = nLineIndex,
 		}))
-		for i, v in ipairs_r(HL_INFO_CALLBACK) do
+		for i, v in X.ipairs_r(HL_INFO_CALLBACK) do
 			local info = FindHLInfo(HL_INFO_CACHE, v.tQuery)
 			if info then
-				SafeCall(v.fnCallback, info)
-				remove(HL_INFO_CALLBACK, i)
+				X.SafeCall(v.fnCallback, info)
+				table.remove(HL_INFO_CALLBACK, i)
 			end
 		end
 	end
 end)
 
 local ApplyCommunityInfo = _G.HomeLand_ApplyCommunityInfo
-function LIB.GetHLLineInfo(tQuery, fnCallback)
+function X.GetHLLineInfo(tQuery, fnCallback)
 	local info = FindHLInfo(HL_INFO_CACHE, tQuery)
 	if info then
-		SafeCall(fnCallback, info)
+		X.SafeCall(fnCallback, info)
 		return info
 	end
-	if IsFunction(ApplyCommunityInfo) and tQuery.dwMapID and tQuery.nCopyIndex then
-		insert(HL_INFO_CALLBACK, {
+	if X.IsFunction(ApplyCommunityInfo) and tQuery.dwMapID and tQuery.nCopyIndex then
+		table.insert(HL_INFO_CALLBACK, {
 			tQuery = tQuery,
 			fnCallback = fnCallback,
 		})
@@ -169,7 +140,7 @@ end
 do
 local S2L_CACHE = setmetatable({}, { __mode = 'k' })
 local L2S_CACHE = setmetatable({}, { __mode = 'k' })
-function LIB.ConvertNpcID(dwID, eType)
+function X.ConvertNpcID(dwID, eType)
 	if IsPlayer(dwID) then
 		if not S2L_CACHE[dwID] then
 			S2L_CACHE[dwID] = { dwID + 0x40000000 }
@@ -185,37 +156,37 @@ end
 end
 
 do
-local O = LIB.CreateUserSettingsModule('LIB', _L['System'], {
+local O = X.CreateUserSettingsModule('LIB', _L['System'], {
 	szDistanceType = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
-		xSchema = Schema.OneOf('gwwean', 'euclidean','plane'),
+		xSchema = X.Schema.OneOf('gwwean', 'euclidean','plane'),
 		xDefaultValue = 'gwwean',
 	},
 })
-function LIB.GetGlobalDistanceType()
+function X.GetGlobalDistanceType()
 	return O.szDistanceType
 end
 
-function LIB.SetGlobalDistanceType(szType)
+function X.SetGlobalDistanceType(szType)
 	O.szDistanceType = szType
 end
 
-function LIB.GetDistanceTypeList(bGlobal)
+function X.GetDistanceTypeList(bGlobal)
 	local t = {
 		{ szType = 'gwwean', szText = _L.DISTANCE_TYPE['gwwean'] },
 		{ szType = 'euclidean', szText = _L.DISTANCE_TYPE['euclidean'] },
 		{ szType = 'plane', szText = _L.DISTANCE_TYPE['plane'] },
 	}
 	if (bGlobal) then
-		insert(t, { szType = 'global', szText = _L.DISTANCE_TYPE['global'] })
+		table.insert(t, { szType = 'global', szText = _L.DISTANCE_TYPE['global'] })
 	end
 	return t
 end
 
-function LIB.GetDistanceTypeMenu(bGlobal, eValue, fnAction)
+function X.GetDistanceTypeMenu(bGlobal, eValue, fnAction)
 	local t = {}
-	for _, p in ipairs(LIB.GetDistanceTypeList(true)) do
+	for _, p in ipairs(X.GetDistanceTypeList(true)) do
 		local t1 = {
 			szOption = p.szText,
 			bCheck = true, bMCheck = true,
@@ -229,52 +200,52 @@ function LIB.GetDistanceTypeMenu(bGlobal, eValue, fnAction)
 			t1.nMouseOverFrame = 106
 			t1.szLayer = 'ICON_RIGHTMOST'
 			t1.fnClickIcon = function()
-				LIB.ShowPanel()
-				LIB.SwitchTab('GlobalConfig')
+				X.ShowPanel()
+				X.SwitchTab('GlobalConfig')
 				UI.ClosePopupMenu()
 			end
 		end
-		insert(t, t1)
+		table.insert(t, t1)
 	end
 	return t
 end
 end
 
 -- OObject: KObject | {nType, dwID} | {dwID} | {nType, szName} | {szName}
--- LIB.GetDistance(OObject[, szType])
--- LIB.GetDistance(nX, nY)
--- LIB.GetDistance(nX, nY, nZ[, szType])
--- LIB.GetDistance(OObject1, OObject2[, szType])
--- LIB.GetDistance(OObject1, nX2, nY2)
--- LIB.GetDistance(OObject1, nX2, nY2, nZ2[, szType])
--- LIB.GetDistance(nX1, nY1, nX2, nY2)
--- LIB.GetDistance(nX1, nY1, nZ1, nX2, nY2, nZ2[, szType])
+-- X.GetDistance(OObject[, szType])
+-- X.GetDistance(nX, nY)
+-- X.GetDistance(nX, nY, nZ[, szType])
+-- X.GetDistance(OObject1, OObject2[, szType])
+-- X.GetDistance(OObject1, nX2, nY2)
+-- X.GetDistance(OObject1, nX2, nY2, nZ2[, szType])
+-- X.GetDistance(nX1, nY1, nX2, nY2)
+-- X.GetDistance(nX1, nY1, nZ1, nX2, nY2, nZ2[, szType])
 -- szType: 'euclidean': 欧氏距离 (default)
 --         'plane'    : 平面距离
 --         'gwwean'   : 郭氏距离
 --         'global'   : 使用全局配置
-function LIB.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+function X.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 	local szType
 	local nX1, nY1, nZ1 = 0, 0, 0
 	local nX2, nY2, nZ2 = 0, 0, 0
-	if IsTable(arg0) then
-		arg0 = LIB.GetObject(unpack(arg0))
+	if X.IsTable(arg0) then
+		arg0 = X.GetObject(unpack(arg0))
 		if not arg0 then
 			return
 		end
 	end
-	if IsTable(arg1) then
-		arg1 = LIB.GetObject(unpack(arg1))
+	if X.IsTable(arg1) then
+		arg1 = X.GetObject(unpack(arg1))
 		if not arg1 then
 			return
 		end
 	end
-	if IsUserdata(arg0) then -- OObject -
+	if X.IsUserdata(arg0) then -- OObject -
 		nX1, nY1, nZ1 = arg0.nX, arg0.nY, arg0.nZ
-		if IsUserdata(arg1) then -- OObject1, OObject2
+		if X.IsUserdata(arg1) then -- OObject1, OObject2
 			nX2, nY2, nZ2, szType = arg1.nX, arg1.nY, arg1.nZ, arg2
-		elseif IsNumber(arg1) and IsNumber(arg2) then -- OObject1, nX2, nY2
-			if IsNumber(arg3) then -- OObject1, nX2, nY2, nZ2[, szType]
+		elseif X.IsNumber(arg1) and X.IsNumber(arg2) then -- OObject1, nX2, nY2
+			if X.IsNumber(arg3) then -- OObject1, nX2, nY2, nZ2[, szType]
 				nX2, nY2, nZ2, szType = arg1, arg2, arg3, arg4
 			else -- OObject1, nX2, nY2[, szType]
 				nX2, nY2, szType = arg1, arg2, arg3
@@ -283,10 +254,10 @@ function LIB.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 			local me = GetClientPlayer()
 			nX2, nY2, nZ2, szType = me.nX, me.nY, me.nZ, arg1
 		end
-	elseif IsNumber(arg0) and IsNumber(arg1) then -- nX1, nY1 -
-		if IsNumber(arg2) then
-			if IsNumber(arg3) then
-				if IsNumber(arg4) and IsNumber(arg5) then -- nX1, nY1, nZ1, nX2, nY2, nZ2[, szType]
+	elseif X.IsNumber(arg0) and X.IsNumber(arg1) then -- nX1, nY1 -
+		if X.IsNumber(arg2) then
+			if X.IsNumber(arg3) then
+				if X.IsNumber(arg4) and X.IsNumber(arg5) then -- nX1, nY1, nZ1, nX2, nY2, nZ2[, szType]
 					nX1, nY1, nZ1, nX2, nY2, nZ2, szType = arg0, arg1, arg2, arg3, arg4, arg5, arg6
 				else -- nX1, nY1, nX2, nY2[, szType]
 					nX1, nY1, nX2, nY2, szType = arg0, arg1, arg2, arg3, arg4
@@ -301,19 +272,19 @@ function LIB.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 		end
 	end
 	if not szType or szType == 'global' then
-		szType = LIB.GetGlobalDistanceType()
+		szType = X.GetGlobalDistanceType()
 	end
 	if szType == 'plane' then
-		return floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2) ^ 0.5) / 64
+		return math.floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2) ^ 0.5) / 64
 	end
 	if szType == 'gwwean' then
-		return max(floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2) ^ 0.5) / 64, floor(abs(nZ1 / 8 - nZ2 / 8)) / 64)
+		return math.max(math.floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2) ^ 0.5) / 64, math.floor(math.abs(nZ1 / 8 - nZ2 / 8)) / 64)
 	end
-	return floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2 + (nZ1 / 8 - nZ2 / 8) ^ 2) ^ 0.5) / 64
+	return math.floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2 + (nZ1 / 8 - nZ2 / 8) ^ 2) ^ 0.5) / 64
 end
 
 do local BUFF_CACHE = {}
-function LIB.GetBuffName(dwBuffID, dwLevel)
+function X.GetBuffName(dwBuffID, dwLevel)
 	local xKey = dwBuffID
 	if dwLevel then
 		xKey = dwBuffID .. '_' .. dwLevel
@@ -335,9 +306,9 @@ end
 end
 
 -- 通过BUFF名称获取BUFF信息
--- (table) LIB.GetBuffByName(szName)
+-- (table) X.GetBuffByName(szName)
 do local CACHE
-function LIB.GetBuffByName(szName)
+function X.GetBuffByName(szName)
 	if not CACHE then
 		local aCache, tLine, tExist = {}, nil, nil
 		for i = 1, g_tTable.Buff:GetRowCount() do
@@ -355,26 +326,26 @@ function LIB.GetBuffByName(szName)
 end
 end
 
-function LIB.GetEndTime(nEndFrame, bAllowNegative)
+function X.GetEndTime(nEndFrame, bAllowNegative)
 	if bAllowNegative then
 		return (nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
 	end
-	return max(0, nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
+	return math.max(0, nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
 end
 
 -- 获取指定名字的右键菜单
-function LIB.GetTargetContextMenu(dwType, szName, dwID)
+function X.GetTargetContextMenu(dwType, szName, dwID)
 	local t = {}
 	if dwType == TARGET.PLAYER then
 		-- 复制
-		insert(t, {
+		table.insert(t, {
 			szOption = _L['Copy'],
 			fnAction = function()
-				LIB.SendChat(GetClientPlayer().szName, '[' .. szName .. ']')
+				X.SendChat(GetClientPlayer().szName, '[' .. szName .. ']')
 			end,
 		})
 		-- 密聊 好友 邀请入帮 跟随
-		Call(InsertPlayerCommonMenu, t, dwID, szName)
+		X.Call(InsertPlayerCommonMenu, t, dwID, szName)
 		-- insert invite team
 		if szName and InsertInviteTeamMenu then
 			InsertInviteTeamMenu(t, szName)
@@ -388,7 +359,7 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 		end
 		-- insert view equip
 		if dwID and UI_GetClientPlayerID() ~= dwID then
-			insert(t, {
+			table.insert(t, {
 				szOption = _L['View equipment'],
 				fnAction = function()
 					ViewInviteToPlayer(dwID)
@@ -396,7 +367,7 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 			})
 		end
 		-- insert view arena
-		insert(t, {
+		table.insert(t, {
 			szOption = g_tStrings.LOOKUP_CORPS,
 			-- fnDisable = function() return not GetPlayer(dwID) end,
 			fnAction = function()
@@ -413,7 +384,7 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 			if v.szOption == g_tStrings.LOOKUP_INFO then
 				for _, vv in ipairs(v) do
 					if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then -- 查看奇穴
-						insert(t, vv)
+						table.insert(t, vv)
 						break
 					end
 				end
@@ -429,7 +400,7 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 			or v.szOption == g_tStrings.STR_MAKE_TRADDING       -- 交易
 			or v.szOption == g_tStrings.REPORT_RABOT            -- 举报外挂
 			then
-				insert(t, v)
+				table.insert(t, v)
 			end
 		end
 	end
@@ -438,13 +409,13 @@ function LIB.GetTargetContextMenu(dwType, szName, dwID)
 end
 
 -- 获取秘境选择菜单
--- (table) LIB.GetDungeonMenu(fnAction, bOnlyRaid)
+-- (table) X.GetDungeonMenu(fnAction, bOnlyRaid)
 do
 local function RecruitItemToDungeonMenu(p, fnAction, tChecked)
 	if p.bParent then
 		local t = { szOption = p.TypeName or p.SubTypeName }
 		for _, pp in ipairs(p) do
-			insert(t, RecruitItemToDungeonMenu(pp, fnAction, tChecked))
+			table.insert(t, RecruitItemToDungeonMenu(pp, fnAction, tChecked))
 		end
 		if #t > 0 then
 			return t
@@ -453,7 +424,7 @@ local function RecruitItemToDungeonMenu(p, fnAction, tChecked)
 		-- 不限阵营 有地图ID 7点开始 持续24小时 基本就是秘境了
 		if p.nCamp == 7
 		and p.nStartTime == 7 and p.nLastTime == 24
-		and p.dwMapID and LIB.IsDungeonMap(p.dwMapID) then
+		and p.dwMapID and X.IsDungeonMap(p.dwMapID) then
 			return {
 				szOption = p.szName,
 				bCheck = tChecked and true or false,
@@ -469,16 +440,16 @@ local function RecruitItemToDungeonMenu(p, fnAction, tChecked)
 	end
 	return nil
 end
-function LIB.GetDungeonMenu(fnAction, bOnlyRaid, tChecked)
+function X.GetDungeonMenu(fnAction, bOnlyRaid, tChecked)
 	local t = {}
-	for _, p in ipairs(LIB.Table_GetTeamRecruit() or {}) do
-		insert(t, RecruitItemToDungeonMenu(p, fnAction, tChecked))
+	for _, p in ipairs(X.Table_GetTeamRecruit() or {}) do
+		table.insert(t, RecruitItemToDungeonMenu(p, fnAction, tChecked))
 	end
 	return t
 end
 end
 
-function LIB.GetTypeGroupMap()
+function X.GetTypeGroupMap()
 	-- 计算地图分组
 	local tGroupMap, tMapExist = {}, {}
 	local function GroupMapIterator(dwMapID, szGroup, szMapName)
@@ -492,7 +463,7 @@ function LIB.GetTypeGroupMap()
 			if not tGroupMap[szGroup] then
 				tGroupMap[szGroup] = {}
 			end
-			insert(tGroupMap[szGroup], { dwID = dwMapID, szName = IsEmpty(szMapName) and ('#' .. dwMapID) or szMapName })
+			table.insert(tGroupMap[szGroup], { dwID = dwMapID, szName = X.IsEmpty(szMapName) and ('#' .. dwMapID) or szMapName })
 		end
 		tMapExist[dwMapID] = szGroup or 'IGNORE'
 	end
@@ -501,7 +472,7 @@ function LIB.GetTypeGroupMap()
 	if g_tTable.DLCInfo then
 		for i = 2, g_tTable.DLCInfo:GetRowCount() do
 			local tLine = g_tTable.DLCInfo:GetRow(i)
-			local szVersionName = LIB.TrimString(tLine.szDLCName)
+			local szVersionName = X.TrimString(tLine.szDLCName)
 			tWeight[szVersionName] = 2000 + i * 10
 		end
 	end
@@ -517,7 +488,7 @@ function LIB.GetTypeGroupMap()
 	-- 获取秘境类型
 	for i = 2, g_tTable.DungeonInfo:GetRowCount() do
 		local tLine = g_tTable.DungeonInfo:GetRow(i)
-		local szVersionName = LIB.TrimString(tLine.szVersionName)
+		local szVersionName = X.TrimString(tLine.szVersionName)
 		local szGroup = szVersionName
 		if tLine.dwClassID == 1 or tLine.dwClassID == 2 then
 			szGroup = szGroup .. ' - ' .. _L['Team dungeon']
@@ -561,10 +532,10 @@ function LIB.GetTypeGroupMap()
 	-- 哈希转数组
 	local aGroup = {}
 	for szGroup, aMapInfo in pairs(tGroupMap) do
-		insert(aGroup, { szGroup = szGroup, aMapInfo = aMapInfo })
+		table.insert(aGroup, { szGroup = szGroup, aMapInfo = aMapInfo })
 	end
 	-- 排序
-	sort(aGroup, function(a, b)
+	table.sort(aGroup, function(a, b)
 		if not tWeight[a.szGroup] then
 			return false
 		elseif not tWeight[b.szGroup] then
@@ -576,7 +547,7 @@ function LIB.GetTypeGroupMap()
 	return aGroup
 end
 
-function LIB.GetRegionGroupMap()
+function X.GetRegionGroupMap()
 	local tMapRegion = {}
 	local nCount = g_tTable.MapList:GetRowCount()
 	for i = 2, nCount do
@@ -592,18 +563,18 @@ function LIB.GetRegionGroupMap()
 					if not tRegion.aRaid then
 						tRegion.aRaid = {}
 					end
-					insert(tRegion.aRaid, { dwID = tLine.nID, szName = tLine.szMiddleMap })
+					table.insert(tRegion.aRaid, { dwID = tLine.nID, szName = tLine.szMiddleMap })
 				else
 					if not tRegion.aDungeon then
 						tRegion.aDungeon = {}
 					end
-					insert(tRegion.aDungeon, { dwID = tLine.nID, szName = tLine.szMiddleMap })
+					table.insert(tRegion.aDungeon, { dwID = tLine.nID, szName = tLine.szMiddleMap })
 				end
 			else
 				if not tRegion.aMap then
 					tRegion.aMap = {}
 				end
-				insert(tRegion.aMap, { dwID = tLine.nID, szName = tLine.szMiddleMap })
+				table.insert(tRegion.aMap, { dwID = tLine.nID, szName = tLine.szMiddleMap })
 			end
 		end
 	end
@@ -613,7 +584,7 @@ function LIB.GetRegionGroupMap()
 		local tLine = g_tTable.RegionMap:GetRow(i)
 		local info = tMapRegion[tLine.dwRegionID]
 		if info then
-			insert(aRegion, {
+			table.insert(aRegion, {
 				dwID = tLine.dwRegionID,
 				szName = tLine.szRegionName,
 				aMapInfo = info.aMap,
@@ -632,7 +603,7 @@ end
 
 -- 获取指定活动任务列表
 -- szType枚举值见 @{{武林通鉴 szType 枚举}}
-function LIB.GetActivityQuest(szType)
+function X.GetActivityQuest(szType)
 	local aQuestID = {}
 	local me = GetClientPlayer()
 	local date = TimeToDate(GetCurrentTime())
@@ -641,12 +612,12 @@ function LIB.GetActivityQuest(szType)
 		if (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_TEAM_DUNGEON)
 		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_RAID_DUNGEON)
 		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_WEEK_PUBLIC_QUEST) then
-			for _, szQuestID in ipairs(LIB.SplitString(p.szQuestID, ';')) do
+			for _, szQuestID in ipairs(X.SplitString(p.szQuestID, ';')) do
 				local tLine = Table_GetCalenderActivityQuest(szQuestID)
 				if tLine and tLine.nNpcTemplateID ~= -1 then
 					local nQuestID = select(2, me.RandomByDailyQuest(szQuestID, tLine.nNpcTemplateID))
 					if nQuestID then
-						insert(aQuestID, {nQuestID, tLine.nNpcTemplateID})
+						table.insert(aQuestID, {nQuestID, tLine.nNpcTemplateID})
 					end
 				end
 			end
@@ -657,32 +628,32 @@ end
 
 -- 获取指定活动地图列表
 -- szType枚举值见 @{{武林通鉴 szType 枚举}}
-function LIB.GetActivityMap(szType)
+function X.GetActivityMap(szType)
 	local aMap = {}
-	local aQuestInfo = LIB.GetActivityQuest(szType)
+	local aQuestInfo = X.GetActivityQuest(szType)
 	for _, p in ipairs(aQuestInfo) do
 		local tInfo = p[1] and Table_GetQuestStringInfo(p[1])
 		local dwMapID = tInfo and tInfo.dwDungeonID
-		local map = dwMapID and LIB.GetMapInfo(dwMapID)
+		local map = dwMapID and X.GetMapInfo(dwMapID)
 		if map then
-			insert(aMap, map)
+			table.insert(aMap, map)
 		end
 	end
 	return aMap
 end
 
 -- 获取秘境CD列表（异步）
--- (table) LIB.GetMapSaveCopy(fnAction)
--- (number|nil) LIB.GetMapSaveCopy(dwMapID, fnAction)
+-- (table) X.GetMapSaveCopy(fnAction)
+-- (number|nil) X.GetMapSaveCopy(dwMapID, fnAction)
 do
 local QUEUE = {}
 local SAVED_COPY_CACHE, REQUEST_FRAME
-function LIB.GetMapSaveCopy(arg0, arg1)
+function X.GetMapSaveCopy(arg0, arg1)
 	local dwMapID, fnAction
-	if IsFunction(arg0) then
+	if X.IsFunction(arg0) then
 		fnAction = arg0
-	elseif IsNumber(arg0) then
-		if IsFunction(arg1) then
+	elseif X.IsNumber(arg0) then
+		if X.IsFunction(arg1) then
 			fnAction = arg1
 		end
 		dwMapID = arg0
@@ -701,7 +672,7 @@ function LIB.GetMapSaveCopy(arg0, arg1)
 		end
 	else
 		if fnAction then
-			insert(QUEUE, { dwMapID = dwMapID, fnAction = fnAction })
+			table.insert(QUEUE, { dwMapID = dwMapID, fnAction = fnAction })
 		end
 		if REQUEST_FRAME ~= GetLogicFrameCount() then
 			ApplyMapSaveCopy()
@@ -710,11 +681,11 @@ function LIB.GetMapSaveCopy(arg0, arg1)
 	end
 end
 
-function LIB.IsDungeonResetable(dwMapID)
+function X.IsDungeonResetable(dwMapID)
 	if not SAVED_COPY_CACHE then
 		return
 	end
-	if not LIB.IsDungeonMap(dwMapID, false) then
+	if not X.IsDungeonMap(dwMapID, false) then
 		return false
 	end
 	return SAVED_COPY_CACHE[dwMapID]
@@ -731,21 +702,21 @@ local function onApplyPlayerSavedCopyRespond()
 	end
 	QUEUE = {}
 end
-LIB.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', onApplyPlayerSavedCopyRespond)
+X.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', onApplyPlayerSavedCopyRespond)
 
 local function onCopyUpdated()
 	SAVED_COPY_CACHE = nil
 end
-LIB.RegisterEvent('ON_RESET_MAP_RESPOND', onCopyUpdated)
-LIB.RegisterEvent('ON_MAP_COPY_PROGRESS_UPDATE', onCopyUpdated)
+X.RegisterEvent('ON_RESET_MAP_RESPOND', onCopyUpdated)
+X.RegisterEvent('ON_MAP_COPY_PROGRESS_UPDATE', onCopyUpdated)
 end
 
 -- 获取日常周常下次刷新时间和刷新周期
--- (dwTime, dwCircle) LIB.GetRefreshTime(szType)
+-- (dwTime, dwCircle) X.GetRefreshTime(szType)
 -- @param szType {string} 刷新类型 daily weekly half-weekly
 -- @return dwTime {number} 下次刷新时间
 -- @return dwCircle {number} 刷新周期
-function LIB.GetRefreshTime(szType)
+function X.GetRefreshTime(szType)
 	local nNextTime, nCircle = 0, 0
 	local nTime = GetCurrentTime()
 	local date = TimeToDate(nTime)
@@ -780,24 +751,24 @@ function LIB.GetRefreshTime(szType)
 	return nNextTime, nCircle
 end
 
-function LIB.IsInSameRefreshTime(szType, dwTime)
-	local nNextTime, nCircle = LIB.GetRefreshTime(szType)
+function X.IsInSameRefreshTime(szType, dwTime)
+	local nNextTime, nCircle = X.GetRefreshTime(szType)
 	return nNextTime > dwTime and nNextTime - dwTime <= nCircle
 end
 
 -- 获取秘境地图刷新时间
--- (number nNextTime, number nCircle) LIB.GetDungeonRefreshTime(dwMapID)
-function LIB.GetDungeonRefreshTime(dwMapID)
+-- (number nNextTime, number nCircle) X.GetDungeonRefreshTime(dwMapID)
+function X.GetDungeonRefreshTime(dwMapID)
 	local _, nMapType, nMaxPlayerCount = GetMapParams(dwMapID)
 	if nMapType == MAP_TYPE.DUNGEON then
 		if nMaxPlayerCount <= 5 then -- 5人本
-			return LIB.GetRefreshTime('daily')
+			return X.GetRefreshTime('daily')
 		end
 		if nMaxPlayerCount <= 10 then -- 10人本
-			return LIB.GetRefreshTime('half-weekly')
+			return X.GetRefreshTime('half-weekly')
 		end
 		if nMaxPlayerCount <= 25 then -- 25人本
-			return LIB.GetRefreshTime('weekly')
+			return X.GetRefreshTime('weekly')
 		end
 	end
 	return 0, 0
@@ -805,23 +776,23 @@ end
 
 -- 地图首领列表
 do local BOSS_LIST, BOSS_LIST_CUSTOM
-local CACHE_PATH = {'temporary/bosslist.jx3dat', PATH_TYPE.GLOBAL}
-local CUSTOM_PATH = {'config/bosslist.jx3dat', PATH_TYPE.GLOBAL}
+local CACHE_PATH = {'temporary/bosslist.jx3dat', X.PATH_TYPE.GLOBAL}
+local CUSTOM_PATH = {'config/bosslist.jx3dat', X.PATH_TYPE.GLOBAL}
 local function LoadCustomList()
 	if not BOSS_LIST_CUSTOM then
-		BOSS_LIST_CUSTOM = LIB.LoadLUAData(CUSTOM_PATH) or {}
+		BOSS_LIST_CUSTOM = X.LoadLUAData(CUSTOM_PATH) or {}
 	end
 end
 local function SaveCustomList()
-	LIB.SaveLUAData(CUSTOM_PATH, BOSS_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
+	X.SaveLUAData(CUSTOM_PATH, BOSS_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
 end
 local function GenerateList(bForceRefresh)
 	LoadCustomList()
 	if BOSS_LIST and not bForceRefresh then
 		return
 	end
-	LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
-	BOSS_LIST = LIB.LoadLUAData(CACHE_PATH)
+	X.CreateDataRoot(X.PATH_TYPE.GLOBAL)
+	BOSS_LIST = X.LoadLUAData(CACHE_PATH)
 	if bForceRefresh or not BOSS_LIST then
 		BOSS_LIST = {}
 		local nCount = g_tTable.DungeonBoss:GetRowCount()
@@ -829,7 +800,7 @@ local function GenerateList(bForceRefresh)
 			local tLine = g_tTable.DungeonBoss:GetRow(i)
 			local dwMapID = tLine.dwMapID
 			local szNpcList = tLine.szNpcList
-			for szNpcIndex in gmatch(szNpcList, '(%d+)') do
+			for szNpcIndex in string.gmatch(szNpcList, '(%d+)') do
 				local p = g_tTable.DungeonNpc:Search(tonumber(szNpcIndex))
 				if p then
 					if not BOSS_LIST[dwMapID] then
@@ -839,11 +810,11 @@ local function GenerateList(bForceRefresh)
 				end
 			end
 		end
-		LIB.SaveLUAData(CACHE_PATH, BOSS_LIST)
-		LIB.Sysmsg(_L('Boss list updated to v%s.', GLOBAL.GAME_VERSION))
+		X.SaveLUAData(CACHE_PATH, BOSS_LIST)
+		X.Sysmsg(_L('Boss list updated to v%s.', GLOBAL.GAME_VERSION))
 	end
 
-	for dwMapID, tInfo in pairs(LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/bosslist/{$edition}.jx3dat') or {}) do
+	for dwMapID, tInfo in pairs(X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/bosslist/{$edition}.jx3dat') or {}) do
 		if not BOSS_LIST[dwMapID] then
 			BOSS_LIST[dwMapID] = {}
 		end
@@ -857,8 +828,8 @@ local function GenerateList(bForceRefresh)
 end
 
 -- 获取指定地图指定模板ID的NPC是不是首领
--- (boolean) LIB.IsBoss(dwMapID, dwTem)
-function LIB.IsBoss(dwMapID, dwTemplateID)
+-- (boolean) X.IsBoss(dwMapID, dwTem)
+function X.IsBoss(dwMapID, dwTemplateID)
 	GenerateList()
 	return (
 		(
@@ -868,16 +839,16 @@ function LIB.IsBoss(dwMapID, dwTemplateID)
 	) and true or false
 end
 
-LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#Bosslist'), function()
-	local dwType, dwID = LIB.GetTarget()
+X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#Bosslist'), function()
+	local dwType, dwID = X.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
-		local p = LIB.GetObject(dwType, dwID)
-		local szName = LIB.GetObjectName(p)
+		local p = X.GetObject(dwType, dwID)
+		local szName = X.GetObjectName(p)
 		local dwMapID = GetClientPlayer().GetMapID()
 		local szMapName = Table_GetMapName(dwMapID)
 		local dwTemplateID = p.dwTemplateID
-		if LIB.IsBoss(dwMapID, dwTemplateID) then
+		if X.IsBoss(dwMapID, dwTemplateID) then
 			return {
 				szOption = _L['Remove from BOSS list'],
 				fnAction = function()
@@ -894,8 +865,8 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#Bosslist'), function()
 					end
 					BOSS_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = nil
 					SaveCustomList()
-					FireUIEvent(NSFormatString('{$NS}_SET_BOSS'), dwMapID, dwTemplateID, false)
-					FireUIEvent(NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, LIB.IsImportantNpc(dwMapID, dwTemplateID))
+					FireUIEvent(X.NSFormatString('{$NS}_SET_BOSS'), dwMapID, dwTemplateID, false)
+					FireUIEvent(X.NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, X.IsImportantNpc(dwMapID, dwTemplateID))
 				end,
 			}
 		else
@@ -912,8 +883,8 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#Bosslist'), function()
 					end
 					BOSS_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = szName
 					SaveCustomList()
-					FireUIEvent(NSFormatString('{$NS}_SET_BOSS'), dwMapID, dwTemplateID, true)
-					FireUIEvent(NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, LIB.IsImportantNpc(dwMapID, dwTemplateID))
+					FireUIEvent(X.NSFormatString('{$NS}_SET_BOSS'), dwMapID, dwTemplateID, true)
+					FireUIEvent(X.NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, X.IsImportantNpc(dwMapID, dwTemplateID))
 				end,
 			}
 		end
@@ -923,27 +894,27 @@ end
 
 -- 地图重要NPC列表
 do local INPC_LIST, INPC_LIST_CUSTOM
-local CACHE_PATH = {'temporary/inpclist.jx3dat', PATH_TYPE.GLOBAL}
+local CACHE_PATH = {'temporary/inpclist.jx3dat', X.PATH_TYPE.GLOBAL}
 local function LoadCustomList()
 	if not INPC_LIST_CUSTOM then
-		INPC_LIST_CUSTOM = LIB.LoadLUAData({'config/inpclist.jx3dat', PATH_TYPE.GLOBAL}) or {}
+		INPC_LIST_CUSTOM = X.LoadLUAData({'config/inpclist.jx3dat', X.PATH_TYPE.GLOBAL}) or {}
 	end
 end
 local function SaveCustomList()
-	LIB.SaveLUAData({'config/inpclist.jx3dat', PATH_TYPE.GLOBAL}, INPC_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
+	X.SaveLUAData({'config/inpclist.jx3dat', X.PATH_TYPE.GLOBAL}, INPC_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
 end
 local function GenerateList(bForceRefresh)
 	LoadCustomList()
 	if INPC_LIST and not bForceRefresh then
 		return
 	end
-	INPC_LIST = LIB.LoadLUAData(CACHE_PATH)
+	INPC_LIST = X.LoadLUAData(CACHE_PATH)
 	if bForceRefresh or not INPC_LIST then
 		INPC_LIST = {}
-		LIB.SaveLUAData(CACHE_PATH, INPC_LIST)
-		LIB.Sysmsg(_L('Important-NPC list updated to v%s.', GLOBAL.GAME_VERSION))
+		X.SaveLUAData(CACHE_PATH, INPC_LIST)
+		X.Sysmsg(_L('Important-NPC list updated to v%s.', GLOBAL.GAME_VERSION))
 	end
-	for dwMapID, tInfo in pairs(LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/inpclist/{$edition}.jx3dat') or {}) do
+	for dwMapID, tInfo in pairs(X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/inpclist/{$edition}.jx3dat') or {}) do
 		if not INPC_LIST[dwMapID] then
 			INPC_LIST[dwMapID] = {}
 		end
@@ -957,20 +928,20 @@ local function GenerateList(bForceRefresh)
 end
 
 -- 获取指定地图指定模板ID的NPC是不是重要NPC
--- (boolean) LIB.IsImportantNpc(dwMapID, dwTemplateID, bNoBoss)
-function LIB.IsImportantNpc(dwMapID, dwTemplateID, bNoBoss)
+-- (boolean) X.IsImportantNpc(dwMapID, dwTemplateID, bNoBoss)
+function X.IsImportantNpc(dwMapID, dwTemplateID, bNoBoss)
 	GenerateList()
 	return (
 		(
 			INPC_LIST[dwMapID] and INPC_LIST[dwMapID][dwTemplateID]
 			and not (INPC_LIST_CUSTOM[dwMapID] and INPC_LIST_CUSTOM[dwMapID].DEL[dwTemplateID])
 		) or (INPC_LIST_CUSTOM[dwMapID] and INPC_LIST_CUSTOM[dwMapID].ADD[dwTemplateID])
-	) and true or (not bNoBoss and LIB.IsBoss(dwMapID, dwTemplateID) or false)
+	) and true or (not bNoBoss and X.IsBoss(dwMapID, dwTemplateID) or false)
 end
 
 -- 获取指定模板ID的NPC是不是被屏蔽的NPC
--- (boolean) LIB.IsShieldedNpc(dwTemplateID, szType)
-function LIB.IsShieldedNpc(dwTemplateID, szType)
+-- (boolean) X.IsShieldedNpc(dwTemplateID, szType)
+function X.IsShieldedNpc(dwTemplateID, szType)
 	if not Table_IsShieldedNpc then
 		return false
 	end
@@ -981,16 +952,16 @@ function LIB.IsShieldedNpc(dwTemplateID, szType)
 	return bShieldFocus
 end
 
-LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#ImportantNpclist'), function()
-	local dwType, dwID = LIB.GetTarget()
+X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#ImportantNpclist'), function()
+	local dwType, dwID = X.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
-		local p = LIB.GetObject(dwType, dwID)
-		local szName = LIB.GetObjectName(p)
+		local p = X.GetObject(dwType, dwID)
+		local szName = X.GetObjectName(p)
 		local dwMapID = GetClientPlayer().GetMapID()
 		local szMapName = Table_GetMapName(dwMapID)
 		local dwTemplateID = p.dwTemplateID
-		if LIB.IsImportantNpc(dwMapID, dwTemplateID, true) then
+		if X.IsImportantNpc(dwMapID, dwTemplateID, true) then
 			return {
 				szOption = _L['Remove from Important-NPC list'],
 				fnAction = function()
@@ -1007,7 +978,7 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#ImportantNpclist'), funct
 					end
 					INPC_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = nil
 					SaveCustomList()
-					FireUIEvent(NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, false)
+					FireUIEvent(X.NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, false)
 				end,
 			}
 		else
@@ -1024,7 +995,7 @@ LIB.RegisterTargetAddonMenu(NSFormatString('{$NS}#Game#ImportantNpclist'), funct
 					end
 					INPC_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = szName
 					SaveCustomList()
-					FireUIEvent(NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, true)
+					FireUIEvent(X.NSFormatString('{$NS}_SET_IMPORTANT_NPC'), dwMapID, dwTemplateID, true)
 				end,
 			}
 		end
@@ -1033,54 +1004,54 @@ end)
 end
 
 do
-local O = LIB.CreateUserSettingsModule('LIB', _L['System'], {
+local O = X.CreateUserSettingsModule('LIB', _L['System'], {
 	tForceForegroundColor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		bDataSet = true,
 		szLabel = _L['Global color'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = CONSTANT.FORCE_COLOR_FG_DEFAULT['*'],
 		tDataSetDefaultValue = CONSTANT.FORCE_COLOR_FG_DEFAULT,
 	},
 	tForceBackgroundColor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		bDataSet = true,
 		szLabel = _L['Global color'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = CONSTANT.FORCE_COLOR_BG_DEFAULT['*'],
 		tDataSetDefaultValue = CONSTANT.FORCE_COLOR_BG_DEFAULT,
 	},
 	tCampForegroundColor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		bDataSet = true,
 		szLabel = _L['Global color'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = CONSTANT.CAMP_COLOR_FG_DEFAULT['*'],
 		tDataSetDefaultValue = CONSTANT.CAMP_COLOR_FG_DEFAULT,
 	},
 	tCampBackgroundColor = {
-		ePathType = PATH_TYPE.ROLE,
+		ePathType = X.PATH_TYPE.ROLE,
 		bDataSet = true,
 		szLabel = _L['Global color'],
-		xSchema = Schema.Tuple(Schema.Number, Schema.Number, Schema.Number),
+		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = CONSTANT.CAMP_COLOR_BG_DEFAULT['*'],
 		tDataSetDefaultValue = CONSTANT.CAMP_COLOR_BG_DEFAULT,
 	},
 })
 
 local function initForceCustom()
-	FireUIEvent(NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
+	FireUIEvent(X.NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#ForceColor', initForceCustom)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#ForceColor', initForceCustom)
 
-function LIB.GetForceColor(dwForce, szType)
+function X.GetForceColor(dwForce, szType)
 	if szType == 'background' then
 		return unpack(O.tForceBackgroundColor[dwForce])
 	end
 	return unpack(O.tForceForegroundColor[dwForce])
 end
 
-function LIB.SetForceColor(dwForce, szType, tCol)
+function X.SetForceColor(dwForce, szType, tCol)
 	if dwForce == 'reset' then
 		O('reset', { 'tForceForegroundColor', 'tForceBackgroundColor' })
 	elseif szType == 'background' then
@@ -1088,22 +1059,22 @@ function LIB.SetForceColor(dwForce, szType, tCol)
 	else
 		O.tForceForegroundColor[dwForce] = tCol
 	end
-	FireUIEvent(NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
+	FireUIEvent(X.NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
 end
 
 local function initCampCustom()
-	FireUIEvent(NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
+	FireUIEvent(X.NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
 end
-LIB.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#CampColor', initCampCustom)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#CampColor', initCampCustom)
 
-function LIB.GetCampColor(nCamp, szType)
+function X.GetCampColor(nCamp, szType)
 	if szType == 'background' then
 		return unpack(O.tCampBackgroundColor[nCamp])
 	end
 	return unpack(O.tCampForegroundColor[nCamp])
 end
 
-function LIB.SetCampColor(nCamp, szType, tCol)
+function X.SetCampColor(nCamp, szType, tCol)
 	if nCamp == 'reset' then
 		O('reset', { 'tCampForegroundColor', 'tCampBackgroundColor' })
 	elseif szType == 'background' then
@@ -1111,17 +1082,17 @@ function LIB.SetCampColor(nCamp, szType, tCol)
 	else
 		O.tCampForegroundColor[nCamp] = tCol
 	end
-	FireUIEvent(NSFormatString('{$NS}_CAMP_COLOR_UPDATE'))
+	FireUIEvent(X.NSFormatString('{$NS}_CAMP_COLOR_UPDATE'))
 end
 end
 
 do
 local FORCE_LIST
-function LIB.GetForceIDS()
+function X.GetForceIDS()
 	FORCE_LIST = {}
-	for _, dwForceID in pairs_c(CONSTANT.FORCE_TYPE) do
+	for _, dwForceID in X.pairs_c(CONSTANT.FORCE_TYPE) do
 		if dwForceID ~= CONSTANT.FORCE_TYPE.JIANG_HU then
-			insert(FORCE_LIST, dwForceID)
+			table.insert(FORCE_LIST, dwForceID)
 		end
 	end
 	return FORCE_LIST
@@ -1134,15 +1105,15 @@ for i, p in ipairs(CONSTANT.KUNGFU_LIST) do
 	ORDER[p.dwID] = i
 end
 local KUNGFU_LIST
-function LIB.GetKungfuIDS()
+function X.GetKungfuIDS()
 	if not KUNGFU_LIST then
 		KUNGFU_LIST = {}
-		for _, dwForceID in ipairs(LIB.GetForceIDS()) do
-			for _, dwKungfuID in ipairs(LIB.GetForceKungfuIDS(dwForceID)) do
-				insert(KUNGFU_LIST, dwKungfuID)
+		for _, dwForceID in ipairs(X.GetForceIDS()) do
+			for _, dwKungfuID in ipairs(X.GetForceKungfuIDS(dwForceID)) do
+				table.insert(KUNGFU_LIST, dwKungfuID)
 			end
 		end
-		sort(KUNGFU_LIST, function(p1, p2)
+		table.sort(KUNGFU_LIST, function(p1, p2)
 			if not ORDER[p2] then
 				return true
 			end
@@ -1159,10 +1130,10 @@ end
 do
 local KUNGFU_NAME_CACHE = {}
 local KUNGFU_SHORT_NAME_CACHE = {}
-function LIB.GetKungfuName(dwKungfuID, szType)
+function X.GetKungfuName(dwKungfuID, szType)
 	if not KUNGFU_NAME_CACHE[dwKungfuID] then
 		KUNGFU_NAME_CACHE[dwKungfuID] = Table_GetSkillName(dwKungfuID, 1) or ''
-		KUNGFU_SHORT_NAME_CACHE[dwKungfuID] = wsub(KUNGFU_NAME_CACHE[dwKungfuID], 1, 2)
+		KUNGFU_SHORT_NAME_CACHE[dwKungfuID] = wstring.sub(KUNGFU_NAME_CACHE[dwKungfuID], 1, 2)
 	end
 	if szType == 'short' then
 		return KUNGFU_SHORT_NAME_CACHE[dwKungfuID]
@@ -1194,23 +1165,23 @@ local NEARBY_DOODAD = {}   -- 附近的玩家
 local NEARBY_FIGHT = {}    -- 附近玩家和NPC战斗状态缓存
 
 -- 获取指定对象
--- (KObject, info, bIsInfo) LIB.GetObject([number dwType, ]number dwID)
--- (KObject, info, bIsInfo) LIB.GetObject([number dwType, ]string szName)
+-- (KObject, info, bIsInfo) X.GetObject([number dwType, ]number dwID)
+-- (KObject, info, bIsInfo) X.GetObject([number dwType, ]string szName)
 -- dwType: [可选]对象类型枚举 TARGET.*
 -- dwID  : 对象ID
 -- return: 根据 dwType 类型和 dwID 取得操作对象
 --         不存在时返回nil, nil
-function LIB.GetObject(arg0, arg1, arg2)
+function X.GetObject(arg0, arg1, arg2)
 	local dwType, dwID, szName
-	if IsNumber(arg0) then
-		if IsNumber(arg1) then
+	if X.IsNumber(arg0) then
+		if X.IsNumber(arg1) then
 			dwType, dwID = arg0, arg1
-		elseif IsString(arg1) then
+		elseif X.IsString(arg1) then
 			dwType, szName = arg0, arg1
-		elseif IsNil(arg1) then
+		elseif X.IsNil(arg1) then
 			dwID = arg0
 		end
-	elseif IsString(arg0) then
+	elseif X.IsString(arg0) then
 		szName = arg0
 	end
 	if not dwID and not szName then
@@ -1240,7 +1211,7 @@ function LIB.GetObject(arg0, arg1, arg2)
 		end
 		for dwObjectType, NEARBY_OBJECT in pairs(tSearch) do
 			for dwObjectID, KObject in pairs(NEARBY_OBJECT) do
-				if LIB.GetObjectName(KObject) == szName then
+				if X.GetObjectName(KObject) == szName then
 					dwType, dwID = dwObjectType, dwObjectID
 					break
 				end
@@ -1272,7 +1243,7 @@ function LIB.GetObject(arg0, arg1, arg2)
 end
 
 -- 获取目标血量和最大血量
-function LIB.GetObjectLife(obj)
+function X.GetObjectLife(obj)
 	if not obj then
 		return
 	end
@@ -1282,7 +1253,7 @@ end
 
 -- 根据模板ID获取NPC真实名称
 local NPC_NAME_CACHE, DOODAD_NAME_CACHE = {}, {}
-function LIB.GetTemplateName(dwType, dwTemplateID)
+function X.GetTemplateName(dwType, dwTemplateID)
 	local CACHE = dwType == TARGET.NPC and NPC_NAME_CACHE or DOODAD_NAME_CACHE
 	local szName
 	if CACHE[dwTemplateID] then
@@ -1299,34 +1270,34 @@ function LIB.GetTemplateName(dwType, dwTemplateID)
 		end
 		CACHE[dwTemplateID] = szName or ''
 	end
-	if IsEmpty(szName) then
+	if X.IsEmpty(szName) then
 		szName = nil
 	end
 	return szName
 end
 
 -- 获取指定对象的名字
--- LIB.GetObjectName(obj, eRetID)
--- LIB.GetObjectName(dwType, dwID, eRetID)
+-- X.GetObjectName(obj, eRetID)
+-- X.GetObjectName(dwType, dwID, eRetID)
 -- (KObject) obj    要获取名字的对象
 -- (string)  eRetID 是否返回对象ID信息
 --    'auto'   名字为空时返回 -- 默认值
 --    'always' 总是返回
 --    'never'  总是不返回
 local OBJECT_NAME = {
-	['PLAYER'   ] = LIB.CreateCache('LIB#GetObjectName#PLAYER.v'   ),
-	['NPC'      ] = LIB.CreateCache('LIB#GetObjectName#NPC.v'      ),
-	['DOODAD'   ] = LIB.CreateCache('LIB#GetObjectName#DOODAD.v'   ),
-	['ITEM'     ] = LIB.CreateCache('LIB#GetObjectName#ITEM.v'     ),
-	['ITEM_INFO'] = LIB.CreateCache('LIB#GetObjectName#ITEM_INFO.v'),
-	['UNKNOWN'  ] = LIB.CreateCache('LIB#GetObjectName#UNKNOWN.v'  ),
+	['PLAYER'   ] = X.CreateCache('LIB#GetObjectName#PLAYER.v'   ),
+	['NPC'      ] = X.CreateCache('LIB#GetObjectName#NPC.v'      ),
+	['DOODAD'   ] = X.CreateCache('LIB#GetObjectName#DOODAD.v'   ),
+	['ITEM'     ] = X.CreateCache('LIB#GetObjectName#ITEM.v'     ),
+	['ITEM_INFO'] = X.CreateCache('LIB#GetObjectName#ITEM_INFO.v'),
+	['UNKNOWN'  ] = X.CreateCache('LIB#GetObjectName#UNKNOWN.v'  ),
 }
-function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
+function X.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 	local KObject, szType, dwID, nExtraID, eRetID
-	if IsNumber(arg0) then
+	if X.IsNumber(arg0) then
 		local dwType = arg0
 		dwID, eRetID = arg1, arg2
-		KObject = LIB.GetObject(dwType, dwID)
+		KObject = X.GetObject(dwType, dwID)
 		if dwType == TARGET.PLAYER then
 			szType = 'PLAYER'
 		elseif dwType == TARGET.NPC then
@@ -1336,22 +1307,22 @@ function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 		else
 			szType = 'UNKNOWN'
 		end
-	elseif IsString(arg0) then
+	elseif X.IsString(arg0) then
 		if arg0 == 'PLAYER' or arg0 == 'NPC' or arg0 == 'DOODAD' then
-			if IsUserdata(arg1) then
+			if X.IsUserdata(arg1) then
 				KObject = arg1
 				dwID, eRetID = KObject.dwID, arg2
 			else
 				local dwType = TARGET[arg0]
 				dwID, eRetID = arg1, arg2
-				KObject = LIB.GetObject(dwType, dwID)
+				KObject = X.GetObject(dwType, dwID)
 				szType = arg0
 			end
 		elseif arg0 == 'ITEM' then
-			if IsUserdata(arg1) then
+			if X.IsUserdata(arg1) then
 				KObject = arg1
 				dwID, eRetID = KObject.dwID, arg2
-			elseif IsNumber(arg3) then
+			elseif X.IsNumber(arg3) then
 				local p = GetPlayer(arg1)
 				if p then
 					KObject = p.GetItem(arg2, arg3)
@@ -1360,7 +1331,7 @@ function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 					end
 					eRetID = arg4
 				end
-			elseif IsNumber(arg2) then
+			elseif X.IsNumber(arg2) then
 				local p = GetClientPlayer()
 				if p then
 					KObject = p.GetItem(arg1, arg2)
@@ -1375,10 +1346,10 @@ function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 			end
 			szType = 'ITEM'
 		elseif arg0 == 'ITEM_INFO' then
-			if IsUserdata(arg1) then
+			if X.IsUserdata(arg1) then
 				KObject = arg1
 				dwID, eRetID = KObject.dwID, arg2
-			elseif IsNumber(arg3) then
+			elseif X.IsNumber(arg3) then
 				dwID = arg1 .. ':' .. arg2 .. ':' .. arg3
 				nExtraID = arg3
 				eRetID = arg4
@@ -1394,7 +1365,7 @@ function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 	else
 		KObject, eRetID = arg0, arg1
 		if KObject then
-			szType = LIB.GetObjectType(KObject)
+			szType = X.GetObjectType(KObject)
 			if szType == 'ITEM_INFO' then
 				dwID = KObject.nGenre .. ':' .. KObject.dwID
 			else
@@ -1419,18 +1390,18 @@ function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 		end
 		if szType == 'PLAYER' then
 			szDispType = 'P'
-			cache.bFull = not IsEmpty(szName)
+			cache.bFull = not X.IsEmpty(szName)
 		elseif szType == 'NPC' then
 			szDispType = 'N'
 			if KObject then
-				if IsEmpty(szName) then
-					szName = LIB.GetTemplateName(TARGET.NPC, KObject.dwTemplateID)
+				if X.IsEmpty(szName) then
+					szName = X.GetTemplateName(TARGET.NPC, KObject.dwTemplateID)
 				end
 				if KObject.dwEmployer and KObject.dwEmployer ~= 0 then
-					if LIB.Table_IsSimplePlayer(KObject.dwTemplateID) then -- 长歌影子
-						szName = LIB.GetObjectName(GetPlayer(KObject.dwEmployer), eRetID)
-					elseif not IsEmpty(szName) then
-						local szEmpName = LIB.GetObjectName(
+					if X.Table_IsSimplePlayer(KObject.dwTemplateID) then -- 长歌影子
+						szName = X.GetObjectName(GetPlayer(KObject.dwEmployer), eRetID)
+					elseif not X.IsEmpty(szName) then
+						local szEmpName = X.GetObjectName(
 							(IsPlayer(KObject.dwEmployer) and GetPlayer(KObject.dwEmployer)) or GetNpc(KObject.dwEmployer),
 							'never'
 						)
@@ -1447,8 +1418,8 @@ function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 			end
 		elseif szType == 'DOODAD' then
 			szDispType = 'D'
-			if KObject and IsEmpty(szName) then
-				szName = LIB.Table_GetDoodadTemplateName(KObject.dwTemplateID)
+			if KObject and X.IsEmpty(szName) then
+				szName = X.Table_GetDoodadTemplateName(KObject.dwTemplateID)
 				if szName then
 					szName = szName:gsub('^%s*(.-)%s*$', '%1')
 				end
@@ -1457,13 +1428,13 @@ function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 		elseif szType == 'ITEM' then
 			szDispType = 'I'
 			if KObject then
-				szName = LIB.GetItemNameByItem(KObject)
+				szName = X.GetItemNameByItem(KObject)
 			end
 			cache.bFull = true
 		elseif szType == 'ITEM_INFO' then
 			szDispType = 'II'
 			if KObject then
-				szName = LIB.GetItemNameByItemInfo(KObject, nExtraID)
+				szName = X.GetItemNameByItemInfo(KObject, nExtraID)
 			end
 			cache.bFull = true
 		else
@@ -1471,14 +1442,14 @@ function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 			cache.bFull = false
 		end
 		if szType == 'NPC' then
-			szDispID = LIB.ConvertNpcID(dwID)
+			szDispID = X.ConvertNpcID(dwID)
 			if KObject then
 				szDispID = szDispID .. '@' .. KObject.dwTemplateID
 			end
 		else
 			szDispID = dwID
 		end
-		if IsEmpty(szName) then
+		if X.IsEmpty(szName) then
 			szName = nil
 		end
 		cache['never'] = szName
@@ -1495,8 +1466,8 @@ function LIB.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 end
 
 do
-local CACHE = LIB.CreateCache('LIB#GetObjectType.v')
-function LIB.GetObjectType(obj)
+local CACHE = X.CreateCache('LIB#GetObjectType.v')
+function X.GetObjectType(obj)
 	if not CACHE[obj] then
 		if NEARBY_PLAYER[obj.dwID] == obj then
 			CACHE[obj] = 'PLAYER'
@@ -1526,15 +1497,15 @@ end
 end
 
 -- 获取附近NPC列表
--- (table) LIB.GetNearNpc(void)
-function LIB.GetNearNpc(nLimit)
+-- (table) X.GetNearNpc(void)
+function X.GetNearNpc(nLimit)
 	local aNpc = {}
 	for k, _ in pairs(NEARBY_NPC) do
 		local npc = GetNpc(k)
 		if not npc then
 			NEARBY_NPC[k] = nil
 		else
-			insert(aNpc, npc)
+			table.insert(aNpc, npc)
 			if nLimit and #aNpc == nLimit then
 				break
 			end
@@ -1543,10 +1514,10 @@ function LIB.GetNearNpc(nLimit)
 	return aNpc
 end
 
-function LIB.GetNearNpcID(nLimit)
+function X.GetNearNpcID(nLimit)
 	local aNpcID = {}
 	for k, _ in pairs(NEARBY_NPC) do
-		insert(aNpcID, k)
+		table.insert(aNpcID, k)
 		if nLimit and #aNpcID == nLimit then
 			break
 		end
@@ -1555,21 +1526,21 @@ function LIB.GetNearNpcID(nLimit)
 end
 
 if IsDebugClient() then
-function LIB.GetNearNpcTable()
+function X.GetNearNpcTable()
 	return NEARBY_NPC
 end
 end
 
 -- 获取附近PET列表
--- (table) LIB.GetNearPet(void)
-function LIB.GetNearPet(nLimit)
+-- (table) X.GetNearPet(void)
+function X.GetNearPet(nLimit)
 	local aPet = {}
 	for k, _ in pairs(NEARBY_PET) do
 		local npc = GetNpc(k)
 		if not npc then
 			NEARBY_PET[k] = nil
 		else
-			insert(aPet, npc)
+			table.insert(aPet, npc)
 			if nLimit and #aPet == nLimit then
 				break
 			end
@@ -1578,10 +1549,10 @@ function LIB.GetNearPet(nLimit)
 	return aPet
 end
 
-function LIB.GetNearPetID(nLimit)
+function X.GetNearPetID(nLimit)
 	local aPetID = {}
 	for k, _ in pairs(NEARBY_PET) do
-		insert(aPetID, k)
+		table.insert(aPetID, k)
 		if nLimit and #aPetID == nLimit then
 			break
 		end
@@ -1590,21 +1561,21 @@ function LIB.GetNearPetID(nLimit)
 end
 
 if IsDebugClient() then
-function LIB.GetNearPetTable()
+function X.GetNearPetTable()
 	return NEARBY_PET
 end
 end
 
 -- 获取附近玩家列表
--- (table) LIB.GetNearPlayer(void)
-function LIB.GetNearPlayer(nLimit)
+-- (table) X.GetNearPlayer(void)
+function X.GetNearPlayer(nLimit)
 	local aPlayer = {}
 	for k, _ in pairs(NEARBY_PLAYER) do
 		local p = GetPlayer(k)
 		if not p then
 			NEARBY_PLAYER[k] = nil
 		else
-			insert(aPlayer, p)
+			table.insert(aPlayer, p)
 			if nLimit and #aPlayer == nLimit then
 				break
 			end
@@ -1613,10 +1584,10 @@ function LIB.GetNearPlayer(nLimit)
 	return aPlayer
 end
 
-function LIB.GetNearPlayerID(nLimit)
+function X.GetNearPlayerID(nLimit)
 	local aPlayerID = {}
 	for k, _ in pairs(NEARBY_PLAYER) do
-		insert(aPlayerID, k)
+		table.insert(aPlayerID, k)
 		if nLimit and #aPlayerID == nLimit then
 			break
 		end
@@ -1625,21 +1596,21 @@ function LIB.GetNearPlayerID(nLimit)
 end
 
 if IsDebugClient() then
-function LIB.GetNearPlayerTable()
+function X.GetNearPlayerTable()
 	return NEARBY_PLAYER
 end
 end
 
 -- 获取附近物品列表
--- (table) LIB.GetNearPlayer(void)
-function LIB.GetNearDoodad(nLimit)
+-- (table) X.GetNearPlayer(void)
+function X.GetNearDoodad(nLimit)
 	local aDoodad = {}
 	for dwID, _ in pairs(NEARBY_DOODAD) do
 		local doodad = GetDoodad(dwID)
 		if not doodad then
 			NEARBY_DOODAD[dwID] = nil
 		else
-			insert(aDoodad, doodad)
+			table.insert(aDoodad, doodad)
 			if nLimit and #aDoodad == nLimit then
 				break
 			end
@@ -1648,10 +1619,10 @@ function LIB.GetNearDoodad(nLimit)
 	return aDoodad
 end
 
-function LIB.GetNearDoodadID(nLimit)
+function X.GetNearDoodadID(nLimit)
 	local aDoodadID = {}
 	for dwID, _ in pairs(NEARBY_DOODAD) do
-		insert(aDoodadID, dwID)
+		table.insert(aDoodadID, dwID)
 		if nLimit and #aDoodadID == nLimit then
 			break
 		end
@@ -1660,26 +1631,26 @@ function LIB.GetNearDoodadID(nLimit)
 end
 
 if IsDebugClient() then
-function LIB.GetNearDoodadTable()
+function X.GetNearDoodadTable()
 	return NEARBY_DOODAD
 end
 end
 
-LIB.BreatheCall(NSFormatString('{$NS}#FIGHT_HINT_TRIGGER'), function()
+X.BreatheCall(X.NSFormatString('{$NS}#FIGHT_HINT_TRIGGER'), function()
 	for dwID, tar in pairs(NEARBY_NPC) do
 		if tar.bFightState ~= NEARBY_FIGHT[dwID] then
 			NEARBY_FIGHT[dwID] = tar.bFightState
-			FireUIEvent(NSFormatString('{$NS}_NPC_FIGHT_HINT'), dwID, tar.bFightState)
+			FireUIEvent(X.NSFormatString('{$NS}_NPC_FIGHT_HINT'), dwID, tar.bFightState)
 		end
 	end
 	for dwID, tar in pairs(NEARBY_PLAYER) do
 		if tar.bFightState ~= NEARBY_FIGHT[dwID] then
 			NEARBY_FIGHT[dwID] = tar.bFightState
-			FireUIEvent(NSFormatString('{$NS}_PLAYER_FIGHT_HINT'), dwID, tar.bFightState)
+			FireUIEvent(X.NSFormatString('{$NS}_PLAYER_FIGHT_HINT'), dwID, tar.bFightState)
 		end
 	end
 end)
-LIB.RegisterEvent('NPC_ENTER_SCENE', function()
+X.RegisterEvent('NPC_ENTER_SCENE', function()
 	local npc = GetNpc(arg0)
 	if npc and npc.dwEmployer ~= 0 then
 		NEARBY_PET[arg0] = npc
@@ -1687,29 +1658,29 @@ LIB.RegisterEvent('NPC_ENTER_SCENE', function()
 	NEARBY_NPC[arg0] = npc
 	NEARBY_FIGHT[arg0] = npc and npc.bFightState or false
 end)
-LIB.RegisterEvent('NPC_LEAVE_SCENE', function()
+X.RegisterEvent('NPC_LEAVE_SCENE', function()
 	NEARBY_PET[arg0] = nil
 	NEARBY_NPC[arg0] = nil
 	NEARBY_FIGHT[arg0] = nil
 end)
-LIB.RegisterEvent('PLAYER_ENTER_SCENE', function()
+X.RegisterEvent('PLAYER_ENTER_SCENE', function()
 	local player = GetPlayer(arg0)
 	NEARBY_PLAYER[arg0] = player
 	NEARBY_FIGHT[arg0] = player and player.bFightState or false
 end)
-LIB.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
 	if UI_GetClientPlayerID() == arg0 then
-		FireUIEvent(NSFormatString('{$NS}_CLIENT_PLAYER_LEAVE_SCENE'))
+		FireUIEvent(X.NSFormatString('{$NS}_CLIENT_PLAYER_LEAVE_SCENE'))
 	end
 	NEARBY_PLAYER[arg0] = nil
 	NEARBY_FIGHT[arg0] = nil
 end)
-LIB.RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = GetDoodad(arg0) end)
-LIB.RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil end)
+X.RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = GetDoodad(arg0) end)
+X.RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil end)
 end
 
 do local CACHE = {}
-function LIB.GetFurnitureInfo(szKey, oVal)
+function X.GetFurnitureInfo(szKey, oVal)
 	if szKey == 'nRepresentID' then
 		szKey = 'dwModelID'
 	end
@@ -1718,7 +1689,7 @@ function LIB.GetFurnitureInfo(szKey, oVal)
 		for i = 2, g_tTable.HomelandFurnitureInfo:GetRowCount() do
 			local tLine = g_tTable.HomelandFurnitureInfo:GetRow(i)
 			if tLine and tLine[szKey] then
-				CACHE[szKey][tLine[szKey]] = LIB.SetmetaReadonly(tLine)
+				CACHE[szKey][tLine[szKey]] = X.SetmetaReadonly(tLine)
 			end
 		end
 	end
@@ -1729,22 +1700,22 @@ end
 do
 local GetNearbyFurnitureInfoList = _G.GetNearbyFurnitureInfoList
 local HomeLand_GetFurniture2GameID = _G.HomeLand_GetFurniture2GameID
-function LIB.GetNearFurniture(nDis)
+function X.GetNearFurniture(nDis)
 	if not nDis then
 		nDis = 256
 	end
 	local aFurniture, tID = {}, {}
-	if IsFunction(GetNearbyFurnitureInfoList) and IsFunction(HomeLand_GetFurniture2GameID) then
+	if X.IsFunction(GetNearbyFurnitureInfoList) and X.IsFunction(HomeLand_GetFurniture2GameID) then
 		for _, p in ipairs(GetNearbyFurnitureInfoList('ui get objects info v_0', nDis)) do
-			local dwID = LIB.NumberBitShl(p.BaseId, 32, 64) + p.InstID
-			local info = not tID[dwID] and LIB.GetFurnitureInfo('nRepresentID', p.RepresentID)
+			local dwID = X.NumberBitShl(p.BaseId, 32, 64) + p.InstID
+			local info = not tID[dwID] and X.GetFurnitureInfo('nRepresentID', p.RepresentID)
 			if info then
 				info = setmetatable(p, { __index = info })
 				info.dwID = dwID
 				info.nInstID = p.InstID
 				info.nBaseID = p.BaseId
 				info.nGameID = HomeLand_GetFurniture2GameID(p.RepresentID)
-				insert(aFurniture, info)
+				table.insert(aFurniture, info)
 				tID[dwID] = true
 			end
 		end
@@ -1754,20 +1725,20 @@ end
 end
 
 -- 打开一个拾取交互物件（当前帧重复调用仅打开一次防止庖丁）
-function LIB.OpenDoodad(me, doodad)
-	LIB.Throttle(NSFormatString('{$NS}#OpenDoodad') .. doodad.dwID, 375, function()
+function X.OpenDoodad(me, doodad)
+	X.Throttle(X.NSFormatString('{$NS}#OpenDoodad') .. doodad.dwID, 375, function()
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Open Doodad ' .. doodad.dwID .. ' [' .. doodad.szName .. '] at ' .. GetLogicFrameCount() .. '.', DEBUG_LEVEL.LOG)
+		X.Debug('Open Doodad ' .. doodad.dwID .. ' [' .. doodad.szName .. '] at ' .. GetLogicFrameCount() .. '.', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		OpenDoodad(me, doodad)
 	end)
 end
 
 -- 交互一个拾取交互物件（当前帧重复调用仅交互一次防止庖丁）
-function LIB.InteractDoodad(dwID)
-	LIB.Throttle(NSFormatString('{$NS}#InteractDoodad') .. dwID, 375, function()
+function X.InteractDoodad(dwID)
+	X.Throttle(X.NSFormatString('{$NS}#InteractDoodad') .. dwID, 375, function()
 		--[[#DEBUG BEGIN]]
-		LIB.Debug('Open Doodad ' .. dwID .. ' at ' .. GetLogicFrameCount() .. '.', DEBUG_LEVEL.LOG)
+		X.Debug('Open Doodad ' .. dwID .. ' at ' .. GetLogicFrameCount() .. '.', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		InteractDoodad(dwID)
 	end)
@@ -1775,7 +1746,7 @@ end
 
 -- 获取玩家自身信息（缓存）
 do local m_ClientInfo
-function LIB.GetClientInfo(arg0)
+function X.GetClientInfo(arg0)
 	if arg0 == true or not (m_ClientInfo and m_ClientInfo.dwID) then
 		local me = GetClientPlayer()
 		if me then -- 确保获取到玩家
@@ -1807,7 +1778,7 @@ function LIB.GetClientInfo(arg0)
 			m_ClientInfo.nCurrentLife      = me.nCurrentLife
 			m_ClientInfo.nMaxLife          = me.nMaxLife
 			m_ClientInfo.fCurrentLife64,
-			m_ClientInfo.fMaxLife64        = LIB.GetObjectLife(me)
+			m_ClientInfo.fMaxLife64        = X.GetObjectLife(me)
 			m_ClientInfo.nMaxLifeBase      = me.nMaxLifeBase
 			m_ClientInfo.nCurrentMana      = me.nCurrentMana
 			m_ClientInfo.nMaxMana          = me.nMaxMana
@@ -1852,27 +1823,27 @@ function LIB.GetClientInfo(arg0)
 	if not m_ClientInfo then
 		return {}
 	end
-	if IsString(arg0) then
+	if X.IsString(arg0) then
 		return m_ClientInfo[arg0]
 	end
 	return m_ClientInfo
 end
 
 local function onLoadingEnding()
-	LIB.GetClientInfo(true)
+	X.GetClientInfo(true)
 end
-LIB.RegisterEvent('LOADING_ENDING', onLoadingEnding)
+X.RegisterEvent('LOADING_ENDING', onLoadingEnding)
 end
 
 -- 获取唯一标识符
 do local m_szUUID
-function LIB.GetClientUUID()
+function X.GetClientUUID()
 	if not m_szUUID then
 		local me = GetClientPlayer()
 		if me.GetGlobalID and me.GetGlobalID() ~= '0' then
 			m_szUUID = me.GetGlobalID()
 		else
-			m_szUUID = (LIB.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. LIB.GetClientInfo().dwID
+			m_szUUID = (X.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. X.GetClientInfo().dwID
 		end
 	end
 	return m_szUUID
@@ -1891,11 +1862,11 @@ local function GeneFriendListCache()
 				FRIEND_LIST_BY_NAME = {}
 				FRIEND_LIST_BY_GROUP = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or '' }} -- 默认分组
 				for _, group in ipairs(infos) do
-					insert(FRIEND_LIST_BY_GROUP, group)
+					table.insert(FRIEND_LIST_BY_GROUP, group)
 				end
 				for _, group in ipairs(FRIEND_LIST_BY_GROUP) do
 					for _, p in ipairs(me.GetFellowshipInfo(group.id) or {}) do
-						insert(group, p)
+						table.insert(group, p)
 						FRIEND_LIST_BY_ID[p.id] = p
 						FRIEND_LIST_BY_NAME[p.name] = p
 					end
@@ -1912,28 +1883,28 @@ local function OnFriendListChange()
 	FRIEND_LIST_BY_NAME = nil
 	FRIEND_LIST_BY_GROUP = nil
 end
-LIB.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , OnFriendListChange)
-LIB.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , OnFriendListChange)
-LIB.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , OnFriendListChange)
-LIB.RegisterEvent('PLAYER_FOE_UPDATE'            , OnFriendListChange)
-LIB.RegisterEvent('PLAYER_BLACK_LIST_UPDATE'     , OnFriendListChange)
-LIB.RegisterEvent('DELETE_FELLOWSHIP'            , OnFriendListChange)
-LIB.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFriendListChange)
+X.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , OnFriendListChange)
+X.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , OnFriendListChange)
+X.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , OnFriendListChange)
+X.RegisterEvent('PLAYER_FOE_UPDATE'            , OnFriendListChange)
+X.RegisterEvent('PLAYER_BLACK_LIST_UPDATE'     , OnFriendListChange)
+X.RegisterEvent('DELETE_FELLOWSHIP'            , OnFriendListChange)
+X.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFriendListChange)
 -- 获取好友列表
--- LIB.GetFriendList()         获取所有好友列表
--- LIB.GetFriendList(1)        获取第一个分组好友列表
--- LIB.GetFriendList('挽月堂') 获取分组名称为挽月堂的好友列表
-function LIB.GetFriendList(arg0)
+-- X.GetFriendList()         获取所有好友列表
+-- X.GetFriendList(1)        获取第一个分组好友列表
+-- X.GetFriendList('挽月堂') 获取分组名称为挽月堂的好友列表
+function X.GetFriendList(arg0)
 	local t = {}
 	local n = 0
 	local tGroup = {}
 	if GeneFriendListCache() then
 		if type(arg0) == 'number' then
-			insert(tGroup, FRIEND_LIST_BY_GROUP[arg0])
+			table.insert(tGroup, FRIEND_LIST_BY_GROUP[arg0])
 		elseif type(arg0) == 'string' then
 			for _, group in ipairs(FRIEND_LIST_BY_GROUP) do
 				if group.name == arg0 then
-					insert(tGroup, Clone(group))
+					table.insert(tGroup, X.Clone(group))
 				end
 			end
 		else
@@ -1941,7 +1912,7 @@ function LIB.GetFriendList(arg0)
 		end
 		for _, group in ipairs(tGroup) do
 			for _, p in ipairs(group) do
-				t[p.id], n = Clone(p), n + 1
+				t[p.id], n = X.Clone(p), n + 1
 			end
 		end
 	end
@@ -1949,18 +1920,18 @@ function LIB.GetFriendList(arg0)
 end
 
 -- 获取好友
-function LIB.GetFriend(arg0)
+function X.GetFriend(arg0)
 	if arg0 and GeneFriendListCache() then
 		if type(arg0) == 'number' then
-			return Clone(FRIEND_LIST_BY_ID[arg0])
+			return X.Clone(FRIEND_LIST_BY_ID[arg0])
 		elseif type(arg0) == 'string' then
-			return Clone(FRIEND_LIST_BY_NAME[arg0])
+			return X.Clone(FRIEND_LIST_BY_NAME[arg0])
 		end
 	end
 end
 
-function LIB.IsFriend(arg0)
-	return LIB.GetFriend(arg0) and true or false
+function X.IsFriend(arg0)
+	return X.GetFriend(arg0) and true or false
 end
 end
 
@@ -1979,7 +1950,7 @@ local function GeneFoeListCache()
 					for i, p in ipairs(infos) do
 						FOE_LIST_BY_ID[p.id] = p
 						FOE_LIST_BY_NAME[p.name] = p
-						insert(FOE_LIST, p)
+						table.insert(FOE_LIST, p)
 					end
 					return true
 				end
@@ -1994,15 +1965,15 @@ local function OnFoeListChange()
 	FOE_LIST_BY_ID = nil
 	FOE_LIST_BY_NAME = nil
 end
-LIB.RegisterEvent('PLAYER_FOE_UPDATE', OnFoeListChange)
+X.RegisterEvent('PLAYER_FOE_UPDATE', OnFoeListChange)
 -- 获取仇人列表
-function LIB.GetFoeList()
+function X.GetFoeList()
 	if GeneFoeListCache() then
-		return Clone(FOE_LIST)
+		return X.Clone(FOE_LIST)
 	end
 end
 -- 获取仇人
-function LIB.GetFoe(arg0)
+function X.GetFoe(arg0)
 	if arg0 and GeneFoeListCache() then
 		if type(arg0) == 'number' then
 			return FOE_LIST_BY_ID[arg0]
@@ -2014,7 +1985,7 @@ end
 end
 
 -- 获取好友列表
-function LIB.GetTongMemberList(bShowOffLine, szSorter, bAsc)
+function X.GetTongMemberList(bShowOffLine, szSorter, bAsc)
 	if bShowOffLine == nil then bShowOffLine = false  end
 	if szSorter     == nil then szSorter     = 'name' end
 	if bAsc         == nil then bAsc         = true   end
@@ -2031,7 +2002,7 @@ function LIB.GetTongMemberList(bShowOffLine, szSorter, bAsc)
 	return GetTongClient().GetMemberList(bShowOffLine, szSorter or 'name', bAsc, -1, -1)
 end
 
-function LIB.GetTongName(dwTongID)
+function X.GetTongName(dwTongID)
 	local szTongName
 	if not dwTongID then
 		dwTongID = (GetClientPlayer() or CONSTANT.EMPTY_TABLE).dwTongID
@@ -2045,7 +2016,7 @@ function LIB.GetTongName(dwTongID)
 end
 
 -- 获取帮会成员
-function LIB.GetTongMember(arg0)
+function X.GetTongMember(arg0)
 	if not arg0 then
 		return
 	end
@@ -2053,14 +2024,14 @@ function LIB.GetTongMember(arg0)
 	return GetTongClient().GetMemberInfo(arg0)
 end
 
-function LIB.IsTongMember(arg0)
-	return LIB.GetTongMember(arg0) and true or false
+function X.IsTongMember(arg0)
+	return X.GetTongMember(arg0) and true or false
 end
 
 -- 判断是不是队友
-function LIB.IsParty(dwID)
-	if IsString(dwID) then
-		if dwID == LIB.GetUserRoleName() then
+function X.IsParty(dwID)
+	if X.IsString(dwID) then
+		if dwID == X.GetUserRoleName() then
 			return true
 		end
 		local team = GetClientTeam()
@@ -2079,7 +2050,7 @@ function LIB.IsParty(dwID)
 end
 
 -- 判断关系
-function LIB.GetRelation(dwSelfID, dwPeerID)
+function X.GetRelation(dwSelfID, dwPeerID)
 	if not dwPeerID then
 		dwPeerID = dwSelfID
 		dwSelfID = GetControlPlayerID()
@@ -2090,7 +2061,7 @@ function LIB.GetRelation(dwSelfID, dwPeerID)
 			dwPeerID = npc.dwEmployer
 		end
 	end
-	if LIB.IsSelf(dwSelfID, dwPeerID) then
+	if X.IsSelf(dwSelfID, dwPeerID) then
 		return 'Self'
 	end
 	local dwSrcID, dwTarID = dwSelfID, dwPeerID
@@ -2102,7 +2073,7 @@ function LIB.GetRelation(dwSelfID, dwPeerID)
 	elseif IsNeutrality(dwSrcID, dwTarID) then
 		return 'Neutrality'
 	elseif IsEnemy(dwSrcID, dwTarID) then -- 敌对关系
-		if LIB.GetFoe(dwPeerID) then
+		if X.GetFoe(dwPeerID) then
 			return 'Foe'
 		else
 			return 'Enemy'
@@ -2115,8 +2086,8 @@ function LIB.GetRelation(dwSelfID, dwPeerID)
 end
 
 -- 判断是不是红名
-function LIB.IsEnemy(dwSelfID, dwPeerID)
-	return LIB.GetRelation(dwSelfID, dwPeerID) == 'Enemy'
+function X.IsEnemy(dwSelfID, dwPeerID)
+	return X.GetRelation(dwSelfID, dwPeerID) == 'Enemy'
 end
 
 -------------------------------------------------------------------------------------------------------
@@ -2141,7 +2112,7 @@ local FIGHT_END_TICK   = -1
 local FIGHTING         = false
 local function ListenFightStateChange()
 	-- 判定战斗边界
-	if LIB.IsFighting() then
+	if X.IsFighting() then
 		-- 进入战斗判断
 		if not FIGHTING then
 			FIGHTING = true
@@ -2154,7 +2125,7 @@ local function ListenFightStateChange()
 				local me = GetClientPlayer()
 				local team = GetClientTeam()
 				local szEdition = GLOBAL.GAME_EDITION
-				local szServer = LIB.GetRealServer()
+				local szServer = X.GetRealServer()
 				local dwTime = GetCurrentTime()
 				local dwTeamID, nTeamMember, dwTeamXorID = 0, 0, 0
 				if team then
@@ -2163,14 +2134,14 @@ local function ListenFightStateChange()
 				if me and team and me.IsInParty() then
 					for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 						nTeamMember = nTeamMember + 1
-						dwTeamXorID = LIB.NumberBitXor(dwTeamXorID, dwTarID)
+						dwTeamXorID = X.NumberBitXor(dwTeamXorID, dwTarID)
 					end
 				elseif me then
 					nTeamMember = 1
 					dwTeamXorID = me.dwID
 				end
 				FIGHT_UUID = szEdition .. '::' .. szServer .. '::' .. dwTime .. '::' .. dwTeamID .. '::' .. dwTeamXorID .. '/' .. nTeamMember
-				FireUIEvent(NSFormatString('{$NS}_FIGHT_HINT'), true, FIGHT_UUID, 0)
+				FireUIEvent(X.NSFormatString('{$NS}_FIGHT_HINT'), true, FIGHT_UUID, 0)
 			end
 		end
 	else
@@ -2179,14 +2150,14 @@ local function ListenFightStateChange()
 			FIGHT_END_TICK, FIGHTING = GetTickCount(), false
 		elseif FIGHT_UUID and GetTickCount() - FIGHT_END_TICK > 5000 then
 			LAST_FIGHT_UUID, FIGHT_UUID = FIGHT_UUID, nil
-			FireUIEvent(NSFormatString('{$NS}_FIGHT_HINT'), false, LAST_FIGHT_UUID, FIGHT_END_TICK - FIGHT_BEGIN_TICK)
+			FireUIEvent(X.NSFormatString('{$NS}_FIGHT_HINT'), false, LAST_FIGHT_UUID, FIGHT_END_TICK - FIGHT_BEGIN_TICK)
 		end
 	end
 end
-LIB.BreatheCall(NSFormatString('{$NS}#ListenFightStateChange'), ListenFightStateChange)
+X.BreatheCall(X.NSFormatString('{$NS}#ListenFightStateChange'), ListenFightStateChange)
 
 -- 获取当前战斗时间
-function LIB.GetFightTime(szFormat)
+function X.GetFightTime(szFormat)
 	local nTick = 0
 	if FIGHTING then -- 战斗状态
 		nTick = GetTickCount() - FIGHT_BEGIN_TICK
@@ -2195,18 +2166,18 @@ function LIB.GetFightTime(szFormat)
 	end
 
 	if szFormat then
-		local nSeconds = floor(nTick / 1000)
-		local nMinutes = floor(nSeconds / 60)
-		local nHours   = floor(nMinutes / 60)
+		local nSeconds = math.floor(nTick / 1000)
+		local nMinutes = math.floor(nSeconds / 60)
+		local nHours   = math.floor(nMinutes / 60)
 		local nMinute  = nMinutes % 60
 		local nSecond  = nSeconds % 60
-		szFormat = szFormat:gsub('f', floor(nTick / 1000 * GLOBAL.GAME_FPS))
+		szFormat = szFormat:gsub('f', math.floor(nTick / 1000 * GLOBAL.GAME_FPS))
 		szFormat = szFormat:gsub('H', nHours)
 		szFormat = szFormat:gsub('M', nMinutes)
 		szFormat = szFormat:gsub('S', nSeconds)
-		szFormat = szFormat:gsub('hh', format('%02d', nHours ))
-		szFormat = szFormat:gsub('mm', format('%02d', nMinute))
-		szFormat = szFormat:gsub('ss', format('%02d', nSecond))
+		szFormat = szFormat:gsub('hh', string.format('%02d', nHours ))
+		szFormat = szFormat:gsub('mm', string.format('%02d', nMinute))
+		szFormat = szFormat:gsub('ss', string.format('%02d', nSecond))
 		szFormat = szFormat:gsub('h', nHours)
 		szFormat = szFormat:gsub('m', nMinute)
 		szFormat = szFormat:gsub('s', nSecond)
@@ -2221,38 +2192,38 @@ function LIB.GetFightTime(szFormat)
 end
 
 -- 获取当前战斗唯一标示符
-function LIB.GetFightUUID()
+function X.GetFightUUID()
 	return FIGHT_UUID
 end
 
 -- 获取上次战斗唯一标示符
-function LIB.GetLastFightUUID()
+function X.GetLastFightUUID()
 	return LAST_FIGHT_UUID
 end
 end
 
 -- 获取自身是否处于逻辑战斗状态
--- (bool) LIB.IsFighting()
+-- (bool) X.IsFighting()
 do local ARENA_START = false
-function LIB.IsFighting()
+function X.IsFighting()
 	local me = GetClientPlayer()
 	if not me then
 		return
 	end
 	local bFightState = me.bFightState
-	if not bFightState and LIB.IsInArena() and ARENA_START then
+	if not bFightState and X.IsInArena() and ARENA_START then
 		bFightState = true
-	elseif not bFightState and LIB.IsInDungeon() then
+	elseif not bFightState and X.IsInDungeon() then
 		-- 在秘境且附近队友进战且附近敌对NPC进战则判断处于战斗状态
 		local bPlayerFighting, bNpcFighting
-		for _, p in ipairs(LIB.GetNearPlayer()) do
+		for _, p in ipairs(X.GetNearPlayer()) do
 			if me.IsPlayerInMyParty(p.dwID) and p.bFightState then
 				bPlayerFighting = true
 				break
 			end
 		end
 		if bPlayerFighting then
-			for _, p in ipairs(LIB.GetNearNpc()) do
+			for _, p in ipairs(X.GetNearNpc()) do
 				if IsEnemy(p.dwID, me.dwID) and p.bFightState then
 					bNpcFighting = true
 					break
@@ -2263,8 +2234,8 @@ function LIB.IsFighting()
 	end
 	return bFightState
 end
-LIB.RegisterEvent('LOADING_ENDING', 'LIB#PLAYER', function() ARENA_START = nil end)
-LIB.RegisterEvent('ARENA_START', 'LIB#PLAYER', function() ARENA_START = true end)
+X.RegisterEvent('LOADING_ENDING', 'LIB#PLAYER', function() ARENA_START = nil end)
+X.RegisterEvent('ARENA_START', 'LIB#PLAYER', function() ARENA_START = true end)
 end
 
 -------------------------------------------------------------------------------------------------------------------
@@ -2282,9 +2253,9 @@ end
 --     #                 #   #               # # #                 #               #         #       # #         --
 -------------------------------------------------------------------------------------------------------------------
 -- 取得目标类型和ID
--- (dwType, dwID) LIB.GetTarget()       -- 取得自己当前的目标类型和ID
--- (dwType, dwID) LIB.GetTarget(object) -- 取得指定操作对象当前的目标类型和ID
-function LIB.GetTarget(...)
+-- (dwType, dwID) X.GetTarget()       -- 取得自己当前的目标类型和ID
+-- (dwType, dwID) X.GetTarget(object) -- 取得指定操作对象当前的目标类型和ID
+function X.GetTarget(...)
 	local object = ...
 	if select('#', ...) == 0 then
 		object = GetClientPlayer()
@@ -2297,36 +2268,36 @@ function LIB.GetTarget(...)
 end
 
 -- 取得目标的目标类型和ID
--- (dwType, dwID) LIB.GetTargetTarget()       -- 取得自己当前的目标的目标类型和ID
--- (dwType, dwID) LIB.GetTargetTarget(object) -- 取得指定操作对象当前的目标的目标类型和ID
-function LIB.GetTargetTarget(object)
-	local nTarType, dwTarID = LIB.GetTarget(object)
-	local KTar = LIB.GetObject(nTarType, dwTarID)
+-- (dwType, dwID) X.GetTargetTarget()       -- 取得自己当前的目标的目标类型和ID
+-- (dwType, dwID) X.GetTargetTarget(object) -- 取得指定操作对象当前的目标的目标类型和ID
+function X.GetTargetTarget(object)
+	local nTarType, dwTarID = X.GetTarget(object)
+	local KTar = X.GetObject(nTarType, dwTarID)
 	if not KTar then
 		return
 	end
-	return LIB.GetTarget(KTar)
+	return X.GetTarget(KTar)
 end
 
-LIB.RegisterRestriction('LIB.SET_TARGET', { ['*'] = true, intl = false })
+X.RegisterRestriction('X.SET_TARGET', { ['*'] = true, intl = false })
 
 -- 根据 dwType 类型和 dwID 设置目标
--- (void) LIB.SetTarget([number dwType, ]number dwID)
--- (void) LIB.SetTarget([number dwType, ]string szName)
+-- (void) X.SetTarget([number dwType, ]number dwID)
+-- (void) X.SetTarget([number dwType, ]string szName)
 -- dwType   -- *可选* 目标类型
 -- dwID     -- 目标 ID
-function LIB.SetTarget(arg0, arg1)
+function X.SetTarget(arg0, arg1)
 	local dwType, dwID, szNames
-	if IsUserdata(arg0) then
-		dwType, dwID = TARGET[LIB.GetObjectType(arg0)], arg0.dwID
-	elseif IsString(arg0) then
+	if X.IsUserdata(arg0) then
+		dwType, dwID = TARGET[X.GetObjectType(arg0)], arg0.dwID
+	elseif X.IsString(arg0) then
 		szNames = arg0
-	elseif IsNumber(arg0) then
-		if IsNil(arg1) then
+	elseif X.IsNumber(arg0) then
+		if X.IsNil(arg1) then
 			dwID = arg0
-		elseif IsString(arg1) then
+		elseif X.IsString(arg1) then
 			dwType, szNames = arg0, arg1
-		elseif IsNumber(arg1) then
+		elseif X.IsNumber(arg1) then
 			dwType, dwID = arg0, arg1
 		end
 	end
@@ -2338,11 +2309,11 @@ function LIB.SetTarget(arg0, arg1)
 	end
 	if szNames then
 		local tTarget = {}
-		for _, szName in pairs(LIB.SplitString(szNames:gsub('[%[%]]', ''), '|')) do
+		for _, szName in pairs(X.SplitString(szNames:gsub('[%[%]]', ''), '|')) do
 			tTarget[szName] = true
 		end
 		if not dwID and (not dwType or dwType == TARGET.NPC) then
-			for _, p in ipairs(LIB.GetNearNpc()) do
+			for _, p in ipairs(X.GetNearNpc()) do
 				if tTarget[p.szName] then
 					dwType, dwID = TARGET.NPC, p.dwID
 					break
@@ -2350,7 +2321,7 @@ function LIB.SetTarget(arg0, arg1)
 			end
 		end
 		if not dwID and (not dwType or dwType == TARGET.PLAYER) then
-			for _, p in ipairs(LIB.GetNearPlayer()) do
+			for _, p in ipairs(X.GetNearPlayer()) do
 				if tTarget[p.szName] then
 					dwType, dwID = TARGET.PLAYER, p.dwID
 					break
@@ -2362,23 +2333,23 @@ function LIB.SetTarget(arg0, arg1)
 		return false
 	end
 	if dwType == TARGET.NPC then
-		if LIB.IsInShieldedMap() and LIB.IsRestricted('LIB.SET_TARGET') then
+		if X.IsInShieldedMap() and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug('SetTarget', 'Set target to player is forbiden in current map.', DEBUG_LEVEL.WARNING)
+			X.Debug('SetTarget', 'Set target to player is forbiden in current map.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
 		local npc = GetNpc(dwID)
-		if npc and not npc.IsSelectable() and LIB.IsRestricted('LIB.SET_TARGET') then
+		if npc and not npc.IsSelectable() and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug('SetTarget', 'Set target to unselectable npc.', DEBUG_LEVEL.WARNING)
+			X.Debug('SetTarget', 'Set target to unselectable npc.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
 	elseif dwType == TARGET.DOODAD then
-		if LIB.IsRestricted('LIB.SET_TARGET') then
+		if X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug('SetTarget', 'Set target to doodad.', DEBUG_LEVEL.WARNING)
+			X.Debug('SetTarget', 'Set target to doodad.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
@@ -2388,31 +2359,31 @@ function LIB.SetTarget(arg0, arg1)
 end
 
 -- 设置/取消 临时目标
--- LIB.SetTempTarget(dwType, dwID)
--- LIB.ResumeTarget()
+-- X.SetTempTarget(dwType, dwID)
+-- X.ResumeTarget()
 do
 local TEMP_TARGET = { TARGET.NO_TARGET, 0 }
-function LIB.SetTempTarget(dwType, dwID)
+function X.SetTempTarget(dwType, dwID)
 	TargetPanel_SetOpenState(true)
 	TEMP_TARGET = { GetClientPlayer().GetTarget() }
-	LIB.SetTarget(dwType, dwID)
+	X.SetTarget(dwType, dwID)
 	TargetPanel_SetOpenState(false)
 end
 
-function LIB.ResumeTarget()
+function X.ResumeTarget()
 	TargetPanel_SetOpenState(true)
 	-- 当之前的目标不存在时，切到空目标
-	if TEMP_TARGET[1] ~= TARGET.NO_TARGET and not LIB.GetObject(unpack(TEMP_TARGET)) then
+	if TEMP_TARGET[1] ~= TARGET.NO_TARGET and not X.GetObject(unpack(TEMP_TARGET)) then
 		TEMP_TARGET = { TARGET.NO_TARGET, 0 }
 	end
-	LIB.SetTarget(unpack(TEMP_TARGET))
+	X.SetTarget(unpack(TEMP_TARGET))
 	TEMP_TARGET = { TARGET.NO_TARGET, 0 }
 	TargetPanel_SetOpenState(false)
 end
 end
 
 -- 临时设置目标为指定目标并执行函数
--- (void) LIB.WithTarget(dwType, dwID, callback)
+-- (void) X.WithTarget(dwType, dwID, callback)
 do
 local WITH_TARGET_LIST = {}
 local LOCK_WITH_TARGET = false
@@ -2423,21 +2394,21 @@ local function WithTargetHandle()
 	end
 
 	LOCK_WITH_TARGET = true
-	local r = remove(WITH_TARGET_LIST, 1)
+	local r = table.remove(WITH_TARGET_LIST, 1)
 
-	LIB.SetTempTarget(r.dwType, r.dwID)
-	local res, err, trace = XpCall(r.callback)
+	X.SetTempTarget(r.dwType, r.dwID)
+	local res, err, trace = X.XpCall(r.callback)
 	if not res then
-		LIB.ErrorLog(err, NSFormatString('{$NS}#WithTarget'), trace)
+		X.ErrorLog(err, X.NSFormatString('{$NS}#WithTarget'), trace)
 	end
-	LIB.ResumeTarget()
+	X.ResumeTarget()
 
 	LOCK_WITH_TARGET = false
 	WithTargetHandle()
 end
-function LIB.WithTarget(dwType, dwID, callback)
+function X.WithTarget(dwType, dwID, callback)
 	-- 因为客户端多线程 所以加上资源锁 防止设置临时目标冲突
-	insert(WITH_TARGET_LIST, {
+	table.insert(WITH_TARGET_LIST, {
 		dwType   = dwType  ,
 		dwID     = dwID    ,
 		callback = callback,
@@ -2447,8 +2418,8 @@ end
 end
 
 -- 求N2在N1的面向角  --  重载+2
--- (number) LIB.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
--- (number) LIB.GetFaceAngel(oN1, oN2, bAbs)
+-- (number) X.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
+-- (number) X.GetFaceAngel(oN1, oN2, bAbs)
 -- @param nX    N1的X坐标
 -- @param nY    N1的Y坐标
 -- @param nFace N1的面向[0, 255]
@@ -2459,57 +2430,57 @@ end
 -- @param oN2   N2对象
 -- @return nil    参数错误
 -- @return number 面向角(-180, 180]
-function LIB.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
+function X.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
 	if type(nY) == 'userdata' and type(nX) == 'userdata' then
 		nX, nY, nFace, nTX, nTY, bAbs = nX.nX, nX.nY, nX.nFaceDirection, nY.nX, nY.nY, nFace
 	end
 	if type(nX) == 'number' and type(nY) == 'number' and type(nFace) == 'number'
 	and type(nTX) == 'number' and type(nTY) == 'number' then
-		local nFace = (nFace * 2 * PI / 255) - PI
-		local nSight = (nX == nTX and ((nY > nTY and PI / 2) or - PI / 2)) or atan((nTY - nY) / (nTX - nX))
-		local nAngel = ((nSight - nFace) % (PI * 2) - PI) / PI * 180
+		local nFace = (nFace * 2 * math.pi / 255) - math.pi
+		local nSight = (nX == nTX and ((nY > nTY and math.pi / 2) or - math.pi / 2)) or math.atan((nTY - nY) / (nTX - nX))
+		local nAngel = ((nSight - nFace) % (math.pi * 2) - math.pi) / math.pi * 180
 		if bAbs then
-			nAngel = abs(nAngel)
+			nAngel = math.abs(nAngel)
 		end
 		return nAngel
 	end
 end
 
-function LIB.GetBagPackageIndex()
-	return LIB.IsInExtraBagMap()
+function X.GetBagPackageIndex()
+	return X.IsInExtraBagMap()
 		and INVENTORY_INDEX.LIMITED_PACKAGE
 		or INVENTORY_INDEX.PACKAGE
 end
 
-function LIB.GetBagPackageCount()
+function X.GetBagPackageCount()
 	if _G.Bag_GetPacketCount then
 		return _G.Bag_GetPacketCount()
 	end
-	return LIB.IsInExtraBagMap() and 1 or 6
+	return X.IsInExtraBagMap() and 1 or 6
 end
 
-function LIB.GetBankPackageCount()
+function X.GetBankPackageCount()
 	local me = GetClientPlayer()
 	return me.GetBankPackageCount() + 1 -- 逻辑写挫了 返回的比真实的少一个
 end
 
 -- 获取背包空位总数
--- (number) LIB.GetFreeBagBoxNum()
-function LIB.GetFreeBagBoxNum()
+-- (number) X.GetFreeBagBoxNum()
+function X.GetFreeBagBoxNum()
 	local me, nFree = GetClientPlayer(), 0
-	local nIndex = LIB.GetBagPackageIndex()
-	for i = nIndex, nIndex + LIB.GetBagPackageCount() do
+	local nIndex = X.GetBagPackageIndex()
+	for i = nIndex, nIndex + X.GetBagPackageCount() do
 		nFree = nFree + me.GetBoxFreeRoomSize(i)
 	end
 	return nFree
 end
 
 -- 获取第一个背包空位
--- (number, number) LIB.GetFreeBagBox()
-function LIB.GetFreeBagBox()
+-- (number, number) X.GetFreeBagBox()
+function X.GetFreeBagBox()
 	local me = GetClientPlayer()
-	local nIndex = LIB.GetBagPackageIndex()
-	for i = nIndex, nIndex + LIB.GetBagPackageCount() do
+	local nIndex = X.GetBagPackageIndex()
+	for i = nIndex, nIndex + X.GetBagPackageCount() do
 		if me.GetBoxFreeRoomSize(i) > 0 then
 			for j = 0, me.GetBoxSize(i) - 1 do
 				if not me.GetItem(i, j) then
@@ -2521,11 +2492,11 @@ function LIB.GetFreeBagBox()
 end
 
 -- 遍历背包物品
--- (number dwBox, number dwX) LIB.WalkBagItem(fnWalker)
-function LIB.WalkBagItem(fnWalker)
+-- (number dwBox, number dwX) X.WalkBagItem(fnWalker)
+function X.WalkBagItem(fnWalker)
 	local me = GetClientPlayer()
-	local nIndex = LIB.GetBagPackageIndex()
-	for dwBox = nIndex, nIndex + LIB.GetBagPackageCount() do
+	local nIndex = X.GetBagPackageIndex()
+	for dwBox = nIndex, nIndex + X.GetBagPackageCount() do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local it = me.GetItem(dwBox, dwX)
 			if it and fnWalker(it, dwBox, dwX) == 0 then
@@ -2536,25 +2507,25 @@ function LIB.WalkBagItem(fnWalker)
 end
 
 -- 获取一样东西在背包的数量
-function LIB.GetItemAmount(dwTabType, dwIndex, nBookID)
+function X.GetItemAmount(dwTabType, dwIndex, nBookID)
 	local me = GetClientPlayer()
 	if not me then
 		return
 	end
 	if nBookID then
-		local nBookID, nSegmentID = LIB.RecipeToSegmentID(nBookID)
+		local nBookID, nSegmentID = X.RecipeToSegmentID(nBookID)
 		return me.GetItemAmount(dwTabType, dwIndex, nBookID, nSegmentID)
 	end
 	return me.GetItemAmount(dwTabType, dwIndex)
 end
 
 do local CACHE = {}
--- LIB.GetItemKey(dwTabType, dwIndex, nBookID)
--- LIB.GetItemKey(KItem)
--- LIB.GetItemKey(KItemInfo, nBookID)
-function LIB.GetItemKey(dwTabType, dwIndex, nBookID)
+-- X.GetItemKey(dwTabType, dwIndex, nBookID)
+-- X.GetItemKey(KItem)
+-- X.GetItemKey(KItemInfo, nBookID)
+function X.GetItemKey(dwTabType, dwIndex, nBookID)
 	local it, nGenre
-	if IsUserdata(dwTabType) then
+	if X.IsUserdata(dwTabType) then
 		it, nBookID = dwTabType, dwIndex
 		nGenre = it.nGenre
 		if not nBookID and nGenre == ITEM_GENRE.BOOK then
@@ -2589,12 +2560,12 @@ end
 do local CACHE, FULL_CACHE
 local function InsertItem(cache, it)
 	if it then
-		local szKey = LIB.GetItemKey(it)
+		local szKey = X.GetItemKey(it)
 		cache[szKey] = (cache[szKey] or 0) + (it.bCanStack and it.nStackNum or 1)
 	end
 end
-function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
-	if IsBoolean(nBookID) then
+function X.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
+	if X.IsBoolean(nBookID) then
 		nBookID, bFull = nil, nBookID
 	end
 	local cache = CACHE
@@ -2607,14 +2578,14 @@ function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
 		if not me then
 			return
 		end
-		local nIndex = bFull and 1 or LIB.GetBagPackageIndex()
-		local nCount = bFull and 7 or LIB.GetBagPackageCount()
+		local nIndex = bFull and 1 or X.GetBagPackageIndex()
+		local nCount = bFull and 7 or X.GetBagPackageCount()
 		for dwBox = nIndex, nCount do
 			for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 				InsertItem(cache, me.GetItem(dwBox, dwX))
 			end
 		end
-		for dwBox = INVENTORY_INDEX.BANK, INVENTORY_INDEX.BANK + LIB.GetBankPackageCount() - 1 do
+		for dwBox = INVENTORY_INDEX.BANK, INVENTORY_INDEX.BANK + X.GetBankPackageCount() - 1 do
 			for dwX = 0,  me.GetBoxSize(dwBox) - 1 do
 				InsertItem(cache, GetPlayerItem(me, dwBox, dwX))
 			end
@@ -2630,17 +2601,17 @@ function LIB.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
 			CACHE = cache
 		end
 	end
-	return cache[LIB.GetItemKey(dwTabType, dwIndex, nBookID)] or 0
+	return cache[X.GetItemKey(dwTabType, dwIndex, nBookID)] or 0
 end
-LIB.RegisterEvent({'BAG_ITEM_UPDATE', 'BANK_ITEM_UPDATE', 'LOADING_ENDING'}, 'LIB#GetItemAmountInAllPackages', function() CACHE, FULL_CACHE = nil, nil end)
+X.RegisterEvent({'BAG_ITEM_UPDATE', 'BANK_ITEM_UPDATE', 'LOADING_ENDING'}, 'LIB#GetItemAmountInAllPackages', function() CACHE, FULL_CACHE = nil, nil end)
 end
 
 -- 装备指定名字的装备
--- (void) LIB.Equip(szName)
+-- (void) X.Equip(szName)
 -- szName  装备名称
-function LIB.Equip(szName)
-	LIB.WalkBagItem(function(it, dwBox, dwX)
-		if LIB.GetItemNameByUIID(it.nUiId) == szName then
+function X.Equip(szName)
+	X.WalkBagItem(function(it, dwBox, dwX)
+		if X.GetItemNameByUIID(it.nUiId) == szName then
 			if szName == g_tStrings.tBulletDetail[BULLET_DETAIL.SNARE]
 			or szName == g_tStrings.tBulletDetail[BULLET_DETAIL.BOLT] then
 				local me = GetClientPlayer()
@@ -2660,20 +2631,20 @@ function LIB.Equip(szName)
 end
 
 -- 使用物品
--- (bool) LIB.UseItem(szName)
--- (bool) LIB.UseItem(dwTabType, dwIndex, nBookID)
-function LIB.UseItem(dwTabType, dwIndex, nBookID)
+-- (bool) X.UseItem(szName)
+-- (bool) X.UseItem(dwTabType, dwIndex, nBookID)
+function X.UseItem(dwTabType, dwIndex, nBookID)
 	local bUse = false
-	if IsString(dwTabType) then
-		LIB.WalkBagItem(function(item, dwBox, dwX)
-			if LIB.GetObjectName('ITEM', item) == dwTabType then
+	if X.IsString(dwTabType) then
+		X.WalkBagItem(function(item, dwBox, dwX)
+			if X.GetObjectName('ITEM', item) == dwTabType then
 				bUse = true
 				OnUseItem(dwBox, dwX)
 				return 0
 			end
 		end)
 	else
-		LIB.WalkBagItem(function(item, dwBox, dwX)
+		X.WalkBagItem(function(item, dwBox, dwX)
 			if item.dwTabType == dwTabType and item.dwIndex == dwIndex then
 				if item.nGenre == ITEM_GENRE.BOOK and item.nBookID ~= nBookID then
 					return
@@ -2700,7 +2671,7 @@ local function GetBuffKey(dwID, nLevel, dwSkillSrcID)
 end
 -- 缓存保护
 local function Reject()
-	assert(false, NSFormatString('Modify buff list from {$NS}.GetBuffList is forbidden!'))
+	assert(false, X.NSFormatString('Modify buff list from {$NS}.GetBuffList is forbidden!'))
 end
 -- 缓存检查
 local function GeneObjectBuffCache(KObject, nIndex)
@@ -2731,7 +2702,7 @@ local function GeneObjectBuffCache(KObject, nIndex)
 			raw.nStackNum    = nStackNum
 			raw.dwSkillSrcID = dwSkillSrcID
 			raw.bValid       = bValid
-			raw.szName, raw.nIcon = LIB.GetBuffName(dwID, nLevel)
+			raw.szName, raw.nIcon = X.GetBuffName(dwID, nLevel)
 			aCache[nCount] = BUFF_PROXY[nIndex]
 		end
 	end
@@ -2747,9 +2718,9 @@ local function GeneObjectBuffCache(KObject, nIndex)
 end
 
 -- 获取对象的buff列表和数量
--- (table, number) LIB.GetBuffList(KObject)
--- 注意：返回表每帧会重复利用，如有缓存需求请调用LIB.CloneBuff接口固化数据
-function LIB.GetBuffList(KObject)
+-- (table, number) X.GetBuffList(KObject)
+-- 注意：返回表每帧会重复利用，如有缓存需求请调用X.CloneBuff接口固化数据
+function X.GetBuffList(KObject)
 	if KObject then
 		return GeneObjectBuffCache(KObject)
 	end
@@ -2758,11 +2729,11 @@ end
 
 -- 获取对象的buff
 -- tBuff: {[dwID1] = nLevel1, [dwID2] = nLevel2}
--- (table) LIB.GetBuff(dwID[, nLevel[, dwSkillSrcID]])
--- (table) LIB.GetBuff(KObject, dwID[, nLevel[, dwSkillSrcID]])
--- (table) LIB.GetBuff(tBuff[, dwSkillSrcID])
--- (table) LIB.GetBuff(KObject, tBuff[, dwSkillSrcID])
-function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
+-- (table) X.GetBuff(dwID[, nLevel[, dwSkillSrcID]])
+-- (table) X.GetBuff(KObject, dwID[, nLevel[, dwSkillSrcID]])
+-- (table) X.GetBuff(tBuff[, dwSkillSrcID])
+-- (table) X.GetBuff(KObject, tBuff[, dwSkillSrcID])
+function X.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 	local tBuff = {}
 	if type(dwID) == 'table' then
 		tBuff, dwSkillSrcID = dwID, nLevel
@@ -2773,7 +2744,7 @@ function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 			tBuff[dwID] = 0
 		end
 	end
-	if IsNumber(dwSkillSrcID) and dwSkillSrcID > 0 then
+	if X.IsNumber(dwSkillSrcID) and dwSkillSrcID > 0 then
 		if KObject.GetBuffByOwner then
 			for k, v in pairs(tBuff) do
 				local KBuffNode = KObject.GetBuffByOwner(k, v, dwSkillSrcID)
@@ -2782,7 +2753,7 @@ function LIB.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 				end
 			end
 		else
-			local aBuff, nCount, buff = LIB.GetBuffList(KObject)
+			local aBuff, nCount, buff = X.GetBuffList(KObject)
 			for i = 1, nCount do
 				buff = aBuff[i]
 				if (tBuff[buff.dwID] == buff.nLevel or tBuff[buff.dwID] == 0) and buff.dwSkillSrcID == dwSkillSrcID then
@@ -2802,15 +2773,15 @@ end
 end
 
 -- 点掉自己的buff
--- (table) LIB.CancelBuff(KObject, dwID[, nLevel = 0])
-function LIB.CancelBuff(KObject, dwID, nLevel)
+-- (table) X.CancelBuff(KObject, dwID[, nLevel = 0])
+function X.CancelBuff(KObject, dwID, nLevel)
 	local KBuffNode = KObject.GetBuff(dwID, nLevel or 0)
 	if KBuffNode then
 		KObject.CancelBuff(KBuffNode.nIndex)
 	end
 end
 
-function LIB.CloneBuff(buff, dst)
+function X.CloneBuff(buff, dst)
 	if not dst then
 		dst = {}
 	end
@@ -2832,7 +2803,7 @@ end
 
 do
 local BUFF_CACHE
-function LIB.IsBossFocusBuff(dwID, nLevel, nStackNum)
+function X.IsBossFocusBuff(dwID, nLevel, nStackNum)
 	if not BUFF_CACHE then
 		BUFF_CACHE = {}
 		if g_tTable.BossFocusBuff then
@@ -2851,28 +2822,28 @@ function LIB.IsBossFocusBuff(dwID, nLevel, nStackNum)
 end
 end
 
-function LIB.IsVisibleBuff(dwID, nLevel)
+function X.IsVisibleBuff(dwID, nLevel)
 	if Table_BuffIsVisible(dwID, nLevel) then
 		return true
 	end
-	if LIB.IsBossFocusBuff(dwID, nLevel, 0xffff) then
+	if X.IsBossFocusBuff(dwID, nLevel, 0xffff) then
 		return true
 	end
 	return false
 end
 
 -- 获取对象是否无敌
--- (mixed) LIB.IsInvincible([object KObject])
+-- (mixed) X.IsInvincible([object KObject])
 -- @return <nil >: invalid KObject
 -- @return <bool>: object invincible state
-function LIB.IsInvincible(...)
+function X.IsInvincible(...)
 	local KObject = ...
 	if select('#', ...) == 0 then
 		KObject = GetClientPlayer()
 	end
 	if not KObject then
 		return nil
-	elseif LIB.GetBuff(KObject, 961) then
+	elseif X.GetBuff(KObject, 961) then
 		return true
 	else
 		return false
@@ -2880,10 +2851,10 @@ function LIB.IsInvincible(...)
 end
 
 -- 获取对象是否被隔离
--- (mixed) LIB.IsIsolated([object KObject])
+-- (mixed) X.IsIsolated([object KObject])
 -- @return <nil >: invalid KObject
 -- @return <bool>: object isolated state
-function LIB.IsIsolated(...)
+function X.IsIsolated(...)
 	local KObject = ...
 	if select('#', ...) == 0 then
 		KObject = GetClientPlayer()
@@ -2899,7 +2870,7 @@ end
 
 -- 获取对象运功状态
 do local bNewAPI
-function LIB.GetOTActionState(...)
+function X.GetOTActionState(...)
 	local KObject = ...
 	if select('#', ...) == 0 then
 		KObject = GetClientPlayer()
@@ -2908,8 +2879,8 @@ function LIB.GetOTActionState(...)
 		return
 	end
 	local nType, dwSkillID, dwSkillLevel, fCastPercent
-	if IsNil(bNewAPI) then
-		local eType = LIB.GetObjectType(KObject)
+	if X.IsNil(bNewAPI) then
+		local eType = X.GetObjectType(KObject)
 		if eType == 'PLAYER' or eType == 'NPC' then
 			bNewAPI = pcall(function() assert(KObject.GetSkillOTActionState) end)
 		end
@@ -2925,8 +2896,8 @@ end
 end
 
 -- 获取对象当前是否可读条
--- (bool) LIB.CanOTAction([object KObject])
-function LIB.CanOTAction(...)
+-- (bool) X.CanOTAction([object KObject])
+function X.CanOTAction(...)
 	local KObject = ...
 	if select('#', ...) == 0 then
 		KObject = GetClientPlayer()
@@ -2938,9 +2909,9 @@ function LIB.CanOTAction(...)
 end
 
 -- 通过技能名称获取技能信息
--- (table) LIB.GetSkillByName(szName)
+-- (table) X.GetSkillByName(szName)
 do local CACHE
-function LIB.GetSkillByName(szName)
+function X.GetSkillByName(szName)
 	if not CACHE then
 		local aCache, tLine, tExist = {}, nil, nil
 		for i = 1, g_tTable.Skill:GetRowCount() do
@@ -2959,25 +2930,25 @@ end
 end
 
 -- 判断技能名称是否有效
--- (bool) LIB.IsValidSkill(szName)
-function LIB.IsValidSkill(szName)
-	if LIB.GetSkillByName(szName)==nil then return false else return true end
+-- (bool) X.IsValidSkill(szName)
+function X.IsValidSkill(szName)
+	if X.GetSkillByName(szName)==nil then return false else return true end
 end
 
 -- 判断当前用户是否可用某个技能
--- (bool) LIB.CanUseSkill(number dwSkillID[, dwLevel])
+-- (bool) X.CanUseSkill(number dwSkillID[, dwLevel])
 do
 local box
-function LIB.CanUseSkill(dwSkillID, dwLevel)
+function X.CanUseSkill(dwSkillID, dwLevel)
 	-- 判断技能是否有效 并将中文名转换为技能ID
 	if type(dwSkillID) == 'string' then
-		if not LIB.IsValidSkill(dwSkillID) then
+		if not X.IsValidSkill(dwSkillID) then
 			return false
 		end
-		dwSkillID = LIB.GetSkillByName(dwSkillID).dwSkillID
+		dwSkillID = X.GetSkillByName(dwSkillID).dwSkillID
 	end
 	if not box or not box:IsValid() then
-		box = UI.GetTempElement(NSFormatString('Box.{$NS}Lib_Skill'))
+		box = UI.GetTempElement(X.NSFormatString('Box.{$NS}Lib_Skill'))
 	end
 	local me = GetClientPlayer()
 	if me and box then
@@ -3001,9 +2972,9 @@ end
 end
 
 -- 根据技能 ID 及等级获取技能的名称及图标 ID（内置缓存处理）
--- (string, number) LIB.GetSkillName(number dwSkillID[, number dwLevel])
+-- (string, number) X.GetSkillName(number dwSkillID[, number dwLevel])
 do local SKILL_CACHE = {} -- 技能列表缓存 技能ID查技能名称图标
-function LIB.GetSkillName(dwSkillID, dwLevel)
+function X.GetSkillName(dwSkillID, dwLevel)
 	if not SKILL_CACHE[dwSkillID] then
 		local tLine = Table_GetSkill(dwSkillID, dwLevel)
 		if tLine and tLine.dwSkillID > 0 and tLine.bShow
@@ -3043,30 +3014,30 @@ RegisterEvent('ON_SKILL_REPLACE', OnSkillReplace)
 RegisterEvent('CHANGE_SKILL_ICON', OnSkillReplace)
 
 -- 获取一个心法的技能列表
--- LIB.GetKungfuSkillIDS(dwKungfuID)
+-- X.GetKungfuSkillIDS(dwKungfuID)
 -- 获取一个套路的技能列表
--- LIB.GetKungfuSkillIDS(dwKungfuID, dwMountKungfu)
-function LIB.GetKungfuSkillIDS(dwKungfuID, dwMountKungfu)
+-- X.GetKungfuSkillIDS(dwKungfuID, dwMountKungfu)
+function X.GetKungfuSkillIDS(dwKungfuID, dwMountKungfu)
 	if not dwMountKungfu then
 		dwMountKungfu = 0
 	end
 	if not (CACHE[dwKungfuID] and CACHE[dwKungfuID][dwMountKungfu]) then
 		local aSkillID
-		if not IsEmpty(dwMountKungfu) then -- 获取一个套路的技能列表
-			if IsFunction(_G.Table_GetNewKungfuSkill) then -- 兼容旧版
+		if not X.IsEmpty(dwMountKungfu) then -- 获取一个套路的技能列表
+			if X.IsFunction(_G.Table_GetNewKungfuSkill) then -- 兼容旧版
 				aSkillID = _G.Table_GetNewKungfuSkill(dwKungfuID, dwMountKungfu)
 					or _G.Table_GetKungfuSkillList(dwMountKungfu)
 			else
 				aSkillID = Table_GetKungfuSkillList(dwMountKungfu, dwKungfuID)
 			end
 		else -- 获取一个心法的技能列表 遍历该心法的所有套路
-			if IsFunction(_G.Table_GetNewKungfuSkill) and IsFunction(_G.Table_GetKungfuSkillList) then -- 兼容旧版
+			if X.IsFunction(_G.Table_GetNewKungfuSkill) and X.IsFunction(_G.Table_GetKungfuSkillList) then -- 兼容旧版
 				aSkillID = _G.Table_GetKungfuSkillList(dwKungfuID)
 			else
 				aSkillID = {}
-				for _, dwMKungfuID in ipairs(LIB.GetMKungfuIDS(dwKungfuID)) do
-					for _, dwSkillID in ipairs(LIB.GetKungfuSkillIDS(dwKungfuID, dwMKungfuID)) do
-						insert(aSkillID, dwSkillID)
+				for _, dwMKungfuID in ipairs(X.GetMKungfuIDS(dwKungfuID)) do
+					for _, dwSkillID in ipairs(X.GetKungfuSkillIDS(dwKungfuID, dwMKungfuID)) do
+						table.insert(aSkillID, dwSkillID)
 					end
 				end
 			end
@@ -3087,7 +3058,7 @@ end
 
 -- 获取内功心法子套路列表（P面板左侧每列标题即为套路名）
 do local CACHE = {}
-function LIB.GetMKungfuIDS(dwKungfuID)
+function X.GetMKungfuIDS(dwKungfuID)
 	if not CACHE[dwKungfuID] then
 		CACHE[dwKungfuID] = Table_GetMKungfuList(dwKungfuID) or CONSTANT.EMPTY_TABLE
 	end
@@ -3096,9 +3067,9 @@ end
 end
 
 do local CACHE = {}
-function LIB.GetForceKungfuIDS(dwForceID)
+function X.GetForceKungfuIDS(dwForceID)
 	if not CACHE[dwForceID] then
-		if IsFunction(_G.Table_GetSkillSchoolKungfu) then
+		if X.IsFunction(_G.Table_GetSkillSchoolKungfu) then
 			-- 这个API真是莫名其妙，明明是Force-Kungfu对应表，标题非写成School-Kungfu对应表
 			CACHE[dwForceID] = _G.Table_GetSkillSchoolKungfu(dwForceID) or {}
 		else
@@ -3106,10 +3077,10 @@ function LIB.GetForceKungfuIDS(dwForceID)
 			local tLine = g_tTable.SkillSchoolKungfu:Search(dwForceID)
 			if tLine then
 				local szKungfu = tLine.szKungfu
-				for s in gmatch(szKungfu, '%d+') do
+				for s in string.gmatch(szKungfu, '%d+') do
 					local dwID = tonumber(s)
 					if dwID then
-						insert(aKungfuList, dwID)
+						table.insert(aKungfuList, dwID)
 					end
 				end
 			end
@@ -3121,9 +3092,9 @@ end
 end
 
 do local CACHE = {}
-function LIB.GetSchoolForceID(dwSchoolID)
+function X.GetSchoolForceID(dwSchoolID)
 	if not CACHE[dwSchoolID] then
-		if IsFunction(_G.Table_SchoolToForce) then
+		if X.IsFunction(_G.Table_SchoolToForce) then
 			CACHE[dwSchoolID] = _G.Table_SchoolToForce(dwSchoolID) or 0
 		else
 			local nCount = g_tTable.ForceToSchool:GetRowCount()
@@ -3141,14 +3112,14 @@ function LIB.GetSchoolForceID(dwSchoolID)
 end
 end
 
-function LIB.GetTargetSkillIDS(tar)
+function X.GetTargetSkillIDS(tar)
 	local aSchoolID, aSkillID = tar.GetSchoolList(), {}
 	for _, dwSchoolID in ipairs(aSchoolID) do
-		local dwForceID = LIB.GetSchoolForceID(dwSchoolID)
-		local aKungfuID = LIB.GetForceKungfuIDS(dwForceID)
+		local dwForceID = X.GetSchoolForceID(dwSchoolID)
+		local aKungfuID = X.GetForceKungfuIDS(dwForceID)
 		for _, dwKungfuID in ipairs(aKungfuID) do
-			for _, dwSkillID in ipairs(LIB.GetKungfuSkillIDS(dwKungfuID)) do
-				insert(aSkillID, dwSkillID)
+			for _, dwSkillID in ipairs(X.GetKungfuSkillIDS(dwKungfuID)) do
+				table.insert(aSkillID, dwSkillID)
 			end
 		end
 	end
@@ -3157,19 +3128,19 @@ end
 
 do
 local LIST, LIST_ALL
-function LIB.GetSkillMountList(bIncludePassive)
+function X.GetSkillMountList(bIncludePassive)
 	if not LIST then
 		LIST, LIST_ALL = {}, {}
 		local me = GetClientPlayer()
-		local aList = LIB.GetTargetSkillIDS(me)
+		local aList = X.GetTargetSkillIDS(me)
 		for _, dwID in ipairs(aList) do
 			local nLevel = me.GetSkillLevel(dwID)
 			if nLevel > 0 then
 				local KSkill = GetSkill(dwID, nLevel)
 				if not KSkill.bIsPassiveSkill then
-					insert(LIST, dwID)
+					table.insert(LIST, dwID)
 				end
-				insert(LIST_ALL, dwID)
+				table.insert(LIST_ALL, dwID)
 			end
 		end
 	end
@@ -3179,15 +3150,15 @@ end
 local function onKungfuChange()
 	LIST, LIST_ALL = nil, nil
 end
-LIB.RegisterEvent('SKILL_MOUNT_KUNG_FU', onKungfuChange)
-LIB.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', onKungfuChange)
+X.RegisterEvent('SKILL_MOUNT_KUNG_FU', onKungfuChange)
+X.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', onKungfuChange)
 end
 
 do
 local SKILL_CACHE = setmetatable({}, { __mode = 'v' })
 local SKILL_PROXY = setmetatable({}, { __mode = 'v' })
-local function reject() assert(false, 'Modify skill info from LIB.GetSkill is forbidden!') end
-function LIB.GetSkill(dwID, nLevel)
+local function reject() assert(false, 'Modify skill info from X.GetSkill is forbidden!') end
+function X.GetSkill(dwID, nLevel)
 	if nLevel == 0 then
 		return
 	end
@@ -3199,12 +3170,12 @@ function LIB.GetSkill(dwID, nLevel)
 	if not SKILL_CACHE[szKey] or not SKILL_PROXY[szKey] then
 		SKILL_CACHE[szKey] = {
 			szKey = szKey,
-			szName = LIB.GetSkillName(dwID, nLevel),
+			szName = X.GetSkillName(dwID, nLevel),
 			dwID = dwID,
 			nLevel = nLevel,
 			bLearned = nLevel > 0,
 			nIcon = Table_GetSkillIconID(dwID, nLevel),
-			dwExtID = LIB.Table_GetSkillExtCDID(dwID),
+			dwExtID = X.Table_GetSkillExtCDID(dwID),
 			bFormation = Table_IsSkillFormation(dwID, nLevel),
 		}
 		SKILL_PROXY[szKey] = setmetatable({}, { __index = SKILL_CACHE[szKey], __newindex = reject })
@@ -3226,8 +3197,8 @@ local function GetSkillCDProgress(dwID, nLevel, dwCDID, KObject)
 		return KObject.GetSkillCDProgress(dwID, nLevel)
 	end
 end
-function LIB.GetSkillCDProgress(KObject, dwID, nLevel, bIgnorePublic)
-	if not IsUserdata(KObject) then
+function X.GetSkillCDProgress(KObject, dwID, nLevel, bIgnorePublic)
+	if not X.IsUserdata(KObject) then
 		KObject, dwID, nLevel = GetClientPlayer(), KObject, dwID
 	end
 	if not nLevel then
@@ -3236,14 +3207,14 @@ function LIB.GetSkillCDProgress(KObject, dwID, nLevel, bIgnorePublic)
 	if not nLevel then
 		return
 	end
-	local KSkill, info = LIB.GetSkill(dwID, nLevel)
+	local KSkill, info = X.GetSkill(dwID, nLevel)
 	if not KSkill or not info then
 		return
 	end
 	-- # 更新CD相关的所有东西
 	-- -- 附加技能CD
 	-- if info.dwExtID then
-	-- 	info.skillExt = LIB.GetTargetSkill(KObject, info.dwExtID)
+	-- 	info.skillExt = X.GetTargetSkill(KObject, info.dwExtID)
 	-- end
 	-- 充能和透支技能CD刷新
 	local nCDMaxCount, dwCDID = KObject.GetCDMaxCount(dwID)
@@ -3308,14 +3279,14 @@ local RECIPE_CACHE = {}
 local function onRecipeUpdate()
 	RECIPE_CACHE = {}
 end
-LIB.RegisterEvent({'SYNC_ROLE_DATA_END', 'SKILL_UPDATE', 'SKILL_RECIPE_LIST_UPDATE'}, onRecipeUpdate)
+X.RegisterEvent({'SYNC_ROLE_DATA_END', 'SKILL_UPDATE', 'SKILL_RECIPE_LIST_UPDATE'}, onRecipeUpdate)
 
 local function GetShortName(sz) -- 获取秘笈短名
 	local nStart, nEnd = string.find(sz, '·')
-	return nStart and wgsub(string.sub(sz, nEnd + 1), _L['>'], '')
+	return nStart and wstring.gsub(string.sub(sz, nEnd + 1), _L['>'], '')
 end
 
-function LIB.IsRecipeActive(szRecipeName)
+function X.IsRecipeActive(szRecipeName)
 	local me = GetClientPlayer()
 	if not RECIPE_CACHE[szRecipeName] then
 		if not me then
@@ -3346,9 +3317,9 @@ end
 end
 
 -- 登出游戏
--- (void) LIB.Logout(bCompletely)
+-- (void) X.Logout(bCompletely)
 -- bCompletely 为true返回登陆页 为false返回角色页 默认为false
-function LIB.Logout(bCompletely)
+function X.Logout(bCompletely)
 	if bCompletely then
 		ReInitUI(LOAD_LOGIN_REASON.RETURN_GAME_LOGIN)
 	else
@@ -3357,46 +3328,46 @@ function LIB.Logout(bCompletely)
 end
 
 -- 根据技能 ID 获取引导帧数，非引导技能返回 nil
--- (number) LIB.GetChannelSkillFrame(number dwSkillID, number nLevel)
-function LIB.GetChannelSkillFrame(dwSkillID, nLevel)
+-- (number) X.GetChannelSkillFrame(number dwSkillID, number nLevel)
+function X.GetChannelSkillFrame(dwSkillID, nLevel)
 	local skill = GetSkill(dwSkillID, nLevel)
 	if skill then
 		return skill.nChannelFrame
 	end
 end
 
-function LIB.IsMarker(...)
+function X.IsMarker(...)
 	local dwID = select('#', ...) == 0 and UI_GetClientPlayerID() or ...
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) == dwID
 end
 
-function LIB.IsLeader(...)
+function X.IsLeader(...)
 	local dwID = select('#', ...) == 0 and UI_GetClientPlayerID() or ...
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) == dwID
 end
 
-function LIB.IsDistributer(...)
+function X.IsDistributer(...)
 	local dwID = select('#', ...) == 0 and UI_GetClientPlayerID() or ...
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) == dwID
 end
 
 -- 判断自己在不在队伍里
--- (bool) LIB.IsInParty()
-function LIB.IsInParty()
+-- (bool) X.IsInParty()
+function X.IsInParty()
 	local me = GetClientPlayer()
 	return me and me.IsInParty()
 end
 
 -- 判断自己在不在团队里
--- (bool) LIB.IsInRaid()
-function LIB.IsInRaid()
+-- (bool) X.IsInRaid()
+function X.IsInRaid()
 	local me = GetClientPlayer()
 	return me and me.IsInRaid()
 end
 
 -- 判断当前地图是不是竞技场
--- (bool) LIB.IsInArena()
-function LIB.IsInArena()
+-- (bool) X.IsInArena()
+function X.IsInArena()
 	local me = GetClientPlayer()
 	return me and (
 		me.GetScene().bIsArenaMap or -- JJC
@@ -3406,10 +3377,10 @@ function LIB.IsInArena()
 end
 
 -- 判断当前地图是不是战场
--- (bool) LIB.IsInBattleField()
-function LIB.IsInBattleField()
+-- (bool) X.IsInBattleField()
+function X.IsInBattleField()
 	local me = GetClientPlayer()
-	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not LIB.IsInArena()
+	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not X.IsInArena()
 end
 
 do
@@ -3428,19 +3399,19 @@ local function GenerateMapInfo()
 			if tDungeonInfo and tDungeonInfo.dwClassID == 3 then
 				map.bDungeon = true
 			end
-			map = LIB.SetmetaReadonly(map)
+			map = X.SetmetaReadonly(map)
 			MAP_LIST[map.dwID] = map
 			MAP_LIST[map.szName] = map
 		end
-		MAP_LIST = LIB.SetmetaReadonly(MAP_LIST)
+		MAP_LIST = X.SetmetaReadonly(MAP_LIST)
 	end
 	return MAP_LIST
 end
 
 -- 判断一个地图是不是秘境
--- (bool) LIB.IsDungeonMap(szMapName, bRaid)
--- (bool) LIB.IsDungeonMap(dwMapID, bRaid)
-function LIB.IsDungeonMap(dwMapID, bRaid)
+-- (bool) X.IsDungeonMap(szMapName, bRaid)
+-- (bool) X.IsDungeonMap(dwMapID, bRaid)
+function X.IsDungeonMap(dwMapID, bRaid)
 	if not MAP_LIST then
 		GenerateMapInfo()
 	end
@@ -3458,9 +3429,9 @@ function LIB.IsDungeonMap(dwMapID, bRaid)
 end
 
 -- 获取一个地图的信息
--- (table) LIB.GetMapInfo(dwMapID)
--- (table) LIB.GetMapInfo(szMapName)
-function LIB.GetMapInfo(arg0)
+-- (table) X.GetMapInfo(dwMapID)
+-- (table) X.GetMapInfo(szMapName)
+function X.GetMapInfo(arg0)
 	if not MAP_LIST then
 		GenerateMapInfo()
 	end
@@ -3471,83 +3442,83 @@ function LIB.GetMapInfo(arg0)
 end
 end
 
-function LIB.GetMapNameList()
+function X.GetMapNameList()
 	local aList, tMap = {}, {}
-	for k, v in ipairs_r(GetMapList()) do
+	for k, v in X.ipairs_r(GetMapList()) do
 		local szName = Table_GetMapName(v)
 		if not tMap[szName] then
 			tMap[szName] = true
-			insert(aList, szName)
+			table.insert(aList, szName)
 		end
 	end
 	return aList
 end
 
 -- 判断一个地图是不是个人CD秘境
--- (bool) LIB.IsDungeonRoleProgressMap(dwMapID)
-function LIB.IsDungeonRoleProgressMap(dwMapID)
+-- (bool) X.IsDungeonRoleProgressMap(dwMapID)
+function X.IsDungeonRoleProgressMap(dwMapID)
 	return (select(8, GetMapParams(dwMapID)))
 end
 
 -- 判断当前地图是不是秘境
--- (bool) LIB.IsInDungeon(bool bRaid)
-function LIB.IsInDungeon(bRaid)
+-- (bool) X.IsInDungeon(bool bRaid)
+function X.IsInDungeon(bRaid)
 	local me = GetClientPlayer()
-	return me and LIB.IsDungeonMap(me.GetMapID(), bRaid)
+	return me and X.IsDungeonMap(me.GetMapID(), bRaid)
 end
 
 -- 判断一个地图是不是主城
--- (bool) LIB.IsCityMap(dwMapID)
-function LIB.IsCityMap(dwMapID)
+-- (bool) X.IsCityMap(dwMapID)
+function X.IsCityMap(dwMapID)
 	local tType = Table_GetMapType(dwMapID)
 	return tType and tType.CITY and true or false
 end
 
 -- 判断当前地图是不是主城
--- (bool) LIB.IsInCity()
-function LIB.IsInCity()
+-- (bool) X.IsInCity()
+function X.IsInCity()
 	local me = GetClientPlayer()
-	return me and LIB.IsCityMap(me.GetMapID())
+	return me and X.IsCityMap(me.GetMapID())
 end
 
 -- 判断一个地图是不是野外
--- (bool) LIB.IsVillageMap(dwMapID)
-function LIB.IsVillageMap(dwMapID)
+-- (bool) X.IsVillageMap(dwMapID)
+function X.IsVillageMap(dwMapID)
 	local tType = Table_GetMapType(dwMapID)
 	return tType and tType.VILLAGE and true or false
 end
 
 -- 判断当前地图是不是野外
--- (bool) LIB.IsInVillage()
-function LIB.IsInVillage()
+-- (bool) X.IsInVillage()
+function X.IsInVillage()
 	local me = GetClientPlayer()
-	return me and LIB.IsVillageMap(me.GetMapID())
+	return me and X.IsVillageMap(me.GetMapID())
 end
 
 -- 判断地图是不是PUBG
--- (bool) LIB.IsPubgMap(dwMapID)
+-- (bool) X.IsPubgMap(dwMapID)
 do
 local PUBG_MAP = {}
-function LIB.IsPubgMap(dwMapID)
+function X.IsPubgMap(dwMapID)
 	if PUBG_MAP[dwMapID] == nil then
-		PUBG_MAP[dwMapID] = LIB.Table_IsTreasureBattleFieldMap(dwMapID) or false
+		PUBG_MAP[dwMapID] = X.Table_IsTreasureBattleFieldMap(dwMapID) or false
 	end
 	return PUBG_MAP[dwMapID]
 end
 end
 
 -- 判断当前地图是不是PUBG
--- (bool) LIB.IsInPubg()
-function LIB.IsInPubg()
+-- (bool) X.IsInPubg()
+function X.IsInPubg()
 	local me = GetClientPlayer()
-	return me and LIB.IsPubgMap(me.GetMapID())
+	return me and X.IsPubgMap(me.GetMapID())
 end
 
 -- 判断地图是不是僵尸地图
--- (bool) LIB.IsZombieMap(dwMapID)
+-- (bool) X.IsZombieMap(dwMapID)
 do
 local ZOMBIE_MAP = {}
-function LIB.IsZombieMap(dwMapID)
+function X.IsZombieMap(dwMapID)
 	if ZOMBIE_MAP[dwMapID] == nil then
 		ZOMBIE_MAP[dwMapID] = Table_IsZombieBattleFieldMap
 			and Table_IsZombieBattleFieldMap(dwMapID) or false
@@ -3557,68 +3528,68 @@ end
 end
 
 -- 判断当前地图是不是僵尸地图
--- (bool) LIB.IsInZombieMap()
-function LIB.IsInZombieMap()
+-- (bool) X.IsInZombieMap()
+function X.IsInZombieMap()
 	local me = GetClientPlayer()
-	return me and LIB.IsZombieMap(me.GetMapID())
+	return me and X.IsZombieMap(me.GetMapID())
 end
 
 -- 判断地图是不是MOBA地图
--- (bool) LIB.IsMobaMap(dwMapID)
-function LIB.IsMobaMap(dwMapID)
+-- (bool) X.IsMobaMap(dwMapID)
+function X.IsMobaMap(dwMapID)
 	return CONSTANT.MOBA_MAP[dwMapID] or false
 end
 
 -- 判断当前地图是不是MOBA地图
--- (bool) LIB.IsInMobaMap()
-function LIB.IsInMobaMap()
+-- (bool) X.IsInMobaMap()
+function X.IsInMobaMap()
 	local me = GetClientPlayer()
-	return me and LIB.IsMobaMap(me.GetMapID())
+	return me and X.IsMobaMap(me.GetMapID())
 end
 
 -- 判断地图是不是浪客行地图
--- (bool) LIB.IsStarveMap(dwMapID)
-function LIB.IsStarveMap(dwMapID)
+-- (bool) X.IsStarveMap(dwMapID)
+function X.IsStarveMap(dwMapID)
 	return CONSTANT.STARVE_MAP[dwMapID] or false
 end
 
 -- 判断当前地图是不是浪客行地图
--- (bool) LIB.IsInStarveMap()
-function LIB.IsInStarveMap()
+-- (bool) X.IsInStarveMap()
+function X.IsInStarveMap()
 	local me = GetClientPlayer()
-	return me and LIB.IsStarveMap(me.GetMapID())
+	return me and X.IsStarveMap(me.GetMapID())
 end
 
 -- 判断地图是不是家园地图
--- (bool) LIB.IsHLMap(dwMapID)
-function LIB.IsHLMap(dwMapID)
+-- (bool) X.IsHLMap(dwMapID)
+function X.IsHLMap(dwMapID)
 	return select(2, GetMapParams(dwMapID)) == MAP_TYPE.COMMUNITY
 end
 
 -- 判断当前地图是不是家园地图
--- (bool) LIB.IsInHLMap()
-function LIB.IsInHLMap()
+-- (bool) X.IsInHLMap()
+function X.IsInHLMap()
 	local me = GetClientPlayer()
-	return me and LIB.IsHLMap(me.GetMapID())
+	return me and X.IsHLMap(me.GetMapID())
 end
 
 -- 判断地图是不是新背包地图
--- (bool) LIB.IsExtraBagMap(dwMapID)
-function LIB.IsExtraBagMap(dwMapID)
-	return LIB.IsPubgMap(dwMapID) or LIB.IsMobaMap(dwMapID) or LIB.IsStarveMap(dwMapID)
+-- (bool) X.IsExtraBagMap(dwMapID)
+function X.IsExtraBagMap(dwMapID)
+	return X.IsPubgMap(dwMapID) or X.IsMobaMap(dwMapID) or X.IsStarveMap(dwMapID)
 end
 
 -- 判断当前地图是不是新背包地图
--- (bool) LIB.IsInExtraBagMap()
-function LIB.IsInExtraBagMap()
+-- (bool) X.IsInExtraBagMap()
+function X.IsInExtraBagMap()
 	local me = GetClientPlayer()
-	return me and LIB.IsExtraBagMap(me.GetMapID())
+	return me and X.IsExtraBagMap(me.GetMapID())
 end
 
 -- 判断地图是不是功能屏蔽地图
--- (bool) LIB.IsShieldedMap(dwMapID)
-function LIB.IsShieldedMap(dwMapID)
-	if LIB.IsPubgMap(dwMapID) or LIB.IsZombieMap(dwMapID) then
+-- (bool) X.IsShieldedMap(dwMapID)
+function X.IsShieldedMap(dwMapID)
+	if X.IsPubgMap(dwMapID) or X.IsZombieMap(dwMapID) then
 		return true
 	end
 	if IsAddonBanMap and IsAddonBanMap(dwMapID) then
@@ -3628,40 +3599,40 @@ function LIB.IsShieldedMap(dwMapID)
 end
 
 -- 判断当前地图是不是PUBG
--- (bool) LIB.IsInShieldedMap()
-function LIB.IsInShieldedMap()
+-- (bool) X.IsInShieldedMap()
+function X.IsInShieldedMap()
 	local me = GetClientPlayer()
-	return me and LIB.IsShieldedMap(me.GetMapID())
+	return me and X.IsShieldedMap(me.GetMapID())
 end
 
 -- 获取主角当前所在地图
--- (number) LIB.GetMapID(bool bFix) 是否做修正
-function LIB.GetMapID(bFix)
+-- (number) X.GetMapID(bool bFix) 是否做修正
+function X.GetMapID(bFix)
 	local dwMapID = GetClientPlayer().GetMapID()
 	return bFix and CONSTANT.MAP_NAME_FIX[dwMapID] or dwMapID
 end
 
 do local MARK_NAME = { _L['Cloud'], _L['Sword'], _L['Ax'], _L['Hook'], _L['Drum'], _L['Shear'], _L['Stick'], _L['Jade'], _L['Dart'], _L['Fan'] }
 -- 获取标记中文名
--- (string) LIB.GetMarkName([number nIndex])
-function LIB.GetMarkName(nIndex)
+-- (string) X.GetMarkName([number nIndex])
+function X.GetMarkName(nIndex)
 	if nIndex then
 		return MARK_NAME[nIndex]
 	else
-		return Clone(MARK_NAME)
+		return X.Clone(MARK_NAME)
 	end
 end
 
-function LIB.GetMarkIndex(dwID)
-	if not LIB.IsInParty() then
+function X.GetMarkIndex(dwID)
+	if not X.IsInParty() then
 		return
 	end
 	return GetClientTeam().GetMarkIndex(dwID)
 end
 
 -- 保存当前团队信息
--- (table) LIB.GetTeamInfo([table tTeamInfo])
-function LIB.GetTeamInfo(tTeamInfo)
+-- (table) X.GetTeamInfo([table tTeamInfo])
+function X.GetTeamInfo(tTeamInfo)
 	local tList, me, team = {}, GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
 		return false
@@ -3701,16 +3672,16 @@ end
 local function SyncMember(team, dwID, szName, state)
 	if state.bForm then --如果这货之前有阵眼
 		team.SetTeamFormationLeader(dwID, state.nGroup) -- 阵眼给他
-		LIB.Sysmsg(_L('Restore formation of %d group: %s', state.nGroup + 1, szName))
+		X.Sysmsg(_L('Restore formation of %d group: %s', state.nGroup + 1, szName))
 	end
 	if state.nMark then -- 如果这货之前有标记
 		team.SetTeamMark(state.nMark, dwID) -- 标记给他
-		LIB.Sysmsg(_L('Restore player marked as [%s]: %s', MARK_NAME[state.nMark], szName))
+		X.Sysmsg(_L('Restore player marked as [%s]: %s', MARK_NAME[state.nMark], szName))
 	end
 end
 -- 恢复团队信息
--- (bool) LIB.SetTeamInfo(table tTeamInfo)
-function LIB.SetTeamInfo(tTeamInfo)
+-- (bool) X.SetTeamInfo(table tTeamInfo)
+function X.SetTeamInfo(tTeamInfo)
 	local me, team = GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
 		return false
@@ -3721,7 +3692,7 @@ function LIB.SetTeamInfo(tTeamInfo)
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) ~= me.dwID then
 		local nGroup = team.GetMemberGroupIndex(me.dwID) + 1
 		local szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
-		return LIB.Sysmsg(_L['You are not team leader, permission denied'])
+		return X.Sysmsg(_L['You are not team leader, permission denied'])
 	end
 
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) ~= me.dwID then
@@ -3736,20 +3707,20 @@ function LIB.SetTeamInfo(tTeamInfo)
 		for _, dwID in pairs(tGroupInfo.MemberList) do
 			local szName = team.GetClientTeamMemberName(dwID)
 			if not szName then
-				LIB.Sysmsg(_L('Unable get player of %d group: #%d', nGroup + 1, dwID))
+				X.Sysmsg(_L('Unable get player of %d group: #%d', nGroup + 1, dwID))
 			else
 				if not tSaved[szName] then
-					szName = gsub(szName, '@.*', '')
+					szName = string.gsub(szName, '@.*', '')
 				end
 				local state = tSaved[szName]
 				if not state then
-					insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = nil })
-					LIB.Sysmsg(_L('Unknown status: %s', szName))
+					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = nil })
+					X.Sysmsg(_L('Unknown status: %s', szName))
 				elseif state.nGroup == nGroup then
 					SyncMember(team, dwID, szName, state)
-					LIB.Sysmsg(_L('Need not adjust: %s', szName))
+					X.Sysmsg(_L('Need not adjust: %s', szName))
 				else
-					insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = state })
+					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = state })
 				end
 				if szName == tTeamInfo.szLeader then
 					dwLeader = dwID
@@ -3759,7 +3730,7 @@ function LIB.SetTeamInfo(tTeamInfo)
 				end
 				if szName == tTeamInfo.szDistribute and dwID ~= team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) then
 					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
-					LIB.Sysmsg(_L('Restore distributor: %s', szName))
+					X.Sysmsg(_L('Restore distributor: %s', szName))
 				end
 			end
 		end
@@ -3771,22 +3742,22 @@ function LIB.SetTeamInfo(tTeamInfo)
 			-- wrong user to be adjusted
 			local src = tWrong[nGroup][nIndex]
 			local dIndex = GetWrongIndex(tWrong[src.state.nGroup], false)
-			remove(tWrong[nGroup], nIndex)
+			table.remove(tWrong[nGroup], nIndex)
 			-- do adjust
 			if not dIndex then
 				team.ChangeMemberGroup(src.dwID, src.state.nGroup, 0) -- 直接丢过去
 			else
 				local dst = tWrong[src.state.nGroup][dIndex]
-				remove(tWrong[src.state.nGroup], dIndex)
+				table.remove(tWrong[src.state.nGroup], dIndex)
 				team.ChangeMemberGroup(src.dwID, src.state.nGroup, dst.dwID)
 				if not dst.state or dst.state.nGroup ~= nGroup then
-					insert(tWrong[nGroup], dst)
+					table.insert(tWrong[nGroup], dst)
 				else -- bingo
-					LIB.Sysmsg(_L('Change group of [%s] to %d', dst.szName, nGroup + 1))
+					X.Sysmsg(_L('Change group of [%s] to %d', dst.szName, nGroup + 1))
 					SyncMember(team, dst.dwID, dst.szName, dst.state)
 				end
 			end
-			LIB.Sysmsg(_L('Change group of [%s] to %d', src.szName, src.state.nGroup + 1))
+			X.Sysmsg(_L('Change group of [%s] to %d', src.szName, src.state.nGroup + 1))
 			SyncMember(team, src.dwID, src.szName, src.state)
 			nIndex = GetWrongIndex(tWrong[nGroup], true) -- update nIndex
 		end
@@ -3797,17 +3768,17 @@ function LIB.SetTeamInfo(tTeamInfo)
 	end
 	if dwMark ~= 0 and dwMark ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwMark)
-		LIB.Sysmsg(_L('Restore team marker: %s', tTeamInfo.szMark))
+		X.Sysmsg(_L('Restore team marker: %s', tTeamInfo.szMark))
 	end
 	if dwLeader ~= 0 and dwLeader ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwLeader)
-		LIB.Sysmsg(_L('Restore team leader: %s', tTeamInfo.szLeader))
+		X.Sysmsg(_L('Restore team leader: %s', tTeamInfo.szLeader))
 	end
-	LIB.Sysmsg(_L['Team list restored'])
+	X.Sysmsg(_L['Team list restored'])
 end
 end
 
-function LIB.UpdateItemBoxExtend(box, nQuality)
+function X.UpdateItemBoxExtend(box, nQuality)
 	local szImage = 'ui/Image/Common/Box.UITex'
 	local nFrame
 	if nQuality == 2 then
@@ -3830,7 +3801,7 @@ end
 
 do
 local l_tGlobalEffect
-function LIB.GetGlobalEffect(nID)
+function X.GetGlobalEffect(nID)
 	if l_tGlobalEffect == nil then
 		local szPath = 'represent\\common\\global_effect.txt'
 		local tTitle = {
@@ -3861,7 +3832,7 @@ function LIB.GetGlobalEffect(nID)
 end
 end
 
-function LIB.GetCharInfo()
+function X.GetCharInfo()
 	local me = GetClientPlayer()
 	local kungfu = GetClientPlayer().GetKungfuMount()
 	local data = {
@@ -3879,14 +3850,14 @@ function LIB.GetCharInfo()
 				nCategoryIndex = nCategoryIndex + 1
 				local category = aCategory[nCategoryIndex]
 				if category then
-					insert(data, {
+					table.insert(data, {
 						category = true,
 						label = category[1],
 					})
 					nSubLen, nSubIndex = category[2], 1
 				end
 			end
-			insert(data, {
+			table.insert(data, {
 				label = content[1],
 				value = content[2],
 				tip = tTip[content[3]],
@@ -3905,7 +3876,7 @@ function LIB.GetCharInfo()
 		local handle = hCharInfo:Lookup('WndScroll_Property', '')
 		for i = 0, handle:GetVisibleItemCount() -1 do
 			local h = handle:Lookup(i)
-			insert(data, {
+			table.insert(data, {
 				szTip = h.szTip,
 				label = h:Lookup(0):GetText(),
 				value = h:Lookup(1):GetText(),
@@ -3915,17 +3886,17 @@ function LIB.GetCharInfo()
 	return data
 end
 
-function LIB.IsPhoneLock()
+function X.IsPhoneLock()
 	local me = GetClientPlayer()
 	return me and me.IsTradingMibaoSwitchOpen()
 end
 
-function LIB.IsAccountInDanger()
+function X.IsAccountInDanger()
 	local me = GetClientPlayer()
 	return me.nAccountSecurityState == ACCOUNT_SECURITY_STATE.DANGER
 end
 
-function LIB.IsSafeLocked(nType)
+function X.IsSafeLocked(nType)
 	local me = GetClientPlayer()
 	if nType == SAFE_LOCK_EFFECT_TYPE.TALK then -- 聊天锁比较特殊
 		if me.GetSafeLockMaskInfo then
@@ -3939,14 +3910,14 @@ function LIB.IsSafeLocked(nType)
 		end
 		return false
 	end
-	if LIB.IsAccountInDanger() then
+	if X.IsAccountInDanger() then
 		return true
 	end
 	return not me.CheckSafeLock(nType)
 end
 
-function LIB.IsTradeLocked()
-	if LIB.IsAccountInDanger() then
+function X.IsTradeLocked()
+	if X.IsAccountInDanger() then
 		return true
 	end
 	local me = GetClientPlayer()
@@ -3954,7 +3925,7 @@ function LIB.IsTradeLocked()
 end
 
 -- * 当前道具是否满足装备要求：包括身法，体型，门派，性别，等级，根骨，力量，体质
-function LIB.DoesEquipmentSuit(item, bIsItem, player)
+function X.DoesEquipmentSuit(item, bIsItem, player)
 	if not player then
 		player = GetClientPlayer()
 	end
@@ -3972,7 +3943,7 @@ end
 -- * 当前装备是否适合当前内功
 do
 local CACHE = {}
-local m_MountTypeToWeapon = LIB.KvpToObject({
+local m_MountTypeToWeapon = X.KvpToObject({
 	{CONSTANT.KUNGFU_TYPE.TIAN_CE  , WEAPON_DETAIL.SPEAR        }, -- 天策内功=长兵类
 	{CONSTANT.KUNGFU_TYPE.WAN_HUA  , WEAPON_DETAIL.PEN          }, -- 万花内功=笔类
 	{CONSTANT.KUNGFU_TYPE.CHUN_YANG, WEAPON_DETAIL.SWORD        }, -- 纯阳内功=短兵类
@@ -3992,15 +3963,15 @@ local m_MountTypeToWeapon = LIB.KvpToObject({
 	--WEAPON_DETAIL.MACH_DART = 机关暗器
 	--WEAPON_DETAIL.SLING_SHOT = 投掷
 })
-function LIB.IsItemFitKungfu(itemInfo, ...)
-	if LIB.GetObjectType(itemInfo) == 'ITEM' then
+function X.IsItemFitKungfu(itemInfo, ...)
+	if X.GetObjectType(itemInfo) == 'ITEM' then
 		itemInfo = GetItemInfo(itemInfo.dwTabType, itemInfo.dwIndex)
 	end
 	local kungfu = ...
 	local me = GetClientPlayer()
 	if select('#', ...) == 0 then
 		kungfu = me.GetKungfuMount()
-	elseif IsNumber(kungfu) then
+	elseif X.IsNumber(kungfu) then
 		kungfu = GetSkill(kungfu, me.GetSkillLevel(kungfu) or 1)
 	end
 	if itemInfo.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
@@ -4027,8 +3998,8 @@ function LIB.IsItemFitKungfu(itemInfo, ...)
 	if not aRecommendKungfuID then
 		local res = g_tTable.EquipRecommend:Search(itemInfo.nRecommendID)
 		aRecommendKungfuID = {}
-		for i, v in ipairs(LIB.SplitString(res.kungfu_ids, '|')) do
-			insert(aRecommendKungfuID, tonumber(v))
+		for i, v in ipairs(X.SplitString(res.kungfu_ids, '|')) do
+			table.insert(aRecommendKungfuID, tonumber(v))
 		end
 		CACHE[itemInfo.nRecommendID] = aRecommendKungfuID
 	end
@@ -4053,7 +4024,7 @@ end
 end
 
 -- * 获取物品对应身上装备的位置
-function LIB.GetItemEquipPos(item, nIndex)
+function X.GetItemEquipPos(item, nIndex)
 	if not nIndex then
 		nIndex = 1
 	end
@@ -4104,7 +4075,7 @@ function LIB.GetItemEquipPos(item, nIndex)
 end
 
 -- * 当前装备是否是比身上已经装备的更好
-function LIB.IsBetterEquipment(item, dwPackage, dwBox)
+function X.IsBetterEquipment(item, dwPackage, dwBox)
 	if item.nGenre ~= ITEM_GENRE.EQUIPMENT
 	or item.nSub == CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND
 	or item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_EXTEND
@@ -4118,8 +4089,8 @@ function LIB.IsBetterEquipment(item, dwPackage, dwBox)
 	if not dwPackage or not dwBox then
 		local nIndex, nCount = 0, 1
 		while nIndex < nCount do
-			dwPackage, dwBox, nIndex, nCount = LIB.GetItemEquipPos(item, nIndex + 1)
-			if LIB.IsBetterEquipment(item, dwPackage, dwBox) then
+			dwPackage, dwBox, nIndex, nCount = X.GetItemEquipPos(item, nIndex + 1)
+			if X.IsBetterEquipment(item, dwPackage, dwBox) then
 				return true
 			end
 		end
@@ -4137,7 +4108,7 @@ function LIB.IsBetterEquipment(item, dwPackage, dwBox)
 	return (item.nEquipScore > equipedItem.nEquipScore) or (item.nLevel > equipedItem.nLevel and item.nQuality >= equipedItem.nQuality)
 end
 
-function LIB.GetCampImage(eCamp, bFight) -- ui\Image\UICommon\CommonPanel2.UITex
+function X.GetCampImage(eCamp, bFight) -- ui\Image\UICommon\CommonPanel2.UITex
 	local szUITex, nFrame
 	if eCamp == CAMP.GOOD then
 		if bFight then
@@ -4159,8 +4130,8 @@ function LIB.GetCampImage(eCamp, bFight) -- ui\Image\UICommon\CommonPanel2.UITex
 end
 
 do local _RoleName
-function LIB.GetUserRoleName()
-	if IsFunction(GetUserRoleName) then
+function X.GetUserRoleName()
+	if X.IsFunction(GetUserRoleName) then
 		return GetUserRoleName()
 	end
 	local me = GetClientPlayer()
@@ -4172,7 +4143,7 @@ end
 end
 
 do local ITEM_CACHE = {}
-function LIB.GetItemNameByUIID(nUiId)
+function X.GetItemNameByUIID(nUiId)
 	if not ITEM_CACHE[nUiId] then
 		local szName = Table_GetItemName(nUiId)
 		if szName == '' then
@@ -4184,24 +4155,24 @@ function LIB.GetItemNameByUIID(nUiId)
 end
 end
 
-function LIB.GetItemNameByItem(item)
+function X.GetItemNameByItem(item)
 	if item.nGenre == ITEM_GENRE.BOOK then
-		local nBookID, nSegID = LIB.RecipeToSegmentID(item.nBookID)
+		local nBookID, nSegID = X.RecipeToSegmentID(item.nBookID)
 		return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
 	end
-	return LIB.GetItemNameByUIID(item.nUiId)
+	return X.GetItemNameByUIID(item.nUiId)
 end
 
-function LIB.GetItemNameByItemInfo(itemInfo, nBookInfo)
+function X.GetItemNameByItemInfo(itemInfo, nBookInfo)
 	if itemInfo.nGenre == ITEM_GENRE.BOOK and nBookInfo then
-		local nBookID, nSegID = LIB.RecipeToSegmentID(nBookInfo)
+		local nBookID, nSegID = X.RecipeToSegmentID(nBookInfo)
 		return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
 	end
-	return LIB.GetItemNameByUIID(itemInfo.nUiId)
+	return X.GetItemNameByUIID(itemInfo.nUiId)
 end
 
 do local ITEM_CACHE = {}
-function LIB.GetItemIconByUIID(nUiId)
+function X.GetItemIconByUIID(nUiId)
 	if not ITEM_CACHE[nUiId] then
 		local nIcon = Table_GetItemIconID(nUiId)
 		if nIcon == -1 then
@@ -4213,16 +4184,16 @@ function LIB.GetItemIconByUIID(nUiId)
 end
 end
 
-function LIB.GetGuildBankBagSize(nPage)
+function X.GetGuildBankBagSize(nPage)
 	return CONSTANT.INVENTORY_GUILD_PAGE_BOX_COUNT
 end
 
-function LIB.GetGuildBankBagPos(nPage, nIndex)
+function X.GetGuildBankBagPos(nPage, nIndex)
 	return CONSTANT.INVENTORY_GUILD_BANK, nPage * CONSTANT.INVENTORY_GUILD_PAGE_SIZE + nIndex - 1
 end
 
-function LIB.IsSelf(dwSrcID, dwTarID)
-	if IsFunction(IsSelf) then
+function X.IsSelf(dwSrcID, dwTarID)
+	if X.IsFunction(IsSelf) then
 		return IsSelf(dwSrcID, dwTarID)
 	end
 	return dwSrcID ~= 0 and dwSrcID == dwTarID and IsPlayer(dwSrcID) and IsPlayer(dwTarID)
@@ -4230,8 +4201,8 @@ end
 
 -- * 获取门派对应心法ID列表
 do local m_tForceToKungfu
-function LIB.ForceIDToKungfuIDs(dwForceID)
-	if IsFunction(ForceIDToKungfuIDs) then
+function X.ForceIDToKungfuIDs(dwForceID)
+	if X.IsFunction(ForceIDToKungfuIDs) then
 		return ForceIDToKungfuIDs(dwForceID)
 	end
 	if not m_tForceToKungfu then
@@ -4240,7 +4211,7 @@ function LIB.ForceIDToKungfuIDs(dwForceID)
 			if not m_tForceToKungfu[v.dwForceID] then
 				m_tForceToKungfu[v.dwForceID] = {}
 			end
-			insert(m_tForceToKungfu[v.dwForceID], v.dwID)
+			table.insert(m_tForceToKungfu[v.dwForceID], v.dwID)
 		end
 	end
 	return m_tForceToKungfu[dwForceID] or {}
@@ -4248,19 +4219,19 @@ end
 end
 
 -- 追加小地图标记
--- (void) LIB.UpdateMiniFlag(number dwType, KObject tar, number nF1[, number nF2])
--- (void) LIB.UpdateMiniFlag(number dwType, number nX, number nZ, number nF1[, number nF2])
+-- (void) X.UpdateMiniFlag(number dwType, KObject tar, number nF1[, number nF2])
+-- (void) X.UpdateMiniFlag(number dwType, number nX, number nZ, number nF1[, number nF2])
 -- dwType -- 类型 由UI脚本指定 (enum MINI_MAP_POINT)
 -- tar    -- 目标对象 KPlayer，KNpc，KDoodad
 -- nF1    -- 图标帧次
 -- nF2    -- 箭头帧次，默认 48 就行
-function LIB.UpdateMiniFlag(dwType, tar, nF1, nF2, nFadeOutTime, argX)
+function X.UpdateMiniFlag(dwType, tar, nF1, nF2, nFadeOutTime, argX)
 	local m = Station.Lookup('Normal/Minimap/Wnd_Minimap/Minimap_Map')
 	if not m then
 		return
 	end
 	local nX, nZ, dwID
-	if IsNumber(tar) then
+	if X.IsNumber(tar) then
 		dwID = GetStringCRC(tar .. nF1)
 		nX, nZ = Scene_PlaneGameWorldPosToScene(tar, nF1)
 		nF1, nF2, nFadeOutTime = nF2, nFadeOutTime, argX
@@ -4272,7 +4243,7 @@ function LIB.UpdateMiniFlag(dwType, tar, nF1, nF2, nFadeOutTime, argX)
 end
 
 -- 获取头像文件路径，帧序，是否动画
-function LIB.GetMiniAvatar(dwAvatarID, nRoleType)
+function X.GetMiniAvatar(dwAvatarID, nRoleType)
 	-- mini avatar
 	local tInfo = g_tTable.RoleAvatar:Search(dwAvatarID)
 	if tInfo then
@@ -4293,57 +4264,57 @@ function LIB.GetMiniAvatar(dwAvatarID, nRoleType)
 end
 
 -- 获取头像文件路径，帧序，是否动画
-function LIB.GetForceAvatar(dwForceID)
+function X.GetForceAvatar(dwForceID)
 	-- force avatar
 	return unpack(CONSTANT.FORCE_AVATAR[dwForceID])
 end
 
 -- 获取头像文件路径，帧序，是否动画
-function LIB.GetPlayerAvatar(dwForceID, nRoleType, dwAvatarID)
+function X.GetPlayerAvatar(dwForceID, nRoleType, dwAvatarID)
 	local szFile, nFrame, bAnimate
 	-- mini avatar
 	if dwAvatarID and dwAvatarID > 0 then
-		szFile, nFrame, bAnimate = LIB.GetMiniAvatar(dwAvatarID, nRoleType)
+		szFile, nFrame, bAnimate = X.GetMiniAvatar(dwAvatarID, nRoleType)
 	end
 	-- force avatar
 	if not szFile and dwForceID then
-		szFile, nFrame, bAnimate = LIB.GetForceAvatar(dwForceID)
+		szFile, nFrame, bAnimate = X.GetForceAvatar(dwForceID)
 	end
 	return szFile, nFrame, bAnimate
 end
 
 -- 获取成就基础信息
-function LIB.GetAchievement(dwAchieveID)
+function X.GetAchievement(dwAchieveID)
 	return g_tTable.Achievement:Search(dwAchieveID)
 end
 
 -- 获取成就描述信息
-function LIB.GetAchievementInfo(dwAchieveID)
+function X.GetAchievementInfo(dwAchieveID)
 	return g_tTable.AchievementInfo:Search(dwAchieveID)
 end
 
 -- 获取一个地图的成就列表（区分是否包含五甲）
 local MAP_ACHI_NORMAL, MAP_ACHI_ALL
-function LIB.GetMapAchievements(dwMapID, bWujia)
+function X.GetMapAchievements(dwMapID, bWujia)
 	if not MAP_ACHI_NORMAL then
 		local tMapAchiNormal, tMapAchiAll = {}, {}
 		local nCount = g_tTable.Achievement:GetRowCount()
 		for i = 2, nCount do
 			local tLine = g_tTable.Achievement:GetRow(i)
 			if tLine and tLine.nVisible == 1 then
-				for _, szID in ipairs(LIB.SplitString(tLine.szSceneID, '|', true)) do
+				for _, szID in ipairs(X.SplitString(tLine.szSceneID, '|', true)) do
 					local dwID = tonumber(szID)
 					if dwID then
 						if tLine.dwGeneral == 1 then
 							if not tMapAchiNormal[dwID] then
 								tMapAchiNormal[dwID] = {}
 							end
-							insert(tMapAchiNormal[dwID], tLine.dwID)
+							table.insert(tMapAchiNormal[dwID], tLine.dwID)
 						end
 						if not tMapAchiAll[dwID] then
 							tMapAchiAll[dwID] = {}
 						end
-						insert(tMapAchiAll[dwID], tLine.dwID)
+						table.insert(tMapAchiAll[dwID], tLine.dwID)
 					end
 				end
 			end
@@ -4351,12 +4322,12 @@ function LIB.GetMapAchievements(dwMapID, bWujia)
 		MAP_ACHI_NORMAL, MAP_ACHI_ALL = tMapAchiNormal, tMapAchiAll
 	end
 	if bWujia then
-		return Clone(MAP_ACHI_ALL[dwMapID])
+		return X.Clone(MAP_ACHI_ALL[dwMapID])
 	end
-	return Clone(MAP_ACHI_NORMAL[dwMapID])
+	return X.Clone(MAP_ACHI_NORMAL[dwMapID])
 end
 
-function LIB.GetPlayerEquipInfo(player)
+function X.GetPlayerEquipInfo(player)
 	local tEquipInfo = {}
 	for nItemIndex = 0, EQUIPMENT_INVENTORY.TOTAL - 1 do
 		local item = GetPlayerItem(player, INVENTORY_INDEX.EQUIP, nItemIndex)
@@ -4396,10 +4367,10 @@ function LIB.GetPlayerEquipInfo(player)
 end
 
 local PLAYER_TALENT_UPDATED = {}
-LIB.RegisterEvent('ON_UPDATE_TALENT', function()
+X.RegisterEvent('ON_UPDATE_TALENT', function()
 	PLAYER_TALENT_UPDATED[arg0] = true
 end)
-function LIB.GetPlayerTalentInfo(...)
+function X.GetPlayerTalentInfo(...)
 	local player = ...
 	if select('#', ...) == 0 then
 		player = GetClientPlayer()
@@ -4463,12 +4434,12 @@ local MACRO_CONDITION_DATATYPE = {
 	['tnobuff'] = 'BUFF',
 	['tbufftime'] = 'BUFF',
 }
-function LIB.IsMacroValid(szMacro)
+function X.IsMacroValid(szMacro)
 	-- /cast [nobuff:太极] 太极无极
-	local bDebug = LIB.IsDebugClient(NSFormatString('{$NS}_Macro'))
-	for nLine, szLine in ipairs(LIB.SplitString(szMacro, '\n')) do
-		szLine = LIB.TrimString(szLine)
-		if not IsEmpty(szLine) then
+	local bDebug = X.IsDebugClient(X.NSFormatString('{$NS}_Macro'))
+	for nLine, szLine in ipairs(X.SplitString(szMacro, '\n')) do
+		szLine = X.TrimString(szLine)
+		if not X.IsEmpty(szLine) then
 			-- 拆分 /动作指令 [条件] 动作指令参数
 			local szAction, szCondition, szActionData = szLine:match('^/([a-zA-Z_]+)%s*%[([^%]]+)%]%s*(.-)%s*$')
 			if not szAction then
@@ -4492,13 +4463,13 @@ function LIB.IsMacroValid(szMacro)
 				return false, 'UNKNOWN_ACTION', nLine, szErrMsg
 			end
 			-- 校验动作指令参数
-			if szActionType == 'SKILL' and not tonumber(szActionData) and not LIB.GetSkillByName(szActionData) then
+			if szActionType == 'SKILL' and not tonumber(szActionData) and not X.GetSkillByName(szActionData) then
 				local szErrMsg = _L('Unknown action skill at line %d', nLine)
 				if bDebug then
 					szErrMsg = szErrMsg .. '{' .. szActionData .. '}'
 				end
 				return false, 'UNKNOWN_ACTION_SKILL', nLine, szErrMsg
-			elseif szActionType == 'BUFF' and not tonumber(szActionData) and not LIB.GetBuffByName(szActionData) then
+			elseif szActionType == 'BUFF' and not tonumber(szActionData) and not X.GetBuffByName(szActionData) then
 				local szErrMsg = _L('Unknown action buff at line %d', nLine)
 				if bDebug then
 					szErrMsg = szErrMsg .. '{' .. szActionData .. '}'
@@ -4506,7 +4477,7 @@ function LIB.IsMacroValid(szMacro)
 				return false, 'UNKNOWN_ACTION_BUFF', nLine, szErrMsg
 			end
 			-- 校验条件
-			for _, szSubCondition in ipairs(LIB.SplitString(szCondition, {'|', '&'}, true)) do
+			for _, szSubCondition in ipairs(X.SplitString(szCondition, {'|', '&'}, true)) do
 				-- last_skill~=钟灵毓秀
 				-- moon>sun
 				-- sun<10
@@ -4527,13 +4498,13 @@ function LIB.IsMacroValid(szMacro)
 						end
 						return false, 'UNKNOWN_CONDITION', nLine, szErrMsg
 					end
-					if szJudgeType == 'SKILL' and not tonumber(szJudgeData) and not LIB.GetSkillByName(szJudgeData) then
+					if szJudgeType == 'SKILL' and not tonumber(szJudgeData) and not X.GetSkillByName(szJudgeData) then
 						local szErrMsg = _L('Unknown condition skill at line %d', nLine)
 						if bDebug then
 							szErrMsg = szErrMsg .. '{' .. szJudgeData .. '}'
 						end
 						return false, 'UNKNOWN_CONDITION_SKILL', nLine, szErrMsg
-					elseif szJudgeType == 'BUFF' and not tonumber(szJudgeData) and not LIB.GetBuffByName(szJudgeData) then
+					elseif szJudgeType == 'BUFF' and not tonumber(szJudgeData) and not X.GetBuffByName(szJudgeData) then
 						local szErrMsg = _L('Unknown condition buff at line %d', nLine)
 						if bDebug then
 							szErrMsg = szErrMsg .. '{' .. szJudgeData .. '}'
@@ -4549,7 +4520,7 @@ function LIB.IsMacroValid(szMacro)
 						end
 						return false, 'UNKNOWN_CONDITION', nLine, szErrMsg
 					end
-					if szJudge and not tonumber(szJudgeData) and not LIB.GetSkillByName(szJudgeData) then
+					if szJudge and not tonumber(szJudgeData) and not X.GetSkillByName(szJudgeData) then
 						local szErrMsg = _L('Unknown condition skill at line %d', nLine)
 						if bDebug then
 							szErrMsg = szErrMsg .. '{' .. szJudgeData .. '}'
@@ -4580,27 +4551,27 @@ do
 			if not PLAYER_GUID[dwTarID]
 			and (info and info.bIsOnLine)
 			and (not REQUEST_TIME[dwTarID] or nTime - REQUEST_TIME[dwTarID] > 2000) then
-				insert(aRequestGUID, dwTarID)
+				table.insert(aRequestGUID, dwTarID)
 				REQUEST_TIME[dwTarID] = nTime
 			end
 		end
-		if not IsEmpty(aRequestGUID) then
-			LIB.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, NSFormatString('{$NS}_GLOBAL_ID_REQUEST'), {aRequestGUID}, true)
+		if not X.IsEmpty(aRequestGUID) then
+			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_GLOBAL_ID_REQUEST'), {aRequestGUID}, true)
 		end
 	end
-	LIB.RegisterEvent('LOADING_END', RequestTeammateGUID)
-	LIB.RegisterEvent('PARTY_UPDATE_BASE_INFO', RequestTeammateGUID)
-	LIB.RegisterEvent('PARTY_LEVEL_UP_RAID', RequestTeammateGUID)
-	LIB.RegisterEvent('PARTY_ADD_MEMBER', RequestTeammateGUID)
-	LIB.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', RequestTeammateGUID)
+	X.RegisterEvent('LOADING_END', RequestTeammateGUID)
+	X.RegisterEvent('PARTY_UPDATE_BASE_INFO', RequestTeammateGUID)
+	X.RegisterEvent('PARTY_LEVEL_UP_RAID', RequestTeammateGUID)
+	X.RegisterEvent('PARTY_ADD_MEMBER', RequestTeammateGUID)
+	X.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', RequestTeammateGUID)
 
-	LIB.RegisterBgMsg(NSFormatString('{$NS}_GLOBAL_ID'), function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	X.RegisterBgMsg(X.NSFormatString('{$NS}_GLOBAL_ID'), function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 		PLAYER_GUID[dwTalkerID] = data
 	end)
 
-	function LIB.GetPlayerGUID(dwID)
+	function X.GetPlayerGUID(dwID)
 		if dwID == UI_GetClientPlayerID() then
-			return LIB.GetClientInfo('szGlobalID')
+			return X.GetClientInfo('szGlobalID')
 		end
 		return PLAYER_GUID[dwID]
 	end
@@ -4611,16 +4582,16 @@ do
 	local function PatternReplacer(szContent, tVar, bKeepNMTS)
 		-- 由于涉及缓存，所以该函数仅允许替换静态映射关系
 		if szContent == 'me' then
-			return LIB.GetUserRoleName()
+			return X.GetUserRoleName()
 		end
-		if not IsNil(tVar[szContent]) then
+		if not X.IsNil(tVar[szContent]) then
 			return tVar[szContent]
 		end
 		if szContent:match('^%d+$') then
 			return tVar[tonumber(szContent)]
 		end
 		local szType = szContent:sub(1, 1)
-		local dwID, nLevel = unpack(LIB.SplitString(szContent:sub(2), ','))
+		local dwID, nLevel = unpack(X.SplitString(szContent:sub(2), ','))
 		if dwID then
 			dwID = tonumber(dwID)
 		end
@@ -4628,19 +4599,19 @@ do
 			nLevel = tonumber(nLevel)
 		end
 		if szType == 'N' then
-			return LIB.GetTemplateName(TARGET.NPC, dwID)
+			return X.GetTemplateName(TARGET.NPC, dwID)
 		end
 		if szType == 'D' then
-			return LIB.GetTemplateName(TARGET.DOODAD, dwID)
+			return X.GetTemplateName(TARGET.DOODAD, dwID)
 		end
 		if szType == 'S' then
-			return LIB.GetSkillName(dwID, nLevel)
+			return X.GetSkillName(dwID, nLevel)
 		end
 		if szType == 'B' then
-			return LIB.GetBuffName(dwID, nLevel)
+			return X.GetBuffName(dwID, nLevel)
 		end
 		if szType == 'M' then
-			local map = LIB.GetMapInfo(dwID)
+			local map = X.GetMapInfo(dwID)
 			if map then
 				return map.szName
 			end
@@ -4651,17 +4622,17 @@ do
 		end
 	end
 	local CACHE, CACHE_KEY, MAX_CACHE = {}, {}, 100
-	function LIB.RenderTemplateString(szTemplate, tVar, nMaxLen, bReplaceSensitiveWord, bKeepNMTS)
+	function X.RenderTemplateString(szTemplate, tVar, nMaxLen, bReplaceSensitiveWord, bKeepNMTS)
 		if not szTemplate then
 			return
 		end
-		local szKey = EncodeLUAData({szTemplate, tVar, nMaxLen, bReplaceSensitiveWord, bKeepNMTS})
+		local szKey = X.EncodeLUAData({szTemplate, tVar, nMaxLen, bReplaceSensitiveWord, bKeepNMTS})
 		if not CACHE[szKey] then
 			if bReplaceSensitiveWord then
-				szTemplate = LIB.ReplaceSensitiveWord(szTemplate)
+				szTemplate = X.ReplaceSensitiveWord(szTemplate)
 			end
 			local szText = ''
-			local nOriginLen, nLen, nPos = len(szTemplate), 0, 1
+			local nOriginLen, nLen, nPos = string.len(szTemplate), 0, 1
 			local szPart, nStart, nEnd, szContent
 			while nPos <= nOriginLen do
 				szPart, nStart, nEnd, szContent = nil, nil, nil, nil
@@ -4683,14 +4654,14 @@ do
 					nPos = nStart
 				end
 				if szPart then
-					if nMaxLen > 0 and nLen + wlen(szPart) > nMaxLen then
-						szPart = wsub(szPart, 1, nMaxLen - nLen)
+					if nMaxLen > 0 and nLen + wstring.len(szPart) > nMaxLen then
+						szPart = wstring.sub(szPart, 1, nMaxLen - nLen)
 						szText = szText .. szPart
 						nLen = nMaxLen
 						break
 					else
 						szText = szText .. szPart
-						nLen = nLen + wlen(szPart)
+						nLen = nLen + wstring.len(szPart)
 					end
 				end
 				if szContent then
@@ -4701,10 +4672,10 @@ do
 					nPos = nEnd + 1
 				end
 				if #CACHE_KEY >= MAX_CACHE then
-					CACHE[remove(CACHE_KEY, 1)] = nil
+					CACHE[table.remove(CACHE_KEY, 1)] = nil
 				end
 				CACHE[szKey] = szText
-				insert(CACHE_KEY, szKey)
+				table.insert(CACHE_KEY, szKey)
 			end
 		end
 		return CACHE[szKey]
@@ -4719,13 +4690,13 @@ local BOOK_SEGMENT_RECIPE = setmetatable({}, {
 		local tSegmentName2RecipeID = t.tSegmentName2RecipeID
 		local tSegmentNameFix = t.tSegmentNameFix
 		if not tSegmentNameFix then
-			local data = LIB.LoadLUAData(PACKET_INFO.FRAMEWORK_ROOT .. 'data/bookfix/{$lang}.jx3dat') or {}
+			local data = X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/bookfix/{$lang}.jx3dat') or {}
 			tSegmentNameFix = data.segment or {}
 			t.tSegmentNameFix = tSegmentNameFix
 		end
 		if not tBookID2RecipeID or not tBookName2RecipeID or not tSegmentName2RecipeID then
-			local cache = LIB.LoadLUAData({'temporary/book-segment.jx3dat', PATH_TYPE.GLOBAL})
-			if IsTable(cache) then
+			local cache = X.LoadLUAData({'temporary/book-segment.jx3dat', X.PATH_TYPE.GLOBAL})
+			if X.IsTable(cache) then
 				tBookID2RecipeID = cache.book_id
 				tBookName2RecipeID = cache.book_name
 				tSegmentName2RecipeID = cache.segment_name
@@ -4742,23 +4713,23 @@ local BOOK_SEGMENT_RECIPE = setmetatable({}, {
 					-- 	dwBookItemIndex = 7936, dwBookNumber = 2, dwPageCount = 6, nSort = 2, nSubSort = 1, nType = 1,
 					-- 	dwPageID_0 = 6, dwPageID_1 = 7, dwPageID_2 = 8, dwPageID_3 = 9, dwPageID_4 = 10, dwPageID_5 = 11, dwPageID_6 = 0, dwPageID_7 = 0, dwPageID_8 = 0, dwPageID_9 = 0
 					-- }
-					local dwRecipeID = LIB.SegmentToRecipeID(row.dwBookID, row.dwSegmentID)
+					local dwRecipeID = X.SegmentToRecipeID(row.dwBookID, row.dwSegmentID)
 					-- 套书
-					local szBookName = LIB.TrimString(row.szBookName)
+					local szBookName = X.TrimString(row.szBookName)
 					if not tBookName2RecipeID[szBookName] then
 						tBookName2RecipeID[szBookName] = {}
 					end
-					insert(tBookName2RecipeID[szBookName], dwRecipeID)
+					table.insert(tBookName2RecipeID[szBookName], dwRecipeID)
 					if not tBookID2RecipeID[row.dwBookID] then
 						tBookID2RecipeID[row.dwBookID] = {}
 					end
-					insert(tBookID2RecipeID[row.dwBookID], dwRecipeID)
+					table.insert(tBookID2RecipeID[row.dwBookID], dwRecipeID)
 					-- 书籍
-					local szSegmentName = LIB.TrimString(row.szSegmentName)
+					local szSegmentName = X.TrimString(row.szSegmentName)
 					tSegmentName2RecipeID[szSegmentName] = dwRecipeID
 				end
 			end
-			LIB.SaveLUAData({'temporary/book-segment.jx3dat', PATH_TYPE.GLOBAL}, {
+			X.SaveLUAData({'temporary/book-segment.jx3dat', X.PATH_TYPE.GLOBAL}, {
 				book_id = tBookID2RecipeID,
 				book_name = tBookName2RecipeID,
 				segment_name = tSegmentName2RecipeID,
@@ -4784,42 +4755,42 @@ local BOOK_SEGMENT_RECIPE = setmetatable({}, {
 })
 
 -- 获取书籍信息
--- LIB.GetBookSegmentInfo(szSegmentName)
--- LIB.GetBookSegmentInfo(dwRecipeID)
--- LIB.GetBookSegmentInfo(dwBookID, dwSegmentID)
-function LIB.GetBookSegmentInfo(...)
+-- X.GetBookSegmentInfo(szSegmentName)
+-- X.GetBookSegmentInfo(dwRecipeID)
+-- X.GetBookSegmentInfo(dwBookID, dwSegmentID)
+function X.GetBookSegmentInfo(...)
 	local dwBookID, dwSegmentID
 	if select('#', ...) == 1 then
 		local dwRecipeID = ...
-		if IsString(dwRecipeID) then
-			dwRecipeID = BOOK_SEGMENT_RECIPE('segment_name', LIB.TrimString(dwRecipeID))
+		if X.IsString(dwRecipeID) then
+			dwRecipeID = BOOK_SEGMENT_RECIPE('segment_name', X.TrimString(dwRecipeID))
 		end
-		if IsNumber(dwRecipeID) then
-			dwBookID, dwSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
+		if X.IsNumber(dwRecipeID) then
+			dwBookID, dwSegmentID = X.RecipeToSegmentID(dwRecipeID)
 		end
 	else
 		dwBookID, dwSegmentID = ...
 	end
-	if IsNumber(dwBookID) and IsNumber(dwSegmentID) then
+	if X.IsNumber(dwBookID) and X.IsNumber(dwSegmentID) then
 		return g_tTable.BookSegment:Search(dwBookID, dwSegmentID)
 	end
 end
 
 -- 获取套书所有书籍信息
--- LIB.GetBookAllSegmentInfo(dwBookID)
--- LIB.GetBookAllSegmentInfo(szBookName)
-function LIB.GetBookAllSegmentInfo(arg0)
+-- X.GetBookAllSegmentInfo(dwBookID)
+-- X.GetBookAllSegmentInfo(szBookName)
+function X.GetBookAllSegmentInfo(arg0)
 	local aRecipeID
-	if IsString(arg0) then
-		aRecipeID = BOOK_SEGMENT_RECIPE('book_name', LIB.TrimString(arg0))
-	elseif IsNumber(arg0) then
+	if X.IsString(arg0) then
+		aRecipeID = BOOK_SEGMENT_RECIPE('book_name', X.TrimString(arg0))
+	elseif X.IsNumber(arg0) then
 		aRecipeID = BOOK_SEGMENT_RECIPE('book_id', arg0)
 	end
 	if aRecipeID then
 		local aSegmentInfo = {}
 		for _, dwRecipeID in ipairs(aRecipeID) do
-			local dwBookID, dwSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
-			insert(aSegmentInfo, LIB.GetBookSegmentInfo(dwBookID, dwSegmentID))
+			local dwBookID, dwSegmentID = X.RecipeToSegmentID(dwRecipeID)
+			table.insert(aSegmentInfo, X.GetBookSegmentInfo(dwBookID, dwSegmentID))
 		end
 		return aSegmentInfo
 	end
@@ -4831,8 +4802,8 @@ local DOODAD_BOOK = setmetatable({}, {
 		local tDoodadID2BookRecipe = t.tDoodadID2BookRecipe
 		local tBookRecipe2DoodadID = t.tBookRecipe2DoodadID
 		if not tDoodadID2BookRecipe or not tBookRecipe2DoodadID then
-			local cache = LIB.LoadLUAData({'temporary/doodad-book.jx3dat', PATH_TYPE.GLOBAL})
-			if IsTable(cache) then
+			local cache = X.LoadLUAData({'temporary/doodad-book.jx3dat', X.PATH_TYPE.GLOBAL})
+			if X.IsTable(cache) then
 				tDoodadID2BookRecipe = cache.doodad_book
 				tBookRecipe2DoodadID = cache.book_doodad
 			end
@@ -4843,17 +4814,17 @@ local DOODAD_BOOK = setmetatable({}, {
 				for i = 2, nCount do
 					local row = g_tTable.DoodadTemplate:GetRow(i)
 					if row.szBarText == _L['Copy inscription'] then
-						local szSegmentName = sub(row.szName, len(_L['Inscription * ']) + 1)
-						local info = LIB.GetBookSegmentInfo(szSegmentName)
+						local szSegmentName = string.sub(row.szName, string.len(_L['Inscription * ']) + 1)
+						local info = X.GetBookSegmentInfo(szSegmentName)
 						if info then
-							local dwRecipeID = LIB.SegmentToRecipeID(info.dwBookID, info.dwSegmentID)
+							local dwRecipeID = X.SegmentToRecipeID(info.dwBookID, info.dwSegmentID)
 							tDoodadID2BookRecipe[row.nID] = dwRecipeID
 							tBookRecipe2DoodadID[dwRecipeID] = row.nID
 						end
 					end
 				end
 			end
-			LIB.SaveLUAData({'temporary/doodad-book.jx3dat', PATH_TYPE.GLOBAL}, {
+			X.SaveLUAData({'temporary/doodad-book.jx3dat', X.PATH_TYPE.GLOBAL}, {
 				doodad_book = tDoodadID2BookRecipe,
 				book_doodad = tBookRecipe2DoodadID,
 			}, {passphrase=false})
@@ -4870,26 +4841,26 @@ local DOODAD_BOOK = setmetatable({}, {
 })
 
 -- 获取碑铭交互物件对应书籍ID
--- LIB.GetDoodadBookRecipeID(dwDoodadTemplate)
-function LIB.GetDoodadBookRecipeID(dwDoodadTemplate)
+-- X.GetDoodadBookRecipeID(dwDoodadTemplate)
+function X.GetDoodadBookRecipeID(dwDoodadTemplate)
 	return DOODAD_BOOK('doodad-book', dwDoodadTemplate)
 end
 
 -- 获取书籍碑铭交互物件模板ID
--- LIB.GetBookDoodadID(dwRecipeID)
--- LIB.GetBookDoodadID(dwBookID, dwSegmentID)
--- LIB.GetBookDoodadID(szSegmentName)
-function LIB.GetBookDoodadID(...)
+-- X.GetBookDoodadID(dwRecipeID)
+-- X.GetBookDoodadID(dwBookID, dwSegmentID)
+-- X.GetBookDoodadID(szSegmentName)
+function X.GetBookDoodadID(...)
 	local dwRecipeID
 	if select('#', ...) == 1 then
 		dwRecipeID = ...
-		if IsString(dwRecipeID) then
-			dwRecipeID = BOOK_SEGMENT_RECIPE('segment_name', LIB.TrimString(dwRecipeID))
+		if X.IsString(dwRecipeID) then
+			dwRecipeID = BOOK_SEGMENT_RECIPE('segment_name', X.TrimString(dwRecipeID))
 		end
 	else
-		dwRecipeID = LIB.SegmentToRecipeID(...)
+		dwRecipeID = X.SegmentToRecipeID(...)
 	end
-	if IsNumber(dwRecipeID) then
+	if X.IsNumber(dwRecipeID) then
 		return DOODAD_BOOK('book-doodad', dwRecipeID)
 	end
 end

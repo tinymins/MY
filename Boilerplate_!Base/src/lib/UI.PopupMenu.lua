@@ -7,49 +7,20 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = Boilerplate
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
-local PLUGIN_NAME = NSFormatString('{$NS}_PopupMenu')
-local COLOR_TABLE_NAME = NSFormatString('{$NS}_ColorTable')
-local COLOR_PICKER_NAME = NSFormatString('{$NS}_ColorPickerEx')
+local PLUGIN_NAME = X.NSFormatString('{$NS}_PopupMenu')
+local COLOR_TABLE_NAME = X.NSFormatString('{$NS}_ColorTable')
+local COLOR_PICKER_NAME = X.NSFormatString('{$NS}_ColorPickerEx')
 
 local D = {}
-local SZ_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/PopupMenu.ini'
-local SZ_TPL_INI = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/PopupMenu.tpl.ini'
+local SZ_INI = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/PopupMenu.ini'
+local SZ_TPL_INI = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/PopupMenu.tpl.ini'
 local LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
 local ENABLE_FONT = 162
 local DISABLE_FONT = 161
@@ -178,7 +149,7 @@ function D.IsEquals(m1, m2)
 	for i = 1, #m1 do
 		local ms1, ms2 = m1[i], m2[i]
 		for _, k in ipairs(DIFF_KEYS) do
-			if not IsEquals(ms1[k], ms2[k]) then
+			if not X.IsEquals(ms1[k], ms2[k]) then
 				return false
 			end
 		end
@@ -204,7 +175,7 @@ end
 function D.Clone(menu)
 	local m = {}
 	for _, k in ipairs(DIFF_KEYS) do
-		m[k] = Clone(menu[k])
+		m[k] = X.Clone(menu[k])
 	end
 	for i, v in ipairs(menu) do
 		m[i] = D.Clone(v)
@@ -275,8 +246,8 @@ function D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFoot
 	local nWidth, nHeight = container:GetSize()
 	scroll:Lookup('Scroll_Menu'):SetH(nHeight)
 	scroll:Lookup('Scroll_Menu'):SetRelX(bInlineContainer and (nWidth - nPaddingRight) or nWidth)
-	scroll:Lookup('Scroll_Menu/WndButton_Scroll_Menu'):SetH(min(nHeight * 2 / 3, 40))
-	scroll:SetW(max(nWidth, scroll:Lookup('Scroll_Menu'):GetRelX() + scroll:Lookup('Scroll_Menu'):GetW()))
+	scroll:Lookup('Scroll_Menu/WndButton_Scroll_Menu'):SetH(math.min(nHeight * 2 / 3, 40))
+	scroll:SetW(math.max(nWidth, scroll:Lookup('Scroll_Menu'):GetRelX() + scroll:Lookup('Scroll_Menu'):GetW()))
 end
 
 -- 绘制选项列表
@@ -289,9 +260,9 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 		if m.bInline then
 			local scroll = container:AppendContentFromIni(SZ_TPL_INI, 'WndScroll_Menu')
 			local n1, n2, n3 = D.DrawScrollContainer(scroll, top, m, nLevel, true)
-			nHeaderWidth = max(nHeaderWidth, n1)
-			nContentWidth = max(nContentWidth, n2)
-			nFooterWidth = max(nFooterWidth, n3)
+			nHeaderWidth = math.max(nHeaderWidth, n1)
+			nContentWidth = math.max(nContentWidth, n2)
+			nFooterWidth = math.max(nFooterWidth, n3)
 		else
 			local wnd = container:AppendContentFromIni(SZ_TPL_INI, 'Wnd_Item')
 			local h = wnd:Lookup('', '')
@@ -332,11 +303,11 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 				local aCustomIcon = {}
 				if m.aCustomIcon then
 					for _, v in ipairs(m.aCustomIcon) do
-						insert(aCustomIcon, v)
+						table.insert(aCustomIcon, v)
 					end
 				end
 				if m.szIcon and m.szLayer ~= 'ICON_FILL' then
-					insert(aCustomIcon, {
+					table.insert(aCustomIcon, {
 						szPosType = m.szLayer == 'ICON_LEFT' and 'LEFT' or 'RIGHT',
 						szUITex = m.szIcon ~= 'fromiconid' and m.szIcon or nil,
 						nFrame = m.szIcon ~= 'fromiconid' and m.nFrame or nil,
@@ -401,7 +372,7 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 				hHeader:Lookup('Handle_MCheck'):SetVisible(m.bMCheck and m.bChecked)
 				hHeader:SetW(99999)
 				hHeader:FormatAllItemPos()
-				nHeaderWidth = max(nHeaderWidth, (hHeader:GetAllItemSize()))
+				nHeaderWidth = math.max(nHeaderWidth, (hHeader:GetAllItemSize()))
 				-- 正文
 				local hContentInner = hContent:Lookup('Handle_ContentInner')
 				local nFont = D.IsDisable(m) and DISABLE_FONT or ENABLE_FONT
@@ -417,7 +388,7 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 				hContentInner:SetRelY((hContent:GetH() - hContentInner:GetH()) / 2)
 				hContent:SetW(hContentInner:GetW())
 				hContent:FormatAllItemPos()
-				nContentWidth = max(nContentWidth, hContent:GetW())
+				nContentWidth = math.max(nContentWidth, hContent:GetW())
 				-- 右侧图标
 				if m.nPushCount then
 					hFooter:Lookup('Handle_PushInfo/Text_PushInfo'):SetText(m.nPushCount)
@@ -429,7 +400,7 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 				hFooter:Lookup('Handle_Child'):SetVisible(#m > 0)
 				hFooter:SetW(99999)
 				hFooter:FormatAllItemPos()
-				nFooterWidth = max(nFooterWidth, hFooter:GetAllItemSize())
+				nFooterWidth = math.max(nFooterWidth, hFooter:GetAllItemSize())
 			end
 			wnd.menu = m
 			wnd.nLevel = nLevel + 1
@@ -440,23 +411,23 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 	container:FormatAllContentPos()
 	local nHeight = select(2, container:GetAllContentSize())
 	if menu.nMaxHeight then
-		nHeight = min(nHeight, menu.nMaxHeight)
+		nHeight = math.min(nHeight, menu.nMaxHeight)
 	end
-	nHeight = min(nHeight, select(2, Station.GetClientSize()) - nPaddingTop - nPaddingBottom)
+	nHeight = math.min(nHeight, select(2, Station.GetClientSize()) - nPaddingTop - nPaddingBottom)
 	container:SetH(nHeight)
 	container:FormatAllContentPos() -- 这里KGUI有BUG 如果调整高度后不重新Format一遍的话 一定会出滚动条
 	scroll:SetH(nHeight)
 	-- 非嵌套层则开始更新所有宽度
 	if not bInlineContainer then
 		if menu.nWidth then
-			nContentWidth = max(menu.nWidth - nHeaderWidth - nFooterWidth - nPaddingLeft - nPaddingRight, 0)
+			nContentWidth = math.max(menu.nWidth - nHeaderWidth - nFooterWidth - nPaddingLeft - nPaddingRight, 0)
 		else
 			local nMinWidth = menu.nMinWidth or menu.nMiniWidth
 			if nMinWidth then
-				nContentWidth = max(nMinWidth - nHeaderWidth - nFooterWidth - nPaddingLeft - nPaddingRight, nContentWidth)
+				nContentWidth = math.max(nMinWidth - nHeaderWidth - nFooterWidth - nPaddingLeft - nPaddingRight, nContentWidth)
 			end
 			if menu.nMaxWidth then
-				nContentWidth = max(min(nContentWidth, menu.nMaxWidth - nHeaderWidth - nFooterWidth - nPaddingLeft - nPaddingRight), 0)
+				nContentWidth = math.max(math.min(nContentWidth, menu.nMaxWidth - nHeaderWidth - nFooterWidth - nPaddingLeft - nPaddingRight), 0)
 			end
 		end
 		D.UpdateScrollContainerWidth(scroll, nHeaderWidth, nContentWidth, nFooterWidth, nPaddingRight, false)
@@ -467,7 +438,7 @@ end
 
 function D.DrawWnd(wnd, top, menu, nLevel)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(PLUGIN_NAME, 'Draw wnd at level ' .. nLevel, DEBUG_LEVEL.LOG)
+	X.Debug(PLUGIN_NAME, 'Draw wnd at level ' .. nLevel, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	-- 绘制列表
 	local scroll = wnd:Lookup('WndScroll_Menu')
@@ -557,7 +528,7 @@ function D.UpdateUI(frame)
 	end
 	-- 逐个绘制菜单
 	local aMenu, nExistLevel, bExist, bDrawed = frame.aMenu, frame.nExistLevel or 0, true, false
-	for nLevel = 1, max(#aMenu, nExistLevel) do
+	for nLevel = 1, math.max(#aMenu, nExistLevel) do
 		local menu = aMenu[nLevel]
 		local wnd = frame:Lookup('Wnd_Menu' .. nLevel)
 		if nLevel > 1 then
@@ -641,7 +612,7 @@ function D.OnItemMouseEnter()
 		local menu = wnd.menu
 		local nLevel = wnd.nLevel
 		if #menu ~= 0 and (not D.IsDisable(menu) or menu.bAlwaysShowSub) then
-			LIB.DelayCall(PLUGIN_NAME .. '__HideSub', false)
+			X.DelayCall(PLUGIN_NAME .. '__HideSub', false)
 			-- 插入子菜单
 			for i = nLevel, #frame.aMenu do
 				frame.aMenu[i] = nil
@@ -656,9 +627,9 @@ function D.OnItemMouseEnter()
 			frame.aInvaild[nLevel] = true
 			-- 更新UI
 			D.UpdateUI(frame)
-		elseif frame.nAutoHideLevel ~= nLevel or not LIB.DelayCall(PLUGIN_NAME .. '__HideSub') then -- 3000ms后关闭之前展开的子菜单
-			LIB.DelayCall(PLUGIN_NAME .. '__HideSub', 1000, function()
-				if not IsElement(wnd) then
+		elseif frame.nAutoHideLevel ~= nLevel or not X.DelayCall(PLUGIN_NAME .. '__HideSub') then -- 3000ms后关闭之前展开的子菜单
+			X.DelayCall(PLUGIN_NAME .. '__HideSub', 1000, function()
+				if not X.IsElement(wnd) then
 					return
 				end
 				for i = nLevel, #frame.aMenu do
@@ -673,9 +644,9 @@ function D.OnItemMouseEnter()
 			menu.fnMouseEnter(menu.UserData)
 		end
 	elseif name == 'Handle_Color' then
-		LIB.ExecuteWithThis(this:GetParent():GetParent(), D.OnItemMouseEnter)
+		X.ExecuteWithThis(this:GetParent():GetParent(), D.OnItemMouseEnter)
 	elseif name == 'Handle_CustomIcon' then
-		LIB.ExecuteWithThis(this:GetParent():GetParent(), D.OnItemMouseEnter)
+		X.ExecuteWithThis(this:GetParent():GetParent(), D.OnItemMouseEnter)
 	end
 end
 
@@ -752,7 +723,7 @@ end
 -- Global exports
 do
 local settings = {
-	name = FRAME_NAME,
+	name = PLUGIN_NAME,
 	exports = {
 		{
 			preset = 'UIEvent',
@@ -764,7 +735,7 @@ local settings = {
 		},
 	},
 }
-_G[PLUGIN_NAME] = LIB.CreateModule(settings)
+_G[PLUGIN_NAME] = X.CreateModule(settings)
 end
 
 UI.PopupMenu = D.Open

@@ -7,51 +7,22 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = Boilerplate
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. '/lang/devs/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. '/lang/devs/')
 ---------------------------------------------------------------------
 -- 本地函数和变量
 ---------------------------------------------------------------------
 local O = {}
 local D = {}
-local UI_INIFILE = PACKET_INFO.FRAMEWORK_ROOT .. '/ui/Dev_UIEditor.ini'
-local FRAME_NAME = NSFormatString('{$NS}Dev_UIEditor')
-local EL_NAME = NSFormatString('{$NS}_El')
+local UI_INIFILE = X.PACKET_INFO.FRAMEWORK_ROOT .. '/ui/Dev_UIEditor.ini'
+local FRAME_NAME = X.NSFormatString('{$NS}Dev_UIEditor')
+local EL_NAME = X.NSFormatString('{$NS}_El')
 
 -- stack overflow
 local function GetUIStru(el)
@@ -78,7 +49,7 @@ local function GetUIStru(el)
 	end
 	local function GetItemStru(el, tab)
 		local dat, bIsWnd, bChild = GetInfo(el)
-		insert(tab, dat)
+		table.insert(tab, dat)
 		if bChild then
 			local i = 0
 			while el:Lookup(i) do
@@ -90,7 +61,7 @@ local function GetUIStru(el)
 	end
 	local function GetWinStru(el, tab)
 		local dat, bIsWnd, bChild, hChildItem = GetInfo(el)
-		insert(tab, dat)
+		table.insert(tab, dat)
 		if hChildItem then
 			GetItemStru(hChildItem, dat.aChild)
 		end
@@ -224,7 +195,7 @@ function D.OnItemLButtonClick()
 		if el and el:IsValid() then
 			local frame = this:GetRoot()
 			local edit = frame:Lookup('Edit_Log/Edit_Default')
-			edit:SetText(GetPureText(concat(D.GetTipInfo(el))))
+			edit:SetText(GetPureText(table.concat(D.GetTipInfo(el))))
 			edit:SetCaretPos(0)
 			local elSel, tElSel = el, {}
 			while elSel do
@@ -242,7 +213,7 @@ function D.OnItemMouseEnter()
 	if name == 'TreeLeaf_Node' or name == 'TreeLeaf_Content' then
 		local el = this.dat.___id
 		if el and el:IsValid() then
-			local szXml = concat(D.GetTipInfo(el))
+			local szXml = table.concat(D.GetTipInfo(el))
 			local x, y = Cursor.GetPos()
 			local w, h = 40, 40
 			OutputTip(szXml, 435, { x, y, w, h }, ALW.RIGHT_LEFT):StartMoving()
@@ -282,29 +253,29 @@ local function table_r(var, level, indent)
 	local t = {}
 	local szType = type(var)
 	if szType == 'nil' then
-		insert(t, 'nil')
+		table.insert(t, 'nil')
 	elseif szType == 'number' then
-		insert(t, tostring(var))
+		table.insert(t, tostring(var))
 	elseif szType == 'string' then
-		insert(t, string.format('%q', var))
+		table.insert(t, string.format('%q', var))
 	elseif szType == 'function' then
 		-- local s = string.dump(var)
-		-- insert(t, 'loadstring('')
+		-- table.insert(t, 'loadstring('')
 		-- -- 'string slice too long'
 		-- for i = 1, #s, 2000 do
-		-- 	insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
+		-- 	table.insert(t, table.concat({'', string.byte(s, i, i + 2000 - 1)}, '\\'))
 		-- end
-		-- insert(t, '')')
-		insert(t, tostring(var))
+		-- table.insert(t, '')')
+		table.insert(t, tostring(var))
 	elseif szType == 'boolean' then
-		insert(t, tostring(var))
+		table.insert(t, tostring(var))
 	elseif szType == 'table' then
-		insert(t, '{')
+		table.insert(t, '{')
 		local s_tab_equ = '='
 		if indent then
 			s_tab_equ = ' = '
-			if not IsEmpty(var) then
-				insert(t, '\n')
+			if not X.IsEmpty(var) then
+				table.insert(t, '\n')
 			end
 		end
 		local nohash = true
@@ -324,43 +295,43 @@ local function table_r(var, level, indent)
 				-- process to insert to table
 				-- insert indent
 				if indent then
-					insert(t, rep(indent, level + 1))
+					table.insert(t, string.rep(indent, level + 1))
 				end
 				-- insert key
 				if nohash then -- pure list: do not need a key
 				elseif type(key) == 'string' and key:find('^[a-zA-Z_][a-zA-Z0-9_]*$') then -- a = val
-					insert(t, key)
-					insert(t, s_tab_equ)
+					table.insert(t, key)
+					table.insert(t, s_tab_equ)
 				else -- [10010] = val -- ['.start with or contains special char'] = val
-					insert(t, '[')
-					insert(t, table_r(key, level + 1, indent))
-					insert(t, ']')
-					insert(t, s_tab_equ)
+					table.insert(t, '[')
+					table.insert(t, table_r(key, level + 1, indent))
+					table.insert(t, ']')
+					table.insert(t, s_tab_equ)
 				end
 				-- insert value
-				insert(t, table_r(val, level + 1, indent))
-				insert(t, ',')
+				table.insert(t, table_r(val, level + 1, indent))
+				table.insert(t, ',')
 				if indent then
-					insert(t, '\n')
+					table.insert(t, '\n')
 				end
 				lastkey, lastval, hasval = key, val, true
 			end
 		until not key
 		-- remove last `,` if no indent
 		if not indent and hasval then
-			remove(t)
+			table.remove(t)
 		end
 		-- insert `}` with indent
-		if indent and not IsEmpty(var) then
-			insert(t, rep(indent, level))
+		if indent and not X.IsEmpty(var) then
+			table.insert(t, string.rep(indent, level))
 		end
-		insert(t, '}')
+		table.insert(t, '}')
 	else --if (szType == 'userdata') then
-		insert(t, '"')
-		insert(t, tostring(var))
-		insert(t, '"')
+		table.insert(t, '"')
+		table.insert(t, tostring(var))
+		table.insert(t, '"')
 	end
-	return concat(t)
+	return table.concat(t)
 end
 
 local function var2str(var, indent, level)
@@ -368,20 +339,20 @@ local function var2str(var, indent, level)
 end
 
 function D.InsertTip(aXml, szTitle, szValue)
-	insert(aXml, GetFormatText(tostring(szTitle), 67))
-	insert(aXml, GetFormatText(tostring(szValue) .. '\n', 44))
+	table.insert(aXml, GetFormatText(tostring(szTitle), 67))
+	table.insert(aXml, GetFormatText(tostring(szValue) .. '\n', 44))
 end
 
 function D.GetTipInfo(el)
 	-- 通用组件信息
 	local szType = el:GetType()
 	local aXml = {}
-	insert(aXml, GetFormatText('[' .. el:GetName() .. ']\n', 65))
+	table.insert(aXml, GetFormatText('[' .. el:GetName() .. ']\n', 65))
 	D.InsertTip(aXml, 'Type: ', szType)
 	D.InsertTip(aXml, 'Visible: ', tostring(el:IsVisible()))
-	D.InsertTip(aXml, 'Size: ', concat({ el:GetSize() }, ', '))
-	D.InsertTip(aXml, 'RelPos: ', concat({ el:GetRelPos() }, ', '))
-	D.InsertTip(aXml, 'AbsPos: ', concat({ el:GetAbsPos() }, ', '))
+	D.InsertTip(aXml, 'Size: ', table.concat({ el:GetSize() }, ', '))
+	D.InsertTip(aXml, 'RelPos: ', table.concat({ el:GetRelPos() }, ', '))
+	D.InsertTip(aXml, 'AbsPos: ', table.concat({ el:GetAbsPos() }, ', '))
 	local szPath1, szPath2 = el:GetTreePath()
 	D.InsertTip(aXml, 'Path1: ', szPath1)
 	if szPath2 then
@@ -418,7 +389,7 @@ function D.GetTipInfo(el)
 		D.InsertTip(aXml, 'Index: ', el:GetIndex())
 	elseif szType == 'Shadow' then
 		D.InsertTip(aXml, 'ShadowColor: ', el:GetShadowColor())
-		D.InsertTip(aXml, 'ColorRGB: ', concat({el:GetColorRGB(), ', '}))
+		D.InsertTip(aXml, 'ColorRGB: ', table.concat({el:GetColorRGB(), ', '}))
 		D.InsertTip(aXml, 'IsTriangleFan: ', tostring(el:IsTriangleFan()))
 		D.InsertTip(aXml, 'Index: ', el:GetIndex())
 	elseif szType == 'Animate' then
@@ -428,7 +399,7 @@ function D.GetTipInfo(el)
 		D.InsertTip(aXml, 'BoxIndex: ', el:GetBoxIndex())
 		-- D.InsertTip(aXml, 'Object: ', hElem:GetObject())
 		D.InsertTip(aXml, 'ObjectType: ', el:GetObjectType())
-		D.InsertTip(aXml, 'ObjectData: ', concat({el:GetObjectData()}, ', '))
+		D.InsertTip(aXml, 'ObjectData: ', table.concat({el:GetObjectData()}, ', '))
 		D.InsertTip(aXml, 'IsEmpty: ', tostring(el:IsEmpty()))
 		if not el:IsEmpty() then
 			D.InsertTip(aXml, 'IsObjectEnable: ', tostring(el:IsObjectEnable()))
@@ -453,7 +424,7 @@ function D.GetTipInfo(el)
 		D.InsertTip(aXml, 'Disable: ', el:GetAnimateGroupDisable())
 	end
 	-- 数据绑定信息
-	insert(aXml, GetFormatText('\n ---------- D Table --------- \n\n', 67))
+	table.insert(aXml, GetFormatText('\n ---------- D Table --------- \n\n', 67))
 	for k, v in pairs(el) do
 		D.InsertTip(aXml, k .. ': ', tostring(v))
 	end
@@ -466,7 +437,7 @@ function D.GetTipInfo(el)
 			G = _G.GetInsideEnv and _G.GetInsideEnv() or _G
 		end
 		if G and G[el:GetName()] then
-			insert(aXml, GetFormatText('\n ---------- D Global --------- \n\n', 67))
+			table.insert(aXml, GetFormatText('\n ---------- D Global --------- \n\n', 67))
 			for k, v in pairs(G[el:GetName()]) do
 				D.InsertTip(aXml, k .. ': ', tostring(v))
 				if debug and type(v) == 'function' then
@@ -476,7 +447,7 @@ function D.GetTipInfo(el)
 						t[g] = v;
 					end
 					t.func = nil
-					insert(aXml, GetFormatText(EncodeLUAData(t, '\t') .. '\n', 44))
+					table.insert(aXml, GetFormatText(X.EncodeLUAData(t, '\t') .. '\n', 44))
 				end
 			end
 		end
@@ -497,12 +468,12 @@ end
 function D.GetMenu(frame)
 	local menu = {}
 	for k, v in ipairs({ 'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2' }) do
-		insert(menu, { szOption = v })
+		table.insert(menu, { szOption = v })
 		local frmLayer = Station.Lookup(v)
 		local frmIter = frmLayer and frmLayer:GetFirstChild()
 		while frmIter do
 			local el = frmIter
-			insert(menu[#menu], {
+			table.insert(menu[#menu], {
 				szOption = frmIter:GetName(),
 				bCheck   = true,
 				bChecked = frmIter:IsVisible(),
@@ -564,7 +535,7 @@ function D.UpdateTree(frame, elRoot, bDropSel)
 end
 end
 
-local ENVIRONMENT = LIB.ENVIRONMENT
+local ENVIRONMENT = X.ENVIRONMENT
 if not ENVIRONMENT.UI_EDITOR then
 	TraceButton_AppendAddonMenu({function()
 		for _, f in ipairs(ENVIRONMENT.UI_EDITOR) do
@@ -576,8 +547,8 @@ if not ENVIRONMENT.UI_EDITOR then
 	end})
 	ENVIRONMENT.UI_EDITOR = {}
 end
-insert(ENVIRONMENT.UI_EDITOR, function()
-	if not LIB.IsDebugClient('Dev_UIEditor') then
+table.insert(ENVIRONMENT.UI_EDITOR, function()
+	if not X.IsDebugClient('Dev_UIEditor') then
 		return
 	end
 	return {{ szOption = _L['Dev_UIEditor'], fnAction = D.CreateFrame }}
@@ -594,5 +565,5 @@ local settings = {
 		},
 	},
 }
-_G[FRAME_NAME] = LIB.CreateModule(settings)
+_G[FRAME_NAME] = X.CreateModule(settings)
 end

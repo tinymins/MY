@@ -7,47 +7,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = Boilerplate
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local PLUGIN_NAME = NSFormatString('{$NS}_Resource')
-local PLUGIN_ROOT = PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = NSFormatString('{$NS}_Resource')
-local _L = LIB.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+local PLUGIN_NAME = X.NSFormatString('{$NS}_Resource')
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = X.NSFormatString('{$NS}_Resource')
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not LIB.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^0.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^0.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -76,7 +47,7 @@ local function GetSoundList(tSound)
 	for _, v in ipairs(tSound) do
 		local t1 = GetSoundList(v)
 		if t1 then
-			insert(t, t1)
+			table.insert(t, t1)
 		end
 	end
 	return t
@@ -89,7 +60,7 @@ end
 
 do
 local BUTTON_STYLE_CONFIG = {
-	FLAT = LIB.SetmetaReadonly({
+	FLAT = X.SetmetaReadonly({
 		nWidth = 100,
 		nHeight = 25,
 		szImage = PLUGIN_ROOT .. '/img/WndButton.UITex',
@@ -98,7 +69,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 10,
 		nDisableGroup = 11,
 	}),
-	FLAT_LACE_BORDER = LIB.SetmetaReadonly({
+	FLAT_LACE_BORDER = X.SetmetaReadonly({
 		nWidth = 148,
 		nHeight = 33,
 		szImage = PLUGIN_ROOT .. '/img/WndButton.UITex',
@@ -107,7 +78,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 2,
 		nDisableGroup = 3,
 	}),
-	SKEUOMORPHISM = LIB.SetmetaReadonly({
+	SKEUOMORPHISM = X.SetmetaReadonly({
 		nWidth = 148,
 		nHeight = 33,
 		szImage = PLUGIN_ROOT .. '/img/WndButton.UITex',
@@ -116,7 +87,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 6,
 		nDisableGroup = 7,
 	}),
-	SKEUOMORPHISM_LACE_BORDER = LIB.SetmetaReadonly({
+	SKEUOMORPHISM_LACE_BORDER = X.SetmetaReadonly({
 		nWidth = 224,
 		nHeight = 64,
 		nPaddingTop = 2,
@@ -129,7 +100,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 14,
 		nDisableGroup = 15,
 	}),
-	QUESTION = LIB.SetmetaReadonly({
+	QUESTION = X.SetmetaReadonly({
 		nWidth = 20,
 		nHeight = 20,
 		szImage = PLUGIN_ROOT .. '/img/WndButton.UITex',
@@ -138,7 +109,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 18,
 		nDisableGroup = 19,
 	}),
-	UNDERLINE_LINK = LIB.SetmetaReadonly({
+	UNDERLINE_LINK = X.SetmetaReadonly({
 		nWidth = 60,
 		nHeight = 26,
 		nMarginTop = 14,
@@ -157,9 +128,9 @@ local BUTTON_STYLE_CONFIG = {
 	}),
 }
 function D.GetWndButtonStyleName(szImage, nNormalGroup)
-	szImage = wlower(LIB.NormalizePath(szImage))
+	szImage = wstring.lower(X.NormalizePath(szImage))
 	for e, p in pairs(BUTTON_STYLE_CONFIG) do
-		if wlower(LIB.NormalizePath(p.szImage)) == szImage and p.nNormalGroup == nNormalGroup then
+		if wstring.lower(X.NormalizePath(p.szImage)) == szImage and p.nNormalGroup == nNormalGroup then
 			return e
 		end
 	end
@@ -184,5 +155,5 @@ local settings = {
 		},
 	},
 }
-_G[MODULE_NAME] = LIB.CreateModule(settings)
+_G[MODULE_NAME] = X.CreateModule(settings)
 end

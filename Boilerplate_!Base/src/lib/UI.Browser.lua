@@ -7,44 +7,15 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = Boilerplate
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
 local D = {}
-local FRAME_NAME = NSFormatString('{$NS}_Browser')
+local FRAME_NAME = X.NSFormatString('{$NS}_Browser')
 
 local function UpdateControls(frame, action, url)
 	local wndWeb = frame:Lookup('Wnd_Web/WndWeb')
@@ -80,7 +51,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_GoTo' then
 		UpdateControls(frame, 'go')
 	elseif name == 'Btn_OuterOpen' then
-		LIB.OpenBrowser(frame:Lookup('Wnd_Controls/Edit_Input'):GetText())
+		X.OpenBrowser(frame:Lookup('Wnd_Controls/Edit_Input'):GetText())
 	elseif name == 'Btn_Close' then
 		UI.CloseBrowser(frame)
 	end
@@ -114,8 +85,8 @@ function D.OnDragButton()
 		local nX, nY = Station.GetMessagePos()
 		local nDeltaX, nDeltaY = nX - this.fDragX, nY - this.fDragY
 		local nMinW, nMinH = UI(this:GetRoot()):MinSize()
-		local nW = max(this.fDragW + nDeltaX, nMinW or 10)
-		local nH = max(this.fDragH + nDeltaY, nMinH or 10)
+		local nW = math.max(this.fDragW + nDeltaX, nMinW or 10)
+		local nH = math.max(this.fDragH + nDeltaY, nMinH or 10)
 		UI(this:GetRoot()):Size(nW, nH)
 	end
 end
@@ -200,7 +171,7 @@ function D.Open(url, options)
 	if WINDOWS[szKey] then
 		Wnd.CloseWindow(WINDOWS[szKey])
 	end
-	WINDOWS[szKey] = Wnd.OpenWindow(PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', FRAME_NAME)
+	WINDOWS[szKey] = Wnd.OpenWindow(X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', FRAME_NAME)
 
 	local frame = WINDOWS[szKey]
 	frame:SetName(FRAME_NAME .. '#' .. szKey)
@@ -217,7 +188,7 @@ function D.Open(url, options)
 		ui:Fetch('Wnd_Web'):Append('WndWebPage', { name = 'WndWeb' })
 	end
 	if ui:Fetch('Wnd_Web/WndWeb'):Count() == 0 then
-		LIB.Debug(NSFormatString('{$NS}.UI.Browser'), 'Create WndWebPage/WndWebCef failed!', DEBUG_LEVEL.ERROR)
+		X.Debug(X.NSFormatString('{$NS}.UI.Browser'), 'Create WndWebPage/WndWebCef failed!', X.DEBUG_LEVEL.ERROR)
 		Wnd.CloseWindow(frame)
 		return
 	end
@@ -241,7 +212,7 @@ function D.Open(url, options)
 end
 
 function D.Close(szKey)
-	if IsString(szKey) then
+	if X.IsString(szKey) then
 		if not WINDOWS[szKey] then
 			return
 		end
@@ -269,7 +240,7 @@ local settings = {
 		},
 	},
 }
-_G[FRAME_NAME] = LIB.CreateModule(settings)
+_G[FRAME_NAME] = X.CreateModule(settings)
 end
 
 UI.LookupBrowser = D.GetFrame

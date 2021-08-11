@@ -7,42 +7,13 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = Boilerplate
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 ---------------------------------------------------------------------------------------------
 -- 事件注册
 ---------------------------------------------------------------------------------------------
@@ -65,24 +36,24 @@ local function CommonEventRegisterOperator(E, eAction, szEvent, szKey, fnAction)
 		if not E.bSingleEvent then
 			szID = szEvent .. '.' .. szID
 		end
-		for i, p in ipairs_r(E.tList[szEvent].aList) do
+		for i, p in X.ipairs_r(E.tList[szEvent].aList) do
 			if p.szKey == szKey then
-				remove(E.tList[szEvent].aList, i)
+				table.remove(E.tList[szEvent].aList, i)
 				E.tList[szEvent].tKey[szKey] = nil
 			end
 		end
-		insert(E.tList[szEvent].aList, { szKey = szKey, szID = szID, fnAction = fnAction })
+		table.insert(E.tList[szEvent].aList, { szKey = szKey, szID = szID, fnAction = fnAction })
 		E.tList[szEvent].tKey[szKey] = true
 	elseif eAction == 'UNREG' then
 		if E.tList and E.tList[szEvent] then
 			if szKey then
-				for i, p in ipairs_r(E.tList[szEvent].aList) do
+				for i, p in X.ipairs_r(E.tList[szEvent].aList) do
 					if p.szKey == szKey then
-						remove(E.tList[szEvent].aList, i)
+						table.remove(E.tList[szEvent].aList, i)
 						E.tList[szEvent].tKey[szKey] = nil
 					end
 				end
-				if IsEmpty(E.tList[szEvent].aList) then
+				if X.IsEmpty(E.tList[szEvent].aList) then
 					E.tList[szEvent] = nil
 				end
 			else
@@ -91,7 +62,7 @@ local function CommonEventRegisterOperator(E, eAction, szEvent, szKey, fnAction)
 			if not E.tList[szEvent] and E.OnRemoveEvent then
 				E.OnRemoveEvent(szEvent)
 			end
-			if IsEmpty(E.tList) then
+			if X.IsEmpty(E.tList) then
 				E.tList = nil
 			end
 		end
@@ -128,40 +99,40 @@ end
 local function CommonEventRegister(E, xArg1, xArg2, xArg3)
 	local eAction, szEvent, szKey, fnAction
 	if E.bSingleEvent then
-		if IsFunction(xArg1) then
+		if X.IsFunction(xArg1) then
 			eAction, fnAction = 'REG', xArg1
-		elseif IsString(xArg1) and IsFunction(xArg2) then
+		elseif X.IsString(xArg1) and X.IsFunction(xArg2) then
 			eAction, szKey, fnAction = 'REG', xArg1, xArg2
-		elseif IsString(xArg1) and xArg2 == false then
+		elseif X.IsString(xArg1) and xArg2 == false then
 			eAction, szKey = 'UNREG', xArg1
-		elseif IsString(xArg1) and IsNil(xArg2) then
+		elseif X.IsString(xArg1) and X.IsNil(xArg2) then
 			eAction, szKey = 'FIND', xArg1
 		end
 		szEvent = 'SINGLE_EVENT'
 	else
-		if (IsString(xArg1) or IsArray(xArg1)) and IsFunction(xArg2) then
+		if (X.IsString(xArg1) or X.IsArray(xArg1)) and X.IsFunction(xArg2) then
 			eAction, szEvent, fnAction = 'REG', xArg1, xArg2
-		elseif (IsString(xArg1) or IsArray(xArg1)) and IsString(xArg2) and IsFunction(xArg3) then
+		elseif (X.IsString(xArg1) or X.IsArray(xArg1)) and X.IsString(xArg2) and X.IsFunction(xArg3) then
 			eAction, szEvent, szKey, fnAction = 'REG', xArg1, xArg2, xArg3
-		elseif (IsString(xArg1) or IsArray(xArg1)) and IsString(xArg2) and xArg3 == false then
+		elseif (X.IsString(xArg1) or X.IsArray(xArg1)) and X.IsString(xArg2) and xArg3 == false then
 			eAction, szEvent, szKey = 'UNREG', xArg1, xArg2
-		elseif IsString(xArg1) and IsString(xArg2) and IsNil(xArg3) then
+		elseif X.IsString(xArg1) and X.IsString(xArg2) and X.IsNil(xArg3) then
 			eAction, szEvent, szKey = 'FIND', xArg1, xArg2
-		elseif IsString(xArg1) and IsNil(xArg2) and IsNil(xArg3) then
+		elseif X.IsString(xArg1) and X.IsNil(xArg2) and X.IsNil(xArg3) then
 			eAction, szEvent = 'FIND', xArg1
 		end
 	end
 	assert(eAction, 'Parameters type not recognized, cannot infer action type.')
 	-- 匿名注册分配随机标识符
-	if eAction == 'REG' and not IsString(szKey) then
+	if eAction == 'REG' and not X.IsString(szKey) then
 		szKey = GetTickCount() * 1000
-		if IsString(szEvent) then
+		if X.IsString(szEvent) then
 			if E.tList and E.tList[szEvent] then
 				while E.tList[szEvent].tKey[tostring(szKey)] do
 					szKey = szKey + 1
 				end
 			end
-		elseif IsArray(szEvent) then
+		elseif X.IsArray(szEvent) then
 			if E.tList then
 				while lodash.some(szEvent, function(szEvent) return E.tList[szEvent] and E.tList[szEvent].tKey[tostring(szKey)] end) do
 					szKey = szKey + 1
@@ -170,7 +141,7 @@ local function CommonEventRegister(E, xArg1, xArg2, xArg3)
 		end
 		szKey = tostring(szKey)
 	end
-	if IsTable(szEvent) then
+	if X.IsTable(szEvent) then
 		for _, szEvent in ipairs(szEvent) do
 			CommonEventRegisterOperator(E, eAction, szEvent, szKey, fnAction)
 		end
@@ -178,23 +149,23 @@ local function CommonEventRegister(E, xArg1, xArg2, xArg3)
 	end
 	return CommonEventRegisterOperator(E, eAction, szEvent, szKey, fnAction)
 end
-LIB.CommonEventRegister = CommonEventRegister
+X.CommonEventRegister = CommonEventRegister
 
 local function FireEventRec(E, p, ...)
 	--[[#DEBUG BEGIN]]
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
-	local res, err, trace = XpCall(p.fnAction, ...)
+	local res, err, trace = X.XpCall(p.fnAction, ...)
 	if not res then
-		LIB.ErrorLog(err, 'On' .. E.szName .. ': ' .. p.szID, trace)
+		X.ErrorLog(err, 'On' .. E.szName .. ': ' .. p.szID, trace)
 	end
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
 	if nTickCount > 50 then
-		LIB.Debug(
+		X.Debug(
 			_L['PMTool'],
 			_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], nTickCount),
-			DEBUG_LEVEL.PMLOG)
+			X.DEBUG_LEVEL.PMLOG)
 	end
 	--[[#DEBUG END]]
 end
@@ -225,7 +196,7 @@ local function CommonEventFirer(E, arg0, ...)
 		end
 	end
 end
-LIB.CommonEventFirer = CommonEventFirer
+X.CommonEventFirer = CommonEventFirer
 end
 
 ---------------------------------------------------------------------------------------------
@@ -233,8 +204,8 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local GLOBAL_EVENT = { szName = 'Event' }
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
 local function EventHandler(szEvent, ...)
 	CommonEventFirer(GLOBAL_EVENT, szEvent, ...)
 end
@@ -247,7 +218,7 @@ function GLOBAL_EVENT.OnRemoveEvent(szEvent)
 	end
 	UnRegisterEvent(szEvent, EventHandler)
 end
-function LIB.RegisterEvent(...)
+function X.RegisterEvent(...)
 	return CommonEventRegister(GLOBAL_EVENT, ...)
 end
 end
@@ -257,32 +228,32 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local INIT_EVENT = { szName = 'Initial', bSingleEvent = true }
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
 local function OnInit()
 	if not INIT_EVENT then
 		return
 	end
-	if not LIB.AssertVersion('', '', '*') then
+	if not X.AssertVersion('', '', '*') then
 		return
 	end
-	LIB.CreateDataRoot(PATH_TYPE.ROLE)
-	LIB.CreateDataRoot(PATH_TYPE.GLOBAL)
-	LIB.CreateDataRoot(PATH_TYPE.SERVER)
-	LIB.ConnectUserSettingsDB()
+	X.CreateDataRoot(X.PATH_TYPE.ROLE)
+	X.CreateDataRoot(X.PATH_TYPE.GLOBAL)
+	X.CreateDataRoot(X.PATH_TYPE.SERVER)
+	X.ConnectUserSettingsDB()
 	CommonEventFirer(INIT_EVENT)
 	INIT_EVENT = nil
 	-- 显示欢迎信息
-	LIB.Sysmsg(_L('%s, welcome to use %s!', LIB.GetUserRoleName(), PACKET_INFO.NAME)
-		.. _L(' v%s Build %s', PACKET_INFO.VERSION, PACKET_INFO.BUILD))
+	X.Sysmsg(_L('%s, welcome to use %s!', X.GetUserRoleName(), X.PACKET_INFO.NAME)
+		.. _L(' v%s Build %s', X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD))
 end
-LIB.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
+X.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 
-function LIB.RegisterInit(...)
+function X.RegisterInit(...)
 	return CommonEventRegister(INIT_EVENT, ...)
 end
 
-function LIB.IsInitialized()
+function X.IsInitialized()
 	return not INIT_EVENT
 end
 end
@@ -292,33 +263,33 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local EXIT_EVENT = { szName = 'Exit', bSingleEvent = true }
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
 local function OnExit()
-	LIB.FireFlush()
+	X.FireFlush()
 	CommonEventFirer(EXIT_EVENT)
-	LIB.ReleaseUserSettingsDB()
+	X.ReleaseUserSettingsDB()
 end
-LIB.RegisterEvent('GAME_EXIT', OnExit)
-LIB.RegisterEvent('PLAYER_EXIT_GAME', OnExit)
-LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnExit)
+X.RegisterEvent('GAME_EXIT', OnExit)
+X.RegisterEvent('PLAYER_EXIT_GAME', OnExit)
+X.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnExit)
 
-function LIB.RegisterExit(...)
+function X.RegisterExit(...)
 	return CommonEventRegister(EXIT_EVENT, ...)
 end
 end
 
 do
 local FLUSH_EVENT = { szName = 'Flush', bSingleEvent = true }
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
-function LIB.FireFlush()
-	LIB.FlushCoroutine()
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
+function X.FireFlush()
+	X.FlushCoroutine()
 	CommonEventFirer(FLUSH_EVENT)
-	LIB.FlushUserSettingsDB()
+	X.FlushUserSettingsDB()
 end
 
-function LIB.RegisterFlush(...)
+function X.RegisterFlush(...)
 	return CommonEventRegister(FLUSH_EVENT, ...)
 end
 end
@@ -328,16 +299,16 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local RELOAD_EVENT = { szName = 'Reload', bSingleEvent = true }
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
 local function OnReload()
-	LIB.FlushCoroutine()
+	X.FlushCoroutine()
 	CommonEventFirer(RELOAD_EVENT)
-	LIB.ReleaseUserSettingsDB()
+	X.ReleaseUserSettingsDB()
 end
-LIB.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
+X.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
 
-function LIB.RegisterReload(...)
+function X.RegisterReload(...)
 	return CommonEventRegister(RELOAD_EVENT, ...)
 end
 end
@@ -347,14 +318,14 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local FRAME_CREATE_EVENT = { szName = 'FrameCreate' }
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
 local function OnFrameCreate()
 	CommonEventFirer(FRAME_CREATE_EVENT, arg0:GetName(), arg0)
 end
-LIB.RegisterEvent('ON_FRAME_CREATE', OnFrameCreate)
+X.RegisterEvent('ON_FRAME_CREATE', OnFrameCreate)
 
-function LIB.RegisterFrameCreate(...)
+function X.RegisterFrameCreate(...)
 	return CommonEventRegister(FRAME_CREATE_EVENT, ...)
 end
 end
@@ -364,14 +335,14 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local FRAME_DESTROY_EVENT = { szName = 'FrameCreate' }
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
 local function OnFrameDestroy()
 	CommonEventFirer(FRAME_DESTROY_EVENT, arg0:GetName(), arg0)
 end
-LIB.RegisterEvent('ON_FRAME_DESTROY', OnFrameDestroy)
+X.RegisterEvent('ON_FRAME_DESTROY', OnFrameDestroy)
 
-function LIB.RegisterFrameDestroy(...)
+function X.RegisterFrameDestroy(...)
 	return CommonEventRegister(FRAME_DESTROY_EVENT, ...)
 end
 end
@@ -381,8 +352,8 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local IDLE_EVENT, TIME = { szName = 'Idle', bSingleEvent = true }, 0
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
 local function OnIdle()
 	local nTime = GetTime()
 	if nTime - TIME < 20000 then
@@ -391,12 +362,12 @@ local function OnIdle()
 	TIME = nTime
 	CommonEventFirer(IDLE_EVENT)
 end
-LIB.RegisterEvent('BUFF_UPDATE', function()
+X.RegisterEvent('BUFF_UPDATE', function()
 	if arg1 then
 		return
 	end
 	if arg0 == UI_GetClientPlayerID() and arg4 == 103 then
-		DelayCall(NSFormatString('{$NS}#ON_IDLE'), random(0, 10000), function()
+		DelayCall(X.NSFormatString('{$NS}#ON_IDLE'), math.random(0, 10000), function()
 			local me = GetClientPlayer()
 			if me and me.GetBuff(103, 0) then
 				OnIdle()
@@ -404,14 +375,14 @@ LIB.RegisterEvent('BUFF_UPDATE', function()
 		end)
 	end
 end)
-LIB.BreatheCall(NSFormatString('{$NS}#ON_IDLE'), function()
+X.BreatheCall(X.NSFormatString('{$NS}#ON_IDLE'), function()
 	if Station.GetIdleTime() > 300000 then
 		OnIdle()
 	end
 end)
-LIB.RegisterFrameCreate('OptionPanel', OnIdle)
+X.RegisterFrameCreate('OptionPanel', OnIdle)
 
-function LIB.RegisterIdle(...)
+function X.RegisterIdle(...)
 	return CommonEventRegister(IDLE_EVENT, ...)
 end
 end
@@ -421,10 +392,10 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local SPECIAL_KEY_EVENT = { szName = 'SpecialKey' }
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
 local ALT, SHIFT, CTRL = false, false, false
-LIB.BreatheCall(NSFormatString('{$NS}#ON_SPECIAL_KEY'), function()
+X.BreatheCall(X.NSFormatString('{$NS}#ON_SPECIAL_KEY'), function()
 	if IsShiftKeyDown() then
 		if not SHIFT then
 			SHIFT = true
@@ -459,7 +430,7 @@ LIB.BreatheCall(NSFormatString('{$NS}#ON_SPECIAL_KEY'), function()
 		end
 	end
 end)
-function LIB.RegisterSpecialKeyEvent(...)
+function X.RegisterSpecialKeyEvent(...)
 	return CommonEventRegister(SPECIAL_KEY_EVENT, ...)
 end
 end
@@ -469,25 +440,25 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local MODULE_LIST = {}
-function LIB.RegisterModuleEvent(arg0, arg1)
+function X.RegisterModuleEvent(arg0, arg1)
 	local szModule = arg0
 	if arg1 == false then
 		local tEvent, nCount = MODULE_LIST[szModule], 0
 		if tEvent then
 			for szEvent, info in pairs(tEvent) do
 				if info.szEvent == '#BREATHE' then
-					LIB.BreatheCall(szModule .. '#BREATHE', false)
+					X.BreatheCall(szModule .. '#BREATHE', false)
 				else
-					LIB.RegisterEvent(szEvent, szModule, false)
+					X.RegisterEvent(szEvent, szModule, false)
 				end
 				nCount = nCount + 1
 			end
 			MODULE_LIST[szModule] = nil
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(NSFormatString('{$NS}#EVENT'), 'Uninit # '  .. szModule .. ' # Events Removed # ' .. nCount, DEBUG_LEVEL.LOG)
+			X.Debug(X.NSFormatString('{$NS}#EVENT'), 'Uninit # '  .. szModule .. ' # Events Removed # ' .. nCount, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
-	elseif IsTable(arg1) then
+	elseif X.IsTable(arg1) then
 		local nCount = 0
 		local tEvent = MODULE_LIST[szModule]
 		if not tEvent then
@@ -495,17 +466,17 @@ function LIB.RegisterModuleEvent(arg0, arg1)
 			MODULE_LIST[szModule] = tEvent
 		end
 		for _, aParams in ipairs(arg1) do
-			local szEvent = remove(aParams, 1)
+			local szEvent = table.remove(aParams, 1)
 			if szEvent == '#BREATHE' then
-				LIB.BreatheCall(szModule .. '#BREATHE', unpack(aParams))
+				X.BreatheCall(szModule .. '#BREATHE', unpack(aParams))
 			else
-				LIB.RegisterEvent(szEvent, szModule, unpack(aParams))
+				X.RegisterEvent(szEvent, szModule, unpack(aParams))
 			end
 			nCount = nCount + 1
 			tEvent[szEvent] = { szEvent = szEvent }
 		end
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(NSFormatString('{$NS}#EVENT'), 'Init # '  .. szModule .. ' # Events Added # ' .. nCount, DEBUG_LEVEL.LOG)
+		X.Debug(X.NSFormatString('{$NS}#EVENT'), 'Init # '  .. szModule .. ' # Events Added # ' .. nCount, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 end
@@ -516,11 +487,11 @@ end
 ---------------------------------------------------------------------------------------------
 do
 local TUTORIAL_LIST = {}
-function LIB.RegisterTutorial(tOptions)
+function X.RegisterTutorial(tOptions)
 	if type(tOptions) ~= 'table' or not tOptions.szKey or not tOptions.szMessage then
 		return
 	end
-	insert(TUTORIAL_LIST, Clone(tOptions, true))
+	table.insert(TUTORIAL_LIST, X.Clone(tOptions, true))
 end
 
 local CHECKED = {}
@@ -531,13 +502,13 @@ local function GetNextTutorial()
 		end
 	end
 end
-LIB.RegisterInit(function()
-	CHECKED = LIB.LoadLUAData({'config/tutorialed.jx3dat', PATH_TYPE.ROLE})
-	if not IsTable(CHECKED) then
+X.RegisterInit(function()
+	CHECKED = X.LoadLUAData({'config/tutorialed.jx3dat', X.PATH_TYPE.ROLE})
+	if not X.IsTable(CHECKED) then
 		CHECKED = {}
 	end
 end)
-LIB.RegisterFlush(function() LIB.SaveLUAData({'config/tutorialed.jx3dat', PATH_TYPE.ROLE}, CHECKED) end)
+X.RegisterFlush(function() X.SaveLUAData({'config/tutorialed.jx3dat', X.PATH_TYPE.ROLE}, CHECKED) end)
 
 local function StepNext(bQuick)
 	local tutorial = GetNextTutorial()
@@ -560,12 +531,12 @@ local function StepNext(bQuick)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = NSFormatString('{$NS}_Tutorial'),
+		szName = X.NSFormatString('{$NS}_Tutorial'),
 		szMessage = tutorial.szMessage,
 		szAlignment = 'CENTER',
 	}
 	for _, p in ipairs(tutorial) do
-		local menu = Clone(p, true)
+		local menu = X.Clone(p, true)
 		menu.fnAction = function()
 			if p.fnAction then
 				p.fnAction()
@@ -573,20 +544,20 @@ local function StepNext(bQuick)
 			CHECKED[tutorial.szKey] = true
 			StepNext()
 		end
-		insert(tMsg, menu)
+		table.insert(tMsg, menu)
 	end
 	MessageBox(tMsg)
 end
 
-function LIB.CheckTutorial()
+function X.CheckTutorial()
 	if not GetNextTutorial() then
 		return
 	end
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3,
-		szName = NSFormatString('{$NS}_Tutorial'),
-		szMessage = _L('Welcome to use %s, would you like to start quick tutorial now?', PACKET_INFO.NAME),
+		szName = X.NSFormatString('{$NS}_Tutorial'),
+		szMessage = _L('Welcome to use %s, would you like to start quick tutorial now?', X.PACKET_INFO.NAME),
 		szAlignment = 'CENTER',
 		{
 			szOption = _L['Quickset'],
@@ -608,10 +579,10 @@ end
 -- 背景通讯
 ---------------------------------------------------------------------------------------------
 do
-local BG_MSG_ID_PREFIX = NSFormatString('{$NS}:')
+local BG_MSG_ID_PREFIX = X.NSFormatString('{$NS}:')
 local BG_MSG_ID_SUFFIX = ':V2'
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
 do
 local BG_MSG_EVENT = { szName = 'BgMsg' }
 local BG_MSG_PROGRESS_EVENT = { szName = 'BgMsgProgress' }
@@ -641,7 +612,7 @@ local function OnBgMsg()
 	if not BG_MSG_PART[szMsgUUID] then
 		BG_MSG_PART[szMsgUUID] = {}
 	end
-	BG_MSG_PART[szMsgUUID][nSegIndex] = LIB.SimpleDecryptString(IsString(szPart) and szPart or '')
+	BG_MSG_PART[szMsgUUID][nSegIndex] = X.SimpleDecryptString(X.IsString(szPart) and szPart or '')
 	-- fire progress event
 	local nSegRecv = 0
 	for _, _ in pairs(BG_MSG_PART[szMsgUUID]) do
@@ -650,27 +621,27 @@ local function OnBgMsg()
 	CommonEventFirer(BG_MSG_PROGRESS_EVENT, szMsgID, nSegCount, nSegRecv, nSegIndex, nChannel, dwID, szName, bSelf)
 	-- concat and decode data
 	if #BG_MSG_PART[szMsgUUID] == nSegCount then
-		local szPlain = concat(BG_MSG_PART[szMsgUUID])
-		local aData = szPlain and DecodeLUAData(szPlain)
+		local szPlain = table.concat(BG_MSG_PART[szMsgUUID])
+		local aData = szPlain and X.DecodeLUAData(szPlain)
 		if aData then
 			CommonEventFirer(BG_MSG_EVENT, szMsgID, aData[1], nChannel, dwID, szName, bSelf)
 		--[[#DEBUG BEGIN]]
 		else
-			LIB.Debug('BG_EVENT#' .. szMsgID, GetTraceback('Cannot decode BgMsg: ' .. szPlain), DEBUG_LEVEL.ERROR)
+			X.Debug('BG_EVENT#' .. szMsgID, X.GetTraceback('Cannot decode BgMsg: ' .. szPlain), X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		end
 		BG_MSG_PART[szMsgUUID] = nil
 	end
 end
-LIB.RegisterEvent('ON_BG_CHANNEL_MSG', OnBgMsg)
+X.RegisterEvent('ON_BG_CHANNEL_MSG', OnBgMsg)
 end
 
--- LIB.RegisterBgMsg('{$NS}_CHECK_INSTALL', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oData) LIB.SendBgMsg(szTalkerName, '{$NS}_CHECK_INSTALL_REPLY', oData) end) -- 注册
--- LIB.RegisterBgMsg('{$NS}_CHECK_INSTALL') -- 注销
--- LIB.RegisterBgMsg('{$NS}_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oData) LIB.SendBgMsg(szTalkerName, '{$NS}_CHECK_INSTALL_REPLY', oData) end) -- 注册
--- LIB.RegisterBgMsg('{$NS}_CHECK_INSTALL.RECEIVER_01') -- 注销
-function LIB.RegisterBgMsg(szMsgID, szID, fnAction, fnProgress)
-	if not IsString(szID) then
+-- X.RegisterBgMsg('{$NS}_CHECK_INSTALL', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oData) X.SendBgMsg(szTalkerName, '{$NS}_CHECK_INSTALL_REPLY', oData) end) -- 注册
+-- X.RegisterBgMsg('{$NS}_CHECK_INSTALL') -- 注销
+-- X.RegisterBgMsg('{$NS}_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oData) X.SendBgMsg(szTalkerName, '{$NS}_CHECK_INSTALL_REPLY', oData) end) -- 注册
+-- X.RegisterBgMsg('{$NS}_CHECK_INSTALL.RECEIVER_01') -- 注销
+function X.RegisterBgMsg(szMsgID, szID, fnAction, fnProgress)
+	if not X.IsString(szID) then
 		szID, fnAction, fnProgress = nil, szID, fnAction
 	end
 	if fnAction == false then
@@ -695,7 +666,7 @@ local function GetSenderStatus(me)
 	if not me then
 		return 'NO_PLAYER'
 	end
-	if LIB.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		return 'TALK_LOCK'
 	end
 	return 'READY'
@@ -706,15 +677,15 @@ local function ProcessQueue()
 	if GetSenderStatus(GetClientPlayer()) ~= 'READY' then
 		return
 	end
-	local v = remove(BG_MSG_QUEUE, 1)
+	local v = table.remove(BG_MSG_QUEUE, 1)
 	if not v then
 		return 0
 	end
-	LIB.SendBgMsg(unpack(v))
+	X.SendBgMsg(unpack(v))
 end
--- LIB.SendBgMsg(szName, szMsgID, oData)
--- LIB.SendBgMsg(nChannel, szMsgID, oData)
-function LIB.SendBgMsg(nChannel, szMsgID, oData, bSilent)
+-- X.SendBgMsg(szName, szMsgID, oData)
+-- X.SendBgMsg(nChannel, szMsgID, oData)
+function X.SendBgMsg(nChannel, szMsgID, oData, bSilent)
 	local szTarget, me = '', GetClientPlayer()
 	if not nChannel then
 		return
@@ -722,10 +693,10 @@ function LIB.SendBgMsg(nChannel, szMsgID, oData, bSilent)
 	local szStatus = GetSenderStatus(me)
 	if szStatus ~= 'READY' then
 		if szStatus == 'TALK_LOCK' and not bSilent then
-			LIB.Systopmsg(_L['BgMsg cannot be send due to talk lock, data will be sent as soon as talk unlocked.'])
+			X.Systopmsg(_L['BgMsg cannot be send due to talk lock, data will be sent as soon as talk unlocked.'])
 		end
-		insert(BG_MSG_QUEUE, { nChannel, szMsgID, oData })
-		LIB.BreatheCall(NSFormatString('{$NS}#BG_MSG_QUEUE'), ProcessQueue)
+		table.insert(BG_MSG_QUEUE, { nChannel, szMsgID, oData })
+		X.BreatheCall(X.NSFormatString('{$NS}#BG_MSG_QUEUE'), ProcessQueue)
 		return
 	end
 	-- channel
@@ -740,18 +711,18 @@ function LIB.SendBgMsg(nChannel, szMsgID, oData, bSilent)
 	end
 	-- encode and pagination
 	local szMsgSID = BG_MSG_ID_PREFIX .. szMsgID .. BG_MSG_ID_SUFFIX
-	local szMsgUUID = LIB.GetUUID():gsub('-', '')
-	local szArg = EncodeLUAData({oData}) -- 如果发送nil，不包一层会被解析器误认为解码失败，所以必须用{}包裹
-	local nMsgLen = wlen(szArg)
-	local nSegLen = floor(MAX_CHANNEL_LEN[nChannel] / 4 * 3) -- Base64编码会导致长度增加
-	local nSegCount = ceil(nMsgLen / nSegLen)
+	local szMsgUUID = X.GetUUID():gsub('-', '')
+	local szArg = X.EncodeLUAData({oData}) -- 如果发送nil，不包一层会被解析器误认为解码失败，所以必须用{}包裹
+	local nMsgLen = wstring.len(szArg)
+	local nSegLen = math.floor(MAX_CHANNEL_LEN[nChannel] / 4 * 3) -- Base64编码会导致长度增加
+	local nSegCount = math.ceil(nMsgLen / nSegLen)
 	-- send msg
 	for nSegIndex = 1, nSegCount do
-		local szSeg = LIB.SimpleEncryptString((wsub(szArg, (nSegIndex - 1) * nSegLen + 1, nSegIndex * nSegLen)))
+		local szSeg = X.SimpleEncryptString((wstring.sub(szArg, (nSegIndex - 1) * nSegLen + 1, nSegIndex * nSegLen)))
 		local aSay = {
 			{ type = 'eventlink', name = 'BG_CHANNEL_MSG', linkinfo = szMsgSID },
-			{ type = 'eventlink', name = '', linkinfo = EncodeLUAData({ u = szMsgUUID, c = nSegCount, i = nSegIndex }) },
-			{ type = 'eventlink', name = '', linkinfo = EncodeLUAData(szSeg) },
+			{ type = 'eventlink', name = '', linkinfo = X.EncodeLUAData({ u = szMsgUUID, c = nSegCount, i = nSegIndex }) },
+			{ type = 'eventlink', name = '', linkinfo = X.EncodeLUAData(szSeg) },
 		}
 		me.Talk(nChannel, szTarget, aSay)
 	end
@@ -762,12 +733,12 @@ end
 ---------------------------------------------------------------------------------------------
 -- 注册聊天监听
 ---------------------------------------------------------------------------------------------
--- Register:   LIB.RegisterMsgMonitor(string szKey, function fnAction)
--- Unregister: LIB.RegisterMsgMonitor(string szKey, false)
+-- Register:   X.RegisterMsgMonitor(string szKey, function fnAction)
+-- Unregister: X.RegisterMsgMonitor(string szKey, false)
 do
 local MSGMON_EVENT = { szName = 'MsgMonitor' }
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
 local function FixMsgMonBug() end
 local function MsgMonHandler(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
 	if bRich then
@@ -776,7 +747,7 @@ local function MsgMonHandler(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID
 			return
 		end
 		-- filter addon echo message.
-		if LIB.ContainsEchoMsgHeader(szMsg) then
+		if X.ContainsEchoMsgHeader(szMsg) then
 			return
 		end
 	end
@@ -797,7 +768,7 @@ function MSGMON_EVENT.OnRemoveEvent(szEvent)
 	UnRegisterMsgMonitor(FixMsgMonBug, { szEvent })
 	UnRegisterMsgMonitor(MsgMonHandler, { szEvent })
 end
-function LIB.RegisterMsgMonitor(...)
+function X.RegisterMsgMonitor(...)
 	return CommonEventRegister(MSGMON_EVENT, ...)
 end
 end
@@ -809,20 +780,20 @@ do
 local COROUTINE_TIME = 1000 * 0.5 / GLOBAL.GAME_FPS -- 一次 Breathe 时最大允许执行协程时间
 local COROUTINE_LIST = {}
 local yield = coroutine and coroutine.yield or function() end
-function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
-	if IsTable(szKey) then
+function X.RegisterCoroutine(szKey, fnAction, fnCallback)
+	if X.IsTable(szKey) then
 		for _, szKey in ipairs(szKey) do
-			LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
+			X.RegisterCoroutine(szKey, fnAction, fnCallback)
 		end
 		return
-	elseif IsFunction(szKey) then
+	elseif X.IsFunction(szKey) then
 		szKey, fnAction = nil, szKey
 	end
-	if IsFunction(fnAction) then
+	if X.IsFunction(fnAction) then
 		local function fnActionWrapper()
 			fnAction(yield)
 		end
-		if not IsString(szKey) then
+		if not X.IsString(szKey) then
 			szKey = GetTickCount() * 1000
 			while COROUTINE_LIST[tostring(szKey)] do
 				szKey = szKey + 1
@@ -830,9 +801,9 @@ function LIB.RegisterCoroutine(szKey, fnAction, fnCallback)
 			szKey = tostring(szKey)
 		end
 		if not coroutine then
-			Call(fnActionWrapper)
+			X.Call(fnActionWrapper)
 			if fnCallback then
-				Call(fnCallback)
+				X.Call(fnCallback)
 			end
 		else
 			COROUTINE_LIST[szKey] = { szID = szKey, coAction = coroutine.create(fnActionWrapper), fnCallback = fnCallback }
@@ -860,16 +831,16 @@ local function onBreathe()
 				if coroutine.status(p.coAction) == 'suspended' then
 					local res = {coroutine.resume(p.coAction)}
 					if res[1] == true then
-						remove(res, 1)
+						table.remove(res, 1)
 						p.bSuccess = true
 						p.aReturn = res
 					elseif not res[1] then
-						LIB.ErrorLog('OnCoroutine: ' .. p.szID .. ', Error: ' .. res[2])
+						X.ErrorLog('OnCoroutine: ' .. p.szID .. ', Error: ' .. res[2])
 					end
 				end
 				if coroutine.status(p.coAction) == 'dead' then
 					if p.fnCallback then
-						Call(p.fnCallback, p.bSuccess or false, unpack(p.aReturn or CONSTANT.EMPTY_TABLE))
+						X.Call(p.fnCallback, p.bSuccess or false, unpack(p.aReturn or CONSTANT.EMPTY_TABLE))
 					end
 					COROUTINE_LIST[k] = nil
 				end
@@ -878,26 +849,26 @@ local function onBreathe()
 	end
 	--[[#DEBUG BEGIN]]
 	if GetTime() - nBeginTime > COROUTINE_TIME then
-		LIB.Debug(_L['PMTool'], _L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), DEBUG_LEVEL.PMLOG)
+		X.Debug(_L['PMTool'], _L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), X.DEBUG_LEVEL.PMLOG)
 	elseif nBeginTime - l_nLastBreatheTime > FPS_SLOW_TIME then
-		LIB.Debug(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), DEBUG_LEVEL.PMLOG)
+		X.Debug(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), X.DEBUG_LEVEL.PMLOG)
 	end
 	--[[#DEBUG END]]
 	l_nLastBreatheTime = nBeginTime
 end
-LIB.BreatheCall(NSFormatString('{$NS}#COROUTINE'), onBreathe)
+X.BreatheCall(X.NSFormatString('{$NS}#COROUTINE'), onBreathe)
 
 -- 执行协程直到它完成
 -- 不传参表示执行所有协程并清空协程队列
 -- 传参标志执行并清空指定ID的协程
-function LIB.FlushCoroutine(...)
+function X.FlushCoroutine(...)
 	if not coroutine then
 		return
 	end
 	if select('#', ...) == 0 then
 		local p = next(COROUTINE_LIST)
 		while p do
-			LIB.FlushCoroutine(p.szID)
+			X.FlushCoroutine(p.szID)
 			p = next(COROUTINE_LIST)
 		end
 	else
@@ -907,11 +878,11 @@ function LIB.FlushCoroutine(...)
 			while coroutine.status(p.coAction) == 'suspended' do
 				local status, err = coroutine.resume(p.coAction)
 				if not status then
-					LIB.ErrorLog('OnCoroutine: ' .. p.szID .. ', Error: ' .. err)
+					X.ErrorLog('OnCoroutine: ' .. p.szID .. ', Error: ' .. err)
 				end
 			end
 			if p.fnCallback then
-				Call(p.fnCallback)
+				X.Call(p.fnCallback)
 			end
 			COROUTINE_LIST[szKey] = nil
 		end

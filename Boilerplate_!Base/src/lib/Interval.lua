@@ -7,40 +7,11 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = Boilerplate
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------
 -- 时钟函数管理中心
@@ -55,7 +26,7 @@ local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCal
 -- FinallyThrottle 确保延迟调用的节流    毫秒       1 / GLOBAL.GAME_FPS
 ---------------------------------------------------------------------
 if DelayCall and BreatheCall and FrameCall and RenderCall then
-	local NS_PREFIX = NSFormatString('{$NS}__')
+	local NS_PREFIX = X.NSFormatString('{$NS}__')
 	local function WrapIntervalCall(szIntervalName, IntervalCall)
 		return function(szKey, nInterval, fnAction, oArg)
 			local bUnreg
@@ -89,7 +60,7 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 					FireUIEvent('CALL_LUA_ERROR', xpErrLog .. '\n')
 				end
 				fnAction = function(...)
-					return GetXpCallReturnVal(XpCall(f, ...))
+					return GetXpCallReturnVal(X.XpCall(f, ...))
 				end
 				--[[#DEBUG END]]
 				if not szKey then -- 匿名调用
@@ -100,21 +71,21 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 					szKey = tostring(szKey)
 				end
 			end
-			assert(IsString(szKey), 'IntervalCall Key MUST be string.')
+			assert(X.IsString(szKey), 'IntervalCall Key MUST be string.')
 			local szNSKey = NS_PREFIX .. szKey
 			local aRetVal = bUnreg
 				and {IntervalCall(szNSKey, false)}
 				or {IntervalCall(szNSKey, nInterval, fnAction, oArg)}
-			if IsString(aRetVal[1]) then
+			if X.IsString(aRetVal[1]) then
 				aRetVal[1] = szKey
 			end
 			return unpack(aRetVal)
 		end
 	end
-	LIB.DelayCall   = WrapIntervalCall('DelayCall'  , DelayCall  )
-	LIB.BreatheCall = WrapIntervalCall('BreatheCall', BreatheCall)
-	LIB.FrameCall   = WrapIntervalCall('FrameCall'  , FrameCall  )
-	LIB.RenderCall  = WrapIntervalCall('RenderCall' , RenderCall )
+	X.DelayCall   = WrapIntervalCall('DelayCall'  , DelayCall  )
+	X.BreatheCall = WrapIntervalCall('BreatheCall', BreatheCall)
+	X.FrameCall   = WrapIntervalCall('FrameCall'  , FrameCall  )
+	X.RenderCall  = WrapIntervalCall('RenderCall' , RenderCall )
 else
 
 local _time      -- current time
@@ -146,9 +117,9 @@ local function onDelayCall()
 	-- traverse dc calls
 	for szKey, dc in pairs(_delaycalls) do
 		if dc.nNext <= _time then
-			local res, err, trace = XpCall(dc.fnAction, dc.oArg)
+			local res, err, trace = X.XpCall(dc.fnAction, dc.oArg)
 			if not res then
-				LIB.ErrorLog(err, 'onDelayCall: ' .. szKey, trace)
+				X.ErrorLog(err, 'onDelayCall: ' .. szKey, trace)
 			end
 			_count = _count - 1
 			_delaycall_t = _tDelayCall[szKey]
@@ -161,7 +132,7 @@ local function onDelayCall()
 	end
 end
 
-function LIB.DelayCall(szKey, nInterval, fnAction, oArg)
+function X.DelayCall(szKey, nInterval, fnAction, oArg)
 	local bUnreg
 	if type(szKey) == 'function' then
 		-- DelayCall(fnAction[, oArg])
@@ -247,9 +218,9 @@ local function onBreatheCall()
 	for szKey, bc in pairs(_breathecalls) do
 		if bc.nNext <= _time then
 			bc.nNext = _time + bc.nInterval
-			local res, err, trace = XpCall(bc.fnAction, bc.oArg)
+			local res, err, trace = X.XpCall(bc.fnAction, bc.oArg)
 			if not res then
-				LIB.ErrorLog(err, 'onBreatheCall: ' .. szKey, trace)
+				X.ErrorLog(err, 'onBreatheCall: ' .. szKey, trace)
 			elseif err == 0 then
 				_count = _count - 1
 				_breathecall_t = _tBreatheCall[szKey]
@@ -263,7 +234,7 @@ local function onBreatheCall()
 	end
 end
 
-function LIB.BreatheCall(szKey, nInterval, fnAction, oArg)
+function X.BreatheCall(szKey, nInterval, fnAction, oArg)
 	local bOnce, bUnreg
 	if type(szKey) == 'function' then
 		-- BreatheCall(fnAction[, oArg])
@@ -352,9 +323,9 @@ local function onFrameCall()
 	for szKey, fc in pairs(_framecalls) do
 		if fc.nNext <= _framecount then
 			fc.nNext = _framecount + fc.nInterval
-			local res, err, trace = XpCall(fc.fnAction, fc.oArg)
+			local res, err, trace = X.XpCall(fc.fnAction, fc.oArg)
 			if not res then
-				LIB.ErrorLog(err, 'onFrameCall: ' .. szKey, trace)
+				X.ErrorLog(err, 'onFrameCall: ' .. szKey, trace)
 			elseif err == 0 then
 				_count = _count - 1
 				_framecall_t = _tFrameCall[szKey]
@@ -368,7 +339,7 @@ local function onFrameCall()
 	end
 end
 
-function LIB.FrameCall(szKey, nInterval, fnAction, oArg)
+function X.FrameCall(szKey, nInterval, fnAction, oArg)
 	local bOnce, bUnreg
 	if type(szKey) == 'function' then
 		-- FrameCall(fnAction[, oArg])
@@ -458,9 +429,9 @@ local function onRenderCall()
 	for szKey, rc in pairs(_rendercalls) do
 		if rc.nNext <= _time then
 			rc.nNext = _time + rc.nInterval
-			local res, err, trace = XpCall(rc.fnAction, rc.oArg)
+			local res, err, trace = X.XpCall(rc.fnAction, rc.oArg)
 			if not res then
-				LIB.ErrorLog(err, 'onRenderCall: ' .. szKey, trace)
+				X.ErrorLog(err, 'onRenderCall: ' .. szKey, trace)
 			elseif err == 0 then
 				_rendercall_c = _rendercall_c - 1
 				_rendercall_t = _tRenderCall[szKey]
@@ -475,7 +446,7 @@ local function onRenderCall()
 	end
 end
 
-function LIB.RenderCall(szKey, nInterval, fnAction, oArg)
+function X.RenderCall(szKey, nInterval, fnAction, oArg)
 	local bOnce, bUnreg
 	if type(szKey) == 'function' then
 		-- RenderCall(fnAction[, oArg])
@@ -512,7 +483,7 @@ function LIB.RenderCall(szKey, nInterval, fnAction, oArg)
 		rc.nNext = GetTime()
 		rc.nInterval = nInterval or 0
 		if not _rendercall_ref then
-			_rendercall_ref = LIB.RegisterEvent('RENDER_FRAME_UPDATE', onRenderCall)
+			_rendercall_ref = X.RegisterEvent('RENDER_FRAME_UPDATE', onRenderCall)
 		end
 	elseif nInterval then -- modify
 		local rc = _tRenderCall[szKey]
@@ -554,7 +525,7 @@ local function __OnActive()
 	onBreatheCall()
 end
 
-local frame = Wnd.OpenWindow(PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameEmpty.ini', NSFormatString('{$NS}#Interval'))
+local frame = Wnd.OpenWindow(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameEmpty.ini', X.NSFormatString('{$NS}#Interval'))
 frame.OnFrameBreathe = __OnActive
 frame:Hide()
 
@@ -571,7 +542,7 @@ end
 --=============================================================================================
 do
 local _tDebounce = {}
-function LIB.Debounce(szKey, nTime, fnAction, oArg)
+function X.Debounce(szKey, nTime, fnAction, oArg)
 	local bUnreg
 	if type(szKey) == 'number' then
 		-- Debounce(nTime, fnAction[, oArg])
@@ -610,13 +581,13 @@ function LIB.Debounce(szKey, nTime, fnAction, oArg)
 	end
 	return szKey
 end
-LIB.BreatheCall(NSFormatString('{$NS}#Debounce'), function()
+X.BreatheCall(X.NSFormatString('{$NS}#Debounce'), function()
 	local nTime = GetTime()
 	for szKey, d in pairs(_tDebounce) do
 		if nTime >= d.nNext then
-			local res, err, trace = XpCall(d.fnAction, d.oArg)
+			local res, err, trace = X.XpCall(d.fnAction, d.oArg)
 			if not res then
-				LIB.ErrorLog(err, 'onDebounce: ' .. szKey, trace)
+				X.ErrorLog(err, 'onDebounce: ' .. szKey, trace)
 			end
 			_tDebounce[szKey] = nil
 		end
@@ -633,7 +604,7 @@ end
 --=============================================================================================
 do
 local _tThrottle = {}
-function LIB.Throttle(szKey, nTime, fnAction, oArg)
+function X.Throttle(szKey, nTime, fnAction, oArg)
 	local bUnreg, bThrottle
 	if type(szKey) == 'number' then
 		-- Throttle(nTime, fnAction[, oArg])
@@ -659,9 +630,9 @@ function LIB.Throttle(szKey, nTime, fnAction, oArg)
 				fnAction = fnAction,
 				oArg = oArg,
 			}
-			local res, err, trace = XpCall(fnAction, oArg)
+			local res, err, trace = X.XpCall(fnAction, oArg)
 			if not res then
-				LIB.ErrorLog(err, 'onThrottle: ' .. szKey, trace)
+				X.ErrorLog(err, 'onThrottle: ' .. szKey, trace)
 			end
 		end
 	elseif nTime then -- modify
@@ -680,7 +651,7 @@ function LIB.Throttle(szKey, nTime, fnAction, oArg)
 	end
 	return szKey, bThrottle
 end
-LIB.BreatheCall(NSFormatString('{$NS}#Throttle'), function()
+X.BreatheCall(X.NSFormatString('{$NS}#Throttle'), function()
 	local nTime = GetTime()
 	for szKey, d in pairs(_tThrottle) do
 		if nTime >= d.nNext then
@@ -690,9 +661,9 @@ LIB.BreatheCall(NSFormatString('{$NS}#Throttle'), function()
 end)
 end
 
-function LIB.FinallyThrottle(...)
-	local _, bThrottle = LIB.Throttle(...)
+function X.FinallyThrottle(...)
+	local _, bThrottle = X.Throttle(...)
 	if bThrottle then
-		LIB.Debounce(...)
+		X.Debounce(...)
 	end
 end

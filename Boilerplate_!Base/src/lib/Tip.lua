@@ -7,47 +7,18 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = Boilerplate
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -------------------------------------------------------------------------------------------------------------
 
 -- 将输入转为 Rect 数组
 local function ConvRectEl(Rect, ePos)
-	if IsTable(Rect) and IsUserdata(Rect.___id) then
+	if X.IsTable(Rect) and X.IsUserdata(Rect.___id) then
 		if not ePos then
 			if Rect:GetRoot():GetName() == 'PopupMenu' then
 				ePos = ALW.RIGHT_LEFT
@@ -95,8 +66,8 @@ local function AdjustFramePos(frame, Rect, nPosType)
 end
 
 -- nFont 为 true 表示传入的是Xml字符串 否则表示格式化的字体
-function LIB.OutputTip(Rect, szText, nFont, ePos, nMaxWidth)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputTip(Rect, szText, nFont, ePos, nMaxWidth)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, szText, nFont, ePos, nMaxWidth = nil, Rect, szText, nFont, ePos
 	end
 	if nFont ~= true then
@@ -106,34 +77,34 @@ function LIB.OutputTip(Rect, szText, nFont, ePos, nMaxWidth)
 	return OutputTip(szText, nMaxWidth or 800, Rect, ePos)
 end
 
-function LIB.OutputBuffTip(Rect, dwID, nLevel, nTime, szExtraXml)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputBuffTip(Rect, dwID, nLevel, nTime, szExtraXml)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwID, nLevel, nTime, szExtraXml = nil, Rect, dwID, nLevel, nTime
 	end
 	local t = {}
 
-	insert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. '\t', 65))
+	table.insert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. '\t', 65))
 	local buffInfo = GetBuffInfo(dwID, nLevel, {})
 	if buffInfo and buffInfo.nDetachType and g_tStrings.tBuffDetachType[buffInfo.nDetachType] then
-		insert(t, GetFormatText(g_tStrings.tBuffDetachType[buffInfo.nDetachType] .. '\n', 106))
+		table.insert(t, GetFormatText(g_tStrings.tBuffDetachType[buffInfo.nDetachType] .. '\n', 106))
 	else
-		insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, CONSTANT.XML_LINE_BREAKER)
 	end
 
 	local szDesc = GetBuffDesc(dwID, nLevel, 'desc')
 	if szDesc then
-		insert(t, GetFormatText(szDesc .. g_tStrings.STR_FULL_STOP, 106))
+		table.insert(t, GetFormatText(szDesc .. g_tStrings.STR_FULL_STOP, 106))
 	end
 
 	if nTime then
 		if nTime == 0 then
-			insert(t, CONSTANT.XML_LINE_BREAKER)
-			insert(t, GetFormatText(g_tStrings.STR_BUFF_H_TIME_ZERO, 102))
+			table.insert(t, CONSTANT.XML_LINE_BREAKER)
+			table.insert(t, GetFormatText(g_tStrings.STR_BUFF_H_TIME_ZERO, 102))
 		else
 			local H, M, S = '', '', ''
-			local h = floor(nTime / 3600)
-			local m = floor(nTime / 60) % 60
-			local s = floor(nTime % 60)
+			local h = math.floor(nTime / 3600)
+			local m = math.floor(nTime / 60) % 60
+			local s = math.floor(nTime % 60)
 			if h > 0 then
 				H = h .. g_tStrings.STR_BUFF_H_TIME_H .. ' '
 			end
@@ -142,41 +113,41 @@ function LIB.OutputBuffTip(Rect, dwID, nLevel, nTime, szExtraXml)
 			end
 			S = s..g_tStrings.STR_BUFF_H_TIME_S
 			if h < 720 then
-				insert(t, CONSTANT.XML_LINE_BREAKER)
-				insert(t, GetFormatText(FormatString(g_tStrings.STR_BUFF_H_LEFT_TIME_MSG, H, M, S), 102))
+				table.insert(t, CONSTANT.XML_LINE_BREAKER)
+				table.insert(t, GetFormatText(FormatString(g_tStrings.STR_BUFF_H_LEFT_TIME_MSG, H, M, S), 102))
 			end
 		end
 	end
 
 	if szExtraXml then
-		insert(t, CONSTANT.XML_LINE_BREAKER)
-		insert(t, szExtraXml)
+		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, szExtraXml)
 	end
 	-- For test
 	if IsCtrlKeyDown() then
-		insert(t, CONSTANT.XML_LINE_BREAKER)
-		insert(t, GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP, 102))
-		insert(t, CONSTANT.XML_LINE_BREAKER)
-		insert(t, GetFormatText('ID:     ' .. dwID, 102))
-		insert(t, CONSTANT.XML_LINE_BREAKER)
-		insert(t, GetFormatText('Level:  ' .. nLevel, 102))
-		insert(t, CONSTANT.XML_LINE_BREAKER)
-		insert(t, GetFormatText('IconID: ' .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
+		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP, 102))
+		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, GetFormatText('ID:     ' .. dwID, 102))
+		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, GetFormatText('Level:  ' .. nLevel, 102))
+		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, GetFormatText('IconID: ' .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
 	end
 	Rect = ConvRectEl(Rect)
-	OutputTip(concat(t), 300, Rect)
+	OutputTip(table.concat(t), 300, Rect)
 end
 
-function LIB.OutputSkillTip(Rect, dwSkilID, dwSkillLevel)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputSkillTip(Rect, dwSkilID, dwSkillLevel)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwSkilID, dwSkillLevel = nil, Rect, dwSkilID
 	end
 	Rect = ConvRectEl(Rect)
 	OutputSkillTip(dwSkilID, dwSkillLevel, Rect, false)
 end
 
-function LIB.OutputTeamMemberTip(Rect, dwID, szExtraXml)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputTeamMemberTip(Rect, dwID, szExtraXml)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwID, szExtraXml = nil, Rect, dwID
 	end
 	local team = GetClientTeam()
@@ -184,44 +155,44 @@ function LIB.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 	if not tMemberInfo then
 		return
 	end
-	local r, g, b = LIB.GetForceColor(tMemberInfo.dwForceID, 'foreground')
+	local r, g, b = X.GetForceColor(tMemberInfo.dwForceID, 'foreground')
 	local szPath, nFrame = GetForceImage(tMemberInfo.dwForceID)
 	local xml = {}
-	insert(xml, GetFormatImage(szPath, nFrame, 22, 22))
-	insert(xml, GetFormatText(FormatString(g_tStrings.STR_NAME_PLAYER, tMemberInfo.szName), 80, r, g, b))
+	table.insert(xml, GetFormatImage(szPath, nFrame, 22, 22))
+	table.insert(xml, GetFormatText(FormatString(g_tStrings.STR_NAME_PLAYER, tMemberInfo.szName), 80, r, g, b))
 	if tMemberInfo.bIsOnLine then
 		local p = GetPlayer(dwID)
 		if p and p.dwTongID > 0 then
 			if GetTongClient().ApplyGetTongName(p.dwTongID) then
-				insert(xml, GetFormatText('[' .. GetTongClient().ApplyGetTongName(p.dwTongID) .. ']\n', 41))
+				table.insert(xml, GetFormatText('[' .. GetTongClient().ApplyGetTongName(p.dwTongID) .. ']\n', 41))
 			end
 		end
-		insert(xml, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, tMemberInfo.nLevel), 82))
-		insert(xml, GetFormatText(LIB.GetSkillName(tMemberInfo.dwMountKungfuID, 1) .. '\n', 82))
+		table.insert(xml, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, tMemberInfo.nLevel), 82))
+		table.insert(xml, GetFormatText(X.GetSkillName(tMemberInfo.dwMountKungfuID, 1) .. '\n', 82))
 		local szMapName = Table_GetMapName(tMemberInfo.dwMapID)
 		if szMapName then
-			insert(xml, GetFormatText(szMapName .. '\n', 82))
+			table.insert(xml, GetFormatText(szMapName .. '\n', 82))
 		end
-		insert(xml, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[tMemberInfo.nCamp] .. '\n', 82))
+		table.insert(xml, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[tMemberInfo.nCamp] .. '\n', 82))
 	else
-		insert(xml, GetFormatText(g_tStrings.STR_FRIEND_NOT_ON_LINE .. '\n', 82, 128, 128, 128))
+		table.insert(xml, GetFormatText(g_tStrings.STR_FRIEND_NOT_ON_LINE .. '\n', 82, 128, 128, 128))
 	end
 	if szExtraXml then
-		insert(xml, szExtraXml)
+		table.insert(xml, szExtraXml)
 	end
 	if IsCtrlKeyDown() then
-		insert(xml, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, dwID), 102))
-		local szGUID = LIB.GetPlayerGUID(dwID)
+		table.insert(xml, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, dwID), 102))
+		local szGUID = X.GetPlayerGUID(dwID)
 		if szGUID then
-			insert(xml, GetFormatText('GUID: ' .. szGUID .. '\n', 102))
+			table.insert(xml, GetFormatText('GUID: ' .. szGUID .. '\n', 102))
 		end
 	end
 	Rect = ConvRectEl(Rect)
-	OutputTip(concat(xml), 345, Rect)
+	OutputTip(table.concat(xml), 345, Rect)
 end
 
-function LIB.OutputPlayerTip(Rect, dwID, szExtraXml)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputPlayerTip(Rect, dwID, szExtraXml)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwID, szExtraXml = nil, Rect, dwID
 	end
 	local player = GetPlayer(dwID)
@@ -232,27 +203,27 @@ function LIB.OutputPlayerTip(Rect, dwID, szExtraXml)
 	local r, g, b = GetForceFontColor(dwID, me.dwID)
 
 	-- 名字
-	insert(t, GetFormatText(FormatString(g_tStrings.STR_NAME_PLAYER, player.szName), 80, r, g, b))
+	table.insert(t, GetFormatText(FormatString(g_tStrings.STR_NAME_PLAYER, player.szName), 80, r, g, b))
 	-- 称号
 	if player.szTitle ~= '' then
-		insert(t, GetFormatText('<' .. player.szTitle .. '>\n', 0))
+		table.insert(t, GetFormatText('<' .. player.szTitle .. '>\n', 0))
 	end
 	-- 帮会
 	if player.dwTongID ~= 0 then
 		local szName = GetTongClient().ApplyGetTongName(player.dwTongID, 1)
 		if szName and szName ~= '' then
-			insert(t, GetFormatText('[' .. szName .. ']\n', 0))
+			table.insert(t, GetFormatText('[' .. szName .. ']\n', 0))
 		end
 	end
 	-- 等级
 	if player.nLevel - me.nLevel > 10 and not me.IsPlayerInMyParty(dwID) then
-		insert(t, GetFormatText(g_tStrings.STR_PLAYER_H_UNKNOWN_LEVEL, 82))
+		table.insert(t, GetFormatText(g_tStrings.STR_PLAYER_H_UNKNOWN_LEVEL, 82))
 	else
-		insert(t, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, player.nLevel), 82))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, player.nLevel), 82))
 	end
 	-- 声望
 	if CONSTANT.FORCE_TYPE_LABEL[player.dwForceID] then
-		insert(t, GetFormatText(CONSTANT.FORCE_TYPE_LABEL[player.dwForceID] .. '\n', 82))
+		table.insert(t, GetFormatText(CONSTANT.FORCE_TYPE_LABEL[player.dwForceID] .. '\n', 82))
 	end
 	-- 所在地图
 	if IsParty(dwID, me.dwID) then
@@ -261,41 +232,41 @@ function LIB.OutputPlayerTip(Rect, dwID, szExtraXml)
 		if tMemberInfo then
 			local szMapName = Table_GetMapName(tMemberInfo.dwMapID)
 			if szMapName then
-				insert(t, GetFormatText(szMapName .. '\n', 82))
+				table.insert(t, GetFormatText(szMapName .. '\n', 82))
 			end
 		end
 	end
 	-- 阵营
 	if player.bCampFlag then
-		insert(t, GetFormatText(g_tStrings.STR_TIP_CAMP_FLAG .. '\n', 163))
+		table.insert(t, GetFormatText(g_tStrings.STR_TIP_CAMP_FLAG .. '\n', 163))
 	end
-	insert(t, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[player.nCamp], 82))
+	table.insert(t, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[player.nCamp], 82))
 	-- 小本本
 	if _G.MY_Anmerkungen and _G.MY_Anmerkungen.GetPlayerNote then
 		local note = _G.MY_Anmerkungen.GetPlayerNote(player.dwID)
 		if note and note.szContent ~= '' then
-			insert(t, CONSTANT.XML_LINE_BREAKER)
-			insert(t, GetFormatText(note.szContent, 0))
+			table.insert(t, CONSTANT.XML_LINE_BREAKER)
+			table.insert(t, GetFormatText(note.szContent, 0))
 		end
 	end
 	-- 自定义项
 	if szExtraXml then
-		insert(t, CONSTANT.XML_LINE_BREAKER)
-		insert(t, szExtraXml)
+		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, szExtraXml)
 	end
 	-- 调试信息
 	if IsCtrlKeyDown() then
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, player.dwID), 102))
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, player.dwModelID), 102))
-		insert(t, GetFormatText(EncodeLUAData(player.GetRepresentID(), '  '), 102))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, player.dwID), 102))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, player.dwModelID), 102))
+		table.insert(t, GetFormatText(X.EncodeLUAData(player.GetRepresentID(), '  '), 102))
 	end
 	-- 格式化输出
 	Rect = ConvRectEl(Rect)
-	OutputTip(concat(t), 345, Rect)
+	OutputTip(table.concat(t), 345, Rect)
 end
 
-function LIB.OutputNpcTemplateTip(Rect, dwNpcTemplateID, szExtraXml)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputNpcTemplateTip(Rect, dwNpcTemplateID, szExtraXml)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwNpcTemplateID, szExtraXml = nil, Rect, dwNpcTemplateID
 	end
 	local npc = GetNpcTemplate(dwNpcTemplateID)
@@ -305,27 +276,27 @@ function LIB.OutputNpcTemplateTip(Rect, dwNpcTemplateID, szExtraXml)
 	local t = {}
 
 	-- 名字
-	local szName = LIB.GetTemplateName(TARGET.NPC, dwNpcTemplateID) or dwNpcTemplateID
-	insert(t, GetFormatText(szName .. '\n', 80, 255, 255, 0))
+	local szName = X.GetTemplateName(TARGET.NPC, dwNpcTemplateID) or dwNpcTemplateID
+	table.insert(t, GetFormatText(szName .. '\n', 80, 255, 255, 0))
 	-- 等级
 	if npc.nLevel - GetClientPlayer().nLevel > 10 then
-		insert(t, GetFormatText(g_tStrings.STR_PLAYER_H_UNKNOWN_LEVEL, 82))
+		table.insert(t, GetFormatText(g_tStrings.STR_PLAYER_H_UNKNOWN_LEVEL, 82))
 	else
-		insert(t, GetFormatText(FormatString(g_tStrings.STR_NPC_H_WHAT_LEVEL, npc.nLevel), 0))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.STR_NPC_H_WHAT_LEVEL, npc.nLevel), 0))
 	end
 	-- 模版ID
-	insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID_NPC_INTENSITY, npc.dwTemplateID, npc.nIntensity or 1), 101))
+	table.insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID_NPC_INTENSITY, npc.dwTemplateID, npc.nIntensity or 1), 101))
 	-- 自定义项
 	if szExtraXml then
-		insert(t, szExtraXml)
+		table.insert(t, szExtraXml)
 	end
 	-- 格式化输出
 	Rect = ConvRectEl(Rect)
-	OutputTip(concat(t), 345, Rect)
+	OutputTip(table.concat(t), 345, Rect)
 end
 
-function LIB.OutputNpcTip(Rect, dwID, szExtraXml)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputNpcTip(Rect, dwID, szExtraXml)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwID, szExtraXml = nil, Rect, dwID
 	end
 	local npc = GetNpc(dwID)
@@ -338,50 +309,50 @@ function LIB.OutputNpcTip(Rect, dwID, szExtraXml)
 	local t = {}
 
 	-- 名字
-	local szName = LIB.GetObjectName(npc)
-	insert(t, GetFormatText(szName .. '\n', 80, r, g, b))
+	local szName = X.GetObjectName(npc)
+	table.insert(t, GetFormatText(szName .. '\n', 80, r, g, b))
 	-- 称号
 	if npc.szTitle ~= '' then
-		insert(t, GetFormatText('<' .. npc.szTitle .. '>\n', 0))
+		table.insert(t, GetFormatText('<' .. npc.szTitle .. '>\n', 0))
 	end
 	-- 等级
 	if npc.nLevel - me.nLevel > 10 then
-		insert(t, GetFormatText(g_tStrings.STR_PLAYER_H_UNKNOWN_LEVEL, 82))
+		table.insert(t, GetFormatText(g_tStrings.STR_PLAYER_H_UNKNOWN_LEVEL, 82))
 	elseif npc.nLevel > 0 then
-		insert(t, GetFormatText(FormatString(g_tStrings.STR_NPC_H_WHAT_LEVEL, npc.nLevel), 0))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.STR_NPC_H_WHAT_LEVEL, npc.nLevel), 0))
 	end
 	-- 势力
 	if g_tReputation and g_tReputation.tReputationTable[npc.dwForceID] then
-		insert(t, GetFormatText(g_tReputation.tReputationTable[npc.dwForceID].szName .. '\n', 0))
+		table.insert(t, GetFormatText(g_tReputation.tReputationTable[npc.dwForceID].szName .. '\n', 0))
 	end
 	-- 任务信息
 	if GetNpcQuestTip then
-		insert(t, GetNpcQuestTip(npc.dwTemplateID))
+		table.insert(t, GetNpcQuestTip(npc.dwTemplateID))
 	end
 	-- 自定义项
 	if szExtraXml then
-		insert(t, szExtraXml)
+		table.insert(t, szExtraXml)
 	end
 	-- 调试信息
 	if IsCtrlKeyDown() then
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_NPC_ID, npc.dwID), 102))
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID_NPC_INTENSITY, npc.dwTemplateID, npc.nIntensity), 102))
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, npc.dwModelID), 102))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.TIP_NPC_ID, npc.dwID), 102))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID_NPC_INTENSITY, npc.dwTemplateID, npc.nIntensity), 102))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, npc.dwModelID), 102))
 		if IsShiftKeyDown() and GetNpcQuestState then
 			local tState = GetNpcQuestState(npc, true)
 			for szKey, tQuestList in pairs(tState) do
-				tState[szKey] = concat(tQuestList, ',')
+				tState[szKey] = table.concat(tQuestList, ',')
 			end
-			insert(t, GetFormatText(EncodeLUAData(tState, '  '), 102))
+			table.insert(t, GetFormatText(X.EncodeLUAData(tState, '  '), 102))
 		end
 	end
 	-- 格式化输出
 	Rect = ConvRectEl(Rect)
-	OutputTip(concat(t), 345, Rect)
+	OutputTip(table.concat(t), 345, Rect)
 end
 
-function LIB.OutputDoodadTemplateTip(Rect, dwTemplateID, szExtraXml)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputDoodadTemplateTip(Rect, dwTemplateID, szExtraXml)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwTemplateID, szExtraXml = nil, Rect, dwTemplateID
 	end
 	local doodad = GetDoodadTemplate(dwTemplateID)
@@ -394,24 +365,24 @@ function LIB.OutputDoodadTemplateTip(Rect, dwTemplateID, szExtraXml)
 	if doodad.nKind == DOODAD_KIND.CORPSE then
 		szName = szName .. g_tStrings.STR_DOODAD_CORPSE
 	end
-	insert(t, GetFormatText(szName .. '\n', 65))
-	insert(t, GetDoodadQuestTip(dwTemplateID))
+	table.insert(t, GetFormatText(szName .. '\n', 65))
+	table.insert(t, GetDoodadQuestTip(dwTemplateID))
 	-- 模版ID
-	insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID, doodad.dwTemplateID), 101))
+	table.insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID, doodad.dwTemplateID), 101))
 	if IsCtrlKeyDown() then
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, doodad.dwRepresentID), 102))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, doodad.dwRepresentID), 102))
 	end
 	-- 自定义项
 	if szExtraXml then
-		insert(t, szExtraXml)
+		table.insert(t, szExtraXml)
 	end
 	-- 格式化输出
 	Rect = ConvRectEl(Rect)
-	OutputTip(concat(t), 300, Rect)
+	OutputTip(table.concat(t), 300, Rect)
 end
 
-function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwDoodadID, szExtraXml = nil, Rect, dwDoodadID
 	end
 	local doodad = GetDoodad(dwDoodadID)
@@ -425,7 +396,7 @@ function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 	if doodad.nKind == DOODAD_KIND.CORPSE then
 		szDoodadName = szDoodadName .. g_tStrings.STR_DOODAD_CORPSE
 	end
-	insert(t, GetFormatText(szDoodadName .. '\n', 37))
+	table.insert(t, GetFormatText(szDoodadName .. '\n', 37))
 	-- 采集信息
 	if (doodad.nKind == DOODAD_KIND.CORPSE and not doodad.CanLoot(player.dwID)) or doodad.nKind == DOODAD_KIND.CRAFT_TARGET then
 		local doodadTemplate = GetDoodadTemplate(doodad.dwTemplateID)
@@ -446,18 +417,18 @@ function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 				end
 
 				if doodadTemplate.dwCraftID == 1 or doodadTemplate.dwCraftID == 2 or doodadTemplate.dwCraftID == 3 then --采金 神农 庖丁
-					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_BEST_CRAFT, LIB.Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
+					table.insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_BEST_CRAFT, X.Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
 				elseif doodadTemplate.dwCraftID ~= 8 then --8 读碑文
-					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_CRAFT, LIB.Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
+					table.insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_CRAFT, X.Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
 				end
 
 				if recipe.nCraftType == ALL_CRAFT_TYPE.READ then
 					if recipe.dwProfessionIDExt ~= 0 then
-						local nBookID, nSegmentID = LIB.RecipeToSegmentID(dwRecipeID)
+						local nBookID, nSegmentID = X.RecipeToSegmentID(dwRecipeID)
 						if player.IsBookMemorized(nBookID, nSegmentID) then
-							insert(t, GetFormatText(g_tStrings.TIP_ALREADY_READ, 108))
+							table.insert(t, GetFormatText(g_tStrings.TIP_ALREADY_READ, 108))
 						else
-							insert(t, GetFormatText(g_tStrings.TIP_UNREAD, 105))
+							table.insert(t, GetFormatText(g_tStrings.TIP_UNREAD, 105))
 						end
 					end
 				end
@@ -473,12 +444,12 @@ function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 					end
 
 					if toolCommonItemInfo then
-						szText = FormatString(g_tStrings.STR_MSG_NEED_TOOL, LIB.GetItemNameByItemInfo(toolItemInfo)
-							.. g_tStrings.STR_OR .. LIB.GetItemNameByItemInfo(toolCommonItemInfo))
+						szText = FormatString(g_tStrings.STR_MSG_NEED_TOOL, X.GetItemNameByItemInfo(toolItemInfo)
+							.. g_tStrings.STR_OR .. X.GetItemNameByItemInfo(toolCommonItemInfo))
 					else
-						szText = FormatString(g_tStrings.STR_MSG_NEED_TOOL, LIB.GetItemNameByItemInfo(toolItemInfo))
+						szText = FormatString(g_tStrings.STR_MSG_NEED_TOOL, X.GetItemNameByItemInfo(toolItemInfo))
 					end
-					insert(t, GetFormatText(szText, nFont))
+					table.insert(t, GetFormatText(szText, nFont))
 				end
 
 				if recipe.nCraftType == ALL_CRAFT_TYPE.COLLECTION then
@@ -486,30 +457,30 @@ function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 					if player.nCurrentThew >= recipe.nThew  then
 						nFont = 106
 					end
-					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_COST_THEW, recipe.nThew), nFont))
+					table.insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_COST_THEW, recipe.nThew), nFont))
 				elseif recipe.nCraftType == ALL_CRAFT_TYPE.PRODUCE  or recipe.nCraftType == ALL_CRAFT_TYPE.READ or recipe.nCraftType == ALL_CRAFT_TYPE.ENCHANT then
 					local nFont = 102
 					if player.nCurrentStamina >= recipe.nStamina then
 						nFont = 106
 					end
-					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_COST_STAMINA, recipe.nStamina), nFont))
+					table.insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_COST_STAMINA, recipe.nStamina), nFont))
 				end
 			end
 		end
 	end
 	-- 任务信息
 	if GetDoodadQuestTip then
-		insert(t, GetDoodadQuestTip(doodad.dwTemplateID))
+		table.insert(t, GetDoodadQuestTip(doodad.dwTemplateID))
 	end
 	-- 自定义项
 	if szExtraXml then
-		insert(t, szExtraXml)
+		table.insert(t, szExtraXml)
 	end
 	-- 调试信息
 	if IsCtrlKeyDown() then
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_DOODAD_ID, doodad.dwID), 102))
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID, doodad.dwTemplateID), 102))
-		insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, doodad.dwRepresentID), 102))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.TIP_DOODAD_ID, doodad.dwID), 102))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID, doodad.dwTemplateID), 102))
+		table.insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, doodad.dwRepresentID), 102))
 	end
 
 	if doodad.nKind == DOODAD_KIND.GUIDE and not Rect then
@@ -518,25 +489,25 @@ function LIB.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 		Rect = {x, y, w, h}
 	end
 	Rect = ConvRectEl(Rect)
-	OutputTip(concat(t), 345, Rect)
+	OutputTip(table.concat(t), 345, Rect)
 end
 
-function LIB.OutputObjectTip(Rect, dwType, dwID, szExtraXml)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputObjectTip(Rect, dwType, dwID, szExtraXml)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwType, dwID, szExtraXml = nil, Rect, dwType, dwID
 	end
 	Rect = ConvRectEl(Rect)
 	if dwType == TARGET.PLAYER then
-		LIB.OutputPlayerTip(Rect, dwID, szExtraXml)
+		X.OutputPlayerTip(Rect, dwID, szExtraXml)
 	elseif dwType == TARGET.NPC then
-		LIB.OutputNpcTip(Rect, dwID, szExtraXml)
+		X.OutputNpcTip(Rect, dwID, szExtraXml)
 	elseif dwType == TARGET.DOODAD then
-		LIB.OutputDoodadTip(Rect, dwID, szExtraXml)
+		X.OutputDoodadTip(Rect, dwID, szExtraXml)
 	end
 end
 
-function LIB.OutputItemInfoTip(Rect, dwTabType, dwIndex, nBookInfo)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputItemInfoTip(Rect, dwTabType, dwIndex, nBookInfo)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwTabType, dwIndex, nBookInfo = nil, Rect, dwTabType, dwIndex
 	end
 	local szXml = GetItemInfoTip(0, dwTabType, dwIndex, nil, nil, nBookInfo)
@@ -549,16 +520,16 @@ function LIB.OutputItemInfoTip(Rect, dwTabType, dwIndex, nBookInfo)
 	OutputTip(szXml, 345, Rect)
 end
 
-function LIB.GetItemTip(KItem)
-	local bStatus, szXml = Call(GetItemTip, KItem)
+function X.GetItemTip(KItem)
+	local bStatus, szXml = X.Call(GetItemTip, KItem)
 	if bStatus then
 		return szXml
 	end
 	return ''
 end
 
-function LIB.OutputItemTip(Rect, dwItemID)
-	if not IsTable(Rect) and not IsNil(Rect) then
+function X.OutputItemTip(Rect, dwItemID)
+	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwItemID = nil, Rect
 	end
 	local item = GetItem(dwItemID)
@@ -572,7 +543,7 @@ function LIB.OutputItemTip(Rect, dwItemID)
 	OutputTip(szXml, 345, Rect)
 end
 
--- LIB.OutputTableTip({
+-- X.OutputTableTip({
 -- 	aRow = {
 -- 		DEFAULT = { -- 通用行设置
 -- 			nPaddingTop = 3,
@@ -607,7 +578,7 @@ end
 -- 	nPosType = ALW.TOP_BOTTOM,
 -- })
 -- 其中，nMinWidth、nMaxWidth 数值相同时可合并简写为 nWidth 。
-function LIB.OutputTableTip(tOptions)
+function X.OutputTableTip(tOptions)
 	local aRow = tOptions.aRow or {}
 	local aColumn = tOptions.aColumn or {}
 	local aDataSource = tOptions.aDataSource
@@ -637,14 +608,14 @@ function LIB.OutputTableTip(tOptions)
 	end
 	-- 数据源不可为空
 	if #aDataSource == 0 then
-		LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip aDataSource is empty.', DEBUG_LEVEL.WARNING)
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip aDataSource is empty.', X.DEBUG_LEVEL.WARNING)
 		return
 	end
 	-- 计算列数
 	for iCol, aCol in ipairs(aDataSource) do
 		local nCol = #aCol
 		if nCol == 0 then
-			LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip row ' .. iCol .. ' is empty.', DEBUG_LEVEL.WARNING)
+			X.Debug(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip row ' .. iCol .. ' is empty.', X.DEBUG_LEVEL.WARNING)
 			return
 		end
 		if nCol ~= 1 then
@@ -652,13 +623,13 @@ function LIB.OutputTableTip(tOptions)
 				nTableColumn = nCol
 			end
 			if nCol ~= nTableColumn then
-				LIB.Debug(
-					PACKET_INFO.NAME_SPACE,
-					'LIB.OutputTableTip row '
+				X.Debug(
+					X.PACKET_INFO.NAME_SPACE,
+					'X.OutputTableTip row '
 						.. iCol .. ' columns count ('
 						.. nCol .. ') should be the same as previous columns ('
 						.. nTableColumn .. ')',
-					DEBUG_LEVEL.LOG)
+					X.DEBUG_LEVEL.LOG)
 				return
 			end
 		end
@@ -679,13 +650,13 @@ function LIB.OutputTableTip(tOptions)
 			col.nMaxWidth = col.nWidth
 		end
 		if col.nMinWidth and col.nMaxWidth and col.nMinWidth > col.nMaxWidth then
-			LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip column ' .. iCol .. ' min width ' .. col.nMinWidth
-				.. ' should be smaller than max width ' .. col.nMaxWidth .. '.', DEBUG_LEVEL.WARNING)
+			X.Debug(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip column ' .. iCol .. ' min width ' .. col.nMinWidth
+				.. ' should be smaller than max width ' .. col.nMaxWidth .. '.', X.DEBUG_LEVEL.WARNING)
 			return
 		end
 		if col.nMinWidth then
 			if iCol == 'MERGE' then
-				nTableMinWidth = max(nTableMinWidth or 0, col.nMinWidth)
+				nTableMinWidth = math.max(nTableMinWidth or 0, col.nMinWidth)
 			else
 				nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nMinWidth
 			end
@@ -697,16 +668,16 @@ function LIB.OutputTableTip(tOptions)
 			col.nPaddingRight = 3
 		end
 		if iCol == 'MERGE' then
-			nTableMinWidth = max(nTableMinWidth or 0, col.nPaddingLeft)
-			nTableMinWidth = max(nTableMinWidth or 0, col.nPaddingRight)
+			nTableMinWidth = math.max(nTableMinWidth or 0, col.nPaddingLeft)
+			nTableMinWidth = math.max(nTableMinWidth or 0, col.nPaddingRight)
 		else
 			nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nPaddingLeft
 			nTableColumnMinWidthSum = nTableColumnMinWidthSum + col.nPaddingRight
 		end
 	end
 	if nTableMaxWidth and nTableColumnMinWidthSum > nTableMaxWidth then
-		LIB.Debug(PACKET_INFO.NAME_SPACE, 'LIB.OutputTableTip summary of columns min width (including horizontal paddings) ' .. nTableColumnMinWidthSum
-			.. ' should be smaller than table max width ' .. nTableMaxWidth .. '.', DEBUG_LEVEL.WARNING)
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip summary of columns min width (including horizontal paddings) ' .. nTableColumnMinWidthSum
+			.. ' should be smaller than table max width ' .. nTableMaxWidth .. '.', X.DEBUG_LEVEL.WARNING)
 		return
 	end
 	-- 格式化行参数
@@ -730,12 +701,12 @@ function LIB.OutputTableTip(tOptions)
 		end
 	end
 	-- 开始创建
-	local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/OutputTableTip.ini'
+	local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/OutputTableTip.ini'
 	local frame, hTotal, imgBg, hTable
 	if hTarget then
 		hTable = hTarget:AppendItemFromIni(INI_PATH, 'Handle_Table')
 	else
-		frame = Wnd.OpenWindow(INI_PATH, NSFormatString('{$NS}_OutputTableTip'))
+		frame = Wnd.OpenWindow(INI_PATH, X.NSFormatString('{$NS}_OutputTableTip'))
 		hTotal = frame:Lookup('', '')
 		imgBg = hTotal:Lookup('Image_Bg')
 		hTable = hTotal:Lookup('Handle_Table')
@@ -765,26 +736,26 @@ function LIB.OutputTableTip(tOptions)
 			hCustom:SetW(nCellMaxWidth)
 			hCustom:FormatAllItemPos()
 			local nAW = hCustom:GetAllItemSize()
-			aColumnWidth[iColumnKey] = max(aColumnWidth[iColumnKey] or 0, nAW + tCol.nPaddingLeft + tCol.nPaddingRight)
+			aColumnWidth[iColumnKey] = math.max(aColumnWidth[iColumnKey] or 0, nAW + tCol.nPaddingLeft + tCol.nPaddingRight)
 		end
 	end
 	-- 整行合并单元格
 	if aColumnWidth['MERGE'] then
 		if nTableMaxWidth then
-			aColumnWidth['MERGE'] = min(aColumnWidth['MERGE'], nTableMaxWidth)
+			aColumnWidth['MERGE'] = math.min(aColumnWidth['MERGE'], nTableMaxWidth)
 		end
 		if nTableMinWidth then
-			nTableMinWidth = max(nTableMinWidth, aColumnWidth['MERGE'])
+			nTableMinWidth = math.max(nTableMinWidth, aColumnWidth['MERGE'])
 		end
 	end
 	-- 限制各列宽配置约束
 	for iCol = 1, nTableColumn do
 		local col = aColumn[iCol]
 		if col.nMinWidth then
-			aColumnWidth[iCol] = max(aColumnWidth[iCol] or 0, col.nMinWidth)
+			aColumnWidth[iCol] = math.max(aColumnWidth[iCol] or 0, col.nMinWidth)
 		end
 		if col.nMaxWidth then
-			aColumnWidth[iCol] = min(aColumnWidth[iCol] or HUGE, col.nMaxWidth)
+			aColumnWidth[iCol] = math.min(aColumnWidth[iCol] or math.huge, col.nMaxWidth)
 		end
 	end
 	-- 存在整体宽度限制，自动平均分布
@@ -809,7 +780,7 @@ function LIB.OutputTableTip(tOptions)
 			end
 		end
 		local nLoopProtect = 0
-		while nExtraWidth and abs(nExtraWidth) > 0.0001 do
+		while nExtraWidth and math.abs(nExtraWidth) > 0.0001 do
 			nLoopProtect = nLoopProtect + 1
 			assert(nLoopProtect < 300)
 			local nExtraPerCol = nExtraWidth / nTableColumn
@@ -818,11 +789,11 @@ function LIB.OutputTableTip(tOptions)
 				local nOffset = nExtraPerCol
 				if nExtraPerCol > 0 then
 					if tCol.nMaxWidth then
-						nOffset = min(nOffset, tCol.nMaxWidth - nWidth)
+						nOffset = math.min(nOffset, tCol.nMaxWidth - nWidth)
 					end
 				else
 					if tCol.nMinWidth then
-						nOffset = max(nOffset, tCol.nMinWidth - nWidth)
+						nOffset = math.max(nOffset, tCol.nMinWidth - nWidth)
 					end
 				end
 				aColumnWidth[iCol] = aColumnWidth[iCol] + nOffset
@@ -855,7 +826,7 @@ function LIB.OutputTableTip(tOptions)
 			local nColumnWidth = bMergeColumnRow and nTableWidth or aColumnWidth[iCol]
 			local nCellWidth, nCellHeight = nColumnWidth - tCol.nPaddingLeft - tCol.nPaddingRight, nil
 			if tCol.szAlignment == 'CENTER' or tCol.szAlignment == 'RIGHT' then
-				nCellWidth = min(nCellWidth, hCustom:GetW())
+				nCellWidth = math.min(nCellWidth, hCustom:GetW())
 			end
 			hCol:SetRelX(nX)
 			hCol:SetW(nColumnWidth)
@@ -874,7 +845,7 @@ function LIB.OutputTableTip(tOptions)
 			hCustom:FormatAllItemPos()
 			nCellHeight = select(2, hCustom:GetAllItemSize())
 			hCustom:SetH(nCellHeight)
-			aRowHeight[iRow] = max(aRowHeight[iRow] or 0, nCellHeight + tRow.nPaddingTop + tRow.nPaddingBottom)
+			aRowHeight[iRow] = math.max(aRowHeight[iRow] or 0, nCellHeight + tRow.nPaddingTop + tRow.nPaddingBottom)
 			nX = nX + nColumnWidth
 		end
 	end
@@ -893,7 +864,7 @@ function LIB.OutputTableTip(tOptions)
 			end
 			local nCellHeight = nRowHeight
 			if tRow.szAlignment == 'MIDDLE' or tRow.szAlignment == 'BOTTOM' then
-				nCellHeight = min(nCellHeight, hCustom:GetH())
+				nCellHeight = math.min(nCellHeight, hCustom:GetH())
 			end
 			hCell:SetH(nCellHeight)
 			hCell:SetRelY(tRow.nPaddingTop)
@@ -933,8 +904,8 @@ function LIB.OutputTableTip(tOptions)
 		hTotal:FormatAllItemPos()
 	end
 	if frame then
-		LIB.RegisterEsc(
-			NSFormatString('{$NS}_OutputTableTip'),
+		X.RegisterEsc(
+			X.NSFormatString('{$NS}_OutputTableTip'),
 			function() return frame:IsValid() and frame:IsVisible() end,
 			function() Wnd.CloseWindow(frame) end)
 		frame:SetSize(
@@ -944,6 +915,6 @@ function LIB.OutputTableTip(tOptions)
 	end
 end
 
-function LIB.HideTableTip()
-	Wnd.CloseWindow(NSFormatString('{$NS}_OutputTableTip'))
+function X.HideTableTip()
+	Wnd.CloseWindow(X.NSFormatString('{$NS}_OutputTableTip'))
 end

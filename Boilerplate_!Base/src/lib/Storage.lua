@@ -7,46 +7,17 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = Boilerplate
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 ---------------------------------------------------------------------------------------------------
 
-local EncodeByteData = GetGameAPI('EncodeByteData')
-local DecodeByteData = GetGameAPI('DecodeByteData')
+local EncodeByteData = X.GetGameAPI('EncodeByteData')
+local DecodeByteData = X.GetGameAPI('DecodeByteData')
 
 -- Save & Load Lua Data
 -- ##################################################################################################
@@ -63,21 +34,21 @@ local DecodeByteData = GetGameAPI('DecodeByteData')
 --       # #       #   #         #   #   # # # # #       #         #                 #     #   #
 --   # #     #   #       #     # # #     #       #       #       # #                 #   #       #
 -- ##################################################################################################
-if IsLocalFileExist(PACKET_INFO.ROOT .. '@DATA/') then
-	CPath.Move(PACKET_INFO.ROOT .. '@DATA/', PACKET_INFO.DATA_ROOT)
+if IsLocalFileExist(X.PACKET_INFO.ROOT .. '@DATA/') then
+	CPath.Move(X.PACKET_INFO.ROOT .. '@DATA/', X.PACKET_INFO.DATA_ROOT)
 end
 
 -- 格式化数据文件路径（替换{$uid}、{$lang}、{$server}以及补全相对路径）
--- (string) LIB.GetLUADataPath(oFilePath)
+-- (string) X.GetLUADataPath(oFilePath)
 --   当路径为绝对路径时(以斜杠开头)不作处理
 --   当路径为相对路径时 相对于插件`{NS}#DATA`目录
 --   可以传入表{szPath, ePathType}
 local PATH_TYPE_MOVE_STATE = {
-	[PATH_TYPE.GLOBAL] = 'PENDING',
-	[PATH_TYPE.ROLE] = 'PENDING',
-	[PATH_TYPE.SERVER] = 'PENDING',
+	[X.PATH_TYPE.GLOBAL] = 'PENDING',
+	[X.PATH_TYPE.ROLE] = 'PENDING',
+	[X.PATH_TYPE.SERVER] = 'PENDING',
 }
-function LIB.FormatPath(oFilePath, tParams)
+function X.FormatPath(oFilePath, tParams)
 	if not tParams then
 		tParams = {}
 	end
@@ -85,20 +56,20 @@ function LIB.FormatPath(oFilePath, tParams)
 	if type(oFilePath) == 'table' then
 		szFilePath, ePathType = unpack(oFilePath)
 	else
-		szFilePath, ePathType = oFilePath, PATH_TYPE.NORMAL
+		szFilePath, ePathType = oFilePath, X.PATH_TYPE.NORMAL
 	end
 	-- 兼容旧版数据位置
 	if PATH_TYPE_MOVE_STATE[ePathType] == 'PENDING' then
 		PATH_TYPE_MOVE_STATE[ePathType] = nil
-		local szPath = LIB.FormatPath({'', ePathType})
+		local szPath = X.FormatPath({'', ePathType})
 		if not IsLocalFileExist(szPath) then
 			local szOriginPath
-			if ePathType == PATH_TYPE.GLOBAL then
-				szOriginPath = LIB.FormatPath({'!all-users@{$lang}/', PATH_TYPE.DATA})
-			elseif ePathType == PATH_TYPE.ROLE then
-				szOriginPath = LIB.FormatPath({'{$uid}@{$lang}/', PATH_TYPE.DATA})
-			elseif ePathType == PATH_TYPE.SERVER then
-				szOriginPath = LIB.FormatPath({'#{$relserver}@{$lang}/', PATH_TYPE.DATA})
+			if ePathType == X.PATH_TYPE.GLOBAL then
+				szOriginPath = X.FormatPath({'!all-users@{$lang}/', X.PATH_TYPE.DATA})
+			elseif ePathType == X.PATH_TYPE.ROLE then
+				szOriginPath = X.FormatPath({'{$uid}@{$lang}/', X.PATH_TYPE.DATA})
+			elseif ePathType == X.PATH_TYPE.SERVER then
+				szOriginPath = X.FormatPath({'#{$relserver}@{$lang}/', X.PATH_TYPE.DATA})
 			end
 			if IsLocalFileExist(szOriginPath) then
 				CPath.Move(szOriginPath, szPath)
@@ -106,54 +77,54 @@ function LIB.FormatPath(oFilePath, tParams)
 		end
 	end
 	-- Unified the directory separator
-	szFilePath = gsub(szFilePath, '\\', '/')
+	szFilePath = string.gsub(szFilePath, '\\', '/')
 	-- if it's relative path then complete path with '/{NS}#DATA/'
 	if szFilePath:sub(2, 3) ~= ':/' then
-		if ePathType == PATH_TYPE.DATA then
-			szFilePath = PACKET_INFO.DATA_ROOT .. szFilePath
-		elseif ePathType == PATH_TYPE.GLOBAL then
-			szFilePath = PACKET_INFO.DATA_ROOT .. '!all-users@{$edition}/' .. szFilePath
-		elseif ePathType == PATH_TYPE.ROLE then
-			szFilePath = PACKET_INFO.DATA_ROOT .. '{$uid}@{$edition}/' .. szFilePath
-		elseif ePathType == PATH_TYPE.SERVER then
-			szFilePath = PACKET_INFO.DATA_ROOT .. '#{$relserver}@{$edition}/' .. szFilePath
+		if ePathType == X.PATH_TYPE.DATA then
+			szFilePath = X.PACKET_INFO.DATA_ROOT .. szFilePath
+		elseif ePathType == X.PATH_TYPE.GLOBAL then
+			szFilePath = X.PACKET_INFO.DATA_ROOT .. '!all-users@{$edition}/' .. szFilePath
+		elseif ePathType == X.PATH_TYPE.ROLE then
+			szFilePath = X.PACKET_INFO.DATA_ROOT .. '{$uid}@{$edition}/' .. szFilePath
+		elseif ePathType == X.PATH_TYPE.SERVER then
+			szFilePath = X.PACKET_INFO.DATA_ROOT .. '#{$relserver}@{$edition}/' .. szFilePath
 		end
 	end
 	-- if exist {$uid} then add user role identity
-	if find(szFilePath, '{$uid}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$uid}', tParams['uid'] or LIB.GetClientUUID())
+	if string.find(szFilePath, '{$uid}', nil, true) then
+		szFilePath = szFilePath:gsub('{%$uid}', tParams['uid'] or X.GetClientUUID())
 	end
 	-- if exist {$name} then add user role identity
-	if find(szFilePath, '{$name}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$name}', tParams['name'] or LIB.GetClientInfo().szName or LIB.GetClientUUID())
+	if string.find(szFilePath, '{$name}', nil, true) then
+		szFilePath = szFilePath:gsub('{%$name}', tParams['name'] or X.GetClientInfo().szName or X.GetClientUUID())
 	end
 	-- if exist {$lang} then add language identity
-	if find(szFilePath, '{$lang}', nil, true) then
+	if string.find(szFilePath, '{$lang}', nil, true) then
 		szFilePath = szFilePath:gsub('{%$lang}', tParams['lang'] or GLOBAL.GAME_LANG)
 	end
 	-- if exist {$edition} then add edition identity
-	if find(szFilePath, '{$edition}', nil, true) then
+	if string.find(szFilePath, '{$edition}', nil, true) then
 		szFilePath = szFilePath:gsub('{%$edition}', tParams['edition'] or GLOBAL.GAME_EDITION)
 	end
 	-- if exist {$branch} then add branch identity
-	if find(szFilePath, '{$branch}', nil, true) then
+	if string.find(szFilePath, '{$branch}', nil, true) then
 		szFilePath = szFilePath:gsub('{%$branch}', tParams['branch'] or GLOBAL.GAME_BRANCH)
 	end
 	-- if exist {$version} then add version identity
-	if find(szFilePath, '{$version}', nil, true) then
+	if string.find(szFilePath, '{$version}', nil, true) then
 		szFilePath = szFilePath:gsub('{%$version}', tParams['version'] or GLOBAL.GAME_VERSION)
 	end
 	-- if exist {$date} then add date identity
-	if find(szFilePath, '{$date}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$date}', tParams['date'] or LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd'))
+	if string.find(szFilePath, '{$date}', nil, true) then
+		szFilePath = szFilePath:gsub('{%$date}', tParams['date'] or X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd'))
 	end
 	-- if exist {$server} then add server identity
-	if find(szFilePath, '{$server}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$server}', tParams['server'] or ((LIB.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
+	if string.find(szFilePath, '{$server}', nil, true) then
+		szFilePath = szFilePath:gsub('{%$server}', tParams['server'] or ((X.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	-- if exist {$relserver} then add relserver identity
-	if find(szFilePath, '{$relserver}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$relserver}', tParams['relserver'] or ((LIB.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
+	if string.find(szFilePath, '{$relserver}', nil, true) then
+		szFilePath = szFilePath:gsub('{%$relserver}', tParams['relserver'] or ((X.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	local rootPath = GetRootPath():gsub('\\', '/')
 	if szFilePath:find(rootPath) == 1 then
@@ -162,45 +133,45 @@ function LIB.FormatPath(oFilePath, tParams)
 	return szFilePath
 end
 
-function LIB.GetRelativePath(oPath, oRoot)
-	local szPath = LIB.FormatPath(oPath):gsub('^%./', '')
-	local szRoot = LIB.FormatPath(oRoot):gsub('^%./', '')
+function X.GetRelativePath(oPath, oRoot)
+	local szPath = X.FormatPath(oPath):gsub('^%./', '')
+	local szRoot = X.FormatPath(oRoot):gsub('^%./', '')
 	local szRootPath = GetRootPath():gsub('\\', '/')
 	if szPath:sub(2, 2) ~= ':' then
-		szPath = LIB.ConcatPath(szRootPath, szPath)
+		szPath = X.ConcatPath(szRootPath, szPath)
 	end
 	if szRoot:sub(2, 2) ~= ':' then
-		szRoot = LIB.ConcatPath(szRootPath, szRoot)
+		szRoot = X.ConcatPath(szRootPath, szRoot)
 	end
 	szRoot = szRoot:gsub('/$', '') .. '/'
-	if wfind(szPath:lower(), szRoot:lower()) ~= 1 then
+	if wstring.find(szPath:lower(), szRoot:lower()) ~= 1 then
 		return
 	end
 	return szPath:sub(#szRoot + 1)
 end
 
-function LIB.GetAbsolutePath(oPath)
-	local szPath = LIB.FormatPath(oPath)
+function X.GetAbsolutePath(oPath)
+	local szPath = X.FormatPath(oPath)
 	if szPath:sub(2, 2) == ':' then
 		return szPath
 	end
-	return LIB.NormalizePath(GetRootPath():gsub('\\', '/') .. '/' .. LIB.GetRelativePath(szPath, {'', PATH_TYPE.NORMAL}):gsub('^[./\\]*', ''))
+	return X.NormalizePath(GetRootPath():gsub('\\', '/') .. '/' .. X.GetRelativePath(szPath, {'', X.PATH_TYPE.NORMAL}):gsub('^[./\\]*', ''))
 end
 
-function LIB.GetLUADataPath(oFilePath)
-	local szFilePath = LIB.FormatPath(oFilePath)
+function X.GetLUADataPath(oFilePath)
+	local szFilePath = X.FormatPath(oFilePath)
 	-- ensure has file name
-	if sub(szFilePath, -1) == '/' then
+	if string.sub(szFilePath, -1) == '/' then
 		szFilePath = szFilePath .. 'data'
 	end
 	-- ensure file ext name
-	if sub(szFilePath, -7):lower() ~= '.jx3dat' then
+	if string.sub(szFilePath, -7):lower() ~= '.jx3dat' then
 		szFilePath = szFilePath .. '.jx3dat'
 	end
 	return szFilePath
 end
 
-function LIB.ConcatPath(...)
+function X.ConcatPath(...)
 	local aPath = {...}
 	local szPath = ''
 	for _, s in ipairs(aPath) do
@@ -217,7 +188,7 @@ function LIB.ConcatPath(...)
 end
 
 -- 替换目录分隔符为反斜杠，并且删除目录中的.\与..\
-function LIB.NormalizePath(szPath)
+function X.NormalizePath(szPath)
 	szPath = szPath:gsub('/', '\\')
 	szPath = szPath:gsub('\\%.\\', '\\')
 	local nPos1, nPos2
@@ -232,17 +203,17 @@ function LIB.NormalizePath(szPath)
 end
 
 -- 获取父层目录 注意文件和文件夹获取父层的区别
-function LIB.GetParentPath(szPath)
-	return LIB.NormalizePath(szPath):gsub('/[^/]*$', '')
+function X.GetParentPath(szPath)
+	return X.NormalizePath(szPath):gsub('/[^/]*$', '')
 end
 
-function LIB.OpenFolder(szPath)
+function X.OpenFolder(szPath)
 	if _G.OpenFolder then
 		_G.OpenFolder(szPath)
 	end
 end
 
-function LIB.IsURL(szURL)
+function X.IsURL(szURL)
 	return szURL:sub(1, 8):lower() == 'https://' or szURL:gsub(1, 7):lower() == 'http://'
 end
 
@@ -253,11 +224,11 @@ local function GetPassphrase(nSeed, nLen)
 	local a = {}
 	local b, c = 0x20, 0x7e - 0x20 + 1
 	for i = 1, nLen do
-		insert(a, ((i + nSeed) % 256 * (2 * i + nSeed) % 32) % c + b)
+		table.insert(a, ((i + nSeed) % 256 * (2 * i + nSeed) % 32) % c + b)
 	end
-	return char(unpack(a))
+	return string.char(unpack(a))
 end
-local szDataRoot = StringLowerW(LIB.FormatPath({'', PATH_TYPE.DATA}))
+local szDataRoot = StringLowerW(X.FormatPath({'', X.PATH_TYPE.DATA}))
 local szPassphrase = GetPassphrase(666, 233)
 local CACHE = {}
 function GetLUADataPathPassphrase(szPath)
@@ -269,14 +240,14 @@ function GetLUADataPathPassphrase(szPath)
 	end
 	szPath = szPath:sub(#szDataRoot + 1)
 	-- 拆分数据分类地址
-	local nPos = wfind(szPath, '/')
+	local nPos = wstring.find(szPath, '/')
 	if not nPos or nPos == 1 then
 		return
 	end
 	local szDomain = szPath:sub(1, nPos)
 	szPath = szPath:sub(nPos + 1)
 	-- 过滤不需要加密的地址
-	local nPos = wfind(szPath, '/')
+	local nPos = wstring.find(szPath, '/')
 	if nPos then
 		if szPath:sub(1, nPos - 1) == 'export' then
 			return
@@ -294,7 +265,7 @@ function GetLUADataPathPassphrase(szPath)
 		end
 		if not CACHE[szDomain][szPath] then
 			bNew = true
-			CACHE[szDomain][szPath] = LIB.GetUUID():gsub('-', '')
+			CACHE[szDomain][szPath] = X.GetUUID():gsub('-', '')
 			SaveLUAData(szFilePath, CACHE[szDomain], { passphrase = szPassphrase })
 		end
 	end
@@ -305,9 +276,9 @@ end
 -- 获取插件软唯一标示符
 do
 local GUID
-function LIB.GetClientGUID()
+function X.GetClientGUID()
 	if not GUID then
-		local szRandom = GetLUADataPathPassphrase(LIB.GetLUADataPath({'GUIDv2', PATH_TYPE.GLOBAL}))
+		local szRandom = GetLUADataPathPassphrase(X.GetLUADataPath({'GUIDv2', X.PATH_TYPE.GLOBAL}))
 		local szPrefix = MD5(szRandom):sub(1, 4)
 		local nCSW, nCSH = GetSystemCScreen()
 		local szCS = MD5(nCSW .. ',' .. nCSH):sub(1, 4)
@@ -318,33 +289,33 @@ end
 end
 
 -- 保存数据文件
-function LIB.SaveLUAData(oFilePath, oData, tConfig)
+function X.SaveLUAData(oFilePath, oData, tConfig)
 	--[[#DEBUG BEGIN]]
 	local nStartTick = GetTickCount()
 	--[[#DEBUG END]]
-	local config, szPassphrase, bNew = Clone(tConfig) or {}, nil, nil
-	local szFilePath = LIB.GetLUADataPath(oFilePath)
-	if IsNil(config.passphrase) then
+	local config, szPassphrase, bNew = X.Clone(tConfig) or {}, nil, nil
+	local szFilePath = X.GetLUADataPath(oFilePath)
+	if X.IsNil(config.passphrase) then
 		config.passphrase = GetLUADataPathPassphrase(szFilePath)
 	end
 	local data = SaveLUAData(szFilePath, oData, config)
 	--[[#DEBUG BEGIN]]
 	nStartTick = GetTickCount() - nStartTick
 	if nStartTick > 5 then
-		LIB.Debug('PMTool', _L('%s saved during %dms.', szFilePath, nStartTick), DEBUG_LEVEL.PMLOG)
+		X.Debug('PMTool', _L('%s saved during %dms.', szFilePath, nStartTick), X.DEBUG_LEVEL.PMLOG)
 	end
 	--[[#DEBUG END]]
 	return data
 end
 
 -- 加载数据文件
-function LIB.LoadLUAData(oFilePath, tConfig)
+function X.LoadLUAData(oFilePath, tConfig)
 	--[[#DEBUG BEGIN]]
 	local nStartTick = GetTickCount()
 	--[[#DEBUG END]]
-	local config, szPassphrase, bNew = Clone(tConfig) or {}, nil, nil
-	local szFilePath = LIB.GetLUADataPath(oFilePath)
-	if IsNil(config.passphrase) then
+	local config, szPassphrase, bNew = X.Clone(tConfig) or {}, nil, nil
+	local szFilePath = X.GetLUADataPath(oFilePath)
+	if X.IsNil(config.passphrase) then
 		szPassphrase, bNew = GetLUADataPathPassphrase(szFilePath)
 		if not bNew then
 			config.passphrase = szPassphrase
@@ -358,7 +329,7 @@ function LIB.LoadLUAData(oFilePath, tConfig)
 	--[[#DEBUG BEGIN]]
 	nStartTick = GetTickCount() - nStartTick
 	if nStartTick > 5 then
-		LIB.Debug('PMTool', _L('%s loaded during %dms.', szFilePath, nStartTick), DEBUG_LEVEL.PMLOG)
+		X.Debug('PMTool', _L('%s loaded during %dms.', szFilePath, nStartTick), X.DEBUG_LEVEL.PMLOG)
 	end
 	--[[#DEBUG END]]
 	return data
@@ -374,13 +345,13 @@ local function GetLUADataHashSYNC(data)
 	if szType == 'table' then
 		local aChild = {}
 		for k, v in pairs(data) do
-			insert(aChild, { k = GetLUADataHashSYNC(k), v = GetLUADataHashSYNC(v) })
+			table.insert(aChild, { k = GetLUADataHashSYNC(k), v = GetLUADataHashSYNC(v) })
 		end
-		sort(aChild, TableSorterK)
+		table.sort(aChild, TableSorterK)
 		for i, v in ipairs(aChild) do
 			aChild[i] = v.k .. ':' .. v.v
 		end
-		return GetLUADataHashSYNC('{}::' .. concat(aChild, ';'))
+		return GetLUADataHashSYNC('{}::' .. table.concat(aChild, ';'))
 	end
 	return tostring(GetStringCRC(szType .. ':' .. tostring(data)))
 end
@@ -401,16 +372,16 @@ local function GetLUADataHash(data, fnAction)
 			state = {},
 			context = setmetatable({}, { __index = prev and prev.context }),
 		}
-		insert(__stack__, current)
+		table.insert(__stack__, current)
 		return current
 	end
 
 	local function __exit_context__()
-		remove(__stack__)
+		table.remove(__stack__)
 	end
 
 	local function __call__(...)
-		insert(__stack__, {
+		table.insert(__stack__, {
 			continuation = '0',
 			arguments = {...},
 			state = {},
@@ -427,7 +398,7 @@ local function GetLUADataHash(data, fnAction)
 
 	local current, continuation, arguments, state, context, timer
 
-	timer = LIB.BreatheCall(function()
+	timer = X.BreatheCall(function()
 		local nTime = GetTime()
 
 		while #__stack__ > 0 do
@@ -453,11 +424,11 @@ local function GetLUADataHash(data, fnAction)
 					nxt.context.k = state.k
 					nxt.context.v = arguments[1][state.k]
 				else
-					sort(context.aChild, TableSorterK)
+					table.sort(context.aChild, TableSorterK)
 					for i, v in ipairs(context.aChild) do
 						context.aChild[i] = v.k .. ':' .. v.v
 					end
-					__call__('{}::' .. concat(context.aChild, ';'))
+					__call__('{}::' .. table.concat(context.aChild, ';'))
 					current.continuation = '1.2'
 				end
 			elseif continuation == '1.2' then
@@ -472,7 +443,7 @@ local function GetLUADataHash(data, fnAction)
 				current.continuation = '2.2'
 			elseif continuation == '2.2' then
 				context.vs = __retvals__[1]
-				insert(context.aChild, { k = context.ks, v = context.vs })
+				table.insert(context.aChild, { k = context.ks, v = context.vs })
 				__exit_context__()
 			end
 
@@ -481,11 +452,11 @@ local function GetLUADataHash(data, fnAction)
 			end
 		end
 
-		LIB.BreatheCall(timer, false)
-		SafeCall(fnAction, unpack(__retvals__))
+		X.BreatheCall(timer, false)
+		X.SafeCall(fnAction, unpack(__retvals__))
 	end)
 end
-LIB.GetLUADataHash = GetLUADataHash
+X.GetLUADataHash = GetLUADataHash
 end
 
 do
@@ -493,18 +464,18 @@ do
 -- 用户配置项
 ---------------------------------------------------------------------------------------------
 local USER_SETTINGS_EVENT = { szName = 'UserSettings' }
-local CommonEventFirer = LIB.CommonEventFirer
-local CommonEventRegister = LIB.CommonEventRegister
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
 
-function LIB.RegisterUserSettingsUpdate(...)
+function X.RegisterUserSettingsUpdate(...)
 	return CommonEventRegister(USER_SETTINGS_EVENT, ...)
 end
 
-local DATABASE_TYPE_LIST = { PATH_TYPE.ROLE, PATH_TYPE.SERVER, PATH_TYPE.GLOBAL }
+local DATABASE_TYPE_LIST = { X.PATH_TYPE.ROLE, X.PATH_TYPE.SERVER, X.PATH_TYPE.GLOBAL }
 local DATABASE_TYPE_PRESET_FILE = {
-	[PATH_TYPE.ROLE] = 'role',
-	[PATH_TYPE.SERVER] = 'server',
-	[PATH_TYPE.GLOBAL] = 'global',
+	[X.PATH_TYPE.ROLE] = 'role',
+	[X.PATH_TYPE.SERVER] = 'server',
+	[X.PATH_TYPE.GLOBAL] = 'global',
 }
 local DATABASE_INSTANCE = {}
 local USER_SETTINGS_INFO = {}
@@ -524,7 +495,7 @@ local function SetInstanceInfoData(inst, info, data, version)
 		--[[#DEBUG END]]
 		db:Set(info.szDataKey, { d = data, v = version })
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(PACKET_INFO.NAME_SPACE, _L('User settings %s saved during %dms.', info.szDataKey, GetTickCount() - nStartTick), DEBUG_LEVEL.PMLOG)
+		X.Debug(X.PACKET_INFO.NAME_SPACE, _L('User settings %s saved during %dms.', info.szDataKey, GetTickCount() - nStartTick), X.DEBUG_LEVEL.PMLOG)
 		--[[#DEBUG END]]
 	end
 end
@@ -538,7 +509,7 @@ local function GetInstanceInfoData(inst, info)
 	--[[#DEBUG END]]
 	local res = db and db:Get(info.szDataKey)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(PACKET_INFO.NAME_SPACE, _L('User settings %s loaded during %dms.', info.szDataKey, GetTickCount() - nStartTick), DEBUG_LEVEL.PMLOG)
+	X.Debug(X.PACKET_INFO.NAME_SPACE, _L('User settings %s loaded during %dms.', info.szDataKey, GetTickCount() - nStartTick), X.DEBUG_LEVEL.PMLOG)
 	--[[#DEBUG END]]
 	if res then
 		return res
@@ -555,28 +526,28 @@ local function DeleteInstanceInfoData(inst, info)
 	end
 end
 
-function LIB.ConnectUserSettingsDB()
+function X.ConnectUserSettingsDB()
 	if DATABASE_CONNECTION_ESTABLISHED then
 		return
 	end
-	local szID, szDBPresetRoot, szUDBPresetRoot = LIB.GetUserSettingsPresetID(), nil, nil
-	if not IsEmpty(szID) then
-		szDBPresetRoot = LIB.FormatPath({'config/settings/' .. szID .. '/', PATH_TYPE.GLOBAL})
-		szUDBPresetRoot = LIB.FormatPath({'userdata/settings/' .. szID .. '/', PATH_TYPE.GLOBAL})
+	local szID, szDBPresetRoot, szUDBPresetRoot = X.GetUserSettingsPresetID(), nil, nil
+	if not X.IsEmpty(szID) then
+		szDBPresetRoot = X.FormatPath({'config/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL})
+		szUDBPresetRoot = X.FormatPath({'userdata/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL})
 		CPath.MakeDir(szDBPresetRoot)
 		CPath.MakeDir(szUDBPresetRoot)
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
-			local pSettingsDB = LIB.NoSQLiteConnect(szDBPresetRoot
+			local pSettingsDB = X.NoSQLiteConnect(szDBPresetRoot
 				and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
-				or LIB.FormatPath({'config/settings.db', ePathType}))
-			local pUserDataDB = LIB.NoSQLiteConnect(LIB.FormatPath({'userdata/userdata.db', ePathType}))
+				or X.FormatPath({'config/settings.db', ePathType}))
+			local pUserDataDB = X.NoSQLiteConnect(X.FormatPath({'userdata/userdata.db', ePathType}))
 			if not pSettingsDB then
-				LIB.Debug(PACKET_INFO.NAME_SPACE, 'Connect user settings database failed!!! ' .. ePathType, DEBUG_LEVEL.ERROR)
+				X.Debug(X.PACKET_INFO.NAME_SPACE, 'Connect user settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
 			end
 			if not pUserDataDB then
-				LIB.Debug(PACKET_INFO.NAME_SPACE, 'Connect userdata database failed!!! ' .. ePathType, DEBUG_LEVEL.ERROR)
+				X.Debug(X.PACKET_INFO.NAME_SPACE, 'Connect userdata database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
 			end
 			DATABASE_INSTANCE[ePathType] = {
 				pSettingsDB = pSettingsDB,
@@ -590,16 +561,16 @@ function LIB.ConnectUserSettingsDB()
 	CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
 end
 
-function LIB.ReleaseUserSettingsDB()
+function X.ReleaseUserSettingsDB()
 	CommonEventFirer(USER_SETTINGS_EVENT, '@@UNINIT@@')
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		local inst = DATABASE_INSTANCE[ePathType]
 		if inst then
 			if inst.pSettingsDB then
-				LIB.NoSQLiteDisconnect(inst.pSettingsDB)
+				X.NoSQLiteDisconnect(inst.pSettingsDB)
 			end
 			if inst.pUserDataDB then
-				LIB.NoSQLiteDisconnect(inst.pUserDataDB)
+				X.NoSQLiteDisconnect(inst.pUserDataDB)
 			end
 			DATABASE_INSTANCE[ePathType] = nil
 		end
@@ -608,7 +579,7 @@ function LIB.ReleaseUserSettingsDB()
 	DATABASE_CONNECTION_ESTABLISHED = false
 end
 
-function LIB.FlushUserSettingsDB()
+function X.FlushUserSettingsDB()
 	-- for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 	-- 	local inst = DATABASE_INSTANCE[ePathType]
 	-- 	if inst then
@@ -624,50 +595,50 @@ function LIB.FlushUserSettingsDB()
 	-- end
 end
 
-function LIB.GetUserSettingsPresetID(bDefault)
-	local szPath = LIB.FormatPath({'config/usersettings-preset.jx3dat', bDefault and PATH_TYPE.GLOBAL or PATH_TYPE.ROLE})
+function X.GetUserSettingsPresetID(bDefault)
+	local szPath = X.FormatPath({'config/usersettings-preset.jx3dat', bDefault and X.PATH_TYPE.GLOBAL or X.PATH_TYPE.ROLE})
 	if not bDefault and not IsLocalFileExist(szPath) then
-		return LIB.GetUserSettingsPresetID(true)
+		return X.GetUserSettingsPresetID(true)
 	end
-	local szID = LIB.LoadLUAData(szPath)
-	if IsString(szID) and not szID:find('[/?*:|\\<>]') then
+	local szID = X.LoadLUAData(szPath)
+	if X.IsString(szID) and not szID:find('[/?*:|\\<>]') then
 		return szID
 	end
 	return ''
 end
 
-function LIB.SetUserSettingsPresetID(szID, bDefault)
+function X.SetUserSettingsPresetID(szID, bDefault)
 	if szID then
 		if szID:find('[/?*:|\\<>]') then
 			return _L['User settings preset id cannot contains special character (/?*:|\\<>).']
 		end
-		szID = wgsub(szID, '^%s+', '')
-		szID = wgsub(szID, '%s+$', '')
+		szID = wstring.gsub(szID, '^%s+', '')
+		szID = wstring.gsub(szID, '%s+$', '')
 	end
-	if IsEmpty(szID) then
+	if X.IsEmpty(szID) then
 		szID = ''
 	end
-	if szID == LIB.GetUserSettingsPresetID(bDefault) then
+	if szID == X.GetUserSettingsPresetID(bDefault) then
 		return
 	end
-	local szCurrentID = LIB.GetUserSettingsPresetID()
-	LIB.SaveLUAData({'config/usersettings-preset.jx3dat', bDefault and PATH_TYPE.GLOBAL or PATH_TYPE.ROLE}, szID)
-	if szCurrentID == LIB.GetUserSettingsPresetID() then
+	local szCurrentID = X.GetUserSettingsPresetID()
+	X.SaveLUAData({'config/usersettings-preset.jx3dat', bDefault and X.PATH_TYPE.GLOBAL or X.PATH_TYPE.ROLE}, szID)
+	if szCurrentID == X.GetUserSettingsPresetID() then
 		return
 	end
 	if DATABASE_CONNECTION_ESTABLISHED then
-		LIB.ReleaseUserSettingsDB()
-		LIB.ConnectUserSettingsDB()
+		X.ReleaseUserSettingsDB()
+		X.ConnectUserSettingsDB()
 	end
 	DATA_CACHE = {}
 end
 
-function LIB.GetUserSettingsPresetList()
-	return CPath.GetFolderList(LIB.FormatPath({'userdata/settings/', PATH_TYPE.GLOBAL}))
+function X.GetUserSettingsPresetList()
+	return CPath.GetFolderList(X.FormatPath({'userdata/settings/', X.PATH_TYPE.GLOBAL}))
 end
 
-function LIB.RemoveUserSettingsPreset(szID)
-	CPath.DelDir(LIB.FormatPath({'userdata/settings/' .. szID .. '/', PATH_TYPE.GLOBAL}))
+function X.RemoveUserSettingsPreset(szID)
+	CPath.DelDir(X.FormatPath({'userdata/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL}))
 end
 
 -- 注册单个用户配置项
@@ -683,9 +654,9 @@ end
 --   {schema} tOption.xSchema 数据类型约束对象，通过 Schema 库生成
 --   {boolean} tOption.bDataSet 是否为配置项组（如用户多套自定义偏好），配置项组在读写时需要额外传入一个组下配置项唯一键值（即多套自定义偏好中某一项的名字）
 --   {table} tOption.tDataSetDefaultValue 数据默认值（仅当 bDataSet 为真时生效，用于设置配置项组不同默认值）
-function LIB.RegisterUserSettings(szKey, tOption)
+function X.RegisterUserSettings(szKey, tOption)
 	local ePathType, szDataKey, bUserData, szGroup, szLabel, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue
-	if IsTable(tOption) then
+	if X.IsTable(tOption) then
 		ePathType = tOption.ePathType
 		szDataKey = tOption.szDataKey
 		bUserData = tOption.bUserData
@@ -698,7 +669,7 @@ function LIB.RegisterUserSettings(szKey, tOption)
 		tDataSetDefaultValue = tOption.tDataSetDefaultValue
 	end
 	if not ePathType then
-		ePathType = PATH_TYPE.ROLE
+		ePathType = X.PATH_TYPE.ROLE
 	end
 	if not szDataKey then
 		szDataKey = szKey
@@ -706,35 +677,35 @@ function LIB.RegisterUserSettings(szKey, tOption)
 	if not szVersion then
 		szVersion = ''
 	end
-	local szErrHeader = 'RegisterUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
-	assert(IsString(szKey) and #szKey > 0, szErrHeader .. '`Key` should be a non-empty string value.')
+	local szErrHeader = 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): '
+	assert(X.IsString(szKey) and #szKey > 0, szErrHeader .. '`Key` should be a non-empty string value.')
 	assert(not USER_SETTINGS_INFO[szKey], szErrHeader .. 'duplicated `Key` found.')
-	assert(IsString(szDataKey) and #szDataKey > 0, szErrHeader .. '`DataKey` should be a non-empty string value.')
+	assert(X.IsString(szDataKey) and #szDataKey > 0, szErrHeader .. '`DataKey` should be a non-empty string value.')
 	assert(not lodash.some(USER_SETTINGS_INFO, function(p) return p.szDataKey == szDataKey and p.ePathType == ePathType end), szErrHeader .. 'duplicated `DataKey` + `PathType` found.')
 	assert(lodash.includes(DATABASE_TYPE_LIST, ePathType), szErrHeader .. '`PathType` value is not valid.')
-	assert(IsNil(szGroup) or (IsString(szGroup) and #szGroup > 0), szErrHeader .. '`Group` should be nil or a non-empty string value.')
-	assert(IsNil(szLabel) or (IsString(szLabel) and #szLabel > 0), szErrHeader .. '`Label` should be nil or a non-empty string value.')
-	assert(IsString(szVersion), szErrHeader .. '`Version` should be a string value.')
+	assert(X.IsNil(szGroup) or (X.IsString(szGroup) and #szGroup > 0), szErrHeader .. '`Group` should be nil or a non-empty string value.')
+	assert(X.IsNil(szLabel) or (X.IsString(szLabel) and #szLabel > 0), szErrHeader .. '`Label` should be nil or a non-empty string value.')
+	assert(X.IsString(szVersion), szErrHeader .. '`Version` should be a string value.')
 	if xSchema then
-		local errs = Schema.CheckSchema(xDefaultValue, xSchema)
+		local errs = X.Schema.CheckSchema(xDefaultValue, xSchema)
 		if errs then
 			local aErrmsgs = {}
 			for i, err in ipairs(errs) do
-				insert(aErrmsgs, '  ' .. i .. '. ' .. err.message)
+				table.insert(aErrmsgs, '  ' .. i .. '. ' .. err.message)
 			end
-			assert(false, szErrHeader .. '`DefaultValue` cannot pass `Schema` check.' .. '\n' .. concat(aErrmsgs, '\n'))
+			assert(false, szErrHeader .. '`DefaultValue` cannot pass `Schema` check.' .. '\n' .. table.concat(aErrmsgs, '\n'))
 		end
 		if bDataSet then
-			tDataSetDefaultValue = IsTable(tDataSetDefaultValue)
-				and Clone(tDataSetDefaultValue)
+			tDataSetDefaultValue = X.IsTable(tDataSetDefaultValue)
+				and X.Clone(tDataSetDefaultValue)
 				or {}
-			local errs = Schema.CheckSchema(tDataSetDefaultValue, Schema.Map(Schema.Any, xSchema))
+			local errs = X.Schema.CheckSchema(tDataSetDefaultValue, X.Schema.Map(X.Schema.Any, xSchema))
 			if errs then
 				local aErrmsgs = {}
 				for i, err in ipairs(errs) do
-					insert(aErrmsgs, '  ' .. i .. '. ' .. err.message)
+					table.insert(aErrmsgs, '  ' .. i .. '. ' .. err.message)
 				end
-				assert(false, szErrHeader .. '`DataSetDefaultValue` cannot pass `Schema` check.' .. '\n' .. concat(aErrmsgs, '\n'))
+				assert(false, szErrHeader .. '`DataSetDefaultValue` cannot pass `Schema` check.' .. '\n' .. table.concat(aErrmsgs, '\n'))
 			end
 		end
 	end
@@ -752,14 +723,14 @@ function LIB.RegisterUserSettings(szKey, tOption)
 		tDataSetDefaultValue = tDataSetDefaultValue,
 	}
 	USER_SETTINGS_INFO[szKey] = tInfo
-	insert(USER_SETTINGS_LIST, tInfo)
+	table.insert(USER_SETTINGS_LIST, tInfo)
 end
 
-function LIB.GetRegisterUserSettingsList()
-	return Clone(USER_SETTINGS_LIST)
+function X.GetRegisterUserSettingsList()
+	return X.Clone(USER_SETTINGS_LIST)
 end
 
-function LIB.ExportUserSettings(aKey)
+function X.ExportUserSettings(aKey)
 	local tKvp = {}
 	for _, szKey in ipairs(aKey) do
 		local info = USER_SETTINGS_INFO[szKey]
@@ -771,10 +742,10 @@ function LIB.ExportUserSettings(aKey)
 	return tKvp
 end
 
-function LIB.ImportUserSettings(tKvp)
+function X.ImportUserSettings(tKvp)
 	local nSuccess = 0
 	for szKey, xValue in pairs(tKvp) do
-		local info = IsTable(xValue) and USER_SETTINGS_INFO[szKey]
+		local info = X.IsTable(xValue) and USER_SETTINGS_INFO[szKey]
 		local inst = info and DATABASE_INSTANCE[info.ePathType]
 		if inst then
 			SetInstanceInfoData(inst, info, xValue.d, xValue.v)
@@ -790,14 +761,14 @@ end
 -- @param {string} szKey 配置项全局唯一键
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
 -- @return 值
-function LIB.GetUserSettings(szKey, ...)
+function X.GetUserSettings(szKey, ...)
 	-- 缓存加速
 	local cache = DATA_CACHE
 	for _, k in ipairs({szKey, ...}) do
-		if IsTable(cache) then
+		if X.IsTable(cache) then
 			cache = cache[k]
 		end
-		if not IsTable(cache) then
+		if not X.IsTable(cache) then
 			cache = nil
 			break
 		end
@@ -807,7 +778,7 @@ function LIB.GetUserSettings(szKey, ...)
 	end
 	-- 参数检查
 	local nParameter = select('#', ...) + 1
-	local szErrHeader = 'GetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
+	local szErrHeader = 'GetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, szErrHeader ..'`Key` has not been registered.')
 	local inst = DATABASE_INSTANCE[info.ePathType]
@@ -816,22 +787,22 @@ function LIB.GetUserSettings(szKey, ...)
 	if info.bDataSet then
 		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
 		szDataSetKey = ...
-		assert(IsString(szDataSetKey) or IsNumber(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number value.')
+		assert(X.IsString(szDataSetKey) or X.IsNumber(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number value.')
 	else
 		assert(nParameter == 1, szErrHeader .. '1 parameters expected, got ' .. nParameter)
 	end
 	-- 读数据库
 	local res, bData = GetInstanceInfoData(inst, info), false
-	if IsTable(res) and res.v == info.szVersion then
+	if X.IsTable(res) and res.v == info.szVersion then
 		local data = res.d
 		if info.bDataSet then
-			if IsTable(data) then
+			if X.IsTable(data) then
 				data = data[szDataSetKey]
 			else
 				data = nil
 			end
 		end
-		if not info.xSchema or not Schema.CheckSchema(data, info.xSchema) then
+		if not info.xSchema or not X.Schema.CheckSchema(data, info.xSchema) then
 			bData = true
 			res = data
 		end
@@ -840,22 +811,22 @@ function LIB.GetUserSettings(szKey, ...)
 	if not bData then
 		if info.bDataSet then
 			res = info.tDataSetDefaultValue[szDataSetKey]
-			if IsNil(res) then
+			if X.IsNil(res) then
 				res = info.xDefaultValue
 			end
 		else
 			res = info.xDefaultValue
 		end
-		res = Clone(res)
+		res = X.Clone(res)
 	end
 	-- 缓存
 	if info.bDataSet then
 		if not DATA_CACHE[szKey] then
 			DATA_CACHE[szKey] = {}
 		end
-		DATA_CACHE[szKey][szDataSetKey] = { DATA_CACHE_LEAF_FLAG, res, Clone(rec) }
+		DATA_CACHE[szKey][szDataSetKey] = { DATA_CACHE_LEAF_FLAG, res, X.Clone(rec) }
 	else
-		DATA_CACHE[szKey] = { DATA_CACHE_LEAF_FLAG, res, Clone(rec) }
+		DATA_CACHE[szKey] = { DATA_CACHE_LEAF_FLAG, res, X.Clone(rec) }
 	end
 	return res
 end
@@ -864,15 +835,15 @@ end
 -- @param {string} szKey 配置项全局唯一键
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
 -- @param {unknown} xValue 值
-function LIB.SetUserSettings(szKey, ...)
+function X.SetUserSettings(szKey, ...)
 	-- 参数检查
 	local nParameter = select('#', ...) + 1
-	local szErrHeader = 'SetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
+	local szErrHeader = 'SetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, szErrHeader .. '`Key` has not been registered.')
 	local inst = DATABASE_INSTANCE[info.ePathType]
-	if not inst and LIB.IsDebugClient() then
-		LIB.Debug(PACKET_INFO.NAME_SPACE, szErrHeader .. 'Database not connected!!!', DEBUG_LEVEL.WARNING)
+	if not inst and X.IsDebugClient() then
+		X.Debug(X.PACKET_INFO.NAME_SPACE, szErrHeader .. 'Database not connected!!!', X.DEBUG_LEVEL.WARNING)
 		return false
 	end
 	assert(inst, szErrHeader .. 'Database not connected.')
@@ -881,36 +852,36 @@ function LIB.SetUserSettings(szKey, ...)
 	if info.bDataSet then
 		assert(nParameter == 3, szErrHeader .. '3 parameters expected, got ' .. nParameter)
 		szDataSetKey, xValue = ...
-		assert(IsString(szDataSetKey) or IsNumber(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number value.')
+		assert(X.IsString(szDataSetKey) or X.IsNumber(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number value.')
 		cache = cache and cache[szDataSetKey]
 	else
 		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
 		xValue = ...
 	end
-	if cache and cache[1] == DATA_CACHE_LEAF_FLAG and IsEquals(cache[3], xValue) then
+	if cache and cache[1] == DATA_CACHE_LEAF_FLAG and X.IsEquals(cache[3], xValue) then
 		return
 	end
 	-- 数据校验
 	if info.xSchema then
-		local errs = Schema.CheckSchema(xValue, info.xSchema)
+		local errs = X.Schema.CheckSchema(xValue, info.xSchema)
 		if errs then
 			local aErrmsgs = {}
 			for i, err in ipairs(errs) do
-				insert(aErrmsgs, i .. '. ' .. err.message)
+				table.insert(aErrmsgs, i .. '. ' .. err.message)
 			end
-			assert(false, szErrHeader .. '' .. szKey .. ', schema check failed.\n' .. concat(aErrmsgs, '\n'))
+			assert(false, szErrHeader .. '' .. szKey .. ', schema check failed.\n' .. table.concat(aErrmsgs, '\n'))
 		end
 	end
 	-- 写数据库
 	if info.bDataSet then
 		local res = GetInstanceInfoData(inst, info)
-		if IsTable(res) and res.v == info.szVersion and IsTable(res.d) then
+		if X.IsTable(res) and res.v == info.szVersion and X.IsTable(res.d) then
 			res.d[szDataSetKey] = xValue
 			xValue = res.d
 		else
 			xValue = { [szDataSetKey] = xValue }
 		end
-		if IsTable(DATA_CACHE[szKey]) then
+		if X.IsTable(DATA_CACHE[szKey]) then
 			DATA_CACHE[szKey][szDataSetKey] = nil
 		end
 	else
@@ -929,26 +900,26 @@ end
 -- 重载刷新用户配置项缓存值
 -- @param {string} szKey 配置项全局唯一键
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
-function LIB.ReloadUserSettings(szKey, ...)
+function X.ReloadUserSettings(szKey, ...)
 	local root = DATA_CACHE
 	local key = szKey
 	if ... then
 		root = root[szKey]
 		key = ...
 	end
-	if IsTable(root) then
+	if X.IsTable(root) then
 		root[key] = nil
 	end
-	LIB.GetUserSettings(szKey, ...)
+	X.GetUserSettings(szKey, ...)
 end
 
 -- 删除用户配置项值（恢复默认值）
 -- @param {string} szKey 配置项全局唯一键
 -- @param {string} szDataSetKey 配置项组（如用户多套自定义偏好）唯一键，当且仅当 szKey 对应注册项携带 bDataSet 标记位时有效
-function LIB.ResetUserSettings(szKey, ...)
+function X.ResetUserSettings(szKey, ...)
 	-- 参数检查
 	local nParameter = select('#', ...) + 1
-	local szErrHeader = 'ResetUserSettings KEY(' .. EncodeLUAData(szKey) .. '): '
+	local szErrHeader = 'ResetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
 	assert(info, szErrHeader .. '`Key` has not been registered.')
 	local inst = DATABASE_INSTANCE[info.ePathType]
@@ -957,16 +928,16 @@ function LIB.ResetUserSettings(szKey, ...)
 	if info.bDataSet then
 		assert(nParameter == 1 or nParameter == 2, szErrHeader .. '1 or 2 parameter(s) expected, got ' .. nParameter)
 		szDataSetKey = ...
-		assert(IsString(szDataSetKey) or IsNumber(szDataSetKey) or IsNil(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number or nil value.')
+		assert(X.IsString(szDataSetKey) or X.IsNumber(szDataSetKey) or X.IsNil(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number or nil value.')
 	else
 		assert(nParameter == 1, szErrHeader .. '1 parameters expected, got ' .. nParameter)
 	end
 	-- 写数据库
 	if info.bDataSet then
 		local res = GetInstanceInfoData(inst, info)
-		if IsTable(res) and res.v == info.szVersion and IsTable(res.d) and szDataSetKey then
+		if X.IsTable(res) and res.v == info.szVersion and X.IsTable(res.d) and szDataSetKey then
 			res.d[szDataSetKey] = nil
-			if IsEmpty(res.d) then
+			if X.IsEmpty(res.d) then
 				DeleteInstanceInfoData(inst, info)
 			else
 				SetInstanceInfoData(inst, info, res.d, info.szVersion)
@@ -993,20 +964,20 @@ end
 -- 创建用户设置代理对象
 -- @param {string | table} xProxy 配置项代理表（ alias => globalKey ），或模块命名空间
 -- @return 配置项读写代理对象
-function LIB.CreateUserSettingsProxy(xProxy)
+function X.CreateUserSettingsProxy(xProxy)
 	local tDataSetProxy = {}
 	local tLoaded = {}
-	local tProxy = IsTable(xProxy) and xProxy or {}
+	local tProxy = X.IsTable(xProxy) and xProxy or {}
 	for k, v in pairs(tProxy) do
-		assert(IsString(k), '`Key` ' .. EncodeLUAData(k) .. ' of proxy should be a string value.')
-		assert(IsString(v), '`Val` ' .. EncodeLUAData(v) .. ' of proxy should be a string value.')
+		assert(X.IsString(k), '`Key` ' .. X.EncodeLUAData(k) .. ' of proxy should be a string value.')
+		assert(X.IsString(v), '`Val` ' .. X.EncodeLUAData(v) .. ' of proxy should be a string value.')
 	end
 	local function GetGlobalKey(k)
 		if not tProxy[k] then
-			if IsString(xProxy) then
+			if X.IsString(xProxy) then
 				tProxy[k] = xProxy .. '.' .. k
 			end
-			assert(tProxy[k], '`Key` ' .. EncodeLUAData(k) .. ' not found in proxy table.')
+			assert(tProxy[k], '`Key` ' .. X.EncodeLUAData(k) .. ' not found in proxy table.')
 		end
 		return tProxy[k]
 	end
@@ -1019,50 +990,50 @@ function LIB.CreateUserSettingsProxy(xProxy)
 					-- 配置项组，初始化读写模块
 					tDataSetProxy[k] = setmetatable({}, {
 						__index = function(_, kds)
-							return LIB.GetUserSettings(szGlobalKey, kds)
+							return X.GetUserSettings(szGlobalKey, kds)
 						end,
 						__newindex = function(_, kds, vds)
-							LIB.SetUserSettings(szGlobalKey, kds, vds)
+							X.SetUserSettings(szGlobalKey, kds, vds)
 						end,
 					})
 				end
 				tLoaded[k] = true
 			end
-			return tDataSetProxy[k] or LIB.GetUserSettings(szGlobalKey)
+			return tDataSetProxy[k] or X.GetUserSettings(szGlobalKey)
 		end,
 		__newindex = function(_, k, v)
-			LIB.SetUserSettings(GetGlobalKey(k), v)
+			X.SetUserSettings(GetGlobalKey(k), v)
 		end,
 		__call = function(_, cmd, arg0)
 			if cmd == 'load' then
-				if not IsTable(arg0) then
+				if not X.IsTable(arg0) then
 					arg0 = {}
 					for k, _ in pairs(tProxy) do
-						insert(arg0, k)
+						table.insert(arg0, k)
 					end
 				end
 				for _, k in ipairs(arg0) do
-					LIB.GetUserSettings(GetGlobalKey(k))
+					X.GetUserSettings(GetGlobalKey(k))
 				end
 			elseif cmd == 'reset' then
-				if not IsTable(arg0) then
+				if not X.IsTable(arg0) then
 					arg0 = {}
 					for k, _ in pairs(tProxy) do
-						insert(arg0, k)
+						table.insert(arg0, k)
 					end
 				end
 				for _, k in ipairs(arg0) do
-					LIB.ResetUserSettings(GetGlobalKey(k))
+					X.ResetUserSettings(GetGlobalKey(k))
 				end
 			elseif cmd == 'reload' then
-				if not IsTable(arg0) then
+				if not X.IsTable(arg0) then
 					arg0 = {}
 					for k, _ in pairs(tProxy) do
-						insert(arg0, k)
+						table.insert(arg0, k)
 					end
 				end
 				for _, k in ipairs(arg0) do
-					LIB.ReloadUserSettings(GetGlobalKey(k))
+					X.ReloadUserSettings(GetGlobalKey(k))
 				end
 			end
 		end,
@@ -1074,29 +1045,29 @@ end
 -- @param {string} *szGroupLabel 模块标题
 -- @param {table} tSettings 模块用户配置表
 -- @return 配置项读写代理对象
-function LIB.CreateUserSettingsModule(szModule, szGroupLabel, tSettings)
-	if IsTable(szGroupLabel) then
+function X.CreateUserSettingsModule(szModule, szGroupLabel, tSettings)
+	if X.IsTable(szGroupLabel) then
 		szGroupLabel, tSettings = nil, szGroupLabel
 	end
 	local tProxy = {}
 	for k, v in pairs(tSettings) do
 		local szKey = szModule .. '.' .. k
-		local tOption = Clone(v)
+		local tOption = X.Clone(v)
 		if tOption.szDataKey then
 			tOption.szDataKey = szModule .. '.' .. tOption.szDataKey
 		end
 		if szGroupLabel then
 			tOption.szGroup = szGroupLabel
 		end
-		LIB.RegisterUserSettings(szKey, tOption)
+		X.RegisterUserSettings(szKey, tOption)
 		tProxy[k] = szKey
 	end
-	return LIB.CreateUserSettingsProxy(tProxy)
+	return X.CreateUserSettingsProxy(tProxy)
 end
 
-LIB.RegisterIdle(NSFormatString('{$NS}#FlushUserSettingsDB'), function()
+X.RegisterIdle(X.NSFormatString('{$NS}#FlushUserSettingsDB'), function()
 	if GetCurrentTime() - FLUSH_TIME > 60 then
-		LIB.FlushUserSettingsDB()
+		X.FlushUserSettingsDB()
 		FLUSH_TIME = GetCurrentTime()
 	end
 end)
@@ -1107,45 +1078,45 @@ end
 ------------------------------------------------------------------------------
 
 do local CREATED = {}
-function LIB.CreateDataRoot(ePathType)
+function X.CreateDataRoot(ePathType)
 	if CREATED[ePathType] then
 		return
 	end
 	CREATED[ePathType] = true
 	-- 创建目录
-	if ePathType == PATH_TYPE.ROLE then
-		LIB.SaveLUAData(
-			{'info.jx3dat', PATH_TYPE.ROLE},
+	if ePathType == X.PATH_TYPE.ROLE then
+		X.SaveLUAData(
+			{'info.jx3dat', X.PATH_TYPE.ROLE},
 			{
-				id = LIB.GetClientInfo('dwID'),
-				uid = LIB.GetClientUUID(),
-				name = LIB.GetClientInfo('szName'),
+				id = X.GetClientInfo('dwID'),
+				uid = X.GetClientUUID(),
+				name = X.GetClientInfo('szName'),
 				lang = GLOBAL.GAME_LANG,
 				edition = GLOBAL.GAME_EDITION,
 				branch = GLOBAL.GAME_BRANCH,
 				version = GLOBAL.GAME_VERSION,
-				region = LIB.GetServer(1),
-				server = LIB.GetServer(2),
-				relregion = LIB.GetRealServer(1),
-				relserver = LIB.GetRealServer(2),
+				region = X.GetServer(1),
+				server = X.GetServer(2),
+				relregion = X.GetRealServer(1),
+				relserver = X.GetRealServer(2),
 				time = GetCurrentTime(),
-				timestr = LIB.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'),
+				timestr = X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'),
 			},
 			{ crc = false, passphrase = false })
-		CPath.MakeDir(LIB.FormatPath({'{$name}/', PATH_TYPE.ROLE}))
+		CPath.MakeDir(X.FormatPath({'{$name}/', X.PATH_TYPE.ROLE}))
 	end
 	-- 版本更新时删除旧的临时目录
-	if IsLocalFileExist(LIB.FormatPath({'temporary/', ePathType}))
-	and not IsLocalFileExist(LIB.FormatPath({'temporary/{$version}', ePathType})) then
-		CPath.DelDir(LIB.FormatPath({'temporary/', ePathType}))
+	if IsLocalFileExist(X.FormatPath({'temporary/', ePathType}))
+	and not IsLocalFileExist(X.FormatPath({'temporary/{$version}', ePathType})) then
+		CPath.DelDir(X.FormatPath({'temporary/', ePathType}))
 	end
-	CPath.MakeDir(LIB.FormatPath({'temporary/{$version}/', ePathType}))
-	CPath.MakeDir(LIB.FormatPath({'audio/', ePathType}))
-	CPath.MakeDir(LIB.FormatPath({'cache/', ePathType}))
-	CPath.MakeDir(LIB.FormatPath({'config/', ePathType}))
-	CPath.MakeDir(LIB.FormatPath({'export/', ePathType}))
-	CPath.MakeDir(LIB.FormatPath({'font/', ePathType}))
-	CPath.MakeDir(LIB.FormatPath({'userdata/', ePathType}))
+	CPath.MakeDir(X.FormatPath({'temporary/{$version}/', ePathType}))
+	CPath.MakeDir(X.FormatPath({'audio/', ePathType}))
+	CPath.MakeDir(X.FormatPath({'cache/', ePathType}))
+	CPath.MakeDir(X.FormatPath({'config/', ePathType}))
+	CPath.MakeDir(X.FormatPath({'export/', ePathType}))
+	CPath.MakeDir(X.FormatPath({'font/', ePathType}))
+	CPath.MakeDir(X.FormatPath({'userdata/', ePathType}))
 end
 end
 
@@ -1164,8 +1135,8 @@ local SetOnlineAddonCustomData = _G.SetOnlineAddonCustomData or SetAddonCustomDa
 local function Byte2Bit(nByte)
 	local aBit = { 0, 0, 0, 0, 0, 0, 0, 0 }
 	for i = 8, 1, -1 do
-		aBit[i] = mod(nByte, 2)
-		nByte = floor(nByte / 2)
+		aBit[i] = nByte % 2
+		nByte = math.floor(nByte / 2)
 	end
 	return aBit
 end
@@ -1182,18 +1153,18 @@ local function OnRemoteStorageChange(szKey)
 	if not REMOTE_STORAGE_WATCHER[szKey] then
 		return
 	end
-	local oVal = LIB.GetRemoteStorage(szKey)
+	local oVal = X.GetRemoteStorage(szKey)
 	for _, fnAction in ipairs(REMOTE_STORAGE_WATCHER[szKey]) do
 		fnAction(oVal)
 	end
 end
 
-function LIB.RegisterRemoteStorage(szKey, nBitPos, nBitNum, fnGetter, fnSetter, bForceOnline)
+function X.RegisterRemoteStorage(szKey, nBitPos, nBitNum, fnGetter, fnSetter, bForceOnline)
 	assert(nBitPos >= 0 and nBitNum > 0 and nBitPos + nBitNum <= BIT_COUNT, 'storage position out of range: ' .. szKey)
 	for _, p in pairs(REMOTE_STORAGE_REGISTER) do
 		assert(nBitPos >= p.nBitPos + p.nBitNum or nBitPos + nBitNum <= p.nBitPos, 'storage position conflicted: ' .. szKey .. ', ' .. p.szKey)
 	end
-	assert(IsFunction(fnGetter) and IsFunction(fnSetter), 'storage settter and getter must be function')
+	assert(X.IsFunction(fnGetter) and X.IsFunction(fnSetter), 'storage settter and getter must be function')
 	REMOTE_STORAGE_REGISTER[szKey] = {
 		szKey = szKey,
 		nBitPos = nBitPos,
@@ -1204,7 +1175,7 @@ function LIB.RegisterRemoteStorage(szKey, nBitPos, nBitNum, fnGetter, fnSetter, 
 	}
 end
 
-function LIB.SetRemoteStorage(szKey, ...)
+function X.SetRemoteStorage(szKey, ...)
 	local st = REMOTE_STORAGE_REGISTER[szKey]
 	assert(st, 'unknown storage key: ' .. szKey)
 
@@ -1213,55 +1184,55 @@ function LIB.SetRemoteStorage(szKey, ...)
 
 	local GetData = st.bForceOnline and GetOnlineAddonCustomData or GetAddonCustomData
 	local SetData = st.bForceOnline and SetOnlineAddonCustomData or SetAddonCustomData
-	local nPos = floor(st.nBitPos / BIT_NUMBER)
-	local nLen = floor((st.nBitPos + st.nBitNum - 1) / BIT_NUMBER) - nPos + 1
-	local aByte = lodash.map({GetData(PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
+	local nPos = math.floor(st.nBitPos / BIT_NUMBER)
+	local nLen = math.floor((st.nBitPos + st.nBitNum - 1) / BIT_NUMBER) - nPos + 1
+	local aByte = lodash.map({GetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
 	for nBitPos = st.nBitPos, st.nBitPos + st.nBitNum - 1 do
-		local nIndex = floor(nBitPos / BIT_NUMBER) - nPos + 1
+		local nIndex = math.floor(nBitPos / BIT_NUMBER) - nPos + 1
 		local nOffset = nBitPos % BIT_NUMBER + 1
 		aByte[nIndex][nOffset] = aBit[nBitPos - st.nBitPos + 1]
 	end
-	SetData(PACKET_INFO.NAME_SPACE, nPos, nLen, unpack(lodash.map(aByte, Bit2Byte)))
+	SetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen, unpack(lodash.map(aByte, Bit2Byte)))
 
 	OnRemoteStorageChange(szKey)
 end
 
-function LIB.GetRemoteStorage(szKey)
+function X.GetRemoteStorage(szKey)
 	local st = REMOTE_STORAGE_REGISTER[szKey]
 	assert(st, 'unknown storage key: ' .. szKey)
 
 	local GetData = st.bForceOnline and GetOnlineAddonCustomData or GetAddonCustomData
-	local nPos = floor(st.nBitPos / BIT_NUMBER)
-	local nLen = floor((st.nBitPos + st.nBitNum - 1) / BIT_NUMBER) - nPos + 1
-	local aByte = lodash.map({GetData(PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
+	local nPos = math.floor(st.nBitPos / BIT_NUMBER)
+	local nLen = math.floor((st.nBitPos + st.nBitNum - 1) / BIT_NUMBER) - nPos + 1
+	local aByte = lodash.map({GetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
 	local aBit = {}
 	for nBitPos = st.nBitPos, st.nBitPos + st.nBitNum - 1 do
-		local nIndex = floor(nBitPos / BIT_NUMBER) - nPos + 1
+		local nIndex = math.floor(nBitPos / BIT_NUMBER) - nPos + 1
 		local nOffset = nBitPos % BIT_NUMBER + 1
-		insert(aBit, aByte[nIndex][nOffset])
+		table.insert(aBit, aByte[nIndex][nOffset])
 	end
 	return st.fnGetter(aBit)
 end
 
 -- 判断是否可以访问同步设置项（ESC-游戏设置-综合-服务器同步设置-界面常规设置）
-function LIB.CanUseOnlineRemoteStorage()
+function X.CanUseOnlineRemoteStorage()
 	if _G.SetOnlineAddonCustomData then
 		return true
 	end
 	local n = (GetUserPreferences(4347, 'c') + 1) % 256
-	SetOnlineAddonCustomData(PACKET_INFO.NAME_SPACE, 31, 1, n)
+	SetOnlineAddonCustomData(X.PACKET_INFO.NAME_SPACE, 31, 1, n)
 	return GetUserPreferences(4347, 'c') == n
 end
 
-function LIB.WatchRemoteStorage(szKey, fnAction)
+function X.WatchRemoteStorage(szKey, fnAction)
 	if not REMOTE_STORAGE_WATCHER[szKey] then
 		REMOTE_STORAGE_WATCHER[szKey] = {}
 	end
-	insert(REMOTE_STORAGE_WATCHER[szKey], fnAction)
+	table.insert(REMOTE_STORAGE_WATCHER[szKey], fnAction)
 end
 
 local INIT_FUNC_LIST = {}
-function LIB.RegisterRemoteStorageInit(szKey, fnAction)
+function X.RegisterRemoteStorageInit(szKey, fnAction)
 	INIT_FUNC_LIST[szKey] = fnAction
 end
 
@@ -1270,14 +1241,14 @@ local function OnInit()
 		OnRemoteStorageChange(szKey)
 	end
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
-		local res, err, trace = XpCall(fnAction)
+		local res, err, trace = X.XpCall(fnAction)
 		if not res then
-			LIB.ErrorLog(err, 'INIT_FUNC_LIST: ' .. szKey, trace)
+			X.ErrorLog(err, 'INIT_FUNC_LIST: ' .. szKey, trace)
 		end
 	end
 	INIT_FUNC_LIST = {}
 end
-LIB.RegisterInit('LIB#RemoteStorage', OnInit)
+X.RegisterInit('LIB#RemoteStorage', OnInit)
 end
 
 ------------------------------------------------------------------------------
@@ -1301,13 +1272,13 @@ end
 
 local function DuplicateDatabase(DB_SRC, DB_DST, szCaption)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(szCaption, 'Duplicate database start.', DEBUG_LEVEL.LOG)
+	X.Debug(szCaption, 'Duplicate database start.', X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	-- 运行 DDL 语句 创建表和索引等
 	for _, rec in ipairs(DB_SRC:Execute('SELECT sql FROM sqlite_master')) do
 		DB_DST:Execute(rec.sql)
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(szCaption, 'Duplicating database: ' .. rec.sql, DEBUG_LEVEL.LOG)
+		X.Debug(szCaption, 'Duplicating database: ' .. rec.sql, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	-- 读取表名 依次复制
@@ -1315,14 +1286,14 @@ local function DuplicateDatabase(DB_SRC, DB_DST, szCaption)
 		-- 读取列名
 		local szTableName, aColumns, aPlaceholders = rec.name, {}, {}
 		for _, rec in ipairs(DB_SRC:Execute('PRAGMA table_info(' .. szTableName .. ')')) do
-			insert(aColumns, rec.name)
-			insert(aPlaceholders, '?')
+			table.insert(aColumns, rec.name)
+			table.insert(aPlaceholders, '?')
 		end
-		local szColumns, szPlaceholders = concat(aColumns, ', '), concat(aPlaceholders, ', ')
-		local nCount, nPageSize = Get(DB_SRC:Execute('SELECT COUNT(*) AS count FROM ' .. szTableName), {1, 'count'}, 0), 10000
+		local szColumns, szPlaceholders = table.concat(aColumns, ', '), table.concat(aPlaceholders, ', ')
+		local nCount, nPageSize = X.Get(DB_SRC:Execute('SELECT COUNT(*) AS count FROM ' .. szTableName), {1, 'count'}, 0), 10000
 		local DB_W = DB_DST:Prepare('REPLACE INTO ' .. szTableName .. ' (' .. szColumns .. ') VALUES (' .. szPlaceholders .. ')')
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(szCaption, 'Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount, DEBUG_LEVEL.LOG)
+		X.Debug(szCaption, 'Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- 开始读取和写入数据
 		DB_DST:Execute('BEGIN TRANSACTION')
@@ -1340,19 +1311,19 @@ local function DuplicateDatabase(DB_SRC, DB_DST, szCaption)
 		DB_W:Reset()
 		DB_DST:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(szCaption, 'Duplicating table finished: ' .. szTableName, DEBUG_LEVEL.LOG)
+		X.Debug(szCaption, 'Duplicating table finished: ' .. szTableName, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 end
 
 local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(szCaption, 'Fixing malformed database...', DEBUG_LEVEL.LOG)
+	X.Debug(szCaption, 'Fixing malformed database...', X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	local szMalformedPath = RenameDatabase(szCaption, szPath)
 	if not szMalformedPath then
 		--[[#DEBUG BEGIN]]
-		LIB.Debug(szCaption, 'Fixing malformed database failed... Move file failed...', DEBUG_LEVEL.LOG)
+		X.Debug(szCaption, 'Fixing malformed database failed... Move file failed...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		return 'FILE_LOCKED'
 	else
@@ -1363,23 +1334,23 @@ local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 			DB_SRC:Release()
 			CPath.DelFile(szMalformedPath)
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(szCaption, 'Fixing malformed database finished...', DEBUG_LEVEL.LOG)
+			X.Debug(szCaption, 'Fixing malformed database finished...', X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			return 'SUCCESS', DB_DST
 		elseif not DB_SRC then
 			--[[#DEBUG BEGIN]]
-			LIB.Debug(szCaption, 'Connect malformed database failed...', DEBUG_LEVEL.LOG)
+			X.Debug(szCaption, 'Connect malformed database failed...', X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			return 'TRANSFER_FAILED', DB_DST
 		end
 	end
 end
 
-function LIB.SQLiteConnect(szCaption, oPath, fnAction)
+function X.SQLiteConnect(szCaption, oPath, fnAction)
 	-- 尝试连接数据库
-	local szPath = LIB.FormatPath(oPath)
+	local szPath = X.FormatPath(oPath)
 	--[[#DEBUG BEGIN]]
-	LIB.Debug(szCaption, 'Connect database: ' .. szPath, DEBUG_LEVEL.LOG)
+	X.Debug(szCaption, 'Connect database: ' .. szPath, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	local DB = SQLite3_Open(szPath)
 	if not DB then
@@ -1388,7 +1359,7 @@ function LIB.SQLiteConnect(szCaption, oPath, fnAction)
 			DB = SQLite3_Open(szPath)
 		end
 		if not DB then
-			LIB.Debug(szCaption, 'Cannot connect to database!!!', DEBUG_LEVEL.ERROR)
+			X.Debug(szCaption, 'Cannot connect to database!!!', X.DEBUG_LEVEL.ERROR)
 			if fnAction then
 				fnAction()
 			end
@@ -1398,27 +1369,27 @@ function LIB.SQLiteConnect(szCaption, oPath, fnAction)
 
 	-- 测试数据库完整性
 	local aRes = DB:Execute('PRAGMA QUICK_CHECK')
-	if Get(aRes, {1, 'integrity_check'}) == 'ok' then
+	if X.Get(aRes, {1, 'integrity_check'}) == 'ok' then
 		if fnAction then
 			fnAction(DB)
 		end
 		return DB
 	else
 		-- 记录错误日志
-		LIB.Debug(szCaption, 'Malformed database detected...', DEBUG_LEVEL.ERROR)
+		X.Debug(szCaption, 'Malformed database detected...', X.DEBUG_LEVEL.ERROR)
 		for _, rec in ipairs(aRes or {}) do
-			LIB.Debug(szCaption, EncodeLUAData(rec), DEBUG_LEVEL.ERROR)
+			X.Debug(szCaption, X.EncodeLUAData(rec), X.DEBUG_LEVEL.ERROR)
 		end
 		DB:Release()
 		-- 准备尝试修复
 		if fnAction then
-			LIB.Confirm(_L('%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.', szCaption), function()
-				LIB.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+			X.Confirm(_L('%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.', szCaption), function()
+				X.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 					local szStatus, DB = ConnectMalformedDatabase(szCaption, szPath)
 					if szStatus == 'FILE_LOCKED' then
-						LIB.Alert(_L('Database file locked, repair database failed! : %s', szPath))
+						X.Alert(_L('Database file locked, repair database failed! : %s', szPath))
 					else
-						LIB.Alert(_L('%s Database repair finished!', szCaption))
+						X.Alert(_L('%s Database repair finished!', szCaption))
 					end
 					fnAction(DB)
 				end)
@@ -1430,7 +1401,7 @@ function LIB.SQLiteConnect(szCaption, oPath, fnAction)
 end
 end
 
-function LIB.SQLiteDisconnect(db)
+function X.SQLiteDisconnect(db)
 	db:Release()
 end
 
@@ -1438,8 +1409,8 @@ end
 -- 基于 SQLite 的 NoSQLite 封装
 ------------------------------------------------------------------------------
 
-function LIB.NoSQLiteConnect(oPath)
-	local db = LIB.SQLiteConnect('NoSQL', oPath)
+function X.NoSQLiteConnect(oPath)
+	local db = X.SQLiteConnect('NoSQL', oPath)
 	if not db then
 		return
 	end
@@ -1449,7 +1420,7 @@ function LIB.NoSQLiteConnect(oPath)
 	local stmtDeleter = db:Prepare('DELETE FROM data WHERE key = ?')
 	local stmtAllGetter = db:Prepare('SELECT * FROM data')
 	if not stmtSetter or not stmtGetter or not stmtDeleter or not stmtAllGetter then
-		LIB.NoSQLiteDisconnect(db)
+		X.NoSQLiteDisconnect(db)
 		return
 	end
 	return setmetatable({}, {
@@ -1520,6 +1491,6 @@ function LIB.NoSQLiteConnect(oPath)
 	})
 end
 
-function LIB.NoSQLiteDisconnect(db)
+function X.NoSQLiteDisconnect(db)
 	db:Release()
 end

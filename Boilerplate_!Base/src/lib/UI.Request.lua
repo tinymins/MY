@@ -7,48 +7,19 @@
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 -------------------------------------------------------------------------------------------------------
-local setmetatable = setmetatable
 local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local byte, char, len, find, format = string.byte, string.char, string.len, string.find, string.format
-local gmatch, gsub, dump, reverse = string.gmatch, string.gsub, string.dump, string.reverse
-local match, rep, sub, upper, lower = string.match, string.rep, string.sub, string.upper, string.lower
-local type, tonumber, tostring = type, tonumber, tostring
-local HUGE, PI, random, randomseed = math.huge, math.pi, math.random, math.randomseed
-local min, max, floor, ceil, abs = math.min, math.max, math.floor, math.ceil, math.abs
-local mod, modf, pow, sqrt = math['mod'] or math['fmod'], math.modf, math.pow, math.sqrt
-local sin, cos, tan, atan, atan2 = math.sin, math.cos, math.tan, math.atan, math.atan2
-local insert, remove, concat = table.insert, table.remove, table.concat
-local pack, unpack = table['pack'] or function(...) return {...} end, table['unpack'] or unpack
-local sort, getn = table.sort, table['getn'] or function(t) return #t end
--- jx3 apis caching
-local wlen, wfind, wgsub, wlower = wstring.len, StringFindW, StringReplaceW, StringLowerW
-local GetTime, GetLogicFrameCount, GetCurrentTime = GetTime, GetLogicFrameCount, GetCurrentTime
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local string, math, table = string, math, table
 -- lib apis caching
-local LIB = Boilerplate
-local UI, GLOBAL, CONSTANT = LIB.UI, LIB.GLOBAL, LIB.CONSTANT
-local PACKET_INFO, DEBUG_LEVEL, PATH_TYPE = LIB.PACKET_INFO, LIB.DEBUG_LEVEL, LIB.PATH_TYPE
-local wsub, count_c, lodash = LIB.wsub, LIB.count_c, LIB.lodash
-local pairs_c, ipairs_c, ipairs_r = LIB.pairs_c, LIB.ipairs_c, LIB.ipairs_r
-local spairs, spairs_r, sipairs, sipairs_r = LIB.spairs, LIB.spairs_r, LIB.sipairs, LIB.sipairs_r
-local IsNil, IsEmpty, IsEquals, IsString = LIB.IsNil, LIB.IsEmpty, LIB.IsEquals, LIB.IsString
-local IsBoolean, IsNumber, IsHugeNumber = LIB.IsBoolean, LIB.IsNumber, LIB.IsHugeNumber
-local IsTable, IsArray, IsDictionary = LIB.IsTable, LIB.IsArray, LIB.IsDictionary
-local IsFunction, IsUserdata, IsElement = LIB.IsFunction, LIB.IsUserdata, LIB.IsElement
-local EncodeLUAData, DecodeLUAData, Schema = LIB.EncodeLUAData, LIB.DecodeLUAData, LIB.Schema
-local GetTraceback, RandomChild, GetGameAPI = LIB.GetTraceback, LIB.RandomChild, LIB.GetGameAPI
-local Get, Set, Clone, GetPatch, ApplyPatch = LIB.Get, LIB.Set, LIB.Clone, LIB.GetPatch, LIB.ApplyPatch
-local IIf, CallWithThis, SafeCallWithThis = LIB.IIf, LIB.CallWithThis, LIB.SafeCallWithThis
-local Call, XpCall, SafeCall, NSFormatString = LIB.Call, LIB.XpCall, LIB.SafeCall, LIB.NSFormatString
+local X = Boilerplate
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
-local _L = LIB.LoadLangPack(PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 local D = {}
-local INI_PATH = PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Request.ini'
+local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Request.ini'
 local REQUEST_LIST = {}
 local REQUEST_HANDLER = {}
-local FRAME_NAME = NSFormatString('{$NS}_Request')
+local FRAME_NAME = X.NSFormatString('{$NS}_Request')
 
 function D.GetFrame()
 	return Station.SearchFrame(FRAME_NAME)
@@ -67,19 +38,19 @@ function D.Close(bCompulsory)
 		REQUEST_LIST = {}
 		Wnd.CloseWindow(D.GetFrame())
 		for _, v in pairs(REQUEST_HANDLER) do
-			SafeCall(v.OnClear)
+			X.SafeCall(v.OnClear)
 		end
 	end
-	if bCompulsory or IsEmpty(REQUEST_LIST) then
+	if bCompulsory or X.IsEmpty(REQUEST_LIST) then
 		fnAction()
 	else
-		LIB.Confirm(_L['Clear list and close?'], fnAction)
+		X.Confirm(_L['Clear list and close?'], fnAction)
 	end
 end
 
 function D.RegisterRequest(szType, tHandler)
 	if REQUEST_HANDLER[szType] then
-		return LIB.Debug(FRAME_NAME, szType .. ' type already registered!', DEBUG_LEVEL.ERROR)
+		return X.Debug(FRAME_NAME, szType .. ' type already registered!', X.DEBUG_LEVEL.ERROR)
 	end
 	REQUEST_HANDLER[szType] = {
 		szIconUITex = tHandler.szIconUITex,
@@ -94,33 +65,33 @@ end
 
 function D.Replace(szType, szKey, data)
 	if not REQUEST_HANDLER[szType] then
-		return LIB.Debug(FRAME_NAME, szType .. ' type not registered yet!', DEBUG_LEVEL.ERROR)
+		return X.Debug(FRAME_NAME, szType .. ' type not registered yet!', X.DEBUG_LEVEL.ERROR)
 	end
 	local bExist
-	for i, v in ipairs_r(REQUEST_LIST) do
+	for i, v in X.ipairs_r(REQUEST_LIST) do
 		if v.szType == szType and v.szKey == szKey then
 			bExist = true
 			v.data = data
 		end
 	end
 	if not bExist then
-		insert(REQUEST_LIST, { szType = szType, szKey = szKey, data = data })
+		table.insert(REQUEST_LIST, { szType = szType, szKey = szKey, data = data })
 	end
-	LIB.DelayCall(FRAME_NAME .. '_Update', 1, D.RedrawList)
+	X.DelayCall(FRAME_NAME .. '_Update', 1, D.RedrawList)
 end
 
 function D.RemoveRequest(szType, szKey)
 	local bExist
-	for i, v in ipairs_r(REQUEST_LIST) do
+	for i, v in X.ipairs_r(REQUEST_LIST) do
 		if v.szType == szType and v.szKey == szKey then
 			bExist = true
-			remove(REQUEST_LIST, i)
+			table.remove(REQUEST_LIST, i)
 		end
 	end
 	if not bExist then
 		return
 	end
-	LIB.DelayCall(FRAME_NAME .. '_Update', 1, D.RedrawList)
+	X.DelayCall(FRAME_NAME .. '_Update', 1, D.RedrawList)
 end
 
 function D.RedrawList()
@@ -149,7 +120,7 @@ function D.RedrawList()
 			wnd:Lookup('', ''):FormatAllItemPos()
 			wnd:SetH(nH)
 		else
-			LIB.Debug(FRAME_NAME, info.szType .. '#' .. info.szKey .. ' drawer does not return a wnd!', DEBUG_LEVEL.ERROR)
+			X.Debug(FRAME_NAME, info.szType .. '#' .. info.szKey .. ' drawer does not return a wnd!', X.DEBUG_LEVEL.ERROR)
 		end
 		local szIconUITex, nIconFrame = handler.szIconUITex, handler.nIconFrame
 		if handler.GetIcon then
@@ -166,7 +137,7 @@ function D.RedrawList()
 		wnd.info = info
 		nSumH = nSumH + nH
 	end
-	nSumH = min(nSumH, 475)
+	nSumH = math.min(nSumH, 475)
 	scroll:SetH(nSumH)
 	scrollbar:SetH(nSumH - 2)
 	container:SetH(nSumH)
@@ -178,7 +149,7 @@ end
 function D.OnFrameCreate()
 	this:SetPoint('CENTER', 0, -200, 'CENTER', 0, 0)
 	this:Lookup('', 'Text_Title'):SetText(_L['Request list'])
-	LIB.RegisterEsc(NSFormatString('{$NS}_PartyRequest'), D.GetFrame, D.Close)
+	X.RegisterEsc(X.NSFormatString('{$NS}_PartyRequest'), D.GetFrame, D.Close)
 end
 
 function D.OnItemMouseEnter()
@@ -208,7 +179,7 @@ function D.OnLButtonClick()
 		local menu = {}
 		for _, v in pairs(REQUEST_HANDLER) do
 			if v.GetMenu then
-				insert(menu, v.GetMenu())
+				table.insert(menu, v.GetMenu())
 			end
 		end
 		if #menu > 0 then
@@ -230,7 +201,7 @@ local settings = {
 		},
 	},
 }
-_G[FRAME_NAME] = LIB.CreateModule(settings)
+_G[FRAME_NAME] = X.CreateModule(settings)
 end
 
 UI.OpenRequest = D.Open
