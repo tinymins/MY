@@ -54,23 +54,29 @@ local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
-	bOnlyInTeamDungeon = {
+	bInTeamDungeon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
+		xDefaultValue = true,
 	},
-	bOnlyInRaidDungeon = {
+	bInRaidDungeon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
+		xDefaultValue = true,
 	},
-	bOnlyInBattlefield = {
+	bInBattlefield = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
+		xDefaultValue = true,
+	},
+	bInOtherMap = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
 	},
 	anchor = {
 		ePathType = X.PATH_TYPE.ROLE,
@@ -300,19 +306,27 @@ function D.IsEnabled()
 	if not O.bOn then
 		return false
 	end
-	if not O.bOnlyInTeamDungeon and not O.bOnlyInRaidDungeon and not O.bOnlyInBattlefield then
+	if O.bInTeamDungeon and O.bInRaidDungeon and O.bInBattlefield and O.bInOtherMap then
 		return true
 	end
-	if O.bOnlyInTeamDungeon and X.IsInDungeon(false) then
-		return true
+	if X.IsInDungeon(false) then
+		return O.bInTeamDungeon
 	end
-	if O.bOnlyInRaidDungeon and X.IsInDungeon(true) then
-		return true
+	if X.IsInDungeon(true) then
+		return O.bInRaidDungeon
 	end
-	if O.bOnlyInBattlefield and (X.IsInBattleField() or X.IsInPubg() or X.IsInZombieMap()) then
-		return true
+	if X.IsInBattleField() or X.IsInPubg() or X.IsInZombieMap() then
+		return O.bInBattlefield
 	end
-	return false
+	return O.bInOtherMap
+end
+
+function D.OutputEnable()
+	X.Systopmsg(
+		D.IsEnabled()
+			and _L['MY_GKPLoot enabled in current map']
+			or _L['MY_GKPLoot disabled in current map']
+	)
 end
 
 function D.CanDialog(tar, doodad)
@@ -2064,33 +2078,48 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Team dungeon'],
-		checked = O.bOnlyInTeamDungeon,
+		checked = O.bInTeamDungeon,
 		oncheck = function(bChecked)
-			O.bOnlyInTeamDungeon = bChecked
+			O.bInTeamDungeon = bChecked
+			D.OutputEnable()
 		end,
-		tip = _L['Only enable in checked map (uncheck all for all map)'],
+		tip = _L['Enable in checked map type'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		autoenable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Raid dungeon'],
-		checked = O.bOnlyInRaidDungeon,
+		checked = O.bInRaidDungeon,
 		oncheck = function(bChecked)
-			O.bOnlyInRaidDungeon = bChecked
+			O.bInRaidDungeon = bChecked
+			D.OutputEnable()
 		end,
-		tip = _L['Only enable in checked map (uncheck all for all map)'],
+		tip = _L['Enable in checked map type'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		autoenable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	nX = ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Battlefield'],
-		checked = O.bOnlyInBattlefield,
+		checked = O.bInBattlefield,
 		oncheck = function(bChecked)
-			O.bOnlyInBattlefield = bChecked
+			O.bInBattlefield = bChecked
+			D.OutputEnable()
 		end,
-		tip = _L['Only enable in checked map (uncheck all for all map)'],
+		tip = _L['Enable in checked map type'],
+		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		autoenable = function() return O.bOn end,
+	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Other map'],
+		checked = O.bInOtherMap,
+		oncheck = function(bChecked)
+			O.bInOtherMap = bChecked
+			D.OutputEnable()
+		end,
+		tip = _L['Enable in checked map type'],
 		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
 		autoenable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
