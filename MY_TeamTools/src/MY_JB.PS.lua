@@ -24,13 +24,20 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/jx3box/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+X.RegisterRestriction('MY_TeamTools_JB', { ['*'] = false, classic = true })
 --------------------------------------------------------------------------
 
 local PS = {
 	-- nPriority = 0,
 	-- bWelcome = true,
-	bIsShielded = X.IsDebugServer(),
 }
+
+function PS.IsRestricted()
+	if X.IsDebugServer() then
+		return true
+	end
+	return X.IsRestricted('MY_TeamTools_JB')
+end
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
