@@ -432,11 +432,11 @@ function D.FlushDB()
 		lshoulder = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwLShoulderItemIndex) },
 		rshoulder = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwRShoulderItemIndex) },
 		backcloak = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwBackCloakItemIndex) },
-		bag = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwBagItemIndex) },
-		glasses = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwGlassesItemIndex) },
-		lglove = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.GetSelectPendent and me.GetSelectPendent(KPENDENT_TYPE.LGLOVE)) },
-		rglove = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.GetSelectPendent and me.GetSelectPendent(KPENDENT_TYPE.RGLOVE)) },
-		penpet = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.GetSelectPendent and me.GetEquippedPendentPet()) },
+		bag = { ITEM_TABLE_TYPE.CUST_TRINKET, GLOBAL.GAME_BRANCH ~= 'classic' and me.dwBagItemIndex or 0 },
+		glasses = { ITEM_TABLE_TYPE.CUST_TRINKET, GLOBAL.GAME_BRANCH ~= 'classic' and me.dwGlassesItemIndex or 0 },
+		lglove = { ITEM_TABLE_TYPE.CUST_TRINKET, GLOBAL.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.LGLOVE) or 0 },
+		rglove = { ITEM_TABLE_TYPE.CUST_TRINKET, GLOBAL.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.RGLOVE) or 0 },
+		penpet = { ITEM_TABLE_TYPE.CUST_TRINKET, GLOBAL.GAME_BRANCH ~= 'classic' and me.GetEquippedPendentPet() or 0 },
 	}))
 
 	DB_OwnerInfoW:ClearBindings()

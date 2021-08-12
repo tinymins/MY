@@ -188,7 +188,7 @@ end
 -- 插入聊天内容时监控聊天信息
 function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szName)
 	-- is enabled
-	if not O.bCapture then
+	if not D.bReady or not O.bCapture then
 		return
 	end
 	--------------------------------------------------------------------------------------
@@ -325,11 +325,17 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
 end
 
 function D.Init()
+	D.bReady = true
 	D.LoadConfig()
 	D.LoadData()
 	D.RegisterMsgMonitor()
 end
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CHATMONITOR', D.Init)
+
+X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_CHATMONITOR', function()
+	D.bReady = false
+	D.RegisterMsgMonitor()
+end)
 
 function D.Exit()
 	D.SaveData()
@@ -340,22 +346,24 @@ function D.RegisterMsgMonitor()
 	for _, szChannel in ipairs(D.aCurrentChannel or CONSTANT.EMPTY_TABLE) do
 		X.RegisterMsgMonitor(szChannel, 'MY_ChatMonitor', false)
 	end
-	local tChannel = {}
-	for _, p in ipairs(O.aKeyword) do
-		if p.bEnable then
-			for szChannel, bCapture in pairs(p.tChannel) do
-				if bCapture then
-					tChannel[szChannel] = true
+	local aChannel = {}
+	if D.bReady then
+		local tChannel = {}
+		for _, p in ipairs(O.aKeyword) do
+			if p.bEnable then
+				for szChannel, bCapture in pairs(p.tChannel) do
+					if bCapture then
+						tChannel[szChannel] = true
+					end
 				end
 			end
 		end
-	end
-	local aChannel = {}
-	for szChannel, _ in pairs(tChannel) do
-		table.insert(aChannel, szChannel)
-	end
-	for _, szChannel in ipairs(aChannel) do
-		X.RegisterMsgMonitor(szChannel, 'MY_ChatMonitor', D.OnMsgArrive)
+		for szChannel, _ in pairs(tChannel) do
+			table.insert(aChannel, szChannel)
+		end
+		for _, szChannel in ipairs(aChannel) do
+			X.RegisterMsgMonitor(szChannel, 'MY_ChatMonitor', D.OnMsgArrive)
+		end
 	end
 	D.aCurrentChannel = aChannel
 end

@@ -306,10 +306,10 @@ function D.AutoSwitchSysHeadTop()
 	if not Config('loaded') then
 		return
 	end
-	if Config.eCss == '' and D.IsMapEnabled() then
+	if D.bReady and Config.eCss == '' and D.IsMapEnabled() then
 		Config('reset')
 	end
-	if O.bAutoHideSysHeadtop and D.IsMapEnabled() then
+	if D.bReady and O.bAutoHideSysHeadtop and D.IsMapEnabled() then
 		D.SaveSysHeadTop()
 		D.HideSysHeadTop()
 	else
@@ -399,7 +399,7 @@ function D.Reset()
 	end
 	OVERWRITE_TITLE_EFFECT = {}
 	-- ×ÔÊÊÓ¦ÕÚµ²Ë³Ðò
-	if O.bEnabled and Config.bScreenPosSort then
+	if D.bReady and O.bEnabled and Config.bScreenPosSort then
 		local dwLastID, nCount
 		local function onGetCharacterTopScreenPos(dwID, xScreen, yScreen)
 			OBJECT_SCREEN_POS_Y_CACHE[dwID] = yScreen or 0
@@ -818,7 +818,7 @@ end)
 -- ¶Ô»°ÅÝÅÝ
 -----------------------------------------------------------------------------------------
 local function OnCharacterSay(dwID, nChannel, szText)
-	if dwID == 0 then
+	if dwID == 0 or not D.bReady then
 		return
 	end
 	local szMsgType = CONSTANT.PLAYER_TALK_CHANNEL_TO_MSG_TYPE[nChannel]
@@ -867,6 +867,11 @@ X.RegisterHotKey('MY_LifeBar_S', _L['MY_LifeBar'], onSwitch)
 
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar', function()
 	D.bReady = true
+	D.Reset()
+end)
+
+X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_LifeBar', function()
+	D.bReady = false
 	D.Reset()
 end)
 
