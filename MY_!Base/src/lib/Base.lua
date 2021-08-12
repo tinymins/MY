@@ -103,27 +103,29 @@ local string, math, table = string, math, table
 -------------------------------------------------------------------------------------------------------
 -- wstring ÐÞÕý
 -------------------------------------------------------------------------------------------------------
-local _wstring, wstring = wstring, nil
-wstring = setmetatable(
-	{
-		len = _wstring.len,
-		find = StringFindW,
-		sub = function(str, s, e)
-			local nLen = wstring.len(str)
-			if s < 0 then
-				s = nLen + s + 1
-			end
-			if not e then
-				e = nLen
-			elseif e < 0 then
-				e = nLen + e + 1
-			end
-			return _wstring.sub(str, s, e)
-		end,
-		gsub = StringReplaceW,
-		lower = StringLowerW,
-	},
-	{ __index = _wstring })
+local wsub = _G.wstring.sub
+local wstring = setmetatable({}, {
+	__index = function(t, k)
+		local v = _G.wstring[k]
+		t[k] = v
+		return v
+	end,
+})
+wstring.find = StringFindW
+wstring.sub = function(str, s, e)
+	local nLen = wstring.len(str)
+	if s < 0 then
+		s = nLen + s + 1
+	end
+	if not e then
+		e = nLen
+	elseif e < 0 then
+		e = nLen + e + 1
+	end
+	return wsub(str, s, e)
+end
+wstring.gsub = StringReplaceW
+wstring.lower = StringLowerW
 -------------------------------------------------------------------------------------------------------
 -- ²âÊÔµÈ¼¶
 -------------------------------------------------------------------------------------------------------
