@@ -761,7 +761,7 @@ function D.RestoreLover(szFilePath)
 	end
 	if data.szUUID == X.GetClientUUID() then
 		GetUserInput(_L['Please input your lover\'s current name:'], function(szLoverName)
-			szLoverName = wstring.gsub(wgsub(X.TrimString(szLoverName), '[', ''), ']', '')
+			szLoverName = wstring.gsub(wstring.gsub(X.TrimString(szLoverName), '[', ''), ']', '')
 			X.Confirm(
 				_L('Send restore lover request to [%s]?', szLoverName),
 				function()

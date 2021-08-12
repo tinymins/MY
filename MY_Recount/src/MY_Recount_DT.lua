@@ -273,7 +273,7 @@ function MY_Recount_DT.OnFrameBreathe()
 		hItem:Lookup('Text_SkillName'):SetText(MY_Recount.GetTargetShowName(p.szName, szPrimarySort == DK_REC_STAT.TARGET and p.dwForceID ~= -1))
 		hItem:Lookup('Text_SkillCount'):SetText(p.nCount)
 		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotal)
-		hItem:Lookup('Text_SkillPercentage'):SetText(nTotal > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotal / nTotal * 1000) / 10) or ' - ')
+		hItem:Lookup('Text_SkillPercentage'):SetText(nTotal > 0 and _L('%.1f%%', (i == 1 and math.ceil or math.floor)(p.nTotal / nTotal * 1000) / 10) or ' - ')
 
 		if szPrimarySort == DK_REC_STAT.SKILL and szSelectedSkill == p.szKey
 		or szPrimarySort == DK_REC_STAT.TARGET and szSelectedTarget == p.szKey then
@@ -354,7 +354,7 @@ function MY_Recount_DT.OnFrameBreathe()
 			hItem:Lookup('Text_DetailMax'):SetText(p.nMax)
 			hItem:Lookup('Text_DetailCount'):SetText(p.nCount)
 			hItem:Lookup('Text_DetailPercent'):SetText(nCountSum > 0
-				and _L('%.1f%%', (i == 1 and ceil or floor)(p.nCount / nCountSum * 1000) / 10)
+				and _L('%.1f%%', (i == 1 and math.ceil or math.floor)(p.nCount / nCountSum * 1000) / 10)
 				or ' - ')
 		end
 		for i = hList:GetItemCount() - 1, #aResult, -1 do
@@ -440,7 +440,7 @@ function MY_Recount_DT.OnFrameBreathe()
 			hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
 			hItem:Lookup('Text_TargetCritical'):SetText(p.nCriticalCount)
 			hItem:Lookup('Text_TargetMiss'):SetText(p.nMissCount)
-			hItem:Lookup('Text_TargetPercent'):SetText((nTotal > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotal / nTotal * 1000) / 10) or ' - '))
+			hItem:Lookup('Text_TargetPercent'):SetText((nTotal > 0 and _L('%.1f%%', (i == 1 and math.ceil or math.floor)(p.nTotal / nTotal * 1000) / 10) or ' - '))
 			hItem.szKey = p.szKey
 		end
 		for i = hList:GetItemCount() - 1, #aResult, -1 do

@@ -216,7 +216,7 @@ function D.InsertLog(szEvent, oData, bReplay)
 		.. '\t' .. GetCurrentTime()
 		.. '\t' .. GetTime()
 		.. '\t' .. szEvent
-		.. '\t' .. wstring.gsub(wgsub(X.EncodeLUAData(oData), '\\\n', '\\n'), '\t', '\\t')
+		.. '\t' .. wstring.gsub(wstring.gsub(X.EncodeLUAData(oData), '\\\n', '\\n'), '\t', '\\t')
 	local nCRC = GetStringCRC(LOG_CRC .. szLog .. 'c910e9b9-8359-4531-85e0-6897d8c129f7')
 	-- ≤Â»Îª∫¥Ê
 	table.insert(LOG_CACHE, nCRC .. '\t' .. szLog .. '\n')
