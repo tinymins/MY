@@ -211,7 +211,7 @@ end
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoSell', function()
 	for _, k in ipairs({'tSellItem', 'tProtectItem'}) do
 		if D[k] then
-			X.SafeCall(Set, O, k, D[k])
+			X.SafeCall(X.Set, O, k, D[k])
 			D[k] = nil
 		end
 	end

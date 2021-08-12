@@ -133,8 +133,8 @@ function D.LoadConfig()
 	local Config = X.LoadLUAData(szPath)
 	if Config then
 		CPath.DelFile(szPath)
-		X.SafeCall(Set, O, 'aSubsidies', Config.Subsidies)
-		X.SafeCall(Set, O, 'aScheme', Config.Scheme2 or O.aScheme)
+		X.SafeCall(X.Set, O, 'aSubsidies', Config.Subsidies)
+		X.SafeCall(X.Set, O, 'aScheme', Config.Scheme2 or O.aScheme)
 	end
 end
 

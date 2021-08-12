@@ -280,13 +280,13 @@ end)
 X.RegisterInit('MY_GKPLoot', function()
 	for _, k in ipairs({'tConfirm'}) do
 		if D[k] then
-			X.SafeCall(Set, O, k, D[k])
+			X.SafeCall(X.Set, O, k, D[k])
 			D[k] = nil
 		end
 	end
 	if D.tItemConfig and X.IsTable(D.tItemConfig) then
 		for k, v in pairs(D.tItemConfig) do
-			X.SafeCall(Set, O, k, v)
+			X.SafeCall(X.Set, O, k, v)
 		end
 		D.tItemConfig = nil
 	end

@@ -454,7 +454,7 @@ end
 X.RegisterInit('MY_GKPDoodad', function()
 	for _, k in ipairs({'tNameColor', 'tCraft', 'szCustom'}) do
 		if O2[k] then
-			X.SafeCall(Set, O, k, O2[k])
+			X.SafeCall(X.Set, O, k, O2[k])
 			O2[k] = nil
 		end
 	end

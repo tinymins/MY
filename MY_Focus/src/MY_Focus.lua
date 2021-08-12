@@ -319,15 +319,15 @@ function D.LoadConfig()
 							v[eType] = {}
 						end
 						for kk, vv in pairs(O.tStaticFocus[eType]) do
-							pcall(Set, v, kk, vv)
+							pcall(X.Set, v, kk, vv)
 						end
 					end
 				elseif k == 'aPatternFocus' then
 					for _, vv in ipairs(O.aPatternFocus) do
-						pcall(insert, v, vv)
+						pcall(table.insert, v, vv)
 					end
 				end
-				pcall(Set, O, k, v)
+				pcall(X.Set, O, k, v)
 			end
 		end
 	end

@@ -778,7 +778,7 @@ function D.LoadConfig(szConfig)
 		end
 		tConfig = FormatConfigData(tConfig.eCss or 'DEFAULT', tConfig)
 		for k, v in pairs(tConfig) do
-			X.Call(Set, Config, {k}, v)
+			X.Call(X.Set, Config, {k}, v)
 		end
 	end
 	ConfigLoaded = true

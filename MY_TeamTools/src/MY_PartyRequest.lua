@@ -496,7 +496,7 @@ X.RegisterEvent('ON_MESSAGE_BOX_OPEN', 'MY_PartyRequest' , D.OnMessageBoxOpen)
 X.RegisterInit('MY_PartyRequest', function()
 	for _, k in ipairs({'tAcceptCustom'}) do
 		if D[k] then
-			X.SafeCall(Set, O, k, D[k])
+			X.SafeCall(X.Set, O, k, D[k])
 			D[k] = nil
 		end
 	end
