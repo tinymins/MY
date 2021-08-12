@@ -342,7 +342,9 @@ local function InitTaskList(bReload)
 	-- ¥Û’Ω
 	table.insert(aTask, {
 		id = 'big_war',
-		szTitle = _L['Big war'],
+		szTitle = GLOBAL.GAME_BRANCH == 'classic'
+			and _L['Bounty']
+			or _L['Big war'],
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = CONSTANT.QUEST_INFO.BIG_WARS,
 	})
