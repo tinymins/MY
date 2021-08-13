@@ -41,26 +41,38 @@ local O = X.CreateUserSettingsModule('MY_ChatEmotion', _L['Chat'], {
 })
 local D = {}
 
+function D.Render(szMsg)
+	if D.bReady and O.bFixSize then
+		local aXMLNode = X.XMLDecode(szMsg)
+		if aXMLNode then
+			for _, node in ipairs(aXMLNode) do
+				local szType = X.XMLGetNodeType(node)
+				local szName = X.XMLGetNodeData(node, 'name')
+				if (szType == 'animate' or szType == 'image')
+				and szName and szName:sub(1, 8) == 'emotion_' then
+					X.XMLSetNodeData(node, 'w', O.nSize)
+					X.XMLSetNodeData(node, 'h', O.nSize)
+					X.XMLSetNodeData(node, 'disablescale', 0)
+				end
+			end
+			szMsg = X.XMLEncode(aXMLNode)
+		end
+	end
+	return szMsg
+end
+
 X.RegisterInit('MY_ChatEmotion', function()
 	X.HookChatPanel('BEFORE', 'MY_ChatEmotion', function(h, szMsg, ...)
-		if O.bFixSize then
-			local aXMLNode = X.XMLDecode(szMsg)
-			if aXMLNode then
-				for _, node in ipairs(aXMLNode) do
-					local szType = X.XMLGetNodeType(node)
-					local szName = X.XMLGetNodeData(node, 'name')
-					if (szType == 'animate' or szType == 'image')
-					and szName and szName:sub(1, 8) == 'emotion_' then
-						X.XMLSetNodeData(node, 'w', O.nSize)
-						X.XMLSetNodeData(node, 'h', O.nSize)
-						X.XMLSetNodeData(node, 'disablescale', 0)
-					end
-				end
-				szMsg = X.XMLEncode(aXMLNode)
-			end
-		end
-		return szMsg
+		return D.Render(szMsg), ...
 	end)
+end)
+
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatEmotion', function()
+	D.bReady = true
+end)
+
+X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_ChatEmotion', function()
+	D.bReady = false
 end)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
@@ -99,6 +111,7 @@ local settings = {
 		{
 			fields = {
 				OnPanelActivePartial = D.OnPanelActivePartial,
+				Render = D.Render,
 			},
 		},
 	},
