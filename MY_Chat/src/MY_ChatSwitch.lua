@@ -284,6 +284,9 @@ local CHANNEL_LIST = {
 							end
 						end
 						local szMsg = table.concat(t, '')
+						if MY_ChatEmotion and MY_ChatEmotion.Render then
+							szMsg = MY_ChatEmotion.Render(szMsg)
+						end
 						if MY_Farbnamen then
 							szMsg = MY_Farbnamen.Render(szMsg)
 						end

@@ -165,17 +165,19 @@ end
 
 function D.GetHTML(rec)
 	-- render link event
-	local html = X.RenderChatLink(rec.html)
-	-- render player name color
-	if MY_Farbnamen and MY_Farbnamen.Render then
-		html = MY_Farbnamen.Render(html)
+	local szMsg = X.RenderChatLink(rec.html)
+	if MY_ChatEmotion and MY_ChatEmotion.Render then
+		szMsg = MY_ChatEmotion.Render(szMsg)
 	end
-	html = X.GetChatTimeXML(rec.time, {
+	if MY_Farbnamen and MY_Farbnamen.Render then
+		szMsg = MY_Farbnamen.Render(szMsg)
+	end
+	szMsg = X.GetChatTimeXML(rec.time, {
 		r = rec.r, g = rec.g, b = rec.b,
 		f = rec.font, s = O.szTimestrap,
-		richtext = html,
-	}) .. html
-	return html
+		richtext = szMsg,
+	}) .. szMsg
+	return szMsg
 end
 
 function D.OnNotifyCB()

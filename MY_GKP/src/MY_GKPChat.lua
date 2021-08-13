@@ -59,6 +59,9 @@ function Chat.OnMsgArrive(szMsg)
 		if MY and X.SendChat and X.RenderChatLink then
 			szMsg =  X.RenderChatLink(szMsg)
 		end
+		if MY_ChatEmotion and MY_ChatEmotion.Render then
+			szMsg = MY_ChatEmotion.Render(szMsg)
+		end
 		if MY_Farbnamen and MY_Farbnamen.Render then
 			szMsg = MY_Farbnamen.Render(szMsg)
 		end

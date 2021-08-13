@@ -314,7 +314,11 @@ function D.UpdatePage(frame, bKeepScroll)
 				s = '[%yyyy/%MM/%dd][%hh:%mm:%ss]', richtext = rec.szMsg,
 			}))
 			local nCount = h:GetItemCount()
-			h:AppendItemFromString(rec.szMsg)
+			local szMsg = rec.szMsg
+			if MY_ChatEmotion and MY_ChatEmotion.Render then
+				szMsg = MY_ChatEmotion.Render(szMsg)
+			end
+			h:AppendItemFromString(szMsg)
 			for i = nCount, h:GetItemCount() - 1 do
 				X.RenderChatLink(h:Lookup(i))
 			end

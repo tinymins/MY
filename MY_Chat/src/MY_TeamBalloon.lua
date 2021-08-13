@@ -41,6 +41,9 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 local D = {}
 
 local function AppendBalloon(hFrame, dwID, szMsg)
+	if MY_ChatEmotion and MY_ChatEmotion.Render then
+		szMsg = MY_ChatEmotion.Render(szMsg)
+	end
 	local hTotal = hFrame:Lookup('', '')
 	local hBalloon = hTotal:Lookup('Balloon_' .. dwID)
 	if not hBalloon then

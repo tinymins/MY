@@ -309,10 +309,10 @@ function D.DrawBoard(ui)
 	end
 	m_aRecTime = {}
 	if ui then
-		local szHTML = ''
+		local szMsg = ''
 		local tNames = {}
 		for _, aRecord in ipairs(D.GetResult()) do
-			szHTML = szHTML ..
+			szMsg = szMsg ..
 				X.GetChatCopyXML() ..
 				GetFormatText('['..aRecord.szName..']', nil, nil, nil, nil, 515, nil, 'namelink_0') ..
 				GetFormatText(_L( ' rolls for %d times, valid score is %s.', aRecord.nCount, (string.gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n')
@@ -332,16 +332,19 @@ function D.DrawBoard(ui)
 				end
 			end
 			if szUnrolledNames ~= '' then
-				szHTML = szHTML ..
+				szMsg = szMsg ..
 				X.GetChatCopyXML() ..
 				szUnrolledNames .. GetFormatText(_L['haven\'t roll yet.'])
 			end
 		end
-		szHTML = X.RenderChatLink(szHTML)
-		if MY_Farbnamen and MY_Farbnamen.Render then
-			szHTML = MY_Farbnamen.Render(szHTML)
+		szMsg = X.RenderChatLink(szMsg)
+		if MY_ChatEmotion and MY_ChatEmotion.Render then
+			szMsg = MY_ChatEmotion.Render(szMsg)
 		end
-		ui:Clear():Append(szHTML)
+		if MY_Farbnamen and MY_Farbnamen.Render then
+			szMsg = MY_Farbnamen.Render(szMsg)
+		end
+		ui:Clear():Append(szMsg)
 	end
 end
 
