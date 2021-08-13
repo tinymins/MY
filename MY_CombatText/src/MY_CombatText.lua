@@ -366,8 +366,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('LEAVE_STORY_MODE')
 	CombatText.handle = this:Lookup('', '')
 	CombatText.FreeQueue()
-	COMBAT_TEXT_UI_SCALE   = Station.GetUIScale()
-	COMBAT_TEXT_TRAJECTORY = CombatText.TrajectoryCount()
+	CombatText.UpdateTrajectoryCount()
 	X.BreatheCall('COMBAT_TEXT_CACHE', 1000 * 60 * 5, function()
 		local count = 0
 		for k, v in pairs(COMBAT_TEXT_LEAVE) do
@@ -413,8 +412,7 @@ function D.OnEvent(szEvent)
 			CombatText.OnSkillMiss(arg1)
 		end
 	elseif szEvent == 'UI_SCALED' then
-		COMBAT_TEXT_UI_SCALE   = Station.GetUIScale()
-		COMBAT_TEXT_TRAJECTORY = CombatText.TrajectoryCount()
+		CombatText.UpdateTrajectoryCount()
 	elseif szEvent == 'SKILL_DODGE' then
 		if arg0 == COMBAT_TEXT_PLAYERID or arg1 == COMBAT_TEXT_PLAYERID then
 			CombatText.OnSkillDodge(arg1)
@@ -616,11 +614,12 @@ end
 D.OnFrameBreathe = CombatText.OnFrameRender
 D.OnFrameRender  = CombatText.OnFrameRender
 
-function CombatText.TrajectoryCount()
-	if O.fScale < 1.5 then
-		return math.floor(3.5 / COMBAT_TEXT_UI_SCALE / O.fScale)
-	else
-		return math.floor(3.5 / COMBAT_TEXT_UI_SCALE)
+function CombatText.UpdateTrajectoryCount()
+	if D.bReady then
+		COMBAT_TEXT_UI_SCALE   = Station.GetUIScale()
+		COMBAT_TEXT_TRAJECTORY = O.fScale < 1.5
+			and math.floor(3.5 / COMBAT_TEXT_UI_SCALE / O.fScale)
+			or math.floor(3.5 / COMBAT_TEXT_UI_SCALE)
 	end
 end
 
@@ -1115,7 +1114,7 @@ function PS.OnPanelActive(frame)
 		value = O.fScale * 100,
 		onchange = function(nVal)
 			O.fScale = nVal / 100
-			COMBAT_TEXT_TRAJECTORY = CombatText.TrajectoryCount()
+			CombatText.UpdateTrajectoryCount()
 		end,
 		autoenable = IsEnabled,
 	})
@@ -1375,6 +1374,7 @@ local function GetPlayerID()
 end
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CombatText', function()
 	D.bReady = true
+	CombatText.UpdateTrajectoryCount()
 	CombatText.CheckEnable()
 end)
 X.RegisterEvent('LOADING_END', 'MY_CombatText', GetPlayerID) -- 很重要的优化
