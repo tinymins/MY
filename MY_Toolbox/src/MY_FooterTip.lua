@@ -59,7 +59,7 @@ function D.Apply()
 	if Navigator_Remove then
 		Navigator_Remove('MY_FRIEND_TIP')
 	end
-	if D.bReady and O.bFriend and not X.IsInShieldedMap() then
+	if D.bReady and O.bFriend and not X.IsInShieldedMap() and not X.IsInDungeon() then
 		local hShaList = UI.GetShadowHandle('MY_FriendHeadTip')
 		if not hShaList.freeShadows then
 			hShaList.freeShadows = {}
@@ -148,7 +148,7 @@ function D.Apply()
 	if Navigator_Remove then
 		Navigator_Remove('MY_GUILDMEMBER_TIP')
 	end
-	if D.bReady and O.bTongMember and not X.IsInShieldedMap() then
+	if D.bReady and O.bTongMember and not X.IsInShieldedMap() and not X.IsInDungeon() then
 		local hShaList = UI.GetShadowHandle('MY_TongMemberHeadTip')
 		if not hShaList.freeShadows then
 			hShaList.freeShadows = {}
