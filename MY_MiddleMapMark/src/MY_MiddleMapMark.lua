@@ -28,7 +28,7 @@ X.RegisterRestriction('MY_MiddleMapMark.MapRestriction', { ['*'] = true })
 --------------------------------------------------------------------------
 X.CreateDataRoot(X.PATH_TYPE.GLOBAL)
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
-local DB = X.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v4.db', X.PATH_TYPE.GLOBAL})
+local DB = X.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v5.db', X.PATH_TYPE.GLOBAL})
 if not DB then
 	return X.Sysmsg(_L['MY_MiddleMapMark'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
@@ -39,6 +39,7 @@ DB:Execute([[
 		mapid INTEGER NOT NULL,
 		x INTEGER NOT NULL,
 		y INTEGER NOT NULL,
+		z INTEGER NOT NULL,
 		name NVARCHAR(20) NOT NULL,
 		title NVARCHAR(20) NOT NULL,
 		level INTEGER NOT NULL,
@@ -49,7 +50,7 @@ DB:Execute([[
 DB:Execute('CREATE INDEX IF NOT EXISTS mmm_name_idx ON NpcInfo(name, mapid)')
 DB:Execute('CREATE INDEX IF NOT EXISTS mmm_title_idx ON NpcInfo(title, mapid)')
 DB:Execute('CREATE INDEX IF NOT EXISTS mmm_template_idx ON NpcInfo(templateid, mapid)')
-local DBN_W  = DB:Prepare('REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, name, title, level, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+local DBN_W  = DB:Prepare('REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, z, name, title, level, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DBN_DM  = DB:Prepare('DELETE FROM NpcInfo WHERE mapid = ?')
 local DBN_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE templateid = ?')
 local DBN_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE name LIKE ? OR title LIKE ?')
@@ -61,13 +62,14 @@ DB:Execute([[
 		mapid INTEGER NOT NULL,
 		x INTEGER NOT NULL,
 		y INTEGER NOT NULL,
+		z INTEGER NOT NULL,
 		name NVARCHAR(20) NOT NULL,
 		extra TEXT NOT NULL,
 		PRIMARY KEY (templateid, poskey)
 	)
 ]])
 DB:Execute('CREATE INDEX IF NOT EXISTS mmm_name_idx ON DoodadInfo(name, mapid)')
-local DBD_W  = DB:Prepare('REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, name, extra) VALUES (?, ?, ?, ?, ?, ?, ?)')
+local DBD_W  = DB:Prepare('REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, z, name, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
 local DBD_DM  = DB:Prepare('DELETE FROM DoodadInfo WHERE mapid = ?')
 local DBD_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE templateid = ?')
 local DBD_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ?')
@@ -100,7 +102,8 @@ function D.Migration()
 	local DB_V1_PATH = X.FormatPath({DB_V1_ROOT, X.PATH_TYPE.DATA})
 	local DB_V2_PATH = X.FormatPath({'cache/npc_doodad_rec.v2.db', X.PATH_TYPE.GLOBAL})
 	local DB_V3_PATH = X.FormatPath({'cache/npc_doodad_rec.v3.db', X.PATH_TYPE.GLOBAL})
-	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
+	local DB_V4_PATH = X.FormatPath({'cache/npc_doodad_rec.v4.db', X.PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) and not IsLocalFileExist(DB_V4_PATH) then
 		return
 	end
 	X.Confirm(
@@ -117,13 +120,13 @@ function D.Migration()
 					if data then
 						for _, p in ipairs(data.Npc) do
 							DBN_W:ClearBindings()
-							DBN_W:BindAll(p.dwTemplateID, GeneNpcInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName), AnsiToUTF8(p.szTitle), p.nLevel, '')
+							DBN_W:BindAll(p.dwTemplateID, GeneNpcInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, -1, AnsiToUTF8(p.szName), AnsiToUTF8(p.szTitle), p.nLevel, '')
 							DBN_W:Execute()
 						end
 						DBN_W:Reset()
 						for _, p in ipairs(data.Doodad) do
 							DBD_W:ClearBindings()
-							DBD_W:BindAll(p.dwTemplateID, GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName), '')
+							DBD_W:BindAll(p.dwTemplateID, GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, -1, AnsiToUTF8(p.szName), '')
 							DBD_W:Execute()
 						end
 						DBD_W:Reset()
@@ -151,6 +154,7 @@ function D.Migration()
 									rec.mapid or -1,
 									rec.x or -1,
 									rec.y or -1,
+									-1,
 									rec.name or '',
 									rec.title or '',
 									rec.level or -1,
@@ -172,6 +176,7 @@ function D.Migration()
 									rec.mapid or -1,
 									rec.x or -1,
 									rec.y or -1,
+									-1,
 									rec.name or '',
 									''
 								)
@@ -201,6 +206,7 @@ function D.Migration()
 									rec.mapid or -1,
 									rec.x or -1,
 									rec.y or -1,
+									-1,
 									rec.name or '',
 									rec.title or '',
 									rec.level or -1,
@@ -222,6 +228,7 @@ function D.Migration()
 									rec.mapid or -1,
 									rec.x or -1,
 									rec.y or -1,
+									-1,
 									rec.name or '',
 									''
 								)
@@ -234,6 +241,58 @@ function D.Migration()
 					DB_V3:Release()
 				end
 				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			-- ×ªÒÆV4¾É°æÊý¾Ý
+			if IsLocalFileExist(DB_V4_PATH) then
+				local DB_V4 = SQLite3_Open(DB_V4_PATH)
+				if DB_V4 then
+					DB:Execute('BEGIN TRANSACTION')
+					local aNpcInfo = DB_V4:Execute('SELECT * FROM NpcInfo WHERE templateid IS NOT NULL')
+					if aNpcInfo then
+						for _, rec in ipairs(aNpcInfo) do
+							if rec.templateid and rec.poskey then
+								DBN_W:ClearBindings()
+								DBN_W:BindAll(
+									rec.templateid,
+									rec.poskey,
+									rec.mapid or -1,
+									rec.x or -1,
+									rec.y or -1,
+									-1,
+									rec.name or '',
+									rec.title or '',
+									rec.level or -1,
+									''
+								)
+								DBN_W:Execute()
+							end
+						end
+						DBN_W:Reset()
+					end
+					local aDoodadInfo = DB_V4:Execute('SELECT * FROM DoodadInfo WHERE templateid IS NOT NULL')
+					if aDoodadInfo then
+						for _, rec in ipairs(aDoodadInfo) do
+							if rec.templateid and rec.poskey then
+								DBD_W:ClearBindings()
+								DBD_W:BindAll(
+									rec.templateid,
+									rec.poskey,
+									rec.mapid or -1,
+									rec.x or -1,
+									rec.y or -1,
+									-1,
+									rec.name or '',
+									''
+								)
+								DBD_W:Execute()
+							end
+						end
+						DBD_W:Reset()
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V4:Release()
+				end
+				CPath.Move(DB_V4_PATH, DB_V4_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			X.Alert(_L['Migrate succeed!'])
 		end)
@@ -254,7 +313,7 @@ local function FlushDB()
 	for i, p in pairs(l_npc) do
 		if not p.temp then
 			DBN_W:ClearBindings()
-			DBN_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level, '')
+			DBN_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, p.z, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level, '')
 			DBN_W:Execute()
 		end
 	end
@@ -264,7 +323,7 @@ local function FlushDB()
 	for i, p in pairs(l_doodad) do
 		if not p.temp then
 			DBD_W:ClearBindings()
-			DBD_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name), '')
+			DBD_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, p.z, AnsiToUTF8(p.name), '')
 			DBD_W:Execute()
 		end
 	end
@@ -346,6 +405,7 @@ local function OnNpcEnterScene()
 		temp = l_tempMap,
 		x = npc.nX,
 		y = npc.nY,
+		z = npc.nZ,
 		mapid = dwMapID,
 		level = npc.nLevel,
 		name  = szName,
@@ -407,6 +467,7 @@ local function OnDoodadEnterScene()
 		temp = l_tempMap,
 		x = doodad.nX,
 		y = doodad.nY,
+		z = doodad.nZ,
 		name = szName,
 		mapid = dwMapID,
 		poskey = dwPosKey,
@@ -568,7 +629,7 @@ local function OnMMMItemMouseEnter()
 	end
 	if IsCtrlKeyDown() then
 		szTip = szTip .. (this.templateid and ('\n' .. this.type .. ' Template ID: ' .. this.templateid) or '')
-			.. '\n' .. this.x .. ', ' .. this.y
+			.. '\n' .. this.x .. ', ' .. this.y .. ',' .. this.z
 	end
 	OutputTip(GetFormatText(szTip, 136), 450, {x, y, w, h}, ALW.TOP_BOTTOM)
 end
@@ -638,6 +699,7 @@ function D.Search(bForce)
 					item.name = info.name
 					item.x = info.x
 					item.y = info.y
+					item.z = info.z
 					item.title = info.title
 					item.level = info.level
 					item.templateid = info.templateid
@@ -667,6 +729,7 @@ function D.Search(bForce)
 					item.name = info.name
 					item.x = info.x
 					item.y = info.y
+					item.z = info.z
 					item.title = info.title
 					item.level = info.level
 					item.templateid = info.templateid
