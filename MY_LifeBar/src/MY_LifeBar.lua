@@ -817,7 +817,7 @@ end)
 -----------------------------------------------------------------------------------------
 -- ¶Ô»°ÅÝÅÝ
 -----------------------------------------------------------------------------------------
-local function OnCharacterSay(dwID, nChannel, szText)
+local function OnCharacterSay(dwID, nChannel, szMsg)
 	if dwID == 0 or not D.bReady then
 		return
 	end
@@ -846,13 +846,19 @@ local function OnCharacterSay(dwID, nChannel, szText)
 	if not cfg.bEnable then
 		return
 	end
-	lb:SetBalloon(szText, GetTime(), bc.nDuring, Config.nBalloonOffsetY)
+	if MY_ChatEmotion and MY_ChatEmotion.Render then
+		szMsg = MY_ChatEmotion.Render(szMsg)
+	end
+	if MY_Farbnamen then
+		szMsg = MY_Farbnamen.Render(szMsg)
+	end
+	lb:SetBalloon(szMsg, GetTime(), bc.nDuring, Config.nBalloonOffsetY)
 end
 
 X.RegisterEvent('CHARACTER_SAY', function()
-	local szText = Table_GetSmartDialog(arg3, arg0)
-	szText = GetFormatText(szText)
-	OnCharacterSay(arg1, arg2, szText)
+	local szMsg = Table_GetSmartDialog(arg3, arg0)
+	szMsg = GetFormatText(szMsg)
+	OnCharacterSay(arg1, arg2, szMsg)
 end)
 
 X.RegisterEvent('PLAYER_SAY', function()
