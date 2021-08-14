@@ -51,7 +51,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_GoTo' then
 		UpdateControls(frame, 'go')
 	elseif name == 'Btn_OuterOpen' then
-		X.OpenBrowser(frame:Lookup('Wnd_Controls/Edit_Input'):GetText())
+		X.OpenBrowser(frame:Lookup('Wnd_Controls/Edit_Input'):GetText(), 'outer')
 	elseif name == 'Btn_Close' then
 		UI.CloseBrowser(frame)
 	end
