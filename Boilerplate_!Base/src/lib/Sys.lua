@@ -1483,12 +1483,25 @@ function X.GetAccount()
 end
 end
 
-function X.OpenBrowser(szAddr)
-	if _G.OpenBrowser then
-		_G.OpenBrowser(szAddr)
-	else
-		UI.OpenBrowser(szAddr)
+-- X.OpenBrowser(szAddr, 'auto')
+-- X.OpenBrowser(szAddr, 'outer')
+-- X.OpenBrowser(szAddr, 'inner')
+function X.OpenBrowser(szAddr, szMode)
+	if not szMode then
+		szMode = 'auto'
 	end
+	if szMode == 'auto' or szMode == 'outer' then
+		local OpenBrowser = X.GetGameAPI('OpenBrowser')
+		if OpenBrowser then
+			OpenBrowser(szAddr)
+			return
+		end
+		if szMode == 'outer' then
+			UI.OpenTextEditor(szAddr)
+			return
+		end
+	end
+	UI.OpenBrowser(szAddr)
 end
 
 function X.ArrayToObject(arr)
@@ -1860,6 +1873,12 @@ else
 				local dwTime = GetCurrentTime()
 				bInit = true
 				dwPointEndTime = dwTime + tonumber(szHour) * 3600 + tonumber(szMinute) * 60 + tonumber(szSecond)
+			end
+			-- 您的月卡剩余总时间：49天19小时
+			local szDay, szHour = szMsg:match(_L['Point left days: (%d+)d(%d+)h'])
+			if szYear and szMonth and szDay and szHour and szMinute then
+				bInit = true
+				dwMonthEndTime = X.DateToTime(szYear, szMonth, szDay, szHour, szMinute, 0)
 			end
 			-- 包月时间截止至：xxxx/xx/xx xx:xx
 			local szYear, szMonth, szDay, szHour, szMinute = szMsg:match(_L['Month time to: (%d+)y(%d+)m(%d+)d (%d+)h(%d+)m'])
