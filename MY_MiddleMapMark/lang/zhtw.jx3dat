@@ -1,4 +1,5 @@
 return {
+    ['MY middle map mark'] = '茗伊插件·地圖搜索',
     ['Type to search, use comma to split.'] = '輸入文字進行搜索，半形逗號分隔多個搜索項。\n如：皇竹草,甜象草',
     ['middle map mark'] = '地圖搜索',
     ['[Read]'] = '[已閱讀]',

@@ -563,7 +563,9 @@ function D.OnMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(
-			GetFormatText(_L['Type to search, use comma to split.'], nil, 255, 255, 0),
+			GetFormatText(_L['MY middle map mark'], nil, 255, 255, 0)
+				.. CONSTANT.XML_LINE_BREAKER
+				.. GetFormatText(_L['Type to search, use comma to split.'], nil, 255, 255, 192),
 			w,
 			{x - 10, y, w, h},
 			UI.TIP_POSITION.TOP_BOTTOM
