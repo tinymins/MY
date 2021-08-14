@@ -316,7 +316,7 @@ function D.GetDoodadInfo(dwID)
 		end
 	end
 	-- Ê¬Ìå
-	if (doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP) and not doodad.CanDialog(me) then
+	if (doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP) and (not doodad.CanDialog(me) or doodad.CanLoot(me.dwID)) then
 		return
 	end
 	-- ÆäËû
