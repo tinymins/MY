@@ -578,7 +578,16 @@ function D.OnMouseLeave()
 	end
 end
 
+function D.HookEdit()
+	local edit = Station.Lookup('Topmost1/MiddleMap/Wnd_Tool/Edit_Search')
+	if edit then
+		HookTableFunc(edit, 'OnEditChanged', D.OnEditChanged, { bAfterOrigin = true })
+	end
+end
+X.RegisterFrameCreate('MiddleMap', 'MY_MiddleMapMark', D.HookEdit)
+
 function D.Hook()
+	D.HookEdit()
 	HookTableFunc(MiddleMap, 'ShowMap', D.ShowMap, { bAfterOrigin = true })
 	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.UpdateCurrentMap, { bAfterOrigin = true })
 	HookTableFunc(MiddleMap, 'OnEditChanged', D.OnEditChanged, { bAfterOrigin = true })
