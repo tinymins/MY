@@ -31,9 +31,12 @@ end
 
 local function GetSvrText()
 	local nFeeTime = X.GetTimeOfFee() - GetCurrentTime()
+	local szFeeTime = nFeeTime > 0
+		and _L('Fee left %s', X.FormatDuration(nFeeTime, 'CHINESE', { accuracyunit = GLOBAL.GAME_BRANCH == 'classic' and 'hour' or nil }))
+		or _L['Fee left unknown']
 	return X.GetServer() .. ' (' .. X.GetRealServer() .. ')'
 		.. g_tStrings.STR_CONNECT
-		.. (nFeeTime > 0 and X.FormatTimeCounter(nFeeTime, _L['Fee left %H:%mm:%ss']) or _L['Fee left unknown'])
+		.. szFeeTime
 end
 
 function PS.OnPanelActive(wnd)

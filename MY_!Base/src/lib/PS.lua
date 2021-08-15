@@ -599,13 +599,13 @@ function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
 end
 
-function X.OnFrameBreathe()
+function D.OnFrameBreathe()
 	if this.MAIN_WND and this.MAIN_WND.OnPanelBreathe then
 		X.Call(this.MAIN_WND.OnPanelBreathe, this.MAIN_WND)
 	end
 end
 
-function X.OnEvent(event)
+function D.OnEvent(event)
 	if event == 'UI_SCALED' then
 		X.ExecuteWithThis(this.MAIN_SCROLL, X.OnScrollBarPosChanged)
 		D.OnSizeChanged()

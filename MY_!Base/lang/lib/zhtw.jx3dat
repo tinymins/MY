@@ -143,6 +143,7 @@ return {
 	},
 
 	['Point left time: (%d+)h(%d+)m(%d+)s'] = '點卡剩餘時間為：(%d+)小時(%d+)分(%d+)秒',
+	['Month time left days: (%d+)d(%d+)h'] = '您的月卡剩餘總時間：(%d+)天(%d+)小時',
 	['Month time to: (%d+)y(%d+)m(%d+)d (%d+)h(%d+)m'] = '包月時間截止至：(%d+)/(%d+)/(%d+) (%d+):(%d+)',
 
 	['Your KGUI is not official, please fix client and try again.'] = '當前客戶端 KGUI 非官方最新發佈版，功能可能受損，請嘗試修複客戶端後再次嘗試確認是否仍然存在問題。',
