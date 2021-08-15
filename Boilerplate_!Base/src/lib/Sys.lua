@@ -1875,10 +1875,11 @@ else
 				dwPointEndTime = dwTime + tonumber(szHour) * 3600 + tonumber(szMinute) * 60 + tonumber(szSecond)
 			end
 			-- 您的月卡剩余总时间：49天19小时
-			local szDay, szHour = szMsg:match(_L['Point left days: (%d+)d(%d+)h'])
-			if szYear and szMonth and szDay and szHour and szMinute then
+			local szDay, szHour = szMsg:match(_L['Month time left days: (%d+)d(%d+)h'])
+			if szDay and szHour then
+				local dwTime = GetCurrentTime()
 				bInit = true
-				dwMonthEndTime = X.DateToTime(szYear, szMonth, szDay, szHour, szMinute, 0)
+				dwPointEndTime = dwTime + tonumber(szDay) * 3600 * 24 + tonumber(szHour) * 3600
 			end
 			-- 包月时间截止至：xxxx/xx/xx xx:xx
 			local szYear, szMonth, szDay, szHour, szMinute = szMsg:match(_L['Month time to: (%d+)y(%d+)m(%d+)d (%d+)h(%d+)m'])
