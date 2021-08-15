@@ -818,73 +818,135 @@ function X.RegisterAddonMenu(...)
 	X.RegisterTraceButtonAddonMenu(...)
 end
 
+-- Format `prime`:
+--   It's not particularly common for expressions of time.
+--   It's similar to degrees-minutes-seconds: instead of decimal degrees (38.897212°,-77.036519°) you write (38° 53′ 49.9632″, -77° 2′ 11.4678″).
+--   Both are derived from a sexagesimal counting system such as that devised in Ancient Babylon:
+--   the single prime represents the first sexagesimal division and the second the next, and so on.
+--   17th-century astronomers used a third division of 1/60th of a second.
+--   The advantage of using minute and second symbols for time is that it obviously expresses a duration rather than a time.
+--   From the time 01:00:00 to the time 02:34:56 is a duration of 1 hour, 34 minutes and 56 seconds (1h 34′ 56″)
+--   Prime markers start single and are multiplied for susbsequent appearances, so minutes use a single prime ′ and seconds use a double-prime ″.
+--   They are pronounced minutes and seconds respectively in the case of durations like this.
+--   Note that a prime ′ is not a straight-apostrophe ' or a printer's apostrophe ’, although straight-apostrophes are a reasonable approximation and printer's apostrophes do occur as well.
+
+local FORMAT_TIME_COUNT_PRESET = {
+	['CHINESE'] = {
+		year = { normal = '%d' .. g_tStrings.STR_YEAR, fixed = '%04d' .. g_tStrings.STR_YEAR, skipnull = true },
+		day = { normal = '%d' .. g_tStrings.STR_BUFF_H_TIME_D_SHORT, fixed = '%02d' .. g_tStrings.STR_BUFF_H_TIME_D_SHORT, skipnull = true },
+		hour = { normal = '%d' .. g_tStrings.STR_TIME_HOUR, fixed = '%02d' .. g_tStrings.STR_TIME_HOUR, skipnull = true },
+		minute = { normal = '%d' .. g_tStrings.STR_TIME_MINUTE, fixed = '%02d' .. g_tStrings.STR_TIME_MINUTE, skipnull = true },
+		second = { normal = '%d' .. g_tStrings.STR_TIME_SECOND, fixed = '%02d' .. g_tStrings.STR_TIME_SECOND, skipnull = true },
+	},
+	['PRIME'] = {
+		minute = { normal = '%d\'', fixed = '%02d\'' },
+		second = { normal = '%d"', fixed = '%02d"' },
+	},
+	['SYMBAL'] = {
+		hour = { normal = '%d', fixed = '%02d', delimiter = ':' },
+		minute = { normal = '%d', fixed = '%02d', delimiter = ':' },
+		second = { normal = '%d', fixed = '%02d' },
+	},
+}
+local FORMAT_TIME_UNIT_LIST = {
+	{ key = 'year' },
+	{ key = 'day', radix = 365 },
+	{ key = 'hour', radix = 24 },
+	{ key = 'minute', radix = 60 },
+	{ key = 'second', radix = 60 },
+}
+
 -- 格式化计时时间
--- (string) X.FormatTimeCounter(nTime, szFormat, nStyle)
--- szFormat  格式化字符串 可选项：
---   %Y 总年数
---   %D 总天数
---   %H 总小时
---   %M 总分钟
---   %S 总秒数
---   %d 天数
---   %h 小时数
---   %m 分钟数
---   %s 秒钟数
---   %dd 天数两位对齐
---   %hh 小时数两位对齐
---   %mm 分钟数两位对齐
---   %ss 秒钟数两位对齐
-function X.FormatTimeCounter(nTime, szFormat, nStyle)
-	local nSeconds = math.floor(nTime)
-	local nMinutes = math.floor(nSeconds / 60)
-	local nHours   = math.floor(nMinutes / 60)
-	local nDays    = math.floor(nHours / 24)
-	local nYears   = math.floor(nDays / 365)
-	local nDay     = nDays % 365
-	local nHour    = nHours % 24
-	local nMinute  = nMinutes % 60
-	local nSecond  = nSeconds % 60
-	if X.IsString(szFormat) then
-		szFormat = wstring.gsub(szFormat, '%Y', nYears)
-		szFormat = wstring.gsub(szFormat, '%D', nDays)
-		szFormat = wstring.gsub(szFormat, '%H', nHours)
-		szFormat = wstring.gsub(szFormat, '%M', nMinutes)
-		szFormat = wstring.gsub(szFormat, '%S', nSeconds)
-		szFormat = wstring.gsub(szFormat, '%dd', string.format('%02d', nDay   ))
-		szFormat = wstring.gsub(szFormat, '%hh', string.format('%02d', nHour  ))
-		szFormat = wstring.gsub(szFormat, '%mm', string.format('%02d', nMinute))
-		szFormat = wstring.gsub(szFormat, '%ss', string.format('%02d', nSecond))
-		szFormat = wstring.gsub(szFormat, '%d', nDay)
-		szFormat = wstring.gsub(szFormat, '%h', nHour)
-		szFormat = wstring.gsub(szFormat, '%m', nMinute)
-		szFormat = wstring.gsub(szFormat, '%s', nSecond)
-		return szFormat
+-- (string) X.FormatDuration(nTime, tUnitFmt, tControl)
+-- (string) X.FormatDuration(nTime, szPreset, tControl)
+-- tUnitFmt 时间各单位格式化字符串
+--   year   年数
+--   day    天数
+--   hour   小时数
+--   minute 分钟数
+--   second 秒钟数
+-- szPreset 预设方案：见 FORMAT_TIME_COUNT_PRESET
+-- tControl 格式化控制
+--   mode         格式化模式，支持 'normal', 'fixed', 'fixed-except-leading'
+--   maxunit      开始单位，最大只显示到该单位，可选：'year', 'day', 'hour', 'miute', 'second'，默认值：'year'。
+--   keepunit     零值也保留的单位位置，可选：'year', 'day', 'hour', 'miute', 'second'，默认值：'second'。
+--   accuracyunit 精度结束单位，精度低于该单位的数据将被省去，可选：'year', 'day', 'hour', 'miute', 'second'，默认值：'second'。
+function X.FormatDuration(nTime, tUnitFmt, tControl)
+	if X.IsString(tUnitFmt) then
+		tUnitFmt = FORMAT_TIME_COUNT_PRESET[tUnitFmt]
 	end
-	if szFormat == 1 then -- M'ss" / s"
-		if nMinutes > 0 then
-			return nMinutes .. '\'' .. string.format('%02d', nSecond) .. '"'
-		end
-		return nSeconds .. '"'
+	assert(X.IsTable(tUnitFmt))
+	-- 格式化模式
+	local mode = tControl and tControl.mode or 'normal'
+	-- 开始单位，最大只显示到该单位
+	local maxunit = tControl and tControl.maxunit or 'year'
+	local maxunitindex = lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == maxunit end)
+	if maxunitindex == -1 then
+		maxunitindex = 1
+		maxunit = FORMAT_TIME_UNIT_LIST[maxunitindex].key
 	end
-	if szFormat == 2 or not szFormat then -- H:mm:ss / M:ss / s
-		local y, d, h, m, s = 'y', 'd', 'h', 'm', 's'
-		if nStyle == 2 then
-			y, d, h, m, s = g_tStrings.STR_YEAR, g_tStrings.STR_BUFF_H_TIME_D_SHORT, g_tStrings.STR_TIME_HOUR, g_tStrings.STR_TIME_MINUTE, g_tStrings.STR_TIME_SECOND
-		end
-		if nYears > 0 then
-			return nYears .. y .. string.format('%02d', nDay) .. d .. string.format('%02d', nHour) .. h .. string.format('%02d', nMinute)  .. m .. string.format('%02d', nSecond) .. s
-		end
-		if nDays > 0 then
-			return nDays .. d .. string.format('%02d', nHour) .. h .. string.format('%02d', nMinute)  .. m .. string.format('%02d', nSecond) .. s
-		end
-		if nHours > 0 then
-			return nHours .. h .. string.format('%02d', nMinute)  .. m .. string.format('%02d', nSecond) .. s
-		end
-		if nMinutes > 0 then
-			return nMinutes .. m .. string.format('%02d', nSecond) .. s
-		end
-		return nSeconds .. s
+	-- 零值也保留的单位位置
+	local keepunit = tControl and tControl.keepunit or 'second'
+	local keepunitindex = lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == keepunit end)
+	if keepunitindex == -1 then
+		keepunitindex = #FORMAT_TIME_UNIT_LIST
+		keepunit = FORMAT_TIME_UNIT_LIST[keepunitindex].key
 	end
+	-- 精度结束单位，精度低于该单位的数据将被省去
+	local accuracy = tControl and tControl.accuracyunit or 'second'
+	local accuracyindex = lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == accuracy end)
+	if accuracyindex == -1 then
+		accuracyindex = #FORMAT_TIME_UNIT_LIST
+		accuracy = FORMAT_TIME_UNIT_LIST[accuracyindex].key
+	end
+	assert(maxunitindex <= keepunitindex)
+	assert(maxunitindex <= accuracyindex)
+	-- 计算完整各个单位数据
+	local aValue = {}
+	for i, unit in X.ipairs_r(FORMAT_TIME_UNIT_LIST) do
+		if i > 1 then
+			aValue[i] = nTime % unit.radix
+			nTime = math.floor(nTime / unit.radix)
+		else
+			aValue[i] = nTime
+		end
+	end
+	-- 合并超出开始单位或不存在的单位数据到下级单位中
+	for i, unit in ipairs(FORMAT_TIME_UNIT_LIST) do
+		if i < maxunitindex or not tUnitFmt[unit.key] then
+			local nextunit = FORMAT_TIME_UNIT_LIST[i + 1]
+			if nextunit then
+				aValue[i + 1] = aValue[i + 1] + aValue[i] * nextunit.radix
+				aValue[i] = 0
+			end
+		end
+	end
+	-- 合并超出精度单位的数据到上级单位中
+	for i, unit in X.ipairs_r(FORMAT_TIME_UNIT_LIST) do
+		if i > accuracyindex then
+			local prevunit = FORMAT_TIME_UNIT_LIST[i - 1]
+			if prevunit then
+				aValue[i - 1] = aValue[i - 1] + aValue[i] / unit.radix
+				aValue[i] = 0
+			end
+		end
+	end
+	-- 单位依次拼接
+	local szText, szSpliter = '', ''
+	for i, unit in ipairs(FORMAT_TIME_UNIT_LIST) do
+		local fmt = tUnitFmt[unit.key]
+		if X.IsString(fmt) then
+			fmt = { normal = fmt }
+		end
+		if i >= maxunitindex and i <= accuracyindex and fmt and (aValue[i] > 0 or not fmt.skipnull or i >= keepunitindex) then
+			local fmtstring = (mode == 'normal' or (mode == 'fixed-except-leading' and szText == ''))
+				and (fmt.normal)
+				or (fmt.fixed or fmt.normal)
+			szText = szText .. szSpliter .. fmtstring:format(math.ceil(aValue[i]))
+			szSpliter = fmt.delimiter or ''
+		end
+	end
+	return szText
 end
 
 -- 格式化时间
