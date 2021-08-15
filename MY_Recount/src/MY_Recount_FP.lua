@@ -304,13 +304,13 @@ local COLUMN_LIST = {
 							rec[13]
 								and 'Remain time %s, cancellable.'
 								or 'Remain time %s, uncancellable.',
-							X.FormatTimeCounter((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 2, 2)))
+							X.FormatDuration((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 'CHINESE')))
 					end
 					return GetFormatText(_L(
 						rec[13]
 							and 'Stacknum %d, remain time %s, cancellable.'
 							or 'Stacknum %d, remain time %s, uncancellable.',
-						rec[11], X.FormatTimeCounter((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 2, 2)))
+						rec[11], X.FormatDuration((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 'CHINESE')))
 				end
 			end
 			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then

@@ -568,7 +568,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 				fTextScale = fTextScale * 1.15
 				if not X.IsEmpty(szText) and not tData.bHideProgress then
 					if nSec then
-						szCountDown = X.FormatTimeCounter(math.min(nSec, 5999), 1)
+						szCountDown = X.FormatDuration(math.min(nSec, 5999), 'PRIME')
 					elseif fPer then
 						szCountDown = math.floor(fPer * 100) .. '%'
 					end

@@ -1175,7 +1175,7 @@ function D.SetBuffItemAction(h)
 		h:Lookup('Text_R'):SetText(_L['INFINITE'])
 	else
 		nSec = nSec / GLOBAL.GAME_FPS
-		h:Lookup('Text_R'):SetText(X.FormatTimeCounter(nSec, 1))
+		h:Lookup('Text_R'):SetText(X.FormatDuration(nSec, 'PRIME'))
 	end
 	h:Lookup('Image_RBg'):Show()
 	local box = h:Lookup('Box')

@@ -165,7 +165,7 @@ function D.OnFrameBreathe()
 					if nSec > 24 * 60 * 60 then
 						h:Lookup('Text_Time'):SetText('')
 					else
-						h:Lookup('Text_Time'):SetText(X.FormatTimeCounter(nSec, 1))
+						h:Lookup('Text_Time'):SetText(X.FormatDuration(nSec, 'PRIME'))
 					end
 					local nAlpha = h:Lookup('Animate_Update'):GetAlpha()
 					if nAlpha > 0 then

@@ -1081,7 +1081,7 @@ function D.OnItemMouseEnter()
 		end
 		table.insert(aText, '')
 		local nTime = X.GetDungeonRefreshTime(this.mapid) - GetCurrentTime()
-		table.insert(aText, _L('Refresh: %s', X.FormatTimeCounter(nTime, 2, 2)))
+		table.insert(aText, _L('Refresh: %s', X.FormatDuration(nTime, 'CHINESE')))
 		OutputTip(GetFormatText(table.concat(aText, '\n'), 162, 255, 255, 255), 400, { x, y, w, h })
 	elseif name == 'Handle_DungeonStatColumn' then
 		local x, y = this:GetAbsPos()

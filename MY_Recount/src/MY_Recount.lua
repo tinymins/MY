@@ -447,7 +447,7 @@ function D.GetHistoryMenu()
 			break
 		end
 		local t1 = {
-			szOption = file.bossname .. ' (' .. X.FormatTimeCounter(file.during, '%M:%ss') .. ')',
+			szOption = file.bossname .. ' (' .. X.FormatDuration(file.during, 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' }) .. ')',
 			rgb = (file.time == DataDisplay[DK.TIME_BEGIN] and {255, 255, 0}) or nil,
 			fnAction = function()
 				local data = MY_Recount_DS.Get(file.fullpath)
@@ -470,7 +470,7 @@ function D.GetHistoryMenu()
 			end,
 			fnMouseEnter = function()
 				local aXml = {}
-				table.insert(aXml, GetFormatText(file.bossname .. '(' .. X.FormatTimeCounter(file.during, '%M:%ss') .. ')\n', nil, 255, 255, 255))
+				table.insert(aXml, GetFormatText(file.bossname .. '(' .. X.FormatDuration(file.during, 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' }) .. ')\n', nil, 255, 255, 255))
 				table.insert(aXml, GetFormatText(X.FormatTime(file.time, '%yyyy/%MM/%dd %hh:%mm:%ss\n'), nil, 255, 255, 255))
 				if MY_Recount_DS.bRecEverything then
 					table.insert(aXml, GetFormatText('\n' .. _L['Hold ctrl click to review whole fight'], nil, 255, 255, 0))
@@ -576,7 +576,7 @@ function D.GetPublishMenu()
 			.. _L['Fight recount'] .. ' - '
 			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
 			.. ' ' .. ((DataDisplay[DK.BOSSNAME] and ' - ' .. DataDisplay[DK.BOSSNAME]) or '')
-			.. '(' .. X.FormatTimeCounter(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), '%M:%ss') .. ')',
+			.. '(' .. X.FormatDuration(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' }) .. ')',
 			{ parsers = { name = false } }
 		)
 		X.SendChat(nChannel, '------------------------')

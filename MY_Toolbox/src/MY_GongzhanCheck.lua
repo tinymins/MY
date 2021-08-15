@@ -108,7 +108,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 						Echo(nIndex, nCount * 2 + 1)
 						X.SendChat(nChannel, _L['------------------------------------'])
 						for _, r in ipairs(aGongZhan) do
-							X.SendChat(nChannel, _L('Detected [%s] has GongZhan buff for %s.', r.szName, X.FormatTimeCounter(r.nTime, nil, 2)))
+							X.SendChat(nChannel, _L('Detected [%s] has GongZhan buff for %s.', r.szName, X.FormatDuration(r.nTime, 'CHINESE')))
 						end
 						X.SendChat(nChannel, _L('Nearby GongZhan Total Count: %d.', #aGongZhan))
 						X.SendChat(nChannel, _L['------------------------------------'])

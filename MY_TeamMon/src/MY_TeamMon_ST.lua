@@ -27,7 +27,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 end
 --------------------------------------------------------------------------
 
-local SplitString, TrimString, FormatTimeCounter = X.SplitString, X.TrimString, X.FormatTimeCounter
+local SplitString, TrimString, FormatDuration = X.SplitString, X.TrimString, X.FormatDuration
 local FilterCustomText = MY_TeamMon.FilterCustomText
 
 local O = X.CreateUserSettingsModule('MY_TeamMon_ST', _L['Raid'], {
@@ -316,7 +316,7 @@ function ST:SetInfo(tTime, nIcon)
 	end
 	if tTime.nTime then
 		self.ui.time:SetText((tTime.nTime >= 1 or tTime.nTime < 0.1)
-			and FormatTimeCounter(tTime.nTime)
+			and FormatDuration(tTime.nTime, 'SYMBAL')
 			or ('%.1f'):format(tTime.nTime) .. 's')
 		self.ui:SetUserData(math.floor(tTime.nTime))
 	end

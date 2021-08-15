@@ -115,7 +115,7 @@ function D.OnFrameBreathe()
 				local box = h:Lookup('Box_Icon')
 				local nSec = X.GetEndTime(buff.nEndFrame)
 				if nSec < 60 then
-					box:SetOverText(1, X.FormatTimeCounter(math.min(nSec, 5999), 1))
+					box:SetOverText(1, X.FormatDuration(math.min(nSec, 5999), 'PRIME'))
 				else
 					box:SetOverText(1, '')
 				end
