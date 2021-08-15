@@ -938,7 +938,13 @@ function X.FormatDuration(nTime, tUnitFmt, tControl)
 		if X.IsString(fmt) then
 			fmt = { normal = fmt }
 		end
-		if i >= maxunitindex and i <= accuracyindex and fmt and (aValue[i] > 0 or not fmt.skipnull or i >= keepunitindex) then
+		if i >= maxunitindex and i <= accuracyindex -- 单位在最大最小允许显示之间
+		and fmt -- 并且单位自定义格式化数据存在
+		and (
+			aValue[i] > 0 --数据不为空
+			or (szText ~= '' and not fmt.skipnull) -- 或者数据为空但高位有值且该单位格式化数据要求不可省略
+			or i >= keepunitindex -- 单位位于零值保留单位之后
+		) then
 			local fmtstring = (mode == 'normal' or (mode == 'fixed-except-leading' and szText == ''))
 				and (fmt.normal)
 				or (fmt.fixed or fmt.normal)
