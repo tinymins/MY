@@ -880,7 +880,22 @@ function D.FrameBuffRefreshCall()
 		local aBuff, nCount, buff = X.GetBuffList(tar)
 		for i = 1, nCount do
 			buff = aBuff[i]
-			OnBuffUpdate(tar.dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
+			if buff then
+				OnBuffUpdate(tar.dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
+				--[[#DEBUG BEGIN]]
+			else
+				X.Debug('MY_CataclysmMain',
+					'FrameBuffRefreshCall GetBuff index nil value '
+						.. X.EncodeLUAData({
+							dwID = aList[i],
+							tar = tostring(tar),
+							nCount = nCount,
+							nIndex = i,
+							buff = buff,
+						}),
+					X.DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
+			end
 		end
 	end
 	i = i + 1
