@@ -24,6 +24,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^8.0.0') then
 	return
 end
+X.RegisterRestriction('MY_YunMacro', { ['*'] = false, classic = true })
 --------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule('MY_YunMacro', _L['General'], {
@@ -173,14 +174,16 @@ X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_YunMacro', function()
 end)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
-	nX = nX + ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 'auto',
-		text = _L['Show yun macro buttons on macro panel.'],
-		checked = MY_YunMacro.bEnable,
-		oncheck = function(bChecked)
-			MY_YunMacro.bEnable = bChecked
-		end,
-	}):Width() + 5
+	if not X.IsRestricted('MY_YunMacro') then
+		nX = nX + ui:Append('WndCheckBox', {
+			x = nX, y = nY, w = 'auto',
+			text = _L['Show yun macro buttons on macro panel.'],
+			checked = MY_YunMacro.bEnable,
+			oncheck = function(bChecked)
+				MY_YunMacro.bEnable = bChecked
+			end,
+		}):Width() + 5
+	end
 	return nX, nY
 end
 
