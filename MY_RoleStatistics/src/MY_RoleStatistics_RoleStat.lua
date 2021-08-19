@@ -490,6 +490,7 @@ local COLUMN_LIST = lodash.filter({
 	{
 		-- √˚Ω£±“
 		id = 'arena_award',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Arena award'],
 		nMinWidth = 60,
 		GetFormatText = GeneCommonFormatText('arena_award'),
@@ -498,6 +499,7 @@ local COLUMN_LIST = lodash.filter({
 	{
 		-- √˚Ω£±“÷‹”‡
 		id = 'arena_award_remain',
+		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Arena award remain'],
 		szShortTitle = _L['Aren awa remain'],
 		nMinWidth = 60,
