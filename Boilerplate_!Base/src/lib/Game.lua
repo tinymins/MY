@@ -2692,7 +2692,7 @@ local function GeneObjectBuffCache(KObject, nTarIndex)
 			if not tBuff or not pBuff then
 				tBuff = {}
 				pBuff = setmetatable({}, {
-					__index = BUFF_CACHE[nIndex],
+					__index = tBuff,
 					__newindex = Reject,
 					__metatable = { const_table = tBuff },
 				})
