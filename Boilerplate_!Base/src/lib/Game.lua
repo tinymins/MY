@@ -2761,9 +2761,7 @@ function X.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 				end
 			end
 		else
-			local aBuff, nCount, buff = X.GetBuffList(KObject)
-			for i = 1, nCount do
-				buff = aBuff[i]
+			for _, buff in X.ipairs_c(X.GetBuffList(KObject)) do
 				if (tBuff[buff.dwID] == buff.nLevel or tBuff[buff.dwID] == 0) and buff.dwSkillSrcID == dwSkillSrcID then
 					return buff
 				end

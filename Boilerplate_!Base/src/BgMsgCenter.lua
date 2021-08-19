@@ -414,9 +414,7 @@ end
 X.RegisterBgMsg(X.NSFormatString('{$NS}_OUTPUT_BUFF'), function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	local aRes = {}
 	local me = GetClientPlayer()
-	local aBuff, nCount, buff = X.GetBuffList(me)
-	for i = 1, nCount do
-		buff = aBuff[i]
+	for _, buff in X.ipairs_c(X.GetBuffList(me)) do
 		table.insert(aRes, X.CloneBuff(buff, {}))
 	end
 	Output(aRes)
