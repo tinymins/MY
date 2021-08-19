@@ -2659,62 +2659,70 @@ function X.UseItem(dwTabType, dwIndex, nBookID)
 end
 
 do
--- 下标为 nIndex 的 BUFF 缓存
+-- “气劲下标” 到 “气劲” 的映射缓存
 local BUFF_CACHE = setmetatable({}, { __mode = 'v' })
 local BUFF_PROXY = setmetatable({}, { __mode = 'v' })
--- 下标为 目标对象 的 BUFF列表 缓存
+-- “目标对象” 到 “气劲列表” 的映射缓存
 local BUFF_LIST_CACHE = setmetatable({}, { __mode = 'v' })
 local BUFF_LIST_PROXY = setmetatable({}, { __mode = 'v' })
--- 获取BUFF缓存标识
-local function GetBuffKey(dwID, nLevel, dwSkillSrcID)
-	return dwSkillSrcID .. ':' .. dwID .. ',' .. nLevel
-end
 -- 缓存保护
 local function Reject()
 	assert(false, X.NSFormatString('Modify buff list from {$NS}.GetBuffList is forbidden!'))
 end
--- 缓存检查
-local function GeneObjectBuffCache(KObject, nIndex)
-	-- 检查对象缓存
-	local aCache, aProxy = BUFF_LIST_CACHE[KObject], BUFF_LIST_PROXY[KObject]
-	if not aCache or not aProxy then
-		aCache = {}
-		aProxy = setmetatable({}, { __index = aCache, __newindex = Reject })
-		BUFF_LIST_CACHE[KObject] = aCache
-		BUFF_LIST_PROXY[KObject] = aProxy
+-- 缓存刷新
+local function GeneObjectBuffCache(KObject, nTarIndex)
+	-- 气劲列表原数据与代理表创建
+	local aList, pList = BUFF_LIST_CACHE[KObject], BUFF_LIST_PROXY[KObject]
+	if not aList or not pList then
+		aList = {}
+		pList = setmetatable({}, {
+			__index = aList,
+			__newindex = Reject,
+			__metatable = { const_table = aList },
+		})
+		BUFF_LIST_CACHE[KObject] = aList
+		BUFF_LIST_PROXY[KObject] = pList
 	end
-	-- 检查BUFF缓存
-	local nCount, raw = 0, nil
+	-- 刷新气劲列表缓存
+	local nCount, tBuff, pBuff = 0, nil, nil
 	for i = 1, KObject.GetBuffCount() or 0 do
 		local dwID, nLevel, bCanCancel, nEndFrame, nIndex, nStackNum, dwSkillSrcID, bValid = KObject.GetBuff(i - 1)
 		if dwID then
-			if not BUFF_CACHE[nIndex] or not BUFF_PROXY[nIndex] then
-				BUFF_CACHE[nIndex] = {}
-				BUFF_PROXY[nIndex] = setmetatable({}, { __index = BUFF_CACHE[nIndex], __newindex = Reject })
+			tBuff, pBuff = BUFF_CACHE[nIndex], BUFF_PROXY[nIndex]
+			if not tBuff or not pBuff then
+				tBuff = {}
+				pBuff = setmetatable({}, {
+					__index = BUFF_CACHE[nIndex],
+					__newindex = Reject,
+					__metatable = { const_table = tBuff },
+				})
+				BUFF_CACHE[nIndex] = tBuff
+				BUFF_PROXY[nIndex] = pBuff
 			end
-			nCount, raw = nCount + 1, BUFF_CACHE[nIndex]
-			raw.szKey        = dwSkillSrcID .. ':' .. dwID .. ',' .. nLevel
-			raw.dwID         = dwID
-			raw.nLevel       = nLevel
-			raw.bCanCancel   = bCanCancel
-			raw.nEndFrame    = nEndFrame
-			raw.nIndex       = nIndex
-			raw.nStackNum    = nStackNum
-			raw.dwSkillSrcID = dwSkillSrcID
-			raw.bValid       = bValid
-			raw.szName, raw.nIcon = X.GetBuffName(dwID, nLevel)
-			aCache[nCount] = BUFF_PROXY[nIndex]
+			nCount = nCount + 1
+			tBuff.szKey        = dwSkillSrcID .. ':' .. dwID .. ',' .. nLevel
+			tBuff.dwID         = dwID
+			tBuff.nLevel       = nLevel
+			tBuff.bCanCancel   = bCanCancel
+			tBuff.nEndFrame    = nEndFrame
+			tBuff.nIndex       = nIndex
+			tBuff.nStackNum    = nStackNum
+			tBuff.dwSkillSrcID = dwSkillSrcID
+			tBuff.bValid       = bValid
+			tBuff.szName, tBuff.nIcon = X.GetBuffName(dwID, nLevel)
+			aList[nCount] = BUFF_PROXY[nIndex]
 		end
 	end
-	-- 删除对象过期BUFF缓存
-	for i = nCount + 1, aCache.nCount or 0 do
-		aCache[i] = nil
+	-- 删除对象过期气劲缓存
+	for i = nCount + 1, aList.nCount or 0 do
+		aList[i] = nil
 	end
-	aCache.nCount = nCount
-	if nIndex then
-		return BUFF_PROXY[nIndex]
+	aList.nCount = nCount
+	-- 如果有目标气劲下标，直接返回指定气劲
+	if nTarIndex then
+		return BUFF_PROXY[nTarIndex]
 	end
-	return aProxy, nCount
+	return pList, nCount
 end
 
 -- 获取对象的buff列表和数量
