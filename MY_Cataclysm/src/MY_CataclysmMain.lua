@@ -810,12 +810,11 @@ function D.OnEvent(szEvent)
 			if not tar then
 				return
 			end
-			local aList, nCount, buff = X.GetBuffList(tar)
-			if nCount == 0 then
+			local aList = X.GetBuffList(tar)
+			if X.count_c(aList) == 0 then
 				return X.DelayCall(update, 75)
 			end
-			for i = 1, nCount do
-				buff = aList[i]
+			for _, buff in X.ipairs_c(aList) do
 				OnBuffUpdate(dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
 			end
 		end
@@ -829,9 +828,7 @@ function D.OnEvent(szEvent)
 		for _, dwID in ipairs(team.GetTeamMemberList()) do
 			local tar = GetPlayer(dwID)
 			if tar then
-				local aBuff, nCount, buff = X.GetBuffList(tar)
-				for i = 1, nCount do
-					buff = aBuff[i]
+				for _, buff in X.ipairs_c(X.GetBuffList(tar)) do
 					OnBuffUpdate(dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
 				end
 			end
@@ -877,25 +874,8 @@ function D.FrameBuffRefreshCall()
 	end
 	local tar = GetPlayer(aList[i])
 	if tar then
-		local aBuff, nCount, buff = X.GetBuffList(tar)
-		for i = 1, nCount do
-			buff = aBuff[i]
-			if buff then
-				OnBuffUpdate(tar.dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
-				--[[#DEBUG BEGIN]]
-			else
-				X.Debug('MY_CataclysmMain',
-					'FrameBuffRefreshCall GetBuff index nil value '
-						.. X.EncodeLUAData({
-							dwID = aList[i],
-							tar = tostring(tar),
-							nCount = nCount,
-							nIndex = i,
-							buff = buff,
-						}),
-					X.DEBUG_LEVEL.LOG)
-				--[[#DEBUG END]]
-			end
+		for _, buff in X.ipairs_c(X.GetBuffList(tar)) do
+			OnBuffUpdate(tar.dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
 		end
 	end
 	i = i + 1

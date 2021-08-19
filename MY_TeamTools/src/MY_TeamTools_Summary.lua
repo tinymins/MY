@@ -771,9 +771,8 @@ function D.GetTeam(page)
 		end
 		if KPlayer then
 			-- Ð¡³ÔºÍbuff
-			local aBuff, nCount, buff, nType = X.GetBuffList(KPlayer)
-			for i = 1, nCount do
-				buff = aBuff[i]
+			local nType
+			for _, buff in X.ipairs_c(X.GetBuffList(KPlayer)) do
 				nType = GetBuffInfo(buff.dwID, buff.nLevel, {}).nDetachType or 0
 				if RT_FOOD_TYPE[nType] then
 					table.insert(aInfo.tFood, buff)

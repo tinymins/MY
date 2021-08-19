@@ -90,9 +90,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 								X.SetTarget(TARGET.PLAYER, tar.dwID)
 							else
 								-- 检测是否有共战
-								local aBuff, nBuffCount, buff = X.GetBuffList(tar)
-								for i = 1, nBuffCount do
-									buff = aBuff[i]
+								for _, buff in X.ipairs_c(X.GetBuffList(tar)) do
 									if (not buff.bCanCancel) and string.find(Table_GetBuffName(buff.dwID, buff.nLevel), _L['GongZhan']) ~= nil then
 										local info = Table_GetBuff(buff.dwID, buff.nLevel)
 										if info and info.bShow ~= 0 then

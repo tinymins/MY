@@ -178,9 +178,7 @@ function D.OnWarningDebuffChange()
 				return
 			end
 			local t, t2 = {}, {}
-			local aBuff, nCount = X.GetBuffList(me)
-			for i = 1, nCount do
-				local buff = aBuff[i]
+			for _, buff in X.ipairs_c(X.GetBuffList(me)) do
 				if not buff.bCanCancel and not t2[buff.dwID] then
 					local info = GetBuffInfo(buff.dwID, buff.nLevel, {})
 					if info and info.nDetachType > 2 then

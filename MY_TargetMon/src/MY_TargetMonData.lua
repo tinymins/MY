@@ -640,7 +640,7 @@ end
 
 local function OnBreathe()
 	-- 更新各目标BUFF数据
-	local nLogicFrame = GetLogicFrameCount()
+	local nLogicFrame, info = GetLogicFrameCount()
 	for _, eType in ipairs(D.GetTargetTypeList('BUFF')) do
 		local KObject = X.GetObject(D.GetTarget(eType, 'BUFF'))
 		if KObject then
@@ -650,9 +650,7 @@ local function OnBreathe()
 				BUFF_CACHE[KObject.dwID] = tCache
 			end
 			-- 当前身上的buff
-			local aBuff, nCount, buff, info = X.GetBuffList(KObject)
-			for i = 1, nCount do -- 缓存时必须复制buff表 否则buff过期后表会被回收导致显示错误的BUFF
-				buff = aBuff[i]
+			for _, buff in X.ipairs_c(X.GetBuffList(KObject)) do -- 缓存时必须复制buff表 否则buff过期后表会被回收导致显示错误的BUFF
 				-- 正向索引用于监控
 				if not tCache[buff.dwID] then
 					tCache[buff.dwID] = {}
