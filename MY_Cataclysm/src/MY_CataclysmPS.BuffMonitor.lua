@@ -78,80 +78,79 @@ local function OpenBuffRuleEditor(rec)
 	end)
 end
 
-function PS.IsRestricted()
-	return X.IsRestricted('MY_Cataclysm_BuffMonitor')
-end
-
 function PS.OnPanelActive(frame)
 	local ui = UI(frame)
 	local nPaddingX, nPaddingY = 10, 10
 	local x, y = nPaddingX, nPaddingY
 	local w, h = ui:Size()
+	local bRestricted = X.IsRestricted('MY_Cataclysm_BuffMonitor')
 
-	x = nPaddingX
-	x = x + ui:Append('WndButton', {
-		x = x, y = y, w = 100,
-		buttonstyle = 'FLAT',
-		text = _L['Add'],
-		onclick = function()
-			local rec = {}
-			table.insert(CFG.aBuffList, rec)
-			l_list:ListBox('insert', { id = rec, text = MY_Cataclysm.EncodeBuffRule(rec), data = rec })
-			OpenBuffRuleEditor(rec)
-		end,
-	}):AutoHeight():Width() + 5
-	x = x + ui:Append('WndButton', {
-		x = x, y = y, w = 100,
-		buttonstyle = 'FLAT',
-		text = _L['Edit'],
-		onclick = function()
-			local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
-				w = 350, h = 550,
-				text = _L['Edit buff'],
-				close = true, anchor = 'CENTER',
-			})
-			local x, y = 20, 60
-			local edit = ui:Append('WndEditBox',{
-				x = x, y = y, w = 310, h = 440,
-				limit = -1, multiline = true,
-				text = EncodeBuffRuleList(CFG.aBuffList),
-			})
-			y = y + edit:Height() + 5
-
-			ui:Append('WndButton', {
-				x = x, y = y, w = 310,
-				text = _L['Sure'],
-				buttonstyle = 'FLAT',
-				onclick = function()
-					CFG.aBuffList = DecodeBuffRuleList(edit:Text())
-					MY_CataclysmMain.UpdateBuffListCache()
-					ui:Remove()
-					X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
-					X.SwitchTab('MY_Cataclysm_BuffMonitor', true)
-				end,
-			})
-		end,
-	}):AutoHeight():Width() + 5
-	x = nPaddingX
-	y = y + 30
-
-	l_list = ui:Append('WndListBox', {
-		x = x, y = y,
-		w = w - 240 - 20, h = h - y - 5,
-		listbox = {{
-			'onlclick',
-			function(id, szText, data, bSelected)
-				OpenBuffRuleEditor(data)
-				return false
+	if not bRestricted then
+		x = nPaddingX
+		x = x + ui:Append('WndButton', {
+			x = x, y = y, w = 100,
+			buttonstyle = 'FLAT',
+			text = _L['Add'],
+			onclick = function()
+				local rec = {}
+				table.insert(CFG.aBuffList, rec)
+				l_list:ListBox('insert', { id = rec, text = MY_Cataclysm.EncodeBuffRule(rec), data = rec })
+				OpenBuffRuleEditor(rec)
 			end,
-		}},
-	})
-	for _, rec in ipairs(CFG.aBuffList) do
-		l_list:ListBox('insert', { id = rec, text = MY_Cataclysm.EncodeBuffRule(rec), data = rec })
-	end
-	y = h
+		}):AutoHeight():Width() + 5
+		x = x + ui:Append('WndButton', {
+			x = x, y = y, w = 100,
+			buttonstyle = 'FLAT',
+			text = _L['Edit'],
+			onclick = function()
+				local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
+					w = 350, h = 550,
+					text = _L['Edit buff'],
+					close = true, anchor = 'CENTER',
+				})
+				local x, y = 20, 60
+				local edit = ui:Append('WndEditBox',{
+					x = x, y = y, w = 310, h = 440,
+					limit = -1, multiline = true,
+					text = EncodeBuffRuleList(CFG.aBuffList),
+				})
+				y = y + edit:Height() + 5
 
-	nPaddingX = w - 240
+				ui:Append('WndButton', {
+					x = x, y = y, w = 310,
+					text = _L['Sure'],
+					buttonstyle = 'FLAT',
+					onclick = function()
+						CFG.aBuffList = DecodeBuffRuleList(edit:Text())
+						MY_CataclysmMain.UpdateBuffListCache()
+						ui:Remove()
+						X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
+						X.SwitchTab('MY_Cataclysm_BuffMonitor', true)
+					end,
+				})
+			end,
+		}):AutoHeight():Width() + 5
+		x = nPaddingX
+		y = y + 30
+
+		l_list = ui:Append('WndListBox', {
+			x = x, y = y,
+			w = w - 240 - 20, h = h - y - 5,
+			listbox = {{
+				'onlclick',
+				function(id, szText, data, bSelected)
+					OpenBuffRuleEditor(data)
+					return false
+				end,
+			}},
+		})
+		for _, rec in ipairs(CFG.aBuffList) do
+			l_list:ListBox('insert', { id = rec, text = MY_Cataclysm.EncodeBuffRule(rec), data = rec })
+		end
+		y = h
+	end
+
+	nPaddingX = X.IIf(bRestricted, 30, w - 240)
 	x = nPaddingX
 	y = nPaddingY + 25
 	x = x + ui:Append('WndCheckBox', {
@@ -179,9 +178,9 @@ function PS.OnPanelActive(frame)
 
 	x = nPaddingX
 	y = y + 30
-	x = x + ui:Append('Text', { x = x, y = y, text = _L['Max count']}):AutoWidth():Width() + 5
+	x = x + ui:Append('Text', { x = x, y = y, h = 25, text = _L['Max count']}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndTrackbar', {
-		x = x, y = y + 3, rw = 80, text = '',
+		x = x, y = y, h = 25, rw = 80, text = '',
 		range = {0, 10},
 		value = CFG.nMaxShowBuff,
 		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
@@ -261,19 +260,21 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Width() + 5
 	y = y + 30
 
-	x = nPaddingX
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y,
-		text = _L['Enable MY_TeamMon data'],
-		checked = CFG.bBuffDataTeamMon,
-		oncheck = function(bCheck)
-			CFG.bBuffDataTeamMon = bCheck
-			MY_CataclysmMain.UpdateBuffListCache()
-			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
-		end,
-		autoenable = function() return MY_Resource and true end,
-	}):AutoWidth():Width() + 5
-	y = y + 30
+	if not bRestricted then
+		x = nPaddingX
+		x = x + ui:Append('WndCheckBox', {
+			x = x, y = y,
+			text = _L['Enable MY_TeamMon data'],
+			checked = CFG.bBuffDataTeamMon,
+			oncheck = function(bCheck)
+				CFG.bBuffDataTeamMon = bCheck
+				MY_CataclysmMain.UpdateBuffListCache()
+				X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
+			end,
+			autoenable = function() return MY_Resource and true end,
+		}):AutoWidth():Width() + 5
+		y = y + 30
+	end
 end
 function PS.OnPanelDeactive()
 	l_list = nil
