@@ -87,7 +87,7 @@ function D.UpdateBuffListCache()
 	if CFG.bBuffDataTeamMon and CTM_BUFF_TEAMMON then
 		InsertBuffListCache(CTM_BUFF_TEAMMON, _L['From MY_TeamMon data'])
 	end
-	if CFG.aBuffList then
+	if CFG.aBuffList and not X.IsRestricted('MY_Cataclysm_BuffMonitor') then
 		InsertBuffListCache(CFG.aBuffList, _L['From custom data'])
 	end
 	if CFG.bBuffPushToOfficial then
@@ -126,7 +126,8 @@ local function UpdateTeamMonData()
 		D.UpdateBuffListCache()
 	end
 end
-X.RegisterEvent('LOADING_ENDING', 'MY_CataclysmMain', UpdateTeamMonData)
+-- X.RegisterEvent('LOADING_ENDING', 'MY_CataclysmMain', UpdateTeamMonData)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CataclysmMain', UpdateTeamMonData)
 local function onTeamMonUpdate()
 	if arg0 and not arg0['BUFF'] and not arg0['DEBUFF'] then
 		return

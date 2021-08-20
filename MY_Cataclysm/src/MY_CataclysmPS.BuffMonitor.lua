@@ -24,6 +24,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^9.0.0') then
 	return
 end
+X.RegisterRestriction('MY_Cataclysm_BuffMonitor', { ['*'] = false, classic = true })
 --------------------------------------------------------------------------
 
 local D = {
@@ -75,6 +76,10 @@ local function OpenBuffRuleEditor(rec)
 		CFG.aBuffList = CFG.aBuffList
 		X.SwitchTab('MY_Cataclysm_BuffMonitor', true)
 	end)
+end
+
+function PS.IsRestricted()
+	return X.IsRestricted('MY_Cataclysm_BuffMonitor')
 end
 
 function PS.OnPanelActive(frame)
