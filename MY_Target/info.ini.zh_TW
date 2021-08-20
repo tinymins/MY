@@ -1,6 +1,6 @@
 [MY_Target]
 name=目標輔助
-desc=顯示自身和目標的方位、連接線等信息。
+desc=顯示自身和目標的方位、連接線等信息
 package=MY
 dependence=MY_!Base
 version=1.0

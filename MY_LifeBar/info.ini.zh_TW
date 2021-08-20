@@ -1,6 +1,6 @@
 [MY_LifeBar]
 name=頭頂血條
-desc=頭頂血條增強
+desc=顯示更多信息的頭頂血條增強功能
 version=1.0
 default=1
 dependence=MY_!Base

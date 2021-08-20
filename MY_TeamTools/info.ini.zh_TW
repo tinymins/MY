@@ -1,6 +1,6 @@
 [MY_TeamTools]
 name=團隊工具
-desc=組隊優化，隊友屬性，重傷記錄，小吃小藥附魔檢查，團隊評分。
+desc=組隊優化，隊友屬性，重傷記錄，小吃小藥附魔檢查，團隊評分
 package=MY
 version=1.0
 default=1

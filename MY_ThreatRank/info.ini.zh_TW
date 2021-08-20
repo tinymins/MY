@@ -1,6 +1,6 @@
 [MY_ThreatRank]
 name=仇恨列表
-desc=(感謝菊花) 漂亮，更準確的仇恨列表。
+desc=漂亮，更準確的仇恨列表
 package=MY
 dependence=MY_!Base
 version=1.0

@@ -1,6 +1,6 @@
 [MY_TeamMon]
 name=團隊監控
-desc=秘境團隊監控，配合團隊面板使用。
+desc=秘境團隊監控，配合團隊面板使用
 package=MY
 version=1.0
 default=1

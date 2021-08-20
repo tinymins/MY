@@ -1,6 +1,6 @@
 [MY_Cataclysm]
 name=團隊面板
-desc=團隊框架，治療以及指揮首選的團隊面板。
+desc=團隊框架，更好用的團隊面板
 package=MY
 version=1.0
 default=1

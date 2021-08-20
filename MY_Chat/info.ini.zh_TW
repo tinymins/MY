@@ -1,6 +1,6 @@
 [MY_Chat]
 name=聊天輔助
-desc=關鍵字監控、複製、過濾、馬賽克、頻道切換、喊話輔助、隊伍泡泡
+desc=聊天切換複製過濾打碼監控喊話以及隊伍泡泡
 default=1
 version=1.0
 dependence=MY_!Base

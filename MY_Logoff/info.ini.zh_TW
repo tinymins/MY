@@ -1,6 +1,6 @@
 [MY_Logoff]
 name=快速登出
-desc=快速登出游戲
+desc=提供快速登出、定時登出游戲的功能
 default=1
 version=1.0
 dependence=MY_!Base

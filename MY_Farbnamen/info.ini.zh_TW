@@ -1,6 +1,6 @@
 [MY_Farbnamen]
-name=職業染色
-desc=聊天欄玩家職業染色和基本信息顯示
+name=門派染色
+desc=聊天欄玩家門派染色和基本信息顯示
 default=1
 version=1.0
 dependence=MY_!Base

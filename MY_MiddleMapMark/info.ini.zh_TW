@@ -1,6 +1,6 @@
 [MY_MiddleMapMark]
 name=地圖搜索
-desc=記錄場景NPC和Doodad並提供日後搜索
+desc=記錄場景角色和交互物件供日後搜索
 default=1
 version=1.0
 dependence=MY_!Base

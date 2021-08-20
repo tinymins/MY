@@ -1,6 +1,6 @@
 [MY_Toolbox]
 name=常用工具
-desc=各種小功能
+desc=各種易用的游戲輔助小功能集合
 default=1
 version=1.0
 dependence=MY_!Base
