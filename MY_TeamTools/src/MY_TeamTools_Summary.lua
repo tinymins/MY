@@ -615,9 +615,11 @@ function D.GetEquipCache(page, KPlayer)
 		local item = KPlayer.GetItem(dwBox, dwX)
 		if item then
 			if RT_EQUIP_SPECIAL[equip] then
-				if equip == 'PENDANT' then
+				if item.dwSkillID ~= 0 then
+					table.insert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
+				elseif equip == 'PENDANT' then
 					local desc = Table_GetItemDesc(item.nUiId)
-					if desc and (desc:find(_L['use'] .. g_tStrings.STR_COLON) or desc:find(_L['Use:']) or desc:find('15' .. g_tStrings.STR_TIME_SECOND)) then
+					if desc and (desc:find(_L['Use:']) or desc:find(_L['Use: ']) or desc:find('15 seconds')) then
 						table.insert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
 					end
 				-- elseif item.nQuality == 5 then -- ³ÈÉ«×°±¸

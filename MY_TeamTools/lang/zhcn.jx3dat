@@ -54,8 +54,10 @@ return {
 	['?'] = '？',
 	[' '] = '　',
 	['%s\'s Team'] = '%s的团队',
-	['Use:'] = '使用:', -- 匹配特效腰椎 缺少item.dwSkillID
-	['use'] = '使用',
+	-- 匹配特效腰坠，缺少 item.dwSkillID
+	['Use:'] = '使用:',
+	['Use: '] = '使用：',
+	['15 seconds'] = '15秒',
 	['Team strength(%d/%d)'] = '团队实力(%d/%d)',
 	-- MY_TeamTools_Achievement
 	['MY_TeamTools_Achievement'] = '成就状态',
