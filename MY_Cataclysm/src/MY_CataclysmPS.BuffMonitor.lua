@@ -127,7 +127,7 @@ function PS.OnPanelActive(frame)
 					MY_CataclysmMain.UpdateBuffListCache()
 					ui:Remove()
 					X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
-					X.SwitchTab('MY_Cataclysm_BuffSettings', true)
+					X.SwitchTab('MY_Cataclysm_BuffMonitor', true)
 				end,
 			})
 		end,
