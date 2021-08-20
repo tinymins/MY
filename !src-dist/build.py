@@ -111,6 +111,8 @@ def __get_version_info(diff_ver):
 			version = re.sub(r'(?is)^\w+\|release:\s+', '', commit).strip()
 			version_message = re.sub(r'(?is)^\w+\|', '', commit).strip()
 			version_hash = re.sub(r'(?is)\|.+$', '', commit).strip()
+			if semver.compare(version, current_version) == 0:
+				continue
 			if diff_ver:
 				if diff_ver == version and semver.compare(version, '0.0.0') == 1:
 					max_version = version
