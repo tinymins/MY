@@ -121,26 +121,28 @@ end)
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
-	-- 名剑大会自动恢复队伍信息
-	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 'auto',
-		text = _L['Auto restore team info in arena'],
-		checked = MY_ArenaHelper.bRestoreAuthorityInfo,
-		oncheck = function(bChecked)
-			MY_ArenaHelper.bRestoreAuthorityInfo = bChecked
-		end,
-	})
-	nY = nY + nLH
+	if GLOBAL.GAME_BRANCH ~= 'classic' then
+		-- 名剑大会自动恢复队伍信息
+		ui:Append('WndCheckBox', {
+			x = nX, y = nY, w = 'auto',
+			text = _L['Auto restore team info in arena'],
+			checked = MY_ArenaHelper.bRestoreAuthorityInfo,
+			oncheck = function(bChecked)
+				MY_ArenaHelper.bRestoreAuthorityInfo = bChecked
+			end,
+		})
+		nY = nY + nLH
 
-	-- 名剑大会战场自动取消屏蔽
-	nX = nX + ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 'auto',
-		text = _L['Auto cancel hide player in arena'],
-		checked = MY_ArenaHelper.bAutoShowModel,
-		oncheck = function(bChecked)
-			MY_ArenaHelper.bAutoShowModel = bChecked
-		end,
-	}):Width() + 5
+		-- 名剑大会战场自动取消屏蔽
+		nX = nX + ui:Append('WndCheckBox', {
+			x = nX, y = nY, w = 'auto',
+			text = _L['Auto cancel hide player in arena'],
+			checked = MY_ArenaHelper.bAutoShowModel,
+			oncheck = function(bChecked)
+				MY_ArenaHelper.bAutoShowModel = bChecked
+			end,
+		}):Width() + 5
+	end
 
 	-- 名剑大会战场自动取消屏蔽
 	nX = nX + ui:Append('WndCheckBox', {
