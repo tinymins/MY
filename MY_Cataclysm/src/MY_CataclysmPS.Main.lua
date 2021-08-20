@@ -145,15 +145,17 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	nX = nX + ui:Append('WndCheckBox', {
-		x = nX, y = nY, text = _L['ZuiWu Effect'],
-		checked = CFG.bShowEffect,
-		oncheck = function(bCheck)
-			CFG.bShowEffect = bCheck
-		end,
-		tip = _L['Show effect when teammate get ZuiWu, only your ZuiWu will be showen while you\'re BuTianJue.'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-	}):AutoWidth():Width() + 5
+	if GLOBAL.GAME_BRANCH ~= 'classic' then
+		nX = nX + ui:Append('WndCheckBox', {
+			x = nX, y = nY, text = _L['ZuiWu Effect'],
+			checked = CFG.bShowEffect,
+			oncheck = function(bCheck)
+				CFG.bShowEffect = bCheck
+			end,
+			tip = _L['Show effect when teammate get ZuiWu, only your ZuiWu will be showen while you\'re BuTianJue.'],
+			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		}):AutoWidth():Width() + 5
+	end
 
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, text = _L['Show central party member tag'],
