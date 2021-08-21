@@ -604,7 +604,7 @@ function D.OnItemRButtonClick()
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
 			if X.IsLeader() or X.IsDebugClient(true) then
-				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TM_SHARE', {MY_TMUI_SELECT_TYPE, t.dwMapID, t})
+				MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TM_SHARE', {MY_TMUI_SELECT_TYPE, t.dwMapID, t})
 				X.Topmsg(g_tStrings.STR_MAIL_SUCCEED)
 			else
 				return X.Alert(_L['You are not team leader.'])

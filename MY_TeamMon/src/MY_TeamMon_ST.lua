@@ -200,7 +200,7 @@ local function SetSTAction(ui, nLeft, nPer)
 		if ui.bTalk and me.IsInParty() then
 			if not ui.szTalk or ui.szTalk ~= math.floor(nLeft) then
 				ui.szTalk = math.floor(nLeft)
-				X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('[%s] remaining %ds.', obj:GetName(), math.floor(nLeft)))
+				MY_TeamMon.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('[%s] remaining %ds.', obj:GetName(), math.floor(nLeft)))
 			end
 		end
 	else

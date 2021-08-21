@@ -31,6 +31,10 @@ local MY_TM_REMOTE_DATA_ROOT = MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
 
 local PS = {}
 
+function PS.IsRestricted()
+	return X.IsRestricted('MY_TeamMon')
+end
+
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local nPaddingX, nPaddingY = 20, 20

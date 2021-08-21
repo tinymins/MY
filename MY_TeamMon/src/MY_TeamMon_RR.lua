@@ -557,7 +557,7 @@ function D.LoadConfigureFile(szFile, info, aSilentType)
 			local szFilePath, aType, szMode, tMeta = ...
 			local me = GetClientPlayer()
 			if not aSilentType and me.IsInParty() then
-				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
+				MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 			end
 			D.GetDataCRC(aType, function(szCRC)
 				MY_TeamMon.SetUserConfig('RR.LastVersion', info.szVersion)
@@ -634,7 +634,7 @@ function D.ShareMetaInfoToRaid(info, bSure)
 		end)
 		return
 	end
-	X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'SYNC', info})
+	MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'SYNC', info})
 end
 
 function D.AppendMetaInfoItem(container, p, bSel)

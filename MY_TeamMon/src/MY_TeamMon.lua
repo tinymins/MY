@@ -25,6 +25,8 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^9.0.0') then
 	return
 end
+local bRestricted = GLOBAL.GAME_BRANCH == 'classic'
+X.RegisterRestriction('MY_TeamMon', { ['*'] = false, classic = true })
 X.RegisterRestriction('MY_TeamMon.MapRestriction', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.HiddenBuff', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.HiddenSkill', { ['*'] = true })
@@ -472,6 +474,20 @@ function D.OnEvent(szEvent)
 	end
 end
 
+function D.SendChat(...)
+	if bRestricted then
+		return
+	end
+	return X.SendChat(...)
+end
+
+function D.SendBgMsg(...)
+	if bRestricted then
+		return
+	end
+	return X.SendBgMsg(...)
+end
+
 function D.Log(szMsg)
 	return Log('[MY_TeamMon] ' .. szMsg)
 end
@@ -488,7 +504,7 @@ function D.Talk(szType, szMsg, szTarget)
 			szMsg = wstring.gsub(szMsg, _L['['] .. g_tStrings.STR_YOU .. _L[']'], ' [' .. szTarget .. '] ')
 		end
 		if me.IsInParty() then
-			X.SendChat(PLAYER_TALK_CHANNEL.RAID, szMsg, { uuid = szKey .. GetStringCRC(szType .. szMsg) })
+			D.SendChat(PLAYER_TALK_CHANNEL.RAID, szMsg, { uuid = szKey .. GetStringCRC(szType .. szMsg) })
 		end
 	elseif szType == 'WHISPER' then
 		if szTarget then
@@ -498,7 +514,7 @@ function D.Talk(szType, szMsg, szTarget)
 		if szTarget == me.szName then
 			X.OutputWhisper(szMsg, _L['MY_TeamMon'])
 		else
-			X.SendChat(szTarget, szMsg, { uuid = szKey .. GetStringCRC(szType .. szMsg) })
+			D.SendChat(szTarget, szMsg, { uuid = szKey .. GetStringCRC(szType .. szMsg) })
 		end
 	elseif szType == 'RAID_WHISPER' then
 		if me.IsInParty() then
@@ -509,7 +525,7 @@ function D.Talk(szType, szMsg, szTarget)
 				if szName == me.szName then
 					X.OutputWhisper(szText, _L['MY_TeamMon'])
 				else
-					X.SendChat(szName, szText, { uuid = szKey .. GetStringCRC(szType .. szText .. szName) })
+					D.SendChat(szName, szText, { uuid = szKey .. GetStringCRC(szType .. szText .. szName) })
 				end
 			end
 		end
@@ -694,7 +710,7 @@ end
 
 -- ÖÇÄÜ±ê¼ÇÂß¼­
 function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
-	if not X.IsMarker() then
+	if not X.IsMarker() or bRestricted then
 		return
 	end
 	local fnAction = function()
@@ -2244,6 +2260,8 @@ local settings = {
 				'ImportDataFromFile',
 				'ExportDataToFile',
 				'Exchange',
+				'SendChat',
+				'SendBgMsg',
 			},
 			root = D,
 		},
