@@ -417,8 +417,6 @@ function MY_GKP_UI.OnFrameCreate()
 			for k, v in pairs(tPayment) do
 				tBill[k] = (tBill[k] or 0) + v
 			end
-			-- 自己拍东西没法交易自己，当作已付账
-			tBill[me.szName] = nil
 
 			-- 排序
 			local aBill = {}
