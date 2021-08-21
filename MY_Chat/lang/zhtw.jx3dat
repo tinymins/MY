@@ -124,7 +124,7 @@ return {
     ['filter duplicate chat ignore id'      ] = '刷屏屏蔽不同玩家發送的相同聊天內容也屏蔽',
     ['only filter continuous duplicate chat'] = '刷屏屏蔽只屏蔽連續發送的刷屏聊天記錄',
     ['select duplicate channels'            ] = '選擇啟用刷屏屏蔽的頻道',
-    ['filter duplicate addon message'       ] = '屏蔽相同內容的插件喊話（如海鰻首領倒計時）',
+    ['filter duplicate addon message'       ] = '屏蔽相同內容的插件喊話',
 
     -- MY_ChatMonitor.lua
     ['MY_ChatMonitor'] = '聊天監控',
