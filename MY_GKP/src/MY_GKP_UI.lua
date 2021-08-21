@@ -433,6 +433,8 @@ function MY_GKP_UI.OnFrameCreate()
 					tBill[k].nGold = tBill[k].nGold + v
 				end
 			end
+			-- 自己拍东西没法交易自己，当作已付账
+			tBill[me.szName] = nil
 
 			-- 排序
 			local aBill = {}
