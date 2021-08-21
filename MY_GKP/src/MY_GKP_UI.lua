@@ -407,39 +407,25 @@ function MY_GKP_UI.OnFrameCreate()
 				return X.Alert('MY_GKP_UI', _L['No Record'])
 			end
 			FireUIEvent('MY_GKP_SEND_BEGIN')
-			for szPlayer, nMoney in pairs(tPayment) do
-				if not tAuction[szPlayer] then
-					tAuction[szPlayer] = 0
-				end
-				tAuction[szPlayer] = tAuction[szPlayer] - nMoney
-			end
 
 			local tBill = {}
 			-- 欠账
 			for k, v in pairs(tAuction) do
-				if v > 0 then
-					if not tBill[k] then
-						tBill[k] = { szName = k, nGold = 0 }
-					end
-					tBill[k].nGold = tBill[k].nGold - v
-				end
+				tBill[k] = (tBill[k] or 0) - v
 			end
 			-- 正账
 			for k, v in pairs(tPayment) do
-				if v > 0 then
-					if not tBill[k] then
-						tBill[k] = { szName = k, nGold = 0 }
-					end
-					tBill[k].nGold = tBill[k].nGold + v
-				end
+				tBill[k] = (tBill[k] or 0) + v
 			end
 			-- 自己拍东西没法交易自己，当作已付账
 			tBill[me.szName] = nil
 
 			-- 排序
 			local aBill = {}
-			for _, v in pairs(tBill) do
-				table.insert(aBill, v)
+			for k, v in pairs(tBill) do
+				if v ~= 0 then
+					table.insert(aBill, { szName = k, nGold = v })
+				end
 			end
 			table.sort(aBill, function(a, b) return a.nGold < b.nGold end)
 
