@@ -413,21 +413,34 @@ function MY_GKP_UI.OnFrameCreate()
 				end
 				tAuction[szPlayer] = tAuction[szPlayer] - nMoney
 			end
+
+			local tBill = {}
 			-- «∑’À
-			local aBill = {}
 			for k, v in pairs(tAuction) do
 				if v > 0 then
-					table.insert(aBill, { szName = k, nGold = -v })
+					if not tBill[k] then
+						tBill[k] = { szName = k, nGold = 0 }
+					end
+					tBill[k].nGold = tBill[k].nGold - v
 				end
 			end
 			-- ’˝’À
 			for k, v in pairs(tPayment) do
 				if v > 0 then
-					table.insert(aBill, { szName = k, nGold = v })
+					if not tBill[k] then
+						tBill[k] = { szName = k, nGold = 0 }
+					end
+					tBill[k].nGold = tBill[k].nGold + v
 				end
 			end
 
+			-- ≈≈–Ú
+			local aBill = {}
+			for _, v in pairs(tBill) do
+				table.insert(aBill, v)
+			end
 			table.sort(aBill, function(a, b) return a.nGold < b.nGold end)
+
 			X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['Information on Debt'])
 			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Start', 'Information on Debt'})
 			for _, v in ipairs(aBill) do
