@@ -253,6 +253,9 @@ function MY_Anmerkungen.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bA
 		_C.list:ListBox('delete', 'id', dwID)
 	end
 	FireUIEvent('MY_ANMERKUNGEN_UPDATE')
+	if X.GetCurrentTabID() == 'MY_Anmerkungen_Player_Note' then
+		X.SwitchTab('MY_Anmerkungen_Player_Note', true)
+	end
 	MY_Anmerkungen.SaveConfig()
 end
 
