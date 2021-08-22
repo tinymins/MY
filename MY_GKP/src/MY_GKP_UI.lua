@@ -339,10 +339,12 @@ function MY_GKP_UI.OnFrameCreate()
 			end, nil, nil, nil, team.GetTeamSize())
 		end,
 	})
-	local function SendGKPInfoBgMsg(szMsgType, aBill, aAuction, nAuctionSum, nTime)
+	local function SendGKPInfoBgMsg(szMsgType, aBill, aAuction)
 		FireUIEvent('MY_GKP_SEND_BEGIN')
 		local szKey = X.GetUUID()
 		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {szMsgType, 'BEGIN', szKey})
+		local nBeginTime, nEndTime = math.huge, 0
+		local nMoney, nEquipNum, nEquipPrice, tEquipPrice = 0, 0, 0, {}
 		for k, v in ipairs(aBill) do
 			local dwForceID, aItem = -1, {}
 			for kk, vv in ipairs(aAuction) do
@@ -353,13 +355,65 @@ function MY_GKP_UI.OnFrameCreate()
 					if vv.nUiId == 0 then
 						table.insert(aItem, { 'M', vv.szName, vv.nMoney })
 					else
+						local KItemInfo = GetItemInfo(vv.dwTabType, vv.dwIndex)
+						if KItemInfo and KItemInfo.nGenre == ITEM_GENRE.EQUIPMENT and KItemInfo.nQuality >= CONSTANT.ITEM_QUALITY.PURPLE then
+							tEquipPrice[vv.nMoney] = true
+							nEquipNum = nEquipNum + 1
+							nEquipPrice = nEquipPrice + vv.nMoney
+						end
 						table.insert(aItem, { vv.dwTabType, vv.dwIndex, vv.nStackNum or vv.nBookID })
 					end
+					nMoney = nMoney + vv.nMoney
+					nBeginTime = math.min(nBeginTime, vv.nTime)
+					nEndTime = math.max(nEndTime, vv.nTime)
 				end
 			end
 			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {szMsgType, 'RECORD', szKey, v.szName, v.nGold, dwForceID, aItem})
 		end
-		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {szMsgType, 'FINISH', szKey, nAuctionSum, nTime})
+		local nDuring = nEndTime >= nBeginTime and nEndTime - nBeginTime or 0
+		local nGKPLevel = 0
+		-- 根据总金额评分
+		for k, v in ipairs({
+			50000 , -- 黑出翔
+			100000, -- 背锅
+			250000, -- 脸帅
+			500000, -- 自称小红手
+			500000, -- 特别红
+			500000, -- 玄晶专用
+		}) do
+			if v >= nMoney then
+				nGKPLevel = k
+				break
+			end
+		end
+		if nEquipNum > 0 then
+			-- 根据装备平均溢价百分比评分
+			local aEquipPrice = {}
+			for k, _ in pairs(tEquipPrice) do
+				table.insert(aEquipPrice, k)
+			end
+			table.sort(aEquipPrice, function(a, b) return a < b end)
+			local nEquipMinPrice = aEquipPrice[1] == 0 and aEquipPrice[2] or aEquipPrice[1]
+			for i = 1, #aEquipPrice - 1 do
+				nEquipMinPrice = math.min(nEquipMinPrice, aEquipPrice[i + 1] - aEquipPrice[i])
+			end
+			local fEquipPrice = nEquipPrice / nEquipNum / nEquipMinPrice
+			for k, v in ipairs({
+				1,   -- 黑出翔
+				1.5, -- 背锅
+				2,   -- 脸帅
+				3,   -- 自称小红手
+				5,   -- 特别红
+			}) do
+				if v >= fEquipPrice then
+					if k >= nGKPLevel then
+						nGKPLevel = k
+					end
+					break
+				end
+			end
+		end
+		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {szMsgType, 'FINISH', szKey, nMoney, nDuring, nGKPLevel})
 	end
 	-- 发布拍卖记录
 	nX = nW - 120 - 5
@@ -401,7 +455,7 @@ function MY_GKP_UI.OnFrameCreate()
 			end
 			X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Total Auction: %d Gold.', nAuctionSum))
 			-- 弹出面板
-			SendGKPInfoBgMsg('GKP_CONSUMPTION', aBill, aAuction, nAuctionSum, nTime)
+			SendGKPInfoBgMsg('GKP_CONSUMPTION', aBill, aAuction)
 		end,
 	})
 	-- 欠费情况
@@ -471,7 +525,7 @@ function MY_GKP_UI.OnFrameCreate()
 				X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Spending: %d Gold.', nGold2 * -1))
 			end
 			-- 弹出面板
-			SendGKPInfoBgMsg('GKP_DEBT', aBill, ds:GetAuctionList(), nil, nil)
+			SendGKPInfoBgMsg('GKP_DEBT', aBill, ds:GetAuctionList())
 		end,
 	})
 	-- 清空数据

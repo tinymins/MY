@@ -268,27 +268,22 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 								end,
 							})
 						end
-						if data[5] and tonumber(data[5]) then
-							local nTime = tonumber(data[5])
+						local nTime = tonumber(data[5]) or 0
+						if nTime > 0 then
 							ui:Append('Text', { w = 725, h = 30, x = x + 0, y = y + 70 + 30 * n + 5, text = _L('Spend time approx %d:%d', nTime / 3600, nTime % 3600 / 60), halign = 1 })
 						end
 						UI(frm):Children('#ScreenShot'):Toggle(true)
-						if n >= 4 then
-							local t = {
-								{ 50000,   1 }, -- 黑出翔
-								{ 100000,  0 }, -- 背锅
-								{ 250000,  2 }, -- 脸帅
-								{ 500000,  6 }, -- 自称小红手
-								{ 5000000, 3 }, -- 特别红
-								{ 5000000, 5 }, -- 玄晶专用r
+						if n >= 4 and data[6] then
+							local nGKPLevel = data[6]
+							local aGKPLevelFrame = {
+								1, -- 黑出翔
+								0, -- 背锅
+								2, -- 脸帅
+								6, -- 自称小红手
+								3, -- 特别红
+								5, -- 玄晶专用
 							}
-							local nFrame = 4
-							for k, v in ipairs(t) do
-								if v[1] >= nMoney then
-									nFrame = v[2]
-									break
-								end
-							end
+							local nFrame = aGKPLevelFrame[math.min(#aGKPLevelFrame, math.max(1, nGKPLevel))]
 							local nImgW, nImgH = 150, 150
 							local nCenterX, nCenterY = x + 590 + nImgW / 2, y + n * 30 - 30 + nImgH / 2
 							local nInitAlpha, nDistAlpha = 180, 60
