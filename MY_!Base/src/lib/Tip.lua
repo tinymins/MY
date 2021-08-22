@@ -241,7 +241,7 @@ function X.OutputPlayerTip(Rect, dwID, szExtraXml)
 		table.insert(t, GetFormatText(g_tStrings.STR_TIP_CAMP_FLAG .. '\n', 163))
 	end
 	table.insert(t, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[player.nCamp], 82))
-	-- 小本本
+	-- 角色备注
 	if _G.MY_Anmerkungen and _G.MY_Anmerkungen.GetPlayerNote then
 		local note = _G.MY_Anmerkungen.GetPlayerNote(player.dwID)
 		if note and note.szContent ~= '' then

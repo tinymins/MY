@@ -118,7 +118,7 @@ local O = X.CreateUserSettingsModule('MY_Focus', _L['Target'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
-	bFocusAnmerkungen = { -- 焦点记在小本本里的玩家
+	bFocusAnmerkungen = { -- 焦点角色备注记录在案的目标
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
 		xSchema = X.Schema.Boolean,
@@ -669,7 +669,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			bFocus = true
 		end
 
-		-- 判断小本本
+		-- 判断角色备注
 		if not bFocus and O.bFocusAnmerkungen
 		and dwType == TARGET.PLAYER
 		and MY_Anmerkungen

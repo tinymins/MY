@@ -213,7 +213,7 @@ function D.UpdateItem(hItem, p)
 			end
 		end
 	end
-	-- 小本本
+	-- 角色备注
 	hInfoList:Lookup('Handle_Anmerkungen'):SetVisible(szVia == _L['Anmerkungen'])
 	hInfoList:FormatAllItemPos()
 
