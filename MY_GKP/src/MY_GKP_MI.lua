@@ -126,7 +126,7 @@ end)
 X.RegisterBgMsg('MY_GKP_SYNC_START', function(_, aData, nChannel, dwID, szName, bIsSelf)
 	local dwID, szKey = aData[1], aData[2]
 	if dwID == UI_GetClientPlayerID() or dwID == 0 then
-		X.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, function(_, aData, nChannel, dwID, szName, bIsSelf)
+		X.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, szKey, function(_, aData, nChannel, dwID, szName, bIsSelf)
 			local dwID, tab = aData[1], aData[2]
 			if dwID == UI_GetClientPlayerID() or dwID == 0 then
 				X.Topmsg(_L['Sychoronization Complete'])
@@ -140,7 +140,7 @@ X.RegisterBgMsg('MY_GKP_SYNC_START', function(_, aData, nChannel, dwID, szName, 
 					D.Sysmsg(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
 				end
 			end
-			X.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, false)
+			X.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, szKey, false)
 		end, function(szMsgID, nSegCount, nSegRecv, nSegIndex, nChannel, dwID, szName, bIsSelf)
 			local fPercent = nSegRecv / nSegCount
 			X.Topmsg(_L('Sychoronizing data please wait %d%% loaded.', fPercent * 100))
