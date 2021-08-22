@@ -306,17 +306,33 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 									break
 								end
 							end
+							local nImgW, nImgH = 150, 150
+							local nCenterX, nCenterY = x + 590 + nImgW / 2, y + n * 30 - 30 + nImgH / 2
+							local nInitAlpha, nDistAlpha = 180, 60
 							local img = ui:Append('Image', {
-								x = x + 590, y = y + n * 30 - 30, w = 150, h = 150, alpha = 180,
+								x = 0, y = 0, w = 0, h = 0, alpha = nInitAlpha,
 								image = X.PACKET_INFO.ROOT .. 'MY_GKP/img/GKPSeal.uitex', imageframe = nFrame,
-								onhover = function(bHover)
-									if bHover then
-										this:SetAlpha(30)
-									else
-										this:SetAlpha(180)
-									end
-								end,
 							})[1]
+							local nStartTick = GetTime()
+							local SCALE_ANIMATE_TIME = 200
+							local IDLE_ANIMATE_TIME = 1000
+							local ALPHA_ANIMATE_TIME = 500
+							X.RenderCall(function()
+								if not X.IsElement(img) then
+									return 0
+								end
+								local nTime = GetTime() - nStartTick
+								local fScale = math.max(1, (1 - nTime / SCALE_ANIMATE_TIME) * 3 + 1)
+								img:SetSize(nImgW * fScale, nImgH * fScale)
+								img:SetRelPos(nCenterX - nImgW * fScale / 2, nCenterY - nImgH * fScale / 2)
+								img:SetAbsPos(img:GetParent():GetAbsX() + img:GetRelX(), img:GetParent():GetAbsY() + img:GetRelY())
+								if nTime >= SCALE_ANIMATE_TIME + IDLE_ANIMATE_TIME then
+									img:SetAlpha(nDistAlpha + math.max(0, (1 - (nTime - SCALE_ANIMATE_TIME - IDLE_ANIMATE_TIME) / ALPHA_ANIMATE_TIME)) * (nInitAlpha - nDistAlpha))
+									if nTime >= SCALE_ANIMATE_TIME + IDLE_ANIMATE_TIME + ALPHA_ANIMATE_TIME then
+										return 0
+									end
+								end
+							end)
 							-- JH.Animate(img, 200):Scale(4)
 						end
 						frm.done = true
