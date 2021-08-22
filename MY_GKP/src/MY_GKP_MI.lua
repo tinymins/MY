@@ -166,15 +166,14 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 				--[[#DEBUG END]]
 			end
 		end
-		if data[1] == 'GKP_INFO' then
-			if data[2] == 'Start' then
-				local szFrameName = data[3] == 'Information on Debt' and 'GKP_Debt' or 'GKP_info'
-				if data[3] == 'Information on Debt' and szName ~= me.szName then -- 欠债记录只自己看
-					return
-				end
+		if data[1] == 'GKP_CONSUMPTION' or data[1] == 'GKP_DEBT' then
+			local szFrameName = data[1] == 'GKP_CONSUMPTION' and 'MY_GKP_Consumption' or 'MY_GKP_Debt'
+			if data[2] == 'BEGIN' then
+				Wnd.CloseWindow(szFrameName)
 				local ui = UI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = 'CENTER' })
 				local x, y = 20, 50
-				ui:Append('Text', { x = x, y = y, w = 760, h = 30, text = _L[data[3]], halign = 1, font = 236, color = { 255, 255, 0 } })
+				local szCaption = data[1] == 'GKP_CONSUMPTION' and _L['--- Consumption ---'] or _L['Information on Debt']
+				ui:Append('Text', { x = x, y = y, w = 760, h = 30, text = szCaption, halign = 1, font = 236, color = { 255, 255, 0 } })
 				ui:Append('WndButton', { name = 'ScreenShot', x = x + 590, y = y, text = _L['Print Ticket'], buttonstyle = 'FLAT_LACE_BORDER' }):Toggle(false):Click(function()
 					local scale         = Station.GetUIScale()
 					local left, top     = ui:Pos()
@@ -193,67 +192,52 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 				end)
 				ui:Append('Text', { w = 120, h = 30, x = x + 40, y = y + 35, text = _L('Operator:%s', szName), font = 41 })
 				ui:Append('Text', { w = 720, h = 30, x = x, halign = 2, y = y + 35, text = _L('Print Time:%s', D.GetTimeString(GetCurrentTime())), font = 41 })
+				ui[1].key = data[3]
 			end
-			if data[2] == 'Info' then
-				if data[3] == me.szName and tonumber(data[4]) and tonumber(data[4]) < 0 then
-					X.OutputWhisper(data[3] .. g_tStrings.STR_COLON .. data[4] .. g_tStrings.STR_GOLD, _L['MY_GKP'])
+			if data[2] == 'RECORD' then
+				if data[4] == me.szName and tonumber(data[5]) and tonumber(data[5]) < 0 then
+					X.OutputWhisper(data[4] .. g_tStrings.STR_COLON .. data[5] .. g_tStrings.STR_GOLD, _L['MY_GKP'])
 				end
-				local frm = Station.Lookup('Normal/GKP_info')
-				if frm and frm.done then
-					frm = Station.Lookup('Normal/GKP_Debt')
-				end
-				if not frm and Station.Lookup('Normal/GKP_Debt') then
-					frm = Station.Lookup('Normal/GKP_Debt')
-				end
-				if frm then
-					if not frm.n then frm.n = 0 end
+				local frm = Station.SearchFrame(szFrameName)
+				if frm and frm.key == data[3] then
+					if not frm.n then
+						frm.n = 0
+					end
+					if not frm.items then
+						frm.items = {}
+					end
+					for k, v in ipairs(data[7]) do
+						table.insert(frm.items, v)
+					end
 					local n = frm.n
 					local ui = UI(frm)
 					local x, y = 20, 50
 					if n % 2 == 0 then
 						ui:Append('Image', { w = 760, h = 30, x = x, y = y + 70 + 30 * n, image = 'ui/Image/button/ShopButton.UITex', imageframe = 75 })
 					end
-					local dwForceID, tBox = -1, {}
-					if me.IsInParty() then
-						for k, v in ipairs(team.GetTeamMemberList()) do
-							if team.GetClientTeamMemberName(v) == data[3] then
-								dwForceID = team.GetMemberInfo(v).dwForceID
-							end
-						end
-					end
-					for k, v in ipairs(ds:GetAuctionList()) do -- 依赖于本地记录 反正也不可能差异到哪去
-						if v.szPlayer == data[3] then
-							if dwForceID == -1 then
-								dwForceID = v.dwForceID
-							end
-							table.insert(tBox, v)
-						end
-					end
-					if dwForceID ~= -1 then
-						ui:Append('Image', { w = 28, h = 28, x = x + 30, y = y + 71 + 30 * n }):Image(GetForceImage(dwForceID))
-					end
-					ui:Append('Text', { w = 140, h = 30, x = x + 60, y = y + 70 + 30 * n, text = data[3], color = { X.GetForceColor(dwForceID) } })
+					ui:Append('Image', { w = 28, h = 28, x = x + 30, y = y + 71 + 30 * n }):Image(GetForceImage(data[6]))
+					ui:Append('Text', { w = 140, h = 30, x = x + 60, y = y + 70 + 30 * n, text = data[4], color = { X.GetForceColor(data[6]) } })
 					local handle = ui:Append('Handle', { w = 130, h = 20, x = x + 200, y = y + 70 + 30 * n, handlestyle = 3 })[1]
-					handle:AppendItemFromString(D.GetMoneyTipText(tonumber(data[4])))
+					handle:AppendItemFromString(D.GetMoneyTipText(tonumber(data[5])))
 					handle:FormatAllItemPos()
-					for k, v in ipairs(tBox) do
+					for k, v in ipairs(data[7]) do
 						if k > 12 then
 							ui:Append('Text', { x = x + 290 + k * 32 + 5, y = y + 71 + 30 * n, w = 28, h = 28, text = '.....', font = 23 })
 							break
 						end
 						local hBox = ui:Append('Box', { x = x + 290 + k * 32, y = y + 71 + 30 * n, w = 28, h = 28, alpha = v.bDelete and 60 })
-						if v.nUiId ~= 0 then
-							hBox:ItemInfo(v.nVersion, v.dwTabType, v.dwIndex, v.nStackNum or v.nBookID)
-						else
+						if v[1] == 'M' then
 							hBox:Icon(582):Hover(function(bHover)
 								if bHover then
 									local x, y = this:GetAbsPos()
 									local w, h = this:GetSize()
-									OutputTip(GetFormatText(v.szName .. g_tStrings.STR_TALK_HEAD_SAY1, 136) .. D.GetMoneyTipText(v.nMoney), 250, { x, y, w, h })
+									OutputTip(GetFormatText(v[2] .. g_tStrings.STR_TALK_HEAD_SAY1, 136) .. D.GetMoneyTipText(v[3]), 250, { x, y, w, h })
 								else
 									HideTip()
 								end
 							end)
+						else
+							hBox:ItemInfo(GLOBAL.GAME_VERSION, v[1], v[2], v[3])
 						end
 					end
 					if frm.n > 5 then
@@ -262,11 +246,10 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 					frm.n = frm.n + 1
 				end
 			end
-			if data[2] == 'End' then
-				local szFrameName = data[4] and 'GKP_info' or 'GKP_Debt'
-				local frm = Station.Lookup('Normal/' .. szFrameName)
-				if frm then
-					if data[4] then
+			if data[2] == 'FINISH' then
+				local frm = Station.SearchFrame(szFrameName)
+				if frm and frm.key == data[3] then
+					if data[1] == 'GKP_CONSUMPTION' then
 						local ui = UI(frm)
 						local x, y = 20, 50
 						local n = frm.n or 0
@@ -336,7 +319,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 							-- JH.Animate(img, 200):Scale(4)
 						end
 						frm.done = true
-					elseif szFrameName == 'GKP_Debt' and not frm:IsVisible() then
+					elseif data[1] == 'GKP_DEBT' and not frm:IsVisible() then
 						Wnd.CloseWindow(frm)
 					end
 				end

@@ -339,6 +339,28 @@ function MY_GKP_UI.OnFrameCreate()
 			end, nil, nil, nil, team.GetTeamSize())
 		end,
 	})
+	local function SendGKPInfoBgMsg(szMsgType, aBill, aAuction, nAuctionSum, nTime)
+		FireUIEvent('MY_GKP_SEND_BEGIN')
+		local szKey = X.GetUUID()
+		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {szMsgType, 'BEGIN', szKey})
+		for k, v in ipairs(aBill) do
+			local dwForceID, aItem = -1, {}
+			for kk, vv in ipairs(aAuction) do
+				if vv.szPlayer == v.szName then
+					if vv.dwForceID and dwForceID == -1 then
+						dwForceID = vv.dwForceID
+					end
+					if vv.nUiId == 0 then
+						table.insert(aItem, { 'M', vv.szName, vv.nMoney })
+					else
+						table.insert(aItem, { vv.dwTabType, vv.dwIndex, vv.nStackNum or vv.nBookID })
+					end
+				end
+			end
+			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {szMsgType, 'RECORD', szKey, v.szName, v.nGold, dwForceID, aItem})
+		end
+		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {szMsgType, 'FINISH', szKey, nAuctionSum, nTime})
+	end
 	-- 发布拍卖记录
 	nX = nW - 120 - 5
 	ui:Append('WndButton', {
@@ -362,25 +384,24 @@ function MY_GKP_UI.OnFrameCreate()
 			if not X.IsDistributer() and not X.IsDebugClient('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
-			FireUIEvent('MY_GKP_SEND_BEGIN')
-
-			X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['--- Consumption ---'])
-			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Start', '--- Consumption ---'})
-
+			-- 处理数据
+			local nTime = aAuction[1].nTime - aAuction[#aAuction].nTime -- 所花费的时间
+			local nAuctionSum = ds:GetAuctionSum()
 			local aBill = {}
 			for k, v in pairs(tAuction) do
 				table.insert(aBill, { szName = k, nGold = v })
 			end
-			table.sort(aBill,function(a,b) return a.nGold < b.nGold end)
+			table.sort(aBill, function(a, b) return a.nGold < b.nGold end)
+			-- 聊天频道
+			X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['--- Consumption ---'])
 			for k, v in ipairs(aBill) do
 				if v.nGold > 0 then
 					X.SendChat(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
 				end
-				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Info', v.szName, v.nGold})
 			end
-			local nTime = aAuction[1].nTime - aAuction[#aAuction].nTime -- 所花费的时间
-			X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Total Auction: %d Gold.', ds:GetAuctionSum()))
-			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'End', _L('Total Auction: %d Gold.', ds:GetAuctionSum()), ds:GetAuctionSum(), nTime})
+			X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Total Auction: %d Gold.', nAuctionSum))
+			-- 弹出面板
+			SendGKPInfoBgMsg('GKP_CONSUMPTION', aBill, aAuction, nAuctionSum, nTime)
 		end,
 	})
 	-- 欠费情况
@@ -406,8 +427,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if X.IsEmpty(tAuction) and X.IsEmpty(tPayment) then
 				return X.Alert('MY_GKP_UI', _L['No Record'])
 			end
-			FireUIEvent('MY_GKP_SEND_BEGIN')
-
+			-- 处理数据
 			local tBill = {}
 			-- 欠账
 			for k, v in pairs(tAuction) do
@@ -417,7 +437,6 @@ function MY_GKP_UI.OnFrameCreate()
 			for k, v in pairs(tPayment) do
 				tBill[k] = (tBill[k] or 0) + v
 			end
-
 			-- 排序
 			local aBill = {}
 			for k, v in pairs(tBill) do
@@ -426,16 +445,13 @@ function MY_GKP_UI.OnFrameCreate()
 				end
 			end
 			table.sort(aBill, function(a, b) return a.nGold < b.nGold end)
-
+			-- 聊天频道
 			X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['Information on Debt'])
-			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Start', 'Information on Debt'})
 			for _, v in ipairs(aBill) do
 				if v.nGold < 0 then
 					X.SendChat(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
-					X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Info', v.szName, v.nGold, '-'})
 				else
 					X.SendChat(PLAYER_TALK_CHANNEL.RAID, { D.GetFormatLink(v.szName, true), D.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. '+' .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
-					X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'Info', v.szName, v.nGold, '+'})
 				end
 			end
 			local nGold, nGold2 = 0, 0
@@ -454,7 +470,8 @@ function MY_GKP_UI.OnFrameCreate()
 			if nGold2 ~= 0 then
 				X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('Spending: %d Gold.', nGold2 * -1))
 			end
-			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'GKP_INFO', 'End', _L('Received: %d Gold.', nGold)})
+			-- 弹出面板
+			SendGKPInfoBgMsg('GKP_DEBT', aBill, ds:GetAuctionList(), nil, nil)
 		end,
 	})
 	-- 清空数据
