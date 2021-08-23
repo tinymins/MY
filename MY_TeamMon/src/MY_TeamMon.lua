@@ -923,7 +923,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 					end
 				end
 				-- 添加到团队面板
-				if O.bPushTeamPanel and cfg.bTeamPanel and (not cfg.bOnlySelfSrc or dwSkillSrcID == MY_TM_CORE_PLAYERID) then
+				if O.bPushTeamPanel and cfg.bTeamPanel and (not cfg.bOnlySelfSrc or dwSkillSrcID == MY_TM_CORE_PLAYERID) and X.IsEmpty(data.aCataclysmBuff) then
 					FireUIEvent('MY_RAID_REC_BUFF', dwOwner, {
 						dwID      = data.dwID,
 						nLevel    = data.bCheckLevel and data.nLevel or 0,
