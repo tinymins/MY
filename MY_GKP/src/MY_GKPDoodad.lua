@@ -257,13 +257,12 @@ function D.GetDoodadInfo(dwID)
 	end
 	local me = GetClientPlayer()
 	local tpl = GetDoodadTemplate(doodad.dwTemplateID)
-	if DOODAD_TYPE_VISIBLE[tpl.nKind] == false then
+	local info = { dwCraftID = tpl.dwCraftID }
+	local eOverwriteAction = (D.tLooted[doodad.dwID] == false or doodad.CanLoot(me.dwID)) and 'loot' or nil
+	-- 跳过非拾取类尸体之类交互物件
+	if DOODAD_TYPE_VISIBLE[tpl.nKind] == false and eOverwriteAction ~= 'loot' then
 		return
 	end
-	local info = {
-		dwCraftID = tpl.dwCraftID,
-	}
-	local eOverwriteAction = doodad.CanLoot(me.dwID) and 'loot' or nil
 	-- 神农、采金
 	if D.tCraft[doodad.dwTemplateID] then
 		info.eDoodadType = 'craft'
@@ -317,6 +316,11 @@ function D.GetDoodadInfo(dwID)
 	end
 	-- 尸体
 	if (doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP) and (not doodad.CanDialog(me) or doodad.CanLoot(me.dwID)) then
+		if eOverwriteAction == 'loot' then
+			info.eDoodadType = 'loot'
+			info.eActionType = 'loot'
+			return info
+		end
 		return
 	end
 	-- 其他
@@ -765,6 +769,10 @@ X.RegisterEvent('OT_ACTION_PROGRESS_BREAK', function()
 	if dwID == UI_GetClientPlayerID() then
 		D.OnPickPrepareStop(false)
 	end
+end)
+X.RegisterEvent('SYNC_LOOT_LIST', function()
+	D.tLooted[arg0] = false
+	D.TryAdd(arg0)
 end)
 X.RegisterInit('MY_GKPDoodad__BC', function()
 	X.BreatheCall('MY_GKPDoodad', D.OnBreatheCall)
