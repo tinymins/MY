@@ -666,10 +666,11 @@ function D.UpdateMiniFlag()
 		return
 	end
 	for dwID, info in pairs(D.tDoodad) do
-		if info.eRuleType == 'quest'
-			or info.eRuleType == 'craft' or info.eRuleType == 'mining'
-			or info.eRuleType == 'herbalism' or info.eRuleType == 'skinning'
-		then
+		if info.eRuleType ~= 'loot' and info.eActionType ~= 'loot' then
+		-- if info.eRuleType == 'quest'
+		-- 	or info.eRuleType == 'craft' or info.eRuleType == 'mining'
+		-- 	or info.eRuleType == 'herbalism' or info.eRuleType == 'skinning'
+		-- then
 			local doodad = GetDoodad(dwID)
 			local dwType, nF1, nF2 = 5, 169, 48
 			if info.eRuleType == 'quest' then
