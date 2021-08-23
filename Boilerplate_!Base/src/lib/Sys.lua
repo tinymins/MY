@@ -838,6 +838,13 @@ local FORMAT_TIME_COUNT_PRESET = {
 		minute = { normal = '%d' .. g_tStrings.STR_TIME_MINUTE, fixed = '%02d' .. g_tStrings.STR_TIME_MINUTE, skipnull = true },
 		second = { normal = '%d' .. g_tStrings.STR_TIME_SECOND, fixed = '%02d' .. g_tStrings.STR_TIME_SECOND, skipnull = true },
 	},
+	['ENGLISH_ABBR'] = {
+		year = { normal = '%dy', fixed = '%04dy' },
+		day = { normal = '%dd', fixed = '%02dd' },
+		hour = { normal = '%dh', fixed = '%02dh' },
+		minute = { normal = '%dm', fixed = '%02dm' },
+		second = { normal = '%ds', fixed = '%02ds' },
+	},
 	['PRIME'] = {
 		minute = { normal = '%d\'', fixed = '%02d\'' },
 		second = { normal = '%d"', fixed = '%02d"' },
