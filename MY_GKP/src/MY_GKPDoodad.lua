@@ -506,7 +506,8 @@ function D.UpdateHeadName()
 	sha:ClearTriangleFanPoint()
 	for dwID, info in pairs(D.tDoodad) do
 		local tar = GetDoodad(dwID)
-		if info.eRuleType ~= 'loot' or info.bCustom or info.bRecent then
+		local bShow = info.eRuleType ~= 'loot' or info.bCustom or info.bRecent
+		if bShow or D.bDebug then
 			local szName = X.GetObjectName(TARGET.DOODAD, dwID, 'never') or ''
 			local fYDelta = 128
 			local nR, nG, nB, nA, bDarken = r, g, b, 255, false
@@ -535,7 +536,7 @@ function D.UpdateHeadName()
 			end
 			--[[#DEBUG BEGIN]]
 			if D.bDebug then
-				szName = szName .. '|D' .. info.eDoodadType .. '|R' .. info.eRuleType .. '|A' .. info.eActionType .. '|' .. dwID
+				szName = szName .. '|D' .. info.eDoodadType .. '|R' .. info.eRuleType .. '|A' .. info.eActionType .. '|' .. dwID .. '|' .. (bShow and 'Y' or 'N')
 			end
 			--[[#DEBUG END]]
 			sha:AppendDoodadID(tar.dwID, nR, nG, nB, nA, fYDelta, O.nNameFont, szName, 0, O.fNameScale)
