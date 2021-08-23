@@ -316,7 +316,7 @@ function ST:SetInfo(tTime, nIcon)
 	end
 	if tTime.nTime then
 		self.ui.time:SetText((tTime.nTime >= 1 or tTime.nTime < 0.1)
-			and FormatDuration(tTime.nTime, 'SYMBAL')
+			and FormatDuration(math.floor(tTime.nTime), 'ENGLISH_ABBR')
 			or ('%.1f'):format(tTime.nTime) .. 's')
 		self.ui:SetUserData(math.floor(tTime.nTime))
 	end
