@@ -2198,6 +2198,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		menu = D.GetAutoPickupMenu,
 		autoenable = function() return O.bOn end,
 	}):AutoWidth():Width() + 5
+	nLFY = nY + nLH
 
 	return nX, nY, nLFY
 end

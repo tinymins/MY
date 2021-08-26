@@ -144,16 +144,21 @@ local PS = { nPriority = 2 }
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local nPaddingX, nPaddingY = 25, 25
-	local nX, nY = nPaddingX, nPaddingY
+	local nX, nY, nLFY = nPaddingX, nPaddingY, nPaddingY
+	local nLineHeightS, nLineHeightM, nLineHeightL = 22, 28, 32
 	local nW, nH = ui:Size()
 
-	ui:Append('Text', { x = nX, y = nY, text = _L['Preference Setting'], font = 27 })
 	ui:Append('WndButton', {
-		x = nW - 165, y = nY, w = 150, h = 38,
+		x = nW - 165, y = nPaddingY, w = 150, h = 38,
 		text = _L['Open Panel'],
 		buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
 		onclick = MY_GKP_MI.OpenPanel,
 	})
+
+	nX, nY, nLFY = MY_GKPLoot.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLineHeightM, nX, nY, nLFY)
+	nX, nY = nPaddingX, nLFY
+
+	ui:Append('Text', { x = nX, y = nY, text = _L['Preference Setting'], font = 27 })
 	nY = nY + 28
 
 	nX = nX + 10
