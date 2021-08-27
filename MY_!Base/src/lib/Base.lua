@@ -170,7 +170,6 @@ end
 local _BUILD_                 = '20210824'
 local _VERSION_               = '9.0.3'
 local _MENU_COLOR_            = {255, 165, 79}
-local _MAX_PLAYER_LEVEL_      = 100
 local _INTERFACE_ROOT_        = 'Interface/'
 local _NAME_SPACE_            = 'MY'
 local _ADDON_ROOT_            = _INTERFACE_ROOT_ .. _NAME_SPACE_ .. '/'
@@ -862,15 +861,8 @@ local tInfo = {
 	AUTHOR_PROTECT_NAMES  = _AUTHOR_PROTECT_NAMES_ ,
 	AUTHOR_FAKE_HEADER    = _AUTHOR_FAKE_HEADER_   ,
 	MENU_COLOR            = _MENU_COLOR_           ,
-	MAX_PLAYER_LEVEL      = _MAX_PLAYER_LEVEL_     ,
 }
 PACKET_INFO = SetmetaReadonly(tInfo)
--- 更新最高玩家等级数据
-local function onPlayerEnterScene()
-	_MAX_PLAYER_LEVEL_ = math.max(_MAX_PLAYER_LEVEL_, GetClientPlayer().nMaxLevel)
-	tInfo.MAX_PLAYER_LEVEL = _MAX_PLAYER_LEVEL_
-end
-RegisterEvent('PLAYER_ENTER_SCENE', onPlayerEnterScene)
 end
 -----------------------------------------------
 -- 枚举
