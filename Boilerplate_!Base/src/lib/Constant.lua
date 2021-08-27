@@ -56,6 +56,7 @@ CONSTANT = {
 	MENU_DIVIDER = SetmetaReadonly({ bDevide = true }),
 	EMPTY_TABLE = SetmetaReadonly({}),
 	XML_LINE_BREAKER = GetFormatText('\n'),
+	MAX_PLAYER_LEVEL = 50,
 	UI_OBJECT = UI_OBJECT or SetmetaReadonly({
 		NONE             = -1, -- 空Box
 		ITEM             = 0 , -- 身上有的物品。nUiId, dwBox, dwX, nItemVersion, nTabType, nIndex
@@ -765,5 +766,13 @@ CONSTANT = {
 	INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,
 	INVENTORY_GUILD_PAGE_BOX_COUNT = 98,
 }
+
+-- 更新最高玩家等级数据
+RegisterEvent('PLAYER_ENTER_SCENE', function()
+	CONSTANT.MAX_PLAYER_LEVEL = math.max(
+		CONSTANT.MAX_PLAYER_LEVEL,
+		GetClientPlayer().nMaxLevel
+	)
+end)
 
 X.CONSTANT = setmetatable({}, { __index = CONSTANT, __newindex = function() end })
