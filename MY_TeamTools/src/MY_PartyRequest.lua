@@ -343,7 +343,7 @@ function D.GetRequestStatus(info)
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 	end
 	if szStatus == 'normal' and not info.bFriend and not info.bTongMember then
-		if O.bRefuseRobot and info.dwID and info.nLevel == X.PACKET_INFO.MAX_PLAYER_LEVEL then
+		if O.bRefuseRobot and info.dwID and info.nLevel == CONSTANT.MAX_PLAYER_LEVEL then
 			local me = GetClientPlayer()
 			local tar = GetPlayer(info.dwID)
 			if tar then
@@ -357,7 +357,7 @@ function D.GetRequestStatus(info)
 				end
 			end
 		end
-		if O.bRefuseLowLv and info.nLevel < X.PACKET_INFO.MAX_PLAYER_LEVEL then
+		if O.bRefuseLowLv and info.nLevel < CONSTANT.MAX_PLAYER_LEVEL then
 			szStatus = 'refuse'
 			szMsg = _L('Auto refuse %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
