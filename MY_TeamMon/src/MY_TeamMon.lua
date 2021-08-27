@@ -2223,6 +2223,9 @@ function D.OnShare(_, data, nChannel, dwID, szName, bIsSelf)
 end
 
 X.RegisterInit('MY_TeamMon', function()
+	X.RegisterEvent('LOADING_ENDING', 'MY_TeamMon', function()
+		FireUIEvent('MY_TM_DATA_RELOAD')
+	end)
 	D.bReady = true
 	D.Init()
 end)

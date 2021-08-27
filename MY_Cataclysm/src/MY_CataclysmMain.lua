@@ -126,8 +126,6 @@ local function UpdateTeamMonData()
 		D.UpdateBuffListCache()
 	end
 end
--- X.RegisterEvent('LOADING_ENDING', 'MY_CataclysmMain', UpdateTeamMonData)
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CataclysmMain', UpdateTeamMonData)
 local function onTeamMonUpdate()
 	if arg0 and not arg0['BUFF'] and not arg0['DEBUFF'] then
 		return

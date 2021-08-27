@@ -1076,7 +1076,6 @@ local function UpdateTeamMonData()
 		D.RescanNearby()
 	end
 end
-X.RegisterEvent('LOADING_ENDING', 'MY_Focus', UpdateTeamMonData)
 local function onTeamMonUpdate()
 	if arg0 and not arg0['NPC'] and not arg0['DOODAD'] then
 		return
