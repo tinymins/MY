@@ -3,8 +3,8 @@ return {
     ['*'] = '●',
     ['Target monitor'] = '目標監控',
     ['[MY TargetMon] '] = '[茗伊監控] ',
-    ['Mingyi self buff monitor'] = '茗伊自身BUFF監控',
-    ['Mingyi target buff monitor'] = '茗伊目標BUFF監控',
+    ['Mingyi self buff monitor'] = '茗伊自身氣勁監控',
+    ['Mingyi target buff monitor'] = '茗伊目標氣勁監控',
 
 	['Encrypt and compressing: '] = '更新加密壓縮：',
 

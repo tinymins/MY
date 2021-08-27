@@ -141,7 +141,7 @@ return {
 	['Show Decimal'] = '顯示小數',
 	['Over mana bar'] = '遮擋內力',
 	['[%s] got buff [%s]x%d, remaining %ds.'] = '[%s]獲得氣勁【%s】x%d，剩餘持續時間%d秒。',
-	['Edit buff'] = '團隊BUFF監控',
+	['Edit buff'] = '團隊氣勁監控',
 	['Name or id'] = 'ID/名稱',
 	['Level'] = '等級',
 	['Stacknum'] = '層數',
