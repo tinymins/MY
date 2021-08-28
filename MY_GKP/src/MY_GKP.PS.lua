@@ -243,12 +243,24 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + 28
 
-	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 150, text = _L['Enable Money Trend'], checked = MY_GKP.bMoneyTalk,
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Enable Money Trend'],
+		checked = MY_GKP.bMoneyTalk,
 		oncheck = function(bChecked)
 			MY_GKP.bMoneyTalk = bChecked
 		end,
-	})
+	}):Width() + 5
+
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Money trend only distributor'],
+		checked = MY_GKP.bMoneyTalkOnlyDistributor,
+		oncheck = function(bChecked)
+			MY_GKP.bMoneyTalkOnlyDistributor = bChecked
+		end,
+		autoenable = function() return MY_GKP.bMoneyTalk end,
+	}):Width() + 5
 	nY = nY + 28
 end
 X.RegisterPanel(_L['General'], 'MY_GKP', _L['GKP Golden Team Record'], 2490, PS)

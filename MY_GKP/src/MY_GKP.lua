@@ -38,6 +38,12 @@ local O = X.CreateUserSettingsModule('MY_GKP', _L['General'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bMoneyTalkOnlyDistributor = { -- 金钱变动喊话仅分配者
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKP'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
 	bAlertMessage = { -- 进入秘境提醒清空数据
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
@@ -363,6 +369,7 @@ local settings = {
 			fields = {
 				'bOn',
 				'bMoneyTalk',
+				'bMoneyTalkOnlyDistributor',
 				'bAlertMessage',
 				'bMoneySystem',
 				'bDisplayEmptyRecords',
@@ -387,6 +394,7 @@ local settings = {
 			fields = {
 				'bOn',
 				'bMoneyTalk',
+				'bMoneyTalkOnlyDistributor',
 				'bAlertMessage',
 				'bMoneySystem',
 				'bDisplayEmptyRecords',

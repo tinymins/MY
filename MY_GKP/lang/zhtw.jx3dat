@@ -73,6 +73,7 @@ return {
 	['Money Record'] = '金錢記錄',
 	['Track Money Trend in the System'] = '記錄系統金錢變動',
 	['Enable Money Trend'] = '開啟金錢變動喊話',
+	['Money trend only distributor'] = '僅當自己或對方為分配者時',
 	['Team Profile on Equipment Score'] = '團隊概況顯示裝備分',
 	['Add New Protocols'] = '添加新方案',
 	['New Protocol  Format: Protocol\'s Name, Money'] = '新方案 格式：方案名,金錢',

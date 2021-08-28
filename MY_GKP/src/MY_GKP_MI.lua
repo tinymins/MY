@@ -396,7 +396,9 @@ function D.MoneyUpdate(nGold, nSilver, nCopper)
 		nTime     = GetCurrentTime(),
 		dwMapID   = GetClientPlayer().GetMapID()
 	})
-	if D.TradingTarget.szName and MY_GKP.bMoneyTalk then
+	if D.TradingTarget.szName
+	and MY_GKP.bMoneyTalk
+	and (not MY_GKP.bMoneyTalkOnlyDistributor or X.IsDistributor(D.TradingTarget.dwID) or X.IsDistributor()) then
 		if nGold > 0 then
 			X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 				D.GetFormatLink(_L['Received']),
