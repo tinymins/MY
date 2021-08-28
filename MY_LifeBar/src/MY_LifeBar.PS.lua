@@ -516,6 +516,15 @@ function PS.OnPanelActive(wnd)
 							end,
 						},
 						{
+							szOption = _L['Hide when full life'],
+							bCheck = true,
+							bChecked = cfg.Player.bHideFullLife,
+							fnAction = function()
+								cfg.Player.bHideFullLife = not cfg.Player.bHideFullLife
+								Config[szKey] = tRelationCfg
+							end,
+						},
+						{
 							szOption = _L['Hide in dungeon'],
 							bCheck = true,
 							bChecked = cfg.Player.bHideInDungeon,
@@ -560,6 +569,15 @@ function PS.OnPanelActive(wnd)
 							bChecked = cfg.Npc.bOnlyFighting,
 							fnAction = function()
 								cfg.Npc.bOnlyFighting = not cfg.Npc.bOnlyFighting
+								Config[szKey] = tRelationCfg
+							end,
+						},
+						{
+							szOption = _L['Hide when full life'],
+							bCheck = true,
+							bChecked = cfg.Npc.bHideFullLife,
+							fnAction = function()
+								cfg.Npc.bHideFullLife = not cfg.Npc.bHideFullLife
 								Config[szKey] = tRelationCfg
 							end,
 						},

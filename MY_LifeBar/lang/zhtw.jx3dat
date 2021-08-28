@@ -93,6 +93,7 @@ return {
     ['Foe'] = '仇人關係',
 
     ['Hide when unfight'] = '脫戰時隱藏',
+    ['Hide when full life'] = '滿血時隱藏',
     ['Hide in dungeon'] = '秘境中隱藏',
     ['Only target'] = '僅當前目標',
     ['Hide pets'] = '不顯示跟寵',
