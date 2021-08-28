@@ -3352,10 +3352,11 @@ function X.IsLeader(...)
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) == dwID
 end
 
-function X.IsDistributer(...)
+function X.IsDistributor(...)
 	local dwID = select('#', ...) == 0 and UI_GetClientPlayerID() or ...
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) == dwID
 end
+X.IsDistributer = X.IsDistributor
 
 -- 判断自己在不在队伍里
 -- (bool) X.IsInParty()
