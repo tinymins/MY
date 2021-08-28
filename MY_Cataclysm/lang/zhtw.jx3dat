@@ -158,7 +158,7 @@ return {
 	['Attention'] = '蒙版警告',
 	['Caution'] = '特效警告',
 	['Screen Head'] = '頭頂警告',
-	['Requires MY_LifeBar loaded.'] = '需載入並啟用扁平血條',
+	['Requires MY_LifeBar loaded.'] = '需載入並啟用頭頂血條',
 	['Add'] = '添加',
 	['Edit'] = '編輯',
 	['Sure'] = '確定',
