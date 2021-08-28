@@ -82,7 +82,7 @@ function D.DrawStat(frame)
 	local c, d = frame.ds:GetPaymentSum()
 	local hStat = frame:Lookup('', 'Handle_Record_Stat')
 	local szXml = GetFormatText(_L['Reall Salary:'], 41) .. D.GetMoneyTipText(a + b)
-	if X.IsDistributer() or not X.IsInParty() then
+	if X.IsDistributor() or not X.IsInParty() then
 		if c + d < 0 then
 			szXml = szXml .. GetFormatText(' || ' .. _L['Spending:'], 41) .. D.GetMoneyTipText(d)
 		elseif c ~= 0 then
@@ -107,7 +107,7 @@ function D.DrawStat(frame)
 				szXml = szXml .. GetFormatText(_L['Reall Salary:'], 41) .. D.GetMoneyTipText(a + b) .. br
 			end
 		end
-		if (X.IsDistributer() or not X.IsInParty()) and c > 0 then
+		if (X.IsDistributor() or not X.IsInParty()) and c > 0 then
 			szXml = szXml .. GetFormatText(_L['Total income:'], 41) .. D.GetMoneyTipText(c) .. br
 			if d ~= 0 then
 				szXml = szXml .. GetFormatText(_L['Spending:'], 41) .. D.GetMoneyTipText(d) .. br
@@ -145,7 +145,7 @@ function D.DrawAuctionPage(frame, szKey, szSort)
 			item:RegisterEvent(32)
 			if bMainInstance then
 				item.OnItemRButtonClick = function()
-					if not X.IsDistributer() and not X.IsDebugClient('MY_GKP') then
+					if not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then
 						return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 					end
 					MY_GKP_AuctionUI.Open(this:GetRoot().ds, v, 'EDIT')
@@ -199,12 +199,12 @@ function D.DrawAuctionPage(frame, szKey, szSort)
 			end
 			if bMainInstance then
 				wnd:Lookup('WndButton_Delete').OnLButtonClick = function()
-					if not X.IsDistributer() and not X.IsDebugClient('MY_GKP') then
+					if not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then
 						return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 					end
 					v.bDelete = not v.bDelete
 					frame.ds:SetAuctionRec(v)
-					if X.IsDistributer() then
+					if X.IsDistributor() then
 						if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 							X.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 						end
@@ -297,7 +297,7 @@ function MY_GKP_UI.OnFrameCreate()
 		x = 20, y = 660, w = 120, text = _L['Add Manually'],
 		buttonstyle = 'FLAT_LACE_BORDER',
 		onclick = function()
-			if not X.IsDistributer() and not X.IsDebugClient('MY_GKP') then -- debug
+			if not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then -- debug
 				return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			MY_GKP_AuctionUI.Open(this:GetRoot().ds)
@@ -320,7 +320,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if X.IsEmpty(ds:GetAuctionList()) then
 				return X.Alert('MY_GKP_UI', _L['No Record'])
 			end
-			if not X.IsDistributer() and not X.IsDebugClient('MY_GKP') then
+			if not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			GetUserInput(_L['Total Amount of People with Output Settle Account'],function(num)
@@ -435,7 +435,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if X.IsEmpty(tAuction) then
 				return X.Alert('MY_GKP_UI', _L['No Record'])
 			end
-			if not X.IsDistributer() and not X.IsDebugClient('MY_GKP') then
+			if not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			-- 处理数据
@@ -473,7 +473,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if not me.IsInParty() and not X.IsDebugClient('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
-			if not X.IsDistributer() and not X.IsDebugClient('MY_GKP') then
+			if not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			local tAuction = ds:GetAuctionPlayerSum()
@@ -623,7 +623,7 @@ function MY_GKP_UI.OnFrameCreate()
 			local me = GetClientPlayer()
 			if not me.IsInParty() then
 				X.Alert('MY_GKP_UI', _L['You are not in the team.'])
-			elseif not X.IsDistributer() and not X.IsDebugClient('MY_GKP') then
+			elseif not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then
 				X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			else
 				local menu = MY_GKP.GetTeamMemberMenu(function(v)

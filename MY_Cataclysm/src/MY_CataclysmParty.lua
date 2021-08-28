@@ -2053,7 +2053,7 @@ function CTM:StartTeamVote(eType)
 				if eType == 'raid_ready' then
 					bAwait = false
 				elseif eType == 'wage_agree' then
-					bAwait = not X.IsDistributer()
+					bAwait = not X.IsDistributor()
 				end
 			end
 			if bAwait then

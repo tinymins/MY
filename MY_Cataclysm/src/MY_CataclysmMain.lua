@@ -238,18 +238,18 @@ end
 
 function D.InsertDistributeMenu(tMenu)
 	local aDistributeMenu = {}
-	InsertDistributeMenu(aDistributeMenu, not X.IsDistributer())
+	InsertDistributeMenu(aDistributeMenu, not X.IsDistributor())
 	for _, menu in ipairs(aDistributeMenu) do
 		if menu.szOption == g_tStrings.STR_LOOT_LEVEL then
 			table.insert(menu, 1, {
-				bDisable = not X.IsDistributer(),
+				bDisable = not X.IsDistributor(),
 				szOption = g_tStrings.STR_WHITE,
 				nFont = 79, rgb = {GetItemFontColorByQuality(1)},
 				bMCheck = true, bChecked = GetClientTeam().nRollQuality == 1,
 				fnAction = function() GetClientTeam().SetTeamRollQuality(1) end,
 			})
 			table.insert(menu, 1, {
-				bDisable = not X.IsDistributer(),
+				bDisable = not X.IsDistributor(),
 				szOption = g_tStrings.STR_GRAY,
 				nFont = 79, rgb = {GetItemFontColorByQuality(0)},
 				bMCheck = true, bChecked = GetClientTeam().nRollQuality == 0,
@@ -973,7 +973,7 @@ function D.OnLButtonClick()
 			table.insert(menu, { bDevide = true })
 		end
 		-- ·ÖÅä
-		D.InsertDistributeMenu(menu, not X.IsDistributer())
+		D.InsertDistributeMenu(menu, not X.IsDistributor())
 		table.insert(menu, { bDevide = true })
 		if me.IsInRaid() then
 			-- ±à¼­Ä£Ê½
@@ -1039,13 +1039,13 @@ function D.OnLButtonClick()
 		end
 		MY_TeamNotice.OpenFrame()
 	elseif szName == 'WndButton_LootMode' or szName == 'WndButton_LootQuality' then
-		if X.IsDistributer() then
+		if X.IsDistributor() then
 			local menu = {}
 			if szName == 'WndButton_LootMode' then
-				D.InsertDistributeMenu(menu, not X.IsDistributer())
+				D.InsertDistributeMenu(menu, not X.IsDistributor())
 				PopupMenu(menu[1])
 			elseif szName == 'WndButton_LootQuality' then
-				D.InsertDistributeMenu(menu, not X.IsDistributer())
+				D.InsertDistributeMenu(menu, not X.IsDistributor())
 				PopupMenu(menu[2])
 			end
 		else

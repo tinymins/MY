@@ -1166,7 +1166,7 @@ function D.AuthCheck(dwID)
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_DISTRIBUTE_LOOT)
 		return false
 	end
-	if not X.IsDistributer() and not X.IsDebugClient('MY_GKP') then -- 需要自己是分配者
+	if not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then -- 需要自己是分配者
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.ERROR_LOOT_DISTRIBUTE)
 		return false
 	end

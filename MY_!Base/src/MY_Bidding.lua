@@ -38,8 +38,8 @@ function D.Open(tConfig)
 	if not tConfig.szKey then
 		tConfig.szKey = X.GetUUID()
 	end
-	if not X.IsDistributer() then
-		return X.Systopmsg(_L['You are not distributer!'])
+	if not X.IsDistributor() then
+		return X.Systopmsg(_L['You are not distributor!'])
 	end
 	if not D.CheckChatLock() then
 		return
@@ -256,13 +256,13 @@ function D.SwitchCustomBidding(frame, bCustom)
 end
 
 function D.UpdateAuthourize(frame)
-	local bDistributer = X.IsDistributer()
-	if not bDistributer then
+	local bDistributor = X.IsDistributor()
+	if not bDistributor then
 		D.SwitchConfig(frame, false)
 	end
-	frame:Lookup('Wnd_Config/Btn_Option'):SetVisible(not frame.bWaitInit and bDistributer)
-	frame:Lookup('Wnd_Bidding/WndButton_Publish'):SetVisible(not frame.bWaitInit and bDistributer)
-	frame:Lookup('Wnd_Bidding/WndButton_Finish'):SetVisible(not frame.bWaitInit and bDistributer)
+	frame:Lookup('Wnd_Config/Btn_Option'):SetVisible(not frame.bWaitInit and bDistributor)
+	frame:Lookup('Wnd_Bidding/WndButton_Publish'):SetVisible(not frame.bWaitInit and bDistributor)
+	frame:Lookup('Wnd_Bidding/WndButton_Finish'):SetVisible(not frame.bWaitInit and bDistributor)
 end
 
 function D.RecordSorter(r1, r2)
@@ -485,15 +485,15 @@ function MY_BiddingBase.OnLButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
 	if name == 'Btn_Close' then
-		if X.IsDistributer() then
-			return X.Systopmsg(_L['You are distributer, Please finish this bidding!'])
+		if X.IsDistributor() then
+			return X.Systopmsg(_L['You are distributor, Please finish this bidding!'])
 		end
 		X.Confirm(_L['Sure cancel this bidding? You will not able to bidding this item.'], function()
 			Wnd.CloseWindow(frame)
 		end)
 	elseif name == 'Btn_Option' then
-		if not X.IsDistributer() then
-			return X.Systopmsg(_L['You are not distributer!'])
+		if not X.IsDistributor() then
+			return X.Systopmsg(_L['You are not distributor!'])
 		end
 		local szKey = D.GetKey(frame)
 		frame.tUnsavedConfig = X.Clone(BIDDING_CACHE[szKey].tConfig)
@@ -519,8 +519,8 @@ function MY_BiddingBase.OnLButtonClick()
 		menu.nMinWidth = wnd:GetW()
 		UI.PopupMenu(menu)
 	elseif name == 'WndButton_ConfigSubmit' then
-		if not X.IsDistributer() then
-			return X.Systopmsg(_L['You are not distributer!'])
+		if not X.IsDistributor() then
+			return X.Systopmsg(_L['You are not distributor!'])
 		end
 		if not D.CheckChatLock() then
 			return
@@ -721,8 +721,8 @@ end
 function MY_BiddingBase.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_RowItemDelete' then
-		if not X.IsDistributer() then
-			return X.Systopmsg(_L['You are not distributer!'])
+		if not X.IsDistributor() then
+			return X.Systopmsg(_L['You are not distributor!'])
 		end
 		if not D.CheckChatLock() then
 			return
@@ -738,8 +738,8 @@ function MY_BiddingBase.OnItemLButtonClick()
 		table.insert(aSay, { type = 'name', name = rec.szTalkerName })
 		table.insert(aSay, { type = 'text', text = _L[' \'s invalid price .'] })
 		X.Confirm(_L('Sure to delete %s\'s bidding record?', rec.szTalkerName), function()
-			if not X.IsDistributer() then
-				return X.Systopmsg(_L['You are not distributer!'])
+			if not X.IsDistributor() then
+				return X.Systopmsg(_L['You are not distributor!'])
 			end
 			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_DELETE', { szKey = szKey, dwTalkerID = rec.dwTalkerID })
 			X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
