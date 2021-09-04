@@ -815,6 +815,9 @@ function MY_GKP_UI.OnItemMouseEnter()
 	local frame = this:GetRoot()
 	if this:GetName() == 'Text_Name' then
 		local data = this.data
+		if not data.dwForceID then
+			return
+		end
 		local szIcon, nFrame = GetForceImage(data.dwForceID)
 		local r, g, b = X.GetForceColor(data.dwForceID)
 		local aXml = {
