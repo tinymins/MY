@@ -379,6 +379,9 @@ end)
 D.TradingTarget = {}
 
 function D.MoneyUpdate(nGold, nSilver, nCopper)
+	if math.abs(nGold) < 1 then -- API 有问题。。。 有时候会给无限接近于0金的数值
+		return
+	end
 	if nGold < 100 and not D.TradingTarget.szName then
 		return
 	end
