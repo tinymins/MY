@@ -346,29 +346,31 @@ function MY_GKP_UI.OnFrameCreate()
 		local nBeginTime, nEndTime = math.huge, 0
 		local nMoney, nEquipNum, nEquipPrice, tEquipPrice = 0, 0, 0, {}
 		for k, v in ipairs(aBill) do
-			local dwForceID, aItem = -1, {}
-			for kk, vv in ipairs(aAuction) do
-				if vv.szPlayer == v.szName then
-					if vv.dwForceID and dwForceID == -1 then
-						dwForceID = vv.dwForceID
-					end
-					if vv.nUiId == 0 then
-						table.insert(aItem, { 'M', vv.szName, vv.nMoney })
-					else
-						local KItemInfo = GetItemInfo(vv.dwTabType, vv.dwIndex)
-						if KItemInfo and KItemInfo.nGenre == ITEM_GENRE.EQUIPMENT and KItemInfo.nQuality >= CONSTANT.ITEM_QUALITY.PURPLE then
-							tEquipPrice[vv.nMoney] = true
-							nEquipNum = nEquipNum + 1
-							nEquipPrice = nEquipPrice + vv.nMoney
+			if v.szName ~= 'System' then
+				local dwForceID, aItem = -1, {}
+				for kk, vv in ipairs(aAuction) do
+					if vv.szPlayer == v.szName then
+						if vv.dwForceID and dwForceID == -1 then
+							dwForceID = vv.dwForceID
 						end
-						table.insert(aItem, { vv.dwTabType, vv.dwIndex, vv.nStackNum or vv.nBookID })
+						if vv.nUiId == 0 then
+							table.insert(aItem, { 'M', vv.szName, vv.nMoney })
+						else
+							local KItemInfo = GetItemInfo(vv.dwTabType, vv.dwIndex)
+							if KItemInfo and KItemInfo.nGenre == ITEM_GENRE.EQUIPMENT and KItemInfo.nQuality >= CONSTANT.ITEM_QUALITY.PURPLE then
+								tEquipPrice[vv.nMoney] = true
+								nEquipNum = nEquipNum + 1
+								nEquipPrice = nEquipPrice + vv.nMoney
+							end
+							table.insert(aItem, { vv.dwTabType, vv.dwIndex, vv.nStackNum or vv.nBookID })
+						end
+						nMoney = nMoney + vv.nMoney
+						nBeginTime = math.min(nBeginTime, vv.nTime)
+						nEndTime = math.max(nEndTime, vv.nTime)
 					end
-					nMoney = nMoney + vv.nMoney
-					nBeginTime = math.min(nBeginTime, vv.nTime)
-					nEndTime = math.max(nEndTime, vv.nTime)
 				end
+				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {szMsgType, 'RECORD', szKey, v.szName, v.nGold, dwForceID, aItem})
 			end
-			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {szMsgType, 'RECORD', szKey, v.szName, v.nGold, dwForceID, aItem})
 		end
 		local nDuring = nEndTime >= nBeginTime and nEndTime - nBeginTime or 0
 		local nGKPLevel = 0
@@ -478,9 +480,6 @@ function MY_GKP_UI.OnFrameCreate()
 			end
 			local tAuction = ds:GetAuctionPlayerSum()
 			local tPayment = ds:GetPaymentPlayerSum()
-			if X.IsEmpty(tAuction) and X.IsEmpty(tPayment) then
-				return X.Alert('MY_GKP_UI', _L['No Record'])
-			end
 			-- 处理数据
 			local tBill = {}
 			-- 欠账
@@ -494,9 +493,12 @@ function MY_GKP_UI.OnFrameCreate()
 			-- 排序
 			local aBill = {}
 			for k, v in pairs(tBill) do
-				if v ~= 0 then
+				if k ~= 'System' and v ~= 0 then
 					table.insert(aBill, { szName = k, nGold = v })
 				end
+			end
+			if X.IsEmpty(aBill) then
+				return X.Alert('MY_GKP_UI', _L['No Record'])
 			end
 			table.sort(aBill, function(a, b) return a.nGold < b.nGold end)
 			-- 聊天频道
