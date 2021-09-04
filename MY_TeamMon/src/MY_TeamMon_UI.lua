@@ -2608,7 +2608,10 @@ function D.OpenSettingPanel(data, szType)
 							local w, h = this:GetSize()
 							local xml = { GetFormatText(_L['Countdown preview'] .. '\n', 0, 255, 255, 0) }
 							for k, v in ipairs(CheckCountdown(szNum)) do
-								table.insert(xml, GetFormatText(v.nTime .. ' - ' .. FilterCustomText(v.szName, '{$sender}', '{$receiver}') .. '\n'))
+								table.insert(xml, GetFormatText(
+									X.FormatDuration(v.nTime, 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' })
+									.. ' - ' .. FilterCustomText(v.szName, '{$sender}', '{$receiver}') .. '\n'
+								))
 							end
 							edit:Color(255, 255, 255)
 							X.OutputTip(this, table.concat(xml), true)
