@@ -303,51 +303,42 @@ function D.SortGuildBank()
 	fnNext()
 end
 
--- 植入堆叠整理按纽
-function D.CreateInjection()
-	-- guild bank sort/stack
-	local btn1 = UI('Normal/GuildBankPanel/Btn_Refresh')
-	local btn2 = UI('Normal/GuildBankPanel/Btn_MY_Sort')
-	local btn3 = UI('Normal/GuildBankPanel/Btn_MY_Stack')
-	if btn1:Count() == 0 then
-		return
-	end
-	if btn2:Count() == 0 then
-		local x, y = btn1:Pos()
-		local w, h = btn1:Size()
-		btn2 = UI('Normal/GuildBankPanel'):Append('WndButton', {
-			name = 'Btn_MY_Sort',
-			x = x - w, y = y, w = w, h = h,
-			text = _L['Sort'],
-			tip = _L['Press shift for random'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			onclick = D.SortGuildBank,
-		})
-	end
-	if btn3:Count() == 0 then
-		local x, y = btn2:Pos()
-		local w, h = btn2:Size()
-		btn3 = UI('Normal/GuildBankPanel'):Append('WndButton', {
-			name = 'Btn_MY_Stack',
-			x = x - w, y = y, w = w, h = h,
-			text = _L['Stack'],
-			onclick = D.StackGuildBank,
-		})
-	end
-end
-
--- 移除堆叠整理按纽
-function D.RemoveInjection()
-	UI('Normal/GuildBankPanel/Btn_MY_Sort'):Remove()
-	UI('Normal/GuildBankPanel/Btn_MY_Stack'):Remove()
-end
-
 -- 检测增加堆叠按纽
-function D.CheckInjection()
-	if O.bGuildBank then
-		D.CreateInjection()
+function D.CheckInjection(bRemoveInjection)
+	if not bRemoveInjection and O.bGuildBank then
+		-- 植入堆叠整理按纽
+		-- guild bank sort/stack
+		local btn1 = UI('Normal/GuildBankPanel/Btn_Refresh')
+		local btn2 = UI('Normal/GuildBankPanel/Btn_MY_Sort')
+		local btn3 = UI('Normal/GuildBankPanel/Btn_MY_Stack')
+		if btn1:Count() > 0 then
+			if btn2:Count() == 0 then
+				local x, y = btn1:Pos()
+				local w, h = btn1:Size()
+				btn2 = UI('Normal/GuildBankPanel'):Append('WndButton', {
+					name = 'Btn_MY_Sort',
+					x = x - w, y = y, w = w, h = h,
+					text = _L['Sort'],
+					tip = _L['Press shift for random'],
+					tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+					onclick = D.SortGuildBank,
+				})
+			end
+			if btn3:Count() == 0 then
+				local x, y = btn2:Pos()
+				local w, h = btn2:Size()
+				btn3 = UI('Normal/GuildBankPanel'):Append('WndButton', {
+					name = 'Btn_MY_Stack',
+					x = x - w, y = y, w = w, h = h,
+					text = _L['Stack'],
+					onclick = D.StackGuildBank,
+				})
+			end
+		end
 	else
-		D.RemoveInjection()
+		-- 移除堆叠整理按纽
+		UI('Normal/GuildBankPanel/Btn_MY_Sort'):Remove()
+		UI('Normal/GuildBankPanel/Btn_MY_Stack'):Remove()
 	end
 end
 
@@ -368,7 +359,7 @@ end
 
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_BagSort', D.CheckInjection)
 X.RegisterFrameCreate('GuildBankPanel', 'MY_BagSort', D.CheckInjection)
-X.RegisterReload('MY_BagSort', D.RemoveInjection)
+X.RegisterReload('MY_BagSort', function() D.CheckInjection(true) end)
 
 ---------------------------------------------------------------------
 -- Global exports
