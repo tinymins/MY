@@ -2222,6 +2222,12 @@ function D.OnShare(_, data, nChannel, dwID, szName, bIsSelf)
 	end
 end
 
+X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon.MapRestriction', function()
+	if arg0 and arg0 ~= 'MY_TeamMon.MapRestriction' then
+		return
+	end
+	D.UpdateShieldStatus()
+end)
 X.RegisterInit('MY_TeamMon', function()
 	X.RegisterEvent('LOADING_ENDING', 'MY_TeamMon', function()
 		FireUIEvent('MY_TM_DATA_RELOAD')
