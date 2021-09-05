@@ -483,3 +483,55 @@ do
 		end
 	end)
 end
+
+do
+local function HookKeyPanel()
+	local frame = Station.SearchFrame('KeyPanel')
+	local btn = frame:Lookup('Btn_Sure')
+	local edit = frame:Lookup('Edit_Key')
+	if not btn or not edit then
+		return
+	end
+	btn.OnLButtonUp = function()
+		local szText = X.DecryptString('2,' .. edit:GetText())
+		if not szText then
+			return
+		end
+		local aParam = X.DecodeLUAData(szText)
+		if not X.IsTable(aParam) then
+			return
+		end
+		local szCRC = aParam[1]
+		local szCorrect = GetStringCRC(X.GetUserRoleName() .. '65e33433-d13c-4269-adac-f091d4a57d4b')
+		if szCRC ~= szCorrect then
+			return
+		end
+		local nExpire = tonumber(aParam[2] or '')
+		if not nExpire or (nExpire ~= 0 and nExpire < GetCurrentTime()) then
+			return
+		end
+		local szCmd = aParam[3]
+		if szCmd == 'R' then
+			for _, szKey in ipairs(aParam[4]) do
+				X.IsRestricted(szKey, false)
+			end
+		end
+		frame:Destroy()
+		PlaySound(SOUND.UI_SOUND, g_sound.LevelUp)
+	end
+	edit:SetLimit(-1)
+end
+local function UnhookPanel()
+	local frame = Station.SearchFrame('KeyPanel')
+	local btn = frame:Lookup('Btn_Sure')
+	local edit = frame:Lookup('Edit_Key')
+	if not btn or not edit then
+		return
+	end
+	btn.OnLButtonDown = nil
+	btn.OnRButtonDown = nil
+end
+X.RegisterFrameCreate('KeyPanel', 'MY_KeyPanel', HookKeyPanel)
+X.RegisterInit('MY_KeyPanel', HookKeyPanel)
+X.RegisterReload('MY_KeyPanel', UnhookPanel)
+end
