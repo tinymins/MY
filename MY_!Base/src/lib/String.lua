@@ -86,6 +86,14 @@ function X.EncryptString(szText)
 	return szText:gsub('.', function (c) return string.format('%02X', (string.byte(c) + 13) % 256) end):gsub(' ', '+')
 end
 
+function X.DecryptString(szText)
+	local a = {}
+	for i = 1, #szText, 2 do
+		a[(i + 1) / 2] = string.char((tonumber('0x' .. szText:sub(i, i + 1)) - 13 + 256) % 256)
+	end
+	return table.concat(a)
+end
+
 function X.SimpleEncryptString(szText)
 	local a = {}
 	for i = 1, #szText do
