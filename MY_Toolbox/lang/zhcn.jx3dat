@@ -464,5 +464,5 @@ return {
     ['MY_DialogNameLink'] = '其它',
 
     ['Produce diamond as last formula'] = '自动按上次配方合石头',
-    ["DIAMOND_REGEX"] = "五行石（(.-)级）",
+    ['DIAMOND_REGEX'] = '五行石（(.-)级）',
 }
