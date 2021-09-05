@@ -34,6 +34,7 @@ return {
 	['Global preference'] = '全局数据',
 	['Error message'] = '错误反馈',
 	['Show error message'] = '点击查看错误日志，请在上报问题时复制提交',
+	['No error message found.'] = '没有找到错误日志记录。',
 	['Debug tools has been enabled...'] = '测试工具已激活_(:彡」∠)_',
 	['Flush data'] = '保存数据',
 	['Export data'] = '导出配置',
