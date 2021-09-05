@@ -224,8 +224,8 @@ function D.OnDiamondUpdate()
 	end)
 end
 
--- 注册下次精炼结果显示
-function D.PlayCommonRefineDuang(bSuccess)
+-- 隐藏结果特效
+function D.HideDuang()
 	local frame = Station.Lookup('Normal/CastingPanel')
 	if not frame then
 		return
@@ -234,15 +234,23 @@ function D.PlayCommonRefineDuang(bSuccess)
 	local sfxFailure = frame:Lookup('PageSet_All/Page_Refine', 'SFX_CommonRefineFailure')
 	sfxSuccess:Hide()
 	sfxFailure:Hide()
+end
 
+-- 精炼结果显示
+function D.PlayDuang(bSuccess)
+	local frame = Station.Lookup('Normal/CastingPanel')
+	if not frame then
+		return
+	end
 	local sfx
 	if bSuccess then
-		sfx = sfxSuccess
+		sfx = frame:Lookup('PageSet_All/Page_Refine', 'SFX_CommonRefineSuccess')
 		PlaySound(SOUND.UI_SOUND, g_sound.ElementalStoneSuccess)
 	else
-		sfx = sfxFailure
+		sfx = frame:Lookup('PageSet_All/Page_Refine', 'SFX_CommonRefineFailure')
 		PlaySound(SOUND.UI_SOUND, g_sound.ElementalStoneFailed)
 	end
+	sfx:Hide()
 	sfx:Show()
 	sfx:Play()
 end
@@ -258,12 +266,13 @@ function D.AwaitNextDuang()
 				local KItem = GetPlayerItem(GetClientPlayer(), d.dwBox, d.dwX)
 				if KItem then
 					if KItem.nDetail > d.detail then
-						D.PlayCommonRefineDuang(true)
+						X.DelayCall(1, function() D.HideDuang() D.PlayDuang(true) end)
 						OutputMessage('MSG_ANNOUNCE_YELLOW', g_tStrings.tFEProduce.SUCCEED)
 					else
-						D.PlayCommonRefineDuang(false)
+						X.DelayCall(1, function() D.HideDuang() D.PlayDuang(false) end)
 						OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.tFEProduce.FAILED)
 					end
+					D.HideDuang()
 				end
 			end
 		end
