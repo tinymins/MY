@@ -233,7 +233,8 @@ end
 function D.IsCustomDoodad(doodad)
 	if O.bCustom and D.tCustom[doodad.szName] then
 		if doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP then
-			return GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING
+			local tpl = GetDoodadTemplate(doodad.dwTemplateID)
+			return tpl and tpl.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING
 		end
 		return true
 	end
@@ -243,7 +244,8 @@ end
 function D.IsRecentDoodad(doodad)
 	if O.bRecent and D.tRecent[doodad.dwTemplateID] then
 		if doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP then
-			return GetDoodadTemplate(doodad.dwTemplateID).dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING
+			local tpl = GetDoodadTemplate(doodad.dwTemplateID)
+			return tpl and tpl.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING
 		end
 		return true
 	end
@@ -257,10 +259,13 @@ function D.GetDoodadInfo(dwID)
 	end
 	local me = GetClientPlayer()
 	local tpl = GetDoodadTemplate(doodad.dwTemplateID)
-	local info = { dwCraftID = tpl.dwCraftID }
+	local info = {}
+	if tpl then
+		info.dwCraftID = tpl.dwCraftID
+	end
 	local eOverwriteAction = (D.tLooted[doodad.dwID] == false or doodad.CanLoot(me.dwID)) and 'loot' or nil
 	-- 跳过非拾取类尸体之类交互物件
-	if DOODAD_TYPE_VISIBLE[tpl.nKind] == false and eOverwriteAction ~= 'loot' then
+	if tpl and DOODAD_TYPE_VISIBLE[tpl.nKind] == false and eOverwriteAction ~= 'loot' then
 		return
 	end
 	-- 神农、采金
