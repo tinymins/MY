@@ -162,11 +162,15 @@ function PS.OnPanelActive(wnd)
 				return
 			end
 			if nErrmsgLen > 300 then
-				szErrmsg = szErrmsg:sub(0, 300)
+				szErrmsg = szErrmsg:sub(0, 512)
+					.. '\n========================================'
 					.. '\n' .. '... ' .. (nErrmsgLen - 300) .. ' char(s) omitted.'
-					.. '\n\n# Full error logs:\n' .. X.GetAbsolutePath(X.GetAddonErrorMessageFilePath()) .. '\n'
+					.. '\n========================================'
+					.. '\n# Full error logs:'
+					.. '\n> ' .. X.GetAbsolutePath(X.GetAddonErrorMessageFilePath())
+					.. '\n========================================'
 			end
-			UI.OpenTextEditor(szErrmsg)
+			UI.OpenTextEditor(szErrmsg, { w = 800, h = 600, title = _L['Error message'] })
 		end,
 	}):AutoWidth():Width() + 5
 	PS.OnPanelResize(wnd)
