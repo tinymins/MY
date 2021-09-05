@@ -247,15 +247,15 @@ function PS.OnPanelActive(wnd)
 				return
 			end
 			local szErrmsg = X.GetAddonErrorMessage()
-			local nErrmsgLen = #szErrmsg
+			local nErrmsgLen, nMaxLen = #szErrmsg, 1024
 			if nErrmsgLen == 0 then
 				X.Alert(_L['No error message found.'])
 				return
 			end
 			if nErrmsgLen > 300 then
-				szErrmsg = szErrmsg:sub(0, 512)
+				szErrmsg = szErrmsg:sub(0, nMaxLen)
 					.. '\n========================================'
-					.. '\n' .. '... ' .. (nErrmsgLen - 300) .. ' char(s) omitted.'
+					.. '\n' .. '... ' .. (nErrmsgLen - nMaxLen) .. ' char(s) omitted.'
 					.. '\n========================================'
 					.. '\n# Full error logs:'
 					.. '\n> ' .. X.GetAbsolutePath(X.GetAddonErrorMessageFilePath())
