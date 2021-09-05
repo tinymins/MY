@@ -219,8 +219,8 @@ function D.OnDiamondUpdate()
 				return
 			end
 		end
+		D.AwaitNextDuang()
 		D.ProduceDiamond()
-		D.RegisterNextRefineDuang()
 	end)
 end
 
@@ -248,7 +248,7 @@ function D.PlayCommonRefineDuang(bSuccess)
 end
 
 -- 注册下次精炼结果显示
-function D.RegisterNextRefineDuang()
+function D.AwaitNextDuang()
 	-- 播放结果动画
 	X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond__Duang', function()
 		local nResult = arg0
