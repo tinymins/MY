@@ -85,7 +85,8 @@ local function from_base64(to_decode)
 		local char = string.sub(to_decode, i, i)
 		local offset, _ = string.find(index_table, char)
 		if offset == nil then
-			error("Invalid character '" .. char .. "' found.")
+			return
+			-- error("Invalid character '" .. char .. "' found.")
 		end
 
 		bit_pattern = bit_pattern .. string.sub(to_binary(offset-1), 3)
