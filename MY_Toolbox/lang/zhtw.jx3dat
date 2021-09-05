@@ -465,4 +465,5 @@ return {
 
     ['Produce diamond as last formula'] = '自動按上次配方合石頭',
     ['DIAMOND_REGEX'] = '五行石（(.-)級）',
+    ['Stop'] = '終止',
 }

@@ -290,18 +290,30 @@ function D.CheckInjection(bRemove)
 		return
 	end
 	if not bRemove and not X.IsRestricted('MY_AutoDiamond') then
-		UI(page):Append('WndCheckBox', {
+		local nX, nY = 80, 390
+		nX = nX + UI(page):Append('WndCheckBox', {
 			name = 'WndCheckBox_MYDiamond',
 			text = _L['Produce diamond as last formula'],
-			x = 100, y = 390, w = 'auto',
-			checked = O.bEnable, font = 57,
+			x = nX, y = nY, w = 'auto', h = 20, alpha = 192,
+			checked = O.bEnable, color = { 255, 128, 0 },
 			oncheck = function(bChecked)
 				O.bEnable = bChecked
 				D.dFormula = nil
 			end,
+		}):Width() + 5
+		UI(page):Append('WndButtonBox', {
+			name = 'WndButton_MYDiamond',
+			x = nX, y = nY, w = 50, h = 20,
+			buttonstyle = 'FLAT',
+			text = _L['Stop'],
+			onclick = function()
+				D.dFormula = nil
+			end,
+			autoenable = function() return not not D.dFormula end,
 		})
 	else
 		UI(page):Fetch('WndCheckBox_MYDiamond'):Remove()
+		UI(page):Fetch('WndButton_MYDiamond'):Remove()
 	end
 end
 X.RegisterFrameCreate('CastingPanel', 'MY_AutoDiamond', function() D.CheckInjection() end)
