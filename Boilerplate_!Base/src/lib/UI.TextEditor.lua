@@ -16,18 +16,26 @@ local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstr
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 -- 打开文本编辑器
-function UI.OpenTextEditor(szText, szFrameName)
-	if not szFrameName then
-		szFrameName = X.NSFormatString('{$NS}_DefaultTextEditor')
+function UI.OpenTextEditor(szText, opt)
+	local szFrameName
+	if X.IsString(opt) then
+		szFrameName = opt.name
 	end
-	local w, h, ui = 400, 300, nil
+	if not X.IsTable(opt) then
+		opt = {}
+	end
+	if not szFrameName then
+		szFrameName = opt.name or X.NSFormatString('{$NS}_DefaultTextEditor')
+	end
+	local w, h, ui = opt.w or 400, opt.h or 300, nil
 	local function OnResize()
 		local nW, nH = select(3, ui:Size())
-		ui:Children('.WndEditBox'):Size(nW, nH)
+		ui:Fetch('WndEditBox'):Size(nW, nH)
 	end
 	ui = UI.CreateFrame(szFrameName, {
-		w = w, h = h, text = _L['Text Editor'], alpha = 180,
-		anchor = { s='CENTER', r='CENTER', x=0, y=0 },
+		w = w, h = h, alpha = opt.alpha or 180,
+		text = opt.title or _L['Text Editor'],
+		anchor = opt.anchor or { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },
 		simple = true, close = true, esc = true,
 		dragresize = true, minimize = true, ondragresize = OnResize,
 	})
