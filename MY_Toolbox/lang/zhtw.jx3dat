@@ -462,4 +462,7 @@ return {
     ['MY_RoleStatistics'] = '角色統計',
 
     ['MY_DialogNameLink'] = '其它',
+
+    ['Produce diamond as last formula'] = '自動按上次配方合石頭',
+    ["DIAMOND_REGEX"] = "五行石（(.-)級）",
 }
