@@ -2010,6 +2010,9 @@ function X.GetAddonErrorMessage()
 	end
 	return szMsg .. table.concat(ERROR_MSG, '\n\n')
 end
+function X.GetAddonErrorMessageFilePath()
+	return X.FormatPath(FILE_PATH)
+end
 X.RegisterInit('LIB#AddonErrorMessage', SaveErrorMessage)
 end
 

@@ -246,7 +246,18 @@ function PS.OnPanelActive(wnd)
 				X.ReopenPanel()
 				return
 			end
-			UI.OpenTextEditor(X.GetAddonErrorMessage())
+			local szErrmsg = X.GetAddonErrorMessage()
+			local nErrmsgLen = #szErrmsg
+			if nErrmsgLen == 0 then
+				X.Alert(_L['No error message found.'])
+				return
+			end
+			if nErrmsgLen > 300 then
+				szErrmsg = szErrmsg:sub(0, 300)
+					.. '\n' .. '... ' .. (nErrmsgLen - 300) .. ' char(s) omitted.'
+					.. '\n\n# Full error logs:\n' .. X.GetAbsolutePath(X.GetAddonErrorMessageFilePath()) .. '\n'
+			end
+			UI.OpenTextEditor(szErrmsg)
 		end,
 	}):AutoWidth():Width() + 5
 	PS.OnPanelResize(wnd)

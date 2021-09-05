@@ -40,6 +40,7 @@ return {
 	['Global preference'] = '全局數據',
 	['Error message'] = '錯誤反饋',
 	['Show error message'] = '點擊查看錯誤日誌，請在上報問題時複製提交',
+	['No error message found.'] = '沒有找到錯誤日誌記錄。',
 	['Debug tools has been enabled...'] = '測試工具已激活_(:彡」∠)_',
 	['Flush data'] = '保存數據',
 	['Export data'] = '導出配置',
