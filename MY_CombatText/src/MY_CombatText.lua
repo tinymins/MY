@@ -550,7 +550,7 @@ function CombatText.OnFrameRender()
 				end
 			end
 			-- draw
-			local r, g, b = unpack(v.col)
+			local r, g, b = unpack(v.col or {255, 255, 255})
 			if not COMBAT_TEXT_LEAVE[v.dwTargetID] or not v.object or not v.tPoint[1] then
 				k:AppendCharacterID(v.dwTargetID, bTop, r, g, b, nAlpha, { 0, 0, 0, nLeft * COMBAT_TEXT_UI_SCALE, nTop * COMBAT_TEXT_UI_SCALE}, nFont, v.szText, 1, fScale)
 				if v.object and v.object.nX then
