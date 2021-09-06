@@ -87,9 +87,13 @@ function X.EncryptString(szText)
 end
 
 function X.DecryptString(szText)
-	local a = {}
+	local a, n = {}, nil
 	for i = 1, #szText, 2 do
-		a[(i + 1) / 2] = string.char((tonumber('0x' .. szText:sub(i, i + 1)) - 13 + 256) % 256)
+		n = tonumber('0x' .. szText:sub(i, i + 1))
+		if not n then
+			return
+		end
+		a[(i + 1) / 2] = string.char(( - 13 + 256) % 256)
 	end
 	return table.concat(a)
 end
