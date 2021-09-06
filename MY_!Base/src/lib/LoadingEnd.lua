@@ -47,6 +47,9 @@ end)
 do
 local function OnKeyPanelBtnLButtonUp()
 	local frame = Station.SearchFrame('KeyPanel')
+	if not frame then
+		return
+	end
 	local btn = frame:Lookup('Btn_Sure')
 	local edit = frame:Lookup('Edit_Key')
 	if not btn or not edit then
@@ -80,6 +83,9 @@ local function OnKeyPanelBtnLButtonUp()
 end
 local function HookKeyPanel()
 	local frame = Station.SearchFrame('KeyPanel')
+	if not frame then
+		return
+	end
 	local btn = frame:Lookup('Btn_Sure')
 	local edit = frame:Lookup('Edit_Key')
 	if not btn or not edit then
@@ -90,6 +96,9 @@ local function HookKeyPanel()
 end
 local function UnhookPanel()
 	local frame = Station.SearchFrame('KeyPanel')
+	if not frame then
+		return
+	end
 	local btn = frame:Lookup('Btn_Sure')
 	local edit = frame:Lookup('Edit_Key')
 	if not btn or not edit then
