@@ -93,7 +93,7 @@ function X.DecryptString(szText)
 		if not n then
 			return
 		end
-		a[(i + 1) / 2] = string.char(( - 13 + 256) % 256)
+		a[(i + 1) / 2] = string.char((n - 13 + 256) % 256)
 	end
 	return table.concat(a)
 end
