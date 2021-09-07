@@ -376,56 +376,74 @@ end)
 ---------------------------------------------------------------------->
 -- 金钱记录
 ----------------------------------------------------------------------<
-D.TradingTarget = {}
+D.tTradingInfo = {}
 
 function D.MoneyUpdate(nGold, nSilver, nCopper)
-	if math.abs(nGold) < 1 then -- API 有问题。。。 有时候会给无限接近于0金的数值
+	if math.abs(nGold) < 1 then -- 不足1金不记录
 		return
 	end
-	if nGold < 100 and not D.TradingTarget.szName then
+	local szPeerName = 'System'
+	if D.tTradingInfo and D.tTradingInfo.dwPeerID
+	and D.tTradingInfo.bSelfConfirm and D.tTradingInfo.bPeerConfirm then
+		szPeerName = D.tTradingInfo.szPeerName
+	end
+	-- 不记录系统交易变动，则直接返回
+	if szPeerName == 'System' and not MY_GKP.bMoneySystem then
 		return
 	end
-	if not D.TradingTarget then
-		return
-	end
-	if not D.TradingTarget.szName and not MY_GKP.bMoneySystem then
+	-- 不记录10金以下系统交易变动
+	if nGold < 10 and szPeerName == 'System' then
 		return
 	end
 	local ds = D.GetDS()
 	ds:SetPaymentRec({
 		nGold     = nGold, -- API给的有问题 …… 只算金
-		szPlayer  = D.TradingTarget.szName or 'System',
-		dwForceID = D.TradingTarget.dwForceID,
+		szPlayer  = szPeerName,
+		dwForceID = D.tTradingInfo.dwForceID,
 		nTime     = GetCurrentTime(),
 		dwMapID   = GetClientPlayer().GetMapID()
 	})
-	if D.TradingTarget.szName
-	and MY_GKP.bMoneyTalk
-	and (not MY_GKP.bMoneyTalkOnlyDistributor or X.IsDistributor(D.TradingTarget.dwID) or X.IsDistributor()) then
+	if MY_GKP.bMoneyTalk and szPeerName ~= 'System'
+	and (not MY_GKP.bMoneyTalkOnlyDistributor or X.IsDistributor(D.tTradingInfo.dwID) or X.IsDistributor()) then
 		if nGold > 0 then
 			X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 				D.GetFormatLink(_L['Received']),
-				D.GetFormatLink(D.TradingTarget.szName, true),
-				D.GetFormatLink(_L['The'] .. nGold ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),
+				D.GetFormatLink(szPeerName, true),
+				D.GetFormatLink(_L['The'] .. nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),
 			})
 		else
 			X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 				D.GetFormatLink(_L['Pay to']),
-				D.GetFormatLink(D.TradingTarget.szName, true),
-				D.GetFormatLink(' ' .. nGold * -1 ..g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),
+				D.GetFormatLink(szPeerName, true),
+				D.GetFormatLink(' ' .. nGold * -1 .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP),
 			})
 		end
 	end
 end
 
-X.RegisterEvent('TRADING_OPEN_NOTIFY',function() -- 交易开始
-	D.TradingTarget = GetPlayer(arg0)
+X.RegisterEvent('TRADING_OPEN_NOTIFY', function() -- 交易开始
+	local tar = GetPlayer(arg0)
+	if not tar then
+		return
+	end
+	D.tTradingInfo = { dwPeerID = tar.dwID, dwForceID = tar.dwForceID, szPeerName = X.GetObjectName(tar) or 'Unknown' }
 end)
-X.RegisterEvent('TRADING_CLOSE',function() -- 交易结束
-	D.TradingTarget = {}
+X.RegisterEvent('TRADING_UPDATE_CONFIRM', function() -- 交易确认
+	local dwID, bConfirm = arg0, arg1
+	if not D.tTradingInfo then
+		return
+	end
+	if dwID == UI_GetClientPlayerID() then
+		D.tTradingInfo.bSelfConfirm = bConfirm
+	elseif dwID == D.tTradingInfo.dwPeerID then
+		D.tTradingInfo.bPeerConfirm = bConfirm
+	end
 end)
-X.RegisterEvent('MONEY_UPDATE',function() --金钱变动
+X.RegisterEvent('MONEY_UPDATE', function() --金钱变动
 	D.MoneyUpdate(arg0, arg1, arg2)
+end)
+X.RegisterEvent('TRADING_CLOSE', function() -- 交易结束
+	D.tTradingInfo = {}
 end)
 
 ---------------------------------------------------------------------->
