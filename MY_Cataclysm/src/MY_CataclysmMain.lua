@@ -50,6 +50,7 @@ local BUFF_LIST = {}
 local GKP_RECORD_TOTAL = 0
 local CTM_CAPTION = ''
 local CTM_BUFF_TEAMMON = {}
+local CTM_BUFF_OFFICIAL = {}
 local DEBUG = false
 
 do
@@ -86,6 +87,9 @@ function D.UpdateBuffListCache()
 	BUFF_LIST = {}
 	if CFG.bBuffDataTeamMon and CTM_BUFF_TEAMMON then
 		InsertBuffListCache(CTM_BUFF_TEAMMON, _L['From MY_TeamMon data'])
+	end
+	if CFG.bBuffDataTeamMon and CTM_BUFF_OFFICIAL then
+		InsertBuffListCache(CTM_BUFF_OFFICIAL, _L['From official raid buff data'])
 	end
 	if CFG.aBuffList and not X.IsRestricted('MY_Cataclysm_BuffMonitor') then
 		InsertBuffListCache(CFG.aBuffList, _L['From custom data'])
@@ -134,6 +138,68 @@ local function onTeamMonUpdate()
 end
 X.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_CataclysmMain', onTeamMonUpdate)
 end
+
+X.RegisterEvent({'LOADING_ENDING', 'SKILL_MOUNT_KUNG_FU', 'SKILL_UNMOUNT_KUNG_FU'}, 'MY_CataclysmMain__OfficialBuff', function()
+	local tRaidPanelBuff = g_tTable.tRaidPanelBuff
+	if not tRaidPanelBuff then
+		local szPath = 'interface\\MY\\MY_Cataclysm\\config\\RaidPanelBuff.tab'
+		local tTitle = {
+			{ f = 'i', t = 'dwMapID' },
+			{ f = 'i', t = 'dwMountKungfuID' },
+			{ f = 'i', t = 'dwBuffID' },
+			{ f = 'i', t = 'nBuffLevel' },
+			{ f = 's', t = 'szStackOp' },
+			{ f = 'i', t = 'nStackNum' },
+			{ f = 'b', t = 'bOnlyMine' },
+			{ f = 'b', t = 'bOnlyMyself' },
+			{ f = 'i', t = 'nIconID' },
+			{ f = 'b', t = 'bAttention' },
+			{ f = 's', t = 'szAttentionColor' },
+			{ f = 'b', t = 'bCaution' },
+			{ f = 'b', t = 'bScreenHead' },
+			{ f = 's', t = 'szScreenHeadColor' },
+			{ f = 'i', t = 'nPriority' },
+			{ f = 's', t = 'szReminder' },
+			{ f = 's', t = 'szReminderColor' },
+			{ f = 's', t = 'szBorderColor' },
+		}
+		tRaidPanelBuff = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL) or false
+	end
+	if not tRaidPanelBuff then
+		return
+	end
+	local dwMapID = X.GetMapID(true)
+	local dwMountKungfuID = UI_GetPlayerMountKungfuID()
+	local nCount = tRaidPanelBuff:GetRowCount()
+	local aBuff = {}
+	for i = 2, nCount do
+		local tLine = tRaidPanelBuff:GetRow(i)
+		if (tLine.dwMapID == dwMapID or tLine.dwMapID == 0)
+		and (tLine.dwMountKungfuID == dwMountKungfuID or tLine.dwMountKungfuID == 0) then
+			local v = {
+				dwID = tLine.dwBuffID,
+				nLevel = X.IIf(tLine.nBuffLevel > 0, tLine.nBuffLevel, nil),
+				szStackOp = X.IIf(tLine.szStackOp == '', nil, tLine.szStackOp),
+				nStackNum = X.IIf(tLine.szStackOp == '', nil, tLine.nStackNum),
+                bOnlyMine = tLine.bOnlyMine,
+                bOnlyMe = tLine.bOnlyMyself,
+				nIconID = X.IIf(tLine.nIconID == 0, nil, tLine.nIconID),
+                bAttention = tLine.bAttention,
+                colAttention = X.IIf(tLine.szAttentionColor == '', nil, tLine.szAttentionColor),
+                bCaution = tLine.bCaution,
+                bScreenHead = tLine.bScreenHead,
+                colScreenHead = X.IIf(tLine.szScreenHeadColor == '', nil, tLine.szScreenHeadColor),
+                nPriority = tLine.nPriority,
+                szReminder = tLine.szReminder,
+                colReminder = X.IIf(tLine.szReminderColor == '', nil, tLine.szReminderColor),
+                colBorder = X.IIf(tLine.szBorderColor == '', nil, tLine.szBorderColor),
+            }
+			table.insert(aBuff, v)
+		end
+	end
+	CTM_BUFF_OFFICIAL = aBuff
+	D.UpdateBuffListCache()
+end)
 
 function D.SetConfig(Config, bKeepBuff)
 	if bKeepBuff then

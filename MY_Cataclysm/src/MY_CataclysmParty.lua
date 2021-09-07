@@ -851,7 +851,8 @@ function CTM:RefreshAttention()
 			local p = GetPlayer(dwTarID)
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
 				if p and not X.IsEmpty(CTM_ATTENTION_STACK[dwTarID]) then
-					local r, g, b = X.HumanColor2RGB(CTM_ATTENTION_STACK[dwTarID][1].col)
+					local data = CTM_ATTENTION_STACK[dwTarID][1]
+					local r, g, b = X.HumanColor2RGB(data.colAttention or data.col)
 					CTM_CACHE[dwTarID]:Lookup('Shadow_Attention'):SetColorRGB(r, g, b)
 					CTM_CACHE[dwTarID]:Lookup('Shadow_Attention'):Show()
 				else
@@ -1430,13 +1431,10 @@ function D.UpdateCharaterBuff(p, handle, key, data, buff)
 			item.bBuff = true
 			-- √Ë±ﬂ
 			local r, g, b, a
-			if data.col then
-				r, g, b, a = X.HumanColor2RGB(data.col)
+			if data.colBorder or data.col then
+				r, g, b, a = X.HumanColor2RGB(data.colBorder or data.col)
 			end
-			if not data.col then
-				item:Lookup('Handle_RbgBorders'):Hide()
-				item:Lookup('Handle_InnerBorders'):Hide()
-			else
+			if data.colBorder or data.col then
 				local hSha, sha = item:Lookup('Handle_RbgBorders')
 				for i = 0, hSha:GetItemCount() - 1 do
 					sha = hSha:Lookup(i)
@@ -1445,6 +1443,9 @@ function D.UpdateCharaterBuff(p, handle, key, data, buff)
 				end
 				item:Lookup('Handle_RbgBorders'):Show()
 				item:Lookup('Handle_InnerBorders'):Show()
+			else
+				item:Lookup('Handle_RbgBorders'):Hide()
+				item:Lookup('Handle_InnerBorders'):Hide()
 			end
 			-- ≈≈–Ú
 			local fromIndex, toIndex = handle:GetItemCount() - 1
@@ -1480,6 +1481,10 @@ function D.UpdateCharaterBuff(p, handle, key, data, buff)
 			end
 			item.nPriority = nPriority
 			-- Œƒ◊÷¥Û–°
+			local r, g, b, a
+			if data.colReminder or data.col then
+				r, g, b, a = X.HumanColor2RGB(data.colReminder or data.col)
+			end
 			local szName, icon = X.GetBuffName(data.dwID, data.nLevelEx)
 			if data.nIcon and tonumber(data.nIcon) then
 				icon = data.nIcon
@@ -1558,7 +1563,7 @@ function D.UpdateCharaterBuff(p, handle, key, data, buff)
 			end
 			if not CTM_ATTENTION_BUFF[dwCharID][key] then
 				local rec = {
-					col = data.col or 'yellow',
+					col = data.colAttention or data.col or 'yellow',
 				}
 				CTM_ATTENTION_BUFF[dwCharID][key] = rec
 				table.insert(CTM_ATTENTION_STACK[dwCharID], 1, rec)
