@@ -333,7 +333,7 @@ function D.CheckInjection(bRemove)
 			onclick = function()
 				D.dFormula = nil
 			end,
-			autoenable = function() return not not D.dFormula end,
+			autoenable = function() return D.dFormula and D.nAutoCount > 0 end,
 		}):Width() + 5
 		ui:Width(nX)
 		ui:Left((380 - nX) / 2)
