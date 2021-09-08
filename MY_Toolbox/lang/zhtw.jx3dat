@@ -463,7 +463,12 @@ return {
 
     ['MY_DialogNameLink'] = '其它',
 
-    ['Produce diamond as last formula'] = '自動按上次配方合石頭',
+    ['Will continue produce until counter reachs or casting failed.'] = '填寫次數，將在合成五行石時，重覆當前配方，直到填寫的次數歸零、或者出現一次合成失敗。',
+    ['Restore bag failed, material may not enough.'] = '擺放原材料失敗，原材料可能不足。',
+    ['Produce failed, action not exist.'] = '操作失敗，無法正確捕獲合成動作。',
+    ['Casting failed, auto cast stopped.'] = '合成失敗，重覆合成停止。',
+    ['Produce diamond as last formula for'] = '按當前配方重覆合成',
+    ['times'] = '次',
     ['DIAMOND_REGEX'] = '五行石（(.-)級）',
     ['Stop'] = '終止',
 }

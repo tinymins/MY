@@ -30,15 +30,9 @@ X.RegisterRestriction('MY_AutoDiamond', { ['*'] = true })
 ---------------------------------------------------------------------
 -- 本地函数和变量
 ---------------------------------------------------------------------
-local O = X.CreateUserSettingsModule('MY_AutoDiamond', _L['General'], {
-	bEnable = { -- 五行石精炼完成后自动再摆上次材料
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Toolbox'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
-	},
-})
-local D = {}
+local D = {
+	nAutoCount = 0,
+}
 
 -- 获取五行石数据
 function D.GetDiamondData(dwBox, dwX)
@@ -178,24 +172,38 @@ function D.RestoreBagDiamond(d)
 	return false
 end
 
+function D.ProduceDiamond()
+	if not D.fnProduceAction then
+		X.Systopmsg(_L['Produce failed, action not exist.'], CONSTANT.MSG_THEME.ERROR)
+		return
+	end
+	D.fnProduceAction()
+end
+
 function D.GetCastingAction()
-	if D.bReady and O.bEnable then
-		local frame = Station.Lookup('Topmost/MB_CastingPanelConfirm')
-		if frame then
-			D.ProduceDiamond = frame:Lookup('Wnd_All/Btn_Option1').fnAction
-			D.SaveDiamondFormula()
-		end
+	local frame = Station.Lookup('Topmost/MB_CastingPanelConfirm')
+	if frame then
+		D.fnProduceAction = frame:Lookup('Wnd_All/Btn_Option1').fnAction
+		D.SaveDiamondFormula()
 	end
 end
 
--- 自动摆五行石材料
-function D.OnDiamondUpdate()
-	if not D.bReady or not O.bEnable or not D.dFormula or arg0 ~= 1 then
+function D.UpdateCounter()
+	local frame = Station.SearchFrame('CastingPanel')
+	local edit = frame and frame:Lookup('PageSet_All/Page_Refine/WndWindow_MYDiamond/WndEditBox_MYDiamond')
+	if not edit then
 		return
 	end
+	UI(edit):Text(D.nAutoCount, WNDEVENT_FIRETYPE.PREVENT)
+end
+
+-- 自动摆五行石材料，开始下一轮合成
+function D.DoAutoDiamond()
 	local box = D.GetRefineHandle():Lookup('Handle_BoxItem/Box_Refine')
 	if not box then
 		D.dFormula = nil
+	end
+	if not D.dFormula then
 		return
 	end
 	-- 移除加锁（延迟一帧）
@@ -207,7 +215,7 @@ function D.OnDiamondUpdate()
 	end)
 	-- 重新放入配方（延迟8帧执行，确保 unlock）
 	X.DelayCall(200, function()
-		if not D.bReady or not O.bEnable then
+		if D.nAutoCount <= 0 then
 			return
 		end
 		D.LoadBagDiamond()
@@ -216,6 +224,7 @@ function D.OnDiamondUpdate()
 				box:ClearObject()
 				D.dFormula = nil
 				D.tBagCache = nil
+				X.Systopmsg(_L['Restore bag failed, material may not enough.'], CONSTANT.MSG_THEME.ERROR)
 				return
 			end
 		end
@@ -289,19 +298,34 @@ function D.CheckInjection(bRemove)
 	if not page then
 		return
 	end
+	UI(page):Fetch('WndWindow_MYDiamond'):Remove()
 	if not bRemove and not X.IsRestricted('MY_AutoDiamond') then
-		local nX, nY = 80, 390
-		nX = nX + UI(page):Append('WndCheckBox', {
-			name = 'WndCheckBox_MYDiamond',
-			text = _L['Produce diamond as last formula'],
-			x = nX, y = nY, w = 'auto', h = 20, alpha = 192,
-			checked = O.bEnable, color = { 255, 128, 0 },
-			oncheck = function(bChecked)
-				O.bEnable = bChecked
-				D.dFormula = nil
-			end,
+		local ui = UI(page):Append('WndWindow', { name = 'WndWindow_MYDiamond', y = 390, h = 24 })
+		local nX, nY = 0, 2
+		nX = nX + ui:Append('Text', {
+			name = 'Text_MYDiamond',
+			x = nX, y = nY, w = 'auto', h = 20,
+			color = { 255, 128, 0 }, alpha = 192,
+			text = _L['Produce diamond as last formula for'],
 		}):Width() + 5
-		UI(page):Append('WndButtonBox', {
+		nX = nX + ui:Append('WndEditBox', {
+			name = 'WndEditBox_MYDiamond',
+			text = D.nAutoCount,
+			x = nX, y = nY - 2, w = 50, h = 20, alpha = 192,
+			edittype = UI.EDIT_TYPE.NUMBER,
+			onchange = function(szText)
+				D.nAutoCount = tonumber(szText) or 0
+			end,
+			tip = _L['Will continue produce until counter reachs or casting failed.'],
+			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		}):Width() + 5
+		nX = nX + ui:Append('Text', {
+			name = 'Text_MYDiamond2',
+			x = nX, y = nY, w = 'auto', h = 20,
+			color = { 255, 128, 0 }, alpha = 192,
+			text = _L['times'],
+		}):Width() + 5
+		nX = nX + ui:Append('WndButtonBox', {
 			name = 'WndButton_MYDiamond',
 			x = nX, y = nY, w = 50, h = 20,
 			buttonstyle = 'FLAT',
@@ -310,10 +334,9 @@ function D.CheckInjection(bRemove)
 				D.dFormula = nil
 			end,
 			autoenable = function() return not not D.dFormula end,
-		})
-	else
-		UI(page):Fetch('WndCheckBox_MYDiamond'):Remove()
-		UI(page):Fetch('WndButton_MYDiamond'):Remove()
+		}):Width() + 5
+		ui:Width(nX)
+		ui:Left((380 - nX) / 2)
 	end
 end
 X.RegisterFrameCreate('CastingPanel', 'MY_AutoDiamond', function() D.CheckInjection() end)
@@ -326,13 +349,16 @@ end)
 X.RegisterInit('MY_AutoDiamond', function() D.CheckInjection() end)
 X.RegisterReload('MY_AutoDiamond', function() D.CheckInjection(true) end)
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoDiamond', function()
-	D.bReady = true
+X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond', function()
+	if D.nAutoCount <= 0 or not D.dFormula then
+		return
+	end
+	if arg0 ~= DIAMOND_RESULT_CODE.SUCCESS then
+		X.Systopmsg(_L['Casting failed, auto cast stopped.'], CONSTANT.MSG_THEME.ERROR)
+		return
+	end
+	D.nAutoCount = math.max(D.nAutoCount - 1, 0)
+	D.UpdateCounter()
+	D.DoAutoDiamond()
 end)
-
-X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_AutoDiamond', function()
-	D.bReady = false
-end)
-
-X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond', D.OnDiamondUpdate)
 X.RegisterEvent('ON_MESSAGE_BOX_OPEN', 'MY_AutoDiamond', D.GetCastingAction)
