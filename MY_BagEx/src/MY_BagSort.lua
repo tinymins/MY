@@ -357,8 +357,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	return nX, nY
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_BagSort', D.CheckInjection)
-X.RegisterFrameCreate('GuildBankPanel', 'MY_BagSort', D.CheckInjection)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_BagSort', function() D.CheckInjection() end)
+X.RegisterFrameCreate('GuildBankPanel', 'MY_BagSort', function() D.CheckInjection() end)
 X.RegisterReload('MY_BagSort', function() D.CheckInjection(true) end)
 
 ---------------------------------------------------------------------
