@@ -67,7 +67,7 @@ local function OnKeyPanelBtnLButtonUp()
 		return
 	end
 	local aCRC = X.SplitString(aParam[2], ',')
-	local szCorrect = GetStringCRC(X.GetUserRoleName() .. '65e33433-d13c-4269-adac-f091d4a57d4b')
+	local szCorrect = tostring(GetStringCRC(X.GetUserRoleName() .. '65e33433-d13c-4269-adac-f091d4a57d4b'))
 	if not lodash.includes(aCRC, szCorrect) then
 		return
 	end
