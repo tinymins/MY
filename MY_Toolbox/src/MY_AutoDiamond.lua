@@ -49,20 +49,29 @@ function D.GetDiamondData(dwBox, dwX)
 	return d
 end
 
--- get refine
-function D.GetRefineHandle()
-	local handle = Station.Lookup('Normal/CastingPanel/PageSet_All/Page_Refine', '')
-	return assert(handle, 'Can not find handle')
+-- 获取精炼面板元素
+function D.LookupCastingPanel(szPath, szSubPath)
+	local frame = Station.SearchFrame('CastingPanel')
+	if szSubPath then
+		return frame:Lookup(szPath, szSubPath)
+	end
+	if szPath then
+		return frame:Lookup(szPath)
+	end
+	return frame
 end
 
 -- 保存五行石精炼方案
 function D.SaveDiamondFormula()
 	local t = {}
-	local handle = D.GetRefineHandle()
-	local box, hL = handle:Lookup('Handle_BoxItem/Box_Refine'), handle:Lookup('Handle_RefineExpend')
+	local box = D.LookupCastingPanel('PageSet_All/Page_Refine', 'Handle_BoxItem/Box_Refine')
+	local hList = D.LookupCastingPanel('PageSet_All/Page_Refine', 'Handle_RefineExpend')
+	if not box or not hList then
+		return
+	end
 	table.insert(t, D.GetDiamondData(box))
 	for i = 1, 16 do
-		local box = hL:Lookup('Box_RefineExpend_' .. i)
+		local box = hList:Lookup('Box_RefineExpend_' .. i)
 		if box:IsObjectEnable() and box:GetObjectData() ~= -1 then
 			table.insert(t, D.GetDiamondData(box))
 		end
@@ -172,14 +181,27 @@ function D.RestoreBagDiamond(d)
 	return false
 end
 
+-- 停止重复合成
+function D.StopProduce()
+	local box = D.LookupCastingPanel('PageSet_All/Page_Refine', 'Handle_BoxItem/Box_Refine')
+	if box then
+		box:ClearObject()
+	end
+	D.dFormula = nil
+	D.tBagCache = nil
+end
+
+-- 触发重复合成
 function D.ProduceDiamond()
 	if not D.fnProduceAction then
+		D.StopProduce()
 		X.Systopmsg(_L['Produce failed, action not exist.'], CONSTANT.MSG_THEME.ERROR)
 		return
 	end
 	D.fnProduceAction()
 end
 
+-- 从系统面板抓取合成函数
 function D.GetCastingAction()
 	local frame = Station.Lookup('Topmost/MB_CastingPanelConfirm')
 	if frame then
@@ -188,9 +210,9 @@ function D.GetCastingAction()
 	end
 end
 
+-- 更新计数器
 function D.UpdateCounter()
-	local frame = Station.SearchFrame('CastingPanel')
-	local edit = frame and frame:Lookup('PageSet_All/Page_Refine/WndWindow_MYDiamond/WndEditBox_MYDiamond')
+	local edit = D.LookupCastingPanel('PageSet_All/Page_Refine/WndWindow_MYDiamond/WndEditBox_MYDiamond')
 	if not edit then
 		return
 	end
@@ -199,7 +221,7 @@ end
 
 -- 自动摆五行石材料，开始下一轮合成
 function D.DoAutoDiamond()
-	local box = D.GetRefineHandle():Lookup('Handle_BoxItem/Box_Refine')
+	local box = D.LookupCastingPanel('PageSet_All/Page_Refine', 'Handle_BoxItem/Box_Refine')
 	if not box then
 		D.dFormula = nil
 	end
@@ -208,6 +230,11 @@ function D.DoAutoDiamond()
 	end
 	-- 移除加锁（延迟一帧）
 	X.DelayCall(50, function()
+		if not box:IsValid() then
+			D.StopProduce()
+			X.Systopmsg(_L['Casting panel closed, produce stopped.'], CONSTANT.MSG_THEME.ERROR)
+			return
+		end
 		local dwBox, dwX = select(2, box:GetObjectData())
 		RemoveUILockItem('CastingPanel:' .. dwBox .. ',' .. dwX)
 		box:SetObject(UI_OBJECT_NOT_NEED_KNOWN, 0)
@@ -215,15 +242,20 @@ function D.DoAutoDiamond()
 	end)
 	-- 重新放入配方（延迟8帧执行，确保 unlock）
 	X.DelayCall(200, function()
+		if not box:IsValid() then
+			D.StopProduce()
+			X.Systopmsg(_L['Casting panel closed, produce stopped.'], CONSTANT.MSG_THEME.ERROR)
+			return
+		end
 		if D.nAutoCount <= 0 then
+			D.StopProduce()
+			box:Clear()
 			return
 		end
 		D.LoadBagDiamond()
 		for _, v in ipairs(D.dFormula) do
 			if not D.RestoreBagDiamond(v) then
-				box:ClearObject()
-				D.dFormula = nil
-				D.tBagCache = nil
+				D.StopProduce()
 				X.Systopmsg(_L['Restore bag failed, material may not enough.'], CONSTANT.MSG_THEME.ERROR)
 				return
 			end
@@ -235,29 +267,27 @@ end
 
 -- 隐藏结果特效
 function D.HideDuang()
-	local frame = Station.Lookup('Normal/CastingPanel')
-	if not frame then
+	local sfxSuccess = D.LookupCastingPanel('PageSet_All/Page_Refine', 'SFX_CommonRefineSuccess')
+	local sfxFailure = D.LookupCastingPanel('PageSet_All/Page_Refine', 'SFX_CommonRefineFailure')
+	if not sfxSuccess or not sfxFailure then
 		return
 	end
-	local sfxSuccess = frame:Lookup('PageSet_All/Page_Refine', 'SFX_CommonRefineSuccess')
-	local sfxFailure = frame:Lookup('PageSet_All/Page_Refine', 'SFX_CommonRefineFailure')
 	sfxSuccess:Hide()
 	sfxFailure:Hide()
 end
 
 -- 精炼结果显示
 function D.PlayDuang(bSuccess)
-	local frame = Station.Lookup('Normal/CastingPanel')
-	if not frame then
-		return
-	end
 	local sfx
 	if bSuccess then
-		sfx = frame:Lookup('PageSet_All/Page_Refine', 'SFX_CommonRefineSuccess')
+		sfx = D.LookupCastingPanel('PageSet_All/Page_Refine', 'SFX_CommonRefineSuccess')
 		PlaySound(SOUND.UI_SOUND, g_sound.ElementalStoneSuccess)
 	else
-		sfx = frame:Lookup('PageSet_All/Page_Refine', 'SFX_CommonRefineFailure')
+		sfx = D.LookupCastingPanel('PageSet_All/Page_Refine', 'SFX_CommonRefineFailure')
 		PlaySound(SOUND.UI_SOUND, g_sound.ElementalStoneFailed)
+	end
+	if not sfx then
+		return
 	end
 	sfx:Hide()
 	sfx:Show()
@@ -293,8 +323,7 @@ end
 -- 设置界面
 -------------------------------------
 function D.CheckInjection(bRemove)
-	local frame = Station.SearchFrame('CastingPanel')
-	local page = frame and frame:Lookup('PageSet_All/Page_Refine')
+	local page = D.LookupCastingPanel('PageSet_All/Page_Refine')
 	if not page then
 		return
 	end
@@ -350,10 +379,15 @@ X.RegisterInit('MY_AutoDiamond', function() D.CheckInjection() end)
 X.RegisterReload('MY_AutoDiamond', function() D.CheckInjection(true) end)
 
 X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond', function()
-	if D.nAutoCount <= 0 or not D.dFormula then
+	if not D.dFormula then
+		return
+	end
+	if D.nAutoCount <= 0 then
+		D.StopProduce()
 		return
 	end
 	if arg0 ~= DIAMOND_RESULT_CODE.SUCCESS then
+		D.StopProduce()
 		X.Systopmsg(_L['Casting failed, auto cast stopped.'], CONSTANT.MSG_THEME.ERROR)
 		return
 	end

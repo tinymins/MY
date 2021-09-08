@@ -471,4 +471,5 @@ return {
     ['times'] = '次',
     ['DIAMOND_REGEX'] = '五行石（(.-)級）',
     ['Stop'] = '終止',
+    ['Casting panel closed, produce stopped.'] = '精煉面板已關閉，重覆精煉停止。',
 }
