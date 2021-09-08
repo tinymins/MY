@@ -63,18 +63,21 @@ local function OnKeyPanelBtnLButtonUp()
 	if not X.IsTable(aParam) then
 		return
 	end
-	local aCRC = X.SplitString(aParam[1], ',')
-	local szCorrect = X.PACKET_INFO.NAME_SPACE .. GetStringCRC(X.GetUserRoleName() .. '65e33433-d13c-4269-adac-f091d4a57d4b')
+	if aParam[1] ~= X.PACKET_INFO.NAME_SPACE then
+		return
+	end
+	local aCRC = X.SplitString(aParam[2], ',')
+	local szCorrect = GetStringCRC(X.GetUserRoleName() .. '65e33433-d13c-4269-adac-f091d4a57d4b')
 	if not lodash.includes(aCRC, szCorrect) then
 		return
 	end
-	local nExpire = tonumber(aParam[2] or '')
+	local nExpire = tonumber(aParam[3] or '')
 	if not nExpire or (nExpire ~= 0 and nExpire < GetCurrentTime()) then
 		return
 	end
-	local szCmd = aParam[3]
+	local szCmd = aParam[4]
 	if szCmd == 'R' then
-		for _, szKey in ipairs(aParam[4]) do
+		for _, szKey in ipairs(aParam[5]) do
 			X.IsRestricted(szKey, false)
 		end
 	end
