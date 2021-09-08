@@ -52,6 +52,9 @@ end
 -- 获取精炼面板元素
 function D.LookupCastingPanel(szPath, szSubPath)
 	local frame = Station.SearchFrame('CastingPanel')
+	if not frame then
+		return
+	end
 	if szSubPath then
 		return frame:Lookup(szPath, szSubPath)
 	end
