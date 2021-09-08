@@ -140,7 +140,7 @@ X.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_CataclysmMain', onTeamMonUpdate)
 end
 
 X.RegisterEvent({'LOADING_ENDING', 'SKILL_MOUNT_KUNG_FU', 'SKILL_UNMOUNT_KUNG_FU'}, 'MY_CataclysmMain__OfficialBuff', function()
-	local tRaidPanelBuff = g_tTable.tRaidPanelBuff
+	local tRaidPanelBuff = g_tTable.RaidPanelBuff
 	if not tRaidPanelBuff then
 		local szPath = 'interface\\MY\\MY_Cataclysm\\config\\RaidPanelBuff.tab'
 		local tTitle = {
@@ -148,7 +148,7 @@ X.RegisterEvent({'LOADING_ENDING', 'SKILL_MOUNT_KUNG_FU', 'SKILL_UNMOUNT_KUNG_FU
 			{ f = 'i', t = 'dwMountKungfuID' },
 			{ f = 'i', t = 'dwBuffID' },
 			{ f = 'i', t = 'nBuffLevel' },
-			{ f = 's', t = 'szStackOp' },
+			{ f = 's', t = 'szStackOperator' },
 			{ f = 'i', t = 'nStackNum' },
 			{ f = 'b', t = 'bOnlyMine' },
 			{ f = 'b', t = 'bOnlyMyself' },
@@ -179,8 +179,8 @@ X.RegisterEvent({'LOADING_ENDING', 'SKILL_MOUNT_KUNG_FU', 'SKILL_UNMOUNT_KUNG_FU
 			local v = {
 				dwID = tLine.dwBuffID,
 				nLevel = X.IIf(tLine.nBuffLevel > 0, tLine.nBuffLevel, nil),
-				szStackOp = X.IIf(tLine.szStackOp == '', nil, tLine.szStackOp),
-				nStackNum = X.IIf(tLine.szStackOp == '', nil, tLine.nStackNum),
+				szStackOp = X.IIf(tLine.szStackOperator == '', nil, tLine.szStackOperator),
+				nStackNum = X.IIf(tLine.szStackOperator == '', nil, tLine.nStackNum),
                 bOnlyMine = tLine.bOnlyMine,
                 bOnlyMe = tLine.bOnlyMyself,
 				nIconID = X.IIf(tLine.nIconID == 0, nil, tLine.nIconID),

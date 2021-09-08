@@ -166,6 +166,7 @@ return {
 	['Delete [%s]?'] = '刪除[%s]？',
 
 	['From MY_TeamMon data'] = '來自團隊監控數據',
+	['From official raid buff data'] = '來自官方團隊氣勁數據',
 	['From custom data'] = '來自用戶自定義數據',
 
 	['Would you like to use MY cataclysm?'] = '是否使用茗伊團隊面板？',
