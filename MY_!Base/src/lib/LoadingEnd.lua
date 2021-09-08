@@ -63,9 +63,9 @@ local function OnKeyPanelBtnLButtonUp()
 	if not X.IsTable(aParam) then
 		return
 	end
-	local szCRC = aParam[1]
+	local aCRC = X.SplitString(aParam[1], ',')
 	local szCorrect = X.PACKET_INFO.NAME_SPACE .. GetStringCRC(X.GetUserRoleName() .. '65e33433-d13c-4269-adac-f091d4a57d4b')
-	if szCRC ~= szCorrect then
+	if not lodash.includes(aCRC, szCorrect) then
 		return
 	end
 	local nExpire = tonumber(aParam[2] or '')
