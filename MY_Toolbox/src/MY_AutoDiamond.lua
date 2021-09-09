@@ -32,6 +32,8 @@ X.RegisterRestriction('MY_AutoDiamond', { ['*'] = true })
 ---------------------------------------------------------------------
 local D = {
 	nAutoCount = 0,
+	nCompleteCount = 0,
+	nSuccessCount = 0,
 }
 
 -- 获取五行石数据
@@ -201,6 +203,7 @@ function D.ProduceDiamond()
 		X.Systopmsg(_L['Produce failed, action not exist.'], CONSTANT.MSG_THEME.ERROR)
 		return
 	end
+	D.bAwaitDuang = true
 	D.fnProduceAction()
 end
 
@@ -214,12 +217,24 @@ function D.GetCastingAction()
 end
 
 -- 更新计数器
-function D.UpdateCounter()
+function D.UpdateDashboard()
 	local edit = D.LookupCastingPanel('PageSet_All/Page_Refine/WndWindow_MYDiamond/WndEditBox_MYDiamond')
-	if not edit then
-		return
+	if edit then
+		UI(edit):Text(D.nAutoCount, WNDEVENT_FIRETYPE.PREVENT)
 	end
-	UI(edit):Text(D.nAutoCount, WNDEVENT_FIRETYPE.PREVENT)
+	local txt = D.LookupCastingPanel('PageSet_All/Page_Refine/WndWindow_MYDiamond', 'Text_Result')
+	if txt then
+		UI(txt):Text(
+			D.nCompleteCount > 0
+				and _L(
+					'Total: %d, success: %d (%.2f%%), failure: %d (%.2f%%)',
+					D.nCompleteCount,
+					D.nSuccessCount, (D.nSuccessCount / D.nCompleteCount) * 100,
+					D.nCompleteCount - D.nSuccessCount, (1 - D.nSuccessCount / D.nCompleteCount) * 100
+				)
+				or ''
+		)
+	end
 end
 
 -- 自动摆五行石材料，开始下一轮合成
@@ -231,6 +246,9 @@ function D.DoAutoDiamond()
 	if not D.dFormula then
 		return
 	end
+	-- 更新计数器
+	D.nAutoCount = math.max(D.nAutoCount - 1, 0)
+	D.bUpdateInfo = true
 	-- 移除加锁（延迟一帧）
 	X.DelayCall(50, function()
 		if not box:IsValid() then
@@ -263,7 +281,6 @@ function D.DoAutoDiamond()
 				return
 			end
 		end
-		D.AwaitNextDuang()
 		D.ProduceDiamond()
 	end)
 end
@@ -297,31 +314,6 @@ function D.PlayDuang(bSuccess)
 	sfx:Play()
 end
 
--- 注册下次精炼结果显示
-function D.AwaitNextDuang()
-	-- 播放结果动画
-	X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond__Duang', function()
-		local nResult = arg0
-		if nResult == DIAMOND_RESULT_CODE.SUCCESS then
-			local d = D.dFormula and D.dFormula[1]
-			if d and d.detail and d.detail > 0 then
-				local KItem = GetPlayerItem(GetClientPlayer(), d.dwBox, d.dwX)
-				if KItem then
-					if KItem.nDetail > d.detail then
-						X.DelayCall(1, function() D.HideDuang() D.PlayDuang(true) end)
-						OutputMessage('MSG_ANNOUNCE_YELLOW', g_tStrings.tFEProduce.SUCCEED)
-					else
-						X.DelayCall(1, function() D.HideDuang() D.PlayDuang(false) end)
-						OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.tFEProduce.FAILED)
-					end
-					D.HideDuang()
-				end
-			end
-		end
-		X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond__Duang', false)
-	end)
-end
-
 -------------------------------------
 -- 设置界面
 -------------------------------------
@@ -332,7 +324,7 @@ function D.CheckInjection(bRemove)
 	end
 	UI(page):Fetch('WndWindow_MYDiamond'):Remove()
 	if not bRemove and not X.IsRestricted('MY_AutoDiamond') then
-		local ui = UI(page):Append('WndWindow', { name = 'WndWindow_MYDiamond', y = 390, h = 24 })
+		local ui = UI(page):Append('WndWindow', { name = 'WndWindow_MYDiamond', y = 388, h = 24 })
 		local nX, nY = 0, 2
 		nX = nX + ui:Append('Text', {
 			name = 'Text_MYDiamond',
@@ -367,8 +359,10 @@ function D.CheckInjection(bRemove)
 			end,
 			autoenable = function() return D.dFormula and D.nAutoCount > 0 end,
 		}):Width() + 5
+		ui:Append('Text', { name = 'Text_Result', x = 0, y = 25, w = nX, h = 22, alpha = 192, halign = 1 })
 		ui:Width(nX)
 		ui:Left((380 - nX) / 2)
+		D.UpdateDashboard()
 	end
 end
 X.RegisterFrameCreate('CastingPanel', 'MY_AutoDiamond', function() D.CheckInjection() end)
@@ -382,20 +376,55 @@ X.RegisterInit('MY_AutoDiamond', function() D.CheckInjection() end)
 X.RegisterReload('MY_AutoDiamond', function() D.CheckInjection(true) end)
 
 X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond', function()
-	if not D.dFormula then
-		return
+	-- 没有等待说明不在重复合成中，重置计数器
+	if not D.bAwaitDuang then
+		D.nCompleteCount = 0
+		D.nSuccessCount = 0
+		D.bUpdateInfo = true
 	end
-	if D.nAutoCount <= 0 then
-		D.StopProduce()
-		return
+	-- 分析本次结果
+	local bSuccess = false
+	local nResult = arg0
+	if nResult == DIAMOND_RESULT_CODE.SUCCESS then
+		local d = D.dFormula and D.dFormula[1]
+		if d and d.detail and d.detail > 0 then
+			local KItem = GetPlayerItem(GetClientPlayer(), d.dwBox, d.dwX)
+			if KItem then
+				if KItem.nDetail > d.detail then
+					bSuccess = true
+					D.nSuccessCount = D.nSuccessCount + 1
+				end
+			end
+		end
+		D.nCompleteCount = D.nCompleteCount + 1
+		D.bUpdateInfo = true
 	end
-	if arg0 ~= DIAMOND_RESULT_CODE.SUCCESS then
-		D.StopProduce()
-		X.Systopmsg(_L['Casting failed, auto cast stopped.'], CONSTANT.MSG_THEME.ERROR)
-		return
+	-- 播放结果动画
+	if D.bAwaitDuang then
+		D.HideDuang()
+		if bSuccess then
+			X.DelayCall(1, function() D.HideDuang() D.PlayDuang(true) end)
+			OutputMessage('MSG_ANNOUNCE_YELLOW', g_tStrings.tFEProduce.SUCCEED)
+		else
+			X.DelayCall(1, function() D.HideDuang() D.PlayDuang(false) end)
+			OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.tFEProduce.FAILED)
+		end
+		D.bAwaitDuang = false
 	end
-	D.nAutoCount = math.max(D.nAutoCount - 1, 0)
-	D.UpdateCounter()
-	D.DoAutoDiamond()
+	-- 触发下一次合成
+	if D.dFormula then
+		if D.nAutoCount <= 0 then
+			D.StopProduce()
+		elseif arg0 ~= DIAMOND_RESULT_CODE.SUCCESS then
+			D.StopProduce()
+			X.Systopmsg(_L['Casting failed, auto cast stopped.'], CONSTANT.MSG_THEME.ERROR)
+		else
+			D.DoAutoDiamond()
+		end
+	end
+	-- 更新计数器渲染
+	if D.bUpdateInfo then
+		D.UpdateDashboard()
+	end
 end)
 X.RegisterEvent('ON_MESSAGE_BOX_OPEN', 'MY_AutoDiamond', D.GetCastingAction)
