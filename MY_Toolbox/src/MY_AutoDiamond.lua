@@ -403,11 +403,17 @@ X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond', function()
 	if D.bAwaitDuang then
 		D.HideDuang()
 		if bSuccess then
-			X.DelayCall(1, function() D.HideDuang() D.PlayDuang(true) end)
-			OutputMessage('MSG_ANNOUNCE_YELLOW', g_tStrings.tFEProduce.SUCCEED)
+			X.DelayCall(1, function()
+				D.HideDuang()
+				D.PlayDuang(true)
+				OutputMessage('MSG_ANNOUNCE_YELLOW', g_tStrings.tFEProduce.SUCCEED)
+			end)
 		else
-			X.DelayCall(1, function() D.HideDuang() D.PlayDuang(false) end)
-			OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.tFEProduce.FAILED)
+			X.DelayCall(1, function()
+				D.HideDuang()
+				D.PlayDuang(false)
+				OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.tFEProduce.FAILED)
+			end)
 		end
 		D.bAwaitDuang = false
 	end
