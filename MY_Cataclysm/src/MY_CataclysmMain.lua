@@ -181,19 +181,19 @@ X.RegisterEvent({'LOADING_ENDING', 'SKILL_MOUNT_KUNG_FU', 'SKILL_UNMOUNT_KUNG_FU
 				nLevel = X.IIf(tLine.nBuffLevel > 0, tLine.nBuffLevel, nil),
 				szStackOp = X.IIf(tLine.szStackOperator == '', nil, tLine.szStackOperator),
 				nStackNum = X.IIf(tLine.szStackOperator == '', nil, tLine.nStackNum),
-                bOnlyMine = tLine.bOnlyMine,
-                bOnlyMe = tLine.bOnlyMyself,
+				bOnlyMine = tLine.bOnlyMine,
+				bOnlyMe = tLine.bOnlyMyself,
 				nIconID = X.IIf(tLine.nIconID == 0, nil, tLine.nIconID),
-                bAttention = tLine.bAttention,
-                colAttention = X.IIf(tLine.szAttentionColor == '', nil, tLine.szAttentionColor),
-                bCaution = tLine.bCaution,
-                bScreenHead = tLine.bScreenHead,
-                colScreenHead = X.IIf(tLine.szScreenHeadColor == '', nil, tLine.szScreenHeadColor),
-                nPriority = tLine.nPriority,
-                szReminder = tLine.szReminder,
-                colReminder = X.IIf(tLine.szReminderColor == '', nil, tLine.szReminderColor),
-                colBorder = X.IIf(tLine.szBorderColor == '', nil, tLine.szBorderColor),
-            }
+				bAttention = tLine.bAttention,
+				colAttention = X.IIf(tLine.szAttentionColor == '', nil, tLine.szAttentionColor),
+				bCaution = tLine.bCaution,
+				bScreenHead = tLine.bScreenHead,
+				colScreenHead = X.IIf(tLine.szScreenHeadColor == '', nil, tLine.szScreenHeadColor),
+				nPriority = tLine.nPriority,
+				szReminder = tLine.szReminder,
+				colReminder = X.IIf(tLine.szReminderColor == '', nil, tLine.szReminderColor),
+				colBorder = X.IIf(tLine.szBorderColor == '', nil, tLine.szBorderColor),
+			}
 			table.insert(aBuff, v)
 		end
 	end
