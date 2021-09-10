@@ -1966,7 +1966,7 @@ end
 -- 迭代数据表子序列
 function D.IterTable(data, dwMapID, bIterItem)
 	local res = {}
-	if data then
+	if data and not X.IsRestricted('MY_TeamMon') then
 		if dwMapID == 0 then
 			dwMapID = X.GetMapID(true)
 		end
@@ -2222,6 +2222,12 @@ function D.OnShare(_, data, nChannel, dwID, szName, bIsSelf)
 	end
 end
 
+X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon', function()
+	if arg0 and arg0 ~= 'MY_TeamMon' then
+		return
+	end
+	FireUIEvent('MY_TM_DATA_RELOAD')
+end)
 X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon.MapRestriction', function()
 	if arg0 and arg0 ~= 'MY_TeamMon.MapRestriction' then
 		return
