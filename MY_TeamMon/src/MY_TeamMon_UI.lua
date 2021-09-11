@@ -1146,7 +1146,7 @@ function D.GetDataName(szType, data)
 	elseif szType == 'DOODAD' then
 		local doodad = GetDoodadTemplate(data.dwID)
 		szName = X.GetTemplateName(TARGET.DOODAD, data.dwID) or data.dwID
-		nIcon  = MY_TMUI_DOODAD_ICON[doodad.nKind]
+		nIcon  = doodad and MY_TMUI_DOODAD_ICON[doodad.nKind] or 13
 	elseif szType == 'TALK' or szType == 'CHAT' then
 		szName = data.szContent
 	else
