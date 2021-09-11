@@ -791,6 +791,15 @@ X.RegisterEvent('PLAYER_LEAVE_SCENE',function()
 	PLAYER_CACHE[arg0] = nil
 end)
 
+local function PrioritySorter(a, b)
+	if not b.nPriority then
+		return true
+	end
+	if not a.nPriority then
+		return false
+	end
+	return a.nPriority < b.nPriority
+end
 X.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
 	local dwID, szType, szKey, tData = arg0, arg1, arg2, arg3
 	if not COUNTDOWN_CACHE[dwID] then
@@ -813,6 +822,7 @@ X.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
 		tData.szType = szType
 		tData.szKey = szKey
 		table.insert(COUNTDOWN_CACHE[dwID], 1, tData)
+		table.sort(COUNTDOWN_CACHE[dwID], PrioritySorter)
 	elseif #COUNTDOWN_CACHE[dwID] == 0 then
 		COUNTDOWN_CACHE[dwID] = nil
 	end
