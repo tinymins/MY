@@ -1966,7 +1966,7 @@ end
 -- 迭代数据表子序列
 function D.IterTable(data, dwMapID, bIterItem)
 	local res = {}
-	if data and not X.IsRestricted('MY_TeamMon') then
+	if data then
 		if dwMapID == 0 then
 			dwMapID = X.GetMapID(true)
 		end
@@ -2260,7 +2260,12 @@ local settings = {
 				ParseCustomText        = ParseCustomText       ,
 				'Enable',
 				'GetTable',
-				'IterTable',
+				IterTable = function(...)
+					if X.IsRestricted('MY_TeamMon') then
+						return X.ipairs_r({})
+					end
+					return D.IterTable(...)
+				end,
 				'GetMapName',
 				'GetMapInfo',
 				'GetData',
