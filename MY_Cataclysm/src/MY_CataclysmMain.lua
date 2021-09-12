@@ -54,7 +54,8 @@ local CTM_BUFF_OFFICIAL = {}
 local DEBUG = false
 
 do
-local function InsertBuffListCache(aBuffList, szVia)
+-- TODO: 不是需要基础排序 而是需要作用域限定加权，当作用域一致时，用户>DBM>官方
+local function InsertBuffListCache(aBuffList, szVia, nViaPriority)
 	for _, tab in ipairs(aBuffList) do
 		local id = tab.dwID or tab.szName
 		if id then
@@ -78,21 +79,21 @@ local function InsertBuffListCache(aBuffList, szVia)
 				if not BUFF_LIST[id] then
 					BUFF_LIST[id] = {}
 				end
-				table.insert(BUFF_LIST[id], 1, setmetatable({ szVia = szVia }, { __index = tab }))
+				table.insert(BUFF_LIST[id], 1, setmetatable({ szVia = szVia, nViaPriority = nViaPriority }, { __index = tab }))
 			end
 		end
 	end
 end
 function D.UpdateBuffListCache()
 	BUFF_LIST = {}
-	if CFG.bBuffDataTeamMon and CTM_BUFF_TEAMMON then
-		InsertBuffListCache(CTM_BUFF_TEAMMON, _L['From MY_TeamMon data'])
-	end
 	if CFG.bBuffDataTeamMon and CTM_BUFF_OFFICIAL then
-		InsertBuffListCache(CTM_BUFF_OFFICIAL, _L['From official raid buff data'])
+		InsertBuffListCache(CTM_BUFF_OFFICIAL, _L['From official raid buff data'], 2)
+	end
+	if CFG.bBuffDataTeamMon and CTM_BUFF_TEAMMON then
+		InsertBuffListCache(CTM_BUFF_TEAMMON, _L['From MY_TeamMon data'], 1)
 	end
 	if CFG.aBuffList and not X.IsRestricted('MY_Cataclysm_BuffMonitor') then
-		InsertBuffListCache(CFG.aBuffList, _L['From custom data'])
+		InsertBuffListCache(CFG.aBuffList, _L['From custom data'], 0)
 	end
 	if CFG.bBuffPushToOfficial then
 		local aBuff = {}
