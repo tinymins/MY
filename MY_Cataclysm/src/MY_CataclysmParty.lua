@@ -54,6 +54,7 @@ local CTM_TARGET  -- 注意这个是UI逻辑选中目标 不一定是真实的当前目标
 local CTM_TTARGET -- 注意这个是UI逻辑目标选中的目标 不一定是真实的当前目标
 local CTM_CACHE              = setmetatable({}, { __mode = 'v' })
 local CTM_LIFE_CACHE         = {} -- 当前帧队友血量缓存
+local CTM_BUFF_TIME          = {} -- 附近目标 BUFF 刷新时间戳
 local CTM_BUFF_RULE          = {} -- 附近记录到的需要显示的BUFF规则缓存
 local CTM_BOSS_CACHE         = {} -- 附近的首领缓存
 local CTM_BOSS_FOCUS_BUFF    = {} -- 附近记录到的首领点名BUFF缓存
@@ -103,6 +104,18 @@ local function onNpcLeaveScene()
 end
 X.RegisterEvent('NPC_LEAVE_SCENE', 'MY_Cataclysm', onNpcLeaveScene)
 end
+
+X.RegisterEvent('BUFF_UPDATE', 'MY_Cataclysm', function()
+	-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
+	--     = arg0 , arg1   , arg2 , arg3     , arg4, arg5    , arg6    , arg7 , arg8 , arg9 , arg10  , arg11
+	if arg1 then
+		return
+	end
+	if not CTM_BUFF_TIME[arg0] then
+		CTM_BUFF_TIME[arg0] = {}
+	end
+	CTM_BUFF_TIME[arg0][arg4] = GetTime()
+end)
 
 do
 local function onBossSet()
@@ -1518,7 +1531,18 @@ local function RuleSorter(a, b)
 end
 local function DispSorter(a, b)
 	if a.nPriority == b.nPriority then
-		return false
+		local nTimeA = CTM_BUFF_TIME[a.dwCharID] and CTM_BUFF_TIME[a.dwCharID][a.tBuff.dwID]
+		local nTimeB = CTM_BUFF_TIME[b.dwCharID] and CTM_BUFF_TIME[b.dwCharID][b.tBuff.dwID]
+		if nTimeA == nTimeB then
+			return false
+		end
+		if not nTimeA then
+			return true
+		end
+		if not nTimeB then
+			return false
+		end
+		return nTimeA < nTimeB
 	end
 	if not a.nPriority then
 		return false
@@ -1568,6 +1592,7 @@ function D.UpdateCharaterBuff(p, handle, tKeep)
 			end
 		end
 		table.insert(aDisp, {
+			dwCharID = dwCharID,
 			tBuff = tItem.tBuff,
 			tRule = tRule,
 			nPriority = nPriority,
