@@ -1517,6 +1517,15 @@ local function RuleSorter(a, b)
 	return a.nPriority < b.nPriority
 end
 local function DispSorter(a, b)
+	if a.nPriority == b.nPriority then
+		return false
+	end
+	if not a.nPriority then
+		return false
+	end
+	if not b.nPriority then
+		return true
+	end
 	return a.nPriority < b.nPriority
 end
 function D.UpdateCharaterBuff(p, handle, tKeep)
