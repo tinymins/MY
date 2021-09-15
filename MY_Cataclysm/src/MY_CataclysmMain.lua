@@ -86,7 +86,7 @@ local function InsertBuffListCache(aBuffList, szVia, nViaPriority)
 end
 function D.UpdateBuffListCache()
 	BUFF_LIST = {}
-	if CFG.bBuffDataTeamMon and CTM_BUFF_OFFICIAL then
+	if CFG.bBuffDataOfficial and CTM_BUFF_OFFICIAL then
 		InsertBuffListCache(CTM_BUFF_OFFICIAL, _L['From official raid buff data'], 2)
 	end
 	if CFG.bBuffDataTeamMon and CTM_BUFF_TEAMMON then

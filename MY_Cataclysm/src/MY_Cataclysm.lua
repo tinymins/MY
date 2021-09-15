@@ -351,6 +351,12 @@ local O = X.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bBuffDataOfficial = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 	bBuffDataTeamMon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],

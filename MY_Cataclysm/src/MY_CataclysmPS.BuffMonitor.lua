@@ -260,6 +260,20 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Width() + 5
 	y = y + 30
 
+	x = nPaddingX
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y,
+		text = _L['Enable official data'],
+		checked = CFG.bBuffDataOfficial,
+		oncheck = function(bCheck)
+			CFG.bBuffDataOfficial = bCheck
+			MY_CataclysmMain.UpdateBuffListCache()
+			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
+		end,
+		autoenable = function() return MY_Resource and true end,
+	}):AutoWidth():Width() + 5
+	y = y + 30
+
 	if not bRestricted then
 		x = nPaddingX
 		x = x + ui:Append('WndCheckBox', {
