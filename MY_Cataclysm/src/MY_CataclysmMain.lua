@@ -26,6 +26,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^9.0.0') then
 	return
 end
+X.RegisterRestriction('MY_CataclysmMain__OfficialBuff', { ['*'] = true })
 --------------------------------------------------------------------------
 local D = {}
 local INI_ROOT = X.PACKET_INFO.ROOT .. 'MY_Cataclysm/ui/'
@@ -140,10 +141,11 @@ end
 X.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_CataclysmMain', onTeamMonUpdate)
 end
 
-X.RegisterEvent({'LOADING_ENDING', 'SKILL_MOUNT_KUNG_FU', 'SKILL_UNMOUNT_KUNG_FU'}, 'MY_CataclysmMain__OfficialBuff', function()
+do
+local function UpdateOfficialBuff()
 	local tRaidPanelBuff = g_tTable.RaidPanelBuff
-	if not tRaidPanelBuff then
-		local szPath = 'interface\\MY\\MY_Cataclysm\\config\\RaidPanelBuff.tab'
+	if not tRaidPanelBuff or not X.IsRestricted('MY_CataclysmMain__OfficialBuff') then
+		local szPath = X.FormatPath({'userdata\\cataclysm\\official_buff.tab', X.PATH_TYPE.GLOBAL})
 		local tTitle = {
 			{ f = 'i', t = 'dwMapID' },
 			{ f = 'i', t = 'dwMountKungfuID' },
@@ -164,7 +166,7 @@ X.RegisterEvent({'LOADING_ENDING', 'SKILL_MOUNT_KUNG_FU', 'SKILL_UNMOUNT_KUNG_FU
 			{ f = 's', t = 'szReminderColor' },
 			{ f = 's', t = 'szBorderColor' },
 		}
-		tRaidPanelBuff = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL) or false
+		tRaidPanelBuff = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL) or tRaidPanelBuff
 	end
 	if not tRaidPanelBuff then
 		return
@@ -200,7 +202,15 @@ X.RegisterEvent({'LOADING_ENDING', 'SKILL_MOUNT_KUNG_FU', 'SKILL_UNMOUNT_KUNG_FU
 	end
 	CTM_BUFF_OFFICIAL = aBuff
 	D.UpdateBuffListCache()
+end
+X.RegisterEvent('MY_RESTRICTION', 'MY_CataclysmMain__OfficialBuff', function()
+	if arg0 and arg0 ~= 'MY_CataclysmMain__OfficialBuff' then
+		return
+	end
+	UpdateOfficialBuff()
 end)
+X.RegisterEvent({'LOADING_ENDING', 'SKILL_MOUNT_KUNG_FU', 'SKILL_UNMOUNT_KUNG_FU'}, 'MY_CataclysmMain__OfficialBuff', UpdateOfficialBuff)
+end
 
 function D.SetConfig(Config, bKeepBuff)
 	if bKeepBuff then
