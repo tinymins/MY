@@ -182,8 +182,12 @@ local function UpdateOfficialBuff()
 			local v = {
 				dwID = tLine.dwBuffID,
 				nLevel = X.IIf(tLine.nBuffLevel > 0, tLine.nBuffLevel, nil),
-				szStackOp = X.IIf(tLine.szStackOperator == '', nil, tLine.szStackOperator),
-				nStackNum = X.IIf(tLine.szStackOperator == '', nil, tLine.nStackNum),
+				szStackOp = X.IIf(
+					tLine.szStackOperator == '',
+					X.IIf(tLine.nStackNum == 0, nil, '>='),
+					tLine.szStackOperator
+				),
+				nStackNum = X.IIf(tLine.szStackOperator == '' and tLine.nStackNum == 0, nil, tLine.nStackNum),
 				bOnlyMine = tLine.bOnlyMine,
 				bOnlyMe = tLine.bOnlyMyself,
 				nIconID = X.IIf(tLine.nIconID == 0, nil, tLine.nIconID),
