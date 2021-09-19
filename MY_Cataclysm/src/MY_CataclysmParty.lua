@@ -1566,15 +1566,17 @@ function D.UpdateCharaterBuff(p, handle, tKeep)
 			and not X.JudgeOperator(tRule.szStackOp or '>=', buff.nStackNum, tRule.nStackNum) then
 				buff = nil
 			end
-			tKeep[tRule.szKey] = true
-			-- 加入 BUFF 组，准备后续排序渲染
-			if not tDisp[buff.szKey] then
-				tDisp[buff.szKey] = {
-					tBuff = buff,
-					aRule = {},
-				}
+			if buff then
+				tKeep[tRule.szKey] = true
+				-- 加入 BUFF 组，准备后续排序渲染
+				if not tDisp[buff.szKey] then
+					tDisp[buff.szKey] = {
+						tBuff = buff,
+						aRule = {},
+					}
+				end
+				table.insert(tDisp[buff.szKey].aRule, tRule)
 			end
-			table.insert(tDisp[buff.szKey].aRule, tRule)
 		end
 	end
 	-- 气劲数据排序
