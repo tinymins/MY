@@ -1668,14 +1668,15 @@ function D.UpdateCharaterBuff(p, handle, tKeep)
 				CTM_SCREEN_HEAD[dwCharID] = {}
 			end
 			if not CTM_SCREEN_HEAD[dwCharID][tRule.szKey] then
-				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCharID, 'BUFF', 'CTM_' .. tBuff.dwID, {
+				local szCountdownKey = 'CTM_' .. tBuff.dwID .. '_' .. tRule.szKey
+				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCharID, 'BUFF', szCountdownKey, {
 					dwBuffID = tBuff.dwID,
 					szText = tBuff.szName,
 					nLogicFrame = tBuff.nEndFrame,
 					col = tRule.colScreenHead or tRule.col,
 					nPriority = tItem.nPriority,
 				})
-				CTM_SCREEN_HEAD[dwCharID][tRule.szKey] = 'CTM_' .. tBuff.dwID
+				CTM_SCREEN_HEAD[dwCharID][tRule.szKey] = szCountdownKey
 			end
 		end
 	end
@@ -1703,7 +1704,13 @@ function D.UpdateCharaterBuff(p, handle, tKeep)
 	if CTM_SCREEN_HEAD[dwCharID] then
 		for szRuleKey, _ in pairs(CTM_SCREEN_HEAD[dwCharID]) do
 			if not tRuleKey[szRuleKey] then
-				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCharID, 'BUFF', CTM_SCREEN_HEAD[dwCharID][szRuleKey], false)
+				FireUIEvent(
+					'MY_LIFEBAR_COUNTDOWN',
+					dwCharID,
+					'BUFF',
+					CTM_SCREEN_HEAD[dwCharID][szRuleKey],
+					false
+				)
 				CTM_SCREEN_HEAD[dwCharID][szRuleKey] = nil
 			end
 		end
