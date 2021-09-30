@@ -1443,9 +1443,9 @@ function X.JudgeOperator(opt, lval, rval, ...)
 		return lval < rval
 	elseif opt == '<=' then
 		return lval <= rval
-	elseif opt == '==' or opt == '===' then
+	elseif opt == '=' or opt == '==' or opt == '===' then
 		return lval == rval
-	elseif opt == '~=' or opt == '!=' or opt == '!==' then
+	elseif opt == '<>' or opt == '~=' or opt == '!=' or opt == '!==' then
 		return lval ~= rval
 	end
 end
