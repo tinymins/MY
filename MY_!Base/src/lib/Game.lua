@@ -2456,7 +2456,9 @@ function X.GetBagPackageCount()
 	if _G.Bag_GetPacketCount then
 		return _G.Bag_GetPacketCount()
 	end
-	return X.IsInExtraBagMap() and 1 or 6
+	return X.IsInExtraBagMap()
+		and #CONSTANT.INVENTORY_LIMITED_PACKAGE_LIST
+		or #CONSTANT.INVENTORY_PACKAGE_LIST
 end
 
 function X.GetBankPackageCount()
@@ -2556,21 +2558,25 @@ function X.GetItemKey(dwTabType, dwIndex, nBookID)
 end
 end
 
--- 获取一样东西在背包、装备、仓库的数量
-do local CACHE, FULL_CACHE
+do local CACHE, NO_LIMITED_CACHE
 local function InsertItem(cache, it)
 	if it then
 		local szKey = X.GetItemKey(it)
 		cache[szKey] = (cache[szKey] or 0) + (it.bCanStack and it.nStackNum or 1)
 	end
 end
-function X.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
+-- 获取一样东西在背包、装备、仓库的数量
+-- dwTabType   物品表类型
+-- dwIndex     物品在表内地址
+-- nBookID     书籍ID
+-- bNoLimited  无视地图限制（部分地图内限制使用临时背包）
+function X.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bNoLimited)
 	if X.IsBoolean(nBookID) then
-		nBookID, bFull = nil, nBookID
+		nBookID, bNoLimited = nil, nBookID
 	end
 	local cache = CACHE
-	if bFull then
-		cache = FULL_CACHE
+	if bNoLimited then
+		cache = NO_LIMITED_CACHE
 	end
 	if not cache then
 		cache = {}
@@ -2578,14 +2584,12 @@ function X.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
 		if not me then
 			return
 		end
-		local nIndex = bFull and 1 or X.GetBagPackageIndex()
-		local nCount = bFull and 7 or X.GetBagPackageCount()
-		for dwBox = nIndex, nCount do
+		for _, dwBox in ipairs(bNoLimited and CONSTANT.INVENTORY_PACKAGE_LIST or CONSTANT.INVENTORY_LIMITED_PACKAGE_LIST)  do
 			for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 				InsertItem(cache, me.GetItem(dwBox, dwX))
 			end
 		end
-		for dwBox = INVENTORY_INDEX.BANK, INVENTORY_INDEX.BANK + X.GetBankPackageCount() - 1 do
+		for _, dwBox in ipairs(CONSTANT.INVENTORY_BANK_LIST) do
 			for dwX = 0,  me.GetBoxSize(dwBox) - 1 do
 				InsertItem(cache, GetPlayerItem(me, dwBox, dwX))
 			end
@@ -2595,15 +2599,15 @@ function X.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bFull)
 				InsertItem(cache, GetPlayerItem(me, dwBox, dwX))
 			end
 		end
-		if bFull then
-			FULL_CACHE = cache
+		if bNoLimited then
+			NO_LIMITED_CACHE = cache
 		else
 			CACHE = cache
 		end
 	end
 	return cache[X.GetItemKey(dwTabType, dwIndex, nBookID)] or 0
 end
-X.RegisterEvent({'BAG_ITEM_UPDATE', 'BANK_ITEM_UPDATE', 'LOADING_ENDING'}, 'LIB#GetItemAmountInAllPackages', function() CACHE, FULL_CACHE = nil, nil end)
+X.RegisterEvent({'BAG_ITEM_UPDATE', 'BANK_ITEM_UPDATE', 'LOADING_ENDING'}, 'LIB#GetItemAmountInAllPackages', function() CACHE, NO_LIMITED_CACHE = nil, nil end)
 end
 
 -- 装备指定名字的装备
