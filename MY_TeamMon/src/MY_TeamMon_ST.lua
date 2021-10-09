@@ -43,10 +43,14 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_ST', _L['Raid'], {
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'TOPRIGHT', r = 'CENTER', x = -250, y = -300 },
 	},
+	nBelowDecimal = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = X.Schema.Number,
+		xDefaultValue = 1,
+	},
 })
 local D = {}
-
-MY_TeamMon_ST = {}
 
 -- ST class
 local ST = {}
@@ -139,7 +143,7 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 	end
 end
 
-function MY_TeamMon_ST.OnFrameCreate()
+function D.OnFrameCreate()
 	this:RegisterEvent('LOADING_END')
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
@@ -152,7 +156,7 @@ function MY_TeamMon_ST.OnFrameCreate()
 	D.handle = this:Lookup('', 'Handle_List')
 end
 
-function MY_TeamMon_ST.OnEvent(szEvent)
+function D.OnEvent(szEvent)
 	if szEvent == 'MY_TM_ST_CREATE' then
 		CreateCountdown(arg0, arg1, arg2, arg3, arg4)
 	elseif szEvent == 'MY_TM_ST_DEL' then
@@ -182,7 +186,7 @@ function MY_TeamMon_ST.OnEvent(szEvent)
 	end
 end
 
-function MY_TeamMon_ST.OnFrameDragEnd()
+function D.OnFrameDragEnd()
 	this:CorrectPos()
 	O.tAnchor = GetFrameAnchor(this, 'TOPLEFT')
 end
@@ -213,7 +217,7 @@ local function SetSTAction(ui, nLeft, nPer)
 	end
 end
 
-function MY_TeamMon_ST.OnFrameBreathe()
+function D.OnFrameBreathe()
 	local me = GetClientPlayer()
 	if not me then return end
 	local nNow = GetTime()
@@ -309,15 +313,25 @@ function ST:ctor(nType, szKey, tParam)
 	end
 	return oo
 end
+
 -- 设置倒计时的名称和时间 用于动态改变分段倒计时
 function ST:SetInfo(tTime, nIcon)
 	if tTime.szName then
 		self.ui.txt:SetText(tTime.szName)
 	end
 	if tTime.nTime then
-		self.ui.time:SetText((tTime.nTime >= 1 or tTime.nTime < 0.1)
-			and FormatDuration(math.floor(tTime.nTime), 'ENGLISH_ABBR')
-			or ('%.1f'):format(tTime.nTime) .. 's')
+		self.ui.time:SetText(
+			(
+				tTime.nTime >= 60
+					and FormatDuration(tTime.nTime, 'ENGLISH_ABBR', { accuracyunit = 'minute' })
+					or ''
+			)
+			.. (
+				(D.bReady and O.nBelowDecimal ~= 0 and (O.nBelowDecimal == 3601 or (tTime.nTime < O.nBelowDecimal and tTime.nTime >= 0.1)))
+					and ('%.1fs'):format(tTime.nTime % 60)
+					or ('%ds'):format(tTime.nTime % 60)
+			)
+		)
 		self.ui:SetUserData(math.floor(tTime.nTime))
 	end
 	if nIcon then
@@ -327,6 +341,7 @@ function ST:SetInfo(tTime, nIcon)
 	end
 	return self
 end
+
 -- 设置进度条
 function ST:SetPercentage(fPercentage)
 	self.ui.img:SetPercentage(fPercentage)
@@ -336,6 +351,7 @@ function ST:SetPercentage(fPercentage)
 	self.ui:FormatAllItemPos()
 	return self
 end
+
 -- 改变样式 如果true则更改为第二样式 用于时间小于5秒的时候
 function ST:Switch(bSwitch)
 	if bSwitch then
@@ -363,10 +379,46 @@ end
 function ST:GetName()
 	return self.ui.txt:GetText()
 end
+
 -- 删除倒计时
 function ST:RemoveItem()
 	D.handle:RemoveItem(self.ui)
 	D.handle:FormatAllItemPos()
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_ST', D.Init)
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_ST', function()
+	D.bReady = true
+	D.Init()
+end)
+
+X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_TeamMon_ST', function()
+	D.bReady = false
+end)
+
+-- Global exports
+do
+local settings = {
+	name = 'MY_TeamMon_ST',
+	exports = {
+		{
+			root = D,
+			preset = 'UIEvent'
+		},
+		{
+			fields = {
+				'nBelowDecimal',
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				'nBelowDecimal',
+			},
+			root = O,
+		},
+	},
+}
+MY_TeamMon_ST = X.CreateModule(settings)
+end

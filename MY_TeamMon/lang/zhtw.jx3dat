@@ -224,12 +224,16 @@ return {
 	['Add circle'] = '添加圈圈',
 	-- MY_TeamMon_ST.lua --
 	['MY_TeamMon_ST'] = '團隊計時',
+	['Countdown configure'] = '時間軸顯示',
 	['Countdown format error'] = '倒計時格式錯誤',
 	['[%s] remaining %ds.'] = '【%s】 剩餘 %d 秒。',
 	['Countdown'] = '倒計時',
 	['Focuslist'] = '焦點列表',
 	['Team panel buff rule list'] = '團隊面板條件監控',
 	['Add buff rule'] = '添加條件監控',
+	['Never show decimal.'] = '從不顯示小數點。',
+	['Always show decimal.'] = '總是顯示小數點。',
+	['Show countdown decimal when duration below: %ds.'] = '倒計時剩餘%d秒時顯示小數點。',
 	-- MY_TeamMon_RR.lua --
 	['MY_TeamMon_RR'] = '團隊監控·數據訂閱',
 	['Subscribe list'] = '訂閱列表',

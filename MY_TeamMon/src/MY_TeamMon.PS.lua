@@ -176,6 +176,25 @@ function PS.OnPanelActive(wnd)
 			return menu
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Countdown configure'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('WndTrackbar', {
+		x = nPaddingX + 10, y = nY, h = 22,
+		range = {0, 3601},
+		value = MY_TeamMon_ST.nBelowDecimal,
+		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		onchange = function(val)
+			MY_TeamMon_ST.nBelowDecimal = val
+		end,
+		textfmt = function(val)
+			if val == 0 then
+				return _L['Never show decimal.']
+			end
+			if val == 3601 then
+				return _L['Always show decimal.']
+			end
+			return _L('Show countdown decimal when duration below: %ds.', val)
+		end,
+	}):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Data save mode'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nPaddingX + 10, y = nY, text = _L['Use common data'],
