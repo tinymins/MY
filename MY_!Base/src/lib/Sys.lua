@@ -1983,7 +1983,7 @@ else
 end
 
 do
-local KEY = wstring.gsub(X.PACKET_INFO.ROOT, '\\', '/'):lower()
+local KEY = '/' .. wstring.gsub(X.PACKET_INFO.ROOT, '\\', '/'):gsub('/+$', ''):gsub('^.*/', ''):lower() .. '/'
 local FILE_PATH = {'temporary/lua_error.jx3dat', X.PATH_TYPE.GLOBAL}
 local LAST_ERROR_MSG = X.LoadLUAData(FILE_PATH, { passphrase = false }) or {}
 local ERROR_MSG = {}

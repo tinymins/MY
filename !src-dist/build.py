@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+# pip3 install semver
+
 '''
 新版本打包自动化
 '''
-# pip3 install semver
 
 import argparse
 import codecs
