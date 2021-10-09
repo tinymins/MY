@@ -298,12 +298,28 @@ function PS.OnPanelActive(wnd)
 		imageframe = 10,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
-
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Auto focus tong'],
 		checked = MY_Focus.bFocusTong,
 		oncheck = function(bChecked)
 			MY_Focus.bFocusTong = bChecked
+			MY_Focus.RescanNearby()
+		end,
+		autoenable = function() return MY_Focus.IsEnabled() end,
+	})
+	y = y + deltaY
+
+	ui:Append('Image', {
+		x = x + 5, y = y - 3, w = 10, h = 8,
+		image = 'ui/Image/UICommon/ScienceTree.UITex',
+		imageframe = 10,
+		autoenable = function() return MY_Focus.IsEnabled() end,
+	})
+	ui:Append('WndCheckBox', {
+		x = x, y = y, w = wr, text = _L['Anmerkungen auto focus'],
+		checked = MY_Focus.bFocusAnmerkungen,
+		oncheck = function(bChecked)
+			MY_Focus.bFocusAnmerkungen = bChecked
 			MY_Focus.RescanNearby()
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
@@ -360,17 +376,6 @@ function PS.OnPanelActive(wnd)
 		checked = MY_Focus.bFocusJJCEnemy,
 		oncheck = function(bChecked)
 			MY_Focus.bFocusJJCEnemy = bChecked
-			MY_Focus.RescanNearby()
-		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
-	})
-	y = y + deltaY
-
-	ui:Append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['Anmerkungen auto focus'],
-		checked = MY_Focus.bFocusAnmerkungen,
-		oncheck = function(bChecked)
-			MY_Focus.bFocusAnmerkungen = bChecked
 			MY_Focus.RescanNearby()
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,

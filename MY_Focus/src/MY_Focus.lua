@@ -623,6 +623,17 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				end
 			else
 				if not O.bOnlyPublicMap or (not X.IsInBattleField() and not X.IsInDungeon() and not X.IsInArena()) then
+					-- ÅÐ¶Ï½ÇÉ«±¸×¢
+					if dwType == TARGET.PLAYER
+					and O.bFocusAnmerkungen
+					and MY_Anmerkungen
+					and MY_Anmerkungen.GetPlayerNote(dwID) then
+						table.insert(aVia, {
+							bDeletable = false,
+							szVia = _L['Anmerkungen'],
+						})
+						bFocus = true
+					end
 					-- ÅÐ¶ÏºÃÓÑ
 					if dwType == TARGET.PLAYER
 					and O.bFocusFriend
@@ -665,18 +676,6 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			table.insert(aVia, {
 				bDeletable = false,
 				szVia = _L['Important npc focus'],
-			})
-			bFocus = true
-		end
-
-		-- ÅÐ¶Ï½ÇÉ«±¸×¢
-		if not bFocus and O.bFocusAnmerkungen
-		and dwType == TARGET.PLAYER
-		and MY_Anmerkungen
-		and MY_Anmerkungen.GetPlayerNote(dwID) then
-			table.insert(aVia, {
-				bDeletable = false,
-				szVia = _L['Anmerkungen'],
 			})
 			bFocus = true
 		end
