@@ -39,6 +39,12 @@ local O = X.CreateUserSettingsModule('MY_FooterTip', _L['General'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bFriendDungeonHide = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Toolbox'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 	bTongMember = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
@@ -51,6 +57,12 @@ local O = X.CreateUserSettingsModule('MY_FooterTip', _L['General'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bTongMemberDungeonHide = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Toolbox'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 })
 local D = {}
 
@@ -59,7 +71,7 @@ function D.Apply()
 	if Navigator_Remove then
 		Navigator_Remove('MY_FRIEND_TIP')
 	end
-	if D.bReady and O.bFriend and not X.IsInShieldedMap() and not X.IsInDungeon() then
+	if D.bReady and O.bFriend and not X.IsInShieldedMap() and (not O.bFriendDungeonHide or not X.IsInDungeon()) then
 		local hShaList = UI.GetShadowHandle('MY_FriendHeadTip')
 		if not hShaList.freeShadows then
 			hShaList.freeShadows = {}
@@ -148,7 +160,7 @@ function D.Apply()
 	if Navigator_Remove then
 		Navigator_Remove('MY_GUILDMEMBER_TIP')
 	end
-	if D.bReady and O.bTongMember and not X.IsInShieldedMap() and not X.IsInDungeon() then
+	if D.bReady and O.bTongMember and not X.IsInShieldedMap() and (not O.bTongMemberDungeonHide or not X.IsInDungeon()) then
 		local hShaList = UI.GetShadowHandle('MY_TongMemberHeadTip')
 		if not hShaList.freeShadows then
 			hShaList.freeShadows = {}
@@ -242,43 +254,63 @@ X.RegisterEvent('LOADING_ENDING', 'MY_FooterTip', D.Apply)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	-- 好友高亮
-	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 180,
+	nX = nPaddingX
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Friend headtop tips'],
 		checked = MY_FooterTip.bFriend,
 		oncheck = function(bCheck)
 			MY_FooterTip.bFriend = not MY_FooterTip.bFriend
 		end,
-	})
-	ui:Append('WndCheckBox', {
-		x = nX + 180, y = nY, w = 180,
+	}):Width() + 5
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Friend headtop hide in dungeon'],
+		checked = MY_FooterTip.bFriendDungeonHide,
+		oncheck = function(bCheck)
+			MY_FooterTip.bFriendDungeonHide = not MY_FooterTip.bFriendDungeonHide
+		end,
+		autoenable = function() return MY_FooterTip.bFriend end,
+	}):Width() + 5
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Friend headtop tips nav'],
 		checked = MY_FooterTip.bFriendNav,
 		oncheck = function(bCheck)
 			MY_FooterTip.bFriendNav = not MY_FooterTip.bFriendNav
 		end,
 		autoenable = function() return MY_FooterTip.bFriend end,
-	})
+	}):Width() + 5
 	nY = nY + nLH
 
 	-- 帮会高亮
-	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 180,
+	nX = nPaddingX
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Tong member headtop tips'],
 		checked = MY_FooterTip.bTongMember,
 		oncheck = function(bCheck)
 			MY_FooterTip.bTongMember = not MY_FooterTip.bTongMember
 		end,
-	})
-	ui:Append('WndCheckBox', {
-		x = nX + 180, y = nY, w = 180,
+	}):Width() + 5
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Tong member headtop hide in dungeon'],
+		checked = MY_FooterTip.bTongMemberDungeonHide,
+		oncheck = function(bCheck)
+			MY_FooterTip.bTongMemberDungeonHide = not MY_FooterTip.bTongMemberDungeonHide
+		end,
+		autoenable = function() return MY_FooterTip.bTongMember end,
+	}):Width() + 5
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Tong member headtop tips nav'],
 		checked = MY_FooterTip.bTongMemberNav,
 		oncheck = function(bCheck)
 			MY_FooterTip.bTongMemberNav = not MY_FooterTip.bTongMemberNav
 		end,
 		autoenable = function() return MY_FooterTip.bTongMember end,
-	})
+	}):Width() + 5
 	nY = nY + nLH
 	return nX, nY
 end
@@ -298,8 +330,10 @@ local settings = {
 			fields = {
 				'bFriend',
 				'bFriendNav',
+				'bFriendDungeonHide',
 				'bTongMember',
 				'bTongMemberNav',
+				'bTongMemberDungeonHide',
 			},
 			root = O,
 		},
@@ -309,14 +343,18 @@ local settings = {
 			fields = {
 				'bFriend',
 				'bFriendNav',
+				'bFriendDungeonHide',
 				'bTongMember',
 				'bTongMemberNav',
+				'bTongMemberDungeonHide',
 			},
 			triggers = {
 				bFriend = D.Apply,
 				bFriendNav = D.Apply,
+				bFriendDungeonHide = D.Apply,
 				bTongMember = D.Apply,
 				bTongMemberNav = D.Apply,
+				bTongMemberDungeonHide = D.Apply,
 			},
 			root = O,
 		},

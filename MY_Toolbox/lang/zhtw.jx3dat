@@ -6,9 +6,11 @@ return {
     -- MY_FooterTip
     ['MY_FooterTip'] = '幫會好友高亮',
     ['Friend headtop tips'] = '附近好友高亮',
-    ['Friend headtop tips nav'] = '啟用場景追蹤點',
-    ['Tong member headtop tips'] = '附近幫會成員高亮',
-    ['Tong member headtop tips nav'] = '啟用場景追蹤點',
+    ['Friend headtop tips nav'] = '顯示場景追蹤點',
+    ['Friend headtop hide in dungeon'] = '秘境中隱藏',
+    ['Tong member headtop tips'] = '附近幫眾高亮',
+    ['Tong member headtop tips nav'] = '顯示場景追蹤點',
+    ['Tong member headtop hide in dungeon'] = '秘境中隱藏',
 
     ['Check nearby gongzhan'] = '檢測附近共戰',
     ['Detected [%s] has Gongzhan BUFF for %d second(s).'] = '檢測到[%s]共戰氣勁剩餘%d秒。',
