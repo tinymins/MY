@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-# pip install pypiwin32
+# pip3 install ntplib pypiwin32 semver
+
 '''
 版本标签创建自动化
 '''
-# pip3 install semver
 
 import argparse
 import codecs
