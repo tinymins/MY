@@ -293,8 +293,8 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					return table.concat(aXml)
 				end
 				col.Compare = function(r1, r2)
-					local k1 = r1.progress_info[map.dwID]
-					local k2 = r2.progress_info[map.dwID]
+					local k1 = r1.progress_info and r1.progress_info[map.dwID]
+					local k2 = r2.progress_info and r2.progress_info[map.dwID]
 					if k1 and not k2 then
 						return 1
 					end
@@ -315,6 +315,9 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 							s2 = s2 + 1
 						end
 					end
+					if s1 == s2 then
+						return 0
+					end
 					return s1 > s2 and 1 or -1
 				end
 			else
@@ -327,8 +330,8 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					return GetFormatText(szText, 162, 255, 255, 255, 786, 'this.mapid=' .. map.dwID, 'Text_CD')
 				end
 				col.Compare = function(r1, r2)
-					local k1 = r1.copy_info[map.dwID] and r1.copy_info[map.dwID][1]
-					local k2 = r2.copy_info[map.dwID] and r2.copy_info[map.dwID][1]
+					local k1 = r1.copy_info and r1.copy_info[map.dwID] and r1.copy_info[map.dwID][1]
+					local k2 = r2.copy_info and r2.copy_info[map.dwID] and r2.copy_info[map.dwID][1]
 					if k1 and not k2 then
 						return 1
 					end
@@ -336,6 +339,9 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 						return -1
 					end
 					if not k1 and not k2 then
+						return 0
+					end
+					if k1 == k2 then
 						return 0
 					end
 					return k1 > k2 and 1 or -1
@@ -348,10 +354,21 @@ end })
 for _, p in ipairs(COLUMN_LIST) do
 	if not p.Compare then
 		p.Compare = function(r1, r2)
-			if r1[p.szKey] == r2[p.szKey] then
+			local k1 = r1[p.szKey]
+			local k2 = r2[p.szKey]
+			if k1 and not k2 then
+				return 1
+			end
+			if k2 and not k1 then
+				return -1
+			end
+			if not k1 and not k2 then
 				return 0
 			end
-			return r1[p.szKey] > r2[p.szKey] and 1 or -1
+			if k1 == k2 then
+				return 0
+			end
+			return k1 > k2 and 1 or -1
 		end
 	end
 	COLUMN_DICT[p.id] = p
