@@ -24,7 +24,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^9.0.0') then
 	return
 end
-X.RegisterRestriction('MY_ItemPrice', { ['*'] = false, classic = true })
+X.RegisterRestriction('MY_ItemPrice', { ['*'] = false })
 --------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule('MY_ItemPrice', _L['General'], {
