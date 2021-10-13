@@ -2332,13 +2332,14 @@ function X.SetTarget(arg0, arg1)
 	if not dwType or not dwID then
 		return false
 	end
-	if dwType == TARGET.NPC then
+	if dwType == TARGET.PLAYER then
 		if X.IsInShieldedMap() and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
 			X.Debug('SetTarget', 'Set target to player is forbiden in current map.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
+	elseif dwType == TARGET.NPC then
 		local npc = GetNpc(dwID)
 		if npc and not npc.IsSelectable() and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
