@@ -183,30 +183,70 @@ local function GetItemKey(it)
 	end
 	return X.NumberBaseN(it.dwTabType, 32) .. '_' .. X.NumberBaseN(it.dwIndex, 32)
 end
+local PRICE_TYPE = X.KvpToObject({
+	{ CONSTANT.AUCTION_ITEM_LIST_TYPE.NORMAL_LOOK_UP, 'n' },
+	{ CONSTANT.AUCTION_ITEM_LIST_TYPE.PRICE_LOOK_UP , 'p' },
+	{ CONSTANT.AUCTION_ITEM_LIST_TYPE.DETAIL_LOOK_UP, 'd' },
+})
 X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 	if not O.bEnable then
 		return
 	end
-	if arg0 == AUCTION_RESPOND_CODE.SUCCEED and arg1 == 0 then
+	if arg0 ~= AUCTION_RESPOND_CODE.SUCCEED then
+		return
+	end
+	local szPriceType = PRICE_TYPE[arg1]
+	if szPriceType then
 		-- 获取数据
 		local AuctionClient = GetAuctionClient()
-		local nCount, aInfo = AuctionClient.GetLookupResult(arg1)
+		local nInfoCount, aInfo = AuctionClient.GetLookupResult(arg1)
 		local dwBaseID = math.huge
 		local tItemGroup = {}
+		-- AuctionClient.GetLookupResult
+		--
+		-- ## CLASSIC ##
+		-- {
+		-- 	BidderName = "",
+		-- 	BuyItNowPrice = { nGold = 0, nSilver = 3, nCopper = 0 },
+		-- 	CanBid = 1,
+		-- 	CRC = -1544935104,
+		-- 	ID = 11612492,
+		-- 	Item = "KGItem:000001D4B0EC0BB0",
+		-- 	LeftTime = 36277,
+		-- 	Price = { nGold = 0, nSilver = 3, nCopper = 0 },
+		-- 	SellerName = "白玉糖",
+		-- }
+		--
+		-- ## REMAKE ##
+		-- {
+		-- 	CRC = 1459347857,
+		-- 	ID = 741069789,
+		-- 	Item = "KGItem:00000234A2D47170",
+		-- 	LastDurationTime = 48,
+		-- 	LeftTime = 1556,
+		-- 	Price = { nGold = 0, nSilver = 1, nCopper = 0 },
+		-- 	SellerName = "奶糖睡不醒",
+		-- 	SellerNum = 14,
+		-- 	StackNum = 4318,
+		-- }
 		for _, info in ipairs(aInfo) do
 			local szKey = GetItemKey(info.Item)
-			local nPrice = GoldSilverAndCopperToMoney(info.BuyItNowPrice.nGold, info.BuyItNowPrice.nSilver, info.BuyItNowPrice.nCopper)
+			local nID = info.ID or 0
+			if nID < 0 then
+				nID = nID + 0xffffffff
+			end
+			local tPrice = info.BuyItNowPrice or info.Price
+			local nPrice = GoldSilverAndCopperToMoney(tPrice.nGold, tPrice.nSilver, tPrice.nCopper)
+			local nCount = info.StackNum or X.IIf(info.Item.bCanStack, info.Item.nStackNum, 1) or 1
 			if not tItemGroup[szKey] then
 				tItemGroup[szKey] = {}
 			end
 			table.insert(tItemGroup[szKey], {
-				dwID = info.ID,
-				nCount = info.Item.bCanStack
-					and info.Item.nStackNum
-					or 1,
+				dwID = nID,
+				nCount = nCount,
 				nPrice = nPrice,
 			})
-			dwBaseID = math.min(dwBaseID, info.ID)
+			dwBaseID = math.min(dwBaseID, nID)
 		end
 		if X.IsHugeNumber(dwBaseID) then
 			return
@@ -240,18 +280,66 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 				s = AnsiToUTF8(X.GetRealServer(2)), -- Server
 				t = GetCurrentTime(), -- Time
 				d = AnsiToUTF8(szData), -- Price data
+				dt = AnsiToUTF8(szPriceType), -- price type
 				ib = X.NumberBaseN(dwBaseID, 32),
 			}, 'e87d2e0a-d3bd-4095-af48-e50dfe58f36b')))
 		-- 延迟一帧 否则系统还没更新界面数据
 		X.DelayCall(function()
-			-- 保证第一页
-			local txtPage = Station.Lookup('Normal/AuctionPanel/PageSet_Totle/Page_Business/Wnd_Result2', 'Text_Page')
-			if not txtPage or txtPage:GetText():find('1-', nil, true) ~= 1 then
-				return
+			local bValid = false
+			-- CLASSIC
+			if not bValid then
+				bValid = true
+				-- 保证第一页
+				local txtPage = Station.Lookup('Normal/AuctionPanel/PageSet_Totle/Page_Business/Wnd_Result2', 'Text_Page')
+				if not txtPage or txtPage:GetText():find('1-', nil, true) ~= 1 then
+					bValid = false
+				end
+				-- 保证一口价升序
+				local imgPriceUp = Station.Lookup('Normal/AuctionPanel/PageSet_Totle/Page_Business/Wnd_Result2/CheckBox_Price', 'Image_PriceNameUp')
+				if not imgPriceUp or not imgPriceUp:IsVisible() then
+					bValid = false
+				end
 			end
-			-- 保证一口价升序
-			local imgPriceUp = Station.Lookup('Normal/AuctionPanel/PageSet_Totle/Page_Business/Wnd_Result2/CheckBox_Price', 'Image_PriceNameUp')
-			if not imgPriceUp or not imgPriceUp:IsVisible() then
+			-- REMAKE
+			if not bValid then
+				bValid = true
+				-- 总搜索页
+				if szPriceType == 'n' then
+					-- 保证第一页
+					local txtPage = Station.Lookup('Normal1/AuctionPanel/TradingPage_Totle/Page_Business/Wnd_Result/Wnd_MN_Item/Edit_PageNumb')
+					if not txtPage or txtPage:GetText() ~= '1' then
+						bValid = false
+					end
+					-- 保证一口价升序
+					local imgPriceUp = Station.Lookup('Normal1/AuctionPanel/TradingPage_Totle/Page_Business/Wnd_Result/CheckBox_LowestPrice', 'Image_LowestPriceUp')
+					if not imgPriceUp or not imgPriceUp:IsVisible() then
+						bValid = false
+					end
+				elseif szPriceType == 'p' then
+					-- 保证第一页
+					local txtPage = Station.Lookup('Normal1/TradingPanels/Wnd_subject/Wnd_List/Wnd_MN_Item', 'Text_MNumberItem')
+					if not txtPage or txtPage:GetText():find('1/', nil, true) ~= 1 then
+						bValid = false
+					end
+					-- 保证一口价升序
+					local imgPriceUp = Station.Lookup('Normal1/TradingPanels/Wnd_subject/Wnd_List/CheckBox_LowestPrice', 'Image_LowestPriceUp')
+					if not imgPriceUp or not imgPriceUp:IsVisible() then
+						bValid = false
+					end
+				elseif szPriceType == 'd' then
+					-- 保证第一页
+					local txtPage = Station.Lookup('Normal1/TradingSellers/Wnd_List/Wnd_MN_Item/Edit_PageNumb')
+					if not txtPage or txtPage:GetText() ~= '1' then
+						bValid = false
+					end
+					-- 保证一口价升序
+					local imgPriceUp = Station.Lookup('Normal1/TradingSellers/Wnd_List/CheckBox_LowestPrice', 'Image_LowestPriceUp')
+					if not imgPriceUp or not imgPriceUp:IsVisible() then
+						bValid = false
+					end
+				end
+			end
+			if not bValid then
 				return
 			end
 			X.Ajax({ driver = 'auto', mode = 'auto', method = 'auto', url = szURL })
