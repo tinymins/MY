@@ -294,6 +294,7 @@ CONSTANT = {
 			{ dwForceID = FORCE_TYPE.WU_DU    , dwID = 10176, nIcon = 2767 , szUITex = 'ui/Image/icon/wudu_neigong_2.UITex'    , nFrame = 0  }, -- 补天
 			{ dwForceID = FORCE_TYPE.WAN_HUA  , dwID = 10028, nIcon = 412  , szUITex = 'ui/Image/icon/skill_wanhua23.UITex'    , nFrame = 0  }, -- 离经
 			{ dwForceID = FORCE_TYPE.CHANG_GE , dwID = 10448, nIcon = 7067 , szUITex = 'ui/Image/icon/skill_0514_23.UITex'     , nFrame = 0  }, -- 相知
+			{ dwForceID = FORCE_TYPE.YAO_ZONG , dwID = 10626, nIcon = 15593, szUITex = 'ui/image/icon/skill_21_9_10_1.UITex '  , nFrame = 0  }, -- 灵素
 			-- 内功
 			{ dwForceID = FORCE_TYPE.TANG_MEN , dwID = 10225, nIcon = 3184 , szUITex = 'ui/Image/icon/skill_tangm_20.UITex'    , nFrame = 0  }, -- 天罗
 			{ dwForceID = FORCE_TYPE.QI_XIU   , dwID = 10081, nIcon = 888  , szUITex = 'ui/Image/icon/skill_qixiu03.UITex'     , nFrame = 0  }, -- 冰心
@@ -304,6 +305,7 @@ CONSTANT = {
 			{ dwForceID = FORCE_TYPE.SHAO_LIN , dwID = 10003, nIcon = 425  , szUITex = 'ui/Image/icon/skill_shaolin10.UITex'   , nFrame = 0  }, -- 易经
 			{ dwForceID = FORCE_TYPE.CHANG_GE , dwID = 10447, nIcon = 7071 , szUITex = 'ui/Image/icon/skill_0514_27.UITex'     , nFrame = 0  }, -- 莫问
 			{ dwForceID = FORCE_TYPE.YAN_TIAN , dwID = 10615, nIcon = 13894, szUITex = 'ui/image/icon/skill_20_9_14_1.uitex'   , nFrame = 19 }, -- 太玄
+			{ dwForceID = FORCE_TYPE.YAO_ZONG , dwID = 10627, nIcon = 15594, szUITex = 'ui/image/icon/skill_21_9_10_2.UITex '  , nFrame = 0  }, -- 无方
 			-- 外功
 			{ dwForceID = FORCE_TYPE.CANG_YUN , dwID = 10390, nIcon = 6314 , szUITex = 'ui/Image/icon/Skill_CangY_32.UITex'    , nFrame = 0  }, -- 分山
 			{ dwForceID = FORCE_TYPE.TANG_MEN , dwID = 10224, nIcon = 3165 , szUITex = 'ui/Image/icon/skill_tangm_01.UITex'    , nFrame = 0  }, -- 鲸鱼
@@ -342,6 +344,7 @@ CONSTANT = {
 			{ FORCE_TYPE.BA_DAO   , {'ui\\Image\\PlayerAvatar\\badao.tga'    , -2, false} }, -- 霸刀
 			{ FORCE_TYPE.PENG_LAI , {'ui\\Image\\PlayerAvatar\\penglai.tga'  , -2, false} }, -- 蓬莱
 			{ FORCE_TYPE.LING_XUE , {'ui\\Image\\PlayerAvatar\\lingxuege.tga', -2, false} }, -- 凌雪
+			{ FORCE_TYPE.YAO_ZONG , {'ui\\Image\\PlayerAvatar\\beitianyaozong.dds', -2, false} }, -- 药宗
 		}),
 		{
 			__index = function(t, k)
@@ -368,6 +371,7 @@ CONSTANT = {
 			{ FORCE_TYPE.PENG_LAI , { 171, 227, 250 } }, -- 蓬莱
 			{ FORCE_TYPE.LING_XUE , bStream and { 253, 86, 86 } or { 161,   9,  34 } }, -- 凌雪
 			{ FORCE_TYPE.YAN_TIAN , { 166,  83, 251 } }, -- 衍天
+			{ FORCE_TYPE.YAO_ZONG , {  18, 131, 140 } }, -- 药宗
 		}),
 		{
 			__index = function(t, k)
@@ -394,6 +398,7 @@ CONSTANT = {
 			{ FORCE_TYPE.PENG_LAI , {  93,  97, 126 } }, -- 蓬莱
 			{ FORCE_TYPE.LING_XUE , { 161,   9,  34 } }, -- 凌雪
 			{ FORCE_TYPE.YAN_TIAN , {  96,  45, 148 } }, -- 衍天
+			{ FORCE_TYPE.YAO_ZONG , {  10,  81,  87 } }, -- 药宗
 		}),
 		{
 			__index = function(t, k)
