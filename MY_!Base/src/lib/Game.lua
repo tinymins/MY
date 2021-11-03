@@ -4441,6 +4441,7 @@ local MACRO_CONDITION_DATATYPE = {
 	['noskill'] = 'SKILL',
 	['npclevel'] = 'VOID',
 	['nearby_enemy'] = 'VOID',
+	['yaoxing'] = 'VOID',
 	['skill_notin_cd'] = 'SKILL',
 	['tbuff'] = 'BUFF',
 	['tnobuff'] = 'BUFF',
