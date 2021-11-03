@@ -257,10 +257,7 @@ local function InsertChangeGroupMenu(tMenu, dwMemberID)
 end
 
 -- 有各个版本之间的文本差异，所以做到翻译中
-local CTM_KUNGFU_TEXT = setmetatable(X.Clone(_L.KUNGFU), {
-	__index = function(t) return _L.KUNGFU[0] end,
-	__metatable = true,
-})
+local CTM_KUNGFU_TEXT = CONSTANT.KUNGFU_NAME_ABBREVIATION
 
 -- CODE --
 local CTM = {}
