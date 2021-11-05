@@ -24,7 +24,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^9.0.0') then
 	return
 end
-X.RegisterRestriction('MY_FriendTipLocation', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_FriendTipLocation', { ['*'] = false })
 X.RegisterRestriction('MY_FriendTipLocation.LV2', { ['*'] = true })
 --------------------------------------------------------------------------
 
