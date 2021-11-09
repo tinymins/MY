@@ -377,7 +377,7 @@ CONSTANT = {
 			{ FORCE_TYPE.PENG_LAI , { 171, 227, 250 } }, -- ÅîÀ³
 			{ FORCE_TYPE.LING_XUE , bStream and { 253, 86, 86 } or { 161,   9,  34 } }, -- ÁèÑ©
 			{ FORCE_TYPE.YAN_TIAN , { 166,  83, 251 } }, -- ÑÜÌì
-			{ FORCE_TYPE.YAO_ZONG , {  18, 131, 140 } }, -- Ò©×Ú
+			{ FORCE_TYPE.YAO_ZONG , {   0, 172, 153 } }, -- Ò©×Ú
 		}),
 		{
 			__index = function(t, k)
