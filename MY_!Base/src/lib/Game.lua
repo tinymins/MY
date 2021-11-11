@@ -3911,21 +3911,26 @@ end
 function X.IsSafeLocked(nType)
 	local me = GetClientPlayer()
 	if nType == SAFE_LOCK_EFFECT_TYPE.TALK then -- 聊天锁比较特殊
-		if me.GetSafeLockMaskInfo then
-			local tLock = me.GetSafeLockMaskInfo()
-			if tLock then
-				return tLock[SAFE_LOCK_EFFECT_TYPE.TALK]
-			end
+		if _G.SafeLock_IsTalkLocked and _G.SafeLock_IsTalkLocked() then
+			return true
 		end
-		if _G.SafeLock_IsTalkLocked then
-			return _G.SafeLock_IsTalkLocked()
+	else
+		if X.IsAccountInDanger() then
+			return true
 		end
-		return false
 	end
-	if X.IsAccountInDanger() then
-		return true
+	if me.CheckSafeLock then
+		local bLock = not me.CheckSafeLock(nType)
+		if bLock then
+			return true
+		end
+	elseif me.GetSafeLockMaskInfo then
+		local tLock = me.GetSafeLockMaskInfo()
+		if tLock and tLock[SAFE_LOCK_EFFECT_TYPE.TALK] then
+			return true
+		end
 	end
-	return not me.CheckSafeLock(nType)
+	return false
 end
 
 function X.IsTradeLocked()
