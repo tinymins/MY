@@ -289,13 +289,14 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 			-- CLASSIC
 			if not bValid then
 				bValid = true
+				local frame = Station.SearchFrame('AuctionPanel')
 				-- 保证第一页
-				local txtPage = Station.Lookup('Normal/AuctionPanel/PageSet_Totle/Page_Business/Wnd_Result2', 'Text_Page')
+				local txtPage = frame and frame:Lookup('PageSet_Totle/Page_Business/Wnd_Result2', 'Text_Page')
 				if not txtPage or txtPage:GetText():find('1-', nil, true) ~= 1 then
 					bValid = false
 				end
 				-- 保证一口价升序
-				local imgPriceUp = Station.Lookup('Normal/AuctionPanel/PageSet_Totle/Page_Business/Wnd_Result2/CheckBox_Price', 'Image_PriceNameUp')
+				local imgPriceUp = frame and frame:Lookup('PageSet_Totle/Page_Business/Wnd_Result2/CheckBox_Price', 'Image_PriceNameUp')
 				if not imgPriceUp or not imgPriceUp:IsVisible() then
 					bValid = false
 				end
@@ -305,35 +306,38 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 				bValid = true
 				-- 总搜索页
 				if szPriceType == 'n' then
+					local frame = Station.SearchFrame('AuctionPanel')
 					-- 保证第一页
-					local txtPage = Station.Lookup('Normal1/AuctionPanel/TradingPage_Totle/Page_Business/Wnd_Result/Wnd_MN_Item/Edit_PageNumb')
+					local txtPage = frame and frame:Lookup('TradingPage_Totle/Page_Business/Wnd_Result/Wnd_MN_Item/Edit_PageNumb')
 					if not txtPage or txtPage:GetText() ~= '1' then
 						bValid = false
 					end
 					-- 保证一口价升序
-					local imgPriceUp = Station.Lookup('Normal1/AuctionPanel/TradingPage_Totle/Page_Business/Wnd_Result/CheckBox_LowestPrice', 'Image_LowestPriceUp')
+					local imgPriceUp = frame and frame:Lookup('TradingPage_Totle/Page_Business/Wnd_Result/CheckBox_LowestPrice', 'Image_LowestPriceUp')
 					if not imgPriceUp or not imgPriceUp:IsVisible() then
 						bValid = false
 					end
 				elseif szPriceType == 'p' then
+					local frame = Station.SearchFrame('TradingPanels')
 					-- 保证第一页
-					local txtPage = Station.Lookup('Normal1/TradingPanels/Wnd_subject/Wnd_List/Wnd_MN_Item', 'Text_MNumberItem')
+					local txtPage = frame and frame:Lookup('Wnd_subject/Wnd_List/Wnd_MN_Item', 'Text_MNumberItem')
 					if not txtPage or txtPage:GetText():find('1/', nil, true) ~= 1 then
 						bValid = false
 					end
 					-- 保证一口价升序
-					local imgPriceUp = Station.Lookup('Normal1/TradingPanels/Wnd_subject/Wnd_List/CheckBox_LowestPrice', 'Image_LowestPriceUp')
+					local imgPriceUp = frame and frame:Lookup('Wnd_subject/Wnd_List/CheckBox_LowestPrice', 'Image_LowestPriceUp')
 					if not imgPriceUp or not imgPriceUp:IsVisible() then
 						bValid = false
 					end
 				elseif szPriceType == 'd' then
+					local frame = Station.SearchFrame('TradingSellers')
 					-- 保证第一页
-					local txtPage = Station.Lookup('Normal1/TradingSellers/Wnd_List/Wnd_MN_Item/Edit_PageNumb')
+					local txtPage = frame and frame:Lookup('Wnd_List/Wnd_MN_Item/Edit_PageNumb')
 					if not txtPage or txtPage:GetText() ~= '1' then
 						bValid = false
 					end
 					-- 保证一口价升序
-					local imgPriceUp = Station.Lookup('Normal1/TradingSellers/Wnd_List/CheckBox_LowestPrice', 'Image_LowestPriceUp')
+					local imgPriceUp = frame and frame:Lookup('Wnd_List/CheckBox_LowestPrice', 'Image_LowestPriceUp')
 					if not imgPriceUp or not imgPriceUp:IsVisible() then
 						bValid = false
 					end
