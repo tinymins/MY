@@ -4845,7 +4845,7 @@ local DOODAD_BOOK = setmetatable({}, {
 			X.SaveLUAData({'temporary/doodad-book.jx3dat', X.PATH_TYPE.GLOBAL}, {
 				doodad_book = tDoodadID2BookRecipe,
 				book_doodad = tBookRecipe2DoodadID,
-			}, {passphrase=false})
+			}, { passphrase = false })
 			t.tDoodadID2BookRecipe = tDoodadID2BookRecipe
 			t.tBookRecipe2DoodadID = tBookRecipe2DoodadID
 		end
