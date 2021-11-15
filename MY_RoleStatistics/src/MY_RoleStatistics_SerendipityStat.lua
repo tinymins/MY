@@ -30,21 +30,7 @@ if GLOBAL.GAME_BRANCH == 'classic' then
 	return
 end
 
-local PASSPHRASE = 'gbn9@#4uirae823&^*423otyeaseaw'
-if X.IsDebugClient('MY_RoleStatistics_SerendipityStat', true) then
-	-- 自动生成内置加密数据
-	local DAT_ROOT = 'MY_RoleStatistics/data/serendipity/'
-	local SRC_ROOT = X.PACKET_INFO.ROOT .. '!src-dist/data/' .. DAT_ROOT
-	for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
-		X.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
-		local data = LoadDataFromFile(SRC_ROOT .. szFile)
-		data = EncodeData(data, true, true)
-		SaveDataToFile(data, X.PACKET_INFO.ROOT .. DAT_ROOT .. szFile, PASSPHRASE)
-	end
-end
-local SERENDIPITY_LIST, MAP_POINT_LIST = unpack(X.LoadLUAData(PLUGIN_ROOT .. '/data/serendipity/{$lang}.jx3dat', { passphrase = PASSPHRASE })
-	or X.LoadLUAData(PLUGIN_ROOT .. '/data/serendipity/{$lang}.jx3dat', { passphrase = false })
-	or {})
+local SERENDIPITY_LIST, MAP_POINT_LIST = unpack(X.LoadLUAData(PLUGIN_ROOT .. '/data/serendipity/{$lang}.jx3dat', { passphrase = false }) or {})
 if not SERENDIPITY_LIST or not MAP_POINT_LIST then
 	return X.Sysmsg(_L['MY_RoleStatistics_SerendipityStat'], _L['Cannot load serendipity data!!!'], CONSTANT.MSG_THEME.ERROR)
 end
