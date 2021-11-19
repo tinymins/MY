@@ -2575,6 +2575,9 @@ function X.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bNoLimited)
 	if X.IsBoolean(nBookID) then
 		nBookID, bNoLimited = nil, nBookID
 	end
+	if X.IsNil(bNoLimited) then
+		bNoLimited = not X.IsInExtraBagMap()
+	end
 	local cache = CACHE
 	if bNoLimited then
 		cache = NO_LIMITED_CACHE
