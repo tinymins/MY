@@ -63,9 +63,21 @@ function D.Apply()
 			if not me or me.dwID == dwTalkerID then
 				return
 			end
-			local szText = "text=" .. EncodeComponentsString("[" .. me.szName .. "]")
-			local nPos = StringFindW(szMsg, g_tStrings.STR_TALK_HEAD_SAY1)
-			if nPos and StringFindW(szMsg, szText, nPos) then
+			local bEcho = false
+			local aXMLNode = X.XMLDecode(szMsg)
+			if not X.IsTable(aXMLNode) then
+				return
+			end
+			for _, node in ipairs(aXMLNode) do
+				local nodeType = X.XMLGetNodeType(node)
+				local nodeName = X.XMLGetNodeData(node, 'name') or ''
+				local nodeText = X.XMLGetNodeData(node, 'text')
+				if nodeType == 'text' and nodeName:sub(1, 8) == 'namelink' and nodeText:sub(2, -2) == me.szName then
+					bEcho = true
+					break
+				end
+			end
+			if bEcho then
 				OutputMessage('MSG_WHISPER', szMsg, bRich, nFont, {r, g, b}, dwTalkerID, szName)
 			end
 		end)
