@@ -31,7 +31,7 @@ local O = X.CreateUserSettingsModule('MY_WhisperMetion', _L['Chat'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue = false,
 	},
 })
 local D = {}
