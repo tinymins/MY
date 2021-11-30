@@ -26,10 +26,18 @@ local O = {
 }
 
 local SERENDIPITY_INFO
+local SERENDIPITY_METHOD = {
+	MSG_SYS       = 1, -- 系统消息
+	EVENT_TRIGGER = 2, -- 事件机制
+	LOOT_ITEM     = 3, -- 拾取物品
+	FINISH_QUEST  = 4, -- 完成任务
+}
 local SERENDIPITY_STATUS = {
-	START = 0,
-	FINISH = 1,
-	START_AND_FINISH = 2,
+	-- START  = 0, -- 历史原因 0、1 枚举取值部分有逻辑问题，为了兼容已废除该值
+	-- FINISH = 1,
+	DONE   = 2, -- 直接完成
+	START  = 3, -- 触发
+	FINISH = 4, -- 完成
 }
 local SERENDIPITY_LIST = {}
 
@@ -195,8 +203,8 @@ X.RegisterEvent('ON_SERENDIPITY_TRIGGER', 'QIYU', function()
 	if not me then
 		return
 	end
-	local nStatus = arg1 and SERENDIPITY_STATUS.START or SERENDIPITY_STATUS.FINISH
-	D.OnSerendipity(me.szName, D.GetSerendipityName(arg0), 2, nStatus, GetCurrentTime())
+	local eStatus = arg1 and SERENDIPITY_STATUS.FINISH or SERENDIPITY_STATUS.START
+	D.OnSerendipity(me.szName, D.GetSerendipityName(arg0), SERENDIPITY_METHOD.EVENT_TRIGGER, eStatus, GetCurrentTime())
 end)
 
 function D.GetSerendipityInfo(dwTabType, dwIndex)
@@ -221,10 +229,11 @@ function D.GetSerendipityInfo(dwTabType, dwIndex)
 		end
 	end
 	local serendipity = SERENDIPITY_INFO[dwTabType] and SERENDIPITY_INFO[dwTabType][dwIndex]
-	if serendipity then
+	local sStatus = serendipity[3] and SERENDIPITY_STATUS[serendipity[3]]
+	if serendipity and sStatus then
 		local iteminfo = GetItemInfo(serendipity[1], serendipity[2])
 		if iteminfo then
-			return iteminfo.szName, serendipity[3]
+			return iteminfo.szName, sStatus
 		end
 	end
 end
@@ -252,14 +261,14 @@ X.RegisterMsgMonitor('MSG_SYS', 'QIYU', function(szChannel, szMsg, nFont, bRich,
 		szMsg = GetPureText(szMsg)
 	end
 	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szSerendipity)
-		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
+		D.OnSerendipity(szName, szSerendipity, SERENDIPITY_METHOD.MSG_SYS, SERENDIPITY_STATUS.START, GetCurrentTime())
 	end)
 	-- 恭喜侠士江阙阙在25人英雄会战唐门中获得稀有掉落[夜话·白鹭]！
 	szMsg:gsub(_L.ADVENTURE_PATT2, function(szName, szSerendipity)
 		if not D.GetSerendipityInfo('name', szSerendipity) then -- 太多了筛选下…
 			return
 		end
-		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
+		D.OnSerendipity(szName, szSerendipity, SERENDIPITY_METHOD.MSG_SYS, SERENDIPITY_STATUS.DONE, GetCurrentTime())
 	end)
 end)
 
@@ -271,7 +280,7 @@ X.RegisterEvent('LOOT_ITEM', function()
 	end
 	local szSerendipity, nStatus = D.GetSerendipityInfo(item.dwTabType, item.dwIndex)
 	if szSerendipity then
-		D.OnSerendipity(player.szName, szSerendipity, 3, nStatus, GetCurrentTime())
+		D.OnSerendipity(player.szName, szSerendipity, SERENDIPITY_METHOD.LOOT_ITEM, nStatus, GetCurrentTime())
 	end
 end)
 
@@ -282,7 +291,7 @@ X.RegisterEvent('QUEST_FINISHED', function()
 	end
 	local szSerendipity, nStatus = D.GetSerendipityInfo('quest', arg0)
 	if szSerendipity then
-		D.OnSerendipity(me.szName, szSerendipity, 4, nStatus, GetCurrentTime())
+		D.OnSerendipity(me.szName, szSerendipity, SERENDIPITY_METHOD.FINISH_QUEST, nStatus, GetCurrentTime())
 	end
 end)
 
