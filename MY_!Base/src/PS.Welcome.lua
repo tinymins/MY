@@ -147,7 +147,6 @@ function PS.OnPanelActive(wnd)
 					L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 					S = szRegionU, s = szServerU,
 					n = szNameU, N = szNameCRC,
-					t = dwTime,
 				}, X.SECRET.SERENDIPITY))))
 		end,
 	}):AutoWidth():Width() + 5
