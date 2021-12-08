@@ -4,7 +4,9 @@ manifest.dat
 manifest.key
 publisher.key
 __pycache__
+/secret.jx3dat
 /squishy
 /*/src.lua
 /*/src.*.lua
+/*/dist/
 /\!src-dist/dist/
