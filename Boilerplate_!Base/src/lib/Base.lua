@@ -93,7 +93,7 @@ local _POSTER_UITEX_          = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/P
 local _POSTER_FRAME_COUNT_    = 1
 local _DEBUG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or DEBUG_LEVEL.NONE
 local _DELOG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or DEBUG_LEVEL.NONE
-local _SECRET_                = setmetatable(LoadLUAData(_ADDON_ROOT_ .. 'secret.jx3dat'), { __index = function(_, k) return k end })
+local _SECRET_                = setmetatable(LoadLUAData(_ADDON_ROOT_ .. 'secret.jx3dat') or {}, { __index = function(_, k) return k end })
 -------------------------------------------------------------------------------------------------------
 -- 初始化调试工具
 -------------------------------------------------------------------------------------------------------
