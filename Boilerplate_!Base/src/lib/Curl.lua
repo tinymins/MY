@@ -591,6 +591,5 @@ end
 function X.SignPostData(tData, szPassphrase)
 	tData._t = GetCurrentTime()
 	tData._c = X.GetPostDataCRC(tData, szPassphrase)
-	tData._ = GetCurrentTime()
 	return tData
 end
