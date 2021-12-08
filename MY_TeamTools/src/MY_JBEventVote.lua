@@ -75,7 +75,7 @@ function D.FetchEventList(frame)
 				l = AnsiToUTF8(GLOBAL.GAME_LANG),
 				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 				jx3id = AnsiToUTF8(X.GetClientUUID()),
-			}, CONSTANT.SECRET.EVENT_LIST))),
+			}, X.SECRET.EVENT_LIST))),
 		charset = 'utf8',
 		success = function(szHTML)
 			local res, err = X.JsonDecode(szHTML)
@@ -149,7 +149,7 @@ function D.FetchRankList(frame, szEventID)
 				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 				jx3id = AnsiToUTF8(X.GetClientUUID()),
 				event_id = szEventID,
-			}, CONSTANT.SECRET.RANK_LIST))),
+			}, X.SECRET.RANK_LIST))),
 		charset = 'utf8',
 		success = function(szHTML)
 			local res, err = X.JsonDecode(szHTML)
@@ -243,7 +243,7 @@ function D.Vote(frame, szEventID, szTeamID)
 				jx3id = AnsiToUTF8(X.GetClientUUID()),
 				event_id = szEventID,
 				team_id = szTeamID,
-			}, CONSTANT.SECRET.RANK_VOTE))),
+			}, X.SECRET.RANK_VOTE))),
 		charset = 'utf8',
 		success = function(szHTML)
 			local res, err = X.JsonDecode(szHTML)

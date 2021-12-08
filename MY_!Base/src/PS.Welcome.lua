@@ -148,7 +148,7 @@ function PS.OnPanelActive(wnd)
 					S = szRegionU, s = szServerU,
 					n = szNameU, N = szNameCRC,
 					t = dwTime,
-				}, CONSTANT.SECRET.SERENDIPITY))))
+				}, X.SECRET.SERENDIPITY))))
 		end,
 	}):AutoWidth():Width() + 5
 	-- Êý¾ÝÎ»ÖÃ

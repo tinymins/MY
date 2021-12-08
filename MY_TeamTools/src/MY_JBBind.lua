@@ -38,7 +38,7 @@ function D.FetchBindStatus(resolve, reject)
 				l = AnsiToUTF8(GLOBAL.GAME_LANG),
 				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 				jx3id = AnsiToUTF8(X.GetClientUUID()),
-			}, CONSTANT.SECRET.ROLE_QUERY)))
+			}, X.SECRET.ROLE_QUERY)))
 		O.pending = true
 		X.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
@@ -83,7 +83,7 @@ function D.Bind(szToken, resolve, reject)
 			name = AnsiToUTF8(X.GetUserRoleName()),
 			mount = me.GetKungfuMount().dwMountType,
 			type = me.nRoleType,
-		}, CONSTANT.SECRET.ROLE_BIND)))
+		}, X.SECRET.ROLE_BIND)))
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = szURL,
@@ -107,7 +107,7 @@ function D.Unbind(resolve, reject)
 			l = AnsiToUTF8(GLOBAL.GAME_LANG),
 			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 			jx3id = AnsiToUTF8(X.GetClientUUID()),
-		}, CONSTANT.SECRET.ROLE_UNBIND)))
+		}, X.SECRET.ROLE_UNBIND)))
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = szURL,

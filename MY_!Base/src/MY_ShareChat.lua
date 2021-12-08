@@ -84,7 +84,7 @@ X.RegisterEvent('OPEN_WINDOW', 'MY_ShareChat__Npc', function()
 					mn = map and AnsiToUTF8(map.szName), -- Map Name
 					nt = npc.dwTemplateID, -- NPC Template ID
 					nn = X.GetObjectName(npc), -- NPC Name
-				}, CONSTANT.SECRET.NPC_CHAT)))
+				}, X.SECRET.NPC_CHAT)))
 			})
 		X.DelayCall(szDelayID, false)
 	end
@@ -156,7 +156,7 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_ShareChat__Sysmsg', function(szChannel, szMs
 						server = AnsiToUTF8(X.GetRealServer(2)), -- Server
 						content = AnsiToUTF8(szMsg), -- Content
 						time = GetCurrentTime(), -- Time
-					}, CONSTANT.SECRET.SHARE_SYSMSG)))
+					}, X.SECRET.SHARE_SYSMSG)))
 				})
 			return
 		end

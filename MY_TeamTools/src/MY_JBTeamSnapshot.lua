@@ -65,7 +65,7 @@ function D.CreateSnapshot()
 			jx3id = AnsiToUTF8(X.GetClientUUID()),
 			server = AnsiToUTF8(X.GetRealServer(2)),
 			teammate = AnsiToUTF8(table.concat(aTeammate, ';')),
-		}, CONSTANT.SECRET.TEAM_SNAPSHOT)))
+		}, X.SECRET.TEAM_SNAPSHOT)))
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = szURL,

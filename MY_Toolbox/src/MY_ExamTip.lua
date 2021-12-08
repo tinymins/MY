@@ -151,7 +151,7 @@ function D.SubmitData(tExamData, bAllRight)
 				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 				data = X.JsonEncode(data),
 				perfect = bAllRight and 1 or 0,
-			}, CONSTANT.SECRET.EXAM_UPLOADS))),
+			}, X.SECRET.EXAM_UPLOADS))),
 		success = function(html, status)
 			local res = X.JsonDecode(html)
 			if X.IsRestricted('MY_ExamTip') or not res then

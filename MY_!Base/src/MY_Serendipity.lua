@@ -103,7 +103,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 					S = szRegionU, s = szServerU, a = szSerendipityU,
 					n = szNameU, N = szNameCRC, R = szReporterU,
 					f = nStatus, t = dwTime, c = nCount, m = nMethod,
-				}, CONSTANT.SECRET.SERENDIPITY_UPLOADS))) })
+				}, X.SECRET.SERENDIPITY_UPLOADS))) })
 		end
 		if szMode == 'manual' or nMethod ~= 1 then
 			DoUpload()
