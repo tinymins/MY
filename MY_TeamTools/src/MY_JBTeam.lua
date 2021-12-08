@@ -49,7 +49,7 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 			name = AnsiToUTF8(X.GetUserRoleName()),
 			mount = me.GetKungfuMount().dwMountType,
 			body_type = me.nRoleType,
-		}, szAction == 'join' and '3a0e8712-db2e-4dd5-a089-169fe2b4093b' or '26f76228-1f64-479a-a6d3-2cff034fcf08')))
+		}, szAction == 'join' and CONSTANT.SECRET.TEAM_JOIN or CONSTANT.SECRET.TEAM_QUIT)))
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = szURL,

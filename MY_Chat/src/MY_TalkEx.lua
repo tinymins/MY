@@ -286,7 +286,7 @@ function PS.OnPanelActive(wnd)
 						l = AnsiToUTF8(GLOBAL.GAME_LANG),
 						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
 						q = AnsiToUTF8(D.szJokeSearch or ''),
-					}, 'c7355a0b-0d97-4ae1-b417-43a5c4e562ec'))),
+					}, CONSTANT.SECRET.JOKE_RANDOM))),
 				success = function(html, status)
 					local res = X.JsonDecode(html)
 					if X.IsTable(res) then
@@ -329,7 +329,7 @@ function PS.OnPanelActive(wnd)
 							role = bAnonymous and '' or AnsiToUTF8(X.GetUserRoleName()),
 							id = bAnonymous and '' or AnsiToUTF8(UI_GetClientPlayerID()),
 							jx3id = bAnonymous and '' or AnsiToUTF8(X.GetClientUUID()),
-						}, 'c7355a0b-0d97-4ae1-b417-43a5c4e562ec'))),
+						}, CONSTANT.SECRET.JOKE))),
 					success = function(html, status)
 						local res = X.JsonDecode(html)
 						if X.IsTable(res) then

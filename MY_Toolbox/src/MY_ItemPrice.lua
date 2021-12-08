@@ -282,7 +282,7 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 				d = AnsiToUTF8(szData), -- Price data
 				dt = AnsiToUTF8(szPriceType), -- price type
 				ib = X.NumberBaseN(dwBaseID, 32),
-			}, 'e87d2e0a-d3bd-4095-af48-e50dfe58f36b')))
+			}, CONSTANT.SECRET.ITEM_PRICE)))
 		-- 延迟一帧 否则系统还没更新界面数据
 		X.DelayCall(function()
 			local bValid = false

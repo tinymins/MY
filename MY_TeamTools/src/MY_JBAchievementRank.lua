@@ -117,7 +117,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 			therapy = p.dwTherapy,
 			roleType = p.nRoleType,
 			onymous = bOnymous and 1 or 0,
-		}, 'MY_BKR_AhfB6aBL9o$8R9t3ka6Uk6@#^^KHLoMtZCdS@5e2@T')))
+		}, CONSTANT.SECRET.ACHIEVEMENT_RANK_UPLOADS)))
 	--[[#DEBUG BEGIN]]
 	X.Debug(szURL, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
