@@ -136,7 +136,6 @@ function PS.OnPanelActive(wnd)
 		name = 'WndButton_SerendipitySearch',
 		text = _L['serendipity'],
 		onclick = function()
-			local dwTime = GetCurrentTime()
 			local szRegionU = AnsiToUTF8((X.GetRealServer(1)))
 			local szServerU = AnsiToUTF8((X.GetRealServer(2)))
 			local szNameU = AnsiToUTF8(X.GetClientInfo().szName)
