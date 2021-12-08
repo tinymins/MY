@@ -8,9 +8,11 @@
 import argparse
 import codecs
 import glob
+import luadata
 import os
 import re
 import semver
+import shutil
 import time
 
 import plib.utils as utils
@@ -33,36 +35,61 @@ def __compress(addon):
 	file_count = 0
 	converter = Converter('zh-TW')
 	srcname = 'src.' + TIME_TAG + '.lua'
-	# Remove debug codes in source
-	for line in open('%s/info.ini' % addon):
-		parts = line.strip().split('=')
-		if parts[0].find('lua_') == 0:
-			source_file = os.path.join(addon, parts[1])
-			source_code = codecs.open(source_file,'r',encoding='gbk').read()
-			source_code = re.sub(r'(?is)[^\n]*--\[\[#DEBUG LINE\]\][^\n]*\n?', '', source_code)
-			source_code = re.sub(r'(?is)\n?--\[\[#DEBUG BEGIN\]\].*?--\[\[#DEBUG END\]\]\n?', '', source_code)
-			codecs.open(source_file,'w',encoding='gbk').write(source_code)
+	try:
+		secret = luadata.read('secret.jx3dat') or {}
+	except:
+		secret = {}
 	# Delete old files
 	acientFileList = glob.glob('./%s/src*.lua' % addon, recursive=False)
 	for filePath in acientFileList:
-		try:
-			os.remove(filePath)
-		except OSError:
-			print('Error while deleting file: ' + filePath)
+		os.remove(filePath)
+	if os.path.isdir('./%s/dist' % addon):
+		shutil.rmtree('./%s/dist' % addon)
+	'''
+	Prepare source
+	'''
 	# Generate squishy file and execute squish
+	os.makedirs('./%s/dist' % addon)
 	with open('squishy', 'w') as squishy:
 		squishy.write('Output "./%s/%s"\n' % (addon, srcname))
 		for line in open('%s/info.ini' % addon):
 			parts = line.strip().split('=')
 			if parts[0].find('lua_') == 0:
+				# If path like src.*.lua means already compressed
 				if parts[1].startswith('src.') and parts[1].endswith('.lua'): # src.lua
 					print('Already compressed...')
 					return
-				file_path = os.path.join('.', addon, parts[1]).replace('\\', '/')
+				'''
+				Convert source codes
+				'''
 				file_count = file_count + 1
-				squishy.write('Module "%d" "%s"\n' % (file_count, file_path))
+				# Load source code
+				source_file = os.path.join(addon, parts[1])
+				dist_file = os.path.join('.', addon, 'dist', f'{file_count}.lua')
+				source_code = codecs.open(source_file, 'r', encoding='gbk').read()
+				# Remove debug codes
+				source_code = re.sub(r'(?is)[^\n]*--\[\[#DEBUG LINE\]\][^\n]*\n?', '', source_code)
+				source_code = re.sub(r'(?is)\n?--\[\[#DEBUG BEGIN\]\].*?--\[\[#DEBUG END\]\]\n?', '', source_code)
+				# Implant sensitive secret values
+				for k in secret:
+					v = luadata.serialize(secret[k], encoding='gbk')
+					source_code = re.sub(f'\\b(X\\.)?CONSTANT\\.SECRET\\[\\s*"{re.escape(k)}"\\s*\\]', v, source_code)
+					source_code = re.sub(f"\\b(X\\.)?CONSTANT\\.SECRET\\[\\s*'{re.escape(k)}'\\s*\\]", v, source_code)
+					source_code = re.sub(f"\\b(X\\.)?CONSTANT\\.SECRET\\.{re.escape(k)}\\b", v, source_code)
+				# Save dist code
+				codecs.open(dist_file, 'w', encoding='gbk').write(source_code)
+				# Append source module path
+				squishy.write('Module "%d" "%s"\n' % (file_count, dist_file.replace('\\', '/')))
+	'''
+	Build & Clean
+	'''
+	# Do squishy build
 	os.popen('lua "./!src-dist/tools/react/squish" --minify-level=full').read()
+	# Remove temporary files
 	os.remove('squishy')
+	'''
+	Implant module loader
+	'''
 	# Modify dist file for loading modules
 	with open('./%s/%s' % (addon, srcname), 'r+') as src:
 		content = src.read()
@@ -77,6 +104,9 @@ def __compress(addon):
 		src.write('}) do package.preload[k]() end\n')
 		src.write('Log("[ADDON] Module %s v%s loaded during " .. (GetTime() - __INIT_TIME__) .. "ms.")' % (addon, TIME_TAG))
 	print('Compress done...')
+	'''
+	Update info.*.ini
+	'''
 	# Modify info.ini file
 	info_content = ''
 	for _, line in enumerate(codecs.open('%s/info.ini' % addon,'r',encoding='gbk')):

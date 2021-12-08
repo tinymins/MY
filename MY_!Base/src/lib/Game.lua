@@ -4600,7 +4600,7 @@ end
 
 
 do
-	local function PatternReplacer(szContent, tVar, bKeepNMTS)
+	local function PatternReplacer(szContent, tVar, bKeepNMTS, bReplaceSensitiveWord)
 		-- 由于涉及缓存，所以该函数仅允许替换静态映射关系
 		if szContent == 'me' then
 			return X.GetUserRoleName()
@@ -4639,6 +4639,9 @@ do
 		end
 		-- keep none-matched template string
 		if bKeepNMTS then
+			if bReplaceSensitiveWord then
+				szContent = X.ReplaceSensitiveWord(szContent)
+			end
 			return '{$' .. szContent .. '}'
 		end
 	end
@@ -4649,9 +4652,6 @@ do
 		end
 		local szKey = X.EncodeLUAData({szTemplate, tVar, nMaxLen, bReplaceSensitiveWord, bKeepNMTS})
 		if not CACHE[szKey] then
-			if bReplaceSensitiveWord then
-				szTemplate = X.ReplaceSensitiveWord(szTemplate)
-			end
 			local szText = ''
 			local nOriginLen, nLen, nPos = string.len(szTemplate), 0, 1
 			local szPart, nStart, nEnd, szContent
@@ -4675,6 +4675,9 @@ do
 					nPos = nStart
 				end
 				if szPart then
+					if bReplaceSensitiveWord then
+						szPart = X.ReplaceSensitiveWord(szPart)
+					end
 					if nMaxLen > 0 and nLen + wstring.len(szPart) > nMaxLen then
 						szPart = wstring.sub(szPart, 1, nMaxLen - nLen)
 						szText = szText .. szPart
@@ -4686,7 +4689,7 @@ do
 					end
 				end
 				if szContent then
-					szPart = PatternReplacer(szContent, tVar, bKeepNMTS)
+					szPart = PatternReplacer(szContent, tVar, bKeepNMTS, bReplaceSensitiveWord)
 					if szPart then
 						szText = szText .. szPart
 					end
