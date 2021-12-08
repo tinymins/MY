@@ -73,9 +73,9 @@ def __compress(addon):
 				# Implant sensitive secret values
 				for k in secret:
 					v = luadata.serialize(secret[k], encoding='gbk')
-					source_code = re.sub(f'\\b(X\\.)?CONSTANT\\.SECRET\\[\\s*"{re.escape(k)}"\\s*\\]', v, source_code)
-					source_code = re.sub(f"\\b(X\\.)?CONSTANT\\.SECRET\\[\\s*'{re.escape(k)}'\\s*\\]", v, source_code)
-					source_code = re.sub(f"\\b(X\\.)?CONSTANT\\.SECRET\\.{re.escape(k)}\\b", v, source_code)
+					source_code = re.sub(f'\\b(X|{re.escape(addon)})\\.SECRET\\[\\s*"{re.escape(k)}"\\s*\\]', v, source_code)
+					source_code = re.sub(f"\\b(X|{re.escape(addon)})\\.SECRET\\[\\s*'{re.escape(k)}'\\s*\\]", v, source_code)
+					source_code = re.sub(f"\\b(X|{re.escape(addon)})\\.SECRET\\.{re.escape(k)}\\b", v, source_code)
 				# Save dist code
 				codecs.open(dist_file, 'w', encoding='gbk').write(source_code)
 				# Append source module path

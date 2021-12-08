@@ -786,7 +786,6 @@ CONSTANT = {
 		SELL_LOOK_UP   = 3,
 		AVG_LOOK_UP    = 4,
 	}),
-	SECRET = setmetatable(X.LoadLUAData(X.PACKET_INFO.ROOT .. 'secret.jx3dat'), { __index = function(_, k) return k end }),
 }
 
 -- 更新最高玩家等级数据
