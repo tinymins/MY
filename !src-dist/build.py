@@ -87,7 +87,6 @@ def __compress(addon):
 	os.popen('lua "./!src-dist/tools/react/squish" --minify-level=full').read()
 	# Remove temporary files
 	os.remove('squishy')
-	shutil.rmtree('./%s/dist' % addon)
 	'''
 	Implant module loader
 	'''
