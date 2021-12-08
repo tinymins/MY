@@ -229,7 +229,7 @@ function D.GetSerendipityInfo(dwTabType, dwIndex)
 		end
 	end
 	local serendipity = SERENDIPITY_INFO[dwTabType] and SERENDIPITY_INFO[dwTabType][dwIndex]
-	local sStatus = serendipity[3] and SERENDIPITY_STATUS[serendipity[3]]
+	local sStatus = serendipity and serendipity[3] and SERENDIPITY_STATUS[serendipity[3]]
 	if serendipity and sStatus then
 		local iteminfo = GetItemInfo(serendipity[1], serendipity[2])
 		if iteminfo then
