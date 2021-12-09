@@ -184,7 +184,6 @@ local _POSTER_UITEX_          = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/P
 local _POSTER_FRAME_COUNT_    = 2
 local _DEBUG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or DEBUG_LEVEL.NONE
 local _DELOG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or DEBUG_LEVEL.NONE
-local _SECRET_                = setmetatable(LoadLUAData(_ADDON_ROOT_ .. 'secret.jx3dat') or {}, { __index = function(_, k) return k end })
 -------------------------------------------------------------------------------------------------------
 -- 初始化调试工具
 -------------------------------------------------------------------------------------------------------
@@ -853,7 +852,6 @@ local tInfo = {
 	LOGO_MENU_HOVER_FRAME = _LOGO_MENU_HOVER_FRAME_,
 	POSTER_UITEX          = _POSTER_UITEX_         ,
 	POSTER_FRAME_COUNT    = _POSTER_FRAME_COUNT_   ,
-	SECRET                = _SECRET_               ,
 	AUTHOR                = _AUTHOR_               ,
 	AUTHOR_WEIBO          = _AUTHOR_WEIBO_         ,
 	AUTHOR_WEIBO_URL      = _AUTHOR_WEIBO_URL_     ,
@@ -888,6 +886,10 @@ local GLOBAL = setmetatable({}, {
 		GAME_PROVIDER = _GAME_PROVIDER_,
 	}, { __index = _G.GLOBAL }),
 	__newindex = function() end,
+})
+
+local SECRET = setmetatable(LoadLUAData(_ADDON_ROOT_ .. 'secret.jx3dat') or {}, {
+	__index = function(_, k) return k end,
 })
 
 local PATH_TYPE = SetmetaReadonly({
@@ -947,6 +949,7 @@ local X = {
 	LoadLangPack     = LoadLangPack    ,
 	GLOBAL           = GLOBAL          ,
 	ENVIRONMENT      = ENVIRONMENT     ,
+	SECRET           = SECRET          ,
 	PATH_TYPE        = PATH_TYPE       ,
 	DEBUG_LEVEL      = DEBUG_LEVEL     ,
 	PACKET_INFO      = PACKET_INFO     ,
