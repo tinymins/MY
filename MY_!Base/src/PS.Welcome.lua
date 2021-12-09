@@ -140,13 +140,15 @@ function PS.OnPanelActive(wnd)
 			local szServerU = AnsiToUTF8((X.GetRealServer(2)))
 			local szNameU = AnsiToUTF8(X.GetClientInfo().szName)
 			local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
-			X.OpenBrowser('https://j3cx.com/serendipity/?'
-				.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-					l = AnsiToUTF8(GLOBAL.GAME_LANG),
-					L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-					S = szRegionU, s = szServerU,
-					n = szNameU, N = szNameCRC,
-				}, X.SECRET.SERENDIPITY))))
+			UI.OpenBrowser(
+				'https://j3cx.com/serendipity/?'
+					.. X.EncodePostData(X.UrlEncode(X.SignPostData({
+						l = AnsiToUTF8(GLOBAL.GAME_LANG),
+						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
+						S = szRegionU, s = szServerU,
+						n = szNameU, N = szNameCRC,
+					}, X.SECRET.SERENDIPITY))),
+				{ openurl = 'https://j3cx.com/serendipity', controls = false })
 		end,
 	}):AutoWidth():Width() + 5
 	-- Êý¾ÝÎ»ÖÃ
