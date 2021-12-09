@@ -1336,7 +1336,7 @@ local function GetRegisterChannelLimitTable()
 			[ROLE_TYPE.LITTLE_BOY     ] = 'LittleBoy'     ,
 			[ROLE_TYPE.LITTLE_GIRL    ] = 'LittleGirl'    ,
 		})[me.nRoleType])
-		local tTitle = {
+		local tTitle = lodash.filter({
 			{f = 'i', t = 'Level'},
 			{f = 'i', t = 'Experience'},
 			{f = 'i', t = 'Strength'},
@@ -1373,7 +1373,7 @@ local function GetRegisterChannelLimitTable()
 			{f = 'i', t = 'CampChannelDailyLimit'},
 			{f = 'i', t = 'MaxContribution'},
 			{f = 'i', t = 'WhisperDailyLimit'},
-			{f = 'i', t = 'IdentityChannelDailyLimit'},
+			GLOBAL.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'IdentityChannelDailyLimit'} or false,
 			{f = 'i', t = 'SprintPowerMax'},
 			{f = 'i', t = 'SprintPowerCost'},
 			{f = 'i', t = 'SprintPowerRevive'},
@@ -1385,9 +1385,9 @@ local function GetRegisterChannelLimitTable()
 			{f = 'i', t = 'HorseSprintPowerRevive'},
 			{f = 'i', t = 'SceneChannelDailyLimit'},
 			{f = 'i', t = 'NearbyChannelDailyLimit'},
-			{f = 'i', t = 'WorldChannelDailyLimitByVIP'},
-			{f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'},
-		}
+			GLOBAL.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitByVIP'} or false,
+			GLOBAL.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'} or false,
+		}, function(item) return item end)
 		m_LevelUpData = KG_Table.Load(path, tTitle, FILE_OPEN_MODE.NORMAL)
 	end
 	return m_LevelUpData
