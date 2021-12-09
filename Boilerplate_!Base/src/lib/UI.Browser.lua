@@ -15,6 +15,8 @@ local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstr
 -------------------------------------------------------------------------------------------------------
 
 local D = {}
+local WINDOWS = setmetatable({}, { __mode = 'v' })
+local OPTIONS = setmetatable({}, { __mode = 'k' })
 local FRAME_NAME = X.NSFormatString('{$NS}_Browser')
 
 local function UpdateControls(frame, action, url)
@@ -42,6 +44,7 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
+	local options = OPTIONS[frame] or {}
 	if name == 'Btn_Refresh' or name == 'Btn_Refresh2' then
 		UpdateControls(frame, 'refresh')
 	elseif name == 'Btn_GoBack' then
@@ -51,7 +54,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_GoTo' then
 		UpdateControls(frame, 'go')
 	elseif name == 'Btn_OuterOpen' then
-		X.OpenBrowser(frame:Lookup('Wnd_Controls/Edit_Input'):GetText(), 'outer')
+		X.OpenBrowser(options.openurl or frame:Lookup('Wnd_Controls/Edit_Input'):GetText(), 'outer')
 	elseif name == 'Btn_Close' then
 		UI.CloseBrowser(frame)
 	end
@@ -122,8 +125,10 @@ function D.OnHistoryChanged()
 	UpdateControls(this:GetRoot())
 end
 
-do
-local WINDOWS = setmetatable({}, { __mode = 'v' })
+function D.GetFrame(szKey)
+	return Station.SearchFrame(FRAME_NAME .. '#' .. szKey)
+end
+
 local function OnResizePanel()
 	local h = this:Lookup('', '')
 	local nWidth, nHeight = this:GetSize()
@@ -152,10 +157,6 @@ local function OnResizePanel()
 	this:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
 end
 
-function D.GetFrame(szKey)
-	return Station.SearchFrame(FRAME_NAME .. '#' .. szKey)
-end
-
 function D.Open(url, options)
 	if not options then
 		options = {}
@@ -172,6 +173,7 @@ function D.Open(url, options)
 		Wnd.CloseWindow(WINDOWS[szKey])
 	end
 	WINDOWS[szKey] = Wnd.OpenWindow(X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', FRAME_NAME)
+	OPTIONS[WINDOWS[szKey]] = options
 
 	local frame = WINDOWS[szKey]
 	frame:SetName(FRAME_NAME .. '#' .. szKey)
@@ -226,7 +228,6 @@ function D.Close(szKey)
 		end
 		Wnd.CloseWindow(szKey)
 	end
-end
 end
 
 -- Global exports
