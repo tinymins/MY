@@ -1321,6 +1321,7 @@ end)
 --    利用外面的注册的[LOADING_END]来打开
 --    利用UI注册的[LOADING_END]来刷新
 --    避免多次重复刷新面板浪费开销
+-- 7) 新增 PARTY_RESET 事件，官方从名剑大会出来时候补发这个事件
 
 X.RegisterEvent('PARTY_UPDATE_BASE_INFO', function()
 	D.CheckCataclysmEnable()
@@ -1329,6 +1330,11 @@ X.RegisterEvent('PARTY_UPDATE_BASE_INFO', function()
 end)
 
 X.RegisterEvent('PARTY_LEVEL_UP_RAID', function()
+	D.CheckCataclysmEnable()
+	D.ReloadCataclysmPanel()
+end)
+
+X.RegisterEvent('PARTY_RESET', function()
 	D.CheckCataclysmEnable()
 	D.ReloadCataclysmPanel()
 end)
