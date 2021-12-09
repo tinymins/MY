@@ -60,6 +60,34 @@ function D.OnLButtonClick()
 	end
 end
 
+function D.OnCheckBoxCheck()
+	local name = this:GetName()
+	if name == 'CheckBox_Maximize' then
+		local frame = this:GetRoot()
+		local ui = UI(frame)
+		frame.tMaximizeAnchor = ui:Anchor()
+		frame.nMaximizeW, frame.nMaximizeH = ui:Size()
+		ui:Pos(0, 0)
+		ui:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+			ui:Size(Station.GetClientSize())
+		end)
+		ui:Drag(false)
+		ui:Size(Station.GetClientSize())
+	end
+end
+
+function D.OnCheckBoxUncheck()
+	local name = this:GetName()
+	if name == 'CheckBox_Maximize' then
+		local frame = this:GetRoot()
+		local ui = UI(frame)
+		ui:Size(frame.nMaximizeW, frame.nMaximizeH)
+		ui:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
+		ui:Drag(true)
+		ui:Anchor(frame.tMaximizeAnchor)
+	end
+end
+
 function D.OnMouseEnter()
 	local name = this:GetName()
 	if name == 'Btn_Drag' then
