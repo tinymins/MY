@@ -775,8 +775,8 @@ for i = 1, 5 do
 			'MY_TargetMon_' .. i .. '_' .. j, _L('Cancel buff %d - %d', i, j),
 			i == 1 and j == 1 and _L['MY Buff Monitor'] or '',
 			function()
-				if X.IsRestricted('MY_TargetMon.MapRestriction') and not X.IsInDungeon() then
-					OutputMessage('MSG_ANNOUNCE_RED', _L['Cancel buff is disabled outside dungeon.'])
+				if X.IsRestricted('MY_TargetMon.MapRestriction') and (X.IsInArena() or X.IsInBattleField()) then
+					OutputMessage('MSG_ANNOUNCE_RED', _L['Cancel buff is disabled in arena and battlefield.'])
 					return
 				end
 				local tViewData = D.GetViewData(i)
