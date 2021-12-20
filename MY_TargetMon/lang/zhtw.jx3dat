@@ -99,7 +99,7 @@ return {
     ['Move Up'] = '上移',
     ['Move Down'] = '下移',
     ['Cancel buff is disabled in arena and battlefield.'] = '快捷鍵卸除氣勁在名劍大會與戰場內不可用',
-    ['Hotkey cancel is only allowed for buff.'] = '快捷鍵只能取消氣勁不能釋放技能',
+    ['Hotkey cancel is only allowed for buff.'] = '快捷鍵只能取消氣勁不能施展招式',
     ['Cannot find target to cancel buff.'] = '找不到需要卸除氣勁的目標',
     ['Cannot find buff to cancel.'] = '需要卸除的氣勁不存在',
     ['Please input id:'] = '請輸入ID：',

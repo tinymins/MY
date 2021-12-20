@@ -69,7 +69,7 @@ return {
     ['Unfight'] = '脫離戰鬥',
     ['Time'] = '時間',
     ['Buff'] = '氣勁',
-    ['Skill'] = '技能',
+    ['Skill'] = '招式',
     ['Death'] = '重傷',
     ['Time (ms)'] = '時間(ms)',
     ['Tick'] = '毫秒數',
