@@ -197,6 +197,35 @@ function D.GetQuickBiddingPrice(szKey)
 	return nPriceNext, nPriceSelf, bP
 end
 
+function D.RaiseBidding(szKey, nPrice)
+	local cache = BIDDING_CACHE[szKey]
+	local tConfig = cache.tConfig
+	if not D.CheckChatLock() then
+		return false
+	end
+	local nPriceMin, nPriceSelf, bP = D.GetQuickBiddingPrice(szKey)
+	if nPriceSelf then
+		X.Systopmsg(_L('You already have a vaild price at %s.', D.GetMoneyChatText(nPriceSelf)))
+		return false
+	end
+	if bP then
+		X.Systopmsg(_L['You have already p.'])
+		return false
+	end
+	local nPriceNear = math.max(nPriceMin, math.floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep)) * tConfig.nPriceStep + tConfig.nPriceMin)
+	if nPrice ~= nPriceNear then
+		X.Systopmsg(_L['Not a valid price'])
+		X.Systopmsg(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceStep))
+		return false
+	end
+	local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
+	table.insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
+	table.insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyChatText(nPrice)) })
+	X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
+	X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+	return true
+end
+
 function D.DrawPrice(h, nGold)
 	h:Clear()
 	h:AppendItemFromString(GetMoneyText({ nGold = nGold }, 'font=162', 'all2'))
@@ -573,22 +602,12 @@ function MY_BiddingBase.OnLButtonClick()
 		X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
 	elseif name == 'WndButton_Bidding' then
 		local szKey = D.GetKey(frame)
-		local nPrice, nPriceSelf, bP = D.GetQuickBiddingPrice(szKey)
+		local nPrice, _, bP = D.GetQuickBiddingPrice(szKey)
 		if bP then
 			return X.Systopmsg(_L['You have already p.'])
 		end
 		if IsShiftKeyDown() then
-			if not D.CheckChatLock() then
-				return
-			end
-			if nPriceSelf then
-				return X.Systopmsg(_L('You already have a vaild price at %s.', D.GetMoneyChatText(nPriceSelf)))
-			end
-			local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
-			table.insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
-			table.insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyChatText(nPrice)) })
-			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
-			X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+			D.RaiseBidding(szKey, nPrice)
 		else
 			this:GetParent():GetParent()
 				:Lookup('Wnd_CustomBidding/WndEditBox_CustomBidding/WndEdit_CustomBidding')
@@ -615,28 +634,9 @@ function MY_BiddingBase.OnLButtonClick()
 		edit:SetText(nPrice)
 	elseif name == 'WndButton_CustomBiddingSure' then
 		local szKey = D.GetKey(frame)
-		local cache = BIDDING_CACHE[szKey]
-		local tConfig = cache.tConfig
 		local edit = this:GetParent():Lookup('WndEditBox_CustomBidding/WndEdit_CustomBidding')
-		local nPriceMin, _, bP = D.GetQuickBiddingPrice(szKey)
-		if bP then
-			return X.Systopmsg(_L['You have already p.'])
-		end
 		local nPrice = tonumber(edit:GetText()) or 0
-		local nPriceNear = math.max(nPriceMin, math.floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep)) * tConfig.nPriceStep + tConfig.nPriceMin)
-		if nPrice ~= nPriceNear then
-			X.Systopmsg(_L['Not a valid price'])
-			X.Systopmsg(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceStep))
-			return
-		end
-		if not D.CheckChatLock() then
-			return
-		end
-		local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
-		table.insert(aSay, 1, { type = 'text', text = _L['Want to buy '] })
-		table.insert(aSay, { type = 'text', text = _L(', bidding for %s.', D.GetMoneyChatText(nPrice)) })
-		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_ACTION', { szKey = szKey, nPrice = nPrice })
-		X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })
+		D.RaiseBidding(szKey, nPrice)
 		D.SwitchCustomBidding(frame, false)
 	elseif name == 'WndButton_CustomBiddingCancel' then
 		D.SwitchCustomBidding(frame, false)
