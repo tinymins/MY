@@ -71,8 +71,8 @@ function D.Hook()
 				success = function(szHTML)
 					local res, err = X.JsonDecode(szHTML)
 					if res then
-						local bVaild, szErrID, nLine, szErrMsg = X.IsMacroValid(res.data)
-						if bVaild then
+						local bValid, szErrID, nLine, szErrMsg = X.IsMacroValid(res.data)
+						if bValid then
 							res.desc = X.ReplaceSensitiveWord(res.desc)
 						else
 							res, err = false, szErrMsg
