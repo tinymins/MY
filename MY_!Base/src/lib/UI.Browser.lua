@@ -60,6 +60,13 @@ function D.OnLButtonClick()
 	end
 end
 
+function D.OnItemLButtonDBClick()
+	local name = this:GetName()
+	if name == 'Handle_DBClick' then
+		this:GetRoot():Lookup('CheckBox_Maximize'):ToggleCheck()
+	end
+end
+
 function D.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Maximize' then
@@ -163,6 +170,7 @@ local function OnResizePanel()
 	local nHeaderHeight = h:Lookup('Image_TitleBg'):GetH()
 	h:Lookup('Text_Title'):SetW(nWidth - 171)
 	h:Lookup('Image_TitleBg'):SetW(nWidth - 4)
+	h:Lookup('Handle_DBClick'):SetW(nWidth)
 	h:SetSize(nWidth, nHeight)
 	this:SetSize(nWidth, nHeight)
 	this:Lookup('Btn_Close'):SetRelX(nWidth - 35)
