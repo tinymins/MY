@@ -626,7 +626,7 @@ function MY_BiddingBase.OnLButtonClick()
 		local nPriceNear = math.max(nPriceMin, math.floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep)) * tConfig.nPriceStep + tConfig.nPriceMin)
 		if nPrice ~= nPriceNear then
 			X.Systopmsg(_L['Not a valid price'])
-			X.Systopmsg(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceMin))
+			X.Systopmsg(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceStep))
 			return
 		end
 		if not D.CheckChatLock() then
