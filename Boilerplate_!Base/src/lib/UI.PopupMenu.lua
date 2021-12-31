@@ -112,7 +112,7 @@ end
 function D.SetDS(frame, menu)
 	frame.aMenu = {menu}
 	frame.aMenuY = {0}
-	frame.aInvaild = {true}
+	frame.aInvalid = {true}
 	if menu.szLayer then
 		frame:ChangeRelation(menu.szLayer)
 	end
@@ -538,10 +538,10 @@ function D.UpdateUI(frame)
 			if not wnd then
 				wnd = D.AppendContentFromIni(frame, SZ_TPL_INI, 'Wnd_Menu', 'Wnd_Menu' .. nLevel)
 			end
-			if frame.aInvaild[nLevel] or not D.IsEquals(wnd.menuSnapshot, menu) then
+			if frame.aInvalid[nLevel] or not D.IsEquals(wnd.menuSnapshot, menu) then
 				D.DrawWnd(wnd, aMenu[1], menu, nLevel)
 				bDrawed = true
-				frame.aInvaild[nLevel] = false
+				frame.aInvalid[nLevel] = false
 				wnd.menuSnapshot = D.Clone(menu)
 			end
 		else -- 需要清理的菜单（已不存在）
@@ -624,7 +624,7 @@ function D.OnItemMouseEnter()
 			end
 			frame.aMenuY[nLevel] = this:GetAbsY() - frame:GetAbsY()
 			-- 标记无效绘制
-			frame.aInvaild[nLevel] = true
+			frame.aInvalid[nLevel] = true
 			-- 更新UI
 			D.UpdateUI(frame)
 		elseif frame.nAutoHideLevel ~= nLevel or not X.DelayCall(PLUGIN_NAME .. '__HideSub') then -- 3000ms后关闭之前展开的子菜单

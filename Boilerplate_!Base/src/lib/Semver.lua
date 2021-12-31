@@ -361,7 +361,7 @@ function mt:__mod(str)
     end
     return self < sv:nextMinor()
   end
-  assert(false, "Invaild operator found: " .. operator)
+  assert(false, "Invalid operator found: " .. operator)
 end
 
 local function new(major, minor, patch, prerelease, build)
