@@ -270,6 +270,7 @@ X.RegisterEvent({
 				dwFightBeginTime = D.dwFightBeginTime,
 				szFightUUID = D.szFightUUID,
 				dwDamage = D.dwDamage,
+				dwTherapy = D.dwTherapy,
 				nRoleType = me.nRoleType,
 				nFightTime = X.GetFightTime(),
 				szClientGUID = X.GetClientGUID(),
