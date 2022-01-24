@@ -197,6 +197,7 @@ local MAX_POINT_POW = 16 -- 分数最高倍数（2^n）
 
 local D = {
 	bEnable = false, -- 启用状态
+	bWaitPoint = false, -- 等待分数刷新 防止错吃药品
 	nPoint = 0, -- 当前总分数
 	nUseItemLFC = 0, -- 上次吃药的逻辑帧
 	nUseHammerLFC = 0, -- 上次用锤子的逻辑帧
@@ -312,6 +313,7 @@ function D.BreakCanStateTransfer()
 		if D.UseBagItem(XIAOJINCHUI, O.bPauseNoXiaojinchui) then
 			-- 砸成功了，等锤子CD
 			D.nUseHammerLFC = nLFC
+			D.bWaitPoint = true
 			return
 		end
 		if O.bPauseNoXiaojinchui then
@@ -324,6 +326,7 @@ function D.BreakCanStateTransfer()
 	if D.UseBagItem(XIAOYINCHUI) then
 		-- 砸成功了，等锤子CD
 		D.nUseHammerLFC = nLFC
+		D.bWaitPoint = true
 		return
 	end
 	-- 没有小银锤时使用小金锤？
@@ -349,6 +352,7 @@ function D.MonitorZP(szChannel, szMsg)
 			D.bReachLimit = true
 			X.Systopmsg(_L['Auto taoguan: reach limit!'])
 		end
+		D.bWaitPoint = false
 		D.nUseHammerLFC = GetLogicFrameCount()
 	end
 end
@@ -356,6 +360,7 @@ end
 function D.OnLootItem()
 	if arg0 == GetClientPlayer().dwID and arg2 > 2 and GetItem(arg1).szName == MEILIANGYUQIAN then
 		D.nPoint = 0
+		D.bWaitPoint = false
 		X.Systopmsg(_L['Auto taoguan: score clear!'])
 	end
 end
@@ -411,6 +416,7 @@ function D.Start()
 		return
 	end
 	D.bEnable = true
+	D.bWaitPoint = false
 	X.RegisterMsgMonitor('MSG_SYS', 'MY_Taoguan', D.MonitorZP)
 	X.BreatheCall('MY_Taoguan', D.BreakCanStateTransfer)
 	X.RegisterEvent('LOOT_ITEM', 'MY_Taoguan', D.OnLootItem)
