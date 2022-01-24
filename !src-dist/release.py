@@ -69,13 +69,13 @@ if __name__ == '__main__':
 
 	env.set_packet_as_cwd()
 
-	utils.assert_exit(git.is_clean(), 'Error: branch has uncommited file change(s)!')
+	utils.assert_exit(git.is_clean(), 'Error: branch has uncommitted file change(s)!')
 
 	os.system('git checkout master')
-	utils.assert_exit(git.is_clean(), 'Error: branch has uncommited file change(s)!')
+	utils.assert_exit(git.is_clean(), 'Error: branch has uncommitted file change(s)!')
 
 	os.system('git rebase prelease')
-	utils.assert_exit(git.is_clean(), 'Error: resolve conflict and remove uncommited changes first!')
+	utils.assert_exit(git.is_clean(), 'Error: resolve conflict and remove uncommitted changes first!')
 
 	print('Reading changelog and version list...')
 	changelog_list = __get_changelog_list()
@@ -122,4 +122,4 @@ if __name__ == '__main__':
 			print('Idle for 5 seconds.')
 			time.sleep(5)
 
-	print('Jobs Acomplished.')
+	print('Jobs Accomplished.')
