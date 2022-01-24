@@ -435,7 +435,7 @@ function D.Stop()
 	X.RegisterMsgMonitor('MSG_SYS', 'MY_Taoguan', false)
 	X.BreatheCall('MY_Taoguan', false)
 	X.RegisterEvent('NPC_ENTER_SCENE', 'MY_Taoguan', false)
-	X.RegisterEvent('LOOT_ITEM', 'MY_Taoguan', false)
+	-- X.RegisterEvent('LOOT_ITEM', 'MY_Taoguan', false) -- 积分清零监听不可注销，否则下次启动会错误判定
 	X.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_Taoguan', false)
 	X.RegisterEvent('HELP_EVENT', 'MY_Taoguan', false)
 	X.Systopmsg(_L['Auto taoguan: off.'])
