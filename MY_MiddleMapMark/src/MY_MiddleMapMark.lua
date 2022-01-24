@@ -639,8 +639,16 @@ local function OnMMMItemMouseEnter()
 		end
 	end
 	if IsCtrlKeyDown() then
-		szTip = szTip .. (this.templateid and ('\n' .. this.type .. ' Template ID: ' .. this.templateid) or '')
-			.. '\n' .. this.x .. ', ' .. this.y .. ',' .. this.z
+		szTip = szTip
+		if this.templateid then
+			szTip = szTip .. '\n' .. this.type .. ' Template ID: ' .. this.templateid
+		end
+		if this.x and this.y then
+			szTip = szTip .. '\n' .. this.x .. ', ' .. this.y
+			if this.z then
+				szTip = szTip .. ',' .. this.z
+			end
+		end
 	end
 	OutputTip(GetFormatText(szTip, 136), 450, {x, y, w, h}, ALW.TOP_BOTTOM)
 end
