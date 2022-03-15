@@ -19,12 +19,15 @@ local X = Boilerplate
 local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
+local Log = Log or print
+
 local byte_escape, byte_slash = (string.byte('\\')), (string.byte('/'))
 local byte_apos  , byte_quote = (string.byte('\'')), (string.byte('"'))
-local byte_lf    , byte_tab   = (string.byte('\n')), (string.byte('\t'))
+local byte_cr    , byte_lf    = (string.byte('\r')), (string.byte('\n'))
+local byte_space , byte_tab   = (string.byte(' ')), (string.byte('\t'))
 local byte_lt    , byte_gt    = (string.byte('<')) , (string.byte('>'))
 local byte_amp   , byte_eq    = (string.byte('&')) , (string.byte('='))
-local byte_space , byte_dot   = (string.byte(' ')) , (string.byte('.'))
+local byte_comma , byte_dot   = (string.byte(',')) , (string.byte('.'))
 local byte_zero  , byte_nine  = (string.byte('0')) , (string.byte('9'))
 local byte_char_a, byte_char_e, byte_char_f = (string.byte('a')), (string.byte('e')), (string.byte('f'))
 local byte_char_l, byte_char_n, byte_char_r = (string.byte('l')), (string.byte('n')), (string.byte('r'))
@@ -43,6 +46,11 @@ local function bytes2string(bytes)
 	else
 		return string.char(unpack(bytes))
 	end
+end
+
+local function IsSpaceCharCode(byte_current)
+	return byte_current == byte_space or byte_current == byte_tab
+		or byte_current == byte_cr or byte_current == byte_lf
 end
 
 local XMLEncodeComponent = EncodeComponentsString
@@ -73,7 +81,7 @@ local XMLDecodeComponent = _G.DecodeComponentsString
 	or function(str)
 		local bytes2string, insert, byte = bytes2string, table.insert, string.byte
 		local bytes_string, b_escaping, len, byte_current = {}, false, #str, nil
-		for i = 1, len do
+		for i = 2, len - 1 do -- str starts with and ends with qoute
 			byte_current = string.byte(str, i)
 			if b_escaping then
 				b_escaping = false
@@ -149,7 +157,7 @@ local function XMLDecode(xml)
 		if state == 'text' then
 			if byte_current == byte_lt then
 				state = 'label_lt'
-			elseif byte_current ~= byte_space then
+			elseif not IsSpaceCharCode(byte_current) then
 				state = 'text_key'
 				pos1 = pos
 			end
@@ -157,7 +165,7 @@ local function XMLDecode(xml)
 			if byte_current == byte_slash then
 				state = 'label_closing'
 				pos1 = pos + 1
-			elseif byte_current ~= byte_space then
+			elseif not IsSpaceCharCode(byte_current) then
 				state = 'label_opening'
 				pos1 = pos
 			end
@@ -168,7 +176,7 @@ local function XMLDecode(xml)
 				table.insert(stack, p1)
 				table.insert(p.children, p1)
 				p = p1
-			elseif byte_current == byte_space then
+			elseif IsSpaceCharCode(byte_current) then
 				state = 'attribute'
 				p1 = XMLCreateNode(xml:sub(pos1, pos - 1))
 				table.insert(stack, p1)
@@ -184,12 +192,12 @@ local function XMLDecode(xml)
 		elseif state == 'attribute' then
 			if byte_current == byte_gt then
 				state = 'text'
-			elseif byte_current ~= byte_space then
+			elseif not IsSpaceCharCode(byte_current) then
 				state = 'attribute_key'
 				pos1 = pos
 			end
 		elseif state == 'attribute_key' then
-			if byte_current == byte_space then
+			if IsSpaceCharCode(byte_current) then
 				key = xml:sub(pos1, pos - 1)
 				state = 'attribute_key_end'
 			elseif byte_current == byte_eq then
@@ -199,7 +207,7 @@ local function XMLDecode(xml)
 		elseif state == 'attribute_key_end' then
 			if byte_current == byte_eq then
 				state = 'attribute_eq'
-			elseif byte_current ~= byte_space then
+			elseif not IsSpaceCharCode(byte_current) then
 				state = 'attribute'
 				p.attrs[key] = key
 				pos = pos - 1
@@ -210,7 +218,7 @@ local function XMLDecode(xml)
 				byte_quoting_char = byte_current
 				state = 'attribute_value_string'
 				pos1 = pos
-			elseif byte_current ~= byte_space then
+			elseif not IsSpaceCharCode(byte_current) then
 				if byte_current >= byte_zero and byte_current <= byte_nine then
 					state = 'attribute_value_number'
 				elseif byte_current == byte_dot then
@@ -241,7 +249,7 @@ local function XMLDecode(xml)
 				state = 'attribute_value_dot_number'
 			elseif byte_current < byte_zero or byte_current > byte_nine then
 				p.attrs[key] = tonumber(xml:sub(pos1, pos - 1))
-				if byte_current == byte_space then
+				if IsSpaceCharCode(byte_current) then
 					state = 'attribute'
 				elseif byte_current == byte_gt then
 					state = 'text'
@@ -302,17 +310,21 @@ local function XMLDecode(xml)
 				pos = pos - 5
 			end
 		elseif state == 'text_key' then
-			if byte_current == byte_space then
+			if IsSpaceCharCode(byte_current) then
 				key = xml:sub(pos1, pos - 1)
 				state = 'text_key_end'
 			elseif byte_current == byte_eq then
 				key = xml:sub(pos1, pos - 1)
 				state = 'text_eq'
+			elseif byte_current == byte_lt then
+				key = xml:sub(pos1, pos - 1)
+				state = 'text_key_end'
+				pos = pos - 1
 			end
 		elseif state == 'text_key_end' then
 			if byte_current == byte_eq then
 				state = 'text_eq'
-			elseif byte_current ~= byte_space then
+			elseif not IsSpaceCharCode(byte_current) then
 				state = 'text'
 				p.data[key] = key
 				pos = pos - 1
@@ -323,7 +335,7 @@ local function XMLDecode(xml)
 				byte_quoting_char = byte_current
 				state = 'text_value_string'
 				pos1 = pos
-			elseif byte_current ~= byte_space then
+			elseif not IsSpaceCharCode(byte_current) then
 				if byte_current >= byte_zero and byte_current <= byte_nine then
 					state = 'text_value_number'
 				elseif byte_current == byte_dot then
@@ -354,7 +366,7 @@ local function XMLDecode(xml)
 				state = 'text_value_dot_number'
 			elseif byte_current < byte_zero or byte_current > byte_nine then
 				p.data[key] = tonumber(xml:sub(pos1, pos - 1))
-				if byte_current == byte_space then
+				if IsSpaceCharCode(byte_current) then
 					state = 'text'
 				elseif byte_current == byte_gt then
 					state = 'text'
@@ -418,7 +430,7 @@ local function XMLDecode(xml)
 		pos = pos + 1
 	end
 	if #stack ~= 0 then
-		return Log('XML decode error: unclosed elements detected.' .. #stack .. ' stacks on `' .. xml .. '`')
+		return Log('XML decode error: unclosed elements detected. ' .. #stack .. ' stacks on `' .. xml .. '`')
 	end
 	return t.children
 end
