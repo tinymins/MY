@@ -1,0 +1,96 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : RSS 数据订阅
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-------------------------------------------------------------------------------------------------------
+local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
+local string, math, table = string, math, table
+-- lib apis caching
+local X = MY
+local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+-------------------------------------------------------------------------------------------------------
+local PLUGIN_NAME = 'MY_!Base'
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_!Base'
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '*') then
+	return
+end
+--------------------------------------------------------------------------
+local D = {}
+local RSS_FILE = {'temporary/rss.jx3dat', X.PATH_TYPE.GLOBAL}
+local RSS_DATA = X.LoadLUAData(RSS_FILE)
+local RSS_ADAPTER = {}
+local RSS_DATA_CACHE = {}
+
+function D.Get(szKey)
+	if not RSS_DATA then
+		return
+	end
+	if not RSS_DATA_CACHE[szKey] then
+		local data = RSS_DATA[szKey]
+		if RSS_ADAPTER[szKey] then
+			data = RSS_ADAPTER[szKey](data)
+		end
+		RSS_DATA_CACHE[szKey] = data
+	end
+	return RSS_DATA_CACHE[szKey]
+end
+
+function D.RegisterAdapter(szKey, fnAdapter)
+	RSS_ADAPTER[szKey] = fnAdapter
+	RSS_DATA_CACHE[szKey] = nil
+	if not RSS_DATA then
+		return
+	end
+	FireUIEvent('MY_RSS_UPDATE', szKey)
+end
+
+X.RegisterInit('MY_RSS', function()
+	if not RSS_DATA or not X.IsNumber(RSS_DATA.EXPIRES) or RSS_DATA.EXPIRES < GetCurrentTime() then
+		X.Ajax({
+			driver = 'auto', mode = 'auto', method = 'auto',
+			url = 'https://pull.j3cx.com/config/all'
+				.. '?l=' .. AnsiToUTF8(GLOBAL.GAME_LANG)
+				.. '&L=' .. AnsiToUTF8(GLOBAL.GAME_EDITION)
+				.. '&_=' .. GetCurrentTime(),
+			success = function(html, status)
+				RSS_DATA = X.JsonDecode(html)
+				if X.IsTable(RSS_DATA) and not X.IsNumber(RSS_DATA.EXPIRES) then
+					local year, month, day, hour, minute, second = X.TimeToDate(GetCurrentTime())
+					if hour >= 7 then
+						day = day + 1
+					end
+					RSS_DATA.EXPIRES = X.DateToTime(year, month, day, 7, 0, 0)
+				end
+				X.SaveLUAData(RSS_FILE, RSS_DATA)
+				FireUIEvent('MY_RSS_UPDATE')
+			end,
+		})
+	end
+end)
+
+-- Global exports
+do
+local settings = {
+	name = 'MY_RSS',
+	exports = {
+		{
+			fields = {
+				'Get',
+				'RegisterAdapter',
+			},
+			root = D,
+		},
+	},
+}
+MY_RSS = X.CreateModule(settings)
+end

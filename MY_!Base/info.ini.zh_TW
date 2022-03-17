@@ -56,5 +56,6 @@ lua_49=src\PS.GlobalConfig.lua
 lua_50=src\PS.UISample.lua
 lua_51=src\MY_Serendipity.lua
 lua_52=src\MY_Bidding.lua
-lua_53=src\MY_ShareChat.lua
+lua_53=src\MY_RSS.lua
+lua_54=src\MY_ShareKnowledge.lua
 package=MY
