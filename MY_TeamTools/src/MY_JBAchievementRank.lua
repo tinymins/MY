@@ -40,7 +40,6 @@ local D = {
 	dwTherapy = 0,
 }
 
-local BOSS_MAP_ACHIEVE_ACQUIRE = X.LoadLUAData({'temporary/achievement_rank.jx3dat', X.PATH_TYPE.GLOBAL}) -- 地图对应的上报成就表（远程）
 local BOSS_ACHIEVE_ACQUIRE_LOG = {} -- 等待上传的首领击杀信息
 local BOSS_ACHIEVE_ACQUIRE_STATE = {} -- 当前地图首领击杀状态
 local DATA_FILE_OLD = {'data/boss_achieve_acquire.jx3dat', X.PATH_TYPE.ROLE}
@@ -174,25 +173,6 @@ function D.ShotAchievementAcquire()
 end
 
 function D.UpdateMapBossAchieveAcquire()
-	if not BOSS_MAP_ACHIEVE_ACQUIRE then
-		X.Ajax({
-			driver = 'auto', mode = 'auto', method = 'auto',
-			url = 'https://pull.j3cx.com/config/achievement-rank'
-				.. '?l=' .. GLOBAL.GAME_LANG
-				.. '&L=' .. GLOBAL.GAME_EDITION
-				.. '&_=' .. GetCurrentTime(),
-			success = function(html, status)
-				local data = X.JsonDecode(html)
-				if X.IsTable(data) then
-					BOSS_MAP_ACHIEVE_ACQUIRE = data
-					X.SaveLUAData(
-						{'temporary/fbk-achieves.jx3dat', X.PATH_TYPE.GLOBAL},
-						data)
-					D.UpdateMapBossAchieveAcquire()
-				end
-			end,
-		})
-	end
 	local me = GetClientPlayer()
 	local dwMapID = me.GetMapID()
 	local tBossAchieveAcquireState = {}
@@ -205,10 +185,11 @@ function D.UpdateMapBossAchieveAcquire()
 		end
 	end
 	-- 初始化所有监听成就状态
+	local rss = MY_RSS.Get('achievement-rank')
 	for _, dwAchieveID in X.sipairs(
 		aMapAchievements,
-		X.IsTable(BOSS_MAP_ACHIEVE_ACQUIRE) and BOSS_MAP_ACHIEVE_ACQUIRE[dwMapID] or CONSTANT.EMPTY_TABLE,
-		X.IsTable(BOSS_MAP_ACHIEVE_ACQUIRE) and BOSS_MAP_ACHIEVE_ACQUIRE['*'] or CONSTANT.EMPTY_TABLE
+		X.IsTable(rss) and rss[dwMapID] or CONSTANT.EMPTY_TABLE,
+		X.IsTable(rss) and rss['*'] or CONSTANT.EMPTY_TABLE
 	) do
 		local achi = X.GetAchievement(dwAchieveID)
 		if achi then
@@ -228,6 +209,11 @@ function D.UpdateMapBossAchieveAcquire()
 	--[[#DEBUG END]]
 	BOSS_ACHIEVE_ACQUIRE_STATE = tBossAchieveAcquireState
 end
+X.RegisterEvent('MY_RSS_UPDATE', 'MY_JBAchievementRank', function()
+	if not arg0 or arg0 == 'achievement-rank' then
+		D.UpdateMapBossAchieveAcquire()
+	end
+end)
 X.RegisterEvent('LOADING_ENDING', 'MY_JBAchievementRank', D.UpdateMapBossAchieveAcquire)
 
 X.RegisterEvent({
