@@ -721,6 +721,13 @@ local function GetGameAPI(szAddon, szInside)
 	end
 	return api
 end
+
+local function GetGameTable(szTable)
+	local b, t = pcall(function() return g_tTable[szTable] end)
+	if b then
+		return t
+	end
+end
 -----------------------------------------------
 -- 插件集信息
 -----------------------------------------------
@@ -839,6 +846,7 @@ local X = {
 	GetTraceback     = GetTraceback    ,
 	NSFormatString   = NSFormatString  ,
 	GetGameAPI       = GetGameAPI      ,
+	GetGameTable     = GetGameTable    ,
 	LoadLangPack     = LoadLangPack    ,
 	GLOBAL           = GLOBAL          ,
 	ENVIRONMENT      = ENVIRONMENT     ,
