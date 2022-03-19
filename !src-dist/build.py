@@ -40,8 +40,8 @@ def __compress(addon):
 	except:
 		secret = {}
 	# Delete old files
-	acientFileList = glob.glob('./%s/src*.lua' % addon, recursive=False)
-	for filePath in acientFileList:
+	ancientFileList = glob.glob('./%s/src*.lua' % addon, recursive=False)
+	for filePath in ancientFileList:
 		os.remove(filePath)
 	if os.path.isdir('./%s/dist' % addon):
 		shutil.rmtree('./%s/dist' % addon)
@@ -212,9 +212,9 @@ def __7zip(file_name, base_message, base_hash, extra_ignore_file):
 		print('')
 
 	# Prepare for 7z compressing
-	print('zippping...')
+	print('zipping...')
 	os.system('start /wait /b ./!src-dist/bin/7z.exe a -t7z "' + file_name + '" -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@.7zipignore' + cmd_suffix)
-	print('File(s) compressing acomplished!')
+	print('File(s) compressing accomplished!')
 	print('Url: ' + file_name)
 	print('Based on git commit "%s(%s)".' % (base_message, base_hash) if base_hash != '' else 'Full package.')
 
@@ -230,7 +230,7 @@ def run(diff_ver, is_source):
 	if not is_source:
 		# Merge master into prelease
 		if git.get_current_branch() == 'master':
-			utils.assert_exit(git.is_clean(), 'Error: master branch has uncommited file change(s)!')
+			utils.assert_exit(git.is_clean(), 'Error: master branch has uncommitted file change(s)!')
 			os.system('git checkout prelease || git checkout -b prelease')
 			os.system('git rebase master')
 			os.system('code "%s"' % os.path.join(get_packet_path(), './%s_!Base/src/lib/Base.lua' % get_current_packet_id()))
@@ -249,7 +249,7 @@ def run(diff_ver, is_source):
 			os.system('git rebase prelease')
 
 		# Check if branch
-		utils.assert_exit(git.is_clean(), 'Error: resolve conflict and remove uncommited changes first!')
+		utils.assert_exit(git.is_clean(), 'Error: resolve conflict and remove uncommitted changes first!')
 		utils.assert_exit(git.get_current_branch() == 'stable', 'Error: current branch is not on stable!')
 
 	# Compress and concat source file
