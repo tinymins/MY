@@ -24,6 +24,10 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^9.0.0') then
 	return
 end
+
+if IsLocalFileExist(X.FormatPath({'config/lifebar-official.jx3dat', X.PATH_TYPE.GLOBAL})) then
+	return
+end
 --------------------------------------------------------------------------
 
 local Config = MY_LifeBar_Config
