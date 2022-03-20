@@ -72,15 +72,18 @@ function TI.GetFrame()
 	return Station.Lookup('Normal/MY_TeamNotice')
 end
 
-function TI.CreateFrame(a, b)
+function TI.CreateFrame(szInitYY, szInitNote)
 	if X.IsInZombieMap() then
 		return
+	end
+	if szInitNote then
+		szInitNote = X.ReplaceSensitiveWord(szInitNote)
 	end
 	local ui = TI.GetFrame()
 	if ui then
 		ui = UI(ui)
-		ui:Children('#YY'):Text(a, WNDEVENT_FIRETYPE.PREVENT)
-		ui:Children('#Message'):Text(b, WNDEVENT_FIRETYPE.PREVENT)
+		ui:Children('#YY'):Text(szInitYY, WNDEVENT_FIRETYPE.PREVENT)
+		ui:Children('#Message'):Text(szInitNote, WNDEVENT_FIRETYPE.PREVENT)
 	else
 		local function FormatAllContentPos()
 			if not ui then
@@ -118,7 +121,7 @@ function TI.CreateFrame(a, b)
 		x = x + ui:Append('WndAutocomplete', {
 			name = 'YY',
 			w = 160, h = 26, x = x, y = y,
-			text = a, font = 48, color = { 128, 255, 0 },
+			text = szInitYY, font = 48, color = { 128, 255, 0 },
 			edittype = UI.EDIT_TYPE.NUMBER,
 			onclick = function()
 				if IsPopupMenuOpened() then
@@ -127,7 +130,8 @@ function TI.CreateFrame(a, b)
 					UI(this):Autocomplete('search', '')
 				end
 			end,
-			onchange = function(szText)
+			onblur = function()
+				local szText = UI(this):Text()
 				if TI.szYY == szText then
 					return
 				end
@@ -203,8 +207,9 @@ function TI.CreateFrame(a, b)
 			name = 'Message',
 			w = 300, h = 80, x = 10, y = y,
 			multiline = true, limit = 512,
-			text = b,
-			onchange = function(szText)
+			text = szInitNote,
+			onblur = function()
+				local szText = X.ReplaceSensitiveWord(UI(this):Text())
 				if TI.szNote == szText then
 					return
 				end
@@ -289,8 +294,8 @@ function TI.CreateFrame(a, b)
 		end
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
-	TI.szYY   = a or TI.szYY
-	TI.szNote = b or TI.szNote
+	TI.szYY   = szInitYY or TI.szYY
+	TI.szNote = szInitNote or TI.szNote
 end
 
 function TI.OpenFrame()
