@@ -98,7 +98,7 @@ local function ApplyCaptionColor(dwID)
 	if not tColor then
 		return
 	end
-	rlcmd('set plugin caption color ' .. dwID .. ' ' .. tColor.dwColor)
+	rlcmd('set plugin caption color ' .. dwID .. ' 1 ' .. tColor.dwColor)
 end
 
 local function ApplyCaption(dwID)
@@ -246,4 +246,6 @@ end)
 X.RegisterEvent({'PLAYER_ENTER_SCENE', 'NPC_ENTER_SCENE'}, 'MY_LifeBar', function()
 	local dwID = arg0
 	X.DelayCall(function() ApplyCaption(dwID) end)
+	X.DelayCall(200, function() ApplyCaption(dwID) end)
+	X.DelayCall(500, function() ApplyCaption(dwID) end)
 end)
