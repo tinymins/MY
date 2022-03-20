@@ -190,12 +190,16 @@ function D.OnSerendipity(szName, szSerendipity, nMethod, eStatus, dwTime)
 end
 
 function D.GetSerendipityName(nID)
-	for i = 2, g_tTable.Adventure:GetRowCount() do
-		local tLine = g_tTable.Adventure:GetRow(i)
-		if tLine.dwID == nID then
-			return tLine.szName
+	local Adventure = X.GetGameTable('Adventure', true)
+	if Adventure then
+		for i = 2, Adventure:GetRowCount() do
+			local tLine = Adventure:GetRow(i)
+			if tLine.dwID == nID then
+				return tLine.szName
+			end
 		end
 	end
+	return tostring(nID)
 end
 
 X.RegisterEvent('ON_SERENDIPITY_TRIGGER', 'QIYU', function()

@@ -163,10 +163,13 @@ end
 function D.ShotAchievementAcquire()
 	local me = GetClientPlayer()
 	local aAcquired = {}
-	for i = 1, g_tTable.Achievement:GetRowCount() do
-		local achi = g_tTable.Achievement:GetRow(i)
-		if me.IsAchievementAcquired(achi.dwID) then
-			table.insert(aAcquired, achi.dwID)
+	local Achievement = X.GetGameTable('Achievement', true)
+	if Achievement then
+		for i = 1, Achievement:GetRowCount() do
+			local achi = Achievement:GetRow(i)
+			if me.IsAchievementAcquired(achi.dwID) then
+				table.insert(aAcquired, achi.dwID)
+			end
 		end
 	end
 	X.SaveLUAData({'userdata/achievement_acquire_shot.jx3dat', X.PATH_TYPE.ROLE}, aAcquired, { crc = false, passphrase = false })

@@ -371,16 +371,20 @@ function D.UpdateList(page)
 						if tEnchant then
 							for kkk, vvv in pairs(tEnchant) do
 								if vvv.nID == ATTRIBUTE_TYPE.SKILL_EVENT_HANDLER then -- ATTRIBUTE_TYPE.SKILL_EVENT_HANDLER
-									local skillEvent = g_tTable.SkillEvent:Search(vvv.nValue1)
+									local SkillEvent = X.GetGameTable('SkillEvent', true)
+									local skillEvent = SkillEvent and SkillEvent:Search(vvv.nValue1)
 									if skillEvent then
 										desc = desc .. FormatString(skillEvent.szDesc, vvv.nValue1, vvv.nValue2)
 									else
 										desc = desc .. '<text>text="unknown skill event id:'.. vvv.nValue1..'"</text>'
 									end
 								elseif vvv.nID == ATTRIBUTE_TYPE.SET_EQUIPMENT_RECIPE then -- ATTRIBUTE_TYPE.SET_EQUIPMENT_RECIPE
-									local tRecipeSkillAtrri = g_tTable.EquipmentRecipe:Search(vvv.nValue1, vvv.nValue2)
-									if tRecipeSkillAtrri then
-										desc = desc .. tRecipeSkillAtrri.szDesc
+									local EquipmentRecipe = X.GetGameTable('EquipmentRecipe', true)
+									if EquipmentRecipe then
+										local tRecipeSkillAtrri = EquipmentRecipe:Search(vvv.nValue1, vvv.nValue2)
+										if tRecipeSkillAtrri then
+											desc = desc .. tRecipeSkillAtrri.szDesc
+										end
 									end
 								else
 									if Table_GetMagicAttributeInfo then

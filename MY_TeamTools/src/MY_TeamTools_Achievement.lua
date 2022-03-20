@@ -157,7 +157,8 @@ function D.GetDispColumns()
 end
 
 function D.UpdateSearchAC()
-	local info = g_tTable.DungeonInfo:Search(D.dwMapID)
+	local DungeonInfo = X.GetGameTable('DungeonInfo', true)
+	local info = DungeonInfo and DungeonInfo:Search(D.dwMapID)
 	D.aSearchAC = info
 		and X.SplitString(info.szBossInfo, ' ', true)
 		or {}
@@ -180,15 +181,18 @@ end
 function D.UpdateAchievementID()
 	local aAchievement = {}
 	if D.dwMapID == 0 then
-		local nCount = g_tTable.Achievement:GetRowCount()
-		for i = 2, nCount do
-			local achi = g_tTable.Achievement:GetRow(i)
-			if achi and achi.nVisible == 1 and achi.dwGeneral == 1
-			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
-			and (X.IsEmpty(D.szSearch) or wstring.find(achi.szName, D.szSearch) or wstring.find(achi.szDesc, D.szSearch)) then
-				table.insert(aAchievement, achi)
-				if #aAchievement >= MAX_ALL_MAP_ACHI then
-					break
+		local Achievement = X.GetGameTable('Achievement', true)
+		if Achievement then
+			local nCount = Achievement:GetRowCount()
+			for i = 2, nCount do
+				local achi = Achievement:GetRow(i)
+				if achi and achi.nVisible == 1 and achi.dwGeneral == 1
+				and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
+				and (X.IsEmpty(D.szSearch) or wstring.find(achi.szName, D.szSearch) or wstring.find(achi.szDesc, D.szSearch)) then
+					table.insert(aAchievement, achi)
+					if #aAchievement >= MAX_ALL_MAP_ACHI then
+						break
+					end
 				end
 			end
 		end

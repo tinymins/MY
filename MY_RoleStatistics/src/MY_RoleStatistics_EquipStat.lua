@@ -228,21 +228,26 @@ end
 
 local function GetEquipRecipeDesc(Value1, Value2)
 	local szText = ''
-	local tRecipeSkillAtrri = g_tTable.EquipmentRecipe:Search(Value1, Value2)
-	if tRecipeSkillAtrri then
-		szText = tRecipeSkillAtrri.szDesc
+	local EquipmentRecipe = X.GetGameTable('EquipmentRecipe', true)
+	if EquipmentRecipe then
+		local tRecipeSkillAtrri = EquipmentRecipe:Search(Value1, Value2)
+		if tRecipeSkillAtrri then
+			szText = tRecipeSkillAtrri.szDesc
+		end
 	end
 	return szText
 end
 
 function D.FormatEnchantAttribText(v)
 	if v.nID == ATTRIBUTE_TYPE.SKILL_EVENT_HANDLER then
-		local skillEvent = g_tTable.SkillEvent:Search(v.nValue1)
-		if skillEvent then
-			return FormatString(skillEvent.szDesc, v.nValue1, v.nValue2)
-		else
-			return '<text>text="unknown skill event id:' .. v.nValue1 .. '"</text>'
+		local SkillEvent = X.GetGameTable('SkillEvent', true)
+		if SkillEvent then
+			local skillEvent = SkillEvent:Search(v.nValue1)
+			if skillEvent then
+				return FormatString(skillEvent.szDesc, v.nValue1, v.nValue2)
+			end
 		end
+		return '<text>text="unknown skill event id:' .. v.nValue1 .. '"</text>'
 	elseif v.nID == ATTRIBUTE_TYPE.SET_EQUIPMENT_RECIPE then
 		return GetEquipRecipeDesc(v.nValue1, v.nValue2)
 	else

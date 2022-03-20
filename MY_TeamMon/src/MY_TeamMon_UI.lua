@@ -308,7 +308,8 @@ end
 function D.UpdateBG()
 	-- background
 	local frame = D.GetFrame()
-	local info = X.IsNumber(MY_TMUI_SELECT_MAP) and g_tTable.DungeonInfo:Search(MY_TMUI_SELECT_MAP)
+	local DungeonInfo = X.GetGameTable('DungeonInfo', true)
+	local info = X.IsNumber(MY_TMUI_SELECT_MAP) and DungeonInfo and DungeonInfo:Search(MY_TMUI_SELECT_MAP)
 	if MY_TMUI_SELECT_TYPE ~= 'TALK' and MY_TMUI_SELECT_TYPE ~= 'CHAT' and info and info.szDungeonImage2 then
 		frame:Lookup('', 'Handle_BG'):Show()
 		frame:Lookup('', 'Handle_BG/Image_BG'):FromUITex(info.szDungeonImage2, 0)
@@ -662,7 +663,8 @@ function D.OnItemMouseEnter()
 	if szName == 'Handle_TreeNode' then
 		D.UpdateMapNodeMouseState(this)
 	elseif szName == 'Handle_TreeItem' then
-		local info = X.IsNumber(this.dwMapID) and g_tTable.DungeonInfo:Search(this.dwMapID)
+		local DungeonInfo = X.GetGameTable('DungeonInfo', true)
+		local info = X.IsNumber(this.dwMapID) and DungeonInfo and DungeonInfo:Search(this.dwMapID)
 		local szXml = GetFormatText(MY_TeamMon.GetMapName(this.dwMapID) ..' (' .. this.nCount ..  ')\n', 47, 255, 255, 0)
 		if info and X.TrimString(info.szBossInfo) ~= '' then
 			local tBoss = X.SplitString(info.szBossInfo, ' ')

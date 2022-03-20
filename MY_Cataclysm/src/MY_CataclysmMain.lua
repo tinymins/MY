@@ -143,8 +143,8 @@ end
 
 do
 local function UpdateOfficialBuff()
-	local tRaidPanelBuff = g_tTable.RaidPanelBuff
-	if not tRaidPanelBuff or not X.IsRestricted('MY_CataclysmMain__OfficialBuff') then
+	local RaidPanelBuff = X.GetGameTable('RaidPanelBuff')
+	if not RaidPanelBuff or not X.IsRestricted('MY_CataclysmMain__OfficialBuff') then
 		local szPath = X.FormatPath({'userdata\\cataclysm\\official_buff.tab', X.PATH_TYPE.GLOBAL})
 		local tTitle = {
 			{ f = 'i', t = 'dwMapID' },
@@ -166,17 +166,17 @@ local function UpdateOfficialBuff()
 			{ f = 's', t = 'szReminderColor' },
 			{ f = 's', t = 'szBorderColor' },
 		}
-		tRaidPanelBuff = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL) or tRaidPanelBuff
+		RaidPanelBuff = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL) or RaidPanelBuff
 	end
-	if not tRaidPanelBuff then
+	if not RaidPanelBuff then
 		return
 	end
 	local dwMapID = X.GetMapID(true)
 	local dwMountKungfuID = UI_GetPlayerMountKungfuID()
-	local nCount = tRaidPanelBuff:GetRowCount()
+	local nCount = RaidPanelBuff:GetRowCount()
 	local aBuff = {}
 	for i = 2, nCount do
-		local tLine = tRaidPanelBuff:GetRow(i)
+		local tLine = RaidPanelBuff:GetRow(i)
 		if (tLine.dwMapID == dwMapID or tLine.dwMapID == 0)
 		and (tLine.dwMountKungfuID == dwMountKungfuID or tLine.dwMountKungfuID == 0) then
 			local v = {

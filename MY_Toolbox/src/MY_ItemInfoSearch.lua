@@ -84,7 +84,8 @@ function D.Init()
 			dwTabType = dwTabType + 1
 		end
 		-- 总查找步数 用于进度条
-		BOOK_SEGMENT_COUNT = g_tTable.BookSegment:GetRowCount()
+		local BookSegment = X.GetGameTable('BookSegment', true)
+		BOOK_SEGMENT_COUNT = BookSegment and BookSegment:GetRowCount() or 0
 		SEARCH_STEP_COUNT = 0
 		for _, nMaxIndex in pairs(ITEM_TYPE_MAX) do
 			SEARCH_STEP_COUNT = SEARCH_STEP_COUNT + nMaxIndex
@@ -131,7 +132,8 @@ function D.DoRawSearch(szSearch, fnProgress, fnCallback)
 				dwIndex = 1
 			end
 		else
-			local row = g_tTable.BookSegment:GetRow(dwIndex)
+			local BookSegment = X.GetGameTable('BookSegment', true)
+			local row = BookSegment and BookSegment:GetRow(dwIndex)
 			local dwRecipeID = row and X.SegmentToRecipeID(row.dwBookID, row.dwSegmentID)
 			if dwRecipeID and X.RecipeToSegmentID(dwRecipeID) then
 				local itemInfo = GetItemInfo(5, row.dwBookItemIndex)
