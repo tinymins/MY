@@ -722,8 +722,8 @@ local function GetGameAPI(szAddon, szInside)
 	return api
 end
 
-local function GetGameTable(szTable)
-	local b, t = pcall(function() return g_tTable[szTable] end)
+local function GetGameTable(szTable, bPringError)
+	local b, t = (bPringError and Call or pcall)(function() return g_tTable[szTable] end)
 	if b then
 		return t
 	end
