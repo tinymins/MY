@@ -913,19 +913,22 @@ local MAX_EMOTION_LEN, EMOTION_CACHE = 0, nil
 local function InitEmotion()
 	if not EMOTION_CACHE then
 		local t = {}
-		for i = 1, g_tTable.FaceIcon:GetRowCount() do
-			local tLine = g_tTable.FaceIcon:GetRow(i)
-			local t1 = {
-				nFrame = tLine.nFrame,
-				dwID   = tLine.dwID or (10000 + i),
-				szCmd  = tLine.szCommand,
-				szType = tLine.szType,
-				szImageFile = tLine.szImageFile or 'ui/Image/UICommon/Talk_face.UITex'
-			}
-			t[t1.dwID] = t1
-			t[t1.szCmd] = t1
-			t[t1.szImageFile..','..t1.nFrame..','..t1.szType] = t1
-			MAX_EMOTION_LEN = math.max(MAX_EMOTION_LEN, wstring.len(t1.szCmd))
+		local FaceIcon = X.GetGameTable('FaceIcon', true)
+		if FaceIcon then
+			for i = 1, FaceIcon:GetRowCount() do
+				local tLine = FaceIcon:GetRow(i)
+				local t1 = {
+					nFrame = tLine.nFrame,
+					dwID   = tLine.dwID or (10000 + i),
+					szCmd  = tLine.szCommand,
+					szType = tLine.szType,
+					szImageFile = tLine.szImageFile or 'ui/Image/UICommon/Talk_face.UITex'
+				}
+				t[t1.dwID] = t1
+				t[t1.szCmd] = t1
+				t[t1.szImageFile..','..t1.nFrame..','..t1.szType] = t1
+				MAX_EMOTION_LEN = math.max(MAX_EMOTION_LEN, wstring.len(t1.szCmd))
+			end
 		end
 		EMOTION_CACHE = t
 	end

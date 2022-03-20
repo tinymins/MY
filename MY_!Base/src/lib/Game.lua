@@ -311,12 +311,15 @@ do local CACHE
 function X.GetBuffByName(szName)
 	if not CACHE then
 		local aCache, tLine, tExist = {}, nil, nil
-		for i = 1, g_tTable.Buff:GetRowCount() do
-			tLine = g_tTable.Buff:GetRow(i)
-			if tLine and tLine.szName then
-				tExist = aCache[tLine.szName]
-				if not tExist or (tLine.bShow == 1 and tExist.bShow == 0) then
-					aCache[tLine.szName] = tLine
+		local Buff = X.GetGameTable('Buff', true)
+		if Buff then
+			for i = 1, Buff:GetRowCount() do
+				tLine = Buff:GetRow(i)
+				if tLine and tLine.szName then
+					tExist = aCache[tLine.szName]
+					if not tExist or (tLine.bShow == 1 and tExist.bShow == 0) then
+						aCache[tLine.szName] = tLine
+					end
 				end
 			end
 		end
@@ -469,9 +472,10 @@ function X.GetTypeGroupMap()
 	end
 	-- 类型排序权重
 	local tWeight = {} -- { ['风起稻香'] = 20, ['风起稻香 - 小队秘境'] = 21 }
-	if g_tTable.DLCInfo then
-		for i = 2, g_tTable.DLCInfo:GetRowCount() do
-			local tLine = g_tTable.DLCInfo:GetRow(i)
+	local DLCInfo = X.GetGameTable('DLCInfo', true)
+	if DLCInfo then
+		for i = 2, DLCInfo:GetRowCount() do
+			local tLine = DLCInfo:GetRow(i)
 			local szVersionName = X.TrimString(tLine.szDLCName)
 			tWeight[szVersionName] = 2000 + i * 10
 		end
@@ -486,39 +490,45 @@ function X.GetTypeGroupMap()
 	tWeight[_L.MAP_GROUP['Other dungeon']] = 96
 	tWeight[_L.MAP_GROUP['Other']] = 95
 	-- 获取秘境类型
-	for i = 2, g_tTable.DungeonInfo:GetRowCount() do
-		local tLine = g_tTable.DungeonInfo:GetRow(i)
-		local szVersionName = X.TrimString(tLine.szVersionName)
-		local szGroup = szVersionName
-		if tLine.dwClassID == 1 or tLine.dwClassID == 2 then
-			szGroup = szGroup .. ' - ' .. _L['Team dungeon']
-			tWeight[szGroup] = (tWeight[szVersionName] or 0) + 2
-		elseif tLine.dwClassID == 3 then
-			szGroup = szGroup .. ' - ' .. _L['Raid dungeon']
-			tWeight[szGroup] = (tWeight[szVersionName] or 0) + 3
-		elseif tLine.dwClassID == 4 then
-			szGroup = szGroup .. ' - ' .. _L['Duo dungeon']
-			tWeight[szGroup] = (tWeight[szVersionName] or 0) + 1
+	local DungeonInfo = X.GetGameTable('DungeonInfo', true)
+	if DungeonInfo then
+		for i = 2, DungeonInfo:GetRowCount() do
+			local tLine = DungeonInfo:GetRow(i)
+			local szVersionName = X.TrimString(tLine.szVersionName)
+			local szGroup = szVersionName
+			if tLine.dwClassID == 1 or tLine.dwClassID == 2 then
+				szGroup = szGroup .. ' - ' .. _L['Team dungeon']
+				tWeight[szGroup] = (tWeight[szVersionName] or 0) + 2
+			elseif tLine.dwClassID == 3 then
+				szGroup = szGroup .. ' - ' .. _L['Raid dungeon']
+				tWeight[szGroup] = (tWeight[szVersionName] or 0) + 3
+			elseif tLine.dwClassID == 4 then
+				szGroup = szGroup .. ' - ' .. _L['Duo dungeon']
+				tWeight[szGroup] = (tWeight[szVersionName] or 0) + 1
+			end
+			GroupMapIterator(tLine.dwMapID, szGroup, tLine.szLayer3Name .. tLine.szOtherName)
 		end
-		GroupMapIterator(tLine.dwMapID, szGroup, tLine.szLayer3Name .. tLine.szOtherName)
 	end
 	-- 非秘境
-	for i = 2, g_tTable.MapList:GetRowCount() do
-		local tLine, szGroup = g_tTable.MapList:GetRow(i), nil
-		if tLine.szType == 'BIRTH' or tLine.szType == 'SCHOOL' then
-			szGroup = _L.MAP_GROUP['Birth / School']
-		elseif tLine.szType == 'CITY' or tLine.szType == 'OLD_CITY' then
-			szGroup = _L.MAP_GROUP['City / Old city']
-		elseif tLine.szType == 'VILLAGE' or tLine.szType == 'OLD_VILLAGE' then
-			szGroup = _L.MAP_GROUP['Village / Camp']
-		elseif tLine.szType == 'BATTLE_FIELD' or tLine.szType == 'ARENA' then
-			szGroup = _L.MAP_GROUP['Battle field / Arena']
-		elseif tLine.szType == 'DUNGEON' or tLine.szType == 'RAID' then
-			szGroup = _L.MAP_GROUP['Other dungeon']
-		elseif tLine.szType ~= 'TEST' then -- tLine.szType == 'OTHER'
-			szGroup = _L.MAP_GROUP['Other']
+	local MapList = X.GetGameTable('MapList', true)
+	if MapList then
+		for i = 2, MapList:GetRowCount() do
+			local tLine, szGroup = MapList:GetRow(i), nil
+			if tLine.szType == 'BIRTH' or tLine.szType == 'SCHOOL' then
+				szGroup = _L.MAP_GROUP['Birth / School']
+			elseif tLine.szType == 'CITY' or tLine.szType == 'OLD_CITY' then
+				szGroup = _L.MAP_GROUP['City / Old city']
+			elseif tLine.szType == 'VILLAGE' or tLine.szType == 'OLD_VILLAGE' then
+				szGroup = _L.MAP_GROUP['Village / Camp']
+			elseif tLine.szType == 'BATTLE_FIELD' or tLine.szType == 'ARENA' then
+				szGroup = _L.MAP_GROUP['Battle field / Arena']
+			elseif tLine.szType == 'DUNGEON' or tLine.szType == 'RAID' then
+				szGroup = _L.MAP_GROUP['Other dungeon']
+			elseif tLine.szType ~= 'TEST' then -- tLine.szType == 'OTHER'
+				szGroup = _L.MAP_GROUP['Other']
+			end
+			GroupMapIterator(tLine.nID, szGroup, tLine.szName)
 		end
-		GroupMapIterator(tLine.nID, szGroup, tLine.szName)
 	end
 	-- 逻辑导出表
 	for _, dwMapID in ipairs(GetMapList()) do
@@ -549,48 +559,54 @@ end
 
 function X.GetRegionGroupMap()
 	local tMapRegion = {}
-	local nCount = g_tTable.MapList:GetRowCount()
-	for i = 2, nCount do
-		local tLine = g_tTable.MapList:GetRow(i)
-		if tLine.dwRegionID > 0 then
-			local dwRegionID = tLine.dwRegionID
-			if not tMapRegion[dwRegionID] then
-				tMapRegion[dwRegionID] = {}
-			end
-			local tRegion = tMapRegion[dwRegionID]
-			if tLine.nGroup == 4 then -- GROUP_TYPE_COPY
-				if tLine.szType == 'RAID' then
-					if not tRegion.aRaid then
-						tRegion.aRaid = {}
+	local MapList = X.GetGameTable('MapList', true)
+	if MapList then
+		local nCount = MapList:GetRowCount()
+		for i = 2, nCount do
+			local tLine = MapList:GetRow(i)
+			if tLine.dwRegionID > 0 then
+				local dwRegionID = tLine.dwRegionID
+				if not tMapRegion[dwRegionID] then
+					tMapRegion[dwRegionID] = {}
+				end
+				local tRegion = tMapRegion[dwRegionID]
+				if tLine.nGroup == 4 then -- GROUP_TYPE_COPY
+					if tLine.szType == 'RAID' then
+						if not tRegion.aRaid then
+							tRegion.aRaid = {}
+						end
+						table.insert(tRegion.aRaid, { dwID = tLine.nID, szName = tLine.szMiddleMap })
+					else
+						if not tRegion.aDungeon then
+							tRegion.aDungeon = {}
+						end
+						table.insert(tRegion.aDungeon, { dwID = tLine.nID, szName = tLine.szMiddleMap })
 					end
-					table.insert(tRegion.aRaid, { dwID = tLine.nID, szName = tLine.szMiddleMap })
 				else
-					if not tRegion.aDungeon then
-						tRegion.aDungeon = {}
+					if not tRegion.aMap then
+						tRegion.aMap = {}
 					end
-					table.insert(tRegion.aDungeon, { dwID = tLine.nID, szName = tLine.szMiddleMap })
+					table.insert(tRegion.aMap, { dwID = tLine.nID, szName = tLine.szMiddleMap })
 				end
-			else
-				if not tRegion.aMap then
-					tRegion.aMap = {}
-				end
-				table.insert(tRegion.aMap, { dwID = tLine.nID, szName = tLine.szMiddleMap })
 			end
 		end
 	end
 	local aRegion = {}
-	local nCount = g_tTable.RegionMap:GetRowCount()
-	for i = 2, nCount do
-		local tLine = g_tTable.RegionMap:GetRow(i)
-		local info = tMapRegion[tLine.dwRegionID]
-		if info then
-			table.insert(aRegion, {
-				dwID = tLine.dwRegionID,
-				szName = tLine.szRegionName,
-				aMapInfo = info.aMap,
-				aRaidInfo = info.aRaid,
-				aDungeonInfo = info.aDungeon,
-			})
+	local RegionMap = X.GetGameTable('RegionMap', true)
+	if RegionMap then
+		local nCount = RegionMap:GetRowCount()
+		for i = 2, nCount do
+			local tLine = RegionMap:GetRow(i)
+			local info = tMapRegion[tLine.dwRegionID]
+			if info then
+				table.insert(aRegion, {
+					dwID = tLine.dwRegionID,
+					szName = tLine.szRegionName,
+					aMapInfo = info.aMap,
+					aRaidInfo = info.aRaid,
+					aDungeonInfo = info.aDungeon,
+				})
+			end
 		end
 	end
 	return aRegion
@@ -795,18 +811,24 @@ local function GenerateList(bForceRefresh)
 	BOSS_LIST = X.LoadLUAData(CACHE_PATH)
 	if bForceRefresh or not BOSS_LIST then
 		BOSS_LIST = {}
-		local nCount = g_tTable.DungeonBoss:GetRowCount()
-		for i = 2, nCount do
-			local tLine = g_tTable.DungeonBoss:GetRow(i)
-			local dwMapID = tLine.dwMapID
-			local szNpcList = tLine.szNpcList
-			for szNpcIndex in string.gmatch(szNpcList, '(%d+)') do
-				local p = g_tTable.DungeonNpc:Search(tonumber(szNpcIndex))
-				if p then
-					if not BOSS_LIST[dwMapID] then
-						BOSS_LIST[dwMapID] = {}
+		local DungeonBoss = X.GetGameTable('DungeonBoss', true)
+		if DungeonBoss then
+			local nCount = DungeonBoss:GetRowCount()
+			for i = 2, nCount do
+				local tLine = DungeonBoss:GetRow(i)
+				local dwMapID = tLine.dwMapID
+				local szNpcList = tLine.szNpcList
+				for szNpcIndex in string.gmatch(szNpcList, '(%d+)') do
+					local DungeonNpc = X.GetGameTable('DungeonNpc', true)
+					if DungeonNpc then
+						local p = DungeonNpc:Search(tonumber(szNpcIndex))
+						if p then
+							if not BOSS_LIST[dwMapID] then
+								BOSS_LIST[dwMapID] = {}
+							end
+							BOSS_LIST[dwMapID][p.dwNpcID] = p.szName
+						end
 					end
-					BOSS_LIST[dwMapID][p.dwNpcID] = p.szName
 				end
 			end
 		end
@@ -1686,10 +1708,13 @@ function X.GetFurnitureInfo(szKey, oVal)
 	end
 	if not CACHE[szKey] then
 		CACHE[szKey] = {}
-		for i = 2, g_tTable.HomelandFurnitureInfo:GetRowCount() do
-			local tLine = g_tTable.HomelandFurnitureInfo:GetRow(i)
-			if tLine and tLine[szKey] then
-				CACHE[szKey][tLine[szKey]] = X.SetmetaReadonly(tLine)
+		local HomelandFurnitureInfo = X.GetGameTable('HomelandFurnitureInfo', true)
+		if HomelandFurnitureInfo then
+			for i = 2, HomelandFurnitureInfo:GetRowCount() do
+				local tLine = HomelandFurnitureInfo:GetRow(i)
+				if tLine and tLine[szKey] then
+					CACHE[szKey][tLine[szKey]] = X.SetmetaReadonly(tLine)
+				end
 			end
 		end
 	end
@@ -2820,14 +2845,17 @@ local BUFF_CACHE
 function X.IsBossFocusBuff(dwID, nLevel, nStackNum)
 	if not BUFF_CACHE then
 		BUFF_CACHE = {}
-		if g_tTable.BossFocusBuff then
-			for i = 2, g_tTable.BossFocusBuff:GetRowCount() do
-				local tLine = g_tTable.BossFocusBuff:GetRow(i)
-				if tLine then
-					if not BUFF_CACHE[tLine.nBuffID] then
-						BUFF_CACHE[tLine.nBuffID] = {}
+		local BossFocusBuff = X.GetGameTable('BossFocusBuff', true)
+		if BossFocusBuff then
+			if BossFocusBuff then
+				for i = 2, BossFocusBuff:GetRowCount() do
+					local tLine = BossFocusBuff:GetRow(i)
+					if tLine then
+						if not BUFF_CACHE[tLine.nBuffID] then
+							BUFF_CACHE[tLine.nBuffID] = {}
+						end
+						BUFF_CACHE[tLine.nBuffID][tLine.nBuffLevel] = tLine.nBuffStack
 					end
-					BUFF_CACHE[tLine.nBuffID][tLine.nBuffLevel] = tLine.nBuffStack
 				end
 			end
 		end
@@ -2928,12 +2956,15 @@ do local CACHE
 function X.GetSkillByName(szName)
 	if not CACHE then
 		local aCache, tLine, tExist = {}, nil, nil
-		for i = 1, g_tTable.Skill:GetRowCount() do
-			tLine = g_tTable.Skill:GetRow(i)
-			if tLine and tLine.dwIconID and tLine.fSortOrder and tLine.szName then
-				tExist = aCache[tLine.szName]
-				if not tExist or tLine.fSortOrder > tExist.fSortOrder then
-					aCache[tLine.szName] = tLine
+		local Skill = X.GetGameTable('Skill', true)
+		if Skill then
+			for i = 1, Skill:GetRowCount() do
+				tLine = Skill:GetRow(i)
+				if tLine and tLine.dwIconID and tLine.fSortOrder and tLine.szName then
+					tExist = aCache[tLine.szName]
+					if not tExist or tLine.fSortOrder > tExist.fSortOrder then
+						aCache[tLine.szName] = tLine
+					end
 				end
 			end
 		end
@@ -3088,13 +3119,16 @@ function X.GetForceKungfuIDS(dwForceID)
 			CACHE[dwForceID] = _G.Table_GetSkillSchoolKungfu(dwForceID) or {}
 		else
 			local aKungfuList = {}
-			local tLine = g_tTable.SkillSchoolKungfu:Search(dwForceID)
-			if tLine then
-				local szKungfu = tLine.szKungfu
-				for s in string.gmatch(szKungfu, '%d+') do
-					local dwID = tonumber(s)
-					if dwID then
-						table.insert(aKungfuList, dwID)
+			local SkillSchoolKungfu = X.GetGameTable('SkillSchoolKungfu', true)
+			if SkillSchoolKungfu then
+				local tLine = SkillSchoolKungfu:Search(dwForceID)
+				if tLine then
+					local szKungfu = tLine.szKungfu
+					for s in string.gmatch(szKungfu, '%d+') do
+						local dwID = tonumber(s)
+						if dwID then
+							table.insert(aKungfuList, dwID)
+						end
 					end
 				end
 			end
@@ -3111,15 +3145,18 @@ function X.GetSchoolForceID(dwSchoolID)
 		if X.IsFunction(_G.Table_SchoolToForce) then
 			CACHE[dwSchoolID] = _G.Table_SchoolToForce(dwSchoolID) or 0
 		else
-			local nCount = g_tTable.ForceToSchool:GetRowCount()
-			local dwForceID = 0
-			for i = 1, nCount do
-				local tLine = g_tTable.ForceToSchool:GetRow(i)
-				if dwSchoolID == tLine.dwSchoolID then
-					dwForceID = tLine.dwForceID
+			local ForceToSchool = X.GetGameTable('ForceToSchool', true)
+			if ForceToSchool then
+				local nCount = ForceToSchool:GetRowCount()
+				local dwForceID = 0
+				for i = 1, nCount do
+					local tLine = ForceToSchool:GetRow(i)
+					if dwSchoolID == tLine.dwSchoolID then
+						dwForceID = tLine.dwForceID
+					end
 				end
+				CACHE[dwSchoolID] = dwForceID or 0
 			end
-			CACHE[dwSchoolID] = dwForceID or 0
 		end
 	end
 	return CACHE[dwSchoolID]
@@ -3410,9 +3447,12 @@ local function GenerateMapInfo()
 				szName   = Table_GetMapName(dwMapID),
 				bDungeon = false,
 			}
-			local tDungeonInfo = g_tTable.DungeonInfo:Search(dwMapID)
-			if tDungeonInfo and tDungeonInfo.dwClassID == 3 then
-				map.bDungeon = true
+			local DungeonInfo = X.GetGameTable('DungeonInfo', true)
+			if DungeonInfo then
+				local tDungeonInfo = DungeonInfo:Search(dwMapID)
+				if tDungeonInfo and tDungeonInfo.dwClassID == 3 then
+					map.bDungeon = true
+				end
 			end
 			map = X.SetmetaReadonly(map)
 			MAP_LIST[map.dwID] = map
@@ -4016,10 +4056,13 @@ function X.IsItemFitKungfu(itemInfo, ...)
 	end
 	local aRecommendKungfuID = CACHE[itemInfo.nRecommendID]
 	if not aRecommendKungfuID then
-		local res = g_tTable.EquipRecommend:Search(itemInfo.nRecommendID)
-		aRecommendKungfuID = {}
-		for i, v in ipairs(X.SplitString(res.kungfu_ids, '|')) do
-			table.insert(aRecommendKungfuID, tonumber(v))
+		local EquipRecommend = X.GetGameTable('EquipRecommend', true)
+		if EquipRecommend then
+			local res = EquipRecommend:Search(itemInfo.nRecommendID)
+			aRecommendKungfuID = {}
+			for i, v in ipairs(X.SplitString(res.kungfu_ids, '|')) do
+				table.insert(aRecommendKungfuID, tonumber(v))
+			end
 		end
 		CACHE[itemInfo.nRecommendID] = aRecommendKungfuID
 	end
@@ -4265,20 +4308,23 @@ end
 -- 获取头像文件路径，帧序，是否动画
 function X.GetMiniAvatar(dwAvatarID, nRoleType)
 	-- mini avatar
-	local tInfo = g_tTable.RoleAvatar:Search(dwAvatarID)
-	if tInfo then
-		if nRoleType == ROLE_TYPE.STANDARD_MALE then
-			return tInfo.szM2Image, tInfo.nM2ImgFrame, tInfo.bAnimate
-		elseif nRoleType == ROLE_TYPE.STANDARD_FEMALE then
-			return tInfo.szF2Image, tInfo.nF2ImgFrame, tInfo.bAnimate
-		elseif nRoleType == ROLE_TYPE.STRONG_MALE then
-			return tInfo.szM3Image, tInfo.nM3ImgFrame, tInfo.bAnimate
-		elseif nRoleType == ROLE_TYPE.SEXY_FEMALE then
-			return tInfo.szF3Image, tInfo.nF3ImgFrame, tInfo.bAnimate
-		elseif nRoleType == ROLE_TYPE.LITTLE_BOY then
-			return tInfo.szM1Image, tInfo.nM1ImgFrame, tInfo.bAnimate
-		elseif nRoleType == ROLE_TYPE.LITTLE_GIRL then
-			return tInfo.szF1Image, tInfo.nF1ImgFrame, tInfo.bAnimate
+	local RoleAvatar = X.GetGameTable('RoleAvatar', true)
+	if RoleAvatar then
+		local tInfo = RoleAvatar:Search(dwAvatarID)
+		if tInfo then
+			if nRoleType == ROLE_TYPE.STANDARD_MALE then
+				return tInfo.szM2Image, tInfo.nM2ImgFrame, tInfo.bAnimate
+			elseif nRoleType == ROLE_TYPE.STANDARD_FEMALE then
+				return tInfo.szF2Image, tInfo.nF2ImgFrame, tInfo.bAnimate
+			elseif nRoleType == ROLE_TYPE.STRONG_MALE then
+				return tInfo.szM3Image, tInfo.nM3ImgFrame, tInfo.bAnimate
+			elseif nRoleType == ROLE_TYPE.SEXY_FEMALE then
+				return tInfo.szF3Image, tInfo.nF3ImgFrame, tInfo.bAnimate
+			elseif nRoleType == ROLE_TYPE.LITTLE_BOY then
+				return tInfo.szM1Image, tInfo.nM1ImgFrame, tInfo.bAnimate
+			elseif nRoleType == ROLE_TYPE.LITTLE_GIRL then
+				return tInfo.szF1Image, tInfo.nF1ImgFrame, tInfo.bAnimate
+			end
 		end
 	end
 end
@@ -4305,12 +4351,18 @@ end
 
 -- 获取成就基础信息
 function X.GetAchievement(dwAchieveID)
-	return g_tTable.Achievement:Search(dwAchieveID)
+	local Achievement = X.GetGameTable('Achievement', true)
+	if Achievement then
+		return Achievement:Search(dwAchieveID)
+	end
 end
 
 -- 获取成就描述信息
 function X.GetAchievementInfo(dwAchieveID)
-	return g_tTable.AchievementInfo:Search(dwAchieveID)
+	local AchievementInfo = X.GetGameTable('AchievementInfo', true)
+	if AchievementInfo then
+		return AchievementInfo:Search(dwAchieveID)
+	end
 end
 
 -- 获取一个地图的成就列表（区分是否包含五甲）
@@ -4318,23 +4370,26 @@ local MAP_ACHI_NORMAL, MAP_ACHI_ALL
 function X.GetMapAchievements(dwMapID, bWujia)
 	if not MAP_ACHI_NORMAL then
 		local tMapAchiNormal, tMapAchiAll = {}, {}
-		local nCount = g_tTable.Achievement:GetRowCount()
-		for i = 2, nCount do
-			local tLine = g_tTable.Achievement:GetRow(i)
-			if tLine and tLine.nVisible == 1 then
-				for _, szID in ipairs(X.SplitString(tLine.szSceneID, '|', true)) do
-					local dwID = tonumber(szID)
-					if dwID then
-						if tLine.dwGeneral == 1 then
-							if not tMapAchiNormal[dwID] then
-								tMapAchiNormal[dwID] = {}
+		local Achievement = X.GetGameTable('Achievement', true)
+		if Achievement then
+			local nCount = Achievement:GetRowCount()
+			for i = 2, nCount do
+				local tLine = Achievement:GetRow(i)
+				if tLine and tLine.nVisible == 1 then
+					for _, szID in ipairs(X.SplitString(tLine.szSceneID, '|', true)) do
+						local dwID = tonumber(szID)
+						if dwID then
+							if tLine.dwGeneral == 1 then
+								if not tMapAchiNormal[dwID] then
+									tMapAchiNormal[dwID] = {}
+								end
+								table.insert(tMapAchiNormal[dwID], tLine.dwID)
 							end
-							table.insert(tMapAchiNormal[dwID], tLine.dwID)
+							if not tMapAchiAll[dwID] then
+								tMapAchiAll[dwID] = {}
+							end
+							table.insert(tMapAchiAll[dwID], tLine.dwID)
 						end
-						if not tMapAchiAll[dwID] then
-							tMapAchiAll[dwID] = {}
-						end
-						table.insert(tMapAchiAll[dwID], tLine.dwID)
 					end
 				end
 			end
@@ -4729,28 +4784,31 @@ local BOOK_SEGMENT_RECIPE = setmetatable({}, {
 				tBookID2RecipeID = {}
 				tBookName2RecipeID = {}
 				tSegmentName2RecipeID = {}
-				local nCount = g_tTable.BookSegment:GetRowCount()
-				for i = 2, nCount do
-					local row = g_tTable.BookSegment:GetRow(i)
-					-- {
-					-- 	dwBookID = 2, dwSegmentID = 1, szBookName = "沉香劈山", szDesc = "沉香救母之传说。", szSegmentName = "沉香劈山上篇",
-					-- 	dwBookItemIndex = 7936, dwBookNumber = 2, dwPageCount = 6, nSort = 2, nSubSort = 1, nType = 1,
-					-- 	dwPageID_0 = 6, dwPageID_1 = 7, dwPageID_2 = 8, dwPageID_3 = 9, dwPageID_4 = 10, dwPageID_5 = 11, dwPageID_6 = 0, dwPageID_7 = 0, dwPageID_8 = 0, dwPageID_9 = 0
-					-- }
-					local dwRecipeID = X.SegmentToRecipeID(row.dwBookID, row.dwSegmentID)
-					-- 套书
-					local szBookName = X.TrimString(row.szBookName)
-					if not tBookName2RecipeID[szBookName] then
-						tBookName2RecipeID[szBookName] = {}
+				local BookSegment = X.GetGameTable('BookSegment', true)
+				if BookSegment then
+					local nCount = BookSegment:GetRowCount()
+					for i = 2, nCount do
+						local row = BookSegment:GetRow(i)
+						-- {
+						-- 	dwBookID = 2, dwSegmentID = 1, szBookName = "沉香劈山", szDesc = "沉香救母之传说。", szSegmentName = "沉香劈山上篇",
+						-- 	dwBookItemIndex = 7936, dwBookNumber = 2, dwPageCount = 6, nSort = 2, nSubSort = 1, nType = 1,
+						-- 	dwPageID_0 = 6, dwPageID_1 = 7, dwPageID_2 = 8, dwPageID_3 = 9, dwPageID_4 = 10, dwPageID_5 = 11, dwPageID_6 = 0, dwPageID_7 = 0, dwPageID_8 = 0, dwPageID_9 = 0
+						-- }
+						local dwRecipeID = X.SegmentToRecipeID(row.dwBookID, row.dwSegmentID)
+						-- 套书
+						local szBookName = X.TrimString(row.szBookName)
+						if not tBookName2RecipeID[szBookName] then
+							tBookName2RecipeID[szBookName] = {}
+						end
+						table.insert(tBookName2RecipeID[szBookName], dwRecipeID)
+						if not tBookID2RecipeID[row.dwBookID] then
+							tBookID2RecipeID[row.dwBookID] = {}
+						end
+						table.insert(tBookID2RecipeID[row.dwBookID], dwRecipeID)
+						-- 书籍
+						local szSegmentName = X.TrimString(row.szSegmentName)
+						tSegmentName2RecipeID[szSegmentName] = dwRecipeID
 					end
-					table.insert(tBookName2RecipeID[szBookName], dwRecipeID)
-					if not tBookID2RecipeID[row.dwBookID] then
-						tBookID2RecipeID[row.dwBookID] = {}
-					end
-					table.insert(tBookID2RecipeID[row.dwBookID], dwRecipeID)
-					-- 书籍
-					local szSegmentName = X.TrimString(row.szSegmentName)
-					tSegmentName2RecipeID[szSegmentName] = dwRecipeID
 				end
 			end
 			X.SaveLUAData({'temporary/book-segment.jx3dat', X.PATH_TYPE.GLOBAL}, {
@@ -4796,7 +4854,10 @@ function X.GetBookSegmentInfo(...)
 		dwBookID, dwSegmentID = ...
 	end
 	if X.IsNumber(dwBookID) and X.IsNumber(dwSegmentID) then
-		return g_tTable.BookSegment:Search(dwBookID, dwSegmentID)
+		local BookSegment = X.GetGameTable('BookSegment', true)
+		if BookSegment then
+			return BookSegment:Search(dwBookID, dwSegmentID)
+		end
 	end
 end
 
@@ -4834,16 +4895,19 @@ local DOODAD_BOOK = setmetatable({}, {
 			if not tDoodadID2BookRecipe or not tBookRecipe2DoodadID then
 				tDoodadID2BookRecipe = {}
 				tBookRecipe2DoodadID = {}
-				local nCount = g_tTable.DoodadTemplate:GetRowCount()
-				for i = 2, nCount do
-					local row = g_tTable.DoodadTemplate:GetRow(i)
-					if row.szBarText == _L['Copy inscription'] then
-						local szSegmentName = string.sub(row.szName, string.len(_L['Inscription * ']) + 1)
-						local info = X.GetBookSegmentInfo(szSegmentName)
-						if info then
-							local dwRecipeID = X.SegmentToRecipeID(info.dwBookID, info.dwSegmentID)
-							tDoodadID2BookRecipe[row.nID] = dwRecipeID
-							tBookRecipe2DoodadID[dwRecipeID] = row.nID
+				local DoodadTemplate = X.GetGameTable('DoodadTemplate', true)
+				if DoodadTemplate then
+					local nCount = DoodadTemplate:GetRowCount()
+					for i = 2, nCount do
+						local row = DoodadTemplate:GetRow(i)
+						if row.szBarText == _L['Copy inscription'] then
+							local szSegmentName = string.sub(row.szName, string.len(_L['Inscription * ']) + 1)
+							local info = X.GetBookSegmentInfo(szSegmentName)
+							if info then
+								local dwRecipeID = X.SegmentToRecipeID(info.dwBookID, info.dwSegmentID)
+								tDoodadID2BookRecipe[row.nID] = dwRecipeID
+								tBookRecipe2DoodadID[dwRecipeID] = row.nID
+							end
 						end
 					end
 				end
