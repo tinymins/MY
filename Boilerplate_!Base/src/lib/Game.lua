@@ -4747,7 +4747,7 @@ do
 					if bReplaceSensitiveWord then
 						szPart = X.ReplaceSensitiveWord(szPart)
 					end
-					if nMaxLen > 0 and nLen + wstring.len(szPart) > nMaxLen then
+					if nMaxLen and nMaxLen > 0 and nLen + wstring.len(szPart) > nMaxLen then
 						szPart = wstring.sub(szPart, 1, nMaxLen - nLen)
 						szText = szText .. szPart
 						nLen = nMaxLen
