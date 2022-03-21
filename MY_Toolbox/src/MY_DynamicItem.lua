@@ -64,7 +64,7 @@ local D = {
 	aList = {},
 }
 
-local MAP_NAME_FIX = setmetatable({
+local MAP_MERGE = setmetatable({
 	[296] = 297, -- 龙门绝境
 	[410] = 297, -- 沧溟绝境
 	[421] = 421, -- 浪客行·悬棺裂谷
@@ -84,11 +84,11 @@ local MAP_NAME_FIX = setmetatable({
 	[442] = 421, -- 浪客行·胡杨林道
 	[443] = 421, -- 浪客行·浮景峰
 	[461] = 421, -- 浪客行·落樱林
-}, {__index = CONSTANT.MAP_NAME_FIX})
+}, {__index = CONSTANT.MAP_MERGE})
 
 function D.GetMapID()
 	local dwMapID = GetClientPlayer().GetMapID()
-	return MAP_NAME_FIX[dwMapID] or dwMapID
+	return MAP_MERGE[dwMapID] or dwMapID
 end
 
 function D.SaveMapConfig()
