@@ -457,8 +457,8 @@ function X.GetTypeGroupMap()
 	local tGroupMap, tMapExist = {}, {}
 	local function GroupMapIterator(dwMapID, szGroup, szMapName)
 		if szGroup then
-			if CONSTANT.MAP_NAME_FIX[dwMapID] then
-				dwMapID = CONSTANT.MAP_NAME_FIX[dwMapID]
+			if CONSTANT.MAP_MERGE[dwMapID] then
+				dwMapID = CONSTANT.MAP_MERGE[dwMapID]
 			end
 			if tMapExist[dwMapID] then
 				return
@@ -1283,9 +1283,13 @@ function X.GetTemplateName(dwType, dwTemplateID)
 	end
 	if not szName then
 		if dwType == TARGET.NPC then
-			szName = CONSTANT.NPC_NAME[dwTemplateID] or Table_GetNpcTemplateName(CONSTANT.NPC_NAME_FIX[dwTemplateID] or dwTemplateID)
+			szName = CONSTANT.NPC_NAME[dwTemplateID]
+				and X.RenderTemplateString(CONSTANT.NPC_NAME[dwTemplateID])
+				or Table_GetNpcTemplateName(dwTemplateID)
 		else
-			szName = CONSTANT.DOODAD_NAME[dwTemplateID] or Table_GetDoodadTemplateName(CONSTANT.DOODAD_NAME_FIX[dwTemplateID] or dwTemplateID)
+			szName = CONSTANT.DOODAD_NAME[dwTemplateID]
+				and X.RenderTemplateString(CONSTANT.DOODAD_NAME[dwTemplateID])
+				or Table_GetDoodadTemplateName(dwTemplateID)
 		end
 		if szName then
 			szName = szName:gsub('^%s*(.-)%s*$', '%1')
@@ -3444,7 +3448,9 @@ local function GenerateMapInfo()
 			local map = {
 				dwID     = dwMapID,
 				dwMapID  = dwMapID,
-				szName   = Table_GetMapName(dwMapID),
+				szName   = CONSTANT.MAP_NAME[dwMapID]
+					and X.RenderTemplateString(CONSTANT.MAP_NAME[dwMapID])
+					or Table_GetMapName(dwMapID),
 				bDungeon = false,
 			}
 			local DungeonInfo = X.GetGameTable('DungeonInfo', true)
@@ -3490,8 +3496,8 @@ function X.GetMapInfo(arg0)
 	if not MAP_LIST then
 		GenerateMapInfo()
 	end
-	if arg0 and CONSTANT.MAP_NAME_FIX[arg0] then
-		arg0 = CONSTANT.MAP_NAME_FIX[arg0]
+	if arg0 and CONSTANT.MAP_MERGE[arg0] then
+		arg0 = CONSTANT.MAP_MERGE[arg0]
 	end
 	return MAP_LIST[arg0]
 end
@@ -3664,7 +3670,7 @@ end
 -- (number) X.GetMapID(bool bFix) ÊÇ·ñ×öÐÞÕý
 function X.GetMapID(bFix)
 	local dwMapID = GetClientPlayer().GetMapID()
-	return bFix and CONSTANT.MAP_NAME_FIX[dwMapID] or dwMapID
+	return bFix and CONSTANT.MAP_MERGE[dwMapID] or dwMapID
 end
 
 do local MARK_NAME = { _L['Cloud'], _L['Sword'], _L['Ax'], _L['Hook'], _L['Drum'], _L['Shear'], _L['Stick'], _L['Jade'], _L['Dart'], _L['Fan'] }
@@ -4660,34 +4666,42 @@ do
 		if szContent == 'me' then
 			return X.GetUserRoleName()
 		end
-		if not X.IsNil(tVar[szContent]) then
-			return tVar[szContent]
-		end
-		if szContent:match('^%d+$') then
-			return tVar[tonumber(szContent)]
+		if X.IsTable(tVar) then
+			if not X.IsNil(tVar[szContent]) then
+				return tVar[szContent]
+			end
+			if szContent:match('^%d+$') then
+				return tVar[tonumber(szContent)]
+			end
 		end
 		local szType = szContent:sub(1, 1)
-		local dwID, nLevel = unpack(X.SplitString(szContent:sub(2), ','))
-		if dwID then
-			dwID = tonumber(dwID)
-		end
-		if nLevel then
-			nLevel = tonumber(nLevel)
+		local aValue = X.SplitString(szContent:sub(2), ',')
+		for k, v in ipairs(aValue) do
+			aValue[k] = tonumber(v)
 		end
 		if szType == 'N' then
-			return X.GetTemplateName(TARGET.NPC, dwID)
+			return X.GetTemplateName(TARGET.NPC, aValue[1])
 		end
 		if szType == 'D' then
-			return X.GetTemplateName(TARGET.DOODAD, dwID)
+			return X.GetTemplateName(TARGET.DOODAD, aValue[1])
 		end
 		if szType == 'S' then
-			return X.GetSkillName(dwID, nLevel)
+			return X.GetSkillName(aValue[1], aValue[2])
 		end
 		if szType == 'B' then
-			return X.GetBuffName(dwID, nLevel)
+			return X.GetBuffName(aValue[1], aValue[2])
+		end
+		if szType == 'I' then
+			if #aValue == 1 then
+				return X.GetItemNameByUIID(aValue[1])
+			end
+			local KItemInfo = GetItemInfo(aValue[1], aValue[2])
+			if KItemInfo then
+				return X.GetItemNameByItemInfo(KItemInfo, aValue[3])
+			end
 		end
 		if szType == 'M' then
-			local map = X.GetMapInfo(dwID)
+			local map = X.GetMapInfo(aValue[1])
 			if map then
 				return map.szName
 			end
@@ -4733,7 +4747,7 @@ do
 					if bReplaceSensitiveWord then
 						szPart = X.ReplaceSensitiveWord(szPart)
 					end
-					if nMaxLen > 0 and nLen + wstring.len(szPart) > nMaxLen then
+					if nMaxLen and nMaxLen > 0 and nLen + wstring.len(szPart) > nMaxLen then
 						szPart = wstring.sub(szPart, 1, nMaxLen - nLen)
 						szText = szText .. szPart
 						nLen = nMaxLen
