@@ -4675,27 +4675,33 @@ do
 			end
 		end
 		local szType = szContent:sub(1, 1)
-		local dwID, nLevel = unpack(X.SplitString(szContent:sub(2), ','))
-		if dwID then
-			dwID = tonumber(dwID)
-		end
-		if nLevel then
-			nLevel = tonumber(nLevel)
+		local aValue = X.SplitString(szContent:sub(2), ',')
+		for k, v in ipairs(aValue) do
+			aValue[k] = tonumber(v)
 		end
 		if szType == 'N' then
-			return X.GetTemplateName(TARGET.NPC, dwID)
+			return X.GetTemplateName(TARGET.NPC, aValue[1])
 		end
 		if szType == 'D' then
-			return X.GetTemplateName(TARGET.DOODAD, dwID)
+			return X.GetTemplateName(TARGET.DOODAD, aValue[1])
 		end
 		if szType == 'S' then
-			return X.GetSkillName(dwID, nLevel)
+			return X.GetSkillName(aValue[1], aValue[2])
 		end
 		if szType == 'B' then
-			return X.GetBuffName(dwID, nLevel)
+			return X.GetBuffName(aValue[1], aValue[2])
+		end
+		if szType == 'I' then
+			if #aValue == 1 then
+				return X.GetItemNameByUIID(aValue[1])
+			end
+			local KItemInfo = GetItemInfo(aValue[1], aValue[2])
+			if KItemInfo then
+				return X.GetItemNameByItemInfo(KItemInfo, aValue[3])
+			end
 		end
 		if szType == 'M' then
-			local map = X.GetMapInfo(dwID)
+			local map = X.GetMapInfo(aValue[1])
 			if map then
 				return map.szName
 			end
