@@ -4660,11 +4660,13 @@ do
 		if szContent == 'me' then
 			return X.GetUserRoleName()
 		end
-		if not X.IsNil(tVar[szContent]) then
-			return tVar[szContent]
-		end
-		if szContent:match('^%d+$') then
-			return tVar[tonumber(szContent)]
+		if X.IsTable(tVar) then
+			if X.IsNil(tVar[szContent]) then
+				return tVar[szContent]
+			end
+			if szContent:match('^%d+$') then
+				return tVar[tonumber(szContent)]
+			end
 		end
 		local szType = szContent:sub(1, 1)
 		local dwID, nLevel = unpack(X.SplitString(szContent:sub(2), ','))
