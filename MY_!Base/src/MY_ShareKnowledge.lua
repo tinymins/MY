@@ -65,6 +65,9 @@ X.RegisterEvent('MY_RSS_UPDATE', function()
 	end
 	for _, p in ipairs(rss) do
 		X.RegisterEvent(p.name, 'MY_ShareKnowledge__Event', function()
+			if not MY_Serendipity.bEnable then
+				return
+			end
 			if GetTime() < NEXT_AWAKE_TIME then
 				return
 			end
@@ -153,6 +156,9 @@ local function SerializeElement(el)
 end
 
 X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
+	if not MY_Serendipity.bEnable then
+		return
+	end
 	local rss = MY_RSS.Get('share-ui')
 	if not rss then
 		return
