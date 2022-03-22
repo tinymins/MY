@@ -151,6 +151,17 @@ local function SerializeElement(el)
 		local image, frame = el:GetImagePath()
 		info.image = image
 		info.frame = frame
+	elseif info.type == 'Handle' then
+		local i = 0
+		local it = el:Lookup(i)
+		if it then
+			info.children = {}
+		end
+		while it do
+			table.insert(info.children, SerializeElement(it))
+			i = i + 1
+			it = el:Lookup(i)
+		end
 	end
 	return info
 end
