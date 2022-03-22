@@ -293,6 +293,20 @@ local function Set(var, keys, val)
 	return res
 end
 -----------------------------------------------
+-- 合并数据
+-----------------------------------------------
+local function TableAssign(t, ...)
+	for index = 1, select('#', ...) do
+		local t1 = select(index, ...)
+		if type(t1) == 'table' then
+			for k, v in pairs(t1) do
+				t[k] = v
+			end
+		end
+	end
+	return t
+end
+-----------------------------------------------
 -- 判断是否为空
 -----------------------------------------------
 local function IsEmpty(var)
@@ -836,6 +850,7 @@ local X = {
 	ErrorLog         = ErrorLog        ,
 	Set              = Set             ,
 	Get              = Get             ,
+	TableAssign      = TableAssign     ,
 	Class            = Class           ,
 	GetPatch         = GetPatch        ,
 	ApplyPatch       = ApplyPatch      ,
