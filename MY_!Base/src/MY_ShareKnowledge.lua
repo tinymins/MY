@@ -109,22 +109,27 @@ local NEXT_AWAKE_TIME = 0
 local CACHE = {}
 
 MY_RSS.RegisterAdapter('share-ui', function(data)
-	local paths = {}
+	local t = {}
 	if X.IsTable(data) then
 		for _, v in ipairs(data) do
+			local path, dataIndex
 			if X.IsString(v) then
-				table.insert(paths, { v })
-			elseif X.IsTable(v) and X.IsString(v[1]) and X.IsString(v[2]) then
-				table.insert(paths, { v[1], v[2] })
+				path = { v }
+			elseif X.IsTable(v)
+			and X.IsString(v[1])
+			and (X.IsNil(v[2]) or X.IsString(v[2]))
+			and (X.IsNil(v[3]) or X.IsString(v[3]) or X.IsTable(v[3])) then
+				path = { v[1], v[2] }
+				dataIndex = v[3]
+			end
+			if path then
+				table.insert(t, {
+					key = X.JsonEncode({path, dataIndex}),
+					path = path,
+					dataIndex = dataIndex,
+				})
 			end
 		end
-	end
-	local t = {}
-	for _, path in ipairs(paths) do
-		table.insert(t, {
-			key = X.JsonEncode(path),
-			path = path,
-		})
 	end
 	return t
 end)
@@ -178,9 +183,14 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 		return
 	end
 	for _, v in ipairs(rss) do
-		local el = Station.Lookup(unpack(v.path))
-		if el then
-			local szContent = X.JsonEncode(SerializeElement(el))
+		local el, data = Station.Lookup(unpack(v.path)), nil
+		if v.dataIndex then
+			data = X.Get(el, v.dataIndex)
+		else
+			data = SerializeElement(el)
+		end
+		if not X.IsNil(data) then
+			local szContent = X.JsonEncode(data)
 			if CACHE[v.key] ~= szContent then
 				X.EnsureAjax({
 					url = 'https://push.j3cx.com/api/share-ui?'
@@ -191,6 +201,7 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 							server = AnsiToUTF8(X.GetRealServer(2)), -- Server
 							path = AnsiToUTF8(v.path[1]), -- Path
 							subpath = v.path[2] and AnsiToUTF8(v.path[2]), -- Subpath
+							dataIndex = v.dataIndex and AnsiToUTF8(X.IsString(v.dataIndex) and v.dataIndex or X.JsonEncode(v.dataIndex)), -- DataIndex
 							content = AnsiToUTF8(szContent), -- Content
 							time = GetCurrentTime(), -- Time
 						}, X.SECRET.SHARE_UI)))
