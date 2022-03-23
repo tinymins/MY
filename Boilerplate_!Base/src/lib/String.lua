@@ -136,11 +136,11 @@ function X.SimpleDecodeString(szCipher, bTripSlashes)
 end
 
 local function UrlEncodeString(szText)
-	return szText:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+')
+	return (szText:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+'))
 end
 
 local function UrlDecodeString(szText)
-	return szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end)
+	return (szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end))
 end
 
 local function UrlEncode(data)
