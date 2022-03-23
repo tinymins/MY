@@ -135,51 +135,51 @@ function X.SimpleDecodeString(szCipher, bTripSlashes)
 	return table.concat(aText)
 end
 
-local function UrlEncodeString(szText)
+local function EncodeURLString(szText)
 	return (szText:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+'))
 end
 
-local function UrlDecodeString(szText)
+local function DecodeURLString(szText)
 	return (szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end))
 end
 
-local function UrlEncode(data)
+local function EncodeURL(data)
 	if type(data) == 'table' then
 		local t = {}
 		for k, v in pairs(data) do
 			if type(k == 'string') then
-				t[UrlEncodeString(k)] = UrlEncode(v)
+				t[EncodeURLString(k)] = EncodeURL(v)
 			else
-				t[k] = UrlEncode(v)
+				t[k] = EncodeURL(v)
 			end
 		end
 		return t
 	elseif type(data) == 'string' then
-		return UrlEncodeString(data)
+		return EncodeURLString(data)
 	else
 		return data
 	end
 end
-X.UrlEncode = UrlEncode
+X.EncodeURL = EncodeURL
 
-local function UrlDecode(data)
+local function DecodeURL(data)
 	if type(data) == 'table' then
 		local t = {}
 		for k, v in pairs(data) do
 			if type(k == 'string') then
-				t[UrlDecodeString(k)] = UrlDecode(v)
+				t[DecodeURLString(k)] = DecodeURL(v)
 			else
-				t[k] = UrlDecode(v)
+				t[k] = DecodeURL(v)
 			end
 		end
 		return t
 	elseif type(data) == 'string' then
-		return UrlDecodeString(data)
+		return DecodeURLString(data)
 	else
 		return data
 	end
 end
-X.UrlDecode = UrlDecode
+X.DecodeURL = DecodeURL
 
 local function EncodeQuerystring(t, prefix, data)
 	if type(data) == 'table' then
@@ -190,7 +190,7 @@ local function EncodeQuerystring(t, prefix, data)
 			else
 				table.insert(t, '&')
 			end
-			k = UrlEncodeString(tostring(k))
+			k = EncodeURLString(tostring(k))
 			if prefix == '' then
 				EncodeQuerystring(t, k, v)
 			else
@@ -202,7 +202,7 @@ local function EncodeQuerystring(t, prefix, data)
 			table.insert(t, prefix)
 			table.insert(t, '=')
 		end
-		table.insert(t, UrlEncodeString(tostring(data)))
+		table.insert(t, EncodeURLString(tostring(data)))
 	end
 	return t
 end
@@ -224,16 +224,16 @@ function X.DecodeQuerystring(s)
 		local k, v = kvp[1], kvp[2]
 		local pos = wstring.find(k, '[')
 		if pos then
-			local ks = { UrlDecodeString(string.sub(k, 1, pos - 1)) }
+			local ks = { DecodeURLString(string.sub(k, 1, pos - 1)) }
 			k = string.sub(k, pos)
 			while wstring.sub(k, 1, 1) == '[' do
 				pos = wstring.find(k, ']') or (string.len(k) + 1)
-				table.insert(ks, UrlDecodeString(string.sub(k, 2, pos - 1)))
+				table.insert(ks, DecodeURLString(string.sub(k, 2, pos - 1)))
 				k = string.sub(k, pos + 1)
 			end
-			X.Set(data, ks, UrlDecodeString(v))
+			X.Set(data, ks, DecodeURLString(v))
 		else
-			data[UrlDecodeString(k)] = UrlDecodeString(v)
+			data[DecodeURLString(k)] = DecodeURLString(v)
 		end
 	end
 	return data
