@@ -123,6 +123,15 @@ function X.Ajax(settings)
 	}
 
 	-------------------------------
+	-- convert encoding
+	-------------------------------
+	local xurl, xdata = config.url, config.data
+	if config.charset == 'utf8' then
+		xurl  = X.ConvertToUTF8(xurl)
+		xdata = X.ConvertToUTF8(xdata)
+	end
+
+	-------------------------------
 	-- auto settings
 	-------------------------------
 	-- select auto method
@@ -153,19 +162,46 @@ function X.Ajax(settings)
 			driver = 'webcef'
 		end
 	end
-	if (method == 'get' or method == 'delete') and config.data then
-		local data = X.EncodePostData(config.data)
+	if (method == 'get' or method == 'delete') and xdata then
+		local data = X.EncodePostData(xdata)
 		if data ~= '' then
-			if not wstring.find(config.url, '?') then
-				config.url = config.url .. '?'
-			elseif wstring.sub(config.url, -1) ~= '&' then
-				config.url = config.url .. '&'
+			if not wstring.find(xurl, '?') then
+				xurl = xurl .. '?'
+			elseif wstring.sub(xurl, -1) ~= '&' then
+				xurl = xurl .. '&'
 			end
-			config.url = config.url .. data
+			xurl = xurl .. data
 		end
-		config.data = nil
+		xdata = nil
 	end
 	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', X.NSFormatString('[{$NS}_AJAX] Unknown http request type: ') .. method)
+
+	-------------------------------
+	-- data signature
+	-------------------------------
+	if config.signature then
+		local pos = wstring.find(xurl, '?')
+		if pos then
+			xurl = string.sub(xurl, 1, pos)
+				.. X.EncodePostData(
+					X.SignPostData(
+						X.DecodePostData(string.sub(xurl, pos + 1)),
+						config.signature
+					)
+				)
+		end
+		if xdata then
+			xdata = X.SignPostData(xdata, config.signature)
+		end
+	end
+
+	-------------------------------
+	-- correct ansi url and data
+	-------------------------------
+	if config.charset == 'utf8' then
+		config.url  = X.ConvertToAnsi(xurl)
+		config.data = X.ConvertToAnsi(xdata)
+	end
 
 	-------------------------------
 	-- finalize settings
@@ -227,12 +263,6 @@ function X.Ajax(settings)
 	-------------------------------
 	-- each driver handlers
 	-------------------------------
-	-- convert encoding
-	local xurl, xdata = config.url, config.data or ''
-	if config.charset == 'utf8' then
-		xurl  = X.ConvertToUTF8(xurl)
-		xdata = X.ConvertToUTF8(xdata) or ''
-	end
 	-- bridge
 	local bridgekey = X.NSFormatString('{$NS}RRDF_TO_') .. id
 	local bridgein = AJAX_BRIDGE_PATH .. id .. '.' .. GLOBAL.GAME_LANG .. '.jx3dat'
@@ -269,7 +299,7 @@ function X.Ajax(settings)
 		local curl = Curl_Create(xurl)
 		if method == 'post' then
 			curl:SetMethod('POST')
-			local data = config.data
+			local data = xdata
 			if config.payload == 'json' then
 				data = X.JsonEncode(data)
 				curl:AddHeader('Content-Type: application/json')
@@ -422,9 +452,9 @@ function X.Ajax(settings)
 			szKey = szKey + 1
 		end
 		szKey = AJAX_TAG .. szKey
-		local ssl = config.url:sub(1, 6) == 'https:'
+		local ssl = xurl:sub(1, 6) == 'https:'
 		if method == 'post' then
-			CURL_HttpPost(szKey, xurl, xdata, ssl, config.timeout)
+			CURL_HttpPost(szKey, xurl, xdata or '', ssl, config.timeout)
 		else
 			CURL_HttpRqst(szKey, xurl, ssl, config.timeout)
 		end
