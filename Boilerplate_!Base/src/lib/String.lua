@@ -220,7 +220,7 @@ end
 function X.DecodeQuerystring(s)
 	local data = {}
 	for _, kvp in ipairs(X.SplitString(s, '&', true)) do
-		kvp = X.SplitString(kvp, '=', true)
+		kvp = X.SplitString(kvp, '=')
 		local k, v = kvp[1], kvp[2]
 		local pos = wstring.find(k, '[')
 		if pos then
