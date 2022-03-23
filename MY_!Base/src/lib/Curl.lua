@@ -304,7 +304,7 @@ function X.Ajax(settings)
 				data = X.EncodeJSON(data)
 				curl:AddHeader('Content-Type: application/json')
 			else -- if config.payload == 'form' then
-				data = X.EncodePostData(data)
+				data = X.EncodeQuerystring(data)
 				curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
 			end
 			curl:AddPostRawData(data)
