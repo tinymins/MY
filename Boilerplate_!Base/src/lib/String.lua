@@ -135,51 +135,41 @@ function X.SimpleDecodeString(szCipher, bTripSlashes)
 	return table.concat(aText)
 end
 
-local function EncodeURLString(szText)
-	return (szText:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+'))
-end
-
-local function DecodeURLString(szText)
-	return (szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end))
-end
-
-local function EncodeURL(data)
+-- 编码 URL 中的参数：方法不会对下列字符编码 [a-zA-Z0-9~!*()']
+-- @param {any} data 需要编码的数据
+-- @return {typeof data} 编码后的数据
+local function EncodeURIComponent(data)
+	if type(data) == 'string' then
+		return (data:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+'))
+	end
 	if type(data) == 'table' then
 		local t = {}
 		for k, v in pairs(data) do
-			if type(k == 'string') then
-				t[EncodeURLString(k)] = EncodeURL(v)
-			else
-				t[k] = EncodeURL(v)
-			end
+			t[EncodeURIComponent(k)] = EncodeURIComponent(v)
 		end
 		return t
-	elseif type(data) == 'string' then
-		return EncodeURLString(data)
-	else
-		return data
 	end
+	return data
 end
-X.EncodeURL = EncodeURL
+X.EncodeURIComponent = EncodeURIComponent
 
-local function DecodeURL(data)
+-- 解码 URL 中的参数
+-- @param {any} data 需要解码的数据
+-- @return {typeof data} 解码后的数据
+local function DecodeURIComponent(data)
+	if type(data) == 'string' then
+		return (data:gsub('+', ' '):gsub('%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end))
+	end
 	if type(data) == 'table' then
 		local t = {}
 		for k, v in pairs(data) do
-			if type(k == 'string') then
-				t[DecodeURLString(k)] = DecodeURL(v)
-			else
-				t[k] = DecodeURL(v)
-			end
+			t[DecodeURIComponent(k)] = DecodeURIComponent(v)
 		end
 		return t
-	elseif type(data) == 'string' then
-		return DecodeURLString(data)
-	else
-		return data
 	end
+	return data
 end
-X.DecodeURL = DecodeURL
+X.DecodeURIComponent = DecodeURIComponent
 
 local function EncodeQuerystring(t, prefix, data)
 	if type(data) == 'table' then
@@ -190,7 +180,7 @@ local function EncodeQuerystring(t, prefix, data)
 			else
 				table.insert(t, '&')
 			end
-			k = EncodeURLString(tostring(k))
+			k = EncodeURIComponent(tostring(k))
 			if prefix == '' then
 				EncodeQuerystring(t, k, v)
 			else
@@ -202,7 +192,7 @@ local function EncodeQuerystring(t, prefix, data)
 			table.insert(t, prefix)
 			table.insert(t, '=')
 		end
-		table.insert(t, EncodeURLString(tostring(data)))
+		table.insert(t, EncodeURIComponent(tostring(data)))
 	end
 	return t
 end
@@ -224,16 +214,16 @@ function X.DecodeQuerystring(s)
 		local k, v = kvp[1], kvp[2]
 		local pos = wstring.find(k, '[')
 		if pos then
-			local ks = { DecodeURLString(string.sub(k, 1, pos - 1)) }
+			local ks = { DecodeURIComponent(string.sub(k, 1, pos - 1)) }
 			k = string.sub(k, pos)
 			while wstring.sub(k, 1, 1) == '[' do
 				pos = wstring.find(k, ']') or (string.len(k) + 1)
-				table.insert(ks, DecodeURLString(string.sub(k, 2, pos - 1)))
+				table.insert(ks, DecodeURIComponent(string.sub(k, 2, pos - 1)))
 				k = string.sub(k, pos + 1)
 			end
-			X.Set(data, ks, DecodeURLString(v))
+			X.Set(data, ks, DecodeURIComponent(v))
 		else
-			data[DecodeURLString(k)] = DecodeURLString(v)
+			data[DecodeURIComponent(k)] = DecodeURIComponent(v)
 		end
 	end
 	return data
