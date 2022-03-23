@@ -163,7 +163,7 @@ function X.Ajax(settings)
 		end
 	end
 	if (method == 'get' or method == 'delete') and xdata then
-		local data = X.EncodePostData(xdata)
+		local data = X.EncodeQuerystring(xdata)
 		if data ~= '' then
 			if not wstring.find(xurl, '?') then
 				xurl = xurl .. '?'
@@ -183,9 +183,9 @@ function X.Ajax(settings)
 		local pos = wstring.find(xurl, '?')
 		if pos then
 			xurl = string.sub(xurl, 1, pos)
-				.. X.EncodePostData(
+				.. X.EncodeQuerystring(
 					X.SignPostData(
-						X.DecodePostData(string.sub(xurl, pos + 1)),
+						X.DecodeQuerystring(string.sub(xurl, pos + 1)),
 						config.signature
 					)
 				)

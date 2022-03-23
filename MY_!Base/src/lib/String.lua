@@ -181,7 +181,7 @@ local function UrlDecode(data)
 end
 X.UrlDecode = UrlDecode
 
-local function EncodePostData(t, prefix, data)
+local function EncodeQuerystring(t, prefix, data)
 	if type(data) == 'table' then
 		local first = true
 		for k, v in pairs(data) do
@@ -192,9 +192,9 @@ local function EncodePostData(t, prefix, data)
 			end
 			k = UrlEncodeString(tostring(k))
 			if prefix == '' then
-				EncodePostData(t, k, v)
+				EncodeQuerystring(t, k, v)
 			else
-				EncodePostData(t, prefix .. '[' .. k .. ']', v)
+				EncodeQuerystring(t, prefix .. '[' .. k .. ']', v)
 			end
 		end
 	else
@@ -210,14 +210,14 @@ end
 -- 将 POST 数据键值对转换为 application/x-www-form-urlencoded 主体数据字符串
 -- @param {table} data POST 数据键值对
 -- @return {string} 主体数据字符串
-function X.EncodePostData(data)
-	return table.concat(EncodePostData({}, '', data))
+function X.EncodeQuerystring(data)
+	return table.concat(EncodeQuerystring({}, '', data))
 end
 
 -- 将 application/x-www-form-urlencoded 主体数据字符串转换为 POST 数据键值对
 -- @param {string} 主体数据字符串
 -- @return {table} data POST 数据键值对
-function X.DecodePostData(s)
+function X.DecodeQuerystring(s)
 	local data = {}
 	for _, kvp in ipairs(X.SplitString(s, '&', true)) do
 		kvp = X.SplitString(kvp, '=', true)
