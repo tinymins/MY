@@ -454,7 +454,16 @@ function X.Ajax(settings)
 		szKey = AJAX_TAG .. szKey
 		local ssl = xurl:sub(1, 6) == 'https:'
 		if method == 'post' then
-			CURL_HttpPost(szKey, xurl, xdata or '', ssl, config.timeout)
+			local data = xdata
+			if X.IsTable(xdata) then
+				data = {}
+				for _, kvp in ipairs(X.SplitString(X.EncodeQuerystring(xdata), '&', true)) do
+					kvp = X.SplitString(kvp, '=')
+					local k, v = kvp[1], kvp[2]
+					data[X.DecodeURIComponent(k)] = X.DecodeURIComponent(v)
+				end
+			end
+			CURL_HttpPost(szKey, xurl, data or '', ssl, config.timeout)
 		else
 			CURL_HttpRqst(szKey, xurl, ssl, config.timeout)
 		end
