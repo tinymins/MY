@@ -94,7 +94,7 @@ local function QueryData(szQues)
 				q = AnsiToUTF8(szQues),
 			})),
 		success = function(html, status)
-			local res = X.JsonDecode(html)
+			local res = X.DecodeJSON(html)
 			if not res or not IsCurrentQuestion(res.ques) then
 				return
 			end
@@ -149,11 +149,11 @@ function D.SubmitData(tExamData, bAllRight)
 			.. X.EncodePostData(X.UrlEncode(X.SignPostData({
 				l = AnsiToUTF8(GLOBAL.GAME_LANG),
 				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-				data = X.JsonEncode(data),
+				data = X.EncodeJSON(data),
 				perfect = bAllRight and 1 or 0,
 			}, X.SECRET.EXAM_UPLOADS))),
 		success = function(html, status)
-			local res = X.JsonDecode(html)
+			local res = X.DecodeJSON(html)
 			if X.IsRestricted('MY_ExamTip') or not res then
 				return
 			end

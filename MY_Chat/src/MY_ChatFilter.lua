@@ -108,7 +108,7 @@ X.HookChatPanel('FILTER', 'MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 		end
 		for _, element in ipairs(aSay) do
 			if element.type == 'eventlink' and element.name == '' then
-				local data = X.JsonDecode(element.linkinfo)
+				local data = X.DecodeJSON(element.linkinfo)
 				if data and data.uuid then
 					local szUUID = data.uuid
 					if szUUID then

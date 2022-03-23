@@ -55,7 +55,7 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 		url = szURL,
 		charset = 'utf8',
 		success = function(szHTML)
-			local res = X.JsonDecode(szHTML)
+			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then
 				X.SafeCall(resolve)
 			else

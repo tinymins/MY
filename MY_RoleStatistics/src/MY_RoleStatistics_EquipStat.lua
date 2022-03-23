@@ -405,7 +405,7 @@ function D.FlushDB()
 					uiid = KItem.nUiId
 					strength = KItem.nStrengthLevel
 					durability = KItem.nCurrentDurability
-					diamond_enchant = AnsiToUTF8(X.JsonEncode(aDiamondEnchant)) -- 五行石
+					diamond_enchant = AnsiToUTF8(X.EncodeJSON(aDiamondEnchant)) -- 五行石
 					fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and KItem.GetMountFEAEnchantID() or 0 -- 五彩石
 					permanent_enchant = KItem.dwPermanentEnchantID -- 附魔
 					desc = AnsiToUTF8(X.GetItemTip(KItem) or '')
@@ -430,7 +430,7 @@ function D.FlushDB()
 	ownerlevel = me.nLevel
 	ownersuitindex = me.GetEquipIDArray(0) + 1
 	ownerscore[ownersuitindex] = me.GetTotalEquipScore() or 0
-	ownerextra = AnsiToUTF8(X.JsonEncode({
+	ownerextra = AnsiToUTF8(X.EncodeJSON({
 		waist = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwWaistItemIndex) },
 		back = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwBackItemIndex) },
 		face = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwFaceItemIndex) },
@@ -503,7 +503,7 @@ function D.UpdateNames(page)
 				rec[k] = UTF8ToAnsi(v)
 			end
 		end
-		rec.ownerextra = X.JsonDecode(rec.extra or '') or {}
+		rec.ownerextra = X.DecodeJSON(rec.extra or '') or {}
 	end
 	if result[1] and not lodash.some(result, function(r) return r.ownerkey == D.szCurrentOwnerKey end) then
 		D.szCurrentOwnerKey = result[1].ownerkey
@@ -574,7 +574,7 @@ function D.UpdateItems(page)
 			if X.IsString(v) then
 				rec[k] = UTF8ToAnsi(v)
 			end
-			rec.diamond_enchant = X.JsonDecode(rec.diamond_enchant) or {}
+			rec.diamond_enchant = X.DecodeJSON(rec.diamond_enchant) or {}
 		end
 		tResult[rec.boxindex] = rec
 	end

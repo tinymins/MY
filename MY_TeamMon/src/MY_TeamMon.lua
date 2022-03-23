@@ -1934,7 +1934,7 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 			szPath = szPath .. '.' .. szFormat:lower():sub(6)
 		end
 		szPath = szPath .. '.json'
-		SaveDataToFile(X.JsonEncode(data, szFormat == 'JSON_FORMATED'), szPath)
+		SaveDataToFile(X.EncodeJSON(data, szFormat == 'JSON_FORMATED'), szPath)
 	else
 		if szFormat ~= 'LUA' then
 			szPath = szPath .. '.' .. szFormat:lower():sub(5)

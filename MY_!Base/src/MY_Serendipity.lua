@@ -91,7 +91,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 			X.EnsureAjax({ url = 'https://serendipity.uploads.j3cx.com/api/serendipity/uploads?'
 				.. 'l=' .. AnsiToUTF8(GLOBAL.GAME_LANG)
 				.. '&L=' .. AnsiToUTF8(GLOBAL.GAME_EDITION)
-				.. '&data=' .. X.EncryptString(X.JsonEncode({
+				.. '&data=' .. X.EncryptString(X.EncodeJSON({
 					S = szRegionU, s = szServerU, a = szSerendipityU,
 					n = szNameU, N = szNameCRC, R = szReporterU,
 					f = eStatus, t = dwTime, c = nCount, m = nMethod,

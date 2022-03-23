@@ -115,7 +115,7 @@ function D.Migration()
 				for _, dwMapID in ipairs(GetMapList()) do
 					local data = X.LoadLUAData({DB_V1_ROOT .. dwMapID .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 					if type(data) == 'string' then
-						data = X.JsonDecode(data)
+						data = X.DecodeJSON(data)
 					end
 					if data then
 						for _, p in ipairs(data.Npc) do

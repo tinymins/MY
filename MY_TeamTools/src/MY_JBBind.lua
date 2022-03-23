@@ -46,7 +46,7 @@ function D.FetchBindStatus(resolve, reject)
 			charset = 'utf8',
 			success = function(szHTML)
 				O.pending = false
-				local res = X.JsonDecode(szHTML)
+				local res = X.DecodeJSON(szHTML)
 				if X.Get(res, {'code'}) == 0 then
 					O.uid = X.Get(res, {'data', 'uid'})
 					X.SafeCall(resolve, O.uid)
@@ -89,7 +89,7 @@ function D.Bind(szToken, resolve, reject)
 		url = szURL,
 		charset = 'utf8',
 		success = function(szHTML)
-			local res = X.JsonDecode(szHTML)
+			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then
 				O.uid = nil
 				X.SafeCall(resolve, O.uid)
@@ -113,7 +113,7 @@ function D.Unbind(resolve, reject)
 		url = szURL,
 		charset = 'utf8',
 		success = function(szHTML)
-			local res = X.JsonDecode(szHTML)
+			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then
 				O.uid = nil
 				X.SafeCall(resolve)

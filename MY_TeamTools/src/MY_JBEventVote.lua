@@ -78,7 +78,7 @@ function D.FetchEventList(frame)
 			}, X.SECRET.EVENT_LIST))),
 		charset = 'utf8',
 		success = function(szHTML)
-			local res, err = X.JsonDecode(szHTML)
+			local res, err = X.DecodeJSON(szHTML)
 			if not res then
 				X.Alert(_L['ERR: Decode eventlist content as json failed!'] .. err)
 				Wnd.CloseWindow(frame)
@@ -152,7 +152,7 @@ function D.FetchRankList(frame, szEventID)
 			}, X.SECRET.RANK_LIST))),
 		charset = 'utf8',
 		success = function(szHTML)
-			local res, err = X.JsonDecode(szHTML)
+			local res, err = X.DecodeJSON(szHTML)
 			if not res then
 				X.Alert(_L['ERR: Decode rankdata content as json failed!'] ..err)
 				return
@@ -246,7 +246,7 @@ function D.Vote(frame, szEventID, szTeamID)
 			}, X.SECRET.RANK_VOTE))),
 		charset = 'utf8',
 		success = function(szHTML)
-			local res, err = X.JsonDecode(szHTML)
+			local res, err = X.DecodeJSON(szHTML)
 			if not res then
 				X.Alert(_L['ERR: Decode vote content as json failed!'] ..err)
 				return

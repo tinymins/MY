@@ -288,7 +288,7 @@ function PS.OnPanelActive(wnd)
 						q = AnsiToUTF8(D.szJokeSearch or ''),
 					}, X.SECRET.JOKE_RANDOM))),
 				success = function(html, status)
-					local res = X.JsonDecode(html)
+					local res = X.DecodeJSON(html)
 					if X.IsTable(res) then
 						ui:Fetch('WndEditBox_JokeText'):Text(res.data.content)
 					end
@@ -331,7 +331,7 @@ function PS.OnPanelActive(wnd)
 							jx3id = bAnonymous and '' or AnsiToUTF8(X.GetClientUUID()),
 						}, X.SECRET.JOKE))),
 					success = function(html, status)
-						local res = X.JsonDecode(html)
+						local res = X.DecodeJSON(html)
 						if X.IsTable(res) then
 							X.Alert(X.ReplaceSensitiveWord(res.msg))
 						else

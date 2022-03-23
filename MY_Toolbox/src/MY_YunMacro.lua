@@ -69,7 +69,7 @@ function D.Hook()
 						name = AnsiToUTF8(szName),
 					})),
 				success = function(szHTML)
-					local res, err = X.JsonDecode(szHTML)
+					local res, err = X.DecodeJSON(szHTML)
 					if res then
 						local bValid, szErrID, nLine, szErrMsg = X.IsMacroValid(res.data)
 						if bValid then

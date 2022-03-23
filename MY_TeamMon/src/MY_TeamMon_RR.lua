@@ -373,7 +373,7 @@ function D.FetchMetaInfo(szURL, onSuccess, onError)
 		url = szURL,
 		charset = 'utf8',
 		success = function(szHTML)
-			local res, err = X.JsonDecode(szHTML)
+			local res, err = X.DecodeJSON(szHTML)
 			if not res then
 				X.SafeCall(onError, _L['ERR: Decode info content as json failed!'])
 				return
@@ -441,7 +441,7 @@ function D.FetchRepoMetaInfoList(nPage)
 			})),
 		charset = 'utf8',
 		success = function(szHTML)
-			local res = X.JsonDecode(szHTML)
+			local res = X.DecodeJSON(szHTML)
 			local errs = X.Schema.CheckSchema(res, META_LIST_JSON_SCHEMA)
 			if errs then
 				local aErrmsgs = {}

@@ -328,7 +328,7 @@ function MY_Anmerkungen.LoadConfig()
 	if IsLocalFileExist(szFilePath) then
 		local data = X.LoadLUAData(szFilePath) or {}
 		if type(data) == 'string' then
-			data = X.JsonDecode(data)
+			data = X.DecodeJSON(data)
 		end
 		for k, v in pairs(data) do
 			if type(v) == 'table' then
@@ -358,7 +358,7 @@ function MY_Anmerkungen.LoadConfig()
 	if IsLocalFileExist(szFilePath) then
 		local data = X.LoadLUAData(szFilePath) or {}
 		if type(data) == 'string' then
-			data = X.JsonDecode(data)
+			data = X.DecodeJSON(data)
 		end
 		for k, v in pairs(data) do
 			if type(v) == 'table' then

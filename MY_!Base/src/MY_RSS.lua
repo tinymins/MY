@@ -63,7 +63,7 @@ X.RegisterInit('MY_RSS', function()
 				.. '&L=' .. AnsiToUTF8(GLOBAL.GAME_EDITION)
 				.. '&_=' .. GetCurrentTime(),
 			success = function(html, status)
-				RSS_DATA = X.JsonDecode(html)
+				RSS_DATA = X.DecodeJSON(html)
 				if X.IsTable(RSS_DATA) and not X.IsNumber(RSS_DATA.EXPIRES) then
 					local year, month, day, hour, minute, second = X.TimeToDate(GetCurrentTime())
 					if hour >= 7 then

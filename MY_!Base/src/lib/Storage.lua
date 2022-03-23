@@ -1132,7 +1132,7 @@ do
 -- chat blocklist (working on)
 -------------------------------
 local function FormatStorageData(me, d)
-	return X.EncryptString(X.ConvertToUTF8(X.JsonEncode({
+	return X.EncryptString(X.ConvertToUTF8(X.EncodeJSON({
 		g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
 		n = X.GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
 		S = X.GetRealServer(1), s = X.GetRealServer(2), r = me.nRoleType,
@@ -1163,7 +1163,7 @@ X.BreatheCall(X.NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 			data = FormatStorageData(me),
 		},
 		success = function(html, status)
-			local data = X.JsonDecode(html)
+			local data = X.DecodeJSON(html)
 			if data then
 				for k, v in pairs(data.public or CONSTANT.EMPTY_TABLE) do
 					local oData = X.DecodeLUAData(v)
@@ -1217,7 +1217,7 @@ function X.StorageData(szKey, oData)
 				data = FormatStorageData(me, { k = szKey, o = oData }),
 			},
 			success = function(html, status)
-				local data = X.JsonDecode(html)
+				local data = X.DecodeJSON(html)
 				if data and data.succeed then
 					FireUIEvent('MY_PRIVATE_STORAGE_SYNC', szKey)
 				end

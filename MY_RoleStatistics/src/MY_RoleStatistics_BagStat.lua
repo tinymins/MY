@@ -434,7 +434,7 @@ function D.ItemToData(KItem, szBagType)
 		uiid = KItem.nUiId
 		strength = KItem.nStrengthLevel
 		durability = KItem.nCurrentDurability
-		diamond_enchant = AnsiToUTF8(X.JsonEncode(aDiamondEnchant)) -- 五行石
+		diamond_enchant = AnsiToUTF8(X.EncodeJSON(aDiamondEnchant)) -- 五行石
 		fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and KItem.GetMountFEAEnchantID() or 0 -- 五彩石
 		permanent_enchant = KItem.dwPermanentEnchantID -- 附魔
 		desc = AnsiToUTF8(X.GetItemTip(KItem) or '')

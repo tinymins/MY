@@ -80,7 +80,7 @@ X.RegisterEvent('MY_RSS_UPDATE', function()
 			for i = 0, p.argc - 1 do
 				argv[i + 1] = _G['arg' .. i]
 			end
-			local szArgs = X.JsonEncode(argv)
+			local szArgs = X.EncodeJSON(argv)
 			X.EnsureAjax({
 				url = 'https://push.j3cx.com/api/share-event?'
 					.. X.EncodePostData(X.UrlEncode(X.SignPostData({
@@ -177,7 +177,7 @@ MY_RSS.RegisterAdapter('share-ui', function(data)
 			local err = X.Schema.CheckSchema(v, SCHEMA)
 			if not err then
 				table.insert(t, {
-					id = X.JsonEncode({v[2], v[3]}),
+					id = X.EncodeJSON({v[2], v[3]}),
 					key = v[1],
 					path = v[2],
 					dataTranslator = v[3],
@@ -262,7 +262,7 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 			end
 		end
 		if not X.IsNil(data) then
-			local szContent = X.IsString(data) and data or X.JsonEncode(data)
+			local szContent = X.IsString(data) and data or X.EncodeJSON(data)
 			if CACHE[v.id] ~= szContent then
 				X.EnsureAjax({
 					url = 'https://push.j3cx.com/api/share-ui?'
