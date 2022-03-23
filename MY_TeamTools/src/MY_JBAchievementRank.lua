@@ -92,37 +92,28 @@ X.RegisterEvent('SYS_MSG', function()
 end)
 
 function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
-	local szServerU = AnsiToUTF8(p.szServer)
-	local szNameU = AnsiToUTF8(p.szName)
-	local szLeaderU = AnsiToUTF8(p.szLeader)
-	local szTeammateU = AnsiToUTF8(p.szTeammate)
-	local szClientGUIDU = AnsiToUTF8(p.szClientGUID)
-	local szFightUUIDU = AnsiToUTF8(p.szFightUUID)
-	local szURL = 'https://push.j3cx.com/api/achievement-rank/uploads?'
-		.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-			l = AnsiToUTF8(GLOBAL.GAME_LANG),
-			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-			server = szServerU,
-			name = szNameU,
-			leader = szLeaderU,
-			teammate = szTeammateU,
-			guid = szClientGUIDU,
+	local tConfig = {
+		driver = 'auto', mode = 'auto', method = 'auto',
+		url = 'https://push.j3cx.com/api/achievement-rank/uploads',
+		data = {
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			server = p.szServer,
+			name = p.szName,
+			leader = p.szLeader,
+			teammate = p.szTeammate,
+			guid = p.szClientGUID,
 			achieve = p.dwAchieveID,
 			time = p.dwTime,
 			fightBegin = p.dwFightBeginTime,
 			fightDuring = p.nFightTime,
-			fightUUID = szFightUUIDU,
+			fightUUID = p.szFightUUID,
 			damage = p.dwDamage,
 			therapy = p.dwTherapy,
 			roleType = p.nRoleType,
 			onymous = bOnymous and 1 or 0,
-		}, X.SECRET.ACHIEVEMENT_RANK_UPLOADS)))
-	--[[#DEBUG BEGIN]]
-	X.Debug(szURL, X.DEBUG_LEVEL.LOG)
-	--[[#DEBUG END]]
-	local tConfig = {
-		url = szURL,
-		driver = 'auto', mode = 'auto', method = 'auto',
+		},
+		signature = X.SECRET.ACHIEVEMENT_RANK_UPLOADS,
 		fulfilled = onfulfilled,
 		complete = oncomplete,
 	}
@@ -207,7 +198,7 @@ function D.UpdateMapBossAchieveAcquire()
 	end
 	--[[#DEBUG BEGIN]]
 	if not X.IsEmpty(tBossAchieveAcquireState) then
-		X.Debug('Current map boss achieve: ' .. X.EncodePostData(tBossAchieveAcquireState) .. '.', X.DEBUG_LEVEL.LOG)
+		X.Debug('Current map boss achieve: ' .. X.EncodeQuerystring(tBossAchieveAcquireState) .. '.', X.DEBUG_LEVEL.LOG)
 	end
 	--[[#DEBUG END]]
 	BOSS_ACHIEVE_ACQUIRE_STATE = tBossAchieveAcquireState

@@ -432,13 +432,13 @@ end
 function D.FetchRepoMetaInfoList(nPage)
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
-		url = 'https://pull.j3cx.com/api/dbm/subscribe/all?'
-			.. X.EncodePostData(X.UrlEncode({
-				l = AnsiToUTF8(GLOBAL.GAME_LANG),
-				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-				page = nPage or REPO_META_PAGE.nIndex,
-				pageSize = 15,
-			})),
+		url = 'https://pull.j3cx.com/api/dbm/subscribe/all',
+		data = {
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			page = nPage or REPO_META_PAGE.nIndex,
+			pageSize = 15,
+		},
 		charset = 'utf8',
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
@@ -457,11 +457,12 @@ function D.FetchRepoMetaInfoList(nPage)
 			}
 			local aMetaInfo = {}
 			for _, info in ipairs(res.data) do
-				info.url = 'https://pull.j3cx.com/api/dbm/feed?'.. X.EncodePostData(X.UrlEncode({
-					l = AnsiToUTF8(GLOBAL.GAME_LANG),
-					L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-					key = AnsiToUTF8(info.key),
-				}))
+				info.url = 'https://pull.j3cx.com/api/dbm/feed?'
+					.. X.EncodeQuerystring(X.ConvertToUTF8({
+						l = GLOBAL.GAME_LANG,
+						L = GLOBAL.GAME_EDITION,
+						key = info.key,
+					}))
 				info = D.FormatMetaInfo(info)
 				if info then
 					info.bEmbedded = true

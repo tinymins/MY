@@ -88,10 +88,10 @@ local function QueryData(szQues)
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/exam?'
-			.. X.EncodePostData(X.UrlEncode({
-				l = AnsiToUTF8(GLOBAL.GAME_LANG),
-				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-				q = AnsiToUTF8(szQues),
+			.. X.EncodeQuerystring(X.ConvertToUTF8({
+				l = GLOBAL.GAME_LANG,
+				L = GLOBAL.GAME_EDITION,
+				q = szQues,
 			})),
 		success = function(html, status)
 			local res = X.DecodeJSON(html)
@@ -145,13 +145,14 @@ function D.SubmitData(tExamData, bAllRight)
 	end
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
-		url = 'https://push.j3cx.com/api/exam/uploads?'
-			.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-				l = AnsiToUTF8(GLOBAL.GAME_LANG),
-				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-				data = X.EncodeJSON(data),
-				perfect = bAllRight and 1 or 0,
-			}, X.SECRET.EXAM_UPLOADS))),
+		url = 'https://push.j3cx.com/api/exam/uploads',
+		data = {
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			data = X.EncodeJSON(data),
+			perfect = bAllRight and 1 or 0,
+		},
+		signature = X.SECRET.EXAM_UPLOADS,
 		success = function(html, status)
 			local res = X.DecodeJSON(html)
 			if X.IsRestricted('MY_ExamTip') or not res then

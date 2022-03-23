@@ -82,17 +82,18 @@ X.RegisterEvent('MY_RSS_UPDATE', function()
 			end
 			local szArgs = X.EncodeJSON(argv)
 			X.EnsureAjax({
-				url = 'https://push.j3cx.com/api/share-event?'
-					.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-						l = AnsiToUTF8(GLOBAL.GAME_LANG),
-						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-						region = AnsiToUTF8(X.GetRealServer(1)), -- Region
-						server = AnsiToUTF8(X.GetRealServer(2)), -- Server
-						event = AnsiToUTF8(p.name), -- Event
-						args = AnsiToUTF8(szArgs), -- Arguments
-						time = GetCurrentTime(), -- Time
-					}, X.SECRET.SHARE_EVENT)))
-				})
+				url = 'https://push.j3cx.com/api/share-event',
+				data = {
+					l = GLOBAL.GAME_LANG,
+					L = GLOBAL.GAME_EDITION,
+					region = X.GetRealServer(1),
+					server = X.GetRealServer(2),
+					event = p.name,
+					args = szArgs,
+					time = GetCurrentTime(),
+				},
+				signature = X.SECRET.SHARE_EVENT,
+			})
 			NEXT_AWAKE_TIME = GetTime() + FREQUENCY_LIMIT
 		end)
 		CURRENT_EVENT[p.name] = true
@@ -265,16 +266,17 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 			local szContent = X.IsString(data) and data or X.EncodeJSON(data)
 			if CACHE[v.id] ~= szContent then
 				X.EnsureAjax({
-					url = 'https://push.j3cx.com/api/share-ui?'
-						.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-							l = AnsiToUTF8(GLOBAL.GAME_LANG),
-							L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-							region = AnsiToUTF8(X.GetRealServer(1)),
-							server = AnsiToUTF8(X.GetRealServer(2)),
-							key = AnsiToUTF8(v.key),
-							content = AnsiToUTF8(szContent),
-							time = GetCurrentTime(),
-						}, X.SECRET.SHARE_UI))),
+					url = 'https://push.j3cx.com/api/share-ui',
+					data = {
+						l = GLOBAL.GAME_LANG,
+						L = GLOBAL.GAME_EDITION,
+						region = X.GetRealServer(1),
+						server = X.GetRealServer(2),
+						key = v.key,
+						content = szContent,
+						time = GetCurrentTime(),
+					},
+					signature = X.SECRET.SHARE_UI,
 				})
 				CACHE[v.id] = szContent
 				break
@@ -327,23 +329,24 @@ X.RegisterEvent('OPEN_WINDOW', 'MY_ShareKnowledge__Npc', function()
 	local szDelayID
 	local function fnAction(line)
 		X.EnsureAjax({
-			url = 'https://push.j3cx.com/api/share-npc-chat?'
-				.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-					l = AnsiToUTF8(GLOBAL.GAME_LANG),
-					L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-					r = AnsiToUTF8(X.GetRealServer(1)), -- Region
-					s = AnsiToUTF8(X.GetRealServer(2)), -- Server
-					c = AnsiToUTF8(szContent), -- Content
-					t = GetCurrentTime(), -- Time
-					cn = line and AnsiToUTF8(line.szCenterName) or '', -- Center Name
-					ci = line and line.dwCenterID or -1, -- Center ID
-					li = line and line.nLineIndex or -1, -- Line Index
-					mi = map and map.dwID, -- Map ID
-					mn = map and AnsiToUTF8(map.szName), -- Map Name
-					nt = npc.dwTemplateID, -- NPC Template ID
-					nn = X.GetObjectName(npc), -- NPC Name
-				}, X.SECRET.SHARE_NPC_CHAT)))
-			})
+			url = 'https://push.j3cx.com/api/share-npc-chat',
+			data = {
+				l = GLOBAL.GAME_LANG,
+				L = GLOBAL.GAME_EDITION,
+				r = X.GetRealServer(1),
+				s = X.GetRealServer(2),
+				t = GetCurrentTime(),
+				c = szContent,
+				cn = line and line.szCenterName or '', -- Center Name
+				ci = line and line.dwCenterID or -1, -- Center ID
+				li = line and line.nLineIndex or -1, -- Line Index
+				mi = map and map.dwID, -- Map ID
+				mn = map and map.szName, -- Map Name
+				nt = npc.dwTemplateID, -- NPC Template ID
+				nn = X.GetObjectName(npc), -- NPC Name
+			},
+			signature = X.SECRET.SHARE_NPC_CHAT,
+		})
 		X.DelayCall(szDelayID, false)
 	end
 	szDelayID = X.DelayCall(5000, fnAction)
@@ -403,16 +406,17 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_ShareKnowledge__Sysmsg', function(szChannel,
 	for _, szPattern in ipairs(rss) do
 		if string.find(szMsg, szPattern) then
 			X.EnsureAjax({
-				url = 'https://push.j3cx.com/api/share-sysmsg?'
-					.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-						l = AnsiToUTF8(GLOBAL.GAME_LANG),
-						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-						region = AnsiToUTF8(X.GetRealServer(1)), -- Region
-						server = AnsiToUTF8(X.GetRealServer(2)), -- Server
-						content = AnsiToUTF8(szMsg), -- Content
-						time = GetCurrentTime(), -- Time
-					}, X.SECRET.SHARE_SYSMSG)))
-				})
+				url = 'https://push.j3cx.com/api/share-sysmsg',
+				data = {
+					l = GLOBAL.GAME_LANG,
+					L = GLOBAL.GAME_EDITION,
+					region = X.GetRealServer(1),
+					server = X.GetRealServer(2),
+					content = szMsg,
+					time = GetCurrentTime(),
+				},
+				signature = X.SECRET.SHARE_SYSMSG,
+			})
 			break
 		end
 	end

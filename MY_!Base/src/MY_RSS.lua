@@ -59,8 +59,8 @@ X.RegisterInit('MY_RSS', function()
 		X.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
 			url = 'https://pull.j3cx.com/config/all'
-				.. '?l=' .. AnsiToUTF8(GLOBAL.GAME_LANG)
-				.. '&L=' .. AnsiToUTF8(GLOBAL.GAME_EDITION)
+				.. '?l=' .. GLOBAL.GAME_LANG
+				.. '&L=' .. GLOBAL.GAME_EDITION
 				.. '&_=' .. GetCurrentTime(),
 			success = function(html, status)
 				RSS_DATA = X.DecodeJSON(html)

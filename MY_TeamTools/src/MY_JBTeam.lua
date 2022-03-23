@@ -35,24 +35,22 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 		return
 	end
 	local me = GetClientPlayer()
-	local szURL = 'https://push.j3cx.com/team/'
-		.. (szAction == 'join' and 'join' or 'quit')
-		.. '?'
-		.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-			l = AnsiToUTF8(GLOBAL.GAME_LANG),
-			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-			team = AnsiToUTF8(szTeam),
-			cguid = X.GetClientGUID(),
-			jx3id = AnsiToUTF8(X.GetClientUUID()),
-			server = AnsiToUTF8(X.GetRealServer(2)),
-			id = AnsiToUTF8(dwID),
-			name = AnsiToUTF8(X.GetUserRoleName()),
-			mount = me.GetKungfuMount().dwMountType,
-			body_type = me.nRoleType,
-		}, szAction == 'join' and X.SECRET.TEAM_JOIN or X.SECRET.TEAM_QUIT)))
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
-		url = szURL,
+		url = 'https://push.j3cx.com/team/' .. (szAction == 'join' and 'join' or 'quit'),
+		data = {
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			team = szTeam,
+			cguid = X.GetClientGUID(),
+			jx3id = X.GetClientUUID(),
+			server = X.GetRealServer(2),
+			id = dwID,
+			name = X.GetUserRoleName(),
+			mount = me.GetKungfuMount().dwMountType,
+			body_type = me.nRoleType,
+		},
+		signature = szAction == 'join' and X.SECRET.TEAM_JOIN or X.SECRET.TEAM_QUIT,
 		charset = 'utf8',
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)

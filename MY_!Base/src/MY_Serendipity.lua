@@ -70,9 +70,8 @@ end
 
 function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTime, szMode)
 	local szKey = szName .. '_' .. szSerendipity .. '_' .. dwTime
-	local szRegionU = AnsiToUTF8((X.GetRealServer(1)))
-	local szServerU = AnsiToUTF8((X.GetRealServer(2)))
-	local szSerendipityU = AnsiToUTF8(szSerendipity)
+	local szRegion = X.GetRealServer(1)
+	local szServer = X.GetRealServer(2)
 	local bSelf = szName == X.GetClientInfo().szName
 	local szNameU = AnsiToUTF8(szName)
 	local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
@@ -80,30 +79,33 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 	local function fnAction(szReporter)
 		if szReporter == '' and nMethod ~= 1 then
 			szName = ''
-			szNameU = ''
 		end
-		local szReporterU = AnsiToUTF8(szReporter)
 		local function DoUpload()
 			--[[#DEBUG BEGIN]]
 			X.Debug('Prepare for uploading serendipity ' .. szSerendipity .. ' by '
 				.. szName .. '#' .. szNameCRC .. ' via ' .. szReporter, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
-			X.EnsureAjax({ url = 'https://serendipity.uploads.j3cx.com/api/serendipity/uploads?'
-				.. 'l=' .. AnsiToUTF8(GLOBAL.GAME_LANG)
-				.. '&L=' .. AnsiToUTF8(GLOBAL.GAME_EDITION)
-				.. '&data=' .. X.EncryptString(X.EncodeJSON({
-					S = szRegionU, s = szServerU, a = szSerendipityU,
-					n = szNameU, N = szNameCRC, R = szReporterU,
+			X.EnsureAjax({
+				url = 'https://serendipity.uploads.j3cx.com/api/serendipity/uploads?'
+					.. 'l=' .. GLOBAL.GAME_LANG
+					.. '&L=' .. GLOBAL.GAME_EDITION,
+				data = X.EncryptString(X.EncodeJSON(X.ConvertToUTF8({
+					S = szRegion, s = szServer, a = szSerendipity,
+					n = szName, N = szNameCRC, R = szReporter,
 					f = eStatus, t = dwTime, c = nCount, m = nMethod,
-				})) })
-			X.EnsureAjax({ url = 'https://push.j3cx.com/api/serendipity/uploads?'
-				.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-					l = AnsiToUTF8(GLOBAL.GAME_LANG),
-					L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-					S = szRegionU, s = szServerU, a = szSerendipityU,
-					n = szNameU, N = szNameCRC, R = szReporterU,
+				}))),
+			})
+			X.EnsureAjax({
+				url = 'https://push.j3cx.com/api/serendipity/uploads',
+				data = {
+					l = GLOBAL.GAME_LANG,
+					L = GLOBAL.GAME_EDITION,
+					S = szRegion, s = szServer, a = szSerendipity,
+					n = szName, N = szNameCRC, R = szReporter,
 					f = eStatus, t = dwTime, c = nCount, m = nMethod,
-				}, X.SECRET.SERENDIPITY_UPLOADS))) })
+				},
+				signature = X.SECRET.SERENDIPITY_UPLOADS,
+			})
 		end
 		if szMode == 'manual' or nMethod ~= 1 then
 			DoUpload()

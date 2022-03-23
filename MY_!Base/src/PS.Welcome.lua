@@ -136,17 +136,17 @@ function PS.OnPanelActive(wnd)
 		name = 'WndButton_SerendipitySearch',
 		text = _L['serendipity'],
 		onclick = function()
-			local szRegionU = AnsiToUTF8((X.GetRealServer(1)))
-			local szServerU = AnsiToUTF8((X.GetRealServer(2)))
-			local szNameU = AnsiToUTF8(X.GetClientInfo().szName)
+			local szNameU = AnsiToUTF8()
 			local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
 			UI.OpenBrowser(
 				'https://j3cx.com/serendipity/?'
-					.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-						l = AnsiToUTF8(GLOBAL.GAME_LANG),
-						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-						S = szRegionU, s = szServerU,
-						n = szNameU, N = szNameCRC,
+					.. X.EncodeQuerystring(X.SignPostData(X.ConvertToUTF8({
+						l = GLOBAL.GAME_LANG,
+						L = GLOBAL.GAME_EDITION,
+						S = X.GetRealServer(1),
+						s = X.GetRealServer(2),
+						n = X.GetClientInfo().szName,
+						N = szNameCRC,
 					}, X.SECRET.SERENDIPITY))),
 				{ openurl = 'https://j3cx.com/serendipity', controls = false })
 		end,

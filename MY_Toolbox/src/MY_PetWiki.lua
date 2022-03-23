@@ -58,10 +58,10 @@ function D.Open(dwPetIndex)
 		return
 	end
 	local szURL = 'https://page.j3cx.com/pet/' .. dwPetIndex .. '?'
-		.. X.EncodePostData(X.UrlEncode({
-			l = AnsiToUTF8(GLOBAL.GAME_LANG),
-			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-			player = AnsiToUTF8(GetUserRoleName()),
+		.. X.EncodeQuerystring(X.ConvertToUTF8({
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			player = GetUserRoleName(),
 		}))
 	local szKey = 'PetsWiki_' .. dwPetIndex
 	local szTitle = tPet.szName .. ' - ' .. X.XMLGetPureText(tPet.szDesc)

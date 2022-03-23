@@ -68,11 +68,12 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 		table.insert(aPath, nBookID)
 	end
 	local szURL = 'https://page.j3cx.com/item/' .. table.concat(aPath, '/') .. '/price?'
-		.. X.EncodePostData(X.UrlEncode({
-			l = AnsiToUTF8(GLOBAL.GAME_LANG),
-			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-			server = AnsiToUTF8(line and line.szCenterName or X.GetRealServer(2)),
-			player = AnsiToUTF8(GetUserRoleName()), item = AnsiToUTF8(szName),
+		.. X.EncodeQuerystring(X.ConvertToUTF8({
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			server = line and line.szCenterName or X.GetRealServer(2),
+			player = GetUserRoleName(),
+			item = szName,
 		}))
 	local szKey = 'ItemPrice_' .. table.concat(aPath, '_')
 	local szTitle = szName
@@ -271,18 +272,16 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 			end
 			table.insert(aData, szKey .. '-' .. table.concat(aPrice, '-'))
 		end
-		local szData = table.concat(aData, ' ')
-		local szURL = 'https://push.j3cx.com/api/item/price?'
-			.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-				l = AnsiToUTF8(GLOBAL.GAME_LANG),
-				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-				r = AnsiToUTF8(X.GetRealServer(1)), -- Region
-				s = AnsiToUTF8(X.GetRealServer(2)), -- Server
-				t = GetCurrentTime(), -- Time
-				d = AnsiToUTF8(szData), -- Price data
-				dt = AnsiToUTF8(szPriceType), -- price type
-				ib = X.NumberBaseN(dwBaseID, 32),
-			}, X.SECRET.ITEM_PRICE)))
+		local data = {
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			r = X.GetRealServer(1),
+			s = X.GetRealServer(2),
+			t = GetCurrentTime(),
+			d = table.concat(aData, ' '), -- Price data
+			dt = szPriceType, -- Price type
+			ib = X.NumberBaseN(dwBaseID, 32),
+		}
 		-- 延迟一帧 否则系统还没更新界面数据
 		X.DelayCall(function()
 			local bValid = false
@@ -346,7 +345,7 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 			if not bValid then
 				return
 			end
-			X.Ajax({ driver = 'auto', mode = 'auto', method = 'auto', url = szURL })
+			X.Ajax({ driver = 'auto', mode = 'auto', method = 'auto', url = 'https://push.j3cx.com/api/item/price', data = data, signature = X.SECRET.ITEM_PRICE })
 		end)
 	end
 end)

@@ -56,19 +56,19 @@ function D.CreateSnapshot()
 		end
 	end
 	local me = GetClientPlayer()
-	local szURL = 'https://push.j3cx.com/team/snapshot?'
-		.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-			l = AnsiToUTF8(GLOBAL.GAME_LANG),
-			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-			team = AnsiToUTF8(O.szTeam),
-			cguid = X.GetClientGUID(),
-			jx3id = AnsiToUTF8(X.GetClientUUID()),
-			server = AnsiToUTF8(X.GetRealServer(2)),
-			teammate = AnsiToUTF8(table.concat(aTeammate, ';')),
-		}, X.SECRET.TEAM_SNAPSHOT)))
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
-		url = szURL,
+		url = 'https://push.j3cx.com/team/snapshot',
+		data = {
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			team = O.szTeam,
+			cguid = X.GetClientGUID(),
+			jx3id = X.GetClientUUID(),
+			server = X.GetRealServer(2),
+			teammate = table.concat(aTeammate, ';'),
+		},
+		signature = X.SECRET.TEAM_SNAPSHOT,
 		charset = 'utf8',
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)

@@ -70,12 +70,13 @@ local VOTE_SCHEMA = X.Schema.Record({
 function D.FetchEventList(frame)
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
-		url = 'https://pull.j3cx.com/event/list?'
-			.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-				l = AnsiToUTF8(GLOBAL.GAME_LANG),
-				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-				jx3id = AnsiToUTF8(X.GetClientUUID()),
-			}, X.SECRET.EVENT_LIST))),
+		url = 'https://pull.j3cx.com/event/list',
+		data = {
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			jx3id = X.GetClientUUID(),
+		},
+		signature = X.SECRET.EVENT_LIST,
 		charset = 'utf8',
 		success = function(szHTML)
 			local res, err = X.DecodeJSON(szHTML)
@@ -143,13 +144,14 @@ end
 function D.FetchRankList(frame, szEventID)
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
-		url = 'https://pull.j3cx.com/rank/list?'
-			.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-				l = AnsiToUTF8(GLOBAL.GAME_LANG),
-				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-				jx3id = AnsiToUTF8(X.GetClientUUID()),
-				event_id = szEventID,
-			}, X.SECRET.RANK_LIST))),
+		url = 'https://pull.j3cx.com/rank/list',
+		data = {
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			jx3id = X.GetClientUUID(),
+			event_id = szEventID,
+		},
+		signature = X.SECRET.RANK_LIST,
 		charset = 'utf8',
 		success = function(szHTML)
 			local res, err = X.DecodeJSON(szHTML)
@@ -236,14 +238,15 @@ end
 function D.Vote(frame, szEventID, szTeamID)
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
-		url = 'https://push.j3cx.com/rank/vote?'
-			.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-				l = AnsiToUTF8(GLOBAL.GAME_LANG),
-				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-				jx3id = AnsiToUTF8(X.GetClientUUID()),
-				event_id = szEventID,
-				team_id = szTeamID,
-			}, X.SECRET.RANK_VOTE))),
+		url = 'https://push.j3cx.com/rank/vote',
+		data = {
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			jx3id = X.GetClientUUID(),
+			event_id = szEventID,
+			team_id = szTeamID,
+		},
+		signature = X.SECRET.RANK_VOTE,
 		charset = 'utf8',
 		success = function(szHTML)
 			local res, err = X.DecodeJSON(szHTML)

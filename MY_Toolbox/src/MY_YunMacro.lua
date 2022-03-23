@@ -62,12 +62,12 @@ function D.Hook()
 			X.Alert('MY_YunMacro', _L['Macro update started, please keep panel opened and wait.'], nil, _L['Got it'])
 			X.Ajax({
 				driver = 'auto', mode = 'auto', method = 'auto',
-				url = 'https://pull.j3cx.com/api/macro/query?'
-					.. X.EncodePostData(X.UrlEncode({
-						l = AnsiToUTF8(GLOBAL.GAME_LANG),
-						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-						name = AnsiToUTF8(szName),
-					})),
+				url = 'https://pull.j3cx.com/api/macro/query',
+				data = {
+					l = GLOBAL.GAME_LANG,
+					L = GLOBAL.GAME_EDITION,
+					name = szName,
+				},
 				success = function(szHTML)
 					local res, err = X.DecodeJSON(szHTML)
 					if res then
@@ -114,10 +114,10 @@ function D.Hook()
 				return X.Alert(_L['Please input macro name first.'])
 			end
 			local szURL = 'https://page.j3cx.com/macro/details?'
-				.. X.EncodePostData(X.UrlEncode({
-					l = AnsiToUTF8(GLOBAL.GAME_LANG),
-					L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-					name = AnsiToUTF8(szName),
+				.. X.EncodeQuerystring(X.ConvertToUTF8({
+					l = GLOBAL.GAME_LANG,
+					L = GLOBAL.GAME_EDITION,
+					name = szName,
 				}))
 			UI.OpenBrowser(szURL, { key = 'MY_YunMacro_' .. GetStringCRC(szName), layer = 'Topmost', readonly = true })
 		end,
@@ -129,9 +129,9 @@ function D.Hook()
 		text = _L['Top yun macro'],
 		onclick = function()
 			local szURL = 'https://page.j3cx.com/macro/tops?'
-				.. X.EncodePostData(X.UrlEncode({
-					l = AnsiToUTF8(GLOBAL.GAME_LANG),
-					L = AnsiToUTF8(GLOBAL.GAME_EDITION),
+				.. X.EncodeQuerystring(X.ConvertToUTF8({
+					l = GLOBAL.GAME_LANG,
+					L = GLOBAL.GAME_EDITION,
 					kungfu = tostring(UI_GetPlayerMountKungfuID()),
 				}))
 			X.OpenBrowser(szURL)

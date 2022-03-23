@@ -1158,8 +1158,8 @@ X.BreatheCall(X.NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 	X.Ajax({
 		url = 'https://storage.j3cx.com/api/storage',
 		data = {
-			l = AnsiToUTF8(GLOBAL.GAME_LANG),
-			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
 			data = FormatStorageData(me),
 		},
 		success = function(html, status)
@@ -1212,8 +1212,8 @@ function X.StorageData(szKey, oData)
 		X.Ajax({
 			url = 'https://storage.uploads.j3cx.com/api/storage/uploads',
 			data = {
-				l = AnsiToUTF8(GLOBAL.GAME_LANG),
-				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
+				l = GLOBAL.GAME_LANG,
+				L = GLOBAL.GAME_EDITION,
 				data = FormatStorageData(me, { k = szKey, o = oData }),
 			},
 			success = function(html, status)

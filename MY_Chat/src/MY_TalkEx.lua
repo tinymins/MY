@@ -281,12 +281,13 @@ function PS.OnPanelActive(wnd)
 		onclick = function()
 			X.Ajax({
 				driver = 'auto', mode = 'auto', method = 'auto',
-				url = 'https://pull.j3cx.com/joke/random?'
-					.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-						l = AnsiToUTF8(GLOBAL.GAME_LANG),
-						L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-						q = AnsiToUTF8(D.szJokeSearch or ''),
-					}, X.SECRET.JOKE_RANDOM))),
+				url = 'https://pull.j3cx.com/joke/random',
+				data = {
+					l = GLOBAL.GAME_LANG,
+					L = GLOBAL.GAME_EDITION,
+					q = D.szJokeSearch or '',
+				},
+				signature = X.SECRET.JOKE_RANDOM,
 				success = function(html, status)
 					local res = X.DecodeJSON(html)
 					if X.IsTable(res) then
@@ -320,16 +321,17 @@ function PS.OnPanelActive(wnd)
 			local function fnAction(bAnonymous)
 				X.Ajax({
 					driver = 'auto', mode = 'auto', method = 'auto',
-					url = 'https://push.j3cx.com/joke?'
-						.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-							l = AnsiToUTF8(GLOBAL.GAME_LANG),
-							L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-							content = AnsiToUTF8(D.szJokeText or ''),
-							server = AnsiToUTF8(X.GetRealServer(2)),
-							role = bAnonymous and '' or AnsiToUTF8(X.GetUserRoleName()),
-							id = bAnonymous and '' or AnsiToUTF8(UI_GetClientPlayerID()),
-							jx3id = bAnonymous and '' or AnsiToUTF8(X.GetClientUUID()),
-						}, X.SECRET.JOKE))),
+					url = 'https://push.j3cx.com/joke',
+					data = {
+						l = GLOBAL.GAME_LANG,
+						L = GLOBAL.GAME_EDITION,
+						content = D.szJokeText or '',
+						server = X.GetRealServer(2),
+						role = bAnonymous and '' or X.GetUserRoleName(),
+						id = bAnonymous and '' or UI_GetClientPlayerID(),
+						jx3id = bAnonymous and '' or X.GetClientUUID(),
+					},
+					signature = X.SECRET.JOKE,
 					success = function(html, status)
 						local res = X.DecodeJSON(html)
 						if X.IsTable(res) then

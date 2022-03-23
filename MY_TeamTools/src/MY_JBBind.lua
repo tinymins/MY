@@ -33,16 +33,16 @@ local O = {
 
 function D.FetchBindStatus(resolve, reject)
 	if X.IsNil(O.uid) then
-		local szURL = 'https://pull.j3cx.com/role/query?'
-			.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-				l = AnsiToUTF8(GLOBAL.GAME_LANG),
-				L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-				jx3id = AnsiToUTF8(X.GetClientUUID()),
-			}, X.SECRET.ROLE_QUERY)))
 		O.pending = true
 		X.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
-			url = szURL,
+			url = 'https://pull.j3cx.com/role/query',
+			data = {
+				l = GLOBAL.GAME_LANG,
+				L = GLOBAL.GAME_EDITION,
+				jx3id = X.GetClientUUID(),
+			},
+			signature = X.SECRET.ROLE_QUERY,
 			charset = 'utf8',
 			success = function(szHTML)
 				O.pending = false
@@ -71,22 +71,22 @@ function D.Bind(szToken, resolve, reject)
 		return
 	end
 	local me = GetClientPlayer()
-	local szURL = 'https://push.j3cx.com/role/bind?'
-		.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-			l = AnsiToUTF8(GLOBAL.GAME_LANG),
-			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-			token = AnsiToUTF8(szToken),
-			cguid = X.GetClientGUID(),
-			jx3id = AnsiToUTF8(X.GetClientUUID()),
-			server = AnsiToUTF8(X.GetRealServer(2)),
-			id = AnsiToUTF8(dwID),
-			name = AnsiToUTF8(X.GetUserRoleName()),
-			mount = me.GetKungfuMount().dwMountType,
-			type = me.nRoleType,
-		}, X.SECRET.ROLE_BIND)))
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
-		url = szURL,
+		url = 'https://push.j3cx.com/role/bind',
+		data = {
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			token = szToken,
+			cguid = X.GetClientGUID(),
+			jx3id = X.GetClientUUID(),
+			server = X.GetRealServer(2),
+			id = dwID,
+			name = X.GetUserRoleName(),
+			mount = me.GetKungfuMount().dwMountType,
+			type = me.nRoleType,
+		},
+		signature = X.SECRET.ROLE_BIND,
 		charset = 'utf8',
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
@@ -102,15 +102,15 @@ function D.Bind(szToken, resolve, reject)
 end
 
 function D.Unbind(resolve, reject)
-	local szURL = 'https://push.j3cx.com/role/unbind?'
-		.. X.EncodePostData(X.UrlEncode(X.SignPostData({
-			l = AnsiToUTF8(GLOBAL.GAME_LANG),
-			L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-			jx3id = AnsiToUTF8(X.GetClientUUID()),
-		}, X.SECRET.ROLE_UNBIND)))
 	X.Ajax({
 		driver = 'auto', mode = 'auto', method = 'auto',
-		url = szURL,
+		url = 'https://push.j3cx.com/role/unbind',
+		data = {
+			l = GLOBAL.GAME_LANG,
+			L = GLOBAL.GAME_EDITION,
+			jx3id = X.GetClientUUID(),
+		},
+		signature = X.SECRET.ROLE_UNBIND,
 		charset = 'utf8',
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
