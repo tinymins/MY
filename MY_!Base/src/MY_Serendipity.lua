@@ -86,16 +86,6 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 				.. szName .. '#' .. szNameCRC .. ' via ' .. szReporter, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			X.EnsureAjax({
-				url = 'https://serendipity.uploads.j3cx.com/api/serendipity/uploads?'
-					.. 'l=' .. GLOBAL.GAME_LANG
-					.. '&L=' .. GLOBAL.GAME_EDITION,
-				data = X.EncryptString(X.EncodeJSON(X.ConvertToUTF8({
-					S = szRegion, s = szServer, a = szSerendipity,
-					n = szName, N = szNameCRC, R = szReporter,
-					f = eStatus, t = dwTime, c = nCount, m = nMethod,
-				}))),
-			})
-			X.EnsureAjax({
 				url = 'https://push.j3cx.com/api/serendipity/uploads',
 				data = {
 					l = GLOBAL.GAME_LANG,
