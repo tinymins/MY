@@ -135,7 +135,7 @@ function X.SimpleDecodeString(szCipher, bTripSlashes)
 	return table.concat(aText)
 end
 
-local function EncodePostData(data, t, prefix)
+local function EncodePostData(t, prefix, data)
 	if type(data) == 'table' then
 		local first = true
 		for k, v in pairs(data) do
@@ -145,9 +145,9 @@ local function EncodePostData(data, t, prefix)
 				table.insert(t, '&')
 			end
 			if prefix == '' then
-				EncodePostData(v, t, k)
+				EncodePostData(t, k, v)
 			else
-				EncodePostData(v, t, prefix .. '[' .. k .. ']')
+				EncodePostData(t, prefix .. '[' .. k .. ']', v)
 			end
 		end
 	else
@@ -157,13 +157,14 @@ local function EncodePostData(data, t, prefix)
 		end
 		table.insert(t, tostring(data))
 	end
+	return t
 end
 
+-- 将 POST 数据键值对转换为 application/x-www-form-urlencoded 主体数据字符串
+-- @param {table} data POST 数据键值对
+-- @return {string} 主体数据字符串
 function X.EncodePostData(data)
-	local t = {}
-	EncodePostData(data, t, '')
-	local text = table.concat(t)
-	return text
+	return table.concat(EncodePostData({}, '', data))
 end
 
 local function ConvertToUTF8(data)
