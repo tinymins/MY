@@ -136,11 +136,11 @@ function X.SimpleDecodeString(szCipher, bTripSlashes)
 end
 
 local function UrlEncodeString(szText)
-	return szText:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+')
+	return (szText:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+'))
 end
 
 local function UrlDecodeString(szText)
-	return szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end)
+	return (szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end))
 end
 
 local function UrlEncode(data)
@@ -212,6 +212,31 @@ end
 -- @return {string} 主体数据字符串
 function X.EncodePostData(data)
 	return table.concat(EncodePostData({}, '', data))
+end
+
+-- 将 application/x-www-form-urlencoded 主体数据字符串转换为 POST 数据键值对
+-- @param {string} 主体数据字符串
+-- @return {table} data POST 数据键值对
+function X.DecodePostData(s)
+	local data = {}
+	for _, kvp in ipairs(X.SplitString(s, '&', true)) do
+		kvp = X.SplitString(kvp, '=', true)
+		local k, v = kvp[1], kvp[2]
+		local pos = wstring.find(k, '[')
+		if pos then
+			local ks = { UrlDecodeString(string.sub(k, 1, pos - 1)) }
+			k = string.sub(k, pos)
+			while wstring.sub(k, 1, 1) == '[' do
+				pos = wstring.find(k, ']') or (string.len(k) + 1)
+				table.insert(ks, UrlDecodeString(string.sub(k, 2, pos - 1)))
+				k = string.sub(k, pos + 1)
+			end
+			X.Set(data, ks, UrlDecodeString(v))
+		else
+			data[UrlDecodeString(k)] = UrlDecodeString(v)
+		end
+	end
+	return data
 end
 
 local function ConvertToUTF8(data)
