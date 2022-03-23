@@ -301,7 +301,7 @@ function X.Ajax(settings)
 			curl:SetMethod('POST')
 			local data = xdata
 			if config.payload == 'json' then
-				data = X.JsonEncode(data)
+				data = X.EncodeJSON(data)
 				curl:AddHeader('Content-Type: application/json')
 			else -- if config.payload == 'form' then
 				data = X.EncodePostData(data)

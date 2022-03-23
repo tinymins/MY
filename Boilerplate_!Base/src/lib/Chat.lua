@@ -1201,7 +1201,7 @@ local function SignChatData(aSay, uuid, me)
 		table.insert(aSay, 1, { type = 'eventlink', name = '', text = '' })
 	end
 	local dwTime = GetCurrentTime()
-	local szLinkInfo = X.JsonEncode({
+	local szLinkInfo = X.EncodeJSON({
 		_ = dwTime,
 		c = X.IsDebugClient(true)
 			and GetStringCRC(me.szName .. dwTime .. '8545ada2-f687-4c95-8558-27cbf823745a')
@@ -1600,7 +1600,7 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 	end
 	local p = aSay[1]
 	if p and p.type == 'eventlink' and p.name == '' then
-		local data = X.JsonDecode(p.linkinfo)
+		local data = X.DecodeJSON(p.linkinfo)
 		if data and data._ and data.c and data.c == GetStringCRC(szName .. data._ .. '8545ada2-f687-4c95-8558-27cbf823745a') then
 			return
 		end

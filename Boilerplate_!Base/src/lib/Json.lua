@@ -4,9 +4,9 @@
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------
 ---------------------------------------------------------------------------
--- local lua_value = X.JsonDecode(raw_json_text)
--- local raw_json_text = X.JsonEncode(lua_table_or_value)
--- local pretty_json_text = X.JsonEncode(lua_table_or_value, true)
+-- local lua_value = X.DecodeJSON(raw_json_text)
+-- local raw_json_text = X.EncodeJSON(lua_table_or_value)
+-- local pretty_json_text = X.EncodeJSON(lua_table_or_value, true)
 ---------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -24,10 +24,10 @@ local ipairs, pairs, pcall = ipairs, pairs, pcall
 local type, tonumber, tostring = type, tonumber, tostring
 
 -- if JsonEncode and JsonDecode then
--- 	X.JsonEncode  = JsonEncode
--- 	X.JsonEncode = JsonEncode
--- 	X.JsonDecode  = JsonDecode
--- 	X.JsonDecode = JsonDecode
+-- 	X.EncodeJSON  = JsonEncode
+-- 	X.EncodeJSON = JsonEncode
+-- 	X.DecodeJSON  = JsonDecode
+-- 	X.DecodeJSON = JsonDecode
 -- else
 ---------------------------------------------------------------------------
 -- Hack for metatable limitation
@@ -1770,10 +1770,10 @@ local JSON = OBJDEF:new()
 --
 
 -- 编码 JSON 数据，成功返回 JSON 字符串，失败返回 nil
--- (string) X.JsonEncode(vData[, bPretty])
+-- (string) X.EncodeJSON(vData[, bPretty])
 -- vData 变量数据，支持字符串、数字、Table/Userdata
 -- bIndent 加缩进美化，默认无
-function X.JsonEncode(vData, bIndent)
+function X.EncodeJSON(vData, bIndent)
 	if bIndent then
 		return JSON:encode_pretty(vData)
 	end
@@ -1781,8 +1781,8 @@ function X.JsonEncode(vData, bIndent)
 end
 
 -- 解析 JSON 数据，成功返回数据，失败返回 nil 加错误信息和错误堆栈
--- (mixed) X.JsonDecode(string szData)
-function X.JsonDecode(value)
+-- (mixed) X.DecodeJSON(string szData)
+function X.DecodeJSON(value)
 	local res, err, trace = X.XpCall(JSON.decode, JSON, value)
 	if res then
 		return err
