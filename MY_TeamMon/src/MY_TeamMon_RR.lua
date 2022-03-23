@@ -187,10 +187,10 @@ local function GetURL(szURL, szType)
 			szProvider = DEFAULT_PROVIDER
 		end
 		szSimple = szUser .. szSimple
-		szSimple = X.EncodeURL(AnsiToUTF8(szSimple))
-		szUser = X.EncodeURL(AnsiToUTF8(szUser))
-		szProject = X.EncodeURL(AnsiToUTF8(szProject))
-		szBranch = X.EncodeURL(AnsiToUTF8(szBranch))
+		szSimple = X.EncodeURIComponent(AnsiToUTF8(szSimple))
+		szUser = X.EncodeURIComponent(AnsiToUTF8(szUser))
+		szProject = X.EncodeURIComponent(AnsiToUTF8(szProject))
+		szBranch = X.EncodeURIComponent(AnsiToUTF8(szBranch))
 	end
 	local provider = szProvider and PROVIDER_PARAMS[szProvider]
 	if not provider then
@@ -209,10 +209,10 @@ local function GetURL(szURL, szType)
 		return provider.szBlobURL:format(szUser, szProject, szBranch, szPath)
 	end
 	if szType == 'SHORT' then
-		szSimple = UTF8ToAnsi(X.DecodeURL(szSimple))
-		szUser = UTF8ToAnsi(X.DecodeURL(szUser))
-		szProject = UTF8ToAnsi(X.DecodeURL(szProject))
-		szBranch = UTF8ToAnsi(X.DecodeURL(szBranch))
+		szSimple = UTF8ToAnsi(X.DecodeURIComponent(szSimple))
+		szUser = UTF8ToAnsi(X.DecodeURIComponent(szUser))
+		szProject = UTF8ToAnsi(X.DecodeURIComponent(szProject))
+		szBranch = UTF8ToAnsi(X.DecodeURIComponent(szBranch))
 		if provider.bSimple then
 			if szProvider ~= DEFAULT_PROVIDER then
 				szSimple = szSimple .. '@' .. szProvider
