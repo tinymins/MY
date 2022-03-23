@@ -190,10 +190,11 @@ local function EncodePostData(t, prefix, data)
 			else
 				table.insert(t, '&')
 			end
+			k = UrlEncodeString(tostring(k))
 			if prefix == '' then
-				EncodePostData(t, UrlEncodeString(k), v)
+				EncodePostData(t, k, v)
 			else
-				EncodePostData(t, prefix .. '[' .. UrlEncodeString(k) .. ']', v)
+				EncodePostData(t, prefix .. '[' .. k .. ']', v)
 			end
 		end
 	else
