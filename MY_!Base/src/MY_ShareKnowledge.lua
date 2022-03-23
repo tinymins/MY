@@ -108,25 +108,79 @@ local FREQUENCY_LIMIT = 10000
 local NEXT_AWAKE_TIME = 0
 local CACHE = {}
 
+local TRANSLATOR = {}
+function TRANSLATOR.PLAIN(info)
+	local t = {}
+	if info.children then
+		for _, v in ipairs(info.children) do
+			table.insert(t, TRANSLATOR.PLAIN(v))
+		end
+	end
+	if info.type == 'Text' then
+		table.insert(t, info.text)
+	end
+	return table.concat(t)
+end
+function TRANSLATOR.BBCODE(info)
+	local t = {}
+	if info.children then
+		for _, v in ipairs(info.children) do
+			table.insert(t, TRANSLATOR.BBCODE(v))
+		end
+	end
+	if info.type == 'Text' then
+		local bStyle = false
+		if info.r and info.g and info.b then
+			bStyle = true
+			table.insert(t, '[style color="')
+			table.insert(t, X.RGB2Hex(info.r, info.g, info.b, info.a))
+			table.insert(t, '"]')
+		end
+		table.insert(t, wstring.gsub(wstring.gsub(info.text, '[', '\\['), ']', '\\]'))
+		if bStyle then
+			table.insert(t, '[/style]')
+		end
+	elseif info.type == 'Image' then
+		table.insert(t, '[img]')
+		table.insert(t, info.image)
+		if info.frame then
+			table.insert(t, ':')
+			table.insert(t, info.frame)
+		end
+		table.insert(t, '[/img]]')
+	end
+	return table.concat(t)
+end
+
+local SCHEMA = X.Schema.MixedTable({
+	-- KEY
+	[1] = X.Schema.String,
+	-- PATH
+	[2] = X.Schema.MixedTable({
+		[1] = X.Schema.String,
+		[2] = X.Schema.OneOf(X.Schema.String, X.Schema.Nil),
+	}),
+	-- UI PROPS PATH / DATA TRANSLATOR NAME
+	[3] = X.Schema.OneOf(unpack((function()
+		local a = {X.Schema.Collection(X.Schema.Any), X.Schema.Nil}
+		for k, _ in pairs(TRANSLATOR) do
+			table.insert(a, k)
+		end
+		return a
+	end)())),
+})
+
 MY_RSS.RegisterAdapter('share-ui', function(data)
 	local t = {}
 	if X.IsTable(data) then
 		for _, v in ipairs(data) do
-			local path, dataIndex
-			if X.IsString(v) then
-				path = { v }
-			elseif X.IsTable(v)
-			and X.IsString(v[1])
-			and (X.IsNil(v[2]) or X.IsString(v[2]))
-			and (X.IsNil(v[3]) or X.IsString(v[3]) or X.IsTable(v[3])) then
-				path = { v[1], v[2] }
-				dataIndex = v[3]
-			end
-			if path then
+			local err = X.Schema.CheckSchema(v, SCHEMA)
+			if not err then
 				table.insert(t, {
-					key = X.JsonEncode({path, dataIndex}),
-					path = path,
-					dataIndex = dataIndex,
+					id = X.JsonEncode({v[2], v[3]}),
+					key = v[1],
+					path = v[2],
+					dataTranslator = v[3],
 				})
 			end
 		end
@@ -151,6 +205,14 @@ local function SerializeElement(el)
 		end
 	end
 	if info.type == 'Text' then
+		local r, g, b = el:GetFontColor()
+		local a = el:GetAlpha()
+		if r ~= 255 or g ~= 255 or b ~= 255 or a ~= 255 then
+			info.r = r
+			info.g = g
+			info.b = b
+			info.a = a
+		end
 		info.text = el:GetText()
 	elseif info.type == 'Image' or info.type == 'Animate' then
 		local image, frame = el:GetImagePath()
@@ -184,29 +246,37 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 	end
 	for _, v in ipairs(rss) do
 		local el, data = Station.Lookup(unpack(v.path)), nil
-		if v.dataIndex then
-			data = X.Get(el, v.dataIndex)
-		else
-			data = SerializeElement(el)
+		if el then
+			if X.IsTable(v.dataTranslator) then
+				data = X.Get(el, v.dataTranslator)
+			else
+				data = SerializeElement(el)
+				if v.dataTranslator then
+					local translator = TRANSLATOR[v.dataTranslator]
+					if translator then
+						data = translator(data)
+					else
+						data = nil
+					end
+				end
+			end
 		end
 		if not X.IsNil(data) then
-			local szContent = X.JsonEncode(data)
-			if CACHE[v.key] ~= szContent then
+			local szContent = X.IsString(data) and data or X.JsonEncode(data)
+			if CACHE[v.id] ~= szContent then
 				X.EnsureAjax({
 					url = 'https://push.j3cx.com/api/share-ui?'
 						.. X.EncodePostData(X.UrlEncode(X.SignPostData({
 							l = AnsiToUTF8(GLOBAL.GAME_LANG),
 							L = AnsiToUTF8(GLOBAL.GAME_EDITION),
-							region = AnsiToUTF8(X.GetRealServer(1)), -- Region
-							server = AnsiToUTF8(X.GetRealServer(2)), -- Server
-							path = AnsiToUTF8(v.path[1]), -- Path
-							subpath = v.path[2] and AnsiToUTF8(v.path[2]), -- Subpath
-							dataIndex = v.dataIndex and AnsiToUTF8(X.IsString(v.dataIndex) and v.dataIndex or X.JsonEncode(v.dataIndex)), -- DataIndex
-							content = AnsiToUTF8(szContent), -- Content
-							time = GetCurrentTime(), -- Time
-						}, X.SECRET.SHARE_UI)))
-					})
-				CACHE[v.key] = szContent
+							region = AnsiToUTF8(X.GetRealServer(1)),
+							server = AnsiToUTF8(X.GetRealServer(2)),
+							key = AnsiToUTF8(v.key),
+							content = AnsiToUTF8(szContent),
+							time = GetCurrentTime(),
+						}, X.SECRET.SHARE_UI))),
+				})
+				CACHE[v.id] = szContent
 				break
 			end
 		end
