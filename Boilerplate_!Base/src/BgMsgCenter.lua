@@ -170,7 +170,7 @@ do
 		end
 		--[[#DEBUG BEGIN]]
 		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Team map copy id request from ' .. szTalkerName
-			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.LOG)
+			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PMLOG)
 		--[[#DEBUG END]]
 		if bResponse then
 			local function fnAction(tMapID)
@@ -385,7 +385,7 @@ do
 		end
 		--[[#DEBUG BEGIN]]
 		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Achievement request from ' .. szTalkerName
-			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.LOG)
+			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PMLOG)
 		--[[#DEBUG END]]
 		if bResponse then
 			local me = GetClientPlayer()
@@ -475,7 +475,7 @@ do
 		end
 		--[[#DEBUG BEGIN]]
 		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Global id request from ' .. szTalkerName
-			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.LOG)
+			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PMLOG)
 		--[[#DEBUG END]]
 		if bResponse then
 			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_GLOBAL_ID'), X.GetClientUUID(), true)
