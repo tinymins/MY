@@ -191,9 +191,9 @@ local function EncodePostData(t, prefix, data)
 				table.insert(t, '&')
 			end
 			if prefix == '' then
-				EncodePostData(t, k, v)
+				EncodePostData(t, UrlEncodeString(k), v)
 			else
-				EncodePostData(t, prefix .. '[' .. k .. ']', v)
+				EncodePostData(t, prefix .. '[' .. UrlEncodeString(k) .. ']', v)
 			end
 		end
 	else
@@ -201,7 +201,7 @@ local function EncodePostData(t, prefix, data)
 			table.insert(t, prefix)
 			table.insert(t, '=')
 		end
-		table.insert(t, tostring(data))
+		table.insert(t, UrlEncodeString(tostring(data)))
 	end
 	return t
 end
