@@ -135,6 +135,52 @@ function X.SimpleDecodeString(szCipher, bTripSlashes)
 	return table.concat(aText)
 end
 
+local function UrlEncodeString(szText)
+	return szText:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+')
+end
+
+local function UrlDecodeString(szText)
+	return szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end)
+end
+
+local function UrlEncode(data)
+	if type(data) == 'table' then
+		local t = {}
+		for k, v in pairs(data) do
+			if type(k == 'string') then
+				t[UrlEncodeString(k)] = UrlEncode(v)
+			else
+				t[k] = UrlEncode(v)
+			end
+		end
+		return t
+	elseif type(data) == 'string' then
+		return UrlEncodeString(data)
+	else
+		return data
+	end
+end
+X.UrlEncode = UrlEncode
+
+local function UrlDecode(data)
+	if type(data) == 'table' then
+		local t = {}
+		for k, v in pairs(data) do
+			if type(k == 'string') then
+				t[UrlDecodeString(k)] = UrlDecode(v)
+			else
+				t[k] = UrlDecode(v)
+			end
+		end
+		return t
+	elseif type(data) == 'string' then
+		return UrlDecodeString(data)
+	else
+		return data
+	end
+end
+X.UrlDecode = UrlDecode
+
 local function EncodePostData(t, prefix, data)
 	if type(data) == 'table' then
 		local first = true
@@ -204,52 +250,6 @@ local function ConvertToAnsi(data)
 	end
 end
 X.ConvertToAnsi = ConvertToAnsi
-
-local function UrlEncodeString(szText)
-	return szText:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+')
-end
-
-local function UrlDecodeString(szText)
-	return szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end)
-end
-
-local function UrlEncode(data)
-	if type(data) == 'table' then
-		local t = {}
-		for k, v in pairs(data) do
-			if type(k == 'string') then
-				t[UrlEncodeString(k)] = UrlEncode(v)
-			else
-				t[k] = UrlEncode(v)
-			end
-		end
-		return t
-	elseif type(data) == 'string' then
-		return UrlEncodeString(data)
-	else
-		return data
-	end
-end
-X.UrlEncode = UrlEncode
-
-local function UrlDecode(data)
-	if type(data) == 'table' then
-		local t = {}
-		for k, v in pairs(data) do
-			if type(k == 'string') then
-				t[UrlDecodeString(k)] = UrlDecode(v)
-			else
-				t[k] = UrlDecode(v)
-			end
-		end
-		return t
-	elseif type(data) == 'string' then
-		return UrlDecodeString(data)
-	else
-		return data
-	end
-end
-X.UrlDecode = UrlDecode
 
 local m_simpleMatchCache = setmetatable({}, { __mode = 'v' })
 function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgnoreSpace)
