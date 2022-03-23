@@ -214,6 +214,31 @@ function X.EncodePostData(data)
 	return table.concat(EncodePostData({}, '', data))
 end
 
+-- 将 application/x-www-form-urlencoded 主体数据字符串转换为 POST 数据键值对
+-- @param {string} 主体数据字符串
+-- @return {table} data POST 数据键值对
+function X.DecodePostData(s)
+	local data = {}
+	for _, kvp in ipairs(X.SplitString(s, '&', true)) do
+		kvp = X.SplitString(kvp, '=', true)
+		local k, v = kvp[1], kvp[2]
+		local pos = wstring.find(k, '[')
+		if pos then
+			local ks = { UrlDecodeString(string.sub(k, 1, pos - 1)) }
+			k = string.sub(k, pos)
+			while wstring.sub(k, 1, 1) == '[' do
+				pos = wstring.find(k, ']') or (string.len(k) + 1)
+				table.insert(ks, UrlDecodeString(string.sub(k, 2, pos - 1)))
+				k = string.sub(k, pos + 1)
+			end
+			X.Set(data, ks, UrlDecodeString(v))
+		else
+			data[UrlDecodeString(k)] = UrlDecodeString(v)
+		end
+	end
+	return data
+end
+
 local function ConvertToUTF8(data)
 	if type(data) == 'table' then
 		local t = {}
