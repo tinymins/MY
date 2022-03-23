@@ -135,75 +135,6 @@ function X.SimpleDecodeString(szCipher, bTripSlashes)
 	return table.concat(aText)
 end
 
-local function EncodePostData(data, t, prefix)
-	if type(data) == 'table' then
-		local first = true
-		for k, v in pairs(data) do
-			if first then
-				first = false
-			else
-				table.insert(t, '&')
-			end
-			if prefix == '' then
-				EncodePostData(v, t, k)
-			else
-				EncodePostData(v, t, prefix .. '[' .. k .. ']')
-			end
-		end
-	else
-		if prefix ~= '' then
-			table.insert(t, prefix)
-			table.insert(t, '=')
-		end
-		table.insert(t, tostring(data))
-	end
-end
-
-function X.EncodePostData(data)
-	local t = {}
-	EncodePostData(data, t, '')
-	local text = table.concat(t)
-	return text
-end
-
-local function ConvertToUTF8(data)
-	if type(data) == 'table' then
-		local t = {}
-		for k, v in pairs(data) do
-			if type(k) == 'string' then
-				t[ConvertToUTF8(k)] = ConvertToUTF8(v)
-			else
-				t[k] = ConvertToUTF8(v)
-			end
-		end
-		return t
-	elseif type(data) == 'string' then
-		return AnsiToUTF8(data)
-	else
-		return data
-	end
-end
-X.ConvertToUTF8 = ConvertToUTF8
-
-local function ConvertToAnsi(data)
-	if type(data) == 'table' then
-		local t = {}
-		for k, v in pairs(data) do
-			if type(k) == 'string' then
-				t[ConvertToAnsi(k)] = ConvertToAnsi(v)
-			else
-				t[k] = ConvertToAnsi(v)
-			end
-		end
-		return t
-	elseif type(data) == 'string' then
-		return UTF8ToAnsi(data)
-	else
-		return data
-	end
-end
-X.ConvertToAnsi = ConvertToAnsi
-
 local function UrlEncodeString(szText)
 	return szText:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+')
 end
@@ -249,6 +180,76 @@ local function UrlDecode(data)
 	end
 end
 X.UrlDecode = UrlDecode
+
+local function EncodePostData(t, prefix, data)
+	if type(data) == 'table' then
+		local first = true
+		for k, v in pairs(data) do
+			if first then
+				first = false
+			else
+				table.insert(t, '&')
+			end
+			if prefix == '' then
+				EncodePostData(t, UrlEncodeString(k), v)
+			else
+				EncodePostData(t, prefix .. '[' .. UrlEncodeString(k) .. ']', v)
+			end
+		end
+	else
+		if prefix ~= '' then
+			table.insert(t, prefix)
+			table.insert(t, '=')
+		end
+		table.insert(t, UrlEncodeString(tostring(data)))
+	end
+	return t
+end
+
+-- 将 POST 数据键值对转换为 application/x-www-form-urlencoded 主体数据字符串
+-- @param {table} data POST 数据键值对
+-- @return {string} 主体数据字符串
+function X.EncodePostData(data)
+	return table.concat(EncodePostData({}, '', data))
+end
+
+local function ConvertToUTF8(data)
+	if type(data) == 'table' then
+		local t = {}
+		for k, v in pairs(data) do
+			if type(k) == 'string' then
+				t[ConvertToUTF8(k)] = ConvertToUTF8(v)
+			else
+				t[k] = ConvertToUTF8(v)
+			end
+		end
+		return t
+	elseif type(data) == 'string' then
+		return AnsiToUTF8(data)
+	else
+		return data
+	end
+end
+X.ConvertToUTF8 = ConvertToUTF8
+
+local function ConvertToAnsi(data)
+	if type(data) == 'table' then
+		local t = {}
+		for k, v in pairs(data) do
+			if type(k) == 'string' then
+				t[ConvertToAnsi(k)] = ConvertToAnsi(v)
+			else
+				t[k] = ConvertToAnsi(v)
+			end
+		end
+		return t
+	elseif type(data) == 'string' then
+		return UTF8ToAnsi(data)
+	else
+		return data
+	end
+end
+X.ConvertToAnsi = ConvertToAnsi
 
 local m_simpleMatchCache = setmetatable({}, { __mode = 'v' })
 function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgnoreSpace)

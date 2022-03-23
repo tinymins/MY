@@ -37,37 +37,6 @@ local AJAX_TAG = X.NSFormatString('{$NS}_AJAX#')
 local AJAX_BRIDGE_WAIT = 10000
 local AJAX_BRIDGE_PATH = X.PACKET_INFO.DATA_ROOT .. '#cache/curl/'
 
-local function EncodePostData(data, t, prefix)
-	if type(data) == 'table' then
-		local first = true
-		for k, v in pairs(data) do
-			if first then
-				first = false
-			else
-				table.insert(t, '&')
-			end
-			if prefix == '' then
-				EncodePostData(v, t, k)
-			else
-				EncodePostData(v, t, prefix .. '[' .. k .. ']')
-			end
-		end
-	else
-		if prefix ~= '' then
-			table.insert(t, prefix)
-			table.insert(t, '=')
-		end
-		table.insert(t, data)
-	end
-end
-
-local function serialize(data)
-	local t = {}
-	EncodePostData(data, t, '')
-	local text = table.concat(t)
-	return text
-end
-
 local function CreateWebPageFrame()
 	local szRequestID, hFrame
 	repeat
@@ -185,12 +154,16 @@ function X.Ajax(settings)
 		end
 	end
 	if (method == 'get' or method == 'delete') and config.data then
-		if not config.url:find('?') then
-			config.url = config.url .. '?'
-		elseif config.url:sub(-1) ~= '&' then
-			config.url = config.url .. '&'
+		local data = X.EncodePostData(config.data)
+		if data ~= '' then
+			if not wstring.find(config.url, '?') then
+				config.url = config.url .. '?'
+			elseif wstring.sub(config.url, -1) ~= '&' then
+				config.url = config.url .. '&'
+			end
+			config.url = config.url .. data
 		end
-		config.url, config.data = config.url .. serialize(config.data), nil
+		config.data = nil
 	end
 	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', X.NSFormatString('[{$NS}_AJAX] Unknown http request type: ') .. method)
 
@@ -507,7 +480,7 @@ end
 -- 发起数据接口安全稳定的多次重试 Ajax 调用
 -- 注意该接口暂只可用于上传 因为不支持返回结果内容
 function X.EnsureAjax(options)
-	local key = GetStringCRC(options.url)
+	local key = GetStringCRC(X.EncodeLUAData({options.url, options.data}))
 	local configs, i, dc = {{'curl', 'post'}, {'origin', 'post'}, {'origin', 'get'}, {'webcef', 'get'}}, 1, nil
 	-- 移除无法访问的调用方式，但至少保留一个用于尝试桥接通信
 	for i, config in X.ipairs_r(configs) do
@@ -524,24 +497,26 @@ function X.EnsureAjax(options)
 			X.SafeCall(options.error)
 			return 0
 		end
+		local driver, method = unpack(config)
 		--[[#DEBUG BEGIN]]
-		X.Debug('Ensure ajax ' .. key .. ' try mode ' .. config[1] .. '/' .. config[2], X.DEBUG_LEVEL.LOG)
+		X.Debug('Ensure ajax ' .. key .. ' try mode ' .. driver .. '/' .. method, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		dc, i = X.DelayCall(30000, TryUploadWithNextDriver), i + 1 -- 必须先发起保护再请求，因为请求可能会立刻失败触发gc
 		local opt = {
-			driver = config[1],
-			method = config[2],
+			driver = driver,
+			method = method,
 			url = options.url,
+			data = options.data,
 			fulfilled = function(...)
 				--[[#DEBUG BEGIN]]
-				X.Debug('Ensure ajax ' .. key .. ' succeed with mode ' .. config[1] .. '/' .. config[2], X.DEBUG_LEVEL.LOG)
+				X.Debug('Ensure ajax ' .. key .. ' succeed with mode ' .. driver .. '/' .. method, X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				X.DelayCall(dc, false)
 				X.SafeCall(options.fulfilled, ...)
 			end,
 			error = function()
 				--[[#DEBUG BEGIN]]
-				X.Debug('Ensure ajax ' .. key .. ' failed with mode ' .. config[1] .. '/' .. config[2], X.DEBUG_LEVEL.LOG)
+				X.Debug('Ensure ajax ' .. key .. ' failed with mode ' .. driver .. '/' .. method, X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				X.DelayCall(dc, false)
 				TryUploadWithNextDriver()
