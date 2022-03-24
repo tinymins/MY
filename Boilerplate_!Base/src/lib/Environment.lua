@@ -11,7 +11,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = Boilerplate
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 ---------------------------------------------------------------------------------------------------
@@ -42,8 +42,8 @@ local RESTRICTION = {}
 function X.RegisterRestriction(szKey, tBranchRestricted)
 	local bRestricted = nil
 	if X.IsTable(tBranchRestricted) then
-		if X.IsBoolean(tBranchRestricted[GLOBAL.GAME_BRANCH]) then
-			bRestricted = tBranchRestricted[GLOBAL.GAME_BRANCH]
+		if X.IsBoolean(tBranchRestricted[ENVIRONMENT.GAME_BRANCH]) then
+			bRestricted = tBranchRestricted[ENVIRONMENT.GAME_BRANCH]
 		elseif X.IsBoolean(tBranchRestricted['*']) then
 			bRestricted = tBranchRestricted['*']
 		end

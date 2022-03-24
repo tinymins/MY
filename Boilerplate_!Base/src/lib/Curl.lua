@@ -11,7 +11,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = Boilerplate
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -------------------------------------------------------------------------------------------------------------
@@ -265,8 +265,8 @@ function X.Ajax(settings)
 	-------------------------------
 	-- bridge
 	local bridgekey = X.NSFormatString('{$NS}RRDF_TO_') .. id
-	local bridgein = AJAX_BRIDGE_PATH .. id .. '.' .. GLOBAL.GAME_LANG .. '.jx3dat'
-	local bridgeout = AJAX_BRIDGE_PATH .. id .. '.result.' .. GLOBAL.GAME_LANG .. '.jx3dat'
+	local bridgein = AJAX_BRIDGE_PATH .. id .. '.' .. ENVIRONMENT.GAME_LANG .. '.jx3dat'
+	local bridgeout = AJAX_BRIDGE_PATH .. id .. '.result.' .. ENVIRONMENT.GAME_LANG .. '.jx3dat'
 	local bridgetimeout = GetTime() + config.timeout
 	settings.closebridge = function()
 		CPath.DelFile(bridgein)

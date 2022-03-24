@@ -800,7 +800,7 @@ local function KvpToObject(kvp)
 	return t
 end
 
-local GLOBAL = setmetatable({}, {
+local ENVIRONMENT = setmetatable({}, {
 	__index = setmetatable({
 		GAME_LANG        = _GAME_LANG_       ,
 		GAME_BRANCH      = _GAME_BRANCH_     ,
@@ -874,7 +874,7 @@ local X = {
 	GetGameAPI       = GetGameAPI      ,
 	GetGameTable     = GetGameTable    ,
 	LoadLangPack     = LoadLangPack    ,
-	GLOBAL           = GLOBAL          ,
+	ENVIRONMENT      = ENVIRONMENT     ,
 	SECRET           = SECRET          ,
 	PATH_TYPE        = PATH_TYPE       ,
 	DEBUG_LEVEL      = DEBUG_LEVEL     ,

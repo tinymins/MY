@@ -11,7 +11,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = Boilerplate
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 -----------------------------------------------
 -- 本地函数和变量
@@ -331,9 +331,9 @@ end
 
 function X.GetEndTime(nEndFrame, bAllowNegative)
 	if bAllowNegative then
-		return (nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
+		return (nEndFrame - GetLogicFrameCount()) / ENVIRONMENT.GAME_FPS
 	end
-	return math.max(0, nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
+	return math.max(0, nEndFrame - GetLogicFrameCount()) / ENVIRONMENT.GAME_FPS
 end
 
 -- 获取指定名字的右键菜单
@@ -833,7 +833,7 @@ local function GenerateList(bForceRefresh)
 			end
 		end
 		X.SaveLUAData(CACHE_PATH, BOSS_LIST)
-		X.Sysmsg(_L('Boss list updated to v%s.', GLOBAL.GAME_VERSION))
+		X.Sysmsg(_L('Boss list updated to v%s.', ENVIRONMENT.GAME_VERSION))
 	end
 
 	for dwMapID, tInfo in pairs(X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/bosslist/{$edition}.jx3dat') or {}) do
@@ -934,7 +934,7 @@ local function GenerateList(bForceRefresh)
 	if bForceRefresh or not INPC_LIST then
 		INPC_LIST = {}
 		X.SaveLUAData(CACHE_PATH, INPC_LIST)
-		X.Sysmsg(_L('Important-NPC list updated to v%s.', GLOBAL.GAME_VERSION))
+		X.Sysmsg(_L('Important-NPC list updated to v%s.', ENVIRONMENT.GAME_VERSION))
 	end
 	for dwMapID, tInfo in pairs(X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/inpclist/{$edition}.jx3dat') or {}) do
 		if not INPC_LIST[dwMapID] then
@@ -1269,8 +1269,8 @@ function X.GetObjectLife(obj)
 	if not obj then
 		return
 	end
-	return GLOBAL.GAME_BRANCH ~= 'classic' and obj.fCurrentLife64 or obj.nCurrentLife,
-		GLOBAL.GAME_BRANCH ~= 'classic' and obj.fMaxLife64 or obj.nMaxLife
+	return ENVIRONMENT.GAME_BRANCH ~= 'classic' and obj.fCurrentLife64 or obj.nCurrentLife,
+		ENVIRONMENT.GAME_BRANCH ~= 'classic' and obj.fMaxLife64 or obj.nMaxLife
 end
 
 -- 根据模板ID获取NPC真实名称
@@ -2153,7 +2153,7 @@ local function ListenFightStateChange()
 				-- 生成战斗全服唯一标示
 				local me = GetClientPlayer()
 				local team = GetClientTeam()
-				local szEdition = GLOBAL.GAME_EDITION
+				local szEdition = ENVIRONMENT.GAME_EDITION
 				local szServer = X.GetRealServer()
 				local dwTime = GetCurrentTime()
 				local dwTeamID, nTeamMember, dwTeamXorID = 0, 0, 0
@@ -2200,7 +2200,7 @@ function X.GetFightTime(szFormat)
 		local nHours   = math.floor(nMinutes / 60)
 		local nMinute  = nMinutes % 60
 		local nSecond  = nSeconds % 60
-		szFormat = szFormat:gsub('f', math.floor(nTick / 1000 * GLOBAL.GAME_FPS))
+		szFormat = szFormat:gsub('f', math.floor(nTick / 1000 * ENVIRONMENT.GAME_FPS))
 		szFormat = szFormat:gsub('H', nHours)
 		szFormat = szFormat:gsub('M', nMinutes)
 		szFormat = szFormat:gsub('S', nSeconds)
@@ -2908,7 +2908,7 @@ function X.IsIsolated(...)
 	if not KObject then
 		return false
 	end
-	if GLOBAL.GAME_BRANCH == 'classic' then
+	if ENVIRONMENT.GAME_BRANCH == 'classic' then
 		return false
 	end
 	return KObject.bIsolated
