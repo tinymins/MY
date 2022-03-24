@@ -86,7 +86,6 @@ local function QueryData(szQues)
 	end
 
 	X.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/exam?'
 			.. X.EncodeQuerystring(X.ConvertToUTF8({
 				l = ENVIRONMENT.GAME_LANG,
@@ -144,7 +143,6 @@ function D.SubmitData(tExamData, bAllRight)
 		return
 	end
 	X.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/api/exam/uploads',
 		data = {
 			l = ENVIRONMENT.GAME_LANG,

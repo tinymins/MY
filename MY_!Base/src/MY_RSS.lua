@@ -57,7 +57,6 @@ end
 X.RegisterInit('MY_RSS', function()
 	if not RSS_DATA or not X.IsNumber(RSS_DATA.EXPIRES) or RSS_DATA.EXPIRES < GetCurrentTime() then
 		X.Ajax({
-			driver = 'auto', mode = 'auto', method = 'auto',
 			url = 'https://pull.j3cx.com/config/all'
 				.. '?l=' .. ENVIRONMENT.GAME_LANG
 				.. '&L=' .. ENVIRONMENT.GAME_EDITION

@@ -369,9 +369,7 @@ end
 function D.FetchMetaInfo(szURL, onSuccess, onError)
 	local szURL = GetRawURL(szURL) or szURL
 	X.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = szURL,
-		charset = 'utf8',
 		success = function(szHTML)
 			local res, err = X.DecodeJSON(szHTML)
 			if not res then
@@ -431,7 +429,6 @@ end
 
 function D.FetchRepoMetaInfoList(nPage)
 	X.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/dbm/subscribe/all',
 		data = {
 			l = ENVIRONMENT.GAME_LANG,
@@ -439,7 +436,6 @@ function D.FetchRepoMetaInfoList(nPage)
 			page = nPage or REPO_META_PAGE.nIndex,
 			pageSize = 15,
 		},
-		charset = 'utf8',
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
 			local errs = X.Schema.CheckSchema(res, META_LIST_JSON_SCHEMA)

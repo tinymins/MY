@@ -57,7 +57,6 @@ function D.CreateSnapshot()
 	end
 	local me = GetClientPlayer()
 	X.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/team/snapshot',
 		data = {
 			l = ENVIRONMENT.GAME_LANG,
@@ -69,7 +68,6 @@ function D.CreateSnapshot()
 			teammate = table.concat(aTeammate, ';'),
 		},
 		signature = X.SECRET.TEAM_SNAPSHOT,
-		charset = 'utf8',
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then

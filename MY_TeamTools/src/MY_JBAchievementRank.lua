@@ -93,7 +93,6 @@ end)
 
 function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 	local tConfig = {
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/api/achievement-rank/uploads',
 		data = {
 			l = ENVIRONMENT.GAME_LANG,

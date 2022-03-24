@@ -69,7 +69,6 @@ local VOTE_SCHEMA = X.Schema.Record({
 
 function D.FetchEventList(frame)
 	X.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/event/list',
 		data = {
 			l = ENVIRONMENT.GAME_LANG,
@@ -77,7 +76,6 @@ function D.FetchEventList(frame)
 			jx3id = X.GetClientUUID(),
 		},
 		signature = X.SECRET.EVENT_LIST,
-		charset = 'utf8',
 		success = function(szHTML)
 			local res, err = X.DecodeJSON(szHTML)
 			if not res then
@@ -143,7 +141,6 @@ end
 
 function D.FetchRankList(frame, szEventID)
 	X.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/rank/list',
 		data = {
 			l = ENVIRONMENT.GAME_LANG,
@@ -152,7 +149,6 @@ function D.FetchRankList(frame, szEventID)
 			event_id = szEventID,
 		},
 		signature = X.SECRET.RANK_LIST,
-		charset = 'utf8',
 		success = function(szHTML)
 			local res, err = X.DecodeJSON(szHTML)
 			if not res then
@@ -237,7 +233,6 @@ end
 
 function D.Vote(frame, szEventID, szTeamID)
 	X.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/rank/vote',
 		data = {
 			l = ENVIRONMENT.GAME_LANG,
@@ -247,7 +242,6 @@ function D.Vote(frame, szEventID, szTeamID)
 			team_id = szTeamID,
 		},
 		signature = X.SECRET.RANK_VOTE,
-		charset = 'utf8',
 		success = function(szHTML)
 			local res, err = X.DecodeJSON(szHTML)
 			if not res then

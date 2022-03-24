@@ -36,7 +36,6 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 	end
 	local me = GetClientPlayer()
 	X.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/team/' .. (szAction == 'join' and 'join' or 'quit'),
 		data = {
 			l = ENVIRONMENT.GAME_LANG,
@@ -51,7 +50,6 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 			body_type = me.nRoleType,
 		},
 		signature = szAction == 'join' and X.SECRET.TEAM_JOIN or X.SECRET.TEAM_QUIT,
-		charset = 'utf8',
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then

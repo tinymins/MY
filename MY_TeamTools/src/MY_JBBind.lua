@@ -35,7 +35,6 @@ function D.FetchBindStatus(resolve, reject)
 	if X.IsNil(O.uid) then
 		O.pending = true
 		X.Ajax({
-			driver = 'auto', mode = 'auto', method = 'auto',
 			url = 'https://pull.j3cx.com/role/query',
 			data = {
 				l = ENVIRONMENT.GAME_LANG,
@@ -43,7 +42,6 @@ function D.FetchBindStatus(resolve, reject)
 				jx3id = X.GetClientUUID(),
 			},
 			signature = X.SECRET.ROLE_QUERY,
-			charset = 'utf8',
 			success = function(szHTML)
 				O.pending = false
 				local res = X.DecodeJSON(szHTML)
@@ -72,7 +70,6 @@ function D.Bind(szToken, resolve, reject)
 	end
 	local me = GetClientPlayer()
 	X.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/role/bind',
 		data = {
 			l = ENVIRONMENT.GAME_LANG,
@@ -87,7 +84,6 @@ function D.Bind(szToken, resolve, reject)
 			type = me.nRoleType,
 		},
 		signature = X.SECRET.ROLE_BIND,
-		charset = 'utf8',
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then
@@ -103,7 +99,6 @@ end
 
 function D.Unbind(resolve, reject)
 	X.Ajax({
-		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/role/unbind',
 		data = {
 			l = ENVIRONMENT.GAME_LANG,
@@ -111,7 +106,6 @@ function D.Unbind(resolve, reject)
 			jx3id = X.GetClientUUID(),
 		},
 		signature = X.SECRET.ROLE_UNBIND,
-		charset = 'utf8',
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then

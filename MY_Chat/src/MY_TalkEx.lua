@@ -280,7 +280,6 @@ function PS.OnPanelActive(wnd)
 		text = _L['Search'],
 		onclick = function()
 			X.Ajax({
-				driver = 'auto', mode = 'auto', method = 'auto',
 				url = 'https://pull.j3cx.com/joke/random',
 				data = {
 					l = ENVIRONMENT.GAME_LANG,
@@ -320,7 +319,6 @@ function PS.OnPanelActive(wnd)
 		onclick = function()
 			local function fnAction(bAnonymous)
 				X.Ajax({
-					driver = 'auto', mode = 'auto', method = 'auto',
 					url = 'https://push.j3cx.com/joke',
 					data = {
 						l = ENVIRONMENT.GAME_LANG,
