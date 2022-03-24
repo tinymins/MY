@@ -39,6 +39,7 @@ return {
     ['lock postion'] = '鎖定聊天頻道快速切換面板位置',
     ['team balloon'] = '顯示隊伍聊天泡泡',
     ['chat copy'] = '聊天複製',
+    ['Right click quick copy chat'] = '右鍵點擊快速複製到當前頻道',
     ['chat time'] = '聊天時間',
     ['hh:mm'] = '時：分',
     ['hh:mm:ss'] = '時：分：秒',

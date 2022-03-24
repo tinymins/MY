@@ -39,6 +39,7 @@ return {
     ['lock postion'] = '锁定聊天频道快速切换面板位置',
     ['team balloon'] = '显示队伍聊天泡泡',
     ['chat copy'] = '聊天复制',
+    ['Right click quick copy chat'] = '右键点击快速复制到当前频道',
     ['chat time'] = '聊天时间',
     ['hh:mm'] = '时：分',
     ['hh:mm:ss'] = '时：分：秒',

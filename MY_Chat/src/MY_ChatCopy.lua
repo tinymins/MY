@@ -32,6 +32,12 @@ local O = X.CreateUserSettingsModule('MY_ChatCopy', _L['Chat'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bChatQuickCopy = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Chat'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
 	bChatTime = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
@@ -92,7 +98,11 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 			if O.bChatCopyAlwaysWhite then
 				_r, _g, _b = 255, 255, 255
 			end
-			szTime = X.GetChatCopyXML(_L[' * '], { r = _r, g = _g, b = _b, richtext = szMsg })
+			szTime = X.GetChatCopyXML(_L[' * '], {
+				r = _r, g = _g, b = _b,
+				richtext = szMsg,
+				rclick = O.bChatQuickCopy == true,
+			})
 		elseif O.bChatCopyAlwaysWhite then
 			nR, nG, nB = 255, 255, 255
 		end
@@ -101,11 +111,13 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 				szTime = szTime .. X.GetChatTimeXML(dwTime, {
 					r = nR, g = nG, b = nB, f = 10,
 					s = '[%hh:%mm:%ss]', richtext = szMsg,
+					rclick = O.bChatQuickCopy == true,
 				})
 			else
 				szTime = szTime .. X.GetChatTimeXML(dwTime, {
 					r = nR, g = nG, b = nB, f = 10,
 					s = '[%hh:%mm]', richtext = szMsg,
+					rclick = O.bChatQuickCopy == true,
 				})
 			end
 		end
@@ -156,16 +168,26 @@ end)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nPaddingX
-	ui:Append('WndCheckBox', {
+	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 250,
 		text = _L['chat copy'],
 		checked = O.bChatCopy,
 		oncheck = function(bChecked)
 			O.bChatCopy = bChecked
 		end,
+	}):AutoWidth():Width()
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 250,
+		text = _L['Right click quick copy chat'],
+		checked = O.bChatQuickCopy,
+		oncheck = function(bChecked)
+			O.bChatQuickCopy = bChecked
+		end,
+		autoenable = function() return O.bChatCopy end,
 	})
 	nY = nY + nLH
 
+	nX = nPaddingX
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 250,
 		text = _L['chat time'],
