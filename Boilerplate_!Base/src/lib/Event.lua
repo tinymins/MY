@@ -777,7 +777,7 @@ end
 -- 注册协程
 ---------------------------------------------------------------------------------------------
 do
-local COROUTINE_TIME = 1000 * 0.5 / GLOBAL.GAME_FPS -- 一次 Breathe 时最大允许执行协程时间
+local COROUTINE_TIME = 1000 * 0.5 / ENVIRONMENT.GAME_FPS -- 一次 Breathe 时最大允许执行协程时间
 local COROUTINE_LIST = {}
 local yield = coroutine and coroutine.yield or function() end
 function X.RegisterCoroutine(szKey, fnAction, fnCallback)
@@ -815,7 +815,7 @@ function X.RegisterCoroutine(szKey, fnAction, fnCallback)
 	end
 	return szKey
 end
-local FPS_SLOW_TIME = 1000 / GLOBAL.GAME_FPS * 1.2
+local FPS_SLOW_TIME = 1000 / ENVIRONMENT.GAME_FPS * 1.2
 local l_nLastBreatheTime = GetTime()
 local function onBreathe()
 	if not coroutine then

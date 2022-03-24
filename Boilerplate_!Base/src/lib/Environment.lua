@@ -154,8 +154,14 @@ end
 
 -- 获取是否测试服务器
 function X.IsDebugServer()
-	local ip = select(7, GetUserServer())
-	if ip:find('^192%.') or ip:find('^10%.') then
+	local ip = ENVIRONMENT.SERVER_ADDRESS
+	if ip:find('^10%.') -- 10.0.0.0/8
+		or ip:find('^127%.') -- 127.0.0.0/8
+		or ip:find('^172%.1[6-9]%.') -- 172.16.0.0/12
+		or ip:find('^172%.2[0-9]%.') -- 172.16.0.0/12
+		or ip:find('^172%.3[0-1]%.') -- 172.16.0.0/12
+		or ip:find('^192%.168%.') -- 192.168.0.0/16
+	then
 		return true
 	end
 	return false
