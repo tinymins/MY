@@ -116,10 +116,10 @@ if not SetmetaReadonly then
 		})
 	end
 end
-local ENVIRONMENT = _G.PLUGIN_ENVIRONMENT
-if type(ENVIRONMENT) ~= 'table' then
-	ENVIRONMENT = {}
-	_G.PLUGIN_ENVIRONMENT = ENVIRONMENT
+local SHARED_MEMORY = _G.PLUGIN_SHARED_MEMORY
+if type(SHARED_MEMORY) ~= 'table' then
+	SHARED_MEMORY = {}
+	_G.PLUGIN_SHARED_MEMORY = SHARED_MEMORY
 end
 ---------------------------------------------------
 -- µ÷ÊÔ¹¤¾ß
@@ -135,20 +135,20 @@ local function ErrorLog(...)
 	FireUIEvent('CALL_LUA_ERROR', szFull)
 end
 if _DEBUG_LEVEL_ < DEBUG_LEVEL.NONE then
-	if not ENVIRONMENT.ECHO_LUA_ERROR then
+	if not SHARED_MEMORY.ECHO_LUA_ERROR then
 		RegisterEvent('CALL_LUA_ERROR', function()
 			OutputMessage('MSG_SYS', 'CALL_LUA_ERROR:\n' .. arg0 .. '\n')
 		end)
-		ENVIRONMENT.ECHO_LUA_ERROR = _NAME_SPACE_
+		SHARED_MEMORY.ECHO_LUA_ERROR = _NAME_SPACE_
 	end
-	if not ENVIRONMENT.RELOAD_UI_ADDON then
+	if not SHARED_MEMORY.RELOAD_UI_ADDON then
 		TraceButton_AppendAddonMenu({{
 			szOption = 'ReloadUIAddon',
 			fnAction = function()
 				ReloadUIAddon()
 			end,
 		}})
-		ENVIRONMENT.RELOAD_UI_ADDON = _NAME_SPACE_
+		SHARED_MEMORY.RELOAD_UI_ADDON = _NAME_SPACE_
 	end
 end
 Log('[' .. _NAME_SPACE_ .. '] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
@@ -864,11 +864,11 @@ local X = {
 	GetGameTable     = GetGameTable    ,
 	LoadLangPack     = LoadLangPack    ,
 	GLOBAL           = GLOBAL          ,
-	ENVIRONMENT      = ENVIRONMENT     ,
 	SECRET           = SECRET          ,
 	PATH_TYPE        = PATH_TYPE       ,
 	DEBUG_LEVEL      = DEBUG_LEVEL     ,
 	PACKET_INFO      = PACKET_INFO     ,
+	SHARED_MEMORY    = SHARED_MEMORY   ,
 }
 _G[_NAME_SPACE_] = X
 ---------------------------------------------------------------------------------------------

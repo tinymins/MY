@@ -56,19 +56,19 @@ local function GetMenu(ui)
 	return menu
 end
 
-local ENVIRONMENT = X.ENVIRONMENT
-if not ENVIRONMENT.UI_MANAGER then
+local SHARED_MEMORY = X.SHARED_MEMORY
+if not SHARED_MEMORY.UI_MANAGER then
 	TraceButton_AppendAddonMenu({function()
-		for _, f in ipairs(ENVIRONMENT.UI_MANAGER) do
+		for _, f in ipairs(SHARED_MEMORY.UI_MANAGER) do
 			local v = f()
 			if v then
 				return v
 			end
 		end
 	end})
-	ENVIRONMENT.UI_MANAGER = {}
+	SHARED_MEMORY.UI_MANAGER = {}
 end
-table.insert(ENVIRONMENT.UI_MANAGER, function()
+table.insert(SHARED_MEMORY.UI_MANAGER, function()
 	if not X.IsDebugClient('Dev_UIManager') then
 		return
 	end
