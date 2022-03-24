@@ -2449,6 +2449,32 @@ function X.WithTarget(dwType, dwID, callback)
 end
 end
 
+do
+local CALLBACK_LIST
+-- 获取到当前角色并执行函数
+-- @param {function} callback 回调函数
+function X.WithClientPlayer(callback)
+	local me = GetClientPlayer()
+	if me then
+		X.SafeCall(callback, me)
+	elseif CALLBACK_LIST then
+		table.insert(CALLBACK_LIST, callback)
+	else
+		CALLBACK_LIST = {callback}
+		X.BreatheCall(X.NSFormatString('{$NS}.WithClientPlayer'), function()
+			local me = GetClientPlayer()
+			if me then
+				for _, callback in ipairs(CALLBACK_LIST) do
+					X.SafeCall(callback, me)
+				end
+				CALLBACK_LIST = nil
+				X.NSFormatString('{$NS}.WithClientPlayer', false)
+			end
+		end)
+	end
+end
+end
+
 -- 求N2在N1的面向角  --  重载+2
 -- (number) X.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
 -- (number) X.GetFaceAngel(oN1, oN2, bAbs)
