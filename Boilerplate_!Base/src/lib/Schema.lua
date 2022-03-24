@@ -445,7 +445,7 @@ function schema.MixedTable(t_schema, additional_values)
     local function CheckMixedTable(obj, path)
         local obj_t = type(obj)
         if obj_t ~= "table" then
-            local msg = ("Type mismatch: '%s' should be a table, is %s"):format(path, obj_t)
+            local msg = ("Type mismatch: '%s' should be a table, is %s"):format(tostring(path), obj_t)
             return schema.Error(msg, path)
         end
 
@@ -487,7 +487,7 @@ function schema.MixedTable(t_schema, additional_values)
                 else
                     if not additional_values then
                         local msg = ("Superfluous value: '%s' does not appear in the table schema")
-                                            :format(path)
+                                            :format(tostring(path))
                         AddError(schema.Error(msg, path))
                     end
                 end
