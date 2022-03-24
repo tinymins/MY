@@ -913,7 +913,7 @@ local MAX_EMOTION_LEN, EMOTION_CACHE = 0, nil
 local function InitEmotion()
 	if not EMOTION_CACHE then
 		local t = {}
-		local FaceIcon = X.GetGameTable('FaceIcon', true)
+		local FaceIcon = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('FaceIcon', true)
 		if FaceIcon then
 			for i = 1, FaceIcon:GetRowCount() do
 				local tLine = FaceIcon:GetRow(i)

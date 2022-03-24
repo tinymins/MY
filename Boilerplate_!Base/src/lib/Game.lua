@@ -311,7 +311,7 @@ do local CACHE
 function X.GetBuffByName(szName)
 	if not CACHE then
 		local aCache, tLine, tExist = {}, nil, nil
-		local Buff = X.GetGameTable('Buff', true)
+		local Buff = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('Buff', true)
 		if Buff then
 			for i = 1, Buff:GetRowCount() do
 				tLine = Buff:GetRow(i)
@@ -811,7 +811,7 @@ local function GenerateList(bForceRefresh)
 	BOSS_LIST = X.LoadLUAData(CACHE_PATH)
 	if bForceRefresh or not BOSS_LIST then
 		BOSS_LIST = {}
-		local DungeonBoss = X.GetGameTable('DungeonBoss', true)
+		local DungeonBoss = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('DungeonBoss', true)
 		if DungeonBoss then
 			local nCount = DungeonBoss:GetRowCount()
 			for i = 2, nCount do
@@ -832,8 +832,10 @@ local function GenerateList(bForceRefresh)
 				end
 			end
 		end
-		X.SaveLUAData(CACHE_PATH, BOSS_LIST)
-		X.Sysmsg(_L('Boss list updated to v%s.', ENVIRONMENT.GAME_VERSION))
+		if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+			X.SaveLUAData(CACHE_PATH, BOSS_LIST)
+			X.Sysmsg(_L('Boss list updated to v%s.', ENVIRONMENT.GAME_VERSION))
+		end
 	end
 
 	for dwMapID, tInfo in pairs(X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/bosslist/{$edition}.jx3dat') or {}) do
@@ -933,8 +935,10 @@ local function GenerateList(bForceRefresh)
 	INPC_LIST = X.LoadLUAData(CACHE_PATH)
 	if bForceRefresh or not INPC_LIST then
 		INPC_LIST = {}
-		X.SaveLUAData(CACHE_PATH, INPC_LIST)
-		X.Sysmsg(_L('Important-NPC list updated to v%s.', ENVIRONMENT.GAME_VERSION))
+		if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+			X.SaveLUAData(CACHE_PATH, INPC_LIST)
+			X.Sysmsg(_L('Important-NPC list updated to v%s.', ENVIRONMENT.GAME_VERSION))
+		end
 	end
 	for dwMapID, tInfo in pairs(X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/inpclist/{$edition}.jx3dat') or {}) do
 		if not INPC_LIST[dwMapID] then
@@ -1712,7 +1716,7 @@ function X.GetFurnitureInfo(szKey, oVal)
 	end
 	if not CACHE[szKey] then
 		CACHE[szKey] = {}
-		local HomelandFurnitureInfo = X.GetGameTable('HomelandFurnitureInfo', true)
+		local HomelandFurnitureInfo = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('HomelandFurnitureInfo', true)
 		if HomelandFurnitureInfo then
 			for i = 2, HomelandFurnitureInfo:GetRowCount() do
 				local tLine = HomelandFurnitureInfo:GetRow(i)
@@ -2849,7 +2853,7 @@ local BUFF_CACHE
 function X.IsBossFocusBuff(dwID, nLevel, nStackNum)
 	if not BUFF_CACHE then
 		BUFF_CACHE = {}
-		local BossFocusBuff = X.GetGameTable('BossFocusBuff', true)
+		local BossFocusBuff = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('BossFocusBuff', true)
 		if BossFocusBuff then
 			if BossFocusBuff then
 				for i = 2, BossFocusBuff:GetRowCount() do
@@ -2960,7 +2964,7 @@ do local CACHE
 function X.GetSkillByName(szName)
 	if not CACHE then
 		local aCache, tLine, tExist = {}, nil, nil
-		local Skill = X.GetGameTable('Skill', true)
+		local Skill = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('Skill', true)
 		if Skill then
 			for i = 1, Skill:GetRowCount() do
 				tLine = Skill:GetRow(i)
@@ -4376,7 +4380,7 @@ local MAP_ACHI_NORMAL, MAP_ACHI_ALL
 function X.GetMapAchievements(dwMapID, bWujia)
 	if not MAP_ACHI_NORMAL then
 		local tMapAchiNormal, tMapAchiAll = {}, {}
-		local Achievement = X.GetGameTable('Achievement', true)
+		local Achievement = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('Achievement', true)
 		if Achievement then
 			local nCount = Achievement:GetRowCount()
 			for i = 2, nCount do
@@ -4798,7 +4802,7 @@ local BOOK_SEGMENT_RECIPE = setmetatable({}, {
 				tBookID2RecipeID = {}
 				tBookName2RecipeID = {}
 				tSegmentName2RecipeID = {}
-				local BookSegment = X.GetGameTable('BookSegment', true)
+				local BookSegment = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('BookSegment', true)
 				if BookSegment then
 					local nCount = BookSegment:GetRowCount()
 					for i = 2, nCount do
@@ -4825,11 +4829,13 @@ local BOOK_SEGMENT_RECIPE = setmetatable({}, {
 					end
 				end
 			end
-			X.SaveLUAData({'temporary/book-segment.jx3dat', X.PATH_TYPE.GLOBAL}, {
-				book_id = tBookID2RecipeID,
-				book_name = tBookName2RecipeID,
-				segment_name = tSegmentName2RecipeID,
-			})
+			if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+				X.SaveLUAData({'temporary/book-segment.jx3dat', X.PATH_TYPE.GLOBAL}, {
+					book_id = tBookID2RecipeID,
+					book_name = tBookName2RecipeID,
+					segment_name = tSegmentName2RecipeID,
+				})
+			end
 			t.tBookID2RecipeID = tBookID2RecipeID
 			t.tBookName2RecipeID = tBookName2RecipeID
 			t.tSegmentName2RecipeID = tSegmentName2RecipeID
@@ -4909,7 +4915,7 @@ local DOODAD_BOOK = setmetatable({}, {
 			if not tDoodadID2BookRecipe or not tBookRecipe2DoodadID then
 				tDoodadID2BookRecipe = {}
 				tBookRecipe2DoodadID = {}
-				local DoodadTemplate = X.GetGameTable('DoodadTemplate', true)
+				local DoodadTemplate = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('DoodadTemplate', true)
 				if DoodadTemplate then
 					local nCount = DoodadTemplate:GetRowCount()
 					for i = 2, nCount do

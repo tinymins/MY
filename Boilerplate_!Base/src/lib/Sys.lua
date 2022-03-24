@@ -1983,26 +1983,31 @@ else
 end
 
 do
-local KEY = '/' .. wstring.gsub(X.PACKET_INFO.ROOT, '\\', '/'):gsub('/+$', ''):gsub('^.*/', ''):lower() .. '/'
 local FILE_PATH = {'temporary/lua_error.jx3dat', X.PATH_TYPE.GLOBAL}
 local LAST_ERROR_MSG = X.LoadLUAData(FILE_PATH, { passphrase = false }) or {}
 local ERROR_MSG = {}
-local function SaveErrorMessage()
-	X.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
-end
-local BROKEN_KGUI = IsDebugClient() and not X.IsDebugServer() and not X.IsDebugClient(true)
-RegisterEvent('CALL_LUA_ERROR', function()
-	local szMsg = arg0
-	local szMsgL = wstring.gsub(arg0:lower(), '\\', '/')
-	if wstring.find(szMsgL, KEY) then
-		if BROKEN_KGUI then
-			local szMessage = 'Your KGUI is not official, please fix client and try again.'
-			X.ErrorLog('[' .. X.PACKET_INFO.NAME_SPACE .. ']' .. szMessage .. '\n' .. _L[szMessage])
-		end
-		table.insert(ERROR_MSG, szMsg)
+
+if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+	local KEY = '/' .. wstring.gsub(X.PACKET_INFO.ROOT, '\\', '/'):gsub('/+$', ''):gsub('^.*/', ''):lower() .. '/'
+	local function SaveErrorMessage()
+		X.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
 	end
-	SaveErrorMessage()
-end)
+	local BROKEN_KGUI = IsDebugClient() and not X.IsDebugServer() and not X.IsDebugClient(true)
+	RegisterEvent('CALL_LUA_ERROR', function()
+		local szMsg = arg0
+		local szMsgL = wstring.gsub(arg0:lower(), '\\', '/')
+		if wstring.find(szMsgL, KEY) then
+			if BROKEN_KGUI then
+				local szMessage = 'Your KGUI is not official, please fix client and try again.'
+				X.ErrorLog('[' .. X.PACKET_INFO.NAME_SPACE .. ']' .. szMessage .. '\n' .. _L[szMessage])
+			end
+			table.insert(ERROR_MSG, szMsg)
+		end
+		SaveErrorMessage()
+	end)
+	X.RegisterInit('LIB#AddonErrorMessage', SaveErrorMessage)
+end
+
 function X.GetAddonErrorMessage()
 	local szMsg = table.concat(LAST_ERROR_MSG, '\n\n')
 	if not X.IsEmpty(szMsg) then
@@ -2010,10 +2015,10 @@ function X.GetAddonErrorMessage()
 	end
 	return szMsg .. table.concat(ERROR_MSG, '\n\n')
 end
+
 function X.GetAddonErrorMessageFilePath()
 	return X.FormatPath(FILE_PATH)
 end
-X.RegisterInit('LIB#AddonErrorMessage', SaveErrorMessage)
 end
 
 -----------------------------------------------
