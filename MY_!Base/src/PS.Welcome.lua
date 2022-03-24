@@ -140,14 +140,17 @@ function PS.OnPanelActive(wnd)
 			local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
 			UI.OpenBrowser(
 				'https://j3cx.com/serendipity/?'
-					.. X.EncodeQuerystring(X.SignPostData(X.ConvertToUTF8({
-						l = ENVIRONMENT.GAME_LANG,
-						L = ENVIRONMENT.GAME_EDITION,
-						S = X.GetRealServer(1),
-						s = X.GetRealServer(2),
-						n = X.GetClientInfo().szName,
-						N = szNameCRC,
-					}, X.SECRET.SERENDIPITY))),
+					.. X.EncodeQuerystring(X.SignPostData(X.ConvertToUTF8(
+						{
+							l = ENVIRONMENT.GAME_LANG,
+							L = ENVIRONMENT.GAME_EDITION,
+							S = X.GetRealServer(1),
+							s = X.GetRealServer(2),
+							n = X.GetClientInfo().szName,
+							N = szNameCRC,
+						}),
+						X.SECRET.SERENDIPITY
+					)),
 				{ openurl = 'https://j3cx.com/serendipity', controls = false })
 		end,
 	}):AutoWidth():Width() + 5
