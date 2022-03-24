@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -304,13 +304,13 @@ local COLUMN_LIST = {
 							rec[13]
 								and 'Remain time %s, cancellable.'
 								or 'Remain time %s, uncancellable.',
-							X.FormatDuration((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 'CHINESE')))
+							X.FormatDuration((rec[12] - rec[1]) / ENVIRONMENT.GAME_FPS, 'CHINESE')))
 					end
 					return GetFormatText(_L(
 						rec[13]
 							and 'Stacknum %d, remain time %s, cancellable.'
 							or 'Stacknum %d, remain time %s, uncancellable.',
-						rec[11], X.FormatDuration((rec[12] - rec[1]) / GLOBAL.GAME_FPS, 'CHINESE')))
+						rec[11], X.FormatDuration((rec[12] - rec[1]) / ENVIRONMENT.GAME_FPS, 'CHINESE')))
 				end
 			end
 			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then

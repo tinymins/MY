@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -74,7 +74,7 @@ local LOG_DOODAD_INFO_TIME_LIMIT = 10000 -- 交互物件信息再次记录最小时间间隔
 local LOG_NAMING_COUNT = {} -- 记录中NPC被提及的数量统计，用于命名记录文件
 
 local LOG_REPLAY = {} -- 最近的数据 （进战时候将最近的数据压进来）
-local LOG_REPLAY_FRAME = GLOBAL.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
+local LOG_REPLAY_FRAME = ENVIRONMENT.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
 
 local LOG_TYPE = {
 	FIGHT_TIME                            = 1,  -- 战斗时间

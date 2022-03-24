@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -72,8 +72,8 @@ function D.FetchEventList(frame)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/event/list',
 		data = {
-			l = GLOBAL.GAME_LANG,
-			L = GLOBAL.GAME_EDITION,
+			l = ENVIRONMENT.GAME_LANG,
+			L = ENVIRONMENT.GAME_EDITION,
 			jx3id = X.GetClientUUID(),
 		},
 		signature = X.SECRET.EVENT_LIST,
@@ -146,8 +146,8 @@ function D.FetchRankList(frame, szEventID)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/rank/list',
 		data = {
-			l = GLOBAL.GAME_LANG,
-			L = GLOBAL.GAME_EDITION,
+			l = ENVIRONMENT.GAME_LANG,
+			L = ENVIRONMENT.GAME_EDITION,
 			jx3id = X.GetClientUUID(),
 			event_id = szEventID,
 		},
@@ -240,8 +240,8 @@ function D.Vote(frame, szEventID, szTeamID)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/rank/vote',
 		data = {
-			l = GLOBAL.GAME_LANG,
-			L = GLOBAL.GAME_EDITION,
+			l = ENVIRONMENT.GAME_LANG,
+			L = ENVIRONMENT.GAME_EDITION,
 			jx3id = X.GetClientUUID(),
 			event_id = szEventID,
 			team_id = szTeamID,

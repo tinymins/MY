@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_LifeBar'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -698,7 +698,7 @@ local function LoadDefaultTemplate(szStyle)
 		end
 		template[1].Color[szRelation].__VALUE__ = tVal
 	end
-	if GLOBAL.GAME_PROVIDER == 'remote' then -- 云端微调对立颜色防止压缩模糊
+	if ENVIRONMENT.GAME_PROVIDER == 'remote' then -- 云端微调对立颜色防止压缩模糊
 		for _, szType in ipairs({ 'Player', 'Npc' }) do
 			template[1].Color.Enemy.__VALUE__[szType] = { 253, 86, 86 }
 		end

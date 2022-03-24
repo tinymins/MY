@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -117,7 +117,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			ondragresize = FormatAllContentPos,
 		})
 		local x, y = 10, 5
-		x = x + ui:Append('Text', { x = x, y = y - 3, text = GLOBAL.GAME_LANG == 'zhcn' and _L['YY:'] or _L['DC:'], font = 48 }):AutoWidth():Width() + 5
+		x = x + ui:Append('Text', { x = x, y = y - 3, text = ENVIRONMENT.GAME_LANG == 'zhcn' and _L['YY:'] or _L['DC:'], font = 48 }):AutoWidth():Width() + 5
 		x = x + ui:Append('WndAutocomplete', {
 			name = 'YY',
 			w = 160, h = 26, x = x, y = y,
@@ -172,8 +172,8 @@ function TI.CreateFrame(szInitYY, szInitNote)
 		y = y + ui:Append('WndButton', {
 			name = 'Btn_YY',
 			x = x, y = y, text = X.IsLeader()
-				and (GLOBAL.GAME_LANG == 'zhcn' and _L['Paste YY'] or _L['Paste DC'])
-				or (GLOBAL.GAME_LANG == 'zhcn' and _L['Copy YY'] or _L['Copy DC']),
+				and (ENVIRONMENT.GAME_LANG == 'zhcn' and _L['Paste YY'] or _L['Paste DC'])
+				or (ENVIRONMENT.GAME_LANG == 'zhcn' and _L['Copy YY'] or _L['Copy DC']),
 			buttonstyle = 'FLAT',
 			onclick = function()
 				local yy = ui:Children('#YY'):Text()
@@ -225,7 +225,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			end,
 		})
 		x, y = 11, 130
-		local bTeamMon = MY_TeamMon_RR and GLOBAL.GAME_BRANCH ~= 'classic'
+		local bTeamMon = MY_TeamMon_RR and ENVIRONMENT.GAME_BRANCH ~= 'classic'
 		local nBtnW = bTeamMon and 96 or 144
 		x = x + ui:Append('WndButton', {
 			name = 'WndBtn_RaidTools',

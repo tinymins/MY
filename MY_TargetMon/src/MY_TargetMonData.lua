@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
 local PLUGIN_NAME = 'MY_TargetMon'
@@ -43,7 +43,7 @@ local SKILL_EXTRA = {} -- 缓存自己放过的技能用于扫描
 local SKILL_CACHE = {} -- 下标为目标ID的目标技能缓存数组 反正ID不可能是doodad不会冲突
 local SKILL_INFO = {} -- 技能反向索引
 local VIEW_LIST = {}
-local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS * 2 / 3
+local BOX_SPARKING_FRAME = ENVIRONMENT.GAME_FPS * 2 / 3
 
 do
 local function FilterMonitors(monitors, dwMapID, dwKungfuID)

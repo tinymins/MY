@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -237,7 +237,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 								end
 							end)
 						else
-							hBox:ItemInfo(GLOBAL.GAME_VERSION, v[1], v[2], v[3])
+							hBox:ItemInfo(ENVIRONMENT.GAME_VERSION, v[1], v[2], v[3])
 						end
 					end
 					if frm.n > 5 then
@@ -257,7 +257,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 						local handle = ui:Append('Handle', { w = 230, h = 20, x = x + 30, y = y + 70 + 30 * n + 5, handlestyle = 3 })[1]
 						handle:AppendItemFromString(GetFormatText(_L['Total Auction:'], 41) .. D.GetMoneyTipText(nMoney))
 						handle:FormatAllItemPos()
-						if X.IsDistributor() and GLOBAL.GAME_BRANCH ~= 'classic' then
+						if X.IsDistributor() and ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 							ui:Append('WndButton', {
 								w = 91, h = 26, x = x + 620, y = y + 70 + 30 * n + 5, text = _L['salary'],
 								buttonstyle = 'SKEUOMORPHISM',

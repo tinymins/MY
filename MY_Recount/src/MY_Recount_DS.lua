@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -450,7 +450,7 @@ local SZ_CFG_FILE = {'userdata/fight_stat/config.jx3dat', X.PATH_TYPE.ROLE}
 local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
 local BUFF_UPDATE_CACHE = {} -- 最近的BUFF效果缓存 （进战时候将最近的数据压进来）
 local ABSORB_CACHE = {} -- 目标盾来源与状态缓存表
-local LOG_REPLAY_FRAME = GLOBAL.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
+local LOG_REPLAY_FRAME = ENVIRONMENT.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
 local SKILL_TYPE = CONSTANT.SKILL_TYPE
 
 -- 输出两个数里面小一点的那个 其中-1表示极大值

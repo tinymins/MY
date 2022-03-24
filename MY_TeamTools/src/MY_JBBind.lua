@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -38,8 +38,8 @@ function D.FetchBindStatus(resolve, reject)
 			driver = 'auto', mode = 'auto', method = 'auto',
 			url = 'https://pull.j3cx.com/role/query',
 			data = {
-				l = GLOBAL.GAME_LANG,
-				L = GLOBAL.GAME_EDITION,
+				l = ENVIRONMENT.GAME_LANG,
+				L = ENVIRONMENT.GAME_EDITION,
 				jx3id = X.GetClientUUID(),
 			},
 			signature = X.SECRET.ROLE_QUERY,
@@ -75,8 +75,8 @@ function D.Bind(szToken, resolve, reject)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/role/bind',
 		data = {
-			l = GLOBAL.GAME_LANG,
-			L = GLOBAL.GAME_EDITION,
+			l = ENVIRONMENT.GAME_LANG,
+			L = ENVIRONMENT.GAME_EDITION,
 			token = szToken,
 			cguid = X.GetClientGUID(),
 			jx3id = X.GetClientUUID(),
@@ -106,8 +106,8 @@ function D.Unbind(resolve, reject)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/role/unbind',
 		data = {
-			l = GLOBAL.GAME_LANG,
-			L = GLOBAL.GAME_EDITION,
+			l = ENVIRONMENT.GAME_LANG,
+			L = ENVIRONMENT.GAME_EDITION,
 			jx3id = X.GetClientUUID(),
 		},
 		signature = X.SECRET.ROLE_UNBIND,

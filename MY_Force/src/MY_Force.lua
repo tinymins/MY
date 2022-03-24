@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Force'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -276,7 +276,7 @@ function PS.OnPanelActive(frame)
 	-- wu du
 	---------------
 	ui:Append('Text', { text = g_tStrings.tForceTitle[CONSTANT.FORCE_TYPE.WU_DU], x = x, y = y, font = 27 })
-	if GLOBAL.GAME_BRANCH ~= 'classic' then
+	if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 		-- crlf
 		x = nPaddingX + 10
 		y = y + 28

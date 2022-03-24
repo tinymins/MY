@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_LifeBar'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -141,7 +141,7 @@ function D.DrawLifeBar(dwID)
 		if tCountDownItem.szType == 'BUFF' or tCountDownItem.szType == 'DEBUFF' then
 			local KBuff = KTarget.GetBuff(tCountDownItem.dwBuffID, 0)
 			if KBuff then
-				nCountDownSecond = (KBuff.GetEndTime() - GetLogicFrameCount()) / GLOBAL.GAME_FPS
+				nCountDownSecond = (KBuff.GetEndTime() - GetLogicFrameCount()) / ENVIRONMENT.GAME_FPS
 				szCountDownText = tCountDownItem.szText or X.GetBuffName(KBuff.dwID, KBuff.nLevel)
 				if KBuff.nStackNum > 1 then
 					szCountDownText = szCountDownText .. 'x' .. KBuff.nStackNum
@@ -162,7 +162,7 @@ function D.DrawLifeBar(dwID)
 			szCountDownText = tCountDownItem.szText or ''
 		else --if tData.szType == 'TIME' then
 			if tCountDownItem.nLogicFrame then
-				nCountDownSecond = (tCountDownItem.nLogicFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
+				nCountDownSecond = (tCountDownItem.nLogicFrame - GetLogicFrameCount()) / ENVIRONMENT.GAME_FPS
 			elseif tCountDownItem.nTime then
 				nCountDownSecond = (tCountDownItem.nTime - GetTime()) / 1000
 			end

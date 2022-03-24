@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -69,8 +69,8 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 	end
 	local szURL = 'https://page.j3cx.com/item/' .. table.concat(aPath, '/') .. '/price?'
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
-			l = GLOBAL.GAME_LANG,
-			L = GLOBAL.GAME_EDITION,
+			l = ENVIRONMENT.GAME_LANG,
+			L = ENVIRONMENT.GAME_EDITION,
 			server = line and line.szCenterName or X.GetRealServer(2),
 			player = GetUserRoleName(),
 			item = szName,
@@ -273,8 +273,8 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 			table.insert(aData, szKey .. '-' .. table.concat(aPrice, '-'))
 		end
 		local data = {
-			l = GLOBAL.GAME_LANG,
-			L = GLOBAL.GAME_EDITION,
+			l = ENVIRONMENT.GAME_LANG,
+			L = ENVIRONMENT.GAME_EDITION,
 			r = X.GetRealServer(1),
 			s = X.GetRealServer(2),
 			t = GetCurrentTime(),

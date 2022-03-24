@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
 local PLUGIN_NAME = 'MY_TargetMon'
@@ -1141,7 +1141,7 @@ local function DrawControls(ui, OpenDetail)
 					and _L['Ensure export (as embedded)']
 					or (szIndent and _L['Ensure export (with indent)'] or _L['Ensure export']),
 				fnAction = function()
-					if GLOBAL.GAME_PROVIDER == 'remote' then
+					if ENVIRONMENT.GAME_PROVIDER == 'remote' then
 						return X.Alert(_L['Streaming client does not support export!'])
 					end
 					local file = X.FormatPath({

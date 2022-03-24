@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -174,7 +174,7 @@ function D.UpdateCDText(txt, nTime)
 	if txt.nTime == nTime then
 		return
 	end
-	local nSec, szTime, nR, nG, nB = math.floor(nTime / GLOBAL.GAME_FPS)
+	local nSec, szTime, nR, nG, nB = math.floor(nTime / ENVIRONMENT.GAME_FPS)
 	if nSec == 0 then
 		szTime, nR, nG, nB = '', 255, 255, 255
 	else

@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_ChatLog'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -49,7 +49,7 @@ local function getHeader()
 	local szHeader = [[<!DOCTYPE html>
 <html>
 <head><meta http-equiv='Content-Type' content='text/html; charset=]]
-	.. ((GLOBAL.GAME_LANG == 'zhcn' and 'GBK') or 'UTF-8') .. [[' />
+	.. ((ENVIRONMENT.GAME_LANG == 'zhcn' and 'GBK') or 'UTF-8') .. [[' />
 <style>
 *{font-size: 12px}
 a{line-height: 16px}
@@ -241,7 +241,7 @@ function D.ExportConfirm()
 		x = x, y = y, w = nMaxWidth - x * 2, h = 35,
 		text = _L['Export chatlog'],
 		onclick = function()
-			if GLOBAL.GAME_PROVIDER == 'remote' then
+			if ENVIRONMENT.GAME_PROVIDER == 'remote' then
 				return X.Alert(_L['Streaming client does not support export!'])
 			end
 			local function doExport(szSuffix)

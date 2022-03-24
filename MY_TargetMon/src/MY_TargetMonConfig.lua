@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
 local PLUGIN_NAME = 'MY_TargetMon'
@@ -28,7 +28,7 @@ end
 X.RegisterRestriction('MY_TargetMon', { ['*'] = false, classic = true })
 X.RegisterRestriction('MY_TargetMon.ShieldedUUID', { ['*'] = true })
 --------------------------------------------------------------------------
-local LANG = GLOBAL.GAME_LANG
+local LANG = ENVIRONMENT.GAME_LANG
 local INIT_STATE = 'NONE'
 local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }, {}
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', X.PATH_TYPE.ROLE}

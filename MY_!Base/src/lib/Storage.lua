@@ -1137,7 +1137,7 @@ local function FormatStorageData(me, d)
 		n = X.GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
 		S = X.GetRealServer(1), s = X.GetRealServer(2), r = me.nRoleType,
 		_ = GetCurrentTime(), t = X.GetTongName(), d = d,
-		m = GLOBAL.GAME_PROVIDER == 'remote' and 1 or 0, v = X.PACKET_INFO.VERSION,
+		m = ENVIRONMENT.GAME_PROVIDER == 'remote' and 1 or 0, v = X.PACKET_INFO.VERSION,
 	})))
 end
 -- 个人数据版本号
@@ -1158,8 +1158,8 @@ X.BreatheCall(X.NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 	X.Ajax({
 		url = 'https://storage.j3cx.com/api/storage',
 		data = {
-			l = GLOBAL.GAME_LANG,
-			L = GLOBAL.GAME_EDITION,
+			l = ENVIRONMENT.GAME_LANG,
+			L = ENVIRONMENT.GAME_EDITION,
 			data = FormatStorageData(me),
 		},
 		success = function(html, status)
@@ -1212,8 +1212,8 @@ function X.StorageData(szKey, oData)
 		X.Ajax({
 			url = 'https://storage.uploads.j3cx.com/api/storage/uploads',
 			data = {
-				l = GLOBAL.GAME_LANG,
-				L = GLOBAL.GAME_EDITION,
+				l = ENVIRONMENT.GAME_LANG,
+				L = ENVIRONMENT.GAME_EDITION,
 				data = FormatStorageData(me, { k = szKey, o = oData }),
 			},
 			success = function(html, status)

@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -25,7 +25,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^9.0.0') then
 	return
 end
-local bRestricted = GLOBAL.GAME_BRANCH == 'classic'
+local bRestricted = ENVIRONMENT.GAME_BRANCH == 'classic'
 X.RegisterRestriction('MY_TeamMon', { ['*'] = false, classic = true })
 X.RegisterRestriction('MY_TeamMon.MapRestriction', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.HiddenBuff', { ['*'] = true })
@@ -1837,7 +1837,7 @@ function D.LoadUserData()
 		FireUIEvent('MY_TM_DATA_RELOAD')
 	else
 		D.ImportDataFromFile(
-			GLOBAL.GAME_EDITION ..  '.jx3dat',
+			ENVIRONMENT.GAME_EDITION ..  '.jx3dat',
 			MY_TM_TYPE_LIST,
 			'REPLACE',
 			function()
@@ -1920,7 +1920,7 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 	end
 	-- HM.20170504: add meta data
 	data['__meta'] = {
-		szEdition = GLOBAL.GAME_EDITION,
+		szEdition = ENVIRONMENT.GAME_EDITION,
 		szAuthor = not X.IsEmpty(szAuthor)
 			and szAuthor
 			or GetUserRoleName(),

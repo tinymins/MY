@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -26,7 +26,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^9.0.0') then
 end
 --------------------------------------------------------------------------
 
-if GLOBAL.GAME_BRANCH == 'classic' then
+if ENVIRONMENT.GAME_BRANCH == 'classic' then
 	return
 end
 
@@ -1406,7 +1406,7 @@ function D.DrawMiniMapPoint()
 			for _, pos in ipairs(mark.aPosition) do
 				if math.pow((me.nX - pos[1]) / 64, 2) + math.pow((me.nY - pos[2]) / 64, 2) <= MINI_MAP_POINT_MAX_DISTANCE then
 					X.UpdateMiniFlag(CONSTANT.MINI_MAP_POINT.FUNCTION_NPC,
-						pos[1], pos[2], 21, 47, GLOBAL.GAME_FPS)
+						pos[1], pos[2], 21, 47, ENVIRONMENT.GAME_FPS)
 				end
 			end
 		end

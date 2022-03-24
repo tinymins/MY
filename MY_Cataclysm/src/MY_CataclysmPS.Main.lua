@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Cataclysm'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -145,7 +145,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	if GLOBAL.GAME_BRANCH ~= 'classic' then
+	if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY, text = _L['ZuiWu Effect'],
 			checked = CFG.bShowEffect,

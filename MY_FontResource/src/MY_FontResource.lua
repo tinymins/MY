@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_FontResource'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -31,7 +31,7 @@ local FONT_DIR = X.PACKET_INFO.ROOT:gsub('%./', '/') .. 'MY_FontResource/font/'
 local FONT_LIST = X.LoadLUAData(FONT_DIR .. '{$lang}.jx3dat') or {}
 
 function D.GetList()
-	local aList, tExist, szLang = {}, {}, GLOBAL.GAME_LANG
+	local aList, tExist, szLang = {}, {}, ENVIRONMENT.GAME_LANG
 	for _, p in ipairs(Font.GetFontPathList() or {}) do
 		local szFile = p.szFile:gsub('/', '\\')
 		local szKey = szFile:lower()

@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -222,7 +222,7 @@ function PS.OnPanelActive(wnd)
 				szOption = _L['Import data (local)'],
 				fnAction = function() MY_TeamMon_UI.OpenImportPanel() end,
 			})
-			local szLang = GLOBAL.GAME_LANG
+			local szLang = ENVIRONMENT.GAME_LANG
 			if szLang == 'zhcn' or szLang == 'zhtw' then
 				table.insert(menu, {
 					szOption = _L['Import data (web)'],

@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -134,18 +134,18 @@ local INFO_TIP_LIST = {
 		GetFormatString = function(data)
 			local s = 1
 			if data.cache.nTimeMachineLFC ~= GetLogicFrameCount() then
-				local tm = data.cache.tTimeMachineRec[GLOBAL.GAME_FPS] or {}
+				local tm = data.cache.tTimeMachineRec[ENVIRONMENT.GAME_FPS] or {}
 				tm.frame = GetLogicFrameCount()
 				tm.tick  = GetTickCount()
-				for i = GLOBAL.GAME_FPS, 1, -1 do
+				for i = ENVIRONMENT.GAME_FPS, 1, -1 do
 					data.cache.tTimeMachineRec[i] = data.cache.tTimeMachineRec[i - 1]
 				end
 				data.cache.tTimeMachineRec[1] = tm
 				data.cache.nTimeMachineLFC = GetLogicFrameCount()
 			end
-			local tm = data.cache.tTimeMachineRec[GLOBAL.GAME_FPS]
+			local tm = data.cache.tTimeMachineRec[ENVIRONMENT.GAME_FPS]
 			if tm then
-				s = 1000 * (GetLogicFrameCount() - tm.frame) / GLOBAL.GAME_FPS / (GetTickCount() - tm.tick)
+				s = 1000 * (GetLogicFrameCount() - tm.frame) / ENVIRONMENT.GAME_FPS / (GetTickCount() - tm.tick)
 			end
 			return string.format(data.cache.formatString, s)
 		end,
@@ -490,19 +490,19 @@ local INFO_TIP_LIST = {
 			local s = 0
 			local me = GetClientPlayer()
 			if me and data.cache.nSpeedometerLFC ~= GetLogicFrameCount() then
-				local sm = data.cache.tSpeedometerRec[GLOBAL.GAME_FPS] or {}
+				local sm = data.cache.tSpeedometerRec[ENVIRONMENT.GAME_FPS] or {}
 				sm.framecount = GetLogicFrameCount()
 				sm.x, sm.y, sm.z = me.nX, me.nY, me.nZ
-				for i = GLOBAL.GAME_FPS, 1, -1 do
+				for i = ENVIRONMENT.GAME_FPS, 1, -1 do
 					data.cache.tSpeedometerRec[i] = data.cache.tSpeedometerRec[i - 1]
 				end
 				data.cache.tSpeedometerRec[1] = sm
 				data.cache.nSpeedometerLFC = GetLogicFrameCount()
 			end
-			local sm = data.cache.tSpeedometerRec[GLOBAL.GAME_FPS]
+			local sm = data.cache.tSpeedometerRec[ENVIRONMENT.GAME_FPS]
 			if sm and me then
 				s = math.sqrt(math.pow(me.nX - sm.x, 2) + math.pow(me.nY - sm.y, 2) + math.pow((me.nZ - sm.z) / 8, 2)) / 64
-					/ (GetLogicFrameCount() - sm.framecount) * GLOBAL.GAME_FPS
+					/ (GetLogicFrameCount() - sm.framecount) * ENVIRONMENT.GAME_FPS
 			end
 			return string.format(data.cache.formatString, s)
 		end

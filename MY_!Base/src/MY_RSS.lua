@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_!Base'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -59,8 +59,8 @@ X.RegisterInit('MY_RSS', function()
 		X.Ajax({
 			driver = 'auto', mode = 'auto', method = 'auto',
 			url = 'https://pull.j3cx.com/config/all'
-				.. '?l=' .. GLOBAL.GAME_LANG
-				.. '&L=' .. GLOBAL.GAME_EDITION
+				.. '?l=' .. ENVIRONMENT.GAME_LANG
+				.. '&L=' .. ENVIRONMENT.GAME_EDITION
 				.. '&_=' .. GetCurrentTime(),
 			success = function(html, status)
 				RSS_DATA = X.DecodeJSON(html)

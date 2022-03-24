@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -77,7 +77,7 @@ function D.SetAutoFeed(dwAutoFeedCubTabType, dwAutoFeedCubTabIndex, dwAutoFeedFo
 	if dwAutoFeedFoodTabType and dwAutoFeedFoodTabIndex then
 		local food = GetItemInfo(dwAutoFeedFoodTabType, dwAutoFeedFoodTabIndex)
 		if food then
-			local szText = MY.GetPureText(GetItemInfoTip(GLOBAL.CURRENT_ITEM_VERSION, dwAutoFeedFoodTabType, dwAutoFeedFoodTabIndex), 'LUA') or ''
+			local szText = MY.GetPureText(GetItemInfoTip(ENVIRONMENT.CURRENT_ITEM_VERSION, dwAutoFeedFoodTabType, dwAutoFeedFoodTabIndex), 'LUA') or ''
 			local szVal = szText:match(_L['measure (%d+) point'])
 			local nAutoFeedFoodMeasure = szVal and tonumber(szVal)
 			if nAutoFeedFoodMeasure then

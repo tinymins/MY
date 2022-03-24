@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_CombatText'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -75,7 +75,7 @@ local COMBAT_TEXT_STRING = { -- 需要变成特定字符串的伤害类型
 }
 local COMBAT_TEXT_COLOR = { --不需要修改的内定颜色
 	YELLOW = { 255, 255, 0   },
-	RED    = GLOBAL.GAME_PROVIDER == 'remote'
+	RED    = ENVIRONMENT.GAME_PROVIDER == 'remote'
 		and { 253, 86, 86 }
 		or { 255, 0, 0 },
 	PURPLE = { 255, 0,   255 },
@@ -269,7 +269,7 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
-		xDefaultValue = GLOBAL.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 },
+		xDefaultValue = ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 },
 	},
 	-- $name 名字 $sn   技能名 $crit 会心 $val  数值
 	szSkill = {
@@ -313,7 +313,7 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		szLabel = _L['MY_CombatText'],
 		xSchema = X.Schema.Map(X.Schema.OneOf(X.Schema.String, X.Schema.Number), X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {
-			['DAMAGE']                               = GLOBAL.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
+			['DAMAGE']                               = ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
 			[SKILL_RESULT_TYPE.THERAPY]              = { 0,   255, 0   }, -- 治疗
 			[SKILL_RESULT_TYPE.PHYSICS_DAMAGE]       = { 255, 255, 255 }, -- 外公
 			[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE]   = { 255, 128, 128 }, -- 阳

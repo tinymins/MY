@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -83,7 +83,7 @@ function PS.OnPanelActive(wnd)
 	nX, nY = ui:Append('Text', { x = nX, y = nY + 5, text = _L['Gadgets'], font = 27 }):Pos('BOTTOMRIGHT')
 	for k, v in ipairs(O.tItem) do
 		if GetItemInfo(v.dwTabType, v.dwIndex) then
-			nX = ui:Append('Box', { x = (k - 1) * 48 + nPaddingX + 10, y = nY + 10, w = 38, h = 38 }):ItemInfo(GLOBAL.CURRENT_ITEM_VERSION, v.dwTabType, v.dwIndex):Pos('BOTTOMRIGHT')
+			nX = ui:Append('Box', { x = (k - 1) * 48 + nPaddingX + 10, y = nY + 10, w = 38, h = 38 }):ItemInfo(ENVIRONMENT.CURRENT_ITEM_VERSION, v.dwTabType, v.dwIndex):Pos('BOTTOMRIGHT')
 		end
 	end
 

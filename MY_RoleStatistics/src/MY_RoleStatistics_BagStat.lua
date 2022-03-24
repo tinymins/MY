@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -181,7 +181,7 @@ local FILTER_LIST = {
 	{ name = 'Drug'     , where = 'I.genre = 1 OR genre = 14' },
 	{ name = 'Material' , where = 'I.genre = 3' },
 	{ name = 'Book'     , where = 'I.genre = 4' },
-	{ name = 'Furniture', where = 'I.genre = 20', visible = GLOBAL.GAME_BRANCH ~= 'classic' },
+	{ name = 'Furniture', where = 'I.genre = 20', visible = ENVIRONMENT.GAME_BRANCH ~= 'classic' },
 	{ name = 'Grey'     , where = 'I.quality = 0' },
 	{ name = 'TimeLtd'  , where = 'I.exist_type <> -1 AND I.exist_type <> ' .. ITEM_EXIST_TYPE.PERMANENT },
 }

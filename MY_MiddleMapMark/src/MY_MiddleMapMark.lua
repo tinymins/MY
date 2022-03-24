@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_MiddleMapMark'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -303,7 +303,7 @@ end
 local l_npc = {}
 local l_doodad = {}
 local l_tempMap = false
-local MAX_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
+local MAX_RENDER_INTERVAL = ENVIRONMENT.GAME_FPS * 5
 local function FlushDB()
 	if X.IsEmpty(l_npc) and X.IsEmpty(l_doodad) then
 		return

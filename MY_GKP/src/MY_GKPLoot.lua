@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -31,7 +31,7 @@ X.RegisterRestriction('MY_GKPLoot.ForceLoot', { ['*'] = true })
 local DEBUG_LOOT = false -- 测试拾取分配 强制进入分配模式并最终不调用分配接口
 local GKP_LOOT_INIFILE = PLUGIN_ROOT .. '/ui/MY_GKPLoot.ini'
 local MY_GKP_LOOT_BOSS -- 散件老板
-local GKP_AUTO_LOOT_DEBOUNCE_TIME = GLOBAL.GAME_FPS / 2 -- 自动拾取时延
+local GKP_AUTO_LOOT_DEBOUNCE_TIME = ENVIRONMENT.GAME_FPS / 2 -- 自动拾取时延
 
 local GKP_LOOT_HUANGBABA_ICON = 2589 -- 玄晶图标
 local GKP_LOOT_HUANGBABA_QUALITY = CONSTANT.ITEM_QUALITY.NACARAT -- 玄晶品级
@@ -265,7 +265,7 @@ RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
 function D.UpdateShielded()
 	GKP_AUTO_LOOT_DEBOUNCE_TIME = X.IsRestricted('MY_GKPLoot.FastLoot')
-		and GLOBAL.GAME_FPS / 2
+		and ENVIRONMENT.GAME_FPS / 2
 		or 0
 end
 

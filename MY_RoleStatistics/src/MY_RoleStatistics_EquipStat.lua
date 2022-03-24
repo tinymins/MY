@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -437,11 +437,11 @@ function D.FlushDB()
 		lshoulder = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwLShoulderItemIndex) },
 		rshoulder = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwRShoulderItemIndex) },
 		backcloak = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwBackCloakItemIndex) },
-		bag = { ITEM_TABLE_TYPE.CUST_TRINKET, GLOBAL.GAME_BRANCH ~= 'classic' and me.dwBagItemIndex or 0 },
-		glasses = { ITEM_TABLE_TYPE.CUST_TRINKET, GLOBAL.GAME_BRANCH ~= 'classic' and me.dwGlassesItemIndex or 0 },
-		lglove = { ITEM_TABLE_TYPE.CUST_TRINKET, GLOBAL.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.LGLOVE) or 0 },
-		rglove = { ITEM_TABLE_TYPE.CUST_TRINKET, GLOBAL.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.RGLOVE) or 0 },
-		penpet = { ITEM_TABLE_TYPE.CUST_TRINKET, GLOBAL.GAME_BRANCH ~= 'classic' and me.GetEquippedPendentPet() or 0 },
+		bag = { ITEM_TABLE_TYPE.CUST_TRINKET, ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.dwBagItemIndex or 0 },
+		glasses = { ITEM_TABLE_TYPE.CUST_TRINKET, ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.dwGlassesItemIndex or 0 },
+		lglove = { ITEM_TABLE_TYPE.CUST_TRINKET, ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.LGLOVE) or 0 },
+		rglove = { ITEM_TABLE_TYPE.CUST_TRINKET, ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.RGLOVE) or 0 },
+		penpet = { ITEM_TABLE_TYPE.CUST_TRINKET, ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetEquippedPendentPet() or 0 },
 	}))
 
 	DB_OwnerInfoW:ClearBindings()

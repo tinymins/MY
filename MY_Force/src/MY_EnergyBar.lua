@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Force'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -304,7 +304,7 @@ function D.UpdateBomb(frame)
 			if bExist then
 				local buff = X.GetBuff(me, nBuffID)
 				if buff then
-					local nLeftTime = math.floor((buff.nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS)
+					local nLeftTime = math.floor((buff.nEndFrame - GetLogicFrameCount()) / ENVIRONMENT.GAME_FPS)
 					if D.tBombMsg[i] and D.tBombMsg[i].nTime >= nLeftTime then
 						D.tBombMsg[i].nTime = nLeftTime
 					else
@@ -547,7 +547,7 @@ end
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_EnergyBar', D.Apply)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
-	if GLOBAL.GAME_BRANCH ~= 'classic' then
+	if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Enable MY_EnergyBar'],

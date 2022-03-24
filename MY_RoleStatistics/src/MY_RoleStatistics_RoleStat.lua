@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -335,7 +335,7 @@ local COLUMN_LIST = lodash.filter({
 	},
 	{ -- 账号精力
 		id = 'account_stamina',
-		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Account Stamina'],
 		szShortTitle = _L['Account_stami'],
 		nMinWidth = 70,
@@ -349,7 +349,7 @@ local COLUMN_LIST = lodash.filter({
 	},
 	{ -- 角色精力
 		id = 'role_stamina',
-		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Role Stamina'],
 		szShortTitle = _L['Role_stami'],
 		nMinWidth = 70,
@@ -363,7 +363,7 @@ local COLUMN_LIST = lodash.filter({
 	},
 	{ -- 精力周余
 		id = 'role_stamina_remain',
-		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Role Stamina Remain'],
 		szShortTitle = _L['Role_stami_remain'],
 		nMinWidth = 70,
@@ -406,7 +406,7 @@ local COLUMN_LIST = lodash.filter({
 	},
 	{ -- 浪客笺
 		id = 'starve',
-		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Starve'],
 		nMinWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('starve'),
@@ -415,7 +415,7 @@ local COLUMN_LIST = lodash.filter({
 	},
 	{ -- 浪客笺周余
 		id = 'starve_remain',
-		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Starve remain'],
 		szShortTitle = _L['Starv_remain'],
 		nMinWidth = 60,
@@ -425,7 +425,7 @@ local COLUMN_LIST = lodash.filter({
 	},
 	{ -- 园宅币
 		id = 'architecture',
-		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Architecture'],
 		nMinWidth = 60,
 		GetFormatText = GeneWeeklyFormatText('architecture'),
@@ -434,7 +434,7 @@ local COLUMN_LIST = lodash.filter({
 	},
 	{ -- 园宅币周余
 		id = 'architecture_remain',
-		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Architecture remain'],
 		szShortTitle = _L['Arch_remain'],
 		nMinWidth = 60,
@@ -490,7 +490,7 @@ local COLUMN_LIST = lodash.filter({
 	{
 		-- 名剑币
 		id = 'arena_award',
-		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Arena award'],
 		nMinWidth = 60,
 		GetFormatText = GeneCommonFormatText('arena_award'),
@@ -499,7 +499,7 @@ local COLUMN_LIST = lodash.filter({
 	{
 		-- 名剑币周余
 		id = 'arena_award_remain',
-		bVisible = GLOBAL.GAME_BRANCH ~= 'classic',
+		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Arena award remain'],
 		szShortTitle = _L['Aren awa remain'],
 		nMinWidth = 60,
@@ -826,7 +826,7 @@ function D.GetClientPlayerRec()
 	rec.vigor = -1
 	rec.vigor_max = -1
 	rec.vigor_remain = -1
-	if GLOBAL.GAME_BRANCH ~= 'classic' then
+	if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 		rec.stamina = me.nCurrentStamina
 		rec.stamina_max = me.nMaxStamina
 		rec.stamina_remain = -1
@@ -848,8 +848,8 @@ function D.GetClientPlayerRec()
 	rec.exam_print = me.nExamPrint
 	rec.exam_print_remain = me.GetExamPrintRemainSpace()
 	rec.achievement_score = me.GetAchievementRecord()
-	rec.architecture = GLOBAL.GAME_BRANCH ~= 'classic' and me.nArchitecture or 0
-	rec.architecture_remain = GLOBAL.GAME_BRANCH ~= 'classic' and X.IsFunction(me.GetArchitectureRemainSpace) and me.GetArchitectureRemainSpace() or 0
+	rec.architecture = ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.nArchitecture or 0
+	rec.architecture_remain = ENVIRONMENT.GAME_BRANCH ~= 'classic' and X.IsFunction(me.GetArchitectureRemainSpace) and me.GetArchitectureRemainSpace() or 0
 	rec.coin = me.nCoin
 	rec.mentor_score = me.dwTAEquipsScore
 	rec.starve = X.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 34797, true)

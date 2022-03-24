@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -238,7 +238,7 @@ local COLUMN_LIST = {
 }
 local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 	if id == 'week_team_dungeon' then
-		if GLOBAL.GAME_BRANCH ~= 'classic' then
+		if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 			return {
 				id = id,
 				szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_TEAM_DUNGEON,
@@ -246,7 +246,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			}
 		end
 	elseif id == 'week_raid_dungeon' then
-		if GLOBAL.GAME_BRANCH ~= 'classic' then
+		if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 			return {
 				id = id,
 				szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_RAID_DUNGEON,

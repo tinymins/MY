@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -64,8 +64,8 @@ function D.Hook()
 				driver = 'auto', mode = 'auto', method = 'auto',
 				url = 'https://pull.j3cx.com/api/macro/query',
 				data = {
-					l = GLOBAL.GAME_LANG,
-					L = GLOBAL.GAME_EDITION,
+					l = ENVIRONMENT.GAME_LANG,
+					L = ENVIRONMENT.GAME_EDITION,
 					name = szName,
 				},
 				success = function(szHTML)
@@ -115,8 +115,8 @@ function D.Hook()
 			end
 			local szURL = 'https://page.j3cx.com/macro/details?'
 				.. X.EncodeQuerystring(X.ConvertToUTF8({
-					l = GLOBAL.GAME_LANG,
-					L = GLOBAL.GAME_EDITION,
+					l = ENVIRONMENT.GAME_LANG,
+					L = ENVIRONMENT.GAME_EDITION,
 					name = szName,
 				}))
 			UI.OpenBrowser(szURL, { key = 'MY_YunMacro_' .. GetStringCRC(szName), layer = 'Topmost', readonly = true })
@@ -130,8 +130,8 @@ function D.Hook()
 		onclick = function()
 			local szURL = 'https://page.j3cx.com/macro/tops?'
 				.. X.EncodeQuerystring(X.ConvertToUTF8({
-					l = GLOBAL.GAME_LANG,
-					L = GLOBAL.GAME_EDITION,
+					l = ENVIRONMENT.GAME_LANG,
+					L = ENVIRONMENT.GAME_EDITION,
 					kungfu = tostring(UI_GetPlayerMountKungfuID()),
 				}))
 			X.OpenBrowser(szURL)

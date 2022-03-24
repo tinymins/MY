@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_!Base'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -84,8 +84,8 @@ X.RegisterEvent('MY_RSS_UPDATE', function()
 			X.EnsureAjax({
 				url = 'https://push.j3cx.com/api/share-event',
 				data = {
-					l = GLOBAL.GAME_LANG,
-					L = GLOBAL.GAME_EDITION,
+					l = ENVIRONMENT.GAME_LANG,
+					L = ENVIRONMENT.GAME_EDITION,
 					region = X.GetRealServer(1),
 					server = X.GetRealServer(2),
 					event = p.name,
@@ -268,8 +268,8 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 				X.EnsureAjax({
 					url = 'https://push.j3cx.com/api/share-ui',
 					data = {
-						l = GLOBAL.GAME_LANG,
-						L = GLOBAL.GAME_EDITION,
+						l = ENVIRONMENT.GAME_LANG,
+						L = ENVIRONMENT.GAME_EDITION,
 						region = X.GetRealServer(1),
 						server = X.GetRealServer(2),
 						key = v.key,
@@ -331,8 +331,8 @@ X.RegisterEvent('OPEN_WINDOW', 'MY_ShareKnowledge__Npc', function()
 		X.EnsureAjax({
 			url = 'https://push.j3cx.com/api/share-npc-chat',
 			data = {
-				l = GLOBAL.GAME_LANG,
-				L = GLOBAL.GAME_EDITION,
+				l = ENVIRONMENT.GAME_LANG,
+				L = ENVIRONMENT.GAME_EDITION,
 				r = X.GetRealServer(1),
 				s = X.GetRealServer(2),
 				t = GetCurrentTime(),
@@ -408,8 +408,8 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_ShareKnowledge__Sysmsg', function(szChannel,
 			X.EnsureAjax({
 				url = 'https://push.j3cx.com/api/share-sysmsg',
 				data = {
-					l = GLOBAL.GAME_LANG,
-					L = GLOBAL.GAME_EDITION,
+					l = ENVIRONMENT.GAME_LANG,
+					L = ENVIRONMENT.GAME_EDITION,
 					region = X.GetRealServer(1),
 					server = X.GetRealServer(2),
 					content = szMsg,

@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -30,7 +30,7 @@ end
 local D = {}
 local O = {}
 
-local EDITION = GLOBAL.GAME_EDITION
+local EDITION = ENVIRONMENT.GAME_EDITION
 local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
 local MY_TM_REMOTE_DATA_ROOT = MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
 local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
@@ -434,8 +434,8 @@ function D.FetchRepoMetaInfoList(nPage)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/dbm/subscribe/all',
 		data = {
-			l = GLOBAL.GAME_LANG,
-			L = GLOBAL.GAME_EDITION,
+			l = ENVIRONMENT.GAME_LANG,
+			L = ENVIRONMENT.GAME_EDITION,
 			page = nPage or REPO_META_PAGE.nIndex,
 			pageSize = 15,
 		},
@@ -459,8 +459,8 @@ function D.FetchRepoMetaInfoList(nPage)
 			for _, info in ipairs(res.data) do
 				info.url = 'https://pull.j3cx.com/api/dbm/feed?'
 					.. X.EncodeQuerystring(X.ConvertToUTF8({
-						l = GLOBAL.GAME_LANG,
-						L = GLOBAL.GAME_EDITION,
+						l = ENVIRONMENT.GAME_LANG,
+						L = ENVIRONMENT.GAME_EDITION,
 						key = info.key,
 					}))
 				info = D.FormatMetaInfo(info)

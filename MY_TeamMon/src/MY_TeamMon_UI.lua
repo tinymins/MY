@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -151,7 +151,7 @@ function D.OnFrameCreate()
 		menu = function()
 			local menu = {}
 			table.insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
-			local szLang = GLOBAL.GAME_LANG
+			local szLang = ENVIRONMENT.GAME_LANG
 			if szLang == 'zhcn' or szLang == 'zhtw' then
 				table.insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
 			end
@@ -991,7 +991,7 @@ function D.OpenExportPanel()
 		end,
 	}):Pos('BOTTOMRIGHT')
 	nY = nY + 10
-	local szFileName = 'TM-' .. GLOBAL.GAME_EDITION .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime())
+	local szFileName = 'TM-' .. ENVIRONMENT.GAME_EDITION .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime())
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['File name'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndEditBox', {
 		x = 25, y = nY, w = 500, h = 25,
@@ -1173,10 +1173,10 @@ function D.SetBuffItemAction(h)
 	local nSec = select(3, GetBuffTime(dat.dwID, dat.nLevel))
 	if not nSec then
 		h:Lookup('Text_R'):SetText('N/A')
-	elseif nSec > 24 * 60 * 60 / GLOBAL.GAME_FPS then
+	elseif nSec > 24 * 60 * 60 / ENVIRONMENT.GAME_FPS then
 		h:Lookup('Text_R'):SetText(_L['INFINITE'])
 	else
-		nSec = nSec / GLOBAL.GAME_FPS
+		nSec = nSec / ENVIRONMENT.GAME_FPS
 		h:Lookup('Text_R'):SetText(X.FormatDuration(nSec, 'PRIME'))
 	end
 	h:Lookup('Image_RBg'):Show()

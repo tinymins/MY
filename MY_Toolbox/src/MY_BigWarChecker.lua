@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -66,7 +66,7 @@ X.RegisterFrameCreate('ExitPanel', 'BIG_WAR_CHECK', function(name, frame)
 		if IsBigWarFinishable(me) then
 			OutputWarningMessage(
 				'MSG_WARNING_RED',
-				GLOBAL.GAME_BRANCH == 'classic'
+				ENVIRONMENT.GAME_BRANCH == 'classic'
 					and _L['Warning: Bounty has been finished but not handed yet!']
 					or _L['Warning: Bigwar has been finished but not handed yet!']
 			)
@@ -75,7 +75,7 @@ X.RegisterFrameCreate('ExitPanel', 'BIG_WAR_CHECK', function(name, frame)
 				ui:Append('Text', { name = 'Text_MY_Tip', y = ui:Height(), w = ui:Width(), color = {255, 255, 0}, font = 199, halign = 1})
 			end
 			ui:Children('#Text_MY_Tip'):Text(
-				GLOBAL.GAME_BRANCH == 'classic'
+				ENVIRONMENT.GAME_BRANCH == 'classic'
 					and _L['Warning: Bounty has been finished but not handed yet!']
 					or _L['Warning: Bigwar has been finished but not handed yet!']
 			)
@@ -109,7 +109,7 @@ X.RegisterFrameCreate('OptionPanel', 'BIG_WAR_CHECK', function(name, frame)
 			end
 			ui:Children('#Text_MY_Tip')
 				:Text(
-					GLOBAL.GAME_BRANCH == 'classic'
+					ENVIRONMENT.GAME_BRANCH == 'classic'
 						and _L['Warning: Bounty has been finished but not handed yet!']
 						or _L['Warning: Bigwar has been finished but not handed yet!']
 					)

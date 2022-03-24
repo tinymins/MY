@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -52,7 +52,7 @@ end
 function D.ShowChatPanel(nShowFrame, nDelayFrame, callback)
 	-- ½¥±ä³öÏÖÖ¡Êý
 	if not nShowFrame then
-		nShowFrame = GLOBAL.GAME_FPS / 4
+		nShowFrame = ENVIRONMENT.GAME_FPS / 4
 	end
 	-- Òþ²ØÑÓ³ÙÖ¡Êý
 	if not nDelayFrame then
@@ -117,11 +117,11 @@ end
 function D.HideChatPanel(nHideFrame, nDelayFrame, callback)
 	-- ½¥±äÏûÊ§Ö¡Êý
 	if not nHideFrame then
-		nHideFrame = GLOBAL.GAME_FPS / 2
+		nHideFrame = ENVIRONMENT.GAME_FPS / 2
 	end
 	-- Òþ²ØÑÓ³ÙÖ¡Êý
 	if not nDelayFrame then
-		nDelayFrame = GLOBAL.GAME_FPS * 5
+		nDelayFrame = ENVIRONMENT.GAME_FPS * 5
 	end
 	-- switch case
 	if m_nState == STATE.SHOW then
@@ -210,9 +210,9 @@ function D.Apply()
 				return
 			end
 			-- show when new msg
-			D.ShowChatPanel(GLOBAL.GAME_FPS / 4, 0, function()
+			D.ShowChatPanel(ENVIRONMENT.GAME_FPS / 4, 0, function()
 				-- hide after 5 sec
-				D.HideChatPanel(GLOBAL.GAME_FPS / 2, GLOBAL.GAME_FPS * 5)
+				D.HideChatPanel(ENVIRONMENT.GAME_FPS / 2, ENVIRONMENT.GAME_FPS * 5)
 			end)
 		end)
 
@@ -223,7 +223,7 @@ function D.Apply()
 		end
 		-- show when chat panel get focus
 		editInput.OnSetFocus = function()
-			D.ShowChatPanel(GLOBAL.GAME_FPS / 4, 0)
+			D.ShowChatPanel(ENVIRONMENT.GAME_FPS / 4, 0)
 			if this._MY_T_AHCP_OnSetFocus then
 				this._MY_T_AHCP_OnSetFocus()
 			end
@@ -234,7 +234,7 @@ function D.Apply()
 		end
 		-- hide after input box lost focus for 5 sec
 		editInput.OnKillFocus = function()
-			D.HideChatPanel(GLOBAL.GAME_FPS / 2, GLOBAL.GAME_FPS * 5)
+			D.HideChatPanel(ENVIRONMENT.GAME_FPS / 2, ENVIRONMENT.GAME_FPS * 5)
 			if this._MY_T_AHCP_OnKillFocus then
 				this._MY_T_AHCP_OnKillFocus()
 			end

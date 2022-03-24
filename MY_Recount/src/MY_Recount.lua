@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -374,12 +374,12 @@ function D.GetMenu()
 		szOption = _L['Redraw interval'],
 		fnDisable = IsUIDisabled,
 	}
-	for _, i in ipairs({1, GLOBAL.GAME_FPS / 2, GLOBAL.GAME_FPS, GLOBAL.GAME_FPS * 2}) do
+	for _, i in ipairs({1, ENVIRONMENT.GAME_FPS / 2, ENVIRONMENT.GAME_FPS, ENVIRONMENT.GAME_FPS * 2}) do
 		local szOption
 		if i == 1 then
 			szOption = _L['Realtime refresh']
 		else
-			szOption = _L('Every %.1f second', i / GLOBAL.GAME_FPS)
+			szOption = _L('Every %.1f second', i / ENVIRONMENT.GAME_FPS)
 		end
 		table.insert(t1, {
 			szOption = szOption,

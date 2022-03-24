@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -89,8 +89,8 @@ local function QueryData(szQues)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://pull.j3cx.com/api/exam?'
 			.. X.EncodeQuerystring(X.ConvertToUTF8({
-				l = GLOBAL.GAME_LANG,
-				L = GLOBAL.GAME_EDITION,
+				l = ENVIRONMENT.GAME_LANG,
+				L = ENVIRONMENT.GAME_EDITION,
 				q = szQues,
 			})),
 		success = function(html, status)
@@ -147,8 +147,8 @@ function D.SubmitData(tExamData, bAllRight)
 		driver = 'auto', mode = 'auto', method = 'auto',
 		url = 'https://push.j3cx.com/api/exam/uploads',
 		data = {
-			l = GLOBAL.GAME_LANG,
-			L = GLOBAL.GAME_EDITION,
+			l = ENVIRONMENT.GAME_LANG,
+			L = ENVIRONMENT.GAME_EDITION,
 			data = X.EncodeJSON(data),
 			perfect = bAllRight and 1 or 0,
 		},

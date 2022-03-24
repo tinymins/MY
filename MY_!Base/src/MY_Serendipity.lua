@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local _L, D = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/my_serendipity/'), {}
 local O = {
@@ -88,8 +88,8 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 			X.EnsureAjax({
 				url = 'https://push.j3cx.com/api/serendipity/uploads',
 				data = {
-					l = GLOBAL.GAME_LANG,
-					L = GLOBAL.GAME_EDITION,
+					l = ENVIRONMENT.GAME_LANG,
+					L = ENVIRONMENT.GAME_EDITION,
 					S = szRegion, s = szServer, a = szSerendipity,
 					n = szName, N = szNameCRC, R = szReporter,
 					f = eStatus, t = dwTime, c = nCount, m = nMethod,

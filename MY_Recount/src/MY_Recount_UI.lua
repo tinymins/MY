@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -213,7 +213,7 @@ local O = X.CreateUserSettingsModule('MY_Recount_UI', _L['Raid'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
 		xSchema = X.Schema.Number,
-		xDefaultValue = GLOBAL.GAME_FPS / 2,
+		xDefaultValue = ENVIRONMENT.GAME_FPS / 2,
 	},
 	bShowNodataTeammate = { -- 显示没有数据的队友
 		ePathType = X.PATH_TYPE.ROLE,

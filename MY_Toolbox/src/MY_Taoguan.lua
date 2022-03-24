@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -191,8 +191,8 @@ local RUYIXIANGNANG = X.GetItemNameByUIID(65579) -- 如意香囊
 local RUYIJINNANG = X.GetItemNameByUIID(65582) -- 如意锦囊
 local JIYOUGU = X.GetItemNameByUIID(65580) -- 寄忧谷
 local ZUISHENG = X.GetItemNameByUIID(65583) -- 醉生
-local ITEM_CD = 1 * GLOBAL.GAME_FPS + 8 -- 吃药CD
-local HAMMER_CD = 5 * GLOBAL.GAME_FPS + 8 -- 锤子CD
+local ITEM_CD = 1 * ENVIRONMENT.GAME_FPS + 8 -- 吃药CD
+local HAMMER_CD = 5 * ENVIRONMENT.GAME_FPS + 8 -- 锤子CD
 local MAX_POINT_POW = 16 -- 分数最高倍数（2^n）
 
 local D = {

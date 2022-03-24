@@ -14,7 +14,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_ChatLog'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -87,7 +87,7 @@ local LOG_TYPE = {
 	},
 	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aChannel = {'MSG_MY_MONITOR'} },
 }
-local LOG_LIMIT = (GLOBAL.GAME_PROVIDER == 'remote' and not X.IsDebugClient())
+local LOG_LIMIT = (ENVIRONMENT.GAME_PROVIDER == 'remote' and not X.IsDebugClient())
 	and {
 		{ aKey = {'whisper'}, nLimit = 5000 },
 		{ aKey = {'party', 'team'}, nLimit = 5000 },
