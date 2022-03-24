@@ -22,6 +22,13 @@ local THEME_LIST = {
 	[CONSTANT.MSG_THEME.SUCCESS] = { r =   0, g = 255, b = 127 },
 }
 
+local DEBUG_THEME = {
+	[X.DEBUG_LEVEL.PMLOG  ] = { r =   0, g = 255, b = 255 },
+	[X.DEBUG_LEVEL.LOG    ] = { r =   0, g = 255, b = 127 },
+	[X.DEBUG_LEVEL.WARNING] = { r = 255, g = 170, b = 170 },
+	[X.DEBUG_LEVEL.ERROR  ] = { r = 255, g =  86, b =  86 },
+}
+
 function X.EncodeEchoMsgHeader(szChannel, oData)
 	return '<text>text="" addonecho=1 channel=' .. X.XMLEncodeComponent(X.EncodeLUAData(szChannel))
 		.. ' data=' .. X.XMLEncodeComponent(X.EncodeLUAData(oData)) .. ' </text>'
@@ -80,7 +87,7 @@ local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle, bEcho)
 	end
 end
 
-local function OutputMessageEx(szType, szTheme, oTitle, oContent, bEcho)
+local function OutputMessageEx(szType, eTheme, oTitle, oContent, bEcho)
 	local aMsg = {}
 	-- 字体颜色优先级：单个节点 > 根节点定义 > 预设样式 > 频道设置
 	-- 频道设置
@@ -91,7 +98,9 @@ local function OutputMessageEx(szType, szTheme, oTitle, oContent, bEcho)
 	}
 	cfg.r, cfg.g, cfg.b = GetMsgFontColor(szType)
 	-- 预设样式
-	local tTheme = szTheme and THEME_LIST[szTheme]
+	local tTheme = X.IsTable(eTheme)
+		and eTheme
+		or (eTheme and THEME_LIST[eTheme])
 	if tTheme then
 		cfg.r = tTheme.r or cfg.r
 		cfg.g = tTheme.g or cfg.g
@@ -105,7 +114,6 @@ local function OutputMessageEx(szType, szTheme, oTitle, oContent, bEcho)
 		cfg.b = oContent.b or cfg.b
 		cfg.f = oContent.f or cfg.f
 	end
-
 	-- 处理数据
 	StringifySysmsgObject(aMsg, oTitle, cfg, true, bEcho)
 	StringifySysmsgObject(aMsg, oContent, cfg, false, false)
@@ -223,16 +231,7 @@ function X.Debug(...)
 	end
 	if nLevel >= X.PACKET_INFO.DEBUG_LEVEL then
 		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
-		if nLevel == X.DEBUG_LEVEL.LOG then
-			eTheme = CONSTANT.MSG_THEME.SUCCESS
-		elseif nLevel == X.DEBUG_LEVEL.WARNING then
-			eTheme = CONSTANT.MSG_THEME.WARNING
-		elseif nLevel == X.DEBUG_LEVEL.ERROR then
-			eTheme = CONSTANT.MSG_THEME.ERROR
-		else
-			eTheme = CONSTANT.MSG_THEME.NORMAL
-		end
-		return OutputMessageEx('MSG_SYS', eTheme, szTitle, oContent, true)
+		return OutputMessageEx('MSG_SYS', DEBUG_THEME[nLevel], szTitle, oContent, true)
 	end
 	if nLevel >= X.PACKET_INFO.DELOG_LEVEL then
 		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
