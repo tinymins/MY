@@ -106,9 +106,9 @@ function X.Ajax(settings)
 		id      = id,
 		url     = settings.url,
 		data    = X.IIf(X.IsEmpty(settings.data), nil, settings.data),
-		method  = settings.method  or 'get' ,
-		payload = settings.payload or 'form',
 		driver  = settings.driver  or 'auto',
+		method  = settings.method  or 'auto',
+		payload = settings.payload or 'form',
 		timeout = settings.timeout or 60000 ,
 		charset = settings.charset or 'utf8',
 	}
