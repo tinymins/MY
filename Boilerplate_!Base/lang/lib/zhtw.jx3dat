@@ -18,10 +18,8 @@ return {
 	['Text Editor'] = '文本編輯器',
 	['Font %d'] = '字體 %d',
 
-	['Boss list updated to v%s.'] = '首領列表已成功更新至v%s。',
 	['Add to BOSS list'] = '加入首領列表',
 	['Remove from BOSS list'] = '從首領列表中移除',
-	['Important-NPC list updated to v%s.'] = '重要角色列表已成功更新至v%s。',
 	['Add to Important-NPC list'] = '加入重要角色列表',
 	['Remove from Important-NPC list'] = '從重要角色列表中移除',
 

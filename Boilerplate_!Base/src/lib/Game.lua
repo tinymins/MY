@@ -834,7 +834,6 @@ local function GenerateList(bForceRefresh)
 		end
 		if not ENVIRONMENT.RUNTIME_OPTIMIZE then
 			X.SaveLUAData(CACHE_PATH, BOSS_LIST)
-			X.Sysmsg(_L('Boss list updated to v%s.', ENVIRONMENT.GAME_VERSION))
 		end
 	end
 
@@ -937,7 +936,6 @@ local function GenerateList(bForceRefresh)
 		INPC_LIST = {}
 		if not ENVIRONMENT.RUNTIME_OPTIMIZE then
 			X.SaveLUAData(CACHE_PATH, INPC_LIST)
-			X.Sysmsg(_L('Important-NPC list updated to v%s.', ENVIRONMENT.GAME_VERSION))
 		end
 	end
 	for dwMapID, tInfo in pairs(X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/inpclist/{$edition}.jx3dat') or {}) do
