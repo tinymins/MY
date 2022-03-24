@@ -87,7 +87,7 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 		-- create timestrap text
 		local szTime = ''
 		for ii = i, h:GetItemCount() - 1 do
-			local el = h:Lookup(i)
+			local el = h:Lookup(ii)
 			if el:GetType() == 'Text' and not el:GetName():find('^namelink_%d+$') and el:GetText() ~= '' then
 				nR, nG, nB = el:GetFontColor()
 				break
