@@ -11,7 +11,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. '/lang/devs/')
@@ -535,19 +535,19 @@ function D.UpdateTree(frame, elRoot, bDropSel)
 end
 end
 
-local ENVIRONMENT = X.ENVIRONMENT
-if not ENVIRONMENT.UI_EDITOR then
+local SHARED_MEMORY = X.SHARED_MEMORY
+if not SHARED_MEMORY.UI_EDITOR then
 	TraceButton_AppendAddonMenu({function()
-		for _, f in ipairs(ENVIRONMENT.UI_EDITOR) do
+		for _, f in ipairs(SHARED_MEMORY.UI_EDITOR) do
 			local v = f()
 			if v then
 				return v
 			end
 		end
 	end})
-	ENVIRONMENT.UI_EDITOR = {}
+	SHARED_MEMORY.UI_EDITOR = {}
 end
-table.insert(ENVIRONMENT.UI_EDITOR, function()
+table.insert(SHARED_MEMORY.UI_EDITOR, function()
 	if not X.IsDebugClient('Dev_UIEditor') then
 		return
 	end

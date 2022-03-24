@@ -164,6 +164,15 @@ do
 		end
 	end
 end
+local _SERVER_ADDRESS_ = select(7, GetUserServer())
+local _RUNTIME_OPTIMIZE_ = (
+	_SERVER_ADDRESS_:find('^10%.') -- 10.0.0.0/8
+	or _SERVER_ADDRESS_:find('^127%.') -- 127.0.0.0/8
+	or _SERVER_ADDRESS_:find('^172%.1[6-9]%.') -- 172.16.0.0/12
+	or _SERVER_ADDRESS_:find('^172%.2[0-9]%.') -- 172.16.0.0/12
+	or _SERVER_ADDRESS_:find('^172%.3[0-1]%.') -- 172.16.0.0/12
+	or _SERVER_ADDRESS_:find('^192%.168%.') -- 192.168.0.0/16
+) and not IsLocalFileExist(_DATA_ROOT_ .. 'no.runtime.optimize.jx3dat')
 -------------------------------------------------------------------------------------------------------
 -- 本地函数变量
 -------------------------------------------------------------------------------------------------------
@@ -207,10 +216,10 @@ if not SetmetaReadonly then
 		})
 	end
 end
-local ENVIRONMENT = _G.PLUGIN_ENVIRONMENT
-if type(ENVIRONMENT) ~= 'table' then
-	ENVIRONMENT = {}
-	_G.PLUGIN_ENVIRONMENT = ENVIRONMENT
+local SHARED_MEMORY = _G.PLUGIN_SHARED_MEMORY
+if type(SHARED_MEMORY) ~= 'table' then
+	SHARED_MEMORY = {}
+	_G.PLUGIN_SHARED_MEMORY = SHARED_MEMORY
 end
 ---------------------------------------------------
 -- 调试工具
@@ -226,20 +235,20 @@ local function ErrorLog(...)
 	FireUIEvent('CALL_LUA_ERROR', szFull)
 end
 if _DEBUG_LEVEL_ < DEBUG_LEVEL.NONE then
-	if not ENVIRONMENT.ECHO_LUA_ERROR then
+	if not SHARED_MEMORY.ECHO_LUA_ERROR then
 		RegisterEvent('CALL_LUA_ERROR', function()
 			OutputMessage('MSG_SYS', 'CALL_LUA_ERROR:\n' .. arg0 .. '\n')
 		end)
-		ENVIRONMENT.ECHO_LUA_ERROR = _NAME_SPACE_
+		SHARED_MEMORY.ECHO_LUA_ERROR = _NAME_SPACE_
 	end
-	if not ENVIRONMENT.RELOAD_UI_ADDON then
+	if not SHARED_MEMORY.RELOAD_UI_ADDON then
 		TraceButton_AppendAddonMenu({{
 			szOption = 'ReloadUIAddon',
 			fnAction = function()
 				ReloadUIAddon()
 			end,
 		}})
-		ENVIRONMENT.RELOAD_UI_ADDON = _NAME_SPACE_
+		SHARED_MEMORY.RELOAD_UI_ADDON = _NAME_SPACE_
 	end
 end
 Log('[' .. _NAME_SPACE_ .. '] Debug level ' .. _DEBUG_LEVEL_ .. ' / delog level ' .. _DELOG_LEVEL_)
@@ -898,13 +907,15 @@ local function KvpToObject(kvp)
 	return t
 end
 
-local GLOBAL = setmetatable({}, {
+local ENVIRONMENT = setmetatable({}, {
 	__index = setmetatable({
-		GAME_LANG     = _GAME_LANG_    ,
-		GAME_BRANCH   = _GAME_BRANCH_  ,
-		GAME_EDITION  = _GAME_EDITION_ ,
-		GAME_VERSION  = _GAME_VERSION_ ,
-		GAME_PROVIDER = _GAME_PROVIDER_,
+		GAME_LANG        = _GAME_LANG_       ,
+		GAME_BRANCH      = _GAME_BRANCH_     ,
+		GAME_EDITION     = _GAME_EDITION_    ,
+		GAME_VERSION     = _GAME_VERSION_    ,
+		GAME_PROVIDER    = _GAME_PROVIDER_   ,
+		SERVER_ADDRESS   = _SERVER_ADDRESS_  ,
+		RUNTIME_OPTIMIZE = _RUNTIME_OPTIMIZE_,
 	}, { __index = _G.GLOBAL }),
 	__newindex = function() end,
 })
@@ -970,12 +981,12 @@ local X = {
 	GetGameAPI       = GetGameAPI      ,
 	GetGameTable     = GetGameTable    ,
 	LoadLangPack     = LoadLangPack    ,
-	GLOBAL           = GLOBAL          ,
 	ENVIRONMENT      = ENVIRONMENT     ,
 	SECRET           = SECRET          ,
 	PATH_TYPE        = PATH_TYPE       ,
 	DEBUG_LEVEL      = DEBUG_LEVEL     ,
 	PACKET_INFO      = PACKET_INFO     ,
+	SHARED_MEMORY    = SHARED_MEMORY   ,
 }
 _G[_NAME_SPACE_] = X
 ---------------------------------------------------------------------------------------------

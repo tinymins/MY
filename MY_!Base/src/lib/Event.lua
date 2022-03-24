@@ -11,7 +11,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 ---------------------------------------------------------------------------------------------
@@ -777,7 +777,7 @@ end
 -- 注册协程
 ---------------------------------------------------------------------------------------------
 do
-local COROUTINE_TIME = 1000 * 0.5 / GLOBAL.GAME_FPS -- 一次 Breathe 时最大允许执行协程时间
+local COROUTINE_TIME = 1000 * 0.5 / ENVIRONMENT.GAME_FPS -- 一次 Breathe 时最大允许执行协程时间
 local COROUTINE_LIST = {}
 local yield = coroutine and coroutine.yield or function() end
 function X.RegisterCoroutine(szKey, fnAction, fnCallback)
@@ -815,7 +815,7 @@ function X.RegisterCoroutine(szKey, fnAction, fnCallback)
 	end
 	return szKey
 end
-local FPS_SLOW_TIME = 1000 / GLOBAL.GAME_FPS * 1.2
+local FPS_SLOW_TIME = 1000 / ENVIRONMENT.GAME_FPS * 1.2
 local l_nLastBreatheTime = GetTime()
 local function onBreathe()
 	if not coroutine then

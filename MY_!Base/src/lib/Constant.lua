@@ -11,16 +11,16 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 local KvpToObject = X.KvpToObject
-local bStream = GLOBAL.GAME_PROVIDER == 'remote'
-local bClassic = GLOBAL.GAME_BRANCH == 'classic'
+local bStream = ENVIRONMENT.GAME_PROVIDER == 'remote'
+local bClassic = ENVIRONMENT.GAME_BRANCH == 'classic'
 
 local function PickBranch(tData)
-	return tData[GLOBAL.GAME_BRANCH] or tData['zhcn']
+	return tData[ENVIRONMENT.GAME_BRANCH] or tData['zhcn']
 end
 
 local FORCE_TYPE = (function()

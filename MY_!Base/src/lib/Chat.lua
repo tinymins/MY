@@ -11,7 +11,7 @@ local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
 local string, math, table = string, math, table
 -- lib apis caching
 local X = MY
-local UI, GLOBAL, CONSTANT, wstring, lodash = X.UI, X.GLOBAL, X.CONSTANT, X.wstring, X.lodash
+local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
@@ -152,7 +152,7 @@ function X.InsertChatInput(szType, ...)
 		local itemInfo = GetItemInfo(dwTabType, dwIndex)
 		if itemInfo then
 			if not nVersion then
-				nVersion = GLOBAL.CURRENT_ITEM_VERSION
+				nVersion = ENVIRONMENT.CURRENT_ITEM_VERSION
 			end
 			if itemInfo.nGenre == ITEM_GENRE.BOOK then
 				if nBookInfo then
@@ -1376,7 +1376,7 @@ local function GetRegisterChannelLimitTable()
 			{f = 'i', t = 'CampChannelDailyLimit'},
 			{f = 'i', t = 'MaxContribution'},
 			{f = 'i', t = 'WhisperDailyLimit'},
-			GLOBAL.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'IdentityChannelDailyLimit'} or false,
+			ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'IdentityChannelDailyLimit'} or false,
 			{f = 'i', t = 'SprintPowerMax'},
 			{f = 'i', t = 'SprintPowerCost'},
 			{f = 'i', t = 'SprintPowerRevive'},
@@ -1388,8 +1388,8 @@ local function GetRegisterChannelLimitTable()
 			{f = 'i', t = 'HorseSprintPowerRevive'},
 			{f = 'i', t = 'SceneChannelDailyLimit'},
 			{f = 'i', t = 'NearbyChannelDailyLimit'},
-			GLOBAL.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitByVIP'} or false,
-			GLOBAL.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'} or false,
+			ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitByVIP'} or false,
+			ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'} or false,
 		}, function(item) return item end)
 		m_LevelUpData = KG_Table.Load(path, tTitle, FILE_OPEN_MODE.NORMAL)
 	end
