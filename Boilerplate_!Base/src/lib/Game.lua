@@ -2468,7 +2468,7 @@ function X.WithClientPlayer(callback)
 					X.SafeCall(callback, me)
 				end
 				CALLBACK_LIST = nil
-				X.NSFormatString('{$NS}.WithClientPlayer', false)
+				X.BreatheCall(X.NSFormatString('{$NS}.WithClientPlayer'), false)
 			end
 		end)
 	end
