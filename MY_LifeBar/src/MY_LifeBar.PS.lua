@@ -25,7 +25,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
 	return
 end
 
-if IsLocalFileExist(X.FormatPath({'config/lifebar-official.jx3dat', X.PATH_TYPE.GLOBAL})) then
+if ENVIRONMENT.GAME_EDITION == 'zhcn_exp' or IsLocalFileExist(X.FormatPath({'config/lifebar-official.jx3dat', X.PATH_TYPE.GLOBAL})) then
 	return
 end
 --------------------------------------------------------------------------
