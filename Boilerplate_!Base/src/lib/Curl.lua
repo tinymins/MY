@@ -211,7 +211,8 @@ function X.Ajax(settings)
 		'AJAX',
 		config.url .. ' - ' .. config.driver .. '/' .. config.method
 			.. ' (' .. driver .. '/' .. method .. ')'
-			.. ': PREPARE READY',
+			.. ': PREPARE READY'
+			.. config.data and ('\n[BODY]' .. X.EncodeQuerystring(config.data)) or '',
 		X.DEBUG_LEVEL.LOG
 	)
 	--[[#DEBUG END]]
