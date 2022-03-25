@@ -212,7 +212,7 @@ function X.Ajax(settings)
 		config.url .. ' - ' .. config.driver .. '/' .. config.method
 			.. ' (' .. driver .. '/' .. method .. ')'
 			.. ': PREPARE READY'
-			.. (config.data and ('\n[BODY]' .. X.EncodeQuerystring(config.data)) or ''),
+			.. (xdata and ('\n[BODY]' .. X.EncodeQuerystring(xdata) .. '[/BODY]') or ''),
 		X.DEBUG_LEVEL.LOG
 	)
 	--[[#DEBUG END]]
