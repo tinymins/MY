@@ -103,14 +103,15 @@ function X.Ajax(settings)
 	local oncomplete, onerror = settings.complete, settings.error
 	local onfulfilled, onsuccess = settings.fulfilled, settings.success
 	local config = {
-		id      = id,
-		url     = settings.url,
-		data    = X.IIf(X.IsEmpty(settings.data), nil, settings.data),
-		driver  = settings.driver  or 'auto',
-		method  = settings.method  or 'auto',
-		payload = settings.payload or 'form',
-		timeout = settings.timeout or 60000 ,
-		charset = settings.charset or 'utf8',
+		id        = id,
+		url       = settings.url,
+		data      = X.IIf(X.IsEmpty(settings.data), nil, settings.data),
+		driver    = settings.driver  or 'auto',
+		method    = settings.method  or 'auto',
+		payload   = settings.payload or 'form',
+		signature = settings.signature,
+		timeout   = settings.timeout or 60000 ,
+		charset   = settings.charset or 'utf8',
 	}
 	local settings = {
 		config = setmetatable({}, {
