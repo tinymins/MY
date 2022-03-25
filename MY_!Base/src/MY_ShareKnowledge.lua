@@ -154,15 +154,13 @@ function TRANSLATOR.BBCODE(info)
 end
 
 local SCHEMA = X.Schema.MixedTable({
-	-- KEY
-	[1] = X.Schema.String,
 	-- PATH
-	[2] = X.Schema.MixedTable({
+	[1] = X.Schema.MixedTable({
 		[1] = X.Schema.String,
 		[2] = X.Schema.OneOf(X.Schema.String, X.Schema.Nil),
 	}),
 	-- UI PROPS PATH / DATA TRANSLATOR NAME
-	[3] = X.Schema.OneOf(unpack((function()
+	[2] = X.Schema.OneOf(unpack((function()
 		local a = {X.Schema.Collection(X.Schema.Any), X.Schema.Nil}
 		for k, _ in pairs(TRANSLATOR) do
 			table.insert(a, k)
@@ -174,14 +172,21 @@ local SCHEMA = X.Schema.MixedTable({
 MY_RSS.RegisterAdapter('share-ui', function(data)
 	local t = {}
 	if X.IsTable(data) then
-		for _, v in ipairs(data) do
+		for k, v in pairs(data) do
 			local err = X.Schema.CheckSchema(v, SCHEMA)
 			if not err then
+				local key = k
+				if not X.IsString(key) then
+					key = v[1][1]
+					if v[1][2] then
+						key = key .. '::' .. v[1][2]
+					end
+				end
 				table.insert(t, {
-					id = X.EncodeJSON({v[2], v[3]}),
-					key = v[1],
-					path = v[2],
-					dataTranslator = v[3],
+					id = GetStringCRC(X.EncodeJSON({key, v[1], v[2]})),
+					key = key,
+					path = v[1],
+					dataTranslator = v[2],
 				})
 			end
 		end
@@ -245,6 +250,7 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 	if GetTime() < NEXT_AWAKE_TIME then
 		return
 	end
+	local res = {}
 	for _, v in ipairs(rss) do
 		local el, data = Station.Lookup(unpack(v.path)), nil
 		if el then
@@ -262,26 +268,25 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 				end
 			end
 		end
-		if not X.IsNil(data) then
-			local szContent = X.IsString(data) and data or X.EncodeJSON(data)
-			if CACHE[v.id] ~= szContent then
-				X.EnsureAjax({
-					url = 'https://push.j3cx.com/api/share-ui',
-					data = {
-						l = ENVIRONMENT.GAME_LANG,
-						L = ENVIRONMENT.GAME_EDITION,
-						region = X.GetRealServer(1),
-						server = X.GetRealServer(2),
-						key = v.key,
-						content = szContent,
-						time = GetCurrentTime(),
-					},
-					signature = X.SECRET.SHARE_UI,
-				})
-				CACHE[v.id] = szContent
-				break
-			end
+		local szContent = X.EncodeJSON(data)
+		if CACHE[v.id] ~= szContent then
+			res[v.key] = data
+			CACHE[v.id] = szContent
 		end
+	end
+	if not X.IsEmpty(res) then
+		X.EnsureAjax({
+			url = 'https://push.j3cx.com/api/share-ui',
+			data = {
+				l = ENVIRONMENT.GAME_LANG,
+				L = ENVIRONMENT.GAME_EDITION,
+				region = X.GetRealServer(1),
+				server = X.GetRealServer(2),
+				time = GetCurrentTime(),
+				data = X.EncodeJSON(res),
+			},
+			signature = X.SECRET.SHARE_UI,
+		})
 	end
 	NEXT_AWAKE_TIME = GetTime() + FREQUENCY_LIMIT
 end)
