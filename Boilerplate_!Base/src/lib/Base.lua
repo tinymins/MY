@@ -73,15 +73,6 @@ do
 		end
 	end
 end
-local _SERVER_ADDRESS_ = select(7, GetUserServer())
-local _RUNTIME_OPTIMIZE_ = (
-	_SERVER_ADDRESS_:find('^10%.') -- 10.0.0.0/8
-	or _SERVER_ADDRESS_:find('^127%.') -- 127.0.0.0/8
-	or _SERVER_ADDRESS_:find('^172%.1[6-9]%.') -- 172.16.0.0/12
-	or _SERVER_ADDRESS_:find('^172%.2[0-9]%.') -- 172.16.0.0/12
-	or _SERVER_ADDRESS_:find('^172%.3[0-1]%.') -- 172.16.0.0/12
-	or _SERVER_ADDRESS_:find('^192%.168%.') -- 192.168.0.0/16
-) and not IsLocalFileExist(_DATA_ROOT_ .. 'no.runtime.optimize.jx3dat')
 -------------------------------------------------------------------------------------------------------
 -- 本地函数变量
 -------------------------------------------------------------------------------------------------------
@@ -102,6 +93,18 @@ local _POSTER_UITEX_          = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/P
 local _POSTER_FRAME_COUNT_    = 1
 local _DEBUG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or DEBUG_LEVEL.NONE
 local _DELOG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or DEBUG_LEVEL.NONE
+-------------------------------------------------------------------------------------------------------
+-- 其它环境变量
+-------------------------------------------------------------------------------------------------------
+local _SERVER_ADDRESS_ = select(7, GetUserServer())
+local _RUNTIME_OPTIMIZE_ = (
+	_SERVER_ADDRESS_:find('^10%.') -- 10.0.0.0/8
+	or _SERVER_ADDRESS_:find('^127%.') -- 127.0.0.0/8
+	or _SERVER_ADDRESS_:find('^172%.1[6-9]%.') -- 172.16.0.0/12
+	or _SERVER_ADDRESS_:find('^172%.2[0-9]%.') -- 172.16.0.0/12
+	or _SERVER_ADDRESS_:find('^172%.3[0-1]%.') -- 172.16.0.0/12
+	or _SERVER_ADDRESS_:find('^192%.168%.') -- 192.168.0.0/16
+) and not IsLocalFileExist(_DATA_ROOT_ .. 'no.runtime.optimize.jx3dat')
 -------------------------------------------------------------------------------------------------------
 -- 初始化调试工具
 -------------------------------------------------------------------------------------------------------
