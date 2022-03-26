@@ -191,7 +191,10 @@ function X.Ajax(settings)
 					)
 				)
 		end
-		if xdata then
+		if not X.IsEmpty(xdata) then
+			if X.IsString(xdata) then
+				xdata = X.DecodeQuerystring(xdata)
+			end
 			xdata = X.SignPostData(xdata, config.signature)
 		end
 	end
