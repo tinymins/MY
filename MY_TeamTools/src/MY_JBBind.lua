@@ -45,8 +45,12 @@ function D.FetchBindStatus(resolve, reject)
 			success = function(szHTML)
 				O.pending = false
 				local res = X.DecodeJSON(szHTML)
-				if X.Get(res, {'code'}) == 0 then
+				local code = X.Get(res, {'code'})
+				if code == 0 then
 					O.uid = X.Get(res, {'data', 'uid'})
+					X.SafeCall(resolve, O.uid)
+				elseif code == 404 then
+					O.uid = 0
 					X.SafeCall(resolve, O.uid)
 				else
 					X.SafeCall(reject)
