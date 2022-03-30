@@ -551,6 +551,7 @@ function X.EnsureAjax(options)
 			method = method,
 			url = options.url,
 			data = options.data,
+			signature = options.signature,
 			fulfilled = function(...)
 				--[[#DEBUG BEGIN]]
 				X.Debug('Ensure ajax ' .. key .. ' succeed with mode ' .. driver .. '/' .. method, X.DEBUG_LEVEL.LOG)
