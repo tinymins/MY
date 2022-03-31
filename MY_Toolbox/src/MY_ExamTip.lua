@@ -90,35 +90,46 @@ local function QueryData(szQues)
 			.. X.EncodeQuerystring(X.ConvertToUTF8({
 				l = ENVIRONMENT.GAME_LANG,
 				L = ENVIRONMENT.GAME_EDITION,
-				q = szQues,
+				search = szQues,
 			})),
 		success = function(html, status)
 			local res = X.DecodeJSON(html)
-			if not res or not IsCurrentQuestion(res.ques) then
+			if not res then
 				return
 			end
-
-			if #res.data == 0 then
-				if res.more then
-					DisplayMessage(_L['No result found, here\'s from open search engine:'] .. '\n' .. res.more)
-				else
-					DisplayMessage(_L['No result found.'])
-				end
-			else
+			if X.IsTable(res.data) and #res.data > 0 then
+				local qas = {}
 				for _, rec in ipairs(res.data) do
-					local ques, ans = UTF8ToAnsi(rec.ques), UTF8ToAnsi(rec.ans)
-					if IsCurrentQuestion(ques) and ResolveAnswer(ans) then
-						REMOTE_DATA_CACHE[ques] = ans
+					local question = X.Get(rec, {'title'})
+					local options = X.Get(rec, {'options'})
+					local answers = X.Get(rec, {'answers'})
+					if X.IsString(question) and X.IsString(answers) then
+						options = X.DecodeJSON(options or '')
+						answers = X.DecodeJSON(answers or '')
+						if X.IsTable(answers) and X.IsNumber(answers[1]) and X.IsTable(options) and X.IsString(options[answers[1] + 1]) then
+							table.insert(qas, { question = question, answer = options[answers[1] + 1] })
+						end
+					end
+				end
+
+				for _, qa in ipairs(qas) do
+					if IsCurrentQuestion(qa.question) and ResolveAnswer(qa.answer) then
+						REMOTE_DATA_CACHE[qa.question] = qa.answer
 						return
 					end
 				end
 
 				local szText = _L['No result matched, here\'s similar answers:']
-				for _, rec in ipairs(res.data) do
-					local ques, ans = UTF8ToAnsi(rec.ques), UTF8ToAnsi(rec.ans)
-					szText = szText .. '\n' .. _L('Question: %s\nAnswer: %s', ques, ans)
+				for _, qa in ipairs(qas) do
+					szText = szText .. '\n' .. _L('Question: %s\nAnswer: %s', qa.question, qa.answer)
 				end
 				DisplayMessage(szText)
+			else
+				if X.IsString(res.more) then
+					DisplayMessage(_L['No result found, here\'s from open search engine:'] .. '\n' .. res.more)
+				else
+					DisplayMessage(_L['No result found.'])
+				end
 			end
 		end,
 		error = function(html, status, connected)
