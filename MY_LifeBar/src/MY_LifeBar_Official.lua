@@ -89,8 +89,9 @@ local function SetCaptionColor(dwID, nR, nG, nB)
 	if tColor and tColor.nR == nR and tColor.nG == nG and tColor.nB == nB then
 		return
 	end
-	tColor = { nR = nR, nG = nG, nB = nB, dwColor = 255 * 16711680 + nR * 65536 + nG * 256 + nB }
+	tColor = { nR = nR, nG = nG, nB = nB, dwColor = 255 * 16777216 + nR * 65536 + nG * 256 + nB }
 	CACHE_CAPTION_COLOR[dwID] = tColor
+	Output('set plugin caption color ' .. dwID .. ' 1 ' .. tColor.dwColor, tColor)
 	rlcmd('set plugin caption color ' .. dwID .. ' 1 ' .. tColor.dwColor)
 end
 local function ApplyCaptionColor(dwID)
