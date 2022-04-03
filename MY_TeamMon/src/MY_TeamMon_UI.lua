@@ -2482,16 +2482,20 @@ function D.OpenSettingPanel(data, szType)
 			menu = function()
 				local menu = {}
 				if IsCtrlKeyDown() then
-					table.insert(menu, { szOption = _L['Set countdown key'], rgb = { 255, 255, 0 } , fnAction = function()
-						GetUserInput(_L['Countdown key'], function(szKey)
-							if X.TrimString(szKey) == '' then
-								v.key = nil
-							else
-								v.key = X.TrimString(szKey)
-							end
-							D.OpenSettingPanel(data, szType)
-						end, nil, nil, nil, v.key)
-					end })
+					table.insert(menu, {
+						szOption = _L['Set countdown key'],
+						rgb = { 255, 255, 0 } ,
+						fnAction = function()
+							GetUserInput(_L['Countdown key'], function(szKey)
+								if X.TrimString(szKey) == '' then
+									v.key = nil
+								else
+									v.key = X.TrimString(szKey)
+								end
+								D.OpenSettingPanel(data, szType)
+							end, nil, nil, nil, v.key)
+						end,
+					})
 					table.insert(menu, { bDevide = true })
 					table.insert(menu, { szOption = _L['Hold countdown when crossmap'], bCheck = true, bChecked = v.bHold, fnAction = function()
 						v.bHold = not v.bHold
@@ -2560,8 +2564,15 @@ function D.OpenSettingPanel(data, szType)
 				end
 				return menu
 			end,
-			tip = _L['Press CTRL click for advance menu'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = function()
+				local szTip = GetFormatText(_L['Press CTRL click for advance menu'], 136)
+				if X.IsString(v.key) then
+					szTip = szTip .. GetFormatText('\n\nKEY: ' .. tostring(v.key), 136, 255, 255, 255)
+				end
+				return szTip
+			end,
+			tippostype = UI.TIP_POSITION.LEFT_RIGHT,
+			tiprichtext = true,
 		}):Pos('BOTTOMRIGHT')
 		-- Í¼±ê
 		nX = ui:Append('Box', {
