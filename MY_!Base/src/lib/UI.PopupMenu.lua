@@ -83,6 +83,9 @@ local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
 function D.Open(menu)
 	local frame = D.GetFrame()
 	if not frame then
+		if not menu.bDisableSound then
+			PlaySound(SOUND.UI_SOUND,g_sound.OpenFrame)
+		end
 		frame = Wnd.OpenWindow(SZ_INI, PLUGIN_NAME)
 	end
 	if not menu.bShowKillFocus then
@@ -578,6 +581,13 @@ end
 function D.OnFrameCreate()
 	this:SetRelPos(0, 0)
 	this.SetDS = D.SetDS
+end
+
+function D.OnFrameDestroy()
+	local top = this.aMenu[1]
+	if not top.bDisableSound then
+		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+	end
 end
 
 function D.OnFrameBreathe()
