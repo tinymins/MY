@@ -121,7 +121,7 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 	or bScaleReset then
 		local fRelativeScale = tViewData.fUIScale / hItem.fUIScale
 		hItem:Scale(fRelativeScale, fRelativeScale)
-		hItem.sfxProcess:SetModelScale(tViewData.fUIScale * 0.2)
+		hItem.sfxProcess:SetModelScale(tViewData.fUIScale * 0.17)
 		hItem.nBoxW = hItem.imgBoxBg:GetW()
 		hItem.nBoxH = hItem.imgBoxBg:GetH()
 		hItem.fUIScale = tViewData.fUIScale
