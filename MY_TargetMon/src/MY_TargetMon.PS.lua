@@ -887,9 +887,11 @@ local function DrawPreview(ui, config, OpenDetail)
 					nIconMarginLeft = -3,
 					nIconMarginRight = -3,
 					szLayer = 'ICON_RIGHTMOST',
+					bCheck = true, bMCheck = true,
 				}
 				if p[1] == config.boxBgUITex then
 					subt.rgb = {255, 255, 0}
+					subt.bChecked = true
 				end
 				table.insert(t, subt)
 			end
@@ -913,9 +915,11 @@ local function DrawPreview(ui, config, OpenDetail)
 					szIcon = szIcon,
 					nFrame = nFrame,
 					szLayer = 'ICON_FILL',
+					bCheck = true, bMCheck = true,
 				}
-				if text == config.cdBarUITex then
+				if string.lower(text) == string.lower(config.cdBarUITex) then
 					subt.rgb = {255, 255, 0}
+					subt.bChecked = true
 				end
 				table.insert(t, subt)
 			end

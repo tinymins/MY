@@ -102,8 +102,12 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 		hItem.hCDBar       = hItem:Lookup('Handle_Bar')
 		hItem.txtProcess   = hItem.hCDBar:Lookup('Text_Process')
 		hItem.imgProcess   = hItem.hCDBar:Lookup('Image_Process')
+		hItem.shaProcess   = hItem.hCDBar:Lookup('Shadow_Background')
 		hItem.txtLongName  = hItem.hCDBar:Lookup('Text_Name')
+		hItem.sfxProcess   = hItem.hCDBar:Lookup('SFX')
 		hItem.imgProcess:SetPercentage(0)
+		hItem.txtProcess:SetFontColor(255, 255, 255)
+		hItem.sfxProcess:Set2DRotation(math.pi / 2)
 		hItem.fUIScale = 1
 		hItem.fIconFontScale = X.GetFontScale()
 		hItem.fOtherFontScale = X.GetFontScale()
@@ -131,6 +135,7 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 			hItem.txtShortName:Hide()
 			hItem.hCDBar:SetW(tViewData.nCdBarWidth)
 			hItem.imgProcess:SetW(tViewData.nCdBarWidth)
+			hItem.shaProcess:SetW(tViewData.nCdBarWidth)
 			hItem.txtProcess:SetW(tViewData.nCdBarWidth - 10)
 			hItem.txtLongName:SetW(tViewData.nCdBarWidth - 10)
 			hItem:SetSize(hItem.nBoxW + tViewData.nCdBarWidth, hItem.nBoxH)
@@ -176,7 +181,15 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 		end
 		if hItem.fCdBar ~= item.fCdBar and tViewData.bCdBar then
 			hItem.imgProcess:SetPercentage(item.fCdBar)
+			hItem.shaProcess:SetW(tViewData.nCdBarWidth * (1 - item.fCdBar))
+			hItem.shaProcess:SetRelX(tViewData.nCdBarWidth * item.fCdBar)
+			hItem.sfxProcess:SetRelX(tViewData.nCdBarWidth * item.fCdBar)
+			hItem.hCDBar:FormatAllItemPos()
 			hItem.fCdBar = item.fCdBar
+		end
+		if hItem.bCdBarFlash ~= item.bCdBarFlash then
+			hItem.sfxProcess:SetVisible(item.bCdBarFlash)
+			hItem.bCdBarFlash = item.bCdBarFlash
 		end
 		if hItem.szCdBarUITex ~= tViewData.szCdBarUITex and tViewData.bCdBar then
 			UI(hItem.imgProcess):Image(tViewData.szCdBarUITex)
@@ -205,8 +218,11 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 		end
 		if hItem.szTimeLeft ~= item.szTimeLeft then
 			hItem.txtTime:SetText(item.szTimeLeft)
-			hItem.txtProcess:SetText(item.szTimeLeft)
 			hItem.szTimeLeft = item.szTimeLeft
+		end
+		if hItem.szProcess ~= item.szProcess then
+			hItem.txtProcess:SetText(item.szProcess)
+			hItem.szProcess = item.szProcess
 		end
 		if hItem.szStackNum ~= item.szStackNum then
 			hItem.txtStackNum:SetText(item.szStackNum)

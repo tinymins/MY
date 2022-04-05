@@ -7,9 +7,9 @@ return {
 	caption             = "新建目標監控",
 	type                = "BUFF",
 	target              = "CLIENT_PLAYER",
-	scale               = 0.8   , -- 界面縮放比
+	scale               = 0.7   , -- 界面縮放比
 	iconFontScale       = 1     , -- 圖標文字縮放比
-	otherFontScale      = 1     , -- 其他文字縮放比
+	otherFontScale      = 1.4   , -- 其他文字縮放比
 	ignoreSystemUIScale = false , -- 禁止系統縮放
 	enable              = false , -- 啟用標記
 	penetrable          = true  , -- 是否穿透
@@ -17,18 +17,18 @@ return {
 	alignment           = "LEFT", -- 對齊方式
 	hideVoid            = false , -- 隱藏消失的BUFF
 	hideOthers          = false , -- 只顯示自己的BUFF
-	maxLineCount        = 16    , -- 單行最大數量
+	maxLineCount        = 1     , -- 單行最大數量
 	showName            = true  , -- 顯示名字
 	showTime            = true  , -- 顯示時間
-	cdCircle            = true  , -- 倒計時圈
-	cdFlash             = true  , -- 倒計時分段特效
-	cdReadySpark        = true  , -- 消失特效
-	decimalTime         = -1    , -- 倒計時出現小數點時間
-	cdBar               = false , -- 顯示倒計時條
+	cdCircle            = false , -- 倒計時圈
+	cdFlash             = false , -- 倒計時分段特效
+	cdReadySpark        = false , -- 消失特效
+	decimalTime         = 1     , -- 倒計時出現小數點時間
+	cdBar               = true  , -- 顯示倒計時條
 	cdBarWidth          = 240   , -- 倒計時條寬度
 	playSound           = true  , -- 是否播放聲音
-	cdBarUITex          = "UI/Image/Common/Money.UITex|210",  -- 倒計時條圖素
-	boxBgUITex          = "UI/Image/Common/Box.UITex|44",  -- Box背景圖素
+	cdBarUITex          = "Interface/MY/MY_TargetMon/img/ST.UITex|5",  -- 倒計時條圖素
+	boxBgUITex          = "",  -- Box背景圖素
 	anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" },
 	monitors = {
 		__META__,

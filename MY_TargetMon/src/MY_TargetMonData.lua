@@ -226,27 +226,43 @@ end
 local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist, tMonLast)
 	-- 格式化完善视图列表信息
 	if config.showTime and item.bCd and item.nTimeLeft and item.nTimeLeft > 0 then
-		local nTimeLeft, szTimeLeft = item.nTimeLeft, ''
-		if nTimeLeft <= 3600 then
-			if nTimeLeft > 60 then
-				if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
-					szTimeLeft = '%d\'%.1f'
+		if config.cdBar then
+			item.szProcess = (
+					item.nTimeLeft >= 60
+						and X.FormatDuration(item.nTimeLeft - item.nTimeLeft % 60, 'ENGLISH_ABBR', { accuracyunit = 'minute' })
+						or ''
+				)
+				.. (
+					(config.decimalTime ~= 0 and (config.decimalTime == 3601 or (item.nTimeLeft < config.decimalTime and item.nTimeLeft >= 0.1)))
+						and ('%.1fs'):format(item.nTimeLeft % 60)
+						or ('%ds'):format(item.nTimeLeft % 60)
+				)
+			item.szTimeLeft = ''
+		else
+			local nTimeLeft, szTimeLeft = item.nTimeLeft, ''
+			if nTimeLeft <= 3600 then
+				if nTimeLeft > 60 then
+					if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
+						szTimeLeft = '%d\'%.1f'
+					else
+						szTimeLeft = '%d\'%d'
+					end
+					szTimeLeft = szTimeLeft:format(math.floor(nTimeLeft / 60), nTimeLeft % 60)
 				else
-					szTimeLeft = '%d\'%d'
+					if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
+						szTimeLeft = '%.1f'
+					else
+						szTimeLeft = '%d'
+					end
+					szTimeLeft = szTimeLeft:format(nTimeLeft)
 				end
-				szTimeLeft = szTimeLeft:format(math.floor(nTimeLeft / 60), nTimeLeft % 60)
-			else
-				if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
-					szTimeLeft = '%.1f'
-				else
-					szTimeLeft = '%d'
-				end
-				szTimeLeft = szTimeLeft:format(nTimeLeft)
 			end
+			item.szTimeLeft = szTimeLeft
+			item.szProcess = ''
 		end
-		item.szTimeLeft = szTimeLeft
 	else
 		item.szTimeLeft = ''
+		item.szProcess = ''
 	end
 	if not config.showName then
 		item.szLongName = ''
@@ -372,6 +388,7 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 		item.bCd = true
 		item.fCd = nTimeLeft / nTimeTotal
 		item.fCdBar = item.fCd
+		item.bCdBarFlash = true
 		item.fProgress = 1 - item.fCd
 		item.bSparking = false
 		item.dwID = buff.dwID
@@ -398,6 +415,7 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 		item.bCd = true
 		item.fCd = 0
 		item.fCdBar = 0
+		item.bCdBarFlash = false
 		item.fProgress = 0
 		item.nTimeLeft = -1
 		item.bSparking = true
@@ -490,6 +508,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		item.bCd = true
 		item.fCd = 1 - nTimeLeft / nTimeTotal
 		item.fCdBar = item.fCd
+		item.bCdBarFlash = true
 		item.fProgress = item.fCd
 		item.bSparking = false
 		item.dwID = skill.dwID
@@ -503,6 +522,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		item.bCd = false
 		item.fCd = 1
 		item.fCdBar = 1
+		item.bCdBarFlash = false
 		item.fProgress = 0
 		item.bSparking = true
 		item.dwID = next(mon.ids) or -1
