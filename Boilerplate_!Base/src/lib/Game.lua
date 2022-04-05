@@ -3052,24 +3052,25 @@ end
 -- (string, number) X.GetSkillName(number dwSkillID[, number dwLevel])
 do local SKILL_CACHE = {} -- 技能列表缓存 技能ID查技能名称图标
 function X.GetSkillName(dwSkillID, dwLevel)
+	local uLevelKey = dwLevel or '*'
 	if not SKILL_CACHE[dwSkillID] then
 		SKILL_CACHE[dwSkillID] = {}
 	end
-	if not SKILL_CACHE[dwSkillID][dwLevel] then
+	if not SKILL_CACHE[dwSkillID][uLevelKey] then
 		local tLine = Table_GetSkill(dwSkillID, dwLevel)
 		if tLine and tLine.dwSkillID > 0 and tLine.bShow
 			and (StringFindW(tLine.szDesc, '_') == nil  or StringFindW(tLine.szDesc, '<') ~= nil)
 		then
-			SKILL_CACHE[dwSkillID][dwLevel] = { tLine.szName, tLine.dwIconID }
+			SKILL_CACHE[dwSkillID][uLevelKey] = { tLine.szName, tLine.dwIconID }
 		else
 			local szName = 'SKILL#' .. dwSkillID
 			if dwLevel then
 				szName = szName .. ':' .. dwLevel
 			end
-			SKILL_CACHE[dwSkillID][dwLevel] = { szName, 13 }
+			SKILL_CACHE[dwSkillID][uLevelKey] = { szName, 13 }
 		end
 	end
-	return unpack(SKILL_CACHE[dwSkillID][dwLevel])
+	return unpack(SKILL_CACHE[dwSkillID][uLevelKey])
 end
 end
 
