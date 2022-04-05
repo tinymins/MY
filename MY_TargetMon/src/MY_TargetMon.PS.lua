@@ -81,6 +81,15 @@ local CUSTOM_BOX_EXTENT_ANIMATE = {
 	{'ui/Image/Common/Box.UITex|20'},
 }
 local CUSTOM_CDBAR_STYLES = {
+	PLUGIN_ROOT .. '/img/ST.UITex|0',
+	PLUGIN_ROOT .. '/img/ST.UITex|1',
+	PLUGIN_ROOT .. '/img/ST.UITex|2',
+	PLUGIN_ROOT .. '/img/ST.UITex|3',
+	PLUGIN_ROOT .. '/img/ST.UITex|4',
+	PLUGIN_ROOT .. '/img/ST.UITex|5',
+	PLUGIN_ROOT .. '/img/ST.UITex|6',
+	PLUGIN_ROOT .. '/img/ST.UITex|7',
+	PLUGIN_ROOT .. '/img/ST.UITex|8',
 	'/ui/Image/Common/Money.UITex|168',
 	'/ui/Image/Common/Money.UITex|203',
 	'/ui/Image/Common/Money.UITex|204',
