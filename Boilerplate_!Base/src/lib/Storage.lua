@@ -230,6 +230,9 @@ local function GetPassphrase(nSeed, nLen)
 end
 local szDataRoot = StringLowerW(X.FormatPath({'', X.PATH_TYPE.DATA}))
 local szPassphrase = GetPassphrase(666, 233)
+local szPassphraseSalted = X.SECRET['@@LUA_DATA_MANIFEST_SALT@@']
+	and (X.KGUIEncrypt(X.SECRET['@@LUA_DATA_MANIFEST_SALT@@']) .. szPassphrase)
+	or szPassphrase
 local CACHE = {}
 function GetLUADataPathPassphrase(szPath)
 	-- ∫ˆ¬‘¥Û–°–¥
@@ -257,16 +260,13 @@ function GetLUADataPathPassphrase(szPath)
 	local bNew = false
 	if not CACHE[szDomain] or not CACHE[szDomain][szPath] then
 		local szFilePath = szDataRoot .. szDomain .. '/manifest.jx3dat'
-		local tManifest = LoadLUAData(szFilePath, { passphrase = szPassphrase }) or {}
-		-- ¡Ÿ ±¥Û–°–¥ºÊ»›¬ﬂº≠
-		CACHE[szDomain] = {}
-		for szPath, v in pairs(tManifest) do
-			CACHE[szDomain][StringLowerW(szPath)] = v
-		end
+		CACHE[szDomain] = LoadLUAData(szFilePath, { passphrase = szPassphraseSalted })
+			or LoadLUAData(szFilePath, { passphrase = szPassphrase })
+			or {}
 		if not CACHE[szDomain][szPath] then
 			bNew = true
 			CACHE[szDomain][szPath] = X.GetUUID():gsub('-', '')
-			SaveLUAData(szFilePath, CACHE[szDomain], { passphrase = szPassphrase })
+			SaveLUAData(szFilePath, CACHE[szDomain], { passphrase = szPassphraseSalted })
 		end
 	end
 	return CACHE[szDomain][szPath], bNew
