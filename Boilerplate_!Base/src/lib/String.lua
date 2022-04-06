@@ -136,6 +136,9 @@ function X.SimpleDecodeString(szCipher, bTripSlashes)
 end
 
 function X.KGUIEncrypt(szText)
+	if not X.IsString(szText) then
+		return
+	end
 	if EncodeData then
 		szText = EncodeData(X.EncryptString(szText)) or szText
 	end
