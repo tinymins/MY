@@ -83,7 +83,7 @@ function X.TrimString(szText)
 end
 
 function X.EncryptString(szText)
-	return szText:gsub('.', function (c) return string.format('%02X', (string.byte(c) + 13) % 256) end):gsub(' ', '+')
+	return (szText:gsub('.', function (c) return string.format('%02X', (string.byte(c) + 13) % 256) end):gsub(' ', '+'))
 end
 
 function X.DecryptString(szText)
