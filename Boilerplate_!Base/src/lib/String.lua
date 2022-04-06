@@ -135,6 +135,16 @@ function X.SimpleDecodeString(szCipher, bTripSlashes)
 	return table.concat(aText)
 end
 
+function X.KGUIEncrypt(szText)
+	if EncodeData then
+		szText = EncodeData(X.EncryptString(szText)) or szText
+	end
+	if KGUIEncrypt then
+		szText = KGUIEncrypt(X.EncryptString(szText)) or szText
+	end
+	return MD5 and MD5(X.EncryptString(szText)) or X.EncryptString(szText)
+end
+
 -- 编码 URL 中的参数：方法不会对下列字符编码 [a-zA-Z0-9~!*()']
 -- @param {any} data 需要编码的数据
 -- @return {typeof data} 编码后的数据
