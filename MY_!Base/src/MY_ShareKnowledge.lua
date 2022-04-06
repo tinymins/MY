@@ -92,7 +92,7 @@ X.RegisterEvent('MY_RSS_UPDATE', function()
 					args = szArgs,
 					time = GetCurrentTime(),
 				},
-				signature = X.SECRET.SHARE_EVENT,
+				signature = X.SECRET['J3CX::SHARE_EVENT'],
 			})
 			NEXT_AWAKE_TIME = GetTime() + FREQUENCY_LIMIT
 		end)
@@ -285,7 +285,7 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 				time = GetCurrentTime(),
 				data = X.EncodeJSON(res),
 			},
-			signature = X.SECRET.SHARE_UI,
+			signature = X.SECRET['J3CX::SHARE_UI'],
 		})
 	end
 	NEXT_AWAKE_TIME = GetTime() + FREQUENCY_LIMIT
@@ -350,7 +350,7 @@ X.RegisterEvent('OPEN_WINDOW', 'MY_ShareKnowledge__Npc', function()
 				nt = npc.dwTemplateID, -- NPC Template ID
 				nn = X.GetObjectName(npc), -- NPC Name
 			},
-			signature = X.SECRET.SHARE_NPC_CHAT,
+			signature = X.SECRET['J3CX::SHARE_NPC_CHAT'],
 		})
 		X.DelayCall(szDelayID, false)
 	end
@@ -420,7 +420,7 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_ShareKnowledge__Sysmsg', function(szChannel,
 					content = szMsg,
 					time = GetCurrentTime(),
 				},
-				signature = X.SECRET.SHARE_SYSMSG,
+				signature = X.SECRET['J3CX::SHARE_SYSMSG'],
 			})
 			break
 		end

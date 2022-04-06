@@ -49,7 +49,7 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 			mount = me.GetKungfuMount().dwMountType,
 			body_type = me.nRoleType,
 		},
-		signature = szAction == 'join' and X.SECRET.TEAM_JOIN or X.SECRET.TEAM_QUIT,
+		signature = szAction == 'join' and X.SECRET['J3CX::TEAM_JOIN'] or X.SECRET['J3CX::TEAM_QUIT'],
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then

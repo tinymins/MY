@@ -286,7 +286,7 @@ function PS.OnPanelActive(wnd)
 					L = ENVIRONMENT.GAME_EDITION,
 					q = D.szJokeSearch or '',
 				},
-				signature = X.SECRET.JOKE_RANDOM,
+				signature = X.SECRET['J3CX::JOKE_RANDOM'],
 				success = function(html, status)
 					local res = X.DecodeJSON(html)
 					if X.IsTable(res) then
@@ -329,7 +329,7 @@ function PS.OnPanelActive(wnd)
 						id = bAnonymous and '' or UI_GetClientPlayerID(),
 						jx3id = bAnonymous and '' or X.GetClientUUID(),
 					},
-					signature = X.SECRET.JOKE,
+					signature = X.SECRET['J3CX::JOKE'],
 					success = function(html, status)
 						local res = X.DecodeJSON(html)
 						if X.IsTable(res) then

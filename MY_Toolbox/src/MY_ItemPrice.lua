@@ -345,7 +345,7 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 			if not bValid then
 				return
 			end
-			X.Ajax({ url = 'https://push.j3cx.com/api/item/price', data = data, signature = X.SECRET.ITEM_PRICE })
+			X.Ajax({ url = 'https://push.j3cx.com/api/item/price', data = data, signature = X.SECRET['J3CX::ITEM_PRICE'] })
 		end)
 	end
 end)

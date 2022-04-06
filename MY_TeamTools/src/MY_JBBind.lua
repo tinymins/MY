@@ -41,7 +41,7 @@ function D.FetchBindStatus(resolve, reject)
 				L = ENVIRONMENT.GAME_EDITION,
 				jx3id = X.GetClientUUID(),
 			},
-			signature = X.SECRET.ROLE_QUERY,
+			signature = X.SECRET['J3CX::ROLE_QUERY'],
 			success = function(szHTML)
 				O.pending = false
 				local res = X.DecodeJSON(szHTML)
@@ -87,7 +87,7 @@ function D.Bind(szToken, resolve, reject)
 			mount = me.GetKungfuMount().dwMountType,
 			type = me.nRoleType,
 		},
-		signature = X.SECRET.ROLE_BIND,
+		signature = X.SECRET['J3CX::ROLE_BIND'],
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then
@@ -109,7 +109,7 @@ function D.Unbind(resolve, reject)
 			L = ENVIRONMENT.GAME_EDITION,
 			jx3id = X.GetClientUUID(),
 		},
-		signature = X.SECRET.ROLE_UNBIND,
+		signature = X.SECRET['J3CX::ROLE_UNBIND'],
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then

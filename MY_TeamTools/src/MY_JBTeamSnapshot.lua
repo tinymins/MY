@@ -67,7 +67,7 @@ function D.CreateSnapshot()
 			server = X.GetRealServer(2),
 			teammate = table.concat(aTeammate, ';'),
 		},
-		signature = X.SECRET.TEAM_SNAPSHOT,
+		signature = X.SECRET['J3CX::TEAM_SNAPSHOT'],
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then

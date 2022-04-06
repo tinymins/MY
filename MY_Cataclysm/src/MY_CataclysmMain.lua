@@ -35,17 +35,6 @@ local CTM_CONFIG_DEFAULT = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_Cataclysm/con
 local CTM_CONFIG_OFFICIAL = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_Cataclysm/config/official/{$lang}.jx3dat')
 local CTM_CONFIG_CATACLYSM = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MY_Cataclysm/config/cataclysm/{$lang}.jx3dat')
 
-local PASSPHRASE
-do
-local a, b = {111, 198, 5}, 31
-for i = 0, 50 do
-	for j, v in ipairs({ 23, 112, 234, 156 }) do
-		table.insert(a, (i * j * ((b * v) % 256)) % 256)
-	end
-end
-PASSPHRASE = string.char(unpack(a))
-end
-
 local TEAM_VOTE_REQUEST = {}
 local BUFF_LIST = {}
 local GKP_RECORD_TOTAL = 0

@@ -41,8 +41,6 @@ local FireUIEvent, MY_IsVisibleBuff, Table_IsSkillShow = FireUIEvent, X.IsVisibl
 local GetHeadTextForceFontColor, TargetPanel_SetOpenState = GetHeadTextForceFontColor, TargetPanel_SetOpenState
 
 local MY_TM_REMOTE_DATA_ROOT = X.FormatPath({'userdata/team_mon/remote/', X.PATH_TYPE.GLOBAL})
-local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
-local MY_TM_DATA_EMBEDDED_ENCRYPTED = false
 local MY_TM_TYPE = {
 	OTHER           = 0,
 	BUFF_GET        = 1,
@@ -153,12 +151,14 @@ local CACHE = {
 	HP_CD_STR   = {},
 }
 
-local D = {
+local D = X.SetmetaLazyload({
 	FILE   = {}, -- 文件原始数据
 	CONFIG = {}, -- 文件原始配置项
 	TEMP   = {}, -- 近期事件记录
 	DATA   = {}, -- 需要监控的数据合集
-}
+}, {
+	PW = function() return X.SECRET['FILE::TEAM_MON_DATA_PW'] end,
+})
 
 -- 初始化table 虽然写法没有直接写来得好 但是为了方便以后改动
 do
@@ -1852,7 +1852,8 @@ function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 		X.SafeCall(fnAction, false, 'File does not exist.')
 		return
 	end
-	local data = X.LoadLUAData(szFilePath, { passphrase = MY_TM_DATA_PASSPHRASE })
+	local data = X.LoadLUAData(szFilePath, { passphrase = D.PW })
+		or X.LoadLUAData(szFilePath, { passphrase = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746' })
 		or X.LoadLUAData(szFilePath, { passphrase = false })
 	if not data then
 		X.SafeCall(fnAction, false, 'Can not read data file.')
@@ -1928,7 +1929,7 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 		szPath = szPath .. '.jx3dat'
 		local option = {
 			passphrase = szFormat == 'LUA_ENCRYPTED'
-				and MY_TM_DATA_PASSPHRASE
+				and D.PW
 				or false,
 			crc = szFormat == 'LUA_ENCRYPTED',
 			compress = szFormat == 'LUA_ENCRYPTED',

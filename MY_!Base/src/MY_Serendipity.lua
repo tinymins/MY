@@ -94,7 +94,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 					n = szName, N = szNameCRC, R = szReporter,
 					f = eStatus, t = dwTime, c = nCount, m = nMethod,
 				},
-				signature = X.SECRET.SERENDIPITY_UPLOADS,
+				signature = X.SECRET['J3CX::SERENDIPITY_UPLOADS'],
 			})
 		end
 		if szMode == 'manual' or nMethod ~= 1 then

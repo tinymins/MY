@@ -149,7 +149,7 @@ function PS.OnPanelActive(wnd)
 							n = X.GetClientInfo().szName,
 							N = szNameCRC,
 						}),
-						X.SECRET.SERENDIPITY
+						X.SECRET['J3CX::SERENDIPITY']
 					)),
 				{ openurl = 'https://j3cx.com/serendipity', controls = false })
 		end,

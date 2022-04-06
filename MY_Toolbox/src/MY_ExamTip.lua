@@ -161,7 +161,7 @@ function D.SubmitData(tExamData, bAllRight)
 			data = X.EncodeJSON(data),
 			perfect = bAllRight and 1 or 0,
 		},
-		signature = X.SECRET.EXAM_UPLOADS,
+		signature = X.SECRET['J3CX::EXAM_UPLOADS'],
 		success = function(html, status)
 			local res = X.DecodeJSON(html)
 			if X.IsRestricted('MY_ExamTip') or not res then

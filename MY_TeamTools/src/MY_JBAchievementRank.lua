@@ -112,7 +112,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 			roleType = p.nRoleType,
 			onymous = bOnymous and 1 or 0,
 		},
-		signature = X.SECRET.ACHIEVEMENT_RANK_UPLOADS,
+		signature = X.SECRET['J3CX::ACHIEVEMENT_RANK_UPLOADS'],
 		fulfilled = onfulfilled,
 		complete = oncomplete,
 	}

@@ -27,13 +27,14 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
 end
 --------------------------------------------------------------------------
 
-local D = {}
+local D = X.SetmetaLazyload({}, {
+	PW = function() return X.SECRET['FILE::TEAM_MON_DATA_PW'] end,
+})
 local O = {}
 
 local EDITION = ENVIRONMENT.GAME_EDITION
 local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
 local MY_TM_REMOTE_DATA_ROOT = MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
-local MY_TM_DATA_PASSPHRASE = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746'
 local META_DOWNLOADING, DATA_DOWNLOADING = {}, {}
 
 local Schema = X.Schema
@@ -576,7 +577,7 @@ function D.DownloadData(info, callback, aSilentType)
 	local szUUID = 'r-'
 		.. ('%08x'):format(GetStringCRC(info.szDataURL))
 		.. ('%08x'):format(GetStringCRC(info.szVersion))
-	local LUA_CONFIG = { passphrase = MY_TM_DATA_PASSPHRASE, crc = true, compress = true }
+	local LUA_CONFIG = { passphrase = D.PW, crc = true, compress = true }
 	local p = X.LoadLUAData(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', LUA_CONFIG)
 	if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.jx3dat') then
 		D.LoadConfigureFile(szUUID .. '.jx3dat', info, aSilentType)
@@ -600,6 +601,7 @@ function D.DownloadData(info, callback, aSilentType)
 	X.DownloadFile(info.szDataURL, function(szPath)
 		DATA_DOWNLOADING[info.szKey] = nil
 		local data = X.LoadLUAData(szPath, LUA_CONFIG)
+			or X.LoadLUAData(szPath, { passphrase = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746', crc = true, compress = true })
 		if data then
 			local szFile = szUUID .. '.jx3dat'
 			X.SaveLUAData(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', info, LUA_CONFIG)

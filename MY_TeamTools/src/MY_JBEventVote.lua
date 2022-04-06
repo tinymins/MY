@@ -75,7 +75,7 @@ function D.FetchEventList(frame)
 			L = ENVIRONMENT.GAME_EDITION,
 			jx3id = X.GetClientUUID(),
 		},
-		signature = X.SECRET.EVENT_LIST,
+		signature = X.SECRET['J3CX::EVENT_LIST'],
 		success = function(szHTML)
 			local res, err = X.DecodeJSON(szHTML)
 			if not res then
@@ -148,7 +148,7 @@ function D.FetchRankList(frame, szEventID)
 			jx3id = X.GetClientUUID(),
 			event_id = szEventID,
 		},
-		signature = X.SECRET.RANK_LIST,
+		signature = X.SECRET['J3CX::RANK_LIST'],
 		success = function(szHTML)
 			local res, err = X.DecodeJSON(szHTML)
 			if not res then
@@ -241,7 +241,7 @@ function D.Vote(frame, szEventID, szTeamID)
 			event_id = szEventID,
 			team_id = szTeamID,
 		},
-		signature = X.SECRET.RANK_VOTE,
+		signature = X.SECRET['J3CX::RANK_VOTE'],
 		success = function(szHTML)
 			local res, err = X.DecodeJSON(szHTML)
 			if not res then

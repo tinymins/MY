@@ -86,7 +86,7 @@ local O = X.CreateUserSettingsModule('MY_Love', _L['Target'], {
 		xDefaultValue = true,
 	},
 })
-local D = {
+local D = X.SetmetaLazyload({
 	-- 导出常量
 	nLoveAttraction = 200,
 	nDoubleLoveAttraction = 800,
@@ -127,7 +127,9 @@ local D = {
 	tLoverItem = {},
 	nPendingItem = 0, -- 请求结缘烟花nItem序号缓存
 	aStorageData = nil, -- 防止被恢复界面配置篡改
-}
+}, {
+	PW = function() return X.SECRET['FILE::LOVE_BACKUP_PW'] end,
+})
 for _, p in ipairs(D.aLoverItem) do
 	assert(not D.tLoverItem[p.nItem], 'MY_Love item index conflict: ' .. p.nItem)
 	D.tLoverItem[p.nItem] = p
@@ -708,7 +710,6 @@ function D.GetOtherLover(dwID)
 	return D.tOtherLover[dwID]
 end
 
-local BACKUP_PASS_PHRASE = '78ed108e-cedd-40ef-8dcc-1529db94b3c9'
 function D.BackupLover(...)
 	local szLoverName, szLoverUUID = ...
 	if not X.CanUseOnlineRemoteStorage() then
@@ -741,7 +742,7 @@ function D.BackupLover(...)
 					nSendItem = lover.nSendItem,
 					nReceiveItem = lover.nReceiveItem,
 				},
-				{ passphrase = BACKUP_PASS_PHRASE }
+				{ passphrase = D.PW }
 			)
 			local szFullPath = X.GetAbsolutePath(szPath)
 			X.Alert(_L('Backup lover successed, file located at: %s.', szFullPath))
@@ -763,7 +764,7 @@ function D.BackupLover(...)
 end
 
 function D.RestoreLover(szFilePath)
-	local data = X.LoadLUAData(szFilePath, { passphrase = BACKUP_PASS_PHRASE })
+	local data = X.LoadLUAData(szFilePath, { passphrase = D.PW })
 	local errs = X.Schema.CheckSchema(data, BACKUP_DATA_SCHEMA)
 	if errs then
 		return X.Alert(_L['Error: file is not a valid lover backup!'])

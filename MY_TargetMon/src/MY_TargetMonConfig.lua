@@ -30,9 +30,15 @@ X.RegisterRestriction('MY_TargetMon.ShieldedUUID', { ['*'] = true })
 --------------------------------------------------------------------------
 local LANG = ENVIRONMENT.GAME_LANG
 local INIT_STATE = 'NONE'
-local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }, {}
+local D = X.SetmetaLazyload({
+	PASSPHRASE = string.char(0xd5, 0xa6, 0xd, 0x0, 0x0, 0x0, 0x0, 0xf7, 0x48, 0x32, 0xa0, 0xee, 0x90, 0x64, 0x40, 0xe5, 0xd8, 0x96, 0xe0, 0xdc, 0x20, 0xc8, 0x80, 0xd3, 0x68, 0xfa, 0x20, 0xca, 0xb0, 0x2c, 0xc0, 0xc1, 0xf8, 0x5e, 0x60, 0xb8, 0x40, 0x90, 0x0, 0xaf, 0x88, 0xc2, 0xa0, 0xa6, 0xd0, 0xf4, 0x40, 0x9d, 0x18, 0x26, 0xe0, 0x94, 0x60, 0x58, 0x80, 0x8b, 0xa8, 0x8a, 0x20, 0x82, 0xf0, 0xbc, 0xc0, 0x79, 0x38, 0xee, 0x60, 0x70, 0x80, 0x20, 0x0, 0x67, 0xc8, 0x52, 0xa0, 0x5e, 0x10, 0x84, 0x40, 0x55, 0x58, 0xb6, 0xe0, 0x4c, 0xa0, 0xe8, 0x80, 0x43, 0xe8, 0x1a, 0x20, 0x3a, 0x30, 0x4c, 0xc0, 0x31, 0x78, 0x7e, 0x60, 0x28),
+	PASSPHRASE_EMBEDDED = string.char(0xd3, 0x62, 0x5, 0x0, 0x0, 0x0, 0x0, 0xd3, 0x68, 0xfa, 0x20, 0xa6, 0xd0, 0xf4, 0x40, 0x79, 0x38, 0xee, 0x60, 0x4c, 0xa0, 0xe8, 0x80, 0x1f, 0x8, 0xe2, 0xa0, 0xf2, 0x70, 0xdc, 0xc0, 0xc5, 0xd8, 0xd6, 0xe0, 0x98, 0x40, 0xd0, 0x0, 0x6b, 0xa8, 0xca, 0x20, 0x3e, 0x10, 0xc4, 0x40, 0x11, 0x78, 0xbe, 0x60, 0xe4, 0xe0, 0xb8, 0x80, 0xb7, 0x48, 0xb2, 0xa0, 0x8a, 0xb0, 0xac, 0xc0, 0x5d, 0x18, 0xa6, 0xe0, 0x30, 0x80, 0xa0, 0x0, 0x3, 0xe8, 0x9a, 0x20, 0xd6, 0x50, 0x94, 0x40, 0xa9, 0xb8, 0x8e, 0x60, 0x7c, 0x20, 0x88, 0x80, 0x4f, 0x88, 0x82, 0xa0, 0x22, 0xf0, 0x7c, 0xc0, 0xf5, 0x58, 0x76, 0xe0, 0xc8),
+},
+{
+	PW = function() return X.SECRET['FILE::TARGET_MON_DATA_PW'] end,
+	PW_E = function() return X.SECRET['FILE::TARGET_MON_DATA_PW_E'] end,
+})
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', X.PATH_TYPE.ROLE}
-local EMBEDDED_ENCRYPTED = false
 local CUSTOM_EMBEDDED_CONFIG_ROOT = X.FormatPath({'userdata/TargetMon/', X.PATH_TYPE.GLOBAL})
 local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', X.PATH_TYPE.GLOBAL}
 local TARGET_TYPE_LIST = {
@@ -86,46 +92,17 @@ function D.FormatConfig(config, bCoroutine)
 end
 
 function D.LoadEmbeddedConfig(bCoroutine)
-	if not X.IsString(C.PASSPHRASE) or not X.IsString(C.PASSPHRASE_EMBEDDED) then
+	if not X.IsString(D.PW) or not X.IsString(D.PW_E) then
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_TargetMonConfig', 'Passphrase cannot be empty!', X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end
-	if not EMBEDDED_ENCRYPTED then
-		-- 自动生成内置加密数据
-		local DAT_ROOT = 'MY_Resource/data/targetmon/'
-		local SRC_ROOT = X.PACKET_INFO.ROOT .. '!src-dist/data/' .. DAT_ROOT
-		for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
-			X.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
-			local uuid = szFile:sub(1, -13)
-			local lang = szFile:sub(-11, -8)
-			if lang == 'zhcn' or lang == 'zhtw' then
-				local data = LoadDataFromFile(SRC_ROOT .. szFile)
-				if IsEncodedData(data) then
-					data = DecodeData(data)
-				end
-				if lang == 'zhcn' then
-					data = X.DecodeLUAData(data)
-					if X.IsArray(data) then
-						for k, p in ipairs(data) do
-							data[k] = D.FormatConfig(p, bCoroutine)
-						end
-					else
-						data = D.FormatConfig(data, bCoroutine)
-					end
-					data = 'return ' .. X.EncodeLUAData(data)
-				end
-				data = EncodeData(data, true, true)
-				SaveDataToFile(data, X.FormatPath({'userdata/TargetMon/' .. uuid .. '.jx3dat', X.PATH_TYPE.GLOBAL}, {lang = lang}), C.PASSPHRASE_EMBEDDED)
-			end
-		end
-		EMBEDDED_ENCRYPTED = true
-	end
 	-- 加载内置数据
 	local aConfig = {}
 	for _, szFile in ipairs(CPath.GetFileList(CUSTOM_EMBEDDED_CONFIG_ROOT) or {}) do
-		local config = X.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
+		local config = X.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = D.PW_E })
+			or X.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = D.PASSPHRASE_EMBEDDED })
 			or X.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile)
 		if X.IsTable(config) and config.uuid and szFile:sub(1, -#'.jx3dat' - 1) == config.uuid and config.group and config.sort and config.monitors then
 			table.insert(aConfig, config)
@@ -344,10 +321,14 @@ end
 function D.LoadConfig(bDefault, bOriginal, bCoroutine)
 	local aPatch
 	if not bDefault then
-		aPatch = X.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or X.LoadLUAData(ROLE_CONFIG_FILE)
+		aPatch = X.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = D.PW })
+			or X.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = D.PASSPHRASE })
+			or X.LoadLUAData(ROLE_CONFIG_FILE)
 	end
 	if not aPatch and not bOriginal then
-		aPatch = X.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or X.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
+		aPatch = X.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE, { passphrase = D.PW })
+			or X.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE, { passphrase = D.PASSPHRASE })
+			or X.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
 	end
 	if not aPatch then
 		aPatch = {}
@@ -402,9 +383,9 @@ function D.SaveConfig(bDefault)
 		end
 	end
 	if bDefault then
-		X.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
+		X.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, aPatch, { passphrase = D.PW })
 	else
-		X.SaveLUAData(ROLE_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
+		X.SaveLUAData(ROLE_CONFIG_FILE, aPatch, { passphrase = D.PW })
 		CONFIG_CHANGED = false
 	end
 end
@@ -420,7 +401,7 @@ function D.ImportPatches(aPatch, bAsEmbedded)
 					nReplaceCount = nReplaceCount + 1
 				end
 				nImportCount = nImportCount + 1
-				X.SaveLUAData(szFile, embedded, { passphrase = C.PASSPHRASE_EMBEDDED })
+				X.SaveLUAData(szFile, embedded, { passphrase = D.PW_E })
 			end
 		end
 		if nImportCount > 0 then
@@ -468,9 +449,14 @@ function D.ExportPatches(aUUID, bAsEmbedded)
 end
 
 function D.ImportPatchFile(oFilePath)
-	local aPatch, bAsEmbedded = X.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE }) or X.LoadLUAData(oFilePath), false
+	local aPatch = X.LoadLUAData(oFilePath, { passphrase = D.PW })
+		or X.LoadLUAData(oFilePath, { passphrase = D.PASSPHRASE })
+		or X.LoadLUAData(oFilePath)
+	local bAsEmbedded = false
 	if not aPatch then
-		aPatch, bAsEmbedded = X.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE_EMBEDDED }), true
+		aPatch = X.LoadLUAData(oFilePath, { passphrase = D.PW_E })
+			or X.LoadLUAData(oFilePath, { passphrase = D.PASSPHRASE_EMBEDDED })
+		bAsEmbedded = true
 	end
 	if not aPatch then
 		return
@@ -484,9 +470,9 @@ function D.ExportPatchFile(oFilePath, aUUID, szIndent, bAsEmbedded)
 	end
 	local szPassphrase
 	if bAsEmbedded then
-		szPassphrase = C.PASSPHRASE_EMBEDDED
+		szPassphrase = D.PW_E
 	elseif not szIndent then
-		szPassphrase = C.PASSPHRASE
+		szPassphrase = D.PW
 	end
 	local aPatch = D.ExportPatches(aUUID, bAsEmbedded)
 	X.SaveLUAData(oFilePath, aPatch, { indent = szIndent, crc = not szIndent, passphrase = szPassphrase })
