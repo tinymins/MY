@@ -220,7 +220,7 @@ local function SerializeElement(el)
 			info.a = a
 		end
 		info.text = el:GetText()
-	elseif info.type == 'Image' or info.type == 'Animate' then
+	elseif info.type == 'Image' then
 		local image, frame = el:GetImagePath()
 		info.image = image
 		info.frame = frame
