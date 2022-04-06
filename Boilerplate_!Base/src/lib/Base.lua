@@ -128,16 +128,27 @@ if not SetmetaReadonly then
 		})
 	end
 end
-local function SetmetaLazyload(t, keyLoader, fallbackLoader)
+local function SetmetaLazyload(t, _keyLoader, fallbackLoader)
+	local keyLoader = {}
+	for k, v in pairs(_keyLoader) do
+		keyLoader[k] = v
+	end
 	return setmetatable(t, {
 		__index = function(t, k)
-			local loader = keyLoader[k] or fallbackLoader
-			if not loader then
-				return
+			local loader = keyLoader[k]
+			if loader then
+				keyLoader[k] = nil
+				if not next(keyLoader) then
+					setmetatable(t, nil)
+				end
+			else
+				loader = fallbackLoader
 			end
-			local v = loader(k)
-			t[k] = v
-			return v
+			if loader then
+				local v = loader(k)
+				t[k] = v
+				return v
+			end
 		end,
 	})
 end
