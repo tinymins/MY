@@ -83,7 +83,7 @@ function X.TrimString(szText)
 end
 
 function X.EncryptString(szText)
-	return szText:gsub('.', function (c) return string.format('%02X', (string.byte(c) + 13) % 256) end):gsub(' ', '+')
+	return (szText:gsub('.', function (c) return string.format('%02X', (string.byte(c) + 13) % 256) end):gsub(' ', '+'))
 end
 
 function X.DecryptString(szText)
@@ -134,6 +134,20 @@ function X.SimpleDecodeString(szCipher, bTripSlashes)
 	end
 	return table.concat(aText)
 end
+
+function X.KGUIEncrypt(szText)
+	if not X.IsString(szText) then
+		return
+	end
+	if EncodeData then
+		szText = EncodeData(X.EncryptString(szText)) or szText
+	end
+	if KGUIEncrypt then
+		szText = KGUIEncrypt(X.EncryptString(szText)) or szText
+	end
+	return MD5 and MD5(X.EncryptString(szText)) or X.EncryptString(szText)
+end
+X.KE = X.KGUIEncrypt
 
 -- 编码 URL 中的参数：方法不会对下列字符编码 [a-zA-Z0-9~!*()']
 -- @param {any} data 需要编码的数据

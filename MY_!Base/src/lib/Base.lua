@@ -219,6 +219,19 @@ if not SetmetaReadonly then
 		})
 	end
 end
+local function SetmetaLazyload(t, keyLoader, fallbackLoader)
+	return setmetatable(t, {
+		__index = function(t, k)
+			local loader = keyLoader[k] or fallbackLoader
+			if not loader then
+				return
+			end
+			local v = loader(k)
+			t[k] = v
+			return v
+		end,
+	})
+end
 local SHARED_MEMORY = _G.PLUGIN_SHARED_MEMORY
 if type(SHARED_MEMORY) ~= 'table' then
 	SHARED_MEMORY = {}
@@ -968,6 +981,7 @@ local X = {
 	CallWithThis     = CallWithThis    ,
 	SafeCallWithThis = SafeCallWithThis,
 	SetmetaReadonly  = SetmetaReadonly ,
+	SetmetaLazyload  = SetmetaLazyload ,
 	ErrorLog         = ErrorLog        ,
 	Set              = Set             ,
 	Get              = Get             ,

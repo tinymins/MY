@@ -109,7 +109,7 @@ function X.Ajax(settings)
 		driver    = settings.driver  or 'auto',
 		method    = settings.method  or 'auto',
 		payload   = settings.payload or 'form',
-		signature = settings.signature,
+		signature = X.KGUIEncrypt(settings.signature),
 		timeout   = settings.timeout or 60000 ,
 		charset   = settings.charset or 'utf8',
 	}
