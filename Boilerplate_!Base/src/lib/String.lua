@@ -140,12 +140,12 @@ function X.KGUIEncrypt(szText)
 		return
 	end
 	if EncodeData then
-		szText = EncodeData(X.EncryptString(szText)) or szText
+		szText = EncodeData(X.SimpleEncryptString(szText)) or szText
 	end
 	if KGUIEncrypt then
-		szText = KGUIEncrypt(X.EncryptString(szText)) or szText
+		szText = KGUIEncrypt(X.SimpleEncryptString(szText)) or szText
 	end
-	return MD5 and string.lower(MD5(X.EncryptString(szText))) or X.EncryptString(szText)
+	return MD5 and string.lower(MD5(X.SimpleEncryptString(szText))) or X.SimpleEncryptString(szText)
 end
 X.KE = X.KGUIEncrypt
 
