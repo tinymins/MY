@@ -750,6 +750,14 @@ function D.GetRepoMetaInfoSel(frame)
 	end
 end
 
+function D.Init()
+	local K = string.char(75, 69)
+	local k = string.char(80, 87)
+	if X.IsString(D[k]) then
+		D[k] = X[K](D[k] .. string.char(77, 89))
+	end
+end
+
 function D.OnFrameCreate()
 	this:Lookup('', 'Text_Title'):SetText(_L['Subscribe list'])
 	this:Lookup('PageSet_Menu/Page_Fav', 'Text_Fav_Break1'):SetText(_L['Author'])
@@ -1009,6 +1017,10 @@ X.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
 	elseif action == 'LOAD' then
 		X.Sysmsg(_L('%s loaded %s', szTalker, data[2]))
 	end
+end)
+
+X.RegisterInit(function()
+	D.Init()
 end)
 
 X.RegisterEvent('LOADING_END', 'MY_TeamMon_RR', function()

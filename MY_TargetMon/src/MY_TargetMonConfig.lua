@@ -494,23 +494,14 @@ end
 
 function D.Init(bNoCoroutine)
 	if INIT_STATE == 'NONE' then
-		local k = string.char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69)
-		if X.IsTable(C[k]) then
-			for i = 0, 50 do
-				for j, v in ipairs({ 253, 12, 34, 56 }) do
-					table.insert(C[k], (i * j * ((3 * v) % 256)) % 256)
-				end
-			end
-			C[k] = string.char(unpack(C[k]))
+		local K = string.char(75, 69)
+		local k = string.char(80, 87)
+		if X.IsString(D[k]) then
+			D[k] = X[K](D[k] .. string.char(77, 89))
 		end
-		local k = string.char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69, 95, 69, 77, 66, 69, 68, 68, 69, 68)
-		if X.IsTable(C[k]) then
-			for i = 0, 50 do
-				for j, v in ipairs({ 253, 12, 34, 56 }) do
-					table.insert(C[k], (i * j * ((15 * v) % 256)) % 256)
-				end
-			end
-			C[k] = string.char(unpack(C[k]))
+		local k = string.char(80, 87, 95, 69)
+		if X.IsString(D[k]) then
+			D[k] = X[K](D[k] .. string.char(77, 89))
 		end
 		INIT_STATE = 'WAIT_CONFIG'
 	end

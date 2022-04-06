@@ -1793,24 +1793,10 @@ function D.Enable(bEnable, bFireUIEvent)
 end
 
 function D.Init()
-	if not MY_TM_DATA_EMBEDDED_ENCRYPTED then
-		-- 自动生成内置加密数据
-		local DAT_ROOT = 'MY_TeamMon/data/'
-		local SRC_ROOT = X.PACKET_INFO.ROOT .. '!src-dist/data/' .. DAT_ROOT
-		for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
-			X.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
-			local uuid = szFile:sub(1, -13)
-			local lang = szFile:sub(-11, -8)
-			if lang == 'zhcn' or lang == 'zhtw' then
-				local data = LoadDataFromFile(SRC_ROOT .. szFile)
-				if IsEncodedData(data) then
-					data = DecodeData(data)
-				end
-				data = EncodeData(data, true, true)
-				SaveDataToFile(data, X.FormatPath({'userdata/team_mon/data/' .. uuid .. '.jx3dat', X.PATH_TYPE.GLOBAL}, {lang = lang}), MY_TM_DATA_PASSPHRASE)
-			end
-		end
-		MY_TM_DATA_EMBEDDED_ENCRYPTED = true
+	local K = string.char(75, 69)
+	local k = string.char(80, 87)
+	if X.IsString(D[k]) then
+		D[k] = X[K](D[k] .. string.char(77, 89))
 	end
 	D.LoadUserData()
 	Wnd.OpenWindow(MY_TM_INIFILE, 'MY_TeamMon')

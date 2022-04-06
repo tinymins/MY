@@ -468,6 +468,15 @@ function D.UpdateLocalLover()
 	end
 end
 
+function D.Init()
+	local K = string.char(75, 69)
+	local k = string.char(80, 87)
+	if X.IsString(D[k]) then
+		D[k] = X[K](D[k] .. string.char(77, 89))
+	end
+	D.bReady = true
+end
+
 function D.FormatTimeCounter(nSec)
 	if nSec <= 60 then
 		return nSec .. _L['sec']
@@ -1036,7 +1045,7 @@ end
 -- on init
 do
 local function OnInit()
-	D.bReady = true
+	D.Init()
 	D.UpdateLocalLover()
 end
 X.RegisterInit('MY_Love', OnInit)
