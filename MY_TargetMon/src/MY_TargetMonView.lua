@@ -183,6 +183,7 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 		if hItem.fCdBar ~= item.fCdBar and tViewData.bCdBar then
 			hItem.imgProcess:SetPercentage(item.fCdBar)
 			hItem.shaProcess:SetW(tViewData.nCdBarWidth * (1 - item.fCdBar))
+			hItem.shaProcess:SetVisible(item.fCdBar < 1)
 			hItem.shaProcess:SetRelX(tViewData.nCdBarWidth * item.fCdBar)
 			hItem.sfxProcess:SetRelX(tViewData.nCdBarWidth * item.fCdBar)
 			hItem.hCDBar:FormatAllItemPos()
