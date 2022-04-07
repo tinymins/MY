@@ -424,3 +424,17 @@ function X.GetPureText(szXml, szDriver)
 	return cache.c or cache.l
 end
 end
+
+function X.FormatCharCodeString(s, m)
+	local a = {}
+	for i = 1, #s do
+		a[i] = string.byte(s, i)
+	end
+	local f = m == 'hex'
+		and '0x%x'
+		or '%s'
+	for i, v in ipairs(a) do
+		a[i] = f:format(v)
+	end
+	return table.concat(a, ', ')
+end
