@@ -102,7 +102,7 @@ function D.SyncMember(team, dwID, szName, state)
 	end
 	if O.bKeepMark and state.nMark then -- 如果这货之前有标记
 		team.SetTeamMark(state.nMark, dwID) -- 标记给他
-		X.Sysmsg(_L('Restore player marked as [%s]: %s', X.GetMarkName(state.nMark), szName))
+		X.Sysmsg(_L('Restore player marked as [%s]: %s', CONSTANT.TEAM_MARK_NAME[state.nMark] or '?', szName))
 	end
 end
 

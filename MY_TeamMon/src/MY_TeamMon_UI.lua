@@ -1577,7 +1577,7 @@ function D.OpenSettingPanel(data, szType)
 		local menu = {}
 		for k, v in X.ipairs_c(PARTY_MARK_ICON_FRAME_LIST) do
 			table.insert(menu, {
-				szOption = X.GetMarkName(k),
+				szOption = CONSTANT.TEAM_MARK_NAME[k] or '?',
 				szIcon = PARTY_MARK_ICON_PATH,
 				nFrame = v, szLayer = 'ICON_RIGHT',
 				bCheck = true, bChecked = data[nClass] and data[nClass].tMark and data[nClass].tMark[k],
