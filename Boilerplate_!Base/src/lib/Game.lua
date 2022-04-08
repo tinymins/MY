@@ -3705,18 +3705,33 @@ function X.GetMapID(bFix)
 	return bFix and CONSTANT.MAP_MERGE[dwMapID] or dwMapID
 end
 
-do local MARK_NAME = { _L['Cloud'], _L['Sword'], _L['Ax'], _L['Hook'], _L['Drum'], _L['Shear'], _L['Stick'], _L['Jade'], _L['Dart'], _L['Fan'] }
--- 获取标记中文名
--- (string) X.GetMarkName([number nIndex])
-function X.GetMarkName(nIndex)
-	if nIndex then
-		return MARK_NAME[nIndex]
-	else
-		return X.Clone(MARK_NAME)
+-- 设置标记目标
+-- @param nMark 标记索引
+-- @param dwID 目标ID
+function X.SetTeamMarkTarget(nMark, dwID)
+	if npc and X.IsShieldedNpc(npc.dwTemplateID, 'TALK') then
+		return
+	end
+	return GetClientTeam().SetTeamMark(nMark, dwID)
+end
+
+-- 获取标记目标
+-- @param nMark 标记索引
+-- @return number 目标ID
+function X.GetTeamMarkTarget(nMark)
+	if not X.IsInParty() then
+		return
+	end
+	local tMark = GetClientTeam().GetTeamMark()
+	if tMark then
+		return tMark[nMark]
 	end
 end
 
-function X.GetMarkIndex(dwID)
+-- 获取目标标记
+-- @param dwID 目标ID
+-- @return number 标记索引
+function X.GetTargetTeamMark(dwID)
 	if not X.IsInParty() then
 		return
 	end
@@ -3755,6 +3770,7 @@ function X.GetTeamInfo(tTeamInfo)
 	return tTeamInfo
 end
 
+do
 local function GetWrongIndex(tWrong, bState)
 	for k, v in ipairs(tWrong) do
 		if not bState or v.state then
@@ -3769,7 +3785,7 @@ local function SyncMember(team, dwID, szName, state)
 	end
 	if state.nMark then -- 如果这货之前有标记
 		team.SetTeamMark(state.nMark, dwID) -- 标记给他
-		X.Sysmsg(_L('Restore player marked as [%s]: %s', MARK_NAME[state.nMark], szName))
+		X.Sysmsg(_L('Restore player marked as [%s]: %s', CONSTANT.TEAM_MARK_NAME[state.nMark], szName))
 	end
 end
 -- 恢复团队信息

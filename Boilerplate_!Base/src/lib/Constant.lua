@@ -52,6 +52,19 @@ local FORCE_TYPE = (function()
 	return SetmetaReadonly(res)
 end)()
 
+local TEAM_MARK = {
+	CLOUD = 1,
+	SWORD = 2,
+	AX    = 3,
+	HOOK  = 4,
+	DRUM  = 5,
+	SHEAR = 6,
+	STICK = 7,
+	JADE  = 8,
+	DART  = 9,
+	FAN   = 10,
+}
+
 CONSTANT = {
 	MENU_DIVIDER = SetmetaReadonly({ bDevide = true }),
 	EMPTY_TABLE = SetmetaReadonly({}),
@@ -788,6 +801,19 @@ CONSTANT = {
 		SELL_LOOK_UP   = 3,
 		AVG_LOOK_UP    = 4,
 	}),
+	TEAM_MARK,
+	TEAM_MARK_NAME = {
+		[TEAM_MARK.CLOUD] = _L['TEAM_MARK_CLOUD'],
+		[TEAM_MARK.SWORD] = _L['TEAM_MARK_SWORD'],
+		[TEAM_MARK.AX   ] = _L['TEAM_MARK_AX'   ],
+		[TEAM_MARK.HOOK ] = _L['TEAM_MARK_HOOK' ],
+		[TEAM_MARK.DRUM ] = _L['TEAM_MARK_DRUM' ],
+		[TEAM_MARK.SHEAR] = _L['TEAM_MARK_SHEAR'],
+		[TEAM_MARK.STICK] = _L['TEAM_MARK_STICK'],
+		[TEAM_MARK.JADE ] = _L['TEAM_MARK_JADE' ],
+		[TEAM_MARK.DART ] = _L['TEAM_MARK_DART' ],
+		[TEAM_MARK.FAN  ] = _L['TEAM_MARK_FAN'  ],
+	},
 }
 
 -- 更新最高玩家等级数据
