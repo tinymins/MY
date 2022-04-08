@@ -1738,19 +1738,22 @@ function X.GetNearFurniture(nDis)
 	if not nDis then
 		nDis = 256
 	end
+	local nPlaneDis = nDis / 32
 	local aFurniture, tID = {}, {}
 	if X.IsFunction(GetNearbyFurnitureInfoList) and X.IsFunction(HomeLand_GetFurniture2GameID) then
 		for _, p in ipairs(GetNearbyFurnitureInfoList('ui get objects info v_0', nDis)) do
-			local dwID = X.NumberBitShl(p.BaseId, 32, 64) + p.InstID
-			local info = not tID[dwID] and X.GetFurnitureInfo('nRepresentID', p.RepresentID)
-			if info then
-				info = setmetatable(p, { __index = info })
-				info.dwID = dwID
-				info.nInstID = p.InstID
-				info.nBaseID = p.BaseId
-				info.nGameID = HomeLand_GetFurniture2GameID(p.RepresentID)
-				table.insert(aFurniture, info)
-				tID[dwID] = true
+			if X.GetDistance(p.nX, p.nY, p.nZ, 'plane') <= nPlaneDis then
+				local dwID = X.NumberBitShl(p.BaseId, 32, 64) + p.InstID
+				local info = not tID[dwID] and X.GetFurnitureInfo('nRepresentID', p.RepresentID)
+				if info then
+					info = setmetatable(p, { __index = info })
+					info.dwID = dwID
+					info.nInstID = p.InstID
+					info.nBaseID = p.BaseId
+					info.nGameID = HomeLand_GetFurniture2GameID(p.RepresentID)
+					table.insert(aFurniture, info)
+					tID[dwID] = true
+				end
 			end
 		end
 	end
