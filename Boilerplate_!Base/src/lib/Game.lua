@@ -970,10 +970,13 @@ function X.IsShieldedNpc(dwTemplateID, szType)
 		return false
 	end
 	local bShieldFocus, bShieldSpeak = Table_IsShieldedNpc(dwTemplateID)
+	if szType == 'FOCUS' then
+		return bShieldFocus
+	end
 	if szType == 'TALK' then
 		return bShieldSpeak
 	end
-	return bShieldFocus
+	return bShieldFocus or bShieldSpeak
 end
 
 X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#ImportantNpclist'), function()
@@ -3709,7 +3712,8 @@ end
 -- @param nMark 标记索引
 -- @param dwID 目标ID
 function X.SetTeamMarkTarget(nMark, dwID)
-	if npc and X.IsShieldedNpc(npc.dwTemplateID, 'TALK') then
+	local npc = not IsPlayer(dwID) and GetNpc(dwID) or nil
+	if npc and X.IsShieldedNpc(npc.dwTemplateID) then
 		return
 	end
 	return GetClientTeam().SetTeamMark(nMark, dwID)
