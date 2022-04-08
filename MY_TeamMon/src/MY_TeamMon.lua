@@ -721,7 +721,7 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 				if bMark and tTeamMark[nMark] ~= dwCharacterID then
 					tar = tTeamMark[nMark] and tTeamMark[nMark] ~= 0 and X.GetObject(tTeamMark[nMark])
 					if not tar or tar.dwTemplateID ~= dwID then
-						return team.SetTeamMark(nMark, dwCharacterID)
+						return X.SetTeamMarkTarget(nMark, dwCharacterID)
 					end
 				end
 			end
@@ -730,14 +730,14 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 				if bMark and tTeamMark[nMark] ~= dwCharacterID then
 					tar = tTeamMark[nMark] and tTeamMark[nMark] ~= 0 and X.GetObject(tTeamMark[nMark])
 					if not tar or not X.GetBuff(tar, dwID) then
-						return team.SetTeamMark(nMark, dwCharacterID)
+						return X.SetTeamMarkTarget(nMark, dwCharacterID)
 					end
 				end
 			end
 		elseif szType == 'CASTING' then
 			for nMark, bMark in ipairs(tMark) do
 				if bMark and (not tTeamMark[nMark] or tTeamMark[nMark] ~= dwCharacterID) then
-					return team.SetTeamMark(nMark, dwCharacterID)
+					return X.SetTeamMarkTarget(nMark, dwCharacterID)
 				end
 			end
 		end
