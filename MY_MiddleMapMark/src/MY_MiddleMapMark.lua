@@ -52,9 +52,9 @@ DB:Execute('CREATE INDEX IF NOT EXISTS mmm_title_idx ON NpcInfo(title, mapid)')
 DB:Execute('CREATE INDEX IF NOT EXISTS mmm_template_idx ON NpcInfo(templateid, mapid)')
 local DBN_W  = DB:Prepare('REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, z, name, title, level, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 local DBN_DM  = DB:Prepare('DELETE FROM NpcInfo WHERE mapid = ?')
-local DBN_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE templateid = ?')
-local DBN_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE name LIKE ? OR title LIKE ?')
-local DBN_RNM = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE (name LIKE ? AND mapid = ?) OR (title LIKE ? AND mapid = ?)')
+local DBN_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name, title, level FROM NpcInfo WHERE templateid = ?')
+local DBN_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name, title, level FROM NpcInfo WHERE name LIKE ? OR title LIKE ?')
+local DBN_RNM = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name, title, level FROM NpcInfo WHERE (name LIKE ? AND mapid = ?) OR (title LIKE ? AND mapid = ?)')
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS DoodadInfo (
 		templateid INTEGER NOT NULL,
@@ -71,9 +71,9 @@ DB:Execute([[
 DB:Execute('CREATE INDEX IF NOT EXISTS mmm_name_idx ON DoodadInfo(name, mapid)')
 local DBD_W  = DB:Prepare('REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, z, name, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
 local DBD_DM  = DB:Prepare('DELETE FROM DoodadInfo WHERE mapid = ?')
-local DBD_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE templateid = ?')
-local DBD_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ?')
-local DBD_RNM = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ? AND mapid = ?')
+local DBD_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name FROM DoodadInfo WHERE templateid = ?')
+local DBD_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name FROM DoodadInfo WHERE name LIKE ?')
+local DBD_RNM = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name FROM DoodadInfo WHERE name LIKE ? AND mapid = ?')
 
 local D = {}
 
@@ -639,14 +639,13 @@ local function OnMMMItemMouseEnter()
 		end
 	end
 	if IsCtrlKeyDown() then
-		szTip = szTip
 		if this.templateid then
 			szTip = szTip .. '\n' .. this.type .. ' Template ID: ' .. this.templateid
 		end
 		if this.x and this.y then
 			szTip = szTip .. '\n' .. this.x .. ', ' .. this.y
 			if this.z then
-				szTip = szTip .. ',' .. this.z
+				szTip = szTip .. ', ' .. this.z
 			end
 		end
 	end
