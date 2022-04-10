@@ -643,7 +643,7 @@ local function OnMMMItemMouseEnter()
 			szTip = szTip .. '\n' .. this.type .. ' Template ID: ' .. this.templateid
 		end
 		if this.x and this.y then
-			szTip = szTip .. '\n' .. this.x .. ', ' .. this.y
+			szTip = szTip .. '\n' .. 'Pos: ' .. this.x .. ', ' .. this.y
 			if this.z then
 				szTip = szTip .. ', ' .. this.z
 			end
