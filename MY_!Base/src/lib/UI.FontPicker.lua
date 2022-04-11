@@ -22,8 +22,9 @@ function UI.OpenFontPicker(callback, t)
 		local font = i
 		local txt = ui:Append('Text', {
 			w = 70, x = i % 10 * 80 + 20, y = math.floor(i / 10) * 25,
-			font = font, alpha = 200, text = _L('Font %d', font),
-			onclick = function()
+			font = font, alpha = 200,
+			text = _L('Font %d', font),
+			onClick = function()
 				if callback then
 					callback(font)
 				end
@@ -31,7 +32,7 @@ function UI.OpenFontPicker(callback, t)
 					ui:Remove()
 				end
 			end,
-			onhover = function(bIn)
+			onHover = function(bIn)
 				UI(this):Alpha(bIn and 255 or 200)
 			end,
 		})

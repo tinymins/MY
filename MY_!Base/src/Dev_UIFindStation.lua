@@ -172,12 +172,12 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndCheckBox', {
 		x = x + 10, y = y + 28,
 		text = _L['Enable button search, mouseover it will show its path'],
-		checked = O.bButton, oncheck = D.UpdateButton,
+		checked = O.bButton, onCheck = D.UpdateButton,
 	}):AutoWidth()
 	ui:Append('WndCheckBox', {
 		x = x + 10, y = y + 56,
 		text = _L['Enable box search, mouseover it will show its path'],
-		checked = O.bBox, oncheck = D.UpdateBox,
+		checked = O.bBox, onCheck = D.UpdateBox,
 	}):AutoWidth()
 	ui:Append('Text', { x = x + 0, y = y + 92, text = _L['Find by text'], font = 27 })
 
@@ -195,7 +195,7 @@ function PS.OnPanelActive(frame)
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = y + 120,
 		text = _L['Search'],
-		onclick = function()
+		onClick = function()
 			ui:Children('#Edit_Result'):Text(_L['Searching, please wait...'])
 			O.szQuery = ui:Children('#Edit_Query'):Text()
 			O.szResult = D.SearchText(O.szQuery)

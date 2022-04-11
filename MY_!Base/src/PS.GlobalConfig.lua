@@ -35,7 +35,7 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY, w = 100, h = 25, group = 'distance type',
 			text = p.szText,
 			checked = X.GetGlobalDistanceType() == p.szType,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				if not bChecked then
 					return
 				end
@@ -153,13 +153,13 @@ function PS.OnPanelActive(wnd)
 			return menu
 		end,
 		tip = _L['PRESET_DESC'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 	}):AutoWidth():Width() + 5
 
 	nX = nX + ui:Append('WndButtonBox', {
 		x = nX, y = nY,
 		text = _L['Export data'],
-		onclick = function()
+		onClick = function()
 			X.OpenUserSettingsExportPanel()
 		end,
 	}):AutoWidth():Width() + 5
@@ -167,7 +167,7 @@ function PS.OnPanelActive(wnd)
 	nX = nX + ui:Append('WndButtonBox', {
 		x = nX, y = nY,
 		text = _L['Import data'],
-		onclick = function()
+		onClick = function()
 			X.OpenUserSettingsImportPanel()
 		end,
 	}):AutoWidth():Width() + 5
@@ -175,7 +175,7 @@ function PS.OnPanelActive(wnd)
 	nX = nX + ui:Append('WndButtonBox', {
 		x = nX, y = nY,
 		text = _L['Backup folder'],
-		onclick = function()
+		onClick = function()
 			local szRoot = X.GetAbsolutePath({'export/settings/', X.PATH_TYPE.GLOBAL}):gsub('/', '\\')
 			X.OpenFolder(szRoot)
 			UI.OpenTextEditor(szRoot)

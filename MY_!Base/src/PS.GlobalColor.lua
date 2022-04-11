@@ -45,7 +45,7 @@ function PS.OnPanelActive(wnd)
 		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { X.GetForceColor(dwForceID, 'foreground') },
-			oncolorpick = function(r, g, b)
+			onColorPick = function(r, g, b)
 				txt:Color(r, g, b)
 				X.SetForceColor(dwForceID, 'foreground', { r, g, b })
 			end,
@@ -54,7 +54,7 @@ function PS.OnPanelActive(wnd)
 		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { X.GetForceColor(dwForceID, 'background') },
-			oncolorpick = function(r, g, b)
+			onColorPick = function(r, g, b)
 				sha:Color(r, g, b)
 				X.SetForceColor(dwForceID, 'background', { r, g, b })
 			end,
@@ -68,9 +68,9 @@ function PS.OnPanelActive(wnd)
 	end
 	ui:Append('WndButton', {
 		x = x, y = y, w = 160, h = 25,
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		text = _L['Restore default'],
-		onclick = function()
+		onClick = function()
 			X.SetForceColor('reset')
 			X.SwitchTab('GlobalColor', true)
 		end,
@@ -99,7 +99,7 @@ function PS.OnPanelActive(wnd)
 		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { X.GetCampColor(nCamp, 'foreground') },
-			oncolorpick = function(r, g, b)
+			onColorPick = function(r, g, b)
 				txt:Color(r, g, b)
 				X.SetCampColor(nCamp, 'foreground', { r, g, b })
 			end,
@@ -108,7 +108,7 @@ function PS.OnPanelActive(wnd)
 		ui:Append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
 			color = { X.GetCampColor(nCamp, 'background') },
-			oncolorpick = function(r, g, b)
+			onColorPick = function(r, g, b)
 				sha:Color(r, g, b)
 				X.SetCampColor(nCamp, 'background', { r, g, b })
 			end,
@@ -123,8 +123,8 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = x, y = y, w = 160, h = 25,
 		text = _L['Restore default'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			X.SetCampColor('reset')
 			X.SwitchTab('GlobalColor', true)
 		end,

@@ -46,11 +46,13 @@ function UI.OpenColorPicker(callback, t)
 				local y = 10 + math.modf((nRed - 1) / 4) * 220 + (nBlue - 1) * 25
 				local r, g, b  = nRed * 32 - 1, nGreen * 32 - 1, nBlue * 32 - 1
 				ui:Append('Shadow', {
-					w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 200,
-					onhover = function(bHover)
+					w = 23, h = 23, x = x, y = y,
+					color = { r, g, b },
+					alpha = 200,
+					onHover = function(bHover)
 						fnHover(bHover, r, g, b)
 					end,
-					onclick = function()
+					onClick = function()
 						fnClick(r, g, b)
 					end,
 				})
@@ -63,11 +65,13 @@ function UI.OpenColorPicker(callback, t)
 		local y = 435
 		local r, g, b  = i * 16 - 1, i * 16 - 1, i * 16 - 1
 		ui:Append('Shadow', {
-			w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 200,
-			onhover = function(bHover)
+			w = 23, h = 23, x = x, y = y,
+			color = { r, g, b },
+			alpha = 200,
+			onHover = function(bHover)
 				fnHover(bHover, r, g, b)
 			end,
-			onclick = function()
+			onClick = function()
 				fnClick(r, g, b)
 			end,
 		})
@@ -88,15 +92,15 @@ function UI.OpenColorPicker(callback, t)
 	end
 	local x, y = 220, 435
 	ui:Append('Text', { text = 'R', x = x, y = y, w = 10 })
-	ui:Append('WndEditBox', { name = 'R', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = UI.EDIT_TYPE.NUMBER, onchange = onChange })
+	ui:Append('WndEditBox', { name = 'R', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, editType = UI.EDIT_TYPE.NUMBER, onChange = onChange })
 	x = x + 14 + 34
 	ui:Append('Text', { text = 'G', x = x, y = y, w = 10 })
-	ui:Append('WndEditBox', { name = 'G', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = UI.EDIT_TYPE.NUMBER, onchange = onChange })
+	ui:Append('WndEditBox', { name = 'G', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, editType = UI.EDIT_TYPE.NUMBER, onChange = onChange })
 	x = x + 14 + 34
 	ui:Append('Text', { text = 'B', x = x, y = y, w = 10 })
-	ui:Append('WndEditBox', { name = 'B', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = UI.EDIT_TYPE.NUMBER, onchange = onChange })
+	ui:Append('WndEditBox', { name = 'B', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, editType = UI.EDIT_TYPE.NUMBER, onChange = onChange })
 	x = x + 14 + 34
-	ui:Append('WndButton', { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
+	ui:Append('WndButton', { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 3, w = 50, h = 30, onClick = function()
 		if GetRGBValue() then
 			fnClick(GetRGBValue())
 		else
@@ -104,7 +108,7 @@ function UI.OpenColorPicker(callback, t)
 		end
 	end})
 	x = x + 50
-	ui:Append('WndButton', { text = _L['Color Picker Pro'], x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
+	ui:Append('WndButton', { text = _L['Color Picker Pro'], x = x + 5, y = y + 3, w = 50, h = 30, onClick = function()
 		UI.OpenColorPickerEx(callback):Pos(ui:Pos())
 		ui:Remove()
 	end})
@@ -178,13 +182,14 @@ function UI.OpenColorPickerEx(fnAction)
 					tUI[v][s]:Color(r, g, b)
 				else
 					tUI[v][s] = wnd:Append('Shadow', {
-						w = 9, h = 9, x = x, y = y, color = { r, g, b },
-						onhover = function(bHover)
+						w = 9, h = 9, x = x, y = y,
+						color = { r, g, b },
+						onHover = function(bHover)
 							wnd:Children('#Select_Image'):Pos(this:GetRelPos()):Toggle(bHover)
 							local r, g, b = this:GetColorRGB()
 							fnHover(bHover, r, g, b)
 						end,
-						onclick = function()
+						onClick = function()
 							fnClick(this:GetColorRGB())
 						end,
 					})
@@ -198,10 +203,10 @@ function UI.OpenColorPickerEx(fnAction)
 	wnd:Append('Text', { name = 'Select_Text', x = 50, y = 10, text = g_tStrings.STR_NONE })
 	wnd:Append('WndTrackbar', {
 		x = 20, y = 35, h = 25, w = 306, rw = 272,
-		textfmt = function(val) return ('%d H'):format(val) end,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textFormatter = function(val) return ('%d H'):format(val) end,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = COLOR_HUE, range = {0, 360},
-		onchange = function(nVal)
+		onChange = function(nVal)
 			COLOR_HUE = nVal
 			SetColor()
 		end,

@@ -15,10 +15,10 @@ local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTA
 -------------------------------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
-UI.MOUSE_EVENT = X.SetmetaReadonly({
-	LBUTTON = 1,
-	MBUTTON = 0,
-	RBUTTON = -1,
+UI.MOUSE_BUTTON = X.SetmetaReadonly({
+	LEFT   = 1,
+	MIDDLE = 0,
+	RIGHT  = -1,
 })
 UI.TIP_POSITION = X.SetmetaReadonly({
 	FOLLOW_MOUSE              = -1,
@@ -29,7 +29,7 @@ UI.TIP_POSITION = X.SetmetaReadonly({
 	BOTTOM_TOP                = ALW.BOTTOM_TOP,
 	RIGHT_LEFT_AND_BOTTOM_TOP = ALW.RIGHT_LEFT_AND_BOTTOM_TOP,
 })
-UI.TIP_HIDEWAY = X.SetmetaReadonly({
+UI.TIP_HIDE_WAY = X.SetmetaReadonly({
 	NO_HIDE      = 100,
 	HIDE         = 101,
 	ANIMATE_HIDE = 102,
@@ -39,19 +39,19 @@ UI.TRACKBAR_STYLE = X.SetmetaReadonly({
 	SHOW_PERCENT  = true,
 })
 UI.WND_SIDE = X.SetmetaReadonly({
-	TOP          = 0,
-	BOTTOM       = 1,
-	LEFT         = 2,
-	RIGHT        = 3,
-	TOPLEFT      = 4,
-	TOPRIGHT     = 5,
-	BOTTOMLEFT   = 6,
-	BOTTOMRIGHT  = 7,
-	CENTER       = 8,
-	LEFTCENTER   = 9,
-	RIGHTCENTER  = 1,
-	TOPCENTER    = 1,
-	BOTTOMCENTER = 1,
+	TOP           = 0,
+	BOTTOM        = 1,
+	LEFT          = 2,
+	RIGHT         = 3,
+	TOP_LEFT      = 4,
+	TOP_RIGHT     = 5,
+	BOTTOM_LEFT   = 6,
+	BOTTOM_RIGHT  = 7,
+	CENTER        = 8,
+	LEFT_CENTER   = 9,
+	RIGHT_CENTER  = 1,
+	TOP_CENTER    = 1,
+	BOTTOM_CENTER = 1,
 })
 UI.EDIT_TYPE = X.SetmetaReadonly({
 	NUMBER = 0, -- 数字
@@ -142,70 +142,74 @@ end
 local function ApplyUIArguments(ui, arg)
 	if ui and arg then
 		-- properties
-		if arg.x ~= nil or arg.y ~= nil  then ui:Pos             (arg.x, arg.y  ) end
-		if arg.alpha              ~= nil then ui:Alpha          (arg.alpha      ) end
-		if arg.font               ~= nil then ui:Font           (arg.font       ) end -- must before color
-		if arg.fontscale          ~= nil then ui:FontScale      (arg.fontscale  ) end -- must before color
-		if arg.color              ~= nil then ui:Color          (arg.color      ) end
-		if arg.r or arg.g or arg.b       then ui:Color      (arg.r, arg.g, arg.b) end
-		if arg.multiline          ~= nil then ui:Multiline      (arg.multiline  ) end -- must before :Text()
-		if arg.trackbarstyle      ~= nil then ui:TrackbarStyle(arg.trackbarstyle) end -- must before :Text()
-		if arg.textfmt            ~= nil then ui:Text           (arg.textfmt    ) end -- must before :Text()
-		if arg.text               ~= nil then ui:Text           (arg.text       ) end
-		if arg.placeholder        ~= nil then ui:Placeholder    (arg.placeholder) end
-		if arg.oncomplete         ~= nil then ui:Complete       (arg.oncomplete ) end
-		if arg.navigate           ~= nil then ui:Navigate       (arg.navigate   ) end
-		if arg.group              ~= nil then ui:Group          (arg.group      ) end
-		if arg.tip                ~= nil then ui:Tip(arg.tip, arg.tippostype, arg.tipoffset, arg.tiprichtext) end
-		if arg.range              ~= nil then ui:Range        (unpack(arg.range)) end
-		if arg.value              ~= nil then ui:Value          (arg.value      ) end
-		if arg.menu               ~= nil then ui:Menu           (arg.menu       ) end
-		if arg.lmenu              ~= nil then ui:LMenu          (arg.lmenu      ) end
-		if arg.rmenu              ~= nil then ui:RMenu          (arg.rmenu      ) end
-		if arg.limit              ~= nil then ui:Limit          (arg.limit      ) end
-		if arg.scroll             ~= nil then ui:Scroll         (arg.scroll     ) end
-		if arg.handlestyle        ~= nil then ui:HandleStyle    (arg.handlestyle) end
-		if arg.containertype      ~= nil then ui:ContainerType(arg.containertype) end
-		if arg.buttonstyle        ~= nil then ui:ButtonStyle    (arg.buttonstyle) end -- must before :Size()
-		if arg.edittype           ~= nil then ui:EditType       (arg.edittype   ) end
-		if arg.visible            ~= nil then ui:Visible        (arg.visible    ) end
-		if arg.autovisible        ~= nil then ui:Visible        (arg.autovisible) end
-		if arg.enable             ~= nil then ui:Enable         (arg.enable     ) end
-		if arg.autoenable         ~= nil then ui:Enable         (arg.autoenable ) end
+		if arg.x ~= nil or arg.y  ~= nil then ui:Pos              (arg.x, arg.y                                    ) end
+		if arg.alpha              ~= nil then ui:Alpha            (arg.alpha                                       ) end
+		if arg.font               ~= nil then ui:Font             (arg.font                                        ) end -- must before color
+		if arg.fontScale          ~= nil then ui:FontScale        (arg.fontScale                                   ) end -- must before color
+		if arg.color              ~= nil then ui:Color            (arg.color                                       ) end
+		if arg.r or arg.g or arg.b       then ui:Color            (arg.r, arg.g, arg.b                             ) end
+		if arg.multiline          ~= nil then ui:Multiline        (arg.multiline                                   ) end -- must before :Text()
+		if arg.trackbarStyle      ~= nil then ui:TrackbarStyle    (arg.trackbarStyle                               ) end -- must before :Text()
+		if arg.textFormatter      ~= nil then ui:Text             (arg.textFormatter                               ) end -- must before :Text()
+		if arg.text               ~= nil then ui:Text             (arg.text                                        ) end
+		if arg.placeholder        ~= nil then ui:Placeholder      (arg.placeholder                                 ) end
+		if arg.oncomplete         ~= nil then ui:Complete         (arg.oncomplete                                  ) end
+		if arg.navigate           ~= nil then ui:Navigate         (arg.navigate                                    ) end
+		if arg.group              ~= nil then ui:Group            (arg.group                                       ) end
+		if arg.tip                ~= nil then ui:Tip       (arg.tip, arg.tipPosType, arg.tipOffset, arg.tipRichText) end
+		if arg.range              ~= nil then ui:Range            (unpack(arg.range)                               ) end
+		if arg.value              ~= nil then ui:Value            (arg.value                                       ) end
+		if arg.menu               ~= nil then ui:Menu             (arg.menu                                        ) end
+		if arg.menuLClick         ~= nil then ui:MenuLClick       (arg.menuLClick                                  ) end
+		if arg.menuRClick         ~= nil then ui:MenuRClick       (arg.menuRClick                                  ) end
+		if arg.limit              ~= nil then ui:Limit            (arg.limit                                       ) end
+		if arg.scroll             ~= nil then ui:Scroll           (arg.scroll                                      ) end
+		if arg.handleStyle        ~= nil then ui:HandleStyle      (arg.handleStyle                                 ) end
+		if arg.containerType      ~= nil then ui:ContainerType    (arg.containerType                               ) end
+		if arg.buttonStyle        ~= nil then ui:ButtonStyle      (arg.buttonStyle                                 ) end -- must before :Size()
+		if arg.editType           ~= nil then ui:EditType         (arg.editType                                    ) end
+		if arg.visible            ~= nil then ui:Visible          (arg.visible                                     ) end
+		if arg.autoVisible        ~= nil then ui:Visible          (arg.autoVisible                                 ) end
+		if arg.enable             ~= nil then ui:Enable           (arg.enable                                      ) end
+		if arg.autoEnable         ~= nil then ui:Enable           (arg.autoEnable                                  ) end
 		if arg.image              ~= nil then
-			ui:Image(arg.image, arg.imageframe, arg.imageoverframe, arg.imagedownframe, arg.imagedisableframe)
+			ui:Image(arg.image, arg.imageFrame, arg.imageOverFrame, arg.imageDownFrame, arg.imageDisableFrame)
 		end
-		if arg.icon               ~= nil then ui:Icon           (arg.icon       ) end
-		if arg.name               ~= nil then ui:Name           (arg.name       ) end
-		if arg.penetrable         ~= nil then ui:Penetrable     (arg.penetrable ) end
-		if arg.dragable           ~= nil then ui:Drag           (arg.dragable   ) end
-		if arg.dragarea           ~= nil then ui:Drag      (unpack(arg.dragarea)) end
-		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then ui:Size(arg.w, arg.h, arg.rw, arg.rh) end -- must after :Text() because w/h can be 'auto'
-		if arg.halign or arg.valign      then ui:Align   (arg.halign, arg.valign) end -- must after :Size()
-		if arg.anchor             ~= nil then ui:Anchor         (arg.anchor     ) end -- must after :Size() :Pos()
+		if arg.icon               ~= nil then ui:Icon             (arg.icon                                        ) end
+		if arg.name               ~= nil then ui:Name             (arg.name                                        ) end
+		if arg.penetrable         ~= nil then ui:Penetrable       (arg.penetrable                                  ) end
+		if arg.draggable          ~= nil then ui:Drag             (arg.draggable                                   ) end
+		if arg.dragArea           ~= nil then ui:Drag             (unpack(arg.dragArea)                            ) end
+		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then        -- must after :Text() because w/h can be 'auto'
+			ui:Size(arg.w, arg.h, arg.rw, arg.rh)
+		end
+		if arg.alignHorizontal or arg.alignVertical then -- must after :Size()
+			ui:Align(arg.alignHorizontal, arg.alignVertical)
+		end
+		if arg.anchor             ~= nil then ui:Anchor           (arg.anchor                                      ) end -- must after :Size() :Pos()
 		-- event handlers
-		if arg.onscroll           ~= nil then ui:Scroll         (arg.onscroll   ) end
-		if arg.onhover            ~= nil then ui:Hover          (arg.onhover    ) end
-		if arg.onfocus            ~= nil then ui:Focus          (arg.onfocus    ) end
-		if arg.onblur             ~= nil then ui:Blur           (arg.onblur     ) end
-		if arg.onclick            ~= nil then ui:Click          (arg.onclick    ) end
-		if arg.onlclick           ~= nil then ui:LClick         (arg.onlclick   ) end
-		if arg.onrclick           ~= nil then ui:RClick         (arg.onrclick   ) end
-		if arg.oncolorpick        ~= nil then ui:ColorPick      (arg.oncolorpick) end
-		if arg.checked            ~= nil then ui:Check          (arg.checked    ) end
-		if arg.oncheck            ~= nil then ui:Check          (arg.oncheck    ) end
-		if arg.onchange           ~= nil then ui:Change         (arg.onchange   ) end
-		if arg.ondragging or arg.ondrag  then ui:Drag(arg.ondragging, arg.ondrag) end
-		if arg.customlayout              then ui:CustomLayout  (arg.customlayout) end
-		if arg.oncustomlayout            then ui:CustomLayout(arg.oncustomlayout, arg.customlayoutpoint) end
-		if arg.events             ~= nil then for _, v in ipairs(arg.events) do ui:Event(unpack(v)) end end
-		if arg.uievents           ~= nil then for _, v in ipairs(arg.uievents) do ui:UIEvent(unpack(v)) end end
-		if arg.listbox            ~= nil then for _, v in ipairs(arg.listbox) do ui:ListBox(unpack(v)) end end
+		if arg.onScroll           ~= nil then ui:Scroll           (arg.onScroll                                    ) end
+		if arg.onHover            ~= nil then ui:Hover            (arg.onHover                                     ) end
+		if arg.onFocus            ~= nil then ui:Focus            (arg.onFocus                                     ) end
+		if arg.onBlur             ~= nil then ui:Blur             (arg.onBlur                                      ) end
+		if arg.onClick            ~= nil then ui:Click            (arg.onClick                                     ) end
+		if arg.onLClick           ~= nil then ui:LClick           (arg.onLClick                                    ) end
+		if arg.onRClick           ~= nil then ui:RClick           (arg.onRClick                                    ) end
+		if arg.onColorPick        ~= nil then ui:ColorPick        (arg.onColorPick                                 ) end
+		if arg.checked            ~= nil then ui:Check            (arg.checked                                     ) end
+		if arg.onCheck            ~= nil then ui:Check            (arg.onCheck                                     ) end
+		if arg.onChange           ~= nil then ui:Change           (arg.onChange                                    ) end
+		if arg.onDragging or arg.onDrag  then ui:Drag             (arg.onDragging, arg.onDrag                      ) end
+		if arg.customLayout              then ui:CustomLayout     (arg.customLayout                                ) end
+		if arg.onCustomLayout            then ui:CustomLayout     (arg.onCustomLayout, arg.customLayoutPoint       ) end
+		if arg.events             ~= nil then for _, v in ipairs(arg.events      ) do ui:Event       (unpack(v)) end end
+		if arg.uiEvents           ~= nil then for _, v in ipairs(arg.uiEvents    ) do ui:UIEvent     (unpack(v)) end end
+		if arg.listBox            ~= nil then for _, v in ipairs(arg.listBox     ) do ui:ListBox     (unpack(v)) end end
 		if arg.autocomplete       ~= nil then for _, v in ipairs(arg.autocomplete) do ui:Autocomplete(unpack(v)) end end
 		-- auto size
-		if arg.autosize                  then ui:AutoSize()                       end
-		if arg.autowidth                 then ui:AutoWidth()                      end
-		if arg.autoheight                then ui:AutoHeight()                     end
+		if arg.autoSize                  then ui:AutoSize         ()                                                 end
+		if arg.autoWidth                 then ui:AutoWidth        ()                                                 end
+		if arg.autoHeight                then ui:AutoHeight       ()                                                 end
 	end
 	return ui
 end
@@ -1923,7 +1927,7 @@ function OO:Autocomplete(method, arg1, arg2)
 	end
 end
 
--- ui listbox interface
+-- ui list box interface
 -- (get) list:ListBox('option')
 -- (set) list:ListBox('option', k, v)
 -- (set) list:ListBox('option', {k1=v1, k2=v2})
@@ -3575,19 +3579,19 @@ function OO:Limit(nLimit)
 	end
 end
 
--- (self) UI:Align(halign, valign)
-function OO:Align(halign, valign)
+-- (self) UI:Align(alignHorizontal, alignVertical)
+function OO:Align(alignHorizontal, alignVertical)
 	self:_checksum()
-	if valign or halign then
+	if alignVertical or alignHorizontal then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'TEXT')
 				or GetComponentElement(raw, 'MAIN_HANDLE')
 			if raw then
-				if halign and raw.SetHAlign then
-					raw:SetHAlign(halign)
+				if alignHorizontal and raw.SetHAlign then
+					raw:SetHAlign(alignHorizontal)
 				end
-				if valign and raw.SetVAlign then
-					raw:SetVAlign(valign)
+				if alignVertical and raw.SetVAlign then
+					raw:SetVAlign(alignVertical)
 				end
 				if raw.FormatTextForDraw then
 					raw:FormatTextForDraw()
@@ -3810,20 +3814,20 @@ function OO:UIEvent(szEvent, fnEvent)
 		end
 		if X.IsFunction(fnEvent) then
 			for _, raw in ipairs(self.raws) do
-				local uievents = GetComponentProp(raw, 'uievents')
-				if not uievents then
-					uievents = {}
-					SetComponentProp(raw, 'uievents', uievents)
+				local uiEvents = GetComponentProp(raw, 'uiEvents')
+				if not uiEvents then
+					uiEvents = {}
+					SetComponentProp(raw, 'uiEvents', uiEvents)
 				end
-				if not uievents[szEvent] then
-					uievents[szEvent] = {}
+				if not uiEvents[szEvent] then
+					uiEvents[szEvent] = {}
 					local onEvent = X.IsFunction(raw[szEvent]) and raw[szEvent]
 					raw[szEvent] = function(...)
 						if onEvent then
 							onEvent(...)
 						end
 						local rets = {}
-						for _, p in ipairs(uievents[szEvent]) do
+						for _, p in ipairs(uiEvents[szEvent]) do
 							local res = { p.fn(...) }
 							if #res > 0 then
 								if #rets == 0 then
@@ -3857,20 +3861,20 @@ function OO:UIEvent(szEvent, fnEvent)
 						end
 					end
 				end
-				table.insert(uievents[szEvent], { id = szKey, fn = fnEvent })
+				table.insert(uiEvents[szEvent], { id = szKey, fn = fnEvent })
 			end
 		else
 			for _, raw in ipairs(self.raws) do
-				local uievents = GetComponentProp(raw, 'uievents')
-				if uievents then
+				local uiEvents = GetComponentProp(raw, 'uiEvents')
+				if uiEvents then
 					if not szKey then
-						for e, _ in pairs(uievents) do
-							uievents[e] = {}
+						for e, _ in pairs(uiEvents) do
+							uiEvents[e] = {}
 						end
-					elseif uievents[szEvent] then
-						for i, p in X.ipairs_r(uievents[szEvent]) do
+					elseif uiEvents[szEvent] then
+						for i, p in X.ipairs_r(uiEvents[szEvent]) do
 							if p.id == szKey then
-								table.remove(uievents[szEvent], i)
+								table.remove(uiEvents[szEvent], i)
 							end
 						end
 					end
@@ -3916,10 +3920,10 @@ end
 -- menu 弹出菜单
 -- :Menu(table menu)  弹出菜单menu
 -- :Menu(function fn)  弹出菜单function返回值table
-function OO:Menu(lmenu, rmenu, bNoAutoBind)
+function OO:Menu(menuLClick, menuRClick, bNoAutoBind)
 	self:_checksum()
 	if not bNoAutoBind then
-		rmenu = rmenu or lmenu
+		menuRClick = menuRClick or menuLClick
 	end
 	-- pop menu function
 	local fnPopMenu = function(raw, menu)
@@ -3942,31 +3946,31 @@ function OO:Menu(lmenu, rmenu, bNoAutoBind)
 		UI.PopupMenu(menu)
 	end
 	-- bind left click
-	if lmenu then
+	if menuLClick then
 		self:Each(function(eself)
-			eself:LClick(function() fnPopMenu(eself[1], lmenu) end)
+			eself:LClick(function() fnPopMenu(eself[1], menuLClick) end)
 		end)
 	end
 	-- bind right click
-	if rmenu then
+	if menuRClick then
 		self:Each(function(eself)
-			eself:RClick(function() fnPopMenu(eself[1], rmenu) end)
+			eself:RClick(function() fnPopMenu(eself[1], menuRClick) end)
 		end)
 	end
 	return self
 end
 
--- lmenu 弹出左键菜单
--- :LMenu(table menu)  弹出菜单menu
--- :LMenu(function fn)  弹出菜单function返回值table
-function OO:LMenu(menu)
+-- MenuLClick 弹出左键菜单
+-- :MenuLClick(table menu)  弹出菜单menu
+-- :MenuLClick(function fn)  弹出菜单function返回值table
+function OO:MenuLClick(menu)
 	return self:Menu(menu, nil, true)
 end
 
--- rmenu 弹出右键菜单
--- :LMenu(table menu)  弹出菜单menu
--- :LMenu(function fn)  弹出菜单function返回值table
-function OO:RMenu(menu)
+-- MenuRClick 弹出右键菜单
+-- :MenuLClick(table menu)  弹出菜单menu
+-- :MenuLClick(function fn)  弹出菜单function返回值table
+function OO:MenuRClick(menu)
 	return self:Menu(nil, menu, true)
 end
 
@@ -3991,7 +3995,7 @@ function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					if GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					X.ExecuteWithThis(raw, fnLClick, UI.MOUSE_EVENT.LBUTTON)
+					X.ExecuteWithThis(raw, fnLClick, UI.MOUSE_BUTTON.LEFT)
 				end
 				if GetComponentType(raw) == 'WndScrollHandleBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemLButtonClick', fnAction)
@@ -4021,7 +4025,7 @@ function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					if GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					X.ExecuteWithThis(raw, fnRClick, UI.MOUSE_EVENT.RBUTTON)
+					X.ExecuteWithThis(raw, fnRClick, UI.MOUSE_BUTTON.RIGHT)
 				end
 				if GetComponentType(raw) == 'WndScrollHandleBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemRButtonClick', fnAction)
@@ -4045,8 +4049,8 @@ function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			end
 		end
 	else
-		local nFlag = fnLClick or fnMClick or fnRClick or UI.MOUSE_EVENT.LBUTTON
-		if nFlag == UI.MOUSE_EVENT.LBUTTON then
+		local nFlag = fnLClick or fnMClick or fnRClick or UI.MOUSE_BUTTON.LEFT
+		if nFlag == UI.MOUSE_BUTTON.LEFT then
 			for _, raw in ipairs(self.raws) do
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
@@ -4057,9 +4061,9 @@ function OO:Click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 					X.CallWithThis(itm, itm.OnItemLButtonClick)
 				end
 			end
-		elseif nFlag==UI.MOUSE_EVENT.MBUTTON then
+		elseif nFlag == UI.MOUSE_BUTTON.MIDDLE then
 
-		elseif nFlag==UI.MOUSE_EVENT.RBUTTON then
+		elseif nFlag == UI.MOUSE_BUTTON.RIGHT then
 			for _, raw in ipairs(self.raws) do
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
@@ -4080,7 +4084,7 @@ end
 -- :LClick(fnAction) 绑定
 -- :LClick()         触发
 function OO:LClick(fnLClick)
-	return self:Click(fnLClick or UI.MOUSE_EVENT.LBUTTON, nil, nil, true)
+	return self:Click(fnLClick or UI.MOUSE_BUTTON.LEFT, nil, nil, true)
 end
 
 -- rclick 鼠标右键单击事件
@@ -4088,7 +4092,7 @@ end
 -- :RClick(fnAction) 绑定
 -- :RClick()         触发
 function OO:RClick(fnRClick)
-	return self:Click(nil, fnRClick or UI.MOUSE_EVENT.RBUTTON, nil, true)
+	return self:Click(nil, fnRClick or UI.MOUSE_BUTTON.RIGHT, nil, true)
 end
 
 -- mclick 鼠标右键单击事件
@@ -4096,7 +4100,7 @@ end
 -- :MClick(fnAction) 绑定
 -- :MClick()         触发
 function OO:MClick(fnMClick)
-	return self:Click(nil, nil, fnMClick or UI.MOUSE_EVENT.MBUTTON, true)
+	return self:Click(nil, nil, fnMClick or UI.MOUSE_BUTTON.MIDDLE, true)
 end
 
 -- complete 加载完成事件
@@ -4156,15 +4160,15 @@ end
 -- tip 鼠标悬停提示
 -- (self) Instance:Tip( tip[, nPosType[, tOffset[, bNoEncode] ] ] ) 绑定tip事件
 -- string|function tip:要提示的文字文本或序列化的DOM文本或返回前述文本的函数
--- number nPosType:    提示位置 有效值为UI.TIP_HIDEWAY.枚举
--- table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = UI.TIP_HIDEWAY.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
+-- number nPosType:    提示位置 有效值为UI.TIP_HIDE_WAY.枚举
+-- table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = UI.TIP_HIDE_WAY.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
 -- boolean bNoEncode:  当szTip为纯文本时保持这个参数为false 当szTip为格式化的DOM字符串时设置该参数为true
 function OO:Tip(tip, nPosType, tOffset, bNoEncode)
 	tOffset = tOffset or {}
 	tOffset.x = tOffset.x or 0
 	tOffset.y = tOffset.y or 0
 	tOffset.w = tOffset.w or 450
-	tOffset.hide = tOffset.hide or UI.TIP_HIDEWAY.HIDE
+	tOffset.hide = tOffset.hide or UI.TIP_HIDE_WAY.HIDE
 	tOffset.nFont = tOffset.nFont or 136
 	nPosType = nPosType or UI.TIP_POSITION.FOLLOW_MOUSE
 	return self:Hover(function()
@@ -4187,9 +4191,9 @@ function OO:Tip(tip, nPosType, tOffset, bNoEncode)
 		end
 		OutputTip(szTip, tOffset.w, {x, y, w, h}, nPosType)
 	end, function()
-		if tOffset.hide == UI.TIP_HIDEWAY.HIDE then
+		if tOffset.hide == UI.TIP_HIDE_WAY.HIDE then
 			HideTip(false)
-		elseif tOffset.hide == UI.TIP_HIDEWAY.ANIMATE_HIDE then
+		elseif tOffset.hide == UI.TIP_HIDE_WAY.ANIMATE_HIDE then
 			HideTip(true)
 		end
 	end, true)

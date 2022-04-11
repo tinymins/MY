@@ -74,13 +74,13 @@ function D.CheckEnable()
 		UI(frame):Append('Image', {
 			w = O.nSize, h = O.nSize,
 			image = X.PACKET_INFO.LOGO_UITEX,
-			imageframe = X.PACKET_INFO.LOGO_MAIN_FRAME,
-			onhover = function(bIn)
+			imageFrame = X.PACKET_INFO.LOGO_MAIN_FRAME,
+			onHover = function(bIn)
 				if bIn and O.bHoverMenu then
 					D.Popup()
 				end
 			end,
-			onclick = D.Popup,
+			onClick = D.Popup,
 		})
 	end
 end
@@ -120,7 +120,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nX, y = nY, w = 100, h = 25,
 		text = _L['Enable'],
 		checked = O.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bEnable = bChecked
 			D.CheckEnable()
 		end,
@@ -129,23 +129,23 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nX, y = nY, w = 100, h = 25,
 		text = _L['Hover popup'],
 		checked = O.bHoverMenu,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bHoverMenu = bChecked
 			D.CheckEnable()
 		end,
-		autoenable = function() return O.bEnable end,
+		autoEnable = function() return O.bEnable end,
 	}):AutoWidth():Width() + 5
 	nX = nX + ui:Append('WndTrackbar', {
 		x = nX, y = nY, w = 100, h = 25,
 		value = O.nSize,
 		range = {1, 300},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		textfmt = function(v) return _L('Size: %d', v) end,
-		onchange = function(val)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textFormatter = function(v) return _L('Size: %d', v) end,
+		onChange = function(val)
 			O.nSize = val
 			D.CheckEnable()
 		end,
-		autoenable = function() return O.bEnable end,
+		autoEnable = function() return O.bEnable end,
 	}):AutoWidth():Width() + 5
 	nX, nY = nPaddingX, nY + 30
 

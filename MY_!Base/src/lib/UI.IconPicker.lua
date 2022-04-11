@@ -103,10 +103,10 @@ function UI.OpenIconPicker(fnAction)
 			else
 				boxs[i] = ui:Append('Box', {
 					w = 48, h = 48, x = x, y = y, icon = nStart + i,
-					onhover = function(bHover)
+					onHover = function(bHover)
 						this:SetObjectMouseOver(bHover)
 					end,
-					onclick = function()
+					onClick = function()
 						if fnAction then
 							fnAction(this:GetObjectIcon())
 						end
@@ -117,12 +117,12 @@ function UI.OpenIconPicker(fnAction)
 			end
 		end
 	end
-	ui:Append('WndEditBox', { name = 'Icon', x = 730, y = 580, w = 50, h = 25, edittype = 0 })
+	ui:Append('WndEditBox', { name = 'Icon', x = 730, y = 580, w = 50, h = 25, editType = 0 })
 	ui:Append('WndButton', {
 		x = 800, y = 580,
 		text = g_tStrings.STR_HOTKEY_SURE,
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			local nIcon = tonumber(ui:Children('#Icon'):Text())
 			if nIcon then
 				if fnAction then
@@ -133,10 +133,10 @@ function UI.OpenIconPicker(fnAction)
 		end,
 	})
 	ui:Append('WndTrackbar', {
-		x = 10, y = 580, h = 25, w = 500, textfmt = ' Page: %d',
+		x = 10, y = 580, h = 25, w = 500, textFormatter = ' Page: %d',
 		range = {1, math.ceil(nMaxIcon / 144)}, value = ICON_PAGE or 21,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		onchange = function(nVal)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		onChange = function(nVal)
 			X.DelayCall(function() GetPage(nVal) end)
 		end,
 	})

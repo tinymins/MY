@@ -206,7 +206,7 @@ RegisterEvent(NS .. '_BASE_LOADING_END', function()
 		BTN = ui:Append('WndButton', {
 			x = x, y = y,
 			text = RUNNING and _L['Stop'] or _L['Start'],
-			onclick = function()
+			onClick = function()
 				if RUNNING then
 					D.RemoveHook()
 					D.SaveStatus()
@@ -222,14 +222,14 @@ RegisterEvent(NS .. '_BASE_LOADING_END', function()
 		ui:Append('WndButton', {
 			x = x + 100, y = y,
 			text = _L['Refresh'],
-			onclick = function()
+			onClick = function()
 				TXT:Text(D.GetRankString(SORT_KEY))
 			end,
 		})
 		ui:Append('WndButton', {
 			x = x + 200, y = y,
 			text = SORT_KEY,
-			onclick = function()
+			onClick = function()
 				if SORT_KEY == 'TIME' then
 					SORT_KEY = 'CALL'
 				else
@@ -242,7 +242,7 @@ RegisterEvent(NS .. '_BASE_LOADING_END', function()
 		ui:Append('WndButton', {
 			x = x + 300, y = y,
 			text = _L['Reset'],
-			onclick = function()
+			onClick = function()
 				D.Reset()
 			end,
 		})
@@ -250,9 +250,9 @@ RegisterEvent(NS .. '_BASE_LOADING_END', function()
 
 		TXT = ui:Append('Text', {
 			x = x, y = y, w = w, h = h - y,
-			halign = 0, valign = 0,
+			alignHorizontal = 0, alignVertical = 0,
 			multiline = true,
-			onclick = function()
+			onClick = function()
 				_G[NS].Topmsg(_L['LuaWatcher'], _L['Copied to clipboard'])
 				_G[NS].UI.OpenTextEditor(D.GetRankString(SORT_KEY))
 			end,
