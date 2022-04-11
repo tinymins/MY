@@ -259,7 +259,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Friend headtop tips'],
 		checked = MY_FooterTip.bFriend,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_FooterTip.bFriend = not MY_FooterTip.bFriend
 		end,
 	}):Width() + 5
@@ -267,19 +267,19 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Friend headtop hide in dungeon'],
 		checked = MY_FooterTip.bFriendDungeonHide,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_FooterTip.bFriendDungeonHide = not MY_FooterTip.bFriendDungeonHide
 		end,
-		autoenable = function() return MY_FooterTip.bFriend end,
+		autoEnable = function() return MY_FooterTip.bFriend end,
 	}):Width() + 5
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Friend headtop tips nav'],
 		checked = MY_FooterTip.bFriendNav,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_FooterTip.bFriendNav = not MY_FooterTip.bFriendNav
 		end,
-		autoenable = function() return MY_FooterTip.bFriend end,
+		autoEnable = function() return MY_FooterTip.bFriend end,
 	}):Width() + 5
 	nY = nY + nLH
 
@@ -289,7 +289,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Tong member headtop tips'],
 		checked = MY_FooterTip.bTongMember,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_FooterTip.bTongMember = not MY_FooterTip.bTongMember
 		end,
 	}):Width() + 5
@@ -297,19 +297,19 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Tong member headtop hide in dungeon'],
 		checked = MY_FooterTip.bTongMemberDungeonHide,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_FooterTip.bTongMemberDungeonHide = not MY_FooterTip.bTongMemberDungeonHide
 		end,
-		autoenable = function() return MY_FooterTip.bTongMember end,
+		autoEnable = function() return MY_FooterTip.bTongMember end,
 	}):Width() + 5
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Tong member headtop tips nav'],
 		checked = MY_FooterTip.bTongMemberNav,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_FooterTip.bTongMemberNav = not MY_FooterTip.bTongMemberNav
 		end,
-		autoenable = function() return MY_FooterTip.bTongMember end,
+		autoEnable = function() return MY_FooterTip.bTongMember end,
 	}):Width() + 5
 	nY = nY + nLH
 	return nX, nY

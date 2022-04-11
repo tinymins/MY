@@ -824,7 +824,7 @@ function PS.OnPanelActive(frame)
 		x = nX, y = nY,
 		text = _L['Enable auto pickup'],
 		checked = O.bOpenLoot,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bOpenLoot = bChecked
 			D.RescanNearby()
 			ui:Fetch('Check_Fight'):Enable(bChecked)
@@ -836,7 +836,7 @@ function PS.OnPanelActive(frame)
 		text = _L['Pickup in fight'],
 		checked = O.bOpenLootEvenFight,
 		enable = O.bOpenLoot,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bOpenLootEvenFight = bChecked
 			D.RescanNearby()
 		end,
@@ -857,7 +857,7 @@ function PS.OnPanelActive(frame)
 			x = nX, y = nY,
 			text = _L['Show the head name'],
 			checked = O.bShowName,
-			oncheck = function()
+			onCheck = function()
 				O.bShowName = not O.bShowName
 				D.CheckShowName()
 			end,
@@ -866,39 +866,39 @@ function PS.OnPanelActive(frame)
 		nX = ui:Append('Shadow', {
 			name = 'Shadow_Color', x = nX + 2, y = nY + 4, w = 18, h = 18,
 			color = O.tNameColor,
-			onclick = function()
+			onClick = function()
 				UI.OpenColorPicker(function(r, g, b)
 					ui:Fetch('Shadow_Color'):Color(r, g, b)
 					O.tNameColor = { r, g, b }
 					D.RescanNearby()
 				end)
 			end,
-			autoenable = function() return O.bShowName end,
+			autoEnable = function() return O.bShowName end,
 		}):Pos('BOTTOMRIGHT') + 5
 
 		nX = nX + ui:Append('WndButton', {
 			x = nX, y = nY, w = 65,
 			text = _L['Font'],
-			onclick = function()
+			onClick = function()
 				UI.OpenFontPicker(function(nFont)
 					O.nNameFont = nFont
 					D.bUpdateLabel = true
 				end)
 			end,
-			autoenable = function() return O.bShowName end,
+			autoEnable = function() return O.bShowName end,
 		}):Width() + 5
 
 		nX = nX + ui:Append('WndTrackbar', {
 			x = nX, y = nY, w = 150,
-			textfmt = function(val) return _L('Font scale is %d%%.', val) end,
+			textFormatter = function(val) return _L('Font scale is %d%%.', val) end,
 			range = {10, 500},
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 			value = O.fNameScale * 100,
-			onchange = function(val)
+			onChange = function(val)
 				O.fNameScale = val / 100
 				D.bUpdateLabel = true
 			end,
-			autoenable = function() return O.bShowName end,
+			autoEnable = function() return O.bShowName end,
 		}):Width() + 5
 
 		nX, nY = nPaddingX + 10, nY + nLineHeightM
@@ -906,11 +906,11 @@ function PS.OnPanelActive(frame)
 			text = _L['Display minimap flag'],
 			x = nX, y = nY,
 			checked = O.bMiniFlag,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bMiniFlag = bChecked
 				D.RescanNearby()
 			end,
-			autoenable = function() return O.bShowName end,
+			autoEnable = function() return O.bShowName end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
 		if not X.IsRestricted('MY_GKPDoodad.AutoInteract') then
@@ -918,7 +918,7 @@ function PS.OnPanelActive(frame)
 				x = nX, y = nY,
 				text = _L['Auto craft'],
 				checked = O.bInteract,
-				oncheck = function(bChecked)
+				onCheck = function(bChecked)
 					O.bInteract = bChecked
 					D.RescanNearby()
 					ui:Fetch('Check_Interact_Fight'):Enable(bChecked)
@@ -930,7 +930,7 @@ function PS.OnPanelActive(frame)
 				text = _L['Interact in fight'],
 				checked = O.bInteractEvenFight,
 				enable = O.bInteract,
-				oncheck = function(bChecked)
+				onCheck = function(bChecked)
 					O.bInteractEvenFight = bChecked
 					D.RescanNearby()
 				end,
@@ -943,7 +943,7 @@ function PS.OnPanelActive(frame)
 				x = nX, y = nY,
 				text = _L['Debug'],
 				checked = D.bDebug,
-				oncheck = function(bChecked)
+				onCheck = function(bChecked)
 					D.bDebug = bChecked
 					D.bUpdateLabel = true
 				end,
@@ -971,7 +971,7 @@ function PS.OnPanelActive(frame)
 						x = nX, y = nY,
 						text = szName,
 						checked = O.tCraft[v],
-						oncheck = function(bChecked)
+						onCheck = function(bChecked)
 							if bChecked then
 								O.tCraft[v] = true
 							else
@@ -980,7 +980,7 @@ function PS.OnPanelActive(frame)
 							O.tCraft = O.tCraft
 							D.RescanNearby()
 						end,
-						autoenable = function() return O.bShowName or O.bInteract end,
+						autoEnable = function() return O.bShowName or O.bInteract end,
 					})
 					nX = nX + 90
 				end
@@ -995,77 +995,77 @@ function PS.OnPanelActive(frame)
 			x = nX, y = nY,
 			text = _L['Mining doodad'],
 			checked = O.bMiningDoodad,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bMiningDoodad = bChecked
 				D.RescanNearby()
 			end,
-			autoenable = function() return O.bShowName or O.bInteract end,
+			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Herbalism doodad'],
 			checked = O.bHerbalismDoodad,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bHerbalismDoodad = bChecked
 				D.RescanNearby()
 			end,
-			autoenable = function() return O.bShowName or O.bInteract end,
+			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Skinning doodad'],
 			checked = O.bSkinningDoodad,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bSkinningDoodad = bChecked
 				D.RescanNearby()
 			end,
-			autoenable = function() return O.bShowName or O.bInteract end,
+			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Quest doodad'],
 			checked = O.bQuestDoodad,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bQuestDoodad = bChecked
 				D.RescanNearby()
 			end,
-			autoenable = function() return O.bShowName or O.bInteract end,
+			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Read inscription doodad'],
 			checked = O.bReadInscriptionDoodad,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bReadInscriptionDoodad = bChecked
 				D.RescanNearby()
 			end,
-			autoenable = function() return O.bShowName or O.bInteract end,
+			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Unread inscription doodad'],
 			checked = O.bUnreadInscriptionDoodad,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bUnreadInscriptionDoodad = bChecked
 				D.RescanNearby()
 			end,
-			autoenable = function() return O.bShowName or O.bInteract end,
+			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Other doodad'],
 			checked = O.bOtherDoodad,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bOtherDoodad = bChecked
 				D.RescanNearby()
 			end,
-			autoenable = function() return O.bShowName or O.bInteract end,
+			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 7
 
 		-- recent / all
@@ -1074,24 +1074,24 @@ function PS.OnPanelActive(frame)
 			x = nX, y = nY,
 			text = _L['Recent doodad'],
 			checked = O.bRecent,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bRecent = bChecked
 				D.RescanNearby()
 			end,
 			tip = _L['Recent crafted doodads during current game'],
-			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-			autoenable = function() return O.bShowName or O.bInteract end,
+			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['All doodad'],
 			checked = O.bAllDoodad,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bAllDoodad = bChecked
 				D.RescanNearby()
 			end,
-			autoenable = function() return O.bShowName or O.bInteract end,
+			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
 		-- custom
@@ -1100,12 +1100,12 @@ function PS.OnPanelActive(frame)
 			text = _L['Customs (split by | )'],
 			x = nX, y = nY,
 			checked = O.bCustom,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bCustom = bChecked
 				D.RescanNearby()
 				ui:Fetch('Edit_Custom'):Enable(bChecked)
 			end,
-			autoenable = function() return O.bShowName or O.bInteract end,
+			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 
 		ui:Append('WndEditBox', {
@@ -1113,7 +1113,7 @@ function PS.OnPanelActive(frame)
 			x = nX, y = nY, w = 360, h = 27,
 			limit = 1024, text = O.szCustom,
 			enable = O.bCustom,
-			onchange = function(szText)
+			onChange = function(szText)
 				O.szCustom = szText
 				D.ReloadCustom()
 			end,
@@ -1123,8 +1123,8 @@ function PS.OnPanelActive(frame)
 				end
 				return _L['Tip: Enter the name of dead animals can be automatically Paoding!']
 			end,
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			autoenable = function() return (O.bShowName or O.bInteract) and O.bCustom end,
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			autoEnable = function() return (O.bShowName or O.bInteract) and O.bCustom end,
 		})
 	end
 end

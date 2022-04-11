@@ -1018,7 +1018,7 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Enable CombatText'], color = { 255, 128, 0 },
 		checked = O.bEnable,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bEnable = bCheck
 			CombatText.CheckEnable()
 		end,
@@ -1028,100 +1028,100 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 200, text = _L['Enable Render'],
 		checked = O.bRender,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bRender = bCheck
 			CombatText.CheckEnable()
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	x = x + 170
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Disable Immunity'],
 		checked = O.bImmunity,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bImmunity = bCheck
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	y = y + deltaY
 
 	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_QUESTTRACE_CHANGE_ALPHA, color = { 255, 255, 200 }, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_QUESTTRACE_CHANGE_ALPHA, color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	x = x + 70
 	ui:Append('WndTrackbar', {
 		x = x, y = y, text = '',
 		range = {1, 255},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nMaxAlpha,
-		onchange = function(nVal)
+		onChange = function(nVal)
 			O.nMaxAlpha = nVal
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 
 	x = x + 180
-	ui:Append('Text', { x = x, y = y, text = _L['Hold time'], color = { 255, 255, 200 }, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['Hold time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	x = x + 70
 	ui:Append('WndTrackbar', {
-		x = x, y = y, textfmt = function(val) return val .. _L['ms'] end,
+		x = x, y = y, textFormatter = function(val) return val .. _L['ms'] end,
 		range = {700, 2500},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nTime * COMBAT_TEXT_TOTAL,
-		onchange = function(nVal)
+		onChange = function(nVal)
 			O.nTime = nVal / COMBAT_TEXT_TOTAL
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	y = y + deltaY
 
 	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['FadeIn time'], color = { 255, 255, 200 }, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['FadeIn time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	x = x + 70
 	ui:Append('WndTrackbar', {
-		x = x, y = y, textfmt = function(val) return val .. _L['Frame'] end,
+		x = x, y = y, textFormatter = function(val) return val .. _L['Frame'] end,
 		range = {0, 15},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nFadeIn,
-		onchange = function(nVal)
+		onChange = function(nVal)
 			O.nFadeIn = nVal
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 
 	x = x + 180
-	ui:Append('Text', { x = x, y = y, text = _L['FadeOut time'], color = { 255, 255, 200 }, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['FadeOut time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	x = x + 70
 	ui:Append('WndTrackbar', {
-		x = x, y = y, textfmt = function(val) return val .. _L['Frame'] end,
+		x = x, y = y, textFormatter = function(val) return val .. _L['Frame'] end,
 		rang = {0, 15},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nFadeOut,
-		onchange = function(nVal)
+		onChange = function(nVal)
 			O.nFadeOut = nVal
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	y = y + deltaY
 
 	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['Font Size'], color = { 255, 255, 200 }, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['Font Size'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	x = x + 70
 	ui:Append('WndTrackbar', {
-		x = x, y = y, textfmt = function(val) return (val / 100) .. _L['times'] end,
+		x = x, y = y, textFormatter = function(val) return (val / 100) .. _L['times'] end,
 		range = {50, 200},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.fScale * 100,
-		onchange = function(nVal)
+		onChange = function(nVal)
 			O.fScale = nVal / 100
 			CombatText.UpdateTrajectoryCount()
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	y = y + deltaY
 
 	x = nPaddingX
-	ui:Append('Text', { x = x, y = y, text = _L['Circle Style'], font = 27, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['Circle Style'], font = 27, autoEnable = IsEnabled })
 	y = y + deltaY
 
 	x = nPaddingX + 10
@@ -1129,11 +1129,11 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 5, text = _L['hit feel'],
 		group = 'style',
 		checked = O.nStyle == 0,
-		oncheck = function()
+		onCheck = function()
 			O.nStyle = 0
 			COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[0]
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	x = x + 90
 
@@ -1141,11 +1141,11 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 5, text = _L['low hit feel'],
 		group = 'style',
 		checked = O.nStyle == 1,
-		oncheck = function()
+		onCheck = function()
 			O.nStyle = 1
 			COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[1]
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	x = x + 90
 
@@ -1153,11 +1153,11 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 5, text = _L['soft'],
 		group = 'style',
 		checked = O.nStyle == 2,
-		oncheck = function()
+		onCheck = function()
 			O.nStyle = 2
 			COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[2]
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	x = x + 60
 
@@ -1165,164 +1165,164 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 5, text = _L['Scale only'],
 		group = 'style',
 		checked = O.nStyle == 3,
-		oncheck = function()
+		onCheck = function()
 			O.nStyle = 3
 			COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[3]
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	x = x + 90
 	y = y + deltaY
 
 	x = nPaddingX
-	ui:Append('Text', { x = x, y = y, text = _L['Text Style'], font = 27, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['Text Style'], font = 27, autoEnable = IsEnabled })
 	y = y + deltaY
 
 	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['Skill Style'], color = { 255, 255, 200 }, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['Skill Style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	x = x + 110
 	ui:Append('WndEditBox', {
 		x = x, y = y, w = 250, h = 25, text = O.szSkill, limit = 30,
-		onchange = function(szText)
+		onChange = function(szText)
 			O.szSkill = szText
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	x = x + 250
 	if O.bCritical then
 		x = x + 10
-		ui:Append('Text', { x = x, y = y, text = _L['critical beat'], autoenable = IsEnabled }) --会心伤害
+		ui:Append('Text', { x = x, y = y, text = _L['critical beat'], autoEnable = IsEnabled }) --会心伤害
 		x = x + 70
 		ui:Append('Shadow', {
 			x = x, y = y + 8, color = O.tCriticalC, w = 15, h = 15,
-			onclick = function()
+			onClick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
 					O.tCriticalC = { r, g, b }
 					UI(this):Color(r, g, b)
 				end)
 			end,
-			autoenable = IsEnabled,
+			autoEnable = IsEnabled,
 		})
 	end
 	y = y + deltaY
 
 	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['Damage Style'], color = { 255, 255, 200 }, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['Damage Style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	x = x + 110
 	ui:Append('WndEditBox', {
 		x = x, y = y, w = 250, h = 25, text = O.szDamage, limit = 30,
-		onchange = function(szText)
+		onChange = function(szText)
 			O.szDamage = szText
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	x = x + 250
 	if O.bCritical then
 		x = x + 10
-		ui:Append('Text', { x = x, y = y, text = _L['critical beaten'], autoenable = IsEnabled }) --会心承伤
+		ui:Append('Text', { x = x, y = y, text = _L['critical beaten'], autoEnable = IsEnabled }) --会心承伤
 		x = x + 70
 		ui:Append('Shadow', {
 			x = x, y = y + 8, color = O.tCriticalB, w = 15, h = 15,
-			onclick = function()
+			onClick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
 					O.tCriticalB = { r, g, b }
 					UI(this):Color(r, g, b)
 				end)
 			end,
-			autoenable = IsEnabled,
+			autoEnable = IsEnabled,
 		})
 	end
 	y = y + deltaY
 
 	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['Therapy Style'], color = { 255, 255, 200 }, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['Therapy Style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	x = x + 110
 	ui:Append('WndEditBox', {
 		x = x, y = y, w = 250, h = 25, text = O.szTherapy, limit = 30,
-		onchange = function(szText)
+		onChange = function(szText)
 			O.szTherapy = szText
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	x = x + 250
 	if O.bCritical then
 		x = x + 10
-		ui:Append('Text', { x = x, y = y, text = _L['critical heaten'], autoenable = IsEnabled }) --会心承疗
+		ui:Append('Text', { x = x, y = y, text = _L['critical heaten'], autoEnable = IsEnabled }) --会心承疗
 		x = x + 70
 		ui:Append('Shadow', {
 			x = x, y = y + 8, color = O.tCriticalH, w = 15, h = 15,
-			onclick = function()
+			onClick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
 					O.tCriticalH = { r, g, b }
 					UI(this):Color(r, g, b)
 				end)
 			end,
-			autoenable = IsEnabled,
+			autoEnable = IsEnabled,
 		})
 	end
 	y = y + deltaY
 
 	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['CombatText Tips'], color = { 196, 196, 196 }, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['CombatText Tips'], color = { 196, 196, 196 }, autoEnable = IsEnabled })
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 190, text = _L['$name not me'], checked = O.bCasterNotI,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bCasterNotI = bCheck
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	x = x + 190
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 110, text = _L['$sn shorten(2)'], checked = O.bSnShorten2,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bSnShorten2 = bCheck
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	x = x + 110
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 140, text = _L['therapy effective only'], checked = O.bTherEffOnly,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bTherEffOnly = bCheck
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	x = x + 140
 
 	ui:Append('WndButton', {
 		x = x, y = y, text = _L['Font edit'],
-		onclick = function()
+		onClick = function()
 			UI.OpenFontPicker(function(nFont)
 				O.nFont = nFont
 			end)
 		end,
 		tip = function() return _L('Current font: %d', O.nFont) end,
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-		autoenable = IsEnabled,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		autoEnable = IsEnabled,
 	})
 	y = y + deltaY
 
 	x = nPaddingX
-	ui:Append('Text', { x = x, y = y, text = _L['Color edit'], font = 27, autoenable = IsEnabled })
+	ui:Append('Text', { x = x, y = y, text = _L['Color edit'], font = 27, autoEnable = IsEnabled })
 	x = x + 10
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Critical Color'], checked = O.bCritical and true or false,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bCritical = bCheck
 			X.ShowPanel()
 			X.FocusPanel()
 			X.SwitchTab('MY_CombatText', true)
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	y = y + deltaY
 
@@ -1330,10 +1330,10 @@ function PS.OnPanelActive(frame)
 	local i = 0
 	for k, v in pairs(O.col) do
 		if k ~= SKILL_RESULT_TYPE.EFFECTIVE_THERAPY then
-			ui:Append('Text', { x = x + (i % 8) * 65, y = y + 30 * math.floor(i / 8), text = _L['CombatText Color ' .. k], autoenable = IsEnabled })
+			ui:Append('Text', { x = x + (i % 8) * 65, y = y + 30 * math.floor(i / 8), text = _L['CombatText Color ' .. k], autoEnable = IsEnabled })
 			ui:Append('Shadow', {
 				x = x + (i % 8) * 65 + 35, y = y + 30 * math.floor(i / 8) + 8, color = v, w = 15, h = 15,
-				onclick = function()
+				onClick = function()
 					local this = this
 					UI.OpenColorPicker(function(r, g, b)
 						O.col[k] = { r, g, b }
@@ -1341,7 +1341,7 @@ function PS.OnPanelActive(frame)
 						UI(this):Color(r, g, b)
 					end)
 				end,
-				autoenable = IsEnabled,
+				autoEnable = IsEnabled,
 			})
 			i = i + 1
 		end
@@ -1351,8 +1351,8 @@ function PS.OnPanelActive(frame)
 		ui:Append('WndButton', {
 			x = W - 120 - nPaddingX, y = 15, w = 120, h = 40,
 			text = _L['Load CombatText Config'],
-			buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
-			onclick = CombatText.CheckEnable,
+			buttonStyle = 'SKEUOMORPHISM_LACE_BORDER',
+			onClick = CombatText.CheckEnable,
 		})
 	end
 end

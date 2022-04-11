@@ -211,7 +211,7 @@ function D.ExportConfirm()
 			x = x, y = y, w = 100,
 			text = info.szTitle,
 			checked = true,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				tChannels[nGroup] = bChecked
 				local bEnable = bChecked
 				if not bChecked then
@@ -240,7 +240,7 @@ function D.ExportConfirm()
 	btnSure = ui:Append('WndButton', {
 		x = x, y = y, w = nMaxWidth - x * 2, h = 35,
 		text = _L['Export chatlog'],
-		onclick = function()
+		onClick = function()
 			if ENVIRONMENT.GAME_PROVIDER == 'remote' then
 				return X.Alert(_L['Streaming client does not support export!'])
 			end
@@ -376,7 +376,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = wr,
 		text = _L['Filter tong member log message'],
 		checked = MY_ChatLog.bIgnoreTongMemberLogMsg,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_ChatLog.bIgnoreTongMemberLogMsg = bChecked
 		end
 	})
@@ -386,7 +386,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = wr,
 		text = _L['Filter tong online message'],
 		checked = MY_ChatLog.bIgnoreTongOnlineMsg,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_ChatLog.bIgnoreTongOnlineMsg = bChecked
 		end
 	})
@@ -397,7 +397,7 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY, w = wr,
 			text = _L['Realtime database commit'],
 			checked = MY_ChatLog.bRealtimeCommit,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_ChatLog.bRealtimeCommit = bChecked
 			end
 		})
@@ -408,17 +408,17 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = wr,
 		text = _L['Auto connect database'],
 		checked = MY_ChatLog.bAutoConnectDB,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_ChatLog.bAutoConnectDB = bChecked
 		end
 	})
 	nY = nY + dy
 
 	nX = nPaddingX
-	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['Tips'], font = 27, multiline = true, valign = 0 })
+	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['Tips'], font = 27, multiline = true, alignVertical = 0 })
 	nY = nY + 30
 	nX = nPaddingX + 10
-	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['MY_ChatLog TIPS'], font = 27, multiline = true, valign = 0 })
+	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['MY_ChatLog TIPS'], font = 27, multiline = true, alignVertical = 0 })
 
 	-- ср╡Ю
 	nX = nW - 150
@@ -427,7 +427,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = nX, y = nY, w = 125, h = 35,
 		text = _L['Open chatlog'],
-		onclick = function()
+		onClick = function()
 			MY_ChatLog.Open()
 		end,
 	})
@@ -436,7 +436,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = nX, y = nY, w = 125, h = 35,
 		text = _L['Export chatlog'],
-		onclick = function()
+		onClick = function()
 			D.ExportConfirm()
 		end,
 	})
@@ -445,7 +445,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = nX, y = nY, w = 125, h = 35,
 		text = _L['Optimize datebase'],
-		onclick = function()
+		onClick = function()
 			X.Confirm(_L['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
 				X.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 					MY_ChatLog.OptimizeDB()
@@ -459,7 +459,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = nX, y = nY, w = 125, h = 35,
 		text = _L['Import chatlog'],
-		onclick = function()
+		onClick = function()
 			local szRoot = X.FormatPath({'export/ChatLog', X.PATH_TYPE.ROLE})
 			if not IsLocalFileExist(szRoot) then
 				szRoot = X.FormatPath({'export/', X.PATH_TYPE.ROLE})

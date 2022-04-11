@@ -172,7 +172,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 250,
 		text = _L['chat copy'],
 		checked = O.bChatCopy,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bChatCopy = bChecked
 		end,
 	}):AutoWidth():Width()
@@ -180,10 +180,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 250,
 		text = _L['Right click quick copy chat'],
 		checked = O.bChatQuickCopy,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bChatQuickCopy = bChecked
 		end,
-		autoenable = function() return O.bChatCopy end,
+		autoEnable = function() return O.bChatCopy end,
 	})
 	nY = nY + nLH
 
@@ -192,7 +192,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 250,
 		text = _L['chat time'],
 		checked = O.bChatTime,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if bChecked and _G.HM_ToolBox then
 				_G.HM_ToolBox.bChatTime = false
 			end
@@ -234,7 +234,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 250,
 		text = _L['always show *'],
 		checked = O.bChatCopyAlwaysShowMask,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bChatCopyAlwaysShowMask = bChecked
 		end,
 		isdisable = function()
@@ -247,7 +247,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 250,
 		text = _L['always be white'],
 		checked = O.bChatCopyAlwaysWhite,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bChatCopyAlwaysWhite = bChecked
 		end,
 		isdisable = function()
@@ -260,7 +260,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 250,
 		text = _L['hide system msg copy'],
 		checked = O.bChatCopyNoCopySysmsg,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bChatCopyNoCopySysmsg = bChecked
 		end,
 		isdisable = function()
@@ -274,12 +274,12 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 250,
 		text = _L['Chat panel namelink ext function'],
 		checked = O.bChatNamelinkEx,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bChatNamelinkEx = bChecked
 			D.CheckNamelinkEnable()
 		end,
 		tip = _L['Alt show equip, shift select.'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 	})
 	nY = nY + nLH
 

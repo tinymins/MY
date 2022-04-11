@@ -43,8 +43,8 @@ function PS.OnPanelActive(wnd)
 
 	-- ui:Append('WndButton', {
 	-- 	x = 400, y = 20, text = g_tStrings.HELP_PANEL,
-	-- 	buttonstyle = 'FLAT',
-	-- 	onclick = function()
+	-- 	buttonStyle = 'FLAT',
+	-- 	onClick = function()
 	-- 		OpenInternetExplorer('https://github.com/luckyyyyy/JH/blob/dev/JH_DBM/README.md')
 	-- 	end,
 	-- })
@@ -53,7 +53,7 @@ function PS.OnPanelActive(wnd)
 	nX = ui:Append('WndCheckBox', {
 		x = nPaddingX + 10, y = nY, text = _L['Enable MY_TeamMon'],
 		checked = MY_TeamMon.bEnable,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_TeamMon.bEnable = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -61,14 +61,14 @@ function PS.OnPanelActive(wnd)
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Enable circle'],
 			checked = MY_TeamMon_CC.bEnable,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				MY_TeamMon_CC.bEnable = bCheck
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Circle border'],
 			checked = MY_TeamMon_CC.bBorder,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				MY_TeamMon_CC.bBorder = bCheck
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -81,7 +81,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['Team channel alarm'],
 		color = GetMsgFontColor('MSG_TEAM', true),
 		checked = MY_TeamMon.bPushTeamChannel,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_TeamMon.bPushTeamChannel = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -89,21 +89,21 @@ function PS.OnPanelActive(wnd)
 		x = nX + 5, y = nY,
 		text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 		checked = MY_TeamMon.bPushWhisperChannel,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_TeamMon.bPushWhisperChannel = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Buff list'],
 		checked = MY_TeamMon.bPushBuffList,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_TeamMon.bPushBuffList = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Center alarm'],
 		checked = MY_TeamMon.bPushCenterAlarm,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_TeamMon.bPushCenterAlarm = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -112,7 +112,7 @@ function PS.OnPanelActive(wnd)
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Large text alarm'],
 			checked = MY_TeamMon.bPushBigFontAlarm,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				MY_TeamMon.bPushBigFontAlarm = bCheck
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -121,7 +121,7 @@ function PS.OnPanelActive(wnd)
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Fullscreen alarm'],
 			checked = MY_TeamMon.bPushFullScreen,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				MY_TeamMon.bPushFullScreen = bCheck
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -129,16 +129,16 @@ function PS.OnPanelActive(wnd)
 	nX = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Party buff list'],
 		checked = MY_TeamMon.bPushPartyBuffList,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_TeamMon.bPushPartyBuffList = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Lifebar alarm'],
 		tip = _L['Requires MY_LifeBar loaded.'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		checked = MY_TeamMon.bPushScreenHead,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_TeamMon.bPushScreenHead = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -146,7 +146,7 @@ function PS.OnPanelActive(wnd)
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nPaddingX + 10, y = nY, text = _L['Team panel bind show buff'],
 		checked = MY_TeamMon.bPushTeamPanel,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_TeamMon.bPushTeamPanel = bCheck
 			FireUIEvent('MY_TM_CREATE_CACHE')
 		end,
@@ -181,11 +181,11 @@ function PS.OnPanelActive(wnd)
 		x = nPaddingX + 10, y = nY, h = 22,
 		range = {0, 3601},
 		value = MY_TeamMon_ST.nBelowDecimal,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		onchange = function(val)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		onChange = function(val)
 			MY_TeamMon_ST.nBelowDecimal = val
 		end,
-		textfmt = function(val)
+		textFormatter = function(val)
 			if val == 0 then
 				return _L['Never show decimal.']
 			end
@@ -199,23 +199,23 @@ function PS.OnPanelActive(wnd)
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nPaddingX + 10, y = nY, text = _L['Use common data'],
 		checked = MY_TeamMon.bCommon,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_TeamMon.bCommon = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
 		x = nPaddingX + 5, y = nY + 15, text = _L['Data panel'],
-		buttonstyle = 'FLAT',
-		onclick = MY_TeamMon_UI.TogglePanel,
+		buttonStyle = 'FLAT',
+		onClick = MY_TeamMon_UI.TogglePanel,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Export data'],
-		buttonstyle = 'FLAT',
-		onclick = MY_TeamMon_UI.OpenExportPanel,
+		buttonStyle = 'FLAT',
+		onClick = MY_TeamMon_UI.OpenExportPanel,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Import data'],
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		menu = function()
 			local menu = {}
 			table.insert(menu, {
@@ -240,8 +240,8 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Open data folder'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			local szRoot = X.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT):gsub('/', '\\')
 			X.OpenFolder(szRoot)
 			UI.OpenTextEditor(szRoot)

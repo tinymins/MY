@@ -693,7 +693,7 @@ function D.OnInitPage()
 	nX = nX + UI(wnd):Append('WndAutocomplete', {
 		x = nX, y = 20, w = 250,
 		name = 'WndAutocomplete_Map',
-		onchange = function(szText)
+		onChange = function(szText)
 			if D.tMapID[szText] then
 				D.dwMapID = D.tMapID[szText]
 				D.UpdateSearchAC()
@@ -710,7 +710,7 @@ function D.OnInitPage()
 		name = 'WndAutocomplete_Search',
 		text = D.szSearch,
 		placeholder = _L['Search'],
-		onchange = function(szText)
+		onChange = function(szText)
 			X.Debounce(
 				'MY_TeamTools_Achievement_Search',
 				500,
@@ -719,8 +719,8 @@ function D.OnInitPage()
 			X.Debounce('MY_TeamTools_Achievement_RequestTeamData', 2000, D.RequestTeamData)
 		end,
 		autocomplete = {{'option', 'source', D.aSearchAC}},
-		onclick = function() UI(this):Autocomplete('search', '') end,
-		onblur = function()
+		onClick = function() UI(this):Autocomplete('search', '') end,
+		onBlur = function()
 			D.RequestTeamData()
 			X.Debounce('MY_TeamTools_Achievement_RequestTeamData', false)
 		end,
@@ -730,18 +730,18 @@ function D.OnInitPage()
 		x = nX, y = 20, w = 200,
 		text = _L['Intelligent hide'],
 		checked = O.bIntelligentHide,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bIntelligentHide = bChecked
 			D.UpdateAchievementID()
 		end,
 		tip = _L['Hide unimportant achievements'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Width() + 5
 
 	UI(wnd):Append('WndButton', {
 		x = 960, y = 20, w = 120,
 		text = _L['Refresh'],
-		onclick = function()
+		onClick = function()
 			D.RequestTeamData()
 			X.Systopmsg(_L['Team achievement request sent.'])
 		end,

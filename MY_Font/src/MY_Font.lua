@@ -125,7 +125,7 @@ function PS.OnPanelActive(wnd)
 			acFile = ui:Append('WndAutocomplete', {
 				x = x, y = y, w = w - 180 - 30,
 				text = szFile,
-				onchange = function(szText)
+				onChange = function(szText)
 					UpdateBtnEnable()
 					szText = StringLowerW(szText)
 					for _, p in ipairs(aFontList) do
@@ -138,7 +138,7 @@ function PS.OnPanelActive(wnd)
 					end
 					acName:Text(g_tStrings.STR_CUSTOM_TEAM)
 				end,
-				onclick = function()
+				onClick = function()
 					if IsPopupMenuOpened() then
 						UI(this):Autocomplete('close')
 					else
@@ -151,7 +151,7 @@ function PS.OnPanelActive(wnd)
 			ui:Append('WndButton', {
 				x = w - 180 - x - 10, y = y, w = 25,
 				text = '...',
-				onclick = function()
+				onClick = function()
 					local file = GetOpenFileName(_L['Please select your font file.'], 'Font File(*.ttf;*.otf;*.fon)\0*.ttf;*.otf;*.fon\0All Files(*.*)\0*.*\0\0')
 					if not X.IsEmpty(file) then
 						file = X.GetRelativePath(file, '') or file
@@ -163,7 +163,7 @@ function PS.OnPanelActive(wnd)
 			acName = ui:Append('WndAutocomplete', {
 				w = 100, h = 25, x = w - 180 + x, y = y,
 				text = szName,
-				onchange = function(szText)
+				onChange = function(szText)
 					UpdateBtnEnable()
 					szText = StringLowerW(szText)
 					for _, p in ipairs(aFontList) do
@@ -174,7 +174,7 @@ function PS.OnPanelActive(wnd)
 						end
 					end
 				end,
-				onclick = function()
+				onClick = function()
 					if IsPopupMenuOpened() then
 						UI(this):Autocomplete('close')
 					else
@@ -187,7 +187,7 @@ function PS.OnPanelActive(wnd)
 			btnSure = ui:Append('WndButton', {
 				w = 60, h = 25, x = w - 60, y = y,
 				text = _L['apply'], enable = false,
-				onclick = function()
+				onClick = function()
 					MY_Font.SetFont(p.tIDs, acName:Text(), acFile:Text())
 					szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
 					UpdateBtnEnable()

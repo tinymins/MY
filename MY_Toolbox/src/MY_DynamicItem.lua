@@ -482,43 +482,43 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		x = nX, y = nY, w = 'auto',
 		text = _L[MODULE_NAME],
 		checked = MY_DynamicItem.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_DynamicItem.bEnable = bChecked
 		end,
 		tip = _L['Dynamic item bar for different map'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Width() + 5
 
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Show background'],
 		checked = MY_DynamicItem.bShowBg,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_DynamicItem.bShowBg = bChecked
 		end,
-		autoenable = function() return MY_DynamicItem.bEnable end,
+		autoEnable = function() return MY_DynamicItem.bEnable end,
 	}):Width() + 5
 
 	nX = nX + ui:Append('WndTrackbar', {
 		x = nX, y = nY, h = 25, w = 220,
 		range = {1, 32}, value = MY_DynamicItem.nNum,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		textfmt = function(v) return _L('Box number: %d', v) end,
-		onchange = function(nVal)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textFormatter = function(v) return _L('Box number: %d', v) end,
+		onChange = function(nVal)
 			X.DelayCall(function() MY_DynamicItem.nNum = nVal end)
 		end,
-		autoenable = function() return MY_DynamicItem.bEnable end,
+		autoEnable = function() return MY_DynamicItem.bEnable end,
 	}):Width() + 5
 
 	nX = nX + ui:Append('WndTrackbar', {
 		x = nX, y = nY, h = 25, w = 220,
 		range = {1, 32}, value = MY_DynamicItem.nCol,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		textfmt = function(v) return _L('Col number: %d', v) end,
-		onchange = function(nVal)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textFormatter = function(v) return _L('Col number: %d', v) end,
+		onChange = function(nVal)
 			X.DelayCall(function() MY_DynamicItem.nCol = nVal end)
 		end,
-		autoenable = function() return MY_DynamicItem.bEnable end,
+		autoEnable = function() return MY_DynamicItem.bEnable end,
 	}):Width() + 5
 
 	return nX, nY

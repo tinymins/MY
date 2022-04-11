@@ -307,17 +307,17 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	for i, v in ipairs(O.SaveList) do
 		nX = ui:Append('WndButton', {
 			x = nX + 5, y = nY, w = 80, text = v.name,
-			buttonstyle = 'FLAT',
+			buttonStyle = 'FLAT',
 			tip = v.name .. '\n' .. _L['Left click to recovery, right click for more.'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			onlclick = function()
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			onLClick = function()
 				if IsCtrlKeyDown() then
 					D.Restore2(i)
 				else
 					D.Restore(i)
 				end
 			end,
-			rmenu = function()
+			menuRClick = function()
 				local menu = {
 					{
 						szOption = _L['Restore'],
@@ -381,8 +381,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 
 	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY, text = _L['Save Team'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			GetUserInput(_L['Save team name'], function(text)
 				D.Save(nil, text)
 				X.SwitchTab('MY_TeamTools', true)

@@ -97,7 +97,7 @@ X.RegisterPanel(_L['Development'], 'Dev_VarWatch', _L['VarWatch'], 'ui/Image/UIC
 				x = x, y = y + (i - 1) * 25,
 				w = 150, h = 25,
 				color = {255, 255, 255},
-				onchange = function(text)
+				onChange = function(text)
 					_C.tVarList[i] = X.TrimString(text)
 					X.SaveLUAData(DATA_PATH, _C.tVarList)
 				end,

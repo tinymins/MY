@@ -54,13 +54,13 @@ function CharInfo.CreateFrame(dwID, szName)
 	ui:Append('Text', {
 		name = 'Text_Name',
 		x = x, y = y + 2, w = 240 - 2 * x,
-		text = wstring.sub(szName, 1, 6), halign = 1,
+		text = wstring.sub(szName, 1, 6), alignHorizontal = 1,
 	}) -- UI≥¨¡À
 	ui:Append('WndButton', {
 		name = 'LOOKUP', x = 70, y = 360,
 		text = g_tStrings.STR_LOOKUP,
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			ViewInviteToPlayer(dwID)
 		end,
 	})
@@ -101,14 +101,14 @@ function CharInfo.UpdateFrame(frame, status, data)
 		for i = 1, #data do
 			local v = data[i]
 			if v.category then
-				ui:Append('Text', { x = 20, y = y0 + i * 25, w = 200, h = 25, halign = 1, text = v.label })
+				ui:Append('Text', { x = 20, y = y0 + i * 25, w = 200, h = 25, alignHorizontal = 1, text = v.label })
 			else
-				ui:Append('Text', { x = 20, y = y0 + i * 25, w = 200, h = 25, halign = 0, text = v.label })
+				ui:Append('Text', { x = 20, y = y0 + i * 25, w = 200, h = 25, alignHorizontal = 0, text = v.label })
 				ui:Append('Text', {
 					x = 20, y = y0 + i * 25, w = 200, h = 25,
-					halign = 2, text = v.value,
+					alignHorizontal = 2, text = v.value,
 					color = GetSelfValue(v.label, v.value),
-					onhover = function(bHover)
+					onHover = function(bHover)
 						if not v.tip or v.szTip then
 							return
 						end

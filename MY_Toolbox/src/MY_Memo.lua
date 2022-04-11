@@ -77,16 +77,16 @@ function D.Reload(bGlobal)
 				ui:Children('#WndEditBox_Memo'):Size(ui:Size())
 			end,
 			w = CFG.nWidth, h = CFG.nHeight, text = TITLE,
-			dragable = true, dragarea = {0, 0, CFG.nWidth, 30},
+			draggable = true, dragArea = {0, 0, CFG.nWidth, 30},
 			anchor = CFG.anchor,
 			events = {{ 'UI_SCALED', function() UI(this):Anchor(CFG.anchor) end }},
-			uievents = {{ 'OnFrameDragEnd', function() CFG.anchor = UI('Normal/' .. NAME):Anchor() end }},
+			uiEvents = {{ 'OnFrameDragEnd', function() CFG.anchor = UI('Normal/' .. NAME):Anchor() end }},
 		}):Append('WndEditBox', {
 			name = 'WndEditBox_Memo',
 			x = 0, y = 0, w = CFG.nWidth, h = CFG.nHeight - 30,
 			text = CFG.szContent, multiline = true,
 			font = CFG.nFont,
-			onchange = function(text) CFG.szContent = text end,
+			onChange = function(text) CFG.szContent = text end,
 		})
 	end
 end
@@ -165,7 +165,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY,
 		text = _L['Memo (Role)'],
 		checked = D.IsEnable(false),
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.Toggle(false, bChecked)
 		end,
 	}):AutoWidth():Width() + 5
@@ -173,7 +173,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY,
 		text = _L['Font'],
-		onclick = function()
+		onClick = function()
 			UI.OpenFontPicker(function(nFont)
 				D.SetFont(false, nFont)
 			end)
@@ -184,7 +184,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY,
 		text = _L['Memo (Global)'],
 		checked = D.IsEnable(true),
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.Toggle(true, bChecked)
 		end,
 	}):AutoWidth():Width() + 5
@@ -192,7 +192,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY,
 		text = _L['Font'],
-		onclick = function()
+		onClick = function()
 			UI.OpenFontPicker(function(nFont)
 				D.SetFont(true, nFont)
 			end)

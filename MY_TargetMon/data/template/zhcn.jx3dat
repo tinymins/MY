@@ -13,7 +13,7 @@ return {
 	ignoreSystemUIScale = false , -- 禁止系统缩放
 	enable              = false , -- 启用标记
 	penetrable          = true  , -- 是否穿透
-	dragable            = false , -- 是否可拖拽
+	draggable            = false , -- 是否可拖拽
 	alignment           = "LEFT", -- 对齐方式
 	hideVoid            = false , -- 隐藏消失的BUFF
 	hideOthers          = false , -- 只显示自己的BUFF

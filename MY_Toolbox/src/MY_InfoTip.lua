@@ -545,13 +545,13 @@ function D.ReinitUI()
 					name = 'Image_Default',
 					w = 220, h = 30,
 					alpha = 180,
-					image = 'UI/Image/UICommon/Commonpanel.UITex', imageframe = 86,
+					image = 'UI/Image/UICommon/Commonpanel.UITex', imageFrame = 86,
 				})
 				local txt = ui:Append('Text', {
 					name = 'Text_Default',
 					w = 220, h = 30,
 					text = data.i18n.name,
-					font = 2, valign = 1, halign = 1,
+					font = 2, alignVertical = 1, alignHorizontal = 1,
 				})
 				ui:Breathe(function() txt:Text(data.GetFormatString(data)) end)
 			end
@@ -597,7 +597,7 @@ function PS.OnPanelActive(wnd)
 			x = x, y = y, w = 250,
 			text = data.i18n.name,
 			checked = data.config.bEnable or false,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				data.config.bEnable = bChecked
 				D.ReinitUI()
 			end,
@@ -610,7 +610,7 @@ function PS.OnPanelActive(wnd)
 				x = x, y = y, w = 100,
 				text = _L['Placeholder'],
 				checked = data.config.bPlaceholder or false,
-				oncheck = function(bChecked)
+				onCheck = function(bChecked)
 					data.config.bPlaceholder = bChecked
 					D.ReinitUI()
 				end,
@@ -623,7 +623,7 @@ function PS.OnPanelActive(wnd)
 			x = x, y = y, w = 60,
 			text = _L['Title'],
 			checked = data.config.bShowTitle or false,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				data.config.bShowTitle = bChecked
 				D.ReinitUI()
 			end,
@@ -635,7 +635,7 @@ function PS.OnPanelActive(wnd)
 			x = x, y = y, w = 60,
 			text = _L['Background'],
 			checked = data.config.bShowBg or false,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				data.config.bShowBg = bChecked
 				D.ReinitUI()
 			end,
@@ -646,7 +646,7 @@ function PS.OnPanelActive(wnd)
 			name = 'WndButton_InfoTipFont_' .. data.id,
 			x = x, y = y, w = 50,
 			text = _L['Font'],
-			onclick = function()
+			onClick = function()
 				UI.OpenFontPicker(function(f)
 					data.config.nFont = f
 					D.ReinitUI()
@@ -659,7 +659,7 @@ function PS.OnPanelActive(wnd)
 			name = 'Shadow_InfoTipColor_' .. data.id,
 			x = x, y = y, w = 20, h = 20,
 			color = data.config.rgb or {255, 255, 255},
-			onclick = function()
+			onClick = function()
 				local el = this
 				UI.OpenColorPicker(function(r, g, b)
 					UI(el):Color(r, g, b)

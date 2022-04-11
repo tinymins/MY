@@ -133,13 +133,13 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 				ui:Alpha(200)
 				ui:Anchor({ x = 0, y = -60, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' })
 			end
-			ui:Append('Handle', { x = 10, y = (h - 90) / 2, w = w - 20, h = h, valign = 1, halign = 1, handlestyle = 3 })
+			ui:Append('Handle', { x = 10, y = (h - 90) / 2, w = w - 20, h = h, alignVertical = 1, alignHorizontal = 1, handleStyle = 3 })
 				:Append('Text', {
 					text = (szName == '' and _L['Anonymous'] or szName)
 						.. '\n' .. szSerendipity .. ' - ' .. X.FormatTime(dwTime, '%hh:%mm:%ss')
 						.. '\n' .. (szReporter == '' and '' or (szReporter .. _L[','])) .. _L['JX3 is pround of you!']
 						.. '\n' .. _L['Thanks for your kindness!'],
-					fontscale = 1.2,
+					fontScale = 1.2,
 				})
 				:FormatChildrenPos()
 			X.DelayCall(10000, function() ui:Remove() end)

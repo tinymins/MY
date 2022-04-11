@@ -223,7 +223,7 @@ local function Hook()
 			w = 100, h = 21, x = 60, y = 30,
 			text = l_szBagFilter,
 			placeholder = _L['Search'],
-			onchange = function(txt)
+			onChange = function(txt)
 				local nLen = txt:len()
 				nLen = math.max(nLen, 10)
 				nLen = math.min(nLen, 20)
@@ -244,7 +244,7 @@ local function Hook()
 			w = 150, h = 21, x = 280, y = 80,
 			text = l_szBankFilter,
 			placeholder = _L['Search'],
-			onchange = function(txt)
+			onChange = function(txt)
 				local nLen = txt:len()
 				nLen = math.max(nLen, 15)
 				nLen = math.min(nLen, 25)
@@ -259,7 +259,7 @@ local function Hook()
 			w = 100, x = 340, y = 56,
 			text = _L['Compare with bag'],
 			checked = l_bCompareBank,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				if bChecked then
 					UI('Normal/BigBankPanel/CheckBox_TimeLtd'):Check(false)
 				end
@@ -273,7 +273,7 @@ local function Hook()
 			w = 60, x = 277, y = 56, alpha = 200,
 			text = _L['Time Limited'],
 			checked = l_bBankTimeLtd,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				if bChecked then
 					UI('Normal/BigBankPanel/WndCheckBox_Compare'):Check(false)
 				end
@@ -293,7 +293,7 @@ local function Hook()
 			w = 100, h = 21, x = 60, y = 25,
 			text = l_szGuildBankFilter,
 			placeholder = _L['Search'],
-			onchange = function(txt)
+			onChange = function(txt)
 				local nLen = txt:len()
 				nLen = math.max(nLen, 10)
 				nLen = math.min(nLen, 25)
@@ -308,7 +308,7 @@ local function Hook()
 			w = 100, x = 20, y = 475,
 			text = _L['Compare with bag'],
 			checked = l_bCompareGuild,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				l_bCompareGuild = bChecked
 				DoCompareGuildBank(true)
 			end
@@ -411,7 +411,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 200,
 		text = _L['Package searcher'],
 		checked = O.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.Enable(bChecked)
 		end,
 	}):AutoWidth():Width() + 5

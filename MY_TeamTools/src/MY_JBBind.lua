@@ -160,8 +160,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	nX = nX + uiCCStatus:Width()
 	uiBtnCCStatus = ui:Append('WndButton', {
 		x = nX, y = nY + 2,
-		buttonstyle = 'FLAT', text = _L['Bind'], enable = false,
-		onclick = function()
+		buttonStyle = 'FLAT', text = _L['Bind'], enable = false,
+		onClick = function()
 			if O.pending or X.IsNil(O.uid) then
 				D.FetchBindStatus(UpdateUI, UpdateUI)
 			elseif X.IsEmpty(O.uid) then
@@ -197,8 +197,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	nX = nX + uiBtnCCStatus:Width()
 	uiBtnCCLink = ui:Append('WndButton', {
 		x = nX, y = nY + 2, w = 120,
-		buttonstyle = 'FLAT', text = _L['Login team platform'],
-		onclick = function()
+		buttonStyle = 'FLAT', text = _L['Login team platform'],
+		onClick = function()
 			X.OpenBrowser('https://page.j3cx.com/jx3box/team/platform')
 		end,
 	})

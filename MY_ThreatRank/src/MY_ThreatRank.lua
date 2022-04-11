@@ -515,7 +515,7 @@ function PS.OnPanelActive(frame)
 
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 130, checked = O.bEnable, text = _L['Enable ThreatScrutiny'],
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bEnable = bChecked
 			_TS.CheckOpen()
 		end,
@@ -526,87 +526,87 @@ function PS.OnPanelActive(frame)
 		x = nX, y = nY, w = 250, checked = O.bInDungeon,
 		enable = O.bEnable,
 		text = _L['Only in the map type is Dungeon Enable plug-in'],
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bInDungeon = bChecked
 			_TS.CheckOpen()
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	nY = nY + 28
 
 	nX = nPaddingX
-	ui:Append('Text', { x = nX, y = nY, text = _L['Alert Setting'], font = 27, autoenable = IsEnabled })
+	ui:Append('Text', { x = nX, y = nY, text = _L['Alert Setting'], font = 27, autoEnable = IsEnabled })
 	nX = nX + 10
 	nY = nY + 28
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, checked = O.nOTAlertLevel == 1, text = _L['OT Alert'],
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if bChecked then -- 以后可以做% 暂时先不管
 				O.nOTAlertLevel = 1
 			else
 				O.nOTAlertLevel = 0
 			end
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, checked = O.bOTAlertSound, text = _L['OT Alert Sound'],
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bOTAlertSound = bChecked
 		end,
-		autoenable = function() return IsEnabled() and O.nOTAlertLevel == 1 end,
+		autoEnable = function() return IsEnabled() and O.nOTAlertLevel == 1 end,
 	})
 	nY = nY + 28
 
 	nX = nPaddingX
-	ui:Append('Text', { x = nX, y = nY, text = _L['Style Setting'], font = 27, autoenable = IsEnabled })
+	ui:Append('Text', { x = nX, y = nY, text = _L['Style Setting'], font = 27, autoEnable = IsEnabled })
 	nY = nY + 28
 
 	nX = nX + 10
 	ui:Append('WndCheckBox', {
 		x = nX , y = nY, checked = O.bShowPercent, text = _L['Show percent'],
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bShowPercent = bChecked
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 
 	nY = nY + 28
 	ui:Append('WndCheckBox', {
 		x = nX , y = nY, checked = O.bTopTarget, text = _L['Top Target'],
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bTopTarget = bChecked
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
 		x = nX , y = nY, checked = O.bForceColor, text = g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bForceColor = bChecked
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
 		x = nX , y = nY, checked = O.bForceIcon, text = g_tStrings.STR_SHOW_KUNGFU,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bForceIcon = bChecked
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	nY = nY + 28
 
 	ui:Append('WndCheckBox', {
 		x = nX , y = nY, w = 200, checked = O.bSpecialSelf, text = _L['Special Self'],
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bSpecialSelf = bChecked
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	nY = nY + 28
 
@@ -626,7 +626,7 @@ function PS.OnPanelActive(frame)
 			end
 			return t
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	nY = nY + 28
 
@@ -646,26 +646,26 @@ function PS.OnPanelActive(frame)
 			end
 			return t
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 	nY = nY + 28
 
 	nX = nPaddingX
-	ui:Append('Text', { x = nX, y = nY, text = g_tStrings.STR_RAID_MENU_BG_ALPHA, autoenable = IsEnabled })
+	ui:Append('Text', { x = nX, y = nY, text = g_tStrings.STR_RAID_MENU_BG_ALPHA, autoEnable = IsEnabled })
 	nX = nX + 5
 	nY = nY + 28
 	ui:Append('WndTrackbar', {
 		x = nX, y = nY, text = '',
 		range = {0, 100},
 		value = O.nBGAlpha,
-		onchange = function(nVal)
+		onChange = function(nVal)
 			O.nBGAlpha = nVal
 			local frame = _TS.GetFrame()
 			if frame then
 				frame.bg:SetAlpha(255 * O.nBGAlpha / 100)
 			end
 		end,
-		autoenable = IsEnabled,
+		autoEnable = IsEnabled,
 	})
 end
 X.RegisterPanel(_L['Target'], 'MY_ThreatRank', g_tStrings.HATRED_COLLECT, 632, PS)

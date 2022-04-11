@@ -52,7 +52,7 @@ function D.Open(ds, tab, szMode)
 
 	local hBox = ui:Append('Box', { name = 'Box', x = x + 175, y = y + 40, h = 48, w = 48 })
 	local hCheckBox = ui:Append('WndCheckBox', { name = 'WndCheckBox', x = x + 50, y = y + 260, font = 65, text = _L['Equiptment Boss'] })
-	local hButton = ui:Append('WndButton', { name = 'Success', x = x + 175, y = y + 260, text = g_tStrings.STR_HOTKEY_SURE, buttonstyle = 'FLAT_LACE_BORDER' })
+	local hButton = ui:Append('WndButton', { name = 'Success', x = x + 175, y = y + 260, text = g_tStrings.STR_HOTKEY_SURE, buttonStyle = 'FLAT_LACE_BORDER' })
 	ui:Remove(function()
 		if bProcessed then
 			return
@@ -107,7 +107,7 @@ function D.Open(ds, tab, szMode)
 				end,
 			},
 		},
-		onclick = function()
+		onClick = function()
 			if IsPopupMenuOpened() then
 				UI(this):Autocomplete('close')
 			else
@@ -116,7 +116,7 @@ function D.Open(ds, tab, szMode)
 		end,
 	})
 	local hMoney = ui:Append('WndAutocomplete', {
-		name = 'Money', x = x + 140, y = y + 151, w = 185, h = 25, limit = 8, edittype = UI.EDIT_TYPE.ASCII,
+		name = 'Money', x = x + 140, y = y + 151, w = 185, h = 25, limit = 8, editType = UI.EDIT_TYPE.ASCII,
 		autocomplete = {
 			{
 				'option', 'beforeSearch', function(text)
@@ -145,7 +145,7 @@ function D.Open(ds, tab, szMode)
 				end,
 			},
 		},
-		onchange = function(szText)
+		onChange = function(szText)
 			local ui = UI(this)
 			if tonumber(szText) or szText == '' or szText == '-' then
 				this.szText = szText

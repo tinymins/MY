@@ -39,7 +39,7 @@ function PS.OnPanelActive(wnd)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 250, text = _L['Enable'],
 		r = 255, g = 255, b = 0, checked = MY_Focus.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bEnable = bChecked
 		end,
 		tip = function()
@@ -47,27 +47,27 @@ function PS.OnPanelActive(wnd)
 				return _L['Can not use in shielded map!']
 			end
 		end,
-		autoenable = function() return not MY_Focus.IsShielded() end,
+		autoEnable = function() return not MY_Focus.IsShielded() end,
 	}):AutoWidth():Width() + 10
 
 	x, y = xl, y + 25
 
 	-- <hr />
-	ui:Append('Image', {x = x, y = y, w = wl, h = 1, image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62})
+	ui:Append('Image', {x = x, y = y, w = wl, h = 1, image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageFrame = 62})
 	y = y + 5
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Auto focus'], checked = MY_Focus.bAutoFocus,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bAutoFocus = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 
 	local list = ui:Append('WndListBox', {
 		x = x, y = y + 30, w = wl - x + xl, h = h - y - 40,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	-- ³õÊ¼»¯list¿Ø¼þ
 	for _, v in ipairs(MY_Focus.GetAllFocusPattern()) do
@@ -229,7 +229,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = wl - 80, y = y, w = 80,
 		text = _L['Add'],
-		onclick = function()
+		onClick = function()
 			GetUserInput(_L['Add auto focus'], function(szText)
 				local tData = MY_Focus.SetFocusPattern(szText)
 				if not tData then
@@ -239,7 +239,7 @@ function PS.OnPanelActive(wnd)
 			end, function() end, function() end, nil, '')
 		end,
 		tip = _L['Right click list to delete'],
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 
 	-- ÓÒ²à
@@ -248,169 +248,169 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Hide when empty'],
 		checked = MY_Focus.bAutoHide,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bAutoHide = bChecked
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Auto focus very important npc'],
 		tip = _L['Boss list is always been collecting and updating'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 		checked = MY_Focus.bFocusINpc,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bFocusINpc = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['TeamMon focus'],
 		tip = _L['TeamMon focus is related to MY_TeamMon data.'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 		checked = MY_Focus.bTeamMonFocus,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bTeamMonFocus = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Auto focus friend'],
 		checked = MY_Focus.bFocusFriend,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bFocusFriend = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('Image', {
 		x = x + 5, y = y - 3, w = 10, h = 8,
 		image = 'ui/Image/UICommon/ScienceTree.UITex',
-		imageframe = 10,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		imageFrame = 10,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Auto focus tong'],
 		checked = MY_Focus.bFocusTong,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bFocusTong = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('Image', {
 		x = x + 5, y = y - 3, w = 10, h = 8,
 		image = 'ui/Image/UICommon/ScienceTree.UITex',
-		imageframe = 10,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		imageFrame = 10,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Anmerkungen auto focus'],
 		checked = MY_Focus.bFocusAnmerkungen,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bFocusAnmerkungen = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('Image', {
 		x = x + 5, y = y, w = 10, h = 10,
 		image = 'ui/Image/UICommon/ScienceTree.UITex',
-		imageframe = 10,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		imageFrame = 10,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	ui:Append('Image', {
 		x = x + 10, y = y + 5, w = 10, h = 10,
 		image = 'ui/Image/UICommon/ScienceTree.UITex',
-		imageframe = 8,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		imageFrame = 8,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	ui:Append('WndCheckBox', {
 		x = x + 20, y = y, w = wr, text = _L['Auto focus only in public map'],
 		checked = MY_Focus.bOnlyPublicMap,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bOnlyPublicMap = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Auto focus enemy'],
 		checked = MY_Focus.bFocusEnemy,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bFocusEnemy = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Auto focus party in arena'],
 		checked = MY_Focus.bFocusJJCParty,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bFocusJJCParty = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Auto focus enemy in arena'],
 		checked = MY_Focus.bFocusJJCEnemy,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bFocusJJCEnemy = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Show focus\'s target'],
 		checked = MY_Focus.bShowTarget,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bShowTarget = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Hide dead object'],
 		checked = MY_Focus.bHideDeath,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bHideDeath = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Display kungfu icon instead of location'],
 		checked = MY_Focus.bDisplayKungfuIcon,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bDisplayKungfuIcon = bChecked
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -419,10 +419,10 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = wr,
 		text = _L['Sort by distance'],
 		checked = MY_Focus.bSortByDistance,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bSortByDistance = bChecked
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -431,33 +431,33 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = wr,
 		text = _L['Enable scene navi'],
 		checked = MY_Focus.bEnableSceneNavi,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bEnableSceneNavi = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Show tip at right bottom'],
 		checked = MY_Focus.bShowTipRB,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bShowTipRB = bChecked
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Heal healper'],
 		tip = _L['Select target when mouse enter'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		checked = MY_Focus.bHealHelper,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Focus.bHealHelper = bChecked
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	}):AutoWidth():Width() + 5
 
 	ui:Append('WndComboBox', {
@@ -467,7 +467,7 @@ function PS.OnPanelActive(wnd)
 				MY_Focus.szDistanceType = p.szType
 			end)
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	}):AutoWidth()
 
 	x = xr
@@ -475,40 +475,40 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		x = x, y = y, w = 150,
-		textfmt = function(val) return _L('Max display count %d.', val) end,
+		textFormatter = function(val) return _L('Max display count %d.', val) end,
 		range = {1, 20},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_Focus.nMaxDisplay,
-		onchange = function(val)
+		onChange = function(val)
 			MY_Focus.nMaxDisplay = val
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndTrackbar', {
 		x = x, y = y, w = 150,
-		textfmt = function(val) return _L('Current scale-x is %d%%.', val) end,
+		textFormatter = function(val) return _L('Current scale-x is %d%%.', val) end,
 		range = {10, 300},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_Focus.fScaleX * 100,
-		onchange = function(val)
+		onChange = function(val)
 			MY_Focus.fScaleX = val / 100
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 
 	ui:Append('WndTrackbar', {
 		x = x, y = y, w = 150,
-		textfmt = function(val) return _L('Current scale-y is %d%%.', val) end,
+		textFormatter = function(val) return _L('Current scale-y is %d%%.', val) end,
 		range = {10, 300},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_Focus.fScaleY * 100,
-		onchange = function(val)
+		onChange = function(val)
 			MY_Focus.fScaleY = val / 100
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
+		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	y = y + deltaY
 end

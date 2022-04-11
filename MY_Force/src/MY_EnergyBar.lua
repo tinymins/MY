@@ -552,7 +552,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			x = nX, y = nY,
 			text = _L['Enable MY_EnergyBar'],
 			checked = O.bEnable,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bEnable = bChecked
 				D.Apply()
 			end,

@@ -40,7 +40,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Official team frame style'],
 		group = 'CSS', checked = CFG.eFrameStyle == 'OFFICIAL',
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if not bChecked then
 				return
 			end
@@ -52,7 +52,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Cataclysm team frame style'],
 		group = 'CSS', checked = CFG.eFrameStyle == 'CATACLYSM',
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if not bChecked then
 				return
 			end
@@ -67,8 +67,8 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = CFG.fScaleX * 100,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		onchange = function(nVal)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		onChange = function(nVal)
 			nVal = nVal / 100
 			local nNewX, nNewY = nVal / CFG.fScaleX, CFG.fScaleY / CFG.fScaleY
 			CFG.fScaleX = nVal
@@ -76,7 +76,7 @@ function PS.OnPanelActive(frame)
 				MY_CataclysmParty:Scale(nNewX, nNewY)
 			end
 		end,
-		textfmt = function(val) return _L('%d%%', val) end,
+		textFormatter = function(val) return _L('%d%%', val) end,
 	}):Height()
 
 	x = nPaddingX + 10
@@ -85,8 +85,8 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = CFG.fScaleY * 100,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		onchange = function(nVal)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		onChange = function(nVal)
 			nVal = nVal / 100
 			local nNewX, nNewY = CFG.fScaleX / CFG.fScaleX, nVal / CFG.fScaleY
 			CFG.fScaleY = nVal
@@ -94,7 +94,7 @@ function PS.OnPanelActive(frame)
 				MY_CataclysmParty:Scale(nNewX, nNewY)
 			end
 		end,
-		textfmt = function(val) return _L('%d%%', val) end,
+		textFormatter = function(val) return _L('%d%%', val) end,
 	}):Height()
 
 	x = nPaddingX
@@ -105,7 +105,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Group Number'],
 		checked = CFG.bShowGroupNumber,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bShowGroupNumber = bCheck
 			MY_CataclysmMain.ReloadCataclysmPanel()
 		end,
@@ -117,14 +117,14 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 3,
 			range = {0, 255},
 			value = CFG.nAlpha,
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-			onchange = function(nVal)
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			onChange = function(nVal)
 				CFG.nAlpha = nVal
 				if MY_CataclysmMain.GetFrame() then
 					FireUIEvent('CTM_SET_ALPHA')
 				end
 			end,
-			textfmt = function(val) return _L('%d%%', val / 255 * 100) end,
+			textFormatter = function(val) return _L('%d%%', val / 255 * 100) end,
 		}):Height()
 	end
 
@@ -137,7 +137,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['One lines: 5/0'],
 		group = 'Arrangement', checked = CFG.nAutoLinkMode == 5,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if not bChecked then
 				return
 			end
@@ -152,7 +152,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 1/4'],
 		group = 'Arrangement', checked = CFG.nAutoLinkMode == 1,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if not bChecked then
 				return
 			end
@@ -167,7 +167,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 2/3'],
 		group = 'Arrangement', checked = CFG.nAutoLinkMode == 2,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if not bChecked then
 				return
 			end
@@ -182,7 +182,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 3/2'],
 		group = 'Arrangement', checked = CFG.nAutoLinkMode == 3,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if not bChecked then
 				return
 			end
@@ -197,7 +197,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Two lines: 4/1'],
 		group = 'Arrangement', checked = CFG.nAutoLinkMode == 4,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if not bChecked then
 				return
 			end

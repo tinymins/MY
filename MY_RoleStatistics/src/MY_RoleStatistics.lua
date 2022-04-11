@@ -357,8 +357,8 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = nW - 165, y = nY, w = 150, h = 38,
 		text = _L['Open panel'],
-		buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
-		onclick = D.Open,
+		buttonStyle = 'SKEUOMORPHISM_LACE_BORDER',
+		onClick = D.Open,
 	})
 
 	local aFloatEntry, aSaveDB = {}, {}
@@ -380,7 +380,7 @@ function PS.OnPanelActive(wnd)
 			nX = nX + ui:Append('WndCheckBox', {
 				x = nX, y = nY, w = 200,
 				text = p.szName, checked = X.Get(_G, p.szKey),
-				oncheck = function(bChecked)
+				onCheck = function(bChecked)
 					X.Set(_G, p.szKey, bChecked)
 				end,
 			}):AutoWidth():Width() + 5
@@ -397,7 +397,7 @@ function PS.OnPanelActive(wnd)
 			nX = nX + ui:Append('WndCheckBox', {
 				x = nX, y = nY, w = 200,
 				text = p.szName, checked = X.Get(_G, p.szKey),
-				oncheck = function(bChecked)
+				onCheck = function(bChecked)
 					X.Set(_G, p.szKey, bChecked)
 				end,
 			}):AutoWidth():Width() + 5
@@ -406,9 +406,9 @@ function PS.OnPanelActive(wnd)
 	end
 
 	nX = nPaddingX
-	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['Tips'], font = 27, multiline = true, valign = 0 })
+	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['Tips'], font = 27, multiline = true, alignVertical = 0 })
 	nY = nY + 30
 	nX = nPaddingX + 10
-	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['MY_RoleStatistics TIPS'], font = 27, multiline = true, valign = 0 })
+	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['MY_RoleStatistics TIPS'], font = 27, multiline = true, alignVertical = 0 })
 end
 X.RegisterPanel(_L['General'], 'MY_RoleStatistics', _L['MY_RoleStatistics'], 13491, PS)

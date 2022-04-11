@@ -128,7 +128,7 @@ function PS.OnPanelActive(wnd)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, text = _L['Enable'],
 		checked = O.bIdleOff,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bIdleOff = bChecked
 			IdleOff()
 		end,
@@ -136,15 +136,15 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		x = nX, y = nY, w = 150,
-		textfmt = function(val) return _L('Auto logoff when keep idle for %dmin.', val) end,
+		textFormatter = function(val) return _L('Auto logoff when keep idle for %dmin.', val) end,
 		range = {1, 1440},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nIdleOffTime,
-		onchange = function(val)
+		onChange = function(val)
 			O.nIdleOffTime = val
 			X.DelayCall('MY_LOGOFF_IDLE_TIME_CHANGE', 500, IdleOff)
 		end,
-		autoenable = function() return O.bIdleOff end,
+		autoEnable = function() return O.bIdleOff end,
 	})
 	nY = nY + 40
 
@@ -156,42 +156,42 @@ function PS.OnPanelActive(wnd)
 	nX = nPaddingX + 10
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, w = 120,
-		text = _L['Return to role list'], buttonstyle = 'FLAT',
-		onclick = function() Logoff(false) end,
+		text = _L['Return to role list'], buttonStyle = 'FLAT',
+		onClick = function() Logoff(false) end,
 	}):Width() + 5
 
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, w = 170,
-		text = _L['Return to role list while not fight'], buttonstyle = 'FLAT',
-		onclick = function() Logoff(false,true) end,
+		text = _L['Return to role list while not fight'], buttonStyle = 'FLAT',
+		onClick = function() Logoff(false,true) end,
 	}):Width() + 5
 
 	ui:Append('WndButton', {
 		x = nX, y = nY, w = 100,
-		text = _L['Hotkey setting'], buttonstyle = 'FLAT',
-		onclick = function() X.SetHotKey() end,
+		text = _L['Hotkey setting'], buttonStyle = 'FLAT',
+		onClick = function() X.SetHotKey() end,
 	})
 	nY = nY + 30
 
 	nX = nPaddingX + 10
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, w = 120,
-		text = _L['Return to game login'], buttonstyle = 'FLAT',
-		onclick = function() Logoff(true) end,
+		text = _L['Return to game login'], buttonStyle = 'FLAT',
+		onClick = function() Logoff(true) end,
 	}):Width() + 5
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, w = 170,
-		text = _L['Return to game login while not fight'], buttonstyle = 'FLAT',
-		onclick = function() Logoff(true,true) end,
+		text = _L['Return to game login while not fight'], buttonStyle = 'FLAT',
+		onClick = function() Logoff(true,true) end,
 	}):Width() + 5
 	nY = nY + 30
 
 	nX = nPaddingX
 	nY = nY + 20
-	ui:Append('Text', { x = nX, y = nY, w = nW - nX * 2, text = _L['Tips'], font = 27, multiline = true, valign = 0 })
+	ui:Append('Text', { x = nX, y = nY, w = nW - nX * 2, text = _L['Tips'], font = 27, multiline = true, alignVertical = 0 })
 	nY = nY + 30
 	nX = nPaddingX + 10
-	ui:Append('Text', { x = nX, y = nY, w = nW - nX * 2, text = _L['MY_Logoff TIPS'], font = 27, multiline = true, valign = 0 })
+	ui:Append('Text', { x = nX, y = nY, w = nW - nX * 2, text = _L['MY_Logoff TIPS'], font = 27, multiline = true, alignVertical = 0 })
 end
 X.RegisterPanel(_L['System'], 'Logoff', _L['Express logoff'], 'UI/Image/UICommon/LoginSchool.UITex|24', PS)
 

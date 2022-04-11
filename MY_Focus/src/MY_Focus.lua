@@ -910,7 +910,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 				group = 'judge_method',
 				text = _L.JUDGE_METHOD[eType],
 				checked = tData.szMethod == eType,
-				oncheck = function()
+				onCheck = function()
 					tData.szMethod = eType
 					onChangeNotify(tData)
 				end,
@@ -924,7 +924,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			x = nX, y = nY,
 			text = _L['All'],
 			checked = tData.tType.bAll,
-			oncheck = function()
+			onCheck = function()
 				tData.tType.bAll = not tData.tType.bAll
 				onChangeNotify(tData)
 			end,
@@ -934,11 +934,11 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 				x = nX, y = nY,
 				text = _L.TARGET[eType],
 				checked = tData.tType[eType],
-				oncheck = function()
+				onCheck = function()
 					tData.tType[eType] = not tData.tType[eType]
 					onChangeNotify(tData)
 				end,
-				autoenable = function() return not tData.tType.bAll end,
+				autoEnable = function() return not tData.tType.bAll end,
 			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		end
 		nX, nY = nPaddingX, nY + dY
@@ -950,7 +950,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 		x = nX, y = nY,
 		text = _L['All'],
 		checked = tData.tRelation.bAll,
-		oncheck = function()
+		onCheck = function()
 			tData.tRelation.bAll = not tData.tRelation.bAll
 			onChangeNotify(tData)
 		end,
@@ -960,11 +960,11 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 			x = nX, y = nY,
 			text = _L.RELATION[szRelation],
 			checked = tData.tRelation['b' .. szRelation],
-			oncheck = function()
+			onCheck = function()
 				tData.tRelation['b' .. szRelation] = not tData.tRelation['b' .. szRelation]
 				onChangeNotify(tData)
 			end,
-			autoenable = function() return not tData.tRelation.bAll end,
+			autoEnable = function() return not tData.tRelation.bAll end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	end
 	nX, nY = nPaddingX, nY + dY
@@ -975,7 +975,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 		x = nX, y = nY, w = 100, h = 25,
 		text = _L['Enable'],
 		checked = tData.tLife.bEnable,
-		oncheck = function()
+		onCheck = function()
 			tData.tLife.bEnable = not tData.tLife.bEnable
 			onChangeNotify(tData)
 		end,
@@ -989,17 +989,17 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 				onChangeNotify(tData)
 			end)
 		end,
-		autoenable = function() return tData.tLife.bEnable end,
+		autoEnable = function() return tData.tLife.bEnable end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	nX = ui:Append('WndEditBox', {
 		x = nX, y = nY, w = 100, h = 25,
 		text = tData.tLife.nValue,
-		onchange = function(szText)
+		onChange = function(szText)
 			local nValue = tonumber(szText) or 0
 			tData.tLife.nValue = nValue
 			onChangeNotify(tData)
 		end,
-		autoenable = function() return tData.tLife.bEnable end,
+		autoEnable = function() return tData.tLife.bEnable end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	nX, nY = nPaddingX, nY + dY
 	-- ◊Ó‘∂æ‡¿Î
@@ -1008,7 +1008,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	nX = ui:Append('WndEditBox', {
 		x = nX, y = nY, w = 200, h = 25,
 		text = tData.nMaxDistance,
-		onchange = function(szText)
+		onChange = function(szText)
 			local nValue = tonumber(szText) or 0
 			tData.nMaxDistance = nValue
 			onChangeNotify(tData)
@@ -1021,7 +1021,7 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	nX = ui:Append('WndEditBox', {
 		x = nX, y = nY, w = 200, h = 25,
 		text = tData.szDisplay,
-		onchange = function(szText)
+		onChange = function(szText)
 			tData.szDisplay = szText
 			onChangeNotify(tData)
 		end,
@@ -1032,8 +1032,8 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	ui:Append('WndButton', {
 		x = (W - 100) / 2, y = nY, w = 100,
 		text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			X.Confirm(_L['Sure to delete?'], function()
 				onChangeNotify()
 				ui:Remove()

@@ -223,12 +223,12 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Auto sell items'],
 		checked = O.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bEnable = bChecked
 			D.CheckEnable()
 		end,
 		tip = _L['Auto sell when open shop'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Width() + 5
 
 	-- 按类型出售
@@ -258,7 +258,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			}
 			return m0
 		end,
-		autoenable = function() return O.bEnable end,
+		autoEnable = function() return O.bEnable end,
 	}):Width() + 5
 
 	-- 按名称出售
@@ -304,7 +304,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			table.insert(m1, m2)
 			return m1
 		end,
-		autoenable = function() return O.bEnable end,
+		autoEnable = function() return O.bEnable end,
 	}):Width() + 5
 
 	-- 保护不被出售的物品
@@ -350,7 +350,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			table.insert(m1, m2)
 			return m1
 		end,
-		autoenable = function() return O.bEnable end,
+		autoEnable = function() return O.bEnable end,
 	}):Width() + 5
 
 	return nX, nY

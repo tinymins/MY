@@ -69,7 +69,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 		name = 'WndEditBox_Name',
 		x = x + 60, y = y, w = 200, h = 25,
 		multiline = false, text = szName or note.szName or '',
-		onchange = function(szName)
+		onChange = function(szName)
 			local rec = MY_Anmerkungen.GetPlayerNote(szName) or {}
 			local info = MY_Farbnamen and MY_Farbnamen.GetAusName(szName)
 			if info and rec.dwID ~= info.dwID then
@@ -128,7 +128,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 		name = 'WndButton_Submit',
 		x = x + 58, y = y, w = 80,
 		text = _L['sure'],
-		onclick = function()
+		onClick = function()
 			MY_Anmerkungen.SetPlayerNote(
 				ui:Children('#WndEditBox_ID'):Text(),
 				ui:Children('#WndEditBox_Name'):Text(),
@@ -142,13 +142,13 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	ui:Append('WndButton', {
 		x = x + 143, y = y, w = 80,
 		text = _L['cancel'],
-		onclick = function() ui:Remove() end,
+		onClick = function() ui:Remove() end,
 	})
 	ui:Append('Text', {
 		x = x + 230, y = y - 3, w = 80, alpha = 200,
 		text = _L['Delete'], color = {255,0,0},
-		onhover = function(bIn) UI(this):Alpha((bIn and 255) or 200) end,
-		onclick = function()
+		onHover = function(bIn) UI(this):Alpha((bIn and 255) or 200) end,
+		onClick = function()
 			MY_Anmerkungen.SetPlayerNote(ui:Children('#WndEditBox_ID'):Text())
 			ui:Remove()
 		end,
@@ -401,8 +401,8 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = x, y = y, w = 110,
 		text = _L['Create'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			MY_Anmerkungen.OpenPlayerNoteEditPanel()
 		end,
 	})
@@ -411,8 +411,8 @@ function PS.OnPanelActive(wnd)
 		ui:Append('WndButton', {
 			x = w - 230, y = y, w = 110,
 			text = _L['Import'],
-			buttonstyle = 'FLAT',
-			onclick = function()
+			buttonStyle = 'FLAT',
+			onClick = function()
 				GetUserInput(_L['Please input import data:'], function(szVal)
 					local config = X.DecodeLUAData(szVal)
 					if config and config.server and config.public and config.private then
@@ -481,8 +481,8 @@ function PS.OnPanelActive(wnd)
 		ui:Append('WndButton', {
 			x = w - 110, y = y, w = 110,
 			text = _L['Export'],
-			buttonstyle = 'FLAT',
-			onclick = function()
+			buttonStyle = 'FLAT',
+			onClick = function()
 				UI.OpenTextEditor(X.EncodeLUAData({
 					server   = X.GetRealServer(),
 					publici  = PUBLIC_PLAYER_IDS,
@@ -498,7 +498,7 @@ function PS.OnPanelActive(wnd)
 	local list = ui:Append('WndListBox', {
 		x = x, y = y,
 		w = w, h = h - 30,
-		listbox = {{
+		listBox = {{
 			'onlclick',
 			function(szID, szText, data, bSelected)
 				MY_Anmerkungen.OpenPlayerNoteEditPanel(data.dwID, data.szName)

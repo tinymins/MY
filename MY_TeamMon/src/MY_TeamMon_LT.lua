@@ -153,7 +153,7 @@ function PS.OnPanelActive(frame)
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 13, text = '',
 		range = {1, 2, 10}, value = O.fScale,
-		onchange = function(nVal)
+		onChange = function(nVal)
 			O.fScale = nVal
 			ui:Children('#Text_Preview'):Font(O.dwFontScheme):scale(O.fScale)
 		end,
@@ -163,7 +163,7 @@ function PS.OnPanelActive(frame)
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0.5, 3, 25}, value = O.fPause,
-		onchange = function(nVal)
+		onChange = function(nVal)
 			O.fPause = nVal
 		end,
 	}):Pos('BOTTOMRIGHT')
@@ -172,7 +172,7 @@ function PS.OnPanelActive(frame)
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0, 3, 30}, value = O.fFadeOut,
-		onchange = function(nVal)
+		onChange = function(nVal)
 			O.fFadeOut = nVal
 		end,
 	}):Pos('BOTTOMRIGHT')
@@ -181,8 +181,8 @@ function PS.OnPanelActive(frame)
 	nX = ui:Append('WndButton', {
 		x = nPaddingX + 10, y = nY + 5,
 		text = g_tStrings.FONT,
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			UI.OpenFontPicker(function(nFont)
 				O.dwFontScheme = nFont
 				ui:Children('#Text_Preview'):Font(O.dwFontScheme):scale(O.fScale)
@@ -192,8 +192,8 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndButton', {
 		x = nX + 10, y = nY + 5,
 		text = _L['Preview'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			D.UpdateText(_L['PVE everyday, Xuanjing everyday!'])
 		end,
 	})

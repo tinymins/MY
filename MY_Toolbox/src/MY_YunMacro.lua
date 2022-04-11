@@ -54,7 +54,7 @@ function D.Hook()
 		x = nX, y = nY,
 		w = 'auto', h = edtName:GetH(),
 		text = _L['Sync yun macro'],
-		onclick = function()
+		onClick = function()
 			local szName = X.TrimString(edtName:GetText())
 			if X.IsEmpty(szName) then
 				return X.Alert(_L['Please input macro name first.'])
@@ -107,7 +107,7 @@ function D.Hook()
 		x = nX, y = nY,
 		w = 'auto', h = edtName:GetH(),
 		text = _L['Show yun macro details'],
-		onclick = function()
+		onClick = function()
 			local szName = X.TrimString(edtName:GetText())
 			if X.IsEmpty(szName) then
 				return X.Alert(_L['Please input macro name first.'])
@@ -126,7 +126,7 @@ function D.Hook()
 		x = edtMacro:GetRelX(), y = btnNew:GetRelY(),
 		w = btnNew:GetW(), h = btnNew:GetH(),
 		text = _L['Top yun macro'],
-		onclick = function()
+		onClick = function()
 			local szURL = 'https://page.j3cx.com/macro/tops?'
 				.. X.EncodeQuerystring(X.ConvertToUTF8({
 					l = ENVIRONMENT.GAME_LANG,
@@ -178,7 +178,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			x = nX, y = nY, w = 'auto',
 			text = _L['Show yun macro buttons on macro panel.'],
 			checked = MY_YunMacro.bEnable,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_YunMacro.bEnable = bChecked
 			end,
 		}):Width() + 5

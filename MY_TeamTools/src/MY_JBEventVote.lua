@@ -205,13 +205,13 @@ function D.UpdateEvent(frame)
 					ui:Append('WndButton', {
 						name = 'Btn_Info',
 						x = 860, y = 3, w = 100, h = 25,
-						buttonstyle = 'LINK',
+						buttonStyle = 'LINK',
 						text = _L['View Detail'],
 					})
 					local btn = ui:Append('WndButton', {
 						name = 'Btn_Vote',
 						x = 960, y = 3, w = 80, h = 25,
-						buttonstyle = 'SKEUOMORPHISM',
+						buttonStyle = 'SKEUOMORPHISM',
 					})
 					if bInTime and not bVoted then
 						btn:Text(_L['Vote'])
@@ -384,9 +384,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		nX = nPaddingX + 10
 		nX = nX + ui:Append('WndButton', {
 			x = nX, y = nY, w = 'auto',
-			buttonstyle = 'FLAT',
+			buttonStyle = 'FLAT',
 			text = _L['MY_JBEventVote'],
-			onclick = function()
+			onClick = function()
 				D.Open()
 			end,
 		}):Width() + 5

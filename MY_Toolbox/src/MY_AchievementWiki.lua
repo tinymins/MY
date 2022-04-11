@@ -165,9 +165,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Achievement wiki'],
 		tip = _L['Click icon on achievemnt panel to view achievement wiki'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		checked = MY_AchievementWiki.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_AchievementWiki.bEnable = bChecked
 		end,
 	}):Width() + 5

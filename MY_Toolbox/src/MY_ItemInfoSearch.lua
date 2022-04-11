@@ -227,7 +227,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = nW - nX, h = 25,
 		text = SEARCH,
 		placeholder = _L['Please input item name or item index number'],
-		onchange = function(szSearch)
+		onChange = function(szSearch)
 			X.DelayCall('MY_ItemInfoSearch', 200, function()
 				D.Search(szSearch,
 					function(fPer)
@@ -253,7 +253,7 @@ function PS.OnPanelActive(wnd)
 
 	list = ui:Append('WndListBox', {
 		x = nX, y = nY, w = nW - nX, h = nH - nY,
-		listbox = {
+		listBox = {
 			{
 				'onhover',
 				function(id, text, data)

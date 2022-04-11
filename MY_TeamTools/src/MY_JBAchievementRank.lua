@@ -275,11 +275,11 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nX, y = nY,
 		checked = MY_JBAchievementRank.bEnable,
 		text = _L['Share boss kill'],
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_JBAchievementRank.bEnable = bChecked
 		end,
 		tip = _L['Share boss kill record for kill rank.'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 	}):AutoWidth():Width() + 5
 
 	nX = nX + ui:Append('Text', {

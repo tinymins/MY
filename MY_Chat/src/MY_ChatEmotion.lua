@@ -81,7 +81,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 250,
 		text = _L['Resize emotion'],
 		checked = O.bFixSize,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bFixSize = bChecked
 		end,
 	}):AutoWidth():Width() + 5
@@ -89,12 +89,12 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 100, h = 25,
 		value = O.nSize,
 		range = {1, 300},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		textfmt = function(v) return _L('Size: %d', v) end,
-		onchange = function(val)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textFormatter = function(v) return _L('Size: %d', v) end,
+		onChange = function(val)
 			O.nSize = val
 		end,
-		autoenable = function() return O.bFixSize end,
+		autoEnable = function() return O.bFixSize end,
 	})
 	nY = nY + nLH
 

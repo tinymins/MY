@@ -168,7 +168,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		text = _L['MY_SocialRequest'],
 		menu = D.GetMenu,
 		tip = _L['Optimize social friend request'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Width() + 5
 
 	nX = nPaddingX
@@ -225,16 +225,16 @@ function R.Drawer(container, info)
 	ui:Append('WndButton', {
 		name = 'Btn_Accept',
 		x = 326, y = 9, w = 60, h = 34,
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		text = _L['Add'],
-		onclick = D.OnLButtonClick,
+		onClick = D.OnLButtonClick,
 	})
 	ui:Append('WndButton', {
 		name = 'Btn_Refuse',
 		x = 393, y = 9, w = 60, h = 34,
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		text = _L['Ignore'],
-		onclick = D.OnLButtonClick,
+		onClick = D.OnLButtonClick,
 	})
 
 	return wnd

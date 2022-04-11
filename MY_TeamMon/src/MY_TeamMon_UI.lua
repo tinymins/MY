@@ -147,7 +147,7 @@ function D.OnFrameCreate()
 	ui:Append('WndButton', {
 		x = 900, y = 52, w = 140, h = 27,
 		text = g_tStrings.SYS_MENU,
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonStyle = 'FLAT_LACE_BORDER',
 		menu = function()
 			local menu = {}
 			table.insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
@@ -172,10 +172,10 @@ function D.OnFrameCreate()
 	})
 	-- debug
 	if X.IsDebugClient(true) then
-		ui:Append('WndButton', { text = 'Reload', x = 10, y = 10, onclick = ReloadUIAddon })
+		ui:Append('WndButton', { text = 'Reload', x = 10, y = 10, onClick = ReloadUIAddon })
 		ui:Append('WndButton', {
 			name = 'On', text = 'Enable', x = 110, y = 10, enable = not MY_TeamMon.bEnable,
-			onclick = function()
+			onClick = function()
 				MY_TeamMon.bEnable = true
 				this:Enable(false)
 				ui:Children('#Off'):Enable(true)
@@ -183,7 +183,7 @@ function D.OnFrameCreate()
 		})
 		ui:Append('WndButton', {
 			name = 'Off', text = 'Disable', x = 210, y = 10, enable = MY_TeamMon.bEnable,
-			onclick = function()
+			onClick = function()
 				MY_TeamMon.bEnable = false
 				this:Enable(false)
 				ui:Children('#On'):Enable(true)
@@ -193,7 +193,7 @@ function D.OnFrameCreate()
 	local uiPageSetMain = ui:Children('#PageSet_Main')
 	uiPageSetMain:Append('WndCheckBox', {
 		x = 575, y = 40, checked = MY_TMUI_GLOBAL_SEARCH, text = _L['Global search'],
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_TMUI_GLOBAL_SEARCH = bCheck
 			FireUIEvent('MY_TMUI_TEMP_RELOAD')
 			FireUIEvent('MY_TMUI_DATA_RELOAD')
@@ -202,8 +202,8 @@ function D.OnFrameCreate()
 	uiPageSetMain:Append('WndButton', {
 		x = 920, y = 40,
 		text = _L['Clear record'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			X.Confirm(_L['Confirm?'], function()
 				MY_TeamMon.ClearTemp(MY_TMUI_SELECT_TYPE)
 			end)
@@ -881,9 +881,9 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 	nX, nY = ui:Append('WndButton', {
 		x = nX + 5, y = nY,
 		text = _L['Browse'],
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		enable = not szDefault,
-		onclick = function()
+		onClick = function()
 			local szFile = GetOpenFileName(
 				_L['please select data file.'],
 				'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
@@ -901,28 +901,28 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 		x = 25, y = nY,
 		text = _L['Cover'],
 		group = 'type', checked = true,
-		oncheck = function()
+		onCheck = function()
 			szMode = 'REPLACE'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndRadioBox', {
 		x = nX + 5, y = nY,
 		text = _L['Merge priority new file'], group = 'type',
-		oncheck = function()
+		onCheck = function()
 			szMode = 'MERGE_OVERWRITE'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndRadioBox', {
 		x = nX + 5, y = nY,
 		text = _L['Merge priority old file'], group = 'type',
-		oncheck = function()
+		onCheck = function()
 			szMode = 'MERGE_SKIP'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
-		buttonstyle = 'FLAT_LACE_BORDER',
-		onclick = function()
+		buttonStyle = 'FLAT_LACE_BORDER',
+		onClick = function()
 			local szFileName = szDefault or ui:Children('#FilePtah'):Text()
 			local aType      = {}
 			for k, v in ipairs(MY_TMUI_TYPE) do
@@ -986,7 +986,7 @@ function D.OpenExportPanel()
 		x = 25, y = nY, w = 500, h = 25,
 		text = szAuthor,
 		limit = 6,
-		onchange = function(szText)
+		onChange = function(szText)
 			szAuthor = X.TrimString(szText)
 		end,
 	}):Pos('BOTTOMRIGHT')
@@ -996,7 +996,7 @@ function D.OpenExportPanel()
 	nX, nY = ui:Append('WndEditBox', {
 		x = 25, y = nY, w = 500, h = 25,
 		text = szFileName,
-		onchange = function(szText)
+		onChange = function(szText)
 			szFileName = szText
 		end,
 	}):Pos('BOTTOMRIGHT')
@@ -1007,7 +1007,7 @@ function D.OpenExportPanel()
 		x = 25, y = nY,
 		text = _L['Lua encrypted'], group = 'type',
 		checked = true,
-		oncheck = function()
+		onCheck = function()
 			szFormat = 'LUA_ENCRYPTED'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -1015,7 +1015,7 @@ function D.OpenExportPanel()
 		x = nX + 5, y = nY,
 		text = _L['Lua plain'], group = 'type',
 		checked = false,
-		oncheck = function()
+		onCheck = function()
 			szFormat = 'LUA'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -1023,7 +1023,7 @@ function D.OpenExportPanel()
 		x = nX + 5, y = nY,
 		text = _L['Lua formated'], group = 'type',
 		checked = false,
-		oncheck = function()
+		onCheck = function()
 			szFormat = 'LUA_FORMATED'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -1031,7 +1031,7 @@ function D.OpenExportPanel()
 		x = nX + 5, y = nY,
 		text = _L['JSON'], group = 'type',
 		checked = false,
-		oncheck = function()
+		onCheck = function()
 			szFormat = 'JSON'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -1039,14 +1039,14 @@ function D.OpenExportPanel()
 		x = nX + 5, y = nY,
 		text = _L['JSON formated'], group = 'type',
 		checked = false,
-		oncheck = function()
+		onCheck = function()
 			szFormat = 'JSON_FORMATED'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
-		buttonstyle = 'FLAT_LACE_BORDER',
-		onclick = function()
+		buttonStyle = 'FLAT_LACE_BORDER',
+		onClick = function()
 			local aType = {}
 			for _, v in ipairs(MY_TMUI_TYPE) do
 				if ui:Children('#' .. v):Check() then
@@ -1375,7 +1375,7 @@ function D.OpenAddPanel(szType, data)
 	else
 		nX, nY = ui:Append('Box', {
 			name = 'Box_Icon', w = 48, h = 48, x = 166, y = 40, icon = nIcon,
-			image = 'ui/Image/TargetPanel/Target.uitex', imageframe = data.nFrame,
+			image = 'ui/Image/TargetPanel/Target.uitex', imageFrame = data.nFrame,
 		}):Pos('BOTTOMRIGHT')
 	end
 	ui:Children('#Box_Icon'):Hover(function(bHover)
@@ -1394,7 +1394,7 @@ function D.OpenAddPanel(szType, data)
 			and MY_TeamMon.GetMapName(MY_TMUI_SELECT_MAP)
 			or MY_TeamMon.GetMapName(data.dwMapID),
 		autocomplete = {{'option', 'source', X.GetMapNameList()}},
-		onchange = function()
+		onChange = function()
 			local el = this
 			local ui = UI(el)
 			if ui:Text() == '' then
@@ -1416,8 +1416,8 @@ function D.OpenAddPanel(szType, data)
 	}):Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 120, y = nY + 40, text = _L['Add'],
-		buttonstyle = 'FLAT_LACE_BORDER',
-		onclick = function()
+		buttonStyle = 'FLAT_LACE_BORDER',
+		onClick = function()
 			local txt = ui:Children('#map'):Text()
 			local map = MY_TeamMon.GetMapInfo(txt)
 			if not map then
@@ -1454,7 +1454,7 @@ function D.OpenJsonPanel(data, fnAction)
 		color = { 255, 255, 0 },
 		text = X.EncodeLUAData(data, '\t'),
 		multiline = true, limit = 999999,
-		onchange = function()
+		onChange = function()
 			local code = ui:Children('#CODE')
 			local dat  = X.DecodeLUAData(code:Text())
 			if dat then
@@ -1467,8 +1467,8 @@ function D.OpenJsonPanel(data, fnAction)
 	ui:Append('WndButton',{
 		x = 30, y = 440,
 		text = g_tStrings.STR_HOTKEY_SURE,
-		buttonstyle = 'FLAT_LACE_BORDER',
-		onclick = function()
+		buttonStyle = 'FLAT_LACE_BORDER',
+		onClick = function()
 			X.Confirm(_L['Confirm?'], function()
 				local dat = X.DecodeLUAData(ui:Children('#CODE'):Text())
 				if fnAction and dat then
@@ -1752,7 +1752,7 @@ function D.OpenSettingPanel(data, szType)
 	else
 		nX, nY = ui:Append('Box', {
 			name = 'Box_Icon', w = 48, h = 48, x = 361, y = 40, icon = nIcon,
-			image = 'ui/Image/TargetPanel/Target.uitex', imageframe = data.nFrame,
+			image = 'ui/Image/TargetPanel/Target.uitex', imageFrame = data.nFrame,
 		}):Pos('BOTTOMRIGHT')
 	end
 	ui:Children('#Box_Icon'):Hover(function(bHover)
@@ -1783,8 +1783,8 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Buffcount achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndEditBox', {
 			x = nX + 2, y = nY + 2, w = 30, h = 26,
-			text = data.nCount or 1, edittype = UI.EDIT_TYPE.NUMBER,
-			onchange = function(nNum)
+			text = data.nCount or 1, editType = UI.EDIT_TYPE.NUMBER,
+			onChange = function(nNum)
 				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
 					data.nCount = nil
@@ -1793,7 +1793,7 @@ function D.OpenSettingPanel(data, szType)
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = data.bCheckLevel, text = _L['Check level'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				data.bCheckLevel = bCheck and true or nil
 				FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 			end,
@@ -1809,41 +1809,41 @@ function D.OpenSettingPanel(data, szType)
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bTeamChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.BUFF_GET, 'bBigFontAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 		end
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			oncheck = function(bCheck)
+			tip = _L['Requires MY_LifeBar loaded.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_FS') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.BUFF_GET, 'bFullScreen', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -1852,19 +1852,19 @@ function D.OpenSettingPanel(data, szType)
 
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bPartyBuffList, text = _L['Party buff list'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bPartyBuffList', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bBuffList, text = _L['Buff list'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bBuffList', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bTeamPanel, text = _L['Team panel'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bTeamPanel', bCheck)
 				ui:Children('#bOnlySelfSrc'):Enable(bCheck)
 				FireUIEvent('MY_TM_CREATE_CACHE')
@@ -1873,7 +1873,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('WndCheckBox', {
 			name = 'bOnlySelfSrc',
 			x = nX + 5, y = nY, checked = cfg.bOnlySelfSrc, text = _L['Only source self'], enable = cfg.bTeamPanel == true,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bOnlySelfSrc', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -1882,7 +1882,7 @@ function D.OpenSettingPanel(data, szType)
 		if not X.IsRestricted('MY_TeamMon.AutoSelect') then
 			local _ui = ui:Append('WndCheckBox', {
 				x = 30, y = nY, checked = cfg.bSelect, text = _L['Auto Select'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.BUFF_GET, 'bSelect', bCheck)
 				end,
 			}):AutoWidth()
@@ -1890,7 +1890,7 @@ function D.OpenSettingPanel(data, szType)
 			if szType == 'BUFF' then
 				nX, nY = ui:Append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bAutoCancel, text = _L['Auto Cancel Buff'],
-					oncheck = function(bCheck)
+					onCheck = function(bCheck)
 						SetDataClass(MY_TM_TYPE.BUFF_GET, 'bAutoCancel', bCheck)
 					end,
 				}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -1903,26 +1903,26 @@ function D.OpenSettingPanel(data, szType)
 		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Lose buff'], font = 27 }):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_LOSE, 'bTeamChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_LOSE, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_LOSE, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.BUFF_LOSE, 'bBigFontAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -1944,14 +1944,14 @@ function D.OpenSettingPanel(data, szType)
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = data.bCheckLevel, text = _L['Check level'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				data.bCheckLevel = bCheck and true or nil
 				FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = data.bMonTarget, text = _L['Show target name'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				data.bMonTarget = bCheck and true or nil
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -1966,32 +1966,32 @@ function D.OpenSettingPanel(data, szType)
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.SKILL_END, 'bTeamChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.SKILL_END, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.SKILL_END, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.SKILL_END, 'bBigFontAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.SKILL_END, 'bFullScreen', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2010,41 +2010,41 @@ function D.OpenSettingPanel(data, szType)
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 			nX = ui:Append('WndCheckBox', {
 				x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bTeamChannel', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bWhisperChannel', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bCenterAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 			if not X.IsRestricted('MY_TeamMon_LT') then
 				nX = ui:Append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
-					oncheck = function(bCheck)
+					onCheck = function(bCheck)
 						SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bBigFontAlarm', bCheck)
 					end,
 				}):AutoWidth():Pos('BOTTOMRIGHT')
 			end
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-				tip = _L['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-				oncheck = function(bCheck)
+				tip = _L['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bScreenHead', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 			if not X.IsRestricted('MY_TeamMon_FS') then
 				nX = ui:Append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
-					oncheck = function(bCheck)
+					onCheck = function(bCheck)
 						SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bFullScreen', bCheck)
 					end,
 				}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2063,8 +2063,8 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Count achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndEditBox', {
 			x = nX + 2, y = nY + 2, w = 30, h = 26,
-			text = data.nCount or 1, edittype = UI.EDIT_TYPE.NUMBER,
-			onchange = function(nNum)
+			text = data.nCount or 1, editType = UI.EDIT_TYPE.NUMBER,
+			onChange = function(nNum)
 				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
 					data.nCount = nil
@@ -2073,7 +2073,7 @@ function D.OpenSettingPanel(data, szType)
 		}):Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = data.bAllLeave, text = _L['Must all leave scene'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				data.bAllLeave = bCheck and true or nil
 				if bCheck then
 					ui:Children('#NPC_LEAVE_TEXT'):Text(_L['All leave scene'])
@@ -2093,41 +2093,41 @@ function D.OpenSettingPanel(data, szType)
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bTeamChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bBigFontAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 		end
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			oncheck = function(bCheck)
+			tip = _L['Requires MY_LifeBar loaded.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_FS') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bFullScreen', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2140,26 +2140,26 @@ function D.OpenSettingPanel(data, szType)
 		local cfg = data[MY_TM_TYPE.NPC_LEAVE] or {}
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bTeamChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bBigFontAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2175,8 +2175,8 @@ function D.OpenSettingPanel(data, szType)
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Count achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndEditBox', {
-			x = nX + 2, y = nY + 2, w = 30, h = 26, text = data.nCount or 1, edittype = UI.EDIT_TYPE.NUMBER,
-			onchange = function(nNum)
+			x = nX + 2, y = nY + 2, w = 30, h = 26, text = data.nCount or 1, editType = UI.EDIT_TYPE.NUMBER,
+			onChange = function(nNum)
 				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
 					data.nCount = nil
@@ -2185,7 +2185,7 @@ function D.OpenSettingPanel(data, szType)
 		}):Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = data.bAllLeave, text = _L['Must all leave scene'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				data.bAllLeave = bCheck and true or nil
 				if bCheck then
 					ui:Children('#DOODAD_LEAVE_TEXT'):Text(_L['All leave scene'])
@@ -2198,41 +2198,41 @@ function D.OpenSettingPanel(data, szType)
 		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Enter scene'], font = 27 }):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bTeamChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bBigFontAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 		end
 			-- nX = ui:Append('WndCheckBox', {
 			-- 	x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			-- 	tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			-- 	oncheck = function(bCheck)
+			-- 	tip = _L['Requires MY_LifeBar loaded.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			-- 	onCheck = function(bCheck)
 			-- 		SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
 			-- 	end,
 			-- }):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_FS') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bFullScreen', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2245,26 +2245,26 @@ function D.OpenSettingPanel(data, szType)
 		local cfg = data[MY_TM_TYPE.DOODAD_LEAVE] or {}
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bTeamChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bBigFontAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2274,7 +2274,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Alert content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY + 8, text = data.szNote, w = 650, h = 25,
-			onchange = function(text)
+			onChange = function(text)
 				local szText = X.TrimString(text)
 				if szText == '' then
 					data.szNote = nil
@@ -2283,12 +2283,12 @@ function D.OpenSettingPanel(data, szType)
 				end
 			end,
 			tip = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Speaker'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY + 8, text = data.szTarget or _L['Warning box'], w = 650, h = 25,
-			onchange = function(text)
+			onChange = function(text)
 				local szText = X.TrimString(text)
 				if szText == '' or szText == _L['Warning box'] then
 					data.szTarget = nil
@@ -2301,7 +2301,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		_, nY = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY + 8, text = data.szContent, w = 650, h = 55, multiline = true,
-			onchange = function(text)
+			onChange = function(text)
 				data.szContent = X.TrimString(text)
 				FireUIEvent('MY_TM_CREATE_CACHE')
 			end,
@@ -2309,18 +2309,18 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 540, y = nY + 3, w = 50,
-			text = _L['Partical search'], tip = _L['Supports match partical.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			text = _L['Partical search'], tip = _L['Supports match partical.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 			checked = data.bSearch,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				data.bSearch = bCheck
 				FireUIEvent('MY_TM_CREATE_CACHE')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = 640, y = nY + 3, w = 50,
-			text = _L['Regexp match'], tip = _L['Supports backreference in note string, format: ${index}.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			text = _L['Regexp match'], tip = _L['Supports backreference in note string, format: ${index}.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 			checked = data.bReg,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				data.bReg = bCheck
 				FireUIEvent('MY_TM_CREATE_CACHE')
 			end,
@@ -2329,41 +2329,41 @@ function D.OpenSettingPanel(data, szType)
 		local cfg = data[MY_TM_TYPE.TALK_MONITOR] or {}
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY + 10, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bTeamChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY + 10, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bBigFontAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 		end
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			oncheck = function(bCheck)
+			tip = _L['Requires MY_LifeBar loaded.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_FS') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bFullScreen', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2373,7 +2373,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Alert content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY + 8, text = data.szNote, w = 650, h = 25,
-			onchange = function(text)
+			onChange = function(text)
 				local szText = X.TrimString(text)
 				if szText == '' then
 					data.szNote = nil
@@ -2382,12 +2382,12 @@ function D.OpenSettingPanel(data, szType)
 				end
 			end,
 			tip = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Chat content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		_, nY = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY + 8, text = data.szContent, w = 650, h = 85, multiline = true,
-			onchange = function(text)
+			onChange = function(text)
 				data.szContent = text:gsub('\r', '')
 				FireUIEvent('MY_TM_CREATE_CACHE')
 			end,
@@ -2395,18 +2395,18 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 540, y = nY + 3, w = 50,
-			text = _L['Partical search'], tip = _L['Supports match partical.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			text = _L['Partical search'], tip = _L['Supports match partical.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 			checked = data.bSearch,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				data.bSearch = bCheck
 				FireUIEvent('MY_TM_CREATE_CACHE')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = 640, y = nY + 3, w = 50,
-			text = _L['Regexp match'], tip = _L['Supports backreference in note string, format: ${index}.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			text = _L['Regexp match'], tip = _L['Supports backreference in note string, format: ${index}.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 			checked = data.bReg,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				data.bReg = bCheck
 				FireUIEvent('MY_TM_CREATE_CACHE')
 			end,
@@ -2415,41 +2415,41 @@ function D.OpenSettingPanel(data, szType)
 		local cfg = data[MY_TM_TYPE.CHAT_MONITOR] or {}
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY + 10, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bTeamChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY + 10, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_LT') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bBigFontAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 		end
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-			oncheck = function(bCheck)
+			tip = _L['Requires MY_LifeBar loaded.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		if not X.IsRestricted('MY_TeamMon_FS') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bFullScreen', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2461,7 +2461,7 @@ function D.OpenSettingPanel(data, szType)
 		nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['Add content'], font = 27 }):Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndEditBox', {
 			x = 30, y = nY, text = data.szNote, w = 650, h = 25, limit = 10,
-			onchange = function(text)
+			onChange = function(text)
 				local szText = X.TrimString(text)
 				if szText == '' then
 					data.szNote = nil
@@ -2571,14 +2571,14 @@ function D.OpenSettingPanel(data, szType)
 				end
 				return szTip
 			end,
-			tippostype = UI.TIP_POSITION.LEFT_RIGHT,
-			tiprichtext = true,
+			tipPosType = UI.TIP_POSITION.LEFT_RIGHT,
+			tipRichText = true,
 		}):Pos('BOTTOMRIGHT')
 		-- 图标
 		nX = ui:Append('Box', {
 			x = nX + 5, y = nY, w = 24, h = 24, icon = v.nIcon or nIcon,
-			onhover = function(bHover) this:SetObjectMouseOver(bHover) end,
-			onclick = function()
+			onHover = function(bHover) this:SetObjectMouseOver(bHover) end,
+			onClick = function()
 				local box = this
 				UI.OpenIconPicker(function(nIcon)
 					v.nIcon = nIcon
@@ -2589,18 +2589,18 @@ function D.OpenSettingPanel(data, szType)
 		-- 队伍频道报警
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY - 2, text = _L['TC'], color = GetMsgFontColor('MSG_TEAM', true), checked = v.bTeamChannel,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				v.bTeamChannel = bCheck and true or nil
 			end,
 			tip = _L['Raid talk warning'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		-- 普通倒计时时间/分段倒计时
 		ui:Append('WndEditBox', {
 			name = 'CountdownTime' .. k,
 			x = nX + 5, y = nY, w = 100, h = 25,
 			text = v.nTime, color = (v.nClass ~= MY_TM_TYPE.NPC_LIFE and not CheckCountdown(v.nTime)) and { 255, 0, 0 },
-			onchange = function(szNum)
+			onChange = function(szNum)
 				v.nTime = tonumber(szNum) or szNum
 				local edit = ui:Children('#CountdownTime' .. k)
 				if szNum == '' then
@@ -2646,41 +2646,41 @@ function D.OpenSettingPanel(data, szType)
 				end
 				return _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called']
 			end,
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		})
 		-- 普通倒计时文本
 		nX = ui:Append('WndEditBox', {
 			name = 'CountdownName' .. k,
 			x = nX + 5 + 100 + 5, y = nY, w = 295, h = 25, text = v.szName,
-			onchange = function(szName)
+			onChange = function(szName)
 				v.szName = szName
 			end,
 			tip = _L['Simple countdown text'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 			placeholder = _L['Please input simple countdown text...'],
 		}):Pos('BOTTOMRIGHT')
 		-- 重复调用时间限制
 		nX = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY, w = 30, h = 25,
-			text = v.nRefresh, edittype = UI.EDIT_TYPE.NUMBER,
-			onchange = function(szNum)
+			text = v.nRefresh, editType = UI.EDIT_TYPE.NUMBER,
+			onChange = function(szNum)
 				v.nRefresh = tonumber(szNum)
 			end,
 			tip = _L['Max repeat time\n\nWhen countdown get trigger again, the last countdown may get overwritten. This config is to sovle this problem, input time limit here to ensure in this time period, countdown will not be trigger again.'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		}):Pos('BOTTOMRIGHT')
 		-- 删除按钮
 		nX, nY = ui:Append('Image', {
 			x = nX + 5, y = nY, w = 26, h = 26,
-			image = file, imageframe = 86,
-			onhover = function(bIn)
+			image = file, imageFrame = 86,
+			onHover = function(bIn)
 				if bIn then
 					this:SetFrame(87)
 				else
 					this:SetFrame(86)
 				end
 			end,
-			onclick = function()
+			onClick = function()
 				if v.nClass ~= -1 then
 					local nClass = v.key and MY_TM_TYPE.COMMON or v.nClass
 					if data.dwID then
@@ -2704,9 +2704,9 @@ function D.OpenSettingPanel(data, szType)
 	nX = ui:Append('WndButton', {
 		x = 30, y = nY + 10,
 		text = _L['Add countdown'],
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		enable = not (data.tCountdown and #data.tCountdown > 10),
-		onclick = function()
+		onClick = function()
 			if not data.tCountdown then
 				data.tCountdown = {}
 			end
@@ -2733,7 +2733,7 @@ function D.OpenSettingPanel(data, szType)
 			nX = ui:Append('WndCheckBox', {
 				x = nX, y = nY, w = 160, h = 25, text = _L['Only my employer'],
 				checked = data.bDrawOnlyMyEmployer,
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					data.bDrawOnlyMyEmployer = bCheck and true or nil
 					FireUIEvent('MY_TM_CC_RELOAD')
 				end,
@@ -2742,7 +2742,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = 160, h = 25, text = _L['Draw line'],
 			checked = data.bDrawLine,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				data.bDrawLine = bCheck and true or nil
 				FireUIEvent('MY_TM_CC_RELOAD')
 			end,
@@ -2751,7 +2751,7 @@ function D.OpenSettingPanel(data, szType)
 			nX = ui:Append('WndCheckBox', {
 				x = nX, y = nY, w = 160, h = 25, text = _L['Only when stare me'],
 				checked = data.bDrawLineOnlyStareMe,
-				oncheck = function(bCheck)
+				onCheck = function(bCheck)
 					data.bDrawLineOnlyStareMe = bCheck and true or nil
 					FireUIEvent('MY_TM_CC_RELOAD')
 				end,
@@ -2760,7 +2760,7 @@ function D.OpenSettingPanel(data, szType)
 		nX, nY = ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = 160, h = 25, text = _L['Draw name'],
 			checked = data.bDrawName,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				data.bDrawName = bCheck and true or nil
 				FireUIEvent('MY_TM_CC_RELOAD')
 			end,
@@ -2772,7 +2772,7 @@ function D.OpenSettingPanel(data, szType)
 				nX = ui:Append('Shadow', {
 					x = 35, y = nY + 3, w = 23, h = 23,
 					color = circle.col,
-					onclick = function()
+					onClick = function()
 						local ui = UI(this)
 						UI.OpenColorPicker(function(r, g, b)
 							ui:Color(r, g, b)
@@ -2782,24 +2782,24 @@ function D.OpenSettingPanel(data, szType)
 					end,
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndEditBox', {
-					x = nX + 5, y = nY + 2, w = 80, h = 26, text = circle.nAngle, edittype = UI.EDIT_TYPE.NUMBER,
-					onchange = function(nNum)
+					x = nX + 5, y = nY + 2, w = 80, h = 26, text = circle.nAngle, editType = UI.EDIT_TYPE.NUMBER,
+					onChange = function(nNum)
 						circle.nAngle = tonumber(nNum) or 80
 						FireUIEvent('MY_TM_CC_RELOAD')
 					end,
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Degree'] }):AutoWidth():Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndEditBox', {
-					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nRadius, edittype = UI.EDIT_TYPE.NUMBER,
-					onchange = function(nNum)
+					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nRadius, editType = UI.EDIT_TYPE.NUMBER,
+					onChange = function(nNum)
 						circle.nRadius = tonumber(nNum) or 4
 						FireUIEvent('MY_TM_CC_RELOAD')
 					end,
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Meter'] }):AutoWidth():Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndEditBox', {
-					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nAlpha, edittype = UI.EDIT_TYPE.NUMBER,
-					onchange = function(nNum)
+					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nAlpha, editType = UI.EDIT_TYPE.NUMBER,
+					onChange = function(nNum)
 						circle.nAlpha = tonumber(nNum)
 						FireUIEvent('MY_TM_CC_RELOAD')
 					end,
@@ -2809,7 +2809,7 @@ function D.OpenSettingPanel(data, szType)
 					x = nX + 10, y = nY + 1,
 					text = _L['Draw Border'],
 					checked = circle.bBorder,
-					oncheck = function(bChecked)
+					onCheck = function(bChecked)
 						circle.bBorder = bChecked
 						FireUIEvent('MY_TM_CC_RELOAD')
 					end,
@@ -2817,14 +2817,14 @@ function D.OpenSettingPanel(data, szType)
 				nX = ui:Append('Image', {
 					x = nX + 5, y = nY + 1,
 					w = 26, h = 26,
-					onhover = function(bIn)
+					onHover = function(bIn)
 						if bIn then
 							this:SetFrame(87)
 						else
 							this:SetFrame(86)
 						end
 					end,
-					onclick = function()
+					onClick = function()
 						if #data.aCircle == 1 then
 							data.aCircle = nil
 						else
@@ -2833,7 +2833,7 @@ function D.OpenSettingPanel(data, szType)
 						FireUIEvent('MY_TM_CC_RELOAD')
 						D.OpenSettingPanel(data, szType)
 					end,
-					image = file, imageframe = 86,
+					image = file, imageFrame = 86,
 				}):Pos('BOTTOMRIGHT')
 				nY = nY + CHECKBOX_HEIGHT
 			end
@@ -2841,9 +2841,9 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('WndButton', {
 			x = 30, y = nY + 10,
 			text = _L['Add circle'],
-			buttonstyle = 'FLAT',
+			buttonStyle = 'FLAT',
 			enable = not (data.aCircle and #data.aCircle > 10),
-			onclick = function()
+			onClick = function()
 				if not data.aCircle then
 					data.aCircle = {}
 				end
@@ -2868,8 +2868,8 @@ function D.OpenSettingPanel(data, szType)
 				nX = nX + ui:Append('WndButton', {
 					x = nX, y = nY, w = 100,
 					text = MY_Focus.FormatRuleText(p, true),
-					buttonstyle = 'FLAT',
-					onclick = function()
+					buttonStyle = 'FLAT',
+					onClick = function()
 						local ui = UI(this)
 						MY_Focus.OpenRuleEditor(p, function(dat)
 							if dat then
@@ -2900,8 +2900,8 @@ function D.OpenSettingPanel(data, szType)
 			nX = ui:Append('WndButton', {
 				x = nX, y = nY, w = 100,
 				text = _L['Add focus'],
-				buttonstyle = 'FLAT',
-				onclick = function()
+				buttonStyle = 'FLAT',
+				onClick = function()
 					if not data.aFocus then
 						data.aFocus = {}
 					end
@@ -2922,8 +2922,8 @@ function D.OpenSettingPanel(data, szType)
 				nX = nX + ui:Append('WndButton', {
 					x = nX, y = nY, w = 100,
 					text = MY_Cataclysm.EncodeBuffRule(p, true),
-					buttonstyle = 'FLAT',
-					onclick = function()
+					buttonStyle = 'FLAT',
+					onClick = function()
 						local ui = UI(this)
 						MY_Cataclysm.OpenBuffRuleEditor(p, function(dat)
 							if dat then
@@ -2954,8 +2954,8 @@ function D.OpenSettingPanel(data, szType)
 			nX = ui:Append('WndButton', {
 				x = nX, y = nY, w = 100,
 				text = _L['Add buff rule'],
-				buttonstyle = 'FLAT',
-				onclick = function()
+				buttonStyle = 'FLAT',
+				onClick = function()
 					if not data.aCataclysmBuff then
 						data.aCataclysmBuff = {}
 					end
@@ -2969,16 +2969,16 @@ function D.OpenSettingPanel(data, szType)
 	end
 	-- nX = ui:Append('WndButton', {
 	-- 	x = 640, y = nY + 10, text = g_tStrings.HELP_PANEL,
-	-- 	buttonstyle = 'FLAT',
-	-- 	onclick = function()
+	-- 	buttonStyle = 'FLAT',
+	-- 	onClick = function()
 	-- 		OpenInternetExplorer('https://github.com/luckyyyyy/JH/blob/master/JH_DBM/README.md')
 	-- 	end,
 	-- }):Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 335, y = nY + 10,
 		text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			X.Confirm(_L['Sure to delete?'], function()
 				D.RemoveData(data.dwMapID, data.nIndex, szName or _L['This data'])
 			end)

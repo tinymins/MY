@@ -181,7 +181,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['chat mosaics (mosaics names in chat panel)'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatMosaics.bEnabled,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			MY_ChatMosaics.bEnabled = bCheck
 			D.ResetMosaics()
 		end,
@@ -192,7 +192,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['no mosaics on my own name'],
 		x = x, y = y, w = 400,
 		checked = O.bIgnoreOwnName,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bIgnoreOwnName = bCheck
 			D.ResetMosaics()
 		end,
@@ -204,7 +204,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
 		checked = O.nMosaicsMode == 1,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			if bCheck then
 				O.nMosaicsMode = 1
 				D.ResetMosaics()
@@ -218,7 +218,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
 		checked = O.nMosaicsMode == 2,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			if bCheck then
 				O.nMosaicsMode = 2
 				D.ResetMosaics()
@@ -232,7 +232,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
 		checked = O.nMosaicsMode == 3,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			if bCheck then
 				O.nMosaicsMode = 3
 				D.ResetMosaics()
@@ -246,7 +246,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 400,
 		group = 'PART_MOSAICS',
 		checked = O.nMosaicsMode == 4,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			if bCheck then
 				O.nMosaicsMode = 4
 				D.ResetMosaics()
@@ -259,7 +259,7 @@ function PS.OnPanelActive(wnd)
 		placeholder = _L['mosaics character'],
 		x = x, y = y, w = w - 2 * x, h = 25,
 		text = D.szMosaics,
-		onchange = function(szText)
+		onChange = function(szText)
 			if szText == '' then
 				D.szMosaics = _L.MOSAICS_CHAR
 			else
@@ -280,7 +280,7 @@ function PS.OnPanelActive(wnd)
 			end
 			table.concat(t, ',')
 		end)(),
-		onchange = function(szText)
+		onChange = function(szText)
 			local tIgnoreNames = {}
 			for _, szName in ipairs(X.SplitString(szText, ',')) do
 				tIgnoreNames[szName] = true

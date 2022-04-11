@@ -42,7 +42,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY,
 		text = _L['Show target direction'],
 		checked = MY_TargetDirection.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_TargetDirection.bEnable = bChecked
 		end,
 	}):AutoWidth():Width()
@@ -63,7 +63,7 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY,
 			text = _L['Display the line from self to target'],
 			checked = MY_TargetLine.bTarget,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_TargetLine.bTarget = bChecked
 			end,
 		}):AutoWidth():Width()
@@ -72,7 +72,7 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY,
 			text = _L['New style'],
 			checked = MY_TargetLine.bTargetRL,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_TargetLine.bTargetRL = bChecked
 			end,
 		}):AutoWidth():Width() + 10
@@ -80,20 +80,20 @@ function PS.OnPanelActive(wnd)
 		nX = nX + ui:Append('Shadow', {
 			x = nX + 2, y = nY + 4, w = 18, h = 18,
 			color = MY_TargetLine.tTargetColor,
-			onclick = function()
+			onClick = function()
 				local ui = UI(this)
 				UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
 					MY_TargetLine.tTargetColor = { r, g, b }
 				end)
 			end,
-			autoenable = function() return not MY_TargetLine.bTargetRL end,
+			autoEnable = function() return not MY_TargetLine.bTargetRL end,
 		}):Width() + 5
 
 		nX = nX + ui:Append('Text', {
 			x = nX, y = nY - 2,
 			text = _L['Change color'],
-			autoenable = function() return not MY_TargetLine.bTargetRL end,
+			autoEnable = function() return not MY_TargetLine.bTargetRL end,
 		}):AutoWidth():Width()
 
 		nX, nY = nPaddingX + 10, nY + nLH
@@ -101,7 +101,7 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY,
 			text = _L['Display the line target self to target target'],
 			checked = MY_TargetLine.bTTarget,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_TargetLine.bTTarget = bChecked
 			end,
 		}):AutoWidth():Width()
@@ -110,7 +110,7 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY,
 			text = _L['New style'],
 			checked = MY_TargetLine.bTTargetRL,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_TargetLine.bTTargetRL = bChecked
 			end,
 		}):AutoWidth():Width() + 10
@@ -118,43 +118,43 @@ function PS.OnPanelActive(wnd)
 		nX = nX + ui:Append('Shadow', {
 			x = nX + 2, y = nY + 4, w = 18, h = 18,
 			color = MY_TargetLine.tTTargetColor,
-			onclick = function()
+			onClick = function()
 				local ui = UI(this)
 				UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
 					MY_TargetLine.tTTargetColor = { r, g, b }
 				end)
 			end,
-			autoenable = function() return not MY_TargetLine.bTTargetRL end,
+			autoEnable = function() return not MY_TargetLine.bTTargetRL end,
 		}):Width() + 5
 
 		nX = nX + ui:Append('Text', {
 			x = nX, y = nY - 2,
 			text = _L['Change color'],
-			autoenable = function() return not MY_TargetLine.bTTargetRL end,
+			autoEnable = function() return not MY_TargetLine.bTTargetRL end,
 		}):AutoWidth():Width()
 
 		nX, nY = nPaddingX + 37, nY + nLH
 		nX = nX + ui:Append('Text', {
 			text = _L['Line width'], x = nX, y = nY,
-			autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
+			autoEnable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 		}):AutoWidth():Width()
 
 		ui:Append('WndTrackbar', {
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetLine.nLineWidth,
 			range = {1, 5},
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-			textfmt = function(val) return _L('%d px', val) end,
-			onchange = function(val) MY_TargetLine.nLineWidth = val end,
-			autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			textFormatter = function(val) return _L('%d px', val) end,
+			onChange = function(val) MY_TargetLine.nLineWidth = val end,
+			autoEnable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 		})
 		nX = nX + 180
 		nX = nX + ui:Append('WndRadioBox', {
 			x = nX, y = nY, w = 100, h = 25, group = 'line postype',
 			text = _L['From head to head'],
 			checked = MY_TargetLine.bAtHead,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				if not bChecked then
 					return
 				end
@@ -166,23 +166,23 @@ function PS.OnPanelActive(wnd)
 		nX, nY = nPaddingX + 37, nY + nLH
 		nX = nX + ui:Append('Text', {
 			text = _L['Line alpha'], x = nX, y = nY,
-			autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
+			autoEnable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 		}):AutoWidth():Width()
 
 		ui:Append('WndTrackbar', {
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetLine.nLineAlpha,
 			range = {1, 255},
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-			onchange = function(val) MY_TargetLine.nLineAlpha = val end,
-			autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			onChange = function(val) MY_TargetLine.nLineAlpha = val end,
+			autoEnable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 		})
 		nX = nX + 180
 		nX = nX + ui:Append('WndRadioBox', {
 			x = nX, y = nY, w = 100, h = 25, group = 'line postype',
 			text = _L['From foot to foot'],
 			checked = not MY_TargetLine.bAtHead,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				if not bChecked then
 					return
 				end
@@ -198,7 +198,7 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY,
 			text = _L['Display the sector of target facing, change color'],
 			checked = MY_TargetFace.bTargetFace,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_TargetFace.bTargetFace = bChecked
 			end,
 		}):AutoWidth():Width()
@@ -206,7 +206,7 @@ function PS.OnPanelActive(wnd)
 		ui:Append('Shadow', {
 			x = nX + 2, y = nY + 2, w = 18, h = 18,
 			color = MY_TargetFace.tTargetFaceColor,
-			onclick = function()
+			onClick = function()
 				local ui = UI(this)
 				UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
@@ -221,7 +221,7 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY,
 			text = _L['Display the sector of target target facing, change color'],
 			checked = MY_TargetFace.bTTargetFace,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_TargetFace.bTTargetFace = bChecked
 			end,
 		}):AutoWidth():Width()
@@ -229,7 +229,7 @@ function PS.OnPanelActive(wnd)
 		ui:Append('Shadow', {
 			x = nX + 2, y = nY + 2, w = 18, h = 18,
 			color = MY_TargetFace.tTTargetFaceColor,
-			onclick = function()
+			onClick = function()
 				local ui = UI(this)
 				UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
@@ -245,9 +245,9 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetFace.nSectorDegree,
 			range = {30, 180},
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-			textfmt = function(val) return _L('%d degree', val) end,
-			onchange = function(val) MY_TargetFace.nSectorDegree = val end,
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			textFormatter = function(val) return _L('%d degree', val) end,
+			onChange = function(val) MY_TargetFace.nSectorDegree = val end,
 		})
 
 		nX, nY = nPaddingX + 37, nY + nLH
@@ -257,9 +257,9 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetFace.nSectorRadius,
 			range = {1, 26},
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-			textfmt = function(val) return _L('%d feet', val) end,
-			onchange = function(val) MY_TargetFace.nSectorRadius = val end,
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			textFormatter = function(val) return _L('%d feet', val) end,
+			onChange = function(val) MY_TargetFace.nSectorRadius = val end,
 		})
 
 		nX, nY = nPaddingX + 37, nY + nLH
@@ -269,9 +269,9 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = math.ceil((200 - MY_TargetFace.nSectorAlpha) / 2),
 			range = {0, 100},
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-			textfmt = function(val) return _L('%d %%', val) end,
-			onchange = function(val) MY_TargetFace.nSectorAlpha = (100 - val) * 2 end,
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			textFormatter = function(val) return _L('%d %%', val) end,
+			onChange = function(val) MY_TargetFace.nSectorAlpha = (100 - val) * 2 end,
 		})
 
 		-- foot shape
@@ -280,13 +280,13 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY,
 			text = _L['Display the foot shape of target, change color'],
 			checked = MY_TargetFace.bTargetShape,
-			oncheck = function(bChecked) MY_TargetFace.bTargetShape = bChecked end,
+			onCheck = function(bChecked) MY_TargetFace.bTargetShape = bChecked end,
 		}):AutoWidth():Width()
 
 		ui:Append('Shadow', {
 			x = nX + 2, y = nY + 2, w = 18, h = 18,
 			color = MY_TargetFace.tTargetShapeColor,
-			onclick = function()
+			onClick = function()
 				local ui = UI(this)
 				UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
@@ -300,13 +300,13 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY,
 			text = _L['Display the foot shape of target target, change color'],
 			checked = MY_TargetFace.bTTargetShape,
-			oncheck = function(bChecked) MY_TargetFace.bTTargetShape = bChecked end,
+			onCheck = function(bChecked) MY_TargetFace.bTTargetShape = bChecked end,
 		}):AutoWidth():Width()
 
 		ui:Append('Shadow', {
 			x = nX + 2, y = nY + 2, w = 18, h = 18,
 			color = MY_TargetFace.tTTargetShapeColor,
-			onclick = function()
+			onClick = function()
 				local ui = UI(this)
 				UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
@@ -322,9 +322,9 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetFace.nShapeRadius,
 			range = {1, 26},
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-			textfmt = function(val) return _L('%.1f feet', val / 2) end,
-			onchange = function(val) MY_TargetFace.nShapeRadius = val end,
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			textFormatter = function(val) return _L('%.1f feet', val / 2) end,
+			onChange = function(val) MY_TargetFace.nShapeRadius = val end,
 		})
 
 		nX, nY = nPaddingX + 37, nY + nLH
@@ -334,9 +334,9 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = math.ceil((200 - MY_TargetFace.nShapeAlpha) / 2),
 			range = {0, 100},
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-			textfmt = function(val) return _L('%d %%', val) end,
-			onchange = function(val) MY_TargetFace.nShapeAlpha = (100 - val) * 2 end,
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			textFormatter = function(val) return _L('%d %%', val) end,
+			onChange = function(val) MY_TargetFace.nShapeAlpha = (100 - val) * 2 end,
 		})
 	end
 end

@@ -285,8 +285,8 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Text(_L['GKP Golden Team Record']):Anchor('CENTER')
 	ui:Append('WndButton', {
 		x = 955, y = 54, w = 20, h = 20,
-		buttonstyle = 'OPTION',
-		onclick = function()
+		buttonStyle = 'OPTION',
+		onClick = function()
 			X.ShowPanel()
 			X.FocusPanel()
 			X.SwitchTab('MY_GKP')
@@ -295,8 +295,8 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_AddManually',
 		x = 20, y = 660, w = 120, text = _L['Add Manually'],
-		buttonstyle = 'FLAT_LACE_BORDER',
-		onclick = function()
+		buttonStyle = 'FLAT_LACE_BORDER',
+		onClick = function()
 			if not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then -- debug
 				return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
@@ -309,8 +309,8 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_Calculate',
 		x = nX, y = 620, w = 120, text = g_tStrings.GOLD_TEAM_SYLARY_LIST,
-		buttonstyle = 'FLAT_LACE_BORDER',
-		onclick = function()
+		buttonStyle = 'FLAT_LACE_BORDER',
+		onClick = function()
 			local ds = this:GetRoot().ds
 			local me = GetClientPlayer()
 			if not me.IsInParty() and not X.IsDebugClient('MY_GKP') then
@@ -422,8 +422,8 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'GOLD_TEAM_BID_LIST',
 		x = nX, y = 660, w = 120, text = g_tStrings.GOLD_TEAM_BID_LIST,
-		buttonstyle = 'FLAT_LACE_BORDER',
-		onclick = function()
+		buttonStyle = 'FLAT_LACE_BORDER',
+		onClick = function()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
@@ -465,8 +465,8 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Debt',
 		x = nX, y = 660, w = 120, text = _L['Debt Issued'],
-		buttonstyle = 'FLAT_LACE_BORDER',
-		onclick = function()
+		buttonStyle = 'FLAT_LACE_BORDER',
+		onClick = function()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
@@ -535,8 +535,8 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_ClearRecord',
 		x = nX, y = 660, w = 120, text = _L['Clear Record'],
-		buttonstyle = 'FLAT_LACE_BORDER',
-		onclick = function()
+		buttonStyle = 'FLAT_LACE_BORDER',
+		onClick = function()
 			local fnAction = function()
 				MY_GKP_MI.NewDS()
 			end
@@ -548,7 +548,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_HistoryRecord',
 		x = nX, y = 660, w = 120, text = _L['History record'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonStyle = 'FLAT_LACE_BORDER',
 		menu = function()
 			local menu = {}
 			local aFiles = MY_GKP.GetHistoryFiles()
@@ -596,10 +596,10 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_SyncRecord',
 		x = nX, y = 660, w = 120, text = _L['Manual SYNC'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonStyle = 'FLAT_LACE_BORDER',
 		tip = _L['Left click to sync from others, right click to sync to others'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-		lmenu = function()
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		menuLClick = function()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
@@ -618,7 +618,7 @@ function MY_GKP_UI.OnFrameCreate()
 				X.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
 		end,
-		rmenu = function()
+		menuRClick = function()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
@@ -653,7 +653,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_SetCaption',
 		x = nX, y = 660, w = 120, text = _L['Set record caption'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonStyle = 'FLAT_LACE_BORDER',
 		menu = function()
 			local ds = this:GetRoot().ds
 			GetUserInput(_L['Please input new caption'],function(szText)
@@ -669,7 +669,7 @@ function MY_GKP_UI.OnFrameCreate()
 	ui:Append('WndButton', {
 		name = 'Btn_SetHistory',
 		x = nX, y = 660, w = 120, text = _L['Set current record'],
-		buttonstyle = 'FLAT_LACE_BORDER',
+		buttonStyle = 'FLAT_LACE_BORDER',
 		menu = function()
 			local frame = this:GetRoot()
 			X.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()

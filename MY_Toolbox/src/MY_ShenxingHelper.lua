@@ -285,9 +285,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Avoid blacking shenxing cd'],
 		tip = _L['Got zhenyan wen shenxing, your shengxing will be blacked.'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		checked = MY_ShenxingHelper.bAvoidBlackCD,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_ShenxingHelper.bAvoidBlackCD = bChecked
 		end,
 	}):Width() + 5
@@ -297,7 +297,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			x = nX, y = nY, w = 'auto',
 			text = _L['Shenxing to ancient maps'],
 			checked = MY_ShenxingHelper.bAncientMap,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_ShenxingHelper.bAncientMap = bChecked
 			end,
 		}):Width() + 5
@@ -306,9 +306,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			x = nX, y = nY, w = 'auto',
 			text = _L['Force open all map shenxing'],
 			tip = _L['Shenxing can fly to undiscovered maps'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 			checked = MY_ShenxingHelper.bOpenAllMap,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_ShenxingHelper.bOpenAllMap = bChecked
 			end,
 		}):Width() + 5

@@ -308,18 +308,18 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Visual skill'],
 		checked = MY_VisualSkill.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_VisualSkill.bEnable = bChecked
 		end,
 	}):Width() + 5
 
 	ui:Append('WndTrackbar', {
 		x = nX, y = nY,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = {1, 32},
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = {1, 32},
 		value = MY_VisualSkill.nVisualSkillBoxCount,
 		text = _L('Display %d skills.', MY_VisualSkill.nVisualSkillBoxCount),
-		textfmt = function(val) return _L('Display %d skills.', val) end,
-		onchange = function(val)
+		textFormatter = function(val) return _L('Display %d skills.', val) end,
+		onChange = function(val)
 			MY_VisualSkill.nVisualSkillBoxCount = val
 		end,
 	})

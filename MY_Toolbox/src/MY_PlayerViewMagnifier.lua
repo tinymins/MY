@@ -49,7 +49,7 @@ local function onFrameCreate()
 		ui:Append(PLUGIN_ROOT .. '/ui/Btn_MagnifierUp.ini:WndButton', {
 			name = 'Btn_MY_MagnifierUp',
 			x = config.x, y = config.y, w = config.w, h = config.h,
-			onclick = function()
+			onClick = function()
 				nOriX, nOriY = ui:Pos()
 				nOriW, nOriH = ui:Size()
 				Fullscreen()
@@ -61,7 +61,7 @@ local function onFrameCreate()
 		ui:Append(X.PACKET_INFO.ROOT .. 'MY_Toolbox/ui/Btn_MagnifierDown.ini:WndButton', {
 			name = 'Btn_MY_MagnifierDown',
 			x = config.x, y = config.y, w = config.w, h = config.h, visible = false,
-			onclick = function()
+			onClick = function()
 				local nCW, nCH = ui:Size()
 				local fCoefficient = nOriW / nCW
 				frame:Scale(fCoefficient, fCoefficient)

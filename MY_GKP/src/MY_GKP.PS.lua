@@ -151,8 +151,8 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = nW - 165, y = nPaddingY, w = 150, h = 38,
 		text = _L['Open Panel'],
-		buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
-		onclick = MY_GKP_MI.OpenPanel,
+		buttonStyle = 'SKEUOMORPHISM_LACE_BORDER',
+		onClick = MY_GKP_MI.OpenPanel,
 	})
 
 	nX, nY, nLFY = MY_GKPLoot.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLineHeightM, nX, nY, nLFY)
@@ -165,7 +165,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Popup Record for Distributor'], checked = MY_GKP.bOn,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_GKP.bOn = bChecked
 		end,
 	})
@@ -174,7 +174,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Clause with 0 Gold as Record'], checked = MY_GKP.bDisplayEmptyRecords,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_GKP.bDisplayEmptyRecords = bChecked
 		end,
 	})
@@ -183,7 +183,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
 		color = { 255, 128, 0 } , text = _L['Show Gold Brick'], checked = MY_GKP.bShowGoldBrick,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_GKP.bShowGoldBrick = bChecked
 		end,
 	})
@@ -192,7 +192,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Remind Wipe Data When Enter Dungeon'], checked = MY_GKP.bAlertMessage,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_GKP.bAlertMessage = bChecked
 		end,
 	})
@@ -201,7 +201,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 250,
 		text = _L['Automatic Reception with Record From Distributor'], checked = MY_GKP.bAutoSync,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_GKP.bAutoSync = bChecked
 		end,
 	})
@@ -210,7 +210,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 250,
 		text = _L['Sync system reception'], checked = MY_GKP.bSyncSystem,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_GKP.bSyncSystem = bChecked
 		end,
 	})
@@ -219,7 +219,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 250,
 		text = _L['Prefer use new bidding panel'], checked = MY_GKP.bNewBidding,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_GKP.bSyncSystem = bChecked
 		end,
 	})
@@ -237,7 +237,7 @@ function PS.OnPanelActive(wnd)
 	nX = nX + 10
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 150, checked = MY_GKP.bMoneySystem, text = _L['Track Money Trend in the System'],
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_GKP.bMoneySystem = bChecked
 		end,
 	})
@@ -247,7 +247,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Enable Money Trend'],
 		checked = MY_GKP.bMoneyTalk,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_GKP.bMoneyTalk = bChecked
 		end,
 	}):Width() + 5
@@ -256,10 +256,10 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Money trend only distributor'],
 		checked = MY_GKP.bMoneyTalkOnlyDistributor,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_GKP.bMoneyTalkOnlyDistributor = bChecked
 		end,
-		autoenable = function() return MY_GKP.bMoneyTalk end,
+		autoEnable = function() return MY_GKP.bMoneyTalk end,
 	}):Width() + 5
 	nY = nY + 28
 end

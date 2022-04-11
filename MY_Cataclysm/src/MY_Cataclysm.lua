@@ -642,7 +642,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		x = x + ui:Append('WndEditBox', {
 			x = x, y = y, w = 105, h = 25,
 			text = rec.dwID or rec.szName,
-			onchange = function(text)
+			onChange = function(text)
 				if tonumber(text) then
 					rec.dwID = tonumber(text)
 					rec.szName = nil
@@ -661,8 +661,8 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		x = x + ui:Append('WndEditBox', {
 			x = x, y = y, w = 60, h = 25,
 			placeholder = _L['No limit'],
-			edittype = UI.EDIT_TYPE.NUMBER, text = rec.nLevel,
-			onchange = function(text)
+			editType = UI.EDIT_TYPE.NUMBER, text = rec.nLevel,
+			onChange = function(text)
 				rec.nLevel = tonumber(text)
 				onChangeNotify(rec)
 			end,
@@ -707,9 +707,9 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	x = x + ui:Append('WndEditBox', {
 		name = 'WndEditBox_StackNum',
 		x = x, y = y, w = 30, h = 25,
-		edittype = UI.EDIT_TYPE.NUMBER,
+		editType = UI.EDIT_TYPE.NUMBER,
 		text = rec.nStackNum,
-		onchange = function(text)
+		onChange = function(text)
 			rec.nStackNum = tonumber(text)
 			if rec.nStackNum then
 				if not rec.szStackOp then
@@ -725,7 +725,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		x = x, y = y - 10,
 		text = _L['Only mine'],
 		checked = rec.bOnlyMine,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			rec.bOnlyMine = bChecked
 			onChangeNotify(rec)
 		end,
@@ -734,7 +734,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		x = x, y = y + 10,
 		text = _L['Only me'],
 		checked = rec.bOnlyMe,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			rec.bOnlyMe = bChecked
 			onChangeNotify(rec)
 		end,
@@ -749,7 +749,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 			x = x, y = y,
 			text = _L['Hide (Can Modify Default Data)'],
 			checked = rec.bDelete,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				rec.bDelete = bChecked
 				onChangeNotify(rec)
 			end,
@@ -762,41 +762,41 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	x = x + ui:Append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Reminder'],
-		autoenable = function() return not rec.bDelete end,
+		autoEnable = function() return not rec.bDelete end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndEditBox', {
 		x = x, y = y, w = 30, h = 25,
 		text = rec.szReminder,
-		onchange = function(text)
+		onChange = function(text)
 			rec.szReminder = text
 			onChangeNotify(rec)
 		end,
-		autoenable = function() return not rec.bDelete end,
+		autoEnable = function() return not rec.bDelete end,
 	}):Width() + 5
 	x = x + ui:Append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Priority'],
-		autoenable = function() return not rec.bDelete end,
+		autoEnable = function() return not rec.bDelete end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndEditBox', {
 		x = x, y = y, w = 40, h = 25,
-		edittype = UI.EDIT_TYPE.NUMBER,
+		editType = UI.EDIT_TYPE.NUMBER,
 		text = rec.nPriority,
-		onchange = function(text)
+		onChange = function(text)
 			rec.nPriority = tonumber(text)
 			onChangeNotify(rec)
 		end,
-		autoenable = function() return not rec.bDelete end,
+		autoEnable = function() return not rec.bDelete end,
 	}):Width() + 5
 	x = x + ui:Append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Color'],
-		autoenable = function() return not rec.bDelete end,
+		autoEnable = function() return not rec.bDelete end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('Shadow', {
 		x = x, y = y + 2, w = 22, h = 22,
 		color = rec.col and {X.HumanColor2RGB(rec.col)} or {255, 255, 0},
-		onlclick = function()
+		onLClick = function()
 			local this = this
 			UI.OpenColorPicker(function(r, g, b)
 				local a = rec.col and select(4, X.Hex2RGB(rec.col)) or 255
@@ -806,19 +806,19 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 				onChangeNotify(rec)
 			end)
 		end,
-		onrclick = function()
+		onRClick = function()
 			UI(this):Color(255, 255, 0)
 			rec.col = nil
 			onChangeNotify(rec)
 		end,
 		tip = _L['Left click to change color, right click to clear color'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-		autoenable = function() return not rec.bDelete end,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		autoEnable = function() return not rec.bDelete end,
 	}):Width() + 5
 	x = x + ui:Append('Shadow', {
 		x = x, y = y + 2, w = 22, h = 22,
 		color = rec.colScreenHead and {X.HumanColor2RGB(rec.colScreenHead)} or {255, 255, 0},
-		onlclick = function()
+		onLClick = function()
 			local this = this
 			UI.OpenColorPicker(function(r, g, b)
 				rec.colScreenHead = X.RGB2Hex(r, g, b)
@@ -826,14 +826,14 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 				onChangeNotify(rec)
 			end)
 		end,
-		onrclick = function()
+		onRClick = function()
 			UI(this):Color(255, 255, 0)
 			rec.colScreenHead = nil
 			onChangeNotify(rec)
 		end,
 		tip = _L['Left click to change screen head color, right click to clear color'],
-		tippostype = ALW.TOP_BOTTOM,
-		autoenable = function() return not rec.bDelete end,
+		tipPosType = ALW.TOP_BOTTOM,
+		autoEnable = function() return not rec.bDelete end,
 	}):Width() + 5
 	y = y + 30
 
@@ -841,14 +841,14 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	x = x + ui:Append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Border alpha'],
-		autoenable = function() return not rec.bDelete end,
+		autoEnable = function() return not rec.bDelete end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndTrackbar', {
 		x = x, y = y, text = '',
 		range = {0, 255},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = rec.col and select(4, X.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
-		onchange = function(nVal)
+		onChange = function(nVal)
 			if rec.col then
 				local r, g, b = X.Hex2RGB(rec.col)
 				if r and g and b then
@@ -858,7 +858,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 			rec.nColAlpha = nVal
 			onChangeNotify(rec)
 		end,
-		autoenable = function() return not rec.bDelete end,
+		autoEnable = function() return not rec.bDelete end,
 	}):AutoWidth():Width() + 5
 	y = y + 30
 
@@ -867,40 +867,40 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		x = x, y = y,
 		text = _L['Attention'],
 		checked = rec.bAttention,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			rec.bAttention = bChecked
 			onChangeNotify(rec)
 		end,
-		autoenable = function() return not rec.bDelete end,
+		autoEnable = function() return not rec.bDelete end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Caution'],
 		checked = rec.bCaution,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			rec.bCaution = bChecked
 			onChangeNotify(rec)
 		end,
-		autoenable = function() return not rec.bDelete end,
+		autoEnable = function() return not rec.bDelete end,
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Screen Head'],
 		checked = rec.bScreenHead,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			rec.bScreenHead = bChecked
 			onChangeNotify(rec)
 		end,
 		tip = _L['Requires MY_LifeBar loaded.'],
-		autoenable = function() return not rec.bDelete end,
+		autoEnable = function() return not rec.bDelete end,
 	}):AutoWidth():Width() + 5
 
 	y = y + 50
 	ui:Append('WndButton', {
 		x = (w - 120) / 2, y = y, w = 120,
 		text = _L['Delete'], color = {223, 63, 95},
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			local function fnAction()
 				onChangeNotify()
 				ui:Remove()

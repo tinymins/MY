@@ -584,30 +584,30 @@ function R.Drawer(container, info)
 	ui:Append('WndButton', {
 		name = 'Btn_Accept',
 		x = 240, y = 9, w = 60, h = 34,
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		text = g_tStrings.STR_ACCEPT,
-		onclick = D.OnLButtonClick,
+		onClick = D.OnLButtonClick,
 	})
 	ui:Append('WndButton', {
 		name = 'Btn_Refuse',
 		x = 305, y = 9, w = 60, h = 34,
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		text = g_tStrings.STR_REFUSE,
-		onclick = D.OnLButtonClick,
+		onClick = D.OnLButtonClick,
 	})
 	ui:Append('WndButton', {
 		name = 'Btn_Lookup',
 		x = 370, y = 9, w = 82, h = 34,
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		text = info.dwID and g_tStrings.STR_LOOKUP or _L['Ask details'],
-		onhover = function(bIn)
+		onHover = function(bIn)
 			if bIn then
 				D.OnMouseEnter()
 			else
 				D.OnMouseLeave()
 			end
 		end,
-		onclick = D.OnLButtonClick,
+		onClick = D.OnLButtonClick,
 	})
 
 	return wnd

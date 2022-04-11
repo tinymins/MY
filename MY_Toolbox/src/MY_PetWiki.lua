@@ -214,9 +214,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Pet wiki'],
 		tip = _L['Click icon on pet panel to view pet wiki'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		checked = MY_PetWiki.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_PetWiki.bEnable = bChecked
 		end,
 	}):Width() + 5

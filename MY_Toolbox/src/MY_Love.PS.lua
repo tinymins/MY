@@ -98,7 +98,7 @@ function PS.OnPanelActive(wnd)
 		nY = nY + ui:Append('WndButton', {
 			x = (nW - 100) / 2, y = nY, w = 100, h = 30,
 			text = _L['Refresh'],
-			onclick = function()
+			onClick = function()
 				D.RefreshPS()
 			end,
 		}):Height() + 20
@@ -108,7 +108,7 @@ function PS.OnPanelActive(wnd)
 			nX = ui:Append('Text', { text = _L['No lover :-('], font = 19, x = nX, y = nY }):Pos('BOTTOMRIGHT')
 			nX = ui:Append('Text', {
 				text = _L['[Restore]'], x = nX + 10, y = nY,
-				onclick = function()
+				onClick = function()
 					local szFilePath = GetOpenFileName(
 						_L['Please select lover backup data file:'],
 						'JX3 Lover File(*.lover.jx3dat)\0*.jx3dat\0JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
@@ -162,21 +162,21 @@ function PS.OnPanelActive(wnd)
 				nX = ui:Append('Text', {
 					x = nX + 10, y = nY,
 					text = _L['[Light firework]'],
-					onclick = function()
+					onClick = function()
 						D.SetLover(lover.dwID, -1)
 					end,
 				}):AutoWidth():Pos('BOTTOMRIGHT')
 			end
-			nX = ui:Append('Text', { text = _L['[Break love]'], x = nX + 10, y = nY, onclick = D.RemoveLover }):AutoWidth():Pos('BOTTOMRIGHT')
+			nX = ui:Append('Text', { text = _L['[Break love]'], x = nX + 10, y = nY, onClick = D.RemoveLover }):AutoWidth():Pos('BOTTOMRIGHT')
 			if lover.nLoverType == 1 then
-				nX = ui:Append('Text', { text = _L['[Recovery]'], x = nX + 10, y = nY, onclick = D.FixLover }):AutoWidth():Pos('BOTTOMRIGHT')
-				nX = ui:Append('Text', { text = _L['[Backup]'], x = nX + 10, y = nY, onclick = D.BackupLover }):AutoWidth():Pos('BOTTOMRIGHT')
+				nX = ui:Append('Text', { text = _L['[Recovery]'], x = nX + 10, y = nY, onClick = D.FixLover }):AutoWidth():Pos('BOTTOMRIGHT')
+				nX = ui:Append('Text', { text = _L['[Backup]'], x = nX + 10, y = nY, onClick = D.BackupLover }):AutoWidth():Pos('BOTTOMRIGHT')
 			end
 			ui:Append('WndCheckBox', {
 				x = nX + 10, y = nY + 2,
 				text = _L['Auto focus lover'],
 				checked = MY_Love.bAutoFocus,
-				oncheck = function(bChecked)
+				onCheck = function(bChecked)
 					MY_Love.bAutoFocus = bChecked
 				end,
 			})
@@ -189,13 +189,13 @@ function PS.OnPanelActive(wnd)
 		nX = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY, w = 198, h = 25,
 			limit = 20, text = MY_Love.szNone,
-			onchange = function(szText) MY_Love.szNone = szText end,
+			onChange = function(szText) MY_Love.szNone = szText end,
 		}):Pos('BOTTOMRIGHT')
 		ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY,
 			text = _L['Enable quiet mode'],
 			checked = MY_Love.bQuiet,
-			oncheck = function(bChecked) MY_Love.bQuiet = bChecked end,
+			onCheck = function(bChecked) MY_Love.bQuiet = bChecked end,
 		})
 		-- jabber
 		nX = nPaddingX + 10
@@ -204,7 +204,7 @@ function PS.OnPanelActive(wnd)
 		ui:Append('WndEditBox', {
 			x = nX + 5, y = nY, w = 340, h = 25,
 			limit = 128, text = MY_Love.szJabber,
-			onchange = function(szText) MY_Love.szJabber = szText end,
+			onChange = function(szText) MY_Love.szJabber = szText end,
 		})
 		-- signature
 		nX = nPaddingX + 10
@@ -214,7 +214,7 @@ function PS.OnPanelActive(wnd)
 			x = nX + 5, y = nY, w = 340, h = 48,
 			limit = 42,  multi = true,
 			text = MY_Love.szSign,
-			onchange = function(szText)
+			onChange = function(szText)
 				MY_Love.szSign = X.ReplaceSensitiveWord(szText)
 			end,
 		})
@@ -224,14 +224,14 @@ function PS.OnPanelActive(wnd)
 		x = nX + 5, y = nY, w = 200,
 		text = _L['Enable player view panel hook'],
 		checked = MY_Love.bHookPlayerView,
-		oncheck = function(bChecked) MY_Love.bHookPlayerView = bChecked end,
+		onCheck = function(bChecked) MY_Love.bHookPlayerView = bChecked end,
 	}):AutoWidth()
 	nY = nY + 25
 	ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, w = 200,
 		text = _L['Other view my lover without ask'],
 		checked = MY_Love.bAutoReplyLover,
-		oncheck = function(bChecked) MY_Love.bAutoReplyLover = bChecked end,
+		onCheck = function(bChecked) MY_Love.bAutoReplyLover = bChecked end,
 	}):AutoWidth()
 
 	-- tips
@@ -241,31 +241,31 @@ function PS.OnPanelActive(wnd)
 	nY = nY + 35
 
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, alignVertical = 0,
 		text = _L['1. You can break love one-sided.'],
 	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, alignVertical = 0,
 		text = _L['2. Data was stored in official data segment.'],
 	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, alignVertical = 0,
 		text = _L['3. Please do not enable config async, that may cause data lose.'],
 		}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, alignVertical = 0,
 		text = _L['4. To recove lover data, please ask you lover click fix button.'],
 	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, alignVertical = 0,
 		text = _L['5. Lover must be toway friend, so delete friend will cause both side none-lover.'],
 	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, alignVertical = 0,
 		text = _L['6. Lover can see each other\'s location, delete friend can prevent this.'],
 	}):AutoHeight():Height() + 1
 	nY = nY + ui:Append('Text', {
-		x = nX, y = nY, w = nW - nX * 2, multiline = true, valign = 0,
+		x = nX, y = nY, w = nW - nX * 2, multiline = true, alignVertical = 0,
 		text = _L['7. Backup lover requires both online and teamed up, backup data can be used to restore data while server merge or player crossing server.'],
 	}):AutoHeight():Height() + 1
 	O.bPanelActive = true

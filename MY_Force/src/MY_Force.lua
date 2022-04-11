@@ -285,7 +285,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y,
 			text = _L['Alert when pet disappear unexpectedly (for 5D)'],
 			checked = O.bAlertPet,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bAlertPet = bChecked
 				D.OnAlertPetChange()
 			end,
@@ -295,7 +295,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y,
 			text = _L['Mark pet'],
 			checked = O.bMarkPet,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bMarkPet = bChecked
 				D.OnMarkPetChange()
 			end,
@@ -308,14 +308,14 @@ function PS.OnPanelActive(frame)
 			x = x, y = y,
 			text = _L['Display GUDING of teammate, change color'],
 			checked = MY_ForceGuding.bEnable,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_ForceGuding.bEnable = bChecked
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 2
 		x = ui:Append('Shadow', {
 			x = x, y = y + 2, w = 18, h = 18,
 			color = MY_ForceGuding.color,
-			onclick = function()
+			onClick = function()
 				local ui = UI(this)
 				OpenColorTablePanel(function(r, g, b)
 					ui:Color(r, g, b)
@@ -327,8 +327,8 @@ function PS.OnPanelActive(frame)
 			x = x, y = y,
 			text = _L['Auto talk in team channel after puting GUDING'],
 			checked = MY_ForceGuding.bAutoSay,
-			autoenable = function() return MY_ForceGuding.bEnable end,
-			oncheck = function(bChecked)
+			autoEnable = function() return MY_ForceGuding.bEnable end,
+			onCheck = function(bChecked)
 				MY_ForceGuding.bAutoSay = bChecked
 			end,
 		})
@@ -338,8 +338,8 @@ function PS.OnPanelActive(frame)
 			x = x, y = y, w = W - x * 2, h = 50,
 			multiline = true, limit = 512,
 			text = MY_ForceGuding.szSay,
-			autoenable = function() return MY_ForceGuding.bAutoSay end,
-			onchange = function(szText)
+			autoEnable = function() return MY_ForceGuding.bAutoSay end,
+			onChange = function(szText)
 				MY_ForceGuding.szSay = szText
 			end,
 		})
@@ -352,7 +352,7 @@ function PS.OnPanelActive(frame)
 				x = x, y = y,
 				checked = MY_ForceGuding.bUseMana,
 				text = _L['Automatic eat GUDING when mana below '],
-				oncheck = function(bChecked)
+				onCheck = function(bChecked)
 					MY_ForceGuding.bUseMana = bChecked
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
@@ -360,8 +360,8 @@ function PS.OnPanelActive(frame)
 				x = x, y = y, w = 70, h = 25,
 				range = {0, 100, 50},
 				value = MY_ForceGuding.nManaMp,
-				onchange = function(nVal) MY_ForceGuding.nManaMp = nVal end,
-				autoenable = function() return MY_ForceGuding.bUseMana end,
+				onChange = function(nVal) MY_ForceGuding.nManaMp = nVal end,
+				autoEnable = function() return MY_ForceGuding.bUseMana end,
 			}):Pos('BOTTOMRIGHT') + 65
 			x = ui:Append('Text', {
 				x = x, y = y - 3,
@@ -371,8 +371,8 @@ function PS.OnPanelActive(frame)
 				x = x, y = y, w = 70, h = 25,
 				range = {0, 100, 50},
 				value = MY_ForceGuding.nManaHp,
-				onchange = function(nVal) MY_ForceGuding.nManaHp = nVal end,
-				autoenable = function() return MY_ForceGuding.bUseMana end,
+				onChange = function(nVal) MY_ForceGuding.nManaHp = nVal end,
+				autoEnable = function() return MY_ForceGuding.bUseMana end,
 			}):Pos('BOTTOMRIGHT')
 			y = y + 36
 		end
@@ -390,7 +390,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y,
 		text = _L['Alert when horse is hungry'],
 		checked = O.bFeedHorse,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bFeedHorse = bChecked
 			D.OnFeedHorseChange()
 		end,
@@ -403,7 +403,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y,
 		text = _L['Alert when I am wanted publishing online'],
 		checked = O.bAlertWanted,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bAlertWanted = bChecked
 			D.OnAlertWantedChange()
 		end,
@@ -416,14 +416,14 @@ function PS.OnPanelActive(frame)
 		x = x, y = y,
 		text = _L['Alert when my same type of debuff reached a certain number '],
 		checked = O.bWarningDebuff,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bWarningDebuff = bChecked
 			D.OnWarningDebuffChange()
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	ui:Append('WndComboBox', {
 		x = x, y = y, w = 50, h = 25,
-		autoenable = function() return O.bWarningDebuff end,
+		autoEnable = function() return O.bWarningDebuff end,
 		text = tostring(O.nDebuffNum),
 		menu = function()
 			local ui = UI(this)

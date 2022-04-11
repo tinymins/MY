@@ -207,7 +207,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY,
 		w = w - 136, h = 148, multiline = true,
 		text = O.szTalkText,
-		onchange = function(text)
+		onChange = function(text)
 			O.szTalkText = text
 		end,
 	})
@@ -220,7 +220,7 @@ function PS.OnPanelActive(wnd)
 			text = g_tStrings.tChannelName[p.szID],
 			color = GetMsgFontColor(p.szID, true),
 			checked = lodash.includes(O.aTalkChannel, p.nChannel),
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				for i, v in X.ipairs_r(O.aTalkChannel) do
 					if v == p.nChannel then
 						table.remove(O.aTalkChannel, i)
@@ -238,7 +238,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = w - 110, y = nY, w = 90,
 		text = _L['Send'],
-		onlclick = function()
+		onLClick = function()
 			if IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown() then
 				X.SetChatInput(O.szTalkText)
 				X.FocusChatInput()
@@ -246,7 +246,7 @@ function PS.OnPanelActive(wnd)
 				D.Talk()
 			end
 		end,
-		onrclick = function()
+		onRClick = function()
 			X.SetChatInput(O.szTalkText)
 			X.FocusChatInput()
 		end,
@@ -269,7 +269,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY,
 		w = 150, h = 25,
 		text = D.szJokeSearch,
-		onchange = function(szText)
+		onChange = function(szText)
 			D.szJokeSearch = szText
 		end,
 	}):Pos('BOTTOMRIGHT') + 5
@@ -278,7 +278,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY,
 		w = 50, h = 25,
 		text = _L['Search'],
-		onclick = function()
+		onClick = function()
 			X.Ajax({
 				url = 'https://pull.j3cx.com/joke/random',
 				data = {
@@ -296,27 +296,27 @@ function PS.OnPanelActive(wnd)
 			})
 		end,
 		tip = _L['Click to search jokes.'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Width() + 5
 	-- 骚话复制按钮
 	nX = ui:Append('WndButton', {
 		x = nX, y = nY,
 		w = 50, h = 25,
 		text = _L['Copy'],
-		onclick = function()
+		onClick = function()
 			X.SetChatInput(D.szJokeText)
 			X.FocusChatInput()
 		end,
-		autoenable = function() return not X.IsEmpty(D.szJokeText) end,
+		autoEnable = function() return not X.IsEmpty(D.szJokeText) end,
 		tip = _L['Click to copy joke to chat panel.'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Pos('BOTTOMRIGHT') + 5
 	-- 骚话分享按钮
 	nX = ui:Append('WndButton', {
 		x = nX, y = nY,
 		w = 50, h = 25,
 		text = _L['Share'],
-		onclick = function()
+		onClick = function()
 			local function fnAction(bAnonymous)
 				X.Ajax({
 					url = 'https://push.j3cx.com/joke',
@@ -352,9 +352,9 @@ function PS.OnPanelActive(wnd)
 			}
 			MessageBox(tMsg)
 		end,
-		autoenable = function() return not X.IsEmpty(D.szJokeText) end,
+		autoEnable = function() return not X.IsEmpty(D.szJokeText) end,
 		tip = _L['Click to share your joke to remote.'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 	}):Pos('BOTTOMRIGHT') + 5
 	-- 骚话输入框
 	nX = nPaddingX
@@ -365,7 +365,7 @@ function PS.OnPanelActive(wnd)
 		w = w - nPaddingX * 2, h = 75,
 		multiline = true,
 		text = D.szJokeText,
-		onchange = function(szText)
+		onChange = function(szText)
 			D.szJokeText = szText
 		end,
 	}):Width() + 5
@@ -430,7 +430,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY,
 		w = w - nPaddingX * 2, h = 25,
 		text = O.szTrickTextBegin,
-		onchange = function(szText)
+		onChange = function(szText)
 			O.szTrickTextBegin = szText
 		end,
 	}):Height() + 5
@@ -438,7 +438,7 @@ function PS.OnPanelActive(wnd)
 	nY = nY + ui:Append('WndEditBox', {
 		x = nX, y = nY, w = w - nPaddingX * 2, h = 55,
 		multiline = true, text = O.szTrickText,
-		onchange = function(szText)
+		onChange = function(szText)
 			O.szTrickText = szText
 		end,
 	}):Height() + 5
@@ -446,7 +446,7 @@ function PS.OnPanelActive(wnd)
 	nY = nY + ui:Append('WndEditBox', {
 		x = nX, y = nY, w = w - nPaddingX * 2, h = 25,
 		text = O.szTrickTextEnd,
-		onchange = function(szText)
+		onChange = function(szText)
 			O.szTrickTextEnd = szText
 		end,
 	}):Height() + 5
@@ -480,7 +480,7 @@ function PS.OnPanelActive(wnd)
 		x = w - nPaddingX - 100, y = nY, w = 100,
 		color = {255, 255, 255},
 		text = _L['Trick'],
-		onclick = D.Trick,
+		onClick = D.Trick,
 	})
 	X.BreatheCall('MY_TalkEx__Enable', function()
 		local dwTime = GetTime() - D.dwTalkCDTime

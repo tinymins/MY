@@ -507,10 +507,10 @@ function PS.OnPanelActive(wnd)
 	})
 
 	ui:Append('Image', {
-		image = 'UI/Image/UICommon/Commonpanel2.UITex', imageframe = 48,
+		image = 'UI/Image/UICommon/Commonpanel2.UITex', imageFrame = 48,
 		x = w - 160, y = 18, w = 20, h = 20, alpha = 180,
-		onhover = function(bIn) this:SetAlpha(bIn and 255 or 180) end,
-		onclick = function()
+		onHover = function(bIn) this:SetAlpha(bIn and 255 or 180) end,
+		onClick = function()
 			local szText = GetFormatText(_L['CHAT_MONITOR_TIP'], 162)
 			local x, y = Cursor.GetPos()
 			local w, h = this:GetSize()
@@ -520,7 +520,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndButton', {
 		x = w - 26, y = 15, w = 25, h = 25,
-		buttonstyle = 'OPTION',
+		buttonStyle = 'OPTION',
 		menu = function()
 			local t = {
 				{
@@ -616,7 +616,7 @@ function PS.OnPanelActive(wnd)
 		name = 'Button_ChatMonitor_Switcher',
 		x = w - 134, y = 15, w = 50,
 		text = (O.bCapture and _L['stop']) or _L['start'],
-		onclick = function()
+		onClick = function()
 			if O.bCapture then
 				UI(this):Text(_L['start'])
 				O.bCapture = false
@@ -630,7 +630,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = w - 79, y = 15, w = 50,
 		text = _L['clear'],
-		onclick = function()
+		onClick = function()
 			RECORD_LIST = {}
 			RECORD_HASH = {}
 			l_uiBoard:Clear()
@@ -639,7 +639,7 @@ function PS.OnPanelActive(wnd)
 
 	l_uiBoard = ui:Append('WndScrollHandleBox', {
 		name = 'WndScrollHandleBox_TalkList',
-		x = 20, y = 50, w = w - 21, h = h - 70, handlestyle = 3,
+		x = 20, y = 50, w = w - 21, h = h - 70, handleStyle = 3,
 	})
 
 	for i = 1, #RECORD_LIST, 1 do

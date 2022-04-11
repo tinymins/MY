@@ -173,8 +173,8 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 				local ui = UI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = 'CENTER' })
 				local x, y = 20, 50
 				local szCaption = data[1] == 'GKP_CONSUMPTION' and _L['--- Consumption ---'] or _L['Information on Debt']
-				ui:Append('Text', { x = x, y = y, w = 760, h = 30, text = szCaption, halign = 1, font = 236, color = { 255, 255, 0 } })
-				ui:Append('WndButton', { name = 'ScreenShot', x = x + 590, y = y, text = _L['Print Ticket'], buttonstyle = 'FLAT_LACE_BORDER' }):Toggle(false):Click(function()
+				ui:Append('Text', { x = x, y = y, w = 760, h = 30, text = szCaption, alignHorizontal = 1, font = 236, color = { 255, 255, 0 } })
+				ui:Append('WndButton', { name = 'ScreenShot', x = x + 590, y = y, text = _L['Print Ticket'], buttonStyle = 'FLAT_LACE_BORDER' }):Toggle(false):Click(function()
 					local scale         = Station.GetUIScale()
 					local left, top     = ui:Pos()
 					local width, height = ui:Size()
@@ -191,7 +191,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 					end, 50)
 				end)
 				ui:Append('Text', { w = 120, h = 30, x = x + 40, y = y + 35, text = _L('Operator:%s', szName), font = 41 })
-				ui:Append('Text', { w = 720, h = 30, x = x, halign = 2, y = y + 35, text = _L('Print Time:%s', D.GetTimeString(GetCurrentTime())), font = 41 })
+				ui:Append('Text', { w = 720, h = 30, x = x, alignHorizontal = 2, y = y + 35, text = _L('Print Time:%s', D.GetTimeString(GetCurrentTime())), font = 41 })
 				ui[1].key = data[3]
 			end
 			if data[2] == 'RECORD' then
@@ -213,11 +213,11 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 					local ui = UI(frm)
 					local x, y = 20, 50
 					if n % 2 == 0 then
-						ui:Append('Image', { w = 760, h = 30, x = x, y = y + 70 + 30 * n, image = 'ui/Image/button/ShopButton.UITex', imageframe = 75 })
+						ui:Append('Image', { w = 760, h = 30, x = x, y = y + 70 + 30 * n, image = 'ui/Image/button/ShopButton.UITex', imageFrame = 75 })
 					end
 					ui:Append('Image', { w = 28, h = 28, x = x + 30, y = y + 71 + 30 * n }):Image(GetForceImage(data[6]))
 					ui:Append('Text', { w = 140, h = 30, x = x + 60, y = y + 70 + 30 * n, text = data[4], color = { X.GetForceColor(data[6]) } })
-					local handle = ui:Append('Handle', { w = 130, h = 20, x = x + 200, y = y + 70 + 30 * n, handlestyle = 3 })[1]
+					local handle = ui:Append('Handle', { w = 130, h = 20, x = x + 200, y = y + 70 + 30 * n, handleStyle = 3 })[1]
 					handle:AppendItemFromString(D.GetMoneyTipText(tonumber(data[5])))
 					handle:FormatAllItemPos()
 					for k, v in ipairs(data[7]) do
@@ -254,14 +254,14 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 						local x, y = 20, 50
 						local n = frm.n or 0
 						local nMoney = tonumber(data[4]) or 0
-						local handle = ui:Append('Handle', { w = 230, h = 20, x = x + 30, y = y + 70 + 30 * n + 5, handlestyle = 3 })[1]
+						local handle = ui:Append('Handle', { w = 230, h = 20, x = x + 30, y = y + 70 + 30 * n + 5, handleStyle = 3 })[1]
 						handle:AppendItemFromString(GetFormatText(_L['Total Auction:'], 41) .. D.GetMoneyTipText(nMoney))
 						handle:FormatAllItemPos()
 						if X.IsDistributor() and ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 							ui:Append('WndButton', {
 								w = 91, h = 26, x = x + 620, y = y + 70 + 30 * n + 5, text = _L['salary'],
-								buttonstyle = 'SKEUOMORPHISM',
-								onclick = function()
+								buttonStyle = 'SKEUOMORPHISM',
+								onClick = function()
 									X.Confirm(_L['Confirm?'], function()
 										MY_GKP.Bidding(nMoney)
 									end)
@@ -270,7 +270,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 						end
 						local nTime = tonumber(data[5]) or 0
 						if nTime > 0 then
-							ui:Append('Text', { w = 725, h = 30, x = x + 0, y = y + 70 + 30 * n + 5, text = _L('Spend time approx %d:%d', nTime / 3600, nTime % 3600 / 60), halign = 1 })
+							ui:Append('Text', { w = 725, h = 30, x = x + 0, y = y + 70 + 30 * n + 5, text = _L('Spend time approx %d:%d', nTime / 3600, nTime % 3600 / 60), alignHorizontal = 1 })
 						end
 						UI(frm):Children('#ScreenShot'):Toggle(true)
 						if n >= 4 and data[6] then
@@ -289,7 +289,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 							local nInitAlpha, nDistAlpha = 180, 60
 							local img = ui:Append('Image', {
 								x = 0, y = 0, w = 0, h = 0, alpha = nInitAlpha,
-								image = X.PACKET_INFO.ROOT .. 'MY_GKP/img/GKPSeal.uitex', imageframe = nFrame,
+								image = X.PACKET_INFO.ROOT .. 'MY_GKP/img/GKPSeal.uitex', imageFrame = nFrame,
 							})[1]
 							local nStartTick = GetTime()
 							local SCALE_ANIMATE_TIME = 200

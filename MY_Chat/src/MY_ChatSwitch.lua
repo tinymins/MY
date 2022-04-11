@@ -241,7 +241,7 @@ local CHANNEL_LIST = {
 		title = _L['WHISPER'],
 		channel = PLAYER_TALK_CHANNEL.WHISPER,
 		cd = 0,
-		onclick = function()
+		onClick = function()
 			local t = {}
 			for i, whisper in ipairs(D.aWhisper) do
 				local info = MY_Farbnamen and MY_Farbnamen.Get(whisper[1])
@@ -318,7 +318,7 @@ local CHANNEL_LIST = {
 	{ -- «Â
 		id = 'cls',
 		title = _L['CLS'],
-		onclick = function()
+		onClick = function()
 			local function Cls(bAll)
 				for i = 1, 32 do
 					local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
@@ -357,7 +357,7 @@ local CHANNEL_LIST = {
 	{ -- ¿Î
 		id = 'away',
 		title = _L['AWAY'],
-		oncheck = function()
+		onCheck = function()
 			X.SwitchChatChannel('/afk')
 			local edit = X.GetChatInput()
 			if edit then
@@ -386,7 +386,7 @@ local CHANNEL_LIST = {
 	{ -- »≈
 		id = 'busy',
 		title = _L['BUSY'],
-		oncheck = function()
+		onCheck = function()
 			X.SwitchChatChannel('/atr')
 			local edit = X.GetChatInput()
 			if edit then
@@ -415,7 +415,7 @@ local CHANNEL_LIST = {
 	{ -- ¬Ì
 		id = 'mosaics',
 		title = _L['MOSAICS'],
-		oncheck = function()
+		onCheck = function()
 			MY_ChatMosaics.bEnabled = true
 		end,
 		onuncheck = function()
@@ -496,18 +496,18 @@ function D.OnFrameCreate()
 				txtCooldown = chk:Lookup('', 'Text_CD')
 				shaCount = chk:Lookup('', 'Shadow_Count')
 				chk.OnCheckBoxCheck = OnChannelCheck
-			elseif v.onclick then
+			elseif v.onClick then
 				wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Channel')
 				chk = wnd:Lookup('WndRadioChannel')
 				txtTitle = chk:Lookup('', 'Text_Channel')
 				txtCooldown = chk:Lookup('', 'Text_CD')
 				shaCount = chk:Lookup('', 'Shadow_Count')
-				chk.OnCheckBoxCheck = v.onclick
+				chk.OnCheckBoxCheck = v.onClick
 			else
 				wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_CheckBox')
 				chk = wnd:Lookup('WndCheckBox')
 				txtTitle = chk:Lookup('', 'Text_CheckBox')
-				chk.OnCheckBoxCheck = v.oncheck
+				chk.OnCheckBoxCheck = v.onCheck
 				chk.OnCheckBoxUncheck = v.onuncheck
 			end
 			wnd:SetRelX(nWidth)
@@ -675,7 +675,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 250,
 		text = _L['display panel'],
 		checked = O.bDisplayPanel,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bDisplayPanel = bChecked
 			D.ReInitUI()
 		end,
@@ -688,7 +688,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 250,
 		text = _L['lock postion'],
 		checked = O.bLockPostion,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bLockPostion = bChecked
 			D.ReInitUI()
 		end,
@@ -733,7 +733,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Auto switch talk channel when into battle field'],
 		checked = O.bAutoSwitchBfChannel,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bAutoSwitchBfChannel = bChecked
 			D.ApplyBattlefieldChannelSwitch()
 		end,

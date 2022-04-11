@@ -72,7 +72,7 @@ X.RegisterFrameCreate('ExitPanel', 'BIG_WAR_CHECK', function(name, frame)
 			)
 			PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 			if ui:Children('#Text_MY_Tip'):Count() == 0 then
-				ui:Append('Text', { name = 'Text_MY_Tip', y = ui:Height(), w = ui:Width(), color = {255, 255, 0}, font = 199, halign = 1})
+				ui:Append('Text', { name = 'Text_MY_Tip', y = ui:Height(), w = ui:Width(), color = {255, 255, 0}, font = 199, alignHorizontal = 1})
 			end
 			ui:Children('#Text_MY_Tip'):Text(
 				ENVIRONMENT.GAME_BRANCH == 'classic'
@@ -105,7 +105,7 @@ X.RegisterFrameCreate('OptionPanel', 'BIG_WAR_CHECK', function(name, frame)
 		local ui = UI(frame)
 		if IsBigWarFinishable(me) then
 			if ui:Children('#Text_MY_Tip'):Count() == 0 then
-				ui:Append('Text', { name = 'Text_MY_Tip', y = -20, w = ui:Width(), color = {255, 255, 0}, font = 199, halign = 1})
+				ui:Append('Text', { name = 'Text_MY_Tip', y = -20, w = ui:Width(), color = {255, 255, 0}, font = 199, alignHorizontal = 1})
 			end
 			ui:Children('#Text_MY_Tip')
 				:Text(

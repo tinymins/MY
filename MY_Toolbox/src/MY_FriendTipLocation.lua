@@ -102,7 +102,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			x = nX, y = nY,
 			text = _L['Show all friend tip location'],
 			checked = MY_FriendTipLocation.bEnable,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_FriendTipLocation.bEnable = bChecked
 			end,
 		}):AutoWidth():Width() + 5

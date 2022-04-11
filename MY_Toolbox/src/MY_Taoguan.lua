@@ -492,7 +492,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = 200,
 		text = _L['Put can if needed?'],
 		checked = O.bUseTaoguan,
-		oncheck = function(bChecked) O.bUseTaoguan = bChecked end,
+		onCheck = function(bChecked) O.bUseTaoguan = bChecked end,
 	}):AutoWidth()
 
 	-- 没有小银锤时使用小金锤
@@ -502,7 +502,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = 200,
 		text = _L('When no %s use %s?', XIAOYINCHUI, XIAOJINCHUI),
 		checked = O.bNoYinchuiUseJinchui,
-		oncheck = function(bChecked) O.bNoYinchuiUseJinchui = bChecked end,
+		onCheck = function(bChecked) O.bNoYinchuiUseJinchui = bChecked end,
 	}):AutoWidth()
 
 	-- 各种东西使用分数和缺少停砸
@@ -537,7 +537,7 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY,
 			text = _L['Stop break when no item'],
 			checked = O['bPauseNo' .. p.szID],
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O['bPauseNo' .. p.szID] = bChecked
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
@@ -608,12 +608,12 @@ function PS.OnPanelActive(wnd)
 	nX = ui:Append('WndButton', {
 		x = nX, y = nY, w = 130, h = 30,
 		text = _L['Start/stop break can'],
-		onclick = D.Switch,
+		onClick = D.Switch,
 	}):Pos('BOTTOMRIGHT') + 5
 	nX = ui:Append('WndButton', {
 		x = nX, y = nY, w = 130, h = 30,
 		text = _L['Restore default config'],
-		onclick = function()
+		onClick = function()
 			O('reset')
 			X.SwitchTab('MY_Taoguan', true)
 		end,

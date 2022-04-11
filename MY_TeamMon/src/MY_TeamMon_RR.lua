@@ -646,14 +646,14 @@ function D.AppendMetaInfoItem(container, p, bSel)
 		UI(wnd):Append('WndButton', {
 			name = 'Btn_Info',
 			x = 760, y = 1, w = 90, h = 30,
-			buttonstyle = 'LINK',
+			buttonStyle = 'LINK',
 			text = _L['See details'],
 		})
 	end
 	UI(wnd):Append('WndButton', {
 		name = 'Btn_Download',
 		x = 860, y = 1, w = 90, h = 30,
-		buttonstyle = 'SKEUOMORPHISM',
+		buttonStyle = 'SKEUOMORPHISM',
 		text = (META_DOWNLOADING[p.szKey] and _L['Fetching...'])
 			or (DATA_DOWNLOADING[p.szKey] and _L['Downloading...'])
 			or ((GetShortURL(p.szURL) or p.szURL) == MY_TeamMon.GetUserConfig('RR.LastURL') and (

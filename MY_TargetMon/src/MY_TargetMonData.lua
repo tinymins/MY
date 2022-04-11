@@ -570,7 +570,7 @@ function UpdateView()
 			view.fIconFontScale       = fFontScaleBase * config.iconFontScale
 			view.fOtherFontScale      = fFontScaleBase * config.otherFontScale
 			view.bPenetrable          = config.penetrable
-			view.bDragable            = config.dragable
+			view.bDragable            = config.draggable
 			view.szAlignment          = config.alignment
 			view.nMaxLineCount        = config.maxLineCount
 			view.bCdCircle            = config.cdCircle

@@ -127,7 +127,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			x = nX, y = nY, w = 'auto',
 			text = _L['Auto restore team info in arena'],
 			checked = MY_ArenaHelper.bRestoreAuthorityInfo,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_ArenaHelper.bRestoreAuthorityInfo = bChecked
 			end,
 		})
@@ -138,7 +138,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			x = nX, y = nY, w = 'auto',
 			text = _L['Auto cancel hide player in arena'],
 			checked = MY_ArenaHelper.bAutoShowModel,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_ArenaHelper.bAutoShowModel = bChecked
 			end,
 		}):Width() + 5
@@ -149,7 +149,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Auto cancel hide player in battlefield'],
 		checked = MY_ArenaHelper.bAutoShowModelBattlefield,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_ArenaHelper.bAutoShowModelBattlefield = bChecked
 		end,
 	}):Width() + 5

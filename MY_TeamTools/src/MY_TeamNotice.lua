@@ -122,15 +122,15 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			name = 'YY',
 			w = 160, h = 26, x = x, y = y,
 			text = szInitYY, font = 48, color = { 128, 255, 0 },
-			edittype = UI.EDIT_TYPE.NUMBER,
-			onclick = function()
+			editType = UI.EDIT_TYPE.NUMBER,
+			onClick = function()
 				if IsPopupMenuOpened() then
 					UI(this):Autocomplete('close')
 				elseif X.IsLeader() then
 					UI(this):Autocomplete('search', '')
 				end
 			end,
-			onblur = function()
+			onBlur = function()
 				local szText = UI(this):Text()
 				if TI.szYY == szText then
 					return
@@ -174,8 +174,8 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			x = x, y = y, text = X.IsLeader()
 				and (ENVIRONMENT.GAME_LANG == 'zhcn' and _L['Paste YY'] or _L['Paste DC'])
 				or (ENVIRONMENT.GAME_LANG == 'zhcn' and _L['Copy YY'] or _L['Copy DC']),
-			buttonstyle = 'FLAT',
-			onclick = function()
+			buttonStyle = 'FLAT',
+			onClick = function()
 				local yy = ui:Children('#YY'):Text()
 				if X.IsLeader() then
 					if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
@@ -208,7 +208,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			w = 300, h = 80, x = 10, y = y,
 			multiline = true, limit = 512,
 			text = szInitNote,
-			onblur = function()
+			onBlur = function()
 				local szText = X.ReplaceSensitiveWord(UI(this):Text())
 				if TI.szNote == szText then
 					return
@@ -231,15 +231,15 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			name = 'WndBtn_RaidTools',
 			x = x, y = y, w = nBtnW,
 			text = _L['MY_TeamTools'],
-			buttonstyle = 'FLAT',
-			onclick = MY_TeamTools.Toggle,
+			buttonStyle = 'FLAT',
+			onClick = MY_TeamTools.Toggle,
 		}):AutoWidth():Width() + 5
 		x = x + ui:Append('WndButton', {
 			name = 'WndBtn_GKP',
 			x = x, y = y, w = nBtnW,
 			text = _L['GKP Golden Team Record'],
-			buttonstyle = 'FLAT',
-			onclick = function()
+			buttonStyle = 'FLAT',
+			onClick = function()
 				if MY_GKP then
 					MY_GKP_MI.TogglePanel()
 				else
@@ -252,8 +252,8 @@ function TI.CreateFrame(szInitYY, szInitNote)
 				name = 'WndBtn_TeamMon',
 				x = x, y = y, w = nBtnW,
 				text = _L['Import Data'],
-				buttonstyle = 'FLAT',
-				onclick = MY_TeamMon_RR.OpenPanel,
+				buttonStyle = 'FLAT',
+				onClick = MY_TeamMon_RR.OpenPanel,
 			}):AutoWidth():Width() + 5
 		end
 		FormatAllContentPos()

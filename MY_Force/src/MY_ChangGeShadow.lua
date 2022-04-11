@@ -128,7 +128,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			x = nX, y = nY, w = 'auto',
 			text = _L['Show changge shadow index'],
 			checked = O.bEnable,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bEnable = bChecked
 				D.Apply()
 			end,
@@ -137,8 +137,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 					return _L['Changge force only']
 				end
 			end,
-			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-			autoenable = function()
+			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+			autoEnable = function()
 				local me = GetClientPlayer()
 				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
@@ -147,7 +147,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			x = nX, y = nY, w = 'auto',
 			text = _L['Show distance'],
 			checked = O.bShowDistance,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bShowDistance = bChecked
 				D.Apply()
 			end,
@@ -156,8 +156,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 					return _L['Changge force only']
 				end
 			end,
-			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-			autoenable = function()
+			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+			autoEnable = function()
 				local me = GetClientPlayer()
 				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
@@ -166,7 +166,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			x = nX, y = nY, w = 'auto',
 			text = _L['Show countdown'],
 			checked = O.bShowCD,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				O.bShowCD = bChecked
 				D.Apply()
 			end,
@@ -175,23 +175,23 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 					return _L['Changge force only']
 				end
 			end,
-			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-			autoenable = function()
+			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+			autoEnable = function()
 				local me = GetClientPlayer()
 				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
 		}):Width() + 5
 		ui:Append('WndTrackbar', {
 			x = nX, y = nY, w = 150,
-			textfmt = function(val) return _L('Scale: %d%%.', val) end,
+			textFormatter = function(val) return _L('Scale: %d%%.', val) end,
 			range = {10, 800},
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 			value = O.fScale * 100,
-			onchange = function(val)
+			onChange = function(val)
 				O.fScale = val / 100
 				D.Apply()
 			end,
-			autoenable = function()
+			autoEnable = function()
 				local me = GetClientPlayer()
 				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
 			end,

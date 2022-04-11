@@ -268,7 +268,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Domesticate feed alert'],
 		checked = O.bAlert,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_Domesticate.bAlert = bChecked
 		end,
 	}):Width() + 5
@@ -276,17 +276,17 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 130,
 		value = O.nAlertNum,
 		range = {0, 1000},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		textfmt = function(val)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textFormatter = function(val)
 			if val == 0 then
 				return _L['Alert when measure is empty']
 			end
 			return _L('Alert when measure larger than %d', val)
 		end,
-		onchange = function(val)
+		onChange = function(val)
 			O.nAlertNum = val
 		end,
-		autoenable = function() return MY_Domesticate.bAlert end,
+		autoEnable = function() return MY_Domesticate.bAlert end,
 	})
 	nX = nPaddingX
 	nY = nY + nLH

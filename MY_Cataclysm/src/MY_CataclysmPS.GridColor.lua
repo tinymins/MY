@@ -47,7 +47,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Colored as official team frame'],
 		group = 'BACK_COLOR', checked = CFG.nBGColorMode == CTM_BG_COLOR_MODE.OFFICIAL,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if not bChecked then
 				return
 			end
@@ -62,7 +62,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Colored all the same'],
 		group = 'BACK_COLOR', checked = CFG.nBGColorMode == CTM_BG_COLOR_MODE.SAME_COLOR,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if not bChecked then
 				return
 			end
@@ -77,7 +77,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, text = _L['Colored according to the distance'],
 		group = 'BACK_COLOR', checked = CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if not bChecked then
 				return
 			end
@@ -92,7 +92,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndRadioBox', {
 		x = x, y = y, text = g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
 		group = 'BACK_COLOR', checked = CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_FORCE,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			if not bChecked then
 				return
 			end
@@ -107,7 +107,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:Append('WndCheckBox', {
 		x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE,
 		checked = CFG.bEnableDistance,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bEnableDistance = bCheck
 			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
@@ -122,8 +122,8 @@ function PS.OnPanelActive(frame)
 		y = y + ui:Append('WndButton', {
 			x = x, y = y, w = 150, h = 35,
 			text = _L['Edit Distance Level'],
-			buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
-			onclick = function()
+			buttonStyle = 'SKEUOMORPHISM_LACE_BORDER',
+			onClick = function()
 				GetUserInput(_L['distance, distance, ...'], function(szText)
 					local t = X.SplitString(X.TrimString(szText), ',')
 					local tt = {}
@@ -158,7 +158,7 @@ function PS.OnPanelActive(frame)
 		x = 280
 		x = x + ui:Append('Shadow', {
 			w = 22, h = 22, x = x, y = y + 3, color = tDistanceCol[1],
-			onclick = function()
+			onClick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
 					tDistanceCol[1] = { r, g, b }
@@ -186,7 +186,7 @@ function PS.OnPanelActive(frame)
 			if CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE then
 				x = x + ui:Append('Shadow', {
 					w = 22, h = 22, x = x, y = y + 3, color = tDistanceCol[i],
-					onclick = function()
+					onClick = function()
 						local this = this
 						UI.OpenColorPicker(function(r, g, b)
 							tDistanceCol[i] = { r, g, b }
@@ -203,15 +203,15 @@ function PS.OnPanelActive(frame)
 					x = x, y = y + 3, h = 22,
 					range = {0, 255},
 					value = tDistanceAlpha[i],
-					trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-					onchange = function(val)
+					trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+					onChange = function(val)
 						tDistanceAlpha[i] = val
 						if MY_CataclysmMain.GetFrame() then
 							MY_CataclysmParty:CallDrawHPMP(true, true)
 						end
 						CFG.tDistanceAlpha = tDistanceAlpha
 					end,
-					textfmt = function(val) return _L('Alpha: %d.', val) end,
+					textFormatter = function(val) return _L('Alpha: %d.', val) end,
 				}):Width() + 5
 			end
 			y = y + 30
@@ -232,7 +232,7 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('Shadow', {
 			w = 22, h = 22, x = x, y = y + 3,
 			color = tOtherCol[3],
-			onclick = function()
+			onClick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
 					tOtherCol[3] = { r, g, b }
@@ -243,7 +243,7 @@ function PS.OnPanelActive(frame)
 					UI(this):Color(r, g, b)
 				end)
 			end,
-			textfmt = function(val) return _L('Alpha: %d.', val) end,
+			textFormatter = function(val) return _L('Alpha: %d.', val) end,
 		}):Width() + 5
 	end
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
@@ -251,15 +251,15 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = tOtherAlpha[3],
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-			onchange = function(val)
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			onChange = function(val)
 				tOtherAlpha[3] = val
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 				CFG.tOtherAlpha = tOtherAlpha
 			end,
-			textfmt = function(val) return _L('Alpha: %d.', val) end,
+			textFormatter = function(val) return _L('Alpha: %d.', val) end,
 		}):Width() + 5
 	end
 	y = y + 30
@@ -271,7 +271,7 @@ function PS.OnPanelActive(frame)
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
 		x = x + ui:Append('Shadow', {
 			w = 22, h = 22, x = x, y = y + 3, color = tOtherCol[2],
-			onclick = function()
+			onClick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
 					tOtherCol[2] = { r, g, b }
@@ -289,15 +289,15 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = tOtherAlpha[2],
-			trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-			onchange = function(val)
+			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			onChange = function(val)
 				tOtherAlpha[2] = val
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 				CFG.tOtherAlpha = tOtherAlpha
 			end,
-			textfmt = function(val) return _L('Alpha: %d.', val) end,
+			textFormatter = function(val) return _L('Alpha: %d.', val) end,
 		}):Width() + 5
 	end
 	y = y + 30
@@ -308,7 +308,7 @@ function PS.OnPanelActive(frame)
 		ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }):AutoWidth()
 		y = y + ui:Append('Shadow', {
 			w = 22, h = 22, x = 280, y = y + 3, color = tManaColor,
-			onclick = function()
+			onClick = function()
 				local this = this
 				UI.OpenColorPicker(function(r, g, b)
 					tManaColor = { r, g, b }
@@ -329,7 +329,7 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y, text = _L['LifeBar Gradient'],
 			checked = CFG.bLifeGradient,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				CFG.bLifeGradient = bCheck
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
@@ -340,7 +340,7 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y, text = _L['ManaBar Gradient'],
 			checked = CFG.bManaGradient,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				CFG.bManaGradient = bCheck
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)

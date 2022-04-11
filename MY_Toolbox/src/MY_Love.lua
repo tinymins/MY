@@ -345,9 +345,9 @@ function D.CreateFireworkSelect(callback)
 			x = nX, y = nY + (nLineHeight - nItemHeight) / 2, w = nItemWidth, h = nItemHeight,
 			text = X.GetItemNameByUIID(p.aUIID[1]),
 			enable = not not D.GetBagItemPos(p.aUIID),
-			onclick = function() callback(p) end,
+			onClick = function() callback(p) end,
 			tip = p.szTitle,
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		})
 		if i % nCol == 0 then
 			nX = nMargin

@@ -320,8 +320,8 @@ function D.CheckInjection(bRemoveInjection)
 					x = x - w, y = y, w = w, h = h,
 					text = _L['Sort'],
 					tip = _L['Press shift for random'],
-					tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-					onclick = D.SortGuildBank,
+					tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+					onClick = D.SortGuildBank,
 				})
 			end
 			if btn3:Count() == 0 then
@@ -331,7 +331,7 @@ function D.CheckInjection(bRemoveInjection)
 					name = 'Btn_MY_Stack',
 					x = x - w, y = y, w = w, h = h,
 					text = _L['Stack'],
-					onclick = D.StackGuildBank,
+					onClick = D.StackGuildBank,
 				})
 			end
 		end
@@ -347,7 +347,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 200,
 		text = _L['Guild package sort and stack'],
 		checked = O.bGuildBank,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bGuildBank = bChecked
 			D.CheckInjection()
 		end,

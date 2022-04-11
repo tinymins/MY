@@ -952,17 +952,17 @@ function D.OnInitPage()
 		x = 380, y = 21, w = 160,
 		text = _L['Tip hide finished'],
 		checked = MY_RoleStatistics_SerendipityStat.bTipHideFinished,
-		oncheck = function()
+		onCheck = function()
 			MY_RoleStatistics_SerendipityStat.bTipHideFinished = not MY_RoleStatistics_SerendipityStat.bTipHideFinished
 		end,
-		autoenable = function() return MY_RoleStatistics_SerendipityStat.bFloatEntry end,
+		autoEnable = function() return MY_RoleStatistics_SerendipityStat.bFloatEntry end,
 	})
 
 	UI(wnd):Append('WndCheckBox', {
 		x = 540, y = 21, w = 130,
 		text = _L['Map mark'],
 		checked = MY_RoleStatistics_SerendipityStat.bMapMark,
-		oncheck = function()
+		onCheck = function()
 			MY_RoleStatistics_SerendipityStat.bMapMark = not MY_RoleStatistics_SerendipityStat.bMapMark
 		end,
 	})
@@ -971,10 +971,10 @@ function D.OnInitPage()
 		x = 670, y = 21, w = 130,
 		text = _L['Map mark hide acquired'],
 		checked = MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired,
-		oncheck = function()
+		onCheck = function()
 			MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired = not MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired
 		end,
-		autoenable = function() return MY_RoleStatistics_SerendipityStat.bMapMark end,
+		autoEnable = function() return MY_RoleStatistics_SerendipityStat.bMapMark end,
 	})
 
 	UI(wnd):Append('WndComboBox', {
@@ -1083,7 +1083,7 @@ function D.OnInitPage()
 	UI(wnd):Append('WndButton', {
 		x = 440, y = 590, w = 120,
 		text = _L['Refresh'],
-		onclick = function()
+		onClick = function()
 			D.FlushDB()
 			D.UpdateUI(page)
 		end,

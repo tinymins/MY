@@ -74,8 +74,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	nX = nX + uiInput:Width() + 5
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY + 2,
-		buttonstyle = 'FLAT', text = _L['Apply join team'],
-		onclick = function()
+		buttonStyle = 'FLAT', text = _L['Apply join team'],
+		onClick = function()
 			if bLoading then
 				return X.Systopmsg(_L['Processing, please wait.'])
 			end
@@ -105,8 +105,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	}):Width() + 5
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY + 2,
-		buttonstyle = 'FLAT', text = _L['Apply quit team'],
-		onclick = function()
+		buttonStyle = 'FLAT', text = _L['Apply quit team'],
+		onClick = function()
 			if bLoading then
 				return X.Systopmsg('Processing, please wait.')
 			end
@@ -136,8 +136,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	}):Width() + 5
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY + 5, w = 20, h = 20,
-		buttonstyle = 'QUESTION',
-		onclick = function()
+		buttonStyle = 'QUESTION',
+		onClick = function()
 			UI.OpenBrowser('https://page.j3cx.com/jx3box/team/about')
 		end,
 	}):Width()

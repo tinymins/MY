@@ -202,7 +202,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['filter duplicate chat'],
 		x = x, y = y, w = 400,
 		checked = O.bFilterDuplicate,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bFilterDuplicate = bCheck
 		end,
 	})
@@ -212,7 +212,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['filter duplicate chat ignore id'],
 		x = x, y = y, w = 400,
 		checked = O.bFilterDuplicateIgnoreID,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bFilterDuplicateIgnoreID = bCheck
 		end,
 	})
@@ -222,7 +222,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['only filter continuous duplicate chat'],
 		x = x, y = y, w = 400,
 		checked = O.bFilterDuplicateContinuous,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bFilterDuplicateContinuous = bCheck
 		end,
 	})
@@ -253,7 +253,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['filter duplicate addon message'],
 		x = x, y = y, w = 400,
 		checked = O.bFilterDuplicateAddonTalk,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bFilterDuplicateAddonTalk = bCheck
 		end,
 	})

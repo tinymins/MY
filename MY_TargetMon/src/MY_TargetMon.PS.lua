@@ -178,7 +178,7 @@ local function DrawDetail(ui)
 	uiSearch = uiWrapper:Append('WndEditBox', {
 		x = x0, y = y0,
 		w = 200, h = 30, placeholder = _L['Search'],
-		onchange = function(text)
+		onChange = function(text)
 			l_search = text
 			Search()
 		end,
@@ -186,8 +186,8 @@ local function DrawDetail(ui)
 	uiWrapper:Append('WndButton', {
 		x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28,
 		text = _L['Add'],
-		buttonstyle = 'FLAT',
-		onclick = function() InsertMonitor() end,
+		buttonStyle = 'FLAT',
+		onClick = function() InsertMonitor() end,
 	})
 
 	-- ³õÊ¼»¯list¿Ø¼þ
@@ -655,8 +655,8 @@ local function DrawDetail(ui)
 		x = x0 + w0 / 2 - 50, y = y0 + h0 - 30,
 		w = 100, h = 30,
 		text = _L['Close'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			l_config = nil
 			uiWrapper:Hide()
 		end,
@@ -683,21 +683,21 @@ local function DrawPreview(ui, config, OpenDetail)
 			x = x + 20, y = y - 3, w = w - 290,
 			r = 255, g = 255, b = 0, text = szCaption,
 			tip = szCaption .. '\n' .. _L['(Embedded caption cannot be changed)'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		}):AutoWidth()
 	else
 		uiWnd:Append('WndEditBox', {
 			x = x + 20, y = y, w = w - 290, h = 22,
 			r = 255, g = 255, b = 0, text = config.caption,
-			onchange = function(val) D.ModifyConfig(config, 'caption', val) end,
+			onChange = function(val) D.ModifyConfig(config, 'caption', val) end,
 		})
 	end
 	uiWnd:Append('WndButton', {
 		x = w - 180, y = y,
 		w = 50, h = 25,
 		text = _L['Move Up'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			D.MoveConfig(config, -1)
 			X.SwitchTab('MY_TargetMon', true)
 		end,
@@ -706,8 +706,8 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = w - 125, y = y,
 		w = 50, h = 25,
 		text = _L['Move Down'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			D.MoveConfig(config, 1)
 			X.SwitchTab('MY_TargetMon', true)
 		end,
@@ -716,13 +716,13 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = w - 70, y = y,
 		w = 60, h = 25,
 		text = _L['Delete'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			D.DeleteConfig(config, IsCtrlKeyDown())
 			X.SwitchTab('MY_TargetMon', true)
 		end,
 		tip = config.embedded and _L['Press ctrl to delete embedded data permanently.'] or nil,
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 	})
 	y = y + 30
 
@@ -732,7 +732,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = x, y = y,
 		text = _L['Enable'],
 		checked = config.enable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'enable', bChecked)
 		end,
 	})
@@ -741,12 +741,12 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = x + 90, y = y, w = 200,
 		text = _L['Hide others buff'],
 		tip = _L['Hide others buff TIP'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 		checked = config.hideOthers,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'hideOthers', bChecked)
 		end,
-		autoenable = function()
+		autoEnable = function()
 			return config.enable and config.type == 'BUFF'
 		end,
 	})
@@ -755,10 +755,10 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = x + 180, y = y, w = 180,
 		text = _L['Hide void'],
 		checked = config.hideVoid,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'hideVoid', bChecked)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	y = y + deltaY
 
@@ -767,30 +767,30 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = x, y = y, w = 90,
 		text = _L['Penetrable'],
 		checked = config.penetrable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'penetrable', bChecked)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = x + 90, y = y, w = 100,
 		text = _L['Undragable'],
-		checked = not config.dragable,
-		oncheck = function(bChecked)
-			D.ModifyConfig(config, 'dragable', not bChecked)
+		checked = not config.draggable,
+		onCheck = function(bChecked)
+			D.ModifyConfig(config, 'draggable', not bChecked)
 		end,
-		autoenable = function() return config.enable and not config.penetrable end,
+		autoEnable = function() return config.enable and not config.penetrable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = x + 180, y = y, w = 120,
 		text = _L['Ignore system ui scale'],
 		checked = config.ignoreSystemUIScale,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'ignoreSystemUIScale', bChecked)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	y = y + deltaY
 
@@ -799,30 +799,30 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = x, y = y, w = 200,
 		text = _L['Show cd circle'],
 		checked = config.cdCircle,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'cdCircle', bChecked)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = x + 90, y = y, w = 200,
 		text = _L['Show cd flash'],
 		checked = config.cdFlash,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'cdFlash', bChecked)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = x + 180, y = y, w = 200,
 		text = _L['Show cd ready spark'],
 		checked = config.cdReadySpark,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'cdReadySpark', bChecked)
 		end,
-		autoenable = function() return config.enable and not config.hideVoid end,
+		autoEnable = function() return config.enable and not config.hideVoid end,
 	})
 	y = y + deltaY
 
@@ -831,30 +831,30 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = x, y = y, w = 120,
 		text = _L['Show cd bar'],
 		checked = config.cdBar,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'cdBar', bChecked)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = x + 90, y = y, w = 120,
 		text = _L['Show name'],
 		checked = config.showName,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'showName', bChecked)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = x + 180, y = y, w = 120,
 		text = _L['Show time'],
 		checked = config.showTime,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'showTime', bChecked)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	y = y + deltaY
 
@@ -863,10 +863,10 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = x, y = y, w = 90,
 		text = _L['Play sound'],
 		checked = config.playSound,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'playSound', bChecked)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 
 	uiWnd:Append('WndComboBox', {
@@ -897,7 +897,7 @@ local function DrawPreview(ui, config, OpenDetail)
 			end
 			return t
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	uiWnd:Append('WndComboBox', {
 		x = x + 90 + 100, y = y, w = 100,
@@ -925,7 +925,7 @@ local function DrawPreview(ui, config, OpenDetail)
 			end
 			return t
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	y = y + 30
 
@@ -972,88 +972,88 @@ local function DrawPreview(ui, config, OpenDetail)
 			end
 			return t
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	uiWnd:Append('WndButton', {
 		x = xr + 140, y = y, w = 102,
 		text = _L['Set monitor'],
-		buttonstyle = 'FLAT',
-		onclick = function() OpenDetail(config) end,
-		autoenable = function() return config.enable end,
+		buttonStyle = 'FLAT',
+		onClick = function() OpenDetail(config) end,
+		autoEnable = function() return config.enable end,
 	})
 	y = y + 24
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 32},
 		value = config.maxLineCount,
-		textfmt = function(val) return _L('Display %d eachline.', val) end,
-		onchange = function(val)
+		textFormatter = function(val) return _L('Display %d eachline.', val) end,
+		onChange = function(val)
 			D.ModifyConfig(config, 'maxLineCount', val)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	y = y + deltaY
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.scale * 100,
-		textfmt = function(val) return _L('UI scale %d%%.', val) end,
-		onchange = function(val)
+		textFormatter = function(val) return _L('UI scale %d%%.', val) end,
+		onChange = function(val)
 			D.ModifyConfig(config, 'scale', val / 100)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	y = y + deltaY
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.iconFontScale * 100,
-		textfmt = function(val) return _L('Icon font scale %d%%.', val) end,
-		onchange = function(val)
+		textFormatter = function(val) return _L('Icon font scale %d%%.', val) end,
+		onChange = function(val)
 			D.ModifyConfig(config, 'iconFontScale', val / 100)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	y = y + deltaY
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.otherFontScale * 100,
-		textfmt = function(val) return _L('Other font scale %d%%.', val) end,
-		onchange = function(val)
+		textFormatter = function(val) return _L('Other font scale %d%%.', val) end,
+		onChange = function(val)
 			D.ModifyConfig(config, 'otherFontScale', val / 100)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	y = y + deltaY
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {50, 1000},
 		value = config.cdBarWidth,
-		textfmt = function(val) return _L('CD width %dpx.', val) end,
-		onchange = function(val)
+		textFormatter = function(val) return _L('CD width %dpx.', val) end,
+		onChange = function(val)
 			D.ModifyConfig(config, 'cdBarWidth', val)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	y = y + deltaY
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {-1, 30},
 		value = config.decimalTime,
-		textfmt = function(val)
+		textFormatter = function(val)
 			if val == -1 then
 				return _L['Always show decimal time.']
 			elseif val == 0 then
@@ -1062,10 +1062,10 @@ local function DrawPreview(ui, config, OpenDetail)
 				return _L('Show decimal time left in %ds.', val)
 			end
 		end,
-		onchange = function(val)
+		onChange = function(val)
 			D.ModifyConfig(config, 'decimalTime', val)
 		end,
-		autoenable = function() return config.enable end,
+		autoEnable = function() return config.enable end,
 	})
 	y = y + deltaY
 
@@ -1081,8 +1081,8 @@ local function DrawControls(ui, OpenDetail)
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Create'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			local config = D.CreateConfig()
 			DrawPreview(ui, config, OpenDetail)
 			DrawControls(ui, OpenDetail)
@@ -1094,8 +1094,8 @@ local function DrawControls(ui, OpenDetail)
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Import'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			local file = GetOpenFileName(
 				_L['Please select import target monitor data file.'],
 				'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
@@ -1123,9 +1123,9 @@ local function DrawControls(ui, OpenDetail)
 		x = x, y = y,
 		w = 60, h = 30,
 		text = _L['Export'],
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		tip = _L['Press ALT to export as default data.\n Press CTRL to export as plain.'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		menu = function()
 			local aUUID = {}
 			local menu = {}
@@ -1182,8 +1182,8 @@ local function DrawControls(ui, OpenDetail)
 		x = x, y = y,
 		w = 80, h = 30,
 		text = _L['Save As Default'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			X.Confirm(_L['Sure to save as default?'], function()
 				D.SaveConfig(true)
 			end)
@@ -1194,8 +1194,8 @@ local function DrawControls(ui, OpenDetail)
 		x = x, y = y,
 		w = 80, h = 30,
 		text = _L['Reset Default'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			X.Dialog(_L['Sure to reset default?'], {
 				{
 					szOption = _L['Origin config'],

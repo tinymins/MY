@@ -178,7 +178,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 70,
 		text = _L['Enable'],
 		checked = O.bBlockWords,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			O.bBlockWords = bCheck
 			D.CheckEnable()
 		end,
@@ -344,7 +344,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = w - 160, y=  0, w = 80,
 		text = _L['Add'],
-		onclick = function()
+		onClick = function()
 			local szText = X.TrimString(edit:Text())
 			if X.IsEmpty(szText) then
 				return
@@ -361,7 +361,7 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = w - 80, y =  0, w = 80,
 		text = _L['Delete'],
-		onclick = function()
+		onClick = function()
 			O('reload', {'aBlockWords'})
 			for _, v in ipairs(list:ListBox('select', 'selected')) do
 				RemoveBlockWord(v.id)

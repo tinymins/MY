@@ -266,7 +266,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Auto hide chat panel'],
 		checked = O.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bEnable = bChecked
 			D.Apply()
 		end,

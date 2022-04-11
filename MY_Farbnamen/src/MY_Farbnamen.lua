@@ -751,7 +751,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Enable MY_Farbnamen'],
 		checked = O.bEnable,
-		oncheck = function()
+		onCheck = function()
 			O.bEnable = not O.bEnable
 		end,
 	}):Width() + 5
@@ -762,10 +762,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		text = _L['Insert force icon'],
 		checked = O.bInsertIcon,
-		oncheck = function()
+		onCheck = function()
 			O.bInsertIcon = not O.bInsertIcon
 		end,
-		autoenable = function()
+		autoEnable = function()
 			return O.bEnable
 		end,
 	}):Width() + 5
@@ -774,12 +774,12 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 100, h = 25,
 		value = O.nInsertIconSize,
 		range = {1, 300},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		textfmt = function(v) return _L('Icon size: %dpx', v) end,
-		onchange = function(val)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textFormatter = function(v) return _L('Icon size: %dpx', v) end,
+		onChange = function(val)
 			O.nInsertIconSize = val
 		end,
-		autoenable = function() return O.bInsertIcon end,
+		autoEnable = function() return O.bInsertIcon end,
 	}):AutoWidth():Width() + 5
 
 	nX = nPaddingX + 25
@@ -787,23 +787,23 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, w = 'auto',
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		text = _L['Customize color'],
-		onclick = function()
+		onClick = function()
 			X.ShowPanel()
 			X.FocusPanel()
 			X.SwitchTab('GlobalColor')
 		end,
-		autoenable = function()
+		autoEnable = function()
 			return O.bEnable
 		end,
 	}):Width() + 5
 
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, w = 'auto',
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		text = _L['Reset data'],
-		onclick = function()
+		onClick = function()
 			X.Confirm(_L['Are you sure to reset farbnamen data? All character\'s data cache will be removed.'], function()
 				if not InitDB() then
 					return
@@ -812,7 +812,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 				X.Sysmsg(_L['MY_Farbnamen'], _L['Cache data deleted.'])
 			end)
 		end,
-		autoenable = function()
+		autoEnable = function()
 			return O.bEnable
 		end,
 	}):Width() + 5

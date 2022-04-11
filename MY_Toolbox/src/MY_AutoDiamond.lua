@@ -336,12 +336,12 @@ function D.CheckInjection(bRemove)
 			name = 'WndEditBox_MYDiamond',
 			text = D.nAutoCount,
 			x = nX, y = nY - 2, w = 50, h = 20, alpha = 192,
-			edittype = UI.EDIT_TYPE.NUMBER,
-			onchange = function(szText)
+			editType = UI.EDIT_TYPE.NUMBER,
+			onChange = function(szText)
 				D.nAutoCount = tonumber(szText) or 0
 			end,
 			tip = _L['Will continue produce until counter reachs or casting failed.'],
-			tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 		}):Width() + 5
 		nX = nX + ui:Append('Text', {
 			name = 'Text_MYDiamond2',
@@ -352,14 +352,14 @@ function D.CheckInjection(bRemove)
 		nX = nX + ui:Append('WndButtonBox', {
 			name = 'WndButton_MYDiamond',
 			x = nX, y = nY, w = 50, h = 20,
-			buttonstyle = 'FLAT',
+			buttonStyle = 'FLAT',
 			text = _L['Stop'],
-			onclick = function()
+			onClick = function()
 				D.dFormula = nil
 			end,
-			autoenable = function() return D.dFormula and D.nAutoCount > 0 end,
+			autoEnable = function() return D.dFormula and D.nAutoCount > 0 end,
 		}):Width() + 5
-		ui:Append('Text', { name = 'Text_Result', x = 0, y = 25, w = nX, h = 22, alpha = 192, halign = 1 })
+		ui:Append('Text', { name = 'Text_Result', x = 0, y = 25, w = nX, h = 22, alpha = 192, alignHorizontal = 1 })
 		ui:Width(nX)
 		ui:Left((380 - nX) / 2)
 		D.UpdateDashboard()

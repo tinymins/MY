@@ -64,7 +64,7 @@ function PS.OnPanelActive(wnd)
 	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['Save Talk'], font = 27 }):Pos('BOTTOMRIGHT')
 
 	nX = nPaddingX + 10
-	nX = ui:Append('WndButton', { x = nX, y = nY + 10, text = _L['Save Advertising'], buttonstyle = 'FLAT' }):Click(function(bChecked)
+	nX = ui:Append('WndButton', { x = nX, y = nY + 10, text = _L['Save Advertising'], buttonStyle = 'FLAT' }):Click(function(bChecked)
 		local edit = X.GetChatInput()
 		local txt, data = edit:GetText(), edit:GetTextStruct()
 		if X.TrimString(txt) == '' then
@@ -100,12 +100,12 @@ function PS.OnPanelActive(wnd)
 		end
 		nX = ui:Append('WndButton', {
 			x = nX, y = nY, w = 80, text = v.key,
-			buttonstyle = 'FLAT',
-			onlclick = function()
+			buttonStyle = 'FLAT',
+			onLClick = function()
 				X.SetChatInput(v.ad)
 				X.FocusChatInput()
 			end,
-			rmenu = function()
+			menuRClick = function()
 				local menu = {{
 					szOption = _L['Delete'],
 					fnAction = function()
@@ -116,7 +116,7 @@ function PS.OnPanelActive(wnd)
 				}}
 				return menu
 			end,
-			onhover = function(bIn)
+			onHover = function(bIn)
 				if bIn then
 					local x, y = this:GetAbsPos()
 					local w, h = this:GetSize()

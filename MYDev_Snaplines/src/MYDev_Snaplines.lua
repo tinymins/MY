@@ -543,7 +543,7 @@ X.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/U
 
 		ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = 200, text = _L['auto scale'], checked = O.bAutoScale,
-			oncheck = function(bCheck) O.bAutoScale = bCheck end
+			onCheck = function(bCheck) O.bAutoScale = bCheck end
 		})
 		nY = nY + 40
 

@@ -40,7 +40,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show AllGrid'],
 		checked = CFG.bShowAllGrid,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bShowAllGrid = bCheck
 			MY_CataclysmMain.ReloadCataclysmPanel()
 		end,
@@ -64,7 +64,7 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndRadioBox', {
 			x = x, y = y, text = p[2],
 			group = 'namecolor', checked = CFG.nColoredName == p[1],
-			oncheck = function()
+			onCheck = function()
 				CFG.nColoredName = p[1]
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallRefreshImages(true, false, false, nil, true)
@@ -78,9 +78,9 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = CFG.fNameFontScale * 100,
 		range = {1, 400},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		textfmt = function(val) return _L('Scale %d%%', val) end,
-		onchange = function(val)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textFormatter = function(val) return _L('Scale %d%%', val) end,
+		onChange = function(val)
 			CFG.fNameFontScale = val / 100
 			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallRefreshImages(nil, nil, nil, nil, true)
@@ -97,7 +97,7 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndRadioBox', {
 			x = x, y = y, text = p[2],
 			group = 'namevali', checked = CFG.nNameVAlignment == p[1],
-			oncheck = function()
+			onCheck = function()
 				CFG.nNameVAlignment = p[1]
 				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
@@ -111,7 +111,7 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndRadioBox', {
 			x = x, y = y, text = p[2],
 			group = 'namehali', checked = CFG.nNameHAlignment == p[1],
-			oncheck = function()
+			onCheck = function()
 				CFG.nNameHAlignment = p[1]
 				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
@@ -121,8 +121,8 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndButton', {
 		x = x, y = y - 3,
 		text = _L['Name font'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nNameFont = nFont
 				if MY_CataclysmMain.GetFrame() then
@@ -145,7 +145,7 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndRadioBox', {
 			x = x, y = y, text = p[2],
 			group = 'lifemode', checked = CFG.nHPShownMode2 == p[1],
-			oncheck = function()
+			onCheck = function()
 				CFG.nHPShownMode2 = p[1]
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
@@ -158,15 +158,15 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = CFG.fLifeFontScale * 100,
 		range = {1, 400},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		textfmt = function(val) return _L('Scale %d%%', val) end,
-		onchange = function(val)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textFormatter = function(val) return _L('Scale %d%%', val) end,
+		onChange = function(val)
 			CFG.fLifeFontScale = val / 100
 			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
-		autoenable = function() return CFG.nHPShownMode2 ~= 0 end,
+		autoEnable = function() return CFG.nHPShownMode2 ~= 0 end,
 	})
 	y = y + 25
 
@@ -180,8 +180,8 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndRadioBox', {
 			x = x, y = y, text = p[2],
 			group = 'lifval', checked = CFG.nHPShownNumMode == p[1],
-			autoenable = function() return CFG.nHPShownMode2 ~= 0 end,
-			oncheck = function()
+			autoEnable = function() return CFG.nHPShownMode2 ~= 0 end,
+			onCheck = function()
 				CFG.nHPShownNumMode = p[1]
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
@@ -193,7 +193,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Decimal'],
 		checked = CFG.bShowHPDecimal,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bShowHPDecimal = bCheck
 			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
@@ -211,8 +211,8 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndRadioBox', {
 			x = x, y = y, text = p[2],
 			group = 'lifvali', checked = CFG.nHPVAlignment == p[1],
-			autoenable = function() return CFG.nHPShownMode2 ~= 0 end,
-			oncheck = function()
+			autoEnable = function() return CFG.nHPShownMode2 ~= 0 end,
+			onCheck = function()
 				CFG.nHPVAlignment = p[1]
 				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
@@ -226,8 +226,8 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndRadioBox', {
 			x = x, y = y, text = p[2],
 			group = 'lifhali', checked = CFG.nHPHAlignment == p[1],
-			autoenable = function() return CFG.nHPShownMode2 ~= 0 end,
-			oncheck = function()
+			autoEnable = function() return CFG.nHPShownMode2 ~= 0 end,
+			onCheck = function()
 				CFG.nHPHAlignment = p[1]
 				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
@@ -236,8 +236,8 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndButton', {
 		x = x, y = y - 1,
 		text = _L['Life font'],
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nLifeFont = nFont
 				if MY_CataclysmMain.GetFrame() then
@@ -245,7 +245,7 @@ function PS.OnPanelActive(frame)
 				end
 			end)
 		end,
-		autoenable = function() return CFG.nHPShownMode2 ~= 0 end,
+		autoEnable = function() return CFG.nHPShownMode2 ~= 0 end,
 	}):AutoWidth()
 	y = y + 25
 
@@ -261,7 +261,7 @@ function PS.OnPanelActive(frame)
 		x = x + ui:Append('WndRadioBox', {
 			x = x, y = y, text = p[2],
 			group = 'icon', checked = CFG.nShowIcon == p[1],
-			oncheck = function()
+			onCheck = function()
 				CFG.nShowIcon = p[1]
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
@@ -277,7 +277,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show ManaCount'],
 		checked = CFG.nShowMP,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.nShowMP = bCheck
 			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
@@ -288,8 +288,8 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndButton', {
 		x = x, y = y,
 		text = g_tStrings.STR_SKILL_MANA .. g_tStrings.FONT,
-		buttonstyle = 'FLAT',
-		onclick = function()
+		buttonStyle = 'FLAT',
+		onClick = function()
 			UI.OpenFontPicker(function(nFont)
 				CFG.nManaFont = nFont
 				if MY_CataclysmMain.GetFrame() then
@@ -297,22 +297,22 @@ function PS.OnPanelActive(frame)
 				end
 			end)
 		end,
-		autoenable = function() return CFG.nShowMP end,
+		autoEnable = function() return CFG.nShowMP end,
 	}):Width() + 5
 
 	ui:Append('WndTrackbar', {
 		x = x, y = y - 1,
 		value = CFG.fManaFontScale * 100,
 		range = {1, 400},
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		textfmt = function(val) return _L('Scale %d%%', val) end,
-		onchange = function(val)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textFormatter = function(val) return _L('Scale %d%%', val) end,
+		onChange = function(val)
 			CFG.fManaFontScale = val / 100
 			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
-		autoenable = function() return CFG.nShowMP end,
+		autoEnable = function() return CFG.nShowMP end,
 	})
 	y = y + 25
 end

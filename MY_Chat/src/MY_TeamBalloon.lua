@@ -172,7 +172,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 250,
 		text = _L['team balloon'],
 		checked = O.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bEnable = bChecked
 			D.Apply()
 		end,

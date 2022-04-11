@@ -89,9 +89,9 @@ function PS.OnPanelActive(frame)
 		x = nPaddingX
 		x = x + ui:Append('WndButton', {
 			x = x, y = y, w = 100,
-			buttonstyle = 'FLAT',
+			buttonStyle = 'FLAT',
 			text = _L['Add'],
-			onclick = function()
+			onClick = function()
 				local rec = {}
 				table.insert(CFG.aBuffList, rec)
 				l_list:ListBox('insert', { id = rec, text = MY_Cataclysm.EncodeBuffRule(rec), data = rec })
@@ -100,9 +100,9 @@ function PS.OnPanelActive(frame)
 		}):AutoHeight():Width() + 5
 		x = x + ui:Append('WndButton', {
 			x = x, y = y, w = 100,
-			buttonstyle = 'FLAT',
+			buttonStyle = 'FLAT',
 			text = _L['Edit'],
-			onclick = function()
+			onClick = function()
 				local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
 					w = 350, h = 550,
 					text = _L['Edit buff'],
@@ -119,8 +119,8 @@ function PS.OnPanelActive(frame)
 				ui:Append('WndButton', {
 					x = x, y = y, w = 310,
 					text = _L['Sure'],
-					buttonstyle = 'FLAT',
-					onclick = function()
+					buttonStyle = 'FLAT',
+					onClick = function()
 						CFG.aBuffList = DecodeBuffRuleList(edit:Text())
 						MY_CataclysmMain.UpdateBuffListCache()
 						ui:Remove()
@@ -136,7 +136,7 @@ function PS.OnPanelActive(frame)
 		l_list = ui:Append('WndListBox', {
 			x = x, y = y,
 			w = w - 240 - 20, h = h - y - 5,
-			listbox = {{
+			listBox = {{
 				'onlclick',
 				function(id, szText, data, bSelected)
 					OpenBuffRuleEditor(data)
@@ -157,7 +157,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y,
 		text = _L['Auto scale'],
 		checked = CFG.bAutoBuffSize,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bAutoBuffSize = bCheck
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
@@ -165,15 +165,15 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndTrackbar', {
 		x = x, y = y, h = 25, rw = 80,
 		enable = not CFG.bAutoBuffSize,
-		autoenable = function() return not CFG.bAutoBuffSize end,
+		autoEnable = function() return not CFG.bAutoBuffSize end,
 		range = {50, 200},
 		value = CFG.fBuffScale * 100,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		onchange = function(nVal)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		onChange = function(nVal)
 			CFG.fBuffScale = nVal / 100
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
-		textfmt = function(val) return _L('%d%%', val) end,
+		textFormatter = function(val) return _L('%d%%', val) end,
 	}):AutoWidth():Width() + 10
 
 	x = nPaddingX
@@ -183,8 +183,8 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, h = 25, rw = 80, text = '',
 		range = {0, 10},
 		value = CFG.nMaxShowBuff,
-		trackbarstyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
-		onchange = function(nVal)
+		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		onChange = function(nVal)
 			CFG.nMaxShowBuff = nVal
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
@@ -195,7 +195,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Push buff to official'],
 		checked = CFG.bBuffPushToOfficial,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bBuffPushToOfficial = bCheck
 			MY_CataclysmMain.UpdateBuffListCache()
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
@@ -204,7 +204,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Buff Staring'],
 		checked = CFG.bStaring,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bStaring = bCheck
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
@@ -215,7 +215,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Buff Time'],
 		checked = CFG.bShowBuffTime,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bShowBuffTime = bCheck
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
@@ -224,7 +224,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y,
 		text = _L['Over mana bar'],
 		checked = not CFG.bBuffAboveMana,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bBuffAboveMana = not bCheck
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
@@ -235,7 +235,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Buff Num'],
 		checked = CFG.bShowBuffNum,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bShowBuffNum = bCheck
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
@@ -243,7 +243,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Show Buff Reminder'],
 		checked = CFG.bShowBuffReminder,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bShowBuffReminder = bCheck
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
@@ -254,7 +254,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, text = _L['Alt Click Publish'],
 		checked = CFG.bBuffAltPublish,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bBuffAltPublish = bCheck
 		end,
 	}):AutoWidth():Width() + 5
@@ -265,12 +265,12 @@ function PS.OnPanelActive(frame)
 		x = x, y = y,
 		text = _L['Enable official data'],
 		checked = CFG.bBuffDataOfficial,
-		oncheck = function(bCheck)
+		onCheck = function(bCheck)
 			CFG.bBuffDataOfficial = bCheck
 			MY_CataclysmMain.UpdateBuffListCache()
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
-		autoenable = function() return MY_Resource and true end,
+		autoEnable = function() return MY_Resource and true end,
 	}):AutoWidth():Width() + 5
 	y = y + 30
 
@@ -280,12 +280,12 @@ function PS.OnPanelActive(frame)
 			x = x, y = y,
 			text = _L['Enable MY_TeamMon data'],
 			checked = CFG.bBuffDataTeamMon,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				CFG.bBuffDataTeamMon = bCheck
 				MY_CataclysmMain.UpdateBuffListCache()
 				X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 			end,
-			autoenable = function() return MY_Resource and true end,
+			autoEnable = function() return MY_Resource and true end,
 		}):AutoWidth():Width() + 5
 		y = y + 30
 	end

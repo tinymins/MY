@@ -41,7 +41,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	ui:Append('WndButton', {
 		x = nW - 130, y = 30, w = 120,
 		text = _L['Check nearby gongzhan'],
-		onlclick = function()
+		onLClick = function()
 			if X.BreatheCall('MY_GongzhanCheck') then
 				X.BreatheCall('MY_GongzhanCheck', false)
 			else
@@ -116,7 +116,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				end)
 			end
 		end,
-		rmenu = function()
+		menuRClick = function()
 			local t = { { szOption = _L['send to ...'], bDisable = true }, { bDevide = true } }
 			for _, tChannel in ipairs(tChannels) do
 				table.insert( t, {

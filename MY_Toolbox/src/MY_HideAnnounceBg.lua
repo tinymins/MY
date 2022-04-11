@@ -56,7 +56,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY,
 		text = _L['Hide announce bg'],
 		checked = MY_HideAnnounceBg.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_HideAnnounceBg.bEnable = bChecked
 		end,
 	}):AutoWidth():Width() + 5

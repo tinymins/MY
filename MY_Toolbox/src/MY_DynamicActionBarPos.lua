@@ -186,7 +186,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 130,
 		text = _L['Restore dynamic action bar pos'],
 		checked = MY_DynamicActionBarPos.bEnable,
-		oncheck = function()
+		onCheck = function()
 			MY_DynamicActionBarPos.bEnable = not MY_DynamicActionBarPos.bEnable
 		end,
 	}):AutoWidth()

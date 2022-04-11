@@ -871,7 +871,7 @@ function D.OnActivePage()
 			group = 'FilterType',
 			text = _L.BAG_FILTER_TYPE[p.name],
 			checked = D.szFilterType == p.name,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				if not bChecked then
 					return
 				end

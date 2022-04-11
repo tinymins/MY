@@ -47,7 +47,7 @@ function D.Hook()
 		x = 50, y = 482,
 		text = _L['Auto memorize book'],
 		checked = O.bEnable,
-		oncheck = function() O.bEnable = not O.bEnable end,
+		onCheck = function() O.bEnable = not O.bEnable end,
 	})
 end
 

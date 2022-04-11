@@ -92,7 +92,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			x = nX, y = nY, w = 'auto',
 			text = _L['Item price'],
 			checked = MY_ItemPrice.bEnable,
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				if bChecked then
 					local ui = UI(this)
 					X.Confirm(_L['Check this will show price entry in bag item menu, and will share price when search auction, are you sure?'], function()
@@ -105,7 +105,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				end
 			end,
 			tip = _L['Hold SHIFT and r-click bag box to show item price, share price when search auction.'],
-			tippostype = UI.TIP_POSITION.BOTTOM_TOP,
+			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
 		}):Width() + 5
 	end
 	return nX, nY

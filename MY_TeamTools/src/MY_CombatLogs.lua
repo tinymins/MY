@@ -682,15 +682,15 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nX, y = nY, w = 200,
 		text = _L['MY_CombatLogs'],
 		checked = MY_CombatLogs.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_CombatLogs.bEnable = bChecked
 		end,
 	}):AutoWidth():Width() + 5
 
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, w = 25, h = 25,
-		buttonstyle = 'OPTION',
-		autoenable = function() return MY_CombatLogs.bEnable end,
+		buttonStyle = 'OPTION',
+		autoEnable = function() return MY_CombatLogs.bEnable end,
 		menu = function()
 			local menu = {}
 			table.insert(menu, {

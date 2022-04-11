@@ -120,7 +120,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, lineHe
 		x = nX, y = nY, w = 'auto',
 		text = _L['Redirect metion to whisper'],
 		checked = O.bEnable,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bEnable = bChecked
 			D.Apply()
 		end,

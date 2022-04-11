@@ -1106,7 +1106,7 @@ function D.UpdateUI(page)
 		UI(hRow):Append('CheckBox', {
 			x = 5, y = 2, w = EXCEL_WIDTH - 10,
 			checked = X.IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] or false,
-			oncheck = function(bCheck)
+			onCheck = function(bCheck)
 				O.tSummaryIgnoreGUID[rec.guid] = not bCheck or nil
 				O.tSummaryIgnoreGUID = O.tSummaryIgnoreGUID
 				D.UpdateUI(page)
@@ -1324,8 +1324,8 @@ function D.OnInitPage()
 
 	UI(wnd):Append('WndButton', {
 		x = 25, y = 552, w = 25, h = 25,
-		buttonstyle = 'OPTION',
-		onclick = function()
+		buttonStyle = 'OPTION',
+		onClick = function()
 			D.bConfigSummary = not D.bConfigSummary
 			D.UpdateUI(page)
 		end,

@@ -222,16 +222,16 @@ function R.Drawer(container, info)
 	ui:Append('WndButton', {
 		name = 'Btn_Accept',
 		x = 326, y = 9, w = 60, h = 34,
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		text = g_tStrings.STR_ACCEPT,
-		onclick = D.OnLButtonClick,
+		onClick = D.OnLButtonClick,
 	})
 	ui:Append('WndButton', {
 		name = 'Btn_Refuse',
 		x = 393, y = 9, w = 60, h = 34,
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		text = g_tStrings.STR_REFUSE,
-		onclick = D.OnLButtonClick,
+		onClick = D.OnLButtonClick,
 	})
 
 	return wnd

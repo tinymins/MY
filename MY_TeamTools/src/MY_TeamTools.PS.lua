@@ -37,8 +37,8 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndButton', {
 		x = nW - 165, y = nY, w = 150, h = 38,
 		text = _L['Open Panel'],
-		buttonstyle = 'SKEUOMORPHISM_LACE_BORDER',
-		onclick = MY_TeamTools.Open,
+		buttonStyle = 'SKEUOMORPHISM_LACE_BORDER',
+		onClick = MY_TeamTools.Open,
 	})
 
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['MY_TeamTools'], font = 27 }):Height() + 5
@@ -47,7 +47,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY,
 		checked = MY_TeamNotice.bEnable,
 		text = _L['Team Message'],
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_TeamNotice.bEnable = bChecked
 		end,
 	}):AutoWidth():Width() + 5
@@ -56,7 +56,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY,
 		checked = MY_CharInfo.bEnable,
 		text = _L['Allow view charinfo'],
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			MY_CharInfo.bEnable = bChecked
 		end,
 	}):AutoWidth():Width() + 5
@@ -66,7 +66,7 @@ function PS.OnPanelActive(wnd)
 			x = nX, y = nY,
 			checked = MY_WorldMark.bEnable,
 			text = _L['World mark enhance'],
-			oncheck = function(bChecked)
+			onCheck = function(bChecked)
 				MY_WorldMark.bEnable = bChecked
 				MY_WorldMark.CheckEnable()
 			end,

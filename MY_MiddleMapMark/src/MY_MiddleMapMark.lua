@@ -832,7 +832,7 @@ function PS.OnPanelActive(wnd)
 		name = 'WndEdit_Search',
 		x = x, y = y,
 		w = w, h = 25,
-		onchange = function(szText)
+		onChange = function(szText)
 			UpdateList(szText)
 		end,
 	})
@@ -850,7 +850,7 @@ function PS.OnPanelActive(wnd)
 		name = 'WndListBox_1',
 		x = x, y = y,
 		w = w, h = h - y,
-		listbox = {
+		listBox = {
 			{
 				'onhover',
 				function(id, text, data)

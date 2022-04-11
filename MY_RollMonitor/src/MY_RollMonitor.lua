@@ -447,8 +447,8 @@ function PS.OnPanelActive(wnd)
 	-- 清空
 	ui:Append('WndButton', {
 		x = w - 176, y = 10, w = 90, text = _L['restart'],
-		onlclick = function(nButton) D.Clear() end,
-		rmenu = function()
+		onLClick = function(nButton) D.Clear() end,
+		menuRClick = function()
 			local t = {{
 				szOption = _L['publish while restart'],
 				bCheck = true, bMCheck = false, bChecked = O.bPublishRestart,
@@ -467,13 +467,13 @@ function PS.OnPanelActive(wnd)
 			return t
 		end,
 		tip = _L['left click to restart, right click to open setting.'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
 	})
 	-- 发布
 	ui:Append('WndButton', {
 		x = w - 86, y = 10, w = 80, text = _L['publish'],
-		onlclick = function() D.Echo() end,
-		rmenu = function()
+		onLClick = function() D.Echo() end,
+		menuRClick = function()
 			local t = { {
 				szOption = _L['publish setting'], {
 					bCheck = true, bMCheck = true, bChecked = O.nPublish == 3,
@@ -510,13 +510,13 @@ function PS.OnPanelActive(wnd)
 			return t
 		end,
 		tip = _L['left click to publish, right click to open setting.'],
-		tippostype = UI.TIP_POSITION.TOP_BOTTOM,
-		tipoffset = { x = -80 },
+		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tipOffset = { x = -80 },
 	})
 	-- 输出板
 	m_uiBoard = ui:Append('WndScrollHandleBox',{
 		x = 20,  y = 40, w = w - 26, h = h - 60,
-		handlestyle = 3, text = _L['average score with out pole']
+		handleStyle = 3, text = _L['average score with out pole']
 	})
 	D.DrawBoard()
 	X.BreatheCall('MY_RollMonitorRedraw', 1000, CheckBoardRedraw)

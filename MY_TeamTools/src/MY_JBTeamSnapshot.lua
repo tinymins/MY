@@ -99,23 +99,23 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	nX = nX + ui:Append('WndEditBox', {
 		x = nX, y = nY + 2, w = 300, h = 25,
 		text = O.szTeam,
-		onchange = function(szText)
+		onChange = function(szText)
 			O.szTeam = szText
 		end,
 	}):Width() + 5
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY + 2,
-		buttonstyle = 'FLAT', text = _L['Upload Snapshot'],
-		onclick = function()
+		buttonStyle = 'FLAT', text = _L['Upload Snapshot'],
+		onClick = function()
 			D.CreateSnapshot()
 		end,
 	}):Width() + 5
 	nX = nX + ui:Append('WndButtonBox', {
 		x = nX, y = nY + 5, w = 130, h = 20,
 		color = { 234, 235, 185 },
-		buttonstyle = 'LINK',
+		buttonStyle = 'LINK',
 		text = _L['>> View Snapshots <<'],
-		onclick = function()
+		onClick = function()
 			X.OpenBrowser('https://page.j3cx.com/jx3box/team/snapshot')
 		end,
 	}):AutoWidth():Width() + 5
