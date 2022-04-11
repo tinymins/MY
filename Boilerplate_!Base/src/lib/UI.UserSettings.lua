@@ -40,7 +40,7 @@ function D.Open(bImport)
 	local uiContainer = uiFrame:Append('WndScrollWindowBox', {
 		x = 10, y = 50,
 		w = W - 20, h = H - 60 - 40,
-		containertype = UI.WND_CONTAINER_STYLE.LEFT_TOP,
+		containerType = UI.WND_CONTAINER_STYLE.LEFT_TOP,
 	})
 	local nW = select(2, uiContainer:Width())
 	local aGroup, tItemAll = {}, {}
@@ -94,7 +94,7 @@ function D.Open(bImport)
 				text = tGroup.szGroup,
 				color = {255, 255, 0},
 				checked = true,
-				oncheck = function (bCheck)
+				onCheck = function (bCheck)
 					for _, tItem in ipairs(tGroup.aItem) do
 						tItemChecked[tItem.szID] = bCheck
 					end
@@ -107,7 +107,7 @@ function D.Open(bImport)
 					x = 0, w = nW / 3,
 					text = tItem.szLabel,
 					checked = true,
-					oncheck = function(bCheck)
+					onCheck = function(bCheck)
 						tItemChecked[tItem.szID] = bCheck
 						UpdateCheckboxState()
 					end,
@@ -119,9 +119,9 @@ function D.Open(bImport)
 	uiFrame:Append('WndButtonBox', {
 		x = (W - 200) / 2, y = H - 40,
 		w = 200, h = 25,
-		buttonstyle = 'FLAT',
+		buttonStyle = 'FLAT',
 		text = bImport and _L['Import'] or _L['Export'],
-		onclick = function()
+		onClick = function()
 			local aKey, tKvp = {}, {}
 			for szID, bCheck in pairs(tItemChecked) do
 				if bCheck then

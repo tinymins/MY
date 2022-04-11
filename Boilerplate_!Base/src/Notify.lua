@@ -354,8 +354,8 @@ local function OnInit()
 		w = 250, h = 150, visible = false,
 		anchor = O.anchor,
 		events = {{ 'UI_SCALED', function() l_uiFrame:Anchor(O.anchor) end }},
-		customlayout = _L[FRAME_NAME],
-		oncustomlayout = function(bEnter, anchor)
+		customLayout = _L[FRAME_NAME],
+		onCustomLayout = function(bEnter, anchor)
 			if bEnter then
 				X.DelayCall(TIP_FRAME_NAME .. '_Hide', false)
 				l_uiFrame:Show():Alpha(255)
@@ -367,15 +367,15 @@ local function OnInit()
 	})
 	-- init tip panel handle and bind animation function
 	l_uiTipBoard = l_uiFrame:Append('WndScrollHandleBox', {
-		handlestyle = 3, x = 0, y = 0, w = 250, h = 150,
-		onclick = function()
+		handleStyle = 3, x = 0, y = 0, w = 250, h = 150,
+		onClick = function()
 			if X.IsInCustomUIMode() then
 				return
 			end
 			D.OpenPanel()
 			l_uiFrame:FadeOut(500)
 		end,
-		onhover = function(bIn)
+		onHover = function(bIn)
 			if X.IsInCustomUIMode() then
 				return
 			end
@@ -407,7 +407,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nX, y = nY, w = 200, h = 25,
 		text = _L['Show in minimap'],
 		checked = O.bEntry,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bEntry = bChecked
 			D.UpdateEntry()
 		end,
@@ -416,7 +416,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nX, y = nY, w = 100, h = 25,
 		text = _L['Order desc'],
 		checked = O.bDesc,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bDesc = bChecked
 			D.DrawNotifies()
 		end,
@@ -425,7 +425,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nX, y = nY, w = 100, h = 25,
 		text = _L['Disable dismiss'],
 		checked = O.bDisableDismiss,
-		oncheck = function(bChecked)
+		onCheck = function(bChecked)
 			O.bDisableDismiss = bChecked
 		end,
 	}):AutoWidth():Width() + 5

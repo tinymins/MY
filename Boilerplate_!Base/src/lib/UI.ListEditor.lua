@@ -31,7 +31,7 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 				UI(this):FadeTo(500,0)
 			end
 		end):Click(function(nButton)
-			if nButton == UI.MOUSE_EVENT.RBUTTON then
+			if nButton == UI.MOUSE_BUTTON.RIGHT then
 				hHandle.Selected = true
 				UI.PopupMenu({{
 					szOption = _L['Delete'],
@@ -50,13 +50,13 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 		end)
 	end
 	local ui = UI.CreateFrame(szFrameName)
-	ui:Append('Image', { x = -10, y = 25, w = 360, h = 10, image = 'UI/Image/UICommon/Commonpanel.UITex', imageframe = 42 })
+	ui:Append('Image', { x = -10, y = 25, w = 360, h = 10, image = 'UI/Image/UICommon/Commonpanel.UITex', imageFrame = 42 })
 	local muEditBox = ui:Append('WndEditBox', { x = 0, y = 0, w = 170, h = 25 })
-	local muList = ui:Append('WndScrollHandleBox', { handlestyle = 3, x = 0, y = 30, w = 340, h = 380 })
+	local muList = ui:Append('WndScrollHandleBox', { handleStyle = 3, x = 0, y = 30, w = 340, h = 380 })
 	-- add
 	ui:Append('WndButton', {
 		x = 180, y = 0, w = 80, text = _L['Add'],
-		onclick = function()
+		onClick = function()
 			local szText = muEditBox:Text()
 			-- º”»Î±Ì
 			if OnAdd then
@@ -71,7 +71,7 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	-- del
 	muDel = ui:Append('WndButton', {
 		x = 260, y = 0, w = 80, text = _L['Delete'],
-		onclick = function()
+		onClick = function()
 			muList:Children():Each(function(ui)
 				if this.Selected then
 					if OnDel then

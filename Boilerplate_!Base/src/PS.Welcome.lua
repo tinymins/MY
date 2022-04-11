@@ -43,9 +43,9 @@ function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:Size()
 	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, color = { 140, 140, 140 } })
-	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, image = X.PACKET_INFO.POSTER_UITEX, imageframe = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT })
+	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT })
 	ui:Append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
-	ui:Append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), halign = 2 })
+	ui:Append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), alignHorizontal = 2 })
 	ui:Append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = GetSvrText(), alpha = 220 })
 	local x = 7
 	-- Êý¾ÝÎ»ÖÃ
@@ -144,8 +144,8 @@ function PS.OnPanelActive(wnd)
 		x = x, y = 405,
 		text = _L['Error message'],
 		tip = _L['Show error message'],
-		tippostype = UI.TIP_POSITION.BOTTOM_TOP,
-		onclick = function()
+		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		onClick = function()
 			if IsCtrlKeyDown() and IsAltKeyDown() and IsShiftKeyDown() then
 				X.IsDebugClient('Dev_LuaWatcher', true, true)
 				X.IsDebugClient('Dev_UIEditor', true, true)
