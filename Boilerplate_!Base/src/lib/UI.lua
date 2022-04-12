@@ -205,6 +205,8 @@ local function ApplyUIArguments(ui, arg)
 		if arg.columns                   then ui:Columns          (arg.columns                                     ) end
 		if arg.dataSource                then ui:DataSource       (arg.dataSource                                  ) end
 		if arg.summary                   then ui:Summary          (arg.summary                                     ) end
+		if arg.sort or arg.sortOrder     then ui:Sort             (arg.sort, arg.sortOrder                         ) end
+		if arg.onSortChange              then ui:Sort             (arg.onSortChange                                ) end
 		if arg.events             ~= nil then for _, v in ipairs(arg.events      ) do ui:Event       (unpack(v)) end end
 		if arg.uiEvents           ~= nil then for _, v in ipairs(arg.uiEvents    ) do ui:UIEvent     (unpack(v)) end end
 		if arg.listBox            ~= nil then for _, v in ipairs(arg.listBox     ) do ui:ListBox     (unpack(v)) end end
@@ -805,6 +807,7 @@ local function InitComponent(raw, szType)
 					else
 						SetComponentProp(raw, 'SortKey', col.key)
 					end
+					X.SafeCall(GetComponentProp(raw, 'OnSortChange'))
 					GetComponentProp(raw, 'UpdateSorterStatus')()
 					GetComponentProp(raw, 'DrawTableContent')()
 				end
@@ -2576,6 +2579,37 @@ function OO:Summary(...)
 		if raw then
 			if GetComponentType(raw) == 'WndTable' then
 				return GetComponentProp(raw, 'Summary')
+			end
+		end
+	end
+end
+
+-- get/set table sort
+function OO:Sort(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local szSortKey, szSortOrder = ...
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndTable' then
+				if X.IsFunction(szSortKey) then
+					SetComponentProp(raw, 'OnSortChange', function()
+						X.ExecuteWithThis(raw, szSortKey, GetComponentProp(raw, 'SortKey'), GetComponentProp(raw, 'SortOrder'))
+					end)
+				elseif szSortKey ~= GetComponentProp(raw, 'SortKey') or szSortOrder ~= GetComponentProp(raw, 'SortOrder') then
+					SetComponentProp(raw, 'SortKey', szSortKey)
+					SetComponentProp(raw, 'SortOrder', szSortOrder)
+					GetComponentProp(raw, 'UpdateSorterStatus')()
+					GetComponentProp(raw, 'DrawTableContent')()
+					X.SafeCall(GetComponentProp(raw, 'OnSortChange'))
+				end
+			end
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			if GetComponentType(raw) == 'WndTable' then
+				return GetComponentProp(raw, 'SortKey'), GetComponentProp(raw, 'SortOrder')
 			end
 		end
 	end
