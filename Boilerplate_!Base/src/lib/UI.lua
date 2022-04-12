@@ -202,6 +202,8 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onDragging or arg.onDrag  then ui:Drag             (arg.onDragging, arg.onDrag                      ) end
 		if arg.customLayout              then ui:CustomLayout     (arg.customLayout                                ) end
 		if arg.onCustomLayout            then ui:CustomLayout     (arg.onCustomLayout, arg.customLayoutPoint       ) end
+		if arg.columns                   then ui:Columns          (arg.columns                                     ) end
+		if arg.dataSource                then ui:DataSource       (arg.dataSource                                  ) end
 		if arg.events             ~= nil then for _, v in ipairs(arg.events      ) do ui:Event       (unpack(v)) end end
 		if arg.uiEvents           ~= nil then for _, v in ipairs(arg.uiEvents    ) do ui:UIEvent     (unpack(v)) end end
 		if arg.listBox            ~= nil then for _, v in ipairs(arg.listBox     ) do ui:ListBox     (unpack(v)) end end
@@ -643,6 +645,207 @@ local function InitComponent(raw, szType)
 			end
 		end)
 		SetComponentProp(raw, 'listboxOptions', { multiSelect = false })
+	elseif szType == 'WndTable' then
+		-- 初始化变量
+		SetComponentProp(raw, 'ScrollX', 'auto')
+		SetComponentProp(raw, 'Columns', {})
+		SetComponentProp(raw, 'DataSource', {})
+		-- 更新表格水平滚动条
+		SetComponentProp(raw, 'UpdateScrollX', function()
+			local hWrapper = raw:Lookup('', 'Handle_Scroll_X_Wrapper')
+			local hScroll = hWrapper:Lookup('Handle_Scroll_X')
+			local nStepCount = hScroll:GetW() - hWrapper:GetW()
+			if nStepCount > 0 then
+				raw:Lookup('Scroll_X'):Show()
+				raw:Lookup('Scroll_X'):SetStepCount(nStepCount)
+			else
+				raw:Lookup('Scroll_X'):Hide()
+			end
+		end)
+		-- 更新表格垂直滚动条
+		SetComponentProp(raw, 'UpdateScrollY', function()
+			local hWrapper = raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper')
+			local hScroll = hWrapper:Lookup('Handle_Scroll_Y')
+			local nStepCount = hScroll:GetH() - hWrapper:GetH()
+			if nStepCount > 0 then
+				raw:Lookup('Scroll_Y'):Show()
+				raw:Lookup('Scroll_Y'):SetStepCount(nStepCount)
+			else
+				raw:Lookup('Scroll_Y'):Hide()
+			end
+		end)
+		-- 自适应表头宽度
+		SetComponentProp(raw, 'AutoFlexTableColumn', function()
+			local hColumns = raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_TableColumns')
+			local aColumns, nX = GetComponentProp(raw, 'Columns'), 0
+			local nScrollX = GetComponentProp(raw, 'ScrollX')
+			if not nScrollX or nScrollX == 'auto' then
+				nScrollX = raw:GetW()
+			end
+			local nExtraWidth = nScrollX
+			for i, col in ipairs(aColumns) do
+				nExtraWidth = nExtraWidth - col.minWidth
+			end
+			for i, col in ipairs(aColumns) do
+				local hCol = hColumns:Lookup(i - 1)
+				local txt = hCol:Lookup('Text_TableColumn_Title')
+				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
+				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
+				local nWidth = i == #aColumns
+					and (nScrollX - nX)
+					or math.min(nExtraWidth * col.minWidth / (nScrollX - nExtraWidth) + col.minWidth, col.maxWidth or math.huge)
+				local nSortDelta = nWidth > 70 and 25 or 15
+				hCol:SetRelX(nX)
+				hCol:SetW(nWidth)
+				txt:SetW(nWidth)
+				imgAsc:SetRelX(nWidth - nSortDelta)
+				imgDesc:SetRelX(nWidth - nSortDelta)
+				hCol:FormatAllItemPos()
+				nX = nX + nWidth
+			end
+			hColumns:SetW(nX)
+			hColumns:FormatAllItemPos()
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X'):SetW(nX)
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper'):SetW(nX)
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper/Handle_Scroll_Y'):SetW(nX)
+			GetComponentProp(raw, 'UpdateScrollX')()
+		end)
+		-- 更新排序函数与表头排序状态显示
+		SetComponentProp(raw, 'UpdateSorterStatus', function()
+			local hColumns = raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_TableColumns')
+			local aColumns = GetComponentProp(raw, 'Columns')
+			local szSortKey = GetComponentProp(raw, 'SortKey')
+			local szSortOrder = GetComponentProp(raw, 'SortOrder')
+			for i, col in ipairs(aColumns) do
+				local hCol = hColumns:Lookup(i - 1)
+				local txt = hCol:Lookup('Text_TableColumn_Title')
+				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
+				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
+				if szSortKey == col.key then
+					SetComponentProp(raw, 'Sorter', function(r1, r2)
+						if szSortOrder == 'asc' then
+							return col.compare(r1, r2) < 0
+						end
+						return col.compare(r1, r2) > 0
+					end)
+				end
+				imgAsc:SetVisible(szSortKey == col.key and szSortOrder == 'asc')
+				imgDesc:SetVisible(szSortKey == col.key and szSortOrder == 'desc')
+			end
+		end)
+		-- 绘制表头内容
+		SetComponentProp(raw, 'DrawTableTitle', function()
+			local hColumns = raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_TableColumns')
+			hColumns:Clear()
+			local aColumns = GetComponentProp(raw, 'Columns')
+			for i, col in ipairs(aColumns) do
+				local hCol = hColumns:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_TableColumn')
+				local txt = hCol:Lookup('Text_TableColumn_Title')
+				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
+				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
+				if i == 0 then
+					hCol:Lookup('Image_TableColumn_Break'):Hide()
+				end
+				hCol.szSort = col.key
+				hCol.szTip = col.titleTip
+				hCol.szDebugTip = 'key: ' .. col.key
+				txt:SetText(col.title)
+			end
+			GetComponentProp(raw, 'AutoFlexTableColumn')()
+			GetComponentProp(raw, 'UpdateSorterStatus')()
+		end)
+		-- 更新数据行各列宽度（跟随表头）
+		SetComponentProp(raw, 'UpdateTableContentColumnWidth', function()
+			local hList = raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper/Handle_Scroll_Y')
+			local hColumns = raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_TableColumns')
+			local aColumns = GetComponentProp(raw, 'Columns')
+			for nRowIndex = 0, hList:GetItemCount() - 1 do
+				local hRow = hList:Lookup(nRowIndex)
+				local hRowColumns = hRow:Lookup('Handle_RowColumns')
+				local nX = 0
+				for nColumnIndex, col in ipairs(aColumns) do
+					local nWidth = hColumns:Lookup(nColumnIndex - 1):GetW()
+					local hItem = hRowColumns:Lookup(nColumnIndex - 1) -- 外部居中层
+					local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
+					hItemContent:SetW(99999)
+					hItemContent:FormatAllItemPos()
+					hItemContent:SetSizeByAllItemSize()
+					hItem:SetRelX(nX)
+					hItem:SetW(nWidth)
+					hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
+					hItem:FormatAllItemPos()
+					nX = nX + nWidth
+				end
+				hRowColumns:SetW(nX)
+				hRowColumns:FormatAllItemPos()
+				hRow:SetW(nX)
+				hRow:Lookup('Image_RowBg'):SetW(nX)
+				hRow:Lookup('Image_RowHover'):SetW(nX)
+				hRow:Lookup('Image_RowSpliter'):SetW(nX)
+				hRow:FormatAllItemPos()
+			end
+			hList:FormatAllItemPos()
+		end)
+		-- 绘制数据行
+		SetComponentProp(raw, 'DrawTableContent', function()
+			local hList = raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper/Handle_Scroll_Y')
+			local aColumns = GetComponentProp(raw, 'Columns')
+			local aDataSource = GetComponentProp(raw, 'DataSource')
+			if X.IsTable(aDataSource) then
+				for nRowIndex, rec in ipairs(aDataSource) do
+					local hRow = hList:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_Row')
+					local hRowColumns = hRow:Lookup('Handle_RowColumns')
+					hRowColumns:Clear()
+					hRow.rec = rec
+					hRow:Lookup('Image_RowBg'):SetVisible(nRowIndex % 2 == 1)
+					for nColumnIndex, col in ipairs(aColumns) do
+						local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_Item') -- 外部居中层
+						local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
+						local szXml
+						if col.render then
+							szXml = col.render(rec[col.key], rec, nRowIndex)
+						else
+							szXml = GetFormatText(rec[col.key])
+						end
+						hItemContent:AppendItemFromString(szXml)
+					end
+				end
+			end
+			GetComponentProp(raw, 'UpdateTableContentColumnWidth')()
+			GetComponentProp(raw, 'UpdateScrollY')()
+		end)
+		-- 水平滚动条事件绑定
+		local scrollX = raw:Lookup('Scroll_X')
+		scrollX.OnScrollBarPosChanged = function()
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X'):SetRelX(-this:GetScrollPos())
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper'):FormatAllItemPos()
+		end
+		scrollX.OnMouseWheel = function()
+			scrollX:ScrollNext(-Station.GetMessageWheelDelta() * 2)
+			return 1
+		end
+		scrollX:Lookup('Btn_Scroll_X').OnMouseWheel = function()
+			scrollX:ScrollNext(-Station.GetMessageWheelDelta())
+			return 1
+		end
+		-- 垂直滚动条事件绑定
+		local scrollY = raw:Lookup('Scroll_Y')
+		scrollY.OnScrollBarPosChanged = function()
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper/Handle_Scroll_Y'):SetRelY(-this:GetScrollPos())
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper'):FormatAllItemPos()
+		end
+		scrollY.OnMouseWheel = function()
+			scrollY:ScrollNext(-Station.GetMessageWheelDelta() * 2)
+			return 1
+		end
+		scrollY:Lookup('Btn_Scroll_Y').OnMouseWheel = function()
+			scrollY:ScrollNext(-Station.GetMessageWheelDelta())
+			return 1
+		end
+		raw.OnMouseWheel = function()
+			scrollY:ScrollNext(Station.GetMessageWheelDelta() * 10)
+			return 1
+		end
 	elseif szType == 'CheckBox' then
 		raw:RegisterEvent(831)
 		local function UpdateCheckState(raw)
@@ -2146,6 +2349,49 @@ function OO:ListBox(method, arg1, arg2, arg3, arg4)
 	end
 end
 
+-- get/set table columns
+function OO:Columns(aColumns)
+	self:_checksum()
+	if aColumns then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndTable' then
+				SetComponentProp(raw, 'Columns', aColumns)
+				GetComponentProp(raw, 'DrawTableTitle')()
+				GetComponentProp(raw, 'DrawTableContent')()
+			end
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			if GetComponentType(raw) == 'WndTable' then
+				return GetComponentProp(raw, 'Columns')
+			end
+		end
+	end
+end
+
+-- get/set table data source
+function OO:DataSource(aDataSource)
+	self:_checksum()
+	if aDataSource then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndTable' then
+				SetComponentProp(raw, 'DataSource', aDataSource)
+				GetComponentProp(raw, 'DrawTableContent')()
+			end
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			if GetComponentType(raw) == 'WndTable' then
+				return GetComponentProp(raw, 'DataSource')
+			end
+		end
+	end
+end
+
 -- get/set ui object name
 function OO:Name(szText)
 	self:_checksum()
@@ -2994,6 +3240,28 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 		txt:SetRelX(nRawWidth + 5)
 		txt:SetSize(nWidth - nRawWidth - 5, nHeight)
 		hdl:FormatAllItemPos()
+	elseif componentType == 'WndTable' then
+		local hTotal = raw:Lookup('', '')
+		raw:SetSize(nWidth, nHeight)
+		hTotal:SetSize(nWidth, nHeight)
+		hTotal:Lookup('Image_Table_Border'):SetSize(nWidth, nHeight)
+		hTotal:Lookup('Image_Table_Background'):SetSize(nWidth - 4, nHeight - 30)
+		hTotal:Lookup('Image_Table_TitleHr'):SetW(nWidth - 6)
+		hTotal:Lookup('Handle_Scroll_X_Wrapper'):SetSize(nWidth, nHeight)
+		hTotal:Lookup('Handle_Scroll_X_Wrapper/Handle_Scroll_X'):SetH(nHeight)
+		hTotal:Lookup('Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper'):SetH(nHeight - 60)
+		hTotal:Lookup('Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_FixedList'):SetRelY(nHeight - 30)
+		hTotal:Lookup('Handle_Scroll_X_Wrapper/Handle_Scroll_X'):FormatAllItemPos()
+		hTotal:FormatAllItemPos()
+		raw:Lookup('Scroll_X'):SetW(nWidth)
+		raw:Lookup('Scroll_X'):SetRelY(nHeight - 10)
+		raw:Lookup('Scroll_X/Btn_Scroll_X'):SetW(math.min(200, math.max(100, nWidth / 3)))
+		raw:Lookup('Scroll_Y'):SetH(nHeight - 32)
+		raw:Lookup('Scroll_Y'):SetRelX(nWidth - 10)
+		raw:Lookup('Scroll_Y/Btn_Scroll_Y'):SetH(math.min(80, math.max(40, (nHeight - 10) / 3)))
+		GetComponentProp(raw, 'AutoFlexTableColumn')()
+		GetComponentProp(raw, 'UpdateTableContentColumnWidth')()
+		GetComponentProp(raw, 'UpdateScrollY')()
 	elseif raw:GetBaseType() == 'Wnd' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
