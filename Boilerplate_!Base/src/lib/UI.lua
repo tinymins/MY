@@ -688,8 +688,8 @@ local function InitComponent(raw, szType)
 				nExtraWidth = nExtraWidth - col.minWidth
 			end
 			for i, col in ipairs(aColumns) do
-				local hCol = hColumns:Lookup(i - 1)
-				local txt = hCol:Lookup('Text_TableColumn_Title')
+				local hCol = hColumns:Lookup(i - 1) -- 外部居中层
+				local hContent = hCol:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
 				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
 				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
 				local nWidth = i == #aColumns
@@ -698,7 +698,23 @@ local function InitComponent(raw, szType)
 				local nSortDelta = nWidth > 70 and 25 or 15
 				hCol:SetRelX(nX)
 				hCol:SetW(nWidth)
-				txt:SetW(nWidth)
+				hContent:SetW(99999)
+				hContent:FormatAllItemPos()
+				hContent:SetSizeByAllItemSize()
+				if col.alignVertical == 'top' then
+					hContent:SetRelY(0)
+				elseif col.alignVertical == 'middle' or col.alignVertical == nil then
+					hContent:SetRelY((hCol:GetH() - hContent:GetH()) / 2)
+				elseif col.alignVertical == 'bottom' then
+					hContent:SetRelY(hCol:GetH() - hContent:GetH())
+				end
+				if col.alignHorizontal == 'left' or col.alignHorizontal == nil then
+					hContent:SetRelX(5)
+				elseif col.alignHorizontal == 'center' then
+					hContent:SetRelX((nWidth - hContent:GetW()) / 2)
+				elseif col.alignHorizontal == 'right' then
+					hContent:SetRelX(nWidth - hContent:GetW() - 5)
+				end
 				imgAsc:SetRelX(nWidth - nSortDelta)
 				imgDesc:SetRelX(nWidth - nSortDelta)
 				hCol:FormatAllItemPos()
@@ -720,7 +736,6 @@ local function InitComponent(raw, szType)
 			SetComponentProp(raw, 'Sorter', nil)
 			for i, col in ipairs(aColumns) do
 				local hCol = hColumns:Lookup(i - 1)
-				local txt = hCol:Lookup('Text_TableColumn_Title')
 				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
 				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
 				if szSortKey == col.key and col.sorter then
@@ -742,13 +757,20 @@ local function InitComponent(raw, szType)
 			hColumns:Clear()
 			local aColumns = GetComponentProp(raw, 'Columns')
 			for i, col in ipairs(aColumns) do
-				local hCol = hColumns:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_TableColumn')
-				local txt = hCol:Lookup('Text_TableColumn_Title')
+				local hCol = hColumns:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_TableColumn') -- 外部居中层
+				local hContent = hCol:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
 				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
 				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
 				if i == 0 then
 					hCol:Lookup('Image_TableColumn_Break'):Hide()
 				end
+				local szXml
+				if X.IsFunction(col.title) then
+					szXml = col.title(col)
+				else
+					szXml = GetFormatText(col.title or '')
+				end
+				hContent:AppendItemFromString(szXml)
 				hCol.OnItemLButtonClick = function()
 					if GetComponentProp(raw, 'SortKey') == col.key then
 						SetComponentProp(raw, 'SortOrder', GetComponentProp(raw, 'SortOrder') == 'asc' and 'desc' or 'asc')
@@ -758,10 +780,8 @@ local function InitComponent(raw, szType)
 					GetComponentProp(raw, 'UpdateSorterStatus')()
 					GetComponentProp(raw, 'DrawTableContent')()
 				end
-				hCol.szSort = col.key
 				hCol.szTip = col.titleTip
 				hCol.szDebugTip = 'key: ' .. col.key
-				txt:SetText(col.title)
 			end
 			GetComponentProp(raw, 'AutoFlexTableColumn')()
 			GetComponentProp(raw, 'UpdateSorterStatus')()
@@ -784,7 +804,20 @@ local function InitComponent(raw, szType)
 					hItemContent:SetSizeByAllItemSize()
 					hItem:SetRelX(nX)
 					hItem:SetW(nWidth)
-					hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
+					if col.alignVertical == 'top' then
+						hItemContent:SetRelY(0)
+					elseif col.alignVertical == 'middle' or col.alignVertical == nil then
+						hItemContent:SetRelY((hItem:GetH() - hItemContent:GetH()) / 2)
+					elseif col.alignVertical == 'bottom' then
+						hItemContent:SetRelY(hItem:GetH() - hItemContent:GetH())
+					end
+					if col.alignHorizontal == 'left' or col.alignHorizontal == nil then
+						hItemContent:SetRelX(5)
+					elseif col.alignHorizontal == 'center' then
+						hItemContent:SetRelX((nWidth - hItemContent:GetW()) / 2)
+					elseif col.alignHorizontal == 'right' then
+						hItemContent:SetRelX(nWidth - hItemContent:GetW() - 5)
+					end
 					hItem:FormatAllItemPos()
 					nX = nX + nWidth
 				end
