@@ -648,6 +648,7 @@ local function InitComponent(raw, szType)
 	elseif szType == 'WndTable' then
 		-- 初始化变量
 		SetComponentProp(raw, 'ScrollX', 'auto')
+		SetComponentProp(raw, 'SortOrder', 'asc')
 		SetComponentProp(raw, 'Columns', {})
 		SetComponentProp(raw, 'DataSource', {})
 		-- 更新表格水平滚动条
@@ -716,17 +717,19 @@ local function InitComponent(raw, szType)
 			local aColumns = GetComponentProp(raw, 'Columns')
 			local szSortKey = GetComponentProp(raw, 'SortKey')
 			local szSortOrder = GetComponentProp(raw, 'SortOrder')
+			SetComponentProp(raw, 'Sorter', nil)
 			for i, col in ipairs(aColumns) do
 				local hCol = hColumns:Lookup(i - 1)
 				local txt = hCol:Lookup('Text_TableColumn_Title')
 				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
 				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
-				if szSortKey == col.key then
+				if szSortKey == col.key and col.sorter then
 					SetComponentProp(raw, 'Sorter', function(r1, r2)
+						local v1, v2 = r1[col.key], r2[col.key]
 						if szSortOrder == 'asc' then
-							return col.compare(r1, r2) < 0
+							return col.sorter(v1, v2, r1, r2) < 0
 						end
-						return col.compare(r1, r2) > 0
+						return col.sorter(v1, v2, r1, r2) > 0
 					end)
 				end
 				imgAsc:SetVisible(szSortKey == col.key and szSortOrder == 'asc')
@@ -745,6 +748,15 @@ local function InitComponent(raw, szType)
 				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
 				if i == 0 then
 					hCol:Lookup('Image_TableColumn_Break'):Hide()
+				end
+				hCol.OnItemLButtonClick = function()
+					if GetComponentProp(raw, 'SortKey') == col.key then
+						SetComponentProp(raw, 'SortOrder', GetComponentProp(raw, 'SortOrder') == 'asc' and 'desc' or 'asc')
+					else
+						SetComponentProp(raw, 'SortKey', col.key)
+					end
+					GetComponentProp(raw, 'UpdateSorterStatus')()
+					GetComponentProp(raw, 'DrawTableContent')()
 				end
 				hCol.szSort = col.key
 				hCol.szTip = col.titleTip
@@ -791,7 +803,17 @@ local function InitComponent(raw, szType)
 			local hList = raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper/Handle_Scroll_Y')
 			local aColumns = GetComponentProp(raw, 'Columns')
 			local aDataSource = GetComponentProp(raw, 'DataSource')
+			hList:Clear()
 			if X.IsTable(aDataSource) then
+				local Sorter = GetComponentProp(raw, 'Sorter')
+				if Sorter then
+					local ds = {}
+					for _, v in ipairs(aDataSource) do
+						table.insert(ds, v)
+					end
+					table.sort(ds, Sorter)
+					aDataSource = ds
+				end
 				for nRowIndex, rec in ipairs(aDataSource) do
 					local hRow = hList:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_Row')
 					local hRowColumns = hRow:Lookup('Handle_RowColumns')
