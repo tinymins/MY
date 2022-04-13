@@ -429,7 +429,13 @@ function D.RenderNamelink(namelink, tOption)
 		end
 	end
 	if tOption.bTip then
-		ui:Hover(D.ShowTip, HideTip, true)
+		ui:Hover(function(bIn)
+			if bIn then
+				D.ShowTip()
+			else
+				HideTip()
+			end
+		end)
 	end
 	return namelink, nNumOffset
 end
