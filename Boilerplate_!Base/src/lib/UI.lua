@@ -4781,7 +4781,7 @@ end
 
 -- 行鼠标中键单击事件
 -- @param {function(eButton: UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
-function OO:MClick(fnClick)
+function OO:RowMClick(fnClick)
 	self:_checksum()
 	if X.IsFunction(fnClick) then
 		for _, raw in ipairs(self.raws) do
@@ -4801,7 +4801,7 @@ end
 
 -- 行鼠标右键单击事件
 -- @param {function(eButton: UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
-function OO:RClick(fnClick)
+function OO:RowRClick(fnClick)
 	self:_checksum()
 	if X.IsFunction(fnClick) then
 		for _, raw in ipairs(self.raws) do
