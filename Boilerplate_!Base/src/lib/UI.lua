@@ -163,6 +163,9 @@ local function ApplyUIArguments(ui, arg)
 		if arg.menu               ~= nil then ui:Menu             (arg.menu                                        ) end
 		if arg.menuLClick         ~= nil then ui:MenuLClick       (arg.menuLClick                                  ) end
 		if arg.menuRClick         ~= nil then ui:MenuRClick       (arg.menuRClick                                  ) end
+		if arg.rowMenu            ~= nil then ui:RowMenu          (arg.rowMenu                                     ) end
+		if arg.rowMenuLClick      ~= nil then ui:RowMenuLClick    (arg.rowMenuLClick                               ) end
+		if arg.rowMenuRClick      ~= nil then ui:RowMenuRClick    (arg.rowMenuRClick                               ) end
 		if arg.limit              ~= nil then ui:Limit            (arg.limit                                       ) end
 		if arg.scroll             ~= nil then ui:Scroll           (arg.scroll                                      ) end
 		if arg.handleStyle        ~= nil then ui:HandleStyle      (arg.handleStyle                                 ) end
@@ -196,7 +199,12 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onBlur             ~= nil then ui:Blur             (arg.onBlur                                      ) end
 		if arg.onClick            ~= nil then ui:Click            (arg.onClick                                     ) end
 		if arg.onLClick           ~= nil then ui:LClick           (arg.onLClick                                    ) end
+		if arg.onMClick           ~= nil then ui:MClick           (arg.onMClick                                    ) end
 		if arg.onRClick           ~= nil then ui:RClick           (arg.onRClick                                    ) end
+		if arg.onRowClick         ~= nil then ui:RowClick         (arg.onRowClick                                  ) end
+		if arg.onRowLClick        ~= nil then ui:RowLClick        (arg.onRowLClick                                 ) end
+		if arg.onRowMClick        ~= nil then ui:RowMClick        (arg.onRowMClick                                 ) end
+		if arg.onRowRClick        ~= nil then ui:RowRClick        (arg.onRowRClick                                 ) end
 		if arg.onColorPick        ~= nil then ui:ColorPick        (arg.onColorPick                                 ) end
 		if arg.checked            ~= nil then ui:Check            (arg.checked                                     ) end
 		if arg.onCheck            ~= nil then ui:Check            (arg.onCheck                                     ) end
@@ -901,6 +909,15 @@ local function InitComponent(raw, szType)
 					end
 					hRow.OnItemMouseLeave = function()
 						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), false, rec, nRowIndex)
+					end
+					hRow.OnItemLButtonClick = function()
+						X.SafeCall(GetComponentProp(raw, 'RowLClick'), rec, nRowIndex)
+					end
+					hRow.OnItemMButtonClick = function()
+						X.SafeCall(GetComponentProp(raw, 'RowMClick'), rec, nRowIndex)
+					end
+					hRow.OnItemRButtonClick = function()
+						X.SafeCall(GetComponentProp(raw, 'RowRClick'), rec, nRowIndex)
 					end
 				end
 			end
@@ -4557,7 +4574,7 @@ end
 -- 鼠标右键单击事件，无参数调用表示触发单击事件
 -- same as jQuery.mclick()
 -- @param {function(eButton: UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
-	function OO:MClick(fnClick)
+	function OO:MClick(...)
 		self:_checksum()
 		if select('#', ...) > 0 then
 			local fnClick = ...
@@ -4650,6 +4667,152 @@ function OO:RClick(...)
 			end
 			if itm and itm.OnItemRButtonClick then
 				X.CallWithThis(itm, itm.OnItemRButtonClick)
+			end
+		end
+	end
+	return self
+end
+
+-- 行弹出菜单
+-- @param {table|function} menu 菜单或返回菜单的函数
+function OO:RowMenu(menu)
+	self:RowClick(function(...)
+		local h = this:Lookup('', '') or this
+		local nX, nY = h:GetAbsPos()
+		local nW, nH = h:GetSize()
+		if X.IsFunction(menu) then
+			menu = menu(...)
+		end
+		if not X.IsTable(menu) then
+			return
+		end
+		menu.x = nX
+		menu.y = nY + nH
+		menu.nMiniWidth = nW
+		if menu.bAlignWidth then
+			menu.nWidth = nW
+		end
+		menu.bVisibleWhenHideUI = true
+		UI.PopupMenu(menu)
+	end)
+	return self
+end
+
+-- 行弹出左键菜单
+-- @param {table|function} menu 菜单或返回菜单的函数
+function OO:RowMenuLClick(menu)
+	self:RowLClick(function(...)
+		local h = this:Lookup('', '') or this
+		local nX, nY = h:GetAbsPos()
+		local nW, nH = h:GetSize()
+		if X.IsFunction(menu) then
+			menu = menu(...)
+		end
+		if not X.IsTable(menu) then
+			return
+		end
+		menu.x = nX
+		menu.y = nY + nH
+		menu.nMiniWidth = nW
+		if menu.bAlignWidth then
+			menu.nWidth = nW
+		end
+		menu.bVisibleWhenHideUI = true
+		UI.PopupMenu(menu)
+	end)
+	return self
+end
+
+-- 行弹出右键菜单
+-- @param {table|function} menu 菜单或返回菜单的函数
+function OO:RowMenuRClick(menu)
+	self:RowRClick(function(...)
+		local h = this:Lookup('', '') or this
+		local nX, nY = h:GetAbsPos()
+		local nW, nH = h:GetSize()
+		if X.IsFunction(menu) then
+			menu = menu(...)
+		end
+		if not X.IsTable(menu) then
+			return
+		end
+		menu.x = nX
+		menu.y = nY + nH
+		menu.nMiniWidth = nW
+		if menu.bAlignWidth then
+			menu.nWidth = nW
+		end
+		menu.bVisibleWhenHideUI = true
+		UI.PopupMenu(menu)
+	end)
+	return self
+end
+
+-- 行绑定鼠标单击事件
+-- @param {function(eButton: UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
+function OO:RowClick(fnClick)
+	if X.IsFunction(fnClick) then
+		self:RowLClick(fnClick)
+		self:RowMClick(fnClick)
+		self:RowRClick(fnClick)
+	end
+	return self
+end
+
+-- 行鼠标左键单击事件
+-- @param {function(eButton: UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
+function OO:RowLClick(fnClick)
+	self:_checksum()
+	if X.IsFunction(fnClick) then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndTable' then
+				local fnAction = function(...)
+					if GetComponentProp(raw, 'bEnable') == false then
+						return
+					end
+					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.LEFT, ...)
+				end
+				SetComponentProp(raw, 'RowLClick', fnAction)
+			end
+		end
+	end
+	return self
+end
+
+-- 行鼠标中键单击事件
+-- @param {function(eButton: UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
+function OO:MClick(fnClick)
+	self:_checksum()
+	if X.IsFunction(fnClick) then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndTable' then
+				local fnAction = function(...)
+					if GetComponentProp(raw, 'bEnable') == false then
+						return
+					end
+					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.MIDDLE, ...)
+				end
+				SetComponentProp(raw, 'RowMClick', fnAction)
+			end
+		end
+	end
+	return self
+end
+
+-- 行鼠标右键单击事件
+-- @param {function(eButton: UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
+function OO:RClick(fnClick)
+	self:_checksum()
+	if X.IsFunction(fnClick) then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndTable' then
+				local fnAction = function(...)
+					if GetComponentProp(raw, 'bEnable') == false then
+						return
+					end
+					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.RIGHT, ...)
+				end
+				SetComponentProp(raw, 'RowRClick', fnAction)
 			end
 		end
 	end
