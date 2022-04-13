@@ -4407,23 +4407,17 @@ function OO:Breathe(fnOnFrameBreathe)
 	return self
 end
 
--- menu 弹出菜单
--- :Menu(table menu)  弹出菜单menu
--- :Menu(function fn)  弹出菜单function返回值table
-function OO:Menu(menuLClick, menuRClick, bNoAutoBind)
-	self:_checksum()
-	if not bNoAutoBind then
-		menuRClick = menuRClick or menuLClick
-	end
-	-- pop menu function
-	local fnPopMenu = function(raw, menu)
-		local h = raw:Lookup('', '') or raw
+-- 弹出菜单
+-- @param {table|function} menu 菜单或返回菜单的函数
+function OO:Menu(menu)
+	self:Click(function()
+		local h = this:Lookup('', '') or this
 		local nX, nY = h:GetAbsPos()
 		local nW, nH = h:GetSize()
 		if X.IsFunction(menu) then
-			menu = menu(raw)
+			menu = menu()
 		end
-		if type(menu) ~= 'table' then
+		if not X.IsTable(menu) then
 			return
 		end
 		menu.x = nX
@@ -4434,34 +4428,58 @@ function OO:Menu(menuLClick, menuRClick, bNoAutoBind)
 		end
 		menu.bVisibleWhenHideUI = true
 		UI.PopupMenu(menu)
-	end
-	-- bind left click
-	if menuLClick then
-		self:Each(function(eself)
-			eself:LClick(function() fnPopMenu(eself[1], menuLClick) end)
-		end)
-	end
-	-- bind right click
-	if menuRClick then
-		self:Each(function(eself)
-			eself:RClick(function() fnPopMenu(eself[1], menuRClick) end)
-		end)
-	end
+	end)
 	return self
 end
 
--- MenuLClick 弹出左键菜单
--- :MenuLClick(table menu)  弹出菜单menu
--- :MenuLClick(function fn)  弹出菜单function返回值table
+-- 弹出左键菜单
+-- @param {table|function} menu 菜单或返回菜单的函数
 function OO:MenuLClick(menu)
-	return self:Menu(menu, nil, true)
+	self:LClick(function()
+		local h = this:Lookup('', '') or this
+		local nX, nY = h:GetAbsPos()
+		local nW, nH = h:GetSize()
+		if X.IsFunction(menu) then
+			menu = menu()
+		end
+		if not X.IsTable(menu) then
+			return
+		end
+		menu.x = nX
+		menu.y = nY + nH
+		menu.nMiniWidth = nW
+		if menu.bAlignWidth then
+			menu.nWidth = nW
+		end
+		menu.bVisibleWhenHideUI = true
+		UI.PopupMenu(menu)
+	end)
+	return self
 end
 
--- MenuRClick 弹出右键菜单
--- :MenuLClick(table menu)  弹出菜单menu
--- :MenuLClick(function fn)  弹出菜单function返回值table
+-- 弹出右键菜单
+-- @param {table|function} menu 菜单或返回菜单的函数
 function OO:MenuRClick(menu)
-	return self:Menu(nil, menu, true)
+	self:RClick(function()
+		local h = this:Lookup('', '') or this
+		local nX, nY = h:GetAbsPos()
+		local nW, nH = h:GetSize()
+		if X.IsFunction(menu) then
+			menu = menu()
+		end
+		if not X.IsTable(menu) then
+			return
+		end
+		menu.x = nX
+		menu.y = nY + nH
+		menu.nMiniWidth = nW
+		if menu.bAlignWidth then
+			menu.nWidth = nW
+		end
+		menu.bVisibleWhenHideUI = true
+		UI.PopupMenu(menu)
+	end)
+	return self
 end
 
 -- click 鼠标单击事件
