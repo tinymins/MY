@@ -63,7 +63,7 @@ function D.CreateSnapshot()
 			L = ENVIRONMENT.GAME_EDITION,
 			team = O.szTeam,
 			cguid = X.GetClientGUID(),
-			jx3id = X.GetClientUUID(),
+			jx3id = X.GetPlayerGUID(),
 			server = X.GetRealServer(2),
 			teammate = table.concat(aTeammate, ';'),
 		},

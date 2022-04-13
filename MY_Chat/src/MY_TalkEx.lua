@@ -331,7 +331,7 @@ function PS.OnPanelActive(wnd)
 						server = X.GetRealServer(2),
 						role = bAnonymous and '' or X.GetUserRoleName(),
 						id = bAnonymous and '' or UI_GetClientPlayerID(),
-						jx3id = bAnonymous and '' or X.GetClientUUID(),
+						jx3id = bAnonymous and '' or X.GetPlayerGUID(),
 					},
 					signature = X.SECRET['J3CX::JOKE'],
 					success = function(html, status)

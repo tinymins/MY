@@ -42,7 +42,7 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 			L = ENVIRONMENT.GAME_EDITION,
 			team = szTeam,
 			cguid = X.GetClientGUID(),
-			jx3id = X.GetClientUUID(),
+			jx3id = X.GetPlayerGUID(),
 			server = X.GetRealServer(2),
 			id = dwID,
 			name = X.GetUserRoleName(),
