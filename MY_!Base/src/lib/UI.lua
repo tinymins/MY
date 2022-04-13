@@ -4685,6 +4685,7 @@ function OO:Tip(props)
 			if ePosition == UI.TIP_POSITION.FOLLOW_MOUSE then
 				nX, nY = Cursor.GetPos()
 				nX, nY = nX - 0, nY - 40
+				nW, nH = 40, 40
 			else
 				nX, nY = this:GetAbsPos()
 				nW, nH = this:GetSize()
@@ -4746,6 +4747,7 @@ function OO:RowTip(props)
 			if ePosition == UI.TIP_POSITION.FOLLOW_MOUSE then
 				nX, nY = Cursor.GetPos()
 				nX, nY = nX - 0, nY - 40
+				nW, nH = 40, 40
 			else
 				nX, nY = this:GetAbsPos()
 				nW, nH = this:GetSize()
