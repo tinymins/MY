@@ -4431,20 +4431,21 @@ function OO:Menu(menu)
 		local h = this:Lookup('', '') or this
 		local nX, nY = h:GetAbsPos()
 		local nW, nH = h:GetSize()
-		if X.IsFunction(menu) then
-			menu = menu()
+		local m = menu
+		if X.IsFunction(m) then
+			m = m()
 		end
-		if not X.IsTable(menu) then
+		if not X.IsTable(m) then
 			return
 		end
-		menu.x = nX
-		menu.y = nY + nH
-		menu.nMiniWidth = nW
-		if menu.bAlignWidth then
-			menu.nWidth = nW
+		m.x = nX
+		m.y = nY + nH
+		m.nMiniWidth = nW
+		if m.bAlignWidth then
+			m.nWidth = nW
 		end
-		menu.bVisibleWhenHideUI = true
-		UI.PopupMenu(menu)
+		m.bVisibleWhenHideUI = true
+		UI.PopupMenu(m)
 	end)
 	return self
 end
@@ -4456,20 +4457,21 @@ function OO:MenuLClick(menu)
 		local h = this:Lookup('', '') or this
 		local nX, nY = h:GetAbsPos()
 		local nW, nH = h:GetSize()
-		if X.IsFunction(menu) then
-			menu = menu()
+		local m = menu
+		if X.IsFunction(m) then
+			m = m()
 		end
-		if not X.IsTable(menu) then
+		if not X.IsTable(m) then
 			return
 		end
-		menu.x = nX
-		menu.y = nY + nH
-		menu.nMiniWidth = nW
-		if menu.bAlignWidth then
-			menu.nWidth = nW
+		m.x = nX
+		m.y = nY + nH
+		m.nMiniWidth = nW
+		if m.bAlignWidth then
+			m.nWidth = nW
 		end
-		menu.bVisibleWhenHideUI = true
-		UI.PopupMenu(menu)
+		m.bVisibleWhenHideUI = true
+		UI.PopupMenu(m)
 	end)
 	return self
 end
@@ -4481,20 +4483,21 @@ function OO:MenuRClick(menu)
 		local h = this:Lookup('', '') or this
 		local nX, nY = h:GetAbsPos()
 		local nW, nH = h:GetSize()
-		if X.IsFunction(menu) then
-			menu = menu()
+		local m = menu
+		if X.IsFunction(m) then
+			m = m()
 		end
-		if not X.IsTable(menu) then
+		if not X.IsTable(m) then
 			return
 		end
-		menu.x = nX
-		menu.y = nY + nH
-		menu.nMiniWidth = nW
-		if menu.bAlignWidth then
-			menu.nWidth = nW
+		m.x = nX
+		m.y = nY + nH
+		m.nMiniWidth = nW
+		if m.bAlignWidth then
+			m.nWidth = nW
 		end
-		menu.bVisibleWhenHideUI = true
-		UI.PopupMenu(menu)
+		m.bVisibleWhenHideUI = true
+		UI.PopupMenu(m)
 	end)
 	return self
 end
@@ -4680,20 +4683,21 @@ function OO:RowMenu(menu)
 		local h = this:Lookup('', '') or this
 		local nX, nY = h:GetAbsPos()
 		local nW, nH = h:GetSize()
-		if X.IsFunction(menu) then
-			menu = menu(...)
+		local m = menu
+		if X.IsFunction(m) then
+			m = m(...)
 		end
-		if not X.IsTable(menu) then
+		if not X.IsTable(m) then
 			return
 		end
-		menu.x = nX
-		menu.y = nY + nH
-		menu.nMiniWidth = nW
-		if menu.bAlignWidth then
-			menu.nWidth = nW
+		m.x = nX
+		m.y = nY + nH
+		m.nMiniWidth = nW
+		if m.bAlignWidth then
+			m.nWidth = nW
 		end
-		menu.bVisibleWhenHideUI = true
-		UI.PopupMenu(menu)
+		m.bVisibleWhenHideUI = true
+		UI.PopupMenu(m)
 	end)
 	return self
 end
@@ -4705,20 +4709,21 @@ function OO:RowMenuLClick(menu)
 		local h = this:Lookup('', '') or this
 		local nX, nY = h:GetAbsPos()
 		local nW, nH = h:GetSize()
-		if X.IsFunction(menu) then
-			menu = menu(...)
+		local m = menu
+		if X.IsFunction(m) then
+			m = m(...)
 		end
-		if not X.IsTable(menu) then
+		if not X.IsTable(m) then
 			return
 		end
-		menu.x = nX
-		menu.y = nY + nH
-		menu.nMiniWidth = nW
-		if menu.bAlignWidth then
-			menu.nWidth = nW
+		m.x = nX
+		m.y = nY + nH
+		m.nMiniWidth = nW
+		if m.bAlignWidth then
+			m.nWidth = nW
 		end
-		menu.bVisibleWhenHideUI = true
-		UI.PopupMenu(menu)
+		m.bVisibleWhenHideUI = true
+		UI.PopupMenu(m)
 	end)
 	return self
 end
@@ -4730,20 +4735,21 @@ function OO:RowMenuRClick(menu)
 		local h = this:Lookup('', '') or this
 		local nX, nY = h:GetAbsPos()
 		local nW, nH = h:GetSize()
-		if X.IsFunction(menu) then
-			menu = menu(...)
+		local m = menu
+		if X.IsFunction(m) then
+			m = m(...)
 		end
-		if not X.IsTable(menu) then
+		if not X.IsTable(m) then
 			return
 		end
-		menu.x = nX
-		menu.y = nY + nH
-		menu.nMiniWidth = nW
-		if menu.bAlignWidth then
-			menu.nWidth = nW
+		m.x = nX
+		m.y = nY + nH
+		m.nMiniWidth = nW
+		if m.bAlignWidth then
+			m.nWidth = nW
 		end
-		menu.bVisibleWhenHideUI = true
-		UI.PopupMenu(menu)
+		m.bVisibleWhenHideUI = true
+		UI.PopupMenu(m)
 	end)
 	return self
 end
