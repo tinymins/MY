@@ -1618,7 +1618,13 @@ local function OnCommonComponentMouseEnter()
 	local w, h = this:GetSize()
 	OutputTip(GetFormatText(szText), 400, { x, y, w, h }, ALW.TOP_BOTTOM)
 end
-local function OnCommonComponentMouseLeave() HideTip() end
+local function OnCommonComponentHover(bIn)
+	if bIn then
+		OnCommonComponentMouseEnter()
+	else
+		HideTip()
+	end
+end
 
 -- xml string
 local _tItemXML = {
@@ -1712,7 +1718,7 @@ function OO:Append(arg0, arg1)
 			end
 			if raw then
 				ui = ui:Add(raw)
-				UI(raw):Hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):Change(OnCommonComponentMouseEnter)
+				UI(raw):Hover(OnCommonComponentHover):Change(OnCommonComponentMouseEnter)
 			else
 				X.Debug(X.NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), X.DEBUG_LEVEL.ERROR)
 			end
@@ -4596,21 +4602,18 @@ end
 
 -- hover 鼠标悬停事件
 -- same as jQuery.hover()
--- :Hover(fnHover[, fnLeave]) 绑定
-function OO:Hover(fnHover, fnLeave, bNoAutoBind)
+-- @param {function(bIn: boolean): void} fnAction 鼠标悬停事件响应函数
+function OO:Hover(fnAction)
 	self:_checksum()
-	if not bNoAutoBind then
-		fnLeave = fnLeave or fnHover
-	end
-	if fnHover then
+	if fnAction then
 		for _, raw in ipairs(self.raws) do
 			local wnd = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'MAIN_WINDOW')
 			local itm = GetComponentElement(raw, 'ITEM')
 			if wnd then
-				UI(wnd):UIEvent('OnMouseIn', function() fnHover(true) end)
+				UI(wnd):UIEvent('OnMouseIn', function() fnAction(true) end)
 			elseif itm then
 				itm:RegisterEvent(256)
-				UI(itm):UIEvent('OnItemMouseIn', function() fnHover(true) end)
+				UI(itm):UIEvent('OnItemMouseIn', function() fnAction(true) end)
 			end
 		end
 	end
@@ -4619,10 +4622,10 @@ function OO:Hover(fnHover, fnLeave, bNoAutoBind)
 			local wnd = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'MAIN_WINDOW')
 			local itm = GetComponentElement(raw, 'ITEM')
 			if wnd then
-				UI(wnd):UIEvent('OnMouseOut', function() fnLeave(false) end)
+				UI(wnd):UIEvent('OnMouseOut', function() fnAction(false) end)
 			elseif itm then
 				itm:RegisterEvent(256)
-				UI(itm):UIEvent('OnItemMouseOut', function() fnLeave(false) end)
+				UI(itm):UIEvent('OnItemMouseOut', function() fnAction(false) end)
 			end
 		end
 	end
@@ -4630,17 +4633,17 @@ function OO:Hover(fnHover, fnLeave, bNoAutoBind)
 end
 
 -- 鼠标悬停提示
--- @param props {object} 配置项
--- @param props.render {string|function} 要提示的纯文字或富文本，或返回前述内容的函数
--- @param props.w {number} 提示框宽度
--- @param props.offset {{ x: number; y: number }} 提示框触发区域偏移量
--- @param props.position {UI.TIP_HIDE_WAY} 提示框相对于触发区域的位置
--- @param props.rich {boolean} 提示框内容是否为富文本（当 render 为函数时取函数第二返回值）
--- @param props.font {number} 提示框字体（仅在非富文本下有效）
--- @param props.r {number} 提示框文字r（仅在非富文本下有效）
--- @param props.g {number} 提示框文字g（仅在非富文本下有效）
--- @param props.b {number} 提示框文字b（仅在非富文本下有效）
--- @param props.hide {UI.TIP_HIDE_WAY} 提示框消失方式
+-- @param {object} props 配置项
+-- @param {string|function} props.render 要提示的纯文字或富文本，或返回前述内容的函数
+-- @param {number} props.w 提示框宽度
+-- @param {{ x: number; y: number }} props.offset 提示框触发区域偏移量
+-- @param {UI.TIP_HIDE_WAY} props.position 提示框相对于触发区域的位置
+-- @param {boolean} props.rich 提示框内容是否为富文本（当 render 为函数时取函数第二返回值）
+-- @param {number} props.font 提示框字体（仅在非富文本下有效）
+-- @param {number} props.r 提示框文字r（仅在非富文本下有效）
+-- @param {number} props.g 提示框文字g（仅在非富文本下有效）
+-- @param {number} props.b 提示框文字b（仅在非富文本下有效）
+-- @param {UI.TIP_HIDE_WAY} props.hide 提示框消失方式
 function OO:Tip(props)
 	if not X.IsTable(props) then
 		props = { render = props }
@@ -4653,7 +4656,15 @@ function OO:Tip(props)
 	local eHide = props.hide or UI.TIP_HIDE_WAY.HIDE
 	local bRichText = props.rich
 	return self:Hover(
-		function()
+		function(bIn)
+			if not bIn then
+				if eHide == UI.TIP_HIDE_WAY.HIDE then
+					HideTip(false)
+				elseif eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE then
+					HideTip(true)
+				end
+				return
+			end
 			local nX, nY, nW, nH
 			if ePosition == UI.TIP_POSITION.FOLLOW_MOUSE then
 				nX, nY = Cursor.GetPos()
@@ -4674,15 +4685,7 @@ function OO:Tip(props)
 				szText = GetFormatText(szText, props.font or 136, props.r, props.g, props.b)
 			end
 			OutputTip(szText, nWidth, {nX, nY, nW, nH}, ePosition)
-		end,
-		function()
-			if eHide == UI.TIP_HIDE_WAY.HIDE then
-				HideTip(false)
-			elseif eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE then
-				HideTip(true)
-			end
-		end,
-		true
+		end
 	)
 end
 
