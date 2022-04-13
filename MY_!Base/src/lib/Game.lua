@@ -1873,17 +1873,18 @@ X.RegisterEvent('LOADING_ENDING', onLoadingEnding)
 end
 
 -- 获取唯一标识符
-do local m_szUUID
-function X.GetClientUUID()
-	if not m_szUUID then
+do
+local PLAYER_GUID
+function X.GetPlayerGUID()
+	if not PLAYER_GUID then
 		local me = GetClientPlayer()
 		if me.GetGlobalID and me.GetGlobalID() ~= '0' then
-			m_szUUID = me.GetGlobalID()
+			PLAYER_GUID = me.GetGlobalID()
 		else
-			m_szUUID = (X.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. X.GetClientInfo().dwID
+			PLAYER_GUID = (X.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. X.GetClientInfo().dwID
 		end
 	end
-	return m_szUUID
+	return PLAYER_GUID
 end
 end
 
