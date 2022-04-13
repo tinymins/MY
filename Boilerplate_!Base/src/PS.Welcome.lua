@@ -143,8 +143,10 @@ function PS.OnPanelActive(wnd)
 		name = 'WndButton_AddonErrorMessage',
 		x = x, y = 405,
 		text = _L['Error message'],
-		tip = _L['Show error message'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Show error message'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 		onClick = function()
 			if IsCtrlKeyDown() and IsAltKeyDown() and IsShiftKeyDown() then
 				X.IsDebugClient('Dev_LuaWatcher', true, true)

@@ -152,8 +152,10 @@ function PS.OnPanelActive(wnd)
 			})
 			return menu
 		end,
-		tip = _L['PRESET_DESC'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['PRESET_DESC'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 	}):AutoWidth():Width() + 5
 
 	nX = nX + ui:Append('WndButtonBox', {

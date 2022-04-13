@@ -156,7 +156,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.oncomplete         ~= nil then ui:Complete         (arg.oncomplete                                  ) end
 		if arg.navigate           ~= nil then ui:Navigate         (arg.navigate                                    ) end
 		if arg.group              ~= nil then ui:Group            (arg.group                                       ) end
-		if arg.tip                ~= nil then ui:Tip       (arg.tip, arg.tipPosType, arg.tipOffset, arg.tipRichText) end
+		if arg.tip                ~= nil then ui:Tip              (arg.tip                                         ) end
 		if arg.range              ~= nil then ui:Range            (unpack(arg.range)                               ) end
 		if arg.value              ~= nil then ui:Value            (arg.value                                       ) end
 		if arg.menu               ~= nil then ui:Menu             (arg.menu                                        ) end
@@ -1113,7 +1113,7 @@ end
 -----------------------------------------------------------
 local OO = {}
 --
--- selt.raws[] : ui element list
+-- self.raws[] : ui element list
 --
 -- ui object creator
 -- same as jQuery.$()
@@ -1558,7 +1558,7 @@ function OO:Count()
 end
 
 -----------------------------------------------------------
--- my ui opreation -- same as jQuery -- by tinymins --
+-- my ui operation -- same as jQuery -- by tinymins --
 -----------------------------------------------------------
 
 -- remove
@@ -4629,46 +4629,61 @@ function OO:Hover(fnHover, fnLeave, bNoAutoBind)
 	return self
 end
 
--- tip 鼠标悬停提示
--- (self) Instance:Tip( tip[, nPosType[, tOffset[, bNoEncode] ] ] ) 绑定tip事件
--- string|function tip:要提示的文字文本或序列化的DOM文本或返回前述文本的函数
--- number nPosType:    提示位置 有效值为UI.TIP_HIDE_WAY.枚举
--- table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = UI.TIP_HIDE_WAY.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
--- boolean bNoEncode:  当szTip为纯文本时保持这个参数为false 当szTip为格式化的DOM字符串时设置该参数为true
-function OO:Tip(tip, nPosType, tOffset, bNoEncode)
-	tOffset = tOffset or {}
-	tOffset.x = tOffset.x or 0
-	tOffset.y = tOffset.y or 0
-	tOffset.w = tOffset.w or 450
-	tOffset.hide = tOffset.hide or UI.TIP_HIDE_WAY.HIDE
-	tOffset.nFont = tOffset.nFont or 136
-	nPosType = nPosType or UI.TIP_POSITION.FOLLOW_MOUSE
-	return self:Hover(function()
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		if nPosType == UI.TIP_POSITION.FOLLOW_MOUSE then
-			x, y = Cursor.GetPos()
-			x, y = x - 0, y - 40
-		end
-		x, y = x + tOffset.x, y + tOffset.y
-		local szTip = tip
-		if X.IsFunction(szTip) then
-			szTip = szTip(self)
-		end
-		if X.IsEmpty(szTip) then
-			return
-		end
-		if not bNoEncode then
-			szTip = GetFormatText(szTip, tOffset.nFont, tOffset.r, tOffset.g, tOffset.b)
-		end
-		OutputTip(szTip, tOffset.w, {x, y, w, h}, nPosType)
-	end, function()
-		if tOffset.hide == UI.TIP_HIDE_WAY.HIDE then
-			HideTip(false)
-		elseif tOffset.hide == UI.TIP_HIDE_WAY.ANIMATE_HIDE then
-			HideTip(true)
-		end
-	end, true)
+-- 鼠标悬停提示
+-- @param props {object} 配置项
+-- @param props.render {string|function} 要提示的纯文字或富文本，或返回前述内容的函数
+-- @param props.w {number} 提示框宽度
+-- @param props.offset {{ x: number; y: number }} 提示框触发区域偏移量
+-- @param props.position {UI.TIP_HIDE_WAY} 提示框相对于触发区域的位置
+-- @param props.rich {boolean} 提示框内容是否为富文本（当 render 为函数时取函数第二返回值）
+-- @param props.font {number} 提示框字体（仅在非富文本下有效）
+-- @param props.r {number} 提示框文字r（仅在非富文本下有效）
+-- @param props.g {number} 提示框文字g（仅在非富文本下有效）
+-- @param props.b {number} 提示框文字b（仅在非富文本下有效）
+-- @param props.hide {UI.TIP_HIDE_WAY} 提示框消失方式
+function OO:Tip(props)
+	if not X.IsTable(props) then
+		props = { render = props }
+	end
+	local nWidth = props.w or 450
+	local tOffset = props.offset or {}
+	local nOffsetX = tOffset.x or 0
+	local nOffsetY = tOffset.y or 0
+	local ePosition = props.position or UI.TIP_POSITION.FOLLOW_MOUSE
+	local eHide = props.hide or UI.TIP_HIDE_WAY.HIDE
+	local bRichText = props.rich
+	return self:Hover(
+		function()
+			local nX, nY, nW, nH
+			if ePosition == UI.TIP_POSITION.FOLLOW_MOUSE then
+				nX, nY = Cursor.GetPos()
+				nX, nY = nX - 0, nY - 40
+			else
+				nX, nY = this:GetAbsPos()
+				nW, nH = this:GetSize()
+			end
+			nX, nY = nX + nOffsetX, nY + nOffsetY
+			local szText = props.render
+			if X.IsFunction(szText) then
+				szText, bRichText = X.ExecuteWithThis(this, szText)
+			end
+			if X.IsEmpty(szText) then
+				return
+			end
+			if not bRichText then
+				szText = GetFormatText(szText, props.font or 136, props.r, props.g, props.b)
+			end
+			OutputTip(szText, nWidth, {nX, nY, nW, nH}, ePosition)
+		end,
+		function()
+			if eHide == UI.TIP_HIDE_WAY.HIDE then
+				HideTip(false)
+			elseif eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE then
+				HideTip(true)
+			end
+		end,
+		true
+	)
 end
 
 -- check 复选框状态变化
