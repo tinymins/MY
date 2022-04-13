@@ -485,8 +485,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		onCheck = function(bChecked)
 			MY_DynamicItem.bEnable = bChecked
 		end,
-		tip = _L['Dynamic item bar for different map'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Dynamic item bar for different map'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 	}):Width() + 5
 
 	nX = nX + ui:Append('WndCheckBox', {

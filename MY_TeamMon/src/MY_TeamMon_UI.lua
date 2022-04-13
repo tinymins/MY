@@ -1835,7 +1835,10 @@ function D.OpenSettingPanel(data, szType)
 		end
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = _L['Requires MY_LifeBar loaded.'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bScreenHead', bCheck)
 			end,
@@ -2036,7 +2039,10 @@ function D.OpenSettingPanel(data, szType)
 			end
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-				tip = _L['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+				tip = {
+					render = _L['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'],
+					position = UI.TIP_POSITION.BOTTOM_TOP,
+				},
 				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bScreenHead', bCheck)
 				end,
@@ -2119,7 +2125,10 @@ function D.OpenSettingPanel(data, szType)
 		end
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = _L['Requires MY_LifeBar loaded.'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
 			end,
@@ -2224,7 +2233,10 @@ function D.OpenSettingPanel(data, szType)
 		end
 			-- nX = ui:Append('WndCheckBox', {
 			-- 	x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			-- 	tip = _L['Requires MY_LifeBar loaded.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			-- 	tip = {
+			-- 	render = _L['Requires MY_LifeBar loaded.'],
+			-- 	position = UI.TIP_POSITION.BOTTOM_TOP,
+			-- },
 			-- 	onCheck = function(bCheck)
 			-- 		SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
 			-- 	end,
@@ -2282,8 +2294,10 @@ function D.OpenSettingPanel(data, szType)
 					data.szNote = szText
 				end
 			end,
-			tip = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Speaker'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndEditBox', {
@@ -2309,7 +2323,11 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 540, y = nY + 3, w = 50,
-			text = _L['Partical search'], tip = _L['Supports match partical.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			text = _L['Partical search'],
+			tip = {
+				render = _L['Supports match partical.'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			checked = data.bSearch,
 			onCheck = function(bCheck)
 				data.bSearch = bCheck
@@ -2318,7 +2336,11 @@ function D.OpenSettingPanel(data, szType)
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = 640, y = nY + 3, w = 50,
-			text = _L['Regexp match'], tip = _L['Supports backreference in note string, format: ${index}.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			text = _L['Regexp match'],
+			tip = {
+				render = _L['Supports backreference in note string, format: ${index}.'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			checked = data.bReg,
 			onCheck = function(bCheck)
 				data.bReg = bCheck
@@ -2355,7 +2377,10 @@ function D.OpenSettingPanel(data, szType)
 		end
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = _L['Requires MY_LifeBar loaded.'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
 			end,
@@ -2381,8 +2406,10 @@ function D.OpenSettingPanel(data, szType)
 					data.szNote = szText
 				end
 			end,
-			tip = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Chat content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		_, nY = ui:Append('WndEditBox', {
@@ -2395,7 +2422,11 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 540, y = nY + 3, w = 50,
-			text = _L['Partical search'], tip = _L['Supports match partical.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			text = _L['Partical search'],
+			tip = {
+				render = _L['Supports match partical.'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			checked = data.bSearch,
 			onCheck = function(bCheck)
 				data.bSearch = bCheck
@@ -2404,7 +2435,11 @@ function D.OpenSettingPanel(data, szType)
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = 640, y = nY + 3, w = 50,
-			text = _L['Regexp match'], tip = _L['Supports backreference in note string, format: ${index}.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			text = _L['Regexp match'],
+			tip = {
+				render = _L['Supports backreference in note string, format: ${index}.'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			checked = data.bReg,
 			onCheck = function(bCheck)
 				data.bReg = bCheck
@@ -2441,7 +2476,10 @@ function D.OpenSettingPanel(data, szType)
 		end
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = _L['Requires MY_LifeBar loaded.'], tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = _L['Requires MY_LifeBar loaded.'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
 			end,
@@ -2564,15 +2602,16 @@ function D.OpenSettingPanel(data, szType)
 				end
 				return menu
 			end,
-			tip = function()
-				local szTip = GetFormatText(_L['Press CTRL click for advance menu'], 136)
-				if X.IsString(v.key) then
-					szTip = szTip .. GetFormatText('\n\nKEY: ' .. tostring(v.key), 136, 255, 255, 255)
-				end
-				return szTip
-			end,
-			tipPosType = UI.TIP_POSITION.LEFT_RIGHT,
-			tipRichText = true,
+			tip = {
+				render = function()
+					local szTip = GetFormatText(_L['Press CTRL click for advance menu'], 136)
+					if X.IsString(v.key) then
+						szTip = szTip .. GetFormatText('\n\nKEY: ' .. tostring(v.key), 136, 255, 255, 255)
+					end
+					return szTip, true
+				end,
+				position = UI.TIP_POSITION.LEFT_RIGHT,
+			},
 		}):Pos('BOTTOMRIGHT')
 		-- 图标
 		nX = ui:Append('Box', {
@@ -2592,8 +2631,10 @@ function D.OpenSettingPanel(data, szType)
 			onCheck = function(bCheck)
 				v.bTeamChannel = bCheck and true or nil
 			end,
-			tip = _L['Raid talk warning'],
-			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = _L['Raid talk warning'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		-- 普通倒计时时间/分段倒计时
 		ui:Append('WndEditBox', {
@@ -2640,13 +2681,15 @@ function D.OpenSettingPanel(data, szType)
 					end
 				end
 			end,
-			tip = function()
-				if v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA then
-					return _L['Life/mana statement.\n\nExample: 0.7-,Remain 70%;0.5-,Remain Half,2;0.01-,Almost empty,5'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called']
-				end
-				return _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called']
-			end,
-			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = function()
+					if v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA then
+						return _L['Life/mana statement.\n\nExample: 0.7-,Remain 70%;0.5-,Remain Half,2;0.01-,Almost empty,5'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called']
+					end
+					return _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called']
+				end,
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 		})
 		-- 普通倒计时文本
 		nX = ui:Append('WndEditBox', {
@@ -2655,8 +2698,10 @@ function D.OpenSettingPanel(data, szType)
 			onChange = function(szName)
 				v.szName = szName
 			end,
-			tip = _L['Simple countdown text'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = _L['Simple countdown text'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			placeholder = _L['Please input simple countdown text...'],
 		}):Pos('BOTTOMRIGHT')
 		-- 重复调用时间限制
@@ -2666,8 +2711,10 @@ function D.OpenSettingPanel(data, szType)
 			onChange = function(szNum)
 				v.nRefresh = tonumber(szNum)
 			end,
-			tip = _L['Max repeat time\n\nWhen countdown get trigger again, the last countdown may get overwritten. This config is to sovle this problem, input time limit here to ensure in this time period, countdown will not be trigger again.'],
-			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = _L['Max repeat time\n\nWhen countdown get trigger again, the last countdown may get overwritten. This config is to sovle this problem, input time limit here to ensure in this time period, countdown will not be trigger again.'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 		}):Pos('BOTTOMRIGHT')
 		-- 删除按钮
 		nX, nY = ui:Append('Image', {

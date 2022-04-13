@@ -597,8 +597,10 @@ function MY_GKP_UI.OnFrameCreate()
 		name = 'Btn_SyncRecord',
 		x = nX, y = 660, w = 120, text = _L['Manual SYNC'],
 		buttonStyle = 'FLAT_LACE_BORDER',
-		tip = _L['Left click to sync from others, right click to sync to others'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Left click to sync from others, right click to sync to others'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 		menuLClick = function()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])

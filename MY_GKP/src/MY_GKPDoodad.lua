@@ -1078,8 +1078,10 @@ function PS.OnPanelActive(frame)
 				O.bRecent = bChecked
 				D.RescanNearby()
 			end,
-			tip = _L['Recent crafted doodads during current game'],
-			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+			tip = {
+				render = _L['Recent crafted doodads during current game'],
+				position = UI.TIP_POSITION.TOP_BOTTOM,
+			},
 			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
@@ -1117,13 +1119,15 @@ function PS.OnPanelActive(frame)
 				O.szCustom = szText
 				D.ReloadCustom()
 			end,
-			tip = function()
-				if X.IsRestricted('MY_GKPDoodad.AutoInteract') then
-					return
-				end
-				return _L['Tip: Enter the name of dead animals can be automatically Paoding!']
-			end,
-			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = function()
+					if X.IsRestricted('MY_GKPDoodad.AutoInteract') then
+						return
+					end
+					return _L['Tip: Enter the name of dead animals can be automatically Paoding!']
+				end,
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			autoEnable = function() return (O.bShowName or O.bInteract) and O.bCustom end,
 		})
 	end

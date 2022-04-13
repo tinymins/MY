@@ -682,8 +682,10 @@ local function DrawPreview(ui, config, OpenDetail)
 		uiWnd:Append('Text', {
 			x = x + 20, y = y - 3, w = w - 290,
 			r = 255, g = 255, b = 0, text = szCaption,
-			tip = szCaption .. '\n' .. _L['(Embedded caption cannot be changed)'],
-			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = szCaption .. '\n' .. _L['(Embedded caption cannot be changed)'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 		}):AutoWidth()
 	else
 		uiWnd:Append('WndEditBox', {
@@ -721,8 +723,10 @@ local function DrawPreview(ui, config, OpenDetail)
 			D.DeleteConfig(config, IsCtrlKeyDown())
 			X.SwitchTab('MY_TargetMon', true)
 		end,
-		tip = config.embedded and _L['Press ctrl to delete embedded data permanently.'] or nil,
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = config.embedded and _L['Press ctrl to delete embedded data permanently.'] or nil,
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 	})
 	y = y + 30
 
@@ -740,8 +744,10 @@ local function DrawPreview(ui, config, OpenDetail)
 	uiWnd:Append('WndCheckBox', {
 		x = x + 90, y = y, w = 200,
 		text = _L['Hide others buff'],
-		tip = _L['Hide others buff TIP'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Hide others buff TIP'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 		checked = config.hideOthers,
 		onCheck = function(bChecked)
 			D.ModifyConfig(config, 'hideOthers', bChecked)
@@ -1124,8 +1130,10 @@ local function DrawControls(ui, OpenDetail)
 		w = 60, h = 30,
 		text = _L['Export'],
 		buttonStyle = 'FLAT',
-		tip = _L['Press ALT to export as default data.\n Press CTRL to export as plain.'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Press ALT to export as default data.\n Press CTRL to export as plain.'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 		menu = function()
 			local aUUID = {}
 			local menu = {}

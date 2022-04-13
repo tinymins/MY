@@ -1303,8 +1303,10 @@ function PS.OnPanelActive(frame)
 				O.nFont = nFont
 			end)
 		end,
-		tip = function() return _L('Current font: %d', O.nFont) end,
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = function() return _L('Current font: %d', O.nFont) end,
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 		autoEnable = IsEnabled,
 	})
 	y = y + deltaY

@@ -257,8 +257,10 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Auto focus very important npc'],
-		tip = _L['Boss list is always been collecting and updating'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Boss list is always been collecting and updating'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 		checked = MY_Focus.bFocusINpc,
 		onCheck = function(bChecked)
 			MY_Focus.bFocusINpc = bChecked
@@ -270,8 +272,10 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['TeamMon focus'],
-		tip = _L['TeamMon focus is related to MY_TeamMon data.'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['TeamMon focus is related to MY_TeamMon data.'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 		checked = MY_Focus.bTeamMonFocus,
 		onCheck = function(bChecked)
 			MY_Focus.bTeamMonFocus = bChecked
@@ -451,8 +455,10 @@ function PS.OnPanelActive(wnd)
 
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['Heal healper'],
-		tip = _L['Select target when mouse enter'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Select target when mouse enter'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 		checked = MY_Focus.bHealHelper,
 		onCheck = function(bChecked)
 			MY_Focus.bHealHelper = bChecked

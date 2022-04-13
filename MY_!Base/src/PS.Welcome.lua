@@ -66,8 +66,10 @@ function PS.OnPanelActive(wnd)
 				MY_Serendipity.bEnable = bChecked
 			end
 		end,
-		tip = _L['Monitor serendipity and show share notify.'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Monitor serendipity and show share notify.'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 	}):AutoWidth():Width()
 	local xS0 = x + ui:Append('WndCheckBox', {
 		x = x, y = 375,
@@ -97,8 +99,10 @@ function PS.OnPanelActive(wnd)
 		x = x, y = 375, w = 105, h = 25,
 		name = 'WndEditBox_SerendipitySilentMode',
 		placeholder = _L['Realname, leave blank for anonymous.'],
-		tip = _L['Realname, leave blank for anonymous.'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Realname, leave blank for anonymous.'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 		limit = 6,
 		text = X.LoadLUAData({'config/realname.jx3dat', X.PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
 		onChange = function(szText)

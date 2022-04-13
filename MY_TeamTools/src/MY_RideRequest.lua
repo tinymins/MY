@@ -375,8 +375,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		x = nX, y = nY, w = 120,
 		text = _L['MY_RideRequest'],
 		menu = D.GetMenu,
-		tip = _L['Optimize ride and emotion request'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Optimize ride and emotion request'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 	}):Width() + 5
 	return nX, nY
 end

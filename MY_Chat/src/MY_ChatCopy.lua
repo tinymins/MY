@@ -278,8 +278,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			O.bChatNamelinkEx = bChecked
 			D.CheckNamelinkEnable()
 		end,
-		tip = _L['Alt show equip, shift select.'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip  {
+			render == _L['Alt show equip, shift select.'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 	})
 	nY = nY + nLH
 

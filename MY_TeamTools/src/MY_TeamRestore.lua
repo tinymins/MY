@@ -308,8 +308,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		nX = ui:Append('WndButton', {
 			x = nX + 5, y = nY, w = 80, text = v.name,
 			buttonStyle = 'FLAT',
-			tip = v.name .. '\n' .. _L['Left click to recovery, right click for more.'],
-			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = v.name .. '\n' .. _L['Left click to recovery, right click for more.'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			onLClick = function()
 				if IsCtrlKeyDown() then
 					D.Restore2(i)

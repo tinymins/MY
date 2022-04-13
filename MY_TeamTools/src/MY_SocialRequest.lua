@@ -167,8 +167,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		x = nX, y = nY, w = 120,
 		text = _L['MY_SocialRequest'],
 		menu = D.GetMenu,
-		tip = _L['Optimize social friend request'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Optimize social friend request'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 	}):Width() + 5
 
 	nX = nPaddingX

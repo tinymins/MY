@@ -2083,8 +2083,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			O.bInTeamDungeon = bChecked
 			D.OutputEnable()
 		end,
-		tip = _L['Enable in checked map type'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Enable in checked map type'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 		autoEnable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	nX = ui:Append('WndCheckBox', {
@@ -2095,8 +2097,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			O.bInRaidDungeon = bChecked
 			D.OutputEnable()
 		end,
-		tip = _L['Enable in checked map type'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Enable in checked map type'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 		autoEnable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	nX = ui:Append('WndCheckBox', {
@@ -2107,8 +2111,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			O.bInBattlefield = bChecked
 			D.OutputEnable()
 		end,
-		tip = _L['Enable in checked map type'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Enable in checked map type'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 		autoEnable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	nX = ui:Append('WndCheckBox', {
@@ -2119,8 +2125,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			O.bInOtherMap = bChecked
 			D.OutputEnable()
 		end,
-		tip = _L['Enable in checked map type'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Enable in checked map type'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 		autoEnable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 

@@ -295,8 +295,10 @@ function PS.OnPanelActive(wnd)
 				end,
 			})
 		end,
-		tip = _L['Click to search jokes.'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Click to search jokes.'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 	}):Width() + 5
 	-- 骚话复制按钮
 	nX = ui:Append('WndButton', {
@@ -308,8 +310,10 @@ function PS.OnPanelActive(wnd)
 			X.FocusChatInput()
 		end,
 		autoEnable = function() return not X.IsEmpty(D.szJokeText) end,
-		tip = _L['Click to copy joke to chat panel.'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Click to copy joke to chat panel.'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 	}):Pos('BOTTOMRIGHT') + 5
 	-- 骚话分享按钮
 	nX = ui:Append('WndButton', {
@@ -353,8 +357,10 @@ function PS.OnPanelActive(wnd)
 			MessageBox(tMsg)
 		end,
 		autoEnable = function() return not X.IsEmpty(D.szJokeText) end,
-		tip = _L['Click to share your joke to remote.'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Click to share your joke to remote.'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 	}):Pos('BOTTOMRIGHT') + 5
 	-- 骚话输入框
 	nX = nPaddingX

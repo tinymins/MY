@@ -284,8 +284,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Avoid blacking shenxing cd'],
-		tip = _L['Got zhenyan wen shenxing, your shengxing will be blacked.'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Got zhenyan wen shenxing, your shengxing will be blacked.'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 		checked = MY_ShenxingHelper.bAvoidBlackCD,
 		onCheck = function(bChecked)
 			MY_ShenxingHelper.bAvoidBlackCD = bChecked
@@ -305,8 +307,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = 'auto',
 			text = _L['Force open all map shenxing'],
-			tip = _L['Shenxing can fly to undiscovered maps'],
-			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = _L['Shenxing can fly to undiscovered maps'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			checked = MY_ShenxingHelper.bOpenAllMap,
 			onCheck = function(bChecked)
 				MY_ShenxingHelper.bOpenAllMap = bChecked

@@ -85,8 +85,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		onCheck = function(bChecked)
 			MY_ItemWiki.bEnable = bChecked
 		end,
-		tip = _L['Hold SHIFT and r-click bag box to show item wiki'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Hold SHIFT and r-click bag box to show item wiki'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 	}):Width() + 5
 	return nX, nY
 end

@@ -227,8 +227,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			O.bEnable = bChecked
 			D.CheckEnable()
 		end,
-		tip = _L['Auto sell when open shop'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Auto sell when open shop'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 	}):Width() + 5
 
 	-- 按类型出售

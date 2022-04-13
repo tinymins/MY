@@ -466,8 +466,10 @@ function PS.OnPanelActive(wnd)
 			end
 			return t
 		end,
-		tip = _L['left click to restart, right click to open setting.'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['left click to restart, right click to open setting.'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 	})
 	-- ·¢²¼
 	ui:Append('WndButton', {
@@ -509,9 +511,11 @@ function PS.OnPanelActive(wnd)
 			end
 			return t
 		end,
-		tip = _L['left click to publish, right click to open setting.'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
-		tipOffset = { x = -80 },
+		tip = {
+			render = _L['left click to publish, right click to open setting.'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+			offset = { x = -80 },
+		},
 	})
 	-- Êä³ö°å
 	m_uiBoard = ui:Append('WndScrollHandleBox',{

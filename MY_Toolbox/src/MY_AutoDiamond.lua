@@ -340,8 +340,10 @@ function D.CheckInjection(bRemove)
 			onChange = function(szText)
 				D.nAutoCount = tonumber(szText) or 0
 			end,
-			tip = _L['Will continue produce until counter reachs or casting failed.'],
-			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+			tip = {
+				render = _L['Will continue produce until counter reachs or casting failed.'],
+				position = UI.TIP_POSITION.TOP_BOTTOM,
+			},
 		}):Width() + 5
 		nX = nX + ui:Append('Text', {
 			name = 'Text_MYDiamond2',

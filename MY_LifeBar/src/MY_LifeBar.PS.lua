@@ -129,8 +129,10 @@ function PS.OnPanelActive(wnd)
 			Config.bOnlyInArena = bChecked
 			D.Reset(true)
 		end,
-		tip = _L['Only enable in checked map types'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Only enable in checked map types'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 		autoEnable = function() return D.IsEnabled() end,
 	}):AutoWidth():Width() + 5
 	nX = nX + ui:Append('WndCheckBox', {
@@ -140,8 +142,10 @@ function PS.OnPanelActive(wnd)
 			Config.bOnlyInBattleField = bChecked
 			D.Reset(true)
 		end,
-		tip = _L['Only enable in checked map types'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Only enable in checked map types'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 		autoEnable = function() return D.IsEnabled() end,
 	}):AutoWidth():Width() + 5
 	nX = nX + ui:Append('WndCheckBox', {
@@ -151,8 +155,10 @@ function PS.OnPanelActive(wnd)
 			Config.bOnlyInDungeon = bChecked
 			D.Reset(true)
 		end,
-		tip = _L['Only enable in checked map types'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Only enable in checked map types'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 		autoEnable = function() return D.IsEnabled() end,
 	}):AutoWidth():Width() + 5
 	nY = nY + nLH
@@ -891,8 +897,10 @@ function PS.OnPanelActive(wnd)
 				Config.bShowSpecialNpc = bChecked
 				D.Reset()
 			end,
-			tip = _L['This function has been shielded by official except in dungeon'],
-			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+			tip = {
+				render = _L['This function has been shielded by official except in dungeon'],
+				position = UI.TIP_POSITION.TOP_BOTTOM,
+			},
 			autoEnable = function() return D.IsEnabled() end,
 		}):AutoWidth():Width() + 5
 		ui:Append('WndCheckBox', {
@@ -904,8 +912,10 @@ function PS.OnPanelActive(wnd)
 				Config.bShowSpecialNpcOnlyEnemy = bChecked
 				D.Reset()
 			end,
-			tip = _L['This function has been shielded by official except in dungeon'],
-			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+			tip = {
+				render = _L['This function has been shielded by official except in dungeon'],
+				position = UI.TIP_POSITION.TOP_BOTTOM,
+			},
 			autoEnable = function() return D.IsEnabled() and Config.bShowSpecialNpc end,
 		})
 	end

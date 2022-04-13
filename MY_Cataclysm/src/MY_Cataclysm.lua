@@ -811,8 +811,10 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 			rec.col = nil
 			onChangeNotify(rec)
 		end,
-		tip = _L['Left click to change color, right click to clear color'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Left click to change color, right click to clear color'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 		autoEnable = function() return not rec.bDelete end,
 	}):Width() + 5
 	x = x + ui:Append('Shadow', {
@@ -831,8 +833,10 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 			rec.colScreenHead = nil
 			onChangeNotify(rec)
 		end,
-		tip = _L['Left click to change screen head color, right click to clear color'],
-		tipPosType = ALW.TOP_BOTTOM,
+		tip = {
+			render = _L['Left click to change screen head color, right click to clear color'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 		autoEnable = function() return not rec.bDelete end,
 	}):Width() + 5
 	y = y + 30

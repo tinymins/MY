@@ -734,8 +734,10 @@ function D.OnInitPage()
 			O.bIntelligentHide = bChecked
 			D.UpdateAchievementID()
 		end,
-		tip = _L['Hide unimportant achievements'],
-		tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+		tip = {
+			render = _L['Hide unimportant achievements'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
 	}):Width() + 5
 
 	UI(wnd):Append('WndButton', {

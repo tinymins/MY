@@ -132,12 +132,14 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				O.bEnable = bChecked
 				D.Apply()
 			end,
-			tip = function(self)
-				if not self:Enable() then
-					return _L['Changge force only']
-				end
-			end,
-			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+			tip = {
+				render = function(self)
+					if not self:Enable() then
+						return _L['Changge force only']
+					end
+				end,
+				position = UI.TIP_POSITION.TOP_BOTTOM,
+			},
 			autoEnable = function()
 				local me = GetClientPlayer()
 				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
@@ -151,12 +153,14 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				O.bShowDistance = bChecked
 				D.Apply()
 			end,
-			tip = function(self)
-				if not self:Enable() then
-					return _L['Changge force only']
-				end
-			end,
-			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+			tip = {
+				render = function(self)
+					if not self:Enable() then
+						return _L['Changge force only']
+					end
+				end,
+				position = UI.TIP_POSITION.TOP_BOTTOM,
+			},
 			autoEnable = function()
 				local me = GetClientPlayer()
 				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
@@ -170,12 +174,14 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				O.bShowCD = bChecked
 				D.Apply()
 			end,
-			tip = function(self)
-				if not self:Enable() then
-					return _L['Changge force only']
-				end
-			end,
-			tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+			tip = {
+				render = function(self)
+					if not self:Enable() then
+						return _L['Changge force only']
+					end
+				end,
+				position = UI.TIP_POSITION.TOP_BOTTOM,
+			},
 			autoEnable = function()
 				local me = GetClientPlayer()
 				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE

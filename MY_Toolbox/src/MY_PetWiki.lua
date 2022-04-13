@@ -213,8 +213,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Pet wiki'],
-		tip = _L['Click icon on pet panel to view pet wiki'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Click icon on pet panel to view pet wiki'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 		checked = MY_PetWiki.bEnable,
 		onCheck = function(bChecked)
 			MY_PetWiki.bEnable = bChecked

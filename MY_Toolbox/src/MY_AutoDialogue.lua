@@ -428,8 +428,10 @@ function D.CreateEntry()
 			p.el = UI(wnd):Append('WndButton', {
 				name = 'WndButton_AutoChat',
 				text = _L['Autochat'],
-				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
-				tipPosType = UI.TIP_POSITION.TOP_BOTTOM,
+				tip = {
+					render = _L['Left click to config autochat.\nRight click to edit global config.'],
+					position = UI.TIP_POSITION.TOP_BOTTOM,
+				},
 				menuLClick = function()
 					return D.GetDialogueMenu(frame[p.keys.info], frame[p.keys.tartype], frame[p.keys.tarid], frame[p.keys.winidx])
 				end,

@@ -135,8 +135,10 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Lifebar alarm'],
-		tip = _L['Requires MY_LifeBar loaded.'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Requires MY_LifeBar loaded.'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 		checked = MY_TeamMon.bPushScreenHead,
 		onCheck = function(bCheck)
 			MY_TeamMon.bPushScreenHead = bCheck

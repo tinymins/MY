@@ -319,8 +319,10 @@ function D.CheckInjection(bRemoveInjection)
 					name = 'Btn_MY_Sort',
 					x = x - w, y = y, w = w, h = h,
 					text = _L['Sort'],
-					tip = _L['Press shift for random'],
-					tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+					tip = {
+						render = _L['Press shift for random'],
+						position = UI.TIP_POSITION.BOTTOM_TOP,
+					},
 					onClick = D.SortGuildBank,
 				})
 			end

@@ -152,8 +152,10 @@ function PS.OnPanelActive(frame)
 			onCheck = function(bCheck)
 				CFG.bShowEffect = bCheck
 			end,
-			tip = _L['Show effect when teammate get ZuiWu, only your ZuiWu will be showen while you\'re BuTianJue.'],
-			tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+			tip = {
+				render = _L['Show effect when teammate get ZuiWu, only your ZuiWu will be showen while you\'re BuTianJue.'],
+				position = UI.TIP_POSITION.BOTTOM_TOP,
+			},
 		}):AutoWidth():Width() + 5
 	end
 
@@ -163,8 +165,10 @@ function PS.OnPanelActive(frame)
 		onCheck = function(bCheck)
 			CFG.bShowSputtering = bCheck
 		end,
-		tip = _L['Show color on right top pos of central member of each party'],
-		tipPosType = UI.TIP_POSITION.BOTTOM_TOP,
+		tip = {
+			render = _L['Show color on right top pos of central member of each party'],
+			position = UI.TIP_POSITION.BOTTOM_TOP,
+		},
 	}):AutoWidth():Width() + 5
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, w = 25, h = 25,
