@@ -157,6 +157,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.navigate           ~= nil then ui:Navigate         (arg.navigate                                    ) end
 		if arg.group              ~= nil then ui:Group            (arg.group                                       ) end
 		if arg.tip                ~= nil then ui:Tip              (arg.tip                                         ) end
+		if arg.rowTip             ~= nil then ui:RowTip           (arg.rowTip                                      ) end
 		if arg.range              ~= nil then ui:Range            (unpack(arg.range)                               ) end
 		if arg.value              ~= nil then ui:Value            (arg.value                                       ) end
 		if arg.menu               ~= nil then ui:Menu             (arg.menu                                        ) end
@@ -190,6 +191,7 @@ local function ApplyUIArguments(ui, arg)
 		-- event handlers
 		if arg.onScroll           ~= nil then ui:Scroll           (arg.onScroll                                    ) end
 		if arg.onHover            ~= nil then ui:Hover            (arg.onHover                                     ) end
+		if arg.onRowHover         ~= nil then ui:RowHover         (arg.onRowHover                                  ) end
 		if arg.onFocus            ~= nil then ui:Focus            (arg.onFocus                                     ) end
 		if arg.onBlur             ~= nil then ui:Blur             (arg.onBlur                                      ) end
 		if arg.onClick            ~= nil then ui:Click            (arg.onClick                                     ) end
@@ -893,6 +895,12 @@ local function InitComponent(raw, szType)
 							szXml = GetFormatText(rec[col.key])
 						end
 						hItemContent:AppendItemFromString(szXml)
+					end
+					hRow.OnItemMouseEnter = function()
+						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), true, rec, nRowIndex)
+					end
+					hRow.OnItemMouseLeave = function()
+						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), false, rec, nRowIndex)
 					end
 				end
 			end
@@ -2223,7 +2231,11 @@ function OO:Autocomplete(method, arg1, arg2)
 										UI(raw):Autocomplete('search')
 									end
 									if opt.beforeDelete then
-										bSure = X.ExecuteWithThis(raw, opt.beforeDelete, src)
+										local bSuccess
+										bSuccess, bSure = X.ExecuteWithThis(raw, opt.beforeDelete, src)
+										if not bSuccess then
+											bSure = false
+										end
 									end
 									if bSure ~= false then
 										fnDoDelete()
@@ -4600,7 +4612,7 @@ function OO:Complete(fnOnComplete)
 	return self
 end
 
--- hover 鼠标悬停事件
+-- 鼠标悬停事件
 -- same as jQuery.hover()
 -- @param {function(bIn: boolean): void} fnAction 鼠标悬停事件响应函数
 function OO:Hover(fnAction)
@@ -4611,21 +4623,25 @@ function OO:Hover(fnAction)
 			local itm = GetComponentElement(raw, 'ITEM')
 			if wnd then
 				UI(wnd):UIEvent('OnMouseIn', function() fnAction(true) end)
-			elseif itm then
-				itm:RegisterEvent(256)
-				UI(itm):UIEvent('OnItemMouseIn', function() fnAction(true) end)
-			end
-		end
-	end
-	if fnLeave then
-		for _, raw in ipairs(self.raws) do
-			local wnd = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'MAIN_WINDOW')
-			local itm = GetComponentElement(raw, 'ITEM')
-			if wnd then
 				UI(wnd):UIEvent('OnMouseOut', function() fnAction(false) end)
 			elseif itm then
 				itm:RegisterEvent(256)
+				UI(itm):UIEvent('OnItemMouseIn', function() fnAction(true) end)
 				UI(itm):UIEvent('OnItemMouseOut', function() fnAction(false) end)
+			end
+		end
+	end
+	return self
+end
+
+-- 行鼠标悬停事件
+-- @param {function(bIn: boolean): void} fnAction 行鼠标悬停事件响应函数
+function OO:RowHover(fnAction)
+	self:_checksum()
+	if fnAction then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndTable' then
+				SetComponentProp(raw, 'OnRowHover', fnAction)
 			end
 		end
 	end
@@ -4676,7 +4692,72 @@ function OO:Tip(props)
 			nX, nY = nX + nOffsetX, nY + nOffsetY
 			local szText = props.render
 			if X.IsFunction(szText) then
-				szText, bRichText = X.ExecuteWithThis(this, szText)
+				local bSuccess
+				bSuccess, szText, bRichText = X.ExecuteWithThis(this, szText)
+				if not bSuccess then
+					return
+				end
+			end
+			if X.IsEmpty(szText) then
+				return
+			end
+			if not bRichText then
+				szText = GetFormatText(szText, props.font or 136, props.r, props.g, props.b)
+			end
+			OutputTip(szText, nWidth, {nX, nY, nW, nH}, ePosition)
+		end
+	)
+end
+
+-- 行鼠标悬停提示
+-- @param {object} props 配置项
+-- @param {string|function} props.render 要提示的纯文字或富文本，或返回前述内容的函数
+-- @param {number} props.w 提示框宽度
+-- @param {{ x: number; y: number }} props.offset 提示框触发区域偏移量
+-- @param {UI.TIP_HIDE_WAY} props.position 提示框相对于触发区域的位置
+-- @param {boolean} props.rich 提示框内容是否为富文本（当 render 为函数时取函数第二返回值）
+-- @param {number} props.font 提示框字体（仅在非富文本下有效）
+-- @param {number} props.r 提示框文字r（仅在非富文本下有效）
+-- @param {number} props.g 提示框文字g（仅在非富文本下有效）
+-- @param {number} props.b 提示框文字b（仅在非富文本下有效）
+-- @param {UI.TIP_HIDE_WAY} props.hide 提示框消失方式
+function OO:RowTip(props)
+	if not X.IsTable(props) then
+		props = { render = props }
+	end
+	local nWidth = props.w or 450
+	local tOffset = props.offset or {}
+	local nOffsetX = tOffset.x or 0
+	local nOffsetY = tOffset.y or 0
+	local ePosition = props.position or UI.TIP_POSITION.FOLLOW_MOUSE
+	local eHide = props.hide or UI.TIP_HIDE_WAY.HIDE
+	local bRichText = props.rich
+	return self:RowHover(
+		function(bIn, ...)
+			if not bIn then
+				if eHide == UI.TIP_HIDE_WAY.HIDE then
+					HideTip(false)
+				elseif eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE then
+					HideTip(true)
+				end
+				return
+			end
+			local nX, nY, nW, nH
+			if ePosition == UI.TIP_POSITION.FOLLOW_MOUSE then
+				nX, nY = Cursor.GetPos()
+				nX, nY = nX - 0, nY - 40
+			else
+				nX, nY = this:GetAbsPos()
+				nW, nH = this:GetSize()
+			end
+			nX, nY = nX + nOffsetX, nY + nOffsetY
+			local szText = props.render
+			if X.IsFunction(szText) then
+				local bSuccess
+				bSuccess, szText, bRichText = X.ExecuteWithThis(this, szText, ...)
+				if not bSuccess then
+					return
+				end
 			end
 			if X.IsEmpty(szText) then
 				return
