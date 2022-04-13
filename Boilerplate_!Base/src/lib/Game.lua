@@ -1854,7 +1854,7 @@ function X.GetClientInfo(arg0)
 			m_ClientInfo.dwPetID           = me.dwPetID
 			m_ClientInfo.dwMapID           = me.GetMapID()
 			m_ClientInfo.szMapName         = Table_GetMapName(me.GetMapID())
-			m_ClientInfo.szGlobalID        = me.GetGlobalID()
+			m_ClientInfo.szGlobalID        = me.GetGlobalID and me.GetGlobalID()
 		end
 	end
 	if not m_ClientInfo then
@@ -1870,22 +1870,6 @@ local function onLoadingEnding()
 	X.GetClientInfo(true)
 end
 X.RegisterEvent('LOADING_ENDING', onLoadingEnding)
-end
-
--- 获取唯一标识符
-do
-local PLAYER_GUID
-function X.GetPlayerGUID()
-	if not PLAYER_GUID then
-		local me = GetClientPlayer()
-		if me.GetGlobalID and me.GetGlobalID() ~= '0' then
-			PLAYER_GUID = me.GetGlobalID()
-		else
-			PLAYER_GUID = (X.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. X.GetClientInfo().dwID
-		end
-	end
-	return PLAYER_GUID
-end
 end
 
 do
@@ -4707,9 +4691,20 @@ do
 		PLAYER_GUID[dwTalkerID] = data
 	end)
 
-	function X.GetPlayerGUID(dwID)
-		if dwID == UI_GetClientPlayerID() then
-			return X.GetClientInfo('szGlobalID')
+	-- 获取唯一标识符
+	function X.GetPlayerGUID(...)
+		local dwID = ...
+		if select('#', ...) == 0 then
+			dwID = UI_GetClientPlayerID()
+		end
+		if not PLAYER_GUID[dwID] then
+			if dwID == UI_GetClientPlayerID() then
+				local szGUID = X.GetClientInfo('szGlobalID')
+				if not szGUID or szGUID == '0' then
+					szGUID = (X.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. X.GetClientInfo().dwID
+				end
+				PLAYER_GUID[dwID] = szGUID
+			end
 		end
 		return PLAYER_GUID[dwID]
 	end
