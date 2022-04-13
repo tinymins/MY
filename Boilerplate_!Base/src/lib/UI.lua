@@ -4555,6 +4555,57 @@ function OO:LClick(...)
 end
 
 -- 鼠标右键单击事件，无参数调用表示触发单击事件
+-- same as jQuery.mclick()
+-- @param {function(eButton: UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
+	function OO:MClick(fnClick)
+		self:_checksum()
+		if select('#', ...) > 0 then
+			local fnClick = ...
+			if X.IsFunction(fnClick) then
+				for _, raw in ipairs(self.raws) do
+					local fnAction = function()
+						if GetComponentProp(raw, 'bEnable') == false then
+							return
+						end
+						X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.MIDDLE)
+					end
+					if GetComponentType(raw) == 'WndScrollHandleBox' then
+						UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemMButtonClick', fnAction)
+					else
+						local cmb = GetComponentElement(raw, 'COMBOBOX')
+						local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+						local itm = GetComponentElement(raw, 'ITEM')
+						local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+						if cmb then
+							UI(cmb):UIEvent('OnMButtonClick', fnAction)
+						elseif wnd then
+							UI(wnd):UIEvent('OnMButtonClick', fnAction)
+						elseif itm then
+							itm:RegisterEvent(16)
+							UI(itm):UIEvent('OnItemMButtonClick', fnAction)
+						elseif hdl then
+							hdl:RegisterEvent(16)
+							UI(hdl):UIEvent('OnItemMButtonClick', fnAction)
+						end
+					end
+				end
+			end
+		else
+			for _, raw in ipairs(self.raws) do
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local itm = GetComponentElement(raw, 'ITEM')
+				if wnd and wnd.OnMButtonClick then
+					X.CallWithThis(wnd, wnd.OnMButtonClick)
+				end
+				if itm and itm.OnItemMButtonClick then
+					X.CallWithThis(itm, itm.OnItemMButtonClick)
+				end
+			end
+		end
+		return self
+	end
+
+-- 鼠标右键单击事件，无参数调用表示触发单击事件
 -- same as jQuery.rclick()
 -- @param {function(eButton: UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
 function OO:RClick(...)
@@ -4599,57 +4650,6 @@ function OO:RClick(...)
 			end
 			if itm and itm.OnItemRButtonClick then
 				X.CallWithThis(itm, itm.OnItemRButtonClick)
-			end
-		end
-	end
-	return self
-end
-
--- 鼠标右键单击事件，无参数调用表示触发单击事件
--- same as jQuery.mclick()
--- @param {function(eButton: UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
-function OO:MClick(fnClick)
-	self:_checksum()
-	if select('#', ...) > 0 then
-		local fnClick = ...
-		if X.IsFunction(fnClick) then
-			for _, raw in ipairs(self.raws) do
-				local fnAction = function()
-					if GetComponentProp(raw, 'bEnable') == false then
-						return
-					end
-					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.MIDDLE)
-				end
-				if GetComponentType(raw) == 'WndScrollHandleBox' then
-					UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemMButtonClick', fnAction)
-				else
-					local cmb = GetComponentElement(raw, 'COMBOBOX')
-					local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-					local itm = GetComponentElement(raw, 'ITEM')
-					local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-					if cmb then
-						UI(cmb):UIEvent('OnMButtonClick', fnAction)
-					elseif wnd then
-						UI(wnd):UIEvent('OnMButtonClick', fnAction)
-					elseif itm then
-						itm:RegisterEvent(16)
-						UI(itm):UIEvent('OnItemMButtonClick', fnAction)
-					elseif hdl then
-						hdl:RegisterEvent(16)
-						UI(hdl):UIEvent('OnItemMButtonClick', fnAction)
-					end
-				end
-			end
-		end
-	else
-		for _, raw in ipairs(self.raws) do
-			local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-			local itm = GetComponentElement(raw, 'ITEM')
-			if wnd and wnd.OnMButtonClick then
-				X.CallWithThis(wnd, wnd.OnMButtonClick)
-			end
-			if itm and itm.OnItemMButtonClick then
-				X.CallWithThis(itm, itm.OnItemMButtonClick)
 			end
 		end
 	end
