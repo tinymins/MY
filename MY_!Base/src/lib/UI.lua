@@ -724,16 +724,23 @@ local function InitComponent(raw, szType)
 			end
 			local nExtraWidth = nScrollX
 			for i, col in ipairs(aColumns) do
-				nExtraWidth = nExtraWidth - col.minWidth
+				if col.minWidth then
+					nExtraWidth = nExtraWidth - col.minWidth
+				end
+			end
+			if nExtraWidth < 0 then
+				nScrollX = nScrollX - nExtraWidth
+				nExtraWidth = 0
 			end
 			for i, col in ipairs(aColumns) do
 				local hCol = hColumns:Lookup(i - 1) -- 外部居中层
 				local hContent = hCol:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
 				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
 				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
+				local nMinWidth = col.minWidth or 0
 				local nWidth = i == #aColumns
 					and (nScrollX - nX)
-					or math.min(nExtraWidth * col.minWidth / (nScrollX - nExtraWidth) + col.minWidth, col.maxWidth or math.huge)
+					or math.min(nExtraWidth * nMinWidth / (nScrollX - nExtraWidth) + nMinWidth, col.maxWidth or math.huge)
 				local nSortDelta = nWidth > 70 and 25 or 15
 				hCol:SetRelX(nX)
 				hCol:SetW(nWidth)
@@ -905,10 +912,14 @@ local function InitComponent(raw, szType)
 						hItemContent:AppendItemFromString(szXml)
 					end
 					hRow.OnItemMouseEnter = function()
-						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), true, rec, nRowIndex)
+						local nX, nY = raw:GetAbsX(), this:GetAbsY()
+						local nW, nH = raw:GetW(), this:GetH()
+						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), true, rec, nRowIndex, { nX, nY, nW, nH })
 					end
 					hRow.OnItemMouseLeave = function()
-						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), false, rec, nRowIndex)
+						local nX, nY = raw:GetAbsX(), this:GetAbsY()
+						local nW, nH = raw:GetW(), this:GetH()
+						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), false, rec, nRowIndex, { nX, nY, nW, nH })
 					end
 					hRow.OnItemLButtonClick = function()
 						X.SafeCall(GetComponentProp(raw, 'RowLClick'), rec, nRowIndex)
@@ -4966,7 +4977,7 @@ function OO:RowTip(props)
 	local eHide = props.hide or UI.TIP_HIDE_WAY.HIDE
 	local bRichText = props.rich
 	return self:RowHover(
-		function(bIn, ...)
+		function(bIn, rec, nIndex, Rect)
 			if not bIn then
 				if eHide == UI.TIP_HIDE_WAY.HIDE then
 					HideTip(false)
@@ -4981,14 +4992,14 @@ function OO:RowTip(props)
 				nX, nY = nX - 0, nY - 40
 				nW, nH = 40, 40
 			else
-				nX, nY = this:GetAbsPos()
-				nW, nH = this:GetSize()
+				nX, nY = Rect[1], Rect[2]
+				nW, nH = Rect[3], Rect[4]
 			end
 			nX, nY = nX + nOffsetX, nY + nOffsetY
 			local szText = props.render
 			if X.IsFunction(szText) then
 				local bSuccess
-				bSuccess, szText, bRichText = X.ExecuteWithThis(this, szText, ...)
+				bSuccess, szText, bRichText = X.ExecuteWithThis(this, szText, rec, nIndex)
 				if not bSuccess then
 					return
 				end
