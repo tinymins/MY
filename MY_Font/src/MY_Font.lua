@@ -27,16 +27,87 @@ end
 --------------------------------------------------------------------------
 
 -- 本地变量
-local OBJ = {}
+local D = {}
+
+-- 设置字体
+function D.SetFont(tIDs, szName, szFile, nSize, tStyle)
+	-- tIDs  : 要改变字体的类型组（标题/文本/姓名 等）
+	-- szName: 字体名称
+	-- szFile: 字体路径
+	-- nSize : 字体大小
+	-- tStyle: {
+	--     ['vertical'] = (bool),
+	--     ['border'  ] = (bool),
+	--     ['shadow'  ] = (bool),
+	--     ['mono'    ] = (bool),
+	--     ['mipmap'  ] = (bool),
+	-- }
+	-- Ex: SetFont(Font.GetChatFontID(), '黑体', '\\UI\\Font\\方正黑体_GBK.ttf', 16, {['shadow'] = true})
+	for _, dwID in ipairs(tIDs) do
+		local szName1, szFile1, nSize1, tStyle1 = Font.GetFont(dwID)
+		Font.SetFont(dwID, szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1)
+		if dwID == Font.GetChatFontID() then
+			Wnd.OpenWindow('ChatSettingPanel')
+			OutputWarningMessage('MSG_REWARD_GREEN', _L['Please click apply or sure button to save change!'], 10)
+		end
+		CONFIG[dwID] = {szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1}
+	end
+	X.SaveLUAData(CONFIG_PATH, CONFIG)
+	Station.SetUIScale(Station.GetUIScale(), true)
+end
+
+-- 字体配置项
 local FONT_TYPE = {
-	{ tIDs = {0, 1, 2, 3, 4, 6    }, szName = _L['content'] },
-	{ tIDs = {Font.GetChatFontID()}, szName = _L['chat'   ] },
-	{ tIDs = {7                   }, szName = _L['fight'  ] },
+	{
+		szTitle = _L['Common UI Text'],
+		Get = function()
+			local szFontName, szFontFile = Font.GetFont(0)
+			return szFontName, szFontFile
+		end,
+		Set = function(szFontName, szFontFile)
+			D.SetFont({0, 1, 2, 3, 4, 6}, szFontName, szFontFile)
+		end,
+	},
+	{
+		szTitle = _L['Chat Panel Text'],
+		Get = function()
+			local szFontName, szFontFile = Font.GetFont(Font.GetChatFontID())
+			return szFontName, szFontFile
+		end,
+		Set = function(szFontName, szFontFile)
+			D.SetFont({Font.GetChatFontID()}, szFontName, szFontFile)
+		end,
+	},
+	{
+		szTitle = _L['Combat Text'],
+		Get = function()
+			local szFontName, szFontFile = Font.GetFont(7)
+			return szFontName, szFontFile
+		end,
+		Set = function(szFontName, szFontFile)
+			D.SetFont({7}, szFontName, szFontFile)
+		end,
+	},
 }
-local CONFIG
+if Global_SetCaptionParams then
+	table.insert(FONT_TYPE, {
+		szTitle = _L['Lifebar Text'],
+		Get = function()
+			local szFontName, szFontFile = '', ''
+			return szFontName, szFontFile
+		end,
+		Set = function(szFontName, szFontFile)
+			local tParams = {
+				{ vtype = 's', key = 'FontFile', value = szFontFile },
+				-- { vtype = 'f', key = 'FontZoomInScale', value = 3 },
+			}
+			Global_SetCaptionParams(tParams)
+		end,
+	})
+end
 
 -- 加载字体配置
-local CONFIG_PATH = {'config/fontconfig.jx3dat', X.PATH_TYPE.GLOBAL}
+local CONFIG, CONFIG_PATH = nil, {'config/fontconfig.jx3dat', X.PATH_TYPE.GLOBAL}
 do
 	local szOrgFile = X.GetLUADataPath({'config/MY_FONT/{$lang}.jx3dat', X.PATH_TYPE.DATA})
 	local szFilePath = X.GetLUADataPath(CONFIG_PATH)
@@ -45,6 +116,128 @@ do
 	end
 	CONFIG = X.LoadLUAData(szFilePath) or {}
 end
+
+-- Global exports
+do
+local settings = {
+	name = 'MY_Font',
+	exports = {
+		{
+			fields = {
+				'SetFont',
+			},
+			root = D,
+		},
+	},
+}
+MY_Font = X.CreateModule(settings)
+end
+
+-- 配置界面
+local PS = {}
+function PS.OnPanelActive(wnd)
+	local ui = UI(wnd)
+	local x, y = 10, 30
+	local w, h = ui:Size()
+	local aFontList = X.GetFontList()
+	local aFontName, aFontPath = {}, {}
+
+	for _, p in ipairs(aFontList) do
+		table.insert(aFontName, p.szName)
+		table.insert(aFontPath, p.szFile)
+	end
+
+	for _, p in ipairs(FONT_TYPE) do
+		local szFontName, szFontFile = p.Get()
+		local acFontFile, acFontName, btnApply
+		local function UpdateBtnEnable()
+			local szNewFile = acFontFile:Text()
+			local bFileExist = IsFileExist(szNewFile)
+			acFontFile:Color(bFileExist and {255, 255, 255} or {255, 0, 0})
+			btnApply:Enable(bFileExist and szNewFile ~= szFontFile)
+		end
+
+		x = 10
+		ui:Append('Text', { text = _L[' * '] .. p.szTitle, x = x, y = y })
+		y = y + 40
+
+		acFontFile = ui:Append('WndAutocomplete', {
+			x = x, y = y, w = w - 180 - 30,
+			text = szFontFile,
+			onChange = function(szText)
+				UpdateBtnEnable()
+				szText = StringLowerW(szText)
+				for _, p in ipairs(aFontList) do
+					if StringLowerW(p.szFile) == szText then
+						if acFontName:Text() ~= p.szName then
+							acFontName:Text(p.szName)
+						end
+						return
+					end
+				end
+				acFontName:Text(g_tStrings.STR_CUSTOM_TEAM)
+			end,
+			onClick = function()
+				if IsPopupMenuOpened() then
+					UI(this):Autocomplete('close')
+				else
+					UI(this):Autocomplete('search', '')
+				end
+			end,
+			autocomplete = {{'option', 'source', aFontPath}},
+		})
+
+		ui:Append('WndButton', {
+			x = w - 180 - x - 10, y = y, w = 25,
+			text = '...',
+			onClick = function()
+				local file = GetOpenFileName(_L['Please select your font file.'], 'Font File(*.ttf;*.otf;*.fon)\0*.ttf;*.otf;*.fon\0All Files(*.*)\0*.*\0\0')
+				if not X.IsEmpty(file) then
+					file = X.GetRelativePath(file, '') or file
+					acFontFile:Text(wstring.gsub(file, '/', '\\'))
+				end
+			end,
+		})
+
+		acFontName = ui:Append('WndAutocomplete', {
+			w = 100, h = 25, x = w - 180 + x, y = y,
+			text = szFontName,
+			onChange = function(szText)
+				UpdateBtnEnable()
+				szText = StringLowerW(szText)
+				for _, p in ipairs(aFontList) do
+					if StringLowerW(p.szName) == szText
+					and acFontFile:Text() ~= p.szFile then
+						acFontFile:Text(p.szFile)
+						return
+					end
+				end
+			end,
+			onClick = function()
+				if IsPopupMenuOpened() then
+					UI(this):Autocomplete('close')
+				else
+					UI(this):Autocomplete('search', '')
+				end
+			end,
+			autocomplete = {{'option', 'source', aFontName}},
+		})
+
+		btnApply = ui:Append('WndButton', {
+			w = 60, h = 25, x = w - 60, y = y,
+			text = _L['Apply'], enable = false,
+			onClick = function()
+				p.Set(acFontName:Text(), acFontFile:Text())
+				szFontName, szFontFile = p.Get()
+				acFontName:Text(szFontName, WNDEVENT_FIRETYPE.PREVENT)
+				acFontFile:Text(szFontFile, WNDEVENT_FIRETYPE.PREVENT)
+				UpdateBtnEnable()
+			end
+		})
+		y = y + 60
+	end
+end
+X.RegisterPanel(_L['System'], 'MY_Font', _L['MY_Font'], 'ui/Image/UICommon/CommonPanel7.UITex|36', PS)
 
 -- 初始化设置
 do
@@ -65,138 +258,3 @@ do
 		Station.SetUIScale(Station.GetUIScale(), true)
 	end
 end
-
--- 设置字体
-function OBJ.SetFont(tIDs, szName, szFile, nSize, tStyle)
-	-- tIDs  : 要改变字体的类型组（标题/文本/姓名 等）
-	-- szName: 字体名称
-	-- szFile: 字体路径
-	-- nSize : 字体大小
-	-- tStyle: {
-	--     ['vertical'] = (bool),
-	--     ['border'  ] = (bool),
-	--     ['shadow'  ] = (bool),
-	--     ['mono'    ] = (bool),
-	--     ['mipmap'  ] = (bool),
-	-- }
-	-- Ex: SetFont(Font.GetChatFontID(), '黑体', '\\UI\\Font\\方正黑体_GBK.ttf', 16, {['shadow'] = true})
-	for _, dwID in ipairs(tIDs) do
-		local szName1, szFile1, nSize1, tStyle1 = Font.GetFont(dwID)
-		Font.SetFont(dwID, szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1)
-		if dwID == Font.GetChatFontID() then
-			Wnd.OpenWindow('ChatSettingPanel')
-			OutputWarningMessage('MSG_REWARD_GREEN', _L['please click apply or sure button to save change!'], 10)
-		end
-		CONFIG[dwID] = {szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1}
-	end
-	X.SaveLUAData(CONFIG_PATH, CONFIG)
-	Station.SetUIScale(Station.GetUIScale(), true)
-end
-
--- 配置界面
-local PS = {}
-function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
-	local x, y = 10, 30
-	local w, h = ui:Size()
-	local aFontList = X.GetFontList()
-	local aFontName, aFontPath = {}, {}
-
-	for _, p in ipairs(aFontList) do
-		table.insert(aFontName, p.szName)
-		table.insert(aFontPath, p.szFile)
-	end
-
-	for _, p in ipairs(FONT_TYPE) do
-		local szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
-		if tStyle then
-			-- local ui = ui:Append('WndWindow', { w = w, h = 60 })
-			local acFile, acName, btnSure
-			local function UpdateBtnEnable()
-				local szNewFile = acFile:Text()
-				local bFileExist = IsFileExist(szNewFile)
-				acFile:Color(bFileExist and {255, 255, 255} or {255, 0, 0})
-				btnSure:Enable(bFileExist and szNewFile ~= szFile)
-			end
-			x = 10
-			ui:Append('Text', { text = _L[' * '] .. p.szName, x = x, y = y })
-			y = y + 40
-
-			acFile = ui:Append('WndAutocomplete', {
-				x = x, y = y, w = w - 180 - 30,
-				text = szFile,
-				onChange = function(szText)
-					UpdateBtnEnable()
-					szText = StringLowerW(szText)
-					for _, p in ipairs(aFontList) do
-						if StringLowerW(p.szFile) == szText then
-							if acName:Text() ~= p.szName then
-								acName:Text(p.szName)
-							end
-							return
-						end
-					end
-					acName:Text(g_tStrings.STR_CUSTOM_TEAM)
-				end,
-				onClick = function()
-					if IsPopupMenuOpened() then
-						UI(this):Autocomplete('close')
-					else
-						UI(this):Autocomplete('search', '')
-					end
-				end,
-				autocomplete = {{'option', 'source', aFontPath}},
-			})
-
-			ui:Append('WndButton', {
-				x = w - 180 - x - 10, y = y, w = 25,
-				text = '...',
-				onClick = function()
-					local file = GetOpenFileName(_L['Please select your font file.'], 'Font File(*.ttf;*.otf;*.fon)\0*.ttf;*.otf;*.fon\0All Files(*.*)\0*.*\0\0')
-					if not X.IsEmpty(file) then
-						file = X.GetRelativePath(file, '') or file
-						acFile:Text(wstring.gsub(file, '/', '\\'))
-					end
-				end,
-			})
-
-			acName = ui:Append('WndAutocomplete', {
-				w = 100, h = 25, x = w - 180 + x, y = y,
-				text = szName,
-				onChange = function(szText)
-					UpdateBtnEnable()
-					szText = StringLowerW(szText)
-					for _, p in ipairs(aFontList) do
-						if StringLowerW(p.szName) == szText
-						and acFile:Text() ~= p.szFile then
-							acFile:Text(p.szFile)
-							return
-						end
-					end
-				end,
-				onClick = function()
-					if IsPopupMenuOpened() then
-						UI(this):Autocomplete('close')
-					else
-						UI(this):Autocomplete('search', '')
-					end
-				end,
-				autocomplete = {{'option', 'source', aFontName}},
-			})
-
-			btnSure = ui:Append('WndButton', {
-				w = 60, h = 25, x = w - 60, y = y,
-				text = _L['apply'], enable = false,
-				onClick = function()
-					MY_Font.SetFont(p.tIDs, acName:Text(), acFile:Text())
-					szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
-					UpdateBtnEnable()
-				end
-			})
-			y = y + 60
-		end
-	end
-end
-X.RegisterPanel(_L['System'], 'MY_Font', _L['MY_Font'], 'ui/Image/UICommon/CommonPanel7.UITex|36', PS)
-
-MY_Font = OBJ

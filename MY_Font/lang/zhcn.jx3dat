@@ -1,12 +1,14 @@
 return {
 	['MY_Font'] = '游戏字体',
 
-	['apply' ] = '应用',
+	['Apply' ] = '应用',
 
-	['content'] = '通用界面文本',
-	['chat'] = '聊天框文本',
-	['fight'] = '战斗浮动伤害显示文本',
+	['Common UI Text'] = '通用界面文本',
+	['Chat Panel Text'] = '聊天框文本',
+	['Combat Text'] = '战斗浮动伤害显示文本',
+	['Lifebar Text'] = '头顶血条文本',
+
 	['Please select your font file.'] = '请选择字体文件',
 
-	['please click apply or sure button to save change!'] = '请点击确定或应用按钮保存设置，否则下次登录时聊天字体将恢复初始设置。',
+	['Please click apply or sure button to save change!'] = '请点击确定或应用按钮保存设置，否则下次登录时聊天字体将恢复初始设置。',
 }
