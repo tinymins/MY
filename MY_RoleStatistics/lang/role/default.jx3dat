@@ -1,0 +1,3 @@
+return {
+    ['MOSAICS_CHAR'] = '*',
+}

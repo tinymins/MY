@@ -19,80 +19,121 @@ local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTA
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_RoleStat'
-local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
---------------------------------------------------------------------------
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/role/')
+-------------------------------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
 	return
 end
---------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 
 CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
-local DB = X.SQLiteConnect(_L['MY_RoleStatistics_RoleStat'], {'userdata/role_statistics/role_stat.v3.db', X.PATH_TYPE.GLOBAL})
-if not DB then
-	return X.Sysmsg(_L['MY_RoleStatistics_RoleStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
-end
+local DATA_FILE = {'userdata/role_statistics/role_stat.jx3dat', X.PATH_TYPE.GLOBAL}
 local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_RoleStat.ini'
 
-DB:Execute([[
-	CREATE TABLE IF NOT EXISTS RoleInfo (
-		guid NVARCHAR(20) NOT NULL,
-		account NVARCHAR(255) NOT NULL,
-		region NVARCHAR(20) NOT NULL,
-		server NVARCHAR(20) NOT NULL,
-		name NVARCHAR(20) NOT NULL,
-		force INTEGER NOT NULL,
-		level INTEGER NOT NULL,
-		equip_score INTEGER NOT NULL,
-		pet_score INTEGER NOT NULL,
-		gold INTEGER NOT NULL,
-		silver INTEGER NOT NULL,
-		copper INTEGER NOT NULL,
-		stamina INTEGER NOT NULL,
-		stamina_max INTEGER NOT NULL,
-		stamina_remain INTEGER NOT NULL,
-		vigor INTEGER NOT NULL,
-		vigor_max INTEGER NOT NULL,
-		vigor_remain INTEGER NOT NULL,
-		contribution INTEGER NOT NULL,
-		contribution_remain INTEGER NOT NULL,
-		justice INTEGER NOT NULL,
-		justice_remain INTEGER NOT NULL,
-		prestige INTEGER NOT NULL,
-		prestige_remain INTEGER NOT NULL,
-		camp_point INTEGER NOT NULL,
-		camp_point_percentage INTEGER NOT NULL,
-		camp_level INTEGER NOT NULL,
-		arena_award INTEGER NOT NULL,
-		arena_award_remain INTEGER NOT NULL,
-		exam_print INTEGER NOT NULL,
-		exam_print_remain INTEGER NOT NULL,
-		achievement_score INTEGER NOT NULL,
-		coin INTEGER NOT NULL,
-		mentor_score INTEGER NOT NULL,
-		starve INTEGER NOT NULL,
-		starve_remain INTEGER NOT NULL,
-		architecture INTEGER NOT NULL,
-		architecture_remain INTEGER NOT NULL,
-		time INTEGER NOT NULL,
-		extra TEXT NOT NULL,
-		PRIMARY KEY(guid)
-	)
-]])
-local DB_RoleInfoW = DB:Prepare([[
-	REPLACE INTO RoleInfo (
-		guid, account, region, server, name, force, level, equip_score, pet_score, gold, silver, copper,
-		stamina, stamina_max, stamina_remain, vigor, vigor_max, vigor_remain,
-		contribution, contribution_remain, justice, justice_remain, prestige, prestige_remain, camp_point,
-		camp_point_percentage, camp_level, arena_award, arena_award_remain,
-		exam_print, exam_print_remain, achievement_score, coin, mentor_score, starve, starve_remain, architecture, architecture_remain,
-		time, extra
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]])
-local DB_RoleInfoCoinW = DB:Prepare('UPDATE RoleInfo SET coin = ? WHERE account = ? AND region = ?')
-local DB_RoleInfoG = DB:Prepare('SELECT * FROM RoleInfo WHERE guid = ?')
-local DB_RoleInfoR = DB:Prepare('SELECT * FROM RoleInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
-local DB_RoleInfoD = DB:Prepare('DELETE FROM RoleInfo WHERE guid = ?')
+-------------------------------------------------------------------------------------------------------
+
+local function GetFormatSysmsgText(szText)
+	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
+end
+
+local function GeneWeeklyFormatText(szKey)
+	return function(r)
+		local nNextTime, nCircle = X.GetRefreshTime('weekly')
+		local szText = (nNextTime - nCircle < r.time and r[szKey] and r[szKey] >= 0)
+			and r[szKey]
+			or _L['--']
+		return GetFormatText(szText, 162, 255, 255, 255)
+	end
+end
+local function GeneWeeklySummaryFormatText(szKey)
+	return function(rs)
+		local nNextTime, nCircle = X.GetRefreshTime('weekly')
+		local v = nil
+		for _, r in ipairs(rs) do
+			if nNextTime - nCircle < r.time and X.IsNumber(r[szKey]) and r[szKey] >= 0 then
+				if not v then
+					v = 0
+				end
+				v = v + r[szKey]
+			end
+		end
+		return GetFormatText(v or '--', 162, 255, 255, 255)
+	end
+end
+local function GeneWeeklyCompare(szKey)
+	return function(r1, r2)
+		local nNextTime, nCircle = X.GetRefreshTime('weekly')
+		local v1 = nNextTime - nCircle < r1.time
+			and r1[szKey]
+			or -1
+		local v2 = nNextTime - nCircle < r2.time
+			and r2[szKey]
+			or -1
+		if v1 == v2 then
+			return 0
+		end
+		return v1 > v2 and 1 or -1
+	end
+end
+
+local DATA_ENV = setmetatable(
+	{
+		_L                         = _L                          ,
+		math                       = math                        ,
+		pairs                      = pairs                       ,
+		ipairs                     = ipairs                      ,
+		tonumber                   = tonumber                    ,
+		wstring                    = X.wstring                   ,
+		count_c                    = X.count_c                   ,
+		pairs_c                    = X.pairs_c                   ,
+		ipairs_c                   = X.ipairs_c                  ,
+		ipairs_r                   = X.ipairs_r                  ,
+		spairs                     = X.spairs                    ,
+		spairs_r                   = X.spairs_r                  ,
+		sipairs                    = X.sipairs                   ,
+		sipairs_r                  = X.sipairs_r                 ,
+		IsArray                    = X.IsArray                   ,
+		IsDictionary               = X.IsDictionary              ,
+		IsEquals                   = X.IsEquals                  ,
+		IsNil                      = X.IsNil                     ,
+		IsBoolean                  = X.IsBoolean                 ,
+		IsNumber                   = X.IsNumber                  ,
+		IsUserdata                 = X.IsUserdata                ,
+		IsHugeNumber               = X.IsHugeNumber              ,
+		IsElement                  = X.IsElement                 ,
+		IsEmpty                    = X.IsEmpty                   ,
+		IsString                   = X.IsString                  ,
+		IsTable                    = X.IsTable                   ,
+		IsFunction                 = X.IsFunction                ,
+		GetAccount                 = X.GetAccount                ,
+		GetRealServer              = X.GetRealServer             ,
+		GetItemAmountInAllPackages = X.GetItemAmountInAllPackages,
+		RegisterFrameCreate        = X.RegisterFrameCreate       ,
+		ITEM_TABLE_TYPE            = ITEM_TABLE_TYPE             ,
+		GetFormatSysmsgText        = GetFormatSysmsgText         ,
+		GetFormatText              = GetFormatText               ,
+		GetMoneyText               = GetMoneyText                ,
+		GetMsgFont                 = GetMsgFont                  ,
+		GetMsgFontColor            = GetMsgFontColor             ,
+		MoneyOptAdd                = MoneyOptAdd                 ,
+		MoneyOptCmp                = MoneyOptCmp                 ,
+		MoneyOptSub                = MoneyOptSub                 ,
+		Output                     = Output                      ,
+	},
+	{
+		__index = function(t, k)
+			if k == 'me' then
+				return GetClientPlayer()
+			end
+			if k:find('^arg%d+$') then
+				return _G[k]
+			end
+		end,
+	})
+local SWAP = {}
+
+-------------------------------------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General'], {
 	aColumn = {
@@ -185,682 +226,291 @@ function D.GetPlayerGUID(me)
 	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
 end
 
-local function GetFormatSysmsgText(szText)
-	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
-end
-
-local function GeneCommonFormatText(id)
-	return function(r)
-		return GetFormatText(r[id], 162, 255, 255, 255)
-	end
-end
-local function GeneCommonSummaryFormatText(id)
-	return function(rs)
-		local v = 0
-		for _, r in ipairs(rs) do
-			if X.IsNumber(r[id]) then
-				v = v + r[id]
-			end
-		end
-		return GetFormatText(v, 162, 255, 255, 255)
-	end
-end
-local function GeneCommonCompare(id)
-	return function(r1, r2)
-		if r1[id] == r2[id] then
-			return 0
-		end
-		return r1[id] > r2[id] and 1 or -1
-	end
-end
-local function GeneWeeklyFormatText(id)
-	return function(r)
-		local nNextTime, nCircle = X.GetRefreshTime('weekly')
-		local szText = (nNextTime - nCircle < r.time and r[id] and r[id] >= 0)
-			and r[id]
-			or _L['--']
-		return GetFormatText(szText, 162, 255, 255, 255)
-	end
-end
-local function GeneWeeklySummaryFormatText(id)
-	return function(rs)
-		local nNextTime, nCircle = X.GetRefreshTime('weekly')
-		local v = nil
-		for _, r in ipairs(rs) do
-			if nNextTime - nCircle < r.time and X.IsNumber(r[id]) and r[id] >= 0 then
-				if not v then
-					v = 0
-				end
-				v = v + r[id]
-			end
-		end
-		return GetFormatText(v or '--', 162, 255, 255, 255)
-	end
-end
-local function GeneWeeklyCompare(id)
-	return function(r1, r2)
-		local nNextTime, nCircle = X.GetRefreshTime('weekly')
-		local v1 = nNextTime - nCircle < r1.time
-			and r1[id]
-			or -1
-		local v2 = nNextTime - nCircle < r2.time
-			and r2[id]
-			or -1
-		if v1 == v2 then
-			return 0
-		end
-		return v1 > v2 and 1 or -1
-	end
-end
-local COLUMN_LIST = lodash.filter({
-	-- guid,
-	-- account,
-	{ -- 大区
-		id = 'region',
-		szTitle = _L['Region'],
-		nMinWidth = 100, nMaxWidth = 100,
-		GetFormatText = GeneCommonFormatText('region'),
-		Compare = GeneCommonCompare('region'),
+local COLUMN_LIST = {
+	-- guid
+	{
+		szKey = 'guid',
+		GetValue = function(env, swap, prevVal, prevRec)
+			return D.GetPlayerGUID(env.me)
+		end,
 	},
-	{ -- 服务器
-		id = 'server',
-		szTitle = _L['Server'],
-		nMinWidth = 100, nMaxWidth = 100,
-		GetFormatText = GeneCommonFormatText('server'),
-		Compare = GeneCommonCompare('server'),
+	-- account
+	{
+		szKey = 'account',
+		GetValue = function(env, swap, prevVal, prevRec)
+			return X.GetAccount() or ''
+		end,
 	},
-	{ -- 名字
-		id = 'name',
-		szTitle = _L['Name'],
-		nMinWidth = 110, nMaxWidth = 200,
-		GetFormatText = function(rec)
-			local name = rec.name
+	-- 大区
+	{
+		szKey = 'region',
+		bTable = true,
+		bRowTip = true,
+		bFloatTip = false,
+		nMinWidth = 100,
+		nMaxWidth = 100,
+		GetValue = function(env, swap, prevVal, prevRec)
+			return X.GetRealServer(1)
+		end,
+	},
+	-- 服务器
+	{
+		szKey = 'server',
+		bTable = true,
+		bRowTip = true,
+		bFloatTip = false,
+		nMinWidth = 100,
+		nMaxWidth = 100,
+		GetValue = function(env, swap, prevVal, prevRec)
+			return X.GetRealServer(2)
+		end,
+	},
+	-- 名字
+	{
+		szKey = 'name',
+		bTable = true,
+		bRowTip = true,
+		bFloatTip = false,
+		nMinWidth = 110,
+		nMaxWidth = 200,
+		GetValue = function(env, swap, prevVal, prevRec)
+			return env.me.szName
+		end,
+		GetSummaryValue = function()
+			return 'SUMMARY'
+		end,
+		GetFormatText = function(name, rec)
+			if name == 'SUMMARY' then
+				return GetFormatText(_L['Summary'], 162)
+			end
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
 			return GetFormatText(name, 162, X.GetForceColor(rec.force, 'foreground'))
 		end,
-		Compare = GeneCommonCompare('name'),
 	},
-	{ -- 门派
-		id = 'force',
-		szTitle = _L['Force'],
-		nMinWidth = 50, nMaxWidth = 70,
-		GetFormatText = function(rec)
-			return GetFormatText(g_tStrings.tForceTitle[rec.force], 162, 255, 255, 255)
+	-- 门派
+	{
+		szKey = 'force',
+		bTable = true,
+		bRowTip = true,
+		bFloatTip = false,
+		nMinWidth = 50,
+		nMaxWidth = 70,
+		GetValue = function(env, swap, prevVal, prevRec)
+			return env.me.dwForceID
 		end,
-		Compare = GeneCommonCompare('force'),
-	},
-	{ -- 等级
-		id = 'level',
-		szTitle = _L['Level'],
-		nMinWidth = 50, nMaxWidth = 50,
-		GetFormatText = GeneCommonFormatText('level'),
-		Compare = GeneCommonCompare('level'),
-	},
-	{ -- 宠物分
-		id = 'pet_score',
-		bHideInFloat = true,
-		szTitle = _L['PetSC'],
-		nMinWidth = 55,
-		GetFormatText = GeneCommonFormatText('pet_score'),
-		Compare = GeneCommonCompare('pet_score'),
-	},
-	{ -- 金钱
-		id = 'money',
-		szTitle = _L['Money'],
-		nMinWidth = 200,
-		GetFormatText = function(rec)
-			return GetMoneyText({ nGold = rec.gold, nSilver = rec.silver, nCopper = rec.copper }, 105)
+		GetSummaryValue = function()
+			return 'SUMMARY'
 		end,
-		Compare = function(r1, r2)
-			if r1.gold == r2.gold then
-				if r1.silver == r2.silver then
-					if r1.copper == r2.copper then
-						return 0
-					end
-					return r1.copper > r2.copper and 1 or -1
-				end
-				return r1.silver > r2.silver and 1 or -1
+		GetFormatText = function(force)
+			if force == 'SUMMARY' then
+				return GetFormatText('--', 162)
 			end
-			return r1.gold > r2.gold and 1 or -1
+			return GetFormatText(g_tStrings.tForceTitle[force], 162, 255, 255, 255)
 		end,
-		GetSummaryFormatText = function(recs)
-			local tMoney = { nGold = 0, nSilver = 0, nCopper = 0 }
-			for _, rec in ipairs(recs) do
-				tMoney = MoneyOptAdd(tMoney, { nGold = rec.gold, nSilver = rec.silver, nCopper = rec.copper })
+	},
+	-- 等级
+	{
+		szKey = 'level',
+		bTable = true,
+		bRowTip = true,
+		bFloatTip = false,
+		nMinWidth = 50,
+		nMaxWidth = 50,
+		GetValue = function(env, swap, prevVal, prevRec)
+			return env.me.nLevel
+		end,
+		GetSummaryValue = function()
+			return 'SUMMARY'
+		end,
+		GetFormatText = function(level)
+			if level == 'SUMMARY' then
+				return GetFormatText('--', 162)
 			end
-			return GetMoneyText(tMoney, 105)
+			return GetFormatText(level, 162, 255, 255, 255)
 		end,
-	},
-	{ -- 账号精力
-		id = 'account_stamina',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Account Stamina'],
-		szShortTitle = _L['Account_stami'],
-		nMinWidth = 70,
-		GetFormatText = function(rec)
-			if rec.stamina < 0 then
-				return GetFormatText('--', 162, 255, 255, 255)
-			end
-			return GetFormatText(rec.stamina .. '/' .. rec.stamina_max, 162, 255, 255, 255)
-		end,
-		Compare = GeneCommonCompare('stamina'),
-	},
-	{ -- 角色精力
-		id = 'role_stamina',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Role Stamina'],
-		szShortTitle = _L['Role_stami'],
-		nMinWidth = 70,
-		GetFormatText = function(rec)
-			if rec.vigor < 0 then
-				return GetFormatText('--', 162, 255, 255, 255)
-			end
-			return GetFormatText(rec.vigor .. '/' .. rec.vigor_max, 162, 255, 255, 255)
-		end,
-		Compare = GeneCommonCompare('vigor'),
-	},
-	{ -- 精力周余
-		id = 'role_stamina_remain',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Role Stamina Remain'],
-		szShortTitle = _L['Role_stami_remain'],
-		nMinWidth = 70,
-		GetFormatText = GeneWeeklyFormatText('vigor_remain'),
-		Compare = GeneCommonCompare('vigor_remain'),
-	},
-	{ -- 江贡
-		id = 'contribution',
-		szTitle = _L['Contribution'],
-		szShortTitle = _L['Contri'],
-		nMinWidth = 70,
-		GetFormatText = GeneCommonFormatText('contribution'),
-		Compare = GeneCommonCompare('contribution'),
-	},
-	{ -- 江贡周余
-		id = 'contribution_remain',
-		szTitle = _L['Contribution remain'],
-		szShortTitle = _L['Contri_remain'],
-		nMinWidth = 70,
-		GetFormatText = GeneWeeklyFormatText('contribution_remain'),
-		Compare = GeneWeeklyCompare('contribution_remain'),
-		GetSummaryFormatText = GeneWeeklySummaryFormatText('contribution_remain'),
-	},
-	{ -- 侠义
-		id = 'justice',
-		szTitle = _L['Justice'],
-		szShortTitle = _L['Justi'],
-		nMinWidth = 60,
-		GetFormatText = GeneCommonFormatText('justice'),
-		Compare = GeneCommonCompare('justice'),
-	},
-	{ -- 侠义周余
-		id = 'justice_remain',
-		szTitle = _L['Justice remain'],
-		szShortTitle = _L['Justi_remain'],
-		nMinWidth = 60,
-		GetFormatText = GeneWeeklyFormatText('justice_remain'),
-		Compare = GeneWeeklyCompare('justice_remain'),
-		GetSummaryFormatText = GeneWeeklySummaryFormatText('justice_remain'),
-	},
-	{ -- 浪客笺
-		id = 'starve',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Starve'],
-		nMinWidth = 60,
-		GetFormatText = GeneWeeklyFormatText('starve'),
-		Compare = GeneWeeklyCompare('starve'),
-		GetSummaryFormatText = GeneWeeklySummaryFormatText('starve'),
-	},
-	{ -- 浪客笺周余
-		id = 'starve_remain',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Starve remain'],
-		szShortTitle = _L['Starv_remain'],
-		nMinWidth = 60,
-		GetFormatText = GeneWeeklyFormatText('starve_remain'),
-		Compare = GeneWeeklyCompare('starve_remain'),
-		GetSummaryFormatText = GeneWeeklySummaryFormatText('starve_remain'),
-	},
-	{ -- 园宅币
-		id = 'architecture',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Architecture'],
-		nMinWidth = 60,
-		GetFormatText = GeneWeeklyFormatText('architecture'),
-		Compare = GeneWeeklyCompare('architecture'),
-		GetSummaryFormatText = GeneWeeklySummaryFormatText('architecture'),
-	},
-	{ -- 园宅币周余
-		id = 'architecture_remain',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Architecture remain'],
-		szShortTitle = _L['Arch_remain'],
-		nMinWidth = 60,
-		GetFormatText = GeneWeeklyFormatText('architecture_remain'),
-		Compare = GeneWeeklyCompare('architecture_remain'),
-		GetSummaryFormatText = GeneWeeklySummaryFormatText('architecture_remain'),
-	},
-	{
-		-- 威望
-		id = 'prestige',
-		szTitle = _L['Prestige'],
-		szShortTitle = _L['Presti'],
-		nMinWidth = 70,
-		GetFormatText = GeneCommonFormatText('prestige'),
-		Compare = GeneCommonCompare('prestige'),
-	},
-	{ -- 威望周余
-		id = 'prestige_remain',
-		szTitle = _L['Prestige remain'],
-		szShortTitle = _L['Presti_remain'],
-		nMinWidth = 70,
-		GetFormatText = GeneWeeklyFormatText('prestige_remain'),
-		Compare = GeneWeeklyCompare('prestige_remain'),
-		GetSummaryFormatText = GeneWeeklySummaryFormatText('prestige_remain'),
-	},
-	{
-		-- 战阶积分
-		id = 'camp_point',
-		szTitle = _L['Camp point'],
-		nMinWidth = 70,
-		GetFormatText = GeneWeeklyFormatText('camp_point'),
-		Compare = GeneWeeklyCompare('camp_point'),
-		GetSummaryFormatText = GeneWeeklySummaryFormatText('camp_point'),
-	},
-	{
-		-- 战阶等级
-		id = 'camp_level',
-		szTitle = _L['Camp level'],
-		nMinWidth = 70,
-		GetFormatText = function(rec)
-			return GetFormatText(rec.camp_level .. ' + ' .. rec.camp_point_percentage .. '%', 162, 255, 255, 255)
-		end,
-		Compare = function(r1, r2)
-			if r1.camp_level == r2.camp_level then
-				if r1.camp_point_percentage == r2.camp_point_percentage then
-					return 0
-				end
-				return r1.camp_point_percentage > r2.camp_point_percentage and 1 or -1
-			end
-			return r1.camp_level > r2.camp_level and 1 or -1
-		end,
-	},
-	{
-		-- 名剑币
-		id = 'arena_award',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Arena award'],
-		nMinWidth = 60,
-		GetFormatText = GeneCommonFormatText('arena_award'),
-		Compare = GeneCommonCompare('arena_award'),
-	},
-	{
-		-- 名剑币周余
-		id = 'arena_award_remain',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Arena award remain'],
-		szShortTitle = _L['Aren awa remain'],
-		nMinWidth = 60,
-		GetFormatText = GeneWeeklyFormatText('arena_award_remain'),
-		Compare = GeneWeeklyCompare('arena_award_remain'),
-		GetSummaryFormatText = GeneWeeklySummaryFormatText('arena_award_remain'),
-	},
-	{
-		-- 监本
-		id = 'exam_print',
-		szTitle = _L['Exam print'],
-		szShortTitle = _L['ExamPt'],
-		nMinWidth = 55,
-		GetFormatText = GeneCommonFormatText('exam_print'),
-		Compare = GeneCommonCompare('exam_print'),
-		GetSummaryFormatText = GeneCommonSummaryFormatText('exam_print'),
-	},
-	{
-		-- 监本周余
-		id = 'exam_print_remain',
-		szTitle = _L['Exam print remain'],
-		szShortTitle = _L['ExamPt_remain'],
-		nMinWidth = 55,
-		GetFormatText = GeneWeeklyFormatText('exam_print_remain'),
-		Compare = GeneWeeklyCompare('exam_print_remain'),
-		GetSummaryFormatText = GeneWeeklySummaryFormatText('exam_print_remain'),
-	},
-	{
-		-- 资历
-		id = 'achievement_score',
-		bHideInFloat = true,
-		szTitle = _L['Achievement score'],
-		szShortTitle = _L['AchiSC'],
-		nMinWidth = 70,
-		GetFormatText = GeneCommonFormatText('achievement_score'),
-		Compare = GeneCommonCompare('achievement_score'),
-	},
-	{
-		-- 通宝
-		id = 'coin',
-		bHideInFloat = true,
-		szTitle = _L['Coin'],
-		nMinWidth = 70,
-		GetFormatText = GeneCommonFormatText('coin'),
-		Compare = GeneCommonCompare('coin'),
-		GetSummaryFormatText = function(recs)
-			local tAccount, nCoin = {}, 0
-			for _, rec in ipairs(recs) do
-				if not tAccount[rec.account] and X.IsNumber(rec.coin) then
-					nCoin = nCoin + rec.coin
-					tAccount[rec.account] = true
-				end
-			end
-			return GetFormatText(nCoin)
-		end,
-	},
-	{
-		-- 师徒分
-		id = 'mentor_score',
-		bHideInFloat = true,
-		szTitle = _L['Mentor score'],
-		nMinWidth = 70,
-		GetFormatText = GeneCommonFormatText('mentor_score'),
-		Compare = GeneCommonCompare('mentor_score'),
-	},
-	{ -- 时间
-		id = 'time',
-		szTitle = _L['Cache time'],
-		nMinWidth = 165, nMaxWidth = 200,
-		GetFormatText = function(rec)
-			return GetFormatText(X.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
-		end,
-		Compare = GeneCommonCompare('time'),
-	},
-	{ -- 时间计时
-		id = 'time_days',
-		szTitle = _L['Cache time days'],
-		nMinWidth = 120, nMaxWidth = 120,
-		GetFormatText = function(rec)
-			local nTime = GetCurrentTime() - rec.time
-			local nSeconds = math.floor(nTime)
-			local nMinutes = math.floor(nSeconds / 60)
-			local nHours   = math.floor(nMinutes / 60)
-			local nDays    = math.floor(nHours / 24)
-			local nYears   = math.floor(nDays / 365)
-			local nDay     = nDays % 365
-			local nHour    = nHours % 24
-			local nMinute  = nMinutes % 60
-			local nSecond  = nSeconds % 60
-			if nYears > 0 then
-				return GetFormatText(_L('%d years %d days before', nYears, nDay), 162, 255, 255, 255)
-			end
-			if nDays > 0 then
-				return GetFormatText(_L('%d days %d hours before', nDays, nHour), 162, 255, 255, 255)
-			end
-			if nHours > 0 then
-				return GetFormatText(_L('%d hours %d mins before', nHours, nMinute), 162, 255, 255, 255)
-			end
-			if nMinutes > 0 then
-				return GetFormatText(_L('%d mins %d secs before', nMinutes, nSecond), 162, 255, 255, 255)
-			end
-			if nSecond > 10 then
-				return GetFormatText(_L('%d secs before', nSecond), 162, 255, 255, 255)
-			end
-			return GetFormatText(_L['Just now'], 162, 255, 255, 255)
-		end,
-		Compare = GeneCommonCompare('time'),
-	},
-}, function(p) return p.bVisible ~= false end)
-
-local COLUMN_DICT = {}
-for _, p in ipairs(COLUMN_LIST) do
-	if not p.Compare then
-		p.Compare = function(r1, r2)
-			if r1[p.szKey] == r2[p.szKey] then
-				return 0
-			end
-			return r1[p.szKey] > r2[p.szKey] and 1 or -1
-		end
-	end
-	COLUMN_DICT[p.id] = p
-end
-local EXCEL_WIDTH = 960
-
--- 小退提示
-local function GeneCommonCompareText(id, szTitle)
-	return function(r1, r2)
-		if r1[id] == r2[id] then
-			return
-		end
-		if not r1[id] or not r2[id] then
-			return
-		end
-		local szOp = r1[id] <= r2[id]
-			and ' increased by %s'
-			or ' decreased by %s'
-		return GetFormatSysmsgText(_L(szTitle .. szOp, math.abs(r2[id] - r1[id])))
-	end
-end
-local ALERT_COLUMN = {
-	{ -- 装分
-		id = 'equip_score',
-		szTitle = _L['Equip score'],
-		GetValue = function(me)
-			return me.GetBaseEquipScore() + me.GetStrengthEquipScore() + me.GetMountsEquipScore()
-		end,
-		GetCompareText = GeneCommonCompareText('equip_score', 'Equip score'),
-	},
-	{ -- 宠物分
-		id = 'pet_score',
-		szTitle = _L['Pet score'],
-		GetValue = function(me)
-			return me.GetAcquiredFellowPetScore() + me.GetAcquiredFellowPetMedalScore()
-		end,
-		GetCompareText = GeneCommonCompareText('pet_score', 'Pet score'),
-	},
-	{ -- 金钱
-		id = 'money',
-		szTitle = _L['Money'],
-		nMinWidth = 200,
-		GetValue = function(me)
-			return me.GetMoney()
-		end,
-		GetCompareText = function(r1, r2)
-			local money = MoneyOptSub(r2.money, r1.money)
-			local nCompare = MoneyOptCmp(money, 0)
-			if nCompare == 0 then
-				return
-			end
-			local f = GetMsgFont('MSG_SYS')
-			local r, g, b = GetMsgFontColor('MSG_SYS')
-			local szExtra = 'font=' .. f .. ' r=' .. r .. ' g=' .. g .. ' b=' .. b
-			return GetFormatSysmsgText(nCompare >= 0 and _L['Money increased by '] or _L['Money decreased by '])
-				.. GetMoneyText({ nGold = math.abs(money.nGold), nSilver = math.abs(money.nSilver), nCopper = math.abs(money.nCopper) }, szExtra)
-		end,
-	},
-	{ -- 江贡
-		id = 'contribution',
-		szTitle = _L['Contribution'],
-		GetValue = function(me)
-			return me.nContribution
-		end,
-		GetCompareText = GeneCommonCompareText('contribution', 'Contribution'),
-	},
-	{ -- 侠义
-		id = 'justice',
-		szTitle = _L['Justice'],
-		GetValue = function(me)
-			return me.nJustice
-		end,
-		GetCompareText = GeneCommonCompareText('justice', 'Justice'),
-	},
-	{ -- 浪客笺
-		id = 'starve',
-		szTitle = _L['Starve'],
-		GetValue = function(me)
-			return X.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 34797, true)
-				+ X.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 40259, true)
-		end,
-		GetCompareText = GeneCommonCompareText('starve', 'Starve'),
-	},
-	{
-		-- 威望
-		id = 'prestige',
-		szTitle = _L['Prestige'],
-		GetValue = function(me)
-			return me.nCurrentPrestige
-		end,
-		GetCompareText = GeneCommonCompareText('prestige', 'Prestige'),
-	},
-	{
-		-- 战阶积分
-		id = 'camp_point',
-		szTitle = _L['Camp point'],
-		GetValue = function(me)
-			return me.nTitlePoint
-		end,
-		GetCompareText = GeneCommonCompareText('camp_point', 'Camp point'),
-	},
-	{
-		-- 名剑币
-		id = 'arena_award',
-		szTitle = _L['Arena award'],
-		GetValue = function(me)
-			return me.nArenaAward
-		end,
-		GetCompareText = GeneCommonCompareText('arena_award', 'Arena award'),
-	},
-	{
-		-- 监本
-		id = 'exam_print',
-		szTitle = _L['Exam print'],
-		GetValue = function(me)
-			return me.nExamPrint
-		end,
-		GetCompareText = GeneCommonCompareText('exam_print', 'Exam print'),
-	},
-	{
-		-- 资历
-		id = 'achievement_score',
-		szTitle = _L['Achievement score'],
-		GetValue = function(me)
-			return me.GetAchievementRecord()
-		end,
-		GetCompareText = GeneCommonCompareText('achievement_score', 'Achievement score'),
-	},
-	{
-		-- 师徒分
-		id = 'mentor_score',
-		szTitle = _L['Mentor score'],
-		GetValue = function(me)
-			return me.dwTAEquipsScore
-		end,
-		GetCompareText = GeneCommonCompareText('mentor_score', 'Mentor score'),
 	},
 }
-local ALERT_COLUMN_DICT = {}
-for _, p in ipairs(ALERT_COLUMN) do
-	ALERT_COLUMN_DICT[p.id] = p
+for _, v in ipairs(X.LoadLUAData(PLUGIN_ROOT .. '/data/role/{$edition}.jx3dat') or {}) do
+	table.insert(COLUMN_LIST, v)
+end
+-- 时间
+table.insert(COLUMN_LIST, {
+	szKey = 'time',
+	bTable = true,
+	bRowTip = true,
+	bFloatTip = false,
+	nMinWidth = 165,
+	nMaxWidth = 200,
+	GetValue = function(env, swap, prevVal, prevRec)
+		return GetCurrentTime()
+	end,
+	GetSummaryValue = function()
+		return 'SUMMARY'
+	end,
+	GetFormatText = function(time)
+		if time == 'SUMMARY' then
+			return GetFormatText('--', 162)
+		end
+		return GetFormatText(X.FormatTime(time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
+	end,
+})
+-- 时间计时
+table.insert(COLUMN_LIST, {
+	szKey = 'time_days',
+	bTable = true,
+	bRowTip = true,
+	bFloatTip = false,
+	nMinWidth = 120,
+	nMaxWidth = 120,
+	GetValue = function(env, swap, prevVal, prevRec)
+		return GetCurrentTime()
+	end,
+	GetSummaryValue = function()
+		return 'SUMMARY'
+	end,
+	Compare = function(v1, v2, r1, r2)
+		v1, v2 = r1.time, r2.time
+		if v1 == v2 then
+			return 0
+		end
+		return v1 > v2 and 1 or -1
+	end,
+	GetFormatText = function(v, rec)
+		if v == 'SUMMARY' then
+			return GetFormatText('--', 162)
+		end
+		local nTime = GetCurrentTime() - rec.time
+		local nSeconds = math.floor(nTime)
+		local nMinutes = math.floor(nSeconds / 60)
+		local nHours   = math.floor(nMinutes / 60)
+		local nDays    = math.floor(nHours / 24)
+		local nYears   = math.floor(nDays / 365)
+		local nDay     = nDays % 365
+		local nHour    = nHours % 24
+		local nMinute  = nMinutes % 60
+		local nSecond  = nSeconds % 60
+		if nYears > 0 then
+			return GetFormatText(_L('%d years %d days before', nYears, nDay), 162, 255, 255, 255)
+		end
+		if nDays > 0 then
+			return GetFormatText(_L('%d days %d hours before', nDays, nHour), 162, 255, 255, 255)
+		end
+		if nHours > 0 then
+			return GetFormatText(_L('%d hours %d mins before', nHours, nMinute), 162, 255, 255, 255)
+		end
+		if nMinutes > 0 then
+			return GetFormatText(_L('%d mins %d secs before', nMinutes, nSecond), 162, 255, 255, 255)
+		end
+		if nSecond > 10 then
+			return GetFormatText(_L('%d secs before', nSecond), 162, 255, 255, 255)
+		end
+		return GetFormatText(_L['Just now'], 162, 255, 255, 255)
+	end,
+})
+
+local COLUMN_DICT = {}
+for _, col in ipairs(COLUMN_LIST) do
+	col.szTitle = _L.COLUMN_TITLE[col.szKey]
+	col.szTitleAbbr = _L.COLUMN_TITLE_ABBR[col.szKey] or _L.COLUMN_TITLE[col.szKey]
+	if not col.GetFormatText then
+		col.GetFormatText = function(v, rec, env)
+			if not v then
+				return GetFormatText('--', 162, 255, 255, 255)
+			end
+			return GetFormatText(v, 162, 255, 255, 255)
+		end
+	end
+	if not col.Compare then
+		col.Compare = function(v1, v2)
+			if v1 == v2 then
+				return 0
+			end
+			if not v1 then
+				return -1
+			end
+			if not v2 then
+				return 1
+			end
+			return v1 > v2 and 1 or -1
+		end
+	end
+	if col.bAlertChange and not col.GetCompareText then
+		col.GetCompareText = function(v1, v2, r1, r2, env)
+			if v1 == v2 or not v1 or not v2 then
+				return
+			end
+			local f = v1 <= v2
+				and _L.COLUMN_COMPARE_INCREASE[col.szKey]
+				or _L.COLUMN_COMPARE_DECREASE[col.szKey]
+			if not f then
+				return
+			end
+			return env.GetFormatSysmsgText(f:format(math.abs(v2 - v1)))
+		end
+	end
+	if not col.GetSummaryValue then
+		col.GetSummaryValue = function(values, records, env)
+			local summary
+			for _, v in ipairs(values) do
+				if X.IsNumber(v) then
+					summary = (summary or 0) + v
+				end
+			end
+			if not summary then
+				return ''
+			end
+			return summary
+		end
+	end
+	SWAP[col.szKey] = {}
+	COLUMN_DICT[col.szKey] = col
 end
 
-do
-local INFO_CACHE = {}
-X.RegisterFrameCreate('regionPQreward', 'MY_RoleStatistics_RoleStat', function()
-	local frame = arg0
-	if not frame then
-		return
-	end
-	local txt = frame:Lookup('', 'Text_discrible')
-	txt.__SetText = txt.SetText
-	txt.SetText = function(txt, szText)
-		local szNum = szText:match(_L['Current week can acquire (%d+) Langke Jian.'])
-			or szText:match(_L['Current week can acquire (%d+) Langke Jian or Zhushu.'])
-		if szNum then
-			INFO_CACHE['starve_remain'] = tonumber(szNum)
-		end
-		txt:__SetText(szText)
-	end
-end)
+for _, col in ipairs(COLUMN_LIST) do
+	X.SafeCall(col.Collector, DATA_ENV, SWAP[col.szKey])
+end
 
-local REC_CACHE
+function D.GetPlayerRecords()
+	local result = X.LoadLUAData(DATA_FILE) or {}
+	for _, data in pairs(result) do
+		if data.time then
+			for _, col in ipairs(COLUMN_LIST) do
+				-- 移除不在同一个刷新周期内的数据字段
+				if col.szRefreshCircle then
+					local dwTime, dwCircle = X.GetRefreshTime(col.szRefreshCircle)
+					if dwTime - dwCircle >= data.time then
+						data[col.szKey] = nil
+					end
+				end
+			end
+		end
+	end
+	return result
+end
+
 function D.GetClientPlayerRec()
 	local me = GetClientPlayer()
 	if not me then
 		return
 	end
-	local rec = REC_CACHE
-	local guid = D.GetPlayerGUID(me)
+	local rec = D.recInitial
 	if not rec then
-		rec = {
-			starve_remain = -1,
-		}
-		-- 如果在同一个CD周期 则保留数据库中的次数统计
-		DB_RoleInfoG:ClearBindings()
-		DB_RoleInfoG:BindAll(AnsiToUTF8(guid))
-		local result = DB_RoleInfoG:GetAll()
-		DB_RoleInfoG:Reset()
-		if result and result[1] and result[1].time then
-			local dwTime, dwCircle = X.GetRefreshTime('weekly')
-			if dwTime - dwCircle < result[1].time then
-				rec.starve_remain = result[1].starve_remain
+		rec = {}
+		local data = D.GetPlayerRecords()[X.GetPlayerGUID()]
+		if data then
+			for _, col in ipairs(COLUMN_LIST) do
+				rec[col.szKey] = data[col.szKey]
 			end
 		end
-		REC_CACHE = rec
+		D.recInitial = rec
 	end
-
-	-- 基础信息
-	rec.guid = guid
-	rec.account = X.GetAccount() or ''
-	rec.region = X.GetRealServer(1)
-	rec.server = X.GetRealServer(2)
-	rec.name = me.szName
-	rec.force = me.dwForceID
-	rec.level = me.nLevel
-	rec.equip_score = me.GetBaseEquipScore() + me.GetStrengthEquipScore() + me.GetMountsEquipScore()
-	rec.pet_score = me.GetAcquiredFellowPetScore() + me.GetAcquiredFellowPetMedalScore()
-	local money = me.GetMoney()
-	rec.gold = money.nGold
-	rec.silver = money.nSilver
-	rec.copper = money.nCopper
-	rec.stamina = -1
-	rec.stamina_max = -1
-	rec.stamina_remain = -1
-	rec.vigor = -1
-	rec.vigor_max = -1
-	rec.vigor_remain = -1
-	if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
-		rec.stamina = me.nCurrentStamina
-		rec.stamina_max = me.nMaxStamina
-		rec.stamina_remain = -1
-		rec.vigor = me.nVigor
-		rec.vigor_max = me.GetMaxVigor()
-		rec.vigor_remain = me.GetVigorRemainSpace()
+	-- 获取各列数据
+	for _, col in ipairs(COLUMN_LIST) do
+		rec[col.szKey] = col.GetValue(DATA_ENV, SWAP[col.szKey], rec[col.szKey], rec)
 	end
-	rec.contribution = me.nContribution
-	rec.contribution_remain = me.GetContributionRemainSpace()
-	rec.justice = me.nJustice
-	rec.justice_remain = me.GetJusticeRemainSpace()
-	rec.prestige = me.nCurrentPrestige
-	rec.prestige_remain = me.GetPrestigeRemainSpace()
-	rec.camp_point = me.nTitlePoint
-	rec.camp_point_percentage = me.GetRankPointPercentage()
-	rec.camp_level = me.nTitle
-	rec.arena_award = me.nArenaAward
-	rec.arena_award_remain = me.GetArenaAwardRemainSpace()
-	rec.exam_print = me.nExamPrint
-	rec.exam_print_remain = me.GetExamPrintRemainSpace()
-	rec.achievement_score = me.GetAchievementRecord()
-	rec.architecture = ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.nArchitecture or 0
-	rec.architecture_remain = ENVIRONMENT.GAME_BRANCH ~= 'classic' and X.IsFunction(me.GetArchitectureRemainSpace) and me.GetArchitectureRemainSpace() or 0
-	rec.coin = me.nCoin
-	rec.mentor_score = me.dwTAEquipsScore
-	rec.starve = X.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 34797, true)
-		+ X.GetItemAmountInAllPackages(ITEM_TABLE_TYPE.OTHER, 40259, true)
-	rec.time = GetCurrentTime()
-
-	for k, v in pairs(INFO_CACHE) do
-		rec[k] = v
-	end
-	return rec
-end
+	return X.Clone(rec)
 end
 
 function D.Migration()
@@ -944,32 +594,10 @@ function D.FlushDB()
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
 
-	local rec = X.Clone(D.GetClientPlayerRec())
-	D.EncodeRow(rec)
+	local data = X.LoadLUAData(DATA_FILE) or {}
+	data[X.GetPlayerGUID()] = D.GetClientPlayerRec()
+	X.SaveLUAData(DATA_FILE, data)
 
-	DB:Execute('BEGIN TRANSACTION')
-
-	DB_RoleInfoW:ClearBindings()
-	DB_RoleInfoW:BindAll(
-		rec.guid, rec.account, rec.region, rec.server,
-		rec.name, rec.force, rec.level, rec.equip_score,
-		rec.pet_score, rec.gold, rec.silver, rec.copper,
-		rec.stamina, rec.stamina_max, rec.stamina_remain, rec.vigor, rec.vigor_max, rec.vigor_remain,
-		rec.contribution, rec.contribution_remain, rec.justice, rec.justice_remain,
-		rec.prestige, rec.prestige_remain, rec.camp_point, rec.camp_point_percentage,
-		rec.camp_level, rec.arena_award, rec.arena_award_remain, rec.exam_print,
-		rec.exam_print_remain, rec.achievement_score, rec.coin, rec.mentor_score,
-		rec.starve, rec.starve_remain, rec.architecture, rec.architecture_remain,
-		rec.time, '')
-	DB_RoleInfoW:Execute()
-	DB_RoleInfoW:Reset()
-
-	DB_RoleInfoCoinW:ClearBindings()
-	DB_RoleInfoCoinW:BindAll(rec.coin, rec.account, rec.region)
-	DB_RoleInfoCoinW:Execute()
-	DB_RoleInfoCoinW:Reset()
-
-	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
 	X.Debug('MY_RoleStatistics_RoleStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
@@ -977,9 +605,8 @@ function D.FlushDB()
 end
 X.RegisterFlush('MY_RoleStatistics_RoleStat', D.FlushDB)
 
-do local INIT = false
 function D.UpdateSaveDB()
-	if not INIT then
+	if not D.bReady then
 		return
 	end
 	local me = GetClientPlayer()
@@ -990,174 +617,101 @@ function D.UpdateSaveDB()
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_RoleStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		DB_RoleInfoD:ClearBindings()
-		DB_RoleInfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
-		DB_RoleInfoD:Execute()
-		DB_RoleInfoD:Reset()
+		local data = X.LoadLUAData(DATA_FILE) or {}
+		data[X.GetPlayerGUID()] = nil
+		X.SaveLUAData(DATA_FILE, data)
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_RoleStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_ROLE_UPDATE')
 end
-X.RegisterInit('MY_RoleStatistics_RoleUpdateSaveDB', function() INIT = true end)
-end
 
 function D.GetColumns()
 	local aCol = {}
-	for _, id in ipairs(O.aColumn) do
-		local col = COLUMN_DICT[id]
+	for _, szKey in ipairs(O.aColumn) do
+		local col = COLUMN_DICT[szKey]
 		if col then
-			table.insert(aCol, col)
+			table.insert(aCol, {
+				key = col.szKey,
+				title = col.szTitleAbbr,
+				minWidth = col.nMinWidth,
+				maxWidth = col.nMaxWidth,
+				alignHorizontal = col.szAlignHorizontal or 'center',
+				render = col.GetFormatText
+					and function(value, record, index)
+						return col.GetFormatText(value, record, DATA_ENV)
+					end
+					or nil,
+				sorter = col.Compare
+					and function(v1, v2, r1, r2)
+						return col.Compare(v1, v2, r1, r2, DATA_ENV)
+					end
+					or nil,
+			})
 		end
 	end
 	return aCol
 end
 
 function D.UpdateUI(page)
-	local hCols = page:Lookup('Wnd_Total/WndScroll_RoleStat', 'Handle_RoleStatColumns')
-	hCols:Clear()
-
-	local aCol, nX, Sorter = D.GetColumns(), 0, nil
-	local nExtraWidth = EXCEL_WIDTH
-	for i, col in ipairs(aCol) do
-		nExtraWidth = nExtraWidth - col.nMinWidth
-	end
-	for i, col in ipairs(aCol) do
-		local hCol = hCols:AppendItemFromIni(SZ_INI, 'Handle_RoleStatColumn')
-		local txt = hCol:Lookup('Text_RoleStat_Title')
-		local imgAsc = hCol:Lookup('Image_RoleStat_Asc')
-		local imgDesc = hCol:Lookup('Image_RoleStat_Desc')
-		local nWidth = i == #aCol
-			and (EXCEL_WIDTH - nX)
-			or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
-		local nSortDelta = nWidth > 70 and 25 or 15
-		if i == 0 then
-			hCol:Lookup('Image_RoleStat_Break'):Hide()
-		end
-		hCol.szSort = col.id
-		hCol:SetRelX(nX)
-		hCol:SetW(nWidth)
-		txt:SetW(nWidth)
-		txt:SetText(col.szShortTitle or col.szTitle)
-		imgAsc:SetRelX(nWidth - nSortDelta)
-		imgDesc:SetRelX(nWidth - nSortDelta)
-		if O.szSort == col.id then
-			Sorter = function(r1, r2)
-				if O.szSortOrder == 'asc' then
-					return col.Compare(r1, r2) < 0
-				end
-				return col.Compare(r1, r2) > 0
-			end
-		end
-		imgAsc:SetVisible(O.szSort == col.id and O.szSortOrder == 'asc')
-		imgDesc:SetVisible(O.szSort == col.id and O.szSortOrder == 'desc')
-		hCol:FormatAllItemPos()
-		nX = nX + nWidth
-	end
-	hCols:FormatAllItemPos()
-
-
+	local wnd = page:Lookup('Wnd_Total')
 	local szSearch = page:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
-	local szUSearch = AnsiToUTF8('%' .. szSearch .. '%')
-	DB_RoleInfoR:ClearBindings()
-	DB_RoleInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
-	local result = DB_RoleInfoR:GetAll()
-	DB_RoleInfoR:Reset()
 
-	for _, rec in ipairs(result) do
-		D.DecodeRow(rec)
-	end
-
-	if Sorter then
-		table.sort(result, Sorter)
-	end
-
-	local aCol = D.GetColumns()
-	-- 列表
-	local hList = page:Lookup('Wnd_Total/WndScroll_RoleStat', 'Handle_List')
-	hList:Clear()
-	for i, rec in ipairs(result) do
-		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
-		hRow.rec = rec
-		hRow:Lookup('Image_RowBg'):SetVisible(i % 2 == 1)
-		-- 绘制列
-		local nX = 0
-		for j, col in ipairs(aCol) do
-			local hItem = hRow:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
-			local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
-			hItemContent:AppendItemFromString(col.GetFormatText(rec))
-			hItemContent:SetW(99999)
-			hItemContent:FormatAllItemPos()
-			hItemContent:SetSizeByAllItemSize()
-			local nWidth = j == #aCol
-				and (EXCEL_WIDTH - nX)
-				or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
-			if j == #aCol then
-				nWidth = EXCEL_WIDTH - nX
-			end
-			hItem:SetRelX(nX)
-			hItem:SetW(nWidth)
-			hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
-			hItem:FormatAllItemPos()
-			nX = nX + nWidth
+	local data = D.GetPlayerRecords()
+	local result = {}
+	for _, rec in pairs(data) do
+		if wstring.find(tostring(rec.account or ''), szSearch)
+		or wstring.find(tostring(rec.name or ''), szSearch)
+		or wstring.find(tostring(rec.region or ''), szSearch)
+		or wstring.find(tostring(rec.server or ''), szSearch) then
+			table.insert(result, rec)
 		end
-		-- 绘制复选框
-		UI(hRow):Append('CheckBox', {
-			x = 5, y = 2, w = EXCEL_WIDTH - 10,
-			checked = X.IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] or false,
-			onCheck = function(bCheck)
-				O.tSummaryIgnoreGUID[rec.guid] = not bCheck or nil
-				O.tSummaryIgnoreGUID = O.tSummaryIgnoreGUID
-				D.UpdateUI(page)
-			end,
-			visible = D.bConfigSummary or false,
-		})
-		-- 格式化位置
-		hRow:FormatAllItemPos()
 	end
-	hList:FormatAllItemPos()
 
 	-- 汇总
-	local aSum = {}
+	local aSumRec, tSumVal = {}, {}
+	for _, col in ipairs(COLUMN_LIST) do
+		if col.bTable then
+			tSumVal[col.szKey] = {}
+		end
+	end
 	for _, rec in ipairs(result) do
 		if X.IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] then
-			table.insert(aSum, rec)
+			for _, col in ipairs(COLUMN_LIST) do
+				if col.bTable then
+					table.insert(tSumVal[col.szKey], rec[col.szKey])
+				end
+			end
+			table.insert(aSumRec, rec)
 		end
 	end
-	local hSum = page:Lookup('Wnd_Total/WndScroll_RoleStat', 'Handle_Sum')
-	hSum:Clear()
-	local hRow = hSum:AppendItemFromIni(SZ_INI, 'Handle_Row', 'Handle_SumRow')
-	hRow:Lookup('Image_RowBg'):SetVisible(false)
-	local nX = 0
-	for j, col in ipairs(aCol) do
-		local hItem = hRow:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
-		local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
-		hItemContent:AppendItemFromString(col.GetSummaryFormatText and col.GetSummaryFormatText(aSum) or GetFormatText('--'))
-		hItemContent:SetW(99999)
-		hItemContent:FormatAllItemPos()
-		hItemContent:SetSizeByAllItemSize()
-		local nWidth = j == #aCol
-			and (EXCEL_WIDTH - nX)
-			or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
-		if j == #aCol then
-			nWidth = EXCEL_WIDTH - nX
+	local summary = {}
+	for _, col in ipairs(COLUMN_LIST) do
+		if col.bTable then
+			summary[col.szKey] = col.GetSummaryValue(tSumVal[col.szKey], aSumRec, DATA_ENV)
 		end
-		hItem:SetRelX(nX)
-		hItem:SetW(nWidth)
-		hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
-		hItem:FormatAllItemPos()
-		nX = nX + nWidth
 	end
-	hRow:FormatAllItemPos()
-	hSum:FormatAllItemPos()
-end
 
-function D.EncodeRow(rec)
-	rec.guid   = AnsiToUTF8(rec.guid)
-	rec.name   = AnsiToUTF8(rec.name)
-	rec.region = AnsiToUTF8(rec.region)
-	rec.server = AnsiToUTF8(rec.server)
+	Boilerplate.UI(wnd)
+		:Fetch('WndTable_Stat')
+		:Columns(D.GetColumns())
+		:DataSource(result)
+		:Summary(summary)
+
+		-- -- 绘制复选框
+		-- UI(hRow):Append('CheckBox', {
+		-- 	x = 5, y = 2, w = EXCEL_WIDTH - 10,
+		-- 	checked = X.IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] or false,
+		-- 	onCheck = function(bCheck)
+		-- 		O.tSummaryIgnoreGUID[rec.guid] = not bCheck or nil
+		-- 		O.tSummaryIgnoreGUID = O.tSummaryIgnoreGUID
+		-- 		D.UpdateUI(page)
+		-- 	end,
+		-- 	visible = D.bConfigSummary or false,
+		-- })
+
+	-- hItemContent:AppendItemFromString(col.GetSummaryFormatText and col.GetSummaryFormatText(aSum) or GetFormatText('--'))
 end
 
 function D.DecodeRow(rec)
@@ -1167,24 +721,39 @@ function D.DecodeRow(rec)
 	rec.server = UTF8ToAnsi(rec.server)
 end
 
-function D.OutputRowTip(this, rec)
+function D.GetRowTip(rec)
 	local aXml = {}
-	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
 	for _, col in ipairs(COLUMN_LIST) do
-		if not bFloat or not col.bHideInFloat then
+		if col.bRowTip then
 			table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
 			table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-			table.insert(aXml, col.GetFormatText(rec))
+			table.insert(aXml, col.GetFormatText(rec[col.szKey], rec, DATA_ENV))
+			table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+		end
+	end
+	return table.concat(aXml)
+end
+
+function D.OutputFloatEntryTip(this, rec)
+	local rec = D.GetClientPlayerRec()
+	if not rec then
+		return
+	end
+	local aXml = {}
+	for _, col in ipairs(COLUMN_LIST) do
+		if col.bFloatTip then
+			table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+			table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+			table.insert(aXml, col.GetFormatText(rec[col.szKey], rec, DATA_ENV))
 			table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 		end
 	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	local nPosType = bFloat and UI.TIP_POSITION.TOP_BOTTOM or UI.TIP_POSITION.RIGHT_LEFT
-	OutputTip(table.concat(aXml), 450, {x, y, w, h}, nPosType)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 end
 
-function D.CloseRowTip()
+function D.CloseFloatEntryTip()
 	HideTip()
 end
 
@@ -1201,8 +770,8 @@ function D.OnInitPage()
 		text = _L['Columns'],
 		menu = function()
 			local t, c, nMinW = {}, {}, 0
-			for i, id in ipairs(O.aColumn) do
-				local col = COLUMN_DICT[id]
+			for i, szKey in ipairs(O.aColumn) do
+				local col = COLUMN_DICT[szKey]
 				if col then
 					table.insert(t, {
 						szOption = col.szTitle,
@@ -1238,23 +807,19 @@ function D.OnInitPage()
 							end,
 						},
 					})
-					c[id] = true
+					c[szKey] = true
 					nMinW = nMinW + col.nMinWidth
 				end
 			end
 			for _, col in ipairs(COLUMN_LIST) do
-				if not c[col.id] then
+				if col.bTable and not c[col.szKey] then
 					table.insert(t, {
 						szOption = col.szTitle,
 						fnAction = function()
-							if nMinW + col.nMinWidth > EXCEL_WIDTH then
-								X.Alert(_L['Too many column selected, width overflow, please delete some!'])
-							else
-								table.insert(O.aColumn, col.id)
-								O.aColumn = O.aColumn
-							end
+							local aColumn = O.aColumn
+							table.insert(aColumn, col.szKey)
+							O.aColumn = aColumn
 							D.UpdateUI(page)
-							UI.ClosePopupMenu()
 						end,
 					})
 				end
@@ -1269,16 +834,16 @@ function D.OnInitPage()
 		text = _L['Columns alert when esc'],
 		menu = function()
 			local t, c = {}, {}
-			for i, id in ipairs(O.aAlertColumn) do
-				local col = ALERT_COLUMN_DICT[id]
+			for nIndex, szKey in ipairs(O.aAlertColumn) do
+				local col = COLUMN_DICT[szKey]
 				if col then
 					table.insert(t, {
 						szOption = col.szTitle,
 						{
 							szOption = _L['Move up'],
 							fnAction = function()
-								if i > 1 then
-									O.aAlertColumn[i], O.aAlertColumn[i - 1] = O.aAlertColumn[i - 1], O.aAlertColumn[i]
+								if nIndex > 1 then
+									O.aAlertColumn[nIndex], O.aAlertColumn[nIndex - 1] = O.aAlertColumn[nIndex - 1], O.aAlertColumn[nIndex]
 									O.aAlertColumn = O.aAlertColumn
 								end
 								UI.ClosePopupMenu()
@@ -1287,8 +852,8 @@ function D.OnInitPage()
 						{
 							szOption = _L['Move down'],
 							fnAction = function()
-								if i < #O.aAlertColumn then
-									O.aAlertColumn[i], O.aAlertColumn[i + 1] = O.aAlertColumn[i + 1], O.aAlertColumn[i]
+								if nIndex < #O.aAlertColumn then
+									O.aAlertColumn[nIndex], O.aAlertColumn[nIndex + 1] = O.aAlertColumn[nIndex + 1], O.aAlertColumn[nIndex]
 									O.aAlertColumn = O.aAlertColumn
 								end
 								UI.ClosePopupMenu()
@@ -1297,21 +862,21 @@ function D.OnInitPage()
 						{
 							szOption = _L['Delete'],
 							fnAction = function()
-								table.remove(O.aAlertColumn, i)
+								table.remove(O.aAlertColumn, nIndex)
 								O.aAlertColumn = O.aAlertColumn
 								UI.ClosePopupMenu()
 							end,
 						},
 					})
-					c[id] = true
+					c[szKey] = true
 				end
 			end
-			for _, col in ipairs(ALERT_COLUMN) do
-				if not c[col.id] then
+			for _, col in ipairs(COLUMN_LIST) do
+				if not c[col.szKey] and col.bAlertChange then
 					table.insert(t, {
 						szOption = col.szTitle,
 						fnAction = function()
-							table.insert(O.aAlertColumn, col.id)
+							table.insert(O.aAlertColumn, col.szKey)
 							O.aAlertColumn = O.aAlertColumn
 							UI.ClosePopupMenu()
 						end,
@@ -1322,12 +887,76 @@ function D.OnInitPage()
 		end,
 	})
 
+	Boilerplate.UI(wnd):Append('WndTable', {
+		name = 'WndTable_Stat',
+		x = 20, y = 60, w = 960, h = 530,
+		sort = O.szSort,
+		sortOrder = O.szSortOrder,
+		onSortChange = function(szSort, szSortOrder)
+			O.szSort, O.szSortOrder = szSort, szSortOrder
+		end,
+		rowTip = {
+			render = function(rec)
+				return D.GetRowTip(rec), true
+			end,
+			position = UI.TIP_POSITION.RIGHT_LEFT,
+		},
+		rowMenuRClick = function(rec, index)
+			local menu = {
+				{
+					szOption = _L['Delete'],
+					fnAction = function()
+						local data = X.LoadLUAData(DATA_FILE) or {}
+						data[rec.guid] = nil
+						X.SaveLUAData(DATA_FILE, data)
+						D.UpdateUI(page)
+					end,
+				},
+			}
+			PopupMenu(menu)
+		end,
+	})
+
 	UI(wnd):Append('WndButton', {
-		x = 25, y = 552, w = 25, h = 25,
+		x = 25, y = 562, w = 25, h = 25,
 		buttonStyle = 'OPTION',
 		onClick = function()
-			D.bConfigSummary = not D.bConfigSummary
-			D.UpdateUI(page)
+			local menu = {}
+			local data = {}
+			for _, v in pairs(D.GetPlayerRecords()) do
+				table.insert(data, v)
+			end
+			table.sort(data, function(d1, d2)
+				if d1 == d2 then
+					return false
+				end
+				if not d1 then
+					return true
+				end
+				if not d2 then
+					return false
+				end
+				return d1.force < d2.force
+			end)
+			for _, rec in ipairs(data) do
+				table.insert(menu, {
+					szOption = rec.name,
+					rgb = {X.GetForceColor(rec.force, 'foreground')},
+					bCheck = true, bMCheck = true,
+					bChecked = not O.tSummaryIgnoreGUID[rec.guid],
+					fnAction = function(_, bChecked)
+						local tSummaryIgnoreGUID = O.tSummaryIgnoreGUID
+						if bChecked then
+							tSummaryIgnoreGUID[rec.guid] = nil
+						else
+							tSummaryIgnoreGUID[rec.guid] = true
+						end
+						O.tSummaryIgnoreGUID = tSummaryIgnoreGUID
+						D.UpdateUI(page)
+					end,
+				})
+			end
+			UI.PopupMenu(menu)
 		end,
 	})
 
@@ -1394,42 +1023,6 @@ function D.OnLButtonClick()
 	end
 end
 
-function D.OnItemLButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_RoleStatColumn' then
-		if this.szSort then
-			local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-			if O.szSort == this.szSort then
-				O.szSortOrder = O.szSortOrder == 'asc' and 'desc' or 'asc'
-			else
-				O.szSort = this.szSort
-			end
-			D.UpdateUI(page)
-		end
-	end
-end
-
-function D.OnItemRButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_Row' then
-		local rec = this.rec
-		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		local menu = {
-			{
-				szOption = _L['Delete'],
-				fnAction = function()
-					DB_RoleInfoD:ClearBindings()
-					DB_RoleInfoD:BindAll(AnsiToUTF8(rec.guid))
-					DB_RoleInfoD:Execute()
-					DB_RoleInfoD:Reset()
-					D.UpdateUI(page)
-				end,
-			},
-		}
-		PopupMenu(menu)
-	end
-end
-
 function D.OnEditSpecialKeyDown()
 	local name = this:GetName()
 	local szKey = GetKeyName(Station.GetMessageKey())
@@ -1444,9 +1037,7 @@ end
 
 function D.OnItemMouseEnter()
 	local name = this:GetName()
-	if name == 'Handle_Row' then
-		D.OutputRowTip(this, this.rec)
-	elseif name == 'Handle_RoleStatColumn' then
+	if name == 'Handle_RoleStatColumn' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local szXml = GetFormatText(this:Lookup('Text_RoleStat_Title'):GetText(), 162, 255, 255, 255)
@@ -1463,35 +1054,40 @@ function D.OnItemMouseLeave()
 	HideTip()
 end
 
-local ALERT_INIT_VAL = {}
 X.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
-	local me = GetClientPlayer()
-	for _, col in ipairs(ALERT_COLUMN) do
-		ALERT_INIT_VAL[col.id] = col.GetValue(me)
-	end
 	if not X.IsTable(O.tAlertTodayVal) or not X.IsNumber(O.tAlertTodayVal.nTime)
 	or not X.IsInSameRefreshTime('daily', O.tAlertTodayVal.nTime) then
-		O.tAlertTodayVal = {}
-		for _, col in ipairs(ALERT_COLUMN) do
-			O.tAlertTodayVal[col.id] = col.GetValue(me)
-		end
-		O.tAlertTodayVal.nTime = GetCurrentTime()
-		O.tAlertTodayVal = O.tAlertTodayVal
+		local rec = D.GetClientPlayerRec()
+		rec.nTime = GetCurrentTime()
+		O.tAlertTodayVal = rec
 	end
+	D.tAlertSessionVal = D.GetClientPlayerRec()
 end)
+
 X.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', function()
-	local me = GetClientPlayer()
-	local tVal = {}
-	for _, col in ipairs(ALERT_COLUMN) do
-		tVal[col.id] = col.GetValue(me)
-	end
+	local rec = D.GetClientPlayerRec()
+	Output(O.tAlertTodayVal, D.tAlertSessionVal, rec)
 
 	local aText, aDailyText = {}, {}
-	for _, id in ipairs(O.aAlertColumn) do
-		local col = ALERT_COLUMN_DICT[id]
-		if col then
-			table.insert(aText, (col.GetCompareText(ALERT_INIT_VAL, tVal)))
-			table.insert(aDailyText, (col.GetCompareText(O.tAlertTodayVal, tVal)))
+	for _, szKey in ipairs(O.aAlertColumn) do
+		local col = COLUMN_DICT[szKey]
+		if col and col.bAlertChange then
+			local szCompare = col.GetCompareText(
+				D.tAlertSessionVal[szKey],
+				rec[szKey],
+				D.tAlertSessionVal,
+				rec,
+				DATA_ENV
+			)
+			table.insert(aText, szCompare)
+			local szDailyCompare = col.GetCompareText(
+				O.tAlertTodayVal[szKey],
+				rec[szKey],
+				O.tAlertTodayVal,
+				rec,
+				DATA_ENV
+			)
+			table.insert(aDailyText, szDailyCompare)
 		end
 	end
 	local szText, szDailyText = table.concat(aText, GetFormatSysmsgText(_L[','])), table.concat(aDailyText, GetFormatSysmsgText(_L[',']))
@@ -1528,14 +1124,10 @@ function D.ApplyFloatEntry(bFloatEntry)
 		btn:SetRelPos(55, -8)
 		Wnd.CloseWindow(frameTemp)
 		btn.OnMouseEnter = function()
-			local rec = D.GetClientPlayerRec()
-			if not rec then
-				return
-			end
-			D.OutputRowTip(this, rec)
+			D.OutputFloatEntryTip(this)
 		end
 		btn.OnMouseLeave = function()
-			D.CloseRowTip()
+			D.CloseFloatEntryTip()
 		end
 		btn.OnLButtonClick = function()
 			MY_RoleStatistics.Open('RoleStat')
