@@ -912,10 +912,14 @@ local function InitComponent(raw, szType)
 						hItemContent:AppendItemFromString(szXml)
 					end
 					hRow.OnItemMouseEnter = function()
-						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), true, rec, nRowIndex)
+						local nX, nY = raw:GetAbsX(), this:GetAbsY()
+						local nW, nH = raw:GetW(), this:GetH()
+						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), true, rec, nRowIndex, { nX, nY, nW, nH })
 					end
 					hRow.OnItemMouseLeave = function()
-						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), false, rec, nRowIndex)
+						local nX, nY = raw:GetAbsX(), this:GetAbsY()
+						local nW, nH = raw:GetW(), this:GetH()
+						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), false, rec, nRowIndex, { nX, nY, nW, nH })
 					end
 					hRow.OnItemLButtonClick = function()
 						X.SafeCall(GetComponentProp(raw, 'RowLClick'), rec, nRowIndex)
@@ -4973,7 +4977,7 @@ function OO:RowTip(props)
 	local eHide = props.hide or UI.TIP_HIDE_WAY.HIDE
 	local bRichText = props.rich
 	return self:RowHover(
-		function(bIn, ...)
+		function(bIn, rec, nIndex, Rect)
 			if not bIn then
 				if eHide == UI.TIP_HIDE_WAY.HIDE then
 					HideTip(false)
@@ -4988,14 +4992,14 @@ function OO:RowTip(props)
 				nX, nY = nX - 0, nY - 40
 				nW, nH = 40, 40
 			else
-				nX, nY = this:GetAbsPos()
-				nW, nH = this:GetSize()
+				nX, nY = Rect[1], Rect[2]
+				nW, nH = Rect[3], Rect[4]
 			end
 			nX, nY = nX + nOffsetX, nY + nOffsetY
 			local szText = props.render
 			if X.IsFunction(szText) then
 				local bSuccess
-				bSuccess, szText, bRichText = X.ExecuteWithThis(this, szText, ...)
+				bSuccess, szText, bRichText = X.ExecuteWithThis(this, szText, rec, nIndex)
 				if not bSuccess then
 					return
 				end
