@@ -724,16 +724,23 @@ local function InitComponent(raw, szType)
 			end
 			local nExtraWidth = nScrollX
 			for i, col in ipairs(aColumns) do
-				nExtraWidth = nExtraWidth - col.minWidth
+				if col.minWidth then
+					nExtraWidth = nExtraWidth - col.minWidth
+				end
+			end
+			if nExtraWidth < 0 then
+				nScrollX = nScrollX - nExtraWidth
+				nExtraWidth = 0
 			end
 			for i, col in ipairs(aColumns) do
 				local hCol = hColumns:Lookup(i - 1) -- 外部居中层
 				local hContent = hCol:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
 				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
 				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
+				local nMinWidth = col.minWidth or 0
 				local nWidth = i == #aColumns
 					and (nScrollX - nX)
-					or math.min(nExtraWidth * col.minWidth / (nScrollX - nExtraWidth) + col.minWidth, col.maxWidth or math.huge)
+					or math.min(nExtraWidth * nMinWidth / (nScrollX - nExtraWidth) + nMinWidth, col.maxWidth or math.huge)
 				local nSortDelta = nWidth > 70 and 25 or 15
 				hCol:SetRelX(nX)
 				hCol:SetW(nWidth)
