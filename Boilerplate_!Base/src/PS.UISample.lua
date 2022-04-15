@@ -57,6 +57,7 @@ local COMPONENT_SAMPLE = {
 					minWidth = 150,
 					alignHorizontal = 'left',
 					alignVertical = 'top',
+					sorter = true,
 				},
 				{
 					key = 'desc',
@@ -86,6 +87,7 @@ local COMPONENT_SAMPLE = {
 					minWidth = 150,
 					alignHorizontal = 'center',
 					alignVertical = 'middle',
+					sorter = true,
 				},
 				{
 					key = 'from',
@@ -93,6 +95,7 @@ local COMPONENT_SAMPLE = {
 					minWidth = 200,
 					alignHorizontal = 'center',
 					alignVertical = 'middle',
+					sorter = true,
 				},
 				{
 					key = 'extra',
@@ -143,7 +146,7 @@ local COMPONENT_SAMPLE = {
 			sort = 'price',
 			sortOrder = 'asc',
 			onSortChange = function(szSort, szSortOrder)
-				Output(szSort, szSortOrder)
+				X.Systopmsg('Sort: ' .. szSort .. ' (order) ' .. szSortOrder)
 			end,
 			rowTip = {
 				render = function(rec)
@@ -156,7 +159,7 @@ local COMPONENT_SAMPLE = {
 					{
 						szOption = _L['Delete'],
 						fnAction = function()
-							Output('Delete', rec.name, index)
+							X.Systopmsg('Delete: ' .. rec.name .. ' (index) ' .. index)
 						end,
 						rgb = { 255, 128, 128 },
 					},
