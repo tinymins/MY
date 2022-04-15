@@ -789,12 +789,21 @@ local function InitComponent(raw, szType)
 				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
 				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
 				if szSortKey == col.key and col.sorter then
+					local sorter = col.sorter
+					if sorter == true then
+						sorter = function(a, b)
+							if a == b then
+								return 0
+							end
+							return a > b and 1 or -1
+						end
+					end
 					SetComponentProp(raw, 'Sorter', function(r1, r2)
 						local v1, v2 = r1[col.key], r2[col.key]
 						if szSortOrder == 'asc' then
-							return col.sorter(v1, v2, r1, r2) < 0
+							return sorter(v1, v2, r1, r2) < 0
 						end
-						return col.sorter(v1, v2, r1, r2) > 0
+						return sorter(v1, v2, r1, r2) > 0
 					end)
 				end
 				imgAsc:SetVisible(szSortKey == col.key and szSortOrder == 'asc')
@@ -845,6 +854,9 @@ local function InitComponent(raw, szType)
 				end
 				-- ≈≈–Ú
 				hCol.OnItemLButtonClick = function()
+					if not col.sorter then
+						return
+					end
 					if GetComponentProp(raw, 'SortKey') == col.key then
 						SetComponentProp(raw, 'SortOrder', GetComponentProp(raw, 'SortOrder') == 'asc' and 'desc' or 'asc')
 					else
