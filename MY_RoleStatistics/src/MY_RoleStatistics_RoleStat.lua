@@ -438,7 +438,7 @@ for _, col in ipairs(COLUMN_LIST) do
 	end
 	if col.bAlertChange and not col.GetCompareText then
 		col.GetCompareText = function(v1, v2, r1, r2, env)
-			if v1 == v2 or not v1 or not v2 then
+			if v1 == v2 or not X.IsNumber(v1) or not X.IsNumber(v2) then
 				return
 			end
 			local f = v1 <= v2
