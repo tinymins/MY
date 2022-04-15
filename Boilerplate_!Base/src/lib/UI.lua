@@ -812,13 +812,16 @@ local function InitComponent(raw, szType)
 				if i == 0 then
 					hCol:Lookup('Image_TableColumn_Break'):Hide()
 				end
-				local szXml
+				-- 标题
+				local szTitle, bTitleRich = col.title, col.titleRich
 				if X.IsFunction(col.title) then
-					szXml = col.title(col)
-				else
-					szXml = GetFormatText(col.title or '')
+					szTitle, bTitleRich = col.title(col)
 				end
-				hContent:AppendItemFromString(szXml)
+				if not bTitleRich then
+					szTitle = GetFormatText(szTitle)
+				end
+				hContent:AppendItemFromString(szTitle)
+				-- 标题 Tip
 				if col.titleTip then
 					hCol.OnItemMouseEnter = function()
 						local szText, bRich = col.titleTip, col.titleTipRich
@@ -840,6 +843,7 @@ local function InitComponent(raw, szType)
 						HideTip()
 					end
 				end
+				-- 排序
 				hCol.OnItemLButtonClick = function()
 					if GetComponentProp(raw, 'SortKey') == col.key then
 						SetComponentProp(raw, 'SortOrder', GetComponentProp(raw, 'SortOrder') == 'asc' and 'desc' or 'asc')
