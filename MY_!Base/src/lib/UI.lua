@@ -714,10 +714,11 @@ local function InitComponent(raw, szType)
 				raw:Lookup('Scroll_Y'):Hide()
 			end
 		end)
-		-- 自适应表头宽度
+		-- 自适应表头宽高
 		SetComponentProp(raw, 'UpdateTitleColumnsWidth', function()
 			local hColumns = raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_TableColumns')
 			local aColumns, nX = GetComponentProp(raw, 'Columns'), 0
+			local nHeight = raw:GetH()
 			local nScrollX = GetComponentProp(raw, 'ScrollX')
 			if not nScrollX or nScrollX == 'auto' then
 				nScrollX = raw:GetW()
@@ -737,6 +738,7 @@ local function InitComponent(raw, szType)
 				local hContent = hCol:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
 				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
 				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
+				local imgBreak = hCol:Lookup('Image_TableColumn_Break')
 				local nMinWidth = col.minWidth or 0
 				local nWidth = i == #aColumns
 					and (nScrollX - nX)
@@ -763,6 +765,7 @@ local function InitComponent(raw, szType)
 				end
 				imgAsc:SetRelX(nWidth - nSortDelta)
 				imgDesc:SetRelX(nWidth - nSortDelta)
+				imgBreak:SetH(nHeight)
 				hCol:FormatAllItemPos()
 				nX = nX + nWidth
 			end
@@ -806,8 +809,6 @@ local function InitComponent(raw, szType)
 			for i, col in ipairs(aColumns) do
 				local hCol = hColumns:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_TableColumn') -- 外部居中层
 				local hContent = hCol:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
-				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
-				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
 				if i == 0 then
 					hCol:Lookup('Image_TableColumn_Break'):Hide()
 				end
