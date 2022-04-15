@@ -546,15 +546,21 @@ function D.Migration()
 										nSilver = rec.silver,
 										nCopper = rec.copper,
 									},
-									account_stamina = {
-										current = rec.stamina or -1,
-										max = rec.stamina_max or -1,
-									},
-									role_stamina = {
-										current = rec.vigor or -1,
-										max = rec.vigor_max or -1,
-									},
-									role_stamina_remain = rec.stamina_remain,
+									account_stamina = rec.stamina and rec.stamina >= 0 and rec.stamina_max and rec.stamina_max >= 0
+										and {
+											current = rec.stamina,
+											max = rec.stamina_max,
+										}
+										or nil,
+									role_stamina = rec.vigor and rec.vigor >= 0 and rec.vigor_max and rec.vigor_max >= 0
+										and {
+											current = rec.vigor,
+											max = rec.vigor_max,
+										}
+										or nil,
+									role_stamina_remain = rec.stamina_remain and rec.stamina_remain >= 0
+										and rec.stamina_remain
+										or nil,
 									contribution = rec.contribution,
 									contribution_remain = rec.contribution_remain,
 									justice = rec.justice,
@@ -606,15 +612,21 @@ function D.Migration()
 										nSilver = rec.silver,
 										nCopper = rec.copper,
 									},
-									account_stamina = {
-										current = rec.stamina or -1,
-										max = rec.stamina_max or -1,
-									},
-									role_stamina = {
-										current = rec.vigor or -1,
-										max = rec.vigor_max or -1,
-									},
-									role_stamina_remain = rec.stamina_remain,
+									account_stamina = rec.stamina and rec.stamina >= 0 and rec.stamina_max and rec.stamina_max >= 0
+										and {
+											current = rec.stamina,
+											max = rec.stamina_max,
+										}
+										or nil,
+									role_stamina = rec.vigor and rec.vigor >= 0 and rec.vigor_max and rec.vigor_max >= 0
+										and {
+											current = rec.vigor,
+											max = rec.vigor_max,
+										}
+										or nil,
+									role_stamina_remain = rec.stamina_remain and rec.stamina_remain >= 0
+										and rec.stamina_remain
+										or nil,
 									contribution = rec.contribution,
 									contribution_remain = rec.contribution_remain,
 									justice = rec.justice,
