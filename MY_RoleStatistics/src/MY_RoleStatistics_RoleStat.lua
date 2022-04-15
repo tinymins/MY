@@ -1078,7 +1078,7 @@ function D.OnInitPage()
 				table.insert(menu, {
 					szOption = rec.name,
 					rgb = {X.GetForceColor(rec.force, 'foreground')},
-					bCheck = true, bMCheck = true,
+					bCheck = true,
 					bChecked = not O.tSummaryIgnoreGUID[rec.guid],
 					fnAction = function(_, bChecked)
 						local tSummaryIgnoreGUID = O.tSummaryIgnoreGUID
