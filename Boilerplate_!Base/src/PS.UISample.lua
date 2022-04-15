@@ -47,32 +47,32 @@ local COMPONENT_SAMPLE = {
 		'WndTable',
 		'WndTable',
 		{
-			w = 600, h = 400,
+			w = 720, h = 400,
 			columns = {
 				{
-					key = 'price',
-					title = 'Account Price',
+					key = 'name',
+					title = 'Name',
 					titleRich = true,
-					titleTip = 'ACCOUNT PRICE!!!',
+					titleTip = 'NAME!!!',
 					minWidth = 150,
 					alignHorizontal = 'left',
 					alignVertical = 'top',
 				},
 				{
-					key = 'text',
-					title = GetFormatText('Account Stamina', 162, 255, 255, 0),
+					key = 'desc',
+					title = GetFormatText('Description', 162, 255, 255, 0),
 					titleRich = true,
-					titleTip = GetFormatText('ACCOUNT STAMINA!!!', 162, 255, 255, 0),
+					titleTip = GetFormatText('DESCRIPTION!!!', 162, 255, 255, 0),
 					titleTipRich = true,
 					minWidth = 150,
 					render = function(value, record, index)
-						if value == '2' then
+						if value == 'desc 2' then
 							return GetFormatText('--', 162, 255, 255, 255)
 						end
-						return GetFormatText(record.text .. '/' .. record.text, 162, 255, 255, 255)
+						return GetFormatText(value .. '/' .. record.price, 162, 255, 255, 255)
 					end,
 					sorter = function(v1, v2, r1, r2)
-						v1, v2 = tonumber(v1), tonumber(v2)
+						v1, v2 = tonumber((v1:sub(1, 4))), tonumber((v2:sub(1, 4)))
 						if v1 == v2 then
 							return 0
 						end
@@ -81,55 +81,88 @@ local COMPONENT_SAMPLE = {
 				},
 				{
 					key = 'price',
-					title = function() return GetFormatText('Account Price', 162, 255, 255, 0), true end,
-					titleTip = function() return GetFormatText('ACCOUNT PRICE!!!', 162, 255, 255, 0), true end,
+					title = function() return GetFormatText('Price', 162, 255, 255, 0), true end,
+					titleTip = function() return GetFormatText('PRICE!!!', 162, 255, 255, 0), true end,
 					minWidth = 150,
 					alignHorizontal = 'center',
 					alignVertical = 'middle',
 				},
 				{
-					key = 'price',
-					title = 'Account Price',
+					key = 'from',
+					title = 'From',
+					minWidth = 200,
+					alignHorizontal = 'center',
+					alignVertical = 'middle',
+				},
+				{
+					key = 'extra',
+					title = 'Extra',
 					minWidth = 300,
 					alignHorizontal = 'right',
 					alignVertical = 'bottom',
+					render = function()
+						return GetFormatText('EXTRA EXTRA EXTRA', 162, 255, 255, 0)
+					end,
 				},
 			},
 			dataSource = {
-				{ text = '1', price = '$1' },
-				{ text = '2', price = '$2' },
-				{ text = '3', price = '$3' },
-				{ text = '4', price = '$4' },
-				{ text = '5', price = '$5' },
-				{ text = '6', price = '$6' },
-				{ text = '7', price = '$7' },
-				{ text = '8', price = '$8' },
-				{ text = '9', price = '$9' },
-				{ text = '10', price = '$10' },
-				{ text = '11', price = '$11' },
-				{ text = '12', price = '$12' },
-				{ text = '13', price = '$13' },
-				{ text = '14', price = '$14' },
-				{ text = '15', price = '$15' },
-				{ text = '16', price = '$16' },
-				{ text = '17', price = '$17' },
-				{ text = '18', price = '$18' },
-				{ text = '19', price = '$19' },
-				{ text = '20', price = '$20' },
-				{ text = '21', price = '$21' },
-				{ text = '22', price = '$22' },
-				{ text = '23', price = '$23' },
-				{ text = '24', price = '$24' },
-				{ text = '25', price = '$25' },
-				{ text = '26', price = '$26' },
-				{ text = '27', price = '$27' },
-				{ text = '28', price = '$28' },
-				{ text = '29', price = '$29' },
-				{ text = '30', price = '$30' },
-				{ text = '31', price = '$31' },
-				{ text = '32', price = '$32' },
+				{ name = 'name 1', desc = 'desc 1', price = 1, from = 'China' },
+				{ name = 'name 2', desc = 'desc 2', price = 2, from = 'England' },
+				{ name = 'name 3', desc = 'desc 3', price = 3, from = 'China' },
+				{ name = 'name 4', desc = 'desc 4', price = 4, from = 'England' },
+				{ name = 'name 5', desc = 'desc 5', price = 5, from = 'China' },
+				{ name = 'name 6', desc = 'desc 6', price = 6, from = 'United States' },
+				{ name = 'name 7', desc = 'desc 7', price = 7, from = 'Cuba' },
+				{ name = 'name 8', desc = 'desc 8', price = 8, from = 'Japan' },
+				{ name = 'name 9', desc = 'desc 9', price = 9, from = 'China' },
+				{ name = 'name 10', desc = 'desc 10', price = 10, from = 'China' },
+				{ name = 'name 11', desc = 'desc 11', price = 11, from = 'China' },
+				{ name = 'name 12', desc = 'desc 12', price = 12, from = 'Japan' },
+				{ name = 'name 13', desc = 'desc 13', price = 13, from = 'United States' },
+				{ name = 'name 14', desc = 'desc 14', price = 14, from = 'Japan' },
+				{ name = 'name 15', desc = 'desc 15', price = 15, from = 'United States' },
+				{ name = 'name 16', desc = 'desc 16', price = 16, from = 'Japan' },
+				{ name = 'name 17', desc = 'desc 17', price = 17, from = 'Japan' },
+				{ name = 'name 18', desc = 'desc 18', price = 18, from = 'United States' },
+				{ name = 'name 19', desc = 'desc 19', price = 19, from = 'United States' },
+				{ name = 'name 20', desc = 'desc 20', price = 20, from = 'Japan' },
+				{ name = 'name 21', desc = 'desc 21', price = 21, from = 'United States' },
+				{ name = 'name 22', desc = 'desc 22', price = 22, from = 'China' },
+				{ name = 'name 23', desc = 'desc 23', price = 23, from = 'Cuba' },
+				{ name = 'name 24', desc = 'desc 24', price = 24, from = 'China' },
+				{ name = 'name 25', desc = 'desc 25', price = 25, from = 'England' },
+				{ name = 'name 26', desc = 'desc 26', price = 26, from = 'China' },
+				{ name = 'name 27', desc = 'desc 27', price = 27, from = 'Cuba' },
+				{ name = 'name 28', desc = 'desc 28', price = 28, from = 'England' },
+				{ name = 'name 29', desc = 'desc 29', price = 29, from = 'United States' },
+				{ name = 'name 30', desc = 'desc 30', price = 30, from = 'England' },
+				{ name = 'name 31', desc = 'desc 31', price = 31, from = 'England' },
+				{ name = 'name 32', desc = 'desc 32', price = 32, from = 'Cuba' },
 			},
-			summary = { text = '32', price = '$32' },
+			summary = { name = 'Summary', desc = '--', price = 528, from = 'Earth' },
+			sort = 'price',
+			sortOrder = 'asc',
+			onSortChange = function(szSort, szSortOrder)
+				Output(szSort, szSortOrder)
+			end,
+			rowTip = {
+				render = function(rec)
+					return X.EncodeJSON(rec, '    '), false
+				end,
+				position = UI.TIP_POSITION.LEFT_RIGHT,
+			},
+			rowMenuRClick = function(rec, index)
+				local menu = {
+					{
+						szOption = _L['Delete'],
+						fnAction = function()
+							Output('Delete', rec.name, index)
+						end,
+						rgb = { 255, 128, 128 },
+					},
+				}
+				UI.PopupMenu(menu)
+			end,
 		},
 	},
 }
@@ -157,14 +190,16 @@ function PS.OnPanelActive(wnd)
 		if v[3].h > COMPONENT_H then
 			nX = nPaddingX
 			nY = nY + COMPONENT_H
-			ui:Append('Shadow', { x = nPaddingX, y = nY + v[3].h, w = W - nPaddingX * 2, h = 1, color = { 255, 255, 255 }, alpha = 100 })
+			ui:Append('Shadow', { x = nPaddingX, y = nY + v[3].h + 5, w = W - nPaddingX * 2, h = 1, color = { 255, 255, 255 }, alpha = 50 })
 		else
-			ui:Append('Shadow', { x = nPaddingX, y = nY + 22, w = W - nPaddingX * 2, h = 1, color = { 255, 255, 255 }, alpha = 100 })
+			ui:Append('Shadow', { x = nPaddingX, y = nY + 22, w = W - nPaddingX * 2, h = 1, color = { 255, 255, 255 }, alpha = 50 })
 		end
 		nX = nX + ui:Append(v[2], v[3]):Pos(nX, nY):Width() + 5
 		nX = nPaddingX
-		nY = nY + LH
+		nY = nY + math.max(LH, v[3].h + 5)
 	end
+
+	ui:Append('WndWindow', { x = 0, y = nY + COMPONENT_H, w = W, h = H / 3 })
 end
 
 X.RegisterPanel(_L['Development'], 'UISample', _L['UI SAMPLE'], '', PS)
