@@ -34,6 +34,25 @@ return {
     ['%s (%s)\tBankx%d Bagx%d Totalx%d\n'] = '%s (%s)\t倉庫x%d 背包x%d 總x%d\n',
     ['Are you sure to delete item record of %s?'] = '確定要清空[%s]的背包物品記錄嗎？',
 
+    ['Region'               ] = '大區',
+    ['Server'               ] = '伺服器',
+    ['Name'                 ] = '名字',
+    ['Camp'                 ] = '陣營',
+    ['Force'                ] = '門派',
+    ['Level'                ] = '等級',
+    ['EquSC'                ] = '裝分',
+    ['Cache time'           ] = '快照時間',
+    ['Cache time days'      ] = '快照計時',
+
+    ['%d years %d days before'] = '%d年零%d天前',
+    ['%d days %d hours before'] = '%d天%d小時前',
+    ['%d hours %d mins before'] = '%d小時%d分鐘前',
+    ['%d mins %d secs before'] = '%d分%d秒前',
+    ['%d secs before'] = '%d秒前',
+    ['Just now'] = '剛剛',
+
+    ['Columns'] = '顯示列',
+
     [','] = '，',
     ['.'] = '。',
 

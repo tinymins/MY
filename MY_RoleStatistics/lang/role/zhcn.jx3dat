@@ -97,6 +97,10 @@ return {
 
     ['Columns'] = '显示列',
     ['Columns alert when esc'] = '打开ESC界面提醒数值变化的列',
+    ['Move up'] = '上移',
+    ['Move down'] = '下移',
+    ['Delete'] = '删除',
+
     ['Today online '] = '今日在线',
     ['Current online '] = '本次登录',
     [','] = '，',

@@ -693,7 +693,7 @@ function D.UpdateUI(page)
 		end
 	end
 
-	Boilerplate.UI(wnd)
+	UI(wnd)
 		:Fetch('WndTable_Stat')
 		:Columns(D.GetColumns())
 		:DataSource(result)
@@ -770,60 +770,70 @@ function D.OnInitPage()
 		text = _L['Columns'],
 		menu = function()
 			local t, c, nMinW = {}, {}, 0
-			for i, szKey in ipairs(O.aColumn) do
-				local col = COLUMN_DICT[szKey]
-				if col then
-					table.insert(t, {
-						szOption = col.szTitle,
-						{
-							szOption = _L['Move up'],
-							fnAction = function()
-								if i > 1 then
-									O.aColumn[i], O.aColumn[i - 1] = O.aColumn[i - 1], O.aColumn[i]
-									O.aColumn = O.aColumn
+			local function UpdateMenu()
+				for i = 1, #t do
+					t[i] = nil
+				end
+				for i, szKey in ipairs(O.aColumn) do
+					local col = COLUMN_DICT[szKey]
+					if col then
+						table.insert(t, {
+							szOption = col.szTitle,
+							{
+								szOption = _L['Move up'],
+								fnAction = function()
+									if i > 1 then
+										local aColumn = O.aColumn
+										aColumn[i], aColumn[i - 1] = aColumn[i - 1], aColumn[i]
+										O.aColumn = aColumn
+										D.UpdateUI(page)
+									end
+									UpdateMenu()
+								end,
+							},
+							{
+								szOption = _L['Move down'],
+								fnAction = function()
+									if i < #O.aColumn then
+										local aColumn = O.aColumn
+										aColumn[i], aColumn[i + 1] = aColumn[i + 1], aColumn[i]
+										O.aColumn = aColumn
+										D.UpdateUI(page)
+									end
+									UpdateMenu()
+								end,
+							},
+							{
+								szOption = _L['Delete'],
+								fnAction = function()
+									local aColumn = O.aColumn
+									table.remove(aColumn, i)
+									O.aColumn = aColumn
 									D.UpdateUI(page)
-								end
-								UI.ClosePopupMenu()
-							end,
-						},
-						{
-							szOption = _L['Move down'],
+									UpdateMenu()
+								end,
+							},
+						})
+						c[szKey] = true
+						nMinW = nMinW + col.nMinWidth
+					end
+				end
+				for _, col in ipairs(COLUMN_LIST) do
+					if col.bTable and not c[col.szKey] then
+						table.insert(t, {
+							szOption = col.szTitle,
 							fnAction = function()
-								if i < #O.aColumn then
-									O.aColumn[i], O.aColumn[i + 1] = O.aColumn[i + 1], O.aColumn[i]
-									O.aColumn = O.aColumn
-									D.UpdateUI(page)
-								end
-								UI.ClosePopupMenu()
-							end,
-						},
-						{
-							szOption = _L['Delete'],
-							fnAction = function()
-								table.remove(O.aColumn, i)
-								O.aColumn = O.aColumn
+								local aColumn = O.aColumn
+								table.insert(aColumn, col.szKey)
+								O.aColumn = aColumn
+								UpdateMenu()
 								D.UpdateUI(page)
-								UI.ClosePopupMenu()
 							end,
-						},
-					})
-					c[szKey] = true
-					nMinW = nMinW + col.nMinWidth
+						})
+					end
 				end
 			end
-			for _, col in ipairs(COLUMN_LIST) do
-				if col.bTable and not c[col.szKey] then
-					table.insert(t, {
-						szOption = col.szTitle,
-						fnAction = function()
-							local aColumn = O.aColumn
-							table.insert(aColumn, col.szKey)
-							O.aColumn = aColumn
-							D.UpdateUI(page)
-						end,
-					})
-				end
-			end
+			UpdateMenu()
 			return t
 		end,
 	})
@@ -834,60 +844,70 @@ function D.OnInitPage()
 		text = _L['Columns alert when esc'],
 		menu = function()
 			local t, c = {}, {}
-			for nIndex, szKey in ipairs(O.aAlertColumn) do
-				local col = COLUMN_DICT[szKey]
-				if col then
-					table.insert(t, {
-						szOption = col.szTitle,
-						{
-							szOption = _L['Move up'],
+			local function UpdateMenu()
+				for i = 1, #t do
+					t[i] = nil
+				end
+				for nIndex, szKey in ipairs(O.aAlertColumn) do
+					local col = COLUMN_DICT[szKey]
+					if col then
+						table.insert(t, {
+							szOption = col.szTitle,
+							{
+								szOption = _L['Move up'],
+								fnAction = function()
+									if nIndex > 1 then
+										local aAlertColumn = O.aAlertColumn
+										aAlertColumn[nIndex], aAlertColumn[nIndex - 1] = aAlertColumn[nIndex - 1], aAlertColumn[nIndex]
+										O.aAlertColumn = aAlertColumn
+									end
+									UpdateMenu()
+								end,
+							},
+							{
+								szOption = _L['Move down'],
+								fnAction = function()
+									if nIndex < #O.aAlertColumn then
+										local aAlertColumn = O.aAlertColumn
+										aAlertColumn[nIndex], aAlertColumn[nIndex + 1] = aAlertColumn[nIndex + 1], aAlertColumn[nIndex]
+										O.aAlertColumn = aAlertColumn
+									end
+									UpdateMenu()
+								end,
+							},
+							{
+								szOption = _L['Delete'],
+								fnAction = function()
+									local aAlertColumn = O.aAlertColumn
+									table.remove(aAlertColumn, nIndex)
+									O.aAlertColumn = aAlertColumn
+									UpdateMenu()
+								end,
+							},
+						})
+						c[szKey] = true
+					end
+				end
+				for _, col in ipairs(COLUMN_LIST) do
+					if not c[col.szKey] and col.bAlertChange then
+						table.insert(t, {
+							szOption = col.szTitle,
 							fnAction = function()
-								if nIndex > 1 then
-									O.aAlertColumn[nIndex], O.aAlertColumn[nIndex - 1] = O.aAlertColumn[nIndex - 1], O.aAlertColumn[nIndex]
-									O.aAlertColumn = O.aAlertColumn
-								end
-								UI.ClosePopupMenu()
+								local aAlertColumn = O.aAlertColumn
+								table.insert(aAlertColumn, col.szKey)
+								O.aAlertColumn = aAlertColumn
+								UpdateMenu()
 							end,
-						},
-						{
-							szOption = _L['Move down'],
-							fnAction = function()
-								if nIndex < #O.aAlertColumn then
-									O.aAlertColumn[nIndex], O.aAlertColumn[nIndex + 1] = O.aAlertColumn[nIndex + 1], O.aAlertColumn[nIndex]
-									O.aAlertColumn = O.aAlertColumn
-								end
-								UI.ClosePopupMenu()
-							end,
-						},
-						{
-							szOption = _L['Delete'],
-							fnAction = function()
-								table.remove(O.aAlertColumn, nIndex)
-								O.aAlertColumn = O.aAlertColumn
-								UI.ClosePopupMenu()
-							end,
-						},
-					})
-					c[szKey] = true
+						})
+					end
 				end
 			end
-			for _, col in ipairs(COLUMN_LIST) do
-				if not c[col.szKey] and col.bAlertChange then
-					table.insert(t, {
-						szOption = col.szTitle,
-						fnAction = function()
-							table.insert(O.aAlertColumn, col.szKey)
-							O.aAlertColumn = O.aAlertColumn
-							UI.ClosePopupMenu()
-						end,
-					})
-				end
-			end
+			UpdateMenu()
 			return t
 		end,
 	})
 
-	Boilerplate.UI(wnd):Append('WndTable', {
+	UI(wnd):Append('WndTable', {
 		name = 'WndTable_Stat',
 		x = 20, y = 60, w = 960, h = 530,
 		sort = O.szSort,

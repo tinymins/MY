@@ -10,6 +10,8 @@ return {
         ['time'               ] = '快照時間',
         ['time_days'          ] = '快照計時',
 
+        ['equip_score'        ] = '裝備分數',
+        ['pet_score'          ] = '寵物分數',
         ['money'              ] = '金錢',
         ['account_stamina'    ] = '賬號精力',
         ['role_stamina'       ] = '角色精力',
@@ -34,10 +36,9 @@ return {
         ['coin'               ] = '通寶',
         ['mentor_score'       ] = '師徒',
 
-        ['equip_score'        ] = '裝備分數',
-        ['pet_score'          ] = '寵物分數',
     },
     COLUMN_TITLE_ABBR = {
+        ['equip_score'        ] = '裝分',
         ['pet_score'          ] = '寵物',
         ['role_stamina_remain'] = '精力周',
         ['contribution'       ] = '江貢',
@@ -82,10 +83,8 @@ return {
         ['money'] = '消耗金錢',
     },
 
-    ['Camp'                 ] = '陣營',
-    ['EquSC'                ] = '裝分',
-
-    ['Summary'] = '總計',
+    ['Current week can acquire (%d+) Langke Jian.'] = '本周還可獲得(%d+)份浪客箋。',
+    ['Current week can acquire (%d+) Langke Jian or Zhushu.'] = '本周還可獲得(%d+)份浪客箋及注疏值。',
 
     ['%d years %d days before'] = '%d年零%d天前',
     ['%d days %d hours before'] = '%d天%d小時前',
@@ -94,10 +93,16 @@ return {
     ['%d secs before'] = '%d秒前',
     ['Just now'] = '剛剛',
 
+    ['Summary'] = '總計',
+
     ['Columns'] = '顯示列',
     ['Columns alert when esc'] = '打開ESC界面提醒數值變化的列',
+    ['Move up'] = '上移',
+    ['Move down'] = '下移',
+    ['Delete'] = '刪除',
+
     ['Today online '] = '今日在線',
     ['Current online '] = '本次登錄',
-    ['Current week can acquire (%d+) Langke Jian.'] = '本周還可獲得(%d+)份浪客箋。',
-    ['Current week can acquire (%d+) Langke Jian or Zhushu.'] = '本周還可獲得(%d+)份浪客箋及注疏值。',
+    [','] = '，',
+    ['.'] = '。',
 }
