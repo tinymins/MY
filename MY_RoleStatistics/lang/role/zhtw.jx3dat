@@ -1,5 +1,10 @@
 return {
     ['MY_RoleStatistics_RoleStat'] = '角色統計',
+    ['%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.'] = '%s尚未啟用，該角色數據不會被統計並顯示到列表中，是否要現在開啟該角色的統計功能？\n選擇後該提示不會再次出現，日後您可以在該界面右上角點擊齒輪，隨時再次修改此項配置。',
+    ['%s stat float entry has not been enabled, are you willing to enable it?\nYou can change this config by click option button on the top-right conner.'] = '%s頭像浮動入口尚未啟用，無法快速查看該角色的統計信息，是否要現在開啟浮動入口功能？\n選擇後該提示不會再次出現，日後您可以在該界面右上角點擊齒輪，隨時再次修改此項配置。',
+
+    ['Ancient database detected, do you want to migrate data from it?'] = '發現舊版數據文件，是否立即遷移數據？',
+    ['Migrate succeed!'] = '舊版數據遷移成功！',
 
     COLUMN_TITLE = {
         ['region'             ] = '大區',

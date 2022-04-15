@@ -515,72 +515,137 @@ end
 
 function D.Migration()
 	local DB_V2_PATH = X.FormatPath({'userdata/role_statistics/role_stat.v2.db', X.PATH_TYPE.GLOBAL})
-	if not IsLocalFileExist(DB_V2_PATH) then
+	local DB_V3_PATH = X.FormatPath({'userdata/role_statistics/role_stat.v3.db', X.PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
 		return
 	end
 	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
+			local data = X.LoadLUAData(DATA_FILE) or {}
 			-- 转移V2旧版数据
 			if IsLocalFileExist(DB_V2_PATH) then
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
 				if DB_V2 then
-					DB:Execute('BEGIN TRANSACTION')
 					local aRoleInfo = DB_V2:Execute('SELECT * FROM RoleInfo WHERE guid IS NOT NULL AND name IS NOT NULL')
 					if aRoleInfo then
 						for _, rec in ipairs(aRoleInfo) do
-							DB_RoleInfoW:ClearBindings()
-							DB_RoleInfoW:BindAll(
-								rec.guid,
-								rec.account,
-								rec.region,
-								rec.server,
-								rec.name,
-								rec.force,
-								rec.level,
-								rec.equip_score,
-								rec.pet_score,
-								rec.gold,
-								rec.silver,
-								rec.copper,
-								rec.stamina or -1,
-								rec.stamina_max or -1,
-								rec.stamina_remain or -1,
-								rec.vigor or -1,
-								rec.vigor_max or -1,
-								rec.vigor_remain or -1,
-								rec.contribution,
-								rec.contribution_remain,
-								rec.justice,
-								rec.justice_remain,
-								rec.prestige,
-								rec.prestige_remain,
-								rec.camp_point,
-								rec.camp_point_percentage,
-								rec.camp_level,
-								rec.arena_award,
-								rec.arena_award_remain,
-								rec.exam_print,
-								rec.exam_print_remain,
-								rec.achievement_score,
-								rec.coin,
-								rec.mentor_score,
-								rec.starve,
-								rec.starve_remain,
-								rec.architecture,
-								rec.architecture_remain,
-								rec.time,
-								''
-							)
-							DB_RoleInfoW:Execute()
+							if not data[rec.guid] or data[rec.guid].time <= rec.time then
+								data[rec.guid] = {
+									guid = rec.guid,
+									account = rec.account,
+									region = rec.region,
+									server = rec.server,
+									name = rec.name,
+									force = rec.force,
+									level = rec.level,
+									equip_score = rec.equip_score,
+									pet_score = rec.pet_score,
+									money = {
+										nGold = rec.gold,
+										nSilver = rec.silver,
+										nCopper = rec.copper,
+									},
+									account_stamina = {
+										current = rec.stamina or -1,
+										max = rec.stamina_max or -1,
+									},
+									role_stamina = {
+										current = rec.vigor or -1,
+										max = rec.vigor_max or -1,
+									},
+									role_stamina_remain = rec.stamina_remain,
+									contribution = rec.contribution,
+									contribution_remain = rec.contribution_remain,
+									justice = rec.justice,
+									justice_remain = rec.justice_remain,
+									prestige = rec.prestige,
+									prestige_remain = rec.prestige_remain,
+									camp_point = rec.camp_point,
+									camp_level = { level = rec.camp_level, percent = rec.camp_point_percentage },
+									arena_award = rec.arena_award,
+									arena_award_remain = rec.arena_award_remain,
+									exam_print = rec.exam_print,
+									exam_print_remain = rec.exam_print_remain,
+									achievement_score = rec.achievement_score,
+									coin = { owner = rec.account .. '#' .. rec.region, value = rec.coin },
+									mentor_score = rec.mentor_score,
+									starve = rec.starve,
+									starve_remain = rec.starve_remain >= 0 and rec.starve_remain or nil,
+									architecture = rec.architecture,
+									architecture_remain = rec.architecture_remain,
+									time = rec.time,
+								}
+							end
 						end
-						DB_RoleInfoW:Reset()
 					end
-					DB:Execute('END TRANSACTION')
 					DB_V2:Release()
 				end
 				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
+			-- 转移V3旧版数据
+			if IsLocalFileExist(DB_V3_PATH) then
+				local DB_V3 = SQLite3_Open(DB_V3_PATH)
+				if DB_V3 then
+					local aRoleInfo = DB_V3:Execute('SELECT * FROM RoleInfo WHERE guid IS NOT NULL AND name IS NOT NULL')
+					if aRoleInfo then
+						for _, rec in ipairs(aRoleInfo) do
+							Output(rec.guid)
+							if not data[rec.guid] or data[rec.guid].time <= rec.time then
+								Output(1)
+								data[rec.guid] = {
+									guid = rec.guid,
+									account = rec.account,
+									region = rec.region,
+									server = rec.server,
+									name = rec.name,
+									force = rec.force,
+									level = rec.level,
+									equip_score = rec.equip_score,
+									pet_score = rec.pet_score,
+									money = {
+										nGold = rec.gold,
+										nSilver = rec.silver,
+										nCopper = rec.copper,
+									},
+									account_stamina = {
+										current = rec.stamina or -1,
+										max = rec.stamina_max or -1,
+									},
+									role_stamina = {
+										current = rec.vigor or -1,
+										max = rec.vigor_max or -1,
+									},
+									role_stamina_remain = rec.stamina_remain,
+									contribution = rec.contribution,
+									contribution_remain = rec.contribution_remain,
+									justice = rec.justice,
+									justice_remain = rec.justice_remain,
+									prestige = rec.prestige,
+									prestige_remain = rec.prestige_remain,
+									camp_point = rec.camp_point,
+									camp_level = { level = rec.camp_level, percent = rec.camp_point_percentage },
+									arena_award = rec.arena_award,
+									arena_award_remain = rec.arena_award_remain,
+									exam_print = rec.exam_print,
+									exam_print_remain = rec.exam_print_remain,
+									achievement_score = rec.achievement_score,
+									coin = { owner = rec.account .. '#' .. rec.region, value = rec.coin },
+									mentor_score = rec.mentor_score,
+									starve = rec.starve,
+									starve_remain = rec.starve_remain >= 0 and rec.starve_remain or nil,
+									architecture = rec.architecture,
+									architecture_remain = rec.architecture_remain,
+									time = rec.time,
+								}
+							end
+						end
+					end
+					DB_V3:Release()
+				end
+				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			X.SaveLUAData(DATA_FILE, data)
 			FireUIEvent('MY_ROLE_STAT_ROLE_UPDATE')
 			X.Alert(_L['Migrate succeed!'])
 		end)
@@ -1077,10 +1142,6 @@ function D.OnLButtonClick()
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
 		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
-			DB_RoleInfoD:ClearBindings()
-			DB_RoleInfoD:BindAll(AnsiToUTF8(wnd.guid))
-			DB_RoleInfoD:Execute()
-			DB_RoleInfoD:Reset()
 			D.UpdateUI(page)
 		end)
 	end
