@@ -43,6 +43,95 @@ local COMPONENT_SAMPLE = {
 	-- WndWebCef
 	-- WndWebPage
 	-- WndWindow
+	{
+		'WndTable',
+		'WndTable',
+		{
+			w = 600, h = 400,
+			columns = {
+				{
+					key = 'price',
+					title = 'Account Price',
+					titleRich = true,
+					titleTip = 'ACCOUNT PRICE!!!',
+					minWidth = 150,
+					alignHorizontal = 'left',
+					alignVertical = 'top',
+				},
+				{
+					key = 'text',
+					title = GetFormatText('Account Stamina', 162, 255, 255, 0),
+					titleRich = true,
+					titleTip = GetFormatText('ACCOUNT STAMINA!!!', 162, 255, 255, 0),
+					titleTipRich = true,
+					minWidth = 150,
+					render = function(value, record, index)
+						if value == '2' then
+							return GetFormatText('--', 162, 255, 255, 255)
+						end
+						return GetFormatText(record.text .. '/' .. record.text, 162, 255, 255, 255)
+					end,
+					sorter = function(v1, v2, r1, r2)
+						v1, v2 = tonumber(v1), tonumber(v2)
+						if v1 == v2 then
+							return 0
+						end
+						return v1 < v2 and -1 or 1
+					end,
+				},
+				{
+					key = 'price',
+					title = function() return GetFormatText('Account Price', 162, 255, 255, 0), true end,
+					titleTip = function() return GetFormatText('ACCOUNT PRICE!!!', 162, 255, 255, 0), true end,
+					minWidth = 150,
+					alignHorizontal = 'center',
+					alignVertical = 'middle',
+				},
+				{
+					key = 'price',
+					title = 'Account Price',
+					minWidth = 300,
+					alignHorizontal = 'right',
+					alignVertical = 'bottom',
+				},
+			},
+			dataSource = {
+				{ text = '1', price = '$1' },
+				{ text = '2', price = '$2' },
+				{ text = '3', price = '$3' },
+				{ text = '4', price = '$4' },
+				{ text = '5', price = '$5' },
+				{ text = '6', price = '$6' },
+				{ text = '7', price = '$7' },
+				{ text = '8', price = '$8' },
+				{ text = '9', price = '$9' },
+				{ text = '10', price = '$10' },
+				{ text = '11', price = '$11' },
+				{ text = '12', price = '$12' },
+				{ text = '13', price = '$13' },
+				{ text = '14', price = '$14' },
+				{ text = '15', price = '$15' },
+				{ text = '16', price = '$16' },
+				{ text = '17', price = '$17' },
+				{ text = '18', price = '$18' },
+				{ text = '19', price = '$19' },
+				{ text = '20', price = '$20' },
+				{ text = '21', price = '$21' },
+				{ text = '22', price = '$22' },
+				{ text = '23', price = '$23' },
+				{ text = '24', price = '$24' },
+				{ text = '25', price = '$25' },
+				{ text = '26', price = '$26' },
+				{ text = '27', price = '$27' },
+				{ text = '28', price = '$28' },
+				{ text = '29', price = '$29' },
+				{ text = '30', price = '$30' },
+				{ text = '31', price = '$31' },
+				{ text = '32', price = '$32' },
+			},
+			summary = { text = '32', price = '$32' },
+		},
+	},
 }
 
 local PS = {}
@@ -64,8 +153,14 @@ function PS.OnPanelActive(wnd)
 	local nX, nY = nPaddingX, nPaddingY
 
 	for _, v in ipairs(COMPONENT_SAMPLE) do
-		ui:Append('Shadow', { x = nX, y = nY + 22, w = W - nPaddingX * 2, h = 1, color = { 255, 255, 255 }, alpha = 100 })
 		nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', h = COMPONENT_H, font = 162, text = v[1] .. ': ' }):Width() + 5
+		if v[3].h > COMPONENT_H then
+			nX = nPaddingX
+			nY = nY + COMPONENT_H
+			ui:Append('Shadow', { x = nPaddingX, y = nY + v[3].h, w = W - nPaddingX * 2, h = 1, color = { 255, 255, 255 }, alpha = 100 })
+		else
+			ui:Append('Shadow', { x = nPaddingX, y = nY + 22, w = W - nPaddingX * 2, h = 1, color = { 255, 255, 255 }, alpha = 100 })
+		end
 		nX = nX + ui:Append(v[2], v[3]):Pos(nX, nY):Width() + 5
 		nX = nPaddingX
 		nY = nY + LH
