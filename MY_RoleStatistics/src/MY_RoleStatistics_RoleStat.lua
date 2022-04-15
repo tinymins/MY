@@ -769,8 +769,9 @@ function D.OnInitPage()
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
-			local t, c, nMinW = {}, {}, 0
+			local t = {}
 			local function UpdateMenu()
+				local c = {}
 				for i = 1, #t do
 					t[i] = nil
 				end
@@ -815,7 +816,6 @@ function D.OnInitPage()
 							},
 						})
 						c[szKey] = true
-						nMinW = nMinW + col.nMinWidth
 					end
 				end
 				for _, col in ipairs(COLUMN_LIST) do
@@ -843,8 +843,9 @@ function D.OnInitPage()
 		x = 600, y = 20, w = 180,
 		text = _L['Columns alert when esc'],
 		menu = function()
-			local t, c = {}, {}
+			local t = {}
 			local function UpdateMenu()
+				local c = {}
 				for i = 1, #t do
 					t[i] = nil
 				end
