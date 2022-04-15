@@ -522,10 +522,12 @@ function D.GetHistoryFiles()
 			end
 		end
 	end
-	for _, v in ipairs(CPath.GetFileList(szRoot)) do
-		if not tFileName[v] then
-			table.insert(aFileName, v)
-			tFileName[v] = true
+	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		for _, v in ipairs(CPath.GetFileList(szRoot)) do
+			if not tFileName[v] then
+				table.insert(aFileName, v)
+				tFileName[v] = true
+			end
 		end
 	end
 	for _, filename in ipairs(aFileName) do
@@ -594,6 +596,9 @@ end
 
 -- 保存缓存的历史数据
 function D.SaveHistory()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	for szFilePath, data in pairs(UNSAVED_CACHE) do
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_Recount_DS.SaveHistory: ' .. szFilePath, X.DEBUG_LEVEL.LOG)
