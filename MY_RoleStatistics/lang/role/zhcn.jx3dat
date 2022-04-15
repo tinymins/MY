@@ -100,6 +100,7 @@ return {
     ['Move up'] = '上移',
     ['Move down'] = '下移',
     ['Delete'] = '删除',
+    ['Click to move up.'] = '鼠标点击可上移当前选项。',
 
     ['Today online '] = '今日在线',
     ['Current online '] = '本次登录',

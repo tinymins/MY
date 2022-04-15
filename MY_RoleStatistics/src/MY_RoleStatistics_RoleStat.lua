@@ -775,44 +775,65 @@ function D.OnInitPage()
 				for i = 1, #t do
 					t[i] = nil
 				end
-				for i, szKey in ipairs(O.aColumn) do
+				for nIndex, szKey in ipairs(O.aColumn) do
 					local col = COLUMN_DICT[szKey]
 					if col then
 						table.insert(t, {
 							szOption = col.szTitle,
+							fnAction = function()
+								if nIndex > 1 then
+									local aColumn = O.aColumn
+									aColumn[nIndex], aColumn[nIndex - 1] = aColumn[nIndex - 1], aColumn[nIndex]
+									O.aColumn = aColumn
+									UpdateMenu()
+									D.UpdateUI(page)
+								end
+							end,
+							fnMouseEnter = function()
+								if nIndex > 1 then
+									local nX, nY = this:GetAbsX(), this:GetAbsY()
+									local nW, nH = this:GetW(), this:GetH()
+									OutputTip(GetFormatText(_L['Click to move up.'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.LEFT_RIGHT)
+								end
+							end,
+							fnMouseLeave = function()
+								HideTip()
+							end,
 							{
 								szOption = _L['Move up'],
 								fnAction = function()
-									if i > 1 then
+									if nIndex > 1 then
 										local aColumn = O.aColumn
-										aColumn[i], aColumn[i - 1] = aColumn[i - 1], aColumn[i]
+										aColumn[nIndex], aColumn[nIndex - 1] = aColumn[nIndex - 1], aColumn[nIndex]
 										O.aColumn = aColumn
+										UpdateMenu()
 										D.UpdateUI(page)
 									end
-									UpdateMenu()
 								end,
 							},
 							{
 								szOption = _L['Move down'],
 								fnAction = function()
-									if i < #O.aColumn then
+									if nIndex < #O.aColumn then
 										local aColumn = O.aColumn
-										aColumn[i], aColumn[i + 1] = aColumn[i + 1], aColumn[i]
+										aColumn[nIndex], aColumn[nIndex + 1] = aColumn[nIndex + 1], aColumn[nIndex]
 										O.aColumn = aColumn
+										UpdateMenu()
 										D.UpdateUI(page)
 									end
-									UpdateMenu()
 								end,
 							},
+							CONSTANT.MENU_DIVIDER,
 							{
 								szOption = _L['Delete'],
 								fnAction = function()
 									local aColumn = O.aColumn
-									table.remove(aColumn, i)
+									table.remove(aColumn, nIndex)
 									O.aColumn = aColumn
-									D.UpdateUI(page)
 									UpdateMenu()
+									D.UpdateUI(page)
 								end,
+								rgb = { 255, 128, 128 },
 							},
 						})
 						c[szKey] = true
@@ -854,6 +875,24 @@ function D.OnInitPage()
 					if col then
 						table.insert(t, {
 							szOption = col.szTitle,
+							fnAction = function()
+								if nIndex > 1 then
+									local aAlertColumn = O.aAlertColumn
+									aAlertColumn[nIndex], aAlertColumn[nIndex - 1] = aAlertColumn[nIndex - 1], aAlertColumn[nIndex]
+									O.aAlertColumn = aAlertColumn
+									UpdateMenu()
+								end
+							end,
+							fnMouseEnter = function()
+								if nIndex > 1 then
+									local nX, nY = this:GetAbsX(), this:GetAbsY()
+									local nW, nH = this:GetW(), this:GetH()
+									OutputTip(GetFormatText(_L['Click to move up.'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.LEFT_RIGHT)
+								end
+							end,
+							fnMouseLeave = function()
+								HideTip()
+							end,
 							{
 								szOption = _L['Move up'],
 								fnAction = function()
@@ -861,8 +900,8 @@ function D.OnInitPage()
 										local aAlertColumn = O.aAlertColumn
 										aAlertColumn[nIndex], aAlertColumn[nIndex - 1] = aAlertColumn[nIndex - 1], aAlertColumn[nIndex]
 										O.aAlertColumn = aAlertColumn
+										UpdateMenu()
 									end
-									UpdateMenu()
 								end,
 							},
 							{
@@ -872,10 +911,11 @@ function D.OnInitPage()
 										local aAlertColumn = O.aAlertColumn
 										aAlertColumn[nIndex], aAlertColumn[nIndex + 1] = aAlertColumn[nIndex + 1], aAlertColumn[nIndex]
 										O.aAlertColumn = aAlertColumn
+										UpdateMenu()
 									end
-									UpdateMenu()
 								end,
 							},
+							CONSTANT.MENU_DIVIDER,
 							{
 								szOption = _L['Delete'],
 								fnAction = function()
@@ -884,6 +924,7 @@ function D.OnInitPage()
 									O.aAlertColumn = aAlertColumn
 									UpdateMenu()
 								end,
+								rgb = { 255, 128, 128 },
 							},
 						})
 						c[szKey] = true
@@ -932,6 +973,7 @@ function D.OnInitPage()
 						X.SaveLUAData(DATA_FILE, data)
 						D.UpdateUI(page)
 					end,
+					rgb = { 255, 128, 128 },
 				},
 			}
 			PopupMenu(menu)

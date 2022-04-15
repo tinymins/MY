@@ -100,6 +100,7 @@ return {
     ['Move up'] = '上移',
     ['Move down'] = '下移',
     ['Delete'] = '刪除',
+    ['Click to move up.'] = '滑鼠點擊可上移當前選項。',
 
     ['Today online '] = '今日在線',
     ['Current online '] = '本次登錄',
