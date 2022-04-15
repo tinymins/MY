@@ -100,6 +100,9 @@ end
 
 do
 local function UpdateTeamMonData()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	if MY_TeamMon and MY_TeamMon.IterTable and MY_TeamMon.GetTable then
 		local aBuff = {}
 		for _, szType in ipairs({'BUFF', 'DEBUFF'}) do
@@ -132,6 +135,9 @@ end
 
 do
 local function UpdateOfficialBuff()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	local RaidPanelBuff = X.GetGameTable('RaidPanelBuff')
 	if not RaidPanelBuff or not X.IsRestricted('MY_CataclysmMain__OfficialBuff') then
 		local szPath = X.FormatPath({'userdata\\cataclysm\\official_buff.tab', X.PATH_TYPE.GLOBAL})
@@ -866,6 +872,9 @@ function D.OnEvent(szEvent)
 		end
 		OnBuffUpdate(arg0, arg4, arg8, arg5, arg9)
 	elseif szEvent == 'PLAYER_ENTER_SCENE' then
+		if ENVIRONMENT.RUNTIME_OPTIMIZE then
+			return
+		end
 		local me = GetClientPlayer()
 		if not me then
 			return
@@ -932,6 +941,9 @@ end
 do
 local i = 1
 function D.FrameBuffRefreshCall()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	local team = GetClientTeam()
 	if not team then
 		return
@@ -952,6 +964,9 @@ end
 end
 
 function D.UpdateOTAction(frame)
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	local me = GetClientPlayer()
 	if not me then
 		return
@@ -1327,6 +1342,9 @@ X.RegisterEvent('PARTY_RESET', function()
 end)
 
 X.RegisterUserSettingsUpdate('@@INIT@@', function()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE and CFG.nDrawInterval == 4 then
+		CFG.nDrawInterval = 32
+	end
 	X.WithClientPlayer(function(me)
 		D.CheckCataclysmEnable()
 		D.UpdateBuffListCache()

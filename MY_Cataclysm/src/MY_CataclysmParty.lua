@@ -779,6 +779,9 @@ local function HideTTarget()
 	end
 end
 function CTM:RefreshTTarget()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	if CFG.bShowTargetTargetAni then
 		local dwType, dwID = Target_GetTargetData()
 		if dwID then
@@ -817,6 +820,9 @@ local function HideBossTarget(dwTarID)
 	end
 end
 function CTM:RefreshBossTarget()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	local tKeep = {}
 	if CFG.bShowBossTarget then
 		for dwNpcID, npc in pairs(CTM_BOSS_CACHE) do
@@ -854,6 +860,9 @@ function CTM:RefreshThreat(dwNpcID, dwTarID)
 end
 
 function CTM:RefreshAttention()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	if CFG.bShowAttention then
 		local team, me = GetClientTeam(), GetClientPlayer()
 		local tKeep = {}
@@ -888,6 +897,9 @@ function CTM:RefreshAttention()
 end
 
 function CTM:RefreshCaution()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	if CFG.bShowCaution or CFG.bShowBossFocus then
 		local team, me = GetClientTeam(), GetClientPlayer()
 		local tKeep = {}
@@ -980,6 +992,9 @@ function CTM:RefreshSFX()
 end
 
 function CTM:RefreshGVoice()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	local team = GetClientTeam()
 	local sayingInfo = X.GVoiceBase_GetSaying()
 	local bInRoom = X.GVoiceBase_GetMicState() ~= CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM
@@ -1715,6 +1730,9 @@ function D.UpdateCharaterBuff(p, handle, tKeep)
 end
 
 function CTM:RefreshBuff()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	local team = GetClientTeam()
 	local tKeep = {}
 	for k, v in ipairs(team.GetTeamMemberList()) do
@@ -1741,6 +1759,9 @@ function CTM:RecBossFocusBuff(dwMemberID, data)
 end
 
 function CTM:RefreshBossFocus()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	local team, me = GetClientTeam(), GetClientPlayer()
 	for k, v in ipairs(team.GetTeamMemberList()) do
 		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() then
@@ -1761,6 +1782,9 @@ function CTM:RefreshBossFocus()
 end
 
 function CTM:RefreshDistance()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	for k, v in pairs(CTM_CACHE) do
 		if v:IsValid() then
 			local p = GetPlayer(k) -- info.nPoX 刷新太慢了 对于治疗来说 这个太重要了
@@ -2067,6 +2091,9 @@ end
 
 -- 重绘溅射助手
 function CTM:RefreshSputtering()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	local team = GetClientTeam()
 	if CFG.bShowSputtering then
 		for nGroup = 0, team.nGroupNum - 1 do
