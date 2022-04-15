@@ -812,13 +812,38 @@ local function InitComponent(raw, szType)
 				if i == 0 then
 					hCol:Lookup('Image_TableColumn_Break'):Hide()
 				end
-				local szXml
+				-- 标题
+				local szTitle, bTitleRich = col.title, col.titleRich
 				if X.IsFunction(col.title) then
-					szXml = col.title(col)
-				else
-					szXml = GetFormatText(col.title or '')
+					szTitle, bTitleRich = col.title(col)
 				end
-				hContent:AppendItemFromString(szXml)
+				if not bTitleRich then
+					szTitle = GetFormatText(szTitle)
+				end
+				hContent:AppendItemFromString(szTitle)
+				-- 标题 Tip
+				if col.titleTip then
+					hCol.OnItemMouseEnter = function()
+						local szText, bRich = col.titleTip, col.titleTipRich
+						if X.IsFunction(col.titleTip) then
+							szText, bRich = col.titleTip(col)
+						end
+						if X.IsEmpty(szText) then
+							return
+						end
+						if not bRich then
+							szText = GetFormatText(szText, 162, 255, 255, 255)
+						end
+						local nX, nY = this:GetAbsPos()
+						local nW, nH = this:GetSize()
+						nX = math.max(nX, raw:GetAbsX())
+						OutputTip(szText, 400, {nX, nY, nW, nH}, ALW.TOP_BOTTOM)
+					end
+					hCol.OnItemMouseLeave = function()
+						HideTip()
+					end
+				end
+				-- 排序
 				hCol.OnItemLButtonClick = function()
 					if GetComponentProp(raw, 'SortKey') == col.key then
 						SetComponentProp(raw, 'SortOrder', GetComponentProp(raw, 'SortOrder') == 'asc' and 'desc' or 'asc')
@@ -829,8 +854,6 @@ local function InitComponent(raw, szType)
 					GetComponentProp(raw, 'UpdateSorterStatus')()
 					GetComponentProp(raw, 'DrawTableContent')()
 				end
-				hCol.szTip = col.titleTip
-				hCol.szDebugTip = 'key: ' .. col.key
 			end
 			GetComponentProp(raw, 'UpdateTitleColumnsWidth')()
 			GetComponentProp(raw, 'UpdateSorterStatus')()
