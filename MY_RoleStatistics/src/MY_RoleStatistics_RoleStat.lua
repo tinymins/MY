@@ -590,9 +590,7 @@ function D.Migration()
 					local aRoleInfo = DB_V3:Execute('SELECT * FROM RoleInfo WHERE guid IS NOT NULL AND name IS NOT NULL')
 					if aRoleInfo then
 						for _, rec in ipairs(aRoleInfo) do
-							Output(rec.guid)
 							if not data[rec.guid] or data[rec.guid].time <= rec.time then
-								Output(1)
 								data[rec.guid] = {
 									guid = rec.guid,
 									account = rec.account,
@@ -846,20 +844,29 @@ function D.OnInitPage()
 						table.insert(t, {
 							szOption = col.szTitle,
 							fnAction = function()
-								if nIndex > 1 then
-									local aColumn = O.aColumn
-									aColumn[nIndex], aColumn[nIndex - 1] = aColumn[nIndex - 1], aColumn[nIndex]
-									O.aColumn = aColumn
-									UpdateMenu()
-									D.UpdateUI(page)
+								local nOffset = IsShiftKeyDown() and 1 or -1
+								if nIndex + nOffset < 1 or nIndex + nOffset > #O.aColumn then
+									return
 								end
+								local aColumn = O.aColumn
+								aColumn[nIndex], aColumn[nIndex + nOffset] = aColumn[nIndex + nOffset], aColumn[nIndex]
+								O.aColumn = aColumn
+								UpdateMenu()
+								D.UpdateUI(page)
 							end,
 							fnMouseEnter = function()
-								if nIndex > 1 then
-									local nX, nY = this:GetAbsX(), this:GetAbsY()
-									local nW, nH = this:GetW(), this:GetH()
-									OutputTip(GetFormatText(_L['Click to move up.'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.LEFT_RIGHT)
+								if #O.aColumn == 1 then
+									return
 								end
+								local szText = _L['Click to move up, Hold SHIFT to move down.']
+								if nIndex == 1 then
+									szText = _L['Hold SHIFT click to move down.']
+								elseif nIndex == #O.aColumn then
+									szText = _L['Click to move up.']
+								end
+								local nX, nY = this:GetAbsX(), this:GetAbsY()
+								local nW, nH = this:GetW(), this:GetH()
+								OutputTip(GetFormatText(szText, nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.LEFT_RIGHT)
 							end,
 							fnMouseLeave = function()
 								HideTip()
@@ -941,19 +948,28 @@ function D.OnInitPage()
 						table.insert(t, {
 							szOption = col.szTitle,
 							fnAction = function()
-								if nIndex > 1 then
-									local aAlertColumn = O.aAlertColumn
-									aAlertColumn[nIndex], aAlertColumn[nIndex - 1] = aAlertColumn[nIndex - 1], aAlertColumn[nIndex]
-									O.aAlertColumn = aAlertColumn
-									UpdateMenu()
+								local nOffset = IsShiftKeyDown() and 1 or -1
+								if nIndex + nOffset < 1 or nIndex + nOffset > #O.aAlertColumn then
+									return
 								end
+								local aAlertColumn = O.aAlertColumn
+								aAlertColumn[nIndex], aAlertColumn[nIndex+ nOffset] = aAlertColumn[nIndex+ nOffset], aAlertColumn[nIndex]
+								O.aAlertColumn = aAlertColumn
+								UpdateMenu()
 							end,
 							fnMouseEnter = function()
-								if nIndex > 1 then
-									local nX, nY = this:GetAbsX(), this:GetAbsY()
-									local nW, nH = this:GetW(), this:GetH()
-									OutputTip(GetFormatText(_L['Click to move up.'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.LEFT_RIGHT)
+								if #O.aAlertColumn == 1 then
+									return
 								end
+								local szText = _L['Click to move up, Hold SHIFT to move down.']
+								if nIndex == 1 then
+									szText = _L['Hold SHIFT click to move down.']
+								elseif nIndex == #O.aAlertColumn then
+									szText = _L['Click to move up.']
+								end
+								local nX, nY = this:GetAbsX(), this:GetAbsY()
+								local nW, nH = this:GetW(), this:GetH()
+								OutputTip(GetFormatText(szText, nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.LEFT_RIGHT)
 							end,
 							fnMouseLeave = function()
 								HideTip()
@@ -1190,7 +1206,6 @@ end)
 
 X.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', function()
 	local rec = D.GetClientPlayerRec()
-	Output(O.tAlertTodayVal, D.tAlertSessionVal, rec)
 
 	local aText, aDailyText = {}, {}
 	for _, szKey in ipairs(O.aAlertColumn) do

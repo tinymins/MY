@@ -106,6 +106,8 @@ return {
     ['Move down'] = '下移',
     ['Delete'] = '删除',
     ['Click to move up.'] = '鼠标点击可上移当前选项。',
+    ['Click to move up, Hold SHIFT to move down.'] = '鼠标点击可上移当前选项，按住 SHIFT 点击可下移当前选项。',
+    ['Hold SHIFT click to move down.'] = '按住 SHIFT 鼠标点击可下移当前选项。',
 
     ['Today online '] = '今日在线',
     ['Current online '] = '本次登录',
