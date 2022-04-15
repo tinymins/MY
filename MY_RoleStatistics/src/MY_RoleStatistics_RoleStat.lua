@@ -702,7 +702,7 @@ function D.UpdateSaveDB()
 	FireUIEvent('MY_ROLE_STAT_ROLE_UPDATE')
 end
 
-function D.GetColumns()
+function D.GetTableColumns()
 	local aCol = {}
 	for _, szKey in ipairs(O.aColumn) do
 		local col = COLUMN_DICT[szKey]
@@ -710,6 +710,7 @@ function D.GetColumns()
 			table.insert(aCol, {
 				key = col.szKey,
 				title = col.szTitleAbbr,
+				titleTip = col.szTitle,
 				minWidth = col.nMinWidth,
 				maxWidth = col.nMaxWidth,
 				alignHorizontal = col.szAlignHorizontal or 'center',
@@ -770,30 +771,9 @@ function D.UpdateUI(page)
 
 	UI(wnd)
 		:Fetch('WndTable_Stat')
-		:Columns(D.GetColumns())
+		:Columns(D.GetTableColumns())
 		:DataSource(result)
 		:Summary(summary)
-
-		-- -- »æÖÆ¸´Ñ¡¿ò
-		-- UI(hRow):Append('CheckBox', {
-		-- 	x = 5, y = 2, w = EXCEL_WIDTH - 10,
-		-- 	checked = X.IsEmpty(O.tSummaryIgnoreGUID) or not O.tSummaryIgnoreGUID[rec.guid] or false,
-		-- 	onCheck = function(bCheck)
-		-- 		O.tSummaryIgnoreGUID[rec.guid] = not bCheck or nil
-		-- 		O.tSummaryIgnoreGUID = O.tSummaryIgnoreGUID
-		-- 		D.UpdateUI(page)
-		-- 	end,
-		-- 	visible = D.bConfigSummary or false,
-		-- })
-
-	-- hItemContent:AppendItemFromString(col.GetSummaryFormatText and col.GetSummaryFormatText(aSum) or GetFormatText('--'))
-end
-
-function D.DecodeRow(rec)
-	rec.guid   = UTF8ToAnsi(rec.guid)
-	rec.name   = UTF8ToAnsi(rec.name)
-	rec.region = UTF8ToAnsi(rec.region)
-	rec.server = UTF8ToAnsi(rec.server)
 end
 
 function D.GetRowTip(rec)
