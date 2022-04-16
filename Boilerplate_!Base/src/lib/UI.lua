@@ -772,12 +772,15 @@ local function InitComponent(raw, szType)
 			end
 			local nRawWidth, nRawHeight = raw:GetSize()
 			-- 左侧固定列
+			local nX = 0
 			local nFixedLWidth = GetComponentProp(raw, 'nFixedLColumnsWidth')
 			local aFixedLColumns = GetComponentProp(raw, 'aFixedLColumns')
 			local hFixedLColumns = raw:Lookup('', 'Handle_Fixed_L_TableColumns')
 			for i, col in ipairs(aFixedLColumns) do
 				local hCol = hFixedLColumns:Lookup(i - 1)
 				local nWidth = col.width
+				hCol:SetRelX(nX)
+				nX = nX + nWidth
 				hCol:Lookup('Image_TableColumn_Break'):SetRelX(nWidth)
 				hCol:Lookup('Image_TableColumn_Break'):Show()
 				UpdateTitleColumnRect(hCol, col, nWidth, nRawHeight)
@@ -787,12 +790,15 @@ local function InitComponent(raw, szType)
 			raw:Lookup('', 'Handle_Fixed_L_Summary'):SetW(nFixedLWidth)
 			raw:Lookup('', 'Handle_Fixed_L_Scroll_Y_Wrapper'):SetW(nFixedLWidth)
 			-- 右侧固定列
+			local nX = 0
 			local nFixedRWidth = GetComponentProp(raw, 'nFixedRColumnsWidth')
 			local aFixedRColumns = GetComponentProp(raw, 'aFixedRColumns')
 			local hFixedRColumns = raw:Lookup('', 'Handle_Fixed_R_TableColumns')
 			for i, col in ipairs(aFixedRColumns) do
 				local hCol = hFixedRColumns:Lookup(i - 1)
 				local nWidth = col.width
+				hCol:SetRelX(nX)
+				nX = nX + nWidth
 				UpdateTitleColumnRect(hCol, col, nWidth, nRawHeight)
 			end
 			hFixedRColumns:SetRelX(nRawWidth - nFixedRWidth)
