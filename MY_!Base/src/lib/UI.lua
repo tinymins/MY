@@ -675,17 +675,18 @@ local function InitComponent(raw, szType)
 			local nFixedLWidth = GetComponentProp(raw, 'nFixedLColumnsWidth')
 			local nFixedRWidth = GetComponentProp(raw, 'nFixedRColumnsWidth')
 			hTotal:SetSize(nRawWidth, nRawHeight)
-			hTotal:Lookup('Image_Table_Border'):SetSize(nRawWidth, nRawHeight)
+			hTotal:Lookup('Image_Table_Border'):SetRelPos(-1, -1)
+			hTotal:Lookup('Image_Table_Border'):SetSize(nRawWidth + 2, nRawHeight + 2)
 			hTotal:Lookup('Image_Table_Background'):SetSize(nRawWidth - 4, nRawHeight - 30)
 			hTotal:Lookup('Image_Table_TitleHr'):SetW(nRawWidth - 6)
 			-- 左侧固定列
-			hTotal:Lookup('Handle_Fixed_L_TableColumns'):SetW(nFixedLWidth)
+			hTotal:Lookup('Handle_Fixed_L_TableColumns'):SetSize(nFixedLWidth, nRawHeight)
 			hTotal:Lookup('Handle_Fixed_L_Scroll_Y_Wrapper'):SetW(nFixedLWidth)
 			hTotal:Lookup('Handle_Fixed_L_Scroll_Y_Wrapper'):SetH(nRawHeight - 60)
 			hTotal:Lookup('Handle_Fixed_L_Summary'):SetRelX(nFixedLWidth)
 			hTotal:Lookup('Handle_Fixed_L_Summary'):SetRelY(nRawHeight - 30)
 			-- 右侧固定列
-			hTotal:Lookup('Handle_Fixed_R_TableColumns'):SetW(nFixedRWidth)
+			hTotal:Lookup('Handle_Fixed_R_TableColumns'):SetSize(nFixedRWidth, nRawHeight)
 			hTotal:Lookup('Handle_Fixed_R_TableColumns'):SetRelX(nRawWidth - nFixedRWidth)
 			hTotal:Lookup('Handle_Fixed_R_Scroll_Y_Wrapper'):SetW(nFixedRWidth)
 			hTotal:Lookup('Handle_Fixed_R_Scroll_Y_Wrapper'):SetRelX(nRawWidth - nFixedRWidth)
@@ -765,7 +766,8 @@ local function InitComponent(raw, szType)
 				end
 				imgAsc:SetRelX(nWidth - nSortDelta)
 				imgDesc:SetRelX(nWidth - nSortDelta)
-				imgBreak:SetH(nHeight)
+				imgBreak:SetRelY(2)
+				imgBreak:SetH(nHeight - 3)
 				hCol:FormatAllItemPos()
 			end
 			local nRawWidth, nRawHeight = raw:GetSize()
@@ -824,6 +826,9 @@ local function InitComponent(raw, szType)
 				local nWidth = i == #aScrollableColumns
 					and (nScrollX - nX)
 					or math.min(nExtraWidth * nMinWidth / (nScrollX - nExtraWidth) + nMinWidth, col.maxWidth or math.huge)
+				if i == 1 then
+					hCol:Lookup('Image_TableColumn_Break'):Hide()
+				end
 				UpdateTitleColumnRect(hCol, col, nWidth, nRawHeight)
 				hCol:SetRelX(nX)
 				nX = nX + nWidth
