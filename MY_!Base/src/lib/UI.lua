@@ -741,21 +741,23 @@ local function InitComponent(raw, szType)
 		-- 自适应表头宽高
 		SetComponentProp(raw, 'UpdateTitleColumnsRect', function()
 			local function UpdateTitleColumnRect(hCol, col, nWidth, nHeight)
-				local hContent = hCol:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
+				local hContentWrapper = hCol:Lookup('Handle_TableColumn_Content_Wrapper') -- 外部居中层
+				local hContent = hContentWrapper:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
 				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
 				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
 				local imgBreak = hCol:Lookup('Image_TableColumn_Break')
 				local nSortDelta = nWidth > 70 and 25 or 15
 				hCol:SetW(nWidth)
+				hContentWrapper:SetW(nWidth)
 				hContent:SetW(99999)
 				hContent:FormatAllItemPos()
 				hContent:SetSizeByAllItemSize()
 				if col.alignVertical == 'top' then
 					hContent:SetRelY(0)
 				elseif col.alignVertical == 'middle' or col.alignVertical == nil then
-					hContent:SetRelY((hCol:GetH() - hContent:GetH()) / 2)
+					hContent:SetRelY((hContentWrapper:GetH() - hContent:GetH()) / 2)
 				elseif col.alignVertical == 'bottom' then
-					hContent:SetRelY(hCol:GetH() - hContent:GetH())
+					hContent:SetRelY(hContentWrapper:GetH() - hContent:GetH())
 				end
 				if col.alignHorizontal == 'left' or col.alignHorizontal == nil then
 					hContent:SetRelX(5)
@@ -768,6 +770,7 @@ local function InitComponent(raw, szType)
 				imgDesc:SetRelX(nWidth - nSortDelta)
 				imgBreak:SetRelY(2)
 				imgBreak:SetH(nHeight - 3)
+				hContentWrapper:FormatAllItemPos()
 				hCol:FormatAllItemPos()
 			end
 			local nRawWidth, nRawHeight = raw:GetSize()
@@ -908,8 +911,9 @@ local function InitComponent(raw, szType)
 			local function DrawColumnTitle(hColumns, aColumns)
 				hColumns:Clear()
 				for i, col in ipairs(aColumns) do
-					local hCol = hColumns:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_TableColumn') -- 外部居中层
-					local hContent = hCol:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
+					local hCol = hColumns:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_TableColumn')
+					local hContentWrapper = hCol:Lookup('Handle_TableColumn_Content_Wrapper') -- 外部居中层
+					local hContent = hContentWrapper:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
 					if i == 0 then
 						hCol:Lookup('Image_TableColumn_Break'):Hide()
 					end
