@@ -776,6 +776,8 @@ local function InitComponent(raw, szType)
 			for i, col in ipairs(aFixedLColumns) do
 				local hCol = hFixedLColumns:Lookup(i - 1)
 				local nWidth = col.width
+				hCol:Lookup('Image_TableColumn_Break'):SetRelX(nWidth)
+				hCol:Lookup('Image_TableColumn_Break'):Show()
 				UpdateTitleColumnRect(hCol, col, nWidth, nRawHeight)
 			end
 			hFixedLColumns:SetW(nFixedLWidth)
@@ -831,8 +833,8 @@ local function InitComponent(raw, szType)
 			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X'):SetW(nX)
 			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper'):SetW(nX)
 			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper/Handle_Scroll_Y'):SetW(nX)
-			raw:Lookup('', 'Handle_Scroll_X_Wrapper'):SetRelX(nFixedLWidth)
-			raw:Lookup('', 'Handle_Scroll_X_Wrapper'):SetSize(nRawWidth - nFixedLWidth - nFixedRWidth, nRawHeight)
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper'):SetRelX(nFixedLWidth + (nFixedLWidth > 0 and 1 or 0))
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper'):SetSize(nRawWidth - nFixedLWidth - (nFixedLWidth > 0 and 1 or 0) - nFixedRWidth - (nFixedRWidth > 0 and 1 or 0), nRawHeight)
 			raw:Lookup('', ''):FormatAllItemPos()
 			-- 汇总水平滚动区
 			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Summary'):SetW(nX)
