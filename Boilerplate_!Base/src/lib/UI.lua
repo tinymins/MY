@@ -824,6 +824,9 @@ local function InitComponent(raw, szType)
 				local nWidth = i == #aScrollableColumns
 					and (nScrollX - nX)
 					or math.min(nExtraWidth * nMinWidth / (nScrollX - nExtraWidth) + nMinWidth, col.maxWidth or math.huge)
+				if i == 1 then
+					hCol:Lookup('Image_TableColumn_Break'):Hide()
+				end
 				UpdateTitleColumnRect(hCol, col, nWidth, nRawHeight)
 				hCol:SetRelX(nX)
 				nX = nX + nWidth
