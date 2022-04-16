@@ -772,12 +772,15 @@ local function InitComponent(raw, szType)
 			end
 			local nRawWidth, nRawHeight = raw:GetSize()
 			-- 左侧固定列
+			local nX = 0
 			local nFixedLWidth = GetComponentProp(raw, 'nFixedLColumnsWidth')
 			local aFixedLColumns = GetComponentProp(raw, 'aFixedLColumns')
 			local hFixedLColumns = raw:Lookup('', 'Handle_Fixed_L_TableColumns')
 			for i, col in ipairs(aFixedLColumns) do
 				local hCol = hFixedLColumns:Lookup(i - 1)
 				local nWidth = col.width
+				hCol:SetRelX(nX)
+				nX = nX + nWidth
 				hCol:Lookup('Image_TableColumn_Break'):SetRelX(nWidth)
 				hCol:Lookup('Image_TableColumn_Break'):Show()
 				UpdateTitleColumnRect(hCol, col, nWidth, nRawHeight)
@@ -787,12 +790,15 @@ local function InitComponent(raw, szType)
 			raw:Lookup('', 'Handle_Fixed_L_Summary'):SetW(nFixedLWidth)
 			raw:Lookup('', 'Handle_Fixed_L_Scroll_Y_Wrapper'):SetW(nFixedLWidth)
 			-- 右侧固定列
+			local nX = 0
 			local nFixedRWidth = GetComponentProp(raw, 'nFixedRColumnsWidth')
 			local aFixedRColumns = GetComponentProp(raw, 'aFixedRColumns')
 			local hFixedRColumns = raw:Lookup('', 'Handle_Fixed_R_TableColumns')
 			for i, col in ipairs(aFixedRColumns) do
 				local hCol = hFixedRColumns:Lookup(i - 1)
 				local nWidth = col.width
+				hCol:SetRelX(nX)
+				nX = nX + nWidth
 				UpdateTitleColumnRect(hCol, col, nWidth, nRawHeight)
 			end
 			hFixedRColumns:SetRelX(nRawWidth - nFixedRWidth)
@@ -838,8 +844,8 @@ local function InitComponent(raw, szType)
 			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X'):SetW(nX)
 			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper'):SetW(nX)
 			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper/Handle_Scroll_Y'):SetW(nX)
-			raw:Lookup('', 'Handle_Scroll_X_Wrapper'):SetRelX(nFixedLWidth + (nFixedLWidth > 0 and 1 or 0))
-			raw:Lookup('', 'Handle_Scroll_X_Wrapper'):SetSize(nRawWidth - nFixedLWidth - (nFixedLWidth > 0 and 1 or 0) - nFixedRWidth - (nFixedRWidth > 0 and 1 or 0), nRawHeight)
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper'):SetRelX(nFixedLWidth)
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper'):SetSize(nRawWidth - nFixedLWidth - nFixedRWidth, nRawHeight)
 			raw:Lookup('', ''):FormatAllItemPos()
 			-- 汇总水平滚动区
 			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Summary'):SetW(nX)
@@ -1060,6 +1066,30 @@ local function InitComponent(raw, szType)
 						local nW, nH = raw:GetW(), this:GetH()
 						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), false, rec, nRowIndex, { nX, nY, nW, nH })
 					end
+					hRow.OnItemMouseIn = function()
+						for _, szPath in ipairs({
+							'Handle_Fixed_L_Scroll_Y_Wrapper/Handle_Fixed_L_Scroll_Y',
+							'Handle_Fixed_R_Scroll_Y_Wrapper/Handle_Fixed_R_Scroll_Y',
+							'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper/Handle_Scroll_Y',
+						}) do
+							local hL = raw:Lookup('', szPath)
+							for i = 0, hL:GetItemCount() - 1 do
+								hL:Lookup(i):Lookup('Image_RowHover'):SetVisible(i + 1 == nRowIndex)
+							end
+						end
+					end
+					hRow.OnItemMouseOut = function()
+						for _, szPath in ipairs({
+							'Handle_Fixed_L_Scroll_Y_Wrapper/Handle_Fixed_L_Scroll_Y',
+							'Handle_Fixed_R_Scroll_Y_Wrapper/Handle_Fixed_R_Scroll_Y',
+							'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper/Handle_Scroll_Y',
+						}) do
+							local hL = raw:Lookup('', szPath)
+							for i = 0, hL:GetItemCount() - 1 do
+								hL:Lookup(i):Lookup('Image_RowHover'):Hide()
+							end
+						end
+					end
 					hRow.OnItemLButtonClick = function()
 						X.SafeCall(GetComponentProp(raw, 'RowLClick'), rec, nRowIndex)
 					end
@@ -1197,6 +1227,30 @@ local function InitComponent(raw, szType)
 							szXml = GetFormatText(rec[col.key])
 						end
 						hItemContent:AppendItemFromString(szXml)
+					end
+				end
+				hRow.OnItemMouseIn = function()
+					for _, szPath in ipairs({
+						'Handle_Fixed_L_Summary',
+						'Handle_Fixed_R_Summary',
+						'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Summary',
+					}) do
+						local hL = raw:Lookup('', szPath)
+						for i = 0, hL:GetItemCount() - 1 do
+							hL:Lookup(i):Lookup('Image_RowHover'):SetVisible(i + 1 == 1)
+						end
+					end
+				end
+				hRow.OnItemMouseOut = function()
+					for _, szPath in ipairs({
+						'Handle_Fixed_L_Summary',
+						'Handle_Fixed_R_Summary',
+						'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Summary',
+					}) do
+						local hL = raw:Lookup('', szPath)
+						for i = 0, hL:GetItemCount() - 1 do
+							hL:Lookup(i):Lookup('Image_RowHover'):Hide()
+						end
 					end
 				end
 			end
