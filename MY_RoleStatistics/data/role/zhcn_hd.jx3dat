@@ -1,17 +1,3 @@
-local function GetFormatSysmsgText(szText)
-	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
-end
-local function GeneCommonSummaryFormatText(id)
-	return function(rs, env)
-		local v = 0
-		for _, r in ipairs(rs) do
-			if env.IsNumber(r[id]) then
-				v = v + r[id]
-			end
-		end
-		return env.GetFormatText(v, 162, 255, 255, 255)
-	end
-end
 return {
 	-- 装分
 	{
@@ -410,7 +396,6 @@ return {
 		GetValue = function(env, swap, prevVal, prevRec)
 			return env.me.nExamPrint
 		end,
-		GetSummaryFormatText = GeneCommonSummaryFormatText('exam_print'),
 	},
 	-- 监本周余
 	{
