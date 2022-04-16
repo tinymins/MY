@@ -959,7 +959,7 @@ function D.OnInitPage()
 									return
 								end
 								local aAlertColumn = O.aAlertColumn
-								aAlertColumn[nIndex], aAlertColumn[nIndex+ nOffset] = aAlertColumn[nIndex+ nOffset], aAlertColumn[nIndex]
+								aAlertColumn[nIndex], aAlertColumn[nIndex + nOffset] = aAlertColumn[nIndex + nOffset], aAlertColumn[nIndex]
 								O.aAlertColumn = aAlertColumn
 								UpdateMenu()
 							end,

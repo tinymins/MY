@@ -52,6 +52,9 @@ return {
     ['Just now'] = '刚刚',
 
     ['Columns'] = '显示列',
+    ['Click to move up.'] = '鼠标点击可上移当前选项。',
+    ['Click to move up, Hold SHIFT to move down.'] = '鼠标点击可上移当前选项，按住 SHIFT 点击可下移当前选项。',
+    ['Hold SHIFT click to move down.'] = '按住 SHIFT 鼠标点击可下移当前选项。',
 
     [','] = '，',
     ['.'] = '。',
