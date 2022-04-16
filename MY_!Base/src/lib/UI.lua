@@ -781,7 +781,7 @@ local function InitComponent(raw, szType)
 				local nWidth = col.width
 				hCol:SetRelX(nX)
 				nX = nX + nWidth
-				hCol:Lookup('Image_TableColumn_Break'):SetRelX(nWidth)
+				hCol:Lookup('Image_TableColumn_Break'):SetRelX(nWidth - 3)
 				hCol:Lookup('Image_TableColumn_Break'):Show()
 				UpdateTitleColumnRect(hCol, col, nWidth, nRawHeight)
 			end
