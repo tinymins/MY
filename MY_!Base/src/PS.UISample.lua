@@ -51,13 +51,13 @@ local COMPONENT_SAMPLE = {
 			columns = {
 				{
 					key = 'name',
-					title = 'Name',
-					titleRich = true,
+					title = 'Fixed L',
 					titleTip = 'NAME!!!',
-					minWidth = 150,
+					width = 80,
 					alignHorizontal = 'left',
 					alignVertical = 'top',
 					sorter = true,
+					fixed = true,
 				},
 				{
 					key = 'desc',
@@ -106,6 +106,16 @@ local COMPONENT_SAMPLE = {
 					render = function()
 						return GetFormatText('EXTRA EXTRA EXTRA', 162, 255, 255, 0)
 					end,
+				},
+				{
+					key = 'name',
+					title = 'Fixed R',
+					titleTip = 'NAME!!!',
+					width = 80,
+					alignHorizontal = 'left',
+					alignVertical = 'middle',
+					sorter = true,
+					fixed = 'right',
 				},
 			},
 			dataSource = {
