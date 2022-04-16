@@ -704,15 +704,21 @@ end
 
 function D.GetTableColumns()
 	local aCol = {}
-	for _, szKey in ipairs(O.aColumn) do
+	local nFixIndex = -1
+	for nIndex, szKey in ipairs(O.aColumn) do
+		if szKey == 'name' then
+			nFixIndex = nIndex
+			break
+		end
+	end
+	for nIndex, szKey in ipairs(O.aColumn) do
 		local col = COLUMN_DICT[szKey]
 		if col then
-			table.insert(aCol, {
+			local bFixed = nIndex <= nFixIndex
+			local c = {
 				key = col.szKey,
 				title = col.szTitleAbbr,
 				titleTip = col.szTitle,
-				minWidth = col.nMinWidth,
-				maxWidth = col.nMaxWidth,
 				alignHorizontal = col.szAlignHorizontal or 'center',
 				render = col.GetFormatText
 					and function(value, record, index)
@@ -724,7 +730,15 @@ function D.GetTableColumns()
 						return col.Compare(v1, v2, r1, r2, DATA_ENV)
 					end
 					or nil,
-			})
+			}
+			if bFixed then
+				c.fixed = true
+				c.width = col.nMinWidth or 100
+			else
+				c.minWidth = col.nMinWidth
+				c.maxWidth = col.nMaxWidth
+			end
+			table.insert(aCol, c)
 		end
 	end
 	return aCol
