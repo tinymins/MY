@@ -230,6 +230,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.checked            ~= nil then ui:Check            (arg.checked                                     ) end
 		if arg.onCheck            ~= nil then ui:Check            (arg.onCheck                                     ) end
 		if arg.onChange           ~= nil then ui:Change           (arg.onChange                                    ) end
+		if arg.onSpecialKeyDown   ~= nil then ui:OnSpecialKeyDown (arg.onSpecialKeyDown                            ) end
 		if arg.onDragging or arg.onDrag  then ui:Drag             (arg.onDragging, arg.onDrag                      ) end
 		if arg.customLayout              then ui:CustomLayout     (arg.customLayout                                ) end
 		if arg.onCustomLayout            then ui:CustomLayout     (arg.onCustomLayout, arg.customLayoutPoint       ) end
@@ -501,10 +502,14 @@ local function InitComponent(raw, szType)
 	elseif szType=='WndEditBox' then
 		local edt = raw:Lookup('WndEdit_Default')
 		edt.OnEditSpecialKeyDown = function()
-			local szKey = GetKeyName(Station.GetMessageKey())
-			if szKey == 'Esc' or (
-				szKey == 'Enter' and not edt:IsMultiLine()
-			) then
+			local nMessageKey = Station.GetMessageKey()
+			local szKey = GetKeyName(nMessageKey)
+			local OnSpecialKeyDown = GetComponentProp(raw, 'OnSpecialKeyDown')
+			if X.IsFunction(OnSpecialKeyDown) then
+				return OnSpecialKeyDown(nMessageKey, szKey)
+			end
+			if szKey == 'Esc'
+			or (szKey == 'Enter' and not edt:IsMultiLine()) then
 				Station.SetFocusWindow(edt:GetRoot())
 				return 1
 			end
@@ -547,7 +552,8 @@ local function InitComponent(raw, szType)
 			end)
 		end
 		edt.OnEditSpecialKeyDown = function() -- TODO: {$NS}_PopupMenu 适配
-			local szKey = GetKeyName(Station.GetMessageKey())
+			local nMessageKey = Station.GetMessageKey()
+			local szKey = GetKeyName(nMessageKey)
 			if IsPopupMenuOpened() and PopupMenu_ProcessHotkey then
 				if szKey == 'Enter'
 				or szKey == 'Up'
@@ -556,11 +562,16 @@ local function InitComponent(raw, szType)
 				or szKey == 'Right' then
 					return PopupMenu_ProcessHotkey(szKey)
 				end
-			elseif szKey == 'Esc' or (
-				szKey == 'Enter' and not edt:IsMultiLine()
-			) then
-				Station.SetFocusWindow(edt:GetRoot())
-				return 1
+			else
+				local OnSpecialKeyDown = GetComponentProp(raw, 'OnSpecialKeyDown')
+				if X.IsFunction(OnSpecialKeyDown) then
+					return OnSpecialKeyDown(nMessageKey, szKey)
+				end
+				if szKey == 'Esc'
+				or (szKey == 'Enter' and not edt:IsMultiLine()) then
+					Station.SetFocusWindow(edt:GetRoot())
+					return 1
+				end
 			end
 		end
 		SetComponentProp(raw, 'autocompleteOptions', {
@@ -5468,6 +5479,21 @@ function OO:Change(fnOnChange)
 		end
 		return self
 	end
+end
+
+-- 输入框特殊键按下
+-- @param {function(nMessageKey: number, szKey: string): number|void} fnOnSpecialKeyDown 绑定的处理函数
+function OO:OnSpecialKeyDown(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		if not X.IsFunction(fnOnSpecialKeyDown) then
+			fnOnSpecialKeyDown = nil
+		end
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'OnSpecialKeyDown', fnOnSpecialKeyDown)
+		end
+	end
+	return self
 end
 
 function OO:Navigate(szURL)
