@@ -1196,6 +1196,32 @@ local function InitComponent(raw, szType)
 							szXml = GetFormatText(rec[col.key])
 						end
 						hItemContent:AppendItemFromString(szXml)
+						-- µ¥Ôª¸ñ Tip
+						if col.tip then
+							local tipProps = X.Clone(col.tip)
+							if not X.IsTable(tipProps) then
+								tipProps = { render = tipProps }
+							end
+							if not tipProps.position then
+								tipProps.position = UI.TIP_POSITION.LEFT_RIGHT
+							end
+							if not X.IsTable(tipProps.rect) then
+								tipProps.rect = {}
+							end
+							hItem.OnItemMouseIn = function()
+								local nX = this:GetAbsX()
+								local nW = this:GetW()
+								local nRawX = raw:GetAbsX()
+								local nOffset = nX < nRawX and nRawX - nX or 0
+								tipProps.rect.x = nX + nOffset
+								tipProps.rect.w = nW - nOffset
+								OutputAdvanceTip(tipProps, rec[col.key], rec, nRowIndex)
+							end
+							hItem.OnItemMouseOut = function()
+								HideAdvanceTip(tipProps)
+							end
+							hItem:RegisterEvent(UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
+						end
 					end
 					hRow.OnItemMouseEnter = function()
 						local nX, nY = raw:GetAbsX(), this:GetAbsY()

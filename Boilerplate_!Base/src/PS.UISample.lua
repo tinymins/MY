@@ -100,6 +100,9 @@ local COMPONENT_SAMPLE = {
 					alignHorizontal = 'center',
 					alignVertical = 'middle',
 					sorter = true,
+					tip = function(value, record, index)
+						return GetFormatText(value, 162, 255, 255, 0), true
+					end,
 				},
 				{
 					key = 'extra',
