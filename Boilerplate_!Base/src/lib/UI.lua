@@ -15,6 +15,31 @@ local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTA
 -------------------------------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
+UI.ITEM_EVENT = X.SetmetaReadonly({
+	L_BUTTON_DOWN     = 0x00000001,
+	R_BUTTON_DOWN     = 0x00000002,
+	L_BUTTON_UP       = 0x00000004,
+	R_BUTTON_UP       = 0x00000008,
+	L_BUTTON_CLICK    = 0x00000010,
+	R_BUTTON_CLICK    = 0x00000020,
+	L_BUTTON_DB_CLICK = 0x00000040,
+	R_BUTTON_DB_CLICK = 0x00000080,
+	MOUSE_ENTER_LEAVE = 0x00000100,
+	MOUSE_AREA        = 0x00000200,
+	MOUSE_MOVE        = 0x00000400,
+	MOUSE_WHEEL       = 0x00000800,
+	KEY_DOWN          = 0x00001000,
+	KEY_UP            = 0x00002000,
+	M_BUTTON_DOWN     = 0x00004000,
+	M_BUTTON_UP       = 0x00008000,
+	M_BUTTON_CLICK    = 0x00010000,
+	M_BUTTON_DB_CLICK = 0x00020000,
+	MOUSE_HOVER       = 0x00040000,
+	L_BUTTON_DRAG     = 0x00080000,
+	R_BUTTON_DRAG     = 0x00100000,
+	M_BUTTON_DRAG     = 0x00200000,
+	MOUSE_IN_OUT      = 0x00400000,
+})
 UI.MOUSE_BUTTON = X.SetmetaReadonly({
 	LEFT   = 1,
 	MIDDLE = 0,
