@@ -33,6 +33,8 @@ local COMPONENT_SAMPLE = {
 	{'WndCheckBox', 'WndCheckBox', { w = 100, h = COMPONENT_H, font = 162, text = 'WndCheckBox' }},
 	{'WndComboBox', 'WndComboBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndComboBox' }},
 	{'WndEditBox', 'WndEditBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditBox' }},
+	{'WndEditBox Left Search', 'WndEditBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditBox', appearance = 'SEARCH_LEFT' }},
+	{'WndEditBox Right Search', 'WndEditBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditBox', appearance = 'SEARCH_RIGHT' }},
 	{'WndEditComboBox', 'WndEditComboBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditComboBox' }},
 	-- WndListBox
 	{'WndRadioBox', 'WndRadioBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndRadioBox' }},
