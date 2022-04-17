@@ -951,7 +951,7 @@ local function InitComponent(raw, szType)
 			local nX = 0
 			local nScrollX = GetComponentProp(raw, 'ScrollX')
 			if not nScrollX or nScrollX == 'auto' then
-				nScrollX = raw:GetW()
+				nScrollX = raw:GetW() - nFixedLWidth - nFixedRWidth
 			end
 			local nExtraWidth = nScrollX
 			for i, col in ipairs(aScrollableColumns) do
