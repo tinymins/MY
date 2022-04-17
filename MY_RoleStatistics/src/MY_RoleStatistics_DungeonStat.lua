@@ -32,7 +32,6 @@ local DB = X.SQLiteConnect(_L['MY_RoleStatistics_DungeonStat'], {'userdata/role_
 if not DB then
 	return X.Sysmsg(_L['MY_RoleStatistics_DungeonStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
-local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_DungeonStat.ini'
 
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS DungeonInfo (
@@ -630,9 +629,9 @@ function D.GetTableColumns()
 end
 
 function D.UpdateUI(page)
-	local wnd = page:Lookup('Wnd_Total')
+	local ui = UI(page)
 
-	local szSearch = page:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
+	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
 	local szUSearch = AnsiToUTF8('%' .. szSearch .. '%')
 	DB_DungeonInfoR:ClearBindings()
 	DB_DungeonInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
@@ -643,8 +642,7 @@ function D.UpdateUI(page)
 		D.DecodeRow(rec)
 	end
 
-	UI(wnd)
-		:Fetch('WndTable_Stat')
+	ui:Fetch('WndTable_Stat')
 		:Columns(D.GetTableColumns())
 		:DataSource(result)
 end
@@ -813,12 +811,22 @@ end
 
 function D.OnInitPage()
 	local page = this
-	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_DungeonStat')
-	local wnd = frameTemp:Lookup('Wnd_Total')
-	wnd:ChangeRelation(page, true, true)
-	Wnd.CloseWindow(frameTemp)
+	local ui = UI(page)
 
-	UI(wnd):Append('WndComboBox', {
+	ui:Append('WndEditBox', {
+		name = 'WndEditBox_Search',
+		x = 20, y = 20, w = 388, h = 25,
+		appearance = 'SEARCH_RIGHT',
+		placeholder = _L['Press ENTER to search...'],
+		onSpecialKeyDown = function(_, szKey)
+			if szKey == 'Enter' then
+				D.UpdateUI(page)
+				return 1
+			end
+		end,
+	})
+
+	ui:Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
@@ -967,7 +975,7 @@ function D.OnInitPage()
 		end,
 	})
 
-	UI(wnd):Append('WndTable', {
+	ui:Append('WndTable', {
 		name = 'WndTable_Stat',
 		x = 20, y = 60, w = 960, h = 530,
 		sort = O.szSort,
@@ -1064,18 +1072,6 @@ function D.OnLButtonClick()
 			DB_DungeonInfoD:Reset()
 			D.UpdateUI(page)
 		end)
-	end
-end
-
-function D.OnEditSpecialKeyDown()
-	local name = this:GetName()
-	local szKey = GetKeyName(Station.GetMessageKey())
-	if szKey == 'Enter' then
-		if name == 'Edit_Search' then
-			local page = this:GetParent():GetParent():GetParent()
-			D.UpdateUI(page)
-		end
-		return 1
 	end
 end
 

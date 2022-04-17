@@ -100,6 +100,7 @@ return {
 
     ['Summary'] = '總計',
 
+    ['Press ENTER to search...'] = '輸入回車鍵搜索...',
     ['Columns'] = '顯示列',
     ['Columns alert when esc'] = '打開ESC界面提醒數值變化的列',
     ['Move up'] = '上移',

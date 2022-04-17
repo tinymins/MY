@@ -51,6 +51,7 @@ return {
     ['%d secs before'] = '%d秒前',
     ['Just now'] = '刚刚',
 
+    ['Press ENTER to search...'] = '输入回车键搜索...',
     ['Columns'] = '显示列',
     ['Click to move up.'] = '鼠标点击可上移当前选项。',
     ['Click to move up, Hold SHIFT to move down.'] = '鼠标点击可上移当前选项，按住 SHIFT 点击可下移当前选项。',
@@ -62,7 +63,6 @@ return {
     ['Move up'] = '上移',
     ['Move down'] = '下移',
     ['Delete'] = '删除',
-    ['Too many column selected, width overflow, please delete some!'] = '选择列过多已超出宽度限制，请先删除一些列！',
 
     ['Map mark'] = '地图显示位置',
     ['Tip hide finished'] = '浮动框隐藏已完成',
@@ -113,7 +113,7 @@ return {
     ['Daily'] = '日常',
     ['Weekly'] = '周常',
     ['Half-weekly'] = '半周常',
-    ['Onece'] = '一次性',
+    ['Once'] = '一次性',
 
     ['MY_RoleStatistics_SerendipityStat'] = '奇遇统计',
     ['Serendipity'] = '奇遇',

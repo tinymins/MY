@@ -29,7 +29,6 @@ end
 CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
 local DATA_FILE = {'userdata/role_statistics/role_stat.jx3dat', X.PATH_TYPE.GLOBAL}
-local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_RoleStat.ini'
 
 -------------------------------------------------------------------------------------------------------
 
@@ -745,9 +744,10 @@ function D.GetTableColumns()
 end
 
 function D.UpdateUI(page)
-	local wnd = page:Lookup('Wnd_Total')
-	local szSearch = page:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
+	local ui = UI(page)
 
+	-- 搜索
+	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
 	local data = D.GetPlayerRecords()
 	local result = {}
 	for _, rec in pairs(data) do
@@ -783,8 +783,7 @@ function D.UpdateUI(page)
 		end
 	end
 
-	UI(wnd)
-		:Fetch('WndTable_Stat')
+	ui:Fetch('WndTable_Stat')
 		:Columns(D.GetTableColumns())
 		:DataSource(result)
 		:Summary(summary)
@@ -828,13 +827,23 @@ end
 
 function D.OnInitPage()
 	local page = this
-	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_RoleStat')
-	local wnd = frameTemp:Lookup('Wnd_Total')
-	wnd:ChangeRelation(page, true, true)
-	Wnd.CloseWindow(frameTemp)
+	local ui = UI(page)
+
+	ui:Append('WndEditBox', {
+		name = 'WndEditBox_Search',
+		x = 20, y = 20, w = 388, h = 25,
+		appearance = 'SEARCH_RIGHT',
+		placeholder = _L['Press ENTER to search...'],
+		onSpecialKeyDown = function(_, szKey)
+			if szKey == 'Enter' then
+				D.UpdateUI(page)
+				return 1
+			end
+		end,
+	})
 
 	-- 显示列
-	UI(wnd):Append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
@@ -938,7 +947,7 @@ function D.OnInitPage()
 	})
 
 	-- ESC提示列
-	UI(wnd):Append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = 600, y = 20, w = 180,
 		text = _L['Columns alert when esc'],
 		menu = function()
@@ -1036,7 +1045,7 @@ function D.OnInitPage()
 		end,
 	})
 
-	UI(wnd):Append('WndTable', {
+	ui:Append('WndTable', {
 		name = 'WndTable_Stat',
 		x = 20, y = 60, w = 960, h = 530,
 		sort = O.szSort,
@@ -1067,7 +1076,7 @@ function D.OnInitPage()
 		end,
 	})
 
-	UI(wnd):Append('WndButton', {
+	ui:Append('WndButton', {
 		x = 25, y = 562, w = 25, h = 25,
 		buttonStyle = 'OPTION',
 		onClick = function()
@@ -1169,26 +1178,8 @@ function D.OnLButtonClick()
 	end
 end
 
-function D.OnEditSpecialKeyDown()
-	local name = this:GetName()
-	local szKey = GetKeyName(Station.GetMessageKey())
-	if szKey == 'Enter' then
-		if name == 'Edit_Search' then
-			local page = this:GetParent():GetParent():GetParent()
-			D.UpdateUI(page)
-		end
-		return 1
-	end
-end
-
 function D.OnItemMouseEnter()
-	local name = this:GetName()
-	if name == 'Handle_RoleStatColumn' then
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		local szXml = GetFormatText(this:Lookup('Text_RoleStat_Title'):GetText(), 162, 255, 255, 255)
-		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
-	elseif this.tip then
+	if this.tip then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)

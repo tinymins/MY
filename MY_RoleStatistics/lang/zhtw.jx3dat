@@ -51,6 +51,7 @@ return {
     ['%d secs before'] = '%d秒前',
     ['Just now'] = '剛剛',
 
+    ['Press ENTER to search...'] = '輸入回車鍵搜索...',
     ['Columns'] = '顯示列',
     ['Click to move up.'] = '滑鼠點擊可上移當前選項。',
     ['Click to move up, Hold SHIFT to move down.'] = '滑鼠點擊可上移當前選項，按住 SHIFT 點擊可下移當前選項。',

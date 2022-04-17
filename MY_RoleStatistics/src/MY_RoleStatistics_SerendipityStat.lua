@@ -45,7 +45,6 @@ local DB = X.SQLiteConnect(_L['MY_RoleStatistics_SerendipityStat'], {'userdata/r
 if not DB then
 	return X.Sysmsg(_L['MY_RoleStatistics_SerendipityStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
-local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_SerendipityStat.ini'
 local SZ_TIP_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_SerendipityTip.ini'
 
 DB:Execute([[
@@ -382,7 +381,6 @@ local function GetSerendipityDailyCount(me, tab)
 	end
 end
 
-local EXCEL_WIDTH = 960
 local TASK_MIN_WIDTH = 42
 local TASK_MAX_WIDTH = 150
 local function GeneCommonFormatText(id)
@@ -745,50 +743,54 @@ function D.GetColumns()
 	return aCol
 end
 
-function D.UpdateUI(page)
-	local hCols = page:Lookup('Wnd_Total/WndScroll_SerendipityStat', 'Handle_SerendipityStatColumns')
-	hCols:Clear()
-
-	local aCol, nX, Sorter = D.GetColumns(), 0, nil
-	local nExtraWidth = EXCEL_WIDTH
-	for i, col in ipairs(aCol) do
-		nExtraWidth = nExtraWidth - col.nMinWidth
-	end
-	for i, col in ipairs(aCol) do
-		local hCol = hCols:AppendItemFromIni(SZ_INI, 'Handle_SerendipityStatColumn')
-		local txt = hCol:Lookup('Text_SerendipityStat_Title')
-		local imgAsc = hCol:Lookup('Image_SerendipityStat_Asc')
-		local imgDesc = hCol:Lookup('Image_SerendipityStat_Desc')
-		local nWidth = i == #aCol
-			and (EXCEL_WIDTH - nX)
-			or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
-		local nSortDelta = nWidth > 70 and 25 or 15
-		if i == 0 then
-			hCol:Lookup('Image_SerendipityStat_Break'):Hide()
+function D.GetTableColumns()
+	local aColumn = D.GetColumns()
+	local aTableColumn = {}
+	local nFixIndex = -1
+	for nIndex, col in ipairs(aColumn) do
+		if col.id == 'name' then
+			nFixIndex = nIndex
+			break
 		end
-		hCol.col = col
-		hCol:SetRelX(nX)
-		hCol:SetW(nWidth)
-		txt:SetW(nWidth)
-		txt:SetText(col.szTitle)
-		imgAsc:SetRelX(nWidth - nSortDelta)
-		imgDesc:SetRelX(nWidth - nSortDelta)
-		if O.szSort == col.id then
-			Sorter = function(r1, r2)
-				if O.szSortOrder == 'asc' then
-					return col.Compare(r1, r2) < 0
+	end
+	for nIndex, col in ipairs(aColumn) do
+		local bFixed = nIndex <= nFixIndex
+		local c = {
+			key = col.id,
+			title = col.szTitle,
+			titleTip = col.szTitleTip
+				or (col.GetTitleFormatTip and function()
+					return col.GetTitleFormatTip(), true
+				end)
+				or col.szTitle,
+			alignHorizontal = 'center',
+			render = col.GetFormatText
+				and function(value, record, index)
+					return col.GetFormatText(record)
 				end
-				return col.Compare(r1, r2) > 0
-			end
+				or nil,
+			sorter = col.Compare
+				and function(v1, v2, r1, r2)
+					return col.Compare(r1, r2)
+				end
+				or nil,
+		}
+		if bFixed then
+			c.fixed = true
+			c.width = col.nMinWidth or 100
+		else
+			c.minWidth = col.nMinWidth
+			c.maxWidth = col.nMaxWidth
 		end
-		imgAsc:SetVisible(O.szSort == col.id and O.szSortOrder == 'asc')
-		imgDesc:SetVisible(O.szSort == col.id and O.szSortOrder == 'desc')
-		hCol:FormatAllItemPos()
-		nX = nX + nWidth
+		table.insert(aTableColumn, c)
 	end
-	hCols:FormatAllItemPos()
+	return aTableColumn
+end
 
-	local szSearch = page:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
+function D.UpdateUI(page)
+	local ui = UI(page)
+
+	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
 	local szUSearch = AnsiToUTF8('%' .. szSearch .. '%')
 	InfoR:ClearBindings()
 	InfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
@@ -799,41 +801,9 @@ function D.UpdateUI(page)
 		D.DecodeRow(rec)
 	end
 
-	if Sorter then
-		table.sort(result, Sorter)
-	end
-
-	local aCol = D.GetColumns()
-	local nExtraWidth = EXCEL_WIDTH
-	for i, col in ipairs(aCol) do
-		nExtraWidth = nExtraWidth - col.nMinWidth
-	end
-	local hList = page:Lookup('Wnd_Total/WndScroll_SerendipityStat', 'Handle_List')
-	hList:Clear()
-	for i, rec in ipairs(result) do
-		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
-		hRow.rec = rec
-		hRow:Lookup('Image_RowBg'):SetVisible(i % 2 == 1)
-		local nX = 0
-		for j, col in ipairs(aCol) do
-			local hItem = hRow:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
-			local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
-			hItemContent:AppendItemFromString(col.GetFormatText(rec))
-			hItemContent:SetW(99999)
-			hItemContent:FormatAllItemPos()
-			hItemContent:SetSizeByAllItemSize()
-			local nWidth = j == #aCol
-				and (EXCEL_WIDTH - nX)
-				or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
-			hItem:SetRelX(nX)
-			hItem:SetW(nWidth)
-			hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
-			hItem:FormatAllItemPos()
-			nX = nX + nWidth
-		end
-		hRow:FormatAllItemPos()
-	end
-	hList:FormatAllItemPos()
+	ui:Fetch('WndTable_Stat')
+		:Columns(D.GetTableColumns())
+		:DataSource(result)
 end
 
 function D.EncodeRow(rec)
@@ -943,12 +913,22 @@ end
 
 function D.OnInitPage()
 	local page = this
-	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_SerendipityStat')
-	local wnd = frameTemp:Lookup('Wnd_Total')
-	wnd:ChangeRelation(page, true, true)
-	Wnd.CloseWindow(frameTemp)
+	local ui = UI(page)
 
-	UI(wnd):Append('WndCheckBox', {
+	ui:Append('WndEditBox', {
+		name = 'WndEditBox_Search',
+		x = 20, y = 20, w = 300, h = 25,
+		appearance = 'SEARCH_RIGHT',
+		placeholder = _L['Press ENTER to search...'],
+		onSpecialKeyDown = function(_, szKey)
+			if szKey == 'Enter' then
+				D.UpdateUI(page)
+				return 1
+			end
+		end,
+	})
+
+	ui:Append('WndCheckBox', {
 		x = 380, y = 21, w = 160,
 		text = _L['Tip hide finished'],
 		checked = MY_RoleStatistics_SerendipityStat.bTipHideFinished,
@@ -958,7 +938,7 @@ function D.OnInitPage()
 		autoEnable = function() return MY_RoleStatistics_SerendipityStat.bFloatEntry end,
 	})
 
-	UI(wnd):Append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = 540, y = 21, w = 130,
 		text = _L['Map mark'],
 		checked = MY_RoleStatistics_SerendipityStat.bMapMark,
@@ -967,7 +947,7 @@ function D.OnInitPage()
 		end,
 	})
 
-	UI(wnd):Append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = 670, y = 21, w = 130,
 		text = _L['Map mark hide acquired'],
 		checked = MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired,
@@ -977,110 +957,175 @@ function D.OnInitPage()
 		autoEnable = function() return MY_RoleStatistics_SerendipityStat.bMapMark end,
 	})
 
-	UI(wnd):Append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
-			local t, aColumn, tChecked, nMinW = {}, O.aColumn, {}, 0
-			-- 已添加的
-			for i, id in ipairs(aColumn) do
-				local col = COLUMN_DICT[id]
-				if col then
-					table.insert(t, {
-						szOption = col.szTitle,
-						{
-							szOption = _L['Move up'],
+			local t = {}
+			local function UpdateMenu()
+				local aColumn, tChecked, nMinW = O.aColumn, {}, 0
+				for i = 1, #t do
+					t[i] = nil
+				end
+				-- 已添加的
+				for nIndex, id in ipairs(aColumn) do
+					local col = COLUMN_DICT[id]
+					if col then
+						table.insert(t, {
+							szOption = col.szTitle,
 							fnAction = function()
-								if i > 1 then
-									aColumn[i], aColumn[i - 1] = aColumn[i - 1], aColumn[i]
-									O.aColumn = aColumn
-									D.UpdateUI(page)
+								local nOffset = IsShiftKeyDown() and 1 or -1
+								if nIndex + nOffset < 1 or nIndex + nOffset > #O.aColumn then
+									return
 								end
-								UI.ClosePopupMenu()
-							end,
-						},
-						{
-							szOption = _L['Move down'],
-							fnAction = function()
-								if i < #aColumn then
-									aColumn[i], aColumn[i + 1] = aColumn[i + 1], aColumn[i]
-									O.aColumn = aColumn
-									D.UpdateUI(page)
-								end
-								UI.ClosePopupMenu()
-							end,
-						},
-						{
-							szOption = _L['Delete'],
-							fnAction = function()
-								table.remove(aColumn, i)
+								local aColumn = O.aColumn
+								aColumn[nIndex], aColumn[nIndex + nOffset] = aColumn[nIndex + nOffset], aColumn[nIndex]
 								O.aColumn = aColumn
+								UpdateMenu()
 								D.UpdateUI(page)
-								UI.ClosePopupMenu()
 							end,
-						},
-					})
-					nMinW = nMinW + col.nMinWidth
-				end
-				tChecked[id] = true
-			end
-			-- 未添加的
-			local function fnAction(id, nWidth)
-				local bExist = false
-				for i, v in ipairs(aColumn) do
-					if v == id then
-						table.remove(aColumn, i)
-						O.aColumn = aColumn
-						bExist = true
-						break
+							fnMouseEnter = function()
+								if #O.aColumn == 1 then
+									return
+								end
+								local szText = _L['Click to move up, Hold SHIFT to move down.']
+								if nIndex == 1 then
+									szText = _L['Hold SHIFT click to move down.']
+								elseif nIndex == #O.aColumn then
+									szText = _L['Click to move up.']
+								end
+								local nX, nY = this:GetAbsX(), this:GetAbsY()
+								local nW, nH = this:GetW(), this:GetH()
+								OutputTip(GetFormatText(szText, nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.LEFT_RIGHT)
+							end,
+							fnMouseLeave = function()
+								HideTip()
+							end,
+							{
+								szOption = _L['Move up'],
+								fnAction = function()
+									if nIndex > 1 then
+										aColumn[nIndex], aColumn[nIndex - 1] = aColumn[nIndex - 1], aColumn[nIndex]
+										O.aColumn = aColumn
+										UpdateMenu()
+										D.UpdateUI(page)
+									end
+								end,
+							},
+							{
+								szOption = _L['Move down'],
+								fnAction = function()
+									if nIndex < #aColumn then
+										aColumn[nIndex], aColumn[nIndex + 1] = aColumn[nIndex + 1], aColumn[nIndex]
+										O.aColumn = aColumn
+										UpdateMenu()
+										D.UpdateUI(page)
+									end
+								end,
+							},
+							CONSTANT.MENU_DIVIDER,
+							{
+								szOption = _L['Delete'],
+								fnAction = function()
+									table.remove(aColumn, nIndex)
+									O.aColumn = aColumn
+									UpdateMenu()
+									D.UpdateUI(page)
+								end,
+								rgb = { 255, 128, 128 },
+							},
+						})
+						nMinW = nMinW + col.nMinWidth
 					end
+					tChecked[id] = true
 				end
-				if not bExist then
-					if nMinW + nWidth > EXCEL_WIDTH then
-						X.Alert(_L['Too many column selected, width overflow, please delete some!'])
-					else
+				-- 未添加的
+				local function fnAction(id, nWidth)
+					local bExist = false
+					for i, v in ipairs(aColumn) do
+						if v == id then
+							table.remove(aColumn, i)
+							O.aColumn = aColumn
+							bExist = true
+							break
+						end
+					end
+					if not bExist then
 						table.insert(aColumn, id)
 						O.aColumn = aColumn
 					end
+					UpdateMenu()
+					D.FlushDB()
+					D.UpdateUI(page)
 				end
-				D.FlushDB()
-				D.UpdateUI(page)
-				UI.ClosePopupMenu()
-			end
-			-- 普通选项
-			for _, col in ipairs(COLUMN_LIST) do
-				if not tChecked[col.id] then
-					table.insert(t, {
-						szOption = col.szTitle,
-						fnAction = function()
-							fnAction(col.id, col.nMinWidth)
-						end,
-					})
-				end
-			end
-			-- 奇遇选项
-			local t1 = { szOption = _L['Serendipity'], nMaxHeight = 1000 }
-			for _, serendipity in ipairs(SERENDIPITY_LIST) do
-				if not tChecked[serendipity.nID] then
-					local col = COLUMN_DICT[serendipity.nID]
-					if col then
-						table.insert(t1, {
+				-- 普通选项
+				for _, col in ipairs(COLUMN_LIST) do
+					if not tChecked[col.id] then
+						table.insert(t, {
 							szOption = col.szTitle,
-							bCheck = true, bChecked = tChecked[col.id],
 							fnAction = function()
 								fnAction(col.id, col.nMinWidth)
 							end,
 						})
 					end
-					tChecked[serendipity.nID] = true
 				end
+				-- 奇遇选项
+				local t1 = { szOption = _L['Serendipity'], nMaxHeight = 1000 }
+				for _, serendipity in ipairs(SERENDIPITY_LIST) do
+					if not tChecked[serendipity.nID] then
+						local col = COLUMN_DICT[serendipity.nID]
+						if col then
+							table.insert(t1, {
+								szOption = col.szTitle,
+								bCheck = true, bChecked = tChecked[col.id],
+								fnAction = function()
+									fnAction(col.id, col.nMinWidth)
+								end,
+							})
+						end
+						tChecked[serendipity.nID] = true
+					end
+				end
+				table.insert(t, t1)
 			end
-			table.insert(t, t1)
+			UpdateMenu()
 			return t
 		end,
 	})
 
-	UI(wnd):Append('WndButton', {
+	ui:Append('WndTable', {
+		name = 'WndTable_Stat',
+		x = 20, y = 60, w = 960, h = 530,
+		sort = O.szSort,
+		sortOrder = O.szSortOrder,
+		onSortChange = function(szSort, szSortOrder)
+			O.szSort, O.szSortOrder = szSort, szSortOrder
+		end,
+		onRowHover = function(bIn, rec)
+			if bIn then
+				D.OutputRowTip(this, rec)
+			else
+				D.CloseRowTip()
+			end
+		end,
+		rowMenuRClick = function(rec, index)
+			local menu = {
+				{
+					szOption = _L['Delete'],
+					fnAction = function()
+						InfoD:ClearBindings()
+						InfoD:BindAll(AnsiToUTF8(rec.guid))
+						InfoD:Execute()
+						D.UpdateUI(page)
+					end,
+					rgb = { 255, 128, 128 },
+				},
+			}
+			PopupMenu(menu)
+		end,
+	})
+
+	ui:Append('WndButton', {
 		x = 440, y = 590, w = 120,
 		text = _L['Refresh'],
 		onClick = function()
@@ -1151,65 +1196,8 @@ function D.OnLButtonClick()
 	end
 end
 
-function D.OnItemLButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_SerendipityStatColumn' then
-		if this.col.id then
-			local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-			if O.szSort == this.col.id then
-				O.szSortOrder = O.szSortOrder == 'asc' and 'desc' or 'asc'
-			else
-				O.szSort = this.col.id
-			end
-			D.UpdateUI(page)
-		end
-	end
-end
-
-function D.OnItemRButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_Row' then
-		local rec = this.rec
-		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		local menu = {
-			{
-				szOption = _L['Delete'],
-				fnAction = function()
-					InfoD:ClearBindings()
-					InfoD:BindAll(AnsiToUTF8(rec.guid))
-					InfoD:Execute()
-					D.UpdateUI(page)
-				end,
-			},
-		}
-		PopupMenu(menu)
-	end
-end
-
-function D.OnEditSpecialKeyDown()
-	local name = this:GetName()
-	local szKey = GetKeyName(Station.GetMessageKey())
-	if szKey == 'Enter' then
-		if name == 'Edit_Search' then
-			local page = this:GetParent():GetParent():GetParent()
-			D.UpdateUI(page)
-		end
-		return 1
-	end
-end
-
 function D.OnItemMouseEnter()
-	local name = this:GetName()
-	if name == 'Handle_Row' then
-		D.OutputRowTip(this, this.rec)
-	elseif name == 'Handle_SerendipityStatColumn' then
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		local szXml = this.col.GetTitleFormatTip
-			and this.col.GetTitleFormatTip()
-			or GetFormatText(this:Lookup('Text_SerendipityStat_Title'):GetText(), 162, 255, 255, 255)
-		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
-	elseif this.tip then
+	if this.tip then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)
