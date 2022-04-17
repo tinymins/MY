@@ -331,6 +331,8 @@ local _AUTHOR_ROLES_     = {
 local _AUTHOR_HEADER_ = GetFormatText(_NAME_ .. ' ' .. _L['[Author]'], 8, 89, 224, 232)
 local _AUTHOR_PROTECT_NAMES_ = {
 	[string.char(0xDC, 0xF8, 0xD2, 0xC1)] = true, -- 简体
+	[string.char(0xDC, 0xF8, 0xD2, 0xC1, 0xD2, 0xC1)] = true, -- 简体
+	[string.char(0XE8, 0X8C, 0X97, 0XE4, 0XBC, 0X8A)] = true, -- 繁体
 	[string.char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A)] = true, -- 繁体
 }
 local _AUTHOR_FAKE_HEADER_ = GetFormatText(_L['[Fake author]'], 8, 255, 95, 159)
