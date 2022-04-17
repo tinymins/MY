@@ -5287,15 +5287,15 @@ end
 -- @param {function(eButton: UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
 function OO:RowClick(fnClick)
 	if X.IsFunction(fnClick) then
-		self:RowLClick(fnClick)
-		self:RowMClick(fnClick)
-		self:RowRClick(fnClick)
+		self:RowLClick(function(...) fnClick(UI.MOUSE_BUTTON.LEFT, ...) end)
+		self:RowMClick(function(...) fnClick(UI.MOUSE_BUTTON.MIDDLE, ...) end)
+		self:RowRClick(function(...) fnClick(UI.MOUSE_BUTTON.RIGHT, ...) end)
 	end
 	return self
 end
 
 -- 行鼠标左键单击事件
--- @param {function(eButton: UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
+-- @param {function(record: table, index: number)} fnAction 鼠标单击事件回调函数
 function OO:RowLClick(fnClick)
 	self:_checksum()
 	if X.IsFunction(fnClick) then
@@ -5305,7 +5305,7 @@ function OO:RowLClick(fnClick)
 					if GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.LEFT, ...)
+					X.ExecuteWithThis(raw, fnClick, ...)
 				end
 				SetComponentProp(raw, 'RowLClick', fnAction)
 			end
@@ -5315,7 +5315,7 @@ function OO:RowLClick(fnClick)
 end
 
 -- 行鼠标中键单击事件
--- @param {function(eButton: UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
+-- @param {function(record: table, index: number)} fnAction 鼠标单击事件回调函数
 function OO:RowMClick(fnClick)
 	self:_checksum()
 	if X.IsFunction(fnClick) then
@@ -5325,7 +5325,7 @@ function OO:RowMClick(fnClick)
 					if GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.MIDDLE, ...)
+					X.ExecuteWithThis(raw, fnClick, ...)
 				end
 				SetComponentProp(raw, 'RowMClick', fnAction)
 			end
@@ -5335,7 +5335,7 @@ function OO:RowMClick(fnClick)
 end
 
 -- 行鼠标右键单击事件
--- @param {function(eButton: UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
+-- @param {function(record: table, index: number)} fnAction 鼠标单击事件回调函数
 function OO:RowRClick(fnClick)
 	self:_checksum()
 	if X.IsFunction(fnClick) then
@@ -5345,7 +5345,7 @@ function OO:RowRClick(fnClick)
 					if GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.RIGHT, ...)
+					X.ExecuteWithThis(raw, fnClick, ...)
 				end
 				SetComponentProp(raw, 'RowRClick', fnAction)
 			end
