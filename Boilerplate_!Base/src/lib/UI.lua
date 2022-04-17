@@ -136,6 +136,26 @@ local function GetButtonStyleConfig(eButtonStyle)
 		or BUTTON_STYLE_CONFIG[eButtonStyle]
 end
 
+local EDIT_BOX_APPEARANCE_CONFIG = {
+	DEFAULT = {},
+	SEARCH_LEFT = {
+		szIconImage = X.PACKET_INFO.FRAMEWORK_ROOT .. 'img/UIComponents.UITex',
+		nIconImageFrame = 4,
+		nIconWidth = 32,
+		nIconHeight = 32,
+		nIconAlpha = 180,
+		szIconAlign = 'LEFT',
+	},
+	SEARCH_RIGHT = {
+		szIconImage = X.PACKET_INFO.FRAMEWORK_ROOT .. 'img/UIComponents.UITex',
+		nIconImageFrame = 4,
+		nIconWidth = 32,
+		nIconHeight = 32,
+		nIconAlpha = 180,
+		szIconAlign = 'RIGHT',
+	},
+}
+
 -----------------------------------------------------------
 -- my ui common functions
 -----------------------------------------------------------
@@ -172,6 +192,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.containerType      ~= nil then ui:ContainerType    (arg.containerType                               ) end
 		if arg.buttonStyle        ~= nil then ui:ButtonStyle      (arg.buttonStyle                                 ) end -- must before :Size()
 		if arg.editType           ~= nil then ui:EditType         (arg.editType                                    ) end
+		if arg.appearance         ~= nil then ui:Appearance       (arg.appearance                                  ) end
 		if arg.visible            ~= nil then ui:Visible          (arg.visible                                     ) end
 		if arg.autoVisible        ~= nil then ui:Visible          (arg.autoVisible                                 ) end
 		if arg.enable             ~= nil then ui:Enable           (arg.enable                                      ) end
@@ -3749,10 +3770,36 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local img = GetComponentElement(raw, 'IMAGE')
 		local edt = GetComponentElement(raw, 'EDIT')
+		local szStyle = GetComponentProp(raw, 'szAppearance')
+		local tStyle = EDIT_BOX_APPEARANCE_CONFIG[szStyle] or EDIT_BOX_APPEARANCE_CONFIG['DEFAULT']
+		local ico = hdl:Lookup('Image_Icon')
 		wnd:SetSize(nWidth, nHeight)
 		hdl:SetSize(nWidth, nHeight)
 		img:SetSize(nWidth, nHeight)
-		edt:SetSize(nWidth-8, nHeight-4)
+		if tStyle.szIconImage then
+			local nIconW, nIconH = tStyle.nIconWidth, tStyle.nIconHeight
+			if nIconH > nHeight then
+				nIconW = nIconW * nHeight / nIconH
+				nIconH = nHeight
+			end
+			ico:Show()
+			ico:FromUITex(tStyle.szIconImage, tStyle.nIconImageFrame)
+			ico:SetAlpha(tStyle.nIconAlpha or 255)
+			ico:SetSize(nIconW, nIconH)
+			if tStyle.szIconAlign == 'LEFT' then
+				ico:SetRelX(0)
+				edt:SetRelX(nIconW)
+			else
+				ico:SetRelX(nWidth - nIconW)
+				edt:SetRelX(4)
+			end
+			ico:SetRelY((nHeight - nIconH) / 2)
+			edt:SetSize(nWidth - 4 - nIconW, nHeight - 4)
+		else
+			ico:Hide()
+			edt:SetRelX(4)
+			edt:SetSize(nWidth - 8, nHeight - 4)
+		end
 		hdl:FormatAllItemPos()
 	elseif componentType == 'Text' then
 		local txt = GetComponentElement(raw, 'TEXT')
@@ -4507,6 +4554,30 @@ function OO:ButtonStyle(...)
 			end
 		end
 		return self
+	end
+end
+
+-- 设置组件外观样式类型
+-- @param {string} szAppearance 样式
+function OO:Appearance(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local szAppearance = ...
+		if X.IsString(szAppearance) then
+			for _, raw in ipairs(self.raws) do
+				SetComponentProp(raw, 'szAppearance', szAppearance)
+				if GetComponentType(raw) == 'WndEditBox' then
+					local nW, nH = raw:GetSize()
+					SetComponentSize(raw, nW, nH)
+				end
+			end
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'szAppearance') or 'DEFAULT'
+		end
 	end
 end
 
