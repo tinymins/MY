@@ -5486,6 +5486,7 @@ end
 function OO:OnSpecialKeyDown(...)
 	self:_checksum()
 	if select('#', ...) > 0 then
+		local fnOnSpecialKeyDown = ...
 		if not X.IsFunction(fnOnSpecialKeyDown) then
 			fnOnSpecialKeyDown = nil
 		end
