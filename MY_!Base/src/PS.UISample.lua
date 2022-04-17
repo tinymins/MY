@@ -65,8 +65,10 @@ local COMPONENT_SAMPLE = {
 					key = 'desc',
 					title = GetFormatText('Description', 162, 255, 255, 0),
 					titleRich = true,
-					titleTip = GetFormatText('DESCRIPTION!!!', 162, 255, 255, 0),
-					titleTipRich = true,
+					titleTip = {
+						render = GetFormatText('DESCRIPTION!!!', 162, 255, 255, 0),
+						rich = true,
+					},
 					minWidth = 150,
 					render = function(value, record, index)
 						if value == 'desc 2' then
@@ -98,6 +100,9 @@ local COMPONENT_SAMPLE = {
 					alignHorizontal = 'center',
 					alignVertical = 'middle',
 					sorter = true,
+					tip = function(value, record, index)
+						return GetFormatText(value, 162, 255, 255, 0), true
+					end,
 				},
 				{
 					key = 'extra',

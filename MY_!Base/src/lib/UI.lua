@@ -15,6 +15,31 @@ local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTA
 -------------------------------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
+UI.ITEM_EVENT = X.SetmetaReadonly({
+	L_BUTTON_DOWN     = 0x00000001,
+	R_BUTTON_DOWN     = 0x00000002,
+	L_BUTTON_UP       = 0x00000004,
+	R_BUTTON_UP       = 0x00000008,
+	L_BUTTON_CLICK    = 0x00000010,
+	R_BUTTON_CLICK    = 0x00000020,
+	L_BUTTON_DB_CLICK = 0x00000040,
+	R_BUTTON_DB_CLICK = 0x00000080,
+	MOUSE_ENTER_LEAVE = 0x00000100,
+	MOUSE_AREA        = 0x00000200,
+	MOUSE_MOVE        = 0x00000400,
+	MOUSE_WHEEL       = 0x00000800,
+	KEY_DOWN          = 0x00001000,
+	KEY_UP            = 0x00002000,
+	M_BUTTON_DOWN     = 0x00004000,
+	M_BUTTON_UP       = 0x00008000,
+	M_BUTTON_CLICK    = 0x00010000,
+	M_BUTTON_DB_CLICK = 0x00020000,
+	MOUSE_HOVER       = 0x00040000,
+	L_BUTTON_DRAG     = 0x00080000,
+	R_BUTTON_DRAG     = 0x00100000,
+	M_BUTTON_DRAG     = 0x00200000,
+	MOUSE_IN_OUT      = 0x00400000,
+})
 UI.MOUSE_BUTTON = X.SetmetaReadonly({
 	LEFT   = 1,
 	MIDDLE = 0,
@@ -448,6 +473,83 @@ local function GetComponentElement(raw, elementType)
 		end
 	end
 	return element
+end
+
+-- 显示提示框
+-- @param {object} props 配置项
+-- @param {string|function} props.render 要提示的纯文字或富文本，或返回前述内容的函数
+-- @param {number} props.w 提示框宽度
+-- @param {{ x: number; y: number; w: number; h: number }} props.rect 提示框触发区域矩形位置（默认则从 this 上获取）
+-- @param {{ x: number; y: number; w: number; h: number }} props.offset 提示框触发区域偏移量
+-- @param {UI.TIP_HIDE_WAY} props.position 提示框相对于触发区域的位置
+-- @param {boolean} props.rich 提示框内容是否为富文本（当 render 为函数时取函数第二返回值）
+-- @param {number} props.font 提示框字体（仅在非富文本下有效）
+-- @param {number} props.r 提示框文字r（仅在非富文本下有效）
+-- @param {number} props.g 提示框文字g（仅在非富文本下有效）
+-- @param {number} props.b 提示框文字b（仅在非富文本下有效）
+-- @param {UI.TIP_HIDE_WAY} props.hide 提示框消失方式
+local function OutputAdvanceTip(props, ...)
+	if not X.IsTable(props) then
+		props = { render = props }
+	end
+	local nWidth = props.w or 450
+	local tOffset = props.offset or {}
+	local nOffsetX = tOffset.x or 0
+	local nOffsetY = tOffset.y or 0
+	local nOffsetW = tOffset.w or 0
+	local nOffsetH = tOffset.h or 0
+	local ePosition = props.position or UI.TIP_POSITION.FOLLOW_MOUSE
+	local bRichText = props.rich
+	local nX, nY, nW, nH
+	if ePosition == UI.TIP_POSITION.FOLLOW_MOUSE then
+		nX, nY = Cursor.GetPos()
+		nX, nY = nX - 0, nY - 40
+		nW, nH = 40, 40
+	elseif props.rect then
+		nX, nY = props.rect.x, props.rect.y
+		nW, nH = props.rect.w, props.rect.h
+	end
+	if not nX then
+		nX = this:GetAbsX()
+	end
+	if not nY then
+		nY = this:GetAbsY()
+	end
+	if not nW then
+		nW = this:GetW()
+	end
+	if not nH then
+		nH = this:GetH()
+	end
+	nX, nY = nX + nOffsetX, nY + nOffsetY
+	nW, nH = nW + nOffsetW, nH + nOffsetH
+	local szText = props.render
+	if X.IsFunction(szText) then
+		local bSuccess
+		bSuccess, szText, bRichText = X.ExecuteWithThis(this, szText, ...)
+		if not bSuccess then
+			return
+		end
+	end
+	if X.IsEmpty(szText) then
+		return
+	end
+	if not bRichText then
+		szText = GetFormatText(szText, props.font or 136, props.r, props.g, props.b)
+	end
+	OutputTip(szText, nWidth, {nX, nY, nW, nH}, ePosition)
+end
+
+local function HideAdvanceTip(props)
+	if not X.IsTable(props) then
+		props = { render = props }
+	end
+	local eHide = props.hide or UI.TIP_HIDE_WAY.HIDE
+	if eHide == UI.TIP_HIDE_WAY.HIDE then
+		HideTip(false)
+	elseif eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE then
+		HideTip(true)
+	end
 end
 
 local function InitComponent(raw, szType)
@@ -960,24 +1062,27 @@ local function InitComponent(raw, szType)
 					hContent:AppendItemFromString(szTitle)
 					-- 标题 Tip
 					if col.titleTip then
+						local tipProps = X.Clone(col.titleTip)
+						if not X.IsTable(tipProps) then
+							tipProps = { render = tipProps }
+						end
+						if not tipProps.position then
+							tipProps.position = UI.TIP_POSITION.TOP_BOTTOM
+						end
+						if not X.IsTable(tipProps.rect) then
+							tipProps.rect = {}
+						end
 						hCol.OnItemMouseEnter = function()
-							local szText, bRich = col.titleTip, col.titleTipRich
-							if X.IsFunction(col.titleTip) then
-								szText, bRich = col.titleTip(col)
-							end
-							if X.IsEmpty(szText) then
-								return
-							end
-							if not bRich then
-								szText = GetFormatText(szText, 162, 255, 255, 255)
-							end
-							local nX, nY = this:GetAbsPos()
-							local nW, nH = this:GetSize()
-							nX = math.max(nX, raw:GetAbsX())
-							OutputTip(szText, 400, {nX, nY, nW, nH}, ALW.TOP_BOTTOM)
+							local nX = this:GetAbsX()
+							local nW = this:GetW()
+							local nRawX = raw:GetAbsX()
+							local nOffset = nX < nRawX and nRawX - nX or 0
+							tipProps.rect.x = nX + nOffset
+							tipProps.rect.w = nW - nOffset
+							OutputAdvanceTip(tipProps, col)
 						end
 						hCol.OnItemMouseLeave = function()
-							HideTip()
+							HideAdvanceTip(tipProps)
 						end
 					end
 					-- 排序
@@ -1091,16 +1196,42 @@ local function InitComponent(raw, szType)
 							szXml = GetFormatText(rec[col.key])
 						end
 						hItemContent:AppendItemFromString(szXml)
+						-- 单元格 Tip
+						if col.tip then
+							local tipProps = X.Clone(col.tip)
+							if not X.IsTable(tipProps) then
+								tipProps = { render = tipProps }
+							end
+							if not tipProps.position then
+								tipProps.position = UI.TIP_POSITION.LEFT_RIGHT
+							end
+							if not X.IsTable(tipProps.rect) then
+								tipProps.rect = {}
+							end
+							hItem.OnItemMouseIn = function()
+								local nX = this:GetAbsX()
+								local nW = this:GetW()
+								local nRawX = raw:GetAbsX()
+								local nOffset = nX < nRawX and nRawX - nX or 0
+								tipProps.rect.x = nX + nOffset
+								tipProps.rect.w = nW - nOffset
+								OutputAdvanceTip(tipProps, rec[col.key], rec, nRowIndex)
+							end
+							hItem.OnItemMouseOut = function()
+								HideAdvanceTip(tipProps)
+							end
+							hItem:RegisterEvent(UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
+						end
 					end
 					hRow.OnItemMouseEnter = function()
 						local nX, nY = raw:GetAbsX(), this:GetAbsY()
 						local nW, nH = raw:GetW(), this:GetH()
-						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), true, rec, nRowIndex, { nX, nY, nW, nH })
+						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), true, rec, nRowIndex, { x = nX, y = nY, w = nW, h = nH })
 					end
 					hRow.OnItemMouseLeave = function()
 						local nX, nY = raw:GetAbsX(), this:GetAbsY()
 						local nW, nH = raw:GetW(), this:GetH()
-						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), false, rec, nRowIndex, { nX, nY, nW, nH })
+						X.SafeCall(GetComponentProp(raw, 'OnRowHover'), false, rec, nRowIndex, { x = nX, y = nY, w = nW, h = nH })
 					end
 					hRow.OnItemMouseIn = function()
 						for _, szPath in ipairs({
@@ -5276,125 +5407,34 @@ function OO:RowHover(fnAction)
 end
 
 -- 鼠标悬停提示
--- @param {object} props 配置项
--- @param {string|function} props.render 要提示的纯文字或富文本，或返回前述内容的函数
--- @param {number} props.w 提示框宽度
--- @param {{ x: number; y: number }} props.offset 提示框触发区域偏移量
--- @param {UI.TIP_HIDE_WAY} props.position 提示框相对于触发区域的位置
--- @param {boolean} props.rich 提示框内容是否为富文本（当 render 为函数时取函数第二返回值）
--- @param {number} props.font 提示框字体（仅在非富文本下有效）
--- @param {number} props.r 提示框文字r（仅在非富文本下有效）
--- @param {number} props.g 提示框文字g（仅在非富文本下有效）
--- @param {number} props.b 提示框文字b（仅在非富文本下有效）
--- @param {UI.TIP_HIDE_WAY} props.hide 提示框消失方式
+-- @ref OutputAdvanceTip
 function OO:Tip(props)
-	if not X.IsTable(props) then
-		props = { render = props }
-	end
-	local nWidth = props.w or 450
-	local tOffset = props.offset or {}
-	local nOffsetX = tOffset.x or 0
-	local nOffsetY = tOffset.y or 0
-	local ePosition = props.position or UI.TIP_POSITION.FOLLOW_MOUSE
-	local eHide = props.hide or UI.TIP_HIDE_WAY.HIDE
-	local bRichText = props.rich
 	return self:Hover(
 		function(bIn)
 			if not bIn then
-				if eHide == UI.TIP_HIDE_WAY.HIDE then
-					HideTip(false)
-				elseif eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE then
-					HideTip(true)
-				end
+				HideAdvanceTip(props)
 				return
 			end
-			local nX, nY, nW, nH
-			if ePosition == UI.TIP_POSITION.FOLLOW_MOUSE then
-				nX, nY = Cursor.GetPos()
-				nX, nY = nX - 0, nY - 40
-				nW, nH = 40, 40
-			else
-				nX, nY = this:GetAbsPos()
-				nW, nH = this:GetSize()
-			end
-			nX, nY = nX + nOffsetX, nY + nOffsetY
-			local szText = props.render
-			if X.IsFunction(szText) then
-				local bSuccess
-				bSuccess, szText, bRichText = X.ExecuteWithThis(this, szText)
-				if not bSuccess then
-					return
-				end
-			end
-			if X.IsEmpty(szText) then
-				return
-			end
-			if not bRichText then
-				szText = GetFormatText(szText, props.font or 136, props.r, props.g, props.b)
-			end
-			OutputTip(szText, nWidth, {nX, nY, nW, nH}, ePosition)
+			OutputAdvanceTip(props)
 		end
 	)
 end
 
 -- 行鼠标悬停提示
--- @param {object} props 配置项
--- @param {string|function} props.render 要提示的纯文字或富文本，或返回前述内容的函数
--- @param {number} props.w 提示框宽度
--- @param {{ x: number; y: number }} props.offset 提示框触发区域偏移量
--- @param {UI.TIP_HIDE_WAY} props.position 提示框相对于触发区域的位置
--- @param {boolean} props.rich 提示框内容是否为富文本（当 render 为函数时取函数第二返回值）
--- @param {number} props.font 提示框字体（仅在非富文本下有效）
--- @param {number} props.r 提示框文字r（仅在非富文本下有效）
--- @param {number} props.g 提示框文字g（仅在非富文本下有效）
--- @param {number} props.b 提示框文字b（仅在非富文本下有效）
--- @param {UI.TIP_HIDE_WAY} props.hide 提示框消失方式
+-- @ref OutputAdvanceTip
 function OO:RowTip(props)
+	local props = X.Clone(props)
 	if not X.IsTable(props) then
 		props = { render = props }
 	end
-	local nWidth = props.w or 450
-	local tOffset = props.offset or {}
-	local nOffsetX = tOffset.x or 0
-	local nOffsetY = tOffset.y or 0
-	local ePosition = props.position or UI.TIP_POSITION.FOLLOW_MOUSE
-	local eHide = props.hide or UI.TIP_HIDE_WAY.HIDE
-	local bRichText = props.rich
 	return self:RowHover(
-		function(bIn, rec, nIndex, Rect)
+		function(bIn, rec, nIndex, rect)
 			if not bIn then
-				if eHide == UI.TIP_HIDE_WAY.HIDE then
-					HideTip(false)
-				elseif eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE then
-					HideTip(true)
-				end
+				HideAdvanceTip(props)
 				return
 			end
-			local nX, nY, nW, nH
-			if ePosition == UI.TIP_POSITION.FOLLOW_MOUSE then
-				nX, nY = Cursor.GetPos()
-				nX, nY = nX - 0, nY - 40
-				nW, nH = 40, 40
-			else
-				nX, nY = Rect[1], Rect[2]
-				nW, nH = Rect[3], Rect[4]
-			end
-			nX, nY = nX + nOffsetX, nY + nOffsetY
-			local szText = props.render
-			if X.IsFunction(szText) then
-				local bSuccess
-				bSuccess, szText, bRichText = X.ExecuteWithThis(this, szText, rec, nIndex)
-				if not bSuccess then
-					return
-				end
-			end
-			if X.IsEmpty(szText) then
-				return
-			end
-			if not bRichText then
-				szText = GetFormatText(szText, props.font or 136, props.r, props.g, props.b)
-			end
-			OutputTip(szText, nWidth, {nX, nY, nW, nH}, ePosition)
+			props.rect = rect
+			OutputAdvanceTip(props, rec, nIndex)
 		end
 	)
 end
