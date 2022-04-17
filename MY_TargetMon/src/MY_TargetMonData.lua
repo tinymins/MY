@@ -233,7 +233,7 @@ local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist
 						or ''
 				)
 				.. (
-					(config.decimalTime ~= 0 and (config.decimalTime == 3601 or (item.nTimeLeft < config.decimalTime and item.nTimeLeft >= 0.1)))
+					(config.decimalTime == -1 or item.nTimeLeft < config.decimalTime)
 						and ('%.1fs'):format(item.nTimeLeft % 60)
 						or ('%ds'):format(item.nTimeLeft % 60)
 				)
