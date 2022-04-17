@@ -1181,6 +1181,7 @@ local function InitComponent(raw, szType)
 		SetComponentProp(raw, 'DrawTableContent', function()
 			local function DrawContent(hContents, aColumns, aDataSource)
 				hContents:Clear()
+				local nContentsH = 0
 				for nRowIndex, rec in ipairs(aDataSource) do
 					local hRow = hContents:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_Row')
 					local hRowColumns = hRow:Lookup('Handle_RowColumns')
@@ -1266,7 +1267,9 @@ local function InitComponent(raw, szType)
 					hRow.OnItemRButtonClick = function()
 						X.SafeCall(GetComponentProp(raw, 'RowRClick'), rec, nRowIndex)
 					end
+					nContentsH = nContentsH + hRow:GetH()
 				end
+				hContents:SetH(nContentsH)
 			end
 			local aDataSource = GetComponentProp(raw, 'DataSource')
 			local Sorter = GetComponentProp(raw, 'Sorter')
