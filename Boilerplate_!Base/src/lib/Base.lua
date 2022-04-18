@@ -98,12 +98,10 @@ local _DELOG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level
 -------------------------------------------------------------------------------------------------------
 local _SERVER_ADDRESS_ = select(7, GetUserServer())
 local _RUNTIME_OPTIMIZE_ = (
-	_SERVER_ADDRESS_:find('^10%.') -- 10.0.0.0/8
-	or _SERVER_ADDRESS_:find('^127%.') -- 127.0.0.0/8
-	or _SERVER_ADDRESS_:find('^172%.1[6-9]%.') -- 172.16.0.0/12
-	or _SERVER_ADDRESS_:find('^172%.2[0-9]%.') -- 172.16.0.0/12
-	or _SERVER_ADDRESS_:find('^172%.3[0-1]%.') -- 172.16.0.0/12
-	or _SERVER_ADDRESS_:find('^192%.168%.') -- 192.168.0.0/16
+	debug.traceback ~= nil
+	and _DEBUG_LEVEL_ == DEBUG_LEVEL.NONE
+	and _DELOG_LEVEL_ == DEBUG_LEVEL.NONE
+	and not IsLocalFileExist(_ADDON_ROOT_ .. 'secret.jx3dat')
 ) and not IsLocalFileExist(_DATA_ROOT_ .. 'no.runtime.optimize.jx3dat')
 -------------------------------------------------------------------------------------------------------
 -- 初始化调试工具

@@ -1254,7 +1254,7 @@ function X.GetObject(arg0, arg1, arg2)
 		local me = GetClientPlayer()
 		if me and dwID == me.dwID then
 			p, info, b = me, me, false
-		elseif me and me.IsPlayerInMyParty(dwID) then
+		elseif not ENVIRONMENT.RUNTIME_OPTIMIZE and me and me.IsPlayerInMyParty(dwID) then
 			p, info, b = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID), true
 		else
 			p, info, b = GetPlayer(dwID), GetPlayer(dwID), false
