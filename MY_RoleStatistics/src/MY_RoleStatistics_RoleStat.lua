@@ -130,7 +130,6 @@ local DATA_ENV = setmetatable(
 			end
 		end,
 	})
-local SWAP = {}
 
 -------------------------------------------------------------------------------------------------------
 
@@ -229,14 +228,14 @@ local COLUMN_LIST = {
 	-- guid
 	{
 		szKey = 'guid',
-		GetValue = function(env, swap, prevVal, prevRec)
-			return D.GetPlayerGUID(env.me)
+		GetValue = function(prevVal, prevRec)
+			return D.GetPlayerGUID(GetClientPlayer())
 		end,
 	},
 	-- account
 	{
 		szKey = 'account',
-		GetValue = function(env, swap, prevVal, prevRec)
+		GetValue = function(prevVal, prevRec)
 			return X.GetAccount() or ''
 		end,
 	},
@@ -248,7 +247,7 @@ local COLUMN_LIST = {
 		bFloatTip = false,
 		nMinWidth = 100,
 		nMaxWidth = 100,
-		GetValue = function(env, swap, prevVal, prevRec)
+		GetValue = function(prevVal, prevRec)
 			return X.GetRealServer(1)
 		end,
 	},
@@ -260,7 +259,7 @@ local COLUMN_LIST = {
 		bFloatTip = false,
 		nMinWidth = 100,
 		nMaxWidth = 100,
-		GetValue = function(env, swap, prevVal, prevRec)
+		GetValue = function(prevVal, prevRec)
 			return X.GetRealServer(2)
 		end,
 	},
@@ -272,8 +271,8 @@ local COLUMN_LIST = {
 		bFloatTip = false,
 		nMinWidth = 110,
 		nMaxWidth = 200,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.szName
+		GetValue = function(prevVal, prevRec)
+			return GetClientPlayer().szName
 		end,
 		GetSummaryValue = function()
 			return 'SUMMARY'
@@ -296,8 +295,8 @@ local COLUMN_LIST = {
 		bFloatTip = false,
 		nMinWidth = 50,
 		nMaxWidth = 70,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.dwForceID
+		GetValue = function(prevVal, prevRec)
+			return GetClientPlayer().dwForceID
 		end,
 		GetSummaryValue = function()
 			return 'SUMMARY'
@@ -317,8 +316,8 @@ local COLUMN_LIST = {
 		bFloatTip = false,
 		nMinWidth = 50,
 		nMaxWidth = 50,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.nLevel
+		GetValue = function(prevVal, prevRec)
+			return GetClientPlayer().nLevel
 		end,
 		GetSummaryValue = function()
 			return 'SUMMARY'
@@ -331,8 +330,17 @@ local COLUMN_LIST = {
 		end,
 	},
 }
-for _, v in ipairs(X.LoadLUAData(PLUGIN_ROOT .. '/data/role/{$edition}.jx3dat') or {}) do
-	table.insert(COLUMN_LIST, v)
+-- 分版本列配置
+do
+	local f = X.LoadLUAData(PLUGIN_ROOT .. '/data/role/{$edition}.jx3dat')
+	if X.IsFunction(f) then
+		local t = f(DATA_ENV)
+		if X.IsTable(t) then
+			for _, v in ipairs(t) do
+				table.insert(COLUMN_LIST, v)
+			end
+		end
+	end
 end
 -- 时间
 table.insert(COLUMN_LIST, {
@@ -342,7 +350,7 @@ table.insert(COLUMN_LIST, {
 	bFloatTip = false,
 	nMinWidth = 165,
 	nMaxWidth = 200,
-	GetValue = function(env, swap, prevVal, prevRec)
+	GetValue = function(prevVal, prevRec)
 		return GetCurrentTime()
 	end,
 	GetSummaryValue = function()
@@ -363,7 +371,7 @@ table.insert(COLUMN_LIST, {
 	bFloatTip = false,
 	nMinWidth = 120,
 	nMaxWidth = 120,
-	GetValue = function(env, swap, prevVal, prevRec)
+	GetValue = function(prevVal, prevRec)
 		return GetCurrentTime()
 	end,
 	GetSummaryValue = function()
@@ -414,7 +422,7 @@ for _, col in ipairs(COLUMN_LIST) do
 	col.szTitle = _L.COLUMN_TITLE[col.szKey]
 	col.szTitleAbbr = _L.COLUMN_TITLE_ABBR[col.szKey] or _L.COLUMN_TITLE[col.szKey]
 	if not col.GetFormatText then
-		col.GetFormatText = function(v, rec, env)
+		col.GetFormatText = function(v, rec)
 			if not v then
 				return GetFormatText('--', 162, 255, 255, 255)
 			end
@@ -436,7 +444,7 @@ for _, col in ipairs(COLUMN_LIST) do
 		end
 	end
 	if col.bAlertChange and not col.GetCompareText then
-		col.GetCompareText = function(v1, v2, r1, r2, env)
+		col.GetCompareText = function(v1, v2, r1, r2)
 			if v1 == v2 or not X.IsNumber(v1) or not X.IsNumber(v2) then
 				return
 			end
@@ -446,11 +454,11 @@ for _, col in ipairs(COLUMN_LIST) do
 			if not f then
 				return
 			end
-			return env.GetFormatSysmsgText(f:format(math.abs(v2 - v1)))
+			return GetFormatSysmsgText(f:format(math.abs(v2 - v1)))
 		end
 	end
 	if not col.GetSummaryValue then
-		col.GetSummaryValue = function(values, records, env)
+		col.GetSummaryValue = function(values, records)
 			local summary
 			for _, v in ipairs(values) do
 				if X.IsNumber(v) then
@@ -463,12 +471,11 @@ for _, col in ipairs(COLUMN_LIST) do
 			return summary
 		end
 	end
-	SWAP[col.szKey] = {}
 	COLUMN_DICT[col.szKey] = col
 end
 
 for _, col in ipairs(COLUMN_LIST) do
-	X.SafeCall(col.Collector, DATA_ENV, SWAP[col.szKey])
+	X.SafeCall(col.Collector)
 end
 
 function D.GetPlayerRecords()
@@ -507,7 +514,7 @@ function D.GetClientPlayerRec()
 	end
 	-- 获取各列数据
 	for _, col in ipairs(COLUMN_LIST) do
-		rec[col.szKey] = col.GetValue(DATA_ENV, SWAP[col.szKey], rec[col.szKey], rec)
+		rec[col.szKey] = col.GetValue(rec[col.szKey], rec)
 	end
 	return X.Clone(rec)
 end
@@ -721,12 +728,12 @@ function D.GetTableColumns()
 				alignHorizontal = col.szAlignHorizontal or 'center',
 				render = col.GetFormatText
 					and function(value, record, index)
-						return col.GetFormatText(value, record, DATA_ENV)
+						return col.GetFormatText(value, record)
 					end
 					or nil,
 				sorter = col.Compare
 					and function(v1, v2, r1, r2)
-						return col.Compare(v1, v2, r1, r2, DATA_ENV)
+						return col.Compare(v1, v2, r1, r2)
 					end
 					or nil,
 			}
@@ -779,7 +786,7 @@ function D.UpdateUI(page)
 	local summary = {}
 	for _, col in ipairs(COLUMN_LIST) do
 		if col.bTable then
-			summary[col.szKey] = col.GetSummaryValue(tSumVal[col.szKey], aSumRec, DATA_ENV)
+			summary[col.szKey] = col.GetSummaryValue(tSumVal[col.szKey], aSumRec)
 		end
 	end
 
@@ -795,7 +802,7 @@ function D.GetRowTip(rec)
 		if col.bRowTip then
 			table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
 			table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-			table.insert(aXml, col.GetFormatText(rec[col.szKey], rec, DATA_ENV))
+			table.insert(aXml, col.GetFormatText(rec[col.szKey], rec))
 			table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 		end
 	end
@@ -812,7 +819,7 @@ function D.OutputFloatEntryTip(this, rec)
 		if col.bFloatTip then
 			table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
 			table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-			table.insert(aXml, col.GetFormatText(rec[col.szKey], rec, DATA_ENV))
+			table.insert(aXml, col.GetFormatText(rec[col.szKey], rec))
 			table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 		end
 	end
@@ -1212,16 +1219,14 @@ X.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', fun
 				D.tAlertSessionVal[szKey],
 				rec[szKey],
 				D.tAlertSessionVal,
-				rec,
-				DATA_ENV
+				rec
 			)
 			table.insert(aText, szCompare)
 			local szDailyCompare = col.GetCompareText(
 				O.tAlertTodayVal[szKey],
 				rec[szKey],
 				O.tAlertTodayVal,
-				rec,
-				DATA_ENV
+				rec
 			)
 			table.insert(aDailyText, szDailyCompare)
 		end

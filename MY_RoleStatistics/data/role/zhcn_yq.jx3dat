@@ -1,293 +1,295 @@
-return {
-	-- 装分
-	{
-		szKey = 'equip_score',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 55,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.GetBaseEquipScore() + env.me.GetStrengthEquipScore() + env.me.GetMountsEquipScore()
-		end,
-		GetSummaryValue = function()
-			return '--'
-		end,
-	},
-	-- 宠物分
-	{
-		szKey = 'pet_score',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 55,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.GetAcquiredFellowPetScore() + env.me.GetAcquiredFellowPetMedalScore()
-		end,
-		GetSummaryValue = function()
-			return '--'
-		end,
-	},
-	-- 金钱
-	{
-		szKey = 'money',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 200,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.GetMoney()
-		end,
-		GetSummaryValue = function(values, records, env)
-			local tMoney = { nGold = 0, nSilver = 0, nCopper = 0 }
-			for _, v in env.ipairs(values) do
-				tMoney = env.MoneyOptAdd(tMoney, v)
-			end
-			return tMoney
-		end,
-		GetFormatText = function(v, rec, env)
-			return env.GetMoneyText(v, 105)
-		end,
-		Compare = function(v1, v2)
-			if v1.nGold == v2.nGold then
-				if v1.nSilver == v2.nSilver then
-					if v1.nCopper == v2.nCopper then
+return function(env)
+	return {
+		-- 装分
+		{
+			szKey = 'equip_score',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 55,
+			GetValue = function(prevVal, prevRec)
+				return env.me.GetBaseEquipScore() + env.me.GetStrengthEquipScore() + env.me.GetMountsEquipScore()
+			end,
+			GetSummaryValue = function()
+				return '--'
+			end,
+		},
+		-- 宠物分
+		{
+			szKey = 'pet_score',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 55,
+			GetValue = function(prevVal, prevRec)
+				return env.me.GetAcquiredFellowPetScore() + env.me.GetAcquiredFellowPetMedalScore()
+			end,
+			GetSummaryValue = function()
+				return '--'
+			end,
+		},
+		-- 金钱
+		{
+			szKey = 'money',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 200,
+			GetValue = function(prevVal, prevRec)
+				return env.me.GetMoney()
+			end,
+			GetSummaryValue = function(values, records)
+				local tMoney = { nGold = 0, nSilver = 0, nCopper = 0 }
+				for _, v in env.ipairs(values) do
+					tMoney = env.MoneyOptAdd(tMoney, v)
+				end
+				return tMoney
+			end,
+			GetFormatText = function(v, rec)
+				return env.GetMoneyText(v, 105)
+			end,
+			Compare = function(v1, v2)
+				if v1.nGold == v2.nGold then
+					if v1.nSilver == v2.nSilver then
+						if v1.nCopper == v2.nCopper then
+							return 0
+						end
+						return v1.nCopper > v2.nCopper and 1 or -1
+					end
+					return v1.nSilver > v2.nSilver and 1 or -1
+				end
+				return v1.nGold > v2.nGold and 1 or -1
+			end,
+			GetCompareText = function(v1, v2, r1, r2)
+				local money = env.MoneyOptSub(v2, v1)
+				local nCompare = env.MoneyOptCmp(money, 0)
+				if nCompare == 0 then
+					return
+				end
+				local f = env.GetMsgFont('MSG_SYS')
+				local r, g, b = env.GetMsgFontColor('MSG_SYS')
+				local szExtra = 'font=' .. f .. ' r=' .. r .. ' g=' .. g .. ' b=' .. b
+				local szPrefix = nCompare >= 0 and env._L.COLUMN_COMPARE_INCREASE['money'] or env._L.COLUMN_COMPARE_DECREASE['money']
+				local moneyAbs = { nGold = env.math.abs(money.nGold), nSilver = env.math.abs(money.nSilver), nCopper = env.math.abs(money.nCopper) }
+				return env.GetFormatSysmsgText(szPrefix)
+					.. env.GetMoneyText(moneyAbs, szExtra)
+			end,
+		},
+		-- 江贡
+		{
+			szKey = 'contribution',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 70,
+			GetValue = function(prevVal, prevRec)
+				return env.me.nContribution
+			end,
+		},
+		-- 江贡周余
+		{
+			szKey = 'contribution_remain',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 70,
+			szRefreshCircle = 'weekly',
+			GetValue = function(prevVal, prevRec)
+				return env.me.GetContributionRemainSpace()
+			end,
+		},
+		-- 侠义
+		{
+			szKey = 'justice',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 60,
+			GetValue = function(prevVal, prevRec)
+				return env.me.nJustice
+			end,
+		},
+		-- 侠义周余
+		{
+			szKey = 'justice_remain',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 60,
+			szRefreshCircle = 'weekly',
+			GetValue = function(prevVal, prevRec)
+				return env.me.GetJusticeRemainSpace()
+			end,
+		},
+		-- 威望
+		{
+			szKey = 'prestige',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 70,
+			GetValue = function(prevVal, prevRec)
+				return env.me.nCurrentPrestige
+			end,
+		},
+		-- 威望周余
+		{
+			szKey = 'prestige_remain',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 70,
+			szRefreshCircle = 'weekly',
+			GetValue = function(prevVal, prevRec)
+				return env.me.GetPrestigeRemainSpace()
+			end,
+		},
+		-- 战阶积分
+		{
+			szKey = 'camp_point',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 70,
+			szRefreshCircle = 'weekly',
+			GetValue = function(prevVal, prevRec)
+				return env.me.nTitlePoint
+			end,
+		},
+		-- 战阶等级
+		{
+			szKey = 'camp_level',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 70,
+			GetValue = function(prevVal, prevRec)
+				return { level = env.me.nTitle, percent = env.me.GetRankPointPercentage() }
+			end,
+			GetSummaryValue = function()
+				return '--'
+			end,
+			Compare = function(v1, v2)
+				if v1.level == v2.level then
+					if v1.percent == v2.percent then
 						return 0
 					end
-					return v1.nCopper > v2.nCopper and 1 or -1
+					return v1.percent > v2.percent and 1 or -1
 				end
-				return v1.nSilver > v2.nSilver and 1 or -1
-			end
-			return v1.nGold > v2.nGold and 1 or -1
-		end,
-		GetCompareText = function(v1, v2, r1, r2, env)
-			local money = env.MoneyOptSub(v2, v1)
-			local nCompare = env.MoneyOptCmp(money, 0)
-			if nCompare == 0 then
-				return
-			end
-			local f = env.GetMsgFont('MSG_SYS')
-			local r, g, b = env.GetMsgFontColor('MSG_SYS')
-			local szExtra = 'font=' .. f .. ' r=' .. r .. ' g=' .. g .. ' b=' .. b
-			local szPrefix = nCompare >= 0 and env._L.COLUMN_COMPARE_INCREASE['money'] or env._L.COLUMN_COMPARE_DECREASE['money']
-			local moneyAbs = { nGold = env.math.abs(money.nGold), nSilver = env.math.abs(money.nSilver), nCopper = env.math.abs(money.nCopper) }
-			return env.GetFormatSysmsgText(szPrefix)
-				.. env.GetMoneyText(moneyAbs, szExtra)
-		end,
-	},
-	-- 江贡
-	{
-		szKey = 'contribution',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 70,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.nContribution
-		end,
-	},
-	-- 江贡周余
-	{
-		szKey = 'contribution_remain',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 70,
-		szRefreshCircle = 'weekly',
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.GetContributionRemainSpace()
-		end,
-	},
-	-- 侠义
-	{
-		szKey = 'justice',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 60,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.nJustice
-		end,
-	},
-	-- 侠义周余
-	{
-		szKey = 'justice_remain',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 60,
-		szRefreshCircle = 'weekly',
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.GetJusticeRemainSpace()
-		end,
-	},
-	-- 威望
-	{
-		szKey = 'prestige',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 70,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.nCurrentPrestige
-		end,
-	},
-	-- 威望周余
-	{
-		szKey = 'prestige_remain',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 70,
-		szRefreshCircle = 'weekly',
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.GetPrestigeRemainSpace()
-		end,
-	},
-	-- 战阶积分
-	{
-		szKey = 'camp_point',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 70,
-		szRefreshCircle = 'weekly',
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.nTitlePoint
-		end,
-	},
-	-- 战阶等级
-	{
-		szKey = 'camp_level',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 70,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return { level = env.me.nTitle, percent = env.me.GetRankPointPercentage() }
-		end,
-		GetSummaryValue = function()
-			return '--'
-		end,
-		Compare = function(v1, v2)
-			if v1.level == v2.level then
-				if v1.percent == v2.percent then
+				return v1.level > v2.level and 1 or -1
+			end,
+			GetFormatText = function(v, r)
+				if not v then
+					return ''
+				end
+				if env.IsString(v) then
+					return env.GetFormatText(v, 162, 255, 255, 255)
+				end
+				return env.GetFormatText(v.level .. ' + ' .. v.percent .. '%', 162, 255, 255, 255)
+			end,
+		},
+		-- 监本
+		{
+			szKey = 'exam_print',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 55,
+			GetValue = function(prevVal, prevRec)
+				return env.me.nExamPrint
+			end,
+		},
+		-- 监本周余
+		{
+			szKey = 'exam_print_remain',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 55,
+			szRefreshCircle = 'weekly',
+			GetValue = function(prevVal, prevRec)
+				return env.me.GetExamPrintRemainSpace()
+			end,
+		},
+		-- 资历
+		{
+			szKey = 'achievement_score',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 70,
+			GetValue = function(prevVal, prevRec)
+				return env.me.GetAchievementRecord()
+			end,
+		},
+		-- 通宝
+		{
+			szKey = 'coin',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 70,
+			GetValue = function(prevVal, prevRec)
+				return { owner = env.GetAccount() .. '#' .. env.GetRealServer(1), value = env.me.nCoin }
+			end,
+			GetSummaryValue = function(values, records)
+				local tOwner, nCoin = {}, 0
+				for _, v in env.ipairs(values) do
+					if not tOwner[v.owner] and env.IsNumber(v.value) then
+						nCoin = nCoin + v.value
+						tOwner[v.owner] = true
+					end
+				end
+				return nCoin
+			end,
+			Compare = function(v1, v2)
+				if v1.value == v2.value then
 					return 0
 				end
-				return v1.percent > v2.percent and 1 or -1
-			end
-			return v1.level > v2.level and 1 or -1
-		end,
-		GetFormatText = function(v, r, env)
-			if not v then
-				return ''
-			end
-			if env.IsString(v) then
-				return env.GetFormatText(v, 162, 255, 255, 255)
-			end
-			return env.GetFormatText(v.level .. ' + ' .. v.percent .. '%', 162, 255, 255, 255)
-		end,
-	},
-	-- 监本
-	{
-		szKey = 'exam_print',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 55,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.nExamPrint
-		end,
-	},
-	-- 监本周余
-	{
-		szKey = 'exam_print_remain',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 55,
-		szRefreshCircle = 'weekly',
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.GetExamPrintRemainSpace()
-		end,
-	},
-	-- 资历
-	{
-		szKey = 'achievement_score',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 70,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.GetAchievementRecord()
-		end,
-	},
-	-- 通宝
-	{
-		szKey = 'coin',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 70,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return { owner = env.GetAccount() .. '#' .. env.GetRealServer(1), value = env.me.nCoin }
-		end,
-		GetSummaryValue = function(values, records, env)
-			local tOwner, nCoin = {}, 0
-			for _, v in env.ipairs(values) do
-				if not tOwner[v.owner] and env.IsNumber(v.value) then
-					nCoin = nCoin + v.value
-					tOwner[v.owner] = true
+				if not v1.value then
+					return -1
 				end
-			end
-			return nCoin
-		end,
-		Compare = function(v1, v2)
-			if v1.value == v2.value then
-				return 0
-			end
-			if not v1.value then
-				return -1
-			end
-			if not v2.value then
-				return 1
-			end
-			return v1.value > v2.value and 1 or -1
-		end,
-		GetFormatText = function(v, r, env)
-			if not v then
-				return ''
-			end
-			if env.IsNumber(v) then
-				return env.GetFormatText(v, 162, 255, 255, 255)
-			end
-			return env.GetFormatText(v.value, 162, 255, 255, 255)
-		end,
-	},
-	-- 师徒分
-	{
-		szKey = 'mentor_score',
-		bTable = true,
-		bRowTip = true,
-		bFloatTip = true,
-		bAlertChange = true,
-		nMinWidth = 70,
-		GetValue = function(env, swap, prevVal, prevRec)
-			return env.me.dwTAEquipsScore
-		end,
-	},
-}
+				if not v2.value then
+					return 1
+				end
+				return v1.value > v2.value and 1 or -1
+			end,
+			GetFormatText = function(v, r)
+				if not v then
+					return ''
+				end
+				if env.IsNumber(v) then
+					return env.GetFormatText(v, 162, 255, 255, 255)
+				end
+				return env.GetFormatText(v.value, 162, 255, 255, 255)
+			end,
+		},
+		-- 师徒分
+		{
+			szKey = 'mentor_score',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 70,
+			GetValue = function(prevVal, prevRec)
+				return env.me.dwTAEquipsScore
+			end,
+		},
+	}
+end
