@@ -1188,8 +1188,10 @@ X.RegisterInit('MY_RoleStatistics_DungeonEntry', function()
 end)
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonStat', function()
 	D.bReady = true
-	D.UpdateSaveDB()
-	D.FlushDB()
+	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
 	D.UpdateFloatEntry()
 end)
 X.RegisterReload('MY_RoleStatistics_DungeonEntry', function() D.ApplyFloatEntry(false) end)

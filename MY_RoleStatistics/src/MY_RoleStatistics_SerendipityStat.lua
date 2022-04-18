@@ -1439,8 +1439,10 @@ end
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_SerendipityStat', function()
 	D.bReady = true
 	D.CheckMapMark()
-	D.UpdateSaveDB()
-	D.FlushDB()
+	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
 	D.UpdateFloatEntry()
 end)
 

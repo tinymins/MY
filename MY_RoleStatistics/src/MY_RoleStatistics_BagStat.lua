@@ -1094,8 +1094,10 @@ end
 
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_BagStat', function()
 	D.bReady = true
-	D.UpdateSaveDB()
-	D.FlushDB()
+	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
 	D.UpdateFloatEntry()
 end)
 X.RegisterReload('MY_RoleStatistics_BagStat', function() D.ApplyFloatEntry(false) end)
