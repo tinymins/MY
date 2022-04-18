@@ -5442,41 +5442,44 @@ function OO:RowTip(props)
 	)
 end
 
--- check 复选框状态变化
--- :Check(fnOnCheckBoxCheck[, fnOnCheckBoxUncheck]) 绑定
--- :Check()                返回是否已勾选
--- :Check(bool bChecked)   勾选/取消勾选
-function OO:Check(fnCheck, fnUncheck, bNoAutoBind)
+-- --------------------------------------------
+-- 绑定复选框状态变化： function(fnAction): self
+-- @param {function(bChecked: boolean): void} fnAction 复选框状态变化回调函数
+-- @return {self} 返回自身
+-- --------------------------------------------
+-- 获取是否已勾选： function(): boolean
+-- @return {boolean} 返回是否已勾选
+-- --------------------------------------------
+-- 勾选/取消勾选： function(bool bChecked): self
+-- @param {boolean} bChecked 是否勾选
+-- @return {self} 返回自身
+-- --------------------------------------------
+function OO:Check(fnAction, eEventFireType)
 	self:_checksum()
-	if not bNoAutoBind then
-		fnUncheck = fnUncheck or fnCheck
-	end
-	if X.IsFunction(fnCheck) or X.IsFunction(fnUncheck) then
+	if X.IsFunction(fnAction) then
 		for _, raw in ipairs(self.raws) do
 			local chk = GetComponentElement(raw, 'CHECKBOX')
 			if chk then
-				if X.IsFunction(fnCheck) then
-					UI(chk):UIEvent('OnCheckBoxCheck', function() fnCheck(true) end)
-				end
-				if X.IsFunction(fnUncheck) then
-					UI(chk):UIEvent('OnCheckBoxUncheck', function() fnUncheck(false) end)
+				if X.IsFunction(fnAction) then
+					UI(chk):UIEvent('OnCheckBoxCheck', function() fnAction(true) end)
+					UI(chk):UIEvent('OnCheckBoxUncheck', function() fnAction(false) end)
 				end
 			end
 		end
 		return self
-	elseif X.IsBoolean(fnCheck) then
+	elseif X.IsBoolean(fnAction) then
 		for _, raw in ipairs(self.raws) do
 			local chk = GetComponentElement(raw, 'CHECKBOX')
 			if chk then
-				if fnUncheck then
-					chk:Check(fnCheck, fnUncheck)
+				if eEventFireType then
+					chk:Check(fnAction, eEventFireType)
 				else
-					chk:Check(fnCheck)
+					chk:Check(fnAction)
 				end
 			end
 		end
 		return self
-	elseif not fnCheck then
+	elseif X.IsNil(fnAction) then
 		local raw = self.raws[1]
 		if raw then
 			local chk = GetComponentElement(raw, 'CHECKBOX')
@@ -5486,7 +5489,7 @@ function OO:Check(fnCheck, fnUncheck, bNoAutoBind)
 		end
 	--[[#DEBUG BEGIN]]
 	else
-		X.Debug('ERROR UI:Check', 'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck), X.DEBUG_LEVEL.ERROR)
+		X.Debug('ERROR UI:Check', 'fnAction: ' .. type(fnAction), X.DEBUG_LEVEL.ERROR)
 	--[[#DEBUG END]]
 	end
 end
