@@ -952,6 +952,9 @@ end
 end
 
 function D.OnFrameBreathe()
+	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 32 ~= 0 then
+		return
+	end
 	local me = GetClientPlayer()
 	if not me then
 		return

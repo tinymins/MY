@@ -664,7 +664,7 @@ function D.GetPlayer(dwID)
 		}
 	else
 		player = GetPlayer(dwID)
-		info = GetClientTeam().GetMemberInfo(dwID)
+		info = not ENVIRONMENT.RUNTIME_OPTIMIZE and GetClientTeam().GetMemberInfo(dwID)
 	end
 	if info then
 		if player then
@@ -1331,6 +1331,9 @@ end
 
 -- 保存玩家信息
 function D.SavePlayerInfo(data, dwID, bRefresh)
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
 	if (bRefresh or not data[DK.PLAYER_LIST][dwID]) and IsPlayer(dwID) then
 		local player, info = D.GetPlayer(dwID)
 		if player and info and not X.IsEmpty(info.dwMountKungfuID) then
