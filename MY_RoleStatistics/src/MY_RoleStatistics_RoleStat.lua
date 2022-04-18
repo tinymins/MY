@@ -36,46 +36,6 @@ local function GetFormatSysmsgText(szText)
 	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
 end
 
-local function GeneWeeklyFormatText(szKey)
-	return function(r)
-		local nNextTime, nCircle = X.GetRefreshTime('weekly')
-		local szText = (nNextTime - nCircle < r.time and r[szKey] and r[szKey] >= 0)
-			and r[szKey]
-			or _L['--']
-		return GetFormatText(szText, 162, 255, 255, 255)
-	end
-end
-local function GeneWeeklySummaryFormatText(szKey)
-	return function(rs)
-		local nNextTime, nCircle = X.GetRefreshTime('weekly')
-		local v = nil
-		for _, r in ipairs(rs) do
-			if nNextTime - nCircle < r.time and X.IsNumber(r[szKey]) and r[szKey] >= 0 then
-				if not v then
-					v = 0
-				end
-				v = v + r[szKey]
-			end
-		end
-		return GetFormatText(v or '--', 162, 255, 255, 255)
-	end
-end
-local function GeneWeeklyCompare(szKey)
-	return function(r1, r2)
-		local nNextTime, nCircle = X.GetRefreshTime('weekly')
-		local v1 = nNextTime - nCircle < r1.time
-			and r1[szKey]
-			or -1
-		local v2 = nNextTime - nCircle < r2.time
-			and r2[szKey]
-			or -1
-		if v1 == v2 then
-			return 0
-		end
-		return v1 > v2 and 1 or -1
-	end
-end
-
 local DATA_ENV = setmetatable(
 	{
 		_L                         = _L                          ,
@@ -1183,19 +1143,6 @@ function D.OnLButtonClick()
 			D.UpdateUI(page)
 		end)
 	end
-end
-
-function D.OnItemMouseEnter()
-	if this.tip then
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)
-	end
-end
-D.OnItemRefreshTip = D.OnItemMouseEnter
-
-function D.OnItemMouseLeave()
-	HideTip()
 end
 
 X.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
