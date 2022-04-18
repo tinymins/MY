@@ -2403,7 +2403,7 @@ end
 
 -- drag area
 -- (self) drag(boolean bEnableDrag) -- enable/disable drag
--- (self) drag(number nX, number y, number w, number h) -- set drag positon and area
+-- (self) drag(number nX, number y, number w, number h) -- set drag position and area
 -- (self) drag(function fnOnDrag, function fnOnDragEnd)-- bind frame/item frag event handle
 function OO:Drag(...)
 	self:_checksum()
@@ -4388,6 +4388,8 @@ end
 
 -- (self) Instance:Image(szImageAndFrame)
 -- (self) Instance:Image(szImage, nFrame)
+-- (self) Instance:Image(szImage, nNormalFrame, nOverFrame, nDownFrame, nDisableFrame)
+-- (self) Instance:Image(el)
 function OO:Image(szImage, nFrame, nOverFrame, nDownFrame, nDisableFrame)
 	self:_checksum()
 	if X.IsString(szImage) and X.IsNil(nFrame) then
@@ -4425,6 +4427,17 @@ function OO:Image(szImage, nFrame, nOverFrame, nDownFrame, nDisableFrame)
 				if raw then
 					raw:FromTextureFile(szImage)
 					raw:GetParent():FormatAllItemPos()
+				end
+			end
+		end
+	elseif X.IsElement(szImage) then
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'IMAGE')
+			if raw then
+				if szImage:GetBaseType() == 'Wnd' then
+					raw:FromWindow(szImage)
+				else
+					raw:FromItem(szImage)
 				end
 			end
 		end
