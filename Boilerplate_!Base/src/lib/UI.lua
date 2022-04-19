@@ -321,6 +321,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onChange           ~= nil then ui:Change           (arg.onChange                                    ) end
 		if arg.onSpecialKeyDown   ~= nil then ui:OnSpecialKeyDown (arg.onSpecialKeyDown                            ) end
 		if arg.onDrag                    then ui:Drag             (arg.onDrag                                      ) end
+		if arg.onDragHover               then ui:DragHover        (arg.onDragHover                                 ) end
 		if arg.onDrop                    then ui:Drop             (arg.onDrop                                      ) end
 		if arg.customLayout              then ui:CustomLayout     (arg.customLayout                                ) end
 		if arg.onCustomLayout            then ui:CustomLayout     (arg.onCustomLayout, arg.customLayoutPoint       ) end
@@ -2553,6 +2554,27 @@ function OO:Drag(...)
 	end
 end
 
+function OO:DragHover(fnAction)
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		if raw:GetBaseType() == 'Item' then
+			SetComponentProp(raw, 'DragHover', fnAction)
+			UI(raw):UIEvent('OnItemMouseHover', function()
+				if not UI.IsDragDropOpened() then
+					return
+				end
+				local szDragGroupID = UI.GetDragDropData()
+				if szDragGroupID == GetComponentProp(raw, 'DragDropGroup') then
+					local rect, bAcceptable, eCursor = fnAction()
+					UI.SetDragDropHoverEl(raw, rect, bAcceptable, eCursor)
+				end
+			end)
+			raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_HOVER)
+		end
+	end
+	return self
+end
+
 function OO:Drop(fnAction)
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
@@ -2563,7 +2585,12 @@ function OO:Drop(fnAction)
 				end
 				local szDragGroupID = UI.GetDragDropData()
 				if szDragGroupID == GetComponentProp(raw, 'DragDropGroup') then
-					UI.SetDragDropHoverEl(raw)
+					local rect, bAcceptable, eCursor
+					local fnDragHover = GetComponentProp(raw, 'DragHover')
+					if fnDragHover then
+						rect, bAcceptable, eCursor = fnDragHover()
+					end
+					UI.SetDragDropHoverEl(raw, rect, bAcceptable, eCursor)
 				end
 			end)
 			UI(raw):UIEvent('OnItemMouseLeave', function()
@@ -2578,6 +2605,7 @@ function OO:Drop(fnAction)
 			SetComponentProp(raw, 'OnDrop', function(szDragGroupID, xData)
 				X.ExecuteWithThis(raw, fnAction, szDragGroupID, xData)
 			end)
+			raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_HOVER)
 			raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
 		end
 	end

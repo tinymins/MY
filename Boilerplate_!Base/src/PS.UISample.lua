@@ -216,6 +216,16 @@ local COMPONENT_SAMPLE = {
 				}
 				return 'data 2', capture
 			end,
+			onDragHover = function()
+				local frame = this:GetRoot()
+				local rect = {
+					x = frame:GetAbsX(),
+					y = frame:GetAbsY(),
+					w = frame:GetW(),
+					h = frame:GetH(),
+				}
+				return rect
+			end,
 			onDrop = function(dragID, data)
 				X.Sysmsg('Drop 2, ' .. tostring(dragID) .. ', ' .. X.EncodeLUAData(data))
 			end,

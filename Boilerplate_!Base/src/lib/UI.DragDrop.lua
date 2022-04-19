@@ -106,7 +106,7 @@ function D.GetData()
 	end
 end
 
-function D.SetHoverEl(el, rect)
+function D.SetHoverEl(el, rect, bAcceptable, eCursor)
 	if not D.IsOpened() then
 		return
 	end
@@ -116,7 +116,10 @@ function D.SetHoverEl(el, rect)
 	end
 	if el then
 		local nX, nY, nW, nH
-		if X.IsTable(rect) then
+		if X.IsElement(rect) then
+			nX, nY = rect:GetAbsPos()
+			nW, nH = rect:GetSize()
+		elseif X.IsTable(rect) then
 			nX = rect.x
 			nY = rect.y
 			nW = rect.w
