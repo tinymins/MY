@@ -1021,10 +1021,13 @@ local function InitComponent(raw, szType)
 			if not nScrollX or nScrollX == 'auto' then
 				nScrollX = raw:GetW() - nFixedLWidth - nFixedRWidth
 			end
-			local nExtraWidth = nScrollX
+			local nExtraWidth, nStaticWidth = nScrollX, 0
 			for i, col in ipairs(aScrollableColumns) do
 				if col.minWidth then
 					nExtraWidth = nExtraWidth - col.minWidth
+				elseif col.width then
+					nExtraWidth = nExtraWidth - col.width
+					nStaticWidth = nStaticWidth + col.width
 				end
 			end
 			if nExtraWidth < 0 then
@@ -1033,10 +1036,14 @@ local function InitComponent(raw, szType)
 			end
 			for i, col in ipairs(aScrollableColumns) do
 				local hCol = hScrollableColumns:Lookup(i - 1) -- Íâ²¿¾ÓÖÐ²ã
-				local nMinWidth = col.minWidth or 0
+				local nMinWidth = col.minWidth
 				local nWidth = i == #aScrollableColumns
 					and (nScrollX - nX)
-					or math.min(nExtraWidth * nMinWidth / (nScrollX - nExtraWidth) + nMinWidth, col.maxWidth or math.huge)
+					or (
+						nMinWidth
+							and math.min(nExtraWidth * nMinWidth / (nScrollX - nExtraWidth) + nMinWidth, col.maxWidth or math.huge)
+							or (col.width or 0)
+					)
 				if i == 1 then
 					hCol:Lookup('Image_TableColumn_Break'):Hide()
 				end
