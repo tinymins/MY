@@ -48,7 +48,7 @@ X.RegisterBgMsg(X.NSFormatString('{$NS}_GFN_CHECK'), function(_, oData, nChannel
 	if bSelf or X.IsDebugClient(true) then
 		return
 	end
-	X.SendBgMsg(szTalkerName, X.NSFormatString('{$NS}_GFN_REPLY'), {oData[1], X.XpCall(X.Get(_G, oData[2]), select(3, unpack(oData)))}, true)
+	X.SendBgMsg(szTalkerName, X.NSFormatString('{$NS}_GFN_REPLY'), {oData[1], X.XpCall(X.Get(_G, oData[2]), select(3, X.Unpack(oData)))}, true)
 end)
 
 -- 进组查看属性

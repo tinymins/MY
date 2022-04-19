@@ -24,7 +24,7 @@ local function PickBranch(tData)
 end
 
 local FORCE_TYPE = (function()
-	local FORCE_TYPE = _G.FORCE_TYPE or SetmetaReadonly({
+	local FORCE_TYPE = _G.FORCE_TYPE or X.SetmetaReadonly({
 		JIANG_HU  = 0 , -- 江湖
 		SHAO_LIN  = 1 , -- 少林
 		WAN_HUA   = 2 , -- 万花
@@ -49,7 +49,7 @@ local FORCE_TYPE = (function()
 			res[k] = v
 		end
 	end
-	return SetmetaReadonly(res)
+	return X.SetmetaReadonly(res)
 end)()
 
 local TEAM_MARK = {
@@ -66,11 +66,11 @@ local TEAM_MARK = {
 }
 
 CONSTANT = {
-	MENU_DIVIDER = SetmetaReadonly({ bDevide = true }),
-	EMPTY_TABLE = SetmetaReadonly({}),
+	MENU_DIVIDER = X.SetmetaReadonly({ bDevide = true }),
+	EMPTY_TABLE = X.SetmetaReadonly({}),
 	XML_LINE_BREAKER = GetFormatText('\n'),
 	MAX_PLAYER_LEVEL = 50,
-	UI_OBJECT = UI_OBJECT or SetmetaReadonly({
+	UI_OBJECT = UI_OBJECT or X.SetmetaReadonly({
 		NONE             = -1, -- 空Box
 		ITEM             = 0 , -- 身上有的物品。nUiId, dwBox, dwX, nItemVersion, nTabType, nIndex
 		SHOP_ITEM        = 1 , -- 商店里面出售的物品 nUiId, dwID, dwShopID, dwIndex
@@ -93,7 +93,7 @@ CONSTANT = {
 		TRAIN            = 21, -- 修为
 		EMOTION_ACTION   = 22, -- 动作表情
 	}),
-	GLOBAL_HEAD = GLOBAL_HEAD or SetmetaReadonly({
+	GLOBAL_HEAD = GLOBAL_HEAD or X.SetmetaReadonly({
 		CLIENTPLAYER = 0,
 		OTHERPLAYER  = 1,
 		NPC          = 2,
@@ -103,7 +103,7 @@ CONSTANT = {
 		NAME         = 3,
 		MARK         = 4,
 	}),
-	EQUIPMENT_SUB = EQUIPMENT_SUB or SetmetaReadonly({
+	EQUIPMENT_SUB = EQUIPMENT_SUB or X.SetmetaReadonly({
 		MELEE_WEAPON      = 0 , -- 近战武器
 		RANGE_WEAPON      = 1 , -- 远程武器
 		CHEST             = 2 , -- 上衣
@@ -129,7 +129,7 @@ CONSTANT = {
 		BACK_CLOAK_EXTEND = 22, -- 披风
 		TOTAL             = 23, --
 	}),
-	EQUIPMENT_INVENTORY = EQUIPMENT_INVENTORY or SetmetaReadonly({
+	EQUIPMENT_INVENTORY = EQUIPMENT_INVENTORY or X.SetmetaReadonly({
 		MELEE_WEAPON  = 1 , -- 普通近战武器
 		BIG_SWORD     = 2 , -- 重剑
 		RANGE_WEAPON  = 3 , -- 远程武器
@@ -174,7 +174,7 @@ CONSTANT = {
 			{ __index = _G.CHARACTER_OTACTION_TYPE }),
 		__newindex = function() end,
 	}),
-	ROLE_TYPE_LABEL = SetmetaReadonly({
+	ROLE_TYPE_LABEL = X.SetmetaReadonly({
 		[ROLE_TYPE.STANDARD_MALE  ] = _L['Man'],
 		[ROLE_TYPE.STANDARD_FEMALE] = _L['Woman'],
 		[ROLE_TYPE.LITTLE_BOY     ] = _L['Boy'],
@@ -183,7 +183,7 @@ CONSTANT = {
 	FORCE_TYPE = FORCE_TYPE,
 	FORCE_TYPE_LABEL = g_tStrings.tForceTitle,
 	KUNGFU_TYPE = (function()
-		local KUNGFU_TYPE = _G.KUNGFU_TYPE or SetmetaReadonly({
+		local KUNGFU_TYPE = _G.KUNGFU_TYPE or X.SetmetaReadonly({
 			TIAN_CE     = 1,      -- 天策内功
 			WAN_HUA     = 2,      -- 万花内功
 			CHUN_YANG   = 3,      -- 纯阳内功
@@ -207,27 +207,27 @@ CONSTANT = {
 				res[k] = v
 			end
 		end
-		return SetmetaReadonly(res)
+		return X.SetmetaReadonly(res)
 	end)(),
-	PEEK_OTHER_PLAYER_RESPOND = PEEK_OTHER_PLAYER_RESPOND or SetmetaReadonly({
+	PEEK_OTHER_PLAYER_RESPOND = PEEK_OTHER_PLAYER_RESPOND or X.SetmetaReadonly({
 		INVALID             = 0,
 		SUCCESS             = 1,
 		FAILED              = 2,
 		CAN_NOT_FIND_PLAYER = 3,
 		TOO_FAR             = 4,
 	}),
-	MIC_STATE = MIC_STATE or SetmetaReadonly({
+	MIC_STATE = MIC_STATE or X.SetmetaReadonly({
 		NOT_AVIAL = 1,
 		CLOSE_NOT_IN_ROOM = 2,
 		CLOSE_IN_ROOM = 3,
 		KEY = 4,
 		FREE = 5,
 	}),
-	SPEAKER_STATE = SPEAKER_STATE or SetmetaReadonly({
+	SPEAKER_STATE = SPEAKER_STATE or X.SetmetaReadonly({
 		OPEN = 1,
 		CLOSE = 2,
 	}),
-	ITEM_QUALITY = SetmetaReadonly({
+	ITEM_QUALITY = X.SetmetaReadonly({
 		GRAY    = 0, -- 灰色
 		WHITE   = 1, -- 白色
 		GREEN   = 2, -- 绿色
@@ -451,7 +451,7 @@ CONSTANT = {
 			end,
 			__metatable = true,
 		}),
-	MSG_THEME = SetmetaReadonly({
+	MSG_THEME = X.SetmetaReadonly({
 		NORMAL = 0,
 		ERROR = 1,
 		WARNING = 2,
@@ -794,7 +794,7 @@ CONSTANT = {
 	INVENTORY_GUILD_BANK = INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, --帮会仓库界面虚拟一个背包位置
 	INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100,
 	INVENTORY_GUILD_PAGE_BOX_COUNT = 98,
-	AUCTION_ITEM_LIST_TYPE = _G.AUCTION_ITEM_LIST_TYPE or SetmetaReadonly({
+	AUCTION_ITEM_LIST_TYPE = _G.AUCTION_ITEM_LIST_TYPE or X.SetmetaReadonly({
 		NORMAL_LOOK_UP = 0,
 		PRICE_LOOK_UP  = 1,
 		DETAIL_LOOK_UP = 2,
@@ -814,6 +814,23 @@ CONSTANT = {
 		[TEAM_MARK.DART ] = _L['TEAM_MARK_DART' ],
 		[TEAM_MARK.FAN  ] = _L['TEAM_MARK_FAN'  ],
 	},
+	MACHINE_GPU_TYPE = X.SetmetaReadonly({
+		LOW    = 1,
+		NORMAL = 2,
+	}),
+	MACHINE_GPU_LEVEL = X.SetmetaReadonly({
+		ENABLE     =  0,
+		ATTEND     =  1,
+		LOWEST     =  2, -- 最简
+		LOW_MOST   =  3, -- 简约
+		LOW        =  4, -- 均衡
+		MEDIUM     =  5, -- 唯美 // 这档现在弃用了，原来选这档的人进来以后直接改成均衡
+		HIGH       =  6, -- 高效
+		PERFECTION =  7, -- 电影
+		HD         =  8, -- 极致
+		PERFECT    = 10, -- 沉浸
+		EXPLORE    =  9, -- 探索 // 比 PERFECT 要高，但是枚举值却小一点
+	}),
 }
 
 -- 更新最高玩家等级数据

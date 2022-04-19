@@ -13,6 +13,16 @@ local string, math, table = string, math, table
 local X = MY
 local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
+
+-- TODO: 界面库需要重构，该文件应作为入口文件，仅用于分发各个组件的函数调用
+-- TODO: 应当增加基础组件类型操作对象 ComponentBase ，可以提供组件的基本操作方法如 ComponentBase.Size(raw, ...)
+-- TODO: 应当增加组件注册函数 function UI.RegisterComponent(function(super, GetComponentProp, SetComponentProp) return szComponentName, ComponentOO end)
+-- TODO: 子组件可以覆盖基础组件的操作方法，如 ComponentOO.Size(raw, ...)
+-- TODO: 子组件也可以通过 super 调用基础组件的方法，如 super.Size(raw, ...)
+-- TODO: 有时间再说吧，是个大工程
+
+-------------------------------------------------------------------------------------------------------
+
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 UI.ITEM_EVENT = X.SetmetaReadonly({
@@ -39,6 +49,57 @@ UI.ITEM_EVENT = X.SetmetaReadonly({
 	R_BUTTON_DRAG     = 0x00100000,
 	M_BUTTON_DRAG     = 0x00200000,
 	MOUSE_IN_OUT      = 0x00400000,
+})
+UI.CURSOR = CURSOR or X.SetmetaReadonly({
+	NORMAL              = 0,
+	CAST                = 1,
+	UNABLECAST          = 2,
+	TRAVEL              = 3,
+	UNABLETRAVEL        = 4,
+	SELL                = 5,
+	UNABLESELL          = 6,
+	BUYBACK             = 7,
+	UNABLEBUYBACK       = 8,
+	REPAIRE             = 9,
+	UNABLEREPAIRE       = 10,
+	ATTACK              = 11,
+	UNABLEATTACK        = 12,
+	SPEAK               = 13,
+	UNABLESPEAK         = 14,
+	LOOT                = 15,
+	UNABLELOOT          = 16,
+	LOCK                = 17,
+	UNABLELOCK          = 18,
+	INSPECT             = 19,
+	UNABLEINSPECT       = 20,
+	SPLIT               = 21,
+	UNABLESPLIT         = 22,
+	FLOWER              = 23,
+	UNABLEFLOWER        = 24,
+	MINE                = 25,
+	UNABLEMINE          = 26,
+	SEARCH              = 27,
+	UNABLESEARCH        = 28,
+	QUEST               = 29,
+	UNABLEQUEST         = 30,
+	READ                = 31,
+	UNABLEREAD          = 32,
+	MARKPRICE           = 33,
+	TOP_BOTTOM          = 34,
+	LEFT_RIGHT          = 35,
+	LEFTTOP_RIGHTBOTTOM = 36,
+	RIGHTTOP_LEFTBOTTOM = 37,
+	CURSOR_MOVE         = 38,
+	CHESS               = 57,
+	CHAT_LOCK           = 58,
+	HAND_OBJECT         = 59,
+	DESTROY             = 60,
+	DRAG                = 61,
+	ON_DRAG             = 62,
+	DRAW                = 63,
+	POSITION            = 64,
+	HOMELAND_BRUSH      = 65,
+	HOMELAND_DIG_CELLAR = 66,
 })
 UI.MOUSE_BUTTON = X.SetmetaReadonly({
 	LEFT   = 1,
@@ -181,6 +242,8 @@ local EDIT_BOX_APPEARANCE_CONFIG = {
 	},
 }
 
+-- TODO: local REGISTERED_COMPONENT = {}
+
 -----------------------------------------------------------
 -- my ui common functions
 -----------------------------------------------------------
@@ -203,7 +266,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.group              ~= nil then ui:Group            (arg.group                                       ) end
 		if arg.tip                ~= nil then ui:Tip              (arg.tip                                         ) end
 		if arg.rowTip             ~= nil then ui:RowTip           (arg.rowTip                                      ) end
-		if arg.range              ~= nil then ui:Range            (unpack(arg.range)                               ) end
+		if arg.range              ~= nil then ui:Range            (X.Unpack(arg.range)                             ) end
 		if arg.value              ~= nil then ui:Value            (arg.value                                       ) end
 		if arg.menu               ~= nil then ui:Menu             (arg.menu                                        ) end
 		if arg.menuLClick         ~= nil then ui:MenuLClick       (arg.menuLClick                                  ) end
@@ -229,7 +292,12 @@ local function ApplyUIArguments(ui, arg)
 		if arg.name               ~= nil then ui:Name             (arg.name                                        ) end
 		if arg.penetrable         ~= nil then ui:Penetrable       (arg.penetrable                                  ) end
 		if arg.draggable          ~= nil then ui:Drag             (arg.draggable                                   ) end
-		if arg.dragArea           ~= nil then ui:Drag             (unpack(arg.dragArea)                            ) end
+		if arg.dragArea           ~= nil then ui:Drag             (X.Unpack(arg.dragArea)                          ) end
+		if arg.dragDropGroup             then ui:DragDropGroup    (arg.dragDropGroup                               ) end
+		if arg.columns                   then ui:Columns          (arg.columns                                     ) end
+		if arg.sort or arg.sortOrder     then ui:Sort             (arg.sort, arg.sortOrder                         ) end
+		if arg.dataSource                then ui:DataSource       (arg.dataSource                                  ) end
+		if arg.summary                   then ui:Summary          (arg.summary                                     ) end
 		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then        -- must after :Text() because w/h can be 'auto'
 			ui:Size(arg.w, arg.h, arg.rw, arg.rh)
 		end
@@ -256,18 +324,17 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onCheck            ~= nil then ui:Check            (arg.onCheck                                     ) end
 		if arg.onChange           ~= nil then ui:Change           (arg.onChange                                    ) end
 		if arg.onSpecialKeyDown   ~= nil then ui:OnSpecialKeyDown (arg.onSpecialKeyDown                            ) end
-		if arg.onDragging or arg.onDrag  then ui:Drag             (arg.onDragging, arg.onDrag                      ) end
+		if arg.onDrag                    then ui:Drag             (arg.onDrag                                      ) end
+		if arg.onDragHover               then ui:DragHover        (arg.onDragHover                                 ) end
+		if arg.onDrop                    then ui:Drop             (arg.onDrop                                      ) end
 		if arg.customLayout              then ui:CustomLayout     (arg.customLayout                                ) end
 		if arg.onCustomLayout            then ui:CustomLayout     (arg.onCustomLayout, arg.customLayoutPoint       ) end
-		if arg.columns                   then ui:Columns          (arg.columns                                     ) end
-		if arg.dataSource                then ui:DataSource       (arg.dataSource                                  ) end
-		if arg.summary                   then ui:Summary          (arg.summary                                     ) end
-		if arg.sort or arg.sortOrder     then ui:Sort             (arg.sort, arg.sortOrder                         ) end
+		if arg.onColumnsChange           then ui:Columns          (arg.onColumnsChange                             ) end
 		if arg.onSortChange              then ui:Sort             (arg.onSortChange                                ) end
-		if arg.events             ~= nil then for _, v in ipairs(arg.events      ) do ui:Event       (unpack(v)) end end
-		if arg.uiEvents           ~= nil then for _, v in ipairs(arg.uiEvents    ) do ui:UIEvent     (unpack(v)) end end
-		if arg.listBox            ~= nil then for _, v in ipairs(arg.listBox     ) do ui:ListBox     (unpack(v)) end end
-		if arg.autocomplete       ~= nil then for _, v in ipairs(arg.autocomplete) do ui:Autocomplete(unpack(v)) end end
+		if arg.events             ~= nil then for _, v in ipairs(arg.events      ) do ui:Event       (X.Unpack(v)) end end
+		if arg.uiEvents           ~= nil then for _, v in ipairs(arg.uiEvents    ) do ui:UIEvent     (X.Unpack(v)) end end
+		if arg.listBox            ~= nil then for _, v in ipairs(arg.listBox     ) do ui:ListBox     (X.Unpack(v)) end end
+		if arg.autocomplete       ~= nil then for _, v in ipairs(arg.autocomplete) do ui:Autocomplete(X.Unpack(v)) end end
 		-- auto size
 		if arg.autoSize                  then ui:AutoSize         ()                                                 end
 		if arg.autoWidth                 then ui:AutoWidth        ()                                                 end
@@ -796,6 +863,7 @@ local function InitComponent(raw, szType)
 		-- 初始化变量
 		SetComponentProp(raw, 'ScrollX', 'auto')
 		SetComponentProp(raw, 'SortOrder', 'asc')
+		SetComponentProp(raw, 'aColumns', {})
 		SetComponentProp(raw, 'aFixedLColumns', {})
 		SetComponentProp(raw, 'aFixedRColumns', {})
 		SetComponentProp(raw, 'aScrollableColumns', {})
@@ -817,7 +885,7 @@ local function InitComponent(raw, szType)
 			hTotal:Lookup('Handle_Fixed_L_TableColumns'):SetSize(nFixedLWidth, nRawHeight)
 			hTotal:Lookup('Handle_Fixed_L_Scroll_Y_Wrapper'):SetW(nFixedLWidth)
 			hTotal:Lookup('Handle_Fixed_L_Scroll_Y_Wrapper'):SetH(nRawHeight - 60)
-			hTotal:Lookup('Handle_Fixed_L_Summary'):SetRelX(nFixedLWidth)
+			hTotal:Lookup('Handle_Fixed_L_Summary'):SetRelX(0)
 			hTotal:Lookup('Handle_Fixed_L_Summary'):SetRelY(nRawHeight - 30)
 			-- 右侧固定列
 			hTotal:Lookup('Handle_Fixed_R_TableColumns'):SetSize(nFixedRWidth, nRawHeight)
@@ -953,10 +1021,13 @@ local function InitComponent(raw, szType)
 			if not nScrollX or nScrollX == 'auto' then
 				nScrollX = raw:GetW() - nFixedLWidth - nFixedRWidth
 			end
-			local nExtraWidth = nScrollX
+			local nExtraWidth, nStaticWidth = nScrollX, 0
 			for i, col in ipairs(aScrollableColumns) do
 				if col.minWidth then
 					nExtraWidth = nExtraWidth - col.minWidth
+				elseif col.width then
+					nExtraWidth = nExtraWidth - col.width
+					nStaticWidth = nStaticWidth + col.width
 				end
 			end
 			if nExtraWidth < 0 then
@@ -965,10 +1036,14 @@ local function InitComponent(raw, szType)
 			end
 			for i, col in ipairs(aScrollableColumns) do
 				local hCol = hScrollableColumns:Lookup(i - 1) -- 外部居中层
-				local nMinWidth = col.minWidth or 0
+				local nMinWidth = col.minWidth
 				local nWidth = i == #aScrollableColumns
 					and (nScrollX - nX)
-					or math.min(nExtraWidth * nMinWidth / (nScrollX - nExtraWidth) + nMinWidth, col.maxWidth or math.huge)
+					or (
+						nMinWidth
+							and math.min(nExtraWidth * nMinWidth / (nScrollX - nExtraWidth) + nMinWidth, col.maxWidth or math.huge)
+							or (col.width or 0)
+					)
 				if i == 1 then
 					hCol:Lookup('Image_TableColumn_Break'):Hide()
 				end
@@ -1098,6 +1173,52 @@ local function InitComponent(raw, szType)
 						X.SafeCall(GetComponentProp(raw, 'OnSortChange'))
 						GetComponentProp(raw, 'UpdateSorterStatus')()
 						GetComponentProp(raw, 'DrawTableContent')()
+					end
+					-- 拖拽
+					if col.draggable then
+						UI(hCol)
+							:DragDropGroup(tostring(raw))
+							:Drag(function()
+								local capture = {
+									element = raw,
+									w = hCol:GetW(),
+									h = raw:GetH(),
+									x = raw:GetAbsX() - hCol:GetAbsX(),
+									y = raw:GetAbsY() - hCol:GetAbsY(),
+								}
+								return col, capture
+							end)
+							:DragHover(function()
+								local rect = {
+									x = hCol:GetAbsX(),
+									y = hCol:GetAbsY() + 1,
+									w = hCol:GetW(),
+									h = raw:GetH() - 2,
+								}
+								return rect
+							end)
+							:Drop(function(_, c)
+								local aColumns = X.Assign({}, GetComponentProp(raw, 'aColumns'))
+								local nFromIndex = math.huge
+								for i, v in ipairs(aColumns) do
+									if v == c then
+										nFromIndex = i
+										table.remove(aColumns, i)
+										break
+									end
+								end
+								for i, v in ipairs(aColumns) do
+									if v == col then
+										if nFromIndex <= i then
+											i = i + 1
+										end
+										table.insert(aColumns, i, c)
+										break
+									end
+								end
+								UI(raw):Columns(aColumns)
+								X.SafeCall(GetComponentProp(raw, 'OnColumnsChange'))
+							end)
 					end
 				end
 			end
@@ -2403,54 +2524,166 @@ end
 
 -- drag area
 -- (self) drag(boolean bEnableDrag) -- enable/disable drag
--- (self) drag(number nX, number y, number w, number h) -- set drag positon and area
+-- (self) drag(number nX, number y, number w, number h) -- set drag position and area
 -- (self) drag(function fnOnDrag, function fnOnDragEnd)-- bind frame/item frag event handle
 function OO:Drag(...)
 	self:_checksum()
 	local argc = select('#', ...)
 	local arg0, arg1, arg2, arg3 = ...
 	if argc == 0 then
-	elseif X.IsBoolean(arg0) then
-		local bDrag = arg0
-		for _, raw in ipairs(self.raws) do
-			if raw.EnableDrag then
-				raw:EnableDrag(bDrag)
-			end
-		end
-		return self
-	elseif X.IsNumber(arg0) or X.IsNumber(arg1) or X.IsNumber(arg2) or X.IsNumber(arg3) then
-		local nX, nY, nW, nH = arg0 or 0, arg1 or 0, arg2, arg3
-		for _, raw in ipairs(self.raws) do
-			if raw:GetType() == 'WndFrame' then
-				raw:SetDragArea(nX, nY, nW or raw:GetW(), nH or raw:GetH())
-			end
-		end
-		return self
-	elseif X.IsFunction(arg0) or X.IsFunction(arg1) then
-		for _, raw in ipairs(self.raws) do
-			if raw:GetType() == 'WndFrame' then
-				if arg0 then
-					UI(raw):UIEvent('OnFrameDragSetPosEnd', arg0)
-				end
-				if arg1 then
-					UI(raw):UIEvent('OnFrameDragEnd', arg1)
-				end
-			elseif raw:GetBaseType() == 'Item' then
-				if arg0 then
-					UI(raw):UIEvent('OnItemLButtonDrag', arg0)
-				end
-				if arg1 then
-					UI(raw):UIEvent('OnItemLButtonDragEnd', arg1)
-				end
-			end
-		end
-		return self
-	else
 		local raw = self.raws[1]
 		if raw and raw:GetType() == 'WndFrame' then
 			return raw:IsDragable()
 		end
+		return
 	end
+	if argc == 1 then
+		if X.IsBoolean(arg0) then
+			local bDrag = arg0
+			for _, raw in ipairs(self.raws) do
+				if raw.EnableDrag then
+					raw:EnableDrag(bDrag)
+				end
+			end
+			return self
+		end
+		if X.IsFunction(arg0) then
+			local fnAction = arg0
+			for _, raw in ipairs(self.raws) do
+				if raw:GetBaseType() == 'Item' then
+					raw.OnItemLButtonDrag = function()
+						local szDragGroupID = GetComponentProp(raw, 'DragDropGroup')
+						local data, capture = fnAction()
+						UI.OpenDragDrop(this, capture, szDragGroupID, data)
+					end
+					raw.OnItemLButtonDragEnd = function()
+						if not UI.IsDragDropOpened() then
+							return
+						end
+						local dropEl, szDragGroupID, xData = UI.CloseDragDrop()
+						local szDropGroupID = GetComponentProp(dropEl, 'DragDropGroup')
+						if szDragGroupID ~= szDropGroupID then
+							return
+						end
+						X.SafeCall(GetComponentProp(dropEl, 'OnDrop'), szDragGroupID, xData)
+					end
+					raw:RegisterEvent(UI.ITEM_EVENT.L_BUTTON_DRAG)
+					raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
+				end
+			end
+			return self
+		end
+	end
+	if argc == 2 then
+		if X.IsFunction(arg0) or X.IsFunction(arg1) then
+			for _, raw in ipairs(self.raws) do
+				if raw:GetType() == 'WndFrame' then
+					if arg0 then
+						UI(raw):UIEvent('OnFrameDragSetPosEnd', arg0)
+					end
+					if arg1 then
+						UI(raw):UIEvent('OnFrameDragEnd', arg1)
+					end
+				elseif raw:GetBaseType() == 'Item' then
+					if arg0 then
+						UI(raw):UIEvent('OnItemLButtonDrag', arg0)
+					end
+					if arg1 then
+						UI(raw):UIEvent('OnItemLButtonDragEnd', arg1)
+					end
+				end
+			end
+			return self
+		end
+	end
+	if argc == 4 then
+		if X.IsNumber(arg0) or X.IsNumber(arg1) or X.IsNumber(arg2) or X.IsNumber(arg3) then
+			local nX, nY, nW, nH = arg0 or 0, arg1 or 0, arg2, arg3
+			for _, raw in ipairs(self.raws) do
+				if raw:GetType() == 'WndFrame' then
+					raw:SetDragArea(nX, nY, nW or raw:GetW(), nH or raw:GetH())
+				end
+			end
+			return self
+		end
+	end
+end
+
+function OO:DragHover(fnAction)
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		if raw:GetBaseType() == 'Item' then
+			SetComponentProp(raw, 'DragHover', fnAction)
+			UI(raw):UIEvent('OnItemMouseHover', function()
+				if not UI.IsDragDropOpened() then
+					return
+				end
+				local szDragGroupID = UI.GetDragDropData()
+				if szDragGroupID == GetComponentProp(raw, 'DragDropGroup') then
+					local rect, bAcceptable, eCursor = fnAction()
+					UI.SetDragDropHoverEl(raw, rect, bAcceptable, eCursor)
+				end
+			end)
+			raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_HOVER)
+		end
+	end
+	return self
+end
+
+function OO:Drop(fnAction)
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		if raw:GetBaseType() == 'Item' then
+			UI(raw):UIEvent('OnItemMouseEnter', function()
+				if not UI.IsDragDropOpened() then
+					return
+				end
+				local szDragGroupID = UI.GetDragDropData()
+				if szDragGroupID == GetComponentProp(raw, 'DragDropGroup') then
+					local rect, bAcceptable, eCursor
+					local fnDragHover = GetComponentProp(raw, 'DragHover')
+					if fnDragHover then
+						rect, bAcceptable, eCursor = fnDragHover()
+					end
+					UI.SetDragDropHoverEl(raw, rect, bAcceptable, eCursor)
+				end
+			end)
+			UI(raw):UIEvent('OnItemMouseLeave', function()
+				if not UI.IsDragDropOpened() then
+					return
+				end
+				local szDragGroupID = UI.GetDragDropData()
+				if szDragGroupID == GetComponentProp(raw, 'DragDropGroup') then
+					UI.SetDragDropHoverEl(nil)
+				end
+			end)
+			SetComponentProp(raw, 'OnDrop', function(szDragGroupID, xData)
+				X.ExecuteWithThis(raw, fnAction, szDragGroupID, xData)
+			end)
+			raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_HOVER)
+			raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
+		end
+	end
+end
+
+function OO:DragDropGroup(...)
+	self:_checksum()
+	if select('#', ...) == 0 then
+		for _, raw in ipairs(self.raws) do
+			if raw:GetBaseType() == 'Item' then
+				return GetComponentProp(raw, 'DragDropGroup')
+			end
+		end
+		return
+	else
+		local szDragGroupID = ...
+		for _, raw in ipairs(self.raws) do
+			if raw:GetBaseType() == 'Item' then
+				SetComponentProp(raw, 'DragDropGroup', szDragGroupID)
+			end
+		end
+	end
+	return self
 end
 
 -- get/set ui object text
@@ -3000,37 +3233,44 @@ function OO:Columns(aColumns)
 	if aColumns then
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTable' then
-				local aFixedLColumns, aFixedRColumns, aScrollableColumns = {}, {}, {}
-				local nFixedLColumnsWidth, nFixedRColumnsWidth = 0, 0
-				for _, col in ipairs(aColumns) do
-					if col.fixed == true or col.fixed == 'left' then
-						assert(X.IsNumber(col.width), 'fixed column width is required')
-						nFixedLColumnsWidth = nFixedLColumnsWidth + col.width
-						table.insert(aFixedLColumns, col)
-					else
-						break
+				if X.IsFunction(aColumns) then
+					SetComponentProp(raw, 'OnColumnsChange', function()
+						X.ExecuteWithThis(raw, aColumns, GetComponentProp(raw, 'aColumns'))
+					end)
+				else
+					local aFixedLColumns, aFixedRColumns, aScrollableColumns = {}, {}, {}
+					local nFixedLColumnsWidth, nFixedRColumnsWidth = 0, 0
+					for _, col in ipairs(aColumns) do
+						if col.fixed == true or col.fixed == 'left' then
+							assert(X.IsNumber(col.width), 'fixed column width is required')
+							nFixedLColumnsWidth = nFixedLColumnsWidth + col.width
+							table.insert(aFixedLColumns, col)
+						else
+							break
+						end
 					end
-				end
-				for _, col in X.ipairs_r(aColumns) do
-					if col.fixed == 'right' then
-						assert(X.IsNumber(col.width), 'fixed column width is required')
-						nFixedRColumnsWidth = nFixedRColumnsWidth + col.width
-						table.insert(aFixedRColumns, col)
-					else
-						break
+					for _, col in X.ipairs_r(aColumns) do
+						if col.fixed == 'right' then
+							assert(X.IsNumber(col.width), 'fixed column width is required')
+							nFixedRColumnsWidth = nFixedRColumnsWidth + col.width
+							table.insert(aFixedRColumns, col)
+						else
+							break
+						end
 					end
+					for i = #aFixedLColumns + 1, #aColumns - #aFixedRColumns do
+						table.insert(aScrollableColumns, aColumns[i])
+					end
+					SetComponentProp(raw, 'aColumns', aColumns)
+					SetComponentProp(raw, 'aFixedLColumns', aFixedLColumns)
+					SetComponentProp(raw, 'aFixedRColumns', aFixedRColumns)
+					SetComponentProp(raw, 'aScrollableColumns', aScrollableColumns)
+					SetComponentProp(raw, 'nFixedLColumnsWidth', nFixedLColumnsWidth)
+					SetComponentProp(raw, 'nFixedRColumnsWidth', nFixedRColumnsWidth)
+					GetComponentProp(raw, 'DrawColumnsTitle')()
+					GetComponentProp(raw, 'DrawTableContent')()
+					GetComponentProp(raw, 'DrawTableSummary')()
 				end
-				for i = #aFixedLColumns + 1, #aColumns - #aFixedRColumns do
-					table.insert(aScrollableColumns, aColumns[i])
-				end
-				SetComponentProp(raw, 'aFixedLColumns', aFixedLColumns)
-				SetComponentProp(raw, 'aFixedRColumns', aFixedRColumns)
-				SetComponentProp(raw, 'aScrollableColumns', aScrollableColumns)
-				SetComponentProp(raw, 'nFixedLColumnsWidth', nFixedLColumnsWidth)
-				SetComponentProp(raw, 'nFixedRColumnsWidth', nFixedRColumnsWidth)
-				GetComponentProp(raw, 'DrawColumnsTitle')()
-				GetComponentProp(raw, 'DrawTableContent')()
-				GetComponentProp(raw, 'DrawTableSummary')()
 			end
 		end
 		return self
@@ -3038,17 +3278,7 @@ function OO:Columns(aColumns)
 		local raw = self.raws[1]
 		if raw then
 			if GetComponentType(raw) == 'WndTable' then
-				local aColumns = {}
-				for _, v in ipairs(GetComponentProp(raw, 'aFixedLColumns')) do
-					table.insert(aColumns, v)
-				end
-				for _, v in ipairs(GetComponentProp(raw, 'aScrollableColumns')) do
-					table.insert(aColumns, v)
-				end
-				for _, v in ipairs(GetComponentProp(raw, 'aFixedRColumns')) do
-					table.insert(aColumns, v)
-				end
-				return aColumns
+				return GetComponentProp(raw, 'aColumns')
 			end
 		end
 	end
@@ -3085,6 +3315,7 @@ function OO:Summary(...)
 				SetComponentProp(raw, 'Summary', summary)
 				GetComponentProp(raw, 'DrawTableSummary')()
 				GetComponentProp(raw, 'UpdateSummaryVisible')()
+				GetComponentProp(raw, 'UpdateSummaryColumnsWidth')()
 			end
 		end
 		return self
@@ -3358,7 +3589,7 @@ end
 function OO:Color(r, g, b)
 	self:_checksum()
 	if X.IsTable(r) then
-		r, g, b = unpack(r)
+		r, g, b = X.Unpack(r)
 	end
 	if b then
 		local element
@@ -4388,6 +4619,8 @@ end
 
 -- (self) Instance:Image(szImageAndFrame)
 -- (self) Instance:Image(szImage, nFrame)
+-- (self) Instance:Image(szImage, nNormalFrame, nOverFrame, nDownFrame, nDisableFrame)
+-- (self) Instance:Image(el)
 function OO:Image(szImage, nFrame, nOverFrame, nDownFrame, nDisableFrame)
 	self:_checksum()
 	if X.IsString(szImage) and X.IsNil(nFrame) then
@@ -4428,6 +4661,17 @@ function OO:Image(szImage, nFrame, nOverFrame, nDownFrame, nDisableFrame)
 				end
 			end
 		end
+	elseif X.IsElement(szImage) then
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'IMAGE')
+			if raw then
+				if szImage:GetBaseType() == 'Wnd' then
+					raw:FromWindow(szImage)
+				else
+					raw:FromItem(szImage)
+				end
+			end
+		end
 	end
 	return self
 end
@@ -4457,7 +4701,7 @@ end
 -- (self) Instance:ItemInfo(...)
 -- NOTICE：only for Box
 function OO:ItemInfo(...)
-	local data = { ... }
+	local data = X.Pack(...)
 	for _, raw in ipairs(self.raws) do
 		raw = GetComponentElement(raw, 'BOX')
 		if raw then
@@ -4468,7 +4712,7 @@ function OO:ItemInfo(...)
 				if KItemInfo and KItemInfo.nGenre == ITEM_GENRE.BOOK and #data == 4 then -- 西山居BUG
 					table.insert(data, 4, 99999)
 				end
-				local res, err, trace = X.XpCall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
+				local res, err, trace = X.XpCall(UpdataItemInfoBoxObject, raw, X.Unpack(data)) -- 防止itemtab不一样
 				if not res then
 					X.ErrorLog(err, X.NSFormatString('{$NS}#UI:ItemInfo'), trace)
 				end
@@ -4864,9 +5108,9 @@ function OO:UIEvent(szEvent, fnEvent)
 						end
 						local rets = {}
 						for _, p in ipairs(uiEvents[szEvent]) do
-							local res = { p.fn(...) }
-							if #res > 0 then
-								if #rets == 0 then
+							local res = X.Pack(p.fn(...))
+							if X.Len(res) > 0 then
+								if X.Len(rets) == 0 then
 									rets = res
 								--[[#DEBUG BEGIN]]
 								else
@@ -4879,7 +5123,7 @@ function OO:UIEvent(szEvent, fnEvent)
 								end
 							end
 						end
-						return unpack(rets)
+						return X.Unpack(rets)
 					end
 					-- 特殊控件的一些HOOK
 					if szEvent == 'OnEditChanged' and raw.GetText then
@@ -5062,7 +5306,7 @@ function OO:LClick(...)
 		if X.IsFunction(fnClick) then
 			for _, raw in ipairs(self.raws) do
 				local fnAction = function()
-					if GetComponentProp(raw, 'bEnable') == false then
+					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.LEFT)
@@ -5113,7 +5357,7 @@ end
 			if X.IsFunction(fnClick) then
 				for _, raw in ipairs(self.raws) do
 					local fnAction = function()
-						if GetComponentProp(raw, 'bEnable') == false then
+						if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 							return
 						end
 						X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.MIDDLE)
@@ -5164,7 +5408,7 @@ function OO:RClick(...)
 		if X.IsFunction(fnClick) then
 			for _, raw in ipairs(self.raws) do
 				local fnAction = function()
-					if GetComponentProp(raw, 'bEnable') == false then
+					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.RIGHT)
@@ -5302,7 +5546,7 @@ function OO:RowLClick(fnClick)
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTable' then
 				local fnAction = function(...)
-					if GetComponentProp(raw, 'bEnable') == false then
+					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, ...)
@@ -5322,7 +5566,7 @@ function OO:RowMClick(fnClick)
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTable' then
 				local fnAction = function(...)
-					if GetComponentProp(raw, 'bEnable') == false then
+					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, ...)
@@ -5342,7 +5586,7 @@ function OO:RowRClick(fnClick)
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTable' then
 				local fnAction = function(...)
-					if GetComponentProp(raw, 'bEnable') == false then
+					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, ...)
@@ -5628,6 +5872,29 @@ X.RegisterEvent(X.NSFormatString('{$NS}_BASE_LOADING_END'), function()
 	})
 end)
 
+-- TODO: 重构，注册组件
+-- function UI.RegisterComponent(GetComponent)
+-- 	local szComponentName, Component = GetComponent(ComponentBase, GetComponentProp, SetComponentProp)
+-- 	for k, v in pairs(Component) do
+-- 		if not OO[k] then
+-- 			OO[k] = function(self, ...)
+-- 				for _, raw in ipairs(self.raws) do
+-- 					local fnAction = REGISTERED_COMPONENT[GetComponentType(raw)]
+-- 					if fnAction then
+-- 						fnAction = fnAction[k]
+-- 					end
+-- 					local res = X.Pack(fnAction(raw, ...))
+-- 					if X.Len(res) > 0 then
+-- 						return X.Unpack(res)
+-- 					end
+-- 				end
+-- 				return self
+-- 			end
+-- 		end
+-- 	end
+-- 	REGISTERED_COMPONENT[szComponentName] = Component
+-- end
+
 ---------------------------------------------------
 -- create new frame
 -- (ui) UI.CreateFrame(string szName, table opt)
@@ -5845,7 +6112,7 @@ function UI.CreateFrame(szName, opt)
 			UI(frm):Remove()
 		end
 	end
-	if not opt.anchor then
+	if not opt.anchor and not (opt.x and opt.y) then
 		opt.anchor = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 	end
 	return ApplyUIArguments(ui, opt)

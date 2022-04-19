@@ -189,12 +189,10 @@ local _DELOG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level
 -------------------------------------------------------------------------------------------------------
 local _SERVER_ADDRESS_ = select(7, GetUserServer())
 local _RUNTIME_OPTIMIZE_ = (
-	_SERVER_ADDRESS_:find('^10%.') -- 10.0.0.0/8
-	or _SERVER_ADDRESS_:find('^127%.') -- 127.0.0.0/8
-	or _SERVER_ADDRESS_:find('^172%.1[6-9]%.') -- 172.16.0.0/12
-	or _SERVER_ADDRESS_:find('^172%.2[0-9]%.') -- 172.16.0.0/12
-	or _SERVER_ADDRESS_:find('^172%.3[0-1]%.') -- 172.16.0.0/12
-	or _SERVER_ADDRESS_:find('^192%.168%.') -- 192.168.0.0/16
+	debug.traceback ~= nil
+	and _DEBUG_LEVEL_ == DEBUG_LEVEL.NONE
+	and _DELOG_LEVEL_ == DEBUG_LEVEL.NONE
+	and not IsLocalFileExist(_ADDON_ROOT_ .. 'secret.jx3dat')
 ) and not IsLocalFileExist(_DATA_ROOT_ .. 'no.runtime.optimize.jx3dat')
 -------------------------------------------------------------------------------------------------------
 -- 初始化调试工具
@@ -438,9 +436,29 @@ local function Set(var, keys, val)
 	return res
 end
 -----------------------------------------------
+-- 打包拆包数据
+-----------------------------------------------
+local Pack = type(table.pack) == 'function'
+	and table.pack
+	or function(...)
+		return { n = select("#", ...), ... }
+	end
+local Unpack = type(table.unpack) == 'function'
+	and table.unpack
+	or unpack
+-----------------------------------------------
+-- 数据长度
+-----------------------------------------------
+local function Len(t)
+	if type(t) == 'table' then
+		return t.n or #t
+	end
+	return #t
+end
+-----------------------------------------------
 -- 合并数据
 -----------------------------------------------
-local function TableAssign(t, ...)
+local function Assign(t, ...)
 	for index = 1, select('#', ...) do
 		local t1 = select(index, ...)
 		if type(t1) == 'table' then
@@ -805,7 +823,7 @@ local Call, XpCall
 do
 local xpAction, xpArgs, xpErrMsg, xpTraceback, xpErrLog
 local function CallHandler()
-	return xpAction(unpack(xpArgs))
+	return xpAction(Unpack(xpArgs))
 end
 local function CallErrorHandler(errMsg)
 	xpErrMsg = errMsg
@@ -819,24 +837,24 @@ local function XpCallErrorHandler(errMsg)
 	xpTraceback = GetTraceback():gsub('^([^\n]+\n)[^\n]+\n', '%1')
 end
 function Call(arg0, ...)
-	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, {...}, nil, nil
-	local res = {xpcall(CallHandler, CallErrorHandler)}
+	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, Pack(...), nil, nil
+	local res = Pack(xpcall(CallHandler, CallErrorHandler))
 	if not res[1] then
 		res[2] = xpErrMsg
 		res[3] = xpTraceback
 	end
 	xpAction, xpArgs, xpErrMsg, xpTraceback = nil, nil, nil, nil
-	return unpack(res)
+	return Unpack(res)
 end
 function XpCall(arg0, ...)
-	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, {...}, nil, nil
-	local res = {xpcall(CallHandler, XpCallErrorHandler)}
+	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, Pack(...), nil, nil
+	local res = Pack(xpcall(CallHandler, XpCallErrorHandler))
 	if not res[1] then
 		res[2] = xpErrMsg
 		res[3] = xpTraceback
 	end
 	xpAction, xpArgs, xpErrMsg, xpTraceback = nil, nil, nil, nil
-	return unpack(res)
+	return Unpack(res)
 end
 end
 local function SafeCall(f, ...)
@@ -848,16 +866,16 @@ end
 local function CallWithThis(context, f, ...)
 	local _this = this
 	this = context
-	local rtc = {Call(f, ...)}
+	local rtc = Pack(Call(f, ...))
 	this = _this
-	return unpack(rtc)
+	return Unpack(rtc)
 end
 local function SafeCallWithThis(context, f, ...)
 	local _this = this
 	this = context
-	local rtc = {SafeCall(f, ...)}
+	local rtc = Pack(SafeCall(f, ...))
 	this = _this
-	return unpack(rtc)
+	return Unpack(rtc)
 end
 
 local NSFormatString
@@ -998,7 +1016,10 @@ local X = {
 	ErrorLog         = ErrorLog        ,
 	Set              = Set             ,
 	Get              = Get             ,
-	TableAssign      = TableAssign     ,
+	Pack             = Pack            ,
+	Unpack           = Unpack          ,
+	Len              = Len             ,
+	Assign           = Assign          ,
 	Class            = Class           ,
 	GetPatch         = GetPatch        ,
 	ApplyPatch       = ApplyPatch      ,

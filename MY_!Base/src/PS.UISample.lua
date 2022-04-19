@@ -60,6 +60,7 @@ local COMPONENT_SAMPLE = {
 					alignVertical = 'top',
 					sorter = true,
 					fixed = true,
+					draggable = true,
 				},
 				{
 					key = 'desc',
@@ -83,6 +84,7 @@ local COMPONENT_SAMPLE = {
 						end
 						return v1 < v2 and -1 or 1
 					end,
+					draggable = true,
 				},
 				{
 					key = 'price',
@@ -92,6 +94,7 @@ local COMPONENT_SAMPLE = {
 					alignHorizontal = 'center',
 					alignVertical = 'middle',
 					sorter = true,
+					draggable = true,
 				},
 				{
 					key = 'from',
@@ -182,6 +185,59 @@ local COMPONENT_SAMPLE = {
 					},
 				}
 				UI.PopupMenu(menu)
+			end,
+			onColumnsChange = function(aColumns)
+				local aKeys = {}
+				for _, v in ipairs(aColumns) do
+					table.insert(aKeys, v.key)
+				end
+				X.Sysmsg('ColumnsChange: ' .. table.concat(aKeys, ','))
+			end,
+		},
+	},
+	{
+		'DragDrop',
+		'Image',
+		{
+			w = 100, h = 100, name = 'Image_DragDrop_1',
+			image = 'ui\\Image\\UICommon\\CommonPanel4.UITex|3',
+			onDrag = function()
+				return 'data 1', this
+			end,
+			onDrop = function(dragID, data)
+				X.Sysmsg('Drop 1, ' .. tostring(dragID) .. ', ' .. X.EncodeLUAData(data))
+			end,
+		},
+	},
+	{
+		'DragDrop',
+		'Image',
+		{
+			w = 100, h = 100, name = 'Image_DragDrop_2',
+			image = 'ui\\Image\\UICommon\\CommonPanel4.UITex|3',
+			onDrag = function()
+				local frame = this:GetRoot()
+				local capture = {
+					element = frame,
+					x = this:GetAbsX() - frame:GetAbsX(),
+					y = this:GetAbsY() - frame:GetAbsY() - 220,
+					w = this:GetW(),
+					h = this:GetH() * 2 + 50,
+				}
+				return 'data 2', capture
+			end,
+			onDragHover = function()
+				local frame = this:GetRoot()
+				local rect = {
+					x = frame:GetAbsX(),
+					y = frame:GetAbsY(),
+					w = frame:GetW(),
+					h = frame:GetH(),
+				}
+				return rect
+			end,
+			onDrop = function(dragID, data)
+				X.Sysmsg('Drop 2, ' .. tostring(dragID) .. ', ' .. X.EncodeLUAData(data))
 			end,
 		},
 	},

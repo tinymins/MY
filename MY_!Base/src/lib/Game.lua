@@ -229,13 +229,13 @@ function X.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 	local nX1, nY1, nZ1 = 0, 0, 0
 	local nX2, nY2, nZ2 = 0, 0, 0
 	if X.IsTable(arg0) then
-		arg0 = X.GetObject(unpack(arg0))
+		arg0 = X.GetObject(X.Unpack(arg0))
 		if not arg0 then
 			return
 		end
 	end
 	if X.IsTable(arg1) then
-		arg1 = X.GetObject(unpack(arg1))
+		arg1 = X.GetObject(X.Unpack(arg1))
 		if not arg1 then
 			return
 		end
@@ -292,16 +292,16 @@ function X.GetBuffName(dwBuffID, dwLevel)
 	if not BUFF_CACHE[xKey] then
 		local tLine = Table_GetBuff(dwBuffID, dwLevel or 1)
 		if tLine then
-			BUFF_CACHE[xKey] = { tLine.szName, tLine.dwIconID }
+			BUFF_CACHE[xKey] = X.Pack(tLine.szName, tLine.dwIconID)
 		else
 			local szName = 'BUFF#' .. dwBuffID
 			if dwLevel then
 				szName = szName .. ':' .. dwLevel
 			end
-			BUFF_CACHE[xKey] = { szName, 1436 }
+			BUFF_CACHE[xKey] = X.Pack(szName, 1436)
 		end
 	end
-	return unpack(BUFF_CACHE[xKey])
+	return X.Unpack(BUFF_CACHE[xKey])
 end
 end
 
@@ -1073,9 +1073,9 @@ X.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#ForceColor', initForceCustom)
 
 function X.GetForceColor(dwForce, szType)
 	if szType == 'background' then
-		return unpack(O.tForceBackgroundColor[dwForce])
+		return X.Unpack(O.tForceBackgroundColor[dwForce])
 	end
-	return unpack(O.tForceForegroundColor[dwForce])
+	return X.Unpack(O.tForceForegroundColor[dwForce])
 end
 
 function X.SetForceColor(dwForce, szType, tCol)
@@ -1096,9 +1096,9 @@ X.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#CampColor', initCampCustom)
 
 function X.GetCampColor(nCamp, szType)
 	if szType == 'background' then
-		return unpack(O.tCampBackgroundColor[nCamp])
+		return X.Unpack(O.tCampBackgroundColor[nCamp])
 	end
-	return unpack(O.tCampForegroundColor[nCamp])
+	return X.Unpack(O.tCampForegroundColor[nCamp])
 end
 
 function X.SetCampColor(nCamp, szType, tCol)
@@ -1254,7 +1254,7 @@ function X.GetObject(arg0, arg1, arg2)
 		local me = GetClientPlayer()
 		if me and dwID == me.dwID then
 			p, info, b = me, me, false
-		elseif me and me.IsPlayerInMyParty(dwID) then
+		elseif not ENVIRONMENT.RUNTIME_OPTIMIZE and me and me.IsPlayerInMyParty(dwID) then
 			p, info, b = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID), true
 		else
 			p, info, b = GetPlayer(dwID), GetPlayer(dwID), false
@@ -2388,7 +2388,7 @@ do
 local TEMP_TARGET = { TARGET.NO_TARGET, 0 }
 function X.SetTempTarget(dwType, dwID)
 	TargetPanel_SetOpenState(true)
-	TEMP_TARGET = { GetClientPlayer().GetTarget() }
+	TEMP_TARGET = X.Pack(GetClientPlayer().GetTarget())
 	X.SetTarget(dwType, dwID)
 	TargetPanel_SetOpenState(false)
 end
@@ -2396,11 +2396,11 @@ end
 function X.ResumeTarget()
 	TargetPanel_SetOpenState(true)
 	-- 当之前的目标不存在时，切到空目标
-	if TEMP_TARGET[1] ~= TARGET.NO_TARGET and not X.GetObject(unpack(TEMP_TARGET)) then
-		TEMP_TARGET = { TARGET.NO_TARGET, 0 }
+	if TEMP_TARGET[1] ~= TARGET.NO_TARGET and not X.GetObject(X.Unpack(TEMP_TARGET)) then
+		TEMP_TARGET = X.Pack(TARGET.NO_TARGET, 0)
 	end
-	X.SetTarget(unpack(TEMP_TARGET))
-	TEMP_TARGET = { TARGET.NO_TARGET, 0 }
+	X.SetTarget(X.Unpack(TEMP_TARGET))
+	TEMP_TARGET = X.Pack(TARGET.NO_TARGET, 0)
 	TargetPanel_SetOpenState(false)
 end
 end
@@ -3052,16 +3052,16 @@ function X.GetSkillName(dwSkillID, dwLevel)
 		if tLine and tLine.dwSkillID > 0 and tLine.bShow
 			and (StringFindW(tLine.szDesc, '_') == nil  or StringFindW(tLine.szDesc, '<') ~= nil)
 		then
-			SKILL_CACHE[dwSkillID][uLevelKey] = { tLine.szName, tLine.dwIconID }
+			SKILL_CACHE[dwSkillID][uLevelKey] = X.Pack(tLine.szName, tLine.dwIconID)
 		else
 			local szName = 'SKILL#' .. dwSkillID
 			if dwLevel then
 				szName = szName .. ':' .. dwLevel
 			end
-			SKILL_CACHE[dwSkillID][uLevelKey] = { szName, 13 }
+			SKILL_CACHE[dwSkillID][uLevelKey] = X.Pack(szName, 13)
 		end
 	end
-	return unpack(SKILL_CACHE[dwSkillID][uLevelKey])
+	return X.Unpack(SKILL_CACHE[dwSkillID][uLevelKey])
 end
 end
 
@@ -4378,7 +4378,7 @@ end
 -- 获取头像文件路径，帧序，是否动画
 function X.GetForceAvatar(dwForceID)
 	-- force avatar
-	return unpack(CONSTANT.FORCE_AVATAR[dwForceID])
+	return X.Unpack(CONSTANT.FORCE_AVATAR[dwForceID])
 end
 
 -- 获取头像文件路径，帧序，是否动画

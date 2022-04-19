@@ -1075,13 +1075,13 @@ function X.DoMessageBox(szName, i)
 		if btn and btn:IsEnabled() then
 			if btn.fnAction then
 				if frame.args then
-					btn.fnAction(unpack(frame.args))
+					btn.fnAction(X.Unpack(frame.args))
 				else
 					btn.fnAction()
 				end
 			elseif frame.fnAction then
 				if frame.args then
-					frame.fnAction(i, unpack(frame.args))
+					frame.fnAction(i, X.Unpack(frame.args))
 				else
 					frame.fnAction(i)
 				end
@@ -1322,7 +1322,7 @@ function X.ColorName2RGB(name)
 	if not COLOR_NAME_RGB[name] then
 		return
 	end
-	return unpack(COLOR_NAME_RGB[name])
+	return X.Unpack(COLOR_NAME_RGB[name])
 end
 
 local HUMAN_COLOR_CACHE = setmetatable({}, {__mode = 'v', __index = COLOR_NAME_RGB})
@@ -1331,13 +1331,13 @@ function X.HumanColor2RGB(name)
 		if name.r then
 			return name.r, name.g, name.b
 		end
-		return unpack(name)
+		return X.Unpack(name)
 	end
 	if not HUMAN_COLOR_CACHE[name] then
 		local r, g, b, a = X.Hex2RGB(name)
 		HUMAN_COLOR_CACHE[name] = {r, g, b, a}
 	end
-	return unpack(HUMAN_COLOR_CACHE[name])
+	return X.Unpack(HUMAN_COLOR_CACHE[name])
 end
 end
 
@@ -1351,9 +1351,9 @@ function X.GetFontColor(nFont)
 			el = UI.GetTempElement(X.NSFormatString('Text.{$NS}Lib_GetFontColor'))
 		end
 		el:SetFontScheme(nFont)
-		CACHE[nFont] = {el:GetFontColor()}
+		CACHE[nFont] = X.Pack(el:GetFontColor())
 	end
-	return unpack(CACHE[nFont])
+	return X.Unpack(CACHE[nFont])
 end
 end
 
@@ -1379,9 +1379,9 @@ function X.ExecuteWithThis(context, fnAction, ...)
 	end
 	local _this = this
 	this = context
-	local rets = {fnAction(...)}
+	local rets = X.Pack(fnAction(...))
 	this = _this
-	return true, unpack(rets)
+	return true, X.Unpack(rets)
 end
 
 do
@@ -1939,7 +1939,7 @@ else
 	local frame = Station.Lookup('Lowest/Scene')
 	local data = frame and frame[X.NSFormatString('{$NS}_TimeOfFee')]
 	if data then
-		bInit, dwMonthEndTime, dwPointEndTime, dwDayEndTime = true, unpack(data)
+		bInit, dwMonthEndTime, dwPointEndTime, dwDayEndTime = true, X.Unpack(data)
 	else
 		X.RegisterMsgMonitor('MSG_SYS', 'LIB#GetTimeOfFee', function(szChannel, szMsg)
 			-- 点卡剩余时间为：558小时41分33秒
@@ -1969,7 +1969,7 @@ else
 				end
 				local frame = Station.Lookup('Lowest/Scene')
 				if frame then
-					frame[X.NSFormatString('{$NS}_TimeOfFee')] = {dwMonthEndTime, dwPointEndTime, dwDayEndTime}
+					frame[X.NSFormatString('{$NS}_TimeOfFee')] = X.Pack(dwMonthEndTime, dwPointEndTime, dwDayEndTime)
 				end
 				X.RegisterMsgMonitor('MSG_SYS', 'LIB#GetTimeOfFee', false)
 			end
