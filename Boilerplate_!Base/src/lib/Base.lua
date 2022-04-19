@@ -340,7 +340,7 @@ local Unpack = type(table.unpack) == 'function'
 -----------------------------------------------
 -- 合并数据
 -----------------------------------------------
-local function TableAssign(t, ...)
+local function Assign(t, ...)
 	for index = 1, select('#', ...) do
 		local t1 = select(index, ...)
 		if type(t1) == 'table' then
@@ -900,7 +900,7 @@ local X = {
 	Get              = Get             ,
 	Pack             = Pack            ,
 	Unpack           = Unpack          ,
-	TableAssign      = TableAssign     ,
+	Assign           = Assign          ,
 	Class            = Class           ,
 	GetPatch         = GetPatch        ,
 	ApplyPatch       = ApplyPatch      ,
