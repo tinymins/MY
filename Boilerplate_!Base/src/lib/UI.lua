@@ -1199,14 +1199,19 @@ local function InitComponent(raw, szType)
 							end)
 							:Drop(function(_, c)
 								local aColumns = X.Assign({}, GetComponentProp(raw, 'aColumns'))
+								local nFromIndex = math.huge
 								for i, v in ipairs(aColumns) do
 									if v == c then
+										nFromIndex = i
 										table.remove(aColumns, i)
 										break
 									end
 								end
 								for i, v in ipairs(aColumns) do
 									if v == col then
+										if nFromIndex <= i then
+											i = i + 1
+										end
 										table.insert(aColumns, i, c)
 										break
 									end
