@@ -541,7 +541,7 @@ function X.EnsureAjax(options)
 			X.SafeCall(options.error)
 			return 0
 		end
-		local driver, method = unpack(config)
+		local driver, method = X.Unpack(config)
 		--[[#DEBUG BEGIN]]
 		X.Debug('Ensure ajax ' .. key .. ' try mode ' .. driver .. '/' .. method, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]

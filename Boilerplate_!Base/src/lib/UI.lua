@@ -203,7 +203,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.group              ~= nil then ui:Group            (arg.group                                       ) end
 		if arg.tip                ~= nil then ui:Tip              (arg.tip                                         ) end
 		if arg.rowTip             ~= nil then ui:RowTip           (arg.rowTip                                      ) end
-		if arg.range              ~= nil then ui:Range            (unpack(arg.range)                               ) end
+		if arg.range              ~= nil then ui:Range            (X.Unpack(arg.range)                             ) end
 		if arg.value              ~= nil then ui:Value            (arg.value                                       ) end
 		if arg.menu               ~= nil then ui:Menu             (arg.menu                                        ) end
 		if arg.menuLClick         ~= nil then ui:MenuLClick       (arg.menuLClick                                  ) end
@@ -229,7 +229,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.name               ~= nil then ui:Name             (arg.name                                        ) end
 		if arg.penetrable         ~= nil then ui:Penetrable       (arg.penetrable                                  ) end
 		if arg.draggable          ~= nil then ui:Drag             (arg.draggable                                   ) end
-		if arg.dragArea           ~= nil then ui:Drag             (unpack(arg.dragArea)                            ) end
+		if arg.dragArea           ~= nil then ui:Drag             (X.Unpack(arg.dragArea)                          ) end
 		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then        -- must after :Text() because w/h can be 'auto'
 			ui:Size(arg.w, arg.h, arg.rw, arg.rh)
 		end
@@ -264,10 +264,10 @@ local function ApplyUIArguments(ui, arg)
 		if arg.summary                   then ui:Summary          (arg.summary                                     ) end
 		if arg.sort or arg.sortOrder     then ui:Sort             (arg.sort, arg.sortOrder                         ) end
 		if arg.onSortChange              then ui:Sort             (arg.onSortChange                                ) end
-		if arg.events             ~= nil then for _, v in ipairs(arg.events      ) do ui:Event       (unpack(v)) end end
-		if arg.uiEvents           ~= nil then for _, v in ipairs(arg.uiEvents    ) do ui:UIEvent     (unpack(v)) end end
-		if arg.listBox            ~= nil then for _, v in ipairs(arg.listBox     ) do ui:ListBox     (unpack(v)) end end
-		if arg.autocomplete       ~= nil then for _, v in ipairs(arg.autocomplete) do ui:Autocomplete(unpack(v)) end end
+		if arg.events             ~= nil then for _, v in ipairs(arg.events      ) do ui:Event       (X.Unpack(v)) end end
+		if arg.uiEvents           ~= nil then for _, v in ipairs(arg.uiEvents    ) do ui:UIEvent     (X.Unpack(v)) end end
+		if arg.listBox            ~= nil then for _, v in ipairs(arg.listBox     ) do ui:ListBox     (X.Unpack(v)) end end
+		if arg.autocomplete       ~= nil then for _, v in ipairs(arg.autocomplete) do ui:Autocomplete(X.Unpack(v)) end end
 		-- auto size
 		if arg.autoSize                  then ui:AutoSize         ()                                                 end
 		if arg.autoWidth                 then ui:AutoWidth        ()                                                 end
@@ -3358,7 +3358,7 @@ end
 function OO:Color(r, g, b)
 	self:_checksum()
 	if X.IsTable(r) then
-		r, g, b = unpack(r)
+		r, g, b = X.Unpack(r)
 	end
 	if b then
 		local element
@@ -4470,7 +4470,7 @@ end
 -- (self) Instance:ItemInfo(...)
 -- NOTICE：only for Box
 function OO:ItemInfo(...)
-	local data = { ... }
+	local data = X.Pack(...)
 	for _, raw in ipairs(self.raws) do
 		raw = GetComponentElement(raw, 'BOX')
 		if raw then
@@ -4481,7 +4481,7 @@ function OO:ItemInfo(...)
 				if KItemInfo and KItemInfo.nGenre == ITEM_GENRE.BOOK and #data == 4 then -- 西山居BUG
 					table.insert(data, 4, 99999)
 				end
-				local res, err, trace = X.XpCall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
+				local res, err, trace = X.XpCall(UpdataItemInfoBoxObject, raw, X.Unpack(data)) -- 防止itemtab不一样
 				if not res then
 					X.ErrorLog(err, X.NSFormatString('{$NS}#UI:ItemInfo'), trace)
 				end
@@ -4877,9 +4877,9 @@ function OO:UIEvent(szEvent, fnEvent)
 						end
 						local rets = {}
 						for _, p in ipairs(uiEvents[szEvent]) do
-							local res = { p.fn(...) }
-							if #res > 0 then
-								if #rets == 0 then
+							local res = X.Pack(p.fn(...))
+							if table.getn(res) > 0 then
+								if table.getn(rets) == 0 then
 									rets = res
 								--[[#DEBUG BEGIN]]
 								else
@@ -4892,7 +4892,7 @@ function OO:UIEvent(szEvent, fnEvent)
 								end
 							end
 						end
-						return unpack(rets)
+						return X.Unpack(rets)
 					end
 					-- 特殊控件的一些HOOK
 					if szEvent == 'OnEditChanged' and raw.GetText then

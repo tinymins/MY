@@ -468,9 +468,9 @@ function X.RegisterModuleEvent(arg0, arg1)
 		for _, aParams in ipairs(arg1) do
 			local szEvent = table.remove(aParams, 1)
 			if szEvent == '#BREATHE' then
-				X.BreatheCall(szModule .. '#BREATHE', unpack(aParams))
+				X.BreatheCall(szModule .. '#BREATHE', X.Unpack(aParams))
 			else
-				X.RegisterEvent(szEvent, szModule, unpack(aParams))
+				X.RegisterEvent(szEvent, szModule, X.Unpack(aParams))
 			end
 			nCount = nCount + 1
 			tEvent[szEvent] = { szEvent = szEvent }
@@ -681,7 +681,7 @@ local function ProcessQueue()
 	if not v then
 		return 0
 	end
-	X.SendBgMsg(unpack(v))
+	X.SendBgMsg(X.Unpack(v))
 end
 -- X.SendBgMsg(szName, szMsgID, oData)
 -- X.SendBgMsg(nChannel, szMsgID, oData)
@@ -695,7 +695,7 @@ function X.SendBgMsg(nChannel, szMsgID, oData, bSilent)
 		if szStatus == 'TALK_LOCK' and not bSilent then
 			X.Systopmsg(_L['BgMsg cannot be send due to talk lock, data will be sent as soon as talk unlocked.'])
 		end
-		table.insert(BG_MSG_QUEUE, { nChannel, szMsgID, oData })
+		table.insert(BG_MSG_QUEUE, X.Pack(nChannel, szMsgID, oData))
 		X.BreatheCall(X.NSFormatString('{$NS}#BG_MSG_QUEUE'), ProcessQueue)
 		return
 	end
@@ -829,18 +829,17 @@ local function onBreathe()
 					break
 				end
 				if coroutine.status(p.coAction) == 'suspended' then
-					local res = {coroutine.resume(p.coAction)}
+					local res = X.Pack(coroutine.resume(p.coAction))
 					if res[1] == true then
-						table.remove(res, 1)
 						p.bSuccess = true
-						p.aReturn = res
+						p.aReturn = X.Pack(select(2, X.Unpack(res)))
 					elseif not res[1] then
 						X.ErrorLog('OnCoroutine: ' .. p.szID .. ', Error: ' .. res[2])
 					end
 				end
 				if coroutine.status(p.coAction) == 'dead' then
 					if p.fnCallback then
-						X.Call(p.fnCallback, p.bSuccess or false, unpack(p.aReturn or CONSTANT.EMPTY_TABLE))
+						X.Call(p.fnCallback, p.bSuccess or false, X.Unpack(p.aReturn or CONSTANT.EMPTY_TABLE))
 					end
 					COROUTINE_LIST[k] = nil
 				end

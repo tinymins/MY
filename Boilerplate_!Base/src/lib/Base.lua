@@ -327,6 +327,17 @@ local function Set(var, keys, val)
 	return res
 end
 -----------------------------------------------
+-- 打包拆包数据
+-----------------------------------------------
+local Pack = type(table.pack) == 'function'
+	and table.pack
+	or function(...)
+		return { n = select("#", ...), ... }
+	end
+local Unpack = type(table.unpack) == 'function'
+	and table.unpack
+	or unpack
+-----------------------------------------------
 -- 合并数据
 -----------------------------------------------
 local function TableAssign(t, ...)
@@ -694,7 +705,7 @@ local Call, XpCall
 do
 local xpAction, xpArgs, xpErrMsg, xpTraceback, xpErrLog
 local function CallHandler()
-	return xpAction(unpack(xpArgs))
+	return xpAction(Unpack(xpArgs))
 end
 local function CallErrorHandler(errMsg)
 	xpErrMsg = errMsg
@@ -708,24 +719,24 @@ local function XpCallErrorHandler(errMsg)
 	xpTraceback = GetTraceback():gsub('^([^\n]+\n)[^\n]+\n', '%1')
 end
 function Call(arg0, ...)
-	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, {...}, nil, nil
-	local res = {xpcall(CallHandler, CallErrorHandler)}
+	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, Pack(...), nil, nil
+	local res = Pack(xpcall(CallHandler, CallErrorHandler))
 	if not res[1] then
 		res[2] = xpErrMsg
 		res[3] = xpTraceback
 	end
 	xpAction, xpArgs, xpErrMsg, xpTraceback = nil, nil, nil, nil
-	return unpack(res)
+	return Unpack(res)
 end
 function XpCall(arg0, ...)
-	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, {...}, nil, nil
-	local res = {xpcall(CallHandler, XpCallErrorHandler)}
+	xpAction, xpArgs, xpErrMsg, xpTraceback = arg0, Pack(...), nil, nil
+	local res = Pack(xpcall(CallHandler, XpCallErrorHandler))
 	if not res[1] then
 		res[2] = xpErrMsg
 		res[3] = xpTraceback
 	end
 	xpAction, xpArgs, xpErrMsg, xpTraceback = nil, nil, nil, nil
-	return unpack(res)
+	return Unpack(res)
 end
 end
 local function SafeCall(f, ...)
@@ -737,16 +748,16 @@ end
 local function CallWithThis(context, f, ...)
 	local _this = this
 	this = context
-	local rtc = {Call(f, ...)}
+	local rtc = Pack(Call(f, ...))
 	this = _this
-	return unpack(rtc)
+	return Unpack(rtc)
 end
 local function SafeCallWithThis(context, f, ...)
 	local _this = this
 	this = context
-	local rtc = {SafeCall(f, ...)}
+	local rtc = Pack(SafeCall(f, ...))
 	this = _this
-	return unpack(rtc)
+	return Unpack(rtc)
 end
 
 local NSFormatString
@@ -887,6 +898,8 @@ local X = {
 	ErrorLog         = ErrorLog        ,
 	Set              = Set             ,
 	Get              = Get             ,
+	Pack             = Pack            ,
+	Unpack           = Unpack          ,
 	TableAssign      = TableAssign     ,
 	Class            = Class           ,
 	GetPatch         = GetPatch        ,
