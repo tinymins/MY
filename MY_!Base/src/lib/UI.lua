@@ -1181,10 +1181,10 @@ local function InitComponent(raw, szType)
 							:Drag(function()
 								local capture = {
 									element = raw,
+									x = hCol:GetAbsX() - raw:GetAbsX(),
+									y = 0,
 									w = hCol:GetW(),
 									h = raw:GetH(),
-									x = raw:GetAbsX() - hCol:GetAbsX(),
-									y = raw:GetAbsY() - hCol:GetAbsY(),
 								}
 								return col, capture
 							end)
@@ -1198,6 +1198,9 @@ local function InitComponent(raw, szType)
 								return rect
 							end)
 							:Drop(function(_, c)
+								if c == col then
+									return
+								end
 								local aColumns = X.Assign({}, GetComponentProp(raw, 'aColumns'))
 								local nFromIndex = math.huge
 								for i, v in ipairs(aColumns) do
