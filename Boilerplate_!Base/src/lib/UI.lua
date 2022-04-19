@@ -294,6 +294,10 @@ local function ApplyUIArguments(ui, arg)
 		if arg.draggable          ~= nil then ui:Drag             (arg.draggable                                   ) end
 		if arg.dragArea           ~= nil then ui:Drag             (X.Unpack(arg.dragArea)                          ) end
 		if arg.dragDropGroup             then ui:DragDropGroup    (arg.dragDropGroup                               ) end
+		if arg.columns                   then ui:Columns          (arg.columns                                     ) end
+		if arg.sort or arg.sortOrder     then ui:Sort             (arg.sort, arg.sortOrder                         ) end
+		if arg.dataSource                then ui:DataSource       (arg.dataSource                                  ) end
+		if arg.summary                   then ui:Summary          (arg.summary                                     ) end
 		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then        -- must after :Text() because w/h can be 'auto'
 			ui:Size(arg.w, arg.h, arg.rw, arg.rh)
 		end
@@ -325,10 +329,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onDrop                    then ui:Drop             (arg.onDrop                                      ) end
 		if arg.customLayout              then ui:CustomLayout     (arg.customLayout                                ) end
 		if arg.onCustomLayout            then ui:CustomLayout     (arg.onCustomLayout, arg.customLayoutPoint       ) end
-		if arg.columns                   then ui:Columns          (arg.columns                                     ) end
-		if arg.dataSource                then ui:DataSource       (arg.dataSource                                  ) end
-		if arg.summary                   then ui:Summary          (arg.summary                                     ) end
-		if arg.sort or arg.sortOrder     then ui:Sort             (arg.sort, arg.sortOrder                         ) end
+		if arg.onColumnsChange           then ui:Columns          (arg.onColumnsChange                             ) end
 		if arg.onSortChange              then ui:Sort             (arg.onSortChange                                ) end
 		if arg.events             ~= nil then for _, v in ipairs(arg.events      ) do ui:Event       (X.Unpack(v)) end end
 		if arg.uiEvents           ~= nil then for _, v in ipairs(arg.uiEvents    ) do ui:UIEvent     (X.Unpack(v)) end end
@@ -862,6 +863,7 @@ local function InitComponent(raw, szType)
 		-- 初始化变量
 		SetComponentProp(raw, 'ScrollX', 'auto')
 		SetComponentProp(raw, 'SortOrder', 'asc')
+		SetComponentProp(raw, 'aColumns', {})
 		SetComponentProp(raw, 'aFixedLColumns', {})
 		SetComponentProp(raw, 'aFixedRColumns', {})
 		SetComponentProp(raw, 'aScrollableColumns', {})
@@ -1164,6 +1166,47 @@ local function InitComponent(raw, szType)
 						X.SafeCall(GetComponentProp(raw, 'OnSortChange'))
 						GetComponentProp(raw, 'UpdateSorterStatus')()
 						GetComponentProp(raw, 'DrawTableContent')()
+					end
+					-- 拖拽
+					if col.draggable then
+						UI(hCol)
+							:DragDropGroup(tostring(raw))
+							:Drag(function()
+								local capture = {
+									element = raw,
+									w = hCol:GetW(),
+									h = raw:GetH(),
+									x = raw:GetAbsX() - hCol:GetAbsX(),
+									y = raw:GetAbsY() - hCol:GetAbsY(),
+								}
+								return col, capture
+							end)
+							:DragHover(function()
+								local rect = {
+									x = hCol:GetAbsX(),
+									y = hCol:GetAbsY() + 1,
+									w = hCol:GetW(),
+									h = raw:GetH() - 2,
+								}
+								return rect
+							end)
+							:Drop(function(_, c)
+								local aColumns = X.Assign({}, GetComponentProp(raw, 'aColumns'))
+								for i, v in ipairs(aColumns) do
+									if v == c then
+										table.remove(aColumns, i)
+										break
+									end
+								end
+								for i, v in ipairs(aColumns) do
+									if v == col then
+										table.insert(aColumns, i, c)
+										break
+									end
+								end
+								UI(raw):Columns(aColumns)
+								X.SafeCall(GetComponentProp(raw, 'OnColumnsChange'))
+							end)
 					end
 				end
 			end
@@ -3178,37 +3221,44 @@ function OO:Columns(aColumns)
 	if aColumns then
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTable' then
-				local aFixedLColumns, aFixedRColumns, aScrollableColumns = {}, {}, {}
-				local nFixedLColumnsWidth, nFixedRColumnsWidth = 0, 0
-				for _, col in ipairs(aColumns) do
-					if col.fixed == true or col.fixed == 'left' then
-						assert(X.IsNumber(col.width), 'fixed column width is required')
-						nFixedLColumnsWidth = nFixedLColumnsWidth + col.width
-						table.insert(aFixedLColumns, col)
-					else
-						break
+				if X.IsFunction(aColumns) then
+					SetComponentProp(raw, 'OnColumnsChange', function()
+						X.ExecuteWithThis(raw, aColumns, GetComponentProp(raw, 'aColumns'))
+					end)
+				else
+					local aFixedLColumns, aFixedRColumns, aScrollableColumns = {}, {}, {}
+					local nFixedLColumnsWidth, nFixedRColumnsWidth = 0, 0
+					for _, col in ipairs(aColumns) do
+						if col.fixed == true or col.fixed == 'left' then
+							assert(X.IsNumber(col.width), 'fixed column width is required')
+							nFixedLColumnsWidth = nFixedLColumnsWidth + col.width
+							table.insert(aFixedLColumns, col)
+						else
+							break
+						end
 					end
-				end
-				for _, col in X.ipairs_r(aColumns) do
-					if col.fixed == 'right' then
-						assert(X.IsNumber(col.width), 'fixed column width is required')
-						nFixedRColumnsWidth = nFixedRColumnsWidth + col.width
-						table.insert(aFixedRColumns, col)
-					else
-						break
+					for _, col in X.ipairs_r(aColumns) do
+						if col.fixed == 'right' then
+							assert(X.IsNumber(col.width), 'fixed column width is required')
+							nFixedRColumnsWidth = nFixedRColumnsWidth + col.width
+							table.insert(aFixedRColumns, col)
+						else
+							break
+						end
 					end
+					for i = #aFixedLColumns + 1, #aColumns - #aFixedRColumns do
+						table.insert(aScrollableColumns, aColumns[i])
+					end
+					SetComponentProp(raw, 'aColumns', aColumns)
+					SetComponentProp(raw, 'aFixedLColumns', aFixedLColumns)
+					SetComponentProp(raw, 'aFixedRColumns', aFixedRColumns)
+					SetComponentProp(raw, 'aScrollableColumns', aScrollableColumns)
+					SetComponentProp(raw, 'nFixedLColumnsWidth', nFixedLColumnsWidth)
+					SetComponentProp(raw, 'nFixedRColumnsWidth', nFixedRColumnsWidth)
+					GetComponentProp(raw, 'DrawColumnsTitle')()
+					GetComponentProp(raw, 'DrawTableContent')()
+					GetComponentProp(raw, 'DrawTableSummary')()
 				end
-				for i = #aFixedLColumns + 1, #aColumns - #aFixedRColumns do
-					table.insert(aScrollableColumns, aColumns[i])
-				end
-				SetComponentProp(raw, 'aFixedLColumns', aFixedLColumns)
-				SetComponentProp(raw, 'aFixedRColumns', aFixedRColumns)
-				SetComponentProp(raw, 'aScrollableColumns', aScrollableColumns)
-				SetComponentProp(raw, 'nFixedLColumnsWidth', nFixedLColumnsWidth)
-				SetComponentProp(raw, 'nFixedRColumnsWidth', nFixedRColumnsWidth)
-				GetComponentProp(raw, 'DrawColumnsTitle')()
-				GetComponentProp(raw, 'DrawTableContent')()
-				GetComponentProp(raw, 'DrawTableSummary')()
 			end
 		end
 		return self
@@ -3216,17 +3266,7 @@ function OO:Columns(aColumns)
 		local raw = self.raws[1]
 		if raw then
 			if GetComponentType(raw) == 'WndTable' then
-				local aColumns = {}
-				for _, v in ipairs(GetComponentProp(raw, 'aFixedLColumns')) do
-					table.insert(aColumns, v)
-				end
-				for _, v in ipairs(GetComponentProp(raw, 'aScrollableColumns')) do
-					table.insert(aColumns, v)
-				end
-				for _, v in ipairs(GetComponentProp(raw, 'aFixedRColumns')) do
-					table.insert(aColumns, v)
-				end
-				return aColumns
+				return GetComponentProp(raw, 'aColumns')
 			end
 		end
 	end
@@ -3263,6 +3303,7 @@ function OO:Summary(...)
 				SetComponentProp(raw, 'Summary', summary)
 				GetComponentProp(raw, 'DrawTableSummary')()
 				GetComponentProp(raw, 'UpdateSummaryVisible')()
+				GetComponentProp(raw, 'UpdateSummaryColumnsWidth')()
 			end
 		end
 		return self

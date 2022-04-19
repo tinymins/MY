@@ -60,6 +60,7 @@ local COMPONENT_SAMPLE = {
 					alignVertical = 'top',
 					sorter = true,
 					fixed = true,
+					draggable = true,
 				},
 				{
 					key = 'desc',
@@ -83,6 +84,7 @@ local COMPONENT_SAMPLE = {
 						end
 						return v1 < v2 and -1 or 1
 					end,
+					draggable = true,
 				},
 				{
 					key = 'price',
@@ -92,6 +94,7 @@ local COMPONENT_SAMPLE = {
 					alignHorizontal = 'center',
 					alignVertical = 'middle',
 					sorter = true,
+					draggable = true,
 				},
 				{
 					key = 'from',
@@ -182,6 +185,13 @@ local COMPONENT_SAMPLE = {
 					},
 				}
 				UI.PopupMenu(menu)
+			end,
+			onColumnsChange = function(aColumns)
+				local aKeys = {}
+				for _, v in ipairs(aColumns) do
+					table.insert(aKeys, v.key)
+				end
+				X.Sysmsg('ColumnsChange: ' .. table.concat(aKeys, ','))
 			end,
 		},
 	},
