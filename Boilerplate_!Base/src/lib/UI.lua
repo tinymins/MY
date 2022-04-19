@@ -1181,10 +1181,10 @@ local function InitComponent(raw, szType)
 							:Drag(function()
 								local capture = {
 									element = raw,
+									x = hCol:GetAbsX() - raw:GetAbsX(),
+									y = 0,
 									w = hCol:GetW(),
 									h = raw:GetH(),
-									x = raw:GetAbsX() - hCol:GetAbsX(),
-									y = raw:GetAbsY() - hCol:GetAbsY(),
 								}
 								return col, capture
 							end)
