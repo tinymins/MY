@@ -814,6 +814,23 @@ CONSTANT = {
 		[TEAM_MARK.DART ] = _L['TEAM_MARK_DART' ],
 		[TEAM_MARK.FAN  ] = _L['TEAM_MARK_FAN'  ],
 	},
+	MACHINE_GPU_TYPE = SetmetaReadonly({
+		LOW    = 1,
+		NORMAL = 2,
+	}),
+	MACHINE_GPU_LEVEL = SetmetaReadonly({
+		ENABLE     =  0,
+		ATTEND     =  1,
+		LOWEST     =  2, -- 最简
+		LOW_MOST   =  3, -- 简约
+		LOW        =  4, -- 均衡
+		MEDIUM     =  5, -- 唯美 // 这档现在弃用了，原来选这档的人进来以后直接改成均衡
+		HIGH       =  6, -- 高效
+		PERFECTION =  7, -- 电影
+		HD         =  8, -- 极致
+		PERFECT    = 10, -- 沉浸
+		EXPLORE    =  9, -- 探索 // 比 PERFECT 要高，但是枚举值却小一点
+	}),
 }
 
 -- 更新最高玩家等级数据
