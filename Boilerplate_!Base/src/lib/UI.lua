@@ -4878,8 +4878,8 @@ function OO:UIEvent(szEvent, fnEvent)
 						local rets = {}
 						for _, p in ipairs(uiEvents[szEvent]) do
 							local res = X.Pack(p.fn(...))
-							if table.getn(res) > 0 then
-								if table.getn(rets) == 0 then
+							if X.Len(res) > 0 then
+								if X.Len(rets) == 0 then
 									rets = res
 								--[[#DEBUG BEGIN]]
 								else

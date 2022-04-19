@@ -257,7 +257,7 @@ function X.CopyChatLine(hTime, bTextEditor, bRichText)
 								end
 							end
 						end
-						if szText ~= '' and (table.getn(edit:GetTextStruct()) > 0 or szText ~= g_tStrings.STR_FACE) then
+						if szText ~= '' and (X.Len(edit:GetTextStruct()) > 0 or szText ~= g_tStrings.STR_FACE) then
 							edit:InsertText(szText)
 						end
 					end

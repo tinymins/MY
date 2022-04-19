@@ -338,6 +338,15 @@ local Unpack = type(table.unpack) == 'function'
 	and table.unpack
 	or unpack
 -----------------------------------------------
+-- 数据长度
+-----------------------------------------------
+local function Len(t)
+	if type(t) == 'table' then
+		return t.n or #t
+	end
+	return #t
+end
+-----------------------------------------------
 -- 合并数据
 -----------------------------------------------
 local function Assign(t, ...)
@@ -900,6 +909,7 @@ local X = {
 	Get              = Get             ,
 	Pack             = Pack            ,
 	Unpack           = Unpack          ,
+	Len              = Len             ,
 	Assign           = Assign          ,
 	Class            = Class           ,
 	GetPatch         = GetPatch        ,
