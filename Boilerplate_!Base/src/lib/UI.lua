@@ -13,6 +13,16 @@ local string, math, table = string, math, table
 local X = Boilerplate
 local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
 -------------------------------------------------------------------------------------------------------
+
+-- TODO: 界面库需要重构，该文件应作为入口文件，仅用于分发各个组件的函数调用
+-- TODO: 应当增加基础组件类型操作对象 ComponentBase ，可以提供组件的基本操作方法如 ComponentBase.Size(raw, ...)
+-- TODO: 应当增加组件注册函数 function UI.RegisterComponent(function(super, GetComponentProp, SetComponentProp) return szComponentName, ComponentOO end)
+-- TODO: 子组件可以覆盖基础组件的操作方法，如 ComponentOO.Size(raw, ...)
+-- TODO: 子组件也可以通过 super 调用基础组件的方法，如 super.Size(raw, ...)
+-- TODO: 有时间再说吧，是个大工程
+
+-------------------------------------------------------------------------------------------------------
+
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 UI.ITEM_EVENT = X.SetmetaReadonly({
@@ -180,6 +190,8 @@ local EDIT_BOX_APPEARANCE_CONFIG = {
 		szIconAlign = 'RIGHT',
 	},
 }
+
+-- TODO: local REGISTERED_COMPONENT = {}
 
 -----------------------------------------------------------
 -- my ui common functions
@@ -5640,6 +5652,29 @@ X.RegisterEvent(X.NSFormatString('{$NS}_BASE_LOADING_END'), function()
 		__tostring = function(t) return X.NSFormatString('{$NS}_UI (class prototype)') end,
 	})
 end)
+
+-- TODO: 重构，注册组件
+-- function UI.RegisterComponent(GetComponent)
+-- 	local szComponentName, Component = GetComponent(ComponentBase, GetComponentProp, SetComponentProp)
+-- 	for k, v in pairs(Component) do
+-- 		if not OO[k] then
+-- 			OO[k] = function(self, ...)
+-- 				for _, raw in ipairs(self.raws) do
+-- 					local fnAction = REGISTERED_COMPONENT[GetComponentType(raw)]
+-- 					if fnAction then
+-- 						fnAction = fnAction[k]
+-- 					end
+-- 					local res = X.Pack(fnAction(raw, ...))
+-- 					if X.Len(res) > 0 then
+-- 						return X.Unpack(res)
+-- 					end
+-- 				end
+-- 				return self
+-- 			end
+-- 		end
+-- 	end
+-- 	REGISTERED_COMPONENT[szComponentName] = Component
+-- end
 
 ---------------------------------------------------
 -- create new frame
