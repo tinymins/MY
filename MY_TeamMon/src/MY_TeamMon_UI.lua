@@ -2338,7 +2338,7 @@ function D.OpenSettingPanel(data, szType)
 			x = 640, y = nY + 3, w = 50,
 			text = _L['Regexp match'],
 			tip = {
-				render = _L['Supports backreference in note string, format: ${index}.'],
+				render = _L['Supports backreference in note string, format: {$index}.'],
 				position = UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			checked = data.bReg,
@@ -2437,7 +2437,7 @@ function D.OpenSettingPanel(data, szType)
 			x = 640, y = nY + 3, w = 50,
 			text = _L['Regexp match'],
 			tip = {
-				render = _L['Supports backreference in note string, format: ${index}.'],
+				render = _L['Supports backreference in note string, format: {$index}.'],
 				position = UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			checked = data.bReg,

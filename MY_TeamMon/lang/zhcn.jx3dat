@@ -129,7 +129,7 @@ return {
 	['Partical search'] = '检索匹配',
 	['Supports match partical.'] = '勾选后，任意部分一致即可匹配成功，会造成少量性能损耗。',
 	['Regexp match'] = '正则匹配',
-	['Supports backreference in note string, format: ${index}.'] = '启用正则匹配后报警内容支持反向索引，格式为“${下标}”。\n正则匹配性能消耗较大，建议同一地图同时不超过5条，过度使用可能影响游戏帧率。\n关于“正则匹配”和“反向索引”知识，请自行搜索“LUA正则”相关知识。',
+	['Supports backreference in note string, format: {$index}.'] = '启用正则匹配后报警内容支持引用捕获，格式为“{$捕获下标}”。\n正则匹配性能消耗较大，建议同一地图同时不超过5条，过度使用可能影响游戏帧率。\n关于“正则匹配”和“捕获组”知识，请自行搜索“LUA正则”相关知识。',
 	['Speaker'] = '喊话对象',
 	['Content'] = '喊话内容',
 	['Chat content'] = '系统喊话',
