@@ -1198,6 +1198,9 @@ local function InitComponent(raw, szType)
 								return rect
 							end)
 							:Drop(function(_, c)
+								if c == col then
+									return
+								end
 								local aColumns = X.Assign({}, GetComponentProp(raw, 'aColumns'))
 								local nFromIndex = math.huge
 								for i, v in ipairs(aColumns) do
