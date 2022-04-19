@@ -885,7 +885,7 @@ local function InitComponent(raw, szType)
 			hTotal:Lookup('Handle_Fixed_L_TableColumns'):SetSize(nFixedLWidth, nRawHeight)
 			hTotal:Lookup('Handle_Fixed_L_Scroll_Y_Wrapper'):SetW(nFixedLWidth)
 			hTotal:Lookup('Handle_Fixed_L_Scroll_Y_Wrapper'):SetH(nRawHeight - 60)
-			hTotal:Lookup('Handle_Fixed_L_Summary'):SetRelX(nFixedLWidth)
+			hTotal:Lookup('Handle_Fixed_L_Summary'):SetRelX(0)
 			hTotal:Lookup('Handle_Fixed_L_Summary'):SetRelY(nRawHeight - 30)
 			-- ”“≤‡πÃ∂®¡–
 			hTotal:Lookup('Handle_Fixed_R_TableColumns'):SetSize(nFixedRWidth, nRawHeight)
