@@ -50,6 +50,57 @@ UI.ITEM_EVENT = X.SetmetaReadonly({
 	M_BUTTON_DRAG     = 0x00200000,
 	MOUSE_IN_OUT      = 0x00400000,
 })
+UI.CURSOR = CURSOR or X.SetmetaReadonly({
+	NORMAL              = 0,
+	CAST                = 1,
+	UNABLECAST          = 2,
+	TRAVEL              = 3,
+	UNABLETRAVEL        = 4,
+	SELL                = 5,
+	UNABLESELL          = 6,
+	BUYBACK             = 7,
+	UNABLEBUYBACK       = 8,
+	REPAIRE             = 9,
+	UNABLEREPAIRE       = 10,
+	ATTACK              = 11,
+	UNABLEATTACK        = 12,
+	SPEAK               = 13,
+	UNABLESPEAK         = 14,
+	LOOT                = 15,
+	UNABLELOOT          = 16,
+	LOCK                = 17,
+	UNABLELOCK          = 18,
+	INSPECT             = 19,
+	UNABLEINSPECT       = 20,
+	SPLIT               = 21,
+	UNABLESPLIT         = 22,
+	FLOWER              = 23,
+	UNABLEFLOWER        = 24,
+	MINE                = 25,
+	UNABLEMINE          = 26,
+	SEARCH              = 27,
+	UNABLESEARCH        = 28,
+	QUEST               = 29,
+	UNABLEQUEST         = 30,
+	READ                = 31,
+	UNABLEREAD          = 32,
+	MARKPRICE           = 33,
+	TOP_BOTTOM          = 34,
+	LEFT_RIGHT          = 35,
+	LEFTTOP_RIGHTBOTTOM = 36,
+	RIGHTTOP_LEFTBOTTOM = 37,
+	CURSOR_MOVE         = 38,
+	CHESS               = 57,
+	CHAT_LOCK           = 58,
+	HAND_OBJECT         = 59,
+	DESTROY             = 60,
+	DRAG                = 61,
+	ON_DRAG             = 62,
+	DRAW                = 63,
+	POSITION            = 64,
+	HOMELAND_BRUSH      = 65,
+	HOMELAND_DIG_CELLAR = 66,
+})
 UI.MOUSE_BUTTON = X.SetmetaReadonly({
 	LEFT   = 1,
 	MIDDLE = 0,
@@ -242,6 +293,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.penetrable         ~= nil then ui:Penetrable       (arg.penetrable                                  ) end
 		if arg.draggable          ~= nil then ui:Drag             (arg.draggable                                   ) end
 		if arg.dragArea           ~= nil then ui:Drag             (X.Unpack(arg.dragArea)                          ) end
+		if arg.dragDropGroup             then ui:DragDropGroup    (arg.dragDropGroup                               ) end
 		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then        -- must after :Text() because w/h can be 'auto'
 			ui:Size(arg.w, arg.h, arg.rw, arg.rh)
 		end
@@ -268,7 +320,8 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onCheck            ~= nil then ui:Check            (arg.onCheck                                     ) end
 		if arg.onChange           ~= nil then ui:Change           (arg.onChange                                    ) end
 		if arg.onSpecialKeyDown   ~= nil then ui:OnSpecialKeyDown (arg.onSpecialKeyDown                            ) end
-		if arg.onDragging or arg.onDrag  then ui:Drag             (arg.onDragging, arg.onDrag                      ) end
+		if arg.onDrag                    then ui:Drag             (arg.onDrag                                      ) end
+		if arg.onDrop                    then ui:Drop             (arg.onDrop                                      ) end
 		if arg.customLayout              then ui:CustomLayout     (arg.customLayout                                ) end
 		if arg.onCustomLayout            then ui:CustomLayout     (arg.onCustomLayout, arg.customLayoutPoint       ) end
 		if arg.columns                   then ui:Columns          (arg.columns                                     ) end
@@ -2422,47 +2475,132 @@ function OO:Drag(...)
 	local argc = select('#', ...)
 	local arg0, arg1, arg2, arg3 = ...
 	if argc == 0 then
-	elseif X.IsBoolean(arg0) then
-		local bDrag = arg0
-		for _, raw in ipairs(self.raws) do
-			if raw.EnableDrag then
-				raw:EnableDrag(bDrag)
-			end
-		end
-		return self
-	elseif X.IsNumber(arg0) or X.IsNumber(arg1) or X.IsNumber(arg2) or X.IsNumber(arg3) then
-		local nX, nY, nW, nH = arg0 or 0, arg1 or 0, arg2, arg3
-		for _, raw in ipairs(self.raws) do
-			if raw:GetType() == 'WndFrame' then
-				raw:SetDragArea(nX, nY, nW or raw:GetW(), nH or raw:GetH())
-			end
-		end
-		return self
-	elseif X.IsFunction(arg0) or X.IsFunction(arg1) then
-		for _, raw in ipairs(self.raws) do
-			if raw:GetType() == 'WndFrame' then
-				if arg0 then
-					UI(raw):UIEvent('OnFrameDragSetPosEnd', arg0)
-				end
-				if arg1 then
-					UI(raw):UIEvent('OnFrameDragEnd', arg1)
-				end
-			elseif raw:GetBaseType() == 'Item' then
-				if arg0 then
-					UI(raw):UIEvent('OnItemLButtonDrag', arg0)
-				end
-				if arg1 then
-					UI(raw):UIEvent('OnItemLButtonDragEnd', arg1)
-				end
-			end
-		end
-		return self
-	else
 		local raw = self.raws[1]
 		if raw and raw:GetType() == 'WndFrame' then
 			return raw:IsDragable()
 		end
+		return
 	end
+	if argc == 1 then
+		if X.IsBoolean(arg0) then
+			local bDrag = arg0
+			for _, raw in ipairs(self.raws) do
+				if raw.EnableDrag then
+					raw:EnableDrag(bDrag)
+				end
+			end
+			return self
+		end
+		if X.IsFunction(arg0) then
+			local fnAction = arg0
+			for _, raw in ipairs(self.raws) do
+				if raw:GetBaseType() == 'Item' then
+					raw.OnItemLButtonDrag = function()
+						local szDragGroupID = GetComponentProp(raw, 'DragDropGroup')
+						local data, capture = fnAction()
+						UI.OpenDragDrop(this, capture, szDragGroupID, data)
+					end
+					raw.OnItemLButtonDragEnd = function()
+						if not UI.IsDragDropOpened() then
+							return
+						end
+						local dropEl, szDragGroupID, xData = UI.CloseDragDrop()
+						local szDropGroupID = GetComponentProp(dropEl, 'DragDropGroup')
+						if szDragGroupID ~= szDropGroupID then
+							return
+						end
+						X.SafeCall(GetComponentProp(dropEl, 'OnDrop'), szDragGroupID, xData)
+					end
+					raw:RegisterEvent(UI.ITEM_EVENT.L_BUTTON_DRAG)
+					raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
+				end
+			end
+			return self
+		end
+	end
+	if argc == 2 then
+		if X.IsFunction(arg0) or X.IsFunction(arg1) then
+			for _, raw in ipairs(self.raws) do
+				if raw:GetType() == 'WndFrame' then
+					if arg0 then
+						UI(raw):UIEvent('OnFrameDragSetPosEnd', arg0)
+					end
+					if arg1 then
+						UI(raw):UIEvent('OnFrameDragEnd', arg1)
+					end
+				elseif raw:GetBaseType() == 'Item' then
+					if arg0 then
+						UI(raw):UIEvent('OnItemLButtonDrag', arg0)
+					end
+					if arg1 then
+						UI(raw):UIEvent('OnItemLButtonDragEnd', arg1)
+					end
+				end
+			end
+			return self
+		end
+	end
+	if argc == 4 then
+		if X.IsNumber(arg0) or X.IsNumber(arg1) or X.IsNumber(arg2) or X.IsNumber(arg3) then
+			local nX, nY, nW, nH = arg0 or 0, arg1 or 0, arg2, arg3
+			for _, raw in ipairs(self.raws) do
+				if raw:GetType() == 'WndFrame' then
+					raw:SetDragArea(nX, nY, nW or raw:GetW(), nH or raw:GetH())
+				end
+			end
+			return self
+		end
+	end
+end
+
+function OO:Drop(fnAction)
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		if raw:GetBaseType() == 'Item' then
+			UI(raw):UIEvent('OnItemMouseEnter', function()
+				if not UI.IsDragDropOpened() then
+					return
+				end
+				local szDragGroupID = UI.GetDragDropData()
+				if szDragGroupID == GetComponentProp(raw, 'DragDropGroup') then
+					UI.SetDragDropHoverEl(raw)
+				end
+			end)
+			UI(raw):UIEvent('OnItemMouseLeave', function()
+				if not UI.IsDragDropOpened() then
+					return
+				end
+				local szDragGroupID = UI.GetDragDropData()
+				if szDragGroupID == GetComponentProp(raw, 'DragDropGroup') then
+					UI.SetDragDropHoverEl(nil)
+				end
+			end)
+			SetComponentProp(raw, 'OnDrop', function(szDragGroupID, xData)
+				X.ExecuteWithThis(raw, fnAction, szDragGroupID, xData)
+			end)
+			raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
+		end
+	end
+end
+
+function OO:DragDropGroup(...)
+	self:_checksum()
+	if select('#', ...) == 0 then
+		for _, raw in ipairs(self.raws) do
+			if raw:GetBaseType() == 'Item' then
+				return GetComponentProp(raw, 'DragDropGroup')
+			end
+		end
+		return
+	else
+		local szDragGroupID = ...
+		for _, raw in ipairs(self.raws) do
+			if raw:GetBaseType() == 'Item' then
+				SetComponentProp(raw, 'DragDropGroup', szDragGroupID)
+			end
+		end
+	end
+	return self
 end
 
 -- get/set ui object text
@@ -5087,7 +5225,7 @@ function OO:LClick(...)
 		if X.IsFunction(fnClick) then
 			for _, raw in ipairs(self.raws) do
 				local fnAction = function()
-					if GetComponentProp(raw, 'bEnable') == false then
+					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.LEFT)
@@ -5138,7 +5276,7 @@ end
 			if X.IsFunction(fnClick) then
 				for _, raw in ipairs(self.raws) do
 					local fnAction = function()
-						if GetComponentProp(raw, 'bEnable') == false then
+						if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 							return
 						end
 						X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.MIDDLE)
@@ -5189,7 +5327,7 @@ function OO:RClick(...)
 		if X.IsFunction(fnClick) then
 			for _, raw in ipairs(self.raws) do
 				local fnAction = function()
-					if GetComponentProp(raw, 'bEnable') == false then
+					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.RIGHT)
@@ -5327,7 +5465,7 @@ function OO:RowLClick(fnClick)
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTable' then
 				local fnAction = function(...)
-					if GetComponentProp(raw, 'bEnable') == false then
+					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, ...)
@@ -5347,7 +5485,7 @@ function OO:RowMClick(fnClick)
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTable' then
 				local fnAction = function(...)
-					if GetComponentProp(raw, 'bEnable') == false then
+					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, ...)
@@ -5367,7 +5505,7 @@ function OO:RowRClick(fnClick)
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTable' then
 				local fnAction = function(...)
-					if GetComponentProp(raw, 'bEnable') == false then
+					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, ...)
@@ -5893,7 +6031,7 @@ function UI.CreateFrame(szName, opt)
 			UI(frm):Remove()
 		end
 	end
-	if not opt.anchor then
+	if not opt.anchor and not (opt.x and opt.y) then
 		opt.anchor = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 	end
 	return ApplyUIArguments(ui, opt)

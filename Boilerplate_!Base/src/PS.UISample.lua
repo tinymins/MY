@@ -185,6 +185,42 @@ local COMPONENT_SAMPLE = {
 			end,
 		},
 	},
+	{
+		'DragDrop',
+		'Image',
+		{
+			w = 100, h = 100, name = 'Image_DragDrop_1',
+			image = 'ui\\Image\\UICommon\\CommonPanel4.UITex|3',
+			onDrag = function()
+				return 'data 1', this
+			end,
+			onDrop = function(dragID, data)
+				X.Sysmsg('Drop 1, ' .. tostring(dragID) .. ', ' .. X.EncodeLUAData(data))
+			end,
+		},
+	},
+	{
+		'DragDrop',
+		'Image',
+		{
+			w = 100, h = 100, name = 'Image_DragDrop_2',
+			image = 'ui\\Image\\UICommon\\CommonPanel4.UITex|3',
+			onDrag = function()
+				local frame = this:GetRoot()
+				local capture = {
+					element = frame,
+					x = this:GetAbsX() - frame:GetAbsX(),
+					y = this:GetAbsY() - frame:GetAbsY() - 220,
+					w = this:GetW(),
+					h = this:GetH() * 2 + 50,
+				}
+				return 'data 2', capture
+			end,
+			onDrop = function(dragID, data)
+				X.Sysmsg('Drop 2, ' .. tostring(dragID) .. ', ' .. X.EncodeLUAData(data))
+			end,
+		},
+	},
 }
 
 local PS = {}
