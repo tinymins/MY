@@ -61,7 +61,7 @@ function D.Open(raw, capture, ...)
 	local nCaptureW, nCaptureH = captureEl:GetW(), captureEl:GetH()
 	-- 拽入位置提示
 	local frame = Wnd.OpenWindow(X.PACKET_INFO.FRAMEWORK_ROOT .. '/ui/DragDrop.ini', DROP_FRAME_NAME)
-	frame:SetAlpha(100)
+	frame:SetAlpha(150)
 	frame:Hide()
 	-- 拖拽状态提示
 	local frame = Wnd.OpenWindow(X.PACKET_INFO.FRAMEWORK_ROOT .. '/ui/DragDrop.ini', DRAG_FRAME_NAME)
