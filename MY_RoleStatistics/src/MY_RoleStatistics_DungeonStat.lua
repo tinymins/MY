@@ -252,17 +252,17 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			}
 		end
 	elseif wstring.find(id, 'dungeon_') then
-		local id, via = wstring.gsub(id, 'dungeon_', ''), ''
-		if wstring.find(id, '@') then
-			local ids = X.SplitString(id, '@')
-			id, via = tonumber(ids[1]), ids[2]
+		local mapid, via = wstring.gsub(id, 'dungeon_', ''), ''
+		if wstring.find(mapid, '@') then
+			local ids = X.SplitString(mapid, '@')
+			mapid, via = tonumber(ids[1]), ids[2]
 		else
-			id = tonumber(id)
+			mapid = tonumber(mapid)
 		end
-		local map = id and X.GetMapInfo(id)
+		local map = mapid and X.GetMapInfo(mapid)
 		if map then
 			local col = { -- ÃØ¾³CD
-				id = 'dungeon_' .. id,
+				id = id,
 				szTitle = map.szName,
 				nMinWidth = DUNGEON_MIN_WIDTH,
 			}
@@ -615,6 +615,7 @@ function D.GetTableColumns()
 					return col.Compare(r1, r2)
 				end
 				or nil,
+			draggable = not col.id:find('@') or not aColumn[nIndex - 1] or aColumn[nIndex - 1].id:gsub('.+@', '') ~= col.id:gsub('.+@', ''),
 		}
 		if bFixed then
 			c.fixed = true
@@ -1004,6 +1005,32 @@ function D.OnInitPage()
 				},
 			}
 			PopupMenu(menu)
+		end,
+		onColumnsChange = function(aColumns)
+			local tAccKeys, tAccKeySuffix = {}, {}
+			for _, col in ipairs(D.GetTableColumns()) do
+				if col.key:find('@') then
+					local szSuffix = col.key:gsub('.+@', '')
+					if not tAccKeySuffix[szSuffix] then
+						tAccKeys[col.key] = true
+						tAccKeySuffix[szSuffix] = true
+					end
+				else
+					tAccKeys[col.key] = true
+				end
+			end
+			local aKeys, tKeys = {}, {}
+			for _, col in ipairs(aColumns) do
+				if tAccKeys[col.key] then
+					local szKey = col.key:gsub('.+@', '')
+					if not tKeys[szKey] then
+						table.insert(aKeys, szKey)
+						tKeys[szKey] = true
+					end
+				end
+			end
+			O.aColumn = aKeys
+			D.UpdateUI(page)
 		end,
 	})
 

@@ -945,6 +945,7 @@ function D.GetTableColumns()
 					return col.GetFormatTip(record), true
 				end
 				or nil,
+			draggable = true,
 		}
 		if bFixed then
 			c.fixed = true
@@ -1238,6 +1239,13 @@ function D.OnInitPage()
 				},
 			}
 			PopupMenu(menu)
+		end,
+		onColumnsChange = function(aColumns)
+			local aKeys = {}
+			for _, col in ipairs(aColumns) do
+				table.insert(aKeys, col.key)
+			end
+			O.aColumn = aKeys
 		end,
 	})
 

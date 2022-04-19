@@ -696,6 +696,7 @@ function D.GetTableColumns()
 						return col.Compare(v1, v2, r1, r2)
 					end
 					or nil,
+				draggable = true,
 			}
 			if bFixed then
 				c.fixed = true
@@ -1040,6 +1041,13 @@ function D.OnInitPage()
 				},
 			}
 			PopupMenu(menu)
+		end,
+		onColumnsChange = function(aColumns)
+			local aKeys = {}
+			for _, col in ipairs(aColumns) do
+				table.insert(aKeys, col.key)
+			end
+			O.aColumn = aKeys
 		end,
 	})
 
