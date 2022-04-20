@@ -920,7 +920,7 @@ local function InitComponent(raw, szType)
 			local hWrapper = raw:Lookup('', 'Handle_Scroll_X_Wrapper')
 			local hScroll = hWrapper:Lookup('Handle_Scroll_X')
 			local nStepCount = hScroll:GetW() - hWrapper:GetW()
-			if nStepCount > 0 then
+			if hWrapper:GetW() > 0 and nStepCount > 0 then
 				raw:Lookup('Scroll_X'):Show()
 				raw:Lookup('Scroll_X'):SetStepCount(nStepCount)
 			else
@@ -1086,7 +1086,7 @@ local function InitComponent(raw, szType)
 			end
 			hScrollableColumns:SetW(nX)
 			hScrollableColumns:FormatAllItemPos()
-			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X'):SetW(math.min(nRawWidth - nFixedLWidth - nFixedRWidth, nX))
+			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X'):SetW(nX)
 			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper'):SetW(nX)
 			raw:Lookup('', 'Handle_Scroll_X_Wrapper/Handle_Scroll_X/Handle_Scroll_Y_Wrapper/Handle_Scroll_Y'):SetW(nX)
 			raw:Lookup('', 'Handle_Scroll_X_Wrapper'):SetRelX(nFixedLWidth)
