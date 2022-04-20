@@ -945,10 +945,14 @@ local function InitComponent(raw, szType)
 			local function UpdateTitleColumnRect(hCol, col, nWidth, nHeight)
 				local hContentWrapper = hCol:Lookup('Handle_TableColumn_Content_Wrapper') -- 外部居中层
 				local hContent = hContentWrapper:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
+				local imgSortTip = hCol:Lookup('Image_TableColumn_SortTip')
+				local imgMoveTip = hCol:Lookup('Image_TableColumn_MoveTip')
 				local imgAsc = hCol:Lookup('Image_TableColumn_Asc')
 				local imgDesc = hCol:Lookup('Image_TableColumn_Desc')
 				local imgBreak = hCol:Lookup('Image_TableColumn_Break')
-				local nSortDelta = nWidth > 70 and 25 or 15
+				local nFloatLeft = nWidth >= 150 and 10 or 0
+				local nFloatRight = nWidth - nFloatLeft
+				local szAlignHorizontal = col.alignHorizontal or 'left'
 				hCol:SetW(nWidth)
 				hContentWrapper:SetW(nWidth)
 				hContent:SetW(99999)
@@ -961,15 +965,44 @@ local function InitComponent(raw, szType)
 				elseif col.alignVertical == 'bottom' then
 					hContent:SetRelY(hContentWrapper:GetH() - hContent:GetH())
 				end
-				if col.alignHorizontal == 'left' or col.alignHorizontal == nil then
+				if szAlignHorizontal == 'left' then
 					hContent:SetRelX(5)
-				elseif col.alignHorizontal == 'center' then
+				elseif szAlignHorizontal == 'center' then
 					hContent:SetRelX((nWidth - hContent:GetW()) / 2)
-				elseif col.alignHorizontal == 'right' then
+				elseif szAlignHorizontal == 'right' then
 					hContent:SetRelX(nWidth - hContent:GetW() - 5)
 				end
-				imgAsc:SetRelX(nWidth - nSortDelta)
-				imgDesc:SetRelX(nWidth - nSortDelta)
+				if nWidth <= 80 then
+					imgAsc:SetSize(10, 10)
+					imgAsc:SetRelPos(nWidth - imgAsc:GetW() - 1, 3)
+					imgDesc:SetSize(10, 10)
+					imgDesc:SetRelPos(nWidth - imgDesc:GetW() - 1, 3)
+					imgSortTip:SetSize(10, 10)
+					imgSortTip:SetRelPos(nWidth - imgSortTip:GetW() - 1, 3)
+					imgMoveTip:SetSize(10, 10)
+					imgMoveTip:SetRelPos(nWidth - imgMoveTip:GetW() - 1, 15)
+				elseif szAlignHorizontal == 'left' then
+					imgAsc:SetRelX(nFloatRight - imgAsc:GetW())
+					imgDesc:SetRelX(nFloatRight - imgDesc:GetW())
+					imgSortTip:SetRelX(nFloatRight - imgSortTip:GetW())
+					nFloatRight = nFloatRight - imgSortTip:GetW() - 3
+					imgMoveTip:SetRelX(nFloatRight - imgMoveTip:GetW())
+					nFloatRight = nFloatRight - imgMoveTip:GetW() - 3
+				elseif szAlignHorizontal == 'center' then
+					imgAsc:SetRelX(nFloatRight - imgAsc:GetW())
+					imgDesc:SetRelX(nFloatRight - imgDesc:GetW())
+					imgSortTip:SetRelX(nFloatRight - imgSortTip:GetW())
+					nFloatRight = nFloatRight - imgSortTip:GetW() - 3
+					imgMoveTip:SetRelX(nFloatLeft)
+					nFloatLeft = nFloatLeft + imgMoveTip:GetW() + 3
+				elseif szAlignHorizontal == 'right' then
+					imgAsc:SetRelX(nFloatLeft)
+					imgDesc:SetRelX(nFloatLeft)
+					imgSortTip:SetRelX(nFloatLeft)
+					nFloatLeft = nFloatLeft + imgSortTip:GetW() + 3
+					imgMoveTip:SetRelX(nFloatLeft)
+					nFloatLeft = nFloatLeft + imgMoveTip:GetW() + 3
+				end
 				imgBreak:SetRelY(2)
 				imgBreak:SetH(nHeight - 3)
 				hContentWrapper:FormatAllItemPos()
@@ -1135,6 +1168,8 @@ local function InitComponent(raw, szType)
 						szTitle = GetFormatText(szTitle)
 					end
 					hContent:AppendItemFromString(szTitle)
+					-- 事件
+					local ui = UI(hCol)
 					-- 标题 Tip
 					if col.titleTip then
 						local tipProps = X.Clone(col.titleTip)
@@ -1147,7 +1182,7 @@ local function InitComponent(raw, szType)
 						if not X.IsTable(tipProps.rect) then
 							tipProps.rect = {}
 						end
-						hCol.OnItemMouseEnter = function()
+						ui:UIEvent('OnItemMouseEnter', function()
 							local nX = this:GetAbsX()
 							local nW = this:GetW()
 							local nRawX = raw:GetAbsX()
@@ -1155,73 +1190,93 @@ local function InitComponent(raw, szType)
 							tipProps.rect.x = nX + nOffset
 							tipProps.rect.w = nW - nOffset
 							OutputAdvanceTip(tipProps, col)
-						end
-						hCol.OnItemMouseLeave = function()
+						end)
+						ui:UIEvent('OnItemMouseLeave', function()
 							HideAdvanceTip(tipProps)
-						end
+						end)
 					end
 					-- 排序
-					hCol.OnItemLButtonClick = function()
-						if not col.sorter then
-							return
-						end
-						if GetComponentProp(raw, 'SortKey') == col.key then
-							SetComponentProp(raw, 'SortOrder', GetComponentProp(raw, 'SortOrder') == 'asc' and 'desc' or 'asc')
-						else
-							SetComponentProp(raw, 'SortKey', col.key)
-						end
-						X.SafeCall(GetComponentProp(raw, 'OnSortChange'))
-						GetComponentProp(raw, 'UpdateSorterStatus')()
-						GetComponentProp(raw, 'DrawTableContent')()
+					if col.sorter then
+						ui:UIEvent('OnItemMouseEnter', function()
+							if GetComponentProp(raw, 'SortKey') == col.key then
+								return
+							end
+							hCol:Lookup('Image_TableColumn_SortTip'):Show()
+						end)
+						ui:UIEvent('OnItemMouseLeave', function()
+							if not hCol:Lookup('Image_TableColumn_SortTip') then
+								return
+							end
+							hCol:Lookup('Image_TableColumn_SortTip'):Hide()
+						end)
+						ui:UIEvent('OnItemLButtonClick', function()
+							if GetComponentProp(raw, 'SortKey') == col.key then
+								SetComponentProp(raw, 'SortOrder', GetComponentProp(raw, 'SortOrder') == 'asc' and 'desc' or 'asc')
+							else
+								SetComponentProp(raw, 'SortKey', col.key)
+							end
+							hCol:Lookup('Image_TableColumn_SortTip'):Hide()
+							GetComponentProp(raw, 'UpdateSorterStatus')()
+							GetComponentProp(raw, 'DrawTableContent')()
+							X.SafeCall(GetComponentProp(raw, 'OnSortChange'))
+						end)
 					end
 					-- 拖拽
 					if col.draggable then
-						UI(hCol)
-							:DragDropGroup(tostring(raw))
-							:Drag(function()
-								local capture = {
-									element = raw,
-									x = hCol:GetAbsX() - raw:GetAbsX(),
-									y = 0,
-									w = hCol:GetW(),
-									h = raw:GetH(),
-								}
-								return col, capture
-							end)
-							:DragHover(function()
-								local rect = {
-									x = hCol:GetAbsX(),
-									y = hCol:GetAbsY() + 1,
-									w = hCol:GetW(),
-									h = raw:GetH() - 2,
-								}
-								return rect
-							end)
-							:Drop(function(_, c)
-								if c == col then
-									return
+						ui:UIEvent('OnItemMouseEnter', function()
+							hCol:Lookup('Image_TableColumn_MoveTip'):Show()
+						end)
+						ui:UIEvent('OnItemMouseLeave', function()
+							if not hCol:Lookup('Image_TableColumn_MoveTip') then
+								return
+							end
+							hCol:Lookup('Image_TableColumn_MoveTip'):Hide()
+						end)
+						ui:DragDropGroup(tostring(raw))
+						ui:Drag(function()
+							local capture = {
+								element = raw,
+								x = hCol:GetAbsX() - raw:GetAbsX(),
+								y = 0,
+								w = hCol:GetW(),
+								h = raw:GetH(),
+							}
+							return col, capture
+						end)
+						ui:DragHover(function()
+							local rect = {
+								x = hCol:GetAbsX(),
+								y = hCol:GetAbsY() + 1,
+								w = hCol:GetW(),
+								h = raw:GetH() - 2,
+							}
+							return rect
+						end)
+						ui:Drop(function(_, c)
+							if c == col then
+								return
+							end
+							local aColumns = X.Assign({}, GetComponentProp(raw, 'aColumns'))
+							local nFromIndex = math.huge
+							for i, v in ipairs(aColumns) do
+								if v == c then
+									nFromIndex = i
+									table.remove(aColumns, i)
+									break
 								end
-								local aColumns = X.Assign({}, GetComponentProp(raw, 'aColumns'))
-								local nFromIndex = math.huge
-								for i, v in ipairs(aColumns) do
-									if v == c then
-										nFromIndex = i
-										table.remove(aColumns, i)
-										break
+							end
+							for i, v in ipairs(aColumns) do
+								if v == col then
+									if nFromIndex <= i then
+										i = i + 1
 									end
+									table.insert(aColumns, i, c)
+									break
 								end
-								for i, v in ipairs(aColumns) do
-									if v == col then
-										if nFromIndex <= i then
-											i = i + 1
-										end
-										table.insert(aColumns, i, c)
-										break
-									end
-								end
-								UI(raw):Columns(aColumns)
-								X.SafeCall(GetComponentProp(raw, 'OnColumnsChange'))
-							end)
+							end
+							UI(raw):Columns(aColumns)
+							X.SafeCall(GetComponentProp(raw, 'OnColumnsChange'))
+						end)
 					end
 				end
 			end
