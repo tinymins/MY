@@ -467,12 +467,14 @@ end
 
 -- 判断一个菜单配置项是不是另一个的子项
 function D.IsSubMenu(menu, t)
-	for _, v in ipairs(menu) do
-		if v == t then
-			return true
-		end
-		if v.bInline and D.IsSubMenu(v, t) then
-			return true
+	if X.IsTable(menu) then
+		for _, v in ipairs(menu) do
+			if v == t then
+				return true
+			end
+			if v.bInline and D.IsSubMenu(v, t) then
+				return true
+			end
 		end
 	end
 	return false
