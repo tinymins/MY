@@ -669,46 +669,54 @@ function D.UpdateSaveDB()
 end
 
 function D.GetTableColumns()
-	local aCol = {}
-	local nFixIndex = -1
+	local aColumn = {}
 	for nIndex, szKey in ipairs(O.aColumn) do
-		if szKey == 'name' then
+		local col = COLUMN_DICT[szKey]
+		if col then
+			table.insert(aColumn, col)
+		end
+	end
+	local nFixIndex, nFixWidth = -1, 0
+	for nIndex, col in ipairs(aColumn) do
+		nFixWidth = nFixWidth + (col.nMinWidth or 100)
+		if nFixWidth > 600 then
+			break
+		end
+		if col.szKey == 'name' then
 			nFixIndex = nIndex
 			break
 		end
 	end
-	for nIndex, szKey in ipairs(O.aColumn) do
-		local col = COLUMN_DICT[szKey]
-		if col then
-			local bFixed = nIndex <= nFixIndex
-			local c = {
-				key = col.szKey,
-				title = col.szTitleAbbr,
-				titleTip = col.szTitle,
-				alignHorizontal = col.szAlignHorizontal or 'center',
-				render = col.GetFormatText
-					and function(value, record, index)
-						return col.GetFormatText(value, record)
-					end
-					or nil,
-				sorter = col.Compare
-					and function(v1, v2, r1, r2)
-						return col.Compare(v1, v2, r1, r2)
-					end
-					or nil,
-				draggable = true,
-			}
-			if bFixed then
-				c.fixed = true
-				c.width = col.nMinWidth or 100
-			else
-				c.minWidth = col.nMinWidth
-				c.maxWidth = col.nMaxWidth
-			end
-			table.insert(aCol, c)
+	local aTableColumn = {}
+	for nIndex, col in ipairs(aColumn) do
+		local bFixed = nIndex <= nFixIndex
+		local c = {
+			key = col.szKey,
+			title = col.szTitleAbbr,
+			titleTip = col.szTitle,
+			alignHorizontal = col.szAlignHorizontal or 'center',
+			render = col.GetFormatText
+				and function(value, record, index)
+					return col.GetFormatText(value, record)
+				end
+				or nil,
+			sorter = col.Compare
+				and function(v1, v2, r1, r2)
+					return col.Compare(v1, v2, r1, r2)
+				end
+				or nil,
+			draggable = true,
+		}
+		if bFixed then
+			c.fixed = true
+			c.width = col.nMinWidth or 100
+		else
+			c.minWidth = col.nMinWidth
+			c.maxWidth = col.nMaxWidth
 		end
+		table.insert(aTableColumn, c)
 	end
-	return aCol
+	return aTableColumn
 end
 
 function D.UpdateUI(page)
@@ -1048,6 +1056,7 @@ function D.OnInitPage()
 				table.insert(aKeys, col.key)
 			end
 			O.aColumn = aKeys
+			D.UpdateUI(page)
 		end,
 	})
 

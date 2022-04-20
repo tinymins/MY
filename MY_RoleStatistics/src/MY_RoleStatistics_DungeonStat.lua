@@ -591,8 +591,12 @@ end
 function D.GetTableColumns()
 	local aColumn = D.GetColumns()
 	local aTableColumn = {}
-	local nFixIndex = -1
+	local nFixIndex, nFixWidth = -1, 0
 	for nIndex, col in ipairs(aColumn) do
+		nFixWidth = nFixWidth + (col.nMinWidth or 100)
+		if nFixWidth > 600 then
+			break
+		end
 		if col.id == 'name' then
 			nFixIndex = nIndex
 			break
