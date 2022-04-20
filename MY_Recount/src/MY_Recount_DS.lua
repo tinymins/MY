@@ -1334,6 +1334,9 @@ function D.SavePlayerInfo(data, dwID, bRefresh)
 	if ENVIRONMENT.RUNTIME_OPTIMIZE then
 		return
 	end
+	if not D.bRecEverything then
+		return
+	end
 	if (bRefresh or not data[DK.PLAYER_LIST][dwID]) and IsPlayer(dwID) then
 		local player, info = D.GetPlayer(dwID)
 		if player and info and not X.IsEmpty(info.dwMountKungfuID) then
