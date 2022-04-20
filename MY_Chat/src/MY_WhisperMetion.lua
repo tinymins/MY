@@ -82,6 +82,11 @@ function D.Apply()
 			end
 		end)
 		X.HookChatPanel('FILTER', 'MY_RedirectMetionToWhisper', function(h, szMsg, szChannel, dwTime)
+			local tInfo = MY_Chat.ParseMessageInfo(szMsg)
+			if tInfo then
+				dwTime    = tInfo.dwTime
+				szChannel = tInfo.szChannel
+			end
 			if h.__MY_LastMsg == szMsg and h.__MY_LastMsgChannel ~= szChannel and szChannel == 'MSG_WHISPER' then
 				return false
 			end
