@@ -874,8 +874,8 @@ local function InitComponent(raw, szType)
 		SetComponentProp(raw, 'UpdateTableRect', function()
 			local nRawWidth, nRawHeight = raw:GetSize()
 			local hTotal = raw:Lookup('', '')
-			local nFixedLWidth = GetComponentProp(raw, 'nFixedLColumnsWidth')
-			local nFixedRWidth = GetComponentProp(raw, 'nFixedRColumnsWidth')
+			local nFixedLWidth = math.min(nRawWidth, GetComponentProp(raw, 'nFixedLColumnsWidth'))
+			local nFixedRWidth = math.min(nRawWidth - nFixedLWidth, GetComponentProp(raw, 'nFixedRColumnsWidth'))
 			hTotal:SetSize(nRawWidth, nRawHeight)
 			hTotal:Lookup('Image_Table_Border'):SetRelPos(-1, -1)
 			hTotal:Lookup('Image_Table_Border'):SetSize(nRawWidth + 2, nRawHeight + 2)
@@ -920,7 +920,7 @@ local function InitComponent(raw, szType)
 			local hWrapper = raw:Lookup('', 'Handle_Scroll_X_Wrapper')
 			local hScroll = hWrapper:Lookup('Handle_Scroll_X')
 			local nStepCount = hScroll:GetW() - hWrapper:GetW()
-			if nStepCount > 0 then
+			if hWrapper:GetW() > 0 and nStepCount > 0 then
 				raw:Lookup('Scroll_X'):Show()
 				raw:Lookup('Scroll_X'):SetStepCount(nStepCount)
 			else
@@ -1011,7 +1011,7 @@ local function InitComponent(raw, szType)
 			local nRawWidth, nRawHeight = raw:GetSize()
 			-- 左侧固定列
 			local nX = 0
-			local nFixedLWidth = GetComponentProp(raw, 'nFixedLColumnsWidth')
+			local nFixedLWidth = math.min(nRawWidth, GetComponentProp(raw, 'nFixedLColumnsWidth'))
 			local aFixedLColumns = GetComponentProp(raw, 'aFixedLColumns')
 			local hFixedLColumns = raw:Lookup('', 'Handle_Fixed_L_TableColumns')
 			for i, col in ipairs(aFixedLColumns) do
@@ -1029,7 +1029,7 @@ local function InitComponent(raw, szType)
 			raw:Lookup('', 'Handle_Fixed_L_Scroll_Y_Wrapper'):SetW(nFixedLWidth)
 			-- 右侧固定列
 			local nX = 0
-			local nFixedRWidth = GetComponentProp(raw, 'nFixedRColumnsWidth')
+			local nFixedRWidth = math.min(nRawWidth - nFixedLWidth, GetComponentProp(raw, 'nFixedRColumnsWidth'))
 			local aFixedRColumns = GetComponentProp(raw, 'aFixedRColumns')
 			local hFixedRColumns = raw:Lookup('', 'Handle_Fixed_R_TableColumns')
 			for i, col in ipairs(aFixedRColumns) do
