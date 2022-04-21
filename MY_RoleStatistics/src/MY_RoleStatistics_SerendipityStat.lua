@@ -324,7 +324,7 @@ local FellowPetLucky = KG_Table.Load('settings\\Domesticate\\FellowPetLucky.tab'
 function D.GetLuckyFellowPet()
 	local tTime = TimeToDate(GetCurrentTime())
 	local nDate = tTime.month * 100 + tTime.day
-	local tLine = FellowPetLucky:Search(nDate)
+	local tLine = FellowPetLucky and FellowPetLucky:Search(nDate)
 	if tLine then
 		return {
 			[tLine.PetIndex0] = true,
@@ -381,90 +381,80 @@ local function GetSerendipityDailyCount(me, tab)
 	end
 end
 
-local TASK_MIN_WIDTH = 42
-local TASK_MAX_WIDTH = 150
-local function GeneCommonFormatText(id)
-	return function(r)
-		return GetFormatText(r[id], 162, 255, 255, 255)
-	end
-end
-local function GeneCommonCompare(id)
-	return function(r1, r2)
-		if r1[id] == r2[id] then
-			return 0
-		end
-		return r1[id] > r2[id] and 1 or -1
-	end
-end
 local COLUMN_LIST = {
 	-- guid,
 	-- account,
-	{ -- 大区
-		id = 'region',
+	-- 大区
+	{
+		szKey = 'region',
 		szTitle = _L['Region'],
-		nMinWidth = 100, nMaxWidth = 100,
-		GetFormatText = GeneCommonFormatText('region'),
-		Compare = GeneCommonCompare('region'),
+		nMinWidth = 100,
+		nMaxWidth = 100,
 	},
-	{ -- 服务器
-		id = 'server',
+	-- 服务器
+	{
+		szKey = 'server',
 		szTitle = _L['Server'],
-		nMinWidth = 100, nMaxWidth = 100,
-		GetFormatText = GeneCommonFormatText('server'),
-		Compare = GeneCommonCompare('server'),
+		nMinWidth = 100,
+		nMaxWidth = 100,
 	},
-	{ -- 名字
-		id = 'name',
+	-- 名字
+	{
+		szKey = 'name',
 		szTitle = _L['Name'],
-		nMinWidth = 110, nMaxWidth = 200,
-		GetFormatText = function(rec)
-			local name = rec.name
+		nMinWidth = 110,
+		nMaxWidth = 200,
+		GetFormatText = function(name, rec)
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
 			return GetFormatText(name, 162, X.GetForceColor(rec.force, 'foreground'))
 		end,
-		Compare = GeneCommonCompare('name'),
 	},
-	{ -- 门派
-		id = 'force',
+	-- 门派
+	{
+		szKey = 'force',
 		szTitle = _L['Force'],
-		nMinWidth = 50, nMaxWidth = 70,
-		GetFormatText = function(rec)
-			return GetFormatText(g_tStrings.tForceTitle[rec.force], 162, 255, 255, 255)
+		nMinWidth = 50,
+		nMaxWidth = 70,
+		GetFormatText = function(force)
+			return GetFormatText(g_tStrings.tForceTitle[force], 162, 255, 255, 255)
 		end,
-		Compare = GeneCommonCompare('force'),
 	},
-	{ -- 阵营
-		id = 'camp',
+	-- 阵营
+	{
+		szKey = 'camp',
 		szTitle = _L['Camp'],
-		nMinWidth = 50, nMaxWidth = 50,
-		GetFormatText = function(rec)
-			return GetFormatText(g_tStrings.STR_CAMP_TITLE[rec.camp], 162, 255, 255, 255)
+		nMinWidth = 50,
+		nMaxWidth = 50,
+		GetFormatText = function(camp)
+			return GetFormatText(g_tStrings.STR_CAMP_TITLE[camp], 162, 255, 255, 255)
 		end,
-		Compare = GeneCommonCompare('camp'),
 	},
-	{ -- 等级
-		id = 'level',
+	-- 等级
+	{
+		szKey = 'level',
 		szTitle = _L['Level'],
-		nMinWidth = 50, nMaxWidth = 50,
-		GetFormatText = GeneCommonFormatText('level'),
-		Compare = GeneCommonCompare('level'),
+		nMinWidth = 50,
+		nMaxWidth = 50,
 	},
-	{ -- 时间
-		id = 'time',
+	-- 时间
+	{
+		szKey = 'time',
 		szTitle = _L['Cache time'],
-		nMinWidth = 165, nMaxWidth = 200,
-		GetFormatText = function(rec)
-			return GetFormatText(X.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
+		nMinWidth = 165,
+		nMaxWidth = 200,
+		GetFormatText = function(time)
+			return GetFormatText(X.FormatTime(time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
 		end,
-		Compare = GeneCommonCompare('time'),
 	},
-	{ -- 时间计时
-		id = 'time_days',
+	-- 时间计时
+	{
+		szKey = 'time_days',
 		szTitle = _L['Cache time days'],
-		nMinWidth = 120, nMaxWidth = 120,
-		GetFormatText = function(rec)
+		nMinWidth = 120,
+		nMaxWidth = 120,
+		GetFormatText = function(v, rec)
 			local nTime = GetCurrentTime() - rec.time
 			local nSeconds = math.floor(nTime)
 			local nMinutes = math.floor(nSeconds / 60)
@@ -492,20 +482,19 @@ local COLUMN_LIST = {
 			end
 			return GetFormatText(_L['Just now'], 162, 255, 255, 255)
 		end,
-		Compare = GeneCommonCompare('time'),
 	},
 }
 
-local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
-	local serendipity = SERENDIPITY_HASH[id]
+local COLUMN_DICT = setmetatable({}, { __index = function(t, szKey)
+	local serendipity = SERENDIPITY_HASH[szKey]
 	if serendipity then
 		local col = { -- 秘境CD
-			id = id,
+			szKey = szKey,
 			szTitle = serendipity.szName,
-			nMinWidth = TASK_MIN_WIDTH,
-			nMaxWidth = TASK_MAX_WIDTH,
+			nMinWidth = 42,
+			nMaxWidth = 150,
 		}
-		col.GetTitleFormatTip = function()
+		col.GetTitleTip = function()
 			local aTitleTipXml = {
 				GetFormatText(serendipity.szName .. '\n', 162, 255, 255, 255),
 			}
@@ -518,10 +507,10 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					table.insert(aTitleTipXml, GetFormatText('(' .. map.szName .. ')\n', 162, 255, 255, 255))
 				end
 			end
-			return table.concat(aTitleTipXml)
+			return table.concat(aTitleTipXml), true
 		end
 		col.GetText = function(rec)
-			local nCount = rec.serendipity_info[id]
+			local nCount = rec.serendipity_info[szKey]
 			local szState, r, g, b = nil, 255, 255, 255
 			if nCount == -1 then
 				szState, r, g, b = _L['Finished'], 128, 255, 128
@@ -542,12 +531,12 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			end
 			return szState, r, g, b
 		end
-		col.GetFormatText = function(rec)
+		col.GetFormatText = function(v, rec)
 			local szState, r, g, b = col.GetText(rec)
 			return GetFormatText(szState, 162, r, g, b)
 		end
-		col.Compare = function(r1, r2)
-			local k1, k2 = r1.serendipity_info[id] or 0, r2.serendipity_info[id] or 0
+		col.Compare = function(v1, v2, r1, r2)
+			local k1, k2 = r1.serendipity_info[szKey] or 0, r2.serendipity_info[szKey] or 0
 			if not IsInSamePeriod(r1.time) then
 				k1 = 0
 			end
@@ -562,8 +551,21 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 		return col
 	end
 end })
-for _, p in ipairs(COLUMN_LIST) do
-	COLUMN_DICT[p.id] = p
+for _, col in ipairs(COLUMN_LIST) do
+	if not col.GetFormatText then
+		col.GetFormatText = function(v)
+			return GetFormatText(v, 162, 255, 255, 255)
+		end
+	end
+	if not col.Compare then
+		col.Compare = function(v1, v2)
+			if v1 == v2 then
+				return 0
+			end
+			return v1 > v2 and 1 or -1
+		end
+	end
+	COLUMN_DICT[col.szKey] = col
 end
 
 do
@@ -589,8 +591,6 @@ function D.GetClientPlayerRec()
 			rec.serendipity_info = X.DecodeLUAData(result[1].serendipity_info) or rec.serendipity_info
 			rec.item_count = X.DecodeLUAData(result[1].item_count) or rec.item_count
 		end
-		rec.serendipity_info = rec.serendipity_info
-		rec.item_count = rec.item_count
 		REC_CACHE = rec
 	end
 
@@ -613,15 +613,16 @@ function D.GetClientPlayerRec()
 		end
 		if serendipity.aAttemptItem then
 			for _, v in ipairs(serendipity.aAttemptItem) do
-				if not rec.item_count[v[1]] then
-					rec.item_count[v[1]] = {}
+				local dwTabType, dwTabIndex = v[1], v[2]
+				if not rec.item_count[dwTabType] then
+					rec.item_count[dwTabType] = {}
 				end
-				rec.item_count[v[1]][v[2]] = X.GetItemAmountInAllPackages(v[1], v[2])
-				if X.IsEmpty(rec.item_count[v[1]][v[2]]) then
-					rec.item_count[v[1]][v[2]] = nil
+				rec.item_count[dwTabType][dwTabIndex] = X.GetItemAmountInAllPackages(dwTabType, dwTabIndex)
+				if X.IsEmpty(rec.item_count[dwTabType][dwTabIndex]) then
+					rec.item_count[dwTabType][dwTabIndex] = nil
 				end
-				if X.IsEmpty(rec.item_count[v[1]]) then
-					rec.item_count[v[1]] = nil
+				if X.IsEmpty(rec.item_count[dwTabType]) then
+					rec.item_count[dwTabType] = nil
 				end
 			end
 		end
@@ -732,19 +733,14 @@ end
 X.RegisterInit('MY_RoleStatistics_SerendipityUpdateSaveDB', function() INIT = true end)
 end
 
-function D.GetColumns()
-	local aCol = {}
-	for _, id in ipairs(O.aColumn) do
-		local col = COLUMN_DICT[id]
+function D.GetTableColumns()
+	local aColumn = {}
+	for _, szKey in ipairs(O.aColumn) do
+		local col = COLUMN_DICT[szKey]
 		if col then
-			table.insert(aCol, col)
+			table.insert(aColumn, col)
 		end
 	end
-	return aCol
-end
-
-function D.GetTableColumns()
-	local aColumn = D.GetColumns()
 	local aTableColumn = {}
 	local nFixIndex, nFixWidth = -1, 0
 	for nIndex, col in ipairs(aColumn) do
@@ -752,7 +748,7 @@ function D.GetTableColumns()
 		if nFixWidth > 600 then
 			break
 		end
-		if col.id == 'name' then
+		if col.szKey == 'name' then
 			nFixIndex = nIndex
 			break
 		end
@@ -760,24 +756,14 @@ function D.GetTableColumns()
 	for nIndex, col in ipairs(aColumn) do
 		local bFixed = nIndex <= nFixIndex
 		local c = {
-			key = col.id,
+			key = col.szKey,
 			title = col.szTitle,
 			titleTip = col.szTitleTip
-				or (col.GetTitleFormatTip and function()
-					return col.GetTitleFormatTip(), true
-				end)
+				or col.GetTitleTip
 				or col.szTitle,
 			alignHorizontal = 'center',
-			render = col.GetFormatText
-				and function(value, record, index)
-					return col.GetFormatText(record)
-				end
-				or nil,
-			sorter = col.Compare
-				and function(v1, v2, r1, r2)
-					return col.Compare(r1, r2)
-				end
-				or nil,
+			render = col.GetFormatText,
+			sorter = col.Compare,
 			draggable = true,
 		}
 		if bFixed then
@@ -973,8 +959,8 @@ function D.OnInitPage()
 					t[i] = nil
 				end
 				-- 已添加的
-				for nIndex, id in ipairs(aColumn) do
-					local col = COLUMN_DICT[id]
+				for nIndex, szKey in ipairs(aColumn) do
+					local col = COLUMN_DICT[szKey]
 					if col then
 						table.insert(t, {
 							szOption = col.szTitle,
@@ -1042,13 +1028,13 @@ function D.OnInitPage()
 						})
 						nMinW = nMinW + col.nMinWidth
 					end
-					tChecked[id] = true
+					tChecked[szKey] = true
 				end
 				-- 未添加的
-				local function fnAction(id, nWidth)
+				local function fnAction(szKey, nWidth)
 					local bExist = false
 					for i, v in ipairs(aColumn) do
-						if v == id then
+						if v == szKey then
 							table.remove(aColumn, i)
 							O.aColumn = aColumn
 							bExist = true
@@ -1056,7 +1042,7 @@ function D.OnInitPage()
 						end
 					end
 					if not bExist then
-						table.insert(aColumn, id)
+						table.insert(aColumn, szKey)
 						O.aColumn = aColumn
 					end
 					UpdateMenu()
@@ -1065,11 +1051,11 @@ function D.OnInitPage()
 				end
 				-- 普通选项
 				for _, col in ipairs(COLUMN_LIST) do
-					if not tChecked[col.id] then
+					if not tChecked[col.szKey] then
 						table.insert(t, {
 							szOption = col.szTitle,
 							fnAction = function()
-								fnAction(col.id, col.nMinWidth)
+								fnAction(col.szKey, col.nMinWidth)
 							end,
 						})
 					end
@@ -1082,9 +1068,9 @@ function D.OnInitPage()
 						if col then
 							table.insert(t1, {
 								szOption = col.szTitle,
-								bCheck = true, bChecked = tChecked[col.id],
+								bCheck = true, bChecked = tChecked[col.szKey],
 								fnAction = function()
-									fnAction(col.id, col.nMinWidth)
+									fnAction(col.szKey, col.nMinWidth)
 								end,
 							})
 						end
@@ -1207,19 +1193,6 @@ function D.OnLButtonClick()
 			D.UpdateUI(page)
 		end)
 	end
-end
-
-function D.OnItemMouseEnter()
-	if this.tip then
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)
-	end
-end
-D.OnItemRefreshTip = D.OnItemMouseEnter
-
-function D.OnItemMouseLeave()
-	HideTip()
 end
 
 -------------------------------------------------------------------------------------------------------
