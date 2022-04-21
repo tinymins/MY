@@ -4700,7 +4700,7 @@ do
 		if not PLAYER_GUID[dwID] then
 			if dwID == UI_GetClientPlayerID() then
 				local szGUID = X.GetClientInfo('szGlobalID')
-				if not szGUID or szGUID == '0' then
+				if szGUID == '0' then
 					szGUID = (X.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. X.GetClientInfo().dwID
 				end
 				PLAYER_GUID[dwID] = szGUID
