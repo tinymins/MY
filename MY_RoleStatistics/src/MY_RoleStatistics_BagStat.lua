@@ -186,10 +186,6 @@ local FILTER_LIST = {
 	{ name = 'TimeLtd'  , where = 'I.exist_type <> -1 AND I.exist_type <> ' .. ITEM_EXIST_TYPE.PERMANENT },
 }
 
-function D.GetPlayerGUID(me)
-	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
-end
-
 do
 local GetItemText
 do
@@ -456,7 +452,7 @@ function D.FlushDB()
 	--[[#DEBUG END]]
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
-	local ownerkey = AnsiToUTF8(D.GetPlayerGUID(me))
+	local ownerkey = AnsiToUTF8(X.GetPlayerGUID())
 	local ownername = AnsiToUTF8(me.szName)
 	local servername = AnsiToUTF8(X.GetRealServer(2))
 	DB:Execute('BEGIN TRANSACTION')
@@ -584,7 +580,7 @@ function D.UpdateSaveDB()
 		X.Debug('MY_RoleStatistics_BagStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, guid in ipairs({
-			AnsiToUTF8(D.GetPlayerGUID(me)),
+			AnsiToUTF8(X.GetPlayerGUID()),
 			'tong' .. me.dwTongID,
 		}) do
 			DB_ItemsDA:ClearBindings()
@@ -603,7 +599,7 @@ function D.UpdateSaveDB()
 	FireUIEvent('MY_ROLE_STAT_BAG_UPDATE')
 end
 X.RegisterInit('MY_RoleStatistics_BagUpdateSaveDB', function()
-	D.tCheckedNames[D.GetPlayerGUID(GetClientPlayer())] = true
+	D.tCheckedNames[X.GetPlayerGUID()] = true
 	INIT = true
 end)
 end

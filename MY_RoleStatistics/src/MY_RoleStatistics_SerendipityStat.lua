@@ -138,10 +138,6 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_SerendipityStat', _L['Ge
 })
 local D = {}
 
-function D.GetPlayerGUID(me)
-	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
-end
-
 -----------------------------------------------------------------------------------------------
 -- 多个渠道奇遇次数监控
 -----------------------------------------------------------------------------------------------
@@ -576,7 +572,7 @@ function D.GetClientPlayerRec()
 		return
 	end
 	local rec = REC_CACHE
-	local guid = D.GetPlayerGUID(me)
+	local guid = X.GetPlayerGUID()
 	if not rec then
 		rec = {
 			serendipity_info = {},
@@ -721,7 +717,7 @@ function D.UpdateSaveDB()
 		X.Debug('MY_RoleStatistics_SerendipityStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		InfoD:ClearBindings()
-		InfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
+		InfoD:BindAll(AnsiToUTF8(X.GetPlayerGUID()))
 		InfoD:Execute()
 		InfoD:Reset()
 		--[[#DEBUG BEGIN]]

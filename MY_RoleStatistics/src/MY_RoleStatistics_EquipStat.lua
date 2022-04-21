@@ -222,10 +222,6 @@ local D = {
 	dwCurrentSuitIndex = 1,
 }
 
-function D.GetPlayerGUID(me)
-	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
-end
-
 local function GetEquipRecipeDesc(Value1, Value2)
 	local szText = ''
 	local EquipmentRecipe = X.GetGameTable('EquipmentRecipe', true)
@@ -349,7 +345,7 @@ function D.FlushDB()
 	--[[#DEBUG END]]
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
-	local ownerkey = AnsiToUTF8(D.GetPlayerGUID(me))
+	local ownerkey = AnsiToUTF8(X.GetPlayerGUID())
 	local ownername = AnsiToUTF8(me.szName)
 	local servername = AnsiToUTF8(X.GetRealServer(2))
 	local rec = REC_CACHE
@@ -470,7 +466,7 @@ function D.UpdateSaveDB()
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_EquipStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		local guid = AnsiToUTF8(D.GetPlayerGUID(me))
+		local guid = AnsiToUTF8(X.GetPlayerGUID())
 		DB_ItemsDA:ClearBindings()
 		DB_ItemsDA:BindAll(guid)
 		DB_ItemsDA:Execute()

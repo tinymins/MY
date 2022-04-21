@@ -180,16 +180,12 @@ local D = {
 	dwLastAlertTime = 0,
 }
 
-function D.GetPlayerGUID(me)
-	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
-end
-
 local COLUMN_LIST = {
 	-- guid
 	{
 		szKey = 'guid',
 		GetValue = function(prevVal, prevRec)
-			return D.GetPlayerGUID(GetClientPlayer())
+			return X.GetPlayerGUID()
 		end,
 	},
 	-- account
