@@ -331,7 +331,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 				if onProgress then
 					onProgress(_L['Export succeed'], 1)
 				end
-				local szFile = GetRootPath() .. szExportFile:gsub('/', '\\')
+				local szFile = X.GetAbsolutePath(szExportFile)
 				X.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
 				X.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0
