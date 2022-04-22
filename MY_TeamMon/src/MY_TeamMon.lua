@@ -1914,7 +1914,6 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 		szServer = select(4, GetUserServer()),
 		nTimeStamp = GetCurrentTime(),
 	}
-	local szRoot = GetRootPath():gsub('\\', '/')
 	local szPath = MY_TM_REMOTE_DATA_ROOT .. szFileName
 	if szFormat == 'JSON' or szFormat == 'JSON_FORMATED' then
 		if szFormat ~= 'JSON' then
@@ -1937,8 +1936,7 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 		}
 		X.SaveLUAData(szPath, data, option)
 	end
-	X.GetAbsolutePath(szPath):gsub('/', '\\')
-	X.SafeCall(fnAction, szRoot .. szPath)
+	X.SafeCall(fnAction, X.GetAbsolutePath(szPath))
 end
 
 -- 获取整个表
