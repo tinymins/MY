@@ -3296,28 +3296,36 @@ function OO:Columns(aColumns)
 						X.ExecuteWithThis(raw, aColumns, GetComponentProp(raw, 'aColumns'))
 					end)
 				else
+					local nFixedLIndex, nFixedRIndex = -1, math.huge
 					local aFixedLColumns, aFixedRColumns, aScrollableColumns = {}, {}, {}
 					local nFixedLColumnsWidth, nFixedRColumnsWidth = 0, 0
-					for _, col in ipairs(aColumns) do
+					for nIndex, col in ipairs(aColumns) do
 						if col.fixed == true or col.fixed == 'left' then
 							assert(X.IsNumber(col.width), 'fixed column width is required')
 							nFixedLColumnsWidth = nFixedLColumnsWidth + col.width
-							table.insert(aFixedLColumns, col)
+							nFixedLIndex = nIndex
 						else
 							break
 						end
 					end
-					for _, col in X.ipairs_r(aColumns) do
+					for nIndex, col in X.ipairs_r(aColumns) do
 						if col.fixed == 'right' then
 							assert(X.IsNumber(col.width), 'fixed column width is required')
 							nFixedRColumnsWidth = nFixedRColumnsWidth + col.width
-							table.insert(aFixedRColumns, col)
+							nFixedRIndex = nIndex
 						else
 							break
 						end
 					end
-					for i = #aFixedLColumns + 1, #aColumns - #aFixedRColumns do
-						table.insert(aScrollableColumns, aColumns[i])
+							table.insert(aFixedRColumns, col)
+					for i = 1, #aColumns do
+						if i <= nFixedLIndex then
+							table.insert(aFixedLColumns, aColumns[i])
+						elseif i >= nFixedRIndex then
+							table.insert(aFixedRColumns, aColumns[i])
+						else
+							table.insert(aScrollableColumns, aColumns[i])
+						end
 					end
 					SetComponentProp(raw, 'aColumns', aColumns)
 					SetComponentProp(raw, 'aFixedLColumns', aFixedLColumns)
