@@ -26,9 +26,9 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0 ') then
 end
 -------------------------------------------------------------------------------------------------------
 
-CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
-
-local DATA_FILE = {'userdata/role_statistics/role_stat.jx3dat', X.PATH_TYPE.GLOBAL}
+local STAT_DATA_FILE = {'userdata/role_statistics/role_stat.jx3dat', X.PATH_TYPE.GLOBAL}
+local PLAYER_REC_FILE = {'userdata/role_statistics/role_stat.jx3dat', X.PATH_TYPE.ROLE}
+local PLAYER_REC_INITIAL, PLAYER_REC = nil, nil
 
 -------------------------------------------------------------------------------------------------------
 
@@ -434,20 +434,24 @@ for _, col in ipairs(COLUMN_LIST) do
 	X.SafeCall(col.Collector)
 end
 
-function D.GetPlayerRecords()
-	local result = X.LoadLUAData(DATA_FILE) or {}
-	for _, data in pairs(result) do
-		if data.time then
-			for _, col in ipairs(COLUMN_LIST) do
-				-- 移除不在同一个刷新周期内的数据字段
-				if col.szRefreshCircle then
-					local dwTime, dwCircle = X.GetRefreshTime(col.szRefreshCircle)
-					if dwTime - dwCircle >= data.time then
-						data[col.szKey] = nil
-					end
+-- 移除不在同一个刷新周期内的数据字段
+function D.FilterColumnCircle(rec)
+	if rec.time then
+		for _, col in ipairs(COLUMN_LIST) do
+			if col.szRefreshCircle then
+				local dwTime, dwCircle = X.GetRefreshTime(col.szRefreshCircle)
+				if dwTime - dwCircle >= rec.time then
+					rec[col.szKey] = nil
 				end
 			end
 		end
+	end
+end
+
+function D.GetPlayerRecords()
+	local result = X.LoadLUAData(STAT_DATA_FILE) or {}
+	for _, rec in pairs(result) do
+		D.FilterColumnCircle(rec)
 	end
 	return result
 end
@@ -457,22 +461,17 @@ function D.GetClientPlayerRec()
 	if not me then
 		return
 	end
-	local rec = D.recInitial
-	if not rec then
-		rec = {}
-		local data = D.GetPlayerRecords()[X.GetPlayerGUID()]
-		if data then
-			for _, col in ipairs(COLUMN_LIST) do
-				rec[col.szKey] = data[col.szKey]
-			end
-		end
-		D.recInitial = rec
+	-- 缓存数据
+	if not PLAYER_REC_INITIAL then
+		PLAYER_REC_INITIAL = X.LoadLUAData(PLAYER_REC_FILE) or {}
+		PLAYER_REC = X.Clone(PLAYER_REC_INITIAL)
+		D.FilterColumnCircle(PLAYER_REC)
 	end
 	-- 获取各列数据
 	for _, col in ipairs(COLUMN_LIST) do
-		rec[col.szKey] = col.GetValue(rec[col.szKey], rec)
+		PLAYER_REC[col.szKey] = col.GetValue(PLAYER_REC_INITIAL[col.szKey], PLAYER_REC_INITIAL)
 	end
-	return X.Clone(rec)
+	return X.Clone(PLAYER_REC)
 end
 
 function D.Migration()
@@ -484,7 +483,7 @@ function D.Migration()
 	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
-			local data = X.LoadLUAData(DATA_FILE) or {}
+			local data = X.LoadLUAData(STAT_DATA_FILE) or {}
 			-- 转移V2旧版数据
 			if IsLocalFileExist(DB_V2_PATH) then
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
@@ -617,7 +616,7 @@ function D.Migration()
 				end
 				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
-			X.SaveLUAData(DATA_FILE, data)
+			X.SaveLUAData(STAT_DATA_FILE, data)
 			FireUIEvent('MY_ROLE_STAT_ROLE_UPDATE')
 			X.Alert(_L['Migrate succeed!'])
 		end)
@@ -631,16 +630,15 @@ function D.FlushDB()
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
 
-	local data = X.LoadLUAData(DATA_FILE) or {}
+	local data = X.LoadLUAData(STAT_DATA_FILE) or {}
 	data[X.GetPlayerGUID()] = D.GetClientPlayerRec()
-	X.SaveLUAData(DATA_FILE, data)
+	X.SaveLUAData(STAT_DATA_FILE, data)
 
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
 	X.Debug('MY_RoleStatistics_RoleStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-X.RegisterFlush('MY_RoleStatistics_RoleStat', D.FlushDB)
 
 function D.UpdateSaveDB()
 	if not D.bReady then
@@ -654,9 +652,9 @@ function D.UpdateSaveDB()
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_RoleStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		local data = X.LoadLUAData(DATA_FILE) or {}
+		local data = X.LoadLUAData(STAT_DATA_FILE) or {}
 		data[X.GetPlayerGUID()] = nil
-		X.SaveLUAData(DATA_FILE, data)
+		X.SaveLUAData(STAT_DATA_FILE, data)
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_RoleStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -1036,9 +1034,9 @@ function D.OnInitPage()
 				{
 					szOption = _L['Delete'],
 					fnAction = function()
-						local data = X.LoadLUAData(DATA_FILE) or {}
+						local data = X.LoadLUAData(STAT_DATA_FILE) or {}
 						data[rec.guid] = nil
-						X.SaveLUAData(DATA_FILE, data)
+						X.SaveLUAData(STAT_DATA_FILE, data)
 						D.UpdateUI(page)
 					end,
 					rgb = { 255, 128, 128 },
@@ -1158,7 +1156,7 @@ function D.OnLButtonClick()
 	end
 end
 
-X.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
+function D.InitAlert()
 	if not X.IsTable(O.tAlertTodayVal) or not X.IsNumber(O.tAlertTodayVal.nTime)
 	or not X.IsInSameRefreshTime('daily', O.tAlertTodayVal.nTime) then
 		local rec = D.GetClientPlayerRec()
@@ -1166,7 +1164,7 @@ X.RegisterInit('MY_RoleStatistics_RoleStat__AlertCol', function()
 		O.tAlertTodayVal = rec
 	end
 	D.tAlertSessionVal = D.GetClientPlayerRec()
-end)
+end
 
 X.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', function()
 	local rec = D.GetClientPlayerRec()
@@ -1240,12 +1238,19 @@ function D.ApplyFloatEntry(bFloatEntry)
 		btn:Destroy()
 	end
 end
+
 function D.UpdateFloatEntry()
 	if not D.bReady then
 		return
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_RoleEntry', D.UpdateFloatEntry)
+
+--------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------
+
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_RoleStat', function()
 	D.bReady = true
 	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
@@ -1254,8 +1259,24 @@ X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_RoleStat', function(
 	end
 	D.UpdateFloatEntry()
 end)
-X.RegisterReload('MY_RoleStatistics_RoleEntry', function() D.ApplyFloatEntry(false) end)
-X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_RoleEntry', D.UpdateFloatEntry)
+
+X.RegisterInit('MY_RoleStatistics_RoleStat', function()
+	D.InitAlert()
+end)
+
+X.RegisterFlush('MY_RoleStatistics_RoleStat', function()
+	D.FlushDB()
+end)
+
+X.RegisterExit('MY_RoleStatistics_RoleStat', function()
+	if PLAYER_REC then
+		X.SaveLUAData(PLAYER_REC_FILE, PLAYER_REC)
+	end
+end)
+
+X.RegisterReload('MY_RoleStatistics_RoleStat', function()
+	D.ApplyFloatEntry(false)
+end)
 
 -- Module exports
 do
