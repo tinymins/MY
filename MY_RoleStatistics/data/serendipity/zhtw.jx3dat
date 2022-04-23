@@ -1576,7 +1576,7 @@ return {
 			szType = "TRIGGER",
 			dwType = TARGET.NPC,
 			dwID = 106832,
-			aPosition = {{17630,59411,1923200}},
+			aPosition = {{17907,67500,1935552},{17630,59411,1923200},{31274,70706,1953664}},
 		},
 		{
 			dwPet = 383,
