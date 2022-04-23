@@ -586,20 +586,35 @@ end
 
 function D.GetTableColumns()
 	local aColumn = D.GetColumns()
-	local aTableColumn = {}
-	local nFixIndex, nFixWidth = -1, 0
+	local nLFixIndex, nLFixWidth = -1, 0
 	for nIndex, col in ipairs(aColumn) do
-		nFixWidth = nFixWidth + (col.nMinWidth or 100)
-		if nFixWidth > 600 then
+		nLFixWidth = nLFixWidth + (col.nMinWidth or 100)
+		if nLFixWidth > 450 then
 			break
 		end
 		if col.id == 'name' then
-			nFixIndex = nIndex
+			nLFixIndex = nIndex
 			break
 		end
 	end
+	local nRFixIndex, nRFixWidth = math.huge, 0
+	for nIndex, col in X.ipairs_r(aColumn) do
+		if nIndex <= nLFixIndex then
+			break
+		end
+		nRFixWidth = nRFixWidth + (col.nMinWidth or 100)
+		if nRFixWidth > 300 then
+			break
+		end
+		if col.id == 'time' or col.id == 'time_days' then
+			nRFixIndex = nIndex
+		end
+	end
+	local aTableColumn = {}
 	for nIndex, col in ipairs(aColumn) do
-		local bFixed = nIndex <= nFixIndex
+		local szFixed = nIndex <= nLFixIndex
+			and 'left'
+			or (nIndex >= nRFixIndex and 'right' or nil)
 		local c = {
 			key = col.id,
 			title = col.szTitle,
@@ -617,8 +632,8 @@ function D.GetTableColumns()
 				or nil,
 			draggable = not col.id:find('@') or not aColumn[nIndex - 1] or aColumn[nIndex - 1].id:gsub('.+@', '') ~= col.id:gsub('.+@', ''),
 		}
-		if bFixed then
-			c.fixed = true
+		if szFixed then
+			c.fixed = szFixed
 			c.width = col.nMinWidth or 100
 		else
 			c.minWidth = col.nMinWidth
