@@ -45,7 +45,7 @@ return {
 	['Special equip score'] = '特效得分',
 	['Too far'] = '距离太远',
 	['Equip'] = '装备',
-	['Dungeon CD'] = '秘境CD',
+	['Dungeon CD'] = '秘境刷新',
 	['Fight'] = '战斗',
 	['None'] = '无',
 	['Unknown'] = '未知',
