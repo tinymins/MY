@@ -956,7 +956,12 @@ function D.UpdateOTAction(frame)
 	if not me then
 		return
 	end
-	local KOTTarget = X.GetNearBoss()[1]
+	local KOTTarget
+	for _, npc in ipairs(X.GetNearBoss()) do
+		if not KOTTarget or not KOTTarget.bFightState then
+			KOTTarget = npc
+		end
+	end
 	if not KOTTarget then
 		local dwType, dwID = me.GetTarget()
 		if dwType == TARGET.NPC then
