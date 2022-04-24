@@ -4618,44 +4618,83 @@ do
 	end
 end
 
-local PLAYER_TALENT_UPDATED = {}
-X.RegisterEvent('ON_UPDATE_TALENT', function()
-	PLAYER_TALENT_UPDATED[arg0] = true
-end)
-function X.GetPlayerTalentInfo(...)
-	local player = ...
-	if select('#', ...) == 0 then
-		player = GetClientPlayer()
-	end
-	if not player then
-		return
-	end
-	if not PLAYER_TALENT_UPDATED[player.dwID] and player.dwID ~= UI_GetClientPlayerID() then
-		return
-	end
-	local aInfo = player.GetTalentInfo()
-	if not aInfo then
-		PLAYER_TALENT_UPDATED[player.dwID] = nil
-		return
-	end
-	local aRes = {}
-	for i, info in ipairs(aInfo) do
-		local skill = info.SkillArray[info.nSelectIndex]
-		if skill then
-			aRes[i] = {
-				nIndex = info.nSelectIndex,
-				dwSkillID = skill.dwSkillID,
-				dwSkillLevel = skill.dwSkillLevel,
-			}
-		else
-			aRes[i] = {
-				nIndex = info.nSelectIndex,
-				dwSkillID = 0,
-				dwSkillLevel = 0,
-			}
+do
+	local EVENT_KEY = nil
+	local PEEK_PLAYER_TALENT_STATE = {}
+	local PEEK_PLAYER_TALENT_CALLBACK = {}
+	local function OnGetPlayerTalnetInfoPeekPlayer(player)
+		if not PEEK_PLAYER_TALENT_CALLBACK[player.dwID] then
+			return
 		end
+		local aInfo = player.GetTalentInfo()
+		if not aInfo then
+			PEEK_PLAYER_TALENT_STATE[player.dwID] = nil
+			return
+		end
+		local aTalent = {}
+		for i, info in ipairs(aInfo) do
+			local skill = info.SkillArray[info.nSelectIndex]
+			if skill then
+				aTalent[i] = {
+					nIndex = info.nSelectIndex,
+					dwSkillID = skill.dwSkillID,
+					dwSkillLevel = skill.dwSkillLevel,
+				}
+			else
+				aTalent[i] = {
+					nIndex = info.nSelectIndex,
+					dwSkillID = 0,
+					dwSkillLevel = 0,
+				}
+			end
+		end
+		for _, fnAction in ipairs(PEEK_PLAYER_TALENT_CALLBACK[player.dwID]) do
+			X.SafeCall(fnAction, aTalent, player.dwID)
+		end
+		PEEK_PLAYER_TALENT_CALLBACK[player.dwID] = nil
 	end
-	return aRes
+
+	-- 获取玩家奇穴信息
+	-- X.GetPlayerTalentInfo(dwID, fnAction)
+	-- X.GetPlayerTalentInfo(dwID, bForcePeek, fnAction)
+	-- @param dwID 玩家ID
+	-- @param bForcePeek 是否强制拉取
+	-- @param fnAction 回调函数
+	function X.GetPlayerTalentInfo(dwID, bForcePeek, fnAction)
+		-- 函数重载
+		if X.IsFunction(bForcePeek) then
+			fnAction, bForcePeek = bForcePeek, nil
+		end
+		-- 加入回调
+		if not PEEK_PLAYER_TALENT_CALLBACK[dwID] then
+			PEEK_PLAYER_TALENT_CALLBACK[dwID] = {}
+		end
+		table.insert(PEEK_PLAYER_TALENT_CALLBACK[dwID], fnAction)
+		-- 自身判定
+		if dwID == UI_GetClientPlayerID() then
+			OnGetPlayerTalnetInfoPeekPlayer(GetClientPlayer())
+			return
+		end
+		-- 缓存判定
+		local player = GetPlayer(dwID)
+		if player and PEEK_PLAYER_TALENT_STATE[dwID] == 'SUCCESS' and not bForcePeek then
+			OnGetPlayerTalnetInfoPeekPlayer(player)
+			return
+		end
+		-- 发送请求
+		PEEK_PLAYER_TALENT_STATE[dwID] = 'PENDING'
+		if not EVENT_KEY then
+			EVENT_KEY = X.RegisterEvent('ON_UPDATE_TALENT', X.NSFormatString('{$NS}#GetPlayerEquipInfo'), function()
+				local dwID = arg0
+				local player = GetPlayer(dwID)
+				if player then
+					PEEK_PLAYER_TALENT_STATE[dwID] = 'SUCCESS'
+					OnGetPlayerTalnetInfoPeekPlayer(player)
+				end
+			end)
+		end
+		X.SafeCall(PeekOtherPlayerTalent, dwID)
+	end
 end
 
 do
