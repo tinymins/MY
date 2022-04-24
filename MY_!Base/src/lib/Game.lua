@@ -1187,6 +1187,7 @@ end
 do
 local NEARBY_NPC = {}      -- 附近的NPC
 local NEARBY_PET = {}      -- 附近的PET
+local NEARBY_BOSS = {}     -- 附近的首领
 local NEARBY_PLAYER = {}   -- 附近的物品
 local NEARBY_DOODAD = {}   -- 附近的玩家
 local NEARBY_FIGHT = {}    -- 附近玩家和NPC战斗状态缓存
@@ -1597,6 +1598,41 @@ function X.GetNearPetTable()
 end
 end
 
+-- 获取附近的首领
+-- (table) X.GetNearBoss(void)
+function X.GetNearBoss(nLimit)
+	local aNpc = {}
+	for k, _ in pairs(NEARBY_BOSS) do
+		local npc = GetNpc(k)
+		if not npc then
+			NEARBY_BOSS[k] = nil
+		else
+			table.insert(aNpc, npc)
+			if nLimit and #aNpc == nLimit then
+				break
+			end
+		end
+	end
+	return aNpc
+end
+
+function X.GetNearBossID(nLimit)
+	local aNpcID = {}
+	for k, _ in pairs(NEARBY_BOSS) do
+		table.insert(aNpcID, k)
+		if nLimit and #aNpcID == nLimit then
+			break
+		end
+	end
+	return aNpcID
+end
+
+if IsDebugClient() then
+function X.GetNearBossTable()
+	return NEARBY_BOSS
+end
+end
+
 -- 获取附近玩家列表
 -- (table) X.GetNearPlayer(void)
 function X.GetNearPlayer(nLimit)
@@ -1686,11 +1722,15 @@ X.RegisterEvent('NPC_ENTER_SCENE', function()
 	if npc and npc.dwEmployer ~= 0 then
 		NEARBY_PET[arg0] = npc
 	end
+	if npc and X.IsBoss(X.GetMapID(), npc.dwTemplateID) then
+		NEARBY_BOSS[arg0] = npc
+	end
 	NEARBY_NPC[arg0] = npc
 	NEARBY_FIGHT[arg0] = npc and npc.bFightState or false
 end)
 X.RegisterEvent('NPC_LEAVE_SCENE', function()
 	NEARBY_PET[arg0] = nil
+	NEARBY_BOSS[arg0] = nil
 	NEARBY_NPC[arg0] = nil
 	NEARBY_FIGHT[arg0] = nil
 end)
