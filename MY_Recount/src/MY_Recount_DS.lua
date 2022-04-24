@@ -1338,9 +1338,10 @@ function D.SavePlayerInfo(data, dwID, bRefresh)
 		return
 	end
 	if (bRefresh or not data[DK.PLAYER_LIST][dwID]) and IsPlayer(dwID) then
-		local tPlayerList = data[DK.PLAYER_LIST]
 		local player, info = D.GetPlayer(dwID)
 		if player and info and not X.IsEmpty(info.dwMountKungfuID) then
+			local tPlayerList = data[DK.PLAYER_LIST]
+			tPlayerList[dwID] = {}
 			local nEquipScore, aEquip
 			local function OnGet()
 				if not nEquipScore or not aEquip then
@@ -1348,7 +1349,7 @@ function D.SavePlayerInfo(data, dwID, bRefresh)
 				end
 				local aInfo = {
 					info.dwMountKungfuID,
-					player.GetTotalEquipScore(),
+					nEquipScore,
 					aEquip,
 				}
 				tPlayerList[dwID] = aInfo
