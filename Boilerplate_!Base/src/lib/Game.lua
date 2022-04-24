@@ -4448,43 +4448,174 @@ function X.GetMapAchievements(dwMapID, bWujia)
 	return X.Clone(MAP_ACHI_NORMAL[dwMapID])
 end
 
-function X.GetPlayerEquipInfo(player)
-	local tEquipInfo = {}
-	for nItemIndex = 0, EQUIPMENT_INVENTORY.TOTAL - 1 do
-		local item = GetPlayerItem(player, INVENTORY_INDEX.EQUIP, nItemIndex)
-		if item then
-			-- 五行石
-			local aSlotItem = {}
-			for i = 1, item.GetSlotCount() do
-				local nEnchantID = item.GetMountDiamondEnchantID(i - 1)
-				if nEnchantID and nEnchantID > 0 then
-					local dwTabType, dwTabIndex = GetDiamondInfoFromEnchantID(nEnchantID)
-					if dwTabType and dwTabIndex then
-						aSlotItem[i] = {dwTabType, dwTabIndex}
+do
+	local EVENT_KEY = nil
+	local PEEK_PLAYER_EQUIP_SCORE_STATE = {}
+	local PEEK_PLAYER_EQUIP_SCORE_RESULT = {}
+	local PEEK_PLAYER_EQUIP_SCORE_CALLBACK = {}
+	local function OnGetPlayerEquipScorePeekPlayer(dwID)
+		if not PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID] then
+			return
+		end
+		local nScore = PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID]
+		for _, fnAction in ipairs(PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID]) do
+			X.SafeCall(fnAction, nScore, dwID)
+		end
+		PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID] = nil
+	end
+
+	-- 获取玩家装备分数
+	-- X.GetPlayerEquipScore(dwID, fnAction)
+	-- X.GetPlayerEquipScore(dwID, bForcePeek, fnAction)
+	-- @param dwID 玩家ID
+	-- @param bForcePeek 是否强制拉取
+	-- @param fnAction 回调函数
+	function X.GetPlayerEquipScore(dwID, bForcePeek, fnAction)
+		-- 函数重载
+		if X.IsFunction(bForcePeek) then
+			fnAction, bForcePeek = bForcePeek, nil
+		end
+		-- 加入回调
+		if not PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID] then
+			PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID] = {}
+		end
+		table.insert(PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID], fnAction)
+		-- 自身判定
+		if dwID == UI_GetClientPlayerID() then
+			PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID] = GetClientPlayer().GetTotalEquipScore()
+			OnGetPlayerEquipScorePeekPlayer(dwID)
+			return
+		end
+		-- 缓存判定
+		if PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] == 'SUCCESS' and not bForcePeek then
+			OnGetPlayerEquipScorePeekPlayer(dwID)
+			return
+		end
+		-- 发送请求
+		PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] = 'PENDING'
+		if PeekOtherPlayerEquipSimpleInfo then
+			if not EVENT_KEY then
+				EVENT_KEY = X.RegisterEvent('ON_SYNC_OTHER_PLAYER_EQUIP_SIMPLE_INFO', X.NSFormatString('{$NS}#GetPlayerEquipScore'), function()
+					local dwID, nEquipScore = arg0, arg1
+					PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] = 'SUCCESS'
+					PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID] = nEquipScore
+					OnGetPlayerEquipScorePeekPlayer(dwID)
+				end)
+			end
+			X.SafeCall(PeekOtherPlayerEquipSimpleInfo, dwID)
+		else
+			if not EVENT_KEY then
+				EVENT_KEY = X.RegisterEvent('PEEK_OTHER_PLAYER', X.NSFormatString('{$NS}#GetPlayerEquipScore'), function()
+					local nResult, dwID = arg0, arg1
+					local player = GetPlayer(dwID)
+					if nResult == PEEK_OTHER_PLAYER_RESPOND.SUCCESS and player then
+						PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] = 'SUCCESS'
+						PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID] = player.GetTotalEquipScore()
+						OnGetPlayerEquipScorePeekPlayer(dwID)
 					end
-				end
+				end)
 			end
-			-- 五彩石
-			local nEnchantID = item.GetMountFEAEnchantID()
-			if nEnchantID and nEnchantID ~= 0 then
-				local dwTabType, dwTabIndex = GetColorDiamondInfoFromEnchantID(nEnchantID)
-				if dwTabType and dwTabIndex then
-					aSlotItem[0] = {dwTabType, dwTabIndex}
-				end
-			end
-			-- 插入结果集
-			tEquipInfo[nItemIndex] = {
-				dwTabType = item.dwTabType,
-				dwTabIndex = item.dwIndex,
-				nStrengthLevel = item.nStrengthLevel,
-				aSlotItem = aSlotItem,
-				dwPermanentEnchantID = item.dwPermanentEnchantID,
-				dwTemporaryEnchantID = item.dwTemporaryEnchantID,
-				dwTemporaryEnchantLeftSeconds = item.GetTemporaryEnchantLeftSeconds(),
-			}
+			X.SafeCall(ViewInviteToPlayer, dwID, true)
 		end
 	end
-	return tEquipInfo
+end
+
+do
+	local EVENT_KEY = nil
+	local PEEK_PLAYER_EQUIP_STATE = {}
+	local PEEK_PLAYER_EQUIP_CALLBACK = {}
+	local function OnGetPlayerEquipInfoPeekPlayer(player)
+		if not PEEK_PLAYER_EQUIP_CALLBACK[player.dwID] then
+			return
+		end
+		local tEquipInfo = {}
+		for nItemIndex = 0, EQUIPMENT_INVENTORY.TOTAL - 1 do
+			local item = GetPlayerItem(player, INVENTORY_INDEX.EQUIP, nItemIndex)
+			if item then
+				-- 五行石
+				local aSlotItem = {}
+				for i = 1, item.GetSlotCount() do
+					local nEnchantID = item.GetMountDiamondEnchantID(i - 1)
+					if nEnchantID and nEnchantID > 0 then
+						local dwTabType, dwTabIndex = GetDiamondInfoFromEnchantID(nEnchantID)
+						if dwTabType and dwTabIndex then
+							aSlotItem[i] = {dwTabType, dwTabIndex}
+						end
+					end
+				end
+				-- 五彩石
+				local nEnchantID = item.GetMountFEAEnchantID()
+				if nEnchantID and nEnchantID ~= 0 then
+					local dwTabType, dwTabIndex = GetColorDiamondInfoFromEnchantID(nEnchantID)
+					if dwTabType and dwTabIndex then
+						aSlotItem[0] = {dwTabType, dwTabIndex}
+					end
+				end
+				-- 插入结果集
+				tEquipInfo[nItemIndex] = {
+					dwTabType = item.dwTabType,
+					dwTabIndex = item.dwIndex,
+					nStrengthLevel = item.nStrengthLevel,
+					aSlotItem = aSlotItem,
+					dwPermanentEnchantID = item.dwPermanentEnchantID,
+					dwTemporaryEnchantID = item.dwTemporaryEnchantID,
+					dwTemporaryEnchantLeftSeconds = item.GetTemporaryEnchantLeftSeconds(),
+				}
+			end
+		end
+		for _, fnAction in ipairs(PEEK_PLAYER_EQUIP_CALLBACK[player.dwID]) do
+			X.SafeCall(fnAction, tEquipInfo, player.dwID)
+		end
+		PEEK_PLAYER_EQUIP_CALLBACK[player.dwID] = nil
+	end
+
+	-- 获取玩家装备信息
+	-- X.GetPlayerEquipInfo(dwID, fnAction)
+	-- X.GetPlayerEquipInfo(dwID, bForcePeek, fnAction)
+	-- @param dwID 玩家ID
+	-- @param bForcePeek 是否强制拉取
+	-- @param fnAction 回调函数
+	function X.GetPlayerEquipInfo(dwID, bForcePeek, fnAction)
+		-- 函数重载
+		if X.IsFunction(bForcePeek) then
+			fnAction, bForcePeek = bForcePeek, nil
+		end
+		-- 加入回调
+		if not PEEK_PLAYER_EQUIP_CALLBACK[dwID] then
+			PEEK_PLAYER_EQUIP_CALLBACK[dwID] = {}
+		end
+		table.insert(PEEK_PLAYER_EQUIP_CALLBACK[dwID], fnAction)
+		-- 自身判定
+		if dwID == UI_GetClientPlayerID() then
+			OnGetPlayerEquipInfoPeekPlayer(GetClientPlayer())
+			return
+		end
+		-- 缓存判定
+		local player = GetPlayer(dwID)
+		if player and PEEK_PLAYER_EQUIP_STATE[dwID] == 'SUCCESS' and not bForcePeek then
+			OnGetPlayerEquipInfoPeekPlayer(player)
+			return
+		end
+		-- 发送请求
+		PEEK_PLAYER_EQUIP_STATE[dwID] = 'PENDING'
+		if not EVENT_KEY then
+			EVENT_KEY = X.RegisterEvent('PEEK_OTHER_PLAYER', X.NSFormatString('{$NS}#GetPlayerEquipInfo'), function()
+				local nResult, dwID = arg0, arg1
+				local player = GetPlayer(dwID)
+				if nResult == PEEK_OTHER_PLAYER_RESPOND.SUCCESS and player then
+					PEEK_PLAYER_EQUIP_STATE[dwID] = 'SUCCESS'
+					OnGetPlayerEquipInfoPeekPlayer(player)
+				else
+					PEEK_PLAYER_EQUIP_STATE[dwID] = 'FAILURE'
+				end
+			end)
+		end
+		if PeekOtherPlayer then
+			X.SafeCall(PeekOtherPlayer, dwID)
+		else
+			X.SafeCall(ViewInviteToPlayer, dwID, true)
+		end
+	end
 end
 
 local PLAYER_TALENT_UPDATED = {}
