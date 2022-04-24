@@ -867,11 +867,9 @@ function D.FlushDB()
 	X.Debug('MY_RoleStatistics_TaskStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-X.RegisterFlush('MY_RoleStatistics_TaskStat', D.FlushDB)
 
-do local INIT = false
 function D.UpdateSaveDB()
-	if not INIT then
+	if not D.bReady then
 		return
 	end
 	local me = GetClientPlayer()
@@ -890,8 +888,6 @@ function D.UpdateSaveDB()
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_TASK_UPDATE')
-end
-X.RegisterInit('MY_RoleStatistics_TaskUpdateSaveDB', function() INIT = true end)
 end
 
 function D.GetColumns()
@@ -1399,24 +1395,45 @@ function D.ApplyFloatEntry(bFloatEntry)
 		btn:Destroy()
 	end
 end
+
 function D.UpdateFloatEntry()
 	if not D.bReady then
 		return
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
+
+--------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------
+
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_TaskStat', function()
 	D.bReady = true
+	D.UpdateFloatEntry()
+end)
+
+X.RegisterExit('MY_RoleStatistics_TaskStat', function()
 	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
 		D.UpdateSaveDB()
 		D.FlushDB()
 	end
+end)
+
+X.RegisterReload('MY_RoleStatistics_TaskStat', function()
+	D.ApplyFloatEntry(false)
+end)
+
+X.RegisterFlush('MY_RoleStatistics_TaskStat', function()
+	D.FlushDB()
+end)
+
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_TaskStat',  function()
 	D.UpdateFloatEntry()
 end)
-X.RegisterReload('MY_RoleStatistics_TaskEntry', function() D.ApplyFloatEntry(false) end)
-X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_TaskEntry', D.UpdateFloatEntry)
 
+--------------------------------------------------------
 -- Module exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_TaskStat',
@@ -1435,7 +1452,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('TaskStat', _L['MY_RoleStatistics_TaskStat'], X.CreateModule(settings))
 end
 
+--------------------------------------------------------
 -- Global exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_TaskStat',

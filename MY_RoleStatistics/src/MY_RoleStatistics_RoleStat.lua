@@ -1181,7 +1181,7 @@ function D.InitAlert()
 	D.tAlertSessionVal = D.GetClientPlayerRec()
 end
 
-X.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', function()
+function D.OutputAlert()
 	local rec = D.GetClientPlayerRec()
 
 	local aText, aDailyText = {}, {}
@@ -1216,7 +1216,7 @@ X.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat__AlertCol', fun
 		D.szLastAlert = szText
 		D.szLastDailyAlert = szDailyText
 	end
-end)
+end
 
 -- ¸¡¶¯¿ò
 function D.ApplyFloatEntry(bFloatEntry)
@@ -1260,7 +1260,6 @@ function D.UpdateFloatEntry()
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
-X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_RoleEntry', D.UpdateFloatEntry)
 
 --------------------------------------------------------
 -- ÊÂ¼þ×¢²á
@@ -1268,10 +1267,6 @@ X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_RoleEntry', D.UpdateFloa
 
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_RoleStat', function()
 	D.bReady = true
-	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
-		D.UpdateSaveDB()
-		D.FlushDB()
-	end
 	D.UpdateFloatEntry()
 end)
 
@@ -1287,13 +1282,27 @@ X.RegisterExit('MY_RoleStatistics_RoleStat', function()
 	if PLAYER_REC then
 		X.SaveLUAData(PLAYER_REC_FILE, PLAYER_REC)
 	end
+	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
 end)
 
 X.RegisterReload('MY_RoleStatistics_RoleStat', function()
 	D.ApplyFloatEntry(false)
 end)
 
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_RoleStat', function()
+	D.UpdateFloatEntry()
+end)
+
+X.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat', function()
+	D.OutputAlert()
+end)
+
+--------------------------------------------------------
 -- Module exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_RoleStat',
@@ -1312,7 +1321,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('RoleStat', _L['MY_RoleStatistics_RoleStat'], X.CreateModule(settings))
 end
 
+--------------------------------------------------------
 -- Global exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_RoleStat',

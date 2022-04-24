@@ -451,11 +451,9 @@ function D.FlushDB()
 	X.Debug('MY_RoleStatistics_EquipStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-X.RegisterFlush('MY_RoleStatistics_EquipStat', D.FlushDB)
 
-do local INIT = false
 function D.UpdateSaveDB()
-	if not INIT then
+	if not D.bReady then
 		return
 	end
 	local me = GetClientPlayer()
@@ -480,8 +478,6 @@ function D.UpdateSaveDB()
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_EQUIP_UPDATE')
-end
-X.RegisterInit('MY_RoleStatistics_EquipUpdateSaveDB', function() INIT = true end)
 end
 
 function D.UpdateNames(page)
@@ -897,22 +893,37 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
+--------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------
+
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_EquipStat', function()
 	D.bReady = true
+	D.UpdateFloatEntry()
+end)
+
+X.RegisterFlush('MY_RoleStatistics_EquipStat', function()
+	D.FlushDB()
+end)
+
+X.RegisterExit('MY_RoleStatistics_EquipStat', function()
 	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
 		D.UpdateSaveDB()
 		D.FlushDB()
 	end
+end)
+
+X.RegisterReload('MY_RoleStatistics_EquipStat', function()
+	D.ApplyFloatEntry(false)
+end)
+
+X.RegisterFrameCreate('CharacterPanel', 'MY_RoleStatistics_EquipStat', function()
 	D.UpdateFloatEntry()
 end)
-X.RegisterReload('MY_RoleStatistics_EquipStat', function() D.ApplyFloatEntry(false) end)
-X.RegisterFrameCreate('CharacterPanel', 'MY_RoleStatistics_EquipStat', D.UpdateFloatEntry)
 
--- function D.OnMouseLeave()
--- 	HideTip()
--- end
-
+--------------------------------------------------------
 -- Module exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_EquipStat',
@@ -931,7 +942,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('EquipStat', _L['MY_RoleStatistics_EquipStat'], X.CreateModule(settings))
 end
 
+--------------------------------------------------------
 -- Global exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_EquipStat',

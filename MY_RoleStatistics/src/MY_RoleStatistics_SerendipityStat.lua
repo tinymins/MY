@@ -759,7 +759,6 @@ function D.FlushDB()
 	X.Debug('MY_RoleStatistics_SerendipityStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-X.RegisterFlush('MY_RoleStatistics_SerendipityStat', D.FlushDB)
 
 function D.UpdateSaveDB()
 	if not D.bReady then
@@ -1281,7 +1280,6 @@ function D.UpdateFloatEntry()
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
-X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
 
 -------------------------------------------------------------------------------------------------------
 -- 地图标记
@@ -1457,9 +1455,22 @@ end
 -- 事件注册
 --------------------------------------------------------
 
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_SerendipityStat', function()
+	D.bReady = true
+	D.CheckMapMark()
+	D.UpdateFloatEntry()
+end)
+
 X.RegisterInit('MY_RoleStatistics_SerendipityStat', function()
 	D.bReady = true
 	D.UpdateFloatEntry()
+end)
+
+X.RegisterExit('MY_RoleStatistics_SerendipityStat', function()
+	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
 end)
 
 X.RegisterReload('MY_RoleStatistics_SerendipityStat', function()
@@ -1468,17 +1479,17 @@ X.RegisterReload('MY_RoleStatistics_SerendipityStat', function()
 	D.ApplyFloatEntry(false)
 end)
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_SerendipityStat', function()
-	D.bReady = true
-	D.CheckMapMark()
-	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
-		D.UpdateSaveDB()
-		D.FlushDB()
-	end
+X.RegisterFlush('MY_RoleStatistics_SerendipityStat', function()
+	D.FlushDB()
+end)
+
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_SerendipityStat', function()
 	D.UpdateFloatEntry()
 end)
 
+--------------------------------------------------------
 -- Module exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_SerendipityStat',
@@ -1497,7 +1508,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('SerendipityStat', _L['MY_RoleStatistics_SerendipityStat'], X.CreateModule(settings))
 end
 
+--------------------------------------------------------
 -- Global exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_SerendipityStat',

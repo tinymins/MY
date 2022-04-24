@@ -312,7 +312,9 @@ for _, szEvent in ipairs({
 	end
 end
 
+--------------------------------------------------------
 -- Global exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics',

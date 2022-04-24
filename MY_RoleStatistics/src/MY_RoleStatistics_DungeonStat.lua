@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_DungeonStat'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0 ') then
 	return
 end
 --------------------------------------------------------------------------
@@ -532,7 +532,6 @@ function D.InitDB()
 		end
 	end
 end
-X.RegisterInit('MY_RoleStatistics_DungeonStat', D.InitDB)
 
 function D.UpdateSaveDB()
 	if not D.bReady then
@@ -1199,6 +1198,31 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
+--------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------
+
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonStat', function()
+	D.bReady = true
+	D.UpdateFloatEntry()
+end)
+
+X.RegisterInit('MY_RoleStatistics_DungeonStat', function()
+	D.InitDB()
+	D.UpdateMapProgress()
+end)
+
+X.RegisterExit('MY_RoleStatistics_DungeonStat', function()
+	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
+end)
+
+X.RegisterReload('MY_RoleStatistics_DungeonStat', function()
+	D.ApplyFloatEntry(false)
+end)
+
 -- 首领死亡刷新秘境进度（秘境内同步拾取则视为进度更新）
 X.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
 	if not D.bReady or not X.IsInDungeon() then
@@ -1211,6 +1235,7 @@ X.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy'
 	end
 	X.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
 end)
+
 X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
 	local dwMapID, dwPlayerID = arg0, arg1
 	if dwPlayerID ~= UI_GetClientPlayerID() then
@@ -1219,27 +1244,21 @@ X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
 	D.tMapProgressValid[dwMapID] = true
 	D.FlushDB()
 end)
+
 X.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', function()
 	local tMapCopy = arg0
 	D.tMapSaveCopy = tMapCopy
 	D.bMapSaveCopyValid = true
 	D.FlushDB()
 end)
-X.RegisterInit('MY_RoleStatistics_DungeonEntry', function()
-	D.UpdateMapProgress()
-end)
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonStat', function()
-	D.bReady = true
-	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
-		D.UpdateSaveDB()
-		D.FlushDB()
-	end
+
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_DungeonStat', function()
 	D.UpdateFloatEntry()
 end)
-X.RegisterReload('MY_RoleStatistics_DungeonEntry', function() D.ApplyFloatEntry(false) end)
-X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry)
 
+--------------------------------------------------------
 -- Module exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_DungeonStat',
@@ -1258,7 +1277,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('DungeonStat', _L['MY_RoleStatistics_DungeonStat'], X.CreateModule(settings))
 end
 
+--------------------------------------------------------
 -- Global exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_DungeonStat',

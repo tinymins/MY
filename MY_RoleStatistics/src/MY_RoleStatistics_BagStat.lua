@@ -1088,22 +1088,33 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
+--------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------
+
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_BagStat', function()
 	D.bReady = true
+	D.UpdateFloatEntry()
+end)
+
+X.RegisterExit('MY_RoleStatistics_BagStat', function()
 	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
 		D.UpdateSaveDB()
 		D.FlushDB()
 	end
+end)
+
+X.RegisterReload('MY_RoleStatistics_BagStat', function()
+	D.ApplyFloatEntry(false)
+end)
+
+X.RegisterFrameCreate('BigBagPanel', 'MY_RoleStatistics_BagStat', function()
 	D.UpdateFloatEntry()
 end)
-X.RegisterReload('MY_RoleStatistics_BagStat', function() D.ApplyFloatEntry(false) end)
-X.RegisterFrameCreate('BigBagPanel', 'MY_RoleStatistics_BagStat', D.UpdateFloatEntry)
 
--- function D.OnMouseLeave()
--- 	HideTip()
--- end
-
+--------------------------------------------------------
 -- Module exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_BagStat',
@@ -1122,7 +1133,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('BagStat', _L['MY_RoleStatistics_BagStat'], X.CreateModule(settings))
 end
 
+--------------------------------------------------------
 -- Global exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_BagStat',
