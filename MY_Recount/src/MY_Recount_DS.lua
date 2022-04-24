@@ -1338,29 +1338,41 @@ function D.SavePlayerInfo(data, dwID, bRefresh)
 		return
 	end
 	if (bRefresh or not data[DK.PLAYER_LIST][dwID]) and IsPlayer(dwID) then
+		local tPlayerList = data[DK.PLAYER_LIST]
 		local player, info = D.GetPlayer(dwID)
 		if player and info and not X.IsEmpty(info.dwMountKungfuID) then
-			local aEquip, nEquipScore = {}, player.GetTotalEquipScore()
-			for nEquipIndex, tEquipInfo in pairs(X.GetPlayerEquipInfo(player)) do
-				table.insert(aEquip, {
-					nEquipIndex,
-					tEquipInfo.dwTabType,
-					tEquipInfo.dwTabIndex,
-					tEquipInfo.nStrengthLevel,
-					tEquipInfo.aSlotItem,
-					tEquipInfo.dwPermanentEnchantID,
-					tEquipInfo.dwTemporaryEnchantID,
-					tEquipInfo.dwTemporaryEnchantLeftSeconds,
-				})
-			end
-			if not X.IsEmpty(aEquip) and not X.IsEmpty(nEquipScore) then
+			local nEquipScore, aEquip
+			local function OnGet()
+				if not nEquipScore or not aEquip then
+					return
+				end
 				local aInfo = {
 					info.dwMountKungfuID,
 					player.GetTotalEquipScore(),
 					aEquip,
 				}
-				data[DK.PLAYER_LIST][dwID] = aInfo
+				tPlayerList[dwID] = aInfo
 			end
+			X.GetPlayerEquipScore(dwID, function(nScore)
+				nEquipScore = nScore
+				OnGet()
+			end)
+			X.GetPlayerEquipInfo(dwID, function(tEquip)
+				aEquip = {}
+				for nEquipIndex, tEquipInfo in pairs(tEquip) do
+					table.insert(aEquip, {
+						nEquipIndex,
+						tEquipInfo.dwTabType,
+						tEquipInfo.dwTabIndex,
+						tEquipInfo.nStrengthLevel,
+						tEquipInfo.aSlotItem,
+						tEquipInfo.dwPermanentEnchantID,
+						tEquipInfo.dwTemporaryEnchantID,
+						tEquipInfo.dwTemporaryEnchantLeftSeconds,
+					})
+				end
+				OnGet()
+			end)
 		end
 	end
 end
