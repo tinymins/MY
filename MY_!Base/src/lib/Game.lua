@@ -1633,6 +1633,16 @@ function X.GetNearBossTable()
 end
 end
 
+X.RegisterEvent(X.NSFormatString('{$NS}_SET_BOSS'), 'LIB#GetNearBoss', function()
+	local dwMapID, tBoss = X.GetMapID(), {}
+	for _, npc in ipairs(X.GetNearNpc()) do
+		if X.IsBoss(dwMapID, npc.dwTemplateID) then
+			NEARBY_BOSS[npc.dwID] = npc
+		end
+	end
+	NEARBY_BOSS = tBoss
+end)
+
 -- 获取附近玩家列表
 -- (table) X.GetNearPlayer(void)
 function X.GetNearPlayer(nLimit)
