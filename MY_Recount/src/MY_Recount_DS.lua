@@ -1342,15 +1342,16 @@ function D.SavePlayerInfo(data, dwID, bRefresh)
 		if player and info and not X.IsEmpty(info.dwMountKungfuID) then
 			local tPlayerList = data[DK.PLAYER_LIST]
 			tPlayerList[dwID] = {}
-			local nEquipScore, aEquip
+			local nEquipScore, aEquip, aTalent
 			local function OnGet()
-				if not nEquipScore or not aEquip then
+				if not nEquipScore or not aEquip or not aTalent then
 					return
 				end
 				local aInfo = {
 					info.dwMountKungfuID,
 					nEquipScore,
 					aEquip,
+					aTalent,
 				}
 				tPlayerList[dwID] = aInfo
 			end
@@ -1371,6 +1372,17 @@ function D.SavePlayerInfo(data, dwID, bRefresh)
 						tEquipInfo.dwTemporaryEnchantID,
 						tEquipInfo.dwTemporaryEnchantLeftSeconds,
 					})
+				end
+				OnGet()
+			end)
+			X.GetPlayerTalentInfo(dwID, function(a)
+				aTalent = {}
+				for i, p in ipairs(a) do
+					aTalent[i] = {
+						p.nIndex,
+						p.dwSkillID,
+						p.dwSkillLevel,
+					}
 				end
 				OnGet()
 			end)
