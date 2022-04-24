@@ -951,6 +951,38 @@ function D.FrameBuffRefreshCall()
 end
 end
 
+function D.UpdateOTAction(frame)
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	local KOTTarget = X.GetNearBoss()[1]
+	if not KOTTarget then
+		local dwType, dwID = me.GetTarget()
+		if dwType == TARGET.NPC then
+			KOTTarget = GetNpc(dwID)
+		elseif dwType == TARGET.PLAYER then
+			local tar = GetPlayer(dwID)
+			local dwType, dwID = tar.GetTarget()
+			if dwType == TARGET.NPC then
+				KOTTarget = GetNpc(dwID)
+			end
+		end
+	end
+	local hPrepare = frame:Lookup('', 'Handle_Prepare')
+	if KOTTarget then
+		local nType, dwSkillID, dwSkillLevel, fProgress = X.GetOTActionState(KOTTarget)
+		if nType ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE and fProgress and dwSkillID and dwSkillLevel then
+			hPrepare:Lookup('Text_Prepare'):SetText(X.GetSkillName(dwSkillID, dwSkillLevel) or '')
+			hPrepare:Lookup('Image_Prepare'):SetPercentage(fProgress)
+			hPrepare:SetAlpha(255)
+			frame.nOTEndTime = GetTime()
+			return
+		end
+	end
+	hPrepare:SetAlpha(math.max(0, (1 - (GetTime() - (frame.nOTEndTime or 0)) / 2000) * 255))
+end
+
 function D.OnFrameBreathe()
 	if not CFG.bFasterHP and GetLogicFrameCount() % CFG.nDrawInterval ~= 0 then
 		return
@@ -967,50 +999,10 @@ function D.OnFrameBreathe()
 	MY_CataclysmParty:RefreshBossTarget()
 	MY_CataclysmParty:RefreshBossFocus()
 	MY_CataclysmParty:RefreshSputtering()
-	local fPrepare, szPrepare, nAlpha
-	local dwType, dwID = me.GetTarget()
-	if dwType == TARGET.NPC then
-		local h = Station.Lookup('Normal/Target', 'Handle_Bar')
-		if h and h:IsVisible() then
-			local txt = h:Lookup('Text_Name')
-			if txt then
-				szPrepare = txt:GetText()
-			end
-			local img = h:Lookup('Image_Progress') or h:Lookup('Image_BarProgress')
-			if img then
-				fPrepare = img:GetPercentage()
-			end
-			nAlpha = h:GetAlpha()
-		end
-	elseif dwType == TARGET.PLAYER then
-		local tar = GetPlayer(dwID)
-		local dwType, dwID = tar.GetTarget()
-		if dwType == TARGET.NPC then
-			local h = Station.Lookup('Normal/TargetTarget', 'Handle_Bar')
-			if h and h:IsVisible() then
-				local txt = h:Lookup('Text_Name')
-				if txt then
-					szPrepare = txt:GetText()
-				end
-				local img = h:Lookup('Image_Progress') or h:Lookup('Image_BarProgress')
-				if img then
-					fPrepare = img:GetPercentage()
-				end
-				nAlpha = h:GetAlpha()
-			end
-		end
-	end
-	local hPrepare = this:Lookup('', 'Handle_Prepare')
-	if fPrepare and szPrepare and nAlpha then
-		hPrepare:Lookup('Text_Prepare'):SetText(szPrepare)
-		hPrepare:Lookup('Image_Prepare'):SetPercentage(fPrepare)
-		hPrepare:SetAlpha(nAlpha)
-	else
-		hPrepare:SetAlpha(0)
-	end
 	-- kill System Panel
 	D.RaidPanel_Switch(DEBUG)
 	D.TeammatePanel_Switch(false)
+	D.UpdateOTAction(this)
 	D.FrameBuffRefreshCall()
 	-- 官方代码太容易报错 放最后
 	if not this.nBreatheTime or GetTime() - this.nBreatheTime >= 300 then -- 语音最短刷新间隔300ms
