@@ -323,9 +323,23 @@ function PS.OnPanelActive(frame)
 
 	nX = nPaddingX + 10
 	nY = nY + 25
-	nY = nY + ui:Append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
-		text = _L['Faster Refresh HP (Greater performance loss)'],
+		text = _L['Faster Refresh (Greater performance loss)'],
+		checked = CFG.nDrawInterval == 1,
+		onCheck = function(bCheck)
+			CFG.nDrawInterval = bCheck and 1 or 4
+		end,
+		tip = {
+			render = _L['Refresh every breathe call.'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
+	})
+
+	nY = nY + 25
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Ultimate Refresh HP (Greater performance loss)'],
 		checked = CFG.bFasterHP,
 		onCheck = function(bCheck)
 			CFG.bFasterHP = bCheck
@@ -337,7 +351,11 @@ function PS.OnPanelActive(frame)
 				end
 			end
 		end,
-	}):Pos('BOTTOMRIGHT')
+		tip = {
+			render = _L['Refresh every render call.'],
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
+	})
 	nY = nY + 25
 end
 X.RegisterPanel(_L['Raid'], 'MY_Cataclysm', _L['Cataclysm'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)

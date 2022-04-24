@@ -309,6 +309,12 @@ local O = X.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.0,
 	},
+	nDrawInterval = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = X.Schema.Number,
+		xDefaultValue = 4,
+	},
 	bFasterHP = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
