@@ -4693,7 +4693,7 @@ do
 				end
 			end)
 		end
-		X.SafeCall(PeekOtherPlayerTalent, dwID)
+		X.SafeCall(PeekOtherPlayerTalent, dwID, 0xffffffff)
 	end
 end
 
