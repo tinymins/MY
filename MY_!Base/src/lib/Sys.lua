@@ -1783,7 +1783,7 @@ function X.CreateModule(options)
 	local importEntries, importInterceptors, importTriggers = FormatModuleProxy(options.imports, name)
 	local function getter(_, k)
 		if not exportEntries[k] then
-			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Module `' .. name .. '`: get value failed, unregistered properity `' .. k .. '`.', X.DEBUG_LEVEL.WARNING)
+			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Module `' .. name .. '`: get value failed, unregistered property `' .. k .. '`.', X.DEBUG_LEVEL.WARNING)
 			return
 		end
 		local interceptor = exportInterceptors[k]
@@ -1806,7 +1806,7 @@ function X.CreateModule(options)
 	end
 	local function setter(_, k, v)
 		if not importEntries[k] then
-			local errmsg = 'Module `' .. name .. '`: set value failed, unregistered properity `' .. k .. '`.'
+			local errmsg = 'Module `' .. name .. '`: set value failed, unregistered property `' .. k .. '`.'
 			if not X.IsDebugClient() then
 				X.Debug(X.PACKET_INFO.NAME_SPACE, errmsg, X.DEBUG_LEVEL.ERROR)
 				return
