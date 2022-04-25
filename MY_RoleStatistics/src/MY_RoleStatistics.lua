@@ -57,17 +57,17 @@ function D.Toggle()
 end
 
 -- ×¢²á×ÓÄ£¿é
-function D.RegisterModule(szID, szName, env)
+function D.RegisterModule(szID, szName, tModule)
 	for i, v in X.ipairs_r(D.aModule) do
 		if v.szID == szID then
 			table.remove(D.aModule, i)
 		end
 	end
-	if szName and env then
+	if szName and tModule then
 		table.insert(D.aModule, {
 			szID = szID,
 			szName = szName,
-			env = env,
+			tModule = tModule,
 		})
 	end
 	if D.IsOpened() then
@@ -139,12 +139,12 @@ function Framework.OnLButtonClick()
 			end,
 		}
 		for _, m in ipairs(D.aModule) do
-			if m and m.env.szFloatEntry then
+			if m and m.tModule.szFloatEntry then
 				table.insert(tFloatEntryMenu, {
 					szOption = m.szName,
-					bCheck = true, bChecked = X.Get(_G, m.env.szFloatEntry),
+					bCheck = true, bChecked = X.Get(_G, m.tModule.szFloatEntry),
 					fnAction = function()
-						X.Set(_G, m.env.szFloatEntry, not X.Get(_G, m.env.szFloatEntry))
+						X.Set(_G, m.tModule.szFloatEntry, not X.Get(_G, m.tModule.szFloatEntry))
 					end,
 				})
 			end
@@ -154,12 +154,12 @@ function Framework.OnLButtonClick()
 		end
 		local tSaveDBMenu = { szOption = _L['Save DB'] }
 		for _, m in ipairs(D.aModule) do
-			if m and m.env.szSaveDB then
+			if m and m.tModule.szSaveDB then
 				table.insert(tSaveDBMenu, {
 					szOption = m.szName,
-					bCheck = true, bChecked = X.Get(_G, m.env.szSaveDB),
+					bCheck = true, bChecked = X.Get(_G, m.tModule.szSaveDB),
 					fnAction = function()
-						X.Set(_G, m.env.szSaveDB, not X.Get(_G, m.env.szSaveDB))
+						X.Set(_G, m.tModule.szSaveDB, not X.Get(_G, m.tModule.szSaveDB))
 					end,
 				})
 			end
@@ -188,18 +188,18 @@ function Framework.OnActivePage()
 		if page.nIndex then
 			local m = D.aModule[page.nIndex]
 			if not page.bInit then
-				if m and m.env.OnInitPage then
+				if m and m.tModule.OnInitPage then
 					local _this = this
 					this = page
-					m.env.OnInitPage()
+					m.tModule.OnInitPage()
 					this = _this
 				end
 				page.bInit = true
 			end
-			if m and m.env.OnActivePage then
+			if m and m.tModule.OnActivePage then
 				local _this = this
 				this = page
-				m.env.OnActivePage()
+				m.tModule.OnActivePage()
 				this = _this
 			end
 		end
@@ -236,10 +236,10 @@ for _, szEvent in ipairs({
 		while page do
 			if page:GetName() == 'Page_Default' and page.bInit then
 				local m = D.aModule[page.nIndex]
-				if m and m.env[szEvent] then
+				if m and m.tModule[szEvent] then
 					local _this = this
 					this = page
-					m.env[szEvent](...)
+					m.tModule[szEvent](...)
 					this = _this
 				end
 			end
@@ -301,8 +301,8 @@ for _, szEvent in ipairs({
 		end
 		if page and page ~= this then
 			local m = D.aModule[page.nIndex]
-			if m and m.env[szEvent] then
-				return m.env[szEvent](...)
+			if m and m.tModule[szEvent] then
+				return m.tModule[szEvent](...)
 			end
 		else
 			if Framework[szEvent] then
@@ -365,11 +365,11 @@ function PS.OnPanelActive(wnd)
 
 	local aFloatEntry, aSaveDB = {}, {}
 	for _, m in ipairs(D.aModule) do
-		if m and m.env.szFloatEntry then
-			table.insert(aFloatEntry, { szName = m.szName, szKey = m.env.szFloatEntry })
+		if m and m.tModule.szFloatEntry then
+			table.insert(aFloatEntry, { szName = m.szName, szKey = m.tModule.szFloatEntry })
 		end
-		if m and m.env.szSaveDB then
-			table.insert(aSaveDB, { szName = m.szName, szKey = m.env.szSaveDB })
+		if m and m.tModule.szSaveDB then
+			table.insert(aSaveDB, { szName = m.szName, szKey = m.tModule.szSaveDB })
 		end
 	end
 	if #aFloatEntry > 0 then
