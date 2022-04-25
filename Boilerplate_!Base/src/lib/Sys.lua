@@ -1782,38 +1782,35 @@ function X.CreateModule(options)
 	local exportEntries, exportInterceptors, exportTriggers = FormatModuleProxy(options.exports, name)
 	local importEntries, importInterceptors, importTriggers = FormatModuleProxy(options.imports, name)
 	local function getter(_, k)
-		if not exportEntries[k] then
-			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Module `' .. name .. '`: get value failed, unregistered property `' .. k .. '`.', X.DEBUG_LEVEL.WARNING)
-			return
-		end
-		local interceptor = exportInterceptors[k]
+		local v = nil
+		local interceptor, hasInterceptor = exportInterceptors[k] or exportInterceptors['*'], false
 		if interceptor then
 			local pc, value = ParameterCounter(interceptor(k))
 			if pc >= 1 then
-				return value
+				v = value
+				hasInterceptor = true
 			end
 		end
-		local value = nil
-		local root = exportEntries[k]
-		if root then
-			value = root[k]
+		if not hasInterceptor then
+			local root = exportEntries[k]
+			if not root then
+				--[[#DEBUG BEGIN]]
+				X.Debug(X.PACKET_INFO.NAME_SPACE, 'Module `' .. name .. '`: get value failed, unregistered property `' .. k .. '`.', X.DEBUG_LEVEL.WARNING)
+				--[[#DEBUG END]]
+				return
+			end
+			if root then
+				v = root[k]
+			end
 		end
 		local trigger = exportTriggers[k]
 		if trigger then
-			trigger(k, value)
+			trigger(k, v)
 		end
-		return value
+		return v
 	end
 	local function setter(_, k, v)
-		if not importEntries[k] then
-			local errmsg = 'Module `' .. name .. '`: set value failed, unregistered property `' .. k .. '`.'
-			if not X.IsDebugClient() then
-				X.Debug(X.PACKET_INFO.NAME_SPACE, errmsg, X.DEBUG_LEVEL.ERROR)
-				return
-			end
-			assert(false, errmsg)
-		end
-		local interceptor = importInterceptors[k]
+		local interceptor, hasInterceptor = importInterceptors[k] or importInterceptors['*'], false
 		if interceptor then
 			local pc, res, value = ParameterCounter(pcall(interceptor, k, v))
 			if not res then
@@ -1821,9 +1818,16 @@ function X.CreateModule(options)
 			end
 			if pc >= 2 then
 				v = value
+				hasInterceptor = true
 			end
 		end
 		local root = importEntries[k]
+		if not root and not hasInterceptor then
+			--[[#DEBUG BEGIN]]
+			assert(false, 'Module `' .. name .. '`: set value failed, unregistered property `' .. k .. '`.')
+			--[[#DEBUG END]]
+			return
+		end
 		if root then
 			root[k] = v
 		end
