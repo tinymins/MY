@@ -29,6 +29,7 @@ end
 local O = {}
 local D = {
 	aModule = {},
+	tModuleAPI = {},
 }
 local Framework = {}
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_RoleStatistics.ini'
@@ -69,6 +70,11 @@ function D.RegisterModule(szID, szName, tModule)
 			szName = szName,
 			tModule = tModule,
 		})
+		if tModule.tAPI then
+			for k, v in pairs(tModule.tAPI) do
+				D.tModuleAPI[k] = v
+			end
+		end
 	end
 	if D.IsOpened() then
 		D.Close()
@@ -320,6 +326,7 @@ local settings = {
 	name = 'MY_RoleStatistics',
 	exports = {
 		{
+			root = D,
 			fields = {
 				Open = D.Open,
 				Close = D.Close,
@@ -327,9 +334,13 @@ local settings = {
 				Toggle = D.Toggle,
 				RegisterModule = D.RegisterModule,
 			},
-		},
-		{
-			root = D,
+			interceptors = {
+				['*'] = function(k)
+					if D.tModuleAPI[k] then
+						return D.tModuleAPI[k]
+					end
+				end,
+			},
 			preset = 'UIEvent'
 		},
 	},
