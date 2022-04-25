@@ -1452,6 +1452,42 @@ function D.CheckMapMark()
 end
 
 --------------------------------------------------------
+-- 接口导出
+--------------------------------------------------------
+
+function D.GetSerendipityCounter(dwPlayerID, dwSerendipity)
+	local rec = dwPlayerID == UI_GetClientPlayerID()
+		and D.GetClientPlayerRec()
+		or D.GetPlayerRecords()[dwPlayerID]
+	local serendipity
+	for _, v in ipairs(SERENDIPITY_LIST) do
+		if v.dwSerendipity == dwSerendipity then
+			serendipity = v
+			break
+		end
+	end
+	if serendipity then
+		return GetSerendipityCounter(serendipity, rec['serendipity_' .. dwSerendipity])
+	end
+end
+
+function D.GetSerendipityCounterText(dwPlayerID, dwSerendipity)
+	local rec = dwPlayerID == UI_GetClientPlayerID()
+		and D.GetClientPlayerRec()
+		or D.GetPlayerRecords()[dwPlayerID]
+	local serendipity
+	for _, v in ipairs(SERENDIPITY_LIST) do
+		if v.dwSerendipity == dwSerendipity then
+			serendipity = v
+			break
+		end
+	end
+	if serendipity then
+		return GetSerendipityCounterText(serendipity, rec['serendipity_' .. dwSerendipity])
+	end
+end
+
+--------------------------------------------------------
 -- 事件注册
 --------------------------------------------------------
 
@@ -1500,6 +1536,10 @@ local settings = {
 				'OnInitPage',
 				szSaveDB = 'MY_RoleStatistics_SerendipityStat.bSaveDB',
 				szFloatEntry = 'MY_RoleStatistics_SerendipityStat.bFloatEntry',
+				tAPI = {
+					GetSerendipityCounter = D.GetSerendipityCounter,
+					GetSerendipityCounterText = D.GetSerendipityCounterText,
+				},
 			},
 			root = D,
 		},
