@@ -21,67 +21,45 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_SerendipityStat'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 --------------------------------------------------------------------------
 
-if ENVIRONMENT.GAME_BRANCH == 'classic' then
-	return
-end
-
-local SERENDIPITY_LIST, MAP_POINT_LIST = unpack(X.LoadLUAData(PLUGIN_ROOT .. '/data/serendipity/{$lang}.jx3dat', { passphrase = false }) or {})
+local SERENDIPITY_LIST, MAP_POINT_LIST = unpack(X.LoadLUAData(PLUGIN_ROOT .. '/data/serendipity/{$edition}.jx3dat', { passphrase = false }) or {})
 if not SERENDIPITY_LIST or not MAP_POINT_LIST then
-	return X.Sysmsg(_L['MY_RoleStatistics_SerendipityStat'], _L['Cannot load serendipity data!!!'], CONSTANT.MSG_THEME.ERROR)
+	return
 end
 local SERENDIPITY_HASH = {}
 for _, v in ipairs(SERENDIPITY_LIST) do
 	SERENDIPITY_HASH[v.nID] = v
 end
 
-CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
-
-local DB = X.SQLiteConnect(_L['MY_RoleStatistics_SerendipityStat'], {'userdata/role_statistics/serendipity_stat.v3.db', X.PATH_TYPE.GLOBAL})
-if not DB then
-	return X.Sysmsg(_L['MY_RoleStatistics_SerendipityStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
-end
-local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_SerendipityStat.ini'
 local SZ_TIP_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_SerendipityTip.ini'
+local STAT_DATA_FILE = {'userdata/role_statistics/serendipity_stat.jx3dat', X.PATH_TYPE.GLOBAL}
+local PLAYER_REC_FILE = {'userdata/role_statistics/serendipity_stat.jx3dat', X.PATH_TYPE.ROLE}
+local PLAYER_REC_INITIAL, PLAYER_REC = nil, nil
 
-DB:Execute([[
-	CREATE TABLE IF NOT EXISTS Info (
-		guid NVARCHAR(20) NOT NULL,
-		account NVARCHAR(255) NOT NULL,
-		region NVARCHAR(20) NOT NULL,
-		server NVARCHAR(20) NOT NULL,
-		name NVARCHAR(20) NOT NULL,
-		force INTEGER NOT NULL,
-		camp INTEGER NOT NULL,
-		level INTEGER NOT NULL,
-		serendipity_info NVARCHAR(65535) NOT NULL,
-		item_count NVARCHAR(65535) NOT NULL,
-		time INTEGER NOT NULL,
-		extra TEXT NOT NULL,
-		PRIMARY KEY(guid)
-	)
-]])
-local InfoW = DB:Prepare('REPLACE INTO Info (guid, account, region, server, name, force, camp, level, serendipity_info, item_count, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-local InfoG = DB:Prepare('SELECT * FROM Info WHERE guid = ?')
-local InfoR = DB:Prepare('SELECT * FROM Info WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
-local InfoD = DB:Prepare('DELETE FROM Info WHERE guid = ?')
 local MINI_MAP_POINT_MAX_DISTANCE = math.pow(300, 2)
 
 local O = X.CreateUserSettingsModule('MY_RoleStatistics_SerendipityStat', _L['General'], {
 	aColumn = {
 		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
-		xSchema = X.Schema.Collection(X.Schema.OneOf(X.Schema.String, X.Schema.Number)),
-		xDefaultValue = {
-			'name',
-			'force',
-			1, 2, 3, 4, 5, 6, 7, 8, 9,
-			'time_days',
-		},
+		xSchema = X.Schema.Collection(X.Schema.String),
+		xDefaultValue = (function()
+			local aKey = {
+				'name',
+			}
+			for i = #SERENDIPITY_LIST, math.max(1, #SERENDIPITY_LIST - 14), -1 do
+				local nID = SERENDIPITY_LIST[i].nID
+				if nID then
+					table.insert(aKey, 'serendipity_' .. nID)
+				end
+			end
+			table.insert(aKey, 'time_days')
+			return aKey
+		end)(),
 	},
 	szSort = {
 		ePathType = X.PATH_TYPE.GLOBAL,
@@ -138,10 +116,6 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_SerendipityStat', _L['Ge
 	},
 })
 local D = {}
-
-function D.GetPlayerGUID(me)
-	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
-end
 
 -----------------------------------------------------------------------------------------------
 -- 多个渠道奇遇次数监控
@@ -325,7 +299,7 @@ local FellowPetLucky = KG_Table.Load('settings\\Domesticate\\FellowPetLucky.tab'
 function D.GetLuckyFellowPet()
 	local tTime = TimeToDate(GetCurrentTime())
 	local nDate = tTime.month * 100 + tTime.day
-	local tLine = FellowPetLucky:Search(nDate)
+	local tLine = FellowPetLucky and FellowPetLucky:Search(nDate)
 	if tLine then
 		return {
 			[tLine.PetIndex0] = true,
@@ -337,13 +311,8 @@ function D.GetLuckyFellowPet()
 end
 
 -----------------------------------------------------------------------------------------------
--- 可信的奇遇次数和周期计算
+-- 可信的奇遇次数
 -----------------------------------------------------------------------------------------------
-local function IsInSamePeriod(dwTime)
-	local nNextTime, nCircle = X.GetRefreshTime('daily')
-	return dwTime >= nNextTime - nCircle
-end
-
 -- 获取奇遇今天尝试了几次 -1表示已完成不需要尝试
 local function GetSerendipityDailyCount(me, tab)
 	if tab.dwPet and me.IsFellowPetAcquired(tab.dwPet) then
@@ -382,91 +351,162 @@ local function GetSerendipityDailyCount(me, tab)
 	end
 end
 
-local EXCEL_WIDTH = 960
-local TASK_MIN_WIDTH = 42
-local TASK_MAX_WIDTH = 150
-local function GeneCommonFormatText(id)
-	return function(r)
-		return GetFormatText(r[id], 162, 255, 255, 255)
-	end
-end
-local function GeneCommonCompare(id)
-	return function(r1, r2)
-		if r1[id] == r2[id] then
-			return 0
+-- 获取奇遇当前尝试了几次，当前周期可以尝试几次
+local function GetSerendipityCounter(serendipity, value)
+	local nCount
+	if value then
+		nCount = value.count or 0
+		if nCount ~= -1 and serendipity.nMaxAttemptNum > 0 then
+			if value.extra then
+				nCount = nCount - value.extra
+			end
 		end
-		return r1[id] > r2[id] and 1 or -1
 	end
+	return nCount, serendipity.nMaxAttemptNum
 end
+
+-- 获取奇遇状态字符串，提示配色
+local function GetSerendipityCounterText(serendipity, value)
+	local szText, r, g, b = nil, 255, 255, 255
+	local nCount, nMaxAttemptNum = GetSerendipityCounter(serendipity, value)
+	if nCount == -1 then
+		szText, r, g, b = _L['Finished'], 128, 255, 128
+	elseif nMaxAttemptNum > 0 then
+		if nCount and nCount >= nMaxAttemptNum then
+			r, g, b = 255, 170, 170
+		end
+		szText = (nCount or 0) .. '/' .. nMaxAttemptNum
+	else
+		szText = tostring(nCount or 0)
+	end
+	return szText, r, g, b
+end
+
 local COLUMN_LIST = {
-	-- guid,
-	-- account,
-	{ -- 大区
-		id = 'region',
+	-- guid
+	{
+		szKey = 'guid',
+		GetValue = function(prevVal, prevRec)
+			return X.GetPlayerGUID()
+		end,
+	},
+	-- account
+	{
+		szKey = 'account',
+		GetValue = function(prevVal, prevRec)
+			return X.GetAccount() or ''
+		end,
+	},
+	-- 大区
+	{
+		szKey = 'region',
 		szTitle = _L['Region'],
-		nMinWidth = 100, nMaxWidth = 100,
-		GetFormatText = GeneCommonFormatText('region'),
-		Compare = GeneCommonCompare('region'),
+		bTable = true,
+		nMinWidth = 100,
+		nMaxWidth = 100,
+		GetValue = function(prevVal, prevRec)
+			return X.GetRealServer(1)
+		end,
 	},
-	{ -- 服务器
-		id = 'server',
+	-- 服务器
+	{
+		szKey = 'server',
 		szTitle = _L['Server'],
-		nMinWidth = 100, nMaxWidth = 100,
-		GetFormatText = GeneCommonFormatText('server'),
-		Compare = GeneCommonCompare('server'),
+		bTable = true,
+		nMinWidth = 100,
+		nMaxWidth = 100,
+		GetValue = function(prevVal, prevRec)
+			return X.GetRealServer(2)
+		end,
 	},
-	{ -- 名字
-		id = 'name',
+	-- 名字
+	{
+		szKey = 'name',
 		szTitle = _L['Name'],
-		nMinWidth = 110, nMaxWidth = 200,
-		GetFormatText = function(rec)
-			local name = rec.name
+		bTable = true,
+		nMinWidth = 110,
+		nMaxWidth = 200,
+		GetValue = function(prevVal, prevRec)
+			return GetClientPlayer().szName
+		end,
+		GetFormatText = function(name, rec)
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
 			return GetFormatText(name, 162, X.GetForceColor(rec.force, 'foreground'))
 		end,
-		Compare = GeneCommonCompare('name'),
 	},
-	{ -- 门派
-		id = 'force',
+	-- 门派
+	{
+		szKey = 'force',
 		szTitle = _L['Force'],
-		nMinWidth = 50, nMaxWidth = 70,
-		GetFormatText = function(rec)
-			return GetFormatText(g_tStrings.tForceTitle[rec.force], 162, 255, 255, 255)
+		bTable = true,
+		nMinWidth = 50,
+		nMaxWidth = 70,
+		GetValue = function(prevVal, prevRec)
+			return GetClientPlayer().dwForceID
 		end,
-		Compare = GeneCommonCompare('force'),
+		GetFormatText = function(force)
+			return GetFormatText(g_tStrings.tForceTitle[force], 162, 255, 255, 255)
+		end,
 	},
-	{ -- 阵营
-		id = 'camp',
+	-- 阵营
+	{
+		szKey = 'camp',
 		szTitle = _L['Camp'],
-		nMinWidth = 50, nMaxWidth = 50,
-		GetFormatText = function(rec)
-			return GetFormatText(g_tStrings.STR_CAMP_TITLE[rec.camp], 162, 255, 255, 255)
+		bTable = true,
+		nMinWidth = 50,
+		nMaxWidth = 50,
+		GetValue = function(prevVal, prevRec)
+			return GetClientPlayer().nCamp
 		end,
-		Compare = GeneCommonCompare('camp'),
+		GetFormatText = function(camp)
+			return GetFormatText(g_tStrings.STR_CAMP_TITLE[camp], 162, 255, 255, 255)
+		end,
 	},
-	{ -- 等级
-		id = 'level',
+	-- 等级
+	{
+		szKey = 'level',
 		szTitle = _L['Level'],
-		nMinWidth = 50, nMaxWidth = 50,
-		GetFormatText = GeneCommonFormatText('level'),
-		Compare = GeneCommonCompare('level'),
-	},
-	{ -- 时间
-		id = 'time',
-		szTitle = _L['Cache time'],
-		nMinWidth = 165, nMaxWidth = 200,
-		GetFormatText = function(rec)
-			return GetFormatText(X.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
+		bTable = true,
+		nMinWidth = 50,
+		nMaxWidth = 50,
+		GetValue = function(prevVal, prevRec)
+			return GetClientPlayer().nLevel
 		end,
-		Compare = GeneCommonCompare('time'),
 	},
-	{ -- 时间计时
-		id = 'time_days',
+	-- 时间
+	{
+		szKey = 'time',
+		szTitle = _L['Cache time'],
+		bTable = true,
+		nMinWidth = 165,
+		nMaxWidth = 200,
+		GetValue = function(prevVal, prevRec)
+			return GetCurrentTime()
+		end,
+		GetFormatText = function(time)
+			return GetFormatText(X.FormatTime(time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
+		end,
+	},
+	-- 时间计时
+	{
+		szKey = 'time_days',
 		szTitle = _L['Cache time days'],
-		nMinWidth = 120, nMaxWidth = 120,
-		GetFormatText = function(rec)
+		bTable = true,
+		nMinWidth = 120,
+		nMaxWidth = 120,
+		GetValue = function(prevVal, prevRec)
+			return GetCurrentTime()
+		end,
+		Compare = function(v1, v2, r1, r2)
+			v1, v2 = r1.time, r2.time
+			if v1 == v2 then
+				return 0
+			end
+			return v1 > v2 and 1 or -1
+		end,
+		GetFormatText = function(v, rec)
 			local nTime = GetCurrentTime() - rec.time
 			local nSeconds = math.floor(nTime)
 			local nMinutes = math.floor(nSeconds / 60)
@@ -494,20 +534,19 @@ local COLUMN_LIST = {
 			end
 			return GetFormatText(_L['Just now'], 162, 255, 255, 255)
 		end,
-		Compare = GeneCommonCompare('time'),
 	},
 }
 
-local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
-	local serendipity = SERENDIPITY_HASH[id]
-	if serendipity then
-		local col = { -- 秘境CD
-			id = id,
-			szTitle = serendipity.szName,
-			nMinWidth = TASK_MIN_WIDTH,
-			nMaxWidth = TASK_MAX_WIDTH,
-		}
-		col.GetTitleFormatTip = function()
+for _, serendipity in ipairs(SERENDIPITY_LIST) do
+	local szKey = 'serendipity_' .. serendipity.nID
+	table.insert(COLUMN_LIST, {
+		szKey = szKey,
+		szTitle = serendipity.szName,
+		bTable = true,
+		nMinWidth = 48,
+		nMaxWidth = 150,
+		szRefreshCircle = 'daily',
+		GetTitleTip = function()
 			local aTitleTipXml = {
 				GetFormatText(serendipity.szName .. '\n', 162, 255, 255, 255),
 			}
@@ -520,162 +559,184 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					table.insert(aTitleTipXml, GetFormatText('(' .. map.szName .. ')\n', 162, 255, 255, 255))
 				end
 			end
-			return table.concat(aTitleTipXml)
-		end
-		col.GetText = function(rec)
-			local nCount = rec.serendipity_info[id]
-			local szState, r, g, b = nil, 255, 255, 255
-			if nCount == -1 then
-				szState, r, g, b = _L['Finished'], 128, 255, 128
-			elseif not IsInSamePeriod(rec.time) then
-				szState = _L['Unknown']
-			elseif serendipity.nMaxAttemptNum > 0 then
-				if serendipity.aAttemptItem then -- 包里有可用触发奇遇道具进行数量补偿
-					for _, v in ipairs(serendipity.aAttemptItem) do
-						nCount = (nCount or 0) - X.Get(rec.item_count, v, 0)
-					end
+			return table.concat(aTitleTipXml), true
+		end,
+		GetValue = function(prevVal, prevRec)
+			local value = {
+				count = GetSerendipityDailyCount(GetClientPlayer(), serendipity) or X.Get(prevVal, 'daily'),
+				extra = 0,
+			}
+			-- 包里有可用触发奇遇道具进行数量补偿
+			if serendipity.aAttemptItem then
+				for _, v in ipairs(serendipity.aAttemptItem) do
+					value.extra = value.extra + X.GetItemAmountInAllPackages(v[1], v[2])
 				end
-				if nCount and nCount >= serendipity.nMaxAttemptNum then
-					r, g, b = 255, 170, 170
-				end
-				szState = (nCount or 0) .. '/' .. serendipity.nMaxAttemptNum
-			else
-				szState = (nCount or 0)
 			end
-			return szState, r, g, b
-		end
-		col.GetFormatText = function(rec)
-			local szState, r, g, b = col.GetText(rec)
-			return GetFormatText(szState, 162, r, g, b)
-		end
-		col.Compare = function(r1, r2)
-			local k1, k2 = r1.serendipity_info[id] or 0, r2.serendipity_info[id] or 0
-			if not IsInSamePeriod(r1.time) then
-				k1 = 0
+			-- 本次在线触发记录
+			if SERENDIPITY_COUNTER[serendipity.nID] then
+				value.count = math.min((value.count or 0) + SERENDIPITY_COUNTER[serendipity.nID], serendipity.nMaxAttemptNum)
 			end
-			if not IsInSamePeriod(r2.time) then
-				k2 = 0
-			end
+			return value
+		end,
+		Compare = function(v1, v2, r1, r2)
+			local k1 = v1 and v1.count or 0
+			local k2 = v2 and v2.count or 0
 			if k1 == k2 then
 				return 0
 			end
 			return k1 > k2 and 1 or -1
-		end
-		return col
-	end
-end })
-for _, p in ipairs(COLUMN_LIST) do
-	COLUMN_DICT[p.id] = p
+		end,
+		GetFormatText = function(v, rec)
+			local szState, r, g, b = GetSerendipityCounterText(serendipity, rec)
+			return GetFormatText(szState, 162, r, g, b)
+		end,
+	})
 end
 
-do
-local REC_CACHE
+local COLUMN_DICT = {}
+for _, col in ipairs(COLUMN_LIST) do
+	if not col.GetFormatText then
+		col.GetFormatText = function(v)
+			return GetFormatText(v, 162, 255, 255, 255)
+		end
+	end
+	if not col.Compare then
+		col.Compare = function(v1, v2)
+			if v1 == v2 then
+				return 0
+			end
+			return v1 > v2 and 1 or -1
+		end
+	end
+	COLUMN_DICT[col.szKey] = col
+end
+
+-- 移除不在同一个刷新周期内的数据字段
+function D.FilterColumnCircle(rec)
+	if rec.time then
+		for _, col in ipairs(COLUMN_LIST) do
+			if col.szRefreshCircle
+			and col.szKey:find('serendipity_') == 1 and rec[col.szKey] and  rec[col.szKey].count ~= -1 then
+				local dwTime, dwCircle = X.GetRefreshTime(col.szRefreshCircle)
+				if dwTime - dwCircle >= rec.time then
+					rec[col.szKey] = nil
+				end
+			end
+		end
+	end
+end
+
+function D.GetPlayerRecords()
+	local result = X.LoadLUAData(STAT_DATA_FILE) or {}
+	for _, rec in pairs(result) do
+		D.FilterColumnCircle(rec)
+	end
+	return result
+end
+
 function D.GetClientPlayerRec()
 	local me = GetClientPlayer()
 	if not me then
 		return
 	end
-	local rec = REC_CACHE
-	local guid = D.GetPlayerGUID(me)
-	if not rec then
-		rec = {
-			serendipity_info = {},
-			item_count = {},
-		}
-		-- 如果在同一个CD周期 则保留数据库中的次数统计
-		InfoG:ClearBindings()
-		InfoG:BindAll(AnsiToUTF8(guid))
-		local result = InfoG:GetAll()
-		InfoG:Reset()
-		if result and result[1] and result[1].time and IsInSamePeriod(result[1].time) then
-			rec.serendipity_info = X.DecodeLUAData(result[1].serendipity_info) or rec.serendipity_info
-			rec.item_count = X.DecodeLUAData(result[1].item_count) or rec.item_count
-		end
-		rec.serendipity_info = rec.serendipity_info
-		rec.item_count = rec.item_count
-		REC_CACHE = rec
+	-- 缓存数据
+	if not PLAYER_REC_INITIAL then
+		PLAYER_REC_INITIAL = X.LoadLUAData(PLAYER_REC_FILE) or {}
+		PLAYER_REC = X.Clone(PLAYER_REC_INITIAL)
+		D.FilterColumnCircle(PLAYER_REC)
 	end
-
-	-- 基础信息
-	rec.guid = guid
-	rec.account = X.GetAccount() or ''
-	rec.region = X.GetRealServer(1)
-	rec.server = X.GetRealServer(2)
-	rec.name = me.szName
-	rec.force = me.dwForceID
-	rec.camp = me.nCamp
-	rec.level = me.nLevel
-	rec.time = GetCurrentTime()
-
-	-- 统计可信的次数
-	for _, serendipity in ipairs(SERENDIPITY_LIST) do
-		local nDailyCount = GetSerendipityDailyCount(me, serendipity)
-		if nDailyCount then
-			rec.serendipity_info[serendipity.nID] = nDailyCount
-		end
-		if serendipity.aAttemptItem then
-			for _, v in ipairs(serendipity.aAttemptItem) do
-				if not rec.item_count[v[1]] then
-					rec.item_count[v[1]] = {}
-				end
-				rec.item_count[v[1]][v[2]] = X.GetItemAmountInAllPackages(v[1], v[2])
-				if X.IsEmpty(rec.item_count[v[1]][v[2]]) then
-					rec.item_count[v[1]][v[2]] = nil
-				end
-				if X.IsEmpty(rec.item_count[v[1]]) then
-					rec.item_count[v[1]] = nil
-				end
-			end
-		end
-		if SERENDIPITY_COUNTER[serendipity.nID] then
-			rec.serendipity_info[serendipity.nID] = math.min((rec.serendipity_info[serendipity.nID] or 0) + SERENDIPITY_COUNTER[serendipity.nID], serendipity.nMaxAttemptNum)
-		end
-		SERENDIPITY_COUNTER[serendipity.nID] = nil
+	-- 获取各列数据
+	for _, col in ipairs(COLUMN_LIST) do
+		PLAYER_REC[col.szKey] = col.GetValue(PLAYER_REC_INITIAL[col.szKey], PLAYER_REC_INITIAL)
 	end
-	return rec
-end
+	return X.Clone(PLAYER_REC)
 end
 
 function D.Migration()
 	local DB_V2_PATH = X.FormatPath({'userdata/role_statistics/serendipity_stat.v2.db', X.PATH_TYPE.GLOBAL})
-	if not IsLocalFileExist(DB_V2_PATH) then
+	local DB_V3_PATH = X.FormatPath({'userdata/role_statistics/serendipity_stat.v3.db', X.PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
 		return
 	end
 	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
+			local data = X.LoadLUAData(STAT_DATA_FILE) or {}
 			-- 转移V2旧版数据
 			if IsLocalFileExist(DB_V2_PATH) then
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
 				if DB_V2 then
-					DB:Execute('BEGIN TRANSACTION')
-					local aInfo = DB_V2:Execute('SELECT * FROM Info WHERE guid IS NOT NULL AND region IS NOT NULL AND name IS NOT NULL')
+					local aInfo = X.ConvertToAnsi(DB_V2:Execute('SELECT * FROM Info WHERE guid IS NOT NULL AND region IS NOT NULL AND name IS NOT NULL'))
 					if aInfo then
 						for _, rec in ipairs(aInfo) do
-							InfoW:ClearBindings()
-							InfoW:BindAll(
-								rec.guid,
-								rec.account,
-								rec.region,
-								rec.server,
-								rec.name,
-								rec.force,
-								rec.camp,
-								rec.level,
-								rec.serendipity_info,
-								rec.item_count,
-								rec.time,
-								''
-							)
-							InfoW:Execute()
+							if not data[rec.guid] or data[rec.guid].time <= rec.time then
+								data[rec.guid] = {
+									guid = rec.guid,
+									account = rec.account,
+									region = rec.region,
+									server = rec.server,
+									name = rec.name,
+									force = rec.force,
+									camp = rec.camp,
+									level = rec.level,
+									time = rec.time,
+								}
+								local t = X.DecodeLUAData(rec.serendipity_info)
+								if X.IsTable(t) then
+									for k, v in pairs(t) do
+										if X.IsNumber(v) then
+											data[rec.guid]['serendipity_' .. k] = {
+												count = v,
+												extra = 0,
+											}
+										end
+									end
+								end
+							end
 						end
-						InfoW:Reset()
 					end
-					DB:Execute('END TRANSACTION')
 					DB_V2:Release()
 				end
 				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
+			-- 转移V3旧版数据
+			if IsLocalFileExist(DB_V3_PATH) then
+				local DB_V3 = SQLite3_Open(DB_V3_PATH)
+				if DB_V3 then
+					local aInfo = X.ConvertToAnsi(DB_V3:Execute('SELECT * FROM Info WHERE guid IS NOT NULL AND region IS NOT NULL AND name IS NOT NULL'))
+					if aInfo then
+						for _, rec in ipairs(aInfo) do
+							if not data[rec.guid] or data[rec.guid].time <= rec.time then
+								data[rec.guid] = {
+									guid = rec.guid,
+									account = rec.account,
+									region = rec.region,
+									server = rec.server,
+									name = rec.name,
+									force = rec.force,
+									camp = rec.camp,
+									level = rec.level,
+									time = rec.time,
+								}
+								local t = X.DecodeLUAData(rec.serendipity_info)
+								if X.IsTable(t) then
+									for k, v in pairs(t) do
+										if X.IsNumber(v) then
+											data[rec.guid]['serendipity_' .. k] = {
+												count = v,
+												extra = 0,
+											}
+										end
+									end
+								end
+							end
+						end
+					end
+					DB_V3:Release()
+				end
+				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			X.SaveLUAData(STAT_DATA_FILE, data)
 			FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
 			X.Alert(_L['Migrate succeed!'])
 		end)
@@ -689,28 +750,18 @@ function D.FlushDB()
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
 
-	local rec = X.Clone(D.GetClientPlayerRec())
-	D.EncodeRow(rec)
+	local data = X.LoadLUAData(STAT_DATA_FILE) or {}
+	data[X.GetPlayerGUID()] = D.GetClientPlayerRec()
+	X.SaveLUAData(STAT_DATA_FILE, data)
 
-	DB:Execute('BEGIN TRANSACTION')
-	InfoW:ClearBindings()
-	InfoW:BindAll(
-		rec.guid, rec.account, rec.region, rec.server,
-		rec.name, rec.force, rec.camp, rec.level,
-		rec.serendipity_info, rec.item_count, rec.time, '')
-	InfoW:Execute()
-	InfoW:Reset()
-	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
 	X.Debug('MY_RoleStatistics_SerendipityStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-X.RegisterFlush('MY_RoleStatistics_SerendipityStat', D.FlushDB)
 
-do local INIT = false
 function D.UpdateSaveDB()
-	if not INIT then
+	if not D.bReady then
 		return
 	end
 	local me = GetClientPlayer()
@@ -721,137 +772,94 @@ function D.UpdateSaveDB()
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_SerendipityStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		InfoD:ClearBindings()
-		InfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
-		InfoD:Execute()
-		InfoD:Reset()
+		local data = X.LoadLUAData(STAT_DATA_FILE) or {}
+		data[X.GetPlayerGUID()] = nil
+		X.SaveLUAData(STAT_DATA_FILE, data)
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_SerendipityStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
 end
-X.RegisterInit('MY_RoleStatistics_SerendipityUpdateSaveDB', function() INIT = true end)
-end
 
-function D.GetColumns()
-	local aCol = {}
-	for _, id in ipairs(O.aColumn) do
-		local col = COLUMN_DICT[id]
+function D.GetTableColumns()
+	local aColumn = {}
+	for _, szKey in ipairs(O.aColumn) do
+		local col = COLUMN_DICT[szKey]
 		if col then
-			table.insert(aCol, col)
+			table.insert(aColumn, col)
 		end
 	end
-	return aCol
+	local nLFixIndex, nLFixWidth = -1, 0
+	for nIndex, col in ipairs(aColumn) do
+		nLFixWidth = nLFixWidth + (col.nMinWidth or 100)
+		if nLFixWidth > 450 then
+			break
+		end
+		if col.szKey == 'name' then
+			nLFixIndex = nIndex
+			break
+		end
+	end
+	local nRFixIndex, nRFixWidth = math.huge, 0
+	for nIndex, col in X.ipairs_r(aColumn) do
+		if nIndex <= nLFixIndex then
+			break
+		end
+		nRFixWidth = nRFixWidth + (col.nMinWidth or 100)
+		if nRFixWidth > 300 then
+			break
+		end
+		if col.szKey == 'time' or col.szKey == 'time_days' then
+			nRFixIndex = nIndex
+		end
+	end
+	local aTableColumn = {}
+	for nIndex, col in ipairs(aColumn) do
+		local szFixed = nIndex <= nLFixIndex
+			and 'left'
+			or (nIndex >= nRFixIndex and 'right' or nil)
+		local c = {
+			key = col.szKey,
+			title = col.szTitle,
+			titleTip = col.szTitleTip
+				or col.GetTitleTip
+				or col.szTitle,
+			alignHorizontal = 'center',
+			render = col.GetFormatText,
+			sorter = col.Compare,
+			draggable = true,
+		}
+		if szFixed then
+			c.fixed = szFixed
+			c.width = col.nMinWidth or 100
+		else
+			c.minWidth = col.nMinWidth
+			c.maxWidth = col.nMaxWidth
+		end
+		table.insert(aTableColumn, c)
+	end
+	return aTableColumn
 end
 
 function D.UpdateUI(page)
-	local hCols = page:Lookup('Wnd_Total/WndScroll_SerendipityStat', 'Handle_SerendipityStatColumns')
-	hCols:Clear()
+	local ui = UI(page)
 
-	local aCol, nX, Sorter = D.GetColumns(), 0, nil
-	local nExtraWidth = EXCEL_WIDTH
-	for i, col in ipairs(aCol) do
-		nExtraWidth = nExtraWidth - col.nMinWidth
-	end
-	for i, col in ipairs(aCol) do
-		local hCol = hCols:AppendItemFromIni(SZ_INI, 'Handle_SerendipityStatColumn')
-		local txt = hCol:Lookup('Text_SerendipityStat_Title')
-		local imgAsc = hCol:Lookup('Image_SerendipityStat_Asc')
-		local imgDesc = hCol:Lookup('Image_SerendipityStat_Desc')
-		local nWidth = i == #aCol
-			and (EXCEL_WIDTH - nX)
-			or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
-		local nSortDelta = nWidth > 70 and 25 or 15
-		if i == 0 then
-			hCol:Lookup('Image_SerendipityStat_Break'):Hide()
+	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
+	local data = D.GetPlayerRecords()
+	local result = {}
+	for _, rec in pairs(data) do
+		if wstring.find(tostring(rec.account or ''), szSearch)
+		or wstring.find(tostring(rec.name or ''), szSearch)
+		or wstring.find(tostring(rec.region or ''), szSearch)
+		or wstring.find(tostring(rec.server or ''), szSearch) then
+			table.insert(result, rec)
 		end
-		hCol.col = col
-		hCol:SetRelX(nX)
-		hCol:SetW(nWidth)
-		txt:SetW(nWidth)
-		txt:SetText(col.szTitle)
-		imgAsc:SetRelX(nWidth - nSortDelta)
-		imgDesc:SetRelX(nWidth - nSortDelta)
-		if O.szSort == col.id then
-			Sorter = function(r1, r2)
-				if O.szSortOrder == 'asc' then
-					return col.Compare(r1, r2) < 0
-				end
-				return col.Compare(r1, r2) > 0
-			end
-		end
-		imgAsc:SetVisible(O.szSort == col.id and O.szSortOrder == 'asc')
-		imgDesc:SetVisible(O.szSort == col.id and O.szSortOrder == 'desc')
-		hCol:FormatAllItemPos()
-		nX = nX + nWidth
-	end
-	hCols:FormatAllItemPos()
-
-	local szSearch = page:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
-	local szUSearch = AnsiToUTF8('%' .. szSearch .. '%')
-	InfoR:ClearBindings()
-	InfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
-	local result = InfoR:GetAll()
-	InfoR:Reset()
-
-	for _, rec in ipairs(result) do
-		D.DecodeRow(rec)
 	end
 
-	if Sorter then
-		table.sort(result, Sorter)
-	end
-
-	local aCol = D.GetColumns()
-	local nExtraWidth = EXCEL_WIDTH
-	for i, col in ipairs(aCol) do
-		nExtraWidth = nExtraWidth - col.nMinWidth
-	end
-	local hList = page:Lookup('Wnd_Total/WndScroll_SerendipityStat', 'Handle_List')
-	hList:Clear()
-	for i, rec in ipairs(result) do
-		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
-		hRow.rec = rec
-		hRow:Lookup('Image_RowBg'):SetVisible(i % 2 == 1)
-		local nX = 0
-		for j, col in ipairs(aCol) do
-			local hItem = hRow:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
-			local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
-			hItemContent:AppendItemFromString(col.GetFormatText(rec))
-			hItemContent:SetW(99999)
-			hItemContent:FormatAllItemPos()
-			hItemContent:SetSizeByAllItemSize()
-			local nWidth = j == #aCol
-				and (EXCEL_WIDTH - nX)
-				or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
-			hItem:SetRelX(nX)
-			hItem:SetW(nWidth)
-			hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
-			hItem:FormatAllItemPos()
-			nX = nX + nWidth
-		end
-		hRow:FormatAllItemPos()
-	end
-	hList:FormatAllItemPos()
-end
-
-function D.EncodeRow(rec)
-	rec.guid = AnsiToUTF8(rec.guid)
-	rec.region = AnsiToUTF8(rec.region)
-	rec.server = AnsiToUTF8(rec.server)
-	rec.name = AnsiToUTF8(rec.name)
-	rec.serendipity_info = X.EncodeLUAData(rec.serendipity_info)
-	rec.item_count = X.EncodeLUAData(rec.item_count)
-end
-
-function D.DecodeRow(rec)
-	rec.guid   = UTF8ToAnsi(rec.guid)
-	rec.name   = UTF8ToAnsi(rec.name)
-	rec.region = UTF8ToAnsi(rec.region)
-	rec.server = UTF8ToAnsi(rec.server)
-	rec.serendipity_info = X.DecodeLUAData(rec.serendipity_info or '') or {}
-	rec.item_count = X.DecodeLUAData(rec.item_count or '') or {}
+	ui:Fetch('WndTable_Stat')
+		:Columns(D.GetTableColumns())
+		:DataSource(result)
 end
 
 function D.OutputRowTip(this, rec)
@@ -866,8 +874,7 @@ function D.OutputRowTip(this, rec)
 	local dwMapID = GetClientPlayer().GetMapID()
 	local tLuckPet = D.GetLuckyFellowPet()
 	for _, serendipity in ipairs(SERENDIPITY_LIST) do
-		local col = COLUMN_DICT[serendipity.nID]
-		local szText, r, g, b = col.GetText(rec)
+		local szText, r, g, b = GetSerendipityCounterText(serendipity, rec['serendipity_' .. serendipity.nID])
 		if not O.bTipHideFinished or szText ~= _L['Finished'] then
 			local hItem = hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Item')
 			local szName = serendipity.szName
@@ -943,12 +950,22 @@ end
 
 function D.OnInitPage()
 	local page = this
-	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_SerendipityStat')
-	local wnd = frameTemp:Lookup('Wnd_Total')
-	wnd:ChangeRelation(page, true, true)
-	Wnd.CloseWindow(frameTemp)
+	local ui = UI(page)
 
-	UI(wnd):Append('WndCheckBox', {
+	ui:Append('WndEditBox', {
+		name = 'WndEditBox_Search',
+		x = 20, y = 20, w = 300, h = 25,
+		appearance = 'SEARCH_RIGHT',
+		placeholder = _L['Press ENTER to search...'],
+		onSpecialKeyDown = function(_, szKey)
+			if szKey == 'Enter' then
+				D.UpdateUI(page)
+				return 1
+			end
+		end,
+	})
+
+	ui:Append('WndCheckBox', {
 		x = 380, y = 21, w = 160,
 		text = _L['Tip hide finished'],
 		checked = MY_RoleStatistics_SerendipityStat.bTipHideFinished,
@@ -958,7 +975,7 @@ function D.OnInitPage()
 		autoEnable = function() return MY_RoleStatistics_SerendipityStat.bFloatEntry end,
 	})
 
-	UI(wnd):Append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = 540, y = 21, w = 130,
 		text = _L['Map mark'],
 		checked = MY_RoleStatistics_SerendipityStat.bMapMark,
@@ -967,7 +984,7 @@ function D.OnInitPage()
 		end,
 	})
 
-	UI(wnd):Append('WndCheckBox', {
+	ui:Append('WndCheckBox', {
 		x = 670, y = 21, w = 130,
 		text = _L['Map mark hide acquired'],
 		checked = MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired,
@@ -977,110 +994,177 @@ function D.OnInitPage()
 		autoEnable = function() return MY_RoleStatistics_SerendipityStat.bMapMark end,
 	})
 
-	UI(wnd):Append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
-			local t, aColumn, tChecked, nMinW = {}, O.aColumn, {}, 0
-			-- 已添加的
-			for i, id in ipairs(aColumn) do
-				local col = COLUMN_DICT[id]
-				if col then
-					table.insert(t, {
-						szOption = col.szTitle,
-						{
-							szOption = _L['Move up'],
-							fnAction = function()
-								if i > 1 then
-									aColumn[i], aColumn[i - 1] = aColumn[i - 1], aColumn[i]
-									O.aColumn = aColumn
-									D.UpdateUI(page)
-								end
-								UI.ClosePopupMenu()
-							end,
-						},
-						{
-							szOption = _L['Move down'],
-							fnAction = function()
-								if i < #aColumn then
-									aColumn[i], aColumn[i + 1] = aColumn[i + 1], aColumn[i]
-									O.aColumn = aColumn
-									D.UpdateUI(page)
-								end
-								UI.ClosePopupMenu()
-							end,
-						},
-						{
-							szOption = _L['Delete'],
-							fnAction = function()
-								table.remove(aColumn, i)
-								O.aColumn = aColumn
-								D.UpdateUI(page)
-								UI.ClosePopupMenu()
-							end,
-						},
-					})
-					nMinW = nMinW + col.nMinWidth
+			local t = {}
+			local function UpdateMenu()
+				local aColumn, tChecked, nMinW = O.aColumn, {}, 0
+				for i = 1, #t do
+					t[i] = nil
 				end
-				tChecked[id] = true
-			end
-			-- 未添加的
-			local function fnAction(id, nWidth)
-				local bExist = false
-				for i, v in ipairs(aColumn) do
-					if v == id then
-						table.remove(aColumn, i)
-						O.aColumn = aColumn
-						bExist = true
-						break
-					end
-				end
-				if not bExist then
-					if nMinW + nWidth > EXCEL_WIDTH then
-						X.Alert(_L['Too many column selected, width overflow, please delete some!'])
-					else
-						table.insert(aColumn, id)
-						O.aColumn = aColumn
-					end
-				end
-				D.FlushDB()
-				D.UpdateUI(page)
-				UI.ClosePopupMenu()
-			end
-			-- 普通选项
-			for _, col in ipairs(COLUMN_LIST) do
-				if not tChecked[col.id] then
-					table.insert(t, {
-						szOption = col.szTitle,
-						fnAction = function()
-							fnAction(col.id, col.nMinWidth)
-						end,
-					})
-				end
-			end
-			-- 奇遇选项
-			local t1 = { szOption = _L['Serendipity'], nMaxHeight = 1000 }
-			for _, serendipity in ipairs(SERENDIPITY_LIST) do
-				if not tChecked[serendipity.nID] then
-					local col = COLUMN_DICT[serendipity.nID]
+				-- 已添加的
+				for nIndex, szKey in ipairs(aColumn) do
+					local col = COLUMN_DICT[szKey]
 					if col then
-						table.insert(t1, {
+						table.insert(t, {
 							szOption = col.szTitle,
-							bCheck = true, bChecked = tChecked[col.id],
 							fnAction = function()
-								fnAction(col.id, col.nMinWidth)
+								local nOffset = IsShiftKeyDown() and 1 or -1
+								if nIndex + nOffset < 1 or nIndex + nOffset > #O.aColumn then
+									return
+								end
+								local aColumn = O.aColumn
+								aColumn[nIndex], aColumn[nIndex + nOffset] = aColumn[nIndex + nOffset], aColumn[nIndex]
+								O.aColumn = aColumn
+								UpdateMenu()
+								D.UpdateUI(page)
 							end,
+							fnMouseEnter = function()
+								if #O.aColumn == 1 then
+									return
+								end
+								local szText = _L['Click to move up, Hold SHIFT to move down.']
+								if nIndex == 1 then
+									szText = _L['Hold SHIFT click to move down.']
+								elseif nIndex == #O.aColumn then
+									szText = _L['Click to move up.']
+								end
+								local nX, nY = this:GetAbsX(), this:GetAbsY()
+								local nW, nH = this:GetW(), this:GetH()
+								OutputTip(GetFormatText(szText, nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.LEFT_RIGHT)
+							end,
+							fnMouseLeave = function()
+								HideTip()
+							end,
+							{
+								szOption = _L['Move up'],
+								fnAction = function()
+									if nIndex > 1 then
+										aColumn[nIndex], aColumn[nIndex - 1] = aColumn[nIndex - 1], aColumn[nIndex]
+										O.aColumn = aColumn
+										UpdateMenu()
+										D.UpdateUI(page)
+									end
+								end,
+							},
+							{
+								szOption = _L['Move down'],
+								fnAction = function()
+									if nIndex < #aColumn then
+										aColumn[nIndex], aColumn[nIndex + 1] = aColumn[nIndex + 1], aColumn[nIndex]
+										O.aColumn = aColumn
+										UpdateMenu()
+										D.UpdateUI(page)
+									end
+								end,
+							},
+							CONSTANT.MENU_DIVIDER,
+							{
+								szOption = _L['Delete'],
+								fnAction = function()
+									table.remove(aColumn, nIndex)
+									O.aColumn = aColumn
+									UpdateMenu()
+									D.UpdateUI(page)
+								end,
+								rgb = { 255, 128, 128 },
+							},
 						})
+						nMinW = nMinW + col.nMinWidth
 					end
-					tChecked[serendipity.nID] = true
+					tChecked[szKey] = true
 				end
+				-- 未添加的
+				local function fnAction(szKey, nWidth)
+					local bExist = false
+					for i, v in ipairs(aColumn) do
+						if v == szKey then
+							table.remove(aColumn, i)
+							O.aColumn = aColumn
+							bExist = true
+							break
+						end
+					end
+					if not bExist then
+						table.insert(aColumn, szKey)
+						O.aColumn = aColumn
+					end
+					UpdateMenu()
+					D.FlushDB()
+					D.UpdateUI(page)
+				end
+				local t1 = { szOption = _L['Serendipity'], nMaxHeight = 1000 }
+				for _, col in ipairs(COLUMN_LIST) do
+					if col.bTable then
+						if col.szKey:find('serendipity_') == 1 then -- 奇遇选项
+							table.insert(t1, {
+								szOption = col.szTitle,
+								bCheck = true, bChecked = tChecked[col.szKey],
+								fnAction = function()
+									fnAction(col.szKey, col.nMinWidth)
+								end,
+							})
+						elseif not tChecked[col.szKey] then -- 普通选项
+							table.insert(t, {
+								szOption = col.szTitle,
+								bCheck = true, bChecked = tChecked[col.szKey],
+								fnAction = function()
+									fnAction(col.szKey, col.nMinWidth)
+								end,
+							})
+						end
+					end
+				end
+				table.insert(t, t1)
 			end
-			table.insert(t, t1)
+			UpdateMenu()
 			return t
 		end,
 	})
 
-	UI(wnd):Append('WndButton', {
+	ui:Append('WndTable', {
+		name = 'WndTable_Stat',
+		x = 20, y = 60, w = 960, h = 530,
+		sort = O.szSort,
+		sortOrder = O.szSortOrder,
+		onSortChange = function(szSort, szSortOrder)
+			O.szSort, O.szSortOrder = szSort, szSortOrder
+		end,
+		onRowHover = function(bIn, rec)
+			if bIn then
+				D.OutputRowTip(this, rec)
+			else
+				D.CloseRowTip()
+			end
+		end,
+		rowMenuRClick = function(rec, index)
+			local menu = {
+				{
+					szOption = _L['Delete'],
+					fnAction = function()
+						local data = X.LoadLUAData(STAT_DATA_FILE) or {}
+						data[rec.guid] = nil
+						X.SaveLUAData(STAT_DATA_FILE, data)
+						D.UpdateUI(page)
+					end,
+					rgb = { 255, 128, 128 },
+				},
+			}
+			PopupMenu(menu)
+		end,
+		onColumnsChange = function(aColumns)
+			local aKeys = {}
+			for _, col in ipairs(aColumns) do
+				table.insert(aKeys, col.key)
+			end
+			O.aColumn = aKeys
+			D.UpdateUI(page)
+		end,
+	})
+
+	ui:Append('WndButton', {
 		x = 440, y = 590, w = 120,
 		text = _L['Refresh'],
 		onClick = function()
@@ -1143,82 +1227,9 @@ function D.OnLButtonClick()
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
 		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
-			InfoD:ClearBindings()
-			InfoD:BindAll(AnsiToUTF8(wnd.guid))
-			InfoD:Reset()
 			D.UpdateUI(page)
 		end)
 	end
-end
-
-function D.OnItemLButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_SerendipityStatColumn' then
-		if this.col.id then
-			local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-			if O.szSort == this.col.id then
-				O.szSortOrder = O.szSortOrder == 'asc' and 'desc' or 'asc'
-			else
-				O.szSort = this.col.id
-			end
-			D.UpdateUI(page)
-		end
-	end
-end
-
-function D.OnItemRButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_Row' then
-		local rec = this.rec
-		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		local menu = {
-			{
-				szOption = _L['Delete'],
-				fnAction = function()
-					InfoD:ClearBindings()
-					InfoD:BindAll(AnsiToUTF8(rec.guid))
-					InfoD:Execute()
-					D.UpdateUI(page)
-				end,
-			},
-		}
-		PopupMenu(menu)
-	end
-end
-
-function D.OnEditSpecialKeyDown()
-	local name = this:GetName()
-	local szKey = GetKeyName(Station.GetMessageKey())
-	if szKey == 'Enter' then
-		if name == 'Edit_Search' then
-			local page = this:GetParent():GetParent():GetParent()
-			D.UpdateUI(page)
-		end
-		return 1
-	end
-end
-
-function D.OnItemMouseEnter()
-	local name = this:GetName()
-	if name == 'Handle_Row' then
-		D.OutputRowTip(this, this.rec)
-	elseif name == 'Handle_SerendipityStatColumn' then
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		local szXml = this.col.GetTitleFormatTip
-			and this.col.GetTitleFormatTip()
-			or GetFormatText(this:Lookup('Text_SerendipityStat_Title'):GetText(), 162, 255, 255, 255)
-		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
-	elseif this.tip then
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)
-	end
-end
-D.OnItemRefreshTip = D.OnItemMouseEnter
-
-function D.OnItemMouseLeave()
-	HideTip()
 end
 
 -------------------------------------------------------------------------------------------------------
@@ -1262,18 +1273,13 @@ function D.ApplyFloatEntry(bFloatEntry)
 		btn:Destroy()
 	end
 end
+
 function D.UpdateFloatEntry()
 	if not D.bReady then
 		return
 	end
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
-X.RegisterInit('MY_RoleStatistics_SerendipityEntry', function()
-	D.bReady = true
-	D.UpdateFloatEntry()
-end)
-X.RegisterReload('MY_RoleStatistics_SerendipityEntry', function() D.ApplyFloatEntry(false) end)
-X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_SerendipityEntry', D.UpdateFloatEntry)
 
 -------------------------------------------------------------------------------------------------------
 -- 地图标记
@@ -1284,17 +1290,15 @@ function D.OnMMMItemMouseEnter()
 		return
 	end
 	local mark = this.data
+	local serendipity = mark.nSerendipityID and SERENDIPITY_HASH[mark.nSerendipityID]
 	local aXml = {}
 	-- 名字
 	if mark.dwType and mark.dwID then
 		table.insert(aXml, GetFormatText(X.GetTemplateName(mark.dwType, mark.dwID) .. '\n', 162, 255, 255, 0))
 	end
 	-- 奇遇名称
-	if mark.nSerendipityID then
-		local serendipity = SERENDIPITY_HASH[mark.nSerendipityID]
-		if serendipity then
-			table.insert(aXml, GetFormatText(serendipity.szName .. _L[' - '], 162, 255, 255, 255))
-		end
+	if serendipity then
+		table.insert(aXml, GetFormatText(serendipity.szName .. _L[' - '], 162, 255, 255, 255))
 	end
 	-- 奇遇类型
 	if mark.szType == 'TRIGGER' then
@@ -1304,12 +1308,12 @@ function D.OnMMMItemMouseEnter()
 	end
 	-- 当前统计
 	local szState, r, g, b
-	if mark.nSerendipityID then
-		local col = COLUMN_DICT[mark.nSerendipityID]
+	if serendipity then
+		local col = COLUMN_DICT[serendipity.nID]
 		if col then
 			local rec = D.GetClientPlayerRec()
 			if rec then
-				szState, r, g, b = col.GetText(rec)
+				szState, r, g, b = GetSerendipityCounterText(serendipity, rec[serendipity.nID])
 			end
 		end
 	end
@@ -1420,7 +1424,6 @@ end
 function D.UnhookMiniMapMark()
 	X.BreatheCall('MY_RoleStatistics_SerendipityMiniMapMark', false)
 end
-X.RegisterReload('MY_RoleStatistics_SerendipityMiniMapMark', D.UnhookMiniMapMark)
 
 function D.HookMapMark()
 	D.UnhookMapMark()
@@ -1436,7 +1439,6 @@ function D.UnhookMapMark()
 	UnhookTableFunc(MiddleMap, 'ShowMap', D.DrawMapMark)
 	UnhookTableFunc(MiddleMap, 'UpdateCurrentMap', D.DrawMapMark)
 end
-X.RegisterReload('MY_RoleStatistics_SerendipityMapMark', D.UnhookMapMark)
 
 function D.CheckMapMark()
 	if D.bReady and O.bMapMark then
@@ -1448,15 +1450,46 @@ function D.CheckMapMark()
 		D.UnhookMiniMapMark()
 	end
 end
+
+--------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------
+
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_SerendipityStat', function()
 	D.bReady = true
 	D.CheckMapMark()
-	D.UpdateSaveDB()
-	D.FlushDB()
 	D.UpdateFloatEntry()
 end)
 
+X.RegisterInit('MY_RoleStatistics_SerendipityStat', function()
+	D.bReady = true
+	D.UpdateFloatEntry()
+end)
+
+X.RegisterExit('MY_RoleStatistics_SerendipityStat', function()
+	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
+end)
+
+X.RegisterReload('MY_RoleStatistics_SerendipityStat', function()
+	D.UnhookMiniMapMark()
+	D.UnhookMapMark()
+	D.ApplyFloatEntry(false)
+end)
+
+X.RegisterFlush('MY_RoleStatistics_SerendipityStat', function()
+	D.FlushDB()
+end)
+
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_SerendipityStat', function()
+	D.UpdateFloatEntry()
+end)
+
+--------------------------------------------------------
 -- Module exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_SerendipityStat',
@@ -1475,7 +1508,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('SerendipityStat', _L['MY_RoleStatistics_SerendipityStat'], X.CreateModule(settings))
 end
 
+--------------------------------------------------------
 -- Global exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_SerendipityStat',

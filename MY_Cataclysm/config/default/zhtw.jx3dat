@@ -45,6 +45,7 @@ return {
 	nTempTargetDelay       = 0,
 	fScaleX                = 1.1,
 	fScaleY                = 1.0,
+	nDrawInterval          = 4,
 	bFasterHP              = false,
 	bStaring               = false,
 	bShowBuffTime          = true,

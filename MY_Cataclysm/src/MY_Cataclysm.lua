@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -308,6 +308,12 @@ local O = X.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 		szLabel = _L['MY_Cataclysm'],
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.0,
+	},
+	nDrawInterval = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = X.Schema.Number,
+		xDefaultValue = 4,
 	},
 	bFasterHP = {
 		ePathType = X.PATH_TYPE.ROLE,

@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -669,7 +669,7 @@ function D.GetPlayer(dwID)
 		}
 	else
 		player = GetPlayer(dwID)
-		info = GetClientTeam().GetMemberInfo(dwID)
+		info = not ENVIRONMENT.RUNTIME_OPTIMIZE and GetClientTeam().GetMemberInfo(dwID)
 	end
 	if info then
 		if player then
@@ -1336,30 +1336,61 @@ end
 
 -- 保存玩家信息
 function D.SavePlayerInfo(data, dwID, bRefresh)
+	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		return
+	end
+	if not D.bRecEverything then
+		return
+	end
 	if (bRefresh or not data[DK.PLAYER_LIST][dwID]) and IsPlayer(dwID) then
 		local player, info = D.GetPlayer(dwID)
 		if player and info and not X.IsEmpty(info.dwMountKungfuID) then
-			local aEquip, nEquipScore = {}, player.GetTotalEquipScore()
-			for nEquipIndex, tEquipInfo in pairs(X.GetPlayerEquipInfo(player)) do
-				table.insert(aEquip, {
-					nEquipIndex,
-					tEquipInfo.dwTabType,
-					tEquipInfo.dwTabIndex,
-					tEquipInfo.nStrengthLevel,
-					tEquipInfo.aSlotItem,
-					tEquipInfo.dwPermanentEnchantID,
-					tEquipInfo.dwTemporaryEnchantID,
-					tEquipInfo.dwTemporaryEnchantLeftSeconds,
-				})
-			end
-			if not X.IsEmpty(aEquip) and not X.IsEmpty(nEquipScore) then
+			local tPlayerList = data[DK.PLAYER_LIST]
+			tPlayerList[dwID] = {}
+			local nEquipScore, aEquip, aTalent
+			local function OnGet()
+				if not nEquipScore or not aEquip or not aTalent then
+					return
+				end
 				local aInfo = {
 					info.dwMountKungfuID,
-					player.GetTotalEquipScore(),
+					nEquipScore,
 					aEquip,
+					aTalent,
 				}
-				data[DK.PLAYER_LIST][dwID] = aInfo
+				tPlayerList[dwID] = aInfo
 			end
+			X.GetPlayerEquipScore(dwID, function(nScore)
+				nEquipScore = nScore
+				OnGet()
+			end)
+			X.GetPlayerEquipInfo(dwID, function(tEquip)
+				aEquip = {}
+				for nEquipIndex, tEquipInfo in pairs(tEquip) do
+					table.insert(aEquip, {
+						nEquipIndex,
+						tEquipInfo.dwTabType,
+						tEquipInfo.dwTabIndex,
+						tEquipInfo.nStrengthLevel,
+						tEquipInfo.aSlotItem,
+						tEquipInfo.dwPermanentEnchantID,
+						tEquipInfo.dwTemporaryEnchantID,
+						tEquipInfo.dwTemporaryEnchantLeftSeconds,
+					})
+				end
+				OnGet()
+			end)
+			X.GetPlayerTalentInfo(dwID, function(a)
+				aTalent = {}
+				for i, p in ipairs(a) do
+					aTalent[i] = {
+						p.nIndex,
+						p.dwSkillID,
+						p.dwSkillLevel,
+					}
+				end
+				OnGet()
+			end)
 		end
 	end
 end

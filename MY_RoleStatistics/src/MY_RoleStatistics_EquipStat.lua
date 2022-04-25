@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_EquipStat'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -222,10 +222,6 @@ local D = {
 	dwCurrentSuitIndex = 1,
 }
 
-function D.GetPlayerGUID(me)
-	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
-end
-
 local function GetEquipRecipeDesc(Value1, Value2)
 	local szText = ''
 	local EquipmentRecipe = X.GetGameTable('EquipmentRecipe', true)
@@ -349,7 +345,7 @@ function D.FlushDB()
 	--[[#DEBUG END]]
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
-	local ownerkey = AnsiToUTF8(D.GetPlayerGUID(me))
+	local ownerkey = AnsiToUTF8(X.GetPlayerGUID())
 	local ownername = AnsiToUTF8(me.szName)
 	local servername = AnsiToUTF8(X.GetRealServer(2))
 	local rec = REC_CACHE
@@ -455,11 +451,9 @@ function D.FlushDB()
 	X.Debug('MY_RoleStatistics_EquipStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 end
-X.RegisterFlush('MY_RoleStatistics_EquipStat', D.FlushDB)
 
-do local INIT = false
 function D.UpdateSaveDB()
-	if not INIT then
+	if not D.bReady then
 		return
 	end
 	local me = GetClientPlayer()
@@ -470,7 +464,7 @@ function D.UpdateSaveDB()
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_EquipStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		local guid = AnsiToUTF8(D.GetPlayerGUID(me))
+		local guid = AnsiToUTF8(X.GetPlayerGUID())
 		DB_ItemsDA:ClearBindings()
 		DB_ItemsDA:BindAll(guid)
 		DB_ItemsDA:Execute()
@@ -484,8 +478,6 @@ function D.UpdateSaveDB()
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_EQUIP_UPDATE')
-end
-X.RegisterInit('MY_RoleStatistics_EquipUpdateSaveDB', function() INIT = true end)
 end
 
 function D.UpdateNames(page)
@@ -901,20 +893,37 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
+--------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------
+
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_EquipStat', function()
 	D.bReady = true
-	D.UpdateSaveDB()
-	D.FlushDB()
 	D.UpdateFloatEntry()
 end)
-X.RegisterReload('MY_RoleStatistics_EquipStat', function() D.ApplyFloatEntry(false) end)
-X.RegisterFrameCreate('CharacterPanel', 'MY_RoleStatistics_EquipStat', D.UpdateFloatEntry)
 
--- function D.OnMouseLeave()
--- 	HideTip()
--- end
+X.RegisterFlush('MY_RoleStatistics_EquipStat', function()
+	D.FlushDB()
+end)
 
+X.RegisterExit('MY_RoleStatistics_EquipStat', function()
+	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
+end)
+
+X.RegisterReload('MY_RoleStatistics_EquipStat', function()
+	D.ApplyFloatEntry(false)
+end)
+
+X.RegisterFrameCreate('CharacterPanel', 'MY_RoleStatistics_EquipStat', function()
+	D.UpdateFloatEntry()
+end)
+
+--------------------------------------------------------
 -- Module exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_EquipStat',
@@ -933,7 +942,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('EquipStat', _L['MY_RoleStatistics_EquipStat'], X.CreateModule(settings))
 end
 
+--------------------------------------------------------
 -- Global exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_EquipStat',

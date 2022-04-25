@@ -1,11 +1,11 @@
---------------------------------------------
--- @Desc  : ÁÄÌì¸¨Öú
--- @Author: ÜøÒÁ @tinymins
--- @Date  : 2016-02-5 11:35:53
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-12-29 14:24:10
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : ÁÄÌì¸¨Öú
+-- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatBlock'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 --------------------------------------------------------------------------

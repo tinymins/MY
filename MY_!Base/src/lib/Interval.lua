@@ -74,12 +74,12 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 			assert(X.IsString(szKey), 'IntervalCall Key MUST be string.')
 			local szNSKey = NS_PREFIX .. szKey
 			local aRetVal = bUnreg
-				and {IntervalCall(szNSKey, false)}
-				or {IntervalCall(szNSKey, nInterval, fnAction, oArg)}
+				and X.Pack(IntervalCall(szNSKey, false))
+				or X.Pack(IntervalCall(szNSKey, nInterval, fnAction, oArg))
 			if X.IsString(aRetVal[1]) then
 				aRetVal[1] = szKey
 			end
-			return unpack(aRetVal)
+			return X.Unpack(aRetVal)
 		end
 	end
 	X.DelayCall   = WrapIntervalCall('DelayCall'  , DelayCall  )

@@ -54,7 +54,7 @@ function X.FormatPath(oFilePath, tParams)
 	end
 	local szFilePath, ePathType
 	if type(oFilePath) == 'table' then
-		szFilePath, ePathType = unpack(oFilePath)
+		szFilePath, ePathType = X.Unpack(oFilePath)
 	else
 		szFilePath, ePathType = oFilePath, X.PATH_TYPE.NORMAL
 	end
@@ -226,7 +226,7 @@ local function GetPassphrase(nSeed, nLen)
 	for i = 1, nLen do
 		table.insert(a, ((i + nSeed) % 256 * (2 * i + nSeed) % 32) % c + b)
 	end
-	return string.char(unpack(a))
+	return string.char(X.Unpack(a))
 end
 local szDataRoot = StringLowerW(X.FormatPath({'', X.PATH_TYPE.DATA}))
 local szPassphrase = GetPassphrase(666, 233)
@@ -383,7 +383,7 @@ local function GetLUADataHash(data, fnAction)
 	local function __call__(...)
 		table.insert(__stack__, {
 			continuation = '0',
-			arguments = {...},
+			arguments = X.Pack(...),
 			state = {},
 			context = {},
 		})
@@ -391,7 +391,7 @@ local function GetLUADataHash(data, fnAction)
 
 	local function __return__(...)
 		__exit_context__()
-		__retvals__ = {...}
+		__retvals__ = X.Pack(...)
 	end
 
 	__call__(data)
@@ -432,8 +432,8 @@ local function GetLUADataHash(data, fnAction)
 					current.continuation = '1.2'
 				end
 			elseif continuation == '1.2' then
-				__return__(unpack(__retvals__))
-				__return__(unpack(__retvals__))
+				__return__(X.Unpack(__retvals__))
+				__return__(X.Unpack(__retvals__))
 			elseif continuation == '2' then
 				__call__(context.k)
 				current.continuation = '2.1'
@@ -453,7 +453,7 @@ local function GetLUADataHash(data, fnAction)
 		end
 
 		X.BreatheCall(timer, false)
-		X.SafeCall(fnAction, unpack(__retvals__))
+		X.SafeCall(fnAction, X.Unpack(__retvals__))
 	end)
 end
 X.GetLUADataHash = GetLUADataHash
@@ -1300,7 +1300,7 @@ function X.SetRemoteStorage(szKey, ...)
 		local nOffset = nBitPos % BIT_NUMBER + 1
 		aByte[nIndex][nOffset] = aBit[nBitPos - st.nBitPos + 1]
 	end
-	SetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen, unpack(lodash.map(aByte, Bit2Byte)))
+	SetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen, X.Unpack(lodash.map(aByte, Bit2Byte)))
 
 	OnRemoteStorageChange(szKey)
 end
@@ -1407,12 +1407,12 @@ local function DuplicateDatabase(DB_SRC, DB_DST, szCaption)
 		DB_DST:Execute('BEGIN TRANSACTION')
 		for i = 0, nCount / nPageSize do
 			for _, rec in ipairs(DB_SRC:Execute('SELECT ' .. szColumns .. ' FROM ' .. szTableName .. ' LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
-				local aVals = {}
+				local aValues = { n = #aColumns }
 				for i, szKey in ipairs(aColumns) do
-					aVals[i] = rec[szKey]
+					aValues[i] = rec[szKey]
 				end
 				DB_W:ClearBindings()
-				DB_W:BindAll(unpack(aVals))
+				DB_W:BindAll(X.Unpack(aValues))
 				DB_W:Execute()
 			end
 		end

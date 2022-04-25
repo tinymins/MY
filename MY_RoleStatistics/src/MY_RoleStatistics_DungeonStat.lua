@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_DungeonStat'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0 ') then
 	return
 end
 --------------------------------------------------------------------------
@@ -32,7 +32,6 @@ local DB = X.SQLiteConnect(_L['MY_RoleStatistics_DungeonStat'], {'userdata/role_
 if not DB then
 	return X.Sysmsg(_L['MY_RoleStatistics_DungeonStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
 end
-local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_DungeonStat.ini'
 
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS DungeonInfo (
@@ -117,8 +116,7 @@ local D = {
 	aMapProgressRequestQueue = {}, -- 单首领 CD 获取队列 （一次获取太多可能会被踢）
 }
 
-local EXCEL_WIDTH = 960
-local DUNGEON_MIN_WIDTH = 80
+local DUNGEON_MIN_WIDTH = 100
 local function GeneCommonFormatText(id)
 	return function(r)
 		return GetFormatText(r[id], 162, 255, 255, 255)
@@ -254,17 +252,17 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			}
 		end
 	elseif wstring.find(id, 'dungeon_') then
-		local id, via = wstring.gsub(id, 'dungeon_', ''), ''
-		if wstring.find(id, '@') then
-			local ids = X.SplitString(id, '@')
-			id, via = tonumber(ids[1]), ids[2]
+		local mapid, via = wstring.gsub(id, 'dungeon_', ''), ''
+		if wstring.find(mapid, '@') then
+			local ids = X.SplitString(mapid, '@')
+			mapid, via = tonumber(ids[1]), ids[2]
 		else
-			id = tonumber(id)
+			mapid = tonumber(mapid)
 		end
-		local map = id and X.GetMapInfo(id)
+		local map = mapid and X.GetMapInfo(mapid)
 		if map then
 			local col = { -- 秘境CD
-				id = 'dungeon_' .. id,
+				id = id,
 				szTitle = map.szName,
 				nMinWidth = DUNGEON_MIN_WIDTH,
 			}
@@ -286,9 +284,16 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					if IsCtrlKeyDown() and aCopyID then
 						table.insert(aXml, GetFormatText(table.concat(aCopyID, ',') .. ' '))
 					end
+					local szBossKill = ''
+					for _, bKill in ipairs(aBossKill) do
+						if szBossKill ~= '' then
+							szBossKill = szBossKill .. ','
+						end
+						szBossKill = szBossKill .. (bKill and '1' or '0')
+					end
 					for _, bKill in ipairs(aBossKill) do
 						table.insert(aXml, '<image>path="' .. PLUGIN_ROOT .. '/img/MY_RoleStatistics.UITex" name="Image_ProgressBoss" eventid=786 frame='
-							.. (bKill and 1 or 0) .. ' w=12 h=12 script="this.mapid=' .. map.dwID .. '"</image>')
+							.. (bKill and 1 or 0) .. ' w=12 h=12 script="this.mapid=' .. map.dwID .. ';this.progress_info=\'' .. szBossKill .. '\'"</image>')
 					end
 					return table.concat(aXml)
 				end
@@ -385,10 +390,6 @@ local TIP_COLUMN = {
 	'time_days',
 }
 
-function D.GetPlayerGUID(me)
-	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
-end
-
 do
 local REC_CACHE
 function D.GetClientPlayerRec(bForceUpdate)
@@ -397,7 +398,7 @@ function D.GetClientPlayerRec(bForceUpdate)
 		return
 	end
 	local rec = REC_CACHE
-	local guid = D.GetPlayerGUID(me)
+	local guid = X.GetPlayerGUID()
 	if not rec then
 		rec = {}
 		REC_CACHE = rec
@@ -520,7 +521,7 @@ function D.InitDB()
 	local me = GetClientPlayer()
 	if me then
 		DB_DungeonInfoG:ClearBindings()
-		DB_DungeonInfoG:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
+		DB_DungeonInfoG:BindAll(AnsiToUTF8(X.GetPlayerGUID()))
 		local result = DB_DungeonInfoG:GetAll()
 		DB_DungeonInfoG:Reset()
 		local rec = result[1]
@@ -531,7 +532,6 @@ function D.InitDB()
 		end
 	end
 end
-X.RegisterInit('MY_RoleStatistics_DungeonStat', D.InitDB)
 
 function D.UpdateSaveDB()
 	if not D.bReady then
@@ -546,7 +546,7 @@ function D.UpdateSaveDB()
 		X.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB_DungeonInfoD:ClearBindings()
-		DB_DungeonInfoD:BindAll(AnsiToUTF8(D.GetPlayerGUID(me)))
+		DB_DungeonInfoD:BindAll(AnsiToUTF8(X.GetPlayerGUID()))
 		DB_DungeonInfoD:Execute()
 		DB_DungeonInfoD:Reset()
 		--[[#DEBUG BEGIN]]
@@ -583,52 +583,70 @@ function D.GetColumns()
 	return aCol
 end
 
-function D.UpdateUI(page)
-	local hCols = page:Lookup('Wnd_Total/WndScroll_DungeonStat', 'Handle_DungeonStatColumns')
-	hCols:Clear()
-
-	local aCol, nX, Sorter = D.GetColumns(), 0, nil
-	local nExtraWidth = EXCEL_WIDTH
-	for i, col in ipairs(aCol) do
-		nExtraWidth = nExtraWidth - col.nMinWidth
-	end
-	for i, col in ipairs(aCol) do
-		local hCol = hCols:AppendItemFromIni(SZ_INI, 'Handle_DungeonStatColumn')
-		local txt = hCol:Lookup('Text_DungeonStat_Title')
-		local imgAsc = hCol:Lookup('Image_DungeonStat_Asc')
-		local imgDesc = hCol:Lookup('Image_DungeonStat_Desc')
-		local nWidth = i == #aCol
-			and (EXCEL_WIDTH - nX)
-			or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
-		local nSortDelta = nWidth > 70 and 25 or 15
-		if i == 0 then
-			hCol:Lookup('Image_DungeonStat_Break'):Hide()
+function D.GetTableColumns()
+	local aColumn = D.GetColumns()
+	local nLFixIndex, nLFixWidth = -1, 0
+	for nIndex, col in ipairs(aColumn) do
+		nLFixWidth = nLFixWidth + (col.nMinWidth or 100)
+		if nLFixWidth > 450 then
+			break
 		end
-		hCol.szSort = col.id
-		hCol.szTip = col.szTitleTip
-		hCol.szDebugTip = 'id: ' .. col.id
-		hCol:SetRelX(nX)
-		hCol:SetW(nWidth)
-		txt:SetW(nWidth)
-		txt:SetText(col.szTitle)
-		imgAsc:SetRelX(nWidth - nSortDelta)
-		imgDesc:SetRelX(nWidth - nSortDelta)
-		if O.szSort == col.id then
-			Sorter = function(r1, r2)
-				if O.szSortOrder == 'asc' then
-					return col.Compare(r1, r2) < 0
+		if col.id == 'name' then
+			nLFixIndex = nIndex
+			break
+		end
+	end
+	local nRFixIndex, nRFixWidth = math.huge, 0
+	for nIndex, col in X.ipairs_r(aColumn) do
+		if nIndex <= nLFixIndex then
+			break
+		end
+		nRFixWidth = nRFixWidth + (col.nMinWidth or 100)
+		if nRFixWidth > 300 then
+			break
+		end
+		if col.id == 'time' or col.id == 'time_days' then
+			nRFixIndex = nIndex
+		end
+	end
+	local aTableColumn = {}
+	for nIndex, col in ipairs(aColumn) do
+		local szFixed = nIndex <= nLFixIndex
+			and 'left'
+			or (nIndex >= nRFixIndex and 'right' or nil)
+		local c = {
+			key = col.id,
+			title = col.szTitle,
+			titleTip = col.szTitleTip or col.szTitle,
+			alignHorizontal = 'center',
+			render = col.GetFormatText
+				and function(value, record, index)
+					return col.GetFormatText(record)
 				end
-				return col.Compare(r1, r2) > 0
-			end
+				or nil,
+			sorter = col.Compare
+				and function(v1, v2, r1, r2)
+					return col.Compare(r1, r2)
+				end
+				or nil,
+			draggable = not col.id:find('@') or not aColumn[nIndex - 1] or aColumn[nIndex - 1].id:gsub('.+@', '') ~= col.id:gsub('.+@', ''),
+		}
+		if szFixed then
+			c.fixed = szFixed
+			c.width = col.nMinWidth or 100
+		else
+			c.minWidth = col.nMinWidth
+			c.maxWidth = col.nMaxWidth
 		end
-		imgAsc:SetVisible(O.szSort == col.id and O.szSortOrder == 'asc')
-		imgDesc:SetVisible(O.szSort == col.id and O.szSortOrder == 'desc')
-		hCol:FormatAllItemPos()
-		nX = nX + nWidth
+		table.insert(aTableColumn, c)
 	end
-	hCols:FormatAllItemPos()
+	return aTableColumn
+end
 
-	local szSearch = page:Lookup('Wnd_Total/Wnd_Search/Edit_Search'):GetText()
+function D.UpdateUI(page)
+	local ui = UI(page)
+
+	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
 	local szUSearch = AnsiToUTF8('%' .. szSearch .. '%')
 	DB_DungeonInfoR:ClearBindings()
 	DB_DungeonInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
@@ -639,40 +657,9 @@ function D.UpdateUI(page)
 		D.DecodeRow(rec)
 	end
 
-	if Sorter then
-		table.sort(result, Sorter)
-	end
-
-	local aCol = D.GetColumns()
-	local hList = page:Lookup('Wnd_Total/WndScroll_DungeonStat', 'Handle_List')
-	hList:Clear()
-	for i, rec in ipairs(result) do
-		local hRow = hList:AppendItemFromIni(SZ_INI, 'Handle_Row')
-		hRow.rec = rec
-		hRow:Lookup('Image_RowBg'):SetVisible(i % 2 == 1)
-		local nX = 0
-		for j, col in ipairs(aCol) do
-			local hItem = hRow:AppendItemFromIni(SZ_INI, 'Handle_Item') -- 外部居中层
-			local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
-			hItemContent:AppendItemFromString(col.GetFormatText(rec))
-			hItemContent:SetW(99999)
-			hItemContent:FormatAllItemPos()
-			hItemContent:SetSizeByAllItemSize()
-			local nWidth = j == #aCol
-				and (EXCEL_WIDTH - nX)
-				or math.min(nExtraWidth * col.nMinWidth / (EXCEL_WIDTH - nExtraWidth) + col.nMinWidth, col.nMaxWidth or math.huge)
-			if j == #aCol then
-				nWidth = EXCEL_WIDTH - nX
-			end
-			hItem:SetRelX(nX)
-			hItem:SetW(nWidth)
-			hItemContent:SetRelPos((nWidth - hItemContent:GetW()) / 2, (hItem:GetH() - hItemContent:GetH()) / 2)
-			hItem:FormatAllItemPos()
-			nX = nX + nWidth
-		end
-		hRow:FormatAllItemPos()
-	end
-	hList:FormatAllItemPos()
+	ui:Fetch('WndTable_Stat')
+		:Columns(D.GetTableColumns())
+		:DataSource(result)
 end
 
 function D.UpdateMapProgress(bForceUpdate)
@@ -776,9 +763,8 @@ function D.GetDungeonRecTipInfo(rec, dwMapID)
 	end
 end
 
-function D.OutputRowTip(this, rec)
+function D.GetRowTip(rec, bFloat)
 	local aXml = {}
-	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
 	for _, id in ipairs(TIP_COLUMN) do
 		if id == 'DUNGEON' then
 			local aMapID = {}
@@ -823,10 +809,15 @@ function D.OutputRowTip(this, rec)
 			end
 		end
 	end
+	return table.concat(aXml)
+end
+
+function D.OutputRowTip(this, rec)
+	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	local nPosType = bFloat and UI.TIP_POSITION.TOP_BOTTOM or UI.TIP_POSITION.RIGHT_LEFT
-	OutputTip(table.concat(aXml), 450, {x, y, w, h}, nPosType)
+	OutputTip(D.GetRowTip(rec, bFloat), 450, {x, y, w, h}, nPosType)
 end
 
 function D.CloseRowTip()
@@ -835,124 +826,225 @@ end
 
 function D.OnInitPage()
 	local page = this
-	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_DungeonStat')
-	local wnd = frameTemp:Lookup('Wnd_Total')
-	wnd:ChangeRelation(page, true, true)
-	Wnd.CloseWindow(frameTemp)
+	local ui = UI(page)
 
-	UI(wnd):Append('WndComboBox', {
+	ui:Append('WndEditBox', {
+		name = 'WndEditBox_Search',
+		x = 20, y = 20, w = 388, h = 25,
+		appearance = 'SEARCH_RIGHT',
+		placeholder = _L['Press ENTER to search...'],
+		onSpecialKeyDown = function(_, szKey)
+			if szKey == 'Enter' then
+				D.UpdateUI(page)
+				return 1
+			end
+		end,
+	})
+
+	ui:Append('WndComboBox', {
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
-			local t, aColumn, tChecked, nMinW = {}, O.aColumn, {}, 0
-			-- 已添加的
-			for i, id in ipairs(aColumn) do
-				local col = COLUMN_DICT[id]
-				if col then
-					table.insert(t, {
-						szOption = col.szTitle,
-						{
-							szOption = _L['Move up'],
+			local t = {}
+			local function UpdateMenu()
+				local aColumn, tChecked, nMinW = O.aColumn, {}, 0
+				for i = 1, #t do
+					t[i] = nil
+				end
+				-- 已添加的
+				for nIndex, id in ipairs(aColumn) do
+					local col = COLUMN_DICT[id]
+					if col then
+						table.insert(t, {
+							szOption = col.szTitle,
 							fnAction = function()
-								if i > 1 then
-									aColumn[i], aColumn[i - 1] = aColumn[i - 1], aColumn[i]
-									O.aColumn = aColumn
-									D.UpdateUI(page)
+								local nOffset = IsShiftKeyDown() and 1 or -1
+								if nIndex + nOffset < 1 or nIndex + nOffset > #O.aColumn then
+									return
 								end
-								UI.ClosePopupMenu()
-							end,
-						},
-						{
-							szOption = _L['Move down'],
-							fnAction = function()
-								if i < #aColumn then
-									aColumn[i], aColumn[i + 1] = aColumn[i + 1], aColumn[i]
-									O.aColumn = aColumn
-									D.UpdateUI(page)
-								end
-								UI.ClosePopupMenu()
-							end,
-						},
-						{
-							szOption = _L['Delete'],
-							fnAction = function()
-								table.remove(aColumn, i)
+								local aColumn = O.aColumn
+								aColumn[nIndex], aColumn[nIndex + nOffset] = aColumn[nIndex + nOffset], aColumn[nIndex]
 								O.aColumn = aColumn
+								UpdateMenu()
 								D.UpdateUI(page)
-								UI.ClosePopupMenu()
 							end,
-						},
-					})
-					nMinW = nMinW + col.nMinWidth
-				end
-				tChecked[id] = true
-			end
-			-- 未添加的
-			local function fnAction(id, nWidth)
-				local bExist = false
-				for i, v in ipairs(aColumn) do
-					if v == id then
-						table.remove(aColumn, i)
-						O.aColumn = aColumn
-						bExist = true
-						break
+							fnMouseEnter = function()
+								if #O.aColumn == 1 then
+									return
+								end
+								local szText = _L['Click to move up, Hold SHIFT to move down.']
+								if nIndex == 1 then
+									szText = _L['Hold SHIFT click to move down.']
+								elseif nIndex == #O.aColumn then
+									szText = _L['Click to move up.']
+								end
+								local nX, nY = this:GetAbsX(), this:GetAbsY()
+								local nW, nH = this:GetW(), this:GetH()
+								OutputTip(GetFormatText(szText, nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.LEFT_RIGHT)
+							end,
+							fnMouseLeave = function()
+								HideTip()
+							end,
+							{
+								szOption = _L['Move up'],
+								fnAction = function()
+									if nIndex > 1 then
+										aColumn[nIndex], aColumn[nIndex - 1] = aColumn[nIndex - 1], aColumn[nIndex]
+										O.aColumn = aColumn
+										UpdateMenu()
+										D.UpdateUI(page)
+									end
+								end,
+							},
+							{
+								szOption = _L['Move down'],
+								fnAction = function()
+									if nIndex < #aColumn then
+										aColumn[nIndex], aColumn[nIndex + 1] = aColumn[nIndex + 1], aColumn[nIndex]
+										O.aColumn = aColumn
+										UpdateMenu()
+										D.UpdateUI(page)
+									end
+								end,
+							},
+							CONSTANT.MENU_DIVIDER,
+							{
+								szOption = _L['Delete'],
+								fnAction = function()
+									table.remove(aColumn, nIndex)
+									O.aColumn = aColumn
+									UpdateMenu()
+									D.UpdateUI(page)
+								end,
+								rgb = { 255, 128, 128 },
+							},
+						})
+						nMinW = nMinW + col.nMinWidth
 					end
+					tChecked[id] = true
 				end
-				if not bExist then
-					if nMinW + nWidth > EXCEL_WIDTH then
-						X.Alert(_L['Too many column selected, width overflow, please delete some!'])
-					else
+				-- 未添加的
+				local function fnAction(id, nWidth)
+					local bExist = false
+					for i, v in ipairs(aColumn) do
+						if v == id then
+							table.remove(aColumn, i)
+							O.aColumn = aColumn
+							bExist = true
+							break
+						end
+					end
+					if not bExist then
 						table.insert(aColumn, id)
 						O.aColumn = aColumn
 					end
+					UpdateMenu()
+					D.FlushDB(true)
+					D.UpdateUI(page)
 				end
-				D.FlushDB(true)
-				D.UpdateUI(page)
-				UI.ClosePopupMenu()
-			end
-			-- 普通选项
-			for _, col in ipairs(COLUMN_LIST) do
-				if not tChecked[col.id] then
-					table.insert(t, {
-						szOption = col.szTitle,
-						fnAction = function()
-							fnAction(col.id, col.nMinWidth)
-						end,
-					})
+				-- 普通选项
+				for _, col in ipairs(COLUMN_LIST) do
+					if not tChecked[col.id] then
+						table.insert(t, {
+							szOption = col.szTitle,
+							fnAction = function()
+								fnAction(col.id, col.nMinWidth)
+							end,
+						})
+					end
 				end
-			end
-			-- 秘境选项
-			local tDungeonChecked = {}
-			for _, id in ipairs(aColumn) do
-				local szID = wstring.find(id, 'dungeon_') and wstring.gsub(id, 'dungeon_', '')
-				local dwID = szID and tonumber(szID)
-				if dwID then
-					tDungeonChecked[dwID] = true
+				-- 秘境选项
+				local tDungeonChecked = {}
+				for _, id in ipairs(aColumn) do
+					local szID = wstring.find(id, 'dungeon_') and wstring.gsub(id, 'dungeon_', '')
+					local dwID = szID and tonumber(szID)
+					if dwID then
+						tDungeonChecked[dwID] = true
+					end
 				end
-			end
-			local tDungeonMenu = X.GetDungeonMenu(function(info)
-				fnAction('dungeon_' .. info.dwID, DUNGEON_MIN_WIDTH)
-			end, nil, tDungeonChecked)
-			-- 动态活动秘境选项
-			for _, szType in ipairs({
-				'week_team_dungeon',
-				'week_raid_dungeon',
-			}) do
-				local col = COLUMN_DICT[szType]
-				if col then
-					table.insert(tDungeonMenu, {
-						szOption = col.szTitle,
-						bCheck = true, bChecked = tChecked[col.id],
-						fnAction = function()
-							fnAction(col.id, col.nMinWidth)
-						end,
-					})
+				local tDungeonMenu = X.GetDungeonMenu(function(info)
+					fnAction('dungeon_' .. info.dwID, DUNGEON_MIN_WIDTH)
+				end, nil, tDungeonChecked)
+				-- 动态活动秘境选项
+				for _, szType in ipairs({
+					'week_team_dungeon',
+					'week_raid_dungeon',
+				}) do
+					local col = COLUMN_DICT[szType]
+					if col then
+						table.insert(tDungeonMenu, {
+							szOption = col.szTitle,
+							bCheck = true, bChecked = tChecked[col.id],
+							fnAction = function()
+								fnAction(col.id, col.nMinWidth)
+							end,
+						})
+					end
 				end
+				-- 子菜单标题
+				tDungeonMenu.szOption = _L['Dungeon copy']
+				table.insert(t, tDungeonMenu)
 			end
-			-- 子菜单标题
-			tDungeonMenu.szOption = _L['Dungeon copy']
-			table.insert(t, tDungeonMenu)
+			UpdateMenu()
 			return t
+		end,
+	})
+
+	ui:Append('WndTable', {
+		name = 'WndTable_Stat',
+		x = 20, y = 60, w = 960, h = 530,
+		sort = O.szSort,
+		sortOrder = O.szSortOrder,
+		onSortChange = function(szSort, szSortOrder)
+			O.szSort, O.szSortOrder = szSort, szSortOrder
+		end,
+		rowTip = {
+			render = function(rec)
+				return D.GetRowTip(rec, false), true
+			end,
+			position = UI.TIP_POSITION.RIGHT_LEFT,
+		},
+		rowMenuRClick = function(rec, index)
+			local menu = {
+				{
+					szOption = _L['Delete'],
+					fnAction = function()
+						DB_DungeonInfoD:ClearBindings()
+						DB_DungeonInfoD:BindAll(AnsiToUTF8(rec.guid))
+						DB_DungeonInfoD:Execute()
+						DB_DungeonInfoD:Reset()
+						D.UpdateUI(page)
+					end,
+					rgb = { 255, 128, 128 },
+				},
+			}
+			PopupMenu(menu)
+		end,
+		onColumnsChange = function(aColumns)
+			local tAccKeys, tAccKeySuffix = {}, {}
+			for _, col in ipairs(D.GetTableColumns()) do
+				if col.key:find('@') then
+					local szSuffix = col.key:gsub('.+@', '')
+					if not tAccKeySuffix[szSuffix] then
+						tAccKeys[col.key] = true
+						tAccKeySuffix[szSuffix] = true
+					end
+				else
+					tAccKeys[col.key] = true
+				end
+			end
+			local aKeys, tKeys = {}, {}
+			for _, col in ipairs(aColumns) do
+				if tAccKeys[col.key] then
+					local szKey = col.key:gsub('.+@', '')
+					if not tKeys[szKey] then
+						table.insert(aKeys, szKey)
+						tKeys[szKey] = true
+					end
+				end
+			end
+			O.aColumn = aKeys
+			D.UpdateUI(page)
 		end,
 	})
 
@@ -1024,59 +1116,9 @@ function D.OnLButtonClick()
 	end
 end
 
-function D.OnItemLButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_DungeonStatColumn' then
-		if this.szSort then
-			local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-			if O.szSort == this.szSort then
-				O.szSortOrder = O.szSortOrder == 'asc' and 'desc' or 'asc'
-			else
-				O.szSort = this.szSort
-			end
-			D.UpdateUI(page)
-		end
-	end
-end
-
-function D.OnItemRButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_Row' then
-		local rec = this.rec
-		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		local menu = {
-			{
-				szOption = _L['Delete'],
-				fnAction = function()
-					DB_DungeonInfoD:ClearBindings()
-					DB_DungeonInfoD:BindAll(AnsiToUTF8(rec.guid))
-					DB_DungeonInfoD:Execute()
-					DB_DungeonInfoD:Reset()
-					D.UpdateUI(page)
-				end,
-			},
-		}
-		PopupMenu(menu)
-	end
-end
-
-function D.OnEditSpecialKeyDown()
-	local name = this:GetName()
-	local szKey = GetKeyName(Station.GetMessageKey())
-	if szKey == 'Enter' then
-		if name == 'Edit_Search' then
-			local page = this:GetParent():GetParent():GetParent()
-			D.UpdateUI(page)
-		end
-		return 1
-	end
-end
-
 function D.OnItemMouseEnter()
 	local name = this:GetName()
-	if name == 'Handle_Row' then
-		D.OutputRowTip(this, this.rec)
-	elseif name == 'Image_ProgressBoss' or name == 'Text_CD' then
+	if name == 'Image_ProgressBoss' or name == 'Text_CD' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local aText = {}
@@ -1091,23 +1133,15 @@ function D.OnItemMouseEnter()
 		end
 		if name == 'Image_ProgressBoss' then
 			table.insert(aText, '')
-			local rec = this:GetParent():GetParent():GetParent().rec
+			local aBossKill = X.SplitString(this.progress_info, ',')
 			for i, boss in ipairs(Table_GetCDProcessBoss(this.mapid)) do
-				table.insert(aText, boss.szName .. '\t' .. _L[rec.progress_info[this.mapid][i] and 'x' or 'r'])
+				table.insert(aText, boss.szName .. '\t' .. _L[aBossKill[i] == '1' and 'x' or 'r'])
 			end
 		end
 		table.insert(aText, '')
 		local nTime = X.GetDungeonRefreshTime(this.mapid) - GetCurrentTime()
 		table.insert(aText, _L('Refresh: %s', X.FormatDuration(nTime, 'CHINESE')))
 		OutputTip(GetFormatText(table.concat(aText, '\n'), 162, 255, 255, 255), 400, { x, y, w, h })
-	elseif name == 'Handle_DungeonStatColumn' then
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		local szXml = GetFormatText(this.szTip or this:Lookup('Text_DungeonStat_Title'):GetText(), 162, 255, 255, 255)
-		if IsCtrlKeyDown() and this.szDebugTip then
-			szXml = szXml .. CONSTANT.XML_LINE_BREAKER .. GetFormatText(this.szDebugTip, 102)
-		end
-		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
 	elseif this.tip then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
@@ -1164,6 +1198,31 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
+--------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------
+
+X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonStat', function()
+	D.bReady = true
+	D.UpdateFloatEntry()
+end)
+
+X.RegisterInit('MY_RoleStatistics_DungeonStat', function()
+	D.InitDB()
+	D.UpdateMapProgress()
+end)
+
+X.RegisterExit('MY_RoleStatistics_DungeonStat', function()
+	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
+end)
+
+X.RegisterReload('MY_RoleStatistics_DungeonStat', function()
+	D.ApplyFloatEntry(false)
+end)
+
 -- 首领死亡刷新秘境进度（秘境内同步拾取则视为进度更新）
 X.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
 	if not D.bReady or not X.IsInDungeon() then
@@ -1176,6 +1235,7 @@ X.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy'
 	end
 	X.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
 end)
+
 X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
 	local dwMapID, dwPlayerID = arg0, arg1
 	if dwPlayerID ~= UI_GetClientPlayerID() then
@@ -1184,25 +1244,21 @@ X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
 	D.tMapProgressValid[dwMapID] = true
 	D.FlushDB()
 end)
+
 X.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', function()
 	local tMapCopy = arg0
 	D.tMapSaveCopy = tMapCopy
 	D.bMapSaveCopyValid = true
 	D.FlushDB()
 end)
-X.RegisterInit('MY_RoleStatistics_DungeonEntry', function()
-	D.UpdateMapProgress()
-end)
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonStat', function()
-	D.bReady = true
-	D.UpdateSaveDB()
-	D.FlushDB()
+
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_DungeonStat', function()
 	D.UpdateFloatEntry()
 end)
-X.RegisterReload('MY_RoleStatistics_DungeonEntry', function() D.ApplyFloatEntry(false) end)
-X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_DungeonEntry', D.UpdateFloatEntry)
 
+--------------------------------------------------------
 -- Module exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_DungeonStat',
@@ -1221,7 +1277,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('DungeonStat', _L['MY_RoleStatistics_DungeonStat'], X.CreateModule(settings))
 end
 
+--------------------------------------------------------
 -- Global exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_DungeonStat',

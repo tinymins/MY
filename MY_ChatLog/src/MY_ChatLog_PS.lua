@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatLog'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 X.RegisterRestriction('MY_ChatLog.RealtimeCommit', { ['*'] = true, intl = false })
@@ -331,7 +331,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 				if onProgress then
 					onProgress(_L['Export succeed'], 1)
 				end
-				local szFile = GetRootPath() .. szExportFile:gsub('/', '\\')
+				local szFile = X.GetAbsolutePath(szExportFile)
 				X.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
 				X.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0

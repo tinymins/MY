@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 X.RegisterRestriction('MY_Cataclysm.CHANGGE_SHADOW', { ['*'] = true, intl = false })
@@ -64,7 +64,7 @@ local CTM_CAUTION_BUFF       = {} -- 附近记录到的警告BUFF缓存
 local CTM_SCREEN_HEAD        = {} -- 头顶倒计时缓存
 local CTM_BOSS_TARGET        = {} -- 首领目标缓存
 local CTM_BOSS_FOCUSED_STATE = {} -- 被首领点名的状态缓存
-local CTM_THREAT_NPC_ID, CTM_THREAT_TARGET_ID
+local CTM_NPC_THREAT_TARGET  = {} -- 首领一仇缓存
 local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local CHANGGE_REAL_SHADOW_CACHE = {}
@@ -827,7 +827,7 @@ function CTM:RefreshBossTarget()
 	if CFG.bShowBossTarget then
 		for dwNpcID, npc in pairs(CTM_BOSS_CACHE) do
 			local dwTarID = (X.IsEnemy(UI_GetClientPlayerID(), dwNpcID) and npc.bFightState)
-				and (CTM_THREAT_NPC_ID == dwNpcID and CTM_THREAT_TARGET_ID or select(2, npc.GetTarget()))
+				and (CTM_NPC_THREAT_TARGET[dwNpcID] or select(2, npc.GetTarget()))
 				or nil
 			if dwTarID then
 				if dwTarID ~= CTM_BOSS_TARGET[dwNpcID] then
@@ -853,9 +853,14 @@ function CTM:RefreshBossTarget()
 end
 end
 
-function CTM:RefreshThreat(dwNpcID, dwTarID)
-	CTM_THREAT_NPC_ID = dwNpcID
-	CTM_THREAT_TARGET_ID = dwTarID
+function CTM:RefreshThreat(dwNpcID, tList)
+	local dwTarID, nMaxThreat = 0, -1
+	for dwID, nThreat in pairs(tList) do
+		if nThreat > nMaxThreat then
+			dwTarID, nMaxThreat = dwID, nThreat
+		end
+	end
+	CTM_NPC_THREAT_TARGET[dwNpcID] = dwTarID
 	self:RefreshBossTarget()
 end
 

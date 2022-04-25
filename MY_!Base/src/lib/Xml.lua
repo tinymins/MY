@@ -34,7 +34,7 @@ local byte_char_l, byte_char_n, byte_char_r = (string.byte('l')), (string.byte('
 local byte_char_s, byte_char_t, byte_char_u = (string.byte('s')), (string.byte('t')), (string.byte('u'))
 
 local function bytes2string(bytes)
-	local char, insert, concat, unpack = string.char, table.insert, table.concat, unpack
+	local char, insert, concat, unpack = string.char, table.insert, table.concat, X.Unpack
 	local count = #bytes
 	if count > 100 then
 		local t, i = {}, 1
@@ -140,7 +140,7 @@ local function XMLGetNodeChildren(node)
 end
 
 local function XMLDecode(xml)
-	local insert, remove, concat, unpack = table.insert, table.remove, table.concat, table.unpack or unpack
+	local insert, remove, concat, unpack = table.insert, table.remove, table.concat, X.Unpack
 	local find, sub, gsub, char, byte = string.find, string.sub, string.gsub, string.char, string.byte
 	local t = XMLCreateNode('')
 	local p = t

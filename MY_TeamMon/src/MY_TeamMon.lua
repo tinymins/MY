@@ -22,7 +22,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 local bRestricted = ENVIRONMENT.GAME_BRANCH == 'classic'
@@ -1914,7 +1914,6 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 		szServer = select(4, GetUserServer()),
 		nTimeStamp = GetCurrentTime(),
 	}
-	local szRoot = GetRootPath():gsub('\\', '/')
 	local szPath = MY_TM_REMOTE_DATA_ROOT .. szFileName
 	if szFormat == 'JSON' or szFormat == 'JSON_FORMATED' then
 		if szFormat ~= 'JSON' then
@@ -1937,8 +1936,7 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 		}
 		X.SaveLUAData(szPath, data, option)
 	end
-	X.GetAbsolutePath(szPath):gsub('/', '\\')
-	X.SafeCall(fnAction, szRoot .. szPath)
+	X.SafeCall(fnAction, X.GetAbsolutePath(szPath))
 end
 
 -- 获取整个表

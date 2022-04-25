@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatFilter'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -97,6 +97,11 @@ local l_tChannelHeader = {
 
 X.HookChatPanel('FILTER', 'MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	local aXMLNode, aSay
+	local tInfo = MY_Chat.ParseMessageInfo(szMsg)
+	if tInfo then
+		dwTime    = tInfo.dwTime
+		szChannel = tInfo.szChannel
+	end
 	-- 插件消息UUID过滤
 	if D.bReady and O.bFilterDuplicateAddonTalk then
 		if not aXMLNode then

@@ -1,8 +1,8 @@
 --------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : ï¿½ï¿½ï¿½ì¸¨ï¿½ï¿½
--- @author   : ï¿½ï¿½ï¿½ï¿½ @Ë«ï¿½ï¿½ï¿½ï¿½ @×·ï¿½ï¿½ï¿½ï¿½Ó°
+-- @desc     : ÁÄÌì¸¨Öú
+-- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatCopy'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -77,29 +77,40 @@ local O = X.CreateUserSettingsModule('MY_ChatCopy', _L['Chat'], {
 })
 local D = {}
 
-local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
+X.HookChatPanel('AFTER', 'MY_ChatCopy', function(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 	if szMsg and i and D.bReady and h:GetItemCount() > i and (O.bChatTime or O.bChatCopy) then
 		-- chat time
-		-- check if timestrap can insert
-		if O.bChatCopyNoCopySysmsg and szChannel == 'SYS_MSG' then
-			return
+		local nFont
+		local tInfo = MY_Chat.ParseMessageInfo(h, i, h:GetItemCount() - 1)
+		if tInfo then
+			dwTime        = tInfo.dwTime
+			nFont         = tInfo.nFont
+			nR            = tInfo.nR
+			nG            = tInfo.nG
+			nB            = tInfo.nB
+			szChannel     = tInfo.szChannel
 		end
-		-- create timestrap text
-		local szTime = ''
 		for ii = i, h:GetItemCount() - 1 do
 			local el = h:Lookup(ii)
 			if el:GetType() == 'Text' and not el:GetName():find('^namelink_%d+$') and el:GetText() ~= '' then
+				nFont = el:GetFontScheme()
 				nR, nG, nB = el:GetFontColor()
 				break
 			end
 		end
+		-- check if timestamp can insert
+		if O.bChatCopyNoCopySysmsg and szChannel == 'SYS_MSG' then
+			return
+		end
+		-- create timestamp text
+		local szTime = ''
 		if O.bChatCopy and (O.bChatCopyAlwaysShowMask or not O.bChatTime) then
 			local _r, _g, _b = nR, nG, nB
 			if O.bChatCopyAlwaysWhite then
 				_r, _g, _b = 255, 255, 255
 			end
 			szTime = X.GetChatCopyXML(_L[' * '], {
-				r = _r, g = _g, b = _b,
+				r = _r, g = _g, b = _b, f = nFont,
 				richtext = szMsg,
 				rclick = O.bChatQuickCopy == true,
 			})
@@ -109,13 +120,13 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 		if O.bChatTime then
 			if O.eChatTime == 'HOUR_MIN_SEC' then
 				szTime = szTime .. X.GetChatTimeXML(dwTime, {
-					r = nR, g = nG, b = nB, f = 10,
+					r = nR, g = nG, b = nB, f = nFont,
 					s = '[%hh:%mm:%ss]', richtext = szMsg,
 					rclick = O.bChatQuickCopy == true,
 				})
 			else
 				szTime = szTime .. X.GetChatTimeXML(dwTime, {
-					r = nR, g = nG, b = nB, f = 10,
+					r = nR, g = nG, b = nB, f = nFont,
 					s = '[%hh:%mm]', richtext = szMsg,
 					rclick = O.bChatQuickCopy == true,
 				})
@@ -124,8 +135,7 @@ local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 		-- insert timestrap text
 		h:InsertItemFromString(i, false, szTime)
 	end
-end
-X.HookChatPanel('AFTER', 'MY_ChatCopy', onNewChatLine)
+end)
 
 function D.OnChatPanelNamelinkLButtonDown(...)
 	X.ChatLinkEventHandlers.OnNameLClick(...)

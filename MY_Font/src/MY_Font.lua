@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Font'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -93,7 +93,16 @@ if Global_SetCaptionParams then
 	table.insert(FONT_TYPE, {
 		szTitle = _L['Lifebar Text'],
 		Get = function()
-			local szFontName, szFontFile = '', ''
+			local szFontName, szFontFile = '', g_tStrings.STR_CUSTOM_TEAM or ''
+			if Global_GetCaptionFontConfig then
+				szFontFile = Global_GetCaptionFontConfig().szFontFile or ''
+				for _, p in ipairs(X.GetFontList()) do
+					if p.szFile == szFontFile then
+						szFontName = p.szName
+						break
+					end
+				end
+			end
 			return szFontName, szFontFile
 		end,
 		Set = function(szFontName, szFontFile)

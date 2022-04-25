@@ -229,13 +229,13 @@ function X.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 	local nX1, nY1, nZ1 = 0, 0, 0
 	local nX2, nY2, nZ2 = 0, 0, 0
 	if X.IsTable(arg0) then
-		arg0 = X.GetObject(unpack(arg0))
+		arg0 = X.GetObject(X.Unpack(arg0))
 		if not arg0 then
 			return
 		end
 	end
 	if X.IsTable(arg1) then
-		arg1 = X.GetObject(unpack(arg1))
+		arg1 = X.GetObject(X.Unpack(arg1))
 		if not arg1 then
 			return
 		end
@@ -292,16 +292,16 @@ function X.GetBuffName(dwBuffID, dwLevel)
 	if not BUFF_CACHE[xKey] then
 		local tLine = Table_GetBuff(dwBuffID, dwLevel or 1)
 		if tLine then
-			BUFF_CACHE[xKey] = { tLine.szName, tLine.dwIconID }
+			BUFF_CACHE[xKey] = X.Pack(tLine.szName, tLine.dwIconID)
 		else
 			local szName = 'BUFF#' .. dwBuffID
 			if dwLevel then
 				szName = szName .. ':' .. dwLevel
 			end
-			BUFF_CACHE[xKey] = { szName, 1436 }
+			BUFF_CACHE[xKey] = X.Pack(szName, 1436)
 		end
 	end
-	return unpack(BUFF_CACHE[xKey])
+	return X.Unpack(BUFF_CACHE[xKey])
 end
 end
 
@@ -1073,9 +1073,9 @@ X.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#ForceColor', initForceCustom)
 
 function X.GetForceColor(dwForce, szType)
 	if szType == 'background' then
-		return unpack(O.tForceBackgroundColor[dwForce])
+		return X.Unpack(O.tForceBackgroundColor[dwForce])
 	end
-	return unpack(O.tForceForegroundColor[dwForce])
+	return X.Unpack(O.tForceForegroundColor[dwForce])
 end
 
 function X.SetForceColor(dwForce, szType, tCol)
@@ -1096,9 +1096,9 @@ X.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#CampColor', initCampCustom)
 
 function X.GetCampColor(nCamp, szType)
 	if szType == 'background' then
-		return unpack(O.tCampBackgroundColor[nCamp])
+		return X.Unpack(O.tCampBackgroundColor[nCamp])
 	end
-	return unpack(O.tCampForegroundColor[nCamp])
+	return X.Unpack(O.tCampForegroundColor[nCamp])
 end
 
 function X.SetCampColor(nCamp, szType, tCol)
@@ -1187,6 +1187,7 @@ end
 do
 local NEARBY_NPC = {}      -- 附近的NPC
 local NEARBY_PET = {}      -- 附近的PET
+local NEARBY_BOSS = {}     -- 附近的首领
 local NEARBY_PLAYER = {}   -- 附近的物品
 local NEARBY_DOODAD = {}   -- 附近的玩家
 local NEARBY_FIGHT = {}    -- 附近玩家和NPC战斗状态缓存
@@ -1254,7 +1255,7 @@ function X.GetObject(arg0, arg1, arg2)
 		local me = GetClientPlayer()
 		if me and dwID == me.dwID then
 			p, info, b = me, me, false
-		elseif me and me.IsPlayerInMyParty(dwID) then
+		elseif not ENVIRONMENT.RUNTIME_OPTIMIZE and me and me.IsPlayerInMyParty(dwID) then
 			p, info, b = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID), true
 		else
 			p, info, b = GetPlayer(dwID), GetPlayer(dwID), false
@@ -1597,6 +1598,51 @@ function X.GetNearPetTable()
 end
 end
 
+-- 获取附近的首领
+-- (table) X.GetNearBoss(void)
+function X.GetNearBoss(nLimit)
+	local aNpc = {}
+	for k, _ in pairs(NEARBY_BOSS) do
+		local npc = GetNpc(k)
+		if not npc then
+			NEARBY_BOSS[k] = nil
+		else
+			table.insert(aNpc, npc)
+			if nLimit and #aNpc == nLimit then
+				break
+			end
+		end
+	end
+	return aNpc
+end
+
+function X.GetNearBossID(nLimit)
+	local aNpcID = {}
+	for k, _ in pairs(NEARBY_BOSS) do
+		table.insert(aNpcID, k)
+		if nLimit and #aNpcID == nLimit then
+			break
+		end
+	end
+	return aNpcID
+end
+
+if IsDebugClient() then
+function X.GetNearBossTable()
+	return NEARBY_BOSS
+end
+end
+
+X.RegisterEvent(X.NSFormatString('{$NS}_SET_BOSS'), 'LIB#GetNearBoss', function()
+	local dwMapID, tBoss = X.GetMapID(), {}
+	for _, npc in ipairs(X.GetNearNpc()) do
+		if X.IsBoss(dwMapID, npc.dwTemplateID) then
+			NEARBY_BOSS[npc.dwID] = npc
+		end
+	end
+	NEARBY_BOSS = tBoss
+end)
+
 -- 获取附近玩家列表
 -- (table) X.GetNearPlayer(void)
 function X.GetNearPlayer(nLimit)
@@ -1686,11 +1732,15 @@ X.RegisterEvent('NPC_ENTER_SCENE', function()
 	if npc and npc.dwEmployer ~= 0 then
 		NEARBY_PET[arg0] = npc
 	end
+	if npc and X.IsBoss(X.GetMapID(), npc.dwTemplateID) then
+		NEARBY_BOSS[arg0] = npc
+	end
 	NEARBY_NPC[arg0] = npc
 	NEARBY_FIGHT[arg0] = npc and npc.bFightState or false
 end)
 X.RegisterEvent('NPC_LEAVE_SCENE', function()
 	NEARBY_PET[arg0] = nil
+	NEARBY_BOSS[arg0] = nil
 	NEARBY_NPC[arg0] = nil
 	NEARBY_FIGHT[arg0] = nil
 end)
@@ -2388,7 +2438,7 @@ do
 local TEMP_TARGET = { TARGET.NO_TARGET, 0 }
 function X.SetTempTarget(dwType, dwID)
 	TargetPanel_SetOpenState(true)
-	TEMP_TARGET = { GetClientPlayer().GetTarget() }
+	TEMP_TARGET = X.Pack(GetClientPlayer().GetTarget())
 	X.SetTarget(dwType, dwID)
 	TargetPanel_SetOpenState(false)
 end
@@ -2396,11 +2446,11 @@ end
 function X.ResumeTarget()
 	TargetPanel_SetOpenState(true)
 	-- 当之前的目标不存在时，切到空目标
-	if TEMP_TARGET[1] ~= TARGET.NO_TARGET and not X.GetObject(unpack(TEMP_TARGET)) then
-		TEMP_TARGET = { TARGET.NO_TARGET, 0 }
+	if TEMP_TARGET[1] ~= TARGET.NO_TARGET and not X.GetObject(X.Unpack(TEMP_TARGET)) then
+		TEMP_TARGET = X.Pack(TARGET.NO_TARGET, 0)
 	end
-	X.SetTarget(unpack(TEMP_TARGET))
-	TEMP_TARGET = { TARGET.NO_TARGET, 0 }
+	X.SetTarget(X.Unpack(TEMP_TARGET))
+	TEMP_TARGET = X.Pack(TARGET.NO_TARGET, 0)
 	TargetPanel_SetOpenState(false)
 end
 end
@@ -3052,16 +3102,16 @@ function X.GetSkillName(dwSkillID, dwLevel)
 		if tLine and tLine.dwSkillID > 0 and tLine.bShow
 			and (StringFindW(tLine.szDesc, '_') == nil  or StringFindW(tLine.szDesc, '<') ~= nil)
 		then
-			SKILL_CACHE[dwSkillID][uLevelKey] = { tLine.szName, tLine.dwIconID }
+			SKILL_CACHE[dwSkillID][uLevelKey] = X.Pack(tLine.szName, tLine.dwIconID)
 		else
 			local szName = 'SKILL#' .. dwSkillID
 			if dwLevel then
 				szName = szName .. ':' .. dwLevel
 			end
-			SKILL_CACHE[dwSkillID][uLevelKey] = { szName, 13 }
+			SKILL_CACHE[dwSkillID][uLevelKey] = X.Pack(szName, 13)
 		end
 	end
-	return unpack(SKILL_CACHE[dwSkillID][uLevelKey])
+	return X.Unpack(SKILL_CACHE[dwSkillID][uLevelKey])
 end
 end
 
@@ -4378,7 +4428,7 @@ end
 -- 获取头像文件路径，帧序，是否动画
 function X.GetForceAvatar(dwForceID)
 	-- force avatar
-	return unpack(CONSTANT.FORCE_AVATAR[dwForceID])
+	return X.Unpack(CONSTANT.FORCE_AVATAR[dwForceID])
 end
 
 -- 获取头像文件路径，帧序，是否动画
@@ -4448,83 +4498,253 @@ function X.GetMapAchievements(dwMapID, bWujia)
 	return X.Clone(MAP_ACHI_NORMAL[dwMapID])
 end
 
-function X.GetPlayerEquipInfo(player)
-	local tEquipInfo = {}
-	for nItemIndex = 0, EQUIPMENT_INVENTORY.TOTAL - 1 do
-		local item = GetPlayerItem(player, INVENTORY_INDEX.EQUIP, nItemIndex)
-		if item then
-			-- 五行石
-			local aSlotItem = {}
-			for i = 1, item.GetSlotCount() do
-				local nEnchantID = item.GetMountDiamondEnchantID(i - 1)
-				if nEnchantID and nEnchantID > 0 then
-					local dwTabType, dwTabIndex = GetDiamondInfoFromEnchantID(nEnchantID)
-					if dwTabType and dwTabIndex then
-						aSlotItem[i] = {dwTabType, dwTabIndex}
+do
+	local EVENT_KEY = nil
+	local PEEK_PLAYER_EQUIP_SCORE_STATE = {}
+	local PEEK_PLAYER_EQUIP_SCORE_RESULT = {}
+	local PEEK_PLAYER_EQUIP_SCORE_CALLBACK = {}
+	local function OnGetPlayerEquipScorePeekPlayer(dwID)
+		if not PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID] then
+			return
+		end
+		local nScore = PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID]
+		for _, fnAction in ipairs(PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID]) do
+			X.SafeCall(fnAction, nScore, dwID)
+		end
+		PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID] = nil
+	end
+
+	-- 获取玩家装备分数
+	-- X.GetPlayerEquipScore(dwID, fnAction)
+	-- X.GetPlayerEquipScore(dwID, bForcePeek, fnAction)
+	-- @param dwID 玩家ID
+	-- @param bForcePeek 是否强制拉取
+	-- @param fnAction 回调函数
+	function X.GetPlayerEquipScore(dwID, bForcePeek, fnAction)
+		-- 函数重载
+		if X.IsFunction(bForcePeek) then
+			fnAction, bForcePeek = bForcePeek, nil
+		end
+		-- 加入回调
+		if not PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID] then
+			PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID] = {}
+		end
+		table.insert(PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID], fnAction)
+		-- 自身判定
+		if dwID == UI_GetClientPlayerID() then
+			PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID] = GetClientPlayer().GetTotalEquipScore()
+			OnGetPlayerEquipScorePeekPlayer(dwID)
+			return
+		end
+		-- 缓存判定
+		if PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] == 'SUCCESS' and not bForcePeek then
+			OnGetPlayerEquipScorePeekPlayer(dwID)
+			return
+		end
+		-- 发送请求
+		PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] = 'PENDING'
+		if PeekOtherPlayerEquipSimpleInfo then
+			if not EVENT_KEY then
+				EVENT_KEY = X.RegisterEvent('ON_SYNC_OTHER_PLAYER_EQUIP_SIMPLE_INFO', X.NSFormatString('{$NS}#GetPlayerEquipScore'), function()
+					local dwID, nEquipScore = arg0, arg1
+					PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] = 'SUCCESS'
+					PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID] = nEquipScore
+					OnGetPlayerEquipScorePeekPlayer(dwID)
+				end)
+			end
+			X.SafeCall(PeekOtherPlayerEquipSimpleInfo, dwID)
+		else
+			if not EVENT_KEY then
+				EVENT_KEY = X.RegisterEvent('PEEK_OTHER_PLAYER', X.NSFormatString('{$NS}#GetPlayerEquipScore'), function()
+					local nResult, dwID = arg0, arg1
+					local player = GetPlayer(dwID)
+					if nResult == PEEK_OTHER_PLAYER_RESPOND.SUCCESS and player then
+						PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] = 'SUCCESS'
+						PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID] = player.GetTotalEquipScore()
+						OnGetPlayerEquipScorePeekPlayer(dwID)
 					end
-				end
+				end)
 			end
-			-- 五彩石
-			local nEnchantID = item.GetMountFEAEnchantID()
-			if nEnchantID and nEnchantID ~= 0 then
-				local dwTabType, dwTabIndex = GetColorDiamondInfoFromEnchantID(nEnchantID)
-				if dwTabType and dwTabIndex then
-					aSlotItem[0] = {dwTabType, dwTabIndex}
-				end
-			end
-			-- 插入结果集
-			tEquipInfo[nItemIndex] = {
-				dwTabType = item.dwTabType,
-				dwTabIndex = item.dwIndex,
-				nStrengthLevel = item.nStrengthLevel,
-				aSlotItem = aSlotItem,
-				dwPermanentEnchantID = item.dwPermanentEnchantID,
-				dwTemporaryEnchantID = item.dwTemporaryEnchantID,
-				dwTemporaryEnchantLeftSeconds = item.GetTemporaryEnchantLeftSeconds(),
-			}
+			X.SafeCall(ViewInviteToPlayer, dwID, true)
 		end
 	end
-	return tEquipInfo
 end
 
-local PLAYER_TALENT_UPDATED = {}
-X.RegisterEvent('ON_UPDATE_TALENT', function()
-	PLAYER_TALENT_UPDATED[arg0] = true
-end)
-function X.GetPlayerTalentInfo(...)
-	local player = ...
-	if select('#', ...) == 0 then
-		player = GetClientPlayer()
+do
+	local EVENT_KEY = nil
+	local PEEK_PLAYER_EQUIP_STATE = {}
+	local PEEK_PLAYER_EQUIP_CALLBACK = {}
+	local function OnGetPlayerEquipInfoPeekPlayer(player)
+		if not PEEK_PLAYER_EQUIP_CALLBACK[player.dwID] then
+			return
+		end
+		local tEquipInfo = {}
+		for nItemIndex = 0, EQUIPMENT_INVENTORY.TOTAL - 1 do
+			local item = GetPlayerItem(player, INVENTORY_INDEX.EQUIP, nItemIndex)
+			if item then
+				-- 五行石
+				local aSlotItem = {}
+				for i = 1, item.GetSlotCount() do
+					local nEnchantID = item.GetMountDiamondEnchantID(i - 1)
+					if nEnchantID and nEnchantID > 0 then
+						local dwTabType, dwTabIndex = GetDiamondInfoFromEnchantID(nEnchantID)
+						if dwTabType and dwTabIndex then
+							aSlotItem[i] = {dwTabType, dwTabIndex}
+						end
+					end
+				end
+				-- 五彩石
+				local nEnchantID = item.GetMountFEAEnchantID()
+				if nEnchantID and nEnchantID ~= 0 then
+					local dwTabType, dwTabIndex = GetColorDiamondInfoFromEnchantID(nEnchantID)
+					if dwTabType and dwTabIndex then
+						aSlotItem[0] = {dwTabType, dwTabIndex}
+					end
+				end
+				-- 插入结果集
+				tEquipInfo[nItemIndex] = {
+					dwTabType = item.dwTabType,
+					dwTabIndex = item.dwIndex,
+					nStrengthLevel = item.nStrengthLevel,
+					aSlotItem = aSlotItem,
+					dwPermanentEnchantID = item.dwPermanentEnchantID,
+					dwTemporaryEnchantID = item.dwTemporaryEnchantID,
+					dwTemporaryEnchantLeftSeconds = item.GetTemporaryEnchantLeftSeconds(),
+				}
+			end
+		end
+		for _, fnAction in ipairs(PEEK_PLAYER_EQUIP_CALLBACK[player.dwID]) do
+			X.SafeCall(fnAction, tEquipInfo, player.dwID)
+		end
+		PEEK_PLAYER_EQUIP_CALLBACK[player.dwID] = nil
 	end
-	if not player then
-		return
-	end
-	if not PLAYER_TALENT_UPDATED[player.dwID] and player.dwID ~= UI_GetClientPlayerID() then
-		return
-	end
-	local aInfo = player.GetTalentInfo()
-	if not aInfo then
-		PLAYER_TALENT_UPDATED[player.dwID] = nil
-		return
-	end
-	local aRes = {}
-	for i, info in ipairs(aInfo) do
-		local skill = info.SkillArray[info.nSelectIndex]
-		if skill then
-			aRes[i] = {
-				nIndex = info.nSelectIndex,
-				dwSkillID = skill.dwSkillID,
-				dwSkillLevel = skill.dwSkillLevel,
-			}
+
+	-- 获取玩家装备信息
+	-- X.GetPlayerEquipInfo(dwID, fnAction)
+	-- X.GetPlayerEquipInfo(dwID, bForcePeek, fnAction)
+	-- @param dwID 玩家ID
+	-- @param bForcePeek 是否强制拉取
+	-- @param fnAction 回调函数
+	function X.GetPlayerEquipInfo(dwID, bForcePeek, fnAction)
+		-- 函数重载
+		if X.IsFunction(bForcePeek) then
+			fnAction, bForcePeek = bForcePeek, nil
+		end
+		-- 加入回调
+		if not PEEK_PLAYER_EQUIP_CALLBACK[dwID] then
+			PEEK_PLAYER_EQUIP_CALLBACK[dwID] = {}
+		end
+		table.insert(PEEK_PLAYER_EQUIP_CALLBACK[dwID], fnAction)
+		-- 自身判定
+		if dwID == UI_GetClientPlayerID() then
+			OnGetPlayerEquipInfoPeekPlayer(GetClientPlayer())
+			return
+		end
+		-- 缓存判定
+		local player = GetPlayer(dwID)
+		if player and PEEK_PLAYER_EQUIP_STATE[dwID] == 'SUCCESS' and not bForcePeek then
+			OnGetPlayerEquipInfoPeekPlayer(player)
+			return
+		end
+		-- 发送请求
+		PEEK_PLAYER_EQUIP_STATE[dwID] = 'PENDING'
+		if not EVENT_KEY then
+			EVENT_KEY = X.RegisterEvent('PEEK_OTHER_PLAYER', X.NSFormatString('{$NS}#GetPlayerEquipInfo'), function()
+				local nResult, dwID = arg0, arg1
+				local player = GetPlayer(dwID)
+				if nResult == PEEK_OTHER_PLAYER_RESPOND.SUCCESS and player then
+					PEEK_PLAYER_EQUIP_STATE[dwID] = 'SUCCESS'
+					OnGetPlayerEquipInfoPeekPlayer(player)
+				else
+					PEEK_PLAYER_EQUIP_STATE[dwID] = 'FAILURE'
+				end
+			end)
+		end
+		if PeekOtherPlayer then
+			X.SafeCall(PeekOtherPlayer, dwID)
 		else
-			aRes[i] = {
-				nIndex = info.nSelectIndex,
-				dwSkillID = 0,
-				dwSkillLevel = 0,
-			}
+			X.SafeCall(ViewInviteToPlayer, dwID, true)
 		end
 	end
-	return aRes
+end
+
+do
+	local EVENT_KEY = nil
+	local PEEK_PLAYER_TALENT_STATE = {}
+	local PEEK_PLAYER_TALENT_CALLBACK = {}
+	local function OnGetPlayerTalnetInfoPeekPlayer(player)
+		if not PEEK_PLAYER_TALENT_CALLBACK[player.dwID] then
+			return
+		end
+		local aInfo = player.GetTalentInfo()
+		if not aInfo then
+			PEEK_PLAYER_TALENT_STATE[player.dwID] = nil
+			return
+		end
+		local aTalent = {}
+		for i, info in ipairs(aInfo) do
+			local skill = info.SkillArray[info.nSelectIndex]
+			if skill then
+				aTalent[i] = {
+					nIndex = info.nSelectIndex,
+					dwSkillID = skill.dwSkillID,
+					dwSkillLevel = skill.dwSkillLevel,
+				}
+			else
+				aTalent[i] = {
+					nIndex = info.nSelectIndex,
+					dwSkillID = 0,
+					dwSkillLevel = 0,
+				}
+			end
+		end
+		for _, fnAction in ipairs(PEEK_PLAYER_TALENT_CALLBACK[player.dwID]) do
+			X.SafeCall(fnAction, aTalent, player.dwID)
+		end
+		PEEK_PLAYER_TALENT_CALLBACK[player.dwID] = nil
+	end
+
+	-- 获取玩家奇穴信息
+	-- X.GetPlayerTalentInfo(dwID, fnAction)
+	-- X.GetPlayerTalentInfo(dwID, bForcePeek, fnAction)
+	-- @param dwID 玩家ID
+	-- @param bForcePeek 是否强制拉取
+	-- @param fnAction 回调函数
+	function X.GetPlayerTalentInfo(dwID, bForcePeek, fnAction)
+		-- 函数重载
+		if X.IsFunction(bForcePeek) then
+			fnAction, bForcePeek = bForcePeek, nil
+		end
+		-- 加入回调
+		if not PEEK_PLAYER_TALENT_CALLBACK[dwID] then
+			PEEK_PLAYER_TALENT_CALLBACK[dwID] = {}
+		end
+		table.insert(PEEK_PLAYER_TALENT_CALLBACK[dwID], fnAction)
+		-- 自身判定
+		if dwID == UI_GetClientPlayerID() then
+			OnGetPlayerTalnetInfoPeekPlayer(GetClientPlayer())
+			return
+		end
+		-- 缓存判定
+		local player = GetPlayer(dwID)
+		if player and PEEK_PLAYER_TALENT_STATE[dwID] == 'SUCCESS' and not bForcePeek then
+			OnGetPlayerTalnetInfoPeekPlayer(player)
+			return
+		end
+		-- 发送请求
+		PEEK_PLAYER_TALENT_STATE[dwID] = 'PENDING'
+		if not EVENT_KEY then
+			EVENT_KEY = X.RegisterEvent('ON_UPDATE_TALENT', X.NSFormatString('{$NS}#GetPlayerEquipInfo'), function()
+				local dwID = arg0
+				local player = GetPlayer(dwID)
+				if player then
+					PEEK_PLAYER_TALENT_STATE[dwID] = 'SUCCESS'
+					OnGetPlayerTalnetInfoPeekPlayer(player)
+				end
+			end)
+		end
+		X.SafeCall(PeekOtherPlayerTalent, dwID, 0xffffffff)
+	end
 end
 
 do
@@ -4700,7 +4920,7 @@ do
 		if not PLAYER_GUID[dwID] then
 			if dwID == UI_GetClientPlayerID() then
 				local szGUID = X.GetClientInfo('szGlobalID')
-				if not szGUID or szGUID == '0' then
+				if szGUID == '0' then
 					szGUID = (X.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. X.GetClientInfo().dwID
 				end
 				PLAYER_GUID[dwID] = szGUID

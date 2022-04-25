@@ -22,7 +22,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -37,6 +37,7 @@ end
 
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)
+	local nW = ui:Size()
 	local nPaddingX, nPaddingY = 20, 20
 	local nX, nY = nPaddingX, nPaddingY
 	local nLineH = 22
@@ -180,12 +181,14 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Countdown configure'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndTrackbar', {
-		x = nPaddingX + 10, y = nY, h = 22,
+		x = nPaddingX + 10, y = nY, w = nW - nPaddingX * 2, rw = nW / 3, h = 22,
 		range = {0, 3601},
 		value = MY_TeamMon_ST.nBelowDecimal,
 		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onChange = function(val)
-			MY_TeamMon_ST.nBelowDecimal = val
+			X.DelayCall('MY_TeamMon_ST_nBelowDecimal', 300, function()
+				MY_TeamMon_ST.nBelowDecimal = val
+			end)
 		end,
 		textFormatter = function(val)
 			if val == 0 then

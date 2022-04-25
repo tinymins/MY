@@ -23,7 +23,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 X.RegisterRestriction('MY_CataclysmMain__OfficialBuff', { ['*'] = true })
@@ -971,7 +971,12 @@ function D.UpdateOTAction(frame)
 	if not me then
 		return
 	end
-	local KOTTarget = X.GetNearBoss()[1]
+	local KOTTarget
+	for _, npc in ipairs(X.GetNearBoss()) do
+		if not KOTTarget or not KOTTarget.bFightState then
+			KOTTarget = npc
+		end
+	end
 	if not KOTTarget then
 		local dwType, dwID = me.GetTarget()
 		if dwType == TARGET.NPC then
@@ -999,6 +1004,9 @@ function D.UpdateOTAction(frame)
 end
 
 function D.OnFrameBreathe()
+	if not CFG.bFasterHP and GetLogicFrameCount() % CFG.nDrawInterval ~= 0 then
+		return
+	end
 	local me = GetClientPlayer()
 	if not me then
 		return

@@ -21,11 +21,11 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 
-if ENVIRONMENT.GAME_EDITION ~= 'zhcn_exp' and not IsLocalFileExist(X.FormatPath({'config/lifebar-official.jx3dat', X.PATH_TYPE.GLOBAL})) then
+if IsLocalFileExist(X.FormatPath({'config/restriction/lifebar.jx3dat', X.PATH_TYPE.GLOBAL})) then
 	return
 end
 --------------------------------------------------------------------------
@@ -34,14 +34,6 @@ local D = {}
 local COUNTDOWN_CACHE = {}
 
 local CACHE_ON_TOP, nTop = {}
-local function SetCaptionOnTop(dwID, bTop)
-	nTop = bTop and 1 or 0
-	if CACHE_ON_TOP[dwID] == nTop then
-		return
-	end
-	CACHE_ON_TOP[dwID] = nTop
-	rlcmd('set caption on top ' .. dwID .. ' ' .. nTop)
-end
 local function ApplyCaptionOnTop(dwID)
 	nTop = CACHE_ON_TOP[dwID]
 	if not nTop then
@@ -49,16 +41,16 @@ local function ApplyCaptionOnTop(dwID)
 	end
 	rlcmd('set caption on top ' .. dwID .. ' ' .. nTop)
 end
-
-local CACHE_ZOOM_IN, nZoomIn = {}
-local function SetCaptionZoomIn(dwID, bZoomIn)
-	nZoomIn = bZoomIn and 1 or 0
-	if CACHE_ZOOM_IN[dwID] == nZoomIn then
+local function SetCaptionOnTop(dwID, bTop)
+	nTop = bTop and 1 or 0
+	if CACHE_ON_TOP[dwID] == nTop then
 		return
 	end
-	CACHE_ZOOM_IN[dwID] = nZoomIn
-	rlcmd('set caption zoom in ' .. dwID .. ' ' .. nZoomIn)
+	CACHE_ON_TOP[dwID] = nTop
+	ApplyCaptionOnTop(dwID)
 end
+
+local CACHE_ZOOM_IN, nZoomIn = {}
 local function ApplyCaptionZoomIn(dwID)
 	nZoomIn = CACHE_ZOOM_IN[dwID]
 	if not nZoomIn then
@@ -66,15 +58,16 @@ local function ApplyCaptionZoomIn(dwID)
 	end
 	rlcmd('set caption zoom in ' .. dwID .. ' ' .. nZoomIn)
 end
-
-local CACHE_EXTRA_TEXT, szExtraText = {}
-local function SetCaptionExtraText(dwID, szExtraText)
-	if CACHE_EXTRA_TEXT[dwID] == szExtraText then
+local function SetCaptionZoomIn(dwID, bZoomIn)
+	nZoomIn = bZoomIn and 1 or 0
+	if CACHE_ZOOM_IN[dwID] == nZoomIn then
 		return
 	end
-	CACHE_EXTRA_TEXT[dwID] = szExtraText
-	rlcmd('set caption extra text ' .. dwID .. ' ' .. szExtraText)
+	CACHE_ZOOM_IN[dwID] = nZoomIn
+	ApplyCaptionZoomIn(dwID)
 end
+
+local CACHE_EXTRA_TEXT, szExtraText = {}
 local function ApplyCaptionExtraText(dwID)
 	szExtraText = CACHE_EXTRA_TEXT[dwID]
 	if not szExtraText then
@@ -82,24 +75,61 @@ local function ApplyCaptionExtraText(dwID)
 	end
 	rlcmd('set caption extra text ' .. dwID .. ' ' .. szExtraText)
 end
-
-local CACHE_CAPTION_COLOR, tColor = {}
-local function SetCaptionColor(dwID, nR, nG, nB)
-	tColor = CACHE_CAPTION_COLOR[dwID]
-	if tColor and tColor.nR == nR and tColor.nG == nG and tColor.nB == nB then
+local function SetCaptionExtraText(dwID, szExtraText)
+	if CACHE_EXTRA_TEXT[dwID] == szExtraText then
 		return
 	end
-	tColor = { nR = nR, nG = nG, nB = nB, dwColor = 255 * 16777216 + nR * 65536 + nG * 256 + nB }
-	CACHE_CAPTION_COLOR[dwID] = tColor
-	rlcmd('set plugin caption color ' .. dwID .. ' 1 ' .. tColor.dwColor)
+	CACHE_EXTRA_TEXT[dwID] = szExtraText
+	ApplyCaptionExtraText(dwID)
 end
+
+local CACHE_CAPTION_COLOR, tColor = {}
+local function RGB2Dword(nR, nG, nB, nA) return nA * 16777216 + nR * 65536 + nG * 256 + nB end
+local function fxTarget(nR, nG, nB, nA) return math.ceil(255 - (255 - nR) * 0.3), math.ceil(255 - (255 - nG) * 0.3), math.ceil(255 - (255 - nB) * 0.3), nA end
+local function fxDeath(nR, nG, nB, nA) return math.ceil(nR * 0.4), math.ceil(nG * 0.4), math.ceil(nB * 0.4), nA end
+local function fxDeathTarget(nR, nG, nB, nA) return math.ceil(nR * 0.45), math.ceil(nG * 0.45), math.ceil(nB * 0.45), nA end
 local function ApplyCaptionColor(dwID)
 	tColor = CACHE_CAPTION_COLOR[dwID]
 	if not tColor then
 		return
 	end
-	rlcmd('set plugin caption color ' .. dwID .. ' 1 ' .. tColor.dwColor)
+	local KTarget, dwColor = (IsPlayer(dwID) and GetPlayer or GetNpc)(dwID), tColor.dwColor
+	if KTarget then
+		if dwID == select(2, X.GetTarget()) then
+			if KTarget.nMoveState == MOVE_STATE.ON_DEATH then
+				dwColor = tColor.dwDeathTargetColor
+			else
+				dwColor = tColor.dwTargetColor
+			end
+		elseif KTarget.nMoveState == MOVE_STATE.ON_DEATH then
+			dwColor = tColor.dwDeathColor
+		end
+	end
+	rlcmd('set plugin caption color ' .. dwID .. ' 1 ' .. dwColor)
 end
+local function SetCaptionColor(dwID, nR, nG, nB)
+	tColor = CACHE_CAPTION_COLOR[dwID]
+	if tColor and tColor.nR == nR and tColor.nG == nG and tColor.nB == nB then
+		return
+	end
+	tColor = {
+		nR = nR,
+		nG = nG,
+		nB = nB,
+		dwColor = RGB2Dword(nR, nG, nB, 255),
+		dwTargetColor = RGB2Dword(fxTarget(nR, nG, nB, 255)),
+		dwDeathColor = RGB2Dword(fxDeath(nR, nG, nB, 255)),
+		dwDeathTargetColor = RGB2Dword(fxDeathTarget(nR, nG, nB, 255)),
+	}
+	CACHE_CAPTION_COLOR[dwID] = tColor
+	ApplyCaptionColor(dwID)
+end
+X.RegisterEvent('TARGET_CHANGE', 'MY_LifeBar', function()
+	-- arg0: dwPrevID, arg1: dwPrevType, arg2: dwID, arg3: dwType
+	local dwPrevID, dwID = arg0, arg2
+	ApplyCaptionColor(dwPrevID)
+	ApplyCaptionColor(dwID)
+end)
 
 local function ApplyCaption(dwID)
 	ApplyCaptionOnTop(dwID)

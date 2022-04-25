@@ -73,7 +73,7 @@ function UI.OpenIconPicker(fnAction)
 				nCount = nCount + 1
 			end
 		end
-		MAX_ICON = MAX_ICON or 10000
+		MAX_ICON = MAX_ICON or 50000
 	end
 	local nMaxIcon, boxs, txts = MAX_ICON, {}, {}
 	local ui = UI.CreateFrame(X.NSFormatString('{$NS}_IconPanel'), { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })

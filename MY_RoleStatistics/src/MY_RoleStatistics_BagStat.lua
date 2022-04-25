@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_BagStat'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -185,10 +185,6 @@ local FILTER_LIST = {
 	{ name = 'Grey'     , where = 'I.quality = 0' },
 	{ name = 'TimeLtd'  , where = 'I.exist_type <> -1 AND I.exist_type <> ' .. ITEM_EXIST_TYPE.PERMANENT },
 }
-
-function D.GetPlayerGUID(me)
-	return me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName
-end
 
 do
 local GetItemText
@@ -456,7 +452,7 @@ function D.FlushDB()
 	--[[#DEBUG END]]
 	local me = GetClientPlayer()
 	local time = GetCurrentTime()
-	local ownerkey = AnsiToUTF8(D.GetPlayerGUID(me))
+	local ownerkey = AnsiToUTF8(X.GetPlayerGUID())
 	local ownername = AnsiToUTF8(me.szName)
 	local servername = AnsiToUTF8(X.GetRealServer(2))
 	DB:Execute('BEGIN TRANSACTION')
@@ -584,7 +580,7 @@ function D.UpdateSaveDB()
 		X.Debug('MY_RoleStatistics_BagStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, guid in ipairs({
-			AnsiToUTF8(D.GetPlayerGUID(me)),
+			AnsiToUTF8(X.GetPlayerGUID()),
 			'tong' .. me.dwTongID,
 		}) do
 			DB_ItemsDA:ClearBindings()
@@ -603,7 +599,7 @@ function D.UpdateSaveDB()
 	FireUIEvent('MY_ROLE_STAT_BAG_UPDATE')
 end
 X.RegisterInit('MY_RoleStatistics_BagUpdateSaveDB', function()
-	D.tCheckedNames[D.GetPlayerGUID(GetClientPlayer())] = true
+	D.tCheckedNames[X.GetPlayerGUID()] = true
 	INIT = true
 end)
 end
@@ -1092,20 +1088,33 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
+--------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------
+
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_BagStat', function()
 	D.bReady = true
-	D.UpdateSaveDB()
-	D.FlushDB()
 	D.UpdateFloatEntry()
 end)
-X.RegisterReload('MY_RoleStatistics_BagStat', function() D.ApplyFloatEntry(false) end)
-X.RegisterFrameCreate('BigBagPanel', 'MY_RoleStatistics_BagStat', D.UpdateFloatEntry)
 
--- function D.OnMouseLeave()
--- 	HideTip()
--- end
+X.RegisterExit('MY_RoleStatistics_BagStat', function()
+	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
+end)
 
+X.RegisterReload('MY_RoleStatistics_BagStat', function()
+	D.ApplyFloatEntry(false)
+end)
+
+X.RegisterFrameCreate('BigBagPanel', 'MY_RoleStatistics_BagStat', function()
+	D.UpdateFloatEntry()
+end)
+
+--------------------------------------------------------
 -- Module exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_BagStat',
@@ -1124,7 +1133,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('BagStat', _L['MY_RoleStatistics_BagStat'], X.CreateModule(settings))
 end
 
+--------------------------------------------------------
 -- Global exports
+--------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_BagStat',

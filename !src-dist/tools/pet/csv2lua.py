@@ -2,7 +2,7 @@ import codecs, pandas, luadata, os
 
 SRC_PATH = os.path.abspath(os.path.join(__file__, '..', 'data.tsv'))
 POS_PATH = os.path.abspath(os.path.join(__file__, '..', 'pos.tsv'))
-DST_PATH = os.path.abspath(os.path.join(__file__, '..\\..\\..\\..\\MY_RoleStatistics\\data\\serendipity\\zhcn.jx3dat'))
+DST_PATH = os.path.abspath(os.path.join(__file__, '..\\..\\..\\..\\MY_RoleStatistics\\data\\serendipity\\zhcn_hd.jx3dat'))
 
 def rowappend(a, p, k, v):
 	if not pandas.notna(v) or k == 'id' or k.startswith('Unnamed'):

@@ -21,7 +21,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^10.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
 --------------------------------------------------------------------------
@@ -326,31 +326,44 @@ function D.OnTargetUpdate(dwID, bForce)
 				end
 			end
 		end
-		local aEquip, nEquipScore = {}, player.GetTotalEquipScore()
-		for nEquipIndex, tEquipInfo in pairs(X.GetPlayerEquipInfo(player)) do
-			table.insert(aEquip, {
-				nEquipIndex,
-				tEquipInfo.dwTabType,
-				tEquipInfo.dwTabIndex,
-				tEquipInfo.nStrengthLevel,
-				tEquipInfo.aSlotItem,
-				tEquipInfo.dwPermanentEnchantID,
-				tEquipInfo.dwTemporaryEnchantID,
-				tEquipInfo.dwTemporaryEnchantLeftSeconds,
-			})
-		end
 		local szGUID = X.GetPlayerGUID(dwID) or ''
-		local aTalent = X.GetPlayerTalentInfo(player)
-		if aTalent then
-			for i, p in ipairs(aTalent) do
+		local aEquip, nEquipScore, aTalent
+		local function OnGet()
+			if not nEquipScore or not aEquip or not aTalent then
+				return
+			end
+			D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip, aTalent, szGUID })
+		end
+		X.GetPlayerEquipScore(dwID, function(nScore)
+			nEquipScore = nScore
+			OnGet()
+		end)
+		X.GetPlayerEquipInfo(dwID, function(tEquip)
+			aEquip = {}
+			for nEquipIndex, tEquipInfo in pairs(tEquip) do
+				table.insert(aEquip, {
+					nEquipIndex,
+					tEquipInfo.dwTabType,
+					tEquipInfo.dwTabIndex,
+					tEquipInfo.nStrengthLevel,
+					tEquipInfo.aSlotItem,
+					tEquipInfo.dwPermanentEnchantID,
+					tEquipInfo.dwTemporaryEnchantID,
+					tEquipInfo.dwTemporaryEnchantLeftSeconds,
+				})
+			end
+		end)
+		X.GetPlayerTalentInfo(dwID, function(a)
+			aTalent = {}
+			for i, p in ipairs(a) do
 				aTalent[i] = {
 					p.nIndex,
 					p.dwSkillID,
 					p.dwSkillLevel,
 				}
 			end
-		end
-		D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip, aTalent, szGUID })
+			OnGet()
+		end)
 	else
 		local npc = GetNpc(dwID)
 		if not npc then
