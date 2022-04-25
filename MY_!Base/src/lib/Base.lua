@@ -168,7 +168,7 @@ end
 -- 本地函数变量
 -------------------------------------------------------------------------------------------------------
 local _BUILD_                 = '20220408'
-local _VERSION_               = '10.0.2'
+local _VERSION_               = '11.0.0'
 local _MENU_COLOR_            = {255, 165, 79}
 local _INTERFACE_ROOT_        = 'Interface/'
 local _NAME_SPACE_            = 'MY'
