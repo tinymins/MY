@@ -1467,7 +1467,7 @@ function D.GetSerendipityCounter(dwPlayerID, dwSerendipity)
 		end
 	end
 	if serendipity then
-		return GetSerendipityCounter(serendipity, rec['serendipity_' .. dwSerendipity])
+		return GetSerendipityCounter(serendipity, rec['serendipity_' .. serendipity.nID])
 	end
 end
 
@@ -1483,7 +1483,7 @@ function D.GetSerendipityCounterText(dwPlayerID, dwSerendipity)
 		end
 	end
 	if serendipity then
-		return GetSerendipityCounterText(serendipity, rec['serendipity_' .. dwSerendipity])
+		return GetSerendipityCounterText(serendipity, rec['serendipity_' .. serendipity.nID])
 	end
 end
 
