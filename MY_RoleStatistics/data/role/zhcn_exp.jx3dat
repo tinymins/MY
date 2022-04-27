@@ -172,31 +172,6 @@ return function(env)
 				return env.me.GetVigorRemainSpace()
 			end,
 		},
-		-- 江贡
-		{
-			szKey = 'contribution',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 70,
-			GetValue = function(prevVal, prevRec)
-				return env.me.nContribution
-			end,
-		},
-		-- 江贡周余
-		{
-			szKey = 'contribution_remain',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 70,
-			szRefreshCircle = 'weekly',
-			GetValue = function(prevVal, prevRec)
-				return env.me.GetContributionRemainSpace()
-			end,
-		},
 		-- 侠义
 		{
 			szKey = 'justice',
@@ -360,56 +335,6 @@ return function(env)
 					return env.GetFormatText(v, 162, 255, 255, 255)
 				end
 				return env.GetFormatText(v.level .. ' + ' .. v.percent .. '%', 162, 255, 255, 255)
-			end,
-		},
-		-- 名剑币
-		{
-			szKey = 'arena_award',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 60,
-			GetValue = function(prevVal, prevRec)
-				return env.me.nArenaAward
-			end,
-		},
-		-- 名剑币周余
-		{
-			szKey = 'arena_award_remain',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 60,
-			szRefreshCircle = 'weekly',
-			GetValue = function(prevVal, prevRec)
-				return env.me.GetArenaAwardRemainSpace()
-			end,
-		},
-		-- 监本
-		{
-			szKey = 'exam_print',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 55,
-			GetValue = function(prevVal, prevRec)
-				return env.me.nExamPrint
-			end,
-		},
-		-- 监本周余
-		{
-			szKey = 'exam_print_remain',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 55,
-			szRefreshCircle = 'weekly',
-			GetValue = function(prevVal, prevRec)
-				return env.me.GetExamPrintRemainSpace()
 			end,
 		},
 		-- 资历
