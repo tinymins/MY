@@ -992,7 +992,7 @@ function D.UpdateOTAction(frame)
 	local hPrepare = frame:Lookup('', 'Handle_Prepare')
 	if KOTTarget then
 		local nType, dwSkillID, dwSkillLevel, fProgress = X.GetOTActionState(KOTTarget)
-		if nType ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE and fProgress and dwSkillID and dwSkillLevel then
+		if nType ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE and fProgress and dwSkillID and dwSkillID ~= 0 and dwSkillLevel then
 			hPrepare:Lookup('Text_Prepare'):SetText(X.GetSkillName(dwSkillID, dwSkillLevel) or '')
 			hPrepare:Lookup('Image_Prepare'):SetPercentage(fProgress)
 			hPrepare:SetAlpha(255)
