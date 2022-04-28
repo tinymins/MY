@@ -75,7 +75,6 @@ local function ParseMessageInfo(...)
 			dwTalkerID   = tonumber(aInfo[7]),
 			szTalkerName = aInfo[8]          ,
 		}
-		Log(X.EncodeLUAData(tInfo))
 		return tInfo
 	end
 end
