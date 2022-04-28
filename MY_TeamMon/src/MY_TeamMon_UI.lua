@@ -1655,15 +1655,15 @@ function D.OpenSettingPanel(data, szType)
 			if #aParams ~= 2 then
 				return
 			end
-			local nTime, szOperator, szContent
-			if aParams[1]:sub(-1) == '+' or aParams[1]:sub(-1) == '-' then
+			local nTime, szContent
+			local szOperator = aParams[1]:sub(-1)
+			if szOperator == '+' or szOperator == '-' or szOperator == '*' then
 				nTime = tonumber(aParams[1]:sub(1, -2))
-				szOperator = aParams[1]:sub(-1)
 				szContent = X.TrimString(aParams[2])
 			else
 				nTime = tonumber(aParams[1])
-				szOperator = '*'
 				szContent = X.TrimString(aParams[2])
+				szOperator = '*'
 			end
 			if not nTime then
 				return
