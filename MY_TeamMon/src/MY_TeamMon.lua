@@ -1617,7 +1617,7 @@ function D.DecodeHPCountdown(szString)
 			if hpcd[1] then
 				hpcd[1] = MY_TrimString(hpcd[1])
 				local szSign = hpcd[1]:sub(-1)
-				if szSign == '-' or szSign == '+' then
+				if szSign == '-' or szSign == '+' or szSign == '*' then
 					hpcd[1] = hpcd[1]:sub(1, -2)
 				else
 					szSign = '*'
