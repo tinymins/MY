@@ -964,7 +964,7 @@ end
 end
 
 function D.UpdateOTAction(frame)
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 4 ~= 0 then
 		return
 	end
 	local me = GetClientPlayer()
@@ -1004,11 +1004,12 @@ function D.UpdateOTAction(frame)
 end
 
 function D.OnFrameBreathe()
-	if not CFG.bFasterHP and GetLogicFrameCount() % CFG.nDrawInterval ~= 0 then
-		return
-	end
 	local me = GetClientPlayer()
 	if not me then
+		return
+	end
+	D.UpdateOTAction(this)
+	if not CFG.bFasterHP and GetLogicFrameCount() % CFG.nDrawInterval ~= 0 then
 		return
 	end
 	MY_CataclysmParty:RefreshDistance()
@@ -1022,7 +1023,6 @@ function D.OnFrameBreathe()
 	-- kill System Panel
 	D.RaidPanel_Switch(DEBUG)
 	D.TeammatePanel_Switch(false)
-	D.UpdateOTAction(this)
 	D.FrameBuffRefreshCall()
 	-- 官方代码太容易报错 放最后
 	if not this.nBreatheTime or GetTime() - this.nBreatheTime >= 300 then -- 语音最短刷新间隔300ms
@@ -1351,7 +1351,7 @@ end)
 
 X.RegisterUserSettingsUpdate('@@INIT@@', function()
 	if ENVIRONMENT.RUNTIME_OPTIMIZE and CFG.nDrawInterval == 4 then
-		CFG.nDrawInterval = 32
+		CFG.nDrawInterval = 16
 	end
 	X.WithClientPlayer(function(me)
 		D.CheckCataclysmEnable()

@@ -779,7 +779,7 @@ local function HideTTarget()
 	end
 end
 function CTM:RefreshTTarget()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	if CFG.bShowTargetTargetAni then
@@ -820,7 +820,7 @@ local function HideBossTarget(dwTarID)
 	end
 end
 function CTM:RefreshBossTarget()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	local tKeep = {}
@@ -865,7 +865,7 @@ function CTM:RefreshThreat(dwNpcID, tList)
 end
 
 function CTM:RefreshAttention()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	if CFG.bShowAttention then
@@ -902,7 +902,7 @@ function CTM:RefreshAttention()
 end
 
 function CTM:RefreshCaution()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	if CFG.bShowCaution or CFG.bShowBossFocus then
@@ -1735,7 +1735,7 @@ function D.UpdateCharaterBuff(p, handle, tKeep)
 end
 
 function CTM:RefreshBuff()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 8 ~= 0 then
 		return
 	end
 	local team = GetClientTeam()
@@ -1764,7 +1764,7 @@ function CTM:RecBossFocusBuff(dwMemberID, data)
 end
 
 function CTM:RefreshBossFocus()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	local team, me = GetClientTeam(), GetClientPlayer()
@@ -1787,7 +1787,7 @@ function CTM:RefreshBossFocus()
 end
 
 function CTM:RefreshDistance()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 8 ~= 0 then
 		return
 	end
 	for k, v in pairs(CTM_CACHE) do
@@ -2096,7 +2096,7 @@ end
 
 -- ÷ÿªÊΩ¶…‰÷˙ ÷
 function CTM:RefreshSputtering()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	local team = GetClientTeam()
