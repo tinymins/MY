@@ -278,7 +278,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		onCheck = function(bChecked)
 			MY_JBAchievementRank.bEnable = bChecked
 		end,
-		tip {
+		tip = {
 			render = _L['Share boss kill record for kill rank.'],
 			position = UI.TIP_POSITION.TOP_BOTTOM,
 		},
