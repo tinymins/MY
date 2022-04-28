@@ -1622,9 +1622,18 @@ function D.OpenSettingPanel(data, szType)
 		end
 	end
 
+	local function IsSimpleCountdown(dat)
+		if dat.nClass == MY_TM_TYPE.NPC_LIFE or dat.nClass == MY_TM_TYPE.NPC_MANA then
+			return false
+		end
+		if X.IsEmpty(dat.nTime) or tonumber(dat.nTime) then
+			return true
+		end
+		return false
+	end
+
 	local function FormatElPosByCountdownType(dat, ui, i)
-		local bSimple = dat.nClass ~= MY_TM_TYPE.NPC_LIFE and dat.nClass ~= MY_TM_TYPE.NPC_MANA
-			and (X.IsEmpty(dat.nTime) or tonumber(dat.nTime)) and true or false
+		local bSimple = IsSimpleCountdown(dat)
 		ui:Children('#CountdownTime' .. i):Width(bSimple and 100 or 400)
 		ui:Children('#CountdownName' .. i):Visible(bSimple)
 	end
@@ -1636,34 +1645,50 @@ function D.OpenSettingPanel(data, szType)
 		UI.ClosePopupMenu()
 	end
 
-	local function CheckCountdown(tTime)
-		if tonumber(tTime) then
-			return true
-		else
-			local tab = {}
-			local t = X.SplitString(tTime, ';')
-			for k, v in ipairs(t) do
-				local time = X.SplitString(v, ',')
-				if time[1] and time[2] and tonumber(X.TrimString(time[1])) and time[2] ~= '' then
-					table.insert(tab, { nTime = tonumber(time[1]), szName = time[2] })
-				elseif X.TrimString(time[1]) ~= '' and not tonumber(time[1]) then
-					return false
-				elseif tonumber(time[1]) and (not time[2] or X.TrimString(time[2]) == '') then
-					return false
-				end
-			end
-			if X.IsEmpty(tab) then
-				return false
-			else
-				table.sort(tab, function(a, b)
-					return a.nTime < b.nTime
-				end)
-				return tab
-			end
+	local function ParseCountdown(szCountdown, bOperator)
+		if not X.IsString(szCountdown) then
+			return
 		end
+		local aCountdown = {}
+		for _, szPart in ipairs(X.SplitString(szCountdown, ';')) do
+			local aParams = X.SplitString(szPart, ',')
+			if #aParams ~= 2 then
+				return
+			end
+			local nTime, szOperator, szContent
+			if aParams[1]:sub(-1) == '+' or aParams[1]:sub(-1) == '-' then
+				nTime = tonumber(aParams[1]:sub(1, -2))
+				szOperator = aParams[1]:sub(-1)
+				szContent = X.TrimString(aParams[2])
+			else
+				nTime = tonumber(aParams[1])
+				szOperator = '*'
+				szContent = X.TrimString(aParams[2])
+			end
+			if not nTime then
+				return
+			end
+			if szOperator and not bOperator then
+				return
+			end
+			if szContent == '' then
+				return
+			end
+			table.insert(aCountdown, {
+				nTime = nTime,
+				szOperator = szOperator,
+				szContent = szContent,
+			})
+		end
+		if X.IsEmpty(aCountdown) then
+			return
+		end
+		table.sort(aCountdown, function(a, b)
+			return a.nTime < b.nTime
+		end)
+		return aCountdown
 	end
-	local tSkillInfo
-	local me = GetClientPlayer()
+	-- local tSkillInfo
 	local file = 'ui/Image/UICommon/Feedanimials.uitex'
 	local szName, nIcon = _L[szType], 340
 	if szType ~= 'TALK' and szType ~= 'CHAT' then
@@ -2648,44 +2673,47 @@ function D.OpenSettingPanel(data, szType)
 		ui:Append('WndEditBox', {
 			name = 'CountdownTime' .. k,
 			x = nX + 5, y = nY, w = 100, h = 25,
-			text = v.nTime, color = (v.nClass ~= MY_TM_TYPE.NPC_LIFE and not CheckCountdown(v.nTime)) and { 255, 0, 0 },
+			text = v.nTime,
+			color = (IsSimpleCountdown(v) or ParseCountdown(v.nTime, v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA))
+				and { 255, 255, 255 }
+				or { 255, 0, 0 },
 			onChange = function(szNum)
 				v.nTime = tonumber(szNum) or szNum
 				local edit = ui:Children('#CountdownTime' .. k)
 				if szNum == '' then
 					return
 				end
-				if v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA then
-					return
+				if IsSimpleCountdown(v) then
+					if this:GetW() > 200 then
+						edit:Size(100, 25):Color(255, 255, 255)
+						ui:Children('#CountdownName' .. k):Visible(true):Text(v.szName or g_tStrings.CHAT_NAME)
+					end
 				else
-					if tonumber(szNum) then
-						if this:GetW() > 200 then
-							local x, y = edit:Pos()
-							edit:Size(100, 25):Color(255, 255, 255)
-							ui:Children('#CountdownName' .. k):Visible(true):Text(v.szName or g_tStrings.CHAT_NAME)
+					local aCountdown = ParseCountdown(szNum, v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA)
+					if aCountdown then
+						local tOperatorDesc = {
+							['+'] = _L['(OPERATOR +)'],
+							['-'] = _L['(OPERATOR -)'],
+						}
+						local xml = { GetFormatText(_L['Countdown preview'] .. '\n', 0, 255, 255, 0) }
+						for k, v in ipairs(aCountdown) do
+							table.insert(xml, GetFormatText(
+								X.FormatDuration(v.nTime, 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' })
+									.. (tOperatorDesc[v.szOperator or ''] or '')
+									.. ' - '
+									.. FilterCustomText(v.szContent, '{$sender}', '{$receiver}')
+									.. '\n'
+							))
 						end
+						edit:Color(255, 255, 255)
+						X.OutputTip(this, table.concat(xml), true)
 					else
-						if CheckCountdown(szNum) then
-							local x, y = this:GetAbsPos()
-							local w, h = this:GetSize()
-							local xml = { GetFormatText(_L['Countdown preview'] .. '\n', 0, 255, 255, 0) }
-							for k, v in ipairs(CheckCountdown(szNum)) do
-								table.insert(xml, GetFormatText(
-									X.FormatDuration(v.nTime, 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' })
-									.. ' - ' .. FilterCustomText(v.szName, '{$sender}', '{$receiver}') .. '\n'
-								))
-							end
-							edit:Color(255, 255, 255)
-							X.OutputTip(this, table.concat(xml), true)
-						else
-							HideTip()
-							edit:Color(255, 0, 0)
-						end
-						if this:GetW() < 200 then
-							local x, y = edit:Pos()
-							edit:Size(400, 25)
-							ui:Children('#CountdownName' .. k):Visible(false)
-						end
+						HideTip()
+						edit:Color(255, 0, 0)
+					end
+					if this:GetW() < 200 then
+						edit:Size(400, 25)
+						ui:Children('#CountdownName' .. k):Visible(false)
 					end
 				end
 			end,
