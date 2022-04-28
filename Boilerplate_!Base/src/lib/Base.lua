@@ -97,12 +97,13 @@ local _DELOG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level
 -- 其它环境变量
 -------------------------------------------------------------------------------------------------------
 local _SERVER_ADDRESS_ = select(7, GetUserServer())
-local _RUNTIME_OPTIMIZE_ = (
-	debug.traceback ~= nil
+local _RUNTIME_OPTIMIZE_ = --[[#DEBUG BEGIN]](
+	(IsDebugClient() or debug.traceback ~= nil)
 	and _DEBUG_LEVEL_ == DEBUG_LEVEL.NONE
 	and _DELOG_LEVEL_ == DEBUG_LEVEL.NONE
 	and not IsLocalFileExist(_ADDON_ROOT_ .. 'secret.jx3dat')
-) and not IsLocalFileExist(_DATA_ROOT_ .. 'no.runtime.optimize.jx3dat')
+) and not IsLocalFileExist(_DATA_ROOT_ .. 'no.runtime.optimize.jx3dat') or --[[#DEBUG END]]false
+
 -------------------------------------------------------------------------------------------------------
 -- 初始化调试工具
 -------------------------------------------------------------------------------------------------------
