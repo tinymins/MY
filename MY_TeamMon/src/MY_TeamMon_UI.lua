@@ -2522,7 +2522,15 @@ function D.OpenSettingPanel(data, szType)
 				if IsCtrlKeyDown() then
 					table.insert(menu, {
 						szOption = _L['Set countdown key'],
-						rgb = { 255, 255, 0 } ,
+						rgb = { 255, 255, 0 },
+						fnMouseEnter = function()
+							local nX, nY = this:GetAbsX(), this:GetAbsY()
+							local nW, nH = this:GetW(), this:GetH()
+							OutputTip(GetFormatText(_L['Key supports template render: {$sender}, {$receiver}, {$1}'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
+						end,
+						fnMouseLeave = function()
+							HideTip()
+						end,
 						fnAction = function()
 							GetUserInput(_L['Countdown key'], function(szKey)
 								if X.TrimString(szKey) == '' then

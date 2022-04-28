@@ -272,10 +272,11 @@ function ST:ctor(nType, szKey, tParam)
 	if not ST_CACHE[nType] then
 		return
 	end
+	if not tParam.szName then
+		tParam.szName = nType .. '#' .. szKey
+	end
 	local ui = ST_CACHE[nType][szKey]
 	local nTime = GetTime()
-	local key = nType .. '#' .. szKey
-	tParam.szName = tParam.szName or key
 	local oo
 	if ui and ui:IsValid() then
 		oo = ui.obj

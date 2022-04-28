@@ -22,6 +22,7 @@ return {
 	['PVE everyday, Xuanjing everyday!'] = '每天一個本，周周見玄晶！',
 	-- MY_TeamMon_UI.lua --
 	['Set countdown key'] = '設置倒計時唯一標識',
+	['Key supports template render: {$sender}, {$receiver}, {$1}'] = '唯一標識支持模板字元串：{$sender}, {$receiver}, {$1}',
 	['Hold countdown when crossmap'] = '倒計時過圖不消失',
 	['Hold countdown when unfight'] = '倒計時脫戰不消失',
 	['Countdown key'] = '倒計時唯一標識',

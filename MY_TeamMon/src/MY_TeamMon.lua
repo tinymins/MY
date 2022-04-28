@@ -261,6 +261,13 @@ local function GetUserDataPath()
 	return szPath
 end
 
+local function RenderCustomText(szTemplate, szSender, szReceiver, aBackreferences)
+	local tVar = X.Clone(aBackreferences) or {}
+	tVar.sender = szSender
+	tVar.receiver = szReceiver
+	return X.RenderTemplateString(szTemplate, tVar, -1, false, false)
+end
+
 local function FilterCustomText(szTemplate, szSender, szReceiver, aBackreferences)
 	local tVar = X.Clone(aBackreferences) or {}
 	tVar.sender = szSender
@@ -749,33 +756,38 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 	D.OnSetMark()
 end
 -- 倒计时处理 支持定义无限的倒计时
-function D.CountdownEvent(data, nClass, szSender, szReceiver)
+function D.CountdownEvent(data, nClass, szSender, szReceiver, aBackreferences)
 	if data.tCountdown then
 		for k, v in ipairs(data.tCountdown) do
 			if nClass == v.nClass then
-				local szKey = k .. '.' .. (data.dwID or 0) .. '.' .. (data.nLevel or 0) .. '.' .. (data.nIndex or 0)
+				local nType, szKey = nClass, v.key
+				if szKey then
+					nType = MY_TM_TYPE.COMMON
+					szKey = RenderCustomText(szKey, szSender, szReceiver, aBackreferences)
+				else
+					szKey = k .. '.' .. (data.dwID or 0) .. '.' .. (data.nLevel or 0) .. '.' .. (data.nIndex or 0) .. '.' .. X.EncodeLUAData(aBackreferences)
+				end
 				local tParam = {
-					key      = v.key,
 					nFrame   = v.nFrame,
 					nTime    = v.nTime,
 					nRefresh = v.nRefresh,
-					szName   = FilterCustomText(v.szName or data.szName, szSender, szReceiver),
+					szName   = FilterCustomText(v.szName or data.szName, szSender, szReceiver, aBackreferences),
 					nIcon    = v.nIcon or data.nIcon or 340,
 					bTalk    = v.bTeamChannel,
 					bHold    = v.bHold,
 				}
-				D.FireCountdownEvent(nClass, szKey, tParam, szSender, szReceiver)
+				D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver)
 			end
 		end
 	end
 end
 
 -- 发布事件 为了方便日后修改 集中起来
-function D.FireCountdownEvent(nClass, szKey, tParam, szSender, szReceiver)
-	tParam.bTalk = O.bPushTeamChannel and tParam.bTalk
-	nClass       = tParam.key and MY_TM_TYPE.COMMON or nClass
-	szKey        = tParam.key or szKey
-	FireUIEvent('MY_TM_ST_CREATE', nClass, szKey, tParam, szSender, szReceiver)
+function D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver)
+	if not O.bPushTeamChannel then
+		tParam.bTalk = false
+	end
+	FireUIEvent('MY_TM_ST_CREATE', nType, szKey, tParam, szSender, szReceiver)
 end
 
 function D.GetSrcName(dwID)
@@ -1457,7 +1469,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			dwReceiverID = me.dwID
 			szReceiver = me.szName
 		end
-		D.CountdownEvent(data, nClass, szSender, szReceiver)
+		D.CountdownEvent(data, nClass, szSender, szReceiver, aBackreferences)
 		local cfg = data[nClass]
 		if cfg then
 			local aXml, aText, aTalkXml, aTalkText = {}, {}, {}, {}
@@ -1661,17 +1673,21 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 							D.Talk('RAID', szText)
 						end
 						if hpcd[4] and tonumber(MY_TrimString(hpcd[4])) then
-							local szKey = k .. '.' .. dwTemplateID .. '.' .. kk
+							local nType, szKey = v.nClass, v.key
+							if szKey then
+								nType = MY_TM_TYPE.COMMON
+							else
+								szKey = k .. '.' .. dwTemplateID .. '.' .. kk
+							end
 							local tParam = {
-								key    = v.key,
 								nFrame = v.nFrame,
 								nTime  = tonumber(MY_TrimString(hpcd[4])),
 								szName = FilterCustomText(hpcd[3], szSender, szReceiver),
 								nIcon  = v.nIcon,
 								bTalk  = v.bTeamChannel,
-								bHold  = v.bHold
+								bHold  = v.bHold,
 							}
-							D.FireCountdownEvent(v.nClass, szKey, tParam, szSender, szReceiver)
+							D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver)
 						end
 						break
 					end
