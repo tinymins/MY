@@ -50,6 +50,33 @@ local D = {
 	szMosaics = _L.MOSAICS_CHAR, -- ÂíÈü¿Ë×Ö·û
 }
 
+function D.OnMosaicsEnable()
+	if not D.tSysHeadTopState then
+		D.tSysHeadTopState = {
+			['OTHERPLAYER_NAME'  ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.NAME ),
+			['OTHERPLAYER_GUILD' ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.GUILD),
+			['CLIENTPLAYER_NAME' ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.NAME ),
+			['CLIENTPLAYER_GUILD'] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD),
+		}
+	end
+	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER, CONSTANT.GLOBAL_HEAD.NAME , false)
+	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, false)
+	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.NAME , false)
+	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, false)
+end
+
+function D.OnMosaicsDisable()
+	if D.tSysHeadTopState then
+		SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.NAME , D.tSysHeadTopState['OTHERPLAYER_NAME'])
+		SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.GUILD, D.tSysHeadTopState['OTHERPLAYER_GUILD'])
+		SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.NAME , D.tSysHeadTopState['CLIENTPLAYER_NAME'])
+		SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, D.tSysHeadTopState['CLIENTPLAYER_GUILD'])
+		D.tSysHeadTopState = nil
+	end
+end
+
+X.RegisterExit('MY_ChatMosaics', D.OnMosaicsDisable)
+
 function D.ResetMosaics()
 	-- re mosaics
 	D.bForceUpdate = true
@@ -62,8 +89,10 @@ function D.ResetMosaics()
 		X.HookChatPanel('AFTER', 'MY_ChatMosaics', function(h, nIndex)
 			D.Mosaics(h, nIndex)
 		end)
+		D.OnMosaicsEnable()
 	else
 		X.HookChatPanel('AFTER', 'MY_ChatMosaics', false)
+		D.OnMosaicsDisable()
 	end
 	FireUIEvent('ON_MY_MOSAICS_RESET')
 end
