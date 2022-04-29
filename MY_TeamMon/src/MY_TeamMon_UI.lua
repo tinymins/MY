@@ -1663,7 +1663,7 @@ function D.OpenSettingPanel(data, szType)
 			else
 				nTime = tonumber(aParams[1])
 				szContent = X.TrimString(aParams[2])
-				szOperator = '*'
+				szOperator = bOperator and '*' or nil
 			end
 			if not nTime then
 				return
