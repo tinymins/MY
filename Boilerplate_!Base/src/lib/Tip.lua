@@ -915,6 +915,16 @@ function X.OutputTableTip(tOptions)
 	end
 end
 
-function X.HideTableTip()
-	Wnd.CloseWindow(X.NSFormatString('{$NS}_OutputTableTip'))
+function X.HideTableTip(bAnimate)
+	local frame = Station.SearchFrame(X.NSFormatString('{$NS}_OutputTableTip'))
+	if not frame then
+		return
+	end
+	if bAnimate then
+		UI(frame):FadeOut(2000, function()
+			Wnd.CloseWindow(frame)
+		end)
+	else
+		Wnd.CloseWindow(frame)
+	end
 end
