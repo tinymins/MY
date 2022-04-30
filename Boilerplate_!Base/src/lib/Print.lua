@@ -203,6 +203,9 @@ function X.Log(...)
 	local szText = select(nType + 1, ...)
 	local szDate = X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd')
 	if LOG_DATE ~= szDate or LOG_LINE_COUNT >= LOG_MAX_LINE then
+		if not X.GetPlayerGUID() then
+			return
+		end
 		if LOG_PATH then
 			Log(LOG_PATH, '', 'close')
 		end
