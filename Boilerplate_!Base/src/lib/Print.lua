@@ -192,6 +192,18 @@ function X.OutputWhisper(szMsg, szHead)
 	PlaySound(SOUND.UI_SOUND, g_sound.Whisper)
 end
 
+local LOG_PATH, LOG_DATE
+-- 输出一条日志到日志文件
+-- @param szText 日志内容
+function X.Log(szText)
+	local szDate = X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd')
+	local szTime = X.FormatTime(GetCurrentTime(), '%hh-%mm-%ss')
+	if LOG_DATE ~= szDate then
+		LOG_PATH = X.FormatPath({'logs/' .. szDate .. '/' .. szTime .. '.log', X.PATH_TYPE.ROLE})
+	end
+	Log(LOG_PATH, '[' .. szDate .. szTime .. ']' .. szText)
+end
+
 -- Debug输出
 -- (void)X.Debug(szTitle, oContent, nLevel)
 -- szTitle  Debug头
