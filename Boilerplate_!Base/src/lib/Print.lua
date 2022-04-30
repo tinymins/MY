@@ -208,7 +208,7 @@ function X.Log(szType, szText)
 			Log(LOG_PATH, '', 'close')
 		end
 		LOG_PATH = X.FormatPath({
-			'logs/'
+			'logs/JX3_'
 				.. szDate .. '/'
 				.. X.PACKET_INFO.NAME_SPACE
 				.. '_' .. ENVIRONMENT.GAME_PROVIDER
