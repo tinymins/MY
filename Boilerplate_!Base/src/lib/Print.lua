@@ -192,15 +192,22 @@ function X.OutputWhisper(szMsg, szHead)
 	PlaySound(SOUND.UI_SOUND, g_sound.Whisper)
 end
 
+local LOG_MAX_FILE = 30
+local LOG_MAX_LINE = 300
+local LOG_LINE_COUNT = 0
 local LOG_PATH, LOG_DATE
 -- 输出一条日志到日志文件
 -- @param szText 日志内容
 function X.Log(szText)
 	local szDate = X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd')
 	local szTime = X.FormatTime(GetCurrentTime(), '%hh-%mm-%ss')
-	if LOG_DATE ~= szDate then
+	if LOG_DATE ~= szDate or LOG_LINE_COUNT >= LOG_MAX_LINE then
+		if LOG_PATH then
+			Log(LOG_PATH, '', 'close')
+		end
 		LOG_PATH = X.FormatPath({'logs/' .. szDate .. '/' .. szTime .. '.log', X.PATH_TYPE.ROLE})
 	end
+	LOG_LINE_COUNT = LOG_LINE_COUNT + 1
 	Log(LOG_PATH, '[' .. szDate .. szTime .. ']' .. szText)
 end
 
@@ -217,13 +224,13 @@ function X.DeleteAncientLogs()
 			table.insert(aFiles, { time = DateToTime(year, month, day, 0, 0, 0), filepath = szRoot .. filename })
 		end
 	end
-	if #aFiles <= 30 then
+	if #aFiles <= LOG_MAX_FILE then
 		return
 	end
 	table.sort(aFiles, function(a, b)
 		return a.time > b.time
 	end)
-	for i = 31, #aFiles do
+	for i = LOG_MAX_FILE + 1, #aFiles do
 		CPath.DelDir(aFiles[i].filepath)
 	end
 end
