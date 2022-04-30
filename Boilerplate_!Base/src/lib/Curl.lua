@@ -210,6 +210,13 @@ function X.Ajax(settings)
 	-------------------------------
 	-- finalize settings
 	-------------------------------
+	-- log
+	X.Log(
+		'AJAX',
+		config.url .. ' - ' .. config.driver .. '/' .. config.method
+			.. ' (' .. driver .. '/' .. method .. ')'
+			.. (config.data and (' [BODY]' .. X.EncodeQuerystring(config.data) .. '[/BODY]') or '')
+	)
 	--[[#DEBUG BEGIN]]
 	X.Debug(
 		'AJAX',
@@ -292,14 +299,6 @@ function X.Ajax(settings)
 	end)
 	X.DelayCall(bridgekey, config.timeout, settings.closebridge)
 	X.RegisterExit(bridgekey, settings.closebridge)
-
-	-- log
-	X.Log(
-		'AJAX',
-		config.url .. ' - ' .. config.driver .. '/' .. config.method
-			.. ' (' .. driver .. '/' .. method .. ')'
-			.. (config.data and (' [BODY]' .. X.EncodeQuerystring(config.data) .. '[/BODY]') or '')
-	)
 
 	local canajax, errmsg = X.CanAjax(driver, method)
 	if not canajax then
