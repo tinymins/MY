@@ -286,8 +286,7 @@ function X.Debug(...)
 		szContent = tostring(oContent)
 	end
 	if nLevel >= X.PACKET_INFO.DEBUG_LEVEL then
-		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
-		return OutputMessageEx('MSG_SYS', DEBUG_THEME[nLevel], szTitle, oContent, true)
+		OutputMessageEx('MSG_SYS', DEBUG_THEME[nLevel], szTitle, oContent, true)
 	end
 	if nLevel >= X.PACKET_INFO.DELOG_LEVEL then
 		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
