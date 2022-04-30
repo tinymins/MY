@@ -269,6 +269,7 @@ local function OnExit()
 	X.FireFlush()
 	CommonEventFirer(EXIT_EVENT)
 	X.ReleaseUserSettingsDB()
+	X.DeleteAncientLogs()
 end
 X.RegisterEvent('GAME_EXIT', OnExit)
 X.RegisterEvent('PLAYER_EXIT_GAME', OnExit)

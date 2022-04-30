@@ -204,6 +204,30 @@ function X.Log(szText)
 	Log(LOG_PATH, '[' .. szDate .. szTime .. ']' .. szText)
 end
 
+-- 清理日志文件
+function X.DeleteAncientLogs()
+	local szRoot = X.FormatPath({'logs/' .. szDate .. '/', X.PATH_TYPE.ROLE})
+	local aFiles = {}
+	for _, filename in ipairs(CPath.GetFileList(szRoot)) do
+		local year, month, day = filename:match('^(%d+)%-(%d+)%-(%d+)$')
+		if year then
+			year = tonumber(year)
+			month = tonumber(month)
+			day = tonumber(day)
+			table.insert(aFiles, { time = DateToTime(year, month, day, 0, 0, 0), filepath = szRoot .. filename })
+		end
+	end
+	if #aFiles <= 30 then
+		return
+	end
+	table.sort(aFiles, function(a, b)
+		return a.time > b.time
+	end)
+	for i = 31, #aFiles do
+		CPath.DelDir(aFiles[i].filepath)
+	end
+end
+
 -- Debug输出
 -- (void)X.Debug(szTitle, oContent, nLevel)
 -- szTitle  Debug头
