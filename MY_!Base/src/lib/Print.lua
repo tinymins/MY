@@ -221,7 +221,7 @@ function X.Log(szType, szText)
 		LOG_LINE_COUNT = 0
 	end
 	LOG_LINE_COUNT = LOG_LINE_COUNT + 1
-	Log(LOG_PATH, X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' [' .. szType .. '] ' .. szText)
+	Log(LOG_PATH, X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' [' .. szType .. '] ' .. szText .. '\n')
 end
 
 -- 清理日志文件
