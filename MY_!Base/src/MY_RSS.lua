@@ -54,26 +54,30 @@ function D.RegisterAdapter(szKey, fnAdapter)
 	FireUIEvent('MY_RSS_UPDATE', szKey)
 end
 
+function D.Sync()
+	X.Ajax({
+		url = 'https://pull.j3cx.com/config/all'
+			.. '?l=' .. ENVIRONMENT.GAME_LANG
+			.. '&L=' .. ENVIRONMENT.GAME_EDITION
+			.. '&_=' .. GetCurrentTime(),
+		success = function(html, status)
+			RSS_DATA = X.DecodeJSON(html)
+			if X.IsTable(RSS_DATA) and not X.IsNumber(RSS_DATA.EXPIRES) then
+				local year, month, day, hour, minute, second = X.TimeToDate(GetCurrentTime())
+				if hour >= 7 then
+					day = day + 1
+				end
+				RSS_DATA.EXPIRES = X.DateToTime(year, month, day, 7, 0, 0)
+			end
+			X.SaveLUAData(RSS_FILE, RSS_DATA)
+			FireUIEvent('MY_RSS_UPDATE')
+		end,
+	})
+end
+
 X.RegisterInit('MY_RSS', function()
 	if not RSS_DATA or not X.IsNumber(RSS_DATA.EXPIRES) or RSS_DATA.EXPIRES < GetCurrentTime() then
-		X.Ajax({
-			url = 'https://pull.j3cx.com/config/all'
-				.. '?l=' .. ENVIRONMENT.GAME_LANG
-				.. '&L=' .. ENVIRONMENT.GAME_EDITION
-				.. '&_=' .. GetCurrentTime(),
-			success = function(html, status)
-				RSS_DATA = X.DecodeJSON(html)
-				if X.IsTable(RSS_DATA) and not X.IsNumber(RSS_DATA.EXPIRES) then
-					local year, month, day, hour, minute, second = X.TimeToDate(GetCurrentTime())
-					if hour >= 7 then
-						day = day + 1
-					end
-					RSS_DATA.EXPIRES = X.DateToTime(year, month, day, 7, 0, 0)
-				end
-				X.SaveLUAData(RSS_FILE, RSS_DATA)
-				FireUIEvent('MY_RSS_UPDATE')
-			end,
-		})
+		D.Sync()
 	end
 end)
 
@@ -84,8 +88,9 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				'Get',
 				'RegisterAdapter',
+				'Get',
+				'Sync',
 			},
 			root = D,
 		},
