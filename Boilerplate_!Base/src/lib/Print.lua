@@ -197,11 +197,10 @@ local LOG_MAX_LINE = 5000
 local LOG_LINE_COUNT = 0
 local LOG_PATH, LOG_DATE
 -- 输出一条日志到日志文件
--- @param szText 日志内容
-function X.Log(szType, szText)
-	if not X.IsString(szText) then
-		szType, szText = 'UNKNOWN', szType
-	end
+-- @params 日志分类层级1, 日志分类层级2, 日志分类层级3, ..., 日志分类层级n, 日志内容
+function X.Log(...)
+	local nType = select('#', ...) - 1
+	local szText = select(nTitle + 1, ...)
 	local szDate = X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd')
 	if LOG_DATE ~= szDate or LOG_LINE_COUNT >= LOG_MAX_LINE then
 		if LOG_PATH then
@@ -221,7 +220,14 @@ function X.Log(szType, szText)
 		LOG_LINE_COUNT = 0
 	end
 	LOG_LINE_COUNT = LOG_LINE_COUNT + 1
-	Log(LOG_PATH, X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' [' .. szType .. '] ' .. szText .. '\n', 'close')
+	local szType = ''
+	for i = 1, nType do
+		szType = szType .. '[' .. select(i, ...) .. ']'
+	end
+	if szType ~= '' then
+		szType = szType .. ' '
+	end
+	Log(LOG_PATH, X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' ' .. szType .. szText .. '\n', 'close')
 end
 
 -- 清理日志文件
@@ -291,5 +297,5 @@ function X.Debug(...)
 	if nLevel >= X.PACKET_INFO.DELOG_LEVEL then
 		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
 	end
-	X.Log('DEBUG::L' .. nLevel .. '::' .. szTitle, szContent)
+	X.Log('DEBUG', 'LEVEL_' .. nLevel, szTitle, szContent)
 end
