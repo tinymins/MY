@@ -212,8 +212,6 @@ function X.Log(szType, szText)
 				.. szDate .. '/'
 				.. X.PACKET_INFO.NAME_SPACE
 				.. '_' .. ENVIRONMENT.GAME_PROVIDER
-				.. '_' .. ENVIRONMENT.GAME_LANG
-				.. '_' .. ENVIRONMENT.GAME_BRANCH
 				.. '_' .. ENVIRONMENT.GAME_EDITION
 				.. '_' .. ENVIRONMENT.GAME_VERSION
 				.. '_' .. X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd_%hh-%mm-%ss') .. '.log',
