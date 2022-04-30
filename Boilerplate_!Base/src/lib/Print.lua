@@ -216,7 +216,7 @@ function X.Log(szType, szText)
 				.. '_' .. ENVIRONMENT.GAME_BRANCH
 				.. '_' .. ENVIRONMENT.GAME_EDITION
 				.. '_' .. ENVIRONMENT.GAME_VERSION
-				.. '_' .. X.FormatTime(GetCurrentTime(), '%hh-%mm-%ss') .. '.log',
+				.. '_' .. X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd_%hh-%mm-%ss') .. '.log',
 			X.PATH_TYPE.ROLE
 		})
 		LOG_DATE = szDate
