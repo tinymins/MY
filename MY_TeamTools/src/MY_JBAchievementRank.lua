@@ -306,11 +306,16 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 				local aDataSource = {
 					{GetFormatText(_L['Current map achievement rank:'], 162, 255, 255, 0)},
 				}
+				local aAchievement = {}
 				for dwAchieveID, bAcquired in pairs(BOSS_ACHIEVE_ACQUIRE_STATE) do
-					local achi = X.GetAchievement(dwAchieveID)
+					table.insert(aAchievement, { dwAchieveID = dwAchieveID, bAcquired = bAcquired })
+				end
+				table.sort(aAchievement, function(a, b) return a.dwAchieveID < b.dwAchieveID end)
+				for _, v in ipairs(aAchievement) do
+					local achi = X.GetAchievement(v.dwAchieveID)
 					table.insert(aDataSource, {
-						GetFormatText('[' .. (achi and achi.szName or dwAchieveID) .. ']', 162, 255, 255, 0),
-						bAcquired and GetFormatText(_L['(Done)'], 162, 255, 128, 0) or GetFormatText(_L['(Pending)'], 162, 0, 255, 128),
+						GetFormatText('[' .. (achi and achi.szName or v.dwAchieveID) .. ']', 162, 255, 255, 0),
+						v.bAcquired and GetFormatText(_L['(Done)'], 162, 255, 128, 0) or GetFormatText(_L['(Pending)'], 162, 0, 255, 128),
 					})
 				end
 				if #aDataSource == 1 then
