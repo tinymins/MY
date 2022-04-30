@@ -213,7 +213,7 @@ end
 
 -- 清理日志文件
 function X.DeleteAncientLogs()
-	local szRoot = X.FormatPath({'logs/' .. szDate .. '/', X.PATH_TYPE.ROLE})
+	local szRoot = X.FormatPath({'logs/', X.PATH_TYPE.ROLE})
 	local aFiles = {}
 	for _, filename in ipairs(CPath.GetFileList(szRoot)) do
 		local year, month, day = filename:match('^(%d+)%-(%d+)%-(%d+)$')
