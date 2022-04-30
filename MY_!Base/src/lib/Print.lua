@@ -221,7 +221,7 @@ function X.Log(szType, szText)
 		LOG_LINE_COUNT = 0
 	end
 	LOG_LINE_COUNT = LOG_LINE_COUNT + 1
-	Log(LOG_PATH, X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' [' .. szType .. '] ' .. szText .. '\n')
+	Log(LOG_PATH, X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' [' .. szType .. '] ' .. szText .. '\n', 'close')
 end
 
 -- 清理日志文件
@@ -286,8 +286,7 @@ function X.Debug(...)
 		szContent = tostring(oContent)
 	end
 	if nLevel >= X.PACKET_INFO.DEBUG_LEVEL then
-		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
-		return OutputMessageEx('MSG_SYS', DEBUG_THEME[nLevel], szTitle, oContent, true)
+		OutputMessageEx('MSG_SYS', DEBUG_THEME[nLevel], szTitle, oContent, true)
 	end
 	if nLevel >= X.PACKET_INFO.DELOG_LEVEL then
 		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
