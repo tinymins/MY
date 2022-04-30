@@ -216,7 +216,7 @@ function X.Ajax(settings)
 		config.url .. ' - ' .. config.driver .. '/' .. config.method
 			.. ' (' .. driver .. '/' .. method .. ')'
 			.. ': PREPARE READY'
-			.. (xdata and ('\n[BODY]' .. X.EncodeQuerystring(xdata) .. '[/BODY]') or ''),
+			.. (config.data and ('\n[BODY]' .. X.EncodeQuerystring(config.data) .. '[/BODY]') or ''),
 		X.DEBUG_LEVEL.LOG
 	)
 	--[[#DEBUG END]]
@@ -294,8 +294,12 @@ function X.Ajax(settings)
 	X.RegisterExit(bridgekey, settings.closebridge)
 
 	-- log
-	X.Log('AJAX', config.url .. ' - ' .. driver .. '/' .. method)
-	X.Log('AJAX', X.EncodeLUAData(config))
+	X.Log(
+		'AJAX',
+		config.url .. ' - ' .. config.driver .. '/' .. config.method
+			.. ' (' .. driver .. '/' .. method .. ')'
+			.. (config.data and (' [BODY]' .. X.EncodeQuerystring(config.data) .. '[/BODY]') or '')
+	)
 
 	local canajax, errmsg = X.CanAjax(driver, method)
 	if not canajax then
