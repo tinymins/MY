@@ -98,7 +98,7 @@ end
 -- settings.error     -- 请求失败回调事件，可能携带数据，回调链： complete -> error
 function X.Ajax(settings)
 	assert(X.IsTable(settings) and X.IsString(settings.url))
-	-- standradize settings
+	-- standardize settings
 	local id = string.lower(X.GetUUID())
 	local oncomplete, onerror = settings.complete, settings.error
 	local onfulfilled, onsuccess = settings.fulfilled, settings.success
@@ -292,6 +292,10 @@ function X.Ajax(settings)
 	end)
 	X.DelayCall(bridgekey, config.timeout, settings.closebridge)
 	X.RegisterExit(bridgekey, settings.closebridge)
+
+	-- log
+	X.Log('[AJAX] ' .. config.url .. ' - ' .. driver .. '/' .. method)
+	X.Log('[AJAX] ' .. X.EncodeLUAData(config))
 
 	local canajax, errmsg = X.CanAjax(driver, method)
 	if not canajax then

@@ -1115,6 +1115,7 @@ function X.CreateDataRoot(ePathType)
 	CPath.MakeDir(X.FormatPath({'cache/', ePathType}))
 	CPath.MakeDir(X.FormatPath({'config/', ePathType}))
 	CPath.MakeDir(X.FormatPath({'export/', ePathType}))
+	CPath.MakeDir(X.FormatPath({'logs/', ePathType}))
 	CPath.MakeDir(X.FormatPath({'font/', ePathType}))
 	CPath.MakeDir(X.FormatPath({'userdata/', ePathType}))
 end
