@@ -193,7 +193,7 @@ function X.OutputWhisper(szMsg, szHead)
 end
 
 local LOG_MAX_FILE = 30
-local LOG_MAX_LINE = 300
+local LOG_MAX_LINE = 5000
 local LOG_LINE_COUNT = 0
 local LOG_PATH, LOG_DATE
 -- 输出一条日志到日志文件
