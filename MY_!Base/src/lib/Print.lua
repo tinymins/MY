@@ -208,7 +208,7 @@ function X.Log(szType, szText)
 			Log(LOG_PATH, '', 'close')
 		end
 		LOG_PATH = X.FormatPath({
-			'logs/'
+			'logs/JX3_'
 				.. szDate .. '/'
 				.. X.PACKET_INFO.NAME_SPACE
 				.. '_' .. ENVIRONMENT.GAME_PROVIDER
@@ -221,7 +221,7 @@ function X.Log(szType, szText)
 		LOG_LINE_COUNT = 0
 	end
 	LOG_LINE_COUNT = LOG_LINE_COUNT + 1
-	Log(LOG_PATH, X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' [' .. szType .. '] ' .. szText .. '\r\n')
+	Log(LOG_PATH, X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' [' .. szType .. '] ' .. szText)
 end
 
 -- 清理日志文件
