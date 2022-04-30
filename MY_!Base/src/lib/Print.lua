@@ -210,7 +210,7 @@ function X.Log(szType, szText)
 		LOG_PATH = X.FormatPath({
 			'logs/'
 				.. szDate .. '/'
-				.. PACKET_INFO.NAME_SPACE
+				.. X.PACKET_INFO.NAME_SPACE
 				.. '_' .. ENVIRONMENT.GAME_PROVIDER
 				.. '_' .. ENVIRONMENT.GAME_LANG
 				.. '_' .. ENVIRONMENT.GAME_BRANCH
