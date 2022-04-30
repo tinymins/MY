@@ -198,17 +198,32 @@ local LOG_LINE_COUNT = 0
 local LOG_PATH, LOG_DATE
 -- 输出一条日志到日志文件
 -- @param szText 日志内容
-function X.Log(szText)
+function X.Log(szType, szText)
+	if not X.IsString(szText) then
+		szType, szText = 'UNKNOWN', szType
+	end
 	local szDate = X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd')
-	local szTime = X.FormatTime(GetCurrentTime(), '%hh-%mm-%ss')
 	if LOG_DATE ~= szDate or LOG_LINE_COUNT >= LOG_MAX_LINE then
 		if LOG_PATH then
 			Log(LOG_PATH, '', 'close')
 		end
-		LOG_PATH = X.FormatPath({'logs/' .. szDate .. '/' .. szTime .. '.log', X.PATH_TYPE.ROLE})
+		LOG_PATH = X.FormatPath({
+			'logs/'
+				.. szDate .. '/'
+				.. PACKET_INFO.NAME_SPACE
+				.. '_' .. ENVIRONMENT.GAME_PROVIDER
+				.. '_' .. ENVIRONMENT.GAME_LANG
+				.. '_' .. ENVIRONMENT.GAME_BRANCH
+				.. '_' .. ENVIRONMENT.GAME_EDITION
+				.. '_' .. ENVIRONMENT.GAME_VERSION
+				.. '_' .. X.FormatTime(GetCurrentTime(), '%hh-%mm-%ss') .. '.log',
+			X.PATH_TYPE.ROLE
+		})
+		LOG_DATE = szDate
+		LOG_LINE_COUNT = 0
 	end
 	LOG_LINE_COUNT = LOG_LINE_COUNT + 1
-	Log(LOG_PATH, '[' .. szDate .. szTime .. ']' .. szText)
+	Log(LOG_PATH, X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' [' .. szType .. '] ' .. szText .. '\r\n')
 end
 
 -- 清理日志文件

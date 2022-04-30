@@ -2005,6 +2005,7 @@ if not ENVIRONMENT.RUNTIME_OPTIMIZE then
 				local szMessage = 'Your KGUI is not official, please fix client and try again.'
 				X.ErrorLog('[' .. X.PACKET_INFO.NAME_SPACE .. ']' .. szMessage .. '\n' .. _L[szMessage])
 			end
+			X.Log('CALL_LUA_ERROR', szMsg)
 			table.insert(ERROR_MSG, szMsg)
 		end
 		SaveErrorMessage()

@@ -294,8 +294,8 @@ function X.Ajax(settings)
 	X.RegisterExit(bridgekey, settings.closebridge)
 
 	-- log
-	X.Log('[AJAX] ' .. config.url .. ' - ' .. driver .. '/' .. method)
-	X.Log('[AJAX] ' .. X.EncodeLUAData(config))
+	X.Log('AJAX', config.url .. ' - ' .. driver .. '/' .. method)
+	X.Log('AJAX', X.EncodeLUAData(config))
 
 	local canajax, errmsg = X.CanAjax(driver, method)
 	if not canajax then
