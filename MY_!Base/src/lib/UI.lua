@@ -559,14 +559,12 @@ local function OutputAdvanceTip(props, ...)
 	if not X.IsTable(props) then
 		props = { render = props }
 	end
-	local nWidth = props.w or 450
 	local tOffset = props.offset or {}
 	local nOffsetX = tOffset.x or 0
 	local nOffsetY = tOffset.y or 0
 	local nOffsetW = tOffset.w or 0
 	local nOffsetH = tOffset.h or 0
 	local ePosition = props.position or UI.TIP_POSITION.FOLLOW_MOUSE
-	local bRichText = props.rich
 	local nX, nY, nW, nH
 	if ePosition == UI.TIP_POSITION.FOLLOW_MOUSE then
 		nX, nY = Cursor.GetPos()
@@ -590,21 +588,70 @@ local function OutputAdvanceTip(props, ...)
 	end
 	nX, nY = nX + nOffsetX, nY + nOffsetY
 	nW, nH = nW + nOffsetW, nH + nOffsetH
-	local szText = props.render
-	if X.IsFunction(szText) then
-		local bSuccess
-		bSuccess, szText, bRichText = X.ExecuteWithThis(this, szText, ...)
-		if not bSuccess then
+	if props.type == 'table' then
+		local aRow
+		if props.rows then
+			aRow = {}
+			for k, v in pairs(props.rows) do
+				aRow[k] = {
+					nPaddingTop = v.paddingTop,
+					nPaddingBottom = v.paddingBottom,
+					szAlignment = v.alignment,
+				}
+			end
+		end
+		local aColumn
+		if props.columns then
+			aColumn = {}
+			for k, v in pairs(props.columns) do
+				aColumn[k] = {
+					nPaddingLeft = v.paddingLeft,
+					nPaddingRight = v.paddingRight,
+					nMinWidth = v.minWidth,
+					szAlignment = v.alignment,
+				}
+			end
+		end
+		local aDataSource = props.dataSource
+		if X.IsFunction(aDataSource) then
+			local bSuccess
+			bSuccess, aDataSource = X.ExecuteWithThis(this, aDataSource, ...)
+			if not bSuccess then
+				return
+			end
+		end
+		X.OutputTableTip({
+			aRow = aRow,
+			aColumn = aColumn,
+			aDataSource = aDataSource,
+			nMinWidth = props.minWidth,
+			nMaxWidth = props.maxWidth,
+			nPaddingTop = props.paddingTop,
+			nPaddingBottom = props.paddingBottom,
+			nPaddingLeft = props.paddingLeft,
+			nPaddingRight = props.paddingRight,
+			Rect = {nX, nY, nW, nH},
+			nPosType = ePosition,
+		})
+	else
+		local nWidth = props.w or 450
+		local bRichText = props.rich
+		local szText = props.render
+		if X.IsFunction(szText) then
+			local bSuccess
+			bSuccess, szText, bRichText = X.ExecuteWithThis(this, szText, ...)
+			if not bSuccess then
+				return
+			end
+		end
+		if X.IsEmpty(szText) then
 			return
 		end
+		if not bRichText then
+			szText = GetFormatText(szText, props.font or 136, props.r, props.g, props.b)
+		end
+		OutputTip(szText, nWidth, {nX, nY, nW, nH}, ePosition)
 	end
-	if X.IsEmpty(szText) then
-		return
-	end
-	if not bRichText then
-		szText = GetFormatText(szText, props.font or 136, props.r, props.g, props.b)
-	end
-	OutputTip(szText, nWidth, {nX, nY, nW, nH}, ePosition)
 end
 
 local function HideAdvanceTip(props)
@@ -612,10 +659,13 @@ local function HideAdvanceTip(props)
 		props = { render = props }
 	end
 	local eHide = props.hide or UI.TIP_HIDE_WAY.HIDE
-	if eHide == UI.TIP_HIDE_WAY.HIDE then
-		HideTip(false)
-	elseif eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE then
-		HideTip(true)
+	if eHide ~= UI.TIP_HIDE_WAY.HIDE and eHide ~= UI.TIP_HIDE_WAY.ANIMATE_HIDE then
+		return
+	end
+	if props.type == 'table' then
+		X.HideTableTip(eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE)
+	else
+		HideTip(eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE)
 	end
 end
 
