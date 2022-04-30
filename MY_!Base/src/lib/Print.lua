@@ -200,7 +200,7 @@ local LOG_PATH, LOG_DATE
 -- @params 日志分类层级1, 日志分类层级2, 日志分类层级3, ..., 日志分类层级n, 日志内容
 function X.Log(...)
 	local nType = select('#', ...) - 1
-	local szText = select(nTitle + 1, ...)
+	local szText = select(nType + 1, ...)
 	local szDate = X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd')
 	if LOG_DATE ~= szDate or LOG_LINE_COUNT >= LOG_MAX_LINE then
 		if LOG_PATH then
