@@ -297,16 +297,26 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			MY_RSS.Sync()
 		end,
 		tip = {
-			render = function()
-				local aText = {_L['Current map achievement rank:']}
+			type = 'table',
+			columns = {
+				{ nPaddingRight = 20, nMinWidth = 100 },
+				{ szAlignment = 'RIGHT' },
+			},
+			dataSource = function()
+				local aDataSource = {
+					{GetFormatText(_L['Current map achievement rank:'], 162, 255, 255, 0)},
+				}
 				for dwAchieveID, bAcquired in pairs(BOSS_ACHIEVE_ACQUIRE_STATE) do
 					local achi = X.GetAchievement(dwAchieveID)
-					table.insert(aText, '[' .. (achi and achi.szName or dwAchieveID) .. ']' .. _L[bAcquired and '(Done)' or '(Not done)'])
+					table.insert(aDataSource, {
+						GetFormatText('[' .. (achi and achi.szName or dwAchieveID) .. ']', 162, 255, 255, 0),
+						bAcquired and GetFormatText(_L['(Done)'], 162, 255, 128, 0) or GetFormatText(_L['(Pending)'], 162, 0, 255, 128),
+					})
 				end
-				if #aText == 1 then
-					aText[1] = aText[1] .. _L['None']
+				if #aDataSource == 1 then
+					aDataSource[1][2] = GetFormatText(_L['None'])
 				end
-				return table.concat(aText, '\n')
+				return aDataSource
 			end,
 			position = UI.TIP_POSITION.TOP_BOTTOM,
 		},

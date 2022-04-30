@@ -34,7 +34,7 @@ return {
     ['Sync competition'] = '同步赛事',
     ['Current map achievement rank:'] = '当前地图赛事成就：',
     ['(Done)'] = '（已达成）',
-    ['(Not done)'] = '（未达成）',
+    ['(Pending)'] = '（可参赛）',
     ['None'] = '无',
 	['Try share boss kill: %s - %ds (%s).'] = '正在分享：%s，战斗%d秒，%s。',
 	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s，战斗%d秒，%s。',
