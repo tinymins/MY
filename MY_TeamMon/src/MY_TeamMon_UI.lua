@@ -2689,19 +2689,24 @@ function D.OpenSettingPanel(data, szType)
 						ui:Children('#CountdownName' .. k):Visible(true):Text(v.szName or g_tStrings.CHAT_NAME)
 					end
 				else
-					local aCountdown = ParseCountdown(szNum, v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA)
+					local bTrigger = v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA
+					local aCountdown = ParseCountdown(szNum, bTrigger)
 					if aCountdown then
 						local tOperatorDesc = {
 							['+'] = _L['(OPERATOR +)'],
 							['-'] = _L['(OPERATOR -)'],
 						}
-						local xml = { GetFormatText(_L['Countdown preview'] .. '\n', 0, 255, 255, 0) }
-						for k, v in ipairs(aCountdown) do
+						local xml = { GetFormatText(_L[bTrigger and 'Trigger preview' or 'Countdown preview'] .. '\n', 0, 255, 255, 0) }
+						for kk, vv in ipairs(aCountdown) do
 							table.insert(xml, GetFormatText(
-								X.FormatDuration(v.nTime, 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' })
-									.. (tOperatorDesc[v.szOperator or ''] or '')
+								(
+									bTrigger
+										and ((vv.nTime * 100) .. '%')
+										or X.FormatDuration(vv.nTime, 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' })
+								)
+									.. (tOperatorDesc[vv.szOperator or ''] or '')
 									.. ' - '
-									.. FilterCustomText(v.szContent, '{$sender}', '{$receiver}')
+									.. FilterCustomText(vv.szContent, '{$sender}', '{$receiver}')
 									.. '\n'
 							))
 						end

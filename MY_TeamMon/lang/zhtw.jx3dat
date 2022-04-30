@@ -197,6 +197,7 @@ return {
 	['Search map'] = '搜索地圖',
 	['Search content'] = '搜索內容',
 	['Global search'] = '全局搜索',
+	['Trigger preview'] = '觸發器預覽',
 	['Countdown preview'] = '倒計時預覽',
 	['Master switch'] = '插件總開關',
 	['Enable MY_TeamMon'] = '開啟團隊監控插件',
