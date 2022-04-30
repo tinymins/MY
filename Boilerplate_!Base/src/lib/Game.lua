@@ -4917,6 +4917,9 @@ do
 		if select('#', ...) == 0 then
 			dwID = UI_GetClientPlayerID()
 		end
+		if not dwID then
+			return
+		end
 		if not PLAYER_GUID[dwID] then
 			if dwID == UI_GetClientPlayerID() then
 				local szGUID = X.GetClientInfo('szGlobalID')
