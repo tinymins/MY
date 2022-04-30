@@ -290,7 +290,31 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		color = { 172, 172, 172 },
 	}):AutoWidth():Width() + 5
 
-	nLFY = nY + nLH
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY,
+		text = _L['Sync competition'],
+		onClick = function()
+			MY_RSS.Sync()
+		end,
+		tip = {
+			render = function()
+				local aText = {_L['Current map achievement rank:']}
+				for dwAchieveID, bAcquired in pairs(BOSS_ACHIEVE_ACQUIRE_STATE) do
+					local achi = X.GetAchievement(dwAchieveID)
+					table.insert(aText, '[' .. (achi and achi.szName or dwAchieveID) .. ']' .. _L[bAcquired and '(Done)' or '(Not done)'])
+				end
+				if #aText == 1 then
+					aText[1] = aText[1] .. _L['None']
+				end
+				return table.concat(aText, '\n')
+			end,
+			position = UI.TIP_POSITION.TOP_BOTTOM,
+		},
+	}):AutoWidth():Width() + 5
+
+	nX = nPaddingX + 10
+	nY = nY + nLH
+	nLFY = nY
 	return nX, nY, nLFY
 end
 
