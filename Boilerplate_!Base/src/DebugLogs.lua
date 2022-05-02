@@ -1,18 +1,10 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 各种调试信息输出
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 X.RegisterEvent('OPEN_WINDOW', X.NSFormatString('{$NS}_DebugLogs'), function()
 	if not X.IsDebugClient(true) then

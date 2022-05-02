@@ -1,22 +1,15 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : TextEditor
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 -- 打开文本编辑器
-function UI.OpenTextEditor(szText, opt)
+function X.UI.OpenTextEditor(szText, opt)
 	local szFrameName
 	if X.IsString(opt) then
 		szFrameName = opt.name
@@ -32,7 +25,7 @@ function UI.OpenTextEditor(szText, opt)
 		local nW, nH = select(3, ui:Size())
 		ui:Fetch('WndEditBox'):Size(nW, nH)
 	end
-	ui = UI.CreateFrame(szFrameName, {
+	ui = X.UI.CreateFrame(szFrameName, {
 		w = w, h = h, alpha = opt.alpha or 180,
 		text = opt.title or _L['Text Editor'],
 		anchor = opt.anchor or { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },

@@ -1,20 +1,10 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 网络请求支持库
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
-local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- (void) X.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
 -- szUrl        -- 请求的完整 URL（包含 http:// 或 https://）
@@ -277,8 +267,8 @@ function X.Ajax(settings)
 	-------------------------------
 	-- bridge
 	local bridgekey = X.NSFormatString('{$NS}RRDF_TO_') .. id
-	local bridgein = AJAX_BRIDGE_PATH .. id .. '.' .. ENVIRONMENT.GAME_LANG .. '.jx3dat'
-	local bridgeout = AJAX_BRIDGE_PATH .. id .. '.result.' .. ENVIRONMENT.GAME_LANG .. '.jx3dat'
+	local bridgein = AJAX_BRIDGE_PATH .. id .. '.' .. X.ENVIRONMENT.GAME_LANG .. '.jx3dat'
+	local bridgeout = AJAX_BRIDGE_PATH .. id .. '.result.' .. X.ENVIRONMENT.GAME_LANG .. '.jx3dat'
 	local bridgetimeout = GetTime() + config.timeout
 	settings.closebridge = function()
 		CPath.DelFile(bridgein)

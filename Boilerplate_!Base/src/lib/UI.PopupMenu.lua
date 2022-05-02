@@ -1,18 +1,10 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 弹出菜单
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local PLUGIN_NAME = X.NSFormatString('{$NS}_PopupMenu')
 local COLOR_TABLE_NAME = X.NSFormatString('{$NS}_ColorTable')
@@ -379,7 +371,7 @@ function D.DrawScrollContainer(scroll, top, menu, nLevel, bInlineContainer)
 				-- 正文
 				local hContentInner = hContent:Lookup('Handle_ContentInner')
 				local nFont = D.IsDisable(m) and DISABLE_FONT or ENABLE_FONT
-				local rgb = m.rgb or CONSTANT.EMPTY_TABLE
+				local rgb = m.rgb or X.CONSTANT.EMPTY_TABLE
 				local r, g, b = rgb.r or rgb[1] or m.r, rgb.g or rgb[2] or m.g, rgb.b or rgb[3] or m.b
 				if D.IsDisable(m) then
 					r, g, b = nil, nil, nil
@@ -715,7 +707,7 @@ function D.OnItemLButtonClick()
 		local wnd = this:GetParent():GetParent():GetParent() -- 'Wnd_Item'
 		local frame = this:GetRoot()
 		frame.bColorPicker = true
-		UI.OpenColorPicker(function(r, g, b)
+		X.UI.OpenColorPicker(function(r, g, b)
 			if not wnd or not wnd:IsValid() then
 				return
 			end
@@ -750,5 +742,5 @@ local settings = {
 _G[PLUGIN_NAME] = X.CreateModule(settings)
 end
 
-UI.PopupMenu = D.Open
-UI.ClosePopupMenu = D.Close
+X.UI.PopupMenu = D.Open
+X.UI.ClosePopupMenu = D.Close

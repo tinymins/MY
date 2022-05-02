@@ -1,23 +1,15 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 悬浮功能入口
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = X.NSFormatString('{$NS}_HoverEntry')
 local PLUGIN_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT
 local MODULE_NAME = X.NSFormatString('{$NS}_HoverEntry')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/hoverentry/')
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
@@ -55,23 +47,23 @@ function D.Popup()
 			szOption = addonmenu.szOption,
 			rgb = addonmenu.rgb,
 		},
-		CONSTANT.MENU_DIVIDER,
+		X.CONSTANT.MENU_DIVIDER,
 	}
 	for i, v in ipairs(addonmenu) do
 		table.insert(menu, v)
 	end
-	UI.PopupMenu(menu)
+	X.UI.PopupMenu(menu)
 end
 
 function D.CheckEnable()
 	Wnd.CloseWindow(FRAME_NAME)
 	if O.bEnable then
-		local frame = UI.CreateFrame(FRAME_NAME, {
+		local frame = X.UI.CreateFrame(FRAME_NAME, {
 			empty = true,
 			w = O.nSize, h = O.nSize,
 			anchor = O.anchor,
 		})
-		UI(frame):Append('Image', {
+		X.UI(frame):Append('Image', {
 			w = O.nSize, h = O.nSize,
 			image = X.PACKET_INFO.LOGO_UITEX,
 			imageFrame = X.PACKET_INFO.LOGO_MAIN_FRAME,
@@ -94,7 +86,7 @@ end
 
 function D.OnEvent(event)
 	if event == 'UI_SCALED' then
-		UI(this):Anchor(O.anchor)
+		X.UI(this):Anchor(O.anchor)
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
 		UpdateCustomModeWindow(this, _L['HoverEntry'])
 	elseif event == 'ON_LEAVE_CUSTOM_UI_MODE' then
@@ -139,7 +131,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nX, y = nY, w = 100, h = 25,
 		value = O.nSize,
 		range = {1, 300},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textFormatter = function(v) return _L('Size: %d', v) end,
 		onChange = function(val)
 			O.nSize = val

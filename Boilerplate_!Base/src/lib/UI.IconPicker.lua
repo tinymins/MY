@@ -1,23 +1,16 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : IconPicker
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 local ICON_PAGE, MAX_ICON
 -- iconÑ¡ÔñÆ÷
-function UI.OpenIconPicker(fnAction)
+function X.UI.OpenIconPicker(fnAction)
 	if not MAX_ICON then
 		local szPath = 'ui\\Scheme\\Case\\icon.txt'
 		local tTitle = {
@@ -76,7 +69,7 @@ function UI.OpenIconPicker(fnAction)
 		MAX_ICON = MAX_ICON or 50000
 	end
 	local nMaxIcon, boxs, txts = MAX_ICON, {}, {}
-	local ui = UI.CreateFrame(X.NSFormatString('{$NS}_IconPanel'), { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
+	local ui = X.UI.CreateFrame(X.NSFormatString('{$NS}_IconPanel'), { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
 	local function GetPage(nPage, bInit)
 		if nPage == ICON_PAGE and not bInit then
 			return
@@ -135,7 +128,7 @@ function UI.OpenIconPicker(fnAction)
 	ui:Append('WndTrackbar', {
 		x = 10, y = 580, h = 25, w = 500, textFormatter = ' Page: %d',
 		range = {1, math.ceil(nMaxIcon / 144)}, value = ICON_PAGE or 21,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onChange = function(nVal)
 			X.DelayCall(function() GetPage(nVal) end)
 		end,

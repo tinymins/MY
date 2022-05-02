@@ -1,19 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 请求处理弹框界面
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 local D = {}
 local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Request.ini'
@@ -161,7 +154,7 @@ function D.OnItemMouseEnter()
 			local x, y = this:GetAbsPos()
 			local w, h = this:GetSize()
 			local szTip = GetTip(info.data)
-			OutputTip(szTip, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+			OutputTip(szTip, 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 		end
 	end
 end
@@ -204,8 +197,8 @@ local settings = {
 _G[FRAME_NAME] = X.CreateModule(settings)
 end
 
-UI.OpenRequest = D.Open
-UI.CloseRequest = D.Close
-UI.RegisterRequest = D.RegisterRequest
-UI.ReplaceRequest = D.Replace
-UI.RemoveRequest = D.RemoveRequest
+X.UI.OpenRequest = D.Open
+X.UI.CloseRequest = D.Close
+X.UI.RegisterRequest = D.RegisterRequest
+X.UI.ReplaceRequest = D.Replace
+X.UI.RemoveRequest = D.RemoveRequest

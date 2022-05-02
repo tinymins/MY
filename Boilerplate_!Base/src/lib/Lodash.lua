@@ -1,21 +1,15 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : Loadsh ¹¤¾ß¿â
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
+--------------------------------------------------------------------------------
+local X = Boilerplate
+--------------------------------------------------------------------------------
+
 -----------------------------------------------------------------------------------
 -- https://raw.githubusercontent.com/danielmgmi/lodash.lua/master/src/lodash.lua --
 -----------------------------------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
-local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+
 ---
 -- lodash for lua
 -- @module lodash
@@ -2321,4 +2315,4 @@ _.range = function(start, ...)
     return t
 end
 
-X.lodash = _
+X.lodash = X.SetmetaReadonly(_)

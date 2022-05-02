@@ -1,18 +1,10 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 弹出菜单
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local PLUGIN_NAME = X.NSFormatString('{$NS}_DragDrop')
 
@@ -80,7 +72,7 @@ function D.Open(raw, capture, ...)
 	frame:SetSize(nW, nH)
 	frame:StartMoving()
 	frame:BringToTop()
-	Cursor.Switch(UI.CURSOR.ON_DRAG)
+	Cursor.Switch(X.UI.CURSOR.ON_DRAG)
 	DATA = X.Pack(...)
 	X.DelayCall(X.NSFormatString('{$NS}_UI__DragDrop_Clear'), false)
 end
@@ -92,7 +84,7 @@ function D.Close()
 		local dropEl = HOVER_EL
 		HOVER_EL = nil
 		X.DelayCall(X.NSFormatString('{$NS}_UI__DragDrop_Clear'), 50, function() DATA = nil end) -- 由于 Click 在 DragEnd 之后
-		Cursor.Switch(UI.CURSOR.NORMAL)
+		Cursor.Switch(X.UI.CURSOR.NORMAL)
 		frame:EndMoving()
 		Wnd.CloseWindow(DRAG_FRAME_NAME)
 		Wnd.CloseWindow(DROP_FRAME_NAME)
@@ -168,8 +160,8 @@ local settings = {
 _G[PLUGIN_NAME] = X.CreateModule(settings)
 end
 
-UI.IsDragDropOpened = D.IsOpened
-UI.OpenDragDrop = D.Open
-UI.CloseDragDrop = D.Close
-UI.GetDragDropData = D.GetData
-UI.SetDragDropHoverEl = D.SetHoverEl
+X.UI.IsDragDropOpened = D.IsOpened
+X.UI.OpenDragDrop = D.Open
+X.UI.CloseDragDrop = D.Close
+X.UI.GetDragDropData = D.GetData
+X.UI.SetDragDropHoverEl = D.SetHoverEl

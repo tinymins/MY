@@ -1,25 +1,18 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 系统输出
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 local THEME_LIST = {
-	-- [CONSTANT.MSG_THEME.NORMAL ] = { r = 255, g = 255, b =   0 },
-	[CONSTANT.MSG_THEME.ERROR  ] = { r = 255, g =  86, b =  86 },
-	[CONSTANT.MSG_THEME.WARNING] = { r = 255, g = 170, b = 170 },
-	[CONSTANT.MSG_THEME.SUCCESS] = { r =   0, g = 255, b = 127 },
+	-- [X.CONSTANT.MSG_THEME.NORMAL ] = { r = 255, g = 255, b =   0 },
+	[X.CONSTANT.MSG_THEME.ERROR  ] = { r = 255, g =  86, b =  86 },
+	[X.CONSTANT.MSG_THEME.WARNING] = { r = 255, g = 170, b = 170 },
+	[X.CONSTANT.MSG_THEME.SUCCESS] = { r =   0, g = 255, b = 127 },
 }
 
 local DEBUG_THEME = {
@@ -121,7 +114,7 @@ local function OutputMessageEx(szType, eTheme, oTitle, oContent, bEcho)
 end
 
 -- 显示本地信息 X.Sysmsg(oTitle, oContent, eTheme)
---   X.Sysmsg({'Error!', wrap = true}, '内容', CONSTANT.MSG_THEME.ERROR)
+--   X.Sysmsg({'Error!', wrap = true}, '内容', X.CONSTANT.MSG_THEME.ERROR)
 --   X.Sysmsg({'New message', r = 0, g = 0, b = 0, wrap = true}, '内容')
 --   X.Sysmsg({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, '内容')
 --   X.Sysmsg('New message', {'内容', '内容2', r = 0, g = 0, b = 0})
@@ -145,7 +138,7 @@ function X.Sysmsg(...)
 		oTitle = X.PACKET_INFO.SHORT_NAME
 	end
 	if not X.IsNumber(eTheme) then
-		eTheme = CONSTANT.MSG_THEME.NORMAL
+		eTheme = X.CONSTANT.MSG_THEME.NORMAL
 	end
 	return OutputMessageEx('MSG_SYS', eTheme, oTitle, oContent)
 end
@@ -169,12 +162,12 @@ function X.Topmsg(...)
 		oTitle, oContent, eTheme = ...
 	end
 	if not oTitle then
-		oTitle = CONSTANT.EMPTY_TABLE
+		oTitle = X.CONSTANT.EMPTY_TABLE
 	end
 	if not X.IsNumber(eTheme) then
-		eTheme = CONSTANT.MSG_THEME.NORMAL
+		eTheme = X.CONSTANT.MSG_THEME.NORMAL
 	end
-	local szType = eTheme == CONSTANT.MSG_THEME.ERROR
+	local szType = eTheme == X.CONSTANT.MSG_THEME.ERROR
 		and 'MSG_ANNOUNCE_RED'
 		or 'MSG_ANNOUNCE_YELLOW'
 	return OutputMessageEx(szType, eTheme, oTitle, oContent)
@@ -213,9 +206,9 @@ function X.Log(...)
 			'logs/'
 				.. szDate .. '/JX3_'
 				.. X.PACKET_INFO.NAME_SPACE
-				.. '_' .. ENVIRONMENT.GAME_PROVIDER
-				.. '_' .. ENVIRONMENT.GAME_EDITION
-				.. '_' .. ENVIRONMENT.GAME_VERSION
+				.. '_' .. X.ENVIRONMENT.GAME_PROVIDER
+				.. '_' .. X.ENVIRONMENT.GAME_EDITION
+				.. '_' .. X.ENVIRONMENT.GAME_VERSION
 				.. '_' .. X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd_%hh-%mm-%ss') .. '.log',
 			X.PATH_TYPE.ROLE
 		})

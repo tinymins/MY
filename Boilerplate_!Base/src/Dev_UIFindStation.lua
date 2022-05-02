@@ -1,24 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
--- @desc     : UI查看器
+-- @desc     : 界面查看器
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--- 来源于海鳗
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
-
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. '/lang/devs/')
----------------------------------------------------------------------
--- 本地函数和变量
----------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local O = {
 	bButton = false,
 	szQuery = '',
@@ -163,7 +152,7 @@ function PS.IsRestricted()
 end
 
 function PS.OnPanelActive(frame)
-	local ui = UI(frame)
+	local ui = X.UI(frame)
 	local nPaddingX, nPaddingY = 20, 20
 	local x, y = nPaddingX, nPaddingY
 	local w, h = ui:Size()

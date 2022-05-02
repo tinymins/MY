@@ -1,19 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 界面组件库示例
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 local COMPONENT_H = 25
 local COMPONENT_SAMPLE = {
@@ -172,7 +165,7 @@ local COMPONENT_SAMPLE = {
 				render = function(rec)
 					return X.EncodeJSON(rec, '    '), false
 				end,
-				position = UI.TIP_POSITION.LEFT_RIGHT,
+				position = X.UI.TIP_POSITION.LEFT_RIGHT,
 			},
 			rowMenuRClick = function(rec, index)
 				local menu = {
@@ -184,7 +177,7 @@ local COMPONENT_SAMPLE = {
 						rgb = { 255, 128, 128 },
 					},
 				}
-				UI.PopupMenu(menu)
+				X.UI.PopupMenu(menu)
 			end,
 			onColumnsChange = function(aColumns)
 				local aKeys = {}
@@ -256,7 +249,7 @@ end
 -- PS.OnPanelDeactive(wnd)
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local W, H = ui:Size()
 	local nPaddingX, nPaddingY, LH = 20, 20, 30
 	local nX, nY = nPaddingX, nPaddingY

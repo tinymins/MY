@@ -1,20 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : ”√ªß≈‰÷√
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local EncodeByteData = X.GetGameAPI('EncodeByteData')
 local DecodeByteData = X.GetGameAPI('DecodeByteData')
@@ -100,19 +92,19 @@ function X.FormatPath(oFilePath, tParams)
 	end
 	-- if exist {$lang} then add language identity
 	if string.find(szFilePath, '{$lang}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$lang}', tParams['lang'] or ENVIRONMENT.GAME_LANG)
+		szFilePath = szFilePath:gsub('{%$lang}', tParams['lang'] or X.ENVIRONMENT.GAME_LANG)
 	end
 	-- if exist {$edition} then add edition identity
 	if string.find(szFilePath, '{$edition}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$edition}', tParams['edition'] or ENVIRONMENT.GAME_EDITION)
+		szFilePath = szFilePath:gsub('{%$edition}', tParams['edition'] or X.ENVIRONMENT.GAME_EDITION)
 	end
 	-- if exist {$branch} then add branch identity
 	if string.find(szFilePath, '{$branch}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$branch}', tParams['branch'] or ENVIRONMENT.GAME_BRANCH)
+		szFilePath = szFilePath:gsub('{%$branch}', tParams['branch'] or X.ENVIRONMENT.GAME_BRANCH)
 	end
 	-- if exist {$version} then add version identity
 	if string.find(szFilePath, '{$version}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$version}', tParams['version'] or ENVIRONMENT.GAME_VERSION)
+		szFilePath = szFilePath:gsub('{%$version}', tParams['version'] or X.ENVIRONMENT.GAME_VERSION)
 	end
 	-- if exist {$date} then add date identity
 	if string.find(szFilePath, '{$date}', nil, true) then
@@ -612,8 +604,8 @@ function X.SetUserSettingsPresetID(szID, bDefault)
 		if szID:find('[/?*:|\\<>]') then
 			return _L['User settings preset id cannot contains special character (/?*:|\\<>).']
 		end
-		szID = wstring.gsub(szID, '^%s+', '')
-		szID = wstring.gsub(szID, '%s+$', '')
+		szID = X.WString.Replace(szID, '^%s+', '')
+		szID = X.WString.Replace(szID, '%s+$', '')
 	end
 	if X.IsEmpty(szID) then
 		szID = ''
@@ -681,8 +673,8 @@ function X.RegisterUserSettings(szKey, tOption)
 	assert(X.IsString(szKey) and #szKey > 0, szErrHeader .. '`Key` should be a non-empty string value.')
 	assert(not USER_SETTINGS_INFO[szKey], szErrHeader .. 'duplicated `Key` found.')
 	assert(X.IsString(szDataKey) and #szDataKey > 0, szErrHeader .. '`DataKey` should be a non-empty string value.')
-	assert(not lodash.some(USER_SETTINGS_INFO, function(p) return p.szDataKey == szDataKey and p.ePathType == ePathType end), szErrHeader .. 'duplicated `DataKey` + `PathType` found.')
-	assert(lodash.includes(DATABASE_TYPE_LIST, ePathType), szErrHeader .. '`PathType` value is not valid.')
+	assert(not X.lodash.some(USER_SETTINGS_INFO, function(p) return p.szDataKey == szDataKey and p.ePathType == ePathType end), szErrHeader .. 'duplicated `DataKey` + `PathType` found.')
+	assert(X.lodash.includes(DATABASE_TYPE_LIST, ePathType), szErrHeader .. '`PathType` value is not valid.')
 	assert(X.IsNil(szGroup) or (X.IsString(szGroup) and #szGroup > 0), szErrHeader .. '`Group` should be nil or a non-empty string value.')
 	assert(X.IsNil(szLabel) or (X.IsString(szLabel) and #szLabel > 0), szErrHeader .. '`Label` should be nil or a non-empty string value.')
 	assert(X.IsString(szVersion), szErrHeader .. '`Version` should be a string value.')
@@ -1091,10 +1083,10 @@ function X.CreateDataRoot(ePathType)
 				id = X.GetClientInfo('dwID'),
 				uid = X.GetPlayerGUID(),
 				name = X.GetClientInfo('szName'),
-				lang = ENVIRONMENT.GAME_LANG,
-				edition = ENVIRONMENT.GAME_EDITION,
-				branch = ENVIRONMENT.GAME_BRANCH,
-				version = ENVIRONMENT.GAME_VERSION,
+				lang = X.ENVIRONMENT.GAME_LANG,
+				edition = X.ENVIRONMENT.GAME_EDITION,
+				branch = X.ENVIRONMENT.GAME_BRANCH,
+				version = X.ENVIRONMENT.GAME_VERSION,
 				region = X.GetServer(1),
 				server = X.GetServer(2),
 				relregion = X.GetRealServer(1),
@@ -1187,13 +1179,13 @@ function X.SetRemoteStorage(szKey, ...)
 	local SetData = st.bForceOnline and SetOnlineAddonCustomData or SetAddonCustomData
 	local nPos = math.floor(st.nBitPos / BIT_NUMBER)
 	local nLen = math.floor((st.nBitPos + st.nBitNum - 1) / BIT_NUMBER) - nPos + 1
-	local aByte = lodash.map({GetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
+	local aByte = X.lodash.map({GetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
 	for nBitPos = st.nBitPos, st.nBitPos + st.nBitNum - 1 do
 		local nIndex = math.floor(nBitPos / BIT_NUMBER) - nPos + 1
 		local nOffset = nBitPos % BIT_NUMBER + 1
 		aByte[nIndex][nOffset] = aBit[nBitPos - st.nBitPos + 1]
 	end
-	SetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen, X.Unpack(lodash.map(aByte, Bit2Byte)))
+	SetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen, X.Unpack(X.lodash.map(aByte, Bit2Byte)))
 
 	OnRemoteStorageChange(szKey)
 end
@@ -1205,7 +1197,7 @@ function X.GetRemoteStorage(szKey)
 	local GetData = st.bForceOnline and GetOnlineAddonCustomData or GetAddonCustomData
 	local nPos = math.floor(st.nBitPos / BIT_NUMBER)
 	local nLen = math.floor((st.nBitPos + st.nBitNum - 1) / BIT_NUMBER) - nPos + 1
-	local aByte = lodash.map({GetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
+	local aByte = X.lodash.map({GetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
 	local aBit = {}
 	for nBitPos = st.nBitPos, st.nBitPos + st.nBitNum - 1 do
 		local nIndex = math.floor(nBitPos / BIT_NUMBER) - nPos + 1

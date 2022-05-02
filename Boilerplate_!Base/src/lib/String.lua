@@ -1,22 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 字符串处理
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local AnsiToUTF8 = AnsiToUTF8 or _G.ansi_to_utf8
---------------------------------------------
--- 本地函数和变量
---------------------------------------------
 
 -- 分隔字符串
 -- (table) X.SplitString(string szText, table aSpliter, bool bIgnoreEmptyPart)
@@ -291,10 +281,10 @@ function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgno
 		szText = StringEnerW(szText)
 	end
 	if bIgnoreSpace then
-		szFind = wstring.gsub(szFind, ' ', '')
-		szFind = wstring.gsub(szFind, g_tStrings.STR_ONE_CHINESE_SPACE, '')
-		szText = wstring.gsub(szText, ' ', '')
-		szText = wstring.gsub(szText, g_tStrings.STR_ONE_CHINESE_SPACE, '')
+		szFind = X.WString.Replace(szFind, ' ', '')
+		szFind = X.WString.Replace(szFind, g_tStrings.STR_ONE_CHINESE_SPACE, '')
+		szText = X.WString.Replace(szText, ' ', '')
+		szText = X.WString.Replace(szText, g_tStrings.STR_ONE_CHINESE_SPACE, '')
 	end
 	local me = GetClientPlayer()
 	if me then

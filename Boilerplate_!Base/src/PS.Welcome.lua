@@ -1,19 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : »¶Ó­Ò³
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/ps/')
+--------------------------------------------------------------------------------
 
 local PS = { bWelcome = true, bHide = true }
 
@@ -32,7 +25,7 @@ end
 local function GetSvrText()
 	local nFeeTime = X.GetTimeOfFee() - GetCurrentTime()
 	local szFeeTime = nFeeTime > 0
-		and _L('Fee left %s', X.FormatDuration(nFeeTime, 'CHINESE', { accuracyunit = ENVIRONMENT.GAME_BRANCH == 'classic' and 'hour' or nil }))
+		and _L('Fee left %s', X.FormatDuration(nFeeTime, 'CHINESE', { accuracyunit = X.ENVIRONMENT.GAME_BRANCH == 'classic' and 'hour' or nil }))
 		or _L['Fee left unknown']
 	return X.GetServer() .. ' (' .. X.GetRealServer() .. ')'
 		.. g_tStrings.STR_CONNECT
@@ -40,7 +33,7 @@ local function GetSvrText()
 end
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, color = { 140, 140, 140 } })
 	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT })
@@ -68,8 +61,8 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						local szRoot = X.GetAbsolutePath({'', X.PATH_TYPE.ROLE}):gsub('/', '\\')
 						X.OpenFolder(szRoot)
-						UI.OpenTextEditor(szRoot)
-						UI.ClosePopupMenu()
+						X.UI.OpenTextEditor(szRoot)
+						X.UI.ClosePopupMenu()
 					end,
 				},
 				{
@@ -85,8 +78,8 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						local szRoot = X.GetAbsolutePath({'', X.PATH_TYPE.SERVER}):gsub('/', '\\')
 						X.OpenFolder(szRoot)
-						UI.OpenTextEditor(szRoot)
-						UI.ClosePopupMenu()
+						X.UI.OpenTextEditor(szRoot)
+						X.UI.ClosePopupMenu()
 					end,
 				},
 				{
@@ -102,11 +95,11 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						local szRoot = X.GetAbsolutePath({'', X.PATH_TYPE.GLOBAL}):gsub('/', '\\')
 						X.OpenFolder(szRoot)
-						UI.OpenTextEditor(szRoot)
-						UI.ClosePopupMenu()
+						X.UI.OpenTextEditor(szRoot)
+						X.UI.ClosePopupMenu()
 					end,
 				},
-				CONSTANT.MENU_DIVIDER,
+				X.CONSTANT.MENU_DIVIDER,
 				{
 					szOption = _L['Flush data'],
 					fnMouseEnter = function()
@@ -119,21 +112,21 @@ function PS.OnPanelActive(wnd)
 					end,
 					fnAction = function()
 						X.FireFlush()
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 				},
 				{
 					szOption = _L['Export data'],
 					fnAction = function()
 						X.OpenUserSettingsExportPanel()
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 				},
 				{
 					szOption = _L['Import data'],
 					fnAction = function()
 						X.OpenUserSettingsImportPanel()
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 				},
 			}
@@ -145,7 +138,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['Error message'],
 		tip = {
 			render = _L['Show error message'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		onClick = function()
 			if IsCtrlKeyDown() and IsAltKeyDown() and IsShiftKeyDown() then
@@ -172,14 +165,14 @@ function PS.OnPanelActive(wnd)
 					.. '\n> ' .. X.GetAbsolutePath(X.GetAddonErrorMessageFilePath())
 					.. '\n========================================'
 			end
-			UI.OpenTextEditor(szErrmsg, { w = 800, h = 600, title = _L['Error message'] })
+			X.UI.OpenTextEditor(szErrmsg, { w = 800, h = 600, title = _L['Error message'] })
 		end,
 	}):AutoWidth():Width() + 5
 	PS.OnPanelResize(wnd)
 end
 
 function PS.OnPanelResize(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	local scaleH = w / 557 * 278
 	local bottomH = 90
@@ -201,7 +194,7 @@ function PS.OnPanelResize(wnd)
 end
 
 function PS.OnPanelBreathe(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	ui:Fetch('Text_Adv'):Text(GetAdvText())
 	ui:Fetch('Text_Svr'):Text(GetSvrText())
 	ui:Fetch('Text_Memory'):Text(GetMemoryText())

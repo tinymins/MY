@@ -23,7 +23,7 @@ import plib.environment as env
 
 TIME_TAG = time.strftime('%Y%m%d%H%M%S', time.localtime())
 
-def __compress(addon):
+def __compress(packet, addon):
 	'''
 	Compress and concat addon source into one file.
 
@@ -94,7 +94,6 @@ def __compress(addon):
 	with open('./%s/%s' % (addon, srcname), 'r+') as src:
 		content = src.read()
 		src.seek(0, 0)
-		src.write('local __INIT_TIME__ = GetTime()\n')
 		src.write('local package={preload={}}\n')
 		src.write(content)
 	with open('./%s/%s' % (addon, srcname), 'a') as src:
@@ -102,7 +101,7 @@ def __compress(addon):
 		for i in range(1, file_count + 1):
 			src.write('\'%d\',' % i)
 		src.write('}) do package.preload[k]() end\n')
-		src.write('Log("[ADDON] Module %s v%s loaded during " .. (GetTime() - __INIT_TIME__) .. "ms.")' % (addon, TIME_TAG))
+		src.write('Log("[ADDON] Module %s v%s loaded.")' % (addon, TIME_TAG))
 	print('Compress done...')
 	'''
 	Update info.*.ini
@@ -122,11 +121,11 @@ def __compress(addon):
 		f.write(converter.convert(info_content))
 	print('Update info done...')
 
-def __get_version_info(diff_ver):
+def __get_version_info(packet, diff_ver):
 	'''Get version information'''
 	# Read version from Base.lua
 	current_version = ''
-	for line in open('%s_!Base/src/lib/Base.lua' % get_current_packet_id()):
+	for line in open('%s_!Base/src/lib/Base.lua' % packet):
 		if line[0:16] == 'local _VERSION_ ':
 			current_version = re.sub(r'(?is)^local _VERSION_\s+=', '', line).strip()[1:-1]
 	# Read max and previous release commit
@@ -221,7 +220,9 @@ def __7zip(file_name, base_message, base_hash, extra_ignore_file):
 def run(diff_ver, is_source):
 	print('> DIFF VERSION: %s' % (diff_ver or 'auto'))
 	print('> RELEASE MODE: %s' % ('source' if is_source else 'dist'))
-	version_info = __get_version_info(diff_ver)
+	packet = get_current_packet_id()
+	packet_path = get_packet_path()
+	version_info = __get_version_info(packet, diff_ver)
 
 	if diff_ver and version_info.get('previous_hash') == '':
 		print('Error: Specified diff commit not found (release: %s).' % diff_ver)
@@ -233,14 +234,14 @@ def run(diff_ver, is_source):
 			utils.assert_exit(git.is_clean(), 'Error: master branch has uncommitted file change(s)!')
 			os.system('git checkout prelease || git checkout -b prelease')
 			os.system('git rebase master')
-			os.system('code "%s"' % os.path.join(get_packet_path(), './%s_!Base/src/lib/Base.lua' % get_current_packet_id()))
-			os.system('code "%s"' % os.path.join(get_packet_path(), './CHANGELOG.md'))
+			os.system('code "%s"' % os.path.join(packet_path, './%s_!Base/src/lib/Base.lua' % packet))
+			os.system('code "%s"' % os.path.join(packet_path, './CHANGELOG.md'))
 			utils.exit_with_message('Switched to prelease branch. Please commit release info and then run this script again!')
 
 		# Merge prelease into stable
 		if git.get_current_branch() == 'prelease':
 			os.system('git reset master')
-			version_info = __get_version_info(diff_ver)
+			version_info = __get_version_info(packet, diff_ver)
 			utils.assert_exit(version_info.get('max') == '' or semver.compare(version_info.get('current'), version_info.get('max')) == 1,
 				'Error: current version(%s) must be larger than max history version(%s)!' % (version_info.get('current'), version_info.get('max')))
 			os.system('git add * && git commit -m "release: %s"' % version_info.get('current'))
@@ -255,18 +256,18 @@ def run(diff_ver, is_source):
 	# Compress and concat source file
 	for addon in os.listdir('./'):
 		if os.path.exists(os.path.join('./', addon, 'info.ini')):
-			__compress(addon)
+			__compress(packet, addon)
 
 	dist_root = os.path.abspath(os.path.join(get_interface_path(), os.pardir))
 	if os.path.isfile(os.path.abspath(os.path.join(dist_root, 'gameupdater.exe'))):
-		dist_root = os.path.abspath(os.path.join(get_packet_path(), '!src-dist', 'dist'))
+		dist_root = os.path.abspath(os.path.join(packet_path, '!src-dist', 'dist'))
 	else:
 		dist_root = os.path.abspath(os.path.join(dist_root, os.pardir, 'dist'))
 
 	# Package files
 	if version_info.get('previous_hash'):
 		file_name_fmt = os.path.abspath(os.path.join(dist_root, '%s_%s_v%s.%sdiff-%s-%s.7z' % (
-			get_current_packet_id(),
+			packet,
 			TIME_TAG,
 			version_info.get('current'),
 			'%s',
@@ -283,7 +284,7 @@ def run(diff_ver, is_source):
 		__7zip(file_name_fmt % 'classic-', base_message, base_hash, '.7zipignore-classic')
 
 	file_name_fmt = os.path.abspath(os.path.join(dist_root, '%s_%s_v%s.%sfull.7z' % (
-		get_current_packet_id(),
+		packet,
 		TIME_TAG,
 		version_info.get('current'),
 		'%s',

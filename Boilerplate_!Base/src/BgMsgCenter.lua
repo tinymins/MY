@@ -1,20 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 背景通讯处理函数集成
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/bgmsg/')
------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 -- 测试用（请求共享位置）
 X.RegisterBgMsg('ASK_CURRENT_LOC', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf then
@@ -252,7 +245,7 @@ do
 				OnSwitchMap(dwMapID, dwID, aMapCopy, dwTime)
 			end)
 		end
-		return UI.FormatWMsgRet(true, true)
+		return X.UI.FormatWMsgRet(true, true)
 	end
 
 	local function OnFBAppendItemFromIni(hList)

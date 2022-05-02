@@ -1,20 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 系统函数库
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- #######################################################################################################
 --       #       #               #         #           #           #
@@ -572,7 +564,7 @@ function X.PlaySound(nType, szFilePath, szCustomPath)
 		end
 	end
 	-- 播放默认声音
-	local szPath = wstring.gsub(szFilePath, '\\', '/')
+	local szPath = X.WString.Replace(szFilePath, '\\', '/')
 	if not wstring.find(szPath, '/') then
 		szPath = X.PACKET_INFO.FRAMEWORK_ROOT .. 'audio/' .. szPath
 	end
@@ -887,21 +879,21 @@ function X.FormatDuration(nTime, tUnitFmt, tControl)
 	local mode = tControl and tControl.mode or 'normal'
 	-- 开始单位，最大只显示到该单位
 	local maxunit = tControl and tControl.maxunit or 'year'
-	local maxunitindex = lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == maxunit end)
+	local maxunitindex = X.lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == maxunit end)
 	if maxunitindex == -1 then
 		maxunitindex = 1
 		maxunit = FORMAT_TIME_UNIT_LIST[maxunitindex].key
 	end
 	-- 零值也保留的单位位置
 	local keepunit = tControl and tControl.keepunit or 'second'
-	local keepunitindex = lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == keepunit end)
+	local keepunitindex = X.lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == keepunit end)
 	if keepunitindex == -1 then
 		keepunitindex = #FORMAT_TIME_UNIT_LIST
 		keepunit = FORMAT_TIME_UNIT_LIST[keepunitindex].key
 	end
 	-- 精度结束单位，精度低于该单位的数据将被省去
 	local accuracy = tControl and tControl.accuracyunit or 'second'
-	local accuracyindex = lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == accuracy end)
+	local accuracyindex = X.lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == accuracy end)
 	if accuracyindex == -1 then
 		accuracyindex = #FORMAT_TIME_UNIT_LIST
 		accuracy = FORMAT_TIME_UNIT_LIST[accuracyindex].key
@@ -981,19 +973,19 @@ end
 --   %s    秒钟
 function X.FormatTime(nTimestamp, szFormat)
 	local t = TimeToDate(nTimestamp)
-	szFormat = wstring.gsub(szFormat, '%yyyy', string.format('%04d', t.year  ))
-	szFormat = wstring.gsub(szFormat, '%yy'  , string.format('%02d', t.year % 100))
-	szFormat = wstring.gsub(szFormat, '%MM'  , string.format('%02d', t.month ))
-	szFormat = wstring.gsub(szFormat, '%dd'  , string.format('%02d', t.day   ))
-	szFormat = wstring.gsub(szFormat, '%hh'  , string.format('%02d', t.hour  ))
-	szFormat = wstring.gsub(szFormat, '%mm'  , string.format('%02d', t.minute))
-	szFormat = wstring.gsub(szFormat, '%ss'  , string.format('%02d', t.second))
-	szFormat = wstring.gsub(szFormat, '%y', t.year  )
-	szFormat = wstring.gsub(szFormat, '%M', t.month )
-	szFormat = wstring.gsub(szFormat, '%d', t.day   )
-	szFormat = wstring.gsub(szFormat, '%h', t.hour  )
-	szFormat = wstring.gsub(szFormat, '%m', t.minute)
-	szFormat = wstring.gsub(szFormat, '%s', t.second)
+	szFormat = X.WString.Replace(szFormat, '%yyyy', string.format('%04d', t.year  ))
+	szFormat = X.WString.Replace(szFormat, '%yy'  , string.format('%02d', t.year % 100))
+	szFormat = X.WString.Replace(szFormat, '%MM'  , string.format('%02d', t.month ))
+	szFormat = X.WString.Replace(szFormat, '%dd'  , string.format('%02d', t.day   ))
+	szFormat = X.WString.Replace(szFormat, '%hh'  , string.format('%02d', t.hour  ))
+	szFormat = X.WString.Replace(szFormat, '%mm'  , string.format('%02d', t.minute))
+	szFormat = X.WString.Replace(szFormat, '%ss'  , string.format('%02d', t.second))
+	szFormat = X.WString.Replace(szFormat, '%y', t.year  )
+	szFormat = X.WString.Replace(szFormat, '%M', t.month )
+	szFormat = X.WString.Replace(szFormat, '%d', t.day   )
+	szFormat = X.WString.Replace(szFormat, '%h', t.hour  )
+	szFormat = X.WString.Replace(szFormat, '%m', t.minute)
+	szFormat = X.WString.Replace(szFormat, '%s', t.second)
 	return szFormat
 end
 
@@ -1348,7 +1340,7 @@ local CACHE, el = {}, nil
 function X.GetFontColor(nFont)
 	if not CACHE[nFont] then
 		if not el or not X.IsElement(el) then
-			el = UI.GetTempElement(X.NSFormatString('Text.{$NS}Lib_GetFontColor'))
+			el = X.UI.GetTempElement(X.NSFormatString('Text.{$NS}Lib_GetFontColor'))
 		end
 		el:SetFontScheme(nFont)
 		CACHE[nFont] = X.Pack(el:GetFontColor())
@@ -1572,11 +1564,11 @@ function X.OpenBrowser(szAddr, szMode)
 			return
 		end
 		if szMode == 'outer' then
-			UI.OpenTextEditor(szAddr)
+			X.UI.OpenTextEditor(szAddr)
 			return
 		end
 	end
-	UI.OpenBrowser(szAddr)
+	X.UI.OpenBrowser(szAddr)
 end
 
 function X.ArrayToObject(arr)
@@ -1874,7 +1866,7 @@ function X.GVoiceBase_GetMicState(...)
 	if X.IsFunction(_G.GVoiceBase_GetMicState) then
 		return _G.GVoiceBase_GetMicState(...)
 	end
-	return CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM
+	return X.CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM
 end
 
 function X.GVoiceBase_SwitchMicState(...)
@@ -1893,7 +1885,7 @@ function X.GVoiceBase_GetSpeakerState(...)
 	if X.IsFunction(_G.GVoiceBase_GetSpeakerState) then
 		return _G.GVoiceBase_GetSpeakerState(...)
 	end
-	return CONSTANT.SPEAKER_STATE.CLOSE
+	return X.CONSTANT.SPEAKER_STATE.CLOSE
 end
 
 function X.GVoiceBase_SwitchSpeakerState(...)
@@ -1991,15 +1983,15 @@ local FILE_PATH = {'temporary/lua_error.jx3dat', X.PATH_TYPE.GLOBAL}
 local LAST_ERROR_MSG = X.LoadLUAData(FILE_PATH, { passphrase = false }) or {}
 local ERROR_MSG = {}
 
-if not ENVIRONMENT.RUNTIME_OPTIMIZE then
-	local KEY = '/' .. wstring.gsub(X.PACKET_INFO.ROOT, '\\', '/'):gsub('/+$', ''):gsub('^.*/', ''):lower() .. '/'
+if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
+	local KEY = '/' .. X.WString.Replace(X.PACKET_INFO.ROOT, '\\', '/'):gsub('/+$', ''):gsub('^.*/', ''):lower() .. '/'
 	local function SaveErrorMessage()
 		X.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
 	end
 	local BROKEN_KGUI = IsDebugClient() and not X.IsDebugServer() and not X.IsDebugClient(true)
 	RegisterEvent('CALL_LUA_ERROR', function()
 		local szMsg = arg0
-		local szMsgL = wstring.gsub(arg0:lower(), '\\', '/')
+		local szMsgL = X.WString.Replace(arg0:lower(), '\\', '/')
 		if wstring.find(szMsgL, KEY) then
 			if BROKEN_KGUI then
 				local szMessage = 'Your KGUI is not official, please fix client and try again.'

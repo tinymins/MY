@@ -1,23 +1,16 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : FontPicker
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 -- 打开字体选择
-function UI.OpenFontPicker(callback, t)
-	local ui, i = UI.CreateFrame(X.NSFormatString('{$NS}_Font_Picker'), { simple = true, close = true, esc = true, text = _L['Font Picker'] }), 0
+function X.UI.OpenFontPicker(callback, t)
+	local ui, i = X.UI.CreateFrame(X.NSFormatString('{$NS}_Font_Picker'), { simple = true, close = true, esc = true, text = _L['Font Picker'] }), 0
 	while 1 do
 		local font = i
 		local txt = ui:Append('Text', {
@@ -33,7 +26,7 @@ function UI.OpenFontPicker(callback, t)
 				end
 			end,
 			onHover = function(bIn)
-				UI(this):Alpha(bIn and 255 or 200)
+				X.UI(this):Alpha(bIn and 255 or 200)
 			end,
 		})
 		-- remove unexist font

@@ -2,7 +2,8 @@ return {
 	PLUGIN_NAME                = 'Boilerplate插件集',
 	PLUGIN_SHORT_NAME          = 'Boilerplate插件',
 	PLUGIN_AUTHOR              = 'Boilerplate @ 夢江南',
-	PLUGIN_AUTHOR_WEIBO        = 'Boilerplate',
+	PLUGIN_AUTHOR_FEEDBACK     = 'Boilerplate',
+	PLUGIN_AUTHOR_FEEDBACK_URL = 'Boilerplate URL',
 	PLUGIN_AUTHOR_SIGNATURE    = 'Boilerplate @夢江南',
 
 	['%s, welcome to use %s!'] = '歡迎%s使用%s！',

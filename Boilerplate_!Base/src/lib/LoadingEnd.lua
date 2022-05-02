@@ -1,18 +1,11 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 基础库加载完成处理
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = Boilerplate
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local PROXY = {}
 if IsDebugClient() then
 function PROXY.DebugSetVal(szKey, oVal)
@@ -68,7 +61,7 @@ local function OnKeyPanelBtnLButtonUp()
 	end
 	local aCRC = X.SplitString(aParam[2], ',')
 	local szCorrect = tostring(MD5(X.GetUserRoleName() .. '65e33433-d13c-4269-adac-f091d4a57d4b')):sub(-6)
-	if not lodash.includes(aCRC, szCorrect) then
+	if not X.lodash.includes(aCRC, szCorrect) then
 		return
 	end
 	local nExpire = tonumber(aParam[3] or '')
