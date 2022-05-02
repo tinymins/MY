@@ -158,7 +158,7 @@ local function FireEventRec(E, p, ...)
 		X.Debug(
 			_L['PMTool'],
 			_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], nTickCount),
-			X.DEBUG_LEVEL.PMLOG)
+			X.DEBUG_LEVEL.PM_LOG)
 	end
 	--[[#DEBUG END]]
 end
@@ -842,9 +842,9 @@ local function onBreathe()
 	end
 	--[[#DEBUG BEGIN]]
 	if GetTime() - nBeginTime > COROUTINE_TIME then
-		X.Debug(_L['PMTool'], _L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), X.DEBUG_LEVEL.PMLOG)
+		X.Debug(_L['PMTool'], _L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), X.DEBUG_LEVEL.PM_LOG)
 	elseif nBeginTime - l_nLastBreatheTime > FPS_SLOW_TIME then
-		X.Debug(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), X.DEBUG_LEVEL.PMLOG)
+		X.Debug(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), X.DEBUG_LEVEL.PM_LOG)
 	end
 	--[[#DEBUG END]]
 	l_nLastBreatheTime = nBeginTime

@@ -16,7 +16,7 @@ local THEME_LIST = {
 }
 
 local DEBUG_THEME = {
-	[X.DEBUG_LEVEL.PMLOG  ] = { r =   0, g = 255, b = 255 },
+	[X.DEBUG_LEVEL.PM_LOG  ] = { r =   0, g = 255, b = 255 },
 	[X.DEBUG_LEVEL.LOG    ] = { r =   0, g = 255, b = 127 },
 	[X.DEBUG_LEVEL.WARNING] = { r = 255, g = 170, b = 170 },
 	[X.DEBUG_LEVEL.ERROR  ] = { r = 255, g =  86, b =  86 },

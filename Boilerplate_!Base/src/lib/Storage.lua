@@ -294,7 +294,7 @@ function X.SaveLUAData(oFilePath, oData, tConfig)
 	--[[#DEBUG BEGIN]]
 	nStartTick = GetTickCount() - nStartTick
 	if nStartTick > 5 then
-		X.Debug('PMTool', _L('%s saved during %dms.', szFilePath, nStartTick), X.DEBUG_LEVEL.PMLOG)
+		X.Debug('PMTool', _L('%s saved during %dms.', szFilePath, nStartTick), X.DEBUG_LEVEL.PM_LOG)
 	end
 	--[[#DEBUG END]]
 	return data
@@ -321,7 +321,7 @@ function X.LoadLUAData(oFilePath, tConfig)
 	--[[#DEBUG BEGIN]]
 	nStartTick = GetTickCount() - nStartTick
 	if nStartTick > 5 then
-		X.Debug('PMTool', _L('%s loaded during %dms.', szFilePath, nStartTick), X.DEBUG_LEVEL.PMLOG)
+		X.Debug('PMTool', _L('%s loaded during %dms.', szFilePath, nStartTick), X.DEBUG_LEVEL.PM_LOG)
 	end
 	--[[#DEBUG END]]
 	return data
@@ -487,7 +487,7 @@ local function SetInstanceInfoData(inst, info, data, version)
 		--[[#DEBUG END]]
 		db:Set(info.szDataKey, { d = data, v = version })
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, _L('User settings %s saved during %dms.', info.szDataKey, GetTickCount() - nStartTick), X.DEBUG_LEVEL.PMLOG)
+		X.Debug(X.PACKET_INFO.NAME_SPACE, _L('User settings %s saved during %dms.', info.szDataKey, GetTickCount() - nStartTick), X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 	end
 end
@@ -501,7 +501,7 @@ local function GetInstanceInfoData(inst, info)
 	--[[#DEBUG END]]
 	local res = db and db:Get(info.szDataKey)
 	--[[#DEBUG BEGIN]]
-	X.Debug(X.PACKET_INFO.NAME_SPACE, _L('User settings %s loaded during %dms.', info.szDataKey, GetTickCount() - nStartTick), X.DEBUG_LEVEL.PMLOG)
+	X.Debug(X.PACKET_INFO.NAME_SPACE, _L('User settings %s loaded during %dms.', info.szDataKey, GetTickCount() - nStartTick), X.DEBUG_LEVEL.PM_LOG)
 	--[[#DEBUG END]]
 	if res then
 		return res

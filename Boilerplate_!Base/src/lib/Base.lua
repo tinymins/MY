@@ -32,7 +32,7 @@ if SM_IsEnable then
 end
 
 local DEBUG_LEVEL = {
-	PMLOG   = 0,
+	PM_LOG  = 0,
 	LOG     = 1,
 	WARNING = 2,
 	ERROR   = 3,
