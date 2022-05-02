@@ -65,7 +65,8 @@ local LOG_PATH, LOG_DATE
 function X.Log(...)
 	local nType = select('#', ...) - 1
 	local szText = select(nType + 1, ...)
-	local szDate = X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd')
+	local tTime = TimeToDate(GetCurrentTime())
+	local szDate = string.format('%04d-%02d-%02d', tTime.year, tTime.month, tTime.day)
 	local szType = ''
 	for i = 1, nType do
 		szType = szType .. '[' .. select(i, ...) .. ']'
@@ -73,7 +74,7 @@ function X.Log(...)
 	if szType ~= '' then
 		szType = szType .. ' '
 	end
-	local szLog = X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' ' .. szType .. szText .. '\n'
+	local szLog = string.format('%04d/%02d/%02d_%02d:%02d:%02d %s%s\n', tTime.year, tTime.month, tTime.day, tTime.hour, tTime.minute, tTime.second, szType, szText)
 	if LOG_DATE ~= szDate or LOG_LINE_COUNT >= LOG_MAX_LINE then
 		-- 系统未初始化完成，加入缓存数组等待写入
 		if not X.GetPlayerGUID or not X.GetPlayerGUID() then
@@ -93,7 +94,8 @@ function X.Log(...)
 				.. '_' .. X.ENVIRONMENT.GAME_PROVIDER
 				.. '_' .. X.ENVIRONMENT.GAME_EDITION
 				.. '_' .. X.ENVIRONMENT.GAME_VERSION
-				.. '_' .. X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd_%hh-%mm-%ss') .. '.log',
+				.. '_' .. string.format('%04d-%02d-%02d_%02d-%02d-%02d', tTime.year, tTime.month, tTime.day, tTime.hour, tTime.minute, tTime.second)
+				.. '.log',
 			X.PATH_TYPE.ROLE
 		})
 		LOG_DATE = szDate
