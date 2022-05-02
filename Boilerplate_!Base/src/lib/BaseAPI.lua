@@ -54,6 +54,87 @@ function X.GetGameTable(szTable, bPrintError)
 	end
 end
 
+local LOG_MAX_FILE = 30
+local LOG_MAX_LINE = 5000
+local LOG_LINE_COUNT = 0
+local LOG_CACHE
+local LOG_PATH, LOG_DATE
+
+-- 输出一条日志到日志文件
+---@vararg string 日志分类层级1, 日志分类层级2, 日志分类层级3, ..., 日志分类层级n, 日志内容
+function X.Log(...)
+	local nType = select('#', ...) - 1
+	local szText = select(nType + 1, ...)
+	local szDate = X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd')
+	local szType = ''
+	for i = 1, nType do
+		szType = szType .. '[' .. select(i, ...) .. ']'
+	end
+	if szType ~= '' then
+		szType = szType .. ' '
+	end
+	local szLog = X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' ' .. szType .. szText .. '\n'
+	if LOG_DATE ~= szDate or LOG_LINE_COUNT >= LOG_MAX_LINE then
+		-- 系统未初始化完成，加入缓存数组等待写入
+		if not X.GetPlayerGUID or not X.GetPlayerGUID() then
+			if not LOG_CACHE then
+				LOG_CACHE = {}
+			end
+			table.insert(LOG_CACHE, szLog)
+			return
+		end
+		if LOG_PATH then
+			Log(LOG_PATH, '', 'close')
+		end
+		LOG_PATH = X.FormatPath({
+			'logs/'
+				.. szDate .. '/JX3_'
+				.. X.PACKET_INFO.NAME_SPACE
+				.. '_' .. X.ENVIRONMENT.GAME_PROVIDER
+				.. '_' .. X.ENVIRONMENT.GAME_EDITION
+				.. '_' .. X.ENVIRONMENT.GAME_VERSION
+				.. '_' .. X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd_%hh-%mm-%ss') .. '.log',
+			X.PATH_TYPE.ROLE
+		})
+		LOG_DATE = szDate
+		LOG_LINE_COUNT = 0
+	end
+	-- 如果存在缓存数据，先处理
+	if LOG_CACHE then
+		for _, szLog in ipairs(LOG_CACHE) do
+			Log(LOG_PATH, szLog)
+			LOG_LINE_COUNT = LOG_LINE_COUNT + 1
+		end
+		LOG_CACHE = nil
+	end
+	LOG_LINE_COUNT = LOG_LINE_COUNT + 1
+	Log(LOG_PATH, szLog, 'close')
+end
+
+-- 清理日志文件
+function X.DeleteAncientLogs()
+	local szRoot = X.FormatPath({'logs/', X.PATH_TYPE.ROLE})
+	local aFiles = {}
+	for _, filename in ipairs(CPath.GetFileList(szRoot)) do
+		local year, month, day = filename:match('^(%d+)%-(%d+)%-(%d+)$')
+		if year then
+			year = tonumber(year)
+			month = tonumber(month)
+			day = tonumber(day)
+			table.insert(aFiles, { time = DateToTime(year, month, day, 0, 0, 0), filepath = szRoot .. filename })
+		end
+	end
+	if #aFiles <= LOG_MAX_FILE then
+		return
+	end
+	table.sort(aFiles, function(a, b)
+		return a.time > b.time
+	end)
+	for i = LOG_MAX_FILE + 1, #aFiles do
+		CPath.DelDir(aFiles[i].filepath)
+	end
+end
+
 -- 产生一个错误堆栈日志并发起事件
 ---@vararg string @错误信息行文本
 ---@return void
@@ -64,7 +145,6 @@ function X.ErrorLog(...)
 		aLine[i] = tostring(xLine)
 	end
 	local szFull = table.concat(aLine, '\n') .. '\n'
-	X.SafeCall(X.Log, 'ERROR_LOG', szFull)
 	FireUIEvent('CALL_LUA_ERROR', szFull)
 end
 
@@ -86,4 +166,4 @@ if X.PACKET_INFO.DEBUG_LEVEL < X.DEBUG_LEVEL.NONE then
 		X.SHARED_MEMORY.RELOAD_UI_ADDON = X.PACKET_INFO.NAME_SPACE
 	end
 end
-Log('[' .. X.PACKET_INFO.NAME_SPACE .. '] Debug level ' .. X.PACKET_INFO.DEBUG_LEVEL .. ' / delog level ' .. X.PACKET_INFO.DELOG_LEVEL)
+X.Log('[' .. X.PACKET_INFO.NAME_SPACE .. '] Debug level ' .. X.PACKET_INFO.DEBUG_LEVEL .. ' / delog level ' .. X.PACKET_INFO.DELOG_LEVEL)
