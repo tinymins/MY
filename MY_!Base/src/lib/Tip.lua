@@ -1,20 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : Tip相关逻辑
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
--------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- 将输入转为 Rect 数组
 local function ConvRectEl(Rect, ePos)
@@ -88,7 +80,7 @@ function X.OutputBuffTip(Rect, dwID, nLevel, nTime, szExtraXml)
 	if buffInfo and buffInfo.nDetachType and g_tStrings.tBuffDetachType[buffInfo.nDetachType] then
 		table.insert(t, GetFormatText(g_tStrings.tBuffDetachType[buffInfo.nDetachType] .. '\n', 106))
 	else
-		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, X.CONSTANT.XML_LINE_BREAKER)
 	end
 
 	local szDesc = GetBuffDesc(dwID, nLevel, 'desc')
@@ -98,7 +90,7 @@ function X.OutputBuffTip(Rect, dwID, nLevel, nTime, szExtraXml)
 
 	if nTime then
 		if nTime == 0 then
-			table.insert(t, CONSTANT.XML_LINE_BREAKER)
+			table.insert(t, X.CONSTANT.XML_LINE_BREAKER)
 			table.insert(t, GetFormatText(g_tStrings.STR_BUFF_H_TIME_ZERO, 102))
 		else
 			local H, M, S = '', '', ''
@@ -113,25 +105,25 @@ function X.OutputBuffTip(Rect, dwID, nLevel, nTime, szExtraXml)
 			end
 			S = s..g_tStrings.STR_BUFF_H_TIME_S
 			if h < 720 then
-				table.insert(t, CONSTANT.XML_LINE_BREAKER)
+				table.insert(t, X.CONSTANT.XML_LINE_BREAKER)
 				table.insert(t, GetFormatText(FormatString(g_tStrings.STR_BUFF_H_LEFT_TIME_MSG, H, M, S), 102))
 			end
 		end
 	end
 
 	if szExtraXml then
-		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, X.CONSTANT.XML_LINE_BREAKER)
 		table.insert(t, szExtraXml)
 	end
 	-- For test
 	if IsCtrlKeyDown() then
-		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, X.CONSTANT.XML_LINE_BREAKER)
 		table.insert(t, GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP, 102))
-		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, X.CONSTANT.XML_LINE_BREAKER)
 		table.insert(t, GetFormatText('ID:     ' .. dwID, 102))
-		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, X.CONSTANT.XML_LINE_BREAKER)
 		table.insert(t, GetFormatText('Level:  ' .. nLevel, 102))
-		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, X.CONSTANT.XML_LINE_BREAKER)
 		table.insert(t, GetFormatText('IconID: ' .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
 	end
 	Rect = ConvRectEl(Rect)
@@ -222,8 +214,8 @@ function X.OutputPlayerTip(Rect, dwID, szExtraXml)
 		table.insert(t, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, player.nLevel), 82))
 	end
 	-- 声望
-	if CONSTANT.FORCE_TYPE_LABEL[player.dwForceID] then
-		table.insert(t, GetFormatText(CONSTANT.FORCE_TYPE_LABEL[player.dwForceID] .. '\n', 82))
+	if X.CONSTANT.FORCE_TYPE_LABEL[player.dwForceID] then
+		table.insert(t, GetFormatText(X.CONSTANT.FORCE_TYPE_LABEL[player.dwForceID] .. '\n', 82))
 	end
 	-- 所在地图
 	if IsParty(dwID, me.dwID) then
@@ -245,13 +237,13 @@ function X.OutputPlayerTip(Rect, dwID, szExtraXml)
 	if _G.MY_Anmerkungen and _G.MY_Anmerkungen.GetPlayerNote then
 		local note = _G.MY_Anmerkungen.GetPlayerNote(player.dwID)
 		if note and note.szContent ~= '' then
-			table.insert(t, CONSTANT.XML_LINE_BREAKER)
+			table.insert(t, X.CONSTANT.XML_LINE_BREAKER)
 			table.insert(t, GetFormatText(note.szContent, 0))
 		end
 	end
 	-- 自定义项
 	if szExtraXml then
-		table.insert(t, CONSTANT.XML_LINE_BREAKER)
+		table.insert(t, X.CONSTANT.XML_LINE_BREAKER)
 		table.insert(t, szExtraXml)
 	end
 	-- 调试信息
@@ -921,7 +913,7 @@ function X.HideTableTip(bAnimate)
 		return
 	end
 	if bAnimate then
-		UI(frame):FadeOut(2000, function()
+		X.UI(frame):FadeOut(2000, function()
 			Wnd.CloseWindow(frame)
 		end)
 	else

@@ -1,18 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : ×ÊÔ´¼à¿Ø
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
+--------------------------------------------------------------------------------
 if LoadLUAData('interface/DEBUG.jx3dat') and IsLocalFileExist('ui/DEBUG.ini') then
 	Wnd.OpenWindow('ui/DEBUG.ini')
 end
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local NS = 'MY'
 local D = {}
 local NO_RES_TIME = 6000

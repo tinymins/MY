@@ -1,20 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : UI查看器
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
-
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. '/lang/devs/')
+--------------------------------------------------------------------------------
+
 ---------------------------------------------------------------------
 -- 本地函数和变量
 ---------------------------------------------------------------------
@@ -149,7 +142,7 @@ function D.OnLButtonClick()
 		menu.x = nX
 		menu.y = nY + nH
 		menu.szLayer = 'Topmost2'
-		UI.PopupMenu(menu)
+		X.UI.PopupMenu(menu)
 	elseif name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
 	elseif name == 'Btn_Setting' then
@@ -480,7 +473,7 @@ function D.GetMenu(frame)
 				rgb      = frmIter:IsAddOn() and { 255, 255, 255 } or { 255, 255, 0 },
 				fnAction = function()
 					D.SetElement(frame, el)
-					UI.ClosePopupMenu()
+					X.UI.ClosePopupMenu()
 				end,
 				fnMouseLeave = function()
 					return D.SetUIPos(frame)

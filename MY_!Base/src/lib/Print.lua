@@ -1,29 +1,22 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 系统输出
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 local THEME_LIST = {
-	-- [CONSTANT.MSG_THEME.NORMAL ] = { r = 255, g = 255, b =   0 },
-	[CONSTANT.MSG_THEME.ERROR  ] = { r = 255, g =  86, b =  86 },
-	[CONSTANT.MSG_THEME.WARNING] = { r = 255, g = 170, b = 170 },
-	[CONSTANT.MSG_THEME.SUCCESS] = { r =   0, g = 255, b = 127 },
+	-- [X.CONSTANT.MSG_THEME.NORMAL ] = { r = 255, g = 255, b =   0 },
+	[X.CONSTANT.MSG_THEME.ERROR  ] = { r = 255, g =  86, b =  86 },
+	[X.CONSTANT.MSG_THEME.WARNING] = { r = 255, g = 170, b = 170 },
+	[X.CONSTANT.MSG_THEME.SUCCESS] = { r =   0, g = 255, b = 127 },
 }
 
 local DEBUG_THEME = {
-	[X.DEBUG_LEVEL.PMLOG  ] = { r =   0, g = 255, b = 255 },
+	[X.DEBUG_LEVEL.PM_LOG  ] = { r =   0, g = 255, b = 255 },
 	[X.DEBUG_LEVEL.LOG    ] = { r =   0, g = 255, b = 127 },
 	[X.DEBUG_LEVEL.WARNING] = { r = 255, g = 170, b = 170 },
 	[X.DEBUG_LEVEL.ERROR  ] = { r = 255, g =  86, b =  86 },
@@ -121,7 +114,7 @@ local function OutputMessageEx(szType, eTheme, oTitle, oContent, bEcho)
 end
 
 -- 显示本地信息 X.Sysmsg(oTitle, oContent, eTheme)
---   X.Sysmsg({'Error!', wrap = true}, '内容', CONSTANT.MSG_THEME.ERROR)
+--   X.Sysmsg({'Error!', wrap = true}, '内容', X.CONSTANT.MSG_THEME.ERROR)
 --   X.Sysmsg({'New message', r = 0, g = 0, b = 0, wrap = true}, '内容')
 --   X.Sysmsg({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, '内容')
 --   X.Sysmsg('New message', {'内容', '内容2', r = 0, g = 0, b = 0})
@@ -145,7 +138,7 @@ function X.Sysmsg(...)
 		oTitle = X.PACKET_INFO.SHORT_NAME
 	end
 	if not X.IsNumber(eTheme) then
-		eTheme = CONSTANT.MSG_THEME.NORMAL
+		eTheme = X.CONSTANT.MSG_THEME.NORMAL
 	end
 	return OutputMessageEx('MSG_SYS', eTheme, oTitle, oContent)
 end
@@ -169,12 +162,12 @@ function X.Topmsg(...)
 		oTitle, oContent, eTheme = ...
 	end
 	if not oTitle then
-		oTitle = CONSTANT.EMPTY_TABLE
+		oTitle = X.CONSTANT.EMPTY_TABLE
 	end
 	if not X.IsNumber(eTheme) then
-		eTheme = CONSTANT.MSG_THEME.NORMAL
+		eTheme = X.CONSTANT.MSG_THEME.NORMAL
 	end
-	local szType = eTheme == CONSTANT.MSG_THEME.ERROR
+	local szType = eTheme == X.CONSTANT.MSG_THEME.ERROR
 		and 'MSG_ANNOUNCE_RED'
 		or 'MSG_ANNOUNCE_YELLOW'
 	return OutputMessageEx(szType, eTheme, oTitle, oContent)
@@ -190,71 +183,6 @@ function X.OutputWhisper(szMsg, szHead)
 	szHead = szHead or X.PACKET_INFO.SHORT_NAME
 	OutputMessage('MSG_WHISPER', '[' .. szHead .. ']' .. g_tStrings.STR_TALK_HEAD_WHISPER .. szMsg .. '\n')
 	PlaySound(SOUND.UI_SOUND, g_sound.Whisper)
-end
-
-local LOG_MAX_FILE = 30
-local LOG_MAX_LINE = 5000
-local LOG_LINE_COUNT = 0
-local LOG_PATH, LOG_DATE
--- 输出一条日志到日志文件
--- @params 日志分类层级1, 日志分类层级2, 日志分类层级3, ..., 日志分类层级n, 日志内容
-function X.Log(...)
-	local nType = select('#', ...) - 1
-	local szText = select(nType + 1, ...)
-	local szDate = X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd')
-	if LOG_DATE ~= szDate or LOG_LINE_COUNT >= LOG_MAX_LINE then
-		if not X.GetPlayerGUID() then
-			return
-		end
-		if LOG_PATH then
-			Log(LOG_PATH, '', 'close')
-		end
-		LOG_PATH = X.FormatPath({
-			'logs/'
-				.. szDate .. '/JX3_'
-				.. X.PACKET_INFO.NAME_SPACE
-				.. '_' .. ENVIRONMENT.GAME_PROVIDER
-				.. '_' .. ENVIRONMENT.GAME_EDITION
-				.. '_' .. ENVIRONMENT.GAME_VERSION
-				.. '_' .. X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd_%hh-%mm-%ss') .. '.log',
-			X.PATH_TYPE.ROLE
-		})
-		LOG_DATE = szDate
-		LOG_LINE_COUNT = 0
-	end
-	LOG_LINE_COUNT = LOG_LINE_COUNT + 1
-	local szType = ''
-	for i = 1, nType do
-		szType = szType .. '[' .. select(i, ...) .. ']'
-	end
-	if szType ~= '' then
-		szType = szType .. ' '
-	end
-	Log(LOG_PATH, X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd_%hh:%mm:%ss') .. ' ' .. szType .. szText .. '\n', 'close')
-end
-
--- 清理日志文件
-function X.DeleteAncientLogs()
-	local szRoot = X.FormatPath({'logs/', X.PATH_TYPE.ROLE})
-	local aFiles = {}
-	for _, filename in ipairs(CPath.GetFileList(szRoot)) do
-		local year, month, day = filename:match('^(%d+)%-(%d+)%-(%d+)$')
-		if year then
-			year = tonumber(year)
-			month = tonumber(month)
-			day = tonumber(day)
-			table.insert(aFiles, { time = DateToTime(year, month, day, 0, 0, 0), filepath = szRoot .. filename })
-		end
-	end
-	if #aFiles <= LOG_MAX_FILE then
-		return
-	end
-	table.sort(aFiles, function(a, b)
-		return a.time > b.time
-	end)
-	for i = LOG_MAX_FILE + 1, #aFiles do
-		CPath.DelDir(aFiles[i].filepath)
-	end
 end
 
 -- Debug输出
@@ -298,7 +226,6 @@ function X.Debug(...)
 		OutputMessageEx('MSG_SYS', DEBUG_THEME[nLevel], szTitle, oContent, true)
 	end
 	if nLevel >= X.PACKET_INFO.DELOG_LEVEL then
-		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
+		X.Log('DEBUG', 'LEVEL_' .. nLevel, szTitle, szContent)
 	end
-	X.Log('DEBUG', 'LEVEL_' .. nLevel, szTitle, szContent)
 end

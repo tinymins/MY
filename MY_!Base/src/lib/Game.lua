@@ -1,22 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 游戏环境库
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
------------------------------------------------
--- 本地函数和变量
------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 -- #######################################################################################################
 --                                 #                   # # # #   # # # #
@@ -91,10 +81,10 @@ end
 local GetRelationCenter = _G.GetRelationCenter or _G.HomeLand_GetRelationCenter
 X.RegisterEvent('HOME_LAND_RESULT_CODE_INT', 'LIB#HL', function()
 	local nResultType = arg0
-	if nResultType == CONSTANT.HOMELAND_RESULT_CODE.APPLY_COMMUNITY_INFO then -- 申请分线详情
+	if nResultType == X.CONSTANT.HOMELAND_RESULT_CODE.APPLY_COMMUNITY_INFO then -- 申请分线详情
 		local dwMapID, nCopyIndex, dwCenterID, nLineIndex = arg1, arg2, arg3, arg4
 		local szCenterName
-		for _, info in ipairs(X.IsFunction(GetRelationCenter) and GetRelationCenter(dwCenterID) or CONSTANT.EMPTY_TABLE) do
+		for _, info in ipairs(X.IsFunction(GetRelationCenter) and GetRelationCenter(dwCenterID) or X.CONSTANT.EMPTY_TABLE) do
 			if info.dwCenterID == dwCenterID then
 				szCenterName = info.szCenterName
 			end
@@ -202,7 +192,7 @@ function X.GetDistanceTypeMenu(bGlobal, eValue, fnAction)
 			t1.fnClickIcon = function()
 				X.ShowPanel()
 				X.SwitchTab('GlobalConfig')
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end
 		end
 		table.insert(t, t1)
@@ -311,7 +301,7 @@ do local CACHE
 function X.GetBuffByName(szName)
 	if not CACHE then
 		local aCache, tLine, tExist = {}, nil, nil
-		local Buff = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('Buff', true)
+		local Buff = not X.ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('Buff', true)
 		if Buff then
 			for i = 1, Buff:GetRowCount() do
 				tLine = Buff:GetRow(i)
@@ -331,9 +321,9 @@ end
 
 function X.GetEndTime(nEndFrame, bAllowNegative)
 	if bAllowNegative then
-		return (nEndFrame - GetLogicFrameCount()) / ENVIRONMENT.GAME_FPS
+		return (nEndFrame - GetLogicFrameCount()) / X.ENVIRONMENT.GAME_FPS
 	end
-	return math.max(0, nEndFrame - GetLogicFrameCount()) / ENVIRONMENT.GAME_FPS
+	return math.max(0, nEndFrame - GetLogicFrameCount()) / X.ENVIRONMENT.GAME_FPS
 end
 
 -- 获取指定名字的右键菜单
@@ -457,8 +447,8 @@ function X.GetTypeGroupMap()
 	local tGroupMap, tMapExist = {}, {}
 	local function GroupMapIterator(dwMapID, szGroup, szMapName)
 		if szGroup then
-			if CONSTANT.MAP_MERGE[dwMapID] then
-				dwMapID = CONSTANT.MAP_MERGE[dwMapID]
+			if X.CONSTANT.MAP_MERGE[dwMapID] then
+				dwMapID = X.CONSTANT.MAP_MERGE[dwMapID]
 			end
 			if tMapExist[dwMapID] then
 				return
@@ -811,7 +801,7 @@ local function GenerateList(bForceRefresh)
 	BOSS_LIST = X.LoadLUAData(CACHE_PATH)
 	if bForceRefresh or not BOSS_LIST then
 		BOSS_LIST = {}
-		local DungeonBoss = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('DungeonBoss', true)
+		local DungeonBoss = not X.ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('DungeonBoss', true)
 		if DungeonBoss then
 			local nCount = DungeonBoss:GetRowCount()
 			for i = 2, nCount do
@@ -832,7 +822,7 @@ local function GenerateList(bForceRefresh)
 				end
 			end
 		end
-		if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 			X.SaveLUAData(CACHE_PATH, BOSS_LIST)
 		end
 	end
@@ -841,10 +831,10 @@ local function GenerateList(bForceRefresh)
 		if not BOSS_LIST[dwMapID] then
 			BOSS_LIST[dwMapID] = {}
 		end
-		for dwNpcID, szName in pairs(tInfo.ADD or CONSTANT.EMPTY_TABLE) do
+		for dwNpcID, szName in pairs(tInfo.ADD or X.CONSTANT.EMPTY_TABLE) do
 			BOSS_LIST[dwMapID][dwNpcID] = szName
 		end
-		for dwNpcID, szName in pairs(tInfo.DEL or CONSTANT.EMPTY_TABLE) do
+		for dwNpcID, szName in pairs(tInfo.DEL or X.CONSTANT.EMPTY_TABLE) do
 			BOSS_LIST[dwMapID][dwNpcID] = nil
 		end
 	end
@@ -934,7 +924,7 @@ local function GenerateList(bForceRefresh)
 	INPC_LIST = X.LoadLUAData(CACHE_PATH)
 	if bForceRefresh or not INPC_LIST then
 		INPC_LIST = {}
-		if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+		if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 			X.SaveLUAData(CACHE_PATH, INPC_LIST)
 		end
 	end
@@ -942,10 +932,10 @@ local function GenerateList(bForceRefresh)
 		if not INPC_LIST[dwMapID] then
 			INPC_LIST[dwMapID] = {}
 		end
-		for dwNpcID, szName in pairs(tInfo.ADD or CONSTANT.EMPTY_TABLE) do
+		for dwNpcID, szName in pairs(tInfo.ADD or X.CONSTANT.EMPTY_TABLE) do
 			INPC_LIST[dwMapID][dwNpcID] = szName
 		end
-		for dwNpcID, szName in pairs(tInfo.DEL or CONSTANT.EMPTY_TABLE) do
+		for dwNpcID, szName in pairs(tInfo.DEL or X.CONSTANT.EMPTY_TABLE) do
 			INPC_LIST[dwMapID][dwNpcID] = nil
 		end
 	end
@@ -1037,32 +1027,32 @@ local O = X.CreateUserSettingsModule('LIB', _L['System'], {
 		bDataSet = true,
 		szLabel = _L['Global color'],
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
-		xDefaultValue = CONSTANT.FORCE_COLOR_FG_DEFAULT['*'],
-		tDataSetDefaultValue = CONSTANT.FORCE_COLOR_FG_DEFAULT,
+		xDefaultValue = X.CONSTANT.FORCE_COLOR_FG_DEFAULT['*'],
+		tDataSetDefaultValue = X.CONSTANT.FORCE_COLOR_FG_DEFAULT,
 	},
 	tForceBackgroundColor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		bDataSet = true,
 		szLabel = _L['Global color'],
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
-		xDefaultValue = CONSTANT.FORCE_COLOR_BG_DEFAULT['*'],
-		tDataSetDefaultValue = CONSTANT.FORCE_COLOR_BG_DEFAULT,
+		xDefaultValue = X.CONSTANT.FORCE_COLOR_BG_DEFAULT['*'],
+		tDataSetDefaultValue = X.CONSTANT.FORCE_COLOR_BG_DEFAULT,
 	},
 	tCampForegroundColor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		bDataSet = true,
 		szLabel = _L['Global color'],
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
-		xDefaultValue = CONSTANT.CAMP_COLOR_FG_DEFAULT['*'],
-		tDataSetDefaultValue = CONSTANT.CAMP_COLOR_FG_DEFAULT,
+		xDefaultValue = X.CONSTANT.CAMP_COLOR_FG_DEFAULT['*'],
+		tDataSetDefaultValue = X.CONSTANT.CAMP_COLOR_FG_DEFAULT,
 	},
 	tCampBackgroundColor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		bDataSet = true,
 		szLabel = _L['Global color'],
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
-		xDefaultValue = CONSTANT.CAMP_COLOR_BG_DEFAULT['*'],
-		tDataSetDefaultValue = CONSTANT.CAMP_COLOR_BG_DEFAULT,
+		xDefaultValue = X.CONSTANT.CAMP_COLOR_BG_DEFAULT['*'],
+		tDataSetDefaultValue = X.CONSTANT.CAMP_COLOR_BG_DEFAULT,
 	},
 })
 
@@ -1117,8 +1107,8 @@ do
 local FORCE_LIST
 function X.GetForceIDS()
 	FORCE_LIST = {}
-	for _, dwForceID in X.pairs_c(CONSTANT.FORCE_TYPE) do
-		if dwForceID ~= CONSTANT.FORCE_TYPE.JIANG_HU then
+	for _, dwForceID in X.pairs_c(X.CONSTANT.FORCE_TYPE) do
+		if dwForceID ~= X.CONSTANT.FORCE_TYPE.JIANG_HU then
 			table.insert(FORCE_LIST, dwForceID)
 		end
 	end
@@ -1128,7 +1118,7 @@ end
 
 do
 local ORDER = {}
-for i, p in ipairs(CONSTANT.KUNGFU_LIST) do
+for i, p in ipairs(X.CONSTANT.KUNGFU_LIST) do
 	ORDER[p.dwID] = i
 end
 local KUNGFU_LIST
@@ -1160,7 +1150,7 @@ local KUNGFU_SHORT_NAME_CACHE = {}
 function X.GetKungfuName(dwKungfuID, szType)
 	if not KUNGFU_NAME_CACHE[dwKungfuID] then
 		KUNGFU_NAME_CACHE[dwKungfuID] = Table_GetSkillName(dwKungfuID, 1) or ''
-		KUNGFU_SHORT_NAME_CACHE[dwKungfuID] = wstring.sub(KUNGFU_NAME_CACHE[dwKungfuID], 1, 2)
+		KUNGFU_SHORT_NAME_CACHE[dwKungfuID] = X.StringSubW(KUNGFU_NAME_CACHE[dwKungfuID], 1, 2)
 	end
 	if szType == 'short' then
 		return KUNGFU_SHORT_NAME_CACHE[dwKungfuID]
@@ -1255,7 +1245,7 @@ function X.GetObject(arg0, arg1, arg2)
 		local me = GetClientPlayer()
 		if me and dwID == me.dwID then
 			p, info, b = me, me, false
-		elseif not ENVIRONMENT.RUNTIME_OPTIMIZE and me and me.IsPlayerInMyParty(dwID) then
+		elseif not X.ENVIRONMENT.RUNTIME_OPTIMIZE and me and me.IsPlayerInMyParty(dwID) then
 			p, info, b = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID), true
 		else
 			p, info, b = GetPlayer(dwID), GetPlayer(dwID), false
@@ -1275,8 +1265,8 @@ function X.GetObjectLife(obj)
 	if not obj then
 		return
 	end
-	return ENVIRONMENT.GAME_BRANCH ~= 'classic' and obj.fCurrentLife64 or obj.nCurrentLife,
-		ENVIRONMENT.GAME_BRANCH ~= 'classic' and obj.fMaxLife64 or obj.nMaxLife
+	return X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and obj.fCurrentLife64 or obj.nCurrentLife,
+		X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and obj.fMaxLife64 or obj.nMaxLife
 end
 
 -- 根据模板ID获取NPC真实名称
@@ -1289,12 +1279,12 @@ function X.GetTemplateName(dwType, dwTemplateID)
 	end
 	if not szName then
 		if dwType == TARGET.NPC then
-			szName = CONSTANT.NPC_NAME[dwTemplateID]
-				and X.RenderTemplateString(CONSTANT.NPC_NAME[dwTemplateID])
+			szName = X.CONSTANT.NPC_NAME[dwTemplateID]
+				and X.RenderTemplateString(X.CONSTANT.NPC_NAME[dwTemplateID])
 				or Table_GetNpcTemplateName(dwTemplateID)
 		else
-			szName = CONSTANT.DOODAD_NAME[dwTemplateID]
-				and X.RenderTemplateString(CONSTANT.DOODAD_NAME[dwTemplateID])
+			szName = X.CONSTANT.DOODAD_NAME[dwTemplateID]
+				and X.RenderTemplateString(X.CONSTANT.DOODAD_NAME[dwTemplateID])
 				or Table_GetDoodadTemplateName(dwTemplateID)
 		end
 		if szName then
@@ -1767,7 +1757,7 @@ function X.GetFurnitureInfo(szKey, oVal)
 	end
 	if not CACHE[szKey] then
 		CACHE[szKey] = {}
-		local HomelandFurnitureInfo = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('HomelandFurnitureInfo', true)
+		local HomelandFurnitureInfo = not X.ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('HomelandFurnitureInfo', true)
 		if HomelandFurnitureInfo then
 			for i = 2, HomelandFurnitureInfo:GetRowCount() do
 				local tLine = HomelandFurnitureInfo:GetRow(i)
@@ -2077,7 +2067,7 @@ end
 function X.GetTongName(dwTongID)
 	local szTongName
 	if not dwTongID then
-		dwTongID = (GetClientPlayer() or CONSTANT.EMPTY_TABLE).dwTongID
+		dwTongID = (GetClientPlayer() or X.CONSTANT.EMPTY_TABLE).dwTongID
 	end
 	if dwTongID and dwTongID ~= 0 then
 		szTongName = GetTongClient().ApplyGetTongName(dwTongID, 253)
@@ -2196,7 +2186,7 @@ local function ListenFightStateChange()
 				-- 生成战斗全服唯一标示
 				local me = GetClientPlayer()
 				local team = GetClientTeam()
-				local szEdition = ENVIRONMENT.GAME_EDITION
+				local szEdition = X.ENVIRONMENT.GAME_EDITION
 				local szServer = X.GetRealServer()
 				local dwTime = GetCurrentTime()
 				local dwTeamID, nTeamMember, dwTeamXorID = 0, 0, 0
@@ -2243,7 +2233,7 @@ function X.GetFightTime(szFormat)
 		local nHours   = math.floor(nMinutes / 60)
 		local nMinute  = nMinutes % 60
 		local nSecond  = nSeconds % 60
-		szFormat = szFormat:gsub('f', math.floor(nTick / 1000 * ENVIRONMENT.GAME_FPS))
+		szFormat = szFormat:gsub('f', math.floor(nTick / 1000 * X.ENVIRONMENT.GAME_FPS))
 		szFormat = szFormat:gsub('H', nHours)
 		szFormat = szFormat:gsub('M', nMinutes)
 		szFormat = szFormat:gsub('S', nSeconds)
@@ -2556,8 +2546,8 @@ function X.GetBagPackageCount()
 		return _G.Bag_GetPacketCount()
 	end
 	return X.IsInExtraBagMap()
-		and #CONSTANT.INVENTORY_LIMITED_PACKAGE_LIST
-		or #CONSTANT.INVENTORY_PACKAGE_LIST
+		and #X.CONSTANT.INVENTORY_LIMITED_PACKAGE_LIST
+		or #X.CONSTANT.INVENTORY_PACKAGE_LIST
 end
 
 function X.GetBankPackageCount()
@@ -2686,17 +2676,17 @@ function X.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bNoLimited)
 		if not me then
 			return
 		end
-		for _, dwBox in ipairs(bNoLimited and CONSTANT.INVENTORY_PACKAGE_LIST or CONSTANT.INVENTORY_LIMITED_PACKAGE_LIST)  do
+		for _, dwBox in ipairs(bNoLimited and X.CONSTANT.INVENTORY_PACKAGE_LIST or X.CONSTANT.INVENTORY_LIMITED_PACKAGE_LIST)  do
 			for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 				InsertItem(cache, me.GetItem(dwBox, dwX))
 			end
 		end
-		for _, dwBox in ipairs(CONSTANT.INVENTORY_BANK_LIST) do
+		for _, dwBox in ipairs(X.CONSTANT.INVENTORY_BANK_LIST) do
 			for dwX = 0,  me.GetBoxSize(dwBox) - 1 do
 				InsertItem(cache, GetPlayerItem(me, dwBox, dwX))
 			end
 		end
-		for _, dwBox in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
+		for _, dwBox in ipairs(X.CONSTANT.INVENTORY_EQUIP_LIST) do
 			for dwX = 0, EQUIPMENT_INVENTORY.TOTAL - 1 do
 				InsertItem(cache, GetPlayerItem(me, dwBox, dwX))
 			end
@@ -2838,7 +2828,7 @@ function X.GetBuffList(KObject)
 	if KObject then
 		return GeneObjectBuffCache(KObject)
 	end
-	return CONSTANT.EMPTY_TABLE, 0
+	return X.CONSTANT.EMPTY_TABLE, 0
 end
 
 -- 获取对象的buff
@@ -2918,7 +2908,7 @@ local BUFF_CACHE
 function X.IsBossFocusBuff(dwID, nLevel, nStackNum)
 	if not BUFF_CACHE then
 		BUFF_CACHE = {}
-		local BossFocusBuff = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('BossFocusBuff', true)
+		local BossFocusBuff = not X.ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('BossFocusBuff', true)
 		if BossFocusBuff then
 			if BossFocusBuff then
 				for i = 2, BossFocusBuff:GetRowCount() do
@@ -2977,7 +2967,7 @@ function X.IsIsolated(...)
 	if not KObject then
 		return false
 	end
-	if ENVIRONMENT.GAME_BRANCH == 'classic' then
+	if X.ENVIRONMENT.GAME_BRANCH == 'classic' then
 		return false
 	end
 	return KObject.bIsolated
@@ -3029,7 +3019,7 @@ do local CACHE
 function X.GetSkillByName(szName)
 	if not CACHE then
 		local aCache, tLine, tExist = {}, nil, nil
-		local Skill = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('Skill', true)
+		local Skill = not X.ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('Skill', true)
 		if Skill then
 			for i = 1, Skill:GetRowCount() do
 				tLine = Skill:GetRow(i)
@@ -3066,7 +3056,7 @@ function X.CanUseSkill(dwSkillID, dwLevel)
 		dwSkillID = X.GetSkillByName(dwSkillID).dwSkillID
 	end
 	if not box or not box:IsValid() then
-		box = UI.GetTempElement(X.NSFormatString('Box.{$NS}Lib_Skill'))
+		box = X.UI.GetTempElement(X.NSFormatString('Box.{$NS}Lib_Skill'))
 	end
 	local me = GetClientPlayer()
 	if me and box then
@@ -3182,7 +3172,7 @@ end
 do local CACHE = {}
 function X.GetMKungfuIDS(dwKungfuID)
 	if not CACHE[dwKungfuID] then
-		CACHE[dwKungfuID] = Table_GetMKungfuList(dwKungfuID) or CONSTANT.EMPTY_TABLE
+		CACHE[dwKungfuID] = Table_GetMKungfuList(dwKungfuID) or X.CONSTANT.EMPTY_TABLE
 	end
 	return CACHE[dwKungfuID]
 end
@@ -3411,7 +3401,7 @@ X.RegisterEvent({'SYNC_ROLE_DATA_END', 'SKILL_UPDATE', 'SKILL_RECIPE_LIST_UPDATE
 
 local function GetShortName(sz) -- 获取秘笈短名
 	local nStart, nEnd = string.find(sz, '·')
-	return nStart and wstring.gsub(string.sub(sz, nEnd + 1), _L['>'], '')
+	return nStart and X.StringReplaceW(string.sub(sz, nEnd + 1), _L['>'], '')
 end
 
 function X.IsRecipeActive(szRecipeName)
@@ -3521,8 +3511,8 @@ local function GenerateMapInfo()
 			local map = {
 				dwID     = dwMapID,
 				dwMapID  = dwMapID,
-				szName   = CONSTANT.MAP_NAME[dwMapID]
-					and X.RenderTemplateString(CONSTANT.MAP_NAME[dwMapID])
+				szName   = X.CONSTANT.MAP_NAME[dwMapID]
+					and X.RenderTemplateString(X.CONSTANT.MAP_NAME[dwMapID])
 					or Table_GetMapName(dwMapID),
 				bDungeon = false,
 			}
@@ -3569,8 +3559,8 @@ function X.GetMapInfo(arg0)
 	if not MAP_LIST then
 		GenerateMapInfo()
 	end
-	if arg0 and CONSTANT.MAP_MERGE[arg0] then
-		arg0 = CONSTANT.MAP_MERGE[arg0]
+	if arg0 and X.CONSTANT.MAP_MERGE[arg0] then
+		arg0 = X.CONSTANT.MAP_MERGE[arg0]
 	end
 	return MAP_LIST[arg0]
 end
@@ -3671,7 +3661,7 @@ end
 -- 判断地图是不是MOBA地图
 -- (bool) X.IsMobaMap(dwMapID)
 function X.IsMobaMap(dwMapID)
-	return CONSTANT.MOBA_MAP[dwMapID] or false
+	return X.CONSTANT.MOBA_MAP[dwMapID] or false
 end
 
 -- 判断当前地图是不是MOBA地图
@@ -3684,7 +3674,7 @@ end
 -- 判断地图是不是浪客行地图
 -- (bool) X.IsStarveMap(dwMapID)
 function X.IsStarveMap(dwMapID)
-	return CONSTANT.STARVE_MAP[dwMapID] or false
+	return X.CONSTANT.STARVE_MAP[dwMapID] or false
 end
 
 -- 判断当前地图是不是浪客行地图
@@ -3743,7 +3733,7 @@ end
 -- (number) X.GetMapID(bool bFix) 是否做修正
 function X.GetMapID(bFix)
 	local dwMapID = GetClientPlayer().GetMapID()
-	return bFix and CONSTANT.MAP_MERGE[dwMapID] or dwMapID
+	return bFix and X.CONSTANT.MAP_MERGE[dwMapID] or dwMapID
 end
 
 -- 设置标记目标
@@ -3827,7 +3817,7 @@ local function SyncMember(team, dwID, szName, state)
 	end
 	if state.nMark then -- 如果这货之前有标记
 		team.SetTeamMark(state.nMark, dwID) -- 标记给他
-		X.Sysmsg(_L('Restore player marked as [%s]: %s', CONSTANT.TEAM_MARK_NAME[state.nMark], szName))
+		X.Sysmsg(_L('Restore player marked as [%s]: %s', X.CONSTANT.TEAM_MARK_NAME[state.nMark], szName))
 	end
 end
 -- 恢复团队信息
@@ -4100,20 +4090,20 @@ end
 do
 local CACHE = {}
 local m_MountTypeToWeapon = X.KvpToObject({
-	{CONSTANT.KUNGFU_TYPE.TIAN_CE  , WEAPON_DETAIL.SPEAR        }, -- 天策内功=长兵类
-	{CONSTANT.KUNGFU_TYPE.WAN_HUA  , WEAPON_DETAIL.PEN          }, -- 万花内功=笔类
-	{CONSTANT.KUNGFU_TYPE.CHUN_YANG, WEAPON_DETAIL.SWORD        }, -- 纯阳内功=短兵类
-	{CONSTANT.KUNGFU_TYPE.QI_XIU   , WEAPON_DETAIL.DOUBLE_WEAPON}, -- 七秀内功 = 双兵类
-	{CONSTANT.KUNGFU_TYPE.SHAO_LIN , WEAPON_DETAIL.WAND         }, -- 少林内功=棍类
-	{CONSTANT.KUNGFU_TYPE.CANG_JIAN, WEAPON_DETAIL.SWORD        }, -- 藏剑内功=短兵类,重兵类 WEAPON_DETAIL.BIG_SWORD
-	{CONSTANT.KUNGFU_TYPE.GAI_BANG , WEAPON_DETAIL.STICK        }, -- 丐帮内功=短棒
-	{CONSTANT.KUNGFU_TYPE.MING_JIAO, WEAPON_DETAIL.KNIFE        }, -- 明教内功=弯刀
-	{CONSTANT.KUNGFU_TYPE.WU_DU    , WEAPON_DETAIL.FLUTE        }, -- 五毒内功=笛类
-	{CONSTANT.KUNGFU_TYPE.TANG_MEN , WEAPON_DETAIL.BOW          }, -- 唐门内功=千机匣
-	{CONSTANT.KUNGFU_TYPE.CANG_YUN , WEAPON_DETAIL.BLADE_SHIELD }, -- 苍云内功=刀盾
-	{CONSTANT.KUNGFU_TYPE.CHANG_GE , WEAPON_DETAIL.HEPTA_CHORD  }, -- 长歌内功=琴
-	{CONSTANT.KUNGFU_TYPE.BA_DAO   , WEAPON_DETAIL.BROAD_SWORD  }, -- 霸刀内功=组合刀
-	{CONSTANT.KUNGFU_TYPE.PENG_LAI , WEAPON_DETAIL.UMBRELLA     }, -- 蓬莱内功=伞
+	{X.CONSTANT.KUNGFU_TYPE.TIAN_CE  , WEAPON_DETAIL.SPEAR        }, -- 天策内功=长兵类
+	{X.CONSTANT.KUNGFU_TYPE.WAN_HUA  , WEAPON_DETAIL.PEN          }, -- 万花内功=笔类
+	{X.CONSTANT.KUNGFU_TYPE.CHUN_YANG, WEAPON_DETAIL.SWORD        }, -- 纯阳内功=短兵类
+	{X.CONSTANT.KUNGFU_TYPE.QI_XIU   , WEAPON_DETAIL.DOUBLE_WEAPON}, -- 七秀内功 = 双兵类
+	{X.CONSTANT.KUNGFU_TYPE.SHAO_LIN , WEAPON_DETAIL.WAND         }, -- 少林内功=棍类
+	{X.CONSTANT.KUNGFU_TYPE.CANG_JIAN, WEAPON_DETAIL.SWORD        }, -- 藏剑内功=短兵类,重兵类 WEAPON_DETAIL.BIG_SWORD
+	{X.CONSTANT.KUNGFU_TYPE.GAI_BANG , WEAPON_DETAIL.STICK        }, -- 丐帮内功=短棒
+	{X.CONSTANT.KUNGFU_TYPE.MING_JIAO, WEAPON_DETAIL.KNIFE        }, -- 明教内功=弯刀
+	{X.CONSTANT.KUNGFU_TYPE.WU_DU    , WEAPON_DETAIL.FLUTE        }, -- 五毒内功=笛类
+	{X.CONSTANT.KUNGFU_TYPE.TANG_MEN , WEAPON_DETAIL.BOW          }, -- 唐门内功=千机匣
+	{X.CONSTANT.KUNGFU_TYPE.CANG_YUN , WEAPON_DETAIL.BLADE_SHIELD }, -- 苍云内功=刀盾
+	{X.CONSTANT.KUNGFU_TYPE.CHANG_GE , WEAPON_DETAIL.HEPTA_CHORD  }, -- 长歌内功=琴
+	{X.CONSTANT.KUNGFU_TYPE.BA_DAO   , WEAPON_DETAIL.BROAD_SWORD  }, -- 霸刀内功=组合刀
+	{X.CONSTANT.KUNGFU_TYPE.PENG_LAI , WEAPON_DETAIL.UMBRELLA     }, -- 蓬莱内功=伞
 	--WEAPON_DETAIL.FIST = 拳腕
 	--WEAPON_DETAIL.DART = 弓弦
 	--WEAPON_DETAIL.MACH_DART = 机关暗器
@@ -4130,7 +4120,7 @@ function X.IsItemFitKungfu(itemInfo, ...)
 	elseif X.IsNumber(kungfu) then
 		kungfu = GetSkill(kungfu, me.GetSkillLevel(kungfu) or 1)
 	end
-	if itemInfo.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
+	if itemInfo.nSub == X.CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
 		if not kungfu then
 			return false
 		end
@@ -4188,46 +4178,46 @@ function X.GetItemEquipPos(item, nIndex)
 		nIndex = 1
 	end
 	local dwPackage, dwBox, nCount = INVENTORY_INDEX.EQUIP, 0, 1
-	if item.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
+	if item.nSub == X.CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
 		if item.nDetail == WEAPON_DETAIL.BIG_SWORD then
-			dwBox = CONSTANT.EQUIPMENT_INVENTORY.BIG_SWORD
+			dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.BIG_SWORD
 		else
-			dwBox = CONSTANT.EQUIPMENT_INVENTORY.MELEE_WEAPON
+			dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.MELEE_WEAPON
 		end
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.RANGE_WEAPON
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.ARROW then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.ARROW
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.CHEST then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.CHEST
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.HELM then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.HELM
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.AMULET then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.AMULET
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.RING then
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.RANGE_WEAPON
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.ARROW then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.ARROW
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.CHEST then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.CHEST
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.HELM then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.HELM
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.AMULET then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.AMULET
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.RING then
 		if nIndex == 1 then
-			dwBox = CONSTANT.EQUIPMENT_INVENTORY.LEFT_RING
+			dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.LEFT_RING
 		else
-			dwBox = CONSTANT.EQUIPMENT_INVENTORY.RIGHT_RING
+			dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.RIGHT_RING
 		end
 		nCount = 2
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.WAIST then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.WAIST
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.PENDANT then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.PENDANT
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.PANTS then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.PANTS
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.BOOTS then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.BOOTS
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.BANGLE then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.BANGLE
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.WAIST_EXTEND
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_EXTEND then
-		dwBox = CONSTANT.EQUIPMENT_INVENTORY.BACK_EXTEND
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.FACE_EXTEND then
-		dwBox = CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
-	elseif item.nSub == CONSTANT.EQUIPMENT_SUB.HORSE then
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.WAIST then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.WAIST
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.PENDANT then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.PENDANT
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.PANTS then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.PANTS
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.BOOTS then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.BOOTS
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.BANGLE then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.BANGLE
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.WAIST_EXTEND
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.BACK_EXTEND then
+		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.BACK_EXTEND
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.FACE_EXTEND then
+		dwBox = X.CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
+	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.HORSE then
 		dwPackage, dwBox = GetClientPlayer().GetEquippedHorsePos()
 	end
 	return dwPackage, dwBox, nIndex, nCount
@@ -4236,12 +4226,12 @@ end
 -- * 当前装备是否是比身上已经装备的更好
 function X.IsBetterEquipment(item, dwPackage, dwBox)
 	if item.nGenre ~= ITEM_GENRE.EQUIPMENT
-	or item.nSub == CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND
-	or item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_EXTEND
-	or item.nSub == CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
-	or item.nSub == CONSTANT.EQUIPMENT_SUB.BULLET
-	or item.nSub == CONSTANT.EQUIPMENT_SUB.MINI_AVATAR
-	or item.nSub == CONSTANT.EQUIPMENT_SUB.PET then
+	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND
+	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.BACK_EXTEND
+	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
+	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.BULLET
+	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.MINI_AVATAR
+	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.PET then
 		return false
 	end
 
@@ -4344,11 +4334,11 @@ end
 end
 
 function X.GetGuildBankBagSize(nPage)
-	return CONSTANT.INVENTORY_GUILD_PAGE_BOX_COUNT
+	return X.CONSTANT.INVENTORY_GUILD_PAGE_BOX_COUNT
 end
 
 function X.GetGuildBankBagPos(nPage, nIndex)
-	return CONSTANT.INVENTORY_GUILD_BANK, nPage * CONSTANT.INVENTORY_GUILD_PAGE_SIZE + nIndex - 1
+	return X.CONSTANT.INVENTORY_GUILD_BANK, nPage * X.CONSTANT.INVENTORY_GUILD_PAGE_SIZE + nIndex - 1
 end
 
 function X.IsSelf(dwSrcID, dwTarID)
@@ -4366,7 +4356,7 @@ function X.ForceIDToKungfuIDs(dwForceID)
 	end
 	if not m_tForceToKungfu then
 		m_tForceToKungfu = {}
-		for _, v in ipairs(CONSTANT.KUNGFU_LIST) do
+		for _, v in ipairs(X.CONSTANT.KUNGFU_LIST) do
 			if not m_tForceToKungfu[v.dwForceID] then
 				m_tForceToKungfu[v.dwForceID] = {}
 			end
@@ -4428,7 +4418,7 @@ end
 -- 获取头像文件路径，帧序，是否动画
 function X.GetForceAvatar(dwForceID)
 	-- force avatar
-	return X.Unpack(CONSTANT.FORCE_AVATAR[dwForceID])
+	return X.Unpack(X.CONSTANT.FORCE_AVATAR[dwForceID])
 end
 
 -- 获取头像文件路径，帧序，是否动画
@@ -4466,7 +4456,7 @@ local MAP_ACHI_NORMAL, MAP_ACHI_ALL
 function X.GetMapAchievements(dwMapID, bWujia)
 	if not MAP_ACHI_NORMAL then
 		local tMapAchiNormal, tMapAchiAll = {}, {}
-		local Achievement = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('Achievement', true)
+		local Achievement = not X.ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('Achievement', true)
 		if Achievement then
 			local nCount = Achievement:GetRowCount()
 			for i = 2, nCount do
@@ -5021,14 +5011,14 @@ do
 					if bReplaceSensitiveWord then
 						szPart = X.ReplaceSensitiveWord(szPart)
 					end
-					if nMaxLen and nMaxLen > 0 and nLen + wstring.len(szPart) > nMaxLen then
-						szPart = wstring.sub(szPart, 1, nMaxLen - nLen)
+					if nMaxLen and nMaxLen > 0 and nLen + X.StringLenW(szPart) > nMaxLen then
+						szPart = X.StringSubW(szPart, 1, nMaxLen - nLen)
 						szText = szText .. szPart
 						nLen = nMaxLen
 						break
 					else
 						szText = szText .. szPart
-						nLen = nLen + wstring.len(szPart)
+						nLen = nLen + X.StringLenW(szPart)
 					end
 				end
 				if szContent then
@@ -5072,7 +5062,7 @@ local BOOK_SEGMENT_RECIPE = setmetatable({}, {
 				tBookID2RecipeID = {}
 				tBookName2RecipeID = {}
 				tSegmentName2RecipeID = {}
-				local BookSegment = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('BookSegment', true)
+				local BookSegment = not X.ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('BookSegment', true)
 				if BookSegment then
 					local nCount = BookSegment:GetRowCount()
 					for i = 2, nCount do
@@ -5099,7 +5089,7 @@ local BOOK_SEGMENT_RECIPE = setmetatable({}, {
 					end
 				end
 			end
-			if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+			if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 				X.SaveLUAData({'temporary/book-segment.jx3dat', X.PATH_TYPE.GLOBAL}, {
 					book_id = tBookID2RecipeID,
 					book_name = tBookName2RecipeID,
@@ -5185,7 +5175,7 @@ local DOODAD_BOOK = setmetatable({}, {
 			if not tDoodadID2BookRecipe or not tBookRecipe2DoodadID then
 				tDoodadID2BookRecipe = {}
 				tBookRecipe2DoodadID = {}
-				local DoodadTemplate = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('DoodadTemplate', true)
+				local DoodadTemplate = not X.ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('DoodadTemplate', true)
 				if DoodadTemplate then
 					local nCount = DoodadTemplate:GetRowCount()
 					for i = 2, nCount do

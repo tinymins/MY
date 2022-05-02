@@ -1,26 +1,19 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : ColorPicker
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 -- 打开取色板
-function UI.OpenColorPicker(callback, t)
+function X.UI.OpenColorPicker(callback, t)
 	if t then
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
-	local ui = UI.CreateFrame(X.NSFormatString('{$NS}_ColorTable'), { simple = true, close = true, esc = true })
+	local ui = X.UI.CreateFrame(X.NSFormatString('{$NS}_ColorTable'), { simple = true, close = true, esc = true })
 		:Size(900, 500):Text(_L['Color Picker']):Anchor({s='CENTER', r='CENTER', x=0, y=0})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
@@ -92,13 +85,13 @@ function UI.OpenColorPicker(callback, t)
 	end
 	local x, y = 220, 435
 	ui:Append('Text', { text = 'R', x = x, y = y, w = 10 })
-	ui:Append('WndEditBox', { name = 'R', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, editType = UI.EDIT_TYPE.NUMBER, onChange = onChange })
+	ui:Append('WndEditBox', { name = 'R', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, editType = X.UI.EDIT_TYPE.NUMBER, onChange = onChange })
 	x = x + 14 + 34
 	ui:Append('Text', { text = 'G', x = x, y = y, w = 10 })
-	ui:Append('WndEditBox', { name = 'G', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, editType = UI.EDIT_TYPE.NUMBER, onChange = onChange })
+	ui:Append('WndEditBox', { name = 'G', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, editType = X.UI.EDIT_TYPE.NUMBER, onChange = onChange })
 	x = x + 14 + 34
 	ui:Append('Text', { text = 'B', x = x, y = y, w = 10 })
-	ui:Append('WndEditBox', { name = 'B', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, editType = UI.EDIT_TYPE.NUMBER, onChange = onChange })
+	ui:Append('WndEditBox', { name = 'B', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, editType = X.UI.EDIT_TYPE.NUMBER, onChange = onChange })
 	x = x + 14 + 34
 	ui:Append('WndButton', { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 3, w = 50, h = 30, onClick = function()
 		if GetRGBValue() then
@@ -109,7 +102,7 @@ function UI.OpenColorPicker(callback, t)
 	end})
 	x = x + 50
 	ui:Append('WndButton', { text = _L['Color Picker Pro'], x = x + 5, y = y + 3, w = 50, h = 30, onClick = function()
-		UI.OpenColorPickerEx(callback):Pos(ui:Pos())
+		X.UI.OpenColorPickerEx(callback):Pos(ui:Pos())
 		ui:Remove()
 	end})
 	Station.SetFocusWindow(ui[1])
@@ -128,7 +121,7 @@ end
 
 -- 调色板
 local COLOR_HUE = 0
-function UI.OpenColorPickerEx(fnAction)
+function X.UI.OpenColorPickerEx(fnAction)
 	local fX, fY = Cursor.GetPos(true)
 	local tUI = {}
 	local function hsv2rgb(h, s, v)
@@ -157,7 +150,7 @@ function UI.OpenColorPickerEx(fnAction)
 		return math.floor(r * 255), math.floor(g * 255), math.floor(b * 255)
 	end
 
-	local wnd = UI.CreateFrame(X.NSFormatString('{$NS}_ColorPickerEx'), { w = 346, h = 430, text = _L['Color Picker Pro'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 })
+	local wnd = X.UI.CreateFrame(X.NSFormatString('{$NS}_ColorPickerEx'), { w = 346, h = 430, text = _L['Color Picker Pro'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 })
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			wnd:Children('#Select'):Color(r, g, b)
@@ -204,7 +197,7 @@ function UI.OpenColorPickerEx(fnAction)
 	wnd:Append('WndTrackbar', {
 		x = 20, y = 35, h = 25, w = 306, rw = 272,
 		textFormatter = function(val) return ('%d H'):format(val) end,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = COLOR_HUE, range = {0, 360},
 		onChange = function(nVal)
 			COLOR_HUE = nVal

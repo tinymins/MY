@@ -1,25 +1,14 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : Base64 ´¦ÀíÄ£¿é
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Base64-encoding
 -- Sourced from http://en.wikipedia.org/wiki/Base64
 -- https://github.com/toastdriven/lua-base64/blob/master/base64.lua
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
-
-local __author__ = 'Daniel Lindsley'
-local __version__ = 'scm-1'
-local __license__ = 'BSD'
+--------------------------------------------------------------------------------
 
 local index_table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 

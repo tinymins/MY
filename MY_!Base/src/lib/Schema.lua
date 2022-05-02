@@ -1,19 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : LUA SCHEMA ¿â
 -- @ref      : https://github.com/sschoener/lua-schema
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 --[[
 The MIT License (MIT)
 
@@ -64,9 +57,9 @@ function schema.FormatOutput(output)
     return table.concat(format, "\n")
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Infrastructure
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- Path class. Represents paths to values in a table (the path's *base*).
 local Path = {}
@@ -243,7 +236,7 @@ setmetatable(Error, {
 })
 schema.Error = Error
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Schema Building Blocks
 -- A schema is a function taking the object to be checked and the path to the
 -- current value in the environment.
@@ -251,7 +244,7 @@ schema.Error = Error
 -- object which describes why it was rejected.
 -- The schemata below are just some basic building blocks. Expand them to your
 -- liking.
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- Always accepts.
 function schema.Any(obj, path)

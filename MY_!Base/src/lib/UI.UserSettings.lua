@@ -1,19 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 用户设置导入导出界面
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 local D = {}
 local FRAME_NAME = X.NSFormatString('{$NS}_UserSettings')
@@ -30,7 +23,7 @@ function D.Open(bImport)
 	end
 	Wnd.CloseWindow(FRAME_NAME)
 	local W, H = 400, 600
-	local uiFrame = UI.CreateFrame(FRAME_NAME, {
+	local uiFrame = X.UI.CreateFrame(FRAME_NAME, {
 		w = W, h = H,
 		text = bImport
 			and _L['Import User Settings']
@@ -40,13 +33,13 @@ function D.Open(bImport)
 	local uiContainer = uiFrame:Append('WndScrollWindowBox', {
 		x = 10, y = 50,
 		w = W - 20, h = H - 60 - 40,
-		containerType = UI.WND_CONTAINER_STYLE.LEFT_TOP,
+		containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP,
 	})
 	local nW = select(2, uiContainer:Width())
 	local aGroup, tItemAll = {}, {}
 	for _, us in ipairs(X.GetRegisterUserSettingsList()) do
 		if us.szGroup and us.szLabel and (not bImport or tSettings[us.szKey]) then
-			local tGroup = lodash.find(aGroup, function(p) return p.szGroup == us.szGroup end)
+			local tGroup = X.lodash.find(aGroup, function(p) return p.szGroup == us.szGroup end)
 			if not tGroup then
 				tGroup = {
 					szGroup = us.szGroup,
@@ -54,10 +47,10 @@ function D.Open(bImport)
 				}
 				table.insert(aGroup, tGroup)
 			end
-			local tItem = lodash.find(tGroup.aItem, function(p) return p.szLabel == us.szLabel end)
+			local tItem = X.lodash.find(tGroup.aItem, function(p) return p.szLabel == us.szLabel end)
 			if not tItem then
 				tItem = {
-					szID = wstring.gsub(X.GetUUID(), '-', ''),
+					szID = X.StringReplaceW(X.GetUUID(), '-', ''),
 					szLabel = us.szLabel,
 					aKey = {},
 				}
@@ -137,13 +130,13 @@ function D.Open(bImport)
 				X.Systopmsg(_L('%d settings imported.', nSuccess))
 			else
 				if #aKey == 0 then
-					X.Systopmsg(_L['No custom setting selected, nothing to export.'], CONSTANT.MSG_THEME.ERROR)
+					X.Systopmsg(_L['No custom setting selected, nothing to export.'], X.CONSTANT.MSG_THEME.ERROR)
 					return
 				end
 				tKvp = X.ExportUserSettings(aKey)
-				local nExport = lodash.size(tKvp)
+				local nExport = X.lodash.size(tKvp)
 				if nExport == 0 then
-					X.Systopmsg(_L['No custom setting found, nothing to export.'], CONSTANT.MSG_THEME.ERROR)
+					X.Systopmsg(_L['No custom setting found, nothing to export.'], X.CONSTANT.MSG_THEME.ERROR)
 					return
 				end
 				local szPath = X.FormatPath({'export/settings/' .. X.GetUserRoleName() .. '_' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. '.us.jx3dat', X.PATH_TYPE.GLOBAL})

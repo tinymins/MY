@@ -1,20 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 背景通讯处理函数集成
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/bgmsg/')
------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 -- 测试用（请求共享位置）
 X.RegisterBgMsg('ASK_CURRENT_LOC', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf then
@@ -170,7 +163,7 @@ do
 		end
 		--[[#DEBUG BEGIN]]
 		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Team map copy id request from ' .. szTalkerName
-			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PMLOG)
+			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then
 			local function fnAction(tMapID)
@@ -252,7 +245,7 @@ do
 				OnSwitchMap(dwMapID, dwID, aMapCopy, dwTime)
 			end)
 		end
-		return UI.FormatWMsgRet(true, true)
+		return X.UI.FormatWMsgRet(true, true)
 	end
 
 	local function OnFBAppendItemFromIni(hList)
@@ -385,7 +378,7 @@ do
 		end
 		--[[#DEBUG BEGIN]]
 		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Achievement request from ' .. szTalkerName
-			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PMLOG)
+			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then
 			local me = GetClientPlayer()
@@ -475,7 +468,7 @@ do
 		end
 		--[[#DEBUG BEGIN]]
 		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Global id request from ' .. szTalkerName
-			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PMLOG)
+			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then
 			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_GLOBAL_ID'), X.GetPlayerGUID(), true)

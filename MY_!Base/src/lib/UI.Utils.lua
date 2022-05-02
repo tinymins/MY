@@ -1,21 +1,14 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 界面工具库
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
-function UI.GetTreePath(raw)
+function X.UI.GetTreePath(raw)
 	local tTreePath = {}
 	if X.IsTable(raw) and raw.GetTreePath then
 		table.insert(tTreePath, (raw:GetTreePath()):sub(1, -2))
@@ -36,7 +29,7 @@ end
 
 do
 local ui, cache
-function UI.GetTempElement(szType)
+function X.UI.GetTempElement(szType)
 	if not X.IsString(szType) then
 		return
 	end
@@ -51,7 +44,7 @@ function UI.GetTempElement(szType)
 	end
 	if not cache or not ui or ui:Count() == 0 then
 		cache = {}
-		ui = UI.CreateFrame(X.NSFormatString('{$NS}#TempElement'), { empty = true }):Hide()
+		ui = X.UI.CreateFrame(X.NSFormatString('{$NS}#TempElement'), { empty = true }):Hide()
 	end
 	local szName = szType .. '_' .. szKey
 	local raw = cache[szName]
@@ -65,7 +58,7 @@ function UI.GetTempElement(szType)
 end
 end
 
-function UI.ScrollIntoView(el, scrollY, nOffsetY, scrollX, nOffsetX)
+function X.UI.ScrollIntoView(el, scrollY, nOffsetY, scrollX, nOffsetX)
 	local elParent, nParentW, nParentH = el:GetParent()
 	local nX, nY = el:GetAbsX() - elParent:GetAbsX(), el:GetAbsY() - elParent:GetAbsY()
 	if elParent:GetType() == 'WndContainer' then
@@ -87,8 +80,8 @@ function UI.ScrollIntoView(el, scrollY, nOffsetY, scrollX, nOffsetX)
 	end
 end
 
-function UI.LookupFrame(szName)
-	for _, v in ipairs(UI.LAYER_LIST) do
+function X.UI.LookupFrame(szName)
+	for _, v in ipairs(X.UI.LAYER_LIST) do
 		local frame = Station.Lookup(v .. '/' .. szName)
 		if frame then
 			return frame
@@ -101,7 +94,7 @@ local ITEM_COUNT = {}
 local HOOK_BEFORE = setmetatable({}, { __mode = 'v' })
 local HOOK_AFTER = setmetatable({}, { __mode = 'v' })
 
-function UI.HookHandleAppend(hList, fnOnAppendItem)
+function X.UI.HookHandleAppend(hList, fnOnAppendItem)
 	-- 注销旧的 HOOK 函数
 	if HOOK_BEFORE[hList] then
 		UnhookTableFunc(hList, 'AppendItemFromIni'   , HOOK_BEFORE[hList])
@@ -150,7 +143,7 @@ local ITEM_COUNT = {}
 local HOOK_BEFORE = setmetatable({}, { __mode = 'v' })
 local HOOK_AFTER = setmetatable({}, { __mode = 'v' })
 
-function UI.HookContainerAppend(hList, fnOnAppendContent)
+function X.UI.HookContainerAppend(hList, fnOnAppendContent)
 	-- 注销旧的 HOOK 函数
 	if HOOK_BEFORE[hList] then
 		UnhookTableFunc(hList, 'AppendContentFromIni'   , HOOK_BEFORE[hList])
@@ -187,7 +180,7 @@ end
 end
 
 -- FORMAT_WMSG_RET
-function UI.FormatWMsgRet(stop, callFrame)
+function X.UI.FormatWMsgRet(stop, callFrame)
 	local ret = 0
 	if stop then
 		ret = ret + 1 --01
@@ -198,4 +191,4 @@ function UI.FormatWMsgRet(stop, callFrame)
 	return ret
 end
 
-UI.UpdateItemInfoBoxObject = _G.UpdateItemInfoBoxObject or UpdataItemInfoBoxObject
+X.UI.UpdateItemInfoBoxObject = _G.UpdateItemInfoBoxObject or UpdataItemInfoBoxObject

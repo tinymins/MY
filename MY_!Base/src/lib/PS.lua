@@ -1,19 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 插件主界面相关函数
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT ..'ui/PS.ini'
 local IMG_PATH = X.PACKET_INFO.FRAMEWORK_ROOT ..'img/PS.UITex'
 local FRAME_NAME = X.NSFormatString('{$NS}_PS')
@@ -118,7 +111,7 @@ function X.HidePanel(bMute, bNoAnimate)
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
 	X.RegisterEsc(X.PACKET_INFO.NAME_SPACE)
-	UI.ClosePopupMenu()
+	X.UI.ClosePopupMenu()
 end
 
 function X.TogglePanel(bVisible, ...)
@@ -211,7 +204,7 @@ function X.SwitchTab(szKey, bForceUpdate)
 	if not frame then
 		return
 	end
-	local tTab = lodash.find(PANEL_TAB_LIST, function(tTab) return tTab.szKey == szKey end)
+	local tTab = X.lodash.find(PANEL_TAB_LIST, function(tTab) return tTab.szKey == szKey end)
 	if not tTab then
 		--[[#DEBUG BEGIN]]
 		if not tTab then
@@ -261,7 +254,7 @@ function X.SwitchTab(szKey, bForceUpdate)
 	scroll:SetScrollPos(0)
 	wnd:Clear()
 	wnd:Lookup('', ''):Clear()
-	wnd:SetContainerType(UI.WND_CONTAINER_STYLE.CUSTOM)
+	wnd:SetContainerType(X.UI.WND_CONTAINER_STYLE.CUSTOM)
 	-- ready to draw
 	if tTab.OnPanelActive then
 		local res, err, trace = X.XpCall(tTab.OnPanelActive, wnd)
@@ -307,7 +300,7 @@ end
 -- Ex： X.RegisterPanel('测试', 'Test', '测试标签', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd) end })
 function X.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 	-- 分类不存在则创建
-	if not options.bHide and not lodash.find(PANEL_CATEGORY_LIST, function(tCategory) return tCategory.szName == szCategory end) then
+	if not options.bHide and not X.lodash.find(PANEL_CATEGORY_LIST, function(tCategory) return tCategory.szName == szCategory end) then
 		table.insert(PANEL_CATEGORY_LIST, {
 			szName = szCategory,
 		})
@@ -370,14 +363,14 @@ end
 -- 窗口函数
 ---------------------------------------------------------------------------------------------
 function D.ResizePanel(frame, nWidth, nHeight)
-	UI(frame):Size(nWidth, nHeight)
+	X.UI(frame):Size(nWidth, nHeight)
 end
 
 function D.RedrawCategory(frame, szCategory)
 	local container = frame:Lookup('Wnd_Total/WndContainer_Category')
 	container:Clear()
 	for _, tCategory in ipairs(PANEL_CATEGORY_LIST) do
-		if lodash.some(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == tCategory.szName and not tTab.bHide and not IsTabRestricted(tTab) end) then
+		if X.lodash.some(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == tCategory.szName and not tTab.bHide and not IsTabRestricted(tTab) end) then
 			local chkCategory = container:AppendContentFromIni(INI_PATH, 'CheckBox_Category')
 			if not szCategory then
 				szCategory = tCategory.szName
@@ -411,8 +404,8 @@ function D.RedrawTabs(frame, szCategory)
 		end
 	end
 	scroll:FormatAllItemPos()
-	local tWelcomeTab = lodash.find(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == szCategory and tTab.bWelcome and not IsTabRestricted(tTab) end)
-		or lodash.find(PANEL_TAB_LIST, function(tTab) return not tTab.szCategory and tTab.bWelcome and not IsTabRestricted(tTab) end)
+	local tWelcomeTab = X.lodash.find(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == szCategory and tTab.bWelcome and not IsTabRestricted(tTab) end)
+		or X.lodash.find(PANEL_TAB_LIST, function(tTab) return not tTab.szCategory and tTab.bWelcome and not IsTabRestricted(tTab) end)
 	if tWelcomeTab then
 		X.SwitchTab(tWelcomeTab.szKey)
 	end
@@ -511,7 +504,7 @@ function D.OnLButtonClick()
 	if name == 'Btn_Close' then
 		X.ClosePanel()
 	elseif name == 'Btn_Weibo' then
-		X.OpenBrowser(X.PACKET_INFO.AUTHOR_WEIBO_URL)
+		X.OpenBrowser(X.PACKET_INFO.AUTHOR_FEEDBACK_URL)
 	end
 end
 
@@ -539,7 +532,7 @@ function D.OnCheckBoxCheck()
 		D.RedrawTabs(frame, this.szCategory)
 	elseif name == 'CheckBox_Maximize' then
 		local frame = this:GetRoot()
-		local ui = UI(frame)
+		local ui = X.UI(frame)
 		frame.tMaximizeAnchor = ui:Anchor()
 		frame.nMaximizeW, frame.nMaximizeH = ui:Size()
 		ui:Pos(0, 0):Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
@@ -554,7 +547,7 @@ function D.OnCheckBoxUncheck()
 	if name == 'CheckBox_Maximize' then
 		local frame = this:GetRoot()
 		D.ResizePanel(frame, frame.nMaximizeW, frame.nMaximizeH)
-		UI(this:GetRoot())
+		X.UI(this:GetRoot())
 			:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 			:Drag(true)
 			:Anchor(frame.tMaximizeAnchor)
@@ -565,7 +558,7 @@ function D.OnDragButtonBegin()
 	local name = this:GetName()
 	if name == 'Btn_Drag' then
 		this.fDragX, this.fDragY = Station.GetMessagePos()
-		this.fDragW, this.fDragH = UI(this:GetRoot()):Size()
+		this.fDragW, this.fDragH = X.UI(this:GetRoot()):Size()
 	end
 end
 
@@ -588,10 +581,10 @@ function D.OnFrameCreate()
 	local fScale = 1 + math.max(Font.GetOffset() * 0.03, 0)
 	this:Lookup('', 'Text_Title'):SetText(_L('%s v%s Build %s', X.PACKET_INFO.NAME, X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD))
 	this:Lookup('', 'Text_Author'):SetText('-- by ' .. X.PACKET_INFO.AUTHOR_SIGNATURE)
-	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', X.PACKET_INFO.AUTHOR_WEIBO))
+	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', X.PACKET_INFO.AUTHOR_FEEDBACK))
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_UITEX, X.PACKET_INFO.LOGO_MAIN_FRAME)
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
-	UI(this):Size(D.OnSizeChanged)
+	X.UI(this):Size(D.OnSizeChanged)
 	D.RedrawCategory(this)
 	D.ResizePanel(this, 960 * fScale, 630 * fScale)
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)

@@ -1,23 +1,15 @@
----------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : XML ´¦Àíº¯Êý¿â
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
----------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Simple JX3 XML decoding and encoding in pure Lua.
----------------------------------------------------------
+--------------------------------------------------------------------------------
 -- local aXMLNode = X.XMLDecode(szXML: string)
 -- local szXML = X.XMLEncode(xml: aXMLNode | XMLNode)
----------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local Log = Log or print
 
@@ -430,7 +422,8 @@ local function XMLDecode(xml)
 		pos = pos + 1
 	end
 	if #stack ~= 0 then
-		return Log('XML decode error: unclosed elements detected. ' .. #stack .. ' stacks on `' .. xml .. '`')
+		X.Debug('XML decode error: unclosed elements detected. ' .. #stack .. ' stacks on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
+		return
 	end
 	return t.children
 end

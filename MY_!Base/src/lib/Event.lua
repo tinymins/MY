@@ -1,22 +1,15 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 事件处理相关函数
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
----------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
 -- 事件注册
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local function CommonEventRegisterOperator(E, eAction, szEvent, szKey, fnAction)
 	if eAction == 'REG' then
@@ -134,7 +127,7 @@ local function CommonEventRegister(E, xArg1, xArg2, xArg3)
 			end
 		elseif X.IsArray(szEvent) then
 			if E.tList then
-				while lodash.some(szEvent, function(szEvent) return E.tList[szEvent] and E.tList[szEvent].tKey[tostring(szKey)] end) do
+				while X.lodash.some(szEvent, function(szEvent) return E.tList[szEvent] and E.tList[szEvent].tKey[tostring(szKey)] end) do
 					szKey = szKey + 1
 				end
 			end
@@ -165,7 +158,7 @@ local function FireEventRec(E, p, ...)
 		X.Debug(
 			_L['PMTool'],
 			_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], nTickCount),
-			X.DEBUG_LEVEL.PMLOG)
+			X.DEBUG_LEVEL.PM_LOG)
 	end
 	--[[#DEBUG END]]
 end
@@ -199,9 +192,9 @@ end
 X.CommonEventFirer = CommonEventFirer
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 监听游戏事件
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local GLOBAL_EVENT = { szName = 'Event' }
 local CommonEventFirer = X.CommonEventFirer
@@ -223,9 +216,9 @@ function X.RegisterEvent(...)
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 监听初始化完成事件
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local INIT_EVENT = { szName = 'Initial', bSingleEvent = true }
 local CommonEventFirer = X.CommonEventFirer
@@ -258,9 +251,9 @@ function X.IsInitialized()
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 监听游戏结束事件
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local EXIT_EVENT = { szName = 'Exit', bSingleEvent = true }
 local CommonEventFirer = X.CommonEventFirer
@@ -295,9 +288,9 @@ function X.RegisterFlush(...)
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 监听插件重载事件
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local RELOAD_EVENT = { szName = 'Reload', bSingleEvent = true }
 local CommonEventFirer = X.CommonEventFirer
@@ -314,9 +307,9 @@ function X.RegisterReload(...)
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 监听面板打开事件
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local FRAME_CREATE_EVENT = { szName = 'FrameCreate' }
 local CommonEventFirer = X.CommonEventFirer
@@ -331,9 +324,9 @@ function X.RegisterFrameCreate(...)
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 监听面板关闭事件
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local FRAME_DESTROY_EVENT = { szName = 'FrameCreate' }
 local CommonEventFirer = X.CommonEventFirer
@@ -348,9 +341,9 @@ function X.RegisterFrameDestroy(...)
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 监听游戏空闲事件
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local IDLE_EVENT, TIME = { szName = 'Idle', bSingleEvent = true }, 0
 local CommonEventFirer = X.CommonEventFirer
@@ -388,9 +381,9 @@ function X.RegisterIdle(...)
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 监听 CTRL ALT SHIFT 按键
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local SPECIAL_KEY_EVENT = { szName = 'SpecialKey' }
 local CommonEventFirer = X.CommonEventFirer
@@ -436,9 +429,9 @@ function X.RegisterSpecialKeyEvent(...)
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 注册模块
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local MODULE_LIST = {}
 function X.RegisterModuleEvent(arg0, arg1)
@@ -483,9 +476,9 @@ function X.RegisterModuleEvent(arg0, arg1)
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 注册新手引导
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local TUTORIAL_LIST = {}
 function X.RegisterTutorial(tOptions)
@@ -576,9 +569,9 @@ function X.CheckTutorial()
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 背景通讯
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local BG_MSG_ID_PREFIX = X.NSFormatString('{$NS}:')
 local BG_MSG_ID_SUFFIX = ':V2'
@@ -714,12 +707,12 @@ function X.SendBgMsg(nChannel, szMsgID, oData, bSilent)
 	local szMsgSID = BG_MSG_ID_PREFIX .. szMsgID .. BG_MSG_ID_SUFFIX
 	local szMsgUUID = X.GetUUID():gsub('-', '')
 	local szArg = X.EncodeLUAData({oData}) -- 如果发送nil，不包一层会被解析器误认为解码失败，所以必须用{}包裹
-	local nMsgLen = wstring.len(szArg)
+	local nMsgLen = X.StringLenW(szArg)
 	local nSegLen = math.floor(MAX_CHANNEL_LEN[nChannel] / 4 * 3) -- Base64编码会导致长度增加
 	local nSegCount = math.ceil(nMsgLen / nSegLen)
 	-- send msg
 	for nSegIndex = 1, nSegCount do
-		local szSeg = X.SimpleEncryptString((wstring.sub(szArg, (nSegIndex - 1) * nSegLen + 1, nSegIndex * nSegLen)))
+		local szSeg = X.SimpleEncryptString((X.StringSubW(szArg, (nSegIndex - 1) * nSegLen + 1, nSegIndex * nSegLen)))
 		local aSay = {
 			{ type = 'eventlink', name = 'BG_CHANNEL_MSG', linkinfo = szMsgSID },
 			{ type = 'eventlink', name = '', linkinfo = X.EncodeLUAData({ u = szMsgUUID, c = nSegCount, i = nSegIndex }) },
@@ -731,9 +724,9 @@ end
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 注册聊天监听
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Register:   X.RegisterMsgMonitor(string szKey, function fnAction)
 -- Unregister: X.RegisterMsgMonitor(string szKey, false)
 do
@@ -774,11 +767,11 @@ function X.RegisterMsgMonitor(...)
 end
 end
 
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 注册协程
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
-local COROUTINE_TIME = 1000 * 0.5 / ENVIRONMENT.GAME_FPS -- 一次 Breathe 时最大允许执行协程时间
+local COROUTINE_TIME = 1000 * 0.5 / X.ENVIRONMENT.GAME_FPS -- 一次 Breathe 时最大允许执行协程时间
 local COROUTINE_LIST = {}
 local yield = coroutine and coroutine.yield or function() end
 function X.RegisterCoroutine(szKey, fnAction, fnCallback)
@@ -816,7 +809,7 @@ function X.RegisterCoroutine(szKey, fnAction, fnCallback)
 	end
 	return szKey
 end
-local FPS_SLOW_TIME = 1000 / ENVIRONMENT.GAME_FPS * 1.2
+local FPS_SLOW_TIME = 1000 / X.ENVIRONMENT.GAME_FPS * 1.2
 local l_nLastBreatheTime = GetTime()
 local function onBreathe()
 	if not coroutine then
@@ -840,7 +833,7 @@ local function onBreathe()
 				end
 				if coroutine.status(p.coAction) == 'dead' then
 					if p.fnCallback then
-						X.Call(p.fnCallback, p.bSuccess or false, X.Unpack(p.aReturn or CONSTANT.EMPTY_TABLE))
+						X.Call(p.fnCallback, p.bSuccess or false, X.Unpack(p.aReturn or X.CONSTANT.EMPTY_TABLE))
 					end
 					COROUTINE_LIST[k] = nil
 				end
@@ -849,9 +842,9 @@ local function onBreathe()
 	end
 	--[[#DEBUG BEGIN]]
 	if GetTime() - nBeginTime > COROUTINE_TIME then
-		X.Debug(_L['PMTool'], _L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), X.DEBUG_LEVEL.PMLOG)
+		X.Debug(_L['PMTool'], _L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), X.DEBUG_LEVEL.PM_LOG)
 	elseif nBeginTime - l_nLastBreatheTime > FPS_SLOW_TIME then
-		X.Debug(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), X.DEBUG_LEVEL.PMLOG)
+		X.Debug(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), X.DEBUG_LEVEL.PM_LOG)
 	end
 	--[[#DEBUG END]]
 	l_nLastBreatheTime = nBeginTime

@@ -1,26 +1,19 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 游戏常量枚举
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 local KvpToObject = X.KvpToObject
-local bStream = ENVIRONMENT.GAME_PROVIDER == 'remote'
-local bClassic = ENVIRONMENT.GAME_BRANCH == 'classic'
+local bStream = X.ENVIRONMENT.GAME_PROVIDER == 'remote'
+local bClassic = X.ENVIRONMENT.GAME_BRANCH == 'classic'
 
 local function PickBranch(tData)
-	return tData[ENVIRONMENT.GAME_BRANCH] or tData['zhcn']
+	return tData[X.ENVIRONMENT.GAME_BRANCH] or tData['zhcn']
 end
 
 local FORCE_TYPE = (function()
@@ -65,7 +58,7 @@ local TEAM_MARK = {
 	FAN   = 10,
 }
 
-CONSTANT = {
+local CONSTANT = {
 	MENU_DIVIDER = X.SetmetaReadonly({ bDevide = true }),
 	EMPTY_TABLE = X.SetmetaReadonly({}),
 	XML_LINE_BREAKER = GetFormatText('\n'),

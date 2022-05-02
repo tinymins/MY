@@ -1,31 +1,23 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 界面库
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 -- TODO: 界面库需要重构，该文件应作为入口文件，仅用于分发各个组件的函数调用
 -- TODO: 应当增加基础组件类型操作对象 ComponentBase ，可以提供组件的基本操作方法如 ComponentBase.Size(raw, ...)
--- TODO: 应当增加组件注册函数 function UI.RegisterComponent(function(super, GetComponentProp, SetComponentProp) return szComponentName, ComponentOO end)
+-- TODO: 应当增加组件注册函数 function X.UI.RegisterComponent(function(super, GetComponentProp, SetComponentProp) return szComponentName, ComponentOO end)
 -- TODO: 子组件可以覆盖基础组件的操作方法，如 ComponentOO.Size(raw, ...)
 -- TODO: 子组件也可以通过 super 调用基础组件的方法，如 super.Size(raw, ...)
 -- TODO: 有时间再说吧，是个大工程
 
 -------------------------------------------------------------------------------------------------------
 
-local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
-
-UI.ITEM_EVENT = X.SetmetaReadonly({
+X.UI.ITEM_EVENT = X.SetmetaReadonly({
 	L_BUTTON_DOWN     = 0x00000001,
 	R_BUTTON_DOWN     = 0x00000002,
 	L_BUTTON_UP       = 0x00000004,
@@ -50,7 +42,7 @@ UI.ITEM_EVENT = X.SetmetaReadonly({
 	M_BUTTON_DRAG     = 0x00200000,
 	MOUSE_IN_OUT      = 0x00400000,
 })
-UI.CURSOR = CURSOR or X.SetmetaReadonly({
+X.UI.CURSOR = CURSOR or X.SetmetaReadonly({
 	NORMAL              = 0,
 	CAST                = 1,
 	UNABLECAST          = 2,
@@ -101,12 +93,12 @@ UI.CURSOR = CURSOR or X.SetmetaReadonly({
 	HOMELAND_BRUSH      = 65,
 	HOMELAND_DIG_CELLAR = 66,
 })
-UI.MOUSE_BUTTON = X.SetmetaReadonly({
+X.UI.MOUSE_BUTTON = X.SetmetaReadonly({
 	LEFT   = 1,
 	MIDDLE = 0,
 	RIGHT  = -1,
 })
-UI.TIP_POSITION = X.SetmetaReadonly({
+X.UI.TIP_POSITION = X.SetmetaReadonly({
 	FOLLOW_MOUSE              = -1,
 	CENTER                    = ALW.CENTER,
 	LEFT_RIGHT                = ALW.LEFT_RIGHT,
@@ -115,16 +107,16 @@ UI.TIP_POSITION = X.SetmetaReadonly({
 	BOTTOM_TOP                = ALW.BOTTOM_TOP,
 	RIGHT_LEFT_AND_BOTTOM_TOP = ALW.RIGHT_LEFT_AND_BOTTOM_TOP,
 })
-UI.TIP_HIDE_WAY = X.SetmetaReadonly({
+X.UI.TIP_HIDE_WAY = X.SetmetaReadonly({
 	NO_HIDE      = 100,
 	HIDE         = 101,
 	ANIMATE_HIDE = 102,
 })
-UI.TRACKBAR_STYLE = X.SetmetaReadonly({
+X.UI.TRACKBAR_STYLE = X.SetmetaReadonly({
 	SHOW_VALUE    = false,
 	SHOW_PERCENT  = true,
 })
-UI.WND_SIDE = X.SetmetaReadonly({
+X.UI.WND_SIDE = X.SetmetaReadonly({
 	TOP           = 0,
 	BOTTOM        = 1,
 	LEFT          = 2,
@@ -139,19 +131,19 @@ UI.WND_SIDE = X.SetmetaReadonly({
 	TOP_CENTER    = 1,
 	BOTTOM_CENTER = 1,
 })
-UI.EDIT_TYPE = X.SetmetaReadonly({
+X.UI.EDIT_TYPE = X.SetmetaReadonly({
 	NUMBER = 0, -- 数字
 	ASCII = 1, -- 英文
 	WIDE_CHAR = 2, -- 中英文
 })
-UI.WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or X.SetmetaReadonly({
+X.UI.WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or X.SetmetaReadonly({
 	CUSTOM = 0,
 	LEFT_TOP = 1,
 	LEFT_BOTTOM = 2,
 	RIGHT_TOP = 3,
 	RIGHT_BOTTOM = 4,
 })
-UI.LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
+X.UI.LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
 
 local BUTTON_STYLE_CONFIG = {
 	DEFAULT = {
@@ -200,7 +192,7 @@ local BUTTON_STYLE_CONFIG = {
 	},
 }
 local function GetButtonStyleName(raw)
-	local szImage = wstring.lower(raw:GetAnimatePath())
+	local szImage = X.StringLowerW(raw:GetAnimatePath())
 	local nNormalGroup = raw:GetAnimateGroupNormal()
 	local GetStyleName = X.Get(_G, {X.NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleName'})
 	if X.IsFunction(GetStyleName) then
@@ -210,7 +202,7 @@ local function GetButtonStyleName(raw)
 		end
 	end
 	for e, p in pairs(BUTTON_STYLE_CONFIG) do
-		if wstring.lower(X.NormalizePath(p.szImage)) == szImage and p.nNormalGroup == nNormalGroup then
+		if X.StringLowerW(X.NormalizePath(p.szImage)) == szImage and p.nNormalGroup == nNormalGroup then
 			return e
 		end
 	end
@@ -342,7 +334,7 @@ local function ApplyUIArguments(ui, arg)
 	end
 	return ui
 end
-UI.ApplyUIArguments = ApplyUIArguments
+X.UI.ApplyUIArguments = ApplyUIArguments
 
 local GetComponentProp, SetComponentProp -- 组件私有属性 仅本文件内使用
 do local l_prop = setmetatable({}, { __mode = 'k' })
@@ -548,13 +540,13 @@ end
 -- @param {number} props.w 提示框宽度
 -- @param {{ x: number; y: number; w: number; h: number }} props.rect 提示框触发区域矩形位置（默认则从 this 上获取）
 -- @param {{ x: number; y: number; w: number; h: number }} props.offset 提示框触发区域偏移量
--- @param {UI.TIP_HIDE_WAY} props.position 提示框相对于触发区域的位置
+-- @param {X.UI.TIP_HIDE_WAY} props.position 提示框相对于触发区域的位置
 -- @param {boolean} props.rich 提示框内容是否为富文本（当 render 为函数时取函数第二返回值）
 -- @param {number} props.font 提示框字体（仅在非富文本下有效）
 -- @param {number} props.r 提示框文字r（仅在非富文本下有效）
 -- @param {number} props.g 提示框文字g（仅在非富文本下有效）
 -- @param {number} props.b 提示框文字b（仅在非富文本下有效）
--- @param {UI.TIP_HIDE_WAY} props.hide 提示框消失方式
+-- @param {X.UI.TIP_HIDE_WAY} props.hide 提示框消失方式
 local function OutputAdvanceTip(props, ...)
 	if not X.IsTable(props) then
 		props = { render = props }
@@ -564,9 +556,9 @@ local function OutputAdvanceTip(props, ...)
 	local nOffsetY = tOffset.y or 0
 	local nOffsetW = tOffset.w or 0
 	local nOffsetH = tOffset.h or 0
-	local ePosition = props.position or UI.TIP_POSITION.FOLLOW_MOUSE
+	local ePosition = props.position or X.UI.TIP_POSITION.FOLLOW_MOUSE
 	local nX, nY, nW, nH
-	if ePosition == UI.TIP_POSITION.FOLLOW_MOUSE then
+	if ePosition == X.UI.TIP_POSITION.FOLLOW_MOUSE then
 		nX, nY = Cursor.GetPos()
 		nX, nY = nX - 0, nY - 40
 		nW, nH = 40, 40
@@ -658,14 +650,14 @@ local function HideAdvanceTip(props)
 	if not X.IsTable(props) then
 		props = { render = props }
 	end
-	local eHide = props.hide or UI.TIP_HIDE_WAY.HIDE
-	if eHide ~= UI.TIP_HIDE_WAY.HIDE and eHide ~= UI.TIP_HIDE_WAY.ANIMATE_HIDE then
+	local eHide = props.hide or X.UI.TIP_HIDE_WAY.HIDE
+	if eHide ~= X.UI.TIP_HIDE_WAY.HIDE and eHide ~= X.UI.TIP_HIDE_WAY.ANIMATE_HIDE then
 		return
 	end
 	if props.type == 'table' then
-		X.HideTableTip(eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE)
+		X.HideTableTip(eHide == X.UI.TIP_HIDE_WAY.ANIMATE_HIDE)
 	else
-		HideTip(eHide == UI.TIP_HIDE_WAY.ANIMATE_HIDE)
+		HideTip(eHide == X.UI.TIP_HIDE_WAY.ANIMATE_HIDE)
 	end
 end
 
@@ -740,7 +732,7 @@ local function InitComponent(raw, szType)
 			if opt.disabled or opt.disabledTmp then
 				return
 			end
-			UI(raw):Autocomplete('search')
+			X.UI(raw):Autocomplete('search')
 		end
 		edt.OnEditChanged = function()
 			local opt = GetComponentProp(raw, 'autocompleteOptions')
@@ -753,12 +745,12 @@ local function InitComponent(raw, szType)
 			if len >= opt.minLength then
 				-- delay search
 				X.DelayCall(opt.delay, function()
-					UI(raw):Autocomplete('search')
+					X.UI(raw):Autocomplete('search')
 					-- for compatible
 					Station.SetFocusWindow(edt)
 				end)
 			else
-				UI(raw):Autocomplete('close')
+				X.UI(raw):Autocomplete('close')
 			end
 		end
 		edt.OnKillFocus = function()
@@ -766,7 +758,7 @@ local function InitComponent(raw, szType)
 				local wnd = Station.GetFocusWindow()
 				local frame = wnd and wnd:GetRoot()
 				if not frame or frame:GetName() ~= X.NSFormatString('{$NS}_PopupMenu') then
-					UI.ClosePopupMenu()
+					X.UI.ClosePopupMenu()
 				end
 			end)
 		end
@@ -809,7 +801,7 @@ local function InitComponent(raw, szType)
 			source       = {}   ,  -- option list
 		})
 	elseif szType == 'WndRadioBox' then
-		UI(raw):UIEvent('OnLButtonUp', function()
+		X.UI(raw):UIEvent('OnLButtonUp', function()
 			if not this:IsEnabled() then
 				return
 			end
@@ -836,7 +828,7 @@ local function InitComponent(raw, szType)
 					return
 				end
 			end
-			UI(this:Lookup('Image_Bg')):FadeIn(100)
+			X.UI(this:Lookup('Image_Bg')):FadeIn(100)
 		end)
 		SetComponentProp(raw, 'OnListItemHandleMouseLeave', function()
 			local data = GetComponentProp(this, 'listboxItemData')
@@ -847,7 +839,7 @@ local function InitComponent(raw, szType)
 					return
 				end
 			end
-			UI(this:Lookup('Image_Bg')):FadeTo(500,0)
+			X.UI(this:Lookup('Image_Bg')):FadeTo(500,0)
 		end)
 		SetComponentProp(raw, 'OnListItemHandleLButtonClick', function()
 			local data = GetComponentProp(this, 'listboxItemData')
@@ -904,7 +896,7 @@ local function InitComponent(raw, szType)
 			if GetMenu then
 				local status, menu = X.CallWithThis(raw, GetMenu, data.id, data.text, data.data, data.selected)
 				if status and menu then
-					UI.PopupMenu(menu)
+					X.UI.PopupMenu(menu)
 				end
 			end
 		end)
@@ -1219,7 +1211,7 @@ local function InitComponent(raw, szType)
 					end
 					hContent:AppendItemFromString(szTitle)
 					-- 事件
-					local ui = UI(hCol)
+					local ui = X.UI(hCol)
 					-- 标题 Tip
 					if col.titleTip then
 						local tipProps = X.Clone(col.titleTip)
@@ -1227,7 +1219,7 @@ local function InitComponent(raw, szType)
 							tipProps = { render = tipProps }
 						end
 						if not tipProps.position then
-							tipProps.position = UI.TIP_POSITION.TOP_BOTTOM
+							tipProps.position = X.UI.TIP_POSITION.TOP_BOTTOM
 						end
 						if not X.IsTable(tipProps.rect) then
 							tipProps.rect = {}
@@ -1324,7 +1316,7 @@ local function InitComponent(raw, szType)
 									break
 								end
 							end
-							UI(raw):Columns(aColumns)
+							X.UI(raw):Columns(aColumns)
 							X.SafeCall(GetComponentProp(raw, 'OnColumnsChange'))
 						end)
 					end
@@ -1433,7 +1425,7 @@ local function InitComponent(raw, szType)
 								tipProps = { render = tipProps }
 							end
 							if not tipProps.position then
-								tipProps.position = UI.TIP_POSITION.LEFT_RIGHT
+								tipProps.position = X.UI.TIP_POSITION.LEFT_RIGHT
 							end
 							if not X.IsTable(tipProps.rect) then
 								tipProps.rect = {}
@@ -1450,7 +1442,7 @@ local function InitComponent(raw, szType)
 							hItem.OnItemMouseOut = function()
 								HideAdvanceTip(tipProps)
 							end
-							hItem:RegisterEvent(UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
+							hItem:RegisterEvent(X.UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
 						end
 					end
 					hRow.OnItemMouseEnter = function()
@@ -1788,11 +1780,11 @@ local function InitComponent(raw, szType)
 				return
 			end
 			-- 颜色组件，无论是否注册过都弹框
-			UI.OpenColorPicker(function(r, g, b)
+			X.UI.OpenColorPicker(function(r, g, b)
 				for _, cb in ipairs(GetComponentProp(raw, 'OnColorPickCBs')) do
 					X.CallWithThis(raw, cb, r, g, b)
 				end
-				UI(raw):Color(r, g, b)
+				X.UI(raw):Color(r, g, b)
 			end)
 		end
 		raw.Enable = function(_, bEnabled)
@@ -1890,7 +1882,7 @@ function OO:Add(mixed)
 			table.insert(raws, mixed[i])
 		end
 	end
-	return UI(raws)
+	return X.UI(raws)
 end
 
 -- delete elements from object
@@ -1947,7 +1939,7 @@ function OO:Del(mixed)
 			end
 		end
 	end
-	return UI(raws)
+	return X.UI(raws)
 end
 
 -- filter elements from object
@@ -2004,7 +1996,7 @@ function OO:Filter(mixed)
 			end
 		end
 	end
-	return UI(raws)
+	return X.UI(raws)
 end
 
 -- get parent
@@ -2022,7 +2014,7 @@ function OO:Parent()
 			end
 		end
 	end
-	return UI(raws)
+	return X.UI(raws)
 end
 
 -- fetch children by name
@@ -2047,7 +2039,7 @@ function OO:Fetch(szName, szSubName)
 			table.insert(raws, el)
 		end
 	end
-	return UI(raws)
+	return X.UI(raws)
 end
 
 -- get children
@@ -2078,7 +2070,7 @@ function OO:Children(filter)
 				end
 			end
 		end
-		return UI(raws)
+		return X.UI(raws)
 	else
 		local raws, hash, child, path = {}, {}, nil, nil
 		for _, raw in ipairs(self.raws) do
@@ -2115,7 +2107,7 @@ function OO:Children(filter)
 				end
 			end
 		end
-		return UI(raws):Filter(filter)
+		return X.UI(raws):Filter(filter)
 	end
 end
 
@@ -2169,7 +2161,7 @@ function OO:Find(filter)
 		-- 因为是求子元素 所以移除第一个压栈的元素（父元素）
 		table.remove(raws, top + 1)
 	end
-	return UI(raws):Filter(filter)
+	return X.UI(raws):Filter(filter)
 end
 
 function OO:Raw(nIndex)
@@ -2193,7 +2185,7 @@ function OO:PtIn()
 			end
 		end
 	end
-	return UI(raws)
+	return X.UI(raws)
 end
 
 -- each
@@ -2202,7 +2194,7 @@ end
 function OO:Each(fn)
 	self:_checksum()
 	for _, raw in pairs(self.raws) do
-		X.ExecuteWithThis(raw, fn, UI(raw))
+		X.ExecuteWithThis(raw, fn, X.UI(raw))
 	end
 	return self
 end
@@ -2223,7 +2215,7 @@ function OO:Slice(startpos, endpos)
 	for i = startpos, endpos, 1 do
 		table.insert(raws, self.raws[i])
 	end
-	return UI(raws)
+	return X.UI(raws)
 end
 
 -- eq
@@ -2304,7 +2296,7 @@ local function OnCommonComponentMouseEnter()
 	end
 
 	local nDisLen = hText:GetTextPosExtent()
-	local nLen = wstring.len(hText:GetText())
+	local nLen = X.StringLenW(hText:GetText())
 	if nDisLen == nLen then
 		return
 	end
@@ -2344,7 +2336,7 @@ function OO:Append(arg0, arg1)
 	end
 	self:_checksum()
 
-	local ui, szXml, szType, tArg = UI()
+	local ui, szXml, szType, tArg = X.UI()
 	if arg0:find('%<') then
 		szXml = arg0
 	else
@@ -2414,7 +2406,7 @@ function OO:Append(arg0, arg1)
 			end
 			if raw then
 				ui = ui:Add(raw)
-				UI(raw):Hover(OnCommonComponentHover):Change(OnCommonComponentMouseEnter)
+				X.UI(raw):Hover(OnCommonComponentHover):Change(OnCommonComponentMouseEnter)
 			else
 				X.Debug(X.NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), X.DEBUG_LEVEL.ERROR)
 			end
@@ -2662,21 +2654,21 @@ function OO:Drag(...)
 					raw.OnItemLButtonDrag = function()
 						local szDragGroupID = GetComponentProp(raw, 'DragDropGroup')
 						local data, capture = fnAction()
-						UI.OpenDragDrop(this, capture, szDragGroupID, data)
+						X.UI.OpenDragDrop(this, capture, szDragGroupID, data)
 					end
 					raw.OnItemLButtonDragEnd = function()
-						if not UI.IsDragDropOpened() then
+						if not X.UI.IsDragDropOpened() then
 							return
 						end
-						local dropEl, szDragGroupID, xData = UI.CloseDragDrop()
+						local dropEl, szDragGroupID, xData = X.UI.CloseDragDrop()
 						local szDropGroupID = GetComponentProp(dropEl, 'DragDropGroup')
 						if szDragGroupID ~= szDropGroupID then
 							return
 						end
 						X.SafeCall(GetComponentProp(dropEl, 'OnDrop'), szDragGroupID, xData)
 					end
-					raw:RegisterEvent(UI.ITEM_EVENT.L_BUTTON_DRAG)
-					raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
+					raw:RegisterEvent(X.UI.ITEM_EVENT.L_BUTTON_DRAG)
+					raw:RegisterEvent(X.UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
 				end
 			end
 			return self
@@ -2687,17 +2679,17 @@ function OO:Drag(...)
 			for _, raw in ipairs(self.raws) do
 				if raw:GetType() == 'WndFrame' then
 					if arg0 then
-						UI(raw):UIEvent('OnFrameDragSetPosEnd', arg0)
+						X.UI(raw):UIEvent('OnFrameDragSetPosEnd', arg0)
 					end
 					if arg1 then
-						UI(raw):UIEvent('OnFrameDragEnd', arg1)
+						X.UI(raw):UIEvent('OnFrameDragEnd', arg1)
 					end
 				elseif raw:GetBaseType() == 'Item' then
 					if arg0 then
-						UI(raw):UIEvent('OnItemLButtonDrag', arg0)
+						X.UI(raw):UIEvent('OnItemLButtonDrag', arg0)
 					end
 					if arg1 then
-						UI(raw):UIEvent('OnItemLButtonDragEnd', arg1)
+						X.UI(raw):UIEvent('OnItemLButtonDragEnd', arg1)
 					end
 				end
 			end
@@ -2722,17 +2714,17 @@ function OO:DragHover(fnAction)
 	for _, raw in ipairs(self.raws) do
 		if raw:GetBaseType() == 'Item' then
 			SetComponentProp(raw, 'DragHover', fnAction)
-			UI(raw):UIEvent('OnItemMouseHover', function()
-				if not UI.IsDragDropOpened() then
+			X.UI(raw):UIEvent('OnItemMouseHover', function()
+				if not X.UI.IsDragDropOpened() then
 					return
 				end
-				local szDragGroupID = UI.GetDragDropData()
+				local szDragGroupID = X.UI.GetDragDropData()
 				if szDragGroupID == GetComponentProp(raw, 'DragDropGroup') then
 					local rect, bAcceptable, eCursor = fnAction()
-					UI.SetDragDropHoverEl(raw, rect, bAcceptable, eCursor)
+					X.UI.SetDragDropHoverEl(raw, rect, bAcceptable, eCursor)
 				end
 			end)
-			raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_HOVER)
+			raw:RegisterEvent(X.UI.ITEM_EVENT.MOUSE_HOVER)
 		end
 	end
 	return self
@@ -2742,34 +2734,34 @@ function OO:Drop(fnAction)
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		if raw:GetBaseType() == 'Item' then
-			UI(raw):UIEvent('OnItemMouseEnter', function()
-				if not UI.IsDragDropOpened() then
+			X.UI(raw):UIEvent('OnItemMouseEnter', function()
+				if not X.UI.IsDragDropOpened() then
 					return
 				end
-				local szDragGroupID = UI.GetDragDropData()
+				local szDragGroupID = X.UI.GetDragDropData()
 				if szDragGroupID == GetComponentProp(raw, 'DragDropGroup') then
 					local rect, bAcceptable, eCursor
 					local fnDragHover = GetComponentProp(raw, 'DragHover')
 					if fnDragHover then
 						rect, bAcceptable, eCursor = fnDragHover()
 					end
-					UI.SetDragDropHoverEl(raw, rect, bAcceptable, eCursor)
+					X.UI.SetDragDropHoverEl(raw, rect, bAcceptable, eCursor)
 				end
 			end)
-			UI(raw):UIEvent('OnItemMouseLeave', function()
-				if not UI.IsDragDropOpened() then
+			X.UI(raw):UIEvent('OnItemMouseLeave', function()
+				if not X.UI.IsDragDropOpened() then
 					return
 				end
-				local szDragGroupID = UI.GetDragDropData()
+				local szDragGroupID = X.UI.GetDragDropData()
 				if szDragGroupID == GetComponentProp(raw, 'DragDropGroup') then
-					UI.SetDragDropHoverEl(nil)
+					X.UI.SetDragDropHoverEl(nil)
 				end
 			end)
 			SetComponentProp(raw, 'OnDrop', function(szDragGroupID, xData)
 				X.ExecuteWithThis(raw, fnAction, szDragGroupID, xData)
 			end)
-			raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_HOVER)
-			raw:RegisterEvent(UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
+			raw:RegisterEvent(X.UI.ITEM_EVENT.MOUSE_HOVER)
+			raw:RegisterEvent(X.UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
 		end
 	end
 end
@@ -2914,7 +2906,7 @@ function OO:Autocomplete(method, arg1, arg2)
 				end
 			end
 		elseif method == 'close' then
-			UI.ClosePopupMenu()
+			X.UI.ClosePopupMenu()
 		elseif method == 'destroy' then
 			for _, raw in ipairs(self.raws) do
 				raw:Lookup('WndEdit_Default').OnSetFocus = nil
@@ -2940,7 +2932,7 @@ function OO:Autocomplete(method, arg1, arg2)
 						if opt.ignoreCase then
 							haystack = StringLowerW(haystack)
 						end
-						local pos = wstring.find(haystack, needle)
+						local pos = X.StringFindW(haystack, needle)
 						if pos and pos > 0 and not opt.anyMatch then
 							pos = nil
 						end
@@ -2948,7 +2940,7 @@ function OO:Autocomplete(method, arg1, arg2)
 							local aPinyin, aPinyinConsonant = X.Han2Pinyin(haystack)
 							if not pos then
 								for _, s in ipairs(aPinyin) do
-									pos = wstring.find(s, needle)
+									pos = X.StringFindW(s, needle)
 									if pos and pos > 0 and not opt.anyMatch then
 										pos = nil
 									end
@@ -2959,7 +2951,7 @@ function OO:Autocomplete(method, arg1, arg2)
 							end
 							if not pos then
 								for _, s in ipairs(aPinyinConsonant) do
-									pos = wstring.find(s, needle)
+									pos = X.StringFindW(s, needle)
 									if pos and pos > 0 and not opt.anyMatch then
 										pos = nil
 									end
@@ -2997,7 +2989,7 @@ function OO:Autocomplete(method, arg1, arg2)
 						local t
 						if bDivide then
 							if #menu == 0 or not menu[#menu].bDevide then
-								t = CONSTANT.MENU_DIVIDER
+								t = X.CONSTANT.MENU_DIVIDER
 							end
 						else
 							t = {
@@ -3009,7 +3001,7 @@ function OO:Autocomplete(method, arg1, arg2)
 									if X.IsFunction(opt.afterComplete) then
 										opt.afterComplete(raw, opt, text, src)
 									end
-									UI.ClosePopupMenu()
+									X.UI.ClosePopupMenu()
 									opt.disabledTmp = nil
 								end,
 							}
@@ -3028,7 +3020,7 @@ function OO:Autocomplete(method, arg1, arg2)
 												table.remove(opt.source, i)
 											end
 										end
-										UI(raw):Autocomplete('search')
+										X.UI(raw):Autocomplete('search')
 									end
 									if opt.beforeDelete then
 										local bSuccess
@@ -3066,11 +3058,11 @@ function OO:Autocomplete(method, arg1, arg2)
 					-- popup menu
 					if #menu > 0 then
 						opt.disabledTmp = true
-						UI.PopupMenu(menu)
+						X.UI.PopupMenu(menu)
 						Station.SetFocusWindow(raw:Lookup('WndEdit_Default'))
 						opt.disabledTmp = nil
 					else
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end
 				end
 			end
@@ -3598,7 +3590,7 @@ function OO:FadeOut(nTime, callback)
 		end
 	end
 	self:FadeTo(nTime, 0, function()
-		local ui = UI(this)
+		local ui = X.UI(this)
 		ui:Toggle(false)
 		if callback then
 			X.CallWithThis(this, callback)
@@ -3934,7 +3926,7 @@ function OO:Shake(xrange, yrange, maxspeed, time)
 		local xspeed, yspeed = maxspeed, - maxspeed
 		local xhalfrange, yhalfrange = xrange / 2, yrange / 2
 		for _, raw in ipairs(self.raws) do
-			local ui = UI(raw)
+			local ui = X.UI(raw)
 			local xoffset, yoffset = 0, 0
 			X.RenderCall(tostring(raw) .. ' shake', function()
 				if ui:Count() == 0 then
@@ -4385,7 +4377,7 @@ function OO:Size(...)
 		local arg0, arg1, arg2, arg3 = ...
 		if X.IsFunction(arg0) then
 			for _, raw in ipairs(self.raws) do
-				UI(raw):UIEvent('OnSizeChanged', arg0)
+				X.UI(raw):UIEvent('OnSizeChanged', arg0)
 			end
 		else
 			local nWidth, nHeight = arg0, arg1
@@ -4519,7 +4511,7 @@ local function AutoSize(raw, bAutoWidth, bAutoHeight)
 				or componentType == 'WndComboBox'
 			local txt = GetComponentElement(raw, 'TEXT')
 			if txt then
-				local ui = UI(raw)
+				local ui = X.UI(raw)
 				local W, H, RW, RH = ui:Size()
 				local oW, oH = txt:GetSize()
 				txt:SetSize(1000, 1000)
@@ -4624,7 +4616,7 @@ function OO:Scroll(mixed)
 			for _, raw in ipairs(self.raws) do
 				local raw = raw:Lookup('WndScrollBar')
 				if raw then
-					UI(raw):UIEvent('OnScrollBarPosChanged', function()
+					X.UI(raw):UIEvent('OnScrollBarPosChanged', function()
 						local nDistance = Station.GetMessageWheelDelta()
 						local nScrollPos = raw:GetScrollPos()
 						local nStepCount = raw:GetStepCount()
@@ -4744,7 +4736,7 @@ function OO:Image(szImage, nFrame, nOverFrame, nDownFrame, nDisableFrame)
 		szImage = string.gsub(szImage, '%|.*', '')
 	end
 	if X.IsString(szImage) then
-		szImage = wstring.gsub(szImage, '/', '\\')
+		szImage = X.StringReplaceW(szImage, '/', '\\')
 		if X.IsNumber(nFrame) and X.IsNumber(nOverFrame) and X.IsNumber(nDownFrame) and X.IsNumber(nDisableFrame) then
 			for _, raw in ipairs(self.raws) do
 				raw = GetComponentElement(raw, 'BUTTON')
@@ -4985,7 +4977,7 @@ end
 -- (self) UI:TrackbarStyle(nTrackbarStyle)
 function OO:TrackbarStyle(nTrackbarStyle)
 	self:_checksum()
-	local bShowPercentage = nTrackbarStyle == UI.TRACKBAR_STYLE.SHOW_PERCENT
+	local bShowPercentage = nTrackbarStyle == X.UI.TRACKBAR_STYLE.SHOW_PERCENT
 	for _, raw in ipairs(self.raws) do
 		if GetComponentType(raw) == 'WndTrackbar' then
 			SetComponentProp(raw, 'bShowPercentage', bShowPercentage)
@@ -5033,12 +5025,12 @@ function OO:ButtonStyle(...)
 		for _, raw in ipairs(self.raws) do
 			local btn = GetComponentElement(raw, 'BUTTON')
 			if btn then
-				btn:SetAnimatePath((wstring.gsub(tStyle.szImage, '/', '\\')))
+				btn:SetAnimatePath((X.StringReplaceW(tStyle.szImage, '/', '\\')))
 				btn:SetAnimateGroupNormal(tStyle.nNormalGroup)
 				btn:SetAnimateGroupMouseOver(tStyle.nMouseOverGroup)
 				btn:SetAnimateGroupMouseDown(tStyle.nMouseDownGroup)
 				btn:SetAnimateGroupDisable(tStyle.nDisableGroup)
-				UI(btn)
+				X.UI(btn)
 					:UIEvent(X.NSFormatString('OnMouseIn.{$NS}_UI_BUTTON_EVENT'), function()
 						SetComponentProp(raw, 'bIn', true)
 						UpdateButtonBoxFont(raw)
@@ -5232,7 +5224,7 @@ function OO:UIEvent(szEvent, fnEvent)
 								else
 									X.Debug(
 										'UI:UIEvent#' .. szEvent .. ':' .. (p.id or 'Unnamed'),
-										_L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', UI.GetTreePath(raw)),
+										_L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', X.UI.GetTreePath(raw)),
 										X.DEBUG_LEVEL.WARNING
 									)
 								--[[#DEBUG END]]
@@ -5306,7 +5298,7 @@ function OO:Breathe(fnOnFrameBreathe)
 	if X.IsFunction(fnOnFrameBreathe) then
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
-				UI(raw):UIEvent('OnFrameBreathe', fnOnFrameBreathe)
+				X.UI(raw):UIEvent('OnFrameBreathe', fnOnFrameBreathe)
 			end
 		end
 	end
@@ -5334,7 +5326,7 @@ function OO:Menu(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
-		UI.PopupMenu(m)
+		X.UI.PopupMenu(m)
 	end)
 	return self
 end
@@ -5360,7 +5352,7 @@ function OO:MenuLClick(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
-		UI.PopupMenu(m)
+		X.UI.PopupMenu(m)
 	end)
 	return self
 end
@@ -5386,26 +5378,26 @@ function OO:MenuRClick(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
-		UI.PopupMenu(m)
+		X.UI.PopupMenu(m)
 	end)
 	return self
 end
 
 -- 绑定鼠标单击事件，无参数或传入鼠标按键枚举值调用表示触发单击事件
 -- same as jQuery.click()
--- @param {function(eButton: UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
+-- @param {function(eButton: X.UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
 function OO:Click(fnClick)
 	if X.IsFunction(fnClick) then
 		self:LClick(fnClick)
 		self:MClick(fnClick)
 		self:RClick(fnClick)
 	else
-		local eButton = fnClick or UI.MOUSE_BUTTON.LEFT
-		if eButton == UI.MOUSE_BUTTON.LEFT then
+		local eButton = fnClick or X.UI.MOUSE_BUTTON.LEFT
+		if eButton == X.UI.MOUSE_BUTTON.LEFT then
 			self:LClick()
-		elseif eButton == UI.MOUSE_BUTTON.MIDDLE then
+		elseif eButton == X.UI.MOUSE_BUTTON.MIDDLE then
 			self:MClick()
-		elseif eButton == UI.MOUSE_BUTTON.RIGHT then
+		elseif eButton == X.UI.MOUSE_BUTTON.RIGHT then
 			self:RClick()
 		end
 	end
@@ -5414,7 +5406,7 @@ end
 
 -- 鼠标左键单击事件，无参数调用表示触发单击事件
 -- same as jQuery.lclick()
--- @param {function(eButton: UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
+-- @param {function(eButton: X.UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
 function OO:LClick(...)
 	self:_checksum()
 	if select('#', ...) > 0 then
@@ -5422,28 +5414,28 @@ function OO:LClick(...)
 		if X.IsFunction(fnClick) then
 			for _, raw in ipairs(self.raws) do
 				local fnAction = function()
-					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
+					if X.UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.LEFT)
+					X.ExecuteWithThis(raw, fnClick, X.UI.MOUSE_BUTTON.LEFT)
 				end
 				if GetComponentType(raw) == 'WndScrollHandleBox' then
-					UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemLButtonClick', fnAction)
+					X.UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemLButtonClick', fnAction)
 				else
 					local cmb = GetComponentElement(raw, 'COMBOBOX')
 					local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 					local itm = GetComponentElement(raw, 'ITEM')
 					local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 					if cmb then
-						UI(cmb):UIEvent('OnLButtonClick', fnAction)
+						X.UI(cmb):UIEvent('OnLButtonClick', fnAction)
 					elseif wnd then
-						UI(wnd):UIEvent('OnLButtonClick', fnAction)
+						X.UI(wnd):UIEvent('OnLButtonClick', fnAction)
 					elseif itm then
 						itm:RegisterEvent(16)
-						UI(itm):UIEvent('OnItemLButtonClick', fnAction)
+						X.UI(itm):UIEvent('OnItemLButtonClick', fnAction)
 					elseif hdl then
 						hdl:RegisterEvent(16)
-						UI(hdl):UIEvent('OnItemLButtonClick', fnAction)
+						X.UI(hdl):UIEvent('OnItemLButtonClick', fnAction)
 					end
 				end
 			end
@@ -5465,7 +5457,7 @@ end
 
 -- 鼠标右键单击事件，无参数调用表示触发单击事件
 -- same as jQuery.mclick()
--- @param {function(eButton: UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
+-- @param {function(eButton: X.UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
 	function OO:MClick(...)
 		self:_checksum()
 		if select('#', ...) > 0 then
@@ -5473,28 +5465,28 @@ end
 			if X.IsFunction(fnClick) then
 				for _, raw in ipairs(self.raws) do
 					local fnAction = function()
-						if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
+						if X.UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 							return
 						end
-						X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.MIDDLE)
+						X.ExecuteWithThis(raw, fnClick, X.UI.MOUSE_BUTTON.MIDDLE)
 					end
 					if GetComponentType(raw) == 'WndScrollHandleBox' then
-						UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemMButtonClick', fnAction)
+						X.UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemMButtonClick', fnAction)
 					else
 						local cmb = GetComponentElement(raw, 'COMBOBOX')
 						local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 						local itm = GetComponentElement(raw, 'ITEM')
 						local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 						if cmb then
-							UI(cmb):UIEvent('OnMButtonClick', fnAction)
+							X.UI(cmb):UIEvent('OnMButtonClick', fnAction)
 						elseif wnd then
-							UI(wnd):UIEvent('OnMButtonClick', fnAction)
+							X.UI(wnd):UIEvent('OnMButtonClick', fnAction)
 						elseif itm then
 							itm:RegisterEvent(16)
-							UI(itm):UIEvent('OnItemMButtonClick', fnAction)
+							X.UI(itm):UIEvent('OnItemMButtonClick', fnAction)
 						elseif hdl then
 							hdl:RegisterEvent(16)
-							UI(hdl):UIEvent('OnItemMButtonClick', fnAction)
+							X.UI(hdl):UIEvent('OnItemMButtonClick', fnAction)
 						end
 					end
 				end
@@ -5516,7 +5508,7 @@ end
 
 -- 鼠标右键单击事件，无参数调用表示触发单击事件
 -- same as jQuery.rclick()
--- @param {function(eButton: UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
+-- @param {function(eButton: X.UI.MOUSE_BUTTON)} fnAction 鼠标单击事件回调函数
 function OO:RClick(...)
 	self:_checksum()
 	if select('#', ...) > 0 then
@@ -5524,28 +5516,28 @@ function OO:RClick(...)
 		if X.IsFunction(fnClick) then
 			for _, raw in ipairs(self.raws) do
 				local fnAction = function()
-					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
+					if X.UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
-					X.ExecuteWithThis(raw, fnClick, UI.MOUSE_BUTTON.RIGHT)
+					X.ExecuteWithThis(raw, fnClick, X.UI.MOUSE_BUTTON.RIGHT)
 				end
 				if GetComponentType(raw) == 'WndScrollHandleBox' then
-					UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemRButtonClick', fnAction)
+					X.UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemRButtonClick', fnAction)
 				else
 					local cmb = GetComponentElement(raw, 'COMBOBOX')
 					local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 					local itm = GetComponentElement(raw, 'ITEM')
 					local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 					if cmb then
-						UI(cmb):UIEvent('OnRButtonClick', fnAction)
+						X.UI(cmb):UIEvent('OnRButtonClick', fnAction)
 					elseif wnd then
-						UI(wnd):UIEvent('OnRButtonClick', fnAction)
+						X.UI(wnd):UIEvent('OnRButtonClick', fnAction)
 					elseif itm then
 						itm:RegisterEvent(32)
-						UI(itm):UIEvent('OnItemRButtonClick', fnAction)
+						X.UI(itm):UIEvent('OnItemRButtonClick', fnAction)
 					elseif hdl then
 						hdl:RegisterEvent(32)
-						UI(hdl):UIEvent('OnItemRButtonClick', fnAction)
+						X.UI(hdl):UIEvent('OnItemRButtonClick', fnAction)
 					end
 				end
 			end
@@ -5586,7 +5578,7 @@ function OO:RowMenu(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
-		UI.PopupMenu(m)
+		X.UI.PopupMenu(m)
 	end)
 	return self
 end
@@ -5612,7 +5604,7 @@ function OO:RowMenuLClick(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
-		UI.PopupMenu(m)
+		X.UI.PopupMenu(m)
 	end)
 	return self
 end
@@ -5638,18 +5630,18 @@ function OO:RowMenuRClick(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
-		UI.PopupMenu(m)
+		X.UI.PopupMenu(m)
 	end)
 	return self
 end
 
 -- 行绑定鼠标单击事件
--- @param {function(eButton: UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
+-- @param {function(eButton: X.UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
 function OO:RowClick(fnClick)
 	if X.IsFunction(fnClick) then
-		self:RowLClick(function(...) fnClick(UI.MOUSE_BUTTON.LEFT, ...) end)
-		self:RowMClick(function(...) fnClick(UI.MOUSE_BUTTON.MIDDLE, ...) end)
-		self:RowRClick(function(...) fnClick(UI.MOUSE_BUTTON.RIGHT, ...) end)
+		self:RowLClick(function(...) fnClick(X.UI.MOUSE_BUTTON.LEFT, ...) end)
+		self:RowMClick(function(...) fnClick(X.UI.MOUSE_BUTTON.MIDDLE, ...) end)
+		self:RowRClick(function(...) fnClick(X.UI.MOUSE_BUTTON.RIGHT, ...) end)
 	end
 	return self
 end
@@ -5662,7 +5654,7 @@ function OO:RowLClick(fnClick)
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTable' then
 				local fnAction = function(...)
-					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
+					if X.UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, ...)
@@ -5682,7 +5674,7 @@ function OO:RowMClick(fnClick)
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTable' then
 				local fnAction = function(...)
-					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
+					if X.UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, ...)
@@ -5702,7 +5694,7 @@ function OO:RowRClick(fnClick)
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'WndTable' then
 				local fnAction = function(...)
-					if UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
+					if X.UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
 						return
 					end
 					X.ExecuteWithThis(raw, fnClick, ...)
@@ -5722,11 +5714,11 @@ function OO:Complete(fnOnComplete)
 		for _, raw in ipairs(self.raws) do
 			local wnd = GetComponentElement(raw, 'WEBPAGE')
 			if wnd then
-				UI(wnd):UIEvent('OnDocumentComplete', fnOnComplete)
+				X.UI(wnd):UIEvent('OnDocumentComplete', fnOnComplete)
 			end
 			local wnd = GetComponentElement(raw, 'WEBCEF')
 			if wnd then
-				UI(wnd):UIEvent('OnWebLoadEnd', fnOnComplete)
+				X.UI(wnd):UIEvent('OnWebLoadEnd', fnOnComplete)
 			end
 		end
 	end
@@ -5743,12 +5735,12 @@ function OO:Hover(fnAction)
 			local wnd = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'MAIN_WINDOW')
 			local itm = GetComponentElement(raw, 'ITEM')
 			if wnd then
-				UI(wnd):UIEvent('OnMouseIn', function() fnAction(true) end)
-				UI(wnd):UIEvent('OnMouseOut', function() fnAction(false) end)
+				X.UI(wnd):UIEvent('OnMouseIn', function() fnAction(true) end)
+				X.UI(wnd):UIEvent('OnMouseOut', function() fnAction(false) end)
 			elseif itm then
 				itm:RegisterEvent(256)
-				UI(itm):UIEvent('OnItemMouseIn', function() fnAction(true) end)
-				UI(itm):UIEvent('OnItemMouseOut', function() fnAction(false) end)
+				X.UI(itm):UIEvent('OnItemMouseIn', function() fnAction(true) end)
+				X.UI(itm):UIEvent('OnItemMouseOut', function() fnAction(false) end)
 			end
 		end
 	end
@@ -5821,8 +5813,8 @@ function OO:Check(fnAction, eEventFireType)
 			local chk = GetComponentElement(raw, 'CHECKBOX')
 			if chk then
 				if X.IsFunction(fnAction) then
-					UI(chk):UIEvent('OnCheckBoxCheck', function() fnAction(true) end)
-					UI(chk):UIEvent('OnCheckBoxUncheck', function() fnAction(false) end)
+					X.UI(chk):UIEvent('OnCheckBoxCheck', function() fnAction(true) end)
+					X.UI(chk):UIEvent('OnCheckBoxUncheck', function() fnAction(false) end)
 				end
 			end
 		end
@@ -5863,7 +5855,7 @@ function OO:Change(fnOnChange)
 		for _, raw in ipairs(self.raws) do
 			local edt = GetComponentElement(raw, 'EDIT')
 			if edt then
-				UI(edt):UIEvent('OnEditChanged', function() X.ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
+				X.UI(edt):UIEvent('OnEditChanged', function() X.ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
 			end
 			if GetComponentType(raw) == 'WndTrackbar' then
 				table.insert(GetComponentProp(raw, 'onChangeEvents'), fnOnChange)
@@ -5923,7 +5915,7 @@ function OO:Focus(fnOnSetFocus)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
-				UI(raw):UIEvent('OnSetFocus', function()
+				X.UI(raw):UIEvent('OnSetFocus', function()
 					X.CallWithThis(raw, fnOnSetFocus)
 				end)
 			end
@@ -5950,7 +5942,7 @@ function OO:Blur(fnOnKillFocus)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
-				UI(raw):UIEvent('OnKillFocus', function() X.ExecuteWithThis(raw, fnOnKillFocus) end)
+				X.UI(raw):UIEvent('OnKillFocus', function() X.ExecuteWithThis(raw, fnOnKillFocus) end)
 			end
 		end
 		return self
@@ -5969,17 +5961,17 @@ end
 -------------------------------------
 -- UI object class
 -------------------------------------
-setmetatable(UI, {
+setmetatable(X.UI, {
 	__call = function (t, ...) return OO:ctor(...) end,
 	__tostring = function(t) return X.NSFormatString('{$NS}_UI (class prototype)') end,
 })
 X.RegisterEvent(X.NSFormatString('{$NS}_BASE_LOADING_END'), function()
 	local PROXY = {}
-	for k, v in pairs(UI) do
+	for k, v in pairs(X.UI) do
 		PROXY[k] = v
-		UI[k] = nil
+		X.UI[k] = nil
 	end
-	setmetatable(UI, {
+	setmetatable(X.UI, {
 		__metatable = true,
 		__call = function (t, ...) return OO:ctor(...) end,
 		__index = PROXY,
@@ -5989,7 +5981,7 @@ X.RegisterEvent(X.NSFormatString('{$NS}_BASE_LOADING_END'), function()
 end)
 
 -- TODO: 重构，注册组件
--- function UI.RegisterComponent(GetComponent)
+-- function X.UI.RegisterComponent(GetComponent)
 -- 	local szComponentName, Component = GetComponent(ComponentBase, GetComponentProp, SetComponentProp)
 -- 	for k, v in pairs(Component) do
 -- 		if not OO[k] then
@@ -6013,11 +6005,11 @@ end)
 
 ---------------------------------------------------
 -- create new frame
--- (ui) UI.CreateFrame(string szName, table opt)
+-- (ui) X.UI.CreateFrame(string szName, table opt)
 -- @param string szName: the ID of frame
 -- @param table  opt   : options
 ---------------------------------------------------
-function UI.CreateFrame(szName, opt)
+function X.UI.CreateFrame(szName, opt)
 	if not X.IsTable(opt) then
 		opt = {}
 	end
@@ -6047,7 +6039,7 @@ function UI.CreateFrame(szName, opt)
 	end
 	frm:ChangeRelation(opt.level)
 	frm:Show()
-	local ui = UI(frm)
+	local ui = X.UI(frm)
 	-- init frame
 	if opt.esc then
 		X.RegisterEsc('Frame_Close_' .. szName, function()
@@ -6071,7 +6063,7 @@ function UI.CreateFrame(szName, opt)
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
 		else
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close').OnLButtonClick = function()
-				if UI(frm):Remove():Count() == 0 then
+				if X.UI(frm):Remove():Count() == 0 then
 					PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 				end
 			end
@@ -6082,13 +6074,13 @@ function UI.CreateFrame(szName, opt)
 			frm:Lookup('WndContainer_TitleBtnL/Wnd_Setting/Btn_Setting').OnLButtonClick = opt.setting
 		end
 		if opt.onrestore then
-			UI(frm):UIEvent('OnRestore', opt.onrestore)
+			X.UI(frm):UIEvent('OnRestore', opt.onrestore)
 		end
 		if not opt.minimize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
 		else
 			if opt.onminimize then
-				UI(frm):UIEvent('OnMinimize', opt.onminimize)
+				X.UI(frm):UIEvent('OnMinimize', opt.onminimize)
 			end
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxCheck = function()
 				if frm.bMaximize then
@@ -6130,7 +6122,7 @@ function UI.CreateFrame(szName, opt)
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
 		else
 			if opt.onmaximize then
-				UI(frm):UIEvent('OnMaximize', opt.onmaximize)
+				X.UI(frm):UIEvent('OnMaximize', opt.onmaximize)
 			end
 			frm:Lookup('WndContainer_TitleBtnR').OnLButtonDBClick = function()
 				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
@@ -6143,9 +6135,9 @@ function UI.CreateFrame(szName, opt)
 					frm.w, frm.h = frm:GetSize()
 				end
 				local w, h = Station.GetClientSize()
-				UI(frm):Pos(0, 0):Drag(false):Size(w, h):Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+				X.UI(frm):Pos(0, 0):Drag(false):Size(w, h):Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
 					local w, h = Station.GetClientSize()
-					UI(frm):Pos(0, 0):Size(w, h)
+					X.UI(frm):Pos(0, 0):Size(w, h)
 				end)
 				if select(2, X.ExecuteWithThis(frm, frm.OnMaximize, frm:Lookup('Wnd_Total'))) then
 					return
@@ -6156,7 +6148,7 @@ function UI.CreateFrame(szName, opt)
 				frm.bMaximize = true
 			end
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxUncheck = function()
-				UI(frm)
+				X.UI(frm)
 				  :Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 				  :Size(frm.w, frm.h)
 				  :Anchor(frm.anchor)
@@ -6175,7 +6167,7 @@ function UI.CreateFrame(szName, opt)
 			frm:Lookup('Btn_Drag'):Hide()
 		else
 			if opt.ondragresize then
-				UI(frm):UIEvent('OnDragResize', opt.ondragresize)
+				X.UI(frm):UIEvent('OnDragResize', opt.ondragresize)
 			end
 			frm:Lookup('Btn_Drag').OnDragButton = function()
 				local x, y = Station.GetMessagePos()
@@ -6205,7 +6197,7 @@ function UI.CreateFrame(szName, opt)
 				local w, h = this:GetRelPos()
 				w = math.max(w + 16, opt.minwidth)
 				h = math.max(h + 16, opt.minheight)
-				UI(frm):Size(w, h)
+				X.UI(frm):Size(w, h)
 				if frm.OnDragResize then
 					local res, err, trace = X.XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
 					if not res then
@@ -6225,7 +6217,7 @@ function UI.CreateFrame(szName, opt)
 		SetComponentProp(frm, 'minWidth', 128)
 		SetComponentProp(frm, 'minHeight', 160)
 		frm:Lookup('Btn_Close').OnLButtonClick = function()
-			UI(frm):Remove()
+			X.UI(frm):Remove()
 		end
 	end
 	if not opt.anchor and not (opt.x and opt.y) then

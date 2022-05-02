@@ -1,18 +1,10 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : Õ¯“≥ΩÁ√Ê
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local D = {}
 local WINDOWS = setmetatable({}, { __mode = 'v' })
@@ -56,7 +48,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_OuterOpen' then
 		X.OpenBrowser(options.openurl or frame:Lookup('Wnd_Controls/Edit_Input'):GetText(), 'outer')
 	elseif name == 'Btn_Close' then
-		UI.CloseBrowser(frame)
+		X.UI.CloseBrowser(frame)
 	end
 end
 
@@ -71,7 +63,7 @@ function D.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Maximize' then
 		local frame = this:GetRoot()
-		local ui = UI(frame)
+		local ui = X.UI(frame)
 		frame.tMaximizeAnchor = ui:Anchor()
 		frame.nMaximizeW, frame.nMaximizeH = ui:Size()
 		ui:Pos(0, 0)
@@ -87,7 +79,7 @@ function D.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Maximize' then
 		local frame = this:GetRoot()
-		local ui = UI(frame)
+		local ui = X.UI(frame)
 		ui:Size(frame.nMaximizeW, frame.nMaximizeH)
 		ui:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 		ui:Drag(true)
@@ -113,7 +105,7 @@ function D.OnDragButtonBegin()
 	local name = this:GetName()
 	if name == 'Btn_Drag' then
 		this.fDragX, this.fDragY = Station.GetMessagePos()
-		this.fDragW, this.fDragH = UI(this:GetRoot()):Size()
+		this.fDragW, this.fDragH = X.UI(this:GetRoot()):Size()
 	end
 end
 
@@ -122,10 +114,10 @@ function D.OnDragButton()
 	if name == 'Btn_Drag' then
 		local nX, nY = Station.GetMessagePos()
 		local nDeltaX, nDeltaY = nX - this.fDragX, nY - this.fDragY
-		local nMinW, nMinH = UI(this:GetRoot()):MinSize()
+		local nMinW, nMinH = X.UI(this:GetRoot()):MinSize()
 		local nW = math.max(this.fDragW + nDeltaX, nMinW or 10)
 		local nH = math.max(this.fDragH + nDeltaY, nMinH or 10)
-		UI(this:GetRoot()):Size(nW, nH)
+		X.UI(this:GetRoot()):Size(nW, nH)
 	end
 end
 
@@ -216,7 +208,7 @@ function D.Open(url, options)
 	if options.layer then
 		frame:ChangeRelation(options.layer)
 	end
-	local ui = UI(frame)
+	local ui = X.UI(frame)
 	if options.driver == 'ie' then
 		ui:Fetch('Wnd_Web'):Append('WndWebPage', { name = 'WndWeb' })
 	else --if options.driver == 'chrome' then
@@ -280,6 +272,6 @@ local settings = {
 _G[FRAME_NAME] = X.CreateModule(settings)
 end
 
-UI.LookupBrowser = D.GetFrame
-UI.OpenBrowser = D.Open
-UI.CloseBrowser = D.Close
+X.UI.LookupBrowser = D.GetFrame
+X.UI.OpenBrowser = D.Open
+X.UI.CloseBrowser = D.Close

@@ -1,18 +1,10 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 集中渲染阴影
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local D = {}
 local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Shadows.ini'
@@ -25,7 +17,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('ENTER_STORY_MODE')
 	this:RegisterEvent('LEAVE_STORY_MODE')
 	this:RegisterEvent('ON_FRAME_CREATE')
-	UI(this):BringToBottom()
+	X.UI(this):BringToBottom()
 end
 
 do
@@ -60,11 +52,11 @@ function D.OnEvent(event)
 	elseif event == 'COINSHOP_ON_CLOSE' or event == 'LEAVE_STORY_MODE' then
 		this:ShowWhenUIHide()
 	elseif event == 'ON_FRAME_CREATE' then
-		UI(this):BringToBottom()
+		X.UI(this):BringToBottom()
 	end
 end
 
-function UI.GetShadowHandle(szName)
+function X.UI.GetShadowHandle(szName)
 	local frame = Station.SearchFrame(FRAME_NAME)
 	if frame and not X.IsElement(frame) then -- 关闭无效的 frame 句柄
 		Wnd.CloseWindow(FRAME_NAME)
@@ -88,15 +80,15 @@ function UI.GetShadowHandle(szName)
 	return sh
 end
 
-function UI.SetShadowHandleParam(szName, tParam)
-	local sh = UI.GetShadowHandle(szName)
+function X.UI.SetShadowHandleParam(szName, tParam)
+	local sh = X.UI.GetShadowHandle(szName)
 	for k, v in pairs(tParam) do
 		sh[k] = v
 	end
 end
 
 do local VISIBLES = {}
-function UI.TempSetShadowHandleVisible(bVisible)
+function X.UI.TempSetShadowHandleVisible(bVisible)
 	local frame = Station.SearchFrame(FRAME_NAME)
 	if not frame then
 		return table.insert(VISIBLES, true)
@@ -105,7 +97,7 @@ function UI.TempSetShadowHandleVisible(bVisible)
 	frame:SetVisible(bVisible)
 end
 
-function UI.RevertShadowHandleVisible()
+function X.UI.RevertShadowHandleVisible()
 	if #VISIBLES == 0 then
 		return
 	end

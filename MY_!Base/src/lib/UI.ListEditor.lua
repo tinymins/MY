@@ -1,22 +1,15 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : ListEditor
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 -- 打开文本列表编辑器
-function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
+function X.UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	local muDel
 	local AddListItem = function(muList, szText)
 		local muItem = muList:Append('<handle><image>w=300 h=25 eventid=371 name="Image_Bg" </image><text>name="Text_Default" </text></handle>'):Children():Last()
@@ -26,14 +19,14 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 		muItem:Children('#Image_Bg'):Image('UI/Image/Common/TextShadow.UITex',5):Alpha(0):Hover(function(bIn)
 			if hHandle.Selected then return nil end
 			if bIn then
-				UI(this):FadeIn(100)
+				X.UI(this):FadeIn(100)
 			else
-				UI(this):FadeTo(500,0)
+				X.UI(this):FadeTo(500,0)
 			end
 		end):Click(function(nButton)
-			if nButton == UI.MOUSE_BUTTON.RIGHT then
+			if nButton == X.UI.MOUSE_BUTTON.RIGHT then
 				hHandle.Selected = true
-				UI.PopupMenu({{
+				X.UI.PopupMenu({{
 					szOption = _L['Delete'],
 					fnAction = function()
 						muDel:Click()
@@ -43,13 +36,13 @@ function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 				hHandle.Selected = not hHandle.Selected
 			end
 			if hHandle.Selected then
-				UI(this):Image('UI/Image/Common/TextShadow.UITex',2)
+				X.UI(this):Image('UI/Image/Common/TextShadow.UITex',2)
 			else
-				UI(this):Image('UI/Image/Common/TextShadow.UITex',5)
+				X.UI(this):Image('UI/Image/Common/TextShadow.UITex',5)
 			end
 		end)
 	end
-	local ui = UI.CreateFrame(szFrameName)
+	local ui = X.UI.CreateFrame(szFrameName)
 	ui:Append('Image', { x = -10, y = 25, w = 360, h = 10, image = 'UI/Image/UICommon/Commonpanel.UITex', imageFrame = 42 })
 	local muEditBox = ui:Append('WndEditBox', { x = 0, y = 0, w = 170, h = 25 })
 	local muList = ui:Append('WndScrollHandleBox', { handleStyle = 3, x = 0, y = 30, w = 340, h = 380 })

@@ -1,22 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 字符串处理
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local AnsiToUTF8 = AnsiToUTF8 or _G.ansi_to_utf8
---------------------------------------------
--- 本地函数和变量
---------------------------------------------
 
 -- 分隔字符串
 -- (table) X.SplitString(string szText, table aSpliter, bool bIgnoreEmptyPart)
@@ -36,7 +26,7 @@ function X.SplitString(szText, aSpliter, bIgnoreEmptyPart, nMaxPart)
 		if not nMaxPart or nMaxPart > nResult + 1 then
 			for _, szSpliter in ipairs(aSpliter) do
 				if szSpliter == '' then
-					nPos = #wstring.sub(string.sub(szText, nOff), 1, 1)
+					nPos = #X.StringSubW(string.sub(szText, nOff), 1, 1)
 					if nPos == 0 then
 						nPos = nil
 					else
@@ -226,12 +216,12 @@ function X.DecodeQuerystring(s)
 	for _, kvp in ipairs(X.SplitString(s, '&', true)) do
 		kvp = X.SplitString(kvp, '=')
 		local k, v = kvp[1], kvp[2]
-		local pos = wstring.find(k, '[')
+		local pos = X.StringFindW(k, '[')
 		if pos then
 			local ks = { DecodeURIComponent(string.sub(k, 1, pos - 1)) }
 			k = string.sub(k, pos)
-			while wstring.sub(k, 1, 1) == '[' do
-				pos = wstring.find(k, ']') or (string.len(k) + 1)
+			while X.StringSubW(k, 1, 1) == '[' do
+				pos = X.StringFindW(k, ']') or (string.len(k) + 1)
 				table.insert(ks, DecodeURIComponent(string.sub(k, 2, pos - 1)))
 				k = string.sub(k, pos + 1)
 			end
@@ -291,10 +281,10 @@ function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgno
 		szText = StringEnerW(szText)
 	end
 	if bIgnoreSpace then
-		szFind = wstring.gsub(szFind, ' ', '')
-		szFind = wstring.gsub(szFind, g_tStrings.STR_ONE_CHINESE_SPACE, '')
-		szText = wstring.gsub(szText, ' ', '')
-		szText = wstring.gsub(szText, g_tStrings.STR_ONE_CHINESE_SPACE, '')
+		szFind = X.StringReplaceW(szFind, ' ', '')
+		szFind = X.StringReplaceW(szFind, g_tStrings.STR_ONE_CHINESE_SPACE, '')
+		szText = X.StringReplaceW(szText, ' ', '')
+		szText = X.StringReplaceW(szText, g_tStrings.STR_ONE_CHINESE_SPACE, '')
 	end
 	local me = GetClientPlayer()
 	if me then
@@ -341,11 +331,11 @@ function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgno
 			for _, info in ipairs(tKeyWords) do      -- 符合一个即可
 				-- szKeyword = X.EscapeString(szKeyword) -- 用了wstring还Escape个捷豹
 				if info.bNegative then               -- !小铁被吃了
-					if not wstring.find(szText, info.szKeyword) then
+					if not X.StringFindW(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				else                                                    -- 十人   -- 10
-					if wstring.find(szText, info.szKeyword) then
+					if X.StringFindW(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				end

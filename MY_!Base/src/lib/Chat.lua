@@ -1,19 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 聊天相关模块
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
 
 local RENDERED_FLAG_KEY = X.NSFormatString('b{$NS}ChatRendered')
 
@@ -152,7 +145,7 @@ function X.InsertChatInput(szType, ...)
 		local itemInfo = GetItemInfo(dwTabType, dwIndex)
 		if itemInfo then
 			if not nVersion then
-				nVersion = ENVIRONMENT.CURRENT_ITEM_VERSION
+				nVersion = X.ENVIRONMENT.CURRENT_ITEM_VERSION
 			end
 			if itemInfo.nGenre == ITEM_GENRE.BOOK then
 				if nBookInfo then
@@ -193,7 +186,7 @@ end
 function X.CopyChatLine(hTime, bTextEditor, bRichText)
 	local edit = X.GetChatInput()
 	if bTextEditor then
-		edit = UI.OpenTextEditor():Find('.WndEdit')[1]
+		edit = X.UI.OpenTextEditor():Find('.WndEdit')[1]
 	end
 	if not edit then
 		return
@@ -212,7 +205,7 @@ function X.CopyChatLine(hTime, bTextEditor, bRichText)
 				if szName ~= 'timelink' and szName ~= 'copylink' and szName ~= 'msglink' and szName ~= 'time' then
 					local szText, bEnd = p:GetText(), false
 					if not bTextEditor and StringFindW(szText, '\n') then
-						szText = wstring.gsub(szText, '\n', '')
+						szText = X.StringReplaceW(szText, '\n', '')
 						bEnd = true
 					end
 					bContent = true
@@ -298,13 +291,13 @@ X.RegisterEvent('PEEK_OTHER_PLAYER', function()
 	if not PEEK_PLAYER[arg1] then
 		return
 	end
-	if arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.INVALID then
+	if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.INVALID then
 		OutputMessage('MSG_ANNOUNCE_RED', _L['Invalid player ID!'])
-	elseif arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.FAILED then
+	elseif arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.FAILED then
 		OutputMessage('MSG_ANNOUNCE_RED', _L['Peek other player failed!'])
-	elseif arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.CAN_NOT_FIND_PLAYER then
+	elseif arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.CAN_NOT_FIND_PLAYER then
 		OutputMessage('MSG_ANNOUNCE_RED', _L['Can not find player to peek!'])
-	elseif arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.TOO_FAR then
+	elseif arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.TOO_FAR then
 		OutputMessage('MSG_ANNOUNCE_RED', _L['Player is too far to peek!'])
 	end
 	PEEK_PLAYER[arg1] = nil
@@ -318,22 +311,22 @@ local ChatLinkEvents = {
 		end
 		if IsCtrlKeyDown() and IsAltKeyDown() then
 			local menu = {}
-			InsertInviteTeamMenu(menu, (UI(link):Text():gsub('[%[%]]', '')))
+			InsertInviteTeamMenu(menu, (X.UI(link):Text():gsub('[%[%]]', '')))
 			menu[1].fnAction()
 		elseif IsCtrlKeyDown() then
 			X.CopyChatItem(link)
 		elseif IsShiftKeyDown() then
-			X.SetTarget(TARGET.PLAYER, UI(link):Text())
+			X.SetTarget(TARGET.PLAYER, X.UI(link):Text())
 		elseif IsAltKeyDown() then
 			if _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
-				local info = _G.MY_Farbnamen.Get((UI(link):Text():gsub('[%[%]]', '')))
+				local info = _G.MY_Farbnamen.Get((X.UI(link):Text():gsub('[%[%]]', '')))
 				if info then
 					PEEK_PLAYER[info.dwID] = true
 					ViewInviteToPlayer(info.dwID)
 				end
 			end
 		else
-			X.SwitchChatChannel(UI(link):Text())
+			X.SwitchChatChannel(X.UI(link):Text())
 			local edit = X.GetChatInput()
 			if edit then
 				Station.SetFocusWindow(edit)
@@ -344,7 +337,7 @@ local ChatLinkEvents = {
 		if not link then
 			link = element
 		end
-		PopupMenu(X.GetTargetContextMenu(TARGET.PLAYER, (UI(link):Text():gsub('[%[%]]', ''))))
+		PopupMenu(X.GetTargetContextMenu(TARGET.PLAYER, (X.UI(link):Text():gsub('[%[%]]', ''))))
 	end,
 	OnCopyLClick = function(element, link)
 		if not link then
@@ -381,7 +374,7 @@ local ChatLinkEvents = {
 			s = s .. _L['RClick to repeat this line.\n']
 		end
 		local szText = GetFormatText(s:sub(1, -2), 136)
-		OutputTip(szText, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+		OutputTip(szText, 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 	end,
 	OnCopyMouseLeave = function(element, link)
 		if not link then
@@ -469,7 +462,7 @@ function X.RenderChatLink(arg1, arg2)
 		if element[RENDERED_FLAG_KEY] then
 			return
 		end
-		local ui = UI(element)
+		local ui = X.UI(element)
 		local name = ui:Name()
 		if name == 'namelink' or name:sub(1, 9) == 'namelink_' then
 			ui:LClick(function() ChatLinkEvents.OnNameLClick(element, link) end)
@@ -913,7 +906,7 @@ local MAX_EMOTION_LEN, EMOTION_CACHE = 0, nil
 local function InitEmotion()
 	if not EMOTION_CACHE then
 		local t = {}
-		local FaceIcon = not ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('FaceIcon', true)
+		local FaceIcon = not X.ENVIRONMENT.RUNTIME_OPTIMIZE and X.GetGameTable('FaceIcon', true)
 		if FaceIcon then
 			for i = 1, FaceIcon:GetRowCount() do
 				local tLine = FaceIcon:GetRow(i)
@@ -927,7 +920,7 @@ local function InitEmotion()
 				t[t1.dwID] = t1
 				t[t1.szCmd] = t1
 				t[t1.szImageFile..','..t1.nFrame..','..t1.szType] = t1
-				MAX_EMOTION_LEN = math.max(MAX_EMOTION_LEN, wstring.len(t1.szCmd))
+				MAX_EMOTION_LEN = math.max(MAX_EMOTION_LEN, X.StringLenW(t1.szCmd))
 			end
 		end
 		EMOTION_CACHE = t
@@ -973,8 +966,8 @@ local function ParseFaceIcon(t)
 				else
 					szLeft = szLeft .. string.sub(szText, 1, nPos - 1)
 					szText = string.sub(szText, nPos)
-					for i = math.min(MAX_EMOTION_LEN, wstring.len(szText)), 2, -1 do
-						local szTest = wstring.sub(szText, 1, i)
+					for i = math.min(MAX_EMOTION_LEN, X.StringLenW(szText)), 2, -1 do
+						local szTest = X.StringSubW(szText, 1, i)
 						local emo = X.GetChatEmotion(szTest)
 						if emo then
 							szFace, dwFaceID = szTest, emo.dwID
@@ -1065,10 +1058,10 @@ local function ParseAntiSWS(t)
 				local nSensitiveWordEndLen = 1 -- 最后一个字符（要裁剪掉的字符）大小
 				local nSensitiveWordEndPos = #szText + 1
 				for _, szSensitiveWord in ipairs(SENSITIVE_WORD) do
-					local _, nEndPos = wstring.find(szText, szSensitiveWord)
+					local _, nEndPos = X.StringFindW(szText, szSensitiveWord)
 					if nEndPos and nEndPos < nSensitiveWordEndPos then
-						local nSensitiveWordLenW = wstring.len(szSensitiveWord)
-						nSensitiveWordEndLen = string.len(wstring.sub(szSensitiveWord, nSensitiveWordLenW, nSensitiveWordLenW))
+						local nSensitiveWordLenW = X.StringLenW(szSensitiveWord)
+						nSensitiveWordEndLen = string.len(X.StringSubW(szSensitiveWord, nSensitiveWordLenW, nSensitiveWordLenW))
 						nSensitiveWordEndPos = nEndPos
 					end
 				end
@@ -1151,10 +1144,10 @@ local function StandardizeChatData(szText, parserOptions)
 	if X.IsRestricted('X.CHAT_CRLF') then
 		for _, v in ipairs(aSay) do
 			if v.text then
-				v.text = wstring.gsub(v.text, '\n', ' ')
+				v.text = X.StringReplaceW(v.text, '\n', ' ')
 			end
 			if v.name then
-				v.name = wstring.gsub(v.name, '\n', ' ')
+				v.name = X.StringReplaceW(v.name, '\n', ' ')
 			end
 		end
 	end
@@ -1174,13 +1167,13 @@ local function StandardizeChatData(szText, parserOptions)
 		local nLen = 0
 		for i, v in ipairs(aSay) do
 			if nLen <= 64 then
-				nLen = nLen + wstring.len(v.text or v.name or '')
+				nLen = nLen + X.StringLenW(v.text or v.name or '')
 				if nLen > 64 then
 					if v.text then
-						v.text = wstring.sub(v.text, 1, 64 - nLen)
+						v.text = X.StringSubW(v.text, 1, 64 - nLen)
 					end
 					if v.name then
-						v.name = wstring.sub(v.name, 1, 64 - nLen)
+						v.name = X.StringSubW(v.name, 1, 64 - nLen)
 					end
 					for j = #aSay, i + 1, -1 do
 						table.remove(aSay, j)
@@ -1339,7 +1332,7 @@ local function GetRegisterChannelLimitTable()
 			[ROLE_TYPE.LITTLE_BOY     ] = 'LittleBoy'     ,
 			[ROLE_TYPE.LITTLE_GIRL    ] = 'LittleGirl'    ,
 		})[me.nRoleType])
-		local tTitle = lodash.filter({
+		local tTitle = X.lodash.filter({
 			{f = 'i', t = 'Level'},
 			{f = 'i', t = 'Experience'},
 			{f = 'i', t = 'Strength'},
@@ -1376,7 +1369,7 @@ local function GetRegisterChannelLimitTable()
 			{f = 'i', t = 'CampChannelDailyLimit'},
 			{f = 'i', t = 'MaxContribution'},
 			{f = 'i', t = 'WhisperDailyLimit'},
-			ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'IdentityChannelDailyLimit'} or false,
+			X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'IdentityChannelDailyLimit'} or false,
 			{f = 'i', t = 'SprintPowerMax'},
 			{f = 'i', t = 'SprintPowerCost'},
 			{f = 'i', t = 'SprintPowerRevive'},
@@ -1388,8 +1381,8 @@ local function GetRegisterChannelLimitTable()
 			{f = 'i', t = 'HorseSprintPowerRevive'},
 			{f = 'i', t = 'SceneChannelDailyLimit'},
 			{f = 'i', t = 'NearbyChannelDailyLimit'},
-			ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitByVIP'} or false,
-			ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'} or false,
+			X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitByVIP'} or false,
+			X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'} or false,
 		}, function(item) return item end)
 		m_LevelUpData = KG_Table.Load(path, tTitle, FILE_OPEN_MODE.NORMAL)
 	end
@@ -1422,7 +1415,7 @@ end
 
 function X.GetMsgTypeMenu(fnAction, tChecked)
 	local t = {}
-	for _, cg in ipairs(CONSTANT.MSG_TYPE_MENU) do
+	for _, cg in ipairs(X.CONSTANT.MSG_TYPE_MENU) do
 		local t1 = { szOption = cg.szCaption }
 		if cg.tChannels[1] then
 			for _, szChannel in ipairs(cg.tChannels) do
@@ -1605,9 +1598,16 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 			return
 		end
 	end
-	if UI_GetClientPlayerID() ~= dwTalkerID and X.PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName] and X.PACKET_INFO.AUTHOR_ROLES[dwTalkerID] ~= szName then
-		return true
+	if UI_GetClientPlayerID() == dwTalkerID then
+		return
 	end
+	if not X.PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName] or X.PACKET_INFO.AUTHOR_ROLES[dwTalkerID] == szName then
+		return
+	end
+	if X.IsParty(dwTalkerID) or X.IsFriend(dwTalkerID) then
+		return
+	end
+	return true
 end, {
 	PLAYER_TALK_CHANNEL.NEARBY,
 	PLAYER_TALK_CHANNEL.SENCE,

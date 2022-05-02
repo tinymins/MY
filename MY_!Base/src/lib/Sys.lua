@@ -1,20 +1,12 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 系统函数库
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- #######################################################################################################
 --       #       #               #         #           #           #
@@ -572,8 +564,8 @@ function X.PlaySound(nType, szFilePath, szCustomPath)
 		end
 	end
 	-- 播放默认声音
-	local szPath = wstring.gsub(szFilePath, '\\', '/')
-	if not wstring.find(szPath, '/') then
+	local szPath = X.StringReplaceW(szFilePath, '\\', '/')
+	if not X.StringFindW(szPath, '/') then
 		szPath = X.PACKET_INFO.FRAMEWORK_ROOT .. 'audio/' .. szPath
 	end
 	if not IsFileExist(szPath) then
@@ -887,21 +879,21 @@ function X.FormatDuration(nTime, tUnitFmt, tControl)
 	local mode = tControl and tControl.mode or 'normal'
 	-- 开始单位，最大只显示到该单位
 	local maxunit = tControl and tControl.maxunit or 'year'
-	local maxunitindex = lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == maxunit end)
+	local maxunitindex = X.lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == maxunit end)
 	if maxunitindex == -1 then
 		maxunitindex = 1
 		maxunit = FORMAT_TIME_UNIT_LIST[maxunitindex].key
 	end
 	-- 零值也保留的单位位置
 	local keepunit = tControl and tControl.keepunit or 'second'
-	local keepunitindex = lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == keepunit end)
+	local keepunitindex = X.lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == keepunit end)
 	if keepunitindex == -1 then
 		keepunitindex = #FORMAT_TIME_UNIT_LIST
 		keepunit = FORMAT_TIME_UNIT_LIST[keepunitindex].key
 	end
 	-- 精度结束单位，精度低于该单位的数据将被省去
 	local accuracy = tControl and tControl.accuracyunit or 'second'
-	local accuracyindex = lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == accuracy end)
+	local accuracyindex = X.lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == accuracy end)
 	if accuracyindex == -1 then
 		accuracyindex = #FORMAT_TIME_UNIT_LIST
 		accuracy = FORMAT_TIME_UNIT_LIST[accuracyindex].key
@@ -981,19 +973,19 @@ end
 --   %s    秒钟
 function X.FormatTime(nTimestamp, szFormat)
 	local t = TimeToDate(nTimestamp)
-	szFormat = wstring.gsub(szFormat, '%yyyy', string.format('%04d', t.year  ))
-	szFormat = wstring.gsub(szFormat, '%yy'  , string.format('%02d', t.year % 100))
-	szFormat = wstring.gsub(szFormat, '%MM'  , string.format('%02d', t.month ))
-	szFormat = wstring.gsub(szFormat, '%dd'  , string.format('%02d', t.day   ))
-	szFormat = wstring.gsub(szFormat, '%hh'  , string.format('%02d', t.hour  ))
-	szFormat = wstring.gsub(szFormat, '%mm'  , string.format('%02d', t.minute))
-	szFormat = wstring.gsub(szFormat, '%ss'  , string.format('%02d', t.second))
-	szFormat = wstring.gsub(szFormat, '%y', t.year  )
-	szFormat = wstring.gsub(szFormat, '%M', t.month )
-	szFormat = wstring.gsub(szFormat, '%d', t.day   )
-	szFormat = wstring.gsub(szFormat, '%h', t.hour  )
-	szFormat = wstring.gsub(szFormat, '%m', t.minute)
-	szFormat = wstring.gsub(szFormat, '%s', t.second)
+	szFormat = X.StringReplaceW(szFormat, '%yyyy', string.format('%04d', t.year  ))
+	szFormat = X.StringReplaceW(szFormat, '%yy'  , string.format('%02d', t.year % 100))
+	szFormat = X.StringReplaceW(szFormat, '%MM'  , string.format('%02d', t.month ))
+	szFormat = X.StringReplaceW(szFormat, '%dd'  , string.format('%02d', t.day   ))
+	szFormat = X.StringReplaceW(szFormat, '%hh'  , string.format('%02d', t.hour  ))
+	szFormat = X.StringReplaceW(szFormat, '%mm'  , string.format('%02d', t.minute))
+	szFormat = X.StringReplaceW(szFormat, '%ss'  , string.format('%02d', t.second))
+	szFormat = X.StringReplaceW(szFormat, '%y', t.year  )
+	szFormat = X.StringReplaceW(szFormat, '%M', t.month )
+	szFormat = X.StringReplaceW(szFormat, '%d', t.day   )
+	szFormat = X.StringReplaceW(szFormat, '%h', t.hour  )
+	szFormat = X.StringReplaceW(szFormat, '%m', t.minute)
+	szFormat = X.StringReplaceW(szFormat, '%s', t.second)
 	return szFormat
 end
 
@@ -1348,7 +1340,7 @@ local CACHE, el = {}, nil
 function X.GetFontColor(nFont)
 	if not CACHE[nFont] then
 		if not el or not X.IsElement(el) then
-			el = UI.GetTempElement(X.NSFormatString('Text.{$NS}Lib_GetFontColor'))
+			el = X.UI.GetTempElement(X.NSFormatString('Text.{$NS}Lib_GetFontColor'))
 		end
 		el:SetFontScheme(nFont)
 		CACHE[nFont] = X.Pack(el:GetFontColor())
@@ -1361,7 +1353,6 @@ function X.ExecuteWithThis(context, fnAction, ...)
 	-- 界面组件支持字符串调用方法
 	if X.IsString(fnAction) then
 		if not X.IsElement(context) then
-			-- Log('[UI ERROR]Invalid element on executing ui event!')
 			return false
 		end
 		if context[fnAction] then
@@ -1374,7 +1365,6 @@ function X.ExecuteWithThis(context, fnAction, ...)
 		end
 	end
 	if not X.IsFunction(fnAction) then
-		-- Log('[UI ERROR]Invalid function on executing ui event! # ' .. element:GetTreePath())
 		return false
 	end
 	local _this = this
@@ -1572,11 +1562,11 @@ function X.OpenBrowser(szAddr, szMode)
 			return
 		end
 		if szMode == 'outer' then
-			UI.OpenTextEditor(szAddr)
+			X.UI.OpenTextEditor(szAddr)
 			return
 		end
 	end
-	UI.OpenBrowser(szAddr)
+	X.UI.OpenBrowser(szAddr)
 end
 
 function X.ArrayToObject(arr)
@@ -1874,7 +1864,7 @@ function X.GVoiceBase_GetMicState(...)
 	if X.IsFunction(_G.GVoiceBase_GetMicState) then
 		return _G.GVoiceBase_GetMicState(...)
 	end
-	return CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM
+	return X.CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM
 end
 
 function X.GVoiceBase_SwitchMicState(...)
@@ -1893,7 +1883,7 @@ function X.GVoiceBase_GetSpeakerState(...)
 	if X.IsFunction(_G.GVoiceBase_GetSpeakerState) then
 		return _G.GVoiceBase_GetSpeakerState(...)
 	end
-	return CONSTANT.SPEAKER_STATE.CLOSE
+	return X.CONSTANT.SPEAKER_STATE.CLOSE
 end
 
 function X.GVoiceBase_SwitchSpeakerState(...)
@@ -1991,19 +1981,25 @@ local FILE_PATH = {'temporary/lua_error.jx3dat', X.PATH_TYPE.GLOBAL}
 local LAST_ERROR_MSG = X.LoadLUAData(FILE_PATH, { passphrase = false }) or {}
 local ERROR_MSG = {}
 
-if not ENVIRONMENT.RUNTIME_OPTIMIZE then
-	local KEY = '/' .. wstring.gsub(X.PACKET_INFO.ROOT, '\\', '/'):gsub('/+$', ''):gsub('^.*/', ''):lower() .. '/'
+if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
+	local KEY = '/' .. X.StringReplaceW(X.PACKET_INFO.ROOT, '\\', '/'):gsub('/+$', ''):gsub('^.*/', ''):lower() .. '/'
 	local function SaveErrorMessage()
 		X.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
 	end
 	local BROKEN_KGUI = IsDebugClient() and not X.IsDebugServer() and not X.IsDebugClient(true)
+	local BROKEN_KGUI_ECHO = false
 	RegisterEvent('CALL_LUA_ERROR', function()
+		if BROKEN_KGUI_ECHO then
+			return
+		end
 		local szMsg = arg0
-		local szMsgL = wstring.gsub(arg0:lower(), '\\', '/')
-		if wstring.find(szMsgL, KEY) then
+		local szMsgL = X.StringReplaceW(arg0:lower(), '\\', '/')
+		if X.StringFindW(szMsgL, KEY) then
 			if BROKEN_KGUI then
 				local szMessage = 'Your KGUI is not official, please fix client and try again.'
-				X.ErrorLog('[' .. X.PACKET_INFO.NAME_SPACE .. ']' .. szMessage .. '\n' .. _L[szMessage])
+				BROKEN_KGUI_ECHO = true
+				X.SafeCall(X.ErrorLog, '[' .. X.PACKET_INFO.NAME_SPACE .. ']' .. szMessage .. '\n' .. _L[szMessage])
+				BROKEN_KGUI_ECHO = false
 			end
 			X.Log('CALL_LUA_ERROR', szMsg)
 			table.insert(ERROR_MSG, szMsg)

@@ -1,26 +1,18 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 全局系统消息通知模块
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = X.NSFormatString('{$NS}_Notify')
 local PLUGIN_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT
 local MODULE_NAME = X.NSFormatString('{$NS}_Notify')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/notify/')
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	anchor = {
 		ePathType = X.PATH_TYPE.ROLE,
@@ -111,9 +103,9 @@ function D.HookEntry()
 	end
 	wItem:Lookup('Btn_News_XJ').OnMouseEnter = function()
 		local szXml = GetFormatText(_L['Addon notification'], 59)
-			.. CONSTANT.XML_LINE_BREAKER
+			.. X.CONSTANT.XML_LINE_BREAKER
 			.. GetFormatText(_L['Click to view addon notification.'], 162)
-		X.OutputTip(this, szXml, true, UI.TIP_POSITION.RIGHT_LEFT_AND_BOTTOM_TOP)
+		X.OutputTip(this, szXml, true, X.UI.TIP_POSITION.RIGHT_LEFT_AND_BOTTOM_TOP)
 	end
 	wItem:Lookup('Btn_News_XJ').OnLButtonClick = function()
 		local menu = {}
@@ -349,7 +341,7 @@ local function OnInit()
 		return
 	end
 	-- init tip frame
-	l_uiFrame = UI.CreateFrame(TIP_FRAME_NAME, {
+	l_uiFrame = X.UI.CreateFrame(TIP_FRAME_NAME, {
 		level = 'Topmost', empty = true,
 		w = 250, h = 150, visible = false,
 		anchor = O.anchor,

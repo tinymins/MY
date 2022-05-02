@@ -1,18 +1,10 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 键值对文件分隔快速存储模块
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function DefaultValueComparer(v1, v2)
 	if v1 == v2 then
@@ -52,7 +44,7 @@ function X.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 		__index = function(t, k)
 			-- if hit in L1 CACHE
 			if tCache[k] then
-				-- Log('INFO CACHE L1 HIT ' .. k)
+				-- X.Log('INFO CACHE L1 HIT ' .. k)
 				return tCache[k]
 			end
 			-- read info from saved data
@@ -119,7 +111,6 @@ function X.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 					local szPath = SZ_DATA_PATH:gsub('<SEG>', szSegID)
 					if IsFileExist(X.GetLUADataPath(szPath)) then
 						X.SaveLUAData(szPath, nil)
-						-- Log('INFO CACHE CLEAR @' .. szSegID)
 					end
 					-- bit add one
 					local i = 1

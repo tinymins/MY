@@ -1,24 +1,17 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 全局染色设置
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/ps/')
+--------------------------------------------------------------------------------
 
 local PS = {}
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	local nPaddingX, nPaddingY = 20, 20
 	local x, y = nPaddingX, nPaddingY
@@ -29,16 +22,16 @@ function PS.OnPanelActive(wnd)
 		color = { 255, 255, 0 },
 	}):AutoWidth()
 	x, y = nPaddingX, y + 30
-	for _, dwForceID in X.pairs_c(CONSTANT.FORCE_TYPE) do
+	for _, dwForceID in X.pairs_c(X.CONSTANT.FORCE_TYPE) do
 		local x0 = x
 		local sha = ui:Append('Shadow', {
 			x = x, y = y, w = 100, h = 25,
-			text = CONSTANT.FORCE_TYPE_LABEL[dwForceID],
+			text = X.CONSTANT.FORCE_TYPE_LABEL[dwForceID],
 			color = { X.GetForceColor(dwForceID, 'background') },
 		})
 		local txt = ui:Append('Text', {
 			x = x + 5, y = y, w = 100, h = 25,
-			text = CONSTANT.FORCE_TYPE_LABEL[dwForceID],
+			text = X.CONSTANT.FORCE_TYPE_LABEL[dwForceID],
 			color = { X.GetForceColor(dwForceID, 'foreground') },
 		})
 		x = x + 105

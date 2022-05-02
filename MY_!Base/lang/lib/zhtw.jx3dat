@@ -2,7 +2,8 @@ return {
 	PLUGIN_NAME                = '茗伊插件集',
 	PLUGIN_SHORT_NAME          = '茗伊插件',
 	PLUGIN_AUTHOR              = '茗伊 @ 夢江南',
-	PLUGIN_AUTHOR_WEIBO        = '茗伊',
+	PLUGIN_AUTHOR_FEEDBACK     = '茗伊',
+	PLUGIN_AUTHOR_FEEDBACK_URL = 'https://weibo.com/zymah',
 	PLUGIN_AUTHOR_SIGNATURE    = '茗伊 @夢江南',
 
 	['%s, welcome to use %s!'] = '歡迎%s使用%s！',

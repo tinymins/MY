@@ -1,23 +1,15 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : Json ´¦ÀíÄ£¿é
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
+--------------------------------------------------------------------------------
+local X = MY
+--------------------------------------------------------------------------------
 ---------------------------------------------------------------------------
 -- local lua_value = X.DecodeJSON(raw_json_text)
 -- local raw_json_text = X.EncodeJSON(lua_table_or_value)
 -- local pretty_json_text = X.EncodeJSON(lua_table_or_value, true)
 ---------------------------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
-local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
 
 local setmetatable = setmetatable
 local ipairs, pairs, pcall = ipairs, pairs, pcall

@@ -1,24 +1,17 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
 -- @desc     : 全局杂项设置
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/ps/')
+--------------------------------------------------------------------------------
 
 local PS = {}
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local W, H = ui:Size()
 	local nPaddingX, nPaddingY, LH = 20, 20, 30
 	local nX, nY, nLFY = nPaddingX, nPaddingY, nPaddingY
@@ -74,7 +67,7 @@ function PS.OnPanelActive(wnd)
 					szOption = _L['Role original user settings'],
 					fnAction = function()
 						X.SetUserSettingsPresetID('')
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 						X.SwitchTab('GlobalConfig', true)
 					end,
 					bCheck = true, bChecked = szCurrentID == '',
@@ -82,13 +75,13 @@ function PS.OnPanelActive(wnd)
 						szOption = _L['Set default preset'],
 						fnAction = function()
 							X.SetUserSettingsPresetID('', true)
-							UI.ClosePopupMenu()
+							X.UI.ClosePopupMenu()
 							X.SwitchTab('GlobalConfig', true)
 						end,
 						bCheck = true, bChecked = szDefaultID == '',
 					},
 				},
-				CONSTANT.MENU_DIVIDER,
+				X.CONSTANT.MENU_DIVIDER,
 			}
 			local aPresetID = X.GetUserSettingsPresetList()
 			if not X.IsEmpty(aPresetID) then
@@ -98,7 +91,7 @@ function PS.OnPanelActive(wnd)
 						szOption = szID,
 						fnAction = function()
 							X.SetUserSettingsPresetID(szID)
-							UI.ClosePopupMenu()
+							X.UI.ClosePopupMenu()
 							X.SwitchTab('GlobalConfig', true)
 						end,
 						bCheck = true, bChecked = szCurrentID == szID,
@@ -106,7 +99,7 @@ function PS.OnPanelActive(wnd)
 							szOption = _L['Set default preset'],
 							fnAction = function()
 								X.SetUserSettingsPresetID(szID, true)
-								UI.ClosePopupMenu()
+								X.UI.ClosePopupMenu()
 								X.SwitchTab('GlobalConfig', true)
 							end,
 							bCheck = true, bChecked = szDefaultID == szID,
@@ -118,7 +111,7 @@ function PS.OnPanelActive(wnd)
 							fnAction = function()
 								X.ReleaseUserSettingsDB()
 								X.ConnectUserSettingsDB()
-								UI.ClosePopupMenu()
+								X.UI.ClosePopupMenu()
 								X.SwitchTab('GlobalConfig', true)
 							end,
 						})
@@ -127,13 +120,13 @@ function PS.OnPanelActive(wnd)
 							szOption = _L['Delete'],
 							fnAction = function()
 								X.RemoveUserSettingsPreset(szID)
-								UI.ClosePopupMenu()
+								X.UI.ClosePopupMenu()
 							end,
 						})
 					end
 					table.insert(menu, m)
 				end
-				table.insert(menu, CONSTANT.MENU_DIVIDER)
+				table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			end
 			table.insert(menu, {
 				szOption = _L['* New *'],
@@ -143,7 +136,7 @@ function PS.OnPanelActive(wnd)
 						function(szText)
 							local szErrmsg = X.SetUserSettingsPresetID(szText)
 							if szErrmsg then
-								X.Systopmsg(szErrmsg, CONSTANT.MSG_THEME.ERROR)
+								X.Systopmsg(szErrmsg, X.CONSTANT.MSG_THEME.ERROR)
 								X.Alert(szErrmsg)
 							end
 						end,
@@ -154,7 +147,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		tip = {
 			render = _L['PRESET_DESC'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	}):AutoWidth():Width() + 5
 
@@ -180,7 +173,7 @@ function PS.OnPanelActive(wnd)
 		onClick = function()
 			local szRoot = X.GetAbsolutePath({'export/settings/', X.PATH_TYPE.GLOBAL}):gsub('/', '\\')
 			X.OpenFolder(szRoot)
-			UI.OpenTextEditor(szRoot)
+			X.UI.OpenTextEditor(szRoot)
 		end,
 	}):AutoWidth():Width() + 5
 	nX, nY = nPaddingX, nY + 30
