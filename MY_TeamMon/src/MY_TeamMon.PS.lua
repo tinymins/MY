@@ -1,4 +1,4 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队监控设置界面
@@ -6,17 +6,9 @@
 -- @ref      : William Chan (Webster)
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
@@ -36,7 +28,7 @@ function PS.IsRestricted()
 end
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local nW = ui:Size()
 	local nPaddingX, nPaddingY = 20, 20
 	local nX, nY = nPaddingX, nPaddingY
@@ -138,7 +130,7 @@ function PS.OnPanelActive(wnd)
 		x = nX + 5, y = nY, text = _L['Lifebar alarm'],
 		tip = {
 			render = _L['Requires MY_LifeBar loaded.'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		checked = MY_TeamMon.bPushScreenHead,
 		onCheck = function(bCheck)
@@ -184,7 +176,7 @@ function PS.OnPanelActive(wnd)
 		x = nPaddingX + 10, y = nY, w = nW - nPaddingX * 2, rw = nW / 3, h = 22,
 		range = {0, 3601},
 		value = MY_TeamMon_ST.nBelowDecimal,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onChange = function(val)
 			X.DelayCall('MY_TeamMon_ST_nBelowDecimal', 300, function()
 				MY_TeamMon_ST.nBelowDecimal = val
@@ -227,7 +219,7 @@ function PS.OnPanelActive(wnd)
 				szOption = _L['Import data (local)'],
 				fnAction = function() MY_TeamMon_UI.OpenImportPanel() end,
 			})
-			local szLang = ENVIRONMENT.GAME_LANG
+			local szLang = X.ENVIRONMENT.GAME_LANG
 			if szLang == 'zhcn' or szLang == 'zhtw' then
 				table.insert(menu, {
 					szOption = _L['Import data (web)'],
@@ -249,7 +241,7 @@ function PS.OnPanelActive(wnd)
 		onClick = function()
 			local szRoot = X.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT):gsub('/', '\\')
 			X.OpenFolder(szRoot)
-			UI.OpenTextEditor(szRoot)
+			X.UI.OpenTextEditor(szRoot)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 end

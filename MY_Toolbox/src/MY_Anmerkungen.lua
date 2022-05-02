@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 角色备注
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Anmerkungen'
@@ -43,7 +35,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
 
 	local w, h = 340, 300
-	local ui = UI.CreateFrame('MY_Anmerkungen_PlayerNoteEdit_' .. (dwID or 0), {
+	local ui = X.UI.CreateFrame('MY_Anmerkungen_PlayerNoteEdit_' .. (dwID or 0), {
 		w = w, h = h, anchor = 'CENTER',
 		text = _L['MY Anmerkungen - Player Note Edit'],
 	})
@@ -147,7 +139,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	ui:Append('Text', {
 		x = x + 230, y = y - 3, w = 80, alpha = 200,
 		text = _L['Delete'], color = {255,0,0},
-		onHover = function(bIn) UI(this):Alpha((bIn and 255) or 200) end,
+		onHover = function(bIn) X.UI(this):Alpha((bIn and 255) or 200) end,
 		onClick = function()
 			MY_Anmerkungen.SetPlayerNote(ui:Children('#WndEditBox_ID'):Text())
 			ui:Remove()
@@ -394,7 +386,7 @@ X.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
 
 local PS = {}
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	local x, y = 0, 0
 
@@ -483,7 +475,7 @@ function PS.OnPanelActive(wnd)
 			text = _L['Export'],
 			buttonStyle = 'FLAT',
 			onClick = function()
-				UI.OpenTextEditor(X.EncodeLUAData({
+				X.UI.OpenTextEditor(X.EncodeLUAData({
 					server   = X.GetRealServer(),
 					publici  = PUBLIC_PLAYER_IDS,
 					publicd  = PUBLIC_PLAYER_NOTES,

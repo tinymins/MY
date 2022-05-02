@@ -1,4 +1,4 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : BUFFÁÐ±í
@@ -6,17 +6,9 @@
 -- @ref      : William Chan (Webster)
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Force'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_EnergyBar'
@@ -304,7 +296,7 @@ function D.UpdateBomb(frame)
 			if bExist then
 				local buff = X.GetBuff(me, nBuffID)
 				if buff then
-					local nLeftTime = math.floor((buff.nEndFrame - GetLogicFrameCount()) / ENVIRONMENT.GAME_FPS)
+					local nLeftTime = math.floor((buff.nEndFrame - GetLogicFrameCount()) / X.ENVIRONMENT.GAME_FPS)
 					if D.tBombMsg[i] and D.tBombMsg[i].nTime >= nLeftTime then
 						D.tBombMsg[i].nTime = nLeftTime
 					else
@@ -540,14 +532,14 @@ function D.Apply()
 	else
 		local frame = Station.Lookup('Normal/MY_EnergyBar')
 		if not frame then
-			UI.CreateFrame('MY_EnergyBar', { empty = true, w = 400, h = 60, penetrable = true, anchor = O.tAnchor })
+			X.UI.CreateFrame('MY_EnergyBar', { empty = true, w = 400, h = 60, penetrable = true, anchor = O.tAnchor })
 		end
 	end
 end
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_EnergyBar', D.Apply)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
-	if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Enable MY_EnergyBar'],

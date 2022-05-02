@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 记住动态技能栏上次位置
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_DynamicActionBarPos'
@@ -57,7 +49,7 @@ local REMPOS_FRAME_TYPE = X.FlipObjectKV({
 })
 
 function D.UpdateAnchor(szName)
-	local frame = UI.LookupFrame(szName)
+	local frame = X.UI.LookupFrame(szName)
 	if not frame then
 		return
 	end
@@ -78,7 +70,7 @@ function D.UpdateAnchor(szName)
 end
 
 function D.SaveAnchor(szName)
-	local frame = UI.LookupFrame(szName)
+	local frame = X.UI.LookupFrame(szName)
 	if not frame then
 		return
 	end
@@ -140,11 +132,11 @@ function D.Hook(szName)
 	X.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE', 'MY_DynamicActionBarPos__' .. szName, function()
 		D.SaveAnchor(szName)
 	end)
-	OnFrameCreate(UI.LookupFrame(szName))
+	OnFrameCreate(X.UI.LookupFrame(szName))
 end
 
 function D.Unhook(szName)
-	local frame = UI.LookupFrame(szName)
+	local frame = X.UI.LookupFrame(szName)
 	if frame then
 		if frame.__MY_OnFrameDragEnd then
 			frame.OnFrameDragEnd = frame.__MY_OnFrameDragEnd

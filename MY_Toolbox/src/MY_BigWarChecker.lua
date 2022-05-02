@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 大战没交
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -37,7 +29,7 @@ local O = X.CreateUserSettingsModule('MY_BigWarChecker', _L['General'], {
 local D = {}
 
 local function IsBigWarFinishable(me)
-	for _, aQuestInfo in ipairs(CONSTANT.QUEST_INFO.BIG_WARS) do
+	for _, aQuestInfo in ipairs(X.CONSTANT.QUEST_INFO.BIG_WARS) do
 		local info = me.GetQuestTraceInfo(aQuestInfo[1])
 		if info then
 			local finished = false
@@ -62,11 +54,11 @@ end
 X.RegisterFrameCreate('ExitPanel', 'BIG_WAR_CHECK', function(name, frame)
 	local me = GetClientPlayer()
 	if me then
-		local ui = UI(frame)
+		local ui = X.UI(frame)
 		if IsBigWarFinishable(me) then
 			OutputWarningMessage(
 				'MSG_WARNING_RED',
-				ENVIRONMENT.GAME_BRANCH == 'classic'
+				X.ENVIRONMENT.GAME_BRANCH == 'classic'
 					and _L['Warning: Bounty has been finished but not handed yet!']
 					or _L['Warning: Bigwar has been finished but not handed yet!']
 			)
@@ -75,7 +67,7 @@ X.RegisterFrameCreate('ExitPanel', 'BIG_WAR_CHECK', function(name, frame)
 				ui:Append('Text', { name = 'Text_MY_Tip', y = ui:Height(), w = ui:Width(), color = {255, 255, 0}, font = 199, alignHorizontal = 1})
 			end
 			ui:Children('#Text_MY_Tip'):Text(
-				ENVIRONMENT.GAME_BRANCH == 'classic'
+				X.ENVIRONMENT.GAME_BRANCH == 'classic'
 					and _L['Warning: Bounty has been finished but not handed yet!']
 					or _L['Warning: Bigwar has been finished but not handed yet!']
 			)
@@ -102,14 +94,14 @@ end)
 X.RegisterFrameCreate('OptionPanel', 'BIG_WAR_CHECK', function(name, frame)
 	local me = GetClientPlayer()
 	if me then
-		local ui = UI(frame)
+		local ui = X.UI(frame)
 		if IsBigWarFinishable(me) then
 			if ui:Children('#Text_MY_Tip'):Count() == 0 then
 				ui:Append('Text', { name = 'Text_MY_Tip', y = -20, w = ui:Width(), color = {255, 255, 0}, font = 199, alignHorizontal = 1})
 			end
 			ui:Children('#Text_MY_Tip')
 				:Text(
-					ENVIRONMENT.GAME_BRANCH == 'classic'
+					X.ENVIRONMENT.GAME_BRANCH == 'classic'
 						and _L['Warning: Bounty has been finished but not handed yet!']
 						or _L['Warning: Bigwar has been finished but not handed yet!']
 					)
@@ -170,7 +162,7 @@ X.RegisterEvent('LOADING_END', 'MY_BigWarChecker', function()
 	local dwMapID = me.GetMapID()
 	-- 分析大战本状态数据
 	local aQuestInfo = {}
-	for _, v in ipairs(CONSTANT.QUEST_INFO.BIG_WARS) do
+	for _, v in ipairs(X.CONSTANT.QUEST_INFO.BIG_WARS) do
 		local szPos = Table_GetQuestPosInfo(v[1], 'quest_state', 1)
 		local szMap = szPos and szPos:match('N (%d+),')
 		local dwMap = szMap and tonumber(szMap)

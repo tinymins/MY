@@ -1,4 +1,4 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 世界标记增强
@@ -6,17 +6,9 @@
 -- @ref      : Webster
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -57,7 +49,7 @@ function D.OnNpcEvent()
 		local mark = WM_LIST[npc.dwTemplateID]
 		if mark then
 			local tPoint = { npc.nX, npc.nY, npc.nZ }
-			local handle = UI.GetShadowHandle('Handle_World_Mark')
+			local handle = X.UI.GetShadowHandle('Handle_World_Mark')
 			local szName = 'w_' .. mark.id
 			if handle:Lookup(szName) then
 				handle:RemoveItem(szName)
@@ -74,7 +66,7 @@ function D.OnNpcLeave()
 		if mark then
 			local tPoint = WM_POINT[mark.id]
 			if tPoint then
-				local handle = UI.GetShadowHandle('Handle_World_Mark')
+				local handle = X.UI.GetShadowHandle('Handle_World_Mark')
 				local szName = 'w_' .. mark.id
 				local sha = handle:Lookup(szName)
 				if not sha then
@@ -90,7 +82,7 @@ end
 function D.OnCast(dwSkillID)
 	if dwSkillID == 4906 then
 		WM_POINT = {}
-		UI.GetShadowHandle('Handle_World_Mark'):Clear()
+		X.UI.GetShadowHandle('Handle_World_Mark'):Clear()
 	end
 end
 
@@ -100,7 +92,7 @@ end
 
 function D.OnLoadingEnd()
 	WM_POINT = {}
-	UI.GetShadowHandle('Handle_World_Mark'):Clear()
+	X.UI.GetShadowHandle('Handle_World_Mark'):Clear()
 end
 
 function D.Draw(Point, sha, col)

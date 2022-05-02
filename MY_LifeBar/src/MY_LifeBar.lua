@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : ±âÆ½ÑªÌõ
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_LifeBar'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar'
@@ -86,7 +78,7 @@ end)
 end
 -----------------------------------------------------------------------------------------
 
-local NPC_HIDDEN = CONSTANT.NPC_HIDDEN
+local NPC_HIDDEN = X.CONSTANT.NPC_HIDDEN
 local LB_CACHE = {}
 local TONG_NAME_CACHE = {}
 local NPC_CACHE = {}
@@ -324,17 +316,17 @@ function D.AutoSwitchSysHeadTop()
 	end
 end
 function D.HideSysHeadTop()
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.NPC, CONSTANT.GLOBAL_HEAD.NAME , false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.NPC, CONSTANT.GLOBAL_HEAD.TITLE, false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.NPC, CONSTANT.GLOBAL_HEAD.LIFE , false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER, CONSTANT.GLOBAL_HEAD.NAME , false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER, CONSTANT.GLOBAL_HEAD.TITLE, false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER, CONSTANT.GLOBAL_HEAD.LIFE , false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.NAME , false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.TITLE, false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.LIFE , false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.NPC, X.CONSTANT.GLOBAL_HEAD.NAME , false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.NPC, X.CONSTANT.GLOBAL_HEAD.TITLE, false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.NPC, X.CONSTANT.GLOBAL_HEAD.LIFE , false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER, X.CONSTANT.GLOBAL_HEAD.NAME , false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER, X.CONSTANT.GLOBAL_HEAD.TITLE, false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER, X.CONSTANT.GLOBAL_HEAD.LIFE , false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER, X.CONSTANT.GLOBAL_HEAD.GUILD, false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.NAME , false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.TITLE, false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.LIFE , false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.GUILD, false)
 	X.SafeCall(_G.SetGlobalTopIntelligenceLife, false)
 	X.SafeCall(_G.Addon_ShowNpcBalloon, false)
 	X.SafeCall(_G.Addon_ShowPlayerBalloon, false)
@@ -344,17 +336,17 @@ function D.SaveSysHeadTop()
 		return
 	end
 	SYS_HEAD_TOP_STATE = {
-		['NPC_NAME'          ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.NPC         , CONSTANT.GLOBAL_HEAD.NAME ),
-		['NPC_TITLE'         ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.NPC         , CONSTANT.GLOBAL_HEAD.TITLE),
-		['NPC_LIFE'          ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.NPC         , CONSTANT.GLOBAL_HEAD.LIFE ),
-		['OTHERPLAYER_NAME'  ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.NAME ),
-		['OTHERPLAYER_TITLE' ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.TITLE),
-		['OTHERPLAYER_LIFE'  ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.LIFE ),
-		['OTHERPLAYER_GUILD' ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.GUILD),
-		['CLIENTPLAYER_NAME' ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.NAME ),
-		['CLIENTPLAYER_TITLE'] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.TITLE),
-		['CLIENTPLAYER_LIFE' ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.LIFE ),
-		['CLIENTPLAYER_GUILD'] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD),
+		['NPC_NAME'          ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.NPC         , X.CONSTANT.GLOBAL_HEAD.NAME ),
+		['NPC_TITLE'         ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.NPC         , X.CONSTANT.GLOBAL_HEAD.TITLE),
+		['NPC_LIFE'          ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.NPC         , X.CONSTANT.GLOBAL_HEAD.LIFE ),
+		['OTHERPLAYER_NAME'  ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.NAME ),
+		['OTHERPLAYER_TITLE' ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.TITLE),
+		['OTHERPLAYER_LIFE'  ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.LIFE ),
+		['OTHERPLAYER_GUILD' ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.GUILD),
+		['CLIENTPLAYER_NAME' ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.NAME ),
+		['CLIENTPLAYER_TITLE'] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.TITLE),
+		['CLIENTPLAYER_LIFE' ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.LIFE ),
+		['CLIENTPLAYER_GUILD'] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.GUILD),
 		['INTELLIGENCE_LIFE' ] = select(2, X.SafeCall(_G.GetGlobalTopIntelligenceLife)),
 		['NPC_BALLOON'       ] = select(2, X.SafeCall(_G.Addon_IsNpcBalloon)),
 		['PLAYER_BALLOON'    ] = select(2, X.SafeCall(_G.Addon_IsPlayerBalloon)),
@@ -364,17 +356,17 @@ function D.ResumeSysHeadTop()
 	if not SYS_HEAD_TOP_STATE then
 		return
 	end
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.NPC         , CONSTANT.GLOBAL_HEAD.NAME , SYS_HEAD_TOP_STATE['NPC_NAME'])
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.NPC         , CONSTANT.GLOBAL_HEAD.TITLE, SYS_HEAD_TOP_STATE['NPC_TITLE'])
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.NPC         , CONSTANT.GLOBAL_HEAD.LIFE , SYS_HEAD_TOP_STATE['NPC_LIFE'])
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.NAME , SYS_HEAD_TOP_STATE['OTHERPLAYER_NAME'])
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.TITLE, SYS_HEAD_TOP_STATE['OTHERPLAYER_TITLE'])
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.LIFE , SYS_HEAD_TOP_STATE['OTHERPLAYER_LIFE'])
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.GUILD, SYS_HEAD_TOP_STATE['OTHERPLAYER_GUILD'])
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.NAME , SYS_HEAD_TOP_STATE['CLIENTPLAYER_NAME'])
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.TITLE, SYS_HEAD_TOP_STATE['CLIENTPLAYER_TITLE'])
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.LIFE , SYS_HEAD_TOP_STATE['CLIENTPLAYER_LIFE'])
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, SYS_HEAD_TOP_STATE['CLIENTPLAYER_GUILD'])
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.NPC         , X.CONSTANT.GLOBAL_HEAD.NAME , SYS_HEAD_TOP_STATE['NPC_NAME'])
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.NPC         , X.CONSTANT.GLOBAL_HEAD.TITLE, SYS_HEAD_TOP_STATE['NPC_TITLE'])
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.NPC         , X.CONSTANT.GLOBAL_HEAD.LIFE , SYS_HEAD_TOP_STATE['NPC_LIFE'])
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.NAME , SYS_HEAD_TOP_STATE['OTHERPLAYER_NAME'])
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.TITLE, SYS_HEAD_TOP_STATE['OTHERPLAYER_TITLE'])
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.LIFE , SYS_HEAD_TOP_STATE['OTHERPLAYER_LIFE'])
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.GUILD, SYS_HEAD_TOP_STATE['OTHERPLAYER_GUILD'])
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.NAME , SYS_HEAD_TOP_STATE['CLIENTPLAYER_NAME'])
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.TITLE, SYS_HEAD_TOP_STATE['CLIENTPLAYER_TITLE'])
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.LIFE , SYS_HEAD_TOP_STATE['CLIENTPLAYER_LIFE'])
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.GUILD, SYS_HEAD_TOP_STATE['CLIENTPLAYER_GUILD'])
 	X.SafeCall(_G.SetGlobalTopIntelligenceLife, SYS_HEAD_TOP_STATE['INTELLIGENCE_LIFE'])
 	X.SafeCall(_G.Addon_ShowNpcBalloon, SYS_HEAD_TOP_STATE['NPC_BALLOON'])
 	X.SafeCall(_G.Addon_ShowPlayerBalloon, SYS_HEAD_TOP_STATE['PLAYER_BALLOON'])
@@ -390,7 +382,7 @@ end
 X.RegisterEvent('UI_SCALED', D.Repaint)
 
 function D.UpdateShadowHandleParam()
-	UI.SetShadowHandleParam('MY_LifeBar', { bShowWhenUIHide = Config.bShowWhenUIHide })
+	X.UI.SetShadowHandleParam('MY_LifeBar', { bShowWhenUIHide = Config.bShowWhenUIHide })
 end
 
 function D.Reset()
@@ -534,7 +526,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 			if tData.szType == 'BUFF' or tData.szType == 'DEBUFF' then
 				local KBuff = object.GetBuff(tData.dwBuffID, 0)
 				if KBuff then
-					nSec = (KBuff.GetEndTime() - GetLogicFrameCount()) / ENVIRONMENT.GAME_FPS
+					nSec = (KBuff.GetEndTime() - GetLogicFrameCount()) / X.ENVIRONMENT.GAME_FPS
 					szText = tData.szText or X.GetBuffName(KBuff.dwID, KBuff.nLevel)
 					if KBuff.nStackNum > 1 then
 						szText = szText .. 'x' .. KBuff.nStackNum
@@ -544,9 +536,9 @@ function CheckInvalidRect(dwType, dwID, me, object)
 				local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(object)
 				if dwSkillID == tData.dwSkillID
 				and (
-					nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-					or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
-					or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE
+					nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+					or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+					or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE
 				) then
 					fPer = fCastPercent
 					szText = tData.szText or X.GetSkillName(dwSkillID, dwSkillLevel)
@@ -555,7 +547,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 				szText = tData.szText or ''
 			else --if tData.szType == 'TIME' then
 				if tData.nLogicFrame then
-					nSec = (tData.nLogicFrame - GetLogicFrameCount()) / ENVIRONMENT.GAME_FPS
+					nSec = (tData.nLogicFrame - GetLogicFrameCount()) / X.ENVIRONMENT.GAME_FPS
 				elseif tData.nTime then
 					nSec = (tData.nTime - GetTime()) / 1000
 				end
@@ -839,7 +831,7 @@ local function OnCharacterSay(dwID, nChannel, szMsg)
 	if dwID == 0 or not D.bReady then
 		return
 	end
-	local szMsgType = CONSTANT.PLAYER_TALK_CHANNEL_TO_MSG_TYPE[nChannel]
+	local szMsgType = X.CONSTANT.PLAYER_TALK_CHANNEL_TO_MSG_TYPE[nChannel]
 	local bc = szMsgType and Config.BalloonChannel[szMsgType]
 	if not bc or not bc.bEnable then
 		return

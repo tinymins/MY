@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : °ó¶¨ JX3BOX
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_JBBind'
@@ -37,8 +29,8 @@ function D.FetchBindStatus(resolve, reject)
 		X.Ajax({
 			url = 'https://pull.j3cx.com/role/query',
 			data = {
-				l = ENVIRONMENT.GAME_LANG,
-				L = ENVIRONMENT.GAME_EDITION,
+				l = X.ENVIRONMENT.GAME_LANG,
+				L = X.ENVIRONMENT.GAME_EDITION,
 				jx3id = X.GetPlayerGUID(),
 			},
 			signature = X.SECRET['J3CX::ROLE_QUERY'],
@@ -76,8 +68,8 @@ function D.Bind(szToken, resolve, reject)
 	X.Ajax({
 		url = 'https://push.j3cx.com/role/bind',
 		data = {
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			token = szToken,
 			cguid = X.GetClientGUID(),
 			jx3id = X.GetPlayerGUID(),
@@ -105,8 +97,8 @@ function D.Unbind(resolve, reject)
 	X.Ajax({
 		url = 'https://push.j3cx.com/role/unbind',
 		data = {
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			jx3id = X.GetPlayerGUID(),
 		},
 		signature = X.SECRET['J3CX::ROLE_UNBIND'],
@@ -178,7 +170,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 						end)
 				end)
 			elseif X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
-				X.Topmsg(_L['Please unlock equip lock first!'], CONSTANT.MSG_THEME.ERROR)
+				X.Topmsg(_L['Please unlock equip lock first!'], X.CONSTANT.MSG_THEME.ERROR)
 			else
 				X.Confirm(_L['Sure to unbind character certification?'], function()
 					uiBtnCCStatus:Enable(false)

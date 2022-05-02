@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队面板模块
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Cataclysm'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
@@ -628,7 +620,7 @@ end
 
 function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	local w, h = 320, 320
-	local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
+	local ui = X.UI.CreateFrame('MY_Cataclysm_BuffConfig', {
 		w = w, h = h,
 		text = _L['Edit buff'],
 		close = true, anchor = 'CENTER',
@@ -667,7 +659,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		x = x + ui:Append('WndEditBox', {
 			x = x, y = y, w = 60, h = 25,
 			placeholder = _L['No limit'],
-			editType = UI.EDIT_TYPE.NUMBER, text = rec.nLevel,
+			editType = X.UI.EDIT_TYPE.NUMBER, text = rec.nLevel,
 			onChange = function(text)
 				rec.nLevel = tonumber(text)
 				onChangeNotify(rec)
@@ -694,7 +686,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 					rec.szStackOp = nil
 					ui:Children('#WndEditBox_StackNum'):Text('')
 					onChangeNotify(rec)
-					UI(this):Text(_L['No limit'])
+					X.UI(this):Text(_L['No limit'])
 				end,
 			}}
 			for _, op in ipairs({ '>=', '=', '!=', '<', '<=', '>', '>=' }) do
@@ -703,7 +695,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 					fnAction = function()
 						rec.szStackOp = op
 						onChangeNotify(rec)
-						UI(this):Text(op)
+						X.UI(this):Text(op)
 					end,
 				})
 			end
@@ -713,7 +705,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	x = x + ui:Append('WndEditBox', {
 		name = 'WndEditBox_StackNum',
 		x = x, y = y, w = 30, h = 25,
-		editType = UI.EDIT_TYPE.NUMBER,
+		editType = X.UI.EDIT_TYPE.NUMBER,
 		text = rec.nStackNum,
 		onChange = function(text)
 			rec.nStackNum = tonumber(text)
@@ -786,7 +778,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndEditBox', {
 		x = x, y = y, w = 40, h = 25,
-		editType = UI.EDIT_TYPE.NUMBER,
+		editType = X.UI.EDIT_TYPE.NUMBER,
 		text = rec.nPriority,
 		onChange = function(text)
 			rec.nPriority = tonumber(text)
@@ -804,22 +796,22 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		color = rec.col and {X.HumanColor2RGB(rec.col)} or {255, 255, 0},
 		onLClick = function()
 			local this = this
-			UI.OpenColorPicker(function(r, g, b)
+			X.UI.OpenColorPicker(function(r, g, b)
 				local a = rec.col and select(4, X.Hex2RGB(rec.col)) or 255
 				rec.nColAlpha = a
 				rec.col = X.RGB2Hex(r, g, b, a)
-				UI(this):Color(r, g, b)
+				X.UI(this):Color(r, g, b)
 				onChangeNotify(rec)
 			end)
 		end,
 		onRClick = function()
-			UI(this):Color(255, 255, 0)
+			X.UI(this):Color(255, 255, 0)
 			rec.col = nil
 			onChangeNotify(rec)
 		end,
 		tip = {
 			render = _L['Left click to change color, right click to clear color'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 		autoEnable = function() return not rec.bDelete end,
 	}):Width() + 5
@@ -828,20 +820,20 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		color = rec.colScreenHead and {X.HumanColor2RGB(rec.colScreenHead)} or {255, 255, 0},
 		onLClick = function()
 			local this = this
-			UI.OpenColorPicker(function(r, g, b)
+			X.UI.OpenColorPicker(function(r, g, b)
 				rec.colScreenHead = X.RGB2Hex(r, g, b)
-				UI(this):Color(r, g, b)
+				X.UI(this):Color(r, g, b)
 				onChangeNotify(rec)
 			end)
 		end,
 		onRClick = function()
-			UI(this):Color(255, 255, 0)
+			X.UI(this):Color(255, 255, 0)
 			rec.colScreenHead = nil
 			onChangeNotify(rec)
 		end,
 		tip = {
 			render = _L['Left click to change screen head color, right click to clear color'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 		autoEnable = function() return not rec.bDelete end,
 	}):Width() + 5
@@ -856,7 +848,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	x = x + ui:Append('WndTrackbar', {
 		x = x, y = y, text = '',
 		range = {0, 255},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = rec.col and select(4, X.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
 		onChange = function(nVal)
 			if rec.col then

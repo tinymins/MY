@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 仓库堆叠整理
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_BagEx'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_BagSort'
@@ -183,7 +175,7 @@ function D.SortGuildBank()
 			})
 			nItemCount = nItemCount + 1
 		else
-			table.insert(aInfo, CONSTANT.EMPTY_TABLE)
+			table.insert(aInfo, X.CONSTANT.EMPTY_TABLE)
 		end
 	end
 	if nItemCount == 0 then
@@ -214,7 +206,7 @@ function D.SortGuildBank()
 	-- 根据排序结果与当前状态交换物品
 	local function fnNext()
 		if not frame or (frame.nPage or 0) ~= nPage then
-			X.Systopmsg(_L['Guild box closed or page changed, sort exited!'], CONSTANT.MSG_THEME.ERROR)
+			X.Systopmsg(_L['Guild box closed or page changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			return fnFinish()
 		end
 		if szState == 'Exchanging' or szState == 'Refreshing' then
@@ -247,7 +239,7 @@ function D.SortGuildBank()
 							return
 						end
 					end
-					X.Systopmsg(_L['Cannot find item temp position, guild bag is full, sort exited!'], CONSTANT.MSG_THEME.ERROR)
+					X.Systopmsg(_L['Cannot find item temp position, guild bag is full, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 					return
 				end
 				-- 寻找预期物品所在位置
@@ -271,7 +263,7 @@ function D.SortGuildBank()
 						return
 					end
 				end
-				X.Systopmsg(_L['Exchange item match failed, guild bag may changed, sort exited!'], CONSTANT.MSG_THEME.ERROR)
+				X.Systopmsg(_L['Exchange item match failed, guild bag may changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 				return
 			end
 		end
@@ -290,10 +282,10 @@ function D.SortGuildBank()
 		if arg0 == TONG_EVENT_CODE.EXCHANGE_REPERTORY_ITEM_SUCCESS then
 			szState = 'Refreshing'
 		elseif arg0 == TONG_EVENT_CODE.PUT_ITEM_IN_REPERTORY_SUCCESS then
-			X.Systopmsg(_L['Put item in guild detected, sort exited!'], CONSTANT.MSG_THEME.ERROR)
+			X.Systopmsg(_L['Put item in guild detected, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			fnFinish()
 		else
-			X.Systopmsg(_L['Unknown exception occured, sort exited!'], CONSTANT.MSG_THEME.ERROR)
+			X.Systopmsg(_L['Unknown exception occured, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			fnFinish()
 			--[[#DEBUG BEGIN]]
 			X.Debug('MY_BagSort', 'TONG_EVENT_NOTIFY: ' .. arg0, X.DEBUG_LEVEL.LOG)
@@ -308,20 +300,20 @@ function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and O.bGuildBank then
 		-- 植入堆叠整理按纽
 		-- guild bank sort/stack
-		local btn1 = UI('Normal/GuildBankPanel/Btn_Refresh')
-		local btn2 = UI('Normal/GuildBankPanel/Btn_MY_Sort')
-		local btn3 = UI('Normal/GuildBankPanel/Btn_MY_Stack')
+		local btn1 = X.UI('Normal/GuildBankPanel/Btn_Refresh')
+		local btn2 = X.UI('Normal/GuildBankPanel/Btn_MY_Sort')
+		local btn3 = X.UI('Normal/GuildBankPanel/Btn_MY_Stack')
 		if btn1:Count() > 0 then
 			if btn2:Count() == 0 then
 				local x, y = btn1:Pos()
 				local w, h = btn1:Size()
-				btn2 = UI('Normal/GuildBankPanel'):Append('WndButton', {
+				btn2 = X.UI('Normal/GuildBankPanel'):Append('WndButton', {
 					name = 'Btn_MY_Sort',
 					x = x - w, y = y, w = w, h = h,
 					text = _L['Sort'],
 					tip = {
 						render = _L['Press shift for random'],
-						position = UI.TIP_POSITION.BOTTOM_TOP,
+						position = X.UI.TIP_POSITION.BOTTOM_TOP,
 					},
 					onClick = D.SortGuildBank,
 				})
@@ -329,7 +321,7 @@ function D.CheckInjection(bRemoveInjection)
 			if btn3:Count() == 0 then
 				local x, y = btn2:Pos()
 				local w, h = btn2:Size()
-				btn3 = UI('Normal/GuildBankPanel'):Append('WndButton', {
+				btn3 = X.UI('Normal/GuildBankPanel'):Append('WndButton', {
 					name = 'Btn_MY_Stack',
 					x = x - w, y = y, w = w, h = h,
 					text = _L['Stack'],
@@ -339,8 +331,8 @@ function D.CheckInjection(bRemoveInjection)
 		end
 	else
 		-- 移除堆叠整理按纽
-		UI('Normal/GuildBankPanel/Btn_MY_Sort'):Remove()
-		UI('Normal/GuildBankPanel/Btn_MY_Stack'):Remove()
+		X.UI('Normal/GuildBankPanel/Btn_MY_Sort'):Remove()
+		X.UI('Normal/GuildBankPanel/Btn_MY_Stack'):Remove()
 	end
 end
 

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 角色统计
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_RoleStat'
@@ -729,17 +721,17 @@ function D.GetTableColumns()
 end
 
 function D.UpdateUI(page)
-	local ui = UI(page)
+	local ui = X.UI(page)
 
 	-- 搜索
 	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
 	local data = D.GetPlayerRecords()
 	local result = {}
 	for _, rec in pairs(data) do
-		if wstring.find(tostring(rec.account or ''), szSearch)
-		or wstring.find(tostring(rec.name or ''), szSearch)
-		or wstring.find(tostring(rec.region or ''), szSearch)
-		or wstring.find(tostring(rec.server or ''), szSearch) then
+		if X.StringFindW(tostring(rec.account or ''), szSearch)
+		or X.StringFindW(tostring(rec.name or ''), szSearch)
+		or X.StringFindW(tostring(rec.region or ''), szSearch)
+		or X.StringFindW(tostring(rec.server or ''), szSearch) then
 			table.insert(result, rec)
 		end
 	end
@@ -803,7 +795,7 @@ function D.OutputFloatEntryTip(this, rec)
 	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	OutputTip(table.concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 end
 
 function D.CloseFloatEntryTip()
@@ -812,7 +804,7 @@ end
 
 function D.OnInitPage()
 	local page = this
-	local ui = UI(page)
+	local ui = X.UI(page)
 
 	ui:Append('WndEditBox', {
 		name = 'WndEditBox_Search',
@@ -895,7 +887,7 @@ function D.OnInitPage()
 									end
 								end,
 							},
-							CONSTANT.MENU_DIVIDER,
+							X.CONSTANT.MENU_DIVIDER,
 							{
 								szOption = _L['Delete'],
 								fnAction = function()
@@ -996,7 +988,7 @@ function D.OnInitPage()
 									end
 								end,
 							},
-							CONSTANT.MENU_DIVIDER,
+							X.CONSTANT.MENU_DIVIDER,
 							{
 								szOption = _L['Delete'],
 								fnAction = function()
@@ -1042,7 +1034,7 @@ function D.OnInitPage()
 			render = function(rec)
 				return D.GetRowTip(rec), true
 			end,
-			position = UI.TIP_POSITION.RIGHT_LEFT,
+			position = X.UI.TIP_POSITION.RIGHT_LEFT,
 		},
 		rowMenuRClick = function(rec, index)
 			local menu = {
@@ -1108,7 +1100,7 @@ function D.OnInitPage()
 					end,
 				})
 			end
-			UI.PopupMenu(menu)
+			X.UI.PopupMenu(menu)
 		end,
 	})
 
@@ -1282,7 +1274,7 @@ X.RegisterExit('MY_RoleStatistics_RoleStat', function()
 	if PLAYER_REC then
 		X.SaveLUAData(PLAYER_REC_FILE, PLAYER_REC)
 	end
-	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		D.UpdateSaveDB()
 		D.FlushDB()
 	end

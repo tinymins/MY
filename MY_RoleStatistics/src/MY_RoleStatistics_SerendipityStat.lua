@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 奇遇统计（尝试触发次数统计）
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_SerendipityStat'
@@ -157,7 +149,7 @@ X.RegisterEvent('LOADING_ENDING', 'MY_RoleStatistics_SerendipityStat', function(
 		X.DelayCall('MY_ROLE_STAT_SERENDIPITY_UPDATE', DelayTrigger)
 	end
 	local PARSE_TEXT = setmetatable({}, {__index = function(t, k)
-		t[k] = wstring.gsub(k, '{$name}', GetClientPlayer().szName)
+		t[k] = X.StringReplaceW(k, '{$name}', GetClientPlayer().szName)
 		return t[k]
 	end})
 	local function SerendipityStringTrigger(szText, aSearch, nID, nNum)
@@ -307,7 +299,7 @@ function D.GetLuckyFellowPet()
 			[tLine.PetIndex2] = true,
 		}
 	end
-	return CONSTANT.EMPTY_TABLE
+	return X.CONSTANT.EMPTY_TABLE
 end
 
 -----------------------------------------------------------------------------------------------
@@ -843,16 +835,16 @@ function D.GetTableColumns()
 end
 
 function D.UpdateUI(page)
-	local ui = UI(page)
+	local ui = X.UI(page)
 
 	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
 	local data = D.GetPlayerRecords()
 	local result = {}
 	for _, rec in pairs(data) do
-		if wstring.find(tostring(rec.account or ''), szSearch)
-		or wstring.find(tostring(rec.name or ''), szSearch)
-		or wstring.find(tostring(rec.region or ''), szSearch)
-		or wstring.find(tostring(rec.server or ''), szSearch) then
+		if X.StringFindW(tostring(rec.account or ''), szSearch)
+		or X.StringFindW(tostring(rec.name or ''), szSearch)
+		or X.StringFindW(tostring(rec.region or ''), szSearch)
+		or X.StringFindW(tostring(rec.server or ''), szSearch) then
 			table.insert(result, rec)
 		end
 	end
@@ -950,7 +942,7 @@ end
 
 function D.OnInitPage()
 	local page = this
-	local ui = UI(page)
+	local ui = X.UI(page)
 
 	ui:Append('WndEditBox', {
 		name = 'WndEditBox_Search',
@@ -1060,7 +1052,7 @@ function D.OnInitPage()
 									end
 								end,
 							},
-							CONSTANT.MENU_DIVIDER,
+							X.CONSTANT.MENU_DIVIDER,
 							{
 								szOption = _L['Delete'],
 								fnAction = function()
@@ -1323,7 +1315,7 @@ function D.OnMMMItemMouseEnter()
 	-- 调用显示
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	OutputTip(table.concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 end
 
 function D.OnMMMItemMouseLeave()
@@ -1409,8 +1401,8 @@ function D.DrawMiniMapPoint()
 		if mark.aPosition then
 			for _, pos in ipairs(mark.aPosition) do
 				if math.pow((me.nX - pos[1]) / 64, 2) + math.pow((me.nY - pos[2]) / 64, 2) <= MINI_MAP_POINT_MAX_DISTANCE then
-					X.UpdateMiniFlag(CONSTANT.MINI_MAP_POINT.FUNCTION_NPC,
-						pos[1], pos[2], 21, 47, ENVIRONMENT.GAME_FPS)
+					X.UpdateMiniFlag(X.CONSTANT.MINI_MAP_POINT.FUNCTION_NPC,
+						pos[1], pos[2], 21, 47, X.ENVIRONMENT.GAME_FPS)
 				end
 			end
 		end
@@ -1503,7 +1495,7 @@ X.RegisterInit('MY_RoleStatistics_SerendipityStat', function()
 end)
 
 X.RegisterExit('MY_RoleStatistics_SerendipityStat', function()
-	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		D.UpdateSaveDB()
 		D.FlushDB()
 	end

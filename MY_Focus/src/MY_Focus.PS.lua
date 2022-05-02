@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 焦点列表
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Focus'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Focus'
@@ -28,7 +20,7 @@ end
 
 local PS = { szRestriction = 'MY_Focus' }
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w  = ui:Width()
 	local h  = math.max(ui:Height(), 440)
 	local xr, yr, wr = w - 260, 5, 260
@@ -79,7 +71,7 @@ function PS.OnPanelActive(wnd)
 			fnAction = function()
 				MY_Focus.RemoveFocusPattern(tData.szPattern)
 				list:ListBox('delete', 'id', oID)
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end,
 		}}
 		-- 匹配方式
@@ -259,7 +251,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = wr, text = _L['Auto focus very important npc'],
 		tip = {
 			render = _L['Boss list is always been collecting and updating'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 		checked = MY_Focus.bFocusINpc,
 		onCheck = function(bChecked)
@@ -274,7 +266,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = wr, text = _L['TeamMon focus'],
 		tip = {
 			render = _L['TeamMon focus is related to MY_TeamMon data.'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 		checked = MY_Focus.bTeamMonFocus,
 		onCheck = function(bChecked)
@@ -457,7 +449,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = wr, text = _L['Heal healper'],
 		tip = {
 			render = _L['Select target when mouse enter'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		checked = MY_Focus.bHealHelper,
 		onCheck = function(bChecked)
@@ -483,7 +475,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		textFormatter = function(val) return _L('Max display count %d.', val) end,
 		range = {1, 20},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_Focus.nMaxDisplay,
 		onChange = function(val)
 			MY_Focus.nMaxDisplay = val
@@ -496,7 +488,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		textFormatter = function(val) return _L('Current scale-x is %d%%.', val) end,
 		range = {10, 300},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_Focus.fScaleX * 100,
 		onChange = function(val)
 			MY_Focus.fScaleX = val / 100
@@ -509,7 +501,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		textFormatter = function(val) return _L('Current scale-y is %d%%.', val) end,
 		range = {10, 300},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = MY_Focus.fScaleY * 100,
 		onChange = function(val)
 			MY_Focus.fScaleY = val / 100

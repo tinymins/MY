@@ -40,11 +40,11 @@ local DEBUG_LEVEL = {
 	NONE    = 4,
 }
 
+local _NAME_SPACE_            = 'MY'
 local _BUILD_                 = '20220429'
 local _VERSION_               = '11.0.3'
 local _MENU_COLOR_            = {255, 165, 79}
 local _INTERFACE_ROOT_        = 'Interface/'
-local _NAME_SPACE_            = 'MY'
 local _ADDON_ROOT_            = _INTERFACE_ROOT_ .. _NAME_SPACE_ .. '/'
 local _DATA_ROOT_             = (_GAME_PROVIDER_ == 'remote' and (GetUserDataFolder() .. '/' .. GetUserAccount() .. '/interface/') or _INTERFACE_ROOT_) .. _NAME_SPACE_ .. '#DATA/'
 local _FRAMEWORK_ROOT_        = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_!Base/'

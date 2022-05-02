@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队工具 - 团队成就
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_Achievement'
@@ -188,7 +180,7 @@ function D.UpdateAchievementID()
 				local achi = Achievement:GetRow(i)
 				if achi and achi.nVisible == 1 and achi.dwGeneral == 1
 				and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
-				and (X.IsEmpty(D.szSearch) or wstring.find(achi.szName, D.szSearch) or wstring.find(achi.szDesc, D.szSearch)) then
+				and (X.IsEmpty(D.szSearch) or X.StringFindW(achi.szName, D.szSearch) or X.StringFindW(achi.szDesc, D.szSearch)) then
 					table.insert(aAchievement, achi)
 					if #aAchievement >= MAX_ALL_MAP_ACHI then
 						break
@@ -197,11 +189,11 @@ function D.UpdateAchievementID()
 			end
 		end
 	else
-		for _, dwAchieveID in ipairs(X.GetMapAchievements(D.dwMapID) or CONSTANT.EMPTY_TABLE) do
+		for _, dwAchieveID in ipairs(X.GetMapAchievements(D.dwMapID) or X.CONSTANT.EMPTY_TABLE) do
 			local achi = X.GetAchievement(dwAchieveID)
 			if achi
 			and (not O.bIntelligentHide or achi.dwSub ~= 10) -- 隐藏声望成就
-			and (X.IsEmpty(D.szSearch) or wstring.find(achi.szName, D.szSearch) or wstring.find(achi.szDesc, D.szSearch)) then
+			and (X.IsEmpty(D.szSearch) or X.StringFindW(achi.szName, D.szSearch) or X.StringFindW(achi.szDesc, D.szSearch)) then
 				table.insert(aAchievement, achi)
 			end
 		end
@@ -417,13 +409,13 @@ function D.OutputRowTip(this, rec)
 	local nLen = 0
 	for _, col in ipairs(aCol) do
 		if col.dwAchieveID then
-			nLen = math.max(nLen, wstring.len(col.szTitle))
+			nLen = math.max(nLen, X.StringLenW(col.szTitle))
 		end
 	end
 	for _, col in ipairs(aCol) do
 		if col.dwAchieveID then
 			local nPoint = D.GetAchievementPoint(col.dwAchieveID)
-			local szSpace = g_tStrings.STR_ONE_CHINESE_SPACE:rep(nLen - wstring.len(col.szTitle))
+			local szSpace = g_tStrings.STR_ONE_CHINESE_SPACE:rep(nLen - X.StringLenW(col.szTitle))
 			if D.GetPlayerAchievementStat(rec.id, col.dwAchieveID) == 'FINISH' then
 				nAciquiePoint = nAciquiePoint + nPoint
 			end
@@ -445,7 +437,7 @@ function D.OutputRowTip(this, rec)
 	table.insert(aXml, 5, GetFormatText(_L('Achievement point: %d / %d', nAciquiePoint, nAchievePoint) .. '\n', 162, 255, 128, 0))
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	local nPosType = UI.TIP_POSITION.RIGHT_LEFT
+	local nPosType = X.UI.TIP_POSITION.RIGHT_LEFT
 	OutputTip(table.concat(aXml), 450, {x, y, w, h}, nPosType)
 end
 
@@ -522,11 +514,11 @@ function D.OutputAchieveTip(dwAchieveID, dwID)
 	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	OutputTip(table.concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 end
 
 function D.UpdatePage(page)
-	UI(page):Fetch('Wnd_Total/WndAutocomplete_Map')
+	X.UI(page):Fetch('Wnd_Total/WndAutocomplete_Map')
 		:Text(D.tMapName[D.dwMapID] or '', WNDEVENT_FIRETYPE.PREVENT)
 
 	local hCols = page:Lookup('Wnd_Total/WndScroll_Stat', 'Handle_StatColumns')
@@ -587,7 +579,7 @@ function D.UpdatePage(page)
 				id = dwID,
 				name = info and info.szName or me.szName,
 				force = info and info.dwForceID or me.dwForceID,
-				achi = ACHIEVE_CACHE[dwID] or CONSTANT.EMPTY_TABLE,
+				achi = ACHIEVE_CACHE[dwID] or X.CONSTANT.EMPTY_TABLE,
 			})
 		end
 	end
@@ -646,7 +638,7 @@ function D.OnInitPage()
 				D.UpdateSearchAC()
 				D.UpdateAchievementID()
 				D.RequestTeamData()
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end,
 		})
 		tMapName[0] = _L['All map']
@@ -658,7 +650,7 @@ function D.OnInitPage()
 				D.UpdateSearchAC()
 				D.UpdateAchievementID()
 				D.RequestTeamData()
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end,
 		})
 		for _, group in ipairs(X.GetTypeGroupMap()) do
@@ -671,7 +663,7 @@ function D.OnInitPage()
 						D.UpdateSearchAC()
 						D.UpdateAchievementID()
 						D.RequestTeamData()
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end
 				})
 				tMapName[info.dwID] = info.szName
@@ -690,7 +682,7 @@ function D.OnInitPage()
 	Wnd.CloseWindow(frameTemp)
 
 	local nX = 20
-	nX = nX + UI(wnd):Append('WndAutocomplete', {
+	nX = nX + X.UI(wnd):Append('WndAutocomplete', {
 		x = nX, y = 20, w = 250,
 		name = 'WndAutocomplete_Map',
 		onChange = function(szText)
@@ -705,7 +697,7 @@ function D.OnInitPage()
 		menu = function() return D.tMapMenu end,
 	}):Width() + 5
 
-	nX = nX + UI(wnd):Append('WndAutocomplete', {
+	nX = nX + X.UI(wnd):Append('WndAutocomplete', {
 		x = nX, y = 20, w = 200,
 		name = 'WndAutocomplete_Search',
 		text = D.szSearch,
@@ -719,14 +711,14 @@ function D.OnInitPage()
 			X.Debounce('MY_TeamTools_Achievement_RequestTeamData', 2000, D.RequestTeamData)
 		end,
 		autocomplete = {{'option', 'source', D.aSearchAC}},
-		onClick = function() UI(this):Autocomplete('search', '') end,
+		onClick = function() X.UI(this):Autocomplete('search', '') end,
 		onBlur = function()
 			D.RequestTeamData()
 			X.Debounce('MY_TeamTools_Achievement_RequestTeamData', false)
 		end,
 	}):Width() + 5
 
-	nX = nX + UI(wnd):Append('WndCheckBox', {
+	nX = nX + X.UI(wnd):Append('WndCheckBox', {
 		x = nX, y = 20, w = 200,
 		text = _L['Intelligent hide'],
 		checked = O.bIntelligentHide,
@@ -736,11 +728,11 @@ function D.OnInitPage()
 		end,
 		tip = {
 			render = _L['Hide unimportant achievements'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	}):Width() + 5
 
-	UI(wnd):Append('WndButton', {
+	X.UI(wnd):Append('WndButton', {
 		x = 960, y = 20, w = 120,
 		text = _L['Refresh'],
 		onClick = function()
@@ -771,7 +763,7 @@ function D.OnEvent(event)
 	if event == 'MY_TEAMTOOLS_ACHI' then
 		D.DelayUpdatePage(this)
 	elseif event == 'MY_TEAMTOOLS_ACHI_SEARCH_AC' then
-		UI(this):Fetch('Wnd_Total/WndAutocomplete_Search'):Autocomplete('option', 'source', D.aSearchAC)
+		X.UI(this):Fetch('Wnd_Total/WndAutocomplete_Search'):Autocomplete('option', 'source', D.aSearchAC)
 	elseif event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdatePage(this)
 	elseif event == 'NEW_ACHIEVEMENT' or event == 'SYNC_ACHIEVEMENT_DATA'

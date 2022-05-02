@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 保存团队
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamRestore'
@@ -47,7 +39,7 @@ end
 function D.Save(nIndex, szName)
 	local tList, tList2, me, team = {}, {}, GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
-		return X.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You are not in a team'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	local tSave = {}
 	tSave.szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
@@ -102,7 +94,7 @@ function D.SyncMember(team, dwID, szName, state)
 	end
 	if O.bKeepMark and state.nMark then -- 如果这货之前有标记
 		X.SetTeamMarkTarget(state.nMark, dwID) -- 标记给他
-		X.Sysmsg(_L('Restore player marked as [%s]: %s', CONSTANT.TEAM_MARK_NAME[state.nMark] or '?', szName))
+		X.Sysmsg(_L('Restore player marked as [%s]: %s', X.CONSTANT.TEAM_MARK_NAME[state.nMark] or '?', szName))
 	end
 end
 
@@ -121,15 +113,15 @@ function D.Restore(n)
 	D.LoadLUAData()
 
 	if not me or not me.IsInParty() then
-		return X.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You are not in a team'], X.CONSTANT.MSG_THEME.ERROR)
 	elseif not O.SaveList[n] then
-		return X.Sysmsg(_L['You have not saved team list data'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You have not saved team list data'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	-- get perm
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) ~= me.dwID then
 		local nGroup = team.GetMemberGroupIndex(me.dwID) + 1
 		local szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
-		return X.Sysmsg(_L['You are not team leader, permission denied'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You are not team leader, permission denied'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) ~= me.dwID then
@@ -144,7 +136,7 @@ function D.Restore(n)
 		for _, dwID in pairs(tGroupInfo.MemberList) do
 			local szName = team.GetClientTeamMemberName(dwID)
 			if not szName then
-				X.Sysmsg(_L('Unable get player of %d group: #%d', nGroup + 1, dwID), CONSTANT.MSG_THEME.ERROR)
+				X.Sysmsg(_L('Unable get player of %d group: #%d', nGroup + 1, dwID), X.CONSTANT.MSG_THEME.ERROR)
 			else
 				if not tSaved[szName] then
 					szName = string.gsub(szName, '@.*', '')
@@ -218,15 +210,15 @@ function D.Restore2(n)
 	D.LoadLUAData()
 	local me, team = GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
-		return X.Sysmsg(_L['You are not in a team'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You are not in a team'], X.CONSTANT.MSG_THEME.ERROR)
 	elseif not O.SaveList[n] then
-		return X.Sysmsg(_L['You have not saved team list data'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You have not saved team list data'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	-- get perm
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) ~= me.dwID then
 		local nGroup = team.GetMemberGroupIndex(me.dwID) + 1
 		local szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
-		return X.Sysmsg(_L['You are not team leader, permission denied'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['You are not team leader, permission denied'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) ~= me.dwID then
@@ -310,7 +302,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			buttonStyle = 'FLAT',
 			tip = {
 				render = v.name .. '\n' .. _L['Left click to recovery, right click for more.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			onLClick = function()
 				if IsCtrlKeyDown() then

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 战斗日志 流式保存原始事件数据
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -74,7 +66,7 @@ local LOG_DOODAD_INFO_TIME_LIMIT = 10000 -- 交互物件信息再次记录最小时间间隔
 local LOG_NAMING_COUNT = {} -- 记录中NPC被提及的数量统计，用于命名记录文件
 
 local LOG_REPLAY = {} -- 最近的数据 （进战时候将最近的数据压进来）
-local LOG_REPLAY_FRAME = ENVIRONMENT.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
+local LOG_REPLAY_FRAME = X.ENVIRONMENT.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
 
 local LOG_TYPE = {
 	FIGHT_TIME                            = 1,  -- 战斗时间
@@ -184,7 +176,7 @@ function D.CloseCombatLogs()
 				szName = '-' .. p.szName
 			end
 		end
-		CPath.Move(LOG_FILE, wstring.sub(LOG_FILE, 1, -9) .. szName .. '.jcl')
+		CPath.Move(LOG_FILE, X.StringSubW(LOG_FILE, 1, -9) .. szName .. '.jcl')
 	end
 	LOG_FILE = nil
 end
@@ -216,7 +208,7 @@ function D.InsertLog(szEvent, oData, bReplay)
 		.. '\t' .. GetCurrentTime()
 		.. '\t' .. GetTime()
 		.. '\t' .. szEvent
-		.. '\t' .. wstring.gsub(wstring.gsub(X.EncodeLUAData(oData), '\\\n', '\\n'), '\t', '\\t')
+		.. '\t' .. X.StringReplaceW(X.StringReplaceW(X.EncodeLUAData(oData), '\\\n', '\\n'), '\t', '\\t')
 	local nCRC = GetStringCRC(LOG_CRC .. szLog .. 'c910e9b9-8359-4531-85e0-6897d8c129f7')
 	-- 插入缓存
 	table.insert(LOG_CACHE, nCRC .. '\t' .. szLog .. '\n')
@@ -753,7 +745,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 				fnAction = function()
 					local szRoot = X.GetAbsolutePath(DS_ROOT)
 					X.OpenFolder(szRoot)
-					UI.OpenTextEditor(szRoot)
+					X.UI.OpenTextEditor(szRoot)
 				end,
 			})
 			return menu

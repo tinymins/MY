@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 角色统计框架
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics'
@@ -179,7 +171,7 @@ function Framework.OnLButtonClick()
 			menu.nMiniWidth = nW
 			menu.x = nX
 			menu.y = nY + nH
-			UI.PopupMenu(menu)
+			X.UI.PopupMenu(menu)
 		end
 	end
 end
@@ -362,7 +354,7 @@ X.RegisterHotKey('MY_RoleStatistics', _L['Open/Close MY_RoleStatistics'], D.Togg
 --------------------------------------------------------------------------
 local PS = { nPriority = 5 }
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local nPaddingX, nPaddingY = 25, 25
 	local nX, nY = nPaddingX, nPaddingY
 	local nW, nH = ui:Size()

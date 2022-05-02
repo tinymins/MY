@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 信息条显示
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_InfoTip'
@@ -134,18 +126,18 @@ local INFO_TIP_LIST = {
 		GetFormatString = function(data)
 			local s = 1
 			if data.cache.nTimeMachineLFC ~= GetLogicFrameCount() then
-				local tm = data.cache.tTimeMachineRec[ENVIRONMENT.GAME_FPS] or {}
+				local tm = data.cache.tTimeMachineRec[X.ENVIRONMENT.GAME_FPS] or {}
 				tm.frame = GetLogicFrameCount()
 				tm.tick  = GetTickCount()
-				for i = ENVIRONMENT.GAME_FPS, 1, -1 do
+				for i = X.ENVIRONMENT.GAME_FPS, 1, -1 do
 					data.cache.tTimeMachineRec[i] = data.cache.tTimeMachineRec[i - 1]
 				end
 				data.cache.tTimeMachineRec[1] = tm
 				data.cache.nTimeMachineLFC = GetLogicFrameCount()
 			end
-			local tm = data.cache.tTimeMachineRec[ENVIRONMENT.GAME_FPS]
+			local tm = data.cache.tTimeMachineRec[X.ENVIRONMENT.GAME_FPS]
 			if tm then
-				s = 1000 * (GetLogicFrameCount() - tm.frame) / ENVIRONMENT.GAME_FPS / (GetTickCount() - tm.tick)
+				s = 1000 * (GetLogicFrameCount() - tm.frame) / X.ENVIRONMENT.GAME_FPS / (GetTickCount() - tm.tick)
 			end
 			return string.format(data.cache.formatString, s)
 		end,
@@ -490,19 +482,19 @@ local INFO_TIP_LIST = {
 			local s = 0
 			local me = GetClientPlayer()
 			if me and data.cache.nSpeedometerLFC ~= GetLogicFrameCount() then
-				local sm = data.cache.tSpeedometerRec[ENVIRONMENT.GAME_FPS] or {}
+				local sm = data.cache.tSpeedometerRec[X.ENVIRONMENT.GAME_FPS] or {}
 				sm.framecount = GetLogicFrameCount()
 				sm.x, sm.y, sm.z = me.nX, me.nY, me.nZ
-				for i = ENVIRONMENT.GAME_FPS, 1, -1 do
+				for i = X.ENVIRONMENT.GAME_FPS, 1, -1 do
 					data.cache.tSpeedometerRec[i] = data.cache.tSpeedometerRec[i - 1]
 				end
 				data.cache.tSpeedometerRec[1] = sm
 				data.cache.nSpeedometerLFC = GetLogicFrameCount()
 			end
-			local sm = data.cache.tSpeedometerRec[ENVIRONMENT.GAME_FPS]
+			local sm = data.cache.tSpeedometerRec[X.ENVIRONMENT.GAME_FPS]
 			if sm and me then
 				s = math.sqrt(math.pow(me.nX - sm.x, 2) + math.pow(me.nY - sm.y, 2) + math.pow((me.nZ - sm.z) / 8, 2)) / 64
-					/ (GetLogicFrameCount() - sm.framecount) * ENVIRONMENT.GAME_FPS
+					/ (GetLogicFrameCount() - sm.framecount) * X.ENVIRONMENT.GAME_FPS
 			end
 			return string.format(data.cache.formatString, s)
 		end
@@ -520,20 +512,20 @@ end)
 -- 显示信息条
 function D.ReinitUI()
 	for _, data in ipairs(INFO_TIP_LIST) do
-		local ui = UI('Normal/MY_InfoTip_' .. data.id)
+		local ui = X.UI('Normal/MY_InfoTip_' .. data.id)
 		if data.config.bEnable then
 			if ui:Count() == 0 then
-				ui = UI.CreateFrame('MY_InfoTip_' .. data.id, { empty = true })
+				ui = X.UI.CreateFrame('MY_InfoTip_' .. data.id, { empty = true })
 					:Size(220,30)
 					:Event(
 						'UI_SCALED',
 						function()
-							UI(this):Anchor(data.config.anchor)
+							X.UI(this):Anchor(data.config.anchor)
 						end)
 					:CustomLayout(data.i18n.name)
 					:CustomLayout(function(bEnter, anchor)
 						if bEnter then
-							UI(this):BringToTop()
+							X.UI(this):BringToTop()
 						else
 							data.config.anchor = anchor
 						end
@@ -577,7 +569,7 @@ end)
 local PS = {}
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	local x, y = 45, 40
 
@@ -647,7 +639,7 @@ function PS.OnPanelActive(wnd)
 			x = x, y = y, w = 50,
 			text = _L['Font'],
 			onClick = function()
-				UI.OpenFontPicker(function(f)
+				X.UI.OpenFontPicker(function(f)
 					data.config.nFont = f
 					D.ReinitUI()
 				end)
@@ -661,8 +653,8 @@ function PS.OnPanelActive(wnd)
 			color = data.config.rgb or {255, 255, 255},
 			onClick = function()
 				local el = this
-				UI.OpenColorPicker(function(r, g, b)
-					UI(el):Color(r, g, b)
+				X.UI.OpenColorPicker(function(r, g, b)
+					X.UI(el):Color(r, g, b)
 					data.config.rgb = { r, g, b }
 					D.ReinitUI()
 				end)

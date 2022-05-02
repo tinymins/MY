@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 装备统计
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_EquipStat'
@@ -30,7 +22,7 @@ CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
 local DB = X.SQLiteConnect(_L['MY_RoleStatistics_EquipStat'], {'userdata/role_statistics/equip_stat.v3.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return X.Sysmsg(_L['MY_RoleStatistics_EquipStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return X.Sysmsg(_L['MY_RoleStatistics_EquipStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
 local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_EquipStat.ini'
 
@@ -91,84 +83,84 @@ local DB_OwnerInfoD = DB:Prepare('DELETE FROM OwnerInfo WHERE ownerkey = ?')
 
 local EQUIPMENT_ITEM_LIST = {
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.HELM or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.HELM,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.HELM or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.HELM,
 		box = 'Handle_Equip/Box_Helm',
 		durability = 'Handle_Equip/Text_Helm',
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.CHEST or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.CHEST,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.CHEST or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.CHEST,
 		box = 'Handle_Equip/Box_Chest',
 		durability = 'Handle_Equip/Text_Chest',
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.BANGLE or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.BANGLE,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.BANGLE or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.BANGLE,
 		box = 'Handle_Equip/Box_Bangle',
 		durability = 'Handle_Equip/Text_Bangle',
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.WAIST or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.WAIST,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.WAIST or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.WAIST,
 		box = 'Handle_Equip/Box_Waist',
 		durability = 'Handle_Equip/Text_Waist',
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.PANTS or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.PANTS,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.PANTS or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.PANTS,
 		box = 'Handle_Equip/Box_Pants',
 		durability = 'Handle_Equip/Text_Pants',
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.BOOTS or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.BOOTS,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.BOOTS or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.BOOTS,
 		box = 'Handle_Equip/Box_Boots',
 		durability = 'Handle_Equip/Text_Boots',
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.AMULET or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.AMULET,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.AMULET or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.AMULET,
 		box = 'Handle_Equip/Box_Amulet'
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.PENDANT or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.PENDANT,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.PENDANT or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.PENDANT,
 		box = 'Handle_Equip/Box_Pendant'
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.RING or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.LEFT_RING,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.RING or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.LEFT_RING,
 		box = 'Handle_Equip/Box_LeftRing'
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.RING or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.RIGHT_RING,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.RING or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.RIGHT_RING,
 		box = 'Handle_Equip/Box_RightRing'
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.MELEE_WEAPON,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.MELEE_WEAPON,
 		box = 'Handle_Weapon/Box_LightSword',
 		durability = 'Handle_Weapon/Text_LightSword',
 	},
 	{
 		label = g_tStrings.WeapenDetail[WEAPON_DETAIL.BIG_SWORD or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.BIG_SWORD,
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.BIG_SWORD,
 		box = 'Handle_Weapon/Box_HeavySword',
 		durability = 'Handle_Weapon/Text_HeavySword',
 		background = 'Handle_Weapon/Image_HeavySword',
-		force = CONSTANT.FORCE_TYPE.CANG_JIAN or -1,
+		force = X.CONSTANT.FORCE_TYPE.CANG_JIAN or -1,
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.RANGE_WEAPON,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.RANGE_WEAPON,
 		box = 'Handle_Weapon/Box_RangeWeapon',
 		durability = 'Handle_Weapon/Text_RangeWeapon',
 	},
 	{
-		label = g_tStrings.tEquipTypeNameTable[CONSTANT.EQUIPMENT_SUB.ARROW or 'NULL'],
-		pos = CONSTANT.EQUIPMENT_INVENTORY.ARROW,
+		label = g_tStrings.tEquipTypeNameTable[X.CONSTANT.EQUIPMENT_SUB.ARROW or 'NULL'],
+		pos = X.CONSTANT.EQUIPMENT_INVENTORY.ARROW,
 		box = 'Handle_Weapon/Box_AmmoPouch'
 	},
 }
@@ -375,10 +367,10 @@ function D.FlushDB()
 
 	-- 背包
 	local tSuitIndexToBoxType = {}
-	for suitindex, boxtype in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
+	for suitindex, boxtype in ipairs(X.CONSTANT.INVENTORY_EQUIP_LIST) do
 		tSuitIndexToBoxType[me.GetEquipIDArray(suitindex - 1) + 1] = boxtype
 	end
-	for suitindex, _ in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
+	for suitindex, _ in ipairs(X.CONSTANT.INVENTORY_EQUIP_LIST) do
 		local boxtype = tSuitIndexToBoxType[suitindex]
 		if boxtype then
 			local count = me.GetBoxSize(boxtype)
@@ -433,11 +425,11 @@ function D.FlushDB()
 		lshoulder = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwLShoulderItemIndex) },
 		rshoulder = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwRShoulderItemIndex) },
 		backcloak = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwBackCloakItemIndex) },
-		bag = { ITEM_TABLE_TYPE.CUST_TRINKET, ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.dwBagItemIndex or 0 },
-		glasses = { ITEM_TABLE_TYPE.CUST_TRINKET, ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.dwGlassesItemIndex or 0 },
-		lglove = { ITEM_TABLE_TYPE.CUST_TRINKET, ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.LGLOVE) or 0 },
-		rglove = { ITEM_TABLE_TYPE.CUST_TRINKET, ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.RGLOVE) or 0 },
-		penpet = { ITEM_TABLE_TYPE.CUST_TRINKET, ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetEquippedPendentPet() or 0 },
+		bag = { ITEM_TABLE_TYPE.CUST_TRINKET, X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.dwBagItemIndex or 0 },
+		glasses = { ITEM_TABLE_TYPE.CUST_TRINKET, X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.dwGlassesItemIndex or 0 },
+		lglove = { ITEM_TABLE_TYPE.CUST_TRINKET, X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.LGLOVE) or 0 },
+		rglove = { ITEM_TABLE_TYPE.CUST_TRINKET, X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.RGLOVE) or 0 },
+		penpet = { ITEM_TABLE_TYPE.CUST_TRINKET, X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetEquippedPendentPet() or 0 },
 	}))
 
 	DB_OwnerInfoW:ClearBindings()
@@ -497,7 +489,7 @@ function D.UpdateNames(page)
 		end
 		rec.ownerextra = X.DecodeJSON(rec.extra or '') or {}
 	end
-	if result[1] and not lodash.some(result, function(r) return r.ownerkey == D.szCurrentOwnerKey end) then
+	if result[1] and not X.lodash.some(result, function(r) return r.ownerkey == D.szCurrentOwnerKey end) then
 		D.szCurrentOwnerKey = result[1].ownerkey
 	end
 	for _, rec in ipairs(result) do
@@ -573,7 +565,7 @@ function D.UpdateItems(page)
 	local handle = page:Lookup('Wnd_Total/Wnd_ItemPage', '')
 	-- local nTitleLen = 0
 	-- for _, info in ipairs(EQUIPMENT_ITEM_LIST) do
-	-- 	nTitleLen = math.max(wstring.len(info.label or '') + 1, nTitleLen)
+	-- 	nTitleLen = math.max(X.StringLenW(info.label or '') + 1, nTitleLen)
 	-- end
 	for _, info in ipairs(EQUIPMENT_ITEM_LIST) do
 		local visible = info.label and (not info.force or info.force == ownerforce) and true or false
@@ -584,7 +576,7 @@ function D.UpdateItems(page)
 		if visible then
 			local szPos = info.label or ''
 			szPos = szPos .. g_tStrings.STR_COLON
-			-- szPos = szPos .. string.rep(g_tStrings.STR_ONE_CHINESE_SPACE, nTitleLen - wstring.len(szPos))
+			-- szPos = szPos .. string.rep(g_tStrings.STR_ONE_CHINESE_SPACE, nTitleLen - X.StringLenW(szPos))
 			table.insert(aXml, GetFormatText(szPos, 162))
 		end
 		if box then
@@ -601,7 +593,7 @@ function D.UpdateItems(page)
 			if KItemInfo then
 				local bMaxStrength = KItemInfo.nMaxStrengthLevel > 0 and rec.strength == KItemInfo.nMaxStrengthLevel
 				if box then
-					UI.UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, rec.stacknum, rec.tabsubindex)
+					X.UI.UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, rec.stacknum, rec.tabsubindex)
 					UpdateItemBoxExtend(box, KItemInfo.nGenre, KItemInfo.nQuality, bMaxStrength)
 					box.OnItemMouseEnter = nil
 					box.OnItemRefreshTip = nil
@@ -640,7 +632,7 @@ function D.UpdateItems(page)
 					local szText = Table_GetCommonEnchantDesc(rec.permanent_enchant)
 					if szText then
 						szText = string.gsub(szText, 'font=%d+', 'font=113')
-						table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+						table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 						table.insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 113))
 						table.insert(aXml, GetFormatImage(szImagePath, nFrame, 20, 20))
 						table.insert(aXml, GetFormatText(' ', 113))
@@ -652,7 +644,7 @@ function D.UpdateItems(page)
 								szText = D.FormatEnchantAttribText(v)
 								if szText ~= '' then
 									szText = string.gsub(szText, 'font=%d+', 'font=113')
-									table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+									table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 									table.insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 113))
 									table.insert(aXml, GetFormatImage(szImagePath, nFrame, 20, 20))
 									table.insert(aXml, GetFormatText(' ', 113))
@@ -664,7 +656,7 @@ function D.UpdateItems(page)
 				end
 				-- 五彩石
 				if KItemInfo.nSub == EQUIPMENT_SUB.MELEE_WEAPON then
-					table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+					table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 					-- table.insert(aXml, GetFormatText(string.rep(g_tStrings.STR_ONE_CHINESE_SPACE, nTitleLen) .. ' ', 162))
 					-- table.insert(aXml, GetFormatText(g_tStrings.STR_ONE_CHINESE_SPACE, 162))
 					table.insert(aXml, GetFormatText(g_tStrings.STR_COLOR_DIAMOND .. g_tStrings.STR_COLON, 162))
@@ -695,7 +687,7 @@ function D.UpdateItems(page)
 			end
 		end
 		if visible then
-			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 		end
 	end
 
@@ -725,7 +717,7 @@ function D.UpdateItems(page)
 	txtName:SetText(_L('%s (Lv%d)', ownername, ownerlevel))
 	txtName:SetFontColor(X.GetForceColor(ownerforce, 'foreground'))
 	local txtRoleInfo = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_RoleInfo')
-	txtRoleInfo:SetText(_L('%s * %s', CONSTANT.FORCE_TYPE_LABEL[ownerforce] or '', CONSTANT.ROLE_TYPE_LABEL[ownerrole] or ''))
+	txtRoleInfo:SetText(_L('%s * %s', X.CONSTANT.FORCE_TYPE_LABEL[ownerforce] or '', X.CONSTANT.ROLE_TYPE_LABEL[ownerrole] or ''))
 	local txtEquipScore = page:Lookup('Wnd_Total/Wnd_ItemPage', 'Text_EquipScore')
 	-- txtEquipScore:SetVisible(ownersuitindex == D.dwCurrentSuitIndex)
 	txtEquipScore:SetText(_L('Equip score: %s', ownerscore[D.dwCurrentSuitIndex] or _L['Unknown']))
@@ -743,7 +735,7 @@ function D.OnInitPage()
 
 	local container = wnd:Lookup('Wnd_ItemPage/WndScroll_PageNum/WndContainer_PageNum')
 	container:Clear()
-	for nIndex, _ in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
+	for nIndex, _ in ipairs(X.CONSTANT.INVENTORY_EQUIP_LIST) do
 		local wndPage = container:AppendContentFromIni(SZ_INI, 'Wnd_PageNum')
 		wndPage:Lookup('CheckBox_PageNum', 'Text_PageNum'):SetText(nIndex)
 		wndPage.nSuitIndex = nIndex
@@ -907,7 +899,7 @@ X.RegisterFlush('MY_RoleStatistics_EquipStat', function()
 end)
 
 X.RegisterExit('MY_RoleStatistics_EquipStat', function()
-	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		D.UpdateSaveDB()
 		D.FlushDB()
 	end

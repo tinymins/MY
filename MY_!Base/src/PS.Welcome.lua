@@ -49,7 +49,7 @@ function PS.OnPanelActive(wnd)
 		checked = MY_Serendipity.bEnable,
 		onCheck = function(bChecked)
 			if bChecked then
-				local ui = UI(this)
+				local ui = X.UI(this)
 				X.Confirm(_L['Check this will monitor system message for serendipity and share it, are you sure?'], function()
 					MY_Serendipity.bEnable = bChecked
 					ui:Check(true, WNDEVENT_FIRETYPE.PREVENT)
@@ -61,7 +61,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		tip = {
 			render = _L['Monitor serendipity and show share notify.'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 	}):AutoWidth():Width()
 	local xS0 = x + ui:Append('WndCheckBox', {
@@ -94,7 +94,7 @@ function PS.OnPanelActive(wnd)
 		placeholder = _L['Realname, leave blank for anonymous.'],
 		tip = {
 			render = _L['Realname, leave blank for anonymous.'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		limit = 6,
 		text = X.LoadLUAData({'config/realname.jx3dat', X.PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
@@ -135,12 +135,12 @@ function PS.OnPanelActive(wnd)
 		onClick = function()
 			local szNameU = AnsiToUTF8(X.GetClientInfo().szName)
 			local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
-			UI.OpenBrowser(
+			X.UI.OpenBrowser(
 				'https://j3cx.com/serendipity/?'
 					.. X.EncodeQuerystring(X.SignPostData(X.ConvertToUTF8(
 						{
-							l = ENVIRONMENT.GAME_LANG,
-							L = ENVIRONMENT.GAME_EDITION,
+							l = X.ENVIRONMENT.GAME_LANG,
+							L = X.ENVIRONMENT.GAME_EDITION,
 							S = X.GetRealServer(1),
 							s = X.GetRealServer(2),
 							n = X.GetClientInfo().szName,

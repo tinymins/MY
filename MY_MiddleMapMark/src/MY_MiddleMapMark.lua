@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 中地图标记 记录所有NPC和Doodad位置 提供搜索
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_MiddleMapMark'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_MiddleMapMark'
@@ -30,7 +22,7 @@ X.CreateDataRoot(X.PATH_TYPE.GLOBAL)
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
 local DB = X.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v5.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return X.Sysmsg(_L['MY_MiddleMapMark'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return X.Sysmsg(_L['MY_MiddleMapMark'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS NpcInfo (
@@ -303,7 +295,7 @@ end
 local l_npc = {}
 local l_doodad = {}
 local l_tempMap = false
-local MAX_RENDER_INTERVAL = ENVIRONMENT.GAME_FPS * 5
+local MAX_RENDER_INTERVAL = X.ENVIRONMENT.GAME_FPS * 5
 local function FlushDB()
 	if X.IsEmpty(l_npc) and X.IsEmpty(l_doodad) then
 		return
@@ -501,7 +493,7 @@ function D.SearchNpc(szText, dwMapID)
 	end
 	for _, info in pairs(l_npc) do
 		if (not dwMapID or info.mapid == dwMapID)
-		and (wstring.find(info.name, szText) or wstring.find(info.title, szText)) then
+		and (X.StringFindW(info.name, szText) or X.StringFindW(info.title, szText)) then
 			table.insert(aInfos, 1, info)
 		end
 	end
@@ -531,7 +523,7 @@ function D.SearchDoodad(szText, dwMapID)
 	end
 	for _, info in pairs(l_doodad) do
 		if (not dwMapID or info.mapid == dwMapID)
-		and (wstring.find(info.name, szText)) then
+		and (X.StringFindW(info.name, szText)) then
 			table.insert(aInfos, 1, info)
 		end
 	end
@@ -564,11 +556,11 @@ function D.OnMouseEnter()
 		local w, h = this:GetSize()
 		OutputTip(
 			GetFormatText(_L['MY middle map mark'], nil, 255, 255, 0)
-				.. CONSTANT.XML_LINE_BREAKER
+				.. X.CONSTANT.XML_LINE_BREAKER
 				.. GetFormatText(_L['Type to search, use comma to split.'], nil, 255, 255, 192),
 			w,
 			{x - 10, y, w, h},
-			UI.TIP_POSITION.TOP_BOTTOM
+			X.UI.TIP_POSITION.TOP_BOTTOM
 		)
 	end
 end
@@ -771,7 +763,7 @@ local PS = { nPriority = 4.1 }
 function PS.OnPanelActive(wnd)
 	D.Migration()
 
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local x, y = 0, 0
 	local w, h = ui:Size()
 
@@ -866,7 +858,7 @@ function PS.OnPanelActive(wnd)
 						return false
 					end
 					OpenMiddleMap(data.dwMapID, 0)
-					UI(D.GetEditSearch()):Text(X.EscapeString(data.szName))
+					X.UI(D.GetEditSearch()):Text(X.EscapeString(data.szName))
 					Station.SetFocusWindow('Topmost1/MiddleMap')
 					if not selected then -- avoid unselect
 						return false
@@ -880,7 +872,7 @@ function PS.OnPanelActive(wnd)
 end
 
 function PS.OnPanelResize(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local x, y = ui:Pos()
 	local w, h = ui:Size()
 

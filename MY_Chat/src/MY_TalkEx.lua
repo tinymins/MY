@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 喊话辅助
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TalkEx'
@@ -58,7 +50,7 @@ local O = X.CreateUserSettingsModule('MY_TalkEx', _L['Chat'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
 		xSchema = X.Schema.Number,
-		xDefaultValue = CONSTANT.FORCE_TYPE.CHUN_YANG,
+		xDefaultValue = X.CONSTANT.FORCE_TYPE.CHUN_YANG,
 	},
 	szTrickTextBegin = {
 		ePathType = X.PATH_TYPE.ROLE,
@@ -114,7 +106,7 @@ local TRICK_CHANNEL_LIST = {
 
 function D.Talk()
 	if #O.szTalkText == 0 then
-		return X.Systopmsg(_L['Please input something.'], CONSTANT.MSG_THEME.ERROR)
+		return X.Systopmsg(_L['Please input something.'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	-- 调试工具
 	if X.ProcessCommand and string.sub(O.szTalkText, 1, 8) == '/script ' then
@@ -127,7 +119,7 @@ function D.Talk()
 	end
 	D.dwTalkTick = GetTime()
 	-- 近聊不放在第一个会导致发不出去
-	if lodash.includes(O.aTalkChannel, PLAYER_TALK_CHANNEL.NEARBY) then
+	if X.lodash.includes(O.aTalkChannel, PLAYER_TALK_CHANNEL.NEARBY) then
 		X.SendChat(PLAYER_TALK_CHANNEL.NEARBY, O.szTalkText)
 	end
 	-- 遍历发送队列
@@ -141,7 +133,7 @@ X.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], D.Talk, nil)
 
 function D.Trick()
 	if #O.szTrickText == 0 then
-		return X.Sysmsg(_L['Please input something.'], CONSTANT.MSG_THEME.ERROR)
+		return X.Sysmsg(_L['Please input something.'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	local t = {}
 	local me = GetClientPlayer()
@@ -173,7 +165,7 @@ function D.Trick()
 	end
 	-- none target
 	if #t == 0 then
-		return X.Systopmsg(_L['No trick target found.'], CONSTANT.MSG_THEME.ERROR)
+		return X.Systopmsg(_L['No trick target found.'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	-- start tricking
 	if #O.szTrickTextBegin > 0 then
@@ -194,7 +186,7 @@ end
 
 local PS = {}
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	local nPaddingX, nPaddingY, LH = 25, 20, 30
 	local nX, nY, nLFY = nPaddingX, nPaddingY, nPaddingY
@@ -219,7 +211,7 @@ function PS.OnPanelActive(wnd)
 			x = w - 110, y = nY + (i - 1) * 120 / nChannelCount,
 			text = g_tStrings.tChannelName[p.szID],
 			color = GetMsgFontColor(p.szID, true),
-			checked = lodash.includes(O.aTalkChannel, p.nChannel),
+			checked = X.lodash.includes(O.aTalkChannel, p.nChannel),
 			onCheck = function(bCheck)
 				for i, v in X.ipairs_r(O.aTalkChannel) do
 					if v == p.nChannel then
@@ -282,8 +274,8 @@ function PS.OnPanelActive(wnd)
 			X.Ajax({
 				url = 'https://pull.j3cx.com/joke/random',
 				data = {
-					l = ENVIRONMENT.GAME_LANG,
-					L = ENVIRONMENT.GAME_EDITION,
+					l = X.ENVIRONMENT.GAME_LANG,
+					L = X.ENVIRONMENT.GAME_EDITION,
 					q = D.szJokeSearch or '',
 				},
 				signature = X.SECRET['J3CX::JOKE_RANDOM'],
@@ -297,7 +289,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		tip = {
 			render = _L['Click to search jokes.'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	}):Width() + 5
 	-- 骚话复制按钮
@@ -312,7 +304,7 @@ function PS.OnPanelActive(wnd)
 		autoEnable = function() return not X.IsEmpty(D.szJokeText) end,
 		tip = {
 			render = _L['Click to copy joke to chat panel.'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	}):Pos('BOTTOMRIGHT') + 5
 	-- 骚话分享按钮
@@ -325,8 +317,8 @@ function PS.OnPanelActive(wnd)
 				X.Ajax({
 					url = 'https://push.j3cx.com/joke',
 					data = {
-						l = ENVIRONMENT.GAME_LANG,
-						L = ENVIRONMENT.GAME_EDITION,
+						l = X.ENVIRONMENT.GAME_LANG,
+						L = X.ENVIRONMENT.GAME_EDITION,
 						content = D.szJokeText or '',
 						server = X.GetRealServer(2),
 						role = bAnonymous and '' or X.GetUserRoleName(),
@@ -339,7 +331,7 @@ function PS.OnPanelActive(wnd)
 						if X.IsTable(res) then
 							X.Alert(X.ReplaceSensitiveWord(res.msg))
 						else
-							X.Systopmsg(_L['Share error: server error.'], CONSTANT.MSG_THEME.ERROR)
+							X.Systopmsg(_L['Share error: server error.'], X.CONSTANT.MSG_THEME.ERROR)
 						end
 					end,
 				})
@@ -359,7 +351,7 @@ function PS.OnPanelActive(wnd)
 		autoEnable = function() return not X.IsEmpty(D.szJokeText) end,
 		tip = {
 			render = _L['Click to share your joke to remote.'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	}):Pos('BOTTOMRIGHT') + 5
 	-- 骚话输入框
@@ -391,9 +383,9 @@ function PS.OnPanelActive(wnd)
 	-- 调侃对象范围过滤器
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 100, h = 25,
-		text = X.Get(lodash.find(TRICK_FILTER_LIST, function(p) return p.szKey == O.szTrickFilter end), 'szLabel', '???'),
+		text = X.Get(X.lodash.find(TRICK_FILTER_LIST, function(p) return p.szKey == O.szTrickFilter end), 'szLabel', '???'),
 		menu = function()
-			local ui = UI(this)
+			local ui = X.UI(this)
 			local t = {}
 			for _, p in ipairs(TRICK_FILTER_LIST) do
 				table.insert(t, {
@@ -401,7 +393,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						ui:Text(p.szLabel)
 						O.szTrickFilter = p.szKey
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 				})
 			end
@@ -411,9 +403,9 @@ function PS.OnPanelActive(wnd)
 	-- 调侃门派过滤器
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 80, h = 25,
-		text = X.Get(lodash.find(FORCE_LIST, function(p) return p.dwForceID == O.nTrickForce end), 'szLabel', '???'),
+		text = X.Get(X.lodash.find(FORCE_LIST, function(p) return p.dwForceID == O.nTrickForce end), 'szLabel', '???'),
 		menu = function()
-			local ui = UI(this)
+			local ui = X.UI(this)
 			local t = {}
 			for _, p in ipairs(FORCE_LIST) do
 				table.insert(t, {
@@ -421,7 +413,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						ui:Text(p.szLabel)
 						O.nTrickForce = p.dwForceID
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 				})
 			end
@@ -461,10 +453,10 @@ function PS.OnPanelActive(wnd)
 	-- 调侃发送频道
 	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 100, h = 25,
-		text = X.Get(lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'szName', '???'),
-		color = X.Get(lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'tCol'),
+		text = X.Get(X.lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'szName', '???'),
+		color = X.Get(X.lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'tCol'),
 		menu = function()
-			local ui = UI(this)
+			local ui = X.UI(this)
 			local t = {}
 			for _, p in ipairs(TRICK_CHANNEL_LIST) do
 				table.insert(t, {
@@ -474,7 +466,7 @@ function PS.OnPanelActive(wnd)
 						O.nTrickChannel = p.nChannel
 						ui:Text(p.szName)
 						ui:Color(p.tCol)
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 				})
 			end

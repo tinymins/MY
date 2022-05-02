@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队面板格子颜色
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Cataclysm'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
@@ -29,7 +21,7 @@ local CFG, PS = MY_Cataclysm.CFG, { nPriority = 3 }
 local CTM_BG_COLOR_MODE = MY_Cataclysm.BG_COLOR_MODE
 
 function PS.OnPanelActive(frame)
-	local ui = UI(frame)
+	local ui = X.UI(frame)
 	local nPaddingX, nPaddingY = 20, 20
 	local x, y = nPaddingX, nPaddingY
 
@@ -160,13 +152,13 @@ function PS.OnPanelActive(frame)
 			w = 22, h = 22, x = x, y = y + 3, color = tDistanceCol[1],
 			onClick = function()
 				local this = this
-				UI.OpenColorPicker(function(r, g, b)
+				X.UI.OpenColorPicker(function(r, g, b)
 					tDistanceCol[1] = { r, g, b }
 					if MY_CataclysmMain.GetFrame() then
 						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
 					CFG.tDistanceCol = tDistanceCol
-					UI(this):Color(r, g, b)
+					X.UI(this):Color(r, g, b)
 				end)
 			end,
 		}):Width() + 5
@@ -188,13 +180,13 @@ function PS.OnPanelActive(frame)
 					w = 22, h = 22, x = x, y = y + 3, color = tDistanceCol[i],
 					onClick = function()
 						local this = this
-						UI.OpenColorPicker(function(r, g, b)
+						X.UI.OpenColorPicker(function(r, g, b)
 							tDistanceCol[i] = { r, g, b }
 							if MY_CataclysmMain.GetFrame() then
 								MY_CataclysmParty:CallDrawHPMP(true, true)
 							end
 							CFG.tDistanceCol = tDistanceCol
-							UI(this):Color(r, g, b)
+							X.UI(this):Color(r, g, b)
 						end)
 					end,
 				}):Width() + 5
@@ -203,7 +195,7 @@ function PS.OnPanelActive(frame)
 					x = x, y = y + 3, h = 22,
 					range = {0, 255},
 					value = tDistanceAlpha[i],
-					trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+					trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 					onChange = function(val)
 						tDistanceAlpha[i] = val
 						if MY_CataclysmMain.GetFrame() then
@@ -234,13 +226,13 @@ function PS.OnPanelActive(frame)
 			color = tOtherCol[3],
 			onClick = function()
 				local this = this
-				UI.OpenColorPicker(function(r, g, b)
+				X.UI.OpenColorPicker(function(r, g, b)
 					tOtherCol[3] = { r, g, b }
 					if MY_CataclysmMain.GetFrame() then
 						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
 					CFG.tOtherCol = tOtherCol
-					UI(this):Color(r, g, b)
+					X.UI(this):Color(r, g, b)
 				end)
 			end,
 			textFormatter = function(val) return _L('Alpha: %d.', val) end,
@@ -251,7 +243,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = tOtherAlpha[3],
-			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 			onChange = function(val)
 				tOtherAlpha[3] = val
 				if MY_CataclysmMain.GetFrame() then
@@ -273,13 +265,13 @@ function PS.OnPanelActive(frame)
 			w = 22, h = 22, x = x, y = y + 3, color = tOtherCol[2],
 			onClick = function()
 				local this = this
-				UI.OpenColorPicker(function(r, g, b)
+				X.UI.OpenColorPicker(function(r, g, b)
 					tOtherCol[2] = { r, g, b }
 					if MY_CataclysmMain.GetFrame() then
 						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
 					CFG.tOtherCol = tOtherCol
-					UI(this):Color(r, g, b)
+					X.UI(this):Color(r, g, b)
 				end)
 			end,
 		}):Width() + 5
@@ -289,7 +281,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = tOtherAlpha[2],
-			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 			onChange = function(val)
 				tOtherAlpha[2] = val
 				if MY_CataclysmMain.GetFrame() then
@@ -310,13 +302,13 @@ function PS.OnPanelActive(frame)
 			w = 22, h = 22, x = 280, y = y + 3, color = tManaColor,
 			onClick = function()
 				local this = this
-				UI.OpenColorPicker(function(r, g, b)
+				X.UI.OpenColorPicker(function(r, g, b)
 					tManaColor = { r, g, b }
 					if MY_CataclysmMain.GetFrame() then
 						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
 					CFG.tManaColor = tManaColor
-					UI(this):Color(r, g, b)
+					X.UI(this):Color(r, g, b)
 				end)
 			end,
 		}):Height() + 5

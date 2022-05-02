@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 扁平血条设置
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_LifeBar'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar'
@@ -79,7 +71,7 @@ local function LoadUI(ui)
 	ui:Children('#WndCheckBox_TargetOnTop'):Check(Config.bTargetOnTop)
 end
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local nW, nH = ui:Size()
 	local nPaddingX, nPaddingY = 10, 10
 	local nX, nY = nPaddingX, nPaddingY
@@ -131,7 +123,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		tip = {
 			render = _L['Only enable in checked map types'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 		autoEnable = function() return D.IsEnabled() end,
 	}):AutoWidth():Width() + 5
@@ -144,7 +136,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		tip = {
 			render = _L['Only enable in checked map types'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 		autoEnable = function() return D.IsEnabled() end,
 	}):AutoWidth():Width() + 5
@@ -157,7 +149,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		tip = {
 			render = _L['Only enable in checked map types'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 		autoEnable = function() return D.IsEnabled() end,
 	}):AutoWidth():Width() + 5
@@ -175,7 +167,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarWidth',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 5, 150 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 5, 150 },
 		text = function(value) return _L('Lifebar width: %s px.', value) end, -- 血条宽度
 		value = Config.nLifeWidth,
 		onChange = function(value)
@@ -187,7 +179,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarHeight',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 1, 150 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 1, 150 },
 		text = function(value) return _L('Lifebar height: %s px.', value) end, -- 血条高度
 		value = Config.nLifeHeight,
 		onChange = function(value)
@@ -199,7 +191,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarOffsetX',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
 		text = function(value) return _L('Lifebar offset-x: %d px.', value) end, -- 血条水平偏移
 		value = Config.nLifeOffsetX,
 		onChange = function(value)
@@ -211,7 +203,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarOffsetY',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('Lifebar offset-y: %d px.', value) end, -- 血条竖直偏移
 		value = Config.nLifeOffsetY,
 		onChange = function(value)
@@ -223,7 +215,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarPadding',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 10 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 10 },
 		text = function(value) return _L('Lifebar padding: %d px.', value) end, -- 血条边框宽度
 		value = Config.nLifePadding,
 		onChange = function(value)
@@ -235,7 +227,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifeBarBorder',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 10 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 10 },
 		text = function(value) return _L('Lifebar border: %d px.', value) end, -- 血条边框宽度
 		value = Config.nLifeBorder,
 		onChange = function(value)
@@ -247,7 +239,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifePerOffsetX',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
 		text = function(value) return _L('Life percentage offset-x: %d px.', value) end, -- 血量百分比水平偏移
 		value = Config.nLifePerOffsetX,
 		onChange = function(value)
@@ -259,7 +251,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_LifePerOffsetY',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('Life percentage offset-y: %d px.', value) end, -- 血量百分比竖直偏移
 		value = Config.nLifePerOffsetY,
 		onChange = function(value)
@@ -271,7 +263,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_TextOffsetY',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('Text offset-y: %d px.', value) end, -- 第一行字高度
 		value = Config.nTextOffsetY,
 		onChange = function(value)
@@ -283,7 +275,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_TextLineHeight',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('Text line height: %d px.', value) end, -- 字行高度
 		value = Config.nTextLineHeight,
 		onChange = function(value)
@@ -295,7 +287,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_TextScale',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 200 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 200 },
 		text = function(value) return _L('Text scale: %.1f%%.', value / 40 * 100) end, -- 字缩放
 		value = Config.fTextScale * 40,
 		onChange = function(value)
@@ -307,7 +299,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_TextSpacing',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
 		text = function(value) return _L('Text spacing: %.1f.', value / 10) end, -- 字间距
 		value = Config.fTextSpacing * 10,
 		onChange = function(value)
@@ -319,7 +311,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_TitleEffectScale',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 200 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 200 },
 		text = function(value) return _L('Title effect scale: %.2f%%.', value / 100) end, -- 头顶特效缩放
 		value = Config.fTitleEffectScale * 100,
 		onChange = function(value)
@@ -331,7 +323,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_TitleEffectOffsetY',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
 		text = function(value) return _L('Title effect offset y: %d px.', value) end, -- 头顶特效间距
 		value = Config.nTitleEffectOffsetY,
 		onChange = function(value)
@@ -343,7 +335,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_BalloonOffsetY',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
 		text = function(value) return _L('Balloon offset y: %d px.', value) end, -- 头顶特效间距
 		value = Config.nBalloonOffsetY,
 		onChange = function(value)
@@ -355,7 +347,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_Distance',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
 		text = function(value) return value == 0 and _L['Max Distance: Unlimited.'] or _L('Max Distance: %s foot.', value) end,
 		value = math.sqrt(Config.nDistance) / 64,
 		onChange = function(value)
@@ -367,7 +359,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_VerticalDistance',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
 		text = function(value) return value == 0 and _L['Max Vertical Distance: Unlimited.'] or _L('Max Vertical Distance: %s foot.', value) end,
 		value = Config.nVerticalDistance / 8 / 64,
 		onChange = function(value)
@@ -379,7 +371,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_Alpha',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_PERCENT, range = { 0, 255 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_PERCENT, range = { 0, 255 },
 		text = function(value) return _L('Alpha: %.0f%%.', value) end, -- 透明度
 		value = Config.nAlpha,
 		onChange = function(value)
@@ -391,7 +383,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndTrackbar', {
 		name = 'WndTrackbar_GlobalUIScale',
-		x = nX, y = nY, trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 1, 200 },
+		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 1, 200 },
 		text = function(value) return _L('Global UI scale: %.2f.', value / 100) end, -- 字缩放
 		value = Config.fGlobalUIScale * 100 * X.GetUIScale(),
 		onChange = function(value)
@@ -424,7 +416,7 @@ function PS.OnPanelActive(wnd)
 					opt.nMouseOverFrame = 70
 					opt.szLayer = 'ICON_RIGHT'
 					opt.fnClickIcon = function()
-						UI.OpenColorPicker(function(r, g, b)
+						X.UI.OpenColorPicker(function(r, g, b)
 							cfg.Player = { r, g, b }
 							opt.rgb = cfg.Player
 							Config.Color = tColor
@@ -484,7 +476,7 @@ function PS.OnPanelActive(wnd)
 					opt.nMouseOverFrame = 70
 					opt.szLayer = 'ICON_RIGHT'
 					opt.fnClickIcon = function()
-						UI.OpenColorPicker(function(r, g, b)
+						X.UI.OpenColorPicker(function(r, g, b)
 							cfg.Npc = { r, g, b }
 							opt.rgb = cfg.Npc
 							Config.Color = tColor
@@ -828,11 +820,11 @@ function PS.OnPanelActive(wnd)
 		b = Config.nLifeBorderB,
 		onClick = function()
 			local this = this
-			UI.OpenColorPicker(function(r, g, b)
+			X.UI.OpenColorPicker(function(r, g, b)
 				Config.nLifeBorderR = r
 				Config.nLifeBorderG = g
 				Config.nLifeBorderB = b
-				UI(this):Color(r, g, b)
+				X.UI(this):Color(r, g, b)
 			end)
 		end,
 		autoEnable = function() return D.IsEnabled() end,
@@ -899,7 +891,7 @@ function PS.OnPanelActive(wnd)
 			end,
 			tip = {
 				render = _L['This function has been shielded by official except in dungeon'],
-				position = UI.TIP_POSITION.TOP_BOTTOM,
+				position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			},
 			autoEnable = function() return D.IsEnabled() end,
 		}):AutoWidth():Width() + 5
@@ -914,7 +906,7 @@ function PS.OnPanelActive(wnd)
 			end,
 			tip = {
 				render = _L['This function has been shielded by official except in dungeon'],
-				position = UI.TIP_POSITION.TOP_BOTTOM,
+				position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			},
 			autoEnable = function() return D.IsEnabled() and Config.bShowSpecialNpc end,
 		})
@@ -1016,7 +1008,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = 65,
 		text = _L['Font'],
 		onClick = function()
-			UI.OpenFontPicker(function(nFont)
+			X.UI.OpenFontPicker(function(nFont)
 				Config.nFont = nFont
 			end)
 		end,

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 战斗统计 数据复盘
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
@@ -304,13 +296,13 @@ local COLUMN_LIST = {
 							rec[13]
 								and 'Remain time %s, cancellable.'
 								or 'Remain time %s, uncancellable.',
-							X.FormatDuration((rec[12] - rec[1]) / ENVIRONMENT.GAME_FPS, 'CHINESE')))
+							X.FormatDuration((rec[12] - rec[1]) / X.ENVIRONMENT.GAME_FPS, 'CHINESE')))
 					end
 					return GetFormatText(_L(
 						rec[13]
 							and 'Stacknum %d, remain time %s, cancellable.'
 							or 'Stacknum %d, remain time %s, uncancellable.',
-						rec[11], X.FormatDuration((rec[12] - rec[1]) / ENVIRONMENT.GAME_FPS, 'CHINESE')))
+						rec[11], X.FormatDuration((rec[12] - rec[1]) / X.ENVIRONMENT.GAME_FPS, 'CHINESE')))
 				end
 			end
 			if rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE then
@@ -401,16 +393,16 @@ function D.MatchRecSearch(data, rec, szSearch, nSearch, bEffectName, bCaster, bT
 		or (szSearch == _L['Warning'] and rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE)
 		or (szSearch == _L['Fight hint'] and rec[4] == EVERYTHING_TYPE.FIGHT_HINT)
 		or (rec[4] == EVERYTHING_TYPE.DEATH and (
-			wstring.find(rec[7] or '', szSearch)
-			or wstring.find(rec[8] or '', szSearch)
+			X.StringFindW(rec[7] or '', szSearch)
+			or X.StringFindW(rec[8] or '', szSearch)
 		))
 		or (rec[4] == EVERYTHING_TYPE.SKILL_EFFECT and (
 			nSearch == rec[8]
 			or (bCaster and nSearch == rec[5])
-			or (bCaster and wstring.find(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch))
+			or (bCaster and X.StringFindW(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch))
 			or (bTarget and nSearch == rec[6])
-			or (bTarget and wstring.find(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch))
-			or (bEffectName and wstring.find(MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or '', szSearch))
+			or (bTarget and X.StringFindW(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch))
+			or (bEffectName and X.StringFindW(MY_Recount_DS.GetEffectInfoAusID(data, rec[10]) or '', szSearch))
 			or (bEffectName and szSearch == MY_Recount.SKILL_RESULT_NAME[rec[11]])
 			or (szSearch == _L['Therapy'] and rec[12] > 0)
 			or (szSearch == _L['EffectTherapy'] and rec[13] > 0)
@@ -420,23 +412,23 @@ function D.MatchRecSearch(data, rec, szSearch, nSearch, bEffectName, bCaster, bT
 		or (rec[4] == EVERYTHING_TYPE.BUFF_UPDATE and (
 			nSearch == rec[7]
 			or (bCaster and nSearch == rec[5])
-			or (bCaster and wstring.find(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch))
+			or (bCaster and X.StringFindW(MY_Recount_DS.GetNameAusID(data, rec[5]) or '', szSearch))
 			or (bTarget and nSearch == rec[6])
-			or (bTarget and wstring.find(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch))
-			or (bEffectName and wstring.find(MY_Recount_DS.GetEffectInfoAusID(data, rec[9]) or '', szSearch))
+			or (bTarget and X.StringFindW(MY_Recount_DS.GetNameAusID(data, rec[6]) or '', szSearch))
+			or (bEffectName and X.StringFindW(MY_Recount_DS.GetEffectInfoAusID(data, rec[9]) or '', szSearch))
 		))
 		or (rec[4] == EVERYTHING_TYPE.ENTER_LEAVE_SCENE and (
 			nSearch == rec[7]
-			or wstring.find(rec[8] or '', szSearch))
+			or X.StringFindW(rec[8] or '', szSearch))
 		)
-		or (rec[4] == EVERYTHING_TYPE.PLAYER_SAY and wstring.find(rec[6] or '', szSearch))
+		or (rec[4] == EVERYTHING_TYPE.PLAYER_SAY and X.StringFindW(rec[6] or '', szSearch))
 		or ((rec[4] == EVERYTHING_TYPE.SYS_MSG
 				or rec[4] == EVERYTHING_TYPE.PLAYER_SAY
 				or rec[4] == EVERYTHING_TYPE.WARNING_MESSAGE)
-			and wstring.find(rec[5], szSearch))
+			and X.StringFindW(rec[5], szSearch))
 		or (rec[4] == EVERYTHING_TYPE.FIGHT_HINT and (
 			nSearch == rec[6]
-			or wstring.find(rec[8], szSearch)
+			or X.StringFindW(rec[8], szSearch)
 		))
 	) then
 		return true
@@ -767,7 +759,7 @@ function D.OutputTip(this, rec)
 
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	OutputTip(table.concat(aXml), 450, {x, y, w, h}, UI.TIP_POSITION.RIGHT_LEFT)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, X.UI.TIP_POSITION.RIGHT_LEFT)
 end
 
 function D.PopupRowMenu(frame, rec)
@@ -1022,7 +1014,7 @@ function MY_Recount_FP.OnItemMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local szXml = GetFormatText(this.szTip or this:Lookup('Text_FP_Title'):GetText())
-		OutputTip(szXml, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+		OutputTip(szXml, 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 	end
 end
 MY_Recount_FP.OnItemRefreshTip = MY_Recount_FP.OnItemMouseEnter

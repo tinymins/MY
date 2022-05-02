@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队面板格子样式
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Cataclysm'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
@@ -28,7 +20,7 @@ end
 local CFG, PS = MY_Cataclysm.CFG, { nPriority = 2 }
 
 function PS.OnPanelActive(frame)
-	local ui = UI(frame)
+	local ui = X.UI(frame)
 	local nPaddingX, nPaddingY = 20, 20
 	local x, y = nPaddingX, nPaddingY
 
@@ -78,7 +70,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = CFG.fNameFontScale * 100,
 		range = {1, 400},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textFormatter = function(val) return _L('Scale %d%%', val) end,
 		onChange = function(val)
 			CFG.fNameFontScale = val / 100
@@ -123,7 +115,7 @@ function PS.OnPanelActive(frame)
 		text = _L['Name font'],
 		buttonStyle = 'FLAT',
 		onClick = function()
-			UI.OpenFontPicker(function(nFont)
+			X.UI.OpenFontPicker(function(nFont)
 				CFG.nNameFont = nFont
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallRefreshImages(true, false, false, nil, true)
@@ -158,7 +150,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = CFG.fLifeFontScale * 100,
 		range = {1, 400},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textFormatter = function(val) return _L('Scale %d%%', val) end,
 		onChange = function(val)
 			CFG.fLifeFontScale = val / 100
@@ -238,7 +230,7 @@ function PS.OnPanelActive(frame)
 		text = _L['Life font'],
 		buttonStyle = 'FLAT',
 		onClick = function()
-			UI.OpenFontPicker(function(nFont)
+			X.UI.OpenFontPicker(function(nFont)
 				CFG.nLifeFont = nFont
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
@@ -290,7 +282,7 @@ function PS.OnPanelActive(frame)
 		text = g_tStrings.STR_SKILL_MANA .. g_tStrings.FONT,
 		buttonStyle = 'FLAT',
 		onClick = function()
-			UI.OpenFontPicker(function(nFont)
+			X.UI.OpenFontPicker(function(nFont)
 				CFG.nManaFont = nFont
 				if MY_CataclysmMain.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
@@ -304,7 +296,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = CFG.fManaFontScale * 100,
 		range = {1, 400},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textFormatter = function(val) return _L('Scale %d%%', val) end,
 		onChange = function(val)
 			CFG.fManaFontScale = val / 100

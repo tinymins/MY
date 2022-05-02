@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 金团记录界面
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
@@ -55,7 +47,7 @@ end
 
 function D.UpdateMode(frame)
 	local bMainInstance = frame.ds == MY_GKP_MI.GetDS()
-	local ui = UI(frame)
+	local ui = X.UI(frame)
 	ui:Fetch('Btn_AddManually'):Visible(bMainInstance)
 	ui:Fetch('Btn_Calculate'):Visible(bMainInstance)
 	ui:Fetch('GOLD_TEAM_BID_LIST'):Visible(bMainInstance)
@@ -281,7 +273,7 @@ end
 function MY_GKP_UI.OnFrameCreate()
 	this.hRecordContainer = this:Lookup('PageSet_Menu/Page_GKP_Record/WndScroll_GKP_Record/WndContainer_Record_List')
 	this.hAccountContainer = this:Lookup('PageSet_Menu/Page_GKP_Account/WndScroll_GKP_Account/WndContainer_Account_List')
-	local ui = UI(this)
+	local ui = X.UI(this)
 	ui:Text(_L['GKP Golden Team Record']):Anchor('CENTER')
 	ui:Append('WndButton', {
 		x = 955, y = 54, w = 20, h = 20,
@@ -357,7 +349,7 @@ function MY_GKP_UI.OnFrameCreate()
 							table.insert(aItem, { 'M', vv.szName, vv.nMoney })
 						else
 							local KItemInfo = GetItemInfo(vv.dwTabType, vv.dwIndex)
-							if KItemInfo and KItemInfo.nGenre == ITEM_GENRE.EQUIPMENT and KItemInfo.nQuality >= CONSTANT.ITEM_QUALITY.PURPLE then
+							if KItemInfo and KItemInfo.nGenre == ITEM_GENRE.EQUIPMENT and KItemInfo.nQuality >= X.CONSTANT.ITEM_QUALITY.PURPLE then
 								tEquipPrice[vv.nMoney] = true
 								nEquipNum = nEquipNum + 1
 								nEquipPrice = nEquipPrice + vv.nMoney
@@ -567,12 +559,12 @@ function MY_GKP_UI.OnFrameCreate()
 					szLayer = 'ICON_RIGHTMOST',
 					fnClickIcon = function()
 						CPath.DelFile(info.fullpath)
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 				})
 			end
 			if #menu > 0 then
-				table.insert(menu, CONSTANT.MENU_DIVIDER)
+				table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			end
 			table.insert(menu, {
 				szOption = _L['Manually load from file.'],
@@ -599,7 +591,7 @@ function MY_GKP_UI.OnFrameCreate()
 		buttonStyle = 'FLAT_LACE_BORDER',
 		tip = {
 			render = _L['Left click to sync from others, right click to sync to others'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 		menuLClick = function()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then

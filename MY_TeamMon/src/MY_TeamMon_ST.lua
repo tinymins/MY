@@ -1,4 +1,4 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : µπº∆ ±¿‡
@@ -6,17 +6,9 @@
 -- @ref      : William Chan (Webster)
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon_ST'
@@ -117,7 +109,7 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 				_L['Countdown format error']
 					.. ' TYPE: ' .. _L['Countdown TYPE ' .. nType]
 					.. ' KEY:' .. szKey .. ' Content:' .. tParam.nTime,
-				CONSTANT.MSG_THEME.ERROR)
+				X.CONSTANT.MSG_THEME.ERROR)
 		end
 	end
 	if tTime.nTime == 0 then

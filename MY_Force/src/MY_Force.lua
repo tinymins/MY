@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 职业特色增强
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Force'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Force'
@@ -269,14 +261,14 @@ end)
 -------------------------------------
 local PS = { szRestriction = 'MY_Force' }
 function PS.OnPanelActive(frame)
-	local ui = UI(frame)
+	local ui = X.UI(frame)
 	local nPaddingX, nPaddingY = 25, 25
 	local x, y = nPaddingX, nPaddingY
 	local W, H = ui:Size()
 	-- wu du
 	---------------
-	ui:Append('Text', { text = g_tStrings.tForceTitle[CONSTANT.FORCE_TYPE.WU_DU], x = x, y = y, font = 27 })
-	if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+	ui:Append('Text', { text = g_tStrings.tForceTitle[X.CONSTANT.FORCE_TYPE.WU_DU], x = x, y = y, font = 27 })
+	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 		-- crlf
 		x = nPaddingX + 10
 		y = y + 28
@@ -316,7 +308,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 2, w = 18, h = 18,
 			color = MY_ForceGuding.color,
 			onClick = function()
-				local ui = UI(this)
+				local ui = X.UI(this)
 				OpenColorTablePanel(function(r, g, b)
 					ui:Color(r, g, b)
 					MY_ForceGuding.color = { r, g, b }
@@ -426,7 +418,7 @@ function PS.OnPanelActive(frame)
 		autoEnable = function() return O.bWarningDebuff end,
 		text = tostring(O.nDebuffNum),
 		menu = function()
-			local ui = UI(this)
+			local ui = X.UI(this)
 			local m0 = {}
 			for i = 1, 10 do
 				table.insert(m0, {

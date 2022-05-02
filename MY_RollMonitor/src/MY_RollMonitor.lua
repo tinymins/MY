@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : ROLL点监控
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RollMonitor'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RollMonitor'
@@ -213,7 +205,7 @@ function D.GetPersonResult(szName, nSortType, nTimeLimit)
 	if type(szName) == 'table' then
 		aRecord = szName
 	else
-		aRecord = m_tRecords[szName] or CONSTANT.EMPTY_TABLE
+		aRecord = m_tRecords[szName] or X.CONSTANT.EMPTY_TABLE
 	end
 	-- 计算有效Roll点数组下标
 	local aTime = {}
@@ -402,7 +394,7 @@ end
 
 -- 标签激活响应函数
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	-- 记录模式
 	ui:Append('WndComboBox', {
@@ -416,7 +408,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						O.nSortType = nSortType
 						D.DrawBoard()
-						UI(raw):Text(SORT_TYPE_INFO[nSortType].szName)
+						X.UI(raw):Text(SORT_TYPE_INFO[nSortType].szName)
 						return 0
 					end,
 				})
@@ -434,7 +426,7 @@ function PS.OnPanelActive(wnd)
 				table.insert(t, {
 					szOption = TIME_LIMIT_TITLE[nSec],
 					fnAction = function()
-						UI(raw):Text(TIME_LIMIT_TITLE[nSec])
+						X.UI(raw):Text(TIME_LIMIT_TITLE[nSec])
 						O.nTimeLimit = nSec
 						D.DrawBoard()
 						return 0
@@ -468,7 +460,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		tip = {
 			render = _L['left click to restart, right click to open setting.'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	})
 	-- 发布
@@ -513,7 +505,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		tip = {
 			render = _L['left click to publish, right click to open setting.'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			offset = { x = -80 },
 		},
 	})

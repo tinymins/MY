@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队面板BUFF设置
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Cataclysm'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
@@ -79,7 +71,7 @@ local function OpenBuffRuleEditor(rec)
 end
 
 function PS.OnPanelActive(frame)
-	local ui = UI(frame)
+	local ui = X.UI(frame)
 	local nPaddingX, nPaddingY = 10, 10
 	local x, y = nPaddingX, nPaddingY
 	local w, h = ui:Size()
@@ -103,7 +95,7 @@ function PS.OnPanelActive(frame)
 			buttonStyle = 'FLAT',
 			text = _L['Edit'],
 			onClick = function()
-				local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
+				local ui = X.UI.CreateFrame('MY_Cataclysm_BuffConfig', {
 					w = 350, h = 550,
 					text = _L['Edit buff'],
 					close = true, anchor = 'CENTER',
@@ -168,7 +160,7 @@ function PS.OnPanelActive(frame)
 		autoEnable = function() return not CFG.bAutoBuffSize end,
 		range = {50, 200},
 		value = CFG.fBuffScale * 100,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onChange = function(nVal)
 			CFG.fBuffScale = nVal / 100
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
@@ -183,7 +175,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, h = 25, rw = 80, text = '',
 		range = {0, 10},
 		value = CFG.nMaxShowBuff,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onChange = function(nVal)
 			CFG.nMaxShowBuff = nVal
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)

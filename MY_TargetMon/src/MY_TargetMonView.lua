@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     :
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TargetMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetMon'
@@ -160,11 +152,11 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 		bRequireFormatPos = true
 	end
 	if hItem.szCdBarUITex ~= tViewData.szCdBarUITex and tViewData.bCdBar then
-		UI(hItem.imgProcess):Image(tViewData.szCdBarUITex)
+		X.UI(hItem.imgProcess):Image(tViewData.szCdBarUITex)
 		hItem.szCdBarUITex = tViewData.szCdBarUITex
 	end
 	if hItem.szBoxBgUITex ~= tViewData.szBoxBgUITex then
-		UI(hItem.imgBoxBg):Image(tViewData.szBoxBgUITex)
+		X.UI(hItem.imgBoxBg):Image(tViewData.szBoxBgUITex)
 		hItem.szBoxBgUITex = tViewData.szBoxBgUITex
 	end
 	if item then
@@ -194,11 +186,11 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 			hItem.bCdBarFlash = item.bCdBarFlash
 		end
 		if hItem.szCdBarUITex ~= tViewData.szCdBarUITex and tViewData.bCdBar then
-			UI(hItem.imgProcess):Image(tViewData.szCdBarUITex)
+			X.UI(hItem.imgProcess):Image(tViewData.szCdBarUITex)
 			hItem.szCdBarUITex = tViewData.szCdBarUITex
 		end
 		if hItem.szBoxBgUITex ~= tViewData.szBoxBgUITex then
-			UI(hItem.imgBoxBg):Image(tViewData.szBoxBgUITex)
+			X.UI(hItem.imgBoxBg):Image(tViewData.szBoxBgUITex)
 			hItem.szBoxBgUITex = tViewData.szBoxBgUITex
 		end
 		if hItem.bStaring ~= item.bStaring then

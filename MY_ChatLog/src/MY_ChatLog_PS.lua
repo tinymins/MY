@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 聊天记录 设置界面
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_ChatLog'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatLog'
@@ -49,7 +41,7 @@ local function getHeader()
 	local szHeader = [[<!DOCTYPE html>
 <html>
 <head><meta http-equiv='Content-Type' content='text/html; charset=]]
-	.. ((ENVIRONMENT.GAME_LANG == 'zhcn' and 'GBK') or 'UTF-8') .. [[' />
+	.. ((X.ENVIRONMENT.GAME_LANG == 'zhcn' and 'GBK') or 'UTF-8') .. [[' />
 <style>
 *{font-size: 12px}
 a{line-height: 16px}
@@ -197,7 +189,7 @@ function D.ExportConfirm()
 	if l_bExporting then
 		return X.Sysmsg(_L['Already exporting, please wait.'])
 	end
-	local ui = UI.CreateFrame('MY_ChatLog_Export', {
+	local ui = X.UI.CreateFrame('MY_ChatLog_Export', {
 		simple = true, esc = true, close = true, w = 140,
 		level = 'Normal1', text = _L['Export chatlog'], alpha = 233,
 	})
@@ -241,7 +233,7 @@ function D.ExportConfirm()
 		x = x, y = y, w = nMaxWidth - x * 2, h = 35,
 		text = _L['Export chatlog'],
 		onClick = function()
-			if ENVIRONMENT.GAME_PROVIDER == 'remote' then
+			if X.ENVIRONMENT.GAME_PROVIDER == 'remote' then
 				return X.Alert(_L['Streaming client does not support export!'])
 			end
 			local function doExport(szSuffix)
@@ -359,7 +351,7 @@ end
 ------------------------------------------------------------------------------------------------------
 local PS = {}
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local nW, nH = ui:Size()
 	local nPaddingX, nPaddingY = 25, 25
 	local nX, nY = nPaddingX, nPaddingY

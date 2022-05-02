@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : ÁÄÌì¸¨Öú
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatBlock'
@@ -170,7 +162,7 @@ end
 
 local PS = {}
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	local x, y = 0, 0
 
@@ -264,7 +256,7 @@ function PS.OnPanelActive(wnd)
 				SaveBlockWords()
 			end
 		end, data.tMsgType)
-		table.insert(menu, 1, CONSTANT.MENU_DIVIDER)
+		table.insert(menu, 1, X.CONSTANT.MENU_DIVIDER)
 		table.insert(menu, 1, {
 			szOption = _L['Edit'],
 			fnAction = function()
@@ -281,7 +273,7 @@ function PS.OnPanelActive(wnd)
 				end, nil, nil, nil, data.szKeyword)
 			end,
 		})
-		table.insert(menu, CONSTANT.MENU_DIVIDER)
+		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 		table.insert(menu, {
 			szOption = _L['Ignore spaces'],
 			bCheck = true, bChecked = data.bIgnoreSpace,
@@ -326,13 +318,13 @@ function PS.OnPanelActive(wnd)
 				end
 			end,
 		})
-		table.insert(menu, CONSTANT.MENU_DIVIDER)
+		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 		table.insert(menu, {
 			szOption = _L['Delete'],
 			fnAction = function()
 				RemoveBlockWord(id)
 				SaveBlockWords()
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end,
 		})
 		menu.szOption = _L['Channels']

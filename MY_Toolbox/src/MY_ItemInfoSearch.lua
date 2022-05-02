@@ -1,13 +1,5 @@
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -113,8 +105,8 @@ function D.DoRawSearch(szSearch, fnProgress, fnCallback)
 			local itemInfo = GetItemInfo(dwTabType, dwIndex)
 			if itemInfo and (
 				dwIndex == dwID
-				or (itemInfo.nGenre ~= ITEM_GENRE.BOOK and wstring.find(X.GetItemNameByItemInfo(itemInfo), szSearch))
-				or wstring.find(itemInfo.szName, szSearch)
+				or (itemInfo.nGenre ~= ITEM_GENRE.BOOK and X.StringFindW(X.GetItemNameByItemInfo(itemInfo), szSearch))
+				or X.StringFindW(itemInfo.szName, szSearch)
 			) then
 				table.insert(aResult, {
 					dwTabType = dwTabType,
@@ -140,7 +132,7 @@ function D.DoRawSearch(szSearch, fnProgress, fnCallback)
 				if itemInfo and (
 					dwID == itemInfo.dwID or dwID == dwRecipeID
 					or dwID == row.dwBookID or dwID == row.dwSegmentID
-					or wstring.find(X.GetItemNameByItemInfo(itemInfo, dwRecipeID), szSearch)
+					or X.StringFindW(X.GetItemNameByItemInfo(itemInfo, dwRecipeID), szSearch)
 				) then
 					table.insert(aResult, {
 						dwTabType = 5,
@@ -197,7 +189,7 @@ end
 local PS = { nPriority = 4 }
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local nPaddingX, nPaddingY = 0, 0
 	local nX, nY = nPaddingX, nPaddingY
 	local nW, nH = ui:Size()

@@ -1,4 +1,4 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : È¦È¦Á¬Ïß
@@ -6,17 +6,9 @@
 -- @ref      : William Chan (Webster)
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon_CC'
@@ -43,9 +35,9 @@ local CIRCLE_CACHE = {
 	[TARGET.NPC] = {},
 	[TARGET.DOODAD] = {},
 }
-local H_CIRCLE = UI.GetShadowHandle('Handle_Shadow_Circle')
-local H_LINE = UI.GetShadowHandle('Handle_Shadow_Line')
-local H_NAME = UI.GetShadowHandle('Handle_Shadow_Name')
+local H_CIRCLE = X.UI.GetShadowHandle('Handle_Shadow_Circle')
+local H_LINE = X.UI.GetShadowHandle('Handle_Shadow_Line')
+local H_NAME = X.UI.GetShadowHandle('Handle_Shadow_Name')
 
 local O = X.CreateUserSettingsModule('MY_TeamMon_CC', _L['Raid'], {
 	bEnable = {

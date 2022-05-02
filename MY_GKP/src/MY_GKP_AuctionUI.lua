@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 金团记录记账页面
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
@@ -35,7 +27,7 @@ local D = {
 function D.Open(ds, tab, szMode)
 	-- CreateFrame
 	local szKey = X.IsTable(tab) and tab.key or X.GetUUID()
-	local ui = UI.CreateFrame('MY_GKP_Record#' .. GetStringCRC(szKey), { h = 380, w = 400, text = _L['GKP Golden Team Record'], close = true, focus = true })
+	local ui = X.UI.CreateFrame('MY_GKP_Record#' .. GetStringCRC(szKey), { h = 380, w = 400, text = _L['GKP Golden Team Record'], close = true, focus = true })
 	local x, y = 10, 55
 	local nAuto = 0
 	local dwForceID, item
@@ -91,7 +83,7 @@ function D.Open(ds, tab, szMode)
 							table.insert(source, v[1])
 						end
 					end
-					UI(this):Autocomplete('option', 'source', source)
+					X.UI(this):Autocomplete('option', 'source', source)
 				end,
 			},
 			{
@@ -109,14 +101,14 @@ function D.Open(ds, tab, szMode)
 		},
 		onClick = function()
 			if IsPopupMenuOpened() then
-				UI(this):Autocomplete('close')
+				X.UI(this):Autocomplete('close')
 			else
-				UI(this):Autocomplete('search', '')
+				X.UI(this):Autocomplete('search', '')
 			end
 		end,
 	})
 	local hMoney = ui:Append('WndAutocomplete', {
-		name = 'Money', x = x + 140, y = y + 151, w = 185, h = 25, limit = 8, editType = UI.EDIT_TYPE.ASCII,
+		name = 'Money', x = x + 140, y = y + 151, w = 185, h = 25, limit = 8, editType = X.UI.EDIT_TYPE.ASCII,
 		autocomplete = {
 			{
 				'option', 'beforeSearch', function(text)
@@ -141,12 +133,12 @@ function D.Open(ds, tab, szMode)
 							richtext = true,
 						})
 					end
-					UI(this):Autocomplete('option', 'source', source)
+					X.UI(this):Autocomplete('option', 'source', source)
 				end,
 			},
 		},
 		onChange = function(szText)
-			local ui = UI(this)
+			local ui = X.UI(this)
 			if tonumber(szText) or szText == '' or szText == '-' then
 				this.szText = szText
 				ui:Color(D.GetMoneyCol(szText))

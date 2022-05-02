@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 自动对话（for 台服）
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -286,7 +278,7 @@ local function HookSkipQuestTalk()
 		if not frame.__SkipQuestHackEl then
 			local w, h = Station.GetClientSize()
 			frame.__SkipQuestEl = frame:Lookup('Btn_Skip')
-			frame.__SkipQuestHackEl = UI(frame):Append('WndWindow', {
+			frame.__SkipQuestHackEl = X.UI(frame):Append('WndWindow', {
 				name = 'Btn_Skip',
 				x = 0, y = 0, w = w, h = h,
 			}):Raw()
@@ -329,8 +321,8 @@ function D.GetDialogueMenu(aInfo, dwTargetType, dwTargetID, dwIndex)
 	-- 显示标题
 	local szCaption = dialog.szName
 	if dialog.szContext ~= '' then
-		szCaption = szCaption .. '(' .. wstring.sub(dialog.szContext:gsub('%s', ''), 1, 8)
-		if wstring.len(dialog.szContext) > 8 then
+		szCaption = szCaption .. '(' .. X.StringSubW(dialog.szContext:gsub('%s', ''), 1, 8)
+		if X.StringLenW(dialog.szContext) > 8 then
 			szCaption = szCaption .. '...'
 		end
 		szCaption = szCaption .. ')'
@@ -371,20 +363,20 @@ function D.GetDialogueMenu(aInfo, dwTargetType, dwTargetID, dwIndex)
 			menuSub.szLayer = 'ICON_RIGHT'
 			menuSub.fnClickIcon = function()
 				D.RemoveDialogueData(dialog.szMap, dialog.szName, dialog.szContext, option.szContext)
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end
 		end
 		if nRepeat and nRepeat > 0 then
 			menuSub.r, menuSub.g, menuSub.b = 255, 0, 255
 			menuSub.fnAction = function()
 				D.DisableDialogueData(dialog.szMap, dialog.szName, dialog.szContext, option.szContext)
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end
 		else
 			menuSub.r, menuSub.g, menuSub.b = 255, 255, 255
 			menuSub.fnAction = function()
 				D.EnableDialogueData(dialog.szMap, dialog.szName, dialog.szContext, option.szContext)
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end
 		end
 		if option.szImage then
@@ -425,12 +417,12 @@ function D.CreateEntry()
 			if p.path then
 				wnd = frame:Lookup(p.path)
 			end
-			p.el = UI(wnd):Append('WndButton', {
+			p.el = X.UI(wnd):Append('WndButton', {
 				name = 'WndButton_AutoChat',
 				text = _L['Autochat'],
 				tip = {
 					render = _L['Left click to config autochat.\nRight click to edit global config.'],
-					position = UI.TIP_POSITION.TOP_BOTTOM,
+					position = X.UI.TIP_POSITION.TOP_BOTTOM,
 				},
 				menuLClick = function()
 					return D.GetDialogueMenu(frame[p.keys.info], frame[p.keys.tartype], frame[p.keys.tarid], frame[p.keys.winidx])

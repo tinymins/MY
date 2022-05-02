@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 战斗浮动文字
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_CombatText'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_CombatText'
@@ -75,7 +67,7 @@ local COMBAT_TEXT_STRING = { -- 需要变成特定字符串的伤害类型
 }
 local COMBAT_TEXT_COLOR = { --不需要修改的内定颜色
 	YELLOW = { 255, 255, 0   },
-	RED    = ENVIRONMENT.GAME_PROVIDER == 'remote'
+	RED    = X.ENVIRONMENT.GAME_PROVIDER == 'remote'
 		and { 253, 86, 86 }
 		or { 255, 0, 0 },
 	PURPLE = { 255, 0,   255 },
@@ -269,7 +261,7 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
-		xDefaultValue = ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 },
+		xDefaultValue = X.ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 },
 	},
 	-- $name 名字 $sn   技能名 $crit 会心 $val  数值
 	szSkill = {
@@ -313,7 +305,7 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		szLabel = _L['MY_CombatText'],
 		xSchema = X.Schema.Map(X.Schema.OneOf(X.Schema.String, X.Schema.Number), X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {
-			['DAMAGE']                               = ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
+			['DAMAGE']                               = X.ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
 			[SKILL_RESULT_TYPE.THERAPY]              = { 0,   255, 0   }, -- 治疗
 			[SKILL_RESULT_TYPE.PHYSICS_DAMAGE]       = { 255, 255, 255 }, -- 外公
 			[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE]   = { 255, 128, 128 }, -- 阳
@@ -812,7 +804,7 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 			szCasterName = ''
 		end
 		if O.bSnShorten2 then
-			szName = wstring.sub(szName, 1, 2) -- wstring是兼容台服的 台服utf-8
+			szName = X.StringSubW(szName, 1, 2) -- wstring是兼容台服的 台服utf-8
 		end
 		szText = szReplaceText
 		szText = szText:gsub('(%s?)$crit(%s?)', (bCriticalStrike and '%1'.. g_tStrings.STR_CS_NAME .. '%2' or ''))
@@ -1005,7 +997,7 @@ end
 
 local PS = {}
 function PS.OnPanelActive(frame)
-	local ui = UI(frame)
+	local ui = X.UI(frame)
 	local W, H = ui:Size()
 	local nPaddingX, nPaddingY = 20, 10
 	local x, y = nPaddingX, nPaddingY
@@ -1052,7 +1044,7 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndTrackbar', {
 		x = x, y = y, text = '',
 		range = {1, 255},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nMaxAlpha,
 		onChange = function(nVal)
 			O.nMaxAlpha = nVal
@@ -1066,7 +1058,7 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndTrackbar', {
 		x = x, y = y, textFormatter = function(val) return val .. _L['ms'] end,
 		range = {700, 2500},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nTime * COMBAT_TEXT_TOTAL,
 		onChange = function(nVal)
 			O.nTime = nVal / COMBAT_TEXT_TOTAL
@@ -1081,7 +1073,7 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndTrackbar', {
 		x = x, y = y, textFormatter = function(val) return val .. _L['Frame'] end,
 		range = {0, 15},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nFadeIn,
 		onChange = function(nVal)
 			O.nFadeIn = nVal
@@ -1095,7 +1087,7 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndTrackbar', {
 		x = x, y = y, textFormatter = function(val) return val .. _L['Frame'] end,
 		rang = {0, 15},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nFadeOut,
 		onChange = function(nVal)
 			O.nFadeOut = nVal
@@ -1110,7 +1102,7 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndTrackbar', {
 		x = x, y = y, textFormatter = function(val) return (val / 100) .. _L['times'] end,
 		range = {50, 200},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.fScale * 100,
 		onChange = function(nVal)
 			O.fScale = nVal / 100
@@ -1197,9 +1189,9 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 8, color = O.tCriticalC, w = 15, h = 15,
 			onClick = function()
 				local this = this
-				UI.OpenColorPicker(function(r, g, b)
+				X.UI.OpenColorPicker(function(r, g, b)
 					O.tCriticalC = { r, g, b }
-					UI(this):Color(r, g, b)
+					X.UI(this):Color(r, g, b)
 				end)
 			end,
 			autoEnable = IsEnabled,
@@ -1226,9 +1218,9 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 8, color = O.tCriticalB, w = 15, h = 15,
 			onClick = function()
 				local this = this
-				UI.OpenColorPicker(function(r, g, b)
+				X.UI.OpenColorPicker(function(r, g, b)
 					O.tCriticalB = { r, g, b }
-					UI(this):Color(r, g, b)
+					X.UI(this):Color(r, g, b)
 				end)
 			end,
 			autoEnable = IsEnabled,
@@ -1255,9 +1247,9 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 8, color = O.tCriticalH, w = 15, h = 15,
 			onClick = function()
 				local this = this
-				UI.OpenColorPicker(function(r, g, b)
+				X.UI.OpenColorPicker(function(r, g, b)
 					O.tCriticalH = { r, g, b }
-					UI(this):Color(r, g, b)
+					X.UI(this):Color(r, g, b)
 				end)
 			end,
 			autoEnable = IsEnabled,
@@ -1299,13 +1291,13 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndButton', {
 		x = x, y = y, text = _L['Font edit'],
 		onClick = function()
-			UI.OpenFontPicker(function(nFont)
+			X.UI.OpenFontPicker(function(nFont)
 				O.nFont = nFont
 			end)
 		end,
 		tip = {
 			render = function() return _L('Current font: %d', O.nFont) end,
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 		autoEnable = IsEnabled,
 	})
@@ -1337,10 +1329,10 @@ function PS.OnPanelActive(frame)
 				x = x + (i % 8) * 65 + 35, y = y + 30 * math.floor(i / 8) + 8, color = v, w = 15, h = 15,
 				onClick = function()
 					local this = this
-					UI.OpenColorPicker(function(r, g, b)
+					X.UI.OpenColorPicker(function(r, g, b)
 						O.col[k] = { r, g, b }
 						O.col = O.col
-						UI(this):Color(r, g, b)
+						X.UI(this):Color(r, g, b)
 					end)
 				end,
 				autoEnable = IsEnabled,

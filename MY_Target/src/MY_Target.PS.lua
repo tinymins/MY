@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 目标面向显示等功能设置面板
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Target'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Target'
@@ -30,7 +22,7 @@ X.RegisterRestriction('MY_Target', { ['*'] = false, classic = true })
 local PS = { szRestriction = 'MY_Target' }
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local nPaddingX, nPaddingY = 20, 20
 	local nX, nY = nPaddingX, nPaddingY
 	local nLH = 26
@@ -81,8 +73,8 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 4, w = 18, h = 18,
 			color = MY_TargetLine.tTargetColor,
 			onClick = function()
-				local ui = UI(this)
-				UI.OpenColorPicker(function(r, g, b)
+				local ui = X.UI(this)
+				X.UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
 					MY_TargetLine.tTargetColor = { r, g, b }
 				end)
@@ -119,8 +111,8 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 4, w = 18, h = 18,
 			color = MY_TargetLine.tTTargetColor,
 			onClick = function()
-				local ui = UI(this)
-				UI.OpenColorPicker(function(r, g, b)
+				local ui = X.UI(this)
+				X.UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
 					MY_TargetLine.tTTargetColor = { r, g, b }
 				end)
@@ -144,7 +136,7 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetLine.nLineWidth,
 			range = {1, 5},
-			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%d px', val) end,
 			onChange = function(val) MY_TargetLine.nLineWidth = val end,
 			autoEnable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
@@ -173,7 +165,7 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetLine.nLineAlpha,
 			range = {1, 255},
-			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 			onChange = function(val) MY_TargetLine.nLineAlpha = val end,
 			autoEnable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 		})
@@ -207,8 +199,8 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2, w = 18, h = 18,
 			color = MY_TargetFace.tTargetFaceColor,
 			onClick = function()
-				local ui = UI(this)
-				UI.OpenColorPicker(function(r, g, b)
+				local ui = X.UI(this)
+				X.UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
 					MY_TargetFace.tTargetFaceColor = { r, g, b }
 				end)
@@ -230,8 +222,8 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2, w = 18, h = 18,
 			color = MY_TargetFace.tTTargetFaceColor,
 			onClick = function()
-				local ui = UI(this)
-				UI.OpenColorPicker(function(r, g, b)
+				local ui = X.UI(this)
+				X.UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
 					MY_TargetFace.tTTargetFaceColor = { r, g, b }
 				end)
@@ -245,7 +237,7 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetFace.nSectorDegree,
 			range = {30, 180},
-			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%d degree', val) end,
 			onChange = function(val) MY_TargetFace.nSectorDegree = val end,
 		})
@@ -257,7 +249,7 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetFace.nSectorRadius,
 			range = {1, 26},
-			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%d feet', val) end,
 			onChange = function(val) MY_TargetFace.nSectorRadius = val end,
 		})
@@ -269,7 +261,7 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = math.ceil((200 - MY_TargetFace.nSectorAlpha) / 2),
 			range = {0, 100},
-			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%d %%', val) end,
 			onChange = function(val) MY_TargetFace.nSectorAlpha = (100 - val) * 2 end,
 		})
@@ -287,8 +279,8 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2, w = 18, h = 18,
 			color = MY_TargetFace.tTargetShapeColor,
 			onClick = function()
-				local ui = UI(this)
-				UI.OpenColorPicker(function(r, g, b)
+				local ui = X.UI(this)
+				X.UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
 					MY_TargetFace.tTargetShapeColor = { r, g, b }
 				end)
@@ -307,8 +299,8 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2, w = 18, h = 18,
 			color = MY_TargetFace.tTTargetShapeColor,
 			onClick = function()
-				local ui = UI(this)
-				UI.OpenColorPicker(function(r, g, b)
+				local ui = X.UI(this)
+				X.UI.OpenColorPicker(function(r, g, b)
 					ui:Color(r, g, b)
 					MY_TargetFace.tTTargetShapeColor = { r, g, b }
 				end)
@@ -322,7 +314,7 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetFace.nShapeRadius,
 			range = {1, 26},
-			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%.1f feet', val / 2) end,
 			onChange = function(val) MY_TargetFace.nShapeRadius = val end,
 		})
@@ -334,7 +326,7 @@ function PS.OnPanelActive(wnd)
 			x = nX + 2, y = nY + 2,
 			value = math.ceil((200 - MY_TargetFace.nShapeAlpha) / 2),
 			range = {0, 100},
-			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%d %%', val) end,
 			onChange = function(val) MY_TargetFace.nShapeAlpha = (100 - val) * 2 end,
 		})

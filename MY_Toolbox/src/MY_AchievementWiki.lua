@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 成就查询
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -59,19 +51,19 @@ function D.Open(dwAchievement)
 	end
 	local szURL = 'https://page.j3cx.com/wiki/' .. dwAchievement .. '?'
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			player = GetUserRoleName(),
 		}))
 	local szKey = 'AchievementWiki_' .. dwAchievement
 	local szTitle = achi.szName .. ' - ' .. achi.szDesc
-	szKey = UI.OpenBrowser(szURL, {
+	szKey = X.UI.OpenBrowser(szURL, {
 		key = szKey,
 		title = szTitle,
 		w = O.nW, h = O.nH,
 		readonly = true,
 	})
-	UI(UI.LookupBrowser(szKey)):Size(D.OnWebSizeChange)
+	X.UI(X.UI.LookupBrowser(szKey)):Size(D.OnWebSizeChange)
 end
 
 function D.OnAchieveItemMouseEnter()
@@ -166,7 +158,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		text = _L['Achievement wiki'],
 		tip = {
 			render = _L['Click icon on achievemnt panel to view achievement wiki'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		checked = MY_AchievementWiki.bEnable,
 		onCheck = function(bChecked)

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : ½ØÍ¼ÖúÊÖ
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_ScreenShot'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ScreenShot'
@@ -143,22 +135,22 @@ function D.ShotScreenEx(nShowUI)
 	local bStationVisible = Station.IsVisible()
 	if nShowUI == SCREENSHOT_MODE.HIDE_UI and bStationVisible then
 		Station.Hide()
-		UI.TempSetShadowHandleVisible(false)
+		X.UI.TempSetShadowHandleVisible(false)
 		X.DelayCall(100, function()
 			D.ShotScreen(szFilePath, O.nQuality)
 			X.DelayCall(300, function()
 				Station.Show()
-				UI.RevertShadowHandleVisible()
+				X.UI.RevertShadowHandleVisible()
 			end)
 		end)
 	elseif nShowUI == SCREENSHOT_MODE.SHOW_UI and not bStationVisible then
 		Station.Show()
-		UI.TempSetShadowHandleVisible(true)
+		X.UI.TempSetShadowHandleVisible(true)
 		X.DelayCall(100, function()
 			D.ShotScreen(szFilePath, O.nQuality)
 			X.DelayCall(300, function()
 				Station.Hide()
-				UI.RevertShadowHandleVisible()
+				X.UI.RevertShadowHandleVisible()
 			end)
 		end)
 	else
@@ -175,7 +167,7 @@ X.RegisterHotKey('MY_ScreenShot_Hotkey_ShowUI', _L['shotscreen with ui'], functi
 local PS = {}
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	local fnRefreshPanel = function(ui)
 		ui:Children('#WndCheckBox_HideUI'):Check(O.bAutoHideUI)
@@ -222,7 +214,7 @@ function PS.OnPanelActive(wnd)
 		szValue = szValue..((#szValue>0 and '/') or '')
 		O.szFilePath = szValue
 	  end)
-	  :Tip(_L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],UI.TIP_POSITION.TOP_BOTTOM)
+	  :Tip(_L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],X.UI.TIP_POSITION.TOP_BOTTOM)
 
 	ui:Append('WndButton', 'WndButton_HotkeyCheck'):Pos(w-180, 30):ButtonStyle('FLAT'):Width(170)
 	  :Text(_L['set default screenshot tool'])

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 分享首次击杀
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -95,8 +87,8 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 	local tConfig = {
 		url = 'https://push.j3cx.com/api/achievement-rank/uploads',
 		data = {
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			server = p.szServer,
 			name = p.szName,
 			leader = p.szLeader,
@@ -171,9 +163,9 @@ function D.UpdateMapBossAchieveAcquire()
 	local tBossAchieveAcquireState = {}
 	-- 根据成就名称自动识别地图全胜成就
 	local aMapAchievements = {}
-	for _, dwAchieveID in ipairs(X.GetMapAchievements(dwMapID) or CONSTANT.EMPTY_TABLE) do
+	for _, dwAchieveID in ipairs(X.GetMapAchievements(dwMapID) or X.CONSTANT.EMPTY_TABLE) do
 		local achi = X.GetAchievement(dwAchieveID)
-		if achi and wstring.find(achi.szName, _L['Full win']) then
+		if achi and X.StringFindW(achi.szName, _L['Full win']) then
 			table.insert(aMapAchievements, dwAchieveID)
 		end
 	end
@@ -181,8 +173,8 @@ function D.UpdateMapBossAchieveAcquire()
 	local rss = MY_RSS.Get('achievement-rank')
 	for _, dwAchieveID in X.sipairs(
 		aMapAchievements,
-		X.IsTable(rss) and rss[dwMapID] or CONSTANT.EMPTY_TABLE,
-		X.IsTable(rss) and rss['*'] or CONSTANT.EMPTY_TABLE
+		X.IsTable(rss) and rss[dwMapID] or X.CONSTANT.EMPTY_TABLE,
+		X.IsTable(rss) and rss['*'] or X.CONSTANT.EMPTY_TABLE
 	) do
 		local achi = X.GetAchievement(dwAchieveID)
 		if achi then
@@ -280,7 +272,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		end,
 		tip = {
 			render = _L['Share boss kill record for kill rank.'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	}):AutoWidth():Width() + 5
 
@@ -323,7 +315,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 				end
 				return aDataSource
 			end,
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	}):AutoWidth():Width() + 5
 

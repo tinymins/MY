@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 扁平血条UI操作类 只做UI操作 不做任何逻辑判断
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_LifeBar'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar'
@@ -35,7 +27,7 @@ local CACHE = setmetatable({}, {__mode = 'v'})
 local REQUIRE_SORT = false
 
 function HP:ctor(dwType, dwID) -- KGobject
-	local hList = UI.GetShadowHandle('MY_LifeBar')
+	local hList = X.UI.GetShadowHandle('MY_LifeBar')
 	local szName = dwType .. '_' .. dwID
 	self.szName = szName
 	self.dwType = dwType
@@ -51,7 +43,7 @@ end
 -- 创建
 function HP:Create()
 	if not self:IsHandleValid() then
-		local hList = UI.GetShadowHandle('MY_LifeBar')
+		local hList = X.UI.GetShadowHandle('MY_LifeBar')
 		hList:AppendItemFromString(FormatHandle(string.format('name="%s"', self.szName)))
 		local hItem = hList:Lookup(self.szName)
 		hItem:AppendItemFromString('<shadow>name="hp_bg"</shadow>')
@@ -69,7 +61,7 @@ end
 -- 删除
 function HP:Remove()
 	if self:IsHandleValid() then
-		local hList = UI.GetShadowHandle('MY_LifeBar')
+		local hList = X.UI.GetShadowHandle('MY_LifeBar')
 		hList:RemoveItem(self.handle)
 		self.handle = nil
 	end
@@ -319,7 +311,7 @@ end
 function MY_LifeBar_HP(dwType, dwID)
 	if dwType == 'clear' then
 		CACHE = {}
-		UI.GetShadowHandle('MY_LifeBar'):Clear()
+		X.UI.GetShadowHandle('MY_LifeBar'):Clear()
 	else
 		local szName = dwType .. '_' .. dwID
 		if not CACHE[szName] then
@@ -333,7 +325,7 @@ do local hList
 local function onBreathe()
 	if REQUIRE_SORT then
 		if not (hList and hList:IsValid()) then
-			hList = UI.GetShadowHandle('MY_LifeBar')
+			hList = X.UI.GetShadowHandle('MY_LifeBar')
 		end
 		hList:Sort()
 		REQUIRE_SORT = false

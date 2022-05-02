@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 神行千里助手
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -97,11 +89,11 @@ function D.HookNonwarMap()
 				img.copy = true
 				img.OnItemMouseEnter = function()
 					img:SetAlpha(255)
-					return UI.FormatWMsgRet(true, true)
+					return X.UI.FormatWMsgRet(true, true)
 				end
 				img.OnItemMouseLeave = function()
 					img:SetAlpha(200)
-					return UI.FormatWMsgRet(true, true)
+					return X.UI.FormatWMsgRet(true, true)
 				end
 				img:SetAlpha(200)
 				img:SetSize(img.w / fS, img.h / fS)
@@ -237,9 +229,9 @@ function D.CheckAvoidBlackShenxingEnable()
 
 			local nType, dwSkillID, dwSkillLevel, fProgress = X.GetOTActionState(player)
 			if not ((
-				nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-				or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
-				or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE
+				nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+				or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+				or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE
 			) and dwSkillID == 3691) then
 				return
 			end
@@ -286,7 +278,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		text = _L['Avoid blacking shenxing cd'],
 		tip = {
 			render = _L['Got zhenyan wen shenxing, your shengxing will be blacked.'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		checked = MY_ShenxingHelper.bAvoidBlackCD,
 		onCheck = function(bChecked)
@@ -309,7 +301,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			text = _L['Force open all map shenxing'],
 			tip = {
 				render = _L['Shenxing can fly to undiscovered maps'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			checked = MY_ShenxingHelper.bOpenAllMap,
 			onCheck = function(bChecked)

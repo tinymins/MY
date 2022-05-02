@@ -1,4 +1,4 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : ÍÅ¶Ó¼à¿ØºËÐÄ
@@ -6,17 +6,9 @@
 -- @ref      : William Chan (Webster)
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
@@ -25,7 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
-local bRestricted = ENVIRONMENT.GAME_BRANCH == 'classic'
+local bRestricted = X.ENVIRONMENT.GAME_BRANCH == 'classic'
 X.RegisterRestriction('MY_TeamMon', { ['*'] = false, classic = true })
 X.RegisterRestriction('MY_TeamMon.MapRestriction', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.HiddenBuff', { ['*'] = true })
@@ -257,7 +249,7 @@ local function GetUserDataPath()
 		})
 		CPath.DelFile(szPathV1)
 	end
-	Log('[MY_TeamMon] Data path: ' .. szPath)
+	X.Debug('[MY_TeamMon] Data path: ' .. szPath, X.DEBUG_LEVEL.LOG)
 	return szPath
 end
 
@@ -507,16 +499,16 @@ function D.Talk(szType, szMsg, szTarget)
 	local szKey = 'MY_TeamMon.' .. GetLogicFrameCount()
 	if szType == 'RAID' then
 		if szTarget then
-			szMsg = wstring.gsub(szMsg, _L['['] .. szTarget .. _L[']'], ' [' .. szTarget .. '] ')
-			szMsg = wstring.gsub(szMsg, _L['['] .. g_tStrings.STR_YOU .. _L[']'], ' [' .. szTarget .. '] ')
+			szMsg = X.StringReplaceW(szMsg, _L['['] .. szTarget .. _L[']'], ' [' .. szTarget .. '] ')
+			szMsg = X.StringReplaceW(szMsg, _L['['] .. g_tStrings.STR_YOU .. _L[']'], ' [' .. szTarget .. '] ')
 		end
 		if me.IsInParty() then
 			D.SendChat(PLAYER_TALK_CHANNEL.RAID, szMsg, { uuid = szKey .. GetStringCRC(szType .. szMsg) })
 		end
 	elseif szType == 'WHISPER' then
 		if szTarget then
-			szMsg = wstring.gsub(szMsg, '[' .. szTarget .. ']', _L['['] .. g_tStrings.STR_YOU .. _L[']'])
-			szMsg = wstring.gsub(szMsg, _L['['] .. szTarget .. _L[']'], _L['['] .. g_tStrings.STR_YOU .. _L[']'])
+			szMsg = X.StringReplaceW(szMsg, '[' .. szTarget .. ']', _L['['] .. g_tStrings.STR_YOU .. _L[']'])
+			szMsg = X.StringReplaceW(szMsg, _L['['] .. szTarget .. _L[']'], _L['['] .. g_tStrings.STR_YOU .. _L[']'])
 		end
 		if szTarget == me.szName then
 			X.OutputWhisper(szMsg, _L['MY_TeamMon'])
@@ -528,7 +520,7 @@ function D.Talk(szType, szMsg, szTarget)
 			local team = GetClientTeam()
 			for _, v in ipairs(team.GetTeamMemberList()) do
 				local szName = team.GetClientTeamMemberName(v)
-				local szText = wstring.gsub(szMsg, '[' .. szName .. ']', _L['['] .. g_tStrings.STR_YOU ..  _L[']'])
+				local szText = X.StringReplaceW(szMsg, '[' .. szName .. ']', _L['['] .. g_tStrings.STR_YOU ..  _L[']'])
 				if szName == me.szName then
 					X.OutputWhisper(szText, _L['MY_TeamMon'])
 				else
@@ -1839,7 +1831,7 @@ function D.LoadUserData()
 		FireUIEvent('MY_TM_DATA_RELOAD')
 	else
 		D.ImportDataFromFile(
-			ENVIRONMENT.GAME_EDITION ..  '.jx3dat',
+			X.ENVIRONMENT.GAME_EDITION ..  '.jx3dat',
 			MY_TM_TYPE_LIST,
 			'REPLACE',
 			function()
@@ -1923,7 +1915,7 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 	end
 	-- HM.20170504: add meta data
 	data['__meta'] = {
-		szEdition = ENVIRONMENT.GAME_EDITION,
+		szEdition = X.ENVIRONMENT.GAME_EDITION,
 		szAuthor = not X.IsEmpty(szAuthor)
 			and szAuthor
 			or GetUserRoleName(),

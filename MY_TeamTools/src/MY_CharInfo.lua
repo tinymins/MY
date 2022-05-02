@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 角色属性
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -44,7 +36,7 @@ function CharInfo.GetFrame(dwID)
 end
 
 function CharInfo.CreateFrame(dwID, szName)
-	local ui = UI.CreateFrame('MY_CharInfo' .. dwID, { w = 240, h = 400, text = '', close = true })
+	local ui = X.UI.CreateFrame('MY_CharInfo' .. dwID, { w = 240, h = 400, text = '', close = true })
 	local frame = CharInfo.GetFrame(dwID)
 	local x, y = 20, 10
 	x = x + ui:Append('Image', {
@@ -54,7 +46,7 @@ function CharInfo.CreateFrame(dwID, szName)
 	ui:Append('Text', {
 		name = 'Text_Name',
 		x = x, y = y + 2, w = 240 - 2 * x,
-		text = wstring.sub(szName, 1, 6), alignHorizontal = 1,
+		text = X.StringSubW(szName, 1, 6), alignHorizontal = 1,
 	}) -- UI超了
 	ui:Append('WndButton', {
 		name = 'LOOKUP', x = 70, y = 360,
@@ -72,7 +64,7 @@ function CharInfo.UpdateFrame(frame, status, data)
 	if not frame or not frame.pending then
 		return
 	end
-	local ui = UI(frame)
+	local ui = X.UI(frame)
 	if status == 'REFUSE' then
 		ui:Children('#Text_Info'):Text(_L['Refuse request']):Show()
 		frame.pending = false

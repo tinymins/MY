@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 开发者工具
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MYDev_UITexViewer'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_UITexViewer'
@@ -36,7 +28,7 @@ local _Cache = {}
 MYDev_UITexViewer = {}
 
 _Cache.OnPanelActive = function(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	local x, y = 20, 20
 
@@ -77,17 +69,17 @@ _Cache.OnPanelActive = function(wnd)
 				  :Image(szText .. '.UITex', tLine.nFrame)
 				  :Size(tLine.nWidth, tLine.nHeight)
 				  :Alpha(220)
-				  :Hover(function(bIn) UI(this):Alpha((bIn and 255) or 220) end)
-				  :Tip(szText .. '.UITex#' .. i .. '\n' .. tLine.nWidth .. 'x' .. tLine.nHeight .. '\n' .. _L['(left click to generate xml)'], UI.TIP_POSITION.TOP_BOTTOM)
+				  :Hover(function(bIn) X.UI(this):Alpha((bIn and 255) or 220) end)
+				  :Tip(szText .. '.UITex#' .. i .. '\n' .. tLine.nWidth .. 'x' .. tLine.nHeight .. '\n' .. _L['(left click to generate xml)'], X.UI.TIP_POSITION.TOP_BOTTOM)
 				  :Click(function() uiEdit:Text('<image>w='..tLine.nWidth..' h='..tLine.nHeight..' path="' .. szText .. '.UITex" frame=' .. i ..'</image>') end)
 			end
 		end
 	  end)
 	  :Click(function(nButton)
 		if IsPopupMenuOpened() then
-			UI(this):Autocomplete('close')
+			X.UI(this):Autocomplete('close')
 		else
-			UI(this):Autocomplete('search', '')
+			X.UI(this):Autocomplete('search', '')
 		end
 	  end)
 	  :Autocomplete('option', 'maxOption', 20)

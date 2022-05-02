@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : ÔÆ¶Ëºê
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -49,7 +41,7 @@ function D.Hook()
 	local hIconList = frame:Lookup('', 'Handle_Icon')
 	local nX = edtName:GetRelX() + edtName:GetW() + 10
 	local nY = edtName:GetRelY() - 4
-	nX = nX + UI(frame):Append('WndButton', {
+	nX = nX + X.UI(frame):Append('WndButton', {
 		name = 'Btn_YunMacro_Update',
 		x = nX, y = nY,
 		w = 'auto', h = edtName:GetH(),
@@ -63,8 +55,8 @@ function D.Hook()
 			X.Ajax({
 				url = 'https://pull.j3cx.com/api/macro/query',
 				data = {
-					l = ENVIRONMENT.GAME_LANG,
-					L = ENVIRONMENT.GAME_EDITION,
+					l = X.ENVIRONMENT.GAME_LANG,
+					L = X.ENVIRONMENT.GAME_EDITION,
 					name = szName,
 				},
 				success = function(szHTML)
@@ -102,7 +94,7 @@ function D.Hook()
 			})
 		end,
 	}):Width()
-	UI(frame):Append('WndButton', {
+	X.UI(frame):Append('WndButton', {
 		name = 'Btn_YunMacro_Details',
 		x = nX, y = nY,
 		w = 'auto', h = edtName:GetH(),
@@ -114,14 +106,14 @@ function D.Hook()
 			end
 			local szURL = 'https://page.j3cx.com/macro/details?'
 				.. X.EncodeQuerystring(X.ConvertToUTF8({
-					l = ENVIRONMENT.GAME_LANG,
-					L = ENVIRONMENT.GAME_EDITION,
+					l = X.ENVIRONMENT.GAME_LANG,
+					L = X.ENVIRONMENT.GAME_EDITION,
 					name = szName,
 				}))
-			UI.OpenBrowser(szURL, { key = 'MY_YunMacro_' .. GetStringCRC(szName), layer = 'Topmost', readonly = true })
+			X.UI.OpenBrowser(szURL, { key = 'MY_YunMacro_' .. GetStringCRC(szName), layer = 'Topmost', readonly = true })
 		end,
 	})
-	UI(frame):Append('WndButton', {
+	X.UI(frame):Append('WndButton', {
 		name = 'Btn_YunMacro_Tops',
 		x = edtMacro:GetRelX(), y = btnNew:GetRelY(),
 		w = btnNew:GetW(), h = btnNew:GetH(),
@@ -129,8 +121,8 @@ function D.Hook()
 		onClick = function()
 			local szURL = 'https://page.j3cx.com/macro/tops?'
 				.. X.EncodeQuerystring(X.ConvertToUTF8({
-					l = ENVIRONMENT.GAME_LANG,
-					L = ENVIRONMENT.GAME_EDITION,
+					l = X.ENVIRONMENT.GAME_LANG,
+					L = X.ENVIRONMENT.GAME_EDITION,
 					kungfu = tostring(UI_GetPlayerMountKungfuID()),
 				}))
 			X.OpenBrowser(szURL)

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 简易的多人拍卖
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/my_bidding/')
 local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_Bidding.ini'
@@ -542,7 +534,7 @@ function MY_BiddingBase.OnLButtonClick()
 				fnAction = function()
 					frame.tUnsavedConfig.nNumber = i
 					txt:SetText(i)
-					UI.ClosePopupMenu()
+					X.UI.ClosePopupMenu()
 				end,
 			})
 		end
@@ -550,7 +542,7 @@ function MY_BiddingBase.OnLButtonClick()
 		menu.x = wnd:GetAbsX()
 		menu.y = wnd:GetAbsY() + wnd:GetH()
 		menu.nMinWidth = wnd:GetW()
-		UI.PopupMenu(menu)
+		X.UI.PopupMenu(menu)
 	elseif name == 'WndButton_ConfigSubmit' then
 		if not X.IsDistributor() then
 			return X.Systopmsg(_L['You are not distributor!'])
@@ -754,7 +746,7 @@ function MY_BiddingBase.OnRButtonClick()
 		menu.nMiniWidth = this:GetW()
 		menu.x = nX
 		menu.y = nY + nH
-		UI.PopupMenu(menu)
+		X.UI.PopupMenu(menu)
 	end
 end
 

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 战斗统计
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
@@ -374,12 +366,12 @@ function D.GetMenu()
 		szOption = _L['Redraw interval'],
 		fnDisable = IsUIDisabled,
 	}
-	for _, i in ipairs({1, ENVIRONMENT.GAME_FPS / 2, ENVIRONMENT.GAME_FPS, ENVIRONMENT.GAME_FPS * 2}) do
+	for _, i in ipairs({1, X.ENVIRONMENT.GAME_FPS / 2, X.ENVIRONMENT.GAME_FPS, X.ENVIRONMENT.GAME_FPS * 2}) do
 		local szOption
 		if i == 1 then
 			szOption = _L['Realtime refresh']
 		else
-			szOption = _L('Every %.1f second', i / ENVIRONMENT.GAME_FPS)
+			szOption = _L('Every %.1f second', i / X.ENVIRONMENT.GAME_FPS)
 		end
 		table.insert(t1, {
 			szOption = szOption,
@@ -426,7 +418,7 @@ function D.GetHistoryMenu()
 			else
 				D.SetDisplayData('CURRENT')
 			end
-			UI.ClosePopupMenu()
+			X.UI.ClosePopupMenu()
 		end,
 		fnMouseEnter = function()
 			if not MY_Recount_DS.bRecEverything then
@@ -456,7 +448,7 @@ function D.GetHistoryMenu()
 				else
 					D.SetDisplayData(data)
 				end
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 			nFrame = 49,
@@ -466,7 +458,7 @@ function D.GetHistoryMenu()
 			szLayer = 'ICON_RIGHTMOST',
 			fnClickIcon = function()
 				MY_Recount_DS.Del(file.fullpath)
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end,
 			fnMouseEnter = function()
 				local aXml = {}
@@ -588,7 +580,7 @@ function D.GetPublishMenu()
 		for i = 0, math.min(hList:GetItemCount(), nLimit) - 1 do
 			local hItem = hList:Lookup(i)
 			table.insert(aResult, hItem.data)
-			nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
+			nMaxNameLen = math.max(nMaxNameLen, X.StringLenW(hItem.data.szName))
 		end
 		if not MY_Recount_UI.bShowPerSec then
 			nTimeCount = 1
@@ -597,7 +589,7 @@ function D.GetPublishMenu()
 		-- 发布数据
 		for i, p in ipairs(aResult) do
 			local szText = string.format('%02d', i) .. '.[' .. p.szName .. ']'
-			for i = wstring.len(p.szName), nMaxNameLen - 1 do
+			for i = X.StringLenW(p.szName), nMaxNameLen - 1 do
 				szText = szText .. g_tStrings.STR_ONE_CHINESE_SPACE
 			end
 			if MY_Recount.nPublishMode == PUBLISH_MODE.BOTH then
@@ -630,7 +622,7 @@ function D.GetPublishMenu()
 			bCheck = true, -- 不设置成可选框不能点╭∩╮(︶︿︶）╭∩╮垃圾
 			fnAction = function()
 				Publish(nChannel, math.huge)
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end,
 			rgb = GetMsgFontColor(szChannel, true),
 		}

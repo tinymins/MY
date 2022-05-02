@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 聊天记录 数据库集群控制器
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_ChatLog'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatLog'
@@ -468,7 +460,7 @@ function DS:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 	local tChannel = aChannel and X.FlipObjectKV(aChannel)
 	for _, rec in ipairs(self.aInsertQueueAnsi) do
 		if (not tChannel or tChannel[rec.szChannel])
-		and (wstring.find(rec.szText, szSearch) or wstring.find(rec.szTalker, szSearch)) then
+		and (X.StringFindW(rec.szText, szSearch) or X.StringFindW(rec.szTalker, szSearch)) then
 			nCount = nCount + 1
 		end
 	end
@@ -519,7 +511,7 @@ function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, b
 				break
 			end
 			if (not tChannel or tChannel[rec.szChannel])
-			and (wstring.find(rec.szText, szSearch) or wstring.find(rec.szTalker, szSearch)) then
+			and (X.StringFindW(rec.szText, szSearch) or X.StringFindW(rec.szTalker, szSearch)) then
 				if nOffset > 0 then
 					nOffset = nOffset - 1
 				else

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 聊天窗口名称染色插件
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Farbnamen'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Farbnamen'
@@ -90,7 +82,7 @@ local function InitDB()
 			szMsg = szMsg .. _L(' Retry time: %d', DB_ERR_COUNT)
 		end
 		DB_ERR_COUNT = DB_ERR_COUNT + 1
-		X.Sysmsg(_L['MY_Farbnamen'], szMsg, CONSTANT.MSG_THEME.ERROR)
+		X.Sysmsg(_L['MY_Farbnamen'], szMsg, X.CONSTANT.MSG_THEME.ERROR)
 		return false
 	end
 	DB:Execute([[
@@ -407,7 +399,7 @@ function D.RenderXml(szMsg, tOption)
 end
 
 function D.RenderNamelink(namelink, tOption)
-	local ui, nNumOffset = UI(namelink), 0
+	local ui, nNumOffset = X.UI(namelink), 0
 	if tOption.bColor or tOption.bInsertIcon then
 		local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
 		local tInfo = D.GetAusName(szName)
@@ -525,13 +517,13 @@ function D.GetTip(szName)
 			local szHeaderXml = HEADER_XML[tInfo.szName] and HEADER_XML[tInfo.szName][tInfo.dwID]
 			if szHeaderXml then
 				table.insert(tTip, szHeaderXml)
-				table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
+				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 			elseif tInfo.dwID ~= UI_GetClientPlayerID() then
 				local szName = GetRealName(tInfo.szName)
 				local szHeaderXml = HEADER_XML[szName] and HEADER_XML[szName]['*']
 				if szHeaderXml then
 					table.insert(tTip, szHeaderXml)
-					table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
+					table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 				end
 			end
 		end
@@ -541,16 +533,16 @@ function D.GetTip(szName)
 		if UI_GetClientPlayerID() ~= tInfo.dwID and X.IsParty(tInfo.dwID) then
 			table.insert(tTip, GetFormatText(_L['[Teammate]'], nil, 0, 255, 0))
 		end
-		table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
+		table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 		-- 称号
 		if tInfo.szTitle and #tInfo.szTitle > 0 then
 			table.insert(tTip, GetFormatText('<' .. tInfo.szTitle .. '>', 136))
-			table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
+			table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 		end
 		-- 帮会
 		if tInfo.szTongID and #tInfo.szTongID > 0 then
 			table.insert(tTip, GetFormatText('[' .. tInfo.szTongID .. ']', 136))
-			table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
+			table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 		end
 		-- 门派 体型 阵营
 		table.insert(tTip, GetFormatText(
@@ -558,18 +550,18 @@ function D.GetTip(szName)
 			(_MY_Farbnamen.tRoleType[tInfo.nRoleType] or tInfo.nRoleType or  _L['Unknown gender'])    .. _L.SPLIT_DOT ..
 			(_MY_Farbnamen.tCampString[tInfo.nCamp] or tInfo.nCamp or  _L['Unknown camp']), 136
 		))
-		table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
+		table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 		-- 随身便笺
 		if MY_Anmerkungen and MY_Anmerkungen.GetPlayerNote then
 			local note = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
 			if note and note.szContent ~= '' then
 				table.insert(tTip, GetFormatText(note.szContent, 0))
-				table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
+				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 			end
 		end
 		-- 调试信息
 		if IsCtrlKeyDown() then
-			table.insert(tTip, CONSTANT.XML_LINE_BREAKER)
+			table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 			table.insert(tTip, GetFormatText(_L('Player ID: %d', tInfo.dwID), 102))
 		end
 		-- 组装Tip
@@ -590,7 +582,7 @@ function D.ShowTip(namelink)
 
 	local szTip = D.GetTip(szName)
 	if szTip then
-		OutputTip(szTip, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+		OutputTip(szTip, 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 	end
 end
 ---------------------------------------------------------------
@@ -780,7 +772,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 100, h = 25,
 		value = O.nInsertIconSize,
 		range = {1, 300},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textFormatter = function(v) return _L('Icon size: %dpx', v) end,
 		onChange = function(val)
 			O.nInsertIconSize = val
@@ -845,7 +837,7 @@ end
 X.BreatheCall(250, onBreathe)
 
 local function OnPeekPlayer()
-	if arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+	if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 		l_peeklist[arg1] = 0
 	end
 end

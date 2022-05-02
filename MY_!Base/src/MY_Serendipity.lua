@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : ÆæÓö·ÖÏíÄ£¿é
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local _L, D = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/my_serendipity/'), {}
 local O = {
 	bEnable     = X.SchemaGet(X.LoadLUAData({'config/show_notify.jx3dat'           , X.PATH_TYPE.GLOBAL}), X.Schema.Boolean, false),
@@ -88,8 +80,8 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 			X.EnsureAjax({
 				url = 'https://push.j3cx.com/api/serendipity/uploads',
 				data = {
-					l = ENVIRONMENT.GAME_LANG,
-					L = ENVIRONMENT.GAME_EDITION,
+					l = X.ENVIRONMENT.GAME_LANG,
+					L = X.ENVIRONMENT.GAME_EDITION,
 					S = szRegion, s = szServer, a = szSerendipity,
 					n = szName, N = szNameCRC, R = szReporter,
 					f = eStatus, t = dwTime, c = nCount, m = nMethod,
@@ -126,7 +118,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 		-- end
 		if szMode ~= 'silent' then
 			local w, h = 270, 180
-			local ui = UI.CreateFrame('MY_Serendipity#' .. szKey, {
+			local ui = X.UI.CreateFrame('MY_Serendipity#' .. szKey, {
 				w = w, h = h, close = true, text = '', anchor = 'CENTER',
 			})
 			if szMode == 'auto' then

@@ -1,4 +1,4 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队监控界面
@@ -6,17 +6,9 @@
 -- @ref      : William Chan (Webster)
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
@@ -139,7 +131,7 @@ function D.OnFrameCreate()
 	this:Lookup('PageSet_Main/Wnd_SearchMap/Edit_SearchMap'):SetPlaceholderText(_L['Search map'])
 	this:Lookup('PageSet_Main/Wnd_SearchContent/Edit_SearchContent'):SetPlaceholderText(_L['Search content'])
 
-	local ui = UI(this)
+	local ui = X.UI(this)
 	ui:Text(_L['MY_TeamMon config panel'])
 	for k, v in ipairs(MY_TMUI_TYPE) do
 		this.hPageSet:Lookup('CheckBox_' .. v, 'Text_Page_' .. v):SetText(_L[v])
@@ -151,7 +143,7 @@ function D.OnFrameCreate()
 		menu = function()
 			local menu = {}
 			table.insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
-			local szLang = ENVIRONMENT.GAME_LANG
+			local szLang = X.ENVIRONMENT.GAME_LANG
 			if szLang == 'zhcn' or szLang == 'zhtw' then
 				table.insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
 			end
@@ -165,7 +157,7 @@ function D.OnFrameCreate()
 			table.insert(menu, { szOption = _L['Open data folder'], fnAction = function()
 				local szRoot = X.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT):gsub('/', '\\')
 				X.OpenFolder(szRoot)
-				UI.OpenTextEditor(szRoot)
+				X.UI.OpenTextEditor(szRoot)
 			end })
 			return menu
 		end,
@@ -280,7 +272,7 @@ function D.ConflictCheck()
 									_L['Data conflict'] .. ' ' .. _L[MY_TMUI_SELECT_TYPE] .. ' '
 										.. MY_TeamMon.GetMapName(k) .. ' :: ' .. vvv.dwID .. ' :: '
 										.. (vvv.szName or D.GetDataName(MY_TMUI_SELECT_TYPE, vvv)),
-									CONSTANT.MSG_THEME.ERROR)
+									X.CONSTANT.MSG_THEME.ERROR)
 								break
 							end
 						end
@@ -289,7 +281,7 @@ function D.ConflictCheck()
 			end
 		end
 		if bMsg then
-			X.Sysmsg(_L['MY_TeamMon'], _L['Data conflict, please check.'], CONSTANT.MSG_THEME.ERROR)
+			X.Sysmsg(_L['MY_TeamMon'], _L['Data conflict, please check.'], X.CONSTANT.MSG_THEME.ERROR)
 		end
 	end
 end
@@ -411,9 +403,9 @@ function D.RedrawMapList(frame)
 	-- 搜索
 	if MY_TMUI_MAP_SEARCH then
 		for i, v in X.ipairs_r(aGroupMap) do
-			if not wstring.find(v.szGroup, MY_TMUI_MAP_SEARCH) then
+			if not X.StringFindW(v.szGroup, MY_TMUI_MAP_SEARCH) then
 				for i, vv in X.ipairs_r(v.aMapInfo) do
-					if not wstring.find(vv.szName, MY_TMUI_MAP_SEARCH) then
+					if not X.StringFindW(vv.szName, MY_TMUI_MAP_SEARCH) then
 						table.remove(v.aMapInfo, i)
 					end
 				end
@@ -869,7 +861,7 @@ function D.InsertDungeonMenu(menu, fnAction)
 end
 
 function D.OpenImportPanel(szDefault, szTitle, fnAction)
-	local ui = UI.CreateFrame('MY_TeamMon_DataPanel', { w = 720, h = 330, text = _L['Import data'], close = true })
+	local ui = X.UI.CreateFrame('MY_TeamMon_DataPanel', { w = 720, h = 330, text = _L['Import data'], close = true })
 	local nX, nY = ui:Append('Text', { x = 20, y = 50, text = _L['Includes'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX = 20
 	for k, v in ipairs(MY_TMUI_TYPE) do
@@ -937,7 +929,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 				function(bStatus, ...)
 					if bStatus then
 						local szFilePath, aType, szMode, tMeta = ...
-						X.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szFilePath)), CONSTANT.MSG_THEME.SUCCESS)
+						X.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szFilePath)), X.CONSTANT.MSG_THEME.SUCCESS)
 						-- local function fnAlert2()
 						-- 	local szAuthor = tMeta and X.ReplaceSensitiveWord(tostring(tMeta.szAuthor)) or _L['Unknown author']
 						-- 	X.Alert(
@@ -963,7 +955,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 					else
 						-- bStatus, szMsg
 						local szMsg = ...
-						X.Sysmsg(_L['MY_TeamMon'], _L('Load config failed: %s', _L[szMsg]), CONSTANT.MSG_THEME.ERROR)
+						X.Sysmsg(_L['MY_TeamMon'], _L('Load config failed: %s', _L[szMsg]), X.CONSTANT.MSG_THEME.ERROR)
 						X.Alert(_L('Import failed: %s', szTitle or _L[szMsg]))
 						X.SafeCall(fnAction, bStatus, szMsg)
 					end
@@ -973,7 +965,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 end
 
 function D.OpenExportPanel()
-	local ui = UI.CreateFrame('MY_TeamMon_DataPanel', { w = 720, h = 410, text = _L['Export data'], close = true })
+	local ui = X.UI.CreateFrame('MY_TeamMon_DataPanel', { w = 720, h = 410, text = _L['Export data'], close = true })
 	local nX, nY = ui:Append('Text', { x = 20, y = 50, text = _L['Includes'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX = 20
 	for k, v in ipairs(MY_TMUI_TYPE) do
@@ -991,7 +983,7 @@ function D.OpenExportPanel()
 		end,
 	}):Pos('BOTTOMRIGHT')
 	nY = nY + 10
-	local szFileName = 'TM-' .. ENVIRONMENT.GAME_EDITION .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime())
+	local szFileName = 'TM-' .. X.ENVIRONMENT.GAME_EDITION .. FormatTime('-%Y%m%d_%H.%M', GetCurrentTime())
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['File name'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndEditBox', {
 		x = 25, y = nY, w = 500, h = 25,
@@ -1173,10 +1165,10 @@ function D.SetBuffItemAction(h)
 	local nSec = select(3, GetBuffTime(dat.dwID, dat.nLevel))
 	if not nSec then
 		h:Lookup('Text_R'):SetText('N/A')
-	elseif nSec > 24 * 60 * 60 / ENVIRONMENT.GAME_FPS then
+	elseif nSec > 24 * 60 * 60 / X.ENVIRONMENT.GAME_FPS then
 		h:Lookup('Text_R'):SetText(_L['INFINITE'])
 	else
-		nSec = nSec / ENVIRONMENT.GAME_FPS
+		nSec = nSec / X.ENVIRONMENT.GAME_FPS
 		h:Lookup('Text_R'):SetText(X.FormatDuration(nSec, 'PRIME'))
 	end
 	h:Lookup('Image_RBg'):Show()
@@ -1357,7 +1349,7 @@ function D.ScrollMapIntoView(frame)
 	if hNode and not MY_TMUI_TREE_EXPAND[hNode.szKey] then
 		X.ExecuteWithThis(hNode, D.OnItemLButtonClick)
 	end
-	UI.ScrollIntoView(hItem, frame.hTreeS)
+	X.UI.ScrollIntoView(hItem, frame.hTreeS)
 end
 
 -- 添加面板
@@ -1366,7 +1358,7 @@ function D.OpenAddPanel(szType, data)
 	if szType ~= 'TALK' and szType ~= 'CHAT' then
 		szName, nIcon = D.GetDataName(szType, data)
 	end
-	local ui = UI.CreateFrame('MY_TeamMon_NewData', { w = 380, h = 250, text = szName, focus = true, close = true })
+	local ui = X.UI.CreateFrame('MY_TeamMon_NewData', { w = 380, h = 250, text = szName, focus = true, close = true })
 	local nX, nY = 0, 0
 	ui:Event('MY_TMUI_SWITCH_PAGE', function() ui:Remove() end)
 	ui:Event('MY_TMUI_TEMP_RELOAD', function() ui:Remove() end)
@@ -1396,7 +1388,7 @@ function D.OpenAddPanel(szType, data)
 		autocomplete = {{'option', 'source', X.GetMapNameList()}},
 		onChange = function()
 			local el = this
-			local ui = UI(el)
+			local ui = X.UI(el)
 			if ui:Text() == '' then
 				local menu = {}
 				D.InsertDungeonMenu(menu, function(dwMapID)
@@ -1446,7 +1438,7 @@ function D.OpenAddPanel(szType, data)
 end
 -- 数据调试面板
 function D.OpenJsonPanel(data, fnAction)
-	local ui = UI.CreateFrame('MY_TeamMon_JsonPanel', { w = 720,h = 500, text = _L['MY_TeamMon DEBUG Panel'], close = true })
+	local ui = X.UI.CreateFrame('MY_TeamMon_JsonPanel', { w = 720,h = 500, text = _L['MY_TeamMon DEBUG Panel'], close = true })
 	ui:Event('MY_TMUI_DATA_RELOAD', function() ui:Remove() end)
 	ui:Event('MY_TMUI_SWITCH_PAGE', function() ui:Remove() end)
 	ui:Append('WndEditBox', {
@@ -1547,10 +1539,10 @@ function D.OpenSettingPanel(data, szType)
 		if data.tKungFu then
 			table.insert(menu, { szOption = _L['No request'], bCheck = true, bChecked = type(data.tKungFu) == 'nil', fnAction = function()
 				data.tKungFu = nil
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end })
 		end
-		for k, v in ipairs(CONSTANT.KUNGFU_LIST) do
+		for k, v in ipairs(X.CONSTANT.KUNGFU_LIST) do
 			table.insert(menu, {
 				szOption = X.GetSkillName(v.dwID, 1),
 				bCheck   = true,
@@ -1577,7 +1569,7 @@ function D.OpenSettingPanel(data, szType)
 		local menu = {}
 		for k, v in X.ipairs_c(PARTY_MARK_ICON_FRAME_LIST) do
 			table.insert(menu, {
-				szOption = CONSTANT.TEAM_MARK_NAME[k] or '?',
+				szOption = X.CONSTANT.TEAM_MARK_NAME[k] or '?',
 				szIcon = PARTY_MARK_ICON_PATH,
 				nFrame = v, szLayer = 'ICON_RIGHT',
 				bCheck = true, bChecked = data[nClass] and data[nClass].tMark and data[nClass].tMark[k],
@@ -1642,7 +1634,7 @@ function D.OpenSettingPanel(data, szType)
 		dat.nClass = val
 		FormatElPosByCountdownType(dat, ui, i)
 		ui:Children('#Countdown' .. i):Text(_L['Countdown TYPE ' ..  dat.nClass])
-		UI.ClosePopupMenu()
+		X.UI.ClosePopupMenu()
 	end
 
 	local function ParseCountdown(szCountdown, bOperator)
@@ -1696,7 +1688,7 @@ function D.OpenSettingPanel(data, szType)
 	elseif szType == 'CHAT' then
 		nIcon = 439
 	end
-	local ui = UI.CreateFrame('MY_TeamMon_SettingPanel', { w = 770, h = 450, text = szName, close = true, focus = true })
+	local ui = X.UI.CreateFrame('MY_TeamMon_SettingPanel', { w = 770, h = 450, text = szName, close = true, focus = true })
 	local frame = Station.Lookup('Normal/MY_TeamMon_SettingPanel')
 	ui:Event('MY_TMUI_DATA_RELOAD', function() ui:Remove() end)
 	ui:Event('MY_TMUI_SWITCH_PAGE', function() ui:Remove() end)
@@ -1730,7 +1722,7 @@ function D.OpenSettingPanel(data, szType)
 		end
 		if szType ~= 'NPC' and szType ~= 'TALK' and szType ~= 'CHAT' then
 			table.insert(menu, { szOption = _L['Edit icon'], fnAction = function()
-				UI.OpenIconPicker(function(nNewIcon)
+				X.UI.OpenIconPicker(function(nNewIcon)
 					nIcon = nNewIcon
 					data.nIcon = nNewIcon
 					box:SetObjectIcon(nNewIcon)
@@ -1749,7 +1741,7 @@ function D.OpenSettingPanel(data, szType)
 				ui:Children('#Shadow_Color'):Alpha(0)
 			end,
 			fnAction = function()
-				UI.OpenColorPicker(function(r, g, b)
+				X.UI.OpenColorPicker(function(r, g, b)
 					data.col = { r, g, b }
 					ui:Children('#Shadow_Color'):Color(r, g, b):Alpha(255)
 				end)
@@ -1808,7 +1800,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Buffcount achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndEditBox', {
 			x = nX + 2, y = nY + 2, w = 30, h = 26,
-			text = data.nCount or 1, editType = UI.EDIT_TYPE.NUMBER,
+			text = data.nCount or 1, editType = X.UI.EDIT_TYPE.NUMBER,
 			onChange = function(nNum)
 				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
@@ -1862,7 +1854,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 			tip = {
 				render = _L['Requires MY_LifeBar loaded.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bScreenHead', bCheck)
@@ -2066,7 +2058,7 @@ function D.OpenSettingPanel(data, szType)
 				x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 				tip = {
 					render = _L['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'],
-					position = UI.TIP_POSITION.BOTTOM_TOP,
+					position = X.UI.TIP_POSITION.BOTTOM_TOP,
 				},
 				onCheck = function(bCheck)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bScreenHead', bCheck)
@@ -2094,7 +2086,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Count achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndEditBox', {
 			x = nX + 2, y = nY + 2, w = 30, h = 26,
-			text = data.nCount or 1, editType = UI.EDIT_TYPE.NUMBER,
+			text = data.nCount or 1, editType = X.UI.EDIT_TYPE.NUMBER,
 			onChange = function(nNum)
 				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
@@ -2152,7 +2144,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 			tip = {
 				render = _L['Requires MY_LifeBar loaded.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
@@ -2209,7 +2201,7 @@ function D.OpenSettingPanel(data, szType)
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Count achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndEditBox', {
-			x = nX + 2, y = nY + 2, w = 30, h = 26, text = data.nCount or 1, editType = UI.EDIT_TYPE.NUMBER,
+			x = nX + 2, y = nY + 2, w = 30, h = 26, text = data.nCount or 1, editType = X.UI.EDIT_TYPE.NUMBER,
 			onChange = function(nNum)
 				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
@@ -2260,7 +2252,7 @@ function D.OpenSettingPanel(data, szType)
 			-- 	x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 			-- 	tip = {
 			-- 	render = _L['Requires MY_LifeBar loaded.'],
-			-- 	position = UI.TIP_POSITION.BOTTOM_TOP,
+			-- 	position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			-- },
 			-- 	onCheck = function(bCheck)
 			-- 		SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
@@ -2321,7 +2313,7 @@ function D.OpenSettingPanel(data, szType)
 			end,
 			tip = {
 				render = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Speaker'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2351,7 +2343,7 @@ function D.OpenSettingPanel(data, szType)
 			text = _L['Partical search'],
 			tip = {
 				render = _L['Supports match partical.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			checked = data.bSearch,
 			onCheck = function(bCheck)
@@ -2364,7 +2356,7 @@ function D.OpenSettingPanel(data, szType)
 			text = _L['Regexp match'],
 			tip = {
 				render = _L['Supports backreference in note string, format: {$index}.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			checked = data.bReg,
 			onCheck = function(bCheck)
@@ -2404,7 +2396,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 			tip = {
 				render = _L['Requires MY_LifeBar loaded.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
@@ -2433,7 +2425,7 @@ function D.OpenSettingPanel(data, szType)
 			end,
 			tip = {
 				render = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Chat content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2450,7 +2442,7 @@ function D.OpenSettingPanel(data, szType)
 			text = _L['Partical search'],
 			tip = {
 				render = _L['Supports match partical.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			checked = data.bSearch,
 			onCheck = function(bCheck)
@@ -2463,7 +2455,7 @@ function D.OpenSettingPanel(data, szType)
 			text = _L['Regexp match'],
 			tip = {
 				render = _L['Supports backreference in note string, format: {$index}.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			checked = data.bReg,
 			onCheck = function(bCheck)
@@ -2503,7 +2495,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 			tip = {
 				render = _L['Requires MY_LifeBar loaded.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			onCheck = function(bCheck)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
@@ -2586,7 +2578,7 @@ function D.OpenSettingPanel(data, szType)
 							bChecked = v.nFrame == i,
 							fnAction = function()
 								v.nFrame = i
-								UI.ClosePopupMenu()
+								X.UI.ClosePopupMenu()
 							end,
 							szIcon = PLUGIN_ROOT .. '/img/ST.UITex',
 							nFrame = i,
@@ -2643,7 +2635,7 @@ function D.OpenSettingPanel(data, szType)
 					end
 					return szTip, true
 				end,
-				position = UI.TIP_POSITION.LEFT_RIGHT,
+				position = X.UI.TIP_POSITION.LEFT_RIGHT,
 			},
 		}):Pos('BOTTOMRIGHT')
 		-- 图标
@@ -2652,7 +2644,7 @@ function D.OpenSettingPanel(data, szType)
 			onHover = function(bHover) this:SetObjectMouseOver(bHover) end,
 			onClick = function()
 				local box = this
-				UI.OpenIconPicker(function(nIcon)
+				X.UI.OpenIconPicker(function(nIcon)
 					v.nIcon = nIcon
 					box:SetObjectIcon(nIcon)
 				end)
@@ -2666,7 +2658,7 @@ function D.OpenSettingPanel(data, szType)
 			end,
 			tip = {
 				render = _L['Raid talk warning'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		-- 普通倒计时时间/分段倒计时
@@ -2729,7 +2721,7 @@ function D.OpenSettingPanel(data, szType)
 					end
 					return _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called']
 				end,
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 		})
 		-- 普通倒计时文本
@@ -2741,20 +2733,20 @@ function D.OpenSettingPanel(data, szType)
 			end,
 			tip = {
 				render = _L['Simple countdown text'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			placeholder = _L['Please input simple countdown text...'],
 		}):Pos('BOTTOMRIGHT')
 		-- 重复调用时间限制
 		nX = ui:Append('WndEditBox', {
 			x = nX + 5, y = nY, w = 30, h = 25,
-			text = v.nRefresh, editType = UI.EDIT_TYPE.NUMBER,
+			text = v.nRefresh, editType = X.UI.EDIT_TYPE.NUMBER,
 			onChange = function(szNum)
 				v.nRefresh = tonumber(szNum)
 			end,
 			tip = {
 				render = _L['Max repeat time\n\nWhen countdown get trigger again, the last countdown may get overwritten. This config is to sovle this problem, input time limit here to ensure in this time period, countdown will not be trigger again.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 		}):Pos('BOTTOMRIGHT')
 		-- 删除按钮
@@ -2861,8 +2853,8 @@ function D.OpenSettingPanel(data, szType)
 					x = 35, y = nY + 3, w = 23, h = 23,
 					color = circle.col,
 					onClick = function()
-						local ui = UI(this)
-						UI.OpenColorPicker(function(r, g, b)
+						local ui = X.UI(this)
+						X.UI.OpenColorPicker(function(r, g, b)
 							ui:Color(r, g, b)
 							circle.col = { r, g, b }
 							FireUIEvent('MY_TM_CC_RELOAD')
@@ -2870,7 +2862,7 @@ function D.OpenSettingPanel(data, szType)
 					end,
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndEditBox', {
-					x = nX + 5, y = nY + 2, w = 80, h = 26, text = circle.nAngle, editType = UI.EDIT_TYPE.NUMBER,
+					x = nX + 5, y = nY + 2, w = 80, h = 26, text = circle.nAngle, editType = X.UI.EDIT_TYPE.NUMBER,
 					onChange = function(nNum)
 						circle.nAngle = tonumber(nNum) or 80
 						FireUIEvent('MY_TM_CC_RELOAD')
@@ -2878,7 +2870,7 @@ function D.OpenSettingPanel(data, szType)
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Degree'] }):AutoWidth():Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndEditBox', {
-					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nRadius, editType = UI.EDIT_TYPE.NUMBER,
+					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nRadius, editType = X.UI.EDIT_TYPE.NUMBER,
 					onChange = function(nNum)
 						circle.nRadius = tonumber(nNum) or 4
 						FireUIEvent('MY_TM_CC_RELOAD')
@@ -2886,7 +2878,7 @@ function D.OpenSettingPanel(data, szType)
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Meter'] }):AutoWidth():Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndEditBox', {
-					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nAlpha, editType = UI.EDIT_TYPE.NUMBER,
+					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nAlpha, editType = X.UI.EDIT_TYPE.NUMBER,
 					onChange = function(nNum)
 						circle.nAlpha = tonumber(nNum)
 						FireUIEvent('MY_TM_CC_RELOAD')
@@ -2952,13 +2944,13 @@ function D.OpenSettingPanel(data, szType)
 		if szType == 'NPC' or szType == 'DOODAD' then
 			nX, nY = ui:Append('Text', { x = 20, y = nY + 10, text = _L['Focuslist'], font = 27 }):Pos('BOTTOMRIGHT')
 			nX, nY = 30, nY + 10
-			for _, p in ipairs(data.aFocus or CONSTANT.EMPTY_TABLE) do
+			for _, p in ipairs(data.aFocus or X.CONSTANT.EMPTY_TABLE) do
 				nX = nX + ui:Append('WndButton', {
 					x = nX, y = nY, w = 100,
 					text = MY_Focus.FormatRuleText(p, true),
 					buttonStyle = 'FLAT',
 					onClick = function()
-						local ui = UI(this)
+						local ui = X.UI(this)
 						MY_Focus.OpenRuleEditor(p, function(dat)
 							if dat then
 								for k, v in pairs(dat) do
@@ -3006,13 +2998,13 @@ function D.OpenSettingPanel(data, szType)
 		if szType == 'BUFF' or szType == 'DEBUFF' then
 			nX, nY = ui:Append('Text', { x = 20, y = nY + 10, text = _L['Team panel buff rule list'], font = 27 }):Pos('BOTTOMRIGHT')
 			nX, nY = 30, nY + 10
-			for _, p in ipairs(data.aCataclysmBuff or CONSTANT.EMPTY_TABLE) do
+			for _, p in ipairs(data.aCataclysmBuff or X.CONSTANT.EMPTY_TABLE) do
 				nX = nX + ui:Append('WndButton', {
 					x = nX, y = nY, w = 100,
 					text = MY_Cataclysm.EncodeBuffRule(p, true),
 					buttonStyle = 'FLAT',
 					onClick = function()
-						local ui = UI(this)
+						local ui = X.UI(this)
 						MY_Cataclysm.OpenBuffRuleEditor(p, function(dat)
 							if dat then
 								for k, v in pairs(dat) do

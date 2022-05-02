@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 长歌影子头顶次序
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Force'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -58,7 +50,7 @@ function D.Apply()
 	if O.bEnable then
 		local MAX_LIMIT_TIME = 25
 		local hList, hItem, nCount, sha, r, g, b, nDis, szText, fPer
-		local hShaList = UI.GetShadowHandle('MY_ChangGeShadow')
+		local hShaList = X.UI.GetShadowHandle('MY_ChangGeShadow')
 		local MAX_SHADOW_COUNT = 10
 		local nInterval = (O.bShowDistance or O.bShowCD) and 50 or 400
 		X.BreatheCall('CHANGGE_SHADOW', nInterval, function()
@@ -117,13 +109,13 @@ function D.Apply()
 		hShaList:Show()
 	else
 		X.BreatheCall('CHANGGE_SHADOW', false)
-		UI.GetShadowHandle('MY_ChangGeShadow'):Hide()
+		X.UI.GetShadowHandle('MY_ChangGeShadow'):Hide()
 	end
 end
 X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChangGeShadow', D.Apply)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
-	if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = 'auto',
 			text = _L['Show changge shadow index'],
@@ -138,11 +130,11 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 						return _L['Changge force only']
 					end
 				end,
-				position = UI.TIP_POSITION.TOP_BOTTOM,
+				position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			},
 			autoEnable = function()
 				local me = GetClientPlayer()
-				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
+				return me and me.dwForceID == X.CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
 		}):Width() + 5
 		nX = nX + ui:Append('WndCheckBox', {
@@ -159,11 +151,11 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 						return _L['Changge force only']
 					end
 				end,
-				position = UI.TIP_POSITION.TOP_BOTTOM,
+				position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			},
 			autoEnable = function()
 				local me = GetClientPlayer()
-				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
+				return me and me.dwForceID == X.CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
 		}):Width() + 5
 		nX = nX + ui:Append('WndCheckBox', {
@@ -180,18 +172,18 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 						return _L['Changge force only']
 					end
 				end,
-				position = UI.TIP_POSITION.TOP_BOTTOM,
+				position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			},
 			autoEnable = function()
 				local me = GetClientPlayer()
-				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
+				return me and me.dwForceID == X.CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
 		}):Width() + 5
 		ui:Append('WndTrackbar', {
 			x = nX, y = nY, w = 150,
 			textFormatter = function(val) return _L('Scale: %d%%.', val) end,
 			range = {10, 800},
-			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 			value = O.fScale * 100,
 			onChange = function(val)
 				O.fScale = val / 100
@@ -199,7 +191,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			end,
 			autoEnable = function()
 				local me = GetClientPlayer()
-				return me and me.dwForceID == CONSTANT.FORCE_TYPE.CHANG_GE
+				return me and me.dwForceID == X.CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
 		})
 	end

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 焦点列表
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Focus'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Focus'
@@ -61,7 +53,7 @@ function D.AdjustScaleRatio(frame, hList)
 		end
 		hInfoList:FormatAllItemPos()
 		-- 字体大小
-		UI(hItem):Find('.Text'):FontScale(frame.fScaleY)
+		X.UI(hItem):Find('.Text'):FontScale(frame.fScaleY)
 	end
 	local nW, nH = hTotal:Lookup('Image_Title'):GetSize()
 	hTotal:Lookup('Text_Title'):SetRelX(nH * 1.1)
@@ -84,7 +76,7 @@ function D.Scale(frame)
 	frame.fScaleX = MY_Focus.fScaleX
 	frame.fScaleY = MY_Focus.fScaleY
 	frame:Scale(frame.fScaleX, frame.fScaleY)
-	UI(frame):Find('.Text'):FontScale(frame.fScaleY)
+	X.UI(frame):Find('.Text'):FontScale(frame.fScaleY)
 	D.AdjustScaleRatio(frame)
 end
 
@@ -310,9 +302,9 @@ function D.UpdateItem(hItem, p)
 	-- 读条
 	if dwType ~= TARGET.DOODAD then
 		local nType, dwSkillID, dwSkillLevel, fProgress = X.GetOTActionState(KObject)
-		if (nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
-			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE)
+		if (nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+			or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+			or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE)
 		and dwSkillID and dwSkillLevel then
 			hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress or 0)
 			hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText(X.GetSkillName(dwSkillID, dwSkillLevel) or '')
@@ -451,7 +443,7 @@ function D.OnEvent(event)
 	if event == 'PARTY_SET_MARK' then
 		D.UpdateList(this)
 	elseif event == 'UI_SCALED' then
-		UI(this):Anchor(MY_Focus.anchor)
+		X.UI(this):Anchor(MY_Focus.anchor)
 	elseif event == 'PLAYER_ENTER_SCENE' then
 		D.OnObjectEnterScene(TARGET.PLAYER, arg0)
 	elseif event == 'NPC_ENTER_SCENE' then
@@ -481,7 +473,7 @@ end
 
 function D.OnFrameDragEnd()
 	this:CorrectPos()
-	MY_Focus.anchor = UI(this):Anchor('TOPRIGHT')
+	MY_Focus.anchor = X.UI(this):Anchor('TOPRIGHT')
 end
 
 function D.OnFrameDragSetPosEnd()
@@ -575,7 +567,7 @@ function D.OnItemRButtonClick()
 					table.insert(aText, 'TemplateID: ' .. obj.dwTemplateID)
 					table.insert(aText, 'Pos: ' .. '[' .. X.GetMapID() .. '] ' .. obj.nX .. ', ' .. obj.nY .. ', ' .. obj.nZ)
 				end
-				UI.OpenTextEditor((table.concat(aText, '\n')))
+				X.UI.OpenTextEditor((table.concat(aText, '\n')))
 			end,
 		})
 		local bLock = dwType == l_dwLockType and dwID == l_dwLockID

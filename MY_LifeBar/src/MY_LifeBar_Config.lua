@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 扁平血条设置
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_LifeBar'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar'
@@ -691,14 +683,14 @@ local function LoadDefaultTemplate(szStyle)
 	end
 	for _, szRelation in ipairs({ 'Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe' }) do
 		local tVal = X.KvpToObject(template[1].Color[szRelation].__VALUE__)
-		for _, dwForceID in X.pairs_c(CONSTANT.FORCE_TYPE) do
+		for _, dwForceID in X.pairs_c(X.CONSTANT.FORCE_TYPE) do
 			if not tVal[dwForceID] then
 				tVal[dwForceID] = { X.GetForceColor(dwForceID, 'foreground') }
 			end
 		end
 		template[1].Color[szRelation].__VALUE__ = tVal
 	end
-	if ENVIRONMENT.GAME_PROVIDER == 'remote' then -- 云端微调对立颜色防止压缩模糊
+	if X.ENVIRONMENT.GAME_PROVIDER == 'remote' then -- 云端微调对立颜色防止压缩模糊
 		for _, szType in ipairs({ 'Player', 'Npc' }) do
 			template[1].Color.Enemy.__VALUE__[szType] = { 253, 86, 86 }
 		end

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 大战没交
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_DynamicItem'
@@ -84,7 +76,7 @@ local MAP_MERGE = setmetatable({
 	[442] = 421, -- 浪客行·胡杨林道
 	[443] = 421, -- 浪客行·浮景峰
 	[461] = 421, -- 浪客行·落樱林
-}, {__index = CONSTANT.MAP_MERGE})
+}, {__index = X.CONSTANT.MAP_MERGE})
 
 function D.GetMapID()
 	local dwMapID = GetClientPlayer().GetMapID()
@@ -174,7 +166,7 @@ function D.UpdateCDText(txt, nTime)
 	if txt.nTime == nTime then
 		return
 	end
-	local nSec, szTime, nR, nG, nB = math.floor(nTime / ENVIRONMENT.GAME_FPS)
+	local nSec, szTime, nR, nG, nB = math.floor(nTime / X.ENVIRONMENT.GAME_FPS)
 	if nSec == 0 then
 		szTime, nR, nG, nB = '', 255, 255, 255
 	else
@@ -487,7 +479,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		end,
 		tip = {
 			render = _L['Dynamic item bar for different map'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	}):Width() + 5
 
@@ -504,7 +496,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX = nX + ui:Append('WndTrackbar', {
 		x = nX, y = nY, h = 25, w = 220,
 		range = {1, 32}, value = MY_DynamicItem.nNum,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textFormatter = function(v) return _L('Box number: %d', v) end,
 		onChange = function(nVal)
 			X.DelayCall(function() MY_DynamicItem.nNum = nVal end)
@@ -515,7 +507,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX = nX + ui:Append('WndTrackbar', {
 		x = nX, y = nY, h = 25, w = 220,
 		range = {1, 32}, value = MY_DynamicItem.nCol,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textFormatter = function(v) return _L('Col number: %d', v) end,
 		onChange = function(nVal)
 			X.DelayCall(function() MY_DynamicItem.nCol = nVal end)

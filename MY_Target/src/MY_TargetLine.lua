@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 目标方位显示
 -- @author   : Webster
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Target'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TargetLine'
@@ -110,7 +102,7 @@ local function DrawShadowLine(sha, dwSrcType, dwSrcID, dwDstType, dwDstID, aCol,
 	sha:Show()
 end
 local function GetShadow(szName)
-	local hShaList = UI.GetShadowHandle('MY_TargetLine')
+	local hShaList = X.UI.GetShadowHandle('MY_TargetLine')
 	local sha = hShaList:Lookup(szName)
 	if not sha then
 		hShaList:AppendItemFromString('<shadow>name="' .. szName .. '"</shadow>')

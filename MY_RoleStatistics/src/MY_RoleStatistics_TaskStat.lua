@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 任务统计（日常统计）
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_TaskStat'
@@ -30,7 +22,7 @@ CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
 local DB = X.SQLiteConnect(_L['MY_RoleStatistics_TaskStat'], {'userdata/role_statistics/task_stat.v3.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return X.Sysmsg(_L['MY_RoleStatistics_TaskStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return X.Sysmsg(_L['MY_RoleStatistics_TaskStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
 
 DB:Execute([[
@@ -336,123 +328,123 @@ local function InitTaskList(bReload)
 	-- 大战
 	table.insert(aTask, {
 		id = 'big_war',
-		szTitle = ENVIRONMENT.GAME_BRANCH == 'classic'
+		szTitle = X.ENVIRONMENT.GAME_BRANCH == 'classic'
 			and _L['Bounty']
 			or _L['Big war'],
 		eType = TASK_TYPE.DAILY,
-		aQuestInfo = CONSTANT.QUEST_INFO.BIG_WARS,
+		aQuestInfo = X.CONSTANT.QUEST_INFO.BIG_WARS,
 	})
 	-- 茶馆
 	table.insert(aTask, {
 		id = 'teahouse',
 		szTitle = _L['Teahouse'],
 		eType = TASK_TYPE.DAILY,
-		aQuestInfo = CONSTANT.QUEST_INFO.TEAHOUSE_ROUTINE,
+		aQuestInfo = X.CONSTANT.QUEST_INFO.TEAHOUSE_ROUTINE,
 	})
 	-- 勤修不辍
 	table.insert(aTask, {
 		id = 'force_routine',
 		szTitle = _L['Force routine'],
 		eType = TASK_TYPE.DAILY,
-		tForceQuestInfo = CONSTANT.QUEST_INFO.FORCE_ROUTINE,
+		tForceQuestInfo = X.CONSTANT.QUEST_INFO.FORCE_ROUTINE,
 	})
 	-- 浪客行
 	table.insert(aTask, {
 		id = 'rookie_routine',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
+		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Rookie routine'],
 		eType = TASK_TYPE.WEEKLY,
-		aQuestInfo = CONSTANT.QUEST_INFO.ROOKIE_ROUTINE,
+		aQuestInfo = X.CONSTANT.QUEST_INFO.ROOKIE_ROUTINE,
 	})
 	-- 晶矿争夺
 	table.insert(aTask, {
 		id = 'crystal_scramble',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
+		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Crystal scramble'],
 		eType = TASK_TYPE.DAILY,
-		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_CRYSTAL_SCRAMBLE,
+		tCampQuestInfo = X.CONSTANT.QUEST_INFO.CAMP_CRYSTAL_SCRAMBLE,
 	})
 	-- 据点贸易
 	table.insert(aTask, {
 		id = 'stronghold_trade',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
+		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Stronghold trade'],
 		eType = TASK_TYPE.DAILY,
-		tCampQuestInfo = CONSTANT.QUEST_INFO.CAMP_STRONGHOLD_TRADE,
+		tCampQuestInfo = X.CONSTANT.QUEST_INFO.CAMP_STRONGHOLD_TRADE,
 	})
 	-- 龙门绝境
 	table.insert(aTask, {
 		id = 'dragon_gate_despair',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
+		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Dragon gate despair'],
 		eType = TASK_TYPE.DAILY,
-		aQuestInfo = CONSTANT.QUEST_INFO.DRAGON_GATE_DESPAIR,
+		aQuestInfo = X.CONSTANT.QUEST_INFO.DRAGON_GATE_DESPAIR,
 	})
 	-- 列星虚境
 	table.insert(aTask, {
 		id = 'lexus_reality',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
+		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Lexus reality'],
 		eType = TASK_TYPE.DAILY,
-		aQuestInfo = CONSTANT.QUEST_INFO.LEXUS_REALITY,
+		aQuestInfo = X.CONSTANT.QUEST_INFO.LEXUS_REALITY,
 	})
 	-- 李渡鬼城
 	table.insert(aTask, {
 		id = 'lidu_ghost_town',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
+		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Lidu ghost town'],
 		eType = TASK_TYPE.DAILY,
-		aQuestInfo = CONSTANT.QUEST_INFO.LIDU_GHOST_TOWN,
+		aQuestInfo = X.CONSTANT.QUEST_INFO.LIDU_GHOST_TOWN,
 	})
 	-- 公共日常
 	table.insert(aTask, {
 		id = 'public_routine',
 		szTitle = _L['Public routine'],
 		eType = TASK_TYPE.DAILY,
-		aQuestInfo = CONSTANT.QUEST_INFO.PUBLIC_ROUTINE,
+		aQuestInfo = X.CONSTANT.QUEST_INFO.PUBLIC_ROUTINE,
 	})
 	-- 采仙草
 	table.insert(aTask, {
 		id = 'picking_fairy_grass',
 		szTitle = _L['Picking fairy grass'],
 		eType = TASK_TYPE.DAILY,
-		aQuestInfo = CONSTANT.QUEST_INFO.PICKING_FAIRY_GRASS,
+		aQuestInfo = X.CONSTANT.QUEST_INFO.PICKING_FAIRY_GRASS,
 	})
 	-- 寻龙脉
 	table.insert(aTask, {
 		id = 'find_dragon_veins',
-		bVisible = ENVIRONMENT.GAME_BRANCH ~= 'classic',
+		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
 		szTitle = _L['Find dragon veins'],
 		eType = TASK_TYPE.DAILY,
-		aQuestInfo = CONSTANT.QUEST_INFO.FIND_DRAGON_VEINS,
+		aQuestInfo = X.CONSTANT.QUEST_INFO.FIND_DRAGON_VEINS,
 	})
 	-- 美人图
 	table.insert(aTask, {
 		id = 'illustration_routine',
 		szTitle = _L['Illustration routine'],
 		eType = TASK_TYPE.DAILY,
-		aQuestInfo = CONSTANT.QUEST_INFO.ILLUSTRATION_ROUTINE,
+		aQuestInfo = X.CONSTANT.QUEST_INFO.ILLUSTRATION_ROUTINE,
 	})
 	-- 美人图潜行
 	table.insert(aTask, {
 		id = 'sneak_routine',
 		szTitle = _L['Sneak routine'],
 		eType = TASK_TYPE.DAILY,
-		aQuestInfo = CONSTANT.QUEST_INFO.SNEAK_ROUTINE,
+		aQuestInfo = X.CONSTANT.QUEST_INFO.SNEAK_ROUTINE,
 	})
 	-- 省试
 	table.insert(aTask, {
 		id = 'exam_sheng',
 		szTitle = _L['Exam sheng'],
 		eType = TASK_TYPE.WEEKLY,
-		aBuffInfo = CONSTANT.BUFF_INFO.EXAM_SHENG,
+		aBuffInfo = X.CONSTANT.BUFF_INFO.EXAM_SHENG,
 	})
 	-- 会试
 	table.insert(aTask, {
 		id = 'exam_hui',
 		szTitle = _L['Exam hui'],
 		eType = TASK_TYPE.WEEKLY,
-		aBuffInfo = CONSTANT.BUFF_INFO.EXAM_HUI,
+		aBuffInfo = X.CONSTANT.BUFF_INFO.EXAM_HUI,
 	})
 	-- 用户自定义数据
 	DB_TaskR:ClearBindings()
@@ -473,12 +465,12 @@ local function InitTaskList(bReload)
 			tForceBuffInfo = tTaskInfo.force_buffs,
 		})
 	end
-	aTask = lodash.filter(aTask, function(p) return p.bVisible ~= false end)
+	aTask = X.lodash.filter(aTask, function(p) return p.bVisible ~= false end)
 	TASK_LIST = aTask
 	-- 高速id键索引
 	local tTask = setmetatable({}, {
 		__index = function(_, id)
-			if ENVIRONMENT.GAME_BRANCH == 'classic' then
+			if X.ENVIRONMENT.GAME_BRANCH == 'classic' then
 				return
 			end
 			if id == 'week_team_dungeon' then
@@ -971,7 +963,7 @@ function D.GetTableColumns()
 end
 
 function D.UpdateUI(page)
-	local ui = UI(page)
+	local ui = X.UI(page)
 
 	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
 	local szUSearch = AnsiToUTF8('%' .. szSearch .. '%')
@@ -1047,7 +1039,7 @@ function D.OutputRowTip(this, rec)
 	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	local nPosType = bFloat and UI.TIP_POSITION.TOP_BOTTOM or UI.TIP_POSITION.RIGHT_LEFT
+	local nPosType = bFloat and X.UI.TIP_POSITION.TOP_BOTTOM or X.UI.TIP_POSITION.RIGHT_LEFT
 	OutputTip(D.GetRowTip(rec, bFloat), 450, {x, y, w, h}, nPosType)
 end
 
@@ -1057,7 +1049,7 @@ end
 
 function D.OnInitPage()
 	local page = this
-	local ui = UI(page)
+	local ui = X.UI(page)
 
 	ui:Append('WndEditBox', {
 		name = 'WndEditBox_Search',
@@ -1138,7 +1130,7 @@ function D.OnInitPage()
 									end
 								end,
 							},
-							CONSTANT.MENU_DIVIDER,
+							X.CONSTANT.MENU_DIVIDER,
 							{
 								szOption = _L['Delete'],
 								fnAction = function()
@@ -1234,7 +1226,7 @@ function D.OnInitPage()
 			render = function(rec)
 				return D.GetRowTip(rec, false), true
 			end,
-			position = UI.TIP_POSITION.RIGHT_LEFT,
+			position = X.UI.TIP_POSITION.RIGHT_LEFT,
 		},
 		rowMenuRClick = function(rec, index)
 			local menu = {
@@ -1413,7 +1405,7 @@ X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_TaskStat', function(
 end)
 
 X.RegisterExit('MY_RoleStatistics_TaskStat', function()
-	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		D.UpdateSaveDB()
 		D.FlushDB()
 	end

@@ -1130,7 +1130,7 @@ local function FormatStorageData(me, d)
 		n = X.GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
 		S = X.GetRealServer(1), s = X.GetRealServer(2), r = me.nRoleType,
 		_ = GetCurrentTime(), t = X.GetTongName(), d = d,
-		m = ENVIRONMENT.GAME_PROVIDER == 'remote' and 1 or 0, v = X.PACKET_INFO.VERSION,
+		m = X.ENVIRONMENT.GAME_PROVIDER == 'remote' and 1 or 0, v = X.PACKET_INFO.VERSION,
 	})))
 end
 -- 个人数据版本号
@@ -1151,20 +1151,20 @@ X.BreatheCall(X.NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 	X.Ajax({
 		url = 'https://storage.j3cx.com/api/storage',
 		data = {
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			data = FormatStorageData(me),
 		},
 		success = function(html, status)
 			local data = X.DecodeJSON(html)
 			if data then
-				for k, v in pairs(data.public or CONSTANT.EMPTY_TABLE) do
+				for k, v in pairs(data.public or X.CONSTANT.EMPTY_TABLE) do
 					local oData = X.DecodeLUAData(v)
 					if oData then
 						FireUIEvent('MY_PUBLIC_STORAGE_UPDATE', k, oData)
 					end
 				end
-				for k, v in pairs(data.private or CONSTANT.EMPTY_TABLE) do
+				for k, v in pairs(data.private or X.CONSTANT.EMPTY_TABLE) do
 					if not m_nStorageVer[k] or m_nStorageVer[k] < v.v then
 						local oData = X.DecodeLUAData(v.o)
 						if oData ~= nil then
@@ -1173,7 +1173,7 @@ X.BreatheCall(X.NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 						m_nStorageVer[k] = v.v
 					end
 				end
-				for _, v in ipairs(data.action or CONSTANT.EMPTY_TABLE) do
+				for _, v in ipairs(data.action or X.CONSTANT.EMPTY_TABLE) do
 					if v[1] == 'execute' then
 						local f = X.GetGlobalValue(v[2])
 						if f then
@@ -1205,8 +1205,8 @@ function X.StorageData(szKey, oData)
 		X.Ajax({
 			url = 'https://storage.uploads.j3cx.com/api/storage/uploads',
 			data = {
-				l = ENVIRONMENT.GAME_LANG,
-				L = ENVIRONMENT.GAME_EDITION,
+				l = X.ENVIRONMENT.GAME_LANG,
+				L = X.ENVIRONMENT.GAME_EDITION,
 				data = FormatStorageData(me, { k = szKey, o = oData }),
 			},
 			success = function(html, status)

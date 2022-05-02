@@ -1,4 +1,4 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队监控远程数据
@@ -6,17 +6,9 @@
 -- @ref      : William Chan (Webster)
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
@@ -32,7 +24,7 @@ local D = X.SetmetaLazyload({}, {
 })
 local O = {}
 
-local EDITION = ENVIRONMENT.GAME_EDITION
+local EDITION = X.ENVIRONMENT.GAME_EDITION
 local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
 local MY_TM_REMOTE_DATA_ROOT = MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
 local META_DOWNLOADING, DATA_DOWNLOADING = {}, {}
@@ -113,7 +105,7 @@ local DEFAULT_BRANCH = 'master'
 local DEFAULT_PATH = 'MY_TeamMon/' .. EDITION .. '/meta.json'
 local function GetURL(szURL, szType)
 	local szSimple, szUser, szProvider, szProject, szBranch, szPath, nPos
-	if wstring.find(szURL, '://') then
+	if X.StringFindW(szURL, '://') then
 		for k, p in pairs(PROVIDER_PARAMS) do
 			if p.bSimple then
 				if X.IsTable(p.szRawURL_T) then
@@ -152,7 +144,7 @@ local function GetURL(szURL, szType)
 		end
 	else
 		szUser, szSimple = szURL, ''
-		nPos = wstring.find(szUser, ':')
+		nPos = X.StringFindW(szUser, ':')
 		if nPos then
 			szPath = szUser:sub(nPos + 1):gsub('^/+', '')
 			szUser = szUser:sub(1, nPos - 1)
@@ -160,7 +152,7 @@ local function GetURL(szURL, szType)
 		else
 			szPath = DEFAULT_PATH
 		end
-		nPos = wstring.find(szUser, '?')
+		nPos = X.StringFindW(szUser, '?')
 		if nPos then
 			szBranch = szUser:sub(nPos + 1)
 			szUser = szUser:sub(1, nPos - 1)
@@ -168,7 +160,7 @@ local function GetURL(szURL, szType)
 		else
 			szBranch = DEFAULT_BRANCH
 		end
-		nPos = wstring.find(szUser, '/')
+		nPos = X.StringFindW(szUser, '/')
 		if nPos then
 			szProject = szUser:sub(nPos + 1)
 			szUser = szUser:sub(1, nPos - 1)
@@ -176,7 +168,7 @@ local function GetURL(szURL, szType)
 		else
 			szProject = DEFAULT_PROJECT
 		end
-		nPos = wstring.find(szUser, '@')
+		nPos = X.StringFindW(szUser, '@')
 		if nPos then
 			szProvider = szUser:sub(nPos + 1)
 			if PROVIDER_PARAMS[szProvider] then
@@ -432,8 +424,8 @@ function D.FetchRepoMetaInfoList(nPage)
 	X.Ajax({
 		url = 'https://pull.j3cx.com/api/dbm/subscribe/all',
 		data = {
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			page = nPage or REPO_META_PAGE.nIndex,
 			pageSize = 15,
 		},
@@ -456,8 +448,8 @@ function D.FetchRepoMetaInfoList(nPage)
 			for _, info in ipairs(res.data) do
 				info.url = 'https://pull.j3cx.com/api/dbm/feed?'
 					.. X.EncodeQuerystring(X.ConvertToUTF8({
-						l = ENVIRONMENT.GAME_LANG,
-						L = ENVIRONMENT.GAME_EDITION,
+						l = X.ENVIRONMENT.GAME_LANG,
+						L = X.ENVIRONMENT.GAME_EDITION,
 						key = info.key,
 					}))
 				info = D.FormatMetaInfo(info)
@@ -489,7 +481,7 @@ function D.CheckUpdate()
 		end
 		local function ParseVersion(szVersion)
 			if X.IsString(szVersion) then
-				local nPos = wstring.find(szVersion, '.')
+				local nPos = X.StringFindW(szVersion, '.')
 				if nPos then
 					local szMajorVersion = szVersion:sub(1, nPos)
 					local szMinorVersion = szVersion:sub(nPos + 1)
@@ -643,14 +635,14 @@ function D.AppendMetaInfoItem(container, p, bSel)
 	wnd:Lookup('', 'Text_Item_Download'):SetText(X.ReplaceSensitiveWord(p.szUpdateTime))
 	wnd:Lookup('', 'Image_Item_Sel'):SetVisible(bSel)
 	if not X.IsEmpty(p.szAboutURL) then
-		UI(wnd):Append('WndButton', {
+		X.UI(wnd):Append('WndButton', {
 			name = 'Btn_Info',
 			x = 760, y = 1, w = 90, h = 30,
 			buttonStyle = 'LINK',
 			text = _L['See details'],
 		})
 	end
-	UI(wnd):Append('WndButton', {
+	X.UI(wnd):Append('WndButton', {
 		name = 'Btn_Download',
 		x = 860, y = 1, w = 90, h = 30,
 		buttonStyle = 'SKEUOMORPHISM',
@@ -883,7 +875,7 @@ function D.OnLButtonClick()
 		for _, info in ipairs(D.LoadFavMetaInfoList()) do
 			table.insert(aMetaInfoURL, GetShortURL(info.szURL) or GetRawURL(info.szURL))
 		end
-		UI.OpenTextEditor(table.concat(aMetaInfoURL, ';'))
+		X.UI.OpenTextEditor(table.concat(aMetaInfoURL, ';'))
 	elseif name == 'Btn_Info' then
 		X.OpenBrowser(this:GetParent().info.szAboutURL)
 	elseif name == 'Btn_FavSyncTeam' then
@@ -932,7 +924,7 @@ function D.OnItemRButtonClick()
 		local t = {{
 			szOption = _L['Copy meta url'],
 			fnAction = function()
-				UI.OpenTextEditor(wnd.info.szURL)
+				X.UI.OpenTextEditor(wnd.info.szURL)
 			end,
 		}}
 		local szShortURL = GetShortURL(wnd.info.szURL)
@@ -940,7 +932,7 @@ function D.OnItemRButtonClick()
 			table.insert(t, {
 				szOption = _L['Copy short meta url'],
 				fnAction = function()
-					UI.OpenTextEditor(szShortURL)
+					X.UI.OpenTextEditor(szShortURL)
 				end,
 			})
 		end

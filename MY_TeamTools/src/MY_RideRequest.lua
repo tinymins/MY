@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 双骑助手
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -113,7 +105,7 @@ function D.GetMenu()
 				O.bEnable = not O.bEnable
 			end,
 		},
-		CONSTANT.MENU_DIVIDER,
+		X.CONSTANT.MENU_DIVIDER,
 		{
 			szOption = _L['Auto accept party'],
 			bCheck = true, bChecked = O.bAcceptParty,
@@ -172,13 +164,13 @@ function D.GetMenu()
 			fnClickIcon = function()
 				O.tAcceptCustom[szName] = nil
 				O.tAcceptCustom = O.tAcceptCustom
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end,
 			fnDisable = function() return not O.bEnable or not O.bAcceptCustom end,
 		})
 	end
 	if #t ~= 0 then
-		table.insert(t, CONSTANT.MENU_DIVIDER)
+		table.insert(t, X.CONSTANT.MENU_DIVIDER)
 	end
 	table.insert(t, {
 		szOption = _L['Add'],
@@ -232,7 +224,7 @@ function D.OnMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local szTip = GetFormatText(this.info.szDesc)
-		OutputTip(szTip, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+		OutputTip(szTip, 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 	end
 end
 
@@ -244,13 +236,13 @@ end
 
 function D.AcceptRequest(info)
 	RIDE_LIST[info.szName] = nil
-	UI.RemoveRequest('MY_RideRequest', info.szName)
+	X.UI.RemoveRequest('MY_RideRequest', info.szName)
 	info.fnAccept()
 end
 
 function D.RefuseRequest(info)
 	RIDE_LIST[info.szName] = nil
-	UI.RemoveRequest('MY_RideRequest', info.szName)
+	X.UI.RemoveRequest('MY_RideRequest', info.szName)
 	info.fnRefuse()
 end
 
@@ -347,7 +339,7 @@ function D.OnMessageBoxOpen()
 					end
 				end
 				if not D.DoAutoAction(info) then
-					UI.ReplaceRequest('MY_RideRequest', info.szName, info)
+					X.UI.ReplaceRequest('MY_RideRequest', info.szName, info)
 				end
 				-- 关闭对话框
 				frame.fnAutoClose = nil
@@ -377,7 +369,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		menu = D.GetMenu,
 		tip = {
 			render = _L['Optimize ride and emotion request'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	}):Width() + 5
 	return nX, nY
@@ -423,7 +415,7 @@ function R.Drawer(container, info)
 	wnd.OnMouseLeave = D.OnMouseLeave
 	wnd:Lookup('', 'Text_Name'):SetText(info.szName)
 
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	ui:Append('WndButton', {
 		name = 'Btn_Accept',
 		x = 326, y = 9, w = 60, h = 34,
@@ -454,4 +446,4 @@ function R.OnClear()
 	RIDE_LIST = {}
 end
 
-UI.RegisterRequest('MY_RideRequest', R)
+X.UI.RegisterRequest('MY_RideRequest', R)

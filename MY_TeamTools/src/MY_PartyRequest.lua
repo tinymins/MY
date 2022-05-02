@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 组队助手
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -98,7 +90,7 @@ function D.GetMenu()
 				O.bEnable = not O.bEnable
 			end,
 		},
-		CONSTANT.MENU_DIVIDER,
+		X.CONSTANT.MENU_DIVIDER,
 		{
 			szOption = _L['Auto refuse low level player'],
 			bCheck = true, bChecked = O.bRefuseLowLv,
@@ -180,13 +172,13 @@ function D.GetMenu()
 			fnClickIcon = function()
 				O.tAcceptCustom[szName] = nil
 				O.tAcceptCustom = O.tAcceptCustom
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end,
 			fnDisable = function() return not O.bEnable or not O.bAcceptCustom end,
 		})
 	end
 	if #t ~= 0 then
-		table.insert(t, CONSTANT.MENU_DIVIDER)
+		table.insert(t, X.CONSTANT.MENU_DIVIDER)
 	end
 	table.insert(t, {
 		szOption = _L['Add'],
@@ -246,14 +238,14 @@ function D.OnMouseEnter()
 			local x, y = this:GetAbsPos()
 			local w, h = this:GetSize()
 			local szTip = GetFormatText(_L['Press ctrl and click to ask detail.'])
-			OutputTip(szTip, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+			OutputTip(szTip, 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 		end
 	elseif this.info then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local szTip = MY_Farbnamen and MY_Farbnamen.GetTip(this.info.szName)
 		if szTip then
-			OutputTip(szTip, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+			OutputTip(szTip, 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 		end
 	end
 end
@@ -278,15 +270,15 @@ end
 -- 判断是否需要更新界面
 function D.CheckRequestUpdate(info)
 	if not info.szName or not info.fnAccept or (info.dwDelayTime and info.dwDelayTime > GetTime()) then
-		UI.RemoveRequest('MY_PartyRequest', info.szName)
+		X.UI.RemoveRequest('MY_PartyRequest', info.szName)
 	else
-		UI.ReplaceRequest('MY_PartyRequest', info.szName, info)
+		X.UI.ReplaceRequest('MY_PartyRequest', info.szName, info)
 	end
 end
 
 function D.OnPeekPlayer()
 	if PR_EQUIP_REQUEST[arg1] then
-		if arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+		if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 			local me = GetClientPlayer()
 			local dwType, dwID = me.GetTarget()
 			X.SetTarget(TARGET.PLAYER, arg1)
@@ -309,13 +301,13 @@ end
 
 function D.AcceptRequest(info)
 	PR_PARTY_REQUEST[info.szName] = nil
-	UI.RemoveRequest('MY_PartyRequest', info.szName)
+	X.UI.RemoveRequest('MY_PartyRequest', info.szName)
 	info.fnAccept()
 end
 
 function D.RefuseRequest(info)
 	PR_PARTY_REQUEST[info.szName] = nil
-	UI.RemoveRequest('MY_PartyRequest', info.szName)
+	X.UI.RemoveRequest('MY_PartyRequest', info.szName)
 	info.fnRefuse()
 end
 
@@ -343,7 +335,7 @@ function D.GetRequestStatus(info)
 			info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 	end
 	if szStatus == 'normal' and not info.bFriend and not info.bTongMember then
-		if O.bRefuseRobot and info.dwID and info.nLevel == CONSTANT.MAX_PLAYER_LEVEL then
+		if O.bRefuseRobot and info.dwID and info.nLevel == X.CONSTANT.MAX_PLAYER_LEVEL then
 			local me = GetClientPlayer()
 			local tar = GetPlayer(info.dwID)
 			if tar then
@@ -357,7 +349,7 @@ function D.GetRequestStatus(info)
 				end
 			end
 		end
-		if O.bRefuseLowLv and info.nLevel < CONSTANT.MAX_PLAYER_LEVEL then
+		if O.bRefuseLowLv and info.nLevel < X.CONSTANT.MAX_PLAYER_LEVEL then
 			szStatus = 'refuse'
 			szMsg = _L('Auto refuse %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
@@ -580,7 +572,7 @@ function R.Drawer(container, info)
 	hItem:Lookup('Text_Name'):SetText(info.szName)
 	hItem:Lookup('Text_Level'):SetText(info.nLevel)
 
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	ui:Append('WndButton', {
 		name = 'Btn_Accept',
 		x = 240, y = 9, w = 60, h = 34,
@@ -628,4 +620,4 @@ function R.OnClear()
 	PR_PARTY_REQUEST = {}
 end
 
-UI.RegisterRequest('MY_PartyRequest', R)
+X.UI.RegisterRequest('MY_PartyRequest', R)

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 宠物百科
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -59,19 +51,19 @@ function D.Open(dwPetIndex)
 	end
 	local szURL = 'https://page.j3cx.com/pet/' .. dwPetIndex .. '?'
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			player = GetUserRoleName(),
 		}))
 	local szKey = 'PetsWiki_' .. dwPetIndex
 	local szTitle = tPet.szName .. ' - ' .. X.XMLGetPureText(tPet.szDesc)
-	szKey = UI.OpenBrowser(szURL, {
+	szKey = X.UI.OpenBrowser(szURL, {
 		key = szKey,
 		title = szTitle,
 		w = O.nW, h = O.nH,
 		readonly = true,
 	})
-	UI(UI.LookupBrowser(szKey)):Size(D.OnWebSizeChange)
+	X.UI(X.UI.LookupBrowser(szKey)):Size(D.OnWebSizeChange)
 end
 
 function D.HookPetFrame(frame)
@@ -85,15 +77,15 @@ function D.HookPetFrame(frame)
 				D.Open(this.tPet.dwPetIndex)
 				return
 			end
-			return UI.FormatWMsgRet(false, true)
+			return X.UI.FormatWMsgRet(false, true)
 		end
-		UI.HookHandleAppend(hMyPets, function(_, hMyPet)
+		X.UI.HookHandleAppend(hMyPets, function(_, hMyPet)
 			local hPets = hMyPet:Lookup('Handle_petsBox')
 			X.DelayCall(function()
 				if not hPets:IsValid() then
 					return
 				end
-				UI.HookHandleAppend(hPets, function(_, hPet)
+				X.UI.HookHandleAppend(hPets, function(_, hPet)
 					X.DelayCall(function()
 						if not hPet:IsValid() then
 							return
@@ -122,7 +114,7 @@ function D.HookPetFrame(frame)
 				D.Open(this.tPet.dwPetIndex)
 				return
 			end
-			return UI.FormatWMsgRet(false, true)
+			return X.UI.FormatWMsgRet(false, true)
 		end
 		for nNum = 1, 10 do
 			local hMedal = hMedalPets:Lookup('Handle_MedalPet_' .. nNum)
@@ -150,7 +142,7 @@ function D.HookPetFrame(frame)
 				D.Open(this.tPet.dwPetIndex)
 				return
 			end
-			return UI.FormatWMsgRet(false, true)
+			return X.UI.FormatWMsgRet(false, true)
 		end
 		for i = 0, hPreferList:GetItemCount() - 1 do
 			local hPet = hPreferList:Lookup(i)
@@ -171,14 +163,14 @@ function D.HookPetFrame(frame)
 				D.Open(this.tPet.dwPetIndex)
 				return
 			end
-			return UI.FormatWMsgRet(false, true)
+			return X.UI.FormatWMsgRet(false, true)
 		end
-		UI.HookHandleAppend(hPets, function(_, hGroup)
+		X.UI.HookHandleAppend(hPets, function(_, hGroup)
 			local hList = hGroup and hGroup:Lookup((hGroup:GetName():gsub('Handle_Pets', 'Handle_List')))
 			if not hList then
 				return
 			end
-			UI.HookHandleAppend(hList, function(_, hItem)
+			X.UI.HookHandleAppend(hList, function(_, hItem)
 				X.DelayCall(function()
 					local boxPet = hItem:IsValid() and hItem:Lookup('Box_PetItem')
 					if not boxPet then
@@ -215,7 +207,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		text = _L['Pet wiki'],
 		tip = {
 			render = _L['Click icon on pet panel to view pet wiki'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		checked = MY_PetWiki.bEnable,
 		onCheck = function(bChecked)

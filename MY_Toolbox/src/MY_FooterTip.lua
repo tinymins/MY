@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 好友、帮会成员脚下姓名显示
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -72,7 +64,7 @@ function D.Apply()
 		Navigator_Remove('MY_FRIEND_TIP')
 	end
 	if D.bReady and O.bFriend and not X.IsInShieldedMap() and (not O.bFriendDungeonHide or not X.IsInDungeon()) then
-		local hShaList = UI.GetShadowHandle('MY_FriendHeadTip')
+		local hShaList = X.UI.GetShadowHandle('MY_FriendHeadTip')
 		if not hShaList.freeShadows then
 			hShaList.freeShadows = {}
 		end
@@ -154,14 +146,14 @@ function D.Apply()
 		X.RegisterEvent('DELETE_FELLOWSHIP', 'MY_FRIEND_TIP', false)
 		X.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE', 'MY_FRIEND_TIP', false)
 		X.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE', 'MY_FRIEND_TIP', false)
-		UI.GetShadowHandle('MY_FriendHeadTip'):Hide()
+		X.UI.GetShadowHandle('MY_FriendHeadTip'):Hide()
 	end
 	-- 帮会成员高亮
 	if Navigator_Remove then
 		Navigator_Remove('MY_GUILDMEMBER_TIP')
 	end
 	if D.bReady and O.bTongMember and not X.IsInShieldedMap() and (not O.bTongMemberDungeonHide or not X.IsInDungeon()) then
-		local hShaList = UI.GetShadowHandle('MY_TongMemberHeadTip')
+		local hShaList = X.UI.GetShadowHandle('MY_TongMemberHeadTip')
 		if not hShaList.freeShadows then
 			hShaList.freeShadows = {}
 		end
@@ -242,7 +234,7 @@ function D.Apply()
 		X.RegisterEvent('ON_ISOLATED', 'MY_GUILDMEMBER_TIP', false)
 		X.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_GUILDMEMBER_TIP', false)
 		X.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_GUILDMEMBER_TIP', false)
-		UI.GetShadowHandle('MY_TongMemberHeadTip'):Hide()
+		X.UI.GetShadowHandle('MY_TongMemberHeadTip'):Hide()
 	end
 end
 

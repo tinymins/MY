@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 目标监控配置相关
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local PLUGIN_NAME = 'MY_TargetMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -137,9 +129,9 @@ local function DrawDetail(ui)
 		list:ListBox('clear')
 		for i, mon in ipairs(l_config.monitors) do
 			if not l_search or l_search == ''
-			or (mon.name and wstring.find(mon.name, l_search))
-			or (mon.longAlias and wstring.find(mon.longAlias, l_search))
-			or (mon.shortAlias and wstring.find(mon.shortAlias, l_search)) then
+			or (mon.name and X.StringFindW(mon.name, l_search))
+			or (mon.longAlias and X.StringFindW(mon.longAlias, l_search))
+			or (mon.shortAlias and X.StringFindW(mon.shortAlias, l_search)) then
 				list:ListBox('insert', {
 					text = mon.name or mon.id,
 					id = mon,
@@ -208,7 +200,7 @@ local function DrawDetail(ui)
 				fnAction = function()
 					D.DeleteMonitor(l_config, mon)
 					list:ListBox('delete', 'id', mon)
-					UI.ClosePopupMenu()
+					X.UI.ClosePopupMenu()
 				end,
 			},
 			{
@@ -221,7 +213,7 @@ local function DrawDetail(ui)
 						end
 					end
 					InsertMonitor(index)
-					UI.ClosePopupMenu()
+					X.UI.ClosePopupMenu()
 				end,
 				bDisable = search,
 			},
@@ -273,7 +265,7 @@ local function DrawDetail(ui)
 							D.ModifyMonitor(mon, 'name', szVal)
 						end
 					end, function() end, function() end, nil, mon.name)
-					UI.ClosePopupMenu()
+					X.UI.ClosePopupMenu()
 				end,
 			},
 			{ bDevide = true },
@@ -489,10 +481,10 @@ local function DrawDetail(ui)
 				nIconHeight = 22,
 				szLayer = 'ICON_RIGHTMOST',
 				fnClickIcon = function()
-					UI.OpenIconPicker(function(dwIcon)
+					X.UI.OpenIconPicker(function(dwIcon)
 						mon.iconid = dwIcon
 					end)
-					UI.ClosePopupMenu()
+					X.UI.ClosePopupMenu()
 				end,
 			})
 			for dwID, info in pairs(mon.ids) do
@@ -515,15 +507,15 @@ local function DrawDetail(ui)
 						if mon.ignoreId then
 							return
 						end
-						UI.OpenIconPicker(function(dwIcon)
+						X.UI.OpenIconPicker(function(dwIcon)
 							D.ModifyMonitorId(info, 'iconid', dwIcon)
 						end)
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 				}
 				if not X.IsEmpty(info.levels) then
 					table.insert(t2, { szOption = _L['Levels'], bDisable = true })
-					table.insert(t2, CONSTANT.MENU_DIVIDER)
+					table.insert(t2, X.CONSTANT.MENU_DIVIDER)
 					table.insert(t2, {
 						szOption = _L['All levels'],
 						bCheck = true,
@@ -540,10 +532,10 @@ local function DrawDetail(ui)
 							if mon.ignoreId or info.ignoreLevel then
 								return
 							end
-							UI.OpenIconPicker(function(dwIcon)
+							X.UI.OpenIconPicker(function(dwIcon)
 								info.iconid = dwIcon
 							end)
-							UI.ClosePopupMenu()
+							X.UI.ClosePopupMenu()
 						end,
 					})
 					local tLevels = {}
@@ -565,10 +557,10 @@ local function DrawDetail(ui)
 								nIconHeight = 22,
 								szLayer = 'ICON_RIGHTMOST',
 								fnClickIcon = function()
-									UI.OpenIconPicker(function(dwIcon)
+									X.UI.OpenIconPicker(function(dwIcon)
 										D.ModifyMonitorLevel(infoLevel, 'iconid', dwIcon)
 									end)
-									UI.ClosePopupMenu()
+									X.UI.ClosePopupMenu()
 								end,
 							}
 						})
@@ -577,7 +569,7 @@ local function DrawDetail(ui)
 					for _, p in ipairs(tLevels) do
 						table.insert(t2, p[2])
 					end
-					table.insert(t2, CONSTANT.MENU_DIVIDER)
+					table.insert(t2, X.CONSTANT.MENU_DIVIDER)
 				end
 				table.insert(t2, {
 					szOption = _L['Manual add level'],
@@ -604,7 +596,7 @@ local function DrawDetail(ui)
 					szOption = _L['Delete'],
 					fnAction = function()
 						D.DeleteMonitorId(mon, dwID)
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 				})
 				table.insert(t1, t2)
@@ -684,7 +676,7 @@ local function DrawPreview(ui, config, OpenDetail)
 			r = 255, g = 255, b = 0, text = szCaption,
 			tip = {
 				render = szCaption .. '\n' .. _L['(Embedded caption cannot be changed)'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 		}):AutoWidth()
 	else
@@ -725,7 +717,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		tip = {
 			render = config.embedded and _L['Press ctrl to delete embedded data permanently.'] or nil,
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 	})
 	y = y + 30
@@ -746,7 +738,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Hide others buff'],
 		tip = {
 			render = _L['Hide others buff TIP'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 		checked = config.hideOthers,
 		onCheck = function(bChecked)
@@ -886,7 +878,7 @@ local function DrawPreview(ui, config, OpenDetail)
 					szOption = p[2] or p[1],
 					fnAction = function()
 						D.ModifyConfig(config, 'boxBgUITex', p[1])
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 					szIcon = szIcon,
 					nFrame = nFrame,
@@ -916,7 +908,7 @@ local function DrawPreview(ui, config, OpenDetail)
 					szOption = text,
 					fnAction = function()
 						D.ModifyConfig(config, 'cdBarUITex', text)
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 					szIcon = szIcon,
 					nFrame = nFrame,
@@ -991,7 +983,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 32},
 		value = config.maxLineCount,
 		textFormatter = function(val) return _L('Display %d eachline.', val) end,
@@ -1004,7 +996,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.scale * 100,
 		textFormatter = function(val) return _L('UI scale %d%%.', val) end,
@@ -1017,7 +1009,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.iconFontScale * 100,
 		textFormatter = function(val) return _L('Icon font scale %d%%.', val) end,
@@ -1030,7 +1022,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.otherFontScale * 100,
 		textFormatter = function(val) return _L('Other font scale %d%%.', val) end,
@@ -1043,7 +1035,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {50, 1000},
 		value = config.cdBarWidth,
 		textFormatter = function(val) return _L('CD width %dpx.', val) end,
@@ -1056,7 +1048,7 @@ local function DrawPreview(ui, config, OpenDetail)
 
 	uiWnd:Append('WndTrackbar', {
 		x = xr, y = y,
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {-1, 30},
 		value = config.decimalTime,
 		textFormatter = function(val)
@@ -1132,7 +1124,7 @@ local function DrawControls(ui, OpenDetail)
 		buttonStyle = 'FLAT',
 		tip = {
 			render = _L['Press ALT to export as default data.\n Press CTRL to export as plain.'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		menu = function()
 			local aUUID = {}
@@ -1155,14 +1147,14 @@ local function DrawControls(ui, OpenDetail)
 				})
 			end
 			if #menu > 0 then
-				table.insert(menu, CONSTANT.MENU_DIVIDER)
+				table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			end
 			table.insert(menu, {
 				szOption = bAsEmbedded
 					and _L['Ensure export (as embedded)']
 					or (szIndent and _L['Ensure export (with indent)'] or _L['Ensure export']),
 				fnAction = function()
-					if ENVIRONMENT.GAME_PROVIDER == 'remote' then
+					if X.ENVIRONMENT.GAME_PROVIDER == 'remote' then
 						return X.Alert(_L['Streaming client does not support export!'])
 					end
 					local file = X.FormatPath({
@@ -1229,11 +1221,11 @@ local function DrawControls(ui, OpenDetail)
 end
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local nW, nH = ui:Size()
 	local nPaddingX, nPaddingY = 20, 20
 	local nX, nY = nPaddingX, nPaddingY
-	ui:ContainerType(UI.WND_CONTAINER_STYLE.LEFT_TOP)
+	ui:ContainerType(X.UI.WND_CONTAINER_STYLE.LEFT_TOP)
 
 	local OpenDetail = DrawDetail(ui)
 	for _, config in ipairs(D.GetConfigList()) do

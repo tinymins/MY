@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队面板主界面
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local Station, MY_IsVisibleBuff, MY_GetBuffName = Station, X.IsVisibleBuff,  X.GetBuffName
 ---------------------------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Cataclysm'
@@ -100,7 +92,7 @@ end
 
 do
 local function UpdateTeamMonData()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		return
 	end
 	if MY_TeamMon and MY_TeamMon.IterTable and MY_TeamMon.GetTable then
@@ -135,7 +127,7 @@ end
 
 do
 local function UpdateOfficialBuff()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		return
 	end
 	local RaidPanelBuff = X.GetGameTable('RaidPanelBuff')
@@ -498,27 +490,27 @@ function D.CreateControlBar()
 		container:AppendContentFromIni(szIniFile, 'Wnd_Speaker')
 			:Lookup('WndButton_Speaker').nSpeakerState = nSpeakerState
 		container:Lookup('Wnd_Speaker/WndButton_Speaker', 'Image_Normal')
-			:SetVisible(nSpeakerState == CONSTANT.SPEAKER_STATE.OPEN)
+			:SetVisible(nSpeakerState == X.CONSTANT.SPEAKER_STATE.OPEN)
 		container:Lookup('Wnd_Speaker/WndButton_Speaker', 'Image_Close_Speaker')
-			:SetVisible(nSpeakerState == CONSTANT.SPEAKER_STATE.CLOSE)
+			:SetVisible(nSpeakerState == X.CONSTANT.SPEAKER_STATE.CLOSE)
 		local nMicState = X.GVoiceBase_GetMicState()
 		container:AppendContentFromIni(szIniFile, 'Wnd_Microphone')
 			:Lookup('WndButton_Microphone').nMicState = nMicState
 		container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Animate_Input_Mic')
-			:SetVisible(nMicState == CONSTANT.MIC_STATE.FREE)
+			:SetVisible(nMicState == X.CONSTANT.MIC_STATE.FREE)
 		container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Image_UnInsert_Mic')
-			:SetVisible(nMicState == CONSTANT.MIC_STATE.NOT_AVIAL)
+			:SetVisible(nMicState == X.CONSTANT.MIC_STATE.NOT_AVIAL)
 		container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Image_Close_Mic')
-			:SetVisible(nMicState == CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM or nMicState == CONSTANT.MIC_STATE.CLOSE_IN_ROOM)
+			:SetVisible(nMicState == X.CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM or nMicState == X.CONSTANT.MIC_STATE.CLOSE_IN_ROOM)
 		local hMicFree = container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Handle_Free_Mic')
 		local hMicHotKey = container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Handle_HotKey')
-		hMicFree:SetVisible(nMicState == CONSTANT.MIC_STATE.FREE)
-		hMicHotKey:SetVisible(nMicState == CONSTANT.MIC_STATE.KEY)
+		hMicFree:SetVisible(nMicState == X.CONSTANT.MIC_STATE.FREE)
+		hMicHotKey:SetVisible(nMicState == X.CONSTANT.MIC_STATE.KEY)
 		-- 自动调整语音按钮宽度
 		local nMicWidth = hMicFree:GetRelX()
-		if nMicState == CONSTANT.MIC_STATE.FREE then
+		if nMicState == X.CONSTANT.MIC_STATE.FREE then
 			nMicWidth = nMicWidth + hMicFree:GetW()
-		elseif nMicState == CONSTANT.MIC_STATE.KEY then
+		elseif nMicState == X.CONSTANT.MIC_STATE.KEY then
 			nMicWidth = hMicHotKey:GetRelX() + hMicHotKey:GetW()
 		end
 		container:Lookup('Wnd_Microphone'):SetW(nMicWidth)
@@ -872,7 +864,7 @@ function D.OnEvent(szEvent)
 		end
 		OnBuffUpdate(arg0, arg4, arg8, arg5, arg9)
 	elseif szEvent == 'PLAYER_ENTER_SCENE' then
-		if ENVIRONMENT.RUNTIME_OPTIMIZE then
+		if X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 			return
 		end
 		local me = GetClientPlayer()
@@ -941,7 +933,7 @@ end
 do
 local i = 1
 function D.FrameBuffRefreshCall()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		return
 	end
 	local team = GetClientTeam()
@@ -964,7 +956,7 @@ end
 end
 
 function D.UpdateOTAction(frame)
-	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 4 ~= 0 then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 4 ~= 0 then
 		return
 	end
 	local me = GetClientPlayer()
@@ -992,7 +984,7 @@ function D.UpdateOTAction(frame)
 	local hPrepare = frame:Lookup('', 'Handle_Prepare')
 	if KOTTarget then
 		local nType, dwSkillID, dwSkillLevel, fProgress = X.GetOTActionState(KOTTarget)
-		if nType ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE and fProgress and dwSkillID and dwSkillID ~= 0 and dwSkillLevel then
+		if nType ~= X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE and fProgress and dwSkillID and dwSkillID ~= 0 and dwSkillLevel then
 			hPrepare:Lookup('Text_Prepare'):SetText(X.GetSkillName(dwSkillID, dwSkillLevel) or '')
 			hPrepare:Lookup('Image_Prepare'):SetPercentage(fProgress)
 			hPrepare:SetAlpha(255)
@@ -1064,7 +1056,7 @@ function D.OnLButtonClick()
 			-- 编辑模式
 			table.insert(menu, { szOption = string.gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt'), bDisable = not X.IsLeader() or not me.IsInRaid(), bCheck = true, bChecked = CFG.bEditMode, fnAction = function()
 				CFG.bEditMode = not CFG.bEditMode
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end })
 			-- 人数统计
 			table.insert(menu, { bDevide = true })
@@ -1183,17 +1175,17 @@ function D.OnMouseLeave()
 end
 
 local SPEAKER_TIP = {
-	[CONSTANT.SPEAKER_STATE.OPEN ] = g_tStrings.GVOICE_SPEAKER_OPEN_TIP,
-	[CONSTANT.SPEAKER_STATE.CLOSE] = g_tStrings.GVOICE_SPEAKER_CLOSE_TIP,
+	[X.CONSTANT.SPEAKER_STATE.OPEN ] = g_tStrings.GVOICE_SPEAKER_OPEN_TIP,
+	[X.CONSTANT.SPEAKER_STATE.CLOSE] = g_tStrings.GVOICE_SPEAKER_CLOSE_TIP,
 }
 local MIC_TIP = setmetatable({
-	[CONSTANT.MIC_STATE.NOT_AVIAL        ] = g_tStrings.GVOICE_MIC_UNAVIAL_STATE_TIP,
-	[CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM] = g_tStrings.GVOICE_MIC_JOIN_STATE_TIP,
-	[CONSTANT.MIC_STATE.CLOSE_IN_ROOM    ] = g_tStrings.GVOICE_MIC_KEY_STATE_TIP,
-	[CONSTANT.MIC_STATE.FREE             ] = g_tStrings.GVOICE_MIC_CLOSE_STATE_TIP,
+	[X.CONSTANT.MIC_STATE.NOT_AVIAL        ] = g_tStrings.GVOICE_MIC_UNAVIAL_STATE_TIP,
+	[X.CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM] = g_tStrings.GVOICE_MIC_JOIN_STATE_TIP,
+	[X.CONSTANT.MIC_STATE.CLOSE_IN_ROOM    ] = g_tStrings.GVOICE_MIC_KEY_STATE_TIP,
+	[X.CONSTANT.MIC_STATE.FREE             ] = g_tStrings.GVOICE_MIC_CLOSE_STATE_TIP,
 }, {
 	__index = function(t, k)
-		if k == CONSTANT.MIC_STATE.KEY then
+		if k == X.CONSTANT.MIC_STATE.KEY then
 			if X.GetHotKey('TOGGLE_GVOCIE_SAY') then
 				return (g_tStrings.GVOICE_MIC_FREE_STATE_TIP
 					:format(X.GetHotKeyDisplay('TOGGLE_GVOCIE_SAY')))
@@ -1350,7 +1342,7 @@ X.RegisterEvent('PARTY_RESET', function()
 end)
 
 X.RegisterUserSettingsUpdate('@@INIT@@', function()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE and CFG.nDrawInterval == 4 then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and CFG.nDrawInterval == 4 then
 		CFG.nDrawInterval = 16
 	end
 	X.WithClientPlayer(function(me)

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 自动售出物品
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -163,19 +155,19 @@ function D.AutoSellItem(nNpcID, nShopID, bIgnoreGray)
 	if #aSell > 0 then
 		local aXML, szReason = {}
 		table.insert(aXML, GetFormatText(_L['Confirm auto sell?']))
-		table.insert(aXML, CONSTANT.XML_LINE_BREAKER)
+		table.insert(aXML, X.CONSTANT.XML_LINE_BREAKER)
 		for _, v in ipairs(aSell) do
 			if v.szReason ~= szReason then
-				table.insert(aXML, CONSTANT.XML_LINE_BREAKER)
+				table.insert(aXML, X.CONSTANT.XML_LINE_BREAKER)
 				table.insert(aXML, GetFormatText(v.szReason .. g_tStrings.STR_CHINESE_MAOHAO))
 				szReason = v.szReason
 			end
-			table.insert(aXML, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXML, X.CONSTANT.XML_LINE_BREAKER)
 			table.insert(aXML, GetFormatText(g_tStrings.STR_TWO_CHINESE_SPACE .. '['.. v.szName ..']', 166, v.r, v.g, v.b))
 			table.insert(aXML, GetFormatText(' x' .. v.nCount))
 		end
-		table.insert(aXML, CONSTANT.XML_LINE_BREAKER)
-		table.insert(aXML, CONSTANT.XML_LINE_BREAKER)
+		table.insert(aXML, X.CONSTANT.XML_LINE_BREAKER)
+		table.insert(aXML, X.CONSTANT.XML_LINE_BREAKER)
 		table.insert(aXML, GetFormatText(_L['Some items may not be able to buy back once you sell it, and there is also a limit number rule by official, change auto sell rules in plugin if you want.']))
 		local nW, nH = Station.GetClientSize()
 		local tMsg = {
@@ -229,7 +221,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		end,
 		tip = {
 			render = _L['Auto sell when open shop'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	}):Width() + 5
 

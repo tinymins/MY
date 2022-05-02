@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 游戏字体
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Font'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Font'
@@ -145,7 +137,7 @@ end
 -- 配置界面
 local PS = {}
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local x, y = 10, 30
 	local w, h = ui:Size()
 	local aFontList = X.GetFontList()
@@ -188,9 +180,9 @@ function PS.OnPanelActive(wnd)
 			end,
 			onClick = function()
 				if IsPopupMenuOpened() then
-					UI(this):Autocomplete('close')
+					X.UI(this):Autocomplete('close')
 				else
-					UI(this):Autocomplete('search', '')
+					X.UI(this):Autocomplete('search', '')
 				end
 			end,
 			autocomplete = {{'option', 'source', aFontPath}},
@@ -203,7 +195,7 @@ function PS.OnPanelActive(wnd)
 				local file = GetOpenFileName(_L['Please select your font file.'], 'Font File(*.ttf;*.otf;*.fon)\0*.ttf;*.otf;*.fon\0All Files(*.*)\0*.*\0\0')
 				if not X.IsEmpty(file) then
 					file = X.GetRelativePath(file, '') or file
-					acFontFile:Text(wstring.gsub(file, '/', '\\'))
+					acFontFile:Text(X.StringReplaceW(file, '/', '\\'))
 				end
 			end,
 		})
@@ -224,9 +216,9 @@ function PS.OnPanelActive(wnd)
 			end,
 			onClick = function()
 				if IsPopupMenuOpened() then
-					UI(this):Autocomplete('close')
+					X.UI(this):Autocomplete('close')
 				else
-					UI(this):Autocomplete('search', '')
+					X.UI(this):Autocomplete('search', '')
 				end
 			end,
 			autocomplete = {{'option', 'source', aFontName}},

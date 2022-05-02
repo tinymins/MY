@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : ÁÄÌìÆµµÀÇÐ»»
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatSwitch'
@@ -144,7 +136,7 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 			end
 		end
 	end
-	UI(shaCount):DrawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, math.pi / 2, math.pi * 2 * dwPercent)
+	X.UI(shaCount):DrawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, math.pi / 2, math.pi * 2 * dwPercent)
 end
 
 local CHANNEL_LIST = {
@@ -262,7 +254,7 @@ local CHANNEL_LIST = {
 						for i = #D.aWhisper, 1, -1 do
 							if D.aWhisper[i][1] == whisper[1] then
 								table.remove(D.aWhisper, i)
-								UI.ClosePopupMenu()
+								X.UI.ClosePopupMenu()
 							end
 						end
 						O.aWhisper = D.aWhisper
@@ -298,7 +290,7 @@ local CHANNEL_LIST = {
 			t.x = x
 			t.y = y - #D.aWhisper * 24 - 24 - 20 - 8
 			if #t > 0 then
-				table.insert(t, 1, CONSTANT.MENU_DIVIDER)
+				table.insert(t, 1, X.CONSTANT.MENU_DIVIDER)
 				table.insert(t, 1, {
 					szOption = g_tStrings.CHANNEL_WHISPER_SIGN,
 					rgb = {202, 126, 255},
@@ -350,7 +342,7 @@ local CHANNEL_LIST = {
 					}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
 				})
 			end
-			UI(this):Check(false)
+			X.UI(this):Check(false)
 		end,
 		color = {255, 0, 0},
 	},
@@ -520,7 +512,7 @@ function D.OnFrameCreate()
 				this.tRadios[v.channel] = chk
 			end
 			if v.tip then
-				UI(chk):Tip(v.tip, UI.TIP_POSITION.CENTER)
+				X.UI(chk):Tip(v.tip, X.UI.TIP_POSITION.CENTER)
 			end
 			if txtTitle then
 				txtTitle:SetText(v.title)
@@ -533,7 +525,7 @@ function D.OnFrameCreate()
 				txtCooldown:SetFontColor(unpack(v.color or {255, 255, 255}))
 			end
 			if shaCount then
-				UI(shaCount):DrawCircle(0, 0, 0)
+				X.UI(shaCount):DrawCircle(0, 0, 0)
 			end
 			chk.info = v
 			UpdateChannelDailyLimit(chk)

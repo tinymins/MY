@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 科举助手 (台服用)
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -88,8 +80,8 @@ local function QueryData(szQues)
 	X.Ajax({
 		url = 'https://pull.j3cx.com/api/exam?'
 			.. X.EncodeQuerystring(X.ConvertToUTF8({
-				l = ENVIRONMENT.GAME_LANG,
-				L = ENVIRONMENT.GAME_EDITION,
+				l = X.ENVIRONMENT.GAME_LANG,
+				L = X.ENVIRONMENT.GAME_EDITION,
 				search = szQues,
 			})),
 		success = function(html, status)
@@ -156,8 +148,8 @@ function D.SubmitData(tExamData, bAllRight)
 	X.Ajax({
 		url = 'https://push.j3cx.com/api/exam/uploads',
 		data = {
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			data = X.EncodeJSON(data),
 			perfect = bAllRight and 1 or 0,
 		},
@@ -282,7 +274,7 @@ X.RegisterEvent('OPEN_WINDOW', 'MY_EXAMTIP', function()
 	if X.IsEmpty(INPUT_DATA_CACHE) then
 		return
 	end
-	if wstring.find(arg1, _L['<G>Congratulations you finished the exam, please visit Yangzhou next monday for result.']) then
+	if X.StringFindW(arg1, _L['<G>Congratulations you finished the exam, please visit Yangzhou next monday for result.']) then
 		local tExamData = X.Clone(INPUT_DATA_CACHE)
 		INPUT_DATA_CACHE = {}
 		D.SubmitData(tExamData, false)

@@ -1,4 +1,4 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队重要BUFF列表
@@ -6,17 +6,9 @@
 -- @ref      : William Chan (Webster)
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon_PBL'
@@ -267,7 +259,7 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	local nSortLFC = nLFC
 	for i = D.handle:GetItemCount() - 1, 0, -1 do
 		local hItem = D.handle:Lookup(i)
-		if nLFC - hItem.nLFC <= ENVIRONMENT.GAME_FPS / 2 and nLFC - hItem.nSortLFC <= ENVIRONMENT.GAME_FPS / 2 then
+		if nLFC - hItem.nLFC <= X.ENVIRONMENT.GAME_FPS / 2 and nLFC - hItem.nSortLFC <= X.ENVIRONMENT.GAME_FPS / 2 then
 			nSortLFC = hItem.nSortLFC
 			break
 		end

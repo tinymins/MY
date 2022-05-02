@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : ÁÄÌìÀ¸ÐÕÃûÒ»¼ü´òÂë
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatMosaics'
@@ -53,24 +45,24 @@ local D = {
 function D.OnMosaicsEnable()
 	if not D.tSysHeadTopState then
 		D.tSysHeadTopState = {
-			['OTHERPLAYER_NAME'  ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.NAME ),
-			['OTHERPLAYER_GUILD' ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.GUILD),
-			['CLIENTPLAYER_NAME' ] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.NAME ),
-			['CLIENTPLAYER_GUILD'] = GetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD),
+			['OTHERPLAYER_NAME'  ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.NAME ),
+			['OTHERPLAYER_GUILD' ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.GUILD),
+			['CLIENTPLAYER_NAME' ] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.NAME ),
+			['CLIENTPLAYER_GUILD'] = GetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.GUILD),
 		}
 	end
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER, CONSTANT.GLOBAL_HEAD.NAME , false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.NAME , false)
-	SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER, X.CONSTANT.GLOBAL_HEAD.NAME , false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER, X.CONSTANT.GLOBAL_HEAD.GUILD, false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.NAME , false)
+	SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.GUILD, false)
 end
 
 function D.OnMosaicsDisable()
 	if D.tSysHeadTopState then
-		SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.NAME , D.tSysHeadTopState['OTHERPLAYER_NAME'])
-		SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.OTHERPLAYER , CONSTANT.GLOBAL_HEAD.GUILD, D.tSysHeadTopState['OTHERPLAYER_GUILD'])
-		SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.NAME , D.tSysHeadTopState['CLIENTPLAYER_NAME'])
-		SetGlobalTopHeadFlag(CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, CONSTANT.GLOBAL_HEAD.GUILD, D.tSysHeadTopState['CLIENTPLAYER_GUILD'])
+		SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.NAME , D.tSysHeadTopState['OTHERPLAYER_NAME'])
+		SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.OTHERPLAYER , X.CONSTANT.GLOBAL_HEAD.GUILD, D.tSysHeadTopState['OTHERPLAYER_GUILD'])
+		SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.NAME , D.tSysHeadTopState['CLIENTPLAYER_NAME'])
+		SetGlobalTopHeadFlag(X.CONSTANT.GLOBAL_HEAD.CLIENTPLAYER, X.CONSTANT.GLOBAL_HEAD.GUILD, D.tSysHeadTopState['CLIENTPLAYER_GUILD'])
 		D.tSysHeadTopState = nil
 	end
 end
@@ -110,17 +102,17 @@ function D.MosaicsString(szText)
 		szText = szText:sub(2, -2) -- È¥µô[]À¨ºÅ
 	end
 	if (not O.bIgnoreOwnName or szText ~= GetClientPlayer().szName) and not O.tIgnoreNames[szText] then
-		local nLen = wstring.len(szText)
+		local nLen = X.StringLenW(szText)
 		if O.nMosaicsMode == 3 and nLen > 2 then
-			szText = wstring.sub(szText, 1, 1) .. string.rep(D.szMosaics, nLen - 2) .. wstring.sub(szText, nLen, nLen)
+			szText = X.StringSubW(szText, 1, 1) .. string.rep(D.szMosaics, nLen - 2) .. X.StringSubW(szText, nLen, nLen)
 		elseif O.nMosaicsMode == 1 and nLen > 1 then
-			szText = wstring.sub(szText, 1, 1) .. string.rep(D.szMosaics, nLen - 1)
+			szText = X.StringSubW(szText, 1, 1) .. string.rep(D.szMosaics, nLen - 1)
 		elseif O.nMosaicsMode == 2 and nLen > 1 then
-			szText = string.rep(D.szMosaics, nLen - 1) .. wstring.sub(szText, nLen, nLen)
+			szText = string.rep(D.szMosaics, nLen - 1) .. X.StringSubW(szText, nLen, nLen)
 		elseif O.nMosaicsMode == 4 or nLen <= 1 then
 			szText = string.rep(D.szMosaics, nLen)
 		else
-			szText = wstring.sub(szText, 1, 1) .. string.rep(D.szMosaics, nLen - 1)
+			szText = X.StringSubW(szText, 1, 1) .. string.rep(D.szMosaics, nLen - 1)
 		end
 	end
 	if bQuote then
@@ -202,7 +194,7 @@ end
 local PS = {}
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	local x, y = 20, 30
 

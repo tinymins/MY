@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 仓库背包增强（搜索/对比）
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_BagEx'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_BagEx'
@@ -74,9 +66,9 @@ local function FilterBags(szTreePath, szFilter, bTimeLtd)
 	end
 	local me = GetClientPlayer()
 	if not szFilter and not bTimeLtd then
-		UI(szTreePath):Find('.Box'):Alpha(255)
+		X.UI(szTreePath):Find('.Box'):Alpha(255)
 	else
-		UI(szTreePath):Find('.Box'):Each(function(ui)
+		X.UI(szTreePath):Find('.Box'):Each(function(ui)
 			if this.bBag then
 				return
 			end
@@ -181,8 +173,8 @@ local function DoCompareBank(bForce)
 		local frmBank = Station.Lookup('Normal/BigBankPanel')
 
 		if frmBag and frmBank and frmBank:IsVisible() then
-			UI('Normal/BigBagPanel/CheckBox_Totle'):Check(true):Check(false)
-			DoCompare(UI(frmBag), UI(frmBank))
+			X.UI('Normal/BigBagPanel/CheckBox_Totle'):Check(true):Check(false)
+			DoCompare(X.UI(frmBag), X.UI(frmBank))
 		end
 	else
 		DoFilterBag(bForce)
@@ -196,8 +188,8 @@ local function DoCompareGuildBank(bForce)
 		local frmGuildBank = Station.Lookup('Normal/GuildBankPanel')
 
 		if frmBag and frmGuildBank and frmGuildBank:IsVisible() then
-			UI('Normal/BigBagPanel/CheckBox_Totle'):Check(true):Check(false)
-			DoCompare(UI(frmBag), UI(frmGuildBank))
+			X.UI('Normal/BigBagPanel/CheckBox_Totle'):Check(true):Check(false)
+			DoCompare(X.UI(frmBag), X.UI(frmGuildBank))
 		end
 	else
 		DoFilterBag(bForce)
@@ -218,7 +210,7 @@ local function Hook()
 	local frame = Station.Lookup('Normal/BigBagPanel')
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
-		UI(frame):Append('WndEditBox', {
+		X.UI(frame):Append('WndEditBox', {
 			name = 'WndEditBox_KeyWord',
 			w = 100, h = 21, x = 60, y = 30,
 			text = l_szBagFilter,
@@ -227,7 +219,7 @@ local function Hook()
 				local nLen = txt:len()
 				nLen = math.max(nLen, 10)
 				nLen = math.min(nLen, 20)
-				UI(this):Width(nLen * 10)
+				X.UI(this):Width(nLen * 10)
 				l_szBagFilter = txt
 				DoFilterBag()
 			end,
@@ -239,7 +231,7 @@ local function Hook()
 	local frame = Station.Lookup('Normal/BigBankPanel')
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
-		UI(frame):Append('WndEditBox', {
+		X.UI(frame):Append('WndEditBox', {
 			name = 'WndEditBox_KeyWord',
 			w = 150, h = 21, x = 280, y = 80,
 			text = l_szBankFilter,
@@ -248,34 +240,34 @@ local function Hook()
 				local nLen = txt:len()
 				nLen = math.max(nLen, 15)
 				nLen = math.min(nLen, 25)
-				UI(this):Width(nLen * 10)
+				X.UI(this):Width(nLen * 10)
 				l_szBankFilter = txt
 				DoFilterBank(true)
 			end,
 		})
 
-		UI(frame):Append('WndCheckBox', {
+		X.UI(frame):Append('WndCheckBox', {
 			name = 'WndCheckBox_Compare',
 			w = 100, x = 340, y = 56,
 			text = _L['Compare with bag'],
 			checked = l_bCompareBank,
 			onCheck = function(bChecked)
 				if bChecked then
-					UI('Normal/BigBankPanel/CheckBox_TimeLtd'):Check(false)
+					X.UI('Normal/BigBankPanel/CheckBox_TimeLtd'):Check(false)
 				end
 				l_bCompareBank = bChecked
 				DoCompareBank(true)
 			end
 		})
 
-		UI(frame):Append('WndCheckBox', {
+		X.UI(frame):Append('WndCheckBox', {
 			name = 'CheckBox_TimeLtd',
 			w = 60, x = 277, y = 56, alpha = 200,
 			text = _L['Time Limited'],
 			checked = l_bBankTimeLtd,
 			onCheck = function(bChecked)
 				if bChecked then
-					UI('Normal/BigBankPanel/WndCheckBox_Compare'):Check(false)
+					X.UI('Normal/BigBankPanel/WndCheckBox_Compare'):Check(false)
 				end
 				l_bBankTimeLtd = bChecked
 				DoFilterBank(true)
@@ -288,7 +280,7 @@ local function Hook()
 	local frame = Station.Lookup('Normal/GuildBankPanel')
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
-		UI('Normal/GuildBankPanel'):Append('WndEditBox', {
+		X.UI('Normal/GuildBankPanel'):Append('WndEditBox', {
 			name = 'WndEditBox_KeyWord',
 			w = 100, h = 21, x = 60, y = 25,
 			text = l_szGuildBankFilter,
@@ -297,13 +289,13 @@ local function Hook()
 				local nLen = txt:len()
 				nLen = math.max(nLen, 10)
 				nLen = math.min(nLen, 25)
-				UI(this):Width(nLen * 10)
+				X.UI(this):Width(nLen * 10)
 				l_szGuildBankFilter = txt
 				DoFilterGuildBank(true)
 			end,
 		})
 
-		UI('Normal/GuildBankPanel'):Append('WndCheckBox', {
+		X.UI('Normal/GuildBankPanel'):Append('WndCheckBox', {
 			name = 'WndCheckBox_Compare',
 			w = 100, x = 20, y = 475,
 			text = _L['Compare with bag'],

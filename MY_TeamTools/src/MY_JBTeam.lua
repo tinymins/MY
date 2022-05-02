@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 快捷入团
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_JBBind'
@@ -38,8 +30,8 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 	X.Ajax({
 		url = 'https://push.j3cx.com/team/' .. (szAction == 'join' and 'join' or 'quit'),
 		data = {
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			team = szTeam,
 			cguid = X.GetClientGUID(),
 			jx3id = X.GetPlayerGUID(),
@@ -84,7 +76,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 				return X.Alert(_L['Please input team name/id.'])
 			end
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
-				return X.Topmsg(_L['Please unlock equip lock first!'], CONSTANT.MSG_THEME.ERROR)
+				return X.Topmsg(_L['Please unlock equip lock first!'], X.CONSTANT.MSG_THEME.ERROR)
 			end
 			X.Confirm(_L('Sure to apply join team %s?', szTeam), function()
 				bLoading = true
@@ -115,7 +107,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 				return X.Alert(_L['Please input team name/id.'])
 			end
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
-				return X.Topmsg(_L['Please unlock equip lock first!'], CONSTANT.MSG_THEME.ERROR)
+				return X.Topmsg(_L['Please unlock equip lock first!'], X.CONSTANT.MSG_THEME.ERROR)
 			end
 			X.Confirm(_L('Sure to apply quit team %s?', szTeam), function()
 				bLoading = true
@@ -138,7 +130,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nX, y = nY + 5, w = 20, h = 20,
 		buttonStyle = 'QUESTION',
 		onClick = function()
-			UI.OpenBrowser('https://page.j3cx.com/jx3box/team/about')
+			X.UI.OpenBrowser('https://page.j3cx.com/jx3box/team/about')
 		end,
 	}):Width()
 

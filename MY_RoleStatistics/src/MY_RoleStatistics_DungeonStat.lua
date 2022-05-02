@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 秘境CD统计
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_DungeonStat'
@@ -30,7 +22,7 @@ CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
 local DB = X.SQLiteConnect(_L['MY_RoleStatistics_DungeonStat'], {'userdata/role_statistics/dungeon_stat.v3.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return X.Sysmsg(_L['MY_RoleStatistics_DungeonStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return X.Sysmsg(_L['MY_RoleStatistics_DungeonStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
 
 DB:Execute([[
@@ -236,7 +228,7 @@ local COLUMN_LIST = {
 }
 local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 	if id == 'week_team_dungeon' then
-		if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+		if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 			return {
 				id = id,
 				szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_TEAM_DUNGEON,
@@ -244,16 +236,16 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			}
 		end
 	elseif id == 'week_raid_dungeon' then
-		if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+		if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 			return {
 				id = id,
 				szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_RAID_DUNGEON,
 				nMinWidth = DUNGEON_MIN_WIDTH * #X.GetActivityMap('WEEK_RAID_DUNGEON'),
 			}
 		end
-	elseif wstring.find(id, 'dungeon_') then
-		local mapid, via = wstring.gsub(id, 'dungeon_', ''), ''
-		if wstring.find(mapid, '@') then
+	elseif X.StringFindW(id, 'dungeon_') then
+		local mapid, via = X.StringReplaceW(id, 'dungeon_', ''), ''
+		if X.StringFindW(mapid, '@') then
 			local ids = X.SplitString(mapid, '@')
 			mapid, via = tonumber(ids[1]), ids[2]
 		else
@@ -644,7 +636,7 @@ function D.GetTableColumns()
 end
 
 function D.UpdateUI(page)
-	local ui = UI(page)
+	local ui = X.UI(page)
 
 	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
 	local szUSearch = AnsiToUTF8('%' .. szSearch .. '%')
@@ -670,7 +662,7 @@ function D.UpdateMapProgress(bForceUpdate)
 	local tProgressBossMapID = {}
 	-- 监控数据里的地图 ID
 	for _, col in ipairs(D.GetColumns()) do
-		local szID = wstring.find(col.id, 'dungeon_') and wstring.gsub(col.id, 'dungeon_', '')
+		local szID = X.StringFindW(col.id, 'dungeon_') and X.StringReplaceW(col.id, 'dungeon_', '')
 		local dwID = szID and tonumber(szID)
 		if dwID then
 			tProgressBossMapID[dwID] = true
@@ -688,7 +680,7 @@ function D.UpdateMapProgress(bForceUpdate)
 		if aProgressBoss then
 			-- 强制刷新秘境进度，或者进度数据已过期并且5秒内未请求过，则发起请求
 			if bForceUpdate or (not D.tMapProgressValid[dwID] and GetTime() - D.tMapProgressRequestTime[dwID] > 5000) then
-				if not lodash.includes(D.aMapProgressRequestQueue, dwID) then
+				if not X.lodash.includes(D.aMapProgressRequestQueue, dwID) then
 					table.insert(D.aMapProgressRequestQueue, dwID)
 				end
 			end
@@ -769,7 +761,7 @@ function D.GetRowTip(rec, bFloat)
 		if id == 'DUNGEON' then
 			local aMapID = {}
 			for _, col in ipairs(D.GetColumns()) do
-				local dwMapID = wstring.find(col.id, 'dungeon_')
+				local dwMapID = X.StringFindW(col.id, 'dungeon_')
 					and tonumber(col.id:sub(#'dungeon_' + 1))
 					or nil
 				table.insert(aMapID, dwMapID)
@@ -816,7 +808,7 @@ function D.OutputRowTip(this, rec)
 	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	local nPosType = bFloat and UI.TIP_POSITION.TOP_BOTTOM or UI.TIP_POSITION.RIGHT_LEFT
+	local nPosType = bFloat and X.UI.TIP_POSITION.TOP_BOTTOM or X.UI.TIP_POSITION.RIGHT_LEFT
 	OutputTip(D.GetRowTip(rec, bFloat), 450, {x, y, w, h}, nPosType)
 end
 
@@ -826,7 +818,7 @@ end
 
 function D.OnInitPage()
 	local page = this
-	local ui = UI(page)
+	local ui = X.UI(page)
 
 	ui:Append('WndEditBox', {
 		name = 'WndEditBox_Search',
@@ -907,7 +899,7 @@ function D.OnInitPage()
 									end
 								end,
 							},
-							CONSTANT.MENU_DIVIDER,
+							X.CONSTANT.MENU_DIVIDER,
 							{
 								szOption = _L['Delete'],
 								fnAction = function()
@@ -956,7 +948,7 @@ function D.OnInitPage()
 				-- 秘境选项
 				local tDungeonChecked = {}
 				for _, id in ipairs(aColumn) do
-					local szID = wstring.find(id, 'dungeon_') and wstring.gsub(id, 'dungeon_', '')
+					local szID = X.StringFindW(id, 'dungeon_') and X.StringReplaceW(id, 'dungeon_', '')
 					local dwID = szID and tonumber(szID)
 					if dwID then
 						tDungeonChecked[dwID] = true
@@ -1002,7 +994,7 @@ function D.OnInitPage()
 			render = function(rec)
 				return D.GetRowTip(rec, false), true
 			end,
-			position = UI.TIP_POSITION.RIGHT_LEFT,
+			position = X.UI.TIP_POSITION.RIGHT_LEFT,
 		},
 		rowMenuRClick = function(rec, index)
 			local menu = {
@@ -1213,7 +1205,7 @@ X.RegisterInit('MY_RoleStatistics_DungeonStat', function()
 end)
 
 X.RegisterExit('MY_RoleStatistics_DungeonStat', function()
-	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		D.UpdateSaveDB()
 		D.FlushDB()
 	end

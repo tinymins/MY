@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : Doodad 物品采集拾取助手
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKPDoodad'
@@ -234,7 +226,7 @@ function D.IsCustomDoodad(doodad)
 	if O.bCustom and D.tCustom[doodad.szName] then
 		if doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP then
 			local tpl = GetDoodadTemplate(doodad.dwTemplateID)
-			return tpl and tpl.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING
+			return tpl and tpl.dwCraftID == X.CONSTANT.CRAFT_TYPE.SKINNING
 		end
 		return true
 	end
@@ -245,7 +237,7 @@ function D.IsRecentDoodad(doodad)
 	if O.bRecent and D.tRecent[doodad.dwTemplateID] then
 		if doodad.nKind == DOODAD_KIND.CORPSE or doodad.nKind == DOODAD_KIND.NPCDROP then
 			local tpl = GetDoodadTemplate(doodad.dwTemplateID)
-			return tpl and tpl.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING
+			return tpl and tpl.dwCraftID == X.CONSTANT.CRAFT_TYPE.SKINNING
 		end
 		return true
 	end
@@ -291,19 +283,19 @@ function D.GetDoodadInfo(dwID)
 		return info
 	end
 	-- 采金
-	if info.dwCraftID == CONSTANT.CRAFT_TYPE.MINING then
+	if info.dwCraftID == X.CONSTANT.CRAFT_TYPE.MINING then
 		info.eDoodadType = 'mining'
 		info.eActionType = eOverwriteAction or 'craft'
 		return info
 	end
 	-- 神农
-	if info.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM then
+	if info.dwCraftID == X.CONSTANT.CRAFT_TYPE.HERBALISM then
 		info.eDoodadType = 'herbalism'
 		info.eActionType = eOverwriteAction or 'craft'
 		return info
 	end
 	-- 庖丁
-	if info.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING then
+	if info.dwCraftID == X.CONSTANT.CRAFT_TYPE.SKINNING then
 		info.eDoodadType = 'skinning'
 		info.eActionType = eOverwriteAction or 'craft'
 		return info
@@ -434,9 +426,9 @@ function D.OnPickPrepare(doodad, nFinishLFC)
 		return
 	end
 	local t = GetDoodadTemplate(doodad.dwTemplateID)
-	if t.dwCraftID == CONSTANT.CRAFT_TYPE.MINING
-	or t.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM
-	or t.dwCraftID == CONSTANT.CRAFT_TYPE.SKINNING then
+	if t.dwCraftID == X.CONSTANT.CRAFT_TYPE.MINING
+	or t.dwCraftID == X.CONSTANT.CRAFT_TYPE.HERBALISM
+	or t.dwCraftID == X.CONSTANT.CRAFT_TYPE.SKINNING then
 		D.nPickPrepareFinishLFC = nFinishLFC
 		D.dwPickPrepareDoodadID = doodad.dwID
 		D.dwPickPrepareDoodadTemplateID = doodad.dwTemplateID
@@ -451,7 +443,7 @@ function D.OnPickPrepareStop(doodad)
 	if dwTemplateID then
 		local bSuccess = doodad
 			and doodad.dwID == D.dwPickPrepareDoodadID
-			and math.abs(GetLogicFrameCount() - D.nPickPrepareFinishLFC) < ENVIRONMENT.GAME_FPS / 2
+			and math.abs(GetLogicFrameCount() - D.nPickPrepareFinishLFC) < X.ENVIRONMENT.GAME_FPS / 2
 		D.nPickPrepareFinishLFC = nil
 		D.dwPickPrepareDoodadID = nil
 		D.dwPickPrepareDoodadTemplateID = nil
@@ -483,7 +475,7 @@ end)
 
 -- switch name
 function D.CheckShowName()
-	local hName = UI.GetShadowHandle('MY_GKPDoodad')
+	local hName = X.UI.GetShadowHandle('MY_GKPDoodad')
 	local bShowName = O.bShowName and not IsShowNameDisabled()
 	if bShowName and not D.pLabel then
 		D.pLabel = hName:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Name')
@@ -558,7 +550,7 @@ end
 function D.AutoInteractDoodad()
 	local me = GetClientPlayer()
 	-- auto interact
-	if not me or X.GetOTActionState(me) ~= CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
+	if not me or X.GetOTActionState(me) ~= X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
 		or (me.nMoveState ~= MOVE_STATE.ON_STAND and me.nMoveState ~= MOVE_STATE.ON_FLOAT)
 		-- or IsDialoguePanelOpened()
 	then
@@ -627,7 +619,7 @@ end
 
 function D.CloseLootWindow()
 	local me = GetClientPlayer()
-	if me and X.GetOTActionState(me) == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
+	if me and X.GetOTActionState(me) == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
 		me.OnCloseLootWindow()
 	end
 end
@@ -684,9 +676,9 @@ function D.UpdateMiniFlag()
 			local dwType, nF1, nF2 = 5, 169, 48
 			if info.eRuleType == 'quest' then
 				nF1 = 114
-			elseif info.dwCraftID == CONSTANT.CRAFT_TYPE.MINING then -- 采金类
+			elseif info.dwCraftID == X.CONSTANT.CRAFT_TYPE.MINING then -- 采金类
 				nF1, nF2 = 16, 47
-			elseif info.dwCraftID == CONSTANT.CRAFT_TYPE.HERBALISM then -- 神农类
+			elseif info.dwCraftID == X.CONSTANT.CRAFT_TYPE.HERBALISM then -- 神农类
 				nF1 = 2
 			end
 			X.UpdateMiniFlag(dwType, doodad, nF1, nF2)
@@ -810,7 +802,7 @@ end)
 local PS = { nPriority = 2.1 }
 
 function PS.OnPanelActive(frame)
-	local ui = UI(frame)
+	local ui = X.UI(frame)
 	local nW, nH = ui:Size()
 	local nPaddingX, nPaddingY = 40, 10
 	local nX, nY, nLFY = nPaddingX, nPaddingY, nPaddingY
@@ -867,7 +859,7 @@ function PS.OnPanelActive(frame)
 			name = 'Shadow_Color', x = nX + 2, y = nY + 4, w = 18, h = 18,
 			color = O.tNameColor,
 			onClick = function()
-				UI.OpenColorPicker(function(r, g, b)
+				X.UI.OpenColorPicker(function(r, g, b)
 					ui:Fetch('Shadow_Color'):Color(r, g, b)
 					O.tNameColor = { r, g, b }
 					D.RescanNearby()
@@ -880,7 +872,7 @@ function PS.OnPanelActive(frame)
 			x = nX, y = nY, w = 65,
 			text = _L['Font'],
 			onClick = function()
-				UI.OpenFontPicker(function(nFont)
+				X.UI.OpenFontPicker(function(nFont)
 					O.nNameFont = nFont
 					D.bUpdateLabel = true
 				end)
@@ -892,7 +884,7 @@ function PS.OnPanelActive(frame)
 			x = nX, y = nY, w = 150,
 			textFormatter = function(val) return _L('Font scale is %d%%.', val) end,
 			range = {10, 500},
-			trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 			value = O.fNameScale * 100,
 			onChange = function(val)
 				O.fNameScale = val / 100
@@ -1080,7 +1072,7 @@ function PS.OnPanelActive(frame)
 			end,
 			tip = {
 				render = _L['Recent crafted doodads during current game'],
-				position = UI.TIP_POSITION.TOP_BOTTOM,
+				position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			},
 			autoEnable = function() return O.bShowName or O.bInteract end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 10
@@ -1126,7 +1118,7 @@ function PS.OnPanelActive(frame)
 					end
 					return _L['Tip: Enter the name of dead animals can be automatically Paoding!']
 				end,
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 			autoEnable = function() return (O.bShowName or O.bInteract) and O.bCustom end,
 		})

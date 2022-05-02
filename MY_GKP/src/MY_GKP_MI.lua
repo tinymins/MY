@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 金团记录主数据源实例化逻辑 (Main Instance)
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
@@ -170,7 +162,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 			local szFrameName = data[1] == 'GKP_CONSUMPTION' and 'MY_GKP_Consumption' or 'MY_GKP_Debt'
 			if data[2] == 'BEGIN' then
 				Wnd.CloseWindow(szFrameName)
-				local ui = UI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = 'CENTER' })
+				local ui = X.UI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = 'CENTER' })
 				local x, y = 20, 50
 				local szCaption = data[1] == 'GKP_CONSUMPTION' and _L['--- Consumption ---'] or _L['Information on Debt']
 				ui:Append('Text', { x = x, y = y, w = 760, h = 30, text = szCaption, alignHorizontal = 1, font = 236, color = { 255, 255, 0 } })
@@ -210,7 +202,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 						table.insert(frm.items, v)
 					end
 					local n = frm.n
-					local ui = UI(frm)
+					local ui = X.UI(frm)
 					local x, y = 20, 50
 					if n % 2 == 0 then
 						ui:Append('Image', { w = 760, h = 30, x = x, y = y + 70 + 30 * n, image = 'ui/Image/button/ShopButton.UITex', imageFrame = 75 })
@@ -237,7 +229,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 								end
 							end)
 						else
-							hBox:ItemInfo(ENVIRONMENT.GAME_VERSION, v[1], v[2], v[3])
+							hBox:ItemInfo(X.ENVIRONMENT.GAME_VERSION, v[1], v[2], v[3])
 						end
 					end
 					if frm.n > 5 then
@@ -250,14 +242,14 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 				local frm = Station.SearchFrame(szFrameName)
 				if frm and frm.key == data[3] then
 					if data[1] == 'GKP_CONSUMPTION' then
-						local ui = UI(frm)
+						local ui = X.UI(frm)
 						local x, y = 20, 50
 						local n = frm.n or 0
 						local nMoney = tonumber(data[4]) or 0
 						local handle = ui:Append('Handle', { w = 230, h = 20, x = x + 30, y = y + 70 + 30 * n + 5, handleStyle = 3 })[1]
 						handle:AppendItemFromString(GetFormatText(_L['Total Auction:'], 41) .. D.GetMoneyTipText(nMoney))
 						handle:FormatAllItemPos()
-						if X.IsDistributor() and ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+						if X.IsDistributor() and X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 							ui:Append('WndButton', {
 								w = 91, h = 26, x = x + 620, y = y + 70 + 30 * n + 5, text = _L['salary'],
 								buttonStyle = 'SKEUOMORPHISM',
@@ -272,7 +264,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 						if nTime > 0 then
 							ui:Append('Text', { w = 725, h = 30, x = x + 0, y = y + 70 + 30 * n + 5, text = _L('Spend time approx %d:%d', nTime / 3600, nTime % 3600 / 60), alignHorizontal = 1 })
 						end
-						UI(frm):Children('#ScreenShot'):Toggle(true)
+						X.UI(frm):Children('#ScreenShot'):Toggle(true)
 						if n >= 4 and data[6] then
 							local nGKPLevel = data[6]
 							local aGKPLevelFrame = {

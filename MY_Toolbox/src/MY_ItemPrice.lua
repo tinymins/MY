@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 物品价格查询
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -69,21 +61,21 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 	end
 	local szURL = 'https://page.j3cx.com/item/' .. table.concat(aPath, '/') .. '/price?'
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			server = line and line.szCenterName or X.GetRealServer(2),
 			player = GetUserRoleName(),
 			item = szName,
 		}))
 	local szKey = 'ItemPrice_' .. table.concat(aPath, '_')
 	local szTitle = szName
-	szKey = UI.OpenBrowser(szURL, {
+	szKey = X.UI.OpenBrowser(szURL, {
 		key = szKey,
 		title = szTitle,
 		w = O.nW, h = O.nH,
 		readonly = true,
 	})
-	UI(UI.LookupBrowser(szKey)):Size(D.OnWebSizeChange)
+	X.UI(X.UI.LookupBrowser(szKey)):Size(D.OnWebSizeChange)
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
@@ -94,7 +86,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			checked = MY_ItemPrice.bEnable,
 			onCheck = function(bChecked)
 				if bChecked then
-					local ui = UI(this)
+					local ui = X.UI(this)
 					X.Confirm(_L['Check this will show price entry in bag item menu, and will share price when search auction, are you sure?'], function()
 						MY_ItemPrice.bEnable = bChecked
 						ui:Check(true, WNDEVENT_FIRETYPE.PREVENT)
@@ -106,7 +98,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 			end,
 			tip = {
 				render = _L['Hold SHIFT and r-click bag box to show item price, share price when search auction.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 		}):Width() + 5
 	end
@@ -169,7 +161,7 @@ Box_AppendAddonMenu({function(box)
 			szOption = _L['Lookup price'],
 			fnAction = function() D.Open(dwTabType, dwTabIndex, nBookID) end,
 		})
-	elseif CONSTANT.FLOWERS_UIID[item.nUiId] then
+	elseif X.CONSTANT.FLOWERS_UIID[item.nUiId] then
 		table.insert(menu, {
 			szOption = _L['Lookup flower price'],
 			fnAction = function() D.Open(dwTabType, dwTabIndex, nBookID) end,
@@ -187,9 +179,9 @@ local function GetItemKey(it)
 	return X.NumberBaseN(it.dwTabType, 32) .. '_' .. X.NumberBaseN(it.dwIndex, 32)
 end
 local PRICE_TYPE = X.KvpToObject({
-	{ CONSTANT.AUCTION_ITEM_LIST_TYPE.NORMAL_LOOK_UP, 'n' },
-	{ CONSTANT.AUCTION_ITEM_LIST_TYPE.PRICE_LOOK_UP , 'p' },
-	{ CONSTANT.AUCTION_ITEM_LIST_TYPE.DETAIL_LOOK_UP, 'd' },
+	{ X.CONSTANT.AUCTION_ITEM_LIST_TYPE.NORMAL_LOOK_UP, 'n' },
+	{ X.CONSTANT.AUCTION_ITEM_LIST_TYPE.PRICE_LOOK_UP , 'p' },
+	{ X.CONSTANT.AUCTION_ITEM_LIST_TYPE.DETAIL_LOOK_UP, 'd' },
 })
 X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 	if not O.bEnable then
@@ -275,8 +267,8 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 			table.insert(aData, szKey .. '-' .. table.concat(aPrice, '-'))
 		end
 		local data = {
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			r = X.GetRealServer(1),
 			s = X.GetRealServer(2),
 			t = GetCurrentTime(),

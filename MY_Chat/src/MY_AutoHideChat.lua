@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 自动隐藏聊天栏
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Chat'
@@ -52,7 +44,7 @@ end
 function D.ShowChatPanel(nShowFrame, nDelayFrame, callback)
 	-- 渐变出现帧数
 	if not nShowFrame then
-		nShowFrame = ENVIRONMENT.GAME_FPS / 4
+		nShowFrame = X.ENVIRONMENT.GAME_FPS / 4
 	end
 	-- 隐藏延迟帧数
 	if not nDelayFrame then
@@ -117,11 +109,11 @@ end
 function D.HideChatPanel(nHideFrame, nDelayFrame, callback)
 	-- 渐变消失帧数
 	if not nHideFrame then
-		nHideFrame = ENVIRONMENT.GAME_FPS / 2
+		nHideFrame = X.ENVIRONMENT.GAME_FPS / 2
 	end
 	-- 隐藏延迟帧数
 	if not nDelayFrame then
-		nDelayFrame = ENVIRONMENT.GAME_FPS * 5
+		nDelayFrame = X.ENVIRONMENT.GAME_FPS * 5
 	end
 	-- switch case
 	if m_nState == STATE.SHOW then
@@ -210,9 +202,9 @@ function D.Apply()
 				return
 			end
 			-- show when new msg
-			D.ShowChatPanel(ENVIRONMENT.GAME_FPS / 4, 0, function()
+			D.ShowChatPanel(X.ENVIRONMENT.GAME_FPS / 4, 0, function()
 				-- hide after 5 sec
-				D.HideChatPanel(ENVIRONMENT.GAME_FPS / 2, ENVIRONMENT.GAME_FPS * 5)
+				D.HideChatPanel(X.ENVIRONMENT.GAME_FPS / 2, X.ENVIRONMENT.GAME_FPS * 5)
 			end)
 		end)
 
@@ -223,7 +215,7 @@ function D.Apply()
 		end
 		-- show when chat panel get focus
 		editInput.OnSetFocus = function()
-			D.ShowChatPanel(ENVIRONMENT.GAME_FPS / 4, 0)
+			D.ShowChatPanel(X.ENVIRONMENT.GAME_FPS / 4, 0)
 			if this._MY_T_AHCP_OnSetFocus then
 				this._MY_T_AHCP_OnSetFocus()
 			end
@@ -234,7 +226,7 @@ function D.Apply()
 		end
 		-- hide after input box lost focus for 5 sec
 		editInput.OnKillFocus = function()
-			D.HideChatPanel(ENVIRONMENT.GAME_FPS / 2, ENVIRONMENT.GAME_FPS * 5)
+			D.HideChatPanel(X.ENVIRONMENT.GAME_FPS / 2, X.ENVIRONMENT.GAME_FPS * 5)
 			if this._MY_T_AHCP_OnKillFocus then
 				this._MY_T_AHCP_OnKillFocus()
 			end

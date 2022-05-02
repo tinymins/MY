@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 开发者工具
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MYDev_Snaplines'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_Snaplines'
@@ -162,7 +154,7 @@ local function InsertElementBasicTip(hElem, tTip)
 
 	table.insert(tTip, _L('Name: %s', hElem:GetName()))
 	table.insert(tTip, _L('Type: %s', hElem:GetType()))
-	table.insert(tTip, _L('Path: %s', UI.GetTreePath(hElem)))
+	table.insert(tTip, _L('Path: %s', X.UI.GetTreePath(hElem)))
 	table.insert(tTip, _L('X: %s, %s', nRelX, nAbsX))
 	table.insert(tTip, _L('Y: %s, %s', nRelY, nAbsY))
 	table.insert(tTip, _L('W: %s', nW))
@@ -315,7 +307,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 		end
 		-- 检测鼠标所在Box信息
 		if O.bDetectBox and not (hItem and hItem:GetType() == 'Box') then
-			UI(hWnd):Find('.Box'):Each(function()
+			X.UI(hWnd):Find('.Box'):Each(function()
 				if this:PtInItem(nCursorX, nCursorY) then
 					table.insert(tTip, '---------------------')
 					InsertElementTip(this, tTip)
@@ -423,7 +415,7 @@ X.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/U
 		return not X.IsDebugClient('Dev_Snaplines')
 	end,
 	OnPanelActive = function(wnd)
-		local ui = UI(wnd)
+		local ui = X.UI(wnd)
 		local nW, nH = ui:Size()
 		local nX, nY = 20, 20
 
@@ -448,8 +440,8 @@ X.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/U
 		  :Size(20, 20):Color(O.rgbTip or {255,255,255})
 		  :Click(function()
 			local me = this
-			UI.OpenColorPicker(function(r, g, b)
-				UI(me):Color(r, g, b)
+			X.UI.OpenColorPicker(function(r, g, b)
+				X.UI(me):Color(r, g, b)
 				O.rgbTip = { r, g, b }
 				MYDev_Snaplines.ReloadUI()
 			end)
@@ -458,7 +450,7 @@ X.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/U
 		ui:Append('WndButton', 'WndButton_TipFont'):Pos(nX, nY)
 		  :Width(50):Text(_L['font'])
 		  :Click(function()
-			UI.OpenFontPicker(function(f)
+			X.UI.OpenFontPicker(function(f)
 				O.nTipFont = f
 				MYDev_Snaplines.ReloadUI()
 			end)
@@ -503,8 +495,8 @@ X.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/U
 		  :Size(20, 20):Color(O.rgbWndSnaplines or {255,255,255})
 		  :Click(function()
 			local me = this
-			UI.OpenColorPicker(function(r, g, b)
-				UI(me):Color(r, g, b)
+			X.UI.OpenColorPicker(function(r, g, b)
+				X.UI(me):Color(r, g, b)
 				O.rgbWndSnaplines = { r, g, b }
 				MYDev_Snaplines.ReloadUI()
 			end)
@@ -524,8 +516,8 @@ X.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/U
 		  :Size(20, 20):Color(O.rgbItemSnaplines or {255,255,255})
 		  :Click(function()
 			local me = this
-			UI.OpenColorPicker(function(r, g, b)
-				UI(me):Color(r, g, b)
+			X.UI.OpenColorPicker(function(r, g, b)
+				X.UI(me):Color(r, g, b)
 				O.rgbItemSnaplines = { r, g, b }
 				MYDev_Snaplines.ReloadUI()
 			end)

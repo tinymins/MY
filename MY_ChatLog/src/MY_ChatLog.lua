@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 聊天记录 记录团队/好友/帮会/密聊 供日后查询
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_ChatLog'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatLog'
@@ -87,7 +79,7 @@ local LOG_TYPE = {
 	},
 	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aChannel = {'MSG_MY_MONITOR'} },
 }
-local LOG_LIMIT = (ENVIRONMENT.GAME_PROVIDER == 'remote' and not X.IsDebugClient())
+local LOG_LIMIT = (X.ENVIRONMENT.GAME_PROVIDER == 'remote' and not X.IsDebugClient())
 	and {
 		{ aKey = {'whisper'}, nLimit = 5000 },
 		{ aKey = {'party', 'team'}, nLimit = 5000 },
@@ -180,7 +172,7 @@ function D.ImportDB(szPath)
 		-- 老版分表机制
 		local dwGlobalID = X.Get(odb:Execute('SELECT * FROM ChatLogInfo WHERE key = "userguid"'), {1, 'value'})
 		if dwGlobalID == GetClientPlayer().GetGlobalID() then
-			for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex WHERE name IS NOT NULL ORDER BY stime ASC') or CONSTANT.EMPTY_TABLE) do
+			for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex WHERE name IS NOT NULL ORDER BY stime ASC') or X.CONSTANT.EMPTY_TABLE) do
 				if info.etime == -1 then
 					info.etime = 0
 				end
@@ -188,7 +180,7 @@ function D.ImportDB(szPath)
 				db:SetMinTime(info.stime)
 				db:SetMaxTime(info.etime)
 				db:SetInfo('user_global_id', dwGlobalID)
-				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' WHERE talker IS NOT NULL ORDER BY time ASC') or CONSTANT.EMPTY_TABLE) do
+				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' WHERE talker IS NOT NULL ORDER BY time ASC') or X.CONSTANT.EMPTY_TABLE) do
 					nImportCount = nImportCount + 1
 					db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
 				end

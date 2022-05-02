@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 金团记录 拾取界面
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_GKP'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_GKP'
@@ -31,20 +23,20 @@ X.RegisterRestriction('MY_GKPLoot.ForceLoot', { ['*'] = true })
 local DEBUG_LOOT = false -- 测试拾取分配 强制进入分配模式并最终不调用分配接口
 local GKP_LOOT_INIFILE = PLUGIN_ROOT .. '/ui/MY_GKPLoot.ini'
 local MY_GKP_LOOT_BOSS -- 散件老板
-local GKP_AUTO_LOOT_DEBOUNCE_TIME = ENVIRONMENT.GAME_FPS / 2 -- 自动拾取时延
+local GKP_AUTO_LOOT_DEBOUNCE_TIME = X.ENVIRONMENT.GAME_FPS / 2 -- 自动拾取时延
 
 local GKP_LOOT_HUANGBABA_ICON = 2589 -- 玄晶图标
-local GKP_LOOT_HUANGBABA_QUALITY = CONSTANT.ITEM_QUALITY.NACARAT -- 玄晶品级
+local GKP_LOOT_HUANGBABA_QUALITY = X.CONSTANT.ITEM_QUALITY.NACARAT -- 玄晶品级
 local GKP_LOOT_ZIBABA_ICON = 2588 -- 小铁图标
-local GKP_LOOT_ZIBABA_QUALITY = CONSTANT.ITEM_QUALITY.PURPLE -- 小铁品级
+local GKP_LOOT_ZIBABA_QUALITY = X.CONSTANT.ITEM_QUALITY.PURPLE -- 小铁品级
 
 local GKP_LOOT_RECENT = {} -- 记录上次物品或物品组分配给了谁
 local GKP_ITEM_QUALITIES = {
-	{ nQuality = CONSTANT.ITEM_QUALITY.WHITE  , szTitle = g_tStrings.STR_WHITE               },
-	{ nQuality = CONSTANT.ITEM_QUALITY.GREEN  , szTitle = g_tStrings.STR_ROLLQUALITY_GREEN   },
-	{ nQuality = CONSTANT.ITEM_QUALITY.BLUE   , szTitle = g_tStrings.STR_ROLLQUALITY_BLUE    },
-	{ nQuality = CONSTANT.ITEM_QUALITY.PURPLE , szTitle = g_tStrings.STR_ROLLQUALITY_PURPLE  },
-	{ nQuality = CONSTANT.ITEM_QUALITY.NACARAT, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
+	{ nQuality = X.CONSTANT.ITEM_QUALITY.WHITE  , szTitle = g_tStrings.STR_WHITE               },
+	{ nQuality = X.CONSTANT.ITEM_QUALITY.GREEN  , szTitle = g_tStrings.STR_ROLLQUALITY_GREEN   },
+	{ nQuality = X.CONSTANT.ITEM_QUALITY.BLUE   , szTitle = g_tStrings.STR_ROLLQUALITY_BLUE    },
+	{ nQuality = X.CONSTANT.ITEM_QUALITY.PURPLE , szTitle = g_tStrings.STR_ROLLQUALITY_PURPLE  },
+	{ nQuality = X.CONSTANT.ITEM_QUALITY.NACARAT, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
 }
 
 local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
@@ -265,7 +257,7 @@ RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
 function D.UpdateShielded()
 	GKP_AUTO_LOOT_DEBOUNCE_TIME = X.IsRestricted('MY_GKPLoot.FastLoot')
-		and ENVIRONMENT.GAME_FPS / 2
+		and X.ENVIRONMENT.GAME_FPS / 2
 		or 0
 end
 
@@ -357,7 +349,7 @@ function D.IsItemDisplay(itemData, config)
 		end
 	end
 	-- 过滤灰色物品
-	if config.bFilterGrayItem and itemData.nQuality == CONSTANT.ITEM_QUALITY.GRAY then
+	if config.bFilterGrayItem and itemData.nQuality == X.CONSTANT.ITEM_QUALITY.GRAY then
 		return false
 	end
 	return true
@@ -413,7 +405,7 @@ end
 
 function D.CloseLootWindow()
 	local me = GetClientPlayer()
-	if me and X.GetOTActionState(me) == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
+	if me and X.GetOTActionState(me) == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
 		me.OnCloseLootWindow()
 	end
 end
@@ -629,10 +621,10 @@ function D.OnLButtonClick()
 		if IsCtrlKeyDown() then
 			table.insert(menu, 1, { szOption = dwDoodadID, bDisable = true })
 		end
-		table.insert(menu, CONSTANT.MENU_DIVIDER)
+		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 		table.insert(menu, D.GetFilterMenu())
 		table.insert(menu, D.GetAutoPickupMenu())
-		UI.PopupMenu(menu)
+		X.UI.PopupMenu(menu)
 	elseif szName == 'Btn_Boss' then
 		if not D.AuthCheck(this:GetParent().dwDoodadID) then
 			return X.Topmsg(_L['You are not the distrubutor.'])
@@ -691,7 +683,7 @@ function D.OnItemMouseEnter()
 		end
 		-- local item = hItem.itemData.item
 		-- if itme and item.nGenre == ITEM_GENRE.EQUIPMENT then
-		-- 	if itme.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
+		-- 	if itme.nSub == X.CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
 		-- 		this:SetOverText(3, g_tStrings.WeapenDetail[item.nDetail])
 		-- 	else
 		-- 		this:SetOverText(3, g_tStrings.tEquipTypeNameTable[item.nSub])
@@ -760,7 +752,7 @@ function D.OnItemLButtonClick()
 			if not D.AuthCheck(dwDoodadID) then
 				return
 			end
-			return UI.PopupMenu(D.GetDistributeMenu(data, data.item.nUiId))
+			return X.UI.PopupMenu(D.GetDistributeMenu(data, data.item.nUiId))
 		elseif data.bBidding then
 			if team.nLootMode ~= PARTY_LOOT_MODE.BIDDING then
 				return OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_BID_LOOT)
@@ -795,7 +787,7 @@ function D.OnItemLButtonClick()
 				return X.Topmsg(_L['You are not the distrubutor.'])
 			end
 		end
-		return UI.PopupMenu(D.GetDistributeMenu(aItemData, hItem.itemData.szType))
+		return X.UI.PopupMenu(D.GetDistributeMenu(aItemData, hItem.itemData.szType))
 	end
 end
 
@@ -814,7 +806,7 @@ function D.OnItemRButtonClick()
 		if not D.AuthCheck(dwDoodadID) then
 			return
 		end
-		UI.PopupMenu(D.GetItemBiddingMenu(dwDoodadID, data))
+		X.UI.PopupMenu(D.GetItemBiddingMenu(dwDoodadID, data))
 	end
 end
 
@@ -859,7 +851,7 @@ function D.GetFilterMenu()
 			szOption = _L['Will be reset when loading'],
 			bDisable = true,
 		},
-		CONSTANT.MENU_DIVIDER,
+		X.CONSTANT.MENU_DIVIDER,
 	}
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
 		table.insert(t1, {
@@ -889,7 +881,7 @@ function D.GetFilterMenu()
 				D.ReloadFrame()
 			end,
 		},
-		CONSTANT.MENU_DIVIDER,
+		X.CONSTANT.MENU_DIVIDER,
 	}
 	for szName, bEnable in pairs(O.tNameFilter) do
 		table.insert(t1, {
@@ -910,14 +902,14 @@ function D.GetFilterMenu()
 			fnClickIcon = function()
 				O.tNameFilter[szName] = nil
 				O.tNameFilter = O.tNameFilter
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 				D.ReloadFrame()
 			end,
 			fnDisable = function() return not ITEM_CONFIG.bNameFilter end,
 		})
 	end
 	if not X.IsEmpty(O.tNameFilter) then
-		table.insert(t1, CONSTANT.MENU_DIVIDER)
+		table.insert(t1, X.CONSTANT.MENU_DIVIDER)
 	end
 	table.insert(t1, {
 		szOption = _L['Add'],
@@ -975,12 +967,12 @@ function D.GetAutoPickupMenu()
 			fnClickIcon = function()
 				O.tAutoPickupFilters[s] = nil
 				O.tAutoPickupFilters = O.tAutoPickupFilters
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end,
 		})
 	end
 	if #t1 > 0 then
-		table.insert(t1, CONSTANT.MENU_DIVIDER)
+		table.insert(t1, X.CONSTANT.MENU_DIVIDER)
 	end
 	table.insert(t1, {
 		szOption = _L['Add new'],
@@ -993,7 +985,7 @@ function D.GetAutoPickupMenu()
 	})
 	table.insert(t, t1)
 	-- 自动拾取
-	table.insert(t, CONSTANT.MENU_DIVIDER)
+	table.insert(t, X.CONSTANT.MENU_DIVIDER)
 	-- 自动拾取任务物品
 	table.insert(t, {
 		szOption = _L['Auto pickup quest item'],
@@ -1021,7 +1013,7 @@ function D.GetAutoPickupMenu()
 				O.bAutoPickupQuality = not O.bAutoPickupQuality
 			end,
 		},
-		CONSTANT.MENU_DIVIDER,
+		X.CONSTANT.MENU_DIVIDER,
 	}
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
 		table.insert(t1, {
@@ -1056,12 +1048,12 @@ function D.GetAutoPickupMenu()
 			fnClickIcon = function()
 				O.tAutoPickupNames[s] = nil
 				O.tAutoPickupNames = O.tAutoPickupNames
-				UI.ClosePopupMenu()
+				X.UI.ClosePopupMenu()
 			end,
 		})
 	end
 	if #t1 > 0 then
-		table.insert(t1, CONSTANT.MENU_DIVIDER)
+		table.insert(t1, X.CONSTANT.MENU_DIVIDER)
 	end
 	table.insert(t1, {
 		szOption = _L['Add new'],
@@ -1086,18 +1078,18 @@ function D.GetBossAction(dwDoodadID, bMenu)
 		for k, v in ipairs(aItemData) do
 			if (
 				(v.item.nGenre == ITEM_GENRE.EQUIPMENT and (
-					v.item.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON
-					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON
-					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.CHEST
-					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.HELM
-					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.AMULET
-					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.RING
-					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.WAIST
-					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.PENDANT
-					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.PANTS
-					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.BOOTS
-					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.BANGLE
-					or v.item.nSub == CONSTANT.EQUIPMENT_SUB.ARROW
+					v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON
+					or v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON
+					or v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.CHEST
+					or v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.HELM
+					or v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.AMULET
+					or v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.RING
+					or v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.WAIST
+					or v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.PENDANT
+					or v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.PANTS
+					or v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.BOOTS
+					or v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.BANGLE
+					or v.item.nSub == X.CONSTANT.EQUIPMENT_SUB.ARROW
 				))
 				or IsCtrlKeyDown()
 			) and v.bDist then -- 按住Ctrl的情况下 无视分类 否则只给装备
@@ -1145,7 +1137,7 @@ function D.GetBossAction(dwDoodadID, bMenu)
 		end, false, true)
 		table.insert(menu, 1, { bDevide = true })
 		table.insert(menu, 1, { szOption = _L['select equip boss'], bDisable = true })
-		UI.PopupMenu(menu)
+		X.UI.PopupMenu(menu)
 	else
 		fnAction()
 	end
@@ -1343,19 +1335,19 @@ local function IsItemRequireConfirm(data)
 		or data.item.nSub == EQUIPMENT_REPRESENT.FACE_EXTEND
 	))
 	or (O.tConfirm.Outlook and data.item.nGenre == ITEM_GENRE.EQUIPMENT and ( -- 肩饰披风
-		data.item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_CLOAK_EXTEND
-		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.L_SHOULDER_EXTEND
-		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.R_SHOULDER_EXTEND
+		data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.BACK_CLOAK_EXTEND
+		or data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.L_SHOULDER_EXTEND
+		or data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.R_SHOULDER_EXTEND
 	))
 	or (O.tConfirm.Pet and ( -- 跟宠
 		data.item.nGenre == ITEM_GENRE.CUB
-		or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.PET)
+		or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.PET)
 	))
 	or (O.tConfirm.Horse and ( -- 坐骑
-		data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.HORSE
+		data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.HORSE
 	))
 	or (O.tConfirm.HorseEquip and ( -- 马具
-		data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.HORSE_EQUIP
+		data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.HORSE_EQUIP
 	))
 	then
 		return true
@@ -1590,7 +1582,7 @@ local function IsItemDataSuitable(data)
 					end
 				end
 			elseif data.szType == 'EQUIPMENT_SIGN' then
-				szSuit = wstring.find(data.item.szName, g_tStrings.tForceTitle[me.dwForceID]) and 'SUITABLE' or 'NOT_SUITABLE'
+				szSuit = X.StringFindW(data.item.szName, g_tStrings.tForceTitle[me.dwForceID]) and 'SUITABLE' or 'NOT_SUITABLE'
 			end
 		end
 		if szSuit == 'SUITABLE' and X.IsBetterEquipment(data.item) then
@@ -1817,31 +1809,31 @@ local function GetItemDataType(data)
 		return 'COIN_SHOP'
 	end
 	if data.item.nGenre == ITEM_GENRE.EQUIPMENT and (
-		data.item.nSub == CONSTANT.EQUIPMENT_SUB.L_SHOULDER_EXTEND
-		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.R_SHOULDER_EXTEND
-		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_CLOAK_EXTEND
+		data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.L_SHOULDER_EXTEND
+		or data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.R_SHOULDER_EXTEND
+		or data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.BACK_CLOAK_EXTEND
 	) then
 		return 'OUTLOOK'
 	end
 	-- 挂件
 	if data.item.nGenre == ITEM_GENRE.EQUIPMENT and (
-		data.item.nSub == CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND
-		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.BACK_EXTEND
-		or data.item.nSub == CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
+		data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND
+		or data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.BACK_EXTEND
+		or data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
 	) then
 		return 'PENDANT'
 	end
 	-- 宠物
 	if (data.item.nGenre == ITEM_GENRE.CUB)
-	or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.PET) then
+	or (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.PET) then
 		return 'PET'
 	end
 	-- 坐骑 马
-	if (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.HORSE) then
+	if (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.HORSE) then
 		return 'HORSE'
 	end
 	-- 马具
-	if (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == CONSTANT.EQUIPMENT_SUB.HORSE_EQUIP) then
+	if (data.item.nGenre == ITEM_GENRE.EQUIPMENT and data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.HORSE_EQUIP) then
 		return 'HORSE_EQUIP'
 	end
 	-- 书籍
@@ -1850,7 +1842,7 @@ local function GetItemDataType(data)
 	end
 	-- 武器
 	if data.item.nGenre == ITEM_GENRE.EQUIPMENT
-	and (data.item.nSub == CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON or data.item.nSub == CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON) then
+	and (data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON or data.item.nSub == X.CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON) then
 		return 'WEAPON'
 	end
 	-- 装备兑换牌
@@ -2031,7 +2023,7 @@ X.RegisterEvent('SYNC_LOOT_LIST', function()
 		local bDungeonTreasure = false
 		local aItemData = D.GetDoodadLootInfo(arg0)
 		for _, v in ipairs(aItemData) do
-			if wstring.find(v.szName, _L['Dungeon treasure']) == 1 -- 秘境宝箱
+			if X.StringFindW(v.szName, _L['Dungeon treasure']) == 1 -- 秘境宝箱
 			or v.szName == X.GetObjectName('ITEM_INFO', 5, 33011) then -- 砥砺同心礼盒
 				bDungeonTreasure = true
 				break
@@ -2085,7 +2077,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		end,
 		tip = {
 			render = _L['Enable in checked map type'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		autoEnable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
@@ -2099,7 +2091,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		end,
 		tip = {
 			render = _L['Enable in checked map type'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		autoEnable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
@@ -2113,7 +2105,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		end,
 		tip = {
 			render = _L['Enable in checked map type'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		autoEnable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
@@ -2127,7 +2119,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		end,
 		tip = {
 			render = _L['Enable in checked map type'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		autoEnable = function() return O.bOn end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
@@ -2171,7 +2163,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 					end,
 				})
 			end
-			table.insert(t, CONSTANT.MENU_DIVIDER)
+			table.insert(t, X.CONSTANT.MENU_DIVIDER)
 			table.insert(t, { szOption = _L['Quality'], bDisable = true })
 			for i, s in ipairs({
 				[1] = g_tStrings.STR_WHITE,

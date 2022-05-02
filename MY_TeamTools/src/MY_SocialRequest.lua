@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 好友助手
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -80,7 +72,7 @@ function D.OnMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local szTip = GetFormatText(this.info.szDesc)
-		OutputTip(szTip, 450, {x, y, w, h}, UI.TIP_POSITION.TOP_BOTTOM)
+		OutputTip(szTip, 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 	end
 end
 
@@ -92,13 +84,13 @@ end
 
 function D.AcceptRequest(info)
 	REQUEST_LIST[info.szName] = nil
-	UI.RemoveRequest('MY_SocialRequest', info.szName)
+	X.UI.RemoveRequest('MY_SocialRequest', info.szName)
 	info.fnAccept()
 end
 
 function D.RefuseRequest(info)
 	REQUEST_LIST[info.szName] = nil
-	UI.RemoveRequest('MY_SocialRequest', info.szName)
+	X.UI.RemoveRequest('MY_SocialRequest', info.szName)
 	info.fnRefuse()
 end
 
@@ -149,7 +141,7 @@ function D.OnMessageBoxOpen()
 						info.dwID = data.dwID
 					end
 				end
-				UI.ReplaceRequest('MY_SocialRequest', info.szName, info)
+				X.UI.ReplaceRequest('MY_SocialRequest', info.szName, info)
 				-- 关闭对话框
 				frame.fnAutoClose = nil
 				frame.fnCancelAction = nil
@@ -169,7 +161,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		menu = D.GetMenu,
 		tip = {
 			render = _L['Optimize social friend request'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	}):Width() + 5
 
@@ -223,7 +215,7 @@ function R.Drawer(container, info)
 	wnd.OnMouseLeave = D.OnMouseLeave
 	wnd:Lookup('', 'Text_Name'):SetText(info.szName)
 
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	ui:Append('WndButton', {
 		name = 'Btn_Accept',
 		x = 326, y = 9, w = 60, h = 34,
@@ -254,4 +246,4 @@ function R.OnClear()
 	REQUEST_LIST = {}
 end
 
-UI.RegisterRequest('MY_SocialRequest', R)
+X.UI.RegisterRequest('MY_SocialRequest', R)

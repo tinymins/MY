@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 目标监控数值计算相关
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local PLUGIN_NAME = 'MY_TargetMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -43,7 +35,7 @@ local SKILL_EXTRA = {} -- 缓存自己放过的技能用于扫描
 local SKILL_CACHE = {} -- 下标为目标ID的目标技能缓存数组 反正ID不可能是doodad不会冲突
 local SKILL_INFO = {} -- 技能反向索引
 local VIEW_LIST = {}
-local BOX_SPARKING_FRAME = ENVIRONMENT.GAME_FPS * 2 / 3
+local BOX_SPARKING_FRAME = X.ENVIRONMENT.GAME_FPS * 2 / 3
 
 do
 local function FilterMonitors(monitors, dwMapID, dwKungfuID)
@@ -341,7 +333,7 @@ local function Buff_MatchMon(tAllBuff, mon, config)
 							or buff.dwSkillSrcID == dwClientID
 							or buff.dwSkillSrcID == dwControlID
 						) and (not D.IsShieldedBuff(dwID, buff.nLevel)) then
-							local tMonLevel = tMonId.levels[buff.nLevel] or CONSTANT.EMPTY_TABLE
+							local tMonLevel = tMonId.levels[buff.nLevel] or X.CONSTANT.EMPTY_TABLE
 							if tMonLevel.enable or tMonId.ignoreLevel then
 								info = buff
 								if not mon.ignoreId then
@@ -461,7 +453,7 @@ local function Skill_MatchMon(tSkill, mon, config)
 			local skill = tSkill[dwID]
 			if skill then
 				-- if Base_MatchMon(mon) then
-					local tMonLevel = tMonId.levels[skill.nLevel] or CONSTANT.EMPTY_TABLE
+					local tMonLevel = tMonId.levels[skill.nLevel] or X.CONSTANT.EMPTY_TABLE
 					if tMonLevel.enable or tMonId.ignoreLevel then
 						if skill.bCool then
 							info = skill
@@ -589,7 +581,7 @@ function UpdateView()
 			local nItemIndex, nItemCount = 1, #aItem
 			local tMonExist, tMonLast = {}, MON_EXIST_CACHE[config.uuid]
 			if config.type == 'BUFF' then
-				local tBuff = KObject and BUFF_CACHE[KObject.dwID] or CONSTANT.EMPTY_TABLE
+				local tBuff = KObject and BUFF_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
 				for _, mon in ipairs(config.monitors) do
 					if Buff_ShowMon(mon, dwTarKungfuID) then
 						-- 如果开启了捕获 从BUFF索引中捕获新的BUFF
@@ -610,7 +602,7 @@ function UpdateView()
 					end
 				end
 			elseif config.type == 'SKILL' then
-				local tSkill = KObject and SKILL_CACHE[KObject.dwID] or CONSTANT.EMPTY_TABLE
+				local tSkill = KObject and SKILL_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
 				for _, mon in ipairs(config.monitors) do
 					if Skill_ShowMon(mon, dwTarKungfuID) then
 						-- 如果开启了捕获 从BUFF索引中捕获新的BUFF

@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队工具 - 团队概况
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools_Summary'
@@ -247,13 +239,13 @@ function D.UpdateList(page)
 			if not h['hHandle_Food'] then
 				h['hHandle_Food'] = {
 					self = h:Lookup('Handle_Food'),
-					Pool = UI.HandlePool(h:Lookup('Handle_Food'), '<box>w=29 h=29 eventid=784</box>')
+					Pool = X.UI.HandlePool(h:Lookup('Handle_Food'), '<box>w=29 h=29 eventid=784</box>')
 				}
 			end
 			if not h['hHandle_Equip'] then
 				h['hHandle_Equip'] = {
 					self = h:Lookup('Handle_Equip'),
-					Pool = UI.HandlePool(h:Lookup('Handle_Equip'), '<box>w=29 h=29 eventid=784</box>')
+					Pool = X.UI.HandlePool(h:Lookup('Handle_Equip'), '<box>w=29 h=29 eventid=784</box>')
 				}
 			end
 			local hBuff = h:Lookup('Box_Buff')
@@ -432,7 +424,7 @@ function D.UpdateList(page)
 						local w, h = this:GetSize()
 						if not GetItem(vv.dwID) then
 							D.GetTotalEquipScore(page, v.dwID)
-							OutputItemTip(UI_OBJECT_ITEM_INFO, ENVIRONMENT.CURRENT_ITEM_VERSION, vv.dwTabType, vv.dwIndex, {x, y, w, h})
+							OutputItemTip(UI_OBJECT_ITEM_INFO, X.ENVIRONMENT.CURRENT_ITEM_VERSION, vv.dwTabType, vv.dwIndex, {x, y, w, h})
 						else
 							OutputItemTip(UI_OBJECT_ITEM_ONLY_ID, vv.dwID, nil, nil, { x, y, w, h })
 						end
@@ -471,7 +463,7 @@ function D.UpdateList(page)
 			if not h.hHandle_BossKills then
 				h.hHandle_BossKills = {
 					self = h:Lookup('Handle_BossKills'),
-					Pool = UI.HandlePool(h:Lookup('Handle_BossKills'), '<handle>postype=8 eventid=784 w=16 h=14 <image>name="Image_BossKilled" w=14 h=14 path="ui/Image/UITga/FBcdPanel01.UITex" frame=20</image><image>name="Image_BossAlive" w=14 h=14 path="ui/Image/UITga/FBcdPanel01.UITex" frame=21</image></handle>')
+					Pool = X.UI.HandlePool(h:Lookup('Handle_BossKills'), '<handle>postype=8 eventid=784 w=16 h=14 <image>name="Image_BossKilled" w=14 h=14 path="ui/Image/UITga/FBcdPanel01.UITex" frame=20</image><image>name="Image_BossAlive" w=14 h=14 path="ui/Image/UITga/FBcdPanel01.UITex" frame=21</image></handle>')
 				}
 			end
 			local hCopyID = h:Lookup('Text_CopyID')
@@ -612,10 +604,10 @@ function D.GetEquipCache(page, KPlayer)
 	for _, equip in ipairs(RT_EQUIP_TOTAL) do
 		-- if #aInfo.tEquip >= 3 then break end
 		-- 藏剑只看重剑
-		if KPlayer.dwForceID == 8 and CONSTANT.EQUIPMENT_INVENTORY[equip] == CONSTANT.EQUIPMENT_INVENTORY.MELEE_WEAPON then
+		if KPlayer.dwForceID == 8 and X.CONSTANT.EQUIPMENT_INVENTORY[equip] == X.CONSTANT.EQUIPMENT_INVENTORY.MELEE_WEAPON then
 			equip = 'BIG_SWORD'
 		end
-		local dwBox, dwX = INVENTORY_INDEX.EQUIP, CONSTANT.EQUIPMENT_INVENTORY[equip]
+		local dwBox, dwX = INVENTORY_INDEX.EQUIP, X.CONSTANT.EQUIPMENT_INVENTORY[equip]
 		local item = KPlayer.GetItem(dwBox, dwX)
 		if item then
 			if RT_EQUIP_SPECIAL[equip] then
@@ -998,7 +990,7 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'UPDATE_DUNGEON_ROLE_PROGRESS' then
 		D.UpdateList(this)
 	elseif szEvent == 'PEEK_OTHER_PLAYER' then
-		if arg0 == CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+		if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 			if this.tViewInvite[arg1] then
 				D.GetEquipCache(this, GetPlayer(arg1)) -- 抓取所有数据
 			end

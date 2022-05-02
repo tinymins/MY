@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 自动按上次配方合石头
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -200,7 +192,7 @@ end
 function D.ProduceDiamond()
 	if not D.fnProduceAction then
 		D.StopProduce()
-		X.Systopmsg(_L['Produce failed, action not exist.'], CONSTANT.MSG_THEME.ERROR)
+		X.Systopmsg(_L['Produce failed, action not exist.'], X.CONSTANT.MSG_THEME.ERROR)
 		return
 	end
 	D.bAwaitDuang = true
@@ -220,11 +212,11 @@ end
 function D.UpdateDashboard()
 	local edit = D.LookupCastingPanel('PageSet_All/Page_Refine/WndWindow_MYDiamond/WndEditBox_MYDiamond')
 	if edit then
-		UI(edit):Text(D.nAutoCount, WNDEVENT_FIRETYPE.PREVENT)
+		X.UI(edit):Text(D.nAutoCount, WNDEVENT_FIRETYPE.PREVENT)
 	end
 	local txt = D.LookupCastingPanel('PageSet_All/Page_Refine/WndWindow_MYDiamond', 'Text_Result')
 	if txt then
-		UI(txt):Text(
+		X.UI(txt):Text(
 			D.nCompleteCount > 0
 				and _L(
 					'Total: %d, success: %d (%.2f%%), failure: %d (%.2f%%)',
@@ -253,7 +245,7 @@ function D.DoAutoDiamond()
 	X.DelayCall(50, function()
 		if not box:IsValid() then
 			D.StopProduce()
-			X.Systopmsg(_L['Casting panel closed, produce stopped.'], CONSTANT.MSG_THEME.ERROR)
+			X.Systopmsg(_L['Casting panel closed, produce stopped.'], X.CONSTANT.MSG_THEME.ERROR)
 			return
 		end
 		local dwBox, dwX = select(2, box:GetObjectData())
@@ -265,7 +257,7 @@ function D.DoAutoDiamond()
 	X.DelayCall(200, function()
 		if not box:IsValid() then
 			D.StopProduce()
-			X.Systopmsg(_L['Casting panel closed, produce stopped.'], CONSTANT.MSG_THEME.ERROR)
+			X.Systopmsg(_L['Casting panel closed, produce stopped.'], X.CONSTANT.MSG_THEME.ERROR)
 			return
 		end
 		if D.nAutoCount <= 0 then
@@ -277,7 +269,7 @@ function D.DoAutoDiamond()
 		for _, v in ipairs(D.dFormula) do
 			if not D.RestoreBagDiamond(v) then
 				D.StopProduce()
-				X.Systopmsg(_L['Restore bag failed, material may not enough.'], CONSTANT.MSG_THEME.ERROR)
+				X.Systopmsg(_L['Restore bag failed, material may not enough.'], X.CONSTANT.MSG_THEME.ERROR)
 				return
 			end
 		end
@@ -322,9 +314,9 @@ function D.CheckInjection(bRemove)
 	if not page then
 		return
 	end
-	UI(page):Fetch('WndWindow_MYDiamond'):Remove()
+	X.UI(page):Fetch('WndWindow_MYDiamond'):Remove()
 	if not bRemove and not X.IsRestricted('MY_AutoDiamond') then
-		local ui = UI(page):Append('WndWindow', { name = 'WndWindow_MYDiamond', y = 388, h = 24 })
+		local ui = X.UI(page):Append('WndWindow', { name = 'WndWindow_MYDiamond', y = 388, h = 24 })
 		local nX, nY = 0, 2
 		nX = nX + ui:Append('Text', {
 			name = 'Text_MYDiamond',
@@ -336,13 +328,13 @@ function D.CheckInjection(bRemove)
 			name = 'WndEditBox_MYDiamond',
 			text = D.nAutoCount,
 			x = nX, y = nY - 2, w = 50, h = 20, alpha = 192,
-			editType = UI.EDIT_TYPE.NUMBER,
+			editType = X.UI.EDIT_TYPE.NUMBER,
 			onChange = function(szText)
 				D.nAutoCount = tonumber(szText) or 0
 			end,
 			tip = {
 				render = _L['Will continue produce until counter reachs or casting failed.'],
-				position = UI.TIP_POSITION.TOP_BOTTOM,
+				position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			},
 		}):Width() + 5
 		nX = nX + ui:Append('Text', {
@@ -425,7 +417,7 @@ X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond', function()
 			D.StopProduce()
 		elseif arg0 ~= DIAMOND_RESULT_CODE.SUCCESS then
 			D.StopProduce()
-			X.Systopmsg(_L['Casting failed, auto cast stopped.'], CONSTANT.MSG_THEME.ERROR)
+			X.Systopmsg(_L['Casting failed, auto cast stopped.'], X.CONSTANT.MSG_THEME.ERROR)
 		else
 			D.DoAutoDiamond()
 		end

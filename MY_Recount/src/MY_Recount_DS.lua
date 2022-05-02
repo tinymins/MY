@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 战斗统计 数据源
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Recount'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Recount'
@@ -450,8 +442,8 @@ local SZ_CFG_FILE = {'userdata/fight_stat/config.jx3dat', X.PATH_TYPE.ROLE}
 local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
 local BUFF_UPDATE_CACHE = {} -- 最近的BUFF效果缓存 （进战时候将最近的数据压进来）
 local ABSORB_CACHE = {} -- 目标盾来源与状态缓存表
-local LOG_REPLAY_FRAME = ENVIRONMENT.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
-local SKILL_TYPE = CONSTANT.SKILL_TYPE
+local LOG_REPLAY_FRAME = X.ENVIRONMENT.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
+local SKILL_TYPE = X.CONSTANT.SKILL_TYPE
 
 -- 输出两个数里面小一点的那个 其中-1表示极大值
 local function Min(a, b)
@@ -514,7 +506,7 @@ function D.GetHistoryFiles()
 	local aFileName, tFileName = {}, {}
 	local szRoot = X.FormatPath(DS_ROOT)
 	for k, _ in pairs(HISTORY_CACHE) do
-		if wstring.find(k, szRoot) == 1 then
+		if X.StringFindW(k, szRoot) == 1 then
 			k = k:sub(#szRoot + 1)
 			if not tFileName[k] then
 				table.insert(aFileName, k)
@@ -522,7 +514,7 @@ function D.GetHistoryFiles()
 			end
 		end
 	end
-	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		for _, v in ipairs(CPath.GetFileList(szRoot)) do
 			if not tFileName[v] then
 				table.insert(aFileName, v)
@@ -596,7 +588,7 @@ end
 
 -- 保存缓存的历史数据
 function D.SaveHistory()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		return
 	end
 	for szFilePath, data in pairs(UNSAVED_CACHE) do
@@ -669,7 +661,7 @@ function D.GetPlayer(dwID)
 		}
 	else
 		player = GetPlayer(dwID)
-		info = not ENVIRONMENT.RUNTIME_OPTIMIZE and GetClientTeam().GetMemberInfo(dwID)
+		info = not X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetClientTeam().GetMemberInfo(dwID)
 	end
 	if info then
 		if player then
@@ -984,7 +976,7 @@ function D.GetEffectInfoAusID(data, szEffectID)
 	if not data or not szEffectID then
 		return
 	end
-	return unpack(data[DK.EFFECT_LIST][szEffectID] or CONSTANT.EMPTY_TABLE)
+	return unpack(data[DK.EFFECT_LIST][szEffectID] or X.CONSTANT.EMPTY_TABLE)
 end
 
 -- 通过ID用途计算效果名
@@ -1336,7 +1328,7 @@ end
 
 -- 保存玩家信息
 function D.SavePlayerInfo(data, dwID, bRefresh)
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		return
 	end
 	if not D.bRecEverything then

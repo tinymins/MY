@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队告示
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -81,7 +73,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 	end
 	local ui = TI.GetFrame()
 	if ui then
-		ui = UI(ui)
+		ui = X.UI(ui)
 		ui:Children('#YY'):Text(szInitYY, WNDEVENT_FIRETYPE.PREVENT)
 		ui:Children('#Message'):Text(szInitNote, WNDEVENT_FIRETYPE.PREVENT)
 	else
@@ -103,7 +95,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			local uiMessage = ui:Fetch('Message')
 			uiMessage:Size(W - 20, uiBtns:Top() - uiMessage:Top() - 10)
 		end
-		ui = UI.CreateFrame('MY_TeamNotice', {
+		ui = X.UI.CreateFrame('MY_TeamNotice', {
 			w = O.nWidth, h = O.nHeight,
 			text = _L['Team Message'],
 			anchor = O.anchor,
@@ -117,21 +109,21 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			ondragresize = FormatAllContentPos,
 		})
 		local x, y = 10, 5
-		x = x + ui:Append('Text', { x = x, y = y - 3, text = ENVIRONMENT.GAME_LANG == 'zhcn' and _L['YY:'] or _L['DC:'], font = 48 }):AutoWidth():Width() + 5
+		x = x + ui:Append('Text', { x = x, y = y - 3, text = X.ENVIRONMENT.GAME_LANG == 'zhcn' and _L['YY:'] or _L['DC:'], font = 48 }):AutoWidth():Width() + 5
 		x = x + ui:Append('WndAutocomplete', {
 			name = 'YY',
 			w = 160, h = 26, x = x, y = y,
 			text = szInitYY, font = 48, color = { 128, 255, 0 },
-			editType = UI.EDIT_TYPE.NUMBER,
+			editType = X.UI.EDIT_TYPE.NUMBER,
 			onClick = function()
 				if IsPopupMenuOpened() then
-					UI(this):Autocomplete('close')
+					X.UI(this):Autocomplete('close')
 				elseif X.IsLeader() then
-					UI(this):Autocomplete('search', '')
+					X.UI(this):Autocomplete('search', '')
 				end
 			end,
 			onBlur = function()
-				local szText = UI(this):Text()
+				local szText = X.UI(this):Text()
 				if TI.szYY == szText then
 					return
 				end
@@ -158,7 +150,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 								source = {}
 							end
 						end
-						UI(this):Autocomplete('option', 'source', source)
+						X.UI(this):Autocomplete('option', 'source', source)
 					end,
 				},
 				{
@@ -172,8 +164,8 @@ function TI.CreateFrame(szInitYY, szInitNote)
 		y = y + ui:Append('WndButton', {
 			name = 'Btn_YY',
 			x = x, y = y, text = X.IsLeader()
-				and (ENVIRONMENT.GAME_LANG == 'zhcn' and _L['Paste YY'] or _L['Paste DC'])
-				or (ENVIRONMENT.GAME_LANG == 'zhcn' and _L['Copy YY'] or _L['Copy DC']),
+				and (X.ENVIRONMENT.GAME_LANG == 'zhcn' and _L['Paste YY'] or _L['Paste DC'])
+				or (X.ENVIRONMENT.GAME_LANG == 'zhcn' and _L['Copy YY'] or _L['Copy DC']),
 			buttonStyle = 'FLAT',
 			onClick = function()
 				local yy = ui:Children('#YY'):Text()
@@ -209,7 +201,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			multiline = true, limit = 512,
 			text = szInitNote,
 			onBlur = function()
-				local szText = X.ReplaceSensitiveWord(UI(this):Text())
+				local szText = X.ReplaceSensitiveWord(X.UI(this):Text())
 				if TI.szNote == szText then
 					return
 				end
@@ -225,7 +217,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			end,
 		})
 		x, y = 11, 130
-		local bTeamMon = MY_TeamMon_RR and ENVIRONMENT.GAME_BRANCH ~= 'classic'
+		local bTeamMon = MY_TeamMon_RR and X.ENVIRONMENT.GAME_BRANCH ~= 'classic'
 		local nBtnW = bTeamMon and 96 or 144
 		x = x + ui:Append('WndButton', {
 			name = 'WndBtn_RaidTools',

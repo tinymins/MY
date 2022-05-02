@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队面板小队界面
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Cataclysm'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
@@ -157,10 +149,10 @@ local HIDE_FORCE = {
 }
 local function IsPlayerManaHide(dwForceID, dwMountType)
 	if dwMountType then
-		if dwMountType == CONSTANT.KUNGFU_TYPE.CANG_JIAN or           --藏剑
-			dwMountType == CONSTANT.KUNGFU_TYPE.TANG_MEN or           --唐门
-			dwMountType == CONSTANT.KUNGFU_TYPE.MING_JIAO or          --明教
-			dwMountType == CONSTANT.KUNGFU_TYPE.CANG_YUN then         --苍云
+		if dwMountType == X.CONSTANT.KUNGFU_TYPE.CANG_JIAN or           --藏剑
+			dwMountType == X.CONSTANT.KUNGFU_TYPE.TANG_MEN or           --唐门
+			dwMountType == X.CONSTANT.KUNGFU_TYPE.MING_JIAO or          --明教
+			dwMountType == X.CONSTANT.KUNGFU_TYPE.CANG_YUN then         --苍云
 			return true
 		else
 			return false
@@ -257,7 +249,7 @@ local function InsertChangeGroupMenu(tMenu, dwMemberID)
 end
 
 -- 有各个版本之间的文本差异，所以做到翻译中
-local CTM_KUNGFU_TEXT = CONSTANT.KUNGFU_NAME_ABBREVIATION
+local CTM_KUNGFU_TEXT = X.CONSTANT.KUNGFU_NAME_ABBREVIATION
 
 -- CODE --
 local CTM = {}
@@ -549,7 +541,7 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 			end
 		end
 		if #extra > 0 then
-			table.insert(menu, CONSTANT.MENU_DIVIDER)
+			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			for _, v in ipairs(extra) do
 				table.insert(menu, v)
 			end
@@ -779,7 +771,7 @@ local function HideTTarget()
 	end
 end
 function CTM:RefreshTTarget()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	if CFG.bShowTargetTargetAni then
@@ -820,7 +812,7 @@ local function HideBossTarget(dwTarID)
 	end
 end
 function CTM:RefreshBossTarget()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	local tKeep = {}
@@ -865,7 +857,7 @@ function CTM:RefreshThreat(dwNpcID, tList)
 end
 
 function CTM:RefreshAttention()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	if CFG.bShowAttention then
@@ -902,7 +894,7 @@ function CTM:RefreshAttention()
 end
 
 function CTM:RefreshCaution()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	if CFG.bShowCaution or CFG.bShowBossFocus then
@@ -997,12 +989,12 @@ function CTM:RefreshSFX()
 end
 
 function CTM:RefreshGVoice()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		return
 	end
 	local team = GetClientTeam()
 	local sayingInfo = X.GVoiceBase_GetSaying()
-	local bInRoom = X.GVoiceBase_GetMicState() ~= CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM
+	local bInRoom = X.GVoiceBase_GetMicState() ~= X.CONSTANT.MIC_STATE.CLOSE_NOT_IN_ROOM
 	for dwID, h in pairs(CTM_CACHE) do
 		if h:IsValid() then
 			local fScale = math.min(CFG.fScaleY, CFG.fScaleX)
@@ -1057,8 +1049,8 @@ function CTM:KungFuSwitch(dwID)
 				local player = GetPlayer(dwID)
 				if player and img and img:IsValid() then
 					local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(player)
-					if (nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-					or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE) and fCastPercent then
+					if (nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+					or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE) and fCastPercent then
 						local alpha = 255 * (math.abs((fCastPercent * 300) % 32 - 7) + 4) / 12
 						if alpha <= 255 then
 							img:SetAlpha(alpha)
@@ -1735,7 +1727,7 @@ function D.UpdateCharaterBuff(p, handle, tKeep)
 end
 
 function CTM:RefreshBuff()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 8 ~= 0 then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 8 ~= 0 then
 		return
 	end
 	local team = GetClientTeam()
@@ -1764,7 +1756,7 @@ function CTM:RecBossFocusBuff(dwMemberID, data)
 end
 
 function CTM:RefreshBossFocus()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	local team, me = GetClientTeam(), GetClientPlayer()
@@ -1787,7 +1779,7 @@ function CTM:RefreshBossFocus()
 end
 
 function CTM:RefreshDistance()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 8 ~= 0 then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 8 ~= 0 then
 		return
 	end
 	for k, v in pairs(CTM_CACHE) do
@@ -2096,7 +2088,7 @@ end
 
 -- 重绘溅射助手
 function CTM:RefreshSputtering()
-	if ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
 	local team = GetClientTeam()

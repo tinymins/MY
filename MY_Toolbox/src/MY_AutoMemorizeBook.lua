@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 自动阅读书籍
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_AutoMemorizeBook'
@@ -42,7 +34,7 @@ function D.Hook()
 	if not frame or frame:Lookup('MY_AutoMemorizeBook') then
 		return
 	end
-	UI(frame):Append('WndCheckBox', {
+	X.UI(frame):Append('WndCheckBox', {
 		name = 'MY_AutoMemorizeBook',
 		x = 50, y = 482,
 		text = _L['Auto memorize book'],
@@ -52,7 +44,7 @@ function D.Hook()
 end
 
 function D.Unhook()
-	UI('Normal/CraftReaderPanel/MY_AutoMemorizeBook'):Remove()
+	X.UI('Normal/CraftReaderPanel/MY_AutoMemorizeBook'):Remove()
 end
 
 function D.CheckEnable()

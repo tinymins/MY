@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 剑侠情缘
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Love'
@@ -260,7 +252,7 @@ local BACKUP_DATA_SCHEMA = X.Schema.Record({
 
 -- 功能屏蔽
 function D.IsShielded()
-	return ENVIRONMENT.GAME_BRANCH == 'classic'
+	return X.ENVIRONMENT.GAME_BRANCH == 'classic'
 end
 
 -- 获取背包指定ID物品列表
@@ -316,8 +308,8 @@ function D.UseDoubleLoveItem(aInfo, aUIID, callback)
 				return 0
 			end
 			local nType = X.GetOTActionState(me)
-			if nType == CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_ITEM_SKILL
-			or nType == CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then -- otActionItemSkill
+			if nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_ITEM_SKILL
+			or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then -- otActionItemSkill
 				nFinishTime = GetTime() + 500
 			elseif GetTime() > nFinishTime then
 				callback(D.GetBagItemNum(dwBox, dwX) ~= nNum)
@@ -334,7 +326,7 @@ function D.CreateFireworkSelect(callback)
 	local nItemWidth = 100 -- 按钮宽度
 	local nItemHeight = 30 -- 按钮高度
 	local nItemPadding = 10 -- 按钮间距
-	local ui = UI.CreateFrame('MY_Love_SetLover', {
+	local ui = X.UI.CreateFrame('MY_Love_SetLover', {
 		w = nItemWidth * nCol + nMargin * 2 + nItemPadding * (nCol - 1),
 		h = 50 + math.ceil(#D.aLoverItem / nCol) * nLineHeight + 30,
 		text = _L['Select a firework'],
@@ -348,7 +340,7 @@ function D.CreateFireworkSelect(callback)
 			onClick = function() callback(p) end,
 			tip = {
 				render = p.szTitle,
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 		})
 		if i % nCol == 0 then
@@ -497,21 +489,21 @@ end
 
 -- 获取情缘字符串
 function D.FormatLoverString(szPatt, lover)
-	if wstring.find(szPatt, '{$type}') then
+	if X.StringFindW(szPatt, '{$type}') then
 		if lover.nLoverType == 1 then
-			szPatt = wstring.gsub(szPatt, '{$type}', _L['Mutual love'])
+			szPatt = X.StringReplaceW(szPatt, '{$type}', _L['Mutual love'])
 		else
-			szPatt = wstring.gsub(szPatt, '{$type}', _L['Blind love'])
+			szPatt = X.StringReplaceW(szPatt, '{$type}', _L['Blind love'])
 		end
 	end
-	if wstring.find(szPatt, '{$time}') then
-		szPatt = wstring.gsub(szPatt, '{$time}', D.FormatTimeCounter(GetCurrentTime() - lover.nLoverTime))
+	if X.StringFindW(szPatt, '{$time}') then
+		szPatt = X.StringReplaceW(szPatt, '{$time}', D.FormatTimeCounter(GetCurrentTime() - lover.nLoverTime))
 	end
-	if wstring.find(szPatt, '{$name}') then
-		szPatt = wstring.gsub(szPatt, '{$name}', lover.szName)
+	if X.StringFindW(szPatt, '{$name}') then
+		szPatt = X.StringReplaceW(szPatt, '{$name}', lover.szName)
 	end
-	if wstring.find(szPatt, '{$map}') then
-		szPatt = wstring.gsub(szPatt, '{$map}', Table_GetMapName(lover.dwMapID))
+	if X.StringFindW(szPatt, '{$map}') then
+		szPatt = X.StringReplaceW(szPatt, '{$map}', Table_GetMapName(lover.dwMapID))
 	end
 	return szPatt
 end
@@ -773,7 +765,7 @@ function D.RestoreLover(szFilePath)
 	end
 	if data.szUUID == X.GetPlayerGUID() then
 		GetUserInput(_L['Please input your lover\'s current name:'], function(szLoverName)
-			szLoverName = wstring.gsub(wstring.gsub(X.TrimString(szLoverName), '[', ''), ']', '')
+			szLoverName = X.StringReplaceW(X.StringReplaceW(X.TrimString(szLoverName), '[', ''), ']', '')
 			X.Confirm(
 				_L('Send restore lover request to [%s]?', szLoverName),
 				function()

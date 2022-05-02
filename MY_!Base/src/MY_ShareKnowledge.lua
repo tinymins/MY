@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 公共数据分享模块
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_!Base'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_!Base'
@@ -84,8 +76,8 @@ X.RegisterEvent('MY_RSS_UPDATE', function()
 			X.EnsureAjax({
 				url = 'https://push.j3cx.com/api/share-event',
 				data = {
-					l = ENVIRONMENT.GAME_LANG,
-					L = ENVIRONMENT.GAME_EDITION,
+					l = X.ENVIRONMENT.GAME_LANG,
+					L = X.ENVIRONMENT.GAME_EDITION,
 					region = X.GetRealServer(1),
 					server = X.GetRealServer(2),
 					event = p.name,
@@ -137,7 +129,7 @@ function TRANSLATOR.BBCODE(info)
 			table.insert(t, X.RGB2Hex(info.r, info.g, info.b, info.a))
 			table.insert(t, '"]')
 		end
-		table.insert(t, wstring.gsub(wstring.gsub(info.text, '[', '\\['), ']', '\\]'))
+		table.insert(t, X.StringReplaceW(X.StringReplaceW(info.text, '[', '\\['), ']', '\\]'))
 		if bStyle then
 			table.insert(t, '[/style]')
 		end
@@ -278,8 +270,8 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 		X.EnsureAjax({
 			url = 'https://push.j3cx.com/api/share-ui',
 			data = {
-				l = ENVIRONMENT.GAME_LANG,
-				L = ENVIRONMENT.GAME_EDITION,
+				l = X.ENVIRONMENT.GAME_LANG,
+				L = X.ENVIRONMENT.GAME_EDITION,
 				region = X.GetRealServer(1),
 				server = X.GetRealServer(2),
 				time = GetCurrentTime(),
@@ -336,8 +328,8 @@ X.RegisterEvent('OPEN_WINDOW', 'MY_ShareKnowledge__Npc', function()
 		X.EnsureAjax({
 			url = 'https://push.j3cx.com/api/share-npc-chat',
 			data = {
-				l = ENVIRONMENT.GAME_LANG,
-				L = ENVIRONMENT.GAME_EDITION,
+				l = X.ENVIRONMENT.GAME_LANG,
+				L = X.ENVIRONMENT.GAME_EDITION,
 				r = X.GetRealServer(1),
 				s = X.GetRealServer(2),
 				t = GetCurrentTime(),
@@ -413,8 +405,8 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_ShareKnowledge__Sysmsg', function(szChannel,
 			X.EnsureAjax({
 				url = 'https://push.j3cx.com/api/share-sysmsg',
 				data = {
-					l = ENVIRONMENT.GAME_LANG,
-					L = ENVIRONMENT.GAME_EDITION,
+					l = X.ENVIRONMENT.GAME_LANG,
+					L = X.ENVIRONMENT.GAME_EDITION,
 					region = X.GetRealServer(1),
 					server = X.GetRealServer(2),
 					content = szMsg,

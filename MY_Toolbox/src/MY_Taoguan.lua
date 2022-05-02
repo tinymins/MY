@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 自动砸年兽陶罐
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Taoguan'
@@ -191,8 +183,8 @@ local RUYIXIANGNANG = X.GetItemNameByUIID(65579) -- 如意香囊
 local RUYIJINNANG = X.GetItemNameByUIID(65582) -- 如意锦囊
 local JIYOUGU = X.GetItemNameByUIID(65580) -- 寄忧谷
 local ZUISHENG = X.GetItemNameByUIID(65583) -- 醉生
-local ITEM_CD = 1 * ENVIRONMENT.GAME_FPS + 8 -- 吃药CD
-local HAMMER_CD = 5 * ENVIRONMENT.GAME_FPS + 8 -- 锤子CD
+local ITEM_CD = 1 * X.ENVIRONMENT.GAME_FPS + 8 -- 吃药CD
+local HAMMER_CD = 5 * X.ENVIRONMENT.GAME_FPS + 8 -- 锤子CD
 local MAX_POINT_POW = 16 -- 分数最高倍数（2^n）
 
 local D = {
@@ -462,7 +454,7 @@ end
 local PS = {}
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local nPaddingX, nPaddingY = 20, 20
 	local nX, nY = nPaddingX, nPaddingY
 
@@ -476,7 +468,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY, w = 100, h = 25,
 		text = O.nPausePoint,
 		menu = function()
-			local ui = UI(this)
+			local ui = X.UI(this)
 			local m0 = {}
 			for i = 2, MAX_POINT_POW do
 				local v = 10 * 2 ^ i
@@ -508,20 +500,20 @@ function PS.OnPanelActive(wnd)
 	-- 各种东西使用分数和缺少停砸
 	local nMaxItemNameLen = 0
 	for _, p in ipairs(D.aUseItemPS) do
-		nMaxItemNameLen = math.max(nMaxItemNameLen, wstring.len(p.szName))
+		nMaxItemNameLen = math.max(nMaxItemNameLen, X.StringLenW(p.szName))
 	end
 	for _, p in ipairs(D.aUseItemPS) do
 		nX = nPaddingX + 10
 		nY = nY + 28
 		nX = ui:Append('Text', {
 			x = nX, y = nY,
-			text = _L('Use %s when score reaches', p.szName .. string.rep(g_tStrings.STR_ONE_CHINESE_SPACE, nMaxItemNameLen - wstring.len(p.szName))),
+			text = _L('Use %s when score reaches', p.szName .. string.rep(g_tStrings.STR_ONE_CHINESE_SPACE, nMaxItemNameLen - X.StringLenW(p.szName))),
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		nX = ui:Append('WndComboBox', {
 			x = nX, y = nY, w = 100, h = 25,
 			text = O['nUse' .. p.szID],
 			menu = function()
-				local ui = UI(this)
+				local ui = X.UI(this)
 				local m0 = {}
 				for i = 2, MAX_POINT_POW - 1 do
 					local v = 10 * 2 ^ i
@@ -579,13 +571,13 @@ function PS.OnPanelActive(wnd)
 						fnClickIcon = function()
 							O.tFilterItem[k] = nil
 							O.tFilterItem = O.tFilterItem
-							UI.ClosePopupMenu()
+							X.UI.ClosePopupMenu()
 						end,
 					})
 				end
 			end
 			if #m0 > 0 then
-				table.insert(m0, CONSTANT.MENU_DIVIDER)
+				table.insert(m0, X.CONSTANT.MENU_DIVIDER)
 			end
 			table.insert(m0, {
 				szOption = _L['Custom add'],

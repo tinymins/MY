@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 聊天监控 按关键字过滤获取聊天消息
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatMonitor'
@@ -345,7 +337,7 @@ end
 X.RegisterExit('MY_ChatMonitor', D.Exit)
 
 function D.RegisterMsgMonitor()
-	for _, szChannel in ipairs(D.aCurrentChannel or CONSTANT.EMPTY_TABLE) do
+	for _, szChannel in ipairs(D.aCurrentChannel or X.CONSTANT.EMPTY_TABLE) do
 		X.RegisterMsgMonitor(szChannel, 'MY_ChatMonitor', false)
 	end
 	local aChannel = {}
@@ -393,7 +385,7 @@ end, nil)
 local PS = {}
 
 function PS.OnPanelActive(wnd)
-	local ui = UI(wnd)
+	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 
 	ui:Append('Text', { x = 22, y = 15, w = 100, h = 25, text = _L['key words:'] })
@@ -415,7 +407,7 @@ function PS.OnPanelActive(wnd)
 						return not p.bEnable
 					end
 				end
-				table.insert(m, 1, CONSTANT.MENU_DIVIDER)
+				table.insert(m, 1, X.CONSTANT.MENU_DIVIDER)
 				table.insert(m, 1, {
 					szOption = _L['Edit'],
 					fnAction = function()
@@ -430,7 +422,7 @@ function PS.OnPanelActive(wnd)
 						end, nil, nil, nil, p.szKeyword)
 					end,
 				})
-				table.insert(m, 1, CONSTANT.MENU_DIVIDER)
+				table.insert(m, 1, X.CONSTANT.MENU_DIVIDER)
 				table.insert(m, 1, {
 					szOption = _L['Enable'],
 					bCheck = true, bChecked = p.bEnable,
@@ -440,7 +432,7 @@ function PS.OnPanelActive(wnd)
 						D.RegisterMsgMonitor()
 					end,
 				})
-				table.insert(m, CONSTANT.MENU_DIVIDER)
+				table.insert(m, X.CONSTANT.MENU_DIVIDER)
 				table.insert(m, {
 					szOption = _L['regular expression'],
 					bCheck = true, bChecked = p.bIsRegexp,
@@ -465,7 +457,7 @@ function PS.OnPanelActive(wnd)
 					end,
 					fnDisable = function() return not p.bEnable end,
 				})
-				table.insert(m, CONSTANT.MENU_DIVIDER)
+				table.insert(m, X.CONSTANT.MENU_DIVIDER)
 				table.insert(m, {
 					szOption = _L['Delete'],
 					fnAction = function()
@@ -473,14 +465,14 @@ function PS.OnPanelActive(wnd)
 						O.aKeyword = aKeyword
 						O.aKeyword = aKeyword
 						D.RegisterMsgMonitor()
-						UI.ClosePopupMenu()
+						X.UI.ClosePopupMenu()
 					end,
 				})
 				m.szOption = p.szKeyword
 				table.insert(menu, m)
 			end
 			if #menu > 0 then
-				table.insert(menu, CONSTANT.MENU_DIVIDER)
+				table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			end
 			table.insert(menu, {
 				szOption = _L['Add'],
@@ -618,10 +610,10 @@ function PS.OnPanelActive(wnd)
 		text = (O.bCapture and _L['stop']) or _L['start'],
 		onClick = function()
 			if O.bCapture then
-				UI(this):Text(_L['start'])
+				X.UI(this):Text(_L['start'])
 				O.bCapture = false
 			else
-				UI(this):Text(_L['stop'])
+				X.UI(this):Text(_L['stop'])
 				O.bCapture = true
 			end
 		end,

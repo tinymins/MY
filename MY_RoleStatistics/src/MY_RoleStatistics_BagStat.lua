@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 背包统计
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_BagStat'
@@ -30,7 +22,7 @@ CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
 local DB = X.SQLiteConnect(_L['MY_RoleStatistics_BagStat'], {'userdata/role_statistics/bag_stat.v4.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return X.Sysmsg(_L['MY_RoleStatistics_BagStat'], _L['Cannot connect to database!!!'], CONSTANT.MSG_THEME.ERROR)
+	return X.Sysmsg(_L['MY_RoleStatistics_BagStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
 local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_BagStat.ini'
 local PAGE_DISPLAY = 15
@@ -105,26 +97,26 @@ local DB_ItemInfoW = DB:Prepare('REPLACE INTO ItemInfo (tabtype, tabindex, tabsu
 
 local BOX_TYPE = X.KvpToObject({
 	-- 100 - 199: Equip
-	{CONSTANT.INVENTORY_INDEX.EQUIP, 100},
-	{CONSTANT.INVENTORY_INDEX.EQUIP_BACKUP1, 101},
-	{CONSTANT.INVENTORY_INDEX.EQUIP_BACKUP2, 102},
-	{CONSTANT.INVENTORY_INDEX.EQUIP_BACKUP3, 103},
+	{X.CONSTANT.INVENTORY_INDEX.EQUIP, 100},
+	{X.CONSTANT.INVENTORY_INDEX.EQUIP_BACKUP1, 101},
+	{X.CONSTANT.INVENTORY_INDEX.EQUIP_BACKUP2, 102},
+	{X.CONSTANT.INVENTORY_INDEX.EQUIP_BACKUP3, 103},
 	-- 200 - 299: Bag
-	{CONSTANT.INVENTORY_INDEX.PACKAGE, 200},
-	{CONSTANT.INVENTORY_INDEX.PACKAGE1, 201},
-	{CONSTANT.INVENTORY_INDEX.PACKAGE2, 202},
-	{CONSTANT.INVENTORY_INDEX.PACKAGE3, 203},
-	{CONSTANT.INVENTORY_INDEX.PACKAGE4, 204},
-	{CONSTANT.INVENTORY_INDEX.PACKAGE_MIBAO, 205},
+	{X.CONSTANT.INVENTORY_INDEX.PACKAGE, 200},
+	{X.CONSTANT.INVENTORY_INDEX.PACKAGE1, 201},
+	{X.CONSTANT.INVENTORY_INDEX.PACKAGE2, 202},
+	{X.CONSTANT.INVENTORY_INDEX.PACKAGE3, 203},
+	{X.CONSTANT.INVENTORY_INDEX.PACKAGE4, 204},
+	{X.CONSTANT.INVENTORY_INDEX.PACKAGE_MIBAO, 205},
 	-- 300 - 399: Bank
-	{CONSTANT.INVENTORY_INDEX.BANK, 300},
-	{CONSTANT.INVENTORY_INDEX.BANK_PACKAGE1, 301},
-	{CONSTANT.INVENTORY_INDEX.BANK_PACKAGE2, 302},
-	{CONSTANT.INVENTORY_INDEX.BANK_PACKAGE3, 303},
-	{CONSTANT.INVENTORY_INDEX.BANK_PACKAGE4, 304},
-	{CONSTANT.INVENTORY_INDEX.BANK_PACKAGE5, 305},
+	{X.CONSTANT.INVENTORY_INDEX.BANK, 300},
+	{X.CONSTANT.INVENTORY_INDEX.BANK_PACKAGE1, 301},
+	{X.CONSTANT.INVENTORY_INDEX.BANK_PACKAGE2, 302},
+	{X.CONSTANT.INVENTORY_INDEX.BANK_PACKAGE3, 303},
+	{X.CONSTANT.INVENTORY_INDEX.BANK_PACKAGE4, 304},
+	{X.CONSTANT.INVENTORY_INDEX.BANK_PACKAGE5, 305},
 	-- 400 - 499: Guild Bank
-	{CONSTANT.INVENTORY_GUILD_BANK, 400}
+	{X.CONSTANT.INVENTORY_GUILD_BANK, 400}
 })
 
 local O = X.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'], {
@@ -181,7 +173,7 @@ local FILTER_LIST = {
 	{ name = 'Drug'     , where = 'I.genre = 1 OR genre = 14' },
 	{ name = 'Material' , where = 'I.genre = 3' },
 	{ name = 'Book'     , where = 'I.genre = 4' },
-	{ name = 'Furniture', where = 'I.genre = 20', visible = ENVIRONMENT.GAME_BRANCH ~= 'classic' },
+	{ name = 'Furniture', where = 'I.genre = 20', visible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic' },
 	{ name = 'Grey'     , where = 'I.quality = 0' },
 	{ name = 'TimeLtd'  , where = 'I.exist_type <> -1 AND I.exist_type <> ' .. ITEM_EXIST_TYPE.PERMANENT },
 }
@@ -459,10 +451,10 @@ function D.FlushDB()
 
 	-- 背包
 	local aPackageBoxType = {}
-	for _, v in ipairs(CONSTANT.INVENTORY_EQUIP_LIST) do
+	for _, v in ipairs(X.CONSTANT.INVENTORY_EQUIP_LIST) do
 		table.insert(aPackageBoxType, v)
 	end
-	for _, v in ipairs(CONSTANT.INVENTORY_PACKAGE_LIST) do
+	for _, v in ipairs(X.CONSTANT.INVENTORY_PACKAGE_LIST) do
 		table.insert(aPackageBoxType, v)
 	end
 	for _, boxtype in ipairs(aPackageBoxType) do
@@ -499,7 +491,7 @@ function D.FlushDB()
 	DB_OwnerInfoW:Reset()
 
 	-- 仓库
-	for _, boxtype in ipairs(CONSTANT.INVENTORY_BANK_LIST) do
+	for _, boxtype in ipairs(X.CONSTANT.INVENTORY_BANK_LIST) do
 		local sboxtype = BOX_TYPE[boxtype]
 		if sboxtype then
 			local count = me.GetBoxSize(boxtype)
@@ -787,14 +779,14 @@ function D.UpdateItems(page)
 				for _, rec in ipairs(result) do
 					count = count + rec.bankcount + rec.bagcount
 				end
-				UI.UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, count, rec.tabsubindex)
+				X.UI.UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, count, rec.tabsubindex)
 				UpdateItemBoxExtend(box, KItemInfo.nGenre, KItemInfo.nQuality, bMaxStrength)
 				box.itemdata = rec
 				box.belongsdata = result
 			else
 				local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Item')
-				UI.UpdateItemInfoBoxObject(hItem:Lookup('Box_Item'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
-				UI.UpdateItemInfoBoxObject(hItem:Lookup('Handle_ItemInfo/Text_ItemName'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
+				X.UI.UpdateItemInfoBoxObject(hItem:Lookup('Box_Item'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
+				X.UI.UpdateItemInfoBoxObject(hItem:Lookup('Handle_ItemInfo/Text_ItemName'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
 				UpdateItemBoxExtend(hItem:Lookup('Box_Item'), KItemInfo.nGenre, KItemInfo.nQuality, bMaxStrength)
 				hItem:Lookup('Text_ItemStatistics'):SprintfText(_L['Bankx%d Bagx%d Totalx%d'], rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
 				if KItemInfo.nGenre == ITEM_GENRE.TASK_ITEM then
@@ -859,7 +851,7 @@ function D.OnActivePage()
 	end
 
 	local page = this
-	local ui = UI(page)
+	local ui = X.UI(page)
 	local nX, nY = 440, 20
 	for _, p in ipairs(FILTER_LIST) do
 		nX = nX + ui:Append('WndRadioBox', {
@@ -953,13 +945,13 @@ function D.OnLButtonClick()
 			D.UpdateNames(page)
 		end)
 	elseif name == 'Btn_SwitchMode' then
-		UI.PopupMenu({
+		X.UI.PopupMenu({
 			{
 				szOption = _L['Switch compact mode'],
 				bCheck = true, bChecked = MY_RoleStatistics_BagStat.bCompactMode,
 				fnAction = function ()
 					MY_RoleStatistics_BagStat.bCompactMode = not MY_RoleStatistics_BagStat.bCompactMode
-					UI.ClosePopupMenu()
+					X.UI.ClosePopupMenu()
 				end,
 			},
 			{
@@ -967,7 +959,7 @@ function D.OnLButtonClick()
 				bCheck = true, bChecked = MY_RoleStatistics_BagStat.bHideEquipped,
 				fnAction = function ()
 					MY_RoleStatistics_BagStat.bHideEquipped = not MY_RoleStatistics_BagStat.bHideEquipped
-					UI.ClosePopupMenu()
+					X.UI.ClosePopupMenu()
 				end,
 			},
 		})
@@ -1007,19 +999,19 @@ function D.OnItemMouseEnter()
 		end
 
 		if IsCtrlKeyDown() then
-			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 			table.insert(aXml, GetFormatText('ItemInfo: ' .. rec.tabtype .. ', ' .. rec.tabindex, 102))
 			if rec.tabsubindex ~= -1 then
 				table.insert(aXml, GetFormatText('ItemInfo: ' .. rec.tabsubindex, 102))
 			end
-			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 			table.insert(aXml, GetFormatText('Box: ' .. rec.boxtype .. ', ' .. rec.boxindex, 102))
-			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 			table.insert(aXml, GetFormatText('IconID: ' .. (Table_GetItemIconID(rec.uiid) or ''), 102))
-			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 			table.insert(aXml, GetFormatText('Strength: ' .. rec.strength, 102))
-			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
-			table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
+			table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 		end
 
 		local aBelongsTip = {}
@@ -1098,7 +1090,7 @@ X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_BagStat', function()
 end)
 
 X.RegisterExit('MY_RoleStatistics_BagStat', function()
-	if not ENVIRONMENT.RUNTIME_OPTIMIZE then
+	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		D.UpdateSaveDB()
 		D.FlushDB()
 	end

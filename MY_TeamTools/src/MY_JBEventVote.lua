@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : Ä§ºÐÍ¶Æ±
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -71,8 +63,8 @@ function D.FetchEventList(frame)
 	X.Ajax({
 		url = 'https://pull.j3cx.com/event/list',
 		data = {
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			jx3id = X.GetPlayerGUID(),
 		},
 		signature = X.SECRET['J3CX::EVENT_LIST'],
@@ -143,8 +135,8 @@ function D.FetchRankList(frame, szEventID)
 	X.Ajax({
 		url = 'https://pull.j3cx.com/rank/list',
 		data = {
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			jx3id = X.GetPlayerGUID(),
 			event_id = szEventID,
 		},
@@ -183,7 +175,7 @@ end
 function D.UpdateEvent(frame)
 	local pageset = frame:Lookup('PageSet_All')
 	local page = pageset:GetFirstChild()
-	local szEventSearch = wstring.gsub(D.szEventSearch, ' ', ',')
+	local szEventSearch = X.StringReplaceW(D.szEventSearch, ' ', ',')
 	while page do
 		if page:GetName() == 'Page_Event' and (D.tChangedEventID[page.eve.id] or D.tChangedEventID['*']) then
 			local bInTime = page.eve.vote_start <= GetCurrentTime() and page.eve.vote_end >= GetCurrentTime()
@@ -201,7 +193,7 @@ function D.UpdateEvent(frame)
 					wnd:Lookup('', 'Text_ItemSlogan'):SetText(X.ReplaceSensitiveWord(team.slogan))
 					wnd:Lookup('', 'Text_ItemCount'):SetText(X.ReplaceSensitiveWord(team.count))
 					wnd:Lookup('', 'Image_RowBg'):SetVisible(i % 2 == 1)
-					local ui = UI(wnd)
+					local ui = X.UI(wnd)
 					ui:Append('WndButton', {
 						name = 'Btn_Info',
 						x = 860, y = 3, w = 100, h = 25,
@@ -235,8 +227,8 @@ function D.Vote(frame, szEventID, szTeamID)
 	X.Ajax({
 		url = 'https://push.j3cx.com/rank/vote',
 		data = {
-			l = ENVIRONMENT.GAME_LANG,
-			L = ENVIRONMENT.GAME_EDITION,
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
 			jx3id = X.GetPlayerGUID(),
 			event_id = szEventID,
 			team_id = szTeamID,
@@ -304,7 +296,7 @@ function D.OnMouseEnter()
 	if name == 'WndCheck_Event' then
 		local aXml = {}
 		table.insert(aXml, GetFormatText(this.eve.name, 82))
-		table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+		table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 		table.insert(aXml, GetFormatText(_L['Finish achieves: '], 82))
 		for _, szAcheveID in ipairs(X.SplitString(this.eve.achieve_ids, ',', true)) do
 			table.insert(aXml, GetFormatText('[' .. X.Get(X.GetAchievement(szAcheveID), {'szName'}, '') .. ']', 82))
@@ -312,13 +304,13 @@ function D.OnMouseEnter()
 				table.insert(aXml, GetFormatText('(' .. szAcheveID .. ')', 102))
 			end
 		end
-		table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+		table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 		table.insert(aXml, GetFormatText(_L['Start time: '], 82))
 		table.insert(aXml, GetFormatText(X.FormatTime(this.eve.vote_start, '%yyyy/%MM/%dd %hh:%mm:%ss'), 82))
-		table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+		table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 		table.insert(aXml, GetFormatText(_L['End time: '], 82))
 		table.insert(aXml, GetFormatText(X.FormatTime(this.eve.vote_end, '%yyyy/%MM/%dd %hh:%mm:%ss'), 82))
-		table.insert(aXml, CONSTANT.XML_LINE_BREAKER)
+		table.insert(aXml, X.CONSTANT.XML_LINE_BREAKER)
 		if IsCtrlKeyDown() then
 			table.insert(aXml, GetFormatText('ID: ' .. this.eve.id, 102))
 		end

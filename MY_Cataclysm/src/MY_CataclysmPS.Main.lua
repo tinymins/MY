@@ -1,21 +1,13 @@
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队面板主设置界面
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
---------------------------------------------------------
--------------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
--------------------------------------------------------------------------------------------------------
-local ipairs, pairs, next, pcall, select = ipairs, pairs, next, pcall, select
-local string, math, table = string, math, table
--- lib apis caching
+--------------------------------------------------------------------------------
 local X = MY
-local UI, ENVIRONMENT, CONSTANT, wstring, lodash = X.UI, X.ENVIRONMENT, X.CONSTANT, X.wstring, X.lodash
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_Cataclysm'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
@@ -28,7 +20,7 @@ end
 local CFG, PS = MY_Cataclysm.CFG, { nPriority = 1 }
 
 function PS.OnPanelActive(frame)
-	local ui = UI(frame)
+	local ui = X.UI(frame)
 	local nPaddingX, nPaddingY = 20, 20
 	local nX, nY = nPaddingX, nPaddingY
 
@@ -145,7 +137,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	if ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY, text = _L['ZuiWu Effect'],
 			checked = CFG.bShowEffect,
@@ -154,7 +146,7 @@ function PS.OnPanelActive(frame)
 			end,
 			tip = {
 				render = _L['Show effect when teammate get ZuiWu, only your ZuiWu will be showen while you\'re BuTianJue.'],
-				position = UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
 		}):AutoWidth():Width() + 5
 	end
@@ -167,7 +159,7 @@ function PS.OnPanelActive(frame)
 		end,
 		tip = {
 			render = _L['Show color on right top pos of central member of each party'],
-			position = UI.TIP_POSITION.BOTTOM_TOP,
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 	}):AutoWidth():Width() + 5
 	nX = nX + ui:Append('WndButton', {
@@ -188,7 +180,7 @@ function PS.OnPanelActive(frame)
 				{
 					szOption = _L['Set sputtering font color'],
 					fnAction = function()
-						UI.OpenColorPicker(function(r, g, b)
+						X.UI.OpenColorPicker(function(r, g, b)
 							CFG.tSputteringFontColor = { r, g, b }
 						end)
 					end,
@@ -206,7 +198,7 @@ function PS.OnPanelActive(frame)
 				{
 					szOption = _L['Set sputtering shadow color'],
 					fnAction = function()
-						UI.OpenColorPicker(function(r, g, b)
+						X.UI.OpenColorPicker(function(r, g, b)
 							CFG.tSputteringShadowColor = { r, g, b }
 						end)
 					end,
@@ -291,7 +283,7 @@ function PS.OnPanelActive(frame)
 		x = nX, y = nY - 1,
 		value = CFG.nTempTargetDelay / 75,
 		range = {0, 8},
-		trackbarStyle = UI.TRACKBAR_STYLE.SHOW_VALUE,
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onChange = function(val)
 			CFG.nTempTargetDelay = val * 75
 		end,
@@ -332,7 +324,7 @@ function PS.OnPanelActive(frame)
 		end,
 		tip = {
 			render = _L['Refresh every breathe call.'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	})
 
@@ -353,7 +345,7 @@ function PS.OnPanelActive(frame)
 		end,
 		tip = {
 			render = _L['Refresh every render call.'],
-			position = UI.TIP_POSITION.TOP_BOTTOM,
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	})
 	nY = nY + 25
