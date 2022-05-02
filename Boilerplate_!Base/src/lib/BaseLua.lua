@@ -321,13 +321,16 @@ end
 ---@param t T 想要设为只读的表
 ---@return T 设为只读的表
 function X.SetmetaReadonly(t)
+	local p = {}
 	for k, v in pairs(t) do
 		if type(v) == 'table' then
-			t[k] = X.SetmetaReadonly(v)
+			p[k] = X.SetmetaReadonly(v)
+		else
+			p[k] = v
 		end
 	end
 	return setmetatable({}, {
-		__index     = t,
+		__index     = p,
 		__newindex  = function() assert(false, 'table is readonly\n') end,
 		__metatable = {
 			const_table = t,
@@ -343,7 +346,11 @@ end
 ---@return T @设为懒加载的表
 function X.SetmetaLazyload(t, _keyLoader, fallbackLoader)
 	local keyLoader = X.Clone(_keyLoader)
-	return setmetatable(t, {
+	local p = {}
+	for k, v in pairs(t) do
+		p[k] = v
+	end
+	return setmetatable(p, {
 		__index = function(t, k)
 			local loader = keyLoader[k]
 			if loader then
