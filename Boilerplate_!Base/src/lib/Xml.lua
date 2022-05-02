@@ -422,7 +422,8 @@ local function XMLDecode(xml)
 		pos = pos + 1
 	end
 	if #stack ~= 0 then
-		return Log('XML decode error: unclosed elements detected. ' .. #stack .. ' stacks on `' .. xml .. '`')
+		X.Debug('XML decode error: unclosed elements detected. ' .. #stack .. ' stacks on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
+		return
 	end
 	return t.children
 end

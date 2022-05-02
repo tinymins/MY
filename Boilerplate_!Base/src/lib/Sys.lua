@@ -1353,7 +1353,6 @@ function X.ExecuteWithThis(context, fnAction, ...)
 	-- 界面组件支持字符串调用方法
 	if X.IsString(fnAction) then
 		if not X.IsElement(context) then
-			-- Log('[UI ERROR]Invalid element on executing ui event!')
 			return false
 		end
 		if context[fnAction] then
@@ -1366,7 +1365,6 @@ function X.ExecuteWithThis(context, fnAction, ...)
 		end
 	end
 	if not X.IsFunction(fnAction) then
-		-- Log('[UI ERROR]Invalid function on executing ui event! # ' .. element:GetTreePath())
 		return false
 	end
 	local _this = this

@@ -44,7 +44,7 @@ function X.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 		__index = function(t, k)
 			-- if hit in L1 CACHE
 			if tCache[k] then
-				-- Log('INFO CACHE L1 HIT ' .. k)
+				-- X.Log('INFO CACHE L1 HIT ' .. k)
 				return tCache[k]
 			end
 			-- read info from saved data
@@ -111,7 +111,6 @@ function X.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 					local szPath = SZ_DATA_PATH:gsub('<SEG>', szSegID)
 					if IsFileExist(X.GetLUADataPath(szPath)) then
 						X.SaveLUAData(szPath, nil)
-						-- Log('INFO CACHE CLEAR @' .. szSegID)
 					end
 					-- bit add one
 					local i = 1
