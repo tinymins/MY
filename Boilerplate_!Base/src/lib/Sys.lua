@@ -1989,13 +1989,19 @@ if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		X.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
 	end
 	local BROKEN_KGUI = IsDebugClient() and not X.IsDebugServer() and not X.IsDebugClient(true)
+	local BROKEN_KGUI_ECHO = false
 	RegisterEvent('CALL_LUA_ERROR', function()
+		if BROKEN_KGUI_ECHO then
+			return
+		end
 		local szMsg = arg0
 		local szMsgL = X.StringReplaceW(arg0:lower(), '\\', '/')
 		if X.StringFindW(szMsgL, KEY) then
 			if BROKEN_KGUI then
 				local szMessage = 'Your KGUI is not official, please fix client and try again.'
-				X.ErrorLog('[' .. X.PACKET_INFO.NAME_SPACE .. ']' .. szMessage .. '\n' .. _L[szMessage])
+				BROKEN_KGUI_ECHO = true
+				X.SafeCall(X.ErrorLog, '[' .. X.PACKET_INFO.NAME_SPACE .. ']' .. szMessage .. '\n' .. _L[szMessage])
+				BROKEN_KGUI_ECHO = false
 			end
 			X.Log('CALL_LUA_ERROR', szMsg)
 			table.insert(ERROR_MSG, szMsg)
