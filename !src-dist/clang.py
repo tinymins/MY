@@ -115,7 +115,11 @@ def convert_progress(argv):
 			relpath = filepath.replace(root_path, '')
 			crc_changed = False
 
-			if extname == '.lua' and basename != 'Base' and basename != 'LuaWatcher' and not (filename.startswith('src.') and filename.endswith('.lua')): # src.xxxxxxx.lua
+			if extname == '.lua' \
+			and basename != 'Base' and basename != 'LuaWatcher' \
+			and relpath.find(os.path.sep + '!src-dist' + os.path.sep) == -1 \
+			and relpath.find(os.path.sep + 'dist' + os.path.sep) == -1 \
+			and not (filename.startswith('src.') and filename.endswith('.lua')): # src.xxxxxxx.lua
 				print('--------------------------------')
 				print('Update header: ' + filepath)
 				crc_text = utils.get_file_crc(filepath)
