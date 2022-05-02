@@ -3523,7 +3523,6 @@ local function GenerateMapInfo()
 					map.bDungeon = true
 				end
 			end
-			map = X.SetmetaReadonly(map)
 			MAP_LIST[map.dwID] = map
 			MAP_LIST[map.szName] = map
 		end
