@@ -226,7 +226,6 @@ function X.Debug(...)
 		OutputMessageEx('MSG_SYS', DEBUG_THEME[nLevel], szTitle, oContent, true)
 	end
 	if nLevel >= X.PACKET_INFO.DELOG_LEVEL then
-		Log('[DEBUG_LEVEL][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. szContent)
+		X.Log('DEBUG', 'LEVEL_' .. nLevel, szTitle, szContent)
 	end
-	X.Log('DEBUG', 'LEVEL_' .. nLevel, szTitle, szContent)
 end
