@@ -321,7 +321,7 @@ end
 ---@param t T 想要设为只读的表
 ---@return T 设为只读的表
 function X.SetmetaReadonly(t)
-	local p = {}
+	local p = setmetatable({}, { __index = t })
 	for k, v in pairs(t) do
 		if type(v) == 'table' then
 			p[k] = X.SetmetaReadonly(v)
@@ -346,7 +346,7 @@ end
 ---@return T @设为懒加载的表
 function X.SetmetaLazyload(t, _keyLoader, fallbackLoader)
 	local keyLoader = X.Clone(_keyLoader)
-	local p = {}
+	local p = setmetatable({}, { __index = t })
 	for k, v in pairs(t) do
 		p[k] = v
 	end
