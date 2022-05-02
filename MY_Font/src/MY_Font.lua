@@ -20,6 +20,8 @@ end
 
 -- 本地变量
 local D = {}
+local CONFIG_PATH = {'config/fontconfig.jx3dat', X.PATH_TYPE.GLOBAL}
+local CONFIG = X.LoadLUAData(CONFIG_PATH) or {}
 
 -- 设置字体
 function D.SetFont(tIDs, szName, szFile, nSize, tStyle)
@@ -105,17 +107,6 @@ if Global_SetCaptionParams then
 			Global_SetCaptionParams(tParams)
 		end,
 	})
-end
-
--- 加载字体配置
-local CONFIG, CONFIG_PATH = nil, {'config/fontconfig.jx3dat', X.PATH_TYPE.GLOBAL}
-do
-	local szOrgFile = X.GetLUADataPath({'config/MY_FONT/{$lang}.jx3dat', X.PATH_TYPE.DATA})
-	local szFilePath = X.GetLUADataPath(CONFIG_PATH)
-	if IsLocalFileExist(szOrgFile) then
-		CPath.Move(szOrgFile, szFilePath)
-	end
-	CONFIG = X.LoadLUAData(szFilePath) or {}
 end
 
 -- Global exports
