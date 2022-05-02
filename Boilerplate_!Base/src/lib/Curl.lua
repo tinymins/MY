@@ -156,9 +156,9 @@ function X.Ajax(settings)
 	if (method == 'get' or method == 'delete') and xdata then
 		local data = X.EncodeQuerystring(xdata)
 		if data ~= '' then
-			if not wstring.find(xurl, '?') then
+			if not X.StringFindW(xurl, '?') then
 				xurl = xurl .. '?'
-			elseif wstring.sub(xurl, -1) ~= '&' then
+			elseif X.StringSubW(xurl, -1) ~= '&' then
 				xurl = xurl .. '&'
 			end
 			xurl = xurl .. data
@@ -171,7 +171,7 @@ function X.Ajax(settings)
 	-- data signature
 	-------------------------------
 	if config.signature then
-		local pos = wstring.find(xurl, '?')
+		local pos = X.StringFindW(xurl, '?')
 		if pos then
 			xurl = string.sub(xurl, 1, pos)
 				.. X.EncodeQuerystring(

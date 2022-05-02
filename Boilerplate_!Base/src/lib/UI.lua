@@ -192,7 +192,7 @@ local BUTTON_STYLE_CONFIG = {
 	},
 }
 local function GetButtonStyleName(raw)
-	local szImage = wstring.lower(raw:GetAnimatePath())
+	local szImage = X.StringLowerW(raw:GetAnimatePath())
 	local nNormalGroup = raw:GetAnimateGroupNormal()
 	local GetStyleName = X.Get(_G, {X.NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleName'})
 	if X.IsFunction(GetStyleName) then
@@ -202,7 +202,7 @@ local function GetButtonStyleName(raw)
 		end
 	end
 	for e, p in pairs(BUTTON_STYLE_CONFIG) do
-		if wstring.lower(X.NormalizePath(p.szImage)) == szImage and p.nNormalGroup == nNormalGroup then
+		if X.StringLowerW(X.NormalizePath(p.szImage)) == szImage and p.nNormalGroup == nNormalGroup then
 			return e
 		end
 	end
@@ -2296,7 +2296,7 @@ local function OnCommonComponentMouseEnter()
 	end
 
 	local nDisLen = hText:GetTextPosExtent()
-	local nLen = wstring.len(hText:GetText())
+	local nLen = X.StringLenW(hText:GetText())
 	if nDisLen == nLen then
 		return
 	end
@@ -2932,7 +2932,7 @@ function OO:Autocomplete(method, arg1, arg2)
 						if opt.ignoreCase then
 							haystack = StringLowerW(haystack)
 						end
-						local pos = wstring.find(haystack, needle)
+						local pos = X.StringFindW(haystack, needle)
 						if pos and pos > 0 and not opt.anyMatch then
 							pos = nil
 						end
@@ -2940,7 +2940,7 @@ function OO:Autocomplete(method, arg1, arg2)
 							local aPinyin, aPinyinConsonant = X.Han2Pinyin(haystack)
 							if not pos then
 								for _, s in ipairs(aPinyin) do
-									pos = wstring.find(s, needle)
+									pos = X.StringFindW(s, needle)
 									if pos and pos > 0 and not opt.anyMatch then
 										pos = nil
 									end
@@ -2951,7 +2951,7 @@ function OO:Autocomplete(method, arg1, arg2)
 							end
 							if not pos then
 								for _, s in ipairs(aPinyinConsonant) do
-									pos = wstring.find(s, needle)
+									pos = X.StringFindW(s, needle)
 									if pos and pos > 0 and not opt.anyMatch then
 										pos = nil
 									end
@@ -4736,7 +4736,7 @@ function OO:Image(szImage, nFrame, nOverFrame, nDownFrame, nDisableFrame)
 		szImage = string.gsub(szImage, '%|.*', '')
 	end
 	if X.IsString(szImage) then
-		szImage = X.WString.Replace(szImage, '/', '\\')
+		szImage = X.StringReplaceW(szImage, '/', '\\')
 		if X.IsNumber(nFrame) and X.IsNumber(nOverFrame) and X.IsNumber(nDownFrame) and X.IsNumber(nDisableFrame) then
 			for _, raw in ipairs(self.raws) do
 				raw = GetComponentElement(raw, 'BUTTON')
@@ -5025,7 +5025,7 @@ function OO:ButtonStyle(...)
 		for _, raw in ipairs(self.raws) do
 			local btn = GetComponentElement(raw, 'BUTTON')
 			if btn then
-				btn:SetAnimatePath((X.WString.Replace(tStyle.szImage, '/', '\\')))
+				btn:SetAnimatePath((X.StringReplaceW(tStyle.szImage, '/', '\\')))
 				btn:SetAnimateGroupNormal(tStyle.nNormalGroup)
 				btn:SetAnimateGroupMouseOver(tStyle.nMouseOverGroup)
 				btn:SetAnimateGroupMouseDown(tStyle.nMouseDownGroup)

@@ -1150,7 +1150,7 @@ local KUNGFU_SHORT_NAME_CACHE = {}
 function X.GetKungfuName(dwKungfuID, szType)
 	if not KUNGFU_NAME_CACHE[dwKungfuID] then
 		KUNGFU_NAME_CACHE[dwKungfuID] = Table_GetSkillName(dwKungfuID, 1) or ''
-		KUNGFU_SHORT_NAME_CACHE[dwKungfuID] = wstring.sub(KUNGFU_NAME_CACHE[dwKungfuID], 1, 2)
+		KUNGFU_SHORT_NAME_CACHE[dwKungfuID] = X.StringSubW(KUNGFU_NAME_CACHE[dwKungfuID], 1, 2)
 	end
 	if szType == 'short' then
 		return KUNGFU_SHORT_NAME_CACHE[dwKungfuID]
@@ -3401,7 +3401,7 @@ X.RegisterEvent({'SYNC_ROLE_DATA_END', 'SKILL_UPDATE', 'SKILL_RECIPE_LIST_UPDATE
 
 local function GetShortName(sz) -- »ñÈ¡ÃØóÅ¶ÌÃû
 	local nStart, nEnd = string.find(sz, '¡¤')
-	return nStart and X.WString.Replace(string.sub(sz, nEnd + 1), _L['>'], '')
+	return nStart and X.StringReplaceW(string.sub(sz, nEnd + 1), _L['>'], '')
 end
 
 function X.IsRecipeActive(szRecipeName)
@@ -5011,14 +5011,14 @@ do
 					if bReplaceSensitiveWord then
 						szPart = X.ReplaceSensitiveWord(szPart)
 					end
-					if nMaxLen and nMaxLen > 0 and nLen + wstring.len(szPart) > nMaxLen then
-						szPart = wstring.sub(szPart, 1, nMaxLen - nLen)
+					if nMaxLen and nMaxLen > 0 and nLen + X.StringLenW(szPart) > nMaxLen then
+						szPart = X.StringSubW(szPart, 1, nMaxLen - nLen)
 						szText = szText .. szPart
 						nLen = nMaxLen
 						break
 					else
 						szText = szText .. szPart
-						nLen = nLen + wstring.len(szPart)
+						nLen = nLen + X.StringLenW(szPart)
 					end
 				end
 				if szContent then

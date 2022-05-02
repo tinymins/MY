@@ -136,7 +136,7 @@ function X.GetRelativePath(oPath, oRoot)
 		szRoot = X.ConcatPath(szRootPath, szRoot)
 	end
 	szRoot = szRoot:gsub('/$', '') .. '/'
-	if wstring.find(szPath:lower(), szRoot:lower()) ~= 1 then
+	if X.StringFindW(szPath:lower(), szRoot:lower()) ~= 1 then
 		return
 	end
 	return szPath:sub(#szRoot + 1)
@@ -235,14 +235,14 @@ function GetLUADataPathPassphrase(szPath)
 	end
 	szPath = szPath:sub(#szDataRoot + 1)
 	-- 拆分数据分类地址
-	local nPos = wstring.find(szPath, '/')
+	local nPos = X.StringFindW(szPath, '/')
 	if not nPos or nPos == 1 then
 		return
 	end
 	local szDomain = szPath:sub(1, nPos)
 	szPath = szPath:sub(nPos + 1)
 	-- 过滤不需要加密的地址
-	local nPos = wstring.find(szPath, '/')
+	local nPos = X.StringFindW(szPath, '/')
 	if nPos then
 		if szPath:sub(1, nPos - 1) == 'export' then
 			return
@@ -604,8 +604,8 @@ function X.SetUserSettingsPresetID(szID, bDefault)
 		if szID:find('[/?*:|\\<>]') then
 			return _L['User settings preset id cannot contains special character (/?*:|\\<>).']
 		end
-		szID = X.WString.Replace(szID, '^%s+', '')
-		szID = X.WString.Replace(szID, '%s+$', '')
+		szID = X.StringReplaceW(szID, '^%s+', '')
+		szID = X.StringReplaceW(szID, '%s+$', '')
 	end
 	if X.IsEmpty(szID) then
 		szID = ''

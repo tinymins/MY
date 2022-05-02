@@ -564,8 +564,8 @@ function X.PlaySound(nType, szFilePath, szCustomPath)
 		end
 	end
 	-- ≤•∑≈ƒ¨»œ…˘“Ù
-	local szPath = X.WString.Replace(szFilePath, '\\', '/')
-	if not wstring.find(szPath, '/') then
+	local szPath = X.StringReplaceW(szFilePath, '\\', '/')
+	if not X.StringFindW(szPath, '/') then
 		szPath = X.PACKET_INFO.FRAMEWORK_ROOT .. 'audio/' .. szPath
 	end
 	if not IsFileExist(szPath) then
@@ -973,19 +973,19 @@ end
 --   %s    √Î÷”
 function X.FormatTime(nTimestamp, szFormat)
 	local t = TimeToDate(nTimestamp)
-	szFormat = X.WString.Replace(szFormat, '%yyyy', string.format('%04d', t.year  ))
-	szFormat = X.WString.Replace(szFormat, '%yy'  , string.format('%02d', t.year % 100))
-	szFormat = X.WString.Replace(szFormat, '%MM'  , string.format('%02d', t.month ))
-	szFormat = X.WString.Replace(szFormat, '%dd'  , string.format('%02d', t.day   ))
-	szFormat = X.WString.Replace(szFormat, '%hh'  , string.format('%02d', t.hour  ))
-	szFormat = X.WString.Replace(szFormat, '%mm'  , string.format('%02d', t.minute))
-	szFormat = X.WString.Replace(szFormat, '%ss'  , string.format('%02d', t.second))
-	szFormat = X.WString.Replace(szFormat, '%y', t.year  )
-	szFormat = X.WString.Replace(szFormat, '%M', t.month )
-	szFormat = X.WString.Replace(szFormat, '%d', t.day   )
-	szFormat = X.WString.Replace(szFormat, '%h', t.hour  )
-	szFormat = X.WString.Replace(szFormat, '%m', t.minute)
-	szFormat = X.WString.Replace(szFormat, '%s', t.second)
+	szFormat = X.StringReplaceW(szFormat, '%yyyy', string.format('%04d', t.year  ))
+	szFormat = X.StringReplaceW(szFormat, '%yy'  , string.format('%02d', t.year % 100))
+	szFormat = X.StringReplaceW(szFormat, '%MM'  , string.format('%02d', t.month ))
+	szFormat = X.StringReplaceW(szFormat, '%dd'  , string.format('%02d', t.day   ))
+	szFormat = X.StringReplaceW(szFormat, '%hh'  , string.format('%02d', t.hour  ))
+	szFormat = X.StringReplaceW(szFormat, '%mm'  , string.format('%02d', t.minute))
+	szFormat = X.StringReplaceW(szFormat, '%ss'  , string.format('%02d', t.second))
+	szFormat = X.StringReplaceW(szFormat, '%y', t.year  )
+	szFormat = X.StringReplaceW(szFormat, '%M', t.month )
+	szFormat = X.StringReplaceW(szFormat, '%d', t.day   )
+	szFormat = X.StringReplaceW(szFormat, '%h', t.hour  )
+	szFormat = X.StringReplaceW(szFormat, '%m', t.minute)
+	szFormat = X.StringReplaceW(szFormat, '%s', t.second)
 	return szFormat
 end
 
@@ -1984,15 +1984,15 @@ local LAST_ERROR_MSG = X.LoadLUAData(FILE_PATH, { passphrase = false }) or {}
 local ERROR_MSG = {}
 
 if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
-	local KEY = '/' .. X.WString.Replace(X.PACKET_INFO.ROOT, '\\', '/'):gsub('/+$', ''):gsub('^.*/', ''):lower() .. '/'
+	local KEY = '/' .. X.StringReplaceW(X.PACKET_INFO.ROOT, '\\', '/'):gsub('/+$', ''):gsub('^.*/', ''):lower() .. '/'
 	local function SaveErrorMessage()
 		X.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
 	end
 	local BROKEN_KGUI = IsDebugClient() and not X.IsDebugServer() and not X.IsDebugClient(true)
 	RegisterEvent('CALL_LUA_ERROR', function()
 		local szMsg = arg0
-		local szMsgL = X.WString.Replace(arg0:lower(), '\\', '/')
-		if wstring.find(szMsgL, KEY) then
+		local szMsgL = X.StringReplaceW(arg0:lower(), '\\', '/')
+		if X.StringFindW(szMsgL, KEY) then
 			if BROKEN_KGUI then
 				local szMessage = 'Your KGUI is not official, please fix client and try again.'
 				X.ErrorLog('[' .. X.PACKET_INFO.NAME_SPACE .. ']' .. szMessage .. '\n' .. _L[szMessage])

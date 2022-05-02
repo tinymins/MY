@@ -120,9 +120,9 @@ local BUTTON_STYLE_CONFIG = {
 	}),
 }
 function D.GetWndButtonStyleName(szImage, nNormalGroup)
-	szImage = wstring.lower(X.NormalizePath(szImage))
+	szImage = X.StringLowerW(X.NormalizePath(szImage))
 	for e, p in pairs(BUTTON_STYLE_CONFIG) do
-		if wstring.lower(X.NormalizePath(p.szImage)) == szImage and p.nNormalGroup == nNormalGroup then
+		if X.StringLowerW(X.NormalizePath(p.szImage)) == szImage and p.nNormalGroup == nNormalGroup then
 			return e
 		end
 	end

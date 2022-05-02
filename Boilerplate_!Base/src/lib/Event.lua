@@ -707,12 +707,12 @@ function X.SendBgMsg(nChannel, szMsgID, oData, bSilent)
 	local szMsgSID = BG_MSG_ID_PREFIX .. szMsgID .. BG_MSG_ID_SUFFIX
 	local szMsgUUID = X.GetUUID():gsub('-', '')
 	local szArg = X.EncodeLUAData({oData}) -- 如果发送nil，不包一层会被解析器误认为解码失败，所以必须用{}包裹
-	local nMsgLen = wstring.len(szArg)
+	local nMsgLen = X.StringLenW(szArg)
 	local nSegLen = math.floor(MAX_CHANNEL_LEN[nChannel] / 4 * 3) -- Base64编码会导致长度增加
 	local nSegCount = math.ceil(nMsgLen / nSegLen)
 	-- send msg
 	for nSegIndex = 1, nSegCount do
-		local szSeg = X.SimpleEncryptString((wstring.sub(szArg, (nSegIndex - 1) * nSegLen + 1, nSegIndex * nSegLen)))
+		local szSeg = X.SimpleEncryptString((X.StringSubW(szArg, (nSegIndex - 1) * nSegLen + 1, nSegIndex * nSegLen)))
 		local aSay = {
 			{ type = 'eventlink', name = 'BG_CHANNEL_MSG', linkinfo = szMsgSID },
 			{ type = 'eventlink', name = '', linkinfo = X.EncodeLUAData({ u = szMsgUUID, c = nSegCount, i = nSegIndex }) },

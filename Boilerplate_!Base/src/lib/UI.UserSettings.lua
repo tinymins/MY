@@ -50,7 +50,7 @@ function D.Open(bImport)
 			local tItem = X.lodash.find(tGroup.aItem, function(p) return p.szLabel == us.szLabel end)
 			if not tItem then
 				tItem = {
-					szID = X.WString.Replace(X.GetUUID(), '-', ''),
+					szID = X.StringReplaceW(X.GetUUID(), '-', ''),
 					szLabel = us.szLabel,
 					aKey = {},
 				}

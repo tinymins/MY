@@ -711,58 +711,63 @@ end
 -----------------------------------------------
 -- 宽字符
 -----------------------------------------------
-X.WString = X.SetmetaReadonly({
-	-- 获取字符串长度
-	---@param s string @需要获取长度的字符串
-	---@return number @字符串长度
-	Len = wstring.len,
-	-- 截取字符串
-	Sub =
-	---@param str string 需要截取的字符串
-	---@param s number 开始位置
-	---@param e number 结束位置
-	---@return string 截取后的字符串
-	function(str, s, e)
-		if s < 0 or not e or e < 0 then
-			local nLen = wstring.len(str)
-			if s < 0 then
-				s = nLen + s + 1
-			end
-			if not e then
-				e = nLen
-			elseif e < 0 then
-				e = nLen + e + 1
-			end
+
+-- 获取字符串长度
+---@param s string @需要获取长度的字符串
+---@return number @字符串长度
+X.StringLenW = wstring.len
+
+-- 截取字符串
+---@param str string 需要截取的字符串
+---@param s number 开始位置
+---@param e number 结束位置
+---@return string 截取后的字符串
+function X.StringSubW(str, s, e)
+	if s < 0 or not e or e < 0 then
+		local nLen = wstring.len(str)
+		if s < 0 then
+			s = nLen + s + 1
 		end
-		return wstring.sub(str, s, e)
-	end,
-	-- 字符串字符迭代器
-	---@param str string @需要迭代的字符串
-	---@param func function(s: string): void @迭代器
-	---@return void
-	Each = wstring.char_task,
-	-- 字符串查找
-	---@param s string @需要查找的字符串
-	---@param p string @查找的字符串
-	---@return number, number @[nStartPos, nEndPos] 开始位置，结束位置
-	Find = StringFindW or wstring.find,
-	-- 字符串切割
-	---@param s string @需要切割的字符串
-	---@param p string @分隔符
-	---@return string[] @切割后的字符串
-	Split = wstring.split,
-	-- 字符串转半角
-	---@param s string @需要转半角的字符串
-	---@return string @转半角后的字符串
-	Ener = StringEnerW or wstring.ener,
-	-- 字符串转小写
-	---@param s string @需要转小写的字符串
-	---@return string @转小写后的字符串
-	Lower = StringLowerW or wstring.lower,
-	-- 字符串替换
-	---@param s string @需要替换的字符串
-	---@param p string @查找的字符串
-	---@param r string @替换的字符串
-	---@return string @替换后的字符串
-	Replace = StringReplaceW or wstring.replace,
-})
+		if not e then
+			e = nLen
+		elseif e < 0 then
+			e = nLen + e + 1
+		end
+	end
+	return wstring.sub(str, s, e)
+end
+
+-- 字符串字符迭代器
+---@param str string @需要迭代的字符串
+---@param func function(s: string): void @迭代器
+---@return void
+X.StringEachW = wstring.char_task
+
+-- 字符串查找
+---@param s string @需要查找的字符串
+---@param p string @查找的字符串
+---@return number, number @[nStartPos, nEndPos] 开始位置，结束位置
+X.StringFindW = StringFindW or wstring.find
+
+-- 字符串切割
+---@param s string @需要切割的字符串
+---@param p string @分隔符
+---@return string[] @切割后的字符串
+X.StringSplitW = wstring.split
+
+-- 字符串转半角
+---@param s string @需要转半角的字符串
+---@return string @转半角后的字符串
+X.StringEnerW = StringEnerW or wstring.ener
+
+-- 字符串转小写
+---@param s string @需要转小写的字符串
+---@return string @转小写后的字符串
+X.StringLowerW = StringLowerW or wstring.lower
+
+-- 字符串替换
+---@param s string @需要替换的字符串
+---@param p string @查找的字符串
+---@param r string @替换的字符串
+---@return string @替换后的字符串
+X.StringReplaceW = StringReplaceW or wstring.replace

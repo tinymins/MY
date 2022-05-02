@@ -205,7 +205,7 @@ function X.CopyChatLine(hTime, bTextEditor, bRichText)
 				if szName ~= 'timelink' and szName ~= 'copylink' and szName ~= 'msglink' and szName ~= 'time' then
 					local szText, bEnd = p:GetText(), false
 					if not bTextEditor and StringFindW(szText, '\n') then
-						szText = X.WString.Replace(szText, '\n', '')
+						szText = X.StringReplaceW(szText, '\n', '')
 						bEnd = true
 					end
 					bContent = true
@@ -920,7 +920,7 @@ local function InitEmotion()
 				t[t1.dwID] = t1
 				t[t1.szCmd] = t1
 				t[t1.szImageFile..','..t1.nFrame..','..t1.szType] = t1
-				MAX_EMOTION_LEN = math.max(MAX_EMOTION_LEN, wstring.len(t1.szCmd))
+				MAX_EMOTION_LEN = math.max(MAX_EMOTION_LEN, X.StringLenW(t1.szCmd))
 			end
 		end
 		EMOTION_CACHE = t
@@ -966,8 +966,8 @@ local function ParseFaceIcon(t)
 				else
 					szLeft = szLeft .. string.sub(szText, 1, nPos - 1)
 					szText = string.sub(szText, nPos)
-					for i = math.min(MAX_EMOTION_LEN, wstring.len(szText)), 2, -1 do
-						local szTest = wstring.sub(szText, 1, i)
+					for i = math.min(MAX_EMOTION_LEN, X.StringLenW(szText)), 2, -1 do
+						local szTest = X.StringSubW(szText, 1, i)
 						local emo = X.GetChatEmotion(szTest)
 						if emo then
 							szFace, dwFaceID = szTest, emo.dwID
@@ -1058,10 +1058,10 @@ local function ParseAntiSWS(t)
 				local nSensitiveWordEndLen = 1 -- 最后一个字符（要裁剪掉的字符）大小
 				local nSensitiveWordEndPos = #szText + 1
 				for _, szSensitiveWord in ipairs(SENSITIVE_WORD) do
-					local _, nEndPos = wstring.find(szText, szSensitiveWord)
+					local _, nEndPos = X.StringFindW(szText, szSensitiveWord)
 					if nEndPos and nEndPos < nSensitiveWordEndPos then
-						local nSensitiveWordLenW = wstring.len(szSensitiveWord)
-						nSensitiveWordEndLen = string.len(wstring.sub(szSensitiveWord, nSensitiveWordLenW, nSensitiveWordLenW))
+						local nSensitiveWordLenW = X.StringLenW(szSensitiveWord)
+						nSensitiveWordEndLen = string.len(X.StringSubW(szSensitiveWord, nSensitiveWordLenW, nSensitiveWordLenW))
 						nSensitiveWordEndPos = nEndPos
 					end
 				end
@@ -1144,10 +1144,10 @@ local function StandardizeChatData(szText, parserOptions)
 	if X.IsRestricted('X.CHAT_CRLF') then
 		for _, v in ipairs(aSay) do
 			if v.text then
-				v.text = X.WString.Replace(v.text, '\n', ' ')
+				v.text = X.StringReplaceW(v.text, '\n', ' ')
 			end
 			if v.name then
-				v.name = X.WString.Replace(v.name, '\n', ' ')
+				v.name = X.StringReplaceW(v.name, '\n', ' ')
 			end
 		end
 	end
@@ -1167,13 +1167,13 @@ local function StandardizeChatData(szText, parserOptions)
 		local nLen = 0
 		for i, v in ipairs(aSay) do
 			if nLen <= 64 then
-				nLen = nLen + wstring.len(v.text or v.name or '')
+				nLen = nLen + X.StringLenW(v.text or v.name or '')
 				if nLen > 64 then
 					if v.text then
-						v.text = wstring.sub(v.text, 1, 64 - nLen)
+						v.text = X.StringSubW(v.text, 1, 64 - nLen)
 					end
 					if v.name then
-						v.name = wstring.sub(v.name, 1, 64 - nLen)
+						v.name = X.StringSubW(v.name, 1, 64 - nLen)
 					end
 					for j = #aSay, i + 1, -1 do
 						table.remove(aSay, j)

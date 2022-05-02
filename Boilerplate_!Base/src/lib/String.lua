@@ -26,7 +26,7 @@ function X.SplitString(szText, aSpliter, bIgnoreEmptyPart, nMaxPart)
 		if not nMaxPart or nMaxPart > nResult + 1 then
 			for _, szSpliter in ipairs(aSpliter) do
 				if szSpliter == '' then
-					nPos = #wstring.sub(string.sub(szText, nOff), 1, 1)
+					nPos = #X.StringSubW(string.sub(szText, nOff), 1, 1)
 					if nPos == 0 then
 						nPos = nil
 					else
@@ -216,12 +216,12 @@ function X.DecodeQuerystring(s)
 	for _, kvp in ipairs(X.SplitString(s, '&', true)) do
 		kvp = X.SplitString(kvp, '=')
 		local k, v = kvp[1], kvp[2]
-		local pos = wstring.find(k, '[')
+		local pos = X.StringFindW(k, '[')
 		if pos then
 			local ks = { DecodeURIComponent(string.sub(k, 1, pos - 1)) }
 			k = string.sub(k, pos)
-			while wstring.sub(k, 1, 1) == '[' do
-				pos = wstring.find(k, ']') or (string.len(k) + 1)
+			while X.StringSubW(k, 1, 1) == '[' do
+				pos = X.StringFindW(k, ']') or (string.len(k) + 1)
 				table.insert(ks, DecodeURIComponent(string.sub(k, 2, pos - 1)))
 				k = string.sub(k, pos + 1)
 			end
@@ -281,10 +281,10 @@ function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgno
 		szText = StringEnerW(szText)
 	end
 	if bIgnoreSpace then
-		szFind = X.WString.Replace(szFind, ' ', '')
-		szFind = X.WString.Replace(szFind, g_tStrings.STR_ONE_CHINESE_SPACE, '')
-		szText = X.WString.Replace(szText, ' ', '')
-		szText = X.WString.Replace(szText, g_tStrings.STR_ONE_CHINESE_SPACE, '')
+		szFind = X.StringReplaceW(szFind, ' ', '')
+		szFind = X.StringReplaceW(szFind, g_tStrings.STR_ONE_CHINESE_SPACE, '')
+		szText = X.StringReplaceW(szText, ' ', '')
+		szText = X.StringReplaceW(szText, g_tStrings.STR_ONE_CHINESE_SPACE, '')
 	end
 	local me = GetClientPlayer()
 	if me then
@@ -331,11 +331,11 @@ function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgno
 			for _, info in ipairs(tKeyWords) do      -- 符合一个即可
 				-- szKeyword = X.EscapeString(szKeyword) -- 用了wstring还Escape个捷豹
 				if info.bNegative then               -- !小铁被吃了
-					if not wstring.find(szText, info.szKeyword) then
+					if not X.StringFindW(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				else                                                    -- 十人   -- 10
-					if wstring.find(szText, info.szKeyword) then
+					if X.StringFindW(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				end
