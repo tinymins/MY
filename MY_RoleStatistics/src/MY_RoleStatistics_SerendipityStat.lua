@@ -1447,6 +1447,19 @@ end
 -- 接口导出
 --------------------------------------------------------
 
+function D.GetSerendipityMapID(dwSerendipity)
+	local serendipity
+	for _, v in ipairs(SERENDIPITY_LIST) do
+		if v.dwSerendipity == dwSerendipity then
+			serendipity = v
+			break
+		end
+	end
+	if serendipity then
+		return serendipity.dwMapID
+	end
+end
+
 function D.GetSerendipityCounter(dwPlayerID, dwSerendipity)
 	local rec = dwPlayerID == UI_GetClientPlayerID()
 		and D.GetClientPlayerRec()
@@ -1529,6 +1542,7 @@ local settings = {
 				szSaveDB = 'MY_RoleStatistics_SerendipityStat.bSaveDB',
 				szFloatEntry = 'MY_RoleStatistics_SerendipityStat.bFloatEntry',
 				tAPI = {
+					GetSerendipityMapID = D.GetSerendipityMapID,
 					GetSerendipityCounter = D.GetSerendipityCounter,
 					GetSerendipityCounterText = D.GetSerendipityCounterText,
 				},
