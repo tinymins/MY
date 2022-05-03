@@ -204,6 +204,7 @@ function X.OpenFolder(szPath)
 	if X.IsFunction(OpenFolder) then
 		OpenFolder(szPath)
 	else
+		X.SafeCall(SetDataToClip, szPath)
 		X.UI.OpenTextEditor(szPath)
 	end
 end
