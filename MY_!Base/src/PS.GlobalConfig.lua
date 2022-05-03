@@ -171,9 +171,7 @@ function PS.OnPanelActive(wnd)
 		x = nX, y = nY,
 		text = _L['Backup folder'],
 		onClick = function()
-			local szRoot = X.GetAbsolutePath({'export/settings/', X.PATH_TYPE.GLOBAL}):gsub('/', '\\')
-			X.OpenFolder(szRoot)
-			X.UI.OpenTextEditor(szRoot)
+			X.OpenFolder(X.GetAbsolutePath({'export/settings/', X.PATH_TYPE.GLOBAL}))
 		end,
 	}):AutoWidth():Width() + 5
 	nX, nY = nPaddingX, nY + 30

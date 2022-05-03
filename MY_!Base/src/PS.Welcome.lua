@@ -169,9 +169,7 @@ function PS.OnPanelActive(wnd)
 						HideTip()
 					end,
 					fnAction = function()
-						local szRoot = X.GetAbsolutePath({'', X.PATH_TYPE.ROLE}):gsub('/', '\\')
-						X.OpenFolder(szRoot)
-						X.UI.OpenTextEditor(szRoot)
+						X.OpenFolder(X.GetAbsolutePath({'', X.PATH_TYPE.ROLE}))
 						X.UI.ClosePopupMenu()
 					end,
 				},
@@ -186,9 +184,7 @@ function PS.OnPanelActive(wnd)
 						HideTip()
 					end,
 					fnAction = function()
-						local szRoot = X.GetAbsolutePath({'', X.PATH_TYPE.SERVER}):gsub('/', '\\')
-						X.OpenFolder(szRoot)
-						X.UI.OpenTextEditor(szRoot)
+						X.OpenFolder(X.GetAbsolutePath({'', X.PATH_TYPE.SERVER}))
 						X.UI.ClosePopupMenu()
 					end,
 				},
@@ -203,9 +199,7 @@ function PS.OnPanelActive(wnd)
 						HideTip()
 					end,
 					fnAction = function()
-						local szRoot = X.GetAbsolutePath({'', X.PATH_TYPE.GLOBAL}):gsub('/', '\\')
-						X.OpenFolder(szRoot)
-						X.UI.OpenTextEditor(szRoot)
+						X.OpenFolder(X.GetAbsolutePath({'', X.PATH_TYPE.GLOBAL}))
 						X.UI.ClosePopupMenu()
 					end,
 				},
