@@ -200,8 +200,11 @@ function X.GetParentPath(szPath)
 end
 
 function X.OpenFolder(szPath)
-	if _G.OpenFolder then
-		_G.OpenFolder(szPath)
+	local OpenFolder = X.GetGameAPI('OpenFolder')
+	if X.IsFunction(OpenFolder) then
+		OpenFolder(szPath)
+	else
+		X.UI.OpenTextEditor(szPath)
 	end
 end
 
