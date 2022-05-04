@@ -8,7 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_'
+local MODULE_PATH = 'MYDev_UITexViewer/MYDev_UITexViewer'
 local PLUGIN_NAME = 'MYDev_UITexViewer'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_UITexViewer'
