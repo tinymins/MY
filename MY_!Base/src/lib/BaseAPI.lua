@@ -175,7 +175,7 @@ RegisterEvent('LOADING_END', function()
 	local nTopTime = 0
 	for i, p in ipairs(aTop) do
 		nTopTime = nTopTime + p.nTime
-		X.Log('MODULE_LOADING_REPORT', string.format('%d. %32s: %dms', i, p.szModule, p.nTime))
+		X.Log('MODULE_LOADING_REPORT', string.format('%d. %' .. nMaxModule .. 's: %dms', i, p.szModule, p.nTime))
 	end
 	X.Log('MODULE_LOADING_REPORT', string.format('Top modules total loading time: %dms', nTopTime))
 end)
