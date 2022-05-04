@@ -59,7 +59,7 @@ local LOG_MAX_LINE = 5000
 local LOG_LINE_COUNT = 0
 local LOG_CACHE
 local LOG_PATH, LOG_DATE
-local LOG_TAG = (GetCurrentTime() - 8 * 60 * 60) % (24 * 60 * 60)
+local LOG_TAG = (GetCurrentTime() + 8 * 60 * 60) % (24 * 60 * 60)
 
 -- 输出一条日志到日志文件
 ---@vararg string 日志分类层级1, 日志分类层级2, 日志分类层级3, ..., 日志分类层级n, 日志内容
