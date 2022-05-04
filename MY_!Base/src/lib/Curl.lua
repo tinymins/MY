@@ -5,9 +5,9 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.Curl')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Curl')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 -- (void) X.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
@@ -615,4 +615,4 @@ function X.SignPostData(tData, szPassphrase)
 	return tData
 end
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

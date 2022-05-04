@@ -5,9 +5,9 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.InfoCache')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/InfoCache')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 local function DefaultValueComparer(v1, v2)
@@ -157,4 +157,4 @@ function X.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 	})
 end
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

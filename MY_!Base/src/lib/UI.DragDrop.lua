@@ -5,11 +5,11 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.UI.DragDrop')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/UI.DragDrop')
+--------------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = X.NSFormatString('{$NS}_DragDrop')
---------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
---------------------------------------------------------------------------------
 
 local DRAG_FRAME_NAME = X.NSFormatString('{$NS}_UI__Drag')
 local DROP_FRAME_NAME = X.NSFormatString('{$NS}_UI__Drop')
@@ -169,4 +169,4 @@ X.UI.CloseDragDrop = D.Close
 X.UI.GetDragDropData = D.GetData
 X.UI.SetDragDropHoverEl = D.SetHoverEl
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

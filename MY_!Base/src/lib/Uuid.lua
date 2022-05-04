@@ -5,9 +5,9 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.Uuid')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Uuid')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 --[[
@@ -114,4 +114,4 @@ end
 --
 X.GetUUID = getUUID
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

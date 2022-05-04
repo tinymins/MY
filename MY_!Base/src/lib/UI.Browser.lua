@@ -5,9 +5,9 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.UI.Browser')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/UI.Browser')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 local D = {}
@@ -280,4 +280,4 @@ X.UI.LookupBrowser = D.GetFrame
 X.UI.OpenBrowser = D.Open
 X.UI.CloseBrowser = D.Close
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

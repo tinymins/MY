@@ -10,9 +10,9 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.Xml')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Xml')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 local Log = Log or print
@@ -549,4 +549,4 @@ X.XMLSetNodeData = XMLSetNodeData
 -- (XMLNode[]) X.XMLGetNodeChildren(xml: XMLNode)
 X.XMLGetNodeChildren = XMLGetNodeChildren
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

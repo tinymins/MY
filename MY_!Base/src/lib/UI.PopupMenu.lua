@@ -5,13 +5,13 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.UI.PopupMenu')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/UI.PopupMenu')
+--------------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = X.NSFormatString('{$NS}_PopupMenu')
 local COLOR_TABLE_NAME = X.NSFormatString('{$NS}_ColorTable')
 local COLOR_PICKER_NAME = X.NSFormatString('{$NS}_ColorPickerEx')
---------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
---------------------------------------------------------------------------------
 
 local D = {}
 local SZ_INI = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/PopupMenu.ini'
@@ -748,4 +748,4 @@ end
 X.UI.PopupMenu = D.Open
 X.UI.ClosePopupMenu = D.Close
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
