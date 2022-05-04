@@ -65,7 +65,14 @@ local function OnKeyPanelBtnLButtonUp()
 	end
 	local aCRC = X.SplitString(aParam[2], ',')
 	local szCorrect = tostring(MD5(X.GetUserRoleName() .. X.SECRET['HASH::AUTH_KEY_CODE'])):sub(-6)
-	if not X.lodash.includes(aCRC, szCorrect) then
+	local bCorrect = false
+	for _, szCRC in ipairs(aCRC) do
+		if szCRC == szCorrect then
+			bCorrect = true
+			break
+		end
+	end
+	if not bCorrect then
 		return
 	end
 	local nExpire = tonumber(aParam[3] or '')

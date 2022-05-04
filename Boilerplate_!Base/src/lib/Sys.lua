@@ -885,21 +885,39 @@ function X.FormatDuration(nTime, tUnitFmt, tControl)
 	local mode = tControl and tControl.mode or 'normal'
 	-- 开始单位，最大只显示到该单位
 	local maxunit = tControl and tControl.maxunit or 'year'
-	local maxunitindex = X.lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == maxunit end)
+	local maxunitindex = -1
+	for i, v in ipairs(FORMAT_TIME_UNIT_LIST) do
+		if v.key == maxunit then
+			maxunitindex = i
+			break
+		end
+	end
 	if maxunitindex == -1 then
 		maxunitindex = 1
 		maxunit = FORMAT_TIME_UNIT_LIST[maxunitindex].key
 	end
 	-- 零值也保留的单位位置
 	local keepunit = tControl and tControl.keepunit or 'second'
-	local keepunitindex = X.lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == keepunit end)
+	local keepunitindex = -1
+	for i, v in ipairs(FORMAT_TIME_UNIT_LIST) do
+		if v.key == keepunit then
+			keepunitindex = i
+			break
+		end
+	end
 	if keepunitindex == -1 then
 		keepunitindex = #FORMAT_TIME_UNIT_LIST
 		keepunit = FORMAT_TIME_UNIT_LIST[keepunitindex].key
 	end
 	-- 精度结束单位，精度低于该单位的数据将被省去
 	local accuracy = tControl and tControl.accuracyunit or 'second'
-	local accuracyindex = X.lodash.findIndex(FORMAT_TIME_UNIT_LIST, function(v) return v.key == accuracy end)
+	local accuracyindex = -1
+	for i, v in ipairs(FORMAT_TIME_UNIT_LIST) do
+		if v.key == accuracy then
+			accuracyindex = i
+			break
+		end
+	end
 	if accuracyindex == -1 then
 		accuracyindex = #FORMAT_TIME_UNIT_LIST
 		accuracy = FORMAT_TIME_UNIT_LIST[accuracyindex].key

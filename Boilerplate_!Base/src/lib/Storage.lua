@@ -1247,13 +1247,19 @@ function X.SetRemoteStorage(szKey, ...)
 	local SetData = st.bForceOnline and SetOnlineAddonCustomData or SetAddonCustomData
 	local nPos = math.floor(st.nBitPos / BIT_NUMBER)
 	local nLen = math.floor((st.nBitPos + st.nBitNum - 1) / BIT_NUMBER) - nPos + 1
-	local aByte = X.lodash.map({GetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
+	local aByte = {GetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen)}
+	for i, v in ipairs(aByte) do
+		aByte[i] = Byte2Bit(v)
+	end
 	for nBitPos = st.nBitPos, st.nBitPos + st.nBitNum - 1 do
 		local nIndex = math.floor(nBitPos / BIT_NUMBER) - nPos + 1
 		local nOffset = nBitPos % BIT_NUMBER + 1
 		aByte[nIndex][nOffset] = aBit[nBitPos - st.nBitPos + 1]
 	end
-	SetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen, X.Unpack(X.lodash.map(aByte, Bit2Byte)))
+	for i, v in ipairs(aByte) do
+		aByte[i] = Bit2Byte(v)
+	end
+	SetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen, X.Unpack(aByte))
 
 	OnRemoteStorageChange(szKey)
 end
@@ -1267,7 +1273,10 @@ function X.GetRemoteStorage(szKey)
 	local GetData = st.bForceOnline and GetOnlineAddonCustomData or GetAddonCustomData
 	local nPos = math.floor(st.nBitPos / BIT_NUMBER)
 	local nLen = math.floor((st.nBitPos + st.nBitNum - 1) / BIT_NUMBER) - nPos + 1
-	local aByte = X.lodash.map({GetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen)}, Byte2Bit)
+	local aByte = {GetData(X.PACKET_INFO.NAME_SPACE, nPos, nLen)}
+	for i, v in ipairs(aByte) do
+		aByte[i] = Byte2Bit(v)
+	end
 	local aBit = {}
 	for nBitPos = st.nBitPos, st.nBitPos + st.nBitNum - 1 do
 		local nIndex = math.floor(nBitPos / BIT_NUMBER) - nPos + 1

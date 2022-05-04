@@ -134,8 +134,18 @@ local function CommonEventRegister(E, xArg1, xArg2, xArg3)
 			end
 		elseif X.IsArray(szEvent) then
 			if E.tList then
-				while X.lodash.some(szEvent, function(szEvent) return E.tList[szEvent] and E.tList[szEvent].tKey[tostring(szKey)] end) do
-					szKey = szKey + 1
+				while true do
+					local bExist = false
+					for _, szEvent in ipairs(szEvent) do
+						if E.tList[szEvent] and E.tList[szEvent].tKey[tostring(szKey)] then
+							bExist = true
+							szKey = szKey + 1
+							break
+						end
+					end
+					if not bExist then
+						break
+					end
 				end
 			end
 		end

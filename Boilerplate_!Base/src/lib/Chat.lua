@@ -1336,7 +1336,7 @@ local function GetRegisterChannelLimitTable()
 			[ROLE_TYPE.LITTLE_BOY     ] = 'LittleBoy'     ,
 			[ROLE_TYPE.LITTLE_GIRL    ] = 'LittleGirl'    ,
 		})[me.nRoleType])
-		local tTitle = X.lodash.filter({
+		local tTitle = {
 			{f = 'i', t = 'Level'},
 			{f = 'i', t = 'Experience'},
 			{f = 'i', t = 'Strength'},
@@ -1387,7 +1387,12 @@ local function GetRegisterChannelLimitTable()
 			{f = 'i', t = 'NearbyChannelDailyLimit'},
 			X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitByVIP'} or false,
 			X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'} or false,
-		}, function(item) return item end)
+		}
+		for i, v in X.ipairs_r(tTitle) do
+			if not v then
+				table.remove(tTitle, i)
+			end
+		end
 		m_LevelUpData = KG_Table.Load(path, tTitle, FILE_OPEN_MODE.NORMAL)
 	end
 	return m_LevelUpData
