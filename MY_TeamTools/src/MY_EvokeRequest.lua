@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_TeamTools/MY_EvokeRequest'
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_EvokeRequest.ini'
 local O = X.CreateUserSettingsModule('MY_EvokeRequest', _L['Raid'], {
@@ -264,3 +266,5 @@ function R.OnClear()
 end
 
 X.UI.RegisterRequest('MY_EvokeRequest', R)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

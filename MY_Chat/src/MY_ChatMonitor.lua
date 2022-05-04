@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Chat/MY_ChatMonitor'
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatMonitor'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 --[[
 	RECORD_LIST = {
@@ -646,3 +648,5 @@ function PS.OnPanelDeactive()
 end
 
 X.RegisterPanel(_L['Chat'], 'MY_ChatMonitor', _L['MY_ChatMonitor'], 'UI/Image/Minimap/Minimap.UITex|197', PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

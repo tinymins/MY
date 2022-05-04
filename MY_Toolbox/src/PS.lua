@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Toolbox/PS'
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
 do
@@ -89,3 +91,5 @@ function PS.OnPanelActive(wnd)
 	MY_DynamicItem.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 end
 X.RegisterPanel(_L['General'], 'MY_Toolbox', _L['MY_Toolbox'], 134, PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

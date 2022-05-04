@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Chat/MY_ChatMosaics'
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatMosaics'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	tIgnoreNames = { -- ºöÂÔÃûµ¥
@@ -314,3 +316,5 @@ function PS.OnPanelActive(wnd)
 end
 
 X.RegisterPanel(_L['Chat'], 'MY_Chat_ChatMosaics', _L['chat mosaics'], 'ui/Image/UICommon/yirong3.UITex|50', PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

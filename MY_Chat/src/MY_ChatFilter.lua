@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Chat/MY_ChatFilter'
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatFilter'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
@@ -258,3 +260,5 @@ function PS.OnPanelActive(wnd)
 end
 
 X.RegisterPanel(_L['Chat'], 'MY_DuplicateChatFilter', _L['duplicate chat filter'], 'ui/Image/UICommon/yirong3.UITex|104', PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

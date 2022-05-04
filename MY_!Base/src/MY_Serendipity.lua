@@ -8,6 +8,11 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/MY_Serendipity')
+--------------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
+
 local _L, D = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/my_serendipity/'), {}
 local O = {
 	bEnable     = X.SchemaGet(X.LoadLUAData({'config/show_notify.jx3dat'           , X.PATH_TYPE.GLOBAL}), X.Schema.Boolean, false),
@@ -477,3 +482,5 @@ local settings = {
 }
 MY_Serendipity = X.CreateModule(settings)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

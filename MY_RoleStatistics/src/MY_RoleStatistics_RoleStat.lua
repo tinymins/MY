@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_RoleStatistics/MY_RoleStatistics_RoleStat'
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_RoleStat'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/role/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 -------------------------------------------------------------------------------------------------------
 
 local STAT_DATA_FILE = {'userdata/role_statistics/role_stat.jx3dat', X.PATH_TYPE.GLOBAL}
@@ -1361,3 +1363,5 @@ local settings = {
 }
 MY_RoleStatistics_RoleStat = X.CreateModule(settings)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_TeamTools/MY_JB.PS'
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_JBBind'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/jx3box/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 X.RegisterRestriction('MY_TeamTools_JB', { ['*'] = false, classic = true })
 --------------------------------------------------------------------------
 
@@ -63,3 +65,5 @@ function PS.OnPanelActive(wnd)
 end
 
 X.RegisterPanel(_L['Raid'], 'MY_JX3BOX', _L['Team Platform'], 5962, PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

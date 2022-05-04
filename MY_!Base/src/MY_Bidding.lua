@@ -8,6 +8,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/MY_Bidding')
+--------------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
 
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/my_bidding/')
 local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/MY_Bidding.ini'
@@ -807,3 +811,5 @@ function MY_BiddingBase.OnItemLButtonClick()
 end
 
 X.RegisterAddonMenu('MY_Bidding', { szOption = _L['Create bidding'], fnAction = D.Open })
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

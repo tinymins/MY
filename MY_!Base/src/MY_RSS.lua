@@ -8,6 +8,8 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/MY_RSS')
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_!Base'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_!Base'
@@ -16,7 +18,8 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '*') then
 	return
 end
---------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
 local D = {}
 local RSS_FILE = {'temporary/rss.jx3dat', X.PATH_TYPE.GLOBAL}
 local RSS_DATA = X.LoadLUAData(RSS_FILE)
@@ -90,3 +93,5 @@ local settings = {
 }
 MY_RSS = X.CreateModule(settings)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

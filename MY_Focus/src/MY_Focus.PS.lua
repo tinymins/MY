@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Focus/MY_Focus.PS'
 local PLUGIN_NAME = 'MY_Focus'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Focus'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
 local PS = { szRestriction = 'MY_Focus' }
@@ -511,3 +513,5 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 end
 X.RegisterPanel(_L['Target'], 'MY_Focus', _L['Focus list'], 'ui/Image/button/SystemButton_1.UITex|9', PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

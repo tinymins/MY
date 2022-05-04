@@ -8,18 +8,19 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local Station, MY_IsVisibleBuff, MY_GetBuffName = Station, X.IsVisibleBuff,  X.GetBuffName
----------------------------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Cataclysm/MY_CataclysmMain'
 local PLUGIN_NAME = 'MY_Cataclysm'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 X.RegisterRestriction('MY_CataclysmMain__OfficialBuff', { ['*'] = true })
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local MY_IsVisibleBuff, MY_GetBuffName = X.IsVisibleBuff,  X.GetBuffName
 local D = {}
 local INI_ROOT = X.PACKET_INFO.ROOT .. 'MY_Cataclysm/ui/'
 local CFG = MY_Cataclysm.CFG
@@ -1384,3 +1385,5 @@ X.RegisterTutorial({
 		end,
 	},
 })
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

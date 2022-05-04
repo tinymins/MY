@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MYDev_Snaplines/MYDev_Snaplines'
 local PLUGIN_NAME = 'MYDev_Snaplines'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_Snaplines'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 -- Êý¾Ý´æ´¢
 --------------------------------------------------------------------------
@@ -556,3 +558,5 @@ if IsDebugClient and IsDebugClient() then
 		X.SetHotKey('MY_Dev_Snaplines_ShowData', 123)
 	end)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

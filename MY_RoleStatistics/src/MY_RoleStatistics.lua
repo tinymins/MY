@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_RoleStatistics/MY_RoleStatistics'
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
 local O = {}
@@ -417,3 +419,5 @@ function PS.OnPanelActive(wnd)
 	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['MY_RoleStatistics TIPS'], font = 27, multiline = true, alignVertical = 0 })
 end
 X.RegisterPanel(_L['General'], 'MY_RoleStatistics', _L['MY_RoleStatistics'], 13491, PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

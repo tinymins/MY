@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Toolbox/MY_ItemWiki'
 local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule('MY_ItemWiki', _L['General'], {
@@ -137,3 +139,5 @@ Box_AppendAddonMenu({function(box)
 	local nBookID = item.nGenre == ITEM_GENRE.BOOK and item.nBookID or -1
 	return {{ szOption = _L['Item wiki'], fnAction = function() D.Open(dwTabType, dwTabIndex, nBookID) end }}
 end})
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

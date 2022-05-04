@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_MiddleMapMark/MY_MiddleMapMark'
 local PLUGIN_NAME = 'MY_MiddleMapMark'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_MiddleMapMark'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 X.RegisterRestriction('MY_MiddleMapMark.MapRestriction', { ['*'] = true })
 --------------------------------------------------------------------------
 X.CreateDataRoot(X.PATH_TYPE.GLOBAL)
@@ -882,3 +884,5 @@ function PS.OnPanelResize(wnd)
 end
 
 X.RegisterPanel(_L['General'], 'MY_MiddleMapMark', _L['middle map mark'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

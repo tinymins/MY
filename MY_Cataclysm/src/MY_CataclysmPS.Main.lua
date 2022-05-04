@@ -8,15 +8,17 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Cataclysm/MY_CataclysmPS.Main'
 local PLUGIN_NAME = 'MY_Cataclysm'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
---------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
 local CFG, PS = MY_Cataclysm.CFG, { nPriority = 1 }
 
 function PS.OnPanelActive(frame)
@@ -351,3 +353,5 @@ function PS.OnPanelActive(frame)
 	nY = nY + 25
 end
 X.RegisterPanel(_L['Raid'], 'MY_Cataclysm', _L['Cataclysm'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

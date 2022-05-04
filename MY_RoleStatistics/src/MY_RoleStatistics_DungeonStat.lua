@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_RoleStatistics/MY_RoleStatistics_DungeonStat'
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_DungeonStat'
@@ -1315,3 +1316,5 @@ local settings = {
 }
 MY_RoleStatistics_DungeonStat = X.CreateModule(settings)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

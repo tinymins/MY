@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_LifeBar/MY_LifeBar_Official'
 local PLUGIN_NAME = 'MY_LifeBar'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 
 if IsLocalFileExist(X.FormatPath({'config/restriction/lifebar.jx3dat', X.PATH_TYPE.GLOBAL})) then
 	return
@@ -271,3 +273,5 @@ X.RegisterEvent({'PLAYER_ENTER_SCENE', 'NPC_ENTER_SCENE'}, 'MY_LifeBar', functio
 	X.DelayCall(200, function() ApplyCaption(dwID) end)
 	X.DelayCall(500, function() ApplyCaption(dwID) end)
 end)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

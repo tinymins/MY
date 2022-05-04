@@ -8,16 +8,18 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Cataclysm/MY_CataclysmPS.BuffMonitor'
 local PLUGIN_NAME = 'MY_Cataclysm'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Cataclysm'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 X.RegisterRestriction('MY_Cataclysm_BuffMonitor', { ['*'] = false, classic = true })
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local D = {
 	ReloadCataclysmPanel = MY_CataclysmMain.ReloadCataclysmPanel,
@@ -286,3 +288,5 @@ function PS.OnPanelDeactive()
 	l_list = nil
 end
 X.RegisterPanel(_L['Raid'], 'MY_Cataclysm_BuffMonitor', _L['Buff settings'], 'ui/Image/UICommon/RaidTotal.uitex|65', PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

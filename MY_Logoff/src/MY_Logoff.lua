@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Logoff/MY_Logoff'
 local PLUGIN_NAME = 'MY_Logoff'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Logoff'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule('MY_Logoff', _L['System'], {
@@ -228,3 +230,5 @@ X.RegisterHotKey('MY_LogOff_RUI_UNFIGHT', _L['Return to role list while not figh
 X.RegisterHotKey('MY_LogOff_RRL_UNFIGHT', _L['Return to game login while not fight'], function() Logoff(true, true) end, nil)
 X.RegisterHotKey('MY_LogOff_RUI_UNFIGHT_ALIVE', _L['Return to role list while not fight and not dead'], function() Logoff(false, true, true) end, nil)
 X.RegisterHotKey('MY_LogOff_RRL_UNFIGHT_ALIVE', _L['Return to game login while not fight and not dead'], function() Logoff(true, true, true) end, nil)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

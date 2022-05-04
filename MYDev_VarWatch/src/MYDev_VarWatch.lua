@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MYDev_VarWatch/MYDev_VarWatch'
 local PLUGIN_NAME = 'MYDev_VarWatch'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MYDev_VarWatch'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 local _C = {}
 local DATA_PATH = {'config/dev_varwatch.jx3dat', X.PATH_TYPE.GLOBAL}
@@ -131,3 +133,5 @@ X.RegisterPanel(_L['Development'], 'Dev_VarWatch', _L['VarWatch'], 'ui/Image/UIC
 		X.BreatheCall('DEV_VARWATCH', false)
 	end,
 })
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

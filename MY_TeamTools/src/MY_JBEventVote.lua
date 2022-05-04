@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_TeamTools/MY_JBEventVote'
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/jx3box/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 local INI_PATH = PLUGIN_ROOT .. '/ui/MY_JBEventVote.ini'
 local SZ_MOD_INI = PLUGIN_ROOT .. '/ui/MY_JBEventVote__Mod.ini'
@@ -408,3 +410,5 @@ local settings = {
 }
 MY_JBEventVote = X.CreateModule(settings)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

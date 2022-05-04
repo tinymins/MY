@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Force/MY_Force'
 local PLUGIN_NAME = 'MY_Force'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Force'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 X.RegisterRestriction('MY_Force', { ['*'] = false, classic = true })
 X.RegisterRestriction('MY_ForceGuding', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
@@ -438,3 +440,5 @@ function PS.OnPanelActive(frame)
 	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y)
 end
 X.RegisterPanel(_L['Target'], 'MY_Force', _L['MY_Force'], 327, PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

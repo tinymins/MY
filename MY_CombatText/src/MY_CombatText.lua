@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_CombatText/MY_CombatText'
 local PLUGIN_NAME = 'MY_CombatText'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_CombatText'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
 local GetSkill, Random = GetSkill, Random
@@ -1381,3 +1383,5 @@ X.RegisterEvent('MY_COMBATTEXT_MSG', 'MY_CombatText', function()
 	CombatText.OnCenterMsg(arg0, arg1, arg2)
 end)
 X.RegisterEvent('FIRST_LOADING_END', 'MY_CombatText', CombatText.CheckEnable)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- This file is part of the JX3 Mingyi Plugin.
+-- v is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
 -- @desc     : 团队监控远程数据
 -- @author   : 茗伊 @双梦镇 @追风蹑影
@@ -9,6 +9,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_RR'
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
@@ -17,6 +18,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
 local D = X.SetmetaLazyload({}, {
@@ -1046,3 +1048,5 @@ local settings = {
 }
 MY_TeamMon_RR = X.CreateModule(settings)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

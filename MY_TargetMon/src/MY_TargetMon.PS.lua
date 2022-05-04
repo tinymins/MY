@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_TargetMon/MY_TargetMon.PS'
 
 local PLUGIN_NAME = 'MY_TargetMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -17,6 +18,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 local C, D = {}, {
 	GetTargetTypeList  = MY_TargetMonConfig.GetTargetTypeList ,
@@ -1239,3 +1241,5 @@ function PS.OnPanelScroll(wnd, scrollX, scrollY)
 	wnd:Lookup('WndWindow_Wrapper'):SetRelPos(scrollX, scrollY)
 end
 X.RegisterPanel(_L['Target'], 'MY_TargetMon', _L['Target monitor'], 'ui/Image/ChannelsPanel/NewChannels.UITex|141', PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

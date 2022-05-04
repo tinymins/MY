@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_TeamTools/MY_TeamTools.PS'
 local PLUGIN_NAME = 'MY_TeamTools'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamTools'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 X.RegisterRestriction('MY_WorldMark', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 local PS = { nPriority = 0 }
@@ -79,3 +81,5 @@ function PS.OnPanelActive(wnd)
 	nX, nY = MY_TeamRestore.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 end
 X.RegisterPanel(_L['Raid'], 'MY_TeamTools', _L['MY_TeamTools'], 5962, PS)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

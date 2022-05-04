@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_RoleStatistics/MY_RoleStatistics_SerendipityStat'
 local PLUGIN_NAME = 'MY_RoleStatistics'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_RoleStatistics_SerendipityStat'
@@ -16,6 +17,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^11.0.0') then
 	return
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
 local SERENDIPITY_LIST, MAP_POINT_LIST = unpack(X.LoadLUAData(PLUGIN_ROOT .. '/data/serendipity/{$edition}.jx3dat', { passphrase = false }) or {})
@@ -1605,3 +1607,5 @@ local settings = {
 }
 MY_RoleStatistics_SerendipityStat = X.CreateModule(settings)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

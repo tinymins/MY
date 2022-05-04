@@ -8,6 +8,8 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/MY_ShareKnowledge')
+--------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_!Base'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_!Base'
@@ -16,7 +18,8 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '*') then
 	return
 end
---------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
 
 ---------------
 -- 系统事件
@@ -420,3 +423,5 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_ShareKnowledge__Sysmsg', function(szChannel,
 	NEXT_AWAKE_TIME = GetTime() + FREQUENCY_LIMIT
 end)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
