@@ -226,6 +226,54 @@ function D.GetSerendipityInfo(dwTabType, dwIndex)
 	end
 end
 
+local FETCH_CACHE = {}
+function D.Fetch(szName, fnAction)
+	if not X.IsString(szName) then
+		szName, fnAction = X.GetClientInfo().szName, szName
+	end
+	if FETCH_CACHE[szName] then
+		fnAction(X.Clone(FETCH_CACHE[szName]))
+		return
+	end
+	local szNameU = AnsiToUTF8(szName)
+	local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
+	local qs = X.ConvertToAnsi(X.SignPostData(X.ConvertToUTF8(
+		{
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
+			S = X.GetRealServer(1),
+			s = X.GetRealServer(2),
+			n = szName,
+			N = szNameCRC,
+		}),
+		X.KGUIEncrypt(X.SECRET['J3CX::SERENDIPITY'])
+	))
+	X.Ajax({
+		url = 'https://pull.j3cx.com/api/serendipity',
+		data = {
+			server = X.GetRealServer(2),
+			role = szName,
+			serendipity = '',
+			cert = table.concat({qs._c, qs._t, qs.L, qs.l, qs.n, qs.N, qs.S, qs.s}, '|'),
+		},
+		success = function(szHTML)
+			local res = X.DecodeJSON(szHTML)
+			if not res then
+				return
+			end
+			local aList = {}
+			for _, p in ipairs(X.Get(res, {'data', 'data'}, {})) do
+				table.insert(aList, {
+					szSerendipity = p.serendipity,
+					dwTime = p.time,
+				})
+			end
+			FETCH_CACHE[szName] = aList
+			fnAction(X.Clone(FETCH_CACHE[szName]))
+		end,
+	})
+end
+
 X.RegisterMsgMonitor('MSG_SYS', 'QIYU', function(szChannel, szMsg, nFont, bRich, r, g, b)
 	local me = GetClientPlayer()
 	if not me then
@@ -374,6 +422,12 @@ local settings = {
 				'bSilentMode',
 			},
 			root = O,
+		},
+		{
+			fields = {
+				'Fetch',
+			},
+			root = D,
 		},
 	},
 	imports = {
