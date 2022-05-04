@@ -203,17 +203,17 @@ function X.Ajax(settings)
 	-- log
 	X.Log(
 		'AJAX',
-		config.url .. ' - ' .. config.driver .. '/' .. config.method
+		xurl .. ' - ' .. config.driver .. '/' .. config.method
 			.. ' (' .. driver .. '/' .. method .. ')'
-			.. (config.data and (' [BODY]' .. X.EncodeQuerystring(config.data) .. '[/BODY]') or '')
+			.. (xdata and (' [BODY]' .. X.EncodeQuerystring(xdata) .. '[/BODY]') or '')
 	)
 	--[[#DEBUG BEGIN]]
 	X.Debug(
 		'AJAX',
-		config.url .. ' - ' .. config.driver .. '/' .. config.method
+		xurl .. ' - ' .. config.driver .. '/' .. config.method
 			.. ' (' .. driver .. '/' .. method .. ')'
 			.. ': PREPARE READY'
-			.. (config.data and ('\n[BODY]' .. X.EncodeQuerystring(config.data) .. '[/BODY]') or ''),
+			.. (xdata and ('\n[BODY]' .. X.EncodeQuerystring(xdata) .. '[/BODY]') or ''),
 		X.DEBUG_LEVEL.LOG
 	)
 	--[[#DEBUG END]]
