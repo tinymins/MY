@@ -677,15 +677,32 @@ function X.RegisterUserSettings(szKey, tOption)
 	if not szVersion then
 		szVersion = ''
 	end
-	local szErrHeader = 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): '
-	assert(X.IsString(szKey) and #szKey > 0, szErrHeader .. '`Key` should be a non-empty string value.')
-	assert(not USER_SETTINGS_INFO[szKey], szErrHeader .. 'duplicated `Key` found.')
-	assert(X.IsString(szDataKey) and #szDataKey > 0, szErrHeader .. '`DataKey` should be a non-empty string value.')
-	assert(not X.lodash.some(USER_SETTINGS_INFO, function(p) return p.szDataKey == szDataKey and p.ePathType == ePathType end), szErrHeader .. 'duplicated `DataKey` + `PathType` found.')
-	assert(X.lodash.includes(DATABASE_TYPE_LIST, ePathType), szErrHeader .. '`PathType` value is not valid.')
-	assert(X.IsNil(szGroup) or (X.IsString(szGroup) and #szGroup > 0), szErrHeader .. '`Group` should be nil or a non-empty string value.')
-	assert(X.IsNil(szLabel) or (X.IsString(szLabel) and #szLabel > 0), szErrHeader .. '`Label` should be nil or a non-empty string value.')
-	assert(X.IsString(szVersion), szErrHeader .. '`Version` should be a string value.')
+	if not X.IsString(szKey) or szKey == '' then
+		assert(false, 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `Key` should be a non-empty string value.')
+	end
+	if USER_SETTINGS_INFO[szKey] then
+		assert(false, 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): duplicated `Key` found.')
+	end
+	if not X.IsString(szDataKey) or szDataKey == '' then
+		assert(false, 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `DataKey` should be a non-empty string value.')
+	end
+	for k, p in pairs(USER_SETTINGS_INFO) do
+		if p.szDataKey == szDataKey and p.ePathType == ePathType then
+			assert(false, 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): duplicated `DataKey` + `PathType` found.')
+		end
+	end
+	if not DATABASE_TYPE_HASH[ePathType] then
+		assert(false, 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `PathType` value is not valid.')
+	end
+	if not X.IsNil(szGroup) and (not X.IsString(szGroup) or szGroup == '') then
+		assert(false, 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `Group` should be nil or a non-empty string value.')
+	end
+	if not X.IsNil(szLabel) and (not X.IsString(szLabel) or szLabel == '') then
+		assert(false, 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `Label` should be nil or a non-empty string value.')
+	end
+	if not X.IsString(szVersion) then
+		assert(false, 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `Version` should be a string value.')
+	end
 	if xSchema then
 		local errs = X.Schema.CheckSchema(xDefaultValue, xSchema)
 		if errs then
@@ -778,18 +795,27 @@ function X.GetUserSettings(szKey, ...)
 	end
 	-- 参数检查
 	local nParameter = select('#', ...) + 1
-	local szErrHeader = 'GetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
-	assert(info, szErrHeader ..'`Key` has not been registered.')
+	if not info then
+		assert(false, 'GetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `Key` has not been registered.')
+	end
 	local inst = DATABASE_INSTANCE[info.ePathType]
-	assert(inst, szErrHeader ..'Database not connected.')
+	if not inst then
+		assert(false, 'GetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): Database not connected.')
+	end
 	local szDataSetKey
 	if info.bDataSet then
-		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
+		if nParameter ~= 2 then
+			assert(false, 'GetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): 2 parameters expected, got ' .. nParameter)
+		end
 		szDataSetKey = ...
-		assert(X.IsString(szDataSetKey) or X.IsNumber(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number value.')
+		if not X.IsString(szDataSetKey) and not X.IsNumber(szDataSetKey) then
+			assert(false, 'GetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `DataSetKey` should be a string or number value.')
+		end
 	else
-		assert(nParameter == 1, szErrHeader .. '1 parameters expected, got ' .. nParameter)
+		if nParameter ~= 1 then
+			assert(false, 'GetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): 1 parameter expected, got ' .. nParameter)
+		end
 	end
 	-- 读数据库
 	local res, bData = GetInstanceInfoData(inst, info), false
@@ -838,24 +864,33 @@ end
 function X.SetUserSettings(szKey, ...)
 	-- 参数检查
 	local nParameter = select('#', ...) + 1
-	local szErrHeader = 'SetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
-	assert(info, szErrHeader .. '`Key` has not been registered.')
+	if not info then
+		assert(false, 'SetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `Key` has not been registered.')
+	end
 	local inst = DATABASE_INSTANCE[info.ePathType]
 	if not inst and X.IsDebugClient() then
-		X.Debug(X.PACKET_INFO.NAME_SPACE, szErrHeader .. 'Database not connected!!!', X.DEBUG_LEVEL.WARNING)
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'SetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): Database not connected!!!', X.DEBUG_LEVEL.WARNING)
 		return false
 	end
-	assert(inst, szErrHeader .. 'Database not connected.')
+	if not inst then
+		assert(false, 'SetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): Database not connected.')
+	end
 	local cache = DATA_CACHE[szKey]
 	local szDataSetKey, xValue
 	if info.bDataSet then
-		assert(nParameter == 3, szErrHeader .. '3 parameters expected, got ' .. nParameter)
+		if nParameter ~= 3 then
+			assert(false, 'SetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): 3 parameters expected, got ' .. nParameter)
+		end
 		szDataSetKey, xValue = ...
-		assert(X.IsString(szDataSetKey) or X.IsNumber(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number value.')
+		if not X.IsString(szDataSetKey) and not X.IsNumber(szDataSetKey) then
+			assert(false, 'SetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `DataSetKey` should be a string or number value.')
+		end
 		cache = cache and cache[szDataSetKey]
 	else
-		assert(nParameter == 2, szErrHeader .. '2 parameters expected, got ' .. nParameter)
+		if nParameter ~= 2 then
+			assert(false, 'SetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): 2 parameters expected, got ' .. nParameter)
+		end
 		xValue = ...
 	end
 	if cache and cache[1] == DATA_CACHE_LEAF_FLAG and X.IsEquals(cache[3], xValue) then
@@ -869,7 +904,7 @@ function X.SetUserSettings(szKey, ...)
 			for i, err in ipairs(errs) do
 				table.insert(aErrmsgs, i .. '. ' .. err.message)
 			end
-			assert(false, szErrHeader .. '' .. szKey .. ', schema check failed.\n' .. table.concat(aErrmsgs, '\n'))
+			assert(false, 'SetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): ' .. szKey .. ', schema check failed.\n' .. table.concat(aErrmsgs, '\n'))
 		end
 	end
 	-- 写数据库
@@ -919,18 +954,27 @@ end
 function X.ResetUserSettings(szKey, ...)
 	-- 参数检查
 	local nParameter = select('#', ...) + 1
-	local szErrHeader = 'ResetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): '
 	local info = USER_SETTINGS_INFO[szKey]
-	assert(info, szErrHeader .. '`Key` has not been registered.')
+	if not info then
+		assert(false, 'ResetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `Key` has not been registered.')
+	end
 	local inst = DATABASE_INSTANCE[info.ePathType]
-	assert(inst, szErrHeader .. 'Database not connected.')
+	if not inst then
+		assert(false, 'ResetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): Database not connected.')
+	end
 	local szDataSetKey
 	if info.bDataSet then
-		assert(nParameter == 1 or nParameter == 2, szErrHeader .. '1 or 2 parameter(s) expected, got ' .. nParameter)
+		if nParameter ~= 1 and nParameter ~= 2 then
+			assert(false, 'ResetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): 1 or 2 parameter(s) expected, got ' .. nParameter)
+		end
 		szDataSetKey = ...
-		assert(X.IsString(szDataSetKey) or X.IsNumber(szDataSetKey) or X.IsNil(szDataSetKey), szErrHeader ..'`DataSetKey` should be a string or number or nil value.')
+		if not X.IsString(szDataSetKey) and not X.IsNumber(szDataSetKey) and not X.IsNil(szDataSetKey) then
+			assert(false, 'ResetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `DataSetKey` should be a string or number or nil value.')
+		end
 	else
-		assert(nParameter == 1, szErrHeader .. '1 parameters expected, got ' .. nParameter)
+		if nParameter ~= 1 then
+			assert(false, 'ResetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): 1 parameter expected, got ' .. nParameter)
+		end
 	end
 	-- 写数据库
 	if info.bDataSet then
