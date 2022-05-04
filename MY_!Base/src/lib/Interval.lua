@@ -68,7 +68,9 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 					szKey = tostring(szKey)
 				end
 			end
-			assert(X.IsString(szKey), 'IntervalCall Key MUST be string.')
+			if not X.IsString(szKey) then
+				assert(false, 'IntervalCall Key MUST be string.')
+			end
 			local szNSKey = NS_PREFIX .. szKey
 			local aRetVal = bUnreg
 				and X.Pack(IntervalCall(szNSKey, false))

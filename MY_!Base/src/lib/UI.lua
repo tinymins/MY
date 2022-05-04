@@ -2334,7 +2334,9 @@ local _nTempWndCount = 0
 -- Instance:Append(szXml)
 -- Instance:Append(szType[, tArg | szName])
 function OO:Append(arg0, arg1)
-	assert(X.IsString(arg0))
+	if not X.IsString(arg0) then
+		assert(false, 'UI:Append() need a string as first argument')
+	end
 	if #arg0 == 0 then
 		return
 	end
@@ -3347,7 +3349,9 @@ function OO:Columns(aColumns)
 					local nFixedLColumnsWidth, nFixedRColumnsWidth = 0, 0
 					for nIndex, col in ipairs(aColumns) do
 						if col.fixed == true or col.fixed == 'left' then
-							assert(X.IsNumber(col.width), 'fixed column width is required')
+							if not X.IsNumber(col.width) then
+								assert(false, 'fixed column width is required')
+							end
 							nFixedLColumnsWidth = nFixedLColumnsWidth + col.width
 							nFixedLIndex = nIndex
 						else
@@ -3356,7 +3360,9 @@ function OO:Columns(aColumns)
 					end
 					for nIndex, col in X.ipairs_r(aColumns) do
 						if col.fixed == 'right' then
-							assert(X.IsNumber(col.width), 'fixed column width is required')
+							if not X.IsNumber(col.width) then
+								assert(false, 'fixed column width is required')
+							end
 							nFixedRColumnsWidth = nFixedRColumnsWidth + col.width
 							nFixedRIndex = nIndex
 						else

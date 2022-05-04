@@ -43,7 +43,13 @@ function D.Open(bImport)
 	local aGroup, tItemAll = {}, {}
 	for _, us in ipairs(X.GetRegisterUserSettingsList()) do
 		if us.szGroup and us.szLabel and (not bImport or tSettings[us.szKey]) then
-			local tGroup = X.lodash.find(aGroup, function(p) return p.szGroup == us.szGroup end)
+			local tGroup
+			for _, v in ipairs(aGroup) do
+				if v.szGroup == us.szGroup then
+					tGroup = v
+					break
+				end
+			end
 			if not tGroup then
 				tGroup = {
 					szGroup = us.szGroup,
@@ -51,7 +57,13 @@ function D.Open(bImport)
 				}
 				table.insert(aGroup, tGroup)
 			end
-			local tItem = X.lodash.find(tGroup.aItem, function(p) return p.szLabel == us.szLabel end)
+			local tItem
+			for _, v in ipairs(tGroup.aItem) do
+				if v.szLabel == us.szLabel then
+					tItem = v
+					break
+				end
+			end
 			if not tItem then
 				tItem = {
 					szID = X.StringReplaceW(X.GetUUID(), '-', ''),
@@ -138,7 +150,10 @@ function D.Open(bImport)
 					return
 				end
 				tKvp = X.ExportUserSettings(aKey)
-				local nExport = X.lodash.size(tKvp)
+				local nExport = 0
+				for _ in pairs(tKvp) do
+					nExport = nExport + 1
+				end
 				if nExport == 0 then
 					X.Systopmsg(_L['No custom setting found, nothing to export.'], X.CONSTANT.MSG_THEME.ERROR)
 					return

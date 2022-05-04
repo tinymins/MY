@@ -133,7 +133,9 @@ local UNIT = {
 	CALL = '',
 }
 function D.GetRankString(key)
-	assert(key == 'TIME' or key == 'CALL')
+	if key ~= 'TIME' and key ~= 'CALL' then
+		assert(false, 'invalid key')
+	end
 	local res = {}
 	local count = 0
 	local found = false

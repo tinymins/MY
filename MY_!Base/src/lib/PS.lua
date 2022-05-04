@@ -208,7 +208,13 @@ function X.SwitchTab(szKey, bForceUpdate)
 	if not frame then
 		return
 	end
-	local tTab = X.lodash.find(PANEL_TAB_LIST, function(tTab) return tTab.szKey == szKey end)
+	local tTab
+	for _, t in ipairs(PANEL_TAB_LIST) do
+		if t.szKey == szKey then
+			tTab = t
+			break
+		end
+	end
 	if not tTab then
 		--[[#DEBUG BEGIN]]
 		if not tTab then
@@ -304,10 +310,19 @@ end
 -- Ex： X.RegisterPanel('测试', 'Test', '测试标签', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd) end })
 function X.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 	-- 分类不存在则创建
-	if not options.bHide and not X.lodash.find(PANEL_CATEGORY_LIST, function(tCategory) return tCategory.szName == szCategory end) then
-		table.insert(PANEL_CATEGORY_LIST, {
-			szName = szCategory,
-		})
+	if not options.bHide then
+		local bExist = false
+		for _, v in ipairs(PANEL_CATEGORY_LIST) do
+			if v.szName == szCategory then
+				bExist = true
+				break
+			end
+		end
+		if not bExist then
+			table.insert(PANEL_CATEGORY_LIST, {
+				szName = szCategory,
+			})
+		end
 	end
 	-- 移除已存在的
 	for i, tTab in ipairs(PANEL_TAB_LIST) do
@@ -374,7 +389,14 @@ function D.RedrawCategory(frame, szCategory)
 	local container = frame:Lookup('Wnd_Total/WndContainer_Category')
 	container:Clear()
 	for _, tCategory in ipairs(PANEL_CATEGORY_LIST) do
-		if X.lodash.some(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == tCategory.szName and not tTab.bHide and not IsTabRestricted(tTab) end) then
+		local bExist = false
+		for _, tTab in ipairs(PANEL_TAB_LIST) do
+			if tTab.szCategory == tCategory.szName and not tTab.bHide and not IsTabRestricted(tTab) then
+				bExist = true
+				break
+			end
+		end
+		if bExist then
 			local chkCategory = container:AppendContentFromIni(INI_PATH, 'CheckBox_Category')
 			if not szCategory then
 				szCategory = tCategory.szName
@@ -408,8 +430,21 @@ function D.RedrawTabs(frame, szCategory)
 		end
 	end
 	scroll:FormatAllItemPos()
-	local tWelcomeTab = X.lodash.find(PANEL_TAB_LIST, function(tTab) return tTab.szCategory == szCategory and tTab.bWelcome and not IsTabRestricted(tTab) end)
-		or X.lodash.find(PANEL_TAB_LIST, function(tTab) return not tTab.szCategory and tTab.bWelcome and not IsTabRestricted(tTab) end)
+	local tWelcomeTab
+	for _, tTab in ipairs(PANEL_TAB_LIST) do
+		if tTab.szCategory == szCategory and tTab.bWelcome and not IsTabRestricted(tTab) then
+			tWelcomeTab = tTab
+			break
+		end
+	end
+	if not tWelcomeTab then
+		for _, tTab in ipairs(PANEL_TAB_LIST) do
+			if not tTab.szCategory and tTab.bWelcome and not IsTabRestricted(tTab) then
+				tWelcomeTab = tTab
+				break
+			end
+		end
+	end
 	if tWelcomeTab then
 		X.SwitchTab(tWelcomeTab.szKey)
 	end

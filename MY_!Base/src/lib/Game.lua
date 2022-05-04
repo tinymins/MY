@@ -2991,7 +2991,11 @@ function X.GetOTActionState(...)
 	if X.IsNil(bNewAPI) then
 		local eType = X.GetObjectType(KObject)
 		if eType == 'PLAYER' or eType == 'NPC' then
-			bNewAPI = pcall(function() assert(KObject.GetSkillOTActionState) end)
+			bNewAPI = pcall(function()
+				if not KObject.GetSkillOTActionState then
+					assert(false)
+				end
+			end)
 		end
 	end
 	if bNewAPI then

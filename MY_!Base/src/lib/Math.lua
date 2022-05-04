@@ -124,7 +124,9 @@ end
 
 -- 格式化数字为指定进制下的字符串表示
 function X.NumberBaseN(n, b, digits)
-	assert(X.IsNumber(n) and not X.IsHugeNumber(n), 'Input must be a no huge number value.')
+	if not X.IsNumber(n) or not X.IsHugeNumber(n) then
+		assert(false, 'Input must be a number value except `math.huge`.')
+	end
 	n = math.floor(n)
 	if not b or b == 10 then
 		return tostring(n)
@@ -132,7 +134,9 @@ function X.NumberBaseN(n, b, digits)
 	if not digits then
 		digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 	end
-	assert(b <= #digits, 'Number base can not be larger than digits length.')
+	if b > #digits then
+		assert(false, 'Number base can not be larger than digits length.')
+	end
 	local t = {}
 	local sign = ''
 	if n < 0 then
@@ -150,7 +154,9 @@ end
 -- 物理地址 => 段地址 + 段内偏移
 function X.NumberToSegment(n, s)
 	-- (!(n & (n - 1)))
-	assert(X.IsNumber(s) and s > 0 and X.NumberBitAnd(s, s - 1) == 0, 'segment size must be a positive number and be power of 2')
+	if not X.IsNumber(s) or s <= 0 or X.NumberBitAnd(s, s - 1) ~= 0 then
+		assert(false, 'segment size must be a positive number and be power of 2')
+	end
 	if s == 0x20 and GlobelRecipeID2BookID then
 		local n, o = GlobelRecipeID2BookID(n)
 		if n and o then
@@ -163,7 +169,9 @@ end
 -- 段地址 + 段内偏移 => 物理地址
 function X.SegmentToNumber(n, o, s)
 	-- (!(n & (n - 1)))
-	assert(X.IsNumber(s) and s > 0 and X.NumberBitAnd(s, s - 1) == 0, 'segment size must be a positive number and be power of 2')
+	if not X.IsNumber(s) or s <= 0 or X.NumberBitAnd(s, s - 1) ~= 0 then
+		assert(false, 'segment size must be a positive number and be power of 2')
+	end
 	if s == 0x20 and BookID2GlobelRecipeID then
 		local n = BookID2GlobelRecipeID(n + 1, o + 1)
 		if n then
