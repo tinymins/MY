@@ -26,36 +26,13 @@ end
 -- 寄忧谷 -- 下一次有五倍几率砸中年兽陶罐
 -- 醉生 -- 下一次砸年兽陶罐失败则不损失积分
 
-local FILTER_ITEM = {
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6072), bFilter = true }, -- 鞭炮
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6069), bFilter = true }, -- 火树银花
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6068), bFilter = true }, -- 龙凤呈祥
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6067), bFilter = true }, -- 彩云逐月
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6076), bFilter = true }, -- 熠熠生辉
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6073), bFilter = true }, -- 焰火棒
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6070), bFilter = true }, -- 窜天猴
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6077), bFilter = true }, -- 彩云逐月
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 8025, 1168), bFilter = true }, -- 剪纸：龙腾
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 8025, 1170), bFilter = true }, -- 剪纸：凤舞
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6066), bFilter = true }, -- 元宝灯
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6067), bFilter = true }, -- 桃花灯
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6024), bFilter = true }, -- 年年有鱼灯
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6048), bFilter = false }, -- 桃木牌·马
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6049), bFilter = true }, -- 桃木牌·年
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6050), bFilter = true }, -- 桃木牌·吉
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6051), bFilter = true }, -- 桃木牌·祥
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6200), bFilter = true }, -- 图样：彩云逐月
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6203), bFilter = true }, -- 图样：熠熠生辉
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6258), bFilter = false }, -- 监本印文兑换券
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 31599), bFilter = false }, -- 战魂佩
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 30692), bFilter = false }, -- 豪侠贡
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 20959), bFilter = false }, -- 年兽陶罐
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6027), bFilter = false }, -- 幸运香囊
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6030), bFilter = false }, -- 幸运锦囊
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6028), bFilter = false }, -- 如意香囊
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6031), bFilter = false }, -- 如意锦囊
-	{ szName = X.GetObjectName('ITEM_INFO', 5, 6043), bFilter = false }, -- 锁住的月光宝盒
-}
+local FILTER_ITEM = {}
+do
+	local data = X.LoadLUAData(PLUGIN_ROOT .. '/data/taoguan/{$lang}.jx3dat')
+	if X.IsTable(data.FILTER_ITEM) then
+		FILTER_ITEM = data.FILTER_ITEM
+	end
+end
 local FILTER_ITEM_DEFAULT = {}
 for _, p in ipairs(FILTER_ITEM) do
 	FILTER_ITEM_DEFAULT[p.szName] = p.bFilter
