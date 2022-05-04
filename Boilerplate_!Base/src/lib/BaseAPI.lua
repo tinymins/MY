@@ -153,11 +153,12 @@ function X.ErrorLog(...)
 end
 
 --[[#DEBUG BEGIN]]
-local MODULE_TIME = {}
+local MODULE_TIME, MODULE_TOTAL_TIME = {}, 0
 RegisterEvent('LOADING_END', function()
 	for szModule, _ in pairs(MODULE_TIME) do
 		X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" missing log finish!!!')
 	end
+	X.Log('MODULE_LOADING_REPORT', 'All modules loaded during ' .. MODULE_TOTAL_TIME .. 'ms.')
 end)
 --[[#DEBUG END]]
 -- 脚本加载性能监控
@@ -174,8 +175,10 @@ function X.ReportModuleLoading(szModule, szStatus)
 		end
 	elseif szStatus == 'FINISH' then
 		if MODULE_TIME[szModule] then
-			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" loaded during ' .. (GetTime() - MODULE_TIME[szModule]) .. 'ms.')
+			local nTime = GetTime() - MODULE_TIME[szModule]
 			MODULE_TIME[szModule] = nil
+			MODULE_TOTAL_TIME = MODULE_TOTAL_TIME + nTime
+			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" loaded during ' .. nTime .. 'ms.')
 		else
 			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" not exist!!!')
 		end
