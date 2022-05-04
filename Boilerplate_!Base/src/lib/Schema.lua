@@ -6,9 +6,9 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.Schema')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Schema')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 --[[
@@ -675,4 +675,4 @@ function X.SchemaGet(data, schemaVal, defaultVal)
     return data
 end
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

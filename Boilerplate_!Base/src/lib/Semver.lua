@@ -5,9 +5,9 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.Semver')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Semver')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------------
@@ -383,4 +383,4 @@ semver._VERSION= semver(semver._VERSION)
 
 X.Semver = semver
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

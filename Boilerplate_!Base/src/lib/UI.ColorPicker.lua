@@ -5,11 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.UI.ColorPicker')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/UI.ColorPicker')
+--------------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
---------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 -- 打开取色板
@@ -215,4 +215,4 @@ function X.UI.OpenColorPickerEx(fnAction)
 	return wnd
 end
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

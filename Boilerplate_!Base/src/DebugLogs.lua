@@ -5,9 +5,9 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}_DebugLogs')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/DebugLogs')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 X.RegisterEvent('OPEN_WINDOW', X.NSFormatString('{$NS}_DebugLogs'), function()
@@ -46,4 +46,4 @@ X.RegisterMsgMonitor('MSG_NPC_NEARBY', X.NSFormatString('{$NS}_DebugLogs'), func
 	X.Log('== MSG INFO END ==')
 end)
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

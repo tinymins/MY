@@ -5,9 +5,9 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.String')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/String')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 local AnsiToUTF8 = AnsiToUTF8 or _G.ansi_to_utf8
@@ -433,4 +433,4 @@ function X.FormatCharCodeString(s, m)
 	return table.concat(a, ', ')
 end
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

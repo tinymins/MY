@@ -5,11 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}_PS.UISample')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/PS.UISample')
+--------------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
---------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local COMPONENT_H = 25
@@ -277,4 +277,4 @@ end
 
 X.RegisterPanel(_L['Development'], 'UISample', _L['UI SAMPLE'], '', PS)
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

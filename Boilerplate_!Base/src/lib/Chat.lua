@@ -5,11 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.Chat')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Chat')
+--------------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
---------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local RENDERED_FLAG_KEY = X.NSFormatString('b{$NS}ChatRendered')
@@ -1627,4 +1627,4 @@ end, {
 	PLAYER_TALK_CHANNEL.TONG_ALLIANCE,
 })
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -5,11 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}_UIFindStation')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/UIFindStation')
+--------------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. '/lang/devs/')
---------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local O = {
@@ -201,4 +201,4 @@ end
 
 X.RegisterPanel(_L['Development'], 'Dev_UIFindStation', _L['Dev_UIFindStation'], 2791, PS)
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -5,11 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}_PS.GlobalConfig')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/PS.GlobalConfig')
+--------------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/ps/')
---------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local PS = {}
@@ -227,4 +227,4 @@ end
 
 X.RegisterPanel(_L['System'], 'GlobalConfig', _L['GlobalConfig'], 'ui\\Image\\Minimap\\Minimap.UITex|181', PS)
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

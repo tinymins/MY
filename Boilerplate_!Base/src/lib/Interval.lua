@@ -5,9 +5,9 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.Interval')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Interval')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------
@@ -665,4 +665,4 @@ function X.FinallyThrottle(...)
 	end
 end
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

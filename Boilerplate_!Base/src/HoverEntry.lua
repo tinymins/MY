@@ -5,13 +5,14 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/HoverEntry')
+--------------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}_HoverEntry')
 local PLUGIN_NAME = X.NSFormatString('{$NS}_HoverEntry')
 local PLUGIN_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT
-local MODULE_NAME = X.NSFormatString('{$NS}_HoverEntry')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/hoverentry/')
---------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
---------------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	bEnable = {
@@ -165,4 +166,4 @@ local settings = {
 _G[FRAME_NAME] = X.CreateModule(settings)
 end
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

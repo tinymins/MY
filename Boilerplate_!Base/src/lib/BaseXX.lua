@@ -8,9 +8,9 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.BaseXX')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/BaseXX')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
@@ -326,4 +326,4 @@ X.EncodeUrl64 = basexx.to_url64
 X.DecodeZ85 = basexx.from_z85
 X.EncodeZ85 = basexx.to_z85
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -5,9 +5,9 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_NAME = X.NSFormatString('{$NS}.Math')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Math')
 --------------------------------------------------------------------------------
-X.ReportModuleLoading(MODULE_NAME, 'START')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
 -- (table) X.Number2Bitmap(number n)
@@ -184,4 +184,4 @@ function X.SegmentToRecipeID(dwSegmentID, dwOffset)
 	return X.SegmentToNumber(dwSegmentID - 1, dwOffset - 1, 0x20)
 end
 
-X.ReportModuleLoading(MODULE_NAME, 'FINISH')
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
