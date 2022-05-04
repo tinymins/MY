@@ -120,7 +120,9 @@ local function CommonEventRegister(E, xArg1, xArg2, xArg3)
 			eAction, szEvent = 'FIND', xArg1
 		end
 	end
-	assert(eAction, 'Parameters type not recognized, cannot infer action type.')
+	if not eAction then
+		assert(false, 'Parameters type not recognized, cannot infer action type.')
+	end
 	-- 匿名注册分配随机标识符
 	if eAction == 'REG' and not X.IsString(szKey) then
 		szKey = GetTickCount() * 1000

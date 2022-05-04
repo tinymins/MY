@@ -878,7 +878,9 @@ function X.FormatDuration(nTime, tUnitFmt, tControl)
 	if X.IsString(tUnitFmt) then
 		tUnitFmt = FORMAT_TIME_COUNT_PRESET[tUnitFmt]
 	end
-	assert(X.IsTable(tUnitFmt))
+	if not X.IsTable(tUnitFmt) then
+		assert(false, X.NSFormatString('{$NS}.FormatDuration: invalid UnitFormat.'))
+	end
 	-- 格式化模式
 	local mode = tControl and tControl.mode or 'normal'
 	-- 开始单位，最大只显示到该单位
@@ -902,8 +904,12 @@ function X.FormatDuration(nTime, tUnitFmt, tControl)
 		accuracyindex = #FORMAT_TIME_UNIT_LIST
 		accuracy = FORMAT_TIME_UNIT_LIST[accuracyindex].key
 	end
-	assert(maxunitindex <= keepunitindex)
-	assert(maxunitindex <= accuracyindex)
+	if maxunitindex > keepunitindex then
+		assert(false, X.NSFormatString('{$NS}.FormatDuration: maxunit must be less than keepunit.'))
+	end
+	if maxunitindex > accuracyindex then
+		assert(false, X.NSFormatString('{$NS}.FormatDuration: maxunit must be less than accuracyunit.'))
+	end
 	-- 计算完整各个单位数据
 	local aValue = {}
 	for i, unit in X.ipairs_r(FORMAT_TIME_UNIT_LIST) do
@@ -1392,7 +1398,9 @@ function X.SetMemberFunctionHook(t, xArg1, xArg2, xArg3, xArg4)
 	elseif X.IsTable(t) and X.IsString(xArg2) and xArg3 == false then
 		eAction, szName, szKey = 'UNREG', xArg1, xArg2
 	end
-	assert(eAction, 'Parameters type not recognized, cannot infer action type.')
+	if not eAction then
+		assert(false, 'Parameters type not recognized, cannot infer action type.')
+	end
 	-- 匿名注册分配随机标识符
 	if eAction == 'REG' and not X.IsString(szKey) then
 		szKey = GetTickCount() * 1000

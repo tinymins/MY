@@ -778,7 +778,9 @@ function X.OutputTableTip(tOptions)
 		local nLoopProtect = 0
 		while nExtraWidth and math.abs(nExtraWidth) > 0.0001 do
 			nLoopProtect = nLoopProtect + 1
-			assert(nLoopProtect < 300)
+			if nLoopProtect >= 300 then
+				assert(false, 'Loop protect.')
+			end
 			local nExtraPerCol = nExtraWidth / nTableColumn
 			for iCol, nWidth in ipairs(aColumnWidth) do
 				local tCol = aColumn[iCol]

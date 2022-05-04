@@ -1013,15 +1013,21 @@ function X.CreateUserSettingsProxy(xProxy)
 	local tLoaded = {}
 	local tProxy = X.IsTable(xProxy) and xProxy or {}
 	for k, v in pairs(tProxy) do
-		assert(X.IsString(k), '`Key` ' .. X.EncodeLUAData(k) .. ' of proxy should be a string value.')
-		assert(X.IsString(v), '`Val` ' .. X.EncodeLUAData(v) .. ' of proxy should be a string value.')
+		if not X.IsString(k) then
+			assert(false, '`Key` ' .. X.EncodeLUAData(k) .. ' of proxy should be a string value.')
+		end
+		if not X.IsString(v) then
+			assert(false, '`Val` ' .. X.EncodeLUAData(v) .. ' of proxy should be a string value.')
+		end
 	end
 	local function GetGlobalKey(k)
 		if not tProxy[k] then
 			if X.IsString(xProxy) then
 				tProxy[k] = xProxy .. '.' .. k
 			end
-			assert(tProxy[k], '`Key` ' .. X.EncodeLUAData(k) .. ' not found in proxy table.')
+			if not tProxy[k] then
+				assert(false, '`Key` ' .. X.EncodeLUAData(k) .. ' not found in proxy table.')
+			end
 		end
 		return tProxy[k]
 	end
@@ -1205,11 +1211,17 @@ local function OnRemoteStorageChange(szKey)
 end
 
 function X.RegisterRemoteStorage(szKey, nBitPos, nBitNum, fnGetter, fnSetter, bForceOnline)
-	assert(nBitPos >= 0 and nBitNum > 0 and nBitPos + nBitNum <= BIT_COUNT, 'storage position out of range: ' .. szKey)
-	for _, p in pairs(REMOTE_STORAGE_REGISTER) do
-		assert(nBitPos >= p.nBitPos + p.nBitNum or nBitPos + nBitNum <= p.nBitPos, 'storage position conflicted: ' .. szKey .. ', ' .. p.szKey)
+	if nBitPos < 0 or nBitNum <= 0 or nBitPos + nBitNum > BIT_COUNT then
+		assert(false, 'storage position out of range: ' .. szKey)
 	end
-	assert(X.IsFunction(fnGetter) and X.IsFunction(fnSetter), 'storage settter and getter must be function')
+	for _, p in pairs(REMOTE_STORAGE_REGISTER) do
+		if nBitPos < p.nBitPos + p.nBitNum and nBitPos + nBitNum > p.nBitPos then
+			assert(false, 'storage position conflicted: ' .. szKey .. ', ' .. p.szKey)
+		end
+	end
+	if not X.IsFunction(fnGetter) or not X.IsFunction(fnSetter) then
+		assert(false, 'storage setter and getter must be function')
+	end
 	REMOTE_STORAGE_REGISTER[szKey] = {
 		szKey = szKey,
 		nBitPos = nBitPos,
@@ -1222,10 +1234,14 @@ end
 
 function X.SetRemoteStorage(szKey, ...)
 	local st = REMOTE_STORAGE_REGISTER[szKey]
-	assert(st, 'unknown storage key: ' .. szKey)
+	if not st then
+		assert(false, 'unknown storage key: ' .. szKey)
+	end
 
 	local aBit = st.fnSetter(...)
-	assert(#aBit == st.nBitNum, 'storage setter bit number mismatch: ' .. szKey)
+	if #aBit ~= st.nBitNum then
+		assert(false, 'storage setter bit number mismatch: ' .. szKey)
+	end
 
 	local GetData = st.bForceOnline and GetOnlineAddonCustomData or GetAddonCustomData
 	local SetData = st.bForceOnline and SetOnlineAddonCustomData or SetAddonCustomData
@@ -1244,7 +1260,9 @@ end
 
 function X.GetRemoteStorage(szKey)
 	local st = REMOTE_STORAGE_REGISTER[szKey]
-	assert(st, 'unknown storage key: ' .. szKey)
+	if not st then
+		assert(false, 'unknown storage key: ' .. szKey)
+	end
 
 	local GetData = st.bForceOnline and GetOnlineAddonCustomData or GetAddonCustomData
 	local nPos = math.floor(st.nBitPos / BIT_NUMBER)
@@ -1471,14 +1489,18 @@ function X.NoSQLiteConnect(oPath)
 	return setmetatable({}, {
 		__index = {
 			Set = function(_, k, v)
-				assert(stmtSetter, 'NoSQL connection closed.')
+				if not stmtSetter then
+					assert(false, 'NoSQL connection closed.')
+				end
 				stmtSetter:ClearBindings()
 				stmtSetter:BindAll(k, EncodeByteData(v))
 				stmtSetter:Execute()
 				stmtSetter:Reset()
 			end,
 			Get = function(_, k)
-				assert(stmtGetter, 'NoSQL connection closed.')
+				if not stmtGetter then
+					assert(false, 'NoSQL connection closed.')
+				end
 				stmtGetter:ClearBindings()
 				stmtGetter:BindAll(k)
 				local res = stmtGetter:GetNext()
@@ -1490,14 +1512,18 @@ function X.NoSQLiteConnect(oPath)
 				return res
 			end,
 			Delete = function(_, k)
-				assert(stmtDeleter, 'NoSQL connection closed.')
+				if not stmtDeleter then
+					assert(false, 'NoSQL connection closed.')
+				end
 				stmtDeleter:ClearBindings()
 				stmtDeleter:BindAll(k)
 				stmtDeleter:Execute()
 				stmtDeleter:Reset()
 			end,
 			GetAll = function(_)
-				assert(stmtAllGetter, 'NoSQL connection closed.')
+				if not stmtAllGetter then
+					assert(false, 'NoSQL connection closed.')
+				end
 				stmtAllGetter:ClearBindings()
 				local res = stmtAllGetter:GetAll()
 				stmtAllGetter:Reset()

@@ -91,7 +91,9 @@ end
 -- settings.success   -- 请求成功回调事件，携带数据，回调链： complete -> fulfilled -> success
 -- settings.error     -- 请求失败回调事件，可能携带数据，回调链： complete -> error
 function X.Ajax(settings)
-	assert(X.IsTable(settings) and X.IsString(settings.url))
+	if not X.IsTable(settings) or not X.IsString(settings.url) then
+		assert(false, X.NSFormatString('{$NS}.Ajax: Invalid settings.'))
+	end
 	-- standardize settings
 	local id = string.lower(X.GetUUID())
 	local oncomplete, onerror = settings.complete, settings.error
@@ -169,7 +171,9 @@ function X.Ajax(settings)
 		end
 		xdata = nil
 	end
-	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', X.NSFormatString('[{$NS}_AJAX] Unknown http request type: ') .. method)
+	if method ~= 'post' and method ~= 'get' and method ~= 'put' and method ~= 'delete' then
+		assert(false, X.NSFormatString('[{$NS}_AJAX] Unknown http request type: ') .. method)
+	end
 
 	-------------------------------
 	-- data signature
