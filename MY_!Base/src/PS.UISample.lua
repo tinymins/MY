@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}_PS.UISample')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local COMPONENT_H = 25
@@ -272,3 +276,5 @@ function PS.OnPanelActive(wnd)
 end
 
 X.RegisterPanel(_L['Development'], 'UISample', _L['UI SAMPLE'], '', PS)
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

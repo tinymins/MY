@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.UI.Shadows')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 local D = {}
 local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Shadows.ini'
@@ -122,3 +126,5 @@ local settings = {
 }
 _G[FRAME_NAME] = X.CreateModule(settings)
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

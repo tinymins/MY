@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.UI.Browser')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 local D = {}
 local WINDOWS = setmetatable({}, { __mode = 'v' })
@@ -275,3 +279,5 @@ end
 X.UI.LookupBrowser = D.GetFrame
 X.UI.OpenBrowser = D.Open
 X.UI.CloseBrowser = D.Close
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

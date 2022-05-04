@@ -10,6 +10,9 @@ local PLUGIN_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT
 local MODULE_NAME = X.NSFormatString('{$NS}_HoverEntry')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/hoverentry/')
 --------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
+
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
@@ -161,3 +164,5 @@ local settings = {
 }
 _G[FRAME_NAME] = X.CreateModule(settings)
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

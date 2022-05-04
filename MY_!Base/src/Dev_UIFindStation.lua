@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}_UIFindStation')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. '/lang/devs/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local O = {
@@ -196,3 +200,5 @@ function PS.OnPanelActive(frame)
 end
 
 X.RegisterPanel(_L['Development'], 'Dev_UIFindStation', _L['Dev_UIFindStation'], 2791, PS)
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

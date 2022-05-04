@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Environment')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 function X.AssertVersion(szKey, szCaption, szRequireVersion)
@@ -158,3 +162,5 @@ function X.IsDebugServer()
 	end
 	return false
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

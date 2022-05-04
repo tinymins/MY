@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Constant')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local KvpToObject = X.KvpToObject
@@ -866,3 +870,5 @@ RegisterEvent('PLAYER_ENTER_SCENE', function()
 end)
 
 X.CONSTANT = setmetatable({}, { __index = CONSTANT, __newindex = function() end })
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

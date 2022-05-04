@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.String')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 local AnsiToUTF8 = AnsiToUTF8 or _G.ansi_to_utf8
 
@@ -428,3 +432,5 @@ function X.FormatCharCodeString(s, m)
 	end
 	return table.concat(a, ', ')
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

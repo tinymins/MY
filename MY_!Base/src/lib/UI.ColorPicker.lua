@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.UI.ColorPicker')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 -- 打开取色板
@@ -210,3 +214,5 @@ function X.UI.OpenColorPickerEx(fnAction)
 	Station.SetFocusWindow(wnd[1])
 	return wnd
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

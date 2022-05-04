@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Lodash')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------------
 -- https://raw.githubusercontent.com/danielmgmi/lodash.lua/master/src/lodash.lua --
@@ -2315,3 +2319,5 @@ _.range = function(start, ...)
 end
 
 X.lodash = X.SetmetaReadonly(_)
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

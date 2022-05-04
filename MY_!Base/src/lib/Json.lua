@@ -5,6 +5,11 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Json')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
+
 ---------------------------------------------------------------------------
 -- local lua_value = X.DecodeJSON(raw_json_text)
 -- local raw_json_text = X.EncodeJSON(lua_table_or_value)
@@ -1786,3 +1791,5 @@ function X.DecodeJSON(value)
 end
 
 -- end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

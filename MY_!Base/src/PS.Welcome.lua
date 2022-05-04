@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}_PS.Welcome')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/ps/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local PS = { bWelcome = true, bHide = true }
@@ -312,3 +316,5 @@ function PS.OnPanelBreathe(wnd)
 end
 
 X.RegisterPanel(nil, 'Welcome', _L['Welcome'], '', PS)
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.UI')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 -- TODO: 界面库需要重构，该文件应作为入口文件，仅用于分发各个组件的函数调用
@@ -6225,3 +6229,5 @@ function X.UI.CreateFrame(szName, opt)
 	end
 	return ApplyUIArguments(ui, opt)
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

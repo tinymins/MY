@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.LoadingEnd')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 local PROXY = {}
 if IsDebugClient() then
@@ -106,3 +110,5 @@ X.RegisterFrameCreate('KeyPanel', 'LIB.KeyPanel_Restriction', HookKeyPanel)
 X.RegisterInit('LIB.KeyPanel_Restriction', HookKeyPanel)
 X.RegisterReload('LIB.KeyPanel_Restriction', UnhookPanel)
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')
