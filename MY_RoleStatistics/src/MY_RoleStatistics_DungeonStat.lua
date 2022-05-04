@@ -1200,14 +1200,17 @@ X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonStat', functi
 end)
 
 X.RegisterInit('MY_RoleStatistics_DungeonStat', function()
+	X.DelayCall('MY_RoleStatistics_DungeonStat__InitMapProgress', 60000, function()
+		D.UpdateMapProgress()
+	end)
 	D.InitDB()
-	D.UpdateMapProgress()
 end)
 
 X.RegisterExit('MY_RoleStatistics_DungeonStat', function()
 	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		D.UpdateSaveDB()
 		D.FlushDB()
+		D.UpdateMapProgress()
 	end
 end)
 

@@ -96,6 +96,10 @@ function D.Apply()
 			end
 		end
 		local function OnPlayerLeave(dwID)
+			if not D.bReady then
+				X.DelayCall(500, function() OnPlayerLeave(dwID) end)
+				return
+			end
 			if O.bFriendNav and Navigator_Remove then
 				Navigator_Remove('MY_FRIEND_TIP.' .. dwID)
 			else
@@ -160,6 +164,10 @@ function D.Apply()
 		hShaList:Show()
 		local function OnPlayerEnter(dwID, nRetryCount)
 			nRetryCount = nRetryCount or 0
+			if not D.bReady then
+				X.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount) end)
+				return
+			end
 			if nRetryCount > 5 then
 				return
 			end
@@ -193,6 +201,10 @@ function D.Apply()
 			end
 		end
 		local function OnPlayerLeave(dwID)
+			if not D.bReady then
+				X.DelayCall(500, function() OnPlayerLeave(dwID) end)
+				return
+			end
 			if O.bTongMemberNav and Navigator_Remove then
 				Navigator_Remove('MY_GUILDMEMBER_TIP.' .. dwID)
 			else

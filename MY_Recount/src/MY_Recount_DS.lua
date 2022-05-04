@@ -615,6 +615,10 @@ function D.SaveHistory()
 end
 
 function D.UpdateIsRecEverything()
+	if not D.bReady then
+		X.DelayCall(500, function() D.UpdateIsRecEverything() end)
+		return
+	end
 	D.bRecEverything = O.bRecEverything and (not O.bREOnlyDungeon or X.IsInDungeon())
 end
 
