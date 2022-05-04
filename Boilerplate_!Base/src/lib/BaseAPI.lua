@@ -154,11 +154,30 @@ end
 
 --[[#DEBUG BEGIN]]
 local MODULE_TIME, MODULE_TOTAL_TIME = {}, 0
+local MODULE_TIME_RANK = {}
 RegisterEvent('LOADING_END', function()
 	for szModule, _ in pairs(MODULE_TIME) do
 		X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" missing FINISH report!!!')
 	end
 	X.Log('MODULE_LOADING_REPORT', 'All modules loaded during ' .. MODULE_TOTAL_TIME .. 'ms.')
+	table.sort(MODULE_TIME_RANK, function(a, b) return a.nTime > b.nTime end)
+	local aTop, nMaxModule = {}, 0
+	for i, p in ipairs(MODULE_TIME_RANK) do
+		if i > 10 or p.nTime < 5 then
+			break
+		end
+		nMaxModule = math.max(nMaxModule, p.szModule:len())
+		table.insert(aTop, p)
+	end
+	if #aTop > 0 then
+		X.Log('MODULE_LOADING_REPORT', 'Top ' .. #aTop ..  ' modules loading time:')
+	end
+	local nTopTime = 0
+	for i, p in ipairs(aTop) do
+		nTopTime = nTopTime + p.nTime
+		X.Log('MODULE_LOADING_REPORT', string.format('%d. %32s: %dms', i, p.szModule, p.nTime))
+	end
+	X.Log('MODULE_LOADING_REPORT', string.format('Top modules total loading time: %dms', nTopTime))
 end)
 --[[#DEBUG END]]
 -- 脚本加载性能监控
@@ -178,6 +197,7 @@ function X.ReportModuleLoading(szModule, szStatus)
 			local nTime = GetTime() - MODULE_TIME[szModule]
 			MODULE_TIME[szModule] = nil
 			MODULE_TOTAL_TIME = MODULE_TOTAL_TIME + nTime
+			table.insert(MODULE_TIME_RANK, { szModule = szModule, nTime = nTime })
 			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" loaded during ' .. nTime .. 'ms.')
 		else
 			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" not exist!!!')
