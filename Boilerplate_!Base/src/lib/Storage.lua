@@ -463,9 +463,50 @@ do
 ---------------------------------------------------------------------------------------------
 -- ÓÃ»§ÅäÖÃÏî
 ---------------------------------------------------------------------------------------------
-local USER_SETTINGS_EVENT = { szName = 'UserSettings' }
+--[[#DEBUG BEGIN]]
+local USER_SETTINGS_TIME_RANK, USER_SETTINGS_TOTAL_TIME = {}, 0
+--[[#DEBUG END]]
+local USER_SETTINGS_EVENT = {
+	szName = 'UserSettings',
+	--[[#DEBUG BEGIN]]
+	OnStat = function(szID, nTime)
+		USER_SETTINGS_TOTAL_TIME = USER_SETTINGS_TOTAL_TIME + nTime
+		table.insert(USER_SETTINGS_TIME_RANK, { szID = szID, nTime = nTime })
+		X.Log('USER_SETTINGS_REPORT', 'Event function "' .. szID .. '" execution takes ' .. nTime .. 'ms.')
+	end,
+	--[[#DEBUG END]]
+}
 local CommonEventFirer = X.CommonEventFirer
 local CommonEventRegister = X.CommonEventRegister
+--[[#DEBUG BEGIN]]
+CommonEventFirer = function(...)
+	X.CommonEventFirer(...)
+	if select(2, ...) ~= '@@INIT@@' then
+		return
+	end
+	X.Log('USER_SETTINGS_REPORT', 'All event functions finished during ' .. USER_SETTINGS_TOTAL_TIME .. 'ms.')
+	table.sort(USER_SETTINGS_TIME_RANK, function(a, b) return a.nTime > b.nTime end)
+	local aTop, nMaxID = {}, 0
+	for i, p in ipairs(USER_SETTINGS_TIME_RANK) do
+		if i > 10 or p.nTime < 5 then
+			break
+		end
+		nMaxID = math.max(nMaxID, p.szID:len())
+		table.insert(aTop, p)
+	end
+	if #aTop > 0 then
+		X.Log('USER_SETTINGS_REPORT', 'Top ' .. #aTop ..  ' event functions loading time:')
+	end
+	local nTopTime = 0
+	for i, p in ipairs(aTop) do
+		nTopTime = nTopTime + p.nTime
+		X.Log('USER_SETTINGS_REPORT', string.format('%d. %' .. nMaxID .. 's: %dms', i, p.szID, p.nTime))
+	end
+	if #aTop > 0 then
+		X.Log('USER_SETTINGS_REPORT', string.format('Top event functions total loading time: %dms', nTopTime))
+	end
+end
+--[[#DEBUG END]]
 
 function X.RegisterUserSettingsUpdate(...)
 	return CommonEventRegister(USER_SETTINGS_EVENT, ...)
