@@ -392,7 +392,7 @@ function D.FetchMetaInfo(szURL, onSuccess, onError)
 				return
 			end
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_TeamMon_RR'], 'ERROR Get MetaInfo: ' .. X.EncodeLUAData(status) .. '\n' .. UTF8ToAnsi(html), X.DEBUG_LEVEL.WARNING)
+			X.Debug(_L['MY_TeamMon_RR'], 'ERROR Get MetaInfo: ' .. X.EncodeLUAData(status) .. '\n' .. (X.ConvertToAnsi(html) or ''), X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			X.SafeCall(onError)
 		end,
