@@ -1573,29 +1573,6 @@ function X.OpenBrowser(szAddr, szMode)
 	X.UI.OpenBrowser(szAddr)
 end
 
-function X.ArrayToObject(arr)
-	if not arr then
-		return
-	end
-	local t = {}
-	for k, v in pairs(arr) do
-		if X.IsTable(v) and v[1] then
-			t[v[1]] = v[2]
-		else
-			t[v] = true
-		end
-	end
-	return t
-end
-
-function X.FlipObjectKV(obj)
-	local t = {}
-	for k, v in pairs(obj) do
-		t[v] = k
-	end
-	return t
-end
-
 -- Global exports
 do
 local PRESETS = {

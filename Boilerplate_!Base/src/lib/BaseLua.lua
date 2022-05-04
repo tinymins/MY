@@ -383,6 +383,31 @@ function X.KvpToObject(kvp)
 	return t
 end
 
+-- 列表转列表值为键的对象
+---@param arr any[] @列表
+---@return table @对象
+function X.ArrayToObject(arr)
+	if not arr then
+		return
+	end
+	local t = {}
+	for k, v in pairs(arr) do
+		t[v] = true
+	end
+	return t
+end
+
+-- 翻转对象键值
+---@param obj table @对象
+---@return table @对象
+function X.FlipObjectKV(obj)
+	local t = {}
+	for k, v in pairs(obj) do
+		t[v] = k
+	end
+	return t
+end
+
 -- 创建数据补丁
 ---@param oBase any @原始数据
 ---@param oData any @目标数据
