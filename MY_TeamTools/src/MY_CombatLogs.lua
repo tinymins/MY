@@ -209,7 +209,7 @@ function D.InsertLog(szEvent, oData, bReplay)
 		.. '\t' .. GetTime()
 		.. '\t' .. szEvent
 		.. '\t' .. X.StringReplaceW(X.StringReplaceW(X.EncodeLUAData(oData), '\\\n', '\\n'), '\t', '\\t')
-	local nCRC = GetStringCRC(LOG_CRC .. szLog .. 'c910e9b9-8359-4531-85e0-6897d8c129f7')
+	local nCRC = GetStringCRC(LOG_CRC .. szLog .. X.SECRET['HASH::MY_COMBAT_JCL'])
 	-- 插入缓存
 	table.insert(LOG_CACHE, nCRC .. '\t' .. szLog .. '\n')
 	-- 插入最近事件表
