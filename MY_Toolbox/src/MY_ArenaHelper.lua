@@ -184,3 +184,5 @@ local settings = {
 }
 MY_ArenaHelper = X.CreateModule(settings)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

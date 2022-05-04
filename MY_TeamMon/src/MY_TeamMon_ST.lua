@@ -417,3 +417,5 @@ local settings = {
 }
 MY_TeamMon_ST = X.CreateModule(settings)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

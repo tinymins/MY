@@ -404,3 +404,5 @@ local settings = {
 }
 MY_TeamRestore = X.CreateModule(settings)
 end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
