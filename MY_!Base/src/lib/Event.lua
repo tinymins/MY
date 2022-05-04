@@ -177,6 +177,9 @@ local function FireEventRec(E, p, ...)
 			_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], nTickCount),
 			X.DEBUG_LEVEL.PM_LOG)
 	end
+	if E.OnStat then
+		E.OnStat(p.szID, nTickCount)
+	end
 	--[[#DEBUG END]]
 end
 
@@ -237,9 +240,48 @@ end
 -- 监听初始化完成事件
 --------------------------------------------------------------------------------
 do
-local INIT_EVENT = { szName = 'Initial', bSingleEvent = true }
+--[[#DEBUG BEGIN]]
+local INIT_TIME_RANK, INIT_TOTAL_TIME = {}, 0
+--[[#DEBUG END]]
+local INIT_EVENT = {
+	szName = 'Initial',
+	bSingleEvent = true,
+	--[[#DEBUG BEGIN]]
+	OnStat = function(szID, nTime)
+		INIT_TOTAL_TIME = INIT_TOTAL_TIME + nTime
+		table.insert(INIT_TIME_RANK, { szID = szID, nTime = nTime })
+		X.Log('INIT_EVENT_REPORT', 'Init function "' .. szID .. '" execution takes ' .. nTime .. 'ms.')
+	end,
+	--[[#DEBUG END]]
+}
 local CommonEventFirer = X.CommonEventFirer
 local CommonEventRegister = X.CommonEventRegister
+--[[#DEBUG BEGIN]]
+CommonEventFirer = function(...)
+	X.CommonEventFirer(...)
+	X.Log('INIT_EVENT_REPORT', 'All initial functions finished during ' .. INIT_TOTAL_TIME .. 'ms.')
+	table.sort(INIT_TIME_RANK, function(a, b) return a.nTime > b.nTime end)
+	local aTop, nMaxID = {}, 0
+	for i, p in ipairs(INIT_TIME_RANK) do
+		if i > 10 or p.nTime < 5 then
+			break
+		end
+		nMaxID = math.max(nMaxID, p.szID:len())
+		table.insert(aTop, p)
+	end
+	if #aTop > 0 then
+		X.Log('INIT_EVENT_REPORT', 'Top ' .. #aTop ..  ' initial functions loading time:')
+	end
+	local nTopTime = 0
+	for i, p in ipairs(aTop) do
+		nTopTime = nTopTime + p.nTime
+		X.Log('INIT_EVENT_REPORT', string.format('%d. %' .. nMaxID .. 's: %dms', i, p.szID, p.nTime))
+	end
+	if #aTop > 0 then
+		X.Log('INIT_EVENT_REPORT', string.format('Top initial functions total loading time: %dms', nTopTime))
+	end
+end
+--[[#DEBUG END]]
 local function OnInit()
 	if not INIT_EVENT then
 		return
