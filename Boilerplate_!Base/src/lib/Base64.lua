@@ -9,6 +9,10 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Base64')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 local index_table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 
@@ -96,3 +100,5 @@ end
 
 X.Base64Encode = to_base64
 X.Base64Decode = from_base64
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

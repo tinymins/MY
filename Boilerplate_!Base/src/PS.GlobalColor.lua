@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}_PS.GlobalColor')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/ps/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local PS = {}
@@ -125,3 +129,5 @@ function PS.OnPanelActive(wnd)
 end
 
 X.RegisterPanel(_L['System'], 'GlobalColor', _L['Global color'], 'ui\\Image\\button\\CommonButton_1.UITex|70', PS)
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

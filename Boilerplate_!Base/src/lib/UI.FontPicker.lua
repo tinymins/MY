@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.UI.FontPicker')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 -- 打开字体选择
@@ -38,3 +42,5 @@ function X.UI.OpenFontPicker(callback, t)
 	end
 	return ui:Size(820, 70 + math.floor(i / 10) * 25):Anchor({ s = 'CENTER', r = 'CENTER', x = 0, y = 0 }):Focus()
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

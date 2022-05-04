@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.UI.ListEditor')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 -- 打开文本列表编辑器
@@ -82,3 +86,5 @@ function X.UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	Station.SetFocusWindow(ui[1])
 	return ui
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

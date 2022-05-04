@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Tip')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 -- 将输入转为 Rect 数组
@@ -920,3 +924,5 @@ function X.HideTableTip(bAnimate)
 		Wnd.CloseWindow(frame)
 	end
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}_UIManager')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. '/lang/devs/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local UI_DESC = _L.UI_DESC or {}
@@ -68,3 +72,5 @@ table.insert(SHARED_MEMORY.UI_MANAGER, function()
 	end
 	return {menu}
 end)
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

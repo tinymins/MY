@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.UI.Request')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local D = {}
@@ -202,3 +206,5 @@ X.UI.CloseRequest = D.Close
 X.UI.RegisterRequest = D.RegisterRequest
 X.UI.ReplaceRequest = D.Replace
 X.UI.RemoveRequest = D.RemoveRequest
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

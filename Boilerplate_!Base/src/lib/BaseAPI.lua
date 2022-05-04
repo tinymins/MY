@@ -152,6 +152,37 @@ function X.ErrorLog(...)
 	FireUIEvent('CALL_LUA_ERROR', szFull)
 end
 
+--[[#DEBUG BEGIN]]
+local MODULE_TIME = {}
+RegisterEvent('LOADING_END', function()
+	for szModule, _ in pairs(MODULE_TIME) do
+		X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" missing log finish!!!')
+	end
+end)
+--[[#DEBUG END]]
+-- 脚本加载性能监控
+---@param szModule string @模块名称
+---@param szStatus "'START'" | "'FINISH'" @加载状态
+---@return void
+function X.ReportModuleLoading(szModule, szStatus)
+	--[[#DEBUG BEGIN]]
+	if szStatus == 'START' then
+		if MODULE_TIME[szModule] then
+			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" is already loading!!!')
+		else
+			MODULE_TIME[szModule] = GetTime()
+		end
+	elseif szStatus == 'FINISH' then
+		if MODULE_TIME[szModule] then
+			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" loaded during ' .. (GetTime() - MODULE_TIME[szModule]) .. 'ms.')
+			MODULE_TIME[szModule] = nil
+		else
+			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" not exist!!!')
+		end
+	end
+	--[[#DEBUG END]]
+end
+
 -- 初始化调试工具
 if X.PACKET_INFO.DEBUG_LEVEL < X.DEBUG_LEVEL.NONE then
 	if not X.SHARED_MEMORY.ECHO_LUA_ERROR then

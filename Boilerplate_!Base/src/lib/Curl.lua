@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Curl')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 -- (void) X.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
 -- szUrl        -- 请求的完整 URL（包含 http:// 或 https://）
@@ -610,3 +614,5 @@ function X.SignPostData(tData, szPassphrase)
 	tData._c = X.GetPostDataCRC(tData, szPassphrase)
 	return tData
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

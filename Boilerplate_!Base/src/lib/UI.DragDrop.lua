@@ -5,8 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-
+local MODULE_NAME = X.NSFormatString('{$NS}.UI.DragDrop')
 local PLUGIN_NAME = X.NSFormatString('{$NS}_DragDrop')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 local DRAG_FRAME_NAME = X.NSFormatString('{$NS}_UI__Drag')
 local DROP_FRAME_NAME = X.NSFormatString('{$NS}_UI__Drop')
@@ -165,3 +168,5 @@ X.UI.OpenDragDrop = D.Open
 X.UI.CloseDragDrop = D.Close
 X.UI.GetDragDropData = D.GetData
 X.UI.SetDragDropHoverEl = D.SetHoverEl
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

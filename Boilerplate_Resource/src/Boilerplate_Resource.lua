@@ -13,6 +13,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^0.0.0') then
 	return
 end
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------
 
 local C, D = {}, {}
@@ -149,3 +150,5 @@ local settings = {
 }
 _G[MODULE_NAME] = X.CreateModule(settings)
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

@@ -6,6 +6,10 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Schema')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 --[[
 The MIT License (MIT)
@@ -670,3 +674,5 @@ function X.SchemaGet(data, schemaVal, defaultVal)
     end
     return data
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

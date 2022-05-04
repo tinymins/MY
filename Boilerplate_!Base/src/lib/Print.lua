@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Print')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local THEME_LIST = {
@@ -229,3 +233,5 @@ function X.Debug(...)
 		X.Log('DEBUG', 'LEVEL_' .. nLevel, szTitle, szContent)
 	end
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.UI.TextEditor')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 -- 打开文本编辑器
@@ -37,3 +41,5 @@ function X.UI.OpenTextEditor(szText, opt)
 	OnResize()
 	return ui
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

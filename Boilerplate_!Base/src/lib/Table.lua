@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Table')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 function X.Table_GetCommonEnchantDesc(enchant_id)
 	if X.IsFunction(_G.Table_GetCommonEnchantDesc) then
@@ -117,3 +121,5 @@ function X.Table_GetSkillExtCDID(dwID)
 	return cache[dwID] and cache[dwID] or nil
 end
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

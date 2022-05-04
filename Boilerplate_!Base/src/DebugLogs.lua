@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}_DebugLogs')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 X.RegisterEvent('OPEN_WINDOW', X.NSFormatString('{$NS}_DebugLogs'), function()
 	if not X.IsDebugClient(true) then
@@ -41,3 +45,5 @@ X.RegisterMsgMonitor('MSG_NPC_NEARBY', X.NSFormatString('{$NS}_DebugLogs'), func
 	X.Log('Msg: ' .. tostring(szMsg))
 	X.Log('== MSG INFO END ==')
 end)
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

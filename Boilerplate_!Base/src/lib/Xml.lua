@@ -10,6 +10,10 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Xml')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 local Log = Log or print
 
@@ -544,3 +548,5 @@ X.XMLSetNodeData = XMLSetNodeData
 -- 获取 XML 子节点列表
 -- (XMLNode[]) X.XMLGetNodeChildren(xml: XMLNode)
 X.XMLGetNodeChildren = XMLGetNodeChildren
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

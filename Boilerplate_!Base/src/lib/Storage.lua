@@ -5,7 +5,11 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Storage')
+--------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
 --------------------------------------------------------------------------------
 
 local EncodeByteData = X.GetGameAPI('EncodeByteData')
@@ -1491,3 +1495,5 @@ end
 function X.NoSQLiteDisconnect(db)
 	db:Release()
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

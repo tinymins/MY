@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Semver')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------------
 -- https://raw.githubusercontent.com/danielmgmi/lodash.lua/master/src/lodash.lua --
@@ -378,3 +382,5 @@ setmetatable(semver, { __call = function(_, ...) return new(...) end })
 semver._VERSION= semver(semver._VERSION)
 
 X.Semver = semver
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

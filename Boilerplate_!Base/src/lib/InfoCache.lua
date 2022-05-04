@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.InfoCache')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 local function DefaultValueComparer(v1, v2)
 	if v1 == v2 then
@@ -152,3 +156,5 @@ function X.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 		end
 	})
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

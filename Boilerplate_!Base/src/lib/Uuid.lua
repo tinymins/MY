@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Uuid')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 --[[
 The MIT License (MIT)
@@ -109,3 +113,5 @@ local function getUUID()
 end
 --
 X.GetUUID = getUUID
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')

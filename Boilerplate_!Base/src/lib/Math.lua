@@ -5,6 +5,10 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
+local MODULE_NAME = X.NSFormatString('{$NS}.Math')
+--------------------------------------------------------------------------------
+X.ReportModuleLoading(MODULE_NAME, 'START')
+--------------------------------------------------------------------------------
 
 -- (table) X.Number2Bitmap(number n)
 -- 将一个数值转换成一个Bit表（低位在前 高位在后）
@@ -179,3 +183,5 @@ end
 function X.SegmentToRecipeID(dwSegmentID, dwOffset)
 	return X.SegmentToNumber(dwSegmentID - 1, dwOffset - 1, 0x20)
 end
+
+X.ReportModuleLoading(MODULE_NAME, 'FINISH')
