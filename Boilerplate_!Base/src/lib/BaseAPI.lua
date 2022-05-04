@@ -156,7 +156,7 @@ end
 local MODULE_TIME, MODULE_TOTAL_TIME = {}, 0
 RegisterEvent('LOADING_END', function()
 	for szModule, _ in pairs(MODULE_TIME) do
-		X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" missing log finish!!!')
+		X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" missing FINISH report!!!')
 	end
 	X.Log('MODULE_LOADING_REPORT', 'All modules loaded during ' .. MODULE_TOTAL_TIME .. 'ms.')
 end)
@@ -169,7 +169,7 @@ function X.ReportModuleLoading(szModule, szStatus)
 	--[[#DEBUG BEGIN]]
 	if szStatus == 'START' then
 		if MODULE_TIME[szModule] then
-			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" is already loading!!!')
+			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" is already START!!!')
 		else
 			MODULE_TIME[szModule] = GetTime()
 		end
