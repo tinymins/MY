@@ -48,7 +48,7 @@ local _INTERFACE_ROOT_        = 'Interface/'
 local _ADDON_ROOT_            = _INTERFACE_ROOT_ .. _NAME_SPACE_ .. '/'
 local _DATA_ROOT_             = (_GAME_PROVIDER_ == 'remote' and (GetUserDataFolder() .. '/' .. GetUserAccount() .. '/interface/') or _INTERFACE_ROOT_) .. _NAME_SPACE_ .. '#DATA/'
 local _FRAMEWORK_ROOT_        = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_!Base/'
-local _UICOMPONENT_ROOT_      = _FRAMEWORK_ROOT_ .. 'ui/components/'
+local _UI_COMPONENT_ROOT_     = _FRAMEWORK_ROOT_ .. 'ui/components/'
 local _LOGO_UITEX_            = _FRAMEWORK_ROOT_ .. 'img/Logo.UITex'
 local _LOGO_MAIN_FRAME_       = 0
 local _LOGO_MENU_FRAME_       = 1
@@ -56,7 +56,7 @@ local _LOGO_MENU_HOVER_FRAME_ = 2
 local _POSTER_UITEX_          = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster.UITex'
 local _POSTER_FRAME_COUNT_    = 2
 local _DEBUG_LEVEL_           = tonumber(LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or nil) or DEBUG_LEVEL.NONE
-local _DELOG_LEVEL_           = math.min(tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or DEBUG_LEVEL.NONE, _DEBUG_LEVEL_)
+local _LOG_LEVEL_           = math.min(tonumber(LoadLUAData(_DATA_ROOT_ .. 'delog.level.jx3dat') or nil) or DEBUG_LEVEL.NONE, _DEBUG_LEVEL_)
 
 -- 创建命名空间
 local X = {
@@ -78,7 +78,7 @@ local X = {
 		ROOT                  = _ADDON_ROOT_           ,
 		DATA_ROOT             = _DATA_ROOT_            ,
 		FRAMEWORK_ROOT        = _FRAMEWORK_ROOT_       ,
-		UICOMPONENT_ROOT      = _UICOMPONENT_ROOT_     ,
+		UI_COMPONENT_ROOT     = _UI_COMPONENT_ROOT_    ,
 		LOGO_UITEX            = _LOGO_UITEX_           ,
 		LOGO_MAIN_FRAME       = _LOGO_MAIN_FRAME_      ,
 		LOGO_MENU_FRAME       = _LOGO_MENU_FRAME_      ,
@@ -86,7 +86,7 @@ local X = {
 		POSTER_UITEX          = _POSTER_UITEX_         ,
 		POSTER_FRAME_COUNT    = _POSTER_FRAME_COUNT_   ,
 		DEBUG_LEVEL           = _DEBUG_LEVEL_          ,
-		DELOG_LEVEL           = _DELOG_LEVEL_          ,
+		LOG_LEVEL             = _LOG_LEVEL_            ,
 	},
 	ENVIRONMENT = setmetatable({}, {
 		__index = setmetatable({
@@ -99,7 +99,7 @@ local X = {
 			RUNTIME_OPTIMIZE = --[[#DEBUG BEGIN]](
 				(IsDebugClient() or debug.traceback ~= nil)
 					and _DEBUG_LEVEL_ == DEBUG_LEVEL.NONE
-					and _DELOG_LEVEL_ == DEBUG_LEVEL.NONE
+					and _LOG_LEVEL_ == DEBUG_LEVEL.NONE
 					and not IsLocalFileExist(_ADDON_ROOT_ .. 'secret.jx3dat')
 				) and not IsLocalFileExist(_DATA_ROOT_ .. 'no.runtime.optimize.jx3dat')
 					and true

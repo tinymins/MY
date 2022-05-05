@@ -39,7 +39,7 @@ local function CreateWebPageFrame()
 	--[[#DEBUG BEGIN]]
 	X.Debug('CreateWebPageFrame: ' .. szRequestID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	hFrame = Wnd.OpenWindow(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebPage.ini', X.NSFormatString('{$NS}RRWP_') .. szRequestID)
+	hFrame = Wnd.OpenWindow(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndWebPage.ini', X.NSFormatString('{$NS}RRWP_') .. szRequestID)
 	hFrame:Hide()
 	return szRequestID, hFrame
 end
@@ -356,7 +356,7 @@ function X.Ajax(settings)
 		-- create page
 		if not hFrame then
 			RequestID = ('%X_%X'):format(GetTickCount(), math.floor(math.random() * 65536))
-			hFrame = Wnd.OpenWindow(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndWebCef.ini', X.NSFormatString('{$NS}RRWC_') .. RequestID)
+			hFrame = Wnd.OpenWindow(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndWebCef.ini', X.NSFormatString('{$NS}RRWC_') .. RequestID)
 			hFrame:Hide()
 		end
 		local wWebCef = hFrame:Lookup('WndWebCef')
