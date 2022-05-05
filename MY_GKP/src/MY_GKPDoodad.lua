@@ -159,7 +159,7 @@ RegisterCustomData('MY_GKPDoodad.szCustom')
 ---------------------------------------------------------------------
 -- 本地函数和变量
 ---------------------------------------------------------------------
-local INI_SHADOW = X.PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini'
+local INI_SHADOW = X.PACKET_INFO.UI_COMPONENT_ROOT .. 'Shadow.ini'
 local DOODAD_TYPE_VISIBLE = {
 	[DOODAD_KIND.INVALID     ] = false,
 	[DOODAD_KIND.NORMAL      ] = false, -- 普通的Doodad,有Tip,不能操作

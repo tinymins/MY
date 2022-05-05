@@ -22,7 +22,7 @@ end
 X.RegisterRestriction('MY_TeamMon_CC', { ['*'] = true })
 --------------------------------------------------------------------------
 local TARGET = TARGET
-local INI_SHADOW          = X.PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini'
+local INI_SHADOW          = X.PACKET_INFO.UI_COMPONENT_ROOT .. 'Shadow.ini'
 local CIRCLE_MAX_RADIUS   = 30    -- 最大的半径
 local CIRCLE_LINE_ALPHA   = 165   -- 线和边框最大透明度
 local CIRCLE_MAX_CIRCLE   = 2

@@ -126,7 +126,7 @@ function FS:ctor(szKey, tArgs)
 	if el.sha1 and el.sha1:IsValid() then
 		el.sha1 = el.sha1
 	else
-		el.sha1 = el:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini', 'Shadow')
+		el.sha1 = el:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'Shadow.ini', 'Shadow')
 		el.sha1:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 		el.sha1:SetD3DPT(D3DPT.TRIANGLESTRIP)
 	end
@@ -138,7 +138,7 @@ function FS:ctor(szKey, tArgs)
 		if el.sha2 and el.sha2:IsValid() then
 			el.sha2 = el.sha2
 		else
-			el.sha2 = el:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'Shadow.ini', 'Shadow')
+			el.sha2 = el:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'Shadow.ini', 'Shadow')
 			el.sha2:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 			el.sha2:SetD3DPT(D3DPT.TRIANGLESTRIP)
 		end
