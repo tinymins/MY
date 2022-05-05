@@ -23,6 +23,16 @@ import plib.environment as env
 
 TIME_TAG = time.strftime('%Y%m%d%H%M%S', time.localtime())
 
+def __rm_temporary(packet, addon):
+	'''
+	Delete temporary files
+	'''
+	ancientFileList = glob.glob('./%s/src*.lua' % addon, recursive=False)
+	for filePath in ancientFileList:
+		os.remove(filePath)
+	if os.path.isdir('./%s/dist' % addon):
+		shutil.rmtree('./%s/dist' % addon)
+
 def __compress(packet, addon):
 	'''
 	Compress and concat addon source into one file.
@@ -40,11 +50,7 @@ def __compress(packet, addon):
 	except:
 		secret = {}
 	# Delete old files
-	ancientFileList = glob.glob('./%s/src*.lua' % addon, recursive=False)
-	for filePath in ancientFileList:
-		os.remove(filePath)
-	if os.path.isdir('./%s/dist' % addon):
-		shutil.rmtree('./%s/dist' % addon)
+	__rm_temporary(packet, addon)
 	'''
 	Prepare source
 	'''
@@ -293,6 +299,11 @@ def run(diff_ver, is_source):
 	__7zip(file_name_fmt % '', '', '', '')
 	__7zip(file_name_fmt % 'remake-', '', '', '.7zipignore-remake')
 	__7zip(file_name_fmt % 'classic-', '', '', '.7zipignore-classic')
+
+	# Remove temporary files
+	for addon in os.listdir('./'):
+		if os.path.exists(os.path.join('./', addon, 'info.ini')):
+			__rm_temporary(packet, addon)
 
 	# Revert source code modify by compressing
 	if not is_source:
