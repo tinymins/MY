@@ -1199,7 +1199,7 @@ local function InitComponent(raw, szType)
 			local function DrawColumnTitle(hColumns, aColumns)
 				hColumns:Clear()
 				for i, col in ipairs(aColumns) do
-					local hCol = hColumns:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_TableColumn')
+					local hCol = hColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_TableColumn')
 					local hContentWrapper = hCol:Lookup('Handle_TableColumn_Content_Wrapper') -- 外部居中层
 					local hContent = hContentWrapper:Lookup('Handle_TableColumn_Content') -- 内部文本布局层
 					if i == 0 then
@@ -1408,12 +1408,12 @@ local function InitComponent(raw, szType)
 				hContents:Clear()
 				local nContentsH = 0
 				for nRowIndex, rec in ipairs(aDataSource) do
-					local hRow = hContents:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_Row')
+					local hRow = hContents:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_Row')
 					local hRowColumns = hRow:Lookup('Handle_RowColumns')
 					hRowColumns:Clear()
 					hRow:Lookup('Image_RowBg'):SetVisible(nRowIndex % 2 == 1)
 					for nColumnIndex, col in ipairs(aColumns) do
-						local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_Item') -- 外部居中层
+						local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_Item') -- 外部居中层
 						local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
 						local szXml
 						if col.render then
@@ -1608,11 +1608,11 @@ local function InitComponent(raw, szType)
 			local function DrawSummaryContents(hContents, aColumns)
 				local rec = GetComponentProp(raw, 'Summary')
 				hContents:Clear()
-				local hRow = hContents:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_Row')
+				local hRow = hContents:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_Row')
 				local hRowColumns = hRow:Lookup('Handle_RowColumns')
 				hRowColumns:Clear()
 				for nColumnIndex, col in ipairs(aColumns) do
-					local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndTable.ini', 'Handle_Item') -- 外部居中层
+					local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_Item') -- 外部居中层
 					local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
 					local szXml
 					if X.IsTable(rec) then
@@ -2381,7 +2381,7 @@ function OO:Append(arg0, arg1)
 				szFile = string.sub(szFile, 0, -#szType - 2)
 				szComponent = szFile:gsub('$.*[/\\]', ''):gsub('^[^<>?]*[/\\]', ''):sub(0, -5)
 			else
-				szFile = X.PACKET_INFO.UICOMPONENT_ROOT .. szFile .. '.ini'
+				szFile = X.PACKET_INFO.UI_COMPONENT_ROOT .. szFile .. '.ini'
 			end
 			local frame = Wnd.OpenWindow(szFile, X.NSFormatString('{$NS}_TempWnd#') .. _nTempWndCount)
 			if not frame then
@@ -6031,11 +6031,11 @@ function X.UI.CreateFrame(szName, opt)
 		opt.level = 'Normal'
 	end
 	-- calc ini file path
-	local szIniFile = X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrame.ini'
+	local szIniFile = X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndFrame.ini'
 	if opt.simple then
-		szIniFile = X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameSimple.ini'
+		szIniFile = X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndFrameSimple.ini'
 	elseif opt.empty then
-		szIniFile = X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameEmpty.ini'
+		szIniFile = X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndFrameEmpty.ini'
 	end
 
 	-- close and reopen exist frame

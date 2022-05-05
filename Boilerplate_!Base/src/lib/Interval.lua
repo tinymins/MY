@@ -524,7 +524,7 @@ local function __OnActive()
 	onBreatheCall()
 end
 
-local frame = Wnd.OpenWindow(X.PACKET_INFO.UICOMPONENT_ROOT .. 'WndFrameEmpty.ini', X.NSFormatString('{$NS}#Interval'))
+local frame = Wnd.OpenWindow(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndFrameEmpty.ini', X.NSFormatString('{$NS}#Interval'))
 frame.OnFrameBreathe = __OnActive
 frame:Hide()
 
