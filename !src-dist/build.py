@@ -69,7 +69,7 @@ def __compress(packet, addon):
 				source_code = codecs.open(source_file, 'r', encoding='gbk').read()
 				# Remove debug codes
 				source_code = re.sub(r'(?is)[^\n]*--\[\[#DEBUG LINE\]\][^\n]*\n?', '', source_code)
-				source_code = re.sub(r'(?is)\n?--\[\[#DEBUG BEGIN\]\].*?--\[\[#DEBUG END\]\]\n?', '', source_code)
+				source_code = re.sub(r'(?is)--\[\[#DEBUG BEGIN\]\].*?--\[\[#DEBUG END\]\]\n?', '', source_code)
 				# Implant sensitive secret values
 				for k in secret:
 					v = luadata.serialize(secret[k], encoding='gbk')
