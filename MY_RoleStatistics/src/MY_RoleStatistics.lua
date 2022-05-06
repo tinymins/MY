@@ -210,7 +210,7 @@ function Framework.OnFrameCreate()
 	D.InitPageSet(this)
 	this:BringToTop()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-	this:Lookup('', 'Text_Title'):SetText(X.PACKET_INFO.NAME .. ' - ' .. _L['MY_RoleStatistics'])
+	this:Lookup('', 'Text_Title'):SetText(X.PACKET_INFO.NAME .. _L.SPLIT_DOT .. _L['MY_RoleStatistics'])
 	PlaySound(SOUND.UI_SOUND,g_sound.OpenFrame)
 end
 
