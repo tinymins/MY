@@ -25,6 +25,7 @@ local DB = X.SQLiteConnect(_L['MY_RoleStatistics_DungeonStat'], {'userdata/role_
 if not DB then
 	return X.Sysmsg(_L['MY_RoleStatistics_DungeonStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS DungeonInfo (
