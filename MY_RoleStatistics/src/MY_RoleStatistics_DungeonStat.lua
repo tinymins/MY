@@ -124,6 +124,29 @@ local function GeneCommonCompare(id)
 		return r1[id] > r2[id] and 1 or -1
 	end
 end
+local function GetDungeonMapColumnID(dwMapID, szVia)
+	local szColumnID = 'dungeon_' .. dwMapID
+	if szVia then
+		szColumnID = szColumnID .. '@' .. szVia
+	end
+	return szColumnID
+end
+local function GetColumnDungeonMapID(szColumnID)
+	if not X.StringFindW(szColumnID, 'dungeon_') then
+		return
+	end
+	local dwMapID, szVia = X.StringReplaceW(szColumnID, 'dungeon_', ''), ''
+	if X.StringFindW(dwMapID, '@') then
+		local ids = X.SplitString(dwMapID, '@')
+		dwMapID, szVia = tonumber(ids[1]), ids[2]
+	else
+		dwMapID = tonumber(dwMapID)
+	end
+	if not dwMapID then
+		return
+	end
+	return dwMapID, szVia
+end
 local COLUMN_LIST = {
 	-- guid,
 	-- account,
@@ -245,14 +268,8 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 				nMinWidth = DUNGEON_MIN_WIDTH * #X.GetActivityMap('WEEK_RAID_DUNGEON'),
 			}
 		end
-	elseif X.StringFindW(id, 'dungeon_') then
-		local mapid, via = X.StringReplaceW(id, 'dungeon_', ''), ''
-		if X.StringFindW(mapid, '@') then
-			local ids = X.SplitString(mapid, '@')
-			mapid, via = tonumber(ids[1]), ids[2]
-		else
-			mapid = tonumber(mapid)
-		end
+	else
+		local mapid, via = GetColumnDungeonMapID(id)
 		local map = mapid and X.GetMapInfo(mapid)
 		if map then
 			local col = { -- 秘境CD
@@ -555,14 +572,14 @@ function D.GetColumns()
 	for _, id in ipairs(O.aColumn) do
 		if id == 'week_team_dungeon' then
 			for _, map in ipairs(X.GetActivityMap('WEEK_TEAM_DUNGEON')) do
-				local col = COLUMN_DICT['dungeon_' .. map.dwID .. '@' .. id]
+				local col = COLUMN_DICT[GetDungeonMapColumnID(map.dwID, id)]
 				if col then
 					table.insert(aCol, col)
 				end
 			end
 		elseif id == 'week_raid_dungeon' then
 			for _, map in ipairs(X.GetActivityMap('WEEK_RAID_DUNGEON')) do
-				local col = COLUMN_DICT['dungeon_' .. map.dwID .. '@' .. id]
+				local col = COLUMN_DICT[GetDungeonMapColumnID(map.dwID, id)]
 				if col then
 					table.insert(aCol, col)
 				end
@@ -664,8 +681,7 @@ function D.UpdateMapProgress(bForceUpdate)
 	local tProgressBossMapID = {}
 	-- 监控数据里的地图 ID
 	for _, col in ipairs(D.GetColumns()) do
-		local szID = X.StringFindW(col.id, 'dungeon_') and X.StringReplaceW(col.id, 'dungeon_', '')
-		local dwID = szID and tonumber(szID)
+		local dwID = GetColumnDungeonMapID(col.id)
 		if dwID then
 			tProgressBossMapID[dwID] = true
 		end
@@ -733,7 +749,7 @@ function D.DecodeRow(rec)
 end
 
 function D.GetDungeonRecTipInfo(rec, dwMapID)
-	local col = COLUMN_DICT['dungeon_' .. dwMapID]
+	local col = COLUMN_DICT[GetDungeonMapColumnID(dwMapID)]
 	if col then
 		local a = {}
 		local nMaxPlayerCount = select(3, GetMapParams(dwMapID))
@@ -763,10 +779,10 @@ function D.GetRowTip(rec, bFloat)
 		if id == 'DUNGEON' then
 			local aMapID = {}
 			for _, col in ipairs(D.GetColumns()) do
-				local dwMapID = X.StringFindW(col.id, 'dungeon_')
-					and tonumber(col.id:sub(#'dungeon_' + 1))
-					or nil
-				table.insert(aMapID, dwMapID)
+				local dwMapID = GetColumnDungeonMapID(col.id)
+				if dwMapID then
+					table.insert(aMapID, dwMapID)
+				end
 			end
 			for dwMapID, _ in pairs(rec.copy_info) do
 				table.insert(aMapID, dwMapID)
@@ -950,14 +966,13 @@ function D.OnInitPage()
 				-- 秘境选项
 				local tDungeonChecked = {}
 				for _, id in ipairs(aColumn) do
-					local szID = X.StringFindW(id, 'dungeon_') and X.StringReplaceW(id, 'dungeon_', '')
-					local dwID = szID and tonumber(szID)
+					local dwID = GetColumnDungeonMapID(id)
 					if dwID then
 						tDungeonChecked[dwID] = true
 					end
 				end
 				local tDungeonMenu = X.GetDungeonMenu(function(info)
-					fnAction('dungeon_' .. info.dwID, DUNGEON_MIN_WIDTH)
+					fnAction(GetDungeonMapColumnID(info.dwID), DUNGEON_MIN_WIDTH)
 				end, nil, tDungeonChecked)
 				-- 动态活动秘境选项
 				for _, szType in ipairs({
