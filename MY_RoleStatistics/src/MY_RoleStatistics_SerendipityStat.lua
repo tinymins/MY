@@ -737,20 +737,19 @@ function D.Migration()
 end
 
 function D.FlushDB()
-	if not O.bSaveDB then
-		return
-	end
 	--[[#DEBUG BEGIN]]
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
-
-	local data = X.LoadLUAData(STAT_DATA_FILE) or {}
-	data[X.GetPlayerGUID()] = D.GetClientPlayerRec()
-	X.SaveLUAData(STAT_DATA_FILE, data)
-
+	local rec = D.GetClientPlayerRec()
+	if O.bSaveDB then
+		local data = X.LoadLUAData(STAT_DATA_FILE) or {}
+		data[X.GetPlayerGUID()] = rec
+		X.SaveLUAData(STAT_DATA_FILE, data)
+	end
+	X.SaveLUAData(PLAYER_REC_FILE, rec)
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	X.Debug('MY_RoleStatistics_SerendipityStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
+	X.Debug('MY_RoleStatistics_SerendipityStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
 	--[[#DEBUG END]]
 end
 
