@@ -326,7 +326,8 @@ local function GetSerendipityDailyCount(me, tab)
 		return -1
 	end
 	if tab.dwSerendipity then
-		local serendipity = Table_GetAdventure(tab.dwSerendipity)
+		local Adventure = X.GetGameTable('Adventure')
+		local serendipity = Adventure and Adventure:Search(tab.dwSerendipity)
 		if serendipity then
 			if serendipity.dwFinishID ~= 0 and me.GetAdventureFlag(serendipity.dwFinishID) then
 				return -1
