@@ -229,7 +229,7 @@ local function InsertElementDetailTip(hElem, tTip)
 		end
 		table.insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'WndButton' then
-		table.insert(tTip, _L('ImagePath: %s', hElem:GetAnimatePath()))
+		table.insert(tTip, _L('ImagePath: %s', hElem:GetAnimatePath() or ''))
 		table.insert(tTip, _L('Normal: %d', hElem:GetAnimateGroupNormal()))
 		table.insert(tTip, _L('Over: %d', hElem:GetAnimateGroupMouseOver()))
 		table.insert(tTip, _L('Down: %d', hElem:GetAnimateGroupMouseDown()))
