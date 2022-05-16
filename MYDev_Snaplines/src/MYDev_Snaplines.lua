@@ -94,6 +94,7 @@ MYDev_Snaplines = {}
 -- ±¾µØº¯Êı
 --------------------------------------------------------------------------
 local function var2str(var, indent, level)
+	local exists = {}
 	local function table_r(var, level, indent)
 		local t = {}
 		local szType = type(var)
@@ -114,31 +115,36 @@ local function var2str(var, indent, level)
 		elseif szType == 'boolean' then
 			table.insert(t, tostring(var))
 		elseif szType == 'table' then
-			table.insert(t, '{')
-			local s_tab_equ = ']='
-			if indent then
-				s_tab_equ = '] = '
-				if not X.IsEmpty(var) then
-					table.insert(t, '\n')
-				end
-			end
-			for key, val in pairs(var) do
+			if exists [var] then
+				table.insert(t, '"[[recursive table]]"')
+			else
+				exists[var] = true
+				table.insert(t, '{')
+				local s_tab_equ = ']='
 				if indent then
-					table.insert(t, string.rep(indent, level + 1))
+					s_tab_equ = '] = '
+					if not X.IsEmpty(var) then
+						table.insert(t, '\n')
+					end
 				end
-				table.insert(t, '[')
-				table.insert(t, table_r(key, level + 1, indent))
-				table.insert(t, s_tab_equ) --'] = '
-				table.insert(t, table_r(val, level + 1, indent))
-				table.insert(t, ',')
-				if indent then
-					table.insert(t, '\n')
+				for key, val in pairs(var) do
+					if indent then
+						table.insert(t, string.rep(indent, level + 1))
+					end
+					table.insert(t, '[')
+					table.insert(t, table_r(key, level + 1, indent))
+					table.insert(t, s_tab_equ) --'] = '
+					table.insert(t, table_r(val, level + 1, indent))
+					table.insert(t, ',')
+					if indent then
+						table.insert(t, '\n')
+					end
 				end
+				if indent and not X.IsEmpty(var) then
+					table.insert(t, string.rep(indent, level))
+				end
+				table.insert(t, '}')
 			end
-			if indent and not X.IsEmpty(var) then
-				table.insert(t, string.rep(indent, level))
-			end
-			table.insert(t, '}')
 		else --if (szType == 'userdata') then
 			table.insert(t, '"')
 			table.insert(t, tostring(var))
