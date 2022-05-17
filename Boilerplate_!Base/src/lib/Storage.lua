@@ -572,18 +572,18 @@ function X.ConnectUserSettingsDB()
 	if DATABASE_CONNECTION_ESTABLISHED then
 		return
 	end
-	local szID, szDBPresetRoot, szUDBPresetRoot = X.GetUserSettingsPresetID(), nil, nil
+	local szID, szDBPresetRoot = X.GetUserSettingsPresetID(), nil
 	if not X.IsEmpty(szID) then
 		szDBPresetRoot = X.FormatPath({'config/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL})
-		szUDBPresetRoot = X.FormatPath({'userdata/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL})
 		CPath.MakeDir(szDBPresetRoot)
-		CPath.MakeDir(szUDBPresetRoot)
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
-			local pSettingsDB = X.NoSQLiteConnect(szDBPresetRoot
-				and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
-				or X.FormatPath({'config/settings.db', ePathType}))
+			local pSettingsDB = X.NoSQLiteConnect(
+				szDBPresetRoot
+					and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
+					or X.FormatPath({'config/settings.db', ePathType})
+			)
 			local pUserDataDB = X.NoSQLiteConnect(X.FormatPath({'userdata/userdata.db', ePathType}))
 			if not pSettingsDB then
 				X.Debug(X.PACKET_INFO.NAME_SPACE, 'Connect user settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
