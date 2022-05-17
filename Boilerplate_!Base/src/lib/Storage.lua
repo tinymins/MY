@@ -92,7 +92,7 @@ function X.FormatPath(oFilePath, tParams)
 	end
 	-- if exist {$name} then add user role identity
 	if string.find(szFilePath, '{$name}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$name}', tParams['name'] or X.GetClientInfo().szName or X.GetPlayerGUID())
+		szFilePath = szFilePath:gsub('{%$name}', tParams['name'] or X.GetClientInfo().szName)
 	end
 	-- if exist {$lang} then add language identity
 	if string.find(szFilePath, '{$lang}', nil, true) then
