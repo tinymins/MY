@@ -88,7 +88,7 @@ function X.FormatPath(oFilePath, tParams)
 	end
 	-- if exist {$uid} then add user role identity
 	if string.find(szFilePath, '{$uid}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$uid}', tParams['uid'] or X.GetPlayerGUID())
+		szFilePath = szFilePath:gsub('{%$uid}', tParams['uid'] or X.GetClientPlayerGlobalID())
 	end
 	-- if exist {$name} then add user role identity
 	if string.find(szFilePath, '{$name}', nil, true) then
@@ -611,6 +611,15 @@ function X.ConnectUserSettingsDB()
 	X.ReportUsageRank('USER_SETTINGS_INIT_REPORT', USER_SETTINGS_INIT_TIME_RANK)
 	--[[#DEBUG END]]
 end
+
+-- 根据 2022年5月17日 导出的接口 GetClientPlayerGlobalID()，
+-- 获取用户ID可提前至 SYNC_ROLE_DATA_BEGIN 事件，
+-- 而此事件发生于插件加载之前，因此可以直接初始化用户数据。
+X.SafeCall(function()
+	if X.GetClientPlayerGlobalID() then
+		X.ConnectUserSettingsDB()
+	end
+end)
 
 function X.ReleaseUserSettingsDB()
 	X.CommonEventFirer(USER_SETTINGS_RELEASE_EVENT)
