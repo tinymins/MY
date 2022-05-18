@@ -152,34 +152,66 @@ function X.ErrorLog(...)
 	FireUIEvent('CALL_LUA_ERROR', szFull)
 end
 
---[[#DEBUG BEGIN]]
-local MODULE_TIME, MODULE_TOTAL_TIME = {}, 0
-local MODULE_TIME_RANK = {}
-RegisterEvent('LOADING_END', function()
-	for szModule, _ in pairs(MODULE_TIME) do
-		X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" missing FINISH report!!!')
+-- 收集性能耗时监控
+---@param aRank table @统计数据集
+---@param szID string @当前采集的模块名称
+---@param nTime number @当前采集的模块耗时
+---@return void
+function X.CollectUsageRank(aRank, szID, nTime)
+	--[[#DEBUG BEGIN]]
+	table.insert(aRank, { szID = szID, nTime = nTime })
+	--[[#DEBUG END]]
+end
+
+-- 输出性能耗时监控统计
+---@param szHeader string @监控统计标题
+---@param aRank table @统计数据集
+---@return void
+function X.ReportUsageRank(szHeader, aRank)
+	--[[#DEBUG BEGIN]]
+	-- 总和统计
+	local nTotalTime = 0
+	for _, rank in ipairs(aRank) do
+		nTotalTime = nTotalTime + rank.nTime
 	end
-	X.Log('MODULE_LOADING_REPORT', 'All modules loaded during ' .. MODULE_TOTAL_TIME .. 'ms.')
-	table.sort(MODULE_TIME_RANK, function(a, b) return a.nTime > b.nTime end)
-	local aTop, nMaxModule = {}, 0
-	for i, p in ipairs(MODULE_TIME_RANK) do
+	X.Log(szHeader, #aRank .. ' tasks finished in ' .. nTotalTime .. 'ms.')
+	-- 排序统计
+	table.sort(aRank, function(a, b) return a.nTime > b.nTime end)
+	local aTop, nMaxID = {}, 0
+	for i, p in ipairs(aRank) do
 		if i > 10 or p.nTime < 5 then
 			break
 		end
-		nMaxModule = math.max(nMaxModule, p.szModule:len())
+		nMaxID = math.max(nMaxID, p.szID:len())
 		table.insert(aTop, p)
 	end
 	if #aTop > 0 then
-		X.Log('MODULE_LOADING_REPORT', 'Top ' .. #aTop ..  ' modules loading time:')
+		X.Log(szHeader, 'Top ' .. #aTop ..  ' loading time:')
 	end
 	local nTopTime = 0
 	for i, p in ipairs(aTop) do
 		nTopTime = nTopTime + p.nTime
-		X.Log('MODULE_LOADING_REPORT', string.format('%d. %' .. nMaxModule .. 's: %dms', i, p.szModule, p.nTime))
+		X.Log(szHeader, string.format('%d. %' .. nMaxID .. 's: %dms', i, p.szID, p.nTime))
 	end
-	X.Log('MODULE_LOADING_REPORT', string.format('Top modules total loading time: %dms', nTopTime))
+	X.Log(szHeader, string.format('Top modules total loading time: %dms', nTopTime))
+	-- 清空数据
+	for i = #aRank, 1, -1 do
+		aRank[i] = nil
+	end
+	--[[#DEBUG END]]
+end
+
+--[[#DEBUG BEGIN]]
+local MODULE_TIME = {}
+local MODULE_TIME_USAGE = {}
+RegisterEvent('LOADING_END', function()
+	for szModule, _ in pairs(MODULE_TIME) do
+		X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" missing FINISH report!!!')
+	end
+	X.ReportUsageRank('MODULE_LOADING_REPORT', MODULE_TIME_USAGE)
 end)
 --[[#DEBUG END]]
+
 -- 脚本加载性能监控
 ---@param szModule string @模块名称
 ---@param szStatus "'START'" | "'FINISH'" @加载状态
@@ -196,8 +228,7 @@ function X.ReportModuleLoading(szModule, szStatus)
 		if MODULE_TIME[szModule] then
 			local nTime = GetTime() - MODULE_TIME[szModule]
 			MODULE_TIME[szModule] = nil
-			MODULE_TOTAL_TIME = MODULE_TOTAL_TIME + nTime
-			table.insert(MODULE_TIME_RANK, { szModule = szModule, nTime = nTime })
+			X.CollectUsageRank(MODULE_TIME_USAGE, szModule, nTime)
 			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" loaded during ' .. nTime .. 'ms.')
 		else
 			X.Log('MODULE_LOADING_REPORT', '"' .. szModule .. '" not exist!!!')

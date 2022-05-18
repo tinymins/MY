@@ -241,48 +241,21 @@ end
 --------------------------------------------------------------------------------
 do
 --[[#DEBUG BEGIN]]
-local INIT_TIME_RANK, INIT_TOTAL_TIME = {}, 0
+local INIT_TIME_USAGE = {}
 --[[#DEBUG END]]
 local INIT_EVENT = {
 	szName = 'Initial',
 	bSingleEvent = true,
 	--[[#DEBUG BEGIN]]
 	OnStat = function(szID, nTime)
-		INIT_TOTAL_TIME = INIT_TOTAL_TIME + nTime
-		table.insert(INIT_TIME_RANK, { szID = szID, nTime = nTime })
+		X.CollectUsageRank(INIT_TIME_USAGE, szID, nTime)
 		X.Log('INIT_EVENT_REPORT', 'Init function "' .. szID .. '" execution takes ' .. nTime .. 'ms.')
 	end,
 	--[[#DEBUG END]]
 }
-local CommonEventFirer = X.CommonEventFirer
-local CommonEventRegister = X.CommonEventRegister
---[[#DEBUG BEGIN]]
-CommonEventFirer = function(...)
-	X.CommonEventFirer(...)
-	X.Log('INIT_EVENT_REPORT', 'All initial functions finished during ' .. INIT_TOTAL_TIME .. 'ms.')
-	table.sort(INIT_TIME_RANK, function(a, b) return a.nTime > b.nTime end)
-	local aTop, nMaxID = {}, 0
-	for i, p in ipairs(INIT_TIME_RANK) do
-		if i > 10 or p.nTime < 5 then
-			break
-		end
-		nMaxID = math.max(nMaxID, p.szID:len())
-		table.insert(aTop, p)
-	end
-	if #aTop > 0 then
-		X.Log('INIT_EVENT_REPORT', 'Top ' .. #aTop ..  ' initial functions loading time:')
-	end
-	local nTopTime = 0
-	for i, p in ipairs(aTop) do
-		nTopTime = nTopTime + p.nTime
-		X.Log('INIT_EVENT_REPORT', string.format('%d. %' .. nMaxID .. 's: %dms', i, p.szID, p.nTime))
-	end
-	if #aTop > 0 then
-		X.Log('INIT_EVENT_REPORT', string.format('Top initial functions total loading time: %dms', nTopTime))
-	end
-end
---[[#DEBUG END]]
-local function OnInit()
+
+-- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
+X.RegisterEvent('LOADING_ENDING', function()
 	if not INIT_EVENT then
 		return
 	end
@@ -293,16 +266,18 @@ local function OnInit()
 	X.CreateDataRoot(X.PATH_TYPE.GLOBAL)
 	X.CreateDataRoot(X.PATH_TYPE.SERVER)
 	X.ConnectUserSettingsDB()
-	CommonEventFirer(INIT_EVENT)
+	X.CommonEventFirer(INIT_EVENT)
+	--[[#DEBUG BEGIN]]
+	X.ReportUsageRank('INIT_EVENT_REPORT', INIT_TIME_USAGE)
+	--[[#DEBUG END]]
 	INIT_EVENT = nil
 	-- 显示欢迎信息
 	X.Sysmsg(_L('%s, welcome to use %s!', X.GetUserRoleName(), X.PACKET_INFO.NAME)
 		.. _L(' v%s Build %s', X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD))
-end
-X.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
+end)
 
 function X.RegisterInit(...)
-	return CommonEventRegister(INIT_EVENT, ...)
+	return X.CommonEventRegister(INIT_EVENT, ...)
 end
 
 function X.IsInitialized()
