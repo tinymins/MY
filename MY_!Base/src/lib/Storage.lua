@@ -88,11 +88,11 @@ function X.FormatPath(oFilePath, tParams)
 	end
 	-- if exist {$uid} then add user role identity
 	if string.find(szFilePath, '{$uid}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$uid}', tParams['uid'] or X.GetPlayerGUID())
+		szFilePath = szFilePath:gsub('{%$uid}', tParams['uid'] or X.GetClientPlayerGlobalID())
 	end
 	-- if exist {$name} then add user role identity
 	if string.find(szFilePath, '{$name}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$name}', tParams['name'] or X.GetClientInfo().szName or X.GetPlayerGUID())
+		szFilePath = szFilePath:gsub('{%$name}', tParams['name'] or X.GetClientInfo().szName)
 	end
 	-- if exist {$lang} then add language identity
 	if string.find(szFilePath, '{$lang}', nil, true) then
@@ -463,53 +463,55 @@ do
 ---------------------------------------------------------------------------------------------
 -- 用户配置项
 ---------------------------------------------------------------------------------------------
+local USER_SETTINGS_UPDATE_EVENT = {
+	szName = 'UserSettingsUpdate',
+}
+
+function X.RegisterUserSettingsUpdate(...)
+	return X.CommonEventRegister(USER_SETTINGS_UPDATE_EVENT, ...)
+end
+
 --[[#DEBUG BEGIN]]
-local USER_SETTINGS_TIME_RANK, USER_SETTINGS_TOTAL_TIME = {}, 0
+local USER_SETTINGS_INIT_TIME_RANK = {}
 --[[#DEBUG END]]
-local USER_SETTINGS_EVENT = {
-	szName = 'UserSettings',
+local USER_SETTINGS_INIT_EVENT = {
+	szName = 'UserSettingsInit',
+	bSingleEvent = true,
 	--[[#DEBUG BEGIN]]
 	OnStat = function(szID, nTime)
-		USER_SETTINGS_TOTAL_TIME = USER_SETTINGS_TOTAL_TIME + nTime
-		table.insert(USER_SETTINGS_TIME_RANK, { szID = szID, nTime = nTime })
-		X.Log('USER_SETTINGS_REPORT', 'Event function "' .. szID .. '" execution takes ' .. nTime .. 'ms.')
+		X.CollectUsageRank(USER_SETTINGS_INIT_TIME_RANK, szID, nTime)
+		X.Log('USER_SETTINGS_INIT_REPORT', 'Event function "' .. szID .. '" execution takes ' .. nTime .. 'ms.')
 	end,
 	--[[#DEBUG END]]
 }
-local CommonEventFirer = X.CommonEventFirer
-local CommonEventRegister = X.CommonEventRegister
---[[#DEBUG BEGIN]]
-CommonEventFirer = function(...)
-	X.CommonEventFirer(...)
-	if select(2, ...) ~= '@@INIT@@' then
-		return
-	end
-	X.Log('USER_SETTINGS_REPORT', 'All event functions finished during ' .. USER_SETTINGS_TOTAL_TIME .. 'ms.')
-	table.sort(USER_SETTINGS_TIME_RANK, function(a, b) return a.nTime > b.nTime end)
-	local aTop, nMaxID = {}, 0
-	for i, p in ipairs(USER_SETTINGS_TIME_RANK) do
-		if i > 10 or p.nTime < 5 then
-			break
-		end
-		nMaxID = math.max(nMaxID, p.szID:len())
-		table.insert(aTop, p)
-	end
-	if #aTop > 0 then
-		X.Log('USER_SETTINGS_REPORT', 'Top ' .. #aTop ..  ' event functions loading time:')
-	end
-	local nTopTime = 0
-	for i, p in ipairs(aTop) do
-		nTopTime = nTopTime + p.nTime
-		X.Log('USER_SETTINGS_REPORT', string.format('%d. %' .. nMaxID .. 's: %dms', i, p.szID, p.nTime))
-	end
-	if #aTop > 0 then
-		X.Log('USER_SETTINGS_REPORT', string.format('Top event functions total loading time: %dms', nTopTime))
-	end
-end
---[[#DEBUG END]]
 
-function X.RegisterUserSettingsUpdate(...)
-	return CommonEventRegister(USER_SETTINGS_EVENT, ...)
+function X.RegisterUserSettingsInit(...)
+	if X.IsUserSettingsAvailable() then
+		local fnAction = ...
+		if not X.IsFunction(fnAction) then
+			fnAction = select(2, ...)
+		end
+		X.SafeCall(fnAction)
+	end
+	return X.CommonEventRegister(USER_SETTINGS_INIT_EVENT, ...)
+end
+
+--[[#DEBUG BEGIN]]
+local USER_SETTINGS_RELEASE_TIME_RANK = {}
+--[[#DEBUG END]]
+local USER_SETTINGS_RELEASE_EVENT = {
+	szName = 'UserSettingsRelease',
+	bSingleEvent = true,
+	--[[#DEBUG BEGIN]]
+	OnStat = function(szID, nTime)
+		X.CollectUsageRank(USER_SETTINGS_RELEASE_TIME_RANK, szID, nTime)
+		X.Log('USER_SETTINGS_RELEASE_REPORT', 'Event function "' .. szID .. '" execution takes ' .. nTime .. 'ms.')
+	end,
+	--[[#DEBUG END]]
+}
+
+function X.RegisterUserSettingsRelease(...)
+	return X.CommonEventRegister(USER_SETTINGS_RELEASE_EVENT, ...)
 end
 
 local DATABASE_TYPE_LIST = { X.PATH_TYPE.ROLE, X.PATH_TYPE.SERVER, X.PATH_TYPE.GLOBAL }
@@ -568,22 +570,26 @@ local function DeleteInstanceInfoData(inst, info)
 	end
 end
 
+function X.IsUserSettingsAvailable()
+	return DATABASE_CONNECTION_ESTABLISHED
+end
+
 function X.ConnectUserSettingsDB()
 	if DATABASE_CONNECTION_ESTABLISHED then
 		return
 	end
-	local szID, szDBPresetRoot, szUDBPresetRoot = X.GetUserSettingsPresetID(), nil, nil
+	local szID, szDBPresetRoot = X.GetUserSettingsPresetID(), nil
 	if not X.IsEmpty(szID) then
 		szDBPresetRoot = X.FormatPath({'config/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL})
-		szUDBPresetRoot = X.FormatPath({'userdata/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL})
 		CPath.MakeDir(szDBPresetRoot)
-		CPath.MakeDir(szUDBPresetRoot)
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
-			local pSettingsDB = X.NoSQLiteConnect(szDBPresetRoot
-				and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
-				or X.FormatPath({'config/settings.db', ePathType}))
+			local pSettingsDB = X.NoSQLiteConnect(
+				szDBPresetRoot
+					and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
+					or X.FormatPath({'config/settings.db', ePathType})
+			)
 			local pUserDataDB = X.NoSQLiteConnect(X.FormatPath({'userdata/userdata.db', ePathType}))
 			if not pSettingsDB then
 				X.Debug(X.PACKET_INFO.NAME_SPACE, 'Connect user settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
@@ -600,11 +606,26 @@ function X.ConnectUserSettingsDB()
 		end
 	end
 	DATABASE_CONNECTION_ESTABLISHED = true
-	CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
+	X.CommonEventFirer(USER_SETTINGS_INIT_EVENT)
+	--[[#DEBUG BEGIN]]
+	X.ReportUsageRank('USER_SETTINGS_INIT_REPORT', USER_SETTINGS_INIT_TIME_RANK)
+	--[[#DEBUG END]]
 end
 
+-- 根据 2022年5月17日 导出的接口 GetClientPlayerGlobalID()，
+-- 获取用户ID可提前至 SYNC_ROLE_DATA_BEGIN 事件，
+-- 而此事件发生于插件加载之前，因此可以直接初始化用户数据。
+X.SafeCall(function()
+	if X.GetClientPlayerGlobalID() then
+		X.ConnectUserSettingsDB()
+	end
+end)
+
 function X.ReleaseUserSettingsDB()
-	CommonEventFirer(USER_SETTINGS_EVENT, '@@UNINIT@@')
+	X.CommonEventFirer(USER_SETTINGS_RELEASE_EVENT)
+	--[[#DEBUG BEGIN]]
+	X.ReportUsageRank('USER_SETTINGS_RELEASE_REPORT', USER_SETTINGS_INIT_TIME_RANK)
+	--[[#DEBUG END]]
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		local inst = DATABASE_INSTANCE[ePathType]
 		if inst then
@@ -812,7 +833,10 @@ function X.ImportUserSettings(tKvp)
 			DATA_CACHE[szKey] = nil
 		end
 	end
-	CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
+	X.CommonEventFirer(USER_SETTINGS_INIT_EVENT)
+	--[[#DEBUG BEGIN]]
+	X.ReportUsageRank('USER_SETTINGS_INIT_REPORT', USER_SETTINGS_INIT_TIME_RANK)
+	--[[#DEBUG END]]
 	return nSuccess
 end
 
@@ -970,7 +994,7 @@ function X.SetUserSettings(szKey, ...)
 	-- else
 	-- 	inst.bSettingsDBCommit = true
 	-- end
-	CommonEventFirer(USER_SETTINGS_EVENT, szKey)
+	X.CommonEventFirer(USER_SETTINGS_UPDATE_EVENT, szKey)
 	return true
 end
 
@@ -1044,7 +1068,7 @@ function X.ResetUserSettings(szKey, ...)
 	-- else
 	-- 	inst.bSettingsDBCommit = true
 	-- end
-	CommonEventFirer(USER_SETTINGS_EVENT, szKey)
+	X.CommonEventFirer(USER_SETTINGS_UPDATE_EVENT, szKey)
 end
 
 -- 创建用户设置代理对象

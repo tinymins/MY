@@ -1063,7 +1063,7 @@ local O = X.CreateUserSettingsModule('LIB', _L['System'], {
 local function initForceCustom()
 	FireUIEvent(X.NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#ForceColor', initForceCustom)
+X.RegisterUserSettingsInit(X.NSFormatString('{$NS}#ForceColor'), initForceCustom)
 
 function X.GetForceColor(dwForce, szType)
 	if szType == 'background' then
@@ -1086,7 +1086,7 @@ end
 local function initCampCustom()
 	FireUIEvent(X.NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'LIB#CampColor', initCampCustom)
+X.RegisterUserSettingsInit(X.NSFormatString('{$NS}#CampColor'), initCampCustom)
 
 function X.GetCampColor(nCamp, szType)
 	if szType == 'background' then
@@ -4919,7 +4919,7 @@ do
 		end
 		if not PLAYER_GUID[dwID] then
 			if dwID == UI_GetClientPlayerID() then
-				local szGUID = X.GetClientInfo('szGlobalID')
+				local szGUID = X.GetClientPlayerGlobalID() or X.GetClientInfo('szGlobalID')
 				if szGUID == '0' then
 					szGUID = (X.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. X.GetClientInfo().dwID
 				end

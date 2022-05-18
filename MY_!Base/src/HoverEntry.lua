@@ -80,7 +80,7 @@ function D.CheckEnable()
 		})
 	end
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'HoverEntry', D.CheckEnable)
+X.RegisterUserSettingsInit(X.NSFormatString('{$NS}_HoverEntry'), D.CheckEnable)
 
 function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
