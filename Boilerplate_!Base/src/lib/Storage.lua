@@ -486,6 +486,13 @@ local USER_SETTINGS_INIT_EVENT = {
 }
 
 function X.RegisterUserSettingsInit(...)
+	if X.IsUserSettingsAvailable() then
+		local fnAction = ...
+		if not X.IsFunction(fnAction) then
+			fnAction = select(2, ...)
+		end
+		X.SafeCall(fnAction)
+	end
 	return X.CommonEventRegister(USER_SETTINGS_INIT_EVENT, ...)
 end
 
@@ -561,6 +568,10 @@ local function DeleteInstanceInfoData(inst, info)
 	if db then
 		db:Delete(info.szDataKey)
 	end
+end
+
+function X.IsUserSettingsAvailable()
+	return DATABASE_CONNECTION_ESTABLISHED
 end
 
 function X.ConnectUserSettingsDB()
