@@ -22,7 +22,7 @@ end
 Sample:
 	------------------
 	-- Get an instance
-	local IC = X.InfoCache('cache/PLAYER_INFO/{$relserver}/TONG/<SEG>.{$lang}.jx3dat', 2, 3000)
+	local IC = X.InfoCache('cache/PLAYER_INFO/{$server_origin}/TONG/<SEG>.{$lang}.jx3dat', 2, 3000)
 	--------------------
 	-- Setter and Getter
 	-- Set value
