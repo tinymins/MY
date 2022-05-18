@@ -554,7 +554,7 @@ function D.FlushDB()
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	X.Debug('MY_RoleStatistics_BagStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.LOG)
+	X.Debug('MY_RoleStatistics_BagStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
 	--[[#DEBUG END]]
 end
 X.RegisterFlush('MY_RoleStatistics_BagStat', D.FlushDB)
