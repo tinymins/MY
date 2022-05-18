@@ -223,7 +223,7 @@ function X.ReportUsageRank(szHeader, aRank)
 	for _, rank in ipairs(aRank) do
 		nTotalTime = nTotalTime + rank.nTime
 	end
-	X.Log(szHeader, #aRank .. ' tasks finished in ' .. nTotalTime .. 'ms.')
+	X.Log(szHeader, 'All ' .. #aRank .. ' tasks finished in ' .. nTotalTime .. 'ms.')
 	-- ÅÅÐòÍ³¼Æ
 	table.sort(aRank, function(a, b) return a.nTime > b.nTime end)
 	local aTop, nMaxID = {}, 0
