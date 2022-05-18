@@ -463,53 +463,48 @@ do
 ---------------------------------------------------------------------------------------------
 -- 用户配置项
 ---------------------------------------------------------------------------------------------
+local USER_SETTINGS_UPDATE_EVENT = {
+	szName = 'UserSettingsUpdate',
+}
+
+function X.RegisterUserSettingsUpdate(...)
+	return X.CommonEventRegister(USER_SETTINGS_UPDATE_EVENT, ...)
+end
+
 --[[#DEBUG BEGIN]]
-local USER_SETTINGS_TIME_RANK, USER_SETTINGS_TOTAL_TIME = {}, 0
+local USER_SETTINGS_INIT_TIME_RANK = {}
 --[[#DEBUG END]]
-local USER_SETTINGS_EVENT = {
-	szName = 'UserSettings',
+local USER_SETTINGS_INIT_EVENT = {
+	szName = 'UserSettingsInit',
+	bSingleEvent = true,
 	--[[#DEBUG BEGIN]]
 	OnStat = function(szID, nTime)
-		USER_SETTINGS_TOTAL_TIME = USER_SETTINGS_TOTAL_TIME + nTime
-		table.insert(USER_SETTINGS_TIME_RANK, { szID = szID, nTime = nTime })
-		X.Log('USER_SETTINGS_REPORT', 'Event function "' .. szID .. '" execution takes ' .. nTime .. 'ms.')
+		X.CollectUsageRank(USER_SETTINGS_INIT_TIME_RANK, szID, nTime)
+		X.Log('USER_SETTINGS_INIT_REPORT', 'Event function "' .. szID .. '" execution takes ' .. nTime .. 'ms.')
 	end,
 	--[[#DEBUG END]]
 }
-local CommonEventFirer = X.CommonEventFirer
-local CommonEventRegister = X.CommonEventRegister
---[[#DEBUG BEGIN]]
-CommonEventFirer = function(...)
-	X.CommonEventFirer(...)
-	if select(2, ...) ~= '@@INIT@@' then
-		return
-	end
-	X.Log('USER_SETTINGS_REPORT', 'All event functions finished during ' .. USER_SETTINGS_TOTAL_TIME .. 'ms.')
-	table.sort(USER_SETTINGS_TIME_RANK, function(a, b) return a.nTime > b.nTime end)
-	local aTop, nMaxID = {}, 0
-	for i, p in ipairs(USER_SETTINGS_TIME_RANK) do
-		if i > 10 or p.nTime < 5 then
-			break
-		end
-		nMaxID = math.max(nMaxID, p.szID:len())
-		table.insert(aTop, p)
-	end
-	if #aTop > 0 then
-		X.Log('USER_SETTINGS_REPORT', 'Top ' .. #aTop ..  ' event functions loading time:')
-	end
-	local nTopTime = 0
-	for i, p in ipairs(aTop) do
-		nTopTime = nTopTime + p.nTime
-		X.Log('USER_SETTINGS_REPORT', string.format('%d. %' .. nMaxID .. 's: %dms', i, p.szID, p.nTime))
-	end
-	if #aTop > 0 then
-		X.Log('USER_SETTINGS_REPORT', string.format('Top event functions total loading time: %dms', nTopTime))
-	end
-end
---[[#DEBUG END]]
 
-function X.RegisterUserSettingsUpdate(...)
-	return CommonEventRegister(USER_SETTINGS_EVENT, ...)
+function X.RegisterUserSettingsInit(...)
+	return X.CommonEventRegister(USER_SETTINGS_INIT_EVENT, ...)
+end
+
+--[[#DEBUG BEGIN]]
+local USER_SETTINGS_RELEASE_TIME_RANK = {}
+--[[#DEBUG END]]
+local USER_SETTINGS_RELEASE_EVENT = {
+	szName = 'UserSettingsRelease',
+	bSingleEvent = true,
+	--[[#DEBUG BEGIN]]
+	OnStat = function(szID, nTime)
+		X.CollectUsageRank(USER_SETTINGS_RELEASE_TIME_RANK, szID, nTime)
+		X.Log('USER_SETTINGS_RELEASE_REPORT', 'Event function "' .. szID .. '" execution takes ' .. nTime .. 'ms.')
+	end,
+	--[[#DEBUG END]]
+}
+
+function X.RegisterUserSettingsRelease(...)
+	return X.CommonEventRegister(USER_SETTINGS_RELEASE_EVENT, ...)
 end
 
 local DATABASE_TYPE_LIST = { X.PATH_TYPE.ROLE, X.PATH_TYPE.SERVER, X.PATH_TYPE.GLOBAL }
@@ -600,11 +595,17 @@ function X.ConnectUserSettingsDB()
 		end
 	end
 	DATABASE_CONNECTION_ESTABLISHED = true
-	CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
+	X.CommonEventFirer(USER_SETTINGS_INIT_EVENT)
+	--[[#DEBUG BEGIN]]
+	X.ReportUsageRank('USER_SETTINGS_INIT_REPORT', USER_SETTINGS_INIT_TIME_RANK)
+	--[[#DEBUG END]]
 end
 
 function X.ReleaseUserSettingsDB()
-	CommonEventFirer(USER_SETTINGS_EVENT, '@@UNINIT@@')
+	X.CommonEventFirer(USER_SETTINGS_RELEASE_EVENT)
+	--[[#DEBUG BEGIN]]
+	X.ReportUsageRank('USER_SETTINGS_RELEASE_REPORT', USER_SETTINGS_INIT_TIME_RANK)
+	--[[#DEBUG END]]
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		local inst = DATABASE_INSTANCE[ePathType]
 		if inst then
@@ -812,7 +813,10 @@ function X.ImportUserSettings(tKvp)
 			DATA_CACHE[szKey] = nil
 		end
 	end
-	CommonEventFirer(USER_SETTINGS_EVENT, '@@INIT@@')
+	X.CommonEventFirer(USER_SETTINGS_INIT_EVENT)
+	--[[#DEBUG BEGIN]]
+	X.ReportUsageRank('USER_SETTINGS_INIT_REPORT', USER_SETTINGS_INIT_TIME_RANK)
+	--[[#DEBUG END]]
 	return nSuccess
 end
 
@@ -970,7 +974,7 @@ function X.SetUserSettings(szKey, ...)
 	-- else
 	-- 	inst.bSettingsDBCommit = true
 	-- end
-	CommonEventFirer(USER_SETTINGS_EVENT, szKey)
+	X.CommonEventFirer(USER_SETTINGS_UPDATE_EVENT, szKey)
 	return true
 end
 
@@ -1044,7 +1048,7 @@ function X.ResetUserSettings(szKey, ...)
 	-- else
 	-- 	inst.bSettingsDBCommit = true
 	-- end
-	CommonEventFirer(USER_SETTINGS_EVENT, szKey)
+	X.CommonEventFirer(USER_SETTINGS_UPDATE_EVENT, szKey)
 end
 
 -- 创建用户设置代理对象
