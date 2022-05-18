@@ -114,7 +114,6 @@ function D.Apply()
 		X.UI.GetShadowHandle('MY_ChangGeShadow'):Hide()
 	end
 end
-X.RegisterUserSettingsInit('MY_ChangGeShadow', D.Apply)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
@@ -214,5 +213,11 @@ local settings = {
 }
 MY_ChangGeShadow = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_ChangGeShadow', D.Apply)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

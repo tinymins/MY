@@ -55,20 +55,6 @@ function D.Render(szMsg)
 	return szMsg
 end
 
-X.RegisterInit('MY_ChatEmotion', function()
-	X.HookChatPanel('BEFORE', 'MY_ChatEmotion', function(h, szMsg, ...)
-		return D.Render(szMsg), ...
-	end)
-end)
-
-X.RegisterUserSettingsInit('MY_ChatEmotion', function()
-	D.bReady = true
-end)
-
-X.RegisterUserSettingsRelease('MY_ChatEmotion', function()
-	D.bReady = false
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nPaddingX
 	nX = nX + ui:Append('WndCheckBox', {
@@ -112,5 +98,23 @@ local settings = {
 }
 MY_ChatEmotion = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterInit('MY_ChatEmotion', function()
+	X.HookChatPanel('BEFORE', 'MY_ChatEmotion', function(h, szMsg, ...)
+		return D.Render(szMsg), ...
+	end)
+end)
+
+X.RegisterUserSettingsInit('MY_ChatEmotion', function()
+	D.bReady = true
+end)
+
+X.RegisterUserSettingsRelease('MY_ChatEmotion', function()
+	D.bReady = false
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

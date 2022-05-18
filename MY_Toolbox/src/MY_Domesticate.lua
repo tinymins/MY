@@ -165,7 +165,7 @@ function D.UnHookDomesticatePanel()
 end
 
 function D.CheckAutoFeedEnable()
-	if D.bReady and D.IsAutoFeedValid(GetClientPlayer()) then
+	if D.bReady then
 		X.BreatheCall('MY_Domesticate__AutoFeed', 30000, function()
 			local me = GetClientPlayer()
 			if not me then
@@ -249,14 +249,6 @@ function D.CheckAlertEnable()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_Domesticate', function()
-	D.bReady = true
-	D.CheckAutoFeedEnable()
-	D.CheckAlertEnable()
-end)
-X.RegisterFrameCreate('DomesticatePanel', 'MY_Domesticate', D.HookDomesticatePanel)
-X.RegisterReload('MY_Domesticate', D.UnHookDomesticatePanel)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
@@ -287,7 +279,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_Domesticate',
@@ -331,5 +325,17 @@ local settings = {
 }
 MY_Domesticate = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_Domesticate', function()
+	D.bReady = true
+	D.CheckAutoFeedEnable()
+	D.CheckAlertEnable()
+end)
+X.RegisterFrameCreate('DomesticatePanel', 'MY_Domesticate', D.HookDomesticatePanel)
+X.RegisterReload('MY_Domesticate', D.UnHookDomesticatePanel)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

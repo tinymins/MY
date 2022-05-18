@@ -326,17 +326,10 @@ function D.Init()
 	D.LoadData()
 	D.RegisterMsgMonitor()
 end
-X.RegisterUserSettingsInit('MY_CHATMONITOR', D.Init)
-
-X.RegisterUserSettingsRelease('MY_CHATMONITOR', function()
-	D.bReady = false
-	D.RegisterMsgMonitor()
-end)
 
 function D.Exit()
 	D.SaveData()
 end
-X.RegisterExit('MY_ChatMonitor', D.Exit)
 
 function D.RegisterMsgMonitor()
 	for _, szChannel in ipairs(D.aCurrentChannel or X.CONSTANT.EMPTY_TABLE) do
@@ -381,9 +374,22 @@ X.RegisterHotKey('MY_ChatMonitor_Hotkey', _L['MY_ChatMonitor'], function()
 	end
 end, nil)
 
--------------------------------------------------------------------------------------------------------
--- 设置界面
--------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_ChatMonitor', D.Init)
+
+X.RegisterUserSettingsRelease('MY_ChatMonitor', function()
+	D.bReady = false
+	D.RegisterMsgMonitor()
+end)
+X.RegisterExit('MY_ChatMonitor', D.Exit)
+
+--------------------------------------------------------------------------------
+-- 面板注册
+--------------------------------------------------------------------------------
+
 local PS = {}
 
 function PS.OnPanelActive(wnd)

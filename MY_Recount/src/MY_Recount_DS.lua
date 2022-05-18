@@ -1996,14 +1996,6 @@ X.RegisterFlush('MY_Recount_DS', function()
 	end
 end)
 
-X.RegisterUserSettingsInit(function()
-	D.bReady = true
-end)
-
-X.RegisterUserSettingsRelease(function()
-	D.bReady = false
-end)
-
 -- 同名目标数据合并
 do local tDstDetail, id, tDstSkill, tDstSkillDetail, tDstSkillTarget, tDstTarget, tDstTargetDetail, tDstTargetSkill
 function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect, bHideAnonymous)
@@ -2300,7 +2292,9 @@ function D.GetMergeTargetData(data, szChannel, id, bMergeNpc, bMergeEffect, bHid
 end
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_Recount_DS',
@@ -2383,5 +2377,17 @@ local settings = {
 }
 MY_Recount_DS = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_Recount_DS', function()
+	D.bReady = true
+end)
+
+X.RegisterUserSettingsRelease('MY_Recount_DS', function()
+	D.bReady = false
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -504,13 +504,6 @@ local INFO_TIP_LIST = {
 }
 local D = {}
 
-X.RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT', function()
-	for _, v in ipairs(INFO_TIP_LIST) do
-		v.config('reset', {'anchor'})
-	end
-	D.ReinitUI()
-end)
-
 -- 显示信息条
 function D.ReinitUI()
 	for _, data in ipairs(INFO_TIP_LIST) do
@@ -563,10 +556,24 @@ function D.ReinitUI()
 	end
 end
 
--- 注册INIT事件
-X.RegisterUserSettingsInit('MY_INFOTIP', function()
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+X.RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT', function()
+	for _, v in ipairs(INFO_TIP_LIST) do
+		v.config('reset', {'anchor'})
+	end
 	D.ReinitUI()
 end)
+
+X.RegisterUserSettingsInit('MY_InfoTip', function()
+	D.ReinitUI()
+end)
+
+--------------------------------------------------------------------------------
+-- 界面注册
+--------------------------------------------------------------------------------
 
 local PS = {}
 

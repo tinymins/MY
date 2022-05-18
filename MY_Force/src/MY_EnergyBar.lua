@@ -538,7 +538,6 @@ function D.Apply()
 		end
 	end
 end
-X.RegisterUserSettingsInit('MY_EnergyBar', D.Apply)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
@@ -576,5 +575,11 @@ local settings = {
 }
 MY_EnergyBar = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_EnergyBar', D.Apply)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

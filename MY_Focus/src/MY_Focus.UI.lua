@@ -618,14 +618,6 @@ function D.OnCheckBoxUncheck()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_FOCUS', function()
-	if MY_Focus.bEnable then
-		D.Open()
-	else
-		D.Close()
-	end
-end)
-
 -- Global exports
 do
 local settings = {
@@ -643,5 +635,17 @@ local settings = {
 }
 MY_FocusUI = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_FocusUI', function()
+	if MY_Focus.IsEnabled() then
+		D.Open()
+	else
+		D.Close()
+	end
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

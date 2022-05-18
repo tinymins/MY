@@ -39,12 +39,6 @@ function D.Apply()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_HideAnnounceBg', function()
-	D.bReady = true
-	D.Apply()
-end)
-X.RegisterFrameCreate('GMAnnouncePanel', 'MY_HideAnnounceBg', D.Apply)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY,
@@ -58,7 +52,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_HideAnnounceBg',
@@ -90,5 +86,15 @@ local settings = {
 }
 MY_HideAnnounceBg = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_HideAnnounceBg', function()
+	D.bReady = true
+	D.Apply()
+end)
+X.RegisterFrameCreate('GMAnnouncePanel', 'MY_HideAnnounceBg', D.Apply)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

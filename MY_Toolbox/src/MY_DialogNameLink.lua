@@ -78,16 +78,14 @@ function D.Apply()
 		X.RegisterEvent('OPEN_WINDOW', 'NAMELINKER', false)
 	end
 end
-X.RegisterUserSettingsInit('MY_DialogNameLink', function()
-	D.bReady = true
-	D.Apply()
-end)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_DialogNameLink',
@@ -119,5 +117,14 @@ local settings = {
 }
 MY_DialogNameLink = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_DialogNameLink', function()
+	D.bReady = true
+	D.Apply()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

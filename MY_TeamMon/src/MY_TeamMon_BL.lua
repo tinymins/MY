@@ -210,9 +210,9 @@ function D.Init()
 	Wnd.OpenWindow(BL_INIFILE, 'MY_TeamMon_BL')
 end
 
-X.RegisterUserSettingsInit('MY_TeamMon_BL', D.Init)
-
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TeamMon_BL',
@@ -247,5 +247,11 @@ local settings = {
 }
 MY_TeamMon_BL = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_TeamMon_BL', D.Init)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

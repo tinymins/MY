@@ -713,9 +713,35 @@ function D.OnBreatheCall()
 	end
 end
 
----------------------------------------------------------------------
--- 注册事件、初始化
----------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_GKPDoodad',
+	exports = {
+		{
+			preset = 'UIEvent',
+			root = D,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				'tNameColor',
+				'tCraft',
+				'szCustom',
+			},
+			root = O2,
+		},
+	},
+}
+MY_GKPDoodad = X.CreateModule(settings)
+end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
 X.RegisterEvent('LOADING_ENDING', function()
 	D.tLooted = {}
 	D.CheckShowName()
@@ -797,10 +823,9 @@ X.RegisterUserSettingsRelease('MY_GKPDoodad', function()
 	D.bReady = false
 end)
 
-
--------------------------------------
--- 设置界面
--------------------------------------
+--------------------------------------------------------------------------------
+-- 界面注册
+--------------------------------------------------------------------------------
 local PS = { nPriority = 2.1 }
 
 function PS.OnPanelActive(frame)
@@ -1127,29 +1152,5 @@ function PS.OnPanelActive(frame)
 	end
 end
 X.RegisterPanel(_L['General'], 'MY_GKPDoodad', _L['MY_GKPLoot'], 90, PS)
-
--- Global exports
-do
-local settings = {
-	name = 'MY_GKPDoodad',
-	exports = {
-		{
-			preset = 'UIEvent',
-			root = D,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				'tNameColor',
-				'tCraft',
-				'szCustom',
-			},
-			root = O2,
-		},
-	},
-}
-MY_GKPDoodad = X.CreateModule(settings)
-end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

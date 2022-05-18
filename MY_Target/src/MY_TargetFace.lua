@@ -198,20 +198,11 @@ function D.CheckEnable()
 	end
 	D.RequireRerender()
 end
-
-X.RegisterEvent('MY_RESTRICTION', 'MY_TargetFace', function()
-	if arg0 and arg0 ~= 'MY_TargetFace' then
-		return
-	end
-	D.CheckEnable()
-end)
-X.RegisterUserSettingsInit('MY_TargetFace', function()
-	D.bReady = true
-	D.CheckEnable()
-end)
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TargetFace',
@@ -273,5 +264,21 @@ local settings = {
 }
 MY_TargetFace = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_TargetFace', function()
+	if arg0 and arg0 ~= 'MY_TargetFace' then
+		return
+	end
+	D.CheckEnable()
+end)
+
+X.RegisterUserSettingsInit('MY_TargetFace', function()
+	D.bReady = true
+	D.CheckEnable()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

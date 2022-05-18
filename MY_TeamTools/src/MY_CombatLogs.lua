@@ -679,11 +679,6 @@ X.RegisterEvent('PARTY_ADD_MEMBER', function()
 	end
 end)
 
-X.RegisterUserSettingsInit('MY_CombatLogs', function()
-	D.bReady = true
-	D.UpdateEnable()
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
@@ -758,8 +753,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	return nX, nY, nLFY
 end
 
-
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_CombatLogs',
@@ -801,5 +797,14 @@ local settings = {
 }
 MY_CombatLogs = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_CombatLogs', function()
+	D.bReady = true
+	D.UpdateEnable()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

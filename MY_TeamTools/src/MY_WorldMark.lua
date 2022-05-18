@@ -135,16 +135,9 @@ function D.CheckEnable()
 	X.RegisterModuleEvent('MY_WorldMark', D.GetEvent())
 end
 
-X.RegisterEvent('MY_RESTRICTION', 'MY_WorldMark', function()
-	if arg0 and arg0 ~= 'MY_WorldMark' then
-		return
-	end
-	D.CheckEnable()
-end)
-X.RegisterUserSettingsInit('MY_WorldMark', D.CheckEnable)
-
-
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_WorldMark',
@@ -173,5 +166,17 @@ local settings = {
 }
 MY_WorldMark = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_WorldMark', function()
+	if arg0 and arg0 ~= 'MY_WorldMark' then
+		return
+	end
+	D.CheckEnable()
+end)
+X.RegisterUserSettingsInit('MY_WorldMark', D.CheckEnable)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

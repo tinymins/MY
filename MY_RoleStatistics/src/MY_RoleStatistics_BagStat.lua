@@ -1082,33 +1082,9 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
---------------------------------------------------------
--- 事件注册
---------------------------------------------------------
-
-X.RegisterUserSettingsInit('MY_RoleStatistics_BagStat', function()
-	D.bReady = true
-	D.UpdateFloatEntry()
-end)
-
-X.RegisterExit('MY_RoleStatistics_BagStat', function()
-	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
-		D.UpdateSaveDB()
-		D.FlushDB()
-	end
-end)
-
-X.RegisterReload('MY_RoleStatistics_BagStat', function()
-	D.ApplyFloatEntry(false)
-end)
-
-X.RegisterFrameCreate('BigBagPanel', 'MY_RoleStatistics_BagStat', function()
-	D.UpdateFloatEntry()
-end)
-
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Module exports
---------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_BagStat',
@@ -1127,9 +1103,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('BagStat', _L['MY_RoleStatistics_BagStat'], X.CreateModule(settings))
 end
 
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Global exports
---------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_BagStat',
@@ -1176,5 +1152,29 @@ local settings = {
 }
 MY_RoleStatistics_BagStat = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_RoleStatistics_BagStat', function()
+	D.bReady = true
+	D.UpdateFloatEntry()
+end)
+
+X.RegisterExit('MY_RoleStatistics_BagStat', function()
+	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
+end)
+
+X.RegisterReload('MY_RoleStatistics_BagStat', function()
+	D.ApplyFloatEntry(false)
+end)
+
+X.RegisterFrameCreate('BigBagPanel', 'MY_RoleStatistics_BagStat', function()
+	D.UpdateFloatEntry()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

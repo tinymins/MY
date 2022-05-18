@@ -136,16 +136,6 @@ function D.CheckEnable()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_ChatBlock', function()
-	D.bReady = true
-	D.aBlockWords = O.aBlockWords
-	D.CheckEnable()
-end)
-X.RegisterUserSettingsRelease('MY_ChatBlock', function()
-	D.bReady = false
-	D.CheckEnable()
-end)
-
 -- Global exports
 do
 local settings = {
@@ -161,6 +151,24 @@ local settings = {
 }
 MY_ChatBlock = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_ChatBlock', function()
+	D.bReady = true
+	D.aBlockWords = O.aBlockWords
+	D.CheckEnable()
+end)
+X.RegisterUserSettingsRelease('MY_ChatBlock', function()
+	D.bReady = false
+	D.CheckEnable()
+end)
+
+--------------------------------------------------------------------------------
+-- Ãæ°å×¢²á
+--------------------------------------------------------------------------------
 
 local PS = {}
 function PS.OnPanelActive(wnd)

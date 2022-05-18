@@ -866,31 +866,10 @@ local function OnCharacterSay(dwID, nChannel, szMsg)
 	lb:SetBalloon(szMsg, GetTime(), bc.nDuring, Config.nBalloonOffsetY)
 end
 
-X.RegisterEvent('CHARACTER_SAY', function()
-	local szMsg = Table_GetSmartDialog(arg3, arg0)
-	szMsg = GetFormatText(szMsg)
-	OnCharacterSay(arg1, arg2, szMsg)
-end)
-
-X.RegisterEvent('PLAYER_SAY', function()
-	OnCharacterSay(arg1, arg2, arg0)
-end)
-
 local function onSwitch()
 	O.bEnabled = not O.bEnabled
 	D.Reset()
 end
-X.RegisterHotKey('MY_LifeBar_S', _L['MY_LifeBar'], onSwitch)
-
-X.RegisterUserSettingsInit('MY_LifeBar', function()
-	D.bReady = true
-	D.Reset()
-end)
-
-X.RegisterUserSettingsRelease('MY_LifeBar', function()
-	D.bReady = false
-	D.Reset()
-end)
 
 --------------------------------------------------------------------------
 -- Global exports
@@ -929,5 +908,31 @@ local settings = {
 }
 MY_LifeBar = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterHotKey('MY_LifeBar_S', _L['MY_LifeBar'], onSwitch)
+
+X.RegisterEvent('CHARACTER_SAY', function()
+	local szMsg = Table_GetSmartDialog(arg3, arg0)
+	szMsg = GetFormatText(szMsg)
+	OnCharacterSay(arg1, arg2, szMsg)
+end)
+
+X.RegisterEvent('PLAYER_SAY', function()
+	OnCharacterSay(arg1, arg2, arg0)
+end)
+
+X.RegisterUserSettingsInit('MY_LifeBar', function()
+	D.bReady = true
+	D.Reset()
+end)
+
+X.RegisterUserSettingsRelease('MY_LifeBar', function()
+	D.bReady = false
+	D.Reset()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

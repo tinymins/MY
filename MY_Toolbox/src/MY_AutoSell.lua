@@ -202,15 +202,6 @@ function D.CheckEnable()
 		X.RegisterEvent('SHOP_OPENSHOP', 'MY_AutoSell', false)
 	end
 end
-X.RegisterUserSettingsInit('MY_AutoSell', function()
-	for _, k in ipairs({'tSellItem', 'tProtectItem'}) do
-		if D[k] then
-			X.SafeCall(X.Set, O, k, D[k])
-			D[k] = nil
-		end
-	end
-	D.CheckEnable()
-end)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX = nX + ui:Append('WndCheckBox', {
@@ -352,7 +343,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_AutoSell',
@@ -378,5 +371,19 @@ local settings = {
 }
 MY_AutoSell = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_AutoSell', function()
+	for _, k in ipairs({'tSellItem', 'tProtectItem'}) do
+		if D[k] then
+			X.SafeCall(X.Set, O, k, D[k])
+			D[k] = nil
+		end
+	end
+	D.CheckEnable()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

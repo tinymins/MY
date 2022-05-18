@@ -78,18 +78,6 @@ function D.CheckEnable()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_FriendTipLocation', function()
-	D.bReady = true
-	D.CheckEnable()
-end)
-X.RegisterReload('MY_FriendTipLocation', D.Unhook)
-X.RegisterEvent('MY_RESTRICTION', 'MY_FriendTipLocation', function()
-	if arg0 and arg0 ~= 'MY_FriendTipLocation' then
-		return
-	end
-	D.CheckEnable()
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	if not X.IsRestricted('MY_FriendTipLocation') then
 		nX = nX + ui:Append('WndCheckBox', {
@@ -104,7 +92,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_FriendTipLocation',
@@ -136,5 +126,21 @@ local settings = {
 }
 MY_FriendTipLocation = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_FriendTipLocation', function()
+	D.bReady = true
+	D.CheckEnable()
+end)
+X.RegisterReload('MY_FriendTipLocation', D.Unhook)
+X.RegisterEvent('MY_RESTRICTION', 'MY_FriendTipLocation', function()
+	if arg0 and arg0 ~= 'MY_FriendTipLocation' then
+		return
+	end
+	D.CheckEnable()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

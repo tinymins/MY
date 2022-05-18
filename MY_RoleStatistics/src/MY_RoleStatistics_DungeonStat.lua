@@ -1208,67 +1208,6 @@ function D.UpdateFloatEntry()
 end
 
 --------------------------------------------------------
--- 事件注册
---------------------------------------------------------
-
-X.RegisterUserSettingsInit('MY_RoleStatistics_DungeonStat', function()
-	D.bReady = true
-	D.UpdateFloatEntry()
-end)
-
-X.RegisterInit('MY_RoleStatistics_DungeonStat', function()
-	X.DelayCall('MY_RoleStatistics_DungeonStat__InitMapProgress', 60000, function()
-		D.UpdateMapProgress()
-	end)
-	D.InitDB()
-end)
-
-X.RegisterExit('MY_RoleStatistics_DungeonStat', function()
-	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
-		D.UpdateSaveDB()
-		D.FlushDB()
-		D.UpdateMapProgress()
-	end
-end)
-
-X.RegisterReload('MY_RoleStatistics_DungeonStat', function()
-	D.ApplyFloatEntry(false)
-end)
-
--- 首领死亡刷新秘境进度（秘境内同步拾取则视为进度更新）
-X.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
-	if not D.bReady or not X.IsInDungeon() then
-		return
-	end
-	local me = GetClientPlayer()
-	if me then
-		D.bMapSaveCopyValid = false
-		D.tMapProgressValid[me.GetMapID()] = false
-	end
-	X.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
-end)
-
-X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
-	local dwMapID, dwPlayerID = arg0, arg1
-	if dwPlayerID ~= UI_GetClientPlayerID() then
-		return
-	end
-	D.tMapProgressValid[dwMapID] = true
-	D.FlushDB()
-end)
-
-X.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', function()
-	local tMapCopy = arg0
-	D.tMapSaveCopy = tMapCopy
-	D.bMapSaveCopyValid = true
-	D.FlushDB()
-end)
-
-X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_DungeonStat', function()
-	D.UpdateFloatEntry()
-end)
-
---------------------------------------------------------
 -- Module exports
 --------------------------------------------------------
 do
@@ -1332,5 +1271,67 @@ local settings = {
 }
 MY_RoleStatistics_DungeonStat = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_RoleStatistics_DungeonStat', function()
+	D.bReady = true
+	D.UpdateFloatEntry()
+end)
+
+X.RegisterInit('MY_RoleStatistics_DungeonStat', function()
+	X.DelayCall('MY_RoleStatistics_DungeonStat__InitMapProgress', 60000, function()
+		D.UpdateMapProgress()
+	end)
+	D.InitDB()
+end)
+
+X.RegisterExit('MY_RoleStatistics_DungeonStat', function()
+	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+		D.UpdateMapProgress()
+	end
+end)
+
+X.RegisterReload('MY_RoleStatistics_DungeonStat', function()
+	D.ApplyFloatEntry(false)
+end)
+
+-- 首领死亡刷新秘境进度（秘境内同步拾取则视为进度更新）
+X.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
+	if not D.bReady or not X.IsInDungeon() then
+		return
+	end
+	local me = GetClientPlayer()
+	if me then
+		D.bMapSaveCopyValid = false
+		D.tMapProgressValid[me.GetMapID()] = false
+	end
+	X.DelayCall('MY_RoleStatistics_DungeonStat__UpdateMapCopy', 300, function() D.UpdateMapProgress() end)
+end)
+
+X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
+	local dwMapID, dwPlayerID = arg0, arg1
+	if dwPlayerID ~= UI_GetClientPlayerID() then
+		return
+	end
+	D.tMapProgressValid[dwMapID] = true
+	D.FlushDB()
+end)
+
+X.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', function()
+	local tMapCopy = arg0
+	D.tMapSaveCopy = tMapCopy
+	D.bMapSaveCopyValid = true
+	D.FlushDB()
+end)
+
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_DungeonStat', function()
+	D.UpdateFloatEntry()
+end)
+
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

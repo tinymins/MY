@@ -60,6 +60,7 @@ local DATA_ENV = setmetatable(
 		IsTable                    = X.IsTable                   ,
 		IsFunction                 = X.IsFunction                ,
 		GetAccount                 = X.GetAccount                ,
+		GetServerOriginName        = X.GetServerOriginName       ,
 		GetItemAmountInAllPackages = X.GetItemAmountInAllPackages,
 		RegisterFrameCreate        = X.RegisterFrameCreate       ,
 		ITEM_TABLE_TYPE            = ITEM_TABLE_TYPE             ,
@@ -1253,48 +1254,9 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
---------------------------------------------------------
--- 事件注册
---------------------------------------------------------
-
-X.RegisterUserSettingsInit('MY_RoleStatistics_RoleStat', function()
-	D.bReady = true
-	D.UpdateFloatEntry()
-end)
-
-X.RegisterInit('MY_RoleStatistics_RoleStat', function()
-	D.InitAlert()
-end)
-
-X.RegisterFlush('MY_RoleStatistics_RoleStat', function()
-	D.FlushDB()
-end)
-
-X.RegisterExit('MY_RoleStatistics_RoleStat', function()
-	if PLAYER_REC then
-		X.SaveLUAData(PLAYER_REC_FILE, PLAYER_REC)
-	end
-	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
-		D.UpdateSaveDB()
-		D.FlushDB()
-	end
-end)
-
-X.RegisterReload('MY_RoleStatistics_RoleStat', function()
-	D.ApplyFloatEntry(false)
-end)
-
-X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_RoleStat', function()
-	D.UpdateFloatEntry()
-end)
-
-X.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat', function()
-	D.OutputAlert()
-end)
-
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Module exports
---------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_RoleStat',
@@ -1313,9 +1275,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('RoleStat', _L['MY_RoleStatistics_RoleStat'], X.CreateModule(settings))
 end
 
---------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Global exports
---------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_RoleStat',
@@ -1361,5 +1323,44 @@ local settings = {
 }
 MY_RoleStatistics_RoleStat = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_RoleStatistics_RoleStat', function()
+	D.bReady = true
+	D.UpdateFloatEntry()
+end)
+
+X.RegisterInit('MY_RoleStatistics_RoleStat', function()
+	D.InitAlert()
+end)
+
+X.RegisterFlush('MY_RoleStatistics_RoleStat', function()
+	D.FlushDB()
+end)
+
+X.RegisterExit('MY_RoleStatistics_RoleStat', function()
+	if PLAYER_REC then
+		X.SaveLUAData(PLAYER_REC_FILE, PLAYER_REC)
+	end
+	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
+		D.UpdateSaveDB()
+		D.FlushDB()
+	end
+end)
+
+X.RegisterReload('MY_RoleStatistics_RoleStat', function()
+	D.ApplyFloatEntry(false)
+end)
+
+X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_RoleStat', function()
+	D.UpdateFloatEntry()
+end)
+
+X.RegisterFrameCreate('OptionPanel', 'MY_RoleStatistics_RoleStat', function()
+	D.OutputAlert()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

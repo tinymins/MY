@@ -192,18 +192,6 @@ function D.OnFrameDragEnd()
 	O.tAnchor = GetFrameAnchor(this)
 end
 
-X.RegisterEvent('MY_RESTRICTION', 'MY_Target', function()
-	if arg0 and arg0 ~= 'MY_Target' then
-		return
-	end
-	D.CheckEnable()
-end)
-X.RegisterUserSettingsInit('MY_TargetDirection', function()
-	D.bReady = true
-	D.CheckEnable()
-	D.UpdateAnchor()
-end)
-
 -- Global exports
 do
 local settings = {
@@ -239,5 +227,21 @@ local settings = {
 }
 MY_TargetDirection = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_Target', function()
+	if arg0 and arg0 ~= 'MY_Target' then
+		return
+	end
+	D.CheckEnable()
+end)
+X.RegisterUserSettingsInit('MY_TargetDirection', function()
+	D.bReady = true
+	D.CheckEnable()
+	D.UpdateAnchor()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

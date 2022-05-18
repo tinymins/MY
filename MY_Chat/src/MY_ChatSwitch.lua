@@ -455,21 +455,6 @@ function D.ApplyBattlefieldChannelSwitch()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
-	D.aWhisper = O.aWhisper
-	D.tChannelCount = O.tChannelCount
-	D.ApplyBattlefieldChannelSwitch()
-end)
-
-X.RegisterUserSettingsRelease('MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
-	if D.bWhisperChanged then
-		O.aWhisper = D.aWhisper
-	end
-	if D.bChannelCountChanged then
-		O.tChannelCount = D.tChannelCount
-	end
-end)
-
 function D.OnFrameCreate()
 	this.tRadios = {}
 	this:RegisterEvent('UI_SCALED')
@@ -661,7 +646,6 @@ function D.ReInitUI()
 	end
 	Wnd.OpenWindow(INI_PATH, 'MY_ChatSwitch')
 end
-X.RegisterUserSettingsInit('MY_ChatSwitch__UI', D.ReInitUI)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nPaddingX
@@ -755,5 +739,26 @@ local settings = {
 }
 MY_ChatSwitch = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
+	D.aWhisper = O.aWhisper
+	D.tChannelCount = O.tChannelCount
+	D.ApplyBattlefieldChannelSwitch()
+end)
+
+X.RegisterUserSettingsRelease('MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
+	if D.bWhisperChanged then
+		O.aWhisper = D.aWhisper
+	end
+	if D.bChannelCountChanged then
+		O.tChannelCount = D.tChannelCount
+	end
+end)
+
+X.RegisterUserSettingsInit('MY_ChatSwitch__UI', D.ReInitUI)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -497,6 +497,50 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 	end
 end
 
+--------------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_ThreatRank',
+	exports = {
+		{
+			preset = 'UIEvent',
+			root = TS,
+		},
+	},
+}
+MY_ThreatRank = X.CreateModule(settings)
+end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+do
+local function GetMenu()
+	return {
+		szOption = g_tStrings.HATRED_COLLECT,
+		bCheck = true, bChecked = not not _TS.GetFrame(),
+		fnAction = function()
+			O.bInDungeon = false
+			if not _TS.GetFrame() then -- 这样才对嘛  按按钮应该强制开启和关闭
+				O.bEnable = true
+			else
+				O.bEnable = false
+			end
+			_TS.CheckOpen()
+		end
+	}
+end
+X.RegisterAddonMenu(GetMenu)
+end
+X.RegisterEvent('LOADING_END', _TS.CheckOpen)
+X.RegisterUserSettingsInit('MY_ThreatRank', _TS.CheckOpen)
+
+--------------------------------------------------------------------------------
+-- 界面注册
+--------------------------------------------------------------------------------
+
 local PS = {}
 function PS.OnPanelActive(frame)
 	local ui = X.UI(frame)
@@ -663,40 +707,5 @@ function PS.OnPanelActive(frame)
 	})
 end
 X.RegisterPanel(_L['Target'], 'MY_ThreatRank', g_tStrings.HATRED_COLLECT, 632, PS)
-
-do
-local function GetMenu()
-	return {
-		szOption = g_tStrings.HATRED_COLLECT,
-		bCheck = true, bChecked = not not _TS.GetFrame(),
-		fnAction = function()
-			O.bInDungeon = false
-			if not _TS.GetFrame() then -- 这样才对嘛  按按钮应该强制开启和关闭
-				O.bEnable = true
-			else
-				O.bEnable = false
-			end
-			_TS.CheckOpen()
-		end
-	}
-end
-X.RegisterAddonMenu(GetMenu)
-end
-X.RegisterEvent('LOADING_END', _TS.CheckOpen)
-X.RegisterUserSettingsInit('MY_ThreatRank', _TS.CheckOpen)
-
--- Global exports
-do
-local settings = {
-	name = 'MY_ThreatRank',
-	exports = {
-		{
-			preset = 'UIEvent',
-			root = TS,
-		},
-	},
-}
-MY_ThreatRank = X.CreateModule(settings)
-end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

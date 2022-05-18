@@ -165,11 +165,6 @@ function D.CheckNamelinkEnable()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_ChatCopy', function()
-	D.bReady = true
-	D.CheckNamelinkEnable()
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nPaddingX
 	nX = nX + ui:Append('WndCheckBox', {
@@ -306,5 +301,14 @@ local settings = {
 }
 MY_ChatCopy = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_ChatCopy', function()
+	D.bReady = true
+	D.CheckNamelinkEnable()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

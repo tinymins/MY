@@ -233,18 +233,10 @@ function D.CheckEnable()
 	D.RequireRerender()
 	D.UpdateLine()
 end
-X.RegisterEvent('MY_RESTRICTION', 'MY_TargetLine', function()
-	if arg0 and arg0 ~= 'MY_TargetLine' then
-		return
-	end
-	D.CheckEnable()
-end)
-X.RegisterUserSettingsInit('MY_TargetLine', function()
-	D.bReady = true
-	D.CheckEnable()
-end)
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TargetLine',
@@ -294,5 +286,21 @@ local settings = {
 }
 MY_TargetLine = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_TargetLine', function()
+	if arg0 and arg0 ~= 'MY_TargetLine' then
+		return
+	end
+	D.CheckEnable()
+end)
+
+X.RegisterUserSettingsInit('MY_TargetLine', function()
+	D.bReady = true
+	D.CheckEnable()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

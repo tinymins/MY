@@ -1354,6 +1354,10 @@ function PS.OnPanelActive(frame)
 end
 X.RegisterPanel(_L['System'], 'MY_CombatText', _L['CombatText'], 2041, PS)
 
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
 local function GetPlayerID()
 	local me = GetControlPlayer()
 	if me then

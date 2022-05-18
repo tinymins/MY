@@ -183,11 +183,6 @@ function D.CheckAllFrame()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_LockFrame', function()
-	D.bReady = true
-	D.CheckAllFrame()
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	ui:Append('WndComboBox', {
 		x = nW - 140, y = 65, w = 130,
@@ -222,7 +217,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_LockFrame',
@@ -257,5 +254,14 @@ local settings = {
 }
 MY_LockFrame = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_LockFrame', function()
+	D.bReady = true
+	D.CheckAllFrame()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

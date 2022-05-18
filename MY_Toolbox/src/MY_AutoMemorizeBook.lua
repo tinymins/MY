@@ -78,6 +78,10 @@ function D.CheckEnable()
 	end
 end
 
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
 X.RegisterUserSettingsInit('MY_AutoMemorizeBook', D.CheckEnable)
 X.RegisterReload('MY_AutoMemorizeBook', D.Unhook)
 X.RegisterEvent('MY_RESTRICTION', 'MY_AutoMemorizeBook', function()

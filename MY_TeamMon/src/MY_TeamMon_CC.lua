@@ -362,18 +362,9 @@ function D.CheckEnable()
 	end
 end
 
-X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_CC', function()
-	if arg0 and arg0 ~= 'MY_TeamMon_CC' then
-		return
-	end
-	D.CheckEnable()
-end)
-X.RegisterUserSettingsInit('MY_TeamMon_CC', function()
-	D.bReady = true
-	D.CheckEnable()
-end)
-
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TeamMon_CC',
@@ -401,5 +392,20 @@ local settings = {
 }
 MY_TeamMon_CC = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_CC', function()
+	if arg0 and arg0 ~= 'MY_TeamMon_CC' then
+		return
+	end
+	D.CheckEnable()
+end)
+X.RegisterUserSettingsInit('MY_TeamMon_CC', function()
+	D.bReady = true
+	D.CheckEnable()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

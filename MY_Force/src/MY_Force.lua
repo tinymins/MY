@@ -243,6 +243,10 @@ function D.OnAlertWantedChange()
 end
 end
 
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
 X.RegisterEvent('LOADING_END', 'MY_Force', function()
 	local buff = Table_GetBuff(374, 1)
 	if buff then

@@ -259,18 +259,6 @@ function D.RemoveHook()
 	D.UnhookOpenAllMap()
 end
 
-X.RegisterEvent('MY_RESTRICTION', 'MY_ShenxingHelper', function()
-	if arg0 and arg0 ~= 'MY_ShenxingHelper' then
-		return
-	end
-	D.CheckEnable()
-end)
-X.RegisterUserSettingsInit('MY_ShenxingHelper', function()
-	D.bReady = true
-	D.CheckEnable()
-end)
-X.RegisterReload('MY_ShenxingHelper', D.RemoveHook)
-
 --------------------------------------------------------------------------
 -- 设置界面
 --------------------------------------------------------------------------
@@ -317,7 +305,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_ShenxingHelper',
@@ -355,5 +345,21 @@ local settings = {
 }
 MY_ShenxingHelper = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_ShenxingHelper', function()
+	if arg0 and arg0 ~= 'MY_ShenxingHelper' then
+		return
+	end
+	D.CheckEnable()
+end)
+X.RegisterUserSettingsInit('MY_ShenxingHelper', function()
+	D.bReady = true
+	D.CheckEnable()
+end)
+X.RegisterReload('MY_ShenxingHelper', D.RemoveHook)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

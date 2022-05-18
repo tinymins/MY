@@ -161,11 +161,6 @@ function D.Apply()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_YunMacro', function()
-	D.bReady = true
-	D.Apply()
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	if not X.IsRestricted('MY_YunMacro') then
 		nX = nX + ui:Append('WndCheckBox', {
@@ -180,7 +175,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_YunMacro',
@@ -212,5 +209,14 @@ local settings = {
 }
 MY_YunMacro = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_YunMacro', function()
+	D.bReady = true
+	D.Apply()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -101,10 +101,60 @@ local function IdleOff()
 	X.Sysmsg(_L('Idle off has been started, you\'ll auto logoff if you keep idle for %dm.', O.nIdleOffTime))
 end
 
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+do
+local menu = {
+	szOption = _L['Express logoff'],
+	{
+		szOption = _L['Return to role list'],
+		fnAction = function()
+			Logoff(false)
+		end,
+	}, {
+		szOption = _L['Return to game login'],
+		fnAction = function()
+			Logoff(true)
+		end,
+	}, {
+		szOption = _L['Return to role list while not fight'],
+		fnAction = function()
+			Logoff(false, true)
+		end,
+	}, {
+		szOption = _L['Return to game login while not fight'],
+		fnAction = function()
+			Logoff(true, true)
+		end,
+	}, {
+		bDevide  = true,
+	}, {
+		szOption = _L['Set hotkey'],
+		fnAction = function()
+			X.SetHotKey()
+		end,
+	},
+}
+X.RegisterAddonMenu('MY_LOGOFF_MENU', menu)
+end
+
+X.RegisterHotKey('MY_LogOff_RUI', _L['Return to role list'], function() Logoff(false) end, nil)
+X.RegisterHotKey('MY_LogOff_RRL', _L['Return to game login'], function() Logoff(true) end, nil)
+X.RegisterHotKey('MY_LogOff_RUI_UNFIGHT', _L['Return to role list while not fight'], function() Logoff(false, true) end, nil)
+X.RegisterHotKey('MY_LogOff_RRL_UNFIGHT', _L['Return to game login while not fight'], function() Logoff(true, true) end, nil)
+X.RegisterHotKey('MY_LogOff_RUI_UNFIGHT_ALIVE', _L['Return to role list while not fight and not dead'], function() Logoff(false, true, true) end, nil)
+X.RegisterHotKey('MY_LogOff_RRL_UNFIGHT_ALIVE', _L['Return to game login while not fight and not dead'], function() Logoff(true, true, true) end, nil)
+
 local function onInit()
 	X.DelayCall(2000, IdleOff)
 end
-X.RegisterUserSettingsInit('MY_LOGOFF', onInit)
+X.RegisterUserSettingsInit('MY_Logoff', onInit)
+
+--------------------------------------------------------------------------------
+-- 界面注册
+--------------------------------------------------------------------------------
 
 local PS = {}
 function PS.OnPanelActive(wnd)
@@ -188,47 +238,5 @@ function PS.OnPanelActive(wnd)
 	ui:Append('Text', { x = nX, y = nY, w = nW - nX * 2, text = _L['MY_Logoff TIPS'], font = 27, multiline = true, alignVertical = 0 })
 end
 X.RegisterPanel(_L['System'], 'Logoff', _L['Express logoff'], 'UI/Image/UICommon/LoginSchool.UITex|24', PS)
-
-do
-local menu = {
-	szOption = _L['Express logoff'],
-	{
-		szOption = _L['Return to role list'],
-		fnAction = function()
-			Logoff(false)
-		end,
-	}, {
-		szOption = _L['Return to game login'],
-		fnAction = function()
-			Logoff(true)
-		end,
-	}, {
-		szOption = _L['Return to role list while not fight'],
-		fnAction = function()
-			Logoff(false, true)
-		end,
-	}, {
-		szOption = _L['Return to game login while not fight'],
-		fnAction = function()
-			Logoff(true, true)
-		end,
-	}, {
-		bDevide  = true,
-	}, {
-		szOption = _L['Set hotkey'],
-		fnAction = function()
-			X.SetHotKey()
-		end,
-	},
-}
-X.RegisterAddonMenu('MY_LOGOFF_MENU', menu)
-end
-
-X.RegisterHotKey('MY_LogOff_RUI', _L['Return to role list'], function() Logoff(false) end, nil)
-X.RegisterHotKey('MY_LogOff_RRL', _L['Return to game login'], function() Logoff(true) end, nil)
-X.RegisterHotKey('MY_LogOff_RUI_UNFIGHT', _L['Return to role list while not fight'], function() Logoff(false, true) end, nil)
-X.RegisterHotKey('MY_LogOff_RRL_UNFIGHT', _L['Return to game login while not fight'], function() Logoff(true, true) end, nil)
-X.RegisterHotKey('MY_LogOff_RUI_UNFIGHT_ALIVE', _L['Return to role list while not fight and not dead'], function() Logoff(false, true, true) end, nil)
-X.RegisterHotKey('MY_LogOff_RRL_UNFIGHT_ALIVE', _L['Return to game login while not fight and not dead'], function() Logoff(true, true, true) end, nil)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

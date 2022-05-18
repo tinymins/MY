@@ -134,7 +134,53 @@ function D.OnBreathe()
 	end
 end
 
+--------------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_TeamMon_LT',
+	exports = {
+		{
+			preset = 'UIEvent',
+			root = D,
+		},
+		{
+			fields = {
+				'tAnchor',
+				'fScale',
+				'fPause',
+				'fFadeOut',
+				'dwFontScheme',
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				'tAnchor',
+				'fScale',
+				'fPause',
+				'fFadeOut',
+				'dwFontScheme',
+			},
+			root = O,
+		},
+	},
+}
+MY_TeamMon_LT = X.CreateModule(settings)
+end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
 X.RegisterUserSettingsInit('MY_TeamMon_LT', D.Init)
+
+--------------------------------------------------------------------------------
+-- 界面注册
+--------------------------------------------------------------------------------
 
 local PS = { szRestriction = 'MY_TeamMon_LT' }
 function PS.OnPanelActive(frame)
@@ -194,41 +240,5 @@ function PS.OnPanelActive(frame)
 	ui:Append('Text', { name = 'Text_Preview', x = 20, y = nY + 50, txt = _L['JX3'], font = O.dwFontScheme, scale = O.fScale})
 end
 X.RegisterPanel(_L['Raid'], 'MY_TeamMon_LT', _L['MY_TeamMon_LT'], 'ui/Image/TargetPanel/Target.uitex|59', PS)
-
--- Global exports
-do
-local settings = {
-	name = 'MY_TeamMon_LT',
-	exports = {
-		{
-			preset = 'UIEvent',
-			root = D,
-		},
-		{
-			fields = {
-				'tAnchor',
-				'fScale',
-				'fPause',
-				'fFadeOut',
-				'dwFontScheme',
-			},
-			root = O,
-		},
-	},
-	imports = {
-		{
-			fields = {
-				'tAnchor',
-				'fScale',
-				'fPause',
-				'fFadeOut',
-				'dwFontScheme',
-			},
-			root = O,
-		},
-	},
-}
-MY_TeamMon_LT = X.CreateModule(settings)
-end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

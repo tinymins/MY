@@ -353,10 +353,6 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	return nX, nY
 end
 
-X.RegisterUserSettingsInit('MY_BagSort', function() D.CheckInjection() end)
-X.RegisterFrameCreate('GuildBankPanel', 'MY_BagSort', function() D.CheckInjection() end)
-X.RegisterReload('MY_BagSort', function() D.CheckInjection(true) end)
-
 ---------------------------------------------------------------------
 -- Global exports
 ---------------------------------------------------------------------
@@ -373,5 +369,13 @@ local settings = {
 }
 MY_BagSort = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_BagSort', function() D.CheckInjection() end)
+X.RegisterFrameCreate('GuildBankPanel', 'MY_BagSort', function() D.CheckInjection() end)
+X.RegisterReload('MY_BagSort', function() D.CheckInjection(true) end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

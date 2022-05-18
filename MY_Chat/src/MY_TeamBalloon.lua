@@ -156,10 +156,6 @@ function D.Apply()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_TeamBalloon', function()
-	D.Apply()
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nPaddingX
 	ui:Append('WndCheckBox', {
@@ -196,5 +192,13 @@ local settings = {
 }
 MY_TeamBalloon = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_TeamBalloon', function()
+	D.Apply()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -288,12 +288,6 @@ function D.OnUseManaChange()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_ForceGuding', function()
-	D.bReady = true
-	D.OnEnableChange()
-	D.OnUseManaChange()
-end)
-
 -------------------------------------
 -- 全局导出接口
 -------------------------------------
@@ -335,5 +329,15 @@ local settings = {
 }
 MY_ForceGuding = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_ForceGuding', function()
+	D.bReady = true
+	D.OnEnableChange()
+	D.OnUseManaChange()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

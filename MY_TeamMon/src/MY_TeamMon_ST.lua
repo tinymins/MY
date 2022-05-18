@@ -381,16 +381,9 @@ function ST:RemoveItem()
 	D.handle:FormatAllItemPos()
 end
 
-X.RegisterUserSettingsInit('MY_TeamMon_ST', function()
-	D.bReady = true
-	D.Init()
-end)
-
-X.RegisterUserSettingsRelease('MY_TeamMon_ST', function()
-	D.bReady = false
-end)
-
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TeamMon_ST',
@@ -417,5 +410,18 @@ local settings = {
 }
 MY_TeamMon_ST = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_TeamMon_ST', function()
+	D.bReady = true
+	D.Init()
+end)
+
+X.RegisterUserSettingsRelease('MY_TeamMon_ST', function()
+	D.bReady = false
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

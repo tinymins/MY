@@ -111,7 +111,6 @@ function D.Apply()
 		X.RegisterMsgMonitor('MSG_NPC_WHISPER', 'MY_RedirectMetionToWhisper',false)
 	end
 end
-X.RegisterUserSettingsInit('MY_WhisperMetion', D.Apply)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, lineHeight)
 	nX = nPaddingX
@@ -128,7 +127,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, lineHe
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_WhisperMetion',
@@ -142,5 +143,11 @@ local settings = {
 }
 MY_WhisperMetion = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_WhisperMetion', D.Apply)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

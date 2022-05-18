@@ -739,8 +739,6 @@ function D.AddAusID(dwID)
 	end
 end
 
-X.RegisterUserSettingsInit('MY_Farbnamen', function() D.bReady = true end)
-
 --------------------------------------------------------------
 -- 菜单
 --------------------------------------------------------------
@@ -822,31 +820,6 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	return nX, nY
 end
 X.RegisterAddonMenu('MY_Farbenamen', D.GetMenu)
---------------------------------------------------------------
--- 注册事件
---------------------------------------------------------------
-do
-local l_peeklist = {}
-local function onBreathe()
-	for dwID, nRetryCount in pairs(l_peeklist) do
-		if D.AddAusID(dwID) or nRetryCount > 5 then
-			l_peeklist[dwID] = nil
-		else
-			l_peeklist[dwID] = nRetryCount + 1
-		end
-	end
-end
-X.BreatheCall(250, onBreathe)
-
-local function OnPeekPlayer()
-	if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
-		l_peeklist[arg1] = 0
-	end
-end
-X.RegisterEvent('PEEK_OTHER_PLAYER', OnPeekPlayer)
-X.RegisterEvent('PLAYER_ENTER_SCENE', function() l_peeklist[arg0] = 0 end)
-X.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() l_tongnames[arg1], l_tongnames_w[arg1] = arg2, AnsiToUTF8(arg2) end)
-end
 
 --------------------------------------------------------------------------
 -- Global exports
@@ -871,5 +844,34 @@ local settings = {
 }
 MY_Farbnamen = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+do
+local l_peeklist = {}
+local function onBreathe()
+	for dwID, nRetryCount in pairs(l_peeklist) do
+		if D.AddAusID(dwID) or nRetryCount > 5 then
+			l_peeklist[dwID] = nil
+		else
+			l_peeklist[dwID] = nRetryCount + 1
+		end
+	end
+end
+X.BreatheCall(250, onBreathe)
+
+local function OnPeekPlayer()
+	if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+		l_peeklist[arg1] = 0
+	end
+end
+X.RegisterEvent('PEEK_OTHER_PLAYER', OnPeekPlayer)
+X.RegisterEvent('PLAYER_ENTER_SCENE', function() l_peeklist[arg0] = 0 end)
+X.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() l_tongnames[arg1], l_tongnames_w[arg1] = arg2, AnsiToUTF8(arg2) end)
+end
+
+X.RegisterUserSettingsInit('MY_Farbnamen', function() D.bReady = true end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -292,11 +292,6 @@ function D.Reload()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_VisualSkill', function()
-	D.bReady = true
-	D.Reload()
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
@@ -322,9 +317,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	return nX, nY
 end
 
----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Global exports
----------------------------------------------------------------------
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_VisualSkill',
@@ -364,5 +359,14 @@ local settings = {
 }
 MY_VisualSkill = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_VisualSkill', function()
+	D.bReady = true
+	D.Reload()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

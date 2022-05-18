@@ -252,12 +252,6 @@ function D.Apply()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_FooterTip', function()
-	D.bReady = true
-	D.Apply()
-end)
-X.RegisterEvent('LOADING_ENDING', 'MY_FooterTip', D.Apply)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	-- 好友高亮
 	nX = nPaddingX
@@ -321,7 +315,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_FooterTip',
@@ -368,5 +364,15 @@ local settings = {
 }
 MY_FooterTip = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_FooterTip', function()
+	D.bReady = true
+	D.Apply()
+end)
+X.RegisterEvent('LOADING_ENDING', 'MY_FooterTip', D.Apply)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

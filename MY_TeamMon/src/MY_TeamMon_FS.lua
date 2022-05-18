@@ -194,9 +194,9 @@ function FS:RemoveItem()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_TeamMon_FS', D.Init)
-
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TeamMon_FS',
@@ -209,5 +209,11 @@ local settings = {
 }
 MY_TeamMon_FS = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_TeamMon_FS', D.Init)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

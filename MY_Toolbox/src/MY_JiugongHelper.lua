@@ -107,16 +107,13 @@ function D.Apply()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_JiugongHelper', function()
-	D.bReady = true
-	D.Apply()
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_JiugongHelper',
@@ -148,5 +145,14 @@ local settings = {
 }
 MY_JiugongHelper = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_JiugongHelper', function()
+	D.bReady = true
+	D.Apply()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

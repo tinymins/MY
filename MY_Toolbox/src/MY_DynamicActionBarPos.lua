@@ -164,17 +164,6 @@ function D.CheckEnable()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_DynamicActionBarPos', function()
-	D.bReady = true
-	D.CheckEnable()
-end)
-
-X.RegisterReload('MY_DynamicActionBarPos', function()
-	for _, szName in ipairs(HOOK_FRAME_NAME) do
-		D.Unhook(szName)
-	end
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 130,
@@ -188,7 +177,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_DynamicActionBarPos',
@@ -222,5 +213,20 @@ local settings = {
 }
 MY_DynamicActionBarPos = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_DynamicActionBarPos', function()
+	D.bReady = true
+	D.CheckEnable()
+end)
+
+X.RegisterReload('MY_DynamicActionBarPos', function()
+	for _, szName in ipairs(HOOK_FRAME_NAME) do
+		D.Unhook(szName)
+	end
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

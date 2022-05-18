@@ -395,11 +395,6 @@ X.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE', 'LOADING_END'}, f
 end)
 end
 
-X.RegisterUserSettingsInit('MY_BAGEX', function()
-	Apply(O.bEnable)
-end)
-X.RegisterReload('MY_BAGEX', function() Apply(false) end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
@@ -413,7 +408,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_BagEx',
@@ -427,5 +424,13 @@ local settings = {
 }
 MY_BagEx = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+X.RegisterUserSettingsInit('MY_BAGEX', function()
+	Apply(O.bEnable)
+end)
+X.RegisterReload('MY_BAGEX', function() Apply(false) end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

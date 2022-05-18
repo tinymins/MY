@@ -195,7 +195,7 @@ return function(env)
 			bAlertChange = true,
 			nMinWidth = 70,
 			GetValue = function(prevVal, prevRec)
-				return { owner = env.GetAccount() .. '#' .. env.GetRealServer(1), value = env.me.nCoin }
+				return { owner = env.GetAccount() .. '#' .. env.GetServerOriginName(), value = env.me.nCoin }
 			end,
 			GetSummaryValue = function(values, records)
 				local tOwner, nCoin = {}, 0

@@ -787,15 +787,6 @@ function D.LoadConfig(szConfig)
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
 
-X.RegisterUserSettingsInit('MY_LifeBar_Config', function()
-	D.Init()
-	D.LoadConfig()
-end)
-
-X.RegisterInit('MY_LifeBar_Config', function()
-	D.AutoAdjustScale()
-end)
-
 MY_LifeBar_Config = setmetatable({}, {
 	__call = function(t, op, ...)
 		local argc = select('#', ...)
@@ -866,5 +857,18 @@ MY_LifeBar_Config = setmetatable({}, {
 	__index = function(t, k) return Config[k] end,
 	__newindex = function(t, k, v) Config[k] = v end,
 })
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_LifeBar_Config', function()
+	D.Init()
+	D.LoadConfig()
+end)
+
+X.RegisterInit('MY_LifeBar_Config', function()
+	D.AutoAdjustScale()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

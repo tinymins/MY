@@ -748,9 +748,9 @@ function D.OnCheckBoxUncheck()
 	end
 end
 
-X.RegisterUserSettingsInit('MY_Recount_UI', D.CheckOpen)
-
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_Recount_UI',
@@ -826,5 +826,11 @@ local settings = {
 }
 MY_Recount_UI = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_Recount_UI', D.CheckOpen)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

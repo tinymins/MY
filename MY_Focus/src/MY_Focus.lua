@@ -1079,16 +1079,6 @@ X.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_Focus', onTeamMonUpdate)
 end
 
 do
-local function onInit()
-	D.bReady = true
-	D.LoadConfig()
-	D.CheckFrameOpen()
-	D.RescanNearby()
-end
-X.RegisterUserSettingsInit('MY_Focus', onInit)
-end
-
-do
 local function onMenu()
 	local dwType, dwID = GetClientPlayer().GetTarget()
 	return D.GetTargetMenu(dwType, dwID)
@@ -1255,5 +1245,16 @@ local settings = {
 }
 MY_Focus = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+-- 初始化需要等待 MY_FocusUI 加载完成
+X.RegisterUserSettingsInit('MY_Focus', function()
+	D.bReady = true
+	D.LoadConfig()
+	D.RescanNearby()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
