@@ -65,7 +65,7 @@ function X.FormatPath(oFilePath, tParams)
 			elseif ePathType == X.PATH_TYPE.ROLE then
 				szOriginPath = X.FormatPath({'{$uid}@{$lang}/', X.PATH_TYPE.DATA})
 			elseif ePathType == X.PATH_TYPE.SERVER then
-				szOriginPath = X.FormatPath({'#{$relserver}@{$lang}/', X.PATH_TYPE.DATA})
+				szOriginPath = X.FormatPath({'#{$server_origin}@{$lang}/', X.PATH_TYPE.DATA})
 			end
 			if IsLocalFileExist(szOriginPath) then
 				CPath.Move(szOriginPath, szPath)
@@ -83,7 +83,7 @@ function X.FormatPath(oFilePath, tParams)
 		elseif ePathType == X.PATH_TYPE.ROLE then
 			szFilePath = X.PACKET_INFO.DATA_ROOT .. '{$uid}@{$edition}/' .. szFilePath
 		elseif ePathType == X.PATH_TYPE.SERVER then
-			szFilePath = X.PACKET_INFO.DATA_ROOT .. '#{$relserver}@{$edition}/' .. szFilePath
+			szFilePath = X.PACKET_INFO.DATA_ROOT .. '#{$server_origin}@{$edition}/' .. szFilePath
 		end
 	end
 	-- if exist {$uid} then add user role identity
@@ -116,11 +116,11 @@ function X.FormatPath(oFilePath, tParams)
 	end
 	-- if exist {$server} then add server identity
 	if string.find(szFilePath, '{$server}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$server}', tParams['server'] or ((X.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
+		szFilePath = szFilePath:gsub('{%$server}', tParams['server'] or ((X.GetRegionName() .. '_' .. X.GetServerName()):gsub('[/\\|:%*%?"<>]', '')))
 	end
-	-- if exist {$relserver} then add relserver identity
-	if string.find(szFilePath, '{$relserver}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$relserver}', tParams['relserver'] or ((X.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
+	-- if exist {$server_origin} then add server_origin identity
+	if string.find(szFilePath, '{$server_origin}', nil, true) then
+		szFilePath = szFilePath:gsub('{%$server_origin}', tParams['server_origin'] or ((X.GetRegionOriginName() .. '_' .. X.GetServerOriginName()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	local rootPath = GetRootPath():gsub('\\', '/')
 	if szFilePath:find(rootPath) == 1 then
@@ -585,10 +585,14 @@ function X.ConnectUserSettingsDB()
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
+			local szSettingsRoot = szDBPresetRoot or X.FormatPath({'config/', ePathType})
+			if not szDBPresetRoot then
+				CPath.MakeDir(szSettingsRoot)
+			end
 			local pSettingsDB = X.NoSQLiteConnect(
 				szDBPresetRoot
 					and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
-					or X.FormatPath({'config/settings.db', ePathType})
+					or (szSettingsRoot .. 'settings.db')
 			)
 			local pUserDataDB = X.NoSQLiteConnect(X.FormatPath({'userdata/userdata.db', ePathType}))
 			if not pSettingsDB then
@@ -611,15 +615,6 @@ function X.ConnectUserSettingsDB()
 	X.ReportUsageRank('USER_SETTINGS_INIT_REPORT', USER_SETTINGS_INIT_TIME_RANK)
 	--[[#DEBUG END]]
 end
-
--- 根据 2022年5月17日 导出的接口 GetClientPlayerGlobalID()，
--- 获取用户ID可提前至 SYNC_ROLE_DATA_BEGIN 事件，
--- 而此事件发生于插件加载之前，因此可以直接初始化用户数据。
-X.SafeCall(function()
-	if X.GetClientPlayerGlobalID() then
-		X.ConnectUserSettingsDB()
-	end
-end)
 
 function X.ReleaseUserSettingsDB()
 	X.CommonEventFirer(USER_SETTINGS_RELEASE_EVENT)
@@ -1211,12 +1206,12 @@ function X.CreateDataRoot(ePathType)
 				edition = X.ENVIRONMENT.GAME_EDITION,
 				branch = X.ENVIRONMENT.GAME_BRANCH,
 				version = X.ENVIRONMENT.GAME_VERSION,
-				region = X.GetServer(1),
-				server = X.GetServer(2),
-				relregion = X.GetRealServer(1),
-				relserver = X.GetRealServer(2),
+				region = X.GetRegionName(),
+				server = X.GetServerName(),
+				region_origin = X.GetServerOriginName(),
+				server_origin = X.GetRegionOriginName(),
 				time = GetCurrentTime(),
-				timestr = X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'),
+				time_str = X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'),
 			},
 			{ crc = false, passphrase = false })
 		CPath.MakeDir(X.FormatPath({'{$name}/', X.PATH_TYPE.ROLE}))
@@ -1640,5 +1635,16 @@ end
 function X.NoSQLiteDisconnect(db)
 	db:Release()
 end
+
+------------------------------------------------------------------------------
+-- 根据 2022年5月17日 导出的接口 GetClientPlayerGlobalID()，
+-- 获取用户ID可提前至 SYNC_ROLE_DATA_BEGIN 事件，
+-- 而此事件发生于插件加载之前，因此可以直接初始化用户数据。
+------------------------------------------------------------------------------
+X.SafeCall(function()
+	if X.GetClientPlayerGlobalID() then
+		X.ConnectUserSettingsDB()
+	end
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

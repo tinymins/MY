@@ -54,6 +54,34 @@ function X.GetGameTable(szTable, bPrintError)
 	end
 end
 
+-- 获取当前大区名称
+---@return string @大区名称
+function X.GetRegionName()
+	local szRegionDisplayName, _, szRegionName, _ = GetUserServer()
+	return szRegionName or szRegionDisplayName
+end
+
+-- 获取当前服务器名称
+---@return string @服务器名称
+function X.GetServerName()
+	local _, szServerDisplayName, _, szServerName = GetUserServer()
+	return szServerName or szServerDisplayName
+end
+
+-- 获取数据互通主大区名称
+---@return string @数据互通主大区名称
+function X.GetRegionOriginName()
+	local szRegionDisplayName, _, _, _, szRegionOriginName, _ = GetUserServer()
+	return szRegionOriginName or szRegionDisplayName
+end
+
+-- 获取数据互通主服务器名称
+---@return string @数据互通主服务器名称
+function X.GetServerOriginName()
+	local _, szServerDisplayName, _, _, _, szServerOriginName = GetUserServer()
+	return szServerOriginName or szServerDisplayName
+end
+
 local CLIENT_PLAYER_GLOBAL_ID
 function X.GetClientPlayerGlobalID()
 	if not CLIENT_PLAYER_GLOBAL_ID then

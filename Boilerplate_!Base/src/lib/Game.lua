@@ -26,45 +26,6 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --     #     #   #   #   #       #           #         #     #   #     #
 --   #     # #   # #     #     #         # #           # # # #   # # # #
 -- #######################################################################################################
--- 获取当前服务器名称
-function X.GetServer(nIndex)
-	local display_region, display_server, region, server = GetUserServer()
-	region = region or display_region
-	server = server or display_server
-	if nIndex == 1 then
-		return region
-	elseif nIndex == 2 then
-		return server
-	else
-		return region .. '_' .. server, {region, server}
-	end
-end
-
--- 获取当前服务器显示名称
-function X.GetDisplayServer(nIndex)
-	local display_region, display_server = GetUserServer()
-	if nIndex == 1 then
-		return display_region
-	elseif nIndex == 2 then
-		return display_server
-	else
-		return display_region .. '_' .. display_server, {display_region, display_server}
-	end
-end
-
--- 获取数据互通主服务器名称
-function X.GetRealServer(nIndex)
-	local display_region, display_server, _, _, real_region, real_server = GetUserServer()
-	real_region = real_region or display_region
-	real_server = real_server or display_server
-	if nIndex == 1 then
-		return real_region
-	elseif nIndex == 2 then
-		return real_server
-	else
-		return real_region .. '_' .. real_server, {real_region, real_server}
-	end
-end
 
 do
 local HL_INFO_CACHE = {}
@@ -2191,7 +2152,7 @@ local function ListenFightStateChange()
 				local me = GetClientPlayer()
 				local team = GetClientTeam()
 				local szEdition = X.ENVIRONMENT.GAME_EDITION
-				local szServer = X.GetRealServer()
+				local szServer = X.GetRegionOriginName() .. '_' .. X.GetServerOriginName()
 				local dwTime = GetCurrentTime()
 				local dwTeamID, nTeamMember, dwTeamXorID = 0, 0, 0
 				if team then
@@ -4921,7 +4882,7 @@ do
 			if dwID == UI_GetClientPlayerID() then
 				local szGUID = X.GetClientPlayerGlobalID() or X.GetClientInfo('szGlobalID')
 				if szGUID == '0' then
-					szGUID = (X.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. X.GetClientInfo().dwID
+					szGUID = (X.GetRegionOriginName() .. '_' .. X.GetServerOriginName()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. X.GetClientInfo().dwID
 				end
 				PLAYER_GUID[dwID] = szGUID
 			end
