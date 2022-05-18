@@ -54,6 +54,27 @@ function X.GetGameTable(szTable, bPrintError)
 	end
 end
 
+local CLIENT_PLAYER_GLOBAL_ID
+function X.GetClientPlayerGlobalID()
+	if not CLIENT_PLAYER_GLOBAL_ID then
+		local szUID = GetClientPlayerGlobalID and GetClientPlayerGlobalID()
+		if X.IsEmpty(szUID) or szUID == '0' then
+			szUID = nil
+		end
+		if not szUID then
+			local me = GetClientPlayer()
+			if me then
+				szUID = me.GetGlobalID()
+			end
+		end
+		if X.IsEmpty(szUID) or szUID == '0' then
+			szUID = nil
+		end
+		CLIENT_PLAYER_GLOBAL_ID = szUID
+	end
+	return CLIENT_PLAYER_GLOBAL_ID
+end
+
 local LOG_MAX_FILE = 30
 local LOG_MAX_LINE = 5000
 local LOG_LINE_COUNT = 0
