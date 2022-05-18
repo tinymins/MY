@@ -870,7 +870,6 @@ function D.OnActivePage()
 			end,
 		}):AutoWidth():Width()
 	end
-	D.FlushDB()
 	D.UpdateNames(this)
 end
 

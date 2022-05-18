@@ -759,7 +759,6 @@ function D.OnActivePage()
 			MY_RoleStatistics_EquipStat.bAdviceSaveDB = true
 		end)
 	end
-	D.FlushDB()
 	D.UpdateNames(this)
 end
 
