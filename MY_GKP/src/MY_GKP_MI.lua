@@ -552,7 +552,7 @@ function D.SyncSystemGKP()
 	X.Debug(
 		_L['PMTool'],
 		_L('MY_GKP_MI SyncSystemGKP in %dms.', nTickCount),
-		X.DEBUG_LEVEL.PMLOG)
+		X.DEBUG_LEVEL.PM_LOG)
 	--[[#DEBUG END]]
 end
 X.RegisterEvent('BIDDING_OPERATION', function()

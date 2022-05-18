@@ -443,7 +443,7 @@ function D.ProcessProgressRequestQueue()
 				X.Debug(
 					_L['PMTool'],
 					_L('[MY_RoleStatistics_DungeonStat] ApplyDungeonRoleProgress: %d.', dwID),
-					X.DEBUG_LEVEL.PMLOG)
+					X.DEBUG_LEVEL.PM_LOG)
 				--[[#DEBUG END]]
 				ApplyDungeonRoleProgress(dwID, UI_GetClientPlayerID())
 			else

@@ -1739,7 +1739,7 @@ function D.DrawLootList(dwID, bRemove)
 		X.Debug(
 			_L['PMTool'],
 			_L('DrawLootList %d in %dms.', dwID, nTickCount),
-			X.DEBUG_LEVEL.PMLOG)
+			X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 	end
 end
