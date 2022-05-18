@@ -239,7 +239,7 @@ X.RegisterEvent('MY_RESTRICTION', 'MY_TargetLine', function()
 	end
 	D.CheckEnable()
 end)
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TargetLine', function()
+X.RegisterUserSettingsInit('MY_TargetLine', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

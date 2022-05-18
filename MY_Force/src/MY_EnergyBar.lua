@@ -538,7 +538,7 @@ function D.Apply()
 		end
 	end
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_EnergyBar', D.Apply)
+X.RegisterUserSettingsInit('MY_EnergyBar', D.Apply)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then

@@ -381,12 +381,12 @@ function ST:RemoveItem()
 	D.handle:FormatAllItemPos()
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_ST', function()
+X.RegisterUserSettingsInit('MY_TeamMon_ST', function()
 	D.bReady = true
 	D.Init()
 end)
 
-X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_TeamMon_ST', function()
+X.RegisterUserSettingsRelease('MY_TeamMon_ST', function()
 	D.bReady = false
 end)
 

@@ -1368,7 +1368,7 @@ local function GetPlayerID()
 		X.DelayCall(1000, GetPlayerID)
 	end
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CombatText', function()
+X.RegisterUserSettingsInit('MY_CombatText', function()
 	D.bReady = true
 	CombatText.UpdateTrajectoryCount()
 	CombatText.CheckEnable()

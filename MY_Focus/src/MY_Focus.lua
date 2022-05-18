@@ -1085,7 +1085,7 @@ local function onInit()
 	D.CheckFrameOpen()
 	D.RescanNearby()
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Focus', onInit)
+X.RegisterUserSettingsInit('MY_Focus', onInit)
 end
 
 do

@@ -564,7 +564,7 @@ function D.ReinitUI()
 end
 
 -- ×¢²áINITÊÂ¼þ
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_INFOTIP', function()
+X.RegisterUserSettingsInit('MY_INFOTIP', function()
 	D.ReinitUI()
 end)
 

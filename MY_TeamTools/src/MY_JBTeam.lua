@@ -37,7 +37,7 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 			team = szTeam,
 			cguid = X.GetClientGUID(),
 			jx3id = X.GetPlayerGUID(),
-			server = X.GetRealServer(2),
+			server = X.GetServerOriginName(),
 			id = dwID,
 			name = X.GetUserRoleName(),
 			mount = me.GetKungfuMount().dwMountType,

@@ -202,7 +202,7 @@ function D.CheckEnable()
 		X.RegisterEvent('SHOP_OPENSHOP', 'MY_AutoSell', false)
 	end
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoSell', function()
+X.RegisterUserSettingsInit('MY_AutoSell', function()
 	for _, k in ipairs({'tSellItem', 'tProtectItem'}) do
 		if D[k] then
 			X.SafeCall(X.Set, O, k, D[k])

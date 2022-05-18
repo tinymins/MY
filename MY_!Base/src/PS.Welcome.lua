@@ -146,8 +146,8 @@ function PS.OnPanelActive(wnd)
 						{
 							l = X.ENVIRONMENT.GAME_LANG,
 							L = X.ENVIRONMENT.GAME_EDITION,
-							S = X.GetRealServer(1),
-							s = X.GetRealServer(2),
+							S = X.GetRegionOriginName(),
+							s = X.GetServerOriginName(),
 							n = X.GetClientInfo().szName,
 							N = szNameCRC,
 						}),

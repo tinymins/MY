@@ -194,7 +194,7 @@ function FS:RemoveItem()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_FS', D.Init)
+X.RegisterUserSettingsInit('MY_TeamMon_FS', D.Init)
 
 -- Global exports
 do

@@ -161,7 +161,7 @@ function D.Apply()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_YunMacro', function()
+X.RegisterUserSettingsInit('MY_YunMacro', function()
 	D.bReady = true
 	D.Apply()
 end)

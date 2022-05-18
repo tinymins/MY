@@ -368,7 +368,7 @@ X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_CC', function()
 	end
 	D.CheckEnable()
 end)
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_CC', function()
+X.RegisterUserSettingsInit('MY_TeamMon_CC', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

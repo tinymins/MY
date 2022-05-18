@@ -679,7 +679,7 @@ X.RegisterEvent('PARTY_ADD_MEMBER', function()
 	end
 end)
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CombatLogs', function()
+X.RegisterUserSettingsInit('MY_CombatLogs', function()
 	D.bReady = true
 	D.UpdateEnable()
 end)

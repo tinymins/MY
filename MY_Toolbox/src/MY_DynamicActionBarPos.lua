@@ -164,7 +164,7 @@ function D.CheckEnable()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_DynamicActionBarPos', function()
+X.RegisterUserSettingsInit('MY_DynamicActionBarPos', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

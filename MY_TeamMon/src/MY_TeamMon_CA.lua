@@ -112,7 +112,7 @@ function D.Init()
 	Wnd.OpenWindow(CA_INIFILE, 'MY_TeamMon_CA'):Hide()
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_CA', D.Init)
+X.RegisterUserSettingsInit('MY_TeamMon_CA', D.Init)
 
 
 -- Global exports

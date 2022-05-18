@@ -205,7 +205,7 @@ X.RegisterEvent('MY_RESTRICTION', 'MY_TargetFace', function()
 	end
 	D.CheckEnable()
 end)
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TargetFace', function()
+X.RegisterUserSettingsInit('MY_TargetFace', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

@@ -75,7 +75,7 @@ function D.Bind(szToken, resolve, reject)
 			token = szToken,
 			cguid = X.GetClientGUID(),
 			jx3id = X.GetPlayerGUID(),
-			server = X.GetRealServer(2),
+			server = X.GetServerOriginName(),
 			id = dwID,
 			name = X.GetUserRoleName(),
 			mount = me.GetKungfuMount().dwMountType,

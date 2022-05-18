@@ -683,7 +683,7 @@ end
 X.RegisterAddonMenu(GetMenu)
 end
 X.RegisterEvent('LOADING_END', _TS.CheckOpen)
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ThreatRank', _TS.CheckOpen)
+X.RegisterUserSettingsInit('MY_ThreatRank', _TS.CheckOpen)
 
 -- Global exports
 do

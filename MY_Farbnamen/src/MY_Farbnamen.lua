@@ -117,14 +117,14 @@ local function InitDB()
 	DBT_RI = DB:Prepare('SELECT id, name FROM TongCache WHERE id = ?')
 
 	-- 旧版文件缓存转换
-	local SZ_IC_PATH = X.FormatPath({'cache/PLAYER_INFO/{$relserver}/', X.PATH_TYPE.DATA})
+	local SZ_IC_PATH = X.FormatPath({'cache/PLAYER_INFO/{$server_origin}/', X.PATH_TYPE.DATA})
 	if IsLocalFileExist(SZ_IC_PATH) then
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite start!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 999 do
-			local data = X.LoadLUAData({'cache/PLAYER_INFO/{$relserver}/DAT2/' .. i .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
+			local data = X.LoadLUAData({'cache/PLAYER_INFO/{$server_origin}/DAT2/' .. i .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 			if data then
 				for id, p in pairs(data) do
 					DBI_W:ClearBindings()
@@ -145,7 +145,7 @@ local function InitDB()
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 128 do
 			for j = 0, 128 do
-				local data = X.LoadLUAData({'cache/PLAYER_INFO/{$relserver}/TONG/' .. i .. '-' .. j .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
+				local data = X.LoadLUAData({'cache/PLAYER_INFO/{$server_origin}/TONG/' .. i .. '-' .. j .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 				if data then
 					for id, name in pairs(data) do
 						DBT_W:ClearBindings()
@@ -739,7 +739,7 @@ function D.AddAusID(dwID)
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Farbnamen', function() D.bReady = true end)
+X.RegisterUserSettingsInit('MY_Farbnamen', function() D.bReady = true end)
 
 --------------------------------------------------------------
 -- 菜单

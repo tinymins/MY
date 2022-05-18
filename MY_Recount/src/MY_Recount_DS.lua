@@ -1460,7 +1460,7 @@ function D.InitData()
 	Data = {
 		[DK.UUID       ] = X.GetFightUUID(),                -- 战斗唯一标识
 		[DK.VERSION    ] = VERSION,                           -- 数据版本号
-		[DK.SERVER     ] = X.GetRealServer(2),              -- 所在服务器
+		[DK.SERVER     ] = X.GetServerOriginName(),              -- 所在服务器
 		[DK.MAP        ] = X.GetMapID(),                    -- 所在地图
 		[DK.TIME_BEGIN ] = GetCurrentTime(),                  -- 战斗开始时间
 		[DK.TICK_BEGIN ] = GetTime(),                         -- 战斗开始毫秒时间
@@ -1996,11 +1996,11 @@ X.RegisterFlush('MY_Recount_DS', function()
 	end
 end)
 
-X.RegisterUserSettingsUpdate('@@INIT@@', function()
+X.RegisterUserSettingsInit(function()
 	D.bReady = true
 end)
 
-X.RegisterUserSettingsUpdate('@@UNINIT@@', function()
+X.RegisterUserSettingsRelease(function()
 	D.bReady = false
 end)
 

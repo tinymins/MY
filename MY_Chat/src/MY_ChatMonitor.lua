@@ -326,9 +326,9 @@ function D.Init()
 	D.LoadData()
 	D.RegisterMsgMonitor()
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_CHATMONITOR', D.Init)
+X.RegisterUserSettingsInit('MY_CHATMONITOR', D.Init)
 
-X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_CHATMONITOR', function()
+X.RegisterUserSettingsRelease('MY_CHATMONITOR', function()
 	D.bReady = false
 	D.RegisterMsgMonitor()
 end)

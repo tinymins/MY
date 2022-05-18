@@ -448,7 +448,7 @@ function D.FlushDB()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(X.GetPlayerGUID())
 	local ownername = AnsiToUTF8(me.szName)
-	local servername = AnsiToUTF8(X.GetRealServer(2))
+	local servername = AnsiToUTF8(X.GetServerOriginName())
 	DB:Execute('BEGIN TRANSACTION')
 
 	-- ±³°ü
@@ -1086,7 +1086,7 @@ end
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_BagStat', function()
+X.RegisterUserSettingsInit('MY_RoleStatistics_BagStat', function()
 	D.bReady = true
 	D.UpdateFloatEntry()
 end)

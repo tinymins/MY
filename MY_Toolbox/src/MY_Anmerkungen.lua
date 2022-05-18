@@ -314,7 +314,7 @@ function MY_Anmerkungen.LoadConfig()
 		PUBLIC_PLAYER_IDS = data.ids or {}
 		PUBLIC_PLAYER_NOTES = data.data or {}
 	end
-	local szOrgFile = X.GetLUADataPath({'config/PLAYER_NOTES/{$relserver}.{$lang}.jx3dat', X.PATH_TYPE.DATA})
+	local szOrgFile = X.GetLUADataPath({'config/PLAYER_NOTES/{$server_origin}.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 	local szFilePath = X.GetLUADataPath({'config/playernotes.jx3dat', X.PATH_TYPE.SERVER})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
@@ -402,6 +402,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	if not MY.IsRestricted('MY_Anmerkungen.Export') then
+		local szOriginServer = X.GetRegionOriginName() .. '_' .. X.GetServerOriginName()
 		ui:Append('WndButton', {
 			x = w - 230, y = y, w = 110,
 			text = _L['Import'],
@@ -410,7 +411,7 @@ function PS.OnPanelActive(wnd)
 				GetUserInput(_L['Please input import data:'], function(szVal)
 					local config = X.DecodeLUAData(szVal)
 					if config and config.server and config.public and config.private then
-						if config.server ~= X.GetRealServer() then
+						if config.server ~= szOriginServer then
 							return X.Alert(_L['Server not match!'])
 						end
 						local function Next(usenew)
@@ -478,7 +479,7 @@ function PS.OnPanelActive(wnd)
 			buttonStyle = 'FLAT',
 			onClick = function()
 				X.UI.OpenTextEditor(X.EncodeLUAData({
-					server   = X.GetRealServer(),
+					server   = szOriginServer,
 					publici  = PUBLIC_PLAYER_IDS,
 					publicd  = PUBLIC_PLAYER_NOTES,
 					privatei = PRIVATE_PLAYER_IDS,

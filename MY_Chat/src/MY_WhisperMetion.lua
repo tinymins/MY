@@ -111,7 +111,7 @@ function D.Apply()
 		X.RegisterMsgMonitor('MSG_NPC_WHISPER', 'MY_RedirectMetionToWhisper',false)
 	end
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_WhisperMetion', D.Apply)
+X.RegisterUserSettingsInit('MY_WhisperMetion', D.Apply)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, lineHeight)
 	nX = nPaddingX

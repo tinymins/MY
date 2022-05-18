@@ -249,7 +249,7 @@ function D.CheckAlertEnable()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Domesticate', function()
+X.RegisterUserSettingsInit('MY_Domesticate', function()
 	D.bReady = true
 	D.CheckAutoFeedEnable()
 	D.CheckAlertEnable()

@@ -141,7 +141,7 @@ X.RegisterEvent('MY_RESTRICTION', 'MY_WorldMark', function()
 	end
 	D.CheckEnable()
 end)
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_WorldMark', D.CheckEnable)
+X.RegisterUserSettingsInit('MY_WorldMark', D.CheckEnable)
 
 
 -- Global exports

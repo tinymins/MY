@@ -1342,7 +1342,7 @@ X.RegisterEvent('PARTY_RESET', function()
 	end)
 end)
 
-X.RegisterUserSettingsUpdate('@@INIT@@', function()
+X.RegisterUserSettingsInit(function()
 	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and CFG.nDrawInterval == 4 then
 		CFG.nDrawInterval = 16
 	end

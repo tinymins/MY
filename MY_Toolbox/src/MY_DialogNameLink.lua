@@ -78,7 +78,7 @@ function D.Apply()
 		X.RegisterEvent('OPEN_WINDOW', 'NAMELINKER', false)
 	end
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_DialogNameLink', function()
+X.RegisterUserSettingsInit('MY_DialogNameLink', function()
 	D.bReady = true
 	D.Apply()
 end)

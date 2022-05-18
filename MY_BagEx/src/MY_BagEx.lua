@@ -395,7 +395,7 @@ X.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE', 'LOADING_END'}, f
 end)
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_BAGEX', function()
+X.RegisterUserSettingsInit('MY_BAGEX', function()
 	Apply(O.bEnable)
 end)
 X.RegisterReload('MY_BAGEX', function() Apply(false) end)

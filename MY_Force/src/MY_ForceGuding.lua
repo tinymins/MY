@@ -288,7 +288,7 @@ function D.OnUseManaChange()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ForceGuding', function()
+X.RegisterUserSettingsInit('MY_ForceGuding', function()
 	D.bReady = true
 	D.OnEnableChange()
 	D.OnUseManaChange()

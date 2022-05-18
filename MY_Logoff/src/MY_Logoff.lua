@@ -104,7 +104,7 @@ end
 local function onInit()
 	X.DelayCall(2000, IdleOff)
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LOGOFF', onInit)
+X.RegisterUserSettingsInit('MY_LOGOFF', onInit)
 
 local PS = {}
 function PS.OnPanelActive(wnd)

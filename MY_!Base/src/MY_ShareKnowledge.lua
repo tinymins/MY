@@ -81,8 +81,8 @@ X.RegisterEvent('MY_RSS_UPDATE', function()
 				data = {
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,
-					region = X.GetRealServer(1),
-					server = X.GetRealServer(2),
+					region = X.GetRegionOriginName(),
+					server = X.GetServerOriginName(),
 					event = p.name,
 					args = szArgs,
 					time = GetCurrentTime(),
@@ -275,8 +275,8 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
-				region = X.GetRealServer(1),
-				server = X.GetRealServer(2),
+				region = X.GetRegionOriginName(),
+				server = X.GetServerOriginName(),
 				time = GetCurrentTime(),
 				data = X.EncodeJSON(res),
 			},
@@ -333,8 +333,8 @@ X.RegisterEvent('OPEN_WINDOW', 'MY_ShareKnowledge__Npc', function()
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
-				r = X.GetRealServer(1),
-				s = X.GetRealServer(2),
+				r = X.GetRegionOriginName(),
+				s = X.GetServerOriginName(),
 				t = GetCurrentTime(),
 				c = szContent,
 				cn = line and line.szCenterName or '', -- Center Name
@@ -410,8 +410,8 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_ShareKnowledge__Sysmsg', function(szChannel,
 				data = {
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,
-					region = X.GetRealServer(1),
-					server = X.GetRealServer(2),
+					region = X.GetRegionOriginName(),
+					server = X.GetServerOriginName(),
 					content = szMsg,
 					time = GetCurrentTime(),
 				},

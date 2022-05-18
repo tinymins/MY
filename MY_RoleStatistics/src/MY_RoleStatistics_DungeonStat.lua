@@ -419,8 +419,8 @@ function D.GetClientPlayerRec(bForceUpdate)
 	-- 基础信息
 	rec.guid = guid
 	rec.account = X.GetAccount() or ''
-	rec.region = X.GetRealServer(1)
-	rec.server = X.GetRealServer(2)
+	rec.region = X.GetRegionOriginName()
+	rec.server = X.GetServerOriginName()
 	rec.name = me.szName
 	rec.force = me.dwForceID
 	rec.level = me.nLevel
@@ -1211,7 +1211,7 @@ end
 -- 事件注册
 --------------------------------------------------------
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_DungeonStat', function()
+X.RegisterUserSettingsInit('MY_RoleStatistics_DungeonStat', function()
 	D.bReady = true
 	D.UpdateFloatEntry()
 end)

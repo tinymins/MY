@@ -400,7 +400,7 @@ local COLUMN_LIST = {
 		nMinWidth = 100,
 		nMaxWidth = 100,
 		GetValue = function(prevVal, prevRec)
-			return X.GetRealServer(1)
+			return X.GetRegionOriginName()
 		end,
 	},
 	-- 服务器
@@ -411,7 +411,7 @@ local COLUMN_LIST = {
 		nMinWidth = 100,
 		nMaxWidth = 100,
 		GetValue = function(prevVal, prevRec)
-			return X.GetRealServer(2)
+			return X.GetServerOriginName()
 		end,
 	},
 	-- 名字
@@ -1498,7 +1498,7 @@ end
 -- 事件注册
 --------------------------------------------------------
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_SerendipityStat', function()
+X.RegisterUserSettingsInit('MY_RoleStatistics_SerendipityStat', function()
 	D.bReady = true
 	D.CheckMapMark()
 	D.UpdateFloatEntry()

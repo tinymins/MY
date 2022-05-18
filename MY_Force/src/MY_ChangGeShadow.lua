@@ -114,7 +114,7 @@ function D.Apply()
 		X.UI.GetShadowHandle('MY_ChangGeShadow'):Hide()
 	end
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChangGeShadow', D.Apply)
+X.RegisterUserSettingsInit('MY_ChangGeShadow', D.Apply)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then

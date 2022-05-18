@@ -618,7 +618,7 @@ function D.OnCheckBoxUncheck()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_FOCUS', function()
+X.RegisterUserSettingsInit('MY_FOCUS', function()
 	if MY_Focus.bEnable then
 		D.Open()
 	else

@@ -466,7 +466,7 @@ for i = 1, 32 do
 		end)
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', MODULE_NAME, function()
+X.RegisterUserSettingsInit(MODULE_NAME, function()
 	D.bReady = true
 	D.CheckEnable()
 end)

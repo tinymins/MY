@@ -455,13 +455,13 @@ function D.ApplyBattlefieldChannelSwitch()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
+X.RegisterUserSettingsInit('MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
 	D.aWhisper = O.aWhisper
 	D.tChannelCount = O.tChannelCount
 	D.ApplyBattlefieldChannelSwitch()
 end)
 
-X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
+X.RegisterUserSettingsRelease('MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
 	if D.bWhisperChanged then
 		O.aWhisper = D.aWhisper
 	end
@@ -661,7 +661,7 @@ function D.ReInitUI()
 	end
 	Wnd.OpenWindow(INI_PATH, 'MY_ChatSwitch')
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatSwitch__UI', D.ReInitUI)
+X.RegisterUserSettingsInit('MY_ChatSwitch__UI', D.ReInitUI)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nPaddingX

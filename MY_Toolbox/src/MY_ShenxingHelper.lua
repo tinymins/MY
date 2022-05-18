@@ -265,7 +265,7 @@ X.RegisterEvent('MY_RESTRICTION', 'MY_ShenxingHelper', function()
 	end
 	D.CheckEnable()
 end)
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ShenxingHelper', function()
+X.RegisterUserSettingsInit('MY_ShenxingHelper', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

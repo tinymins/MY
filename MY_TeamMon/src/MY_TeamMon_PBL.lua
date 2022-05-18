@@ -305,7 +305,7 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	CACHE_LIST[key] = h
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_PBL', D.Init)
+X.RegisterUserSettingsInit('MY_TeamMon_PBL', D.Init)
 
 -- Global exports
 do

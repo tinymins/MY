@@ -210,7 +210,7 @@ function D.Init()
 	Wnd.OpenWindow(BL_INIFILE, 'MY_TeamMon_BL')
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_BL', D.Init)
+X.RegisterUserSettingsInit('MY_TeamMon_BL', D.Init)
 
 -- Global exports
 do

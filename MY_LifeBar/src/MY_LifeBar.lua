@@ -882,12 +882,12 @@ local function onSwitch()
 end
 X.RegisterHotKey('MY_LifeBar_S', _L['MY_LifeBar'], onSwitch)
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar', function()
+X.RegisterUserSettingsInit('MY_LifeBar', function()
 	D.bReady = true
 	D.Reset()
 end)
 
-X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_LifeBar', function()
+X.RegisterUserSettingsRelease('MY_LifeBar', function()
 	D.bReady = false
 	D.Reset()
 end)

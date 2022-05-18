@@ -61,11 +61,11 @@ X.RegisterInit('MY_ChatEmotion', function()
 	end)
 end)
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatEmotion', function()
+X.RegisterUserSettingsInit('MY_ChatEmotion', function()
 	D.bReady = true
 end)
 
-X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_ChatEmotion', function()
+X.RegisterUserSettingsRelease('MY_ChatEmotion', function()
 	D.bReady = false
 end)
 

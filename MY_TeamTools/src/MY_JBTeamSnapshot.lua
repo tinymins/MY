@@ -58,7 +58,7 @@ function D.CreateSnapshot()
 			team = O.szTeam,
 			cguid = X.GetClientGUID(),
 			jx3id = X.GetPlayerGUID(),
-			server = X.GetRealServer(2),
+			server = X.GetServerOriginName(),
 			teammate = table.concat(aTeammate, ';'),
 		},
 		signature = X.SECRET['J3CX::TEAM_SNAPSHOT'],

@@ -67,8 +67,8 @@ end
 
 function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTime, szMode)
 	local szKey = szName .. '_' .. szSerendipity .. '_' .. dwTime
-	local szRegion = X.GetRealServer(1)
-	local szServer = X.GetRealServer(2)
+	local szRegion = X.GetRegionOriginName()
+	local szServer = X.GetServerOriginName()
 	local bSelf = szName == X.GetClientInfo().szName
 	local szNameU = AnsiToUTF8(szName)
 	local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
@@ -246,8 +246,8 @@ function D.Fetch(szName, fnAction)
 		{
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			S = X.GetRealServer(1),
-			s = X.GetRealServer(2),
+			S = X.GetRegionOriginName(),
+			s = X.GetServerOriginName(),
 			n = szName,
 			N = szNameCRC,
 		}),
@@ -256,7 +256,7 @@ function D.Fetch(szName, fnAction)
 	X.Ajax({
 		url = 'https://pull.j3cx.com/api/serendipity',
 		data = {
-			server = X.GetRealServer(2),
+			server = X.GetServerOriginName(),
 			role = szName,
 			serendipity = '',
 			cert = table.concat({qs._c, qs._t, qs.L, qs.l, qs.n, qs.N, qs.S, qs.s}, '|'),

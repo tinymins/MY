@@ -252,7 +252,7 @@ function D.Apply()
 		D.ShowChatPanel()
 	end
 end
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoHideChat', D.Apply)
+X.RegisterUserSettingsInit('MY_AutoHideChat', D.Apply)
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nPaddingX

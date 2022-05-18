@@ -234,7 +234,7 @@ X.RegisterEvent({
 				table.insert(aTeammate, me.szName .. ',' .. UI_GetPlayerMountKungfuID())
 			end
 			local rec = {
-				szServer = X.GetRealServer(2),
+				szServer = X.GetServerOriginName(),
 				szName = me.szName,
 				szLeader = szLeader,
 				szTeammate = table.concat(aTeammate, ';'),

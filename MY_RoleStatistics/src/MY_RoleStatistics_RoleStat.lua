@@ -60,7 +60,6 @@ local DATA_ENV = setmetatable(
 		IsTable                    = X.IsTable                   ,
 		IsFunction                 = X.IsFunction                ,
 		GetAccount                 = X.GetAccount                ,
-		GetRealServer              = X.GetRealServer             ,
 		GetItemAmountInAllPackages = X.GetItemAmountInAllPackages,
 		RegisterFrameCreate        = X.RegisterFrameCreate       ,
 		ITEM_TABLE_TYPE            = ITEM_TABLE_TYPE             ,
@@ -198,7 +197,7 @@ local COLUMN_LIST = {
 		nMinWidth = 100,
 		nMaxWidth = 100,
 		GetValue = function(prevVal, prevRec)
-			return X.GetRealServer(1)
+			return X.GetRegionOriginName()
 		end,
 	},
 	-- 服务器
@@ -210,7 +209,7 @@ local COLUMN_LIST = {
 		nMinWidth = 100,
 		nMaxWidth = 100,
 		GetValue = function(prevVal, prevRec)
-			return X.GetRealServer(2)
+			return X.GetServerOriginName()
 		end,
 	},
 	-- 名字
@@ -1258,7 +1257,7 @@ end
 -- 事件注册
 --------------------------------------------------------
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_RoleStat', function()
+X.RegisterUserSettingsInit('MY_RoleStatistics_RoleStat', function()
 	D.bReady = true
 	D.UpdateFloatEntry()
 end)

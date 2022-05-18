@@ -252,7 +252,7 @@ function D.Apply()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_FooterTip', function()
+X.RegisterUserSettingsInit('MY_FooterTip', function()
 	D.bReady = true
 	D.Apply()
 end)

@@ -787,7 +787,7 @@ function D.LoadConfig(szConfig)
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LifeBar_Config', function()
+X.RegisterUserSettingsInit('MY_LifeBar_Config', function()
 	D.Init()
 	D.LoadConfig()
 end)

@@ -292,7 +292,7 @@ function D.Reload()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_VisualSkill', function()
+X.RegisterUserSettingsInit('MY_VisualSkill', function()
 	D.bReady = true
 	D.Reload()
 end)

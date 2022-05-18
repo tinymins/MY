@@ -65,7 +65,7 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			server = line and line.szCenterName or X.GetRealServer(2),
+			server = line and line.szCenterName or X.GetServerOriginName(),
 			player = GetUserRoleName(),
 			item = szName,
 		}))
@@ -271,8 +271,8 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 		local data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			r = X.GetRealServer(1),
-			s = X.GetRealServer(2),
+			r = X.GetRegionOriginName(),
+			s = X.GetServerOriginName(),
 			t = GetCurrentTime(),
 			d = table.concat(aData, ' '), -- Price data
 			dt = szPriceType, -- Price type

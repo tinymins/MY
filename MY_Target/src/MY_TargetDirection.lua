@@ -198,7 +198,7 @@ X.RegisterEvent('MY_RESTRICTION', 'MY_Target', function()
 	end
 	D.CheckEnable()
 end)
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TargetDirection', function()
+X.RegisterUserSettingsInit('MY_TargetDirection', function()
 	D.bReady = true
 	D.CheckEnable()
 	D.UpdateAnchor()

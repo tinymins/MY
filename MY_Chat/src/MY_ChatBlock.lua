@@ -136,12 +136,12 @@ function D.CheckEnable()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatBlock', function()
+X.RegisterUserSettingsInit('MY_ChatBlock', function()
 	D.bReady = true
 	D.aBlockWords = O.aBlockWords
 	D.CheckEnable()
 end)
-X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_ChatBlock', function()
+X.RegisterUserSettingsRelease('MY_ChatBlock', function()
 	D.bReady = false
 	D.CheckEnable()
 end)

@@ -341,7 +341,7 @@ function D.FlushDB()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(X.GetPlayerGUID())
 	local ownername = AnsiToUTF8(me.szName)
-	local servername = AnsiToUTF8(X.GetRealServer(2))
+	local servername = AnsiToUTF8(X.GetServerOriginName())
 	local rec = REC_CACHE
 	if not rec then
 		rec = {
@@ -891,7 +891,7 @@ end
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_RoleStatistics_EquipStat', function()
+X.RegisterUserSettingsInit('MY_RoleStatistics_EquipStat', function()
 	D.bReady = true
 	D.UpdateFloatEntry()
 end)

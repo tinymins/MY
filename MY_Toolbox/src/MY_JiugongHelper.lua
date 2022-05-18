@@ -107,7 +107,7 @@ function D.Apply()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_JiugongHelper', function()
+X.RegisterUserSettingsInit('MY_JiugongHelper', function()
 	D.bReady = true
 	D.Apply()
 end)

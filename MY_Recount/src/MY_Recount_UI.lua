@@ -748,7 +748,7 @@ function D.OnCheckBoxUncheck()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Recount_UI', D.CheckOpen)
+X.RegisterUserSettingsInit('MY_Recount_UI', D.CheckOpen)
 
 -- Global exports
 do

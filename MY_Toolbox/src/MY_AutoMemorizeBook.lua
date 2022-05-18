@@ -78,7 +78,7 @@ function D.CheckEnable()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_AutoMemorizeBook', D.CheckEnable)
+X.RegisterUserSettingsInit('MY_AutoMemorizeBook', D.CheckEnable)
 X.RegisterReload('MY_AutoMemorizeBook', D.Unhook)
 X.RegisterEvent('MY_RESTRICTION', 'MY_AutoMemorizeBook', function()
 	if arg0 and arg0 ~= 'MY_AutoMemorizeBook' then

@@ -122,7 +122,7 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 	})();
 </script>
 <div>
-<a style='color: #fff;margin: 0 10px'>]] .. GetClientPlayer().szName .. ' @ ' .. X.GetServer() ..
+<a style='color: #fff;margin: 0 10px'>]] .. GetClientPlayer().szName .. ' @ ' .. X.GetServerName() ..
 ' Exported at ' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd %hh:%mm:%ss') .. '</a><hr />'
 
 	return szHeader

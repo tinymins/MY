@@ -156,7 +156,7 @@ function D.Apply()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamBalloon', function()
+X.RegisterUserSettingsInit('MY_TeamBalloon', function()
 	D.Apply()
 end)
 

@@ -183,7 +183,7 @@ function D.CheckAllFrame()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_LockFrame', function()
+X.RegisterUserSettingsInit('MY_LockFrame', function()
 	D.bReady = true
 	D.CheckAllFrame()
 end)

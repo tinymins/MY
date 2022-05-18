@@ -250,7 +250,7 @@ X.RegisterEvent('LOADING_END', 'MY_Force', function()
 	end
 end)
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_Force', function()
+X.RegisterUserSettingsInit('MY_Force', function()
 	D.OnAlertPetChange()
 	D.OnMarkPetChange()
 	D.OnFeedHorseChange()

@@ -39,7 +39,7 @@ function D.Apply()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_HideAnnounceBg', function()
+X.RegisterUserSettingsInit('MY_HideAnnounceBg', function()
 	D.bReady = true
 	D.Apply()
 end)

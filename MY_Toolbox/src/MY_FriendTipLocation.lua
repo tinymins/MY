@@ -78,7 +78,7 @@ function D.CheckEnable()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_FriendTipLocation', function()
+X.RegisterUserSettingsInit('MY_FriendTipLocation', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

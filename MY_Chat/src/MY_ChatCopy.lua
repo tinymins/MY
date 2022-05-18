@@ -165,7 +165,7 @@ function D.CheckNamelinkEnable()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_ChatCopy', function()
+X.RegisterUserSettingsInit('MY_ChatCopy', function()
 	D.bReady = true
 	D.CheckNamelinkEnable()
 end)

@@ -134,7 +134,7 @@ function D.OnBreathe()
 	end
 end
 
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_TeamMon_LT', D.Init)
+X.RegisterUserSettingsInit('MY_TeamMon_LT', D.Init)
 
 local PS = { szRestriction = 'MY_TeamMon_LT' }
 function PS.OnPanelActive(frame)

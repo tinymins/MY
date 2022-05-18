@@ -782,7 +782,7 @@ end)
 X.RegisterEvent('MY_RESTRICTION', function()
 	D.CheckShowName()
 end)
-X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_GKPDoodad', function()
+X.RegisterUserSettingsInit('MY_GKPDoodad', function()
 	for _, dwID in ipairs(D.aCraft) do
 		if dwID ~= 0 then
 			if not X.IsBoolean(O.tCraft[dwID]) then
@@ -793,7 +793,7 @@ X.RegisterUserSettingsUpdate('@@INIT@@', 'MY_GKPDoodad', function()
 	D.RescanNearby()
 	D.bReady = true
 end)
-X.RegisterUserSettingsUpdate('@@UNINIT@@', 'MY_GKPDoodad', function()
+X.RegisterUserSettingsRelease('MY_GKPDoodad', function()
 	D.bReady = false
 end)
 
