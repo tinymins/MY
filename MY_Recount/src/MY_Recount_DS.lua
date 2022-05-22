@@ -476,6 +476,9 @@ local AsyncSaveLuaData = _G.AsyncSaveLuaData or SaveLUAData
 -- ##################################################################################################
 -- 登录游戏加载保存的数据
 function D.LoadData()
+	if Data then
+		return
+	end
 	local data = X.LoadLUAData(SZ_CFG_FILE, DS_DATA_CONFIG)
 	if data then
 		if X.IsTable(data.History) then
@@ -1985,17 +1988,6 @@ X.RegisterEvent('PARTY_ADD_MEMBER', function()
 	end
 end)
 
-X.RegisterInit('MY_Recount_DS', function()
-	D.LoadData()
-end)
-
-X.RegisterFlush('MY_Recount_DS', function()
-	D.SaveData()
-	if O.bSaveHistoryOnExit then
-		D.SaveHistory()
-	end
-end)
-
 -- 同名目标数据合并
 do local tDstDetail, id, tDstSkill, tDstSkillDetail, tDstSkillTarget, tDstTarget, tDstTargetDetail, tDstTargetSkill
 function D.MergeTargetData(tDst, tSrc, data, szChannel, bMergeNpc, bMergeEffect, bHideAnonymous)
@@ -2382,8 +2374,20 @@ end
 -- 事件注册
 --------------------------------------------------------------------------------
 
+X.RegisterInit('MY_Recount_DS', function()
+	D.LoadData()
+end)
+
+X.RegisterFlush('MY_Recount_DS', function()
+	D.SaveData()
+	if O.bSaveHistoryOnExit then
+		D.SaveHistory()
+	end
+end)
+
 X.RegisterUserSettingsInit('MY_Recount_DS', function()
 	D.bReady = true
+	D.LoadData()
 end)
 
 X.RegisterUserSettingsRelease('MY_Recount_DS', function()
