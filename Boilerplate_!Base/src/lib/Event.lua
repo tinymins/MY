@@ -295,7 +295,6 @@ local CommonEventRegister = X.CommonEventRegister
 local function OnExit()
 	X.FireFlush()
 	CommonEventFirer(EXIT_EVENT)
-	X.ReleaseUserSettingsDB()
 	X.DeleteAncientLogs()
 end
 X.RegisterEvent('GAME_EXIT', OnExit)
@@ -332,7 +331,6 @@ local CommonEventRegister = X.CommonEventRegister
 local function OnReload()
 	X.FlushCoroutine()
 	CommonEventFirer(RELOAD_EVENT)
-	X.ReleaseUserSettingsDB()
 end
 X.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
 
