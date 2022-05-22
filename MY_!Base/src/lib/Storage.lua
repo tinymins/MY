@@ -1755,4 +1755,23 @@ X.SafeCall(function()
 	end
 end)
 
+-- Hack方式优化用户数据逻辑，创建一个窗口用于退出游戏断开数据库链接
+X.SafeCall(function()
+	local frame = Wnd.OpenWindow(X.PACKET_INFO.FRAMEWORK_ROOT .. '/ui/components/WndFrameEmpty.ini', X.NSFormatString('{$NS}#UserSettingsReleaseListener'))
+	local nCount = 0
+	frame.OnFrameBreathe = function()
+		if nCount > 0 then
+			nCount = nCount - 1
+			return
+		end
+		nCount = 128
+		this:BringToTop()
+	end
+	frame.OnFrameDestroy = function()
+		X.ReleaseUserSettingsDB()
+	end
+	frame:ChangeRelation('Topmost2')
+	frame:SetRelPos(-10000, -10000)
+end)
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
