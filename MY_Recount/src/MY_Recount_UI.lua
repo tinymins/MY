@@ -219,8 +219,7 @@ local O = X.CreateUserSettingsModule('MY_Recount_UI', _L['Raid'], {
 local D = {}
 
 -- 根据基础库的门派配色创建配色方案
-do
-local function onForceColorUpdate()
+function D.OnForceColorUpdate()
 	local tCss = FORCE_BAR_CSS[1]
 	for _, dwForceID in X.pairs_c(X.CONSTANT.FORCE_TYPE) do
 		local r, g, b = X.GetForceColor(dwForceID, 'background')
@@ -229,8 +228,6 @@ local function onForceColorUpdate()
 	local r, g, b = X.GetForceColor(-1, 'background')
 	tCss[-1] = { r = r, g = g, b = b, a = 255 }
 	FireUIEvent('MY_RECOUNT_CSS_UPDATE')
-end
-X.RegisterEvent('MY_FORCE_COLOR_UPDATE', onForceColorUpdate)
 end
 
 function D.Open()
@@ -831,6 +828,13 @@ end
 -- 事件注册
 --------------------------------------------------------------------------------
 
-X.RegisterUserSettingsInit('MY_Recount_UI', D.CheckOpen)
+X.RegisterEvent('MY_FORCE_COLOR_UPDATE', 'MY_Recount_UI', function()
+	D.OnForceColorUpdate()
+end)
+
+X.RegisterUserSettingsInit('MY_Recount_UI', function()
+	D.CheckOpen()
+	D.OnForceColorUpdate()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
