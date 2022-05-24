@@ -572,4 +572,8 @@ X.RegisterUserSettingsInit(MODULE_NAME, function()
 	D.CheckEnable()
 end)
 
+X.RegisterInit(MODULE_NAME, function()
+	D.CheckEnable()
+end)
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
