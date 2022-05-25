@@ -316,15 +316,6 @@ function D.OnLButtonClick()
 	end
 end
 
-X.RegisterInit(FRAME_NAME, function()
-	D.HookEntry()
-	D.UpdateEntry()
-end)
-X.RegisterUserSettingsInit(MODULE_NAME, function()
-	D.UpdateEntry()
-end)
-X.RegisterReload(FRAME_NAME, D.UnhookEntry)
-
 do
 local l_uiFrame, l_uiTipBoard
 function D.ShowTip(szMsg)
@@ -430,7 +421,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	return nX, nY, nLFY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = FRAME_NAME,
@@ -446,5 +439,18 @@ local settings = {
 }
 _G[FRAME_NAME] = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterInit(FRAME_NAME, function()
+	D.HookEntry()
+	D.UpdateEntry()
+end)
+X.RegisterUserSettingsInit(MODULE_NAME, function()
+	D.UpdateEntry()
+end)
+X.RegisterReload(FRAME_NAME, D.UnhookEntry)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

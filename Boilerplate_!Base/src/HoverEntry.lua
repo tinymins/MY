@@ -80,7 +80,6 @@ function D.CheckEnable()
 		})
 	end
 end
-X.RegisterUserSettingsInit(X.NSFormatString('{$NS}_HoverEntry'), D.CheckEnable)
 
 function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
@@ -149,7 +148,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	return nX, nY, nLFY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = FRAME_NAME,
@@ -165,5 +166,11 @@ local settings = {
 }
 _G[FRAME_NAME] = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit(X.NSFormatString('{$NS}_HoverEntry'), D.CheckEnable)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
