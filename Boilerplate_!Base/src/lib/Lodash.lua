@@ -24,15 +24,15 @@ local _ = {
     _VERSION = '0.02'
 }
 
-if type(table.pack) ~= 'function' then
-   function table.pack(...)
-     return { n = select("#", ...), ... }
-   end
-end
+-- if type(table.pack) ~= 'function' then
+--    function table.pack(...)
+--      return { n = select("#", ...), ... }
+--    end
+-- end
 
-if type(table.unpack) ~= 'function' then
-   table.unpack = unpack
-end
+-- if type(table.unpack) ~= 'function' then
+--    table.unpack = unpack
+-- end
 
 --- Array
 -- @section Array
