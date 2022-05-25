@@ -25,8 +25,17 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Interval')
 if DelayCall and BreatheCall and FrameCall and RenderCall then
 	local NS_PREFIX = X.NSFormatString('{$NS}__')
 	local function WrapIntervalCall(szIntervalName, IntervalCall)
+		--[[#DEBUG BEGIN]]
+		local REG_KEY_GC = {}
+		RegisterEvent('RELOAD_UI_ADDON_BEGIN', function()
+			for k, _ in pairs(REG_KEY_GC) do
+				IntervalCall(k, false)
+			end
+			REG_KEY_GC = {}
+		end)
+		--[[#DEBUG END]]
 		return function(szKey, nInterval, fnAction, oArg)
-			local bUnreg
+			local bUnReg
 			if type(szKey) == 'function' then
 				-- DelayCall(fnAction[, oArg])
 				szKey, nInterval, fnAction, oArg = nil, 0, szKey, nInterval
@@ -38,7 +47,7 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 				nInterval, fnAction, oArg = 0, nInterval, fnAction
 			elseif type(nInterval) == 'boolean' then
 				-- DelayCall(szKey, false)
-				nInterval, bUnreg = nil, true
+				nInterval, bUnReg = nil, true
 			elseif nInterval and type(fnAction) ~= 'function' then
 				-- DelayCall(szKey, nInterval)
 				fnAction = nil
@@ -72,7 +81,14 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 				assert(false, 'IntervalCall Key MUST be string.')
 			end
 			local szNSKey = NS_PREFIX .. szKey
-			local aRetVal = bUnreg
+			--[[#DEBUG BEGIN]]
+			if bUnReg then
+				REG_KEY_GC[szNSKey] = nil
+			else
+				REG_KEY_GC[szNSKey] = true
+			end
+			--[[#DEBUG END]]
+			local aRetVal = bUnReg
 				and X.Pack(IntervalCall(szNSKey, false))
 				or X.Pack(IntervalCall(szNSKey, nInterval, fnAction, oArg))
 			if X.IsString(aRetVal[1]) then
