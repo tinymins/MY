@@ -25,16 +25,25 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Interval')
 if DelayCall and BreatheCall and FrameCall and RenderCall then
 	local NS_PREFIX = X.NSFormatString('{$NS}__')
 	local function WrapIntervalCall(szIntervalName, IntervalCall)
-		--[[#DEBUG BEGIN]]
-		local REG_KEY_GC = {}
-		RegisterEvent('RELOAD_UI_ADDON_BEGIN', function()
-			for k, _ in pairs(REG_KEY_GC) do
+		-- 游戏结束时清理注册防止异常
+		local tRegKeys, bRegClosed = {}, false
+		local function OnRegClose()
+			for k, _ in pairs(tRegKeys) do
 				IntervalCall(k, false)
 			end
-			REG_KEY_GC = {}
-		end)
-		--[[#DEBUG END]]
+			tRegKeys, bRegClosed = nil, true
+			UnRegisterEvent('GAME_EXIT', OnRegClose)
+			UnRegisterEvent('PLAYER_EXIT_GAME', OnRegClose)
+			UnRegisterEvent('RELOAD_UI_ADDON_BEGIN', OnRegClose)
+		end
+		RegisterEvent('GAME_EXIT', OnRegClose)
+		RegisterEvent('PLAYER_EXIT_GAME', OnRegClose)
+		RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnRegClose)
+		-- 注册函数
 		return function(szKey, nInterval, fnAction, oArg)
+			if bRegClosed then
+				return
+			end
 			local bUnReg
 			if type(szKey) == 'function' then
 				-- DelayCall(fnAction[, oArg])
@@ -81,13 +90,11 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 				assert(false, 'IntervalCall Key MUST be string.')
 			end
 			local szNSKey = NS_PREFIX .. szKey
-			--[[#DEBUG BEGIN]]
 			if bUnReg then
-				REG_KEY_GC[szNSKey] = nil
+				tRegKeys[szNSKey] = nil
 			else
-				REG_KEY_GC[szNSKey] = true
+				tRegKeys[szNSKey] = true
 			end
-			--[[#DEBUG END]]
 			local aRetVal = bUnReg
 				and X.Pack(IntervalCall(szNSKey, false))
 				or X.Pack(IntervalCall(szNSKey, nInterval, fnAction, oArg))
