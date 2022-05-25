@@ -189,6 +189,9 @@ function D.CheckAutoFeedEnable()
 			local nMeasure = domesticate.nMaxFullMeasure - domesticate.nFullMeasure
 			local nRound = math.floor(nMeasure / O.nAutoFeedFoodMeasure)
 			local bFeed = false
+			if nRound == 0 and domesticate.nFullMeasure == 0 then
+				nRound = 1
+			end
 			for _ = 1, nRound do
 				X.WalkBagItem(function(item, dwBox, dwX)
 					if item.dwTabType == O.dwAutoFeedFoodTabType and item.dwIndex == O.dwAutoFeedFoodTabIndex then
