@@ -124,7 +124,7 @@ end
 
 -- 格式化数字为指定进制下的字符串表示
 function X.NumberBaseN(n, b, digits)
-	if not X.IsNumber(n) or not X.IsHugeNumber(n) then
+	if not X.IsNumber(n) or X.IsHugeNumber(n) then
 		assert(false, 'Input must be a number value except `math.huge`.')
 	end
 	n = math.floor(n)
