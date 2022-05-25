@@ -373,6 +373,9 @@ X.RegisterUserSettingsInit('MY_FooterTip', function()
 	D.bReady = true
 	D.Apply()
 end)
+X.RegisterUserSettingsRelease('MY_FooterTip', function()
+	D.bReady = false
+end)
 X.RegisterEvent('LOADING_ENDING', 'MY_FooterTip', D.Apply)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
