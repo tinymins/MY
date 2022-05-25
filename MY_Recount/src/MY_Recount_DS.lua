@@ -474,36 +474,6 @@ local AsyncSaveLuaData = _G.AsyncSaveLuaData or SaveLUAData
 --             #               #           #           #       #             # #           #
 --           # #               #           #         #           # # # # #         # # # # # # # #
 -- ##################################################################################################
--- µÇÂ¼ÓÎÏ·¼ÓÔØ±£´æµÄÊý¾Ý
-function D.LoadData()
-	if Data then
-		return
-	end
-	local data = X.LoadLUAData(SZ_CFG_FILE, DS_DATA_CONFIG)
-	if data then
-		if X.IsTable(data.History) then
-			for _, data in ipairs(data.History) do
-				UNSAVED_CACHE[X.FormatPath(DS_ROOT) .. D.GetDataFileName(data)] = data
-			end
-			D.SaveHistory()
-		end
-		O.bEnable            = X.Get(data, 'bEnable', false)
-		O.bSaveHistoryOnExit = X.Get(data, 'bSaveHistoryOnExit', false)
-		O.bSaveHistoryOnExFi = X.Get(data, 'bSaveHistoryOnExFi', false)
-		O.nMaxHistory        = X.Get(data, 'nMaxHistory', 10)
-		O.nMinFightTime      = X.Get(data, 'nMinFightTime', 30)
-		O.bRecEverything     = false -- X.Get(data, 'bRecEverything', false)
-		O.bREOnlyDungeon     = X.Get(data, 'bREOnlyDungeon', true)
-		O.bSaveEverything    = false -- X.Get(data, 'bSaveEverything', false)
-		MY_Recount_UI.CheckOpen()
-	end
-	D.InitData()
-end
-
--- ÍË³öÓÎÏ·±£´æÊý¾Ý
-function D.SaveData()
-	X.SaveLUAData(SZ_CFG_FILE, nil, DS_DATA_CONFIG)
-end
 
 -- ¼ÓÔØÀúÊ·Êý¾ÝÁÐ±í
 function D.GetHistoryFiles()
@@ -640,7 +610,7 @@ end)
 
 -- ÍË³öÕ½¶· ±£´æÊý¾Ý
 X.RegisterEvent('MY_FIGHT_HINT', function()
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
@@ -1548,7 +1518,7 @@ end
 -- ÏµÍ³ÈÕÖ¾¼à¿Ø£¨Êý¾ÝÔ´£©
 do local aAbsorbInfo, nLFC
 X.RegisterEvent('SYS_MSG', function()
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
@@ -1693,7 +1663,7 @@ end
 X.RegisterEvent('BUFF_UPDATE', function()
 	-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
 	--     = arg0 , arg1   , arg2 , arg3     , arg4, arg5    , arg6    , arg7 , arg8 , arg9 , arg10  , arg11
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	nAbsorbPriority = ABSORB_BUFF[arg4]
@@ -1780,7 +1750,7 @@ function D.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
 	end
 end
 X.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	local team = GetClientTeam()
@@ -1799,7 +1769,7 @@ for _, v in ipairs({
 }) do
 	local szEvent, dwType, nEnter = unpack(v)
 	X.RegisterEvent(szEvent, function()
-		if not D.bReady or not O.bEnable then
+		if not Data or not D.bReady or not O.bEnable then
 			return
 		end
 		-- ²åÈëÊý¾Ýµ½ÈÕÖ¾
@@ -1832,7 +1802,7 @@ for _, v in ipairs({
 end
 -- ÏµÍ³ÏûÏ¢ÈÕÖ¾
 X.RegisterMsgMonitor('MSG_SYS', 'MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	if bRich then
@@ -1846,7 +1816,7 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_Recount_DS_Everything', function(szChannel, 
 end)
 -- ½ÇÉ«º°»°ÈÕÖ¾
 X.RegisterEvent('PLAYER_SAY', function()
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	if not IsPlayer(arg1) then
@@ -1865,7 +1835,7 @@ X.RegisterEvent('PLAYER_SAY', function()
 end)
 -- ÏµÍ³¾¯¸æ¿òÈÕÖ¾
 X.RegisterEvent('ON_WARNING_MESSAGE', function()
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
@@ -1878,7 +1848,7 @@ X.RegisterEvent('ON_WARNING_MESSAGE', function()
 end)
 -- ½øÈëÍË³öÕ½¶·ÈÕÖ¾
 X.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
@@ -1911,7 +1881,7 @@ X.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
 end)
 -- ËÀÍöÈÕÖ¾
 X.RegisterEvent('SYS_MSG', function()
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	if arg0 ~= 'UI_OME_DEATH_NOTIFY' then
@@ -1931,7 +1901,7 @@ X.RegisterEvent('SYS_MSG', function()
 end)
 -- ÉÏÏßÏÂÏßÈÕÖ¾
 X.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	if X.IsParty(arg1) then
@@ -1955,7 +1925,7 @@ X.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 end)
 -- ½ø³öÕ½¶·ÔÝÀë¼ÇÂ¼
 X.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµô/µôÏßµÄÈË
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	local team = GetClientTeam()
@@ -1975,7 +1945,7 @@ X.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµ
 end)
 -- ÖÐÍ¾ÓÐÈË½ø¶Ó ²¹ÉÏÔÝÀë¼ÇÂ¼
 X.RegisterEvent('PARTY_ADD_MEMBER', function()
-	if not D.bReady or not O.bEnable then
+	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
 	local team = GetClientTeam()
@@ -2348,20 +2318,12 @@ local settings = {
 			},
 			triggers = {
 				bEnable = function()
-					D.SaveData()
 					D.UpdateIsRecEverything()
 					MY_Recount_UI.CheckOpen()
 				end,
-				bSaveHistoryOnExit = D.SaveData,
-				bSaveHistoryOnExFi = D.SaveData,
-				nMaxHistory        = D.SaveData,
-				nMinFightTime      = D.SaveData,
-				bRecEverything     = D.SaveData,
 				bREOnlyDungeon = function()
-					D.SaveData()
 					D.UpdateIsRecEverything()
 				end,
-				bSaveEverything    = D.SaveData,
 			},
 			root = O,
 		},
@@ -2375,11 +2337,10 @@ end
 --------------------------------------------------------------------------------
 
 X.RegisterInit('MY_Recount_DS', function()
-	D.LoadData()
+	D.InitData()
 end)
 
 X.RegisterFlush('MY_Recount_DS', function()
-	D.SaveData()
 	if O.bSaveHistoryOnExit then
 		D.SaveHistory()
 	end
@@ -2387,7 +2348,6 @@ end)
 
 X.RegisterUserSettingsInit('MY_Recount_DS', function()
 	D.bReady = true
-	D.LoadData()
 end)
 
 X.RegisterUserSettingsRelease('MY_Recount_DS', function()
