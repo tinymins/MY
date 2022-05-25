@@ -558,7 +558,7 @@ for _, serendipity in ipairs(SERENDIPITY_LIST) do
 		end,
 		GetValue = function(prevVal, prevRec)
 			local value = {
-				count = GetSerendipityDailyCount(GetClientPlayer(), serendipity) or X.Get(prevVal, 'daily'),
+				count = GetSerendipityDailyCount(GetClientPlayer(), serendipity) or X.Get(prevVal, 'count'),
 				extra = 0,
 			}
 			-- 包里有可用触发奇遇道具进行数量补偿
