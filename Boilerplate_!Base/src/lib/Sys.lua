@@ -845,7 +845,7 @@ local FORMAT_TIME_COUNT_PRESET = {
 		minute = { normal = '%d\'', fixed = '%02d\'' },
 		second = { normal = '%d"', fixed = '%02d"' },
 	},
-	['SYMBAL'] = {
+	['SYMBOL'] = {
 		hour = { normal = '%d', fixed = '%02d', delimiter = ':' },
 		minute = { normal = '%d', fixed = '%02d', delimiter = ':' },
 		second = { normal = '%d', fixed = '%02d' },
