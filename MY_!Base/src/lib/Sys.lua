@@ -822,17 +822,31 @@ end
 --   17th-century astronomers used a third division of 1/60th of a second.
 --   The advantage of using minute and second symbols for time is that it obviously expresses a duration rather than a time.
 --   From the time 01:00:00 to the time 02:34:56 is a duration of 1 hour, 34 minutes and 56 seconds (1h 34′ 56″)
---   Prime markers start single and are multiplied for susbsequent appearances, so minutes use a single prime ′ and seconds use a double-prime ″.
+--   Prime markers start single and are multiplied for subsequent appearances, so minutes use a single prime ′ and seconds use a double-prime ″.
 --   They are pronounced minutes and seconds respectively in the case of durations like this.
 --   Note that a prime ′ is not a straight-apostrophe ' or a printer's apostrophe ’, although straight-apostrophes are a reasonable approximation and printer's apostrophes do occur as well.
 
+---@class FormatDurationUnitItem @格式化时间配置项参数
+---@field normal string @正常显示格式
+---@field fixed string @固定宽度显示格式
+---@field skipNull boolean @为空是否跳过
+---@field delimiter string @分隔符
+
+---@class FormatDurationUnit @格式化时间配置参数
+---@field year FormatDurationUnitItem | string @年数
+---@field day FormatDurationUnitItem | string @天数
+---@field hour FormatDurationUnitItem | string @小时数
+---@field minute FormatDurationUnitItem | string @分钟数
+---@field second FormatDurationUnitItem | string @秒钟数
+
+---@type table<string, FormatDurationUnit>
 local FORMAT_TIME_COUNT_PRESET = {
 	['CHINESE'] = {
-		year = { normal = '%d' .. g_tStrings.STR_YEAR, fixed = '%04d' .. g_tStrings.STR_YEAR, skipnull = true },
-		day = { normal = '%d' .. g_tStrings.STR_BUFF_H_TIME_D_SHORT, fixed = '%02d' .. g_tStrings.STR_BUFF_H_TIME_D_SHORT, skipnull = true },
-		hour = { normal = '%d' .. g_tStrings.STR_TIME_HOUR, fixed = '%02d' .. g_tStrings.STR_TIME_HOUR, skipnull = true },
-		minute = { normal = '%d' .. g_tStrings.STR_TIME_MINUTE, fixed = '%02d' .. g_tStrings.STR_TIME_MINUTE, skipnull = true },
-		second = { normal = '%d' .. g_tStrings.STR_TIME_SECOND, fixed = '%02d' .. g_tStrings.STR_TIME_SECOND, skipnull = true },
+		year = { normal = '%d' .. g_tStrings.STR_YEAR, fixed = '%04d' .. g_tStrings.STR_YEAR, skipNull = true },
+		day = { normal = '%d' .. g_tStrings.STR_BUFF_H_TIME_D_SHORT, fixed = '%02d' .. g_tStrings.STR_BUFF_H_TIME_D_SHORT, skipNull = true },
+		hour = { normal = '%d' .. g_tStrings.STR_TIME_HOUR, fixed = '%02d' .. g_tStrings.STR_TIME_HOUR, skipNull = true },
+		minute = { normal = '%d' .. g_tStrings.STR_TIME_MINUTE, fixed = '%02d' .. g_tStrings.STR_TIME_MINUTE, skipNull = true },
+		second = { normal = '%d' .. g_tStrings.STR_TIME_SECOND, fixed = '%02d' .. g_tStrings.STR_TIME_SECOND, skipNull = true },
 	},
 	['ENGLISH_ABBR'] = {
 		year = { normal = '%dy', fixed = '%04dy' },
@@ -845,7 +859,7 @@ local FORMAT_TIME_COUNT_PRESET = {
 		minute = { normal = '%d\'', fixed = '%02d\'' },
 		second = { normal = '%d"', fixed = '%02d"' },
 	},
-	['SYMBAL'] = {
+	['SYMBOL'] = {
 		hour = { normal = '%d', fixed = '%02d', delimiter = ':' },
 		minute = { normal = '%d', fixed = '%02d', delimiter = ':' },
 		second = { normal = '%d', fixed = '%02d' },
@@ -859,21 +873,16 @@ local FORMAT_TIME_UNIT_LIST = {
 	{ key = 'second', radix = 60 },
 }
 
+---@class FormatDurationControl @格式化时间控制参数
+---@field mode "'normal'" | "'fixed'" | "'fixed-except-leading'" @格式化模式
+---@field maxUnit "'year'" | "'day'" | "'hour'" | "'minute'" | "'second'" @开始单位，最大只显示到该单位，默认值：'year'。
+---@field keepUnit "'year'" | "'day'" | "'hour'" | "'minute'" | "'second'" @零值也保留的单位位置，默认值：'second'。
+---@field accuracyUnit "'year'" | "'day'" | "'hour'" | "'minute'" | "'second'" @精度结束单位，精度低于该单位的数据将被省去，默认值：'second'。
+
 -- 格式化计时时间
--- (string) X.FormatDuration(nTime, tUnitFmt, tControl)
--- (string) X.FormatDuration(nTime, szPreset, tControl)
--- tUnitFmt 时间各单位格式化字符串
---   year   年数
---   day    天数
---   hour   小时数
---   minute 分钟数
---   second 秒钟数
--- szPreset 预设方案：见 FORMAT_TIME_COUNT_PRESET
--- tControl 格式化控制
---   mode         格式化模式，支持 'normal', 'fixed', 'fixed-except-leading'
---   maxunit      开始单位，最大只显示到该单位，可选：'year', 'day', 'hour', 'miute', 'second'，默认值：'year'。
---   keepunit     零值也保留的单位位置，可选：'year', 'day', 'hour', 'miute', 'second'，默认值：'second'。
---   accuracyunit 精度结束单位，精度低于该单位的数据将被省去，可选：'year', 'day', 'hour', 'miute', 'second'，默认值：'second'。
+---@param nTime number @时间
+---@param tUnitFmt FormatDurationUnit | string @格式化参数 或 预设方案名（见 `FORMAT_TIME_COUNT_PRESET`）
+---@param tControl FormatDurationControl @控制参数
 function X.FormatDuration(nTime, tUnitFmt, tControl)
 	if X.IsString(tUnitFmt) then
 		tUnitFmt = FORMAT_TIME_COUNT_PRESET[tUnitFmt]
@@ -884,49 +893,49 @@ function X.FormatDuration(nTime, tUnitFmt, tControl)
 	-- 格式化模式
 	local mode = tControl and tControl.mode or 'normal'
 	-- 开始单位，最大只显示到该单位
-	local maxunit = tControl and tControl.maxunit or 'year'
-	local maxunitindex = -1
+	local maxUnit = tControl and tControl.maxUnit or 'year'
+	local maxUnitIndex = -1
 	for i, v in ipairs(FORMAT_TIME_UNIT_LIST) do
-		if v.key == maxunit then
-			maxunitindex = i
+		if v.key == maxUnit then
+			maxUnitIndex = i
 			break
 		end
 	end
-	if maxunitindex == -1 then
-		maxunitindex = 1
-		maxunit = FORMAT_TIME_UNIT_LIST[maxunitindex].key
+	if maxUnitIndex == -1 then
+		maxUnitIndex = 1
+		maxUnit = FORMAT_TIME_UNIT_LIST[maxUnitIndex].key
 	end
 	-- 零值也保留的单位位置
-	local keepunit = tControl and tControl.keepunit or 'second'
-	local keepunitindex = -1
+	local keepUnit = tControl and tControl.keepUnit or 'second'
+	local keepUnitIndex = -1
 	for i, v in ipairs(FORMAT_TIME_UNIT_LIST) do
-		if v.key == keepunit then
-			keepunitindex = i
+		if v.key == keepUnit then
+			keepUnitIndex = i
 			break
 		end
 	end
-	if keepunitindex == -1 then
-		keepunitindex = #FORMAT_TIME_UNIT_LIST
-		keepunit = FORMAT_TIME_UNIT_LIST[keepunitindex].key
+	if keepUnitIndex == -1 then
+		keepUnitIndex = #FORMAT_TIME_UNIT_LIST
+		keepUnit = FORMAT_TIME_UNIT_LIST[keepUnitIndex].key
 	end
 	-- 精度结束单位，精度低于该单位的数据将被省去
-	local accuracy = tControl and tControl.accuracyunit or 'second'
-	local accuracyindex = -1
+	local accuracy = tControl and tControl.accuracyUnit or 'second'
+	local accuracyUnitIndex = -1
 	for i, v in ipairs(FORMAT_TIME_UNIT_LIST) do
 		if v.key == accuracy then
-			accuracyindex = i
+			accuracyUnitIndex = i
 			break
 		end
 	end
-	if accuracyindex == -1 then
-		accuracyindex = #FORMAT_TIME_UNIT_LIST
-		accuracy = FORMAT_TIME_UNIT_LIST[accuracyindex].key
+	if accuracyUnitIndex == -1 then
+		accuracyUnitIndex = #FORMAT_TIME_UNIT_LIST
+		accuracy = FORMAT_TIME_UNIT_LIST[accuracyUnitIndex].key
 	end
-	if maxunitindex > keepunitindex then
-		assert(false, X.NSFormatString('{$NS}.FormatDuration: maxunit must be less than keepunit.'))
+	if maxUnitIndex > keepUnitIndex then
+		assert(false, X.NSFormatString('{$NS}.FormatDuration: maxUnit must be less than keepUnit.'))
 	end
-	if maxunitindex > accuracyindex then
-		assert(false, X.NSFormatString('{$NS}.FormatDuration: maxunit must be less than accuracyunit.'))
+	if maxUnitIndex > accuracyUnitIndex then
+		assert(false, X.NSFormatString('{$NS}.FormatDuration: maxUnit must be less than accuracyUnit.'))
 	end
 	-- 计算完整各个单位数据
 	local aValue = {}
@@ -940,43 +949,43 @@ function X.FormatDuration(nTime, tUnitFmt, tControl)
 	end
 	-- 合并超出开始单位或不存在的单位数据到下级单位中
 	for i, unit in ipairs(FORMAT_TIME_UNIT_LIST) do
-		if i < maxunitindex or not tUnitFmt[unit.key] then
-			local nextunit = FORMAT_TIME_UNIT_LIST[i + 1]
-			if nextunit then
-				aValue[i + 1] = aValue[i + 1] + aValue[i] * nextunit.radix
+		if i < maxUnitIndex or not tUnitFmt[unit.key] then
+			local nextUnit = FORMAT_TIME_UNIT_LIST[i + 1]
+			if nextUnit then
+				aValue[i + 1] = aValue[i + 1] + aValue[i] * nextUnit.radix
 				aValue[i] = 0
 			end
 		end
 	end
 	-- 合并超出精度单位的数据到上级单位中
 	for i, unit in X.ipairs_r(FORMAT_TIME_UNIT_LIST) do
-		if i > accuracyindex then
-			local prevunit = FORMAT_TIME_UNIT_LIST[i - 1]
-			if prevunit then
+		if i > accuracyUnitIndex then
+			local prevUnit = FORMAT_TIME_UNIT_LIST[i - 1]
+			if prevUnit then
 				aValue[i - 1] = aValue[i - 1] + aValue[i] / unit.radix
 				aValue[i] = 0
 			end
 		end
 	end
 	-- 单位依次拼接
-	local szText, szSpliter = '', ''
+	local szText, szSplitter = '', ''
 	for i, unit in ipairs(FORMAT_TIME_UNIT_LIST) do
 		local fmt = tUnitFmt[unit.key]
 		if X.IsString(fmt) then
 			fmt = { normal = fmt }
 		end
-		if i >= maxunitindex and i <= accuracyindex -- 单位在最大最小允许显示之间
+		if i >= maxUnitIndex and i <= accuracyUnitIndex -- 单位在最大最小允许显示之间
 		and fmt -- 并且单位自定义格式化数据存在
 		and (
 			aValue[i] > 0 --数据不为空
-			or (szText ~= '' and not fmt.skipnull) -- 或者数据为空但高位有值且该单位格式化数据要求不可省略
-			or i >= keepunitindex -- 单位位于零值保留单位之后
+			or (szText ~= '' and not fmt.skipNull) -- 或者数据为空但高位有值且该单位格式化数据要求不可省略
+			or i >= keepUnitIndex -- 单位位于零值保留单位之后
 		) then
-			local fmtstring = (mode == 'normal' or (mode == 'fixed-except-leading' and szText == ''))
+			local formatString = (mode == 'normal' or (mode == 'fixed-except-leading' and szText == ''))
 				and (fmt.normal)
 				or (fmt.fixed or fmt.normal)
-			szText = szText .. szSpliter .. fmtstring:format(math.ceil(aValue[i]))
-			szSpliter = fmt.delimiter or ''
+			szText = szText .. szSplitter .. formatString:format(math.ceil(aValue[i]))
+			szSplitter = fmt.delimiter or ''
 		end
 	end
 	return szText
