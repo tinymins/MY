@@ -670,8 +670,8 @@ function X.SetUserSettingsPresetID(szID, bDefault)
 		if szID:find('[/?*:|\\<>]') then
 			return _L['User settings preset id cannot contains special character (/?*:|\\<>).']
 		end
-		szID = X.StringReplaceW(szID, '^%s+', '')
-		szID = X.StringReplaceW(szID, '%s+$', '')
+		szID = X.TrimString(szID)
+		szID = X.TrimString(szID)
 	end
 	if X.IsEmpty(szID) then
 		szID = ''
@@ -692,11 +692,11 @@ function X.SetUserSettingsPresetID(szID, bDefault)
 end
 
 function X.GetUserSettingsPresetList()
-	return CPath.GetFolderList(X.FormatPath({'userdata/settings/', X.PATH_TYPE.GLOBAL}))
+	return CPath.GetFolderList(X.FormatPath({'config/settings/', X.PATH_TYPE.GLOBAL}))
 end
 
 function X.RemoveUserSettingsPreset(szID)
-	CPath.DelDir(X.FormatPath({'userdata/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL}))
+	CPath.DelDir(X.FormatPath({'config/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL}))
 end
 
 -- 注册单个用户配置项
