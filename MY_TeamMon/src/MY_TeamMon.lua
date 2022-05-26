@@ -2015,7 +2015,7 @@ function D.GetTable(szType, bTemp)
 end
 
 -- 迭代数据表子序列
-function D.IterTable(data, dwMapID, bIterItem)
+function D.IterTable(data, dwMapID, bIterItem, bReverse)
 	local res = {}
 	if data then
 		if dwMapID == 0 then
@@ -2045,6 +2045,12 @@ function D.IterTable(data, dwMapID, bIterItem)
 		if data[dwMapID] then
 			table.insert(res, data[dwMapID])
 		end
+	end
+	if bReverse then
+		if bIterItem then
+			return X.sipairs(unpack(res))
+		end
+		return X.ipairs(res)
 	end
 	if bIterItem then
 		return X.sipairs_r(unpack(res))

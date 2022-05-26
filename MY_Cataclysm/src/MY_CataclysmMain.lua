@@ -99,7 +99,7 @@ local function UpdateTeamMonData()
 	if MY_TeamMon and MY_TeamMon.IterTable and MY_TeamMon.GetTable then
 		local aBuff = {}
 		for _, szType in ipairs({'BUFF', 'DEBUFF'}) do
-			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(szType), 0, true) do
+			for _, data in MY_TeamMon.IterTable(MY_TeamMon.GetTable(szType), 0, true, true) do
 				if data.aCataclysmBuff then
 					for _, v in ipairs(data.aCataclysmBuff) do
 						v = X.Clone(v)
