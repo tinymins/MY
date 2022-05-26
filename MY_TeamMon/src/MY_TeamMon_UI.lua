@@ -1658,7 +1658,7 @@ function D.OpenSettingPanel(data, szType)
 	elseif szType == 'CHAT' then
 		nIcon = 439
 	end
-	local ui = X.UI.CreateFrame('MY_TeamMon_SettingPanel', { w = 770, h = 450, text = szName, close = true, focus = true })
+	local ui = X.UI.CreateFrame('MY_TeamMon_SettingPanel', { w = 770, h = 450, text = szName, close = true, focus = true, esc = true })
 	local frame = Station.Lookup('Normal/MY_TeamMon_SettingPanel')
 	ui:Event('MY_TMUI_DATA_RELOAD', function() ui:Remove() end)
 	ui:Event('MY_TMUI_SWITCH_PAGE', function() ui:Remove() end)
