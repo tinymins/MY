@@ -92,7 +92,10 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 	local tTime = {}
 	local nTime = GetTime()
 	if X.IsNumber(tParam.nTime) then
-		tTime = tParam
+		tTime = {
+			nTime = tParam.nTime,
+			szContent = tParam.szContent,
+		}
 	elseif X.IsString(tParam.nTime) then
 		local aCountdown = ParseCountdown(tParam.nTime, szSender, szReceiver)
 		if aCountdown then

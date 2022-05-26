@@ -848,13 +848,13 @@ function D.CountdownEvent(data, nClass, szSender, szReceiver, aBackreferences)
 					szKey = k .. '.' .. (data.dwID or 0) .. '.' .. (data.nLevel or 0) .. '.' .. (data.nIndex or 0) .. '.' .. X.EncodeLUAData(aBackreferences)
 				end
 				local tParam = {
-					nFrame   = v.nFrame,
-					nTime    = v.nTime,
-					nRefresh = v.nRefresh,
-					szName   = FilterCustomText(v.szName or data.szName, szSender, szReceiver, aBackreferences),
-					nIcon    = v.nIcon or data.nIcon or 340,
-					bTalk    = v.bTeamChannel,
-					bHold    = v.bHold,
+					nIcon     = v.nIcon or data.nIcon or 340,
+					nFrame    = v.nFrame,
+					szContent = FilterCustomText(v.szName or data.szName, szSender, szReceiver, aBackreferences),
+					nTime     = v.nTime,
+					nRefresh  = v.nRefresh,
+					bTalk     = v.bTeamChannel,
+					bHold     = v.bHold,
 				}
 				D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver)
 			end
@@ -1730,12 +1730,12 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 								szKey = k .. '.' .. dwTemplateID .. '.' .. kk
 							end
 							local tParam = {
-								nFrame = v.nFrame,
-								nTime  = tHpCd.nTime,
-								szName = FilterCustomText(tHpCd.szContent, szSender, szReceiver),
-								nIcon  = v.nIcon,
-								bTalk  = v.bTeamChannel,
-								bHold  = v.bHold,
+								nIcon     = v.nIcon,
+								nFrame    = v.nFrame,
+								szContent = FilterCustomText(tHpCd.szContent, szSender, szReceiver),
+								nTime     = tHpCd.nTime,
+								bTalk     = v.bTeamChannel,
+								bHold     = v.bHold,
 							}
 							D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver)
 						end
