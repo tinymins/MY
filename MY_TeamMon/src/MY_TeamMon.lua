@@ -142,6 +142,7 @@ local CACHE = {
 	DOODAD_LIST = {},
 	SKILL_LIST  = {},
 	INTERVAL    = {},
+	CD_STR      = {},
 	HP_CD_STR   = {},
 }
 
@@ -287,6 +288,35 @@ local function ConstructSpeech(aText, aXml, szText, nFont, nR, nG, nB)
 	if aText then
 		table.insert(aText, szText)
 	end
+end
+
+-- 解析分段倒计时
+---@param szCountdown string @倒计时字符串，如 “10,文本提示;20,文本提示;30,文本提示”
+---@return table @倒计时列表
+local function ParseCountdown(szCountdown)
+	if not CACHE.CD_STR[szCountdown] then
+		local aCountdown = {}
+		for _, szPart in ipairs(X.SplitString(szCountdown, ';')) do
+			local aParams = X.SplitString(szPart, ',')
+			local nTime = tonumber(aParams[1])
+			local szContent = aParams[2]
+			if nTime and szContent and nTime and szContent ~= '' then
+				table.insert(aCountdown, {
+					nTime = nTime,
+					szContent = szContent,
+				})
+			end
+		end
+		if X.IsEmpty(aCountdown) then
+			aCountdown = false
+		else
+			table.sort(aCountdown, function(a, b)
+				return a.nTime < b.nTime
+			end)
+		end
+		CACHE.CD_STR[szCountdown] = aCountdown
+	end
+	return X.Clone(CACHE.CD_STR[szCountdown])
 end
 
 function D.OnFrameCreate()
@@ -2259,6 +2289,7 @@ local settings = {
 				MY_TM_SCRUTINY_TYPE    = MY_TM_SCRUTINY_TYPE   ,
 				FilterCustomText       = FilterCustomText      ,
 				ParseCustomText        = ParseCustomText       ,
+				ParseCountdown         = ParseCountdown        ,
 				'Enable',
 				'GetTable',
 				IterTable = function(...)

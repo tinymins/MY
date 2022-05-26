@@ -65,22 +65,16 @@ do
 end
 
 -- 解析分段倒计时
-local function GetCountdown(tTime, szSender, szReceiver)
-	local tab = {}
-	local t = SplitString(tTime, ';')
-	for k, v in ipairs(t) do
-		local time = SplitString(v, ',')
-		if time[1] and time[2] and tonumber(TrimString(time[1])) and time[2] ~= '' then
-			table.insert(tab, { nTime = tonumber(time[1]), szName = FilterCustomText(time[2], szSender, szReceiver) })
+local function ParseCountdown(szCountdown, szSender, szReceiver)
+	local aCountdown = MY_TeamMon.ParseCountdown(szCountdown)
+	if X.IsTable(aCountdown) then
+		for _, v in ipairs(aCountdown) do
+			v.szContent = FilterCustomText(v.szContent, szSender, szReceiver)
 		end
 	end
-	if X.IsEmpty(tab) then
-		return nil
-	else
-		table.sort(tab, function(a, b) return a.nTime < b.nTime end)
-		return tab
-	end
+	return aCountdown
 end
+
 -- 倒计时模块 事件名称 MY_TM_ST_CREATE
 -- nType 倒计时类型 MY_TM_TYPE
 -- szKey 同一类型内唯一标识符
@@ -97,14 +91,14 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 	assert(type(tParam) == 'table', 'CreateCountdown failed!')
 	local tTime = {}
 	local nTime = GetTime()
-	if type(tParam.nTime) == 'number' then
+	if X.IsNumber(tParam.nTime) then
 		tTime = tParam
-	else
-		local tCountdown = GetCountdown(tParam.nTime, szSender, szReceiver)
-		if tCountdown then
-			tTime = tCountdown[1]
-			tParam.nTime = tCountdown
-			tParam.nRefresh = tParam.nRefresh or tCountdown[#tCountdown].nTime - 3 -- 最大时间内防止重复刷新 但是脱离战斗的NPC需要手动删除
+	elseif X.IsString(tParam.nTime) then
+		local aCountdown = ParseCountdown(tParam.nTime, szSender, szReceiver)
+		if aCountdown then
+			tTime = aCountdown[1]
+			tParam.nTime = aCountdown
+			tParam.nRefresh = tParam.nRefresh or aCountdown[#aCountdown].nTime - 3 -- 最大时间内防止重复刷新 但是脱离战斗的NPC需要手动删除
 		else
 			return X.Sysmsg(
 				_L['MY_TeamMon'],
@@ -113,6 +107,13 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 					.. ' KEY:' .. szKey .. ' Content:' .. tParam.nTime,
 				X.CONSTANT.MSG_THEME.ERROR)
 		end
+	else
+		return X.Sysmsg(
+			_L['MY_TeamMon'],
+			_L['Countdown format error']
+				.. ' TYPE: ' .. _L['Countdown TYPE ' .. nType]
+				.. ' KEY:' .. szKey .. ' Content:' .. X.EncodeLUAData(tParam.nTime),
+			X.CONSTANT.MSG_THEME.ERROR)
 	end
 	if tTime.nTime == 0 then
 		local ui = ST_CACHE[nType][szKey]
@@ -311,8 +312,8 @@ end
 
 -- 设置倒计时的名称和时间 用于动态改变分段倒计时
 function ST:SetInfo(tTime, nIcon)
-	if tTime.szName then
-		self.ui.txt:SetText(tTime.szName)
+	if tTime.szContent then
+		self.ui.txt:SetText(tTime.szContent)
 	end
 	if tTime.nTime then
 		self.ui.time:SetText(
@@ -390,6 +391,9 @@ local settings = {
 	exports = {
 		{
 			root = D,
+			fields = {
+				ParseCountdown = ParseCountdown,
+			},
 			preset = 'UIEvent'
 		},
 		{
