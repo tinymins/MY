@@ -2663,7 +2663,7 @@ function D.OpenSettingPanel(data, szType)
 								(
 									bTrigger
 										and ((vv.nValue * 100) .. '%')
-										or X.FormatDuration(vv.nTime, 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' })
+										or X.FormatDuration(vv.nTime, 'SYMBOL', { mode = 'fixed-except-leading', maxUnit = 'minute', keepUnit = 'minute' })
 								)
 									.. (tOperatorDesc[vv.szOperator or ''] or '')
 									.. ' - '

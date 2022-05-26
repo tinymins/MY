@@ -67,7 +67,7 @@ function D.GetDetailMenu(frame)
 			.. _L['Fight recount'] .. ' - '
 			.. frame:Lookup('', 'Text_Default'):GetText()
 			.. ' ' .. ((DataDisplay[DK.BOSSNAME] and ' - ' .. DataDisplay[DK.BOSSNAME]) or '')
-			.. '(' .. X.FormatDuration(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' }) .. ')',
+			.. '(' .. X.FormatDuration(MY_Recount_DS.GeneFightTime(DataDisplay, eTimeChannel), 'SYMBOL', { mode = 'fixed-except-leading', maxUnit = 'minute', keepUnit = 'minute' }) .. ')',
 			{ parsers = { name = false } }
 		)
 		X.SendChat(nChannel, '------------------------------')

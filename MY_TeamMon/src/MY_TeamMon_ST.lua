@@ -319,7 +319,7 @@ function ST:SetInfo(tTime, nIcon)
 		self.ui.time:SetText(
 			(
 				tTime.nTime >= 60
-					and FormatDuration(tTime.nTime - tTime.nTime % 60, 'ENGLISH_ABBR', { accuracyunit = 'minute' })
+					and FormatDuration(tTime.nTime - tTime.nTime % 60, 'ENGLISH_ABBR', { accuracyUnit = 'minute' })
 					or ''
 			)
 			.. (

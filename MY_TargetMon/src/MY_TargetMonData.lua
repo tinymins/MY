@@ -223,7 +223,7 @@ local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist
 		if config.cdBar then
 			item.szProcess = (
 					item.nTimeLeft >= 60
-						and X.FormatDuration(item.nTimeLeft - item.nTimeLeft % 60, 'ENGLISH_ABBR', { accuracyunit = 'minute' })
+						and X.FormatDuration(item.nTimeLeft - item.nTimeLeft % 60, 'ENGLISH_ABBR', { accuracyUnit = 'minute' })
 						or ''
 				)
 				.. (

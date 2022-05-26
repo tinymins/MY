@@ -281,7 +281,7 @@ function D.UpdateUI(frame)
 	-- 计算战斗时间
 	local eTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
 	local nTimeCount = MY_Recount_DS.GeneFightTime(data, eTimeChannel)
-	local szTimeCount = X.FormatDuration(nTimeCount, 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' })
+	local szTimeCount = X.FormatDuration(nTimeCount, 'SYMBOL', { mode = 'fixed-except-leading', maxUnit = 'minute', keepUnit = 'minute' })
 	if X.IsInArena() then
 		szTimeCount = X.GetFightTime('M:ss')
 	end
