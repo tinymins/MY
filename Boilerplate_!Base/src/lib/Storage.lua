@@ -670,8 +670,8 @@ function X.SetUserSettingsPresetID(szID, bDefault)
 		if szID:find('[/?*:|\\<>]') then
 			return _L['User settings preset id cannot contains special character (/?*:|\\<>).']
 		end
-		szID = X.StringReplaceW(szID, '^%s+', '')
-		szID = X.StringReplaceW(szID, '%s+$', '')
+		szID = X.TrimString(szID)
+		szID = X.TrimString(szID)
 	end
 	if X.IsEmpty(szID) then
 		szID = ''
