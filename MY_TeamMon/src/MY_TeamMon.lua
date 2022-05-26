@@ -295,28 +295,34 @@ end
 ---@return table @倒计时列表
 local function ParseCountdown(szCountdown)
 	if not CACHE.CD_STR[szCountdown] then
-		local aCountdown = {}
+		local aCountdown, bError = {}, false
 		for _, szPart in ipairs(MY_SplitString(szCountdown, ';')) do
-			local aParams = MY_SplitString(szPart, ',')
-			local nTime = tonumber(aParams[1])
-			local szContent = aParams[2]
-			if nTime and szContent and nTime and szContent ~= '' then
-				table.insert(aCountdown, {
-					nTime = nTime,
-					szContent = szContent,
-				})
+			local aParams, bPartError = MY_SplitString(szPart, ','), true
+			if #aParams == 2 then
+				local nTime = tonumber(aParams[1])
+				local szContent = aParams[2]
+				if nTime and szContent and nTime and szContent ~= '' then
+					table.insert(aCountdown, {
+						nTime = nTime,
+						szContent = szContent,
+					})
+					bPartError = false
+				end
+			end
+			if bPartError then
+				bError = true
 			end
 		end
 		if X.IsEmpty(aCountdown) then
-			aCountdown = false
+			aCountdown = nil
 		else
 			table.sort(aCountdown, function(a, b)
 				return a.nTime < b.nTime
 			end)
 		end
-		CACHE.CD_STR[szCountdown] = aCountdown
+		CACHE.CD_STR[szCountdown] = {aCountdown, bError}
 	end
-	return X.Clone(CACHE.CD_STR[szCountdown] or nil)
+	return X.Clone(CACHE.CD_STR[szCountdown][1]), CACHE.CD_STR[szCountdown][2]
 end
 
 -- 解析气血内力监控
@@ -324,9 +330,9 @@ end
 ---@return table @气血内力监控列表
 local function ParseHPCountdown(szString)
 	if not CACHE.HP_CD_STR[szString] then
-		local aHPCountdown = {}
-		for _, szPart in ipairs(MY_SplitString(szString, ';', true)) do
-			local aParams = MY_SplitString(szPart, ',')
+		local aHPCountdown, bError = {}, false
+		for _, szPart in ipairs(MY_SplitString(szString, ';')) do
+			local aParams, bPartError = MY_SplitString(szPart, ','), true
 			if #aParams >= 2 and #aParams <= 3 then
 				local nValue, szOperator = nil, aParams[1]:sub(-1)
 				if szOperator == '+' or szOperator == '-' or szOperator == '*' then
@@ -335,28 +341,32 @@ local function ParseHPCountdown(szString)
 					szOperator = '*'
 					nValue = tonumber(aParams[1])
 				end
-				local szContent = MY_TrimString(aParams[2])
+				local szContent = aParams[2]
 				local nTime = aParams[3] and tonumber(aParams[3]) or nil
-				if nValue and szOperator and szContent ~= '' then
+				if nValue and szOperator and szContent ~= '' and (nTime or not aParams[3]) then
 					table.insert(aHPCountdown, {
 						nValue = nValue,
 						szOperator = szOperator,
 						szContent = szContent,
 						nTime = nTime,
 					})
+					bPartError = false
 				end
+			end
+			if bPartError then
+				bError = true
 			end
 		end
 		if X.IsEmpty(aHPCountdown) then
-			aHPCountdown = false
+			aHPCountdown = nil
 		else
 			table.sort(aHPCountdown, function(a, b)
 				return a.nValue > b.nValue
 			end)
 		end
-		CACHE.HP_CD_STR[szString] = aHPCountdown
+		CACHE.HP_CD_STR[szString] = {aHPCountdown, bError}
 	end
-	return X.Clone(CACHE.HP_CD_STR[szString] or nil)
+	return X.Clone(CACHE.HP_CD_STR[szString][1]), CACHE.HP_CD_STR[szString][2]
 end
 
 function D.OnFrameCreate()

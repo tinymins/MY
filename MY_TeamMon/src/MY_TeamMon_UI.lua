@@ -1640,10 +1640,15 @@ function D.OpenSettingPanel(data, szType)
 	end
 
 	local function ParseCountdown(szCountdown, nClass)
+		local aCountdown, bError, bTrigger
 		if nClass == MY_TM_TYPE.NPC_LIFE or nClass == MY_TM_TYPE.NPC_MANA then
-			return MY_TeamMon.ParseHPCountdown(szCountdown), true
+			bTrigger = true
+			aCountdown, bError = MY_TeamMon.ParseHPCountdown(szCountdown)
+		else
+			bTrigger = false
+			aCountdown, bError = MY_TeamMon.ParseCountdown(szCountdown)
 		end
-		return MY_TeamMon.ParseCountdown(szCountdown), false
+		return aCountdown, bError, bTrigger
 	end
 	-- local tSkillInfo
 	local file = 'ui/Image/UICommon/Feedanimials.uitex'
@@ -2631,7 +2636,7 @@ function D.OpenSettingPanel(data, szType)
 			name = 'CountdownTime' .. k,
 			x = nX + 5, y = nY, w = 100, h = 25,
 			text = v.nTime,
-			color = (IsSimpleCountdown(v) or ParseCountdown(v.nTime, v.nClass))
+			color = (IsSimpleCountdown(v) or not select(2, ParseCountdown(v.nTime, v.nClass)))
 				and { 255, 255, 255 }
 				or { 255, 0, 0 },
 			onChange = function(szNum)
@@ -2646,7 +2651,7 @@ function D.OpenSettingPanel(data, szType)
 						ui:Children('#CountdownName' .. k):Visible(true):Text(v.szName or g_tStrings.CHAT_NAME)
 					end
 				else
-					local aCountdown, bTrigger = ParseCountdown(szNum, v.nClass)
+					local aCountdown, bError, bTrigger = ParseCountdown(szNum, v.nClass)
 					if aCountdown then
 						local tOperatorDesc = {
 							['+'] = _L['(OPERATOR +)'],
@@ -2667,10 +2672,13 @@ function D.OpenSettingPanel(data, szType)
 									.. '\n'
 							))
 						end
-						edit:Color(255, 255, 255)
 						X.OutputTip(this, table.concat(xml), true)
 					else
 						HideTip()
+					end
+					if aCountdown and not bError then
+						edit:Color(255, 255, 255)
+					else
 						edit:Color(255, 0, 0)
 					end
 					if this:GetW() < 200 then
