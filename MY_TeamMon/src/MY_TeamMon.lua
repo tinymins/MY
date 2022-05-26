@@ -714,7 +714,7 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 	if not X.IsMarker() or bRestricted then
 		return
 	end
-	local fnAction = function()
+	local function fnGetNextMark()
 		local team, tar = GetClientTeam()
 		local tTeamMark = X.FlipObjectKV(team.GetTeamMark())
 		if szType == 'NPC' then
@@ -722,7 +722,7 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 				if bMark and tTeamMark[nMark] ~= dwCharacterID then
 					tar = tTeamMark[nMark] and tTeamMark[nMark] ~= 0 and X.GetObject(tTeamMark[nMark])
 					if not tar or tar.dwTemplateID ~= dwID then
-						return X.SetTeamMarkTarget(nMark, dwCharacterID)
+						return nMark, dwCharacterID
 					end
 				end
 			end
@@ -731,16 +731,22 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 				if bMark and tTeamMark[nMark] ~= dwCharacterID then
 					tar = tTeamMark[nMark] and tTeamMark[nMark] ~= 0 and X.GetObject(tTeamMark[nMark])
 					if not tar or not X.GetBuff(tar, dwID) then
-						return X.SetTeamMarkTarget(nMark, dwCharacterID)
+						return nMark, dwCharacterID
 					end
 				end
 			end
 		elseif szType == 'CASTING' then
 			for nMark, bMark in ipairs(tMark) do
 				if bMark and (not tTeamMark[nMark] or tTeamMark[nMark] ~= dwCharacterID) then
-					return X.SetTeamMarkTarget(nMark, dwCharacterID)
+					return nMark, dwCharacterID
 				end
 			end
+		end
+	end
+	local fnAction = function()
+		local nMark, dwCharacterID = fnGetNextMark()
+		if nMark and dwCharacterID and X.SetTeamMarkTarget(nMark, dwCharacterID) then
+			return
 		end
 		D.OnSetMark(true) -- 标记失败 直接处理下一个
 	end
