@@ -1639,48 +1639,11 @@ function D.OpenSettingPanel(data, szType)
 		X.UI.ClosePopupMenu()
 	end
 
-	local function ParseCountdown(szCountdown, bOperator)
-		if not X.IsString(szCountdown) then
-			return
+	local function ParseCountdown(szCountdown, nClass)
+		if nClass == MY_TM_TYPE.NPC_LIFE or nClass == MY_TM_TYPE.NPC_MANA then
+			return MY_TeamMon.ParseHPCountdown(szCountdown), true
 		end
-		local aCountdown = {}
-		for _, szPart in ipairs(X.SplitString(szCountdown, ';')) do
-			local aParams = X.SplitString(szPart, ',')
-			if #aParams ~= 2 then
-				return
-			end
-			local nTime, szContent
-			local szOperator = aParams[1]:sub(-1)
-			if szOperator == '+' or szOperator == '-' or szOperator == '*' then
-				nTime = tonumber(aParams[1]:sub(1, -2))
-				szContent = X.TrimString(aParams[2])
-			else
-				nTime = tonumber(aParams[1])
-				szContent = X.TrimString(aParams[2])
-				szOperator = bOperator and '*' or nil
-			end
-			if not nTime then
-				return
-			end
-			if szOperator and not bOperator then
-				return
-			end
-			if szContent == '' then
-				return
-			end
-			table.insert(aCountdown, {
-				nTime = nTime,
-				szOperator = szOperator,
-				szContent = szContent,
-			})
-		end
-		if X.IsEmpty(aCountdown) then
-			return
-		end
-		table.sort(aCountdown, function(a, b)
-			return a.nTime < b.nTime
-		end)
-		return aCountdown
+		return MY_TeamMon.ParseCountdown(szCountdown), false
 	end
 	-- local tSkillInfo
 	local file = 'ui/Image/UICommon/Feedanimials.uitex'
@@ -2668,7 +2631,7 @@ function D.OpenSettingPanel(data, szType)
 			name = 'CountdownTime' .. k,
 			x = nX + 5, y = nY, w = 100, h = 25,
 			text = v.nTime,
-			color = (IsSimpleCountdown(v) or ParseCountdown(v.nTime, v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA))
+			color = (IsSimpleCountdown(v) or ParseCountdown(v.nTime, v.nClass))
 				and { 255, 255, 255 }
 				or { 255, 0, 0 },
 			onChange = function(szNum)
@@ -2683,8 +2646,7 @@ function D.OpenSettingPanel(data, szType)
 						ui:Children('#CountdownName' .. k):Visible(true):Text(v.szName or g_tStrings.CHAT_NAME)
 					end
 				else
-					local bTrigger = v.nClass == MY_TM_TYPE.NPC_LIFE or v.nClass == MY_TM_TYPE.NPC_MANA
-					local aCountdown = ParseCountdown(szNum, bTrigger)
+					local aCountdown, bTrigger = ParseCountdown(szNum, v.nClass)
 					if aCountdown then
 						local tOperatorDesc = {
 							['+'] = _L['(OPERATOR +)'],
@@ -2695,12 +2657,13 @@ function D.OpenSettingPanel(data, szType)
 							table.insert(xml, GetFormatText(
 								(
 									bTrigger
-										and ((vv.nTime * 100) .. '%')
+										and ((vv.nValue * 100) .. '%')
 										or X.FormatDuration(vv.nTime, 'SYMBAL', { mode = 'fixed-except-leading', maxunit = 'minute', keepunit = 'minute' })
 								)
 									.. (tOperatorDesc[vv.szOperator or ''] or '')
 									.. ' - '
 									.. FilterCustomText(vv.szContent, '{$sender}', '{$receiver}')
+									.. (bTrigger and vv.nTime and (' (' .. vv.nTime .. 's)') or '')
 									.. '\n'
 							))
 						end

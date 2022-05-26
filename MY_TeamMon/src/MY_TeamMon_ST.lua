@@ -391,9 +391,6 @@ local settings = {
 	exports = {
 		{
 			root = D,
-			fields = {
-				ParseCountdown = ParseCountdown,
-			},
 			preset = 'UIEvent'
 		},
 		{

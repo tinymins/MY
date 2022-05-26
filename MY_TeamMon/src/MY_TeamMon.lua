@@ -296,8 +296,8 @@ end
 local function ParseCountdown(szCountdown)
 	if not CACHE.CD_STR[szCountdown] then
 		local aCountdown = {}
-		for _, szPart in ipairs(X.SplitString(szCountdown, ';')) do
-			local aParams = X.SplitString(szPart, ',')
+		for _, szPart in ipairs(MY_SplitString(szCountdown, ';')) do
+			local aParams = MY_SplitString(szPart, ',')
 			local nTime = tonumber(aParams[1])
 			local szContent = aParams[2]
 			if nTime and szContent and nTime and szContent ~= '' then
@@ -316,7 +316,47 @@ local function ParseCountdown(szCountdown)
 		end
 		CACHE.CD_STR[szCountdown] = aCountdown
 	end
-	return X.Clone(CACHE.CD_STR[szCountdown])
+	return X.Clone(CACHE.CD_STR[szCountdown] or nil)
+end
+
+-- 解析气血内力监控
+---@param szString string @气血内力监控字符串，如 “0.5-,气血下降50%提示;0.3+,气血回升30%提示,5;0.1,气血10%提示,15”，时间可选，不填时间时仅显示提示不显示倒计时
+---@return table @气血内力监控列表
+local function ParseHPCountdown(szString)
+	if not CACHE.HP_CD_STR[szString] then
+		local aHPCountdown = {}
+		for _, szPart in ipairs(MY_SplitString(szString, ';', true)) do
+			local aParams = MY_SplitString(szPart, ',')
+			if #aParams >= 2 and #aParams <= 3 then
+				local nValue, szOperator = nil, aParams[1]:sub(-1)
+				if szOperator == '+' or szOperator == '-' or szOperator == '*' then
+					nValue = tonumber(aParams[1]:sub(1, -2))
+				else
+					szOperator = '*'
+					nValue = tonumber(aParams[1])
+				end
+				local szContent = MY_TrimString(aParams[2])
+				local nTime = aParams[3] and tonumber(aParams[3]) or nil
+				if nValue and szOperator and szContent ~= '' then
+					table.insert(aHPCountdown, {
+						nValue = nValue,
+						szOperator = szOperator,
+						szContent = szContent,
+						nTime = nTime,
+					})
+				end
+			end
+		end
+		if X.IsEmpty(aHPCountdown) then
+			aHPCountdown = false
+		else
+			table.sort(aHPCountdown, function(a, b)
+				return a.nValue > b.nValue
+			end)
+		end
+		CACHE.HP_CD_STR[szString] = aHPCountdown
+	end
+	return X.Clone(CACHE.HP_CD_STR[szString] or nil)
 end
 
 function D.OnFrameCreate()
@@ -1638,36 +1678,6 @@ function D.OnNpcFight(dwTemplateID, bFight)
 	end
 end
 
--- 0.5-,50%,2; -> { 50, '-', '50%', 2 }
-function D.DecodeHPCountdown(szString)
-	if not CACHE.HP_CD_STR[szString] then
-		local aHPCD = {}
-		for k, v in ipairs(MY_SplitString(szString, ';', true)) do
-			local hpcd = MY_SplitString(v, ',', true)
-			if hpcd[1] then
-				hpcd[1] = MY_TrimString(hpcd[1])
-				local szSign = hpcd[1]:sub(-1)
-				if szSign == '-' or szSign == '+' or szSign == '*' then
-					hpcd[1] = hpcd[1]:sub(1, -2)
-				else
-					szSign = '*'
-				end
-				table.insert(hpcd, 2, szSign)
-				hpcd[1] = tonumber(hpcd[1])
-			end
-			if hpcd[1] and hpcd[3] then
-				hpcd[1] = hpcd[1] * 100
-				hpcd[3] = MY_TrimString(hpcd[3])
-				if hpcd[3] ~= '' then
-					table.insert(aHPCD, hpcd)
-				end
-			end
-		end
-		CACHE.HP_CD_STR[szString] = aHPCD
-	end
-	return CACHE.HP_CD_STR[szString]
-end
-
 -- 不该放在倒计时中 需要重构
 function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 	if MY_TM_SHIELDED_MAP then
@@ -1680,18 +1690,18 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 		local szReceiver = X.GetTemplateName(TARGET.NPC, dwTemplateID)
 		for k, v in ipairs(data.tCountdown) do
 			if v.nClass == dwType then
-				local aHPCD = D.DecodeHPCountdown(v.nTime)
-				for kk, hpcd in ipairs(aHPCD) do
-					if hpcd[1] == nPer
-					and (hpcd[2] == '*' or (bIncrease and hpcd[2] == '+') or (not bIncrease and hpcd[2] == '-')) then -- hit
+				local aHPCountdown = ParseHPCountdown(v.nTime)
+				for kk, tHpCd in ipairs(aHPCountdown) do
+					if tHpCd.nValue == nPer
+					and (tHpCd.szOperator == '*' or (bIncrease and tHpCd.szOperator == '+') or (not bIncrease and tHpCd.szOperator == '-')) then -- hit
 						local szName = FilterCustomText(data.szName, szSender, szReceiver) or szReceiver
 						local aXml, aText = {}, {}
 						ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
 						ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
 						ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
 						ConstructSpeech(aText, aXml, dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255)
-						ConstructSpeech(aText, aXml, ' ' .. hpcd[1] .. '%', 44, 255, 255, 0)
-						ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(hpcd[3], szSender, szReceiver), 44, 255, 255, 255)
+						ConstructSpeech(aText, aXml, ' ' .. tHpCd.nValue .. '%', 44, 255, 255, 0)
+						ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(tHpCd.szContent, szSender, szReceiver), 44, 255, 255, 255)
 						local szXml, szText = table.concat(aXml), table.concat(aText)
 						if O.bPushCenterAlarm then
 							FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
@@ -1702,7 +1712,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 						if O.bPushTeamChannel and v.bTeamChannel then
 							D.Talk('RAID', szText)
 						end
-						if hpcd[4] and tonumber(MY_TrimString(hpcd[4])) then
+						if tHpCd.nTime then
 							local nType, szKey = v.nClass, v.key
 							if szKey then
 								nType = MY_TM_TYPE.COMMON
@@ -1711,8 +1721,8 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 							end
 							local tParam = {
 								nFrame = v.nFrame,
-								nTime  = tonumber(MY_TrimString(hpcd[4])),
-								szName = FilterCustomText(hpcd[3], szSender, szReceiver),
+								nTime  = tHpCd.nTime,
+								szName = FilterCustomText(tHpCd.szContent, szSender, szReceiver),
 								nIcon  = v.nIcon,
 								bTalk  = v.bTeamChannel,
 								bHold  = v.bHold,
@@ -2290,6 +2300,7 @@ local settings = {
 				FilterCustomText       = FilterCustomText      ,
 				ParseCustomText        = ParseCustomText       ,
 				ParseCountdown         = ParseCountdown        ,
+				ParseHPCountdown       = ParseHPCountdown      ,
 				'Enable',
 				'GetTable',
 				IterTable = function(...)
