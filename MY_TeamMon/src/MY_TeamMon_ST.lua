@@ -21,7 +21,7 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
-local SplitString, TrimString, FormatDuration = X.SplitString, X.TrimString, X.FormatDuration
+local MY_FormatDuration = X.FormatDuration
 local FilterCustomText = MY_TeamMon.FilterCustomText
 
 local O = X.CreateUserSettingsModule('MY_TeamMon_ST', _L['Raid'], {
@@ -319,7 +319,7 @@ function ST:SetInfo(tTime, nIcon)
 		self.ui.time:SetText(
 			(
 				tTime.nTime >= 60
-					and FormatDuration(tTime.nTime - tTime.nTime % 60, 'ENGLISH_ABBR', { accuracyUnit = 'minute' })
+					and MY_FormatDuration(tTime.nTime - tTime.nTime % 60, 'ENGLISH_ABBR', { accuracyUnit = 'minute' })
 					or ''
 			)
 			.. (
