@@ -29,7 +29,7 @@ end
 local function GetSvrText()
 	local nFeeTime = X.GetTimeOfFee() - GetCurrentTime()
 	local szFeeTime = nFeeTime > 0
-		and _L('Fee left %s', X.FormatDuration(nFeeTime, 'CHINESE', { accuracyunit = X.ENVIRONMENT.GAME_BRANCH == 'classic' and 'hour' or nil }))
+		and _L('Fee left %s', X.FormatDuration(nFeeTime, 'CHINESE', { accuracyUnit = X.ENVIRONMENT.GAME_BRANCH == 'classic' and 'hour' or nil }))
 		or _L['Fee left unknown']
 	return X.GetRegionName() .. '::' .. X.GetServerName()
 		.. ' (' .. X.GetRegionOriginName() .. '::' .. X.GetServerOriginName() .. ')'
