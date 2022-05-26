@@ -13,54 +13,54 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/String')
 local AnsiToUTF8 = AnsiToUTF8 or _G.ansi_to_utf8
 
 -- 分隔字符串
--- (table) X.SplitString(string szText, table aSpliter, bool bIgnoreEmptyPart)
--- (table) X.SplitString(string szText, string szSpliter, bool bIgnoreEmptyPart)
--- szText           原始字符串
--- szSpliter        分隔符
--- aSpliter         多个分隔符
--- bIgnoreEmptyPart 是否忽略空字符串，即'123;234;'被';'分成{'123','234'}还是{'123','234',''}
--- nMaxPart         最多分成几份，即'1;2;3;4'被';'分隔时，如果最多三份则得到{'1','2','3;4'}
-function X.SplitString(szText, aSpliter, bIgnoreEmptyPart, nMaxPart)
-	if X.IsString(aSpliter) then
-		aSpliter = {aSpliter}
+---@param szText string @原始字符串
+---@param aSplitter string | string[] @分隔符或分隔符数组
+---@param bIgnoreEmptyPart boolean @是否忽略空字符串，即'123;234;'被';'分成{'123','234'}还是{'123','234',''}
+---@param nMaxPart number @最多分成几份，即'1;2;3;4'被';'分隔时，如果最多三份则得到{'1','2','3;4'}
+---@return string[] @分隔后的字符串数组
+function X.SplitString(szText, aSplitter, bIgnoreEmptyPart, nMaxPart)
+	if X.IsString(aSplitter) then
+		aSplitter = {aSplitter}
 	end
-	local nOff, nLen, aResult, nResult, szPart, nEnd, szEnd, nPos = 1, #szText, {}, 0, nil, nil, nil, nil
+	local nOffset, nLen = 1, #szText
+	local aResult, nResult = {}, 0
+	local nPos, szPart = nil, nil
+	local nSplitterPos, szSplitterFound = nil, nil
 	while true do
-		nEnd, szEnd = nil, nil
-		if not nMaxPart or nMaxPart > nResult + 1 then
-			for _, szSpliter in ipairs(aSpliter) do
-				if szSpliter == '' then
-					nPos = #X.StringSubW(string.sub(szText, nOff), 1, 1)
+		nSplitterPos, szSplitterFound = nil, nil
+		if (not nMaxPart or nMaxPart > nResult + 1) and nOffset <= nLen then
+			for _, szSplitter in ipairs(aSplitter) do
+				if szSplitter == '' then
+					nPos = #X.StringSubW(string.sub(szText, nOffset), 1, 1)
 					if nPos == 0 then
 						nPos = nil
 					else
-						nPos = nOff + nPos
+						nPos = nOffset + nPos
 					end
 				else
-					nPos = StringFindW(szText, szSpliter, nOff)
+					nPos = StringFindW(szText, szSplitter, nOffset)
 				end
-				if nPos and (not nEnd or nPos < nEnd) then
-					nEnd, szEnd = nPos, szSpliter
+				if nPos and (not nSplitterPos or nPos <= nSplitterPos) then
+					nSplitterPos, szSplitterFound = nPos, szSplitter
 				end
 			end
 		end
-		if not nEnd then
-			szPart = string.sub(szText, nOff, string.len(szText))
+		if not nSplitterPos then
+			szPart = nOffset <= nLen
+				and string.sub(szText, nOffset, string.len(szText))
+				or ''
 			if not bIgnoreEmptyPart or szPart ~= '' then
 				nResult = nResult + 1
 				table.insert(aResult, szPart)
 			end
 			break
 		end
-		szPart = string.sub(szText, nOff, nEnd - 1)
+		szPart = string.sub(szText, nOffset, nSplitterPos - 1)
 		if not bIgnoreEmptyPart or szPart ~= '' then
 			nResult = nResult + 1
 			table.insert(aResult, szPart)
 		end
-		nOff = nEnd + string.len(szEnd)
-		if nOff > nLen then
-			break
-		end
+		nOffset = nSplitterPos + string.len(szSplitterFound)
 	end
 	return aResult
 end
