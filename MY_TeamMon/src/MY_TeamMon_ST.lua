@@ -51,10 +51,10 @@ local ST = {}
 ST.__index = ST
 
 local MY_TM_TYPE = MY_TeamMon.MY_TM_TYPE
-local ST_INIFILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_ST.ini'
-local ST_UI_NOMAL   = 5
+local ST_INI_FILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_ST.ini'
+local ST_UI_NORMAL = 5
 local ST_UI_WARNING = 2
-local ST_UI_ALPHA   = 180
+local ST_UI_ALPHA = 180
 local ST_TIME_EXPIRE = {}
 local ST_CACHE = {}
 do
@@ -145,7 +145,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('MY_TM_ST_CREATE')
 	this:RegisterEvent('MY_TM_ST_DEL')
 	this:RegisterEvent('MY_TM_ST_CLEAR')
-	D.hItem = this:CreateItemData(ST_INIFILE, 'Handle_Item')
+	D.hItem = this:CreateItemData(ST_INI_FILE, 'Handle_Item')
 	D.UpdateAnchor(this)
 	D.handle = this:Lookup('', 'Handle_List')
 end
@@ -258,7 +258,7 @@ end
 
 function D.Init()
 	Wnd.CloseWindow('MY_TeamMon_ST')
-	Wnd.OpenWindow(ST_INIFILE, 'MY_TeamMon_ST')
+	Wnd.OpenWindow(ST_INI_FILE, 'MY_TeamMon_ST')
 end
 
 -- ¹¹Ôìº¯Êý
@@ -357,7 +357,7 @@ function ST:Switch(bSwitch)
 	else
 		self.ui.txt:SetFontColor(255, 255, 0)
 		self.ui.time:SetFontColor(255, 255, 255)
-		self.ui.img:SetFrame(self.ui.nFrame or ST_UI_NOMAL)
+		self.ui.img:SetFrame(self.ui.nFrame or ST_UI_NORMAL)
 		self.ui.img:SetAlpha(self.ui.nAlpha)
 		-- self.ui.sha:SetAlpha(100)
 		self.ui.sha:SetColorRGB(0, 0, 0)
