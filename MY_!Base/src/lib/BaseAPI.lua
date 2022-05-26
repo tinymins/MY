@@ -34,7 +34,7 @@ end
 ---@return any @接口对象
 function X.GetGameAPI(szAddon, szInside)
 	local api = _G[szAddon]
-	if not api and _DEBUG_LEVEL_ < X.DEBUG_LEVEL.NONE then
+	if not api and X.PACKET_INFO.DEBUG_LEVEL < X.DEBUG_LEVEL.NONE then
 		local env = GetInsideEnv()
 		if env then
 			api = env[szInside or szAddon]

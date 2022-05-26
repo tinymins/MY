@@ -3705,19 +3705,20 @@ function X.GetMapID(bFix)
 end
 
 -- 设置标记目标
--- @param nMark 标记索引
--- @param dwID 目标ID
+---@param nMark number @标记索引
+---@param dwID number @目标ID
+---@return boolean @是否成功
 function X.SetTeamMarkTarget(nMark, dwID)
 	local npc = not IsPlayer(dwID) and GetNpc(dwID) or nil
 	if npc and X.IsShieldedNpc(npc.dwTemplateID) then
-		return
+		return false
 	end
-	return GetClientTeam().SetTeamMark(nMark, dwID)
+	return GetClientTeam().SetTeamMark(nMark, dwID) or false
 end
 
 -- 获取标记目标
--- @param nMark 标记索引
--- @return number 目标ID
+---@param nMark number @标记索引
+---@return number @目标ID
 function X.GetTeamMarkTarget(nMark)
 	if not X.IsInParty() then
 		return
@@ -3729,8 +3730,8 @@ function X.GetTeamMarkTarget(nMark)
 end
 
 -- 获取目标标记
--- @param dwID 目标ID
--- @return number 标记索引
+---@param dwID number @目标ID
+---@return number @标记索引
 function X.GetTargetTeamMark(dwID)
 	if not X.IsInParty() then
 		return
