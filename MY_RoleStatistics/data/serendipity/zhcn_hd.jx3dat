@@ -938,7 +938,8 @@ return {
 			szAchieve = "幽海牧",
 			dwSerendipity = 103,
 			nMaxAttemptNum = 3,
-			aRejectOpenWindow = {"<G>唉……谢谢你愿意听我说这么多，你真是个好人。"},
+			aRejectOpenWindow = {"<G>唉......谢谢你愿意听我说这么多，你真是个好人。"},
+			aFailureOpenWindow = {"唉......我家的羊又不吃草了，正是贴膘的时候，这可怎么办啊。", "唉......我家的羊喜欢上了外面的黄羊，闹离家出走，这可怎么办啊。"},
 		},
 		{
 			nID = 63,
