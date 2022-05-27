@@ -41,8 +41,8 @@ local DEBUG_LEVEL = {
 }
 
 local _NAME_SPACE_            = 'MY'
-local _BUILD_                 = '20220526'
-local _VERSION_               = '13.0.2'
+local _BUILD_                 = '20220530'
+local _VERSION_               = '14.0.0'
 local _MENU_COLOR_            = {255, 165, 79}
 local _INTERFACE_ROOT_        = 'Interface/'
 local _ADDON_ROOT_            = _INTERFACE_ROOT_ .. _NAME_SPACE_ .. '/'
