@@ -652,7 +652,7 @@ function UpdateView()
 end
 end
 
-local function OnBreathe()
+local function OnFrameCall()
 	-- 更新各目标BUFF数据
 	local nLogicFrame, info = GetLogicFrameCount()
 	for _, eType in ipairs(D.GetTargetTypeList('BUFF')) do
@@ -766,9 +766,9 @@ local function OnBreathe()
 end
 
 function D.OnTargetMonReload()
-	OnBreathe()
+	OnFrameCall()
 	FireUIEvent('MY_TARGET_MON_DATA_INIT')
-	X.BreatheCall('MY_TargetMonData', OnBreathe)
+	X.FrameCall('MY_TargetMonData', 2, OnFrameCall)
 end
 end
 
