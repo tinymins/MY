@@ -608,10 +608,10 @@ end
 
 -- 移除不在同一个刷新周期内的数据字段
 function D.FilterColumnCircle(rec)
-	if rec.time then
+	if X.IsNumber(rec.time) then
 		for _, col in ipairs(COLUMN_LIST) do
 			if col.szRefreshCircle
-			and col.szKey:find('serendipity_') == 1 and rec[col.szKey] and  rec[col.szKey].count ~= -1 then
+			and col.szKey:find('serendipity_') == 1 and rec[col.szKey] and rec[col.szKey].count ~= -1 then
 				local dwTime, dwCircle = X.GetRefreshTime(col.szRefreshCircle)
 				if dwTime - dwCircle >= rec.time then
 					rec[col.szKey] = nil
@@ -637,6 +637,7 @@ function D.GetClientPlayerRec()
 	-- 缓存数据
 	if not PLAYER_REC_INITIAL then
 		PLAYER_REC_INITIAL = X.LoadLUAData(PLAYER_REC_FILE) or {}
+		D.FilterColumnCircle(PLAYER_REC_INITIAL)
 		PLAYER_REC = X.Clone(PLAYER_REC_INITIAL)
 		D.FilterColumnCircle(PLAYER_REC)
 	end
