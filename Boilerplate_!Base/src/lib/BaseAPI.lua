@@ -82,6 +82,18 @@ function X.GetServerOriginName()
 	return szServerOriginName or szServerDisplayName
 end
 
+-- 获取登录角色ID
+---@return number @登录角色ID
+function X.GetClientPlayerID()
+	return UI_GetClientPlayerID()
+end
+
+-- 获取当前控制角色ID（如：平沙落雁目标ID）
+---@return number @当前控制角色ID
+function X.GetControlPlayerID()
+	return GetControlPlayerID()
+end
+
 local CLIENT_PLAYER_GLOBAL_ID
 function X.GetClientPlayerGlobalID()
 	if not CLIENT_PLAYER_GLOBAL_ID then
