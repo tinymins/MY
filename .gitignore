@@ -6,6 +6,7 @@ publisher.key
 __pycache__
 /secret.jx3dat
 /secret.yaml
+/secret.yaml-cache.jx3dat
 /squishy
 /*/src.lua
 /*/src.*.lua
