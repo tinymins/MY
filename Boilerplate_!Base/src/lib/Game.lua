@@ -1859,7 +1859,6 @@ function X.GetClientInfo(arg0)
 			m_ClientInfo.dwPetID           = me.dwPetID
 			m_ClientInfo.dwMapID           = me.GetMapID()
 			m_ClientInfo.szMapName         = Table_GetMapName(me.GetMapID())
-			m_ClientInfo.szGlobalID        = me.GetGlobalID and me.GetGlobalID()
 		end
 	end
 	if not m_ClientInfo then
@@ -4881,11 +4880,7 @@ do
 		end
 		if not PLAYER_GUID[dwID] then
 			if dwID == UI_GetClientPlayerID() then
-				local szGUID = X.GetClientPlayerGlobalID() or X.GetClientInfo('szGlobalID')
-				if szGUID == '0' then
-					szGUID = (X.GetRegionOriginName() .. '_' .. X.GetServerOriginName()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. X.GetClientInfo().dwID
-				end
-				PLAYER_GUID[dwID] = szGUID
+				PLAYER_GUID[dwID] = X.GetClientPlayerGlobalID()
 			end
 		end
 		return PLAYER_GUID[dwID]

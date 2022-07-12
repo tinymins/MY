@@ -105,6 +105,9 @@ function X.GetClientPlayerGlobalID()
 			local me = GetClientPlayer()
 			if me then
 				szUID = me.GetGlobalID()
+				if szUID == '0' then
+					szUID = '0' .. GetStringCRC(X.GetRegionOriginName()) .. GetStringCRC(X.GetServerOriginName()) .. me.dwID
+				end
 			end
 		end
 		if X.IsEmpty(szUID) or szUID == '0' then
