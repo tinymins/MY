@@ -142,18 +142,6 @@ function D.HookAchieveFrame(frame)
 	D.HookAchieveHandle(frame:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_AlmostFinish', ''))
 end
 
-X.RegisterInit('MY_AchievementWiki', function()
-	local frame = Station.Lookup('Normal/AchievementPanel')
-	if not frame then
-		return
-	end
-	D.HookAchieveFrame(frame)
-end)
-
-X.RegisterFrameCreate('AchievementPanel', 'MY_AchievementWiki', function(name, frame)
-	D.HookAchieveFrame(frame)
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
@@ -170,7 +158,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	return nX, nY
 end
 
+
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_AchievementWiki',
@@ -204,5 +195,21 @@ local settings = {
 }
 MY_AchievementWiki = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterInit('MY_AchievementWiki', function()
+	local frame = Station.Lookup('Normal/AchievementPanel')
+	if not frame then
+		return
+	end
+	D.HookAchieveFrame(frame)
+end)
+
+X.RegisterFrameCreate('AchievementPanel', 'MY_AchievementWiki', function(name, frame)
+	D.HookAchieveFrame(frame)
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

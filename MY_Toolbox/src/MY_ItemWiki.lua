@@ -87,7 +87,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	return nX, nY
 end
 
+--------------------------------------------------------------------------------
 -- Global exports
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_ItemWiki',
@@ -122,6 +124,9 @@ local settings = {
 MY_ItemWiki = X.CreateModule(settings)
 end
 
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
 Box_AppendAddonMenu({function(box)
 	if not X.IsElement(box) or box:GetType() ~= 'Box' or not O.bEnable then
 		return

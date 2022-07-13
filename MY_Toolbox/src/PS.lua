@@ -64,6 +64,7 @@ function PS.OnPanelActive(wnd)
 	nX = nX + 10
 	nX, nY = MY_AchievementWiki.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 	nX, nY = MY_PetWiki.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
+	nX, nY = MY_QuestWiki.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 	nX, nY = MY_YunMacro.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 	nX, nY = MY_ItemWiki.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 	nX, nY = MY_ItemPrice.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
