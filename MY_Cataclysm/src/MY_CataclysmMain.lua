@@ -131,6 +131,9 @@ local function UpdateOfficialBuff()
 	if X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		return
 	end
+	local dwMapID = X.GetMapID(true)
+	local dwMountKungfuID = UI_GetPlayerMountKungfuID()
+	local aBuff = {}
 	local RaidPanelBuff = X.GetGameTable('RaidPanelBuff')
 	if not RaidPanelBuff or not X.IsRestricted('MY_CataclysmMain__OfficialBuff') then
 		local szPath = X.FormatPath({'userdata\\cataclysm\\official_buff.tab', X.PATH_TYPE.GLOBAL})
@@ -156,40 +159,64 @@ local function UpdateOfficialBuff()
 		}
 		RaidPanelBuff = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL) or RaidPanelBuff
 	end
-	if not RaidPanelBuff then
-		return
+	if RaidPanelBuff then
+		local nCount = RaidPanelBuff:GetRowCount()
+		for i = 2, nCount do
+			local tLine = RaidPanelBuff:GetRow(i)
+			if (tLine.dwMapID == dwMapID or tLine.dwMapID == 0)
+			and (tLine.dwMountKungfuID == dwMountKungfuID or tLine.dwMountKungfuID == 0) then
+				local v = {
+					dwID = tLine.dwBuffID,
+					nLevel = X.IIf(tLine.nBuffLevel > 0, tLine.nBuffLevel, nil),
+					szStackOp = X.IIf(
+						tLine.szStackOperator == '',
+						X.IIf(tLine.nStackNum == 0, nil, '>='),
+						tLine.szStackOperator
+					),
+					nStackNum = X.IIf(tLine.szStackOperator == '' and tLine.nStackNum == 0, nil, tLine.nStackNum),
+					bOnlyMine = tLine.bOnlyMine,
+					bOnlyMe = tLine.bOnlyMyself,
+					nIconID = X.IIf(tLine.nIconID == 0, nil, tLine.nIconID),
+					bAttention = tLine.bAttention,
+					colAttention = X.IIf(tLine.szAttentionColor == '', nil, tLine.szAttentionColor),
+					bCaution = tLine.bCaution,
+					bScreenHead = tLine.bScreenHead,
+					colScreenHead = X.IIf(tLine.szScreenHeadColor == '', nil, tLine.szScreenHeadColor),
+					nPriority = tLine.nPriority,
+					szReminder = tLine.szReminder,
+					colReminder = X.IIf(tLine.szReminderColor == '', nil, tLine.szReminderColor),
+					colBorder = X.IIf(tLine.szBorderColor == '', nil, tLine.szBorderColor),
+				}
+				table.insert(aBuff, v)
+			end
+		end
 	end
-	local dwMapID = X.GetMapID(true)
-	local dwMountKungfuID = UI_GetPlayerMountKungfuID()
-	local nCount = RaidPanelBuff:GetRowCount()
-	local aBuff = {}
-	for i = 2, nCount do
-		local tLine = RaidPanelBuff:GetRow(i)
-		if (tLine.dwMapID == dwMapID or tLine.dwMapID == 0)
-		and (tLine.dwMountKungfuID == dwMountKungfuID or tLine.dwMountKungfuID == 0) then
-			local v = {
-				dwID = tLine.dwBuffID,
-				nLevel = X.IIf(tLine.nBuffLevel > 0, tLine.nBuffLevel, nil),
-				szStackOp = X.IIf(
-					tLine.szStackOperator == '',
-					X.IIf(tLine.nStackNum == 0, nil, '>='),
-					tLine.szStackOperator
-				),
-				nStackNum = X.IIf(tLine.szStackOperator == '' and tLine.nStackNum == 0, nil, tLine.nStackNum),
-				bOnlyMine = tLine.bOnlyMine,
-				bOnlyMe = tLine.bOnlyMyself,
-				nIconID = X.IIf(tLine.nIconID == 0, nil, tLine.nIconID),
-				bAttention = tLine.bAttention,
-				colAttention = X.IIf(tLine.szAttentionColor == '', nil, tLine.szAttentionColor),
-				bCaution = tLine.bCaution,
-				bScreenHead = tLine.bScreenHead,
-				colScreenHead = X.IIf(tLine.szScreenHeadColor == '', nil, tLine.szScreenHeadColor),
-				nPriority = tLine.nPriority,
-				szReminder = tLine.szReminder,
-				colReminder = X.IIf(tLine.szReminderColor == '', nil, tLine.szReminderColor),
-				colBorder = X.IIf(tLine.szBorderColor == '', nil, tLine.szBorderColor),
-			}
-			table.insert(aBuff, v)
+	local NewRaidBuff = X.GetGameTable('NewRaidBuff')
+	if NewRaidBuff then
+		local nCount = NewRaidBuff:GetRowCount()
+		for i = 2, nCount do
+			local tLine = NewRaidBuff:GetRow(i)
+			if (tLine.dwMountKungfuID == dwMountKungfuID or tLine.dwMountKungfuID == 0) then
+				local v = {
+					dwID = tLine.dwBuffID,
+					nLevel = X.IIf(tLine.nBuffLevel > 0, tLine.nBuffLevel, nil),
+					szStackOp = nil,
+					nStackNum = nil,
+					bOnlyMine = nil,
+					bOnlyMe = tLine.bOnlyMyself,
+					nIconID = Table_GetBuffIconID(tLine.dwBuffID, tLine.nBuffLevel) or 13,
+					bAttention = nil,
+					colAttention = nil,
+					bCaution = nil,
+					bScreenHead = nil,
+					colScreenHead = nil,
+					nPriority = nil,
+					szReminder = nil,
+					colReminder = nil,
+					colBorder = nil,
+				}
+				table.insert(aBuff, v)
+			end
 		end
 	end
 	CTM_BUFF_OFFICIAL = aBuff
