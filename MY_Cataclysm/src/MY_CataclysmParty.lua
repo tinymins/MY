@@ -59,6 +59,7 @@ local CTM_SCREEN_HEAD        = {} -- 头顶倒计时缓存
 local CTM_BOSS_TARGET        = {} -- 首领目标缓存
 local CTM_BOSS_FOCUSED_STATE = {} -- 被首领点名的状态缓存
 local CTM_NPC_THREAT_TARGET  = {} -- 首领一仇缓存
+local CTM_PLAYER_SKILL_CD    = {} -- 队友招式调息状态显示
 local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local CHANGGE_REAL_SHADOW_CACHE = {}
@@ -1256,6 +1257,7 @@ function CTM:ReloadParty()
 	self:RefreshMark()
 	self:RefreshDistance()
 	self:RefreshFormation()
+	self:RefreshPlayerSkillCD()
 	CTM_LIFE_CACHE = {}
 end
 
@@ -1316,6 +1318,7 @@ function CTM:DrawParty(nIndex)
 	local dwType, dwID = Target_GetTargetData()
 	self:RefreshTarget(dwID, dwType, dwID, dwType)
 	self:RefreshTTarget()
+	self:RefreshPlayerSkillCD()
 end
 
 function CTM:Scale(fX, fY, frame)
@@ -1825,6 +1828,43 @@ function CTM:RefreshDistance()
 					v.nDistanceLevel = nil
 					self:CallDrawHPMP(k, true)
 				end
+			end
+		end
+	end
+end
+
+function CTM:RecPlayerSkillCD(dwMemberID, dwSkillID, nSkillLevel, nEndFrame)
+	if not CTM_PLAYER_SKILL_CD[dwMemberID] then
+		CTM_PLAYER_SKILL_CD[dwMemberID] = {}
+	end
+	CTM_PLAYER_SKILL_CD[dwMemberID] = {
+		dwSkillID = dwSkillID,
+		nSkillLevel = nSkillLevel,
+		nEndFrame = nEndFrame,
+	}
+end
+
+function CTM:RefreshPlayerSkillCD()
+	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
+		return
+	end
+	for k, v in pairs(CTM_CACHE) do
+		if v:IsValid() then
+			local rec = CFG.bEnableImportantSkill and CTM_PLAYER_SKILL_CD[k]
+			if rec then
+				local nLeft = math.ceil(math.max(0, rec.nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS)
+				if nLeft > 0 then
+					v:Lookup('Handle_SkillCD/Box_SkillCD'):Hide()
+					v:Lookup('Handle_SkillCD/Text_SkillCD'):Show()
+					v:Lookup('Handle_SkillCD/Text_SkillCD'):SetText(nLeft > 60 and (math.ceil(nLeft / 60) .. '\'') or (nLeft .. '"'))
+				else
+					v:Lookup('Handle_SkillCD/Text_SkillCD'):Hide()
+					v:Lookup('Handle_SkillCD/Box_SkillCD'):Show()
+					v:Lookup('Handle_SkillCD/Box_SkillCD'):SetObjectIcon(Table_GetSkillIconID(rec.dwSkillID, rec.nSkillLevel))
+				end
+				v:Lookup('Handle_SkillCD'):Show()
+			else
+				v:Lookup('Handle_SkillCD'):Hide()
 			end
 		end
 	end

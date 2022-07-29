@@ -1040,6 +1040,7 @@ function D.OnFrameBreathe()
 	MY_CataclysmParty:RefreshBossTarget()
 	MY_CataclysmParty:RefreshBossFocus()
 	MY_CataclysmParty:RefreshSputtering()
+	MY_CataclysmParty:RefreshPlayerSkillCD()
 	-- kill System Panel
 	D.RaidPanel_Switch(DEBUG)
 	D.TeammatePanel_Switch(false)
@@ -1367,6 +1368,24 @@ X.RegisterEvent('PARTY_RESET', function()
 		D.CheckCataclysmEnable()
 		D.ReloadCataclysmPanel()
 	end)
+end)
+
+X.RegisterEvent('ON_PLUGIN_TEAM_NOTICE', function()
+	local tData, dwPlayerID = arg0, arg1
+	if not tData[1] or not tData[1].dwSubType or tData[1].dwSubType ~= PLUGIN_TEAM.SKILL_NOTICE then
+		return
+	end
+	local tSkillInfo = string.split(tData[1].szText, '|')
+	if not tSkillInfo or X.IsEmpty(tSkillInfo) then
+		return
+	end
+	local nEndFrame = tonumber(tSkillInfo[1])
+	local dwSkillID = tonumber(tSkillInfo[2])
+	local nSkillLevel = tonumber(tSkillInfo[3])
+	if not nEndFrame or not dwSkillID or not nSkillLevel then
+		return
+	end
+	MY_CataclysmParty:RecPlayerSkillCD(dwPlayerID, dwSkillID, nSkillLevel, nEndFrame)
 end)
 
 X.RegisterUserSettingsInit(function()

@@ -24,6 +24,7 @@ return {
 	bShowBossTarget        = true,
 	bShowBossFocus         = false,
 	bEnableDistance        = true,
+	bEnableImportantSkill  = true,
 	bShowTargetTargetAni   = false,
 	nNameFont              = 234,
 	nLifeFont              = 212,

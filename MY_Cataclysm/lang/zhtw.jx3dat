@@ -23,6 +23,7 @@ return {
 	['Show attention shadow'] = '顯示警告色',
 	['Show caution animate'] = '顯示警告特效',
 	['Show screen head'] = '顯示頭頂警告',
+	['Show important skill'] = '顯示重要招式調息狀態',
 	['ZuiWu Effect'] = '醉舞範圍',
 	['Show effect when teammate get ZuiWu, only your ZuiWu will be showen while you\'re BuTianJue.'] = '顯示受到醉舞治療的隊友特效，當你的心法為補天訣時將僅顯示受到你的醉舞效果治療的隊友。',
 	['Name/Icon/Mana/Life Display'] = '名字、圖標、內力和血量顯示方案',

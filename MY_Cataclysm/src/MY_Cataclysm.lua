@@ -177,6 +177,12 @@ local O = X.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bEnableImportantSkill = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Cataclysm'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 	bShowTargetTargetAni = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],

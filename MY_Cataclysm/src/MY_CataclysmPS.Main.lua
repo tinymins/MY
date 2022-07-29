@@ -118,6 +118,14 @@ function PS.OnPanelActive(frame)
 		tip = _L['Requires MY_LifeBar loaded.'],
 	}):AutoWidth():Width() + 5
 
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show important skill'],
+		checked = CFG.bEnableImportantSkill,
+		onCheck = function(bCheck)
+			CFG.bEnableImportantSkill = bCheck
+		end,
+	}):AutoWidth():Width() + 5
+
 	nX = nPaddingX + 10
 	nY = nY + 25
 	nX = nX + ui:Append('WndCheckBox', {
