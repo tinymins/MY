@@ -199,12 +199,14 @@ local function UpdateOfficialBuff()
 			if (tLine.dwMountKungfuID == dwMountKungfuID or tLine.dwMountKungfuID == 0) then
 				local v = {
 					dwID = tLine.dwBuffID,
-					nLevel = X.IIf(tLine.nBuffLevel > 0, tLine.nBuffLevel, nil),
+					nLevel = nil,
 					szStackOp = nil,
 					nStackNum = nil,
 					bOnlyMine = tLine.bOnlyMyself,
 					bOnlyMe = nil,
-					nIconID = Table_GetBuffIconID(tLine.dwBuffID, tLine.nBuffLevel) or 13,
+					nIconID = Table_GetBuffIconID(tLine.dwBuffID, tLine.nBuffLevel)
+						or Table_GetBuffIconID(tLine.dwBuffID)
+						or 13,
 					bAttention = nil,
 					colAttention = nil,
 					bCaution = nil,
