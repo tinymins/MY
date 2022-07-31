@@ -345,7 +345,7 @@ local function ParseHPCountdown(szString)
 				local nTime = aParams[3] and tonumber(aParams[3]) or nil
 				if nValue and szOperator and szContent ~= '' and (nTime or not aParams[3]) then
 					table.insert(aHPCountdown, {
-						nValue = nValue,
+						nValue = nValue * 100,
 						szOperator = szOperator,
 						szContent = szContent,
 						nTime = nTime,
@@ -744,12 +744,21 @@ function D.CreateData(szEvent)
 	D.Log('MAPID: ' .. dwMapID ..  ' create data success:' .. GetTime() - nTime  .. 'ms')
 	-- gc
 	if szEvent ~= 'MY_TM_CREATE_CACHE' then
-		CACHE.NPC_LIST   = {}
 		CACHE.SKILL_LIST = {}
 		CACHE.HP_CD_STR  = {}
 		D.Log('collectgarbage(\'count\') ' .. collectgarbage('count'))
 		collectgarbage('collect')
 		D.Log('collectgarbage(\'collect\') ' .. collectgarbage('count'))
+	end
+	-- clear nearby cache
+	CACHE.NPC_LIST    = {}
+	CACHE.DOODAD_LIST = {}
+	-- re-scan nearby
+	for _, v in pairs(X.GetNearNpcID()) do
+		FireUIEvent('MY_TM_NPC_ENTER_SCENE', v)
+	end
+	for _, v in pairs(X.GetNearDoodadID()) do
+		FireUIEvent('MY_TM_DOODAD_ENTER_SCENE', v)
 	end
 	FireUIEvent('MY_TMUI_FREECACHE')
 end
@@ -1164,9 +1173,6 @@ end
 
 -- NPC事件
 function D.OnNpcEvent(npc, bEnter)
-	if MY_TM_SHIELDED_MAP then
-		return
-	end
 	local data = D.GetData('NPC', npc.dwTemplateID)
 	local nTime = GetTime()
 	if bEnter then
@@ -1218,6 +1224,9 @@ function D.OnNpcEvent(npc, bEnter)
 				end
 			end
 		end
+	end
+	if MY_TM_SHIELDED_MAP then
+		return
 	end
 	if data then
 		local cfg, nClass, nCount
@@ -1315,9 +1324,6 @@ end
 
 -- DOODAD事件
 function D.OnDoodadEvent(doodad, bEnter)
-	if MY_TM_SHIELDED_MAP then
-		return
-	end
 	local data = D.GetData('DOODAD', doodad.dwTemplateID)
 	local nTime = GetTime()
 	if bEnter then
@@ -1364,6 +1370,9 @@ function D.OnDoodadEvent(doodad, bEnter)
 				end
 			end
 		end
+	end
+	if MY_TM_SHIELDED_MAP then
+		return
 	end
 	if data then
 		local cfg, nClass, nCount
@@ -1835,8 +1844,9 @@ function D.Close()
 		end
 		D.RegisterMessage(false)
 		FireUIEvent('MY_TM_ST_CLEAR')
-		CACHE.NPC_LIST = {}
-		CACHE.SKILL_LIST = {}
+		CACHE.NPC_LIST    = {}
+		CACHE.DOODAD_LIST = {}
+		CACHE.SKILL_LIST  = {}
 		collectgarbage('collect')
 	end
 end
@@ -1849,10 +1859,8 @@ function D.Enable(bEnable, bFireUIEvent)
 		end
 		if bFireUIEvent then
 			FireUIEvent('MY_TM_LOADING_END')
-			for _, v in pairs(X.GetNearNpcID()) do
-				FireUIEvent('MY_TM_NPC_ENTER_SCENE', v)
-			end
 		end
+		FireUIEvent('MY_TM_CREATE_CACHE')
 	else
 		D.Close()
 	end
@@ -1886,6 +1894,7 @@ function D.LoadUserData()
 			D.FILE[k] = data.data[k] or {}
 		end
 		D.CONFIG = data.config or {}
+		FireUIEvent('MY_TM_CREATE_CACHE')
 		FireUIEvent('MY_TM_DATA_RELOAD')
 	else
 		D.ImportDataFromFile(
