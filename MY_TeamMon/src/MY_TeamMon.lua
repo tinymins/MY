@@ -844,18 +844,26 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 	})
 	D.OnSetMark()
 end
+
+-- 根据配置获取倒计时实例的 类型 与 唯一标识符
+function D.GetCountdownTypeKey(data, nIndex, szSender, szReceiver, aBackreferences)
+	local v = data.tCountdown[nIndex]
+	local nType, szKey = v.nClass, v.key
+	if szKey then
+		nType = MY_TM_TYPE.COMMON
+		szKey = RenderCustomText(szKey, szSender, szReceiver, aBackreferences)
+	else
+		szKey = nIndex .. '.' .. (data.dwID or 0) .. '.' .. (data.nLevel or 0) .. '.' .. (data.nIndex or 0) .. '.' .. X.EncodeLUAData(aBackreferences)
+	end
+	return nType, szKey
+end
+
 -- 倒计时处理 支持定义无限的倒计时
 function D.CountdownEvent(data, nClass, szSender, szReceiver, aBackreferences)
 	if data.tCountdown then
-		for k, v in ipairs(data.tCountdown) do
+		for i, v in ipairs(data.tCountdown) do
 			if nClass == v.nClass then
-				local nType, szKey = nClass, v.key
-				if szKey then
-					nType = MY_TM_TYPE.COMMON
-					szKey = RenderCustomText(szKey, szSender, szReceiver, aBackreferences)
-				else
-					szKey = k .. '.' .. (data.dwID or 0) .. '.' .. (data.nLevel or 0) .. '.' .. (data.nIndex or 0) .. '.' .. X.EncodeLUAData(aBackreferences)
-				end
+				local nType, szKey = D.GetCountdownTypeKey(data, i, szSender, szReceiver, aBackreferences)
 				local tParam = {
 					nIcon     = v.nIcon or data.nIcon or 340,
 					nFrame    = v.nFrame,
@@ -1686,11 +1694,10 @@ function D.OnNpcFight(dwTemplateID, bFight)
 		if bFight then
 			D.CountdownEvent(data, MY_TM_TYPE.NPC_FIGHT, szSender, szReceiver)
 		elseif data.tCountdown then -- 脱离的时候清空下
-			for k, v in ipairs(data.tCountdown) do
+			for i, v in ipairs(data.tCountdown) do
 				if v.nClass == MY_TM_TYPE.NPC_FIGHT and not v.bFightHold then
-					local nClass = v.key and MY_TM_TYPE.COMMON or v.nClass
-					local szKey = v.key or (k .. '.' .. (data.dwID or 0) .. '.' .. (data.nLevel or 0) .. '.' .. (data.nIndex or 0))
-					FireUIEvent('MY_TM_ST_DEL', nClass, szKey) -- try kill
+					local nType, szKey = D.GetCountdownTypeKey(data, i, szSender, szReceiver)
+					FireUIEvent('MY_TM_ST_DEL', nType, szKey) -- try kill
 				end
 			end
 		end
