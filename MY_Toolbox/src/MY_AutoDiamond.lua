@@ -64,7 +64,9 @@ end
 function D.SaveDiamondFormula()
 	local t = {}
 	local box = D.LookupCastingPanel('PageSet_All/Page_Refine', 'Handle_BoxItem/Box_Refine')
+		or D.LookupCastingPanel('PageSet_All/Page_DiamondRefine', 'Handle_BoxItem/Box_Refine')
 	local hList = D.LookupCastingPanel('PageSet_All/Page_Refine', 'Handle_RefineExpend')
+		or D.LookupCastingPanel('PageSet_All/Page_DiamondRefine', 'Handle_RefineExpend')
 	if not box or not hList then
 		return
 	end
@@ -183,6 +185,7 @@ end
 -- 停止重复合成
 function D.StopProduce()
 	local box = D.LookupCastingPanel('PageSet_All/Page_Refine', 'Handle_BoxItem/Box_Refine')
+		or D.LookupCastingPanel('PageSet_All/Page_DiamondRefine', 'Handle_BoxItem/Box_Refine')
 	if box then
 		box:ClearObject()
 	end
@@ -213,10 +216,12 @@ end
 -- 更新计数器
 function D.UpdateDashboard()
 	local edit = D.LookupCastingPanel('PageSet_All/Page_Refine/WndWindow_MYDiamond/WndEditBox_MYDiamond')
+		or D.LookupCastingPanel('PageSet_All/Page_DiamondRefine/WndWindow_MYDiamond/WndEditBox_MYDiamond')
 	if edit then
 		X.UI(edit):Text(D.nAutoCount, WNDEVENT_FIRETYPE.PREVENT)
 	end
 	local txt = D.LookupCastingPanel('PageSet_All/Page_Refine/WndWindow_MYDiamond', 'Text_Result')
+		or D.LookupCastingPanel('PageSet_All/Page_DiamondRefine/WndWindow_MYDiamond', 'Text_Result')
 	if txt then
 		X.UI(txt):Text(
 			D.nCompleteCount > 0
@@ -234,6 +239,7 @@ end
 -- 自动摆五行石材料，开始下一轮合成
 function D.DoAutoDiamond()
 	local box = D.LookupCastingPanel('PageSet_All/Page_Refine', 'Handle_BoxItem/Box_Refine')
+		or D.LookupCastingPanel('PageSet_All/Page_DiamondRefine', 'Handle_BoxItem/Box_Refine')
 	if not box then
 		D.dFormula = nil
 	end
@@ -282,7 +288,9 @@ end
 -- 隐藏结果特效
 function D.HideDuang()
 	local sfxSuccess = D.LookupCastingPanel('PageSet_All/Page_Refine', 'SFX_CommonRefineSuccess')
+		or D.LookupCastingPanel('PageSet_All/Page_DiamondRefine', 'SFX_CommonRefineSuccess')
 	local sfxFailure = D.LookupCastingPanel('PageSet_All/Page_Refine', 'SFX_CommonRefineFailure')
+		or D.LookupCastingPanel('PageSet_All/Page_DiamondRefine', 'SFX_CommonRefineFailure')
 	if not sfxSuccess or not sfxFailure then
 		return
 	end
@@ -295,9 +303,11 @@ function D.PlayDuang(bSuccess)
 	local sfx
 	if bSuccess then
 		sfx = D.LookupCastingPanel('PageSet_All/Page_Refine', 'SFX_CommonRefineSuccess')
+			or D.LookupCastingPanel('PageSet_All/Page_DiamondRefine', 'SFX_CommonRefineSuccess')
 		PlaySound(SOUND.UI_SOUND, g_sound.ElementalStoneSuccess)
 	else
 		sfx = D.LookupCastingPanel('PageSet_All/Page_Refine', 'SFX_CommonRefineFailure')
+			or D.LookupCastingPanel('PageSet_All/Page_DiamondRefine', 'SFX_CommonRefineFailure')
 		PlaySound(SOUND.UI_SOUND, g_sound.ElementalStoneFailed)
 	end
 	if not sfx then
@@ -313,12 +323,13 @@ end
 -------------------------------------
 function D.CheckInjection(bRemove)
 	local page = D.LookupCastingPanel('PageSet_All/Page_Refine')
+		or D.LookupCastingPanel('PageSet_All/Page_DiamondRefine')
 	if not page then
 		return
 	end
 	X.UI(page):Fetch('WndWindow_MYDiamond'):Remove()
 	if not bRemove and not X.IsRestricted('MY_AutoDiamond') then
-		local ui = X.UI(page):Append('WndWindow', { name = 'WndWindow_MYDiamond', y = 388, h = 24 })
+		local ui = X.UI(page):Append('WndWindow', { name = 'WndWindow_MYDiamond', y = 383, h = 24 })
 		local nX, nY = 0, 2
 		nX = nX + ui:Append('Text', {
 			name = 'Text_MYDiamond',
@@ -355,7 +366,7 @@ function D.CheckInjection(bRemove)
 			end,
 			autoEnable = function() return D.dFormula and D.nAutoCount > 0 end,
 		}):Width() + 5
-		ui:Append('Text', { name = 'Text_Result', x = 0, y = 25, w = nX, h = 22, alpha = 192, alignHorizontal = 1 })
+		ui:Append('Text', { name = 'Text_Result', x = 0, y = 22, w = nX, h = 22, alpha = 192, alignHorizontal = 1 })
 		ui:Width(nX)
 		ui:Left((380 - nX) / 2)
 		D.UpdateDashboard()
