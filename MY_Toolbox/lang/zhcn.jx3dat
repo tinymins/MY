@@ -471,7 +471,9 @@ return {
 
     ['MY_DialogNameLink'] = '其它',
 
-    ['Will continue produce until counter reachs or casting failed.'] = '填写次数，将在合成五行石时，重复当前配方，直到填写的次数归零、或者合成操作异常。',
+    -- MY_AutoDiamond.lua
+    ['Show batch refine diamond in casting panel'] = '在精炼界面显示按当前配方重复合成选项',
+    ['Will continue produce until counter reaches or casting failed.'] = '填写次数，将在合成五行石时，重复当前配方，直到填写的次数归零、或者合成操作异常。',
     ['Total: %d, success: %d (%.2f%%), failure: %d (%.2f%%)'] = '总：%d　成功：%d (%.2f%%)　失败：%d (%.2f%%)',
     ['Restore bag failed, material may not enough.'] = '摆放原材料失败，原材料可能不足。',
     ['Produce failed, action not exist.'] = '操作失败，无法正确捕获合成动作。',

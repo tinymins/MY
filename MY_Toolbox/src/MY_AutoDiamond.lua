@@ -18,7 +18,6 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^14.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
-X.RegisterRestriction('MY_AutoDiamond', { ['*'] = true })
 --------------------------------------------------------------------------
 
 ---------------------------------------------------------------------
@@ -29,6 +28,15 @@ local D = {
 	nCompleteCount = 0,
 	nSuccessCount = 0,
 }
+
+local O = X.CreateUserSettingsModule('MY_AutoDiamond', _L['General'], {
+	bEnable = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Toolbox'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 
 -- 获取五行石数据
 function D.GetDiamondData(dwBox, dwX)
@@ -327,8 +335,10 @@ function D.CheckInjection(bRemove)
 	if not page then
 		return
 	end
-	X.UI(page):Fetch('WndWindow_MYDiamond'):Remove()
-	if not bRemove and not X.IsRestricted('MY_AutoDiamond') then
+	X.UI(page)
+		:Fetch('WndWindow_MYDiamond')
+		:Remove()
+	if not bRemove and D.bReady and O.bEnable then
 		local ui = X.UI(page):Append('WndWindow', { name = 'WndWindow_MYDiamond', y = 383, h = 24 })
 		local nX, nY = 0, 2
 		nX = nX + ui:Append('Text', {
@@ -346,7 +356,7 @@ function D.CheckInjection(bRemove)
 				D.nAutoCount = tonumber(szText) or 0
 			end,
 			tip = {
-				render = _L['Will continue produce until counter reachs or casting failed.'],
+				render = _L['Will continue produce until counter reaches or casting failed.'],
 				position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			},
 		}):Width() + 5
@@ -372,11 +382,64 @@ function D.CheckInjection(bRemove)
 		D.UpdateDashboard()
 	end
 end
+
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Show batch refine diamond in casting panel'],
+		checked = O.bEnable,
+		onCheck = function(bChecked)
+			O.bEnable = bChecked
+			D.CheckInjection()
+		end,
+	}):Width() + 5
+
+	return nX, nY
+end
+
+--------------------------------------------------------------------------------
+-- Global exports
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_AutoDiamond',
+	exports = {
+		{
+			preset = 'UIEvent',
+			fields = {
+				'OnPanelActivePartial',
+			},
+			root = D,
+		},
+		{
+			fields = {
+				'bEnable',
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				'bEnable',
+			},
+			triggers = {
+				bEnable = D.CheckInjection,
+			},
+			root = O,
+		},
+	},
+}
+MY_AutoDiamond = X.CreateModule(settings)
+end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
 X.RegisterFrameCreate('CastingPanel', 'MY_AutoDiamond', function() D.CheckInjection() end)
-X.RegisterEvent('MY_RESTRICTION', 'MY_AutoDiamond', function()
-	if arg0 and arg0 ~= 'MY_AutoDiamond' then
-		return
-	end
+X.RegisterUserSettingsInit('MY_AutoDiamond', function()
+	D.bReady = true
 	D.CheckInjection()
 end)
 X.RegisterInit('MY_AutoDiamond', function() D.CheckInjection() end)
