@@ -17,7 +17,7 @@ local bStream = X.ENVIRONMENT.GAME_PROVIDER == 'remote'
 local bClassic = X.ENVIRONMENT.GAME_BRANCH == 'classic'
 
 local function PickBranch(tData)
-	return tData[X.ENVIRONMENT.GAME_BRANCH] or tData['zhcn']
+	return tData[X.ENVIRONMENT.GAME_BRANCH] or tData['remake']
 end
 
 local FORCE_TYPE = (function()
