@@ -233,7 +233,7 @@ function D.ImportRecentLogs()
 	local nLFC, nCRC = GetLogicFrameCount(), LOG_CRC
 	for _, v in ipairs(LOG_REPLAY) do
 		if nLFC - v.nLFC <= LOG_REPLAY_FRAME then
-			nCRC = GetStringCRC(nCRC .. v.szLog .. 'c910e9b9-8359-4531-85e0-6897d8c129f7')
+			nCRC = GetStringCRC(nCRC .. v.szLog .. X.SECRET['HASH::MY_COMBAT_JCL'])
 			table.insert(LOG_CACHE, nCRC .. '\t' .. v.szLog .. '\n')
 		end
 	end
