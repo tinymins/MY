@@ -2166,7 +2166,9 @@ local function ListenFightStateChange()
 					nTeamMember = 1
 					dwTeamXorID = me.dwID
 				end
-				FIGHT_UUID = szEdition .. '::' .. szServer .. '::' .. dwTime .. '::' .. dwTeamID .. '::' .. dwTeamXorID .. '/' .. nTeamMember
+				FIGHT_UUID = szEdition .. '::' .. szServer .. '::' .. dwTime .. '::'
+					.. dwTeamID .. '::' .. dwTeamXorID .. '/' .. nTeamMember
+					.. '::U' .. me.GetGlobalID() .. '/' .. me.dwID
 				FireUIEvent(X.NSFormatString('{$NS}_FIGHT_HINT'), true, FIGHT_UUID, 0)
 			end
 		end
