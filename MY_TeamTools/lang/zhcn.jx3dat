@@ -212,7 +212,7 @@ return {
     -- MY_CombatLogs.lua
     ['MY_CombatLogs'] = '战斗事件记录',
     ['Only in dungeon'] = '仅在秘境中启用',
-    ['Only self related'] = '仅记录与我相关',
+    ['Save all nearby records'] = '保存附近所有角色事件记录',
     ['Max history'] = '最大历史记录',
     ['Min fight time'] = '最小战斗时间',
     ['%s second(s)'] = '%s秒',

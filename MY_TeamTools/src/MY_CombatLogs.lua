@@ -45,7 +45,7 @@ local O = X.CreateUserSettingsModule('MY_CombatLogs', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
-	bOnlySelf = { -- 仅记录和自己有关的
+	bNearbyAll = { -- 保存附近所有角色事件记录
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
 		xSchema = X.Schema.Boolean,
@@ -269,7 +269,7 @@ X.RegisterEvent('MY_FIGHT_HINT', function()
 end)
 
 function D.WillRecID(dwID)
-	if O.bOnlySelf then
+	if not O.bNearbyAll then
 		if not IsPlayer(dwID) then
 			local npc = GetNpc(dwID)
 			if npc then
@@ -704,11 +704,11 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 				end,
 			})
 			table.insert(menu, {
-				szOption = _L['Only self related'],
+				szOption = _L['Save all nearby records'],
 				bCheck = true,
-				bChecked = MY_CombatLogs.bOnlySelf,
+				bChecked = MY_CombatLogs.bNearbyAll,
 				fnAction = function()
-					MY_CombatLogs.bOnlySelf = not MY_CombatLogs.bOnlySelf
+					MY_CombatLogs.bNearbyAll = not MY_CombatLogs.bNearbyAll
 				end,
 			})
 			local m0 = { szOption = _L['Max history'] }
@@ -772,7 +772,7 @@ local settings = {
 				'nMaxHistory',
 				'nMinFightTime',
 				'bOnlyDungeon',
-				'bOnlySelf',
+				'bNearbyAll',
 			},
 			root = O,
 		},
@@ -784,12 +784,12 @@ local settings = {
 				'nMaxHistory',
 				'nMinFightTime',
 				'bOnlyDungeon',
-				'bOnlySelf',
+				'bNearbyAll',
 			},
 			triggers = {
 				bEnable      = D.UpdateEnable,
 				bOnlyDungeon = D.UpdateEnable,
-				bOnlySelf    = D.UpdateEnable,
+				bNearbyAll   = D.UpdateEnable,
 			},
 			root = O,
 		},
