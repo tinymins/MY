@@ -1214,7 +1214,10 @@ function X.CreateDataRoot(ePathType)
 				time_str = X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'),
 			},
 			{ crc = false, passphrase = false })
-		CPath.MakeDir(X.FormatPath({'{$name}/', X.PATH_TYPE.ROLE}))
+		local szRoleName = X.GetUserRoleName()
+		if szRoleName then
+			CPath.MakeDir(X.FormatPath({szRoleName .. '/', X.PATH_TYPE.ROLE}))
+		end
 	end
 	-- 版本更新时删除旧的临时目录
 	if IsLocalFileExist(X.FormatPath({'temporary/', ePathType}))
