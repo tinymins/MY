@@ -4459,6 +4459,13 @@ function X.GetMapAchievements(dwMapID, bWujia)
 end
 
 do
+	local function PeekPlayer(dwID)
+		if PeekOtherPlayerEquipSimpleInfo then
+			X.SafeCall(PeekOtherPlayerEquipSimpleInfo, dwID)
+		else
+			X.SafeCall(ViewInviteToPlayer, dwID, true)
+		end
+	end
 	local EVENT_KEY = nil
 	local PEEK_PLAYER_EQUIP_SCORE_STATE = {}
 	local PEEK_PLAYER_EQUIP_SCORE_RESULT = {}
@@ -4503,18 +4510,15 @@ do
 		end
 		-- ∑¢ÀÕ«Î«Û
 		PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] = 'PENDING'
-		if PeekOtherPlayerEquipSimpleInfo then
-			if not EVENT_KEY then
+		if not EVENT_KEY then
+			if PeekOtherPlayerEquipSimpleInfo then
 				EVENT_KEY = X.RegisterEvent('ON_SYNC_OTHER_PLAYER_EQUIP_SIMPLE_INFO', X.NSFormatString('{$NS}#GetPlayerEquipScore'), function()
 					local dwID, nEquipScore = arg0, arg1
 					PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] = 'SUCCESS'
 					PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID] = nEquipScore
 					OnGetPlayerEquipScorePeekPlayer(dwID)
 				end)
-			end
-			X.SafeCall(PeekOtherPlayerEquipSimpleInfo, dwID)
-		else
-			if not EVENT_KEY then
+			else
 				EVENT_KEY = X.RegisterEvent('PEEK_OTHER_PLAYER', X.NSFormatString('{$NS}#GetPlayerEquipScore'), function()
 					local nResult, dwID = arg0, arg1
 					local player = GetPlayer(dwID)
@@ -4525,12 +4529,19 @@ do
 					end
 				end)
 			end
-			X.SafeCall(ViewInviteToPlayer, dwID, true)
 		end
+		PeekPlayer(dwID)
 	end
 end
 
 do
+	local function PeekPlayer(dwID)
+		if PeekOtherPlayer then
+			X.SafeCall(PeekOtherPlayer, dwID)
+		else
+			X.SafeCall(ViewInviteToPlayer, dwID, true)
+		end
+	end
 	local EVENT_KEY = nil
 	local PEEK_PLAYER_EQUIP_STATE = {}
 	local PEEK_PLAYER_EQUIP_CALLBACK = {}
@@ -4572,6 +4583,10 @@ do
 					dwTemporaryEnchantLeftSeconds = item.GetTemporaryEnchantLeftSeconds(),
 				}
 			end
+		end
+		if X.IsEmpty(tEquipInfo) then
+			PeekPlayer(player.dwID)
+			return
 		end
 		for _, fnAction in ipairs(PEEK_PLAYER_EQUIP_CALLBACK[player.dwID]) do
 			X.SafeCall(fnAction, tEquipInfo, player.dwID)
@@ -4620,15 +4635,18 @@ do
 				end
 			end)
 		end
-		if PeekOtherPlayer then
-			X.SafeCall(PeekOtherPlayer, dwID)
-		else
-			X.SafeCall(ViewInviteToPlayer, dwID, true)
-		end
+		PeekPlayer(dwID)
 	end
 end
 
 do
+	local function PeekPlayer(dwID)
+		if X.ENVIRONMENT.GAME_BRANCH == 'classic' then
+			X.SafeCall(PeekOtherPlayerTalent, dwID)
+		else
+			X.SafeCall(PeekOtherPlayerTalent, dwID, 0xffffffff)
+		end
+	end
 	local EVENT_KEY = nil
 	local PEEK_PLAYER_TALENT_STATE = {}
 	local PEEK_PLAYER_TALENT_CALLBACK = {}
@@ -4657,6 +4675,10 @@ do
 					dwSkillLevel = 0,
 				}
 			end
+		end
+		if X.IsEmpty(aTalent) then
+			PeekPlayer(dwID)
+			return
 		end
 		for _, fnAction in ipairs(PEEK_PLAYER_TALENT_CALLBACK[player.dwID]) do
 			X.SafeCall(fnAction, aTalent, player.dwID)
@@ -4703,7 +4725,7 @@ do
 				end
 			end)
 		end
-		X.SafeCall(PeekOtherPlayerTalent, dwID, 0xffffffff)
+		PeekPlayer(dwID)
 	end
 end
 
