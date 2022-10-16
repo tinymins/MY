@@ -323,9 +323,6 @@ function D.OnTargetUpdate(dwID, bForce)
 		local szGUID = X.GetPlayerGUID(dwID) or ''
 		local aEquip, nEquipScore, aTalent
 		local function OnGet()
-			if not nEquipScore or not aEquip or not aTalent then
-				return
-			end
 			D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip, aTalent, szGUID })
 		end
 		X.GetPlayerEquipScore(dwID, function(nScore)
