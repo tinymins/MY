@@ -62,9 +62,9 @@ local COMBAT_TEXT_IGNORE = {}
 local COMBAT_TEXT_EVENT  = { 'COMMON_HEALTH_TEXT', 'SKILL_EFFECT_TEXT', 'SKILL_MISS', 'SKILL_DODGE', 'SKILL_BUFF', 'BUFF_IMMUNITY' }
 local COMBAT_TEXT_OFFICIAL_EVENT = { 'SKILL_EFFECT_TEXT', 'COMMON_HEALTH_TEXT', 'SKILL_MISS', 'SKILL_DODGE', 'SKILL_BUFF', 'BUFF_IMMUNITY', 'ON_EXP_LOG', 'SYS_MSG', 'FIGHT_HINT' }
 local COMBAT_TEXT_STRING = { -- 需要变成特定字符串的伤害类型
-	[SKILL_RESULT_TYPE.SHIELD_DAMAGE]  = g_tStrings.STR_MSG_ABSORB,
-	[SKILL_RESULT_TYPE.ABSORB_DAMAGE]  = g_tStrings.STR_MSG_ABSORB,
-	[SKILL_RESULT_TYPE.PARRY_DAMAGE]   = g_tStrings.STR_MSG_COUNTERACT,
+	[SKILL_RESULT_TYPE.SHIELD_DAMAGE ] = g_tStrings.STR_MSG_ABSORB,
+	[SKILL_RESULT_TYPE.ABSORB_DAMAGE ] = g_tStrings.STR_MSG_ABSORB,
+	[SKILL_RESULT_TYPE.PARRY_DAMAGE  ] = g_tStrings.STR_MSG_COUNTERACT,
 	[SKILL_RESULT_TYPE.INSIGHT_DAMAGE] = g_tStrings.STR_MSG_INSIGHT,
 }
 local COMBAT_TEXT_COLOR = { --不需要修改的内定颜色
@@ -170,6 +170,26 @@ local COMBAT_TEXT_POINT = {
 		98,  100, 102, 104, 106, 108, 110, 112,
 	},
 }
+
+local COMBAT_TEXT_TYPE_COLOR = {
+	['DAMAGE'                              ] = X.ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
+	[SKILL_RESULT_TYPE.THERAPY             ] = { 0,   255, 0   }, -- 治疗
+	[SKILL_RESULT_TYPE.PHYSICS_DAMAGE      ] = { 255, 255, 255 }, -- 外功
+	[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE  ] = { 255, 128, 128 }, -- 阳
+	[SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE] = { 255, 255, 0   }, -- 混元
+	[SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE  ] = { 12,  242, 255 }, -- 阴
+	[SKILL_RESULT_TYPE.POISON_DAMAGE       ] = { 128, 255, 128 }, -- 有毒啊
+	[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   ] = { 255, 128, 128 }, -- 反弹 ？？
+	[SKILL_RESULT_TYPE.SPIRIT              ] = { 160,   0, 160 }, -- 精神
+	[SKILL_RESULT_TYPE.STAYING_POWER       ] = { 255, 169,   0 }, -- 耐力
+}
+
+local COMBAT_TEXT_TYPE_CLASS = {
+	[SKILL_RESULT_TYPE.STEAL_LIFE       ] = 'THERAPY',
+	[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = 'THERAPY',
+	[SKILL_RESULT_TYPE.THERAPY          ] = 'THERAPY',
+}
+
 local COMBAT_TEXT_LEAVE  = {}
 local COMBAT_TEXT_FREE   = {}
 local COMBAT_TEXT_SHADOW = {}
@@ -306,19 +326,12 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
 		xSchema = X.Schema.Map(X.Schema.OneOf(X.Schema.String, X.Schema.Number), X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
-		xDefaultValue = {
-			['DAMAGE']                               = X.ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
-			[SKILL_RESULT_TYPE.THERAPY]              = { 0,   255, 0   }, -- 治疗
-			[SKILL_RESULT_TYPE.PHYSICS_DAMAGE]       = { 255, 255, 255 }, -- 外公
-			[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE]   = { 255, 128, 128 }, -- 阳
-			[SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE] = { 255, 255, 0   }, -- 混元
-			[SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE]   = { 12,  242, 255 }, -- 阴
-			[SKILL_RESULT_TYPE.POISON_DAMAGE]        = { 128, 255, 128 }, -- 有毒啊
-			[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE]    = { 255, 128, 128 }, -- 反弹 ？？
-		},
+		xDefaultValue = {},
 	},
 })
-local D = {}
+local D = {
+	col = setmetatable({}, { __index = function(_, k) return O.col[k] or COMBAT_TEXT_TYPE_COLOR[k] or COMBAT_TEXT_COLOR.WHITE end })
+}
 
 local function IsEnabled()
 	return D.bReady and O.bEnable
@@ -529,7 +542,7 @@ function CombatText.OnFrameRender()
 				elseif tScale[nBefore] < tScale[nAfter] then
 					fScale = fScale + ((tScale[nAfter] - tScale[nBefore]) * fDiff)
 				end
-				if v.nType == SKILL_RESULT_TYPE.THERAPY then -- 治疗缩小
+				if COMBAT_TEXT_TYPE_CLASS[v.nType] == 'THERAPY' then -- 治疗缩小
 					if v.bCriticalStrike then
 						fScale = math.max(fScale * 0.7, COMBAT_TEXT_SCALE.NORMAL[#COMBAT_TEXT_SCALE.NORMAL] + 0.1)
 					end
@@ -692,14 +705,8 @@ function CombatText.CreateText(shadow, dwTargetID, szText, szPoint, nType, bCrit
 	end
 end
 
-local tTherapyType = {
-	[SKILL_RESULT_TYPE.STEAL_LIFE]        = true,
-	[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = true,
-	[SKILL_RESULT_TYPE.THERAPY]           = true,
-}
-
 function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, nValue, dwSkillID, dwSkillLevel, nEffectType)
-	-- 过滤 有效治疗 有效伤害 西区内力 化解治疗
+	-- 过滤 有效治疗 有效伤害 汲取内力 化解治疗
 	if nType == SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE
 --	or nType == SKILL_RESULT_TYPE.EFFECTIVE_THERAPY
 	or (nType == SKILL_RESULT_TYPE.EFFECTIVE_THERAPY and not O.bTherEffOnly)
@@ -715,10 +722,8 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 	then
 		return
 	end
-	-- 把治疗归类为一种 方便处理
-	local bStealLife = nType == SKILL_RESULT_TYPE.STEAL_LIFE and true
-	nType = tTherapyType[nType] and SKILL_RESULT_TYPE.THERAPY or nType
-	if nType == SKILL_RESULT_TYPE.THERAPY and nValue == 0 then
+	-- 过滤无效治疗
+	if COMBAT_TEXT_TYPE_CLASS[nType] == 'THERAPY' and nValue == 0 then
 		return
 	end
 	local bIsPlayer = IsPlayer(dwCasterID)
@@ -738,39 +743,55 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 		return
 	end
 
-	local szName, szText, szReplaceText
-	-- skill name
-	if not bStealLife then
-		szName = nEffectType == SKILL_EFFECT_TYPE.BUFF and Table_GetBuffName(dwSkillID, dwSkillLevel) or Table_GetSkillName(dwSkillID, dwSkillLevel)
-	else -- 吸血技能偷取避免重复获取 浪费性能
-		szName = g_tStrings.SKILL_STEAL_LIFE
-	end
-	-- replace
-	if nType == SKILL_RESULT_TYPE.THERAPY then
-		szReplaceText = O.szTherapy
-	else
-		szReplaceText = O.szSkill
-	end
-	-- point color
+	local szSkillName, szText, szReplaceText, bStaticSign
+	-- replace text / point / color
 	local szPoint = 'TOP'
-	local col     = O.col[nType]
-	if COMBAT_TEXT_STRING[nType] then
+	local col     = D.col[nType]
+	-- skill type effect by class and presets
+	if COMBAT_TEXT_STRING[nType] then -- 需要变成特定字符串的伤害类型
 		szText = COMBAT_TEXT_STRING[nType]
 		if dwTargetID == COMBAT_TEXT_PLAYERID then
 			szPoint = 'LEFT'
 			col = COMBAT_TEXT_COLOR.YELLOW
 		end
-	elseif nType == SKILL_RESULT_TYPE.THERAPY then
+	elseif COMBAT_TEXT_TYPE_CLASS[nType] == 'THERAPY' then
 		if dwTargetID == COMBAT_TEXT_PLAYERID then
 			szPoint = 'BOTTOM_RIGHT'
 		end
 		if bCriticalStrike and O.bCritical then
 			col = O.tCriticalH
 		end
+		szReplaceText = O.szTherapy
 	else
 		if dwTargetID == COMBAT_TEXT_PLAYERID then
 			szPoint = 'BOTTOM_LEFT'
+			szReplaceText = O.szDamage
 		end
+		szReplaceText = O.szSkill
+	end
+	-- specific skill type overwrite
+	if nType == SKILL_RESULT_TYPE.STEAL_LIFE then -- 吸血技能偷取避免重复获取 浪费性能
+		szSkillName = g_tStrings.SKILL_STEAL_LIFE
+	elseif nType == SKILL_RESULT_TYPE.SPIRIT then
+		if dwTargetID == COMBAT_TEXT_PLAYERID then
+			szPoint = 'BOTTOM_RIGHT'
+		end
+		szReplaceText = O.szSkill
+		szSkillName = g_tStrings.SKILL_SPIRIT
+		bStaticSign = true
+	elseif nType == SKILL_RESULT_TYPE.STAYING_POWER then
+		if dwTargetID == COMBAT_TEXT_PLAYERID then
+			szPoint = 'BOTTOM_RIGHT'
+		end
+		szReplaceText = O.szSkill
+		szSkillName = g_tStrings.SKILL_STAYING_POWER
+		bStaticSign = true
+	end
+	-- skill name fallback
+	if not szSkillName then
+		szSkillName = nEffectType == SKILL_EFFECT_TYPE.BUFF
+			and Table_GetBuffName(dwSkillID, dwSkillLevel)
+			or Table_GetSkillName(dwSkillID, dwSkillLevel)
 	end
 	if szPoint == 'BOTTOM_LEFT' then -- 左下角肯定是伤害
 		-- 苍云反弹技能修正颜色
@@ -778,18 +799,17 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 			local hSkill = GetSkill(dwSkillID, dwSkillLevel)
 			if hSkill and hSkill.dwBelongSchool ~= 18 and hSkill.dwBelongSchool ~= 0 then
 				nType = SKILL_RESULT_TYPE.REFLECTIED_DAMAGE
-				col = O.col[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE]
+				col = D.col[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE]
 			end
 		end
 		if nType ~= SKILL_RESULT_TYPE.REFLECTIED_DAMAGE then
-			col = O.col['DAMAGE']
+			col = D.col.DAMAGE
 			if bCriticalStrike and O.bCritical then
 				col = O.tCriticalB
 			end
 		end
-		szReplaceText = O.szDamage
 	end
-	if szPoint == 'TOP' and bCriticalStrike and nType ~= SKILL_RESULT_TYPE.THERAPY and O.bCritical then
+	if szPoint == 'TOP' and bCriticalStrike and COMBAT_TEXT_TYPE_CLASS[nType] ~= 'THERAPY' and O.bCritical then
 		col = O.tCriticalC
 	end
 	-- draw text
@@ -806,13 +826,13 @@ function CombatText.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nType, 
 			szCasterName = ''
 		end
 		if O.bSnShorten2 then
-			szName = X.StringSubW(szName, 1, 2) -- wstring是兼容台服的 台服utf-8
+			szSkillName = X.StringSubW(szSkillName, 1, 2) -- wstring是兼容台服的 台服utf-8
 		end
 		szText = szReplaceText
 		szText = szText:gsub('(%s?)$crit(%s?)', (bCriticalStrike and '%1'.. g_tStrings.STR_CS_NAME .. '%2' or ''))
 		szText = szText:gsub('$name', szCasterName)
-		szText = szText:gsub('$sn', szName)
-		szText = szText:gsub('$val', nValue or '')
+		szText = szText:gsub('$sn', szSkillName)
+		szText = szText:gsub('$val', (bStaticSign and X.IsNumber(nValue) and nValue > 0 and '+' or '') .. (nValue or ''))
 	end
 	CombatText.CreateText(shadow, dwTargetID, szText, szPoint, nType, bCriticalStrike, col)
 end
@@ -872,7 +892,7 @@ function CombatText.OnCommonHealth(dwCharacterID, nDeltaLife)
 		end
 	end
 	local szText = nDeltaLife > 0 and '+' .. nDeltaLife or nDeltaLife
-	local col    = nDeltaLife > 0 and O.col[SKILL_RESULT_TYPE.THERAPY] or O.col['DAMAGE']
+	local col    = nDeltaLife > 0 and D.col[SKILL_RESULT_TYPE.THERAPY] or D.col.DAMAGE
 	CombatText.CreateText(shadow, dwCharacterID, szText, szPoint, 'COMMON_HEALTH', false, col)
 end
 
@@ -971,7 +991,6 @@ function CombatText.CheckEnable()
 			return me['TOP']
 		end
 	end })
-	setmetatable(O.col, { __index = function() return COMBAT_TEXT_COLOR.WHITE end })
 	local mt = { __index = function(me)
 		return me[#me]
 	end }
@@ -1324,7 +1343,7 @@ function PS.OnPanelActive(frame)
 
 	x = nPaddingX + 10
 	local i = 0
-	for k, v in pairs(O.col) do
+	for k, v in pairs(COMBAT_TEXT_TYPE_COLOR) do
 		if k ~= SKILL_RESULT_TYPE.EFFECTIVE_THERAPY then
 			ui:Append('Text', { x = x + (i % 8) * 65, y = y + 30 * math.floor(i / 8), text = _L['CombatText Color ' .. k], autoEnable = IsEnabled })
 			ui:Append('Shadow', {

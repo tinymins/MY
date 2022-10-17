@@ -35,6 +35,8 @@ return {
 	['CombatText Color 4'] = '毒性',
 	['CombatText Color 5'] = '反彈',
 	['CombatText Color 6'] = '治療',
+	['CombatText Color 17'] = '精神',
+	['CombatText Color 18'] = '耐力',
 	['Text Style'] = '戰鬥文字格式設置',
 	['Skill Style'] = '招式文字格式',
 	['Damage Style'] = '受傷文字格式',
