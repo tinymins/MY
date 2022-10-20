@@ -390,6 +390,7 @@ local CONSTANT = {
 			{ FORCE_TYPE.LING_XUE , bStream and { 253, 86, 86 } or { 161,   9,  34 } }, -- ÁèÑ©
 			{ FORCE_TYPE.YAN_TIAN , { 166,  83, 251 } }, -- ÑÜÌì
 			{ FORCE_TYPE.YAO_ZONG , {   0, 172, 153 } }, -- Ò©×Ú
+			{ FORCE_TYPE.DAO_ZONG , { 107, 183, 242 } }, -- µ¶×Ú
 		}),
 		{
 			__index = function(t, k)
@@ -417,6 +418,7 @@ local CONSTANT = {
 			{ FORCE_TYPE.LING_XUE , { 161,   9,  34 } }, -- ÁèÑ©
 			{ FORCE_TYPE.YAN_TIAN , {  96,  45, 148 } }, -- ÑÜÌì
 			{ FORCE_TYPE.YAO_ZONG , {  10,  81,  87 } }, -- Ò©×Ú
+			{ FORCE_TYPE.DAO_ZONG , {  64, 101, 169 } }, -- µ¶×Ú
 		}),
 		{
 			__index = function(t, k)
