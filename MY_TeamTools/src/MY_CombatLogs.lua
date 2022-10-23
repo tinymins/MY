@@ -99,6 +99,7 @@ local LOG_TYPE = {
 	SYS_MSG_UI_OME_SKILL_DODGE_LOG        = 26, -- 技能被闪避日志
 	SYS_MSG_UI_OME_COMMON_HEALTH_LOG      = 27, -- 普通治疗日志
 	SYS_MSG_UI_OME_DEATH_NOTIFY           = 28, -- 死亡日志
+	TARGET_LOCATION                       = 29, -- 目标坐标信息
 }
 
 -- 更新启用状态
@@ -297,6 +298,7 @@ function D.OnTargetUpdate(dwID, bForce)
 		LOG_NAMING_COUNT[dwID].nCount = LOG_NAMING_COUNT[dwID].nCount + 1
 	end
 	if not bForce and LOG_TARGET_INFO_TIME[dwID] and LOG_TARGET_INFO_TIME[dwID] - GetTime() < LOG_TARGET_INFO_TIME_LIMIT then
+		D.OnTargetLocationUpdate(bIsPlayer and TARGET.PLAYER or TARGET.NPC, dwID)
 		return
 	end
 	if bIsPlayer then
@@ -378,6 +380,20 @@ function D.OnDoodadUpdate(dwID, bForce)
 	end
 	D.InsertLog(LOG_TYPE.DOODAD_INFO, { dwID, doodad.dwTemplateID, doodad.nX, doodad.nY, doodad.nZ })
 	LOG_DOODAD_INFO_TIME[dwID] = GetTime()
+end
+
+function D.OnTargetLocationUpdate(dwType, dwID)
+	local tar
+	if dwType == TARGET.PLAYER then
+		tar = GetPlayer(dwID)
+	elseif dwType == TARGET.NPC then
+		tar = GetNpc(dwID)
+	elseif dwType == TARGET.DOODAD then
+		tar = GetDoodad(dwID)
+	end
+	if tar then
+		D.InsertLog(LOG_TYPE.TARGET_LOCATION, { dwType, dwID, tar.nX, tar.nY, tar.nZ })
+	end
 end
 
 -- 系统日志监控（数据源）
