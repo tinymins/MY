@@ -171,24 +171,24 @@ local COMBAT_TEXT_POINT = {
 	},
 }
 
-local COMBAT_TEXT_TYPE_COLOR = {
-	['DAMAGE'                              ] = X.ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }, -- 自己受到的伤害
-	[SKILL_RESULT_TYPE.THERAPY             ] = { 0,   255, 0   }, -- 治疗
-	[SKILL_RESULT_TYPE.PHYSICS_DAMAGE      ] = { 255, 255, 255 }, -- 外功
-	[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE  ] = { 255, 128, 128 }, -- 阳
-	[SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE] = { 255, 255, 0   }, -- 混元
-	[SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE  ] = { 12,  242, 255 }, -- 阴
-	[SKILL_RESULT_TYPE.POISON_DAMAGE       ] = { 128, 255, 128 }, -- 有毒啊
-	[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   ] = { 255, 128, 128 }, -- 反弹 ？？
-	[SKILL_RESULT_TYPE.SPIRIT              ] = { 160,   0, 160 }, -- 精神
-	[SKILL_RESULT_TYPE.STAYING_POWER       ] = { 255, 169,   0 }, -- 耐力
-}
+local COMBAT_TEXT_TYPE_COLOR = X.KvpToObject({
+	{'DAMAGE'                              , X.ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }}, -- 自己受到的伤害
+	{SKILL_RESULT_TYPE.THERAPY             , { 0,   255, 0   }}, -- 治疗
+	{SKILL_RESULT_TYPE.PHYSICS_DAMAGE      , { 255, 255, 255 }}, -- 外功
+	{SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE  , { 255, 128, 128 }}, -- 阳
+	{SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE, { 255, 255, 0   }}, -- 混元
+	{SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE  , { 12,  242, 255 }}, -- 阴
+	{SKILL_RESULT_TYPE.POISON_DAMAGE       , { 128, 255, 128 }}, -- 有毒啊
+	{SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   , { 255, 128, 128 }}, -- 反弹？？
+	{SKILL_RESULT_TYPE.SPIRIT              , { 160,   0, 160 }}, -- 精神
+	{SKILL_RESULT_TYPE.STAYING_POWER       , { 255, 169,   0 }}, -- 耐力
+})
 
-local COMBAT_TEXT_TYPE_CLASS = {
-	[SKILL_RESULT_TYPE.STEAL_LIFE       ] = 'THERAPY',
-	[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = 'THERAPY',
-	[SKILL_RESULT_TYPE.THERAPY          ] = 'THERAPY',
-}
+local COMBAT_TEXT_TYPE_CLASS = X.KvpToObject({
+	{SKILL_RESULT_TYPE.STEAL_LIFE       , 'THERAPY'},
+	{SKILL_RESULT_TYPE.EFFECTIVE_THERAPY, 'THERAPY'},
+	{SKILL_RESULT_TYPE.THERAPY          , 'THERAPY'},
+})
 
 local COMBAT_TEXT_LEAVE  = {}
 local COMBAT_TEXT_FREE   = {}
