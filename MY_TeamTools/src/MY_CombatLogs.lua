@@ -357,6 +357,7 @@ function D.OnTargetUpdate(dwID, bForce)
 			end
 			OnGet()
 		end)
+		D.OnTargetLocationUpdate(TARGET.PLAYER, dwID)
 	else
 		local npc = GetNpc(dwID)
 		if not npc then
@@ -364,7 +365,7 @@ function D.OnTargetUpdate(dwID, bForce)
 		end
 		local szName = X.GetObjectName(npc, 'never') or ''
 		LOG_NAMING_COUNT[dwID].szName = szName
-		D.InsertLog(LOG_TYPE.NPC_INFO, { dwID, szName, npc.dwTemplateID, npc.dwEmployer, npc.nX, npc.nY, npc.nZ })
+		D.InsertLog(LOG_TYPE.NPC_INFO, { dwID, szName, npc.dwTemplateID, npc.dwEmployer, npc.nX, npc.nY, npc.nZ, npc.nFaceDirection })
 	end
 	LOG_TARGET_INFO_TIME[dwID] = GetTime()
 end
@@ -378,7 +379,7 @@ function D.OnDoodadUpdate(dwID, bForce)
 	if not doodad then
 		return
 	end
-	D.InsertLog(LOG_TYPE.DOODAD_INFO, { dwID, doodad.dwTemplateID, doodad.nX, doodad.nY, doodad.nZ })
+	D.InsertLog(LOG_TYPE.DOODAD_INFO, { dwID, doodad.dwTemplateID, doodad.nX, doodad.nY, doodad.nZ, doodad.nFaceDirection })
 	LOG_DOODAD_INFO_TIME[dwID] = GetTime()
 end
 
@@ -392,7 +393,7 @@ function D.OnTargetLocationUpdate(dwType, dwID)
 		tar = GetDoodad(dwID)
 	end
 	if tar then
-		D.InsertLog(LOG_TYPE.TARGET_LOCATION, { dwType, dwID, tar.nX, tar.nY, tar.nZ })
+		D.InsertLog(LOG_TYPE.TARGET_LOCATION, { dwType, dwID, tar.nX, tar.nY, tar.nZ, tar.nFaceDirection })
 	end
 end
 
