@@ -46,16 +46,16 @@ local COMBAT_TEXT_UI_SCALE       = 1
 local COMBAT_TEXT_TRAJECTORY     = 4   -- 顶部Y轴轨迹数量 根据缩放大小变化 0.8就是5条了 屏幕小更多
 local COMBAT_TEXT_MAX_COUNT      = 100 -- 最多同屏显示100个 再多部分机器吃不消了
 local COMBAT_TEXT_CRITICAL = { -- 需要会心跳帧的伤害类型
-	[SKILL_RESULT_TYPE.PHYSICS_DAMAGE]       = true,
-	[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE]   = true,
+	[SKILL_RESULT_TYPE.PHYSICS_DAMAGE      ] = true,
+	[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE  ] = true,
 	[SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE] = true,
-	[SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE]   = true,
-	[SKILL_RESULT_TYPE.POISON_DAMAGE]        = true,
-	[SKILL_RESULT_TYPE.THERAPY]              = true,
-	[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE]    = true,
-	[SKILL_RESULT_TYPE.STEAL_LIFE]           = true,
-	['EXP']                                  = true,
-	['CRITICAL_MSG']                         = true,
+	[SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE  ] = true,
+	[SKILL_RESULT_TYPE.POISON_DAMAGE       ] = true,
+	[SKILL_RESULT_TYPE.THERAPY             ] = true,
+	[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   ] = true,
+	[SKILL_RESULT_TYPE.STEAL_LIFE          ] = true,
+	['EXP'                                 ] = true,
+	['CRITICAL_MSG'                        ] = true,
 }
 local COMBAT_TEXT_IGNORE_TYPE = {}
 local COMBAT_TEXT_IGNORE = {}
@@ -171,20 +171,30 @@ local COMBAT_TEXT_POINT = {
 	},
 }
 
-local COMBAT_TEXT_TYPE_COLOR = X.KvpToObject({
-	{'DAMAGE'                              , X.ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }}, -- 自己受到的伤害
+local COMBAT_TEXT_TYPE_LIST = {}
+local COMBAT_TEXT_TYPE_COLOR = {}
+for _, v in ipairs({
+	-- 受伤
+	{'DAMAGE'                              , X.ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }}, -- 受伤 自己受到的伤害
+	-- 治疗
 	{SKILL_RESULT_TYPE.THERAPY             , {   0, 255,   0 }}, -- 治疗
 	{SKILL_RESULT_TYPE.EFFECTIVE_THERAPY   , {   0, 255,   0 }}, -- 有效治疗
-	{SKILL_RESULT_TYPE.STEAL_LIFE          , {   0, 255,   0 }}, -- 吸血
-	{SKILL_RESULT_TYPE.PHYSICS_DAMAGE      , { 255, 255, 255 }}, -- 外功
-	{SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE  , { 255, 128, 128 }}, -- 阳
-	{SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE, { 255, 255, 0   }}, -- 混元
-	{SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE  , { 12,  242, 255 }}, -- 阴
-	{SKILL_RESULT_TYPE.POISON_DAMAGE       , { 128, 255, 128 }}, -- 有毒啊
-	{SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   , { 255, 128, 128 }}, -- 反弹？？
+	{SKILL_RESULT_TYPE.STEAL_LIFE          , {   0, 255,   0 }}, -- 偷取气血
+	-- 招式
+	{SKILL_RESULT_TYPE.PHYSICS_DAMAGE      , { 255, 255, 255 }}, -- 外功攻击
+	{SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE  , { 255, 128, 128 }}, -- 阳性攻击
+	{SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE, { 255, 255, 0   }}, -- 混元攻击
+	{SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE  , { 12,  242, 255 }}, -- 阴性攻击
+	{SKILL_RESULT_TYPE.POISON_DAMAGE       , { 128, 255, 128 }}, -- 毒性攻击
+	{SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   , { 255, 128, 128 }}, -- 反弹伤害
 	{SKILL_RESULT_TYPE.SPIRIT              , { 160,   0, 160 }}, -- 精神
 	{SKILL_RESULT_TYPE.STAYING_POWER       , { 255, 169,   0 }}, -- 耐力
-})
+}) do
+	if v[1] then
+		table.insert(COMBAT_TEXT_TYPE_LIST, v[1])
+		COMBAT_TEXT_TYPE_COLOR[v[1]] = v[2]
+	end
+end
 
 local COMBAT_TEXT_TYPE_CLASS = X.KvpToObject({
 	{SKILL_RESULT_TYPE.STEAL_LIFE       , 'THERAPY'},
@@ -536,7 +546,7 @@ function CombatText.OnFrameRender()
 				fScale = 1.5
 			end
 			-- 缩放
-			if COMBAT_TEXT_CRITICAL[v.nType] then
+			if COMBAT_TEXT_CRITICAL[v.eType] then
 				local tScale  = v.bCriticalStrike and COMBAT_TEXT_SCALE.CRITICAL or COMBAT_TEXT_SCALE.NORMAL
 				fScale  = tScale[nBefore]
 				if tScale[nBefore] > tScale[nAfter] then
@@ -544,7 +554,7 @@ function CombatText.OnFrameRender()
 				elseif tScale[nBefore] < tScale[nAfter] then
 					fScale = fScale + ((tScale[nAfter] - tScale[nBefore]) * fDiff)
 				end
-				if COMBAT_TEXT_TYPE_CLASS[v.nType] == 'THERAPY' then -- 治疗缩小
+				if COMBAT_TEXT_TYPE_CLASS[v.eType] == 'THERAPY' then -- 治疗缩小
 					if v.bCriticalStrike then
 						fScale = math.max(fScale * 0.7, COMBAT_TEXT_SCALE.NORMAL[#COMBAT_TEXT_SCALE.NORMAL] + 0.1)
 					end
@@ -672,7 +682,7 @@ function CombatText.GetTrajectory(dwTargetID, bCriticalStrike)
 	return nSort, szPoint
 end
 
-function CombatText.CreateText(shadow, dwTargetID, szText, szPoint, nType, bCriticalStrike, col)
+function CombatText.CreateText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike, col)
 	local object, tPoint
 	local bIsPlayer = IsPlayer(dwTargetID)
 	if dwTargetID ~= COMBAT_TEXT_PLAYERID then
@@ -686,7 +696,7 @@ function CombatText.CreateText(shadow, dwTargetID, szText, szPoint, nType, bCrit
 		nSort           = 0,
 		dwTargetID      = dwTargetID,
 		szText          = szText,
-		nType           = nType,
+		eType           = eType,
 		nFrame          = 0,
 		bCriticalStrike = bCriticalStrike,
 		col             = col,
@@ -1344,24 +1354,29 @@ function PS.OnPanelActive(frame)
 	y = y + deltaY
 
 	x = nPaddingX + 10
-	local i = 0
-	for k, v in pairs(COMBAT_TEXT_TYPE_COLOR) do
-		if k ~= SKILL_RESULT_TYPE.EFFECTIVE_THERAPY then
-			ui:Append('Text', { x = x + (i % 8) * 65, y = y + 30 * math.floor(i / 8), text = _L['CombatText Color ' .. k], autoEnable = IsEnabled })
-			ui:Append('Shadow', {
-				x = x + (i % 8) * 65 + 35, y = y + 30 * math.floor(i / 8) + 8, color = v, w = 15, h = 15,
-				onClick = function()
-					local this = this
-					X.UI.OpenColorPicker(function(r, g, b)
-						O.col[k] = { r, g, b }
-						O.col = O.col
-						X.UI(this):Color(r, g, b)
-					end)
-				end,
-				autoEnable = IsEnabled,
-			})
-			i = i + 1
+	for _, k in ipairs(COMBAT_TEXT_TYPE_LIST) do
+		if x > W - 100 then
+			x = nPaddingX + 10
+			y = y + 30
 		end
+		ui:Append('Shadow', {
+			x = x, y = y + 8, color = D.col[k], w = 15, h = 15,
+			onClick = function()
+				local this = this
+				X.UI.OpenColorPicker(function(r, g, b)
+					O.col[k] = { r, g, b }
+					O.col = O.col
+					X.UI(this):Color(r, g, b)
+				end)
+			end,
+			autoEnable = IsEnabled,
+		})
+		x = x + 20
+		x = x + ui:Append('Text', {
+			x = x, y = y, w = 'auto',
+			text = _L['CombatText Color ' .. k],
+			autoEnable = IsEnabled,
+		}):Width() + 10
 	end
 
 	if IsFileExist(COMBAT_TEXT_CONFIG) then
