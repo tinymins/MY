@@ -173,7 +173,9 @@ local COMBAT_TEXT_POINT = {
 
 local COMBAT_TEXT_TYPE_COLOR = X.KvpToObject({
 	{'DAMAGE'                              , X.ENVIRONMENT.GAME_PROVIDER == 'remote' and { 253, 86, 86 } or { 255, 0, 0 }}, -- 自己受到的伤害
-	{SKILL_RESULT_TYPE.THERAPY             , { 0,   255, 0   }}, -- 治疗
+	{SKILL_RESULT_TYPE.THERAPY             , {   0, 255,   0 }}, -- 治疗
+	{SKILL_RESULT_TYPE.EFFECTIVE_THERAPY   , {   0, 255,   0 }}, -- 有效治疗
+	{SKILL_RESULT_TYPE.STEAL_LIFE          , {   0, 255,   0 }}, -- 吸血
 	{SKILL_RESULT_TYPE.PHYSICS_DAMAGE      , { 255, 255, 255 }}, -- 外功
 	{SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE  , { 255, 128, 128 }}, -- 阳
 	{SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE, { 255, 255, 0   }}, -- 混元
