@@ -308,6 +308,12 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bOtherCharacter = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
 	bCritical = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
@@ -366,16 +372,28 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 })
 local D = {}
 
+local function IsEnabled()
+	return D.bReady and O.bEnable
+end
+
+local function IsCombatTextPlayerID(...)
+	if O.bOtherCharacter then
+		return true
+	end
+	for i = 1, select('#', ...) do
+		if select(i, ...) == COMBAT_TEXT_PLAYERID then
+			return true
+		end
+	end
+	return false
+end
+
 function D.GetColor(eType, bCritical)
 	return (bCritical and O.bCritical)
 		and O.tCriticalColor[eType]
 		or O.tColor[eType]
 		or COMBAT_TEXT_COLOR[eType]
 		or { 255, 255, 255 }
-end
-
-local function IsEnabled()
-	return D.bReady and O.bEnable
 end
 
 function D.HideOfficialCombat()
@@ -452,17 +470,17 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'SKILL_BUFF' then
 		D.OnSkillBuff(arg0, arg1, arg2, arg3)
 	elseif szEvent == 'BUFF_IMMUNITY' then
-		if not O.bImmunity and arg1 == COMBAT_TEXT_PLAYERID then
+		if not O.bImmunity and IsCombatTextPlayerID(arg1) then
 			D.OnBuffImmunity(arg0)
 		end
 	elseif szEvent == 'SKILL_MISS' then
-		if arg0 == COMBAT_TEXT_PLAYERID or arg1 == COMBAT_TEXT_PLAYERID then
+		if IsCombatTextPlayerID(arg0, arg1) then
 			D.OnSkillMiss(arg1)
 		end
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateTrajectoryCount()
 	elseif szEvent == 'SKILL_DODGE' then
-		if arg0 == COMBAT_TEXT_PLAYERID or arg1 == COMBAT_TEXT_PLAYERID then
+		if IsCombatTextPlayerID(arg0, arg1) then
 			D.OnSkillDodge(arg1)
 		end
 	elseif szEvent == 'NPC_ENTER_SCENE' then
@@ -797,7 +815,9 @@ function D.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nSkillResultType
 			KEmployer = GetPlayer(dwEmployerID)
 		end
 	end
-	if dwCasterID ~= COMBAT_TEXT_PLAYERID and dwTargetID ~= COMBAT_TEXT_PLAYERID and dwEmployerID ~= COMBAT_TEXT_PLAYERID then -- 和我没什么卵关系
+	-- 过滤他人数据
+	if (dwCasterID ~= COMBAT_TEXT_PLAYERID and dwTargetID ~= COMBAT_TEXT_PLAYERID and dwEmployerID ~= COMBAT_TEXT_PLAYERID)
+	and not O.bOtherCharacter then
 		return
 	end
 	local shadow = D.GetFreeShadow()
@@ -926,7 +946,7 @@ end
 
 -- FireUIEvent('COMMON_HEALTH_TEXT', GetClientPlayer().dwID, -8888)
 function D.OnCommonHealth(dwCharacterID, nDeltaLife)
-	if nDeltaLife < 0 and dwCharacterID ~= COMBAT_TEXT_PLAYERID then
+	if nDeltaLife < 0 and not IsCombatTextPlayerID(dwCharacterID) then
 		return
 	end
 	local shadow = D.GetFreeShadow()
@@ -1077,35 +1097,47 @@ function PS.OnPanelActive(frame)
 	x = x + 10
 	y = y + nDeltaY + nChapterPaddingBottom
 
-	ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Enable combat text'], color = { 255, 128, 0 },
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Enable combat text'],
+		color = { 255, 128, 0 },
 		checked = O.bEnable,
 		onCheck = function(bCheck)
 			O.bEnable = bCheck
 			D.CheckEnable()
 		end,
-	})
-	x = x + 130
+	}):Width() + 5
 
-	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 200, text = _L['Enable render'],
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Enable render'],
 		checked = O.bRender,
 		onCheck = function(bCheck)
 			O.bRender = bCheck
 			D.CheckEnable()
 		end,
 		autoEnable = IsEnabled,
-	})
-	x = x + 170
+	}):Width() + 5
 
-	ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Disable immunity'],
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Disable immunity'],
 		checked = O.bImmunity,
 		onCheck = function(bCheck)
 			O.bImmunity = bCheck
 		end,
 		autoEnable = IsEnabled,
-	})
+	}):Width() + 5
+
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Only show my related combat text'],
+		checked = not O.bOtherCharacter,
+		onCheck = function(bCheck)
+			O.bOtherCharacter = not bCheck
+		end,
+		autoEnable = IsEnabled,
+	}):Width() + 5
 	y = y + nDeltaY
 
 	x = nPaddingX + 10

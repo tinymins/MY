@@ -42,6 +42,7 @@ return {
 	['Enable combat text'] = '启用战斗文字',
 	['Enable render'] = '使用渲染帧（平滑）',
 	['Disable immunity'] = '屏蔽免疫',
+	['Only show my related combat text'] = '仅显示与我有关的战斗文字',
 	['Hold time'] = '动画时间',
 	['Fade in time'] = '淡入时间',
 	['Fade out time'] = '淡出时间',
