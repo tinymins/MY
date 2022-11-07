@@ -51,6 +51,18 @@ local O = X.CreateUserSettingsModule('MY_CombatLogs', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bTargetLocation = { -- 保存角色坐标数据
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamTools'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nTargetLocationThrottle = { -- 保存角色坐标数据节流时间间隔
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamTools'],
+		xSchema = X.Schema.Number,
+		xDefaultValue = 200,
+	},
 })
 local D = {}
 local DS_ROOT = {'userdata/combat_logs/', X.PATH_TYPE.ROLE}
@@ -66,6 +78,7 @@ local LOG_TARGET_INFO_TIME_LIMIT = 10000 -- 目标信息再次记录最小时间间隔
 local LOG_DOODAD_INFO_TIME = {} -- 交互物件信息记录时间
 local LOG_DOODAD_INFO_TIME_LIMIT = 10000 -- 交互物件信息再次记录最小时间间隔
 local LOG_NAMING_COUNT = {} -- 记录中NPC被提及的数量统计，用于命名记录文件
+local LOG_TARGET_LOCATION_TIME = {} -- 记录角色坐标节流器数据
 
 local LOG_REPLAY = {} -- 最近的数据 （进战时候将最近的数据压进来）
 local LOG_REPLAY_FRAME = X.ENVIRONMENT.GAME_FPS * 1 -- 进战时候将多久的数据压进来（逻辑帧）
@@ -157,6 +170,7 @@ function D.OpenCombatLogs()
 	LOG_CACHE = {}
 	LOG_TARGET_INFO_TIME = {}
 	LOG_DOODAD_INFO_TIME = {}
+	LOG_TARGET_LOCATION_TIME = {}
 	LOG_NAMING_COUNT = {}
 	LOG_CRC = 0
 	Log(LOG_FILE, '', 'clear')
@@ -384,6 +398,12 @@ function D.OnDoodadUpdate(dwID, bForce)
 end
 
 function D.OnTargetLocationUpdate(dwType, dwID)
+	if not O.bTargetLocation then
+		return
+	end
+	if LOG_TARGET_LOCATION_TIME[dwID] and GetTime() - LOG_TARGET_LOCATION_TIME[dwID] < O.nTargetLocationThrottle then
+		return
+	end
 	local tar
 	if dwType == TARGET.PLAYER then
 		tar = GetPlayer(dwID)
@@ -395,6 +415,7 @@ function D.OnTargetLocationUpdate(dwType, dwID)
 	if tar then
 		D.InsertLog(LOG_TYPE.TARGET_LOCATION, { dwType, dwID, tar.nX, tar.nY, tar.nZ, tar.nFaceDirection })
 	end
+	LOG_TARGET_LOCATION_TIME[dwID] = GetTime() -- 忽略 doodad 与 player 的 id 冲突，为了性能，一般也不会冲突
 end
 
 -- 系统日志监控（数据源）
@@ -725,6 +746,22 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 					MY_CombatLogs.bNearbyAll = not MY_CombatLogs.bNearbyAll
 				end,
 			})
+			table.insert(menu, {
+				szOption = _L['PVP mode'],
+				bCheck = true,
+				bChecked = MY_CombatLogs.bTargetLocation,
+				fnAction = function()
+					MY_CombatLogs.bTargetLocation = not MY_CombatLogs.bTargetLocation
+				end,
+				fnMouseEnter = function()
+					local nX, nY = this:GetAbsX(), this:GetAbsY()
+					local nW, nH = this:GetW(), this:GetH()
+					OutputTip(GetFormatText(_L['Save target location on event'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
+				end,
+				fnMouseLeave = function()
+					HideTip()
+				end,
+			})
 			local m0 = { szOption = _L['Max history'] }
 			for _, i in ipairs({10, 20, 30, 50, 100, 200, 300, 500, 1000, 2000, 5000}) do
 				table.insert(m0, {
@@ -799,11 +836,15 @@ local settings = {
 				'nMinFightTime',
 				'bOnlyDungeon',
 				'bNearbyAll',
+				'bTargetLocation',
+				'nTargetLocationThrottle',
 			},
 			triggers = {
-				bEnable      = D.UpdateEnable,
-				bOnlyDungeon = D.UpdateEnable,
-				bNearbyAll   = D.UpdateEnable,
+				bEnable                 = D.UpdateEnable,
+				bOnlyDungeon            = D.UpdateEnable,
+				bNearbyAll              = D.UpdateEnable,
+				bTargetLocation         = D.UpdateEnable,
+				nTargetLocationThrottle = D.UpdateEnable,
 			},
 			root = O,
 		},
