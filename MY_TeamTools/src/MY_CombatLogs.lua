@@ -311,7 +311,7 @@ function D.OnTargetUpdate(dwID, bForce)
 		end
 		LOG_NAMING_COUNT[dwID].nCount = LOG_NAMING_COUNT[dwID].nCount + 1
 	end
-	if not bForce and LOG_TARGET_INFO_TIME[dwID] and LOG_TARGET_INFO_TIME[dwID] - GetTime() < LOG_TARGET_INFO_TIME_LIMIT then
+	if not bForce and LOG_TARGET_INFO_TIME[dwID] and GetTime() - LOG_TARGET_INFO_TIME[dwID] < LOG_TARGET_INFO_TIME_LIMIT then
 		D.OnTargetLocationUpdate(bIsPlayer and TARGET.PLAYER or TARGET.NPC, dwID)
 		return
 	end
@@ -386,7 +386,7 @@ end
 
 -- 保存交互物件信息
 function D.OnDoodadUpdate(dwID, bForce)
-	if not bForce and LOG_DOODAD_INFO_TIME[dwID] and LOG_DOODAD_INFO_TIME[dwID] - GetTime() < LOG_DOODAD_INFO_TIME_LIMIT then
+	if not bForce and LOG_DOODAD_INFO_TIME[dwID] and GetTime() - LOG_DOODAD_INFO_TIME[dwID] < LOG_DOODAD_INFO_TIME_LIMIT then
 		return
 	end
 	local doodad = GetDoodad(dwID)
