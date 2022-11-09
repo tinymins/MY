@@ -756,7 +756,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 				fnMouseEnter = function()
 					local nX, nY = this:GetAbsX(), this:GetAbsY()
 					local nW, nH = this:GetW(), this:GetH()
-					OutputTip(GetFormatText(_L['Save target location on event'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
+					OutputTip(GetFormatText(_L['Save target location on event'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.TOP_BOTTOM)
 				end,
 				fnMouseLeave = function()
 					HideTip()
