@@ -27,7 +27,8 @@ local O = X.CreateUserSettingsModule('MY_Force', _L['Target'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		szVersion = '20221109',
+		xDefaultValue = false,
 	},
 	bMarkPet = { -- 五毒宠物标记
 		ePathType = X.PATH_TYPE.ROLE,
