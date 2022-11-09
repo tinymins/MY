@@ -213,7 +213,7 @@ return {
     ['MY_CombatLogs'] = '战斗事件记录',
     ['Only in dungeon'] = '仅在秘境中启用',
     ['Save all nearby records'] = '保存附近所有角色事件记录',
-	['PVP mode'] = '启用角色对抗模式',
+	['PVP mode'] = '角色对抗模式',
     ['Save target location on event'] = '记录各类事件发生时的角色坐标',
     ['Max history'] = '最大历史记录',
     ['Min fight time'] = '最小战斗时间',
