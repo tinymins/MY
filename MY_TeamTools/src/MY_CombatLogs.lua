@@ -824,6 +824,8 @@ local settings = {
 				'nMinFightTime',
 				'bOnlyDungeon',
 				'bNearbyAll',
+				'bTargetLocation',
+				'nTargetLocationThrottle',
 			},
 			root = O,
 		},
