@@ -4,7 +4,7 @@ return {
 
 	['Combat text config loaded.'] = '战斗文字配置加载完成。',
 	['Combat text config failed.'] = '战斗文字配置加载失败。',
-	['[MY] Same time combat text reach limit %d, please check server script.'] = '[MY] 同屏战斗文字已抵达上限%d个，建议检查服务端脚本是不是给外包乱写了，卡成PPT不要甩锅给界面组。',
+	['[MY] Same time combat text reach limit %d, please check server script.'] = '[MY] 同屏战斗文字已抵达上限%d个，请检查服务端脚本是否存在逻辑异常，过多的战斗日志可能导致客户端响应缓慢。',
 
 	COMBAT_TEXT_TYPE_NAME = {
 		DAMAGE               = '受伤',
