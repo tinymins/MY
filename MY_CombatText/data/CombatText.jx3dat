@@ -1,0 +1,177 @@
+-- 编辑器支持的话可以高亮成LUA文件看。
+-- 在本文件中可以修改一些游戏内没有列出的配置，例如文字轨迹等。
+
+-- 本文件只是作为参考，实际使用请把本文件复制一份到以下位置后再做修改：
+-- 点击插件主界面“配置存储”按钮，选择“全局数据”，然后进入 config 文件夹，将该配置文件复制进去，例如：
+-- 重制版： interface/MY#DATA/!all-users@zhcn/config/CombatText.jx3dat
+-- 国际版： interface/MY#DATA/!all-users@zhtw/config/CombatText.jx3dat （注：需要转为 UTF-8 编码）
+-- 缘起版： interface/MY#DATA/!all-users@classic_yq/config/CombatText.jx3dat
+
+-- 在游戏内重新打开伤害样式设置界面，点击右上角载入配置可直接刷新本文件。
+-- 以下local定义不要去修改，只是作为注解和枚举。
+-- 不要改本文件，本文件只是做参考，而且每次插件更新会覆盖。
+-- 修改教程 详见 https://www.bilibili.com/video/av3409345 （部分参数可能已变更，以该文件为准）
+-- 修改后 会心样式将失效 可以选择删除 COMBAT_TEXT_SCALE 重新使样式生效
+
+local COMBAT_TEXT_TYPE = {
+	DAMAGE               = 'DAMAGE'              , -- 受伤
+
+	THERAPY              = 'THERAPY'             , -- 治疗
+	EFFECTIVE_THERAPY    = 'EFFECTIVE_THERAPY'   , -- 有效治疗
+	STEAL_LIFE           = 'STEAL_LIFE'          , -- 偷取气血
+
+	PHYSICS_DAMAGE       = 'PHYSICS_DAMAGE'      , -- 外功伤害
+	SOLAR_MAGIC_DAMAGE   = 'SOLAR_MAGIC_DAMAGE'  , -- 阳性内功伤害
+	NEUTRAL_MAGIC_DAMAGE = 'NEUTRAL_MAGIC_DAMAGE', -- 混元性内功伤害
+	LUNAR_MAGIC_DAMAGE   = 'LUNAR_MAGIC_DAMAGE'  , -- 阴性内功伤害
+	POISON_DAMAGE        = 'POISON_DAMAGE'       , -- 毒性伤害
+	REFLECTED_DAMAGE     = 'REFLECTED_DAMAGE'    , -- 反弹伤害
+	SPIRIT               = 'SPIRIT'              , -- 精神
+	STAYING_POWER        = 'STAYING_POWER'       , -- 耐力
+
+	SHIELD_DAMAGE        = 'SHIELD_DAMAGE'       , -- 无效伤害
+	ABSORB_DAMAGE        = 'ABSORB_DAMAGE'       , -- 化解伤害
+	PARRY_DAMAGE         = 'PARRY_DAMAGE'        , -- 拆招/招架
+	INSIGHT_DAMAGE       = 'INSIGHT_DAMAGE'      , -- 识破
+
+	SKILL_BUFF           = 'SKILL_BUFF'          , -- 增益效果
+	SKILL_DEBUFF         = 'SKILL_DEBUFF'        , -- 减益效果
+	SKILL_MISS           = 'SKILL_MISS'          , -- 招式偏离
+	BUFF_IMMUNITY        = 'BUFF_IMMUNITY'       , -- 免疫气劲
+	SKILL_DODGE          = 'SKILL_DODGE'         , -- 招式闪避
+	EXP                  = 'EXP'                 , -- 角色经验
+	MSG                  = 'MSG'                 , -- 普通消息
+	CRITICAL_MSG         = 'CRITICAL_MSG'        , -- 重要消息
+}
+
+-- 从这里开始可以修改了
+return {
+	-- 需要会心和放大的类型
+	COMBAT_TEXT_CRITICAL = {
+		[COMBAT_TEXT_TYPE.THERAPY             ] = true,
+		[COMBAT_TEXT_TYPE.EFFECTIVE_THERAPY   ] = true,
+		[COMBAT_TEXT_TYPE.STEAL_LIFE          ] = true,
+		[COMBAT_TEXT_TYPE.PHYSICS_DAMAGE      ] = true,
+		[COMBAT_TEXT_TYPE.SOLAR_MAGIC_DAMAGE  ] = true,
+		[COMBAT_TEXT_TYPE.NEUTRAL_MAGIC_DAMAGE] = true,
+		[COMBAT_TEXT_TYPE.LUNAR_MAGIC_DAMAGE  ] = true,
+		[COMBAT_TEXT_TYPE.POISON_DAMAGE       ] = true,
+		[COMBAT_TEXT_TYPE.REFLECTED_DAMAGE    ] = true,
+		[COMBAT_TEXT_TYPE.EXP                 ] = true,
+		[COMBAT_TEXT_TYPE.CRITICAL_MSG        ] = true,
+	},
+	-- 各种伤害的缩放帧数 一共32个关键帧 后面是延长帧
+	COMBAT_TEXT_SCALE = {
+		CRITICAL = { -- 会心
+			2, 4.5, 2, 2, 2, 2, 2, 2,
+			2, 2, 2, 2, 2, 2, 2, 2,
+			2, 2, 2, 2, 2, 2, 2, 2,
+			2, 2, 2, 2, 2, 2, 2, 2,
+			2, 2, 2, 2, 2, 2, 2, 2,
+			2, 2, 2, 2, 2, 2, 2, 2,
+		},
+		NORMAL = { -- 普通伤害
+			1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5,
+			1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5,
+			1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5,
+			1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5,
+			1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5,
+			1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5,
+		},
+	},
+	-- 伤害位置移动 当然可以负数
+	COMBAT_TEXT_POINT = {
+		TOP = { -- 伤害 往上的 分四组 普通 慢 慢 快~~
+			0,   6,   12,  18,  24,  30,  36,  42,
+			45,  48,  51,  54,  57,  60,  63,  66,
+			69,  72,  75,  78,  81,  84,  87,  90,
+			100, 110, 120, 130, 140, 150, 160, 170,
+		},
+		RIGHT = { -- 从左往右的
+			8,   16,  24,  32,  40,  48,  56,  64,
+			72,  80,  88,  96,  104, 112, 120, 128,
+			136, 136, 136, 136, 136, 136, 136, 136,
+			136, 136, 136, 136, 136, 136, 136, 136,
+			139, 142, 145, 148, 151, 154, 157, 160,
+			163, 166, 169, 172, 175, 178, 181, 184,
+		},
+		LEFT = { -- 从右到左
+			8,   16,  24,  32,  40,  48,  56,  64,
+			72,  80,  88,  96,  104, 112, 120, 128,
+			136, 136, 136, 136, 136, 136, 136, 136,
+			136, 136, 136, 136, 136, 136, 136, 136,
+			139, 142, 145, 148, 151, 154, 157, 160,
+			163, 166, 169, 172, 175, 178, 181, 184,
+		},
+		BOTTOM_LEFT = { -- 左下角
+			5,   10,  15,  20,  25,  30,  35,  40,
+			45,  50,  55,  60,  65,  70,  75,  80,
+			80,  80,  80,  80,  80,  80,  80,  80,
+			80,  80,  80,  80,  80,  80,  80,  80,
+			82,  84,  86,  88,  90,  92,  94,  96,
+			98,  100, 102, 104, 106, 108, 110, 112,
+		},
+		BOTTOM_RIGHT = {
+			5,   10,  15,  20,  25,  30,  35,  40,
+			45,  50,  55,  60,  65,  70,  75,  80,
+			80,  80,  80,  80,  80,  80,  80,  80,
+			80,  80,  80,  80,  80,  80,  80,  80,
+			82,  84,  86,  88,  90,  92,  94,  96,
+			98,  100, 102, 104, 106, 108, 110, 112,
+		},
+	},
+	-- 用于屏蔽事件，比如不需要BUFF可以删除 SKILL_BUFF
+	COMBAT_TEXT_EVENT = {
+		"COMMON_HEALTH_TEXT",
+		"SKILL_EFFECT_TEXT",
+		"SKILL_MISS",
+		"SKILL_DODGE",
+		"SKILL_BUFF",
+		"BUFF_IMMUNITY",
+	},
+	-- 忽略不显示的招式 ID可以在团队监控近期招式记录找 普通攻击也是个招式
+	COMBAT_TEXT_SKILL_IGNORE = {
+		-- [16]   = true, -- XX普通攻击
+		-- [4326] = true, -- 明教普通攻击
+		-- 其他自己找了 都注解了 需要无视自己去掉 但是小心仙侣老3害人
+	},
+	-- 忽略自身施展的部分类型 明教可以忽略外功伤害 也可以忽略吸血
+	COMBAT_TEXT_SKILL_TYPE_IGNORE = {
+		-- [COMBAT_TEXT_TYPE.STEAL_LIFE] = true,
+	},
+	-- 各种类型战斗文字的配色
+	COMBAT_TEXT_COLOR = {
+		-- 受伤
+		[COMBAT_TEXT_TYPE.DAMAGE              ] = { 253,  86,  86 }, -- 受伤 自己受到的伤害
+		-- 治疗
+		[COMBAT_TEXT_TYPE.THERAPY             ] = {   0, 255,   0 }, -- 治疗
+		[COMBAT_TEXT_TYPE.EFFECTIVE_THERAPY   ] = {   0, 255,   0 }, -- 有效治疗
+		[COMBAT_TEXT_TYPE.STEAL_LIFE          ] = {   0, 255,   0 }, -- 偷取气血
+		-- 招式
+		[COMBAT_TEXT_TYPE.PHYSICS_DAMAGE      ] = { 255, 255, 255 }, -- 外功攻击
+		[COMBAT_TEXT_TYPE.SOLAR_MAGIC_DAMAGE  ] = { 255, 128, 128 }, -- 阳性攻击
+		[COMBAT_TEXT_TYPE.NEUTRAL_MAGIC_DAMAGE] = { 255, 255,   0 }, -- 混元攻击
+		[COMBAT_TEXT_TYPE.LUNAR_MAGIC_DAMAGE  ] = {  12, 242, 255 }, -- 阴性攻击
+		[COMBAT_TEXT_TYPE.POISON_DAMAGE       ] = { 128, 255, 128 }, -- 毒性攻击
+		[COMBAT_TEXT_TYPE.REFLECTED_DAMAGE    ] = { 255, 128, 128 }, -- 反弹伤害
+		[COMBAT_TEXT_TYPE.SPIRIT              ] = { 160,   0, 160 }, -- 精神
+		[COMBAT_TEXT_TYPE.STAYING_POWER       ] = { 255, 169,   0 }, -- 耐力
+
+		[COMBAT_TEXT_TYPE.SHIELD_DAMAGE       ] = { 255, 255,   0 },
+		[COMBAT_TEXT_TYPE.ABSORB_DAMAGE       ] = { 255, 255,   0 },
+		[COMBAT_TEXT_TYPE.PARRY_DAMAGE        ] = { 255, 255,   0 },
+		[COMBAT_TEXT_TYPE.INSIGHT_DAMAGE      ] = { 255, 255,   0 },
+
+		[COMBAT_TEXT_TYPE.SKILL_BUFF          ] = { 255, 255,   0 },
+		[COMBAT_TEXT_TYPE.SKILL_DEBUFF        ] = { 255,   0,   0 },
+		[COMBAT_TEXT_TYPE.SKILL_MISS          ] = { 255, 255, 255 },
+		[COMBAT_TEXT_TYPE.BUFF_IMMUNITY       ] = { 255, 255, 255 },
+		[COMBAT_TEXT_TYPE.SKILL_DODGE         ] = { 255,   0,   0 },
+
+		[COMBAT_TEXT_TYPE.EXP                 ] = { 255,   0, 255 },
+		[COMBAT_TEXT_TYPE.MSG                 ] = { 255, 255,   0 },
+		[COMBAT_TEXT_TYPE.CRITICAL_MSG        ] = { 255,   0,   0 },
+	},
+	-- 各种类型战斗文字会心时的配色，默认为空即与普通保持一致
+	COMBAT_TEXT_CRITICAL_COLOR = {},
+}
