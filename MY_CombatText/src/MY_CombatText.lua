@@ -730,7 +730,7 @@ function D.GetTrajectory(dwTargetID, bCriticalStrike)
 	return nSort, szPoint
 end
 
-function D.CreateText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike)
+function D.CreateColorText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike, tCol)
 	local object, tPoint
 	local bIsPlayer = IsPlayer(dwTargetID)
 	if dwTargetID ~= COMBAT_TEXT_PLAYERID then
@@ -747,7 +747,7 @@ function D.CreateText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrik
 		eType           = eType,
 		nFrame          = 0,
 		bCriticalStrike = bCriticalStrike,
-		col             = D.GetColor(eType, bCriticalStrike),
+		col             = tCol or D.GetColor(eType, bCriticalStrike),
 		object          = object,
 		tPoint          = tPoint,
 	}
@@ -763,6 +763,10 @@ function D.CreateText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrik
 		COMBAT_TEXT_QUEUE[szPoint][dwTargetID] = COMBAT_TEXT_QUEUE[szPoint][dwTargetID] or {}
 		table.insert(COMBAT_TEXT_QUEUE[szPoint][dwTargetID], { shadow = shadow, dat = dat })
 	end
+end
+
+function D.CreateText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike)
+	return D.CreateColorText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike)
 end
 
 local SKILL_RESULT_TYPE_TO_COMBAT_TEXT_TYPE = X.KvpToObject({
@@ -982,12 +986,17 @@ function D.OnExpLog(dwCharacterID, nExp)
 	D.CreateText(shadow, dwCharacterID, g_tStrings.STR_COMBATMSG_EXP .. nExp, 'CENTER', COMBAT_TEXT_TYPE.EXP, true)
 end
 
-function D.OnCenterMsg(szText, bCritical, tCol)
+function D.CreateMessage(szText, tOptions)
 	local shadow = D.GetFreeShadow()
 	if not shadow then -- 没有空闲的shadow
 		return
 	end
-	D.CreateText(shadow, COMBAT_TEXT_PLAYERID, szText, 'CENTER', bCritical and COMBAT_TEXT_TYPE.CRITICAL_MSG or COMBAT_TEXT_TYPE.MSG, bCritical)
+	local dwTargetID = tOptions.dwTargetID or COMBAT_TEXT_PLAYERID
+	local szPosition = tOptions.szPosition or 'CENTER'
+	local bCritical = tOptions.bCritical or false
+	local eType = bCritical and COMBAT_TEXT_TYPE.CRITICAL_MSG or COMBAT_TEXT_TYPE.MSG
+	local tColor = tOptions.tColor
+	D.CreateColorText(shadow, dwTargetID, szText, szPosition, eType, bCritical, tColor)
 end
 
 function D.GetFreeShadow()
@@ -1074,8 +1083,11 @@ local settings = {
 	name = 'MY_CombatText',
 	exports = {
 		{
-			root = D,
 			preset = 'UIEvent',
+			fields = {
+				'CreateMessage',
+			},
+			root = D,
 		},
 	},
 }
@@ -1535,9 +1547,6 @@ X.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) 
 X.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
 X.RegisterEvent('ON_PVP_SHOW_SELECT_PLAYER', 'MY_CombatText', function()
 	COMBAT_TEXT_PLAYERID = arg0
-end)
-X.RegisterEvent('MY_COMBATTEXT_MSG', 'MY_CombatText', function()
-	D.OnCenterMsg(arg0, arg1, arg2)
 end)
 X.RegisterEvent('FIRST_LOADING_END', 'MY_CombatText', D.CheckEnable)
 
