@@ -44,7 +44,7 @@ local COMBAT_TEXT_PLAYERID       = 0
 local COMBAT_TEXT_TOTAL          = 32
 local COMBAT_TEXT_UI_SCALE       = 1
 local COMBAT_TEXT_TRAJECTORY     = 4   -- 顶部Y轴轨迹数量 根据缩放大小变化 0.8就是5条了 屏幕小更多
-local COMBAT_TEXT_MAX_COUNT      = 100 -- 最多同屏显示100个 再多部分机器吃不消了
+local COMBAT_TEXT_MAX_COUNT      = 150 -- 最多同屏显示150个 再多部分机器吃不消了
 
 local COMBAT_TEXT_TYPE = {
 	DAMAGE               = 'DAMAGE'              ,
