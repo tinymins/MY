@@ -289,7 +289,7 @@ return {
     ['[%s] disabled ui config sync, unable to read data.'] = '[%s] 禁用了界面常規設置同步，無法讀取數據！',
     ['Failed to attach love, light firework failed.'] = '煙花未能成功燃放，結緣失敗。',
 	['Warm tip: Your {$type} lover [{$name}] online, hurry doing needy doing.'] = '溫馨提醒：你的{$type}情緣[{$name}]上線啦，該幹嘛趕緊幹嘛。',
-	['Love tip: %s onlines now'] = '情緣提示：%s上線了',
+	['Love tip: %s is online now'] = '情緣提示：%s上線了',
 	['Warm tip: Your {$type} lover [{$name}] offline, hurry doing like doing.'] = '溫馨提醒：你的{$type}情緣[{$name}]下線咧，想幹嘛趕緊幹嘛。',
 	['Heart lover'] = '心動情緣',
 	['No lover :-('] = '還木有情緣呢 :-(',

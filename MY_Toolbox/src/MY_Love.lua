@@ -1013,7 +1013,10 @@ local function OnPlayerFellowshipLogin()
 	end
 	if not arg2 and arg1 == D.lover.szName and D.lover.szName ~= '' then
 		if arg0 then
-			FireUIEvent('MY_COMBATTEXT_MSG', _L('Love tip: %s onlines now', D.lover.szName), true, { 255, 0, 255 })
+			X.SafeCall(MY_CombatText.CreateMessage, _L('Love tip: %s is online now', D.lover.szName), {
+				bCritical = true,
+				tColor = { 255, 0, 255 },
+			})
 			PlaySound(SOUND.UI_SOUND, g_sound.LevelUp)
 			D.OutputLoverMsg(D.FormatLoverString(_L('Warm tip: Your {$type} lover [{$name}] online, hurry doing needy doing.'), D.lover))
 		else
