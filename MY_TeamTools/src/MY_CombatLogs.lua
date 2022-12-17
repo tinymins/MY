@@ -51,13 +51,13 @@ local O = X.CreateUserSettingsModule('MY_CombatLogs', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
-	bTargetLocation = { -- 保存角色坐标数据
+	bTargetInformation = { -- 保存角色状态数据
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
-	nTargetLocationThrottle = { -- 保存角色坐标数据节流时间间隔
+	nTargetInformationThrottle = { -- 保存角色状态数据节流时间间隔
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
 		xSchema = X.Schema.Number,
@@ -68,6 +68,8 @@ local D = {}
 local DS_ROOT = {'userdata/combat_logs/', X.PATH_TYPE.ROLE}
 
 local LOG_ENABLE = false -- 计算出来的总开关，按条件随时重算
+local LOG_TARGET_INFORMATION_ENABLE = false -- 计算出来的目标状态记录开关，按条件随时重算
+local LOG_TARGET_INFORMATION_THROTTLE = 0 -- 计算出来的目标状态记录限流，按条件随时重算
 local LOG_TIME = 0
 local LOG_FILE -- 当前日志文件，处于存盘模式，即处于逻辑战斗状态时不为空
 local LOG_CACHE = {} -- 尚未存盘的数据（降低磁盘压力）
@@ -112,7 +114,7 @@ local LOG_TYPE = {
 	SYS_MSG_UI_OME_SKILL_DODGE_LOG        = 26, -- 技能被闪避日志
 	SYS_MSG_UI_OME_COMMON_HEALTH_LOG      = 27, -- 普通治疗日志
 	SYS_MSG_UI_OME_DEATH_NOTIFY           = 28, -- 死亡日志
-	TARGET_LOCATION                       = 29, -- 目标坐标信息
+	TARGET_INFORMATION                    = 29, -- 目标状态信息
 }
 
 -- 更新启用状态
@@ -124,6 +126,11 @@ function D.UpdateEnable()
 		D.OpenCombatLogs()
 	end
 	LOG_ENABLE = bEnable
+	LOG_TARGET_INFORMATION_ENABLE = false
+	if bEnable and O.bTargetInformation and X.IsInArena() then
+		LOG_TARGET_INFORMATION_ENABLE = true
+	end
+	LOG_TARGET_INFORMATION_THROTTLE = O.nTargetInformationThrottle
 end
 X.RegisterEvent('LOADING_ENDING', D.UpdateEnable)
 
@@ -312,7 +319,7 @@ function D.OnTargetUpdate(dwID, bForce)
 		LOG_NAMING_COUNT[dwID].nCount = LOG_NAMING_COUNT[dwID].nCount + 1
 	end
 	if not bForce and LOG_TARGET_INFO_TIME[dwID] and GetTime() - LOG_TARGET_INFO_TIME[dwID] < LOG_TARGET_INFO_TIME_LIMIT then
-		D.OnTargetLocationUpdate(bIsPlayer and TARGET.PLAYER or TARGET.NPC, dwID)
+		D.OnTargetInformationUpdate(bIsPlayer and TARGET.PLAYER or TARGET.NPC, dwID)
 		return
 	end
 	if bIsPlayer then
@@ -371,7 +378,7 @@ function D.OnTargetUpdate(dwID, bForce)
 			end
 			OnGet()
 		end)
-		D.OnTargetLocationUpdate(TARGET.PLAYER, dwID)
+		D.OnTargetInformationUpdate(TARGET.PLAYER, dwID)
 	else
 		local npc = GetNpc(dwID)
 		if not npc then
@@ -397,11 +404,11 @@ function D.OnDoodadUpdate(dwID, bForce)
 	LOG_DOODAD_INFO_TIME[dwID] = GetTime()
 end
 
-function D.OnTargetLocationUpdate(dwType, dwID)
-	if not O.bTargetLocation then
+function D.OnTargetInformationUpdate(dwType, dwID)
+	if not LOG_TARGET_INFORMATION_ENABLE then
 		return
 	end
-	if LOG_TARGET_LOCATION_TIME[dwID] and GetTime() - LOG_TARGET_LOCATION_TIME[dwID] < O.nTargetLocationThrottle then
+	if LOG_TARGET_LOCATION_TIME[dwID] and GetTime() - LOG_TARGET_LOCATION_TIME[dwID] < LOG_TARGET_INFORMATION_THROTTLE then
 		return
 	end
 	local tar
@@ -413,7 +420,14 @@ function D.OnTargetLocationUpdate(dwType, dwID)
 		tar = GetDoodad(dwID)
 	end
 	if tar then
-		D.InsertLog(LOG_TYPE.TARGET_LOCATION, { dwType, dwID, tar.nX, tar.nY, tar.nZ, tar.nFaceDirection })
+		local nLife, nMaxLife = X.GetObjectLife(tar)
+		local nMana, nMaxMana = X.GetObjectMana(tar)
+		local nDamageAbsorbValue = tar.nDamageAbsorbValue
+		D.InsertLog(LOG_TYPE.TARGET_INFORMATION, {
+			dwType, dwID,
+			tar.nX, tar.nY, tar.nZ, tar.nFaceDirection,
+			nLife, nMaxLife, nMana, nMaxMana, nDamageAbsorbValue,
+		})
 	end
 	LOG_TARGET_LOCATION_TIME[dwID] = GetTime() -- 忽略 doodad 与 player 的 id 冲突，为了性能，一般也不会冲突
 end
@@ -749,9 +763,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			table.insert(menu, {
 				szOption = _L['PVP mode'],
 				bCheck = true,
-				bChecked = MY_CombatLogs.bTargetLocation,
+				bChecked = MY_CombatLogs.bTargetInformation,
 				fnAction = function()
-					MY_CombatLogs.bTargetLocation = not MY_CombatLogs.bTargetLocation
+					MY_CombatLogs.bTargetInformation = not MY_CombatLogs.bTargetInformation
 				end,
 				fnMouseEnter = function()
 					local nX, nY = this:GetAbsX(), this:GetAbsY()
@@ -824,8 +838,8 @@ local settings = {
 				'nMinFightTime',
 				'bOnlyDungeon',
 				'bNearbyAll',
-				'bTargetLocation',
-				'nTargetLocationThrottle',
+				'bTargetInformation',
+				'nTargetInformationThrottle',
 			},
 			root = O,
 		},
@@ -838,15 +852,15 @@ local settings = {
 				'nMinFightTime',
 				'bOnlyDungeon',
 				'bNearbyAll',
-				'bTargetLocation',
-				'nTargetLocationThrottle',
+				'bTargetInformation',
+				'nTargetInformationThrottle',
 			},
 			triggers = {
 				bEnable                 = D.UpdateEnable,
 				bOnlyDungeon            = D.UpdateEnable,
 				bNearbyAll              = D.UpdateEnable,
-				bTargetLocation         = D.UpdateEnable,
-				nTargetLocationThrottle = D.UpdateEnable,
+				bTargetInformation         = D.UpdateEnable,
+				nTargetInformationThrottle = D.UpdateEnable,
 			},
 			root = O,
 		},
