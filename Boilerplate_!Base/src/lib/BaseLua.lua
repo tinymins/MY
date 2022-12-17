@@ -20,7 +20,7 @@ function X.Random(...)
 	while fValue == RANDOM_VALUE do
 		fValue = math.random()
 	end
-	local nArgs = select('#', ...) == 0
+	local nArgs = select('#', ...)
 	if nArgs == 0 or nArgs > 2 then
 		return fValue
 	end
