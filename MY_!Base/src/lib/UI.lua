@@ -3945,7 +3945,7 @@ function OO:Shake(xrange, yrange, maxspeed, time)
 					local x, y = ui:Pos()
 					x, y = x - xoffset, y - yoffset
 
-					xoffset = xoffset + math.random(xspeed > 0 and 0 or xspeed, xspeed > 0 and xspeed or 0)
+					xoffset = xoffset + X.Random(xspeed > 0 and 0 or xspeed, xspeed > 0 and xspeed or 0)
 					if xoffset < - xhalfrange then
 						xoffset = math.min(- xrange - xoffset, xhalfrange)
 						xspeed = - xspeed
@@ -3954,7 +3954,7 @@ function OO:Shake(xrange, yrange, maxspeed, time)
 						xspeed = - xspeed
 					end
 
-					yoffset = yoffset + math.random(yspeed > 0 and 0 or yspeed, yspeed > 0 and yspeed or 0)
+					yoffset = yoffset + X.Random(yspeed > 0 and 0 or yspeed, yspeed > 0 and yspeed or 0)
 					if yoffset < - yhalfrange then
 						yoffset =  math.min(- yrange - yoffset, yhalfrange)
 						yspeed = - yspeed

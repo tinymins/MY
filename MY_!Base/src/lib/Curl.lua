@@ -34,7 +34,7 @@ local AJAX_BRIDGE_PATH = X.PACKET_INFO.DATA_ROOT .. '#cache/curl/'
 local function CreateWebPageFrame()
 	local szRequestID, hFrame
 	repeat
-		szRequestID = ('%X%X'):format(GetTickCount(), math.floor(math.random() * 0xEFFF) + 0x1000)
+		szRequestID = ('%X%X'):format(GetTickCount(), X.Random(0x1000, 0xEFFF))
 	until not Station.Lookup(X.NSFormatString('Lowest/{$NS}RRWP_') .. szRequestID)
 	--[[#DEBUG BEGIN]]
 	X.Debug('CreateWebPageFrame: ' .. szRequestID, X.DEBUG_LEVEL.LOG)
@@ -355,7 +355,7 @@ function X.Ajax(settings)
 		end
 		-- create page
 		if not hFrame then
-			RequestID = ('%X_%X'):format(GetTickCount(), math.floor(math.random() * 65536))
+			RequestID = ('%X_%X'):format(GetTickCount(), X.Random(0x1000, 0xEFFF))
 			hFrame = Wnd.OpenWindow(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndWebCef.ini', X.NSFormatString('{$NS}RRWC_') .. RequestID)
 			hFrame:Hide()
 		end

@@ -6,6 +6,43 @@
 local X = MY
 --------------------------------------------------------------------------------
 
+local RANDOM_VALUE = nil
+-- 保证与上一次结果不同的随机函数，当传入上下限值时候不保证
+---@param nMin number @下限
+---@param nMax number @上限
+---@return number @随机结果
+function X.Random(...)
+	-- init
+	if not RANDOM_VALUE then
+		-- math.randomseed(os.clock() * math.random(os.time()))
+		math.randomseed(GetTickCount() * math.random(GetCurrentTime()))
+	end
+	-- do random
+	local fValue = math.random()
+	while fValue == RANDOM_VALUE do
+		X.Debug(
+			X.PACKET_INFO.NAME_SPACE,
+			'Random: math.random get same value: ' .. fValue
+				.. ', this is abnormal, you should be attention about this!',
+			X.DEBUG_LEVEL.ERROR
+		)
+		fValue = math.random()
+	end
+	RANDOM_VALUE = fValue
+	-- finalize
+	local nArgs = select('#', ...)
+	if nArgs == 0 or nArgs > 2 then
+		return fValue
+	end
+	local nMin, nMax = 1, 1
+	if nArgs == 1 then
+		nMin, nMax = 1, ...
+	elseif nArgs == 2 then
+		nMin, nMax = ...
+	end
+	return math.floor(fValue * (nMax - nMin)) + nMin
+end
+
 -- 获取调用栈
 ---@param str string @调用栈附加字符串
 ---@return string @完整调用栈

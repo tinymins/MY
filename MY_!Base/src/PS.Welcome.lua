@@ -245,37 +245,75 @@ function PS.OnPanelActive(wnd)
 		name = 'WndButton_AddonErrorMessage',
 		x = x, y = 405,
 		text = _L['Error message'],
-		tip = {
-			render = _L['Show error message'],
-			position = X.UI.TIP_POSITION.BOTTOM_TOP,
-		},
-		onClick = function()
+		menu = function()
+			local menu = {
+				{
+					szOption = _L['Show error message'],
+					tip = {
+						render = _L['Show error message, please commit it while report bugs'],
+						position = X.UI.TIP_POSITION.BOTTOM_TOP,
+					},
+					fnAction = function()
+						local szErrmsg = X.GetAddonErrorMessage()
+						local nErrmsgLen, nMaxLen = #szErrmsg, 1024
+						if nErrmsgLen == 0 then
+							X.Alert(_L['No error message found.'])
+							return
+						end
+						if nErrmsgLen > 300 then
+							szErrmsg = szErrmsg:sub(0, nMaxLen)
+								.. '\n========================================'
+								.. '\n' .. '... ' .. (nErrmsgLen - nMaxLen) .. ' char(s) omitted.'
+								.. '\n========================================'
+								.. '\n# Full error logs:'
+								.. '\n> ' .. X.GetAbsolutePath(X.GetAddonErrorMessageFilePath())
+								.. '\n========================================'
+						end
+						X.UI.OpenTextEditor(szErrmsg, { w = 800, h = 600, title = _L['Error message'] })
+						X.UI.ClosePopupMenu()
+					end,
+				},
+				{
+					szOption = _L['Open error message folder'],
+					fnAction = function()
+						X.OpenFolder(X.GetAbsolutePath(X.GetAddonErrorMessageFilePath()))
+						X.UI.ClosePopupMenu()
+					end,
+				},
+				{
+					szOption = _L['Open logs folder'],
+					fnAction = function()
+						X.OpenFolder(X.GetAbsolutePath(X.FormatPath({'logs/', X.PATH_TYPE.ROLE})))
+						X.UI.ClosePopupMenu()
+					end,
+				},
+				X.CONSTANT.MENU_DIVIDER,
+				{
+					szOption = _L['Report bugs'],
+					fnAction = function()
+						X.OpenBrowser(X.PACKET_INFO.AUTHOR_FEEDBACK_URL)
+						X.UI.ClosePopupMenu()
+					end,
+				},
+			}
 			if IsCtrlKeyDown() and IsAltKeyDown() and IsShiftKeyDown() then
-				X.IsDebugClient('Dev_LuaWatcher', true, true)
-				X.IsDebugClient('Dev_UIEditor', true, true)
-				X.IsDebugClient('Dev_UIManager', true, true)
-				X.IsDebugClient('Dev_UIFindStation', true, true)
-				X.IsDebugClient('Dev_DebugLogs', true, true)
-				X.Systopmsg(_L['Debug tools has been enabled...'])
-				X.ReopenPanel()
-				return
+				table.insert(menu, 1, {
+					szOption = _L['Enable debug tools'],
+					rgb = { 255, 128, 0 },
+					fnAction = function()
+						X.IsDebugClient('Dev_LuaWatcher', true, true)
+						X.IsDebugClient('Dev_UIEditor', true, true)
+						X.IsDebugClient('Dev_UIManager', true, true)
+						X.IsDebugClient('Dev_UIFindStation', true, true)
+						X.IsDebugClient('Dev_DebugLogs', true, true)
+						X.Systopmsg(_L['Debug tools has been enabled...'])
+						X.ReopenPanel()
+						X.UI.ClosePopupMenu()
+					end,
+				})
+				table.insert(menu, 2, X.CONSTANT.MENU_DIVIDER)
 			end
-			local szErrmsg = X.GetAddonErrorMessage()
-			local nErrmsgLen, nMaxLen = #szErrmsg, 1024
-			if nErrmsgLen == 0 then
-				X.Alert(_L['No error message found.'])
-				return
-			end
-			if nErrmsgLen > 300 then
-				szErrmsg = szErrmsg:sub(0, nMaxLen)
-					.. '\n========================================'
-					.. '\n' .. '... ' .. (nErrmsgLen - nMaxLen) .. ' char(s) omitted.'
-					.. '\n========================================'
-					.. '\n# Full error logs:'
-					.. '\n> ' .. X.GetAbsolutePath(X.GetAddonErrorMessageFilePath())
-					.. '\n========================================'
-			end
-			X.UI.OpenTextEditor(szErrmsg, { w = 800, h = 600, title = _L['Error message'] })
+			return menu
 		end,
 	}):AutoWidth():Width() + 5
 	PS.OnPanelResize(wnd)
