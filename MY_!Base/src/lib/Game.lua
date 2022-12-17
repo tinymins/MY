@@ -1234,6 +1234,14 @@ function X.GetObjectLife(obj)
 		X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and obj.fMaxLife64 or obj.nMaxLife
 end
 
+-- 获取目标内力和最大内力
+function X.GetObjectMana(obj)
+	if not obj then
+		return
+	end
+	return obj.nCurrentMana, obj.nMaxMana
+end
+
 -- 根据模板ID获取NPC真实名称
 local NPC_NAME_CACHE, DOODAD_NAME_CACHE = {}, {}
 function X.GetTemplateName(dwType, dwTemplateID)
