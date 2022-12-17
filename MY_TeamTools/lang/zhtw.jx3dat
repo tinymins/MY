@@ -214,6 +214,7 @@ return {
     ['Enable in dungeon'] = '在秘境中啟用',
     ['Enable in arena'] = '在名劍大會中啟用',
     ['Enable in battlefield'] = '在戰場中啟用',
+    ['Enable in other maps'] = '在其他地圖中啟用',
     ['Save all nearby records'] = '保存附近所有角色事件記錄',
 	['PVP mode'] = '角色對抗模式',
     ['Save target information on event\n(Only in arena)'] = '記錄各類事件發生時的角色坐標面向氣血內力等基礎信息（僅在名劍大會中生效）',

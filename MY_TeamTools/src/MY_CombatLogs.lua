@@ -57,6 +57,12 @@ local O = X.CreateUserSettingsModule('MY_CombatLogs', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bEnableInOtherMaps = { -- 在其他类型地图中启用
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamTools'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
 	bNearbyAll = { -- 保存附近所有角色事件记录
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
@@ -132,11 +138,17 @@ local LOG_TYPE = {
 -- 更新启用状态
 function D.UpdateEnable()
 	local bEnable = D.bReady and O.bEnable
-		and (
-			(O.bEnableInDungeon and X.IsInDungeon())
-			or (O.bEnableInArena and X.IsInArena())
-			or (O.bEnableInBattleField and X.IsInBattleField())
-		)
+	if bEnable then
+		if X.IsInDungeon() then
+			bEnable = O.bEnableInDungeon
+		elseif X.IsInArena() then
+			bEnable = O.bEnableInArena
+		elseif X.IsInBattleField() then
+			bEnable = O.bEnableInBattleField
+		else
+			bEnable = O.bEnableInOtherMaps
+		end
+	end
 	if not bEnable and LOG_ENABLE then
 		D.CloseCombatLogs()
 	elseif bEnable and not LOG_ENABLE and X.IsFighting() then
@@ -785,6 +797,14 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 					MY_CombatLogs.bEnableInBattleField = not MY_CombatLogs.bEnableInBattleField
 				end,
 			})
+			table.insert(menu, {
+				szOption = _L['Enable in other maps'],
+				bCheck = true,
+				bChecked = MY_CombatLogs.bEnableInOtherMaps,
+				fnAction = function()
+					MY_CombatLogs.bEnableInOtherMaps = not MY_CombatLogs.bEnableInOtherMaps
+				end,
+			})
 			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			table.insert(menu, {
 				szOption = _L['Save all nearby records'],
@@ -874,6 +894,7 @@ local settings = {
 				'bEnableInDungeon',
 				'bEnableInArena',
 				'bEnableInBattleField',
+				'bEnableInOtherMaps',
 				'bNearbyAll',
 				'bTargetInformation',
 				'nTargetInformationThrottle',
@@ -890,6 +911,7 @@ local settings = {
 				'bEnableInDungeon',
 				'bEnableInArena',
 				'bEnableInBattleField',
+				'bEnableInOtherMaps',
 				'bNearbyAll',
 				'bTargetInformation',
 				'nTargetInformationThrottle',
@@ -899,6 +921,7 @@ local settings = {
 				bEnableInDungeon           = D.UpdateEnable,
 				bEnableInArena             = D.UpdateEnable,
 				bEnableInBattleField       = D.UpdateEnable,
+				bEnableInOtherMaps         = D.UpdateEnable,
 				bNearbyAll                 = D.UpdateEnable,
 				bTargetInformation         = D.UpdateEnable,
 				nTargetInformationThrottle = D.UpdateEnable,
