@@ -1,4 +1,5 @@
 return {
+    ['MY_RoleStatistics'] = '角色统计',
     ['MY_RoleStatistics_RoleStat'] = '角色统计',
     ['%s stat has not been enabled, this character\'s data will not be saved, are you willing to save this character?\nYou can change this config by click option button on the top-right conner.'] = '%s尚未启用，该角色数据不会被统计并显示到列表中，是否要现在开启该角色的统计功能？\n选择后该提示不会再次出现，日后您可以在该界面右上角点击齿轮，随时再次修改此项配置。',
     ['%s stat float entry has not been enabled, are you willing to enable it?\nYou can change this config by click option button on the top-right conner.'] = '%s头像浮动入口尚未启用，无法快速查看该角色的统计信息，是否要现在开启浮动入口功能？\n选择后该提示不会再次出现，日后您可以在该界面右上角点击齿轮，随时再次修改此项配置。',
