@@ -12,14 +12,18 @@ local RANDOM_VALUE = nil
 ---@param nMax number @上限
 ---@return number @随机结果
 function X.Random(...)
+	-- init
 	if not RANDOM_VALUE then
 		-- math.randomseed(os.clock() * math.random(os.time()))
 		math.randomseed(GetTickCount() * math.random(GetCurrentTime()))
 	end
+	-- do random
 	local fValue = math.random()
 	while fValue == RANDOM_VALUE do
 		fValue = math.random()
 	end
+	RANDOM_VALUE = fValue
+	-- finalize
 	local nArgs = select('#', ...)
 	if nArgs == 0 or nArgs > 2 then
 		return fValue
