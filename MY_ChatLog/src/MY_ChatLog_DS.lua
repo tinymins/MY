@@ -86,7 +86,7 @@ end
 local function NewDB(szRoot, nMinTime, nMaxTime)
 	local szPath
 	repeat
-		szPath = szRoot .. ('chatlog_%x'):format(math.random(0x100000, 0xFFFFFF)) .. '.db'
+		szPath = szRoot .. ('chatlog_%x'):format(X.Random(0x100000, 0xFFFFFF)) .. '.db'
 	until not IsLocalFileExist(szPath)
 	local db = MY_ChatLog_DB(szPath)
 	db:SetMinTime(nMinTime)

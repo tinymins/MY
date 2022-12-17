@@ -186,7 +186,7 @@ function D.SortGuildBank()
 	-- 排序格子列表
 	if IsShiftKeyDown() then
 		for i = 1, #aInfo do
-			local j = math.random(1, #aInfo)
+			local j = X.Random(1, #aInfo)
 			if i ~= j then
 				aInfo[i], aInfo[j] = aInfo[j], aInfo[i]
 			end

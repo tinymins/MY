@@ -97,7 +97,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 		if szMode == 'manual' or nMethod ~= 1 then
 			DoUpload()
 		else
-			X.DelayCall(math.random(0, 10000), DoUpload)
+			X.DelayCall(X.Random(0, 10000), DoUpload)
 		end
 		-- if szMode == 'manual' then
 		-- 	DoUpload()

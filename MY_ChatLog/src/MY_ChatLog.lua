@@ -203,7 +203,7 @@ function D.ImportDB(szPath)
 					aRes = stmt:GetAll()
 					if #aRes > 0 then
 						repeat
-							szNewPath = szRoot .. ('chatlog_%x'):format(math.random(0x100000, 0xFFFFFF)) .. '.db'
+							szNewPath = szRoot .. ('chatlog_%x'):format(X.Random(0x100000, 0xFFFFFF)) .. '.db'
 						until not IsLocalFileExist(szNewPath)
 						dbNew = MY_ChatLog_DB(szNewPath)
 						dbNew:SetMinTime(aRes[1].time)
