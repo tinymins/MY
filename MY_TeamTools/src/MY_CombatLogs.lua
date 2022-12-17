@@ -39,11 +39,23 @@ local O = X.CreateUserSettingsModule('MY_CombatLogs', _L['Raid'], {
 		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},
-	bOnlyDungeon = { -- 仅在秘境中启用
+	bEnableInDungeon = { -- 在秘境中启用
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamTools'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
+	bEnableInArena = { -- 在名剑大会中启用
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
+	},
+	bEnableInBattleField = { -- 在战场中启用
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamTools'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
 	},
 	bNearbyAll = { -- 保存附近所有角色事件记录
 		ePathType = X.PATH_TYPE.ROLE,
@@ -119,7 +131,12 @@ local LOG_TYPE = {
 
 -- 更新启用状态
 function D.UpdateEnable()
-	local bEnable = D.bReady and O.bEnable and (not O.bOnlyDungeon or X.IsInDungeon())
+	local bEnable = D.bReady and O.bEnable
+		and (
+			(O.bEnableInDungeon and X.IsInDungeon())
+			or (O.bEnableInArena and X.IsInArena())
+			or (O.bEnableInBattleField and X.IsInBattleField())
+		)
 	if not bEnable and LOG_ENABLE then
 		D.CloseCombatLogs()
 	elseif bEnable and not LOG_ENABLE and X.IsFighting() then
@@ -745,13 +762,30 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		menu = function()
 			local menu = {}
 			table.insert(menu, {
-				szOption = _L['Only in dungeon'],
+				szOption = _L['Enable in dungeon'],
 				bCheck = true,
-				bChecked = MY_CombatLogs.bOnlyDungeon,
+				bChecked = MY_CombatLogs.bEnableInDungeon,
 				fnAction = function()
-					MY_CombatLogs.bOnlyDungeon = not MY_CombatLogs.bOnlyDungeon
+					MY_CombatLogs.bEnableInDungeon = not MY_CombatLogs.bEnableInDungeon
 				end,
 			})
+			table.insert(menu, {
+				szOption = _L['Enable in arena'],
+				bCheck = true,
+				bChecked = MY_CombatLogs.bEnableInArena,
+				fnAction = function()
+					MY_CombatLogs.bEnableInArena = not MY_CombatLogs.bEnableInArena
+				end,
+			})
+			table.insert(menu, {
+				szOption = _L['Enable in battlefield'],
+				bCheck = true,
+				bChecked = MY_CombatLogs.bEnableInBattleField,
+				fnAction = function()
+					MY_CombatLogs.bEnableInBattleField = not MY_CombatLogs.bEnableInBattleField
+				end,
+			})
+			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			table.insert(menu, {
 				szOption = _L['Save all nearby records'],
 				bCheck = true,
@@ -770,12 +804,13 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 				fnMouseEnter = function()
 					local nX, nY = this:GetAbsX(), this:GetAbsY()
 					local nW, nH = this:GetW(), this:GetH()
-					OutputTip(GetFormatText(_L['Save target location on event'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.TOP_BOTTOM)
+					OutputTip(GetFormatText(_L['Save target information on event\n(Only in arena)'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.TOP_BOTTOM)
 				end,
 				fnMouseLeave = function()
 					HideTip()
 				end,
 			})
+			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			local m0 = { szOption = _L['Max history'] }
 			for _, i in ipairs({10, 20, 30, 50, 100, 200, 300, 500, 1000, 2000, 5000}) do
 				table.insert(m0, {
@@ -836,7 +871,9 @@ local settings = {
 				'bEnable',
 				'nMaxHistory',
 				'nMinFightTime',
-				'bOnlyDungeon',
+				'bEnableInDungeon',
+				'bEnableInArena',
+				'bEnableInBattleField',
 				'bNearbyAll',
 				'bTargetInformation',
 				'nTargetInformationThrottle',
@@ -850,15 +887,19 @@ local settings = {
 				'bEnable',
 				'nMaxHistory',
 				'nMinFightTime',
-				'bOnlyDungeon',
+				'bEnableInDungeon',
+				'bEnableInArena',
+				'bEnableInBattleField',
 				'bNearbyAll',
 				'bTargetInformation',
 				'nTargetInformationThrottle',
 			},
 			triggers = {
-				bEnable                 = D.UpdateEnable,
-				bOnlyDungeon            = D.UpdateEnable,
-				bNearbyAll              = D.UpdateEnable,
+				bEnable                    = D.UpdateEnable,
+				bEnableInDungeon           = D.UpdateEnable,
+				bEnableInArena             = D.UpdateEnable,
+				bEnableInBattleField       = D.UpdateEnable,
+				bNearbyAll                 = D.UpdateEnable,
 				bTargetInformation         = D.UpdateEnable,
 				nTargetInformationThrottle = D.UpdateEnable,
 			},
