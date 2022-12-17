@@ -19,7 +19,15 @@ function X.Random(...)
 	end
 	-- do random
 	local fValue = math.random()
+	local nRetry = 0 --[[#DEBUG LINE]]
 	while fValue == RANDOM_VALUE do
+		--[[#DEBUG BEGIN]]
+		if nRetry > 20 then
+			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Random retried for ' .. nRetry .. ' times, but still get same value: ' .. fValue .. ', you should be attention about this!', X.DEBUG_LEVEL.ERROR)
+			break
+		end
+		nRetry = nRetry + 1
+		--[[#DEBUG END]]
 		fValue = math.random()
 	end
 	RANDOM_VALUE = fValue
