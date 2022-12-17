@@ -393,7 +393,7 @@ X.RegisterEvent('BUFF_UPDATE', function()
 		return
 	end
 	if arg0 == UI_GetClientPlayerID() and arg4 == 103 then
-		DelayCall(X.NSFormatString('{$NS}#ON_IDLE'), math.random(0, 10000), function()
+		DelayCall(X.NSFormatString('{$NS}#ON_IDLE'), X.Random(0, 10000), function()
 			local me = GetClientPlayer()
 			if me and me.GetBuff(103, 0) then
 				OnIdle()

@@ -6,14 +6,16 @@
 local X = Boilerplate
 --------------------------------------------------------------------------------
 
-math.randomseed(GetCurrentTime())
-
 local RANDOM_VALUE = nil
 -- 保证与上一次结果不同的随机函数，当传入上下限值时候不保证
 ---@param nMin number @下限
 ---@param nMax number @上限
 ---@return number @随机结果
 function X.Random(...)
+	if not RANDOM_VALUE then
+		-- math.randomseed(os.clock() * math.random(os.time()))
+		math.randomseed(GetTickCount() * math.random(GetCurrentTime()))
+	end
 	local fValue = math.random()
 	while fValue == RANDOM_VALUE do
 		fValue = math.random()

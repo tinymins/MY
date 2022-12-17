@@ -20,7 +20,7 @@ X.EncodeLUAData = _G.var2str
 ---@return any @反序列化后的数据
 X.DecodeLUAData = _G.str2var or function(szText)
 	local DECODE_ROOT = X.PACKET_INFO.DATA_ROOT .. '#cache/decode/'
-	local DECODE_PATH = DECODE_ROOT .. GetCurrentTime() .. GetTime() .. math.random(0, 999999) .. '.jx3dat'
+	local DECODE_PATH = DECODE_ROOT .. GetCurrentTime() .. GetTime() .. X.Random(1000000000, 9999999999) .. '.jx3dat'
 	CPath.MakeDir(DECODE_ROOT)
 	SaveDataToFile(szText, DECODE_PATH)
 	local data = LoadLUAData(DECODE_PATH)

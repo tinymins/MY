@@ -27,10 +27,6 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --]]
 
-local M = {}
------
-math.randomseed(GetCurrentTime())
-math.random()
 -----
 local function num2bs(num)
 	local _mod = math.mod
@@ -70,7 +66,7 @@ local function padbits(num,bits)
 end
 --
 local function getUUID()
-	local _rnd = math.random
+	local _rnd = X.Random
 	local _fmt = string.format
 	--
 	_rnd()
