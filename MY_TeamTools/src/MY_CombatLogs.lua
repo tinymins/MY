@@ -813,6 +813,14 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 				fnAction = function()
 					MY_CombatLogs.bNearbyAll = not MY_CombatLogs.bNearbyAll
 				end,
+				fnMouseEnter = function()
+					local nX, nY = this:GetAbsX(), this:GetAbsY()
+					local nW, nH = this:GetW(), this:GetH()
+					OutputTip(GetFormatText(_L['Check to save all nearby records, otherwise only save records related to me'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.TOP_BOTTOM)
+				end,
+				fnMouseLeave = function()
+					HideTip()
+				end,
 			})
 			table.insert(menu, {
 				szOption = _L['PVP mode'],

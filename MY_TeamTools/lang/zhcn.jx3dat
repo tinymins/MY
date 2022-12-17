@@ -211,15 +211,16 @@ return {
 
     -- MY_CombatLogs.lua
     ['MY_CombatLogs'] = '战斗事件记录',
-    ['Enable in dungeon'] = '在秘境中启用',
+    ['Enable in dungeon'] = '在秘境地图中启用',
     ['Enable in arena'] = '在名剑大会中启用',
-    ['Enable in battlefield'] = '在战场中启用',
+    ['Enable in battlefield'] = '在战场地图中启用',
     ['Enable in other maps'] = '在其他地图中启用',
-    ['Save all nearby records'] = '保存附近所有角色事件记录',
-	['PVP mode'] = '角色对抗模式',
+    ['Save all nearby records'] = '保存所有角色记录',
+    ['Check to save all nearby records, otherwise only save records related to me'] = '勾选则保存附近所有角色的事件记录，否则仅记录与自身有关的事件记录',
+	['PVP mode'] = '启用角色对抗模式',
     ['Save target information on event\n(Only in arena)'] = '记录各类事件发生时的角色坐标面向气血内力等基础信息（仅在名剑大会中生效）',
-    ['Max history'] = '最大历史记录',
-    ['Min fight time'] = '最小战斗时间',
+    ['Max history'] = '最大历史记录数量',
+    ['Min fight time'] = '最小战斗时间限制',
     ['%s second(s)'] = '%s秒',
-	['Show data files'] = '打开数据目录',
+	['Show data files'] = '打开数据所在目录',
 }
