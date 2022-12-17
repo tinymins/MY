@@ -6,6 +6,31 @@
 local X = Boilerplate
 --------------------------------------------------------------------------------
 
+math.randomseed(GetCurrentTime())
+
+local RANDOM_VALUE = nil
+-- 保证与上一次结果不同的随机函数，当传入上下限值时候不保证
+---@param nMin number @下限
+---@param nMax number @上限
+---@return number @随机结果
+function X.Random(...)
+	local fValue = math.random()
+	while fValue == RANDOM_VALUE do
+		fValue = math.random()
+	end
+	local nArgs = select('#', ...) == 0
+	if nArgs == 0 or nArgs > 2 then
+		return fValue
+	end
+	local nMin, nMax = 1, 1
+	if nArgs == 1 then
+		nMin, nMax = 1, ...
+	elseif nArgs == 2 then
+		nMin, nMax = ...
+	end
+	return math.floor(fValue * (nMax - nMin)) + nMin
+end
+
 -- 获取调用栈
 ---@param str string @调用栈附加字符串
 ---@return string @完整调用栈
