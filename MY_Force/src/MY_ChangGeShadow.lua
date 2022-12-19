@@ -126,8 +126,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				D.Apply()
 			end,
 			tip = {
-				render = function(self)
-					if not self:Enable() then
+				render = function()
+					if not X.UI(this):Enable() then
 						return _L['Changge force only']
 					end
 				end,
@@ -147,8 +147,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				D.Apply()
 			end,
 			tip = {
-				render = function(self)
-					if not self:Enable() then
+				render = function()
+					if not X.UI(this):Enable() then
 						return _L['Changge force only']
 					end
 				end,
@@ -168,8 +168,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				D.Apply()
 			end,
 			tip = {
-				render = function(self)
-					if not self:Enable() then
+				render = function()
+					if not X.UI(this):Enable() then
 						return _L['Changge force only']
 					end
 				end,
