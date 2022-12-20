@@ -305,8 +305,9 @@ X.RegisterEvent('MY_FIGHT_HINT', function()
 		return
 	end
 	local bFighting, szUUID, nDuring = arg0, arg1, arg2
+	local dwMapID = X.GetMapID()
 	if not bFighting then
-		D.InsertLog(LOG_TYPE.FIGHT_TIME, { bFighting, szUUID, nDuring })
+		D.InsertLog(LOG_TYPE.FIGHT_TIME, { bFighting, szUUID, nDuring, dwMapID })
 	end
 	if bFighting then -- 进入新的战斗
 		D.OpenCombatLogs()
@@ -315,7 +316,7 @@ X.RegisterEvent('MY_FIGHT_HINT', function()
 		D.CloseCombatLogs()
 	end
 	if bFighting then
-		D.InsertLog(LOG_TYPE.FIGHT_TIME, { bFighting, szUUID, nDuring })
+		D.InsertLog(LOG_TYPE.FIGHT_TIME, { bFighting, szUUID, nDuring, dwMapID })
 	end
 end)
 
