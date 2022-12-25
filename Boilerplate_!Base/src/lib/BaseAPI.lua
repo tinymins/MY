@@ -82,6 +82,37 @@ function X.GetServerOriginName()
 	return szServerOriginName or szServerDisplayName
 end
 
+-- 获取 ID 是否为玩家（区别于 NPC）
+---@param dwID number @ID
+---@return boolean @是否为玩家
+function X.IsPlayer(dwID)
+	return IsPlayer(dwID)
+end
+
+-- 获取主角玩家对象
+---@return userdata | nil @主角玩家对象，获取失败返回空
+function X.GetClientPlayer()
+	return GetClientPlayer()
+end
+
+-- 获取登录角色ID
+---@return number @登录角色ID
+function X.GetClientPlayerID()
+	return UI_GetClientPlayerID()
+end
+
+-- 获取当前控制角色对象
+---@return userdata | nil @当前控制角色对象，获取失败返回空
+function X.GetControlPlayer()
+	return GetClientPlayer()
+end
+
+-- 获取当前控制角色ID（如：平沙落雁目标ID）
+---@return number @当前控制角色ID
+function X.GetControlPlayerID()
+	return GetControlPlayerID()
+end
+
 -- 获取玩家对象
 ---@param dwID number @玩家ID
 ---@return userdata | nil @玩家对象，获取失败返回空
@@ -104,18 +135,6 @@ end
 ---@return userdata | nil @交互物件对象，获取失败返回空
 function X.GetDoodad(dwID)
 	return GetDoodad(dwID)
-end
-
--- 获取登录角色ID
----@return number @登录角色ID
-function X.GetClientPlayerID()
-	return UI_GetClientPlayerID()
-end
-
--- 获取当前控制角色ID（如：平沙落雁目标ID）
----@return number @当前控制角色ID
-function X.GetControlPlayerID()
-	return GetControlPlayerID()
 end
 
 local CLIENT_PLAYER_GLOBAL_ID
