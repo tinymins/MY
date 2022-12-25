@@ -64,7 +64,7 @@ end)
 
 -- 查看完整属性
 X.RegisterBgMsg('CHAR_INFO', function(_, data, nChannel, dwID, szName, bIsSelf)
-	if not bIsSelf and data[2] == UI_GetClientPlayerID() then
+	if not bIsSelf and data[2] == X.GetClientPlayerID() then
 		if data[1] == 'ASK'  then
 			if not _G.MY_CharInfo or _G.MY_CharInfo.bEnable or data[3] == 'DEBUG' then
 				local aInfo = X.GetCharInfo()
@@ -127,7 +127,7 @@ do
 			return
 		end
 		local dwMapID, aRequestID, aRefreshID = data[1], data[2], data[3]
-		local dwID = UI_GetClientPlayerID()
+		local dwID = X.GetClientPlayerID()
 		local bRequest, bRefresh, bResponse = false, false, false
 		if not bResponse then
 			if aRequestID then
@@ -329,7 +329,7 @@ do
 			return
 		end
 		local aAchieveID, aCounterID, aRequestID, aRefreshID = data[1], data[2], data[3], data[4]
-		local dwID = UI_GetClientPlayerID()
+		local dwID = X.GetClientPlayerID()
 		local bRequest, bRefresh, bResponse = false, false, false
 		if not bResponse then
 			if aRequestID then
@@ -432,7 +432,7 @@ do
 			return
 		end
 		local aRequestID, aRefreshID = data[1], data[2]
-		local dwID = UI_GetClientPlayerID()
+		local dwID = X.GetClientPlayerID()
 		local bRequest, bRefresh, bResponse = false, false, false
 		if not bResponse then
 			if aRequestID then

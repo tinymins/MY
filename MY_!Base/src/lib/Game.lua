@@ -316,7 +316,7 @@ function X.GetTargetContextMenu(dwType, szName, dwID)
 			end
 		end
 		-- insert view equip
-		if dwID and UI_GetClientPlayerID() ~= dwID then
+		if dwID and X.GetClientPlayerID() ~= dwID then
 			table.insert(t, {
 				szOption = _L['View equipment'],
 				fnAction = function()
@@ -1711,12 +1711,12 @@ X.RegisterEvent('PLAYER_ENTER_SCENE', function()
 	local player = X.GetPlayer(arg0)
 	NEARBY_PLAYER[arg0] = player
 	NEARBY_FIGHT[arg0] = player and player.bFightState or false
-	if UI_GetClientPlayerID() == arg0 then
+	if X.GetClientPlayerID() == arg0 then
 		FireUIEvent(X.NSFormatString('{$NS}_CLIENT_PLAYER_ENTER_SCENE'))
 	end
 end)
 X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
-	if UI_GetClientPlayerID() == arg0 then
+	if X.GetClientPlayerID() == arg0 then
 		FireUIEvent(X.NSFormatString('{$NS}_CLIENT_PLAYER_LEAVE_SCENE'))
 	end
 	NEARBY_PLAYER[arg0] = nil
@@ -2079,7 +2079,7 @@ function X.IsParty(dwID)
 		end
 		return false
 	end
-	if dwID == UI_GetClientPlayerID() then
+	if dwID == X.GetClientPlayerID() then
 		return true
 	end
 	local me = X.GetClientPlayer()
@@ -3436,17 +3436,17 @@ function X.GetChannelSkillFrame(dwSkillID, nLevel)
 end
 
 function X.IsMarker(...)
-	local dwID = select('#', ...) == 0 and UI_GetClientPlayerID() or ...
+	local dwID = select('#', ...) == 0 and X.GetClientPlayerID() or ...
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) == dwID
 end
 
 function X.IsLeader(...)
-	local dwID = select('#', ...) == 0 and UI_GetClientPlayerID() or ...
+	local dwID = select('#', ...) == 0 and X.GetClientPlayerID() or ...
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) == dwID
 end
 
 function X.IsDistributor(...)
-	local dwID = select('#', ...) == 0 and UI_GetClientPlayerID() or ...
+	local dwID = select('#', ...) == 0 and X.GetClientPlayerID() or ...
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) == dwID
 end
 X.IsDistributer = X.IsDistributor
@@ -4509,7 +4509,7 @@ do
 		end
 		table.insert(PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID], fnAction)
 		-- 自身判定
-		if dwID == UI_GetClientPlayerID() then
+		if dwID == X.GetClientPlayerID() then
 			PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID] = X.GetClientPlayer().GetTotalEquipScore()
 			OnGetPlayerEquipScorePeekPlayer(dwID)
 			return
@@ -4622,7 +4622,7 @@ do
 		end
 		table.insert(PEEK_PLAYER_EQUIP_CALLBACK[dwID], fnAction)
 		-- 自身判定
-		if dwID == UI_GetClientPlayerID() then
+		if dwID == X.GetClientPlayerID() then
 			OnGetPlayerEquipInfoPeekPlayer(X.GetClientPlayer())
 			return
 		end
@@ -4714,7 +4714,7 @@ do
 		end
 		table.insert(PEEK_PLAYER_TALENT_CALLBACK[dwID], fnAction)
 		-- 自身判定
-		if dwID == UI_GetClientPlayerID() then
+		if dwID == X.GetClientPlayerID() then
 			OnGetPlayerTalnetInfoPeekPlayer(X.GetClientPlayer())
 			return
 		end
@@ -4908,13 +4908,13 @@ do
 	function X.GetPlayerGUID(...)
 		local dwID = ...
 		if select('#', ...) == 0 then
-			dwID = UI_GetClientPlayerID()
+			dwID = X.GetClientPlayerID()
 		end
 		if not dwID then
 			return
 		end
 		if not PLAYER_GUID[dwID] then
-			if dwID == UI_GetClientPlayerID() then
+			if dwID == X.GetClientPlayerID() then
 				PLAYER_GUID[dwID] = X.GetClientPlayerGlobalID()
 			end
 		end

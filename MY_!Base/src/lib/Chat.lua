@@ -1607,7 +1607,7 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 			return
 		end
 	end
-	if UI_GetClientPlayerID() == dwTalkerID then
+	if X.GetClientPlayerID() == dwTalkerID then
 		return
 	end
 	if not X.PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName] or X.PACKET_INFO.AUTHOR_ROLES[dwTalkerID] == szName then
