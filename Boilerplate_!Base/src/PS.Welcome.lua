@@ -19,7 +19,7 @@ local function GetMemoryText()
 end
 
 local function GetAdvText()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return ''
 	end

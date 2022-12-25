@@ -879,7 +879,7 @@ local CONSTANT = {
 RegisterEvent('PLAYER_ENTER_SCENE', function()
 	CONSTANT.MAX_PLAYER_LEVEL = math.max(
 		CONSTANT.MAX_PLAYER_LEVEL,
-		GetClientPlayer().nMaxLevel
+		X.GetClientPlayer().nMaxLevel
 	)
 end)
 

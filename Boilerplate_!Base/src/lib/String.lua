@@ -290,7 +290,7 @@ function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgno
 		szText = X.StringReplaceW(szText, ' ', '')
 		szText = X.StringReplaceW(szText, g_tStrings.STR_ONE_CHINESE_SPACE, '')
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me then
 		szFind = szFind:gsub('$zj', me.szName)
 		local szTongName = ''

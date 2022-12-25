@@ -104,7 +104,7 @@ end
 -- 获取当前控制角色对象
 ---@return userdata | nil @当前控制角色对象，获取失败返回空
 function X.GetControlPlayer()
-	return GetClientPlayer()
+	return GetControlPlayer()
 end
 
 -- 获取当前控制角色ID（如：平沙落雁目标ID）
@@ -118,7 +118,7 @@ end
 ---@return userdata | nil @玩家对象，获取失败返回空
 function X.GetPlayer(dwID)
 	if dwID == UI_GetClientPlayerID() then
-		return GetClientPlayer()
+		return X.GetClientPlayer()
 	end
 	return GetPlayer(dwID)
 end
@@ -145,7 +145,7 @@ function X.GetClientPlayerGlobalID()
 			szUID = nil
 		end
 		if not szUID then
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if me then
 				szUID = me.GetGlobalID()
 				if szUID == '0' then
