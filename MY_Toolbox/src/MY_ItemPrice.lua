@@ -55,7 +55,7 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 	if not szName then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local line = X.GetHLLineInfo({ dwMapID = me.GetMapID(), nCopyIndex = me.GetScene().nCopyIndex })
 	local aPath = {dwTabType, dwTabIndex}
 	if nBookID then
@@ -150,7 +150,7 @@ Box_AppendAddonMenu({function(box)
 	if not dwBox or not dwX then
 		return
 	end
-	local item = GetPlayerItem(GetClientPlayer(), dwBox, dwX)
+	local item = GetPlayerItem(X.GetClientPlayer(), dwBox, dwX)
 	if not item then
 		return
 	end

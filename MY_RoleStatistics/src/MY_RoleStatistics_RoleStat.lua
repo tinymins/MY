@@ -77,7 +77,7 @@ local DATA_ENV = setmetatable(
 	{
 		__index = function(t, k)
 			if k == 'me' then
-				return GetClientPlayer()
+				return X.GetClientPlayer()
 			end
 			if k:find('^arg%d+$') then
 				return _G[k]
@@ -222,7 +222,7 @@ local COLUMN_LIST = {
 		nMinWidth = 110,
 		nMaxWidth = 200,
 		GetValue = function(prevVal, prevRec)
-			return GetClientPlayer().szName
+			return X.GetClientPlayer().szName
 		end,
 		GetSummaryValue = function()
 			return 'SUMMARY'
@@ -246,7 +246,7 @@ local COLUMN_LIST = {
 		nMinWidth = 50,
 		nMaxWidth = 70,
 		GetValue = function(prevVal, prevRec)
-			return GetClientPlayer().dwForceID
+			return X.GetClientPlayer().dwForceID
 		end,
 		GetSummaryValue = function()
 			return 'SUMMARY'
@@ -267,7 +267,7 @@ local COLUMN_LIST = {
 		nMinWidth = 50,
 		nMaxWidth = 50,
 		GetValue = function(prevVal, prevRec)
-			return GetClientPlayer().nLevel
+			return X.GetClientPlayer().nLevel
 		end,
 		GetSummaryValue = function()
 			return 'SUMMARY'
@@ -451,7 +451,7 @@ function D.GetPlayerRecords()
 end
 
 function D.GetClientPlayerRec()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -638,7 +638,7 @@ function D.UpdateSaveDB()
 	if not D.bReady then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end

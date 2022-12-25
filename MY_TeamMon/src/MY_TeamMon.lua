@@ -392,7 +392,7 @@ function D.OnFrameCreate()
 end
 
 function D.OnFrameBreathe()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -411,7 +411,7 @@ function D.OnFrameBreathe()
 			local fLifePer, fManaPer
 			-- TargetPanel_SetOpenState(true)
 			for dwNpcID, tab in pairs(npcInfo.tList) do
-				local npc = GetNpc(dwNpcID)
+				local npc = X.GetNpc(dwNpcID)
 				if npc then
 					-- if bTempTarget then
 					-- 	X.SetTarget(TARGET.NPC, vv)
@@ -492,7 +492,7 @@ function D.OnEvent(szEvent)
 		D.OnBuff(arg0, arg1, arg3, arg4, arg5, arg8, arg9)
 	elseif szEvent == 'SYS_MSG' then
 		if arg0 == 'UI_OME_DEATH_NOTIFY' then
-			if not IsPlayer(arg1) then
+			if not X.IsPlayer(arg1) then
 				D.OnDeath(arg1, arg2)
 			end
 		elseif arg0 == 'UI_OME_SKILL_CAST_LOG' then
@@ -510,7 +510,7 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'PARTY_SET_MARK' then
 		D.OnSetMark(true)
 	elseif szEvent == 'PLAYER_SAY' then
-		if not IsPlayer(arg1) then
+		if not X.IsPlayer(arg1) then
 			local szText = MY_GetPureText(arg0)
 			if szText and szText ~= '' then
 				D.OnCallMessage('TALK', szText, arg1, arg3 == '' and '%' or arg3)
@@ -521,24 +521,24 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'ON_WARNING_MESSAGE' then
 		D.OnCallMessage('TALK', arg1)
 	elseif szEvent == 'DOODAD_ENTER_SCENE' or szEvent == 'MY_TM_DOODAD_ENTER_SCENE' then
-		local doodad = GetDoodad(arg0)
+		local doodad = X.GetDoodad(arg0)
 		if doodad then
 			D.OnDoodadEvent(doodad, true)
 		end
 	elseif szEvent == 'DOODAD_LEAVE_SCENE' then
-		local doodad = GetDoodad(arg0)
+		local doodad = X.GetDoodad(arg0)
 		if doodad then
 			D.OnDoodadEvent(doodad, false)
 		end
 	elseif szEvent == 'MY_TM_DOODAD_ALL_LEAVE_SCENE' then
 		D.OnDoodadAllLeave(arg0)
 	elseif szEvent == 'NPC_ENTER_SCENE' or szEvent == 'MY_TM_NPC_ENTER_SCENE' then
-		local npc = GetNpc(arg0)
+		local npc = X.GetNpc(arg0)
 		if npc then
 			D.OnNpcEvent(npc, true)
 		end
 	elseif szEvent == 'NPC_LEAVE_SCENE' then
-		local npc = GetNpc(arg0)
+		local npc = X.GetNpc(arg0)
 		if npc then
 			D.OnNpcEvent(npc, false)
 		end
@@ -574,7 +574,7 @@ function D.Log(szMsg)
 end
 
 function D.Talk(szType, szMsg, szTarget)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -645,7 +645,7 @@ end
 function D.CreateData(szEvent)
 	local nTime   = GetTime()
 	local dwMapID = X.GetMapID(true)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	-- 用于更新 BUFF / CAST / NPC 缓存处理 不需要再获取本地对象
 	MY_TM_CORE_NAME     = me.szName
 	MY_TM_CORE_PLAYERID = me.dwID
@@ -894,7 +894,7 @@ function D.GetSrcName(dwID)
 	if dwID == 0 then
 		return g_tStrings.COINSHOP_SOURCE_NULL
 	end
-	local KObject = IsPlayer(dwID) and GetPlayer(dwID) or GetNpc(dwID)
+	local KObject = X.IsPlayer(dwID) and X.GetPlayer(dwID) or X.GetNpc(dwID)
 	if KObject then
 		return X.GetObjectName(KObject)
 	else
@@ -902,7 +902,7 @@ function D.GetSrcName(dwID)
 	end
 end
 
--- local a=GetTime();for i=1, 10000 do FireUIEvent('BUFF_UPDATE',UI_GetClientPlayerID(),false,1,true,i,1,1,1,1,0) end;Output(GetTime()-a)
+-- local a=GetTime();for i=1, 10000 do FireUIEvent('BUFF_UPDATE',X.GetClientPlayerID(),false,1,true,i,1,1,1,1,0) end;Output(GetTime()-a)
 -- 事件操作
 function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dwSkillSrcID)
 	if MY_TM_SHIELDED_MAP or (MY_TM_PVP_MAP and dwOwner ~= MY_TM_CORE_PLAYERID) then
@@ -921,7 +921,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 					dwMapID      = X.GetMapID(),
 					dwID         = dwBuffID,
 					nLevel       = nBuffLevel,
-					bIsPlayer    = dwSkillSrcID ~= 0 and IsPlayer(dwSkillSrcID),
+					bIsPlayer    = dwSkillSrcID ~= 0 and X.IsPlayer(dwSkillSrcID),
 					szSrcName    = D.GetSrcName(dwSkillSrcID),
 					nCurrentTime = GetCurrentTime()
 				}
@@ -956,8 +956,8 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 		else
 			cfg, nClass = data[MY_TM_TYPE.BUFF_GET], MY_TM_TYPE.BUFF_GET
 		end
-		local szSender = X.GetObjectName(IsPlayer(dwSkillSrcID) and TARGET.PLAYER or TARGET.NPC, dwSkillSrcID)
-		local szReceiver = X.GetObjectName(IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
+		local szSender = X.GetObjectName(X.IsPlayer(dwSkillSrcID) and TARGET.PLAYER or TARGET.NPC, dwSkillSrcID)
+		local szReceiver = X.GetObjectName(X.IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
 		D.CountdownEvent(data, nClass, szSender, szReceiver)
 		if cfg then
 			local szName, nIcon = X.GetBuffName(dwBuffID, nBuffLevel)
@@ -986,23 +986,23 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 				FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
 			end
 			-- 特大文字
-			if O.bPushBigFontAlarm and cfg.bBigFontAlarm and (MY_TM_CORE_PLAYERID == dwOwner or not IsPlayer(dwOwner)) then
+			if O.bPushBigFontAlarm and cfg.bBigFontAlarm and (MY_TM_CORE_PLAYERID == dwOwner or not X.IsPlayer(dwOwner)) then
 				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { GetHeadTextForceFontColor(dwOwner, MY_TM_CORE_PLAYERID) })
 			end
 
 			-- 获得处理
 			if nClass == MY_TM_TYPE.BUFF_GET then
 				if cfg.bSelect then
-					SetTarget(IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
+					SetTarget(X.IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
 				end
 				if cfg.bAutoCancel and MY_TM_CORE_PLAYERID == dwOwner then
-					X.CancelBuff(GetClientPlayer(), dwBuffID)
+					X.CancelBuff(X.GetClientPlayer(), dwBuffID)
 				end
 				if cfg.tMark then
 					D.SetTeamMark(szType, cfg.tMark, dwOwner, dwBuffID, nBuffLevel)
 				end
 				-- 重要Buff列表
-				if O.bPushPartyBuffList and IsPlayer(dwOwner) and cfg.bPartyBuffList and (X.IsParty(dwOwner) or MY_TM_CORE_PLAYERID == dwOwner) then
+				if O.bPushPartyBuffList and X.IsPlayer(dwOwner) and cfg.bPartyBuffList and (X.IsParty(dwOwner) or MY_TM_CORE_PLAYERID == dwOwner) then
 					FireUIEvent('MY_TM_PARTY_BUFF_LIST', dwOwner, data.dwID, data.nLevel, data.nIcon)
 				end
 				-- 头顶报警
@@ -1078,7 +1078,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 				dwMapID      = X.GetMapID(),
 				dwID         = dwCastID,
 				nLevel       = dwLevel,
-				bIsPlayer    = IsPlayer(dwCaster),
+				bIsPlayer    = X.IsPlayer(dwCaster),
 				szSrcName    = D.GetSrcName(dwCaster),
 				nCurrentTime = GetCurrentTime()
 			}
@@ -1100,12 +1100,12 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		end
 		local szName, nIcon = X.GetSkillName(dwCastID, dwLevel)
 		local szSender, szReceiver
-		local KObject = IsPlayer(dwCaster) and GetPlayer(dwCaster) or GetNpc(dwCaster)
+		local KObject = X.IsPlayer(dwCaster) and X.GetPlayer(dwCaster) or X.GetNpc(dwCaster)
 		if KObject then
 			szSender = X.GetObjectName(KObject)
 			szReceiver = X.GetObjectName(X.GetObject(KObject.GetTarget()), 'auto')
 		else
-			szSender = X.GetObjectName(IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
+			szSender = X.GetObjectName(X.IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
 		end
 		if data.szName then
 			szName = FilterCustomText(data.szName, szSender, szReceiver)
@@ -1151,7 +1151,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TM_CORE_PLAYERID) })
 			end
 			if not X.IsRestricted('MY_TeamMon.AutoSelect') and cfg.bSelect then
-				SetTarget(IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
+				SetTarget(X.IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
 			end
 			if cfg.tMark then
 				D.SetTeamMark('CASTING', cfg.tMark, dwCaster, dwCastID, dwLevel)
@@ -1488,15 +1488,15 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 	if MY_TM_SHIELDED_MAP then
 		return
 	end
-	if dwNpcID and not IsPlayer(dwNpcID) then
-		local npc = GetNpc(dwNpcID)
+	if dwNpcID and not X.IsPlayer(dwNpcID) then
+		local npc = X.GetNpc(dwNpcID)
 		if npc and X.IsShieldedNpc(npc.dwTemplateID, 'TALK') then
 			return
 		end
 	end
 	-- 近期记录
 	szContent = tostring(szContent)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local key = (szNpcName or 'sys') .. '::' .. szContent
 	local tWeak, tTemp = CACHE.TEMP[szEvent], D.TEMP[szEvent]
 	if not tWeak[key] then
@@ -1657,7 +1657,7 @@ function D.OnDeath(dwCharacterID, dwKiller)
 	if MY_TM_SHIELDED_MAP then
 		return
 	end
-	local npc = GetNpc(dwCharacterID)
+	local npc = X.GetNpc(dwCharacterID)
 	if npc then
 		local data = D.GetData('NPC', npc.dwTemplateID)
 		if data then
@@ -1668,7 +1668,7 @@ function D.OnDeath(dwCharacterID, dwKiller)
 			local bAllDeath = true
 			if CACHE.NPC_LIST[dwTemplateID] then
 				for k, v in pairs(CACHE.NPC_LIST[dwTemplateID].tList) do
-					local npc = GetNpc(k)
+					local npc = X.GetNpc(k)
 					if npc and npc.nMoveState ~= MOVE_STATE.ON_DEATH then
 						bAllDeath = false
 						break
@@ -1809,7 +1809,7 @@ function D.RegisterMessage(bEnable)
 			if MY_TM_SHIELDED_MAP then
 				return
 			end
-			if not GetClientPlayer() then
+			if not X.GetClientPlayer() then
 				return
 			end
 			if bRich then

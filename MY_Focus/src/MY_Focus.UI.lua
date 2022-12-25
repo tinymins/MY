@@ -145,7 +145,7 @@ function D.UpdateItem(hItem, p)
 	if not szName or szName == '' then
 		szName = X.GetObjectName(KObject)
 	end
-	local player = GetClientPlayer()
+	local player = X.GetClientPlayer()
 	if not KObject then
 		return
 	end
@@ -246,7 +246,7 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen'):Hide()
 		if player and nDistance > 0 then
 			local h
-			if (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and X.IsEnemy(UI_GetClientPlayerID(), dwID) then
+			if (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and X.IsEnemy(X.GetClientPlayerID(), dwID) then
 				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointRed')
 			else
 				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen')

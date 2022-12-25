@@ -308,12 +308,12 @@ X.RegisterEvent('OPEN_WINDOW', 'MY_ShareKnowledge__Npc', function()
 	if not MY_Serendipity.bEnable then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
 	local dwTargetID = arg3
-	local npc = GetNpc(dwTargetID)
+	local npc = X.GetNpc(dwTargetID)
 	if not npc then
 		return
 	end
@@ -378,7 +378,7 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_ShareKnowledge__Sysmsg', function(szChannel,
 	if not MY_Serendipity.bEnable then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end

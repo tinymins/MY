@@ -63,7 +63,7 @@ function D.StackGuildBank()
 		X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagSort__Stack', false)
 	end
 	local function fnLoop()
-		local me, tList = GetClientPlayer(), {}
+		local me, tList = X.GetClientPlayer(), {}
 		bTrigger = true
 		for i = 1, X.GetGuildBankBagSize(nPage) do
 			local dwPos, dwX = X.GetGuildBankBagPos(nPage, i)
@@ -156,7 +156,7 @@ function D.SortGuildBank()
 	end
 	local nPage, szState = frame.nPage or 0, 'Idle'
 	-- 加载格子列表
-	local me, aInfo, nItemCount = GetClientPlayer(), {}, 0
+	local me, aInfo, nItemCount = X.GetClientPlayer(), {}, 0
 	for i = 1, X.GetGuildBankBagSize(nPage) do
 		local dwPos, dwX = X.GetGuildBankBagPos(nPage, i)
 		local item = GetPlayerItem(me, dwPos, dwX)

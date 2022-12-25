@@ -103,7 +103,7 @@ local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_Chat/ui/MY_ChatSwitch.ini'
 local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7点更新CD
 
 local function UpdateChannelDailyLimit(hRadio, bPlus)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local shaCount = hRadio and hRadio.shaCount
 	if not (me and shaCount) then
 		return
@@ -441,7 +441,7 @@ function D.ApplyBattlefieldChannelSwitch()
 	-- 名剑大会自动切换团队频道
 	if O.bAutoSwitchBfChannel then
 		X.RegisterEvent('LOADING_ENDING', 'MY_ChatSwitch__AutoSwitchBattlefieldChannel', function()
-			local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
+			local bIsBattleField = (X.GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
 			local nChannel, szName = EditBox_GetChannel()
 			if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
 				O.JJCAutoSwitchChatChannel_OrgChannel = nChannel
@@ -553,7 +553,7 @@ function D.OnEvent(event)
 			table.insert(D.aWhisper, t)
 			D.bWhisperChanged = true
 		end
-		if dwTalkerID ~= UI_GetClientPlayerID() then
+		if dwTalkerID ~= X.GetClientPlayerID() then
 			return
 		end
 		local hRadio = this.tRadios[nChannel]

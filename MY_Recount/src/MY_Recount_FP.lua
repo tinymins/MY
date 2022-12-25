@@ -280,13 +280,13 @@ local COLUMN_LIST = {
 				return GetFormatText(_L['Not fighting now.'])
 			end
 			if rec[4] == EVERYTHING_TYPE.DEATH then
-				if IsPlayer(rec[5]) then
-					if IsPlayer(rec[6]) then
+				if X.IsPlayer(rec[5]) then
+					if X.IsPlayer(rec[6]) then
 						return GetFormatText(_L('[%s] killed [%s].', rec[8], rec[7]))
 					end
 					return GetFormatText(_L('%s killed [%s].', rec[8], rec[7]))
 				end
-				if IsPlayer(rec[6]) then
+				if X.IsPlayer(rec[6]) then
 					return GetFormatText(_L('[%s] killed %s.', rec[8], rec[7]))
 				end
 				return GetFormatText(_L('%s killed %s.', rec[8], rec[7]))
@@ -788,14 +788,14 @@ function D.PopupRowMenu(frame, rec)
 						szText = szText .. GetFormatText(_L['Not fighting now.'])
 					end
 				elseif rec[4] == EVERYTHING_TYPE.DEATH then
-					if IsPlayer(rec[5]) then
-						if IsPlayer(rec[6]) then
+					if X.IsPlayer(rec[5]) then
+						if X.IsPlayer(rec[6]) then
 							szText = szText .. _L('[%s] killed [%s].', rec[8], rec[7])
 						else
 							szText = szText .. _L('%s killed [%s].', rec[8], rec[7])
 						end
 					else
-						if IsPlayer(rec[6]) then
+						if X.IsPlayer(rec[6]) then
 							szText = szText .. _L('[%s] killed %s.', rec[8], rec[7])
 						else
 							szText = szText .. _L('%s killed %s.', rec[8], rec[7])

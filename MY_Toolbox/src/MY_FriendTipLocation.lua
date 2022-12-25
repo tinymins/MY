@@ -37,7 +37,7 @@ function D.Hook()
 	if not frame then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end

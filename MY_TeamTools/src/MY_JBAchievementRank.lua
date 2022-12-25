@@ -75,10 +75,10 @@ X.RegisterEvent('SYS_MSG', function()
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
 		-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResult：数值集合
 		local KCaster = X.GetObject(arg1)
-		if KCaster and not IsPlayer(arg1) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
+		if KCaster and not X.IsPlayer(arg1) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
 			KCaster = X.GetObject(KCaster.dwEmployer)
 		end
-		if KCaster and KCaster.dwID == UI_GetClientPlayerID() then
+		if KCaster and KCaster.dwID == X.GetClientPlayerID() then
 			D.dwDamage = D.dwDamage + (arg9[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0)
 			D.dwTherapy = D.dwTherapy + (arg9[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] or 0)
 		end
@@ -145,7 +145,7 @@ function D.CheckUpdateAcquire()
 end
 
 function D.ShotAchievementAcquire()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local aAcquired = {}
 	local Achievement = X.GetGameTable('Achievement', true)
 	if Achievement then
@@ -160,7 +160,7 @@ function D.ShotAchievementAcquire()
 end
 
 function D.UpdateMapBossAchieveAcquire()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local dwMapID = me.GetMapID()
 	local tBossAchieveAcquireState = {}
 	-- 根据成就名称自动识别地图全胜成就
@@ -209,7 +209,7 @@ X.RegisterEvent({
 	'UPDATE_ACHIEVEMENT_POINT',
 	'UPDATE_ACHIEVEMENT_COUNT',
 }, 'MY_JBAchievementRank', function()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	for dwAchieveID, bAcquired in pairs(BOSS_ACHIEVE_ACQUIRE_STATE) do
 		if not bAcquired and me.IsAchievementAcquired(dwAchieveID) then
 			local aTeammate, szLeader = {}, ''
@@ -231,7 +231,7 @@ X.RegisterEvent({
 				end
 			else
 				szLeader = me.szName
-				table.insert(aTeammate, me.szName .. ',' .. UI_GetPlayerMountKungfuID() .. ',' .. X.GetPlayerGUID() .. ',' .. UI_GetClientPlayerID())
+				table.insert(aTeammate, me.szName .. ',' .. UI_GetPlayerMountKungfuID() .. ',' .. X.GetPlayerGUID() .. ',' .. X.GetClientPlayerID())
 			end
 			local rec = {
 				szServer = X.GetServerOriginName(),

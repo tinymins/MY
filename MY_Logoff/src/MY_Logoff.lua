@@ -42,7 +42,7 @@ local function Logoff(bCompletely, bUnfight, bNotDead)
 		return
 	end
 	local function onBreatheCall()
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if not me then
 			return
 		end

@@ -48,7 +48,7 @@ local PS = { IsRestricted = MY_Love.IsShielded }
 
 -- 获取可情缘好友列表
 function D.GetLoverMenu(nType)
-	local me, m0 = GetClientPlayer(), {}
+	local me, m0 = X.GetClientPlayer(), {}
 	local aGroup = me.GetFellowshipGroupInfo() or {}
 	table.insert(aGroup, 1, {id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND})
 	for _, v in ipairs(aGroup) do

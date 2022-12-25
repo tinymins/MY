@@ -337,7 +337,7 @@ function D.IsItemDisplay(itemData, config)
 	end
 	-- 过滤已读、已有书籍
 	if (config.bFilterBookRead or config.bFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if config.bFilterBookRead then
 			local nBookID, nSegmentID = X.RecipeToSegmentID(itemData.nBookID)
 			if me and me.IsBookMemorized(nBookID, nSegmentID) then
@@ -369,7 +369,7 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 	end
 	-- 不拾取已读、已有书籍
 	if (config.bAutoPickupFilterBookRead or config.bAutoPickupFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if config.bAutoPickupFilterBookRead then
 			local nBookID, nSegmentID = X.RecipeToSegmentID(itemData.nBookID)
 			if me and me.IsBookMemorized(nBookID, nSegmentID) then
@@ -406,7 +406,7 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 end
 
 function D.CloseLootWindow()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me and X.GetOTActionState(me) == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
 		me.OnCloseLootWindow()
 	end
@@ -428,10 +428,10 @@ end
 
 function D.OnFrameBreathe()
 	local nLFC = GetLogicFrameCount()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local wnd = this:Lookup('Scroll_DoodadList/WndContainer_DoodadList'):LookupContent(0)
 	while wnd do
-		local doodad = GetDoodad(wnd.dwDoodadID)
+		local doodad = X.GetDoodad(wnd.dwDoodadID)
 		-- 拾取判定
 		local bCanDialog = D.CanDialog(me, doodad)
 		local hList, hItem = wnd:Lookup('', 'Handle_ItemList')
@@ -492,7 +492,7 @@ function D.OnEvent(szEvent)
 			-- Wnd.CloseWindow(this)
 		end
 	elseif szEvent == 'PARTY_DISBAND' or szEvent == 'PARTY_DELETE_MEMBER' then
-		if szEvent == 'PARTY_DELETE_MEMBER' and arg1 ~= UI_GetClientPlayerID() then
+		if szEvent == 'PARTY_DELETE_MEMBER' and arg1 ~= X.GetClientPlayerID() then
 			return
 		end
 		D.CloseFrame()
@@ -734,9 +734,9 @@ function D.OnItemLButtonClick()
 		local hItem      = szName == 'Handle_Item' and this or this:GetParent()
 		local box        = hItem:Lookup('Box_Item')
 		local data       = hItem.itemData
-		local me, team   = GetClientPlayer(), GetClientTeam()
+		local me, team   = X.GetClientPlayer(), GetClientTeam()
 		local dwDoodadID = data.dwDoodadID
-		local doodad     = GetDoodad(dwDoodadID)
+		local doodad     = X.GetDoodad(dwDoodadID)
 		if not data.bDist and not data.bNeedRoll and not data.bBidding then
 			if doodad.CanLoot(me.dwID) then
 				X.OpenDoodad(me, doodad)
@@ -778,7 +778,7 @@ function D.OnItemLButtonClick()
 		end
 		for _, data in ipairs(aItemData) do
 			local dwDoodadID = data.dwDoodadID
-			local doodad     = GetDoodad(dwDoodadID)
+			local doodad     = X.GetDoodad(dwDoodadID)
 			if not doodad then
 				--[[#DEBUG BEGIN]]
 				X.Debug('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
@@ -803,7 +803,7 @@ function D.OnItemRButtonClick()
 		if not data.bDist then
 			return
 		end
-		local me, team   = GetClientPlayer(), GetClientTeam()
+		local me, team   = X.GetClientPlayer(), GetClientTeam()
 		local dwDoodadID = data.dwDoodadID
 		if not D.AuthCheck(dwDoodadID) then
 			return
@@ -1146,8 +1146,8 @@ function D.GetBossAction(dwDoodadID, bMenu)
 end
 
 function D.AuthCheck(dwID)
-	local me, team       = GetClientPlayer(), GetClientTeam()
-	local doodad         = GetDoodad(dwID)
+	local me, team       = X.GetClientPlayer(), GetClientTeam()
+	local doodad         = X.GetDoodad(dwID)
 	if not doodad then
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_GKPLoot:AuthCheck', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
@@ -1182,7 +1182,7 @@ function D.GetaPartyMember(aDoodadID)
 	local aPartyMember = {}
 	for _, dwDoodadID in ipairs(aDoodadID) do
 		if not tDoodadID[dwDoodadID] then
-			local doodad = GetDoodad(dwDoodadID)
+			local doodad = X.GetDoodad(dwDoodadID)
 			if doodad then
 				local aLooterList = doodad.GetLooterList()
 				if aLooterList then
@@ -1222,11 +1222,11 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 		end
 		return
 	end
-	local doodad = GetDoodad(info.dwDoodadID)
+	local doodad = X.GetDoodad(info.dwDoodadID)
 	if not D.AuthCheck(info.dwDoodadID) then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local item = GetItem(info.dwID)
 	if not item then
 		--[[#DEBUG BEGIN]]
@@ -1406,7 +1406,7 @@ function D.GetDistributeMenu(aItemData, szAutoDistType)
 			table.insert(aDoodadID, p.dwDoodadID)
 		end
 	end
-	local me, team     = GetClientPlayer(), GetClientTeam()
+	local me, team     = X.GetClientPlayer(), GetClientTeam()
 	local dwMapID      = me.GetMapID()
 	local aPartyMember = D.GetaPartyMember(aDoodadID)
 	table.sort(aPartyMember, function(a, b)
@@ -1559,7 +1559,7 @@ function D.GetDoodadWnd(frame, dwID, bCreate)
 end
 
 local function IsItemDataSuitable(data)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return 'NOT_SUITABLE'
 	end
@@ -1920,8 +1920,8 @@ end
 
 -- 检查物品
 function D.GetDoodadLootInfo(dwID)
-	local me = GetClientPlayer()
-	local d  = GetDoodad(dwID)
+	local me = X.GetClientPlayer()
+	local d  = X.GetDoodad(dwID)
 	local aItemData = {}
 	local bSpecial = false
 	local nMoney, szName = 0, ''
@@ -1965,7 +1965,7 @@ end
 function D.AutoSetSystemLootVisible()
 	local team = GetClientTeam()
 	local bCanBiddingDistribute = team and team.nLootMode == PARTY_LOOT_MODE.BIDDING
-		and team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) == UI_GetClientPlayerID()
+		and team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) == X.GetClientPlayerID()
 	if D.IsEnabled() and not bCanBiddingDistribute then
 		D.HideSystemLoot()
 	else
@@ -1994,10 +1994,10 @@ X.RegisterEvent('OPEN_DOODAD', function()
 	if not D.IsEnabled() then
 		return
 	end
-	if arg1 ~= UI_GetClientPlayerID() then
+	if arg1 ~= X.GetClientPlayerID() then
 		return
 	end
-	local doodad = GetDoodad(arg0)
+	local doodad = X.GetDoodad(arg0)
 	local nM = doodad.GetLootMoney() or 0
 	if nM > 0 then
 		LootMoney(arg0)

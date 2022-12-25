@@ -85,7 +85,7 @@ RegisterCustomData('MY_AutoSell.tSellItem')
 RegisterCustomData('MY_AutoSell.tProtectItem')
 
 function D.SellItem(nNpcID, nShopID, dwBox, dwX, nCount, szReason, szName, nUiId)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local item = me.GetItem(dwBox, dwX)
 	if not item or item.nUiId ~= nUiId then
 		return
@@ -99,7 +99,7 @@ function D.AutoSellItem(nNpcID, nShopID, bIgnoreGray)
 	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local nIndex = X.GetBagPackageIndex()
 	local aSell = {}
 	for dwBox = nIndex, nIndex + X.GetBagPackageCount() do

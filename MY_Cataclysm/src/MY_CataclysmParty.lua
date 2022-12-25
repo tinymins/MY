@@ -65,13 +65,13 @@ local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local CHANGGE_REAL_SHADOW_CACHE = {}
 do
 local function onNpcEnterScene()
-	local me = GetClientPlayer()
-	local npc = GetNpc(arg0)
+	local me = X.GetClientPlayer()
+	local npc = X.GetNpc(arg0)
 	if X.IsBoss(me.GetMapID(), npc.dwTemplateID) then
 		CTM_BOSS_CACHE[npc.dwID] = npc
 	end
 	if npc.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID then
-		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and X.IsRestricted('MY_Cataclysm.CHANGGE_SHADOW')) then
+		if not (IsEnemy(X.GetClientPlayerID(), arg0) and X.IsRestricted('MY_Cataclysm.CHANGGE_SHADOW')) then
 			local dwType, dwID = X.GetTarget()
 			if dwType == TARGET.PLAYER and dwID == npc.dwEmployer then
 				X.SetTarget(TARGET.NPC, arg0)
@@ -84,9 +84,9 @@ end
 X.RegisterEvent('NPC_ENTER_SCENE', 'MY_Cataclysm', onNpcEnterScene)
 
 local function onNpcLeaveScene()
-	local npc = GetNpc(arg0)
+	local npc = X.GetNpc(arg0)
 	if CHANGGE_REAL_SHADOW_CACHE[arg0] then
-		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and X.IsRestricted('MY_Cataclysm.CHANGGE_SHADOW')) then
+		if not (IsEnemy(X.GetClientPlayerID(), arg0) and X.IsRestricted('MY_Cataclysm.CHANGGE_SHADOW')) then
 			local dwType, dwID = X.GetTarget()
 			if dwType == TARGET.NPC and dwID == arg0 then
 				X.SetTarget(TARGET.PLAYER, npc.dwEmployer)
@@ -115,7 +115,7 @@ end)
 do
 local function onBossSet()
 	CTM_BOSS_CACHE = {}
-	local dwMapID = GetClientPlayer().GetMapID()
+	local dwMapID = X.GetClientPlayer().GetMapID()
 	for _, npc in ipairs(X.GetNearNpc()) do
 		if X.IsBoss(dwMapID, npc.dwTemplateID) then
 			CTM_BOSS_CACHE[npc.dwID] = npc
@@ -136,10 +136,10 @@ local function CanTarget(dwID)
 	if CHANGGE_REAL_SHADOW_CACHE[dwID] then
 		dwID = CHANGGE_REAL_SHADOW_CACHE[dwID]
 	end
-	if IsPlayer(dwID) then
-		return GetPlayer(dwID)
+	if X.IsPlayer(dwID) then
+		return X.GetPlayer(dwID)
 	else
-		return GetNpc(dwID)
+		return X.GetNpc(dwID)
 	end
 end
 
@@ -288,7 +288,7 @@ function MY_CataclysmParty_Base.OnItemLButtonDrag()
 		return
 	end
 	local team = GetClientTeam()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if (IsAltKeyDown() or CFG.bEditMode) and me.IsInRaid() and X.IsLeader() then
 		CTM_DRAG = true
 		CTM_DRAG_ID = dwID
@@ -326,7 +326,7 @@ function MY_CataclysmParty_Base.OnItemLButtonDragEnd()
 end
 
 function D.SetTargetTeammate(dwID, info)
-	if X.IsInPubg() and GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
+	if X.IsInPubg() and X.GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
 		BattleField_MatchPlayer(dwID)
 	elseif info.bIsOnLine and CanTarget(dwID) then -- 有待考证
 		if CFG.bTempTargetEnable then
@@ -364,7 +364,7 @@ function MY_CataclysmParty_Base.OnItemLButtonClick()
 	if not info then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -492,7 +492,7 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 	end
 	local dwID = this.dwID
 	local menu = {}
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local info = CTM:GetMemberInfo(dwID)
 	local szPath, nFrame = GetForceImage(info.dwForceID)
 	table.insert(menu, {
@@ -559,8 +559,8 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 				rgb = { 255, 255, 0 },
 				fnAction = function()
 					local team = GetClientTeam()
-					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, UI_GetClientPlayerID())
-					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, UI_GetClientPlayerID())
+					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, X.GetClientPlayerID())
+					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, X.GetClientPlayerID())
 				end,
 			})
 		elseif not X.IsRestricted('MY_Cataclysm.Seize') then
@@ -638,7 +638,7 @@ end
 
 -- 创建面板
 function CTM:CreatePanel(nIndex)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local frame = self:GetPartyFrame(nIndex)
 	if not frame then
 		frame = Wnd.OpenWindow(
@@ -655,7 +655,7 @@ end
 -- 刷新团队组编号
 function CTM:RefreshGroupText()
 	local team = GetClientTeam()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	for i = 0, team.nGroupNum - 1 do
 		local frame = self:GetPartyFrame(i)
 		if frame then
@@ -667,7 +667,7 @@ function CTM:RefreshGroupText()
 				local tGroup = team.GetGroupInfo(i)
 				if tGroup and tGroup.MemberList then
 					for k, v in ipairs(tGroup.MemberList) do
-						if v == UI_GetClientPlayerID() then
+						if v == X.GetClientPlayerID() then
 							-- txtGroup:SetFontScheme(2)
 							txtGroup:SetFontColor(255, 128, 0) -- 自己所在的小队 黄色
 							break
@@ -821,7 +821,7 @@ function CTM:RefreshBossTarget()
 	local tKeep = {}
 	if CFG.bShowBossTarget then
 		for dwNpcID, npc in pairs(CTM_BOSS_CACHE) do
-			local dwTarID = (X.IsEnemy(UI_GetClientPlayerID(), dwNpcID) and npc.bFightState)
+			local dwTarID = (X.IsEnemy(X.GetClientPlayerID(), dwNpcID) and npc.bFightState)
 				and (CTM_NPC_THREAT_TARGET[dwNpcID] or select(2, npc.GetTarget()))
 				or nil
 			if dwTarID then
@@ -864,10 +864,10 @@ function CTM:RefreshAttention()
 		return
 	end
 	if CFG.bShowAttention then
-		local team, me = GetClientTeam(), GetClientPlayer()
+		local team, me = GetClientTeam(), X.GetClientPlayer()
 		local tKeep = {}
 		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
-			local p = GetPlayer(dwTarID)
+			local p = X.GetPlayer(dwTarID)
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
 				if p and not X.IsEmpty(CTM_ATTENTION_STACK[dwTarID]) then
 					local data = CTM_ATTENTION_STACK[dwTarID][1]
@@ -901,10 +901,10 @@ function CTM:RefreshCaution()
 		return
 	end
 	if CFG.bShowCaution or CFG.bShowBossFocus then
-		local team, me = GetClientTeam(), GetClientPlayer()
+		local team, me = GetClientTeam(), X.GetClientPlayer()
 		local tKeep = {}
 		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
-			local p = GetPlayer(dwTarID)
+			local p = X.GetPlayer(dwTarID)
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
 				CTM_CACHE[dwTarID]:Lookup('Handle_Caution'):SetVisible(
 					p and (
@@ -1045,11 +1045,11 @@ end
 function CTM:KungFuSwitch(dwID)
 	local handle = CTM_CACHE[dwID]
 	if handle and handle:IsValid() then
-		if GetPlayer(dwID) then
+		if X.GetPlayer(dwID) then
 			local key = 'CTM_KUNFU_' .. dwID
 			local img = handle:Lookup('Image_Icon')
 			X.BreatheCall(key, function()
-				local player = GetPlayer(dwID)
+				local player = X.GetPlayer(dwID)
 				if player and img and img:IsValid() then
 					local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(player)
 					if (nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
@@ -1568,7 +1568,7 @@ local function DispSorter(a, b)
 end
 function D.UpdateCharaterBuff(p, handle, tKeep)
 	local dwCharID = p.dwID
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	-- 气劲数据归并
 	local tDisp = {}
 	for _, tRule in pairs(CTM_BUFF_RULE) do
@@ -1738,7 +1738,7 @@ function CTM:RefreshBuff()
 	local team = GetClientTeam()
 	local tKeep = {}
 	for k, v in ipairs(team.GetTeamMemberList()) do
-		local p = GetPlayer(v)
+		local p = X.GetPlayer(v)
 		local handle = CTM_CACHE[v] and CTM_CACHE[v]:IsValid() and CTM_CACHE[v]:Lookup('Handle_Buff_Boxes')
 		if handle then
 			if p then
@@ -1764,10 +1764,10 @@ function CTM:RefreshBossFocus()
 	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 16 ~= 0 then
 		return
 	end
-	local team, me = GetClientTeam(), GetClientPlayer()
+	local team, me = GetClientTeam(), X.GetClientPlayer()
 	for k, v in ipairs(team.GetTeamMemberList()) do
 		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() then
-			local p, bFocus = GetPlayer(v), nil
+			local p, bFocus = X.GetPlayer(v), nil
 			if p then
 				for _, data in pairs(CTM_BOSS_FOCUS_BUFF) do
 					local buff = MY_GetBuff(p, data.dwID, data.nLevel)
@@ -1789,7 +1789,7 @@ function CTM:RefreshDistance()
 	end
 	for k, v in pairs(CTM_CACHE) do
 		if v:IsValid() then
-			local p = GetPlayer(k) -- info.nPoX 刷新太慢了 对于治疗来说 这个太重要了
+			local p = X.GetPlayer(k) -- info.nPoX 刷新太慢了 对于治疗来说 这个太重要了
 			if p then
 				local nDistance = MY_GetDistance(p) -- 只计算平面 --??
 				if CFG.bEnableDistance then
@@ -1902,10 +1902,10 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	local Mimg = hMana:Lookup('Image_Mana')
 	local player, npc, dwMountType
 	if CHANGGE_REAL_SHADOW_CACHE[dwID] then
-		npc = GetNpc(CHANGGE_REAL_SHADOW_CACHE[dwID])
+		npc = X.GetNpc(CHANGGE_REAL_SHADOW_CACHE[dwID])
 	end
 	if CFG.bFasterHP then
-		player = GetPlayer(dwID)
+		player = X.GetPlayer(dwID)
 	end
 	-- 气血计算 因为sync 必须拿出来单独算
 	local obj = npc or player
@@ -2034,7 +2034,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			local r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
 			if info.bIsOnLine then
 				if CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE then
-					if player or GetPlayer(dwID) then
+					if player or X.GetPlayer(dwID) then
 						if h.nDistanceLevel then
 							r, g, b = unpack(CFG.tDistanceCol[h.nDistanceLevel])
 						else
@@ -2140,11 +2140,11 @@ function CTM:RefreshSputtering()
 			local nMaxCount, tCount = 1, {}
 			for _, dwID in pairs(tGroupInfo.MemberList) do
 				local info, nCount = team.GetMemberInfo(dwID), 0
-				local player = GetPlayer(dwID)
+				local player = X.GetPlayer(dwID)
 				if player and not info.bDeathFlag and info.bIsOnLine then
 					for _, dwID2 in pairs(tGroupInfo.MemberList) do
 						local info2 = team.GetMemberInfo(dwID2)
-						local player2 = GetPlayer(dwID2)
+						local player2 = X.GetPlayer(dwID2)
 						if player2 and not info2.bDeathFlag and info2.bIsOnLine
 						and X.GetDistance(player.nX, player.nY, player.nZ, player2.nX, player2.nY, player2.nZ, 'gwwean') <= CFG.nSputteringDistance then
 							nCount = nCount + 1
@@ -2206,7 +2206,7 @@ function CTM:StartTeamVote(eType)
 		if v:IsValid() then
 			local info = self:GetMemberInfo(k)
 			local bAwait = info.bIsOnLine
-			if k == UI_GetClientPlayerID() then
+			if k == X.GetClientPlayerID() then
 				if eType == 'raid_ready' then
 					bAwait = false
 				elseif eType == 'wage_agree' then

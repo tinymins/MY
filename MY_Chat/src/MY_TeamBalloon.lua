@@ -101,7 +101,7 @@ end
 
 
 local function OnSay(hFrame, szMsg, dwID, nChannel)
-	local player = GetClientPlayer()
+	local player = X.GetClientPlayer()
 	if player and player.dwID ~= dwID and (
 		nChannel == PLAYER_TALK_CHANNEL.TEAM or
 		nChannel == PLAYER_TALK_CHANNEL.RAID

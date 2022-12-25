@@ -203,7 +203,7 @@ function D.HookPlayerViewPanel()
 				local mp = this:GetParent():GetParent()
 				local tar = D.GetPlayerInfo(mp.dwPlayer)
 				if tar then
-					local m0, me = {}, GetClientPlayer()
+					local m0, me = {}, X.GetClientPlayer()
 					InsertInviteTeamMenu(m0, tar.szName)
 					if me.IsInParty() and me.dwID == GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) then
 						InsertMarkMenu(m0, tar.dwID)
@@ -257,7 +257,7 @@ function D.OnPeekOtherPlayer()
 	if arg0 ~= 1 or IsRemotePlayer(arg1) then
 		return
 	end
-	local tar = GetPlayer(arg1)
+	local tar = X.GetPlayer(arg1)
 	if not tar then
 		return
 	end
@@ -289,7 +289,7 @@ local function onMenu(dwTarType, dwTarID)
 	if MY_Love.IsShielded() then
 		return
 	end
-	if dwTarType ~= TARGET.PLAYER or dwTarID == UI_GetClientPlayerID() or IsRemotePlayer(dwTarID) then
+	if dwTarType ~= TARGET.PLAYER or dwTarID == X.GetClientPlayerID() or IsRemotePlayer(dwTarID) then
 		return
 	end
 	return {{

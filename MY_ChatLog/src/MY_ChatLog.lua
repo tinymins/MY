@@ -173,7 +173,7 @@ function D.ImportDB(szPath)
 	if odb then
 		-- 老版分表机制
 		local dwGlobalID = X.Get(odb:Execute('SELECT * FROM ChatLogInfo WHERE key = "userguid"'), {1, 'value'})
-		if dwGlobalID == GetClientPlayer().GetGlobalID() then
+		if dwGlobalID == X.GetClientPlayer().GetGlobalID() then
 			for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex WHERE name IS NOT NULL ORDER BY stime ASC') or X.CONSTANT.EMPTY_TABLE) do
 				if info.etime == -1 then
 					info.etime = 0
@@ -192,7 +192,7 @@ function D.ImportDB(szPath)
 		end
 		-- 新版导出数据
 		local dwGlobalID = X.Get(odb:Execute('SELECT value FROM ChatInfo WHERE key = "user_global_id"'), {1, 'value'}, ''):gsub('"', '')
-		if dwGlobalID == GetClientPlayer().GetGlobalID() then
+		if dwGlobalID == X.GetClientPlayer().GetGlobalID() then
 			local nCount = X.Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 			if nCount > 0 then
 				local szRoot, nOffset, nLimit, szNewPath, dbNew = D.GetRoot(), 0, 20000
@@ -286,7 +286,7 @@ X.RegisterIdle('MY_ChatLog_Save', function()
 end)
 
 function D.OnInit()
-	if not GetClientPlayer() then
+	if not X.GetClientPlayer() then
 		return X.DelayCall(500, D.OnInit)
 	end
 	if O.bAutoConnectDB then

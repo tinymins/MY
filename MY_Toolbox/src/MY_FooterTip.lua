@@ -72,8 +72,8 @@ function D.Apply()
 		end
 		hShaList:Show()
 		local function OnPlayerEnter(dwID)
-			local tar = GetPlayer(dwID)
-			local me = GetClientPlayer()
+			local tar = X.GetPlayer(dwID)
+			local me = X.GetClientPlayer()
 			if not tar or not me
 			or X.IsIsolated(tar) ~= X.IsIsolated(me) then
 				return
@@ -120,8 +120,8 @@ function D.Apply()
 		RescanNearby()
 		X.RegisterEvent('ON_ISOLATED', 'MY_FRIEND_TIP', function(event)
 			-- dwCharacterID, nIsolated
-			local me = GetClientPlayer()
-			if arg0 == UI_GetClientPlayerID() then
+			local me = X.GetClientPlayer()
+			if arg0 == X.GetClientPlayerID() then
 				for _, p in ipairs(X.GetNearPlayer()) do
 					if X.IsIsolated(p) == X.IsIsolated(me) then
 						OnPlayerEnter(p.dwID)
@@ -130,7 +130,7 @@ function D.Apply()
 					end
 				end
 			else
-				local tar = GetPlayer(arg0)
+				local tar = X.GetPlayer(arg0)
 				if tar then
 					if X.IsIsolated(tar) == X.IsIsolated(me) then
 						OnPlayerEnter(arg0)
@@ -173,8 +173,8 @@ function D.Apply()
 			if nRetryCount > 5 then
 				return
 			end
-			local tar = GetPlayer(dwID)
-			local me = GetClientPlayer()
+			local tar = X.GetPlayer(dwID)
+			local me = X.GetClientPlayer()
 			if not tar or not me
 			or me.dwTongID == 0
 			or me.dwID == tar.dwID
@@ -222,8 +222,8 @@ function D.Apply()
 		end
 		X.RegisterEvent('ON_ISOLATED', 'MY_GUILDMEMBER_TIP', function(event)
 			-- dwCharacterID, nIsolated
-			local me = GetClientPlayer()
-			if arg0 == UI_GetClientPlayerID() then
+			local me = X.GetClientPlayer()
+			if arg0 == X.GetClientPlayerID() then
 				for _, p in ipairs(X.GetNearPlayer()) do
 					if X.IsIsolated(p) == X.IsIsolated(me) then
 						OnPlayerEnter(p.dwID)
@@ -232,7 +232,7 @@ function D.Apply()
 					end
 				end
 			else
-				local tar = GetPlayer(arg0)
+				local tar = X.GetPlayer(arg0)
 				if tar then
 					if X.IsIsolated(tar) == X.IsIsolated(me) then
 						OnPlayerEnter(arg0)

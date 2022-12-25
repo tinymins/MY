@@ -404,7 +404,7 @@ local TIP_COLUMN = {
 do
 local REC_CACHE
 function D.GetClientPlayerRec(bForceUpdate)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -445,7 +445,7 @@ function D.ProcessProgressRequestQueue()
 					_L('[MY_RoleStatistics_DungeonStat] ApplyDungeonRoleProgress: %d.', dwID),
 					X.DEBUG_LEVEL.PM_LOG)
 				--[[#DEBUG END]]
-				ApplyDungeonRoleProgress(dwID, UI_GetClientPlayerID())
+				ApplyDungeonRoleProgress(dwID, X.GetClientPlayerID())
 			else
 				X.BreatheCall(szKey, false)
 			end
@@ -529,7 +529,7 @@ end
 X.RegisterFlush('MY_RoleStatistics_DungeonStat', function() D.FlushDB() end)
 
 function D.InitDB()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me then
 		DB_DungeonInfoG:ClearBindings()
 		DB_DungeonInfoG:BindAll(AnsiToUTF8(X.GetPlayerGUID()))
@@ -548,7 +548,7 @@ function D.UpdateSaveDB()
 	if not D.bReady then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -674,7 +674,7 @@ function D.UpdateUI(page)
 end
 
 function D.UpdateMapProgress(bForceUpdate)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then -- 确保不可能在切换GS时请求
 		return
 	end
@@ -706,7 +706,7 @@ function D.UpdateMapProgress(bForceUpdate)
 			local bMapProgressValid = D.tMapProgressValid[dwID]
 			if not bMapProgressValid then
 				for i, boss in ipairs(aProgressBoss) do
-					if GetDungeonRoleProgress(dwID, UI_GetClientPlayerID(), boss.dwProgressID) then
+					if GetDungeonRoleProgress(dwID, X.GetClientPlayerID(), boss.dwProgressID) then
 						bMapProgressValid = true
 						break
 					end
@@ -716,7 +716,7 @@ function D.UpdateMapProgress(bForceUpdate)
 			if bMapProgressValid or (D.bMapSaveCopyValid and not D.tMapSaveCopy[dwID]) then
 				local aProgress = {}
 				for i, boss in ipairs(aProgressBoss) do
-					aProgress[i] = GetDungeonRoleProgress(dwID, UI_GetClientPlayerID(), boss.dwProgressID)
+					aProgress[i] = GetDungeonRoleProgress(dwID, X.GetClientPlayerID(), boss.dwProgressID)
 				end
 				D.tMapProgress[dwID] = aProgress
 			end
@@ -1305,7 +1305,7 @@ X.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy'
 	if not D.bReady or not X.IsInDungeon() then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me then
 		D.bMapSaveCopyValid = false
 		D.tMapProgressValid[me.GetMapID()] = false
@@ -1315,7 +1315,7 @@ end)
 
 X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
 	local dwMapID, dwPlayerID = arg0, arg1
-	if dwPlayerID ~= UI_GetClientPlayerID() then
+	if dwPlayerID ~= X.GetClientPlayerID() then
 		return
 	end
 	D.tMapProgressValid[dwMapID] = true

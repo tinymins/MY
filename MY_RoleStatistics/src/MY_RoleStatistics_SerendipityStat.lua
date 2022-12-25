@@ -151,7 +151,7 @@ X.RegisterEvent('LOADING_ENDING', 'MY_RoleStatistics_SerendipityStat', function(
 		X.DelayCall('MY_ROLE_STAT_SERENDIPITY_UPDATE', DelayTrigger)
 	end
 	local PARSE_TEXT = setmetatable({}, {__index = function(t, k)
-		t[k] = X.StringReplaceW(k, '{$name}', GetClientPlayer().szName)
+		t[k] = X.StringReplaceW(k, '{$name}', X.GetClientPlayer().szName)
 		return t[k]
 	end})
 	local function SerendipityStringTrigger(szText, aSearch, nID, nNum)
@@ -164,7 +164,7 @@ X.RegisterEvent('LOADING_ENDING', 'MY_RoleStatistics_SerendipityStat', function(
 			end
 		end
 	end
-	local dwMapID = GetClientPlayer().GetMapID()
+	local dwMapID = X.GetClientPlayer().GetMapID()
 	for _, serendipity in ipairs(SERENDIPITY_LIST) do
 		if serendipity.dwMapID == dwMapID then
 			-- 今日失败的判断们
@@ -174,7 +174,7 @@ X.RegisterEvent('LOADING_ENDING', 'MY_RoleStatistics_SerendipityStat', function(
 					-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
 					-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
 					-- arg8：nLevel，arg9：dwSkillSrcID
-					if arg0 == UI_GetClientPlayerID() and arg4 == serendipity.dwBuffID then
+					if arg0 == X.GetClientPlayerID() and arg4 == serendipity.dwBuffID then
 						OnSerendipityTrigger()
 					end
 				end)
@@ -213,7 +213,7 @@ X.RegisterEvent('LOADING_ENDING', 'MY_RoleStatistics_SerendipityStat', function(
 			end
 			if serendipity.aAttemptLootItem then
 				RegisterEvent('LOOT_ITEM', 'MY_RoleStatistics_SerendipityStat_AttemptLootItem' .. serendipity.nID, function()
-					if arg0 == UI_GetClientPlayerID() then
+					if arg0 == X.GetClientPlayerID() then
 						local item = GetItem(arg1)
 						if item then
 							for _, v in ipairs(serendipity.aAttemptLootItem) do
@@ -229,7 +229,7 @@ X.RegisterEvent('LOADING_ENDING', 'MY_RoleStatistics_SerendipityStat', function(
 			if serendipity.aAttemptItem then
 				RegisterEvent('BAG_ITEM_UPDATE', 'MY_RoleStatistics_SerendipityStat_AttemptItem' .. serendipity.nID, function()
 					local dwBox, dwX = arg0, arg1
-					local me = GetClientPlayer()
+					local me = X.GetClientPlayer()
 					local item = GetPlayerItem(me, dwBox, dwX)
 					if item then
 						for _, v in ipairs(serendipity.aAttemptItem) do
@@ -263,7 +263,7 @@ X.RegisterEvent('LOADING_ENDING', 'MY_RoleStatistics_SerendipityStat', function(
 			end
 			if serendipity.aFailureLootItem then
 				RegisterEvent('LOOT_ITEM', 'MY_RoleStatistics_SerendipityStat_FailureLootItem' .. serendipity.nID, function()
-					if arg0 == UI_GetClientPlayerID() then
+					if arg0 == X.GetClientPlayerID() then
 						local item = GetItem(arg1)
 						if item then
 							for _, v in ipairs(serendipity.aFailureLootItem) do
@@ -422,7 +422,7 @@ local COLUMN_LIST = {
 		nMinWidth = 110,
 		nMaxWidth = 200,
 		GetValue = function(prevVal, prevRec)
-			return GetClientPlayer().szName
+			return X.GetClientPlayer().szName
 		end,
 		GetFormatText = function(name, rec)
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
@@ -439,7 +439,7 @@ local COLUMN_LIST = {
 		nMinWidth = 50,
 		nMaxWidth = 70,
 		GetValue = function(prevVal, prevRec)
-			return GetClientPlayer().dwForceID
+			return X.GetClientPlayer().dwForceID
 		end,
 		GetFormatText = function(force)
 			return GetFormatText(g_tStrings.tForceTitle[force], 162, 255, 255, 255)
@@ -453,7 +453,7 @@ local COLUMN_LIST = {
 		nMinWidth = 50,
 		nMaxWidth = 50,
 		GetValue = function(prevVal, prevRec)
-			return GetClientPlayer().nCamp
+			return X.GetClientPlayer().nCamp
 		end,
 		GetFormatText = function(camp)
 			return GetFormatText(g_tStrings.STR_CAMP_TITLE[camp], 162, 255, 255, 255)
@@ -467,7 +467,7 @@ local COLUMN_LIST = {
 		nMinWidth = 50,
 		nMaxWidth = 50,
 		GetValue = function(prevVal, prevRec)
-			return GetClientPlayer().nLevel
+			return X.GetClientPlayer().nLevel
 		end,
 	},
 	-- 时间
@@ -558,7 +558,7 @@ for _, serendipity in ipairs(SERENDIPITY_LIST) do
 		end,
 		GetValue = function(prevVal, prevRec)
 			local value = {
-				count = GetSerendipityDailyCount(GetClientPlayer(), serendipity) or X.Get(prevVal, 'count'),
+				count = GetSerendipityDailyCount(X.GetClientPlayer(), serendipity) or X.Get(prevVal, 'count'),
 				extra = 0,
 			}
 			-- 包里有可用触发奇遇道具进行数量补偿
@@ -630,7 +630,7 @@ function D.GetPlayerRecords()
 end
 
 function D.GetClientPlayerRec()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -759,7 +759,7 @@ function D.UpdateSaveDB()
 	if not D.bReady then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -866,7 +866,7 @@ function D.OutputRowTip(this, rec)
 	hList:AppendItemFromIni(SZ_TIP_INI, 'Handle_Title'):Lookup('Text_Title'):SetText(
 		rec.region .. ' ' .. rec.server .. ' - ' .. rec.name
 		.. ' (' .. g_tStrings.tForceTitle[rec.force] .. ' ' .. rec.level .. g_tStrings.STR_LEVEL .. ')')
-	local dwMapID = GetClientPlayer().GetMapID()
+	local dwMapID = X.GetClientPlayer().GetMapID()
 	local tLuckPet = D.GetLuckyFellowPet()
 	for _, serendipity in ipairs(SERENDIPITY_LIST) do
 		local szText, r, g, b = GetSerendipityCounterText(serendipity, rec['serendipity_' .. serendipity.nID])
@@ -1280,7 +1280,7 @@ end
 -- 地图标记
 -------------------------------------------------------------------------------------------------------
 function D.OnMMMItemMouseEnter()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -1327,7 +1327,7 @@ end
 
 function D.GetVisibleMapPoint(dwMapID)
 	local aMapPoint = {}
-	local player = GetClientPlayer()
+	local player = X.GetClientPlayer()
 	if player then
 		for _, mark in ipairs(MAP_POINT_LIST) do
 			local bShow = mark.dwMapID == dwMapID and mark.aPosition and true or false
@@ -1352,7 +1352,7 @@ end
 
 function D.DrawMapMark()
 	local frame = Station.Lookup('Topmost1/MiddleMap')
-	local player = GetClientPlayer()
+	local player = X.GetClientPlayer()
 	if not player or not frame or not frame:IsVisible() then
 		return
 	end
@@ -1396,7 +1396,7 @@ function D.DrawMapMark()
 end
 
 function D.DrawMiniMapPoint()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -1464,7 +1464,7 @@ function D.GetSerendipityMapID(dwSerendipity)
 end
 
 function D.GetSerendipityCounter(dwPlayerID, dwSerendipity)
-	local rec = dwPlayerID == UI_GetClientPlayerID()
+	local rec = dwPlayerID == X.GetClientPlayerID()
 		and D.GetClientPlayerRec()
 		or D.GetPlayerRecords()[dwPlayerID]
 	local serendipity
@@ -1480,7 +1480,7 @@ function D.GetSerendipityCounter(dwPlayerID, dwSerendipity)
 end
 
 function D.GetSerendipityCounterText(dwPlayerID, dwSerendipity)
-	local rec = dwPlayerID == UI_GetClientPlayerID()
+	local rec = dwPlayerID == X.GetClientPlayerID()
 		and D.GetClientPlayerRec()
 		or D.GetPlayerRecords()[dwPlayerID]
 	local serendipity

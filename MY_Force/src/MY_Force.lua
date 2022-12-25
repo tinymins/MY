@@ -70,7 +70,7 @@ function D.OnAlertPetChange()
 	local bAlertPet = O.bAlertPet
 	if bAlertPet then
 		X.RegisterEvent('NPC_LEAVE_SCENE', 'MY_Force__AlertPet', function()
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if me and me.dwForceID == FORCE_TYPE.WU_DU then
 				local pet = me.GetPet()
 				if pet and pet.dwID == arg0 and (GetLogicFrameCount() - D.nFrameXJ) >= 32 then
@@ -80,7 +80,7 @@ function D.OnAlertPetChange()
 			end
 		end)
 		X.RegisterEvent('DO_SKILL_CAST', 'MY_Force__AlertPet', function()
-			if arg0 == UI_GetClientPlayerID() then
+			if arg0 == X.GetClientPlayerID() then
 				-- 献祭、各种召唤：2965，2221 ~ 2226
 				if arg1 == 2965 or (arg1 >= 2221 and arg1 <= 2226) then
 					D.nFrameXJ = GetLogicFrameCount()
@@ -96,7 +96,7 @@ end
 -- check to mark pet
 do
 local function UpdatePetMark(bMark)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -113,14 +113,14 @@ function D.OnMarkPetChange()
 	local bMarkPet = O.bMarkPet
 	if bMarkPet then
 		X.RegisterEvent({'NPC_ENTER_SCENE', 'NPC_DISPLAY_DATA_UPDATE'}, 'MY_Force__MarkPet', function()
-			local pet = GetClientPlayer().GetPet()
+			local pet = X.GetClientPlayer().GetPet()
 			if pet and arg0 == pet.dwID then
 				X.DelayCall(500, function()
 					UpdatePetMark(true)
 				end)
 			else
-				local npc = GetNpc(arg0)
-				if npc.dwTemplateID == 46297 and npc.dwEmployer == UI_GetClientPlayerID() then
+				local npc = X.GetNpc(arg0)
+				if npc.dwTemplateID == 46297 and npc.dwEmployer == X.GetClientPlayerID() then
 					SceneObject_SetTitleEffect(TARGET.NPC, npc.dwID, 13)
 				end
 			end
@@ -137,7 +137,7 @@ function D.OnFeedHorseChange()
 	local bFeedHorse = O.bFeedHorse
 	if bFeedHorse then
 		X.RegisterEvent('SYS_MSG', 'MY_Force__FeedHorse', function()
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			-- 读条技能
 			if arg0 == 'UI_OME_SKILL_CAST_LOG' and O.bFeedHorse and arg1 == me.dwID
 			and (arg2 == 433 or arg2 == 53 or Table_GetSkillName(arg2, 1) == Table_GetSkillName(53, 1)) then -- on prepare 骑乘
@@ -168,7 +168,7 @@ function D.OnWarningDebuffChange()
 			-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
 			-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
 			-- arg8：nLevel，arg9：dwSkillSrcID
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if arg0 ~= me.dwID or not O.bWarningDebuff or (not arg7 and arg3) then
 				return
 			end
@@ -203,12 +203,12 @@ end
 do
 local function OnMsgAnnounce(szMsg)
 	local _, _, sM, sN = string.find(szMsg, _L['Now somebody pay (%d+) gold to buy life of (.-)'])
-	if sM and sN == GetClientPlayer().szName then
+	if sM and sN == X.GetClientPlayer().szName then
 		local fW = function()
 			OutputWarningMessage('MSG_WARNING_RED', _L('Congratulations, you offered a reward [%s] gold!', sM))
 			PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 		end
-		SceneObject_SetTitleEffect(TARGET.PLAYER, UI_GetClientPlayerID(), 47)
+		SceneObject_SetTitleEffect(TARGET.PLAYER, X.GetClientPlayerID(), 47)
 		fW()
 		X.DelayCall(2000, fW)
 		X.DelayCall(4000, fW)
@@ -220,7 +220,7 @@ function D.OnAlertWantedChange()
 	if bAlertWanted then
 		-- 变化时更新头顶效果
 		X.RegisterEvent('PLAYER_STATE_UPDATE', 'MY_Force__AlertWanted', function()
-			if arg0 == UI_GetClientPlayerID() then
+			if arg0 == X.GetClientPlayerID() then
 				if D.bHasWanted then
 					SceneObject_SetTitleEffect(TARGET.PLAYER, arg0, 47)
 				end
@@ -229,7 +229,7 @@ function D.OnAlertWantedChange()
 		-- 重伤后删除头顶效果
 		X.RegisterEvent('SYS_MSG', 'MY_Force__AlertWanted', function()
 			if arg0 == 'UI_OME_DEATH_NOTIFY' then
-				if D.bHasWanted and arg1 == UI_GetClientPlayerID() then
+				if D.bHasWanted and arg1 == X.GetClientPlayerID() then
 					D.bHasWanted = nil
 					SceneObject_SetTitleEffect(TARGET.PLAYER, arg1, 0)
 				end

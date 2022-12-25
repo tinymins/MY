@@ -122,10 +122,10 @@ do
 -- 将服务器返回的对话Info解析为内容和交互选项
 function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 	local szName, szMap = _L['Common'], _L['Common']
-	if dwTarID ~= UI_GetClientPlayerID() then
+	if dwTarID ~= X.GetClientPlayerID() then
 		szName = X.GetObjectName(X.GetObject(dwTarType, dwTarID), 'never') or _L['Common']
 		if dwTarType ~= TARGET.ITEM then
-			szMap = Table_GetMapName(GetClientPlayer().GetMapID())
+			szMap = Table_GetMapName(X.GetClientPlayer().GetMapID())
 		end
 	end
 	local dialog = { szMap = szMap, szName = szName, szContext = '', aOptions = {} }
@@ -211,7 +211,7 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 			rlcmd('dialogue with npc 0')
 		end
 		for i = 1, nRepeat do
-			GetClientPlayer().WindowSelect(dwIndex, option.dwID)
+			X.GetClientPlayer().WindowSelect(dwIndex, option.dwID)
 		end
 		if O.bEchoOn then
 			X.Sysmsg(_L('Conversation with [%s]: %s', dialog.szName, dialog.szContext:gsub('%s', '')))

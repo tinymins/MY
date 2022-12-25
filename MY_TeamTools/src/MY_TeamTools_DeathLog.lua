@@ -54,20 +54,20 @@ local RT_SKILL_TYPE = {
 
 local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLevel, bCriticalStrike, nCount, tResult)
 	if not tResult[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE] then -- 没有反弹的情况下
-		if not IsPlayer(dwTarget) or not MY_IsParty(dwTarget) and dwTarget ~= PLAYER_ID then -- 目标不是队友也不是自己
+		if not X.IsPlayer(dwTarget) or not MY_IsParty(dwTarget) and dwTarget ~= PLAYER_ID then -- 目标不是队友也不是自己
 			return
 		end
 	else
-		if not IsPlayer(dwCaster) or not MY_IsParty(dwCaster) and dwCaster ~= PLAYER_ID then -- 目标不是队友也不是自己
+		if not X.IsPlayer(dwCaster) or not MY_IsParty(dwCaster) and dwCaster ~= PLAYER_ID then -- 目标不是队友也不是自己
 			return
 		end
 	end
-	local KCaster = IsPlayer(dwCaster) and GetPlayer(dwCaster) or GetNpc(dwCaster)
-	local KTarget = IsPlayer(dwTarget) and GetPlayer(dwTarget) or GetNpc(dwTarget)
+	local KCaster = X.IsPlayer(dwCaster) and X.GetPlayer(dwCaster) or X.GetNpc(dwCaster)
+	local KTarget = X.IsPlayer(dwTarget) and X.GetPlayer(dwTarget) or X.GetNpc(dwTarget)
 
 	local szSkill = nEffectType == SKILL_EFFECT_TYPE.SKILL and MY_GetSkillName(dwSkillID, dwLevel) or MY_GetBuffName(dwSkillID, dwLevel)
 		-- 五类伤害
-	if IsPlayer(dwTarget)
+	if X.IsPlayer(dwTarget)
 		and tResult[SKILL_RESULT_TYPE.PHYSICS_DAMAGE]
 		or tResult[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE]
 		or tResult[SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE]
@@ -76,7 +76,7 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 	then
 		local szCaster
 		if KCaster then
-			if IsPlayer(dwCaster) then
+			if X.IsPlayer(dwCaster) then
 				szCaster = KCaster.szName
 			else
 				szCaster = X.GetObjectName(KCaster)
@@ -99,10 +99,10 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 		})
 	end
 	-- 有反弹伤害
-	if tResult[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE] and IsPlayer(dwCaster) then
+	if tResult[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE] and X.IsPlayer(dwCaster) then
 		local szTarget
 		if KTarget then
-			if IsPlayer(dwTarget) then
+			if X.IsPlayer(dwTarget) then
 				szTarget = KTarget.szName
 			else
 				szTarget = X.GetObjectName(KTarget)
@@ -130,10 +130,10 @@ end
 -- 意外摔伤 会触发这个日志
 local function OnCommonHealthLog(dwCharacterID, nDeltaLife)
 	-- 过滤非玩家和治疗日志
-	if not IsPlayer(dwCharacterID) or nDeltaLife >= 0 then
+	if not X.IsPlayer(dwCharacterID) or nDeltaLife >= 0 then
 		return
 	end
-	local p = GetPlayer(dwCharacterID)
+	local p = X.GetPlayer(dwCharacterID)
 	if not p then
 		return
 	end
@@ -149,7 +149,7 @@ local function OnCommonHealthLog(dwCharacterID, nDeltaLife)
 end
 
 local function OnSkill(dwCaster, dwSkillID, dwLevel)
-	local p = GetPlayer(dwCaster)
+	local p = X.GetPlayer(dwCaster)
 	if not p then return end
 
 	local key = dwCaster == PLAYER_ID and 'self' or dwCaster
@@ -168,7 +168,7 @@ end
 -- 因为策划不喜欢写模板名称 导致NPC名字全是空的 摔死和淹死也是空
 -- 这就特别郁闷
 local function OnDeath(dwID, dwKiller)
-	if IsPlayer(dwID) and (MY_IsParty(dwID) or dwID == PLAYER_ID) then
+	if X.IsPlayer(dwID) and (MY_IsParty(dwID) or dwID == PLAYER_ID) then
 		local key = dwID == PLAYER_ID
 			and 'self'
 			or dwID
@@ -177,7 +177,7 @@ local function OnDeath(dwID, dwKiller)
 		end
 		if not INFO_CACHE[dwID] then
 			if key == 'self' then
-				local me = GetClientPlayer()
+				local me = X.GetClientPlayer()
 				INFO_CACHE[dwID] = {
 					szName = me.szName,
 					dwForceID = me.dwForceID,
@@ -195,7 +195,7 @@ local function OnDeath(dwID, dwKiller)
 				end
 			end
 		end
-		local szKiller = X.GetObjectName(IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller, 'never')
+		local szKiller = X.GetObjectName(X.IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller, 'never')
 		table.insert(DEATH_LOG[key], {
 			nCurrentTime = GetCurrentTime(),
 			data         = DAMAGE_LOG[key] or { szCaster = szKiller },
@@ -208,7 +208,7 @@ end
 
 X.RegisterEvent('LOADING_END', function()
 	DAMAGE_LOG = {}
-	PLAYER_ID  = UI_GetClientPlayerID()
+	PLAYER_ID  = X.GetClientPlayerID()
 end)
 
 X.RegisterEvent('SYS_MSG', function()
@@ -222,7 +222,7 @@ X.RegisterEvent('SYS_MSG', function()
 end)
 
 X.RegisterEvent('DO_SKILL_CAST', function()
-	if arg1 == 608 and IsPlayer(arg0) then -- 自觉经脉
+	if arg1 == 608 and X.IsPlayer(arg0) then -- 自觉经脉
 		OnSkill(arg0, arg1, arg2)
 	end
 end)
@@ -236,7 +236,7 @@ end
 -- 重伤记录
 function D.UpdatePage(page)
 	local hDeathList = page:Lookup('Wnd_DeathLog/Scroll_Player_List', '')
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local team = GetClientTeam()
 	local aList = {}
 	for k, v in pairs(DEATH_LOG) do
@@ -332,7 +332,7 @@ end
 
 function D.UpdateList(page, dwID)
 	local hDeathMsg = page:Lookup('Wnd_DeathLog/Scroll_Death_Info', '')
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local team = GetClientTeam()
 	local aRec = {}
 	local key = dwID == me.dwID and 'self' or dwID

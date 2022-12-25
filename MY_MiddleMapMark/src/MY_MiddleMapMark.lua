@@ -329,7 +329,7 @@ end
 local function onLoadingEnding()
 	l_tempMap = X.IsInZombieMap() or X.IsInPubg() or X.IsInArena() or X.IsInBattleField() or false
 	if l_tempMap then
-		local dwMapID = GetClientPlayer().GetMapID()
+		local dwMapID = X.GetClientPlayer().GetMapID()
 		DBN_DM:ClearBindings()
 		DBN_DM:BindAll(dwMapID)
 		DBN_DM:Execute()
@@ -371,8 +371,8 @@ local function OnNpcEnterScene()
 	if l_tempMap and X.IsRestricted('MY_MiddleMapMark.MapRestriction') then
 		return
 	end
-	local npc = GetNpc(arg0)
-	local player = GetClientPlayer()
+	local npc = X.GetNpc(arg0)
+	local player = X.GetClientPlayer()
 	if not (npc and player) then
 		return
 	end
@@ -434,8 +434,8 @@ local function OnDoodadEnterScene()
 	if l_tempMap and X.IsRestricted('MY_MiddleMapMark.MapRestriction') then
 		return
 	end
-	local doodad = GetDoodad(arg0)
-	local player = GetClientPlayer()
+	local doodad = X.GetDoodad(arg0)
+	local player = X.GetClientPlayer()
 	if not (doodad and player) then
 		return
 	end
@@ -613,7 +613,7 @@ end
 -- start search
 local MAX_DISPLAY_COUNT = 1000
 local function OnMMMItemMouseEnter()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
 	local szTip = (this.decoded and this.name or UTF8ToAnsi(this.name))
@@ -650,7 +650,7 @@ local function OnMMMItemMouseLeave()
 end
 function D.Search(bForce)
 	local frame = Station.Lookup('Topmost1/MiddleMap')
-	local player = GetClientPlayer()
+	local player = X.GetClientPlayer()
 	if not player or not frame or not frame:IsVisible() then
 		return
 	end

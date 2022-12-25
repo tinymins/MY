@@ -632,14 +632,14 @@ end)
 
 function D.GetPlayer(dwID)
 	local player, info
-	if dwID == UI_GetClientPlayerID() then
-		player = GetClientPlayer()
+	if dwID == X.GetClientPlayerID() then
+		player = X.GetClientPlayer()
 		info = {
 			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
 			szName = player.szName,
 		}
 	else
-		player = GetPlayer(dwID)
+		player = X.GetPlayer(dwID)
 		info = not X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetClientTeam().GetMemberInfo(dwID)
 	end
 	if info then
@@ -791,11 +791,11 @@ do local KCaster, KTarget, dwTargetEmployer, me, szEffectID, nTherapy, nEffectTh
 function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	-- »ñÈ¡ÊÍ·Å¶ÔÏóºÍ³ÐÊÜ¶ÔÏó
 	KCaster = X.GetObject(dwCaster)
-	if KCaster and not IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- ³èÎïµÄÊý¾ÝËãÔÚÖ÷ÈËÍ³¼ÆÖÐ
+	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- ³èÎïµÄÊý¾ÝËãÔÚÖ÷ÈËÍ³¼ÆÖÐ
 		KCaster = X.GetObject(KCaster.dwEmployer)
 	end
 	KTarget, dwTargetEmployer = X.GetObject(dwTarget), nil
-	if KTarget and not IsPlayer(dwTarget) and KTarget.dwEmployer and KTarget.dwEmployer ~= 0 then
+	if KTarget and not X.IsPlayer(dwTarget) and KTarget.dwEmployer and KTarget.dwEmployer ~= 0 then
 		dwTargetEmployer = KTarget.dwEmployer
 	end
 	if not (KCaster and KTarget) then
@@ -805,7 +805,7 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 	dwTarget = KTarget.dwID
 
 	-- ¹ýÂËµô²»ÊÇ¶ÓÓÑµÄÒÔ¼°²»ÊÇÊ×ÁìµÄ
-	me = GetClientPlayer()
+	me = X.GetClientPlayer()
 	if dwCaster ~= me.dwID                 -- ÊÍ·ÅÕß²»ÊÇ×Ô¼º
 	and dwTarget ~= me.dwID                -- ³ÐÊÜÕß²»ÊÇ×Ô¼º
 	and dwTargetEmployer ~= me.dwID        -- ³ÐÊÜÕßÖ÷ÈË²»ÊÇ×Ô¼º
@@ -886,7 +886,7 @@ end
 do local KCaster, szEffectID
 function D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
 	KCaster = X.GetObject(dwCaster)
-	if KCaster and not IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- ³èÎïµÄÊý¾ÝËãÔÚÖ÷ÈËÍ³¼ÆÖÐ
+	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- ³èÎïµÄÊý¾ÝËãÔÚÖ÷ÈËÍ³¼ÆÖÐ
 		dwCaster = KCaster.dwEmployer
 	end
 	szEffectID = D.InitEffectData(Data, SKILL_EFFECT_TYPE.BUFF, dwBuffID, dwBuffLevel)
@@ -985,10 +985,10 @@ do local dwID
 function D.IsParty(id)
 	dwID = tonumber(id)
 	if dwID then
-		if dwID == UI_GetClientPlayerID() then
+		if dwID == X.GetClientPlayerID() then
 			return true
 		else
-			return IsParty(dwID, UI_GetClientPlayerID())
+			return IsParty(dwID, X.GetClientPlayerID())
 		end
 	else
 		return false
@@ -1313,7 +1313,7 @@ function D.SavePlayerInfo(data, dwID, bRefresh)
 	if not D.bRecEverything then
 		return
 	end
-	if (bRefresh or not data[DK.PLAYER_LIST][dwID]) and IsPlayer(dwID) then
+	if (bRefresh or not data[DK.PLAYER_LIST][dwID]) and X.IsPlayer(dwID) then
 		local player, info = D.GetPlayer(dwID)
 		if player and info and not X.IsEmpty(info.dwMountKungfuID) then
 			local tPlayerList = data[DK.PLAYER_LIST]
@@ -1370,12 +1370,12 @@ end
 function D.InitObjectData(data, dwID, szChannel)
 	-- Ãû³Æ»º´æ
 	if not data[DK.NAME_LIST][dwID] then
-		data[DK.NAME_LIST][dwID] = X.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, 'never') -- Ãû³Æ»º´æ
+		data[DK.NAME_LIST][dwID] = X.GetObjectName(X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, 'never') -- Ãû³Æ»º´æ
 	end
 	-- ÊÆÁ¦»º´æ
 	if not data[DK.FORCE_LIST][dwID] then
-		if IsPlayer(dwID) then
-			local player = GetPlayer(dwID)
+		if X.IsPlayer(dwID) then
+			local player = X.GetPlayer(dwID)
 			if player then
 				data[DK.FORCE_LIST][dwID] = player.dwForceID or 0
 			end
@@ -1475,7 +1475,7 @@ function D.FlushData()
 			nEnemyMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
 			szEnemyBossName = D.GetNameAusID(Data, id)
 		end
-		if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and id ~= UI_GetClientPlayerID() then
+		if nMaxValue < p[DK_REC_STAT.TOTAL_EFFECT] and id ~= X.GetClientPlayerID() then
 			nMaxValue  = p[DK_REC_STAT.TOTAL_EFFECT]
 			szBossName = D.GetNameAusID(Data, id)
 		end
@@ -1819,10 +1819,10 @@ X.RegisterEvent('PLAYER_SAY', function()
 	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
-	if not IsPlayer(arg1) then
+	if not X.IsPlayer(arg1) then
 		local szText = X.GetPureText(arg0)
 		if szText and szText ~= '' then
-			local npc = GetNpc(arg1)
+			local npc = X.GetNpc(arg1)
 			local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
 			D.InsertEverything(
 				Data, nLFC, nTime, nTick,
@@ -1894,8 +1894,8 @@ X.RegisterEvent('SYS_MSG', function()
 		D.InsertEverything(
 			Data, nLFC, nTime, nTick,
 			EVERYTHING_TYPE.DEATH, dwID, dwKiller,
-			X.GetObjectName(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID),
-			X.GetObjectName(IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller)
+			X.GetObjectName(X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID),
+			X.GetObjectName(X.IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller)
 		)
 	end
 end)
@@ -1929,7 +1929,7 @@ X.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµ
 		return
 	end
 	local team = GetClientTeam()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if team and me and (me.IsInParty() or me.IsInRaid()) then
 		for _, dwID in ipairs(team.GetTeamMemberList()) do
 			local info = team.GetMemberInfo(dwID)

@@ -244,7 +244,7 @@ function D.GetTeamMemberMenu(fnAction, bDisable, bSelf)
 		local info = GetClientTeam().GetMemberInfo(v)
 		table.insert(tTeam, { szName = info.szName, dwID = v, dwForce = info.dwForceID, bIsOnLine = info.bIsOnLine})
 	end
-	local dwID = UI_GetClientPlayerID()
+	local dwID = X.GetClientPlayerID()
 	table.sort(tTeam, function(a, b) return a.dwForce < b.dwForce end)
 	for _, v in ipairs(tTeam) do
 		if v.dwID ~= dwID or bSelf then

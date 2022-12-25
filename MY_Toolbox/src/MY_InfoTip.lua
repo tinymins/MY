@@ -422,7 +422,7 @@ local INFO_TIP_LIST = {
 		},
 		cache = {},
 		GetFormatString = function(data)
-			local player, text = GetClientPlayer(), ''
+			local player, text = X.GetClientPlayer(), ''
 			if player then
 				text = string.format(data.cache.formatString, player.GetMapID(), player.nX, player.nY, player.nZ)
 			end
@@ -482,7 +482,7 @@ local INFO_TIP_LIST = {
 		},
 		GetFormatString = function(data)
 			local s = 0
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if me and data.cache.nSpeedometerLFC ~= GetLogicFrameCount() then
 				local sm = data.cache.tSpeedometerRec[X.ENVIRONMENT.GAME_FPS] or {}
 				sm.framecount = GetLogicFrameCount()

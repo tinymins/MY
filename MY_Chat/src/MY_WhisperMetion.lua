@@ -53,7 +53,7 @@ function D.Apply()
 			'MSG_NPC_PARTY',
 			'MSG_NPC_WHISPER',
 		}, 'MY_RedirectMetionToWhisper', function(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szName)
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if not me or me.dwID == dwTalkerID then
 				return
 			end

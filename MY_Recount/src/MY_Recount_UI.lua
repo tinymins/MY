@@ -296,11 +296,11 @@ function D.UpdateUI(frame)
 		if (bShowZeroVal or rec[MY_Recount_UI.bShowEffect and DK_REC_STAT.TOTAL_EFFECT or DK_REC_STAT.TOTAL] > 0)
 		and (
 			MY_Recount_UI.nDisplayMode == DISPLAY_MODE.BOTH or  -- 确定显示模式（显示NPC/显示玩家/全部显示）
-			(MY_Recount_UI.nDisplayMode == DISPLAY_MODE.NPC and not IsPlayer(dwID)) or
-			(MY_Recount_UI.nDisplayMode == DISPLAY_MODE.PLAYER and IsPlayer(dwID))
+			(MY_Recount_UI.nDisplayMode == DISPLAY_MODE.NPC and not X.IsPlayer(dwID)) or
+			(MY_Recount_UI.nDisplayMode == DISPLAY_MODE.PLAYER and X.IsPlayer(dwID))
 		) then
 			local id, tRec = dwID
-			if not IsPlayer(dwID) then
+			if not X.IsPlayer(dwID) then
 				id = MY_Recount_UI.bGroupSameNpc and MY_Recount_DS.GetNameAusID(data, dwID) or dwID
 				tRec = tResult[id]
 			end
@@ -372,7 +372,7 @@ function D.UpdateUI(frame)
 	local hList = frame:Lookup('Wnd_Main', 'Handle_List')
 	for i, p in pairs(aResult) do
 		-- 自己的记录
-		if p.id == UI_GetClientPlayerID() then
+		if p.id == X.GetClientPlayerID() then
 			tMyRec = p
 			tMyRec.nRank = i
 		end
@@ -600,8 +600,8 @@ function D.OnItemLButtonClick()
 	local id = this.id
 	local name = this:GetName()
 	if name == 'Handle_Me' then
-		id = UI_GetClientPlayerID()
-		name = 'Handle_LI_' .. UI_GetClientPlayerID()
+		id = X.GetClientPlayerID()
+		name = 'Handle_LI_' .. X.GetClientPlayerID()
 	end
 	if id and name:find('Handle_LI_') == 1 then
 		MY_Recount_DT_Open(id, MY_Recount_UI.nChannel)
@@ -612,8 +612,8 @@ function D.OnItemRefreshTip()
 	local id = this.id
 	local name = this:GetName()
 	if name == 'Handle_Me' then
-		id = UI_GetClientPlayerID()
-		name = 'Handle_LI_' .. UI_GetClientPlayerID()
+		id = X.GetClientPlayerID()
+		name = 'Handle_LI_' .. X.GetClientPlayerID()
 	end
 	name:gsub('Handle_LI_(.+)', function()
 		if tonumber(id) then

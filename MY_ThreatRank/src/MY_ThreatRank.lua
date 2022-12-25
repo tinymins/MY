@@ -103,9 +103,9 @@ local O = X.CreateUserSettingsModule('MY_ThreatRank', _L['Target'], {
 
 local TS = {}
 local ipairs, pairs = ipairs, pairs
-local GetPlayer, GetNpc, IsPlayer, ApplyCharacterThreatRankList = GetPlayer, GetNpc, IsPlayer, ApplyCharacterThreatRankList
-local GetClientPlayer, GetClientTeam = GetClientPlayer, GetClientTeam
-local UI_GetClientPlayerID, GetTime = UI_GetClientPlayerID, GetTime
+local MY_GetPlayer, MY_GetNpc, MY_IsPlayer, ApplyCharacterThreatRankList = X.GetPlayer, X.GetNpc, X.IsPlayer, ApplyCharacterThreatRankList
+local MY_GetClientPlayer, GetClientTeam = X.GetClientPlayer, GetClientTeam
+local MY_GetClientPlayerID, GetTime = UI_GetClientPlayerID, GetTime
 local HATRED_COLLECT = g_tStrings.HATRED_COLLECT
 local MY_GetObjName, MY_GetForceColor = X.GetObjectName, X.GetForceColor
 local MY_GetBuff, MY_GetBuffName, MY_GetEndTime = X.GetBuff, X.GetBuffName, X.GetEndTime
@@ -147,15 +147,15 @@ function TS.OnEvent(szEvent)
 		local dwType, dwID = Target_GetTargetData()
 		local dwTargetID
 		-- check tar
-		if dwType == TARGET.NPC or GetNpc(this.dwLockTargetID) then
-			if GetNpc(this.dwLockTargetID) then
+		if dwType == TARGET.NPC or MY_GetNpc(this.dwLockTargetID) then
+			if MY_GetNpc(this.dwLockTargetID) then
 				dwTargetID = this.dwLockTargetID
 			else
 				dwTargetID = dwID
 			end
-		elseif dwType == TARGET.PLAYER and GetPlayer(dwID) then
-			local tdwTpye, tdwID = GetPlayer(dwID).GetTarget()
-			if tdwTpye == TARGET.NPC then
+		elseif dwType == TARGET.PLAYER and MY_GetPlayer(dwID) then
+			local tdwType, tdwID = MY_GetPlayer(dwID).GetTarget()
+			if tdwType == TARGET.NPC then
 				dwTargetID = tdwID
 			end
 		end
@@ -182,7 +182,7 @@ function TS.OnEvent(szEvent)
 end
 
 function TS.OnFrameBreathe()
-	local p = GetNpc(this.dwTargetID)
+	local p = MY_GetNpc(this.dwTargetID)
 	if p then
 		ApplyCharacterThreatRankList(this.dwTargetID)
 		local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(p)
@@ -202,7 +202,7 @@ function TS.OnFrameBreathe()
 		end
 
 		-- 无威胁提醒
-		local buff = MY_GetBuff(GetClientPlayer(), {
+		local buff = MY_GetBuff(MY_GetClientPlayer(), {
 			[917]  = 0,
 			[4487] = 0,
 			[926]  = 0,
@@ -224,7 +224,7 @@ function TS.OnFrameBreathe()
 
 		-- 开怪提醒
 		if this.nTime >= 0 and GetTime() - this.nTime > 1000 * 7 and GetNpcIntensity(p) > 2 then
-			local me = GetClientPlayer()
+			local me = MY_GetClientPlayer()
 			if not me.bFightState then return end
 			this.nTime = -1
 			X.DelayCall(1000, function()
@@ -236,8 +236,8 @@ function TS.OnFrameBreathe()
 						local nGroup = team.GetMemberGroupIndex(p.dwDropTargetPlayerID) + 1
 						local name = MY_GetObjName(p)
 						local oContent = {_L('Well done! %s in %d group first to attack %s!!', nGroup, szMember, name), r = 150, g = 250, b = 230}
-						local oTitile = {g_tStrings.HATRED_COLLECT, r = 150, g = 250, b = 230}
-						X.Sysmsg(oTitile, oContent)
+						local oTitle = {g_tStrings.HATRED_COLLECT, r = 150, g = 250, b = 230}
+						X.Sysmsg(oTitle, oContent)
 					end
 				end
 			end)
@@ -350,7 +350,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 	-- 修复arg2反馈不准 当前目标才修复 非当前目标也不准。。
 	local dwType, dwID = Target_GetTargetData()
 	if dwID == dwApplyID and dwType == TARGET.NPC then
-		local p = GetNpc(dwApplyID)
+		local p = MY_GetNpc(dwApplyID)
 		if p then
 			local _, tdwID = p.GetTarget()
 			if tdwID and tdwID ~= 0 and tdwID ~= dwTargetID and tList[tdwID] then -- 原来是0 搞半天。。
@@ -365,13 +365,13 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 	table.sort(tThreat, function(a, b) return a.val > b.val end) -- 进行排序
 	for k, v in ipairs(tThreat) do
 		v.sort = k
-		if v.id == UI_GetClientPlayerID() then
+		if v.id == MY_GetClientPlayerID() then
 			tMyRank = v
 		end
 	end
 	this.bg:SetH(55 + 24 * math.min(#tThreat, O.nMaxBarCount))
 	this.handle:Clear()
-	local KGnpc = GetNpc(dwApplyID)
+	local KGnpc = MY_GetNpc(dwApplyID)
 	if #tThreat > 0 and KGnpc then
 		this:Show()
 		if #tThreat >= 2 then
@@ -395,7 +395,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 		local show = false
 		for k, v in ipairs(tThreat) do
 			if k > O.nMaxBarCount then break end
-			if UI_GetClientPlayerID() == v.id then
+			if MY_GetClientPlayerID() == v.id then
 				if O.nOTAlertLevel > 0 and GetNpcIntensity(KGnpc) > 2 then
 					if this.bSelfTreatRank < O.nOTAlertLevel and v.val / nTopRank >= O.nOTAlertLevel then
 						X.Topmsg(_L('** You Threat more than %d, 120% is Out of Taunt! **', O.nOTAlertLevel * 100))
@@ -406,7 +406,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 				end
 				this.bSelfTreatRank = v.val / nTopRank
 				show = true
-			elseif k == O.nMaxBarCount and not show and tList[UI_GetClientPlayerID()] then -- 始终显示自己的
+			elseif k == O.nMaxBarCount and not show and tList[MY_GetClientPlayerID()] then -- 始终显示自己的
 				v = tMyRank
 			end
 
@@ -426,7 +426,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			item:Lookup('Text_ThreatValue'):SetFontScheme(dat[6][2])
 
 			if v.id == dwTargetID then
-				if dwTargetID == UI_GetClientPlayerID() then
+				if dwTargetID == MY_GetClientPlayerID() then
 					item:Lookup('Image_Target'):SetFrame(10)
 				end
 				item:Lookup('Image_Target'):Show()
@@ -434,8 +434,8 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 
 			local r, g, b = 188, 188, 188
 			local szName, dwForceID = _L['Loading...'], 0
-			if IsPlayer(v.id) then
-				local p = GetPlayer(v.id)
+			if MY_IsPlayer(v.id) then
+				local p = MY_GetPlayer(v.id)
 				if p then
 					dwForceID = p.dwForceID
 					szName    = p.szName
@@ -454,7 +454,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 					r, g, b = 255, 255, 255
 				end
 			else
-				local p = GetNpc(v.id)
+				local p = MY_GetNpc(v.id)
 				if p then
 					szName = X.GetObjectName(p)
 				end
@@ -463,10 +463,10 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			item:Lookup('Text_ThreatName'):SetFontScheme(dat[6][1])
 			item:Lookup('Text_ThreatName'):SetFontColor(r, g, b)
 			if O.bForceIcon then
-				local info = X.IsParty(v.id) and IsPlayer(v.id) and team.GetMemberInfo(v.id)
+				local info = X.IsParty(v.id) and MY_IsPlayer(v.id) and team.GetMemberInfo(v.id)
 				if info then
 					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
-				elseif IsPlayer(v.id) then
+				elseif MY_IsPlayer(v.id) then
 					item:Lookup('Image_Icon'):FromUITex(GetForceImage(dwForceID))
 				else
 					item:Lookup('Image_Icon'):FromUITex('ui/Image/TargetPanel/Target.uitex', 57)
@@ -484,7 +484,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			elseif fDiff >= 0.01 then
 				item:Lookup('Image_Treat_Bar'):FromUITex(unpack(dat[1]))
 			end
-			if O.bSpecialSelf and v.id == UI_GetClientPlayerID() then
+			if O.bSpecialSelf and v.id == MY_GetClientPlayerID() then
 				item:Lookup('Image_Treat_Bar'):FromUITex(unpack(dat[5]))
 			end
 			item:Lookup('Image_Treat_Bar'):SetPercentage(nThreatPercentage)

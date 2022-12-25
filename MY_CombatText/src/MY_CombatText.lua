@@ -445,11 +445,11 @@ function D.OnFrameCreate()
 	end)
 end
 
--- for i=1,5 do FireUIEvent('SKILL_EFFECT_TEXT',UI_GetClientPlayerID(),1073741860,true,5,1111,111,1)end
--- for i=1,5 do FireUIEvent('SKILL_EFFECT_TEXT',UI_GetClientPlayerID(),1073741860,false,5,1111,111,1)end
--- for i=1, 5 do FireEvent('SKILL_BUFF', UI_GetClientPlayerID(), true, 103, 1) end
--- FireUIEvent('SKILL_MISS', UI_GetClientPlayerID(), UI_GetClientPlayerID())
--- FireUIEvent('SYS_MSG', 'UI_OME_EXP_LOG', UI_GetClientPlayerID(), UI_GetClientPlayerID())
+-- for i=1,5 do FireUIEvent('SKILL_EFFECT_TEXT',X.GetClientPlayerID(),1073741860,true,5,1111,111,1)end
+-- for i=1,5 do FireUIEvent('SKILL_EFFECT_TEXT',X.GetClientPlayerID(),1073741860,false,5,1111,111,1)end
+-- for i=1, 5 do FireEvent('SKILL_BUFF', X.GetClientPlayerID(), true, 103, 1) end
+-- FireUIEvent('SKILL_MISS', X.GetClientPlayerID(), X.GetClientPlayerID())
+-- FireUIEvent('SYS_MSG', 'UI_OME_EXP_LOG', X.GetClientPlayerID(), X.GetClientPlayerID())
 function D.OnEvent(szEvent)
 	if szEvent == 'FIGHT_HINT' then -- 进出战斗文字
 		if arg0 then
@@ -489,7 +489,7 @@ function D.OnEvent(szEvent)
 		D.OnExpLog(arg0, arg1)
 	elseif szEvent == 'SYS_MSG' then
 		if arg0 == 'UI_OME_DEATH_NOTIFY' then
-			if not IsPlayer(arg1) then
+			if not X.IsPlayer(arg1) then
 				COMBAT_TEXT_LEAVE[arg1] = true
 			end
 		elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
@@ -732,9 +732,9 @@ end
 
 function D.CreateColorText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike, tCol)
 	local object, tPoint
-	local bIsPlayer = IsPlayer(dwTargetID)
+	local bIsPlayer = X.IsPlayer(dwTargetID)
 	if dwTargetID ~= COMBAT_TEXT_PLAYERID then
-		object = bIsPlayer and GetPlayer(dwTargetID) or GetNpc(dwTargetID)
+		object = bIsPlayer and X.GetPlayer(dwTargetID) or X.GetNpc(dwTargetID)
 		if object and object.nX then
 			tPoint = { object.nX, object.nY, object.nZ }
 		end
@@ -810,13 +810,13 @@ function D.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nSkillResultType
 	if COMBAT_TEXT_TYPE_CLASS[eType] == 'THERAPY' and nValue == 0 then
 		return
 	end
-	local bIsPlayer = IsPlayer(dwCasterID)
-	local KCaster = bIsPlayer and GetPlayer(dwCasterID) or GetNpc(dwCasterID)
+	local bIsPlayer = X.IsPlayer(dwCasterID)
+	local KCaster = bIsPlayer and X.GetPlayer(dwCasterID) or X.GetNpc(dwCasterID)
 	local KEmployer, dwEmployerID
 	if not bIsPlayer and KCaster then
 		dwEmployerID = KCaster.dwEmployer
 		if dwEmployerID ~= 0 then -- NPC要算归属圈
-			KEmployer = GetPlayer(dwEmployerID)
+			KEmployer = X.GetPlayer(dwEmployerID)
 		end
 	end
 	-- 过滤他人数据
@@ -948,7 +948,7 @@ function D.OnBuffImmunity(dwTargetID)
 	D.CreateText(shadow, dwTargetID, g_tStrings.STR_MSG_IMMUNITY, 'LEFT', COMBAT_TEXT_TYPE.BUFF_IMMUNITY, false)
 end
 
--- FireUIEvent('COMMON_HEALTH_TEXT', GetClientPlayer().dwID, -8888)
+-- FireUIEvent('COMMON_HEALTH_TEXT', X.GetClientPlayer().dwID, -8888)
 function D.OnCommonHealth(dwCharacterID, nDeltaLife)
 	if nDeltaLife < 0 and not IsCombatTextPlayerID(dwCharacterID) then
 		return
@@ -1524,7 +1524,7 @@ X.RegisterPanel(_L['System'], 'MY_CombatText', _L['MY_CombatText'], 2041, PS)
 --------------------------------------------------------------------------------
 
 local function GetPlayerID()
-	local me = GetControlPlayer()
+	local me = X.GetControlPlayer()
 	if me then
 		COMBAT_TEXT_PLAYERID = me.dwID
 		--[[#DEBUG BEGIN]]

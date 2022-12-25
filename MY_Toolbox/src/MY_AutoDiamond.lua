@@ -43,7 +43,7 @@ function D.GetDiamondData(dwBox, dwX)
 	if not dwX then
 		dwBox, dwX = select(2, dwBox:GetObjectData())
 	end
-	local d, item = {}, GetClientPlayer().GetItem(dwBox, dwX)
+	local d, item = {}, X.GetClientPlayer().GetItem(dwBox, dwX)
 	d.dwBox, d.dwX = dwBox, dwX
 	if item then
 		d.level = string.match(item.szName, _L['DIAMOND_REGEX'])
@@ -90,7 +90,7 @@ end
 
 -- 扫描背包石头及空位信息（存在 buggy cache）
 function D.LoadBagDiamond()
-	local me, t = GetClientPlayer(), {}
+	local me, t = X.GetClientPlayer(), {}
 	for dwBox = 1, X.GetBagPackageCount() do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local d = D.GetDiamondData(dwBox, dwX)
@@ -111,7 +111,7 @@ end
 
 -- 还原背包格子里的石头，失败返回 false，成功返回 true
 function D.RestoreBagDiamond(d)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local tBag = D.tBagCache
 	-- move box item
 	local item = me.GetItem(d.dwBox, d.dwX)
@@ -267,7 +267,7 @@ function D.DoAutoDiamond()
 		local dwBox, dwX = select(2, box:GetObjectData())
 		RemoveUILockItem('CastingPanel:' .. dwBox .. ',' .. dwX)
 		box:SetObject(UI_OBJECT_NOT_NEED_KNOWN, 0)
-		box:SetObjectIcon(3388 - GetClientPlayer().nGender)
+		box:SetObjectIcon(3388 - X.GetClientPlayer().nGender)
 	end)
 	-- 重新放入配方（延迟8帧执行，确保 unlock）
 	X.DelayCall(200, function()
@@ -458,7 +458,7 @@ X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond', function()
 	if nResult == DIAMOND_RESULT_CODE.SUCCESS then
 		local d = D.dFormula and D.dFormula[1]
 		if d and d.detail and d.detail > 0 then
-			local KItem = GetPlayerItem(GetClientPlayer(), d.dwBox, d.dwX)
+			local KItem = GetPlayerItem(X.GetClientPlayer(), d.dwBox, d.dwX)
 			if KItem then
 				if KItem.nDetail > d.detail then
 					bSuccess = true

@@ -79,7 +79,7 @@ function D.OnEvent(event)
 end
 
 function D.OnFrameBreathe()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then return end
 	local dwKungfuID = UI_GetPlayerMountKungfuID()
 	local DISTANCE = 20
@@ -222,14 +222,14 @@ end
 
 function D.GetPlayer(dwID)
 	local player, info
-	if dwID == UI_GetClientPlayerID() then
-		player = GetClientPlayer()
+	if dwID == X.GetClientPlayerID() then
+		player = X.GetClientPlayer()
 		info = {
 			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
 			szName = player.szName,
 		}
 	else
-		player = GetPlayer(dwID)
+		player = X.GetPlayer(dwID)
 		info = GetClientTeam().GetMemberInfo(dwID)
 	end
 	if info then

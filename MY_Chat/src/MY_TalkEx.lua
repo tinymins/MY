@@ -138,7 +138,7 @@ function D.Trick()
 		return X.Sysmsg(_L['Please input something.'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	local t = {}
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -324,7 +324,7 @@ function PS.OnPanelActive(wnd)
 						content = D.szJokeText or '',
 						server = X.GetServerOriginName(),
 						role = bAnonymous and '' or X.GetUserRoleName(),
-						id = bAnonymous and '' or UI_GetClientPlayerID(),
+						id = bAnonymous and '' or X.GetClientPlayerID(),
 						jx3id = bAnonymous and '' or X.GetPlayerGUID(),
 					},
 					signature = X.SECRET['J3CX::JOKE'],

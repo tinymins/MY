@@ -128,7 +128,7 @@ end
 
 X.RegisterBgMsg('CHAR_INFO', function(szMsgID, aData, nChannel, dwID, szName, bIsSelf)
 	local szAction, dwTarID, oData = aData[1], aData[2], aData[3]
-	if not bIsSelf and dwTarID == UI_GetClientPlayerID() then
+	if not bIsSelf and dwTarID == X.GetClientPlayerID() then
 		local frame = CharInfo.GetFrame(dwID)
 		if not frame then
 			return
@@ -161,7 +161,7 @@ function D.ViewCharInfoToPlayer(dwID)
 		end
 	end
 	if not nChannel then
-		local tar = GetPlayer(dwID)
+		local tar = X.GetPlayer(dwID)
 		if tar then
 			nChannel = tar.szName
 			szName = tar.szName
@@ -185,7 +185,7 @@ end
 do
 local function GetInfoPanelMenu()
 	local dwType, dwID = X.GetTarget()
-	if dwType == TARGET.PLAYER and dwID ~= UI_GetClientPlayerID() then
+	if dwType == TARGET.PLAYER and dwID ~= X.GetClientPlayerID() then
 		return {
 			szOption = g_tStrings.STR_LOOK .. g_tStrings.STR_EQUIP_ATTR,
 			fnAction = function()

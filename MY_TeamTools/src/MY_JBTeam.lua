@@ -23,12 +23,12 @@ local D = {}
 local O = {}
 
 function D.ApplyAPI(szAction, szTeam, resolve, reject)
-	local dwID = UI_GetClientPlayerID()
+	local dwID = X.GetClientPlayerID()
 	if IsRemotePlayer(dwID) then
 		X.Alert(_L['You are crossing server, please do this after backing.'])
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	X.Ajax({
 		url = 'https://push.j3cx.com/team/' .. (szAction == 'join' and 'join' or 'quit'),
 		data = {

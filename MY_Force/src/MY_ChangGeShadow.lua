@@ -78,7 +78,7 @@ function D.Apply()
 					hShaList:AppendItemFromString('<shadow></shadow>')
 					sha = hShaList:Lookup(i)
 				end
-				nDis = X.GetDistance(GetNpc(hItem.nNpcID))
+				nDis = X.GetDistance(X.GetNpc(hItem.nNpcID))
 				if hItem.szState == 'disable' then
 					r, g, b = 191, 31, 31
 				else
@@ -134,7 +134,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			},
 			autoEnable = function()
-				local me = GetClientPlayer()
+				local me = X.GetClientPlayer()
 				return me and me.dwForceID == X.CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
 		}):Width() + 5
@@ -155,7 +155,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			},
 			autoEnable = function()
-				local me = GetClientPlayer()
+				local me = X.GetClientPlayer()
 				return me and me.dwForceID == X.CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
 		}):Width() + 5
@@ -176,7 +176,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				position = X.UI.TIP_POSITION.TOP_BOTTOM,
 			},
 			autoEnable = function()
-				local me = GetClientPlayer()
+				local me = X.GetClientPlayer()
 				return me and me.dwForceID == X.CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
 		}):Width() + 5
@@ -191,7 +191,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				D.Apply()
 			end,
 			autoEnable = function()
-				local me = GetClientPlayer()
+				local me = X.GetClientPlayer()
 				return me and me.dwForceID == X.CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
 		})

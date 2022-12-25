@@ -46,7 +46,7 @@ local O = X.CreateUserSettingsModule('MY_WorldMark', _L['Raid'], {
 local D = {}
 
 function D.OnNpcEvent()
-	local npc = GetNpc(arg0)
+	local npc = X.GetNpc(arg0)
 	if npc then
 		local mark = WM_LIST[npc.dwTemplateID]
 		if mark then
@@ -62,7 +62,7 @@ function D.OnNpcEvent()
 end
 
 function D.OnNpcLeave()
-	local npc = GetNpc(arg0)
+	local npc = X.GetNpc(arg0)
 	if npc then
 		local mark = WM_LIST[npc.dwTemplateID]
 		if mark then

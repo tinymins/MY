@@ -53,12 +53,12 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 					local bTermial, bStep
 					if nIndex <= nCount then -- 获取下一个有效的扫描目标
 						local dwID = aPendingID[nIndex]
-						local tar = GetPlayer(dwID)
+						local tar = X.GetPlayer(dwID)
 						while not tar and nIndex <= nCount do
 							Echo(nIndex, nCount * 2 + 1)
 							nIndex = nIndex + 1
 							dwID = aPendingID[nIndex]
-							tar = GetPlayer(dwID)
+							tar = X.GetPlayer(dwID)
 						end
 						if tar then
 							local dwType, dwID = X.GetTarget()
@@ -71,12 +71,12 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 						end
 					elseif nIndex <= nCount * 2 then -- 获取下一个有效的输出目标
 						local dwID = aProcessID[nIndex - nCount]
-						local tar = GetPlayer(dwID)
+						local tar = X.GetPlayer(dwID)
 						while not tar and nIndex <= nCount * 2 do
 							Echo(nIndex, nCount * 2 + 1)
 							nIndex = nIndex + 1
 							dwID = aProcessID[nIndex - nCount]
-							tar = GetPlayer(dwID)
+							tar = X.GetPlayer(dwID)
 						end
 						if tar then
 							local dwType, dwID = X.GetTarget()

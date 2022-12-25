@@ -55,7 +55,7 @@ local function CreateBuffList(dwID, nLevel, col, tArgs, szSender, szReceiver)
 	col = col or { 255, 255, 0 }
 	tArgs = tArgs or {}
 	local level = tArgs.bCheckLevel and nLevel or nil
-	local buff = GetBuff(GetClientPlayer(), dwID, level)
+	local buff = GetBuff(X.GetClientPlayer(), dwID, level)
 	if buff then
 		local ui, bScale
 		if D.handle:Lookup(key) then
@@ -116,7 +116,7 @@ function D.OnEvent(szEvent)
 end
 function D.OnItemMouseEnter()
 	local h = this:GetParent()
-	local buff = GetBuff(GetClientPlayer(), h.dwID, h.nLevel)
+	local buff = GetBuff(X.GetClientPlayer(), h.dwID, h.nLevel)
 	if buff then
 		this:SetObjectMouseOver(true)
 		local x, y = this:GetAbsPos()
@@ -127,7 +127,7 @@ end
 
 function D.OnItemRButtonClick()
 	local h = this:GetParent()
-	X.CancelBuff(GetClientPlayer(), h.dwID, h.nLevel)
+	X.CancelBuff(X.GetClientPlayer(), h.dwID, h.nLevel)
 end
 
 function D.OnItemMouseLeave()
@@ -138,7 +138,7 @@ function D.OnItemMouseLeave()
 end
 
 function D.OnFrameBreathe()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then return end
 	for i = D.handle:GetItemCount() -1, 0, -1 do
 		local h = D.handle:Lookup(i)

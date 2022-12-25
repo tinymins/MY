@@ -102,7 +102,7 @@ function PS.OnPanelActive(wnd)
 			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		limit = 6,
-		text = X.LoadLUAData({'config/realname.jx3dat', X.PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
+		text = X.LoadLUAData({'config/realname.jx3dat', X.PATH_TYPE.ROLE}) or X.GetClientPlayer().szName:gsub('@.-$', ''),
 		onChange = function(szText)
 			X.SaveLUAData({'config/realname.jx3dat', X.PATH_TYPE.ROLE}, szText)
 		end,

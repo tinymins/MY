@@ -115,7 +115,7 @@ function D.HookDomesticatePanel()
 	local box = Station.Lookup('Normal/DomesticatePanel/Wnd_Satiation', 'Box_Feed')
 	if btn and box then
 		btn.OnRButtonClick = function()
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			local x, y = this:GetAbsPos()
 			local w, h = this:GetSize()
 			local menu = {
@@ -130,7 +130,7 @@ function D.HookDomesticatePanel()
 							D.SetAutoFeed()
 							X.Systopmsg(_L['Auto feed domesticate cancelled.'])
 						else
-							local domesticate = GetClientPlayer().GetDomesticate()
+							local domesticate = X.GetClientPlayer().GetDomesticate()
 							local dwCubTabType, dwCubTabIndex = domesticate.dwCubTabType, domesticate.dwCubTabIndex
 							local dwFoodTabType, dwFoodTabIndex = select(5, box:GetObjectData())
 							if not domesticate then
@@ -167,7 +167,7 @@ end
 function D.CheckAutoFeedEnable()
 	if D.bReady then
 		X.BreatheCall('MY_Domesticate__AutoFeed', 30000, function()
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if not me then
 				return
 			end
@@ -215,7 +215,7 @@ end
 function D.CheckAlertEnable()
 	if D.bReady and O.bAlert then
 		X.BreatheCall('MY_Domesticate__Alert', 60000, function()
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if not me then
 				return
 			end

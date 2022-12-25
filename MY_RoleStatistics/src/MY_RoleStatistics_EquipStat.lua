@@ -324,7 +324,7 @@ X.RegisterEvent({'EQUIP_CHANGE', 'EQUIP_ITEM_UPDATE'}, 'MY_RoleStatistics_EquipS
 		if not REC_CACHE then
 			return
 		end
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		local ownersuitindex = me.GetEquipIDArray(0) + 1
 		REC_CACHE.ownerscore[ownersuitindex] = me.GetTotalEquipScore() or 0
 	end)
@@ -337,7 +337,7 @@ function D.FlushDB()
 	--[[#DEBUG BEGIN]]
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(X.GetPlayerGUID())
 	local ownername = AnsiToUTF8(me.szName)
@@ -450,7 +450,7 @@ function D.UpdateSaveDB()
 	if not D.bReady then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end

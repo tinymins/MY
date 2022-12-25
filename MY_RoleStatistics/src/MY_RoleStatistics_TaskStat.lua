@@ -711,7 +711,7 @@ local TIP_COLUMN = {
 do
 local REC_CACHE
 function D.GetClientPlayerRec()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -866,7 +866,7 @@ function D.UpdateSaveDB()
 	if not D.bReady then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end

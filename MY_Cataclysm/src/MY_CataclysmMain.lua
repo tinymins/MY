@@ -392,7 +392,7 @@ function D.TeammatePanel_Switch(bOpen)
 end
 
 function D.GetGroupTotal()
-	local me, team = GetClientPlayer(), GetClientTeam()
+	local me, team = X.GetClientPlayer(), GetClientTeam()
 	local nGroup = 0
 	if me.IsInRaid() then
 		for i = 0, team.nGroupNum - 1 do
@@ -597,7 +597,7 @@ function D.CloseCataclysmPanel()
 end
 
 function D.CheckCataclysmEnable()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not MY_Cataclysm.bEnable then
 		D.CloseCataclysmPanel()
 		return false
@@ -694,7 +694,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('GVOICE_MIC_STATE_CHANGED')
 	this:RegisterEvent('GVOICE_SPEAKER_STATE_CHANGED')
 	this:RegisterEvent('ON_MY_MOSAICS_RESET')
-	if GetClientPlayer() then
+	if X.GetClientPlayer() then
 		D.UpdateAnchor(this)
 		MY_CataclysmParty:AutoLinkAllPanel()
 	end
@@ -728,7 +728,7 @@ local function RecBuffWithTabs(tabs, dwOwnerID, dwBuffID, dwSrcID)
 		return
 	end
 	for _, tab in ipairs(tabs) do
-		if not tab.bOnlyMine or dwSrcID == UI_GetClientPlayerID() then
+		if not tab.bOnlyMine or dwSrcID == X.GetClientPlayerID() then
 			MY_CataclysmParty:RecBuff(dwOwnerID, setmetatable({
 				dwID      = dwBuffID,
 				nLevel    = tab.nLevel or 0,
@@ -762,7 +762,7 @@ function D.OnEvent(szEvent)
 			if arg0 == 'UI_OME_SKILL_EFFECT_LOG'
 			and arg5 == 6252
 			and arg9[SKILL_RESULT_TYPE.THERAPY]
-			and (arg1 == GetControlPlayerID() or UI_GetPlayerMountKungfuID() ~= 10176) then
+			and (arg1 == X.GetControlPlayerID() or UI_GetPlayerMountKungfuID() ~= 10176) then
 				MY_CataclysmParty:CallEffect(arg2, 500)
 			end
 		end
@@ -782,7 +782,7 @@ function D.OnEvent(szEvent)
 		end
 		D.UpdatePrepareBarPos()
 	elseif szEvent == 'PARTY_DELETE_MEMBER' then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if me.dwID == arg1 then
 			D.OnWageFinish()
 			D.CloseCataclysmPanel()
@@ -852,7 +852,7 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_ANSWER' then
 		MY_CataclysmParty:ChangeTeamVoteState('raid_ready', arg0, arg1 == 1 and 'resolve' or 'reject')
 	elseif szEvent == 'TEAM_CHANGE_MEMBER_GROUP' then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		local team = GetClientTeam()
 		local tSrcGropu = team.GetGroupInfo(arg1)
 		-- SrcGroup
@@ -897,7 +897,7 @@ function D.OnEvent(szEvent)
 		if X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 			return
 		end
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if not me then
 			return
 		end
@@ -906,7 +906,7 @@ function D.OnEvent(szEvent)
 			return
 		end
 		local function update()
-			local tar = GetPlayer(dwID)
+			local tar = X.GetPlayer(dwID)
 			if not tar then
 				return
 			end
@@ -926,7 +926,7 @@ function D.OnEvent(szEvent)
 		end
 		MY_CataclysmParty:ClearBuff()
 		for _, dwID in ipairs(team.GetTeamMemberList()) do
-			local tar = GetPlayer(dwID)
+			local tar = X.GetPlayer(dwID)
 			if tar then
 				for _, buff in X.ipairs_c(X.GetBuffList(tar)) do
 					OnBuffUpdate(dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
@@ -975,7 +975,7 @@ function D.FrameBuffRefreshCall()
 	if i > nCount then
 		i = 1
 	end
-	local tar = GetPlayer(aList[i])
+	local tar = X.GetPlayer(aList[i])
 	if tar then
 		for _, buff in X.ipairs_c(X.GetBuffList(tar)) do
 			OnBuffUpdate(tar.dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
@@ -989,7 +989,7 @@ function D.UpdateOTAction(frame)
 	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 4 ~= 0 then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -1002,12 +1002,12 @@ function D.UpdateOTAction(frame)
 	if not KOTTarget then
 		local dwType, dwID = me.GetTarget()
 		if dwType == TARGET.NPC then
-			KOTTarget = GetNpc(dwID)
+			KOTTarget = X.GetNpc(dwID)
 		elseif dwType == TARGET.PLAYER then
-			local tar = GetPlayer(dwID)
+			local tar = X.GetPlayer(dwID)
 			local dwType, dwID = tar.GetTarget()
 			if dwType == TARGET.NPC then
-				KOTTarget = GetNpc(dwID)
+				KOTTarget = X.GetNpc(dwID)
 			end
 		end
 	end
@@ -1026,7 +1026,7 @@ function D.UpdateOTAction(frame)
 end
 
 function D.OnFrameBreathe()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -1059,7 +1059,7 @@ end
 function D.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Option' then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		local menu = {}
 		if me.IsInRaid() then
 			-- 团队就位
@@ -1118,7 +1118,7 @@ function D.OnLButtonClick()
 		menu.x, menu.y = nX, nY
 		PopupMenu(menu)
 	elseif szName == 'WndButton_WorldMark' then
-		local me  = GetClientPlayer()
+		local me  = X.GetClientPlayer()
 		local dwMapID = me.GetMapID()
 		local nMapType = select(2, GetMapParams(dwMapID))
 		if not nMapType or nMapType ~= MAP_TYPE.DUNGEON then
@@ -1253,7 +1253,7 @@ function D.CheckEnableTeamPanel()
 		D.ReloadCataclysmPanel()
 	end
 	if not MY_Cataclysm.bEnable then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if me.IsInRaid() then
 			FireUIEvent('CTM_PANEL_RAID', true)
 		elseif me.IsInParty() then

@@ -38,7 +38,7 @@ function D.Apply()
 				return
 			end
 			-- 确定当前对话对象是醉逍遥（18707）
-			local target = GetTargetHandle(GetClientPlayer().GetTarget())
+			local target = GetTargetHandle(X.GetClientPlayer().GetTarget())
 			if target and target.dwTemplateID ~= 18707 then
 				return
 			end

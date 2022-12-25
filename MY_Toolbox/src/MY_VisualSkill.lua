@@ -248,12 +248,12 @@ function D.OnEvent(event)
 		D.UpdateAnchor(this)
 	elseif event == 'DO_SKILL_CAST' then
 		local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
-		if dwID == GetControlPlayer().dwID then
+		if dwID == X.GetControlPlayer().dwID then
 			D.OnSkillCast(this, dwSkillID, dwSkillLevel)
 		end
 	elseif event == 'DO_SKILL_CHANNEL_PROGRESS' then
 		local dwID, dwSkillID, dwSkillLevel = arg3, arg1, arg2
-		if dwID == GetControlPlayer().dwID then
+		if dwID == X.GetControlPlayer().dwID then
 			D.OnSkillCast(this, dwSkillID, dwSkillLevel)
 		end
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then

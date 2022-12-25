@@ -205,7 +205,7 @@ end
 local l_guildcache = {}
 local function UpdateTongRepertoryPage()
 	local nPage = arg0
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	for nIndex = 1, X.GetGuildBankBagSize(nPage) do
 		local boxtype, boxindex = X.GetGuildBankBagPos(nPage, nIndex)
 		local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex), 'BANK')
@@ -444,7 +444,7 @@ function D.FlushDB()
 	--[[#DEBUG BEGIN]]
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(X.GetPlayerGUID())
 	local ownername = AnsiToUTF8(me.szName)
@@ -565,7 +565,7 @@ function D.UpdateSaveDB()
 	if not INIT then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end

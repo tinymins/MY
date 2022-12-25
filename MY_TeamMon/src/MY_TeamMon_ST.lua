@@ -190,7 +190,7 @@ function D.OnFrameDragEnd()
 end
 
 local function SetSTAction(ui, nLeft, nPer)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local obj = ui.obj
 	if nLeft < 5 then
 		local nTimeLeft = nLeft * 1000 % 1000
@@ -216,7 +216,7 @@ local function SetSTAction(ui, nLeft, nPer)
 end
 
 function D.OnFrameBreathe()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then return end
 	local nNow = GetTime()
 	for k, v in pairs(ST_CACHE) do

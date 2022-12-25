@@ -78,7 +78,7 @@ end
 
 function D.UpdateDSMeta()
 	local ds = D.GetDS()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	ds:SetTime(GetCurrentTime())
 	ds:SetMap(me and Table_GetMapName(me.GetMapID()) or '')
 end
@@ -119,10 +119,10 @@ end)
 
 X.RegisterBgMsg('MY_GKP_SYNC_START', function(_, aData, nChannel, dwID, szName, bIsSelf)
 	local dwID, szKey = aData[1], aData[2]
-	if dwID == UI_GetClientPlayerID() or dwID == 0 then
+	if dwID == X.GetClientPlayerID() or dwID == 0 then
 		X.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, szKey, function(_, aData, nChannel, dwID, szName, bIsSelf)
 			local dwID, tab = aData[1], aData[2]
-			if dwID == UI_GetClientPlayerID() or dwID == 0 then
+			if dwID == X.GetClientPlayerID() or dwID == 0 then
 				X.Topmsg(_L['Sychoronization Complete'])
 				if tab then
 					X.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tab.GKP_Record, #tab.GKP_Account), function()
@@ -145,7 +145,7 @@ end)
 
 X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 	local ds = D.GetDS()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local team = GetClientTeam()
 	if team then
 		if not bIsSelf then
@@ -319,7 +319,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 end)
 
 X.RegisterEvent('ON_BG_CHANNEL_MSG', 'LR_GKP', function()
-	local szMsgID, nChannel, dwID, szName, data, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
+	local szMsgID, nChannel, dwID, szName, data, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == X.GetClientPlayerID()
 	if szMsgID ~= 'LR_GKP' or bSelf then
 		return
 	end
@@ -395,7 +395,7 @@ function D.MoneyUpdate(nGold, nSilver, nCopper)
 		szPlayer  = szPeerName,
 		dwForceID = D.tTradingInfo.dwForceID,
 		nTime     = GetCurrentTime(),
-		dwMapID   = GetClientPlayer().GetMapID()
+		dwMapID   = X.GetClientPlayer().GetMapID()
 	})
 	if MY_GKP.bMoneyTalk and szPeerName ~= 'System'
 	and (not MY_GKP.bMoneyTalkOnlyDistributor or X.IsDistributor(D.tTradingInfo.dwID) or X.IsDistributor()) then
@@ -416,7 +416,7 @@ function D.MoneyUpdate(nGold, nSilver, nCopper)
 end
 
 X.RegisterEvent('TRADING_OPEN_NOTIFY', function() -- 交易开始
-	local tar = GetPlayer(arg0)
+	local tar = X.GetPlayer(arg0)
 	if not tar then
 		return
 	end
@@ -427,7 +427,7 @@ X.RegisterEvent('TRADING_UPDATE_CONFIRM', function() -- 交易确认
 	if not D.tTradingInfo then
 		return
 	end
-	if dwID == UI_GetClientPlayerID() then
+	if dwID == X.GetClientPlayerID() then
 		D.tTradingInfo.bSelfConfirm = bConfirm
 	elseif dwID == D.tTradingInfo.dwPeerID then
 		D.tTradingInfo.bPeerConfirm = bConfirm
@@ -469,7 +469,7 @@ function D.SyncSystemGKP()
 		-- 拍卖记录
 		local item = not X.IsEmpty(v.dwItemID) and GetItem(v.dwItemID)
 		local itemInfo = not X.IsEmpty(v.dwItemTabType) and not X.IsEmpty(v.dwItemTabIndex) and GetItemInfo(v.dwItemTabType, v.dwItemTabIndex)
-		local player = GetPlayer(v.dwDestPlayerID)
+		local player = X.GetPlayer(v.dwDestPlayerID)
 		local dwForceID = player and player.dwForceID
 		if not dwForceID then
 			if MY_Farbnamen and MY_Farbnamen.Get then
@@ -522,7 +522,7 @@ function D.SyncSystemGKP()
 		ds:SetAuctionRec(tab)
 		-- 付款记录
 		if not X.IsEmpty(v.dwPayerID) and not X.IsEmpty(v.nPrice) then
-			local player = GetPlayer(v.dwDestPlayerID) -- 记账到欠款人头上方便统计
+			local player = X.GetPlayer(v.dwDestPlayerID) -- 记账到欠款人头上方便统计
 			local dwForceID = player and player.dwForceID
 			if not dwForceID then
 				if MY_Farbnamen and MY_Farbnamen.Get then

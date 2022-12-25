@@ -91,7 +91,7 @@ local function NewDB(szRoot, nMinTime, nMaxTime)
 	local db = MY_ChatLog_DB(szPath)
 	db:SetMinTime(nMinTime)
 	db:SetMaxTime(nMaxTime)
-	db:SetInfo('user_global_id', GetClientPlayer().GetGlobalID())
+	db:SetInfo('user_global_id', X.GetClientPlayer().GetGlobalID())
 	return db
 end
 
@@ -148,7 +148,7 @@ function DS:InitDB(bFixProblem)
 				else
 					bConn = db:Connect()
 				end
-				if bConn and db:GetInfo('user_global_id') == GetClientPlayer().GetGlobalID() then
+				if bConn and db:GetInfo('user_global_id') == X.GetClientPlayer().GetGlobalID() then
 					table.insert(aDB, db)
 				else
 					--[[#DEBUG BEGIN]]

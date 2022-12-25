@@ -85,7 +85,7 @@ function D.UpdateAccumulateValue(frame)
 	end
 	local handle = frame:Lookup('', D.szShow)
 	if handle then
-		local nValue = GetClientPlayer().nAccumulateValue
+		local nValue = X.GetClientPlayer().nAccumulateValue
 		if nValue < 0 then
 			nValue = 0
 		end
@@ -149,7 +149,7 @@ function D.UpdateAccumulateValue(frame)
 end
 
 function D.UpdateCangJian(frame)
-	local me, hCangjian = GetClientPlayer(), frame:Lookup('', D.szShow)
+	local me, hCangjian = X.GetClientPlayer(), frame:Lookup('', D.szShow)
 	if not me or not hCangjian or not me.bCanUseBigSword then
 		return
 	end
@@ -191,7 +191,7 @@ function D.UpdateMingJiao(frame)
 	if not hMingJiao then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 
 	local hImageSunEnergy = hMingJiao:Lookup('Image_SunEnergy')
 	local hImageMoonEnergy = hMingJiao:Lookup('Image_MoonEnergy')
@@ -239,7 +239,7 @@ end
 
 -- cangyun pose type
 function D.UpdateCangYun(frame)
-	local me, hCangyun = GetClientPlayer(), frame:Lookup('', D.szShow)
+	local me, hCangyun = X.GetClientPlayer(), frame:Lookup('', D.szShow)
 	if not me or not hCangyun then
 		return
 	end
@@ -275,7 +275,7 @@ end
 
 -- badao
 function D.UpdateBaDao(frame)
-	local me, hBaDao = GetClientPlayer(), frame:Lookup('', D.szShow)
+	local me, hBaDao = X.GetClientPlayer(), frame:Lookup('', D.szShow)
 	if not me or not hBaDao then
 		return
 	end
@@ -285,7 +285,7 @@ end
 -- 唐门机关暗藏杀机 抄的官方代码
 function D.UpdateBomb(frame)
 	local h = frame:Lookup('', D.szShow)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not h or not me then
 		return
 	end
@@ -342,7 +342,7 @@ function D.UpdateBomb(frame)
 				hBomb:Show()
 				hBomb:Lookup(2):SetText(tostring(D.tBombMsg[i].nTime))
 				if D.tBombMsg[i].nBombNpcID then
-					local npc = GetNpc(D.tBombMsg[i].nBombNpcID)
+					local npc = X.GetNpc(D.tBombMsg[i].nBombNpcID)
 					local nDistance = npc and X.GetDistance(npc, 'plane')
 					if nDistance and nDistance <= 30 then
 						hBomb:SetAlpha(255)
@@ -356,7 +356,7 @@ function D.UpdateBomb(frame)
 end
 
 function D.UpdateTangMen(frame)
-	local me, h = GetClientPlayer(), frame:Lookup('', D.szShow)
+	local me, h = X.GetClientPlayer(), frame:Lookup('', D.szShow)
 	if D.szShowSub ~= 'TM' or not me or not h then
 		return
 	end
@@ -387,7 +387,7 @@ function D.Update(frame)
 end
 
 function D.UpdateHandleName()
-	local mnt = GetClientPlayer().GetKungfuMount()
+	local mnt = X.GetClientPlayer().GetKungfuMount()
 	local szShow, szShowSub = '', ''
 	if mnt then
 		if mnt.dwMountType == 3 then
@@ -412,7 +412,7 @@ end
 
 function D.CopyHandle(frame)
 	local hTotal = frame:Lookup('', '')
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	D.UpdateHandleName()
 	if me and me.bCanUseBigSword then
 		D.szShow = 'Handle_CangJian'
@@ -469,7 +469,7 @@ function D.OnEvent(event)
 		D.CopyHandle(this)
 		D.Update(this)
 	elseif event == 'DO_SKILL_CAST' then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if me.dwID == arg0 then
 			local nBomb = D.nBombCount
 			if arg1 == 3357 then
@@ -490,7 +490,7 @@ function D.OnEvent(event)
 		this:BringToTop()
 	elseif event == 'UI_SCALED' then
 		D.UpdateAnchor(this)
-	elseif event == 'PLAYER_STATE_UPDATE' and arg0 == GetClientPlayer().dwID then
+	elseif event == 'PLAYER_STATE_UPDATE' and arg0 == X.GetClientPlayer().dwID then
 		if D.szShowSub == 'CJ' then
 			D.UpdateCangJian(this)
 		elseif D.szShowSub == 'TM' then
@@ -526,7 +526,7 @@ end
 
 -- macro command
 function D.Apply()
-	if not GetClientPlayer() then
+	if not X.GetClientPlayer() then
 		return X.DelayCall('MY_EnergyBar#Apply', 300, D.Apply)
 	end
 	if not O.bEnable then

@@ -369,7 +369,7 @@ function D.Close()
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me and me.nMaxLevel == me.nLevel then
 		nX = nPaddingX
 		nY = nLFY

@@ -302,7 +302,7 @@ end
 
 -- 读取公共数据
 function MY_Anmerkungen.LoadConfig()
-	if not GetClientPlayer() then
+	if not X.GetClientPlayer() then
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_Anmerkungen.LoadConfig', 'Client player not exist! Cannot load config!', X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]

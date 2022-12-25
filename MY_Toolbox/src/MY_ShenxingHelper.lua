@@ -60,7 +60,7 @@ function D.HookNonwarMap()
 	if not h or h.__MY_NonwarData then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -139,7 +139,7 @@ function D.HookOpenAllMap()
 	if not h then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local dwCurrMapID = me and me.GetScene().dwMapID
 	for _, szHandleName in ipairs({ 'Handle_CityBtn', 'Handle_CopyBtn' }) do
 		local hList = h:Lookup(szHandleName)
@@ -220,11 +220,11 @@ function D.CheckAvoidBlackShenxingEnable()
 	if D.bReady and O.bAvoidBlackCD then
 		X.RegisterEvent('DO_SKILL_CAST', 'MY_AvoidBlackShenxingCD', function()
 			local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
-			if not(UI_GetClientPlayerID() == dwID and
+			if not(X.GetClientPlayerID() == dwID and
 			Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)) then
 				return
 			end
-			local player = GetClientPlayer()
+			local player = X.GetClientPlayer()
 			if not player then
 				return
 			end

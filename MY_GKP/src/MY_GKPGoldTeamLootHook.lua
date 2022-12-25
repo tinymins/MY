@@ -27,11 +27,11 @@ function D.OnGoldTeamLootListItemRButtonClick()
 	if not tData then
 		return
 	end
-	local d = GetDoodad(tData.dwDoodadID)
+	local d = X.GetDoodad(tData.dwDoodadID)
 	if not d then
 		return
 	end
-	local data = MY_GKPLoot.GetItemData(GetClientPlayer(), d, tData.nLootIndex)
+	local data = MY_GKPLoot.GetItemData(X.GetClientPlayer(), d, tData.nLootIndex)
 	if not data then
 		return
 	end

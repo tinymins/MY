@@ -254,7 +254,7 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 	return hItem, bRequireFormatPos
 end
 function D.UpdateFrame(frame)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end

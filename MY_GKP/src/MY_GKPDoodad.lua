@@ -247,11 +247,11 @@ function D.IsRecentDoodad(doodad)
 end
 
 function D.GetDoodadInfo(dwID)
-	local doodad = GetDoodad(dwID)
+	local doodad = X.GetDoodad(dwID)
 	if not doodad then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local tpl = GetDoodadTemplate(doodad.dwTemplateID)
 	local info = {}
 	if tpl then
@@ -337,7 +337,7 @@ function D.TryAdd(dwID, bDelay)
 	end
 	local info = D.GetDoodadInfo(dwID)
 	if info then
-		local doodad = GetDoodad(dwID)
+		local doodad = X.GetDoodad(dwID)
 		info.bCustom = D.IsCustomDoodad(doodad)
 		info.bRecent = D.IsRecentDoodad(doodad)
 		if info.eDoodadType == 'craft' and O.tCraft[doodad.dwTemplateID] then
@@ -508,7 +508,7 @@ function D.UpdateHeadName()
 	sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 	sha:ClearTriangleFanPoint()
 	for dwID, info in pairs(D.tDoodad) do
-		local tar = GetDoodad(dwID)
+		local tar = X.GetDoodad(dwID)
 		local bShow = info.eRuleType ~= 'loot' or info.bCustom or info.bRecent
 		if bShow or D.bDebug then
 			local szName = X.GetObjectName(TARGET.DOODAD, dwID, 'never') or ''
@@ -550,7 +550,7 @@ end
 
 -- auto interact
 function D.AutoInteractDoodad()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	-- auto interact
 	if not me or X.GetOTActionState(me) ~= X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
 		or (me.nMoveState ~= MOVE_STATE.ON_STAND and me.nMoveState ~= MOVE_STATE.ON_FLOAT)
@@ -560,7 +560,7 @@ function D.AutoInteractDoodad()
 	end
 	local bAllowAutoIntr = (not me.bFightState or O.bInteractEvenFight) and not me.bOnHorse and not IsAutoInteractDisabled()
 	for dwID, info in pairs(D.tDoodad) do
-		local doodad, bIntr, bOpen = GetDoodad(dwID), false, false
+		local doodad, bIntr, bOpen = X.GetDoodad(dwID), false, false
 		if doodad and doodad.CanDialog(me) then -- 若存在却不能对话只简单保留
 			local bAllowAutoOpen = not D.tLooted[doodad.dwID]
 			if info.bCustom then
@@ -584,7 +584,7 @@ function D.AutoInteractDoodad()
 			then -- 任务和普通道具尝试 5 次
 				bIntr = bAllowAutoIntr
 				-- 宴席只能吃队友的
-				if doodad.dwOwnerID ~= 0 and IsPlayer(doodad.dwOwnerID) and not X.IsParty(doodad.dwOwnerID) then
+				if doodad.dwOwnerID ~= 0 and X.IsPlayer(doodad.dwOwnerID) and not X.IsParty(doodad.dwOwnerID) then
 					bIntr = false
 				end
 				if bIntr then
@@ -620,7 +620,7 @@ function D.AutoInteractDoodad()
 end
 
 function D.CloseLootWindow()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me and X.GetOTActionState(me) == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
 		me.OnCloseLootWindow()
 	end
@@ -628,7 +628,7 @@ end
 
 -- open doodad (loot)
 function D.OnOpenDoodad(dwID)
-	local doodad = GetDoodad(dwID)
+	local doodad = X.GetDoodad(dwID)
 	local info = D.tDoodad[dwID]
 	if info then
 		-- 摸掉落且开了插件拾取框 可以安全的起身
@@ -652,7 +652,7 @@ function D.OnLootDoodad()
 	if not O.bRecent then
 		return
 	end
-	local doodad = GetDoodad(arg0)
+	local doodad = X.GetDoodad(arg0)
 	if not doodad then
 		return
 	end
@@ -664,7 +664,7 @@ function D.UpdateMiniFlag()
 	if not D.bReady or not O.bMiniFlag or IsShowNameDisabled() then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -674,7 +674,7 @@ function D.UpdateMiniFlag()
 		-- 	or info.eRuleType == 'craft' or info.eRuleType == 'mining'
 		-- 	or info.eRuleType == 'herbalism' or info.eRuleType == 'skinning'
 		-- then
-			local doodad = GetDoodad(dwID)
+			local doodad = X.GetDoodad(dwID)
 			local dwType, nF1, nF2 = 5, 169, 48
 			if info.eRuleType == 'quest' then
 				nF1 = 114
@@ -689,12 +689,12 @@ function D.UpdateMiniFlag()
 end
 
 function D.OnBreatheCall()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me or not D.bReady then
 		return
 	end
 	for dwID, info in pairs(D.tDoodad) do
-		local doodad = GetDoodad(dwID)
+		local doodad = X.GetDoodad(dwID)
 		if not doodad
 			or (info.eRuleType == 'quest' and info.eActionType == 'quest' and not doodad.HaveQuest(me.dwID))
 			or (info.eActionType == 'loot' and not doodad.CanLoot(me.dwID))
@@ -784,14 +784,14 @@ X.RegisterEvent('DO_PICK_PREPARE_PROGRESS', function()
 	if nTotalFrame == 0 then
 		return
 	end
-	local doodad = GetDoodad(dwDoodadID)
+	local doodad = X.GetDoodad(dwDoodadID)
 	if doodad then
 		D.OnPickPrepare(doodad, GetLogicFrameCount() + nTotalFrame)
 	end
 end)
 X.RegisterEvent('OT_ACTION_PROGRESS_BREAK', function()
     local dwID = arg0
-	if dwID == UI_GetClientPlayerID() then
+	if dwID == X.GetClientPlayerID() then
 		D.OnPickPrepareStop(false)
 	end
 end)

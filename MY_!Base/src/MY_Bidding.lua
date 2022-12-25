@@ -185,7 +185,7 @@ function D.GetQuickBiddingPrice(szKey)
 	-- 计算自己的当前有效出价
 	local nMyPrice, bPassed
 	for i, p in ipairs(aRecord) do
-		if p.dwTalkerID == UI_GetClientPlayerID() then
+		if p.dwTalkerID == X.GetClientPlayerID() then
 			if i <= tConfig.nNumber then
 				nMyPrice = p.nPrice
 			end
@@ -502,7 +502,7 @@ function MY_BiddingBase.OnEvent(event)
 	if event == 'PARTY_DISBAND' then
 		Wnd.CloseWindow(this)
 	elseif event == 'PARTY_DELETE_MEMBER' then
-		if UI_GetClientPlayerID() == arg1 then
+		if X.GetClientPlayerID() == arg1 then
 			Wnd.CloseWindow(this)
 		end
 	elseif event == 'TEAM_AUTHORITY_CHANGED' then
@@ -576,7 +576,7 @@ function MY_BiddingBase.OnLButtonClick()
 		local aRecord = D.GetRankRecord(cache.aRecord)
 		local bExist, bP, bValid = false, false, false
 		for i, p in ipairs(aRecord) do
-			if p.dwTalkerID == UI_GetClientPlayerID() then
+			if p.dwTalkerID == X.GetClientPlayerID() then
 				bExist = true
 				if p.bP then
 					bP = true

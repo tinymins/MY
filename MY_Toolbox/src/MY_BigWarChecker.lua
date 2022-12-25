@@ -54,7 +54,7 @@ end
 
 -- 大战没交
 X.RegisterFrameCreate('ExitPanel', 'BIG_WAR_CHECK', function(name, frame)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me then
 		local ui = X.UI(frame)
 		if IsBigWarFinishable(me) then
@@ -94,7 +94,7 @@ X.RegisterFrameCreate('ExitPanel', 'BIG_WAR_CHECK', function(name, frame)
 	end
 end)
 X.RegisterFrameCreate('OptionPanel', 'BIG_WAR_CHECK', function(name, frame)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me then
 		local ui = X.UI(frame)
 		if IsBigWarFinishable(me) then
@@ -160,7 +160,7 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 end
 
 X.RegisterEvent('LOADING_END', 'MY_BigWarChecker', function()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local dwMapID = me.GetMapID()
 	-- 分析大战本状态数据
 	local aQuestInfo = {}

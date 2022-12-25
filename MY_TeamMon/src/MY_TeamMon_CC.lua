@@ -203,13 +203,13 @@ function D.DrawObject(dwType, dwID, KObject)
 		end
 	end
 	if cache.bDrawLine then
-		local dwTarType, dwTarID = TARGET.PLAYER, UI_GetClientPlayerID()
+		local dwTarType, dwTarID = TARGET.PLAYER, X.GetClientPlayerID()
 		if dwType == TARGET.NPC then
 			dwTarType, dwTarID = KObject.GetTarget()
 		end
 		local tar = X.GetObject(dwTarType, dwTarID)
 		if tar and dwTarType == TARGET.PLAYER and dwTarID ~= 0
-		and (not cache.bDrawLineOnlyStareMe or dwTarID == UI_GetClientPlayerID()) then
+		and (not cache.bDrawLineOnlyStareMe or dwTarID == X.GetClientPlayerID()) then
 			if not cache.shaLine or cache.shaLine.dwTarID ~= dwTarID then
 				if not cache.shaLine then
 					cache.shaLine = H_LINE:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Line')
@@ -217,7 +217,7 @@ function D.DrawObject(dwType, dwID, KObject)
 				cache.shaLine.dwTarID = dwTarID
 				local r, g, b = 0, 255, 255
 				if dwType == TARGET.NPC then
-					if dwTarID == UI_GetClientPlayerID() then
+					if dwTarID == X.GetClientPlayerID() then
 						r, g, b = 255, 0, 128
 					else
 						r, g, b = 255, 255, 0
@@ -254,7 +254,7 @@ end
 function D.OnObjectEnterScene(dwType, dwID)
 	local tar = X.GetObject(dwType, dwID)
 	local rule = CIRCLE_RULE[dwType][tar.dwTemplateID]
-	if rule and (not rule.bDrawOnlyMyEmployer or dwType ~= TARGET.NPC or tar.dwEmployer == UI_GetClientPlayerID()) then
+	if rule and (not rule.bDrawOnlyMyEmployer or dwType ~= TARGET.NPC or tar.dwEmployer == X.GetClientPlayerID()) then
 		local cache = setmetatable({}, { __index = rule })
 		if rule.aCircle then
 			local aCircle = {}
@@ -308,7 +308,7 @@ function D.OnObjectLeaveScene(dwType, dwID)
 end
 
 function D.OnBreathe()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end

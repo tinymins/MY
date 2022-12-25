@@ -39,7 +39,7 @@ function D.SaveLUAData()
 end
 
 function D.Save(nIndex, szName)
-	local tList, tList2, me, team = {}, {}, GetClientPlayer(), GetClientTeam()
+	local tList, tList2, me, team = {}, {}, X.GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
 		return X.Sysmsg(_L['You are not in a team'], X.CONSTANT.MSG_THEME.ERROR)
 	end
@@ -110,7 +110,7 @@ end
 
 function D.Restore(n)
 	-- 获取自己和团队操作对象
-	local me, team = GetClientPlayer(), GetClientTeam()
+	local me, team = X.GetClientPlayer(), GetClientTeam()
 	-- update之前保存的团队列表
 	D.LoadLUAData()
 
@@ -210,7 +210,7 @@ end
 
 function D.Restore2(n)
 	D.LoadLUAData()
-	local me, team = GetClientPlayer(), GetClientTeam()
+	local me, team = X.GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
 		return X.Sysmsg(_L['You are not in a team'], X.CONSTANT.MSG_THEME.ERROR)
 	elseif not O.SaveList[n] then

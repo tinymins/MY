@@ -520,7 +520,7 @@ function D.GetTip(szName)
 			if szHeaderXml then
 				table.insert(tTip, szHeaderXml)
 				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
-			elseif tInfo.dwID ~= UI_GetClientPlayerID() then
+			elseif tInfo.dwID ~= X.GetClientPlayerID() then
 				local szName = GetRealName(tInfo.szName)
 				local szHeaderXml = HEADER_XML[szName] and HEADER_XML[szName]['*']
 				if szHeaderXml then
@@ -532,7 +532,7 @@ function D.GetTip(szName)
 		-- 名称 等级
 		table.insert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
 		-- 是否同队伍
-		if UI_GetClientPlayerID() ~= tInfo.dwID and X.IsParty(tInfo.dwID) then
+		if X.GetClientPlayerID() ~= tInfo.dwID and X.IsParty(tInfo.dwID) then
 			table.insert(tTip, GetFormatText(_L['[Teammate]'], nil, 0, 255, 0))
 		end
 		table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
@@ -702,7 +702,7 @@ end
 
 -- 保存指定dwID的玩家
 function D.AddAusID(dwID)
-	local player = GetPlayer(dwID)
+	local player = X.GetPlayer(dwID)
 	if not player or not player.szName or player.szName == '' then
 		return false
 	else

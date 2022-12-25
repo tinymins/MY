@@ -81,7 +81,7 @@ local MAP_MERGE = setmetatable({
 }, {__index = X.CONSTANT.MAP_MERGE})
 
 function D.GetMapID()
-	local dwMapID = GetClientPlayer().GetMapID()
+	local dwMapID = X.GetClientPlayer().GetMapID()
 	return MAP_MERGE[dwMapID] or dwMapID
 end
 
@@ -105,7 +105,7 @@ function D.GetFrame()
 end
 
 function D.CheckEnable()
-	if not GetClientPlayer() then
+	if not X.GetClientPlayer() then
 		return
 	end
 	if D.bReady and O.bEnable then
@@ -211,7 +211,7 @@ function D.UpdateCDText(txt, nTime)
 end
 
 function D.UpdateListCD(frame)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -261,7 +261,7 @@ function D.UpdateList(frame)
 end
 
 function D.ParseBoxItem(box)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local data, tItem = {box:GetObject()}
 	if data[1] == UI_OBJECT.ITEM then
 		local KItem = GetPlayerItem(me, data[3], data[4])

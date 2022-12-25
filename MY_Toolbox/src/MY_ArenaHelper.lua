@@ -48,7 +48,7 @@ X.RegisterEvent('ARENA_START', function() l_bConfigEnd = true end)
 X.RegisterEvent('LOADING_ENDING', function() l_bConfigEnd = false end)
 X.RegisterEvent('PARTY_DELETE_MEMBER', function() l_bConfigEnd = false end)
 local function RestoreTeam()
-	local me, team = GetClientPlayer(), GetClientTeam()
+	local me, team = X.GetClientPlayer(), GetClientTeam()
 	if not l_tTeamInfo
 	or not O.bRestoreAuthorityInfo
 	or not X.IsLeader()
@@ -60,7 +60,7 @@ end
 X.RegisterEvent('PARTY_ADD_MEMBER', RestoreTeam)
 
 local function SaveTeam()
-	local me, team = GetClientPlayer(), GetClientTeam()
+	local me, team = X.GetClientPlayer(), GetClientTeam()
 	if not me.IsInParty() or not X.IsInArena() or l_bConfigEnd then
 		return
 	end

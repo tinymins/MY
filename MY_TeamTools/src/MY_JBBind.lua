@@ -61,12 +61,12 @@ function D.FetchBindStatus(resolve, reject)
 end
 
 function D.Bind(szToken, resolve, reject)
-	local dwID = UI_GetClientPlayerID()
+	local dwID = X.GetClientPlayerID()
 	if IsRemotePlayer(dwID) then
 		X.Alert(_L['You are crossing server, please do this after backing.'])
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	X.Ajax({
 		url = 'https://push.j3cx.com/role/bind',
 		data = {

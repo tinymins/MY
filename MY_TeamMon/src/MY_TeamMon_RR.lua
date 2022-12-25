@@ -547,7 +547,7 @@ function D.LoadConfigureFile(szFile, info, aSilentType)
 	local function fnAction(bStatus, ...)
 		if bStatus then
 			local szFilePath, aType, szMode, tMeta = ...
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if not aSilentType and me.IsInParty() then
 				MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 			end

@@ -118,7 +118,7 @@ local function UpdateTitleEffect(dwType, dwID)
 			nEffectID = PARTY_TITLE_MARK_EFFECT_LIST[nMark]
 		end
 	elseif dwType == TARGET.NPC then
-		local npc = GetNpc(dwID)
+		local npc = X.GetNpc(dwID)
 		if npc then
 			local aQuestState = GetNpcQuestState(npc) or {}
 			if aQuestState.normal_finished_proper or aQuestState.normal_finished_high or aQuestState.normal_finished_higher
@@ -191,14 +191,14 @@ local function onPartySetMark()
 		tID[dwID] = true
 	end
 	for dwID, _ in pairs(tID) do
-		UpdateTitleEffect(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID)
+		UpdateTitleEffect(X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID)
 	end
 	OVERWRITE_TITLE_EFFECT = {}
 end
 X.RegisterInit('MY_LifeBar_onPartySetMark', onPartySetMark)
 X.RegisterEvent('PARTY_SET_MARK', 'MY_LifeBar', onPartySetMark)
 X.RegisterEvent('PARTY_DELETE_MEMBER', 'MY_LifeBar', function()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me.dwID == arg1 then
 		onPartySetMark()
 	end
@@ -258,7 +258,7 @@ function D.GetNz(nZ,nZ2)
 end
 
 function D.GetRelation(dwSrcID, dwTarID, KSrc, KTar)
-	if Config.nCamp == -1 or not IsPlayer(dwTarID) then
+	if Config.nCamp == -1 or not X.IsPlayer(dwTarID) then
 		return X.GetRelation(dwSrcID, dwTarID)
 	else
 		if not KTar then
@@ -394,7 +394,7 @@ function D.Reset()
 	-- »Ö¸´¹Ù·½±ê¼Ç
 	for dwID, _ in pairs(OVERWRITE_TITLE_EFFECT) do
 		if OBJECT_TITLE_EFFECT[dwID] then
-			SceneObject_SetTitleEffect(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, OBJECT_TITLE_EFFECT[dwID].nID)
+			SceneObject_SetTitleEffect(X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, OBJECT_TITLE_EFFECT[dwID].nID)
 		end
 	end
 	OVERWRITE_TITLE_EFFECT = {}
@@ -514,7 +514,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 			nPriority = nPriority + 10000
 		end
 		szName = X.GetObjectName(object, (Config.bShowObjectID and (Config.bShowObjectIDOnlyUnnamed and 'auto' or 'always') or 'never'))
-		bPet = dwType == TARGET.NPC and object.dwEmployer ~= 0 and IsPlayer(object.dwEmployer)
+		bPet = dwType == TARGET.NPC and object.dwEmployer ~= 0 and X.IsPlayer(object.dwEmployer)
 		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString and szName and (dwType == TARGET.PLAYER or bPet) then
 			szName = MY_ChatMosaics.MosaicsString(szName)
 		end
@@ -692,7 +692,7 @@ local function onBreathe()
 	if not D.IsMapEnabled() then
 		return
 	end
-	me = GetClientPlayer()
+	me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -745,7 +745,7 @@ end
 end
 
 X.RegisterEvent('NPC_ENTER_SCENE',function()
-	NPC_CACHE[arg0] = GetNpc(arg0)
+	NPC_CACHE[arg0] = X.GetNpc(arg0)
 end)
 
 X.RegisterEvent('NPC_LEAVE_SCENE',function()
@@ -767,7 +767,7 @@ X.RegisterEvent('NPC_LEAVE_SCENE',function()
 end)
 
 X.RegisterEvent('PLAYER_ENTER_SCENE',function()
-	PLAYER_CACHE[arg0] = GetPlayer(arg0)
+	PLAYER_CACHE[arg0] = X.GetPlayer(arg0)
 end)
 
 X.RegisterEvent('PLAYER_LEAVE_SCENE',function()
@@ -837,7 +837,7 @@ local function OnCharacterSay(dwID, nChannel, szMsg)
 	if not bc or not bc.bEnable then
 		return
 	end
-	local dwType = IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
+	local dwType = X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
 	local object = X.GetObject(dwType, dwID)
 	if not object then
 		return
@@ -846,7 +846,7 @@ local function OnCharacterSay(dwID, nChannel, szMsg)
 	if not lb then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local scene = me.GetScene()
 	if dwType == TARGET.PLAYER and IsEnemy(me.dwID, dwID) and (scene.bIsArenaMap or X.IsShieldedMap(scene.dwMapID)) then
 		return

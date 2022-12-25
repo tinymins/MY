@@ -623,7 +623,7 @@ local function DrawDetail(ui)
 						end
 						local dwIconID = 13
 						if l_config.type == 'SKILL' then
-							local dwLevel = GetClientPlayer().GetSkillLevel(dwID) or 1
+							local dwLevel = X.GetClientPlayer().GetSkillLevel(dwID) or 1
 							dwIconID = Table_GetSkillIconID(dwID, dwLevel) or dwIconID
 						else
 							dwIconID = Table_GetBuffIconID(dwID, 1) or 13

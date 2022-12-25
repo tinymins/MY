@@ -281,11 +281,11 @@ end
 function D.OnPeekPlayer()
 	if PR_EQUIP_REQUEST[arg1] then
 		if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			local dwType, dwID = me.GetTarget()
 			X.SetTarget(TARGET.PLAYER, arg1)
 			X.SetTarget(dwType, dwID)
-			local p = GetPlayer(arg1)
+			local p = X.GetPlayer(arg1)
 			if p then
 				local mnt = p.GetKungfuMount()
 				local data = { nil, arg1, mnt and mnt.dwSkillID or nil, false }
@@ -338,8 +338,8 @@ function D.GetRequestStatus(info)
 	end
 	if szStatus == 'normal' and not info.bFriend and not info.bTongMember then
 		if O.bRefuseRobot and info.dwID and info.nLevel == X.CONSTANT.MAX_PLAYER_LEVEL then
-			local me = GetClientPlayer()
-			local tar = GetPlayer(info.dwID)
+			local me = X.GetClientPlayer()
+			local tar = X.GetPlayer(info.dwID)
 			if tar then
 				local nScore = tar.GetTotalEquipScore()
 				if nScore == 0 then

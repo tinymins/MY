@@ -30,7 +30,7 @@ local O = X.CreateUserSettingsModule('MY_JBTeamSnapshot', _L['Raid'], {
 local D = {}
 
 function D.CreateSnapshot()
-	local dwID = UI_GetClientPlayerID()
+	local dwID = X.GetClientPlayerID()
 	if IsRemotePlayer(dwID) then
 		X.Alert(_L['You are crossing server, please do this after backing.'])
 		return
@@ -49,7 +49,7 @@ function D.CreateSnapshot()
 			table.insert(aTeammate, info.szName .. ',' .. dwTarID .. ',' .. guid .. ',' .. info.dwMountKungfuID)
 		end
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	X.Ajax({
 		url = 'https://push.j3cx.com/team/snapshot',
 		data = {

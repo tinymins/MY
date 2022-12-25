@@ -70,7 +70,7 @@ function PS.OnPanelActive(frame)
 			if MY_CataclysmMain.CheckCataclysmEnable() then
 				MY_CataclysmMain.ReloadCataclysmPanel()
 			end
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if me.IsInParty() and not me.IsInRaid() then
 				FireUIEvent('CTM_PANEL_TEAMATE', CFG.bShowInRaid)
 			end

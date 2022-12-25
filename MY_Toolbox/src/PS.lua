@@ -28,7 +28,7 @@ local function onHotKey()
 		TARGET_TYPE, TARGET_ID = nil
 	else
 		TARGET_TYPE, TARGET_ID = X.GetTarget()
-		X.SetTarget(TARGET.PLAYER, UI_GetClientPlayerID())
+		X.SetTarget(TARGET.PLAYER, X.GetClientPlayerID())
 	end
 end
 X.RegisterHotKey('MY_AutoLoopMeAndTarget', _L['Loop target between me and target'], onHotKey)

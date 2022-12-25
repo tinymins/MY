@@ -248,7 +248,7 @@ local function OnFrameBreathe()
 	if szQues and aBody then
 		INPUT_DATA_CACHE[szQues] = aBody
 	end
-	l_nExamPrintRemainSpace = GetClientPlayer().GetExamPrintRemainSpace()
+	l_nExamPrintRemainSpace = X.GetClientPlayer().GetExamPrintRemainSpace()
 end
 
 X.RegisterFrameCreate('ExaminationPanel', 'EXAM_TIP', function(name, frame)
@@ -265,7 +265,7 @@ X.RegisterEvent('LOOT_ITEM', 'MY_EXAMTIP', function()
 		local tExamData = X.Clone(INPUT_DATA_CACHE)
 		INPUT_DATA_CACHE = {}
 		X.DelayCall(2000, function()
-			local bAllRight = nBeforeExamPrintRemainSpace - GetClientPlayer().GetExamPrintRemainSpace() == 100
+			local bAllRight = nBeforeExamPrintRemainSpace - X.GetClientPlayer().GetExamPrintRemainSpace() == 100
 			D.SubmitData(tExamData, bAllRight)
 		end)
 	end

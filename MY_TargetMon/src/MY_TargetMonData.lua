@@ -54,7 +54,7 @@ end
 local CACHE_CONFIG
 function D.GetConfigList()
 	if not CACHE_CONFIG then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if not me then
 			return MY_TargetMonConfig.GetConfigList()
 		end
@@ -101,9 +101,9 @@ local TEAM_MARK = {
 }
 function D.GetTarget(eTarType, eMonType)
 	if eMonType == 'SKILL' or eTarType == 'CONTROL_PLAYER' then
-		return TARGET.PLAYER, GetControlPlayerID()
+		return TARGET.PLAYER, X.GetControlPlayerID()
 	elseif eTarType == 'CLIENT_PLAYER' then
-		return TARGET.PLAYER, UI_GetClientPlayerID()
+		return TARGET.PLAYER, X.GetClientPlayerID()
 	elseif eTarType == 'TARGET' then
 		return X.GetTarget()
 	elseif eTarType == 'TTARGET' then
@@ -116,7 +116,7 @@ function D.GetTarget(eTarType, eMonType)
 		if mark then
 			for dwID, nMark in pairs(mark) do
 				if TEAM_MARK[eTarType] == nMark then
-					return TARGET[IsPlayer(dwID) and 'PLAYER' or 'NPC'], dwID
+					return TARGET[X.IsPlayer(dwID) and 'PLAYER' or 'NPC'], dwID
 				end
 			end
 		end
@@ -184,17 +184,17 @@ local function OnSkill(dwID, nLevel)
 end
 local function OnSysMsg(event)
 	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
-		if arg1 ~= UI_GetClientPlayerID() then
+		if arg1 ~= X.GetClientPlayerID() then
 			return
 		end
 		OnSkill(arg2, arg3)
 	elseif arg0 == 'UI_OME_SKILL_HIT_LOG' then
-		if arg1 ~= UI_GetClientPlayerID() then
+		if arg1 ~= X.GetClientPlayerID() then
 			return
 		end
 		OnSkill(arg4, arg5)
 	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
-		if arg4 ~= SKILL_EFFECT_TYPE.SKILL or arg1 ~= UI_GetClientPlayerID() then
+		if arg4 ~= SKILL_EFFECT_TYPE.SKILL or arg1 ~= X.GetClientPlayerID() then
 			return
 		end
 		OnSkill(arg5, arg6)
@@ -322,7 +322,7 @@ local function Buff_ShowMon(mon, dwTarKungfuID)
 	return Base_ShowMon(mon, dwTarKungfuID)
 end
 local function Buff_MatchMon(tAllBuff, mon, config)
-	local info, nIconID, dwClientID, dwControlID = nil, nil, UI_GetClientPlayerID(), GetControlPlayerID()
+	local info, nIconID, dwClientID, dwControlID = nil, nil, X.GetClientPlayerID(), X.GetControlPlayerID()
 	-- ids={[13942]={enable=true,iconid=7237,ignoreLevel=false,levels={[2]={enable=true,iconid=7237}}}}
 	for dwID, tMonId in pairs(mon.ids) do
 		if tMonId.enable or mon.ignoreId then
@@ -535,7 +535,7 @@ end
 local UpdateView
 do local fUIScale, fFontScaleBase
 function UpdateView()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
 	for _, config in ipairs(D.GetConfigList()) do
 		if config.enable then

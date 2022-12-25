@@ -259,7 +259,7 @@ end
 
 -- 获取背包指定ID物品列表
 function D.GetBagItemPos(aUIID)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local nIndex = X.GetBagPackageIndex()
 	for dwBox = nIndex, nIndex + X.GetBagPackageCount() do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
@@ -277,7 +277,7 @@ end
 
 -- 根据背包坐标获取物品及数量
 function D.GetBagItemNum(dwBox, dwX)
-	local item = GetPlayerItem(GetClientPlayer(), dwBox, dwX)
+	local item = GetPlayerItem(X.GetClientPlayer(), dwBox, dwX)
 	if not item then
 		return 0
 	elseif not item.bCanStack then
@@ -290,7 +290,7 @@ end
 -- 是否可结双向好友，并返回真橙之心的位置
 function D.GetDoubleLoveItem(aInfo, aUIID)
 	if aInfo then
-		local tar = GetPlayer(aInfo.id)
+		local tar = X.GetPlayer(aInfo.id)
 		if aInfo.attraction >= D.nDoubleLoveAttraction and tar and X.IsParty(tar.dwID) and X.GetDistance(tar) <= 4 then
 			return D.GetBagItemPos(aUIID)
 		end
@@ -305,7 +305,7 @@ function D.UseDoubleLoveItem(aInfo, aUIID, callback)
 		OnUseItem(dwBox, dwX)
 		local nFinishTime = GetTime() + 500
 		X.BreatheCall(function()
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if not me then
 				return 0
 			end
@@ -381,7 +381,7 @@ function D.GetLover()
 	if MY_Love.IsShielded() then
 		return
 	end
-	local szKey, me = '#HM#LOVER#', GetClientPlayer()
+	local szKey, me = '#HM#LOVER#', X.GetClientPlayer()
 	if not me or not X.CanUseOnlineRemoteStorage() then
 		return
 	end
@@ -654,7 +654,7 @@ end
 
 -- 获取查看目标
 function D.GetPlayerInfo(dwID)
-	local tar = GetPlayer(dwID)
+	local tar = X.GetPlayer(dwID)
 	if not tar then
 		local aCard = GetFellowshipCardClient().GetFellowshipCardInfo(dwID)
 		if aCard and aCard.bExist then
@@ -682,7 +682,7 @@ function D.RequestOtherLover(dwID, nX, nY, fnAutoClose)
 			FireUIEvent('MY_LOVE_PV_ACTIVE_CHANGE', tar.dwID, false)
 			return X.Systopmsg(_L('[%s] is in fighting, no time for you.', tar.szName))
 		end
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		X.SendBgMsg(tar.szName, 'MY_LOVE', {'VIEW', X.PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'})
 	else
 		local tMsg = {
@@ -843,7 +843,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 			if X.IsParty(dwTalkerID) or data == 'Author' or O.bAutoReplyLover then
 				D.tViewer[dwTalkerID] = szTalkerName
 				D.ReplyLove()
-			elseif not GetClientPlayer().bFightState and not O.bQuiet then
+			elseif not X.GetClientPlayer().bFightState and not O.bQuiet then
 				D.tViewer[dwTalkerID] = szTalkerName
 				X.Confirm(
 					_L('[%s] want to see your lover info, OK?', szTalkerName),

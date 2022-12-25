@@ -47,7 +47,7 @@ X.RegisterEvent('MY_NOTIFY_DISMISS', function()
 end)
 
 function D.GetSerendipityShareName(fnAction, bNoConfirm)
-	local szReporter = X.LoadLUAData({'config/realname.jx3dat', X.PATH_TYPE.ROLE}) or GetClientPlayer().szName:gsub('@.-$', '')
+	local szReporter = X.LoadLUAData({'config/realname.jx3dat', X.PATH_TYPE.ROLE}) or X.GetClientPlayer().szName:gsub('@.-$', '')
 	if bNoConfirm then
 		if fnAction then
 			fnAction(szReporter)
@@ -154,7 +154,7 @@ function D.OnSerendipity(szName, szSerendipity, nMethod, eStatus, dwTime)
 	if MY_Serendipity.bAutoShare then
 		D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTime, MY_Serendipity.bSilentMode and 'silent' or 'auto')
 	else
-		local szXml = GetFormatText(szName == GetClientPlayer().szName
+		local szXml = GetFormatText(szName == X.GetClientPlayer().szName
 			and _L(eStatus == SERENDIPITY_STATUS.START
 				and 'You got %s, would you like to share?'
 				or 'You finished %s, would you like to share?', szSerendipity)
@@ -192,7 +192,7 @@ function D.GetSerendipityName(nID)
 end
 
 X.RegisterEvent('ON_SERENDIPITY_TRIGGER', 'QIYU', function()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -280,7 +280,7 @@ function D.Fetch(szName, fnAction)
 end
 
 X.RegisterMsgMonitor('MSG_SYS', 'QIYU', function(szChannel, szMsg, nFont, bRich, r, g, b)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -314,7 +314,7 @@ X.RegisterMsgMonitor('MSG_SYS', 'QIYU', function(szChannel, szMsg, nFont, bRich,
 end)
 
 X.RegisterEvent('LOOT_ITEM', function()
-	local player = GetPlayer(arg0)
+	local player = X.GetPlayer(arg0)
 	local item = GetItem(arg1)
 	if not player or not item then
 		return
@@ -326,7 +326,7 @@ X.RegisterEvent('LOOT_ITEM', function()
 end)
 
 X.RegisterEvent('QUEST_FINISHED', function()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end

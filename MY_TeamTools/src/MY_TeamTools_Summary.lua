@@ -118,7 +118,7 @@ local RT_SELECT_DEATH
 local RT_SCORE_FULL = 30000
 
 function D.UpdateDungeonInfo(hDungeon)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local szText = Table_GetMapName(RT_MAPID)
 	if me.GetMapID() == RT_MAPID and X.IsDungeonMap(RT_MAPID) then
 		szText = szText .. '\n' .. 'ID:(' .. me.GetScene().nCopyIndex  ..')'
@@ -136,7 +136,7 @@ function D.GetPlayerView()
 end
 
 function D.ViewInviteToPlayer(page, dwID)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if dwID ~= me.dwID then
 		page.tViewInvite[dwID] = true
 		ViewInviteToPlayer(dwID)
@@ -201,7 +201,7 @@ function D.Sorter(a, b)
 end
 -- 更新UI 没什么特殊情况 不要clear
 function D.UpdateList(page)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then return end
 	local aTeam, tKungfu = D.GetTeam(page), {}
 	local tScore = {
@@ -596,13 +596,13 @@ function D.GetEquipCache(page, KPlayer)
 	if not KPlayer then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local aInfo = {
 		tEquip            = {},
 		tPermanentEnchant = {},
 		tTemporaryEnchant = {}
 	}
-	-- 装备 Output(GetClientPlayer().GetItem(0,0).GetMagicAttrib())
+	-- 装备 Output(X.GetClientPlayer().GetItem(0,0).GetMagicAttrib())
 	for _, equip in ipairs(RT_EQUIP_TOTAL) do
 		-- if #aInfo.tEquip >= 3 then break end
 		-- 藏剑只看重剑
@@ -678,7 +678,7 @@ end
 
 function D.UpdateSelfData()
 	local dwMapID = RT_MAPID
-	local dwID = UI_GetClientPlayerID()
+	local dwID = X.GetClientPlayerID()
 	local function fnAction(tMapID)
 		local aCopyID = tMapID[dwMapID]
 		if not RT_PLAYER_MAP_COPYID[dwID] then
@@ -691,7 +691,7 @@ function D.UpdateSelfData()
 end
 
 function D.RequestTeamData()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -737,7 +737,7 @@ end
 
 -- 获取团队大部分情况 非缓存
 function D.GetTeam(page)
-	local me    = GetClientPlayer()
+	local me    = X.GetClientPlayer()
 	local team  = GetClientTeam()
 	local aList = {}
 	local bIsInParty = X.IsInParty()
@@ -746,7 +746,7 @@ function D.GetTeam(page)
 	local aRequestMapCopyID = {}
 	local aTeamMemberList = D.GetTeamMemberList()
 	for _, dwID in ipairs(aTeamMemberList) do
-		local KPlayer = GetPlayer(dwID)
+		local KPlayer = X.GetPlayer(dwID)
 		local info = bIsInParty and team.GetMemberInfo(dwID) or {}
 		local aInfo = {
 			KPlayer           = KPlayer,
@@ -805,7 +805,7 @@ function D.GetEquip(page)
 	if hView and hView:IsVisible() then -- 查看装备的时候停止请求
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -822,7 +822,7 @@ end
 
 -- 获取团队成员列表
 function D.GetTeamMemberList(bIsOnLine)
-	local me   = GetClientPlayer()
+	local me   = X.GetClientPlayer()
 	local team = GetClientTeam()
 	if me.IsInParty() then
 		if bIsOnLine then
@@ -851,7 +851,7 @@ function D.SetMapID(dwMapID)
 end
 
 X.RegisterEvent('LOADING_END', function()
-	D.SetMapID(GetClientPlayer().GetMapID())
+	D.SetMapID(X.GetClientPlayer().GetMapID())
 end)
 
 X.RegisterBgMsg('MY_MAP_COPY_ID', function(_, data, nChannel, dwID, szName, bIsSelf)
@@ -994,7 +994,7 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'PEEK_OTHER_PLAYER' then
 		if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 			if this.tViewInvite[arg1] then
-				D.GetEquipCache(this, GetPlayer(arg1)) -- 抓取所有数据
+				D.GetEquipCache(this, X.GetPlayer(arg1)) -- 抓取所有数据
 			end
 		else
 			this.tViewInvite[arg1] = nil
@@ -1004,7 +1004,7 @@ function D.OnEvent(szEvent)
 			this.tDataCache[arg1] = nil
 		end
 	elseif szEvent == 'PARTY_DELETE_MEMBER' then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if me.dwID == arg1 then
 			this.tDataCache = {}
 			this.hList:Clear()
@@ -1085,7 +1085,7 @@ end
 function D.OnItemRButtonClick()
 	local szName = this:GetName()
 	local dwID = tonumber(szName:match('P(%d+)'))
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if dwID and dwID ~= me.dwID then
 		local page = this:GetParent():GetParent():GetParent():GetParent()
 		local menu = {

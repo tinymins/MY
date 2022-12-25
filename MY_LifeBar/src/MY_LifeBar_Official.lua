@@ -86,7 +86,7 @@ local function ApplyCaptionColor(dwID)
 	if not tColor then
 		return
 	end
-	local KTarget, dwColor = (IsPlayer(dwID) and GetPlayer or GetNpc)(dwID), tColor.dwColor
+	local KTarget, dwColor = (X.IsPlayer(dwID) and X.GetPlayer or X.GetNpc)(dwID), tColor.dwColor
 	if KTarget then
 		if dwID == select(2, X.GetTarget()) then
 			if KTarget.nMoveState == MOVE_STATE.ON_DEATH then
@@ -152,7 +152,7 @@ end
 local KTarget, aCountDown, nR, nG, nB
 local tCountDownItem, szCountDownText, nCountDownSecond, fCountDownPercent
 function D.DrawLifeBar(dwID)
-	KTarget = (IsPlayer(dwID) and GetPlayer or GetNpc)(dwID)
+	KTarget = (X.IsPlayer(dwID) and X.GetPlayer or X.GetNpc)(dwID)
 	if not KTarget then
 		return
 	end

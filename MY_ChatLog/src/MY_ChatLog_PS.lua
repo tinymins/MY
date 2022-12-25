@@ -122,7 +122,7 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 	})();
 </script>
 <div>
-<a style='color: #fff;margin: 0 10px'>]] .. GetClientPlayer().szName .. ' @ ' .. X.GetServerName() ..
+<a style='color: #fff;margin: 0 10px'>]] .. X.GetClientPlayer().szName .. ' @ ' .. X.GetServerName() ..
 ' Exported at ' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd %hh:%mm:%ss') .. '</a><hr />'
 
 	return szHeader
@@ -286,7 +286,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 		end
 		db:SetMinTime(0)
 		db:SetMaxTime(math.huge)
-		db:SetInfo('user_global_id', GetClientPlayer().GetGlobalID())
+		db:SetInfo('user_global_id', X.GetClientPlayer().GetGlobalID())
 		l_bExporting = true
 
 		local nPage, nPageCount = 0, math.ceil(ds:CountMsg(aChannels, '') / EXPORT_SLICE)

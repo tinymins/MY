@@ -34,7 +34,7 @@ function D.ClearEnterMapLog()
 end
 
 X.RegisterEvent('LOADING_END', function()
-	PLAYER_ID = UI_GetClientPlayerID()
+	PLAYER_ID = X.GetClientPlayerID()
 end)
 
 X.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
@@ -44,7 +44,7 @@ X.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTalke
 		or dwTalkerID
 	if not INFO_CACHE[dwTalkerID] then
 		if key == 'self' then
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			INFO_CACHE[dwTalkerID] = {
 				szName = me.szName,
 				dwForceID = me.dwForceID,
@@ -141,7 +141,7 @@ end
 
 function D.UpdateList(page, dwMapID)
 	local hDeathMsg = page:Lookup('Wnd_EnterMap/Scroll_Death_Info', '')
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local team = GetClientTeam()
 	local aRec = {}
 	local aEnterMapLog = X.Clone(ENTER_MAP_LOG)

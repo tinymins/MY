@@ -63,7 +63,7 @@ function D.CheckEnable()
 				if IsShiftKeyDown() then
 					return X.Systopmsg(_L['Auto memorize book has been disabled due to SHIFT key pressed.'])
 				end
-				local me = GetClientPlayer()
+				local me = X.GetClientPlayer()
 				if not me then
 					return
 				end

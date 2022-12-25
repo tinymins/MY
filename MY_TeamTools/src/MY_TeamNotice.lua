@@ -263,7 +263,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			if szEvent == 'PARTY_DISBAND' then
 				ui:Remove()
 			elseif szEvent == 'PARTY_DELETE_MEMBER' then
-				if arg1 == UI_GetClientPlayerID() then
+				if arg1 == X.GetClientPlayerID() then
 					ui:Remove()
 				end
 			elseif szEvent == 'PARTY_ADD_MEMBER' then
@@ -340,7 +340,7 @@ end)
 
 -- 退队时清空团队告示
 X.RegisterEvent({'PARTY_DISBAND', 'PARTY_DELETE_MEMBER'}, 'TEAM_NOTICE', function(e)
-	if e == 'PARTY_DISBAND' or (e == 'PARTY_DELETE_MEMBER' and arg1 == UI_GetClientPlayerID()) then
+	if e == 'PARTY_DISBAND' or (e == 'PARTY_DELETE_MEMBER' and arg1 == X.GetClientPlayerID()) then
 		local frame = TI.GetFrame()
 		if frame then
 			Wnd.CloseWindow(frame)
@@ -354,7 +354,7 @@ X.RegisterEvent('ON_BG_CHANNEL_MSG', 'LR_TeamNotice', function()
 	if not O.bEnable then
 		return
 	end
-	local szMsgID, nChannel, dwID, szName, aMsg, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
+	local szMsgID, nChannel, dwID, szName, aMsg, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == X.GetClientPlayerID()
 	if szMsgID ~= 'LR_TeamNotice' or bSelf then
 		return
 	end
@@ -372,7 +372,7 @@ X.RegisterBgMsg('TI', function(_, data, nChannel, dwID, szName, bIsSelf)
 		return
 	end
 	if not bIsSelf then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		local team = GetClientTeam()
 		if team then
 			if data[1] == 'ASK' and X.IsLeader() then
@@ -385,7 +385,7 @@ X.RegisterBgMsg('TI', function(_, data, nChannel, dwID, szName, bIsSelf)
 				end
 				if data[1] == 'Edit' then
 					TI.CreateFrame(data[2], data[3])
-				elseif data[1] == 'reply' and (tonumber(data[2]) == UI_GetClientPlayerID() or data[2] == me.szName) then
+				elseif data[1] == 'reply' and (tonumber(data[2]) == X.GetClientPlayerID() or data[2] == me.szName) then
 					TI.CreateFrame(data[3], data[4])
 				end
 			end

@@ -118,7 +118,7 @@ function D.UpdateLine()
 	if not D.bReady then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local dwTarType, dwTarID = X.GetTarget(me)
 	local tar = X.GetObject(dwTarType, dwTarID)
 	local dwTTarType, dwTTarID = X.GetTarget(tar)

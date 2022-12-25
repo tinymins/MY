@@ -105,7 +105,7 @@ function D.OnFrameRender()
 			end
 			if v.tBindBuff then
 				local dwID, nLevel = unpack(v.tBindBuff)
-				local buff = GetBuff(GetClientPlayer(), dwID)
+				local buff = GetBuff(X.GetClientPlayer(), dwID)
 				if not buff then
 					v.obj:RemoveItem()
 				end

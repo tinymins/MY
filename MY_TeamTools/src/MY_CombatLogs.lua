@@ -194,7 +194,7 @@ function D.OpenCombatLogs()
 	CPath.MakeDir(szRoot)
 	local szTime = X.FormatTime(GetCurrentTime(), '%yyyy-%MM-%dd-%hh-%mm-%ss')
 	local szMapName = ''
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me then
 		local map = X.GetMapInfo(me.GetMapID())
 		if map then
@@ -322,13 +322,13 @@ end)
 
 function D.WillRecID(dwID)
 	if not O.bNearbyAll then
-		if not IsPlayer(dwID) then
-			local npc = GetNpc(dwID)
+		if not X.IsPlayer(dwID) then
+			local npc = X.GetNpc(dwID)
 			if npc then
 				dwID = npc.dwEmployer
 			end
 		end
-		return dwID == UI_GetClientPlayerID()
+		return dwID == X.GetClientPlayerID()
 	end
 	return true
 end
@@ -338,7 +338,7 @@ function D.OnTargetUpdate(dwID, bForce)
 	if not X.IsNumber(dwID) then
 		return
 	end
-	local bIsPlayer = IsPlayer(dwID)
+	local bIsPlayer = X.IsPlayer(dwID)
 	if not bIsPlayer then
 		if not LOG_NAMING_COUNT[dwID] then
 			LOG_NAMING_COUNT[dwID] = {
@@ -353,14 +353,14 @@ function D.OnTargetUpdate(dwID, bForce)
 		return
 	end
 	if bIsPlayer then
-		local player = GetPlayer(dwID)
+		local player = X.GetPlayer(dwID)
 		if not player then
 			return
 		end
 		local szName = player.szName
 		local dwForceID = player.dwForceID
 		local dwMountKungfuID = -1
-		if dwID == UI_GetClientPlayerID() then
+		if dwID == X.GetClientPlayerID() then
 			dwMountKungfuID = UI_GetPlayerMountKungfuID()
 		else
 			local info = GetClientTeam().GetMemberInfo(dwID)
@@ -410,7 +410,7 @@ function D.OnTargetUpdate(dwID, bForce)
 		end)
 		D.OnTargetInformationUpdate(TARGET.PLAYER, dwID)
 	else
-		local npc = GetNpc(dwID)
+		local npc = X.GetNpc(dwID)
 		if not npc then
 			return
 		end
@@ -426,7 +426,7 @@ function D.OnDoodadUpdate(dwID, bForce)
 	if not bForce and LOG_DOODAD_INFO_TIME[dwID] and GetTime() - LOG_DOODAD_INFO_TIME[dwID] < LOG_DOODAD_INFO_TIME_LIMIT then
 		return
 	end
-	local doodad = GetDoodad(dwID)
+	local doodad = X.GetDoodad(dwID)
 	if not doodad then
 		return
 	end
@@ -443,11 +443,11 @@ function D.OnTargetInformationUpdate(dwType, dwID)
 	end
 	local tar
 	if dwType == TARGET.PLAYER then
-		tar = GetPlayer(dwID)
+		tar = X.GetPlayer(dwID)
 	elseif dwType == TARGET.NPC then
-		tar = GetNpc(dwID)
+		tar = X.GetNpc(dwID)
 	elseif dwType == TARGET.DOODAD then
-		tar = GetDoodad(dwID)
+		tar = X.GetDoodad(dwID)
 	end
 	if tar then
 		local nLife, nMaxLife = X.GetObjectLife(tar)
@@ -654,7 +654,7 @@ X.RegisterEvent('PLAYER_SAY', function()
 	end
 	-- arg0: szContent, arg1: dwTalkerID, arg2: nChannel, arg3: szName, arg4: bOnlyShowBallon
 	-- arg5: bSecurity, arg6: bGMAccount, arg7: bCheater, arg8: dwTitleID, arg9: szMsg
-	if not IsPlayer(arg1) and D.WillRecID(arg1) then
+	if not X.IsPlayer(arg1) and D.WillRecID(arg1) then
 		local szText = X.GetPureText(arg0)
 		if szText and szText ~= '' then
 			D.OnTargetUpdate(arg1)
@@ -729,7 +729,7 @@ X.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµ
 		return
 	end
 	local team = GetClientTeam()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not team or not me or (not me.IsInParty() and not me.IsInRaid()) then
 		return
 	end

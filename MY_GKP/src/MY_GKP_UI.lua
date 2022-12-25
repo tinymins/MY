@@ -230,7 +230,7 @@ function D.DrawPaymentPage(frame, szKey, szSort)
 	frame.hAccountContainer.key = szKey
 	frame.hAccountContainer.sort = szSort
 	frame.hAccountContainer:Clear()
-	local tMoney = GetClientPlayer().GetMoney()
+	local tMoney = X.GetClientPlayer().GetMoney()
 	for k, v in ipairs(tab) do
 		local c = frame.hAccountContainer:AppendContentFromIni(PLUGIN_ROOT .. '/ui/MY_GKP_Account_Item.ini', 'WndWindow', k)
 		local item = c:Lookup('', '')
@@ -306,7 +306,7 @@ function MY_GKP_UI.OnFrameCreate()
 		buttonStyle = 'FLAT_LACE_BORDER',
 		onClick = function()
 			local ds = this:GetRoot().ds
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if not me.IsInParty() and not X.IsDebugClient('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
@@ -422,7 +422,7 @@ function MY_GKP_UI.OnFrameCreate()
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
 			local ds = this:GetRoot().ds
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if not me.IsInParty() and not X.IsDebugClient('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
@@ -465,7 +465,7 @@ function MY_GKP_UI.OnFrameCreate()
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
 			local ds = this:GetRoot().ds
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if not me.IsInParty() and not X.IsDebugClient('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
@@ -599,7 +599,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if me.IsInParty() then
 				local menu = MY_GKP.GetTeamMemberMenu(function(v)
 					X.Confirm(_L('Wheater replace the current record with the synchronization [%s]\'s record?\n Please notice, this means you are going to lose the information of current record.', v.szName), function()
@@ -618,7 +618,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if not me.IsInParty() then
 				X.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			elseif not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then

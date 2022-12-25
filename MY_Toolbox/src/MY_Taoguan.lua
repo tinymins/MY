@@ -198,7 +198,7 @@ local D = {
 
 -- 使用背包物品
 function D.UseBagItem(szName, bWarn)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	for i = 1, 6 do
 		for j = 0, me.GetBoxSize(i) - 1 do
 		local it = GetPlayerItem(me, i, j)
@@ -218,7 +218,7 @@ end
 
 -- 砸罐子状态机转移函数
 function D.BreakCanStateTransfer()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me or not D.bEnable then
 		return
 	end
@@ -329,7 +329,7 @@ function D.MonitorZP(szChannel, szMsg)
 end
 
 function D.OnLootItem()
-	if arg0 == GetClientPlayer().dwID and arg2 > 2 and GetItem(arg1).szName == MEILIANGYUQIAN then
+	if arg0 == X.GetClientPlayer().dwID and arg2 > 2 and GetItem(arg1).szName == MEILIANGYUQIAN then
 		D.nPoint = 0
 		D.bWaitPoint = false
 		X.Systopmsg(_L['Auto taoguan: score clear!'])
@@ -338,8 +338,8 @@ end
 
 function D.OnDoodadEnter()
 	if D.bEnable or D.bReachLimit then
-		local d = GetDoodad(arg0)
-		if d and d.szName == TAOGUAN and d.CanDialog(GetClientPlayer())
+		local d = X.GetDoodad(arg0)
+		if d and d.szName == TAOGUAN and d.CanDialog(X.GetClientPlayer())
 			and X.GetDistance(d) < 4.1
 		then
 			D.dwDoodadID = arg0
@@ -352,9 +352,9 @@ end
 
 function D.OnOpenDoodad()
 	if D.bEnable or D.bReachLimit then
-		local d = GetDoodad(D.dwDoodadID)
+		local d = X.GetDoodad(D.dwDoodadID)
 		if d and d.szName == TAOGUAN then
-			local nQ, nM, me = 1, d.GetLootMoney(), GetClientPlayer()
+			local nQ, nM, me = 1, d.GetLootMoney(), X.GetClientPlayer()
 			if nM > 0 then
 				LootMoney(d.dwID)
 			end

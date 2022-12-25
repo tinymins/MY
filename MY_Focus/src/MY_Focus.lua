@@ -492,7 +492,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 	if nRetryCount and nRetryCount > 5 then
 		return
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return X.DelayCall(5000, function() D.OnObjectEnterScene(dwType, dwID) end)
 	end
@@ -541,7 +541,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			and not (
 				dwType == TARGET.NPC
 				and dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
-				and IsEnemy(UI_GetClientPlayerID(), dwID)
+				and IsEnemy(X.GetClientPlayerID(), dwID)
 				and X.IsRestricted('MY_Focus.CHANGGE_SHADOW')
 			) then
 				table.insert(aVia, {
@@ -587,7 +587,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 						})
 						bFocus = true
 					elseif O.bFocusJJCParty then
-						if not IsEnemy(UI_GetClientPlayerID(), dwID) then
+						if not IsEnemy(X.GetClientPlayerID(), dwID) then
 							table.insert(aVia, {
 								bDeletable = false,
 								szVia = _L['Auto focus party in arena'],
@@ -595,7 +595,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 							bFocus = true
 						end
 					elseif O.bFocusJJCEnemy then
-						if IsEnemy(UI_GetClientPlayerID(), dwID) then
+						if IsEnemy(X.GetClientPlayerID(), dwID) then
 							table.insert(aVia, {
 								bDeletable = false,
 								szVia = _L['Auto focus enemy in arena'],
@@ -606,7 +606,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				elseif dwType == TARGET.NPC then
 					if O.bFocusJJCParty
 					and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
-					and not (IsEnemy(UI_GetClientPlayerID(), dwID) and X.IsRestricted('MY_Focus.CHANGGE_SHADOW')) then
+					and not (IsEnemy(X.GetClientPlayerID(), dwID) and X.IsRestricted('MY_Focus.CHANGGE_SHADOW')) then
 						D.OnRemoveFocus(TARGET.PLAYER, KObject.dwEmployer)
 						table.insert(aVia, {
 							bDeletable = false,
@@ -653,7 +653,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				-- 判断敌对玩家
 				if dwType == TARGET.PLAYER
 				and O.bFocusEnemy
-				and IsEnemy(UI_GetClientPlayerID(), dwID) then
+				and IsEnemy(X.GetClientPlayerID(), dwID) then
 					table.insert(aVia, {
 						bDeletable = false,
 						szVia = _L['Enemy focus'],
@@ -693,7 +693,7 @@ function D.OnObjectLeaveScene(dwType, dwID)
 		if dwType == TARGET.NPC then
 			if D.bReady and O.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
-			and X.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and X.IsRestricted('MY_Focus.SHILDED_NPC')) then
+			and X.IsInArena() and not (IsEnemy(X.GetClientPlayerID(), dwID) and X.IsRestricted('MY_Focus.SHILDED_NPC')) then
 				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, X.GetObjectName(KObject, 'never'), _L['Auto focus party in arena'])
 			end
 		end
@@ -737,7 +737,7 @@ end
 
 -- 排序
 function D.SortFocus(fn)
-	local p = GetClientPlayer()
+	local p = X.GetClientPlayer()
 	fn = fn or function(p1, p2)
 		p1 = X.GetObject(p1.dwType, p1.dwID)
 		p2 = X.GetObject(p2.dwType, p2.dwID)
@@ -761,7 +761,7 @@ end
 -- 获取当前显示的焦点列表
 function D.GetDisplayList()
 	local t = {}
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not D.IsShielded() and me then
 		for _, p in ipairs(FOCUS_LIST) do
 			if #t >= O.nMaxDisplay then
@@ -1080,7 +1080,7 @@ end
 
 do
 local function onMenu()
-	local dwType, dwID = GetClientPlayer().GetTarget()
+	local dwType, dwID = X.GetClientPlayer().GetTarget()
 	return D.GetTargetMenu(dwType, dwID)
 end
 X.RegisterTargetAddonMenu('MY_Focus', onMenu)

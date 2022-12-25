@@ -85,7 +85,7 @@ end
 function D.AddToList(tar, dwCaster, dwTime, szEvent)
 	D.tList[tar.dwID] = { dwCaster = dwCaster, dwTime = dwTime }
 	-- bg notify
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if szEvent == 'DO_SKILL_CAST' and me.IsInParty() then
 		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GUDING_NOTIFY', {tar.dwID, dwCaster}, true)
 	end
@@ -108,8 +108,8 @@ end
 -------------------------------------
 -- skill cast log
 function D.OnSkillCast(dwCaster, dwSkillID, dwLevel, szEvent)
-	local player = GetPlayer(dwCaster)
-	if player and dwSkillID == D.dwSkillID and (dwCaster == UI_GetClientPlayerID() or X.IsParty(dwCaster)) then
+	local player = X.GetPlayer(dwCaster)
+	if player and dwSkillID == D.dwSkillID and (dwCaster == X.GetClientPlayerID() or X.IsParty(dwCaster)) then
 		table.insert(D.tCast, { dwCaster = dwCaster, dwTime = GetTime(), szEvent = szEvent })
 		--[[#DEBUG BEGIN]]
 		D.Debug('[' .. player.szName .. '] cast [' .. X.GetSkillName(dwSkillID, dwLevel) .. '#' .. szEvent .. ']')
@@ -119,7 +119,7 @@ end
 
 -- doodad enter
 function D.OnDoodadEnter()
-	local tar = GetDoodad(arg0)
+	local tar = X.GetDoodad(arg0)
 	if not tar or D.tList[arg0] or tar.dwTemplateID ~= D.dwTemplateID then
 		return
 	end
@@ -191,7 +191,7 @@ function D.OnEnableChange()
 			end
 			D.nFrame = nFrame
 			-- check empty
-			local sha, me = D.pLabel, GetClientPlayer()
+			local sha, me = D.pLabel, X.GetClientPlayer()
 			if not me or not MY_ForceGuding.bEnable or X.IsEmpty(D.tList) then
 				return sha:Hide()
 			end
@@ -211,11 +211,11 @@ function D.OnEnableChange()
 				if nLeft < 0 then
 					D.RemoveFromList(k)
 				else
-					local tar = GetDoodad(k)
+					local tar = X.GetDoodad(k)
 					if tar then
 						--  show name
 						local szText = _L['-'] .. math.floor(nLeft / 1000)
-						local player = GetPlayer(v.dwCaster)
+						local player = X.GetPlayer(v.dwCaster)
 						if player then
 							szText = player.szName .. szText
 						else
@@ -250,7 +250,7 @@ function D.OnUseManaChange()
 				return
 			end
 			-- Ã»×Ô¼º
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if not me then
 				return
 			end
@@ -274,7 +274,7 @@ function D.OnUseManaChange()
 			end
 			-- ÕÒ¶¦
 			for k, _ in pairs(aList) do
-				local doo = GetDoodad(k)
+				local doo = X.GetDoodad(k)
 				if doo and X.GetDistance(doo) < 6 then
 					D.nManaFrame = GetLogicFrameCount()
 					X.InteractDoodad(doo.dwID)

@@ -103,7 +103,7 @@ function D.MosaicsString(szText)
 	if bQuote then
 		szText = szText:sub(2, -2) -- È¥µô[]À¨ºÅ
 	end
-	if (not O.bIgnoreOwnName or szText ~= GetClientPlayer().szName) and not O.tIgnoreNames[szText] then
+	if (not O.bIgnoreOwnName or szText ~= X.GetClientPlayer().szName) and not O.tIgnoreNames[szText] then
 		local nLen = X.StringLenW(szText)
 		if O.nMosaicsMode == 3 and nLen > 2 then
 			szText = X.StringSubW(szText, 1, 1) .. string.rep(D.szMosaics, nLen - 2) .. X.StringSubW(szText, nLen, nLen)

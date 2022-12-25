@@ -212,7 +212,7 @@ X.RegisterEvent('LOADING_ENDING', function()
 	if MY_TeamTools.IsOpened() then
 		return
 	end
-	D.dwMapID = GetClientPlayer().GetMapID()
+	D.dwMapID = X.GetClientPlayer().GetMapID()
 	D.szSearch = ''
 	D.UpdateSearchAC()
 	D.UpdateAchievementID()
@@ -220,7 +220,7 @@ end)
 
 -- 获取团队成员列表
 function D.GetTeamMemberList(bIsOnLine)
-	local me   = GetClientPlayer()
+	local me   = X.GetClientPlayer()
 	local team = GetClientTeam()
 	if me.IsInParty() then
 		if bIsOnLine then
@@ -328,7 +328,7 @@ end
 
 function D.UpdateSelfData()
 	local aAchieveID, aCounterID = D.AnalysisAchievementRequest(D.aAchievement)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not ACHIEVE_CACHE[me.dwID] then
 		ACHIEVE_CACHE[me.dwID] = {}
 	end
@@ -362,7 +362,7 @@ function D.RequestTeamData()
 		end
 	end
 	for _, dwID in ipairs(aTeamMemberList) do
-		if dwID ~= UI_GetClientPlayerID() then
+		if dwID ~= X.GetClientPlayerID() then
 			if tRequestID[dwID] then
 				table.insert(aRequestID, dwID)
 			else
@@ -569,7 +569,7 @@ function D.UpdatePage(page)
 	end
 	hCols:FormatAllItemPos()
 
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local team = GetClientTeam()
 	local bIsInParty = X.IsInParty()
 	local aRec = {}
@@ -648,7 +648,7 @@ function D.OnInitPage()
 		table.insert(tMapMenu, {
 			szOption = _L['Current map'],
 			fnAction = function()
-				D.dwMapID = GetClientPlayer().GetMapID()
+				D.dwMapID = X.GetClientPlayer().GetMapID()
 				D.UpdateSearchAC()
 				D.UpdateAchievementID()
 				D.RequestTeamData()
