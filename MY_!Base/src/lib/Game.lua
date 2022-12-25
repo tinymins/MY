@@ -327,7 +327,7 @@ function X.GetTargetContextMenu(dwType, szName, dwID)
 		-- insert view arena
 		table.insert(t, {
 			szOption = g_tStrings.LOOKUP_CORPS,
-			-- fnDisable = function() return not GetPlayer(dwID) end,
+			-- fnDisable = function() return not X.GetPlayer(dwID) end,
 			fnAction = function()
 				Wnd.CloseWindow('ArenaCorpsPanel')
 				OpenArenaCorpsPanel(true, dwID)
@@ -1211,14 +1211,14 @@ function X.GetObject(arg0, arg1, arg2)
 		if me and dwID == me.dwID then
 			p, info, b = me, me, false
 		elseif not X.ENVIRONMENT.RUNTIME_OPTIMIZE and me and me.IsPlayerInMyParty(dwID) then
-			p, info, b = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID), true
+			p, info, b = X.GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID), true
 		else
-			p, info, b = GetPlayer(dwID), GetPlayer(dwID), false
+			p, info, b = X.GetPlayer(dwID), X.GetPlayer(dwID), false
 		end
 	elseif dwType == TARGET.NPC then
-		p, info, b = GetNpc(dwID), GetNpc(dwID), false
+		p, info, b = X.GetNpc(dwID), X.GetNpc(dwID), false
 	elseif dwType == TARGET.DOODAD then
-		p, info, b = GetDoodad(dwID), GetDoodad(dwID), false
+		p, info, b = X.GetDoodad(dwID), X.GetDoodad(dwID), false
 	elseif dwType == TARGET.ITEM then
 		p, info, b = GetItem(dwID), GetItem(dwID), GetItem(dwID)
 	end
@@ -1318,7 +1318,7 @@ function X.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 				KObject = arg1
 				dwID, eRetID = KObject.dwID, arg2
 			elseif X.IsNumber(arg3) then
-				local p = GetPlayer(arg1)
+				local p = X.GetPlayer(arg1)
 				if p then
 					KObject = p.GetItem(arg2, arg3)
 					if KObject then
@@ -1394,10 +1394,10 @@ function X.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 				end
 				if KObject.dwEmployer and KObject.dwEmployer ~= 0 then
 					if X.Table_IsSimplePlayer(KObject.dwTemplateID) then -- 长歌影子
-						szName = X.GetObjectName(GetPlayer(KObject.dwEmployer), eRetID)
+						szName = X.GetObjectName(X.GetPlayer(KObject.dwEmployer), eRetID)
 					elseif not X.IsEmpty(szName) then
 						local szEmpName = X.GetObjectName(
-							(IsPlayer(KObject.dwEmployer) and GetPlayer(KObject.dwEmployer)) or GetNpc(KObject.dwEmployer),
+							(IsPlayer(KObject.dwEmployer) and X.GetPlayer(KObject.dwEmployer)) or X.GetNpc(KObject.dwEmployer),
 							'never'
 						)
 						if szEmpName then
@@ -1496,7 +1496,7 @@ end
 function X.GetNearNpc(nLimit)
 	local aNpc = {}
 	for k, _ in pairs(NEARBY_NPC) do
-		local npc = GetNpc(k)
+		local npc = X.GetNpc(k)
 		if not npc then
 			NEARBY_NPC[k] = nil
 		else
@@ -1531,7 +1531,7 @@ end
 function X.GetNearPet(nLimit)
 	local aPet = {}
 	for k, _ in pairs(NEARBY_PET) do
-		local npc = GetNpc(k)
+		local npc = X.GetNpc(k)
 		if not npc then
 			NEARBY_PET[k] = nil
 		else
@@ -1566,7 +1566,7 @@ end
 function X.GetNearBoss(nLimit)
 	local aNpc = {}
 	for k, _ in pairs(NEARBY_BOSS) do
-		local npc = GetNpc(k)
+		local npc = X.GetNpc(k)
 		if not npc then
 			NEARBY_BOSS[k] = nil
 		else
@@ -1611,7 +1611,7 @@ end)
 function X.GetNearPlayer(nLimit)
 	local aPlayer = {}
 	for k, _ in pairs(NEARBY_PLAYER) do
-		local p = GetPlayer(k)
+		local p = X.GetPlayer(k)
 		if not p then
 			NEARBY_PLAYER[k] = nil
 		else
@@ -1646,7 +1646,7 @@ end
 function X.GetNearDoodad(nLimit)
 	local aDoodad = {}
 	for dwID, _ in pairs(NEARBY_DOODAD) do
-		local doodad = GetDoodad(dwID)
+		local doodad = X.GetDoodad(dwID)
 		if not doodad then
 			NEARBY_DOODAD[dwID] = nil
 		else
@@ -1691,7 +1691,7 @@ X.BreatheCall(X.NSFormatString('{$NS}#FIGHT_HINT_TRIGGER'), function()
 	end
 end)
 X.RegisterEvent('NPC_ENTER_SCENE', function()
-	local npc = GetNpc(arg0)
+	local npc = X.GetNpc(arg0)
 	if npc and npc.dwEmployer ~= 0 then
 		NEARBY_PET[arg0] = npc
 	end
@@ -1708,17 +1708,11 @@ X.RegisterEvent('NPC_LEAVE_SCENE', function()
 	NEARBY_FIGHT[arg0] = nil
 end)
 X.RegisterEvent('PLAYER_ENTER_SCENE', function()
-	local player = GetPlayer(arg0)
+	local player = X.GetPlayer(arg0)
+	NEARBY_PLAYER[arg0] = player
+	NEARBY_FIGHT[arg0] = player and player.bFightState or false
 	if UI_GetClientPlayerID() == arg0 then
-		if not player then
-			player = GetClientPlayer()
-		end
-		NEARBY_PLAYER[arg0] = player
-		NEARBY_FIGHT[arg0] = player and player.bFightState or false
 		FireUIEvent(X.NSFormatString('{$NS}_CLIENT_PLAYER_ENTER_SCENE'))
-	else
-		NEARBY_PLAYER[arg0] = player
-		NEARBY_FIGHT[arg0] = player and player.bFightState or false
 	end
 end)
 X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
@@ -1728,7 +1722,7 @@ X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
 	NEARBY_PLAYER[arg0] = nil
 	NEARBY_FIGHT[arg0] = nil
 end)
-X.RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = GetDoodad(arg0) end)
+X.RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = X.GetDoodad(arg0) end)
 X.RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil end)
 end
 
@@ -2099,8 +2093,8 @@ function X.GetRelation(dwSelfID, dwPeerID)
 		dwSelfID = GetControlPlayerID()
 	end
 	if not IsPlayer(dwPeerID) then
-		local npc = GetNpc(dwPeerID)
-		if npc and npc.dwEmployer ~= 0 and GetPlayer(npc.dwEmployer) then
+		local npc = X.GetNpc(dwPeerID)
+		if npc and npc.dwEmployer ~= 0 and X.GetPlayer(npc.dwEmployer) then
 			dwPeerID = npc.dwEmployer
 		end
 	end
@@ -2385,7 +2379,7 @@ function X.SetTarget(arg0, arg1)
 			return false
 		end
 	elseif dwType == TARGET.NPC then
-		local npc = GetNpc(dwID)
+		local npc = X.GetNpc(dwID)
 		if npc and not npc.IsSelectable() and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
 			X.Debug('SetTarget', 'Set target to unselectable npc.', X.DEBUG_LEVEL.WARNING)
@@ -3727,7 +3721,7 @@ end
 ---@param dwID number @目标ID
 ---@return boolean @是否成功
 function X.SetTeamMarkTarget(nMark, dwID)
-	local npc = not IsPlayer(dwID) and GetNpc(dwID) or nil
+	local npc = not IsPlayer(dwID) and X.GetNpc(dwID) or nil
 	if npc and X.IsShieldedNpc(npc.dwTemplateID) then
 		return false
 	end
@@ -4538,7 +4532,7 @@ do
 			else
 				EVENT_KEY = X.RegisterEvent('PEEK_OTHER_PLAYER', X.NSFormatString('{$NS}#GetPlayerEquipScore'), function()
 					local nResult, dwID = arg0, arg1
-					local player = GetPlayer(dwID)
+					local player = X.GetPlayer(dwID)
 					if nResult == PEEK_OTHER_PLAYER_RESPOND.SUCCESS and player then
 						PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] = 'SUCCESS'
 						PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID] = player.GetTotalEquipScore()
@@ -4633,7 +4627,7 @@ do
 			return
 		end
 		-- 缓存判定
-		local player = GetPlayer(dwID)
+		local player = X.GetPlayer(dwID)
 		if player and PEEK_PLAYER_EQUIP_STATE[dwID] == 'SUCCESS' and not bForcePeek then
 			OnGetPlayerEquipInfoPeekPlayer(player)
 			return
@@ -4643,7 +4637,7 @@ do
 		if not EVENT_KEY then
 			EVENT_KEY = X.RegisterEvent('PEEK_OTHER_PLAYER', X.NSFormatString('{$NS}#GetPlayerEquipInfo'), function()
 				local nResult, dwID = arg0, arg1
-				local player = GetPlayer(dwID)
+				local player = X.GetPlayer(dwID)
 				if nResult == PEEK_OTHER_PLAYER_RESPOND.SUCCESS and player then
 					PEEK_PLAYER_EQUIP_STATE[dwID] = 'SUCCESS'
 					OnGetPlayerEquipInfoPeekPlayer(player)
@@ -4725,7 +4719,7 @@ do
 			return
 		end
 		-- 缓存判定
-		local player = GetPlayer(dwID)
+		local player = X.GetPlayer(dwID)
 		if player and PEEK_PLAYER_TALENT_STATE[dwID] == 'SUCCESS' and not bForcePeek then
 			OnGetPlayerTalnetInfoPeekPlayer(player)
 			return
@@ -4735,7 +4729,7 @@ do
 		if not EVENT_KEY then
 			EVENT_KEY = X.RegisterEvent('ON_UPDATE_TALENT', X.NSFormatString('{$NS}#GetPlayerEquipInfo'), function()
 				local dwID = arg0
-				local player = GetPlayer(dwID)
+				local player = X.GetPlayer(dwID)
 				if player then
 					PEEK_PLAYER_TALENT_STATE[dwID] = 'SUCCESS'
 					OnGetPlayerTalnetInfoPeekPlayer(player)

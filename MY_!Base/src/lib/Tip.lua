@@ -157,7 +157,7 @@ function X.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 	table.insert(xml, GetFormatImage(szPath, nFrame, 22, 22))
 	table.insert(xml, GetFormatText(FormatString(g_tStrings.STR_NAME_PLAYER, tMemberInfo.szName), 80, r, g, b))
 	if tMemberInfo.bIsOnLine then
-		local p = GetPlayer(dwID)
+		local p = X.GetPlayer(dwID)
 		if p and p.dwTongID > 0 then
 			if GetTongClient().ApplyGetTongName(p.dwTongID) then
 				table.insert(xml, GetFormatText('[' .. GetTongClient().ApplyGetTongName(p.dwTongID) .. ']\n', 41))
@@ -191,7 +191,7 @@ function X.OutputPlayerTip(Rect, dwID, szExtraXml)
 	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwID, szExtraXml = nil, Rect, dwID
 	end
-	local player = GetPlayer(dwID)
+	local player = X.GetPlayer(dwID)
 	if not player then
 		return
 	end
@@ -295,7 +295,7 @@ function X.OutputNpcTip(Rect, dwID, szExtraXml)
 	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwID, szExtraXml = nil, Rect, dwID
 	end
-	local npc = GetNpc(dwID)
+	local npc = X.GetNpc(dwID)
 	if not npc then
 		return
 	end
@@ -381,7 +381,7 @@ function X.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 	if not X.IsTable(Rect) and not X.IsNil(Rect) then
 		Rect, dwDoodadID, szExtraXml = nil, Rect, dwDoodadID
 	end
-	local doodad = GetDoodad(dwDoodadID)
+	local doodad = X.GetDoodad(dwDoodadID)
 	if not doodad then
 		return
 	end

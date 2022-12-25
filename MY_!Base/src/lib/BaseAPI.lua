@@ -82,6 +82,30 @@ function X.GetServerOriginName()
 	return szServerOriginName or szServerDisplayName
 end
 
+-- 获取玩家对象
+---@param dwID number @玩家ID
+---@return userdata | nil @玩家对象，获取失败返回空
+function X.GetPlayer(dwID)
+	if dwID == UI_GetClientPlayerID() then
+		return GetClientPlayer()
+	end
+	return GetPlayer(dwID)
+end
+
+-- 获取 NPC 对象
+---@param dwID number @NPC ID
+---@return userdata | nil @NPC 对象，获取失败返回空
+function X.GetNpc(dwID)
+	return GetNpc(dwID)
+end
+
+-- 获取交互物件对象
+---@param dwID number @交互物件ID
+---@return userdata | nil @交互物件对象，获取失败返回空
+function X.GetDoodad(dwID)
+	return GetDoodad(dwID)
+end
+
 -- 获取登录角色ID
 ---@return number @登录角色ID
 function X.GetClientPlayerID()
