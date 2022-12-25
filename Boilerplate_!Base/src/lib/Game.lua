@@ -1709,8 +1709,17 @@ X.RegisterEvent('NPC_LEAVE_SCENE', function()
 end)
 X.RegisterEvent('PLAYER_ENTER_SCENE', function()
 	local player = GetPlayer(arg0)
-	NEARBY_PLAYER[arg0] = player
-	NEARBY_FIGHT[arg0] = player and player.bFightState or false
+	if UI_GetClientPlayerID() == arg0 then
+		if not player then
+			player = GetClientPlayer()
+		end
+		NEARBY_PLAYER[arg0] = player
+		NEARBY_FIGHT[arg0] = player and player.bFightState or false
+		FireUIEvent(X.NSFormatString('{$NS}_CLIENT_PLAYER_ENTER_SCENE'))
+	else
+		NEARBY_PLAYER[arg0] = player
+		NEARBY_FIGHT[arg0] = player and player.bFightState or false
+	end
 end)
 X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
 	if UI_GetClientPlayerID() == arg0 then
