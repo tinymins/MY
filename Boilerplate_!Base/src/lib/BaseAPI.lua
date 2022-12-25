@@ -117,7 +117,7 @@ end
 ---@param dwID number @玩家ID
 ---@return userdata | nil @玩家对象，获取失败返回空
 function X.GetPlayer(dwID)
-	if dwID == UI_GetClientPlayerID() then
+	if dwID == X.GetClientPlayerID() then
 		return X.GetClientPlayer()
 	end
 	return GetPlayer(dwID)

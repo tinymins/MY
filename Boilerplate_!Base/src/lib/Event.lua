@@ -392,7 +392,7 @@ X.RegisterEvent('BUFF_UPDATE', function()
 	if arg1 then
 		return
 	end
-	if arg0 == UI_GetClientPlayerID() and arg4 == 103 then
+	if arg0 == X.GetClientPlayerID() and arg4 == 103 then
 		DelayCall(X.NSFormatString('{$NS}#ON_IDLE'), X.Random(0, 10000), function()
 			local me = X.GetClientPlayer()
 			if me and me.GetBuff(103, 0) then
@@ -625,7 +625,7 @@ local BG_MSG_PROGRESS_EVENT = { szName = 'BgMsgProgress' }
 do
 local BG_MSG_PART = {}
 local function OnBgMsg()
-	local szMsgSID, nChannel, dwID, szName, aMsg, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
+	local szMsgSID, nChannel, dwID, szName, aMsg, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == X.GetClientPlayerID()
 	if not szMsgSID or szMsgSID:sub(1, #BG_MSG_ID_PREFIX) ~= BG_MSG_ID_PREFIX or szMsgSID:sub(-#BG_MSG_ID_SUFFIX) ~= BG_MSG_ID_SUFFIX then
 		return
 	end
