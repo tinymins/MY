@@ -249,7 +249,7 @@ if X.PACKET_INFO.DEBUG_LEVEL <= X.DEBUG_LEVEL.DEBUG then
 		end
 	end)
 end
-X.RegisterHotKey(X.NSFormatString('{$NS}_STOP_CASTING'), _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
+X.RegisterHotKey(X.NSFormatString('{$NS}_STOP_CASTING'), _L['Stop cast skill'], function() X.GetClientPlayer().StopCurrentAction() end)
 end
 
 -- Format data's structure as struct descripted.

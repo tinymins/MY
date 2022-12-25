@@ -195,7 +195,7 @@ function X.OutputPlayerTip(Rect, dwID, szExtraXml)
 	if not player then
 		return
 	end
-	local me, t = GetClientPlayer(), {}
+	local me, t = X.GetClientPlayer(), {}
 	local r, g, b = GetForceFontColor(dwID, me.dwID)
 
 	-- 名字
@@ -275,7 +275,7 @@ function X.OutputNpcTemplateTip(Rect, dwNpcTemplateID, szExtraXml)
 	local szName = X.GetTemplateName(TARGET.NPC, dwNpcTemplateID) or dwNpcTemplateID
 	table.insert(t, GetFormatText(szName .. '\n', 80, 255, 255, 0))
 	-- 等级
-	if npc.nLevel - GetClientPlayer().nLevel > 10 then
+	if npc.nLevel - X.GetClientPlayer().nLevel > 10 then
 		table.insert(t, GetFormatText(g_tStrings.STR_PLAYER_H_UNKNOWN_LEVEL, 82))
 	else
 		table.insert(t, GetFormatText(FormatString(g_tStrings.STR_NPC_H_WHAT_LEVEL, npc.nLevel), 0))
@@ -300,7 +300,7 @@ function X.OutputNpcTip(Rect, dwID, szExtraXml)
 		return
 	end
 
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local r, g, b = GetForceFontColor(dwID, me.dwID)
 	local t = {}
 
@@ -386,7 +386,7 @@ function X.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 		return
 	end
 
-	local player, t = GetClientPlayer(), {}
+	local player, t = X.GetClientPlayer(), {}
 	-- 名字
 	local szDoodadName = Table_GetDoodadName(doodad.dwTemplateID, doodad.dwNpcTemplateID)
 	if doodad.nKind == DOODAD_KIND.CORPSE then

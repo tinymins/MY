@@ -96,7 +96,7 @@ do
 local S2L_CACHE = setmetatable({}, { __mode = 'k' })
 local L2S_CACHE = setmetatable({}, { __mode = 'k' })
 function X.ConvertNpcID(dwID, eType)
-	if IsPlayer(dwID) then
+	if X.IsPlayer(dwID) then
 		if not S2L_CACHE[dwID] then
 			S2L_CACHE[dwID] = { dwID + 0x40000000 }
 		end
@@ -206,7 +206,7 @@ function X.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 				nX2, nY2, szType = arg1, arg2, arg3
 			end
 		else -- OObject[, szType]
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			nX2, nY2, nZ2, szType = me.nX, me.nY, me.nZ, arg1
 		end
 	elseif X.IsNumber(arg0) and X.IsNumber(arg1) then -- nX1, nY1 -
@@ -218,11 +218,11 @@ function X.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 					nX1, nY1, nX2, nY2, szType = arg0, arg1, arg2, arg3, arg4
 				end
 			else -- nX1, nY1, nZ1[, szType]
-				local me = GetClientPlayer()
+				local me = X.GetClientPlayer()
 				nX1, nY1, nZ1, nX2, nY2, nZ2, szType = me.nX, me.nY, me.nZ, arg0, arg1, arg2, arg3
 			end
 		else -- nX1, nY1
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			nX1, nY1, nX2, nY2 = me.nX, me.nY, arg0, arg1
 		end
 	end
@@ -299,7 +299,7 @@ function X.GetTargetContextMenu(dwType, szName, dwID)
 		table.insert(t, {
 			szOption = _L['Copy'],
 			fnAction = function()
-				X.SendChat(GetClientPlayer().szName, '[' .. szName .. ']')
+				X.SendChat(X.GetClientPlayer().szName, '[' .. szName .. ']')
 			end,
 		})
 		-- 密聊 好友 邀请入帮 跟随
@@ -576,7 +576,7 @@ end
 -- szType枚举值见 @{{武林通鉴 szType 枚举}}
 function X.GetActivityQuest(szType)
 	local aQuestID = {}
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local date = TimeToDate(GetCurrentTime())
 	local aActive = Table_GetActivityOfDay(date.year, date.month, date.day, ACTIVITY_UI.CALENDER)
 	for _, p in ipairs(aActive) do
@@ -823,7 +823,7 @@ X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#Bosslist'), function()
 		GenerateList()
 		local p = X.GetObject(dwType, dwID)
 		local szName = X.GetObjectName(p)
-		local dwMapID = GetClientPlayer().GetMapID()
+		local dwMapID = X.GetClientPlayer().GetMapID()
 		local szMapName = Table_GetMapName(dwMapID)
 		local dwTemplateID = p.dwTemplateID
 		if X.IsBoss(dwMapID, dwTemplateID) then
@@ -940,7 +940,7 @@ X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#ImportantNpclist'), funct
 		GenerateList()
 		local p = X.GetObject(dwType, dwID)
 		local szName = X.GetObjectName(p)
-		local dwMapID = GetClientPlayer().GetMapID()
+		local dwMapID = X.GetClientPlayer().GetMapID()
 		local szMapName = Table_GetMapName(dwMapID)
 		local dwTemplateID = p.dwTemplateID
 		if X.IsImportantNpc(dwMapID, dwTemplateID, true) then
@@ -1207,7 +1207,7 @@ function X.GetObject(arg0, arg1, arg2)
 
 	local p, info, b
 	if dwType == TARGET.PLAYER then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if me and dwID == me.dwID then
 			p, info, b = me, me, false
 		elseif not X.ENVIRONMENT.RUNTIME_OPTIMIZE and me and me.IsPlayerInMyParty(dwID) then
@@ -1327,7 +1327,7 @@ function X.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 					eRetID = arg4
 				end
 			elseif X.IsNumber(arg2) then
-				local p = GetClientPlayer()
+				local p = X.GetClientPlayer()
 				if p then
 					KObject = p.GetItem(arg1, arg2)
 					if KObject then
@@ -1397,7 +1397,7 @@ function X.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 						szName = X.GetObjectName(X.GetPlayer(KObject.dwEmployer), eRetID)
 					elseif not X.IsEmpty(szName) then
 						local szEmpName = X.GetObjectName(
-							(IsPlayer(KObject.dwEmployer) and X.GetPlayer(KObject.dwEmployer)) or X.GetNpc(KObject.dwEmployer),
+							(X.IsPlayer(KObject.dwEmployer) and X.GetPlayer(KObject.dwEmployer)) or X.GetNpc(KObject.dwEmployer),
 							'never'
 						)
 						if szEmpName then
@@ -1801,7 +1801,7 @@ end
 do local m_ClientInfo
 function X.GetClientInfo(arg0)
 	if arg0 == true or not (m_ClientInfo and m_ClientInfo.dwID) then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if me then -- 确保获取到玩家
 			if not m_ClientInfo then
 				m_ClientInfo = {}
@@ -1891,7 +1891,7 @@ do
 local FRIEND_LIST_BY_ID, FRIEND_LIST_BY_NAME, FRIEND_LIST_BY_GROUP
 local function GeneFriendListCache()
 	if not FRIEND_LIST_BY_GROUP then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if me then
 			local infos = me.GetFellowshipGroupInfo()
 			if infos then
@@ -1976,7 +1976,7 @@ do
 local FOE_LIST, FOE_LIST_BY_ID, FOE_LIST_BY_NAME
 local function GeneFoeListCache()
 	if not FOE_LIST then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if me then
 			FOE_LIST = {}
 			FOE_LIST_BY_ID = {}
@@ -2042,7 +2042,7 @@ end
 function X.GetTongName(dwTongID)
 	local szTongName
 	if not dwTongID then
-		dwTongID = (GetClientPlayer() or X.CONSTANT.EMPTY_TABLE).dwTongID
+		dwTongID = (X.GetClientPlayer() or X.CONSTANT.EMPTY_TABLE).dwTongID
 	end
 	if dwTongID and dwTongID ~= 0 then
 		szTongName = GetTongClient().ApplyGetTongName(dwTongID, 253)
@@ -2082,7 +2082,7 @@ function X.IsParty(dwID)
 	if dwID == UI_GetClientPlayerID() then
 		return true
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and me.IsPlayerInMyParty(dwID)
 end
 
@@ -2090,9 +2090,9 @@ end
 function X.GetRelation(dwSelfID, dwPeerID)
 	if not dwPeerID then
 		dwPeerID = dwSelfID
-		dwSelfID = GetControlPlayerID()
+		dwSelfID = X.GetControlPlayerID()
 	end
-	if not IsPlayer(dwPeerID) then
+	if not X.IsPlayer(dwPeerID) then
 		local npc = X.GetNpc(dwPeerID)
 		if npc and npc.dwEmployer ~= 0 and X.GetPlayer(npc.dwEmployer) then
 			dwPeerID = npc.dwEmployer
@@ -2102,7 +2102,7 @@ function X.GetRelation(dwSelfID, dwPeerID)
 		return 'Self'
 	end
 	local dwSrcID, dwTarID = dwSelfID, dwPeerID
-	if not IsPlayer(dwTarID) then
+	if not X.IsPlayer(dwTarID) then
 		dwSrcID, dwTarID = dwTarID, dwSrcID
 	end
 	if IsParty(dwSrcID, dwTarID) then
@@ -2159,7 +2159,7 @@ local function ListenFightStateChange()
 				-- 新的一轮战斗开始
 				FIGHT_BEGIN_TICK = GetTickCount()
 				-- 生成战斗全服唯一标示
-				local me = GetClientPlayer()
+				local me = X.GetClientPlayer()
 				local team = GetClientTeam()
 				local szEdition = X.ENVIRONMENT.GAME_EDITION
 				local szServer = X.GetRegionOriginName() .. '_' .. X.GetServerOriginName()
@@ -2245,7 +2245,7 @@ end
 -- (bool) X.IsFighting()
 do local ARENA_START = false
 function X.IsFighting()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -2297,7 +2297,7 @@ end
 function X.GetTarget(...)
 	local object = ...
 	if select('#', ...) == 0 then
-		object = GetClientPlayer()
+		object = X.GetClientPlayer()
 	end
 	if object and object.GetTarget then
 		return object.GetTarget()
@@ -2344,7 +2344,7 @@ function X.SetTarget(arg0, arg1)
 		return
 	end
 	if dwID and not dwType then
-		dwType = IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
+		dwType = X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
 	end
 	if szNames then
 		local tTarget = {}
@@ -2405,7 +2405,7 @@ do
 local TEMP_TARGET = { TARGET.NO_TARGET, 0 }
 function X.SetTempTarget(dwType, dwID)
 	TargetPanel_SetOpenState(true)
-	TEMP_TARGET = X.Pack(GetClientPlayer().GetTarget())
+	TEMP_TARGET = X.Pack(X.GetClientPlayer().GetTarget())
 	X.SetTarget(dwType, dwID)
 	TargetPanel_SetOpenState(false)
 end
@@ -2462,7 +2462,7 @@ local CALLBACK_LIST
 -- 获取到当前角色并执行函数
 -- @param {function} callback 回调函数
 function X.WithClientPlayer(callback)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me then
 		X.SafeCall(callback, me)
 	elseif CALLBACK_LIST then
@@ -2470,7 +2470,7 @@ function X.WithClientPlayer(callback)
 	else
 		CALLBACK_LIST = {callback}
 		X.BreatheCall(X.NSFormatString('{$NS}.WithClientPlayer'), function()
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if me then
 				for _, callback in ipairs(CALLBACK_LIST) do
 					X.SafeCall(callback, me)
@@ -2528,14 +2528,14 @@ function X.GetBagPackageCount()
 end
 
 function X.GetBankPackageCount()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me.GetBankPackageCount() + 1 -- 逻辑写挫了 返回的比真实的少一个
 end
 
 -- 获取背包空位总数
 -- (number) X.GetFreeBagBoxNum()
 function X.GetFreeBagBoxNum()
-	local me, nFree = GetClientPlayer(), 0
+	local me, nFree = X.GetClientPlayer(), 0
 	local nIndex = X.GetBagPackageIndex()
 	for i = nIndex, nIndex + X.GetBagPackageCount() do
 		nFree = nFree + me.GetBoxFreeRoomSize(i)
@@ -2546,7 +2546,7 @@ end
 -- 获取第一个背包空位
 -- (number, number) X.GetFreeBagBox()
 function X.GetFreeBagBox()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local nIndex = X.GetBagPackageIndex()
 	for i = nIndex, nIndex + X.GetBagPackageCount() do
 		if me.GetBoxFreeRoomSize(i) > 0 then
@@ -2562,7 +2562,7 @@ end
 -- 遍历背包物品
 -- (number dwBox, number dwX) X.WalkBagItem(fnWalker)
 function X.WalkBagItem(fnWalker)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local nIndex = X.GetBagPackageIndex()
 	for dwBox = nIndex, nIndex + X.GetBagPackageCount() do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
@@ -2576,7 +2576,7 @@ end
 
 -- 获取一样东西在背包的数量
 function X.GetItemAmount(dwTabType, dwIndex, nBookID)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
@@ -2649,7 +2649,7 @@ function X.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bNoLimited)
 	end
 	if not cache then
 		cache = {}
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if not me then
 			return
 		end
@@ -2687,7 +2687,7 @@ function X.Equip(szName)
 		if X.GetItemNameByUIID(it.nUiId) == szName then
 			if szName == g_tStrings.tBulletDetail[BULLET_DETAIL.SNARE]
 			or szName == g_tStrings.tBulletDetail[BULLET_DETAIL.BOLT] then
-				local me = GetClientPlayer()
+				local me = X.GetClientPlayer()
 				for nIndex = 0, 15 do
 					if me.GetItem(INVENTORY_INDEX.BULLET_PACKAGE, nIndex) == nil then
 						OnExchangeItem(dwBox, dwX, INVENTORY_INDEX.BULLET_PACKAGE, nIndex)
@@ -2695,7 +2695,7 @@ function X.Equip(szName)
 					end
 				end
 			else
-				local nEquipPos = select(2, GetClientPlayer().GetEquipPos(dwBox, dwX))
+				local nEquipPos = select(2, X.GetClientPlayer().GetEquipPos(dwBox, dwX))
 				OnExchangeItem(dwBox, dwX, INVENTORY_INDEX.EQUIP, nEquipPos)
 			end
 			return 0
@@ -2921,7 +2921,7 @@ end
 function X.IsInvincible(...)
 	local KObject = ...
 	if select('#', ...) == 0 then
-		KObject = GetClientPlayer()
+		KObject = X.GetClientPlayer()
 	end
 	if not KObject then
 		return nil
@@ -2939,7 +2939,7 @@ end
 function X.IsIsolated(...)
 	local KObject = ...
 	if select('#', ...) == 0 then
-		KObject = GetClientPlayer()
+		KObject = X.GetClientPlayer()
 	end
 	if not KObject then
 		return false
@@ -2955,7 +2955,7 @@ do local bNewAPI
 function X.GetOTActionState(...)
 	local KObject = ...
 	if select('#', ...) == 0 then
-		KObject = GetClientPlayer()
+		KObject = X.GetClientPlayer()
 	end
 	if not KObject then
 		return
@@ -2986,7 +2986,7 @@ end
 function X.CanOTAction(...)
 	local KObject = ...
 	if select('#', ...) == 0 then
-		KObject = GetClientPlayer()
+		KObject = X.GetClientPlayer()
 	end
 	if not KObject then
 		return
@@ -3039,7 +3039,7 @@ function X.CanUseSkill(dwSkillID, dwLevel)
 	if not box or not box:IsValid() then
 		box = X.UI.GetTempElement(X.NSFormatString('Box.{$NS}Lib_Skill'))
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me and box then
 		if not dwLevel then
 			if dwSkillID ~= 9007 then
@@ -3230,7 +3230,7 @@ local LIST, LIST_ALL
 function X.GetSkillMountList(bIncludePassive)
 	if not LIST then
 		LIST, LIST_ALL = {}, {}
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		local aList = X.GetTargetSkillIDS(me)
 		for _, dwID in ipairs(aList) do
 			local nLevel = me.GetSkillLevel(dwID)
@@ -3298,7 +3298,7 @@ local function GetSkillCDProgress(dwID, nLevel, dwCDID, KObject)
 end
 function X.GetSkillCDProgress(KObject, dwID, nLevel, bIgnorePublic)
 	if not X.IsUserdata(KObject) then
-		KObject, dwID, nLevel = GetClientPlayer(), KObject, dwID
+		KObject, dwID, nLevel = X.GetClientPlayer(), KObject, dwID
 	end
 	if not nLevel then
 		nLevel = KObject.GetSkillLevel(dwID)
@@ -3386,7 +3386,7 @@ local function GetShortName(sz) -- 获取秘笈短名
 end
 
 function X.IsRecipeActive(szRecipeName)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if not RECIPE_CACHE[szRecipeName] then
 		if not me then
 			return
@@ -3454,21 +3454,21 @@ X.IsDistributer = X.IsDistributor
 -- 判断自己在不在队伍里
 -- (bool) X.IsInParty()
 function X.IsInParty()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and me.IsInParty()
 end
 
 -- 判断自己在不在团队里
 -- (bool) X.IsInRaid()
 function X.IsInRaid()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and me.IsInRaid()
 end
 
 -- 判断当前地图是不是名剑大会
 -- (bool) X.IsInArena()
 function X.IsInArena()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and (
 		me.GetScene().bIsArenaMap or -- 名剑大会
 		me.GetMapID() == 173 or      -- 齐物阁
@@ -3479,7 +3479,7 @@ end
 -- 判断当前地图是不是战场
 -- (bool) X.IsInBattleField()
 function X.IsInBattleField()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not X.IsInArena()
 end
 
@@ -3567,7 +3567,7 @@ end
 -- 判断当前地图是不是秘境
 -- (bool) X.IsInDungeon(bool bRaid)
 function X.IsInDungeon(bRaid)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and X.IsDungeonMap(me.GetMapID(), bRaid)
 end
 
@@ -3581,7 +3581,7 @@ end
 -- 判断当前地图是不是主城
 -- (bool) X.IsInCity()
 function X.IsInCity()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and X.IsCityMap(me.GetMapID())
 end
 
@@ -3595,7 +3595,7 @@ end
 -- 判断当前地图是不是野外
 -- (bool) X.IsInVillage()
 function X.IsInVillage()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and X.IsVillageMap(me.GetMapID())
 end
 
@@ -3614,7 +3614,7 @@ end
 -- 判断当前地图是不是PUBG
 -- (bool) X.IsInPubg()
 function X.IsInPubg()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and X.IsPubgMap(me.GetMapID())
 end
 
@@ -3634,7 +3634,7 @@ end
 -- 判断当前地图是不是僵尸地图
 -- (bool) X.IsInZombieMap()
 function X.IsInZombieMap()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and X.IsZombieMap(me.GetMapID())
 end
 
@@ -3647,7 +3647,7 @@ end
 -- 判断当前地图是不是MOBA地图
 -- (bool) X.IsInMobaMap()
 function X.IsInMobaMap()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and X.IsMobaMap(me.GetMapID())
 end
 
@@ -3660,7 +3660,7 @@ end
 -- 判断当前地图是不是浪客行地图
 -- (bool) X.IsInStarveMap()
 function X.IsInStarveMap()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and X.IsStarveMap(me.GetMapID())
 end
 
@@ -3673,7 +3673,7 @@ end
 -- 判断当前地图是不是家园地图
 -- (bool) X.IsInHLMap()
 function X.IsInHLMap()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and X.IsHLMap(me.GetMapID())
 end
 
@@ -3686,7 +3686,7 @@ end
 -- 判断当前地图是不是新背包地图
 -- (bool) X.IsInExtraBagMap()
 function X.IsInExtraBagMap()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and X.IsExtraBagMap(me.GetMapID())
 end
 
@@ -3705,14 +3705,14 @@ end
 -- 判断当前地图是不是PUBG
 -- (bool) X.IsInShieldedMap()
 function X.IsInShieldedMap()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and X.IsShieldedMap(me.GetMapID())
 end
 
 -- 获取主角当前所在地图
 -- (number) X.GetMapID(bool bFix) 是否做修正
 function X.GetMapID(bFix)
-	local dwMapID = GetClientPlayer().GetMapID()
+	local dwMapID = X.GetClientPlayer().GetMapID()
 	return bFix and X.CONSTANT.MAP_MERGE[dwMapID] or dwMapID
 end
 
@@ -3721,7 +3721,7 @@ end
 ---@param dwID number @目标ID
 ---@return boolean @是否成功
 function X.SetTeamMarkTarget(nMark, dwID)
-	local npc = not IsPlayer(dwID) and X.GetNpc(dwID) or nil
+	local npc = not X.IsPlayer(dwID) and X.GetNpc(dwID) or nil
 	if npc and X.IsShieldedNpc(npc.dwTemplateID) then
 		return false
 	end
@@ -3754,7 +3754,7 @@ end
 -- 保存当前团队信息
 -- (table) X.GetTeamInfo([table tTeamInfo])
 function X.GetTeamInfo(tTeamInfo)
-	local tList, me, team = {}, GetClientPlayer(), GetClientTeam()
+	local tList, me, team = {}, X.GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
 		return false
 	end
@@ -3804,7 +3804,7 @@ end
 -- 恢复团队信息
 -- (bool) X.SetTeamInfo(table tTeamInfo)
 function X.SetTeamInfo(tTeamInfo)
-	local me, team = GetClientPlayer(), GetClientTeam()
+	local me, team = X.GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
 		return false
 	elseif not tTeamInfo then
@@ -3955,8 +3955,8 @@ end
 end
 
 function X.GetCharInfo()
-	local me = GetClientPlayer()
-	local kungfu = GetClientPlayer().GetKungfuMount()
+	local me = X.GetClientPlayer()
+	local kungfu = X.GetClientPlayer().GetKungfuMount()
 	local data = {
 		dwID = me.dwID,
 		szName = me.szName,
@@ -4009,17 +4009,17 @@ function X.GetCharInfo()
 end
 
 function X.IsPhoneLock()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me and me.IsTradingMibaoSwitchOpen()
 end
 
 function X.IsAccountInDanger()
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me.nAccountSecurityState == ACCOUNT_SECURITY_STATE.DANGER
 end
 
 function X.IsSafeLocked(nType)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if nType == SAFE_LOCK_EFFECT_TYPE.TALK then -- 聊天锁比较特殊
 		if _G.SafeLock_IsTalkLocked and _G.SafeLock_IsTalkLocked() then
 			return true
@@ -4047,14 +4047,14 @@ function X.IsTradeLocked()
 	if X.IsAccountInDanger() then
 		return true
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	return me.bIsBankPasswordVerified == false
 end
 
 -- * 当前道具是否满足装备要求：包括身法，体型，门派，性别，等级，根骨，力量，体质
 function X.DoesEquipmentSuit(item, bIsItem, player)
 	if not player then
-		player = GetClientPlayer()
+		player = X.GetClientPlayer()
 	end
 	local requireAttrib = item.GetRequireAttrib()
 	for k, v in pairs(requireAttrib) do
@@ -4095,7 +4095,7 @@ function X.IsItemFitKungfu(itemInfo, ...)
 		itemInfo = GetItemInfo(itemInfo.dwTabType, itemInfo.dwIndex)
 	end
 	local kungfu = ...
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if select('#', ...) == 0 then
 		kungfu = me.GetKungfuMount()
 	elseif X.IsNumber(kungfu) then
@@ -4199,7 +4199,7 @@ function X.GetItemEquipPos(item, nIndex)
 	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.FACE_EXTEND then
 		dwBox = X.CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
 	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.HORSE then
-		dwPackage, dwBox = GetClientPlayer().GetEquippedHorsePos()
+		dwPackage, dwBox = X.GetClientPlayer().GetEquippedHorsePos()
 	end
 	return dwPackage, dwBox, nIndex, nCount
 end
@@ -4227,7 +4227,7 @@ function X.IsBetterEquipment(item, dwPackage, dwBox)
 		return false
 	end
 
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local equipedItem = GetPlayerItem(me, dwPackage, dwBox)
 	if not equipedItem then
 		return false
@@ -4264,7 +4264,7 @@ function X.GetUserRoleName()
 	if X.IsFunction(GetUserRoleName) then
 		return GetUserRoleName()
 	end
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	if me and not IsRemotePlayer(me.dwID) then
 		_RoleName = me.szName
 	end
@@ -4326,7 +4326,7 @@ function X.IsSelf(dwSrcID, dwTarID)
 	if X.IsFunction(IsSelf) then
 		return IsSelf(dwSrcID, dwTarID)
 	end
-	return dwSrcID ~= 0 and dwSrcID == dwTarID and IsPlayer(dwSrcID) and IsPlayer(dwTarID)
+	return dwSrcID ~= 0 and dwSrcID == dwTarID and X.IsPlayer(dwSrcID) and X.IsPlayer(dwTarID)
 end
 
 -- * 获取门派对应心法ID列表
@@ -4510,7 +4510,7 @@ do
 		table.insert(PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID], fnAction)
 		-- 自身判定
 		if dwID == UI_GetClientPlayerID() then
-			PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID] = GetClientPlayer().GetTotalEquipScore()
+			PEEK_PLAYER_EQUIP_SCORE_RESULT[dwID] = X.GetClientPlayer().GetTotalEquipScore()
 			OnGetPlayerEquipScorePeekPlayer(dwID)
 			return
 		end
@@ -4623,7 +4623,7 @@ do
 		table.insert(PEEK_PLAYER_EQUIP_CALLBACK[dwID], fnAction)
 		-- 自身判定
 		if dwID == UI_GetClientPlayerID() then
-			OnGetPlayerEquipInfoPeekPlayer(GetClientPlayer())
+			OnGetPlayerEquipInfoPeekPlayer(X.GetClientPlayer())
 			return
 		end
 		-- 缓存判定
@@ -4715,7 +4715,7 @@ do
 		table.insert(PEEK_PLAYER_TALENT_CALLBACK[dwID], fnAction)
 		-- 自身判定
 		if dwID == UI_GetClientPlayerID() then
-			OnGetPlayerTalnetInfoPeekPlayer(GetClientPlayer())
+			OnGetPlayerTalnetInfoPeekPlayer(X.GetClientPlayer())
 			return
 		end
 		-- 缓存判定
@@ -4874,7 +4874,7 @@ do
 	local REQUEST_TIME = {}
 	local PLAYER_GUID = {}
 	local function RequestTeammateGUID()
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		local team = GetClientTeam()
 		if not me or IsRemotePlayer(me.dwID) or not team or not me.IsInParty() then
 			return

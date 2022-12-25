@@ -21,7 +21,7 @@ X.RegisterBgMsg('ASK_CURRENT_LOC', function(_, data, nChannel, dwTalkerID, szTal
 		szName = 'ASK_CURRENT_LOC' .. dwTalkerID,
 		szMessage = _L('[%s] wants to get your location, would you like to share?', szTalkerName), {
 			szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
-				local me = GetClientPlayer()
+				local me = X.GetClientPlayer()
 				X.SendBgMsg(szTalkerName, 'REPLY_CURRENT_LOC', { me.GetMapID(), me.nX, me.nY, me.nZ }, true)
 			end
 		}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
@@ -53,7 +53,7 @@ X.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
 	if not bIsSelf then
 		if data[1] == 'ASK' then
 			X.Confirm(_L('[%s] want to see your info, OK?', szName), function()
-				local me = GetClientPlayer()
+				local me = X.GetClientPlayer()
 				local nGongZhan = X.GetBuff(me, 3219) and 1 or 0
 				local bEx = X.PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'
 				X.SendBgMsg(szName, 'RL', {'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx}, true)
@@ -84,7 +84,7 @@ end)
 -- 搬运JH_ABOUT
 X.RegisterBgMsg(X.NSFormatString('{$NS}_ABOUT'), function(_, data, nChannel, dwID, szName, bIsSelf)
 	if data[1] == 'Author' then -- 版本检查 自用 可以绘制详细表格
-		local me, szTong = GetClientPlayer(), ''
+		local me, szTong = X.GetClientPlayer(), ''
 		if me.dwTongID > 0 then
 			szTong = GetTongClient().ApplyGetTongName(me.dwTongID) or 'Failed'
 		end
@@ -287,7 +287,7 @@ do
 
 	X.RegisterEvent('LOADING_ENDING', 'LIB#CD', function()
 		l_dwEnteringTime = GetCurrentTime()
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		local dwMapID = me.GetMapID()
 		local nCopyIndex = me.GetScene().nCopyIndex
 		X.GetMapSaveCopy(dwMapID, function(aMapCopy)
@@ -306,7 +306,7 @@ do
 		--[[#DEBUG BEGIN]]
 		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Enter map request from ' .. szTalkerName, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		local dwMapID = me.GetMapID()
 		local nCopyIndex = me.GetScene().nCopyIndex
 		X.GetMapSaveCopy(dwMapID, function(aMapCopy)
@@ -385,7 +385,7 @@ do
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			local aAchieveRes, aCounterRes = {}, {}
 			for _, dwAchieveID in ipairs(aAchieveID) do
 				LAST_ACHI_TIME[dwAchieveID] = GetCurrentTime()
@@ -410,7 +410,7 @@ end
 
 X.RegisterBgMsg(X.NSFormatString('{$NS}_OUTPUT_BUFF'), function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	local aRes = {}
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	for _, buff in X.ipairs_c(X.GetBuffList(me)) do
 		table.insert(aRes, X.CloneBuff(buff, {}))
 	end

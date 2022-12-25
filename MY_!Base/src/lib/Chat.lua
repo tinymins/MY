@@ -35,7 +35,7 @@ function X.RepeatChatLine(hTime)
 	end
 	local nChannel, szName = EditBox_GetChannel()
 	if X.CanUseChatChannel(nChannel) then
-		GetClientPlayer().Talk(nChannel, szName or '', tMsg)
+		X.GetClientPlayer().Talk(nChannel, szName or '', tMsg)
 		edit:ClearText()
 	end
 end
@@ -1001,7 +1001,7 @@ local function ParseFaceIcon(t)
 end
 -- parse name in talking message
 local function ParseName(t)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local tar = X.GetObject(me.GetTarget())
 	for i, v in ipairs(t) do
 		if v.type == 'text' then
@@ -1216,7 +1216,7 @@ end
 -- parsers   -- *可选* 解析器参数，参见 X.SendChat: tOptions.parsers
 -- uuid      -- *可选* 消息唯一标识符，参见 X.SendChat: tOptions.uuid
 function X.SetChatInput(szText, parsers, uuid)
-	local me = GetClientPlayer()
+	local me = X.GetClientPlayer()
 	local edit = X.GetChatInput()
 	if me and edit then
 		local parserOptions = StandardizeParserOptions(parsers)
@@ -1253,7 +1253,7 @@ function X.SendChat(nChannel, szText, tOptions)
 		return
 	end
 	-- 初始化参数
-	local szTarget, me = '', GetClientPlayer()
+	local szTarget, me = '', X.GetClientPlayer()
 	if X.IsString(nChannel) then
 		szTarget = nChannel
 		nChannel = PLAYER_TALK_CHANNEL.WHISPER
@@ -1324,7 +1324,7 @@ do
 local m_LevelUpData
 local function GetRegisterChannelLimitTable()
 	if not m_LevelUpData then
-		local me = GetClientPlayer()
+		local me = X.GetClientPlayer()
 		if not me then
 			return false
 		end

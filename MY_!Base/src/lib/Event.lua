@@ -394,7 +394,7 @@ X.RegisterEvent('BUFF_UPDATE', function()
 	end
 	if arg0 == UI_GetClientPlayerID() and arg4 == 103 then
 		DelayCall(X.NSFormatString('{$NS}#ON_IDLE'), X.Random(0, 10000), function()
-			local me = GetClientPlayer()
+			local me = X.GetClientPlayer()
 			if me and me.GetBuff(103, 0) then
 				OnIdle()
 			end
@@ -700,7 +700,7 @@ end
 -- 无法发送时的缓存队列
 local BG_MSG_QUEUE = {}
 local function ProcessQueue()
-	if GetSenderStatus(GetClientPlayer()) ~= 'READY' then
+	if GetSenderStatus(X.GetClientPlayer()) ~= 'READY' then
 		return
 	end
 	local v = table.remove(BG_MSG_QUEUE, 1)
@@ -712,7 +712,7 @@ end
 -- X.SendBgMsg(szName, szMsgID, oData)
 -- X.SendBgMsg(nChannel, szMsgID, oData)
 function X.SendBgMsg(nChannel, szMsgID, oData, bSilent)
-	local szTarget, me = '', GetClientPlayer()
+	local szTarget, me = '', X.GetClientPlayer()
 	if not nChannel then
 		return
 	end
