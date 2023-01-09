@@ -4519,6 +4519,10 @@ do
 			OnGetPlayerEquipScorePeekPlayer(dwID)
 			return
 		end
+		-- 防抖限制
+		if PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] == 'PENDING' and not bForcePeek then
+			return
+		end
 		-- 发送请求
 		PEEK_PLAYER_EQUIP_SCORE_STATE[dwID] = 'PENDING'
 		if not EVENT_KEY then
@@ -4632,6 +4636,10 @@ do
 			OnGetPlayerEquipInfoPeekPlayer(player)
 			return
 		end
+		-- 防抖限制
+		if PEEK_PLAYER_EQUIP_STATE[dwID] == 'PENDING' and not bForcePeek then
+			return
+		end
 		-- 发送请求
 		PEEK_PLAYER_EQUIP_STATE[dwID] = 'PENDING'
 		if not EVENT_KEY then
@@ -4722,6 +4730,10 @@ do
 		local player = X.GetPlayer(dwID)
 		if player and PEEK_PLAYER_TALENT_STATE[dwID] == 'SUCCESS' and not bForcePeek then
 			OnGetPlayerTalnetInfoPeekPlayer(player)
+			return
+		end
+		-- 防抖限制
+		if PEEK_PLAYER_TALENT_STATE[dwID] == 'PENDING' and not bForcePeek then
 			return
 		end
 		-- 发送请求
