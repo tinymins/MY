@@ -1,0 +1,249 @@
+--------------------------------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 宠物百科
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------------------------------
+local X = MY
+--------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_Toolbox/MY_RideWiki'
+local PLUGIN_NAME = 'MY_Toolbox'
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_Toolbox'
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^14.0.0') then
+	return
+end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------
+
+local O = X.CreateUserSettingsModule('MY_RideWiki', _L['General'], {
+	bEnable = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Toolbox'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
+	nW = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Toolbox'],
+		xSchema = X.Schema.Number,
+		xDefaultValue = 850,
+	},
+	nH = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Toolbox'],
+		xSchema = X.Schema.Number,
+		xDefaultValue = 610,
+	},
+})
+local D = {}
+
+function D.OnWebSizeChange()
+	O.nW, O.nH = this:GetSize()
+end
+
+function D.Open(dwTabType, dwTabIndex)
+	local item = GetItemInfo(dwTabType, dwTabIndex)
+	if not item then
+		return
+	end
+	local szURL = 'https://page.j3cx.com/ride/' .. dwTabType .. '/' .. dwTabIndex .. '?'
+		.. X.EncodeQuerystring(X.ConvertToUTF8({
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
+			player = GetUserRoleName(),
+		}))
+	local szKey = 'RideWiki_' .. dwTabType .. '_' .. dwTabIndex
+	local szTitle = item.szName
+	szKey = X.UI.OpenBrowser(szURL, {
+		key = szKey,
+		title = szTitle,
+		w = O.nW, h = O.nH,
+		readonly = true,
+	})
+	X.UI(X.UI.LookupBrowser(szKey)):Size(D.OnWebSizeChange)
+end
+
+function D.HookPlayerViewFrame(frame)
+	----------------
+	-- 怀旧版
+	----------------
+
+	----------------
+	-- 重制版
+	----------------
+	local box = frame:Lookup('Page_Main/Page_Ride', 'Box_RideBox')
+	if box then
+		local function OnRideItemLButtonClick()
+			if O.bEnable and not IsCtrlKeyDown() and not IsAltKeyDown() then
+				local _, _, dwBox, dwBoxIndex, dwPlayerID = this:GetObject()
+				local tar = X.GetPlayer(dwPlayerID)
+				if tar then
+					local item = GetPlayerItem(tar, dwBox, dwBoxIndex)
+					if item then
+						D.Open(item.dwTabType, item.dwIndex)
+					end
+				end
+				return
+			end
+			return X.UI.FormatWMsgRet(false, true)
+		end
+		X.SetMemberFunctionHook(
+			box,
+			'OnItemLButtonClick',
+			'MY_RideWiki',
+			OnRideItemLButtonClick,
+			{ bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+		box:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
+	end
+end
+
+X.RegisterInit('MY_RideWiki', function()
+	local frame = Station.Lookup('Normal/PlayerView')
+	if not frame then
+		return
+	end
+	D.HookPlayerViewFrame(frame)
+end)
+
+X.RegisterFrameCreate('PlayerView', 'MY_RideWiki', function(name, frame)
+	D.HookPlayerViewFrame(frame)
+end)
+
+function D.HookHorsePanel(frame)
+	----------------
+	-- 怀旧版
+	----------------
+
+	----------------
+	-- 重制版
+	----------------
+	local hList = frame:Lookup('PageSet_All/Page_Horse/WndScroll_Horse', '')
+	if hList then
+		local function OnRideItemLButtonClick()
+			if O.bEnable and not IsCtrlKeyDown() and not IsAltKeyDown() then
+				local _, _, dwBox, dwBoxIndex = this:GetObject()
+				local tar = X.GetClientPlayer()
+				if tar then
+					local item = GetPlayerItem(tar, dwBox, dwBoxIndex)
+					if item then
+						D.Open(item.dwTabType, item.dwIndex)
+					end
+				end
+				return
+			end
+			return X.UI.FormatWMsgRet(false, true)
+		end
+		X.UI.HookHandleAppend(hList, function(_, hItem)
+			local box = hItem:Lookup('Box_Horse')
+			if box then
+				X.SetMemberFunctionHook(
+					box,
+					'OnItemLButtonClick',
+					'MY_RideWiki',
+					OnRideItemLButtonClick,
+					{ bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+				box:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
+			end
+		end)
+	end
+
+	local hList = frame:Lookup('PageSet_All/Page_Qiqu/WndScroll_Qiqu', '')
+	if hList then
+		local function OnRideItemLButtonClick()
+			if O.bEnable and not IsCtrlKeyDown() and not IsAltKeyDown() then
+				local _, _, dwBox, dwBoxIndex = this:GetObject()
+				local tar = X.GetClientPlayer()
+				if tar then
+					local item = GetPlayerItem(tar, dwBox, dwBoxIndex)
+					if item then
+						D.Open(item.dwTabType, item.dwIndex)
+					end
+				end
+				return
+			end
+			return X.UI.FormatWMsgRet(false, true)
+		end
+		X.UI.HookHandleAppend(hList, function(_, hItem)
+			local box = hItem:Lookup('Box_Qiqu')
+			if box then
+				X.SetMemberFunctionHook(
+					box,
+					'OnItemLButtonClick',
+					'MY_RideWiki',
+					OnRideItemLButtonClick,
+					{ bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+				box:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
+			end
+		end)
+	end
+end
+
+X.RegisterInit('MY_RideWiki', function()
+	local frame = Station.Lookup('Normal/HorsePanel')
+	if not frame then
+		return
+	end
+	D.HookHorsePanel(frame)
+end)
+
+X.RegisterFrameCreate('HorsePanel', 'MY_RideWiki', function(name, frame)
+	D.HookHorsePanel(frame)
+end)
+
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Ride wiki'],
+		tip = {
+			render = _L['Click icon on ride panel to view ride wiki'],
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
+		},
+		checked = MY_RideWiki.bEnable,
+		onCheck = function(bChecked)
+			MY_RideWiki.bEnable = bChecked
+		end,
+	}):Width() + 5
+	return nX, nY
+end
+
+-- Global exports
+do
+local settings = {
+	name = 'MY_RideWiki',
+	exports = {
+		{
+			fields = {
+				'Open',
+				'OnPanelActivePartial',
+			},
+			root = D,
+		},
+		{
+			fields = {
+				'bEnable',
+				'nW',
+				'nH',
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				'bEnable',
+				'nW',
+				'nH',
+			},
+			root = O,
+		},
+	},
+}
+MY_RideWiki = X.CreateModule(settings)
+end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -165,7 +165,11 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	if not X.IsRestricted('MY_YunMacro') then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = 'auto',
-			text = _L['Show yun macro buttons on macro panel.'],
+			text = _L['Cloud macro'],
+			tip = {
+				render = _L['Click icon on macro panel to view macro wiki'],
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
+			},
 			checked = MY_YunMacro.bEnable,
 			onCheck = function(bChecked)
 				MY_YunMacro.bEnable = bChecked

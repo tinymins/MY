@@ -359,6 +359,11 @@ return {
     ['Pet wiki'] = '宠物百科',
     ['Click icon on pet panel to view pet wiki'] = '点击宠物秘鉴图标显示宠物百科',
 
+    -- MY_RideWiki
+    ['MY_RideWiki'] = '坐骑百科',
+    ['Ride wiki'] = '坐骑百科',
+    ['Click icon on ride panel to view ride wiki'] = '点击坐骑图标显示坐骑百科',
+
     -- MY_ItemWiki
     ['MY_ItemWiki'] = '物品百科',
     ['Item wiki'] = '物品百科',
@@ -463,7 +468,8 @@ return {
     ['Macro update started, please keep panel opened and wait.'] = '开始更新宏，请保持当前界面开启、不要切换宏并等待结果。',
     ['Macro update succeed, please click save button.'] = '宏数据更新成功，请点击宏界面的“确定”或“应用”按钮使该宏生效。',
     ['Top yun macro'] = '云端宏排名',
-    ['Show yun macro buttons on macro panel.'] = '在宏界面显示云端宏按钮',
+    ['Cloud macro'] = '云端宏',
+    ['Click icon on macro panel to view macro wiki'] = '在宏界面显示云端宏按钮',
     ['Got it'] = '好的',
     ['Please input macro name first.'] = '请先输入宏名称。',
 
