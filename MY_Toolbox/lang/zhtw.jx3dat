@@ -349,7 +349,7 @@ return {
     ['Click icon on achievemnt panel to view achievement wiki'] = '點擊成就界面圖標顯示成就百科',
 
     -- MY_QuestWiki
-    ['MY_PetWiki'] = '任務百科',
+    ['MY_QuestWiki'] = '任務百科',
     ['Click for quest wiki'] = '點擊查看任務百科',
     ['Quest wiki'] = '任務百科',
     ['Click help icon on quest panel to view quest wiki'] = '點擊任務面板百科圖標顯示任務百科',
