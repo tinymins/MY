@@ -311,6 +311,11 @@ X.RegisterMsgMonitor('MSG_SYS', 'QIYU', function(szChannel, szMsg, nFont, bRich,
 		end
 		D.OnSerendipity(szName, szSerendipity, SERENDIPITY_METHOD.MSG_SYS, SERENDIPITY_STATUS.DONE, GetCurrentTime())
 	end)
+	-- 江湖快马飞报！侠士“琵琶声停@隐士”在白龙口捕获12级稀有坐骑马“闪电”的马驹！假以时日，此马驹必能成长为一匹纵横江湖的宝马神骏！
+	-- 江湖快马飞报！侠士“你不会前来”在鲲鹏岛捕获9级稀有坐骑马“麟驹·潮生”的马驹！假以时日，此马驹必能成长为一匹纵横江湖的宝马神骏！
+	szMsg:gsub(_L.ADVENTURE_PATT3, function(szName, szSerendipity)
+		D.OnSerendipity(szName, szSerendipity, SERENDIPITY_METHOD.MSG_SYS, SERENDIPITY_STATUS.DONE, GetCurrentTime())
+	end)
 end)
 
 X.RegisterEvent('LOOT_ITEM', function()

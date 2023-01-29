@@ -1,7 +1,7 @@
 return {
 	['ADVENTURE_PATT'] = '“(.-)”[女侠在].-触发奇遇【(.-)】',
 	['ADVENTURE_PATT2'] = '恭喜侠士(.-)在.-中获得稀有掉落%[(.-)%]',
-
+	['ADVENTURE_PATT3'] = '“(.-)”在.-捕获.-稀有坐骑马“(.-)”的马驹',
 	['You got %s, would you like to share?'] = '你触发了%s，是否愿意点击分享到公共数据查询中？',
 	['[%s] got %s, would you like to share?'] = '[%s]触发了%s，是否愿意点击分享到公共数据查询中？',
 	['You finished %s, would you like to share?'] = '你获得了%s，是否愿意点击分享到公共数据查询中？',
