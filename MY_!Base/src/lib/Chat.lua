@@ -208,7 +208,7 @@ function X.CopyChatLine(hTime, bTextEditor, bRichText)
 				local szName = p:GetName()
 				if szName ~= 'timelink' and szName ~= 'copylink' and szName ~= 'msglink' and szName ~= 'time' then
 					local szText, bEnd = p:GetText(), false
-					if not bTextEditor and StringFindW(szText, '\n') then
+					if not bTextEditor and X.StringFindW(szText, '\n') then
 						szText = X.StringReplaceW(szText, '\n', '')
 						bEnd = true
 					end
@@ -247,7 +247,7 @@ function X.CopyChatLine(hTime, bTextEditor, bRichText)
 					else
 						if bBegin == false then
 							for _, v in ipairs({g_tStrings.STR_TALK_HEAD_WHISPER, g_tStrings.STR_TALK_HEAD_SAY, g_tStrings.STR_TALK_HEAD_SAY1, g_tStrings.STR_TALK_HEAD_SAY2 }) do
-								local nB, nE = StringFindW(szText, v)
+								local nB, nE = X.StringFindW(szText, v)
 								if nB then
 									szText, bBegin = string.sub(szText, nB + nE), true
 									edit:ClearText()
@@ -963,7 +963,7 @@ local function ParseFaceIcon(t)
 			local szLeft = ''
 			while szText and #szText > 0 do
 				local szFace, dwFaceID = nil, nil
-				local nPos = StringFindW(szText, '#')
+				local nPos = X.StringFindW(szText, '#')
 				if not nPos then
 					szLeft = szLeft .. szText
 					szText = ''
@@ -1596,7 +1596,7 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 		return
 	end
 	local szRealName = szName
-	local nPos = StringFindW(szName, '@')
+	local nPos = X.StringFindW(szName, '@')
 	if nPos then
 		szRealName = szName:sub(1, nPos - 1)
 	end

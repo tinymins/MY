@@ -769,7 +769,7 @@ local function FixMsgMonBug() end
 local function MsgMonHandler(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
 	if bRich then
 		-- filter addon comm.
-		if StringFindW(szMsg, 'eventlink') and StringFindW(szMsg, _L['Addon comm.']) then
+		if X.StringFindW(szMsg, 'eventlink') and X.StringFindW(szMsg, _L['Addon comm.']) then
 			return
 		end
 		-- filter addon echo message.

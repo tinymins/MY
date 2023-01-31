@@ -38,7 +38,7 @@ function X.UI.GetTempElement(szType)
 		return
 	end
 	local szKey = nil
-	local nPos = StringFindW(szType, '.')
+	local nPos = X.StringFindW(szType, '.')
 	if nPos then
 		szKey = string.sub(szType, nPos + 1)
 		szType = string.sub(szType, 1, nPos - 1)

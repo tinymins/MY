@@ -5139,7 +5139,7 @@ end
 function OO:Event(szEvent, fnEvent)
 	self:_checksum()
 	if X.IsString(szEvent) then
-		local nPos, szKey = (StringFindW(szEvent, '.')), nil
+		local nPos, szKey = (X.StringFindW(szEvent, '.')), nil
 		if nPos then
 			szKey = string.sub(szEvent, nPos + 1)
 			szEvent = string.sub(szEvent, 1, nPos - 1)
@@ -5205,7 +5205,7 @@ end
 function OO:UIEvent(szEvent, fnEvent)
 	self:_checksum()
 	if X.IsString(szEvent) then
-		local nPos, szKey = (StringFindW(szEvent, '.')), nil
+		local nPos, szKey = (X.StringFindW(szEvent, '.')), nil
 		if nPos then
 			szKey = string.sub(szEvent, nPos + 1)
 			szEvent = string.sub(szEvent, 1, nPos - 1)
