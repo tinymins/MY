@@ -38,7 +38,7 @@ function X.SplitString(szText, aSplitter, bIgnoreEmptyPart, nMaxPart)
 						nPos = nOffset + nPos
 					end
 				else
-					nPos = StringFindW(szText, szSplitter, nOffset)
+					nPos = X.StringFindW(szText, szSplitter, nOffset)
 				end
 				if nPos and (not nSplitterPos or nPos <= nSplitterPos) then
 					nSplitterPos, szSplitterFound = nPos, szSplitter

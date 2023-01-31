@@ -2045,7 +2045,7 @@ function X.CreateCache(szNameMode, aEvent)
 	-- 处理参数
 	local szName, szMode
 	if X.IsString(szNameMode) then
-		local nPos = StringFindW(szNameMode, '.')
+		local nPos = X.StringFindW(szNameMode, '.')
 		if nPos then
 			szName = string.sub(szNameMode, 1, nPos - 1)
 			szMode = string.sub(szNameMode, nPos + 1)

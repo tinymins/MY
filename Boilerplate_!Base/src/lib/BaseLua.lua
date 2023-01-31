@@ -816,7 +816,29 @@ X.StringEachW = wstring.char_task
 ---@param s string @需要查找的字符串
 ---@param p string @查找的字符串
 ---@return number, number @[nStartPos, nEndPos] 开始位置，结束位置
-X.StringFindW = StringFindW or wstring.find
+X.StringFindW = StringFindW
+	and function(szHaystack, szNeedle, nOffset)
+		if not nOffset then
+			nOffset = 1
+		end
+		-- 官方 StringFindW 有缺陷，当目标串 szHaystack 包含乱码时，查找结果可能低于偏移位置
+		-- 最小复现： StringFindW(string.char(91,232,181,93), '[', 1)
+		-- 最小复现结果： 返回 (0, 0) 这不可能，实际字符串下标最小为 1
+		-- 解决方式： 检测到非法返回值时，回落到官方 LUA 实现 (wstring 库)，最终返回前再次校验约束关系
+		local nStartPos, nEndPos = StringFindW(szHaystack, szNeedle, nOffset)
+		if nStartPos and nStartPos < nOffset then
+			local szPart = string.sub(szHaystack, nOffset)
+			nStartPos, nEndPos = wstring.find(szPart, szNeedle)
+			if nStartPos then
+				nStartPos = nStartPos + nOffset - 1
+				nEndPos = nEndPos + nOffset - 1
+			end
+		end
+		if nStartPos and nEndPos and nStartPos >= nOffset then
+			return nStartPos, nEndPos
+		end
+	end
+	or wstring.find
 
 -- 字符串切割
 ---@param s string @需要切割的字符串

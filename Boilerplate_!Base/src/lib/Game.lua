@@ -3071,7 +3071,7 @@ function X.GetSkillName(dwSkillID, dwLevel)
 	if not SKILL_CACHE[dwSkillID][uLevelKey] then
 		local tLine = Table_GetSkill(dwSkillID, dwLevel)
 		if tLine and tLine.dwSkillID > 0 and tLine.bShow
-			and (StringFindW(tLine.szDesc, '_') == nil  or StringFindW(tLine.szDesc, '<') ~= nil)
+			and (X.StringFindW(tLine.szDesc, '_') == nil  or X.StringFindW(tLine.szDesc, '<') ~= nil)
 		then
 			SKILL_CACHE[dwSkillID][uLevelKey] = X.Pack(tLine.szName, tLine.dwIconID)
 		else
@@ -5001,9 +5001,9 @@ do
 			local szPart, nStart, nEnd, szContent
 			while nPos <= nOriginLen do
 				szPart, nStart, nEnd, szContent = nil, nil, nil, nil
-				nStart = StringFindW(szTemplate, '{$', nPos)
+				nStart = X.StringFindW(szTemplate, '{$', nPos)
 				if nStart then
-					nEnd = StringFindW(szTemplate, '}', nStart + 2)
+					nEnd = X.StringFindW(szTemplate, '}', nStart + 2)
 					if nEnd then
 						szContent = szTemplate:sub(nStart + 2, nEnd - 1)
 					end
