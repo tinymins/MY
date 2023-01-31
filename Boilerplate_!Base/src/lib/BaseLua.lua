@@ -838,7 +838,20 @@ X.StringFindW = StringFindW
 			return nStartPos, nEndPos
 		end
 	end
-	or wstring.find
+	or function(szHaystack, szNeedle, nOffset)
+		if not nOffset then
+			nOffset = 1
+		end
+		local szPart = string.sub(szHaystack, nOffset)
+		local nStartPos, nEndPos = wstring.find(szPart, szNeedle)
+		if nStartPos then
+			nStartPos = nStartPos + nOffset - 1
+			nEndPos = nEndPos + nOffset - 1
+		end
+		if nStartPos and nEndPos and nStartPos >= nOffset then
+			return nStartPos, nEndPos
+		end
+	end
 
 -- ×Ö·û´®ÇÐ¸î
 ---@param s string @ÐèÒªÇÐ¸îµÄ×Ö·û´®
