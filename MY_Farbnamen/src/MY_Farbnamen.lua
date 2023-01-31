@@ -63,7 +63,7 @@ local DB, DBI_W, DBI_RI, DBI_RN, DBT_W, DBT_RI
 
 local function GetRealName(szName)
 	local szRealName = szName
-	local nPos = StringFindW(szName, '@')
+	local nPos = X.StringFindW(szName, '@')
 	if nPos then
 		szRealName = szName:sub(1, nPos - 1)
 	end
