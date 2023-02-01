@@ -77,17 +77,62 @@ function X.TrimString(szText)
 end
 
 function X.EncryptString(szText)
-	return (szText:gsub('.', function (c) return string.format('%02X', (string.byte(c) + 13) % 256) end):gsub(' ', '+'))
+	local map = X.SECRET['CRYPTO::STRING_ENCRYPTION_MAP']
+	if not map then
+		return (szText:gsub('.', function (c) return string.format('%02X', (string.byte(c) + 13) % 256) end):gsub(' ', '+'))
+	end
+	local seed = math.random(0, 0xFF)
+	local dist = math.random(0, 0xFF)
+	local a = {szText:byte(1, #szText)}
+	for i, v in ipairs(a) do
+		a[i] = string.char((map[(v + seed + i - 1) % 0x100 + 1] + i - 1) % 0x100)
+	end
+	table.insert(a, 1, (string.char(dist)))
+	table.insert(a, (string.char(X.NumberBitXor(dist, seed))))
+	return '2,' .. X.Base64Encode(table.concat(a)):gsub('/', '-'):gsub('+', '_'):gsub('=', '.')
 end
 
 function X.DecryptString(szText)
-	local a, n = {}, nil
-	for i = 1, #szText, 2 do
-		n = tonumber('0x' .. szText:sub(i, i + 1))
-		if not n then
-			return
+	local map = X.SECRET['CRYPTO::STRING_DECRYPTION_MAP']
+	if not map then
+		local a, n = {}, nil
+		for i = 1, #szText, 2 do
+			n = tonumber('0x' .. szText:sub(i, i + 1))
+			if not n then
+				return
+			end
+			a[(i + 1) / 2] = string.char((n - 13 + 256) % 256)
 		end
-		a[(i + 1) / 2] = string.char((n - 13 + 256) % 256)
+		return table.concat(a)
+	end
+	if szText:sub(1, 2) ~= '2,' then
+		return
+	end
+	szText = szText:sub(3):gsub('-', '/'):gsub('_', '+'):gsub('%.', '=')
+	szText = X.Base64Decode(szText)
+	if not szText then
+		return
+	end
+	local a = {}
+	for i = 1, #szText do
+		a[i] = szText:byte(i)
+	end
+	local seed = table.remove(a)
+	local dist = table.remove(a, 1)
+	if not dist or not seed then
+		return
+	end
+	seed = X.NumberBitXor(seed, dist)
+	for i, v in ipairs(a) do
+		v = (v - (i - 1)) % 0x100
+		if v < 0 then
+			v = v + 0x100
+		end
+		v = (map[v] - seed - (i - 1)) % 0x100
+		if v < 0 then
+			v = v + 0x100
+		end
+		a[i] = string.char(v)
 	end
 	return table.concat(a)
 end
