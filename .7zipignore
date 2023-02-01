@@ -2,10 +2,10 @@
 *.py
 *.pyc
 __pycache__
-/secret.*
-/README.md
-/header.tpl.lua
-/!src-dist
-/MYDev_*
-/*/src/
-/*/dist/
+secret.*
+README.md
+header.tpl.lua
+!src-dist
+MYDev_*
+*/src/
+*/dist/
