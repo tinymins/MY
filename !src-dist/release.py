@@ -74,7 +74,7 @@ if __name__ == '__main__':
 	os.system('git checkout master')
 	utils.assert_exit(git.is_clean(), 'Error: branch has uncommitted file change(s)!')
 
-	os.system('git rebase prelease')
+	os.system('git rebase stable')
 	utils.assert_exit(git.is_clean(), 'Error: resolve conflict and remove uncommitted changes first!')
 
 	print('Reading changelog and version list...')
