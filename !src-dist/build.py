@@ -236,25 +236,22 @@ def run(diff_ver, is_source):
 		exit()
 
 	if not is_source:
-		# Merge master into prelease
+		# Checkout stable and reset with master
 		if git.get_current_branch() == 'master':
 			utils.assert_exit(git.is_clean(), 'Error: master branch has uncommitted file change(s)!')
-			os.system('git checkout prelease || git checkout -b prelease')
-			os.system('git rebase master')
+			os.system('git checkout stable || git checkout -b stable')
+			os.system('git reset master')
 			os.system('code "%s"' % os.path.join(packet_path, './%s_!Base/src/lib/Base.lua' % packet))
 			os.system('code "%s"' % os.path.join(packet_path, './CHANGELOG.md'))
-			utils.exit_with_message('Switched to prelease branch. Please commit release info and then run this script again!')
+			utils.exit_with_message('Switched to stable branch. Please commit release info and then run this script again!')
 
-		# Merge prelease into stable
-		if git.get_current_branch() == 'prelease':
+		# Commit release message
+		if git.get_current_branch() == 'stable' and not git.is_clean():
 			os.system('git reset master')
 			version_info = __get_version_info(packet, diff_ver)
 			utils.assert_exit(version_info.get('max') == '' or semver.compare(version_info.get('current'), version_info.get('max')) == 1,
 				'Error: current version(%s) must be larger than max history version(%s)!' % (version_info.get('current'), version_info.get('max')))
 			os.system('git add * && git commit -m "release: %s"' % version_info.get('current'))
-			os.system('git checkout stable || git checkout -b stable')
-			os.system('git reset origin/stable --hard')
-			os.system('git rebase prelease')
 
 		# Check if branch
 		utils.assert_exit(git.is_clean(), 'Error: resolve conflict and remove uncommitted changes first!')
