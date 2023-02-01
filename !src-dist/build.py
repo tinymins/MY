@@ -240,6 +240,7 @@ def run(diff_ver, is_source):
 		if git.get_current_branch() == 'master':
 			utils.assert_exit(git.is_clean(), 'Error: master branch has uncommitted file change(s)!')
 			os.system('git checkout stable || git checkout -b stable')
+			os.system('git rebase master')
 			os.system('git reset master')
 			os.system('code "%s"' % os.path.join(packet_path, './%s_!Base/src/lib/Base.lua' % packet))
 			os.system('code "%s"' % os.path.join(packet_path, './CHANGELOG.md'))
