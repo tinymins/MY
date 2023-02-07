@@ -91,11 +91,11 @@ function D.HookNonwarMap()
 				img.copy = true
 				img.OnItemMouseEnter = function()
 					img:SetAlpha(255)
-					return X.UI.FormatWMsgRet(true, true)
+					return X.UI.FormatUIEventMask(true, true)
 				end
 				img.OnItemMouseLeave = function()
 					img:SetAlpha(200)
-					return X.UI.FormatWMsgRet(true, true)
+					return X.UI.FormatUIEventMask(true, true)
 				end
 				img:SetAlpha(200)
 				img:SetSize(img.w / fS, img.h / fS)

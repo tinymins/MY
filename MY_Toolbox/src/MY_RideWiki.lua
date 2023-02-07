@@ -90,7 +90,7 @@ function D.HookPlayerViewFrame(frame)
 				end
 				return
 			end
-			return X.UI.FormatWMsgRet(false, true)
+			return X.UI.FormatUIEventMask(false, true)
 		end
 		X.SetMemberFunctionHook(
 			box,
@@ -136,7 +136,7 @@ function D.HookHorsePanel(frame)
 				end
 				return
 			end
-			return X.UI.FormatWMsgRet(false, true)
+			return X.UI.FormatUIEventMask(false, true)
 		end
 		X.UI.HookHandleAppend(hList, function(_, hItem)
 			local box = hItem:Lookup('Box_Horse')
@@ -166,7 +166,7 @@ function D.HookHorsePanel(frame)
 				end
 				return
 			end
-			return X.UI.FormatWMsgRet(false, true)
+			return X.UI.FormatUIEventMask(false, true)
 		end
 		X.UI.HookHandleAppend(hList, function(_, hItem)
 			local box = hItem:Lookup('Box_Qiqu')

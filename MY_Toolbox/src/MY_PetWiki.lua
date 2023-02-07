@@ -79,7 +79,7 @@ function D.HookPetFrame(frame)
 				D.Open(this.tPet.dwPetIndex)
 				return
 			end
-			return X.UI.FormatWMsgRet(false, true)
+			return X.UI.FormatUIEventMask(false, true)
 		end
 		X.UI.HookHandleAppend(hMyPets, function(_, hMyPet)
 			local hPets = hMyPet:Lookup('Handle_petsBox')
@@ -116,7 +116,7 @@ function D.HookPetFrame(frame)
 				D.Open(this.tPet.dwPetIndex)
 				return
 			end
-			return X.UI.FormatWMsgRet(false, true)
+			return X.UI.FormatUIEventMask(false, true)
 		end
 		for nNum = 1, 10 do
 			local hMedal = hMedalPets:Lookup('Handle_MedalPet_' .. nNum)
@@ -144,7 +144,7 @@ function D.HookPetFrame(frame)
 				D.Open(this.tPet.dwPetIndex)
 				return
 			end
-			return X.UI.FormatWMsgRet(false, true)
+			return X.UI.FormatUIEventMask(false, true)
 		end
 		for i = 0, hPreferList:GetItemCount() - 1 do
 			local hPet = hPreferList:Lookup(i)
@@ -165,7 +165,7 @@ function D.HookPetFrame(frame)
 				D.Open(this.tPet.dwPetIndex)
 				return
 			end
-			return X.UI.FormatWMsgRet(false, true)
+			return X.UI.FormatUIEventMask(false, true)
 		end
 		X.UI.HookHandleAppend(hPets, function(_, hGroup)
 			local hList = hGroup and hGroup:Lookup((hGroup:GetName():gsub('Handle_Pets', 'Handle_List')))
