@@ -187,6 +187,7 @@ function D.HookPlayerViewPanel()
 					D.PvRequestOtherLover(this:GetRoot())
 				end
 				PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+				return X.UI.FormatUIEventMask(true, true)
 			end
 			page:Lookup('Btn_LoveYou').OnLButtonClick = function()
 				local mp = this:GetParent():GetParent()
