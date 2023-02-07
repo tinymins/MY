@@ -249,7 +249,7 @@ do
 				OnSwitchMap(dwMapID, dwID, aMapCopy, dwTime)
 			end)
 		end
-		return X.UI.FormatWMsgRet(true, true)
+		return X.UI.FormatUIEventMask(true, true)
 	end
 
 	local function OnFBAppendItemFromIni(hList)

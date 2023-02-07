@@ -183,13 +183,16 @@ function X.UI.HookContainerAppend(hList, fnOnAppendContent)
 end
 end
 
--- FORMAT_WMSG_RET
-function X.UI.FormatWMsgRet(stop, callFrame)
+-- 格式化界面事件回调函数行为掩码返回值，同官方 FORMAT_WMSG_RET 函数（未导出）
+---@param stopPropagation boolean @事件已处理，停止冒泡寻找父层元素
+---@param callFrameBinding boolean @继续调用窗体绑定的脚本上的同名回调函数
+---@return number 界面事件回调函数行为掩码值
+function X.UI.FormatUIEventMask(stopPropagation, callFrameBinding)
 	local ret = 0
-	if stop then
+	if stopPropagation then
 		ret = ret + 1 --01
 	end
-	if callFrame then
+	if callFrameBinding then
 		ret = ret + 2 --10
 	end
 	return ret
