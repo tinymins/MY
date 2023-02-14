@@ -902,6 +902,9 @@ function X.OutputTableTip(tOptions)
 		hTotal:FormatAllItemPos()
 	end
 	if frame then
+		if not Station.IsVisible() then
+			frame:ShowWhenUIHide()
+		end
 		X.RegisterEsc(
 			X.NSFormatString('{$NS}_OutputTableTip'),
 			function() return frame:IsValid() and frame:IsVisible() end,
