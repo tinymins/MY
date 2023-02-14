@@ -730,7 +730,8 @@ function D.UpdateUI(page)
 	local data = D.GetPlayerRecords()
 	local result = {}
 	for _, rec in pairs(data) do
-		if X.StringFindW(tostring(rec.account or ''), szSearch)
+		if szSearch == ''
+		or X.StringFindW(tostring(rec.account or ''), szSearch)
 		or X.StringFindW(tostring(rec.name or ''), szSearch)
 		or X.StringFindW(tostring(rec.region or ''), szSearch)
 		or X.StringFindW(tostring(rec.server or ''), szSearch) then
