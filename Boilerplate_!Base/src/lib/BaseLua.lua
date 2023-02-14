@@ -821,6 +821,11 @@ X.StringFindW = StringFindW
 		if not nOffset then
 			nOffset = 1
 		end
+		--[[#DEBUG BEGIN]]
+		if szNeedle == '' then
+			X.Debug(X.PACKET_INFO.NAME_SPACE, X.GetTraceback('Call StringFindW with empty needle!'), X.DEBUG_LEVEL.ERROR)
+		end
+		--[[#DEBUG END]]
 		-- 官方 StringFindW 有缺陷，当目标串 szHaystack 包含乱码时，查找结果可能低于偏移位置
 		-- 最小复现： StringFindW(string.char(91,232,181,93), '[', 1)
 		-- 最小复现结果： 返回 (0, 0) 这不可能，实际字符串下标最小为 1
