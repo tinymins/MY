@@ -669,7 +669,7 @@ function X.Class(className, classMembers, super)
 	end
 	-- 初始化父类、创建入口
 	classPrototypeProxy.super = super
-	classPrototypeProxy.new = function(classPrototypeProxy, ...)
+	classPrototypeProxy.new = function(classPrototype, ...)
 		local classInstance = setmetatable({}, {
 			__index = function(_, k)
 				if k == 'new' or k == 'constructor' then
