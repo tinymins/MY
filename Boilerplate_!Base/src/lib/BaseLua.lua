@@ -806,7 +806,7 @@ X.Promise = X.Class('Promise', {
 					end
 				else
 					local szErrMsg, szTraceback = res[2], res[3]
-					self.error = X.Error(szErrMsg or '', szTraceback)
+					self.error = X.Error:new(szErrMsg or '', szTraceback)
 					self.status = 'REJECTED'
 				end
 			end
