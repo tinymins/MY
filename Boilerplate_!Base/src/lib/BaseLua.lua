@@ -679,8 +679,8 @@ function X.Class(className, classMembers, super)
 			end,
 			__tostring = function(t) return className .. ' (class instance)' end,
 		})
-		if classInstance.constructor then
-			classInstance:constructor(...)
+		if classPrototype.constructor then
+			classPrototype.constructor(classInstance, ...)
 		end
 		return classInstance
 	end
