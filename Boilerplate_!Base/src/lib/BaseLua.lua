@@ -650,66 +650,52 @@ end
 -- 类
 -----------------------------------------------
 
-local FREEZE_CLASS = {}
-
 -- 创建类
 ---@param className string @类名
+---@param classMembers table<string, any> @类成员函数对象
 ---@param super? table @父类
 ---@return table @类
-function X.Class(className, super)
-	if type(super) == 'string' then
-		className, super = super, nil
+function X.Class(className, classMembers, super)
+	if X.IsTable(className) then
+		className, classMembers, super = nil, className, classMembers
 	end
 	if not className then
 		className = 'Unnamed Class'
 	end
-	local freezed = false
-	local proxies = {
-		new = function(classPrototype, ...)
-			local classInstance = setmetatable({}, {
-				__index = function(_, k)
-					if k == 'new' or k == 'constructor' then
-						return nil
-					end
-					return classPrototype[k]
-				end,
-				__tostring = function(t) return className .. ' (class instance)' end,
-			})
-			if classInstance.constructor then
-				classInstance:constructor(...)
-			end
-			return classInstance
-		end
-	}
-	if super then
-		proxies.super = super
-		setmetatable(proxies, { __index = super })
+	-- 初始化成员变量表
+	local classPrototypeProxy = {}
+	for k, v in pairs(classMembers) do
+		classPrototypeProxy[k] = v
 	end
+	-- 初始化父类、创建入口
+	classPrototypeProxy.super = super
+	classPrototypeProxy.new = function(classPrototypeProxy, ...)
+		local classInstance = setmetatable({}, {
+			__index = function(_, k)
+				if k == 'new' or k == 'constructor' then
+					return nil
+				end
+				return classPrototype[k]
+			end,
+			__tostring = function(t) return className .. ' (class instance)' end,
+		})
+		if classInstance.constructor then
+			classInstance:constructor(...)
+		end
+		return classInstance
+	end
+	-- 创建并返回类只读对象
 	return setmetatable({}, {
-		__index = proxies,
+		__index = setmetatable(classPrototypeProxy, { __index = super }),
 		__tostring = function(t) return className .. ' (class prototype)' end,
 		__call = function (classPrototype, ...)
-			if ... == FREEZE_CLASS then
-				freezed = true
-				return classPrototype
-			end
 			return classPrototype:new(...)
 		end,
-		__newindex = function(_, k, v)
-			assert(freezed == false, 'Class is freezed.')
-			assert(k ~= 'super', 'Class super is readonly.')
-			assert(k ~= 'new', 'Class new function is readonly.')
-			proxies[k] = v
+		__newindex = function()
+			assert(false, 'Class Prototype is readonly.')
 		end,
 		__metatable = true,
 	})
-end
-
--- 冻结类禁止修改成员函数
----@param Class table @类
----@return table @冻结后的类
-function X.FreezeClass(Class)
-	return Class(FREEZE_CLASS)
 end
 
 -----------------------------------------------
@@ -719,14 +705,12 @@ end
 -- Error 生成错误对象
 ---@param message string @错误内容
 ---@return Error @错误对象
-X.Error = X.Class('Error')
-
-function X.Error:constructor(message, traceback)
-	self.message = tostring(message)
-	self.traceback = traceback or X.GetTraceback()
-end
-
-X.FreezeClass(X.Error)
+X.Error = X.Class('Error', {
+	constructor = function(self, message, traceback)
+		self.message = tostring(message)
+		self.traceback = traceback or X.GetTraceback()
+	end
+})
 
 -----------------------------------------------
 -- Promise
@@ -735,102 +719,100 @@ X.FreezeClass(X.Error)
 -- Promise 生成承诺回调
 ---@param func fun(resolve: fun(result: any), reject: fun(error: Error)) @异步承诺函数主体
 ---@return table @承诺对象
-X.Promise = X.Class('Promise')
+X.Promise = X.Class('Promise', {
+	-- 类静态函数
+	Resolve = function(data)
+		return 'RESOLVED', data
+	end,
 
--- 类静态函数
-function X.Promise.Resolve(data)
-	return 'RESOLVED', data
-end
+	Reject = function(error)
+		return 'REJECTED', error
+	end,
 
-function X.Promise.Reject(error)
-	return 'REJECTED', error
-end
+	-- 构造函数
+	constructor = function(self, task, ...)
+		self.ctor = function() end
+		self.chains = {}
+		self.status = 'PENDING'
+		local function onResolve(res)
+			if self.status ~= 'PENDING' then
+				return
+			end
+			self.status = 'RESOLVED'
+			self.result = res
+			self:Process()
+		end
+		local function onReject(error)
+			if self.status ~= 'PENDING' then
+				return
+			end
+			self.status = 'REJECTED'
+			self.error = error
+			self:Process()
+		end
+		task(onResolve, onReject)
+	end,
 
--- 构造函数
-function X.Promise:constructor(task, ...)
-	self.ctor = function() end
-	self.chains = {}
-	self.status = 'PENDING'
-	local function onResolve(res)
-		if self.status ~= 'PENDING' then
+	-- 实例成员函数
+	Then = function(self, onResolve)
+		table.insert(self.chains, {
+			type = 'then',
+			handler = onResolve,
+		})
+		self:Process()
+		return self
+	end,
+
+	Catch = function(self, onReject)
+		table.insert(self.chains, {
+			type = 'catch',
+			handler = onReject,
+		})
+		self:Process()
+		return self
+	end,
+
+	Process = function(self)
+		if self.status == 'PENDING' then
 			return
 		end
-		self.status = 'RESOLVED'
-		self.result = res
-		self:Process()
-	end
-	local function onReject(error)
-		if self.status ~= 'PENDING' then
-			return
-		end
-		self.status = 'REJECTED'
-		self.error = error
-		self:Process()
-	end
-	task(onResolve, onReject)
-end
-
--- 实例成员函数
-function X.Promise:Then(onResolve)
-	table.insert(self.chains, {
-		type = 'then',
-		handler = onResolve,
-	})
-	self:Process()
-	return self
-end
-
-function X.Promise:Catch(onReject)
-	table.insert(self.chains, {
-		type = 'catch',
-		handler = onReject,
-	})
-	self:Process()
-	return self
-end
-
-function X.Promise:Process()
-	if self.status == 'PENDING' then
-		return
-	end
-	while true do
-		local p = table.remove(self.chains, 1)
-		if not p then
-			break
-		end
-		local res
-		if self.status == 'RESOLVED' then
-			if p.type == 'then' then
-				res = {X.XpCall(p.handler, self.result)}
+		while true do
+			local p = table.remove(self.chains, 1)
+			if not p then
+				break
 			end
-		elseif self.status == 'REJECTED' then
-			if p.type == 'catch' then
-				res = {X.XpCall(p.handler, self.error)}
-			end
-		end
-		if res then
-			local bSuccess = res[1]
-			if bSuccess then
-				local szStatus, vData = res[2], res[3]
-				if szStatus == 'RESOLVED' then
-					self.result = vData
-					self.status = 'RESOLVED'
-				elseif szStatus == 'REJECTED' then
-					self.error = vData
-					self.status = 'REJECTED'
-				else
-					self.status = 'RESOLVED'
+			local res
+			if self.status == 'RESOLVED' then
+				if p.type == 'then' then
+					res = {X.XpCall(p.handler, self.result)}
 				end
-			else
-				local szErrMsg, szTraceback = res[2], res[3]
-				self.error = X.Error:new(szErrMsg or '', szTraceback)
-				self.status = 'REJECTED'
+			elseif self.status == 'REJECTED' then
+				if p.type == 'catch' then
+					res = {X.XpCall(p.handler, self.error)}
+				end
+			end
+			if res then
+				local bSuccess = res[1]
+				if bSuccess then
+					local szStatus, vData = res[2], res[3]
+					if szStatus == 'RESOLVED' then
+						self.result = vData
+						self.status = 'RESOLVED'
+					elseif szStatus == 'REJECTED' then
+						self.error = vData
+						self.status = 'REJECTED'
+					else
+						self.status = 'RESOLVED'
+					end
+				else
+					local szErrMsg, szTraceback = res[2], res[3]
+					self.error = X.Error(szErrMsg or '', szTraceback)
+					self.status = 'REJECTED'
+				end
 			end
 		end
-	end
-end
-
-X.FreezeClass(X.Promise)
+	end,
+})
 
 -----------------------------------------------
 -- 安全调用
