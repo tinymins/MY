@@ -650,9 +650,11 @@ end
 -- 类
 -----------------------------------------------
 
+local FREEZE_CLASS = {}
+
 -- 创建类
 ---@param className string @类名
----@param super table @父类
+---@param super? table @父类
 ---@return table @类
 function X.Class(className, super)
 	if type(super) == 'string' then
@@ -661,6 +663,7 @@ function X.Class(className, super)
 	if not className then
 		className = 'Unnamed Class'
 	end
+	local freezed = false
 	local proxies = {}
 	if super then
 		proxies.super = super
@@ -670,6 +673,10 @@ function X.Class(className, super)
 		__index = proxies,
 		__tostring = function(t) return className .. ' (class prototype)' end,
 		__call = function (classPrototype, ...)
+			if ... == FREEZE_CLASS then
+				freezed = true
+				return classPrototype
+			end
 			local classInstance = setmetatable({}, {
 				__index = classPrototype,
 				__tostring = function(t) return className .. ' (class instance)' end,
@@ -679,7 +686,20 @@ function X.Class(className, super)
 			end
 			return classInstance
 		end,
+		__newindex = function(_, k, v)
+			assert(freezed, 'Class is freezed.')
+			assert(k ~= 'super', 'Class super is readonly.')
+			proxies[k] = v
+		end,
+		__metatable = true,
 	})
+end
+
+-- 冻结类禁止修改成员函数
+---@param Class table @类
+---@return table @冻结后的类
+function X.FreezeClass(Class)
+	return Class(FREEZE_CLASS)
 end
 
 -----------------------------------------------
