@@ -44,7 +44,7 @@ function X.Random(...)
 end
 
 -- 获取调用栈
----@param str string @调用栈附加字符串
+---@param str? string @调用栈附加字符串
 ---@return string @完整调用栈
 function X.GetTraceback(str)
 	local traceback = debug and debug.traceback and debug.traceback():gsub('^([^\n]+\n)[^\n]+\n', '%1')
