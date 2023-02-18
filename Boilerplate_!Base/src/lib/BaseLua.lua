@@ -666,7 +666,7 @@ function X.Class(className, super)
 	local freezed = false
 	local proxies = {
 		new = function(self, ...)
-			self(...)
+			return self(...)
 		end,
 	}
 	if super then
