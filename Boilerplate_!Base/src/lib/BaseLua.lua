@@ -664,7 +664,11 @@ function X.Class(className, super)
 		className = 'Unnamed Class'
 	end
 	local freezed = false
-	local proxies = {}
+	local proxies = {
+		new = function(self, ...)
+			self(...)
+		end,
+	}
 	if super then
 		proxies.super = super
 		setmetatable(proxies, { __index = super })
@@ -689,6 +693,7 @@ function X.Class(className, super)
 		__newindex = function(_, k, v)
 			assert(freezed, 'Class is freezed.')
 			assert(k ~= 'super', 'Class super is readonly.')
+			assert(k ~= 'new', 'Class new function is readonly.')
 			proxies[k] = v
 		end,
 		__metatable = true,
