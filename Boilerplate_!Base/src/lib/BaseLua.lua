@@ -709,12 +709,14 @@ end
 -- Error 生成错误对象
 ---@param message string @错误内容
 ---@return Error @错误对象
-X.Error = X.Class('Error', {
-	constructor = function(self, message, traceback)
-		self.message = tostring(message)
-		self.traceback = traceback or X.GetTraceback()
-	end,
-})
+X.Error = X.Class('Error')
+
+function X.Error:constructor(message, traceback)
+	self.message = tostring(message)
+	self.traceback = traceback or X.GetTraceback()
+end
+
+X.FreezeClass(X.Error)
 
 -----------------------------------------------
 -- Promise
