@@ -513,6 +513,59 @@ end
 X.RegisterEvent('CURL_REQUEST_RESULT', 'AJAX', OnCurlRequestResult)
 end
 
+do
+local PENDING = {}
+function X.DownloadFile(szURL, szPath)
+	local szKey = X.NSFormatString('{$NS}#DownloadFile.') .. GetStringCRC(szURL) .. GetStringCRC(szPath)
+	local info = PENDING[szKey]
+	if not info then
+		info = { keys = { szKey, '__addon_' .. szKey } }
+		for _, k in ipairs(info.keys) do
+			PENDING[k] = info
+		end
+		info.promise = X.Promise:new(function(resolve, reject)
+			if CURL_DownloadFile then
+				info.resolve = resolve
+				info.reject = reject
+				CURL_DownloadFile(szKey, szURL, szPath, szURL:lower():find('^https://') and true or false, 5)
+			else
+				for _, k in ipairs(info.keys) do
+					PENDING[k] = nil
+				end
+				reject(X.Error:new('Global function CURL_DownloadFile not exists!'))
+			end
+		end)
+	end
+	return X.Promise:new(function(resolve, reject)
+		info.promise
+			:Then(function(res)
+				X.Call(resolve, res)
+				return X.Promise.Resolve(res)
+			end)
+			:Catch(function(error)
+				X.Call(reject, error)
+				return X.Promise.Reject(error)
+			end)
+	end)
+end
+
+RegisterEvent('CURL_DOWNLOAD_RESULT', function()
+	local szKey, bSuccess = arg0, arg1
+	local info = PENDING[szKey]
+	if not info then
+		return
+	end
+	for _, k in ipairs(info.keys) do
+		PENDING[k] = nil
+	end
+	if bSuccess then
+		info.resolve()
+	else
+		info.reject(X.Error:new('CURL_DOWNLOAD_RESULT failed!'))
+	end
+end)
+end
+
 function X.FetchLUAData(szURL, tOptions)
 	return X.Promise:new(function(resolve, reject)
 		local downloader = X.UI.GetTempElement(X.NSFormatString('Image.{$NS}#DownloadLUAData-') .. GetStringCRC(szURL) .. '#' .. GetTime())
