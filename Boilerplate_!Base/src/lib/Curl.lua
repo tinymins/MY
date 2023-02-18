@@ -513,20 +513,19 @@ end
 X.RegisterEvent('CURL_REQUEST_RESULT', 'AJAX', OnCurlRequestResult)
 end
 
-function X.FetchLUAData(szPath, tOptions, onResolve, onReject)
-	if X.IsFunction(tOptions) then
-		tOptions, onResolve, onReject = nil, onResolve, onReject
-	end
-	local downloader = X.UI.GetTempElement(X.NSFormatString('Image.{$NS}#DownloadLUAData-') .. GetStringCRC(szPath) .. '#' .. GetTime())
-	downloader.FromTextureFile = function(_, szPath)
-		local data = X.LoadLUAData(szPath, tOptions)
-		X.Call(onResolve, data)
-	end
-	downloader:FromRemoteFile(szPath, false, function(image, szURL, szAbsPath, bSuccess)
-		if not bSuccess then
-			X.Call(onReject)
+function X.FetchLUAData(szPath, tOptions)
+	return X.Promise(function(resolve, reject)
+		local downloader = X.UI.GetTempElement(X.NSFormatString('Image.{$NS}#DownloadLUAData-') .. GetStringCRC(szPath) .. '#' .. GetTime())
+		downloader.FromTextureFile = function(_, szPath)
+			local data = X.LoadLUAData(szPath, tOptions)
+			resolve(data)
 		end
-		downloader:GetParent():RemoveItem(downloader)
+		downloader:FromRemoteFile(szPath, false, function(image, szURL, szAbsPath, bSuccess)
+			if not bSuccess then
+				reject(X.Error('FetchLUAData failed.'))
+			end
+			downloader:GetParent():RemoveItem(downloader)
+		end)
 	end)
 end
 
