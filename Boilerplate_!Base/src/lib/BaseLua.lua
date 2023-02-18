@@ -649,46 +649,39 @@ end
 -----------------------------------------------
 -- 类
 -----------------------------------------------
-local function ClassCreateInstance(c, ins, ...)
-	if not ins then
-		ins = c
-	end
-	if c.ctor then
-		c.ctor(ins, ...)
-	end
-	return c
-end
 
 -- 创建类
 ---@param className string @类名
 ---@param super table @父类
 ---@return table @类
 function X.Class(className, super)
-	local classPrototype
 	if type(super) == 'string' then
 		className, super = super, nil
 	end
 	if not className then
 		className = 'Unnamed Class'
 	end
-	classPrototype = (function ()
-		local proxys = {}
+	return (function ()
+		local proxies = {}
 		if super then
-			proxys.super = super
-			setmetatable(proxys, { __index = super })
+			proxies.super = super
+			setmetatable(proxies, { __index = super })
 		end
 		return setmetatable({}, {
-			__index = proxys,
+			__index = proxies,
 			__tostring = function(t) return className .. ' (class prototype)' end,
-			__call = function (...)
-				return ClassCreateInstance(setmetatable({}, {
+			__call = function (classPrototype, ...)
+				local classInstance = setmetatable({}, {
 					__index = classPrototype,
 					__tostring = function(t) return className .. ' (class instance)' end,
-				}), nil, ...)
+				})
+				if classInstance.constructor then
+					classInstance.constructor(classInstance, ...)
+				end
+				return classInstance
 			end,
 		})
 	end)()
-	return classPrototype
 end
 
 -----------------------------------------------
