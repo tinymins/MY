@@ -725,87 +725,9 @@ X.FreezeClass(X.Error)
 -- Promise 生成承诺回调
 ---@param func fun(resolve: fun(result: any), reject: fun(error: Error)) @异步承诺函数主体
 ---@return table @承诺对象
-X.Promise = X.Class('Promise', {
-	constructor = function(self, task, ...)
-		self.ctor = function() end
-		self.chains = {}
-		self.status = 'PENDING'
-		local function onResolve(res)
-			if self.status ~= 'PENDING' then
-				return
-			end
-			self.status = 'RESOLVED'
-			self.result = res
-			self:Process()
-		end
-		local function onReject(error)
-			if self.status ~= 'PENDING' then
-				return
-			end
-			self.status = 'REJECTED'
-			self.error = error
-			self:Process()
-		end
-		task(onResolve, onReject)
-	end,
-	Process = function(self)
-		if self.status == 'PENDING' then
-			return
-		end
-		while true do
-			local p = table.remove(self.chains, 1)
-			if not p then
-				break
-			end
-			local res
-			if self.status == 'RESOLVED' then
-				if p.type == 'then' then
-					res = {X.XpCall(p.handler, self.result)}
-				end
-			elseif self.status == 'REJECTED' then
-				if p.type == 'catch' then
-					res = {X.XpCall(p.handler, self.error)}
-				end
-			end
-			if res then
-				local bSuccess = res[1]
-				if bSuccess then
-					local szStatus, vData = res[2], res[3]
-					if szStatus == 'RESOLVED' then
-						self.result = vData
-						self.status = 'RESOLVED'
-					elseif szStatus == 'REJECTED' then
-						self.error = vData
-						self.status = 'REJECTED'
-					else
-						self.status = 'RESOLVED'
-					end
-				else
-					local szErrMsg, szTraceback = res[2], res[3]
-					self.error = X.Error(szErrMsg or '', szTraceback)
-					self.status = 'REJECTED'
-				end
-			end
-		end
-	end,
-	Then = function(self, onResolve)
-		table.insert(self.chains, {
-			type = 'then',
-			handler = onResolve,
-		})
-		self:Process()
-		return self
-	end,
-	Catch = function(self, onReject)
-		table.insert(self.chains, {
-			type = 'catch',
-			handler = onReject,
-		})
-		self:Process()
-		return self
-	end,
-})
+X.Promise = X.Class('Promise')
 
+-- 类静态函数
 function X.Promise.Resolve(data)
 	return 'RESOLVED', data
 end
@@ -813,6 +735,92 @@ end
 function X.Promise.Reject(error)
 	return 'REJECTED', error
 end
+
+-- 构造函数
+function X.Promise:constructor(task, ...)
+	self.ctor = function() end
+	self.chains = {}
+	self.status = 'PENDING'
+	local function onResolve(res)
+		if self.status ~= 'PENDING' then
+			return
+		end
+		self.status = 'RESOLVED'
+		self.result = res
+		self:Process()
+	end
+	local function onReject(error)
+		if self.status ~= 'PENDING' then
+			return
+		end
+		self.status = 'REJECTED'
+		self.error = error
+		self:Process()
+	end
+	task(onResolve, onReject)
+end
+
+-- 实例成员函数
+function X.Promise:Then(onResolve)
+	table.insert(self.chains, {
+		type = 'then',
+		handler = onResolve,
+	})
+	self:Process()
+	return self
+end
+
+function X.Promise:Catch(onReject)
+	table.insert(self.chains, {
+		type = 'catch',
+		handler = onReject,
+	})
+	self:Process()
+	return self
+end
+
+function X.Promise:Process()
+	if self.status == 'PENDING' then
+		return
+	end
+	while true do
+		local p = table.remove(self.chains, 1)
+		if not p then
+			break
+		end
+		local res
+		if self.status == 'RESOLVED' then
+			if p.type == 'then' then
+				res = {X.XpCall(p.handler, self.result)}
+			end
+		elseif self.status == 'REJECTED' then
+			if p.type == 'catch' then
+				res = {X.XpCall(p.handler, self.error)}
+			end
+		end
+		if res then
+			local bSuccess = res[1]
+			if bSuccess then
+				local szStatus, vData = res[2], res[3]
+				if szStatus == 'RESOLVED' then
+					self.result = vData
+					self.status = 'RESOLVED'
+				elseif szStatus == 'REJECTED' then
+					self.error = vData
+					self.status = 'REJECTED'
+				else
+					self.status = 'RESOLVED'
+				end
+			else
+				local szErrMsg, szTraceback = res[2], res[3]
+				self.error = X.Error(szErrMsg or '', szTraceback)
+				self.status = 'REJECTED'
+			end
+		end
+	end
+end
+
+X.FreezeClass(X.Promise)
 
 -----------------------------------------------
 -- 安全调用
