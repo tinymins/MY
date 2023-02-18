@@ -649,46 +649,149 @@ end
 -----------------------------------------------
 -- 类
 -----------------------------------------------
-local function ClassCreateInstance(c, ins, ...)
-	if not ins then
-		ins = c
-	end
-	if c.ctor then
-		c.ctor(ins, ...)
-	end
-	return c
-end
 
 -- 创建类
 ---@param className string @类名
 ---@param super table @父类
 ---@return table @类
 function X.Class(className, super)
-	local classPrototype
 	if type(super) == 'string' then
 		className, super = super, nil
 	end
 	if not className then
 		className = 'Unnamed Class'
 	end
-	classPrototype = (function ()
-		local proxys = {}
+	return (function ()
+		local proxies = {}
 		if super then
-			proxys.super = super
-			setmetatable(proxys, { __index = super })
+			proxies.super = super
+			setmetatable(proxies, { __index = super })
 		end
 		return setmetatable({}, {
-			__index = proxys,
+			__index = proxies,
 			__tostring = function(t) return className .. ' (class prototype)' end,
-			__call = function (...)
-				return ClassCreateInstance(setmetatable({}, {
+			__call = function (classPrototype, ...)
+				local classInstance = setmetatable({}, {
 					__index = classPrototype,
 					__tostring = function(t) return className .. ' (class instance)' end,
-				}), nil, ...)
+				})
+				if classInstance.constructor then
+					classInstance.constructor(classInstance, ...)
+				end
+				return classInstance
 			end,
 		})
 	end)()
-	return classPrototype
+end
+
+-----------------------------------------------
+-- Error
+-----------------------------------------------
+
+-- Error 生成错误对象
+---@param message string @错误内容
+---@return Error @错误对象
+X.Error = X.Class('Error', {
+	constructor = function(self, message, traceback)
+		self.message = tostring(message)
+		self.traceback = traceback or X.GetTraceback()
+	end,
+})
+
+-----------------------------------------------
+-- Promise
+-----------------------------------------------
+
+-- Promise 生成承诺回调
+---@param func fun(resolve: fun(result: any), reject: fun(error: Error)) @异步承诺函数主体
+---@return table @承诺对象
+X.Promise = X.Class('Promise', {
+	constructor = function(self, task, ...)
+		self.ctor = function() end
+		self.chains = {}
+		self.status = 'PENDING'
+		local function onResolve(res)
+			if self.status ~= 'PENDING' then
+				return
+			end
+			self.status = 'RESOLVED'
+			self.result = res
+			self:Process()
+		end
+		local function onReject(error)
+			if self.status ~= 'PENDING' then
+				return
+			end
+			self.status = 'REJECTED'
+			self.error = error
+			self:Process()
+		end
+		task(onResolve, onReject)
+	end,
+	Process = function(self)
+		if self.status == 'PENDING' then
+			return
+		end
+		while true do
+			local p = table.remove(self.chains, 1)
+			if not p then
+				break
+			end
+			local res
+			if self.status == 'RESOLVED' then
+				if p.type == 'then' then
+					res = {X.XpCall(p.handler, self.result)}
+				end
+			elseif self.status == 'REJECTED' then
+				if p.type == 'catch' then
+					res = {X.XpCall(p.handler, self.error)}
+				end
+			end
+			if res then
+				local bSuccess = res[1]
+				if bSuccess then
+					local szStatus, vData = res[2], res[3]
+					if szStatus == 'RESOLVED' then
+						self.result = vData
+						self.status = 'RESOLVED'
+					elseif szStatus == 'REJECTED' then
+						self.error = vData
+						self.status = 'REJECTED'
+					else
+						self.status = 'RESOLVED'
+					end
+				else
+					local szErrMsg, szTraceback = res[2], res[3]
+					self.error = X.Error(szErrMsg or '', szTraceback)
+					self.status = 'REJECTED'
+				end
+			end
+		end
+	end,
+	Then = function(self, onResolve)
+		table.insert(self.chains, {
+			type = 'then',
+			handler = onResolve,
+		})
+		self:Process()
+		return self
+	end,
+	Catch = function(self, onReject)
+		table.insert(self.chains, {
+			type = 'catch',
+			handler = onReject,
+		})
+		self:Process()
+		return self
+	end,
+})
+
+function X.Promise.Resolve(data)
+	return 'RESOLVED', data
+end
+
+function X.Promise.Reject(error)
+	return 'REJECTED', error
 end
 
 -----------------------------------------------
