@@ -665,9 +665,21 @@ function X.Class(className, super)
 	end
 	local freezed = false
 	local proxies = {
-		new = function(self, ...)
-			return self(...)
-		end,
+		new = function(classPrototype, ...)
+			local classInstance = setmetatable({}, {
+				__index = function(_, k)
+					if k == 'new' or k == 'constructor' then
+						return nil
+					end
+					return classPrototype[k]
+				end,
+				__tostring = function(t) return className .. ' (class instance)' end,
+			})
+			if classInstance.constructor then
+				classInstance:constructor(...)
+			end
+			return classInstance
+		end
 	}
 	if super then
 		proxies.super = super
@@ -681,14 +693,7 @@ function X.Class(className, super)
 				freezed = true
 				return classPrototype
 			end
-			local classInstance = setmetatable({}, {
-				__index = classPrototype,
-				__tostring = function(t) return className .. ' (class instance)' end,
-			})
-			if classInstance.constructor then
-				classInstance.constructor(classInstance, ...)
-			end
-			return classInstance
+			return classPrototype:new(...)
 		end,
 		__newindex = function(_, k, v)
 			assert(freezed == false, 'Class is freezed.')
@@ -818,7 +823,7 @@ function X.Promise:Process()
 				end
 			else
 				local szErrMsg, szTraceback = res[2], res[3]
-				self.error = X.Error(szErrMsg or '', szTraceback)
+				self.error = X.Error:new(szErrMsg or '', szTraceback)
 				self.status = 'REJECTED'
 			end
 		end
