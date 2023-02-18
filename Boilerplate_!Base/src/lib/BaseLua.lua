@@ -661,27 +661,25 @@ function X.Class(className, super)
 	if not className then
 		className = 'Unnamed Class'
 	end
-	return (function ()
-		local proxies = {}
-		if super then
-			proxies.super = super
-			setmetatable(proxies, { __index = super })
-		end
-		return setmetatable({}, {
-			__index = proxies,
-			__tostring = function(t) return className .. ' (class prototype)' end,
-			__call = function (classPrototype, ...)
-				local classInstance = setmetatable({}, {
-					__index = classPrototype,
-					__tostring = function(t) return className .. ' (class instance)' end,
-				})
-				if classInstance.constructor then
-					classInstance.constructor(classInstance, ...)
-				end
-				return classInstance
-			end,
-		})
-	end)()
+	local proxies = {}
+	if super then
+		proxies.super = super
+		setmetatable(proxies, { __index = super })
+	end
+	return setmetatable({}, {
+		__index = proxies,
+		__tostring = function(t) return className .. ' (class prototype)' end,
+		__call = function (classPrototype, ...)
+			local classInstance = setmetatable({}, {
+				__index = classPrototype,
+				__tostring = function(t) return className .. ' (class instance)' end,
+			})
+			if classInstance.constructor then
+				classInstance.constructor(classInstance, ...)
+			end
+			return classInstance
+		end,
+	})
 end
 
 -----------------------------------------------
