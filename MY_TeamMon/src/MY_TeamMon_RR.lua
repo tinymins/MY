@@ -592,23 +592,23 @@ function D.DownloadData(info, callback, aSilentType)
 		X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	DATA_DOWNLOADING[info.szKey] = true
-	X.DownloadFile(info.szDataURL, function(szPath)
-		DATA_DOWNLOADING[info.szKey] = nil
-		local data = X.LoadLUAData(szPath, LUA_CONFIG)
-			or X.LoadLUAData(szPath, { passphrase = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746', crc = true, compress = true })
-		if data then
-			local szFile = szUUID .. '.jx3dat'
-			X.SaveLUAData(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', info, LUA_CONFIG)
-			X.SaveLUAData(MY_TM_REMOTE_DATA_ROOT .. szFile, data, LUA_CONFIG)
-			D.LoadConfigureFile(szFile, info, aSilentType)
-		elseif not aSilentType then
-			X.Topmsg(_L('Decode %s failed!', info.szTitle))
-		end
-		X.SafeCall(callback, true)
-	end, function()
-		DATA_DOWNLOADING[info.szKey] = nil
-		X.SafeCall(callback, false)
-	end)
+	X.FetchLUAData(info.szDataURL, LUA_CONFIG)
+		:Then(function(data)
+			DATA_DOWNLOADING[info.szKey] = nil
+			if data then
+				local szFile = szUUID .. '.jx3dat'
+				X.SaveLUAData(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', info, LUA_CONFIG)
+				X.SaveLUAData(MY_TM_REMOTE_DATA_ROOT .. szFile, data, LUA_CONFIG)
+				D.LoadConfigureFile(szFile, info, aSilentType)
+			elseif not aSilentType then
+				X.Topmsg(_L('Decode %s failed!', info.szTitle))
+			end
+			X.SafeCall(callback, true)
+		end)
+		:Catch(function(error)
+			DATA_DOWNLOADING[info.szKey] = nil
+			X.SafeCall(callback, false)
+		end)
 end
 
 function D.ShareMetaInfoToRaid(info, bSure)
