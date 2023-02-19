@@ -515,6 +515,18 @@ end
 
 do
 local PENDING = {}
+local Downloader = X.Class('Downloader', {
+	constructor = function(self, promiseFunction, info)
+		self.info = info
+		self:super(promiseFunction)
+	end,
+	Progress = function(self, handler)
+		if X.IsFunction(handler) then
+			table.insert(self.info.progressHandlers, handler)
+		end
+		return self
+	end,
+}, X.Promise)
 function X.DownloadFile(szURL, szPath)
 	local szKey = X.NSFormatString('{$NS}#DownloadFile.') .. GetStringCRC(szURL) .. GetStringCRC(szPath)
 	local info = PENDING[szKey]
@@ -539,34 +551,17 @@ function X.DownloadFile(szURL, szPath)
 			end
 		end)
 	end
-	return {
-		info = info,
-		promise = X.Promise:new(function(resolve, reject)
-			info.promise
-				:Then(function(res)
-					X.Call(resolve, res)
-					return X.Promise.Resolve(res)
-				end)
-				:Catch(function(error)
-					X.Call(reject, error)
-					return X.Promise.Reject(error)
-				end)
-		end),
-		Progress = function(self, handler)
-			if X.IsFunction(handler) then
-				table.insert(info.progressHandlers, handler)
-			end
-			return self
-		end,
-		Then = function(self, ...)
-			self.promise:Then(...)
-			return self
-		end,
-		Catch = function(self, ...)
-			self.promise:Catch(...)
-			return self
-		end,
-	}
+	return Downloader:new(function(resolve, reject)
+		info.promise
+			:Then(function(res)
+				X.Call(resolve, res)
+				return X.Promise.Resolve(res)
+			end)
+			:Catch(function(error)
+				X.Call(reject, error)
+				return X.Promise.Reject(error)
+			end)
+	end, info)
 end
 
 RegisterEvent('CURL_PROGRESS_UPDATE', function()
