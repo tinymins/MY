@@ -663,21 +663,33 @@ function X.Class(className, classMembers, super)
 		className = 'Unnamed Class'
 	end
 	-- 初始化成员变量表
-	local classPrototypeProxy = {}
+	local classPrototypeProxy = setmetatable({}, { __index = super })
 	for k, v in pairs(classMembers) do
 		classPrototypeProxy[k] = v
 	end
 	-- 初始化父类、创建入口
 	classPrototypeProxy.super = super
 	classPrototypeProxy.new = function(classPrototype, ...)
+		local classInstanceProxy = setmetatable(
+			{
+				super = function(classInstance, ...)
+					if super.constructor then
+						super.constructor(classInstance, ...)
+					end
+				end,
+			},
+			{
+				__index = function(_, k)
+					if k == 'new' or k == 'constructor' then
+						return nil
+					end
+					return classPrototype[k]
+				end,
+			})
 		local classInstance = setmetatable({}, {
-			__index = function(_, k)
-				if k == 'new' or k == 'constructor' then
-					return nil
-				end
-				return classPrototype[k]
-			end,
+			__index = classInstanceProxy,
 			__tostring = function(t) return className .. ' (class instance)' end,
+			__metatable = true,
 		})
 		if classPrototype.constructor then
 			classPrototype.constructor(classInstance, ...)
@@ -686,7 +698,7 @@ function X.Class(className, classMembers, super)
 	end
 	-- 创建并返回类只读对象
 	return setmetatable({}, {
-		__index = setmetatable(classPrototypeProxy, { __index = super }),
+		__index = classPrototypeProxy,
 		__tostring = function(t) return className .. ' (class prototype)' end,
 		__call = function (classPrototype, ...)
 			return classPrototype:new(...)
