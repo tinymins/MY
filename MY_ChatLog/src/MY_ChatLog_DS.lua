@@ -462,7 +462,7 @@ function DS:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 	local tChannel = aChannel and X.FlipObjectKV(aChannel)
 	for _, rec in ipairs(self.aInsertQueueAnsi) do
 		if (not tChannel or tChannel[rec.szChannel])
-		and (X.StringFindW(rec.szText, szSearch) or X.StringFindW(rec.szTalker, szSearch)) then
+		and (szSearch == '' or X.StringFindW(rec.szText, szSearch) or X.StringFindW(rec.szTalker, szSearch)) then
 			nCount = nCount + 1
 		end
 	end
@@ -513,7 +513,7 @@ function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, b
 				break
 			end
 			if (not tChannel or tChannel[rec.szChannel])
-			and (X.StringFindW(rec.szText, szSearch) or X.StringFindW(rec.szTalker, szSearch)) then
+			and (szSearch == '' or X.StringFindW(rec.szText, szSearch) or X.StringFindW(rec.szTalker, szSearch)) then
 				if nOffset > 0 then
 					nOffset = nOffset - 1
 				else
