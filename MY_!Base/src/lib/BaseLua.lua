@@ -44,7 +44,7 @@ function X.Random(...)
 end
 
 -- 获取调用栈
----@param str string @调用栈附加字符串
+---@param str? string @调用栈附加字符串
 ---@return string @完整调用栈
 function X.GetTraceback(str)
 	local traceback = debug and debug.traceback and debug.traceback():gsub('^([^\n]+\n)[^\n]+\n', '%1')
@@ -652,36 +652,62 @@ end
 
 -- 创建类
 ---@param className string @类名
----@param super table @父类
+---@param classMembers table<string, any> @类成员函数对象
+---@param super? table @父类
 ---@return table @类
-function X.Class(className, super)
-	if type(super) == 'string' then
-		className, super = super, nil
+function X.Class(className, classMembers, super)
+	if X.IsTable(className) then
+		className, classMembers, super = nil, className, classMembers
 	end
 	if not className then
 		className = 'Unnamed Class'
 	end
-	return (function ()
-		local proxies = {}
-		if super then
-			proxies.super = super
-			setmetatable(proxies, { __index = super })
-		end
-		return setmetatable({}, {
-			__index = proxies,
-			__tostring = function(t) return className .. ' (class prototype)' end,
-			__call = function (classPrototype, ...)
-				local classInstance = setmetatable({}, {
-					__index = classPrototype,
-					__tostring = function(t) return className .. ' (class instance)' end,
-				})
-				if classInstance.constructor then
-					classInstance.constructor(classInstance, ...)
-				end
-				return classInstance
-			end,
+	-- 初始化成员变量表
+	local classPrototypeProxy = setmetatable({}, { __index = super })
+	for k, v in pairs(classMembers) do
+		classPrototypeProxy[k] = v
+	end
+	-- 初始化父类、创建入口
+	classPrototypeProxy.super = super
+	classPrototypeProxy.new = function(classPrototype, ...)
+		local classInstanceProxy = setmetatable(
+			{
+				super = function(classInstance, ...)
+					if super.constructor then
+						super.constructor(classInstance, ...)
+					end
+				end,
+			},
+			{
+				__index = function(_, k)
+					if k == 'new' or k == 'constructor' then
+						return nil
+					end
+					return classPrototype[k]
+				end,
+			})
+		local classInstance = setmetatable({}, {
+			__index = classInstanceProxy,
+			__tostring = function(t) return className .. ' (class instance)' end,
+			__metatable = true,
 		})
-	end)()
+		if classPrototype.constructor then
+			classPrototype.constructor(classInstance, ...)
+		end
+		return classInstance
+	end
+	-- 创建并返回类只读对象
+	return setmetatable({}, {
+		__index = classPrototypeProxy,
+		__tostring = function(t) return className .. ' (class prototype)' end,
+		__call = function (classPrototype, ...)
+			return classPrototype:new(...)
+		end,
+		__newindex = function()
+			assert(false, 'Class Prototype is readonly.')
+		end,
+		__metatable = true,
+	})
 end
 
 -----------------------------------------------
@@ -695,7 +721,7 @@ X.Error = X.Class('Error', {
 	constructor = function(self, message, traceback)
 		self.message = tostring(message)
 		self.traceback = traceback or X.GetTraceback()
-	end,
+	end
 })
 
 -----------------------------------------------
@@ -706,6 +732,16 @@ X.Error = X.Class('Error', {
 ---@param func fun(resolve: fun(result: any), reject: fun(error: Error)) @异步承诺函数主体
 ---@return table @承诺对象
 X.Promise = X.Class('Promise', {
+	-- 类静态函数
+	Resolve = function(data)
+		return 'RESOLVED', data
+	end,
+
+	Reject = function(error)
+		return 'REJECTED', error
+	end,
+
+	-- 构造函数
 	constructor = function(self, task, ...)
 		self.ctor = function() end
 		self.chains = {}
@@ -728,6 +764,26 @@ X.Promise = X.Class('Promise', {
 		end
 		task(onResolve, onReject)
 	end,
+
+	-- 实例成员函数
+	Then = function(self, onResolve)
+		table.insert(self.chains, {
+			type = 'then',
+			handler = onResolve,
+		})
+		self:Process()
+		return self
+	end,
+
+	Catch = function(self, onReject)
+		table.insert(self.chains, {
+			type = 'catch',
+			handler = onReject,
+		})
+		self:Process()
+		return self
+	end,
+
 	Process = function(self)
 		if self.status == 'PENDING' then
 			return
@@ -762,37 +818,13 @@ X.Promise = X.Class('Promise', {
 					end
 				else
 					local szErrMsg, szTraceback = res[2], res[3]
-					self.error = X.Error(szErrMsg or '', szTraceback)
+					self.error = X.Error:new(szErrMsg or '', szTraceback)
 					self.status = 'REJECTED'
 				end
 			end
 		end
 	end,
-	Then = function(self, onResolve)
-		table.insert(self.chains, {
-			type = 'then',
-			handler = onResolve,
-		})
-		self:Process()
-		return self
-	end,
-	Catch = function(self, onReject)
-		table.insert(self.chains, {
-			type = 'catch',
-			handler = onReject,
-		})
-		self:Process()
-		return self
-	end,
 })
-
-function X.Promise.Resolve(data)
-	return 'RESOLVED', data
-end
-
-function X.Promise.Reject(error)
-	return 'REJECTED', error
-end
 
 -----------------------------------------------
 -- 安全调用

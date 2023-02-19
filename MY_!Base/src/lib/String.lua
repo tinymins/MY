@@ -380,11 +380,11 @@ function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgno
 			for _, info in ipairs(tKeyWords) do      -- 符合一个即可
 				-- szKeyword = X.EscapeString(szKeyword) -- 用了wstring还Escape个捷豹
 				if info.bNegative then               -- !小铁被吃了
-					if not X.StringFindW(szText, info.szKeyword) then
+					if info.szKeyword ~= '' and not X.StringFindW(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				else                                                    -- 十人   -- 10
-					if X.StringFindW(szText, info.szKeyword) then
+					if info.szKeyword ~= '' and X.StringFindW(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				end

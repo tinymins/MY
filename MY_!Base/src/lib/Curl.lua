@@ -458,7 +458,7 @@ function X.Ajax(settings)
 		end
 	else -- if driver == 'origin' then
 		local szKey = GetTickCount() * 100
-		while CALL_AJAX['__addon_' .. AJAX_TAG .. szKey] do
+		while CALL_AJAX[AJAX_TAG .. szKey] do
 			szKey = szKey + 1
 		end
 		szKey = AJAX_TAG .. szKey
@@ -513,16 +513,95 @@ end
 X.RegisterEvent('CURL_REQUEST_RESULT', 'AJAX', OnCurlRequestResult)
 end
 
-function X.FetchLUAData(szPath, tOptions)
-	return X.Promise(function(resolve, reject)
-		local downloader = X.UI.GetTempElement(X.NSFormatString('Image.{$NS}#DownloadLUAData-') .. GetStringCRC(szPath) .. '#' .. GetTime())
+do
+local PENDING = {}
+local Downloader = X.Class('Downloader', {
+	constructor = function(self, promiseFunction, info)
+		self.info = info
+		self:super(promiseFunction)
+	end,
+	Progress = function(self, handler)
+		if X.IsFunction(handler) then
+			table.insert(self.info.progressHandlers, handler)
+		end
+		return self
+	end,
+}, X.Promise)
+function X.DownloadFile(szURL, szPath)
+	local szKey = X.NSFormatString('{$NS}#DownloadFile.') .. GetStringCRC(szURL) .. GetStringCRC(szPath)
+	local info = PENDING[szKey]
+	if not info then
+		info = {
+			keys = { szKey, '__addon_' .. szKey },
+			progressHandlers = {},
+		}
+		for _, k in ipairs(info.keys) do
+			PENDING[k] = info
+		end
+		info.promise = X.Promise:new(function(resolve, reject)
+			if CURL_DownloadFile then
+				info.resolve = resolve
+				info.reject = reject
+				CURL_DownloadFile(szKey, szURL, szPath, szURL:lower():find('^https://') and true or false, 5)
+			else
+				for _, k in ipairs(info.keys) do
+					PENDING[k] = nil
+				end
+				reject(X.Error:new('Global function CURL_DownloadFile not exists!'))
+			end
+		end)
+	end
+	return Downloader:new(function(resolve, reject)
+		info.promise
+			:Then(function(res)
+				X.Call(resolve, res)
+				return X.Promise.Resolve(res)
+			end)
+			:Catch(function(error)
+				X.Call(reject, error)
+				return X.Promise.Reject(error)
+			end)
+	end, info)
+end
+
+RegisterEvent('CURL_PROGRESS_UPDATE', function()
+	local szKey, nTotal, nAlready = arg0, arg1, arg2
+	local info = PENDING[szKey]
+	if not info then
+		return
+	end
+	for _, f in ipairs(info.progressHandlers) do
+		X.Call(f, nTotal, nAlready)
+	end
+end)
+
+RegisterEvent('CURL_DOWNLOAD_RESULT', function()
+	local szKey, bSuccess = arg0, arg1
+	local info = PENDING[szKey]
+	if not info then
+		return
+	end
+	for _, k in ipairs(info.keys) do
+		PENDING[k] = nil
+	end
+	if bSuccess then
+		info.resolve()
+	else
+		info.reject(X.Error:new('CURL_DOWNLOAD_RESULT failed!'))
+	end
+end)
+end
+
+function X.FetchLUAData(szURL, tOptions)
+	return X.Promise:new(function(resolve, reject)
+		local downloader = X.UI.GetTempElement(X.NSFormatString('Image.{$NS}#DownloadLUAData-') .. GetStringCRC(szURL) .. '#' .. GetTime())
 		downloader.FromTextureFile = function(_, szPath)
 			local data = X.LoadLUAData(szPath, tOptions)
 			resolve(data)
 		end
-		downloader:FromRemoteFile(szPath, false, function(image, szURL, szAbsPath, bSuccess)
+		downloader:FromRemoteFile(szURL, false, function(image, szImageURL, szAbsPath, bSuccess)
 			if not bSuccess then
-				reject(X.Error('FetchLUAData failed.'))
+				reject(X.Error:new('FetchLUAData failed.'))
 			end
 			downloader:GetParent():RemoveItem(downloader)
 		end)
