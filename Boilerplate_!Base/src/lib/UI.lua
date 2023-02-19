@@ -2938,7 +2938,7 @@ function OO:Autocomplete(method, arg1, arg2)
 						if opt.ignoreCase then
 							haystack = StringLowerW(haystack)
 						end
-						local pos = X.StringFindW(haystack, needle)
+						local pos = needle == '' and 1 or X.StringFindW(haystack, needle)
 						if pos and pos > 0 and not opt.anyMatch then
 							pos = nil
 						end
@@ -2946,7 +2946,7 @@ function OO:Autocomplete(method, arg1, arg2)
 							local aPinyin, aPinyinConsonant = X.Han2Pinyin(haystack)
 							if not pos then
 								for _, s in ipairs(aPinyin) do
-									pos = X.StringFindW(s, needle)
+									pos = needle == '' and 1 or X.StringFindW(s, needle)
 									if pos and pos > 0 and not opt.anyMatch then
 										pos = nil
 									end
@@ -2957,7 +2957,7 @@ function OO:Autocomplete(method, arg1, arg2)
 							end
 							if not pos then
 								for _, s in ipairs(aPinyinConsonant) do
-									pos = X.StringFindW(s, needle)
+									pos = needle == '' and 1 or X.StringFindW(s, needle)
 									if pos and pos > 0 and not opt.anyMatch then
 										pos = nil
 									end
