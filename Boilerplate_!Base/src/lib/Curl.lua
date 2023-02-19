@@ -519,7 +519,10 @@ function X.DownloadFile(szURL, szPath)
 	local szKey = X.NSFormatString('{$NS}#DownloadFile.') .. GetStringCRC(szURL) .. GetStringCRC(szPath)
 	local info = PENDING[szKey]
 	if not info then
-		info = { keys = { szKey, '__addon_' .. szKey } }
+		info = {
+			keys = { szKey, '__addon_' .. szKey },
+			progressHandlers = {},
+		}
 		for _, k in ipairs(info.keys) do
 			PENDING[k] = info
 		end
@@ -536,18 +539,46 @@ function X.DownloadFile(szURL, szPath)
 			end
 		end)
 	end
-	return X.Promise:new(function(resolve, reject)
-		info.promise
-			:Then(function(res)
-				X.Call(resolve, res)
-				return X.Promise.Resolve(res)
-			end)
-			:Catch(function(error)
-				X.Call(reject, error)
-				return X.Promise.Reject(error)
-			end)
-	end)
+	return {
+		info = info,
+		promise = X.Promise:new(function(resolve, reject)
+			info.promise
+				:Then(function(res)
+					X.Call(resolve, res)
+					return X.Promise.Resolve(res)
+				end)
+				:Catch(function(error)
+					X.Call(reject, error)
+					return X.Promise.Reject(error)
+				end)
+		end),
+		Progress = function(self, handler)
+			if X.IsFunction(handler) then
+				table.insert(info.progressHandlers, handler)
+			end
+			return self
+		end,
+		Then = function(self, ...)
+			self.promise:Then(...)
+			return self
+		end,
+		Catch = function(self, ...)
+			self.promise:Catch(...)
+			return self
+		end,
+	}
 end
+
+RegisterEvent('CURL_PROGRESS_UPDATE', function()
+	local szKey, nTotal, nAlready = arg0, arg1, arg2
+	local info = PENDING[szKey]
+	if not info then
+		return
+	end
+	for _, f in ipairs(info.progressHandlers) do
+		X.Call(f, nTotal, nAlready)
+	end
+end)
 
 RegisterEvent('CURL_DOWNLOAD_RESULT', function()
 	local szKey, bSuccess = arg0, arg1
