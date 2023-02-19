@@ -458,7 +458,7 @@ function X.Ajax(settings)
 		end
 	else -- if driver == 'origin' then
 		local szKey = GetTickCount() * 100
-		while CALL_AJAX['__addon_' .. AJAX_TAG .. szKey] do
+		while CALL_AJAX[AJAX_TAG .. szKey] do
 			szKey = szKey + 1
 		end
 		szKey = AJAX_TAG .. szKey
