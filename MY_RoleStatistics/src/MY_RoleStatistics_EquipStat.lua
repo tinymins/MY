@@ -393,7 +393,7 @@ function D.FlushDB()
 					tabsubindex = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
 					stacknum = KItem.bCanStack and KItem.nStackNum or 1
 					uiid = KItem.nUiId
-					strength = KItem.nStrengthLevel
+					strength = X.GetItemStrengthLevel(KItem, me)
 					durability = KItem.nCurrentDurability
 					diamond_enchant = AnsiToUTF8(X.EncodeJSON(aDiamondEnchant)) -- 五行石
 					fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and KItem.GetMountFEAEnchantID() or 0 -- 五彩石
