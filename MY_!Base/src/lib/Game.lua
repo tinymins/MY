@@ -4153,6 +4153,28 @@ function X.IsItemFitKungfu(itemInfo, ...)
 end
 end
 
+-- 获取物品精炼等级
+---@param KItem string @物品对象
+---@param KPlayer string @物品所属角色
+---@return number, number, number @[有效精炼等级, 物品精炼等级, 装备栏精炼等级]
+function X.GetItemStrengthLevel(KItem, KPlayer)
+	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+		if not KPlayer then
+			KPlayer = X.GetClientPlayer()
+		end
+		local dwPackage, dwBox = X.GetItemEquipPos(KItem)
+		if dwPackage == INVENTORY_INDEX.EQUIP and KPlayer.GetEquipBoxStrength then
+			local KItemInfo = GetItemInfo(KItem.dwTabType, KItem.dwIndex)
+			local nMaxStrengthLevel = KItemInfo.nMaxStrengthLevel
+			local nBoxStrengthLevel = KPlayer.GetEquipBoxStrength(dwBox)
+			local nItemStrengthLevel = KItem.nStrengthLevel
+			local nStrengthLevel = math.min(math.max(nItemStrengthLevel, nBoxStrengthLevel), nMaxStrengthLevel)
+			return nStrengthLevel, nItemStrengthLevel, nBoxStrengthLevel
+		end
+	end
+	return KItem.nStrengthLevel, KItem.nStrengthLevel, 0
+end
+
 -- * 获取物品对应身上装备的位置
 function X.GetItemEquipPos(item, nIndex)
 	if not nIndex then
@@ -4591,7 +4613,7 @@ do
 				tEquipInfo[nItemIndex] = {
 					dwTabType = item.dwTabType,
 					dwTabIndex = item.dwIndex,
-					nStrengthLevel = item.nStrengthLevel,
+					nStrengthLevel = X.GetItemStrengthLevel(item, player),
 					aSlotItem = aSlotItem,
 					dwPermanentEnchantID = item.dwPermanentEnchantID,
 					dwTemporaryEnchantID = item.dwTemporaryEnchantID,
