@@ -4696,7 +4696,7 @@ do
 			end
 		end
 		if X.IsEmpty(aTalent) then
-			PeekPlayer(dwID)
+			PeekPlayer(player.dwID)
 			return
 		end
 		for _, fnAction in ipairs(PEEK_PLAYER_TALENT_CALLBACK[player.dwID]) do
@@ -4739,13 +4739,110 @@ do
 		-- 发送请求
 		PEEK_PLAYER_TALENT_STATE[dwID] = 'PENDING'
 		if not EVENT_KEY then
-			EVENT_KEY = X.RegisterEvent('ON_UPDATE_TALENT', X.NSFormatString('{$NS}#GetPlayerEquipInfo'), function()
+			EVENT_KEY = X.RegisterEvent('ON_UPDATE_TALENT', X.NSFormatString('{$NS}#GetPlayerTalentInfo'), function()
 				local dwID = arg0
 				local player = X.GetPlayer(dwID)
 				if player then
 					PEEK_PLAYER_TALENT_STATE[dwID] = 'SUCCESS'
 					OnGetPlayerTalnetInfoPeekPlayer(player)
 				end
+			end)
+		end
+		PeekPlayer(dwID)
+	end
+end
+
+do
+	local function PeekPlayer(dwID)
+		X.SafeCall(ViewOtherZhenPaiSkill, dwID, true)
+		X.SafeCall(Wnd.CloseWindow, 'ZhenPaiSkill')
+	end
+	local EVENT_KEY = nil
+	local PEEK_PLAYER_ZHEN_PAI_STATE = {}
+	local PEEK_PLAYER_ZHEN_PAI_CALLBACK = {}
+	local PEEK_PLAYER_ZHEN_PAI_CACHE = {}
+	local function OnGetPlayerTalnetInfoPeekPlayer(player)
+		if not PEEK_PLAYER_ZHEN_PAI_CALLBACK[player.dwID] then
+			return
+		end
+		local tZhenPaiInfo = X.Clone(PEEK_PLAYER_ZHEN_PAI_CACHE[player.dwID])
+		if not tZhenPaiInfo then
+			PeekPlayer(player.dwID)
+			return
+		end
+		for _, fnAction in ipairs(PEEK_PLAYER_ZHEN_PAI_CALLBACK[player.dwID]) do
+			X.SafeCall(fnAction, tZhenPaiInfo, player.dwID)
+		end
+		PEEK_PLAYER_ZHEN_PAI_CALLBACK[player.dwID] = nil
+	end
+
+	-- 获取玩家镇派信息
+	-- X.GetPlayerZhenPaiInfo(dwID, fnAction)
+	-- X.GetPlayerZhenPaiInfo(dwID, bForcePeek, fnAction)
+	-- @param dwID 玩家ID
+	-- @param bForcePeek 是否强制拉取
+	-- @param fnAction 回调函数
+	function X.GetPlayerZhenPaiInfo(dwID, bForcePeek, fnAction)
+		-- 函数重载
+		if X.IsFunction(bForcePeek) then
+			fnAction, bForcePeek = bForcePeek, nil
+		end
+		-- 支持性兼容
+		if not X.CONSTANT.ZHEN_PAI then
+			fnAction({})
+			return
+		end
+		-- 加入回调
+		if not PEEK_PLAYER_ZHEN_PAI_CALLBACK[dwID] then
+			PEEK_PLAYER_ZHEN_PAI_CALLBACK[dwID] = {}
+		end
+		table.insert(PEEK_PLAYER_ZHEN_PAI_CALLBACK[dwID], fnAction)
+		-- 自身判定
+		if dwID == X.GetClientPlayerID() then
+			local tTalentSkillLevel = {}
+			local tar = X.GetPlayer(dwID)
+			if tar then
+				local aKungfuTalent = X.CONSTANT.ZHEN_PAI[tar.dwForceID]
+				local nTalentSetID = tar.GetTalentSetID()
+				if aKungfuTalent and nTalentSetID then
+					for nKungfuIndex, aKungfuSubTalent in ipairs(aKungfuTalent) do
+						for nKungfuSubIndex, aTalentSkillID in ipairs(aKungfuSubTalent) do
+							for nSkillIndex, dwTalentSkillID in ipairs(aTalentSkillID) do
+								if dwTalentSkillID ~= 0 then
+									tTalentSkillLevel[dwTalentSkillID] = tar.GetTalentSkillLevel(nTalentSetID, dwTalentSkillID)
+								end
+							end
+						end
+					end
+				end
+			end
+			PEEK_PLAYER_ZHEN_PAI_CACHE[dwID] = tTalentSkillLevel
+			OnGetPlayerTalnetInfoPeekPlayer(X.GetClientPlayer())
+			return
+		end
+		-- 缓存判定
+		local player = X.GetPlayer(dwID)
+		if player and PEEK_PLAYER_ZHEN_PAI_STATE[dwID] == 'SUCCESS' and not bForcePeek then
+			OnGetPlayerTalnetInfoPeekPlayer(player)
+			return
+		end
+		-- 防抖限制
+		if PEEK_PLAYER_ZHEN_PAI_STATE[dwID] == 'PENDING' and not bForcePeek then
+			return
+		end
+		-- 发送请求
+		PEEK_PLAYER_ZHEN_PAI_STATE[dwID] = 'PENDING'
+		if not EVENT_KEY then
+			EVENT_KEY = X.RegisterEvent('ON_GET_SKILL_LEVEL_RESULT', X.NSFormatString('{$NS}#GetPlayerZhenPaiInfo'), function()
+				local dwID = arg0
+				local t = arg1 or {}
+				local tSkillLevel = {}
+				for k, v in pairs(t) do
+					tSkillLevel[k] = v
+				end
+				PEEK_PLAYER_ZHEN_PAI_STATE[dwID] = 'SUCCESS'
+				PEEK_PLAYER_ZHEN_PAI_CACHE[dwID] = tSkillLevel
+				OnGetPlayerTalnetInfoPeekPlayer(player)
 			end)
 		end
 		PeekPlayer(dwID)
