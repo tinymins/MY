@@ -410,7 +410,7 @@ function D.ItemToData(KItem, szBagType)
 		local aDiamondEnchant = {}
 		if KItem.nGenre == ITEM_GENRE.EQUIPMENT then
 			for i = 1, KItem.GetSlotCount() do
-				aDiamondEnchant[i] = KItem.GetMountDiamondEnchantID(i)
+				aDiamondEnchant[i] = X.GetItemMountDiamondEnchantID(KItem, i - 1)
 			end
 		end
 		if szBagType == 'BANK' then
