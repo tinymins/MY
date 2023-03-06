@@ -385,7 +385,7 @@ function D.FlushDB()
 				if KItem then
 					local aDiamondEnchant = {}
 					for i = 1, KItem.GetSlotCount() do
-						aDiamondEnchant[i] = KItem.GetMountDiamondEnchantID(i)
+						aDiamondEnchant[i] = X.GetItemMountDiamondEnchantID(KItem, i - 1)
 					end
 					itemid = KItem.dwID
 					tabtype = KItem.dwTabType
