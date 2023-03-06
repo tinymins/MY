@@ -374,9 +374,9 @@ function D.OnTargetUpdate(dwID, bForce)
 			end
 		end
 		local szGUID = X.GetPlayerGUID(dwID) or ''
-		local aEquip, nEquipScore, aTalent
+		local aEquip, nEquipScore, aTalent, tZhenPai
 		local function OnGet()
-			D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip, aTalent, szGUID })
+			D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip, aTalent, szGUID, tZhenPai })
 		end
 		X.GetPlayerEquipScore(dwID, function(nScore)
 			nEquipScore = nScore
@@ -396,6 +396,7 @@ function D.OnTargetUpdate(dwID, bForce)
 					tEquipInfo.dwTemporaryEnchantLeftSeconds,
 				})
 			end
+			OnGet()
 		end)
 		X.GetPlayerTalentInfo(dwID, function(a)
 			aTalent = {}
@@ -405,6 +406,15 @@ function D.OnTargetUpdate(dwID, bForce)
 					p.dwSkillID,
 					p.dwSkillLevel,
 				}
+			end
+			OnGet()
+		end)
+		X.GetPlayerZhenPaiInfo(dwID, function(a)
+			tZhenPai = {}
+			for k, p in pairs(a) do
+				if p ~= 0 then
+					tZhenPai[k] = p
+				end
 			end
 			OnGet()
 		end)
