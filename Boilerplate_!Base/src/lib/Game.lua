@@ -4154,8 +4154,8 @@ end
 end
 
 -- 获取物品精炼等级
----@param KItem string @物品对象
----@param KPlayer string @物品所属角色
+---@param KItem userdata @物品对象
+---@param KPlayer userdata @物品所属角色
 ---@return number, number, number @[有效精炼等级, 物品精炼等级, 装备栏精炼等级]
 function X.GetItemStrengthLevel(KItem, KPlayer)
 	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
@@ -4173,6 +4173,28 @@ function X.GetItemStrengthLevel(KItem, KPlayer)
 		end
 	end
 	return KItem.nStrengthLevel, KItem.nStrengthLevel, 0
+end
+
+-- 获取物品熔嵌孔镶嵌信息
+---@param KItem userdata @物品对象
+---@param nSlotIndex string @熔嵌孔下标
+---@param KPlayer userdata @物品所属角色
+---@return number, number, number @[有效熔嵌孔五行石ID, 物品熔嵌孔五行石ID, 装备栏熔嵌孔五行石ID]
+function X.GetItemMountDiamondEnchantID(KItem, nSlotIndex, KPlayer)
+	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+		if not KPlayer then
+			KPlayer = X.GetClientPlayer()
+		end
+		local dwPackage, dwBox = X.GetItemEquipPos(KItem)
+		if dwPackage == INVENTORY_INDEX.EQUIP and KPlayer.GetEquipBoxMountDiamondEnchantID then
+			local dwBoxEnchantID, nBoxQuality = KPlayer.GetEquipBoxMountDiamondEnchantID(dwBox, nSlotIndex)
+            local dwItemEnchantID = KItem.GetMountDiamondEnchantID(nSlotIndex)
+            local dwEnchantID = KItem.GetAdaptedDiamondEnchantID(nSlotIndex, KItem.nLevel, dwBoxEnchantID)
+			return dwEnchantID, dwItemEnchantID, dwBoxEnchantID
+		end
+	end
+	local dwItemEnchantID = KItem.GetMountDiamondEnchantID(nSlotIndex)
+	return dwItemEnchantID, dwItemEnchantID, 0
 end
 
 -- * 获取物品对应身上装备的位置
