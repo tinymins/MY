@@ -1975,6 +1975,7 @@ function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 		end
 	end
 	FireUIEvent('MY_TM_CREATE_CACHE')
+	FireUIEvent('MY_TM_DATA_MODIFY')
 	FireUIEvent('MY_TM_DATA_RELOAD')
 	FireUIEvent('MY_TMUI_DATA_RELOAD')
 	-- szFilePath, aType, szMode, tMeta
@@ -2150,35 +2151,32 @@ end
 -- 删除 移动 添加 清空
 function D.RemoveData(szType, dwMapID, nIndex)
 	if nIndex then
-		if D.FILE[szType][dwMapID] and D.FILE[szType][dwMapID][nIndex] then
-			if dwMapID == MY_TM_SPECIAL_MAP.RECYCLE_BIN then
-				table.remove(D.FILE[szType][dwMapID], nIndex)
-				if #D.FILE[szType][dwMapID] == 0 then
-					D.FILE[szType][dwMapID] = nil
-				end
-				FireUIEvent('MY_TM_CREATE_CACHE')
-				FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
-				FireUIEvent('MY_TMUI_DATA_RELOAD')
-			else
-				D.MoveData(szType, dwMapID, nIndex, MY_TM_SPECIAL_MAP.RECYCLE_BIN)
+		if not D.FILE[szType][dwMapID] or not D.FILE[szType][dwMapID][nIndex] then
+			return
+		end
+		if dwMapID == MY_TM_SPECIAL_MAP.RECYCLE_BIN then
+			table.remove(D.FILE[szType][dwMapID], nIndex)
+			if #D.FILE[szType][dwMapID] == 0 then
+				D.FILE[szType][dwMapID] = nil
 			end
+			return
 		end
+		D.MoveData(szType, dwMapID, nIndex, MY_TM_SPECIAL_MAP.RECYCLE_BIN)
 	elseif dwMapID then
-		if D.FILE[szType][dwMapID] then
-			D.FILE[szType][dwMapID] = nil
-			FireUIEvent('MY_TM_CREATE_CACHE')
-			FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
-			FireUIEvent('MY_TMUI_DATA_RELOAD')
+		if not D.FILE[szType][dwMapID] then
+			return
 		end
+		D.FILE[szType][dwMapID] = nil
 	else
-		if D.FILE[szType] then
-			D.FILE[szType] = {}
-			FireUIEvent('MY_TM_CREATE_CACHE')
-			FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
-			FireUIEvent('MY_TMUI_DATA_RELOAD')
+		if not D.FILE[szType] then
+			return
 		end
+		D.FILE[szType] = {}
 	end
+	FireUIEvent('MY_TM_CREATE_CACHE')
+	FireUIEvent('MY_TM_DATA_MODIFY')
 	FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
+	FireUIEvent('MY_TMUI_DATA_RELOAD')
 end
 
 function D.CheckSameData(szType, dwMapID, dwID, nLevel)
@@ -2203,50 +2201,57 @@ function D.MoveData(szType, dwMapID, nIndex, dwTargetMapID, bCopy)
 	if dwMapID == dwTargetMapID then
 		return
 	end
-	if D.FILE[szType][dwMapID] and D.FILE[szType][dwMapID][nIndex] then
-		local data = D.FILE[szType][dwMapID][nIndex]
-		if D.CheckSameData(szType, dwTargetMapID, data.dwID or data.szContent, data.nLevel or data.szTarget) then
-			return X.Alert(_L['Same data exist'])
-		end
-		D.FILE[szType][dwTargetMapID] = D.FILE[szType][dwTargetMapID] or {}
-		table.insert(D.FILE[szType][dwTargetMapID], clone(D.FILE[szType][dwMapID][nIndex]))
-		if not bCopy then
-			table.remove(D.FILE[szType][dwMapID], nIndex)
-			if #D.FILE[szType][dwMapID] == 0 then
-				D.FILE[szType][dwMapID] = nil
-			end
-		end
-		FireUIEvent('MY_TM_CREATE_CACHE')
-		FireUIEvent('MY_TMUI_DATA_RELOAD')
-		FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
+	if not D.FILE[szType][dwMapID] or not D.FILE[szType][dwMapID][nIndex] then
+		return
 	end
+	local data = D.FILE[szType][dwMapID][nIndex]
+	if D.CheckSameData(szType, dwTargetMapID, data.dwID or data.szContent, data.nLevel or data.szTarget) then
+		return X.Alert(_L['Same data exist'])
+	end
+	D.FILE[szType][dwTargetMapID] = D.FILE[szType][dwTargetMapID] or {}
+	table.insert(D.FILE[szType][dwTargetMapID], clone(D.FILE[szType][dwMapID][nIndex]))
+	if not bCopy then
+		table.remove(D.FILE[szType][dwMapID], nIndex)
+		if #D.FILE[szType][dwMapID] == 0 then
+			D.FILE[szType][dwMapID] = nil
+		end
+	end
+	FireUIEvent('MY_TM_CREATE_CACHE')
+	FireUIEvent('MY_TM_DATA_MODIFY')
+	FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
+	FireUIEvent('MY_TMUI_DATA_RELOAD')
 end
+
 -- 交换 其实没用 满足强迫症
 function D.Exchange(szType, dwMapID, nIndex1, nIndex2)
 	if nIndex1 == nIndex2 then
 		return
 	end
-	if D.FILE[szType][dwMapID] then
-		local data1 = D.FILE[szType][dwMapID][nIndex1]
-		local data2 = D.FILE[szType][dwMapID][nIndex2]
-		if data1 and data2 then
-			-- local data = table.remove(D.FILE[szType][dwMapID], nIndex1)
-			-- table.insert(D.FILE[szType][dwMapID], nIndex2 + 1, data)
-			D.FILE[szType][dwMapID][nIndex1] = data2
-			D.FILE[szType][dwMapID][nIndex2] = data1
-			FireUIEvent('MY_TM_CREATE_CACHE')
-			FireUIEvent('MY_TMUI_DATA_RELOAD')
-			FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
-		end
+	if not D.FILE[szType][dwMapID] then
+		return
 	end
+	local data1 = D.FILE[szType][dwMapID][nIndex1]
+	local data2 = D.FILE[szType][dwMapID][nIndex2]
+	if not data1 or not data2 then
+		return
+	end
+	-- local data = table.remove(D.FILE[szType][dwMapID], nIndex1)
+	-- table.insert(D.FILE[szType][dwMapID], nIndex2 + 1, data)
+	D.FILE[szType][dwMapID][nIndex1] = data2
+	D.FILE[szType][dwMapID][nIndex2] = data1
+	FireUIEvent('MY_TM_CREATE_CACHE')
+	FireUIEvent('MY_TM_DATA_MODIFY')
+	FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
+	FireUIEvent('MY_TMUI_DATA_RELOAD')
 end
 
 function D.AddData(szType, dwMapID, data)
 	D.FILE[szType][dwMapID] = D.FILE[szType][dwMapID] or {}
 	table.insert(D.FILE[szType][dwMapID], data)
 	FireUIEvent('MY_TM_CREATE_CACHE')
-	FireUIEvent('MY_TMUI_DATA_RELOAD')
+	FireUIEvent('MY_TM_DATA_MODIFY')
 	FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
+	FireUIEvent('MY_TMUI_DATA_RELOAD')
 	return D.FILE[szType][dwMapID][#D.FILE[szType][dwMapID]]
 end
 

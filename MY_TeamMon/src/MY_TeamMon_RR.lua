@@ -469,18 +469,15 @@ end
 
 function D.CheckUpdate()
 	local szLastURL = MY_TeamMon.GetUserConfig('RR.LastURL')
-	if X.IsEmpty(szLastURL) then
+	local bDataNotModified = MY_TeamMon.GetUserConfig('RR.DataNotModified')
+	if X.IsEmpty(szLastURL) or not bDataNotModified then
 		return
 	end
 	local aType = MY_TeamMon.GetUserConfig('RR.LastType')
-	local szLastCRC = MY_TeamMon.GetUserConfig('RR.LastCRC')
-	if X.IsEmpty(aType) or not X.IsTable(aType) or X.IsEmpty(szLastCRC) then
+	if X.IsEmpty(aType) or not X.IsTable(aType) then
 		return
 	end
 	D.GetDataCRC(aType, function(szCRC)
-		if szCRC ~= szLastCRC then
-			return
-		end
 		local function ParseVersion(szVersion)
 			if X.IsString(szVersion) then
 				local nPos = X.StringFindW(szVersion, '.')
@@ -551,12 +548,10 @@ function D.LoadConfigureFile(szFile, info, aSilentType)
 			if not aSilentType and me.IsInParty() then
 				MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
 			end
-			D.GetDataCRC(aType, function(szCRC)
-				MY_TeamMon.SetUserConfig('RR.LastVersion', info.szVersion)
-				MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
-				MY_TeamMon.SetUserConfig('RR.LastType', aType)
-				MY_TeamMon.SetUserConfig('RR.LastCRC', szCRC)
-			end)
+			MY_TeamMon.SetUserConfig('RR.LastVersion', info.szVersion)
+			MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
+			MY_TeamMon.SetUserConfig('RR.LastType', aType)
+			MY_TeamMon.SetUserConfig('RR.DataNotModified', true)
 			FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
 		end
 	end
@@ -1025,6 +1020,10 @@ X.RegisterEvent('LOADING_END', 'MY_TeamMon_RR', function()
 	end
 	D.CheckUpdate()
 	X.RegisterEvent('LOADING_END', 'MY_TeamMon_RR', false)
+end)
+
+X.RegisterEvent('MY_TM_DATA_MODIFY', 'MY_TeamMon_RR', function()
+	D.SetUserConfig('RR.DataNotModified', false)
 end)
 
 -- Global exports

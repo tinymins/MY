@@ -245,6 +245,7 @@ function D.RefreshTable(frame, szRefresh)
 		D.UpdateRList()
 	end
 end
+
 -- 用于刷新滚动条 来刷新内容
 function D.RefreshScroll(szRefresh)
 	local frame = D.GetFrame()
@@ -1438,6 +1439,7 @@ function D.OpenAddPanel(szType, data)
 		end,
 	})
 end
+
 -- 数据调试面板
 function D.OpenJsonPanel(data, fnAction)
 	local ui = X.UI.CreateFrame('MY_TeamMon_JsonPanel', { w = 720,h = 500, text = _L['MY_TeamMon DEBUG Panel'], close = true })
@@ -1498,6 +1500,7 @@ function D.OpenSettingPanel(data, szType)
 				bChecked = type(data.nScrutinyType) == 'nil',
 				fnAction = function()
 					data.nScrutinyType = nil
+					FireUIEvent('MY_TM_DATA_MODIFY')
 				end,
 			},
 			-- { bDevide = true },
@@ -1507,6 +1510,7 @@ function D.OpenSettingPanel(data, szType)
 				bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.SELF,
 				fnAction = function()
 					data.nScrutinyType = MY_TM_SCRUTINY_TYPE.SELF
+					FireUIEvent('MY_TM_DATA_MODIFY')
 				end,
 			},
 			{
@@ -1515,6 +1519,7 @@ function D.OpenSettingPanel(data, szType)
 				bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.TEAM,
 				fnAction = function()
 					data.nScrutinyType = MY_TM_SCRUTINY_TYPE.TEAM
+					FireUIEvent('MY_TM_DATA_MODIFY')
 				end,
 			},
 			{
@@ -1523,6 +1528,7 @@ function D.OpenSettingPanel(data, szType)
 				bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.ENEMY,
 				fnAction = function()
 					data.nScrutinyType = MY_TM_SCRUTINY_TYPE.ENEMY
+					FireUIEvent('MY_TM_DATA_MODIFY')
 				end,
 			},
 			{
@@ -1531,6 +1537,7 @@ function D.OpenSettingPanel(data, szType)
 				bChecked = data.nScrutinyType == MY_TM_SCRUTINY_TYPE.TARGET,
 				fnAction = function()
 					data.nScrutinyType = MY_TM_SCRUTINY_TYPE.TARGET
+					FireUIEvent('MY_TM_DATA_MODIFY')
 				end,
 			},
 		}
@@ -1541,6 +1548,7 @@ function D.OpenSettingPanel(data, szType)
 		if data.tKungFu then
 			table.insert(menu, { szOption = _L['No request'], bCheck = true, bChecked = type(data.tKungFu) == 'nil', fnAction = function()
 				data.tKungFu = nil
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				X.UI.ClosePopupMenu()
 			end })
 		end
@@ -1562,6 +1570,7 @@ function D.OpenSettingPanel(data, szType)
 							data.tKungFu = nil
 						end
 					end
+					FireUIEvent('MY_TM_DATA_MODIFY')
 				end
 			})
 		end
@@ -1599,6 +1608,7 @@ function D.OpenSettingPanel(data, szType)
 						end
 						if X.IsEmpty(data[nClass]) then data[nClass] = nil end
 					end
+					FireUIEvent('MY_TM_DATA_MODIFY')
 				end,
 			})
 		end
@@ -1614,6 +1624,7 @@ function D.OpenSettingPanel(data, szType)
 				data[nClass] = nil
 			end
 		end
+		FireUIEvent('MY_TM_DATA_MODIFY')
 	end
 
 	local function IsSimpleCountdown(dat)
@@ -1634,6 +1645,7 @@ function D.OpenSettingPanel(data, szType)
 
 	local function SetCountdownType(dat, val, ui, i)
 		dat.nClass = val
+		FireUIEvent('MY_TM_DATA_MODIFY')
 		FormatElPosByCountdownType(dat, ui, i)
 		ui:Children('#Countdown' .. i):Text(_L['Countdown TYPE ' ..  dat.nClass])
 		X.UI.ClosePopupMenu()
@@ -1685,6 +1697,7 @@ function D.OpenSettingPanel(data, szType)
 						data.szName = szText
 						ui:Text(ParseCustomText(szText))
 					end
+					FireUIEvent('MY_TM_DATA_MODIFY')
 					CloseHelp()
 				end, CloseHelp, function() return not frame or not frame:IsValid() end, nil, szDefault)
 			end})
@@ -1695,6 +1708,7 @@ function D.OpenSettingPanel(data, szType)
 				X.UI.OpenIconPicker(function(nNewIcon)
 					nIcon = nNewIcon
 					data.nIcon = nNewIcon
+					FireUIEvent('MY_TM_DATA_MODIFY')
 					box:SetObjectIcon(nNewIcon)
 				end)
 			end})
@@ -1708,11 +1722,13 @@ function D.OpenSettingPanel(data, szType)
 			nMouseOverFrame = 87,
 			fnClickIcon = function()
 				data.col = nil
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				ui:Children('#Shadow_Color'):Alpha(0)
 			end,
 			fnAction = function()
 				X.UI.OpenColorPicker(function(r, g, b)
 					data.col = { r, g, b }
+					FireUIEvent('MY_TM_DATA_MODIFY')
 					ui:Children('#Shadow_Color'):Color(r, g, b):Alpha(255)
 				end)
 			end
@@ -1725,6 +1741,7 @@ function D.OpenSettingPanel(data, szType)
 					file[data.dwMapID][data.nIndex] = dat
 				end
 				FireUIEvent('MY_TM_CREATE_CACHE')
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 				FireUIEvent('MY_TMUI_DATA_RELOAD')
 				D.OpenSettingPanel(file[data.dwMapID][data.nIndex], szType)
@@ -1776,12 +1793,14 @@ function D.OpenSettingPanel(data, szType)
 				if data.nCount == 1 then
 					data.nCount = nil
 				end
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = data.bCheckLevel, text = _L['Check level'],
 			onCheck = function(bCheck)
 				data.bCheckLevel = bCheck and true or nil
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -1936,6 +1955,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5, y = nY, checked = data.bCheckLevel, text = _L['Check level'],
 			onCheck = function(bCheck)
 				data.bCheckLevel = bCheck and true or nil
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -1943,6 +1963,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5, y = nY, checked = data.bMonTarget, text = _L['Show target name'],
 			onCheck = function(bCheck)
 				data.bMonTarget = bCheck and true or nil
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 
@@ -2062,12 +2083,14 @@ function D.OpenSettingPanel(data, szType)
 				if data.nCount == 1 then
 					data.nCount = nil
 				end
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = data.bAllLeave, text = _L['Must all leave scene'],
 			onCheck = function(bCheck)
 				data.bAllLeave = bCheck and true or nil
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				if bCheck then
 					ui:Children('#NPC_LEAVE_TEXT'):Text(_L['All leave scene'])
 				else
@@ -2177,12 +2200,14 @@ function D.OpenSettingPanel(data, szType)
 				if data.nCount == 1 then
 					data.nCount = nil
 				end
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = data.bAllLeave, text = _L['Must all leave scene'],
 			onCheck = function(bCheck)
 				data.bAllLeave = bCheck and true or nil
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				if bCheck then
 					ui:Children('#DOODAD_LEAVE_TEXT'):Text(_L['All leave scene'])
 				else
@@ -2280,6 +2305,7 @@ function D.OpenSettingPanel(data, szType)
 				else
 					data.szNote = szText
 				end
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 			tip = {
 				render = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
@@ -2297,6 +2323,7 @@ function D.OpenSettingPanel(data, szType)
 					data.szTarget = szText
 				end
 				FireUIEvent('MY_TM_CREATE_CACHE')
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2305,6 +2332,7 @@ function D.OpenSettingPanel(data, szType)
 			onChange = function(text)
 				data.szContent = X.TrimString(text)
 				FireUIEvent('MY_TM_CREATE_CACHE')
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
@@ -2319,6 +2347,7 @@ function D.OpenSettingPanel(data, szType)
 			onCheck = function(bCheck)
 				data.bSearch = bCheck
 				FireUIEvent('MY_TM_CREATE_CACHE')
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
@@ -2332,6 +2361,7 @@ function D.OpenSettingPanel(data, szType)
 			onCheck = function(bCheck)
 				data.bReg = bCheck
 				FireUIEvent('MY_TM_CREATE_CACHE')
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger talk'], font = 27 }):Pos('BOTTOMRIGHT')
@@ -2392,6 +2422,7 @@ function D.OpenSettingPanel(data, szType)
 				else
 					data.szNote = szText
 				end
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 			tip = {
 				render = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
@@ -2404,6 +2435,7 @@ function D.OpenSettingPanel(data, szType)
 			onChange = function(text)
 				data.szContent = text:gsub('\r', '')
 				FireUIEvent('MY_TM_CREATE_CACHE')
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
@@ -2418,6 +2450,7 @@ function D.OpenSettingPanel(data, szType)
 			onCheck = function(bCheck)
 				data.bSearch = bCheck
 				FireUIEvent('MY_TM_CREATE_CACHE')
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndCheckBox', {
@@ -2431,6 +2464,7 @@ function D.OpenSettingPanel(data, szType)
 			onCheck = function(bCheck)
 				data.bReg = bCheck
 				FireUIEvent('MY_TM_CREATE_CACHE')
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger chat'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2493,6 +2527,7 @@ function D.OpenSettingPanel(data, szType)
 				else
 					data.szNote = szText
 				end
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 		}):Pos('BOTTOMRIGHT')
 	end
@@ -2525,6 +2560,7 @@ function D.OpenSettingPanel(data, szType)
 								else
 									v.key = X.TrimString(szKey)
 								end
+								FireUIEvent('MY_TM_DATA_MODIFY')
 								D.OpenSettingPanel(data, szType)
 							end, nil, nil, nil, v.key)
 						end,
@@ -2532,10 +2568,12 @@ function D.OpenSettingPanel(data, szType)
 					table.insert(menu, { bDevide = true })
 					table.insert(menu, { szOption = _L['Hold countdown when crossmap'], bCheck = true, bChecked = v.bHold, fnAction = function()
 						v.bHold = not v.bHold
+						FireUIEvent('MY_TM_DATA_MODIFY')
 					end })
 					if v.nClass == MY_TM_TYPE.NPC_FIGHT then
 						table.insert(menu, { szOption = _L['Hold countdown when unfight'], bCheck = true, bChecked = v.bFightHold, fnAction = function()
 							v.bFightHold = not v.bFightHold
+							FireUIEvent('MY_TM_DATA_MODIFY')
 						end })
 					end
 
@@ -2548,6 +2586,7 @@ function D.OpenSettingPanel(data, szType)
 							bChecked = v.nFrame == i,
 							fnAction = function()
 								v.nFrame = i
+								FireUIEvent('MY_TM_DATA_MODIFY')
 								X.UI.ClosePopupMenu()
 							end,
 							szIcon = PLUGIN_ROOT .. '/img/ST.UITex',
@@ -2616,6 +2655,7 @@ function D.OpenSettingPanel(data, szType)
 				local box = this
 				X.UI.OpenIconPicker(function(nIcon)
 					v.nIcon = nIcon
+					FireUIEvent('MY_TM_DATA_MODIFY')
 					box:SetObjectIcon(nIcon)
 				end)
 			end,
@@ -2625,6 +2665,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5, y = nY - 2, text = _L['TC'], color = GetMsgFontColor('MSG_TEAM', true), checked = v.bTeamChannel,
 			onCheck = function(bCheck)
 				v.bTeamChannel = bCheck and true or nil
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 			tip = {
 				render = _L['Raid talk warning'],
@@ -2641,6 +2682,7 @@ function D.OpenSettingPanel(data, szType)
 				or { 255, 0, 0 },
 			onChange = function(szNum)
 				v.nTime = tonumber(szNum) or szNum
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				local edit = ui:Children('#CountdownTime' .. k)
 				if szNum == '' then
 					return
@@ -2703,6 +2745,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5 + 100 + 5, y = nY, w = 295, h = 25, text = v.szName,
 			onChange = function(szName)
 				v.szName = szName
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 			tip = {
 				render = _L['Simple countdown text'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
@@ -2716,6 +2759,7 @@ function D.OpenSettingPanel(data, szType)
 			text = v.nRefresh, editType = X.UI.EDIT_TYPE.NUMBER,
 			onChange = function(szNum)
 				v.nRefresh = tonumber(szNum)
+				FireUIEvent('MY_TM_DATA_MODIFY')
 			end,
 			tip = {
 				render = _L['Max repeat time\n\nWhen countdown get trigger again, the last countdown may get overwritten. This config is to sovle this problem, input time limit here to ensure in this time period, countdown will not be trigger again.'],
@@ -2749,6 +2793,7 @@ function D.OpenSettingPanel(data, szType)
 				else
 					table.remove(data.tCountdown, k)
 				end
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				D.OpenSettingPanel(data, szType)
 			end,
 		}):Pos('BOTTOMRIGHT')
@@ -2774,6 +2819,7 @@ function D.OpenSettingPanel(data, szType)
 				nClass = -1,
 				nIcon = nIcon or 13,
 			})
+			FireUIEvent('MY_TM_DATA_MODIFY')
 			D.OpenSettingPanel(data, szType)
 		end,
 	}):Pos('BOTTOMRIGHT')
@@ -2788,6 +2834,7 @@ function D.OpenSettingPanel(data, szType)
 				checked = data.bDrawOnlyMyEmployer,
 				onCheck = function(bCheck)
 					data.bDrawOnlyMyEmployer = bCheck and true or nil
+					FireUIEvent('MY_TM_DATA_MODIFY')
 					FireUIEvent('MY_TM_CC_RELOAD')
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
@@ -2797,6 +2844,7 @@ function D.OpenSettingPanel(data, szType)
 			checked = data.bDrawLine,
 			onCheck = function(bCheck)
 				data.bDrawLine = bCheck and true or nil
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				FireUIEvent('MY_TM_CC_RELOAD')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
@@ -2806,6 +2854,7 @@ function D.OpenSettingPanel(data, szType)
 				checked = data.bDrawLineOnlyStareMe,
 				onCheck = function(bCheck)
 					data.bDrawLineOnlyStareMe = bCheck and true or nil
+					FireUIEvent('MY_TM_DATA_MODIFY')
 					FireUIEvent('MY_TM_CC_RELOAD')
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
@@ -2815,6 +2864,7 @@ function D.OpenSettingPanel(data, szType)
 			checked = data.bDrawName,
 			onCheck = function(bCheck)
 				data.bDrawName = bCheck and true or nil
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				FireUIEvent('MY_TM_CC_RELOAD')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2830,6 +2880,7 @@ function D.OpenSettingPanel(data, szType)
 						X.UI.OpenColorPicker(function(r, g, b)
 							ui:Color(r, g, b)
 							circle.col = { r, g, b }
+							FireUIEvent('MY_TM_DATA_MODIFY')
 							FireUIEvent('MY_TM_CC_RELOAD')
 						end)
 					end,
@@ -2838,6 +2889,7 @@ function D.OpenSettingPanel(data, szType)
 					x = nX + 5, y = nY + 2, w = 80, h = 26, text = circle.nAngle, editType = X.UI.EDIT_TYPE.NUMBER,
 					onChange = function(nNum)
 						circle.nAngle = tonumber(nNum) or 80
+						FireUIEvent('MY_TM_DATA_MODIFY')
 						FireUIEvent('MY_TM_CC_RELOAD')
 					end,
 				}):Pos('BOTTOMRIGHT')
@@ -2846,6 +2898,7 @@ function D.OpenSettingPanel(data, szType)
 					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nRadius, editType = X.UI.EDIT_TYPE.NUMBER,
 					onChange = function(nNum)
 						circle.nRadius = tonumber(nNum) or 4
+						FireUIEvent('MY_TM_DATA_MODIFY')
 						FireUIEvent('MY_TM_CC_RELOAD')
 					end,
 				}):Pos('BOTTOMRIGHT')
@@ -2854,6 +2907,7 @@ function D.OpenSettingPanel(data, szType)
 					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nAlpha, editType = X.UI.EDIT_TYPE.NUMBER,
 					onChange = function(nNum)
 						circle.nAlpha = tonumber(nNum)
+						FireUIEvent('MY_TM_DATA_MODIFY')
 						FireUIEvent('MY_TM_CC_RELOAD')
 					end,
 				}):Pos('BOTTOMRIGHT')
@@ -2864,6 +2918,7 @@ function D.OpenSettingPanel(data, szType)
 					checked = circle.bBorder,
 					onCheck = function(bChecked)
 						circle.bBorder = bChecked
+						FireUIEvent('MY_TM_DATA_MODIFY')
 						FireUIEvent('MY_TM_CC_RELOAD')
 					end,
 				}):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2883,6 +2938,7 @@ function D.OpenSettingPanel(data, szType)
 						else
 							table.remove(data.aCircle, k)
 						end
+						FireUIEvent('MY_TM_DATA_MODIFY')
 						FireUIEvent('MY_TM_CC_RELOAD')
 						D.OpenSettingPanel(data, szType)
 					end,
@@ -2906,6 +2962,7 @@ function D.OpenSettingPanel(data, szType)
 					col = {0, 255, 0},
 					bBorder = true,
 				})
+				FireUIEvent('MY_TM_DATA_MODIFY')
 				FireUIEvent('MY_TM_CC_RELOAD')
 				D.OpenSettingPanel(data, szType)
 			end,
@@ -2941,6 +2998,7 @@ function D.OpenSettingPanel(data, szType)
 								end
 								D.OpenSettingPanel(data, szType)
 							end
+							FireUIEvent('MY_TM_DATA_MODIFY')
 							FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 						end, true)
 					end,
@@ -2960,6 +3018,7 @@ function D.OpenSettingPanel(data, szType)
 					end
 					table.insert(data.aFocus, {})
 					D.OpenSettingPanel(data, szType)
+					FireUIEvent('MY_TM_DATA_MODIFY')
 					FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 				end,
 			}):Width() + 5
@@ -2995,6 +3054,7 @@ function D.OpenSettingPanel(data, szType)
 								end
 								D.OpenSettingPanel(data, szType)
 							end
+							FireUIEvent('MY_TM_DATA_MODIFY')
 							FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 						end, nil, true)
 					end,
@@ -3014,6 +3074,7 @@ function D.OpenSettingPanel(data, szType)
 					end
 					table.insert(data.aCataclysmBuff, {})
 					D.OpenSettingPanel(data, szType)
+					FireUIEvent('MY_TM_DATA_MODIFY')
 					FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
 				end,
 			}):Width() + 5
