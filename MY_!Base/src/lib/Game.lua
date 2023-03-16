@@ -1242,6 +1242,52 @@ function X.GetObjectMana(obj)
 	return obj.nCurrentMana, obj.nMaxMana
 end
 
+do
+local CACHE = {}
+local function GetObjectSceneIndex(dwID)
+	local me = X.GetClientPlayer()
+	local scene = me and me.GetScene()
+	if not scene then
+		return
+	end
+	local nType = X.IsPlayer(dwID) and 0 or 1
+	local nIndex = CACHE[dwID]
+	if not nIndex or scene.GetTempCustomUnsigned4(1, nIndex * 20 + 1) ~= dwID then
+		for i = 0, 9 do
+			local nOffset = i * 20 + 1
+			if scene.GetTempCustomUnsigned4(nType, nOffset) == dwID then
+				CACHE[dwID] = i
+				nIndex = i
+				break
+			end
+		end
+	end
+	return scene, nType, nIndex
+end
+
+-- 获取目标精力和最大精力
+---@param obj userdata | string @目标对象或目标ID
+---@return number @目标精力，最大精力
+function X.GetObjectSpirit(obj)
+	local scene, nType, nIndex = GetObjectSceneIndex(X.IsUserdata(obj) and obj.dwID or obj)
+	if scene and nType and nIndex then
+		return scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 4),
+			scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 8)
+	end
+end
+
+-- 获取目标耐力和最大耐力
+---@param obj userdata | string @目标对象或目标ID
+---@return number @目标耐力，最大耐力
+function X.GetObjectEndurance(obj)
+	local scene, nType, nIndex = GetObjectSceneIndex(X.IsUserdata(obj) and obj.dwID or obj)
+	if scene and nType and nIndex then
+		return scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 12),
+			scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 16)
+	end
+end
+end
+
 -- 根据模板ID获取NPC真实名称
 local NPC_NAME_CACHE, DOODAD_NAME_CACHE = {}, {}
 function X.GetTemplateName(dwType, dwTemplateID)
