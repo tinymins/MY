@@ -325,6 +325,20 @@ function D.UpdateItem(hItem, p)
 			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText('')
 		end
 	end
+	-- ¾«ÄÍ
+	local nSpirit, nMaxSpirit = X.GetObjectSpirit(KObject)
+	local nEndurance, nMaxEndurance = X.GetObjectEndurance(KObject)
+	if nSpirit and nMaxSpirit and nEndurance and nMaxEndurance then
+		hItem:Lookup('Handle_SpiritEndurance/Handle_SpiritEndurance_Taichi/Animate_SpiritEndurance_Taichi_SpiritBar'):SetAnimateType(ANIMATE.BOTTOM_TOP)
+		hItem:Lookup('Handle_SpiritEndurance/Handle_SpiritEndurance_Taichi/Animate_SpiritEndurance_Taichi_SpiritBar'):SetPercentage(nSpirit / nMaxSpirit)
+		hItem:Lookup('Handle_SpiritEndurance/Handle_SpiritEndurance_Taichi/Animate_SpiritEndurance_Taichi_EnduranceBar'):SetAnimateType(ANIMATE.BOTTOM_TOP)
+		hItem:Lookup('Handle_SpiritEndurance/Handle_SpiritEndurance_Taichi/Animate_SpiritEndurance_Taichi_EnduranceBar'):SetPercentage(nEndurance / nMaxEndurance)
+		hItem:Lookup('Handle_SpiritEndurance/Handle_SpiritEndurance_Number/Handle_SpiritNum/Text_Spirit_Num'):SetText(nSpirit)
+		hItem:Lookup('Handle_SpiritEndurance/Handle_SpiritEndurance_Number/Handle_EnduranceNum/Text_Endurance_Num'):SetText(nEndurance)
+		hItem:Lookup('Handle_SpiritEndurance'):Show()
+	else
+		hItem:Lookup('Handle_SpiritEndurance'):Hide()
+	end
 	-- Ñ¡ÖÐ×´Ì¬
 	hItem:Lookup('Image_Select'):Hide()
 	if player then
