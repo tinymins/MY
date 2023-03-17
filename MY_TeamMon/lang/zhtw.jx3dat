@@ -273,6 +273,7 @@ return {
 	['Title: %s'] = '標題：%s',
 	['Author: %s'] = '作者：%s',
 	['%s loaded %s'] = '[%s]載入了團隊監控數據：%s。',
+	['Upgrade TeamMon data to latest: %s'] = '團隊監控數據已更新至最新：%s。',
 	['Sync team'] = '同步團隊',
 	['Add fav success, you can switch to fav page to see.'] = '數據收藏成功，前往收藏數據分頁即可查看。',
 	['Add fav'] = '加入收藏',

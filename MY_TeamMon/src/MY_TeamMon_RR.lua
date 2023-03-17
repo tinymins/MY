@@ -470,66 +470,56 @@ end
 function D.CheckUpdate()
 	local szLastURL = MY_TeamMon.GetUserConfig('RR.LastURL')
 	local bDataNotModified = MY_TeamMon.GetUserConfig('RR.DataNotModified')
-	if X.IsEmpty(szLastURL) or not bDataNotModified then
-		return
-	end
 	local aType = MY_TeamMon.GetUserConfig('RR.LastType')
-	if X.IsEmpty(aType) or not X.IsTable(aType) then
+	if X.IsEmpty(szLastURL)
+	or not bDataNotModified
+	or not X.IsTable(aType) or X.IsEmpty(aType) then
 		return
 	end
-	D.GetDataCRC(aType, function(szCRC)
-		local function ParseVersion(szVersion)
-			if X.IsString(szVersion) then
-				local nPos = X.StringFindW(szVersion, '.')
-				if nPos then
-					local szMajorVersion = szVersion:sub(1, nPos)
-					local szMinorVersion = szVersion:sub(nPos + 1)
-					return szMajorVersion, szMinorVersion
-				end
-				return szVersion, ''
+	local function ParseVersion(szVersion)
+		if X.IsString(szVersion) then
+			local nPos = X.StringFindW(szVersion, '.')
+			if nPos then
+				local szMajorVersion = szVersion:sub(1, nPos)
+				local szMinorVersion = szVersion:sub(nPos + 1)
+				return szMajorVersion, szMinorVersion
 			end
-			return '', ''
+			return szVersion, ''
 		end
-		D.FetchMetaInfo(
-			szLastURL,
-			function(info)
-				local szPrimaryVersion = ParseVersion(info.szVersion)
-				local szLastPrimaryVersion = ParseVersion(MY_TeamMon.GetUserConfig('RR.LastVersion'))
-				if X.IsEmpty(szPrimaryVersion) or szPrimaryVersion == szLastPrimaryVersion then
-					return
-				end
-				--[[#DEBUG BEGIN]]
-				local nTime = GetTime()
-				X.Debug(
-					'MY_TeamMon_RR',
-					'Hash matched, auto update comfirmed: ' .. szLastPrimaryVersion
-						.. ' -> ' .. szPrimaryVersion
-						.. ' (' .. table.concat(aType, ',') .. ')',
-					X.DEBUG_LEVEL.LOG)
-				--[[#DEBUG END]]
-				D.DownloadData(
-					info,
-					function()
-						FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-						--[[#DEBUG BEGIN]]
-						X.Debug(
-							'MY_TeamMon_RR',
-							'Auto update complete, cost time ' .. (GetTime() - nTime) .. 'ms',
-							X.DEBUG_LEVEL.LOG)
-						--[[#DEBUG END]]
-					end,
-					aType)
-				FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-			end)
-	end)
-end
-
-function D.GetDataCRC(aType, fnCallback)
-	local tCRC = {}
-	for _, k in ipairs(aType) do
-		tCRC[k] = MY_TeamMon.GetTable(k)
+		return '', ''
 	end
-	X.GetLUADataHash(tCRC, fnCallback)
+	D.FetchMetaInfo(
+		szLastURL,
+		function(info)
+			local szPrimaryVersion = ParseVersion(info.szVersion)
+			local szLastPrimaryVersion = ParseVersion(MY_TeamMon.GetUserConfig('RR.LastVersion'))
+			if X.IsEmpty(szPrimaryVersion) or szPrimaryVersion == szLastPrimaryVersion then
+				return
+			end
+			--[[#DEBUG BEGIN]]
+			local nTime = GetTime()
+			X.Debug(
+				'MY_TeamMon_RR',
+				'Hash matched, auto update confirmed: ' .. szLastPrimaryVersion
+					.. ' -> ' .. szPrimaryVersion
+					.. ' (' .. table.concat(aType, ',') .. ')',
+				X.DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
+			D.DownloadData(
+				info,
+				function()
+					FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+					--[[#DEBUG BEGIN]]
+					X.Debug(
+						'MY_TeamMon_RR',
+						'Auto update complete, cost time ' .. (GetTime() - nTime) .. 'ms',
+						X.DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
+					X.Sysmsg(_L('Upgrade TeamMon data to latest: %s', info.szTitle))
+				end,
+				aType)
+			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+		end)
 end
 
 function D.LoadConfigureFile(szFile, info, aSilentType)
@@ -1014,12 +1004,11 @@ X.RegisterInit(function()
 	D.Init()
 end)
 
-X.RegisterEvent('LOADING_END', 'MY_TeamMon_RR', function()
+X.RegisterInit('MY_TeamMon_RR', function()
 	if X.IsDebugServer() then
 		return
 	end
-	D.CheckUpdate()
-	X.RegisterEvent('LOADING_END', 'MY_TeamMon_RR', false)
+	X.DelayCall(8000, function() D.CheckUpdate() end)
 end)
 
 X.RegisterEvent('MY_TM_DATA_MODIFY', 'MY_TeamMon_RR', function()
