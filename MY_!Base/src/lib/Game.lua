@@ -1246,7 +1246,13 @@ do
 local CACHE = {}
 local function GetObjectSceneIndex(dwID)
 	local me = X.GetClientPlayer()
-	local scene = me and me.GetScene()
+	if not me then
+		return
+	end
+	if not X.IsMonsterMap(me.GetMapID()) then
+		return
+	end
+	local scene = me.GetScene()
 	if not scene then
 		return
 	end
@@ -3674,6 +3680,22 @@ function X.IsZombieMap(dwMapID)
 			and Table_IsZombieBattleFieldMap(dwMapID) or false
 	end
 	return ZOMBIE_MAP[dwMapID]
+end
+end
+
+-- 判断地图是不是百战地图
+-- (bool) X.IsMonsterMap(dwMapID)
+do
+local MONSTER_MAP = {}
+function X.IsMonsterMap(dwMapID)
+	if MONSTER_MAP[dwMapID] == nil then
+		if GDAPI_SpiritEndurance_IsSEMap then
+			MONSTER_MAP[dwMapID] = GDAPI_SpiritEndurance_IsSEMap(dwMapID) or false
+		else
+			MONSTER_MAP[dwMapID] = X.CONSTANT.MONSTER_MAP[dwMapID] or false
+		end
+	end
+	return MONSTER_MAP[dwMapID]
 end
 end
 
