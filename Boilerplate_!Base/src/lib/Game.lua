@@ -3677,6 +3677,22 @@ function X.IsZombieMap(dwMapID)
 end
 end
 
+-- 判断地图是不是百战地图
+-- (bool) X.IsMonsterMap(dwMapID)
+do
+local MONSTER_MAP = {}
+function X.IsMonsterMap(dwMapID)
+	if MONSTER_MAP[dwMapID] == nil then
+		if GDAPI_SpiritEndurance_IsSEMap then
+			MONSTER_MAP[dwMapID] = GDAPI_SpiritEndurance_IsSEMap(dwMapID) or false
+		else
+			MONSTER_MAP[dwMapID] = X.CONSTANT.MONSTER_MAP[dwMapID] or false
+		end
+	end
+	return MONSTER_MAP[dwMapID]
+end
+end
+
 -- 判断当前地图是不是僵尸地图
 -- (bool) X.IsInZombieMap()
 function X.IsInZombieMap()
