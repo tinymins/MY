@@ -1246,7 +1246,13 @@ do
 local CACHE = {}
 local function GetObjectSceneIndex(dwID)
 	local me = X.GetClientPlayer()
-	local scene = me and me.GetScene()
+	if not me then
+		return
+	end
+	if not X.IsMonsterMap(me.GetMapID()) then
+		return
+	end
+	local scene = me.GetScene()
 	if not scene then
 		return
 	end
