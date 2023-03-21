@@ -3699,6 +3699,13 @@ function X.IsMonsterMap(dwMapID)
 end
 end
 
+-- 判断当前地图是不是百战地图
+-- (bool) X.IsInMonsterMap()
+function X.IsInMonsterMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsMonsterMap(me.GetMapID())
+end
+
 -- 判断当前地图是不是僵尸地图
 -- (bool) X.IsInZombieMap()
 function X.IsInZombieMap()
