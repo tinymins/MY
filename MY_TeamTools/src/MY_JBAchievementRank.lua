@@ -104,6 +104,7 @@ function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 			damage = p.dwDamage,
 			therapy = p.dwTherapy,
 			roleType = p.nRoleType,
+			achievement = p.nAchievement,
 			onymous = bOnymous and 1 or 0,
 		},
 		signature = X.SECRET['J3CX::ACHIEVEMENT_RANK_UPLOADS'],
@@ -245,6 +246,7 @@ X.RegisterEvent({
 				dwDamage = D.dwDamage,
 				dwTherapy = D.dwTherapy,
 				nRoleType = me.nRoleType,
+				nAchievement = me.GetAchievementRecord(),
 				nFightTime = X.GetFightTime(),
 				szClientGUID = X.GetClientGUID(),
 			}
