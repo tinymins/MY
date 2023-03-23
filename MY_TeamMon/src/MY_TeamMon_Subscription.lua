@@ -1012,7 +1012,7 @@ X.RegisterInit('MY_TeamMon_Subscription', function()
 end)
 
 X.RegisterEvent('MY_TM_DATA_MODIFY', 'MY_TeamMon_Subscription', function()
-	D.SetUserConfig('RR.DataNotModified', false)
+	MY_TeamMon.SetUserConfig('RR.DataNotModified', false)
 end)
 
 -- Global exports
