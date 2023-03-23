@@ -353,7 +353,7 @@ function D.CheckEnable()
 			{ 'DOODAD_LEAVE_SCENE', function() D.OnObjectLeaveScene(TARGET.DOODAD, arg0) end },
 			{ 'LOADING_ENDING', D.UpdateRule },
 			{ 'MY_TEAM_MON__CIRCLE_LINE__RELOAD', D.UpdateRule },
-			{ 'MY_TM_DATA_RELOAD', D.OnTMDataReload },
+			{ 'MY_TEAM_MON_DATA_RELOAD', D.OnTMDataReload },
 			{ 'MY_TEAM_MON__CIRCLE_LINE__RESERT_DRAW', function() CIRCLE_RESERT_DRAW = true end }
 		})
 		D.UpdateRule()

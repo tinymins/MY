@@ -21,7 +21,7 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
-local MY_TM_REMOTE_DATA_ROOT = MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
+local MY_TEAM_MON_REMOTE_DATA_ROOT = MY_TeamMon.MY_TEAM_MON_REMOTE_DATA_ROOT
 
 local PS = {}
 
@@ -145,7 +145,7 @@ function PS.OnPanelActive(wnd)
 		checked = MY_TeamMon.bPushTeamPanel,
 		onCheck = function(bCheck)
 			MY_TeamMon.bPushTeamPanel = bCheck
-			FireUIEvent('MY_TM_CREATE_CACHE')
+			FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Buff list'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
@@ -241,7 +241,7 @@ function PS.OnPanelActive(wnd)
 		x = nX + 5, y = nY + 15, text = _L['Open data folder'],
 		buttonStyle = 'FLAT',
 		onClick = function()
-			local szRoot = X.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT):gsub('/', '\\')
+			local szRoot = X.GetAbsolutePath(MY_TEAM_MON_REMOTE_DATA_ROOT):gsub('/', '\\')
 			X.OpenFolder(szRoot)
 			X.UI.OpenTextEditor(szRoot)
 		end,

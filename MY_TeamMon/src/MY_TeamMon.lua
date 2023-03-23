@@ -34,8 +34,8 @@ local MY_GetFormatText, MY_GetPureText = X.GetFormatText, X.GetPureText
 local FireUIEvent, MY_IsVisibleBuff, Table_IsSkillShow = FireUIEvent, X.IsVisibleBuff, Table_IsSkillShow
 local GetHeadTextForceFontColor, TargetPanel_SetOpenState = GetHeadTextForceFontColor, TargetPanel_SetOpenState
 
-local MY_TM_REMOTE_DATA_ROOT = X.FormatPath({'userdata/team_mon/remote/', X.PATH_TYPE.GLOBAL})
-local MY_TM_TYPE = {
+local MY_TEAM_MON_REMOTE_DATA_ROOT = X.FormatPath({'userdata/team_mon/remote/', X.PATH_TYPE.GLOBAL})
+local MY_TEAM_MON_TYPE = {
 	OTHER           = 0,
 	BUFF_GET        = 1,
 	BUFF_LOSE       = 2,
@@ -58,8 +58,8 @@ local MY_TM_TYPE = {
 	DOODAD_ALLLEAVE = 19,
 	CHAT_MONITOR    = 20,
 }
-local MY_TM_SCRUTINY_TYPE = { SELF = 1, TEAM = 2, ENEMY = 3, TARGET = 4 }
-local MY_TM_SPECIAL_MAP = {
+local MY_TEAM_MON_SCRUTINY_TYPE = { SELF = 1, TEAM = 2, ENEMY = 3, TARGET = 4 }
+local MY_TEAM_MON_SPECIAL_MAP = {
 	COMMON = -1, -- 通用
 	CITY = -2, -- 主城
 	DUNGEON = -3, -- 秘境
@@ -69,61 +69,61 @@ local MY_TM_SPECIAL_MAP = {
 	VILLAGE = -7, -- 野外
 	RECYCLE_BIN = -9, -- 回收站
 }
-local MY_TM_SPECIAL_MAP_NAME = {
-	[MY_TM_SPECIAL_MAP.COMMON] = _L['Common data'],
-	[MY_TM_SPECIAL_MAP.CITY] = _L['City data'],
-	[MY_TM_SPECIAL_MAP.VILLAGE] = _L['Village data'],
-	[MY_TM_SPECIAL_MAP.DUNGEON] = _L['Dungeon data'],
-	[MY_TM_SPECIAL_MAP.TEAM_DUNGEON] = _L['Team dungeon data'],
-	[MY_TM_SPECIAL_MAP.RAID_DUNGEON] = _L['Raid dungeon data'],
-	[MY_TM_SPECIAL_MAP.STARVE] = _L['Starve data'],
-	[MY_TM_SPECIAL_MAP.RECYCLE_BIN] = _L['Recycle bin data'],
+local MY_TEAM_MON_SPECIAL_MAP_NAME = {
+	[MY_TEAM_MON_SPECIAL_MAP.COMMON] = _L['Common data'],
+	[MY_TEAM_MON_SPECIAL_MAP.CITY] = _L['City data'],
+	[MY_TEAM_MON_SPECIAL_MAP.VILLAGE] = _L['Village data'],
+	[MY_TEAM_MON_SPECIAL_MAP.DUNGEON] = _L['Dungeon data'],
+	[MY_TEAM_MON_SPECIAL_MAP.TEAM_DUNGEON] = _L['Team dungeon data'],
+	[MY_TEAM_MON_SPECIAL_MAP.RAID_DUNGEON] = _L['Raid dungeon data'],
+	[MY_TEAM_MON_SPECIAL_MAP.STARVE] = _L['Starve data'],
+	[MY_TEAM_MON_SPECIAL_MAP.RECYCLE_BIN] = _L['Recycle bin data'],
 }
-local MY_TM_SPECIAL_MAP_INFO = {}
-for _, dwMapID in pairs(MY_TM_SPECIAL_MAP) do
+local MY_TEAM_MON_SPECIAL_MAP_INFO = {}
+for _, dwMapID in pairs(MY_TEAM_MON_SPECIAL_MAP) do
 	local map = X.SetmetaReadonly({
 		dwID = dwMapID,
 		dwMapID = dwMapID,
-		szName = MY_TM_SPECIAL_MAP_NAME[dwMapID],
+		szName = MY_TEAM_MON_SPECIAL_MAP_NAME[dwMapID],
 	})
-	MY_TM_SPECIAL_MAP_INFO[map.szName] = map
-	MY_TM_SPECIAL_MAP_INFO[map.dwMapID] = map
+	MY_TEAM_MON_SPECIAL_MAP_INFO[map.szName] = map
+	MY_TEAM_MON_SPECIAL_MAP_INFO[map.dwMapID] = map
 end
 -- 核心优化变量
-local MY_TM_CORE_PLAYERID = 0
-local MY_TM_CORE_NAME     = 0
+local MY_TEAM_MON_CORE_PLAYERID = 0
+local MY_TEAM_MON_CORE_NAME     = 0
 
-local MY_TM_MAX_INTERVAL  = 300
-local MY_TM_MAX_CACHE     = 3000 -- 最大的cache数量 主要是UI的问题
-local MY_TM_DEL_CACHE     = 1000 -- 每次清理的数量 然后会做一次gc
-local MY_TM_INIFILE       = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon.ini'
+local MY_TEAM_MON_MAX_INTERVAL  = 300
+local MY_TEAM_MON_MAX_CACHE     = 3000 -- 最大的cache数量 主要是UI的问题
+local MY_TEAM_MON_DEL_CACHE     = 1000 -- 每次清理的数量 然后会做一次gc
+local MY_TEAM_MON_INI_FILE      = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon.ini'
 
-local MY_TM_SHARE_QUEUE  = {}
-local MY_TM_MARK_QUEUE   = {}
-local MY_TM_MARK_IDLE    = true -- 标记空闲
-local MY_TM_SHIELDED_MAP = false -- 标记当前在功能限制地图 限制所有功能监听
-local MY_TM_PVP_MAP      = false -- 标记当前在可能发生PVP战斗的地图 限制战斗功能监听
+local MY_TEAM_MON_SHARE_QUEUE  = {}
+local MY_TEAM_MON_MARK_QUEUE   = {}
+local MY_TEAM_MON_MARK_IDLE    = true -- 标记空闲
+local MY_TEAM_MON_SHIELDED_MAP = false -- 标记当前在功能限制地图 限制所有功能监听
+local MY_TEAM_MON_PVP_MAP      = false -- 标记当前在可能发生PVP战斗的地图 限制战斗功能监听
 ----
-local MY_TM_LEFT_BRACKET      = _L['[']
-local MY_TM_RIGHT_BRACKET     = _L[']']
-local MY_TM_LEFT_BRACKET_XML  = MY_GetFormatText(MY_TM_LEFT_BRACKET, 44, 255, 255, 255)
-local MY_TM_RIGHT_BRACKET_XML = MY_GetFormatText(MY_TM_RIGHT_BRACKET, 44, 255, 255, 255)
+local MY_TEAM_MON_LEFT_BRACKET      = _L['[']
+local MY_TEAM_MON_RIGHT_BRACKET     = _L[']']
+local MY_TEAM_MON_LEFT_BRACKET_XML  = MY_GetFormatText(MY_TEAM_MON_LEFT_BRACKET, 44, 255, 255, 255)
+local MY_TEAM_MON_RIGHT_BRACKET_XML = MY_GetFormatText(MY_TEAM_MON_RIGHT_BRACKET, 44, 255, 255, 255)
 ----
-local MY_TM_TYPE_LIST = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
+local MY_TEAM_MON_TYPE_LIST = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
 
-local MYTM_EVENTS = {
+local MY_TEAM_MON_EVENTS = {
 	'NPC_ENTER_SCENE',
 	'NPC_LEAVE_SCENE',
-	'MY_TM_NPC_FIGHT',
-	'MY_TM_NPC_ENTER_SCENE',
-	'MY_TM_NPC_ALL_LEAVE_SCENE',
-	'MY_TM_NPC_LIFE_CHANGE',
-	'MY_TM_NPC_MANA_CHANGE',
+	'MY_TEAM_MON_NPC_FIGHT',
+	'MY_TEAM_MON_NPC_ENTER_SCENE',
+	'MY_TEAM_MON_ALL_LEAVE_SCENE',
+	'MY_TEAM_MON_NPC_LIFE_CHANGE',
+	'MY_TEAM_MON_NPC_MANA_CHANGE',
 
 	'DOODAD_ENTER_SCENE',
 	'DOODAD_LEAVE_SCENE',
-	'MY_TM_DOODAD_ENTER_SCENE',
-	'MY_TM_DOODAD_ALL_LEAVE_SCENE',
+	'MY_TEAM_MON_DOODAD_ENTER_SCENE',
+	'MY_TEAM_MON_DOODAD_ALL_LEAVE_SCENE',
 
 	'BUFF_UPDATE',
 	'SYS_MSG',
@@ -157,7 +157,7 @@ local D = X.SetmetaLazyload({
 
 -- 初始化table 虽然写法没有直接写来得好 但是为了方便以后改动
 do
-	for k, v in ipairs(MY_TM_TYPE_LIST) do
+	for k, v in ipairs(MY_TEAM_MON_TYPE_LIST) do
 		D.FILE[v]         = {}
 		D.DATA[v]         = {}
 		D.TEMP[v]         = {}
@@ -370,20 +370,20 @@ local function ParseHPCountdown(szString)
 end
 
 function D.OnFrameCreate()
-	this:RegisterEvent('MY_TM_LOADING_END')
-	this:RegisterEvent('MY_TM_CREATE_CACHE')
+	this:RegisterEvent('MY_TEAM_MON_LOADING_END')
+	this:RegisterEvent('MY_TEAM_MON_CREATE_CACHE')
 	this:RegisterEvent('LOADING_END')
 	D.Enable(O.bEnable)
 	D.Log('init success!')
-	X.BreatheCall('MY_TM_CACHE_CLEAR', 60 * 2 * 1000, function()
-		for k, v in ipairs(MY_TM_TYPE_LIST) do
-			if #D.TEMP[v] > MY_TM_MAX_CACHE then
+	X.BreatheCall('MY_TeamMon_CacheClear', 60 * 2 * 1000, function()
+		for k, v in ipairs(MY_TEAM_MON_TYPE_LIST) do
+			if #D.TEMP[v] > MY_TEAM_MON_MAX_CACHE then
 				D.FreeCache(v)
 			end
 		end
 		for k, v in pairs(CACHE.INTERVAL) do
 			for kk, vv in pairs(v) do
-				if #vv > MY_TM_MAX_INTERVAL then
+				if #vv > MY_TEAM_MON_MAX_INTERVAL then
 					CACHE.INTERVAL[k][kk] = {}
 				end
 			end
@@ -402,7 +402,7 @@ function D.OnFrameBreathe()
 		if data then
 			-- local bTempTarget = false
 			-- for kk, vv in ipairs(data.tCountdown or {}) do
-			-- 	if vv.nClass == MY_TM_TYPE.NPC_MANA then
+			-- 	if vv.nClass == MY_TEAM_MON_TYPE.NPC_MANA then
 			-- 		bTempTarget = true
 			-- 		break
 			-- 	end
@@ -429,7 +429,7 @@ function D.OnFrameBreathe()
 								nStart = nStart + nStep
 							end
 							for nLife = nStart, nLife, nStep do
-								FireUIEvent('MY_TM_NPC_LIFE_CHANGE', dwTemplateID, nLife, bIncrease)
+								FireUIEvent('MY_TEAM_MON_NPC_LIFE_CHANGE', dwTemplateID, nLife, bIncrease)
 							end
 							tab.nLife = nLife
 						end
@@ -446,7 +446,7 @@ function D.OnFrameBreathe()
 								nStart = nStart + nStep
 							end
 							for nMana = nStart, nMana, nStep do
-								FireUIEvent('MY_TM_NPC_MANA_CHANGE', dwTemplateID, nMana, bIncrease)
+								FireUIEvent('MY_TEAM_MON_NPC_MANA_CHANGE', dwTemplateID, nMana, bIncrease)
 							end
 							tab.nMana = nMana
 						end
@@ -457,11 +457,11 @@ function D.OnFrameBreathe()
 						if npc.bFightState then
 							local nTime = GetTime()
 							npcInfo.nSec = nTime
-							FireUIEvent('MY_TM_NPC_FIGHT', dwTemplateID, true, nTime)
+							FireUIEvent('MY_TEAM_MON_NPC_FIGHT', dwTemplateID, true, nTime)
 						else
 							local nTime = GetTime() - (npcInfo.nSec or GetTime())
 							npcInfo.nSec = nil
-							FireUIEvent('MY_TM_NPC_FIGHT', dwTemplateID, false, nTime)
+							FireUIEvent('MY_TEAM_MON_NPC_FIGHT', dwTemplateID, false, nTime)
 						end
 						tab.bFightState = npc.bFightState
 					end
@@ -474,11 +474,11 @@ end
 
 function D.OnSetMark(bFinish)
 	if bFinish then
-		MY_TM_MARK_IDLE = true
+		MY_TEAM_MON_MARK_IDLE = true
 	end
-	if MY_TM_MARK_IDLE and #MY_TM_MARK_QUEUE >= 1 then
-		MY_TM_MARK_IDLE = false
-		local r = table.remove(MY_TM_MARK_QUEUE, 1)
+	if MY_TEAM_MON_MARK_IDLE and #MY_TEAM_MON_MARK_QUEUE >= 1 then
+		MY_TEAM_MON_MARK_IDLE = false
+		local r = table.remove(MY_TEAM_MON_MARK_QUEUE, 1)
 		local res, err, trace = X.XpCall(r.fnAction)
 		if not res then
 			FireUIEvent('CALL_LUA_ERROR', 'MY_TeamMon_Mark ERROR: ' .. err .. '\n' .. trace)
@@ -520,7 +520,7 @@ function D.OnEvent(szEvent)
 		end
 	elseif szEvent == 'ON_WARNING_MESSAGE' then
 		D.OnCallMessage('TALK', arg1)
-	elseif szEvent == 'DOODAD_ENTER_SCENE' or szEvent == 'MY_TM_DOODAD_ENTER_SCENE' then
+	elseif szEvent == 'DOODAD_ENTER_SCENE' or szEvent == 'MY_TEAM_MON_DOODAD_ENTER_SCENE' then
 		local doodad = X.GetDoodad(arg0)
 		if doodad then
 			D.OnDoodadEvent(doodad, true)
@@ -530,9 +530,9 @@ function D.OnEvent(szEvent)
 		if doodad then
 			D.OnDoodadEvent(doodad, false)
 		end
-	elseif szEvent == 'MY_TM_DOODAD_ALL_LEAVE_SCENE' then
+	elseif szEvent == 'MY_TEAM_MON_DOODAD_ALL_LEAVE_SCENE' then
 		D.OnDoodadAllLeave(arg0)
-	elseif szEvent == 'NPC_ENTER_SCENE' or szEvent == 'MY_TM_NPC_ENTER_SCENE' then
+	elseif szEvent == 'NPC_ENTER_SCENE' or szEvent == 'MY_TEAM_MON_NPC_ENTER_SCENE' then
 		local npc = X.GetNpc(arg0)
 		if npc then
 			D.OnNpcEvent(npc, true)
@@ -542,13 +542,13 @@ function D.OnEvent(szEvent)
 		if npc then
 			D.OnNpcEvent(npc, false)
 		end
-	elseif szEvent == 'MY_TM_NPC_ALL_LEAVE_SCENE' then
+	elseif szEvent == 'MY_TEAM_MON_ALL_LEAVE_SCENE' then
 		D.OnNpcAllLeave(arg0)
-	elseif szEvent == 'MY_TM_NPC_FIGHT' then
+	elseif szEvent == 'MY_TEAM_MON_NPC_FIGHT' then
 		D.OnNpcFight(arg0, arg1)
-	elseif szEvent == 'MY_TM_NPC_LIFE_CHANGE' or szEvent == 'MY_TM_NPC_MANA_CHANGE' then
+	elseif szEvent == 'MY_TEAM_MON_NPC_LIFE_CHANGE' or szEvent == 'MY_TEAM_MON_NPC_MANA_CHANGE' then
 		D.OnNpcInfoChange(szEvent, arg0, arg1, arg2)
-	elseif szEvent == 'LOADING_END' or szEvent == 'MY_TM_CREATE_CACHE' or szEvent == 'MY_TM_LOADING_END' then
+	elseif szEvent == 'LOADING_END' or szEvent == 'MY_TEAM_MON_CREATE_CACHE' or szEvent == 'MY_TEAM_MON_LOADING_END' then
 		D.FireCrossMapEvent('before')
 		D.CreateData(szEvent)
 		X.DelayCall('MY_TeamMon__FireCrossMapEvent__after', D.FireCrossMapEvent, 'after')
@@ -624,7 +624,7 @@ function D.UpdateShieldStatus()
 	if bRestrictedMap then
 		X.Sysmsg(_L['MY_TeamMon is blocked in this map, temporary disabled.'])
 	end
-	MY_TM_SHIELDED_MAP, MY_TM_PVP_MAP = bRestrictedMap, bPvpMap
+	MY_TEAM_MON_SHIELDED_MAP, MY_TEAM_MON_PVP_MAP = bRestrictedMap, bPvpMap
 end
 
 local function CreateCache(szType, tab)
@@ -647,8 +647,8 @@ function D.CreateData(szEvent)
 	local dwMapID = X.GetMapID(true)
 	local me = X.GetClientPlayer()
 	-- 用于更新 BUFF / CAST / NPC 缓存处理 不需要再获取本地对象
-	MY_TM_CORE_NAME     = me.szName
-	MY_TM_CORE_PLAYERID = me.dwID
+	MY_TEAM_MON_CORE_NAME     = me.szName
+	MY_TEAM_MON_CORE_PLAYERID = me.dwID
 	D.Log('get player info cache success!')
 	-- 更新功能屏蔽状态
 	D.UpdateShieldStatus()
@@ -658,7 +658,7 @@ function D.CreateData(szEvent)
 			if index == _L['All data'] then
 				local t = {}
 				for k, v in pairs(vTable) do
-					if k ~= MY_TM_SPECIAL_MAP.RECYCLE_BIN then
+					if k ~= MY_TEAM_MON_SPECIAL_MAP.RECYCLE_BIN then
 						for kk, vv in ipairs(v) do
 							t[#t +1] = vv
 						end
@@ -730,12 +730,12 @@ function D.CreateData(szEvent)
 	if O.bPushTeamPanel then
 		local tBuff = {}
 		for k, v in ipairs(D.DATA.BUFF) do
-			if v[MY_TM_TYPE.BUFF_GET] and v[MY_TM_TYPE.BUFF_GET].bTeamPanel then
+			if v[MY_TEAM_MON_TYPE.BUFF_GET] and v[MY_TEAM_MON_TYPE.BUFF_GET].bTeamPanel then
 				table.insert(tBuff, v.dwID)
 			end
 		end
 		for k, v in ipairs(D.DATA.DEBUFF) do
-			if v[MY_TM_TYPE.BUFF_GET] and v[MY_TM_TYPE.BUFF_GET].bTeamPanel then
+			if v[MY_TEAM_MON_TYPE.BUFF_GET] and v[MY_TEAM_MON_TYPE.BUFF_GET].bTeamPanel then
 				table.insert(tBuff, v.dwID)
 			end
 		end
@@ -743,7 +743,7 @@ function D.CreateData(szEvent)
 	end
 	D.Log('MAPID: ' .. dwMapID ..  ' create data success:' .. GetTime() - nTime  .. 'ms')
 	-- gc
-	if szEvent ~= 'MY_TM_CREATE_CACHE' then
+	if szEvent ~= 'MY_TEAM_MON_CREATE_CACHE' then
 		CACHE.SKILL_LIST = {}
 		CACHE.HP_CD_STR  = {}
 		D.Log('collectgarbage(\'count\') ' .. collectgarbage('count'))
@@ -755,34 +755,34 @@ function D.CreateData(szEvent)
 	CACHE.DOODAD_LIST = {}
 	-- re-scan nearby
 	for _, v in pairs(X.GetNearNpcID()) do
-		FireUIEvent('MY_TM_NPC_ENTER_SCENE', v)
+		FireUIEvent('MY_TEAM_MON_NPC_ENTER_SCENE', v)
 	end
 	for _, v in pairs(X.GetNearDoodadID()) do
-		FireUIEvent('MY_TM_DOODAD_ENTER_SCENE', v)
+		FireUIEvent('MY_TEAM_MON_DOODAD_ENTER_SCENE', v)
 	end
-	FireUIEvent('MY_TMUI_FREECACHE')
+	FireUIEvent('MY_TEAM_MON__UI__FREE_CACHE')
 end
 
 function D.FreeCache(szType)
 	local t = {}
 	local tTemp = D.TEMP[szType]
-	for i = MY_TM_DEL_CACHE, #tTemp do
+	for i = MY_TEAM_MON_DEL_CACHE, #tTemp do
 		t[#t + 1] = tTemp[i]
 	end
 	D.TEMP[szType] = t
 	collectgarbage('collect')
-	FireUIEvent('MY_TMUI_TEMP_RELOAD', szType)
+	FireUIEvent('MY_TEAM_MON__UI__TEMP_RELOAD', szType)
 	D.Log(szType .. ' cache clear!')
 end
 
 function D.CheckScrutinyType(nScrutinyType, dwID)
-	if nScrutinyType == MY_TM_SCRUTINY_TYPE.SELF and dwID ~= MY_TM_CORE_PLAYERID then
+	if nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.SELF and dwID ~= MY_TEAM_MON_CORE_PLAYERID then
 		return false
-	elseif nScrutinyType == MY_TM_SCRUTINY_TYPE.TEAM and (not X.IsParty(dwID) and dwID ~= MY_TM_CORE_PLAYERID) then
+	elseif nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.TEAM and (not X.IsParty(dwID) and dwID ~= MY_TEAM_MON_CORE_PLAYERID) then
 		return false
-	elseif nScrutinyType == MY_TM_SCRUTINY_TYPE.ENEMY and not IsEnemy(MY_TM_CORE_PLAYERID, dwID) then
+	elseif nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.ENEMY and not IsEnemy(MY_TEAM_MON_CORE_PLAYERID, dwID) then
 		return false
-	elseif nScrutinyType == MY_TM_SCRUTINY_TYPE.TARGET then
+	elseif nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.TARGET then
 		local obj = X.GetObject(X.GetTarget())
 		if not obj or obj and obj.dwID ~= dwID then
 			return false
@@ -839,7 +839,7 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 		end
 		D.OnSetMark(true) -- 标记失败 直接处理下一个
 	end
-	table.insert(MY_TM_MARK_QUEUE, {
+	table.insert(MY_TEAM_MON_MARK_QUEUE, {
 		fnAction = fnAction,
 	})
 	D.OnSetMark()
@@ -850,7 +850,7 @@ function D.GetCountdownTypeKey(data, nIndex, szSender, szReceiver, aBackreferenc
 	local v = data.tCountdown[nIndex]
 	local nType, szKey = v.nClass, v.key
 	if szKey then
-		nType = MY_TM_TYPE.COMMON
+		nType = MY_TEAM_MON_TYPE.COMMON
 		szKey = RenderCustomText(szKey, szSender, szReceiver, aBackreferences)
 	else
 		szKey = nIndex .. '.' .. (data.dwID or 0) .. '.' .. (data.nLevel or 0) .. '.' .. (data.nIndex or 0) .. '.' .. X.EncodeLUAData(aBackreferences)
@@ -905,7 +905,7 @@ end
 -- local a=GetTime();for i=1, 10000 do FireUIEvent('BUFF_UPDATE',X.GetClientPlayerID(),false,1,true,i,1,1,1,1,0) end;Output(GetTime()-a)
 -- 事件操作
 function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dwSkillSrcID)
-	if MY_TM_SHIELDED_MAP or (MY_TM_PVP_MAP and dwOwner ~= MY_TM_CORE_PLAYERID) then
+	if MY_TEAM_MON_SHIELDED_MAP or (MY_TEAM_MON_PVP_MAP and dwOwner ~= MY_TEAM_MON_CORE_PLAYERID) then
 		return
 	end
 	local szType = bCanCancel and 'BUFF' or 'DEBUFF'
@@ -927,7 +927,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 				}
 				tWeak[key] = t
 				tTemp[#tTemp + 1] = tWeak[key]
-				FireUIEvent('MY_TMUI_TEMP_UPDATE', szType, t)
+				FireUIEvent('MY_TEAM_MON__UI__TEMP_UPDATE', szType, t)
 			end
 			-- 记录时间
 			CACHE.INTERVAL[szType][key] = CACHE.INTERVAL[szType][key] or {}
@@ -952,9 +952,9 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 			return
 		end
 		if bDelete then
-			cfg, nClass = data[MY_TM_TYPE.BUFF_LOSE], MY_TM_TYPE.BUFF_LOSE
+			cfg, nClass = data[MY_TEAM_MON_TYPE.BUFF_LOSE], MY_TEAM_MON_TYPE.BUFF_LOSE
 		else
-			cfg, nClass = data[MY_TM_TYPE.BUFF_GET], MY_TM_TYPE.BUFF_GET
+			cfg, nClass = data[MY_TEAM_MON_TYPE.BUFF_GET], MY_TEAM_MON_TYPE.BUFF_GET
 		end
 		local szSender = X.GetObjectName(X.IsPlayer(dwSkillSrcID) and TARGET.PLAYER or TARGET.NPC, dwSkillSrcID)
 		local szReceiver = X.GetObjectName(X.IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
@@ -968,10 +968,10 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 				nIcon = data.nIcon
 			end
 			local aXml, aText = {}, {}
-			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-			ConstructSpeech(aText, aXml, szReceiver == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szReceiver, 44, 255, 255, 0)
-			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
-			if nClass == MY_TM_TYPE.BUFF_GET then
+			ConstructSpeech(aText, aXml, MY_TEAM_MON_LEFT_BRACKET, MY_TEAM_MON_LEFT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, szReceiver == MY_TEAM_MON_CORE_NAME and g_tStrings.STR_YOU or szReceiver, 44, 255, 255, 0)
+			ConstructSpeech(aText, aXml, MY_TEAM_MON_RIGHT_BRACKET, MY_TEAM_MON_RIGHT_BRACKET_XML)
+			if nClass == MY_TEAM_MON_TYPE.BUFF_GET then
 				ConstructSpeech(aText, aXml, _L['Get buff'], 44, 255, 255, 255)
 				ConstructSpeech(aText, aXml, szName .. ' x' .. nCount, 44, 255, 255, 0)
 				if data.szNote and not X.IsRestricted('MY_TeamMon.Note') then
@@ -986,35 +986,35 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 				FireUIEvent('MY_TEAM_MON__CENTER_ALARM__CREATE', szXml, 3, true)
 			end
 			-- 特大文字
-			if O.bPushBigFontAlarm and cfg.bBigFontAlarm and (MY_TM_CORE_PLAYERID == dwOwner or not X.IsPlayer(dwOwner)) then
-				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(dwOwner, MY_TM_CORE_PLAYERID) })
+			if O.bPushBigFontAlarm and cfg.bBigFontAlarm and (MY_TEAM_MON_CORE_PLAYERID == dwOwner or not X.IsPlayer(dwOwner)) then
+				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(dwOwner, MY_TEAM_MON_CORE_PLAYERID) })
 			end
 
 			-- 获得处理
-			if nClass == MY_TM_TYPE.BUFF_GET then
+			if nClass == MY_TEAM_MON_TYPE.BUFF_GET then
 				if cfg.bSelect then
 					SetTarget(X.IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
 				end
-				if cfg.bAutoCancel and MY_TM_CORE_PLAYERID == dwOwner then
+				if cfg.bAutoCancel and MY_TEAM_MON_CORE_PLAYERID == dwOwner then
 					X.CancelBuff(X.GetClientPlayer(), dwBuffID)
 				end
 				if cfg.tMark then
 					D.SetTeamMark(szType, cfg.tMark, dwOwner, dwBuffID, nBuffLevel)
 				end
 				-- 重要Buff列表
-				if O.bPushPartyBuffList and X.IsPlayer(dwOwner) and cfg.bPartyBuffList and (X.IsParty(dwOwner) or MY_TM_CORE_PLAYERID == dwOwner) then
+				if O.bPushPartyBuffList and X.IsPlayer(dwOwner) and cfg.bPartyBuffList and (X.IsParty(dwOwner) or MY_TEAM_MON_CORE_PLAYERID == dwOwner) then
 					FireUIEvent('MY_TEAM_MON__PARTY_BUFF_LIST', dwOwner, data.dwID, data.nLevel, data.nIcon)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwOwner, szType, 'MY_TM_BUFF_' .. data.dwID, {
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwOwner, szType, 'MY_TEAM_MON_BUFF_' .. data.dwID, {
 						dwBuffID = data.dwID,
 						szText = szName,
 						col = data.col or (szType == 'BUFF' and {0, 255, 0} or {255, 0, 0}),
 					})
-					FireUIEvent('MY_TM_SA_CREATE', szType, dwOwner, { dwID = data.dwID, col = data.col, text = szName })
+					FireUIEvent('MY_TEAM_MON__SA__CREATE', szType, dwOwner, { dwID = data.dwID, col = data.col, text = szName })
 				end
-				if MY_TM_CORE_PLAYERID == dwOwner then
+				if MY_TEAM_MON_CORE_PLAYERID == dwOwner then
 					if O.bPushBuffList and cfg.bBuffList then
 						local col = szType == 'BUFF' and { 0, 255, 0 } or { 255, 0, 0 }
 						if data.col then
@@ -1032,7 +1032,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 					end
 				end
 				-- 添加到团队面板
-				if O.bPushTeamPanel and cfg.bTeamPanel and (not cfg.bOnlySelfSrc or dwSkillSrcID == MY_TM_CORE_PLAYERID) and X.IsEmpty(data.aCataclysmBuff) then
+				if O.bPushTeamPanel and cfg.bTeamPanel and (not cfg.bOnlySelfSrc or dwSkillSrcID == MY_TEAM_MON_CORE_PLAYERID) and X.IsEmpty(data.aCataclysmBuff) then
 					FireUIEvent('MY_RAID_REC_BUFF', dwOwner, {
 						dwID      = data.dwID,
 						nLevel    = data.bCheckLevel and data.nLevel or 0,
@@ -1056,7 +1056,7 @@ end
 
 -- 技能事件
 function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
-	if MY_TM_SHIELDED_MAP or (MY_TM_PVP_MAP and dwCaster ~= MY_TM_CORE_PLAYERID) then
+	if MY_TEAM_MON_SHIELDED_MAP or (MY_TEAM_MON_PVP_MAP and dwCaster ~= MY_TEAM_MON_CORE_PLAYERID) then
 		return
 	end
 	local key = dwCastID .. '_' .. dwLevel
@@ -1084,7 +1084,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			}
 			tWeak[key] = t
 			tTemp[#tTemp + 1] = tWeak[key]
-			FireUIEvent('MY_TMUI_TEMP_UPDATE', 'CASTING', t)
+			FireUIEvent('MY_TEAM_MON__UI__TEMP_UPDATE', 'CASTING', t)
 		end
 		CACHE.INTERVAL.CASTING[key] = CACHE.INTERVAL.CASTING[key] or {}
 		CACHE.INTERVAL.CASTING[key][#CACHE.INTERVAL.CASTING[key] + 1] = nTime
@@ -1115,29 +1115,29 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		end
 		local cfg, nClass
 		if szEvent == 'UI_OME_SKILL_CAST_LOG' then
-			cfg, nClass = data[MY_TM_TYPE.SKILL_BEGIN], MY_TM_TYPE.SKILL_BEGIN
+			cfg, nClass = data[MY_TEAM_MON_TYPE.SKILL_BEGIN], MY_TEAM_MON_TYPE.SKILL_BEGIN
 		else
-			cfg, nClass = data[MY_TM_TYPE.SKILL_END], MY_TM_TYPE.SKILL_END
+			cfg, nClass = data[MY_TEAM_MON_TYPE.SKILL_END], MY_TEAM_MON_TYPE.SKILL_END
 		end
 		D.CountdownEvent(data, nClass, szSender, szReceiver)
 		if cfg then
 			local aXml, aText = {}, {}
-			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, MY_TEAM_MON_LEFT_BRACKET, MY_TEAM_MON_LEFT_BRACKET_XML)
 			ConstructSpeech(aText, aXml, szSender, 44, 255, 255, 0)
-			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
-			if nClass == MY_TM_TYPE.SKILL_END then
+			ConstructSpeech(aText, aXml, MY_TEAM_MON_RIGHT_BRACKET, MY_TEAM_MON_RIGHT_BRACKET_XML)
+			if nClass == MY_TEAM_MON_TYPE.SKILL_END then
 				ConstructSpeech(aText, aXml, _L['use of'], 44, 255, 255, 255)
 			else
 				ConstructSpeech(aText, aXml, _L['Casting'], 44, 255, 255, 255)
 			end
-			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, MY_TEAM_MON_LEFT_BRACKET, MY_TEAM_MON_LEFT_BRACKET_XML)
 			ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
-			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, MY_TEAM_MON_RIGHT_BRACKET, MY_TEAM_MON_RIGHT_BRACKET_XML)
 			if data.bMonTarget and szReceiver then
 				ConstructSpeech(aText, aXml, g_tStrings.TARGET, 44, 255, 255, 255)
-				ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
-				ConstructSpeech(aText, aXml, szReceiver == MY_TM_CORE_NAME and g_tStrings.STR_YOU or szReceiver, 44, 255, 255, 0)
-				ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+				ConstructSpeech(aText, aXml, MY_TEAM_MON_LEFT_BRACKET, MY_TEAM_MON_LEFT_BRACKET_XML)
+				ConstructSpeech(aText, aXml, szReceiver == MY_TEAM_MON_CORE_NAME and g_tStrings.STR_YOU or szReceiver, 44, 255, 255, 0)
+				ConstructSpeech(aText, aXml, MY_TEAM_MON_RIGHT_BRACKET, MY_TEAM_MON_RIGHT_BRACKET_XML)
 			end
 			if data.szNote and not X.IsRestricted('MY_TeamMon.Note') then
 				ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(data.szNote, szSender, szReceiver), 44, 255, 255, 255)
@@ -1148,7 +1148,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
-				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TM_CORE_PLAYERID) })
+				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TEAM_MON_CORE_PLAYERID) })
 			end
 			if not X.IsRestricted('MY_TeamMon.AutoSelect') and cfg.bSelect then
 				SetTarget(X.IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
@@ -1158,12 +1158,12 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			end
 			-- 头顶报警
 			if O.bPushScreenHead and cfg.bScreenHead then
-				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCaster, 'CASTING', 'MY_TM_CASTING_' .. data.dwID, {
+				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCaster, 'CASTING', 'MY_TEAM_MON_CASTING_' .. data.dwID, {
 					dwSkillID = dwCastID,
 					szText = szName,
 					col = data.col,
 				})
-				FireUIEvent('MY_TM_SA_CREATE', 'CASTING', dwCaster, { text = szName, col = data.col })
+				FireUIEvent('MY_TEAM_MON__SA__CREATE', 'CASTING', dwCaster, { text = szName, col = data.col })
 			end
 			-- 全屏泛光
 			if O.bPushFullScreen and cfg.bFullScreen then
@@ -1201,12 +1201,12 @@ function D.OnNpcEvent(npc, bEnter)
 				dwMapID      = X.GetMapID(),
 				dwID         = npc.dwTemplateID,
 				nFrame       = select(2, GetNpcHeadImage(npc.dwID)),
-				col          = { GetHeadTextForceFontColor(npc.dwID, MY_TM_CORE_PLAYERID) },
+				col          = { GetHeadTextForceFontColor(npc.dwID, MY_TEAM_MON_CORE_PLAYERID) },
 				nCurrentTime = GetCurrentTime()
 			}
 			tWeak[npc.dwTemplateID] = t
 			tTemp[#tTemp + 1] = tWeak[npc.dwTemplateID]
-			FireUIEvent('MY_TMUI_TEMP_UPDATE', 'NPC', t)
+			FireUIEvent('MY_TEAM_MON__UI__TEMP_UPDATE', 'NPC', t)
 		end
 		CACHE.INTERVAL.NPC[npc.dwTemplateID] = CACHE.INTERVAL.NPC[npc.dwTemplateID] or {}
 		if #CACHE.INTERVAL.NPC[npc.dwTemplateID] > 0 then
@@ -1224,16 +1224,16 @@ function D.OnNpcEvent(npc, bEnter)
 				npcInfo.tList[npc.dwID] = nil
 				npcInfo.nCount = npcInfo.nCount - 1
 				if tab.bFightState then
-					FireUIEvent('MY_TM_NPC_FIGHT', npc.dwTemplateID, false, GetTime() - (tab.nSec or GetTime()))
+					FireUIEvent('MY_TEAM_MON_NPC_FIGHT', npc.dwTemplateID, false, GetTime() - (tab.nSec or GetTime()))
 				end
 				if npcInfo.nCount == 0 then
 					CACHE.NPC_LIST[npc.dwTemplateID] = nil
-					FireUIEvent('MY_TM_NPC_ALL_LEAVE_SCENE', npc.dwTemplateID)
+					FireUIEvent('MY_TEAM_MON_ALL_LEAVE_SCENE', npc.dwTemplateID)
 				end
 			end
 		end
 	end
-	if MY_TM_SHIELDED_MAP then
+	if MY_TEAM_MON_SHIELDED_MAP then
 		return
 	end
 	if data then
@@ -1244,12 +1244,12 @@ function D.OnNpcEvent(npc, bEnter)
 		local szSender = nil
 		local szReceiver = X.GetObjectName(npc)
 		if bEnter then
-			cfg, nClass = data[MY_TM_TYPE.NPC_ENTER], MY_TM_TYPE.NPC_ENTER
+			cfg, nClass = data[MY_TEAM_MON_TYPE.NPC_ENTER], MY_TEAM_MON_TYPE.NPC_ENTER
 			nCount = CACHE.NPC_LIST[npc.dwTemplateID].nCount
 		else
-			cfg, nClass = data[MY_TM_TYPE.NPC_LEAVE], MY_TM_TYPE.NPC_LEAVE
+			cfg, nClass = data[MY_TEAM_MON_TYPE.NPC_LEAVE], MY_TEAM_MON_TYPE.NPC_LEAVE
 		end
-		if nClass == MY_TM_TYPE.NPC_LEAVE then
+		if nClass == MY_TEAM_MON_TYPE.NPC_LEAVE then
 			if data.bAllLeave and CACHE.NPC_LIST[npc.dwTemplateID] then
 				return
 			end
@@ -1268,11 +1268,11 @@ function D.OnNpcEvent(npc, bEnter)
 					if not X.IsRestricted('MY_TeamMon.Note') then
 						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
 					end
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TM_NPC_' .. npc.dwID, {
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TEAM_MON_NPC_' .. npc.dwID, {
 						szText = szNote,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'NPC', npc.dwID, { text = szNote, col = data.col, szName = szName })
+					FireUIEvent('MY_TEAM_MON__SA__CREATE', 'NPC', npc.dwID, { text = szNote, col = data.col, szName = szName })
 				end
 			end
 			if nTime - CACHE.NPC_LIST[npc.dwTemplateID].nTime < 500 then -- 0.5秒内进入相同的NPC直接忽略
@@ -1288,10 +1288,10 @@ function D.OnNpcEvent(npc, bEnter)
 				szName = FilterCustomText(data.szName, szSender, szReceiver)
 			end
 			local aXml, aText = {}, {}
-			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, MY_TEAM_MON_LEFT_BRACKET, MY_TEAM_MON_LEFT_BRACKET_XML)
 			ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
-			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
-			if nClass == MY_TM_TYPE.NPC_ENTER then
+			ConstructSpeech(aText, aXml, MY_TEAM_MON_RIGHT_BRACKET, MY_TEAM_MON_RIGHT_BRACKET_XML)
+			if nClass == MY_TEAM_MON_TYPE.NPC_ENTER then
 				ConstructSpeech(aText, aXml, _L['Appear'], 44, 255, 255, 255)
 				if nCount > 1 then
 					ConstructSpeech(aText, aXml, ' x' .. nCount, 44, 255, 255, 0)
@@ -1308,7 +1308,7 @@ function D.OnNpcEvent(npc, bEnter)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
-				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(npc.dwID, MY_TM_CORE_PLAYERID) })
+				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(npc.dwID, MY_TEAM_MON_CORE_PLAYERID) })
 			end
 
 			if O.bPushTeamChannel and cfg.bTeamChannel then
@@ -1318,7 +1318,7 @@ function D.OnNpcEvent(npc, bEnter)
 				D.Talk('RAID_WHISPER', szText)
 			end
 
-			if nClass == MY_TM_TYPE.NPC_ENTER then
+			if nClass == MY_TEAM_MON_TYPE.NPC_ENTER then
 				if not X.IsRestricted('MY_TeamMon.AutoSelect') and cfg.bSelect then
 					SetTarget(TARGET.NPC, npc.dwID)
 				end
@@ -1354,7 +1354,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 				}
 				tWeak[doodad.dwTemplateID] = t
 				tTemp[#tTemp + 1] = tWeak[doodad.dwTemplateID]
-				FireUIEvent('MY_TMUI_TEMP_UPDATE', 'DOODAD', t)
+				FireUIEvent('MY_TEAM_MON__UI__TEMP_UPDATE', 'DOODAD', t)
 			end
 		end
 		CACHE.INTERVAL.DOODAD[doodad.dwTemplateID] = CACHE.INTERVAL.DOODAD[doodad.dwTemplateID] or {}
@@ -1374,12 +1374,12 @@ function D.OnDoodadEvent(doodad, bEnter)
 				doodadInfo.nCount = doodadInfo.nCount - 1
 				if doodadInfo.nCount == 0 then
 					CACHE.DOODAD_LIST[doodad.dwTemplateID] = nil
-					FireUIEvent('MY_TM_DOODAD_ALL_LEAVE_SCENE', doodad.dwTemplateID)
+					FireUIEvent('MY_TEAM_MON_DOODAD_ALL_LEAVE_SCENE', doodad.dwTemplateID)
 				end
 			end
 		end
 	end
-	if MY_TM_SHIELDED_MAP then
+	if MY_TEAM_MON_SHIELDED_MAP then
 		return
 	end
 	if data then
@@ -1390,12 +1390,12 @@ function D.OnDoodadEvent(doodad, bEnter)
 		local szSender = nil
 		local szReceiver = X.GetObjectName(doodad)
 		if bEnter then
-			cfg, nClass = data[MY_TM_TYPE.DOODAD_ENTER], MY_TM_TYPE.DOODAD_ENTER
+			cfg, nClass = data[MY_TEAM_MON_TYPE.DOODAD_ENTER], MY_TEAM_MON_TYPE.DOODAD_ENTER
 			nCount = CACHE.DOODAD_LIST[doodad.dwTemplateID].nCount
 		else
-			cfg, nClass = data[MY_TM_TYPE.DOODAD_LEAVE], MY_TM_TYPE.DOODAD_LEAVE
+			cfg, nClass = data[MY_TEAM_MON_TYPE.DOODAD_LEAVE], MY_TEAM_MON_TYPE.DOODAD_LEAVE
 		end
-		if nClass == MY_TM_TYPE.DOODAD_LEAVE then
+		if nClass == MY_TEAM_MON_TYPE.DOODAD_LEAVE then
 			if data.bAllLeave and CACHE.DOODAD_LIST[doodad.dwTemplateID] then
 				return
 			end
@@ -1411,11 +1411,11 @@ function D.OnDoodadEvent(doodad, bEnter)
 					if not X.IsRestricted('MY_TeamMon.Note') then
 						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
 					end
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TM_DOODAD_' .. doodad.dwID, {
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TEAM_MON_DOODAD_' .. doodad.dwID, {
 						szText = szNote,
 						col = data.col,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'DOODAD', doodad.dwID, { text = szNote, col = data.col, szName = szName })
+					FireUIEvent('MY_TEAM_MON__SA__CREATE', 'DOODAD', doodad.dwID, { text = szNote, col = data.col, szName = szName })
 				end
 			end
 			if nTime - CACHE.DOODAD_LIST[doodad.dwTemplateID].nTime < 500 then
@@ -1431,10 +1431,10 @@ function D.OnDoodadEvent(doodad, bEnter)
 				szName = FilterCustomText(data.szName, szSender, szReceiver)
 			end
 			local aXml, aText = {}, {}
-			ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+			ConstructSpeech(aText, aXml, MY_TEAM_MON_LEFT_BRACKET, MY_TEAM_MON_LEFT_BRACKET_XML)
 			ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
-			ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
-			if nClass == MY_TM_TYPE.DOODAD_ENTER then
+			ConstructSpeech(aText, aXml, MY_TEAM_MON_RIGHT_BRACKET, MY_TEAM_MON_RIGHT_BRACKET_XML)
+			if nClass == MY_TEAM_MON_TYPE.DOODAD_ENTER then
 				ConstructSpeech(aText, aXml, _L['Appear'], 44, 255, 255, 255)
 				if nCount > 1 then
 					ConstructSpeech(aText, aXml, ' x' .. nCount, 44, 255, 255, 0)
@@ -1461,7 +1461,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 				D.Talk('RAID_WHISPER', szText)
 			end
 
-			if nClass == MY_TM_TYPE.DOODAD_ENTER then
+			if nClass == MY_TEAM_MON_TYPE.DOODAD_ENTER then
 				if O.bPushFullScreen and cfg.bFullScreen then
 					FireUIEvent('MY_TEAM_MON__FULL_SCREEN_ALARM__CREATE', 'DOODAD', { nTime  = 3, col = data.col, bFlash = true })
 				end
@@ -1471,21 +1471,21 @@ function D.OnDoodadEvent(doodad, bEnter)
 end
 
 function D.OnDoodadAllLeave(dwTemplateID)
-	if MY_TM_SHIELDED_MAP then
+	if MY_TEAM_MON_SHIELDED_MAP then
 		return
 	end
 	local data = D.GetData('DOODAD', dwTemplateID)
 	if data then
 		local szSender = nil
 		local szReceiver = X.GetTemplateName(TARGET.DOODAD, dwTemplateID)
-		D.CountdownEvent(data, MY_TM_TYPE.DOODAD_ALLLEAVE, szSender, szReceiver)
+		D.CountdownEvent(data, MY_TEAM_MON_TYPE.DOODAD_ALLLEAVE, szSender, szReceiver)
 	end
 end
 
 -- 系统和NPC喊话处理
 -- OutputMessage('MSG_SYS', 1..'\n')
 function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
-	if MY_TM_SHIELDED_MAP then
+	if MY_TEAM_MON_SHIELDED_MAP then
 		return
 	end
 	if dwNpcID and not X.IsPlayer(dwNpcID) then
@@ -1508,7 +1508,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 		}
 		tWeak[key] = t
 		tTemp[#tTemp + 1] = tWeak[key]
-		FireUIEvent('MY_TMUI_TEMP_UPDATE', szEvent, t)
+		FireUIEvent('MY_TEAM_MON__UI__TEMP_UPDATE', szEvent, t)
 	end
 	local cache, data = CACHE.MAP[szEvent], nil
 	if cache.HIT[szContent] then
@@ -1560,8 +1560,8 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 	end
 	if data then
 		local nClass = szEvent == 'TALK'
-			and MY_TM_TYPE.TALK_MONITOR
-			or MY_TM_TYPE.CHAT_MONITOR
+			and MY_TEAM_MON_TYPE.TALK_MONITOR
+			or MY_TEAM_MON_TYPE.CHAT_MONITOR
 		if not dwReceiverID and not szReceiver and data.szContent:find('{$me}', nil, true) then
 			dwReceiverID = me.dwID
 			szReceiver = me.szName
@@ -1571,18 +1571,18 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 		if cfg then
 			local aXml, aText, aTalkXml, aTalkText = {}, {}, {}, {}
 			if szReceiver then
-				ConstructSpeech(aTalkText, aTalkXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, MY_TEAM_MON_LEFT_BRACKET, MY_TEAM_MON_LEFT_BRACKET_XML)
 				ConstructSpeech(aTalkText, aTalkXml, szSender, 44, 255, 255, 0)
-				ConstructSpeech(aTalkText, aTalkXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, MY_TEAM_MON_RIGHT_BRACKET, MY_TEAM_MON_RIGHT_BRACKET_XML)
 				ConstructSpeech(aTalkText, aTalkXml, _L['is calling'], 44, 255, 255, 255)
-				ConstructSpeech(aTalkText, aTalkXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, MY_TEAM_MON_LEFT_BRACKET, MY_TEAM_MON_LEFT_BRACKET_XML)
 				ConstructSpeech(aTalkText, aTalkXml, szReceiver == me.szName and g_tStrings.STR_YOU or szReceiver, 44, 255, 255, 0)
-				ConstructSpeech(aTalkText, aTalkXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, MY_TEAM_MON_RIGHT_BRACKET, MY_TEAM_MON_RIGHT_BRACKET_XML)
 				ConstructSpeech(aTalkText, aTalkXml, _L['\'s name.'], 44, 255, 255, 255)
 			else
-				ConstructSpeech(aTalkText, aTalkXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, MY_TEAM_MON_LEFT_BRACKET, MY_TEAM_MON_LEFT_BRACKET_XML)
 				ConstructSpeech(aTalkText, aTalkXml, szSender, 44, 255, 255, 0)
-				ConstructSpeech(aTalkText, aTalkXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
+				ConstructSpeech(aTalkText, aTalkXml, MY_TEAM_MON_RIGHT_BRACKET, MY_TEAM_MON_RIGHT_BRACKET_XML)
 				ConstructSpeech(aTalkText, aTalkXml, g_tStrings.HEADER_SHOW_SAY, 44, 255, 255, 0)
 				ConstructSpeech(aTalkText, aTalkXml, szContent, 44, 255, 255, 0)
 			end
@@ -1602,13 +1602,13 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwReceiverID, 'TIME', 'MY_TM_TIME_' .. dwReceiverID, {
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwReceiverID, 'TIME', 'MY_TEAM_MON_TIME_' .. dwReceiverID, {
 						nTime = GetTime() + 5000,
 						szText = _L('%s call name', szNpcName or g_tStrings.SYSTEM),
 						col = data.col,
 						bHideProgress = true,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'TIME', dwReceiverID, { text = _L('%s call name', szNpcName or g_tStrings.SYSTEM)})
+					FireUIEvent('MY_TEAM_MON__SA__CREATE', 'TIME', dwReceiverID, { text = _L('%s call name', szNpcName or g_tStrings.SYSTEM)})
 				end
 				if not X.IsRestricted('MY_TeamMon.AutoSelect') and cfg.bSelect then
 					SetTarget(TARGET.PLAYER, dwReceiverID)
@@ -1619,13 +1619,13 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwNpcID or me.dwID, 'TIME', 'MY_TM_TIME_' .. (dwNpcID or me.dwID), {
+					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwNpcID or me.dwID, 'TIME', 'MY_TEAM_MON_TIME_' .. (dwNpcID or me.dwID), {
 						nTime = GetTime() + 5000,
 						szText = szText,
 						col = data.col,
 						bHideProgress = true,
 					})
-					FireUIEvent('MY_TM_SA_CREATE', 'TIME', dwNpcID or me.dwID, { text = szText })
+					FireUIEvent('MY_TEAM_MON__SA__CREATE', 'TIME', dwNpcID or me.dwID, { text = szText })
 				end
 			end
 			-- 中央报警
@@ -1654,7 +1654,7 @@ end
 
 -- NPC死亡事件 触发倒计时
 function D.OnDeath(dwCharacterID, dwKiller)
-	if MY_TM_SHIELDED_MAP then
+	if MY_TEAM_MON_SHIELDED_MAP then
 		return
 	end
 	local npc = X.GetNpc(dwCharacterID)
@@ -1664,7 +1664,7 @@ function D.OnDeath(dwCharacterID, dwKiller)
 			local dwTemplateID = npc.dwTemplateID
 			local szSender = X.GetObjectName(X.GetObject(dwKiller), 'auto')
 			local szReceiver = X.GetObjectName(npc)
-			D.CountdownEvent(data, MY_TM_TYPE.NPC_DEATH, szSender, szReceiver)
+			D.CountdownEvent(data, MY_TEAM_MON_TYPE.NPC_DEATH, szSender, szReceiver)
 			local bAllDeath = true
 			if CACHE.NPC_LIST[dwTemplateID] then
 				for k, v in pairs(CACHE.NPC_LIST[dwTemplateID].tList) do
@@ -1676,7 +1676,7 @@ function D.OnDeath(dwCharacterID, dwKiller)
 				end
 			end
 			if bAllDeath then
-				D.CountdownEvent(data, MY_TM_TYPE.NPC_ALLDEATH, szSender, szReceiver)
+				D.CountdownEvent(data, MY_TEAM_MON_TYPE.NPC_ALLDEATH, szSender, szReceiver)
 			end
 		end
 	end
@@ -1684,7 +1684,7 @@ end
 
 -- NPC进出战斗事件 触发倒计时
 function D.OnNpcFight(dwTemplateID, bFight)
-	if MY_TM_SHIELDED_MAP then
+	if MY_TEAM_MON_SHIELDED_MAP then
 		return
 	end
 	local data = D.GetData('NPC', dwTemplateID)
@@ -1692,10 +1692,10 @@ function D.OnNpcFight(dwTemplateID, bFight)
 		local szSender = nil
 		local szReceiver = X.GetTemplateName(TARGET.NPC, dwTemplateID)
 		if bFight then
-			D.CountdownEvent(data, MY_TM_TYPE.NPC_FIGHT, szSender, szReceiver)
+			D.CountdownEvent(data, MY_TEAM_MON_TYPE.NPC_FIGHT, szSender, szReceiver)
 		elseif data.tCountdown then -- 脱离的时候清空下
 			for i, v in ipairs(data.tCountdown) do
-				if v.nClass == MY_TM_TYPE.NPC_FIGHT and not v.bFightHold then
+				if v.nClass == MY_TEAM_MON_TYPE.NPC_FIGHT and not v.bFightHold then
 					local nType, szKey = D.GetCountdownTypeKey(data, i, szSender, szReceiver)
 					FireUIEvent('MY_TEAM_MON__SPELL_TIMER__DEL', nType, szKey) -- try kill
 				end
@@ -1706,12 +1706,12 @@ end
 
 -- 不该放在倒计时中 需要重构
 function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
-	if MY_TM_SHIELDED_MAP then
+	if MY_TEAM_MON_SHIELDED_MAP then
 		return
 	end
 	local data = D.GetData('NPC', dwTemplateID)
 	if data and data.tCountdown then
-		local dwType = szEvent == 'MY_TM_NPC_LIFE_CHANGE' and MY_TM_TYPE.NPC_LIFE or MY_TM_TYPE.NPC_MANA
+		local dwType = szEvent == 'MY_TEAM_MON_NPC_LIFE_CHANGE' and MY_TEAM_MON_TYPE.NPC_LIFE or MY_TEAM_MON_TYPE.NPC_MANA
 		local szSender = nil
 		local szReceiver = X.GetTemplateName(TARGET.NPC, dwTemplateID)
 		for k, v in ipairs(data.tCountdown) do
@@ -1722,10 +1722,10 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 					and (tHpCd.szOperator == '*' or (bIncrease and tHpCd.szOperator == '+') or (not bIncrease and tHpCd.szOperator == '-')) then -- hit
 						local szName = FilterCustomText(data.szName, szSender, szReceiver) or szReceiver
 						local aXml, aText = {}, {}
-						ConstructSpeech(aText, aXml, MY_TM_LEFT_BRACKET, MY_TM_LEFT_BRACKET_XML)
+						ConstructSpeech(aText, aXml, MY_TEAM_MON_LEFT_BRACKET, MY_TEAM_MON_LEFT_BRACKET_XML)
 						ConstructSpeech(aText, aXml, szName, 44, 255, 255, 0)
-						ConstructSpeech(aText, aXml, MY_TM_RIGHT_BRACKET, MY_TM_RIGHT_BRACKET_XML)
-						ConstructSpeech(aText, aXml, dwType == MY_TM_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255)
+						ConstructSpeech(aText, aXml, MY_TEAM_MON_RIGHT_BRACKET, MY_TEAM_MON_RIGHT_BRACKET_XML)
+						ConstructSpeech(aText, aXml, dwType == MY_TEAM_MON_TYPE.NPC_LIFE and _L['\'s life remaining to '] or _L['\'s mana reaches '], 44, 255, 255, 255)
 						ConstructSpeech(aText, aXml, ' ' .. tHpCd.nValue .. '%', 44, 255, 255, 0)
 						ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(tHpCd.szContent, szSender, szReceiver), 44, 255, 255, 255)
 						local szXml, szText = table.concat(aXml), table.concat(aText)
@@ -1741,7 +1741,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 						if tHpCd.nTime then
 							local nType, szKey = v.nClass, v.key
 							if szKey then
-								nType = MY_TM_TYPE.COMMON
+								nType = MY_TEAM_MON_TYPE.COMMON
 							else
 								szKey = k .. '.' .. dwTemplateID .. '.' .. kk
 							end
@@ -1765,14 +1765,14 @@ end
 
 -- NPC 全部消失的倒计时处理
 function D.OnNpcAllLeave(dwTemplateID)
-	if MY_TM_SHIELDED_MAP then
+	if MY_TEAM_MON_SHIELDED_MAP then
 		return
 	end
 	local data = D.GetData('NPC', dwTemplateID)
 	local szSender = nil
 	local szReceiver = X.GetTemplateName(TARGET.NPC, dwTemplateID)
 	if data then
-		D.CountdownEvent(data, MY_TM_TYPE.NPC_ALLLEAVE, szSender, szReceiver)
+		D.CountdownEvent(data, MY_TEAM_MON_TYPE.NPC_ALLLEAVE, szSender, szReceiver)
 	end
 end
 
@@ -1806,7 +1806,7 @@ end
 function D.RegisterMessage(bEnable)
 	if bEnable then
 		X.RegisterMsgMonitor('MSG_SYS', 'MY_TeamMon_MON', function(szChannel, szMsg, nFont, bRich)
-			if MY_TM_SHIELDED_MAP then
+			if MY_TEAM_MON_SHIELDED_MAP then
 				return
 			end
 			if not X.GetClientPlayer() then
@@ -1835,7 +1835,7 @@ end
 function D.Open()
 	local frame = D.GetFrame()
 	if frame then
-		for k, v in ipairs(MYTM_EVENTS) do
+		for k, v in ipairs(MY_TEAM_MON_EVENTS) do
 			frame:UnRegisterEvent(v)
 			frame:RegisterEvent(v)
 		end
@@ -1846,7 +1846,7 @@ end
 function D.Close()
 	local frame = D.GetFrame()
 	if frame then
-		for k, v in ipairs(MYTM_EVENTS) do
+		for k, v in ipairs(MY_TEAM_MON_EVENTS) do
 			frame:UnRegisterEvent(v)  -- kill all event
 		end
 		D.RegisterMessage(false)
@@ -1865,9 +1865,9 @@ function D.Enable(bEnable, bFireUIEvent)
 			return X.Debug(err, X.DEBUG_LEVEL.WARNING)
 		end
 		if bFireUIEvent then
-			FireUIEvent('MY_TM_LOADING_END')
+			FireUIEvent('MY_TEAM_MON_LOADING_END')
 		end
-		FireUIEvent('MY_TM_CREATE_CACHE')
+		FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 	else
 		D.Close()
 	end
@@ -1880,7 +1880,7 @@ function D.Init()
 		D[k] = X[K](D[k] .. string.char(77, 89))
 	end
 	D.LoadUserData()
-	Wnd.OpenWindow(MY_TM_INIFILE, 'MY_TeamMon')
+	Wnd.OpenWindow(MY_TEAM_MON_INI_FILE, 'MY_TeamMon')
 end
 
 -- 保存用户监控数据、配置
@@ -1901,12 +1901,12 @@ function D.LoadUserData()
 			D.FILE[k] = data.data[k] or {}
 		end
 		D.CONFIG = data.config or {}
-		FireUIEvent('MY_TM_CREATE_CACHE')
-		FireUIEvent('MY_TM_DATA_RELOAD')
+		FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
+		FireUIEvent('MY_TEAM_MON_DATA_RELOAD')
 	else
 		D.ImportDataFromFile(
 			X.ENVIRONMENT.GAME_EDITION ..  '.jx3dat',
-			MY_TM_TYPE_LIST,
+			MY_TEAM_MON_TYPE_LIST,
 			'REPLACE',
 			function()
 				D.Log('load custom data finish!')
@@ -1928,7 +1928,7 @@ end
 function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 	local szFullPath = szFileName:sub(2, 2) == ':'
 		and szFileName
-		or X.GetAbsolutePath(MY_TM_REMOTE_DATA_ROOT .. szFileName)
+		or X.GetAbsolutePath(MY_TEAM_MON_REMOTE_DATA_ROOT .. szFileName)
 	local szFilePath = X.GetRelativePath(szFullPath, {'', X.PATH_TYPE.NORMAL}) or szFullPath
 	if not IsFileExist(szFilePath) then
 		X.SafeCall(fnAction, false, 'File does not exist.')
@@ -1942,7 +1942,7 @@ function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 		return
 	end
 	if not aType then
-		aType = X.Clone(MY_TM_TYPE_LIST)
+		aType = X.Clone(MY_TEAM_MON_TYPE_LIST)
 	end
 	if szMode == 'REPLACE' then
 		for _, k in ipairs(aType) do
@@ -1974,10 +1974,10 @@ function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 			fnMergeData(tab_data)
 		end
 	end
-	FireUIEvent('MY_TM_CREATE_CACHE')
-	FireUIEvent('MY_TM_DATA_MODIFY')
-	FireUIEvent('MY_TM_DATA_RELOAD')
-	FireUIEvent('MY_TMUI_DATA_RELOAD')
+	FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
+	FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+	FireUIEvent('MY_TEAM_MON_DATA_RELOAD')
+	FireUIEvent('MY_TEAM_MON__UI__DATA_RELOAD')
 	-- szFilePath, aType, szMode, tMeta
 	X.SafeCall(fnAction, true, szFullPath:gsub('\\', '/'), aType, szMode, X.Clone(data.__meta))
 end
@@ -1997,7 +1997,7 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 		szServer = select(4, GetUserServer()),
 		nTimeStamp = GetCurrentTime(),
 	}
-	local szPath = MY_TM_REMOTE_DATA_ROOT .. szFileName
+	local szPath = MY_TEAM_MON_REMOTE_DATA_ROOT .. szFileName
 	if szFormat == 'JSON' or szFormat == 'JSON_FORMATED' then
 		if szFormat ~= 'JSON' then
 			szPath = szPath .. '.' .. szFormat:lower():sub(6)
@@ -2038,26 +2038,26 @@ function D.IterTable(data, dwMapID, bIterItem, bReverse)
 		if dwMapID == 0 then
 			dwMapID = X.GetMapID(true)
 		end
-		if data[MY_TM_SPECIAL_MAP.COMMON] then
-			table.insert(res, data[MY_TM_SPECIAL_MAP.COMMON])
+		if data[MY_TEAM_MON_SPECIAL_MAP.COMMON] then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.COMMON])
 		end
 		if X.IsDungeonMap(dwMapID) then
-			table.insert(res, data[MY_TM_SPECIAL_MAP.DUNGEON])
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.DUNGEON])
 		end
 		if X.IsDungeonMap(dwMapID, true) then
-			table.insert(res, data[MY_TM_SPECIAL_MAP.RAID_DUNGEON])
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.RAID_DUNGEON])
 		end
 		if X.IsDungeonMap(dwMapID, false) then
-			table.insert(res, data[MY_TM_SPECIAL_MAP.TEAM_DUNGEON])
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.TEAM_DUNGEON])
 		end
 		if X.IsCityMap(dwMapID) then
-			table.insert(res, data[MY_TM_SPECIAL_MAP.CITY])
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.CITY])
 		end
 		if X.IsVillageMap(dwMapID) then
-			table.insert(res, data[MY_TM_SPECIAL_MAP.VILLAGE])
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.VILLAGE])
 		end
 		if X.IsStarveMap(dwMapID) then
-			table.insert(res, data[MY_TM_SPECIAL_MAP.STARVE])
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.STARVE])
 		end
 		if data[dwMapID] then
 			table.insert(res, data[dwMapID])
@@ -2087,7 +2087,7 @@ function D.GetMapName(dwMapID)
 end
 
 function D.GetMapInfo(id)
-	return MY_TM_SPECIAL_MAP_INFO[id] or X.GetMapInfo(id)
+	return MY_TEAM_MON_SPECIAL_MAP_INFO[id] or X.GetMapInfo(id)
 end
 
 local function GetData(tab, szType, dwID, nLevel)
@@ -2154,14 +2154,14 @@ function D.RemoveData(szType, dwMapID, nIndex)
 		if not D.FILE[szType][dwMapID] or not D.FILE[szType][dwMapID][nIndex] then
 			return
 		end
-		if dwMapID == MY_TM_SPECIAL_MAP.RECYCLE_BIN then
+		if dwMapID == MY_TEAM_MON_SPECIAL_MAP.RECYCLE_BIN then
 			table.remove(D.FILE[szType][dwMapID], nIndex)
 			if #D.FILE[szType][dwMapID] == 0 then
 				D.FILE[szType][dwMapID] = nil
 			end
 			return
 		end
-		D.MoveData(szType, dwMapID, nIndex, MY_TM_SPECIAL_MAP.RECYCLE_BIN)
+		D.MoveData(szType, dwMapID, nIndex, MY_TEAM_MON_SPECIAL_MAP.RECYCLE_BIN)
 	elseif dwMapID then
 		if not D.FILE[szType][dwMapID] then
 			return
@@ -2173,15 +2173,15 @@ function D.RemoveData(szType, dwMapID, nIndex)
 		end
 		D.FILE[szType] = {}
 	end
-	FireUIEvent('MY_TM_CREATE_CACHE')
-	FireUIEvent('MY_TM_DATA_MODIFY')
-	FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
-	FireUIEvent('MY_TMUI_DATA_RELOAD')
+	FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
+	FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+	FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
+	FireUIEvent('MY_TEAM_MON__UI__DATA_RELOAD')
 end
 
 function D.CheckSameData(szType, dwMapID, dwID, nLevel)
 	if D.FILE[szType][dwMapID] then
-		if dwMapID ~= MY_TM_SPECIAL_MAP.RECYCLE_BIN then
+		if dwMapID ~= MY_TEAM_MON_SPECIAL_MAP.RECYCLE_BIN then
 			for k, v in ipairs(D.FILE[szType][dwMapID]) do
 				if type(dwID) == 'string' then
 					if dwID == v.szContent and nLevel == v.szTarget then
@@ -2216,10 +2216,10 @@ function D.MoveData(szType, dwMapID, nIndex, dwTargetMapID, bCopy)
 			D.FILE[szType][dwMapID] = nil
 		end
 	end
-	FireUIEvent('MY_TM_CREATE_CACHE')
-	FireUIEvent('MY_TM_DATA_MODIFY')
-	FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
-	FireUIEvent('MY_TMUI_DATA_RELOAD')
+	FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
+	FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+	FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
+	FireUIEvent('MY_TEAM_MON__UI__DATA_RELOAD')
 end
 
 -- 交换 其实没用 满足强迫症
@@ -2239,26 +2239,26 @@ function D.Exchange(szType, dwMapID, nIndex1, nIndex2)
 	-- table.insert(D.FILE[szType][dwMapID], nIndex2 + 1, data)
 	D.FILE[szType][dwMapID][nIndex1] = data2
 	D.FILE[szType][dwMapID][nIndex2] = data1
-	FireUIEvent('MY_TM_CREATE_CACHE')
-	FireUIEvent('MY_TM_DATA_MODIFY')
-	FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
-	FireUIEvent('MY_TMUI_DATA_RELOAD')
+	FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
+	FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+	FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
+	FireUIEvent('MY_TEAM_MON__UI__DATA_RELOAD')
 end
 
 function D.AddData(szType, dwMapID, data)
 	D.FILE[szType][dwMapID] = D.FILE[szType][dwMapID] or {}
 	table.insert(D.FILE[szType][dwMapID], data)
-	FireUIEvent('MY_TM_CREATE_CACHE')
-	FireUIEvent('MY_TM_DATA_MODIFY')
-	FireUIEvent('MY_TM_DATA_RELOAD', { [szType] = true })
-	FireUIEvent('MY_TMUI_DATA_RELOAD')
+	FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
+	FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+	FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
+	FireUIEvent('MY_TEAM_MON__UI__DATA_RELOAD')
 	return D.FILE[szType][dwMapID][#D.FILE[szType][dwMapID]]
 end
 
 function D.ClearTemp(szType)
 	CACHE.INTERVAL[szType] = {}
 	D.TEMP[szType] = {}
-	FireUIEvent('MY_TMUI_TEMP_RELOAD')
+	FireUIEvent('MY_TEAM_MON__UI__TEMP_RELOAD')
 	collectgarbage('collect')
 	D.Log('clear ' .. szType .. ' cache success!')
 end
@@ -2270,8 +2270,8 @@ function D.GetIntervalData(szType, key)
 end
 
 function D.ConfirmShare()
-	if #MY_TM_SHARE_QUEUE > 0 then
-		local t = MY_TM_SHARE_QUEUE[1]
+	if #MY_TEAM_MON_SHARE_QUEUE > 0 then
+		local t = MY_TEAM_MON_SHARE_QUEUE[1]
 		X.Confirm(_L('%s share a %s data to you, accept?', t.szName, _L[t.szType]), function()
 			local data = t.tData
 			local nIndex = D.CheckSameData(t.szType, t.dwMapID, data.dwID or data.szContent, data.nLevel or data.szTarget)
@@ -2279,10 +2279,10 @@ function D.ConfirmShare()
 				D.RemoveData(t.szType, t.dwMapID, nIndex)
 			end
 			D.AddData(t.szType, t.dwMapID, data)
-			table.remove(MY_TM_SHARE_QUEUE, 1)
+			table.remove(MY_TEAM_MON_SHARE_QUEUE, 1)
 			X.DelayCall(100, D.ConfirmShare)
 		end, function()
-			table.remove(MY_TM_SHARE_QUEUE, 1)
+			table.remove(MY_TEAM_MON_SHARE_QUEUE, 1)
 			X.DelayCall(100, D.ConfirmShare)
 		end)
 	end
@@ -2290,7 +2290,7 @@ end
 
 function D.OnShare(_, data, nChannel, dwID, szName, bIsSelf)
 	if not bIsSelf then
-		table.insert(MY_TM_SHARE_QUEUE, {
+		table.insert(MY_TEAM_MON_SHARE_QUEUE, {
 			szType  = data[1],
 			tData   = data[3],
 			szName  = szName,
@@ -2304,7 +2304,7 @@ X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon', function()
 	if arg0 and arg0 ~= 'MY_TeamMon' then
 		return
 	end
-	FireUIEvent('MY_TM_DATA_RELOAD')
+	FireUIEvent('MY_TEAM_MON_DATA_RELOAD')
 end)
 X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon.MapRestriction', function()
 	if arg0 and arg0 ~= 'MY_TeamMon.MapRestriction' then
@@ -2314,13 +2314,13 @@ X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon.MapRestriction', function()
 end)
 X.RegisterInit('MY_TeamMon', function()
 	X.RegisterEvent('LOADING_ENDING', 'MY_TeamMon', function()
-		FireUIEvent('MY_TM_DATA_RELOAD')
+		FireUIEvent('MY_TEAM_MON_DATA_RELOAD')
 	end)
 	D.bReady = true
 	D.Init()
 end)
 X.RegisterFlush('MY_TeamMon', D.SaveUserData)
-X.RegisterBgMsg('MY_TM_SHARE', D.OnShare)
+X.RegisterBgMsg('MY_TEAM_MON_SHARE', D.OnShare)
 
 -- Global exports
 do
@@ -2330,14 +2330,14 @@ local settings = {
 		{
 			preset = 'UIEvent',
 			fields = {
-				MY_TM_REMOTE_DATA_ROOT = MY_TM_REMOTE_DATA_ROOT,
-				MY_TM_SPECIAL_MAP      = MY_TM_SPECIAL_MAP     ,
-				MY_TM_TYPE             = MY_TM_TYPE            ,
-				MY_TM_SCRUTINY_TYPE    = MY_TM_SCRUTINY_TYPE   ,
-				FilterCustomText       = FilterCustomText      ,
-				ParseCustomText        = ParseCustomText       ,
-				ParseCountdown         = ParseCountdown        ,
-				ParseHPCountdown       = ParseHPCountdown      ,
+				MY_TEAM_MON_REMOTE_DATA_ROOT = MY_TEAM_MON_REMOTE_DATA_ROOT,
+				MY_TEAM_MON_SPECIAL_MAP      = MY_TEAM_MON_SPECIAL_MAP     ,
+				MY_TEAM_MON_TYPE             = MY_TEAM_MON_TYPE            ,
+				MY_TEAM_MON_SCRUTINY_TYPE    = MY_TEAM_MON_SCRUTINY_TYPE   ,
+				FilterCustomText             = FilterCustomText            ,
+				ParseCustomText              = ParseCustomText             ,
+				ParseCountdown               = ParseCountdown              ,
+				ParseHPCountdown             = ParseHPCountdown            ,
 				'Enable',
 				'GetTable',
 				IterTable = function(...)

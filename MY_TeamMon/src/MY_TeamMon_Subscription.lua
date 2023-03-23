@@ -28,7 +28,7 @@ local O = {}
 
 local EDITION = X.ENVIRONMENT.GAME_EDITION
 local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_Subscription.ini'
-local MY_TM_REMOTE_DATA_ROOT = MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
+local MY_TEAM_MON_REMOTE_DATA_ROOT = MY_TeamMon.MY_TEAM_MON_REMOTE_DATA_ROOT
 local META_DOWNLOADING, DATA_DOWNLOADING = {}, {}
 
 local Schema = X.Schema
@@ -557,8 +557,8 @@ function D.DownloadData(info, callback, aSilentType)
 		.. ('%08x'):format(GetStringCRC(info.szDataURL))
 		.. ('%08x'):format(GetStringCRC(info.szVersion))
 	local LUA_CONFIG = { passphrase = D.PW, crc = true, compress = true }
-	local p = X.LoadLUAData(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', LUA_CONFIG)
-	if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.jx3dat') then
+	local p = X.LoadLUAData(MY_TEAM_MON_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', LUA_CONFIG)
+	if p and p.szVersion == info.szVersion and IsLocalFileExist(MY_TEAM_MON_REMOTE_DATA_ROOT .. szUUID .. '.jx3dat') then
 		D.LoadConfigureFile(szUUID .. '.jx3dat', info, aSilentType)
 		X.SafeCall(callback, true)
 		return
@@ -582,8 +582,8 @@ function D.DownloadData(info, callback, aSilentType)
 			DATA_DOWNLOADING[info.szKey] = nil
 			if data then
 				local szFile = szUUID .. '.jx3dat'
-				X.SaveLUAData(MY_TM_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', info, LUA_CONFIG)
-				X.SaveLUAData(MY_TM_REMOTE_DATA_ROOT .. szFile, data, LUA_CONFIG)
+				X.SaveLUAData(MY_TEAM_MON_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat', info, LUA_CONFIG)
+				X.SaveLUAData(MY_TEAM_MON_REMOTE_DATA_ROOT .. szFile, data, LUA_CONFIG)
 				D.LoadConfigureFile(szFile, info, aSilentType)
 			elseif not aSilentType then
 				X.Topmsg(_L('Decode %s failed!', info.szTitle))
@@ -1011,7 +1011,7 @@ X.RegisterInit('MY_TeamMon_Subscription', function()
 	X.DelayCall(8000, function() D.CheckUpdate() end)
 end)
 
-X.RegisterEvent('MY_TM_DATA_MODIFY', 'MY_TeamMon_Subscription', function()
+X.RegisterEvent('MY_TEAM_MON_DATA_MODIFY', 'MY_TeamMon_Subscription', function()
 	MY_TeamMon.SetUserConfig('MY_TeamMon_Subscription.DataNotModified', false)
 end)
 

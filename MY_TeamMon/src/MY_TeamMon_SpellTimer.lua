@@ -50,7 +50,7 @@ local D = {}
 local ST = {}
 ST.__index = ST
 
-local MY_TM_TYPE = MY_TeamMon.MY_TM_TYPE
+local MY_TEAM_MON_TYPE = MY_TeamMon.MY_TEAM_MON_TYPE
 local ST_INI_FILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_SpellTimer.ini'
 local ST_UI_NORMAL = 5
 local ST_UI_WARNING = 2
@@ -58,7 +58,7 @@ local ST_UI_ALPHA = 180
 local ST_TIME_EXPIRE = {}
 local ST_CACHE = {}
 do
-	for k, v in pairs(MY_TM_TYPE) do
+	for k, v in pairs(MY_TEAM_MON_TYPE) do
 		ST_CACHE[v] = setmetatable({}, { __mode = 'v' })
 		ST_TIME_EXPIRE[v] = {}
 	end
@@ -76,7 +76,7 @@ local function ParseCountdown(szCountdown, szSender, szReceiver)
 end
 
 -- 倒计时模块 事件名称 MY_TEAM_MON__SPELL_TIMER__CREATE
--- nType 倒计时类型 MY_TM_TYPE
+-- nType 倒计时类型 MY_TEAM_MON_TYPE
 -- szKey 同一类型内唯一标识符
 -- tParam {
 --      szName   -- 倒计时名称 如果是分段就不需要传名称

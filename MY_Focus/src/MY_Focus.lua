@@ -1075,7 +1075,7 @@ local function onTeamMonUpdate()
 	end
 	UpdateTeamMonData()
 end
-X.RegisterEvent('MY_TM_DATA_RELOAD', 'MY_Focus', onTeamMonUpdate)
+X.RegisterEvent('MY_TEAM_MON_DATA_RELOAD', 'MY_Focus', onTeamMonUpdate)
 end
 
 do
