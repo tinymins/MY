@@ -1,7 +1,7 @@
 return function(env)
 	local swap = {}
 	return {
-		-- 装分
+		-- 裝分
 		{
 			szKey = 'equip_score',
 			bTable = true,
@@ -16,7 +16,7 @@ return function(env)
 				return '--'
 			end,
 		},
-		-- 宠物分
+		-- 寵物分
 		{
 			szKey = 'pet_score',
 			bTable = true,
@@ -31,7 +31,7 @@ return function(env)
 				return '--'
 			end,
 		},
-		-- 金钱
+		-- 金錢
 		{
 			szKey = 'money',
 			bTable = true,
@@ -79,7 +79,7 @@ return function(env)
 					.. env.GetMoneyText(moneyAbs, szExtra)
 			end,
 		},
-		-- 账号精力
+		-- 賬號精力
 		{
 			szKey = 'account_stamina',
 			bTable = true,
@@ -159,7 +159,7 @@ return function(env)
 				return env.GetFormatText(v.current .. '/' .. v.max, 162, 255, 255, 255)
 			end,
 		},
-		-- 精力周余
+		-- 精力周餘
 		{
 			szKey = 'role_stamina_remain',
 			bTable = true,
@@ -172,32 +172,7 @@ return function(env)
 				return env.me.GetVigorRemainSpace()
 			end,
 		},
-		-- 江贡
-		{
-			szKey = 'contribution',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 70,
-			GetValue = function(prevVal, prevRec)
-				return env.me.nContribution
-			end,
-		},
-		-- 江贡周余
-		{
-			szKey = 'contribution_remain',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 70,
-			szRefreshCircle = 'weekly',
-			GetValue = function(prevVal, prevRec)
-				return env.me.GetContributionRemainSpace()
-			end,
-		},
-		-- 侠义
+		-- 俠義
 		{
 			szKey = 'justice',
 			bTable = true,
@@ -209,7 +184,7 @@ return function(env)
 				return env.me.nJustice
 			end,
 		},
-		-- 侠义周余
+		-- 俠義周餘
 		{
 			szKey = 'justice_remain',
 			bTable = true,
@@ -222,7 +197,7 @@ return function(env)
 				return env.me.GetJusticeRemainSpace()
 			end,
 		},
-		-- 浪客笺
+		-- 浪客箋
 		{
 			szKey = 'starve',
 			bTable = true,
@@ -235,7 +210,7 @@ return function(env)
 					+ env.GetItemAmountInAllPackages(env.ITEM_TABLE_TYPE.OTHER, 40259, true)
 			end,
 		},
-		-- 浪客笺周余
+		-- 浪客箋周餘
 		{
 			szKey = 'starve_remain',
 			bTable = true,
@@ -266,7 +241,7 @@ return function(env)
 				return swap['starve_remain'] or prevVal
 			end,
 		},
-		-- 园宅币
+		-- 園宅幣
 		{
 			szKey = 'architecture',
 			bTable = true,
@@ -278,7 +253,7 @@ return function(env)
 				return env.me.nArchitecture
 			end,
 		},
-		-- 园宅币周余
+		-- 園宅幣周餘
 		{
 			szKey = 'architecture_remain',
 			bTable = true,
@@ -289,6 +264,81 @@ return function(env)
 			szRefreshCircle = 'weekly',
 			GetValue = function(prevVal, prevRec)
 				return env.me.GetArchitectureRemainSpace()
+			end,
+		},
+		-- 百戰
+		{
+			szKey = 'monster',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 60,
+			szRefreshCircle = 'weekly',
+			Collector = function()
+				local function Collect()
+					local bf1 = env.me.GetBuff(24917, 0)
+					local bf2 = env.me.GetBuff(24918, 0)
+					if not bf1 and not bf2 and not env.IsInMonsterMap() then
+						return
+					end
+					swap['monster'] = { bf1 and bf1.nStackNum or 0, bf2 and bf2.nStackNum or 0 }
+				end
+				env.RegisterEvent('BUFF_UPDATE', 'MY_RoleStatistics_RoleStat__monster', function()
+					-- buff update：
+					-- arg0：dwPlayerID，arg1：bDelete，arg2：nIndex，arg3：bCanCancel
+					-- arg4：dwBuffID，arg5：nStackNum，arg6：nEndFrame，arg7：？update all?
+					-- arg8：nLevel，arg9：dwSkillSrcID
+					if arg0 ~= env.me.dwID then
+						return
+					end
+					if arg4 ~= 24917 and arg4 ~= 24918 then
+						return
+					end
+					Collect()
+				end)
+				env.RegisterEvent('LOADING_END', 'MY_RoleStatistics_RoleStat__monster', function()
+					Collect()
+				end)
+			end,
+			GetValue = function(prevVal, prevRec)
+				return swap['monster'] or prevVal
+			end,
+			GetSummaryValue = function()
+				return nil
+			end,
+			GetFormatText = function(v, rec)
+				if not v then
+					return env.GetFormatText('--', 162, 255, 255, 255)
+				end
+				return env.GetFormatText(v[1] .. '+' .. v[2], 162, 255, 255, 255)
+			end,
+			Compare = function(v1, v2)
+				if not v1 and not v2 then
+					return 0
+				end
+				if not v1 then
+					return -1
+				end
+				if not v2 then
+					return 1
+				end
+				local n1 = v1[1] + v1[2]
+				local n2 = v2[1] + v2[2]
+				if n1 == n2 then
+					return 0
+				end
+				return n1 > n2 and 1 or -1
+			end,
+			GetCompareText = function(v1, v2, r1, r2)
+				local n1 = v1[1] + v1[2]
+				local n2 = v2[1] + v2[2]
+				local nCompare = n2 - n1
+				if nCompare == 0 then
+					return
+				end
+				local szPrefix = nCompare >= 0 and env._L.COLUMN_COMPARE_INCREASE['monster'] or env._L.COLUMN_COMPARE_DECREASE['monster']
+				return env.GetFormatSysmsgText(szPrefix:format(nCompare))
 			end,
 		},
 		-- 威望
@@ -303,7 +353,7 @@ return function(env)
 				return env.me.nCurrentPrestige
 			end,
 		},
-		-- 威望周余
+		-- 威望周餘
 		{
 			szKey = 'prestige_remain',
 			bTable = true,
@@ -316,7 +366,7 @@ return function(env)
 				return env.me.GetPrestigeRemainSpace()
 			end,
 		},
-		-- 战阶积分
+		-- 戰階積分
 		{
 			szKey = 'camp_point',
 			bTable = true,
@@ -329,7 +379,7 @@ return function(env)
 				return env.me.nTitlePoint
 			end,
 		},
-		-- 战阶等级
+		-- 戰階等級
 		{
 			szKey = 'camp_level',
 			bTable = true,
@@ -362,57 +412,7 @@ return function(env)
 				return env.GetFormatText(v.level .. ' + ' .. v.percent .. '%', 162, 255, 255, 255)
 			end,
 		},
-		-- 名剑币
-		{
-			szKey = 'arena_award',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 60,
-			GetValue = function(prevVal, prevRec)
-				return env.me.nArenaAward
-			end,
-		},
-		-- 名剑币周余
-		{
-			szKey = 'arena_award_remain',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 60,
-			szRefreshCircle = 'weekly',
-			GetValue = function(prevVal, prevRec)
-				return env.me.GetArenaAwardRemainSpace()
-			end,
-		},
-		-- 监本
-		{
-			szKey = 'exam_print',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 55,
-			GetValue = function(prevVal, prevRec)
-				return env.me.nExamPrint
-			end,
-		},
-		-- 监本周余
-		{
-			szKey = 'exam_print_remain',
-			bTable = true,
-			bRowTip = true,
-			bFloatTip = true,
-			bAlertChange = true,
-			nMinWidth = 55,
-			szRefreshCircle = 'weekly',
-			GetValue = function(prevVal, prevRec)
-				return env.me.GetExamPrintRemainSpace()
-			end,
-		},
-		-- 资历
+		-- 資歷
 		{
 			szKey = 'achievement_score',
 			bTable = true,
@@ -424,7 +424,7 @@ return function(env)
 				return env.me.GetAchievementRecord()
 			end,
 		},
-		-- 通宝
+		-- 通寶
 		{
 			szKey = 'coin',
 			bTable = true,
@@ -467,7 +467,7 @@ return function(env)
 				return env.GetFormatText(v.value, 162, 255, 255, 255)
 			end,
 		},
-		-- 师徒分
+		-- 師徒分
 		{
 			szKey = 'mentor_score',
 			bTable = true,
