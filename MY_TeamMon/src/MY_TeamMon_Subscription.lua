@@ -538,10 +538,10 @@ function D.LoadConfigureFile(szFile, info, aSilentType)
 			if not aSilentType and me.IsInParty() then
 				MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_Subscription', {'LOAD', info.szTitle}, true)
 			end
-			MY_TeamMon.SetUserConfig('RR.LastVersion', info.szVersion)
-			MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
-			MY_TeamMon.SetUserConfig('RR.LastType', aType)
-			MY_TeamMon.SetUserConfig('RR.DataNotModified', true)
+			MY_TeamMon.SetUserConfig('MY_TeamMon_Subscription.LastVersion', info.szVersion)
+			MY_TeamMon.SetUserConfig('MY_TeamMon_Subscription.LastURL', GetShortURL(info.szURL) or info.szURL)
+			MY_TeamMon.SetUserConfig('MY_TeamMon_Subscription.LastType', aType)
+			MY_TeamMon.SetUserConfig('MY_TeamMon_Subscription.DataNotModified', true)
 			FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__FAV_META_LIST_UPDATE')
 		end
 	end
@@ -1012,7 +1012,7 @@ X.RegisterInit('MY_TeamMon_Subscription', function()
 end)
 
 X.RegisterEvent('MY_TM_DATA_MODIFY', 'MY_TeamMon_Subscription', function()
-	MY_TeamMon.SetUserConfig('RR.DataNotModified', false)
+	MY_TeamMon.SetUserConfig('MY_TeamMon_Subscription.DataNotModified', false)
 end)
 
 -- Global exports
