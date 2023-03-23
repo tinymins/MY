@@ -515,7 +515,7 @@ end
 
 do
 local PENDING = {}
-local Downloader = X.Class('Downloader', {
+local Downloader = X.Class(X.NSFormatString('{$NS}Curl_FileDownloader'), {
 	constructor = function(self, promiseFunction, info)
 		self.info = info
 		self:super(promiseFunction)
