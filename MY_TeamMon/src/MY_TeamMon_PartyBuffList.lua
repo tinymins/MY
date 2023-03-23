@@ -9,10 +9,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_PBL'
+local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_PartyBuffList'
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_TeamMon_PBL'
+local MODULE_NAME = 'MY_TeamMon_PartyBuffList'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^15.0.0') then
@@ -24,7 +24,7 @@ end
 local GetBuff = X.GetBuff
 
 -- 这个需要重写 构思已有 就是没时间。。
-local O = X.CreateUserSettingsModule('MY_TeamMon_PBL', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_TeamMon_PartyBuffList', _L['Raid'], {
 	bHoverSelect = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
@@ -42,20 +42,20 @@ local D = {}
 
 local TEMP_TARGET_TYPE, TEMP_TARGET_ID
 local CACHE_LIST = setmetatable({}, { __mode = 'v' })
-local PBL_INI_FILE = X.PACKET_INFO.ROOT ..  'MY_TeamMon/ui/MY_TeamMon_PBL.ini'
+local PBL_INI_FILE = X.PACKET_INFO.ROOT ..  'MY_TeamMon/ui/MY_TeamMon_PartyBuffList.ini'
 
 function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	this:RegisterEvent('TARGET_CHANGE')
-	this:RegisterEvent('MY_TM_PARTY_BUFF_LIST')
+	this:RegisterEvent('MY_TEAM_MON__PARTY_BUFF_LIST')
 	D.hItem = this:CreateItemData(PBL_INI_FILE, 'Handle_Item')
 	D.frame = this
 	D.handle = this:Lookup('', 'Handle_List')
 	D.bg = this:Lookup('', 'Image_Bg')
 	D.handle:Clear()
-	this:Lookup('', 'Text_Title'):SetText(_L['MY_TeamMon_PBL'])
+	this:Lookup('', 'Text_Title'):SetText(_L['MY_TeamMon_PartyBuffList'])
 	D.UpdateAnchor(this)
 end
 
@@ -64,10 +64,10 @@ function D.OnEvent(event)
 		D.UpdateAnchor(this)
 	elseif event == 'TARGET_CHANGE' then
 		D.SwitchSelect()
-	elseif event == 'MY_TM_PARTY_BUFF_LIST' then
+	elseif event == 'MY_TEAM_MON__PARTY_BUFF_LIST' then
 		D.OnTableInsert(arg0, arg1, arg2, arg3)
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' or event == 'ON_LEAVE_CUSTOM_UI_MODE' then
-		UpdateCustomModeWindow(this, _L['MY_TeamMon_PBL'])
+		UpdateCustomModeWindow(this, _L['MY_TeamMon_PartyBuffList'])
 		if event == 'ON_ENTER_CUSTOM_UI_MODE' then
 			D.frame:Show()
 		else
@@ -175,8 +175,8 @@ function D.OnFrameDragEnd()
 end
 
 function D.Init()
-	Wnd.CloseWindow('MY_TeamMon_PBL')
-	Wnd.OpenWindow(PBL_INI_FILE, 'MY_TeamMon_PBL')
+	Wnd.CloseWindow('MY_TeamMon_PartyBuffList')
+	Wnd.OpenWindow(PBL_INI_FILE, 'MY_TeamMon_PartyBuffList')
 	D.SwitchPanel(0)
 end
 
@@ -310,7 +310,7 @@ end
 --------------------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_TeamMon_PBL',
+	name = 'MY_TeamMon_PartyBuffList',
 	exports = {
 		{
 			preset = 'UIEvent',
@@ -334,13 +334,13 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_PBL = X.CreateModule(settings)
+MY_TeamMon_PartyBuffList = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
 -- 事件注册
 --------------------------------------------------------------------------------
 
-X.RegisterUserSettingsInit('MY_TeamMon_PBL', D.Init)
+X.RegisterUserSettingsInit('MY_TeamMon_PartyBuffList', D.Init)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

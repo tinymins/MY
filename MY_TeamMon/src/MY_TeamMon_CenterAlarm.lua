@@ -9,10 +9,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_CA'
+local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_CenterAlarm'
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_TeamMon_CA'
+local MODULE_NAME = 'MY_TeamMon_CenterAlarm'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^15.0.0') then
@@ -21,8 +21,8 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
-local CA_INIFILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_CA.ini'
-local O = X.CreateUserSettingsModule('MY_TeamMon_CA', _L['Raid'], {
+local INI_FILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_CenterAlarm.ini'
+local O = X.CreateUserSettingsModule('MY_TeamMon_CenterAlarm', _L['Raid'], {
 	tAnchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
@@ -32,7 +32,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_CA', _L['Raid'], {
 })
 local D = {}
 
--- FireUIEvent('MY_TM_CA_CREATE', 'test', 3)
+-- FireUIEvent('MY_TEAM_MON__CENTER_ALARM__CREATE', 'test', 3)
 local function CreateCentralAlert(szMsg, nTime, bXml)
 	local msg = D.msg
 	nTime = nTime or 3
@@ -55,7 +55,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
-	this:RegisterEvent('MY_TM_CA_CREATE')
+	this:RegisterEvent('MY_TEAM_MON__CENTER_ALARM__CREATE')
 	D.frame  = this
 	D.handle = this:Lookup('', '')
 	D.msg    = this:Lookup('', 'MessageBox')
@@ -82,7 +82,7 @@ function D.OnFrameRender()
 end
 
 function D.OnEvent(szEvent)
-	if szEvent == 'MY_TM_CA_CREATE' then
+	if szEvent == 'MY_TEAM_MON__CENTER_ALARM__CREATE' then
 		CreateCentralAlert(arg0, arg1, arg2)
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)
@@ -108,8 +108,8 @@ function D.UpdateAnchor(frame)
 end
 
 function D.Init()
-	Wnd.CloseWindow('MY_TeamMon_CA')
-	Wnd.OpenWindow(CA_INIFILE, 'MY_TeamMon_CA'):Hide()
+	Wnd.CloseWindow('MY_TeamMon_CenterAlarm')
+	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_CenterAlarm'):Hide()
 end
 
 --------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ end
 --------------------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_TeamMon_CA',
+	name = 'MY_TeamMon_CenterAlarm',
 	exports = {
 		{
 			preset = 'UIEvent',
@@ -139,13 +139,13 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_CA = X.CreateModule(settings)
+MY_TeamMon_CenterAlarm = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------------------------------
 
-X.RegisterUserSettingsInit('MY_TeamMon_CA', D.Init)
+X.RegisterUserSettingsInit('MY_TeamMon_CenterAlarm', D.Init)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -884,7 +884,7 @@ function D.FireCountdownEvent(nType, szKey, tParam, szSender, szReceiver)
 	if not O.bPushTeamChannel then
 		tParam.bTalk = false
 	end
-	FireUIEvent('MY_TM_ST_CREATE', nType, szKey, tParam, szSender, szReceiver)
+	FireUIEvent('MY_TEAM_MON__SPELL_TIMER__CREATE', nType, szKey, tParam, szSender, szReceiver)
 end
 
 function D.GetSrcName(dwID)
@@ -983,11 +983,11 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 			end
 			local szXml, szText = table.concat(aXml), table.concat(aText)
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
+				FireUIEvent('MY_TEAM_MON__CENTER_ALARM__CREATE', szXml, 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm and (MY_TM_CORE_PLAYERID == dwOwner or not X.IsPlayer(dwOwner)) then
-				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { GetHeadTextForceFontColor(dwOwner, MY_TM_CORE_PLAYERID) })
+				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(dwOwner, MY_TM_CORE_PLAYERID) })
 			end
 
 			-- 获得处理
@@ -1003,7 +1003,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 				end
 				-- 重要Buff列表
 				if O.bPushPartyBuffList and X.IsPlayer(dwOwner) and cfg.bPartyBuffList and (X.IsParty(dwOwner) or MY_TM_CORE_PLAYERID == dwOwner) then
-					FireUIEvent('MY_TM_PARTY_BUFF_LIST', dwOwner, data.dwID, data.nLevel, data.nIcon)
+					FireUIEvent('MY_TEAM_MON__PARTY_BUFF_LIST', dwOwner, data.dwID, data.nLevel, data.nIcon)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
@@ -1020,11 +1020,11 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 						if data.col then
 							col = data.col
 						end
-						FireUIEvent('MY_TM_BL_CREATE', data.dwID, data.nLevel, col, data, szSender, szReceiver)
+						FireUIEvent('MY_TEAM_MON__BUFF_LIST__CREATE', data.dwID, data.nLevel, col, data, szSender, szReceiver)
 					end
 					-- 全屏泛光
 					if O.bPushFullScreen and cfg.bFullScreen then
-						FireUIEvent('MY_TM_FS_CREATE', data.dwID .. '_'  .. data.nLevel, {
+						FireUIEvent('MY_TEAM_MON__FULL_SCREEN_ALARM__CREATE', data.dwID .. '_'  .. data.nLevel, {
 							nTime = 3,
 							col = data.col,
 							tBindBuff = { data.dwID, data.nLevel }
@@ -1144,11 +1144,11 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			end
 			local szXml, szText = table.concat(aXml), table.concat(aText)
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
+				FireUIEvent('MY_TEAM_MON__CENTER_ALARM__CREATE', szXml, 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
-				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TM_CORE_PLAYERID) })
+				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(dwCaster, MY_TM_CORE_PLAYERID) })
 			end
 			if not X.IsRestricted('MY_TeamMon.AutoSelect') and cfg.bSelect then
 				SetTarget(X.IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
@@ -1167,7 +1167,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			end
 			-- 全屏泛光
 			if O.bPushFullScreen and cfg.bFullScreen then
-				FireUIEvent('MY_TM_FS_CREATE', data.dwID .. '#SKILL#'  .. data.nLevel, { nTime = 3, col = data.col})
+				FireUIEvent('MY_TEAM_MON__FULL_SCREEN_ALARM__CREATE', data.dwID .. '#SKILL#'  .. data.nLevel, { nTime = 3, col = data.col})
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
 				D.Talk('RAID', szText, szReceiver)
@@ -1304,11 +1304,11 @@ function D.OnNpcEvent(npc, bEnter)
 			end
 			local szXml, szText = table.concat(aXml), table.concat(aText)
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
+				FireUIEvent('MY_TEAM_MON__CENTER_ALARM__CREATE', szXml, 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
-				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { GetHeadTextForceFontColor(npc.dwID, MY_TM_CORE_PLAYERID) })
+				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(npc.dwID, MY_TM_CORE_PLAYERID) })
 			end
 
 			if O.bPushTeamChannel and cfg.bTeamChannel then
@@ -1323,7 +1323,7 @@ function D.OnNpcEvent(npc, bEnter)
 					SetTarget(TARGET.NPC, npc.dwID)
 				end
 				if O.bPushFullScreen and cfg.bFullScreen then
-					FireUIEvent('MY_TM_FS_CREATE', 'NPC', { nTime  = 3, col = data.col, bFlash = true })
+					FireUIEvent('MY_TEAM_MON__FULL_SCREEN_ALARM__CREATE', 'NPC', { nTime  = 3, col = data.col, bFlash = true })
 				end
 			end
 		end
@@ -1447,11 +1447,11 @@ function D.OnDoodadEvent(doodad, bEnter)
 			end
 			local szXml, szText = table.concat(aXml), table.concat(aText)
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
+				FireUIEvent('MY_TEAM_MON__CENTER_ALARM__CREATE', szXml, 3, true)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
-				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { 255, 255, 0 })
+				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { 255, 255, 0 })
 			end
 
 			if O.bPushTeamChannel and cfg.bTeamChannel then
@@ -1463,7 +1463,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 
 			if nClass == MY_TM_TYPE.DOODAD_ENTER then
 				if O.bPushFullScreen and cfg.bFullScreen then
-					FireUIEvent('MY_TM_FS_CREATE', 'DOODAD', { nTime  = 3, col = data.col, bFlash = true })
+					FireUIEvent('MY_TEAM_MON__FULL_SCREEN_ALARM__CREATE', 'DOODAD', { nTime  = 3, col = data.col, bFlash = true })
 				end
 			end
 		end
@@ -1630,15 +1630,15 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			end
 			-- 中央报警
 			if O.bPushCenterAlarm and cfg.bCenterAlarm then
-				FireUIEvent('MY_TM_CA_CREATE', #aXml > 0 and szXml or szText, 3, #aXml > 0)
+				FireUIEvent('MY_TEAM_MON__CENTER_ALARM__CREATE', #aXml > 0 and szXml or szText, 3, #aXml > 0)
 			end
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
-				FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { 255, 128, 0 })
+				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { 255, 128, 0 })
 			end
 			if O.bPushFullScreen and cfg.bFullScreen then
 				if not dwReceiverID or dwReceiverID == me.dwID then
-					FireUIEvent('MY_TM_FS_CREATE', szEvent, { nTime  = 3, col = data.col or { 0, 255, 0 }, bFlash = true })
+					FireUIEvent('MY_TEAM_MON__FULL_SCREEN_ALARM__CREATE', szEvent, { nTime  = 3, col = data.col or { 0, 255, 0 }, bFlash = true })
 				end
 			end
 			if O.bPushTeamChannel and cfg.bTeamChannel then
@@ -1697,7 +1697,7 @@ function D.OnNpcFight(dwTemplateID, bFight)
 			for i, v in ipairs(data.tCountdown) do
 				if v.nClass == MY_TM_TYPE.NPC_FIGHT and not v.bFightHold then
 					local nType, szKey = D.GetCountdownTypeKey(data, i, szSender, szReceiver)
-					FireUIEvent('MY_TM_ST_DEL', nType, szKey) -- try kill
+					FireUIEvent('MY_TEAM_MON__SPELL_TIMER__DEL', nType, szKey) -- try kill
 				end
 			end
 		end
@@ -1730,10 +1730,10 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 						ConstructSpeech(aText, aXml, ' ' .. FilterCustomText(tHpCd.szContent, szSender, szReceiver), 44, 255, 255, 255)
 						local szXml, szText = table.concat(aXml), table.concat(aText)
 						if O.bPushCenterAlarm then
-							FireUIEvent('MY_TM_CA_CREATE', szXml, 3, true)
+							FireUIEvent('MY_TEAM_MON__CENTER_ALARM__CREATE', szXml, 3, true)
 						end
 						if O.bPushBigFontAlarm then
-							FireUIEvent('MY_TM_LARGE_TEXT', szText, data.col or { 255, 128, 0 })
+							FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { 255, 128, 0 })
 						end
 						if O.bPushTeamChannel and v.bTeamChannel then
 							D.Talk('RAID', szText)
@@ -1850,7 +1850,7 @@ function D.Close()
 			frame:UnRegisterEvent(v)  -- kill all event
 		end
 		D.RegisterMessage(false)
-		FireUIEvent('MY_TM_ST_CLEAR')
+		FireUIEvent('MY_TEAM_MON__SPELL_TIMER__CLEAR')
 		CACHE.NPC_LIST    = {}
 		CACHE.DOODAD_LIST = {}
 		CACHE.SKILL_LIST  = {}

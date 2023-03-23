@@ -9,10 +9,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_ST'
+local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_SpellTimer'
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_TeamMon_ST'
+local MODULE_NAME = 'MY_TeamMon_SpellTimer'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^15.0.0') then
@@ -24,7 +24,7 @@ end
 local MY_FormatDuration = X.FormatDuration
 local FilterCustomText = MY_TeamMon.FilterCustomText
 
-local O = X.CreateUserSettingsModule('MY_TeamMon_ST', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_TeamMon_SpellTimer', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
@@ -51,7 +51,7 @@ local ST = {}
 ST.__index = ST
 
 local MY_TM_TYPE = MY_TeamMon.MY_TM_TYPE
-local ST_INI_FILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_ST.ini'
+local ST_INI_FILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_SpellTimer.ini'
 local ST_UI_NORMAL = 5
 local ST_UI_WARNING = 2
 local ST_UI_ALPHA = 180
@@ -75,7 +75,7 @@ local function ParseCountdown(szCountdown, szSender, szReceiver)
 	return aCountdown
 end
 
--- 倒计时模块 事件名称 MY_TM_ST_CREATE
+-- 倒计时模块 事件名称 MY_TEAM_MON__SPELL_TIMER__CREATE
 -- nType 倒计时类型 MY_TM_TYPE
 -- szKey 同一类型内唯一标识符
 -- tParam {
@@ -85,8 +85,8 @@ end
 --      nIcon    -- 倒计时图标ID
 --      bTalk    -- 是否发布倒计时 5秒内聊天框提示 【szName】 剩余 n 秒。
 -- }
--- 例子：FireUIEvent('MY_TM_ST_CREATE', 0, 'test', { nTime = '5,test;15,测试;25,c', szName = 'demo' })
--- 性能测试：for i = 1, 200 do FireUIEvent('MY_TM_ST_CREATE', 0, i, { nTime = Random(5, 15), nIcon = i }) end
+-- 例子：FireUIEvent('MY_TEAM_MON__SPELL_TIMER__CREATE', 0, 'test', { nTime = '5,test;15,测试;25,c', szName = 'demo' })
+-- 性能测试：for i = 1, 200 do FireUIEvent('MY_TEAM_MON__SPELL_TIMER__CREATE', 0, i, { nTime = Random(5, 15), nIcon = i }) end
 local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 	assert(type(tParam) == 'table', 'CreateCountdown failed!')
 	local tTime = {}
@@ -146,24 +146,24 @@ function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
-	this:RegisterEvent('MY_TM_ST_CREATE')
-	this:RegisterEvent('MY_TM_ST_DEL')
-	this:RegisterEvent('MY_TM_ST_CLEAR')
+	this:RegisterEvent('MY_TEAM_MON__SPELL_TIMER__CREATE')
+	this:RegisterEvent('MY_TEAM_MON__SPELL_TIMER__DEL')
+	this:RegisterEvent('MY_TEAM_MON__SPELL_TIMER__CLEAR')
 	D.hItem = this:CreateItemData(ST_INI_FILE, 'Handle_Item')
 	D.UpdateAnchor(this)
 	D.handle = this:Lookup('', 'Handle_List')
 end
 
 function D.OnEvent(szEvent)
-	if szEvent == 'MY_TM_ST_CREATE' then
+	if szEvent == 'MY_TEAM_MON__SPELL_TIMER__CREATE' then
 		CreateCountdown(arg0, arg1, arg2, arg3, arg4)
-	elseif szEvent == 'MY_TM_ST_DEL' then
+	elseif szEvent == 'MY_TEAM_MON__SPELL_TIMER__DEL' then
 		local ui = ST_CACHE[arg0][arg1]
 		if ui and ui:IsValid() then
 			ui.obj:RemoveItem()
 		end
 		ST_TIME_EXPIRE[arg0][arg1] = nil
-	elseif szEvent == 'MY_TM_ST_CLEAR' then
+	elseif szEvent == 'MY_TEAM_MON__SPELL_TIMER__CLEAR' then
 		D.handle:Clear()
 		for k, v in pairs(ST_TIME_EXPIRE) do
 			ST_TIME_EXPIRE[k] = {}
@@ -261,8 +261,8 @@ function D.UpdateAnchor(frame)
 end
 
 function D.Init()
-	Wnd.CloseWindow('MY_TeamMon_ST')
-	Wnd.OpenWindow(ST_INI_FILE, 'MY_TeamMon_ST')
+	Wnd.CloseWindow('MY_TeamMon_SpellTimer')
+	Wnd.OpenWindow(ST_INI_FILE, 'MY_TeamMon_SpellTimer')
 end
 
 -- 构造函数
@@ -390,7 +390,7 @@ end
 --------------------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_TeamMon_ST',
+	name = 'MY_TeamMon_SpellTimer',
 	exports = {
 		{
 			root = D,
@@ -412,19 +412,19 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_ST = X.CreateModule(settings)
+MY_TeamMon_SpellTimer = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
 -- 事件注册
 --------------------------------------------------------------------------------
 
-X.RegisterUserSettingsInit('MY_TeamMon_ST', function()
+X.RegisterUserSettingsInit('MY_TeamMon_SpellTimer', function()
 	D.bReady = true
 	D.Init()
 end)
 
-X.RegisterUserSettingsRelease('MY_TeamMon_ST', function()
+X.RegisterUserSettingsRelease('MY_TeamMon_SpellTimer', function()
 	D.bReady = false
 end)
 

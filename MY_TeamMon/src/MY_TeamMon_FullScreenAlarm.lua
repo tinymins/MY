@@ -9,7 +9,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_FS'
+local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_FullScreenAlarm'
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
@@ -19,7 +19,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^15.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
-X.RegisterRestriction('MY_TeamMon_FS', { ['*'] = true })
+X.RegisterRestriction('MY_TeamMon_FullScreenAlarm', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local GetBuff = X.GetBuff
@@ -30,11 +30,11 @@ FS.__index = FS
 
 local FS_HANDLE, FS_FRAME
 local FS_CACHE   = setmetatable({}, { __mode = 'v' })
-local FS_INIFILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_FS.ini'
+local INI_FILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_FullScreenAlarm.ini'
 
--- FireUIEvent('MY_TM_FS_CREATE', Random(50, 255), { col = { Random(50, 255), Random(50, 255), Random(50, 255) }, bFlash = true})
+-- FireUIEvent('MY_TEAM_MON__FULL_SCREEN_ALARM__CREATE', Random(50, 255), { col = { Random(50, 255), Random(50, 255), Random(50, 255) }, bFlash = true})
 local function CreateFullScreen(szKey, tArgs)
-	if X.IsRestricted('MY_TeamMon_FS') then
+	if X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 		return
 	end
 	assert(type(tArgs) == 'table', 'CreateFullScreen failed!')
@@ -47,23 +47,23 @@ local function CreateFullScreen(szKey, tArgs)
 end
 
 function D.Init()
-	Wnd.CloseWindow('MY_TeamMon_FS')
-	Wnd.OpenWindow(FS_INIFILE, 'MY_TeamMon_FS'):Hide()
+	Wnd.CloseWindow('MY_TeamMon_FullScreenAlarm')
+	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_FullScreenAlarm'):Hide()
 end
 
 function D.OnFrameCreate()
 	this:RegisterEvent('LOADING_END')
 	this:RegisterEvent('UI_SCALED')
-	this:RegisterEvent('MY_TM_FS_CREATE')
+	this:RegisterEvent('MY_TEAM_MON__FULL_SCREEN_ALARM__CREATE')
 
-	this.hItem = this:CreateItemData(FS_INIFILE, 'Handle_Item')
+	this.hItem = this:CreateItemData(INI_FILE, 'Handle_Item')
 	FS_FRAME   = this
 	FS_HANDLE  = this:Lookup('', '')
 	FS_HANDLE:Clear()
 end
 
 function D.OnEvent(szEvent)
-	if szEvent == 'MY_TM_FS_CREATE' then
+	if szEvent == 'MY_TEAM_MON__FULL_SCREEN_ALARM__CREATE' then
 		CreateFullScreen(arg0, arg1)
 	elseif szEvent == 'UI_SCALED' then
 		for k, v in pairs(FS_CACHE) do
@@ -199,7 +199,7 @@ end
 --------------------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_TeamMon_FS',
+	name = 'MY_TeamMon_FullScreenAlarm',
 	exports = {
 		{
 			root = D,
@@ -207,13 +207,13 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_FS = X.CreateModule(settings)
+MY_TeamMon_FullScreenAlarm = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------------------------------
 
-X.RegisterUserSettingsInit('MY_TeamMon_FS', D.Init)
+X.RegisterUserSettingsInit('MY_TeamMon_FullScreenAlarm', D.Init)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

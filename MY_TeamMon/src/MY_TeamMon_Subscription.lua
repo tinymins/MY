@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- v is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 团队监控远程数据
+-- @desc     : 团队监控订阅数据
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @ref      : William Chan (Webster)
 -- @modifier : Emil Zhai (root@derzh.com)
@@ -9,7 +9,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_RR'
+local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_Subscription'
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
@@ -27,7 +27,7 @@ local D = X.SetmetaLazyload({}, {
 local O = {}
 
 local EDITION = X.ENVIRONMENT.GAME_EDITION
-local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_RR.ini'
+local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_Subscription.ini'
 local MY_TM_REMOTE_DATA_ROOT = MY_TeamMon.MY_TM_REMOTE_DATA_ROOT
 local META_DOWNLOADING, DATA_DOWNLOADING = {}, {}
 
@@ -287,11 +287,11 @@ local REPO_META_LIST = {
 }
 
 function D.GetFrame()
-	return Station.SearchFrame('MY_TeamMon_RR')
+	return Station.SearchFrame('MY_TeamMon_Subscription')
 end
 
 function D.OpenPanel()
-	local frame = D.GetFrame() or Wnd.OpenWindow(INI_PATH, 'MY_TeamMon_RR')
+	local frame = D.GetFrame() or Wnd.OpenWindow(INI_PATH, 'MY_TeamMon_Subscription')
 	frame:Show()
 	frame:BringToTop()
 	return frame
@@ -311,7 +311,7 @@ end
 
 function D.SaveFavMetaInfoList(aMetaInfo)
 	X.SaveLUAData({'userdata/team_mon/metalist.jx3dat', X.PATH_TYPE.GLOBAL}, aMetaInfo)
-	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+	FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__FAV_META_LIST_UPDATE')
 end
 
 function D.AddFavMetaInfo(info, szReplaceKey)
@@ -337,7 +337,7 @@ function D.AddFavMetaInfo(info, szReplaceKey)
 		table.insert(aMetaInfo, info)
 	end
 	D.SaveFavMetaInfoList(aMetaInfo)
-	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+	FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__FAV_META_LIST_UPDATE')
 end
 
 -- 格式化描述内容
@@ -394,7 +394,7 @@ function D.FetchMetaInfo(szURL, onSuccess, onError)
 				return
 			end
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_TeamMon_RR'], 'ERROR Get MetaInfo: ' .. X.EncodeLUAData(status) .. '\n' .. (X.ConvertToAnsi(html) or ''), X.DEBUG_LEVEL.WARNING)
+			X.Debug(_L['MY_TeamMon_Subscription'], 'ERROR Get MetaInfo: ' .. X.EncodeLUAData(status) .. '\n' .. (X.ConvertToAnsi(html) or ''), X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			X.SafeCall(onError)
 		end,
@@ -413,13 +413,13 @@ function D.FetchFavMetaInfoList()
 			function(err)
 				META_DOWNLOADING[info.szKey] = nil
 				X.Debug(
-					_L['MY_TeamMon_RR'],
+					_L['MY_TeamMon_Subscription'],
 					err ..'\n' ..  info.szURL,
 					X.DEBUG_LEVEL.WARNING)
-				FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+				FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__FAV_META_LIST_UPDATE')
 			end)
 	end
-	FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+	FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__FAV_META_LIST_UPDATE')
 end
 
 function D.FetchRepoMetaInfoList(nPage)
@@ -439,7 +439,7 @@ function D.FetchRepoMetaInfoList(nPage)
 				for i, err in ipairs(errs) do
 					table.insert(aErrmsgs, i .. '. ' .. err.message)
 				end
-				return X.Debug(_L['MY_TeamMon_RR'], _L['Fetch repo meta list failed.'] .. '\n' .. table.concat(aErrmsgs, '\n'), X.DEBUG_LEVEL.WARNING)
+				return X.Debug(_L['MY_TeamMon_Subscription'], _L['Fetch repo meta list failed.'] .. '\n' .. table.concat(aErrmsgs, '\n'), X.DEBUG_LEVEL.WARNING)
 			end
 			local tPage = {
 				nIndex = res.page.index,
@@ -462,7 +462,7 @@ function D.FetchRepoMetaInfoList(nPage)
 			end
 			REPO_META_PAGE = tPage
 			REPO_META_LIST = aMetaInfo
-			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+			FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__REPO_META_LIST_UPDATE')
 		end,
 	})
 end
@@ -499,7 +499,7 @@ function D.CheckUpdate()
 			--[[#DEBUG BEGIN]]
 			local nTime = GetTime()
 			X.Debug(
-				'MY_TeamMon_RR',
+				'MY_TeamMon_Subscription',
 				'Hash matched, auto update confirmed: ' .. szLastPrimaryVersion
 					.. ' -> ' .. szPrimaryVersion
 					.. ' (' .. table.concat(aType, ',') .. ')',
@@ -508,24 +508,24 @@ function D.CheckUpdate()
 			D.DownloadData(
 				info,
 				function()
-					FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+					FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__REPO_META_LIST_UPDATE')
 					--[[#DEBUG BEGIN]]
 					X.Debug(
-						'MY_TeamMon_RR',
+						'MY_TeamMon_Subscription',
 						'Auto update complete, cost time ' .. (GetTime() - nTime) .. 'ms',
 						X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					X.Sysmsg(_L('Upgrade TeamMon data to latest: %s', info.szTitle))
 				end,
 				aType)
-			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+			FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__REPO_META_LIST_UPDATE')
 		end)
 end
 
 function D.LoadConfigureFile(szFile, info, aSilentType)
 	--[[#DEBUG BEGIN]]
 	X.Debug(
-		'MY_TeamMon_RR',
+		'MY_TeamMon_Subscription',
 		'Load configure file ' .. szFile
 			.. ' info: ' .. X.EncodeLUAData(info)
 			.. ' silentType: ' .. X.EncodeLUAData(aSilentType),
@@ -536,13 +536,13 @@ function D.LoadConfigureFile(szFile, info, aSilentType)
 			local szFilePath, aType, szMode, tMeta = ...
 			local me = X.GetClientPlayer()
 			if not aSilentType and me.IsInParty() then
-				MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'LOAD', info.szTitle}, true)
+				MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_Subscription', {'LOAD', info.szTitle}, true)
 			end
 			MY_TeamMon.SetUserConfig('RR.LastVersion', info.szVersion)
 			MY_TeamMon.SetUserConfig('RR.LastURL', GetShortURL(info.szURL) or info.szURL)
 			MY_TeamMon.SetUserConfig('RR.LastType', aType)
 			MY_TeamMon.SetUserConfig('RR.DataNotModified', true)
-			FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+			FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__FAV_META_LIST_UPDATE')
 		end
 	end
 	if aSilentType then
@@ -571,7 +571,7 @@ function D.DownloadData(info, callback, aSilentType)
 	end
 	--[[#DEBUG BEGIN]]
 	X.Debug(
-		'MY_TeamMon_RR',
+		'MY_TeamMon_Subscription',
 		'Start download file. info: ' .. X.EncodeLUAData(info)
 			.. ' silentType: ' .. X.EncodeLUAData(aSilentType),
 		X.DEBUG_LEVEL.LOG)
@@ -612,7 +612,7 @@ function D.ShareMetaInfoToRaid(info, bSure)
 		end)
 		return
 	end
-	MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_RR', {'SYNC', info})
+	MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamMon_Subscription', {'SYNC', info})
 end
 
 function D.AppendMetaInfoItem(container, p, bSel)
@@ -757,16 +757,16 @@ function D.OnFrameCreate()
 	this:Lookup('PageSet_Menu/Page_Fav/Btn_FavAddUrl', 'Text_FavAddUrl'):SetText(_L['Add url'])
 	this:Lookup('PageSet_Menu/Page_Fav/Btn_FavRemoveUrl', 'Text_FavRemoveUrl'):SetText(_L['Remove url'])
 	this:Lookup('PageSet_Menu/Page_Fav/Btn_FavExportUrl', 'Text_FavExportUrl'):SetText(_L['Export meta url'])
-	this:RegisterEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
-	this:RegisterEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+	this:RegisterEvent('MY_TEAM_MON__SUBSCRIPTION__REPO_META_LIST_UPDATE')
+	this:RegisterEvent('MY_TEAM_MON__SUBSCRIPTION__FAV_META_LIST_UPDATE')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	D.CheckPageInit(this:Lookup('PageSet_Menu'))
 end
 
 function D.OnEvent(event)
-	if event == 'MY_TM_RR_REPO_META_LIST_UPDATE' then
+	if event == 'MY_TEAM_MON__SUBSCRIPTION__REPO_META_LIST_UPDATE' then
 		D.UpdateRepoList(this)
-	elseif event == 'MY_TM_RR_FAV_META_LIST_UPDATE' then
+	elseif event == 'MY_TEAM_MON__SUBSCRIPTION__FAV_META_LIST_UPDATE' then
 		D.UpdateFavList(this)
 	end
 end
@@ -783,9 +783,9 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_Download' then
 		if this:GetParent():GetParent():GetParent():GetParent():GetName() == 'Page_Repo' then
 			D.DownloadData(this:GetParent().info, function()
-				FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+				FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__REPO_META_LIST_UPDATE')
 			end)
-			FireUIEvent('MY_TM_RR_REPO_META_LIST_UPDATE')
+			FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__REPO_META_LIST_UPDATE')
 		else
 			local info = this:GetParent().info
 			META_DOWNLOADING[info.szKey] = true
@@ -794,16 +794,16 @@ function D.OnLButtonClick()
 				function(info)
 					META_DOWNLOADING[info.szKey] = nil
 					D.DownloadData(info, function()
-						FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+						FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__FAV_META_LIST_UPDATE')
 					end)
-					FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+					FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__FAV_META_LIST_UPDATE')
 				end,
 				function(szErrmsg)
 					if szErrmsg then
 						X.Alert(szErrmsg .. '\n' ..  info.szURL)
 					end
 					META_DOWNLOADING[info.szKey] = nil
-					FireUIEvent('MY_TM_RR_FAV_META_LIST_UPDATE')
+					FireUIEvent('MY_TEAM_MON__SUBSCRIPTION__FAV_META_LIST_UPDATE')
 				end)
 		end
 	elseif name == 'Btn_FavAddUrl' then
@@ -971,7 +971,7 @@ function D.OnItemMouseLeave()
 	end
 end
 
-X.RegisterBgMsg('MY_TeamMon_RR', function(_, data, _, _, szTalker, _)
+X.RegisterBgMsg('MY_TeamMon_Subscription', function(_, data, _, _, szTalker, _)
 	local action = data[1]
 	if action == 'SYNC' then
 		local errs = X.Schema.CheckSchema(data[2], META_LUA_SCHEMA)
@@ -1004,21 +1004,21 @@ X.RegisterInit(function()
 	D.Init()
 end)
 
-X.RegisterInit('MY_TeamMon_RR', function()
+X.RegisterInit('MY_TeamMon_Subscription', function()
 	if X.IsDebugServer() then
 		return
 	end
 	X.DelayCall(8000, function() D.CheckUpdate() end)
 end)
 
-X.RegisterEvent('MY_TM_DATA_MODIFY', 'MY_TeamMon_RR', function()
+X.RegisterEvent('MY_TM_DATA_MODIFY', 'MY_TeamMon_Subscription', function()
 	D.SetUserConfig('RR.DataNotModified', false)
 end)
 
 -- Global exports
 do
 local settings = {
-	name = 'MY_TeamMon_RR',
+	name = 'MY_TeamMon_Subscription',
 	exports = {
 		{
 			root = D,
@@ -1034,7 +1034,7 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_RR = X.CreateModule(settings)
+MY_TeamMon_Subscription = X.CreateModule(settings)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

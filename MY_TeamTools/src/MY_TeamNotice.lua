@@ -219,7 +219,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			end,
 		})
 		x, y = 11, 130
-		local bTeamMon = MY_TeamMon_RR and X.ENVIRONMENT.GAME_BRANCH ~= 'classic'
+		local bTeamMon = MY_TeamMon_Subscription and X.ENVIRONMENT.GAME_BRANCH ~= 'classic'
 		local nBtnW = bTeamMon and 96 or 144
 		x = x + ui:Append('WndButton', {
 			name = 'WndBtn_RaidTools',
@@ -247,7 +247,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 				x = x, y = y, w = nBtnW,
 				text = _L['Import Data'],
 				buttonStyle = 'FLAT',
-				onClick = MY_TeamMon_RR.OpenPanel,
+				onClick = MY_TeamMon_Subscription.OpenPanel,
 			}):AutoWidth():Width() + 5
 		end
 		FormatAllContentPos()

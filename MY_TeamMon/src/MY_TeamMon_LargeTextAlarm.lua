@@ -9,7 +9,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_LT'
+local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_LargeTextAlarm'
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon'
@@ -19,12 +19,12 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^15.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
-X.RegisterRestriction('MY_TeamMon_LT', { ['*'] = true })
+X.RegisterRestriction('MY_TeamMon_LargeTextAlarm', { ['*'] = true })
 --------------------------------------------------------------------------
 
-local INIFILE = X.PACKET_INFO.ROOT ..  'MY_TeamMon/ui/MY_TeamMon_LT.ini'
+local INI_FILE = X.PACKET_INFO.ROOT ..  'MY_TeamMon/ui/MY_TeamMon_LargeTextAlarm.ini'
 
-local O = X.CreateUserSettingsModule('MY_TeamMon_LT', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_TeamMon_LargeTextAlarm', _L['Raid'], {
 	tAnchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
@@ -62,7 +62,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	this:RegisterEvent('UI_SCALED')
-	this:RegisterEvent('MY_TM_LARGE_TEXT')
+	this:RegisterEvent('MY_TEAM_MON__LARGE_TEXT_ALARM')
 	D.UpdateAnchor(this)
 	D.frame = this
 	D.txt = this:Lookup('', 'Text_Total')
@@ -70,7 +70,7 @@ end
 
 function D.OnEvent(szEvent)
 	if szEvent == 'ON_ENTER_CUSTOM_UI_MODE' or szEvent == 'ON_LEAVE_CUSTOM_UI_MODE' then
-		if X.IsRestricted('MY_TeamMon_LT') then
+		if X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			return
 		end
 		if szEvent == 'ON_LEAVE_CUSTOM_UI_MODE' then
@@ -80,10 +80,10 @@ function D.OnEvent(szEvent)
 			D.frame:SetAlpha(255)
 			D.frame:Show()
 		end
-		UpdateCustomModeWindow(this, _L['MY_TeamMon_LT'], true)
+		UpdateCustomModeWindow(this, _L['MY_TeamMon_LargeTextAlarm'], true)
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)
-	elseif szEvent == 'MY_TM_LARGE_TEXT' then
+	elseif szEvent == 'MY_TEAM_MON__LARGE_TEXT_ALARM' then
 		D.UpdateText(arg0, arg1)
 	end
 end
@@ -103,12 +103,12 @@ function D.UpdateAnchor(frame)
 end
 
 function D.Init()
-	Wnd.CloseWindow('MY_TeamMon_LT')
-	Wnd.OpenWindow(INIFILE, 'MY_TeamMon_LT')
+	Wnd.CloseWindow('MY_TeamMon_LargeTextAlarm')
+	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_LargeTextAlarm')
 end
 
 function D.UpdateText(txt, col)
-	if X.IsRestricted('MY_TeamMon_LT') then
+	if X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 		return
 	end
 	if not col then
@@ -122,7 +122,7 @@ function D.UpdateText(txt, col)
 	D.frame:SetAlpha(255)
 	D.frame:Show()
 	D.nTime = GetTime()
-	X.BreatheCall('MY_TeamMon_LT', D.OnBreathe)
+	X.BreatheCall('MY_TeamMon_LargeTextAlarm', D.OnBreathe)
 end
 
 function D.OnBreathe()
@@ -130,7 +130,7 @@ function D.OnBreathe()
 	if D.nTime and (nTime - D.nTime) / 1000 > O.fPause then
 		D.nTime = nil
 		D.frame:FadeOut(O.fFadeOut * 10)
-		X.BreatheCall('MY_TeamMon_LT', false)
+		X.BreatheCall('MY_TeamMon_LargeTextAlarm', false)
 	end
 end
 
@@ -139,7 +139,7 @@ end
 --------------------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_TeamMon_LT',
+	name = 'MY_TeamMon_LargeTextAlarm',
 	exports = {
 		{
 			preset = 'UIEvent',
@@ -169,26 +169,26 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_LT = X.CreateModule(settings)
+MY_TeamMon_LargeTextAlarm = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
 -- 事件注册
 --------------------------------------------------------------------------------
 
-X.RegisterUserSettingsInit('MY_TeamMon_LT', D.Init)
+X.RegisterUserSettingsInit('MY_TeamMon_LargeTextAlarm', D.Init)
 
 --------------------------------------------------------------------------------
 -- 界面注册
 --------------------------------------------------------------------------------
 
-local PS = { szRestriction = 'MY_TeamMon_LT' }
+local PS = { szRestriction = 'MY_TeamMon_LargeTextAlarm' }
 function PS.OnPanelActive(frame)
 	local ui = X.UI(frame)
 	local nPaddingX, nPaddingY = 20, 20
 	local nX, nY = nPaddingX, nPaddingY
 
-	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['MY_TeamMon_LT'], font = 27 }):Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['MY_TeamMon_LargeTextAlarm'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX = ui:Append('Text', { text = _L['Font scale'], x = nPaddingX + 10, y = nY + 10 }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nX + 10, y = nY + 13, text = '',
@@ -239,6 +239,6 @@ function PS.OnPanelActive(frame)
 	})
 	ui:Append('Text', { name = 'Text_Preview', x = 20, y = nY + 50, txt = _L['JX3'], font = O.dwFontScheme, scale = O.fScale})
 end
-X.RegisterPanel(_L['Raid'], 'MY_TeamMon_LT', _L['MY_TeamMon_LT'], 'ui/Image/TargetPanel/Target.uitex|59', PS)
+X.RegisterPanel(_L['Raid'], 'MY_TeamMon_LargeTextAlarm', _L['MY_TeamMon_LargeTextAlarm'], 'ui/Image/TargetPanel/Target.uitex|59', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

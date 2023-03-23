@@ -3,17 +3,17 @@ return {
 	['Leave map %s.'] = '你已離開地圖【%s】。',
 	['Enter map %s.'] = '你已進入地圖【%s】。',
 	['Encrypt and compressing: '] = '更新加密壓縮：',
-	-- MY_TeamMon_CA.lua --
-	['MY_TeamMon_CA'] = '中央提醒',
-	-- MY_TeamMon_CC.lua --
-	['MY_TeamMon_CC'] = '圈圈連線',
-	-- MY_TeamMon_BL.lua --
-	['MY_TeamMon_BL'] = '自身氣勁列表',
-	-- MY_TeamMon_PBL.lua --
-	['MY_TeamMon_PBL'] = '團隊重要氣勁列表',
+	-- MY_TeamMon_CenterAlarm.lua --
+	['MY_TeamMon_CenterAlarm'] = '中央提醒',
+	-- MY_TeamMon_CircleLine.lua --
+	['MY_TeamMon_CircleLine'] = '圈圈連線',
+	-- MY_TeamMon_BuffList.lua --
+	['MY_TeamMon_BuffList'] = '自身氣勁列表',
+	-- MY_TeamMon_PartyBuffList.lua --
+	['MY_TeamMon_PartyBuffList'] = '團隊重要氣勁列表',
 	['Mouse enter select'] = '滑鼠滑過選中目標',
-	-- MY_TeamMon_LT.lua --
-	['MY_TeamMon_LT'] = '特大文字',
+	-- MY_TeamMon_LargeTextAlarm.lua --
+	['MY_TeamMon_LargeTextAlarm'] = '特大文字',
 	['Font scale'] = '字體縮放',
 	['Pause time'] = '停留時間',
 	['FadeIn time'] = '淡入時間',
@@ -226,8 +226,8 @@ return {
 	['Draw Border'] = '繪製邊框',
 	['Draw name'] = '繪製名稱',
 	['Add circle'] = '添加圈圈',
-	-- MY_TeamMon_ST.lua --
-	['MY_TeamMon_ST'] = '團隊計時',
+	-- MY_TeamMon_SpellTimer.lua --
+	['MY_TeamMon_SpellTimer'] = '團隊計時',
 	['Countdown configure'] = '時間軸顯示',
 	['Countdown format error'] = '倒計時格式錯誤',
 	['[%s] remaining %ds.'] = '【%s】 剩餘 %d 秒。',
@@ -238,8 +238,8 @@ return {
 	['Never show decimal.'] = '從不顯示小數點。',
 	['Always show decimal.'] = '總是顯示小數點。',
 	['Show countdown decimal when duration below: %ds.'] = '倒計時剩餘%d秒時顯示小數點。',
-	-- MY_TeamMon_RR.lua --
-	['MY_TeamMon_RR'] = '團隊監控·數據訂閱',
+	-- MY_TeamMon_Subscription.lua --
+	['MY_TeamMon_Subscription'] = '團隊監控·數據訂閱',
 	['Subscribe list'] = '訂閱列表',
 	['Default'] = '默認',
 	['Default monitor data'] = '默認數據',

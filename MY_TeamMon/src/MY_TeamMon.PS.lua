@@ -52,19 +52,19 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bEnable = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	if not X.IsRestricted('MY_TeamMon_CC') then
+	if not X.IsRestricted('MY_TeamMon_CircleLine') then
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Enable circle'],
-			checked = MY_TeamMon_CC.bEnable,
+			checked = MY_TeamMon_CircleLine.bEnable,
 			onCheck = function(bCheck)
-				MY_TeamMon_CC.bEnable = bCheck
+				MY_TeamMon_CircleLine.bEnable = bCheck
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Circle border'],
-			checked = MY_TeamMon_CC.bBorder,
+			checked = MY_TeamMon_CircleLine.bBorder,
 			onCheck = function(bCheck)
-				MY_TeamMon_CC.bBorder = bCheck
+				MY_TeamMon_CircleLine.bBorder = bCheck
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 	end
@@ -103,7 +103,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = nPaddingX + 5
-	if not X.IsRestricted('MY_TeamMon_LT') then
+	if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Large text alarm'],
 			checked = MY_TeamMon.bPushBigFontAlarm,
@@ -112,7 +112,7 @@ function PS.OnPanelActive(wnd)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 	end
-	if not X.IsRestricted('MY_TeamMon_FS') then
+	if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, text = _L['Fullscreen alarm'],
 			checked = MY_TeamMon.bPushFullScreen,
@@ -154,8 +154,8 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local menu = {}
 			for k, v in ipairs({ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }) do
-				table.insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BL.nCount == v, fnAction = function()
-					MY_TeamMon_BL.nCount = v
+				table.insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BuffList.nCount == v, fnAction = function()
+					MY_TeamMon_BuffList.nCount = v
 				end })
 			end
 			return menu
@@ -166,8 +166,8 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local menu = {}
 			for k, v in ipairs({ 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100 }) do
-				table.insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BL.fScale == v / 55, fnAction = function()
-					MY_TeamMon_BL.fScale = v / 55
+				table.insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BuffList.fScale == v / 55, fnAction = function()
+					MY_TeamMon_BuffList.fScale = v / 55
 				end })
 			end
 			return menu
@@ -177,11 +177,11 @@ function PS.OnPanelActive(wnd)
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nPaddingX + 10, y = nY, w = nW - nPaddingX * 2, rw = nW / 3, h = 22,
 		range = {0, 3601},
-		value = MY_TeamMon_ST.nBelowDecimal,
+		value = MY_TeamMon_SpellTimer.nBelowDecimal,
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onChange = function(val)
-			X.DelayCall('MY_TeamMon_ST_nBelowDecimal', 300, function()
-				MY_TeamMon_ST.nBelowDecimal = val
+			X.DelayCall('MY_TeamMon_SpellTimer_nBelowDecimal', 300, function()
+				MY_TeamMon_SpellTimer.nBelowDecimal = val
 			end)
 		end,
 		textFormatter = function(val)
@@ -225,7 +225,7 @@ function PS.OnPanelActive(wnd)
 			if szLang == 'zhcn' or szLang == 'zhtw' then
 				table.insert(menu, {
 					szOption = _L['Import data (web)'],
-					fnAction = function() MY_TeamMon_RR.OpenPanel() end,
+					fnAction = function() MY_TeamMon_Subscription.OpenPanel() end,
 				})
 			end
 			table.insert(menu, {

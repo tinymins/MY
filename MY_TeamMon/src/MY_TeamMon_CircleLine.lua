@@ -9,17 +9,17 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_CC'
+local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_CircleLine'
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_TeamMon_CC'
+local MODULE_NAME = 'MY_TeamMon_CircleLine'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^15.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
-X.RegisterRestriction('MY_TeamMon_CC', { ['*'] = true })
+X.RegisterRestriction('MY_TeamMon_CircleLine', { ['*'] = true })
 --------------------------------------------------------------------------
 local TARGET = TARGET
 local INI_SHADOW          = X.PACKET_INFO.UI_COMPONENT_ROOT .. 'Shadow.ini'
@@ -41,7 +41,7 @@ local H_CIRCLE = X.UI.GetShadowHandle('Handle_Shadow_Circle')
 local H_LINE = X.UI.GetShadowHandle('Handle_Shadow_Line')
 local H_NAME = X.UI.GetShadowHandle('Handle_Shadow_Name')
 
-local O = X.CreateUserSettingsModule('MY_TeamMon_CC', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_TeamMon_CircleLine', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
@@ -325,7 +325,7 @@ function D.RescanNearby()
 	H_CIRCLE:Clear()
 	H_LINE:Clear()
 	H_NAME:Clear()
-	if X.IsRestricted('MY_TeamMon_CC') then
+	if X.IsRestricted('MY_TeamMon_CircleLine') then
 		return
 	end
 	for _, dwID in pairs(X.GetNearNpcID()) do
@@ -344,21 +344,21 @@ function D.OnTMDataReload()
 end
 
 function D.CheckEnable()
-	if D.bReady and O.bEnable and not X.IsRestricted('MY_TeamMon_CC') then
-		X.RegisterModuleEvent('MY_TeamMon_CC', {
+	if D.bReady and O.bEnable and not X.IsRestricted('MY_TeamMon_CircleLine') then
+		X.RegisterModuleEvent('MY_TeamMon_CircleLine', {
 			{ '#BREATHE', D.OnBreathe },
 			{ 'NPC_ENTER_SCENE', function() D.OnObjectEnterScene(TARGET.NPC, arg0) end },
 			{ 'NPC_LEAVE_SCENE', function() D.OnObjectLeaveScene(TARGET.NPC, arg0) end },
 			{ 'DOODAD_ENTER_SCENE', function() D.OnObjectEnterScene(TARGET.DOODAD, arg0) end },
 			{ 'DOODAD_LEAVE_SCENE', function() D.OnObjectLeaveScene(TARGET.DOODAD, arg0) end },
 			{ 'LOADING_ENDING', D.UpdateRule },
-			{ 'MY_TM_CC_RELOAD', D.UpdateRule },
+			{ 'MY_TEAM_MON__CIRCLE_LINE__RELOAD', D.UpdateRule },
 			{ 'MY_TM_DATA_RELOAD', D.OnTMDataReload },
-			{ 'MY_TM_CC_RESERT_DRAW', function() CIRCLE_RESERT_DRAW = true end }
+			{ 'MY_TEAM_MON__CIRCLE_LINE__RESERT_DRAW', function() CIRCLE_RESERT_DRAW = true end }
 		})
 		D.UpdateRule()
 	else
-		X.RegisterModuleEvent('MY_TeamMon_CC', false)
+		X.RegisterModuleEvent('MY_TeamMon_CircleLine', false)
 	end
 end
 
@@ -367,7 +367,7 @@ end
 --------------------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_TeamMon_CC',
+	name = 'MY_TeamMon_CircleLine',
 	exports = {
 		{
 			fields = {
@@ -390,20 +390,20 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_CC = X.CreateModule(settings)
+MY_TeamMon_CircleLine = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------------------------------
 
-X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_CC', function()
-	if arg0 and arg0 ~= 'MY_TeamMon_CC' then
+X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_CircleLine', function()
+	if arg0 and arg0 ~= 'MY_TeamMon_CircleLine' then
 		return
 	end
 	D.CheckEnable()
 end)
-X.RegisterUserSettingsInit('MY_TeamMon_CC', function()
+X.RegisterUserSettingsInit('MY_TeamMon_CircleLine', function()
 	D.bReady = true
 	D.CheckEnable()
 end)

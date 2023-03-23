@@ -73,7 +73,7 @@ setmetatable(MY_TMUI_DOODAD_ICON, { __index = function(me, key)
 end })
 
 local function OpenDragPanel(el)
-	local frame = Wnd.OpenWindow(X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_DRAG.ini', 'MY_TeamMon_DRAG')
+	local frame = Wnd.OpenWindow(X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_DRAG.ini', 'MY_TeamMon_UI_DRAG')
 	local x, y = Cursor.GetPos()
 	local w, h = el:GetSize()
 	-- local x, y = el:GetAbsPos()
@@ -92,7 +92,7 @@ local function OpenDragPanel(el)
 end
 
 local function CloseDragPanel()
-	local frame = Station.Lookup('Normal1/MY_TeamMon_DRAG')
+	local frame = Station.Lookup('Normal1/MY_TeamMon_UI_DRAG')
 	if frame then
 		frame:EndMoving()
 		Wnd.CloseWindow(frame)
@@ -101,7 +101,7 @@ local function CloseDragPanel()
 end
 
 local function DragPanelIsOpened()
-	return Station.Lookup('Normal1/MY_TeamMon_DRAG') and Station.Lookup('Normal1/MY_TeamMon_DRAG'):IsVisible()
+	return Station.Lookup('Normal1/MY_TeamMon_UI_DRAG') and Station.Lookup('Normal1/MY_TeamMon_UI_DRAG'):IsVisible()
 end
 
 function D.OnFrameCreate()
@@ -147,7 +147,7 @@ function D.OnFrameCreate()
 			table.insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
 			local szLang = X.ENVIRONMENT.GAME_LANG
 			if szLang == 'zhcn' or szLang == 'zhtw' then
-				table.insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_RR.OpenPanel })
+				table.insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_Subscription.OpenPanel })
 			end
 			table.insert(menu, {
 				szOption = _L['Clear data'],
@@ -1831,7 +1831,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
@@ -1849,7 +1849,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.BUFF_GET, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_FS') then
+		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
@@ -1928,7 +1928,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.BUFF_LOSE, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
@@ -1993,7 +1993,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.SKILL_END, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
@@ -2037,7 +2037,7 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bCenterAlarm', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
-			if not X.IsRestricted('MY_TeamMon_LT') then
+			if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 				nX = ui:Append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 					onCheck = function(bCheck)
@@ -2055,7 +2055,7 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TM_TYPE.SKILL_BEGIN, 'bScreenHead', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
-			if not X.IsRestricted('MY_TeamMon_FS') then
+			if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 				nX = ui:Append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 					onCheck = function(bCheck)
@@ -2125,7 +2125,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
@@ -2143,7 +2143,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_FS') then
+		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
@@ -2175,7 +2175,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.NPC_LEAVE, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
@@ -2235,7 +2235,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
@@ -2253,7 +2253,7 @@ function D.OpenSettingPanel(data, szType)
 			-- 		SetDataClass(MY_TM_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
 			-- 	end,
 			-- }):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_FS') then
+		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
@@ -2285,7 +2285,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.DOODAD_LEAVE, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
@@ -2384,7 +2384,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
@@ -2402,7 +2402,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_FS') then
+		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
@@ -2487,7 +2487,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bCenterAlarm', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_LT') then
+		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
@@ -2505,7 +2505,7 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TM_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		if not X.IsRestricted('MY_TeamMon_FS') then
+		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
@@ -2782,10 +2782,10 @@ function D.OpenSettingPanel(data, szType)
 					local nClass = v.key and MY_TM_TYPE.COMMON or v.nClass
 					if data.dwID then
 						local szKey = v.key or (k .. '.'  .. data.dwID .. '.' .. (data.nLevel or 0))
-						FireUIEvent('MY_TM_ST_DEL', nClass, szKey) -- try kill
+						FireUIEvent('MY_TEAM_MON__SPELL_TIMER__DEL', nClass, szKey) -- try kill
 					else
 						local szKey = v.key or (data.nIndex .. '.' .. k)
-						FireUIEvent('MY_TM_ST_DEL', nClass, szKey) -- try kill
+						FireUIEvent('MY_TEAM_MON__SPELL_TIMER__DEL', nClass, szKey) -- try kill
 					end
 				end
 				if #data.tCountdown == 1 then
@@ -2825,7 +2825,7 @@ function D.OpenSettingPanel(data, szType)
 	}):Pos('BOTTOMRIGHT')
 	nY = nY + 35
 	-- 圈圈连线
-	if (szType == 'NPC' or szType == 'DOODAD') and not X.IsRestricted('MY_TeamMon_CC') then
+	if (szType == 'NPC' or szType == 'DOODAD') and not X.IsRestricted('MY_TeamMon_CircleLine') then
 		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Circle and line'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = 30, nY + 5
 		if szType == 'NPC' then
@@ -2835,7 +2835,7 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					data.bDrawOnlyMyEmployer = bCheck and true or nil
 					FireUIEvent('MY_TM_DATA_MODIFY')
-					FireUIEvent('MY_TM_CC_RELOAD')
+					FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		end
@@ -2845,7 +2845,7 @@ function D.OpenSettingPanel(data, szType)
 			onCheck = function(bCheck)
 				data.bDrawLine = bCheck and true or nil
 				FireUIEvent('MY_TM_DATA_MODIFY')
-				FireUIEvent('MY_TM_CC_RELOAD')
+				FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		if szType == 'NPC' then
@@ -2855,7 +2855,7 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					data.bDrawLineOnlyStareMe = bCheck and true or nil
 					FireUIEvent('MY_TM_DATA_MODIFY')
-					FireUIEvent('MY_TM_CC_RELOAD')
+					FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 		end
@@ -2865,7 +2865,7 @@ function D.OpenSettingPanel(data, szType)
 			onCheck = function(bCheck)
 				data.bDrawName = bCheck and true or nil
 				FireUIEvent('MY_TM_DATA_MODIFY')
-				FireUIEvent('MY_TM_CC_RELOAD')
+				FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nY = nY + 10
@@ -2881,7 +2881,7 @@ function D.OpenSettingPanel(data, szType)
 							ui:Color(r, g, b)
 							circle.col = { r, g, b }
 							FireUIEvent('MY_TM_DATA_MODIFY')
-							FireUIEvent('MY_TM_CC_RELOAD')
+							FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 						end)
 					end,
 				}):Pos('BOTTOMRIGHT')
@@ -2890,7 +2890,7 @@ function D.OpenSettingPanel(data, szType)
 					onChange = function(nNum)
 						circle.nAngle = tonumber(nNum) or 80
 						FireUIEvent('MY_TM_DATA_MODIFY')
-						FireUIEvent('MY_TM_CC_RELOAD')
+						FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 					end,
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Degree'] }):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2899,7 +2899,7 @@ function D.OpenSettingPanel(data, szType)
 					onChange = function(nNum)
 						circle.nRadius = tonumber(nNum) or 4
 						FireUIEvent('MY_TM_DATA_MODIFY')
-						FireUIEvent('MY_TM_CC_RELOAD')
+						FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 					end,
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Meter'] }):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2908,7 +2908,7 @@ function D.OpenSettingPanel(data, szType)
 					onChange = function(nNum)
 						circle.nAlpha = tonumber(nNum)
 						FireUIEvent('MY_TM_DATA_MODIFY')
-						FireUIEvent('MY_TM_CC_RELOAD')
+						FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 					end,
 				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Alpha'] }):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2919,7 +2919,7 @@ function D.OpenSettingPanel(data, szType)
 					onCheck = function(bChecked)
 						circle.bBorder = bChecked
 						FireUIEvent('MY_TM_DATA_MODIFY')
-						FireUIEvent('MY_TM_CC_RELOAD')
+						FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 					end,
 				}):AutoWidth():Pos('BOTTOMRIGHT')
 				nX = ui:Append('Image', {
@@ -2939,7 +2939,7 @@ function D.OpenSettingPanel(data, szType)
 							table.remove(data.aCircle, k)
 						end
 						FireUIEvent('MY_TM_DATA_MODIFY')
-						FireUIEvent('MY_TM_CC_RELOAD')
+						FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 						D.OpenSettingPanel(data, szType)
 					end,
 					image = file, imageFrame = 86,
@@ -2963,7 +2963,7 @@ function D.OpenSettingPanel(data, szType)
 					bBorder = true,
 				})
 				FireUIEvent('MY_TM_DATA_MODIFY')
-				FireUIEvent('MY_TM_CC_RELOAD')
+				FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 				D.OpenSettingPanel(data, szType)
 			end,
 		}):Pos('BOTTOMRIGHT')

@@ -9,10 +9,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_BL'
+local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_BuffList'
 local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_TeamMon_BL'
+local MODULE_NAME = 'MY_TeamMon_BuffList'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^15.0.0') then
@@ -24,8 +24,8 @@ end
 local GetBuff = X.GetBuff
 local FilterCustomText = MY_TeamMon.FilterCustomText
 
-local BL_INIFILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_BL.ini'
-local O = X.CreateUserSettingsModule('MY_TeamMon_BL', _L['Raid'], {
+local INI_FILE = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_BuffList.ini'
+local O = X.CreateUserSettingsModule('MY_TeamMon_BuffList', _L['Raid'], {
 	tAnchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
@@ -49,7 +49,7 @@ local D = {
 	fScale = 1,
 }
 
--- FireUIEvent('MY_TM_BL_CREATE', 103, 1, { 255, 0, 0 })
+-- FireUIEvent('MY_TEAM_MON__BUFF_LIST__CREATE', 103, 1, { 255, 0, 0 })
 local function CreateBuffList(dwID, nLevel, col, tArgs, szSender, szReceiver)
 	local key = tostring(dwID) -- .. '.' .. nLevel
 	col = col or { 255, 255, 0 }
@@ -97,8 +97,8 @@ function D.OnFrameCreate()
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
-	this:RegisterEvent('MY_TM_BL_CREATE')
-	D.hItem = this:CreateItemData(BL_INIFILE, 'Handle_Item')
+	this:RegisterEvent('MY_TEAM_MON__BUFF_LIST__CREATE')
+	D.hItem = this:CreateItemData(INI_FILE, 'Handle_Item')
 	D.handle = this:Lookup('', '')
 	D.handle:Clear()
 	D.ReSize()
@@ -106,7 +106,7 @@ function D.OnFrameCreate()
 end
 
 function D.OnEvent(szEvent)
-	if szEvent == 'MY_TM_BL_CREATE' then
+	if szEvent == 'MY_TEAM_MON__BUFF_LIST__CREATE' then
 		CreateBuffList(arg0, arg1, arg2, arg3, arg4, arg5)
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)
@@ -206,8 +206,8 @@ function D.UpdateAnchor(frame)
 end
 
 function D.Init()
-	Wnd.CloseWindow('MY_TeamMon_BL')
-	Wnd.OpenWindow(BL_INIFILE, 'MY_TeamMon_BL')
+	Wnd.CloseWindow('MY_TeamMon_BuffList')
+	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_BuffList')
 end
 
 --------------------------------------------------------------------------------
@@ -215,7 +215,7 @@ end
 --------------------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_TeamMon_BL',
+	name = 'MY_TeamMon_BuffList',
 	exports = {
 		{
 			preset = 'UIEvent',
@@ -245,13 +245,13 @@ local settings = {
 		},
 	},
 }
-MY_TeamMon_BL = X.CreateModule(settings)
+MY_TeamMon_BuffList = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------------------------------
 
-X.RegisterUserSettingsInit('MY_TeamMon_BL', D.Init)
+X.RegisterUserSettingsInit('MY_TeamMon_BuffList', D.Init)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
