@@ -1274,7 +1274,7 @@ function X.SendChat(nChannel, szText, tOptions)
 	end
 	-- Ç©Ãû²¢·¢ËÍ
 	local aSignSay = SignChatData(aSay, tOptions.uuid, me)
-	me.Talk(nChannel, szTarget, aSay)
+	me.Talk(nChannel, szTarget, aSignSay)
 end
 end
 
