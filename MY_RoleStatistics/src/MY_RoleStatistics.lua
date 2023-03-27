@@ -20,19 +20,16 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
-local O = {}
 local D = {
-	aModule = {},
-	tModuleAPI = {},
+	aFloatEntry = {},
+	aSaveDB = {},
 }
-local Framework = {}
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_RoleStatistics.ini'
-local SZ_MOD_INI = PLUGIN_ROOT .. '/ui/MY_RoleStatistics.Mod.ini'
 
 function D.Open(szModule)
 	local frame = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics')
 	frame:BringToTop()
-	D.ActivePage(frame, szModule or 1, true)
+	D.PageSetModule.ActivePage(frame, szModule or 1, true)
 end
 
 function D.Close()
@@ -52,76 +49,24 @@ function D.Toggle()
 end
 
 -- 注册子模块
-function D.RegisterModule(szID, szName, tModule)
-	for i, v in X.ipairs_r(D.aModule) do
-		if v.szID == szID then
-			table.remove(D.aModule, i)
-		end
+function D.RegisterModule(szKey, szName, tModule)
+	if not D.PageSetModule or not szName or not tModule then
+		return
 	end
-	if szName and tModule then
-		table.insert(D.aModule, {
-			szID = szID,
-			szName = szName,
-			tModule = tModule,
-		})
-		if tModule.tAPI then
-			for k, v in pairs(tModule.tAPI) do
-				D.tModuleAPI[k] = v
-			end
-		end
+	if tModule.szFloatEntry then
+		table.insert(D.aFloatEntry, { szName = szName, szKey = tModule.szFloatEntry })
 	end
+	if tModule.szSaveDB then
+		table.insert(D.aSaveDB, { szName = szName, szKey = tModule.szSaveDB })
+	end
+	D.PageSetModule.RegisterModule(szKey, szName, tModule)
 	if D.IsOpened() then
 		D.Close()
 		D.Open()
 	end
 end
 
--- 初始化主界面 绘制分页按钮
-function D.InitPageSet(frame)
-	frame.bInitPageset = true
-	local pageset = frame:Lookup('PageSet_All')
-	for i, m in ipairs(D.aModule) do
-		local frameMod = Wnd.OpenWindow(SZ_MOD_INI, 'MY_RoleStatisticsMod')
-		local checkbox = frameMod:Lookup('PageSet_Total/WndCheck_Default')
-		local page = frameMod:Lookup('PageSet_Total/Page_Default')
-		checkbox:ChangeRelation(pageset, true, true)
-		page:ChangeRelation(pageset, true, true)
-		Wnd.CloseWindow(frameMod)
-		pageset:AddPage(page, checkbox)
-		checkbox:Show()
-		checkbox:Lookup('', 'Text_CheckDefault'):SetText(m.szName)
-		checkbox:SetRelX(checkbox:GetRelX() + checkbox:GetW() * (i - 1))
-		checkbox.nIndex = i
-		page.nIndex = i
-	end
-	frame.bInitPageset = nil
-end
-
-function D.ActivePage(frame, szModule, bFirst)
-	local pageset = frame:Lookup('PageSet_All')
-	local pageActive = pageset:GetActivePage()
-	local nActiveIndex, nToIndex = pageActive.nIndex, nil
-	for i, m in ipairs(D.aModule) do
-		if m.szID == szModule or i == szModule then
-			nToIndex = i
-		end
-	end
-	if bFirst and not nToIndex then
-		nToIndex = 1
-	end
-	if nToIndex then
-		if nToIndex == nActiveIndex then
-			local _this = this
-			this = pageset
-			Framework.OnActivePage()
-			this = _this
-		else
-			pageset:ActivePage(nToIndex - 1)
-		end
-	end
-end
-
-function Framework.OnLButtonClick()
+function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		D.Close()
@@ -138,31 +83,27 @@ function Framework.OnLButtonClick()
 				HideTip()
 			end,
 		}
-		for _, m in ipairs(D.aModule) do
-			if m and m.tModule.szFloatEntry then
-				table.insert(tFloatEntryMenu, {
-					szOption = m.szName,
-					bCheck = true, bChecked = X.Get(_G, m.tModule.szFloatEntry),
-					fnAction = function()
-						X.Set(_G, m.tModule.szFloatEntry, not X.Get(_G, m.tModule.szFloatEntry))
-					end,
-				})
-			end
+		for _, m in ipairs(D.aFloatEntry) do
+			table.insert(tFloatEntryMenu, {
+				szOption = m.szName,
+				bCheck = true, bChecked = X.Get(_G, m.szKey),
+				fnAction = function()
+					X.Set(_G, m.szKey, not X.Get(_G, m.szKey))
+				end,
+			})
 		end
 		if #tFloatEntryMenu > 0 then
 			table.insert(menu, tFloatEntryMenu)
 		end
 		local tSaveDBMenu = { szOption = _L['Save DB'] }
-		for _, m in ipairs(D.aModule) do
-			if m and m.tModule.szSaveDB then
-				table.insert(tSaveDBMenu, {
-					szOption = m.szName,
-					bCheck = true, bChecked = X.Get(_G, m.tModule.szSaveDB),
-					fnAction = function()
-						X.Set(_G, m.tModule.szSaveDB, not X.Get(_G, m.tModule.szSaveDB))
-					end,
-				})
-			end
+		for _, m in ipairs(D.aSaveDB) do
+			table.insert(tSaveDBMenu, {
+				szOption = m.szName,
+				bCheck = true, bChecked = X.Get(_G, m.szKey),
+				fnAction = function()
+					X.Set(_G, m.szKey, not X.Get(_G, m.szKey))
+				end,
+			})
 		end
 		if #tSaveDBMenu > 0 then
 			table.insert(menu, tSaveDBMenu)
@@ -178,139 +119,18 @@ function Framework.OnLButtonClick()
 	end
 end
 
-function Framework.OnActivePage()
-	if this:GetRoot().bInitPageset then
-		return
-	end
-	local name = this:GetName()
-	if name == 'PageSet_All' then
-		local page = this:GetActivePage()
-		if page.nIndex then
-			local m = D.aModule[page.nIndex]
-			if not page.bInit then
-				if m and m.tModule.OnInitPage then
-					local _this = this
-					this = page
-					m.tModule.OnInitPage()
-					this = _this
-				end
-				page.bInit = true
-			end
-			if m and m.tModule.OnActivePage then
-				local _this = this
-				this = page
-				m.tModule.OnActivePage()
-				this = _this
-			end
-		end
-	end
-end
-
-function Framework.OnFrameCreate()
-	D.InitPageSet(this)
+function D.OnFrameCreate()
 	this:BringToTop()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:Lookup('', 'Text_Title'):SetText(X.PACKET_INFO.NAME .. _L.SPLIT_DOT .. _L['MY_RoleStatistics'])
 	PlaySound(SOUND.UI_SOUND,g_sound.OpenFrame)
 end
 
-function Framework.OnFrameDestroy()
+function D.OnFrameDestroy()
 	PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 end
 
--- 全局广播模块事件
-for _, szEvent in ipairs({
-	'OnFrameCreate',
-	'OnFrameDestroy',
-	'OnFrameBreathe',
-	'OnFrameRender',
-	'OnFrameDragEnd',
-	'OnFrameDragSetPosEnd',
-	'OnEvent',
-}) do
-	D[szEvent] = function(...)
-		if Framework[szEvent] then
-			Framework[szEvent](...)
-		end
-		local page = this:Lookup('PageSet_All'):GetFirstChild()
-		while page do
-			if page:GetName() == 'Page_Default' and page.bInit then
-				local m = D.aModule[page.nIndex]
-				if m and m.tModule[szEvent] then
-					local _this = this
-					this = page
-					m.tModule[szEvent](...)
-					this = _this
-				end
-			end
-			page = page:GetNext()
-		end
-	end
-end
-
--- 根据元素位置转发对应模块事件
-for _, szEvent in ipairs({
-	'OnSetFocus',
-	'OnKillFocus',
-	'OnItemLButtonDown',
-	'OnItemMButtonDown',
-	'OnItemRButtonDown',
-	'OnItemLButtonUp',
-	'OnItemMButtonUp',
-	'OnItemRButtonUp',
-	'OnItemLButtonClick',
-	'OnItemMButtonClick',
-	'OnItemRButtonClick',
-	'OnItemMouseEnter',
-	'OnItemMouseLeave',
-	'OnItemRefreshTip',
-	'OnItemMouseWheel',
-	'OnItemLButtonDrag',
-	'OnItemLButtonDragEnd',
-	'OnLButtonDown',
-	'OnLButtonUp',
-	'OnLButtonClick',
-	'OnLButtonHold',
-	'OnMButtonDown',
-	'OnMButtonUp',
-	'OnMButtonClick',
-	'OnMButtonHold',
-	'OnRButtonDown',
-	'OnRButtonUp',
-	'OnRButtonClick',
-	'OnRButtonHold',
-	'OnMouseEnter',
-	'OnMouseLeave',
-	'OnScrollBarPosChanged',
-	'OnEditChanged',
-	'OnEditSpecialKeyDown',
-	'OnCheckBoxCheck',
-	'OnCheckBoxUncheck',
-	'OnActivePage',
-}) do
-	D[szEvent] = function(...)
-		local szPrefix = 'Normal/MY_Statistics/PageSet_All/Page_Default'
-		local page, nLimit = this, 50
-		while page and page:GetName() ~= 'Page_Default' and page:GetTreePath() ~= szPrefix do
-			if nLimit > 0 then
-				page = page:GetParent()
-				nLimit = nLimit - 1
-			else
-				page = nil
-			end
-		end
-		if page and page ~= this then
-			local m = D.aModule[page.nIndex]
-			if m and m.tModule[szEvent] then
-				return m.tModule[szEvent](...)
-			end
-		else
-			if Framework[szEvent] then
-				return Framework[szEvent](...)
-			end
-		end
-	end
-end
+D.PageSetModule = X.UI.CreatePageSetModule(D, 'PageSet_All')
 
 --------------------------------------------------------
 -- Global exports
@@ -330,8 +150,8 @@ local settings = {
 			},
 			interceptors = {
 				['*'] = function(k)
-					if D.tModuleAPI[k] then
-						return D.tModuleAPI[k]
+					if D.PageSetModule and D.PageSetModule.tModuleAPI[k] then
+						return D.PageSetModule.tModuleAPI[k]
 					end
 				end,
 			},
@@ -368,22 +188,13 @@ function PS.OnPanelActive(wnd)
 		onClick = D.Open,
 	})
 
-	local aFloatEntry, aSaveDB = {}, {}
-	for _, m in ipairs(D.aModule) do
-		if m and m.tModule.szFloatEntry then
-			table.insert(aFloatEntry, { szName = m.szName, szKey = m.tModule.szFloatEntry })
-		end
-		if m and m.tModule.szSaveDB then
-			table.insert(aSaveDB, { szName = m.szName, szKey = m.tModule.szSaveDB })
-		end
-	end
-	if #aFloatEntry > 0 then
+	if #D.aFloatEntry > 0 then
 		nX = nPaddingX
 		ui:Append('Text', { x = nX, y = nY, text = _L['Float panel'], font = 27 })
 		nX = nX + 10
 		nY = nY + 35
 
-		for _, p in ipairs(aFloatEntry) do
+		for _, p in ipairs(D.aFloatEntry) do
 			nX = nX + ui:Append('WndCheckBox', {
 				x = nX, y = nY, w = 200,
 				text = p.szName, checked = X.Get(_G, p.szKey),
@@ -394,13 +205,13 @@ function PS.OnPanelActive(wnd)
 		end
 		nY = nY + 40
 	end
-	if #aSaveDB > 0 then
+	if #D.aSaveDB > 0 then
 		nX = nPaddingX
 		ui:Append('Text', { x = nX, y = nY, text = _L['Save DB'], font = 27 })
 		nX = nX + 10
 		nY = nY + 35
 
-		for _, p in ipairs(aSaveDB) do
+		for _, p in ipairs(D.aSaveDB) do
 			nX = nX + ui:Append('WndCheckBox', {
 				x = nX, y = nY, w = 200,
 				text = p.szName, checked = X.Get(_G, p.szKey),
