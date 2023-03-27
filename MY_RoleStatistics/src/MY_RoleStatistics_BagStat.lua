@@ -834,6 +834,25 @@ function D.OnInitPage()
 	wnd:ChangeRelation(this, true, true)
 	Wnd.CloseWindow(frameTemp)
 
+	local page = this
+	local ui = X.UI(page)
+	local nX, nY = 440, 20
+	for _, p in ipairs(FILTER_LIST) do
+		nX = nX + ui:Append('WndRadioBox', {
+			x = nX, y = nY, w = 'auto', h = 25,
+			group = 'FilterType',
+			text = _L.BAG_FILTER_TYPE[p.name],
+			checked = D.szFilterType == p.name,
+			onCheck = function(bChecked)
+				if not bChecked then
+					return
+				end
+				D.szFilterType = p.name
+				D.UpdateItems(page)
+			end,
+		}):AutoWidth():Width()
+	end
+
 	local frame = this:GetRoot()
 	frame:RegisterEvent('MY_BAGSTATISTICS_MODE_CHANGE')
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
@@ -888,24 +907,6 @@ function D.OnActivePage()
 		end)
 	end
 
-	local page = this
-	local ui = X.UI(page)
-	local nX, nY = 440, 20
-	for _, p in ipairs(FILTER_LIST) do
-		nX = nX + ui:Append('WndRadioBox', {
-			x = nX, y = nY, w = 'auto', h = 25,
-			group = 'FilterType',
-			text = _L.BAG_FILTER_TYPE[p.name],
-			checked = D.szFilterType == p.name,
-			onCheck = function(bChecked)
-				if not bChecked then
-					return
-				end
-				D.szFilterType = p.name
-				D.UpdateItems(page)
-			end,
-		}):AutoWidth():Width()
-	end
 	D.UpdateNames(this)
 end
 
