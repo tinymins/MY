@@ -254,18 +254,13 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 		local fnOriginAction = NS[szEvent]
 		NS[szEvent] = function(...)
 			-- 转发给子模块
-			local ps = this:Lookup(szPageSetPath)
+			local ps = this:GetRoot():Lookup(szPageSetPath)
 			if ps then
-				local page, nLimit = this, 50
+				local page = this
 				while page and page:GetParent() ~= ps do
-					if nLimit > 0 then
-						page = page:GetParent()
-						nLimit = nLimit - 1
-					else
-						page = nil
-					end
+					page = page:GetParent()
 				end
-				if page and page ~= this then
+				if page and this ~= page then
 					local m = Modules[page.nIndex]
 					if m and m.tModule[szEvent] then
 						return m.tModule[szEvent](...)
@@ -274,7 +269,7 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 				end
 			end
 			-- 转发给 PageSet 主体
-			if PageSetEvent[szEvent] and this:GetRoot():Lookup(szPageSetPath) == this then
+			if PageSetEvent[szEvent] and this == ps then
 				return PageSetEvent[szEvent](...)
 			end
 			-- 转发给原始事件
