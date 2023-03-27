@@ -1928,14 +1928,13 @@ end
 function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 	local szFullPath = szFileName:sub(2, 2) == ':'
 		and szFileName
-		or X.GetAbsolutePath(MY_TEAM_MON_REMOTE_DATA_ROOT .. szFileName)
+		or X.GetAbsolutePath(szFileName)
 	local szFilePath = X.GetRelativePath(szFullPath, {'', X.PATH_TYPE.NORMAL}) or szFullPath
 	if not IsFileExist(szFilePath) then
 		X.SafeCall(fnAction, false, 'File does not exist.')
 		return
 	end
 	local data = X.LoadLUAData(szFilePath, { passphrase = D.PW })
-		or X.LoadLUAData(szFilePath, { passphrase = '89g45ynbtldnsryu98rbny9ps7468hb6npyusiryuxoldg7lbn894bn678b496746' })
 		or X.LoadLUAData(szFilePath, { passphrase = false })
 	if not data then
 		X.SafeCall(fnAction, false, 'Can not read data file.')

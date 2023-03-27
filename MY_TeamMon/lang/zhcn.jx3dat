@@ -238,25 +238,22 @@ return {
 	['Never show decimal.'] = '从不显示小数点。',
 	['Always show decimal.'] = '总是显示小数点。',
 	['Show countdown decimal when duration below: %ds.'] = '倒计时剩余%d秒时显示小数点。',
-	-- MY_TeamMon_Subscription.lua --
-	['MY_TeamMon_Subscription'] = '团队监控·数据订阅',
-	['Subscribe list'] = '订阅列表',
+	-- MY_TeamMon_Subscribe.lua --
+	['MY_TeamMon_Subscribe'] = '团队监控·数据订阅',
 	['Default'] = '默认',
 	['Default monitor data'] = '默认数据',
-	['Data Fav'] = '收藏数据',
-	['Repo Rank'] = '推荐数据',
 	['ERR: Decode info content as json failed!'] = '错误：描述文件解析失败！',
 	['ERR: Info content is illegal!'] = '错误：描述文件数据结构不符合约束！',
 	['Fetch repo meta list failed.'] = '获取推荐数据失败。',
 	['ERR404: MetaInfo address not found!'] = '错误404：订阅地址不存在！',
-	['Downloader is not ready!'] = '数据下载器未就绪！',
 	['New version found for TeamMon_RR\nSURL: %s\nName: %s\nTime: %s\n\nDo you want to update data now?'] = '团队监控数据订阅有更新\n短链：%s\n标题：%s\n时间：%s\n\n是否立即下载更新数据？',
 	['Update'] = '更新',
 	['Skip current version'] = '跳过此版本',
 	['Downloading in progress, please wait...'] = '数据下载正在进行中，请稍后...',
 	['Please unlock talk lock first.'] = '请先解除聊天锁。',
 	['Decode %s failed!'] = '解码[%s]失败！',
-	['Please input meta address:'] = '请输入订阅地址，添加多个使用分号分隔：',
+	-- MY_TeamMon_Subscribe_Data.lua --
+	['Subscribe list'] = '推荐数据',
 	['Please select one dataset first!'] = '请先选择一个数据项！',
 	['Author'] = '作者',
 	['Title'] = '标题',
@@ -275,8 +272,8 @@ return {
 	['%s loaded %s'] = '[%s]加载了团队监控数据：%s。',
 	['Upgrade TeamMon data to latest: %s'] = '团队监控数据已更新至最新：%s。',
 	['Sync team'] = '同步团队',
-	['Add fav success, you can switch to fav page to see.'] = '数据收藏成功，前往收藏数据分页即可查看。',
-	['Add fav'] = '加入收藏',
+	['Add favorite success, you can switch to favorite page to see.'] = '数据收藏成功，前往收藏数据分页即可查看。',
+	['Add favorite'] = '加入收藏',
 	['Check update'] = '检查更新',
 	['Refresh list'] = '刷新列表',
 	['Prev page'] = '上一页',
@@ -292,4 +289,8 @@ return {
 	['Export meta url'] = '导出订阅',
 
 	['Plugin is plugin, data is data, plugin author is plugin author, data author is data author..\nYou just loaded data\'s author is %s, it works on mingyi plugin team monitor addon.\n%s is data author, do not response for plugin problems. MingYi is plugin author, do not response for data problems.\n\nIf there is some strange headtop, focus, buff or talk, please try to use other author\'s data, and response to current author %s, plugin author MingYi does not response for this.'] = '插件是插件，数据是数据；插件作者是插件作者，数据作者是数据作者。\n\n您刚刚加载的是数据作者【%s】的团队监控数据，它配置在插件作者【茗伊】编写的团队监控插件中。\n\n【%s】是数据作者不负责插件功能问题，【茗伊】是插件作者不负责具体数据问题，需要反馈问题时请注意分别。\n\n例如：出现奇怪的目标血条颜色、错误的提示、莫名的自动喊话，又或是过多的焦点列表、气劲监控、倒计时条，请尝试更换加载其他作者的数据，并且向当前数据作者【%s】反馈问题，插件作者【茗伊】不负责具体数据内容。',
+
+	-- MY_TeamMon_Subscribe_FavoriteData.lua --
+	['Favorite list'] = '收藏数据',
+	['Please input meta address:'] = '请输入订阅地址，添加多个使用分号分隔：',
 }

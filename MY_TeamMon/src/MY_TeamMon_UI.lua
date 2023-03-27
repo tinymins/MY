@@ -147,7 +147,7 @@ function D.OnFrameCreate()
 			table.insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
 			local szLang = X.ENVIRONMENT.GAME_LANG
 			if szLang == 'zhcn' or szLang == 'zhtw' then
-				table.insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_Subscription.OpenPanel })
+				table.insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_Subscribe.OpenPanel })
 			end
 			table.insert(menu, {
 				szOption = _L['Clear data'],

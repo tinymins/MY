@@ -225,7 +225,7 @@ function PS.OnPanelActive(wnd)
 			if szLang == 'zhcn' or szLang == 'zhtw' then
 				table.insert(menu, {
 					szOption = _L['Import data (web)'],
-					fnAction = function() MY_TeamMon_Subscription.OpenPanel() end,
+					fnAction = function() MY_TeamMon_Subscribe.OpenPanel() end,
 				})
 			end
 			table.insert(menu, {
