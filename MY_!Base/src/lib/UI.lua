@@ -120,6 +120,24 @@ X.UI.TRACKBAR_STYLE = X.SetmetaReadonly({
 	SHOW_VALUE    = false,
 	SHOW_PERCENT  = true,
 })
+X.UI.IMAGE_TYPE = IMAGE_TYPE or X.SetmetaReadonly({
+	NORMAL             = 0,
+	LEFT_RIGHT         = 1,
+	RIGHT_LEFT         = 2,
+	TOP_BOTTOM         = 3,
+	BOTTOM_TOP         = 4,
+	TIMER_HIDE         = 5,
+	ROTATE             = 6,
+	FLIP_VERTICAL      = 7,
+	FLIP_HORIZONTAL    = 8,
+	FLIP_CENTRAL       = 9,
+	NINE_PART          = 10,
+	LEFT_CENTER_RIGHT  = 11,
+	TOP_CENTER_BOTTOM  = 12,
+	TIMER_SHOW         = 13,
+	REVERSE_TIMER_HIDE = 14,
+	REVERSE_TIMER_SHOW = 15,
+})
 X.UI.WND_SIDE = X.SetmetaReadonly({
 	TOP           = 0,
 	BOTTOM        = 1,
