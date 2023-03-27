@@ -24,7 +24,6 @@ local D = {
 	aFloatEntry = {},
 	aSaveDB = {},
 }
-local SZ_INI = PLUGIN_ROOT .. '/ui/MY_RoleStatistics.ini'
 
 function D.Open(szModule)
 	local ui = X.UI.CreateFrame('MY_RoleStatistics', {
