@@ -4384,6 +4384,14 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 	elseif componentType == 'WndTable' then
 		raw:SetSize(nWidth, nHeight)
 		GetComponentProp(raw, 'UpdateTableRect')()
+	elseif componentType == 'WndPageSet' then
+		local page = raw:GetFirstChild()
+		while page do
+			if page:GetName() == 'Page_Default' then
+				page:SetSize(nWidth - page:GetRelX(), nHeight - page:GetRelY())
+			end
+			page = page:GetNext()
+		end
 	elseif raw:GetBaseType() == 'Wnd' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
