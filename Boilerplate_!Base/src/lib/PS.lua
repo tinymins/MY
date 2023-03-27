@@ -450,7 +450,7 @@ function D.RedrawTabs(frame, szCategory)
 	end
 end
 
-function D.OnSizeChanged()
+function D.OnSizeChange()
 	local frame = this
 	if not frame then
 		return
@@ -623,7 +623,7 @@ function D.OnFrameCreate()
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', X.PACKET_INFO.AUTHOR_FEEDBACK))
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_UITEX, X.PACKET_INFO.LOGO_MAIN_FRAME)
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
-	X.UI(this):Size(D.OnSizeChanged)
+	X.UI(this):Size(D.OnSizeChange)
 	D.RedrawCategory(this)
 	D.ResizePanel(this, 960 * fScale, 630 * fScale)
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
@@ -640,7 +640,7 @@ end
 function D.OnEvent(event)
 	if event == 'UI_SCALED' then
 		X.ExecuteWithThis(this.MAIN_SCROLL, X.OnScrollBarPosChanged)
-		D.OnSizeChanged()
+		D.OnSizeChange()
 	end
 end
 

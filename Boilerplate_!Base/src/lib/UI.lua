@@ -4403,19 +4403,19 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			h:FormatAllItemPos()
 		end
 	end
-	X.ExecuteWithThis(raw, raw.OnSizeChanged)
+	X.ExecuteWithThis(raw, raw.OnSizeChange)
 end
 
 -- (number, number) Instance:Size(bInnerSize)
 -- (self) Instance:Size(nLeft, nTop)
--- (self) Instance:Size(OnSizeChanged)
+-- (self) Instance:Size(OnSizeChange)
 function OO:Size(...)
 	self:_checksum()
 	if select('#', ...) > 0 then
 		local arg0, arg1, arg2, arg3 = ...
 		if X.IsFunction(arg0) then
 			for _, raw in ipairs(self.raws) do
-				X.UI(raw):UIEvent('OnSizeChanged', arg0)
+				X.UI(raw):UIEvent('OnSizeChange', arg0)
 			end
 		else
 			local nWidth, nHeight = arg0, arg1
