@@ -102,7 +102,12 @@ local PROVIDER_PARAMS = {
 	jx3box = {
 		bSimple = true,
 		szRawURL = 'https://pull.j3cx.com/api/dbm/feed?key=%s',
-		szRawURL_T = '^https://pull%.j3cx%.com/api/dbm/feed%?key%=(.+)$',
+		szRawURL_T = {
+			'^https://pull%.j3cx%.com/api/dbm/feed%?.*&key%=([^&]+)&.*$',
+			'^https://pull%.j3cx%.com/api/dbm/feed%?key%=([^&]+)&.*$',
+			'^https://pull%.j3cx%.com/api/dbm/feed%?.*&key%=([^&]+)$',
+			'^https://pull%.j3cx%.com/api/dbm/feed%?key%=([^&]+)$',
+		},
 	},
 }
 local DEFAULT_PROVIDER = 'jx3box'
