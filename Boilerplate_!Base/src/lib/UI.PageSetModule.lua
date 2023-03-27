@@ -72,6 +72,8 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 				checkbox:ChangeRelation(ps, true, true)
 				page:ChangeRelation(ps, true, true)
 				Wnd.CloseWindow(frameTemp)
+				checkbox:SetName('WndCheck_Default')
+				page:SetName('Page_Default')
 				ps:AddPage(page, checkbox)
 				checkbox:Show()
 				if m.GetCheckboxPos then
