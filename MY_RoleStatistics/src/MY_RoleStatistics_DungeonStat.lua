@@ -852,6 +852,7 @@ function D.OnInitPage()
 	})
 
 	ui:Append('WndComboBox', {
+		name = 'WndComboBox_DisplayColumns',
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
@@ -1062,6 +1063,17 @@ function D.OnInitPage()
 	frame:RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS')
 	frame:RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND')
 	frame:RegisterEvent('MY_ROLE_STAT_DUNGEON_UPDATE')
+
+	D.OnResizePage()
+end
+
+function D.OnResizePage()
+	local page = this
+	local ui = X.UI(page)
+	local nW, nH = ui:Size()
+
+	ui:Fetch('WndComboBox_DisplayColumns'):Left(nW - 200)
+	ui:Fetch('WndTable_Stat'):Size(nW - 40, nH - 100)
 end
 
 function D.CheckAdvice()
@@ -1218,6 +1230,7 @@ local settings = {
 			preset = 'UIEvent',
 			fields = {
 				'OnInitPage',
+				'OnResizePage',
 				szSaveDB = 'MY_RoleStatistics_DungeonStat.bSaveDB',
 				szFloatEntry = 'MY_RoleStatistics_DungeonStat.bFloatEntry',
 			},

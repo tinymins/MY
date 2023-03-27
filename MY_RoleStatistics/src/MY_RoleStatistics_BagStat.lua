@@ -838,6 +838,42 @@ function D.OnInitPage()
 	frame:RegisterEvent('MY_BAGSTATISTICS_MODE_CHANGE')
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 	frame:RegisterEvent('MY_ROLE_STAT_BAG_UPDATE')
+
+	D.OnResizePage()
+end
+
+function D.OnResizePage()
+	local page = this
+	local ui = X.UI(page)
+	local nW, nH = ui:Size()
+
+	page:Lookup('Wnd_Total'):SetSize(nW, nH)
+	page:Lookup('Wnd_Total/WndScroll_Name'):SetH(nH - 78)
+	page:Lookup('Wnd_Total/WndScroll_Name', 'Image_Name'):SetH(nH - 78)
+	page:Lookup('Wnd_Total/WndScroll_Name/WndContainer_Name'):SetH(nH - 108)
+	page:Lookup('Wnd_Total/WndScroll_Name/Scroll_Name'):SetH(nH - 108)
+	page:Lookup('Wnd_Total/WndScroll_Name/Btn_NameAll'):SetRelY(nH - 90)
+	page:Lookup('Wnd_Total/WndScroll_Name/Wnd_SearchInfo'):SetRelY(nH - 103)
+	page:Lookup('Wnd_Total/WndScroll_Item'):SetSize(nW - 220, nH - 109)
+	page:Lookup('Wnd_Total/WndScroll_Item', ''):SetSize(nW - 220, nH - 109)
+	page:Lookup('Wnd_Total/WndScroll_Item', 'Image_Item'):SetSize(nW - 235, nH - 109)
+	page:Lookup('Wnd_Total/WndScroll_Item', 'Handle_Items'):SetSize(nW - 235, nH - 121)
+	page:Lookup('Wnd_Total/WndScroll_Item', 'Handle_Items'):FormatAllItemPos()
+	page:Lookup('Wnd_Total/WndScroll_Item', ''):FormatAllItemPos()
+	page:Lookup('Wnd_Total/WndScroll_Item/Scroll_Item'):SetRelX(nW - 235)
+	page:Lookup('Wnd_Total/WndScroll_Item/Scroll_Item'):SetH(nH - 83)
+	page:Lookup('Wnd_Total/Wnd_Index'):SetRelY(nH - 58)
+	page:Lookup('Wnd_Total/Wnd_Index'):SetW(nW - 235)
+	page:Lookup('Wnd_Total/Wnd_Index', ''):SetW(nW - 235)
+	page:Lookup('Wnd_Total/Wnd_Index', 'Image_Index'):SetW(nW - 235)
+	page:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexesOuter'):SetW(nW - 341)
+	page:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexesOuter'):FormatAllItemPos()
+	page:Lookup('Wnd_Total/Wnd_Index/Wnd_IndexEdit'):SetRelX(nW - 275)
+
+	PAGE_DISPLAY = math.max(15, math.floor((nW - 341) / 35))
+	NORMAL_MODE_PAGE_SIZE = math.max(50, math.ceil(nH / 150))
+	COMPACT_MODE_PAGE_SIZE = math.max(150, math.floor((nW - 235) / 51) * math.ceil((nH - 121) / 51))
+	D.UpdateNames(this)
 end
 
 function D.OnActivePage()
@@ -1092,6 +1128,7 @@ local settings = {
 			preset = 'UIEvent',
 			fields = {
 				'OnInitPage',
+				'OnResizePage',
 				szSaveDB = 'MY_RoleStatistics_BagStat.bSaveDB',
 				szFloatEntry = 'MY_RoleStatistics_BagStat.bFloatEntry',
 			},

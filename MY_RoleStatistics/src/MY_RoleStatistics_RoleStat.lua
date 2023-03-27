@@ -827,6 +827,7 @@ function D.OnInitPage()
 
 	-- 显示列
 	ui:Append('WndComboBox', {
+		name = 'WndComboBox_DisplayColumns',
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
@@ -931,6 +932,7 @@ function D.OnInitPage()
 
 	-- ESC提示列
 	ui:Append('WndComboBox', {
+		name = 'WndComboBox_EscAlertColumns',
 		x = 600, y = 20, w = 180,
 		text = _L['Columns alert when esc'],
 		menu = function()
@@ -1068,6 +1070,7 @@ function D.OnInitPage()
 	})
 
 	ui:Append('WndButton', {
+		name = 'WndButton_IgnoreManage',
 		x = 25, y = 562, w = 25, h = 25,
 		buttonStyle = 'OPTION',
 		onClick = function()
@@ -1109,10 +1112,22 @@ function D.OnInitPage()
 			X.UI.PopupMenu(menu)
 		end,
 	})
+	D.OnResizePage()
 
 	local frame = page:GetRoot()
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 	frame:RegisterEvent('MY_ROLE_STAT_ROLE_UPDATE')
+end
+
+function D.OnResizePage()
+	local page = this
+	local ui = X.UI(page)
+	local nW, nH = ui:Size()
+
+	ui:Fetch('WndComboBox_DisplayColumns'):Left(nW - 200)
+	ui:Fetch('WndComboBox_EscAlertColumns'):Left(nW - 400)
+	ui:Fetch('WndTable_Stat'):Size(nW - 40, nH - 100)
+	ui:Fetch('WndButton_IgnoreManage'):Top(nH - 70)
 end
 
 function D.CheckAdvice()
@@ -1270,6 +1285,7 @@ local settings = {
 			preset = 'UIEvent',
 			fields = {
 				'OnInitPage',
+				'OnResizePage',
 				szSaveDB = 'MY_RoleStatistics_RoleStat.bSaveDB',
 				szFloatEntry = 'MY_RoleStatistics_RoleStat.bFloatEntry',
 			},

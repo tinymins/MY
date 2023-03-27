@@ -27,8 +27,41 @@ local D = {
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_RoleStatistics.ini'
 
 function D.Open(szModule)
-	local frame = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics')
+	local ui = X.UI.CreateFrame('MY_RoleStatistics', {
+		w = 1000, h = 700,
+		close = true,
+		maximize = true,
+		dragresize = true,
+		minWidth = 1000,
+		minHeight = 700,
+		text = X.PACKET_INFO.NAME .. _L.SPLIT_DOT .. _L['MY_RoleStatistics'],
+		anchor = 'CENTER',
+		onSizeChange = function()
+			local ui = X.UI(this)
+			local nW, nH = ui:Size()
+			ui:Children('#Image_TabBg'):Width(nW - 5)
+			ui:Children('#Btn_Option'):Left(nW - 40)
+			ui:Children('#PageSet_All'):Size(nW, nH - 48)
+			D.PageSetModule.BroadcastPageEvent(this, 'OnResizePage')
+		end,
+	})
+	ui:Append('WndPageSet', {
+		name = 'PageSet_All',
+		x = 0, y = 48, w = 1000, h = 700 - 48,
+	})
+	ui:Append('WndButton', {
+		name = 'Btn_Option',
+		x = 960, y = 54, w = 20, h = 20,
+		buttonStyle = 'OPTION',
+	})
+	ui:Append('Image', {
+		name =  'Image_TabBg',
+		x = 3, y = 50, w = 1000 - 5, h = 32,
+		image = 'ui/Image/UICommon/ActivePopularize2.UITex', imageFrame = 46, imageType = X.UI.IMAGE_TYPE.LEFT_CENTER_RIGHT,
+	})
+	local frame = ui:Raw()
 	frame:BringToTop()
+	D.PageSetModule.DrawUI(frame)
 	D.PageSetModule.ActivePage(frame, szModule or 1, true)
 end
 
@@ -121,8 +154,6 @@ end
 
 function D.OnFrameCreate()
 	this:BringToTop()
-	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-	this:Lookup('', 'Text_Title'):SetText(X.PACKET_INFO.NAME .. _L.SPLIT_DOT .. _L['MY_RoleStatistics'])
 	PlaySound(SOUND.UI_SOUND,g_sound.OpenFrame)
 end
 
@@ -130,7 +161,7 @@ function D.OnFrameDestroy()
 	PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 end
 
-D.PageSetModule = X.UI.CreatePageSetModule(D, 'PageSet_All')
+D.PageSetModule = X.UI.CreatePageSetModule(D, 'Wnd_Total/PageSet_All')
 
 --------------------------------------------------------
 -- Global exports

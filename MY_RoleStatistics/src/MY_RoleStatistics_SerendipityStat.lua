@@ -962,6 +962,7 @@ function D.OnInitPage()
 	})
 
 	ui:Append('WndCheckBox', {
+		name = 'WndCheckBox_TipHideFinished',
 		x = 380, y = 21, w = 160,
 		text = _L['Tip hide finished'],
 		checked = MY_RoleStatistics_SerendipityStat.bTipHideFinished,
@@ -972,6 +973,7 @@ function D.OnInitPage()
 	})
 
 	ui:Append('WndCheckBox', {
+		name = 'WndCheckBox_MapMark',
 		x = 540, y = 21, w = 130,
 		text = _L['Map mark'],
 		checked = MY_RoleStatistics_SerendipityStat.bMapMark,
@@ -981,6 +983,7 @@ function D.OnInitPage()
 	})
 
 	ui:Append('WndCheckBox', {
+		name = 'WndCheckBox_MapMarkHideAcquired',
 		x = 670, y = 21, w = 130,
 		text = _L['Map mark hide acquired'],
 		checked = MY_RoleStatistics_SerendipityStat.bMapMarkHideAcquired,
@@ -991,6 +994,7 @@ function D.OnInitPage()
 	})
 
 	ui:Append('WndComboBox', {
+		name = 'WndComboBox_DisplayColumns',
 		x = 800, y = 20, w = 180,
 		text = _L['Columns'],
 		menu = function()
@@ -1161,6 +1165,7 @@ function D.OnInitPage()
 	})
 
 	ui:Append('WndButton', {
+		name = 'WndButton_Refresh',
 		x = 440, y = 590, w = 120,
 		text = _L['Refresh'],
 		onClick = function()
@@ -1172,6 +1177,21 @@ function D.OnInitPage()
 	local frame = page:GetRoot()
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 	frame:RegisterEvent('MY_ROLE_STAT_SERENDIPITY_UPDATE')
+
+	D.OnResizePage()
+end
+
+function D.OnResizePage()
+	local page = this
+	local ui = X.UI(page)
+	local nW, nH = ui:Size()
+
+		ui:Fetch('WndCheckBox_TipHideFinished'):Left(nW - 620)
+		ui:Fetch('WndCheckBox_MapMark'):Left(nW - 460)
+		ui:Fetch('WndCheckBox_MapMarkHideAcquired'):Left(nW - 330)
+		ui:Fetch('WndComboBox_DisplayColumns'):Left(nW - 200)
+		ui:Fetch('WndTable_Stat'):Size(nW - 40, nH - 100)
+		ui:Fetch('WndButton_Refresh'):Pos((nW - 120) / 2, nH - 193)
 end
 
 function D.CheckAdvice()
@@ -1507,6 +1527,7 @@ local settings = {
 			preset = 'UIEvent',
 			fields = {
 				'OnInitPage',
+				'OnResizePage',
 				szSaveDB = 'MY_RoleStatistics_SerendipityStat.bSaveDB',
 				szFloatEntry = 'MY_RoleStatistics_SerendipityStat.bFloatEntry',
 				tAPI = {

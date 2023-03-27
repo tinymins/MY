@@ -747,6 +747,29 @@ function D.OnInitPage()
 	local frame = this:GetRoot()
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 	frame:RegisterEvent('MY_ROLE_STAT_EQUIP_UPDATE')
+
+	D.OnResizePage()
+end
+
+function D.OnResizePage()
+	local page = this
+	local ui = X.UI(page)
+	local nW, nH = ui:Size()
+
+	page:Lookup('Wnd_Total'):SetSize(nW, nH)
+	page:Lookup('Wnd_Total/WndScroll_Name'):SetH(nH - 78)
+	page:Lookup('Wnd_Total/WndScroll_Name', 'Image_Name'):SetH(nH - 78)
+	page:Lookup('Wnd_Total/WndScroll_Name/WndContainer_Name'):SetH(nH - 78)
+	page:Lookup('Wnd_Total/WndScroll_Name/Scroll_Name'):SetH(nH - 78)
+	page:Lookup('Wnd_Total/Wnd_ItemPage'):SetSize(nW - 235, nH - 54)
+	page:Lookup('Wnd_Total/Wnd_ItemPage', ''):SetSize(nW - 235, nH - 54)
+	page:Lookup('Wnd_Total/Wnd_ItemPage', 'Image_ItemPageBg'):SetSize(nW - 235, nH - 54)
+	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo'):SetSize(nW - 563, nH - 78)
+	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', ''):SetSize(nW - 579, nH - 78)
+	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', 'Image_EquipInfo'):SetSize(nW - 579, nH - 78)
+	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', 'Handle_EquipInfo'):SetSize(nW - 602, nH - 90)
+	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo', 'Handle_EquipInfo'):FormatAllItemPos()
+	page:Lookup('Wnd_Total/Wnd_ItemPage/WndScroll_EquipInfo/Scroll_EquipInfo'):SetH(78)
 end
 
 function D.OnActivePage()
@@ -897,6 +920,7 @@ local settings = {
 			preset = 'UIEvent',
 			fields = {
 				'OnInitPage',
+				'OnResizePage',
 				szSaveDB = 'MY_RoleStatistics_EquipStat.bSaveDB',
 				szFloatEntry = 'MY_RoleStatistics_EquipStat.bFloatEntry',
 			},
