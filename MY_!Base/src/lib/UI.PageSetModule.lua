@@ -72,6 +72,8 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 				checkbox:ChangeRelation(ps, true, true)
 				page:ChangeRelation(ps, true, true)
 				Wnd.CloseWindow(frameTemp)
+				checkbox:SetName('WndCheck_Default')
+				page:SetName('Page_Default')
 				ps:AddPage(page, checkbox)
 				checkbox:Show()
 				if m.GetCheckboxPos then
@@ -131,6 +133,23 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 
 	function PageSetEvent.OnFrameCreate()
 		Exports.DrawUI(this)
+	end
+
+	-- 广播给子模块
+	function Exports.BroadcastPageEvent(frame, szEvent, ...)
+		local ps = frame:Lookup(szPageSetPath)
+		if ps then
+			local page = ps:GetFirstChild()
+			while page do
+				if page:GetName() == 'Page_Default' and page.bInit then
+					local m = Modules[page.nIndex]
+					if m and m.tModule[szEvent] then
+						X.SafeCallWithThis(page, m.tModule[szEvent], ...)
+					end
+				end
+				page = page:GetNext()
+			end
+		end
 	end
 
 	-- 全局广播模块事件
