@@ -4136,9 +4136,18 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			if btnMax then
 				btnMax:SetRelPos(nWidth - 63, 15)
 			end
+			local containerR = raw:Lookup('WndContainer_TitleBtnR')
+			if containerR then
+				containerR:SetSize(nWidth - 4, 30)
+				containerR:FormatAllContentPos()
+			end
 			if wnd then
 				wnd:SetSize(nWidth, nHeight)
 				wnd:Lookup('', ''):SetSize(nWidth, nHeight)
+			end
+			local hdb = wnd:Lookup('', 'Handle_DBClick')
+			if hdb then
+				hdb:SetW(nWidth)
 			end
 			raw:SetSize(nWidth, nHeight)
 			raw:SetDragArea(0, 0, nWidth, 55)
@@ -6197,11 +6206,11 @@ function X.UI.CreateFrame(szName, opt)
 			end
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxUncheck = function()
 				X.UI(frm)
-				  :Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
-				  :Size(frm.w, frm.h)
-				  :Anchor(frm.anchor)
-				  :Drag(true)
-				  if opt.dragresize then
+					:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
+					:Size(frm.w, frm.h)
+					:Anchor(frm.anchor)
+					:Drag(true)
+				if opt.dragresize then
 					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMaximize = false
@@ -6262,10 +6271,96 @@ function X.UI.CreateFrame(szName, opt)
 		end
 	elseif not opt.empty then
 		SetComponentProp(frm, 'intact', true)
-		SetComponentProp(frm, 'minWidth', 128)
-		SetComponentProp(frm, 'minHeight', 160)
-		frm:Lookup('Btn_Close').OnLButtonClick = function()
-			X.UI(frm):Remove()
+		SetComponentProp(frm, 'minWidth', opt.minWidth or 128)
+		SetComponentProp(frm, 'minHeight', opt.minHeight or 160)
+		-- top right buttons
+		if opt.close == false then
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
+		else
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close').OnLButtonClick = function()
+				X.UI(frm):Remove()
+			end
+		end
+		if not opt.maximize then
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
+		else
+			if opt.onmaximize then
+				X.UI(frm):UIEvent('OnMaximize', opt.onmaximize)
+			end
+			frm:Lookup('Wnd_Total', 'Handle_DBClick').OnItemLButtonDBClick = function()
+				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
+			end
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxCheck = function()
+				frm.anchor = GetFrameAnchor(frm)
+				frm.w, frm.h = frm:GetSize()
+				local w, h = Station.GetClientSize()
+				X.UI(frm):Pos(0, 0):Drag(false):Size(w, h):Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+					local w, h = Station.GetClientSize()
+					X.UI(frm):Pos(0, 0):Size(w, h)
+				end)
+				if select(2, X.ExecuteWithThis(frm, frm.OnMaximize, frm:Lookup('Wnd_Total'))) then
+					return
+				end
+				if opt.dragresize then
+					frm:Lookup('Btn_Drag'):Hide()
+				end
+				frm.bMaximize = true
+			end
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxUncheck = function()
+				X.UI(frm)
+					:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
+					:Size(frm.w, frm.h)
+					:Anchor(frm.anchor)
+					:Drag(true)
+				if opt.dragresize then
+					frm:Lookup('Btn_Drag'):Show()
+				end
+				frm.bMaximize = false
+				X.ExecuteWithThis(frm, frm.OnRestore, frm:Lookup('Wnd_Total'))
+			end
+		end
+		-- drag resize button
+		if not opt.dragresize then
+			frm:Lookup('Btn_Drag'):Hide()
+		else
+			if opt.ondragresize then
+				X.UI(frm):UIEvent('OnDragResize', opt.ondragresize)
+			end
+			frm:Lookup('Btn_Drag').OnDragButton = function()
+				local x, y = Station.GetMessagePos()
+				local nClientW, nClientH = Station.GetClientSize()
+				local nFrameX, nFrameY = frm:GetRelPos()
+				local w, h = x - nFrameX, y - nFrameY
+				w = math.min(w, nClientW - nFrameX) -- frame size should not larger than client size
+				h = math.min(h, nClientH - nFrameY)
+				w = math.max(w, GetComponentProp(frm, 'minWidth')) -- frame size must larger than setted min size
+				h = math.max(h, GetComponentProp(frm, 'minHeight'))
+				frm:Lookup('Btn_Drag'):SetRelPos(w - 16, h - 16)
+				frm:Lookup('Wnd_DragBg', 'Shadow_DragBg'):SetSize(w, h)
+			end
+			frm:Lookup('Btn_Drag').OnDragButtonBegin = function()
+				frm:Lookup('Wnd_DragBg'):Show()
+				frm:Lookup('', ''):Hide()
+				frm:Lookup('Wnd_Total'):Hide()
+				frm:Lookup('WndContainer_TitleBtnR'):Hide()
+			end
+			frm:Lookup('Btn_Drag').OnDragButtonEnd = function()
+				frm:Lookup('Wnd_DragBg'):Hide()
+				frm:Lookup('', ''):Show()
+				frm:Lookup('Wnd_Total'):Show()
+				frm:Lookup('WndContainer_TitleBtnR'):Show()
+				local w, h = this:GetRelPos()
+				w = math.max(w + 16, GetComponentProp(frm, 'minWidth'))
+				h = math.max(h + 16, GetComponentProp(frm, 'minHeight'))
+				X.UI(frm):Size(w, h)
+				if frm.OnDragResize then
+					local res, err, trace = X.XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
+					if not res then
+						X.ErrorLog(err, X.NSFormatString('{$NS}#UI:CreateFrame#OnDragResize'), trace)
+					end
+				end
+			end
+			frm:Lookup('Btn_Drag'):RegisterLButtonDrag()
 		end
 	end
 	if not opt.anchor and not (opt.x and opt.y) then
