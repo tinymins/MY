@@ -342,6 +342,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onDrag                    then ui:Drag             (arg.onDrag                                      ) end
 		if arg.onDragHover               then ui:DragHover        (arg.onDragHover                                 ) end
 		if arg.onDrop                    then ui:Drop             (arg.onDrop                                      ) end
+		if arg.onSizeChange              then ui:Size             (arg.onSizeChange                                ) end
 		if arg.customLayout              then ui:CustomLayout     (arg.customLayout                                ) end
 		if arg.onCustomLayout            then ui:CustomLayout     (arg.onCustomLayout, arg.customLayoutPoint       ) end
 		if arg.onColumnsChange           then ui:Columns          (arg.onColumnsChange                             ) end
