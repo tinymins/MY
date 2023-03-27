@@ -75,7 +75,7 @@ function D.Dismiss(szKey, bOnlyData)
 	for i, v in X.ipairs_r(NOTIFY_LIST) do
 		if v.szKey == szKey then
 			table.remove(NOTIFY_LIST, i)
-			FireUIEvent('MY_NOTIFY_DISMISS', szKey)
+			FireUIEvent(X.NSFormatString('{$NS}_NOTIFY_DISMISS'), szKey)
 		end
 	end
 	if bOnlyData then
