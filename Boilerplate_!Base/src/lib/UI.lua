@@ -284,6 +284,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.image              ~= nil then
 			ui:Image(arg.image, arg.imageFrame, arg.imageOverFrame, arg.imageDownFrame, arg.imageDisableFrame)
 		end
+		if arg.imageType          ~= nil then ui:ImageType        (arg.imageType                                   ) end
 		if arg.icon               ~= nil then ui:Icon             (arg.icon                                        ) end
 		if arg.name               ~= nil then ui:Name             (arg.name                                        ) end
 		if arg.penetrable         ~= nil then ui:Penetrable       (arg.penetrable                                  ) end
@@ -4814,6 +4815,25 @@ function OO:Frame(nFrame)
 			return raw:GetFrame()
 		end
 	end
+end
+
+-- (self) Instance:ImageType(dwType)
+function OO:ImageType(dwType)
+	self:_checksum()
+	if dwType then
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'IMAGE')
+			if raw then
+				raw:SetImageType(dwType)
+			end
+		end
+	else
+		local raw = self.raws[1]
+		if raw and GetComponentType(raw) == 'Image' then
+			return raw:GetImageType()
+		end
+	end
+	return self
 end
 
 -- (self) Instance:ItemInfo(...)
