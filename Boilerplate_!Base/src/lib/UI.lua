@@ -4392,6 +4392,7 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			end
 			page = page:GetNext()
 		end
+		raw:SetSize(nWidth, nHeight)
 	elseif raw:GetBaseType() == 'Wnd' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
