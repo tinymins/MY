@@ -82,11 +82,11 @@ if __name__ == '__main__':
 	tag_list = __get_release_tag_list()
 	release_list = __get_release_commit_list()
 
-	for changlog in changelog_list:
+	for changelog in changelog_list:
 		if not args.overwrite:
 			tag = None
 			for p in tag_list:
-				if p.get('version') == changlog.get('version'):
+				if p.get('version') == changelog.get('version'):
 					tag = p
 					break
 			if tag != None:
@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
 		release = None
 		for p in release_list:
-			if p.get('version') == changlog.get('version'):
+			if p.get('version') == changelog.get('version'):
 				release = p
 				break
 		if release == None:
@@ -107,14 +107,16 @@ if __name__ == '__main__':
 			if not args.dry_run:
 				set_system_time(t.year, t.month, t.day, t.hour, t.minute, t.second)
 
-		print('Creating tag v%s on %s...' % (changlog.get('version'), release.get('hash')))
+		print('Creating tag v%s on %s...' % (changelog.get('version'), release.get('hash')))
 
 		if not args.dry_run:
-			message = 'Release v%s\n%s' % (changlog.get('version'), changlog.get('message'))
+			message = 'Release v%s\n%s' % (changelog.get('version'), changelog.get('message'))
 			with codecs.open('commit_msg.txt','w',encoding='utf8') as f:
 				f.write(message)
-			os.system('git tag -a v%s %s -f -F commit_msg.txt' % (changlog.get('version'), release.get('hash')))
+			os.system('git tag -a v%s %s -f -F commit_msg.txt' % (changelog.get('version'), release.get('hash')))
 			os.remove('commit_msg.txt')
+			os.system('git push')
+			os.system('git push --tags')
 
 		if args.mock_time:
 			if not args.dry_run:

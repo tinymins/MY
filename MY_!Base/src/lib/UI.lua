@@ -4392,6 +4392,10 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			end
 			page = page:GetNext()
 		end
+		local img = raw:Lookup('', 'Image_TabBg')
+		if img then
+			img:SetW(nWidth)
+		end
 		raw:SetSize(nWidth, nHeight)
 	elseif raw:GetBaseType() == 'Wnd' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
