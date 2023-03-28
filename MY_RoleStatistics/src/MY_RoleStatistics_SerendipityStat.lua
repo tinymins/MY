@@ -1190,8 +1190,8 @@ function D.OnResizePage()
 		ui:Fetch('WndCheckBox_MapMark'):Left(nW - 460)
 		ui:Fetch('WndCheckBox_MapMarkHideAcquired'):Left(nW - 330)
 		ui:Fetch('WndComboBox_DisplayColumns'):Left(nW - 200)
-		ui:Fetch('WndTable_Stat'):Size(nW - 40, nH - 100)
-		ui:Fetch('WndButton_Refresh'):Pos((nW - 120) / 2, nH - 193)
+		ui:Fetch('WndTable_Stat'):Size(nW - 40, nH - 110)
+		ui:Fetch('WndButton_Refresh'):Pos((nW - 120) / 2, nH - 43)
 end
 
 function D.CheckAdvice()
