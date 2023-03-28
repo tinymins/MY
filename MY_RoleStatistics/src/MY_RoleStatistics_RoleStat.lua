@@ -725,15 +725,13 @@ function D.GetTableColumns()
 	return aTableColumn
 end
 
-function D.UpdateUI(page)
-	local ui = X.UI(page)
-
+function D.GetResult(szSearch)
 	-- ËÑË÷
-	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
 	local data = D.GetPlayerRecords()
 	local result = {}
 	for _, rec in pairs(data) do
-		if szSearch == ''
+		if not X.IsString(szSearch)
+		or szSearch == ''
 		or X.StringFindW(tostring(rec.account or ''), szSearch)
 		or X.StringFindW(tostring(rec.name or ''), szSearch)
 		or X.StringFindW(tostring(rec.region or ''), szSearch)
@@ -765,6 +763,27 @@ function D.UpdateUI(page)
 			summary[col.szKey] = col.GetSummaryValue(tSumVal[col.szKey], aSumRec)
 		end
 	end
+	return result, summary
+end
+
+function D.GetRoleStat()
+	local result, summary = D.GetResult()
+	local res = {
+		aDetail = X.Clone(result),
+		tSummary = X.Clone(summary),
+	}
+	for _, v in ipairs(res.aDetail) do
+		v.account = nil
+		v.coin = v.coin.value
+	end
+	return res
+end
+
+function D.UpdateUI(page)
+	local ui = X.UI(page)
+
+	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
+	local result, summary = D.GetResult(szSearch)
 
 	ui:Fetch('WndTable_Stat')
 		:Columns(D.GetTableColumns())
@@ -1288,6 +1307,9 @@ local settings = {
 				'OnResizePage',
 				szSaveDB = 'MY_RoleStatistics_RoleStat.bSaveDB',
 				szFloatEntry = 'MY_RoleStatistics_RoleStat.bFloatEntry',
+				tAPI = {
+					GetRoleStat = D.GetRoleStat,
+				},
 			},
 			root = D,
 		},
