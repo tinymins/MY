@@ -38,7 +38,6 @@ function D.Open(szModule)
 		onSizeChange = function()
 			local ui = X.UI(this)
 			local nW, nH = ui:Size()
-			ui:Children('#Image_TabBg'):Width(nW - 5)
 			ui:Children('#Btn_Option'):Left(nW - 40)
 			ui:Children('#PageSet_All'):Size(nW, nH - 48)
 			D.PageSetModule.BroadcastPageEvent(this, 'OnResizePage')
@@ -52,11 +51,6 @@ function D.Open(szModule)
 		name = 'Btn_Option',
 		x = 960, y = 54, w = 20, h = 20,
 		buttonStyle = 'OPTION',
-	})
-	ui:Append('Image', {
-		name =  'Image_TabBg',
-		x = 3, y = 50, w = 1000 - 5, h = 32,
-		image = 'ui/Image/UICommon/ActivePopularize2.UITex', imageFrame = 46, imageType = X.UI.IMAGE_TYPE.LEFT_CENTER_RIGHT,
 	})
 	local frame = ui:Raw()
 	frame:BringToTop()

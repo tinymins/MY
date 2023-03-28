@@ -39,11 +39,6 @@ function D.OpenPanel(szModule)
 		x = 960, y = 54, w = 20, h = 20,
 		buttonStyle = 'OPTION',
 	})
-	ui:Append('Image', {
-		name =  'Image_TabBg',
-		x = 3, y = 50, w = 1000 - 5, h = 32,
-		image = 'ui/Image/UICommon/ActivePopularize2.UITex', imageFrame = 46, imageType = X.UI.IMAGE_TYPE.LEFT_CENTER_RIGHT,
-	})
 	local frame = ui:Raw()
 	frame:BringToTop()
 	D.PageSetModule.DrawUI(frame)
