@@ -58,16 +58,9 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 		end
 		ps.bInitPageSet = true
 		for i, m in ipairs(Modules) do
-			local frameTemp, checkbox, page
-			if m.szIni and m.szCheckboxPath and m.szPagePath then
-				frameTemp = Wnd.OpenWindow(m.szIni, X.NSFormatString('{$NS}#PageSetModuleTemp'))
-				checkbox = frameTemp and frameTemp:Lookup(m.szCheckboxPath)
-				page = frameTemp and frameTemp:Lookup(m.szPagePath)
-			else
-				frameTemp = Wnd.OpenWindow(INI_PATH, X.NSFormatString('{$NS}#PageSetModuleTemp'))
-				checkbox = frameTemp and frameTemp:Lookup('PageSet_Total/WndCheck_Default')
-				page = frameTemp and frameTemp:Lookup('PageSet_Total/Page_Default')
-			end
+			local frameTemp = Wnd.OpenWindow(INI_PATH, X.NSFormatString('{$NS}#PageSetModuleTemp'))
+			local checkbox = frameTemp and frameTemp:Lookup('PageSet_Total/WndCheck_Default')
+			local page = frameTemp and frameTemp:Lookup('PageSet_Total/Page_Default')
 			if checkbox and page then
 				checkbox:ChangeRelation(ps, true, true)
 				page:ChangeRelation(ps, true, true)
@@ -76,28 +69,10 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 				page:SetName('Page_Default')
 				ps:AddPage(page, checkbox)
 				checkbox:Show()
-				if m.GetCheckboxPos then
-					local x, y = m.GetCheckboxPos(checkbox, m, i)
-					checkbox:SetRelPos(x, y)
-				else
-					checkbox:SetRelX(checkbox:GetRelX() + checkbox:GetW() * (i - 1))
-				end
-				if m.GetPagePos then
-					local x, y = m.GetPagePos(page, m, i)
-					page:SetRelPos(x, y)
-				else
-					page:SetRelPos(0, checkbox:GetH() + 4)
-				end
-				if m.GetPageSize then
-					local w, h = m.GetPageSize(page, m, i)
-					page:SetSize(w, h)
-				else
-					page:SetSize(ps:GetW(), ps:GetH() - checkbox:GetH() - 4)
-				end
-				local text = checkbox:Lookup(m.szCheckboxTextPath or '', m.szCheckboxTextSubPath or 'Text_CheckDefault')
-				if text then
-					text:SetText(m.szName)
-				end
+				checkbox:SetRelX(checkbox:GetRelX() + checkbox:GetW() * (i - 1))
+				page:SetRelPos(0, checkbox:GetH() + 4)
+				page:SetSize(ps:GetW(), ps:GetH() - checkbox:GetH() - 4)
+				checkbox:Lookup('', 'Text_CheckDefault'):SetText(m.szName)
 				checkbox.nIndex = i
 				page.nIndex = i
 			else
