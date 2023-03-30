@@ -3755,16 +3755,16 @@ function X.IsInStarveMap()
 end
 
 -- 判断地图是不是家园地图
--- (bool) X.IsHLMap(dwMapID)
-function X.IsHLMap(dwMapID)
+-- (bool) X.IsHomelandMap(dwMapID)
+function X.IsHomelandMap(dwMapID)
 	return select(2, GetMapParams(dwMapID)) == MAP_TYPE.COMMUNITY
 end
 
 -- 判断当前地图是不是家园地图
--- (bool) X.IsInHLMap()
-function X.IsInHLMap()
+-- (bool) X.IsInHomelandMap()
+function X.IsInHomelandMap()
 	local me = X.GetClientPlayer()
-	return me and X.IsHLMap(me.GetMapID())
+	return me and X.IsHomelandMap(me.GetMapID())
 end
 
 -- 判断地图是不是新背包地图
