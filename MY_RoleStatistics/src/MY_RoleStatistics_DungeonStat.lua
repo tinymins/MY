@@ -972,9 +972,12 @@ function D.OnInitPage()
 						tDungeonChecked[dwID] = true
 					end
 				end
-				local tDungeonMenu = X.GetDungeonMenu(function(info)
-					fnAction(GetDungeonMapColumnID(info.dwID), DUNGEON_MIN_WIDTH)
-				end, nil, tDungeonChecked)
+				local tDungeonMenu = X.GetDungeonMenu({
+					fnAction = function(info)
+						fnAction(GetDungeonMapColumnID(info.dwID), DUNGEON_MIN_WIDTH)
+					end,
+					tChecked = tDungeonChecked,
+				})
 				-- 动态活动秘境选项
 				for _, szType in ipairs({
 					'week_team_dungeon',

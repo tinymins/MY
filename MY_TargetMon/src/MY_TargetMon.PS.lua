@@ -380,9 +380,12 @@ local function DrawDetail(ui)
 		end
 		table.insert(t1, t2)
 		-- µØÍ¼ÒªÇó
-		local t2 = X.GetDungeonMenu(function(p)
-			D.ModifyMonitor(mon, {'maps', p.dwID}, not mon.maps[p.dwID])
-		end, false, mon.maps)
+		local t2 = X.GetDungeonMenu({
+			fnAction = function(p)
+				D.ModifyMonitor(mon, {'maps', p.dwID}, not mon.maps[p.dwID])
+			end,
+			tChecked = mon.maps,
+		})
 		for i, p in ipairs(t2) do
 			p.fnDisable = function() return mon.maps.all or X.IsEmpty(mon.maps) end
 		end

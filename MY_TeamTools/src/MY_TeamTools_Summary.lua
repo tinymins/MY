@@ -1069,7 +1069,11 @@ end
 function D.OnItemLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Handle_Dungeon' then
-		local menu = X.GetDungeonMenu(function(p) D.SetMapID(p.dwID) end)
+		local menu = X.GetDungeonMenu({
+			fnAction = function(p)
+				D.SetMapID(p.dwID)
+			end,
+		})
 		menu.x, menu.y = Cursor.GetPos(true)
 		PopupMenu(menu)
 	elseif tonumber(szName:find('P(%d+)')) then
