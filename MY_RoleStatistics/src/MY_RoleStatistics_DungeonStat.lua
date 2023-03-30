@@ -977,6 +977,8 @@ function D.OnInitPage()
 						fnAction(GetDungeonMapColumnID(info.dwID), DUNGEON_MIN_WIDTH)
 					end,
 					tChecked = tDungeonChecked,
+					bStarveMap = false,
+					bMonsterMap = false,
 				})
 				-- 动态活动秘境选项
 				for _, szType in ipairs({
