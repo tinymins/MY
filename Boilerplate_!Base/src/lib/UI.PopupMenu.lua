@@ -121,6 +121,30 @@ function D.SetDS(frame, menu)
 	D.UpdateUI(frame)
 end
 
+-- 刷新数据源缓存：父层数据变更而子项数据未变更时，保持子项层级展开优化体验
+function D.UpdateDS(frame)
+	for i = 2, #frame.aMenu do
+		local menuParent = frame.aMenu[i - 1]
+		local menuCurrent = frame.aMenu[i]
+		if not menuParent or not menuCurrent then
+			break
+		end
+		local menuReplace = nil
+		for _, menu in ipairs(menuParent) do
+			if menu == menuCurrent then
+				menuReplace = nil
+				break
+			end
+			if menu.szOption == menuCurrent.szOption then
+				menuReplace = menu
+			end
+		end
+		if menuReplace then
+			frame.aMenu[i] = menuReplace
+		end
+	end
+end
+
 function D.AppendContentFromIni(parentWnd, szIni, szPath, szName)
 	local frameTemp = Wnd.OpenWindow(szIni, PLUGIN_NAME .. '__TempWnd')
 	local wnd = frameTemp:Lookup(szPath)
@@ -608,6 +632,7 @@ function D.OnFrameBreathe()
 		return Wnd.CloseWindow(this)
 	end
 	D.CalcDisable(top)
+	D.UpdateDS(this)
 	D.UpdateUI(this)
 end
 
