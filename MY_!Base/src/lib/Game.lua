@@ -371,6 +371,7 @@ end
 ---@field fnAction fun(tMapNameID: table<string, string | number>) @点击时回调函数
 ---@field bPartyMap boolean @是否包含小队地图
 ---@field bRaidMap boolean @是否包含团队地图
+---@field bHomelandMap boolean @是否包含家园地图
 ---@field bMonsterMap boolean @是否包含百战地图
 ---@field bZombieMap boolean @是否包含僵尸地图
 ---@field bStarveMap boolean @是否包含浪客行地图
@@ -391,6 +392,7 @@ local function RecruitItemToDungeonMenu(p, tOptions)
 		and p.dwMapID and X.IsDungeonMap(p.dwMapID)
 		and not (tOptions.bPartyMap == false and X.IsDungeonMap(p.dwMapID, false))
 		and not (tOptions.bRaidMap == false and X.IsDungeonMap(p.dwMapID, true))
+		and not (tOptions.bHomelandMap == false and X.IsHomelandMap(p.dwMapID))
 		and not (tOptions.bMonsterMap == false and X.IsMonsterMap(p.dwMapID))
 		and not (tOptions.bZombieMap == false and X.IsZombieMap(p.dwMapID))
 		and not (tOptions.bStarveMap == false and X.IsStarveMap(p.dwMapID)) then
@@ -3755,16 +3757,16 @@ function X.IsInStarveMap()
 end
 
 -- 判断地图是不是家园地图
--- (bool) X.IsHLMap(dwMapID)
-function X.IsHLMap(dwMapID)
+-- (bool) X.IsHomelandMap(dwMapID)
+function X.IsHomelandMap(dwMapID)
 	return select(2, GetMapParams(dwMapID)) == MAP_TYPE.COMMUNITY
 end
 
 -- 判断当前地图是不是家园地图
--- (bool) X.IsInHLMap()
-function X.IsInHLMap()
+-- (bool) X.IsInHomelandMap()
+function X.IsInHomelandMap()
 	local me = X.GetClientPlayer()
-	return me and X.IsHLMap(me.GetMapID())
+	return me and X.IsHomelandMap(me.GetMapID())
 end
 
 -- 判断地图是不是新背包地图
