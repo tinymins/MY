@@ -60,6 +60,8 @@ return {
     [','] = '，',
     ['.'] = '。',
 
+    ['Manage added'] = '已添加',
+    ['Show all'] = '全部选项',
     ['Move up'] = '上移',
     ['Move down'] = '下移',
     ['Delete'] = '删除',

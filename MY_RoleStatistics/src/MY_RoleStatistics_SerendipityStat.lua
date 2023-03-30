@@ -1005,10 +1005,11 @@ function D.OnInitPage()
 					t[i] = nil
 				end
 				-- 已添加的
+				local t1 = { szOption = _L['Manage added'] }
 				for nIndex, szKey in ipairs(aColumn) do
 					local col = COLUMN_DICT[szKey]
 					if col then
-						table.insert(t, {
+						table.insert(t1, {
 							szOption = col.szTitle,
 							fnAction = function()
 								local nOffset = IsShiftKeyDown() and 1 or -1
@@ -1076,7 +1077,9 @@ function D.OnInitPage()
 					end
 					tChecked[szKey] = true
 				end
+				table.insert(t, t1)
 				-- 未添加的
+				local t1 = { szOption = _L['Show all'] }
 				local function fnAction(szKey, nWidth)
 					local bExist = false
 					for i, v in ipairs(aColumn) do
@@ -1095,19 +1098,19 @@ function D.OnInitPage()
 					D.FlushDB()
 					D.UpdateUI(page)
 				end
-				local t1 = { szOption = _L['Serendipity'], nMaxHeight = 1000 }
+				local t2 = { szOption = _L['Serendipity'], nMaxHeight = 1000 }
 				for _, col in ipairs(COLUMN_LIST) do
 					if col.bTable then
 						if col.szKey:find('serendipity_') == 1 then -- 奇遇选项
-							table.insert(t1, {
+							table.insert(t2, {
 								szOption = col.szTitle,
 								bCheck = true, bChecked = tChecked[col.szKey],
 								fnAction = function()
 									fnAction(col.szKey, col.nMinWidth)
 								end,
 							})
-						elseif not tChecked[col.szKey] then -- 普通选项
-							table.insert(t, {
+						else -- 普通选项
+							table.insert(t1, {
 								szOption = col.szTitle,
 								bCheck = true, bChecked = tChecked[col.szKey],
 								fnAction = function()
@@ -1117,6 +1120,7 @@ function D.OnInitPage()
 						end
 					end
 				end
+				table.insert(t1, t2)
 				table.insert(t, t1)
 			end
 			UpdateMenu()
