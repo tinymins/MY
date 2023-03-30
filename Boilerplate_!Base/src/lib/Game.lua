@@ -366,14 +366,20 @@ function X.GetTargetContextMenu(dwType, szName, dwID)
 	return t
 end
 
--- 获取秘境选择菜单
--- (table) X.GetDungeonMenu(fnAction, bOnlyRaid)
+---@class GetDungeonMenuOptions @获取秘境菜单参数
+---@field tChecked table<number, boolean> @默认选中的秘境
+---@field fnAction fun(tMapNameID: table<string, string | number>) @点击时回调函数
+---@field bPartyMap boolean @是否包含小队地图
+---@field bRaidMap boolean @是否包含团队地图
+---@field bMonsterMap boolean @是否包含百战地图
+---@field bZombieMap boolean @是否包含僵尸地图
+---@field bStarveMap boolean @是否包含浪客行地图
 do
-local function RecruitItemToDungeonMenu(p, fnAction, tChecked)
+local function RecruitItemToDungeonMenu(p, tOptions)
 	if p.bParent then
 		local t = { szOption = p.TypeName or p.SubTypeName }
 		for _, pp in ipairs(p) do
-			table.insert(t, RecruitItemToDungeonMenu(pp, fnAction, tChecked))
+			table.insert(t, RecruitItemToDungeonMenu(pp, tOptions))
 		end
 		if #t > 0 then
 			return t
@@ -382,26 +388,35 @@ local function RecruitItemToDungeonMenu(p, fnAction, tChecked)
 		-- 不限阵营 有地图ID 7点开始 持续24小时 基本就是秘境了
 		if p.nCamp == 7
 		and p.nStartTime == 7 and p.nLastTime == 24
-		and p.dwMapID and X.IsDungeonMap(p.dwMapID) then
+		and p.dwMapID and X.IsDungeonMap(p.dwMapID)
+		and not (tOptions.bPartyMap == false and X.IsDungeonMap(p.dwMapID, false))
+		and not (tOptions.bRaidMap == false and X.IsDungeonMap(p.dwMapID, true))
+		and not (tOptions.bMonsterMap == false and X.IsMonsterMap(p.dwMapID))
+		and not (tOptions.bZombieMap == false and X.IsZombieMap(p.dwMapID))
+		and not (tOptions.bStarveMap == false and X.IsStarveMap(p.dwMapID)) then
 			return {
 				szOption = p.szName,
-				bCheck = tChecked and true or false,
-				bChecked = tChecked and tChecked[p.dwMapID] or false,
+				bCheck = tOptions.tChecked and true or false,
+				bChecked = tOptions.tChecked and tOptions.tChecked[p.dwMapID] or false,
 				bDisable = false,
 				UserData = {
 					dwID = p.dwMapID,
 					szName = p.szName,
 				},
-				fnAction = fnAction,
+				fnAction = tOptions.fnAction,
 			}
 		end
 	end
 	return nil
 end
-function X.GetDungeonMenu(fnAction, bOnlyRaid, tChecked)
+
+-- 获取秘境选择菜单
+---@param tOptions GetDungeonMenuOptions @额外参数
+---@return table @选择菜单数据
+function X.GetDungeonMenu(tOptions)
 	local t = {}
 	for _, p in ipairs(X.Table_GetTeamRecruit() or {}) do
-		table.insert(t, RecruitItemToDungeonMenu(p, fnAction, tChecked))
+		table.insert(t, RecruitItemToDungeonMenu(p, tOptions or {}))
 	end
 	return t
 end
