@@ -582,7 +582,7 @@ for _, serendipity in ipairs(SERENDIPITY_LIST) do
 			return k1 > k2 and 1 or -1
 		end,
 		GetFormatText = function(v, rec)
-			local szState, r, g, b = GetSerendipityCounterText(serendipity, rec)
+			local szState, r, g, b = GetSerendipityCounterText(serendipity, v)
 			return GetFormatText(szState, 162, r, g, b)
 		end,
 	})
