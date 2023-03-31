@@ -99,6 +99,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	this:RegisterEvent('MY_TEAM_MON__BUFF_LIST__CREATE')
 	D.hItem = this:CreateItemData(INI_FILE, 'Handle_Item')
+	D.frame = this
 	D.handle = this:Lookup('', '')
 	D.handle:Clear()
 	D.ReSize()
@@ -189,12 +190,15 @@ function D.OnFrameDragEnd()
 end
 
 function D.ReSize()
+	if not D.frame or not D.handle then
+		return
+	end
 	if D.fScale ~= O.fScale then
 		local fNewScale = O.fScale / D.fScale
-		this:Scale(fNewScale, fNewScale)
+		D.frame:Scale(fNewScale, fNewScale)
 		D.fScale = O.fScale
 	end
-	this:SetSize(O.nCount * 55 * O.fScale, 90 * O.fScale)
+	D.frame:SetSize(O.nCount * 55 * O.fScale, 90 * O.fScale)
 	D.handle:SetSize(O.nCount * 55 * O.fScale, 90 * O.fScale)
 	D.handle:FormatAllItemPos()
 end
