@@ -241,5 +241,47 @@ return function(env)
 				return env.me.dwTAEquipsScore
 			end,
 		},
+		-- Ê¦Í½·Ö
+		{
+			szKey = 'eight_wasters_award',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 70,
+			GetValue = function(prevVal, prevRec)
+				return {env.GetEightWastersAwardNum()}
+			end,
+			GetSummaryValue = function(values, records)
+				return {}
+			end,
+			Compare = function(v1, v2)
+				if v1[1] == v2[1] and v1[2] == v2[2] then
+					return 0
+				end
+				if not v1 then
+					return -1
+				end
+				if not v2 then
+					return 1
+				end
+				if v1[1] == v2[1] then
+					return v1[2] > v2[2] and 1 or -1
+				end
+				return v1[1] > v2[1] and 1 or -1
+			end,
+			GetFormatText = function(v, r)
+				if not v then
+					return ''
+				end
+				if not v[1] or not v[2] then
+					return env.GetFormatText('--', 162, 255, 255, 255)
+				end
+				if env.IsTable(v) then
+					return env.GetFormatText(v[1] .. ' + ' .. v[2], 162, 255, 255, 255)
+				end
+				return ''
+			end,
+		},
 	}
 end

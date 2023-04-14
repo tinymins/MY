@@ -76,6 +76,7 @@ local DATA_ENV = setmetatable(
 		MoneyOptCmp                = MoneyOptCmp                 ,
 		MoneyOptSub                = MoneyOptSub                 ,
 		Output                     = Output                      ,
+		GetEightWastersAwardNum    = X.IsTable(KGlobalScripts) and KGlobalScripts.EightWastersInterfaceGetAwardNum,
 	},
 	{
 		__index = function(t, k)

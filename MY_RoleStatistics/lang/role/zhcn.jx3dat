@@ -36,6 +36,7 @@ return {
         ['achievement_score'  ] = '江湖资历',
         ['coin'               ] = '通宝',
         ['mentor_score'       ] = '师徒',
+        ['eight_wasters_award'] = '八荒衡鉴（普通模式奖励 + 挑战模式奖励）',
 
     },
     COLUMN_TITLE_ABBR = {
@@ -50,6 +51,7 @@ return {
         ['prestige'           ] = '威名',
         ['prestige_remain'    ] = '威名周',
         ['achievement_score'  ] = '资历',
+        ['eight_wasters_award'] = '八荒',
     },
     COLUMN_COMPARE_INCREASE = {
         ['equip_score'] = '装备分数提升了%s分',
