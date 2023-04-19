@@ -95,11 +95,18 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bPushBuffList = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndCheckBox', {
+	nX = ui:Append('WndCheckBox', {
 		x = nX + 5, y = nY, text = _L['Center alarm'],
 		checked = MY_TeamMon.bPushCenterAlarm,
 		onCheck = function(bCheck)
 			MY_TeamMon.bPushCenterAlarm = bCheck
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('WndCheckBox', {
+		x = nX + 5, y = nY, text = _L['Voice alarm'],
+		checked = MY_TeamMon.bPushVoiceAlarm,
+		onCheck = function(bCheck)
+			MY_TeamMon.bPushVoiceAlarm = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = nPaddingX + 5

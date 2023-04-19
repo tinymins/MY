@@ -90,6 +90,7 @@ return {
 	['Voice'] = '语音报警',
 	['No voice'] = '无',
 	['Center alarm'] = '中央报警',
+	['Voice alarm'] = '语音报警',
 	['Large text alarm'] = '特大文字报警',
 	['Lifebar alarm'] = '头顶报警',
 	['Fullscreen alarm'] = '全屏泛光报警',

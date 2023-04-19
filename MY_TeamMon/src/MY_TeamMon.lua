@@ -196,6 +196,12 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bPushVoiceAlarm = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 	bPushBigFontAlarm = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
@@ -1039,7 +1045,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(dwOwner, MY_TEAM_MON_CORE_PLAYERID) })
 			end
 			-- ”Ô“Ù±®æØ
-			if cfg.szVoice then
+			if O.bPushVoiceAlarm and cfg.szVoice then
 				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bOfficialVoice, cfg.szVoice)
 			end
 
@@ -1210,7 +1216,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 				D.SetTeamMark('CASTING', cfg.tMark, dwCaster, dwCastID, dwLevel)
 			end
 			-- ”Ô“Ù±®æØ
-			if cfg.szVoice then
+			if O.bPushVoiceAlarm and cfg.szVoice then
 				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bOfficialVoice, cfg.szVoice)
 			end
 			-- Õ∑∂•±®æØ
@@ -1368,7 +1374,7 @@ function D.OnNpcEvent(npc, bEnter)
 				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(npc.dwID, MY_TEAM_MON_CORE_PLAYERID) })
 			end
 			-- ”Ô“Ù±®æØ
-			if cfg.szVoice then
+			if O.bPushVoiceAlarm and cfg.szVoice then
 				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bOfficialVoice, cfg.szVoice)
 			end
 
@@ -1515,7 +1521,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { 255, 255, 0 })
 			end
 			-- ”Ô“Ù±®æØ
-			if cfg.szVoice then
+			if O.bPushVoiceAlarm and cfg.szVoice then
 				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bOfficialVoice, cfg.szVoice)
 			end
 
@@ -1702,7 +1708,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { 255, 128, 0 })
 			end
 			-- ”Ô“Ù±®æØ
-			if cfg.szVoice then
+			if O.bPushVoiceAlarm and cfg.szVoice then
 				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bOfficialVoice, cfg.szVoice)
 			end
 			if O.bPushFullScreen and cfg.bFullScreen then
@@ -1807,7 +1813,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 						if O.bPushTeamChannel and v.bTeamChannel then
 							D.Talk('RAID', szText)
 						end
-						if tHpCd.szVoice then
+						if O.bPushVoiceAlarm and tHpCd.szVoice then
 							FireUIEvent('MY_TEAM_MON__VOICE_ALARM', tHpCd.bOfficialVoice, tHpCd.szVoice)
 						end
 						if tHpCd.nTime then
@@ -2442,6 +2448,7 @@ local settings = {
 				'bCommon',
 				'bPushScreenHead',
 				'bPushCenterAlarm',
+				'bPushVoiceAlarm',
 				'bPushBigFontAlarm',
 				'bPushTeamPanel',
 				'bPushFullScreen',
@@ -2460,6 +2467,7 @@ local settings = {
 				'bCommon',
 				'bPushScreenHead',
 				'bPushCenterAlarm',
+				'bPushVoiceAlarm',
 				'bPushBigFontAlarm',
 				'bPushTeamPanel',
 				'bPushFullScreen',
