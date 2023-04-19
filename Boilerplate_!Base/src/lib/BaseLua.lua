@@ -752,7 +752,7 @@ X.Promise = X.Class('Promise', {
 			end
 			self.status = 'RESOLVED'
 			self.result = res
-			self:Process()
+			self:__PROCESS__()
 		end
 		local function onReject(error)
 			if self.status ~= 'PENDING' then
@@ -760,7 +760,7 @@ X.Promise = X.Class('Promise', {
 			end
 			self.status = 'REJECTED'
 			self.error = error
-			self:Process()
+			self:__PROCESS__()
 		end
 		if X.DelayCall then
 			X.DelayCall(1, task, onResolve, onReject)
@@ -777,7 +777,7 @@ X.Promise = X.Class('Promise', {
 			type = 'then',
 			handler = onResolve,
 		})
-		self:Process()
+		self:__PROCESS__()
 		return self
 	end,
 
@@ -786,11 +786,11 @@ X.Promise = X.Class('Promise', {
 			type = 'catch',
 			handler = onReject,
 		})
-		self:Process()
+		self:__PROCESS__()
 		return self
 	end,
 
-	Process = function(self)
+	__PROCESS__ = function(self)
 		if self.status == 'PENDING' then
 			return
 		end
