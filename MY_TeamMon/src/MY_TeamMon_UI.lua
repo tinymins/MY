@@ -1614,6 +1614,51 @@ function D.OpenSettingPanel(data, szType)
 		end
 		return menu
 	end
+	local function GetVoiceMenu(nClass)
+		local menu = {{
+			szOption = _L['No voice'],
+			bCheck = true,
+			bMCheck = true,
+			bChecked = not data[nClass] or not data[nClass].szVoice,
+			fnAction = function(_, bCheck)
+				if data[nClass] then
+					data[nClass].bOfficialVoice = nil
+					data[nClass].szVoice = nil
+				end
+			end,
+		}}
+		local m1 = { szOption = _L['Official voice'] }
+		for k, v in X.ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('OFFICIAL')) do
+			table.insert(m1, {
+				szOption = v.szRemark,
+				bCheck = true,
+				bMCheck = true,
+				bChecked = data[nClass] and data[nClass].bOfficialVoice and data[nClass].szVoice == v.szSlug,
+				fnAction = function(_, bCheck)
+					data[nClass] = data[nClass] or {}
+					data[nClass].bOfficialVoice = true
+					data[nClass].szVoice = v.szSlug
+				end,
+			})
+		end
+		table.insert(menu, m1)
+		local m1 = { szOption = _L['Custom voice'] }
+		for k, v in X.ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('CUSTOM')) do
+			table.insert(m1, {
+				szOption = v.szRemark,
+				bCheck = true,
+				bMCheck = true,
+				bChecked = data[nClass] and not data[nClass].bOfficialVoice and data[nClass].szVoice == v.szSlug,
+				fnAction = function(_, bCheck)
+					data[nClass] = data[nClass] or {}
+					data[nClass].bOfficialVoice = false
+					data[nClass].szVoice = v.szSlug
+				end,
+			})
+		end
+		table.insert(menu, m1)
+		return menu
+	end
 	local function SetDataClass(nClass, key, value)
 		if value then
 			data[nClass] = data[nClass] or {}
@@ -1804,13 +1849,20 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		-- get buff
+		-- 获得气劲
 		local cfg = data[MY_TEAM_MON_TYPE.BUFF_GET] or {}
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Get buff'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Mark'],
+		nX = ui:Append('Text', { x = 20, y = nY + 5, w = 'auto', text = _L['Get buff'], font = 27  }):Pos('BOTTOMRIGHT')
+		nX = ui:Append('WndComboBox', {
+			x = nX + 5, y = nY + 8, w = 'auto', h = 25,
+			text = _L['Mark'],
 			menu = function()
 				return GetMarkMenu(MY_TEAM_MON_TYPE.BUFF_GET)
+			end,
+		}):Pos('BOTTOMRIGHT')
+		nX, nY = ui:Append('WndComboBox', {
+			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+			menu = function()
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_GET)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
@@ -1907,9 +1959,16 @@ function D.OpenSettingPanel(data, szType)
 				nX, nY = _ui:Pos('BOTTOMRIGHT')
 			end
 		end
-		-- 失去buff
+		-- 失去气劲
 		local cfg = data[MY_TEAM_MON_TYPE.BUFF_LOSE] or {}
-		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Lose buff'], font = 27 }):Pos('BOTTOMRIGHT')
+		nX = ui:Append('Text', { x = 20, y = nY + 5, w = 'auto', text = _L['Lose buff'], font = 27 }):Pos('BOTTOMRIGHT')
+		nX, nY = ui:Append('WndComboBox', {
+			x = nX + 5, y = nY + 8, w = 'auto', h = 25,
+			text = _L['Voice'],
+			menu = function()
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_GET)
+			end,
+		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
@@ -2704,13 +2763,14 @@ function D.OpenSettingPanel(data, szType)
 							table.insert(xml, GetFormatText(
 								(
 									bTrigger
-										and ((vv.nValue * 100) .. '%')
+										and (vv.nValue .. '%')
 										or X.FormatDuration(vv.nTime, 'SYMBOL', { mode = 'fixed-except-leading', maxUnit = 'minute', keepUnit = 'minute' })
 								)
 									.. (tOperatorDesc[vv.szOperator or ''] or '')
 									.. ' - '
 									.. FilterCustomText(vv.szContent, '{$sender}', '{$receiver}')
 									.. (bTrigger and vv.nTime and (' (' .. vv.nTime .. 's)') or '')
+									.. (vv.szVoice and (' - (' .. (vv.bOfficialVoice and _L['Official voice'] or _L['Custom voice']) .. ')' .. vv.szVoice) or '')
 									.. '\n'
 							))
 						end

@@ -159,6 +159,11 @@ end
 function D.FetchSlugList(szType)
 end
 
+function D.GetSlugList(szType)
+	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
+	return {}
+end
+
 function D.FetchVoiceList(szType)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
 	return X.Promise:new(function(resolve, reject)
@@ -234,19 +239,6 @@ function D.FetchVoiceList(szType)
 			end
 		})
 	end)
-end
-
-function D.GetVoiceList(szType)
-	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
-	if szType == 'OFFICIAL' then
-		return D.tOfficialPacketInfo
-			and X.Clone(D.tOfficialPacketInfo.aVoice)
-			or {}
-	else
-		return D.tCustomPacketInfo
-			and X.Clone(D.tCustomPacketInfo.aVoice)
-			or {}
-	end
 end
 
 function D.DownloadPacket(szType)
@@ -380,7 +372,7 @@ local settings = {
 				'SetCurrentPacketID',
 				'GetCurrentPacketID',
 				'GetPacketDownloadProgress',
-				'GetVoiceList',
+				'GetSlugList',
 				'PlayVoice',
 			},
 			preset = 'UIEvent'
