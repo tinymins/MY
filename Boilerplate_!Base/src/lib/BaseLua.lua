@@ -833,6 +833,37 @@ X.Promise = X.Class('Promise', {
 })
 
 -----------------------------------------------
+-- ProgressPromise
+-----------------------------------------------
+
+-- ProgressPromise 生成过程承诺回调
+---@param func fun(resolve: fun(result: any), reject: fun(error: Error)) @异步过程承诺函数主体
+---@return table @过程承诺对象
+X.ProgressPromise = X.Class('ProgressPromise', {
+	constructor = function(self, promiseFunction)
+		self.progress = nil
+		self.progressParams = nil
+		self.progressHandlers = {}
+		local function onProgress(...)
+			self.progress = ...
+			self.progressParams = {...}
+			for _, f in ipairs(self.progressHandlers) do
+				X.Call(f, ...)
+			end
+		end
+		self:super(function(onResolve, onReject)
+			promiseFunction(onResolve, onReject, onProgress)
+		end)
+	end,
+	Progress = function(self, handler)
+		if X.IsFunction(handler) then
+			table.insert(self.progressHandlers, handler)
+		end
+		return self
+	end,
+}, X.Promise)
+
+-----------------------------------------------
 -- 安全调用
 -----------------------------------------------
 do
