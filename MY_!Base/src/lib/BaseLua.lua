@@ -752,7 +752,7 @@ X.Promise = X.Class('Promise', {
 			end
 			self.status = 'RESOLVED'
 			self.result = res
-			self:Process()
+			self:__PROCESS__()
 		end
 		local function onReject(error)
 			if self.status ~= 'PENDING' then
@@ -760,9 +760,15 @@ X.Promise = X.Class('Promise', {
 			end
 			self.status = 'REJECTED'
 			self.error = error
-			self:Process()
+			self:__PROCESS__()
 		end
-		task(onResolve, onReject)
+		if X.DelayCall then
+			X.DelayCall(1, task, onResolve, onReject)
+		elseif DelayCall then
+			DelayCall(1, task, onResolve, onReject)
+		else
+			task(onResolve, onReject)
+		end
 	end,
 
 	-- 实例成员函数
@@ -771,7 +777,7 @@ X.Promise = X.Class('Promise', {
 			type = 'then',
 			handler = onResolve,
 		})
-		self:Process()
+		self:__PROCESS__()
 		return self
 	end,
 
@@ -780,11 +786,11 @@ X.Promise = X.Class('Promise', {
 			type = 'catch',
 			handler = onReject,
 		})
-		self:Process()
+		self:__PROCESS__()
 		return self
 	end,
 
-	Process = function(self)
+	__PROCESS__ = function(self)
 		if self.status == 'PENDING' then
 			return
 		end
@@ -825,6 +831,37 @@ X.Promise = X.Class('Promise', {
 		end
 	end,
 })
+
+-----------------------------------------------
+-- ProgressPromise
+-----------------------------------------------
+
+-- ProgressPromise 生成过程承诺回调
+---@param func fun(resolve: fun(result: any), reject: fun(error: Error)) @异步过程承诺函数主体
+---@return table @过程承诺对象
+X.ProgressPromise = X.Class('ProgressPromise', {
+	constructor = function(self, promiseFunction)
+		self.progress = nil
+		self.progressParams = nil
+		self.progressHandlers = {}
+		local function onProgress(...)
+			self.progress = ...
+			self.progressParams = {...}
+			for _, f in ipairs(self.progressHandlers) do
+				X.Call(f, ...)
+			end
+		end
+		self:super(function(onResolve, onReject)
+			promiseFunction(onResolve, onReject, onProgress)
+		end)
+	end,
+	Progress = function(self, handler)
+		if X.IsFunction(handler) then
+			table.insert(self.progressHandlers, handler)
+		end
+		return self
+	end,
+}, X.Promise)
 
 -----------------------------------------------
 -- 安全调用
