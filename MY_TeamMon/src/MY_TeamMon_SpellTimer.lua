@@ -338,6 +338,9 @@ function ST:SetInfo(tTime, nIcon)
 		box:SetObject(UI_OBJECT_NOT_NEED_KNOWN)
 		box:SetObjectIcon(nIcon)
 	end
+	if tTime.szVoice then
+		FireUIEvent('MY_TEAM_MON__VOICE_ALARM', tTime.bOfficialVoice, tTime.szVoice)
+	end
 	return self
 end
 

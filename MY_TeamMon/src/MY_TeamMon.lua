@@ -298,13 +298,35 @@ local function ParseCountdown(szCountdown)
 		local aCountdown, bError = {}, false
 		for _, szPart in ipairs(MY_SplitString(szCountdown, ';')) do
 			local aParams, bPartError = MY_SplitString(szPart, ','), true
-			if #aParams == 2 then
+			if #aParams >= 2 then
 				local nTime = tonumber(aParams[1])
 				local szContent = aParams[2]
-				if nTime and szContent and nTime and szContent ~= '' then
+				local szVoice, bOfficialVoice
+				local szParam, bUnknownParam, bParamRecognized
+				for i = 3, #aParams do
+					szParam = aParams[i]
+					bParamRecognized = false
+					if not szVoice and not bParamRecognized then
+						if szParam:sub(1, 3) == 'VO:' then
+							bOfficialVoice = true
+							szVoice = szParam:sub(4)
+							bParamRecognized = true
+						elseif szParam:sub(1, 3) == 'VC:' then
+							bOfficialVoice = false
+							szVoice = szParam:sub(4)
+							bParamRecognized = true
+						end
+					end
+					if not bParamRecognized then
+						bUnknownParam = true
+					end
+				end
+				if nTime and szContent and nTime and szContent ~= '' and not bUnknownParam then
 					table.insert(aCountdown, {
 						nTime = nTime,
 						szContent = szContent,
+						szVoice = szVoice,
+						bOfficialVoice = bOfficialVoice,
 					})
 					bPartError = false
 				end
@@ -333,7 +355,7 @@ local function ParseHPCountdown(szString)
 		local aHPCountdown, bError = {}, false
 		for _, szPart in ipairs(MY_SplitString(szString, ';')) do
 			local aParams, bPartError = MY_SplitString(szPart, ','), true
-			if #aParams >= 2 and #aParams <= 3 then
+			if #aParams >= 2 then
 				local nValue, szOperator = nil, aParams[1]:sub(-1)
 				if szOperator == '+' or szOperator == '-' or szOperator == '*' then
 					nValue = tonumber(aParams[1]:sub(1, -2))
@@ -342,13 +364,40 @@ local function ParseHPCountdown(szString)
 					nValue = tonumber(aParams[1])
 				end
 				local szContent = aParams[2]
-				local nTime = aParams[3] and tonumber(aParams[3]) or nil
-				if nValue and szOperator and szContent ~= '' and (nTime or not aParams[3]) then
+				local nTime
+				local szVoice, bOfficialVoice
+				local szParam, bUnknownParam, bParamRecognized
+				for i = 3, #aParams do
+					szParam = aParams[i]
+					bParamRecognized = false
+					if not szVoice and not bParamRecognized then
+						if szParam:sub(1, 3) == 'VO:' then
+							bOfficialVoice = true
+							szVoice = szParam:sub(4)
+							bParamRecognized = true
+						elseif szParam:sub(1, 3) == 'VC:' then
+							bOfficialVoice = false
+							szVoice = szParam:sub(4)
+							bParamRecognized = true
+						end
+					end
+					if not nTime and not bParamRecognized and i == 3 then
+						if tonumber(szParam) then
+							nTime = tonumber(szParam)
+						end
+					end
+					if not bParamRecognized then
+						bUnknownParam = true
+					end
+				end
+				if nValue and szOperator and szContent ~= '' and not bUnknownParam then
 					table.insert(aHPCountdown, {
 						nValue = nValue * 100,
 						szOperator = szOperator,
 						szContent = szContent,
 						nTime = nTime,
+						szVoice = szVoice,
+						bOfficialVoice = bOfficialVoice,
 					})
 					bPartError = false
 				end
@@ -1757,6 +1806,9 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 						end
 						if O.bPushTeamChannel and v.bTeamChannel then
 							D.Talk('RAID', szText)
+						end
+						if tHpCd.szVoice then
+							FireUIEvent('MY_TEAM_MON__VOICE_ALARM', tHpCd.bOfficialVoice, tHpCd.szVoice)
 						end
 						if tHpCd.nTime then
 							local nType, szKey = v.nClass, v.key
