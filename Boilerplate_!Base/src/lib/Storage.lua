@@ -768,7 +768,7 @@ function X.RegisterUserSettings(szKey, tOption)
 			for i, err in ipairs(errs) do
 				table.insert(aErrmsgs, '  ' .. i .. '. ' .. err.message)
 			end
-			assert(false, szErrHeader .. '`DefaultValue` cannot pass `Schema` check.' .. '\n' .. table.concat(aErrmsgs, '\n'))
+			assert(false, 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `DefaultValue` cannot pass `Schema` check.' .. '\n' .. table.concat(aErrmsgs, '\n'))
 		end
 		if bDataSet then
 			tDataSetDefaultValue = X.IsTable(tDataSetDefaultValue)
@@ -780,7 +780,7 @@ function X.RegisterUserSettings(szKey, tOption)
 				for i, err in ipairs(errs) do
 					table.insert(aErrmsgs, '  ' .. i .. '. ' .. err.message)
 				end
-				assert(false, szErrHeader .. '`DataSetDefaultValue` cannot pass `Schema` check.' .. '\n' .. table.concat(aErrmsgs, '\n'))
+				assert(false, 'RegisterUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): `DataSetDefaultValue` cannot pass `Schema` check.' .. '\n' .. table.concat(aErrmsgs, '\n'))
 			end
 		end
 	end
