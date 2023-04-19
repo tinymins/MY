@@ -762,12 +762,15 @@ X.Promise = X.Class('Promise', {
 			self.error = error
 			self:__PROCESS__()
 		end
-		if X.DelayCall then
-			X.DelayCall(1, task, onResolve, onReject)
-		elseif DelayCall then
-			DelayCall(1, task, onResolve, onReject)
-		else
+		local function fnAction()
 			task(onResolve, onReject)
+		end
+		if X.DelayCall then
+			X.DelayCall(1, fnAction)
+		elseif DelayCall then
+			DelayCall(1, fnAction)
+		else
+			fnAction()
 		end
 	end,
 
