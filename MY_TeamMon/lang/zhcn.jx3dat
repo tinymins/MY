@@ -87,6 +87,8 @@ return {
 	['All leave scene'] = '全部离开场景',
 	['Check level'] = '区分等级',
 	['Mark'] = '标记',
+	['Voice'] = '语音报警',
+	['No voice'] = '无',
 	['Center alarm'] = '中央报警',
 	['Large text alarm'] = '特大文字报警',
 	['Lifebar alarm'] = '头顶报警',
@@ -293,4 +295,21 @@ return {
 	-- MY_TeamMon_Subscribe_FavoriteData.lua --
 	['Favorite list'] = '收藏数据',
 	['Please input meta address:'] = '请输入订阅地址，添加多个使用分号分隔：',
+
+	-- MY_TeamMon_Subscribe_VoicePacket_Official.lua --
+	['See details'] = '查看详情',
+	['Downloading...'] = '下载中...',
+	['Can update'] = '有更新',
+	['Current selected'] = '使用中',
+	['Select'] = '使用',
+	['Author'] = '作者',
+	['Title'] = '标题',
+	['Refresh list'] = '刷新列表',
+	['Prev page'] = '上一页',
+	['Next page'] = '下一页',
+	['Title: %s'] = '标题：%s',
+	['Author: %s'] = '作者：%s',
+	['Update at: %s'] = '最后更新于：%s',
+	['Voice packet official'] = '官方语音',
+	['Voice packet custom'] = '更多语音',
 }
