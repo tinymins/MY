@@ -989,6 +989,10 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm and (MY_TEAM_MON_CORE_PLAYERID == dwOwner or not X.IsPlayer(dwOwner)) then
 				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(dwOwner, MY_TEAM_MON_CORE_PLAYERID) })
 			end
+			-- 语音报警
+			if cfg.szVoice then
+				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bOfficialVoice, cfg.szVoice)
+			end
 
 			-- 获得处理
 			if nClass == MY_TEAM_MON_TYPE.BUFF_GET then
@@ -1156,6 +1160,10 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			if cfg.tMark then
 				D.SetTeamMark('CASTING', cfg.tMark, dwCaster, dwCastID, dwLevel)
 			end
+			-- 语音报警
+			if cfg.szVoice then
+				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bOfficialVoice, cfg.szVoice)
+			end
 			-- 头顶报警
 			if O.bPushScreenHead and cfg.bScreenHead then
 				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCaster, 'CASTING', 'MY_TEAM_MON_CASTING_' .. data.dwID, {
@@ -1310,6 +1318,10 @@ function D.OnNpcEvent(npc, bEnter)
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
 				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(npc.dwID, MY_TEAM_MON_CORE_PLAYERID) })
 			end
+			-- 语音报警
+			if cfg.szVoice then
+				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bOfficialVoice, cfg.szVoice)
+			end
 
 			if O.bPushTeamChannel and cfg.bTeamChannel then
 				D.Talk('RAID', szText)
@@ -1452,6 +1464,10 @@ function D.OnDoodadEvent(doodad, bEnter)
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
 				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { 255, 255, 0 })
+			end
+			-- 语音报警
+			if cfg.szVoice then
+				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bOfficialVoice, cfg.szVoice)
 			end
 
 			if O.bPushTeamChannel and cfg.bTeamChannel then
@@ -1635,6 +1651,10 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			-- 特大文字
 			if O.bPushBigFontAlarm and cfg.bBigFontAlarm then
 				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { 255, 128, 0 })
+			end
+			-- 语音报警
+			if cfg.szVoice then
+				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bOfficialVoice, cfg.szVoice)
 			end
 			if O.bPushFullScreen and cfg.bFullScreen then
 				if not dwReceiverID or dwReceiverID == me.dwID then

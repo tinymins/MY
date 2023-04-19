@@ -343,11 +343,11 @@ function D.PlayVoice(szType, szSlug)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
 	local tVoiceCache = szType == 'OFFICIAL' and D.tOfficialVoiceCache or D.tCustomVoiceCache
 	local dwPacketID = szType == 'OFFICIAL' and O.dwOfficialVoicePacketID or O.dwCustomVoicePacketID
-	local voice = tVoiceCache[szSlug]
+	local voice = tVoiceCache and tVoiceCache[szSlug]
 	if not voice or dwPacketID == 0 then
 		tVoiceCache = szType ~= 'OFFICIAL' and D.tOfficialVoiceCache or D.tCustomVoiceCache
 		dwPacketID = szType ~= 'OFFICIAL' and O.dwOfficialVoicePacketID or O.dwCustomVoicePacketID
-		voice = tVoiceCache[szSlug]
+		voice = tVoiceCache and tVoiceCache[szSlug]
 		if not voice or dwPacketID == 0 then
 			--[[#DEBUG BEGIN]]
 			X.Debug('MY_TeamMon_VoiceAlarm', 'PlayVoice ERROR ' .. szType .. ' ' .. szSlug .. ' ' .. ' voice not found', X.DEBUG_LEVEL.ERROR)
@@ -416,6 +416,10 @@ X.RegisterInit('MY_TeamMon_VoiceAlarm', function()
 	D.FetchSlugList('CUSTOM')
 	D.FetchVoiceList('OFFICIAL')
 	D.FetchVoiceList('CUSTOM')
+end)
+
+X.RegisterEvent('MY_TEAM_MON__VOICE_ALARM', 'MY_TeamMon_VoiceAlarm', function()
+	D.PlayVoice(arg0 and 'OFFICIAL' or 'CUSTOM', arg1)
 end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
