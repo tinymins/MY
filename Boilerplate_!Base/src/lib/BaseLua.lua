@@ -762,7 +762,13 @@ X.Promise = X.Class('Promise', {
 			self.error = error
 			self:Process()
 		end
-		task(onResolve, onReject)
+		if X.DelayCall then
+			X.DelayCall(1, task, onResolve, onReject)
+		elseif DelayCall then
+			DelayCall(1, task, onResolve, onReject)
+		else
+			task(onResolve, onReject)
+		end
 	end,
 
 	-- 实例成员函数
