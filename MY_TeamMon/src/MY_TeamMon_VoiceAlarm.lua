@@ -88,6 +88,16 @@ local VOICE_LIST_JSON_SCHEMA = X.Schema.Record({
 	}, true)
 }, true)
 
+local SLUG_LIST_JSON_SCHEMA = X.Schema.Record({
+	data = X.Schema.Collection(X.Schema.Record({
+		id = X.Schema.Number,
+		group = X.Schema.String,
+		group_name = X.Schema.String,
+		slug = X.Schema.String,
+		remark = X.Schema.String,
+	}, true)),
+}, true)
+
 function D.FetchPacketList(szType, nPage)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
 	return X.Promise:new(function(resolve, reject)
@@ -156,12 +166,64 @@ function D.GetCurrentPacketID(szType)
 	end
 end
 
-function D.FetchSlugList(szType)
+function D.FetchSlugList()
+	return X.Promise:new(function(resolve, reject)
+		if D.aSlugGroup then
+			resolve(D.aSlugGroup)
+			return
+		end
+		X.Ajax({
+			url = 'https://dbm.jx3box.com/api/dbm/game/vpk/slug',
+			data = {
+				l = X.ENVIRONMENT.GAME_LANG,
+				L = X.ENVIRONMENT.GAME_EDITION,
+			},
+			success = function(szHTML)
+				local res = X.DecodeJSON(szHTML)
+				local errs = X.Schema.CheckSchema(res, SLUG_LIST_JSON_SCHEMA)
+				if errs then
+					local aErrmsg = {}
+					for i, err in ipairs(errs) do
+						table.insert(aErrmsg, i .. '. ' .. err.message)
+					end
+					local szErrmsg = _L['Fetch repo meta list failed.'] .. '\n' .. table.concat(aErrmsg, '\n')
+					X.Debug(_L['MY_TeamMon_VoiceAlarm'], szErrmsg, X.DEBUG_LEVEL.WARNING)
+					reject(X.Error:new(szErrmsg))
+					return
+				end
+				local aSlugGroup, tSlugGroup = {}, {}
+				for _, slug in ipairs(res.data) do
+					if not tSlugGroup[slug.group] then
+						tSlugGroup[slug.group] = {
+							bOfficial = not slug.group:find('^jx3box') and not slug.group:find('^extend'),
+							szGroupID = slug.group,
+							szGroupName = slug.group_name,
+						}
+						table.insert(aSlugGroup, tSlugGroup[slug.group])
+					end
+					table.insert(tSlugGroup[slug.group], {
+						dwID = slug.id,
+						szSlug = slug.slug,
+						szRemark = slug.remark,
+					})
+				end
+				D.aSlugGroup = aSlugGroup
+				resolve(aSlugGroup)
+			end,
+		})
+	end)
 end
 
 function D.GetSlugList(szType)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
-	return {}
+	local aSlugGroup = {}
+	for _, tSlugGroup in ipairs(D.aSlugGroup) do
+		if (szType == 'OFFICIAL' and tSlugGroup.bOfficial)
+		or szType == 'CUSTOM' then
+			table.insert(aSlugGroup, X.Clone(tSlugGroup))
+		end
+	end
+	return aSlugGroup
 end
 
 function D.FetchVoiceList(szType)
@@ -404,8 +466,7 @@ end
 --------------------------------------------------------------------------------
 
 X.RegisterInit('MY_TeamMon_VoiceAlarm', function()
-	D.FetchSlugList('OFFICIAL')
-	D.FetchSlugList('CUSTOM')
+	D.FetchSlugList()
 	D.FetchVoiceList('OFFICIAL')
 	D.FetchVoiceList('CUSTOM')
 end)
