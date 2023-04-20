@@ -1628,33 +1628,73 @@ function D.OpenSettingPanel(data, szType)
 			end,
 		}}
 		local m1 = { szOption = _L['Official voice'] }
-		for k, v in X.ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('OFFICIAL')) do
-			table.insert(m1, {
-				szOption = v.szRemark,
-				bCheck = true,
-				bMCheck = true,
-				bChecked = data[nClass] and data[nClass].bOfficialVoice and data[nClass].szVoice == v.szSlug,
-				fnAction = function(_, bCheck)
-					data[nClass] = data[nClass] or {}
-					data[nClass].bOfficialVoice = true
-					data[nClass].szVoice = v.szSlug
-				end,
-			})
+		for _, tGroup in ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('OFFICIAL')) do
+			local m2 = { szOption = tGroup.szGroupName }
+			for _, tSlug in ipairs(tGroup) do
+				local bChecked = data[nClass] and data[nClass].bOfficialVoice and data[nClass].szVoice == tSlug.szSlug
+				if bChecked then
+					m1.rgb = { 255, 255, 0 }
+					m2.rgb = { 255, 255, 0 }
+				end
+				table.insert(m2, {
+					szOption = tSlug.szRemark,
+					bCheck = true,
+					bMCheck = true,
+					bChecked = bChecked,
+					fnAction = function(_, bCheck)
+						for _, v in ipairs(menu) do
+							for _, vv in ipairs(v) do
+								for _, vvv in ipairs(vv) do
+									vvv.bChecked = v.szOption == m1.szOption and vv.szOption == m2.szOption and vvv.szOption == tSlug.szRemark
+								end
+							end
+							v.rgb = v.szOption == m1.szOption and { 255, 255, 0 } or nil
+						end
+						for _, v in ipairs(m1) do
+							v.rgb = v.szOption == m2.szOption and { 255, 255, 0 } or nil
+						end
+						data[nClass] = data[nClass] or {}
+						data[nClass].bOfficialVoice = true
+						data[nClass].szVoice = tSlug.szSlug
+					end,
+				})
+			end
+			table.insert(m1, m2)
 		end
 		table.insert(menu, m1)
 		local m1 = { szOption = _L['Custom voice'] }
-		for k, v in X.ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('CUSTOM')) do
-			table.insert(m1, {
-				szOption = v.szRemark,
-				bCheck = true,
-				bMCheck = true,
-				bChecked = data[nClass] and not data[nClass].bOfficialVoice and data[nClass].szVoice == v.szSlug,
-				fnAction = function(_, bCheck)
-					data[nClass] = data[nClass] or {}
-					data[nClass].bOfficialVoice = false
-					data[nClass].szVoice = v.szSlug
-				end,
-			})
+		for _, tGroup in ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('CUSTOM')) do
+			local m2 = { szOption = tGroup.szGroupName }
+			for _, tSlug in ipairs(tGroup) do
+				local bChecked = data[nClass] and not data[nClass].bOfficialVoice and data[nClass].szVoice == tSlug.szSlug
+				if bChecked then
+					m1.rgb = { 255, 255, 0 }
+					m2.rgb = { 255, 255, 0 }
+				end
+				table.insert(m2, {
+					szOption = tSlug.szRemark,
+					bCheck = true,
+					bMCheck = true,
+					bChecked = bChecked,
+					fnAction = function(_, bCheck)
+						for _, v in ipairs(menu) do
+							for _, vv in ipairs(v) do
+								for _, vvv in ipairs(vv) do
+									vvv.bChecked = v.szOption == m1.szOption and vv.szOption == m2.szOption and vvv.szOption == tSlug.szRemark
+								end
+							end
+							v.rgb = v.szOption == m1.szOption and { 255, 255, 0 } or nil
+						end
+						for _, v in ipairs(m1) do
+							v.rgb = v.szOption == m2.szOption and { 255, 255, 0 } or nil
+						end
+						data[nClass] = data[nClass] or {}
+						data[nClass].bOfficialVoice = false
+						data[nClass].szVoice = tSlug.szSlug
+					end,
+				})
+			end
+			table.insert(m1, m2)
 		end
 		table.insert(menu, m1)
 		return menu
@@ -1966,7 +2006,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5, y = nY + 8, w = 'auto', h = 25,
 			text = _L['Voice'],
 			menu = function()
-				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_GET)
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_LOSE)
 			end,
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
@@ -2026,12 +2066,19 @@ function D.OpenSettingPanel(data, szType)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 
+		-- 招式成功释放
 		local cfg = data[MY_TEAM_MON_TYPE.SKILL_END] or {}
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Skills cast succeed'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
+		nX = ui:Append('WndComboBox', {
 			x = nX + 5, y = nY + 8, w = 160, h = 25, text = _L['Mark'],
 			menu = function()
 				return GetMarkMenu(MY_TEAM_MON_TYPE.SKILL_END)
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
+		nX, nY = ui:Append('WndComboBox', {
+			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+			menu = function()
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.SKILL_END)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
@@ -2070,12 +2117,19 @@ function D.OpenSettingPanel(data, szType)
 		-- local tRecipeKey = me.GetSkillRecipeKey(data.dwID, data.nLevel)
 		-- tSkillInfo = GetSkillInfo(tRecipeKey)
 		-- if tSkillInfo and tSkillInfo.CastTime ~= 0 then
+			-- 招式开始运功
 			local cfg = data[MY_TEAM_MON_TYPE.SKILL_BEGIN] or {}
 			nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Skills began to cast'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-			nX, nY = ui:Append('WndComboBox', {
+			nX = ui:Append('WndComboBox', {
 				x = nX + 5, y = nY + 8, w = 160, h = 25, text = _L['Mark'],
 				menu = function()
 					return GetMarkMenu(MY_TEAM_MON_TYPE.SKILL_BEGIN)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+			nX, nY = ui:Append('WndComboBox', {
+				x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+				menu = function()
+					return GetVoiceMenu(MY_TEAM_MON_TYPE.SKILL_BEGIN)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 			nX = ui:Append('WndCheckBox', {
@@ -2160,10 +2214,16 @@ function D.OpenSettingPanel(data, szType)
 		-- 进入场景
 		local cfg = data[MY_TEAM_MON_TYPE.NPC_ENTER] or {}
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Enter scene'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
+		nX = ui:Append('WndComboBox', {
 			x = nX + 5, y = nY + 8, w = 160, h = 25, text = _L['Mark'],
 			menu = function()
 				return GetMarkMenu(MY_TEAM_MON_TYPE.NPC_ENTER)
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
+		nX, nY = ui:Append('WndComboBox', {
+			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+			menu = function()
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.NPC_ENTER)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
@@ -2211,11 +2271,19 @@ function D.OpenSettingPanel(data, szType)
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 		end
 		nY = nY + CHECKBOX_HEIGHT
-		nX, nY = ui:Append('Text', {
+
+		-- 离开场景
+		local cfg = data[MY_TEAM_MON_TYPE.NPC_LEAVE] or {}
+		nX = ui:Append('Text', {
 			name = 'NPC_LEAVE_TEXT', x = 20, y = nY + 5,
 			text = data.bAllLeave and _L['All leave scene'] or _L['Leave scene'], font = 27,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		local cfg = data[MY_TEAM_MON_TYPE.NPC_LEAVE] or {}
+		nX, nY = ui:Append('WndComboBox', {
+			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+			menu = function()
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.NPC_LEAVE)
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
@@ -2274,8 +2342,16 @@ function D.OpenSettingPanel(data, szType)
 				end
 			end,
 		}):Pos('BOTTOMRIGHT')
+
+		-- 进入场景
 		local cfg = data[MY_TEAM_MON_TYPE.DOODAD_ENTER] or {}
-		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Enter scene'], font = 27 }):Pos('BOTTOMRIGHT')
+		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Enter scene'], font = 27 }):Pos('BOTTOMRIGHT')
+		nX, nY = ui:Append('WndComboBox', {
+			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+			menu = function()
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.DOODAD_ENTER)
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
@@ -2321,11 +2397,19 @@ function D.OpenSettingPanel(data, szType)
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 		end
 		nY = nY + CHECKBOX_HEIGHT
-		nX, nY = ui:Append('Text', {
+
+		-- 离开场景
+		local cfg = data[MY_TEAM_MON_TYPE.DOODAD_LEAVE] or {}
+		nX = ui:Append('Text', {
 			name = 'DOODAD_LEAVE_TEXT', x = 20, y = nY + 5,
 			text = data.bAllLeave and _L['All leave scene'] or _L['Leave scene'], font = 27,
 		}):Pos('BOTTOMRIGHT')
-		local cfg = data[MY_TEAM_MON_TYPE.DOODAD_LEAVE] or {}
+		nX, nY = ui:Append('WndComboBox', {
+			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+			menu = function()
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.DOODAD_LEAVE)
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
@@ -2423,8 +2507,16 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger talk'], font = 27 }):Pos('BOTTOMRIGHT')
+
+		-- 触发喊话
 		local cfg = data[MY_TEAM_MON_TYPE.TALK_MONITOR] or {}
+		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger talk'], font = 27 }):Pos('BOTTOMRIGHT')
+		nX, nY = ui:Append('WndComboBox', {
+			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+			menu = function()
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.TALK_MONITOR)
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY + 10, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
@@ -2526,8 +2618,16 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger chat'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+
+		-- 触发系统喊话
 		local cfg = data[MY_TEAM_MON_TYPE.CHAT_MONITOR] or {}
+		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger chat'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+		nX, nY = ui:Append('WndComboBox', {
+			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+			menu = function()
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.CHAT_MONITOR)
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
 			x = 30, y = nY + 10, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
