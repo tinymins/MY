@@ -233,7 +233,7 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 				nID = nID + 0xffffffff
 			end
 			local tPrice = info.BuyItNowPrice or info.Price
-			local nPrice = GoldSilverAndCopperToMoney(tPrice.nGold, tPrice.nSilver, tPrice.nCopper)
+			local nPrice = tPrice.nGold * 10000 + tPrice.nSilver * 100 + tPrice.nCopper
 			local nCount = info.StackNum or X.IIf(info.Item.bCanStack, info.Item.nStackNum, 1) or 1
 			if not tItemGroup[szKey] then
 				tItemGroup[szKey] = {}
