@@ -200,6 +200,7 @@ function D.OpenCombatLogs()
 		if map then
 			szMapName = '-' .. map.szName
 		end
+		szMapName = szMapName .. '(' .. me.GetMapID().. ')'
 	end
 	LOG_FILE = szRoot .. szTime .. szMapName .. '.jcl.log'
 	LOG_TIME = GetCurrentTime()
@@ -226,7 +227,7 @@ function D.CloseCombatLogs()
 		for _, p in pairs(LOG_NAMING_COUNT) do
 			if p.nCount > nCount then
 				nCount = p.nCount
-				szName = '-' .. p.szName
+				szName = '-' .. p.szName .. '(' .. p.dwTemplateID .. ')'
 			end
 		end
 		CPath.Move(LOG_FILE, X.StringSubW(LOG_FILE, 1, -9) .. szName .. '.jcl')
@@ -426,6 +427,7 @@ function D.OnTargetUpdate(dwID, bForce)
 		end
 		local szName = X.GetObjectName(npc, 'never') or ''
 		LOG_NAMING_COUNT[dwID].szName = szName
+		LOG_NAMING_COUNT[dwID].dwTemplateID = npc.dwTemplateID
 		D.InsertLog(LOG_TYPE.NPC_INFO, { dwID, szName, npc.dwTemplateID, npc.dwEmployer, npc.nX, npc.nY, npc.nZ, npc.nFaceDirection })
 	end
 	LOG_TARGET_INFO_TIME[dwID] = GetTime()
