@@ -55,6 +55,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_VoiceAlarm', _L['Raid'], {
 local D = {}
 local MY_TEAM_MON_VA_VOICE_ROOT = X.FormatPath({'userdata/team_mon/audio/', X.PATH_TYPE.GLOBAL})
 local DOWNLOADER_CACHE = {}
+local CACHE_FILE = {'temporary/team_mon/voice_alarm.jx3dat', X.PATH_TYPE.GLOBAL}
 
 CPath.MakeDir(MY_TEAM_MON_VA_VOICE_ROOT)
 
@@ -97,6 +98,32 @@ local SLUG_LIST_JSON_SCHEMA = X.Schema.Record({
 		remark = X.Schema.String,
 	}, true)),
 }, true)
+
+function D.SaveCache()
+	X.SaveLUAData(CACHE_FILE, {
+		aSlugGroup = D.aSlugGroup,
+		dwOfficialVoicePacketID = D.dwOfficialVoicePacketID,
+		tOfficialPacketInfo = D.tOfficialPacketInfo,
+		tOfficialVoiceCache = D.tOfficialVoiceCache,
+		dwCustomVoicePacketID = D.dwCustomVoicePacketID,
+		tCustomPacketInfo = D.tCustomPacketInfo,
+		tCustomVoiceCache = D.tCustomVoiceCache,
+	})
+end
+
+function D.LoadCache()
+	local cache = X.LoadLUAData(CACHE_FILE)
+	if not cache then
+		return
+	end
+	D.aSlugGroup = cache.aSlugGroup
+	D.dwOfficialVoicePacketID = cache.dwOfficialVoicePacketID
+	D.tOfficialPacketInfo = cache.tOfficialPacketInfo
+	D.tOfficialVoiceCache = cache.tOfficialVoiceCache
+	D.dwCustomVoicePacketID = cache.dwCustomVoicePacketID
+	D.tCustomPacketInfo = cache.tCustomPacketInfo
+	D.tCustomVoiceCache = cache.tCustomVoiceCache
+end
 
 function D.FetchPacketList(szType, nPage)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
@@ -208,6 +235,7 @@ function D.FetchSlugList()
 					})
 				end
 				D.aSlugGroup = aSlugGroup
+				D.SaveCache()
 				resolve(aSlugGroup)
 			end,
 		})
@@ -294,6 +322,7 @@ function D.FetchVoiceList(szType)
 					D.tCustomPacketInfo = tInfo
 					D.tCustomVoiceCache = tVoiceCache
 				end
+				D.SaveCache()
 				resolve(X.Clone(tInfo))
 			end,
 			error = function(html, status)
@@ -474,5 +503,7 @@ end)
 X.RegisterEvent('MY_TEAM_MON__VOICE_ALARM', 'MY_TeamMon_VoiceAlarm', function()
 	D.PlayVoice(arg0 and 'OFFICIAL' or 'CUSTOM', arg1)
 end)
+
+D.LoadCache()
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
