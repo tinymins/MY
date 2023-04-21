@@ -173,7 +173,7 @@ function D.FetchSlugList()
 			return
 		end
 		X.Ajax({
-			url = 'https://dbm.jx3box.com/api/dbm/game/vpk/slug',
+			url = 'https://dbm.jx3box.com/api/dbm/game/vpk/slugs',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
