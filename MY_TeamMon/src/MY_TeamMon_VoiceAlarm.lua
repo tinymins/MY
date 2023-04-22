@@ -94,6 +94,7 @@ local SLUG_LIST_JSON_SCHEMA = X.Schema.Record({
 		id = X.Schema.Number,
 		group = X.Schema.String,
 		group_name = X.Schema.String,
+		is_official = X.Schema.Number,
 		slug = X.Schema.String,
 		remark = X.Schema.String,
 	}, true)),
@@ -222,11 +223,7 @@ function D.FetchSlugList()
 				for _, slug in ipairs(res.data) do
 					if not tSlugGroup[slug.group] then
 						tSlugGroup[slug.group] = {
-							bOfficial = (
-								slug.is_official == nil
-									and (not slug.group:find('^jx3box') and not slug.group:find('^extend'))
-									or slug.is_official
-							) or false,
+							bOfficial = slug.is_official == 1,
 							szGroupID = slug.group,
 							szGroupName = slug.group_name,
 						}
