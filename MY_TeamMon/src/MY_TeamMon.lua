@@ -1045,7 +1045,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 				FireUIEvent('MY_TEAM_MON__LARGE_TEXT_ALARM', szText, data.col or { GetHeadTextForceFontColor(dwOwner, MY_TEAM_MON_CORE_PLAYERID) })
 			end
 			-- ”Ô“Ù±®æØ
-			if O.bPushVoiceAlarm and cfg.szVoice then
+			if O.bPushVoiceAlarm and cfg.szVoice and (not cfg.bVoiceSelfOnly or dwOwner == MY_TEAM_MON_CORE_PLAYERID) then
 				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bOfficialVoice, cfg.szVoice)
 			end
 

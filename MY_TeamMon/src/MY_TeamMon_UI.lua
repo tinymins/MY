@@ -1614,8 +1614,22 @@ function D.OpenSettingPanel(data, szType)
 		end
 		return menu
 	end
-	local function GetVoiceMenu(nClass)
-		local menu = {{
+	local function GetVoiceMenu(nClass, bSelf)
+		local menu = {}
+		if bSelf then
+			table.insert(menu, {
+				szOption = _L['Buff target must be myself'],
+				bCheck = true,
+				bChecked = data[nClass] and data[nClass].bVoiceSelfOnly,
+				fnAction = function()
+					data[nClass] = data[nClass] or {}
+					data[nClass].bVoiceSelfOnly = not data[nClass].bVoiceSelfOnly
+					FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+				end,
+			})
+			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+		end
+		table.insert(menu, {
 			szOption = _L['No voice'],
 			bCheck = true,
 			bMCheck = true,
@@ -1626,7 +1640,7 @@ function D.OpenSettingPanel(data, szType)
 					data[nClass].szVoice = nil
 				end
 			end,
-		}}
+		})
 		local m1 = { szOption = _L['Official voice'] }
 		for _, tGroup in ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('OFFICIAL')) do
 			local m2 = { szOption = tGroup.szGroupName }
@@ -1902,7 +1916,7 @@ function D.OpenSettingPanel(data, szType)
 		nX, nY = ui:Append('WndComboBox', {
 			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
 			menu = function()
-				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_GET)
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_GET, true)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {
@@ -2006,7 +2020,7 @@ function D.OpenSettingPanel(data, szType)
 			x = nX + 5, y = nY + 8, w = 'auto', h = 25,
 			text = _L['Voice'],
 			menu = function()
-				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_LOSE)
+				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_LOSE, true)
 			end,
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndCheckBox', {

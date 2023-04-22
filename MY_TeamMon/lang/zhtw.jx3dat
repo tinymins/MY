@@ -88,6 +88,7 @@ return {
 	['Check level'] = '區分等級',
 	['Mark'] = '標記',
 	['Voice'] = '語音報警',
+	['Buff target must be myself'] = '氣勁目標必須是自己',
 	['No voice'] = '無',
 	['Center alarm'] = '中央報警',
 	['Voice alarm'] = '語音報警',
