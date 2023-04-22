@@ -2905,10 +2905,17 @@ function D.OpenSettingPanel(data, szType)
 			end,
 			tip = {
 				render = function()
+					local aText = {}
 					if v.nClass == MY_TEAM_MON_TYPE.NPC_LIFE or v.nClass == MY_TEAM_MON_TYPE.NPC_MANA then
-						return _L['Life/mana statement.\n\nExample: 0.7-,Remain 70%;0.5-,Remain Half,2;0.01-,Almost empty,5'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called']
+						table.insert(aText, _L['Life/mana statement.\n\nExample: 0.7-,Remain 70%;0.5-,Remain Half,2;0.01-,Almost empty,5'])
+					else
+						table.insert(aText, _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'])
 					end
-					return _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called']
+					table.insert(aText, '\n\n')
+					table.insert(aText, _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'])
+					table.insert(aText, '\n\n')
+					table.insert(aText, _L['Notice: spell timer starts with VO: means play official voice while this part active, starts with VC: means play custom voice while this part active.'])
+					return table.concat(aText)
 				end,
 				position = X.UI.TIP_POSITION.BOTTOM_TOP,
 			},
