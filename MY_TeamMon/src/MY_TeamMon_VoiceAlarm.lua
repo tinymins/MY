@@ -65,6 +65,7 @@ local VOICE_PACKET_LIST_JSON_SCHEMA = X.Schema.Record({
 		title = X.Schema.String,
 		version = X.Schema.Number,
 		display_name = X.Schema.String,
+		update = X.Schema.String,
 	}, true)),
 	page = X.Schema.Record({
 		index = X.Schema.Number,
@@ -165,7 +166,7 @@ function D.FetchPacketList(szType, nPage)
 						szTitle = info.title,
 						szVersion = tostring(info.version),
 						szAuthor = info.display_name,
-						szUpdateTime = info.updated_at,
+						szUpdateTime = info.update,
 					})
 				end
 				resolve({ tPagination = tPagination, aPacket = aPacket })
