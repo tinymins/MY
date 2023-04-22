@@ -88,7 +88,7 @@ return {
 	['Check level'] = '区分等级',
 	['Mark'] = '标记',
 	['Voice'] = '语音报警',
-	['Buff target must be myself'] = '气劲目标必须是自己',
+	['Buff target must be myself'] = '仅自身气劲',
 	['No voice'] = '无',
 	['Center alarm'] = '中央报警',
 	['Voice alarm'] = '语音报警',
