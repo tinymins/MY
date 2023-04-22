@@ -165,9 +165,9 @@ function D.OnItemMouseEnter()
 	local name = this:GetName()
 	if name == 'Handle_Item' then
 		local wnd = this:GetParent()
-		local szTip = _L('Title: %s', wnd.info.szTitle)
-			.. '\n' .. _L('Author: %s', wnd.info.szAuthor)
-			.. '\n' .. _L('Update at: %s', wnd.info.szUpdateTime)
+		local szTip = _L('Title: %s', X.ReplaceSensitiveWord(wnd.info.szTitle))
+			.. '\n' .. _L('Author: %s', X.ReplaceSensitiveWord(wnd.info.szAuthor))
+			.. '\n' .. _L('Update at: %s', X.ReplaceSensitiveWord(wnd.info.szUpdateTime))
 		if IsCtrlKeyDown() then
 			szTip = szTip .. '\n' .. X.EncodeLUAData(wnd.info, '  ')
 		end
