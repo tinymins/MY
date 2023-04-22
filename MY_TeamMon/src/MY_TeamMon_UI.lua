@@ -32,7 +32,7 @@ local MY_TEAM_MON__UI__ITEM_L        = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_T
 local MY_TEAM_MON__UI__TALK_L        = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_L.ini'
 local MY_TEAM_MON__UI__ITEM_R        = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_ITEM_R.ini'
 local MY_TEAM_MON__UI__TALK_R        = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_TALK_R.ini'
-local MY_TEAM_MON__UI__TYPE          = { 'BUFF', 'DEBUFF', 'CASTING', 'NPC', 'DOODAD', 'TALK', 'CHAT' }
+local MY_TEAM_MON__UI__TYPE          = MY_TeamMon.MY_TEAM_MON_TYPE_LIST
 local MY_TEAM_MON__UI__SELECT_TYPE   = MY_TEAM_MON__UI__TYPE[1]
 local MY_TEAM_MON__UI__SELECT_MAP    = _L['All data']
 local MY_TEAM_MON__UI__TREE_EXPAND   = { [_L['All']] = true } -- 默认第一项展开
@@ -144,18 +144,30 @@ function D.OnFrameCreate()
 		buttonStyle = 'FLAT_LACE_BORDER',
 		menu = function()
 			local menu = {}
-			table.insert(menu, { szOption = _L['Import data (local)'], fnAction = function() D.OpenImportPanel() end }) -- 有传参 不要改
 			local szLang = X.ENVIRONMENT.GAME_LANG
 			if szLang == 'zhcn' or szLang == 'zhtw' then
-				table.insert(menu, { szOption = _L['Import data (web)'], fnAction = MY_TeamMon_Subscribe.OpenPanel })
+				table.insert(menu, {
+					szOption = _L['Subscribe data'],
+					fnAction = MY_TeamMon_Subscribe.OpenPanel,
+				})
+				table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			end
 			table.insert(menu, {
-				szOption = _L['Clear data'],
+				szOption = _L['Import local data'],
+				fnAction = function() D.OpenImportPanel() end, -- 有传参 不要改
+			})
+			table.insert(menu, { szOption = _L['Export local data'], fnAction = D.OpenExportPanel })
+			table.insert(menu, {
+				szOption = _L['Clear local data'],
 				fnAction = function()
-					D.RemoveData(nil, nil, _L['All data'])
+					X.Confirm(_L['Are you sure to clear local data? All team mon data will be removed totally, this is not reversible.'], function()
+						for _, v in ipairs(MY_TeamMon.MY_TEAM_MON_TYPE_LIST) do
+							MY_TeamMon.RemoveData(v)
+						end
+					end)
 				end,
 			})
-			table.insert(menu, { szOption = _L['Export data'], fnAction = D.OpenExportPanel })
+			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			table.insert(menu, { szOption = _L['Open data folder'], fnAction = function()
 				local szRoot = X.GetAbsolutePath(MY_TEAM_MON_REMOTE_DATA_ROOT):gsub('/', '\\')
 				X.OpenFolder(szRoot)
@@ -864,7 +876,7 @@ function D.InsertDungeonMenu(menu, fnAction)
 end
 
 function D.OpenImportPanel(szDefault, szTitle, fnAction)
-	local ui = X.UI.CreateFrame('MY_TeamMon_DataPanel', { w = 720, h = 330, text = _L['Import data'], close = true })
+	local ui = X.UI.CreateFrame('MY_TeamMon_DataPanel', { w = 720, h = 330, text = _L['Import local data'], close = true })
 	local nX, nY = ui:Append('Text', { x = 20, y = 50, text = _L['Includes'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX = 20
 	for k, v in ipairs(MY_TEAM_MON__UI__TYPE) do
@@ -968,7 +980,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 end
 
 function D.OpenExportPanel()
-	local ui = X.UI.CreateFrame('MY_TeamMon_DataPanel', { w = 720, h = 410, text = _L['Export data'], close = true })
+	local ui = X.UI.CreateFrame('MY_TeamMon_DataPanel', { w = 720, h = 410, text = _L['Export local data'], close = true })
 	local nX, nY = ui:Append('Text', { x = 20, y = 50, text = _L['Includes'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX = 20
 	for k, v in ipairs(MY_TEAM_MON__UI__TYPE) do

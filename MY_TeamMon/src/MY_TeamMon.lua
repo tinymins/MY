@@ -2410,6 +2410,7 @@ local settings = {
 				MY_TEAM_MON_REMOTE_DATA_ROOT = MY_TEAM_MON_REMOTE_DATA_ROOT,
 				MY_TEAM_MON_SPECIAL_MAP      = MY_TEAM_MON_SPECIAL_MAP     ,
 				MY_TEAM_MON_TYPE             = MY_TEAM_MON_TYPE            ,
+				MY_TEAM_MON_TYPE_LIST        = MY_TEAM_MON_TYPE_LIST       ,
 				MY_TEAM_MON_SCRUTINY_TYPE    = MY_TEAM_MON_SCRUTINY_TYPE   ,
 				FilterCustomText             = FilterCustomText            ,
 				ParseCustomText              = ParseCustomText             ,

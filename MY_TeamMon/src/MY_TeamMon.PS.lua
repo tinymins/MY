@@ -209,39 +209,37 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bCommon = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
+	if szLang == 'zhcn' or szLang == 'zhtw' then
+		nX = ui:Append('WndButton', {
+			x = nX + 5, y = nY + 15, text = _L['Subscribe data'],
+			buttonStyle = 'FLAT',
+			onClick = function() MY_TeamMon_Subscribe.OpenPanel() end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
+	end
 	nX = ui:Append('WndButton', {
-		x = nPaddingX + 5, y = nY + 15, text = _L['Data panel'],
+		x = nPaddingX + 5, y = nY + 15, text = _L['Open data panel'],
 		buttonStyle = 'FLAT',
 		onClick = MY_TeamMon_UI.TogglePanel,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
-		x = nX + 5, y = nY + 15, text = _L['Export data'],
+		x = nX + 5, y = nY + 15, text = _L['Import local data'],
+		buttonStyle = 'FLAT',
+		onClick = function() MY_TeamMon_UI.OpenImportPanel() end,
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndButton', {
+		x = nX + 5, y = nY + 15, text = _L['Export local data'],
 		buttonStyle = 'FLAT',
 		onClick = MY_TeamMon_UI.OpenExportPanel,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
-		x = nX + 5, y = nY + 15, text = _L['Import data'],
+		x = nX + 5, y = nY + 15, text = _L['Clear local data'],
 		buttonStyle = 'FLAT',
-		menu = function()
-			local menu = {}
-			table.insert(menu, {
-				szOption = _L['Import data (local)'],
-				fnAction = function() MY_TeamMon_UI.OpenImportPanel() end,
-			})
-			local szLang = X.ENVIRONMENT.GAME_LANG
-			if szLang == 'zhcn' or szLang == 'zhtw' then
-				table.insert(menu, {
-					szOption = _L['Import data (web)'],
-					fnAction = function() MY_TeamMon_Subscribe.OpenPanel() end,
-				})
-			end
-			table.insert(menu, {
-				szOption = _L['Clear data'],
-				fnAction = function()
-					MY_TeamMon.RemoveData(nil, nil, _L['All data'])
-				end,
-			})
-			return menu
+		onClick = function()
+			X.Confirm(_L['Are you sure to clear local data? All team mon data will be removed totally, this is not reversible.'], function()
+				for _, v in ipairs(MY_TeamMon.MY_TEAM_MON_TYPE_LIST) do
+					MY_TeamMon.RemoveData(v)
+				end
+			end)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
