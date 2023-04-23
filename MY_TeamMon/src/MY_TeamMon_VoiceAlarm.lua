@@ -222,7 +222,11 @@ function D.FetchSlugList()
 				for _, slug in ipairs(res.data) do
 					if not tSlugGroup[slug.group] then
 						tSlugGroup[slug.group] = {
-							bOfficial = not slug.group:find('^jx3box') and not slug.group:find('^extend'),
+							bOfficial = (
+								slug.is_official == nil
+									and (not slug.group:find('^jx3box') and not slug.group:find('^extend'))
+									or slug.is_official
+							) or false,
 							szGroupID = slug.group,
 							szGroupName = slug.group_name,
 						}
