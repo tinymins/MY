@@ -1674,10 +1674,14 @@ function D.OpenSettingPanel(data, szType)
 									vvv.bChecked = v.szOption == m1.szOption and vv.szOption == m2.szOption and vvv.szOption == tSlug.szRemark
 								end
 							end
-							v.rgb = v.szOption == m1.szOption and { 255, 255, 0 } or nil
+							if v.szOption then
+								v.rgb = v.szOption == m1.szOption and { 255, 255, 0 } or nil
+							end
 						end
 						for _, v in ipairs(m1) do
-							v.rgb = v.szOption == m2.szOption and { 255, 255, 0 } or nil
+							if v.szOption then
+								v.rgb = v.szOption == m2.szOption and { 255, 255, 0 } or nil
+							end
 						end
 						data[nClass] = data[nClass] or {}
 						data[nClass].bOfficialVoice = true
@@ -1709,10 +1713,14 @@ function D.OpenSettingPanel(data, szType)
 									vvv.bChecked = v.szOption == m1.szOption and vv.szOption == m2.szOption and vvv.szOption == tSlug.szRemark
 								end
 							end
-							v.rgb = v.szOption == m1.szOption and { 255, 255, 0 } or nil
+							if v.szOption then
+								v.rgb = v.szOption == m1.szOption and { 255, 255, 0 } or nil
+							end
 						end
 						for _, v in ipairs(m1) do
-							v.rgb = v.szOption == m2.szOption and { 255, 255, 0 } or nil
+							if v.szOption then
+								v.rgb = v.szOption == m2.szOption and { 255, 255, 0 } or nil
+							end
 						end
 						data[nClass] = data[nClass] or {}
 						data[nClass].bOfficialVoice = false
