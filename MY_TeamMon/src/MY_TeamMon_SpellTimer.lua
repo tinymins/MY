@@ -339,7 +339,7 @@ function ST:SetInfo(tTime, nIcon)
 		box:SetObjectIcon(nIcon)
 	end
 	if MY_TeamMon.bPushVoiceAlarm and tTime.szVoice then
-		FireUIEvent('MY_TEAM_MON__VOICE_ALARM', tTime.bOfficialVoice, tTime.szVoice)
+		FireUIEvent('MY_TEAM_MON__VOICE_ALARM', tTime.bVoiceOfficial, tTime.szVoice)
 	end
 	return self
 end

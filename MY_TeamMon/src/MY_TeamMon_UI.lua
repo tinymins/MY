@@ -1648,7 +1648,7 @@ function D.OpenSettingPanel(data, szType)
 			bChecked = not data[nClass] or not data[nClass].szVoice,
 			fnAction = function(_, bCheck)
 				if data[nClass] then
-					data[nClass].bOfficialVoice = nil
+					data[nClass].bVoiceOfficial = nil
 					data[nClass].szVoice = nil
 				end
 			end,
@@ -1657,7 +1657,7 @@ function D.OpenSettingPanel(data, szType)
 		for _, tGroup in ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('OFFICIAL')) do
 			local m2 = { szOption = tGroup.szGroupName }
 			for _, tSlug in ipairs(tGroup) do
-				local bChecked = data[nClass] and data[nClass].bOfficialVoice and data[nClass].szVoice == tSlug.szSlug
+				local bChecked = data[nClass] and data[nClass].bVoiceOfficial and data[nClass].szVoice == tSlug.szSlug
 				if bChecked then
 					m1.rgb = { 255, 255, 0 }
 					m2.rgb = { 255, 255, 0 }
@@ -1684,7 +1684,7 @@ function D.OpenSettingPanel(data, szType)
 							end
 						end
 						data[nClass] = data[nClass] or {}
-						data[nClass].bOfficialVoice = true
+						data[nClass].bVoiceOfficial = true
 						data[nClass].szVoice = tSlug.szSlug
 					end,
 				})
@@ -1696,7 +1696,7 @@ function D.OpenSettingPanel(data, szType)
 		for _, tGroup in ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('CUSTOM')) do
 			local m2 = { szOption = tGroup.szGroupName }
 			for _, tSlug in ipairs(tGroup) do
-				local bChecked = data[nClass] and not data[nClass].bOfficialVoice and data[nClass].szVoice == tSlug.szSlug
+				local bChecked = data[nClass] and not data[nClass].bVoiceOfficial and data[nClass].szVoice == tSlug.szSlug
 				if bChecked then
 					m1.rgb = { 255, 255, 0 }
 					m2.rgb = { 255, 255, 0 }
@@ -1723,7 +1723,7 @@ function D.OpenSettingPanel(data, szType)
 							end
 						end
 						data[nClass] = data[nClass] or {}
-						data[nClass].bOfficialVoice = false
+						data[nClass].bVoiceOfficial = false
 						data[nClass].szVoice = tSlug.szSlug
 					end,
 				})
@@ -2904,7 +2904,7 @@ function D.OpenSettingPanel(data, szType)
 									.. ' - '
 									.. FilterCustomText(vv.szContent, '{$sender}', '{$receiver}')
 									.. (bTrigger and vv.nTime and (' (' .. vv.nTime .. 's)') or '')
-									.. (vv.szVoice and (' - (' .. (vv.bOfficialVoice and _L['Official voice'] or _L['Custom voice']) .. ')' .. vv.szVoice) or '')
+									.. (vv.szVoice and (' - (' .. (vv.bVoiceOfficial and _L['Official voice'] or _L['Custom voice']) .. ')' .. vv.szVoice) or '')
 									.. '\n'
 							))
 						end
