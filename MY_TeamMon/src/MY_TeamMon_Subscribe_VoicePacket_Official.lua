@@ -47,7 +47,6 @@ function D.UpdateList(page)
 			bExistSelect = true
 		end
 		local wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Item')
-		wnd:Lookup('', 'Text_Item_Author'):SetText(X.ReplaceSensitiveWord(info.szAuthor))
 		wnd:Lookup('', 'Text_Item_Title'):SetText(X.ReplaceSensitiveWord(info.szTitle))
 		wnd:Lookup('', 'Text_Item_Download'):SetText(X.ReplaceSensitiveWord(info.szUpdateTime))
 		wnd:Lookup('', 'Image_Item_Sel'):SetVisible(bSel)
@@ -102,7 +101,6 @@ function D.OnInitPage()
 	wnd:SetRelPos(0, 0)
 	Wnd.CloseWindow(frameTemp)
 
-	wnd:Lookup('', 'Text_Break1'):SetText(_L['Author'])
 	wnd:Lookup('', 'Text_Break2'):SetText(_L['Title'])
 	wnd:Lookup('Btn_CheckUpdate', 'Text_CheckUpdate'):SetText(_L['Refresh list'])
 	wnd:Lookup('Btn_PrevPage', 'Text_PrevPage'):SetText(_L['Prev page'])
@@ -166,7 +164,6 @@ function D.OnItemMouseEnter()
 	if name == 'Handle_Item' then
 		local wnd = this:GetParent()
 		local szTip = _L('Title: %s', X.ReplaceSensitiveWord(wnd.info.szTitle))
-			.. '\n' .. _L('Author: %s', X.ReplaceSensitiveWord(wnd.info.szAuthor))
 			.. '\n' .. _L('Update at: %s', X.ReplaceSensitiveWord(wnd.info.szUpdateTime))
 		if IsCtrlKeyDown() then
 			szTip = szTip .. '\n' .. X.EncodeLUAData(wnd.info, '  ')
