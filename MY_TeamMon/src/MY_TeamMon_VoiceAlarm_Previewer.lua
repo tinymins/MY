@@ -26,7 +26,7 @@ function D.Open(szType)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
 	Wnd.CloseWindow('MY_TeamMon_VoiceAlarm_Previewer')
 	local ui = X.UI.CreateFrame('MY_TeamMon_VoiceAlarm_Previewer', {
-		w = 400, h = 600, anchor = 'CENTER',
+		w = 400, h = 620, anchor = 'CENTER',
 		text = szType == 'OFFICIAL' and _L['Preview official voice'] or _L['Preview custom voice'],
 		events = {
 			{
