@@ -349,6 +349,24 @@ function D.DownloadPacket(szType)
 	X.Debug('MY_TeamMon_VoiceAlarm', 'DownloadPacket ' .. szType .. ' ' .. dwPacketID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	DOWNLOADER_CACHE[dwPacketID] = X.ProgressPromise:new(function(resolve, reject, progress)
+		if dwPacketID == 0 then
+			if szType == 'OFFICIAL' then
+				O.szOfficialVoicePacketVersion = ''
+				D.dwOfficialVoicePacketID = nil
+				D.tOfficialPacketInfo = nil
+				D.tOfficialVoiceCache = nil
+			else
+				O.szCustomVoicePacketVersion = ''
+				D.dwCustomVoicePacketID = nil
+				D.tCustomPacketInfo = nil
+				D.tCustomVoiceCache = nil
+			end
+			DOWNLOADER_CACHE[dwPacketID] = nil
+			FireUIEvent('MY_TEAM_MON__VOICE_ALARM__DOWNLOAD_PROGRESS', dwPacketID)
+			FireUIEvent('MY_TEAM_MON__VOICE_ALARM__DOWNLOAD_FILE_SUCCESS')
+			resolve()
+			return
+		end
 		D.FetchVoiceList(szType, true)
 			:Then(function(tInfo)
 				local aVoice = tInfo.aVoice
@@ -384,6 +402,7 @@ function D.DownloadPacket(szType)
 						end
 						DOWNLOADER_CACHE[dwPacketID] = nil
 						FireUIEvent('MY_TEAM_MON__VOICE_ALARM__DOWNLOAD_PROGRESS', dwPacketID)
+						FireUIEvent('MY_TEAM_MON__VOICE_ALARM__DOWNLOAD_FILE_SUCCESS')
 						resolve()
 						return
 					end
@@ -401,6 +420,7 @@ function D.DownloadPacket(szType)
 					X.DownloadFile(szURL, szPath)
 						:Then(function()
 							SetProgress(szKey, 1)
+							FireUIEvent('MY_TEAM_MON__VOICE_ALARM__DOWNLOAD_FILE_SUCCESS')
 							FetchNext()
 						end)
 						:Catch(function(err)
@@ -431,11 +451,11 @@ end
 
 function D.PlayVoice(szType, szSlug)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
-	local tVoiceCache = szType == 'OFFICIAL' and D.tOfficialVoiceCache or D.tCustomVoiceCache
+	local tVoiceCache = X.IIf(szType == 'OFFICIAL', D.tOfficialVoiceCache, D.tCustomVoiceCache)
 	local dwPacketID = szType == 'OFFICIAL' and O.dwOfficialVoicePacketID or O.dwCustomVoicePacketID
 	local voice = tVoiceCache and tVoiceCache[szSlug]
 	if not voice or dwPacketID == 0 then
-		tVoiceCache = szType ~= 'OFFICIAL' and D.tOfficialVoiceCache or D.tCustomVoiceCache
+		tVoiceCache = X.IIf(szType ~= 'OFFICIAL', D.tOfficialVoiceCache, D.tCustomVoiceCache)
 		dwPacketID = szType ~= 'OFFICIAL' and O.dwOfficialVoicePacketID or O.dwCustomVoicePacketID
 		voice = tVoiceCache and tVoiceCache[szSlug]
 		if not voice or dwPacketID == 0 then
@@ -458,7 +478,7 @@ end
 
 function D.IsVoiceExist(szType, szSlug)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
-	local tVoiceCache = szType == 'OFFICIAL' and D.tOfficialVoiceCache or D.tCustomVoiceCache
+	local tVoiceCache = X.IIf(szType == 'OFFICIAL', D.tOfficialVoiceCache, D.tCustomVoiceCache)
 	local voice = tVoiceCache and tVoiceCache[szSlug]
 	return voice ~= nil
 end

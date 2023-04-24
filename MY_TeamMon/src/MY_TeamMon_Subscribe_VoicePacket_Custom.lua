@@ -72,7 +72,13 @@ function D.UpdateList(page)
 				or (bIsSubscripted and _L['Current selected'])
 				or _L['Select'],
 			enable = not fProgress,
-			onClick = function() MY_TeamMon_VoiceAlarm.SetCurrentPacketID('CUSTOM', info.dwID) end,
+			onClick = function()
+				if not fProgress and not bIsSubscriptedCanUpdate and bIsSubscripted then
+					MY_TeamMon_VoiceAlarm.SetCurrentPacketID('CUSTOM', 0)
+				else
+					MY_TeamMon_VoiceAlarm.SetCurrentPacketID('CUSTOM', info.dwID)
+				end
+			end,
 		})
 		wnd.info = info
 	end

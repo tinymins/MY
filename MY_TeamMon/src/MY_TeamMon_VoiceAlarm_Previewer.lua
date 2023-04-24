@@ -35,6 +35,12 @@ function D.Open(szType)
 					X.DelayCall('MY_TeamMon_VoiceAlarm_Previewer', 10, function() D.Open(szType) end)
 				end,
 			},
+			{
+				'MY_TEAM_MON__VOICE_ALARM__DOWNLOAD_FILE_SUCCESS',
+				function()
+					X.DelayCall('MY_TeamMon_VoiceAlarm_Previewer', 10, function() D.Open(szType) end)
+				end,
+			},
 		},
 	})
 	ui:Raw():GetRoot().szType = szType
