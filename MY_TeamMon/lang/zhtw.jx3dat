@@ -310,6 +310,7 @@ return {
 	['Author'] = '作者',
 	['Title'] = '標題',
 	['Refresh list'] = '刷新列表',
+	['Preview voice'] = '預覽語音',
 	['Prev page'] = '上一頁',
 	['Next page'] = '下一頁',
 	['Title: %s'] = '標題：%s',
@@ -317,4 +318,13 @@ return {
 	['Update at: %s'] = '最後更新於：%s',
 	['Voice packet official'] = '官方語音',
 	['Voice packet custom'] = '更多語音',
+
+	['Preview official voice'] = '預覽官方語音',
+	['Preview custom voice'] = '預覽插件語音',
+	['Voice title'] = '標題',
+	['Voice preview'] = '預覽',
+	['Not exist'] = '無',
+	['Voice not exist in current packet'] = '當前語音包不包含該條語音',
+	['Click to play'] = '點擊播放',
+	['Voice slug name has been copied to clipboard'] = '語音標識已複製到剪切板',
 }

@@ -103,6 +103,7 @@ function D.OnInitPage()
 
 	wnd:Lookup('', 'Text_Break2'):SetText(_L['Title'])
 	wnd:Lookup('Btn_CheckUpdate', 'Text_CheckUpdate'):SetText(_L['Refresh list'])
+	wnd:Lookup('Btn_Preview', 'Text_Preview'):SetText(_L['Preview voice'])
 	wnd:Lookup('Btn_PrevPage', 'Text_PrevPage'):SetText(_L['Prev page'])
 	wnd:Lookup('Btn_NextPage', 'Text_NextPage'):SetText(_L['Next page'])
 
@@ -138,6 +139,8 @@ function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_CheckUpdate' then
 		D.SwitchPage(DATA_PAGINATION.nIndex)
+	elseif name == 'Btn_Preview' then
+		MY_TeamMon_VoiceAlarm_Previewer.Open('OFFICIAL')
 	elseif name == 'Btn_PrevPage' then
 		D.SwitchPage(DATA_PAGINATION.nIndex - 1)
 	elseif name == 'Btn_NextPage' then

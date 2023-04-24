@@ -449,11 +449,18 @@ function D.PlayVoice(szType, szSlug)
 	local dwCRC = GetFileCRC(szPath)
 	if dwCRC ~= voice.dwCRC then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_TeamMon_VoiceAlarm', 'PlayVoice ERROR ' .. szType .. ' ' .. szSlug .. ' ' .. szPath .. ' CRC mismatch ' .. dwCRC .. ' ~= ' .. voice.dwCRC, X.DEBUG_LEVEL.ERROR)
+		X.Debug('MY_TeamMon_VoiceAlarm', 'PlayVoice ERROR ' .. szType .. ' ' .. szSlug .. ' ' .. szPath .. ' CRC mismatch ' .. tostring(dwCRC) .. ' ~= ' .. voice.dwCRC, X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end
 	X.PlaySound(szPath)
+end
+
+function D.IsVoiceExist(szType, szSlug)
+	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
+	local tVoiceCache = szType == 'OFFICIAL' and D.tOfficialVoiceCache or D.tCustomVoiceCache
+	local voice = tVoiceCache and tVoiceCache[szSlug]
+	return voice ~= nil
 end
 
 --------------------------------------------------------------------------------
@@ -472,6 +479,7 @@ local settings = {
 				'GetPacketDownloadProgress',
 				'GetSlugList',
 				'PlayVoice',
+				'IsVoiceExist',
 			},
 			preset = 'UIEvent'
 		},

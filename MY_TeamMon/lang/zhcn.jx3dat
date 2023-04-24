@@ -310,6 +310,7 @@ return {
 	['Author'] = '作者',
 	['Title'] = '标题',
 	['Refresh list'] = '刷新列表',
+	['Preview voice'] = '预览语音',
 	['Prev page'] = '上一页',
 	['Next page'] = '下一页',
 	['Title: %s'] = '标题：%s',
@@ -317,4 +318,13 @@ return {
 	['Update at: %s'] = '最后更新于：%s',
 	['Voice packet official'] = '官方语音',
 	['Voice packet custom'] = '更多语音',
+
+	['Preview official voice'] = '预览官方语音',
+	['Preview custom voice'] = '预览插件语音',
+	['Voice title'] = '标题',
+	['Voice preview'] = '预览',
+	['Not exist'] = '无',
+	['Voice not exist in current packet'] = '当前语音包不包含该条语音',
+	['Click to play'] = '点击播放',
+	['Voice slug name has been copied to clipboard'] = '语音标识已复制到剪切板',
 }
