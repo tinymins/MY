@@ -146,6 +146,14 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bPushScreenHead = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Etc function enable'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+	nX, nY = ui:Append('WndCheckBox', {
+		x = nPaddingX + 10, y = nY, text = _L['Show voice recommendation confirm on load data'],
+		checked = MY_TeamMon.bShowVoicePacketRecommendation,
+		onCheck = function(bCheck)
+			MY_TeamMon.bShowVoicePacketRecommendation = bCheck
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nPaddingX + 10, y = nY, text = _L['Team panel bind show buff'],

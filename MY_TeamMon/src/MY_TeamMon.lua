@@ -244,6 +244,12 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bShowVoicePacketRecommendation = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
 })
 
 local function GetUserDataPath()
@@ -2051,6 +2057,9 @@ function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 			fnMergeData(tab_data)
 		end
 	end
+	if X.IsTable(data.__meta) and (data.__meta.szOfficialVoicePacketUUID or data.__meta.szCustomVoicePacketUUID) and O.bShowVoicePacketRecommendation then
+		MY_TeamMon_VoiceAlarm.ShowVoiceRecommendation(data.__meta.szOfficialVoicePacketUUID, data.__meta.szCustomVoicePacketUUID)
+	end
 	FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 	FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 	FireUIEvent('MY_TEAM_MON_DATA_RELOAD')
@@ -2457,6 +2466,7 @@ local settings = {
 				'bPushWhisperChannel',
 				'bPushBuffList',
 				'bPushPartyBuffList',
+				'bShowVoicePacketRecommendation',
 			},
 			root = O,
 		},
@@ -2476,6 +2486,7 @@ local settings = {
 				'bPushWhisperChannel',
 				'bPushBuffList',
 				'bPushPartyBuffList',
+				'bShowVoicePacketRecommendation',
 			},
 			triggers = {
 				bEnable = function(k, v)

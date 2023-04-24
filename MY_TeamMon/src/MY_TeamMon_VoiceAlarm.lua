@@ -202,7 +202,7 @@ function D.FetchSlugList()
 			return
 		end
 		X.Ajax({
-			url = 'https://dbm.jx3box.com/api/dbm/game/vpk/slugs',
+			url = 'https://pull.j3cx.com/api/dbm/game/vpk/slugs',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
@@ -497,6 +497,83 @@ function D.IsVoiceExist(szType, szSlug)
 	return voice ~= nil
 end
 
+function D.ShowVoiceRecommendation(szOfficialVoicePacketUUID, szCustomVoicePacketUUID)
+		local dwOfficialVoicePacketID, szOfficialVoicePacketName
+		local dwCustomVoicePacketID, szCustomVoicePacketName
+		local function CheckConfirm()
+			if szOfficialVoicePacketUUID and not dwOfficialVoicePacketID then
+				return
+			end
+			if szCustomVoicePacketUUID and not dwCustomVoicePacketID then
+				return
+			end
+			local szName = ''
+			if szOfficialVoicePacketName then
+				szName = szOfficialVoicePacketName
+			end
+			if szCustomVoicePacketName then
+				if szName ~= '' then
+					szName = szName .. _L.AND_COMMA
+				end
+				szName = szName .. szCustomVoicePacketName
+			end
+			X.Confirm(_L('Current loaded data recommend voice packet %s, do you want to download and use?', szName), function()
+				if dwOfficialVoicePacketID then
+					D.SetCurrentPacketID('OFFICIAL', dwOfficialVoicePacketID)
+				end
+				if dwCustomVoicePacketID then
+					D.SetCurrentPacketID('CUSTOM', dwCustomVoicePacketID)
+				end
+			end)
+		end
+		if szOfficialVoicePacketUUID then
+			X.Ajax({
+				url = 'https://pull.j3cx.com/api/dbm/game/vpk',
+				data = {
+					l = X.ENVIRONMENT.GAME_LANG,
+					L = X.ENVIRONMENT.GAME_EDITION,
+					uuid = szOfficialVoicePacketUUID,
+				},
+				success = function(szHTML)
+					local res = X.DecodeJSON(szHTML)
+					local res = X.IsTable(res) and res.data
+					local errs = X.Schema.CheckSchema(res, VOICE_PACKET_LIST_JSON_SCHEMA)
+					if errs then
+						return
+					end
+					if res.list[1] and res.list[1].is_official == 1 then
+						dwOfficialVoicePacketID = res.list[1].id
+						szOfficialVoicePacketName = res.list[1].title
+					end
+					CheckConfirm()
+				end,
+			})
+		end
+		if szCustomVoicePacketUUID then
+			X.Ajax({
+				url = 'https://pull.j3cx.com/api/dbm/game/vpk',
+				data = {
+					l = X.ENVIRONMENT.GAME_LANG,
+					L = X.ENVIRONMENT.GAME_EDITION,
+					uuid = szCustomVoicePacketUUID,
+				},
+				success = function(szHTML)
+					local res = X.DecodeJSON(szHTML)
+					local res = X.IsTable(res) and res.data
+					local errs = X.Schema.CheckSchema(res, VOICE_PACKET_LIST_JSON_SCHEMA)
+					if errs then
+						return
+					end
+					if res.list[1] and res.list[1].is_official == 0 then
+						dwCustomVoicePacketID = res.list[1].id
+						szCustomVoicePacketName = res.list[1].title
+					end
+					CheckConfirm()
+				end,
+			})
+		end
+end
+
 --------------------------------------------------------------------------------
 -- Global exports
 --------------------------------------------------------------------------------
@@ -515,6 +592,7 @@ local settings = {
 				'PlayVoice',
 				'IsVoiceExist',
 				'GetSlugRemark',
+				'ShowVoiceRecommendation',
 			},
 			preset = 'UIEvent'
 		},

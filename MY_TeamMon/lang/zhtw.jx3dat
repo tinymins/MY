@@ -103,6 +103,8 @@ return {
 	['Only source self'] = '僅顯示來源自己的氣勁',
 	['Requires MY_LifeBar loaded.'] = '需載入並啟用頭頂血條',
 	['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'] = '需載入並啟用頭頂血條\n由於官方限制，僅目標運功狀態可顯示',
+	['Etc function enable'] = '通用功能開關',
+	['Show voice recommendation confirm on load data'] = '載入數據時顯示推薦語音包',
 	['Add countdown'] = '添加倒計時',
 	['Press CTRL click for advance menu'] = '按住CTRL點擊可查看高級選項',
 	['Please select type'] = '請選擇類型',
@@ -306,6 +308,10 @@ return {
 	['Favorite list'] = '收藏數據',
 	['Please input meta address:'] = '請輸入訂閱地址，添加多個使用分號分隔：',
 
+	-- MY_TeamMon_VoiceAlarm.lua
+	['Current loaded data recommend voice packet %s, do you want to download and use?'] = '當前數據推薦使用語音包：%s，是否下載並啟用推薦的語音包？',
+	['AND_COMMA'] = '、',
+
 	-- MY_TeamMon_Subscribe_VoicePacket_Official.lua --
 	['See details'] = '查看詳情',
 	['Downloading...'] = '下載中...',
@@ -324,6 +330,7 @@ return {
 	['Voice packet official'] = '官方語音',
 	['Voice packet custom'] = '更多語音',
 
+	-- MY_TeamMon_VoiceAlarm_Previewer.lua
 	['Preview official voice'] = '預覽官方語音',
 	['Preview custom voice'] = '預覽插件語音',
 	['Voice title'] = '標題',
