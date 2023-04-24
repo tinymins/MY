@@ -256,35 +256,40 @@ function D.GetSlugList(szType)
 	return aSlugGroup
 end
 
-function D.FetchVoiceList(szType)
+function D.FetchVoiceList(szType, bDownload)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
 	return X.Promise:new(function(resolve, reject)
 		if szType == 'OFFICIAL' and O.dwOfficialVoicePacketID == 0 then
 			reject(X.Error:new(_L['No official voice packet selected.']))
 			return
 		end
-		if szType == 'OFFICIAL' and D.tOfficialPacketInfo
-		and D.tOfficialPacketInfo.dwID == O.dwOfficialVoicePacketID then
-			resolve(X.Clone(D.tOfficialPacketInfo))
-			return
-		end
 		if szType == 'CUSTOM' and O.dwCustomVoicePacketID == 0 then
 			reject(X.Error:new(_L['No custom voice packet selected.']))
 			return
 		end
-		if szType == 'CUSTOM' and D.tCustomPacketInfo
-		and D.tCustomPacketInfo.dwID == O.dwCustomVoicePacketID then
-			resolve(X.Clone(D.tCustomPacketInfo))
-			return
+		if not bDownload then
+			if szType == 'OFFICIAL' and D.tOfficialPacketInfo
+			and D.tOfficialPacketInfo.dwID == O.dwOfficialVoicePacketID then
+				resolve(X.Clone(D.tOfficialPacketInfo))
+				return
+			end
+			if szType == 'CUSTOM' and D.tCustomPacketInfo
+			and D.tCustomPacketInfo.dwID == O.dwCustomVoicePacketID then
+				resolve(X.Clone(D.tCustomPacketInfo))
+				return
+			end
 		end
 		local dwPacketID = szType == 'OFFICIAL' and O.dwOfficialVoicePacketID or O.dwCustomVoicePacketID
 		X.Ajax({
-			url = 'https://pull.j3cx.com/api/dbm/game/vpk/voices',
+			url = bDownload
+				and 'https://pull.j3cx.com/api/dbm/game/vpk/voices/d'
+				or 'https://pull.j3cx.com/api/dbm/game/vpk/voices',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
 				id = dwPacketID,
 			},
+			signature = X.SECRET['J3CX::TEAM_MON_VOICES_DOWNLOAD'],
 			success = function(szHTML)
 				local res = X.DecodeJSON(szHTML)
 				local errs = X.Schema.CheckSchema(res, VOICE_LIST_JSON_SCHEMA)
@@ -344,7 +349,7 @@ function D.DownloadPacket(szType)
 	X.Debug('MY_TeamMon_VoiceAlarm', 'DownloadPacket ' .. szType .. ' ' .. dwPacketID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	DOWNLOADER_CACHE[dwPacketID] = X.ProgressPromise:new(function(resolve, reject, progress)
-		D.FetchVoiceList(szType)
+		D.FetchVoiceList(szType, true)
 			:Then(function(tInfo)
 				local aVoice = tInfo.aVoice
 				local tProgress = {}
