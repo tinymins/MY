@@ -256,6 +256,20 @@ function D.GetSlugList(szType)
 	return aSlugGroup
 end
 
+function D.GetSlugRemark(szType, szSlug)
+	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
+	for _, tSlugGroup in ipairs(D.aSlugGroup) do
+		if (szType == 'OFFICIAL' and tSlugGroup.bOfficial)
+		or szType == 'CUSTOM' then
+			for _, v in ipairs(tSlugGroup) do
+				if v.szSlug == szSlug then
+					return v.szRemark
+				end
+			end
+		end
+	end
+end
+
 function D.FetchVoiceList(szType, bDownload)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
 	return X.Promise:new(function(resolve, reject)
@@ -500,6 +514,7 @@ local settings = {
 				'GetSlugList',
 				'PlayVoice',
 				'IsVoiceExist',
+				'GetSlugRemark',
 			},
 			preset = 'UIEvent'
 		},

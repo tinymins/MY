@@ -157,6 +157,7 @@ return {
 	['(OPERATOR -)'] = '↓',
 	['Official voice'] = '官方語音',
 	['Custom voice'] = '更多語音',
+	['Unknown voice'] = '未知語音',
 	['Max repeat time\n\nWhen countdown get trigger again, the last countdown may get overwritten. This config is to sovle this problem, input time limit here to ensure in this time period, countdown will not be trigger again.'] = '重覆調用時間限制\n\n當倒計時被再次觸發時，可能會導致前一次倒計時被覆蓋，該設置就是解決這個問題，在此直接輸入時間即可保證在這段時間內不會再次被重覆同樣的倒計時。請注意，分段倒計時默認取最大的時間作為重覆調用時間限制，當然您也可以自由更改。',
 	['Class'] = '分類',
 	['Succeed'] = '操作成功',

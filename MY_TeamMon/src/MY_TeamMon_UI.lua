@@ -2904,7 +2904,16 @@ function D.OpenSettingPanel(data, szType)
 									.. ' - '
 									.. FilterCustomText(vv.szContent, '{$sender}', '{$receiver}')
 									.. (bTrigger and vv.nTime and (' (' .. vv.nTime .. 's)') or '')
-									.. (vv.szVoice and (' - (' .. (vv.bVoiceOfficial and _L['Official voice'] or _L['Custom voice']) .. ')' .. vv.szVoice) or '')
+									.. (
+										vv.szVoice
+										and (
+											' - ['
+											.. (vv.bVoiceOfficial and _L['Official voice'] or _L['Custom voice']) .. ']'
+											.. (MY_TeamMon_VoiceAlarm.GetSlugRemark(vv.bVoiceOfficial and 'OFFICIAL' or 'CUSTOM',vv.szVoice) or _L['Unknown voice'])
+											.. '(' .. vv.szVoice .. ')'
+										)
+										or ''
+									)
 									.. '\n'
 							))
 						end
