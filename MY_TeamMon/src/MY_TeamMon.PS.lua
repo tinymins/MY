@@ -222,25 +222,30 @@ function PS.OnPanelActive(wnd)
 		onClick = MY_TeamMon_UI.TogglePanel,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
+		x = nX + 5, y = nY + 15, text = _L['Data voice subscribe'],
+		buttonStyle = 'FLAT',
+		onClick = function() MY_TeamMon_Subscribe.OpenPanel() end,
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndButton', {
+		x = nX + 5, y = nY + 15, text = _L['Preview voice packet'],
+		buttonStyle = 'FLAT',
+		menu = function()
+			return {
+				{
+					szOption = _L['Preview official voice packet'],
+					fnAction = function() MY_TeamMon_VoiceAlarm_Previewer.Open('OFFICIAL') end,
+				},
+				{
+					szOption = _L['Preview custom voice packet'],
+					fnAction = function() MY_TeamMon_VoiceAlarm_Previewer.Open('CUSTOM') end,
+				},
+			}
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Import local data'],
 		buttonStyle = 'FLAT',
 		onClick = function() MY_TeamMon_UI.OpenImportPanel() end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndButton', {
-		x = nX + 5, y = nY + 15, text = _L['Export local data'],
-		buttonStyle = 'FLAT',
-		onClick = MY_TeamMon_UI.OpenExportPanel,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndButton', {
-		x = nX + 5, y = nY + 15, text = _L['Clear local data'],
-		buttonStyle = 'FLAT',
-		onClick = function()
-			X.Confirm(_L['Are you sure to clear local data? All team mon data will be removed totally, this is not reversible.'], function()
-				for _, v in ipairs(MY_TeamMon.MY_TEAM_MON_TYPE_LIST) do
-					MY_TeamMon.RemoveData(v)
-				end
-			end)
-		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Open data folder'],
