@@ -1653,7 +1653,8 @@ function D.OpenSettingPanel(data, szType)
 				end
 			end,
 		})
-		local m1 = { szOption = _L['Official voice'] }
+		-- local m1 = { szOption = _L['Official voice'] }
+		local m1 = menu
 		for _, tGroup in ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('OFFICIAL')) do
 			local m2 = { szOption = tGroup.szGroupName }
 			for _, tSlug in ipairs(tGroup) do
@@ -1691,46 +1692,46 @@ function D.OpenSettingPanel(data, szType)
 			end
 			table.insert(m1, m2)
 		end
-		table.insert(menu, m1)
-		local m1 = { szOption = _L['Custom voice'] }
-		for _, tGroup in ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('CUSTOM')) do
-			local m2 = { szOption = tGroup.szGroupName }
-			for _, tSlug in ipairs(tGroup) do
-				local bChecked = data[nClass] and not data[nClass].bVoiceOfficial and data[nClass].szVoice == tSlug.szSlug
-				if bChecked then
-					m1.rgb = { 255, 255, 0 }
-					m2.rgb = { 255, 255, 0 }
-				end
-				table.insert(m2, {
-					szOption = tSlug.szRemark,
-					bCheck = true,
-					bMCheck = true,
-					bChecked = bChecked,
-					fnAction = function(_, bCheck)
-						for _, v in ipairs(menu) do
-							for _, vv in ipairs(v) do
-								for _, vvv in ipairs(vv) do
-									vvv.bChecked = v.szOption == m1.szOption and vv.szOption == m2.szOption and vvv.szOption == tSlug.szRemark
-								end
-							end
-							if v.szOption then
-								v.rgb = v.szOption == m1.szOption and { 255, 255, 0 } or nil
-							end
-						end
-						for _, v in ipairs(m1) do
-							if v.szOption then
-								v.rgb = v.szOption == m2.szOption and { 255, 255, 0 } or nil
-							end
-						end
-						data[nClass] = data[nClass] or {}
-						data[nClass].bVoiceOfficial = false
-						data[nClass].szVoice = tSlug.szSlug
-					end,
-				})
-			end
-			table.insert(m1, m2)
-		end
-		table.insert(menu, m1)
+		-- table.insert(menu, m1)
+		-- local m1 = { szOption = _L['Custom voice'] }
+		-- for _, tGroup in ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('CUSTOM')) do
+		-- 	local m2 = { szOption = tGroup.szGroupName }
+		-- 	for _, tSlug in ipairs(tGroup) do
+		-- 		local bChecked = data[nClass] and not data[nClass].bVoiceOfficial and data[nClass].szVoice == tSlug.szSlug
+		-- 		if bChecked then
+		-- 			m1.rgb = { 255, 255, 0 }
+		-- 			m2.rgb = { 255, 255, 0 }
+		-- 		end
+		-- 		table.insert(m2, {
+		-- 			szOption = tSlug.szRemark,
+		-- 			bCheck = true,
+		-- 			bMCheck = true,
+		-- 			bChecked = bChecked,
+		-- 			fnAction = function(_, bCheck)
+		-- 				for _, v in ipairs(menu) do
+		-- 					for _, vv in ipairs(v) do
+		-- 						for _, vvv in ipairs(vv) do
+		-- 							vvv.bChecked = v.szOption == m1.szOption and vv.szOption == m2.szOption and vvv.szOption == tSlug.szRemark
+		-- 						end
+		-- 					end
+		-- 					if v.szOption then
+		-- 						v.rgb = v.szOption == m1.szOption and { 255, 255, 0 } or nil
+		-- 					end
+		-- 				end
+		-- 				for _, v in ipairs(m1) do
+		-- 					if v.szOption then
+		-- 						v.rgb = v.szOption == m2.szOption and { 255, 255, 0 } or nil
+		-- 					end
+		-- 				end
+		-- 				data[nClass] = data[nClass] or {}
+		-- 				data[nClass].bVoiceOfficial = false
+		-- 				data[nClass].szVoice = tSlug.szSlug
+		-- 			end,
+		-- 		})
+		-- 	end
+		-- 	table.insert(m1, m2)
+		-- end
+		-- table.insert(menu, m1)
 		return menu
 	end
 	local function SetDataClass(nClass, key, value)

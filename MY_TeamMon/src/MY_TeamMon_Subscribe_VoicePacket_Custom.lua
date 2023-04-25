@@ -197,22 +197,22 @@ end
 --------------------------------------------------------------------------------
 -- Module exports
 --------------------------------------------------------------------------------
-do
-local settings = {
-	name = 'MY_TeamMon_Subscribe_VoicePacket_Custom',
-	exports = {
-		{
-			preset = 'UIEvent',
-			fields = {
-				'OnInitPage',
-				'OnResizePage',
-			},
-			root = D,
-		},
-	},
-}
-MY_TeamMon_Subscribe.RegisterModule('Subscribe_VoicePacket_Custom', _L['Voice packet custom'], X.CreateModule(settings))
-end
+-- do
+-- local settings = {
+-- 	name = 'MY_TeamMon_Subscribe_VoicePacket_Custom',
+-- 	exports = {
+-- 		{
+-- 			preset = 'UIEvent',
+-- 			fields = {
+-- 				'OnInitPage',
+-- 				'OnResizePage',
+-- 			},
+-- 			root = D,
+-- 		},
+-- 	},
+-- }
+-- MY_TeamMon_Subscribe.RegisterModule('Subscribe_VoicePacket_Custom', _L['Voice packet custom'], X.CreateModule(settings))
+-- end
 
 --------------------------------------------------------------------------------
 -- Global exports

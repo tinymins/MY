@@ -237,18 +237,19 @@ function PS.OnPanelActive(wnd)
 	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Preview voice packet'],
 		buttonStyle = 'FLAT',
-		menu = function()
-			return {
-				{
-					szOption = _L['Preview official voice packet'],
-					fnAction = function() MY_TeamMon_VoiceAlarm_Previewer.Open('OFFICIAL') end,
-				},
-				{
-					szOption = _L['Preview custom voice packet'],
-					fnAction = function() MY_TeamMon_VoiceAlarm_Previewer.Open('CUSTOM') end,
-				},
-			}
-		end,
+		-- menu = function()
+		-- 	return {
+		-- 		{
+		-- 			szOption = _L['Preview official voice packet'],
+		-- 			fnAction = function() MY_TeamMon_VoiceAlarm_Previewer.Open('OFFICIAL') end,
+		-- 		},
+		-- 		{
+		-- 			szOption = _L['Preview custom voice packet'],
+		-- 			fnAction = function() MY_TeamMon_VoiceAlarm_Previewer.Open('CUSTOM') end,
+		-- 		},
+		-- 	}
+		-- end,
+		onClick = function() MY_TeamMon_VoiceAlarm_Previewer.Open('OFFICIAL') end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndButton', {
 		x = nX + 5, y = nY + 15, text = _L['Import local data'],
