@@ -396,6 +396,7 @@ local function ParseHPCountdown(szString)
 					if not nTime and not bParamRecognized and i == 3 then
 						if tonumber(szParam) then
 							nTime = tonumber(szParam)
+							bParamRecognized = true
 						end
 					end
 					if not bParamRecognized then
