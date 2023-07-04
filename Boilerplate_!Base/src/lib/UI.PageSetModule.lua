@@ -77,7 +77,7 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 				checkbox.nIndex = i
 				if m.szNameTip then
 					checkbox.OnMouseEnter = function()
-						X.OutputTip(this, m.szNameTip, 162, X.UI.TIP_POSITION.TOP_BOTTOM)
+						X.OutputTip(this, m.szNameTip, true, X.UI.TIP_POSITION.TOP_BOTTOM)
 					end
 					checkbox.OnMouseLeave = function()
 						X.HideTip()
