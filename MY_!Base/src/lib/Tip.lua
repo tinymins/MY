@@ -539,6 +539,10 @@ function X.OutputItemTip(Rect, dwItemID)
 	OutputTip(szXml, 345, Rect)
 end
 
+function X.HideTip(...)
+	HideTip(...)
+end
+
 -- X.OutputTableTip({
 -- 	aRow = {
 -- 		DEFAULT = { -- 通用行设置
