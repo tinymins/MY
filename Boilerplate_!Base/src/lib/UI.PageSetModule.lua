@@ -40,6 +40,7 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 			table.insert(Modules, {
 				szKey = szKey,
 				szName = szName,
+				szNameTip = tModule.szNameTip,
 				tModule = tModule,
 			})
 			if tModule.tAPI then
@@ -74,6 +75,14 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 				page:SetSize(ps:GetW(), ps:GetH() - checkbox:GetH() - 4)
 				checkbox:Lookup('', 'Text_CheckDefault'):SetText(m.szName)
 				checkbox.nIndex = i
+				if m.szNameTip then
+					checkbox.OnMouseEnter = function()
+						X.OutputTip(this, m.szNameTip, 162, X.UI.TIP_POSITION.TOP_BOTTOM)
+					end
+					checkbox.OnMouseLeave = function()
+						X.HideTip()
+					end
+				end
 				page.nIndex = i
 			else
 				Wnd.CloseWindow(frameTemp)
