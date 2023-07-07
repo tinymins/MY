@@ -2009,20 +2009,10 @@ function D.SetUserConfig(szKey, oVal)
 	D.CONFIG[szKey] = oVal
 end
 
--- 从文件导入数据
-function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
-	local szFullPath = szFileName:sub(2, 2) == ':'
-		and szFileName
-		or X.GetAbsolutePath(szFileName)
-	local szFilePath = X.GetRelativePath(szFullPath, {'', X.PATH_TYPE.NORMAL}) or szFullPath
-	if not IsFileExist(szFilePath) then
-		X.SafeCall(fnAction, false, 'File does not exist.')
-		return
-	end
-	local data = X.LoadLUAData(szFilePath, { passphrase = D.PW })
-		or X.LoadLUAData(szFilePath, { passphrase = false })
+-- 从内存导入数据
+function D.ImportData(data, aType, szMode, fnAction)
 	if not data then
-		X.SafeCall(fnAction, false, 'Can not read data file.')
+		X.SafeCall(fnAction, false, 'Can not read empty data.')
 		return
 	end
 	if not aType then
@@ -2067,6 +2057,25 @@ function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 	FireUIEvent('MY_TEAM_MON__UI__DATA_RELOAD')
 	-- szFilePath, aType, szMode, tMeta
 	X.SafeCall(fnAction, true, szFullPath:gsub('\\', '/'), aType, szMode, X.Clone(data.__meta))
+end
+
+-- 从文件导入数据
+function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
+	local szFullPath = szFileName:sub(2, 2) == ':'
+		and szFileName
+		or X.GetAbsolutePath(szFileName)
+	local szFilePath = X.GetRelativePath(szFullPath, {'', X.PATH_TYPE.NORMAL}) or szFullPath
+	if not IsFileExist(szFilePath) then
+		X.SafeCall(fnAction, false, 'File does not exist.')
+		return
+	end
+	local data = X.LoadLUAData(szFilePath, { passphrase = D.PW })
+		or X.LoadLUAData(szFilePath, { passphrase = false })
+	if not data then
+		X.SafeCall(fnAction, false, 'Can not read data file.')
+		return
+	end
+	D.ImportData(data, aType, szMode, fnAction)
 end
 
 -- 导出数据到文件
@@ -2445,6 +2454,7 @@ local settings = {
 				'AddData',
 				'GetUserConfig',
 				'SetUserConfig',
+				'ImportData',
 				'ImportDataFromFile',
 				'ExportDataToFile',
 				'Exchange',
