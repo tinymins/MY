@@ -176,6 +176,7 @@ return {
 	['Add to monitor list'] = '添加到监控列表',
 	['(player)'] = '（玩家）',
 	['Subscribe data'] = '订阅在线数据、语音包',
+	['Merge data slice'] = '快速载入在线数据条目',
 	['Import local data'] = '导入本地数据',
 	['Export local data'] = '导出本地数据',
 	['Clear local data'] = '清空本地数据',
@@ -329,6 +330,16 @@ return {
 	['Update at: %s'] = '最后更新于：%s',
 	['Voice packet official'] = '官方语音',
 	['Voice packet custom'] = '更多语音',
+
+	-- MY_TeamMon_Subscribe_MergeDataSlice.lua
+	['Please input data slice id:'] = '请输入数据唯一标识：',
+	['Invalid data slice data response.'] = '获取数据失败。',
+	['Invalid data slice data response payload.'] = '未知的数据载体类型。',
+	['Sure to merge this data? conflict item will be overwritten.\n\nTitle: %s\nDesc: %s\nType: %s\nRecord Name: %s\nCreate at: %s\nUpdate at: %s'] = '确认要合并加载该数据吗？相同条目的数据将会被覆盖。\n\n标题：%s\n描述：%s\n类型：%s\n目标：%s\n创建时间：%s\n更新时间：%s',
+	['Load data slice success.'] = '合并数据条目成功。',
+	['Load data slice [%s] success.'] = '成功合并数据条目：[%s]。',
+	['Load data slice failed.'] = '合并数据条目失败。',
+
 
 	-- MY_TeamMon_VoiceAlarm_Previewer.lua
 	['Preview official voice'] = '预览官方语音',

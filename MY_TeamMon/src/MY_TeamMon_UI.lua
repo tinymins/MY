@@ -150,6 +150,10 @@ function D.OnFrameCreate()
 					szOption = _L['Subscribe data'],
 					fnAction = MY_TeamMon_Subscribe.OpenPanel,
 				})
+				table.insert(menu, {
+					szOption = _L['Merge data slice'],
+					fnAction = MY_TeamMon_Subscribe_MergeDataSlice.OpenPanel,
+				})
 				table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			end
 			table.insert(menu, {
