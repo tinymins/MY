@@ -10,5 +10,4 @@ lua_2=src\MY_RoleStatistics_BagStat.lua
 lua_3=src\MY_RoleStatistics_EquipStat.lua
 lua_4=src\MY_RoleStatistics_DungeonStat.lua
 lua_5=src\MY_RoleStatistics_TaskStat.lua
-lua_6=src\MY_RoleStatistics_SerendipityStat.lua
 package=MY
