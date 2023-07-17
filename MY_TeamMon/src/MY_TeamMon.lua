@@ -2055,8 +2055,8 @@ function D.ImportData(data, aType, szMode, fnAction)
 	FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 	FireUIEvent('MY_TEAM_MON_DATA_RELOAD')
 	FireUIEvent('MY_TEAM_MON__UI__DATA_RELOAD')
-	-- szFilePath, aType, szMode, tMeta
-	X.SafeCall(fnAction, true, szFullPath:gsub('\\', '/'), aType, szMode, X.Clone(data.__meta))
+	-- bStatus, szFilePath, aType, szMode, tMeta
+	X.SafeCall(fnAction, true, 'LUAData', aType, szMode, X.Clone(data.__meta))
 end
 
 -- 从文件导入数据
@@ -2075,7 +2075,7 @@ function D.ImportDataFromFile(szFileName, aType, szMode, fnAction)
 		X.SafeCall(fnAction, false, 'Can not read data file.')
 		return
 	end
-	D.ImportData(data, aType, szMode, fnAction)
+	D.ImportData(data, aType, szMode, function(bStatus, szFilePath, aType, szMode, tMeta) fnAction(bStatus, szFullPath:gsub('\\', '/'), aType, szMode, tMeta) end)
 end
 
 -- 导出数据到文件
