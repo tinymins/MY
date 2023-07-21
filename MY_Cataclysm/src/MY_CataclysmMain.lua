@@ -132,16 +132,17 @@ local function UpdateOfficialBuff()
 		return
 	end
 	local dwMapID = X.GetMapID(true)
+	local szMapID = tostring(dwMapID)
 	local dwMountKungfuID = UI_GetPlayerMountKungfuID()
 	local aBuff = {}
 	local RaidPanelBuff = X.GetGameTable('RaidPanelBuff')
 	if not RaidPanelBuff or not X.IsRestricted('MY_CataclysmMain__OfficialBuff') then
 		local szPath = X.FormatPath({'userdata\\cataclysm\\official_buff.tab', X.PATH_TYPE.GLOBAL})
 		local tTitle = {
-			{ f = 'i', t = 'dwMapID' },
-			{ f = 'i', t = 'dwMountKungfuID' },
 			{ f = 'i', t = 'dwBuffID' },
 			{ f = 'i', t = 'nBuffLevel' },
+			{ f = 's', t = 'szMapID' },
+			{ f = 'i', t = 'dwMountKungfuID' },
 			{ f = 's', t = 'szStackOperator' },
 			{ f = 'i', t = 'nStackNum' },
 			{ f = 'b', t = 'bOnlyMine' },
@@ -163,8 +164,9 @@ local function UpdateOfficialBuff()
 		local nCount = RaidPanelBuff:GetRowCount()
 		for i = 2, nCount do
 			local tLine = RaidPanelBuff:GetRow(i)
-			if (tLine.dwMapID == dwMapID or tLine.dwMapID == 0)
-			and (tLine.dwMountKungfuID == dwMountKungfuID or tLine.dwMountKungfuID == 0) then
+			if (not tLine.dwMapID or tLine.dwMapID == dwMapID or tLine.dwMapID == 0)
+			and (not tLine.szMapID or X.lodash.includes(X.SplitString(tLine.szMapID, ';'), szMapID))
+			and (not tLine.dwMountKungfuID or tLine.dwMountKungfuID == dwMountKungfuID or tLine.dwMountKungfuID == 0) then
 				local v = {
 					dwID = tLine.dwBuffID,
 					nLevel = X.IIf(tLine.nBuffLevel > 0, tLine.nBuffLevel, nil),
