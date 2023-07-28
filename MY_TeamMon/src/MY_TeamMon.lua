@@ -20,7 +20,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^15.0.0') then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 local bRestricted = X.ENVIRONMENT.GAME_BRANCH == 'classic'
-X.RegisterRestriction('MY_TeamMon', { ['*'] = false, classic = true })
+X.RegisterRestriction('MY_TeamMon', { ['*'] = false })
 X.RegisterRestriction('MY_TeamMon.MapRestriction', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.HiddenBuff', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.HiddenSkill', { ['*'] = true })

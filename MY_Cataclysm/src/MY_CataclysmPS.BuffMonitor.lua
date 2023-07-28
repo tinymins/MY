@@ -18,7 +18,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^15.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
-X.RegisterRestriction('MY_Cataclysm_BuffMonitor', { ['*'] = false, classic = true })
+X.RegisterRestriction('MY_Cataclysm_BuffMonitor', { ['*'] = false })
 --------------------------------------------------------------------------------
 
 local D = {

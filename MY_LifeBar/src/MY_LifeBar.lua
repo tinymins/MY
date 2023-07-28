@@ -21,7 +21,7 @@ if not IsLocalFileExist(X.FormatPath({'config/restriction/lifebar.jx3dat', X.PAT
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
-X.RegisterRestriction('MY_LifeBar', { ['*'] = false, classic = true })
+X.RegisterRestriction('MY_LifeBar', { ['*'] = false })
 X.RegisterRestriction('MY_LifeBar.MapRestriction', { ['*'] = true })
 X.RegisterRestriction('MY_LifeBar.SpecialNpc', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------

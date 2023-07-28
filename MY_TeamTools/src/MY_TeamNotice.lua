@@ -219,18 +219,16 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			end,
 		})
 		x, y = 11, 130
-		local bTeamMon = MY_TeamMon_Subscribe and X.ENVIRONMENT.GAME_BRANCH ~= 'classic'
-		local nBtnW = bTeamMon and 96 or 144
 		x = x + ui:Append('WndButton', {
 			name = 'WndBtn_RaidTools',
-			x = x, y = y, w = nBtnW,
+			x = x, y = y, w = 96,
 			text = _L['MY_TeamTools'],
 			buttonStyle = 'FLAT',
 			onClick = MY_TeamTools.Toggle,
 		}):AutoWidth():Width() + 5
 		x = x + ui:Append('WndButton', {
 			name = 'WndBtn_GKP',
-			x = x, y = y, w = nBtnW,
+			x = x, y = y, w = 96,
 			text = _L['GKP Golden Team Record'],
 			buttonStyle = 'FLAT',
 			onClick = function()
@@ -244,7 +242,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 		if bTeamMon then
 			x = x + ui:Append('WndButton', {
 				name = 'WndBtn_TeamMon',
-				x = x, y = y, w = nBtnW,
+				x = x, y = y, w = 96,
 				text = _L['Import Data'],
 				buttonStyle = 'FLAT',
 				onClick = MY_TeamMon_Subscribe.OpenPanel,
