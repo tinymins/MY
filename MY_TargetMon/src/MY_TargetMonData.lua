@@ -45,7 +45,12 @@ local function FilterMonitors(monitors, dwMapID, dwKungfuID)
 	for i, mon in ipairs(monitors) do
 		if mon.enable
 		and (not next(mon.maps) or mon.maps.all or mon.maps[dwMapID])
-		and (not next(mon.kungfus) or mon.kungfus.all or mon.kungfus[dwKungfuID]) then
+		and (not next(mon.kungfus) or mon.kungfus.all or mon.kungfus[dwKungfuID]
+			or ( -- 藏剑不区分心法
+				(dwKungfuID == X.CONSTANT.KUNGFU_TYPE.WEN_SHUI or dwKungfuID == X.CONSTANT.KUNGFU_TYPE.SHAN_JU)
+				and (mon.kungfus[X.CONSTANT.KUNGFU_TYPE.WEN_SHUI] or mon.kungfus[X.CONSTANT.KUNGFU_TYPE.SHAN_JU])
+			)
+		) then
 			table.insert(ret, mon)
 		end
 	end
@@ -74,9 +79,8 @@ end
 local function onFilterChange()
 	CACHE_CONFIG = nil
 end
-X.RegisterEvent('LOADING_END', 'MY_TargetMonData', onFilterChange)
-X.RegisterEvent('SKILL_MOUNT_KUNG_FU', 'MY_TargetMonData', onFilterChange)
-X.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', 'MY_TargetMonData', onFilterChange)
+X.RegisterInit('MY_TargetMonData', onFilterChange)
+X.RegisterKungfuMount('MY_TargetMonData', onFilterChange)
 X.RegisterEvent('MY_TARGET_MON_MONITOR_CHANGE', 'MY_TargetMonData', onFilterChange)
 
 local function onTargetMonReload()

@@ -370,7 +370,6 @@ function MY_TargetMonView.OnFrameCreate()
 	this.hList.FormatAllItemPosExt = FormatAllItemPosExt
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('HOT_KEY_RELOADED')
-	this:RegisterEvent('SKILL_MOUNT_KUNG_FU')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	D.ResetScale(this)
