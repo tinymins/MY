@@ -243,11 +243,20 @@ do
 local KUNGFU_CHANGE_EVENT = { szName = 'KungfuChange', bSingleEvent = true }
 local CommonEventFirer = X.CommonEventFirer
 local CommonEventRegister = X.CommonEventRegister
+local dwLastKungfuMountID = nil
+local dwLastKungfuMountLevel = nil
+local function OnSkillUnmountKungfu()
+	dwLastKungfuMountID = arg0
+	dwLastKungfuMountLevel = arg1
+end
+X.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', OnSkillUnmountKungfu)
 local function OnSkillMountKungfu()
-	if X.CONSTANT.KUNGFU_FORCE_TYPE[arg0] == X.CONSTANT.FORCE_TYPE.CANG_JIAN then
+	if dwLastKungfuMountID
+	and X.CONSTANT.KUNGFU_FORCE_TYPE[arg0] == X.CONSTANT.FORCE_TYPE.CANG_JIAN
+	and X.CONSTANT.KUNGFU_FORCE_TYPE[dwLastKungfuMountID] == X.CONSTANT.FORCE_TYPE.CANG_JIAN then
 		return
 	end
-	CommonEventFirer(KUNGFU_CHANGE_EVENT, arg0)
+	CommonEventFirer(KUNGFU_CHANGE_EVENT, arg0, arg1, dwLastKungfuMountID, dwLastKungfuMountLevel)
 end
 X.RegisterEvent('SKILL_MOUNT_KUNG_FU', OnSkillMountKungfu)
 
