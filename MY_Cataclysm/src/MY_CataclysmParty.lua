@@ -152,10 +152,10 @@ local HIDE_FORCE = {
 }
 local function IsPlayerManaHide(dwForceID, dwMountType)
 	if dwMountType then
-		if dwMountType == X.CONSTANT.KUNGFU_TYPE.CANG_JIAN or           --藏剑
-			dwMountType == X.CONSTANT.KUNGFU_TYPE.TANG_MEN or           --唐门
-			dwMountType == X.CONSTANT.KUNGFU_TYPE.MING_JIAO or          --明教
-			dwMountType == X.CONSTANT.KUNGFU_TYPE.CANG_YUN then         --苍云
+		if dwMountType == X.CONSTANT.KUNGFU_MOUNT_TYPE.CANG_JIAN or           --藏剑
+			dwMountType == X.CONSTANT.KUNGFU_MOUNT_TYPE.TANG_MEN or           --唐门
+			dwMountType == X.CONSTANT.KUNGFU_MOUNT_TYPE.MING_JIAO or          --明教
+			dwMountType == X.CONSTANT.KUNGFU_MOUNT_TYPE.CANG_YUN then         --苍云
 			return true
 		else
 			return false
@@ -252,7 +252,7 @@ local function InsertChangeGroupMenu(tMenu, dwMemberID)
 end
 
 -- 有各个版本之间的文本差异，所以做到翻译中
-local CTM_KUNGFU_TEXT = X.CONSTANT.KUNGFU_NAME_ABBREVIATION
+local CTM_KUNGFU_TEXT = X.CONSTANT.KUNGFU_TYPE_LABEL_ABBR
 
 -- CODE --
 local CTM = {}
