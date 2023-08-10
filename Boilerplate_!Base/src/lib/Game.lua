@@ -3322,6 +3322,18 @@ X.RegisterEvent('SKILL_MOUNT_KUNG_FU', onKungfuChange)
 X.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', onKungfuChange)
 end
 
+-- 判断两个心法ID是不是同一心法，藏剑视为单心法
+function X.IsSameKungfu(dwID1, dwID2)
+	if dwID1 == dwID2 then
+		return true
+	end
+	if X.CONSTANT.KUNGFU_FORCE_TYPE[dwID1] == X.CONSTANT.FORCE_TYPE.CANG_JIAN
+	and X.CONSTANT.KUNGFU_FORCE_TYPE[dwID2] == X.CONSTANT.FORCE_TYPE.CANG_JIAN then
+		return true
+	end
+	return false
+end
+
 do
 local SKILL_CACHE = setmetatable({}, { __mode = 'v' })
 local SKILL_PROXY = setmetatable({}, { __mode = 'v' })
