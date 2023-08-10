@@ -62,6 +62,48 @@ local TEAM_MARK = {
 	FAN   = 10,
 }
 
+-- skillid, uitex, frame
+local KUNGFU_LIST = {
+	-- MT
+	{ dwForceID = FORCE_TYPE.TIAN_CE  , dwID = 10062, nIcon = 632  , szUITex = 'ui/Image/icon/skill_tiance01.UITex'    , nFrame = 0  }, -- 天策 铁牢律
+	{ dwForceID = FORCE_TYPE.MING_JIAO, dwID = 10243, nIcon = 3864 , szUITex = 'ui/Image/icon/mingjiao_taolu_7.UITex'  , nFrame = 0  }, -- 明教 明尊琉璃体
+	{ dwForceID = FORCE_TYPE.CANG_YUN , dwID = 10389, nIcon = 6315 , szUITex = 'ui/Image/icon/Skill_CangY_33.UITex'    , nFrame = 0  }, -- 苍云 铁骨衣
+	{ dwForceID = FORCE_TYPE.SHAO_LIN , dwID = 10002, nIcon = 429  , szUITex = 'ui/Image/icon/skill_shaolin14.UITex'   , nFrame = 0  }, -- 少林 洗髓经
+	-- 治疗
+	{ dwForceID = FORCE_TYPE.QI_XIU   , dwID = 10080, nIcon = 887  , szUITex = 'ui/Image/icon/skill_qixiu02.UITex'     , nFrame = 0  }, -- 七秀 云裳心经
+	{ dwForceID = FORCE_TYPE.WU_DU    , dwID = 10176, nIcon = 2767 , szUITex = 'ui/Image/icon/wudu_neigong_2.UITex'    , nFrame = 0  }, -- 五毒 补天诀
+	{ dwForceID = FORCE_TYPE.WAN_HUA  , dwID = 10028, nIcon = 412  , szUITex = 'ui/Image/icon/skill_wanhua23.UITex'    , nFrame = 0  }, -- 万花 离经易道
+	{ dwForceID = FORCE_TYPE.CHANG_GE , dwID = 10448, nIcon = 7067 , szUITex = 'ui/Image/icon/skill_0514_23.UITex'     , nFrame = 0  }, -- 长歌 相知
+	{ dwForceID = FORCE_TYPE.YAO_ZONG , dwID = 10626, nIcon = 15593, szUITex = 'ui/image/icon/skill_21_9_10_1.UITex '  , nFrame = 0  }, -- 药宗 灵素
+	-- 内功
+	{ dwForceID = FORCE_TYPE.TANG_MEN , dwID = 10225, nIcon = 3184 , szUITex = 'ui/Image/icon/skill_tangm_20.UITex'    , nFrame = 0  }, -- 唐门 天罗诡道
+	{ dwForceID = FORCE_TYPE.QI_XIU   , dwID = 10081, nIcon = 888  , szUITex = 'ui/Image/icon/skill_qixiu03.UITex'     , nFrame = 0  }, -- 七秀 冰心诀
+	{ dwForceID = FORCE_TYPE.WU_DU    , dwID = 10175, nIcon = 2766 , szUITex = 'ui/Image/icon/wudu_neigong_1.UITex'    , nFrame = 0  }, -- 五毒 毒经
+	{ dwForceID = FORCE_TYPE.MING_JIAO, dwID = 10242, nIcon = 3865 , szUITex = 'ui/Image/icon/mingjiao_taolu_8.UITex'  , nFrame = 0  }, -- 明教 焚影圣诀
+	{ dwForceID = FORCE_TYPE.CHUN_YANG, dwID = 10014, nIcon = 627  , szUITex = 'ui/Image/icon/skill_chunyang21.UITex'  , nFrame = 0  }, -- 纯阳 紫霞功
+	{ dwForceID = FORCE_TYPE.WAN_HUA  , dwID = 10021, nIcon = 406  , szUITex = 'ui/Image/icon/skill_wanhua17.UITex'    , nFrame = 0  }, -- 万花 花间游
+	{ dwForceID = FORCE_TYPE.SHAO_LIN , dwID = 10003, nIcon = 425  , szUITex = 'ui/Image/icon/skill_shaolin10.UITex'   , nFrame = 0  }, -- 少林 易经经
+	{ dwForceID = FORCE_TYPE.CHANG_GE , dwID = 10447, nIcon = 7071 , szUITex = 'ui/Image/icon/skill_0514_27.UITex'     , nFrame = 0  }, -- 长歌 莫问
+	{ dwForceID = FORCE_TYPE.YAN_TIAN , dwID = 10615, nIcon = 13894, szUITex = 'ui/image/icon/skill_20_9_14_1.uitex'   , nFrame = 0  }, -- 衍天 太玄经
+	{ dwForceID = FORCE_TYPE.YAO_ZONG , dwID = 10627, nIcon = 15594, szUITex = 'ui/image/icon/skill_21_9_10_2.UITex '  , nFrame = 0  }, -- 药宗 无方
+	-- 外功
+	{ dwForceID = FORCE_TYPE.CANG_YUN , dwID = 10390, nIcon = 6314 , szUITex = 'ui/Image/icon/Skill_CangY_32.UITex'    , nFrame = 0  }, -- 苍云 分山劲
+	{ dwForceID = FORCE_TYPE.TANG_MEN , dwID = 10224, nIcon = 3165 , szUITex = 'ui/Image/icon/skill_tangm_01.UITex'    , nFrame = 0  }, -- 唐门 惊羽诀
+	{ dwForceID = FORCE_TYPE.CANG_JIAN, dwID = 10144, nIcon = 2376 , szUITex = 'ui/Image/icon/cangjian_neigong_1.UITex', nFrame = 0  }, -- 藏剑 问水诀
+	{ dwForceID = FORCE_TYPE.CANG_JIAN, dwID = 10145, nIcon = 2377 , szUITex = 'ui/Image/icon/cangjian_neigong_2.UITex', nFrame = 0  }, -- 藏剑 山居剑意
+	{ dwForceID = FORCE_TYPE.CHUN_YANG, dwID = 10015, nIcon = 619  , szUITex = 'ui/Image/icon/skill_chunyang13.UITex'  , nFrame = 0  }, -- 纯阳 太虚剑意
+	{ dwForceID = FORCE_TYPE.TIAN_CE  , dwID = 10026, nIcon = 633  , szUITex = 'ui/Image/icon/skill_tiance02.UITex'    , nFrame = 0  }, -- 天策 傲血战意
+	{ dwForceID = FORCE_TYPE.GAI_BANG , dwID = 10268, nIcon = 4610 , szUITex = 'ui/Image/icon/skill_GB_30.UITex'       , nFrame = 0  }, -- 丐帮 笑尘诀
+	{ dwForceID = FORCE_TYPE.BA_DAO   , dwID = 10464, nIcon = 8424 , szUITex = 'ui/Image/icon/daoj_16_8_25_16.UITex'   , nFrame = 0  }, -- 霸刀 北傲诀
+	{ dwForceID = FORCE_TYPE.PENG_LAI , dwID = 10533, nIcon = 10709, szUITex = 'ui/image/icon/JNPL_18_10_30_27.uitex'  , nFrame = 0  }, -- 蓬莱 凌海诀
+	{ dwForceID = FORCE_TYPE.LING_XUE , dwID = 10585, nIcon = 12128, szUITex = 'ui/image/icon/JNLXG_19_10_21_9.uitex'  , nFrame = 0  }, -- 凌雪 隐龙诀
+}
+for i, v in X.ipairs_r(KUNGFU_LIST) do
+	if not v.dwForceID or not Table_GetSkill(v.dwID) then
+		table.remove(KUNGFU_LIST, i)
+	end
+end
+
 local CONSTANT = {
 	MENU_DIVIDER = X.SetmetaReadonly({ bDevide = true }),
 	EMPTY_TABLE = X.SetmetaReadonly({}),
@@ -297,51 +339,14 @@ local CONSTANT = {
 		[3115] = '{$I5,11092}', -- 仙崖石花
 		[3116] = '{$I5,11093}', -- 顾渚紫笋
 	},
-	KUNGFU_LIST = (function()
-		-- skillid, uitex, frame
-		local KUNGFU_LIST = {
-			-- MT
-			{ dwForceID = FORCE_TYPE.TIAN_CE  , dwID = 10062, nIcon = 632  , szUITex = 'ui/Image/icon/skill_tiance01.UITex'    , nFrame = 0  }, -- 天策 铁牢律
-			{ dwForceID = FORCE_TYPE.MING_JIAO, dwID = 10243, nIcon = 3864 , szUITex = 'ui/Image/icon/mingjiao_taolu_7.UITex'  , nFrame = 0  }, -- 明教 明尊琉璃体
-			{ dwForceID = FORCE_TYPE.CANG_YUN , dwID = 10389, nIcon = 6315 , szUITex = 'ui/Image/icon/Skill_CangY_33.UITex'    , nFrame = 0  }, -- 苍云 铁骨衣
-			{ dwForceID = FORCE_TYPE.SHAO_LIN , dwID = 10002, nIcon = 429  , szUITex = 'ui/Image/icon/skill_shaolin14.UITex'   , nFrame = 0  }, -- 少林 洗髓经
-			-- 治疗
-			{ dwForceID = FORCE_TYPE.QI_XIU   , dwID = 10080, nIcon = 887  , szUITex = 'ui/Image/icon/skill_qixiu02.UITex'     , nFrame = 0  }, -- 七秀 云裳心经
-			{ dwForceID = FORCE_TYPE.WU_DU    , dwID = 10176, nIcon = 2767 , szUITex = 'ui/Image/icon/wudu_neigong_2.UITex'    , nFrame = 0  }, -- 五毒 补天诀
-			{ dwForceID = FORCE_TYPE.WAN_HUA  , dwID = 10028, nIcon = 412  , szUITex = 'ui/Image/icon/skill_wanhua23.UITex'    , nFrame = 0  }, -- 万花 离经易道
-			{ dwForceID = FORCE_TYPE.CHANG_GE , dwID = 10448, nIcon = 7067 , szUITex = 'ui/Image/icon/skill_0514_23.UITex'     , nFrame = 0  }, -- 长歌 相知
-			{ dwForceID = FORCE_TYPE.YAO_ZONG , dwID = 10626, nIcon = 15593, szUITex = 'ui/image/icon/skill_21_9_10_1.UITex '  , nFrame = 0  }, -- 药宗 灵素
-			-- 内功
-			{ dwForceID = FORCE_TYPE.TANG_MEN , dwID = 10225, nIcon = 3184 , szUITex = 'ui/Image/icon/skill_tangm_20.UITex'    , nFrame = 0  }, -- 唐门 天罗诡道
-			{ dwForceID = FORCE_TYPE.QI_XIU   , dwID = 10081, nIcon = 888  , szUITex = 'ui/Image/icon/skill_qixiu03.UITex'     , nFrame = 0  }, -- 七秀 冰心诀
-			{ dwForceID = FORCE_TYPE.WU_DU    , dwID = 10175, nIcon = 2766 , szUITex = 'ui/Image/icon/wudu_neigong_1.UITex'    , nFrame = 0  }, -- 五毒 毒经
-			{ dwForceID = FORCE_TYPE.MING_JIAO, dwID = 10242, nIcon = 3865 , szUITex = 'ui/Image/icon/mingjiao_taolu_8.UITex'  , nFrame = 0  }, -- 明教 焚影圣诀
-			{ dwForceID = FORCE_TYPE.CHUN_YANG, dwID = 10014, nIcon = 627  , szUITex = 'ui/Image/icon/skill_chunyang21.UITex'  , nFrame = 0  }, -- 纯阳 紫霞功
-			{ dwForceID = FORCE_TYPE.WAN_HUA  , dwID = 10021, nIcon = 406  , szUITex = 'ui/Image/icon/skill_wanhua17.UITex'    , nFrame = 0  }, -- 万花 花间游
-			{ dwForceID = FORCE_TYPE.SHAO_LIN , dwID = 10003, nIcon = 425  , szUITex = 'ui/Image/icon/skill_shaolin10.UITex'   , nFrame = 0  }, -- 少林 易经经
-			{ dwForceID = FORCE_TYPE.CHANG_GE , dwID = 10447, nIcon = 7071 , szUITex = 'ui/Image/icon/skill_0514_27.UITex'     , nFrame = 0  }, -- 长歌 莫问
-			{ dwForceID = FORCE_TYPE.YAN_TIAN , dwID = 10615, nIcon = 13894, szUITex = 'ui/image/icon/skill_20_9_14_1.uitex'   , nFrame = 0  }, -- 衍天 太玄经
-			{ dwForceID = FORCE_TYPE.YAO_ZONG , dwID = 10627, nIcon = 15594, szUITex = 'ui/image/icon/skill_21_9_10_2.UITex '  , nFrame = 0  }, -- 药宗 无方
-			-- 外功
-			{ dwForceID = FORCE_TYPE.CANG_YUN , dwID = 10390, nIcon = 6314 , szUITex = 'ui/Image/icon/Skill_CangY_32.UITex'    , nFrame = 0  }, -- 苍云 分山劲
-			{ dwForceID = FORCE_TYPE.TANG_MEN , dwID = 10224, nIcon = 3165 , szUITex = 'ui/Image/icon/skill_tangm_01.UITex'    , nFrame = 0  }, -- 唐门 惊羽诀
-			{ dwForceID = FORCE_TYPE.CANG_JIAN, dwID = 10144, nIcon = 2376 , szUITex = 'ui/Image/icon/cangjian_neigong_1.UITex', nFrame = 0  }, -- 藏剑 问水诀
-			{ dwForceID = FORCE_TYPE.CANG_JIAN, dwID = 10145, nIcon = 2377 , szUITex = 'ui/Image/icon/cangjian_neigong_2.UITex', nFrame = 0  }, -- 藏剑 山居剑意
-			{ dwForceID = FORCE_TYPE.CHUN_YANG, dwID = 10015, nIcon = 619  , szUITex = 'ui/Image/icon/skill_chunyang13.UITex'  , nFrame = 0  }, -- 纯阳 太虚剑意
-			{ dwForceID = FORCE_TYPE.TIAN_CE  , dwID = 10026, nIcon = 633  , szUITex = 'ui/Image/icon/skill_tiance02.UITex'    , nFrame = 0  }, -- 天策 傲血战意
-			{ dwForceID = FORCE_TYPE.GAI_BANG , dwID = 10268, nIcon = 4610 , szUITex = 'ui/Image/icon/skill_GB_30.UITex'       , nFrame = 0  }, -- 丐帮 笑尘诀
-			{ dwForceID = FORCE_TYPE.BA_DAO   , dwID = 10464, nIcon = 8424 , szUITex = 'ui/Image/icon/daoj_16_8_25_16.UITex'   , nFrame = 0  }, -- 霸刀 北傲诀
-			{ dwForceID = FORCE_TYPE.PENG_LAI , dwID = 10533, nIcon = 10709, szUITex = 'ui/image/icon/JNPL_18_10_30_27.uitex'  , nFrame = 0  }, -- 蓬莱 凌海诀
-			{ dwForceID = FORCE_TYPE.LING_XUE , dwID = 10585, nIcon = 12128, szUITex = 'ui/image/icon/JNLXG_19_10_21_9.uitex'  , nFrame = 0  }, -- 凌雪 隐龙诀
-		}
+	KUNGFU_LIST = KUNGFU_LIST,
+	KUNGFU_FORCE_TYPE = ((function()
 		local res = {}
-		for _, v in ipairs(KUNGFU_LIST) do
-			if v.dwForceID and Table_GetSkill(v.dwID) then
-				table.insert(res, v)
-			end
+		for i, v in ipairs(KUNGFU_LIST) do
+			res[v.dwID] = v.dwForceID
 		end
 		return res
-	end)(),
+	end)()),
 	KUNGFU_NAME_ABBREVIATION = setmetatable(X.Clone(_L.KUNGFU_NAME_ABBREVIATION), {
 		__index = function(t)
 			return _L.KUNGFU_NAME_ABBREVIATION[0]
