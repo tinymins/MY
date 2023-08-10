@@ -466,6 +466,9 @@ end
 
 function D.OnEvent(event)
 	if event == 'SKILL_MOUNT_KUNG_FU' or event == 'SKILL_UNMOUNT_KUNG_FU' then
+		if X.CONSTANT.KUNGFU_FORCE_TYPE[arg0] == X.CONSTANT.FORCE_TYPE.CANG_JIAN then
+			return
+		end
 		D.CopyHandle(this)
 		D.Update(this)
 	elseif event == 'DO_SKILL_CAST' then
