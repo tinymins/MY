@@ -49,6 +49,31 @@ local FORCE_TYPE = (function()
 	return X.SetmetaReadonly(res)
 end)()
 
+local FORCE_LIST = {
+	{ dwID = FORCE_TYPE.JIANG_HU , szUITex = 'ui\\Image\\PlayerAvatar\\jianghu.tga'       , nFrame = -2, bAnimate = false }, -- Ω≠∫˛
+	{ dwID = FORCE_TYPE.SHAO_LIN , szUITex = 'ui\\Image\\PlayerAvatar\\shaolin.tga'       , nFrame = -2, bAnimate = false }, -- …Ÿ¡÷
+	{ dwID = FORCE_TYPE.WAN_HUA  , szUITex = 'ui\\Image\\PlayerAvatar\\wanhua.tga'        , nFrame = -2, bAnimate = false }, -- ÕÚª®
+	{ dwID = FORCE_TYPE.TIAN_CE  , szUITex = 'ui\\Image\\PlayerAvatar\\tiance.tga'        , nFrame = -2, bAnimate = false }, -- ÃÏ≤ﬂ
+	{ dwID = FORCE_TYPE.CHUN_YANG, szUITex = 'ui\\Image\\PlayerAvatar\\chunyang.tga'      , nFrame = -2, bAnimate = false }, -- ¥ø—Ù
+	{ dwID = FORCE_TYPE.QI_XIU   , szUITex = 'ui\\Image\\PlayerAvatar\\qixiu.tga'         , nFrame = -2, bAnimate = false }, -- ∆ﬂ–„
+	{ dwID = FORCE_TYPE.WU_DU    , szUITex = 'ui\\Image\\PlayerAvatar\\wudu.tga'          , nFrame = -2, bAnimate = false }, -- ŒÂ∂æ
+	{ dwID = FORCE_TYPE.TANG_MEN , szUITex = 'ui\\Image\\PlayerAvatar\\tangmen.tga'       , nFrame = -2, bAnimate = false }, -- Ã∆√≈
+	{ dwID = FORCE_TYPE.CANG_JIAN, szUITex = 'ui\\Image\\PlayerAvatar\\cangjian.tga'      , nFrame = -2, bAnimate = false }, -- ≤ÿΩ£
+	{ dwID = FORCE_TYPE.GAI_BANG , szUITex = 'ui\\Image\\PlayerAvatar\\gaibang.tga'       , nFrame = -2, bAnimate = false }, -- ÿ§∞Ô
+	{ dwID = FORCE_TYPE.MING_JIAO, szUITex = 'ui\\Image\\PlayerAvatar\\mingjiao.tga'      , nFrame = -2, bAnimate = false }, -- √˜ΩÃ
+	{ dwID = FORCE_TYPE.CANG_YUN , szUITex = 'ui\\Image\\PlayerAvatar\\cangyun.tga'       , nFrame = -2, bAnimate = false }, -- ≤‘‘∆
+	{ dwID = FORCE_TYPE.CHANG_GE , szUITex = 'ui\\Image\\PlayerAvatar\\changge.tga'       , nFrame = -2, bAnimate = false }, -- ≥§∏Ë
+	{ dwID = FORCE_TYPE.BA_DAO   , szUITex = 'ui\\Image\\PlayerAvatar\\badao.tga'         , nFrame = -2, bAnimate = false }, -- ∞‘µ∂
+	{ dwID = FORCE_TYPE.PENG_LAI , szUITex = 'ui\\Image\\PlayerAvatar\\penglai.tga'       , nFrame = -2, bAnimate = false }, -- ≈Ó¿≥
+	{ dwID = FORCE_TYPE.LING_XUE , szUITex = 'ui\\Image\\PlayerAvatar\\lingxuege.tga'     , nFrame = -2, bAnimate = false }, -- ¡Ë—©
+	{ dwID = FORCE_TYPE.YAO_ZONG , szUITex = 'ui\\Image\\PlayerAvatar\\beitianyaozong.dds', nFrame = -2, bAnimate = false }, -- “©◊⁄
+}
+for i, v in X.ipairs_r(FORCE_LIST) do
+	if not v.dwID or not g_tStrings.tForceTitle[v.dwID] then
+		table.remove(FORCE_LIST, i)
+	end
+end
+
 local KUNGFU_TYPE = (function()
 	local KUNGFU_TYPE = {
 		XI_SUI    = 10002, -- …Ÿ¡÷ œ¥ÀËæ≠
@@ -129,31 +154,6 @@ local KUNGFU_LIST = {
 for i, v in X.ipairs_r(KUNGFU_LIST) do
 	if not v.dwForceID or not Table_GetSkill(v.dwID) then
 		table.remove(KUNGFU_LIST, i)
-	end
-end
-
-local FORCE_LIST = {
-	{ dwID = FORCE_TYPE.JIANG_HU , szUITex = 'ui\\Image\\PlayerAvatar\\jianghu.tga'       , nFrame = -2, bAnimate = false }, -- Ω≠∫˛
-	{ dwID = FORCE_TYPE.SHAO_LIN , szUITex = 'ui\\Image\\PlayerAvatar\\shaolin.tga'       , nFrame = -2, bAnimate = false }, -- …Ÿ¡÷
-	{ dwID = FORCE_TYPE.WAN_HUA  , szUITex = 'ui\\Image\\PlayerAvatar\\wanhua.tga'        , nFrame = -2, bAnimate = false }, -- ÕÚª®
-	{ dwID = FORCE_TYPE.TIAN_CE  , szUITex = 'ui\\Image\\PlayerAvatar\\tiance.tga'        , nFrame = -2, bAnimate = false }, -- ÃÏ≤ﬂ
-	{ dwID = FORCE_TYPE.CHUN_YANG, szUITex = 'ui\\Image\\PlayerAvatar\\chunyang.tga'      , nFrame = -2, bAnimate = false }, -- ¥ø—Ù
-	{ dwID = FORCE_TYPE.QI_XIU   , szUITex = 'ui\\Image\\PlayerAvatar\\qixiu.tga'         , nFrame = -2, bAnimate = false }, -- ∆ﬂ–„
-	{ dwID = FORCE_TYPE.WU_DU    , szUITex = 'ui\\Image\\PlayerAvatar\\wudu.tga'          , nFrame = -2, bAnimate = false }, -- ŒÂ∂æ
-	{ dwID = FORCE_TYPE.TANG_MEN , szUITex = 'ui\\Image\\PlayerAvatar\\tangmen.tga'       , nFrame = -2, bAnimate = false }, -- Ã∆√≈
-	{ dwID = FORCE_TYPE.CANG_JIAN, szUITex = 'ui\\Image\\PlayerAvatar\\cangjian.tga'      , nFrame = -2, bAnimate = false }, -- ≤ÿΩ£
-	{ dwID = FORCE_TYPE.GAI_BANG , szUITex = 'ui\\Image\\PlayerAvatar\\gaibang.tga'       , nFrame = -2, bAnimate = false }, -- ÿ§∞Ô
-	{ dwID = FORCE_TYPE.MING_JIAO, szUITex = 'ui\\Image\\PlayerAvatar\\mingjiao.tga'      , nFrame = -2, bAnimate = false }, -- √˜ΩÃ
-	{ dwID = FORCE_TYPE.CANG_YUN , szUITex = 'ui\\Image\\PlayerAvatar\\cangyun.tga'       , nFrame = -2, bAnimate = false }, -- ≤‘‘∆
-	{ dwID = FORCE_TYPE.CHANG_GE , szUITex = 'ui\\Image\\PlayerAvatar\\changge.tga'       , nFrame = -2, bAnimate = false }, -- ≥§∏Ë
-	{ dwID = FORCE_TYPE.BA_DAO   , szUITex = 'ui\\Image\\PlayerAvatar\\badao.tga'         , nFrame = -2, bAnimate = false }, -- ∞‘µ∂
-	{ dwID = FORCE_TYPE.PENG_LAI , szUITex = 'ui\\Image\\PlayerAvatar\\penglai.tga'       , nFrame = -2, bAnimate = false }, -- ≈Ó¿≥
-	{ dwID = FORCE_TYPE.LING_XUE , szUITex = 'ui\\Image\\PlayerAvatar\\lingxuege.tga'     , nFrame = -2, bAnimate = false }, -- ¡Ë—©
-	{ dwID = FORCE_TYPE.YAO_ZONG , szUITex = 'ui\\Image\\PlayerAvatar\\beitianyaozong.dds', nFrame = -2, bAnimate = false }, -- “©◊⁄
-}
-for i, v in X.ipairs_r(FORCE_LIST) do
-	if not v.dwID or not g_tStrings.tForceTitle[v.dwID] then
-		table.remove(FORCE_LIST, i)
 	end
 end
 

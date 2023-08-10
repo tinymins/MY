@@ -1086,47 +1086,6 @@ end
 end
 
 do
-local FORCE_LIST
-function X.GetForceIDS()
-	FORCE_LIST = {}
-	for _, dwForceID in X.pairs_c(X.CONSTANT.FORCE_TYPE) do
-		if dwForceID ~= X.CONSTANT.FORCE_TYPE.JIANG_HU then
-			table.insert(FORCE_LIST, dwForceID)
-		end
-	end
-	return FORCE_LIST
-end
-end
-
-do
-local ORDER = {}
-for i, p in ipairs(X.CONSTANT.KUNGFU_LIST) do
-	ORDER[p.dwID] = i
-end
-local KUNGFU_LIST
-function X.GetKungfuIDS()
-	if not KUNGFU_LIST then
-		KUNGFU_LIST = {}
-		for _, dwForceID in ipairs(X.GetForceIDS()) do
-			for _, dwKungfuID in ipairs(X.GetForceKungfuIDS(dwForceID)) do
-				table.insert(KUNGFU_LIST, dwKungfuID)
-			end
-		end
-		table.sort(KUNGFU_LIST, function(p1, p2)
-			if not ORDER[p2] then
-				return true
-			end
-			if not ORDER[p1] then
-				return false
-			end
-			return ORDER[p1] < ORDER[p2]
-		end)
-	end
-	return KUNGFU_LIST
-end
-end
-
-do
 local KUNGFU_NAME_CACHE = {}
 local KUNGFU_SHORT_NAME_CACHE = {}
 function X.GetKungfuName(dwKungfuID, szType)
@@ -3176,10 +3135,10 @@ RegisterEvent('ON_SKILL_REPLACE', OnSkillReplace)
 RegisterEvent('CHANGE_SKILL_ICON', OnSkillReplace)
 
 -- 获取一个心法的技能列表
--- X.GetKungfuSkillIDS(dwKungfuID)
+-- X.GetKungfuSkillIDs(dwKungfuID)
 -- 获取一个套路的技能列表
--- X.GetKungfuSkillIDS(dwKungfuID, dwMountKungfu)
-function X.GetKungfuSkillIDS(dwKungfuID, dwMountKungfu)
+-- X.GetKungfuSkillIDs(dwKungfuID, dwMountKungfu)
+function X.GetKungfuSkillIDs(dwKungfuID, dwMountKungfu)
 	if not dwMountKungfu then
 		dwMountKungfu = 0
 	end
@@ -3197,8 +3156,8 @@ function X.GetKungfuSkillIDS(dwKungfuID, dwMountKungfu)
 				aSkillID = _G.Table_GetKungfuSkillList(dwKungfuID)
 			else
 				aSkillID = {}
-				for _, dwMKungfuID in ipairs(X.GetMKungfuIDS(dwKungfuID)) do
-					for _, dwSkillID in ipairs(X.GetKungfuSkillIDS(dwKungfuID, dwMKungfuID)) do
+				for _, dwMKungfuID in ipairs(X.GetMKungfuIDs(dwKungfuID)) do
+					for _, dwSkillID in ipairs(X.GetKungfuSkillIDs(dwKungfuID, dwMKungfuID)) do
 						table.insert(aSkillID, dwSkillID)
 					end
 				end
@@ -3220,7 +3179,7 @@ end
 
 -- 获取内功心法子套路列表（P面板左侧每列标题即为套路名）
 do local CACHE = {}
-function X.GetMKungfuIDS(dwKungfuID)
+function X.GetMKungfuIDs(dwKungfuID)
 	if not CACHE[dwKungfuID] then
 		CACHE[dwKungfuID] = Table_GetMKungfuList(dwKungfuID) or X.CONSTANT.EMPTY_TABLE
 	end
@@ -3229,7 +3188,7 @@ end
 end
 
 do local CACHE = {}
-function X.GetForceKungfuIDS(dwForceID)
+function X.GetForceKungfuIDs(dwForceID)
 	if not CACHE[dwForceID] then
 		if X.IsFunction(_G.Table_GetSkillSchoolKungfu) then
 			-- 这个API真是莫名其妙，明明是Force-Kungfu对应表，标题非写成School-Kungfu对应表
@@ -3280,13 +3239,13 @@ function X.GetSchoolForceID(dwSchoolID)
 end
 end
 
-function X.GetTargetSkillIDS(tar)
+function X.GetTargetSkillIDs(tar)
 	local aSchoolID, aSkillID = tar.GetSchoolList(), {}
 	for _, dwSchoolID in ipairs(aSchoolID) do
 		local dwForceID = X.GetSchoolForceID(dwSchoolID)
-		local aKungfuID = X.GetForceKungfuIDS(dwForceID)
+		local aKungfuID = X.GetForceKungfuIDs(dwForceID)
 		for _, dwKungfuID in ipairs(aKungfuID) do
-			for _, dwSkillID in ipairs(X.GetKungfuSkillIDS(dwKungfuID)) do
+			for _, dwSkillID in ipairs(X.GetKungfuSkillIDs(dwKungfuID)) do
 				table.insert(aSkillID, dwSkillID)
 			end
 		end
@@ -3300,7 +3259,7 @@ function X.GetSkillMountList(bIncludePassive)
 	if not LIST then
 		LIST, LIST_ALL = {}, {}
 		local me = X.GetClientPlayer()
-		local aList = X.GetTargetSkillIDS(me)
+		local aList = X.GetTargetSkillIDs(me)
 		for _, dwID in ipairs(aList) do
 			local nLevel = me.GetSkillLevel(dwID)
 			if nLevel > 0 then
