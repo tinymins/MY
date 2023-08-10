@@ -326,11 +326,11 @@ local function DrawDetail(ui)
 				end,
 			},
 		}
-		for _, dwForceID in ipairs(X.GetForceIDS()) do
-			for i, dwKungfuID in ipairs(X.GetForceKungfuIDS(dwForceID) or {}) do
+		for _, force in ipairs(X.CONSTANT.FORCE_LIST) do
+			for i, dwKungfuID in ipairs(X.GetForceKungfuIDs(force.dwID) or {}) do
 				table.insert(t2, {
 					szOption = X.GetSkillName(dwKungfuID, 1),
-					rgb = {X.GetForceColor(dwForceID, 'foreground')},
+					rgb = {X.GetForceColor(force.dwID, 'foreground')},
 					bCheck = true,
 					bChecked = mon.kungfus[dwKungfuID],
 					fnAction = function()
@@ -364,11 +364,11 @@ local function DrawDetail(ui)
 				fnDisable = function() return mon.tarkungfus.all or X.IsEmpty(mon.tarkungfus) end,
 			},
 		}
-		for _, dwForceID in ipairs(X.GetForceIDS()) do
-			for i, dwKungfuID in ipairs(X.GetForceKungfuIDS(dwForceID) or {}) do
+		for _, force in ipairs(X.CONSTANT.FORCE_LIST) do
+			for i, dwKungfuID in ipairs(X.GetForceKungfuIDs(force.dwID) or {}) do
 				table.insert(t2, {
 					szOption = X.GetSkillName(dwKungfuID, 1),
-					rgb = {X.GetForceColor(dwForceID, 'foreground')},
+					rgb = {X.GetForceColor(force.dwID, 'foreground')},
 					bCheck = true,
 					bChecked = mon.tarkungfus[dwKungfuID],
 					fnAction = function()

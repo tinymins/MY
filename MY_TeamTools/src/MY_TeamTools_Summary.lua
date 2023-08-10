@@ -537,17 +537,17 @@ function D.UpdateList(page)
 	page.hProgress:Lookup('Image_Progress'):SetPercentage(nAvgScore / RT_SCORE_FULL)
 	page.hProgress:Lookup('Text_Progress'):SetText(_L('Team strength(%d/%d)', math.floor(nAvgScore), RT_SCORE_FULL))
 	-- 心法统计
-	for k, dwKungfuID in pairs(X.GetKungfuIDS()) do
+	for k, kungfu in pairs(X.CONSTANT.KUNGFU_LIST) do
 		local h = page.hKungfuList:Lookup(k - 1)
 		local img = h:Lookup('Image_Force')
 		local nCount = 0
-		if tKungfu[dwKungfuID] then
-			nCount = #tKungfu[dwKungfuID]
+		if tKungfu[kungfu.dwID] then
+			nCount = #tKungfu[kungfu.dwID]
 		end
-		local szName, nIcon = MY_GetSkillName(dwKungfuID)
+		local szName, nIcon = MY_GetSkillName(kungfu.dwID)
 		img:FromIconID(nIcon)
 		h:Lookup('Text_Num'):SetText(nCount)
-		if not tKungfu[dwKungfuID] then
+		if not tKungfu[kungfu.dwID] then
 			h:SetAlpha(60)
 			h.OnItemMouseEnter = nil
 		else
@@ -556,12 +556,12 @@ function D.UpdateList(page)
 				this:Lookup('Text_Num'):SetFontScheme(101)
 				local xml = {}
 				table.insert(xml, GetFormatText(szName .. g_tStrings.STR_COLON .. nCount .. g_tStrings.STR_PERSON ..'\n', 157))
-				table.sort(tKungfu[dwKungfuID], function(a, b)
+				table.sort(tKungfu[kungfu.dwID], function(a, b)
 					local nCountA = a.nEquipScore or -1
 					local nCountB = b.nEquipScore or -1
 					return nCountA > nCountB
 				end)
-				for k, v in ipairs(tKungfu[dwKungfuID]) do
+				for k, v in ipairs(tKungfu[kungfu.dwID]) do
 					if v.nEquipScore then
 						table.insert(xml, GetFormatText(v.szName .. g_tStrings.STR_COLON ..  v.nEquipScore  ..'\n', 106))
 					else
@@ -925,10 +925,10 @@ function D.OnInitPage()
 	this.hKungfuList = page:Lookup('Wnd_Summary', 'Handle_Kungfu/Handle_Kungfu_List')
 	this.hKungfu     = frame:CreateItemData(SZ_INI, 'Handle_Kungfu_Item')
 	this.hKungfuList:Clear()
-	for k, dwKungfuID in pairs(X.GetKungfuIDS()) do
-		local h = this.hKungfuList:AppendItemFromData(this.hKungfu, dwKungfuID)
+	for k, kungfu in pairs(X.CONSTANT.KUNGFU_LIST) do
+		local h = this.hKungfuList:AppendItemFromData(this.hKungfu, kungfu.dwID)
 		local img = h:Lookup('Image_Force')
-		img:FromIconID(select(2, MY_GetSkillName(dwKungfuID)))
+		img:FromIconID(select(2, MY_GetSkillName(kungfu.dwID)))
 		h:Lookup('Text_Num'):SetText(0)
 		h.nFont = h:Lookup('Text_Num'):GetFontScheme()
 		h.OnItemMouseLeave = function()
