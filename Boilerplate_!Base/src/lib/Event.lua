@@ -237,6 +237,26 @@ end
 end
 
 --------------------------------------------------------------------------------
+-- 监听心法切换事件
+--------------------------------------------------------------------------------
+do
+local KUNGFU_CHANGE_EVENT = { szName = 'KungfuChange', bSingleEvent = true }
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
+local function OnSkillMountKungfu()
+	if X.CONSTANT.KUNGFU_FORCE_TYPE[arg0] == X.CONSTANT.FORCE_TYPE.CANG_JIAN then
+		return
+	end
+	CommonEventFirer(KUNGFU_CHANGE_EVENT, arg0)
+end
+X.RegisterEvent('SKILL_MOUNT_KUNG_FU', OnSkillMountKungfu)
+
+function X.RegisterKungfuMount(...)
+	return CommonEventRegister(KUNGFU_CHANGE_EVENT, ...)
+end
+end
+
+--------------------------------------------------------------------------------
 -- 监听初始化完成事件
 --------------------------------------------------------------------------------
 do
