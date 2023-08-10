@@ -6,6 +6,6 @@
 
 ### 新门派
 
-* 团队面板心法简化文字 `Boilerplate_!Base\lang\lib\zhcn.jx3dat` `KUNGFU_NAME_ABBREVIATION`
+* 团队面板心法简化文字 `Boilerplate_!Base\lang\lib\zhcn.jx3dat` `KUNGFU_TYPE_LABEL_ABBR`
 * 全局门派配色 `Boilerplate_!Base\src\lib\Constant.lua` `FORCE_COLOR_BG_DEFAULT` `FORCE_COLOR_FG_DEFAULT`
 * 全局门派心法枚举 `Boilerplate_!Base\src\lib\Constant.lua` `FORCE_TYPE` `KUNGFU_TYPE` `KUNGFU_TYPE`

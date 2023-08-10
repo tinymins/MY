@@ -140,7 +140,7 @@ return {
 		['Other dungeon'] = '其它秘境',
 		['Other'] = '其它地圖',
 	},
-	KUNGFU_NAME_ABBREVIATION = {
+	KUNGFU_TYPE_LABEL_ABBR = {
 		[    0] = '俠', -- 大俠
 		[10080] = '雲', -- 七秀 雲裳心經
 		[10081] = '冰', -- 七秀 冰心訣
