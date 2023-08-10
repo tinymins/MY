@@ -166,7 +166,7 @@ local function UpdateOfficialBuff()
 			local tLine = RaidPanelBuff:GetRow(i)
 			if (not tLine.dwMapID or tLine.dwMapID == dwMapID or tLine.dwMapID == 0)
 			and (not tLine.szMapID or X.lodash.includes(X.SplitString(tLine.szMapID, ';'), szMapID))
-			and (not tLine.dwMountKungfuID or tLine.dwMountKungfuID == dwMountKungfuID or tLine.dwMountKungfuID == 0) then
+			and (not tLine.dwMountKungfuID or tLine.dwMountKungfuID == 0 or X.IsSameKungfu(tLine.dwMountKungfuID, dwMountKungfuID)) then
 				local v = {
 					dwID = tLine.dwBuffID,
 					nLevel = X.IIf(tLine.nBuffLevel > 0, tLine.nBuffLevel, nil),
@@ -198,7 +198,7 @@ local function UpdateOfficialBuff()
 		local nCount = NewRaidBuff:GetRowCount()
 		for i = 2, nCount do
 			local tLine = NewRaidBuff:GetRow(i)
-			if (tLine.dwMountKungfuID == dwMountKungfuID or tLine.dwMountKungfuID == 0) then
+			if tLine.dwMountKungfuID == 0 or X.IsSameKungfu(tLine.dwMountKungfuID,  dwMountKungfuID) then
 				local v = {
 					dwID = tLine.dwBuffID,
 					nLevel = nil,
@@ -232,7 +232,8 @@ X.RegisterEvent('MY_RESTRICTION', 'MY_CataclysmMain__OfficialBuff', function()
 	end
 	UpdateOfficialBuff()
 end)
-X.RegisterEvent({'LOADING_ENDING', 'SKILL_MOUNT_KUNG_FU', 'SKILL_UNMOUNT_KUNG_FU'}, 'MY_CataclysmMain__OfficialBuff', UpdateOfficialBuff)
+X.RegisterInit('MY_CataclysmMain__OfficialBuff', UpdateOfficialBuff)
+X.RegisterKungfuMount('MY_CataclysmMain__OfficialBuff', UpdateOfficialBuff)
 end
 
 function D.SetConfig(Config, bKeepBuff)
