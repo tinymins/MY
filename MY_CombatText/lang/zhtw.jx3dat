@@ -4,7 +4,6 @@ return {
 
 	['Combat text config loaded.'] = '戰鬥文字配置載入完成。',
 	['Combat text config failed.'] = '戰鬥文字配置載入失敗。',
-	['[MY] Same time combat text reach limit %d, please check server script.'] = '[MY] 同屏戰鬥文字已抵達上限%d個，請檢查服務端腳本是否存在邏輯異常，過多的戰鬥日誌可能導致客戶端響應緩慢。',
 
 	COMBAT_TEXT_TYPE_NAME = {
 		DAMAGE               = '受傷',
@@ -43,6 +42,7 @@ return {
 	['Enable render'] = '使用渲染幀（平滑）',
 	['Disable immunity'] = '屏蔽免疫',
 	['Only show my related combat text'] = '僅顯示與我有關的戰鬥文字',
+	['Max same time combat text count limit'] = '最大同屏戰鬥文字數量',
 	['Hold time'] = '動畫時間',
 	['Fade in time'] = '淡入時間',
 	['Fade out time'] = '淡出時間',

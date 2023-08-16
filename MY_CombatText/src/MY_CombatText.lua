@@ -44,7 +44,6 @@ local COMBAT_TEXT_PLAYERID       = 0
 local COMBAT_TEXT_TOTAL          = 32
 local COMBAT_TEXT_UI_SCALE       = 1
 local COMBAT_TEXT_TRAJECTORY     = 4   -- 顶部Y轴轨迹数量 根据缩放大小变化 0.8就是5条了 屏幕小更多
-local COMBAT_TEXT_MAX_COUNT      = 150 -- 最多同屏显示150个 再多部分机器吃不消了
 
 local COMBAT_TEXT_TYPE = {
 	DAMAGE               = 'DAMAGE'              ,
@@ -277,6 +276,12 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		szLabel = _L['MY_CombatText'],
 		xSchema = X.Schema.Number,
 		xDefaultValue = 240,
+	},
+	nMaxCount = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = X.Schema.Number,
+		xDefaultValue = 300,
 	},
 	nTime = {
 		ePathType = X.PATH_TYPE.ROLE,
@@ -1006,7 +1011,7 @@ function D.GetFreeShadow()
 			return v
 		end
 	end
-	if #COMBAT_TEXT_FREE < COMBAT_TEXT_MAX_COUNT then
+	if O.nMaxCount > 0 and #COMBAT_TEXT_FREE < O.nMaxCount then
 		local handle = D.handle
 		local sha = handle:AppendItemFromIni(COMBAT_TEXT_INIFILE, 'Shadow_Content')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
@@ -1014,8 +1019,6 @@ function D.GetFreeShadow()
 		table.insert(COMBAT_TEXT_FREE, sha)
 		return sha
 	end
-	Log('[MY] CombatText Get Free Item Failed!!!')
-	Log(_L('[MY] Same time combat text reach limit %d, please check server script.', COMBAT_TEXT_MAX_COUNT))
 end
 
 function D.LoadConfig()
@@ -1150,6 +1153,21 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	}):Width() + 5
+	y = y + nDeltaY
+
+	x = nPaddingX + 10
+	ui:Append('Text', { x = x, y = y, text = _L['Max same time combat text count limit'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
+	x = x + 70
+	ui:Append('WndTrackbar', {
+		x = x, y = y, text = '',
+		range = {0, 500},
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		value = O.nMaxCount,
+		onChange = function(nVal)
+			O.nMaxCount = nVal
+		end,
+		autoEnable = IsEnabled,
+	})
 	y = y + nDeltaY
 
 	x = nPaddingX + 10
