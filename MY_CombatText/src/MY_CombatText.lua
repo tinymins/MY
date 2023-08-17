@@ -1156,21 +1156,6 @@ function PS.OnPanelActive(frame)
 	y = y + nDeltaY
 
 	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['Max same time combat text count limit'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
-	x = x + 70
-	ui:Append('WndTrackbar', {
-		x = x, y = y, text = '',
-		range = {0, 500},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
-		value = O.nMaxCount,
-		onChange = function(nVal)
-			O.nMaxCount = nVal
-		end,
-		autoEnable = IsEnabled,
-	})
-	y = y + nDeltaY
-
-	x = nPaddingX + 10
 	ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_QUESTTRACE_CHANGE_ALPHA, color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	x = x + 70
 	ui:Append('WndTrackbar', {
@@ -1244,6 +1229,35 @@ function PS.OnPanelActive(frame)
 	})
 	x = x + 180
 
+	ui:Append('Text', {
+		x = x, y = y,
+		text = _L['Max count'],
+		tip = {
+			render = _L['Max same time combat text count limit'],
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
+		},
+		color = { 255, 255, 200 },
+		autoEnable = IsEnabled,
+	})
+	x = x + 70
+	ui:Append('WndTrackbar', {
+		x = x, y = y, text = '',
+		textFormatter = function(val)
+			return val == 0
+				and _L['Limitless']
+				or _L('Limit to %d', val)
+		end,
+		range = {0, 500},
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		value = O.nMaxCount,
+		onChange = function(nVal)
+			O.nMaxCount = nVal
+		end,
+		autoEnable = IsEnabled,
+	})
+	y = y + nDeltaY
+
+	x = nPaddingX + 10
 	ui:Append('Text', { x = x, y = y, text = _L['Critical style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	x = x + 70
 
