@@ -4652,6 +4652,9 @@ do
 				end)
 			end
 		end
+		--[[#DEBUG BEGIN]]
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'EquipScore Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		PeekPlayer(dwID)
 	end
 end
@@ -4761,6 +4764,9 @@ do
 				end
 			end)
 		end
+		--[[#DEBUG BEGIN]]
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'EquipInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		PeekPlayer(dwID)
 	end
 end
@@ -4803,6 +4809,9 @@ do
 			end
 		end
 		if X.IsEmpty(aTalent) then
+			--[[#DEBUG BEGIN]]
+			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Talent Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
 			PeekPlayer(player.dwID)
 			return
 		end
@@ -4855,6 +4864,9 @@ do
 				end
 			end)
 		end
+		--[[#DEBUG BEGIN]]
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'TelentInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		PeekPlayer(dwID)
 	end
 end
@@ -4952,6 +4964,9 @@ do
 				OnGetPlayerTalnetInfoPeekPlayer(player)
 			end)
 		end
+		--[[#DEBUG BEGIN]]
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'ZhenPaiInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		PeekPlayer(dwID)
 	end
 end
