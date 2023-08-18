@@ -38,12 +38,13 @@ local Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible = Table_GetBuff
 	其他类型：使用轨迹合并16-32帧，后来的文本会顶走前面的文本，从而跳过这部分停留的帧数。
 ]]
 
-local COMBAT_TEXT_INIFILE        = X.PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
-local COMBAT_TEXT_CONFIG         = X.FormatPath({'config/CombatText.jx3dat', X.PATH_TYPE.GLOBAL})
-local COMBAT_TEXT_PLAYERID       = 0
-local COMBAT_TEXT_TOTAL          = 32
-local COMBAT_TEXT_UI_SCALE       = 1
-local COMBAT_TEXT_TRAJECTORY     = 4   -- 顶部Y轴轨迹数量 根据缩放大小变化 0.8就是5条了 屏幕小更多
+local COMBAT_TEXT_INIFILE          = X.PACKET_INFO.ROOT .. 'MY_CombatText/ui/MY_CombatText_Render.ini'
+local COMBAT_TEXT_CONFIG           = X.FormatPath({'config/CombatText.jx3dat', X.PATH_TYPE.GLOBAL})
+local COMBAT_TEXT_PLAYERID         = 0
+local COMBAT_TEXT_IN_ROGUELIKE_MAP = false
+local COMBAT_TEXT_TOTAL            = 32
+local COMBAT_TEXT_UI_SCALE         = 1
+local COMBAT_TEXT_TRAJECTORY       = 4   -- 顶部Y轴轨迹数量 根据缩放大小变化 0.8就是5条了 屏幕小更多
 
 local COMBAT_TEXT_TYPE = {
 	DAMAGE               = 'DAMAGE'              ,
@@ -324,6 +325,12 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		szLabel = _L['MY_CombatText'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
+	},
+	bOptimizeRoguelike = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
 	},
 	-- $name 名字 $sn   技能名 $crit 会心 $val  数值
 	szSkill = {
@@ -813,6 +820,10 @@ function D.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nSkillResultType
 	end
 	-- 过滤无效治疗
 	if COMBAT_TEXT_TYPE_CLASS[eType] == 'THERAPY' and nValue == 0 then
+		return
+	end
+	-- 八荒衡鉴优化：保留玩家自己的伤害，屏蔽受到的伤害和治疗
+	if COMBAT_TEXT_IN_ROGUELIKE_MAP and (COMBAT_TEXT_TYPE_CLASS[eType] == 'THERAPY' or dwTargetID == COMBAT_TEXT_PLAYERID) and O.bOptimizeRoguelike then
 		return
 	end
 	local bIsPlayer = X.IsPlayer(dwCasterID)
@@ -1555,28 +1566,29 @@ X.RegisterPanel(_L['System'], 'MY_CombatText', _L['MY_CombatText'], 2041, PS)
 -- 事件注册
 --------------------------------------------------------------------------------
 
-local function GetPlayerID()
+local function OnLoadingEnding()
 	local me = X.GetControlPlayer()
-	if me then
-		COMBAT_TEXT_PLAYERID = me.dwID
-		--[[#DEBUG BEGIN]]
-		-- X.Debug('CombatText get player id ' .. me.dwID, X.DEBUG_LEVEL.LOG)
-		--[[#DEBUG END]]
-	else
+	if not me then
 		--[[#DEBUG BEGIN]]
 		X.Debug('CombatText get player id failed!!! try again', X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
-		X.DelayCall(1000, GetPlayerID)
+		X.DelayCall(1000, OnLoadingEnding)
+		return
 	end
+	COMBAT_TEXT_PLAYERID = me.dwID
+	--[[#DEBUG BEGIN]]
+	-- X.Debug('CombatText get player id ' .. me.dwID, X.DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+	COMBAT_TEXT_IN_ROGUELIKE_MAP = X.IsInRoguelikeMap()
 end
 X.RegisterUserSettingsInit('MY_CombatText', function()
 	D.bReady = true
 	D.UpdateTrajectoryCount()
 	D.CheckEnable()
 end)
-X.RegisterEvent('LOADING_END', 'MY_CombatText', GetPlayerID) -- 很重要的优化
-X.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
-X.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
+X.RegisterEvent('LOADING_ENDING', 'MY_CombatText', OnLoadingEnding) -- 很重要的优化
+X.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', OnLoadingEnding) -- 长歌控制主体ID切换
+X.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY', 'MY_CombatText', OnLoadingEnding) -- 长歌控制主体ID切换
 X.RegisterEvent('ON_PVP_SHOW_SELECT_PLAYER', 'MY_CombatText', function()
 	COMBAT_TEXT_PLAYERID = arg0
 end)
