@@ -4598,6 +4598,9 @@ do
 		end
 		PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID] = nil
 	end
+	X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+		PEEK_PLAYER_EQUIP_SCORE_STATE[arg0] = nil
+	end)
 
 	-- 获取玩家装备分数
 	-- X.GetPlayerEquipScore(dwID, fnAction)
@@ -4718,6 +4721,9 @@ do
 		end
 		PEEK_PLAYER_EQUIP_CALLBACK[player.dwID] = nil
 	end
+	X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+		PEEK_PLAYER_EQUIP_STATE[arg0] = nil
+	end)
 
 	-- 获取玩家装备信息
 	-- X.GetPlayerEquipInfo(dwID, fnAction)
@@ -4781,6 +4787,7 @@ do
 	end
 	local EVENT_KEY = nil
 	local PEEK_PLAYER_TALENT_STATE = {}
+	local PEEK_PLAYER_TALENT_TIME = {}
 	local PEEK_PLAYER_TALENT_CALLBACK = {}
 	local function OnGetPlayerTalnetInfoPeekPlayer(player)
 		if not PEEK_PLAYER_TALENT_CALLBACK[player.dwID] then
@@ -4808,7 +4815,7 @@ do
 				}
 			end
 		end
-		if X.IsEmpty(aTalent) then
+		if X.IsEmpty(aTalent) and (not PEEK_PLAYER_TALENT_TIME[player.dwID] or GetTime() - PEEK_PLAYER_TALENT_TIME[player.dwID] > 60000) then
 			--[[#DEBUG BEGIN]]
 			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Talent Peek player: ' .. player.dwID, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
@@ -4820,6 +4827,10 @@ do
 		end
 		PEEK_PLAYER_TALENT_CALLBACK[player.dwID] = nil
 	end
+	X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+		PEEK_PLAYER_TALENT_STATE[arg0] = nil
+		PEEK_PLAYER_TALENT_TIME[arg0] = nil
+	end)
 
 	-- 获取玩家奇穴信息
 	-- X.GetPlayerTalentInfo(dwID, fnAction)
@@ -4860,6 +4871,7 @@ do
 				local player = X.GetPlayer(dwID)
 				if player then
 					PEEK_PLAYER_TALENT_STATE[dwID] = 'SUCCESS'
+					PEEK_PLAYER_TALENT_TIME[dwID] = GetTime()
 					OnGetPlayerTalnetInfoPeekPlayer(player)
 				end
 			end)
@@ -4894,6 +4906,9 @@ do
 		end
 		PEEK_PLAYER_ZHEN_PAI_CALLBACK[player.dwID] = nil
 	end
+	X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+		PEEK_PLAYER_ZHEN_PAI_STATE[arg0] = nil
+	end)
 
 	-- 获取玩家镇派信息
 	-- X.GetPlayerZhenPaiInfo(dwID, fnAction)
