@@ -3671,6 +3671,13 @@ function X.IsZombieMap(dwMapID)
 end
 end
 
+-- 判断当前地图是不是僵尸地图
+-- (bool) X.IsInZombieMap()
+function X.IsInZombieMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsZombieMap(me.GetMapID())
+end
+
 -- 判断地图是不是百战地图
 -- (bool) X.IsMonsterMap(dwMapID)
 do
@@ -3692,13 +3699,6 @@ end
 function X.IsInMonsterMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsMonsterMap(me.GetMapID())
-end
-
--- 判断当前地图是不是僵尸地图
--- (bool) X.IsInZombieMap()
-function X.IsInZombieMap()
-	local me = X.GetClientPlayer()
-	return me and X.IsZombieMap(me.GetMapID())
 end
 
 -- 判断地图是不是MOBA地图
