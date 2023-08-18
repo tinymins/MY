@@ -3740,6 +3740,29 @@ function X.IsInHomelandMap()
 	return me and X.IsHomelandMap(me.GetMapID())
 end
 
+-- 判断地图是不是八荒衡鉴地图
+-- (bool) X.IsMonsterMap(dwMapID)
+do
+local ROGUELIKE_MAP = {}
+function X.IsRoguelikeMap(dwMapID)
+	if ROGUELIKE_MAP[dwMapID] == nil then
+		if Table_IsRougeLikeMap then
+			ROGUELIKE_MAP[dwMapID] = Table_IsRougeLikeMap(dwMapID) or false
+		else
+			ROGUELIKE_MAP[dwMapID] = X.CONSTANT.ROGUELIKE_MAP[dwMapID] or false
+		end
+	end
+	return ROGUELIKE_MAP[dwMapID]
+end
+end
+
+-- 判断当前地图是不是八荒衡鉴地图
+-- (bool) X.IsInMonsterMap()
+function X.IsInRoguelikeMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsRoguelikeMap(me.GetMapID())
+end
+
 -- 判断地图是不是新背包地图
 -- (bool) X.IsExtraBagMap(dwMapID)
 function X.IsExtraBagMap(dwMapID)
