@@ -4880,7 +4880,7 @@ do
 	local PEEK_PLAYER_ZHEN_PAI_STATE = {}
 	local PEEK_PLAYER_ZHEN_PAI_CALLBACK = {}
 	local PEEK_PLAYER_ZHEN_PAI_CACHE = {}
-	local function OnGetPlayerTalnetInfoPeekPlayer(player)
+	local function OnGetPlayerZhenPaiInfoPeekPlayer(player)
 		if not PEEK_PLAYER_ZHEN_PAI_CALLBACK[player.dwID] then
 			return
 		end
@@ -4936,13 +4936,13 @@ do
 				end
 			end
 			PEEK_PLAYER_ZHEN_PAI_CACHE[dwID] = tTalentSkillLevel
-			OnGetPlayerTalnetInfoPeekPlayer(X.GetClientPlayer())
+			OnGetPlayerZhenPaiInfoPeekPlayer(X.GetClientPlayer())
 			return
 		end
 		-- ª∫¥Ê≈–∂®
 		local player = X.GetPlayer(dwID)
 		if player and PEEK_PLAYER_ZHEN_PAI_STATE[dwID] == 'SUCCESS' and not bForcePeek then
-			OnGetPlayerTalnetInfoPeekPlayer(player)
+			OnGetPlayerZhenPaiInfoPeekPlayer(player)
 			return
 		end
 		-- ∑¿∂∂œﬁ÷∆
@@ -4961,7 +4961,7 @@ do
 				end
 				PEEK_PLAYER_ZHEN_PAI_STATE[dwID] = 'SUCCESS'
 				PEEK_PLAYER_ZHEN_PAI_CACHE[dwID] = tSkillLevel
-				OnGetPlayerTalnetInfoPeekPlayer(player)
+				OnGetPlayerZhenPaiInfoPeekPlayer(player)
 			end)
 		end
 		--[[#DEBUG BEGIN]]
