@@ -4810,7 +4810,7 @@ do
 		end
 		if X.IsEmpty(aTalent) then
 			--[[#DEBUG BEGIN]]
-			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Talent Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Talent Peek player: ' .. player.dwID, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			PeekPlayer(player.dwID)
 			return
