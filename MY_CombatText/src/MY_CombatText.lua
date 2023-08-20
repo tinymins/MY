@@ -1114,17 +1114,17 @@ function PS.OnPanelActive(frame)
 	local ui = X.UI(frame)
 	local W, H = ui:Size()
 	local nPaddingX, nPaddingY = 20, 10
-	local x, y = nPaddingX, nPaddingY
+	local nX, nY = nPaddingX, nPaddingY
 	local nDeltaY = 28
 	local nChapterPaddingTop = 5
 	local nChapterPaddingBottom = 3
 
-	ui:Append('Text', { x = x, y = y, text = _L['Combat text'], font = 27 })
-	x = x + 10
-	y = y + nDeltaY + nChapterPaddingBottom
+	ui:Append('Text', { x = nX, y = nY, text = _L['Combat text'], font = 27 })
+	nX = nX + 10
+	nY = nY + nDeltaY + nChapterPaddingBottom
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Enable combat text'],
 		color = { 255, 128, 0 },
 		checked = O.bEnable,
@@ -1134,8 +1134,8 @@ function PS.OnPanelActive(frame)
 		end,
 	}):Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Enable render'],
 		checked = O.bRender,
 		onCheck = function(bCheck)
@@ -1144,11 +1144,11 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	}):Width() + 5
-	y = y + nDeltaY
+	nY = nY + nDeltaY
 
-	x = nPaddingX + 10
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+	nX = nPaddingX + 10
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Only show my related combat text'],
 		checked = not O.bOtherCharacter,
 		onCheck = function(bCheck)
@@ -1157,8 +1157,8 @@ function PS.OnPanelActive(frame)
 		autoEnable = IsEnabled,
 	}):Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Disable immunity'],
 		checked = O.bImmunity,
 		onCheck = function(bCheck)
@@ -1167,8 +1167,8 @@ function PS.OnPanelActive(frame)
 		autoEnable = IsEnabled,
 	}):Width() + 5
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
 		text = _L['Optimize in roguelike'],
 		checked = O.bOptimizeRoguelike,
 		onCheck = function(bCheck)
@@ -1176,13 +1176,13 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	}):Width() + 5
-	y = y + nDeltaY
+	nY = nY + nDeltaY
 
-	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_QUESTTRACE_CHANGE_ALPHA, color = { 255, 255, 200 }, autoEnable = IsEnabled })
-	x = x + 70
+	nX = nPaddingX + 10
+	ui:Append('Text', { x = nX, y = nY, text = g_tStrings.STR_QUESTTRACE_CHANGE_ALPHA, color = { 255, 255, 200 }, autoEnable = IsEnabled })
+	nX = nX + 70
 	ui:Append('WndTrackbar', {
-		x = x, y = y, text = '',
+		x = nX, y = nY, text = '',
 		range = {1, 255},
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nMaxAlpha,
@@ -1192,11 +1192,11 @@ function PS.OnPanelActive(frame)
 		autoEnable = IsEnabled,
 	})
 
-	x = x + 180
-	ui:Append('Text', { x = x, y = y, text = _L['Hold time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
-	x = x + 70
+	nX = nX + 180
+	ui:Append('Text', { x = nX, y = nY, text = _L['Hold time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
+	nX = nX + 70
 	ui:Append('WndTrackbar', {
-		x = x, y = y, textFormatter = function(val) return val .. _L['ms'] end,
+		x = nX, y = nY, textFormatter = function(val) return val .. _L['ms'] end,
 		range = {700, 2500},
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nTime * COMBAT_TEXT_TOTAL,
@@ -1205,13 +1205,13 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	})
-	y = y + nDeltaY
+	nY = nY + nDeltaY
 
-	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['Fade in time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
-	x = x + 70
+	nX = nPaddingX + 10
+	ui:Append('Text', { x = nX, y = nY, text = _L['Fade in time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
+	nX = nX + 70
 	ui:Append('WndTrackbar', {
-		x = x, y = y, textFormatter = function(val) return val .. _L['frame'] end,
+		x = nX, y = nY, textFormatter = function(val) return val .. _L['frame'] end,
 		range = {0, 15},
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nFadeIn,
@@ -1221,11 +1221,11 @@ function PS.OnPanelActive(frame)
 		autoEnable = IsEnabled,
 	})
 
-	x = x + 180
-	ui:Append('Text', { x = x, y = y, text = _L['Fade out time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
-	x = x + 70
+	nX = nX + 180
+	ui:Append('Text', { x = nX, y = nY, text = _L['Fade out time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
+	nX = nX + 70
 	ui:Append('WndTrackbar', {
-		x = x, y = y, textFormatter = function(val) return val .. _L['frame'] end,
+		x = nX, y = nY, textFormatter = function(val) return val .. _L['frame'] end,
 		rang = {0, 15},
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.nFadeOut,
@@ -1234,13 +1234,13 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	})
-	y = y + nDeltaY
+	nY = nY + nDeltaY
 
-	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['Font size'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
-	x = x + 70
+	nX = nPaddingX + 10
+	ui:Append('Text', { x = nX, y = nY, text = _L['Font size'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
+	nX = nX + 70
 	ui:Append('WndTrackbar', {
-		x = x, y = y, textFormatter = function(val) return (val / 100) .. _L['times'] end,
+		x = nX, y = nY, textFormatter = function(val) return (val / 100) .. _L['times'] end,
 		range = {50, 200},
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		value = O.fScale * 100,
@@ -1250,10 +1250,10 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	})
-	x = x + 180
+	nX = nX + 180
 
 	ui:Append('Text', {
-		x = x, y = y,
+		x = nX, y = nY,
 		text = _L['Max count'],
 		tip = {
 			render = _L['Max same time combat text count limit'],
@@ -1262,9 +1262,9 @@ function PS.OnPanelActive(frame)
 		color = { 255, 255, 200 },
 		autoEnable = IsEnabled,
 	})
-	x = x + 70
+	nX = nX + 70
 	ui:Append('WndTrackbar', {
-		x = x, y = y, text = '',
+		x = nX, y = nY, text = '',
 		textFormatter = function(val)
 			return val == 0
 				and _L['Limitless']
@@ -1278,14 +1278,14 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	})
-	y = y + nDeltaY
+	nY = nY + nDeltaY
 
-	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['Critical style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
-	x = x + 70
+	nX = nPaddingX + 10
+	ui:Append('Text', { x = nX, y = nY, text = _L['Critical style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
+	nX = nX + 70
 
 	ui:Append('WndRadioBox', {
-		x = x, y = y + 5, text = _L['Hit feel'],
+		x = nX, y = nY + 5, text = _L['Hit feel'],
 		group = 'style',
 		checked = O.nStyle == 0,
 		onCheck = function()
@@ -1294,10 +1294,10 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	})
-	x = x + 90
+	nX = nX + 90
 
 	ui:Append('WndRadioBox', {
-		x = x, y = y + 5, text = _L['Low hit feel'],
+		x = nX, y = nY + 5, text = _L['Low hit feel'],
 		group = 'style',
 		checked = O.nStyle == 1,
 		onCheck = function()
@@ -1306,10 +1306,10 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	})
-	x = x + 90
+	nX = nX + 90
 
 	ui:Append('WndRadioBox', {
-		x = x, y = y + 5, text = _L['Soft'],
+		x = nX, y = nY + 5, text = _L['Soft'],
 		group = 'style',
 		checked = O.nStyle == 2,
 		onCheck = function()
@@ -1318,10 +1318,10 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	})
-	x = x + 60
+	nX = nX + 60
 
 	ui:Append('WndRadioBox', {
-		x = x, y = y + 5, text = _L['Scale only'],
+		x = nX, y = nY + 5, text = _L['Scale only'],
 		group = 'style',
 		checked = O.nStyle == 3,
 		onCheck = function()
@@ -1330,89 +1330,89 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	})
-	x = x + 90
-	y = y + nDeltaY
+	nX = nX + 90
+	nY = nY + nDeltaY
 
-	x = nPaddingX
-	y = y + nChapterPaddingTop
-	x = x + ui:Append('Text', { x = x, y = y, w = 'auto', text = _L['Text style'], font = 27, autoEnable = IsEnabled }):Width() + 5
-	x = x + ui:Append('Text', {
-		x = x, y = y,
+	nX = nPaddingX
+	nY = nY + nChapterPaddingTop
+	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Text style'], font = 27, autoEnable = IsEnabled }):Width() + 5
+	nX = nX + ui:Append('Text', {
+		x = nX, y = nY,
 		text = _L['Tips: $name means caster\'s name, $sn means skill name, $crit means critical, $val means value.'],
 		color = { 196, 196, 196 },
 		autoEnable = IsEnabled,
 	}):Width() + 5
-	y = y + nDeltaY + nChapterPaddingBottom
+	nY = nY + nDeltaY + nChapterPaddingBottom
 
-	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['Skill style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
-	x = x + 110
+	nX = nPaddingX + 10
+	ui:Append('Text', { x = nX, y = nY, text = _L['Skill style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
+	nX = nX + 110
 	ui:Append('WndEditBox', {
-		x = x, y = y, w = 250, h = 25, text = O.szSkill, limit = 30,
+		x = nX, y = nY, w = 250, h = 25, text = O.szSkill, limit = 30,
 		onChange = function(szText)
 			O.szSkill = szText
 		end,
 		autoEnable = IsEnabled,
 	})
-	x = x + 250
-	y = y + nDeltaY
+	nX = nX + 250
+	nY = nY + nDeltaY
 
-	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['Damage style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
-	x = x + 110
+	nX = nPaddingX + 10
+	ui:Append('Text', { x = nX, y = nY, text = _L['Damage style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
+	nX = nX + 110
 	ui:Append('WndEditBox', {
-		x = x, y = y, w = 250, h = 25, text = O.szDamage, limit = 30,
+		x = nX, y = nY, w = 250, h = 25, text = O.szDamage, limit = 30,
 		onChange = function(szText)
 			O.szDamage = szText
 		end,
 		autoEnable = IsEnabled,
 	})
-	x = x + 250
-	y = y + nDeltaY
+	nX = nX + 250
+	nY = nY + nDeltaY
 
-	x = nPaddingX + 10
-	ui:Append('Text', { x = x, y = y, text = _L['Therapy style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
-	x = x + 110
+	nX = nPaddingX + 10
+	ui:Append('Text', { x = nX, y = nY, text = _L['Therapy style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
+	nX = nX + 110
 	ui:Append('WndEditBox', {
-		x = x, y = y, w = 250, h = 25, text = O.szTherapy, limit = 30,
+		x = nX, y = nY, w = 250, h = 25, text = O.szTherapy, limit = 30,
 		onChange = function(szText)
 			O.szTherapy = szText
 		end,
 		autoEnable = IsEnabled,
 	})
-	x = x + 250
-	y = y + nDeltaY
+	nX = nX + 250
+	nY = nY + nDeltaY
 
-	x = nPaddingX + 10
+	nX = nPaddingX + 10
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 190, text = _L['$name not me'], checked = O.bCasterNotI,
+		x = nX, y = nY, w = 190, text = _L['$name not me'], checked = O.bCasterNotI,
 		onCheck = function(bCheck)
 			O.bCasterNotI = bCheck
 		end,
 		autoEnable = IsEnabled,
 	})
-	x = x + 190
+	nX = nX + 190
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 110, text = _L['$sn shorten(2)'], checked = O.bSnShorten2,
+		x = nX, y = nY, w = 110, text = _L['$sn shorten(2)'], checked = O.bSnShorten2,
 		onCheck = function(bCheck)
 			O.bSnShorten2 = bCheck
 		end,
 		autoEnable = IsEnabled,
 	})
-	x = x + 110
+	nX = nX + 110
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 140, text = _L['Therapy effective only'], checked = O.bTherapyEffectiveOnly,
+		x = nX, y = nY, w = 140, text = _L['Therapy effective only'], checked = O.bTherapyEffectiveOnly,
 		onCheck = function(bCheck)
 			O.bTherapyEffectiveOnly = bCheck
 		end,
 		autoEnable = IsEnabled,
 	})
-	x = x + 140
+	nX = nX + 140
 
-	x = x + ui:Append('WndButton', {
-		x = x, y = y, text = _L['Font edit'],
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY, text = _L['Font edit'],
 		onClick = function()
 			X.UI.OpenFontPicker(function(nFont)
 				O.nFont = nFont
@@ -1424,15 +1424,15 @@ function PS.OnPanelActive(frame)
 		},
 		autoEnable = IsEnabled,
 	}):Width() + 10
-	y = y + nDeltaY
+	nY = nY + nDeltaY
 
-	x = nPaddingX
-	y = y + nChapterPaddingTop
-	x = x + ui:Append('Text', { x = x, y = y, w = 'auto', text = _L['Color edit'], font = 27, autoEnable = IsEnabled }):Width() + 10
-	x = x + 10
+	nX = nPaddingX
+	nY = nY + nChapterPaddingTop
+	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Color edit'], font = 27, autoEnable = IsEnabled }):Width() + 10
+	nX = nX + 10
 
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y + 2, w = 'auto',
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY + 2, w = 'auto',
 		text = _L['Distinct critical color'],
 		checked = O.bCritical,
 		onCheck = function(bCheck)
@@ -1443,8 +1443,8 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	}):Width() + 10
-	x = x + ui:Append('WndButton', {
-		x = x, y = y + 2, w = 'auto',
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY + 2, w = 'auto',
 		text = _L['Reset color'],
 		onClick = function()
 			O('reset', { 'tColor', 'tCriticalColor' })
@@ -1454,9 +1454,9 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	}):Width() + 10
-	y = y + nDeltaY + nChapterPaddingBottom
+	nY = nY + nDeltaY + nChapterPaddingBottom
 
-	x = nPaddingX + 20
+	nX = nPaddingX + 20
 	for _, eType in ipairs({
 		COMBAT_TEXT_TYPE.DAMAGE               ,
 		COMBAT_TEXT_TYPE.THERAPY              ,
@@ -1469,13 +1469,13 @@ function PS.OnPanelActive(frame)
 		COMBAT_TEXT_TYPE.POISON_DAMAGE        ,
 		COMBAT_TEXT_TYPE.REFLECTED_DAMAGE     ,
 	}) do
-		if x > W - 100 then
-			x = nPaddingX + 20
-			y = y + 25
+		if nX > W - 100 then
+			nX = nPaddingX + 20
+			nY = nY + 25
 		end
 		local uiCritical
 		ui:Append('Shadow', {
-			x = x, y = y + 8, color = D.GetColor(eType, false), w = 15, h = 15,
+			x = nX, y = nY + 8, color = D.GetColor(eType, false), w = 15, h = 15,
 			onClick = function()
 				local this = this
 				X.UI.OpenColorPicker(function(r, g, b)
@@ -1489,10 +1489,10 @@ function PS.OnPanelActive(frame)
 			end,
 			autoEnable = IsEnabled,
 		})
-		x = x + 20
+		nX = nX + 20
 		if O.bCritical then
 			uiCritical = ui:Append('Shadow', {
-				x = x, y = y + 8, color = D.GetColor(eType, true), w = 15, h = 15,
+				x = nX, y = nY + 8, color = D.GetColor(eType, true), w = 15, h = 15,
 				tip = {
 					render = _L['Critical color'],
 					position = X.UI.TIP_POSITION.BOTTOM_TOP,
@@ -1507,17 +1507,17 @@ function PS.OnPanelActive(frame)
 				end,
 				autoEnable = IsEnabled,
 			})
-			x = x + 20
+			nX = nX + 20
 		end
-		x = x + math.max(ui:Append('Text', {
-			x = x, y = y, w = 'auto',
+		nX = nX + math.max(ui:Append('Text', {
+			x = nX, y = nY, w = 'auto',
 			text = COMBAT_TEXT_TYPE_NAME[eType],
 			autoEnable = IsEnabled,
 		}):Width() + 10, 100)
 	end
-	y = y + 30
+	nY = nY + 30
 
-	x = nPaddingX + 20
+	nX = nPaddingX + 20
 	for _, eType in ipairs({
 		COMBAT_TEXT_TYPE.SPIRIT               ,
 		COMBAT_TEXT_TYPE.STAYING_POWER        ,
@@ -1534,12 +1534,12 @@ function PS.OnPanelActive(frame)
 		COMBAT_TEXT_TYPE.MSG                  ,
 		COMBAT_TEXT_TYPE.CRITICAL_MSG         ,
 	}) do
-		if x > W - 100 then
-			x = nPaddingX + 20
-			y = y + 25
+		if nX > W - 100 then
+			nX = nPaddingX + 20
+			nY = nY + 25
 		end
 		ui:Append('Shadow', {
-			x = x, y = y + 8, color = D.GetColor(eType, false), w = 15, h = 15,
+			x = nX, y = nY + 8, color = D.GetColor(eType, false), w = 15, h = 15,
 			onClick = function()
 				local this = this
 				X.UI.OpenColorPicker(function(r, g, b)
@@ -1550,16 +1550,16 @@ function PS.OnPanelActive(frame)
 			end,
 			autoEnable = IsEnabled,
 		})
-		x = x + 20
-		x = x + math.max(ui:Append('Text', {
-			x = x, y = y, w = 'auto',
+		nX = nX + 20
+		nX = nX + math.max(ui:Append('Text', {
+			x = nX, y = nY, w = 'auto',
 			text = COMBAT_TEXT_TYPE_NAME[eType],
 			autoEnable = IsEnabled,
 		}):Width() + 10, 100)
 	end
-	y = y + 30
+	nY = nY + 30
 
-	ui:Append('WndWindow', { x = x, y = y + 10, w = W, h = 0 }) -- 剑三的滚动有问题，必须使用一个 Wnd 才能触发滚动。。
+	ui:Append('WndWindow', { x = nX, y = nY + 10, w = W, h = 0 }) -- 剑三的滚动有问题，必须使用一个 Wnd 才能触发滚动。。
 
 	if IsFileExist(COMBAT_TEXT_CONFIG) then
 		ui:Append('WndButton', {
