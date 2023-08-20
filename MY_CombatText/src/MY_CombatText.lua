@@ -1144,6 +1144,18 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	}):Width() + 5
+	y = y + nDeltaY
+
+	x = nPaddingX + 10
+	x = x + ui:Append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Only show my related combat text'],
+		checked = not O.bOtherCharacter,
+		onCheck = function(bCheck)
+			O.bOtherCharacter = not bCheck
+		end,
+		autoEnable = IsEnabled,
+	}):Width() + 5
 
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
@@ -1157,10 +1169,10 @@ function PS.OnPanelActive(frame)
 
 	x = x + ui:Append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
-		text = _L['Only show my related combat text'],
-		checked = not O.bOtherCharacter,
+		text = _L['Optimize in roguelike'],
+		checked = O.bOptimizeRoguelike,
 		onCheck = function(bCheck)
-			O.bOtherCharacter = not bCheck
+			O.bOptimizeRoguelike = bCheck
 		end,
 		autoEnable = IsEnabled,
 	}):Width() + 5
@@ -1323,7 +1335,13 @@ function PS.OnPanelActive(frame)
 
 	x = nPaddingX
 	y = y + nChapterPaddingTop
-	ui:Append('Text', { x = x, y = y, text = _L['Text style'], font = 27, autoEnable = IsEnabled })
+	x = x + ui:Append('Text', { x = x, y = y, w = 'auto', text = _L['Text style'], font = 27, autoEnable = IsEnabled }):Width() + 5
+	x = x + ui:Append('Text', {
+		x = x, y = y,
+		text = _L['Tips: $name means caster\'s name, $sn means skill name, $crit means critical, $val means value.'],
+		color = { 196, 196, 196 },
+		autoEnable = IsEnabled,
+	}):Width() + 5
 	y = y + nDeltaY + nChapterPaddingBottom
 
 	x = nPaddingX + 10
@@ -1366,14 +1384,6 @@ function PS.OnPanelActive(frame)
 	y = y + nDeltaY
 
 	x = nPaddingX + 10
-	ui:Append('Text', {
-		x = x, y = y,
-		text = _L['Tips: $name means caster\'s name, $sn means skill name, $crit means critical, $val means value.'],
-		color = { 196, 196, 196 },
-		autoEnable = IsEnabled,
-	})
-	y = y + nDeltaY
-
 	ui:Append('WndCheckBox', {
 		x = x, y = y, w = 190, text = _L['$name not me'], checked = O.bCasterNotI,
 		onCheck = function(bCheck)
