@@ -928,6 +928,10 @@ function D.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nSkillResultType
 end
 
 function D.OnSkillBuff(dwCharacterID, bCanCancel, dwID, nLevel)
+	-- 八荒衡鉴优化：保留玩家自己的伤害，屏蔽受到的伤害和治疗
+	if COMBAT_TEXT_IN_ROGUELIKE_MAP and O.bOptimizeRoguelike then
+		return
+	end
 	if not Table_BuffIsVisible(dwID, nLevel) then
 		return
 	end
@@ -948,6 +952,10 @@ function D.OnSkillBuff(dwCharacterID, bCanCancel, dwID, nLevel)
 end
 
 function D.OnSkillMiss(dwTargetID)
+	-- 八荒衡鉴优化：保留玩家自己的伤害，屏蔽受到的伤害和治疗
+	if COMBAT_TEXT_IN_ROGUELIKE_MAP and O.bOptimizeRoguelike then
+		return
+	end
 	local shadow = D.GetFreeShadow()
 	if not shadow then -- 没有空闲的shadow
 		return
@@ -957,6 +965,10 @@ function D.OnSkillMiss(dwTargetID)
 end
 
 function D.OnBuffImmunity(dwTargetID)
+	-- 八荒衡鉴优化：保留玩家自己的伤害，屏蔽受到的伤害和治疗
+	if COMBAT_TEXT_IN_ROGUELIKE_MAP and O.bOptimizeRoguelike then
+		return
+	end
 	local shadow = D.GetFreeShadow()
 	if not shadow then -- 没有空闲的shadow
 		return
@@ -966,6 +978,10 @@ end
 
 -- FireUIEvent('COMMON_HEALTH_TEXT', X.GetClientPlayer().dwID, -8888)
 function D.OnCommonHealth(dwCharacterID, nDeltaLife)
+	-- 八荒衡鉴优化：保留玩家自己的伤害，屏蔽受到的伤害和治疗
+	if COMBAT_TEXT_IN_ROGUELIKE_MAP and O.bOptimizeRoguelike then
+		return
+	end
 	if nDeltaLife < 0 and not IsCombatTextPlayerID(dwCharacterID) then
 		return
 	end
@@ -987,6 +1003,10 @@ function D.OnCommonHealth(dwCharacterID, nDeltaLife)
 end
 
 function D.OnSkillDodge(dwTargetID)
+	-- 八荒衡鉴优化：保留玩家自己的伤害，屏蔽受到的伤害和治疗
+	if COMBAT_TEXT_IN_ROGUELIKE_MAP and O.bOptimizeRoguelike then
+		return
+	end
 	local shadow = D.GetFreeShadow()
 	if not shadow then -- 没有空闲的shadow
 		return
