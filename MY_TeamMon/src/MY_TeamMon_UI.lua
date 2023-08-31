@@ -1956,12 +1956,14 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bCenterAlarm', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bCenterAlarm', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
@@ -1990,18 +1992,23 @@ function D.OpenSettingPanel(data, szType)
 		end
 		nY = nY + CHECKBOX_HEIGHT
 
-		nX = ui:Append('WndCheckBox', {
-			x = 30, y = nY, checked = cfg.bPartyBuffList, text = _L['Party buff list'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bPartyBuffList', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bBuffList, text = _L['Buff list'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bBuffList', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		nX = 25
+		if not X.IsRestricted('MY_TeamMon_PartyBuffList') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bPartyBuffList, text = _L['Party buff list'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bPartyBuffList', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
+		if not X.IsRestricted('MY_TeamMon_BuffList') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bBuffList, text = _L['Buff list'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bBuffList', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		nX = ui:Append('WndCheckBox', {
 			x = nX + 5, y = nY, checked = cfg.bTeamPanel, text = _L['Team panel'],
 			onCheck = function(bCheck)
@@ -2060,12 +2067,14 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bCenterAlarm', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bCenterAlarm', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
@@ -2132,12 +2141,14 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TEAM_MON_TYPE.SKILL_END, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.SKILL_END, 'bCenterAlarm', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.SKILL_END, 'bCenterAlarm', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
@@ -2183,12 +2194,14 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bWhisperChannel', bCheck)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-				onCheck = function(bCheck)
-					SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bCenterAlarm', bCheck)
-				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
+				nX = ui:Append('WndCheckBox', {
+					x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+					onCheck = function(bCheck)
+						SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bCenterAlarm', bCheck)
+					end,
+				}):AutoWidth():Pos('BOTTOMRIGHT')
+			end
 			if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 				nX = ui:Append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
@@ -2277,12 +2290,14 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bCenterAlarm', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bCenterAlarm', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
@@ -2335,12 +2350,14 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TEAM_MON_TYPE.NPC_LEAVE, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.NPC_LEAVE, 'bCenterAlarm', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.NPC_LEAVE, 'bCenterAlarm', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
@@ -2403,12 +2420,14 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bCenterAlarm', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bCenterAlarm', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
@@ -2461,12 +2480,14 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TEAM_MON_TYPE.DOODAD_LEAVE, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.DOODAD_LEAVE, 'bCenterAlarm', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.DOODAD_LEAVE, 'bCenterAlarm', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
@@ -2568,12 +2589,14 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bCenterAlarm', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bCenterAlarm', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
@@ -2679,12 +2702,14 @@ function D.OpenSettingPanel(data, szType)
 				SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bWhisperChannel', bCheck)
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bCenterAlarm', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bCenterAlarm', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
@@ -2730,315 +2755,317 @@ function D.OpenSettingPanel(data, szType)
 		}):Pos('BOTTOMRIGHT')
 	end
 	-- 倒计时
-	nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Countdown'], font = 27 }):Pos('BOTTOMRIGHT')
-	for k, v in ipairs(data.tCountdown or {}) do
-		-- 类型
-		nX = ui:Append('WndComboBox', {
-			name = 'Countdown' .. k, x = 30, w = 155, h = 25, y = nY,
-			color = v.key and { 255, 255, 0 },
-			text = v.nClass == -1 and _L['Please select type'] or _L['Countdown TYPE ' ..  v.nClass],
-			menu = function()
-				local menu = {}
-				if IsCtrlKeyDown() then
-					table.insert(menu, {
-						szOption = _L['Set countdown key'],
-						rgb = { 255, 255, 0 },
-						fnMouseEnter = function()
-							local nX, nY = this:GetAbsX(), this:GetAbsY()
-							local nW, nH = this:GetW(), this:GetH()
-							OutputTip(GetFormatText(_L['Key supports template render: {$sender}, {$receiver}, {$1}'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
-						end,
-						fnMouseLeave = function()
-							HideTip()
-						end,
-						fnAction = function()
-							GetUserInput(_L['Countdown key'], function(szKey)
-								if X.TrimString(szKey) == '' then
-									v.key = nil
-								else
-									v.key = X.TrimString(szKey)
-								end
-								FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-								D.OpenSettingPanel(data, szType)
-							end, nil, nil, nil, v.key)
-						end,
-					})
-					table.insert(menu, { bDevide = true })
-					table.insert(menu, { szOption = _L['Hold countdown when crossmap'], bCheck = true, bChecked = v.bHold, fnAction = function()
-						v.bHold = not v.bHold
-						FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-					end })
-					if v.nClass == MY_TEAM_MON_TYPE.NPC_FIGHT then
-						table.insert(menu, { szOption = _L['Hold countdown when unfight'], bCheck = true, bChecked = v.bFightHold, fnAction = function()
-							v.bFightHold = not v.bFightHold
+	if not X.IsRestricted('MY_TeamMon_SpellTimer') then
+		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Countdown'], font = 27 }):Pos('BOTTOMRIGHT')
+		for k, v in ipairs(data.tCountdown or {}) do
+			-- 类型
+			nX = ui:Append('WndComboBox', {
+				name = 'Countdown' .. k, x = 30, w = 155, h = 25, y = nY,
+				color = v.key and { 255, 255, 0 },
+				text = v.nClass == -1 and _L['Please select type'] or _L['Countdown TYPE ' ..  v.nClass],
+				menu = function()
+					local menu = {}
+					if IsCtrlKeyDown() then
+						table.insert(menu, {
+							szOption = _L['Set countdown key'],
+							rgb = { 255, 255, 0 },
+							fnMouseEnter = function()
+								local nX, nY = this:GetAbsX(), this:GetAbsY()
+								local nW, nH = this:GetW(), this:GetH()
+								OutputTip(GetFormatText(_L['Key supports template render: {$sender}, {$receiver}, {$1}'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
+							end,
+							fnMouseLeave = function()
+								HideTip()
+							end,
+							fnAction = function()
+								GetUserInput(_L['Countdown key'], function(szKey)
+									if X.TrimString(szKey) == '' then
+										v.key = nil
+									else
+										v.key = X.TrimString(szKey)
+									end
+									FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+									D.OpenSettingPanel(data, szType)
+								end, nil, nil, nil, v.key)
+							end,
+						})
+						table.insert(menu, { bDevide = true })
+						table.insert(menu, { szOption = _L['Hold countdown when crossmap'], bCheck = true, bChecked = v.bHold, fnAction = function()
+							v.bHold = not v.bHold
 							FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 						end })
-					end
-
-					table.insert(menu, { bDevide = true })
-					table.insert(menu, { szOption = _L['Color Picker'], bDisable = true })
-					-- Color Picker
-					for i = 0, 8 do
-						table.insert(menu, {
-							bMCheck = true,
-							bChecked = v.nFrame == i,
-							fnAction = function()
-								v.nFrame = i
+						if v.nClass == MY_TEAM_MON_TYPE.NPC_FIGHT then
+							table.insert(menu, { szOption = _L['Hold countdown when unfight'], bCheck = true, bChecked = v.bFightHold, fnAction = function()
+								v.bFightHold = not v.bFightHold
 								FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-								X.UI.ClosePopupMenu()
-							end,
-							szIcon = PLUGIN_ROOT .. '/img/ST.UITex',
-							nFrame = i,
-							szLayer = 'ICON_FILL',
-						})
-					end
-				else
-					table.insert(menu, { szOption = _L['Please select type'], bDisable = true, bChecked = v.nClass == -1 })
-					table.insert(menu, { bDevide = true })
-					if szType == 'BUFF' or szType == 'DEBUFF' then
-						for kk, vv in ipairs({ MY_TEAM_MON_TYPE.BUFF_GET, MY_TEAM_MON_TYPE.BUFF_LOSE }) do
-							table.insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
-								SetCountdownType(v, vv, ui, k)
 							end })
 						end
-					elseif szType == 'CASTING' then
-						table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TEAM_MON_TYPE.SKILL_END], bMCheck = true, bChecked = v.nClass == MY_TEAM_MON_TYPE.SKILL_END, fnAction = function()
-							SetCountdownType(v, MY_TEAM_MON_TYPE.SKILL_END, ui, k)
-						end })
-						-- if tSkillInfo and tSkillInfo.CastTime ~= 0 then
-							table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TEAM_MON_TYPE.SKILL_BEGIN], bMCheck = true, bChecked = v.nClass == MY_TEAM_MON_TYPE.SKILL_BEGIN, fnAction = function()
-								SetCountdownType(v, MY_TEAM_MON_TYPE.SKILL_BEGIN, ui, k)
+
+						table.insert(menu, { bDevide = true })
+						table.insert(menu, { szOption = _L['Color Picker'], bDisable = true })
+						-- Color Picker
+						for i = 0, 8 do
+							table.insert(menu, {
+								bMCheck = true,
+								bChecked = v.nFrame == i,
+								fnAction = function()
+									v.nFrame = i
+									FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+									X.UI.ClosePopupMenu()
+								end,
+								szIcon = PLUGIN_ROOT .. '/img/ST.UITex',
+								nFrame = i,
+								szLayer = 'ICON_FILL',
+							})
+						end
+					else
+						table.insert(menu, { szOption = _L['Please select type'], bDisable = true, bChecked = v.nClass == -1 })
+						table.insert(menu, { bDevide = true })
+						if szType == 'BUFF' or szType == 'DEBUFF' then
+							for kk, vv in ipairs({ MY_TEAM_MON_TYPE.BUFF_GET, MY_TEAM_MON_TYPE.BUFF_LOSE }) do
+								table.insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
+									SetCountdownType(v, vv, ui, k)
+								end })
+							end
+						elseif szType == 'CASTING' then
+							table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TEAM_MON_TYPE.SKILL_END], bMCheck = true, bChecked = v.nClass == MY_TEAM_MON_TYPE.SKILL_END, fnAction = function()
+								SetCountdownType(v, MY_TEAM_MON_TYPE.SKILL_END, ui, k)
 							end })
-						-- end
-					elseif szType == 'NPC' then
-						for kk, vv in ipairs({ MY_TEAM_MON_TYPE.NPC_ENTER, MY_TEAM_MON_TYPE.NPC_LEAVE, MY_TEAM_MON_TYPE.NPC_ALLLEAVE, MY_TEAM_MON_TYPE.NPC_FIGHT, MY_TEAM_MON_TYPE.NPC_DEATH, MY_TEAM_MON_TYPE.NPC_ALLDEATH, MY_TEAM_MON_TYPE.NPC_LIFE, MY_TEAM_MON_TYPE.NPC_MANA }) do
-							table.insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
-								SetCountdownType(v, vv, ui, k)
+							-- if tSkillInfo and tSkillInfo.CastTime ~= 0 then
+								table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TEAM_MON_TYPE.SKILL_BEGIN], bMCheck = true, bChecked = v.nClass == MY_TEAM_MON_TYPE.SKILL_BEGIN, fnAction = function()
+									SetCountdownType(v, MY_TEAM_MON_TYPE.SKILL_BEGIN, ui, k)
+								end })
+							-- end
+						elseif szType == 'NPC' then
+							for kk, vv in ipairs({ MY_TEAM_MON_TYPE.NPC_ENTER, MY_TEAM_MON_TYPE.NPC_LEAVE, MY_TEAM_MON_TYPE.NPC_ALLLEAVE, MY_TEAM_MON_TYPE.NPC_FIGHT, MY_TEAM_MON_TYPE.NPC_DEATH, MY_TEAM_MON_TYPE.NPC_ALLDEATH, MY_TEAM_MON_TYPE.NPC_LIFE, MY_TEAM_MON_TYPE.NPC_MANA }) do
+								table.insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
+									SetCountdownType(v, vv, ui, k)
+								end })
+							end
+						elseif szType == 'DOODAD' then
+							for kk, vv in ipairs({ MY_TEAM_MON_TYPE.DOODAD_ENTER, MY_TEAM_MON_TYPE.DOODAD_LEAVE, MY_TEAM_MON_TYPE.DOODAD_ALLLEAVE }) do
+								table.insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
+									SetCountdownType(v, vv, ui, k)
+								end })
+							end
+						elseif szType == 'TALK' then
+							table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TEAM_MON_TYPE.TALK_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TEAM_MON_TYPE.TALK_MONITOR, fnAction = function()
+								SetCountdownType(v, MY_TEAM_MON_TYPE.TALK_MONITOR, ui, k)
+							end })
+						elseif szType == 'CHAT' then
+							table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TEAM_MON_TYPE.CHAT_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TEAM_MON_TYPE.CHAT_MONITOR, fnAction = function()
+								SetCountdownType(v, MY_TEAM_MON_TYPE.CHAT_MONITOR, ui, k)
 							end })
 						end
-					elseif szType == 'DOODAD' then
-						for kk, vv in ipairs({ MY_TEAM_MON_TYPE.DOODAD_ENTER, MY_TEAM_MON_TYPE.DOODAD_LEAVE, MY_TEAM_MON_TYPE.DOODAD_ALLLEAVE }) do
-							table.insert(menu, { szOption = _L['Countdown TYPE ' .. vv], bMCheck = true, bChecked = v.nClass == vv, fnAction = function()
-								SetCountdownType(v, vv, ui, k)
-							end })
-						end
-					elseif szType == 'TALK' then
-						table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TEAM_MON_TYPE.TALK_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TEAM_MON_TYPE.TALK_MONITOR, fnAction = function()
-							SetCountdownType(v, MY_TEAM_MON_TYPE.TALK_MONITOR, ui, k)
-						end })
-					elseif szType == 'CHAT' then
-						table.insert(menu, { szOption = _L['Countdown TYPE ' .. MY_TEAM_MON_TYPE.CHAT_MONITOR], bMCheck = true, bChecked = v.nClass == MY_TEAM_MON_TYPE.CHAT_MONITOR, fnAction = function()
-							SetCountdownType(v, MY_TEAM_MON_TYPE.CHAT_MONITOR, ui, k)
-						end })
 					end
-				end
-				return menu
-			end,
-			tip = {
-				render = function()
-					local szTip = GetFormatText(_L['Press CTRL click for advance menu'], 136)
-					if X.IsString(v.key) then
-						szTip = szTip .. GetFormatText('\n\nKEY: ' .. tostring(v.key), 136, 255, 255, 255)
-					end
-					return szTip, true
+					return menu
 				end,
-				position = X.UI.TIP_POSITION.LEFT_RIGHT,
-			},
-		}):Pos('BOTTOMRIGHT')
-		-- 图标
-		nX = ui:Append('Box', {
-			x = nX + 5, y = nY, w = 24, h = 24, icon = v.nIcon or nIcon,
-			onHover = function(bHover) this:SetObjectMouseOver(bHover) end,
-			onClick = function()
-				local box = this
-				X.UI.OpenIconPicker(function(nIcon)
-					v.nIcon = nIcon
+				tip = {
+					render = function()
+						local szTip = GetFormatText(_L['Press CTRL click for advance menu'], 136)
+						if X.IsString(v.key) then
+							szTip = szTip .. GetFormatText('\n\nKEY: ' .. tostring(v.key), 136, 255, 255, 255)
+						end
+						return szTip, true
+					end,
+					position = X.UI.TIP_POSITION.LEFT_RIGHT,
+				},
+			}):Pos('BOTTOMRIGHT')
+			-- 图标
+			nX = ui:Append('Box', {
+				x = nX + 5, y = nY, w = 24, h = 24, icon = v.nIcon or nIcon,
+				onHover = function(bHover) this:SetObjectMouseOver(bHover) end,
+				onClick = function()
+					local box = this
+					X.UI.OpenIconPicker(function(nIcon)
+						v.nIcon = nIcon
+						FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+						box:SetObjectIcon(nIcon)
+					end)
+				end,
+			}):Pos('BOTTOMRIGHT')
+			-- 队伍频道报警
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY - 2, text = _L['TC'], color = GetMsgFontColor('MSG_TEAM', true), checked = v.bTeamChannel,
+				onCheck = function(bCheck)
+					v.bTeamChannel = bCheck and true or nil
 					FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-					box:SetObjectIcon(nIcon)
-				end)
-			end,
-		}):Pos('BOTTOMRIGHT')
-		-- 队伍频道报警
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY - 2, text = _L['TC'], color = GetMsgFontColor('MSG_TEAM', true), checked = v.bTeamChannel,
-			onCheck = function(bCheck)
-				v.bTeamChannel = bCheck and true or nil
-				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-			end,
-			tip = {
-				render = _L['Raid talk warning'],
-				position = X.UI.TIP_POSITION.BOTTOM_TOP,
-			},
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		-- 普通倒计时时间/分段倒计时
-		ui:Append('WndEditBox', {
-			name = 'CountdownTime' .. k,
-			x = nX + 5, y = nY, w = 100, h = 25,
-			text = v.nTime,
-			color = (IsSimpleCountdown(v) or not select(2, ParseCountdown(v.nTime, v.nClass)))
-				and { 255, 255, 255 }
-				or { 255, 0, 0 },
-			onChange = function(szNum)
-				v.nTime = tonumber(szNum) or szNum
-				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-				local edit = ui:Children('#CountdownTime' .. k)
-				if szNum == '' then
-					return
-				end
-				if IsSimpleCountdown(v) then
-					if this:GetW() > 200 then
-						edit:Size(100, 25):Color(255, 255, 255)
-						ui:Children('#CountdownName' .. k):Visible(true):Text(v.szName or g_tStrings.CHAT_NAME)
-					end
-				else
-					local aCountdown, bError, bTrigger = ParseCountdown(szNum, v.nClass)
-					if aCountdown then
-						local tOperatorDesc = {
-							['+'] = _L['(OPERATOR +)'],
-							['-'] = _L['(OPERATOR -)'],
-						}
-						local xml = { GetFormatText(_L[bTrigger and 'Trigger preview' or 'Countdown preview'] .. '\n', 0, 255, 255, 0) }
-						for kk, vv in ipairs(aCountdown) do
-							table.insert(xml, GetFormatText(
-								(
-									bTrigger
-										and (vv.nValue .. '%')
-										or X.FormatDuration(vv.nTime, 'SYMBOL', { mode = 'fixed-except-leading', maxUnit = 'minute', keepUnit = 'minute' })
-								)
-									.. (tOperatorDesc[vv.szOperator or ''] or '')
-									.. ' - '
-									.. FilterCustomText(vv.szContent, '{$sender}', '{$receiver}')
-									.. (bTrigger and vv.nTime and (' (' .. vv.nTime .. 's)') or '')
-									.. (
-										vv.szVoice
-										and (
-											' - ['
-											.. (vv.bVoiceOfficial and _L['Official voice'] or _L['Custom voice']) .. ']'
-											.. (MY_TeamMon_VoiceAlarm.GetSlugRemark(vv.bVoiceOfficial and 'OFFICIAL' or 'CUSTOM',vv.szVoice) or _L['Unknown voice'])
-											.. '(' .. vv.szVoice .. ')'
-										)
-										or ''
-									)
-									.. '\n'
-							))
-						end
-						X.OutputTip(this, table.concat(xml), true)
-					else
-						HideTip()
-					end
-					if aCountdown and not bError then
-						edit:Color(255, 255, 255)
-					else
-						edit:Color(255, 0, 0)
-					end
-					if this:GetW() < 200 then
-						edit:Size(400, 25)
-						ui:Children('#CountdownName' .. k):Visible(false)
-					end
-				end
-			end,
-			tip = {
-				render = function()
-					local aText = {}
-					if v.nClass == MY_TEAM_MON_TYPE.NPC_LIFE or v.nClass == MY_TEAM_MON_TYPE.NPC_MANA then
-						table.insert(aText, _L['Life/mana statement.\n\nExample: 0.7-,Remain 70%;0.5-,Remain Half,2;0.01-,Almost empty,5'])
-					else
-						table.insert(aText, _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'])
-					end
-					table.insert(aText, '\n\n')
-					table.insert(aText, _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'])
-					table.insert(aText, '\n\n')
-					table.insert(aText, _L['Notice: spell timer starts with VO: means play official voice while this part active, starts with VC: means play custom voice while this part active.'])
-					return table.concat(aText)
 				end,
-				position = X.UI.TIP_POSITION.BOTTOM_TOP,
-			},
-		})
-		-- 普通倒计时文本
-		nX = ui:Append('WndEditBox', {
-			name = 'CountdownName' .. k,
-			x = nX + 5 + 100 + 5, y = nY, w = 295, h = 25, text = v.szName,
-			onChange = function(szName)
-				v.szName = szName
-				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-			end,
-			tip = {
-				render = _L['Simple countdown text'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-				position = X.UI.TIP_POSITION.BOTTOM_TOP,
-			},
-			placeholder = _L['Please input simple countdown text...'],
-		}):Pos('BOTTOMRIGHT')
-		-- 重复调用时间限制
-		nX = ui:Append('WndEditBox', {
-			x = nX + 5, y = nY, w = 30, h = 25,
-			text = v.nRefresh, editType = X.UI.EDIT_TYPE.NUMBER,
-			onChange = function(szNum)
-				v.nRefresh = tonumber(szNum)
-				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-			end,
-			tip = {
-				render = _L['Max repeat time\n\nWhen countdown get trigger again, the last countdown may get overwritten. This config is to sovle this problem, input time limit here to ensure in this time period, countdown will not be trigger again.'],
-				position = X.UI.TIP_POSITION.BOTTOM_TOP,
-			},
-		}):Pos('BOTTOMRIGHT')
-		-- 删除按钮
-		nX, nY = ui:Append('Image', {
-			x = nX + 5, y = nY, w = 26, h = 26,
-			image = file, imageFrame = 86,
-			onHover = function(bIn)
-				if bIn then
-					this:SetFrame(87)
-				else
-					this:SetFrame(86)
-				end
-			end,
-			onClick = function()
-				if v.nClass ~= -1 then
-					local nClass = v.key and MY_TEAM_MON_TYPE.COMMON or v.nClass
-					if data.dwID then
-						local szKey = v.key or (k .. '.'  .. data.dwID .. '.' .. (data.nLevel or 0))
-						FireUIEvent('MY_TEAM_MON__SPELL_TIMER__DEL', nClass, szKey) -- try kill
-					else
-						local szKey = v.key or (data.nIndex .. '.' .. k)
-						FireUIEvent('MY_TEAM_MON__SPELL_TIMER__DEL', nClass, szKey) -- try kill
+				tip = {
+					render = _L['Raid talk warning'],
+					position = X.UI.TIP_POSITION.BOTTOM_TOP,
+				},
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+			-- 普通倒计时时间/分段倒计时
+			ui:Append('WndEditBox', {
+				name = 'CountdownTime' .. k,
+				x = nX + 5, y = nY, w = 100, h = 25,
+				text = v.nTime,
+				color = (IsSimpleCountdown(v) or not select(2, ParseCountdown(v.nTime, v.nClass)))
+					and { 255, 255, 255 }
+					or { 255, 0, 0 },
+				onChange = function(szNum)
+					v.nTime = tonumber(szNum) or szNum
+					FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+					local edit = ui:Children('#CountdownTime' .. k)
+					if szNum == '' then
+						return
 					end
+					if IsSimpleCountdown(v) then
+						if this:GetW() > 200 then
+							edit:Size(100, 25):Color(255, 255, 255)
+							ui:Children('#CountdownName' .. k):Visible(true):Text(v.szName or g_tStrings.CHAT_NAME)
+						end
+					else
+						local aCountdown, bError, bTrigger = ParseCountdown(szNum, v.nClass)
+						if aCountdown then
+							local tOperatorDesc = {
+								['+'] = _L['(OPERATOR +)'],
+								['-'] = _L['(OPERATOR -)'],
+							}
+							local xml = { GetFormatText(_L[bTrigger and 'Trigger preview' or 'Countdown preview'] .. '\n', 0, 255, 255, 0) }
+							for kk, vv in ipairs(aCountdown) do
+								table.insert(xml, GetFormatText(
+									(
+										bTrigger
+											and (vv.nValue .. '%')
+											or X.FormatDuration(vv.nTime, 'SYMBOL', { mode = 'fixed-except-leading', maxUnit = 'minute', keepUnit = 'minute' })
+									)
+										.. (tOperatorDesc[vv.szOperator or ''] or '')
+										.. ' - '
+										.. FilterCustomText(vv.szContent, '{$sender}', '{$receiver}')
+										.. (bTrigger and vv.nTime and (' (' .. vv.nTime .. 's)') or '')
+										.. (
+											vv.szVoice
+											and (
+												' - ['
+												.. (vv.bVoiceOfficial and _L['Official voice'] or _L['Custom voice']) .. ']'
+												.. (MY_TeamMon_VoiceAlarm.GetSlugRemark(vv.bVoiceOfficial and 'OFFICIAL' or 'CUSTOM',vv.szVoice) or _L['Unknown voice'])
+												.. '(' .. vv.szVoice .. ')'
+											)
+											or ''
+										)
+										.. '\n'
+								))
+							end
+							X.OutputTip(this, table.concat(xml), true)
+						else
+							HideTip()
+						end
+						if aCountdown and not bError then
+							edit:Color(255, 255, 255)
+						else
+							edit:Color(255, 0, 0)
+						end
+						if this:GetW() < 200 then
+							edit:Size(400, 25)
+							ui:Children('#CountdownName' .. k):Visible(false)
+						end
+					end
+				end,
+				tip = {
+					render = function()
+						local aText = {}
+						if v.nClass == MY_TEAM_MON_TYPE.NPC_LIFE or v.nClass == MY_TEAM_MON_TYPE.NPC_MANA then
+							table.insert(aText, _L['Life/mana statement.\n\nExample: 0.7-,Remain 70%;0.5-,Remain Half,2;0.01-,Almost empty,5'])
+						else
+							table.insert(aText, _L['Simple countdown time or multi countdown statement. Input pure number for simple countdown time, otherwise for multi countdown statement.\n\nMulti countdown example: 10,Countdown1;25,Countdown2;55,Countdown3\nExplain: Countdown1 finished will start Countdown2, so as Countdown3.'])
+						end
+						table.insert(aText, '\n\n')
+						table.insert(aText, _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'])
+						table.insert(aText, '\n\n')
+						table.insert(aText, _L['Notice: spell timer starts with VO: means play official voice while this part active, starts with VC: means play custom voice while this part active.'])
+						return table.concat(aText)
+					end,
+					position = X.UI.TIP_POSITION.BOTTOM_TOP,
+				},
+			})
+			-- 普通倒计时文本
+			nX = ui:Append('WndEditBox', {
+				name = 'CountdownName' .. k,
+				x = nX + 5 + 100 + 5, y = nY, w = 295, h = 25, text = v.szName,
+				onChange = function(szName)
+					v.szName = szName
+					FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+				end,
+				tip = {
+					render = _L['Simple countdown text'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
+					position = X.UI.TIP_POSITION.BOTTOM_TOP,
+				},
+				placeholder = _L['Please input simple countdown text...'],
+			}):Pos('BOTTOMRIGHT')
+			-- 重复调用时间限制
+			nX = ui:Append('WndEditBox', {
+				x = nX + 5, y = nY, w = 30, h = 25,
+				text = v.nRefresh, editType = X.UI.EDIT_TYPE.NUMBER,
+				onChange = function(szNum)
+					v.nRefresh = tonumber(szNum)
+					FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+				end,
+				tip = {
+					render = _L['Max repeat time\n\nWhen countdown get trigger again, the last countdown may get overwritten. This config is to sovle this problem, input time limit here to ensure in this time period, countdown will not be trigger again.'],
+					position = X.UI.TIP_POSITION.BOTTOM_TOP,
+				},
+			}):Pos('BOTTOMRIGHT')
+			-- 删除按钮
+			nX, nY = ui:Append('Image', {
+				x = nX + 5, y = nY, w = 26, h = 26,
+				image = file, imageFrame = 86,
+				onHover = function(bIn)
+					if bIn then
+						this:SetFrame(87)
+					else
+						this:SetFrame(86)
+					end
+				end,
+				onClick = function()
+					if v.nClass ~= -1 then
+						local nClass = v.key and MY_TEAM_MON_TYPE.COMMON or v.nClass
+						if data.dwID then
+							local szKey = v.key or (k .. '.'  .. data.dwID .. '.' .. (data.nLevel or 0))
+							FireUIEvent('MY_TEAM_MON__SPELL_TIMER__DEL', nClass, szKey) -- try kill
+						else
+							local szKey = v.key or (data.nIndex .. '.' .. k)
+							FireUIEvent('MY_TEAM_MON__SPELL_TIMER__DEL', nClass, szKey) -- try kill
+						end
+					end
+					if #data.tCountdown == 1 then
+						data.tCountdown = nil
+					else
+						table.remove(data.tCountdown, k)
+					end
+					FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+					D.OpenSettingPanel(data, szType)
+				end,
+			}):Pos('BOTTOMRIGHT')
+			FormatElPosByCountdownType(v, ui, k)
+		end
+		nX = ui:Append('WndButton', {
+			x = 30, y = nY + 10,
+			text = _L['Add countdown'],
+			buttonStyle = 'FLAT',
+			enable = not (data.tCountdown and #data.tCountdown > 10),
+			onClick = function()
+				if not data.tCountdown then
+					data.tCountdown = {}
 				end
-				if #data.tCountdown == 1 then
-					data.tCountdown = nil
-				else
-					table.remove(data.tCountdown, k)
+				local szCountdown = _L['Countdown']
+				local szPattern = GetPatternName()
+				if szPattern then
+					szCountdown = szCountdown .. ' ' .. szPattern
 				end
+				table.insert(data.tCountdown, {
+					nTime = 10,
+					szName = szCountdown,
+					nClass = -1,
+					nIcon = nIcon or 13,
+				})
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 				D.OpenSettingPanel(data, szType)
 			end,
 		}):Pos('BOTTOMRIGHT')
-		FormatElPosByCountdownType(v, ui, k)
+		nY = nY + 35
 	end
-	nX = ui:Append('WndButton', {
-		x = 30, y = nY + 10,
-		text = _L['Add countdown'],
-		buttonStyle = 'FLAT',
-		enable = not (data.tCountdown and #data.tCountdown > 10),
-		onClick = function()
-			if not data.tCountdown then
-				data.tCountdown = {}
-			end
-			local szCountdown = _L['Countdown']
-			local szPattern = GetPatternName()
-			if szPattern then
-				szCountdown = szCountdown .. ' ' .. szPattern
-			end
-			table.insert(data.tCountdown, {
-				nTime = 10,
-				szName = szCountdown,
-				nClass = -1,
-				nIcon = nIcon or 13,
-			})
-			FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-			D.OpenSettingPanel(data, szType)
-		end,
-	}):Pos('BOTTOMRIGHT')
-	nY = nY + 35
 	-- 圈圈连线
 	if (szType == 'NPC' or szType == 'DOODAD') and not X.IsRestricted('MY_TeamMon_CircleLine') then
 		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Circle and line'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')

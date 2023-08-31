@@ -102,11 +102,6 @@ function D.UpdateAnchor(frame)
 	end
 end
 
-function D.Init()
-	Wnd.CloseWindow('MY_TeamMon_LargeTextAlarm')
-	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_LargeTextAlarm')
-end
-
 function D.UpdateText(txt, col)
 	if X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 		return
@@ -132,6 +127,18 @@ function D.OnBreathe()
 		D.frame:FadeOut(O.fFadeOut * 10)
 		X.BreatheCall('MY_TeamMon_LargeTextAlarm', false)
 	end
+end
+
+function D.CheckEnable()
+	Wnd.CloseWindow('MY_TeamMon_LargeTextAlarm')
+	if X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
+		return
+	end
+	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_LargeTextAlarm')
+end
+
+function D.Init()
+	D.CheckEnable()
 end
 
 --------------------------------------------------------------------------------
@@ -177,6 +184,13 @@ end
 --------------------------------------------------------------------------------
 
 X.RegisterUserSettingsInit('MY_TeamMon_LargeTextAlarm', D.Init)
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_LargeTextAlarm', function()
+	if arg0 and arg0 ~= 'MY_TeamMon_LargeTextAlarm' then
+		return
+	end
+	D.CheckEnable()
+end)
 
 --------------------------------------------------------------------------------
 -- ½çÃæ×¢²á

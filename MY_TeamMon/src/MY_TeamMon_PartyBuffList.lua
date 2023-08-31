@@ -19,6 +19,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^16.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+X.RegisterRestriction('MY_TeamMon_PartyBuffList', { ['*'] = false, classic = true })
 --------------------------------------------------------------------------
 
 local GetBuff = X.GetBuff
@@ -174,12 +175,6 @@ function D.OnFrameDragEnd()
 	O.tAnchor = GetFrameAnchor(this, 'TOPCENTER')
 end
 
-function D.Init()
-	Wnd.CloseWindow('MY_TeamMon_PartyBuffList')
-	Wnd.OpenWindow(PBL_INI_FILE, 'MY_TeamMon_PartyBuffList')
-	D.SwitchPanel(0)
-end
-
 function D.UpdateAnchor(frame)
 	local a = O.tAnchor
 	frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
@@ -305,6 +300,19 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 	CACHE_LIST[key] = h
 end
 
+function D.CheckEnable()
+	Wnd.CloseWindow('MY_TeamMon_PartyBuffList')
+	if X.IsRestricted('MY_TeamMon_PartyBuffList') then
+		return
+	end
+	Wnd.OpenWindow(PBL_INI_FILE, 'MY_TeamMon_PartyBuffList')
+	D.SwitchPanel(0)
+end
+
+function D.Init()
+	D.CheckEnable()
+end
+
 --------------------------------------------------------------------------------
 -- Global exports
 --------------------------------------------------------------------------------
@@ -342,5 +350,12 @@ end
 --------------------------------------------------------------------------------
 
 X.RegisterUserSettingsInit('MY_TeamMon_PartyBuffList', D.Init)
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_PartyBuffList', function()
+	if arg0 and arg0 ~= 'MY_TeamMon_PartyBuffList' then
+		return
+	end
+	D.CheckEnable()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

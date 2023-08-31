@@ -46,11 +46,6 @@ local function CreateFullScreen(szKey, tArgs)
 	end
 end
 
-function D.Init()
-	Wnd.CloseWindow('MY_TeamMon_FullScreenAlarm')
-	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_FullScreenAlarm'):Hide()
-end
-
 function D.OnFrameCreate()
 	this:RegisterEvent('LOADING_END')
 	this:RegisterEvent('UI_SCALED')
@@ -194,6 +189,18 @@ function FS:RemoveItem()
 	end
 end
 
+function D.CheckEnable()
+	Wnd.CloseWindow('MY_TeamMon_FullScreenAlarm')
+	if X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
+		return
+	end
+	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_FullScreenAlarm'):Hide()
+end
+
+function D.Init()
+	D.CheckEnable()
+end
+
 --------------------------------------------------------------------------------
 -- Global exports
 --------------------------------------------------------------------------------
@@ -215,5 +222,12 @@ end
 --------------------------------------------------------------------------------
 
 X.RegisterUserSettingsInit('MY_TeamMon_FullScreenAlarm', D.Init)
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_FullScreenAlarm', function()
+	if arg0 and arg0 ~= 'MY_TeamMon_FullScreenAlarm' then
+		return
+	end
+	D.CheckEnable()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

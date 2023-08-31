@@ -19,6 +19,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^16.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+X.RegisterRestriction('MY_TeamMon_BuffList', { ['*'] = false, classic = true })
 --------------------------------------------------------------------------
 
 local GetBuff = X.GetBuff
@@ -209,9 +210,16 @@ function D.UpdateAnchor(frame)
 	frame:CorrectPos()
 end
 
-function D.Init()
+function D.CheckEnable()
 	Wnd.CloseWindow('MY_TeamMon_BuffList')
+	if X.IsRestricted('MY_TeamMon_BuffList') then
+		return
+	end
 	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_BuffList')
+end
+
+function D.Init()
+	D.CheckEnable()
 end
 
 --------------------------------------------------------------------------------
@@ -257,5 +265,12 @@ end
 --------------------------------------------------------------------------------
 
 X.RegisterUserSettingsInit('MY_TeamMon_BuffList', D.Init)
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_BuffList', function()
+	if arg0 and arg0 ~= 'MY_TeamMon_BuffList' then
+		return
+	end
+	D.CheckEnable()
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

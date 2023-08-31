@@ -19,6 +19,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^16.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+X.RegisterRestriction('MY_TeamMon_SpellTimer', { ['*'] = false })
 --------------------------------------------------------------------------
 
 local MY_FormatDuration = X.FormatDuration
@@ -260,11 +261,6 @@ function D.UpdateAnchor(frame)
 	frame:CorrectPos()
 end
 
-function D.Init()
-	Wnd.CloseWindow('MY_TeamMon_SpellTimer')
-	Wnd.OpenWindow(ST_INI_FILE, 'MY_TeamMon_SpellTimer')
-end
-
 -- 构造函数
 function ST:ctor(nType, szKey, tParam)
 	if not ST_CACHE[nType] then
@@ -388,6 +384,18 @@ function ST:RemoveItem()
 	D.handle:FormatAllItemPos()
 end
 
+function D.CheckEnable()
+	Wnd.CloseWindow('MY_TeamMon_SpellTimer')
+	if X.IsRestricted('MY_TeamMon_SpellTimer') then
+		return
+	end
+	Wnd.OpenWindow(ST_INI_FILE, 'MY_TeamMon_SpellTimer')
+end
+
+function D.Init()
+	D.CheckEnable()
+end
+
 --------------------------------------------------------------------------------
 -- Global exports
 --------------------------------------------------------------------------------
@@ -421,6 +429,13 @@ end
 --------------------------------------------------------------------------------
 -- 事件注册
 --------------------------------------------------------------------------------
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_SpellTimer', function()
+	if arg0 and arg0 ~= 'MY_TeamMon_SpellTimer' then
+		return
+	end
+	D.CheckEnable()
+end)
 
 X.RegisterUserSettingsInit('MY_TeamMon_SpellTimer', function()
 	D.bReady = true
