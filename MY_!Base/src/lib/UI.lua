@@ -4397,6 +4397,8 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 			img:SetW(nWidth)
 		end
 		raw:SetSize(nWidth, nHeight)
+	elseif componentType == 'WndDummyWrapper' then
+		raw:SetSize(nWidth, nHeight)
 	elseif raw:GetBaseType() == 'Wnd' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
@@ -4415,6 +4417,16 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 		local h = itm:GetParent()
 		if h and h:GetType() == 'Handle' then
 			h:FormatAllItemPos()
+		end
+	end
+	if raw:GetBaseType() == 'Wnd' then
+		local parent = raw:GetParent()
+		if GetComponentType(parent) == 'WndDummyWrapper' then
+			local wnd = raw
+			if raw.IsDummyWnd and raw:IsDummyWnd() then
+				wnd = raw:Lookup('', '') or raw
+			end
+			parent:SetSize(wnd:GetSize())
 		end
 	end
 	X.ExecuteWithThis(raw, raw.OnSizeChange)
@@ -4539,20 +4551,41 @@ function OO:MinHeight(nH)
 	end
 end
 
+-- (self) Instance:ChildrenSize() -- Get element all children size
+function OO:ChildrenSize()
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		if GetComponentType(raw) == 'Handle' then
+			return raw:GetAllItemSize()
+		elseif GetComponentType(raw) == 'WndContainer' then
+			return raw:GetAllContentSize()
+		end
+	end
+end
+
 do
 local function AutoSize(raw, bAutoWidth, bAutoHeight)
-	if GetComponentType(raw) == 'Text' then
-		local w, h = raw:GetSize()
+	local componentType = GetComponentType(raw)
+	if componentType == 'Text' then
+		local nW, nH = raw:GetSize()
 		raw:AutoSize()
+		if bAutoWidth then
+			nW = raw:GetW()
+		end
+		if bAutoHeight then
+			nH = raw:GetH()
+		end
+		SetComponentSize(raw, nW, nH)
+	elseif componentType == 'Handle' then
+		local nW, nH = raw:GetAllItemSize()
 		if not bAutoWidth then
-			raw:SetW(w)
+			nW = raw:GetW()
 		end
 		if not bAutoHeight then
-			raw:SetH(h)
+			nH = raw:GetH()
 		end
-	else
-		local componentType = GetComponentType(raw)
-		if componentType == 'WndCheckBox'
+		SetComponentSize(raw, nW, nH)
+	elseif componentType == 'WndCheckBox'
 		or componentType == 'WndRadioBox'
 		or componentType == 'WndComboBox'
 		or componentType == 'WndTrackbar'
@@ -4583,9 +4616,17 @@ local function AutoSize(raw, bAutoWidth, bAutoHeight)
 					H = H + deltaH
 				end
 				txt:SetSize(oW, oH)
-				ui:Size(W, H, RW, RH)
+				SetComponentSize(raw, W, H, RW, RH)
 			end
+	elseif componentType == 'WndContainer' then
+		local nW, nH = raw:GetAllContentSize()
+		if not bAutoWidth then
+			nW = raw:GetW()
 		end
+		if not bAutoHeight then
+			nH = raw:GetH()
+		end
+		SetComponentSize(raw, nW, nH)
 	end
 end
 
