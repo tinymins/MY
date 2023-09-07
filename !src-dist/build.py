@@ -195,25 +195,34 @@ def __make_changelog(packet, packet_path, branch):
     with open(os.path.join(packet_path, 'CHANGELOG.md'), 'r', encoding='utf8') as input_file:
         input_lines = input_file.readlines()
 
-    branch_pattern = re.compile('\\(.*%s.*\\)$' % branch)
+    branch_pattern = re.compile('\\*\\(.*\\b%s\\b.*\\)\\*$' % branch)
 
     output_lines = []
 
     for index, line in enumerate(input_lines):
         line = line.rstrip()
-        if line.endswith(')'):
+        if line.endswith(')*'):
             if branch_pattern.search(line):
                 line = line[:branch_pattern.search(line).start()].rstrip()
             else:
                 continue
         if index < 2:
             continue
-        if line.startswith('## '):
-            line = line[3:]
+        if line == '' and len(output_lines) > 0 and output_lines[len(output_lines) - 1].startswith('## '):
+            continue
+        if line.startswith('## ') and len(output_lines) > 0 and output_lines[len(output_lines) - 1].startswith('## '):
+            output_lines.pop()
         if line.startswith('* '):
             line = ' ' + line
         line = line + '\n'
         output_lines.append(line)
+
+    if len(output_lines) > 0 and output_lines[len(output_lines) - 1].startswith('## '):
+        output_lines.pop()
+
+    for index, line in enumerate(output_lines):
+        if line.startswith('## '):
+            output_lines[index] = line[3:]
 
     with open(os.path.join(packet_path, '%s_CHANGELOG.txt' % packet), 'w', encoding='gbk') as output_file:
         output_file.writelines(output_lines)
