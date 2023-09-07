@@ -71,72 +71,76 @@ function PS.OnPanelActive(wnd)
 	nY = nY + nLineH
 
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Enable alarm (master switch)'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndCheckBox', {
-		x = nPaddingX + 10, y = nY,
+	local uiContainer = ui:Append('WndContainer', { x = nPaddingX + 5, y = nY + 5, w = nW - nPaddingX * 2 - 5, containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+	uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 		text = _L['Team channel alarm'],
 		color = GetMsgFontColor('MSG_TEAM', true),
 		checked = MY_TeamMon.bPushTeamChannel,
 		onCheck = function(bCheck)
 			MY_TeamMon.bPushTeamChannel = bCheck
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndCheckBox', {
-		x = nX + 5, y = nY,
+	}):AutoWidth()
+	uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 		text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 		checked = MY_TeamMon.bPushWhisperChannel,
 		onCheck = function(bCheck)
 			MY_TeamMon.bPushWhisperChannel = bCheck
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndCheckBox', {
-		x = nX + 5, y = nY, text = _L['Buff list'],
-		checked = MY_TeamMon.bPushBuffList,
-		onCheck = function(bCheck)
-			MY_TeamMon.bPushBuffList = bCheck
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndCheckBox', {
-		x = nX + 5, y = nY, text = _L['Center alarm'],
-		checked = MY_TeamMon.bPushCenterAlarm,
-		onCheck = function(bCheck)
-			MY_TeamMon.bPushCenterAlarm = bCheck
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndCheckBox', {
-		x = nX + 5, y = nY, text = _L['Voice alarm'],
+	}):AutoWidth()
+	if not X.IsRestricted('MY_TeamMon_BuffList') then
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			text = _L['Buff list'],
+			checked = MY_TeamMon.bPushBuffList,
+			onCheck = function(bCheck)
+				MY_TeamMon.bPushBuffList = bCheck
+			end,
+		}):AutoWidth()
+	end
+	if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			text = _L['Center alarm'],
+			checked = MY_TeamMon.bPushCenterAlarm,
+			onCheck = function(bCheck)
+				MY_TeamMon.bPushCenterAlarm = bCheck
+			end,
+		}):AutoWidth()
+	end
+	uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+		text = _L['Voice alarm'],
 		checked = MY_TeamMon.bPushVoiceAlarm,
 		onCheck = function(bCheck)
 			MY_TeamMon.bPushVoiceAlarm = bCheck
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = nPaddingX + 5
+	}):AutoWidth()
 	if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, text = _L['Large text alarm'],
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			text = _L['Large text alarm'],
 			checked = MY_TeamMon.bPushBigFontAlarm,
 			onCheck = function(bCheck)
 				MY_TeamMon.bPushBigFontAlarm = bCheck
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		}):AutoWidth()
 	end
 	if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, text = _L['Fullscreen alarm'],
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			text = _L['Fullscreen alarm'],
 			checked = MY_TeamMon.bPushFullScreen,
 			onCheck = function(bCheck)
 				MY_TeamMon.bPushFullScreen = bCheck
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		}):AutoWidth()
 	end
-	nX = ui:Append('WndCheckBox', {
-		x = nX + 5, y = nY, text = _L['Party buff list'],
-		checked = MY_TeamMon.bPushPartyBuffList,
-		onCheck = function(bCheck)
-			MY_TeamMon.bPushPartyBuffList = bCheck
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndCheckBox', {
-		x = nX + 5, y = nY, text = _L['Lifebar alarm'],
+	if not X.IsRestricted('MY_TeamMon_PartyBuffList') then
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			text = _L['Party buff list'],
+			checked = MY_TeamMon.bPushPartyBuffList,
+			onCheck = function(bCheck)
+				MY_TeamMon.bPushPartyBuffList = bCheck
+			end,
+		}):AutoWidth()
+	end
+	uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+		text = _L['Lifebar alarm'],
 		tip = {
 			render = _L['Requires MY_LifeBar loaded.'],
 			position = X.UI.TIP_POSITION.BOTTOM_TOP,
@@ -145,7 +149,11 @@ function PS.OnPanelActive(wnd)
 		onCheck = function(bCheck)
 			MY_TeamMon.bPushScreenHead = bCheck
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	}):AutoWidth()
+	uiContainer:FormatChildrenPos():AutoHeight()
+	nX = nPaddingX
+	nY = nY + uiContainer:Height()
+
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Etc function enable'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nPaddingX + 10, y = nY, text = _L['Show voice recommendation confirm on load data'],
@@ -154,6 +162,7 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bShowVoicePacketRecommendation = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
+
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nPaddingX + 10, y = nY, text = _L['Team panel bind show buff'],
@@ -163,31 +172,35 @@ function PS.OnPanelActive(wnd)
 			FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Buff list'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-	nX = ui:Append('WndComboBox', {
-		x = nPaddingX + 10, y = nY, text = _L['Max buff count'],
-		menu = function()
-			local menu = {}
-			for k, v in ipairs({ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }) do
-				table.insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BuffList.nCount == v, fnAction = function()
-					MY_TeamMon_BuffList.nCount = v
-				end })
-			end
-			return menu
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndComboBox', {
-		x = nX + 5, y = nY, text = _L['Buff size'],
-		menu = function()
-			local menu = {}
-			for k, v in ipairs({ 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100 }) do
-				table.insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BuffList.fScale == v / 55, fnAction = function()
-					MY_TeamMon_BuffList.fScale = v / 55
-				end })
-			end
-			return menu
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+
+	if not X.IsRestricted('MY_TeamMon_BuffList') then
+		nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Buff list'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+		nX = ui:Append('WndComboBox', {
+			x = nPaddingX + 10, y = nY, text = _L['Max buff count'],
+			menu = function()
+				local menu = {}
+				for k, v in ipairs({ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }) do
+					table.insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BuffList.nCount == v, fnAction = function()
+						MY_TeamMon_BuffList.nCount = v
+					end })
+				end
+				return menu
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
+		nX, nY = ui:Append('WndComboBox', {
+			x = nX + 5, y = nY, text = _L['Buff size'],
+			menu = function()
+				local menu = {}
+				for k, v in ipairs({ 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100 }) do
+					table.insert(menu, { szOption = v, bMCheck = true, bChecked = MY_TeamMon_BuffList.fScale == v / 55, fnAction = function()
+						MY_TeamMon_BuffList.fScale = v / 55
+					end })
+				end
+				return menu
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
+	end
+
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Countdown configure'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndTrackbar', {
 		x = nPaddingX + 10, y = nY, w = nW - nPaddingX * 2, rw = nW / 3, h = 22,
@@ -209,6 +222,7 @@ function PS.OnPanelActive(wnd)
 			return _L('Show countdown decimal when duration below: %ds.', val)
 		end,
 	}):Pos('BOTTOMRIGHT')
+
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Data save mode'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
 		x = nPaddingX + 10, y = nY, text = _L['Use common data'],
