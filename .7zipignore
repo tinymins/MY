@@ -4,6 +4,7 @@
 __pycache__
 secret.*
 README.md
+CHANGELOG.md
 header.tpl.lua
 !src-dist
 MYDev_*

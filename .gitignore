@@ -4,6 +4,7 @@ manifest.dat
 manifest.key
 publisher.key
 __pycache__
+/Boilerplate_CHANGELOG.txt
 /secret.jx3dat
 /secret.yaml
 /secret.yaml-cache.jx3dat
