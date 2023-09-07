@@ -191,6 +191,34 @@ def __get_version_info(packet, diff_ver):
     }
 
 
+def __make_changelog(packet, packet_path, branch):
+    with open(os.path.join(packet_path, 'CHANGELOG.md'), 'r', encoding='utf8') as input_file:
+        input_lines = input_file.readlines()
+
+    branch_pattern = re.compile('\\(.*%s.*\\)$' % branch)
+
+    output_lines = []
+
+    for index, line in enumerate(input_lines):
+        line = line.rstrip()
+        if line.endswith(')'):
+            if branch_pattern.search(line):
+                line = line[:branch_pattern.search(line).start()].rstrip()
+            else:
+                continue
+        if index < 2:
+            continue
+        if line.startswith('## '):
+            line = line[3:]
+        if line.startswith('* '):
+            line = ' ' + line
+        line = line + '\n'
+        output_lines.append(line)
+
+    with open(os.path.join(packet_path, '%s_CHANGELOG.txt' % packet), 'w', encoding='gbk') as output_file:
+        output_file.writelines(output_lines)
+
+
 def __7zip(file_name, base_message, base_hash, extra_ignore_file):
     cmd_suffix = ''
     if extra_ignore_file:
@@ -290,8 +318,9 @@ def run(diff_ver, is_source):
         if version_info.get('current') != '' and version_info.get('previous_hash') != '':
             base_message = version_info.get('previous_message')
             base_hash = version_info.get('previous_hash')
-        __7zip(file_name_fmt % '', base_message, base_hash, '')
+        __make_changelog(packet, packet_path, 'remake')
         __7zip(file_name_fmt % 'remake-', base_message, base_hash, '.7zipignore-remake')
+        __make_changelog(packet, packet_path, 'classic')
         __7zip(file_name_fmt % 'classic-', base_message, base_hash, '.7zipignore-classic')
 
     file_name_fmt = os.path.abspath(os.path.join(dist_root, '%s_%s_v%s.%sfull.7z' % (
@@ -300,8 +329,9 @@ def run(diff_ver, is_source):
         version_info.get('current'),
         '%s',
     )))
-    __7zip(file_name_fmt % '', '', '', '')
+    __make_changelog(packet, packet_path, 'remake')
     __7zip(file_name_fmt % 'remake-', '', '', '.7zipignore-remake')
+    __make_changelog(packet, packet_path, 'classic')
     __7zip(file_name_fmt % 'classic-', '', '', '.7zipignore-classic')
 
     # Remove temporary files
