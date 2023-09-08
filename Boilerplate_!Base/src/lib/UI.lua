@@ -4059,24 +4059,21 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 	local bAutoHeight = nHeight == 'auto'
 	if bAutoWidth or bAutoHeight then
 		if componentType == 'Text' then
-			local nW, nH = raw:GetSize()
 			raw:AutoSize()
 			if bAutoWidth then
-				nW = raw:GetW()
+				nWidth = raw:GetW()
 			end
 			if bAutoHeight then
-				nH = raw:GetH()
+				nHeight = raw:GetH()
 			end
-			nWidth, nHeight = nW, nH
 		elseif componentType == 'Handle' then
 			local nW, nH = raw:GetAllItemSize()
-			if not bAutoWidth then
-				nW = raw:GetW()
+			if bAutoWidth then
+				nWidth = nW
 			end
-			if not bAutoHeight then
-				nH = raw:GetH()
+			if bAutoHeight then
+				nHeight = nH
 			end
-			nWidth, nHeight = nW, nH
 		elseif componentType == 'WndCheckBox'
 			or componentType == 'WndRadioBox'
 			or componentType == 'WndComboBox'
@@ -4089,36 +4086,35 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 				local txt = GetComponentElement(raw, 'TEXT')
 				if txt then
 					local ui = X.UI(raw)
-					local W, H, RW, RH = ui:Size()
-					local oW, oH = txt:GetSize()
+					local nW, nH, nRawW, nRawH = ui:Size()
+					local nOriginW, nOriginH = txt:GetSize()
 					txt:SetSize(1000, 1000)
 					txt:AutoSize()
-					local deltaW = txt:GetW() - oW
-					local deltaH = txt:GetH() - oH
+					local nDeltaW = txt:GetW() - nOriginW
+					local nDeltaH = txt:GetH() - nOriginH
 					if bAutoWidth then
-						if RW and bWillAffectRaw then
-							RW = RW + deltaW
+						if nRawW and bWillAffectRaw then
+							nRawW = nRawW + nDeltaW
 						end
-						W = W + deltaW
+						nW = nW + nDeltaW
 					end
 					if bAutoHeight then
-						if RH and bWillAffectRaw then
-							RH = RH + deltaH
+						if nRawH and bWillAffectRaw then
+							nRawH = nRawH + nDeltaH
 						end
-						H = H + deltaH
+						nH = nH + nDeltaH
 					end
-					txt:SetSize(oW, oH)
-					nWidth, nHeight, nInnerWidth, nInnerHeight = W, H, RW, RH
+					txt:SetSize(nOriginW, nOriginH)
+					nWidth, nHeight, nInnerWidth, nInnerHeight = nW, nH, nRawW, nRawH
 				end
 		elseif componentType == 'WndContainer' then
 			local nW, nH = raw:GetAllContentSize()
-			if not bAutoWidth then
-				nW = raw:GetW()
+			if bAutoWidth then
+				nWidth = nW
 			end
-			if not bAutoHeight then
-				nH = raw:GetH()
+			if bAutoHeight then
+				nHeight = nH
 			end
-			nWidth, nHeight = nW, nH
 		end
 	end
 	if not X.IsNumber(nWidth) or not X.IsNumber(nHeight) then
