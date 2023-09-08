@@ -558,8 +558,6 @@ local function GetComponentElement(raw, elementType)
 	return element
 end
 
-local SetComponentSize, AutoSetComponentSize
-
 -- 显示提示框
 -- @param {object} props 配置项
 -- @param {string|function} props.render 要提示的纯文字或富文本，或返回前述内容的函数
@@ -4048,8 +4046,88 @@ function OO:Height(nHeight, nRawHeight)
 	end
 end
 
-function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nInnerHeight)
-	local nWidth, nHeight = nOuterWidth, nOuterHeight
+local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
+	local componentType = GetComponentType(raw)
+	if not nWidth then
+		nWidth = raw:GetW()
+	end
+	if not nHeight then
+		nHeight = raw:GetH()
+	end
+	-- Auto
+	local bAutoWidth = nWidth == 'auto'
+	local bAutoHeight = nHeight == 'auto'
+	if bAutoWidth or bAutoHeight then
+		if componentType == 'Text' then
+			local nW, nH = raw:GetSize()
+			raw:AutoSize()
+			if bAutoWidth then
+				nW = raw:GetW()
+			end
+			if bAutoHeight then
+				nH = raw:GetH()
+			end
+			nWidth, nHeight = nW, nH
+		elseif componentType == 'Handle' then
+			local nW, nH = raw:GetAllItemSize()
+			if not bAutoWidth then
+				nW = raw:GetW()
+			end
+			if not bAutoHeight then
+				nH = raw:GetH()
+			end
+			nWidth, nHeight = nW, nH
+		elseif componentType == 'WndCheckBox'
+			or componentType == 'WndRadioBox'
+			or componentType == 'WndComboBox'
+			or componentType == 'WndTrackbar'
+			or componentType == 'CheckBox'
+			or componentType == 'ColorBox' then
+				local bWillAffectRaw = componentType == 'WndCheckBox'
+					or componentType == 'WndRadioBox'
+					or componentType == 'WndComboBox'
+				local txt = GetComponentElement(raw, 'TEXT')
+				if txt then
+					local ui = X.UI(raw)
+					local W, H, RW, RH = ui:Size()
+					local oW, oH = txt:GetSize()
+					txt:SetSize(1000, 1000)
+					txt:AutoSize()
+					local deltaW = txt:GetW() - oW
+					local deltaH = txt:GetH() - oH
+					if bAutoWidth then
+						if RW and bWillAffectRaw then
+							RW = RW + deltaW
+						end
+						W = W + deltaW
+					end
+					if bAutoHeight then
+						if RH and bWillAffectRaw then
+							RH = RH + deltaH
+						end
+						H = H + deltaH
+					end
+					txt:SetSize(oW, oH)
+					nWidth, nHeight, nInnerWidth, nInnerHeight = W, H, RW, RH
+				end
+		elseif componentType == 'WndContainer' then
+			local nW, nH = raw:GetAllContentSize()
+			if not bAutoWidth then
+				nW = raw:GetW()
+			end
+			if not bAutoHeight then
+				nH = raw:GetH()
+			end
+			nWidth, nHeight = nW, nH
+		end
+	end
+	if not X.IsNumber(nWidth) or not X.IsNumber(nHeight) then
+		--[[#DEBUG BEGIN]]
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Set size of ' .. raw:GetName() .. '(' .. GetComponentType(raw) .. ') failed: ' .. X.EncodeLUAData(nWidth) .. ', ' .. X.EncodeLUAData(nHeight), X.DEBUG_LEVEL.ERROR)
+		--[[#DEBUG END]]
+		return
+	end
+	-- Set
 	local nMinWidth = GetComponentProp(raw, 'minWidth')
 	local nMinHeight = GetComponentProp(raw, 'minHeight')
 	if nMinWidth and nWidth < nMinWidth then
@@ -4058,7 +4136,6 @@ function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nInnerHei
 	if nMinHeight and nHeight < nMinHeight then
 		nHeight = nMinHeight
 	end
-	local componentType = GetComponentType(raw)
 	if componentType == 'WndFrame' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hnd = raw:Lookup('', '')
@@ -4369,8 +4446,8 @@ function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nInnerHei
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local sld = GetComponentElement(raw, 'TRACKBAR')
 		local txt = GetComponentElement(raw, 'TEXT')
-		local nWidth = nOuterWidth or math.max(nWidth, (nInnerWidth or 0) + 5)
-		local nHeight = nOuterHeight or math.max(nHeight, (nInnerHeight or 0) + 5)
+		local nWidth = nWidth or math.max(nWidth, (nInnerWidth or 0) + 5)
+		local nHeight = nHeight or math.max(nHeight, (nInnerHeight or 0) + 5)
 		local nRawWidth = math.min(nWidth, nInnerWidth or sld:GetW())
 		local nRawHeight = math.min(nHeight, nInnerHeight or sld:GetH())
 		wnd:SetSize(nWidth, nHeight)
@@ -4429,12 +4506,13 @@ function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nInnerHei
 			if raw.IsDummyWnd and raw:IsDummyWnd() then
 				wnd = raw:Lookup('', '') or raw
 			end
-			SetComponentSize(parent, wnd:GetSize())
+			local nW, nH = wnd:GetSize()
+			SetComponentSize(parent, nW, nH)
 		elseif parentComponentType == 'WndContainer' then
 			local bAutoWidth = GetComponentProp(parent, 'AutoWidth')
 			local bAutoHeight = GetComponentProp(parent, 'AutoHeight')
 			if bAutoWidth or bAutoHeight then
-				AutoSetComponentSize(parent, bAutoWidth, bAutoHeight)
+				SetComponentSize(parent, bAutoWidth and 'auto' or nil, bAutoHeight and 'auto' or nil)
 			end
 		end
 	end
@@ -4473,15 +4551,8 @@ function OO:Size(...)
 					if bAutoHeight or bStaticHeight then
 						SetComponentProp(raw, 'AutoHeight', bAutoHeight)
 					end
-					SetComponentSize(raw, nWidth or raw:GetW(), nHeight or raw:GetH(), nRawWidth, nRawHeight)
+					SetComponentSize(raw, bAutoWidth and 'auto' or nWidth, bAutoHeight and 'auto' or nHeight, nRawWidth, nRawHeight)
 				end
-			end
-			if bAutoWidth and bAutoHeight then
-				self:AutoSize()
-			elseif bAutoWidth then
-				self:AutoWidth()
-			elseif bAutoHeight then
-				self:AutoHeight()
 			end
 		end
 		return self
@@ -4580,79 +4651,13 @@ function OO:ChildrenSize()
 	end
 end
 
-function AutoSetComponentSize(raw, bAutoWidth, bAutoHeight)
-	local componentType = GetComponentType(raw)
-	if componentType == 'Text' then
-		local nW, nH = raw:GetSize()
-		raw:AutoSize()
-		if bAutoWidth then
-			nW = raw:GetW()
-		end
-		if bAutoHeight then
-			nH = raw:GetH()
-		end
-		SetComponentSize(raw, nW, nH)
-	elseif componentType == 'Handle' then
-		local nW, nH = raw:GetAllItemSize()
-		if not bAutoWidth then
-			nW = raw:GetW()
-		end
-		if not bAutoHeight then
-			nH = raw:GetH()
-		end
-		SetComponentSize(raw, nW, nH)
-	elseif componentType == 'WndCheckBox'
-		or componentType == 'WndRadioBox'
-		or componentType == 'WndComboBox'
-		or componentType == 'WndTrackbar'
-		or componentType == 'CheckBox'
-		or componentType == 'ColorBox' then
-			local bWillAffectRaw = componentType == 'WndCheckBox'
-				or componentType == 'WndRadioBox'
-				or componentType == 'WndComboBox'
-			local txt = GetComponentElement(raw, 'TEXT')
-			if txt then
-				local ui = X.UI(raw)
-				local W, H, RW, RH = ui:Size()
-				local oW, oH = txt:GetSize()
-				txt:SetSize(1000, 1000)
-				txt:AutoSize()
-				local deltaW = txt:GetW() - oW
-				local deltaH = txt:GetH() - oH
-				if bAutoWidth then
-					if RW and bWillAffectRaw then
-						RW = RW + deltaW
-					end
-					W = W + deltaW
-				end
-				if bAutoHeight then
-					if RH and bWillAffectRaw then
-						RH = RH + deltaH
-					end
-					H = H + deltaH
-				end
-				txt:SetSize(oW, oH)
-				SetComponentSize(raw, W, H, RW, RH)
-			end
-	elseif componentType == 'WndContainer' then
-		local nW, nH = raw:GetAllContentSize()
-		if not bAutoWidth then
-			nW = raw:GetW()
-		end
-		if not bAutoHeight then
-			nH = raw:GetH()
-		end
-		SetComponentSize(raw, nW, nH)
-	end
-end
-
 -- Auto set width of element by text
 -- (self) Instance:AutoWidth()
 function OO:AutoWidth()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		SetComponentProp(raw, 'AutoWidth', true)
-		AutoSetComponentSize(raw, true, false)
+		SetComponentSize(raw, 'auto', nil)
 	end
 	return self
 end
@@ -4663,7 +4668,7 @@ function OO:AutoHeight()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		SetComponentProp(raw, 'AutoHeight', true)
-		AutoSetComponentSize(raw, false, true)
+		SetComponentSize(raw, nil, 'auto')
 	end
 	return self
 end
@@ -4676,7 +4681,7 @@ function OO:AutoSize(arg0, arg1)
 		for _, raw in ipairs(self.raws) do
 			SetComponentProp(raw, 'AutoWidth', true)
 			SetComponentProp(raw, 'AutoHeight', true)
-			AutoSetComponentSize(raw, true, true)
+			SetComponentSize(raw, 'auto', 'auto')
 		end
 	elseif X.IsBoolean(arg0) then
 		for _, raw in ipairs(self.raws) do
