@@ -228,7 +228,7 @@ def __make_changelog(packet, packet_path, branch):
         output_file.writelines(output_lines)
 
 
-def __7zip(file_name, base_message, base_hash, extra_ignore_file):
+def __7zip(packet, file_name, base_message, base_hash, extra_ignore_file):
     cmd_suffix = ''
     if extra_ignore_file:
         cmd_suffix = cmd_suffix + ' -x@' + extra_ignore_file
@@ -239,6 +239,7 @@ def __7zip(file_name, base_message, base_hash, extra_ignore_file):
         paths = {
             'package.ini': True,
             'package.ini.*': True,
+            '%s_CHANGELOG.txt' % packet: True,
         }
         print('File change list:')
         filelist = os.popen('git diff ' + base_hash + ' HEAD --name-status').read().strip().split('\n')
@@ -328,9 +329,9 @@ def run(diff_ver, is_source):
             base_message = version_info.get('previous_message')
             base_hash = version_info.get('previous_hash')
         __make_changelog(packet, packet_path, 'remake')
-        __7zip(file_name_fmt % 'remake-', base_message, base_hash, '.7zipignore-remake')
+        __7zip(packet, file_name_fmt % 'remake-', base_message, base_hash, '.7zipignore-remake')
         __make_changelog(packet, packet_path, 'classic')
-        __7zip(file_name_fmt % 'classic-', base_message, base_hash, '.7zipignore-classic')
+        __7zip(packet, file_name_fmt % 'classic-', base_message, base_hash, '.7zipignore-classic')
 
     file_name_fmt = os.path.abspath(os.path.join(dist_root, '%s_%s_v%s.%sfull.7z' % (
         packet,
@@ -339,9 +340,9 @@ def run(diff_ver, is_source):
         '%s',
     )))
     __make_changelog(packet, packet_path, 'remake')
-    __7zip(file_name_fmt % 'remake-', '', '', '.7zipignore-remake')
+    __7zip(packet, file_name_fmt % 'remake-', '', '', '.7zipignore-remake')
     __make_changelog(packet, packet_path, 'classic')
-    __7zip(file_name_fmt % 'classic-', '', '', '.7zipignore-classic')
+    __7zip(packet, file_name_fmt % 'classic-', '', '', '.7zipignore-classic')
 
     # Remove temporary files
     for addon in os.listdir('./'):
