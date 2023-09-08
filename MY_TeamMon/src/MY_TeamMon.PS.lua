@@ -71,7 +71,7 @@ function PS.OnPanelActive(wnd)
 	nY = nY + nLineH
 
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Enable alarm (master switch)'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-	local uiContainer = ui:Append('WndContainer', { x = nPaddingX + 5, y = nY + 5, w = nW - nPaddingX * 2 - 5, containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+	local uiContainer = ui:Append('WndContainer', { x = nPaddingX + 5, y = nY, w = nW - nPaddingX * 2 - 5, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
 	uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 		text = _L['Team channel alarm'],
 		color = GetMsgFontColor('MSG_TEAM', true),
@@ -150,7 +150,6 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bPushScreenHead = bCheck
 		end,
 	}):AutoWidth()
-	uiContainer:FormatChildrenPos():AutoHeight()
 	nX = nPaddingX
 	nY = nY + uiContainer:Height()
 
