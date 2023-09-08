@@ -558,6 +558,8 @@ local function GetComponentElement(raw, elementType)
 	return element
 end
 
+local SetComponentSize, AutoSetComponentSize
+
 -- 显示提示框
 -- @param {object} props 配置项
 -- @param {string|function} props.render 要提示的纯文字或富文本，或返回前述内容的函数
@@ -4046,7 +4048,7 @@ function OO:Height(nHeight, nRawHeight)
 	end
 end
 
-local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nInnerHeight)
+function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nInnerHeight)
 	local nWidth, nHeight = nOuterWidth, nOuterHeight
 	local nMinWidth = GetComponentProp(raw, 'minWidth')
 	local nMinHeight = GetComponentProp(raw, 'minHeight')
@@ -4421,12 +4423,19 @@ local function SetComponentSize(raw, nOuterWidth, nOuterHeight, nInnerWidth, nIn
 	end
 	if raw:GetBaseType() == 'Wnd' then
 		local parent = raw:GetParent()
-		if GetComponentType(parent) == 'WndDummyWrapper' then
+		local parentComponentType = GetComponentType(parent)
+		if parentComponentType == 'WndDummyWrapper' then
 			local wnd = raw
 			if raw.IsDummyWnd and raw:IsDummyWnd() then
 				wnd = raw:Lookup('', '') or raw
 			end
-			parent:SetSize(wnd:GetSize())
+			SetComponentSize(parent, wnd:GetSize())
+		elseif parentComponentType == 'WndContainer' then
+			local bAutoWidth = GetComponentProp(parent, 'AutoWidth')
+			local bAutoHeight = GetComponentProp(parent, 'AutoHeight')
+			if bAutoWidth or bAutoHeight then
+				AutoSetComponentSize(parent, bAutoWidth, bAutoHeight)
+			end
 		end
 	end
 	X.ExecuteWithThis(raw, raw.OnSizeChange)
@@ -4447,7 +4456,9 @@ function OO:Size(...)
 			local nWidth, nHeight = arg0, arg1
 			local nRawWidth, nRawHeight = arg2, arg3
 			local bAutoWidth = nWidth == 'auto'
+			local bStaticWidth = X.IsNumber(nWidth)
 			local bAutoHeight = nHeight == 'auto'
+			local bStaticHeight = X.IsNumber(nHeight)
 			if bAutoWidth then
 				nWidth = nil
 			end
@@ -4456,6 +4467,12 @@ function OO:Size(...)
 			end
 			if X.IsNumber(nWidth) or X.IsNumber(nHeight) or X.IsNumber(nRawWidth) or X.IsNumber(nRawHeight) then
 				for _, raw in ipairs(self.raws) do
+					if bAutoWidth or bStaticWidth then
+						SetComponentProp(raw, 'AutoWidth', bAutoWidth)
+					end
+					if bAutoHeight or bStaticHeight then
+						SetComponentProp(raw, 'AutoHeight', bAutoHeight)
+					end
 					SetComponentSize(raw, nWidth or raw:GetW(), nHeight or raw:GetH(), nRawWidth, nRawHeight)
 				end
 			end
@@ -4563,8 +4580,7 @@ function OO:ChildrenSize()
 	end
 end
 
-do
-local function AutoSize(raw, bAutoWidth, bAutoHeight)
+function AutoSetComponentSize(raw, bAutoWidth, bAutoHeight)
 	local componentType = GetComponentType(raw)
 	if componentType == 'Text' then
 		local nW, nH = raw:GetSize()
@@ -4635,7 +4651,8 @@ end
 function OO:AutoWidth()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
-		AutoSize(raw, true, false)
+		SetComponentProp(raw, 'AutoWidth', true)
+		AutoSetComponentSize(raw, true, false)
 	end
 	return self
 end
@@ -4645,7 +4662,8 @@ end
 function OO:AutoHeight()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
-		AutoSize(raw, false, true)
+		SetComponentProp(raw, 'AutoHeight', true)
+		AutoSetComponentSize(raw, false, true)
 	end
 	return self
 end
@@ -4656,7 +4674,9 @@ function OO:AutoSize(arg0, arg1)
 	self:_checksum()
 	if X.IsNil(arg0) then
 		for _, raw in ipairs(self.raws) do
-			AutoSize(raw, true, true)
+			SetComponentProp(raw, 'AutoWidth', true)
+			SetComponentProp(raw, 'AutoHeight', true)
+			AutoSetComponentSize(raw, true, true)
 		end
 	elseif X.IsBoolean(arg0) then
 		for _, raw in ipairs(self.raws) do
@@ -4666,7 +4686,6 @@ function OO:AutoSize(arg0, arg1)
 		end
 	end
 	return self
-end
 end
 
 -- (number) Instance:FontScale()
