@@ -402,7 +402,6 @@ local CONSTANT = {
 		[528] = true, -- 浪客行·漓水
 	},
 	MONSTER_MAP = {
-		[559] = true, --
 		[562] = true, -- 百战异闻录
 	},
 	ROGUELIKE_MAP = {
