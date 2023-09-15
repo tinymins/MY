@@ -2415,7 +2415,7 @@ function D.OpenSettingPanel(data, szType)
 
 		-- 进入场景
 		local cfg = data[MY_TEAM_MON_TYPE.DOODAD_ENTER] or {}
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Enter scene'], font = 27 }):Pos('BOTTOMRIGHT')
+		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Enter scene'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndComboBox', {
 			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
 			menu = function()
@@ -2477,7 +2477,7 @@ function D.OpenSettingPanel(data, szType)
 		nX = ui:Append('Text', {
 			name = 'DOODAD_LEAVE_TEXT', x = 20, y = nY + 5,
 			text = data.bAllLeave and _L['All leave scene'] or _L['Leave scene'], font = 27,
-		}):Pos('BOTTOMRIGHT')
+		}):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndComboBox', {
 			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
 			menu = function()
@@ -2586,7 +2586,7 @@ function D.OpenSettingPanel(data, szType)
 
 		-- 触发喊话
 		local cfg = data[MY_TEAM_MON_TYPE.TALK_MONITOR] or {}
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger talk'], font = 27 }):Pos('BOTTOMRIGHT')
+		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger talk'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 		nX, nY = ui:Append('WndComboBox', {
 			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
 			menu = function()
