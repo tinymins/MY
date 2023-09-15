@@ -1982,16 +1982,18 @@ function D.OpenSettingPanel(data, szType)
 				end,
 			}):AutoWidth()
 		end
-		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
-			checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = {
-				render = _L['Requires MY_LifeBar loaded.'],
-				position = X.UI.TIP_POSITION.BOTTOM_TOP,
-			},
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bScreenHead', bCheck)
-			end,
-		}):AutoWidth()
+		if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+				tip = {
+					render = _L['Requires MY_LifeBar loaded.'],
+					position = X.UI.TIP_POSITION.BOTTOM_TOP,
+				},
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bScreenHead', bCheck)
+				end,
+			}):AutoWidth()
+		end
 		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 				checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
@@ -2218,16 +2220,18 @@ function D.OpenSettingPanel(data, szType)
 					end,
 				}):AutoWidth():Pos('BOTTOMRIGHT')
 			end
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-				tip = {
-					render = _L['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'],
-					position = X.UI.TIP_POSITION.BOTTOM_TOP,
-				},
-				onCheck = function(bCheck)
-					SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bScreenHead', bCheck)
-				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
+				nX = ui:Append('WndCheckBox', {
+					x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+					tip = {
+						render = _L['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'],
+						position = X.UI.TIP_POSITION.BOTTOM_TOP,
+					},
+					onCheck = function(bCheck)
+						SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bScreenHead', bCheck)
+					end,
+				}):AutoWidth():Pos('BOTTOMRIGHT')
+			end
 			if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 				nX = ui:Append('WndCheckBox', {
 					x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
@@ -2314,16 +2318,18 @@ function D.OpenSettingPanel(data, szType)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 		end
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = {
-				render = _L['Requires MY_LifeBar loaded.'],
-				position = X.UI.TIP_POSITION.BOTTOM_TOP,
-			},
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+				tip = {
+					render = _L['Requires MY_LifeBar loaded.'],
+					position = X.UI.TIP_POSITION.BOTTOM_TOP,
+				},
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
@@ -2444,6 +2450,7 @@ function D.OpenSettingPanel(data, szType)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 		end
+		-- if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
 			-- nX = ui:Append('WndCheckBox', {
 			-- 	x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 			-- 	tip = {
@@ -2454,6 +2461,7 @@ function D.OpenSettingPanel(data, szType)
 			-- 		SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
 			-- 	end,
 			-- }):AutoWidth():Pos('BOTTOMRIGHT')
+		-- end
 		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
@@ -2613,16 +2621,18 @@ function D.OpenSettingPanel(data, szType)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 		end
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = {
-				render = _L['Requires MY_LifeBar loaded.'],
-				position = X.UI.TIP_POSITION.BOTTOM_TOP,
-			},
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+				tip = {
+					render = _L['Requires MY_LifeBar loaded.'],
+					position = X.UI.TIP_POSITION.BOTTOM_TOP,
+				},
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
@@ -2726,16 +2736,18 @@ function D.OpenSettingPanel(data, szType)
 				end,
 			}):AutoWidth():Pos('BOTTOMRIGHT')
 		end
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
-			tip = {
-				render = _L['Requires MY_LifeBar loaded.'],
-				position = X.UI.TIP_POSITION.BOTTOM_TOP,
-			},
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
-			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
+			nX = ui:Append('WndCheckBox', {
+				x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+				tip = {
+					render = _L['Requires MY_LifeBar loaded.'],
+					position = X.UI.TIP_POSITION.BOTTOM_TOP,
+				},
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
+				end,
+			}):AutoWidth():Pos('BOTTOMRIGHT')
+		end
 		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			nX = ui:Append('WndCheckBox', {
 				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],

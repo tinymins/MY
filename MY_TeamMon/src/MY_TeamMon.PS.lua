@@ -139,17 +139,19 @@ function PS.OnPanelActive(wnd)
 			end,
 		}):AutoWidth()
 	end
-	uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
-		text = _L['Lifebar alarm'],
-		tip = {
-			render = _L['Requires MY_LifeBar loaded.'],
-			position = X.UI.TIP_POSITION.BOTTOM_TOP,
-		},
-		checked = MY_TeamMon.bPushScreenHead,
-		onCheck = function(bCheck)
-			MY_TeamMon.bPushScreenHead = bCheck
-		end,
-	}):AutoWidth()
+	if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			text = _L['Lifebar alarm'],
+			tip = {
+				render = _L['Requires MY_LifeBar loaded.'],
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
+			},
+			checked = MY_TeamMon.bPushScreenHead,
+			onCheck = function(bCheck)
+				MY_TeamMon.bPushScreenHead = bCheck
+			end,
+		}):AutoWidth()
+	end
 	nX = nPaddingX
 	nY = nY + uiContainer:Height()
 
