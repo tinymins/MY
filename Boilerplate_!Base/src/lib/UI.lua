@@ -4494,15 +4494,18 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			h:FormatAllItemPos()
 		end
 	end
-	if raw:GetBaseType() == 'Wnd' then
-		local parent = raw:GetParent()
+	local parent = raw:GetParent()
+	if parent and parent:GetBaseType() ~= 'Wnd' then
+		parent = parent:GetParent()
+	end
+	if parent then
 		local parentComponentType = GetComponentType(parent)
 		if parentComponentType == 'WndDummyWrapper' then
-			local wnd = raw
-			if raw.IsDummyWnd and raw:IsDummyWnd() then
-				wnd = raw:Lookup('', '') or raw
+			local el = raw
+			if el:GetBaseType() == 'Wnd' and raw.IsDummyWnd and raw:IsDummyWnd() then
+				el = raw:Lookup('', '') or raw
 			end
-			local nW, nH = wnd:GetSize()
+			local nW, nH = el:GetSize()
 			SetComponentSize(parent, nW, nH)
 		elseif parentComponentType == 'WndContainer' then
 			local bAutoWidth = GetComponentProp(parent, 'AutoWidth')
