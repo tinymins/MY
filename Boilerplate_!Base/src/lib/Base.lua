@@ -96,6 +96,9 @@ local X = {
 			GAME_VERSION = _GAME_VERSION_,
 			GAME_PROVIDER = _GAME_PROVIDER_,
 			SERVER_ADDRESS = select(7, GetUserServer()),
+			SOUND_DRIVER = IsFileExist('bin64\\KG3DWwiseSoundX64.dll')
+				and 'WWISE'
+				or 'FMOD',
 			RUNTIME_OPTIMIZE = --[[#DEBUG BEGIN]](
 				(IsDebugClient() or debug.traceback ~= nil)
 					and _DEBUG_LEVEL_ == DEBUG_LEVEL.NONE
