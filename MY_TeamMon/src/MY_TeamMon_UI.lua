@@ -1895,22 +1895,26 @@ function D.OpenSettingPanel(data, szType)
 	end):Click(fnClickBox)
 
 	if szType == 'BUFF' or szType == 'DEBUFF' then
+		-- 通用
 		nX, nY = ui:Append('Text', { x = 20, y = nY, text = g_tStrings.CHANNEL_COMMON, font = 27 }):Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndComboBox', {
-			x = 30, y = nY, w = 200, text = _L['Scrutiny type'],
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndComboBox', {
+			w = 200, text = _L['Scrutiny type'],
 			menu = function()
 				return GetScrutinyTypeMenu(data)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 2, w = 200, text = _L['Self kungfu requirement'],
+		}):AutoWidth()
+		uiContainer:Append('WndComboBox', {
+			w = 200, text = _L['Self kungfu requirement'],
 			menu = function()
 				return GetKungFuMenu(data)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Buffcount achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndEditBox', {
-			x = nX + 2, y = nY + 2, w = 30, h = 26,
+		}):AutoWidth()
+		uiContainer:Append('WndWindow', { w = 5, h = 30 })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { y = -3, text = _L['Buffcount achieve'] }):AutoWidth()
+		uiContainer:Append('WndEditBox', {
+			w = 30, h = 26,
 			text = data.nCount or 1, editType = X.UI.EDIT_TYPE.NUMBER,
 			onChange = function(nNum)
 				data.nCount = tonumber(nNum)
@@ -1919,61 +1923,67 @@ function D.OpenSettingPanel(data, szType)
 				end
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = data.bCheckLevel, text = _L['Check level'],
+		}):AutoWidth()
+		uiContainer:Append('WndCheckBox', {
+			checked = data.bCheckLevel, text = _L['Check level'],
 			onCheck = function(bCheck)
 				data.bCheckLevel = bCheck and true or nil
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 				FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		}):AutoWidth()
+		nY = nY + uiContainer:Height() + 5
+
 		-- 获得气劲
 		local cfg = data[MY_TEAM_MON_TYPE.BUFF_GET] or {}
-		nX = ui:Append('Text', { x = 20, y = nY + 5, w = 'auto', text = _L['Get buff'], font = 27  }):Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 'auto', h = 25,
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { y = -2, w = 'auto', text = _L['Get buff'], font = 27 }):AutoWidth()
+		uiContainer:Append('WndComboBox', {
+			w = 'auto', h = 25,
 			text = _L['Mark'],
 			menu = function()
 				return GetMarkMenu(MY_TEAM_MON_TYPE.BUFF_GET)
 			end,
-		}):Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+		})
+		uiContainer:Append('WndComboBox', {
+			w = 60, h = 25, text = _L['Voice'],
 			menu = function()
 				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_GET, true)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
+		}):AutoWidth()
+		nY = nY + uiContainer:Height()
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bTeamChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
+		}):AutoWidth()
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bWhisperChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		}):AutoWidth()
 		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bCenterAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			}):AutoWidth()
 		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bBigFontAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			}):AutoWidth()
 		end
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 			tip = {
 				render = _L['Requires MY_LifeBar loaded.'],
 				position = X.UI.TIP_POSITION.BOTTOM_TOP,
@@ -1981,109 +1991,107 @@ function D.OpenSettingPanel(data, szType)
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bScreenHead', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		}):AutoWidth()
 		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bFullScreen', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			}):AutoWidth()
 		end
-		nY = nY + CHECKBOX_HEIGHT
-
-		nX = 25
 		if not X.IsRestricted('MY_TeamMon_PartyBuffList') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bPartyBuffList, text = _L['Party buff list'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bPartyBuffList, text = _L['Party buff list'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bPartyBuffList', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			}):AutoWidth()
 		end
 		if not X.IsRestricted('MY_TeamMon_BuffList') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bBuffList, text = _L['Buff list'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bBuffList, text = _L['Buff list'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bBuffList', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			}):AutoWidth()
 		end
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bTeamPanel, text = _L['Team panel'],
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bTeamPanel, text = _L['Team panel'],
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bTeamPanel', bCheck)
 				ui:Children('#bOnlySelfSrc'):Enable(bCheck)
 				FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
+		}):AutoWidth()
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 			name = 'bOnlySelfSrc',
-			x = nX + 5, y = nY, checked = cfg.bOnlySelfSrc, text = _L['Only source self'], enable = cfg.bTeamPanel == true,
+			checked = cfg.bOnlySelfSrc, text = _L['Only source self'], enable = cfg.bTeamPanel == true,
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bOnlySelfSrc', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nY = nY + CHECKBOX_HEIGHT
-
+		}):AutoWidth()
 		if not X.IsRestricted('MY_TeamMon.AutoSelect') then
-			local _ui = ui:Append('WndCheckBox', {
-				x = 30, y = nY, checked = cfg.bSelect, text = _L['Auto Select'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bSelect, text = _L['Auto Select'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bSelect', bCheck)
 				end,
 			}):AutoWidth()
-			nX = _ui:Pos('BOTTOMRIGHT')
 			if szType == 'BUFF' then
-				nX, nY = ui:Append('WndCheckBox', {
-					x = nX + 5, y = nY, checked = cfg.bAutoCancel, text = _L['Auto Cancel Buff'],
+				uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+					checked = cfg.bAutoCancel, text = _L['Auto Cancel Buff'],
 					onCheck = function(bCheck)
 						SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bAutoCancel', bCheck)
 					end,
-				}):AutoWidth():Pos('BOTTOMRIGHT')
-			else
-				nX, nY = _ui:Pos('BOTTOMRIGHT')
+				}):AutoWidth()
 			end
 		end
+		nY = nY + uiContainer:Height() + 5
+
 		-- 失去气劲
 		local cfg = data[MY_TEAM_MON_TYPE.BUFF_LOSE] or {}
-		nX = ui:Append('Text', { x = 20, y = nY + 5, w = 'auto', text = _L['Lose buff'], font = 27 }):Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 'auto', h = 25,
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { y = -2, w = 'auto', text = _L['Lose buff'], font = 27 }):AutoWidth()
+		uiContainer:Append('WndComboBox', {
+			w = 'auto', h = 25,
 			text = _L['Voice'],
 			menu = function()
 				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_LOSE, true)
 			end,
-		}):Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
+		})
+		nY = nY + uiContainer:Height()
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bTeamChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
+		}):AutoWidth()
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bWhisperChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		}):AutoWidth()
 		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bCenterAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			}):AutoWidth()
 		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bBigFontAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			}):AutoWidth()
 		end
-		nY = nY + CHECKBOX_HEIGHT
+		nY = nY + uiContainer:Height() + 5
 	elseif szType == 'CASTING' then
 		nX, nY = ui:Append('Text', { x = 20, y = nY, text = g_tStrings.CHANNEL_COMMON, font = 27 }):Pos('BOTTOMRIGHT')
 		nX = ui:Append('WndComboBox', {
