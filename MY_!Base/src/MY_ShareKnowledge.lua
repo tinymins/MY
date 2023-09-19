@@ -424,4 +424,88 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_ShareKnowledge__Sysmsg', function(szChannel,
 end)
 end
 
+---------------
+-- 通用信息
+---------------
+do
+local FREQUENCY_LIMIT = 1000
+local NEXT_AWAKE_TIME = 0
+local CURRENT_MSG_CHANNEL = {}
+
+MY_RSS.RegisterAdapter('share-msg', function(data)
+	local t = {}
+	if X.IsTable(data) then
+		for szChannel, aList in pairs(data) do
+			local a = {}
+			for _, s in ipairs(aList) do
+				if X.IsString(s) then
+					table.insert(a, s)
+				end
+			end
+			t[szChannel] = a
+		end
+	end
+	return t
+end)
+
+X.RegisterEvent('MY_RSS_UPDATE', function()
+	for k, _ in pairs(CURRENT_MSG_CHANNEL) do
+		X.RegisterMsgMonitor(k, 'MY_ShareKnowledge__MSG', false)
+	end
+	CURRENT_MSG_CHANNEL = {}
+	local rss = MY_RSS.Get('share-msg')
+	if not rss then
+		return
+	end
+	for k, p in pairs(rss) do
+		X.RegisterMsgMonitor(k, 'MY_ShareKnowledge__MSG', function(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szName)
+			if not MY_Serendipity.bEnable then
+				return
+			end
+			if GetTime() < NEXT_AWAKE_TIME then
+				return
+			end
+			local me = X.GetClientPlayer()
+			if not me then
+				return
+			end
+			-- 跨服中免打扰
+			if IsRemotePlayer(me.dwID) then
+				return
+			end
+			-- 确认是真实消息
+			if X.ContainsEchoMsgHeader(szMsg) then
+				return
+			end
+			if bRich then
+				szMsg = GetPureText(szMsg)
+				bRich = false
+			end
+			for _, s in ipairs(p) do
+				if string.find(szMsg, s) then
+					X.EnsureAjax({
+						url = 'https://push.j3cx.com/api/share-msg',
+						data = {
+							l = X.ENVIRONMENT.GAME_LANG,
+							L = X.ENVIRONMENT.GAME_EDITION,
+							region = X.GetRegionOriginName(),
+							server = X.GetServerOriginName(),
+							channel = szChannel,
+							msg = szMsg,
+							talkerId = dwTalkerID,
+							talkerName = szName,
+							time = GetCurrentTime(),
+						},
+						signature = X.SECRET['J3CX::SHARE_MSG'],
+					})
+					NEXT_AWAKE_TIME = GetTime() + FREQUENCY_LIMIT
+					return
+				end
+			end
+		end)
+		CURRENT_MSG_CHANNEL[k] = true
+	end
+end)
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
