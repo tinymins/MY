@@ -417,10 +417,10 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_ShareKnowledge__Sysmsg', function(szChannel,
 				},
 				signature = X.SECRET['J3CX::SHARE_SYSMSG'],
 			})
+			NEXT_AWAKE_TIME = GetTime() + FREQUENCY_LIMIT
 			break
 		end
 	end
-	NEXT_AWAKE_TIME = GetTime() + FREQUENCY_LIMIT
 end)
 end
 
