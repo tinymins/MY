@@ -3671,6 +3671,13 @@ function X.IsZombieMap(dwMapID)
 end
 end
 
+-- 判断当前地图是不是僵尸地图
+-- (bool) X.IsInZombieMap()
+function X.IsInZombieMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsZombieMap(me.GetMapID())
+end
+
 -- 判断地图是不是百战地图
 -- (bool) X.IsMonsterMap(dwMapID)
 do
@@ -3692,13 +3699,6 @@ end
 function X.IsInMonsterMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsMonsterMap(me.GetMapID())
-end
-
--- 判断当前地图是不是僵尸地图
--- (bool) X.IsInZombieMap()
-function X.IsInZombieMap()
-	local me = X.GetClientPlayer()
-	return me and X.IsZombieMap(me.GetMapID())
 end
 
 -- 判断地图是不是MOBA地图
@@ -3738,6 +3738,29 @@ end
 function X.IsInHomelandMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsHomelandMap(me.GetMapID())
+end
+
+-- 判断地图是不是八荒衡鉴地图
+-- (bool) X.IsMonsterMap(dwMapID)
+do
+local ROGUELIKE_MAP = {}
+function X.IsRoguelikeMap(dwMapID)
+	if ROGUELIKE_MAP[dwMapID] == nil then
+		if Table_IsRougeLikeMap then
+			ROGUELIKE_MAP[dwMapID] = Table_IsRougeLikeMap(dwMapID) or false
+		else
+			ROGUELIKE_MAP[dwMapID] = X.CONSTANT.ROGUELIKE_MAP[dwMapID] or false
+		end
+	end
+	return ROGUELIKE_MAP[dwMapID]
+end
+end
+
+-- 判断当前地图是不是八荒衡鉴地图
+-- (bool) X.IsInMonsterMap()
+function X.IsInRoguelikeMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsRoguelikeMap(me.GetMapID())
 end
 
 -- 判断地图是不是新背包地图
@@ -4598,6 +4621,9 @@ do
 		end
 		PEEK_PLAYER_EQUIP_SCORE_CALLBACK[dwID] = nil
 	end
+	X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+		PEEK_PLAYER_EQUIP_SCORE_STATE[arg0] = nil
+	end)
 
 	-- 获取玩家装备分数
 	-- X.GetPlayerEquipScore(dwID, fnAction)
@@ -4718,6 +4744,9 @@ do
 		end
 		PEEK_PLAYER_EQUIP_CALLBACK[player.dwID] = nil
 	end
+	X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+		PEEK_PLAYER_EQUIP_STATE[arg0] = nil
+	end)
 
 	-- 获取玩家装备信息
 	-- X.GetPlayerEquipInfo(dwID, fnAction)
@@ -4781,6 +4810,7 @@ do
 	end
 	local EVENT_KEY = nil
 	local PEEK_PLAYER_TALENT_STATE = {}
+	local PEEK_PLAYER_TALENT_TIME = {}
 	local PEEK_PLAYER_TALENT_CALLBACK = {}
 	local function OnGetPlayerTalnetInfoPeekPlayer(player)
 		if not PEEK_PLAYER_TALENT_CALLBACK[player.dwID] then
@@ -4808,9 +4838,9 @@ do
 				}
 			end
 		end
-		if X.IsEmpty(aTalent) then
+		if X.IsEmpty(aTalent) and (not PEEK_PLAYER_TALENT_TIME[player.dwID] or GetTime() - PEEK_PLAYER_TALENT_TIME[player.dwID] > 60000) then
 			--[[#DEBUG BEGIN]]
-			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Talent Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Talent Peek player: ' .. player.dwID, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			PeekPlayer(player.dwID)
 			return
@@ -4820,6 +4850,10 @@ do
 		end
 		PEEK_PLAYER_TALENT_CALLBACK[player.dwID] = nil
 	end
+	X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+		PEEK_PLAYER_TALENT_STATE[arg0] = nil
+		PEEK_PLAYER_TALENT_TIME[arg0] = nil
+	end)
 
 	-- 获取玩家奇穴信息
 	-- X.GetPlayerTalentInfo(dwID, fnAction)
@@ -4860,6 +4894,7 @@ do
 				local player = X.GetPlayer(dwID)
 				if player then
 					PEEK_PLAYER_TALENT_STATE[dwID] = 'SUCCESS'
+					PEEK_PLAYER_TALENT_TIME[dwID] = GetTime()
 					OnGetPlayerTalnetInfoPeekPlayer(player)
 				end
 			end)
@@ -4880,7 +4915,7 @@ do
 	local PEEK_PLAYER_ZHEN_PAI_STATE = {}
 	local PEEK_PLAYER_ZHEN_PAI_CALLBACK = {}
 	local PEEK_PLAYER_ZHEN_PAI_CACHE = {}
-	local function OnGetPlayerTalnetInfoPeekPlayer(player)
+	local function OnGetPlayerZhenPaiInfoPeekPlayer(player)
 		if not PEEK_PLAYER_ZHEN_PAI_CALLBACK[player.dwID] then
 			return
 		end
@@ -4894,6 +4929,9 @@ do
 		end
 		PEEK_PLAYER_ZHEN_PAI_CALLBACK[player.dwID] = nil
 	end
+	X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+		PEEK_PLAYER_ZHEN_PAI_STATE[arg0] = nil
+	end)
 
 	-- 获取玩家镇派信息
 	-- X.GetPlayerZhenPaiInfo(dwID, fnAction)
@@ -4936,13 +4974,13 @@ do
 				end
 			end
 			PEEK_PLAYER_ZHEN_PAI_CACHE[dwID] = tTalentSkillLevel
-			OnGetPlayerTalnetInfoPeekPlayer(X.GetClientPlayer())
+			OnGetPlayerZhenPaiInfoPeekPlayer(X.GetClientPlayer())
 			return
 		end
 		-- 缓存判定
 		local player = X.GetPlayer(dwID)
 		if player and PEEK_PLAYER_ZHEN_PAI_STATE[dwID] == 'SUCCESS' and not bForcePeek then
-			OnGetPlayerTalnetInfoPeekPlayer(player)
+			OnGetPlayerZhenPaiInfoPeekPlayer(player)
 			return
 		end
 		-- 防抖限制
@@ -4961,7 +4999,7 @@ do
 				end
 				PEEK_PLAYER_ZHEN_PAI_STATE[dwID] = 'SUCCESS'
 				PEEK_PLAYER_ZHEN_PAI_CACHE[dwID] = tSkillLevel
-				OnGetPlayerTalnetInfoPeekPlayer(player)
+				OnGetPlayerZhenPaiInfoPeekPlayer(player)
 			end)
 		end
 		--[[#DEBUG BEGIN]]
