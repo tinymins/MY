@@ -536,36 +536,45 @@ end
 do
 local SOUND_PLAYER
 -- 播放声音
--- X.PlaySound(szAddonBuiltinPath, szUserCustomPath)
----@param szAddonBuiltinPath string | "false" @插件自带音频文件地址，传入 false 表示不处理
----@param szUserCustomPath string | "false" @用户个性化音频文件地址，传入 false 表示不处理，不传入则同 szAddonBuiltinPath
--- 注：优先播放用户个性化音频，用户个性化音频不存在才会播放插件自带音频文件
-function X.PlaySound(szAddonBuiltinPath, szUserCustomPath)
-	if X.IsNil(szUserCustomPath) then
-		szUserCustomPath = szAddonBuiltinPath
+-- X.PlaySound(szSoundPath, bAllowCustomize)
+---@param szSoundPath string @音频文件地址
+---@param bAllowCustomize boolean @是否允许用户使用个性化音频覆盖，默认允许
+function X.PlaySound(szSoundPath, bAllowCustomize)
+	-- 允许简写基础库提供的音频资源地址
+	szSoundPath = X.StringReplaceW(szSoundPath, '\\', '/')
+	if not X.StringFindW(szSoundPath, '/') then
+		szSoundPath = X.ConcatPath(X.PACKET_INFO.FRAMEWORK_ROOT, 'audio', szSoundPath)
 	end
 	local szFinalPath
-	-- 自定义声音：位于用户数据目录
-	if not szFinalPath and X.IsString(szUserCustomPath) and szUserCustomPath ~= '' then
-		for _, ePathType in ipairs({
-			X.PATH_TYPE.ROLE,
-			X.PATH_TYPE.GLOBAL,
-		}) do
-			local szPath = X.FormatPath({ 'audio/' .. szUserCustomPath, ePathType })
-			if IsFileExist(szPath) then
-				szFinalPath = szPath
-				break
+	-- 自定义声音覆盖：仅可覆盖本插件的音频资源，覆盖文件位于插件数据文件夹角色配置、全局配置目录下的同名子路径文件
+	if not szFinalPath and bAllowCustomize ~= false then
+		local szPath = X.GetRelativePath(szSoundPath, '')
+		if szPath then
+			local szPrefix = X.PACKET_INFO.ROOT:lower()
+			if szPath:lower():sub(1, #szPrefix) == szPrefix then
+				szPath = szPath:sub(#szPrefix + 1)
+				szPath = X.ConcatPath('audio', szPath)
+			else
+				szPath = nil
+			end
+		end
+		if szPath then
+			for _, ePathType in ipairs({
+				X.PATH_TYPE.ROLE,
+				X.PATH_TYPE.GLOBAL,
+			}) do
+				local szPath = X.FormatPath({ szPath, ePathType })
+				if IsFileExist(szPath) then
+					szFinalPath = szPath
+					break
+				end
 			end
 		end
 	end
-	-- 默认声音：位于基础库 audio 子文件夹
-	if not szFinalPath and X.IsString(szAddonBuiltinPath) and szAddonBuiltinPath ~= '' then
-		local szPath = X.StringReplaceW(szAddonBuiltinPath, '\\', '/')
-		if not X.StringFindW(szPath, '/') then
-			szPath = X.PACKET_INFO.FRAMEWORK_ROOT .. 'audio/' .. szPath
-		end
-		if IsFileExist(szPath) then
-			szFinalPath = szPath
+	-- 插件内置声音：位于基础库 audio 子文件夹
+	if not szFinalPath then
+		if IsFileExist(szSoundPath) then
+			szFinalPath = szSoundPath
 		end
 	end
 	-- 播放声音
