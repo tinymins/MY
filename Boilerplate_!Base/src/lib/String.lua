@@ -188,12 +188,12 @@ function X.KGUIEncrypt(szText)
 end
 X.KE = X.KGUIEncrypt
 
--- 编码 URL 中的参数：方法不会对下列字符编码 [a-zA-Z0-9~!*()']
+-- 编码 URL 中的参数：方法不会对下列字符编码 [a-zA-Z0-9-_.!~*'()]
 -- @param {any} data 需要编码的数据
 -- @return {typeof data} 编码后的数据
 local function EncodeURIComponent(data)
 	if type(data) == 'string' then
-		return (data:gsub('([^0-9a-zA-Z ])', function (c) return string.format('%%%02X', string.byte(c)) end):gsub(' ', '+'))
+		return (data:gsub('([^a-zA-Z0-9-_.!~*\'()])', function (c) return string.format('%%%02X', string.byte(c)) end))
 	end
 	if type(data) == 'table' then
 		local t = {}
