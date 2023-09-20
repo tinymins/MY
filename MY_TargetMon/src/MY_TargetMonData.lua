@@ -294,7 +294,7 @@ local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist
 			if dwSoundID then
 				local szSoundPath = X.GetSoundPath(dwSoundID)
 				if szSoundPath then
-					X.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
+					X.PlaySound(szSoundPath, false)
 				end
 			end
 		end
@@ -639,7 +639,7 @@ function UpdateView()
 						if dwSoundID then
 							local szSoundPath = X.GetSoundPath(dwSoundID)
 							if szSoundPath then
-								X.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
+								X.PlaySound(szSoundPath, false)
 							end
 						end
 					end

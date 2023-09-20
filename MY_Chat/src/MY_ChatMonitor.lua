@@ -289,7 +289,6 @@ function D.OnMsgArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szNa
 		fnAction = D.OnNotifyCB,
 		bPlaySound = O.bPlaySound,
 		szSound = PLUGIN_ROOT .. '/audio/MsgArrive.ogg',
-		szCustomSound = 'MsgArrive.ogg',
 		bPopupPreview = O.bShowPreview,
 	})
 	--------------------------------------------------------------------------------------
