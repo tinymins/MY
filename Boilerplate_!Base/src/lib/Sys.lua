@@ -541,12 +541,12 @@ local SOUND_PLAYER = X.UI.GetTempElement('WndWebCef', X.NSFormatString('{$NS}Lib
 ---@param szCustomPath string @个性化音频文件地址
 -- 注：优先播放个性化音频，个性化音频不存在才会播放默认音频文件
 function X.PlaySound(szFilePath, szCustomPath)
-	if not szCustomPath then
+	if X.IsNil(szCustomPath) then
 		szCustomPath = szFilePath
 	end
 	local szFinalPath
-	-- 自定义声音
-	if not szFinalPath and szCustomPath ~= '' then
+	-- 自定义声音：位于用户数据目录
+	if not szFinalPath and X.IsString(szCustomPath) and szCustomPath ~= '' then
 		for _, ePathType in ipairs({
 			X.PATH_TYPE.ROLE,
 			X.PATH_TYPE.GLOBAL,
@@ -558,7 +558,7 @@ function X.PlaySound(szFilePath, szCustomPath)
 			end
 		end
 	end
-	-- 默认声音
+	-- 默认声音：位于基础库 audio 子文件夹
 	if not szFinalPath then
 		local szPath = X.StringReplaceW(szFilePath, '\\', '/')
 		if not X.StringFindW(szPath, '/') then
@@ -571,8 +571,12 @@ function X.PlaySound(szFilePath, szCustomPath)
 	-- 播放声音
 	if szFinalPath then
 		if X.ENVIRONMENT.SOUND_DRIVER == 'FMOD' then
+			szFinalPath = X.NormalizePath(szFinalPath)
 			PlaySound(SOUND.UI_SOUND, szFinalPath)
 		else
+			szFinalPath = X.GetAbsolutePath(szFinalPath)
+			szFinalPath = X.StringReplaceW(szFinalPath, '\\', '/')
+			SOUND_PLAYER:Navigate('about:blank')
 			SOUND_PLAYER:Navigate('file:///' .. X.ConvertToUTF8(szFinalPath))
 		end
 	end
