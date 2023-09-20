@@ -450,7 +450,7 @@ local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
 		t.fnAction = fnAction
 		t.fnMouseEnter = function()
 			if IsCtrlKeyDown() then
-				X.PlaySound(SOUND.UI_SOUND, tSound.szPath, '')
+				X.PlaySound(tSound.szPath, '')
 			else
 				local szXml = GetFormatText(_L['Hold ctrl when move in to preview.'], nil, 255, 255, 0)
 				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
@@ -533,49 +533,50 @@ function X.GetSoundPath(dwID)
 end
 end
 
+do
+local SOUND_PLAYER = X.UI.GetTempElement('WndWebCef', X.NSFormatString('{$NS}Lib__SoundPlayer'))
 -- 播放声音
--- X.PlaySound([nType, ]szFilePath[, szCustomPath])
---   nType        声音类型
---     SOUND.BG_MUSIC = 0,    // 背景音乐
---     SOUND.UI_SOUND,        // 界面音效    -- 默认值
---     SOUND.UI_ERROR_SOUND,  // 错误提示音
---     SOUND.SCENE_SOUND,     // 环境音效
---     SOUND.CHARACTER_SOUND, // 角色音效,包括打击，特效的音效
---     SOUND.CHARACTER_SPEAK, // 角色对话
---     SOUND.FRESHER_TIP,     // 新手提示音
---     SOUND.SYSTEM_TIP,      // 系统提示音
---     SOUND.TREATYANI_SOUND, // 协议动画声音
---   szFilePath   音频文件地址
---   szCustomPath 个性化音频文件地址
--- 注：优先播放szCustomPath, szCustomPath不存在才会播放szFilePath
-function X.PlaySound(nType, szFilePath, szCustomPath)
-	if not X.IsNumber(nType) then
-		nType, szFilePath, szCustomPath = SOUND.UI_SOUND, nType, szFilePath
-	end
+-- X.PlaySound(szFilePath[, szCustomPath])
+---@param szFilePath string @音频文件地址
+---@param szCustomPath string @个性化音频文件地址
+-- 注：优先播放个性化音频，个性化音频不存在才会播放默认音频文件
+function X.PlaySound(szFilePath, szCustomPath)
 	if not szCustomPath then
 		szCustomPath = szFilePath
 	end
-	-- 播放自定义声音
-	if szCustomPath ~= '' then
+	local szFinalPath
+	-- 自定义声音
+	if not szFinalPath and szCustomPath ~= '' then
 		for _, ePathType in ipairs({
 			X.PATH_TYPE.ROLE,
 			X.PATH_TYPE.GLOBAL,
 		}) do
 			local szPath = X.FormatPath({ 'audio/' .. szCustomPath, ePathType })
 			if IsFileExist(szPath) then
-				return PlaySound(nType, szPath)
+				szFinalPath = szPath
+				break
 			end
 		end
 	end
-	-- 播放默认声音
-	local szPath = X.StringReplaceW(szFilePath, '\\', '/')
-	if not X.StringFindW(szPath, '/') then
-		szPath = X.PACKET_INFO.FRAMEWORK_ROOT .. 'audio/' .. szPath
+	-- 默认声音
+	if not szFinalPath then
+		local szPath = X.StringReplaceW(szFilePath, '\\', '/')
+		if not X.StringFindW(szPath, '/') then
+			szPath = X.PACKET_INFO.FRAMEWORK_ROOT .. 'audio/' .. szPath
+		end
+		if IsFileExist(szPath) then
+			szFinalPath = szPath
+		end
 	end
-	if not IsFileExist(szPath) then
-		return
+	-- 播放声音
+	if szFinalPath then
+		if X.ENVIRONMENT.SOUND_DRIVER == 'FMOD' then
+			PlaySound(SOUND.UI_SOUND, szFinalPath)
+		else
+			SOUND_PLAYER:Navigate('file:///' .. X.ConvertToUTF8(szFinalPath))
+		end
 	end
-	PlaySound(nType, szPath)
+end
 end
 
 function X.GetFontList()
