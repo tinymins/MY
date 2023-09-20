@@ -579,8 +579,13 @@ function X.PlaySound(szAddonBuiltinPath, szUserCustomPath)
 			end
 			szFinalPath = X.GetAbsolutePath(szFinalPath)
 			szFinalPath = X.StringReplaceW(szFinalPath, '\\', '/')
+			local szDriverLetter = szFinalPath:sub(1, 3)
+			local aURLParts = X.SplitString(szFinalPath:sub(4), '/')
+			for i, s in ipairs(aURLParts) do
+				aURLParts[i] = X.EncodeURIComponent(X.ConvertToUTF8(s))
+			end
 			SOUND_PLAYER:Navigate('about:blank')
-			SOUND_PLAYER:Navigate('file:///' .. X.ConvertToUTF8(szFinalPath))
+			SOUND_PLAYER:Navigate('file:///' .. szDriverLetter .. table.concat(aURLParts, '/'))
 		end
 	end
 end
