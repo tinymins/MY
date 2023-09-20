@@ -1377,7 +1377,7 @@ local CACHE, el = {}, nil
 function X.GetFontColor(nFont)
 	if not CACHE[nFont] then
 		if not el or not X.IsElement(el) then
-			el = X.UI.GetTempElement(X.NSFormatString('Text.{$NS}Lib_GetFontColor'))
+			el = X.UI.GetTempElement('Text', X.NSFormatString('{$NS}Lib__GetFontColor'))
 		end
 		el:SetFontScheme(nFont)
 		CACHE[nFont] = X.Pack(el:GetFontColor())
