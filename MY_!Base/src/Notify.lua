@@ -65,7 +65,7 @@ function D.Create(opt)
 		D.ShowTip(opt.szMsg)
 	end
 	if opt.bPlaySound then
-		X.PlaySound(opt.szSound or 'Notify.ogg', opt.szCustomSound)
+		X.PlaySound(opt.szSound or 'Notify.ogg')
 	end
 	return opt.szKey
 end
