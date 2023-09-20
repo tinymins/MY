@@ -594,7 +594,7 @@ end
 
 function X.FetchLUAData(szURL, tOptions)
 	return X.Promise:new(function(resolve, reject)
-		local downloader = X.UI.GetTempElement(X.NSFormatString('Image.{$NS}#DownloadLUAData-') .. GetStringCRC(szURL) .. '#' .. GetTime())
+		local downloader = X.UI.GetTempElement('Image', X.NSFormatString('{$NS}Lib__DownloadLUAData-') .. GetStringCRC(szURL) .. '#' .. GetTime())
 		downloader.FromTextureFile = function(_, szPath)
 			local data = X.LoadLUAData(szPath, tOptions)
 			resolve(data)

@@ -3065,7 +3065,7 @@ function X.CanUseSkill(dwSkillID, dwLevel)
 		dwSkillID = X.GetSkillByName(dwSkillID).dwSkillID
 	end
 	if not box or not box:IsValid() then
-		box = X.UI.GetTempElement(X.NSFormatString('Box.{$NS}Lib_Skill'))
+		box = X.UI.GetTempElement('Box', X.NSFormatString('{$NS}Lib__Skill'))
 	end
 	local me = X.GetClientPlayer()
 	if me and box then

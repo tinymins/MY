@@ -33,15 +33,9 @@ end
 
 do
 local ui, cache
-function X.UI.GetTempElement(szType)
+function X.UI.GetTempElement(szType, szKey)
 	if not X.IsString(szType) then
 		return
-	end
-	local szKey = nil
-	local nPos = X.StringFindW(szType, '.')
-	if nPos then
-		szKey = string.sub(szType, nPos + 1)
-		szType = string.sub(szType, 1, nPos - 1)
 	end
 	if not X.IsString(szKey) then
 		szKey = 'Default'
