@@ -534,7 +534,7 @@ end
 end
 
 do
-local SOUND_PLAYER = X.UI.GetTempElement('WndWebCef', X.NSFormatString('{$NS}Lib__SoundPlayer'))
+local SOUND_PLAYER
 -- 播放声音
 -- X.PlaySound(szAddonBuiltinPath, szUserCustomPath)
 ---@param szAddonBuiltinPath string | "false" @插件自带音频文件地址，传入 false 表示不处理
@@ -574,6 +574,9 @@ function X.PlaySound(szAddonBuiltinPath, szUserCustomPath)
 			szFinalPath = X.NormalizePath(szFinalPath)
 			PlaySound(SOUND.UI_SOUND, szFinalPath)
 		else
+			if not SOUND_PLAYER then
+				SOUND_PLAYER = X.UI.GetTempElement('WndWebCef', X.NSFormatString('{$NS}Lib__SoundPlayer'))
+			end
 			szFinalPath = X.GetAbsolutePath(szFinalPath)
 			szFinalPath = X.StringReplaceW(szFinalPath, '\\', '/')
 			SOUND_PLAYER:Navigate('about:blank')
