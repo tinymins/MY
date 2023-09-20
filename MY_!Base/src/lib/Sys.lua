@@ -450,7 +450,7 @@ local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
 		t.fnAction = fnAction
 		t.fnMouseEnter = function()
 			if IsCtrlKeyDown() then
-				X.PlaySound(tSound.szPath, '')
+				X.PlaySound(tSound.szPath, false)
 			else
 				local szXml = GetFormatText(_L['Hold ctrl when move in to preview.'], nil, 255, 255, 0)
 				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
@@ -536,22 +536,22 @@ end
 do
 local SOUND_PLAYER = X.UI.GetTempElement('WndWebCef', X.NSFormatString('{$NS}Lib__SoundPlayer'))
 -- 播放声音
--- X.PlaySound(szFilePath[, szCustomPath])
----@param szFilePath string @音频文件地址
----@param szCustomPath string @个性化音频文件地址
--- 注：优先播放个性化音频，个性化音频不存在才会播放默认音频文件
-function X.PlaySound(szFilePath, szCustomPath)
-	if X.IsNil(szCustomPath) then
-		szCustomPath = szFilePath
+-- X.PlaySound(szAddonBuiltinPath, szUserCustomPath)
+---@param szAddonBuiltinPath string | "false" @插件自带音频文件地址，传入 false 表示不处理
+---@param szUserCustomPath string | "false" @用户个性化音频文件地址，传入 false 表示不处理，不传入则同 szAddonBuiltinPath
+-- 注：优先播放用户个性化音频，用户个性化音频不存在才会播放插件自带音频文件
+function X.PlaySound(szAddonBuiltinPath, szUserCustomPath)
+	if X.IsNil(szUserCustomPath) then
+		szUserCustomPath = szAddonBuiltinPath
 	end
 	local szFinalPath
 	-- 自定义声音：位于用户数据目录
-	if not szFinalPath and X.IsString(szCustomPath) and szCustomPath ~= '' then
+	if not szFinalPath and X.IsString(szUserCustomPath) and szUserCustomPath ~= '' then
 		for _, ePathType in ipairs({
 			X.PATH_TYPE.ROLE,
 			X.PATH_TYPE.GLOBAL,
 		}) do
-			local szPath = X.FormatPath({ 'audio/' .. szCustomPath, ePathType })
+			local szPath = X.FormatPath({ 'audio/' .. szUserCustomPath, ePathType })
 			if IsFileExist(szPath) then
 				szFinalPath = szPath
 				break
@@ -559,8 +559,8 @@ function X.PlaySound(szFilePath, szCustomPath)
 		end
 	end
 	-- 默认声音：位于基础库 audio 子文件夹
-	if not szFinalPath then
-		local szPath = X.StringReplaceW(szFilePath, '\\', '/')
+	if not szFinalPath and X.IsString(szAddonBuiltinPath) and szAddonBuiltinPath ~= '' then
+		local szPath = X.StringReplaceW(szAddonBuiltinPath, '\\', '/')
 		if not X.StringFindW(szPath, '/') then
 			szPath = X.PACKET_INFO.FRAMEWORK_ROOT .. 'audio/' .. szPath
 		end
