@@ -73,6 +73,8 @@ end
 X.RegisterInit('MY_RSS', function()
 	if not RSS_DATA or not X.IsNumber(RSS_DATA.EXPIRES) or RSS_DATA.EXPIRES < GetCurrentTime() then
 		D.Sync()
+	else
+		FireUIEvent('MY_RSS_UPDATE')
 	end
 end)
 
