@@ -974,21 +974,19 @@ end
 --    SFX初始中心应当为最终想要的中心点
 -- 计算方法是 每次计算允许缩放的Handle与禁止缩放的Handle的比例差即可得知SFX当前理应当缩放和平移数值
 function CTM:RefreshSFX()
-	local hDest--[[, hScale]], hFixed, mdl3D
+	local hDest--[[, hScale]], hFixed
 	local fSfxX, fSfxY -- SFX当前状态下对比初始时正确的缩放比
 	-- local fUIX, fUIY -- UI当前状态下对应1.0的缩放比
+	local fUIScale = Station.GetUIScale()
 	for dwID, h in pairs(CTM_CACHE) do
 		if h:IsValid() then
 			for _, szID in ipairs({ 'TargetTarget', 'Caution' }) do
 				hDest = h:Lookup('Handle_' .. szID)
-				mdl3D = hDest:Lookup('SFX_' .. szID):Get3DModel()
-				if mdl3D then
-					-- hScale = hDest:Lookup('Handle_' .. szID .. '_Scale')
-					hFixed = hDest:Lookup('Handle_' .. szID .. '_Fixed')
-					-- fUIX, fUIY = hScale:GetW() / hFixed:GetW(), hScale:GetH() / hFixed:GetH()
-					fSfxX, fSfxY = hDest:GetW() / hFixed:GetW(), hDest:GetH() / hFixed:GetH()
-					mdl3D:SetScaling(fSfxX, fSfxY, fSfxX)
-				end
+				-- hScale = hDest:Lookup('Handle_' .. szID .. '_Scale')
+				hFixed = hDest:Lookup('Handle_' .. szID .. '_Fixed')
+				-- fUIX, fUIY = hScale:GetW() / hFixed:GetW(), hScale:GetH() / hFixed:GetH()
+				fSfxX, fSfxY = hDest:GetW() / hFixed:GetW(), hDest:GetH() / hFixed:GetH()
+				hDest:Lookup('SFX_' .. szID):SetModelScale(fSfxX / fUIScale, fSfxY / fUIScale, fSfxX / fUIScale)
 			end
 		end
 	end
