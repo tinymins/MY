@@ -39,6 +39,7 @@ local FORCE_TYPE = (function()
 		PENG_LAI  = 24, -- ÅîÀ³
 		LING_XUE  = 25, -- ÁèÑ©
 		YAN_TIAN  = 211, -- ÑÜÌì
+		WAN_LING  = 214, -- ÍòÁé
 	})
 	local res = {}
 	for k, v in X.pairs_c(FORCE_TYPE) do
@@ -67,6 +68,7 @@ local FORCE_LIST = {
 	{ dwID = FORCE_TYPE.PENG_LAI , szUITex = 'ui\\Image\\PlayerAvatar\\penglai.tga'       , nFrame = -2, bAnimate = false }, -- ÅîÀ³
 	{ dwID = FORCE_TYPE.LING_XUE , szUITex = 'ui\\Image\\PlayerAvatar\\lingxuege.tga'     , nFrame = -2, bAnimate = false }, -- ÁèÑ©
 	{ dwID = FORCE_TYPE.YAO_ZONG , szUITex = 'ui\\Image\\PlayerAvatar\\beitianyaozong.dds', nFrame = -2, bAnimate = false }, -- Ò©×Ú
+	{ dwID = FORCE_TYPE.WAN_LING , szUITex = 'ui\\Image\\PlayerAvatar\\wanling.tga'       , nFrame = -2, bAnimate = false }, -- ÍòÁé
 }
 for i, v in X.ipairs_r(FORCE_LIST) do
 	if not v.dwID or not g_tStrings.tForceTitle[v.dwID] then
@@ -105,6 +107,7 @@ local KUNGFU_TYPE = (function()
 		TAI_XUAN  = 10615, -- ÑÜÌì Ì«Ðþ¾­
 		LING_SU   = 10626, -- Ò©×Ú ÁéËØ
 		WU_FANG   = 10627, -- Ò©×Ú ÎÞ·½
+		SHAN_HAI  = 10756, -- ÍòÁé É½º£ÐÄ¾÷
 	}
 	local res = {}
 	for k, v in pairs(KUNGFU_TYPE) do
@@ -150,6 +153,7 @@ local KUNGFU_LIST = {
 	{ dwID = KUNGFU_TYPE.BEI_AO   , dwForceID = FORCE_TYPE.BA_DAO   , nIcon = 8424 , szUITex = 'ui/Image/icon/daoj_16_8_25_16.UITex'   , nFrame = 0  }, -- °Ôµ¶ ±±°Á¾÷
 	{ dwID = KUNGFU_TYPE.LING_HAI , dwForceID = FORCE_TYPE.PENG_LAI , nIcon = 10709, szUITex = 'ui/image/icon/JNPL_18_10_30_27.uitex'  , nFrame = 0  }, -- ÅîÀ³ Áèº£¾÷
 	{ dwID = KUNGFU_TYPE.YIN_LONG , dwForceID = FORCE_TYPE.LING_XUE , nIcon = 12128, szUITex = 'ui/image/icon/JNLXG_19_10_21_9.uitex'  , nFrame = 0  }, -- ÁèÑ© ÒþÁú¾÷
+	{ dwID = KUNGFU_TYPE.SHAN_HAI , dwForceID = FORCE_TYPE.WAN_LING , nIcon = 19664, szUITex = 'ui/image/icon/skill_23_8_22_1.uitex'   , nFrame = 9  }, -- ÍòÁé É½º£ÐÄ¾÷
 }
 for i, v in X.ipairs_r(KUNGFU_LIST) do
 	if not v.dwForceID or not Table_GetSkill(v.dwID) then
@@ -458,6 +462,7 @@ local CONSTANT = {
 			{ FORCE_TYPE.YAN_TIAN , { 166,  83, 251 } }, -- ÑÜÌì
 			{ FORCE_TYPE.YAO_ZONG , {   0, 172, 153 } }, -- Ò©×Ú
 			{ FORCE_TYPE.DAO_ZONG , { 107, 183, 242 } }, -- µ¶×Ú
+			{ FORCE_TYPE.WAN_LING , { 235, 215, 115 } }, -- ÍòÁé
 		}),
 		{
 			__index = function(t, k)
@@ -486,6 +491,7 @@ local CONSTANT = {
 			{ FORCE_TYPE.YAN_TIAN , {  96,  45, 148 } }, -- ÑÜÌì
 			{ FORCE_TYPE.YAO_ZONG , {  10,  81,  87 } }, -- Ò©×Ú
 			{ FORCE_TYPE.DAO_ZONG , {  64, 101, 169 } }, -- µ¶×Ú
+			{ FORCE_TYPE.WAN_LING , { 160, 135,  75 } }, -- ÍòÁé
 		}),
 		{
 			__index = function(t, k)
