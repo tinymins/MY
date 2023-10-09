@@ -559,42 +559,51 @@ local function BreatheFlushShopCache()
 	if NEXT_AWAKE_TIME > GetTime() then
 		return
 	end
-	for dwShopID, tList in pairs(SHOP_CACHE) do
-		local aList = {}
-		for dwItemIndex, tItem in pairs(tList) do
-			table.insert(aList, {
-				dwItemIndex = dwItemIndex,
-				dwTabType = tItem.dwTabType,
-				dwTabIndex = tItem.dwTabIndex,
-				nGenre = tItem.nGenre,
-				nBookID = tItem.nBookID,
-			})
-		end
-		table.sort(aList, function(a, b) return a.dwItemIndex > b.dwItemIndex end)
-
-		local aItem = {}
-		for _, it in ipairs(aList) do
-			table.insert(aItem, GetItemKey(it))
-		end
-		local szItems = table.concat(aItem, '~')
-
-		X.EnsureAjax({
-			url = 'https://push.j3cx.com/api/share-shop',
-			data = {
-				l = X.ENVIRONMENT.GAME_LANG,
-				L = X.ENVIRONMENT.GAME_EDITION,
-				region = X.GetRegionOriginName(),
-				server = X.GetServerOriginName(),
-				shop = dwShopID,
-				npc = SHOP_OWNER_INFO[dwShopID],
-				items = szItems,
-				time = GetCurrentTime(),
-			},
-			signature = X.SECRET['J3CX::SHARE_SHOP'],
-		})
-		SHOP_CACHE[dwShopID] = nil
-		NEXT_AWAKE_TIME = GetTime() + FREQUENCY_LIMIT
+	local rss = MY_RSS.Get('share-shop')
+	if not rss then
 		return
+	end
+	for dwShopID, tList in pairs(SHOP_CACHE) do
+		local dwShopNpcTemplateID = SHOP_OWNER_INFO[dwShopID]
+		if dwShopNpcTemplateID then
+			if rss[dwShopNpcTemplateID] then
+				local aList = {}
+				for dwItemIndex, tItem in pairs(tList) do
+					table.insert(aList, {
+						dwItemIndex = dwItemIndex,
+						dwTabType = tItem.dwTabType,
+						dwTabIndex = tItem.dwTabIndex,
+						nGenre = tItem.nGenre,
+						nBookID = tItem.nBookID,
+					})
+				end
+				table.sort(aList, function(a, b) return a.dwItemIndex > b.dwItemIndex end)
+
+				local aItem = {}
+				for _, it in ipairs(aList) do
+					table.insert(aItem, GetItemKey(it))
+				end
+				local szItems = table.concat(aItem, '~')
+
+				X.EnsureAjax({
+					url = 'https://push.j3cx.com/api/share-shop',
+					data = {
+						l = X.ENVIRONMENT.GAME_LANG,
+						L = X.ENVIRONMENT.GAME_EDITION,
+						region = X.GetRegionOriginName(),
+						server = X.GetServerOriginName(),
+						shop = dwShopID,
+						npc = SHOP_OWNER_INFO[dwShopID],
+						items = szItems,
+						time = GetCurrentTime(),
+					},
+					signature = X.SECRET['J3CX::SHARE_SHOP'],
+				})
+				NEXT_AWAKE_TIME = GetTime() + FREQUENCY_LIMIT
+			end
+			SHOP_CACHE[dwShopID] = nil
+			return
+		end
 	end
 	X.BreatheCall('MY_ShareKnowledge__ShareShop', false)
 end
@@ -604,22 +613,19 @@ X.RegisterEvent('SHOP_UPDATEITEM', 'MY_ShareKnowledge__ShareShop', function()
 		return
 	end
 	local dwShopID, dwItemIndex = arg0, arg1
-	local dwShopNpcTemplateID = SHOP_OWNER_INFO[dwShopID]
-	if dwShopNpcTemplateID and rss[dwShopNpcTemplateID] then
-		if not SHOP_CACHE[dwShopID] then
-			SHOP_CACHE[dwShopID] = {}
-		end
-		local dwItemID = GetShopItemID(dwShopID, dwItemIndex)
-		local KItem = dwItemID and GetItem(dwItemID)
-		if KItem then
-			SHOP_CACHE[dwShopID][dwItemIndex] = {
-				dwTabType = KItem.dwTabType,
-				dwTabIndex = KItem.dwIndex,
-				nGenre = KItem.nGenre,
-				nBookID = KItem.nBookID,
-			}
-			X.BreatheCall('MY_ShareKnowledge__ShareShop', 3000, BreatheFlushShopCache)
-		end
+	if not SHOP_CACHE[dwShopID] then
+		SHOP_CACHE[dwShopID] = {}
+	end
+	local dwItemID = GetShopItemID(dwShopID, dwItemIndex)
+	local KItem = dwItemID and GetItem(dwItemID)
+	if KItem then
+		SHOP_CACHE[dwShopID][dwItemIndex] = {
+			dwTabType = KItem.dwTabType,
+			dwTabIndex = KItem.dwIndex,
+			nGenre = KItem.nGenre,
+			nBookID = KItem.nBookID,
+		}
+		X.BreatheCall('MY_ShareKnowledge__ShareShop', 3000, BreatheFlushShopCache)
 	end
 end)
 end
