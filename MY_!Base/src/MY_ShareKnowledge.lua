@@ -518,13 +518,32 @@ local NEXT_AWAKE_TIME = 0
 MY_RSS.RegisterAdapter('share-shop', function(data)
 	local t = {}
 	if X.IsArray(data) then
-		for _, dwShopID in ipairs(data) do
-			if X.IsNumber(dwShopID) then
-				t[dwShopID] = true
+		for _, dwShopNpcTemplateID in ipairs(data) do
+			if X.IsNumber(dwShopNpcTemplateID) then
+				t[dwShopNpcTemplateID] = true
 			end
 		end
 	end
 	return t
+end)
+
+local SHOP_OWNER_INFO = {}
+X.RegisterEvent('SHOP_OPENSHOP', 'MY_ShareKnowledge__ShareShop', function()
+	local rss = MY_RSS.Get('share-shop')
+	if not rss then
+		return
+	end
+	local dwShopID = arg0
+	local txtNpcName = Station.Lookup('Normal/ShopPanel/Wnd_BG', 'Text_Title')
+	if not txtNpcName then
+		return
+	end
+	local szNpcName = txtNpcName:GetText()
+	local KNpc = X.GetObject(TARGET.NPC, szNpcName)
+	if not KNpc then
+		return
+	end
+	SHOP_OWNER_INFO[dwShopID] = KNpc.dwTemplateID
 end)
 
 local SHOP_CACHE = {}
@@ -557,7 +576,7 @@ local function BreatheFlushShopCache()
 		for _, it in ipairs(aList) do
 			table.insert(aItem, GetItemKey(it))
 		end
-		local szItems = table.concat(aItem, '-')
+		local szItems = table.concat(aItem, '~')
 
 		X.EnsureAjax({
 			url = 'https://push.j3cx.com/api/share-shop',
@@ -567,6 +586,7 @@ local function BreatheFlushShopCache()
 				region = X.GetRegionOriginName(),
 				server = X.GetServerOriginName(),
 				shop = dwShopID,
+				npc = SHOP_OWNER_INFO[dwShopID],
 				items = szItems,
 				time = GetCurrentTime(),
 			},
@@ -584,7 +604,8 @@ X.RegisterEvent('SHOP_UPDATEITEM', 'MY_ShareKnowledge__ShareShop', function()
 		return
 	end
 	local dwShopID, dwItemIndex = arg0, arg1
-	if rss[dwShopID] then
+	local dwShopNpcTemplateID = SHOP_OWNER_INFO[dwShopID]
+	if dwShopNpcTemplateID and rss[dwShopNpcTemplateID] then
 		if not SHOP_CACHE[dwShopID] then
 			SHOP_CACHE[dwShopID] = {}
 		end
