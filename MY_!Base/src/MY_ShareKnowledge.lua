@@ -508,4 +508,99 @@ X.RegisterEvent('MY_RSS_UPDATE', function()
 end)
 end
 
+---------------
+-- Í¨ÓÃÉÌµê
+---------------
+do
+local FREQUENCY_LIMIT = 1000
+local NEXT_AWAKE_TIME = 0
+
+MY_RSS.RegisterAdapter('share-shop', function(data)
+	local t = {}
+	if X.IsArray(data) then
+		for _, dwShopID in ipairs(data) do
+			if X.IsNumber(dwShopID) then
+				t[dwShopID] = true
+			end
+		end
+	end
+	return t
+end)
+
+local SHOP_CACHE = {}
+local function GetItemKey(it)
+	if it.nGenre == ITEM_GENRE.BOOK then
+		return X.NumberBaseN(it.dwTabType, 32) .. '_'
+			.. X.NumberBaseN(it.dwTabIndex, 32) .. '_'
+			.. X.NumberBaseN(it.nBookID, 32)
+	end
+	return X.NumberBaseN(it.dwTabType, 32) .. '_' .. X.NumberBaseN(it.dwTabIndex, 32)
+end
+local function BreatheFlushShopCache()
+	if NEXT_AWAKE_TIME > GetTime() then
+		return
+	end
+	for dwShopID, tList in pairs(SHOP_CACHE) do
+		local aList = {}
+		for dwItemIndex, tItem in pairs(tList) do
+			table.insert(aList, {
+				dwItemIndex = dwItemIndex,
+				dwTabType = tItem.dwTabType,
+				dwTabIndex = tItem.dwTabIndex,
+				nGenre = tItem.nGenre,
+				nBookID = tItem.nBookID,
+			})
+		end
+		table.sort(aList, function(a, b) return a.dwItemIndex > b.dwItemIndex end)
+
+		local aItem = {}
+		for _, it in ipairs(aList) do
+			table.insert(aItem, GetItemKey(it))
+		end
+		local szItems = table.concat(aItem, '-')
+
+		X.EnsureAjax({
+			url = 'https://push.j3cx.com/api/share-shop',
+			data = {
+				l = X.ENVIRONMENT.GAME_LANG,
+				L = X.ENVIRONMENT.GAME_EDITION,
+				region = X.GetRegionOriginName(),
+				server = X.GetServerOriginName(),
+				shop = dwShopID,
+				items = szItems,
+				time = GetCurrentTime(),
+			},
+			signature = X.SECRET['J3CX::SHARE_SHOP'],
+		})
+		SHOP_CACHE[dwShopID] = nil
+		NEXT_AWAKE_TIME = GetTime() + FREQUENCY_LIMIT
+		return
+	end
+	X.BreatheCall('MY_ShareKnowledge__ShareShop', false)
+end
+X.RegisterEvent('SHOP_UPDATEITEM', 'MY_ShareKnowledge__ShareShop', function()
+	local rss = MY_RSS.Get('share-shop')
+	if not rss then
+		return
+	end
+	local dwShopID, dwItemIndex = arg0, arg1
+	if rss[dwShopID] then
+		if not SHOP_CACHE[dwShopID] then
+			SHOP_CACHE[dwShopID] = {}
+		end
+		local dwItemID = GetShopItemID(dwShopID, dwItemIndex)
+		local KItem = dwItemID and GetItem(dwItemID)
+		if KItem then
+			SHOP_CACHE[dwShopID][dwItemIndex] = {
+				dwTabType = KItem.dwTabType,
+				dwTabIndex = KItem.dwIndex,
+				nGenre = KItem.nGenre,
+				nBookID = KItem.nBookID,
+			}
+			X.BreatheCall('MY_ShareKnowledge__ShareShop', 3000, BreatheFlushShopCache)
+		end
+	end
+end)
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
