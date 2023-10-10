@@ -274,7 +274,7 @@ X.RegisterEvent('AUCTION_LOOKUP_RESPOND', function()
 			r = X.GetRegionOriginName(),
 			s = X.GetServerOriginName(),
 			t = GetCurrentTime(),
-			d = table.concat(aData, ' '), -- Price data
+			d = table.concat(aData, '~'), -- Price data
 			dt = szPriceType, -- Price type
 			ib = X.NumberBaseN(dwBaseID, 32),
 		}
