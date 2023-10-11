@@ -76,10 +76,19 @@ local XMLDecodeComponent = _G.DecodeComponentsString
 		end)
 	or function(str)
 		local bytes2string, insert, byte = bytes2string, table.insert, string.byte
-		local bytes_string, b_escaping, len, byte_current = {}, false, #str, nil
-		for i = 2, len - 1 do -- str starts with and ends with qoute
+		local bytes_string, b_escaping, b_partial_gbk, len, byte_current = {}, false, false, #str, nil
+		for i = 2, len - 1 do -- str starts with and ends with quote
 			byte_current = string.byte(str, i)
-			if b_escaping then
+			if b_partial_gbk then
+				if byte_current >= 64 and byte_current <= 254 then
+					b_partial_gbk = false
+				else
+					X.Debug('XML decode component error: partial GBK character detected at ' .. i .. ' on `' .. str .. '`', X.DEBUG_LEVEL.LOG)
+					return
+				end
+			elseif byte_current >= 129 and byte_current <= 254 then
+				b_partial_gbk = true
+			elseif b_escaping then
 				b_escaping = false
 				-- if byte_current == byte_char_n then
 					-- byte_current = byte_lf
@@ -145,7 +154,7 @@ local function XMLDecode(xml)
 	local state = 'text'
 	local pos, xlen = 1, #xml
 	local byte_current
-	local pos1, pos2, byte_quoting_char, key, b_escaping
+	local pos1, pos2, byte_quoting_char, key, b_escaping, b_partial_gbk
 	-- <        label         attribute_key=attribute_value>        text_key=text_value<        /     label         >
 	-- label_lt label_opening attribute                    label_gt text               label_lt slash label_closing label_gt
 	while pos <= xlen do
@@ -232,7 +241,16 @@ local function XMLDecode(xml)
 				pos1 = pos
 			end
 		elseif state == 'attribute_value_string' then
-			if b_escaping then
+			if b_partial_gbk then
+				if byte_current >= 64 and byte_current <= 254 then
+					b_partial_gbk = false
+				else
+					X.Debug('XML decode error: partial GBK character detected at ' .. pos .. ' on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
+					return
+				end
+			elseif byte_current >= 129 and byte_current <= 254 then
+				b_partial_gbk = true
+			elseif b_escaping then
 				b_escaping = false
 			elseif byte_current == byte_escape then
 				b_escaping = true
@@ -349,7 +367,16 @@ local function XMLDecode(xml)
 				pos1 = pos
 			end
 		elseif state == 'text_value_string' then
-			if b_escaping then
+			if b_partial_gbk then
+				if byte_current >= 64 and byte_current <= 254 then
+					b_partial_gbk = false
+				else
+					X.Debug('XML decode error: partial GBK character detected at ' .. pos .. ' on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
+					return
+				end
+			elseif byte_current >= 129 and byte_current <= 254 then
+				b_partial_gbk = true
+			elseif b_escaping then
 				b_escaping = false
 			elseif byte_current == byte_escape then
 				b_escaping = true
