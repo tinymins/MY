@@ -4542,7 +4542,7 @@ function OO:Size(...)
 			if bAutoHeight then
 				nHeight = nil
 			end
-			if X.IsNumber(nWidth) or X.IsNumber(nHeight) or X.IsNumber(nRawWidth) or X.IsNumber(nRawHeight) then
+			if X.IsNumber(nWidth) or bAutoWidth or X.IsNumber(nHeight) or bAutoHeight or X.IsNumber(nRawWidth) or X.IsNumber(nRawHeight) then
 				for _, raw in ipairs(self.raws) do
 					if bAutoWidth or bStaticWidth then
 						SetComponentProp(raw, 'AutoWidth', bAutoWidth)
