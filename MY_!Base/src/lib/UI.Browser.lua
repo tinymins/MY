@@ -206,6 +206,9 @@ function D.Open(url, options)
 	end
 	WINDOWS[szKey] = Wnd.OpenWindow(X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', FRAME_NAME)
 	OPTIONS[WINDOWS[szKey]] = options
+	--[[#DEBUG BEGIN]]
+	X.Debug(X.PACKET_INFO.NAME_SPACE, 'UI.OpenBrowser #' .. szKey .. ': ' .. url, X.DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
 
 	local frame = WINDOWS[szKey]
 	frame:SetName(FRAME_NAME .. '#' .. szKey)
