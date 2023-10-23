@@ -4987,6 +4987,13 @@ do
 		if PEEK_PLAYER_ZHEN_PAI_STATE[dwID] == 'PENDING' and not bForcePeek then
 			return
 		end
+		-- 大侠判定
+		if player.dwForceID == 0 or not player.GetKungfuMount() then
+			PEEK_PLAYER_ZHEN_PAI_STATE[dwID] = 'SUCCESS'
+			PEEK_PLAYER_ZHEN_PAI_CACHE[dwID] = {}
+			OnGetPlayerZhenPaiInfoPeekPlayer(player)
+			return
+		end
 		-- 发送请求
 		PEEK_PLAYER_ZHEN_PAI_STATE[dwID] = 'PENDING'
 		if not EVENT_KEY then
