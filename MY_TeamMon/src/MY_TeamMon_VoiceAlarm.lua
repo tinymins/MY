@@ -329,6 +329,7 @@ function D.FetchVoiceList(szType, bDownload)
 				end
 				local tInfo = {
 					dwID = res.data.vpk_id,
+					szName = tostring(res.data.vpk_name or res.data.name or ''),
 					szVersion = tostring(res.data.vpk_version),
 					aVoice = aVoice,
 				}
@@ -384,6 +385,9 @@ function D.DownloadPacket(szType)
 		D.FetchVoiceList(szType, true)
 			:Then(function(tInfo)
 				local aVoice = tInfo.aVoice
+				if X.ENVIRONMENT.SOUND_DRIVER == 'WWISE' and tInfo.szName ~= '' then
+					aVoice = {}
+				end
 				local tProgress = {}
 				for _, voice in ipairs(aVoice) do
 					tProgress[voice.dwID] = 0
@@ -465,6 +469,11 @@ end
 
 function D.PlayVoice(szType, szSlug)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
+	local tVoiceInfo = X.IIf(szType == 'OFFICIAL', D.tOfficialPacketInfo, D.tCustomPacketInfo)
+	if X.ENVIRONMENT.SOUND_DRIVER == 'WWISE' and tVoiceInfo and tVoiceInfo.szName ~= '' then
+		PlaySound(SOUND.UI_SOUND, 'UserPluginAudio_Interface' .. tVoiceInfo.szName .. '_' .. szSlug)
+		return
+	end
 	local tVoiceCache = X.IIf(szType == 'OFFICIAL', D.tOfficialVoiceCache, D.tCustomVoiceCache)
 	local dwPacketID = szType == 'OFFICIAL' and O.dwOfficialVoicePacketID or O.dwCustomVoicePacketID
 	local voice = tVoiceCache and tVoiceCache[szSlug]
