@@ -153,6 +153,7 @@ return {
     ['Auto restore team info in arena'] = '名剑大会中自动恢复上次组队信息',
     ['Auto cancel hide player in arena'] = '名剑大会中自动取消屏蔽角色模型',
     ['Auto cancel hide player in battlefield'] = '战场中自动取消屏蔽角色模型',
+    ['Auto cancel hide player in pubg'] = '绝境战场中自动取消屏蔽角色模型',
 
     ['Loop target between me and target'] = '循环选择自己和目标',
     ['%%.1f/%d meter(s)'] = '%%.1f/%d 尺',

@@ -39,6 +39,12 @@ local O = X.CreateUserSettingsModule('MY_ArenaHelper', _L['General'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bAutoShowModelPubg = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Toolbox'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
 })
 local D = {}
 
@@ -84,10 +90,12 @@ X.RegisterEvent('ON_REPRESENT_CMD', function()
 	end
 end)
 X.RegisterEvent('LOADING_END', function()
-	if not O.bAutoShowModel and not O.bAutoShowModelBattlefield then
+	if not O.bAutoShowModel and not O.bAutoShowModelBattlefield and not O.bAutoShowModelPubg then
 		return
 	end
-	if (X.IsInArena() and O.bAutoShowModel) or (X.IsInBattleField() and O.bAutoShowModelBattlefield) then
+	if (X.IsInArena() and O.bAutoShowModel)
+	or (X.IsInBattleField() and O.bAutoShowModelBattlefield)
+	or (X.IsInPubg() and O.bAutoShowModelPubg) then
 		l_lock = true
 		rlcmd('show npc')
 		rlcmd('show player')
@@ -116,17 +124,16 @@ end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	-- 名剑大会自动恢复队伍信息
-	ui:Append('WndCheckBox', {
+	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Auto restore team info in arena'],
 		checked = MY_ArenaHelper.bRestoreAuthorityInfo,
 		onCheck = function(bChecked)
 			MY_ArenaHelper.bRestoreAuthorityInfo = bChecked
 		end,
-	})
-	nY = nY + nLH
+	}):Width() + 5
 
-	-- 名剑大会战场自动取消屏蔽
+	-- 名剑大会自动取消屏蔽
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Auto cancel hide player in arena'],
@@ -136,13 +143,26 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		end,
 	}):Width() + 5
 
-	-- 名剑大会战场自动取消屏蔽
+	nY = nY + nLH
+	nX = nPaddingX
+
+	-- 战场自动取消屏蔽
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Auto cancel hide player in battlefield'],
 		checked = MY_ArenaHelper.bAutoShowModelBattlefield,
 		onCheck = function(bChecked)
 			MY_ArenaHelper.bAutoShowModelBattlefield = bChecked
+		end,
+	}):Width() + 5
+
+	-- 自动取消屏蔽
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Auto cancel hide player in pubg'],
+		checked = MY_ArenaHelper.bAutoShowModelPubg,
+		onCheck = function(bChecked)
+			MY_ArenaHelper.bAutoShowModelPubg = bChecked
 		end,
 	}):Width() + 5
 
@@ -165,6 +185,7 @@ local settings = {
 				'bRestoreAuthorityInfo',
 				'bAutoShowModel',
 				'bAutoShowModelBattlefield',
+				'bAutoShowModelPubg',
 			},
 			root = O,
 		},
@@ -175,6 +196,7 @@ local settings = {
 				'bRestoreAuthorityInfo',
 				'bAutoShowModel',
 				'bAutoShowModelBattlefield',
+				'bAutoShowModelPubg',
 			},
 			root = O,
 		},
