@@ -86,7 +86,7 @@ local XMLDecodeComponent = _G.DecodeComponentsString
 					X.Debug('XML decode component error: partial GBK character detected at ' .. i .. ' on `' .. str .. '`', X.DEBUG_LEVEL.LOG)
 					return
 				end
-			elseif byte_current >= 129 and byte_current <= 254 then
+			elseif X.ENVIRONMENT.CODE_PAGE == X.CODE_PAGE.GBK and byte_current >= 129 and byte_current <= 254 then
 				b_partial_gbk = true
 			elseif b_escaping then
 				b_escaping = false
@@ -248,7 +248,7 @@ local function XMLDecode(xml)
 					X.Debug('XML decode error: partial GBK character detected at ' .. pos .. ' on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
 					return
 				end
-			elseif byte_current >= 129 and byte_current <= 254 then
+			elseif X.ENVIRONMENT.CODE_PAGE == X.CODE_PAGE.GBK and byte_current >= 129 and byte_current <= 254 then
 				b_partial_gbk = true
 			elseif b_escaping then
 				b_escaping = false
@@ -374,7 +374,7 @@ local function XMLDecode(xml)
 					X.Debug('XML decode error: partial GBK character detected at ' .. pos .. ' on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
 					return
 				end
-			elseif byte_current >= 129 and byte_current <= 254 then
+			elseif X.ENVIRONMENT.CODE_PAGE == X.CODE_PAGE.GBK and byte_current >= 129 and byte_current <= 254 then
 				b_partial_gbk = true
 			elseif b_escaping then
 				b_escaping = false
