@@ -40,6 +40,11 @@ local DEBUG_LEVEL = {
 	NONE    = 4,
 }
 
+local CODE_PAGE = {
+	UTF8 = 65001,
+	GBK = 936,
+}
+
 local _NAME_SPACE_            = 'Boilerplate'
 local _BUILD_                 = '19700101'
 local _VERSION_               = '0.0.0'
@@ -62,6 +67,7 @@ local _LOG_LEVEL_             = math.min(DEBUG_LEVEL[LoadLUAData(_DATA_ROOT_ .. 
 local X = {
 	UI = {},
 	DEBUG_LEVEL = DEBUG_LEVEL,
+	CODE_PAGE = CODE_PAGE,
 	PATH_TYPE = {
 		NORMAL = 0,
 		DATA   = 1,
@@ -99,6 +105,9 @@ local X = {
 			SOUND_DRIVER = IsFileExist('bin64\\KG3DWwiseSoundX64.dll')
 				and 'WWISE'
 				or 'FMOD',
+			CODE_PAGE = _GAME_BRANCH_ == 'intl'
+				and CODE_PAGE.UTF8
+				or CODE_PAGE.GBK,
 			RUNTIME_OPTIMIZE = --[[#DEBUG BEGIN]](
 				(IsDebugClient() or debug.traceback ~= nil)
 					and _DEBUG_LEVEL_ == DEBUG_LEVEL.NONE
