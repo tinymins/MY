@@ -496,7 +496,7 @@ function D.PlayVoice(szType, szSlug)
 		--[[#DEBUG END]]
 		return
 	end
-	X.PlaySound(szPath, false)
+	X.PlaySound(SOUND.UI_SOUND, szPath, false)
 end
 
 function D.IsVoiceExist(szType, szSlug)

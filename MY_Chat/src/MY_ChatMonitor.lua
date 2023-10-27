@@ -324,6 +324,7 @@ function D.Init()
 	D.LoadConfig()
 	D.LoadData()
 	D.RegisterMsgMonitor()
+	X.RegisterWwiseSound(PLUGIN_ROOT .. '/audio/MsgArrive.ogg', 'UserPluginAudio_MY_Base_Notify')
 end
 
 function D.Exit()
