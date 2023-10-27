@@ -1,7 +1,7 @@
-方法：将同名文件放到 Interface/MY#DATA/!all-users@zhcn/audio 目录下即可
+方法：将同名文件放到 Interface/MY#DATA/!all-users@zhcn/audio/MY_Chat/audio 目录下即可
 
-如 MsgArrive.ogg 则放到 Interface/MY#DATA/!all-users@zhcn/audio/MsgArrive.ogg 下
-插件检测到有 Interface/MY#DATA/!all-users@zhcn/audio/MsgArrive.ogg 存在就不会播放默认音频
+如 MsgArrive.ogg 则放到 Interface/MY#DATA/!all-users@zhcn/audio/MY_Chat/audio/MsgArrive.ogg 下
+插件检测到有 Interface/MY#DATA/!all-users@zhcn/audio/MY_Chat/audio/MsgArrive.ogg 存在就不会播放默认音频
 
 Good Luck
 
