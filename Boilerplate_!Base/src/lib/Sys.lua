@@ -540,7 +540,7 @@ local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
 		t.fnAction = fnAction
 		t.fnMouseEnter = function()
 			if IsCtrlKeyDown() then
-				X.PlaySound(tSound.szPath, false)
+				X.PlaySound(SOUND.UI_SOUND, tSound.szPath, false)
 			else
 				local szXml = GetFormatText(_L['Hold ctrl when move in to preview.'], nil, 255, 255, 0)
 				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
@@ -579,7 +579,7 @@ local function Cache(tSound)
 			szName = tSound.szName,
 			szPath = tSound.szPath,
 		}
-		if tSound.szWWise then
+		if tSound.szWwise then
 			WWISE_EVENT[string.lower(tSound.szPath)] = tSound.szWwise
 		end
 	end
@@ -637,6 +637,9 @@ local SOUND_BRIDGE_ROOT = X.PACKET_INFO.DATA_ROOT .. '#cache/sound/'
 ---@param szSoundPath string @音频文件地址
 ---@param bAllowCustomize boolean @是否允许用户使用个性化音频覆盖，默认允许
 function X.PlaySound(eChannel, szSoundPath, bAllowCustomize)
+	if not GeneCache() then
+		return
+	end
 	-- 允许简写基础库提供的音频资源地址
 	szSoundPath = X.StringReplaceW(szSoundPath, '\\', '/')
 	if not X.StringFindW(szSoundPath, '/') then
