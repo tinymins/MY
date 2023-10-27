@@ -188,9 +188,17 @@ function X.KGUIEncrypt(szText)
 end
 X.KE = X.KGUIEncrypt
 
--- 编码 URL 中的参数：方法不会对下列字符编码 [a-zA-Z0-9-_.!~*'()]
--- @param {any} data 需要编码的数据
--- @return {typeof data} 编码后的数据
+-- 用于对整个 URI 进行编码：方法不会对下列字符编码 [a-zA-Z0-9-_.!~*'():/?#]
+---@param data string @需要编码的数据
+---@return string @编码后的数据
+function X.EncodeURI(data)
+	return (data:gsub('([^a-zA-Z0-9-_.!~*\'():/?#])', function (c) return string.format('%%%02X', string.byte(c)) end))
+end
+
+-- 用于对 URI 中的每个组件进行编码：方法不会对下列字符编码 [a-zA-Z0-9-_.!~*'()]
+---@generic T
+---@param data T @需要编码的数据
+---@return T @编码后的数据
 local function EncodeURIComponent(data)
 	if type(data) == 'string' then
 		return (data:gsub('([^a-zA-Z0-9-_.!~*\'()])', function (c) return string.format('%%%02X', string.byte(c)) end))
@@ -223,6 +231,13 @@ local function DecodeURIComponent(data)
 	return data
 end
 X.DecodeURIComponent = DecodeURIComponent
+
+-- 用于对文件协议路径进行 URI 编码：方法不会对下列字符编码 [a-zA-Z0-9-_.!~*'():/?]
+---@param szFilePath string @需要编码的路径
+---@return string @编码后的 URI
+function X.EncodeFileURI(szFilePath)
+	return 'file:///' .. szFilePath:gsub('([^a-zA-Z0-9-_.!~*\'():/?])', function (c) return string.format('%%%02X', string.byte(c)) end)
+end
 
 local function EncodeQuerystring(t, prefix, data)
 	if type(data) == 'table' then

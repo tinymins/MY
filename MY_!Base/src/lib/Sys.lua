@@ -415,15 +415,105 @@ function X.GetGlobalValue(szVarPath)
 end
 
 do
+local SOUND_VOLUME_CACHE
+local function CaptureSoundVolumes()
+	local frame = Station.SearchFrame('SoundSettingPanel')
+	local bClose = not frame
+	if not frame then
+		frame = Wnd.OpenWindow('SoundSettingPanel')
+	end
+	local chkMainMute = frame and frame:Lookup('CheckBox_Silence')
+	local scrollMainVolume = frame and frame:Lookup('Scroll_MainVolume')
+	local nMainVolume = chkMainMute and not chkMainMute:IsCheckBoxChecked() and scrollMainVolume
+		and (scrollMainVolume:GetScrollPos() / scrollMainVolume:GetStepCount())
+		or 0
+	local chkBgMute = frame and frame:Lookup('CheckBox_BgSound')
+	local scrollBgVolume = frame and frame:Lookup('Scroll_BgVolume')
+	local nBgVolume = chkBgMute and chkBgMute:IsCheckBoxChecked() and scrollBgVolume
+		and (scrollBgVolume:GetScrollPos() / scrollBgVolume:GetStepCount())
+		or 0
+	local chkRoleMute = frame and frame:Lookup('CheckBox_RoleSound')
+	local scrollRoleVolume = frame and frame:Lookup('Scroll_ChVolume')
+	local nRoleVolume = chkRoleMute and chkRoleMute:IsCheckBoxChecked() and scrollRoleVolume
+		and (scrollRoleVolume:GetScrollPos() / scrollRoleVolume:GetStepCount())
+		or 0
+	local chkSceneMute = frame and frame:Lookup('CheckBox_SceneSound')
+	local scrollSceneVolume = frame and frame:Lookup('Scroll_SceneVolume')
+	local nSceneVolume = chkSceneMute and chkSceneMute:IsCheckBoxChecked() and scrollSceneVolume
+		and (scrollSceneVolume:GetScrollPos() / scrollSceneVolume:GetStepCount())
+		or 0
+	local chkUIMute = frame and frame:Lookup('CheckBox_UISound')
+	local scrollUIVolume = frame and frame:Lookup('Scroll_UIVolume')
+	local nUIVolume = chkUIMute and chkUIMute:IsCheckBoxChecked() and scrollUIVolume
+		and (scrollUIVolume:GetScrollPos() / scrollUIVolume:GetStepCount())
+		or 0
+	local chkTipMute = frame and frame:Lookup('CheckBox_Tip')
+	local scrollTipVolume = frame and frame:Lookup('Scroll_TipVolume')
+	local nTipVolume = chkTipMute and chkTipMute:IsCheckBoxChecked() and scrollTipVolume
+		and (scrollTipVolume:GetScrollPos() / scrollTipVolume:GetStepCount())
+		or 0
+	local chkSpeakMute = frame and frame:Lookup('CheckBox_Speak')
+	local scrollSpeakVolume = frame and frame:Lookup('Scroll_SpeakVolume')
+	local nSpeakVolume = chkSpeakMute and chkSpeakMute:IsCheckBoxChecked() and scrollSpeakVolume
+		and (scrollSpeakVolume:GetScrollPos() / scrollSpeakVolume:GetStepCount())
+		or 0
+	local chkErrorMute = frame and frame:Lookup('CheckBox_ErrorSound')
+	local scrollErrorVolume = frame and frame:Lookup('Scroll_ErrorVolume')
+	local nErrorVolume = chkErrorMute and chkErrorMute:IsCheckBoxChecked() and scrollErrorVolume
+		and (scrollErrorVolume:GetScrollPos() / scrollErrorVolume:GetStepCount())
+		or 0
+	local chkHelpMute = frame and frame:Lookup('CheckBox_Help')
+	local scrollHelpVolume = frame and frame:Lookup('Scroll_HelpVolume')
+	local nHelpVolume = chkHelpMute and chkHelpMute:IsCheckBoxChecked() and scrollHelpVolume
+		and (scrollHelpVolume:GetScrollPos() / scrollHelpVolume:GetStepCount())
+		or 0
+	if bClose then
+		Wnd.CloseWindow('SoundSettingPanel')
+	end
+	SOUND_VOLUME_CACHE = {
+		[SOUND.BG_MUSIC       ] = nBgVolume    * nMainVolume,
+		[SOUND.UI_SOUND       ] = nUIVolume    * nMainVolume,
+		[SOUND.UI_ERROR_SOUND ] = nErrorVolume * nMainVolume,
+		[SOUND.SCENE_SOUND    ] = nSceneVolume * nMainVolume,
+		[SOUND.CHARACTER_SOUND] = nRoleVolume  * nMainVolume,
+		[SOUND.CHARACTER_SPEAK] = nSpeakVolume * nMainVolume,
+		[SOUND.FRESHER_TIP    ] = nHelpVolume  * nMainVolume,
+		[SOUND.SYSTEM_TIP     ] = nTipVolume   * nMainVolume,
+	}
+end
+
+local SOUND_PANEL_OPEN_TIME
+X.RegisterEvent('ON_FRAME_CREATE', 'LIB#SOUND_VOLUME', function()
+	if arg0 and arg0:GetName() == 'SoundSettingPanel' then
+		SOUND_PANEL_OPEN_TIME = GetTickCount()
+	end
+end)
+X.RegisterEvent('ON_FRAME_DESTROY', 'LIB#SOUND_VOLUME', function()
+	if arg0 and arg0:GetName() == 'SoundSettingPanel' then
+		if GetTickCount() - SOUND_PANEL_OPEN_TIME >= 500 then
+			SOUND_VOLUME_CACHE = nil
+		end
+	end
+end)
+
+function X.GetSoundVolume(eChannel)
+	if not SOUND_VOLUME_CACHE then
+		CaptureSoundVolumes()
+	end
+	return SOUND_VOLUME_CACHE[eChannel] or 0
+end
+end
+
+do
 local SOUND_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT .. 'audio/'
 local SOUNDS = {
 	{
 		szType = _L['Default'],
-		{ dwID = 1, szName = _L['Bing.ogg'], szPath = SOUND_ROOT .. 'Bing.ogg' },
-		{ dwID = 88001, szName = _L['Notify.ogg'], szPath = SOUND_ROOT .. 'Notify.ogg' },
+		{ dwID = 1, szName = _L['Bing.ogg'], szPath = SOUND_ROOT .. 'Bing.ogg', szWwise = 'UserPluginAudio_MY_Base_Bing' },
+		{ dwID = 88001, szName = _L['Notify.ogg'], szPath = SOUND_ROOT .. 'Notify.ogg', szWwise = 'UserPluginAudio_MY_Base_Notify' },
 	},
 }
-local CACHE = nil
+local CACHE, WWISE_EVENT = nil, {}
 local function GetSoundList()
 	local a = { szOption = _L['Sound'] }
 	for _, v in ipairs(SOUNDS) do
@@ -450,7 +540,7 @@ local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
 		t.fnAction = fnAction
 		t.fnMouseEnter = function()
 			if IsCtrlKeyDown() then
-				X.PlaySound(tSound.szPath, false)
+				X.PlaySound(SOUND.UI_SOUND, tSound.szPath, false)
 			else
 				local szXml = GetFormatText(_L['Hold ctrl when move in to preview.'], nil, 255, 255, 0)
 				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
@@ -489,6 +579,9 @@ local function Cache(tSound)
 			szName = tSound.szName,
 			szPath = tSound.szPath,
 		}
+		if tSound.szWwise then
+			WWISE_EVENT[string.lower(tSound.szPath)] = tSound.szWwise
+		end
 	end
 	for _, t in ipairs(tSound) do
 		Cache(t)
@@ -531,15 +624,22 @@ function X.GetSoundPath(dwID)
 	end
 	return tSound.szPath
 end
+
+function X.RegisterWwiseSound(szPath, szEvent)
+	WWISE_EVENT[string.lower(szPath)] = szEvent
 end
 
-do
 local SOUND_PLAYER
+local SOUND_BRIDGE_ROOT = X.PACKET_INFO.DATA_ROOT .. '#cache/sound/'
 -- 播放声音
--- X.PlaySound(szSoundPath, bAllowCustomize)
+-- X.PlaySound(eChannel, szSoundPath, bAllowCustomize)
+---@param eChannel SOUND @音频播放通道
 ---@param szSoundPath string @音频文件地址
 ---@param bAllowCustomize boolean @是否允许用户使用个性化音频覆盖，默认允许
-function X.PlaySound(szSoundPath, bAllowCustomize)
+function X.PlaySound(eChannel, szSoundPath, bAllowCustomize)
+	if not GeneCache() then
+		return
+	end
 	-- 允许简写基础库提供的音频资源地址
 	szSoundPath = X.StringReplaceW(szSoundPath, '\\', '/')
 	if not X.StringFindW(szSoundPath, '/') then
@@ -579,22 +679,22 @@ function X.PlaySound(szSoundPath, bAllowCustomize)
 	end
 	-- 播放声音
 	if szFinalPath then
-		if X.ENVIRONMENT.SOUND_DRIVER == 'FMOD' then
+		if X.ENVIRONMENT.SOUND_DRIVER == 'FMOD' then -- FMOD
 			szFinalPath = X.NormalizePath(szFinalPath)
-			PlaySound(SOUND.UI_SOUND, szFinalPath)
-		else
+			PlaySound(eChannel, szFinalPath)
+		elseif WWISE_EVENT[string.lower(szFinalPath)] then -- WWISE
+			PlaySound(eChannel, WWISE_EVENT[string.lower(szFinalPath)])
+		else -- fallback
 			if not SOUND_PLAYER then
 				SOUND_PLAYER = X.UI.GetTempElement('WndWebCef', X.NSFormatString('{$NS}Lib__SoundPlayer'))
 			end
 			szFinalPath = X.GetAbsolutePath(szFinalPath)
 			szFinalPath = X.StringReplaceW(szFinalPath, '\\', '/')
-			local szDriverLetter = szFinalPath:sub(1, 3)
-			local aURLParts = X.SplitString(szFinalPath:sub(4), '/')
-			for i, s in ipairs(aURLParts) do
-				aURLParts[i] = X.EncodeURIComponent(X.ConvertToUTF8(s))
-			end
+			local SOUND_BRIDGE_PATH = SOUND_BRIDGE_ROOT .. eChannel .. '.html'
+			CPath.MakeDir(SOUND_BRIDGE_ROOT)
+			SaveDataToFile('<!DOCTYPE html><html><body><audio id="audio" autoplay><source src="' .. 'file:///' .. X.EncodeURI(szFinalPath) .. '"></audio><script>var audio = document.getElementById("audio"); audio.volume = ' .. X.GetSoundVolume(eChannel) .. ';</script></body></html>', SOUND_BRIDGE_PATH)
 			SOUND_PLAYER:Navigate('about:blank')
-			SOUND_PLAYER:Navigate('file:///' .. szDriverLetter .. table.concat(aURLParts, '/'))
+			SOUND_PLAYER:Navigate(X.EncodeFileURI(X.StringReplaceW(X.GetAbsolutePath(SOUND_BRIDGE_PATH), '\\', '/')))
 		end
 	end
 end
