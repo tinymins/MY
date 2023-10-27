@@ -235,6 +235,8 @@ def __7zip(packet, file_name, base_message, base_hash, extra_ignore_file):
     if base_hash != '':
         # Generate file change list since previous release commit
         def pathToModule(path):
+            if path[0] == '"' and path[-1] == '"':
+                path = path[1:-1]
             return re.sub('(?:^\\!src-dist/data/|["/].*$)', '', path)
         paths = {
             'package.ini': True,
