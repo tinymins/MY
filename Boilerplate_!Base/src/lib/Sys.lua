@@ -419,11 +419,11 @@ local SOUND_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT .. 'audio/'
 local SOUNDS = {
 	{
 		szType = _L['Default'],
-		{ dwID = 1, szName = _L['Bing.ogg'], szPath = SOUND_ROOT .. 'Bing.ogg' },
-		{ dwID = 88001, szName = _L['Notify.ogg'], szPath = SOUND_ROOT .. 'Notify.ogg' },
+		{ dwID = 1, szName = _L['Bing.ogg'], szPath = SOUND_ROOT .. 'Bing.ogg', szWwise = 'UserPluginAudio_MY_Base_Bing' },
+		{ dwID = 88001, szName = _L['Notify.ogg'], szPath = SOUND_ROOT .. 'Notify.ogg', szWwise = 'UserPluginAudio_MY_Base_Notify' },
 	},
 }
-local CACHE = nil
+local CACHE, WWISE_EVENT = nil, {}
 local function GetSoundList()
 	local a = { szOption = _L['Sound'] }
 	for _, v in ipairs(SOUNDS) do
@@ -489,6 +489,9 @@ local function Cache(tSound)
 			szName = tSound.szName,
 			szPath = tSound.szPath,
 		}
+		if tSound.szWWise then
+			WWISE_EVENT[string.lower(tSound.szPath)] = tSound.szWwise
+		end
 	end
 	for _, t in ipairs(tSound) do
 		Cache(t)
@@ -531,9 +534,11 @@ function X.GetSoundPath(dwID)
 	end
 	return tSound.szPath
 end
+
+function X.RegisterWwiseSound(szPath, szEvent)
+	WWISE_EVENT[string.lower(szPath)] = szEvent
 end
 
-do
 local SOUND_PLAYER
 -- ≤•∑≈…˘“Ù
 -- X.PlaySound(szSoundPath, bAllowCustomize)
@@ -579,10 +584,12 @@ function X.PlaySound(szSoundPath, bAllowCustomize)
 	end
 	-- ≤•∑≈…˘“Ù
 	if szFinalPath then
-		if X.ENVIRONMENT.SOUND_DRIVER == 'FMOD' then
+		if X.ENVIRONMENT.SOUND_DRIVER == 'FMOD' then -- FMOD
 			szFinalPath = X.NormalizePath(szFinalPath)
 			PlaySound(SOUND.UI_SOUND, szFinalPath)
-		else
+		elseif WWISE_EVENT[string.lower(szFinalPath)] then -- WWISE
+			PlaySound(SOUND.UI_SOUND, WWISE_EVENT[string.lower(szFinalPath)])
+		else -- fallback
 			if not SOUND_PLAYER then
 				SOUND_PLAYER = X.UI.GetTempElement('WndWebCef', X.NSFormatString('{$NS}Lib__SoundPlayer'))
 			end
