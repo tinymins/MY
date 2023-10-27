@@ -692,7 +692,7 @@ function X.PlaySound(eChannel, szSoundPath, bAllowCustomize)
 			szFinalPath = X.StringReplaceW(szFinalPath, '\\', '/')
 			local SOUND_BRIDGE_PATH = SOUND_BRIDGE_ROOT .. eChannel .. '.html'
 			CPath.MakeDir(SOUND_BRIDGE_ROOT)
-			SaveDataToFile('<!DOCTYPE html><html><body><audio id="audio" autoplay><source src="' .. 'file:///' .. X.EncodeURI(szFinalPath) .. '"></audio><script>var audio = document.getElementById("audio"); audio.volume = ' .. X.GetSoundVolume(eChannel) .. ';</script></body></html>', SOUND_BRIDGE_PATH)
+			SaveDataToFile('<!DOCTYPE html><html><body><audio id="audio" autoplay><source src="' .. X.EncodeFileURI(szFinalPath) .. '"></audio><script>var audio = document.getElementById("audio"); audio.volume = ' .. X.GetSoundVolume(eChannel) .. ';</script></body></html>', SOUND_BRIDGE_PATH)
 			SOUND_PLAYER:Navigate('about:blank')
 			SOUND_PLAYER:Navigate(X.EncodeFileURI(X.StringReplaceW(X.GetAbsolutePath(SOUND_BRIDGE_PATH), '\\', '/')))
 		end
