@@ -859,11 +859,10 @@ function D.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nSkillResultType
 			szPoint = 'BOTTOM_RIGHT'
 		end
 		szReplaceText = O.szTherapy
+	elseif dwTargetID == COMBAT_TEXT_PLAYERID then
+		szPoint = 'BOTTOM_LEFT'
+		szReplaceText = O.szDamage
 	else
-		if dwTargetID == COMBAT_TEXT_PLAYERID then
-			szPoint = 'BOTTOM_LEFT'
-			szReplaceText = O.szDamage
-		end
 		szReplaceText = O.szSkill
 	end
 	-- specific skill type overwrite
