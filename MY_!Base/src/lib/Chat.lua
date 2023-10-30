@@ -1324,76 +1324,87 @@ do
 local m_LevelUpData
 local function GetRegisterChannelLimitTable()
 	if not m_LevelUpData then
-		local me = X.GetClientPlayer()
-		if not me then
-			return false
-		end
-		local path = ('settings\\LevelUpData\\%s.tab'):format(({
-			[ROLE_TYPE.STANDARD_MALE  ] = 'StandardMale'  ,
-			[ROLE_TYPE.STANDARD_FEMALE] = 'StandardFemale',
-			[ROLE_TYPE.STRONG_MALE    ] = 'StrongMale'    ,
-			[ROLE_TYPE.SEXY_FEMALE    ] = 'SexyFemale'    ,
-			[ROLE_TYPE.LITTLE_BOY     ] = 'LittleBoy'     ,
-			[ROLE_TYPE.LITTLE_GIRL    ] = 'LittleGirl'    ,
-		})[me.nRoleType])
-		local tTitle = {
-			{f = 'i', t = 'Level'},
-			{f = 'i', t = 'Experience'},
-			{f = 'i', t = 'Strength'},
-			{f = 'i', t = 'Agility'},
-			{f = 'i', t = 'Vigor'},
-			{f = 'i', t = 'Spirit'},
-			{f = 'i', t = 'Spunk'},
-			{f = 'i', t = 'MaxLife'},
-			{f = 'i', t = 'MaxMana'},
-			{f = 'i', t = 'MaxStamina'},
-			{f = 'i', t = 'MaxThew'},
-			{f = 'i', t = 'MaxAssistExp'},
-			{f = 'i', t = 'MaxAssistTimes'},
-			{f = 'i', t = 'RunSpeed'},
-			{f = 'i', t = 'JumpSpeed'},
-			{f = 'i', t = 'Height'},
-			{f = 'i', t = 'LifeReplenish'},
-			{f = 'i', t = 'LifeReplenishPercent'},
-			{f = 'i', t = 'LifeReplenishExt'},
-			{f = 'i', t = 'ManaReplenish'},
-			{f = 'i', t = 'ManaReplenishPercent'},
-			{f = 'i', t = 'ManaReplenishExt'},
-			{f = 'i', t = 'HitBase'},
-			{f = 'i', t = 'ParryBaseRate'},
-			{f = 'i', t = 'PhysicsCriticalStrike'},
-			{f = 'i', t = 'SolarCriticalStrike'},
-			{f = 'i', t = 'NeutralCriticalStrike'},
-			{f = 'i', t = 'LunarCriticalStrike'},
-			{f = 'i', t = 'PoisonCriticalStrike'},
-			{f = 'i', t = 'NoneWeaponAttackSpeedBase'},
-			{f = 'i', t = 'MaxPhysicsDefence'},
-			{f = 'i', t = 'WorldChannelDailyLimit'},
-			{f = 'i', t = 'ForceChannelDailyLimit'},
-			{f = 'i', t = 'CampChannelDailyLimit'},
-			{f = 'i', t = 'MaxContribution'},
-			{f = 'i', t = 'WhisperDailyLimit'},
-			X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'IdentityChannelDailyLimit'} or false,
-			{f = 'i', t = 'SprintPowerMax'},
-			{f = 'i', t = 'SprintPowerCost'},
-			{f = 'i', t = 'SprintPowerRevive'},
-			{f = 'i', t = 'SprintPowerCostOnWall'},
-			{f = 'i', t = 'SprintPowerCostStandOnWall'},
-			{f = 'i', t = 'SprintPowerCostRunOnWallExtra'},
-			{f = 'i', t = 'HorseSprintPowerMax'},
-			{f = 'i', t = 'HorseSprintPowerCost'},
-			{f = 'i', t = 'HorseSprintPowerRevive'},
-			{f = 'i', t = 'SceneChannelDailyLimit'},
-			{f = 'i', t = 'NearbyChannelDailyLimit'},
-			X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitByVIP'} or false,
-			X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'} or false,
-		}
-		for i, v in X.ipairs_r(tTitle) do
-			if not v then
-				table.remove(tTitle, i)
+		if IsFileExist('settings\\Chat\\ChatDailyCountLimit.tab') then
+			m_LevelUpData = KG_Table.Load('settings\\Chat\\ChatDailyCountLimit.tab', {
+				{f = 'i', t = 'Level'},
+				{f = 'i', t = 'SceneChannelDailyLimit'},
+				{f = 'i', t = 'WorldChannelDailyLimit'},
+				{f = 'i', t = 'CampChannelDailyLimit'},
+				{f = 'i', t = 'ForceChannelDailyLimit'},
+				{f = 'i', t = 'IdentityChannelDailyLimit'},
+			}, FILE_OPEN_MODE.NORMAL)
+		else
+			local me = X.GetClientPlayer()
+			if not me then
+				return false
 			end
+			local szPath = ('settings\\LevelUpData\\%s.tab'):format(({
+				[ROLE_TYPE.STANDARD_MALE  ] = 'StandardMale'  ,
+				[ROLE_TYPE.STANDARD_FEMALE] = 'StandardFemale',
+				[ROLE_TYPE.STRONG_MALE    ] = 'StrongMale'    ,
+				[ROLE_TYPE.SEXY_FEMALE    ] = 'SexyFemale'    ,
+				[ROLE_TYPE.LITTLE_BOY     ] = 'LittleBoy'     ,
+				[ROLE_TYPE.LITTLE_GIRL    ] = 'LittleGirl'    ,
+			})[me.nRoleType])
+			local tTitle = {
+				{f = 'i', t = 'Level'},
+				{f = 'i', t = 'Experience'},
+				{f = 'i', t = 'Strength'},
+				{f = 'i', t = 'Agility'},
+				{f = 'i', t = 'Vigor'},
+				{f = 'i', t = 'Spirit'},
+				{f = 'i', t = 'Spunk'},
+				{f = 'i', t = 'MaxLife'},
+				{f = 'i', t = 'MaxMana'},
+				{f = 'i', t = 'MaxStamina'},
+				{f = 'i', t = 'MaxThew'},
+				{f = 'i', t = 'MaxAssistExp'},
+				{f = 'i', t = 'MaxAssistTimes'},
+				{f = 'i', t = 'RunSpeed'},
+				{f = 'i', t = 'JumpSpeed'},
+				{f = 'i', t = 'Height'},
+				{f = 'i', t = 'LifeReplenish'},
+				{f = 'i', t = 'LifeReplenishPercent'},
+				{f = 'i', t = 'LifeReplenishExt'},
+				{f = 'i', t = 'ManaReplenish'},
+				{f = 'i', t = 'ManaReplenishPercent'},
+				{f = 'i', t = 'ManaReplenishExt'},
+				{f = 'i', t = 'HitBase'},
+				{f = 'i', t = 'ParryBaseRate'},
+				{f = 'i', t = 'PhysicsCriticalStrike'},
+				{f = 'i', t = 'SolarCriticalStrike'},
+				{f = 'i', t = 'NeutralCriticalStrike'},
+				{f = 'i', t = 'LunarCriticalStrike'},
+				{f = 'i', t = 'PoisonCriticalStrike'},
+				{f = 'i', t = 'NoneWeaponAttackSpeedBase'},
+				{f = 'i', t = 'MaxPhysicsDefence'},
+				{f = 'i', t = 'WorldChannelDailyLimit'},
+				{f = 'i', t = 'ForceChannelDailyLimit'},
+				{f = 'i', t = 'CampChannelDailyLimit'},
+				{f = 'i', t = 'MaxContribution'},
+				{f = 'i', t = 'WhisperDailyLimit'},
+				X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'IdentityChannelDailyLimit'} or false,
+				{f = 'i', t = 'SprintPowerMax'},
+				{f = 'i', t = 'SprintPowerCost'},
+				{f = 'i', t = 'SprintPowerRevive'},
+				{f = 'i', t = 'SprintPowerCostOnWall'},
+				{f = 'i', t = 'SprintPowerCostStandOnWall'},
+				{f = 'i', t = 'SprintPowerCostRunOnWallExtra'},
+				{f = 'i', t = 'HorseSprintPowerMax'},
+				{f = 'i', t = 'HorseSprintPowerCost'},
+				{f = 'i', t = 'HorseSprintPowerRevive'},
+				{f = 'i', t = 'SceneChannelDailyLimit'},
+				{f = 'i', t = 'NearbyChannelDailyLimit'},
+				X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitByVIP'} or false,
+				X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'} or false,
+			}
+			for i, v in X.ipairs_r(tTitle) do
+				if not v then
+					table.remove(tTitle, i)
+				end
+			end
+			m_LevelUpData = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL)
 		end
-		m_LevelUpData = KG_Table.Load(path, tTitle, FILE_OPEN_MODE.NORMAL)
 	end
 	return m_LevelUpData
 end
