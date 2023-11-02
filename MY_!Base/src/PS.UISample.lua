@@ -22,6 +22,45 @@ local COMPONENT_SAMPLE = {
 	{'Handle', 'Handle', { w = COMPONENT_H, h = COMPONENT_H }},
 	{'Box', 'Box', { w = COMPONENT_H, h = COMPONENT_H, frame = 233 }},
 	{'Image', 'Image', { w = COMPONENT_H, h = COMPONENT_H, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT }},
+	{
+		'WndFrame',
+		'WndButton',
+		{
+			w = 100, h = COMPONENT_H, name = 'WndButton_CreateFrame', text = 'Create',
+			onClick = function()
+				X.UI.CreateFrame('SampleFrame', {
+					maximize = true,
+					dragresize = true,
+				})
+			end,
+		},
+	},
+	{
+		'WndFrame Simple',
+		'WndButton',
+		{
+			w = 100, h = COMPONENT_H, name = 'WndButton_CreateSimpleFrame', text = 'Create',
+			onClick = function()
+				X.UI.CreateFrame('SampleFrame', {
+					simple = true,
+					close = true,
+					minimize = true,
+					maximize = true,
+					dragresize = true,
+				})
+			end,
+		},
+	},
+	{
+		'UI.Browser',
+		'WndButton',
+		{
+			w = 100, h = COMPONENT_H, name = 'WndButton_CreateUIBrowser', text = 'Create',
+			onClick = function()
+				X.UI.OpenBrowser('https://jx3.xoyo.com')
+			end,
+		},
+	},
 	{'WndAutocomplete', 'WndAutocomplete', { w = 200, h = COMPONENT_H, font = 162, text = 'WndAutocomplete' }},
 	{'WndButtonBox', 'WndButtonBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndButtonBox' }},
 	{'WndButtonBox Themed', 'WndButtonBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndButtonBox', buttonStyle = 'FLAT' }},
