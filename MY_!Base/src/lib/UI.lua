@@ -6365,9 +6365,6 @@ function X.UI.CreateFrame(szName, opt)
 			frm:Lookup('Btn_Drag'):Hide()
 		else
 			SetComponentProp(frm, 'bDragResize', true)
-			if opt.onResize then
-				X.UI(frm):UIEvent('OnDragResize', opt.onResize)
-			end
 			frm:Lookup('Btn_Drag').OnDragButton = function()
 				local x, y = Station.GetMessagePos()
 				local nClientW, nClientH = Station.GetClientSize()
@@ -6397,12 +6394,6 @@ function X.UI.CreateFrame(szName, opt)
 				w = math.max(w + 16, opt.minWidth)
 				h = math.max(h + 16, opt.minHeight)
 				X.UI(frm):Size(w, h)
-				if frm.OnDragResize then
-					local res, err, trace = X.XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
-					if not res then
-						X.ErrorLog(err, X.NSFormatString('{$NS}#UI:CreateFrame#OnDragResize'), trace)
-					end
-				end
 			end
 			frm:Lookup('Btn_Drag'):RegisterLButtonDrag()
 		end
@@ -6461,9 +6452,6 @@ function X.UI.CreateFrame(szName, opt)
 			frm:Lookup('Btn_Drag'):Hide()
 		else
 			SetComponentProp(frm, 'bDragResize', true)
-			if opt.onResize then
-				X.UI(frm):UIEvent('OnDragResize', opt.onResize)
-			end
 			frm:Lookup('Btn_Drag').OnDragButton = function()
 				local x, y = Station.GetMessagePos()
 				local nClientW, nClientH = Station.GetClientSize()
@@ -6491,12 +6479,6 @@ function X.UI.CreateFrame(szName, opt)
 				w = math.max(w + 16, GetComponentProp(frm, 'minWidth'))
 				h = math.max(h + 16, GetComponentProp(frm, 'minHeight'))
 				X.UI(frm):Size(w, h)
-				if frm.OnDragResize then
-					local res, err, trace = X.XpCall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
-					if not res then
-						X.ErrorLog(err, X.NSFormatString('{$NS}#UI:CreateFrame#OnDragResize'), trace)
-					end
-				end
 			end
 			frm:Lookup('Btn_Drag'):RegisterLButtonDrag()
 		end
