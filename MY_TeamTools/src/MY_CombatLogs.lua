@@ -339,10 +339,10 @@ function D.OnTargetUpdate(dwID, bForce)
 	if not X.IsNumber(dwID) then
 		return
 	end
-	if not X.IsParty(dwID) and not X.IsInArena() and not X.IsInBattleField() then
+	local bIsPlayer = X.IsPlayer(dwID)
+	if bIsPlayer and not X.IsParty(dwID) and not X.IsInArena() and not X.IsInBattleField() then
 		return
 	end
-	local bIsPlayer = X.IsPlayer(dwID)
 	if not bIsPlayer then
 		if not LOG_NAMING_COUNT[dwID] then
 			LOG_NAMING_COUNT[dwID] = {
