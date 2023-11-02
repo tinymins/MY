@@ -34,7 +34,7 @@ function X.UI.OpenTextEditor(szText, opt)
 		text = opt.title or _L['Text Editor'],
 		anchor = opt.anchor or { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },
 		simple = true, close = true, esc = true,
-		dragresize = true, minimize = true, ondragresize = OnResize,
+		resize = true, minimize = true, onResize = OnResize,
 	})
 	ui:Append('WndEditBox', { x = 0, y = 0, multiline = true, text = szText })
 	ui:Focus()
