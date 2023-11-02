@@ -101,14 +101,14 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			w = O.nWidth, h = O.nHeight,
 			text = _L['Team Message'],
 			anchor = O.anchor,
-			simple = true, close = true, dragresize = true,
-			minwidth = 320, minheight = 195,
+			simple = true, close = true, resize = true,
+			minWidth = 320, minHeight = 195,
 			setting = function()
 				X.ShowPanel()
 				X.FocusPanel()
 				X.SwitchTab('MY_TeamTools')
 			end,
-			ondragresize = FormatAllContentPos,
+			onSizeChange = FormatAllContentPos,
 		})
 		local x, y = 10, 5
 		x = x + ui:Append('Text', { x = x, y = y - 3, text = X.ENVIRONMENT.GAME_LANG == 'zhcn' and _L['YY:'] or _L['DC:'], font = 48 }):AutoWidth():Width() + 5

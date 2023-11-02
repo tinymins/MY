@@ -30,7 +30,7 @@ function D.Open(szModule)
 		w = 1000, h = 700,
 		close = true,
 		maximize = true,
-		dragresize = true,
+		resize = true,
 		minWidth = 1000,
 		minHeight = 700,
 		text = X.PACKET_INFO.NAME .. _L.SPLIT_DOT .. _L['MY_RoleStatistics'],

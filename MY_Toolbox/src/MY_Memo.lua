@@ -52,23 +52,22 @@ function D.Reload(bGlobal)
 	if CFG.bEnable then
 		X.UI.CreateFrame(NAME, {
 			simple = true, alpha = 140,
-			maximize = true, minimize = true, dragresize = true,
-			minwidth = 180, minheight = 100,
-			onmaximize = function(wnd)
+			maximize = true, minimize = true, resize = true,
+			minWidth = 180, minHeight = 100,
+			onMaximize = function(wnd)
 				local ui = X.UI(wnd)
 				ui:Children('#WndEditBox_Memo'):Size(ui:Size())
 			end,
-			onrestore = function(wnd)
+			onRestore = function(wnd)
 				local ui = X.UI(wnd)
 				ui:Children('#WndEditBox_Memo'):Size(ui:Size())
 			end,
-			ondragresize = function(wnd)
-				local ui = X.UI(wnd:GetRoot())
+			onSizeChange = function()
+				local ui = X.UI(this)
 				CFG.nWidth  = ui:Width()
 				CFG.anchor  = ui:Anchor()
 				CFG.nHeight = ui:Height()
-				local ui = X.UI(wnd)
-				ui:Children('#WndEditBox_Memo'):Size(ui:Size())
+				ui:Children('#WndEditBox_Memo'):Size(X.UI(this:Lookup('Wnd_Total')):Size())
 			end,
 			w = CFG.nWidth, h = CFG.nHeight, text = TITLE,
 			draggable = true, dragArea = {0, 0, CFG.nWidth, 30},
