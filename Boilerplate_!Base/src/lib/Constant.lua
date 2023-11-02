@@ -39,6 +39,8 @@ local FORCE_TYPE = (function()
 		PENG_LAI  = 24, -- ÅîÀ³
 		LING_XUE  = 25, -- ÁèÑ©
 		YAN_TIAN  = 211, -- ÑÜÌì
+		YAO_ZONG  = 212, -- Ò©×Ú
+		DAO_ZONG  = 213, -- µ¶×Ú
 		WAN_LING  = 214, -- ÍòÁé
 	})
 	local res = {}
@@ -67,7 +69,9 @@ local FORCE_LIST = {
 	{ dwID = FORCE_TYPE.BA_DAO   , szUITex = 'ui\\Image\\PlayerAvatar\\badao.tga'         , nFrame = -2, bAnimate = false }, -- °Ôµ¶
 	{ dwID = FORCE_TYPE.PENG_LAI , szUITex = 'ui\\Image\\PlayerAvatar\\penglai.tga'       , nFrame = -2, bAnimate = false }, -- ÅîÀ³
 	{ dwID = FORCE_TYPE.LING_XUE , szUITex = 'ui\\Image\\PlayerAvatar\\lingxuege.tga'     , nFrame = -2, bAnimate = false }, -- ÁèÑ©
+	{ dwID = FORCE_TYPE.YAN_TIAN , szUITex = 'ui\\Image\\PlayerAvatar\\yantianzong.dds'   , nFrame = -2, bAnimate = false }, -- ÑÜÌì
 	{ dwID = FORCE_TYPE.YAO_ZONG , szUITex = 'ui\\Image\\PlayerAvatar\\beitianyaozong.dds', nFrame = -2, bAnimate = false }, -- Ò©×Ú
+	{ dwID = FORCE_TYPE.DAO_ZONG , szUITex = 'ui\\Image\\PlayerAvatar\\daozong.dds'       , nFrame = -2, bAnimate = false }, -- µ¶×Ú
 	{ dwID = FORCE_TYPE.WAN_LING , szUITex = 'ui\\Image\\PlayerAvatar\\wanling.tga'       , nFrame = -2, bAnimate = false }, -- ÍòÁé
 }
 for i, v in X.ipairs_r(FORCE_LIST) do
@@ -107,6 +111,7 @@ local KUNGFU_TYPE = (function()
 		TAI_XUAN  = 10615, -- ÑÜÌì Ì«Ðþ¾­
 		LING_SU   = 10626, -- Ò©×Ú ÁéËØ
 		WU_FANG   = 10627, -- Ò©×Ú ÎÞ·½
+		GU_FENG   = 10698, -- µ¶×Ú ¹Â·å¾÷
 		SHAN_HAI  = 10756, -- ÍòÁé É½º£ÐÄ¾÷
 	}
 	local res = {}
@@ -153,6 +158,7 @@ local KUNGFU_LIST = {
 	{ dwID = KUNGFU_TYPE.BEI_AO   , dwForceID = FORCE_TYPE.BA_DAO   , nIcon = 8424 , szUITex = 'ui/Image/icon/daoj_16_8_25_16.UITex'   , nFrame = 0  }, -- °Ôµ¶ ±±°Á¾÷
 	{ dwID = KUNGFU_TYPE.LING_HAI , dwForceID = FORCE_TYPE.PENG_LAI , nIcon = 10709, szUITex = 'ui/image/icon/JNPL_18_10_30_27.uitex'  , nFrame = 0  }, -- ÅîÀ³ Áèº£¾÷
 	{ dwID = KUNGFU_TYPE.YIN_LONG , dwForceID = FORCE_TYPE.LING_XUE , nIcon = 12128, szUITex = 'ui/image/icon/JNLXG_19_10_21_9.uitex'  , nFrame = 0  }, -- ÁèÑ© ÒþÁú¾÷
+	{ dwID = KUNGFU_TYPE.GU_FENG  , dwForceID = FORCE_TYPE.DAO_ZONG , nIcon = 17633, szUITex = 'ui/image/icon/skill_22_9_7_2.uitex'    , nFrame = 51 }, -- µ¶×Ú ¹Â·å¾÷
 	{ dwID = KUNGFU_TYPE.SHAN_HAI , dwForceID = FORCE_TYPE.WAN_LING , nIcon = 19664, szUITex = 'ui/image/icon/skill_23_8_22_1.uitex'   , nFrame = 9  }, -- ÍòÁé É½º£ÐÄ¾÷
 }
 for i, v in X.ipairs_r(KUNGFU_LIST) do
