@@ -4729,30 +4729,47 @@ function OO:FrameVisualState(...)
 					SetComponentProp(raw, 'nFrameVisualStateRestoreHeight', nH)
 				end
 				-- 处理视觉变化
+				local wndTotal = raw:Lookup('Wnd_Total')
+				local shaBg = raw:Lookup('', 'Shadow_Bg')
+				local btnDrag = raw:Lookup('Btn_Drag')
 				if eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化
 					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
-					raw:Lookup('Wnd_Total'):Hide()
-					raw:Lookup('', 'Shadow_Bg'):Hide()
-					raw:SetH(30)
+					if wndTotal then
+						wndTotal:Hide()
+					end
+					if shaBg then
+						shaBg:Hide()
+					end
+					if GetComponentProp(raw, 'simple') then
+						raw:SetH(30)
+					elseif GetComponentProp(raw, 'intact') then
+						raw:SetH(54)
+						raw:Lookup('', ''):SetH(54)
+					end
 					if chkMaximize then
 						chkMaximize:Enable(false)
 					end
-					if GetComponentProp(raw, 'bDragResize') then
-						raw:Lookup('Btn_Drag'):Hide()
+					if btnDrag and GetComponentProp(raw, 'bDragResize') then
+						btnDrag:Hide()
 					end
-					X.ExecuteWithThis(raw, raw.OnMinimize, raw:Lookup('Wnd_Total'))
+					X.ExecuteWithThis(raw, raw.OnMinimize, wndTotal or raw)
 				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化恢复
 					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
-					raw:Lookup('Wnd_Total'):Show()
-					raw:Lookup('', 'Shadow_Bg'):Show()
-					raw:SetSize(GetComponentProp(raw, 'nFrameVisualStateRestoreWidth'), GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
+					if wndTotal then
+						wndTotal:Show()
+					end
+					if shaBg then
+						shaBg:Show()
+					end
+					raw:SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
+					raw:Lookup('', ''):SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
 					if chkMaximize then
 						chkMaximize:Enable(true)
 					end
-					if GetComponentProp(raw, 'bDragResize') then
-						raw:Lookup('Btn_Drag'):Show()
+					if btnDrag and GetComponentProp(raw, 'bDragResize') then
+						btnDrag:Show()
 					end
-					X.ExecuteWithThis(raw, raw.OnRestore, raw:Lookup('Wnd_Total'))
+					X.ExecuteWithThis(raw, raw.OnRestore, wndTotal or raw)
 				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化
 					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
 					local nScreenW, nScreeH = Station.GetClientSize()
@@ -4764,10 +4781,10 @@ function OO:FrameVisualState(...)
 							local nScreenW, nScreeH = Station.GetClientSize()
 							X.UI(raw):Pos(0, 0):Size(nScreenW, nScreeH)
 						end)
-					if GetComponentProp(raw, 'bDragResize') then
-						raw:Lookup('Btn_Drag'):Hide()
+					if btnDrag and GetComponentProp(raw, 'bDragResize') then
+						btnDrag:Hide()
 					end
-					X.ExecuteWithThis(raw, raw.OnMaximize, raw:Lookup('Wnd_Total'))
+					X.ExecuteWithThis(raw, raw.OnMaximize, wndTotal or raw)
 				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化恢复
 					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
 					X.UI(raw)
@@ -4775,10 +4792,10 @@ function OO:FrameVisualState(...)
 						:Size(GetComponentProp(raw, 'nFrameVisualStateRestoreWidth'), GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
 						:Anchor(GetComponentProp(raw, 'tFrameVisualStateRestoreAnchor'))
 						:Drag(true)
-					if GetComponentProp(raw, 'bDragResize') then
-						raw:Lookup('Btn_Drag'):Show()
+					if btnDrag and GetComponentProp(raw, 'bDragResize') then
+						btnDrag:Show()
 					end
-					X.ExecuteWithThis(raw, raw.OnRestore, raw:Lookup('Wnd_Total'))
+					X.ExecuteWithThis(raw, raw.OnRestore, wndTotal or raw)
 				end
 			end
 		end
@@ -6404,6 +6421,22 @@ function X.UI.CreateFrame(szName, opt)
 		else
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close').OnLButtonClick = function()
 				X.UI(frm):Remove()
+			end
+		end
+		if opt.onrestore then
+			X.UI(frm):UIEvent('OnRestore', opt.onrestore)
+		end
+		if not opt.minimize then
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
+		else
+			if opt.onminimize then
+				X.UI(frm):UIEvent('OnMinimize', opt.onminimize)
+			end
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxCheck = function()
+				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MINIMIZE)
+			end
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxUncheck = function()
+				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
 			end
 		end
 		if not opt.maximize then

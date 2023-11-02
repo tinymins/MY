@@ -29,6 +29,7 @@ local COMPONENT_SAMPLE = {
 			w = 100, h = COMPONENT_H, name = 'WndButton_CreateFrame', text = 'Create',
 			onClick = function()
 				X.UI.CreateFrame('SampleFrame', {
+					minimize = true,
 					maximize = true,
 					dragresize = true,
 				})
