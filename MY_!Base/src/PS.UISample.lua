@@ -31,7 +31,7 @@ local COMPONENT_SAMPLE = {
 				X.UI.CreateFrame('SampleFrame', {
 					minimize = true,
 					maximize = true,
-					dragresize = true,
+					resize = true,
 				})
 			end,
 		},
@@ -47,7 +47,7 @@ local COMPONENT_SAMPLE = {
 					close = true,
 					minimize = true,
 					maximize = true,
-					dragresize = true,
+					resize = true,
 				})
 			end,
 		},
