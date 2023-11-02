@@ -51,6 +51,16 @@ local COMPONENT_SAMPLE = {
 			end,
 		},
 	},
+	{
+		'UI.Browser',
+		'WndButton',
+		{
+			w = 100, h = COMPONENT_H, name = 'WndButton_CreateUIBrowser', text = 'Create',
+			onClick = function()
+				X.UI.OpenBrowser('https://jx3.xoyo.com')
+			end,
+		},
+	},
 	{'WndAutocomplete', 'WndAutocomplete', { w = 200, h = COMPONENT_H, font = 162, text = 'WndAutocomplete' }},
 	{'WndButtonBox', 'WndButtonBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndButtonBox' }},
 	{'WndButtonBox Themed', 'WndButtonBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndButtonBox', buttonStyle = 'FLAT' }},
