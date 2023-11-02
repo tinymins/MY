@@ -4786,7 +4786,7 @@ function OO:FrameVisualState(...)
 	else -- get
 		local raw = self.raws[1]
 		if raw and GetComponentType(raw) == 'WndFrame' then
-			return GetComponentProp(raw, 'eFrameVisualState')
+			return GetComponentProp(raw, 'eFrameVisualState') or X.UI.FRAME_VISUAL_STATE.NORMAL
 		end
 	end
 	return self
