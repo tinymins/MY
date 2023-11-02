@@ -4744,6 +4744,7 @@ function OO:FrameVisualState(...)
 						raw:SetH(30)
 					elseif GetComponentProp(raw, 'intact') then
 						raw:SetH(54)
+						raw:Lookup('', ''):SetH(54)
 					end
 					if chkMaximize then
 						chkMaximize:Enable(false)
@@ -4760,7 +4761,8 @@ function OO:FrameVisualState(...)
 					if shaBg then
 						shaBg:Show()
 					end
-					raw:SetSize(GetComponentProp(raw, 'nFrameVisualStateRestoreWidth'), GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
+					raw:SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
+					raw:Lookup('', ''):SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
 					if chkMaximize then
 						chkMaximize:Enable(true)
 					end
@@ -6419,6 +6421,22 @@ function X.UI.CreateFrame(szName, opt)
 		else
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close').OnLButtonClick = function()
 				X.UI(frm):Remove()
+			end
+		end
+		if opt.onrestore then
+			X.UI(frm):UIEvent('OnRestore', opt.onrestore)
+		end
+		if not opt.minimize then
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
+		else
+			if opt.onminimize then
+				X.UI(frm):UIEvent('OnMinimize', opt.onminimize)
+			end
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxCheck = function()
+				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MINIMIZE)
+			end
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxUncheck = function()
+				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
 			end
 		end
 		if not opt.maximize then
