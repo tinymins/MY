@@ -43,7 +43,9 @@ local O = X.CreateUserSettingsModule('MY_ItemWiki', _L['General'], {
 local D = {}
 
 function D.OnWebSizeChange()
-	O.nW, O.nH = this:GetSize()
+	if X.UI(this):FrameVisualState() == X.UI.FRAME_VISUAL_STATE.NORMAL then
+		O.nW, O.nH = this:GetSize()
+	end
 end
 
 function D.Open(dwTabType, dwTabIndex, nBookID)
