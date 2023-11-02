@@ -66,28 +66,14 @@ end
 function D.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Maximize' then
-		local frame = this:GetRoot()
-		local ui = X.UI(frame)
-		frame.tMaximizeAnchor = ui:Anchor()
-		frame.nMaximizeW, frame.nMaximizeH = ui:Size()
-		ui:Pos(0, 0)
-		ui:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
-			ui:Size(Station.GetClientSize())
-		end)
-		ui:Drag(false)
-		ui:Size(Station.GetClientSize())
+		X.UI(this:GetRoot()):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MAXIMIZE)
 	end
 end
 
 function D.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Maximize' then
-		local frame = this:GetRoot()
-		local ui = X.UI(frame)
-		ui:Size(frame.nMaximizeW, frame.nMaximizeH)
-		ui:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
-		ui:Drag(true)
-		ui:Anchor(frame.tMaximizeAnchor)
+		X.UI(this:GetRoot()):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
 	end
 end
 
