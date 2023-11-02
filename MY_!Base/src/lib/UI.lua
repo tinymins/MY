@@ -4730,6 +4730,7 @@ function OO:FrameVisualState(...)
 				end
 				-- 处理视觉变化
 				if eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化
+					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
 					raw:Lookup('Wnd_Total'):Hide()
 					raw:Lookup('', 'Shadow_Bg'):Hide()
 					raw:SetH(30)
@@ -4739,9 +4740,9 @@ function OO:FrameVisualState(...)
 					if GetComponentProp(raw, 'bDragResize') then
 						raw:Lookup('Btn_Drag'):Hide()
 					end
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
 					X.ExecuteWithThis(raw, raw.OnMinimize, raw:Lookup('Wnd_Total'))
 				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化恢复
+					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
 					raw:Lookup('Wnd_Total'):Show()
 					raw:Lookup('', 'Shadow_Bg'):Show()
 					raw:SetSize(GetComponentProp(raw, 'nFrameVisualStateRestoreWidth'), GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
@@ -4751,9 +4752,9 @@ function OO:FrameVisualState(...)
 					if GetComponentProp(raw, 'bDragResize') then
 						raw:Lookup('Btn_Drag'):Show()
 					end
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
 					X.ExecuteWithThis(raw, raw.OnRestore, raw:Lookup('Wnd_Total'))
 				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化
+					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
 					local nScreenW, nScreeH = Station.GetClientSize()
 					X.UI(raw)
 						:Pos(0, 0)
@@ -4766,9 +4767,9 @@ function OO:FrameVisualState(...)
 					if GetComponentProp(raw, 'bDragResize') then
 						raw:Lookup('Btn_Drag'):Hide()
 					end
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
 					X.ExecuteWithThis(raw, raw.OnMaximize, raw:Lookup('Wnd_Total'))
 				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化恢复
+					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
 					X.UI(raw)
 						:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', false)
 						:Size(GetComponentProp(raw, 'nFrameVisualStateRestoreWidth'), GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
@@ -4777,7 +4778,6 @@ function OO:FrameVisualState(...)
 					if GetComponentProp(raw, 'bDragResize') then
 						raw:Lookup('Btn_Drag'):Show()
 					end
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
 					X.ExecuteWithThis(raw, raw.OnRestore, raw:Lookup('Wnd_Total'))
 				end
 			end
