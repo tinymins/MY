@@ -4705,9 +4705,7 @@ function OO:FrameVisualState(...)
 	if argc > 0 then -- set
 		local eNextVisualState = ...
 		for _, raw in ipairs(self.raws) do
-			if GetComponentType(raw) == 'WndFrame' and GetComponentProp(raw, 'eFrameVisualState') ~= eNextVisualState
-			and not (eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE and not GetComponentProp(raw, 'bCanMinimize'))
-			and not (eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE and not GetComponentProp(raw, 'bCanMaximize')) then
+			if GetComponentType(raw) == 'WndFrame' and GetComponentProp(raw, 'eFrameVisualState') ~= eNextVisualState then
 				local eCurrentVisualState = GetComponentProp(raw, 'eFrameVisualState') or X.UI.FRAME_VISUAL_STATE.NORMAL
 				-- 更新界面按钮状态
 				local chkMaximize = raw:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
@@ -6316,7 +6314,6 @@ function X.UI.CreateFrame(szName, opt)
 		if not opt.minimize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
 		else
-			SetComponentProp(frm, 'bCanMinimize', true)
 			if opt.onminimize then
 				X.UI(frm):UIEvent('OnMinimize', opt.onminimize)
 			end
@@ -6330,7 +6327,6 @@ function X.UI.CreateFrame(szName, opt)
 		if not opt.maximize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
 		else
-			SetComponentProp(frm, 'bCanMaximize', true)
 			if opt.onmaximize then
 				X.UI(frm):UIEvent('OnMaximize', opt.onmaximize)
 			end
@@ -6413,7 +6409,6 @@ function X.UI.CreateFrame(szName, opt)
 		if not opt.maximize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
 		else
-			SetComponentProp(frm, 'bCanMaximize', true)
 			if opt.onmaximize then
 				X.UI(frm):UIEvent('OnMaximize', opt.onmaximize)
 			end
