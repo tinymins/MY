@@ -4696,103 +4696,111 @@ end
 
 -- (bool) Instance:FrameVisualState() -- get frame visual state
 -- (self) Instance:FrameVisualState(X.UI.FRAME_VISUAL_STATE eVisualState) -- set frame visual state
+-- (self) Instance:FrameVisualState(function onFrameVisualStateChange) -- set frame visual state change event handler
 function OO:FrameVisualState(...)
 	self:_checksum()
 	local argc = select('#', ...)
 	if argc > 0 then -- set
-		local eNextVisualState = ...
-		for _, raw in ipairs(self.raws) do
-			if GetComponentType(raw) == 'WndFrame' and GetComponentProp(raw, 'eFrameVisualState') ~= eNextVisualState then
-				local eCurrentVisualState = GetComponentProp(raw, 'eFrameVisualState') or X.UI.FRAME_VISUAL_STATE.NORMAL
-				-- 更新界面按钮状态
-				local chkMaximize = raw:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
-				if eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then
-					if chkMaximize then
-						chkMaximize:Check(false, WNDEVENT_FIRETYPE.PREVENT)
+		local arg0 = ...
+		if X.IsFunction(arg0) then
+			for _, raw in ipairs(self.raws) do
+				X.UI(raw):UIEvent('OnFrameVisualStateChange', arg0)
+			end
+		else
+			local eNextVisualState = arg0
+			for _, raw in ipairs(self.raws) do
+				if GetComponentType(raw) == 'WndFrame' and GetComponentProp(raw, 'eFrameVisualState') ~= eNextVisualState then
+					local eCurrentVisualState = GetComponentProp(raw, 'eFrameVisualState') or X.UI.FRAME_VISUAL_STATE.NORMAL
+					-- 更新界面按钮状态
+					local chkMaximize = raw:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
+					if eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then
+						if chkMaximize then
+							chkMaximize:Check(false, WNDEVENT_FIRETYPE.PREVENT)
+						end
+					elseif eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then
+						raw:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize'):Check(false, WNDEVENT_FIRETYPE.PREVENT)
 					end
-				elseif eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then
-					raw:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize'):Check(false, WNDEVENT_FIRETYPE.PREVENT)
-				end
-				-- 恢复默认窗体状态
-				if (eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE)
-				or (eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE) then
-					X.UI(raw):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
-				end
-				-- 保存普通窗体大小
-				if eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL then
-					local nW, nH = raw:GetSize()
-					SetComponentProp(raw, 'tFrameVisualStateRestoreAnchor', GetFrameAnchor(raw))
-					SetComponentProp(raw, 'nFrameVisualStateRestoreWidth', nW)
-					SetComponentProp(raw, 'nFrameVisualStateRestoreHeight', nH)
-				end
-				-- 处理视觉变化
-				local wndTotal = raw:Lookup('Wnd_Total')
-				local shaBg = raw:Lookup('', 'Shadow_Bg')
-				local btnDrag = raw:Lookup('Btn_Drag')
-				if eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
-					if wndTotal then
-						wndTotal:Hide()
+					-- 恢复默认窗体状态
+					if (eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE)
+					or (eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE) then
+						X.UI(raw):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
 					end
-					if shaBg then
-						shaBg:Hide()
+					-- 保存普通窗体大小
+					if eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL then
+						local nW, nH = raw:GetSize()
+						SetComponentProp(raw, 'tFrameVisualStateRestoreAnchor', GetFrameAnchor(raw))
+						SetComponentProp(raw, 'nFrameVisualStateRestoreWidth', nW)
+						SetComponentProp(raw, 'nFrameVisualStateRestoreHeight', nH)
 					end
-					if GetComponentProp(raw, 'simple') then
-						raw:SetH(30)
-					elseif GetComponentProp(raw, 'intact') then
-						raw:SetH(54)
-						raw:Lookup('', ''):SetH(54)
+					-- 处理视觉变化
+					local wndTotal = raw:Lookup('Wnd_Total')
+					local shaBg = raw:Lookup('', 'Shadow_Bg')
+					local btnDrag = raw:Lookup('Btn_Drag')
+					if eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化
+						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
+						if wndTotal then
+							wndTotal:Hide()
+						end
+						if shaBg then
+							shaBg:Hide()
+						end
+						if GetComponentProp(raw, 'simple') then
+							raw:SetH(30)
+						elseif GetComponentProp(raw, 'intact') then
+							raw:SetH(54)
+							raw:Lookup('', ''):SetH(54)
+						end
+						if chkMaximize then
+							chkMaximize:Enable(false)
+						end
+						if btnDrag and GetComponentProp(raw, 'bDragResize') then
+							btnDrag:Hide()
+						end
+						X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
+					elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化恢复
+						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
+						if wndTotal then
+							wndTotal:Show()
+						end
+						if shaBg then
+							shaBg:Show()
+						end
+						raw:SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
+						raw:Lookup('', ''):SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
+						if chkMaximize then
+							chkMaximize:Enable(true)
+						end
+						if btnDrag and GetComponentProp(raw, 'bDragResize') then
+							btnDrag:Show()
+						end
+						X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
+					elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化
+						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
+						local nScreenW, nScreeH = Station.GetClientSize()
+						X.UI(raw)
+							:Pos(0, 0)
+							:Drag(false)
+							:Size(nScreenW, nScreeH)
+							:Event('UI_SCALED', 'FRAME_MAXIMIZE_RESIZE', function()
+								local nScreenW, nScreeH = Station.GetClientSize()
+								X.UI(raw):Pos(0, 0):Size(nScreenW, nScreeH)
+							end)
+						if btnDrag and GetComponentProp(raw, 'bDragResize') then
+							btnDrag:Hide()
+						end
+						X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
+					elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化恢复
+						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
+						X.UI(raw)
+							:Event('UI_SCALED', 'FRAME_MAXIMIZE_RESIZE', false)
+							:Size(GetComponentProp(raw, 'nFrameVisualStateRestoreWidth'), GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
+							:Anchor(GetComponentProp(raw, 'tFrameVisualStateRestoreAnchor'))
+							:Drag(true)
+						if btnDrag and GetComponentProp(raw, 'bDragResize') then
+							btnDrag:Show()
+						end
+						X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
 					end
-					if chkMaximize then
-						chkMaximize:Enable(false)
-					end
-					if btnDrag and GetComponentProp(raw, 'bDragResize') then
-						btnDrag:Hide()
-					end
-					X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
-				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化恢复
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
-					if wndTotal then
-						wndTotal:Show()
-					end
-					if shaBg then
-						shaBg:Show()
-					end
-					raw:SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
-					raw:Lookup('', ''):SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
-					if chkMaximize then
-						chkMaximize:Enable(true)
-					end
-					if btnDrag and GetComponentProp(raw, 'bDragResize') then
-						btnDrag:Show()
-					end
-					X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
-				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
-					local nScreenW, nScreeH = Station.GetClientSize()
-					X.UI(raw)
-						:Pos(0, 0)
-						:Drag(false)
-						:Size(nScreenW, nScreeH)
-						:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
-							local nScreenW, nScreeH = Station.GetClientSize()
-							X.UI(raw):Pos(0, 0):Size(nScreenW, nScreeH)
-						end)
-					if btnDrag and GetComponentProp(raw, 'bDragResize') then
-						btnDrag:Hide()
-					end
-					X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
-				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化恢复
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
-					X.UI(raw)
-						:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', false)
-						:Size(GetComponentProp(raw, 'nFrameVisualStateRestoreWidth'), GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
-						:Anchor(GetComponentProp(raw, 'tFrameVisualStateRestoreAnchor'))
-						:Drag(true)
-					if btnDrag and GetComponentProp(raw, 'bDragResize') then
-						btnDrag:Show()
-					end
-					X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
 				end
 			end
 		end
@@ -5280,19 +5288,19 @@ function OO:ButtonStyle(...)
 				btn:SetAnimateGroupMouseDown(tStyle.nMouseDownGroup)
 				btn:SetAnimateGroupDisable(tStyle.nDisableGroup)
 				X.UI(btn)
-					:UIEvent(X.NSFormatString('OnMouseIn.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent('OnMouseIn', 'LIB#UI_BUTTON_EVENT', function()
 						SetComponentProp(raw, 'bIn', true)
 						UpdateButtonBoxFont(raw)
 					end)
-					:UIEvent(X.NSFormatString('OnMouseOut.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent('OnMouseOut', 'LIB#UI_BUTTON_EVENT', function()
 						SetComponentProp(raw, 'bIn', false)
 						UpdateButtonBoxFont(raw)
 					end)
-					:UIEvent(X.NSFormatString('OnLButtonDown.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent('OnLButtonDown', 'LIB#UI_BUTTON_EVENT', function()
 						SetComponentProp(raw, 'bDown', true)
 						UpdateButtonBoxFont(raw)
 					end)
-					:UIEvent(X.NSFormatString('OnLButtonUp.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent('OnLButtonUp', 'LIB#UI_BUTTON_EVENT', function()
 						SetComponentProp(raw, 'bDown', false)
 						UpdateButtonBoxFont(raw)
 					end)
@@ -5375,15 +5383,13 @@ end
 -----------------------------------------------------------
 
 -- 绑定Frame的事件
-function OO:Event(szEvent, fnEvent)
+function OO:Event(szEvent, szKey, fnEvent)
 	self:_checksum()
+	if X.IsFunction(szKey) then
+		szKey, fnEvent = nil, szKey
+	end
 	if X.IsString(szEvent) then
-		local nPos, szKey = (X.StringFindW(szEvent, '.')), nil
-		if nPos then
-			szKey = string.sub(szEvent, nPos + 1)
-			szEvent = string.sub(szEvent, 1, nPos - 1)
-		end
-		if X.IsFunction(fnEvent) then
+		if X.IsFunction(fnEvent) then -- register
 			for _, raw in ipairs(self.raws) do
 				if raw:GetType() == 'WndFrame' then
 					local events = GetComponentProp(raw, 'onEvents')
@@ -5396,7 +5402,7 @@ function OO:Event(szEvent, fnEvent)
 							end
 							if events[e] then
 								for _, p in ipairs(events[e]) do
-									p.fn(e, ...)
+									p.fnAction(e, ...)
 								end
 							end
 						end
@@ -5408,28 +5414,22 @@ function OO:Event(szEvent, fnEvent)
 					end
 					if szKey then
 						for i, p in X.ipairs_r(events[szEvent]) do
-							if p.id == szKey then
+							if p.szKey == szKey then
 								table.remove(events[szEvent], i)
 							end
 						end
 					end
-					table.insert(events[szEvent], { id = szKey, fn = fnEvent })
+					table.insert(events[szEvent], { szKey = szKey, fnAction = fnEvent })
 				end
 			end
-		else
+		elseif X.IsString(szKey) and fnEvent == false then -- unregister
 			for _, raw in ipairs(self.raws) do
 				if raw:GetType() == 'WndFrame' then
 					local events = GetComponentProp(raw, 'events')
-					if events then
-						if not szKey then
-							for e, _ in pairs(events) do
-								events[e] = {}
-							end
-						elseif events[szEvent] then
-							for i, p in X.ipairs_r(events[szEvent]) do
-								if p.id == szKey then
-									table.remove(events[szEvent], i)
-								end
+					if events and events[szEvent] then
+						for i, p in X.ipairs_r(events[szEvent]) do
+							if p.szKey == szKey then
+								table.remove(events[szEvent], i)
 							end
 						end
 					end
@@ -5441,15 +5441,13 @@ function OO:Event(szEvent, fnEvent)
 end
 
 -- 绑定ele的UI事件
-function OO:UIEvent(szEvent, fnEvent)
+function OO:UIEvent(szEvent, szKey, fnEvent)
 	self:_checksum()
+	if X.IsFunction(szKey) then
+		szKey, fnEvent = nil, szKey
+	end
 	if X.IsString(szEvent) then
-		local nPos, szKey = (X.StringFindW(szEvent, '.')), nil
-		if nPos then
-			szKey = string.sub(szEvent, nPos + 1)
-			szEvent = string.sub(szEvent, 1, nPos - 1)
-		end
-		if X.IsFunction(fnEvent) then
+		if X.IsFunction(fnEvent) then -- register
 			for _, raw in ipairs(self.raws) do
 				local uiEvents = GetComponentProp(raw, 'uiEvents')
 				if not uiEvents then
@@ -5465,14 +5463,14 @@ function OO:UIEvent(szEvent, fnEvent)
 						end
 						local rets = {}
 						for _, p in ipairs(uiEvents[szEvent]) do
-							local res = X.Pack(p.fn(...))
+							local res = X.Pack(p.fnAction(...))
 							if X.Len(res) > 0 then
 								if X.Len(rets) == 0 then
 									rets = res
 								--[[#DEBUG BEGIN]]
 								else
 									X.Debug(
-										'UI:UIEvent#' .. szEvent .. ':' .. (p.id or 'Unnamed'),
+										'UI:UIEvent#' .. szEvent .. ':' .. (p.szKey or 'Unnamed'),
 										_L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', X.UI.GetTreePath(raw)),
 										X.DEBUG_LEVEL.WARNING
 									)
@@ -5498,21 +5496,15 @@ function OO:UIEvent(szEvent, fnEvent)
 						end
 					end
 				end
-				table.insert(uiEvents[szEvent], { id = szKey, fn = fnEvent })
+				table.insert(uiEvents[szEvent], { szKey = szKey, fnAction = fnEvent })
 			end
-		else
+		elseif X.IsString(szKey) and fnEvent == false then -- unregister
 			for _, raw in ipairs(self.raws) do
 				local uiEvents = GetComponentProp(raw, 'uiEvents')
-				if uiEvents then
-					if not szKey then
-						for e, _ in pairs(uiEvents) do
-							uiEvents[e] = {}
-						end
-					elseif uiEvents[szEvent] then
-						for i, p in X.ipairs_r(uiEvents[szEvent]) do
-							if p.id == szKey then
-								table.remove(uiEvents[szEvent], i)
-							end
+				if uiEvents and uiEvents[szEvent] then
+					for i, p in X.ipairs_r(uiEvents[szEvent]) do
+						if p.szKey == szKey then
+							table.remove(uiEvents[szEvent], i)
 						end
 					end
 				end
