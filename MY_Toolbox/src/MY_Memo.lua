@@ -14,7 +14,7 @@ local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Toolbox'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
-if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^17.0.0') then
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^16.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
@@ -54,20 +54,18 @@ function D.Reload(bGlobal)
 			simple = true, alpha = 140,
 			maximize = true, minimize = true, resize = true,
 			minWidth = 180, minHeight = 100,
-			onMaximize = function(wnd)
-				local ui = X.UI(wnd)
-				ui:Children('#WndEditBox_Memo'):Size(ui:Size())
-			end,
-			onRestore = function(wnd)
-				local ui = X.UI(wnd)
-				ui:Children('#WndEditBox_Memo'):Size(ui:Size())
-			end,
 			onSizeChange = function()
 				local ui = X.UI(this)
 				CFG.nWidth  = ui:Width()
 				CFG.anchor  = ui:Anchor()
 				CFG.nHeight = ui:Height()
-				ui:Children('#WndEditBox_Memo'):Size(X.UI(this:Lookup('Wnd_Total')):Size())
+				local nInnerW, nInnerH = select(3, ui:Size())
+				ui:Children('#WndEditBox_Memo'):Size(nInnerW, nInnerH)
+			end,
+			onFrameVisualStateChange = function()
+				local ui = X.UI(this)
+				local nInnerW, nInnerH = select(3, ui:Size())
+				ui:Children('#WndEditBox_Memo'):Size(nInnerW, nInnerH)
 			end,
 			w = CFG.nWidth, h = CFG.nHeight, text = TITLE,
 			draggable = true, dragArea = {0, 0, CFG.nWidth, 30},
