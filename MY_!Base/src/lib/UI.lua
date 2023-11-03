@@ -4523,7 +4523,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 	X.ExecuteWithThis(raw, raw.OnSizeChange)
 end
 
--- (number, number) Instance:Size(bInnerSize)
+-- (number, number) Instance:Size()
 -- (self) Instance:Size(nLeft, nTop)
 -- (self) Instance:Size(OnSizeChange)
 function OO:Size(...)
@@ -4563,9 +4563,6 @@ function OO:Size(...)
 	else
 		local raw, w, h, rw, rh = self.raws[1], nil, nil, nil, nil
 		if raw then
-			if arg0 == true then
-				raw = GetComponentElement(raw, 'MAIN_WINDOW') or raw
-			end
 			if raw.IsDummyWnd and raw:IsDummyWnd() then
 				raw = raw:Lookup('', '') or raw
 			end
