@@ -4781,7 +4781,7 @@ function OO:FrameVisualState(...)
 							:Pos(0, 0)
 							:Drag(false)
 							:Size(nScreenW, nScreeH)
-							:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+							:Event('UI_SCALED', 'FRAME_MAXIMIZE_RESIZE', function()
 								local nScreenW, nScreeH = Station.GetClientSize()
 								X.UI(raw):Pos(0, 0):Size(nScreenW, nScreeH)
 							end)
@@ -4792,7 +4792,7 @@ function OO:FrameVisualState(...)
 					elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化恢复
 						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
 						X.UI(raw)
-							:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', false)
+							:Event('UI_SCALED', 'FRAME_MAXIMIZE_RESIZE', false)
 							:Size(GetComponentProp(raw, 'nFrameVisualStateRestoreWidth'), GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
 							:Anchor(GetComponentProp(raw, 'tFrameVisualStateRestoreAnchor'))
 							:Drag(true)
@@ -5383,15 +5383,13 @@ end
 -----------------------------------------------------------
 
 -- 绑定Frame的事件
-function OO:Event(szEvent, fnEvent)
+function OO:Event(szEvent, szKey, fnEvent)
 	self:_checksum()
+	if X.IsFunction(szKey) then
+		szKey, fnEvent = nil, szKey
+	end
 	if X.IsString(szEvent) then
-		local nPos, szKey = (X.StringFindW(szEvent, '.')), nil
-		if nPos then
-			szKey = string.sub(szEvent, nPos + 1)
-			szEvent = string.sub(szEvent, 1, nPos - 1)
-		end
-		if X.IsFunction(fnEvent) then
+		if X.IsFunction(fnEvent) then -- register
 			for _, raw in ipairs(self.raws) do
 				if raw:GetType() == 'WndFrame' then
 					local events = GetComponentProp(raw, 'onEvents')
@@ -5404,7 +5402,7 @@ function OO:Event(szEvent, fnEvent)
 							end
 							if events[e] then
 								for _, p in ipairs(events[e]) do
-									p.fn(e, ...)
+									p.fnAction(e, ...)
 								end
 							end
 						end
@@ -5416,28 +5414,22 @@ function OO:Event(szEvent, fnEvent)
 					end
 					if szKey then
 						for i, p in X.ipairs_r(events[szEvent]) do
-							if p.id == szKey then
+							if p.szKey == szKey then
 								table.remove(events[szEvent], i)
 							end
 						end
 					end
-					table.insert(events[szEvent], { id = szKey, fn = fnEvent })
+					table.insert(events[szEvent], { szKey = szKey, fnAction = fnEvent })
 				end
 			end
-		else
+		elseif X.IsString(szKey) and fnEvent == false then -- unregister
 			for _, raw in ipairs(self.raws) do
 				if raw:GetType() == 'WndFrame' then
 					local events = GetComponentProp(raw, 'events')
-					if events then
-						if not szKey then
-							for e, _ in pairs(events) do
-								events[e] = {}
-							end
-						elseif events[szEvent] then
-							for i, p in X.ipairs_r(events[szEvent]) do
-								if p.id == szKey then
-									table.remove(events[szEvent], i)
-								end
+					if events and events[szEvent] then
+						for i, p in X.ipairs_r(events[szEvent]) do
+							if p.szKey == szKey then
+								table.remove(events[szEvent], i)
 							end
 						end
 					end
