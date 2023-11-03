@@ -4696,103 +4696,111 @@ end
 
 -- (bool) Instance:FrameVisualState() -- get frame visual state
 -- (self) Instance:FrameVisualState(X.UI.FRAME_VISUAL_STATE eVisualState) -- set frame visual state
+-- (self) Instance:FrameVisualState(function onFrameVisualStateChange) -- set frame visual state change event handler
 function OO:FrameVisualState(...)
 	self:_checksum()
 	local argc = select('#', ...)
 	if argc > 0 then -- set
-		local eNextVisualState = ...
-		for _, raw in ipairs(self.raws) do
-			if GetComponentType(raw) == 'WndFrame' and GetComponentProp(raw, 'eFrameVisualState') ~= eNextVisualState then
-				local eCurrentVisualState = GetComponentProp(raw, 'eFrameVisualState') or X.UI.FRAME_VISUAL_STATE.NORMAL
-				-- 更新界面按钮状态
-				local chkMaximize = raw:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
-				if eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then
-					if chkMaximize then
-						chkMaximize:Check(false, WNDEVENT_FIRETYPE.PREVENT)
+		local arg0 = ...
+		if X.IsFunction(arg0) then
+			for _, raw in ipairs(self.raws) do
+				X.UI(raw):UIEvent('OnFrameVisualStateChange', arg0)
+			end
+		else
+			local eNextVisualState = arg0
+			for _, raw in ipairs(self.raws) do
+				if GetComponentType(raw) == 'WndFrame' and GetComponentProp(raw, 'eFrameVisualState') ~= eNextVisualState then
+					local eCurrentVisualState = GetComponentProp(raw, 'eFrameVisualState') or X.UI.FRAME_VISUAL_STATE.NORMAL
+					-- 更新界面按钮状态
+					local chkMaximize = raw:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
+					if eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then
+						if chkMaximize then
+							chkMaximize:Check(false, WNDEVENT_FIRETYPE.PREVENT)
+						end
+					elseif eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then
+						raw:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize'):Check(false, WNDEVENT_FIRETYPE.PREVENT)
 					end
-				elseif eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then
-					raw:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize'):Check(false, WNDEVENT_FIRETYPE.PREVENT)
-				end
-				-- 恢复默认窗体状态
-				if (eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE)
-				or (eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE) then
-					X.UI(raw):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
-				end
-				-- 保存普通窗体大小
-				if eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL then
-					local nW, nH = raw:GetSize()
-					SetComponentProp(raw, 'tFrameVisualStateRestoreAnchor', GetFrameAnchor(raw))
-					SetComponentProp(raw, 'nFrameVisualStateRestoreWidth', nW)
-					SetComponentProp(raw, 'nFrameVisualStateRestoreHeight', nH)
-				end
-				-- 处理视觉变化
-				local wndTotal = raw:Lookup('Wnd_Total')
-				local shaBg = raw:Lookup('', 'Shadow_Bg')
-				local btnDrag = raw:Lookup('Btn_Drag')
-				if eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
-					if wndTotal then
-						wndTotal:Hide()
+					-- 恢复默认窗体状态
+					if (eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE)
+					or (eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE) then
+						X.UI(raw):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
 					end
-					if shaBg then
-						shaBg:Hide()
+					-- 保存普通窗体大小
+					if eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL then
+						local nW, nH = raw:GetSize()
+						SetComponentProp(raw, 'tFrameVisualStateRestoreAnchor', GetFrameAnchor(raw))
+						SetComponentProp(raw, 'nFrameVisualStateRestoreWidth', nW)
+						SetComponentProp(raw, 'nFrameVisualStateRestoreHeight', nH)
 					end
-					if GetComponentProp(raw, 'simple') then
-						raw:SetH(30)
-					elseif GetComponentProp(raw, 'intact') then
-						raw:SetH(54)
-						raw:Lookup('', ''):SetH(54)
+					-- 处理视觉变化
+					local wndTotal = raw:Lookup('Wnd_Total')
+					local shaBg = raw:Lookup('', 'Shadow_Bg')
+					local btnDrag = raw:Lookup('Btn_Drag')
+					if eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化
+						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
+						if wndTotal then
+							wndTotal:Hide()
+						end
+						if shaBg then
+							shaBg:Hide()
+						end
+						if GetComponentProp(raw, 'simple') then
+							raw:SetH(30)
+						elseif GetComponentProp(raw, 'intact') then
+							raw:SetH(54)
+							raw:Lookup('', ''):SetH(54)
+						end
+						if chkMaximize then
+							chkMaximize:Enable(false)
+						end
+						if btnDrag and GetComponentProp(raw, 'bDragResize') then
+							btnDrag:Hide()
+						end
+						X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
+					elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化恢复
+						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
+						if wndTotal then
+							wndTotal:Show()
+						end
+						if shaBg then
+							shaBg:Show()
+						end
+						raw:SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
+						raw:Lookup('', ''):SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
+						if chkMaximize then
+							chkMaximize:Enable(true)
+						end
+						if btnDrag and GetComponentProp(raw, 'bDragResize') then
+							btnDrag:Show()
+						end
+						X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
+					elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化
+						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
+						local nScreenW, nScreeH = Station.GetClientSize()
+						X.UI(raw)
+							:Pos(0, 0)
+							:Drag(false)
+							:Size(nScreenW, nScreeH)
+							:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+								local nScreenW, nScreeH = Station.GetClientSize()
+								X.UI(raw):Pos(0, 0):Size(nScreenW, nScreeH)
+							end)
+						if btnDrag and GetComponentProp(raw, 'bDragResize') then
+							btnDrag:Hide()
+						end
+						X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
+					elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化恢复
+						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
+						X.UI(raw)
+							:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', false)
+							:Size(GetComponentProp(raw, 'nFrameVisualStateRestoreWidth'), GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
+							:Anchor(GetComponentProp(raw, 'tFrameVisualStateRestoreAnchor'))
+							:Drag(true)
+						if btnDrag and GetComponentProp(raw, 'bDragResize') then
+							btnDrag:Show()
+						end
+						X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
 					end
-					if chkMaximize then
-						chkMaximize:Enable(false)
-					end
-					if btnDrag and GetComponentProp(raw, 'bDragResize') then
-						btnDrag:Hide()
-					end
-					X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
-				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化恢复
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
-					if wndTotal then
-						wndTotal:Show()
-					end
-					if shaBg then
-						shaBg:Show()
-					end
-					raw:SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
-					raw:Lookup('', ''):SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
-					if chkMaximize then
-						chkMaximize:Enable(true)
-					end
-					if btnDrag and GetComponentProp(raw, 'bDragResize') then
-						btnDrag:Show()
-					end
-					X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
-				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
-					local nScreenW, nScreeH = Station.GetClientSize()
-					X.UI(raw)
-						:Pos(0, 0)
-						:Drag(false)
-						:Size(nScreenW, nScreeH)
-						:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
-							local nScreenW, nScreeH = Station.GetClientSize()
-							X.UI(raw):Pos(0, 0):Size(nScreenW, nScreeH)
-						end)
-					if btnDrag and GetComponentProp(raw, 'bDragResize') then
-						btnDrag:Hide()
-					end
-					X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
-				elseif eNextVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then -- 最大化恢复
-					SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
-					X.UI(raw)
-						:Event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', false)
-						:Size(GetComponentProp(raw, 'nFrameVisualStateRestoreWidth'), GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
-						:Anchor(GetComponentProp(raw, 'tFrameVisualStateRestoreAnchor'))
-						:Drag(true)
-					if btnDrag and GetComponentProp(raw, 'bDragResize') then
-						btnDrag:Show()
-					end
-					X.ExecuteWithThis(raw, raw.OnFrameVisualStateChange, eNextVisualState)
 				end
 			end
 		end
