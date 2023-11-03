@@ -5288,19 +5288,19 @@ function OO:ButtonStyle(...)
 				btn:SetAnimateGroupMouseDown(tStyle.nMouseDownGroup)
 				btn:SetAnimateGroupDisable(tStyle.nDisableGroup)
 				X.UI(btn)
-					:UIEvent(X.NSFormatString('OnMouseIn.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent('OnMouseIn', 'LIB#UI_BUTTON_EVENT', function()
 						SetComponentProp(raw, 'bIn', true)
 						UpdateButtonBoxFont(raw)
 					end)
-					:UIEvent(X.NSFormatString('OnMouseOut.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent('OnMouseOut', 'LIB#UI_BUTTON_EVENT', function()
 						SetComponentProp(raw, 'bIn', false)
 						UpdateButtonBoxFont(raw)
 					end)
-					:UIEvent(X.NSFormatString('OnLButtonDown.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent('OnLButtonDown', 'LIB#UI_BUTTON_EVENT', function()
 						SetComponentProp(raw, 'bDown', true)
 						UpdateButtonBoxFont(raw)
 					end)
-					:UIEvent(X.NSFormatString('OnLButtonUp.{$NS}_UI_BUTTON_EVENT'), function()
+					:UIEvent('OnLButtonUp', 'LIB#UI_BUTTON_EVENT', function()
 						SetComponentProp(raw, 'bDown', false)
 						UpdateButtonBoxFont(raw)
 					end)
@@ -5449,15 +5449,13 @@ function OO:Event(szEvent, fnEvent)
 end
 
 -- 绑定ele的UI事件
-function OO:UIEvent(szEvent, fnEvent)
+function OO:UIEvent(szEvent, szKey, fnEvent)
 	self:_checksum()
+	if X.IsFunction(szKey) then
+		szKey, fnEvent = nil, szKey
+	end
 	if X.IsString(szEvent) then
-		local nPos, szKey = (X.StringFindW(szEvent, '.')), nil
-		if nPos then
-			szKey = string.sub(szEvent, nPos + 1)
-			szEvent = string.sub(szEvent, 1, nPos - 1)
-		end
-		if X.IsFunction(fnEvent) then
+		if X.IsFunction(fnEvent) then -- register
 			for _, raw in ipairs(self.raws) do
 				local uiEvents = GetComponentProp(raw, 'uiEvents')
 				if not uiEvents then
@@ -5473,14 +5471,14 @@ function OO:UIEvent(szEvent, fnEvent)
 						end
 						local rets = {}
 						for _, p in ipairs(uiEvents[szEvent]) do
-							local res = X.Pack(p.fn(...))
+							local res = X.Pack(p.fnAction(...))
 							if X.Len(res) > 0 then
 								if X.Len(rets) == 0 then
 									rets = res
 								--[[#DEBUG BEGIN]]
 								else
 									X.Debug(
-										'UI:UIEvent#' .. szEvent .. ':' .. (p.id or 'Unnamed'),
+										'UI:UIEvent#' .. szEvent .. ':' .. (p.szKey or 'Unnamed'),
 										_L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', X.UI.GetTreePath(raw)),
 										X.DEBUG_LEVEL.WARNING
 									)
@@ -5506,21 +5504,15 @@ function OO:UIEvent(szEvent, fnEvent)
 						end
 					end
 				end
-				table.insert(uiEvents[szEvent], { id = szKey, fn = fnEvent })
+				table.insert(uiEvents[szEvent], { szKey = szKey, fnAction = fnEvent })
 			end
-		else
+		elseif X.IsString(szKey) and fnEvent == false then -- unregister
 			for _, raw in ipairs(self.raws) do
 				local uiEvents = GetComponentProp(raw, 'uiEvents')
-				if uiEvents then
-					if not szKey then
-						for e, _ in pairs(uiEvents) do
-							uiEvents[e] = {}
-						end
-					elseif uiEvents[szEvent] then
-						for i, p in X.ipairs_r(uiEvents[szEvent]) do
-							if p.id == szKey then
-								table.remove(uiEvents[szEvent], i)
-							end
+				if uiEvents and uiEvents[szEvent] then
+					for i, p in X.ipairs_r(uiEvents[szEvent]) do
+						if p.szKey == szKey then
+							table.remove(uiEvents[szEvent], i)
 						end
 					end
 				end
