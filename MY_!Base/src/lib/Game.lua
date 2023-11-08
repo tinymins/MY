@@ -5508,4 +5508,85 @@ function X.GetBookDoodadID(...)
 	end
 end
 
+do
+local CURRENT_NPC_SHOW_ALL = true
+local CURRENT_PLAYER_SHOW_ALL = true
+local CURRENT_PLAYER_SHOW_PARTY_OVERRIDE = false
+X.RegisterEvent('ON_REPRESENT_CMD', 'LIB#PLAYER_DISPLAY_MODE', function()
+	if arg0 == 'show npc' then
+		CURRENT_NPC_SHOW_ALL = true
+	elseif arg0 == 'hide npc' then
+		CURRENT_NPC_SHOW_ALL = false
+	elseif arg0 == 'show player' then
+		CURRENT_PLAYER_SHOW_ALL = true
+	elseif arg0 == 'hide player' then
+		CURRENT_PLAYER_SHOW_ALL = false
+	elseif arg0 == 'show or hide party player 1' then
+		CURRENT_PLAYER_SHOW_PARTY_OVERRIDE = true
+	elseif arg0 == 'show or hide party player 0' then
+		CURRENT_PLAYER_SHOW_PARTY_OVERRIDE = false
+	end
+end)
+
+--- 获取 NPC 显示状态
+---@return boolean @NPC 是否显示
+function X.GetNpcVisibility()
+	return CURRENT_NPC_SHOW_ALL
+end
+
+--- 设置 NPC 显示状态
+---@param bShow boolean @NPC 是否显示
+function X.SetNpcVisibility(bShow)
+	if bShow then
+		rlcmd('show npc')
+	else
+		rlcmd('hide npc')
+	end
+end
+
+--- 获取玩家显示状态
+---@return boolean, boolean @玩家是否显示 @队友是否强制显示
+function X.GetPlayerVisibility()
+	if UIGetPlayerDisplayMode and PLAYER_DISPLAY_MODE then
+		local eMode = UIGetPlayerDisplayMode()
+		if eMode == PLAYER_DISPLAY_MODE.ALL then
+			return true, true
+		end
+		if eMode == PLAYER_DISPLAY_MODE.ONLY_PARTY then
+			return false, true
+		end
+		if eMode == PLAYER_DISPLAY_MODE.ONLY_SELF then
+			return false, false
+		end
+		return true, false
+	end
+	return CURRENT_PLAYER_SHOW_ALL, CURRENT_PLAYER_SHOW_PARTY_OVERRIDE
+end
+
+--- 设置玩家显示状态
+---@param bShowAll boolean @玩家是否显示
+---@param bShowPartyOverride boolean @队友是否强制显示
+function X.SetPlayerVisibility(bShowAll, bShowPartyOverride)
+	if UISetPlayerDisplayMode and PLAYER_DISPLAY_MODE then
+		if bShowAll then
+			return UISetPlayerDisplayMode(PLAYER_DISPLAY_MODE.ALL)
+		end
+		if bShowPartyOverride then
+			return UISetPlayerDisplayMode(PLAYER_DISPLAY_MODE.ONLY_PARTY)
+		end
+		return UISetPlayerDisplayMode(PLAYER_DISPLAY_MODE.ONLY_SELF)
+	end
+	if bShowAll then
+		rlcmd('show player')
+	else
+		rlcmd('hide player')
+	end
+	if bShowPartyOverride then
+		rlcmd('show or hide party player 1')
+	else
+		rlcmd('show or hide party player 0')
+	end
+end
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
