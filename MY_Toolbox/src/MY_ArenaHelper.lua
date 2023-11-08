@@ -76,49 +76,27 @@ X.RegisterEvent({'TEAM_AUTHORITY_CHANGED', 'PARTY_SET_FORMATION_LEADER', 'TEAM_C
 end
 
 -- 进入JJC自动显示所有人物
-do local l_bHideNpc, l_bHidePlayer, l_bShowParty, l_lock
-X.RegisterEvent('ON_REPRESENT_CMD', function()
-	if l_lock then
-		return
-	end
-	if arg0 == 'show npc' or arg0 == 'hide npc' then
-		l_bHideNpc = arg0 == 'hide npc'
-	elseif arg0 == 'show player' or arg0 == 'hide player' then
-		l_bHidePlayer = arg0 == 'hide player'
-	elseif arg0 == 'show or hide party player 0' or 'show or hide party player 1' then
-		l_bShowParty = arg0 == 'show or hide party player 1'
-	end
-end)
-X.RegisterEvent('LOADING_END', function()
+do
+local l_bShowNpc, l_bShowPlayer, l_bShowPartyOverride
+X.RegisterEvent('LOADING_END', 'MY_ArenaHelper_ShowTargetModel', function()
 	if not O.bAutoShowModel and not O.bAutoShowModelBattlefield and not O.bAutoShowModelPubg then
 		return
 	end
 	if (X.IsInArena() and O.bAutoShowModel)
 	or (X.IsInBattleField() and O.bAutoShowModelBattlefield)
 	or (X.IsInPubg() and O.bAutoShowModelPubg) then
-		l_lock = true
-		rlcmd('show npc')
-		rlcmd('show player')
-		rlcmd('show or hide party player 0')
+		l_bShowNpc = X.GetNpcVisibility()
+		l_bShowPlayer, l_bShowPartyOverride = X.GetPlayerVisibility()
+		X.SetNpcVisibility(true)
+		X.SetPlayerVisibility(true, true)
 	else
-		l_lock = true
-		if l_bHideNpc then
-			rlcmd('hide npc')
-		else
-			rlcmd('show npc')
-		end
-		if l_bHidePlayer then
-			rlcmd('hide player')
-		else
-			rlcmd('show player')
-		end
-		if l_bShowParty then
-			rlcmd('show or hide party player 1')
-		else
-			rlcmd('show or hide party player 0')
-		end
-		l_lock = false
+		X.SetNpcVisibility(l_bShowNpc)
+		X.SetPlayerVisibility(l_bShowPlayer, l_bShowPartyOverride)
 	end
+end)
+X.RegisterReload('MY_ArenaHelper_ShowTargetModel', function()
+	X.SetNpcVisibility(l_bShowNpc)
+	X.SetPlayerVisibility(l_bShowPlayer, l_bShowPartyOverride)
 end)
 end
 
