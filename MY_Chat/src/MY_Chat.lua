@@ -88,4 +88,32 @@ local settings = {
 MY_Chat = X.CreateModule(settings)
 end
 
+X.HookChatPanel('BEFORE', 'MY_Chat', function(h, szMsg, ...)
+	local aXMLNode = X.XMLDecode(szMsg)
+	if aXMLNode then
+		for _, node in ipairs(aXMLNode) do
+			local szType = X.XMLGetNodeType(node)
+			local szName = X.XMLGetNodeData(node, 'name')
+			local szText = X.XMLGetNodeData(node, 'text')
+			local szScript = X.XMLGetNodeData(node, 'script')
+			if szType == 'text'
+			and szName == 'eventlink'
+			and szText == 'ReputationLink' then -- 修复官方通过 eventlink 实现声望文本时没有处理聊天数据的问题
+				local szReputation = szScript:match('this.szLinkInfo=\"Reputation/(%d+)\"')
+				if szReputation then
+					local dwReputation = tonumber(szReputation)
+					if dwReputation then
+						local reputation = Table_GetReputationForceInfo(dwReputation)
+						if reputation then
+							X.XMLSetNodeData(node, 'text', '[' .. reputation.szName .. ']')
+						end
+					end
+				end
+			end
+		end
+		szMsg = X.XMLEncode(aXMLNode)
+	end
+	return szMsg
+end)
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
