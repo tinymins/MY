@@ -2049,7 +2049,9 @@ function D.ImportData(data, aType, szMode, fnAction)
 			fnMergeData(tab_data)
 		end
 	end
-	if X.IsTable(data.__meta) and (data.__meta.szOfficialVoicePacketUUID or data.__meta.szCustomVoicePacketUUID) and O.bShowVoicePacketRecommendation then
+	if X.IsTable(data.__meta)
+	and not (X.IsEmpty(data.__meta.szOfficialVoicePacketUUID) and X.IsEmpty(data.__meta.szCustomVoicePacketUUID))
+	and O.bShowVoicePacketRecommendation then
 		MY_TeamMon_VoiceAlarm.ShowVoiceRecommendation(data.__meta.szOfficialVoicePacketUUID, data.__meta.szCustomVoicePacketUUID)
 	end
 	FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
@@ -2093,6 +2095,8 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 			or GetUserRoleName(),
 		szServer = select(4, GetUserServer()),
 		nTimeStamp = GetCurrentTime(),
+		szOfficialVoicePacketUUID = MY_TeamMon_VoiceAlarm.GetCurrentPacketUUID('OFFICIAL'),
+		szCustomVoicePacketUUID = MY_TeamMon_VoiceAlarm.GetCurrentPacketUUID('CUSTOM'),
 	}
 	local szPath = MY_TEAM_MON_REMOTE_DATA_ROOT .. szFileName
 	if szFormat == 'JSON' or szFormat == 'JSON_FORMATED' then

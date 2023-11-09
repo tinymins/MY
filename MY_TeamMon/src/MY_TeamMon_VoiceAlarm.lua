@@ -163,6 +163,7 @@ function D.FetchPacketList(szType, nPage)
 				for _, info in ipairs(res.list) do
 					table.insert(aPacket, {
 						dwID = info.id,
+						szUUID = info.uuid,
 						szTitle = info.title,
 						szVersion = tostring(info.version),
 						szAuthor = info.display_name,
@@ -192,6 +193,15 @@ function D.GetCurrentPacketID(szType)
 		return O.dwOfficialVoicePacketID, O.szOfficialVoicePacketVersion
 	else
 		return O.dwCustomVoicePacketID, O.szCustomVoicePacketVersion
+	end
+end
+
+function D.GetCurrentPacketUUID(szType)
+	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
+	if szType == 'OFFICIAL' then
+		return D.tOfficialPacketInfo and D.tOfficialPacketInfo.szUUID or ''
+	else
+		return D.tCustomPacketInfo and D.tCustomPacketInfo.szUUID or ''
 	end
 end
 
@@ -329,6 +339,7 @@ function D.FetchVoiceList(szType, bDownload)
 				end
 				local tInfo = {
 					dwID = res.data.vpk_id,
+					szUUID = res.data.vpk_uuid,
 					szName = tostring(res.data.vpk_name or res.data.name or ''),
 					szVersion = tostring(res.data.vpk_version),
 					aVoice = aVoice,
@@ -596,6 +607,7 @@ local settings = {
 				'FetchPacketList',
 				'SetCurrentPacketID',
 				'GetCurrentPacketID',
+				'GetCurrentPacketUUID',
 				'GetPacketDownloadProgress',
 				'GetSlugList',
 				'PlayVoice',
