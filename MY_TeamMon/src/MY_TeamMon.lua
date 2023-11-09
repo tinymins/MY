@@ -149,6 +149,7 @@ local CACHE = {
 
 local D = X.SetmetaLazyload({
 	FILE   = {}, -- 文件原始数据
+	META   = {}, -- 文件原信息
 	CONFIG = {}, -- 文件原始配置项
 	TEMP   = {}, -- 近期事件记录
 	DATA   = {}, -- 需要监控的数据合集
@@ -1975,6 +1976,7 @@ function D.SaveUserData()
 		GetUserDataPath(),
 		{
 			data = D.FILE,
+			meta = D.META,
 			config = D.CONFIG,
 		})
 end
@@ -1986,6 +1988,7 @@ function D.LoadUserData()
 		for k, v in pairs(D.FILE) do
 			D.FILE[k] = data.data[k] or {}
 		end
+		D.META = data.meta or {}
 		D.CONFIG = data.config or {}
 		FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 		FireUIEvent('MY_TEAM_MON_DATA_RELOAD')
@@ -2049,17 +2052,21 @@ function D.ImportData(data, aType, szMode, fnAction)
 			fnMergeData(tab_data)
 		end
 	end
-	if X.IsTable(data.__meta)
-	and not (X.IsEmpty(data.__meta.szOfficialVoicePacketUUID) and X.IsEmpty(data.__meta.szCustomVoicePacketUUID))
-	and O.bShowVoicePacketRecommendation then
-		MY_TeamMon_VoiceAlarm.ShowVoiceRecommendation(data.__meta.szOfficialVoicePacketUUID, data.__meta.szCustomVoicePacketUUID)
+	if X.IsTable(data.__meta) then
+		if not (X.IsEmpty(data.__meta.szOfficialVoicePacketUUID) and X.IsEmpty(data.__meta.szCustomVoicePacketUUID))
+		and O.bShowVoicePacketRecommendation then
+			MY_TeamMon_VoiceAlarm.ShowVoiceRecommendation(data.__meta.szOfficialVoicePacketUUID, data.__meta.szCustomVoicePacketUUID)
+		end
+		D.META = data.__meta
+	else
+		D.META = {}
 	end
 	FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 	FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 	FireUIEvent('MY_TEAM_MON_DATA_RELOAD')
 	FireUIEvent('MY_TEAM_MON__UI__DATA_RELOAD')
 	-- bStatus, szFilePath, aType, szMode, tMeta
-	X.SafeCall(fnAction, true, 'LUAData', aType, szMode, X.Clone(data.__meta))
+	X.SafeCall(fnAction, true, 'LUAData', aType, szMode, X.Clone(D.META))
 end
 
 -- 从文件导入数据
@@ -2087,17 +2094,15 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 	for _, k in ipairs(aType) do
 		data[k] = D.FILE[k]
 	end
+	-- MY.20231110: add meta inherit
+	data.__meta = X.Clone(D.META)
 	-- HM.20170504: add meta data
-	data['__meta'] = {
-		szEdition = X.ENVIRONMENT.GAME_EDITION,
-		szAuthor = not X.IsEmpty(szAuthor)
-			and szAuthor
-			or GetUserRoleName(),
-		szServer = select(4, GetUserServer()),
-		nTimeStamp = GetCurrentTime(),
-		szOfficialVoicePacketUUID = MY_TeamMon_VoiceAlarm.GetCurrentPacketUUID('OFFICIAL'),
-		szCustomVoicePacketUUID = MY_TeamMon_VoiceAlarm.GetCurrentPacketUUID('CUSTOM'),
-	}
+	data.__meta.szEdition = X.ENVIRONMENT.GAME_EDITION
+	data.__meta.szAuthor = not X.IsEmpty(szAuthor) and szAuthor or GetUserRoleName()
+	data.__meta.szServer = select(4, GetUserServer())
+	data.__meta.nTimeStamp = GetCurrentTime()
+	data.__meta.szOfficialVoicePacketUUID = MY_TeamMon_VoiceAlarm.GetCurrentPacketUUID('OFFICIAL')
+	data.__meta.szCustomVoicePacketUUID = MY_TeamMon_VoiceAlarm.GetCurrentPacketUUID('CUSTOM')
 	local szPath = MY_TEAM_MON_REMOTE_DATA_ROOT .. szFileName
 	if szFormat == 'JSON' or szFormat == 'JSON_FORMATED' then
 		if szFormat ~= 'JSON' then
