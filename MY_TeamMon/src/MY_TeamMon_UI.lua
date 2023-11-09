@@ -167,6 +167,7 @@ function D.OnFrameCreate()
 					X.Confirm(_L['Are you sure to clear local data? All team mon data will be removed totally, this is not reversible.'], function()
 						for _, v in ipairs(MY_TeamMon.MY_TEAM_MON_TYPE_LIST) do
 							MY_TeamMon.RemoveData(v)
+							MY_TeamMon.RemoveMeta()
 						end
 					end)
 				end,

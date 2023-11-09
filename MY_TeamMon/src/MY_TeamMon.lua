@@ -2285,6 +2285,10 @@ function D.RemoveData(szType, dwMapID, nIndex)
 	FireUIEvent('MY_TEAM_MON__UI__DATA_RELOAD')
 end
 
+function D.RemoveMeta()
+	D.META = {}
+end
+
 function D.CheckSameData(szType, dwMapID, dwID, nLevel)
 	if D.FILE[szType][dwMapID] then
 		if dwMapID ~= MY_TEAM_MON_SPECIAL_MAP.RECYCLE_BIN then
@@ -2458,6 +2462,7 @@ local settings = {
 				'GetData',
 				'GetIntervalData',
 				'RemoveData',
+				'RemoveMeta',
 				'MoveData',
 				'CheckSameData',
 				'ClearTemp',
