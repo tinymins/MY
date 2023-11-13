@@ -77,22 +77,25 @@ end
 
 -- 进入JJC自动显示所有人物
 do
-local l_bShowNpc = X.GetNpcVisibility()
-local l_bShowPlayer, l_bShowPartyOverride = X.GetPlayerVisibility()
+local l_bShowNpc, l_bShowPlayer, l_bShowPartyOverride
 X.RegisterEvent('LOADING_END', 'MY_ArenaHelper_ShowTargetModel', function()
 	if not O.bAutoShowModel and not O.bAutoShowModelBattlefield and not O.bAutoShowModelPubg then
 		return
 	end
+	local bHasValue = X.IsBoolean(l_bShowNpc) and X.IsBoolean(l_bShowPlayer) and X.IsBoolean(l_bShowPartyOverride)
 	if (X.IsInArena() and O.bAutoShowModel)
 	or (X.IsInBattleField() and O.bAutoShowModelBattlefield)
 	or (X.IsInPubg() and O.bAutoShowModelPubg) then
-		l_bShowNpc = X.GetNpcVisibility()
-		l_bShowPlayer, l_bShowPartyOverride = X.GetPlayerVisibility()
-		X.SetNpcVisibility(true)
-		X.SetPlayerVisibility(true, true)
-	else
+		if not bHasValue then
+			l_bShowNpc = X.GetNpcVisibility()
+			l_bShowPlayer, l_bShowPartyOverride = X.GetPlayerVisibility()
+			X.SetNpcVisibility(true)
+			X.SetPlayerVisibility(true, true)
+		end
+	elseif bHasValue then
 		X.SetNpcVisibility(l_bShowNpc)
 		X.SetPlayerVisibility(l_bShowPlayer, l_bShowPartyOverride)
+		l_bShowNpc, l_bShowPlayer, l_bShowPartyOverride = nil, nil, nil
 	end
 end)
 X.RegisterReload('MY_ArenaHelper_ShowTargetModel', function()
