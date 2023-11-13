@@ -136,4 +136,5 @@ return {
     ['Create Category'] = '新建监控',
     ['Import Category'] = '数据导入',
     ['Search content'] = '搜索数据',
+    ['Create Record'] = '新建条目',
 }

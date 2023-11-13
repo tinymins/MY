@@ -35,6 +35,7 @@ function D.OnFrameCreate()
 	this:Lookup('', 'Text_Title'):SetText(_L['MY_TargetMon'])
 	this:Lookup('Wnd_Total/Btn_CreateCategory', 'Text_CreateCategory'):SetText(_L['Create Category'])
 	this:Lookup('Wnd_Total/Btn_ImportCategory', 'Text_ImportCategory'):SetText(_L['Import Category'])
+	this:Lookup('Wnd_Total/Btn_CreateRecord', 'Text_CreateRecord'):SetText(_L['Create Record'])
 	this:Lookup('Wnd_Total/Wnd_SearchContent/Edit_SearchContent'):SetPlaceholderText(_L['Search content'])
 end
 
