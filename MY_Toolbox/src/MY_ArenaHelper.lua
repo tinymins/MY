@@ -77,7 +77,8 @@ end
 
 -- 进入JJC自动显示所有人物
 do
-local l_bShowNpc, l_bShowPlayer, l_bShowPartyOverride
+local l_bShowNpc = X.GetNpcVisibility()
+local l_bShowPlayer, l_bShowPartyOverride = X.GetPlayerVisibility()
 X.RegisterEvent('LOADING_END', 'MY_ArenaHelper_ShowTargetModel', function()
 	if not O.bAutoShowModel and not O.bAutoShowModelBattlefield and not O.bAutoShowModelPubg then
 		return
