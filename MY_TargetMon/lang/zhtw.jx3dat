@@ -130,4 +130,10 @@ return {
     ['None'] = '無',
     ['(Embedded caption cannot be changed)'] = '（內置數據標題不可更改）',
     ['Press ctrl to delete embedded data permanently.'] = '按住CTRL點擊可徹底刪除該內置數據。',
+
+    -- MY_TargetMon_PS.lua
+    ['MY_TargetMon_PS'] = '目標監控設置面板',
+    ['Create Category'] = '新建監控',
+    ['Import Category'] = '數據導入',
+    ['Search content'] = '搜索數據',
 }
