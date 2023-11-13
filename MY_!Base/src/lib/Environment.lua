@@ -14,15 +14,23 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 function X.AssertVersion(szKey, szCaption, szRequireVersion)
 	if not X.IsString(szRequireVersion) then
-		X.Sysmsg(_L(
-			'%s requires a invalid base library version value: %s.',
-			szCaption, X.EncodeLUAData(szRequireVersion)))
+		X.Debug(
+			X.PACKET_INFO.NAME_SPACE,
+			_L(
+				'%s requires a invalid base library version value: %s.',
+				szCaption, X.EncodeLUAData(szRequireVersion)
+			),
+			X.DEBUG_LEVEL.ERROR)
 		return IsDebugClient() or false
 	end
 	if not (X.Semver(X.PACKET_INFO.VERSION) % szRequireVersion) then
-		X.Sysmsg(_L(
-			'%s requires base library version at %s, current at %s.',
-			szCaption, szRequireVersion, X.PACKET_INFO.VERSION))
+		X.Debug(
+			X.PACKET_INFO.NAME_SPACE,
+			_L(
+				'%s requires base library version at %s, current at %s.',
+				szCaption, szRequireVersion, X.PACKET_INFO.VERSION
+			),
+			X.DEBUG_LEVEL.ERROR)
 		return IsDebugClient() or false
 	end
 	return true
