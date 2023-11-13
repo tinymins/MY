@@ -44,6 +44,8 @@ function D.OnItemMouseIn()
 	if name == 'Handle_ContentItem' then
 		this:Lookup('Image_ContentItem'):Hide()
 		this:Lookup('Box_ContentItem'):SetObjectMouseOver(true)
+	elseif name == 'Image_CategoryItemConfig' then
+		this:SetFrame(106)
 	end
 end
 
@@ -52,6 +54,8 @@ function D.OnItemMouseOut()
 	if name == 'Handle_ContentItem' then
 		this:Lookup('Image_ContentItem'):Show()
 		this:Lookup('Box_ContentItem'):SetObjectMouseOver(false)
+	elseif name == 'Image_CategoryItemConfig' then
+		this:SetFrame(105)
 	end
 end
 
