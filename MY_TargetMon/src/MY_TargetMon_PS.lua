@@ -85,6 +85,7 @@ function D.DrawMonitorList(frame)
 				hItem:Lookup('Image_MonitorItemRBg'):SetVisible(not X.IsEmpty(mon.szContent))
 				hItem:Lookup('Text_MonitorItemDisplayName'):SetText(mon.szContent)
 				hItem:Lookup('Text_MonitorItemDisplayName'):SetFontColor(X.Unpack(mon.aContentColor or {255, 255, 255}))
+				hItem:SetAlpha(mon.bEnable and 255 or 128)
 				hItem.mon = mon
 				hItem.szType = config.szType
 			end
