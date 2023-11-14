@@ -207,8 +207,11 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					szOption = _L['Monitor All Kungfu'],
 					rgb = {255, 255, 0},
 					bCheck = true,
-					bChecked = mon.tKungfu.bAll,
+					bChecked = X.IsEmpty(mon.tKungfu) or mon.tKungfu.bAll,
 					fnAction = function(_, bChecked)
+						if not mon.tKungfu then
+							mon.tKungfu = {}
+						end
 						mon.tKungfu.bAll = bChecked
 						FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
 					end,
@@ -220,12 +223,15 @@ function D.Open(szConfigUUID, szMonitorUUID)
 						szOption = X.GetSkillName(dwKungfuID, 1),
 						rgb = {X.GetForceColor(force.dwID, 'foreground')},
 						bCheck = true,
-						bChecked = mon.tKungfu[dwKungfuID],
+						bChecked = not X.IsEmpty(mon.tKungfu) and mon.tKungfu[dwKungfuID],
 						fnAction = function(_, bChecked)
+							if not mon.tKungfu then
+								mon.tKungfu = {}
+							end
 							mon.tKungfu[dwKungfuID] = bChecked
 							FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
 						end,
-						fnDisable = function() return mon.tKungfu.bAll end,
+						fnDisable = function() return X.IsEmpty(mon.tKungfu) or mon.tKungfu.bAll end,
 					})
 				end
 			end
@@ -243,8 +249,11 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					szOption = _L['All kungfus'],
 					rgb = {255, 255, 0},
 					bCheck = true,
-					bChecked = mon.tTargetKungfu.bAll,
+					bChecked = X.IsEmpty(mon.tTargetKungfu) or mon.tTargetKungfu.bAll,
 					fnAction = function(_, bChecked)
+						if not mon.tTargetKungfu then
+							mon.tTargetKungfu = {}
+						end
 						mon.tTargetKungfu.bAll = bChecked
 						FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
 					end,
@@ -253,12 +262,15 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					szOption = _L['NPC'],
 					rgb = {255, 255, 0},
 					bCheck = true,
-					bChecked = mon.tTargetKungfu.bNpc,
+					bChecked = not X.IsEmpty(mon.tTargetKungfu) and mon.tTargetKungfu.bNpc,
 					fnAction = function(_, bChecked)
+						if not mon.tTargetKungfu then
+							mon.tTargetKungfu = {}
+						end
 						mon.tTargetKungfu.bNpc = bChecked
 						FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
 					end,
-					fnDisable = function() return mon.tTargetKungfu.bAll end,
+					fnDisable = function() return X.IsEmpty(mon.tTargetKungfu) or mon.tTargetKungfu.bAll end,
 				},
 			}
 			for _, force in ipairs(X.CONSTANT.FORCE_LIST) do
@@ -267,12 +279,15 @@ function D.Open(szConfigUUID, szMonitorUUID)
 						szOption = X.GetSkillName(dwKungfuID, 1),
 						rgb = {X.GetForceColor(force.dwID, 'foreground')},
 						bCheck = true,
-						bChecked = mon.tTargetKungfu[dwKungfuID],
+						bChecked = not X.IsEmpty(mon.tTargetKungfu) and mon.tTargetKungfu[dwKungfuID],
 						fnAction = function(_, bChecked)
+							if not mon.tTargetKungfu then
+								mon.tTargetKungfu = {}
+							end
 							mon.tTargetKungfu[dwKungfuID] = bChecked
 							FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
 						end,
-						fnDisable = function() return mon.tTargetKungfu.bAll end,
+						fnDisable = function() return X.IsEmpty(mon.tTargetKungfu) or mon.tTargetKungfu.bAll end,
 					})
 				end
 			end
@@ -287,19 +302,25 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		menu = function()
 			local menu = X.GetDungeonMenu({
 				fnAction = function(p)
+					if not mon.tMap then
+						mon.tMap = {}
+					end
 					mon.tMap[p.dwID] = not mon.tMap[p.dwID]
 					FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
 				end,
 				tChecked = mon.tMap,
 			})
 			for i, p in ipairs(menu) do
-				p.fnDisable = function() return mon.tMap.bAll end
+				p.fnDisable = function() return X.IsEmpty(mon.tMap) or mon.tMap.bAll end
 			end
 			table.insert(menu, 1, {
 				szOption = _L['Monitor All Maps'],
 				bCheck = true,
-				bChecked = mon.tMap.bAll,
+				bChecked = X.IsEmpty(mon.tMap) or mon.tMap.bAll,
 				fnAction = function(_, bChecked)
+					if not mon.tMap then
+						mon.tMap = {}
+					end
 					mon.tMap.bAll = bChecked
 					FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
 				end,
