@@ -143,4 +143,5 @@ return {
     ['Title:'] = '標題：',
     ['Author:'] = '作者：',
     ['Version:'] = '版本：',
+    ['New target mon config'] = '新建目標監控',
 }

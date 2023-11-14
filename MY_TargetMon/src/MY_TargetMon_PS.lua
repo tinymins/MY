@@ -99,6 +99,8 @@ function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
+	elseif name == 'Btn_CreateConfig' then
+		MY_TargetMon.CreateConfig()
 	end
 end
 

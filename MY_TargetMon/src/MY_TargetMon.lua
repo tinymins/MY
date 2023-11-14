@@ -209,7 +209,6 @@ function D.LoadAncientData()
 			nCdBarWidth = config.cdBarWidth,
 			nDecimalTime = config.decimalTime,
 
-			nSort = config.sort,
 			tAnchor = config.anchor,
 			aMonitor = {},
 		}
@@ -289,6 +288,45 @@ function D.GetConfig(szUUID)
 	end
 end
 
+function D.CreateConfig()
+	table.insert(D.CONFIG_LIST, {
+		szUUID = X.GetUUID(),
+		szTitle = _L['New target mon config'] .. '#' .. (#D.CONFIG_LIST + 1),
+		szAuthor = X.GetUserRoleName(),
+		szVersion = X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd'),
+		szType = 'BUFF',
+		szTarget = 'CLIENT_PLAYER',
+		szAlignment = 'LEFT',
+
+		bEnable = true,
+		bHideOthers = false,
+		bHideVoid = false,
+		bPenetrable = false,
+		bDraggable = false,
+		bIgnoreSystemUIScale = false,
+		bCdCircle = true,
+		bCdFlash = true,
+		bCdReadySpark = true,
+		bCdBar = false,
+		bShowName = true,
+		bShowTime = true,
+		bPlaySound = true,
+		szBoxBgUITex = '',
+		szCdBarUITex = '/ui/Image/Common/Money.UITex|208',
+
+		nMaxLineCount = 16,
+		fScale = 0.7,
+		fIconFontScale = 1,
+		fOtherFontScale = 1,
+		nCdBarWidth = 240,
+		nDecimalTime = 1,
+
+		tAnchor = { y = 152, x = -343, s = 'TOPLEFT', r = 'CENTER' },
+		aMonitor = {},
+	})
+	FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+end
+
 function D.DeleteConfig(szUUID)
 	for i, v in ipairs(D.CONFIG_LIST) do
 		if v.szUUID == szUUID then
@@ -308,6 +346,7 @@ local settings = {
 			fields = {
 				GetConfigList = D.GetConfigList,
 				GetConfig = D.GetConfig,
+				CreateConfig = D.CreateConfig,
 				DeleteConfig = D.DeleteConfig,
 			},
 		},
