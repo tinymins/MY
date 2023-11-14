@@ -54,9 +54,13 @@ function D.DrawConfigList(frame)
 	hList:Clear()
 	for _, config in ipairs(aConfig) do
 		local hItem = hList:AppendItemFromIni(INI_FILE, 'Handle_ConfigItem')
+		local aTextColor = config.bEnable and {255, 255, 255} or {192, 192, 192}
 		hItem:Lookup('Text_ConfigItemTitle'):SetText(config.szTitle)
+		hItem:Lookup('Text_ConfigItemTitle'):SetFontColor(X.Unpack(aTextColor))
 		hItem:Lookup('Text_ConfigItemAuthor'):SetText(config.szAuthor)
+		hItem:Lookup('Text_ConfigItemAuthor'):SetFontColor(X.Unpack(aTextColor))
 		hItem:Lookup('Text_ConfigItemVersion'):SetText(config.szVersion)
+		hItem:Lookup('Text_ConfigItemVersion'):SetFontColor(X.Unpack(aTextColor))
 		hItem:Lookup('Image_ConfigItemBg_Sel'):SetVisible(config.szUUID == szActiveConfigUUID)
 		hItem.config = config
 	end
