@@ -137,4 +137,10 @@ return {
     ['Import Config'] = '数据导入',
     ['Search Monitor'] = '搜索数据',
     ['Create Monitor'] = '新建条目',
+
+    -- MY_TargetMon_CP
+    ['MY_TargetMon_CP'] = '目标监控项全局设置面板',
+    ['Title:'] = '标题：',
+    ['Author:'] = '作者：',
+    ['Version:'] = '版本：',
 }

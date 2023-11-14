@@ -289,6 +289,16 @@ function D.GetConfig(szUUID)
 	end
 end
 
+function D.DeleteConfig(szUUID)
+	for i, v in ipairs(D.CONFIG_LIST) do
+		if v.szUUID == szUUID then
+			table.remove(D.CONFIG_LIST, i)
+			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			return
+		end
+	end
+end
+
 -- Global exports
 do
 local settings = {
@@ -298,6 +308,7 @@ local settings = {
 			fields = {
 				GetConfigList = D.GetConfigList,
 				GetConfig = D.GetConfig,
+				DeleteConfig = D.DeleteConfig,
 			},
 		},
 	},
