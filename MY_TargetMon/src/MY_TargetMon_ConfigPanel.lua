@@ -104,7 +104,6 @@ function D.Open(szConfigUUID)
 		return
 	end
 	local ui = X.UI.CreateFrame('MY_TargetMon_ConfigPanel', {
-		level = 'Normal1',
 		w = 800, h = 360, text = _L['MY_TargetMon_ConfigPanel'],
 	})
 	local nPaddingX, nPaddingY = 10, 10
@@ -541,8 +540,20 @@ function D.Close()
 end
 
 function D.OnFrameBreathe()
-	if not Station.Lookup('Normal/MY_TargetMon_PS') then
+	local parent = Station.Lookup('Normal/MY_TargetMon_PS')
+	if not parent then
 		Wnd.CloseWindow(this)
+	end
+	local frame, bBehindParent = parent:GetNext(), true
+	while frame do
+		if frame:GetName() == this:GetName() then
+			bBehindParent = false
+			break
+		end
+		frame = frame:GetNext()
+	end
+	if bBehindParent then
+		this:BringToTop()
 	end
 end
 
