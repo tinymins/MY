@@ -94,7 +94,7 @@ function D.OnFrameCreate()
 	this:Lookup('Wnd_Total/Btn_CreateMonitor', 'Text_CreateMonitor'):SetText(_L['Create Monitor'])
 	this:Lookup('Wnd_Total/Wnd_SearchMonitor/Edit_SearchMonitor'):SetPlaceholderText(_L['Search Monitor'])
 	this:RegisterEvent('MY_TARGET_MON_CONFIG_MODIFY')
-	this:RegisterEvent('MY_TARGET_MON_DATA_MODIFY')
+	this:RegisterEvent('MY_TARGET_MON_MONITOR_MODIFY')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, -100)
 	D.DrawConfigList(this)
 end
@@ -145,16 +145,23 @@ function D.OnItemLButtonClick()
 		frame.szActiveConfigUUID = this.config.szUUID
 		D.UpdateConfigActiveState(frame)
 		D.DrawMonitorList(frame)
+	elseif name == 'Handle_MonitorItem' then
+		MY_TargetMon_MonitorPanel.Open(frame.szActiveConfigUUID, this.mon.szUUID)
 	elseif name == 'Image_ConfigItemConfig' then
 		MY_TargetMon_ConfigPanel.Open(this:GetParent().config.szUUID)
 	end
 end
 
 function D.OnEvent(event)
-	if event == 'MY_TARGET_MON_CONFIG_MODIFY' or event == 'MY_TARGET_MON_DATA_MODIFY' then
+	if event == 'MY_TARGET_MON_CONFIG_MODIFY' then
 		local frame = this
 		X.DelayCall('MY_TargetMon_PS_DrawConfigList', 100, function()
 			D.DrawConfigList(frame)
+		end)
+	elseif event == 'MY_TARGET_MON_MONITOR_MODIFY' then
+		local frame = this
+		X.DelayCall('MY_TargetMon_PS_DrawConfigList', 300, function()
+			D.DrawMonitorList(frame)
 		end)
 	end
 end

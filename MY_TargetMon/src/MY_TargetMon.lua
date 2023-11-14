@@ -214,15 +214,17 @@ function D.LoadAncientData()
 		}
 		for _, mon in ipairs(config.monitors) do
 			for id, idConfig in pairs(mon.ids or {}) do
-				local tMap = X.Clone(mon.maps)
-				tMap.bAll = tMap.all
+				local tMap = X.Clone(mon.maps) or {}
+				tMap.bAll = tMap.all or X.IsEmpty(tMap)
 				tMap.all = nil
-				local tKungfu = X.Clone(mon.kungfus)
-				tKungfu.bAll = tKungfu.all
+				local tKungfu = X.Clone(mon.kungfus) or {}
+				tKungfu.bAll = tKungfu.all or X.IsEmpty(tKungfu)
 				tKungfu.all = nil
-				local tTargetKungfu = X.Clone(mon.kungfus)
-				tTargetKungfu.bAll = tTargetKungfu.all
+				local tTargetKungfu = X.Clone(mon.kungfus) or {}
+				tTargetKungfu.bAll = tTargetKungfu.all or X.IsEmpty(tTargetKungfu)
 				tTargetKungfu.all = nil
+				tTargetKungfu.bNpc = tTargetKungfu.npc
+				tTargetKungfu.npc = nil
 				for level, levelConfig in pairs(idConfig.levels or {[0] = {}}) do
 					table.insert(tRecord.aMonitor, X.Clone({
 						szUUID = mon.uuid .. '-' .. id .. '-' .. level,
@@ -242,6 +244,7 @@ function D.LoadAncientData()
 						bFlipHideOthers = mon.rHideOthers,
 						aSoundAppear = idConfig.soundAppear or mon.soundAppear,
 						aSoundDisappear = idConfig.soundDisappear or mon.soundDisappear,
+						szExtentAnimate = mon.extentAnimate,
 					}))
 				end
 			end
