@@ -1,14 +1,14 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 目标监控项全局配置相关
+-- @desc     : 目标监控项全局配置
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_TargetMon/MY_TargetMon_CP'
+local MODULE_PATH = 'MY_TargetMon/MY_TargetMon_ConfigPanel'
 --------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TargetMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -63,11 +63,6 @@ local CUSTOM_BOX_BG_STYLES = {
 	{'UI/Image/Common/Box.UITex|77'},
 	{'UI/Image/Common/Box.UITex|78'},
 }
-local CUSTOM_BOX_EXTENT_ANIMATE = {
-	{nil, _L['None']},
-	{'ui/Image/Common/Box.UITex|17'},
-	{'ui/Image/Common/Box.UITex|20'},
-}
 local CUSTOM_CD_BAR_STYLES = {
 	PLUGIN_ROOT .. '/img/ST.UITex|0',
 	PLUGIN_ROOT .. '/img/ST.UITex|1',
@@ -108,9 +103,9 @@ function D.Open(szConfigUUID)
 	if not config then
 		return
 	end
-	local ui = X.UI.CreateFrame('MY_TargetMon_CP', {
+	local ui = X.UI.CreateFrame('MY_TargetMon_ConfigPanel', {
 		level = 'Normal1',
-		w = 800, h = 360, text = _L['MY_TargetMon_CP'],
+		w = 800, h = 360, text = _L['MY_TargetMon_ConfigPanel'],
 	})
 	local nPaddingX, nPaddingY = 10, 10
 	local nX, nY = nPaddingX, nPaddingY
@@ -532,7 +527,7 @@ function D.Open(szConfigUUID)
 		onClick = function()
 			X.Confirm(_L['Sure to delete config? This operation can not be undone.'], function()
 				MY_TargetMon.DeleteConfig(szConfigUUID)
-				MY_TargetMon_CP.Close()
+				MY_TargetMon_ConfigPanel.Close()
 			end)
 		end,
 	})
@@ -542,7 +537,7 @@ function D.Open(szConfigUUID)
 end
 
 function D.Close()
-	Wnd.CloseWindow('MY_TargetMon_CP')
+	Wnd.CloseWindow('MY_TargetMon_ConfigPanel')
 end
 
 function D.OnFrameBreathe()
@@ -554,7 +549,7 @@ end
 -- Global exports
 do
 local settings = {
-	name = 'MY_TargetMon_CP',
+	name = 'MY_TargetMon_ConfigPanel',
 	exports = {
 		{
 			preset = 'UIEvent',
@@ -568,7 +563,7 @@ local settings = {
 		},
 	},
 }
-MY_TargetMon_CP = X.CreateModule(settings)
+MY_TargetMon_ConfigPanel = X.CreateModule(settings)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

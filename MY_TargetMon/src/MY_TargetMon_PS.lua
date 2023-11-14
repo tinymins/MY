@@ -146,7 +146,7 @@ function D.OnItemLButtonClick()
 		D.UpdateConfigActiveState(frame)
 		D.DrawMonitorList(frame)
 	elseif name == 'Image_ConfigItemConfig' then
-		MY_TargetMon_CP.Open(this:GetParent().config.szUUID)
+		MY_TargetMon_ConfigPanel.Open(this:GetParent().config.szUUID)
 	end
 end
 

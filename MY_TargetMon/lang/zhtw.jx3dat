@@ -138,8 +138,8 @@ return {
     ['Search Monitor'] = '搜索數據',
     ['Create Monitor'] = '新建條目',
 
-    -- MY_TargetMon_CP
-    ['MY_TargetMon_CP'] = '目標監控項全局設置面板',
+    -- MY_TargetMon_ConfigPanel.lua
+    ['MY_TargetMon_ConfigPanel'] = '目標監控項全局設置面板',
     ['Title:'] = '標題：',
     ['Author:'] = '作者：',
     ['Version:'] = '版本：',
