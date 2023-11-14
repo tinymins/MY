@@ -31,38 +31,112 @@ function D.Close()
 	Wnd.CloseWindow('MY_TargetMon_PS')
 end
 
+function D.UpdateConfigActiveState(frame)
+	local hList = frame:Lookup('Wnd_Total/WndScroll_Config', 'Handle_ConfigList')
+	for i = 0, hList:GetItemCount() - 1 do
+		local hItem = hList:Lookup(i)
+		hItem:Lookup('Image_ConfigItemBg_Sel'):SetVisible(hItem.config.szUUID == frame.szActiveConfigUUID)
+	end
+end
+
+function D.DrawConfigList(frame)
+	local aConfig = MY_TargetMon.GetConfigList()
+	local szActiveConfigUUID
+	-- 选中数据
+	for _, config in ipairs(aConfig) do
+		if not szActiveConfigUUID or config.szUUID == frame.szActiveConfigUUID then
+			szActiveConfigUUID = config.szUUID
+		end
+	end
+	frame.szActiveConfigUUID = szActiveConfigUUID
+	-- 渲染列表
+	local hList = frame:Lookup('Wnd_Total/WndScroll_Config', 'Handle_ConfigList')
+	hList:Clear()
+	for _, config in ipairs(aConfig) do
+		local hItem = hList:AppendItemFromIni(INI_FILE, 'Handle_ConfigItem')
+		hItem:Lookup('Text_ConfigItemTitle'):SetText(config.szTitle)
+		hItem:Lookup('Text_ConfigItemAuthor'):SetText(config.szAuthor)
+		hItem:Lookup('Text_ConfigItemVersion'):SetText(config.szVersion)
+		hItem:Lookup('Image_ConfigItemBg_Sel'):SetVisible(config.szUUID == szActiveConfigUUID)
+		hItem.config = config
+	end
+	hList:FormatAllItemPos()
+	D.DrawMonitorList(frame)
+end
+
+function D.DrawMonitorList(frame)
+	local config = MY_TargetMon.GetConfig(frame.szActiveConfigUUID)
+	local hList = frame:Lookup('Wnd_Total/WndScroll_Monitor', 'Handle_Monitor_List')
+	hList:Clear()
+	if config then
+		for _, mon in ipairs(config.aMonitor) do
+			local hItem = hList:AppendItemFromIni(INI_FILE, 'Handle_MonitorItem')
+			hItem:Lookup('Box_MonitorItem'):SetObjectIcon(mon.nIconID or 13)
+			hItem:Lookup('Text_MonitorItem'):SetText(mon.szNote)
+			hItem:Lookup('Image_MonitorItemRBg'):SetVisible(not X.IsEmpty(mon.szContent))
+			hItem:Lookup('Text_MonitorItemDisplayName'):SetText(mon.szContent)
+			hItem:Lookup('Text_MonitorItemDisplayName'):SetFontColor(X.Unpack(mon.aContentColor))
+			hItem.mon = mon
+			hItem.szType = config.szType
+		end
+	end
+	hList:FormatAllItemPos()
+end
+
 function D.OnFrameCreate()
-	this:Lookup('', 'Text_Title'):SetText(_L['MY_TargetMon'])
-	this:Lookup('Wnd_Total/Btn_CreateCategory', 'Text_CreateCategory'):SetText(_L['Create Category'])
-	this:Lookup('Wnd_Total/Btn_ImportCategory', 'Text_ImportCategory'):SetText(_L['Import Category'])
-	this:Lookup('Wnd_Total/Btn_CreateRecord', 'Text_CreateRecord'):SetText(_L['Create Record'])
-	this:Lookup('Wnd_Total/Wnd_SearchContent/Edit_SearchContent'):SetPlaceholderText(_L['Search content'])
-end
-
-function D.OnItemMouseIn()
-	local name = this:GetName()
-	if name == 'Handle_ContentItem' then
-		this:Lookup('Image_ContentItem'):Hide()
-		this:Lookup('Box_ContentItem'):SetObjectMouseOver(true)
-	elseif name == 'Image_CategoryItemConfig' then
-		this:SetFrame(106)
-	end
-end
-
-function D.OnItemMouseOut()
-	local name = this:GetName()
-	if name == 'Handle_ContentItem' then
-		this:Lookup('Image_ContentItem'):Show()
-		this:Lookup('Box_ContentItem'):SetObjectMouseOver(false)
-	elseif name == 'Image_CategoryItemConfig' then
-		this:SetFrame(105)
-	end
+	this:Lookup('', 'Text_Title'):SetText(_L['MY_TargetMon_PS'])
+	this:Lookup('Wnd_Total/Btn_CreateConfig', 'Text_CreateConfig'):SetText(_L['Create Config'])
+	this:Lookup('Wnd_Total/Btn_ImportConfig', 'Text_ImportConfig'):SetText(_L['Import Config'])
+	this:Lookup('Wnd_Total/Btn_CreateMonitor', 'Text_CreateMonitor'):SetText(_L['Create Monitor'])
+	this:Lookup('Wnd_Total/Wnd_SearchMonitor/Edit_SearchMonitor'):SetPlaceholderText(_L['Search Monitor'])
+	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, -100)
+	D.DrawConfigList(this)
 end
 
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
+	end
+end
+
+function D.OnItemMouseIn()
+	local name = this:GetName()
+	if name == 'Handle_MonitorItem' then
+		this:Lookup('Image_MonitorItem'):Hide()
+		this:Lookup('Box_MonitorItem'):SetObjectMouseOver(true)
+		if this.szType == 'BUFF' then
+			local w, h = this:GetW(), this:GetH()
+			local x, y = this:GetAbsX(), this:GetAbsY()
+			X.OutputBuffTip({x, y, w, h}, this.mon.dwID, this.mon.nLevel)
+		elseif this.szType == 'SKILL' then
+			local w, h = this:GetW(), this:GetH()
+			local x, y = this:GetAbsX(), this:GetAbsY()
+			X.OutputSkillTip({x, y, w, h}, this.mon.dwID, this.mon.nLevel)
+		end
+	elseif name == 'Image_ConfigItemConfig' then
+		this:SetFrame(106)
+	end
+end
+
+function D.OnItemMouseOut()
+	local name = this:GetName()
+	if name == 'Handle_MonitorItem' then
+		this:Lookup('Image_MonitorItem'):Show()
+		this:Lookup('Box_MonitorItem'):SetObjectMouseOver(false)
+		X.HideTip()
+	elseif name == 'Image_ConfigItemConfig' then
+		this:SetFrame(105)
+	end
+end
+
+function D.OnItemLButtonClick()
+	local name = this:GetName()
+	local frame = this:GetRoot()
+	if name == 'Handle_ConfigItem' then
+		frame.szActiveConfigUUID = this.config.szUUID
+		D.UpdateConfigActiveState(frame)
+		D.DrawMonitorList(frame)
 	end
 end
 

@@ -133,8 +133,8 @@ return {
 
     -- MY_TargetMon_PS.lua
     ['MY_TargetMon_PS'] = '目标监控设置面板',
-    ['Create Category'] = '新建监控',
-    ['Import Category'] = '数据导入',
-    ['Search content'] = '搜索数据',
-    ['Create Record'] = '新建条目',
+    ['Create Config'] = '新建监控',
+    ['Import Config'] = '数据导入',
+    ['Search Monitor'] = '搜索数据',
+    ['Create Monitor'] = '新建条目',
 }
