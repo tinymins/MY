@@ -5567,6 +5567,7 @@ function OO:Menu(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
+		m.szLayer = 'Topmost2'
 		X.UI.PopupMenu(m)
 	end)
 	return self
@@ -5593,6 +5594,7 @@ function OO:MenuLClick(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
+		m.szLayer = 'Topmost2'
 		X.UI.PopupMenu(m)
 	end)
 	return self
@@ -5619,6 +5621,7 @@ function OO:MenuRClick(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
+		m.szLayer = 'Topmost2'
 		X.UI.PopupMenu(m)
 	end)
 	return self
@@ -5819,6 +5822,7 @@ function OO:RowMenu(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
+		m.szLayer = 'Topmost2'
 		X.UI.PopupMenu(m)
 	end)
 	return self
@@ -5845,6 +5849,7 @@ function OO:RowMenuLClick(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
+		m.szLayer = 'Topmost2'
 		X.UI.PopupMenu(m)
 	end)
 	return self
@@ -5871,6 +5876,7 @@ function OO:RowMenuRClick(menu)
 			m.nWidth = nW
 		end
 		m.bVisibleWhenHideUI = true
+		m.szLayer = 'Topmost2'
 		X.UI.PopupMenu(m)
 	end)
 	return self
