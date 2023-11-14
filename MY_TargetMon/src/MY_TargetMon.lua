@@ -228,7 +228,7 @@ function D.LoadAncientData()
 				for level, levelConfig in pairs(idConfig.levels or {[0] = {}}) do
 					table.insert(tRecord.aMonitor, X.Clone({
 						szUUID = mon.uuid .. '-' .. id .. '-' .. level,
-						szDistinct = mon.uuid,
+						szGroupID = mon.uuid,
 						bEnable = mon.enable and (idConfig.ignoreLevel or levelConfig.enable),
 						dwID = id,
 						nLevel = level,
@@ -340,6 +340,34 @@ function D.DeleteConfig(szUUID)
 	end
 end
 
+function D.CreateMonitor(szUUID, dwID, nLevel)
+	local config = D.GetConfig(szUUID)
+	if not config then
+		return
+	end
+	table.insert(config.aMonitor, {
+		szUUID = X.GetUUID(),
+		szGroupID = nil,
+		bEnable = true,
+		dwID = dwID,
+		nLevel = nLevel,
+		nStackNum = 0,
+		szNote = config.szType == 'BUFF' and (X.GetBuffName(dwID, nLevel) or '') or (X.GetSkillName(dwID, nLevel) or ''),
+		szContent = '',
+		aContentColor = nil,
+		nIconID = config.szType == 'BUFF' and (X.GetBuffIconID(dwID, nLevel) or 13) or (X.GetSkillIconID(dwID, nLevel) or 13),
+		tMap = nil,
+		tKungfu = nil,
+		tTargetKungfu = nil,
+		bFlipHideVoid = nil,
+		bFlipHideOthers = nil,
+		aSoundAppear = nil,
+		aSoundDisappear = nil,
+		szExtentAnimate = nil,
+	})
+	FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+end
+
 -- Global exports
 do
 local settings = {
@@ -351,6 +379,7 @@ local settings = {
 				GetConfig = D.GetConfig,
 				CreateConfig = D.CreateConfig,
 				DeleteConfig = D.DeleteConfig,
+				CreateMonitor = D.CreateMonitor,
 			},
 		},
 	},

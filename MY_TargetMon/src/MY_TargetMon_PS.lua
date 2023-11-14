@@ -79,7 +79,7 @@ function D.DrawMonitorList(frame)
 			hItem:Lookup('Text_MonitorItem'):SetText(mon.szNote)
 			hItem:Lookup('Image_MonitorItemRBg'):SetVisible(not X.IsEmpty(mon.szContent))
 			hItem:Lookup('Text_MonitorItemDisplayName'):SetText(mon.szContent)
-			hItem:Lookup('Text_MonitorItemDisplayName'):SetFontColor(X.Unpack(mon.aContentColor))
+			hItem:Lookup('Text_MonitorItemDisplayName'):SetFontColor(X.Unpack(mon.aContentColor or {255, 255, 255}))
 			hItem.mon = mon
 			hItem.szType = config.szType
 		end
@@ -101,10 +101,33 @@ end
 
 function D.OnLButtonClick()
 	local name = this:GetName()
+	local frame = this:GetRoot()
 	if name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
 	elseif name == 'Btn_CreateConfig' then
 		MY_TargetMon.CreateConfig()
+	elseif name == 'Btn_CreateMonitor' then
+		local config = MY_TargetMon.GetConfig(frame.szActiveConfigUUID)
+		if not config then
+			return
+		end
+		GetUserInput(config.szType == 'BUFF' and _L['Please Input Monitor Buff Id'] or _L['Please Input Monitor Skill Id'], function(szID)
+			local dwID = tonumber(szID)
+			if not dwID then
+				X.Alert(_L['Invalid Input Number'])
+				return
+			end
+			X.DelayCall(function()
+				GetUserInput(config.szType == 'BUFF' and _L['Please Input Monitor Buff Level'] or _L['Please Input Monitor Skill Level'], function(szLevel)
+					local nLevel = tonumber(szLevel)
+					if not nLevel then
+						X.Alert(_L['Invalid Input Number'])
+						return
+					end
+					MY_TargetMon.CreateMonitor(config.szUUID, dwID, nLevel)
+				end)
+			end)
+		end)
 	end
 end
 
