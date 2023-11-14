@@ -402,15 +402,16 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = 20, y = 10, w = 180,
 		text = SORT_TYPE_INFO[O.nSortType].szName,
-		menu = function(raw)
+		menu = function()
 			local t = {}
+			local el = this
 			for _, nSortType in ipairs(SORT_TYPE_LIST) do
 				table.insert(t, {
 					szOption = SORT_TYPE_INFO[nSortType].szName,
 					fnAction = function()
 						O.nSortType = nSortType
 						D.DrawBoard()
-						X.UI(raw):Text(SORT_TYPE_INFO[nSortType].szName)
+						X.UI(el):Text(SORT_TYPE_INFO[nSortType].szName)
 						return 0
 					end,
 				})
@@ -422,13 +423,14 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndComboBox', {
 		x = 210, y = 10, w = 120,
 		text = TIME_LIMIT_TITLE[O.nTimeLimit],
-		menu = function(raw)
+		menu = function()
 			local t = {}
+			local el = this
 			for _, nSec in ipairs(TIME_LIMIT) do
 				table.insert(t, {
 					szOption = TIME_LIMIT_TITLE[nSec],
 					fnAction = function()
-						X.UI(raw):Text(TIME_LIMIT_TITLE[nSec])
+						X.UI(el):Text(TIME_LIMIT_TITLE[nSec])
 						O.nTimeLimit = nSec
 						D.DrawBoard()
 						return 0
