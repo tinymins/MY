@@ -144,4 +144,5 @@ return {
     ['Author:'] = '作者：',
     ['Version:'] = '版本：',
     ['New target mon config'] = '新建目標監控',
+    ['Sure to delete config? This operation can not be undone.'] = '您確定要刪除該數據嗎？數據刪除操作確認後無法撤銷。',
 }

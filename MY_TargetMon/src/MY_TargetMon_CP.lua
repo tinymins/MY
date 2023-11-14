@@ -530,8 +530,10 @@ function D.Open(szConfigUUID)
 		color = { 255, 0, 0 },
 		buttonStyle = 'FLAT',
 		onClick = function()
-			MY_TargetMon.DeleteConfig(szConfigUUID)
-			MY_TargetMon_CP.Close()
+			X.Confirm(_L['Sure to delete config? This operation can not be undone.'], function()
+				MY_TargetMon.DeleteConfig(szConfigUUID)
+				MY_TargetMon_CP.Close()
+			end)
 		end,
 	})
 
