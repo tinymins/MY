@@ -71,17 +71,23 @@ end
 function D.DrawMonitorList(frame)
 	local config = MY_TargetMon.GetConfig(frame.szActiveConfigUUID)
 	local hList = frame:Lookup('Wnd_Total/WndScroll_Monitor', 'Handle_Monitor_List')
+	local szSearchMonitor = frame.szSearchMonitor
 	hList:Clear()
 	if config then
 		for _, mon in ipairs(config.aMonitor) do
-			local hItem = hList:AppendItemFromIni(INI_FILE, 'Handle_MonitorItem')
-			hItem:Lookup('Box_MonitorItem'):SetObjectIcon(mon.nIconID or 13)
-			hItem:Lookup('Text_MonitorItem'):SetText(mon.szNote)
-			hItem:Lookup('Image_MonitorItemRBg'):SetVisible(not X.IsEmpty(mon.szContent))
-			hItem:Lookup('Text_MonitorItemDisplayName'):SetText(mon.szContent)
-			hItem:Lookup('Text_MonitorItemDisplayName'):SetFontColor(X.Unpack(mon.aContentColor or {255, 255, 255}))
-			hItem.mon = mon
-			hItem.szType = config.szType
+			if not szSearchMonitor
+			or szSearchMonitor == ''
+			or (mon.szNote and mon.szNote:find(szSearchMonitor))
+			or (mon.szContent and mon.szContent:find(szSearchMonitor)) then
+				local hItem = hList:AppendItemFromIni(INI_FILE, 'Handle_MonitorItem')
+				hItem:Lookup('Box_MonitorItem'):SetObjectIcon(mon.nIconID or 13)
+				hItem:Lookup('Text_MonitorItem'):SetText(mon.szNote)
+				hItem:Lookup('Image_MonitorItemRBg'):SetVisible(not X.IsEmpty(mon.szContent))
+				hItem:Lookup('Text_MonitorItemDisplayName'):SetText(mon.szContent)
+				hItem:Lookup('Text_MonitorItemDisplayName'):SetFontColor(X.Unpack(mon.aContentColor or {255, 255, 255}))
+				hItem.mon = mon
+				hItem.szType = config.szType
+			end
 		end
 	end
 	hList:FormatAllItemPos()
@@ -128,6 +134,15 @@ function D.OnLButtonClick()
 				end)
 			end)
 		end)
+	end
+end
+
+function D.OnEditChanged()
+	local name = this:GetName()
+	local frame = this:GetRoot()
+	if name == 'Edit_SearchMonitor' then
+		frame.szSearchMonitor = X.TrimString(this:GetText())
+		D.DrawMonitorList(frame)
 	end
 end
 
