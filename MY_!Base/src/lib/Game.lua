@@ -260,6 +260,13 @@ function X.GetBuffName(dwBuffID, dwLevel)
 end
 end
 
+function X.GetBuffIconID(dwBuffID, dwLevel)
+	local nIconID = Table_GetBuffIconID(dwBuffID, dwLevel)
+	if nIconID ~= -1 then
+		return nIconID
+	end
+end
+
 -- 通过BUFF名称获取BUFF信息
 -- (table) X.GetBuffByName(szName)
 do local CACHE
@@ -3112,6 +3119,13 @@ function X.GetSkillName(dwSkillID, dwLevel)
 	end
 	return X.Unpack(SKILL_CACHE[dwSkillID][uLevelKey])
 end
+end
+
+function X.GetSkillIconID(dwSkillID, dwLevel)
+	local nIconID = Table_GetSkillIconID(dwSkillID, dwLevel)
+	if nIconID ~= -1 then
+		return nIconID
+	end
 end
 
 do
