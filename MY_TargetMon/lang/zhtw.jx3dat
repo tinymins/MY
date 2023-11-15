@@ -152,6 +152,7 @@ return {
     ['Invalid Input Number'] = '無法解析輸入的數字內容',
     ['Please Input Monitor Buff Level'] = '請輸入要監控的氣勁等級，輸入0表示不限制等級',
     ['Please Input Monitor Skill Level'] = '請輸入要監控的招式等級，輸入0表示不限制等級',
+    ['Open/close MY_TargetMon'] = '打開/關閉目標監控',
 
     -- MY_TargetMon_ConfigPanel.lua
     ['MY_TargetMon_ConfigPanel'] = '目標監控項全局設置面板',

@@ -231,8 +231,8 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 			hItem.nContentColorR, hItem.nContentColorG, hItem.nContentColorB = unpack(item.aContentColor)
 		end
 		if hItem.szContent ~= item.szContent then
-			hItem.txtLongName:SetText(item.szContent)
-			hItem.txtShortName:SetText(item.szContent)
+			hItem.txtLongName:SetText(X.ReplaceSensitiveWord(item.szContent))
+			hItem.txtShortName:SetText(X.ReplaceSensitiveWord(item.szContent))
 			hItem.szContent = item.szContent
 		end
 		if not hItem:IsVisible() then

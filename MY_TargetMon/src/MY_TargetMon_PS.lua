@@ -31,6 +31,14 @@ function D.Close()
 	Wnd.CloseWindow('MY_TargetMon_PS')
 end
 
+function D.TogglePanel()
+	if Station.Lookup('Normal/MY_TargetMon_PS') then
+		D.Close()
+	else
+		D.Open()
+	end
+end
+
 function D.UpdateConfigActiveState(frame)
 	local hList = frame:Lookup('Wnd_Total/WndScroll_Config', 'Handle_ConfigList')
 	for i = 0, hList:GetItemCount() - 1 do
@@ -411,6 +419,8 @@ function D.OnEvent(event)
 		end)
 	end
 end
+
+X.RegisterHotKey('MY_TargetMon_PS', _L['Open/close MY_TargetMon'], D.TogglePanel)
 
 -- Global exports
 do
