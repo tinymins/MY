@@ -72,14 +72,16 @@ function D.DrawMonitorList(frame)
 	local config = MY_TargetMonConfig.GetConfig(frame.szActiveConfigUUID)
 	local hList = frame:Lookup('Wnd_Total/WndScroll_Monitor', 'Handle_Monitor_List')
 	local szSearchMonitor = frame.szSearchMonitor
-	hList:Clear()
 	if config then
-		for _, mon in ipairs(config.aMonitor) do
+		for i, mon in ipairs(config.aMonitor) do
 			if not szSearchMonitor
 			or szSearchMonitor == ''
 			or (mon.szNote and mon.szNote:find(szSearchMonitor))
 			or (mon.szContent and mon.szContent:find(szSearchMonitor)) then
-				local hItem = hList:AppendItemFromIni(INI_FILE, 'Handle_MonitorItem')
+				local hItem = hList:Lookup(i - 1)
+				if not hItem then
+					hItem = hList:AppendItemFromIni(INI_FILE, 'Handle_MonitorItem')
+				end
 				hItem:Lookup('Box_MonitorItem'):SetObjectIcon(mon.nIconID or 13)
 				hItem:Lookup('Text_MonitorItem'):SetText(mon.szNote)
 				hItem:Lookup('Image_MonitorItemRBg'):SetVisible(not X.IsEmpty(mon.szContent))
@@ -90,6 +92,11 @@ function D.DrawMonitorList(frame)
 				hItem.szType = config.szType
 			end
 		end
+		for i = hList:GetItemCount() - 1, #config.aMonitor, -1 do
+			hList:RemoveItem(i)
+		end
+	else
+		hList:Clear()
 	end
 	hList:FormatAllItemPos()
 end
