@@ -454,6 +454,12 @@ local settings = {
 	exports = {
 		{
 			fields = {
+				'bCommon',
+			},
+			root = O,
+		},
+		{
+			fields = {
 				ImportConfigFile = D.ImportConfigFile,
 				ExportConfigFile = D.ExportConfigFile,
 				GetConfigTitle = D.GetConfigTitle,
@@ -463,6 +469,17 @@ local settings = {
 				DeleteConfig = D.DeleteConfig,
 				CreateMonitor = D.CreateMonitor,
 			},
+		},
+	},
+	imports = {
+		{
+			fields = {
+				'bCommon',
+			},
+			triggers = {
+				bCommon = D.LoadUserData,
+			},
+			root = O,
 		},
 	},
 }

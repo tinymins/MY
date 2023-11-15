@@ -200,5 +200,8 @@ return {
     ['Monitor Active Extent Animate'] = '設置激活特效框',
 
     -- MY_TargetMon.PS.lua
+	['Data save mode'] = '數據保存模式',
+	['Use common data'] = '使用通用數據（即當前角色和其他角色共用同一個數據）',
+    ['Data settings'] = '數據設置',
     ['Open config panel'] = '打開設置面板',
 }

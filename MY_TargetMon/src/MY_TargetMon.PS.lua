@@ -120,6 +120,20 @@ function PS.OnPanelActive(wnd)
 	local nPaddingX, nPaddingY = 20, 20
 	local nX, nY = nPaddingX, nPaddingY
 
+	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Data save mode'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = nPaddingX + 10
+	nX, nY = ui:Append('WndCheckBox', {
+		x = nPaddingX, y = nY, text = _L['Use common data'],
+		checked = MY_TargetMonConfig.bCommon,
+		onCheck = function(bCheck)
+			MY_TargetMonConfig.bCommon = bCheck
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nY = nY + 10
+
+	nX = nPaddingX
+	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Data settings'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = nPaddingX + 10
 	ui:Append('WndButton', {
 		x = nX, y = nY, w = 150, h = 28,
 		text = _L['Open config panel'],
