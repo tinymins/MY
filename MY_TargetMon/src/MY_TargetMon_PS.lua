@@ -277,6 +277,38 @@ function D.OnItemLButtonClick()
 	end
 end
 
+function D.OnItemRButtonClick()
+	local name = this:GetName()
+	if name == 'Image_ConfigItemConfig' then
+		local config = this:GetParent().config
+		local menu = {}
+		table.insert(menu, {
+			szOption = _L['Enable'],
+			bCheck = true, bChecked = config.bEnable,
+			fnAction = function()
+				config.bEnable = not config.bEnable
+				FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			end,
+		})
+		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+		table.insert(menu, {
+			szOption = _L['Delete'],
+			rgb = { 255, 0, 0 },
+			fnAction = function()
+				X.Confirm(_L['Sure to delete config? This operation can not be undone.'], function()
+					MY_TargetMonConfig.DeleteConfig(config.szUUID)
+				end)
+			end,
+		})
+		local nX, nY = this:GetAbsPos()
+		local nW, nH = this:GetSize()
+		menu.x = nX
+		menu.y = nY + nH
+		menu.nMiniWidth = nW
+		X.UI.PopupMenu(menu)
+	end
+end
+
 function D.OnItemLButtonDrag()
 	local name = this:GetName()
 	if name == 'Handle_ConfigItem' then
