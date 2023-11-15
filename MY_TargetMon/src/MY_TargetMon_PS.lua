@@ -261,6 +261,135 @@ function D.OnItemLButtonClick()
 	end
 end
 
+function D.OnItemLButtonDrag()
+	local name = this:GetName()
+	if name == 'Handle_ConfigItem' then
+		X.UI.OpenDragDrop(this, this, 'MY_TargetMon_PS#Handle_ConfigItem', this.config.szUUID)
+	elseif name == 'Handle_MonitorItem' then
+		X.UI.OpenDragDrop(this, this, 'MY_TargetMon_PS#Handle_MonitorItem', this.mon.szUUID)
+	end
+end
+
+function D.OnItemMouseHover()
+	local name = this:GetName()
+	if name == 'Handle_ConfigItem' then
+		if not X.UI.IsDragDropOpened() then
+			return
+		end
+		local szDragGroupID = X.UI.GetDragDropData()
+		if szDragGroupID == 'MY_TargetMon_PS#Handle_ConfigItem' then
+			X.UI.SetDragDropHoverEl(
+				this,
+				{
+					x = this:GetAbsX(),
+					y = this:GetAbsY() + 1,
+					w = this:GetW(),
+					h = this:GetH() - 2,
+				},
+				true
+			)
+		end
+	elseif name == 'Handle_MonitorItem' then
+		if not X.UI.IsDragDropOpened() then
+			return
+		end
+		local szDragGroupID = X.UI.GetDragDropData()
+		if szDragGroupID == 'MY_TargetMon_PS#Handle_MonitorItem' then
+			X.UI.SetDragDropHoverEl(
+				this,
+				{
+					x = this:GetAbsX(),
+					y = this:GetAbsY() + 1,
+					w = this:GetW(),
+					h = this:GetH() - 2,
+				},
+				true
+			)
+		end
+	end
+end
+D.OnItemMouseEnter = D.OnItemMouseHover
+
+function D.OnItemLButtonDragEnd()
+	local name = this:GetName()
+	local frame = this:GetRoot()
+	if name == 'Handle_ConfigItem' then
+		if not X.UI.IsDragDropOpened() then
+			return
+		end
+		local dropEl, szDragGroupID, xData = X.UI.CloseDragDrop()
+		if szDragGroupID ~= 'MY_TargetMon_PS#Handle_ConfigItem'
+		or not dropEl or dropEl:GetName() ~= 'Handle_ConfigItem' or dropEl:GetRoot() ~= frame then
+			return
+		end
+		local szDragUUID = xData
+		local szDropUUID = dropEl.config.szUUID
+		if szDragUUID == szDropUUID then
+			return
+		end
+		local aConfig = MY_TargetMonConfig.GetConfigList()
+		local nPosition, dragConfig = 0, nil
+		for _, config in ipairs(aConfig) do
+			if config.szUUID == szDragUUID then
+				nPosition = 1
+				break
+			elseif config.szUUID == szDropUUID then
+				break
+			end
+		end
+		for i, config in ipairs(aConfig) do
+			if config.szUUID == szDragUUID then
+				dragConfig = table.remove(aConfig, i)
+				break
+			end
+		end
+		for i, config in ipairs(aConfig) do
+			if config.szUUID == szDropUUID then
+				table.insert(aConfig, i + nPosition, dragConfig)
+				break
+			end
+		end
+		FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+	elseif name == 'Handle_MonitorItem' then
+		if not X.UI.IsDragDropOpened() then
+			return
+		end
+		local dropEl, szDragGroupID, xData = X.UI.CloseDragDrop()
+		if szDragGroupID ~= 'MY_TargetMon_PS#Handle_MonitorItem'
+		or not dropEl or dropEl:GetName() ~= 'Handle_MonitorItem' or dropEl:GetRoot() ~= frame then
+			return
+		end
+		local szDragUUID = xData
+		local szDropUUID = dropEl.mon.szUUID
+		if szDragUUID == szDropUUID then
+			return
+		end
+		local config = MY_TargetMonConfig.GetConfig(frame.szActiveConfigUUID)
+		local nPosition, dragConfig = 0, nil
+		for _, mon in ipairs(config.aMonitor) do
+			if mon.szUUID == szDragUUID then
+				nPosition = 1
+				break
+			elseif mon.szUUID == szDropUUID then
+				break
+			end
+		end
+		for i, mon in ipairs(config.aMonitor) do
+			if mon.szUUID == szDragUUID then
+				dragConfig = table.remove(config.aMonitor, i)
+				break
+			end
+		end
+		for i, mon in ipairs(config.aMonitor) do
+			if mon.szUUID == szDropUUID then
+				table.insert(config.aMonitor, i + nPosition, dragConfig)
+				break
+			end
+		end
+		FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+	end
+end
+
 function D.OnEvent(event)
 	if event == 'MY_TARGET_MON_CONFIG_MODIFY' then
 		local frame = this
