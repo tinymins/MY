@@ -387,6 +387,14 @@ local settings = {
 MY_TargetMonConfig = X.CreateModule(settings)
 end
 
+do
+local function DelaySaveConfig()
+	X.DelayCall('MY_TargetMon#SaveConfig', 500, D.SaveUserData)
+end
+X.RegisterEvent('MY_TARGET_MON_CONFIG_MODIFY', 'MY_TargetMonConfig', DelaySaveConfig)
+X.RegisterEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY', 'MY_TargetMonConfig', DelaySaveConfig)
+end
+
 X.RegisterInit('MY_TargetMonConfig', D.LoadUserData)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
