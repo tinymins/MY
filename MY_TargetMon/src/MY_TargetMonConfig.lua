@@ -312,13 +312,19 @@ function D.ImportConfigFile(szFile)
 	end
 	X.Confirm(_L['Are you sure to import configs below?'] .. '\n\n' .. table.concat(aTitle, '\n'), function()
 		for _, config in ipairs(aConfig) do
-			local nIndex = #D.CONFIG_LIST + 1
+			local bExist = false
 			for i, v in ipairs(D.CONFIG_LIST) do
 				if v.szUUID == config.szUUID then
-					nIndex = i
+					v.aMonitor = config.aMonitor
+					v.szTitle = config.szTitle
+					v.szAuthor = config.szAuthor
+					v.szVersion = config.szVersion
+					bExist = true
 				end
 			end
-			D.CONFIG_LIST[nIndex] = config
+			if not bExist then
+				table.insert(D.CONFIG_LIST, config)
+			end
 		end
 		FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
 		X.Sysmsg(_L['MY_TargetMon'], _L('Load config success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
