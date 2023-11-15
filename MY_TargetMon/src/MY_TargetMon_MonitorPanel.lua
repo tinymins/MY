@@ -373,6 +373,9 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		menu = function()
 			local menu = X.GetSoundMenu(
 				function(dwID, bCheck)
+					if not mon.aSoundAppear then
+						mon.aSoundAppear = {}
+					end
 					if not bCheck then
 						for i, v in X.ipairs_r(mon.aSoundAppear) do
 							if v == dwID then
@@ -398,6 +401,9 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		menu = function()
 			local menu = X.GetSoundMenu(
 				function(dwID, bCheck)
+					if not mon.aSoundDisappear then
+						mon.aSoundDisappear = {}
+					end
 					if not bCheck then
 						for i, v in X.ipairs_r(mon.aSoundDisappear) do
 							if v == dwID then
