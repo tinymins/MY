@@ -345,10 +345,17 @@ function D.ExportConfigFile(aUUID, bIndent)
 			.. '.{$lang}.jx3dat',
 		X.PATH_TYPE.GLOBAL,
 	})
-	X.SaveLUAData(szFile, aExport, {
-		indent = X.IIf(bIndent, '\t', nil),
-		passphrase = X.IIf(bIndent, false, X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW'] .. 'MY')),
-	})
+	if bIndent then
+		X.SaveLUAData(szFile, aExport, {
+			indent = '\t',
+			passphrase = false,
+			crc = false,
+		})
+	else
+		X.SaveLUAData(szFile, aExport, {
+			passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW'] .. 'MY'),
+		})
+	end
 	X.Alert(_L('Export config success: %s', tostring(szFile)))
 	X.Sysmsg(_L['MY_TargetMon'], _L('Export config success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
 	return true
