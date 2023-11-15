@@ -45,7 +45,7 @@ function D.GetConfigTitle(config)
 		szTitle = g_tStrings.STR_BRACKET_LEFT .. config.szAuthor .. g_tStrings.STR_BRACKET_RIGHT .. szTitle
 	end
 	if config.szVersion and config.szVersion ~= '' then
-		szTitle = szTitle .. _L['*'] .. config.szVersion
+		szTitle = szTitle .. g_tStrings.STR_CONNECT .. config.szVersion
 	end
 	return szTitle
 end
