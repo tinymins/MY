@@ -28,7 +28,7 @@ local CUSTOM_BOX_EXTENT_ANIMATE = {
 }
 
 function D.Open(szConfigUUID, szMonitorUUID)
-	local config = MY_TargetMon.GetConfig(szConfigUUID)
+	local config = MY_TargetMonConfig.GetConfig(szConfigUUID)
 	if not config then
 		return
 	end
@@ -59,7 +59,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			local box = this
 			X.UI.OpenIconPicker(function(nIconID)
 				mon.nIconID = nIconID
-				FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+				FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 				box:SetObjectIcon(nIconID)
 			end)
 		end,
@@ -80,7 +80,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		checked = mon.bEnable,
 		onCheck = function(bChecked)
 			mon.bEnable = bChecked
-			FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 		end,
 	}):Width() + 5
 	nY = nY + nDeltaY
@@ -98,7 +98,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			local nValue = tonumber(val)
 			if nValue then
 				mon.dwID = nValue
-				FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+				FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 			end
 		end,
 	}):Width() + 5
@@ -114,7 +114,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			local nValue = tonumber(val)
 			if nValue then
 				mon.nLevel = nValue
-				FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+				FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 			end
 		end,
 	}):Width() + 5
@@ -131,7 +131,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 				local nValue = tonumber(val)
 				if nValue then
 					mon.nStackNum = nValue
-					FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+					FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 				end
 			end,
 		}):Width() + 5
@@ -149,7 +149,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		text = mon.szNote,
 		onChange = function(val)
 			mon.szNote = val
-			FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 		end,
 	}):Width() + 5
 	nY = nY + nDeltaY
@@ -165,7 +165,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		x = nX, y = nY, w = 180, h = 22,
 		onChange = function(szText)
 			mon.szContent = szText
-			FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 		end,
 		onClick = function()
 			if IsPopupMenuOpened() then
@@ -181,7 +181,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		x = nX, y = nY + 1, color = mon.aContentColor,
 		onColorPick = function(r, g, b)
 			mon.aContentColor = {r, g, b}
-			FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 		end,
 	}):Width() + 5
 	nY = nY + nDeltaY
@@ -213,7 +213,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 							mon.tKungfu = {}
 						end
 						mon.tKungfu.bAll = bChecked
-						FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+						FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 					end,
 				},
 			}
@@ -229,7 +229,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 								mon.tKungfu = {}
 							end
 							mon.tKungfu[dwKungfuID] = bChecked
-							FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+							FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 						end,
 						fnDisable = function() return X.IsEmpty(mon.tKungfu) or mon.tKungfu.bAll end,
 					})
@@ -255,7 +255,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 							mon.tTargetKungfu = {}
 						end
 						mon.tTargetKungfu.bAll = bChecked
-						FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+						FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 					end,
 				},
 				{
@@ -268,7 +268,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 							mon.tTargetKungfu = {}
 						end
 						mon.tTargetKungfu.bNpc = bChecked
-						FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+						FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 					end,
 					fnDisable = function() return X.IsEmpty(mon.tTargetKungfu) or mon.tTargetKungfu.bAll end,
 				},
@@ -285,7 +285,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 								mon.tTargetKungfu = {}
 							end
 							mon.tTargetKungfu[dwKungfuID] = bChecked
-							FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+							FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 						end,
 						fnDisable = function() return X.IsEmpty(mon.tTargetKungfu) or mon.tTargetKungfu.bAll end,
 					})
@@ -306,7 +306,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 						mon.tMap = {}
 					end
 					mon.tMap[p.dwID] = not mon.tMap[p.dwID]
-					FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+					FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 				end,
 				tChecked = mon.tMap,
 			})
@@ -322,7 +322,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 						mon.tMap = {}
 					end
 					mon.tMap.bAll = bChecked
-					FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+					FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 				end,
 			})
 			return menu
@@ -336,7 +336,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		checked = mon.bFlipHideVoid,
 		onCheck = function(bChecked)
 			mon.bFlipHideVoid = bChecked
-			FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 		end,
 	}):Width() + 5
 
@@ -348,7 +348,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			checked = mon.bFlipHideOthers,
 			onCheck = function(bChecked)
 				mon.bFlipHideOthers = bChecked
-				FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+				FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 			end,
 		}):Width() + 5
 	end
@@ -382,7 +382,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					else
 						table.insert(mon.aSoundAppear, dwID)
 					end
-					FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+					FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 				end,
 				X.ArrayToObject(mon.aSoundAppear),
 				true
@@ -407,7 +407,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					else
 						table.insert(mon.aSoundDisappear, dwID)
 					end
-					FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+					FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 				end,
 				X.ArrayToObject(mon.aSoundDisappear),
 				true
@@ -429,7 +429,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					bChecked = p[1] == mon.szExtentAnimate,
 					fnAction = function()
 						mon.szExtentAnimate = p[1]
-						FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+						FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 					end,
 					nIconMarginLeft = -3,
 					nIconMarginRight = -3,
@@ -458,7 +458,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					if v == mon then
 						table.remove(config.aMonitor, i)
 						MY_TargetMon_MonitorPanel.Close()
-						FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+						FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 						return
 					end
 				end

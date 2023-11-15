@@ -53,12 +53,12 @@ function D.GetConfigList()
 	if not CACHE_CONFIG then
 		local me = X.GetClientPlayer()
 		if not me then
-			return MY_TargetMon.GetConfigList()
+			return MY_TargetMonConfig.GetConfigList()
 		end
 		local aConfig = {}
 		local dwMapID = me.GetMapID() or 0
 		local dwKungfuID = me.GetKungfuMountID() or 0
-		for i, config in ipairs(MY_TargetMon.GetConfigList()) do
+		for i, config in ipairs(MY_TargetMonConfig.GetConfigList()) do
 			aConfig[i] = setmetatable(
 				{
 					aMonitor = FilterMonitors(config.aMonitor, dwMapID, dwKungfuID),
@@ -82,9 +82,9 @@ local function onTargetMonReload()
 	onFilterChange()
 	D.OnTargetMonReload()
 end
-X.RegisterEvent('MY_TARGET_MON_DATA_RELOAD', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG_RELOAD', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)
-X.RegisterEvent('MY_TARGET_MON_MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
 end
 
 do
@@ -548,7 +548,7 @@ end
 local function OnFrameCall()
 	local tExistBuffMonitorTargetType = {}
 	local tExistSkillMonitorTargetType = {}
-	for _, config in ipairs(MY_TargetMon.GetConfigList()) do
+	for _, config in ipairs(MY_TargetMonConfig.GetConfigList()) do
 		if config.bEnable then
 			if config.szType == 'BUFF' then
 				tExistBuffMonitorTargetType[config.szTarget] = true

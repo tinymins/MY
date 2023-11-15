@@ -40,7 +40,7 @@ function D.UpdateConfigActiveState(frame)
 end
 
 function D.DrawConfigList(frame)
-	local aConfig = MY_TargetMon.GetConfigList()
+	local aConfig = MY_TargetMonConfig.GetConfigList()
 	local szActiveConfigUUID
 	-- 选中数据
 	for _, config in ipairs(aConfig) do
@@ -69,7 +69,7 @@ function D.DrawConfigList(frame)
 end
 
 function D.DrawMonitorList(frame)
-	local config = MY_TargetMon.GetConfig(frame.szActiveConfigUUID)
+	local config = MY_TargetMonConfig.GetConfig(frame.szActiveConfigUUID)
 	local hList = frame:Lookup('Wnd_Total/WndScroll_Monitor', 'Handle_Monitor_List')
 	local szSearchMonitor = frame.szSearchMonitor
 	hList:Clear()
@@ -101,7 +101,7 @@ function D.OnFrameCreate()
 	this:Lookup('Wnd_Total/Btn_CreateMonitor', 'Text_CreateMonitor'):SetText(_L['Create Monitor'])
 	this:Lookup('Wnd_Total/Wnd_SearchMonitor/Edit_SearchMonitor'):SetPlaceholderText(_L['Search Monitor'])
 	this:RegisterEvent('MY_TARGET_MON_CONFIG_MODIFY')
-	this:RegisterEvent('MY_TARGET_MON_MONITOR_MODIFY')
+	this:RegisterEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, -100)
 	D.DrawConfigList(this)
 end
@@ -112,9 +112,9 @@ function D.OnLButtonClick()
 	if name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
 	elseif name == 'Btn_CreateConfig' then
-		MY_TargetMon.CreateConfig()
+		MY_TargetMonConfig.CreateConfig()
 	elseif name == 'Btn_CreateMonitor' then
-		local config = MY_TargetMon.GetConfig(frame.szActiveConfigUUID)
+		local config = MY_TargetMonConfig.GetConfig(frame.szActiveConfigUUID)
 		if not config then
 			return
 		end
@@ -131,7 +131,7 @@ function D.OnLButtonClick()
 						X.Alert(_L['Invalid Input Number'])
 						return
 					end
-					MY_TargetMon.CreateMonitor(config.szUUID, dwID, nLevel)
+					MY_TargetMonConfig.CreateMonitor(config.szUUID, dwID, nLevel)
 				end)
 			end)
 		end)
@@ -197,7 +197,7 @@ function D.OnEvent(event)
 		X.DelayCall('MY_TargetMon_PS_DrawConfigList', 100, function()
 			D.DrawConfigList(frame)
 		end)
-	elseif event == 'MY_TARGET_MON_MONITOR_MODIFY' then
+	elseif event == 'MY_TARGET_MON_CONFIG_MONITOR_MODIFY' then
 		local frame = this
 		X.DelayCall('MY_TargetMon_PS_DrawConfigList', 300, function()
 			D.DrawMonitorList(frame)

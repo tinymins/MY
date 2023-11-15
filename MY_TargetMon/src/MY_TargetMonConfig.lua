@@ -8,7 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_TargetMon/MY_TargetMon'
+local MODULE_PATH = 'MY_TargetMon/MY_TargetMonConfig'
 --------------------------------------------------------------------------------
 local PLUGIN_NAME = 'MY_TargetMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
@@ -272,7 +272,7 @@ function D.LoadUserData()
 		D.CONFIG_LIST = {}
 		D.LoadAncientData()
 	end
-	FireUIEvent('MY_TARGET_MON_DATA_RELOAD')
+	FireUIEvent('MY_TARGET_MON_CONFIG_RELOAD')
 end
 
 function D.SetConfigList(aList)
@@ -365,13 +365,13 @@ function D.CreateMonitor(szUUID, dwID, nLevel)
 		aSoundDisappear = nil,
 		szExtentAnimate = nil,
 	})
-	FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+	FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 end
 
 -- Global exports
 do
 local settings = {
-	name = 'MY_TargetMon',
+	name = 'MY_TargetMonConfig',
 	exports = {
 		{
 			fields = {
@@ -384,9 +384,9 @@ local settings = {
 		},
 	},
 }
-MY_TargetMon = X.CreateModule(settings)
+MY_TargetMonConfig = X.CreateModule(settings)
 end
 
-X.RegisterInit('MY_TargetMon', D.LoadUserData)
+X.RegisterInit('MY_TargetMonConfig', D.LoadUserData)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

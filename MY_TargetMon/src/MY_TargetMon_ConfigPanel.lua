@@ -99,7 +99,7 @@ local CUSTOM_CD_BAR_STYLES = {
 }
 
 function D.Open(szConfigUUID)
-	local config = MY_TargetMon.GetConfig(szConfigUUID)
+	local config = MY_TargetMonConfig.GetConfig(szConfigUUID)
 	if not config then
 		return
 	end
@@ -525,7 +525,7 @@ function D.Open(szConfigUUID)
 		buttonStyle = 'FLAT',
 		onClick = function()
 			X.Confirm(_L['Sure to delete config? This operation can not be undone.'], function()
-				MY_TargetMon.DeleteConfig(szConfigUUID)
+				MY_TargetMonConfig.DeleteConfig(szConfigUUID)
 				MY_TargetMon_ConfigPanel.Close()
 			end)
 		end,
