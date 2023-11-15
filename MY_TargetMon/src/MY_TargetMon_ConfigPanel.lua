@@ -109,7 +109,7 @@ function D.Open(szConfigUUID)
 	local nPaddingX, nPaddingY = 10, 10
 	local nX, nY = nPaddingX, nPaddingY
 	local nW, nH = ui:Size()
-	local uiWnd = ui:Append('WndWindow', { x = 0, y = 50, w = nW, h = 280 })
+	local uiWnd = ui:Append('WndWindow', { x = 0, y = 50, w = nW, h = 310 })
 
 	nX = nPaddingX + 20
 	nX = nX + uiWnd:Append('Text', {

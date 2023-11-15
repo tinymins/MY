@@ -42,12 +42,12 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		return
 	end
 	local ui = X.UI.CreateFrame('MY_TargetMon_MonitorPanel', {
-		w = 800, h = 400, text = '',
+		w = 800, h = 420, text = '',
 	})
 	local nPaddingX, nPaddingY = 30, 10
 	local nX, nY = nPaddingX, nPaddingY
 	local nW, nH = ui:Size()
-	local uiWnd = ui:Append('WndWindow', { x = 0, y = 30, w = nW, h = 280 })
+	local uiWnd = ui:Append('WndWindow', { x = 0, y = 30, w = nW, h = 380 })
 
 	local nDeltaY = 28
 
@@ -443,6 +443,28 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			return menu
 		end,
 	}):Width() + 5
+
+	nX = nPaddingX + 20
+	nY = nY + nDeltaY + 20
+	uiWnd:Append('WndButton', {
+		x = (nW - 70) / 2, y = nY,
+		w = 80, h = 35,
+		text = _L['Delete'],
+		color = { 255, 0, 0 },
+		buttonStyle = 'FLAT',
+		onClick = function()
+			X.Confirm(_L['Sure to delete config? This operation can not be undone.'], function()
+				for i, v in X.ipairs_r(config.aMonitor) do
+					if v == mon then
+						table.remove(config.aMonitor, i)
+						MY_TargetMon_MonitorPanel.Close()
+						FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
+						return
+					end
+				end
+			end)
+		end,
+	})
 
 	local parent = Station.Lookup('Normal/MY_TargetMon_PS')
 	ui:Pos(parent:GetRelX() + (parent:GetW() - ui:Width()) / 2, parent:GetRelY() + (parent:GetH() - ui:Height()) / 2)
