@@ -384,7 +384,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					end
 					FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 				end,
-				X.ArrayToObject(mon.aSoundAppear),
+				mon.aSoundAppear and X.ArrayToObject(mon.aSoundAppear) or {},
 				true
 			)
 			return menu
@@ -409,7 +409,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					end
 					FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
 				end,
-				X.ArrayToObject(mon.aSoundDisappear),
+				mon.aSoundDisappear and X.ArrayToObject(mon.aSoundDisappear) or {},
 				true
 			)
 			return menu

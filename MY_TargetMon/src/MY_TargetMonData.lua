@@ -288,7 +288,7 @@ local function Base_MonToView(mon, info, item, KObject, nIconID, config, tMonExi
 		item.bCd = false
 	end
 	if info and info.bCool then
-		if tMonLast and not tMonLast[mon.szUUID] and config.bPlaySound then
+		if tMonLast and not tMonLast[mon.szUUID] and config.bPlaySound and mon.aSoundAppear then
 			local dwSoundID = X.RandomChild(mon.aSoundAppear)
 			if dwSoundID then
 				local szSoundPath = X.GetSoundPath(dwSoundID)
@@ -515,7 +515,7 @@ function UpdateView()
 			end
 			if tMonLast then
 				for uuid, mon in pairs(tMonLast) do
-					if not tMonExist[uuid] and config.bPlaySound then
+					if not tMonExist[uuid] and config.bPlaySound and mon.aSoundDisappear then
 						local dwSoundID = X.RandomChild(mon.aSoundDisappear)
 						if dwSoundID then
 							local szSoundPath = X.GetSoundPath(dwSoundID)
