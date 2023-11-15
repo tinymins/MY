@@ -39,6 +39,17 @@ local function GetUserDataPath()
 	return szPath
 end
 
+function D.GetConfigTitle(config)
+	local szTitle = config.szTitle
+	if config.szAuthor and config.szAuthor ~= '' then
+		szTitle = g_tStrings.STR_BRACKET_LEFT .. config.szAuthor .. g_tStrings.STR_BRACKET_RIGHT .. szTitle
+	end
+	if config.szVersion and config.szVersion ~= '' then
+		szTitle = szTitle .. _L['*'] .. config.szVersion
+	end
+	return szTitle
+end
+
 function D.AncientPatchToConfig(patch, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH)
 	-- 处理用户删除的内建数据和不合法的数据
 	if patch.delete or not patch.uuid then
@@ -117,6 +128,82 @@ function D.AncientPatchToConfig(patch, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HA
 	return config
 end
 
+function D.ConvertAncientConfig(config)
+	local tRecord = {
+		szUUID = config.uuid,
+		szTitle = config.caption,
+		szAuthor = config.group,
+		szVersion = '',
+		szType = config.type,
+		szTarget = config.target,
+		szAlignment = config.alignment,
+
+		bEnable = config.enable,
+		bHideOthers = config.hideOthers,
+		bHideVoid = config.hideVoid,
+		bPenetrable = config.penetrable,
+		bDraggable = config.draggable,
+		bIgnoreSystemUIScale = config.ignoreSystemUIScale,
+		bCdCircle = config.cdCircle,
+		bCdFlash = config.cdFlash,
+		bCdReadySpark = config.cdReadySpark,
+		bCdBar = config.cdBar,
+		bShowName = config.showName,
+		bShowTime = config.showTime,
+		bPlaySound = config.playSound,
+		szBoxBgUITex = config.boxBgUITex,
+		szCdBarUITex = config.cdBarUITex,
+
+		nMaxLineCount = config.maxLineCount,
+		fScale = config.scale,
+		fIconFontScale = config.iconFontScale,
+		fOtherFontScale = config.otherFontScale,
+		nCdBarWidth = config.cdBarWidth,
+		nDecimalTime = config.decimalTime,
+
+		tAnchor = config.anchor,
+		aMonitor = {},
+	}
+	for _, mon in ipairs(config.monitors) do
+		for id, idConfig in pairs(mon.ids or {}) do
+			local tMap = X.Clone(mon.maps) or {}
+			tMap.bAll = tMap.all or X.IsEmpty(tMap)
+			tMap.all = nil
+			local tKungfu = X.Clone(mon.kungfus) or {}
+			tKungfu.bAll = tKungfu.all or X.IsEmpty(tKungfu)
+			tKungfu.all = nil
+			local tTargetKungfu = X.Clone(mon.kungfus) or {}
+			tTargetKungfu.bAll = tTargetKungfu.all or X.IsEmpty(tTargetKungfu)
+			tTargetKungfu.all = nil
+			tTargetKungfu.bNpc = tTargetKungfu.npc
+			tTargetKungfu.npc = nil
+			for level, levelConfig in pairs(idConfig.levels or {[0] = {}}) do
+				table.insert(tRecord.aMonitor, X.Clone({
+					szUUID = mon.uuid .. '-' .. id .. '-' .. level,
+					szGroupID = mon.uuid,
+					bEnable = mon.enable and (idConfig.ignoreLevel or levelConfig.enable),
+					dwID = id,
+					nLevel = level,
+					nStackNum = 0,
+					szNote = mon.name,
+					szContent = not X.IsEmpty(mon.longAlias) and mon.longAlias or mon.shortAlias,
+					aContentColor = not X.IsEmpty(mon.rgbLongAlias) and mon.rgbLongAlias or mon.rgbShortAlias,
+					nIconID = levelConfig.iconid or idConfig.iconid or mon.iconid,
+					tMap = tMap,
+					tKungfu = tKungfu,
+					tTargetKungfu = tTargetKungfu,
+					bFlipHideVoid = mon.rHideVoid,
+					bFlipHideOthers = mon.rHideOthers,
+					aSoundAppear = idConfig.soundAppear or mon.soundAppear,
+					aSoundDisappear = idConfig.soundDisappear or mon.soundDisappear,
+					szExtentAnimate = mon.extentAnimate,
+				}))
+			end
+		end
+	end
+	return tRecord
+end
+
 function D.LoadAncientData()
 	-- 加载内置数据
 	local CUSTOM_EMBEDDED_CONFIG_ROOT = X.FormatPath({'userdata/TargetMon/', X.PATH_TYPE.GLOBAL})
@@ -177,79 +264,7 @@ function D.LoadAncientData()
 	-- 转换数据
 	local aResult = {}
 	for i, config in ipairs(aConfig) do
-		local tRecord = {
-			szUUID = config.uuid,
-			szTitle = config.caption,
-			szAuthor = config.group,
-			szVersion = '',
-			szType = config.type,
-			szTarget = config.target,
-			szAlignment = config.alignment,
-
-			bEnable = config.enable,
-			bHideOthers = config.hideOthers,
-			bHideVoid = config.hideVoid,
-			bPenetrable = config.penetrable,
-			bDraggable = config.draggable,
-			bIgnoreSystemUIScale = config.ignoreSystemUIScale,
-			bCdCircle = config.cdCircle,
-			bCdFlash = config.cdFlash,
-			bCdReadySpark = config.cdReadySpark,
-			bCdBar = config.cdBar,
-			bShowName = config.showName,
-			bShowTime = config.showTime,
-			bPlaySound = config.playSound,
-			szBoxBgUITex = config.boxBgUITex,
-			szCdBarUITex = config.cdBarUITex,
-
-			nMaxLineCount = config.maxLineCount,
-			fScale = config.scale,
-			fIconFontScale = config.iconFontScale,
-			fOtherFontScale = config.otherFontScale,
-			nCdBarWidth = config.cdBarWidth,
-			nDecimalTime = config.decimalTime,
-
-			tAnchor = config.anchor,
-			aMonitor = {},
-		}
-		for _, mon in ipairs(config.monitors) do
-			for id, idConfig in pairs(mon.ids or {}) do
-				local tMap = X.Clone(mon.maps) or {}
-				tMap.bAll = tMap.all or X.IsEmpty(tMap)
-				tMap.all = nil
-				local tKungfu = X.Clone(mon.kungfus) or {}
-				tKungfu.bAll = tKungfu.all or X.IsEmpty(tKungfu)
-				tKungfu.all = nil
-				local tTargetKungfu = X.Clone(mon.kungfus) or {}
-				tTargetKungfu.bAll = tTargetKungfu.all or X.IsEmpty(tTargetKungfu)
-				tTargetKungfu.all = nil
-				tTargetKungfu.bNpc = tTargetKungfu.npc
-				tTargetKungfu.npc = nil
-				for level, levelConfig in pairs(idConfig.levels or {[0] = {}}) do
-					table.insert(tRecord.aMonitor, X.Clone({
-						szUUID = mon.uuid .. '-' .. id .. '-' .. level,
-						szGroupID = mon.uuid,
-						bEnable = mon.enable and (idConfig.ignoreLevel or levelConfig.enable),
-						dwID = id,
-						nLevel = level,
-						nStackNum = 0,
-						szNote = mon.name,
-						szContent = not X.IsEmpty(mon.longAlias) and mon.longAlias or mon.shortAlias,
-						aContentColor = not X.IsEmpty(mon.rgbLongAlias) and mon.rgbLongAlias or mon.rgbShortAlias,
-						nIconID = levelConfig.iconid or idConfig.iconid or mon.iconid,
-						tMap = tMap,
-						tKungfu = tKungfu,
-						tTargetKungfu = tTargetKungfu,
-						bFlipHideVoid = mon.rHideVoid,
-						bFlipHideOthers = mon.rHideOthers,
-						aSoundAppear = idConfig.soundAppear or mon.soundAppear,
-						aSoundDisappear = idConfig.soundDisappear or mon.soundDisappear,
-						szExtentAnimate = mon.extentAnimate,
-					}))
-				end
-			end
-		end
-		table.insert(aResult, tRecord)
+		table.insert(aResult, D.ConvertAncientConfig(config))
 	end
 	D.CONFIG_LIST = aResult
 end
@@ -273,6 +288,70 @@ function D.LoadUserData()
 		D.LoadAncientData()
 	end
 	FireUIEvent('MY_TARGET_MON_CONFIG_RELOAD')
+end
+
+function D.ImportConfigFile(szFile)
+	local aConfig = X.LoadLUAData(szFile, { passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW'] .. 'MY') })
+		or X.LoadLUAData(szFile, { passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW_E'] .. 'MY') })
+		or X.LoadLUAData(szFile, { passphrase = false })
+	if not X.IsArray(aConfig) then
+		X.Sysmsg(_L['MY_TargetMon'], _L('Load config failed: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.ERROR)
+		return
+	end
+	for i, config in ipairs(aConfig) do
+		if config.uuid then
+			aConfig[i] = D.ConvertAncientConfig(config)
+		end
+	end
+	if #aConfig == 0 then
+		return
+	end
+	local aTitle = {}
+	for _, config in ipairs(aConfig) do
+		table.insert(aTitle, D.GetConfigTitle(config))
+	end
+	X.Confirm(_L['Are you sure to import configs below?'] .. '\n\n' .. table.concat(aTitle, '\n'), function()
+		for _, config in ipairs(aConfig) do
+			local nIndex = #D.CONFIG_LIST + 1
+			for i, v in ipairs(D.CONFIG_LIST) do
+				if v.szUUID == config.szUUID then
+					nIndex = i
+				end
+			end
+			D.CONFIG_LIST[nIndex] = config
+		end
+		FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+		X.Sysmsg(_L['MY_TargetMon'], _L('Load config success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
+	end)
+end
+
+function D.ExportConfigFile(aUUID, bIndent)
+	local tConfig = {}
+	for _, config in ipairs(D.CONFIG_LIST) do
+		tConfig[config.szUUID] = config
+	end
+	local aExport = {}
+	for _, szUUID in ipairs(aUUID) do
+		table.insert(aExport, tConfig[szUUID])
+	end
+	if #aExport == 0 then
+		X.Topmsg(_L['Please select at least one config to export'])
+		return
+	end
+	local szFile = X.FormatPath({
+		'userdata/target_mon/remote/'
+			.. '{$name}@{$server}@'
+			.. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd_%hh%mm%ss')
+			.. '.{$lang}.jx3dat',
+		X.PATH_TYPE.GLOBAL,
+	})
+	X.SaveLUAData(szFile, aExport, {
+		indent = X.IIf(bIndent, '\t', nil),
+		passphrase = X.IIf(bIndent, false, X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW'] .. 'MY')),
+	})
+	X.Alert(_L('Export config success: %s', tostring(szFile)))
+	X.Sysmsg(_L['MY_TargetMon'], _L('Export config success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
+	return true
 end
 
 function D.SetConfigList(aList)
@@ -375,6 +454,9 @@ local settings = {
 	exports = {
 		{
 			fields = {
+				ImportConfigFile = D.ImportConfigFile,
+				ExportConfigFile = D.ExportConfigFile,
+				GetConfigTitle = D.GetConfigTitle,
 				GetConfigList = D.GetConfigList,
 				GetConfig = D.GetConfig,
 				CreateConfig = D.CreateConfig,

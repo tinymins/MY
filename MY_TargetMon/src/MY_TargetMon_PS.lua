@@ -97,7 +97,7 @@ end
 function D.OnFrameCreate()
 	this:Lookup('', 'Text_Title'):SetText(_L['MY_TargetMon_PS'])
 	this:Lookup('Wnd_Total/Btn_CreateConfig', 'Text_CreateConfig'):SetText(_L['Create Config'])
-	this:Lookup('Wnd_Total/Btn_ImportConfig', 'Text_ImportConfig'):SetText(_L['Import Config'])
+	this:Lookup('Wnd_Total/Btn_ImportConfig', 'Text_ImportConfig'):SetText(_L['Import Export'])
 	this:Lookup('Wnd_Total/Btn_CreateMonitor', 'Text_CreateMonitor'):SetText(_L['Create Monitor'])
 	this:Lookup('Wnd_Total/Wnd_SearchMonitor/Edit_SearchMonitor'):SetPlaceholderText(_L['Search Monitor'])
 	this:RegisterEvent('MY_TARGET_MON_CONFIG_MODIFY')
@@ -135,6 +135,76 @@ function D.OnLButtonClick()
 				end)
 			end)
 		end)
+	elseif name == 'Btn_ImportConfig' then
+		local menu = {}
+		table.insert(menu, {
+			szOption = _L['Import local data'],
+			fnAction = function()
+				X.UI.ClosePopupMenu()
+				local szFile = GetOpenFileName(
+					_L['Please select data file.'],
+					'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
+					X.GetAbsolutePath({'userdata/target_mon/remote/', X.PATH_TYPE.GLOBAL})
+				)
+				if X.IsEmpty(szFile) then
+					return
+				end
+				MY_TargetMonConfig.ImportConfigFile(szFile)
+			end,
+		})
+		local t1 = { szOption = _L['Export local data'] }
+		local aExportUUID = {}
+		for _, config in ipairs(MY_TargetMonConfig.GetConfigList()) do
+			table.insert(t1, {
+				szOption = MY_TargetMonConfig.GetConfigTitle(config),
+				bCheck = true,
+				fnAction = function(_, bChecked)
+					for i, v in ipairs(aExportUUID) do
+						if v == config.szUUID then
+							table.remove(aExportUUID, i)
+							break
+						end
+					end
+					if bChecked then
+						table.insert(aExportUUID, config.szUUID)
+					end
+				end,
+			})
+		end
+		table.insert(t1, X.CONSTANT.MENU_DIVIDER)
+		table.insert(t1, {
+			szOption = _L['Ensure export'],
+			fnAction = function()
+				if MY_TargetMonConfig.ExportConfigFile(aExportUUID) then
+					X.UI.ClosePopupMenu()
+				end
+			end,
+		})
+		table.insert(t1, {
+			szOption = _L['Ensure export (with indent)'],
+			fnAction = function()
+				if MY_TargetMonConfig.ExportConfigFile(aExportUUID, true) then
+					X.UI.ClosePopupMenu()
+				end
+			end,
+		})
+		table.insert(menu, t1)
+		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+		table.insert(menu, {
+			szOption = _L['Open data folder'],
+			fnAction = function()
+				local szRoot = X.GetAbsolutePath({'userdata/target_mon/remote/', X.PATH_TYPE.GLOBAL}):gsub('/', '\\')
+				X.OpenFolder(szRoot)
+				X.UI.OpenTextEditor(szRoot)
+				X.UI.ClosePopupMenu()
+			end,
+		})
+		local nX, nY = this:GetAbsPos()
+		local nW, nH = this:GetSize()
+		menu.x = nX
+		menu.y = nY + nH
+		menu.nMiniWidth = nW
+		X.UI.PopupMenu(menu)
 	end
 end
 

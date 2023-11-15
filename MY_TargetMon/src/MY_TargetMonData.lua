@@ -126,14 +126,6 @@ function D.GetTarget(eTarType, eMonType)
 end
 end
 
-function D.GetConfigTitle(config)
-	local szTitle = config.szTitle
-	if config.szAuthor ~= '' then
-		szTitle = g_tStrings.STR_BRACKET_LEFT .. config.szAuthor .. g_tStrings.STR_BRACKET_RIGHT .. szTitle
-	end
-	return szTitle
-end
-
 do
 local EVENT_UPDATE = {}
 function D.RegisterDataUpdateEvent(frame, fnAction)
@@ -458,7 +450,7 @@ function UpdateView()
 			view.szUUID               = config.szUUID
 			view.szType               = config.szType
 			view.szTarget             = config.szTarget
-			view.szCaption            = D.GetConfigTitle(config)
+			view.szCaption            = MY_TargetMonConfig.GetConfigTitle(config)
 			view.tAnchor              = config.tAnchor
 			view.bIgnoreSystemUIScale = config.bIgnoreSystemUIScale
 			view.fUIScale             = fUIScale
