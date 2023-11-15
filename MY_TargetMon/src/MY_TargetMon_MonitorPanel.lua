@@ -58,7 +58,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		onClick = function()
 			local box = this
 			X.UI.OpenIconPicker(function(nIconID)
-				mon.nIcon = nIconID
+				mon.nIconID = nIconID
 				FireUIEvent('MY_TARGET_MON_MONITOR_MODIFY')
 				box:SetObjectIcon(nIconID)
 			end)

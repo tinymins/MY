@@ -19,12 +19,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^17.0.0') then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
-local D = {
-	ModifyConfig = MY_TargetMonConfig.ModifyConfig,
-	GetTarget = MY_TargetMonData.GetTarget,
-	GetViewData = MY_TargetMonData.GetViewData,
-	RegisterDataUpdateEvent = MY_TargetMonData.RegisterDataUpdateEvent,
-}
+local D = {}
 local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 
 function D.UpdateItemHotkey(hItem, i, j)
@@ -50,7 +45,11 @@ function D.SaveAnchor(frame)
 		tAnchor.x = tAnchor.x * fRelativeScale
 		tAnchor.y = tAnchor.y * fRelativeScale
 	end
-	D.ModifyConfig(frame.tViewData.szUuid, 'anchor', tAnchor)
+	local config = MY_TargetMon.GetConfig(frame.tViewData.szUUID)
+	if config then
+		config.tAnchor = tAnchor
+		FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+	end
 end
 
 function D.UpdateAnchor(frame)
@@ -162,9 +161,9 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 		hItem.szBoxBgUITex = tViewData.szBoxBgUITex
 	end
 	if item then
-		if hItem.nIcon ~= item.nIcon then
-			hItem.box:SetObjectIcon(item.nIcon)
-			hItem.nIcon = item.nIcon
+		if hItem.nIconID ~= item.nIconID then
+			hItem.box:SetObjectIcon(item.nIconID)
+			hItem.nIconID = item.nIconID
 		end
 		if hItem.bCd ~= item.bCd then
 			hItem.box:SetObjectCoolDown(item.bCd)
@@ -224,25 +223,17 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 			hItem.txtStackNum:SetText(item.szStackNum)
 			hItem.szStackNum = item.szStackNum
 		end
-		if hItem.nLongAliasR ~= item.aLongAliasRGB[1]
-		or hItem.nLongAliasG ~= item.aLongAliasRGB[2]
-		or hItem.nLongAliasB ~= item.aLongAliasRGB[3] then
-			hItem.txtLongName:SetFontColor(unpack(item.aLongAliasRGB))
-			hItem.nLongAliasR, hItem.nLongAliasG, hItem.nLongAliasB = unpack(item.aLongAliasRGB)
+		if hItem.nContentColorR ~= item.aContentColor[1]
+		or hItem.nContentColorG ~= item.aContentColor[2]
+		or hItem.nContentColorB ~= item.aContentColor[3] then
+			hItem.txtLongName:SetFontColor(unpack(item.aContentColor))
+			hItem.txtShortName:SetFontColor(unpack(item.aContentColor))
+			hItem.nContentColorR, hItem.nContentColorG, hItem.nContentColorB = unpack(item.aContentColor)
 		end
-		if hItem.szLongName ~= item.szLongName then
-			hItem.txtLongName:SetText(item.szLongName)
-			hItem.szLongName = item.szLongName
-		end
-		if hItem.nShortAliasR ~= item.aShortAliasRGB[1]
-		or hItem.nShortAliasG ~= item.aShortAliasRGB[2]
-		or hItem.nShortAliasB ~= item.aShortAliasRGB[3] then
-			hItem.txtShortName:SetFontColor(unpack(item.aShortAliasRGB))
-			hItem.nShortAliasR, hItem.nShortAliasG, hItem.nShortAliasB = unpack(item.aShortAliasRGB)
-		end
-		if hItem.szShortName ~= item.szShortName then
-			hItem.txtShortName:SetText(item.szShortName)
-			hItem.szShortName = item.szShortName
+		if hItem.szContent ~= item.szContent then
+			hItem.txtLongName:SetText(item.szContent)
+			hItem.txtShortName:SetText(item.szContent)
+			hItem.szContent = item.szContent
 		end
 		if not hItem:IsVisible() then
 			bRequireFormatPos = true
@@ -258,7 +249,7 @@ function D.UpdateFrame(frame)
 	if not me then
 		return
 	end
-	local tViewData = D.GetViewData(frame.nIndex)
+	local tViewData = MY_TargetMonData.GetViewData(frame.nIndex)
 	if not tViewData then
 		return Wnd.CloseWindow(frame)
 	end
@@ -315,10 +306,10 @@ function D.UpdateFrame(frame)
 		D.UpdateAnchor(frame)
 	end
 	if frame.bPenetrable ~= tViewData.bPenetrable
-	or frame.bDragable ~= tViewData.bDragable then
+	or frame.bDraggable ~= tViewData.bDraggable then
 		frame.bPenetrable = tViewData.bPenetrable
-		frame.bDragable = tViewData.bDragable
-		frame:EnableDrag(not tViewData.bPenetrable and tViewData.bDragable)
+		frame.bDraggable = tViewData.bDraggable
+		frame:EnableDrag(not tViewData.bPenetrable and tViewData.bDraggable)
 		frame:SetMousePenetrable(tViewData.bPenetrable)
 	end
 end
@@ -374,12 +365,12 @@ function MY_TargetMonView.OnFrameCreate()
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	D.ResetScale(this)
 	D.UpdateFrame(this)
-	D.RegisterDataUpdateEvent(this, D.UpdateFrame)
+	MY_TargetMonData.RegisterDataUpdateEvent(this, D.UpdateFrame)
 end
 end
 
 function MY_TargetMonView.OnFrameDestroy()
-	D.RegisterDataUpdateEvent(this, false)
+	MY_TargetMonData.RegisterDataUpdateEvent(this, false)
 end
 
 function MY_TargetMonView.OnFrameDragEnd()
@@ -443,7 +434,7 @@ function MY_TargetMonView.OnItemRButtonClick()
 	local tViewData = frame.tViewData
 	if name == 'Box_Default' and tViewData.szType == 'BUFF' then
 		local hItem = this:GetParent():GetParent()
-		local KTarget = X.GetObject(D.GetTarget(tViewData.szTarget, tViewData.szType))
+		local KTarget = X.GetObject(MY_TargetMonData.GetTarget(tViewData.szTarget, tViewData.szType))
 		if not KTarget then
 			return
 		end
@@ -460,7 +451,7 @@ function MY_TargetMonView.OnEvent(event)
 	elseif event == 'ON_LEAVE_CUSTOM_UI_MODE' then
 		this:Lookup('', 'Handle_List'):SetAlpha(255)
 		UpdateCustomModeWindow(this, _L['[MY TargetMon] '] .. this.tViewData.szCaption, this.tViewData.bPenetrable)
-		if this.tViewData.bDragable then
+		if this.tViewData.bDraggable then
 			this:EnableDrag(true)
 		end
 		D.SaveAnchor(this)
@@ -472,7 +463,7 @@ end
 
 do
 local function onDataInit()
-	for nIndex, _ in ipairs(D.GetViewData()) do
+	for nIndex, _ in ipairs(MY_TargetMonData.GetViewData()) do
 		if not Station.Lookup('Normal/' .. 'MY_TargetMon#' .. nIndex) then
 			Wnd.OpenWindow(INI_PATH, 'MY_TargetMon#' .. nIndex)
 		end

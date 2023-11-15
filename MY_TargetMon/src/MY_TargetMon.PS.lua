@@ -1232,6 +1232,15 @@ function PS.OnPanelActive(wnd)
 	local nX, nY = nPaddingX, nPaddingY
 	ui:ContainerType(X.UI.WND_CONTAINER_STYLE.LEFT_TOP)
 
+	ui:Append('WndButton', {
+		x = 0, y = 0, w = 150, h = 28,
+		text = _L['Open config panel'],
+		buttonStyle = 'FLAT',
+		onClick = function()
+			MY_TargetMon_PS.Open()
+		end,
+	})
+
 	local OpenDetail = DrawDetail(ui)
 	for _, config in ipairs(D.GetConfigList()) do
 		DrawPreview(ui, config, OpenDetail)

@@ -188,4 +188,7 @@ return {
     ['Monitor Play Sound When Appear'] = '設置出現提示音',
     ['Monitor Play Sound When Disappear'] = '設置消失提示音',
     ['Monitor Active Extent Animate'] = '設置激活特效框',
+
+    -- MY_TargetMon.PS.lua
+    ['Open config panel'] = '打開設置面板',
 }
