@@ -313,9 +313,16 @@ end
 
 function D.OnItemLButtonDrag()
 	local name = this:GetName()
+	local frame = this:GetRoot()
 	if name == 'Handle_ConfigItem' then
+		if not X.IsEmpty(frame.szSearchMonitor) then
+			return
+		end
 		X.UI.OpenDragDrop(this, this, 'MY_TargetMon_PS#Handle_ConfigItem', this.config.szUUID)
 	elseif name == 'Handle_MonitorItem' then
+		if not X.IsEmpty(frame.szSearchMonitor) then
+			return
+		end
 		X.UI.OpenDragDrop(this, this, 'MY_TargetMon_PS#Handle_MonitorItem', this.mon.szUUID)
 	end
 end
