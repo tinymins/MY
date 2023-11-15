@@ -139,7 +139,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['Open config panel'],
 		buttonStyle = 'FLAT',
 		onClick = function()
-			MY_TargetMon_PS.Open()
+			MY_TargetMon_PS.OpenPanel()
 		end,
 	})
 end

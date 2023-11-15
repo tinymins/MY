@@ -23,19 +23,19 @@ end
 local INI_FILE = X.PACKET_INFO.ROOT .. 'MY_TargetMon/ui/MY_TargetMon_PS.ini'
 local D = {}
 
-function D.Open()
+function D.OpenPanel()
 	Wnd.OpenWindow(INI_FILE, 'MY_TargetMon_PS')
 end
 
-function D.Close()
+function D.ClosePanel()
 	Wnd.CloseWindow('MY_TargetMon_PS')
 end
 
 function D.TogglePanel()
 	if Station.Lookup('Normal/MY_TargetMon_PS') then
-		D.Close()
+		D.ClosePanel()
 	else
-		D.Open()
+		D.OpenPanel()
 	end
 end
 
@@ -433,8 +433,8 @@ local settings = {
 		},
 		{
 			fields = {
-				Open = D.Open,
-				Close = D.Close,
+				OpenPanel = D.OpenPanel,
+				ClosePanel = D.ClosePanel,
 			},
 		},
 	},
