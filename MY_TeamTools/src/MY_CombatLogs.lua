@@ -322,6 +322,9 @@ X.RegisterEvent('MY_FIGHT_HINT', function()
 end)
 
 function D.WillRecID(dwID)
+	if not D.bReady then
+		return false
+	end
 	if not O.bNearbyAll then
 		if not X.IsPlayer(dwID) then
 			local npc = X.GetNpc(dwID)
@@ -964,6 +967,10 @@ end
 X.RegisterUserSettingsInit('MY_CombatLogs', function()
 	D.bReady = true
 	D.UpdateEnable()
+end)
+
+X.RegisterUserSettingsRelease('MY_CombatLogs', function()
+	D.bReady = false
 end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
