@@ -81,6 +81,7 @@ function D.DrawMonitorList(frame)
 	local hList = frame:Lookup('Wnd_Total/WndScroll_Monitor', 'Handle_Monitor_List')
 	local szSearchMonitor = frame.szSearchMonitor
 	if config then
+		local nCount = 0
 		for i, mon in ipairs(config.aMonitor) do
 			if not szSearchMonitor
 			or szSearchMonitor == ''
@@ -98,9 +99,10 @@ function D.DrawMonitorList(frame)
 				hItem:SetAlpha(mon.bEnable and 255 or 128)
 				hItem.mon = mon
 				hItem.szType = config.szType
+				nCount = nCount + 1
 			end
 		end
-		for i = hList:GetItemCount() - 1, #config.aMonitor, -1 do
+		for i = hList:GetItemCount() - 1, nCount, -1 do
 			hList:RemoveItem(i)
 		end
 	else
