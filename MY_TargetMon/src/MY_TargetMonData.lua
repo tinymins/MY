@@ -481,7 +481,7 @@ function UpdateView()
 					if Buff_ShowMon(mon, dwTarKungfuID) then
 						-- 通过监控项生成视图列表
 						local buff, nIconID = Buff_MatchMon(tBuff, mon, config)
-						if (buff and buff.bCool) or config.bHideVoid == mon.bFlipHideVoid then
+						if (buff and buff.bCool) or not config.bHideVoid == not mon.bFlipHideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
 								item = {}
@@ -498,7 +498,7 @@ function UpdateView()
 					if Skill_ShowMon(mon, dwTarKungfuID) then
 						-- 通过监控项生成视图列表
 						local skill, nIconID = Skill_MatchMon(tSkill, mon, config)
-						if (skill and skill.bCool) or config.bHideVoid == mon.bFlipHideVoid then
+						if (skill and skill.bCool) or not config.bHideVoid == not mon.bFlipHideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
 								item = {}
