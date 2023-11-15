@@ -29,6 +29,7 @@ local SKILL_EXTRA = {} -- 缓存自己放过的技能用于扫描
 local SKILL_CACHE = {} -- 下标为目标ID的目标技能缓存数组 反正ID不可能是doodad不会冲突
 local SKILL_INFO = {} -- 技能反向索引
 local VIEW_LIST = {}
+local DEFAULT_CONTENT_COLOR = {255, 255, 255}
 
 do
 local function FilterMonitors(aMonitor, dwMapID, dwKungfuID)
@@ -377,7 +378,7 @@ local function Buff_MonToView(mon, buff, item, KObject, nIconID, config, tMonExi
 		item.szStackNum = ''
 		item.szContent = X.IsEmpty(mon.szContent) and X.GetBuffName(mon.dwID, mon.nLevel) or mon.szContent
 	end
-	item.aContentColor = mon.aContentColor
+	item.aContentColor = mon.aContentColor or DEFAULT_CONTENT_COLOR
 	Base_MonToView(mon, buff, item, KObject, nIconID, config, tMonExist, tMonLast)
 end
 -- 技能：判断监控项是否显示
@@ -430,7 +431,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIconID, config, tMonE
 		and (skill.nCdMaxCount - skill.nCdCount)
 		or 0
 	item.szStackNum = nStackNum > 0 and nStackNum or ''
-	item.aContentColor = mon.aContentColor
+	item.aContentColor = mon.aContentColor or DEFAULT_CONTENT_COLOR
 	Base_MonToView(mon, skill, item, KObject, nIconID, config, tMonExist, tMonLast)
 end
 local UpdateView
