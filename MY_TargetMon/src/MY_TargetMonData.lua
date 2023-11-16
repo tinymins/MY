@@ -316,7 +316,7 @@ local function Buff_MatchMon(tAllBuff, mon, config)
 					or buff.dwSkillSrcID == dwClientID
 					or buff.dwSkillSrcID == dwControlID
 				)
-				and (not D.IsShieldedBuff(dwID, buff.nLevel))
+				and (not D.IsShieldedBuff(buff.dwID, buff.nLevel))
 				and (mon.nLevel == 0 or mon.nLevel == buff.nLevel)
 				and (not mon.nStackNum or mon.nStackNum == 0 or mon.nStackNum == buff.nStackNum) then
 					return buff, mon.nIconID or buff.nIcon or 13
