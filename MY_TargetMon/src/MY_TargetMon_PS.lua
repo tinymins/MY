@@ -243,7 +243,7 @@ function D.OnItemMouseIn()
 		if this.szType == 'BUFF' then
 			local w, h = this:GetW(), this:GetH()
 			local x, y = this:GetAbsX(), this:GetAbsY()
-			X.OutputBuffTip({x, y, w, h}, this.mon.dwID, this.mon.nLevel)
+			X.OutputBuffTip({x, y, w, h}, this.mon.dwID, this.mon.nLevel == 0 and 1 or this.mon.nLevel)
 		elseif this.szType == 'SKILL' then
 			local w, h = this:GetW(), this:GetH()
 			local x, y = this:GetAbsX(), this:GetAbsY()
