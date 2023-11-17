@@ -178,7 +178,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 	}):Width() + 5
 	nX = nX + uiWnd:Append('ColorBox', {
 		w = 18, h = 18, text = '',
-		x = nX, y = nY + 1, color = mon.aContentColor,
+		x = nX, y = nY + 1, color = mon.aContentColor or {255, 255, 255},
 		onColorPick = function(r, g, b)
 			mon.aContentColor = {r, g, b}
 			FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
