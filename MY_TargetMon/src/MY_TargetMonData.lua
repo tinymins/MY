@@ -319,7 +319,7 @@ local function Buff_MatchMon(tAllBuff, mon, config)
 				and (not D.IsShieldedBuff(buff.dwID, buff.nLevel))
 				and (mon.nLevel == 0 or mon.nLevel == buff.nLevel)
 				and (not mon.nStackNum or mon.nStackNum == 0 or mon.nStackNum == buff.nStackNum) then
-					return buff, mon.nIconID or buff.nIcon or 13
+					return buff, mon.nIconID ~= 13 and mon.nIconID or buff.nIcon or 13
 				end
 			end
 		end
@@ -381,7 +381,7 @@ end
 local function Skill_MatchMon(tSkill, mon, config)
 	local skill = tSkill[mon.dwID]
 	if skill and (mon.nLevel == 0 or mon.nLevel == skill.nLevel) then
-		return skill, mon.nIconID or skill.nIcon or 13
+		return skill, mon.nIconID ~= 13 and mon.nIconID or skill.nIcon or 13
 	end
 end
 -- 技能：监控项转视图数据
