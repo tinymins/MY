@@ -2529,7 +2529,7 @@ function D.OpenSettingPanel(data, szType)
 			end,
 			tip = {
 				render = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-				position = X.UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.RIGHT_LEFT,
 			},
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Speaker'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2658,7 +2658,7 @@ function D.OpenSettingPanel(data, szType)
 			end,
 			tip = {
 				render = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-				position = X.UI.TIP_POSITION.BOTTOM_TOP,
+				position = X.UI.TIP_POSITION.RIGHT_LEFT,
 			},
 		}):Pos('BOTTOMRIGHT')
 		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Chat content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
@@ -2998,7 +2998,7 @@ function D.OpenSettingPanel(data, szType)
 						table.insert(aText, _L['Notice: spell timer starts with VO: means play official voice while this part active, starts with VC: means play custom voice while this part active.'])
 						return table.concat(aText)
 					end,
-					position = X.UI.TIP_POSITION.BOTTOM_TOP,
+					position = X.UI.TIP_POSITION.RIGHT_LEFT,
 				},
 			})
 			-- 普通倒计时文本
@@ -3011,7 +3011,7 @@ function D.OpenSettingPanel(data, szType)
 				end,
 				tip = {
 					render = _L['Simple countdown text'] .. '\n\n' .. _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
-					position = X.UI.TIP_POSITION.BOTTOM_TOP,
+					position = X.UI.TIP_POSITION.RIGHT_LEFT,
 				},
 				placeholder = _L['Please input simple countdown text...'],
 			}):Pos('BOTTOMRIGHT')
