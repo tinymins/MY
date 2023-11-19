@@ -217,7 +217,7 @@ X.RegisterFrameCreate('WorldMap', 'MY_ShenxingHelper__OpenAllMap', D.CheckOpenAl
 -- 防止神行CD被黑
 --------------------------------------------------------------------------
 function D.CheckAvoidBlackShenxingEnable()
-	if D.bReady and O.bAvoidBlackCD then
+	if D.bReady and O.bAvoidBlackCD and X.ENVIRONMENT.GAME_BRANCH == 'classic' then
 		X.RegisterEvent('DO_SKILL_CAST', 'MY_AvoidBlackShenxingCD', function()
 			local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 			if not(X.GetClientPlayerID() == dwID and
@@ -263,18 +263,20 @@ end
 -- 设置界面
 --------------------------------------------------------------------------
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
-	nX = nX + ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 'auto',
-		text = _L['Avoid blacking shenxing cd'],
-		tip = {
-			render = _L['Got zhenyan wen shenxing, your shengxing will be blacked.'],
-			position = X.UI.TIP_POSITION.BOTTOM_TOP,
-		},
-		checked = MY_ShenxingHelper.bAvoidBlackCD,
-		onCheck = function(bChecked)
-			MY_ShenxingHelper.bAvoidBlackCD = bChecked
-		end,
-	}):Width() + 5
+	if X.ENVIRONMENT.GAME_BRANCH == 'classic' then
+		nX = nX + ui:Append('WndCheckBox', {
+			x = nX, y = nY, w = 'auto',
+			text = _L['Avoid blacking shenxing cd'],
+			tip = {
+				render = _L['Got zhenyan wen shenxing, your shengxing will be blacked.'],
+				position = X.UI.TIP_POSITION.BOTTOM_TOP,
+			},
+			checked = MY_ShenxingHelper.bAvoidBlackCD,
+			onCheck = function(bChecked)
+				MY_ShenxingHelper.bAvoidBlackCD = bChecked
+			end,
+		}):Width() + 5
+	end
 
 	if not X.IsRestricted('MY_ShenxingHelper') then
 		nX = nX + ui:Append('WndCheckBox', {
