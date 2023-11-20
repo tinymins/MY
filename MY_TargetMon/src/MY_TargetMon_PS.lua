@@ -98,6 +98,7 @@ function D.DrawMonitorList(frame)
 				hItem:Lookup('Text_MonitorItemDisplayName'):SetFontColor(X.Unpack(mon.aContentColor or {255, 255, 255}))
 				hItem:SetAlpha(mon.bEnable and 255 or 128)
 				hItem.mon = mon
+				hItem.nMonitorIndex = i
 				hItem.szType = config.szType
 				nCount = nCount + 1
 			end
@@ -109,6 +110,30 @@ function D.DrawMonitorList(frame)
 		hList:Clear()
 	end
 	hList:FormatAllItemPos()
+end
+
+function D.CreateMonitor(frame, nIndex)
+	local config = MY_TargetMonConfig.GetConfig(frame.szActiveConfigUUID)
+	if not config then
+		return
+	end
+	GetUserInput(config.szType == 'BUFF' and _L['Please Input Monitor Buff Id'] or _L['Please Input Monitor Skill Id'], function(szID)
+		local dwID = tonumber(szID)
+		if not dwID then
+			X.Alert(_L['Invalid Input Number'])
+			return
+		end
+		X.DelayCall(function()
+			GetUserInput(config.szType == 'BUFF' and _L['Please Input Monitor Buff Level'] or _L['Please Input Monitor Skill Level'], function(szLevel)
+				local nLevel = tonumber(szLevel)
+				if not nLevel then
+					X.Alert(_L['Invalid Input Number'])
+					return
+				end
+				MY_TargetMonConfig.CreateMonitor(config.szUUID, nIndex, dwID, nLevel)
+			end)
+		end)
+	end)
 end
 
 function D.OnFrameCreate()
@@ -132,27 +157,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_CreateConfig' then
 		MY_TargetMonConfig.CreateConfig()
 	elseif name == 'Btn_CreateMonitor' then
-		local config = MY_TargetMonConfig.GetConfig(frame.szActiveConfigUUID)
-		if not config then
-			return
-		end
-		GetUserInput(config.szType == 'BUFF' and _L['Please Input Monitor Buff Id'] or _L['Please Input Monitor Skill Id'], function(szID)
-			local dwID = tonumber(szID)
-			if not dwID then
-				X.Alert(_L['Invalid Input Number'])
-				return
-			end
-			X.DelayCall(function()
-				GetUserInput(config.szType == 'BUFF' and _L['Please Input Monitor Buff Level'] or _L['Please Input Monitor Skill Level'], function(szLevel)
-					local nLevel = tonumber(szLevel)
-					if not nLevel then
-						X.Alert(_L['Invalid Input Number'])
-						return
-					end
-					MY_TargetMonConfig.CreateMonitor(config.szUUID, dwID, nLevel)
-				end)
-			end)
-		end)
+		D.CreateMonitor(frame, nil)
 	elseif name == 'Btn_ImportConfig' then
 		local menu = {}
 		table.insert(menu, {
@@ -281,6 +286,7 @@ end
 
 function D.OnItemRButtonClick()
 	local name = this:GetName()
+	local frame = this:GetRoot()
 	if name == 'Image_ConfigItemConfig' then
 		local config = this:GetParent().config
 		local menu = {}
@@ -304,6 +310,21 @@ function D.OnItemRButtonClick()
 		})
 		local nX, nY = this:GetAbsPos()
 		local nW, nH = this:GetSize()
+		menu.x = nX
+		menu.y = nY + nH
+		menu.nMiniWidth = nW
+		X.UI.PopupMenu(menu)
+	elseif name == 'Handle_MonitorItem' then
+		local nMonitorIndex = this.nMonitorIndex
+		local menu = {}
+		table.insert(menu, {
+			szOption = _L['Insert'],
+			fnAction = function()
+				D.CreateMonitor(frame, nMonitorIndex)
+			end,
+		})
+		local nX, nY = Cursor.GetPos()
+		local nW, nH = 40, 40
 		menu.x = nX
 		menu.y = nY + nH
 		menu.nMiniWidth = nW

@@ -435,12 +435,15 @@ function D.DeleteConfig(szUUID)
 	end
 end
 
-function D.CreateMonitor(szUUID, dwID, nLevel)
+function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
 	local config = D.GetConfig(szUUID)
 	if not config then
 		return
 	end
-	table.insert(config.aMonitor, {
+	if not nIndex then
+		nIndex = #config.aMonitor
+	end
+	table.insert(config.aMonitor, nIndex, {
 		szUUID = X.GetUUID(),
 		szGroupID = nil,
 		bEnable = true,
