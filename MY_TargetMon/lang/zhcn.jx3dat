@@ -138,6 +138,8 @@ return {
 	['Import local data'] = '导入本地数据',
 	['Export local data'] = '导出本地数据',
 	['Import ancient data'] = '导入旧版数据',
+	['Delete all config data'] = '清空全部数据',
+	['Sure to delete all config data? This operation can not be undone.'] = '确定要清空全部数据吗？数据清空操作确认后无法撤销。',
 	['Sure to import ancient config? Current data with same uuid will be overwritten.'] = '确定要导入旧版数据吗？当前数据如有UUID与旧版数据相同的监控，将会被旧版监控数据覆盖。',
     ['Ancient configs import success:'] = '旧版数据导入成功：',
     ['Are you sure to import configs below?'] = '确定要加载以下数据吗？',

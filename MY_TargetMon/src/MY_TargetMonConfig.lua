@@ -458,6 +458,13 @@ function D.DeleteConfig(szUUID)
 	end
 end
 
+function D.DeleteAllConfig()
+	for i, _ in X.ipairs_r(D.CONFIG_LIST) do
+		table.remove(D.CONFIG_LIST, i)
+	end
+	FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+end
+
 function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
 	local config = D.GetConfig(szUUID)
 	if not config then
@@ -511,6 +518,7 @@ local settings = {
 				GetConfig = D.GetConfig,
 				CreateConfig = D.CreateConfig,
 				DeleteConfig = D.DeleteConfig,
+				DeleteAllConfig = D.DeleteAllConfig,
 				CreateMonitor = D.CreateMonitor,
 			},
 		},

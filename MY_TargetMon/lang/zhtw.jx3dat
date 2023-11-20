@@ -138,6 +138,8 @@ return {
 	['Import local data'] = '導入本地數據',
 	['Export local data'] = '導出本地數據',
 	['Import ancient data'] = '導入舊版數據',
+	['Delete all config data'] = '清空全部數據',
+	['Sure to delete all config data? This operation can not be undone.'] = '確定要清空全部數據嗎？數據清空操作確認後無法撤銷。',
 	['Sure to import ancient config? Current data with same uuid will be overwritten.'] = '確定要導入舊版數據嗎？當前數據如有UUID與舊版數據相同的監控，將會被舊版監控數據覆蓋。',
     ['Ancient configs import success:'] = '舊版數據導入成功：',
     ['Are you sure to import configs below?'] = '確定要載入以下數據嗎？',

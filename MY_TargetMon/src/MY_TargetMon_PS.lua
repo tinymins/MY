@@ -212,8 +212,8 @@ function D.OnLButtonClick()
 			end,
 		})
 		table.insert(menu, t1)
+		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 		if MY_TargetMonConfig.HasAncientData() then
-			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			table.insert(menu, {
 				szOption = _L['Import ancient data'],
 				fnAction = function()
@@ -230,6 +230,16 @@ function D.OnLButtonClick()
 				end,
 			})
 		end
+		table.insert(menu, {
+			szOption = _L['Delete all config data'],
+			rgb = {255, 0, 0},
+			fnAction = function()
+				X.Confirm(_L['Sure to delete all config data? This operation can not be undone.'], function()
+					MY_TargetMonConfig.DeleteAllConfig()
+					X.UI.ClosePopupMenu()
+				end)
+			end,
+		})
 		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 		table.insert(menu, {
 			szOption = _L['Open data folder'],
