@@ -29,7 +29,7 @@ local SKILL_EXTRA = {} -- 缓存自己放过的技能用于扫描
 local SKILL_CACHE = {} -- 下标为目标ID的目标技能缓存数组 反正ID不可能是doodad不会冲突
 local SKILL_INFO = {} -- 技能反向索引
 local VIEW_LIST = {}
-local DEFAULT_CONTENT_COLOR = {255, 255, 255}
+local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 
 do
 local function FilterMonitors(aMonitor, dwMapID, dwKungfuID)
