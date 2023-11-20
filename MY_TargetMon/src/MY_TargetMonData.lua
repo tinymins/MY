@@ -263,8 +263,7 @@ local function Base_MonToView(mon, info, item, KObject, nIconID, config, tMonExi
 		item.szProcess = ''
 	end
 	if not config.bShowName then
-		item.szLongName = ''
-		item.szShortName = ''
+		item.szContent = ''
 	end
 	if not item.nIconID then
 		item.nIconID = 13
