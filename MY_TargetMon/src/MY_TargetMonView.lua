@@ -28,7 +28,7 @@ function D.UpdateItemHotkey(hItem, i, j)
 end
 
 function D.UpdateHotkey(frame)
-	local i = this.nIndex
+	local i = frame.nIndex
 	local hList = frame:Lookup('', 'Handle_List')
 	for j = 0, hList:GetItemCount() - 1 do
 		D.UpdateItemHotkey(hList:Lookup(j), i, j + 1)
