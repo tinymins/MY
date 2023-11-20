@@ -470,6 +470,21 @@ function UpdateView()
 			-- view.playSound         = config.bPlaySound
 			view.szCdBarUITex         = config.szCdBarUITex
 			view.szBoxBgUITex         = config.szBoxBgUITex
+			local tMonGroupFallbackUUID = view.tMonGroupFallbackUUID
+			if not tMonGroupFallbackUUID then
+				tMonGroupFallbackUUID = {}
+				for _, mon in ipairs(config.aMonitor) do
+					if mon.szGroup then
+						tMonGroupFallbackUUID[mon.szGroup] = mon.szUUID
+					end
+				end
+				view.tMonGroupFallbackUUID = tMonGroupFallbackUUID
+			end
+			local tMonGroupActiveUUID = view.tMonGroupActiveUUID
+			if not tMonGroupActiveUUID then
+				tMonGroupActiveUUID = {}
+				view.tMonGroupActiveUUID = tMonGroupActiveUUID
+			end
 			local aItem = view.aItem
 			if not aItem then
 				aItem = {}
@@ -483,13 +498,32 @@ function UpdateView()
 					if Buff_ShowMon(mon, dwTarKungfuID) then
 						-- 通过监控项生成视图列表
 						local buff, nIconID = Buff_MatchMon(tBuff, mon, config)
-						if (buff and buff.bCool) or not config.bHideVoid == not mon.bFlipHideVoid then
+						if mon.szGroup and (
+							tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
+							or tMonGroupActiveUUID[mon.szGroup] == tMonGroupFallbackUUID[mon.szGroup]
+						) then
+							tMonGroupActiveUUID[mon.szGroup] = nil
+						end
+						if (
+							not mon.szGroup -- 无同组项设置
+							or (
+								not tMonGroupActiveUUID[mon.szGroup] -- 不存在激活的同组项
+								and (
+									(buff and buff.bCool) -- 并且当前 BUFF 激活
+									or tMonGroupFallbackUUID[mon.szGroup] == mon.szUUID -- 或者当前是同组项最后一个显示项
+								)
+							)
+						)
+						and ((buff and buff.bCool) or not config.bHideVoid == not mon.bFlipHideVoid) then
 							local item = aItem[nItemIndex]
 							if not item then
 								item = {}
 								aItem[nItemIndex] = item
 							end
 							Buff_MonToView(mon, buff, item, KObject, nIconID, config, tMonExist, tMonLast)
+							if mon.szGroup then
+								tMonGroupActiveUUID[mon.szGroup] = mon.szUUID
+							end
 							nItemIndex = nItemIndex + 1
 						end
 					end
@@ -500,11 +534,30 @@ function UpdateView()
 					if Skill_ShowMon(mon, dwTarKungfuID) then
 						-- 通过监控项生成视图列表
 						local skill, nIconID = Skill_MatchMon(tSkill, mon, config)
-						if (skill and skill.bCool) or not config.bHideVoid == not mon.bFlipHideVoid then
+						if mon.szGroup and (
+							tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
+							or tMonGroupActiveUUID[mon.szGroup] == tMonGroupFallbackUUID[mon.szGroup]
+						) then
+							tMonGroupActiveUUID[mon.szGroup] = nil
+						end
+						if (
+							not mon.szGroup -- 无同组项设置
+							or (
+								not tMonGroupActiveUUID[mon.szGroup] -- 不存在激活的同组项
+								and (
+									(skill and skill.bCool) -- 并且当前 技能CD 激活
+									or tMonGroupFallbackUUID[mon.szGroup] == mon.szUUID -- 或者当前是同组项最后一个显示项
+								)
+							)
+						)
+						and (skill and skill.bCool) or not config.bHideVoid == not mon.bFlipHideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
 								item = {}
 								aItem[nItemIndex] = item
+							end
+							if mon.szGroup then
+								tMonGroupActiveUUID[mon.szGroup] = mon.szUUID
 							end
 							Skill_MonToView(mon, skill, item, KObject, nIconID, config, tMonExist, tMonLast)
 							nItemIndex = nItemIndex + 1

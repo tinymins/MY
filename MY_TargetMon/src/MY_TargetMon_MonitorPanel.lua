@@ -186,6 +186,29 @@ function D.Open(szConfigUUID, szMonitorUUID)
 	}):Width() + 5
 	nY = nY + nDeltaY
 
+	-- 提示内容
+	nX = nPaddingX + 20
+	nX = nX + uiWnd:Append('Text', {
+		x = nX, y = nY - 3, w = 'auto',
+		text = _L['Monitor Group'],
+	}):Width() + 5
+	nX = nX + uiWnd:Append('WndEditBox', {
+		text = mon.szGroup,
+		x = nX, y = nY, w = 180, h = 22,
+		onChange = function(szText)
+			if szText == '' then
+				szText = nil
+			end
+			mon.szGroup = szText
+			FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
+		end,
+		tip = {
+			render = _L['Monitor same group will only show one at the same time'],
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
+		},
+	}):Width() + 5
+	nY = nY + nDeltaY
+
 	-- 条件
 	nX = nPaddingX
 	nY = nY + 10
