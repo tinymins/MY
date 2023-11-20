@@ -79,6 +79,7 @@ X.RegisterKungfuMount('MY_TargetMonData', onFilterChange)
 X.RegisterEvent('LOADING_ENDING', 'MY_TargetMonData', onFilterChange)
 
 local function onTargetMonReload()
+	VIEW_LIST = {}
 	onFilterChange()
 	D.OnTargetMonReload()
 end
@@ -427,7 +428,8 @@ local function Skill_MonToView(mon, skill, item, KObject, nIconID, config, tMonE
 	Base_MonToView(mon, skill, item, KObject, nIconID, config, tMonExist, tMonLast)
 end
 local UpdateView
-do local fUIScale, fFontScaleBase
+do
+local fUIScale, fFontScaleBase
 function UpdateView()
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
 	for _, config in ipairs(D.GetConfigList()) do
