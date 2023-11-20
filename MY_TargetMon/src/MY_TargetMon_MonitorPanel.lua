@@ -507,6 +507,7 @@ function D.OnFrameBreathe()
 	local parent = Station.Lookup('Normal/MY_TargetMon_PS')
 	if not parent or Station.Lookup('Normal/MY_TargetMon_ConfigPanel') then
 		Wnd.CloseWindow(this)
+		return
 	end
 	local frame, bBehindParent = parent:GetNext(), true
 	while frame do
