@@ -313,7 +313,7 @@ local function Buff_MatchMon(tAllBuff, mon, config)
 		for _, buff in pairs(tBuff) do
 			if buff and buff.bCool then
 				if (
-					config.bHideOthers == mon.bFlipHideOthers
+					not config.bHideOthers == not mon.bFlipHideOthers
 					or buff.dwSkillSrcID == dwClientID
 					or buff.dwSkillSrcID == dwControlID
 				)
