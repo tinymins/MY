@@ -26,6 +26,7 @@ local CUSTOM_BOX_EXTENT_ANIMATE = {
 	{'ui/Image/Common/Box.UITex|17'},
 	{'ui/Image/Common/Box.UITex|20'},
 }
+local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 
 function D.Open(szConfigUUID, szMonitorUUID)
 	local config = MY_TargetMonConfig.GetConfig(szConfigUUID)
@@ -178,7 +179,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 	}):Width() + 5
 	nX = nX + uiWnd:Append('ColorBox', {
 		w = 18, h = 18, text = '',
-		x = nX, y = nY + 1, color = mon.aContentColor or {255, 255, 0},
+		x = nX, y = nY + 1, color = mon.aContentColor or DEFAULT_CONTENT_COLOR,
 		onColorPick = function(r, g, b)
 			mon.aContentColor = {r, g, b}
 			FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
