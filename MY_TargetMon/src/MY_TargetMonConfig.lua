@@ -164,8 +164,10 @@ function D.ConvertAncientConfig(config)
 		tAnchor = config.anchor,
 		aMonitor = {},
 	}
+	local DEFAULT_IDS = {[0] = { ignoreLevel = true }}
+	local DEFAULT_LEVELS = {[0] = {}}
 	for _, mon in ipairs(config.monitors) do
-		for id, idConfig in pairs(mon.ids or {}) do
+		for id, idConfig in pairs(X.IsEmpty(mon.ids) and DEFAULT_IDS or mon.ids) do
 			local tMap = X.Clone(mon.maps) or {}
 			tMap.bAll = tMap.all or X.IsEmpty(tMap)
 			tMap.all = nil
@@ -177,7 +179,7 @@ function D.ConvertAncientConfig(config)
 			tTargetKungfu.all = nil
 			tTargetKungfu.bNpc = tTargetKungfu.npc
 			tTargetKungfu.npc = nil
-			for level, levelConfig in pairs(idConfig.levels or {[0] = {}}) do
+			for level, levelConfig in pairs(X.IsEmpty(idConfig.levels) and DEFAULT_LEVELS or idConfig.levels) do
 				table.insert(tRecord.aMonitor, X.Clone({
 					szUUID = mon.uuid .. '-' .. id .. '-' .. level,
 					szGroupID = mon.uuid,
