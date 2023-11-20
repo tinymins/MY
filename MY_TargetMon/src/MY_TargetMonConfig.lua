@@ -31,6 +31,7 @@ local O = X.CreateUserSettingsModule('MY_TargetMon', _L['Target'], {
 local D = {
 	CONFIG_LIST = {},
 }
+local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 
 local function GetUserDataPath()
 	local ePathType = O.bCommon and X.PATH_TYPE.GLOBAL or X.PATH_TYPE.ROLE
@@ -180,6 +181,30 @@ function D.ConvertAncientConfig(config)
 			tTargetKungfu.bNpc = tTargetKungfu.npc
 			tTargetKungfu.npc = nil
 			for level, levelConfig in pairs(X.IsEmpty(idConfig.levels) and DEFAULT_LEVELS or idConfig.levels) do
+				local szContent, aContentColor = '', nil
+				if config.cdBar then
+					if X.IsEmpty(mon.longAlias) then
+						szContent = mon.shortAlias
+					else
+						szContent = mon.longAlias
+					end
+					if X.IsEmpty(mon.rgbLongAlias) or X.IsEquals(mon.rgbLongAlias, DEFAULT_CONTENT_COLOR) then
+						aContentColor = mon.rgbShortAlias
+					else
+						aContentColor = mon.rgbLongAlias
+					end
+				else
+					if X.IsEmpty(mon.shortAlias) then
+						szContent = mon.longAlias
+					else
+						szContent = mon.shortAlias
+					end
+					if X.IsEmpty(mon.rgbShortAlias) or X.IsEquals(mon.rgbShortAlias, DEFAULT_CONTENT_COLOR) then
+						aContentColor = mon.rgbLongAlias
+					else
+						aContentColor = mon.rgbShortAlias
+					end
+				end
 				table.insert(tRecord.aMonitor, X.Clone({
 					szUUID = mon.uuid .. '-' .. id .. '-' .. level,
 					szGroupID = mon.uuid,
@@ -188,8 +213,8 @@ function D.ConvertAncientConfig(config)
 					nLevel = level,
 					nStackNum = 0,
 					szNote = mon.name,
-					szContent = not X.IsEmpty(mon.longAlias) and mon.longAlias or mon.shortAlias,
-					aContentColor = not X.IsEmpty(mon.rgbLongAlias) and mon.rgbLongAlias or mon.rgbShortAlias,
+					szContent = szContent,
+					aContentColor = aContentColor,
 					nIconID = levelConfig.iconid or idConfig.iconid or mon.iconid,
 					tMap = tMap,
 					tKungfu = tKungfu,
