@@ -172,7 +172,7 @@ function D.ConvertAncientConfig(config)
 			local tKungfu = X.Clone(mon.kungfus) or {}
 			tKungfu.bAll = tKungfu.all or X.IsEmpty(tKungfu)
 			tKungfu.all = nil
-			local tTargetKungfu = X.Clone(mon.kungfus) or {}
+			local tTargetKungfu = X.Clone(mon.tarkungfus) or {}
 			tTargetKungfu.bAll = tTargetKungfu.all or X.IsEmpty(tTargetKungfu)
 			tTargetKungfu.all = nil
 			tTargetKungfu.bNpc = tTargetKungfu.npc
@@ -298,6 +298,7 @@ function D.ImportConfigFile(szFile)
 		X.Sysmsg(_L['MY_TargetMon'], _L('Load config failed: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.ERROR)
 		return
 	end
+	SaveLUAData('interface/a.jx3dat', aConfig, {crc = false,indent = '\t'})
 	for i, config in ipairs(aConfig) do
 		if config.uuid then
 			aConfig[i] = D.ConvertAncientConfig(config)
