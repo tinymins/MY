@@ -323,7 +323,6 @@ function D.ImportConfigFile(szFile)
 		X.Sysmsg(_L['MY_TargetMon'], _L('Load config failed: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.ERROR)
 		return
 	end
-	SaveLUAData('interface/a.jx3dat', aConfig, {crc = false,indent = '\t'})
 	for i, config in ipairs(aConfig) do
 		if config.uuid then
 			aConfig[i] = D.ConvertAncientConfig(config)
