@@ -182,7 +182,7 @@ return {
     ['Monitor Note'] = '備注名稱',
     ['Monitor Content'] = '提示內容',
     ['Monitor Group'] = '監控組名',
-    ['Monitor same group will only show one at the same time'] = '相同組的監控項同時只會顯示一個',
+    ['Monitor same group will only show one at the same time'] = '相同組的監控項同時只會顯示一個，設置該項後同組僅最後一個監控項可在隱藏後顯示圖標。',
     ['Monitor Common Config'] = '通用設置',
     ['Monitor Condition Config'] = '條件設置',
     ['Monitor ID'] = 'ID',
