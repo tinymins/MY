@@ -87,7 +87,7 @@ function D.DrawMonitorList(frame)
 			or szSearchMonitor == ''
 			or (mon.szNote and mon.szNote:find(szSearchMonitor))
 			or (mon.szContent and mon.szContent:find(szSearchMonitor)) then
-				local hItem = hList:Lookup(i - 1)
+				local hItem = hList:Lookup(nCount)
 				if not hItem then
 					hItem = hList:AppendItemFromIni(INI_FILE, 'Handle_MonitorItem')
 				end
