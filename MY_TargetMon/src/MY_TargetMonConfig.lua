@@ -205,6 +205,14 @@ function D.ConvertAncientConfig(config)
 						aContentColor = mon.rgbShortAlias
 					end
 				end
+				local nIconID
+				if levelConfig.iconid and levelConfig.iconid > 0 and levelConfig.iconid ~= 13 then
+					nIconID = levelConfig.iconid
+				elseif idConfig.iconid and idConfig.iconid > 0 and idConfig.iconid ~= 13 then
+					nIconID = idConfig.iconid
+				elseif mon.iconid and mon.iconid > 0 and mon.iconid ~= 13 then
+					nIconID = mon.iconid
+				end
 				table.insert(tRecord.aMonitor, X.Clone({
 					szUUID = mon.uuid .. '-' .. id .. '-' .. level,
 					szGroupID = mon.uuid,
@@ -215,7 +223,7 @@ function D.ConvertAncientConfig(config)
 					szNote = mon.name,
 					szContent = szContent,
 					aContentColor = aContentColor,
-					nIconID = levelConfig.iconid or idConfig.iconid or mon.iconid,
+					nIconID = nIconID,
 					tMap = tMap,
 					tKungfu = tKungfu,
 					tTargetKungfu = tTargetKungfu,
