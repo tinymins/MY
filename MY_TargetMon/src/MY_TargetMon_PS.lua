@@ -212,6 +212,24 @@ function D.OnLButtonClick()
 			end,
 		})
 		table.insert(menu, t1)
+		if MY_TargetMonConfig.HasAncientData() then
+			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+			table.insert(menu, {
+				szOption = _L['Import ancient data'],
+				fnAction = function()
+					X.Confirm(_L['Sure to import ancient config? Current data with same uuid will be overwritten.'], function()
+						MY_TargetMonConfig.ImportAncientData(function(aConfig)
+							local aName = {}
+							for _, config in ipairs(aConfig) do
+								table.insert(aName, MY_TargetMonConfig.GetConfigTitle(config))
+							end
+							X.Alert(_L['Ancient configs import success:'] .. '\n\n' .. table.concat(aName, '\n'))
+						end)
+						X.UI.ClosePopupMenu()
+					end)
+				end,
+			})
+		end
 		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 		table.insert(menu, {
 			szOption = _L['Open data folder'],

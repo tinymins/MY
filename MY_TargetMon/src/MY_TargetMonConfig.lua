@@ -206,7 +206,12 @@ function D.ConvertAncientConfig(config)
 	return tRecord
 end
 
-function D.LoadAncientData()
+function D.HasAncientData()
+	local szPath = X.FormatPath({'config/my_targetmon.jx3dat', X.PATH_TYPE.ROLE})
+	return IsLocalFileExist(szPath)
+end
+
+function D.ImportAncientData(fnCallback)
 	-- 加载内置数据
 	local CUSTOM_EMBEDDED_CONFIG_ROOT = X.FormatPath({'userdata/TargetMon/', X.PATH_TYPE.GLOBAL})
 	local EMBEDDED_CONFIG_LIST = {}
@@ -268,7 +273,26 @@ function D.LoadAncientData()
 	for i, config in ipairs(aConfig) do
 		table.insert(aResult, D.ConvertAncientConfig(config))
 	end
-	D.CONFIG_LIST = aResult
+	-- 导入数据
+	for _, config in ipairs(aResult) do
+		local bExist = false
+		for i, v in ipairs(D.CONFIG_LIST) do
+			if v.szUUID == config.szUUID then
+				v.aMonitor = config.aMonitor
+				v.szTitle = config.szTitle
+				v.szAuthor = config.szAuthor
+				v.szVersion = config.szVersion
+				bExist = true
+			end
+		end
+		if not bExist then
+			table.insert(D.CONFIG_LIST, config)
+		end
+	end
+	FireUIEvent('MY_TARGET_MON_CONFIG_RELOAD')
+	if fnCallback then
+		fnCallback(aResult)
+	end
 end
 
 -- 保存用户监控数据、配置
@@ -285,11 +309,10 @@ function D.LoadUserData()
 	local data = X.LoadLUAData(GetUserDataPath())
 	if X.IsTable(data) then
 		D.CONFIG_LIST = data.data or {}
+		FireUIEvent('MY_TARGET_MON_CONFIG_RELOAD')
 	else
-		D.CONFIG_LIST = {}
-		D.LoadAncientData()
+		D.ImportAncientData()
 	end
-	FireUIEvent('MY_TARGET_MON_CONFIG_RELOAD')
 end
 
 function D.ImportConfigFile(szFile)
@@ -479,6 +502,8 @@ local settings = {
 		},
 		{
 			fields = {
+				HasAncientData = D.HasAncientData,
+				ImportAncientData = D.ImportAncientData,
 				ImportConfigFile = D.ImportConfigFile,
 				ExportConfigFile = D.ExportConfigFile,
 				GetConfigTitle = D.GetConfigTitle,
