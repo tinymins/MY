@@ -3828,17 +3828,21 @@ function X.SetTeamMarkTarget(nMark, dwID)
 	return GetClientTeam().SetTeamMark(nMark, dwID) or false
 end
 
+-- 获取所有标记目标
+---@return table @所有标记目标
+function X.GetTeamMark()
+	if not X.IsInParty() then
+		return X.CONSTANT.EMPTY_TABLE
+	end
+	return GetClientTeam().GetTeamMark() or X.CONSTANT.EMPTY_TABLE
+end
+
 -- 获取标记目标
 ---@param nMark number @标记索引
 ---@return number @目标ID
 function X.GetTeamMarkTarget(nMark)
-	if not X.IsInParty() then
-		return
-	end
-	local tMark = GetClientTeam().GetTeamMark()
-	if tMark then
-		return tMark[nMark]
-	end
+	local tMark = X.GetTeamMark()
+	return tMark[nMark]
 end
 
 -- 获取目标标记
