@@ -416,7 +416,12 @@ function D.Subscribe(info, bSilent)
 	local szURL = D.GetShortURL(info.szURL) or info.szURL
 	local tLastInfo = tSubscribed[szURL]
 	if tLastInfo then
-		aUUID = tLastInfo.aUUID
+		aUUID = {}
+		for _, szUUID in ipairs(tLastInfo.aUUID) do
+			if not tLastInfo.tUUIDModified[szUUID] then
+				table.insert(aUUID, szUUID)
+			end
+		end
 	end
 	return X.Promise:new(function(resolve, reject)
 		X.Promise:new(function(resolve, reject)
@@ -483,7 +488,7 @@ function D.Subscribe(info, bSilent)
 						local tInfo = tSubscribed[szURL]
 						if tInfo then
 							for _, szUUID in ipairs(tInfo.aUUID) do
-								if not tUUID[szUUID] then
+								if not tUUID[szUUID] and not tInfo.tUUIDModified[szUUID] then
 									MY_TargetMonConfig.DeleteDataset(szUUID)
 								end
 							end
@@ -491,8 +496,8 @@ function D.Subscribe(info, bSilent)
 						tSubscribed[szURL] = {
 							szKey = info.szKey,
 							szVersion = info.szVersion,
-							bDataNotModified = true,
 							aUUID = aUUID,
+							tUUIDModified = {},
 						}
 						MY_TargetMonConfig.SetUserConfig('MY_TargetMon_Subscribe_Data.Subscribed', tSubscribed)
 						FireUIEvent('MY_TARGET_MON__SUBSCRIBE_DATA__SUBSCRIBE_UPDATE')
@@ -514,7 +519,9 @@ function D.Unsubscribe(info)
 	local tInfo = tSubscribed[szURL]
 	if tInfo then
 		for _, szUUID in ipairs(tInfo.aUUID) do
-			MY_TargetMonConfig.DeleteDataset(szUUID)
+			if not tInfo.tUUIDModified[szUUID] then
+				MY_TargetMonConfig.DeleteDataset(szUUID)
+			end
 		end
 	end
 	tSubscribed[szURL] = nil
@@ -891,8 +898,17 @@ X.RegisterInit('MY_TargetMon_Subscribe_Data', function()
 	-- end)
 end)
 
-X.RegisterEvent('MY_TEAM_MON_DATA_MODIFY', 'MY_TargetMon_Subscribe_Data', function()
-	MY_TargetMonConfig.SetUserConfig('MY_TargetMon_Subscribe_Data.DataNotModified', false)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMon_Subscribe_Data', function()
+	local szModifiedUUID = arg0
+	local tSubscribed = MY_TargetMonConfig.GetUserConfig('MY_TargetMon_Subscribe_Data.Subscribed') or {}
+	for _, tInfo in pairs(tSubscribed) do
+		for _, szUUID in ipairs(tInfo.aUUID) do
+			if szUUID == szModifiedUUID then
+				tInfo.tUUIDModified[szUUID] = true
+			end
+		end
+	end
+	MY_TargetMonConfig.SetUserConfig('MY_TargetMon_Subscribe_Data.Subscribed', tSubscribed)
 end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
