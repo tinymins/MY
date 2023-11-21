@@ -5550,7 +5550,7 @@ end
 -- @param {table|function} menu 菜单或返回菜单的函数
 function OO:Menu(menu)
 	self:Click(function()
-		local h = this:Lookup('', '') or this
+		local h = this:GetBaseType() == 'Wnd' and this:Lookup('', '') or this
 		local nX, nY = h:GetAbsPos()
 		local nW, nH = h:GetSize()
 		local m = menu
