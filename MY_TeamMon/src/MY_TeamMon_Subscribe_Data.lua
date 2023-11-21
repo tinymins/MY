@@ -756,6 +756,7 @@ local settings = {
 				'FetchSubscribeItem',
 				'SyncTeam',
 			},
+			preset = 'UIEvent',
 		},
 	},
 }

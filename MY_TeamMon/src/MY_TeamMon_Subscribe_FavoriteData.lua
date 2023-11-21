@@ -371,6 +371,7 @@ local settings = {
 				'Remove',
 				'Fetch',
 			},
+			preset = 'UIEvent',
 		},
 	},
 }
