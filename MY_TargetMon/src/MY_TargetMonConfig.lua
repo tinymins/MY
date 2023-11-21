@@ -29,6 +29,7 @@ local O = X.CreateUserSettingsModule('MY_TargetMon', _L['Target'], {
 	},
 })
 local D = {
+	CONFIG = {},
 	DATASET_LIST = {},
 }
 local REMOTE_DATA_ROOT = X.FormatPath({'userdata/target_mon/remote/', X.PATH_TYPE.GLOBAL})
@@ -335,6 +336,7 @@ function D.SaveUserData()
 	X.SaveLUAData(
 		GetUserDataPath(),
 		{
+			config = D.CONFIG,
 			data = D.DATASET_LIST,
 		})
 end
@@ -343,11 +345,21 @@ end
 function D.LoadUserData()
 	local data = X.LoadLUAData(GetUserDataPath())
 	if X.IsTable(data) then
+		D.CONFIG = data.config or {}
 		D.DATASET_LIST = data.data or {}
 		FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD')
 	else
 		D.ImportAncientData()
 	end
+end
+
+function D.SetUserConfig(szKey, xVal)
+	D.CONFIG[szKey] = xVal
+	FireUIEvent('MY_TARGET_MON_CONFIG__USER_CONFIG_MODIFY')
+end
+
+function D.GetUserConfig(szKey)
+	return D.CONFIG[szKey]
 end
 
 function D.ImportDatasetFile(szFile, tOption)
@@ -586,6 +598,10 @@ function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
 	FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY')
 end
 
+function D.SendBgMsg(...)
+	return X.SendBgMsg(...)
+end
+
 -- Global exports
 do
 local settings = {
@@ -605,6 +621,8 @@ local settings = {
 				ImportAncientData = D.ImportAncientData,
 				ImportDatasetFile = D.ImportDatasetFile,
 				ExportDatasetFile = D.ExportDatasetFile,
+				SetUserConfig = D.SetUserConfig,
+				GetUserConfig = D.GetUserConfig,
 				GetDatasetTitle = D.GetDatasetTitle,
 				GetDatasetList = D.GetDatasetList,
 				GetDataset = D.GetDataset,
@@ -612,6 +630,7 @@ local settings = {
 				DeleteDataset = D.DeleteDataset,
 				DeleteAllDataset = D.DeleteAllDataset,
 				CreateMonitor = D.CreateMonitor,
+				SendBgMsg = D.SendBgMsg,
 			},
 		},
 	},
@@ -636,6 +655,7 @@ local function DelaySaveUserData()
 end
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMonConfig', DelaySaveUserData)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMonConfig', DelaySaveUserData)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__USER_CONFIG_MODIFY', 'MY_TargetMonConfig', DelaySaveUserData)
 end
 
 X.RegisterInit('MY_TargetMonConfig', D.LoadUserData)

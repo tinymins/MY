@@ -161,6 +161,14 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_ImportConfig' then
 		local menu = {}
 		table.insert(menu, {
+			szOption = _L['Subscribe remote data'],
+			fnAction = function()
+				X.UI.ClosePopupMenu()
+				MY_TargetMon_Subscribe.OpenPanel()
+			end,
+		})
+		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+		table.insert(menu, {
 			szOption = _L['Import local data'],
 			fnAction = function()
 				X.UI.ClosePopupMenu()
