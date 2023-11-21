@@ -58,12 +58,12 @@ function D.GetDatasetList()
 		local aConfig = {}
 		local dwMapID = me.GetMapID() or 0
 		local dwKungfuID = me.GetKungfuMountID() or 0
-		for i, config in ipairs(MY_TargetMonConfig.GetDatasetList()) do
+		for i, dataset in ipairs(MY_TargetMonConfig.GetDatasetList()) do
 			aConfig[i] = setmetatable(
 				{
-					aMonitor = FilterMonitors(config.aMonitor, dwMapID, dwKungfuID),
+					aMonitor = FilterMonitors(dataset.aMonitor, dwMapID, dwKungfuID),
 				},
-				{ __index = config }
+				{ __index = dataset }
 			)
 		end
 		CACHE_CONFIG = aConfig
@@ -221,17 +221,17 @@ local function Base_MonVisible(mon, dwTarKungfuID)
 	return true
 end
 -- 通用：监控项转视图数据
-local function Base_MonToView(mon, info, item, KObject, config, tMonExist, tMonLast)
+local function Base_MonToView(mon, info, item, KObject, dataset, tMonExist, tMonLast)
 	-- 格式化完善视图列表信息
-	if config.bShowTime and item.bCd and item.nTimeLeft and item.nTimeLeft > 0 then
-		if config.bCdBar then
+	if dataset.bShowTime and item.bCd and item.nTimeLeft and item.nTimeLeft > 0 then
+		if dataset.bCdBar then
 			item.szProcess = (
 					item.nTimeLeft >= 60
 						and X.FormatDuration(item.nTimeLeft - item.nTimeLeft % 60, 'ENGLISH_ABBR', { accuracyUnit = 'minute' })
 						or ''
 				)
 				.. (
-					(config.nDecimalTime == -1 or item.nTimeLeft < config.nDecimalTime)
+					(dataset.nDecimalTime == -1 or item.nTimeLeft < dataset.nDecimalTime)
 						and ('%.1fs'):format(item.nTimeLeft % 60)
 						or ('%ds'):format(item.nTimeLeft % 60)
 				)
@@ -240,14 +240,14 @@ local function Base_MonToView(mon, info, item, KObject, config, tMonExist, tMonL
 			local nTimeLeft, szTimeLeft = item.nTimeLeft, ''
 			if nTimeLeft <= 3600 then
 				if nTimeLeft > 60 then
-					if config.nDecimalTime == -1 or nTimeLeft < config.nDecimalTime then
+					if dataset.nDecimalTime == -1 or nTimeLeft < dataset.nDecimalTime then
 						szTimeLeft = '%d\'%.1f'
 					else
 						szTimeLeft = '%d\'%d'
 					end
 					szTimeLeft = szTimeLeft:format(math.floor(nTimeLeft / 60), nTimeLeft % 60)
 				else
-					if config.nDecimalTime == -1 or nTimeLeft < config.nDecimalTime then
+					if dataset.nDecimalTime == -1 or nTimeLeft < dataset.nDecimalTime then
 						szTimeLeft = '%.1f'
 					else
 						szTimeLeft = '%d'
@@ -262,13 +262,13 @@ local function Base_MonToView(mon, info, item, KObject, config, tMonExist, tMonL
 		item.szTimeLeft = ''
 		item.szProcess = ''
 	end
-	if not config.bShowName then
+	if not dataset.bShowName then
 		item.szContent = ''
 	end
 	if not item.nIconID then
 		item.nIconID = MY_TargetMonConfig.DEFAULT_MONITOR_ICON_ID
 	end
-	if config.bCdFlash and item.bCd then
+	if dataset.bCdFlash and item.bCd then
 		if item.fProgress >= 0.9 then
 			item.szExtentAnimate = EXTENT_ANIMATE['[0.9,1]']
 		elseif item.fProgress >= 0.7 then
@@ -284,11 +284,11 @@ local function Base_MonToView(mon, info, item, KObject, config, tMonExist, tMonL
 	if item.szExtentAnimate == EXTENT_ANIMATE.NONE and item.bActive and mon.szExtentAnimate then
 		item.szExtentAnimate = mon.szExtentAnimate
 	end
-	if not config.bCdCircle then
+	if not dataset.bCdCircle then
 		item.bCd = false
 	end
 	if info and info.bCool then
-		if tMonLast and not tMonLast[mon.szUUID] and config.bPlaySound and mon.aSoundAppear then
+		if tMonLast and not tMonLast[mon.szUUID] and dataset.bPlaySound and mon.aSoundAppear then
 			local dwSoundID = X.RandomChild(mon.aSoundAppear)
 			if dwSoundID then
 				local szSoundPath = X.GetSoundPath(dwSoundID)
@@ -305,14 +305,14 @@ local function Buff_MonVisible(mon, dwTarKungfuID)
 	return Base_MonVisible(mon, dwTarKungfuID)
 end
 -- BUFF：监控项匹配 BUFF 对象
-local function Buff_MonMatch(tAllBuff, mon, config)
+local function Buff_MonMatch(tAllBuff, mon, dataset)
 	local dwClientID, dwControlID = X.GetClientPlayerID(), X.GetControlPlayerID()
 	local tBuff = tAllBuff[mon.dwID]
 	if tBuff then
 		for _, buff in pairs(tBuff) do
 			if buff and buff.bCool then
 				if (
-					not config.bHideOthers == not mon.bFlipHideOthers
+					not dataset.bHideOthers == not mon.bFlipHideOthers
 					or buff.dwSkillSrcID == dwClientID
 					or buff.dwSkillSrcID == dwControlID
 				)
@@ -326,7 +326,7 @@ local function Buff_MonMatch(tAllBuff, mon, config)
 	end
 end
 -- BUFF：监控项转视图数据
-local function Buff_MonToView(mon, buff, item, KObject, config, tMonExist, tMonLast)
+local function Buff_MonToView(mon, buff, item, KObject, dataset, tMonExist, tMonLast)
 	if buff and buff.bCool then
 		local nTimeLeft = buff.nLeft * 0.0625
 		if not BUFF_TIME[KObject.dwID] then
@@ -366,21 +366,21 @@ local function Buff_MonToView(mon, buff, item, KObject, config, tMonExist, tMonL
 		item.szContent = X.IsEmpty(mon.szContent) and X.GetBuffName(mon.dwID, mon.nLevel) or mon.szContent
 	end
 	item.aContentColor = mon.aContentColor or DEFAULT_CONTENT_COLOR
-	Base_MonToView(mon, buff, item, KObject, config, tMonExist, tMonLast)
+	Base_MonToView(mon, buff, item, KObject, dataset, tMonExist, tMonLast)
 end
 -- 技能：判断监控项是否显示
 local function Skill_ShowMon(mon, dwTarKungfuID)
 	return Base_MonVisible(mon, dwTarKungfuID)
 end
 -- 技能：监控项匹配 BUFF 对象
-local function Skill_MatchMon(tSkill, mon, config)
+local function Skill_MatchMon(tSkill, mon, dataset)
 	local skill = tSkill[mon.dwID]
 	if skill and (mon.nLevel == 0 or mon.nLevel == skill.nLevel) then
 		return skill
 	end
 end
 -- 技能：监控项转视图数据
-local function Skill_MonToView(mon, skill, item, KObject, config, tMonExist, tMonLast)
+local function Skill_MonToView(mon, skill, item, KObject, dataset, tMonExist, tMonLast)
 	if skill and skill.bCool then
 		if not item.nIconID then
 			item.nIconID = skill.nIcon
@@ -418,16 +418,16 @@ local function Skill_MonToView(mon, skill, item, KObject, config, tMonExist, tMo
 		or 0
 	item.szStackNum = nStackNum > 0 and nStackNum or ''
 	item.aContentColor = mon.aContentColor or DEFAULT_CONTENT_COLOR
-	Base_MonToView(mon, skill, item, KObject, config, tMonExist, tMonLast)
+	Base_MonToView(mon, skill, item, KObject, dataset, tMonExist, tMonLast)
 end
 local UpdateView
 do
 local fUIScale, fFontScaleBase
 function UpdateView()
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
-	for _, config in ipairs(D.GetDatasetList()) do
-		if config.bEnable then
-			local dwTarType, dwTarID = D.GetTarget(config.szTarget, config.szType)
+	for _, dataset in ipairs(D.GetDatasetList()) do
+		if dataset.bEnable then
+			local dwTarType, dwTarID = D.GetTarget(dataset.szTarget, dataset.szType)
 			local KObject = X.GetObject(dwTarType, dwTarID)
 			local dwTarKungfuID = KObject
 				and (dwTarType == TARGET.PLAYER
@@ -440,33 +440,33 @@ function UpdateView()
 				view = {}
 				VIEW_LIST[nViewIndex] = view
 			end
-			fUIScale = (config.bIgnoreSystemUIScale and 1 or Station.GetUIScale()) * config.fScale
-			fFontScaleBase = fUIScale * X.GetFontScale() * config.fScale
-			view.szUUID               = config.szUUID
-			view.szType               = config.szType
-			view.szTarget             = config.szTarget
-			view.szCaption            = MY_TargetMonConfig.GetDatasetTitle(config)
-			view.tAnchor              = config.tAnchor
-			view.bIgnoreSystemUIScale = config.bIgnoreSystemUIScale
+			fUIScale = (dataset.bIgnoreSystemUIScale and 1 or Station.GetUIScale()) * dataset.fScale
+			fFontScaleBase = fUIScale * X.GetFontScale() * dataset.fScale
+			view.szUUID               = dataset.szUUID
+			view.szType               = dataset.szType
+			view.szTarget             = dataset.szTarget
+			view.szCaption            = MY_TargetMonConfig.GetDatasetTitle(dataset)
+			view.tAnchor              = dataset.tAnchor
+			view.bIgnoreSystemUIScale = dataset.bIgnoreSystemUIScale
 			view.fUIScale             = fUIScale
-			view.fIconFontScale       = fFontScaleBase * config.fIconFontScale
-			view.fOtherFontScale      = fFontScaleBase * config.fOtherFontScale
-			view.bPenetrable          = config.bPenetrable
-			view.bDraggable           = config.bDraggable
-			view.szAlignment          = config.szAlignment
-			view.nMaxLineCount        = config.nMaxLineCount
-			view.bCdCircle            = config.bCdCircle
-			view.bCdFlash             = config.bCdFlash
-			view.bCdReadySpark        = config.bCdReadySpark
-			view.bCdBar               = config.bCdBar
-			view.nCdBarWidth          = config.nCdBarWidth
-			-- view.playSound         = config.bPlaySound
-			view.szCdBarUITex         = config.szCdBarUITex
-			view.szBoxBgUITex         = config.szBoxBgUITex
+			view.fIconFontScale       = fFontScaleBase * dataset.fIconFontScale
+			view.fOtherFontScale      = fFontScaleBase * dataset.fOtherFontScale
+			view.bPenetrable          = dataset.bPenetrable
+			view.bDraggable           = dataset.bDraggable
+			view.szAlignment          = dataset.szAlignment
+			view.nMaxLineCount        = dataset.nMaxLineCount
+			view.bCdCircle            = dataset.bCdCircle
+			view.bCdFlash             = dataset.bCdFlash
+			view.bCdReadySpark        = dataset.bCdReadySpark
+			view.bCdBar               = dataset.bCdBar
+			view.nCdBarWidth          = dataset.nCdBarWidth
+			-- view.playSound         = dataset.bPlaySound
+			view.szCdBarUITex         = dataset.szCdBarUITex
+			view.szBoxBgUITex         = dataset.szBoxBgUITex
 			local tMonGroupFallbackUUID = view.tMonGroupFallbackUUID
 			if not tMonGroupFallbackUUID then
 				tMonGroupFallbackUUID = {}
-				for _, mon in ipairs(config.aMonitor) do
+				for _, mon in ipairs(dataset.aMonitor) do
 					if mon.szGroup then
 						tMonGroupFallbackUUID[mon.szGroup] = mon.szUUID
 					end
@@ -484,13 +484,13 @@ function UpdateView()
 				view.aItem = aItem
 			end
 			local nItemIndex, nItemCount = 1, #aItem
-			local tMonExist, tMonLast = {}, MON_EXIST_CACHE[config.szUUID]
-			if config.szType == 'BUFF' then
+			local tMonExist, tMonLast = {}, MON_EXIST_CACHE[dataset.szUUID]
+			if dataset.szType == 'BUFF' then
 				local tBuff = KObject and BUFF_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
-				for _, mon in ipairs(config.aMonitor) do
+				for _, mon in ipairs(dataset.aMonitor) do
 					if Buff_MonVisible(mon, dwTarKungfuID) then
 						-- 通过监控项生成视图列表
-						local buff = Buff_MonMatch(tBuff, mon, config)
+						local buff = Buff_MonMatch(tBuff, mon, dataset)
 						if mon.szGroup and (
 							tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
 							or tMonGroupActiveUUID[mon.szGroup] == tMonGroupFallbackUUID[mon.szGroup]
@@ -507,13 +507,13 @@ function UpdateView()
 								)
 							)
 						)
-						and ((buff and buff.bCool) or not config.bHideVoid == not mon.bFlipHideVoid) then
+						and ((buff and buff.bCool) or not dataset.bHideVoid == not mon.bFlipHideVoid) then
 							local item = aItem[nItemIndex]
 							if not item then
 								item = {}
 								aItem[nItemIndex] = item
 							end
-							Buff_MonToView(mon, buff, item, KObject, config, tMonExist, tMonLast)
+							Buff_MonToView(mon, buff, item, KObject, dataset, tMonExist, tMonLast)
 							if mon.szGroup then
 								tMonGroupActiveUUID[mon.szGroup] = mon.szUUID
 							end
@@ -521,12 +521,12 @@ function UpdateView()
 						end
 					end
 				end
-			elseif config.szType == 'SKILL' then
+			elseif dataset.szType == 'SKILL' then
 				local tSkill = KObject and SKILL_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
-				for _, mon in ipairs(config.aMonitor) do
+				for _, mon in ipairs(dataset.aMonitor) do
 					if Skill_ShowMon(mon, dwTarKungfuID) then
 						-- 通过监控项生成视图列表
-						local skill = Skill_MatchMon(tSkill, mon, config)
+						local skill = Skill_MatchMon(tSkill, mon, dataset)
 						if mon.szGroup and (
 							tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
 							or tMonGroupActiveUUID[mon.szGroup] == tMonGroupFallbackUUID[mon.szGroup]
@@ -543,7 +543,7 @@ function UpdateView()
 								)
 							)
 						)
-						and (skill and skill.bCool) or not config.bHideVoid == not mon.bFlipHideVoid then
+						and (skill and skill.bCool) or not dataset.bHideVoid == not mon.bFlipHideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
 								item = {}
@@ -552,7 +552,7 @@ function UpdateView()
 							if mon.szGroup then
 								tMonGroupActiveUUID[mon.szGroup] = mon.szUUID
 							end
-							Skill_MonToView(mon, skill, item, KObject, config, tMonExist, tMonLast)
+							Skill_MonToView(mon, skill, item, KObject, dataset, tMonExist, tMonLast)
 							nItemIndex = nItemIndex + 1
 						end
 					end
@@ -563,7 +563,7 @@ function UpdateView()
 			end
 			if tMonLast then
 				for uuid, mon in pairs(tMonLast) do
-					if not tMonExist[uuid] and config.bPlaySound and mon.aSoundDisappear then
+					if not tMonExist[uuid] and dataset.bPlaySound and mon.aSoundDisappear then
 						local dwSoundID = X.RandomChild(mon.aSoundDisappear)
 						if dwSoundID then
 							local szSoundPath = X.GetSoundPath(dwSoundID)
@@ -574,7 +574,7 @@ function UpdateView()
 					end
 				end
 			end
-			MON_EXIST_CACHE[config.szUUID] = tMonExist
+			MON_EXIST_CACHE[dataset.szUUID] = tMonExist
 			nViewIndex = nViewIndex + 1
 		end
 	end
@@ -588,12 +588,12 @@ end
 local function OnFrameCall()
 	local tExistBuffMonitorTargetType = {}
 	local tExistSkillMonitorTargetType = {}
-	for _, config in ipairs(MY_TargetMonConfig.GetDatasetList()) do
-		if config.bEnable then
-			if config.szType == 'BUFF' then
-				tExistBuffMonitorTargetType[config.szTarget] = true
-			elseif config.szType == 'SKILL' then
-				tExistSkillMonitorTargetType[config.szTarget] = true
+	for _, dataset in ipairs(MY_TargetMonConfig.GetDatasetList()) do
+		if dataset.bEnable then
+			if dataset.szType == 'BUFF' then
+				tExistBuffMonitorTargetType[dataset.szTarget] = true
+			elseif dataset.szType == 'SKILL' then
+				tExistSkillMonitorTargetType[dataset.szTarget] = true
 			end
 		end
 	end

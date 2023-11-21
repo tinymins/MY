@@ -29,12 +29,12 @@ local CUSTOM_BOX_EXTENT_ANIMATE = {
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 
 function D.Open(szConfigUUID, szMonitorUUID)
-	local config = MY_TargetMonConfig.GetDataset(szConfigUUID)
-	if not config then
+	local dataset = MY_TargetMonConfig.GetDataset(szConfigUUID)
+	if not dataset then
 		return
 	end
 	local mon
-	for _, m in ipairs(config.aMonitor) do
+	for _, m in ipairs(dataset.aMonitor) do
 		if m.szUUID == szMonitorUUID then
 			mon = m
 		end
@@ -64,7 +64,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 				fnAction = function()
 					X.UI.OpenIconPicker(function(nIconID)
 						mon.nIconID = nIconID
-						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 						box:SetObjectIcon(nIconID)
 					end)
 				end,
@@ -76,7 +76,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 				t1.nMouseOverFrame = 87
 				t1.fnClickIcon = function()
 					mon.nIconID = nil
-					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 					box:SetObjectIcon(MY_TargetMonConfig.DEFAULT_MONITOR_ICON_ID)
 				end
 			end
@@ -105,7 +105,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		checked = mon.bEnable,
 		onCheck = function(bChecked)
 			mon.bEnable = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 		end,
 	}):Width() + 5
 	nY = nY + nDeltaY
@@ -123,7 +123,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			local nValue = tonumber(val)
 			if nValue then
 				mon.dwID = nValue
-				FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+				FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 			end
 		end,
 	}):Width() + 5
@@ -139,12 +139,12 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			local nValue = tonumber(val)
 			if nValue then
 				mon.nLevel = nValue
-				FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+				FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 			end
 		end,
 	}):Width() + 5
 	-- 层数
-	if config.szType == 'BUFF' then
+	if dataset.szType == 'BUFF' then
 		nX = nX + uiWnd:Append('Text', {
 			x = nX, y = nY - 3, w = 'auto',
 			text = _L['Monitor StackNum'],
@@ -156,7 +156,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 				local nValue = tonumber(val)
 				if nValue then
 					mon.nStackNum = nValue
-					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 				end
 			end,
 		}):Width() + 5
@@ -174,7 +174,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		text = mon.szNote,
 		onChange = function(val)
 			mon.szNote = val
-			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 		end,
 	}):Width() + 5
 	nY = nY + nDeltaY
@@ -190,7 +190,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		x = nX, y = nY, w = 180, h = 22,
 		onChange = function(szText)
 			mon.szContent = szText
-			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 		end,
 		onClick = function()
 			if IsPopupMenuOpened() then
@@ -206,7 +206,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		x = nX, y = nY + 1, color = mon.aContentColor or DEFAULT_CONTENT_COLOR,
 		onColorPick = function(r, g, b)
 			mon.aContentColor = {r, g, b}
-			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 		end,
 	}):Width() + 5
 	nY = nY + nDeltaY
@@ -225,7 +225,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 				szText = nil
 			end
 			mon.szGroup = szText
-			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 		end,
 		tip = {
 			render = _L['Monitor same group will only show one at the same time'],
@@ -261,7 +261,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 							mon.tKungfu = {}
 						end
 						mon.tKungfu.bAll = bChecked
-						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 					end,
 				},
 			}
@@ -277,7 +277,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 								mon.tKungfu = {}
 							end
 							mon.tKungfu[dwKungfuID] = bChecked
-							FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+							FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 						end,
 						fnDisable = function() return X.IsEmpty(mon.tKungfu) or mon.tKungfu.bAll end,
 					})
@@ -303,7 +303,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 							mon.tTargetKungfu = {}
 						end
 						mon.tTargetKungfu.bAll = bChecked
-						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 					end,
 				},
 				{
@@ -316,7 +316,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 							mon.tTargetKungfu = {}
 						end
 						mon.tTargetKungfu.bNpc = bChecked
-						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 					end,
 					fnDisable = function() return X.IsEmpty(mon.tTargetKungfu) or mon.tTargetKungfu.bAll end,
 				},
@@ -333,7 +333,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 								mon.tTargetKungfu = {}
 							end
 							mon.tTargetKungfu[dwKungfuID] = bChecked
-							FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+							FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 						end,
 						fnDisable = function() return X.IsEmpty(mon.tTargetKungfu) or mon.tTargetKungfu.bAll end,
 					})
@@ -354,7 +354,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 						mon.tMap = {}
 					end
 					mon.tMap[p.dwID] = not mon.tMap[p.dwID]
-					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 				end,
 				tChecked = mon.tMap,
 			})
@@ -370,7 +370,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 						mon.tMap = {}
 					end
 					mon.tMap.bAll = bChecked
-					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 				end,
 			})
 			return menu
@@ -379,24 +379,24 @@ function D.Open(szConfigUUID, szMonitorUUID)
 
 	-- 隐藏消失的
 	nX = nX + uiWnd:Append('WndCheckBox', {
-		w = 'auto', h = 25, text = config.bHideVoid and _L['Monitor Show Even Void'] or _L['Monitor Hide If Void'],
+		w = 'auto', h = 25, text = dataset.bHideVoid and _L['Monitor Show Even Void'] or _L['Monitor Hide If Void'],
 		x = nX, y = nY,
 		checked = mon.bFlipHideVoid,
 		onCheck = function(bChecked)
 			mon.bFlipHideVoid = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 		end,
 	}):Width() + 5
 
 	-- 隐藏他人的
-	if config.szType == 'BUFF' then
+	if dataset.szType == 'BUFF' then
 		nX = nX + uiWnd:Append('WndCheckBox', {
-			w = 'auto', h = 25, text = config.bHideOthers and _L['Monitor Show Even Others'] or _L['Monitor Hide If Others'],
+			w = 'auto', h = 25, text = dataset.bHideOthers and _L['Monitor Show Even Others'] or _L['Monitor Hide If Others'],
 			x = nX, y = nY,
 			checked = mon.bFlipHideOthers,
 			onCheck = function(bChecked)
 				mon.bFlipHideOthers = bChecked
-				FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+				FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 			end,
 		}):Width() + 5
 	end
@@ -433,7 +433,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					else
 						table.insert(mon.aSoundAppear, dwID)
 					end
-					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 				end,
 				mon.aSoundAppear and X.ArrayToObject(mon.aSoundAppear) or {},
 				true
@@ -461,7 +461,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					else
 						table.insert(mon.aSoundDisappear, dwID)
 					end
-					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 				end,
 				mon.aSoundDisappear and X.ArrayToObject(mon.aSoundDisappear) or {},
 				true
@@ -483,7 +483,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					bChecked = p[1] == mon.szExtentAnimate,
 					fnAction = function()
 						mon.szExtentAnimate = p[1]
-						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 					end,
 					nIconMarginLeft = -3,
 					nIconMarginRight = -3,
@@ -507,12 +507,12 @@ function D.Open(szConfigUUID, szMonitorUUID)
 		color = { 255, 0, 0 },
 		buttonStyle = 'FLAT',
 		onClick = function()
-			X.Confirm(_L['Sure to delete config? This operation can not be undone.'], function()
-				for i, v in X.ipairs_r(config.aMonitor) do
+			X.Confirm(_L['Sure to delete monitor? This operation can not be undone.'], function()
+				for i, v in X.ipairs_r(dataset.aMonitor) do
 					if v == mon then
-						table.remove(config.aMonitor, i)
+						table.remove(dataset.aMonitor, i)
 						MY_TargetMon_MonitorPanel.Close()
-						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', config.szUUID)
+						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 						return
 					end
 				end

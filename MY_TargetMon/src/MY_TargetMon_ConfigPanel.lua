@@ -99,8 +99,8 @@ local CUSTOM_CD_BAR_STYLES = {
 }
 
 function D.Open(szConfigUUID)
-	local config = MY_TargetMonConfig.GetDataset(szConfigUUID)
-	if not config then
+	local dataset = MY_TargetMonConfig.GetDataset(szConfigUUID)
+	if not dataset then
 		return
 	end
 	local ui = X.UI.CreateFrame('MY_TargetMon_ConfigPanel', {
@@ -119,9 +119,9 @@ function D.Open(szConfigUUID)
 	}):Width() + 5
 	nX = nX + uiWnd:Append('WndEditBox', {
 		x = nX, y = nY, w = 220, h = 22,
-		r = 255, g = 255, b = 0, text = config.szTitle,
+		r = 255, g = 255, b = 0, text = dataset.szTitle,
 		onChange = function(val)
-			config.szTitle = val
+			dataset.szTitle = val
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
 	}):Width() + 5
@@ -132,9 +132,9 @@ function D.Open(szConfigUUID)
 	}):Width() + 5
 	nX = nX + uiWnd:Append('WndEditBox', {
 		x = nX, y = nY, w = 180, h = 22,
-		r = 255, g = 255, b = 0, text = config.szAuthor,
+		r = 255, g = 255, b = 0, text = dataset.szAuthor,
 		onChange = function(val)
-			config.szAuthor = val
+			dataset.szAuthor = val
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
 	}):Width() + 5
@@ -145,9 +145,9 @@ function D.Open(szConfigUUID)
 	}):Width() + 5
 	nX = nX + uiWnd:Append('WndEditBox', {
 		x = nX, y = nY, w = 120, h = 22,
-		r = 255, g = 255, b = 0, text = config.szVersion,
+		r = 255, g = 255, b = 0, text = dataset.szVersion,
 		onChange = function(val)
-			config.szVersion = val
+			dataset.szVersion = val
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
 	}):Width() + 5
@@ -158,9 +158,9 @@ function D.Open(szConfigUUID)
 	uiWnd:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Enable'],
-		checked = config.bEnable,
+		checked = dataset.bEnable,
 		onCheck = function(bChecked)
-			config.bEnable = bChecked
+			dataset.bEnable = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
 	})
@@ -172,25 +172,25 @@ function D.Open(szConfigUUID)
 			render = _L['Hide others buff TIP'],
 			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
-		checked = config.bHideOthers,
+		checked = dataset.bHideOthers,
 		onCheck = function(bChecked)
-			config.bHideOthers = bChecked
+			dataset.bHideOthers = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
 		autoEnable = function()
-			return config.bEnable and config.szType == 'BUFF'
+			return dataset.bEnable and dataset.szType == 'BUFF'
 		end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = nX + 180, y = nY, w = 180,
 		text = _L['Hide void'],
-		checked = config.bHideVoid,
+		checked = dataset.bHideVoid,
 		onCheck = function(bChecked)
-			config.bHideVoid = bChecked
+			dataset.bHideVoid = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	nY = nY + nDeltaY
 
@@ -198,34 +198,34 @@ function D.Open(szConfigUUID)
 	uiWnd:Append('WndCheckBox', {
 		x = nX, y = nY, w = 90,
 		text = _L['Penetrable'],
-		checked = config.bPenetrable,
+		checked = dataset.bPenetrable,
 		onCheck = function(bChecked)
-			config.bPenetrable = bChecked
+			dataset.bPenetrable = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = nX + 90, y = nY, w = 100,
 		text = _L['Undragable'],
-		checked = not config.bDraggable,
+		checked = not dataset.bDraggable,
 		onCheck = function(bChecked)
-			config.bDraggable = not bChecked
+			dataset.bDraggable = not bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable and not config.bPenetrable end,
+		autoEnable = function() return dataset.bEnable and not dataset.bPenetrable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = nX + 180, y = nY, w = 120,
 		text = _L['Ignore system ui scale'],
-		checked = config.bIgnoreSystemUIScale,
+		checked = dataset.bIgnoreSystemUIScale,
 		onCheck = function(bChecked)
-			config.bIgnoreSystemUIScale = bChecked
+			dataset.bIgnoreSystemUIScale = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	nY = nY + nDeltaY
 
@@ -233,34 +233,34 @@ function D.Open(szConfigUUID)
 	uiWnd:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['Show cd circle'],
-		checked = config.bCdCircle,
+		checked = dataset.bCdCircle,
 		onCheck = function(bChecked)
-			config.bCdCircle = bChecked
+			dataset.bCdCircle = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = nX + 90, y = nY, w = 200,
 		text = _L['Show cd flash'],
-		checked = config.bCdFlash,
+		checked = dataset.bCdFlash,
 		onCheck = function(bChecked)
-			config.bCdFlash = bChecked
+			dataset.bCdFlash = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = nX + 180, y = nY, w = 200,
 		text = _L['Show cd ready spark'],
-		checked = config.bCdReadySpark,
+		checked = dataset.bCdReadySpark,
 		onCheck = function(bChecked)
-			config.bCdReadySpark = bChecked
+			dataset.bCdReadySpark = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable and not config.bHideVoid end,
+		autoEnable = function() return dataset.bEnable and not dataset.bHideVoid end,
 	})
 	nY = nY + nDeltaY
 
@@ -268,34 +268,34 @@ function D.Open(szConfigUUID)
 	uiWnd:Append('WndCheckBox', {
 		x = nX, y = nY, w = 120,
 		text = _L['Show cd bar'],
-		checked = config.bCdBar,
+		checked = dataset.bCdBar,
 		onCheck = function(bChecked)
-			config.bCdBar = bChecked
+			dataset.bCdBar = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = nX + 90, y = nY, w = 120,
 		text = _L['Show name'],
-		checked = config.bShowName,
+		checked = dataset.bShowName,
 		onCheck = function(bChecked)
-			config.bShowName = bChecked
+			dataset.bShowName = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 
 	uiWnd:Append('WndCheckBox', {
 		x = nX + 180, y = nY, w = 120,
 		text = _L['Show time'],
-		checked = config.bShowTime,
+		checked = dataset.bShowTime,
 		onCheck = function(bChecked)
-			config.bShowTime = bChecked
+			dataset.bShowTime = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	nY = nY + nDeltaY
 
@@ -303,12 +303,12 @@ function D.Open(szConfigUUID)
 	uiWnd:Append('WndCheckBox', {
 		x = nX, y = nY, w = 90,
 		text = _L['Play sound'],
-		checked = config.bPlaySound,
+		checked = dataset.bPlaySound,
 		onCheck = function(bChecked)
-			config.bPlaySound = bChecked
+			dataset.bPlaySound = bChecked
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 
 	uiWnd:Append('WndComboBox', {
@@ -321,7 +321,7 @@ function D.Open(szConfigUUID)
 				t1 = {
 					szOption = p[2] or p[1],
 					fnAction = function()
-						config.szBoxBgUITex = p[1]
+						dataset.szBoxBgUITex = p[1]
 						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 						X.UI.ClosePopupMenu()
 					end,
@@ -332,7 +332,7 @@ function D.Open(szConfigUUID)
 					szLayer = 'ICON_RIGHTMOST',
 					bCheck = true, bMCheck = true,
 				}
-				if p[1] == config.bBoxBgUITex then
+				if p[1] == dataset.bBoxBgUITex then
 					t1.rgb = {255, 255, 0}
 					t1.bChecked = true
 				end
@@ -340,7 +340,7 @@ function D.Open(szConfigUUID)
 			end
 			return t
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	uiWnd:Append('WndComboBox', {
 		x = nX + 90 + 100, y = nY, w = 100,
@@ -352,7 +352,7 @@ function D.Open(szConfigUUID)
 				t1 = {
 					szOption = text,
 					fnAction = function()
-						config.szCdBarUITex = text
+						dataset.szCdBarUITex = text
 						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 						X.UI.ClosePopupMenu()
 					end,
@@ -361,7 +361,7 @@ function D.Open(szConfigUUID)
 					szLayer = 'ICON_FILL',
 					bCheck = true, bMCheck = true,
 				}
-				if string.lower(text) == string.lower(config.szCdBarUITex) then
+				if string.lower(text) == string.lower(dataset.szCdBarUITex) then
 					t1.rgb = {255, 255, 0}
 					t1.bChecked = true
 				end
@@ -369,7 +369,7 @@ function D.Open(szConfigUUID)
 			end
 			return t
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	nY = nY + 30
 
@@ -385,12 +385,12 @@ function D.Open(szConfigUUID)
 				table.insert(t, {
 					szOption = _L.TARGET[eType],
 					bCheck = true, bMCheck = true,
-					bChecked = eType == (config.szType == 'SKILL' and 'CONTROL_PLAYER' or config.szTarget),
+					bChecked = eType == (dataset.szType == 'SKILL' and 'CONTROL_PLAYER' or dataset.szTarget),
 					fnDisable = function()
-						return config.szType == 'SKILL' and eType ~= 'CONTROL_PLAYER'
+						return dataset.szType == 'SKILL' and eType ~= 'CONTROL_PLAYER'
 					end,
 					fnAction = function()
-						config.szTarget = eType
+						dataset.szTarget = eType
 						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 					end,
 				})
@@ -399,9 +399,9 @@ function D.Open(szConfigUUID)
 			for _, eType in ipairs({'BUFF', 'SKILL'}) do
 				table.insert(t, {
 					szOption = _L.TYPE[eType],
-					bCheck = true, bMCheck = true, bChecked = eType == config.szType,
+					bCheck = true, bMCheck = true, bChecked = eType == dataset.szType,
 					fnAction = function()
-						config.szType = eType
+						dataset.szType = eType
 						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 					end,
 				})
@@ -410,16 +410,16 @@ function D.Open(szConfigUUID)
 			for _, eType in ipairs({'LEFT', 'RIGHT', 'CENTER'}) do
 				table.insert(t, {
 					szOption = _L.ALIGNMENT[eType],
-					bCheck = true, bMCheck = true, bChecked = eType == config.szAlignment,
+					bCheck = true, bMCheck = true, bChecked = eType == dataset.szAlignment,
 					fnAction = function()
-						config.szAlignment = eType
+						dataset.szAlignment = eType
 						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 					end,
 				})
 			end
 			return t
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	nY = nY + 24
 
@@ -427,13 +427,13 @@ function D.Open(szConfigUUID)
 		x = xr, y = nY,
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 32},
-		value = config.nMaxLineCount,
+		value = dataset.nMaxLineCount,
 		textFormatter = function(val) return _L('Display %d eachline.', val) end,
 		onChange = function(val)
-			config.nMaxLineCount = val
+			dataset.nMaxLineCount = val
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	nY = nY + nDeltaY
 
@@ -441,13 +441,13 @@ function D.Open(szConfigUUID)
 		x = xr, y = nY,
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
-		value = config.fScale * 100,
+		value = dataset.fScale * 100,
 		textFormatter = function(val) return _L('UI scale %d%%.', val) end,
 		onChange = function(val)
-			config.fScale = val / 100
+			dataset.fScale = val / 100
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	nY = nY + nDeltaY
 
@@ -455,13 +455,13 @@ function D.Open(szConfigUUID)
 		x = xr, y = nY,
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
-		value = config.fIconFontScale * 100,
+		value = dataset.fIconFontScale * 100,
 		textFormatter = function(val) return _L('Icon font scale %d%%.', val) end,
 		onChange = function(val)
-			config.fIconFontScale = val / 100
+			dataset.fIconFontScale = val / 100
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	nY = nY + nDeltaY
 
@@ -469,13 +469,13 @@ function D.Open(szConfigUUID)
 		x = xr, y = nY,
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {1, 300},
-		value = config.fOtherFontScale * 100,
+		value = dataset.fOtherFontScale * 100,
 		textFormatter = function(val) return _L('Other font scale %d%%.', val) end,
 		onChange = function(val)
-			config.fOtherFontScale = val / 100
+			dataset.fOtherFontScale = val / 100
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	nY = nY + nDeltaY
 
@@ -483,13 +483,13 @@ function D.Open(szConfigUUID)
 		x = xr, y = nY,
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {50, 1000},
-		value = config.nCdBarWidth,
+		value = dataset.nCdBarWidth,
 		textFormatter = function(val) return _L('CD width %dpx.', val) end,
 		onChange = function(val)
-			config.nCdBarWidth = val
+			dataset.nCdBarWidth = val
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	nY = nY + nDeltaY
 
@@ -497,7 +497,7 @@ function D.Open(szConfigUUID)
 		x = xr, y = nY,
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		range = {-1, 30},
-		value = config.nDecimalTime,
+		value = dataset.nDecimalTime,
 		textFormatter = function(val)
 			if val == -1 then
 				return _L['Always show decimal time.']
@@ -508,10 +508,10 @@ function D.Open(szConfigUUID)
 			end
 		end,
 		onChange = function(val)
-			config.nDecimalTime = val
+			dataset.nDecimalTime = val
 			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 		end,
-		autoEnable = function() return config.bEnable end,
+		autoEnable = function() return dataset.bEnable end,
 	})
 	nY = nY + nDeltaY
 
@@ -524,7 +524,7 @@ function D.Open(szConfigUUID)
 		color = { 255, 0, 0 },
 		buttonStyle = 'FLAT',
 		onClick = function()
-			X.Confirm(_L['Sure to delete config? This operation can not be undone.'], function()
+			X.Confirm(_L['Sure to delete monitor? This operation can not be undone.'], function()
 				MY_TargetMonConfig.DeleteDataset(szConfigUUID)
 				MY_TargetMon_ConfigPanel.Close()
 			end)

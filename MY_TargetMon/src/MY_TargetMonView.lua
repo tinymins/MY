@@ -45,9 +45,9 @@ function D.SaveAnchor(frame)
 		tAnchor.x = tAnchor.x * fRelativeScale
 		tAnchor.y = tAnchor.y * fRelativeScale
 	end
-	local config = MY_TargetMonConfig.GetDataset(frame.tViewData.szUUID)
-	if config then
-		config.tAnchor = tAnchor
+	local dataset = MY_TargetMonConfig.GetDataset(frame.tViewData.szUUID)
+	if dataset then
+		dataset.tAnchor = tAnchor
 		FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 	end
 end

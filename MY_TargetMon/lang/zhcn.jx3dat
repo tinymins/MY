@@ -167,7 +167,7 @@ return {
     ['Author:'] = '作者：',
     ['Version:'] = '版本：',
     ['New target mon dataset'] = '新建目标监控',
-    ['Sure to delete config? This operation can not be undone.'] = '您确定要删除该数据吗？数据删除操作确认后无法撤销。',
+    ['Sure to delete monitor? This operation can not be undone.'] = '您确定要删除该数据吗？数据删除操作确认后无法撤销。',
 
     -- MY_TargetMon_MonitorPanel.lua
     ['MY_TargetMon_MonitorPanel'] = '目标监控条目设置面板',

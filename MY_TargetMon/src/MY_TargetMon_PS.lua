@@ -339,7 +339,7 @@ function D.OnItemRButtonClick()
 			szOption = _L['Delete'],
 			rgb = { 255, 0, 0 },
 			fnAction = function()
-				X.Confirm(_L['Sure to delete config? This operation can not be undone.'], function()
+				X.Confirm(_L['Sure to delete monitor? This operation can not be undone.'], function()
 					MY_TargetMonConfig.DeleteDataset(config.szUUID)
 				end)
 			end,
