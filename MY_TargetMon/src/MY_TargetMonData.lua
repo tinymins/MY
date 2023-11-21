@@ -214,14 +214,14 @@ local EXTENT_ANIMATE = {
 }
 local MON_EXIST_CACHE = {}
 -- 通用：判断监控项是否显示
-local function Base_ShowMon(mon, dwTarKungfuID)
+local function Base_MonVisible(mon, dwTarKungfuID)
 	if not X.IsEmpty(mon.tTargetKungfu) and not mon.tTargetKungfu.bAll and not mon.tTargetKungfu[dwTarKungfuID] then
 		return
 	end
 	return true
 end
 -- 通用：监控项转视图数据
-local function Base_MonToView(mon, info, item, KObject, nIconID, config, tMonExist, tMonLast)
+local function Base_MonToView(mon, info, item, KObject, config, tMonExist, tMonLast)
 	-- 格式化完善视图列表信息
 	if config.bShowTime and item.bCd and item.nTimeLeft and item.nTimeLeft > 0 then
 		if config.bCdBar then
@@ -301,11 +301,11 @@ local function Base_MonToView(mon, info, item, KObject, nIconID, config, tMonExi
 	end
 end
 -- BUFF：判断监控项是否显示
-local function Buff_ShowMon(mon, dwTarKungfuID)
-	return Base_ShowMon(mon, dwTarKungfuID)
+local function Buff_MonVisible(mon, dwTarKungfuID)
+	return Base_MonVisible(mon, dwTarKungfuID)
 end
 -- BUFF：监控项匹配 BUFF 对象
-local function Buff_MatchMon(tAllBuff, mon, config)
+local function Buff_MonMatch(tAllBuff, mon, config)
 	local dwClientID, dwControlID = X.GetClientPlayerID(), X.GetControlPlayerID()
 	local tBuff = tAllBuff[mon.dwID]
 	if tBuff then
@@ -319,21 +319,15 @@ local function Buff_MatchMon(tAllBuff, mon, config)
 				and (not D.IsShieldedBuff(buff.dwID, buff.nLevel))
 				and (mon.nLevel == 0 or mon.nLevel == buff.nLevel)
 				and (not mon.nStackNum or mon.nStackNum == 0 or mon.nStackNum == buff.nStackNum) then
-					return buff, mon.nIconID ~= 13 and mon.nIconID or buff.nIcon or 13
+					return buff
 				end
 			end
 		end
 	end
 end
 -- BUFF：监控项转视图数据
-local function Buff_MonToView(mon, buff, item, KObject, nIconID, config, tMonExist, tMonLast)
-	if nIconID then
-		item.nIconID = nIconID
-	end
+local function Buff_MonToView(mon, buff, item, KObject, config, tMonExist, tMonLast)
 	if buff and buff.bCool then
-		if not item.nIconID then
-			item.nIconID = buff.nIcon
-		end
 		local nTimeLeft = buff.nLeft * 0.0625
 		if not BUFF_TIME[KObject.dwID] then
 			BUFF_TIME[KObject.dwID] = {}
@@ -354,6 +348,7 @@ local function Buff_MonToView(mon, buff, item, KObject, nIconID, config, tMonExi
 		item.nTimeLeft = nTimeLeft
 		item.szStackNum = buff.nStackNum > 1 and buff.nStackNum or ''
 		item.nTimeTotal = nTimeTotal
+		item.nIconID = mon.nIconID ~= 13 and mon.nIconID or buff.nIcon
 		item.szContent = X.IsEmpty(mon.szContent) and X.GetBuffName(buff.dwID, buff.nLevel) or mon.szContent
 	else
 		item.bActive = false
@@ -366,29 +361,26 @@ local function Buff_MonToView(mon, buff, item, KObject, nIconID, config, tMonExi
 		item.bSparking = true
 		item.dwID = mon.dwID
 		item.nLevel = mon.nLevel
-		item.nIconID = mon.nIconID
+		item.nIconID = mon.nIconID ~= 13 and mon.nIconID or X.GetBuffIconID(item.dwID, item.nLevel == 0 and 1 or item.nLevel)
 		item.szStackNum = ''
 		item.szContent = X.IsEmpty(mon.szContent) and X.GetBuffName(mon.dwID, mon.nLevel) or mon.szContent
 	end
 	item.aContentColor = mon.aContentColor or DEFAULT_CONTENT_COLOR
-	Base_MonToView(mon, buff, item, KObject, nIconID, config, tMonExist, tMonLast)
+	Base_MonToView(mon, buff, item, KObject, config, tMonExist, tMonLast)
 end
 -- 技能：判断监控项是否显示
 local function Skill_ShowMon(mon, dwTarKungfuID)
-	return Base_ShowMon(mon, dwTarKungfuID)
+	return Base_MonVisible(mon, dwTarKungfuID)
 end
 -- 技能：监控项匹配 BUFF 对象
 local function Skill_MatchMon(tSkill, mon, config)
 	local skill = tSkill[mon.dwID]
 	if skill and (mon.nLevel == 0 or mon.nLevel == skill.nLevel) then
-		return skill, mon.nIconID ~= 13 and mon.nIconID or skill.nIcon or 13
+		return skill
 	end
 end
 -- 技能：监控项转视图数据
-local function Skill_MonToView(mon, skill, item, KObject, nIconID, config, tMonExist, tMonLast)
-	if nIconID then
-		item.nIconID = nIconID
-	end
+local function Skill_MonToView(mon, skill, item, KObject, config, tMonExist, tMonLast)
 	if skill and skill.bCool then
 		if not item.nIconID then
 			item.nIconID = skill.nIcon
@@ -406,6 +398,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIconID, config, tMonE
 		item.nLevel = skill.nLevel
 		item.nTimeLeft = nTimeLeft
 		item.nTimeTotal = nTimeTotal
+		item.nIconID = mon.nIconID ~= 13 and mon.nIconID or skill.nIcon
 		item.szContent = X.IsEmpty(mon.szContent) and skill.szName or mon.szContent
 	else
 		item.bActive = true
@@ -417,6 +410,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIconID, config, tMonE
 		item.bSparking = true
 		item.dwID = mon.dwID
 		item.nLevel = mon.nLevel
+		item.nIconID = mon.nIconID ~= 13 and mon.nIconID or X.GetSkillIconID(item.dwID, item.nLevel)
 		item.szContent = X.IsEmpty(mon.szContent) and X.GetSkillName(mon.dwID, mon.nLevel) or mon.szContent
 	end
 	local nStackNum = (skill and skill.nCdMaxCount > 1)
@@ -424,7 +418,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIconID, config, tMonE
 		or 0
 	item.szStackNum = nStackNum > 0 and nStackNum or ''
 	item.aContentColor = mon.aContentColor or DEFAULT_CONTENT_COLOR
-	Base_MonToView(mon, skill, item, KObject, nIconID, config, tMonExist, tMonLast)
+	Base_MonToView(mon, skill, item, KObject, config, tMonExist, tMonLast)
 end
 local UpdateView
 do
@@ -494,9 +488,9 @@ function UpdateView()
 			if config.szType == 'BUFF' then
 				local tBuff = KObject and BUFF_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
 				for _, mon in ipairs(config.aMonitor) do
-					if Buff_ShowMon(mon, dwTarKungfuID) then
+					if Buff_MonVisible(mon, dwTarKungfuID) then
 						-- 通过监控项生成视图列表
-						local buff, nIconID = Buff_MatchMon(tBuff, mon, config)
+						local buff = Buff_MonMatch(tBuff, mon, config)
 						if mon.szGroup and (
 							tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
 							or tMonGroupActiveUUID[mon.szGroup] == tMonGroupFallbackUUID[mon.szGroup]
@@ -519,7 +513,7 @@ function UpdateView()
 								item = {}
 								aItem[nItemIndex] = item
 							end
-							Buff_MonToView(mon, buff, item, KObject, nIconID, config, tMonExist, tMonLast)
+							Buff_MonToView(mon, buff, item, KObject, config, tMonExist, tMonLast)
 							if mon.szGroup then
 								tMonGroupActiveUUID[mon.szGroup] = mon.szUUID
 							end
@@ -532,7 +526,7 @@ function UpdateView()
 				for _, mon in ipairs(config.aMonitor) do
 					if Skill_ShowMon(mon, dwTarKungfuID) then
 						-- 通过监控项生成视图列表
-						local skill, nIconID = Skill_MatchMon(tSkill, mon, config)
+						local skill = Skill_MatchMon(tSkill, mon, config)
 						if mon.szGroup and (
 							tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
 							or tMonGroupActiveUUID[mon.szGroup] == tMonGroupFallbackUUID[mon.szGroup]
@@ -558,7 +552,7 @@ function UpdateView()
 							if mon.szGroup then
 								tMonGroupActiveUUID[mon.szGroup] = mon.szUUID
 							end
-							Skill_MonToView(mon, skill, item, KObject, nIconID, config, tMonExist, tMonLast)
+							Skill_MonToView(mon, skill, item, KObject, config, tMonExist, tMonLast)
 							nItemIndex = nItemIndex + 1
 						end
 					end
