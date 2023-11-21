@@ -167,7 +167,7 @@ function D.OnLButtonClick()
 				local szFile = GetOpenFileName(
 					_L['Please select data file.'],
 					'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
-					X.GetAbsolutePath({'userdata/target_mon/remote/', X.PATH_TYPE.GLOBAL})
+					X.GetAbsolutePath(MY_TargetMonConfig.REMOTE_DATA_ROOT)
 				)
 				if X.IsEmpty(szFile) then
 					return
@@ -244,7 +244,7 @@ function D.OnLButtonClick()
 		table.insert(menu, {
 			szOption = _L['Open data folder'],
 			fnAction = function()
-				local szRoot = X.GetAbsolutePath({'userdata/target_mon/remote/', X.PATH_TYPE.GLOBAL}):gsub('/', '\\')
+				local szRoot = X.GetAbsolutePath(MY_TargetMonConfig.REMOTE_DATA_ROOT):gsub('/', '\\')
 				X.OpenFolder(szRoot)
 				X.UI.OpenTextEditor(szRoot)
 				X.UI.ClosePopupMenu()

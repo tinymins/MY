@@ -31,6 +31,7 @@ local O = X.CreateUserSettingsModule('MY_TargetMon', _L['Target'], {
 local D = {
 	CONFIG_LIST = {},
 }
+local REMOTE_DATA_ROOT = X.FormatPath({'userdata/target_mon/remote/', X.PATH_TYPE.GLOBAL})
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 local DEFAULT_MONITOR_ICON_ID = 13
 
@@ -452,13 +453,12 @@ function D.ExportConfigFile(aUUID, bIndent)
 		X.Topmsg(_L['Please select at least one config to export'])
 		return
 	end
-	local szFile = X.FormatPath({
-		'userdata/target_mon/remote/'
+	local szFile = X.FormatPath(
+		REMOTE_DATA_ROOT
 			.. '{$name}@{$server}@'
 			.. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd_%hh%mm%ss')
-			.. '.{$lang}.jx3dat',
-		X.PATH_TYPE.GLOBAL,
-	})
+			.. '.{$lang}.jx3dat'
+	)
 	if bIndent then
 		X.SaveLUAData(szFile, aExport, {
 			indent = '\t',
@@ -599,6 +599,7 @@ local settings = {
 		},
 		{
 			fields = {
+				REMOTE_DATA_ROOT = REMOTE_DATA_ROOT,
 				DEFAULT_MONITOR_ICON_ID = DEFAULT_MONITOR_ICON_ID,
 				HasAncientData = D.HasAncientData,
 				ImportAncientData = D.ImportAncientData,
