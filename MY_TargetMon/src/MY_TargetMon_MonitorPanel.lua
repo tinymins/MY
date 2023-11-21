@@ -54,15 +54,39 @@ function D.Open(szConfigUUID, szMonitorUUID)
 
 	-- Í¼±ê
 	uiWnd:Append('Box', {
-		x = (nW - 50) / 2, y = nY, w = 50, h = 50, icon = mon.nIconID or 13,
+		x = (nW - 50) / 2, y = nY, w = 50, h = 50, icon = mon.nIconID or MY_TargetMonConfig.DEFAULT_MONITOR_ICON_ID,
 		onHover = function(bHover) this:SetObjectMouseOver(bHover) end,
 		onClick = function()
 			local box = this
-			X.UI.OpenIconPicker(function(nIconID)
-				mon.nIconID = nIconID
-				FireUIEvent('MY_TARGET_MON_CONFIG__MONITOR_MODIFY')
-				box:SetObjectIcon(nIconID)
-			end)
+			local menu = {}
+			local t1 = {
+				szOption = _L['Monitor Change Icon'],
+				fnAction = function()
+					X.UI.OpenIconPicker(function(nIconID)
+						mon.nIconID = nIconID
+						FireUIEvent('MY_TARGET_MON_CONFIG__MONITOR_MODIFY')
+						box:SetObjectIcon(nIconID)
+					end)
+				end,
+			}
+			if mon.nIconID then
+				t1.szLayer = 'ICON_RIGHT'
+				t1.szIcon = 'ui/Image/UICommon/Feedanimials.uitex'
+				t1.nFrame = 86
+				t1.nMouseOverFrame = 87
+				t1.fnClickIcon = function()
+					mon.nIconID = nil
+					FireUIEvent('MY_TARGET_MON_CONFIG__MONITOR_MODIFY')
+					box:SetObjectIcon(MY_TargetMonConfig.DEFAULT_MONITOR_ICON_ID)
+				end
+			end
+			table.insert(menu, t1)
+			local nX, nY = Cursor.GetPos()
+			local nW, nH = 0, 0
+			menu.x = nX
+			menu.y = nY + nH
+			menu.nMiniWidth = nW
+			X.UI.PopupMenu(menu)
 		end,
 	})
 	nY = nY + 40

@@ -32,6 +32,7 @@ local D = {
 	CONFIG_LIST = {},
 }
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
+local DEFAULT_MONITOR_ICON_ID = 13
 
 local function GetUserDataPath()
 	local ePathType = O.bCommon and X.PATH_TYPE.GLOBAL or X.PATH_TYPE.ROLE
@@ -206,11 +207,11 @@ function D.ConvertAncientConfig(config)
 					end
 				end
 				local nIconID
-				if levelConfig.iconid and levelConfig.iconid > 0 and levelConfig.iconid ~= 13 then
+				if levelConfig.iconid and levelConfig.iconid > 0 then
 					nIconID = levelConfig.iconid
-				elseif idConfig.iconid and idConfig.iconid > 0 and idConfig.iconid ~= 13 then
+				elseif idConfig.iconid and idConfig.iconid > 0 then
 					nIconID = idConfig.iconid
-				elseif mon.iconid and mon.iconid > 0 and mon.iconid ~= 13 then
+				elseif mon.iconid and mon.iconid > 0 then
 					nIconID = mon.iconid
 				end
 				table.insert(tRecord.aMonitor, X.Clone({
@@ -505,6 +506,14 @@ function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
 	if not nIndex then
 		nIndex = #config.aMonitor
 	end
+	local szNote, nIconID = '', nil
+	if config.szType == 'BUFF' then
+		szNote = X.GetBuffName(dwID, nLevel == 0 and 1 or nLevel) or ''
+		nIconID = X.GetBuffIconID(dwID, nLevel == 0 and 1 or nLevel)
+	elseif config.szType == 'SKILL' then
+		szNote = X.GetSkillName(dwID, nLevel) or ''
+		nIconID = X.GetSkillIconID(dwID, nLevel)
+	end
 	table.insert(config.aMonitor, nIndex, {
 		szUUID = X.GetUUID(),
 		szGroupID = nil,
@@ -512,10 +521,10 @@ function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
 		dwID = dwID,
 		nLevel = nLevel,
 		nStackNum = 0,
-		szNote = config.szType == 'BUFF' and (X.GetBuffName(dwID, nLevel == 0 and 1 or nLevel) or '') or (X.GetSkillName(dwID, nLevel) or ''),
+		szNote = szNote,
 		szContent = '',
 		aContentColor = nil,
-		nIconID = config.szType == 'BUFF' and (X.GetBuffIconID(dwID, nLevel == 0 and 1 or nLevel) or 13) or (X.GetSkillIconID(dwID, nLevel) or 13),
+		nIconID = nIconID,
 		tMap = nil,
 		tKungfu = nil,
 		tTargetKungfu = nil,
@@ -541,6 +550,7 @@ local settings = {
 		},
 		{
 			fields = {
+				DEFAULT_MONITOR_ICON_ID = DEFAULT_MONITOR_ICON_ID,
 				HasAncientData = D.HasAncientData,
 				ImportAncientData = D.ImportAncientData,
 				ImportConfigFile = D.ImportConfigFile,

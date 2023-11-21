@@ -188,6 +188,7 @@ return {
     ['Monitor Content'] = '提示内容',
     ['Monitor Group'] = '监控组名',
     ['Monitor same group will only show one at the same time'] = '相同组的监控项同时只会显示一个，设置该项后同组仅最后一个监控项可在隐藏后显示图标。',
+    ['Monitor Change Icon'] = '修改图标',
     ['Monitor Common Config'] = '通用设置',
     ['Monitor Condition Config'] = '条件设置',
     ['Monitor ID'] = 'ID',

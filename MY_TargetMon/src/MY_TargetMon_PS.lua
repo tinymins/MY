@@ -91,7 +91,7 @@ function D.DrawMonitorList(frame)
 				if not hItem then
 					hItem = hList:AppendItemFromIni(INI_FILE, 'Handle_MonitorItem')
 				end
-				hItem:Lookup('Box_MonitorItem'):SetObjectIcon(mon.nIconID or 13)
+				hItem:Lookup('Box_MonitorItem'):SetObjectIcon(mon.nIconID or MY_TargetMonConfig.DEFAULT_MONITOR_ICON_ID)
 				hItem:Lookup('Text_MonitorItem'):SetText(mon.szNote)
 				hItem:Lookup('Image_MonitorItemRBg'):SetVisible(not X.IsEmpty(mon.szContent))
 				hItem:Lookup('Text_MonitorItemDisplayName'):SetText(mon.szContent)

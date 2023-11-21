@@ -266,7 +266,7 @@ local function Base_MonToView(mon, info, item, KObject, config, tMonExist, tMonL
 		item.szContent = ''
 	end
 	if not item.nIconID then
-		item.nIconID = 13
+		item.nIconID = MY_TargetMonConfig.DEFAULT_MONITOR_ICON_ID
 	end
 	if config.bCdFlash and item.bCd then
 		if item.fProgress >= 0.9 then
@@ -348,7 +348,7 @@ local function Buff_MonToView(mon, buff, item, KObject, config, tMonExist, tMonL
 		item.nTimeLeft = nTimeLeft
 		item.szStackNum = buff.nStackNum > 1 and buff.nStackNum or ''
 		item.nTimeTotal = nTimeTotal
-		item.nIconID = mon.nIconID ~= 13 and mon.nIconID or buff.nIcon
+		item.nIconID = mon.nIconID or buff.nIcon
 		item.szContent = X.IsEmpty(mon.szContent) and X.GetBuffName(buff.dwID, buff.nLevel) or mon.szContent
 	else
 		item.bActive = false
@@ -361,7 +361,7 @@ local function Buff_MonToView(mon, buff, item, KObject, config, tMonExist, tMonL
 		item.bSparking = true
 		item.dwID = mon.dwID
 		item.nLevel = mon.nLevel
-		item.nIconID = mon.nIconID ~= 13 and mon.nIconID or X.GetBuffIconID(item.dwID, item.nLevel == 0 and 1 or item.nLevel)
+		item.nIconID = mon.nIconID or X.GetBuffIconID(item.dwID, item.nLevel == 0 and 1 or item.nLevel)
 		item.szStackNum = ''
 		item.szContent = X.IsEmpty(mon.szContent) and X.GetBuffName(mon.dwID, mon.nLevel) or mon.szContent
 	end
@@ -398,7 +398,7 @@ local function Skill_MonToView(mon, skill, item, KObject, config, tMonExist, tMo
 		item.nLevel = skill.nLevel
 		item.nTimeLeft = nTimeLeft
 		item.nTimeTotal = nTimeTotal
-		item.nIconID = mon.nIconID ~= 13 and mon.nIconID or skill.nIcon
+		item.nIconID = mon.nIconID or skill.nIcon
 		item.szContent = X.IsEmpty(mon.szContent) and skill.szName or mon.szContent
 	else
 		item.bActive = true
@@ -410,7 +410,7 @@ local function Skill_MonToView(mon, skill, item, KObject, config, tMonExist, tMo
 		item.bSparking = true
 		item.dwID = mon.dwID
 		item.nLevel = mon.nLevel
-		item.nIconID = mon.nIconID ~= 13 and mon.nIconID or X.GetSkillIconID(item.dwID, item.nLevel)
+		item.nIconID = mon.nIconID or X.GetSkillIconID(item.dwID, item.nLevel)
 		item.szContent = X.IsEmpty(mon.szContent) and X.GetSkillName(mon.dwID, mon.nLevel) or mon.szContent
 	end
 	local nStackNum = (skill and skill.nCdMaxCount > 1)
