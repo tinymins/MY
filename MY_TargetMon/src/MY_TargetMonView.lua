@@ -45,10 +45,10 @@ function D.SaveAnchor(frame)
 		tAnchor.x = tAnchor.x * fRelativeScale
 		tAnchor.y = tAnchor.y * fRelativeScale
 	end
-	local config = MY_TargetMonConfig.GetConfig(frame.tViewData.szUUID)
+	local config = MY_TargetMonConfig.GetDataset(frame.tViewData.szUUID)
 	if config then
 		config.tAnchor = tAnchor
-		FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
+		FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 	end
 end
 

@@ -29,7 +29,7 @@ local O = X.CreateUserSettingsModule('MY_TargetMon', _L['Target'], {
 	},
 })
 local D = {
-	CONFIG_LIST = {},
+	DATASET_LIST = {},
 }
 local REMOTE_DATA_ROOT = X.FormatPath({'userdata/target_mon/remote/', X.PATH_TYPE.GLOBAL})
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
@@ -42,18 +42,18 @@ local function GetUserDataPath()
 	return szPath
 end
 
-function D.GetConfigTitle(config)
-	local szTitle = config.szTitle
-	if config.szAuthor and config.szAuthor ~= '' then
-		szTitle = g_tStrings.STR_BRACKET_LEFT .. config.szAuthor .. g_tStrings.STR_BRACKET_RIGHT .. szTitle
+function D.GetDatasetTitle(dataset)
+	local szTitle = dataset.szTitle
+	if dataset.szAuthor and dataset.szAuthor ~= '' then
+		szTitle = g_tStrings.STR_BRACKET_LEFT .. dataset.szAuthor .. g_tStrings.STR_BRACKET_RIGHT .. szTitle
 	end
-	if config.szVersion and config.szVersion ~= '' then
-		szTitle = szTitle .. g_tStrings.STR_CONNECT .. config.szVersion
+	if dataset.szVersion and dataset.szVersion ~= '' then
+		szTitle = szTitle .. g_tStrings.STR_CONNECT .. dataset.szVersion
 	end
 	return szTitle
 end
 
-function D.AncientPatchToConfig(patch, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH)
+function D.AncientPatchToDataset(patch, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH)
 	-- 处理用户删除的内建数据和不合法的数据
 	if patch.delete or not patch.uuid then
 		return
@@ -131,45 +131,45 @@ function D.AncientPatchToConfig(patch, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HA
 	return config
 end
 
-function D.ConvertAncientConfig(config)
+function D.ConvertAncientDataset(dataset)
 	local tRecord = {
-		szUUID = config.uuid,
-		szTitle = config.caption,
-		szAuthor = config.group,
+		szUUID = dataset.uuid,
+		szTitle = dataset.caption,
+		szAuthor = dataset.group,
 		szVersion = '',
-		szType = config.type,
-		szTarget = config.target,
-		szAlignment = config.alignment,
+		szType = dataset.type,
+		szTarget = dataset.target,
+		szAlignment = dataset.alignment,
 
-		bEnable = config.enable,
-		bHideOthers = config.hideOthers,
-		bHideVoid = config.hideVoid,
-		bPenetrable = config.penetrable,
-		bDraggable = config.draggable,
-		bIgnoreSystemUIScale = config.ignoreSystemUIScale,
-		bCdCircle = config.cdCircle,
-		bCdFlash = config.cdFlash,
-		bCdReadySpark = config.cdReadySpark,
-		bCdBar = config.cdBar,
-		bShowName = config.showName,
-		bShowTime = config.showTime,
-		bPlaySound = config.playSound,
-		szBoxBgUITex = config.boxBgUITex,
-		szCdBarUITex = config.cdBarUITex,
+		bEnable = dataset.enable,
+		bHideOthers = dataset.hideOthers,
+		bHideVoid = dataset.hideVoid,
+		bPenetrable = dataset.penetrable,
+		bDraggable = dataset.draggable,
+		bIgnoreSystemUIScale = dataset.ignoreSystemUIScale,
+		bCdCircle = dataset.cdCircle,
+		bCdFlash = dataset.cdFlash,
+		bCdReadySpark = dataset.cdReadySpark,
+		bCdBar = dataset.cdBar,
+		bShowName = dataset.showName,
+		bShowTime = dataset.showTime,
+		bPlaySound = dataset.playSound,
+		szBoxBgUITex = dataset.boxBgUITex,
+		szCdBarUITex = dataset.cdBarUITex,
 
-		nMaxLineCount = config.maxLineCount,
-		fScale = config.scale,
-		fIconFontScale = config.iconFontScale,
-		fOtherFontScale = config.otherFontScale,
-		nCdBarWidth = config.cdBarWidth,
-		nDecimalTime = config.decimalTime,
+		nMaxLineCount = dataset.maxLineCount,
+		fScale = dataset.scale,
+		fIconFontScale = dataset.iconFontScale,
+		fOtherFontScale = dataset.otherFontScale,
+		nCdBarWidth = dataset.cdBarWidth,
+		nDecimalTime = dataset.decimalTime,
 
-		tAnchor = config.anchor,
+		tAnchor = dataset.anchor,
 		aMonitor = {},
 	}
 	local DEFAULT_IDS = {[0] = { ignoreLevel = true }}
 	local DEFAULT_LEVELS = {[0] = {}}
-	for _, mon in ipairs(config.monitors) do
+	for _, mon in ipairs(dataset.monitors) do
 		for id, idConfig in pairs(X.IsEmpty(mon.ids) and DEFAULT_IDS or mon.ids) do
 			local tMap = X.Clone(mon.maps) or {}
 			tMap.bAll = tMap.all or X.IsEmpty(tMap)
@@ -184,7 +184,7 @@ function D.ConvertAncientConfig(config)
 			tTargetKungfu.npc = nil
 			for level, levelConfig in pairs(X.IsEmpty(idConfig.levels) and DEFAULT_LEVELS or idConfig.levels) do
 				local szContent, aContentColor = '', nil
-				if config.cdBar then
+				if dataset.cdBar then
 					if X.IsEmpty(mon.longAlias) then
 						szContent = mon.shortAlias
 					else
@@ -251,11 +251,11 @@ function D.ImportAncientData(fnCallback)
 	local CUSTOM_EMBEDDED_CONFIG_ROOT = X.FormatPath({'userdata/TargetMon/', X.PATH_TYPE.GLOBAL})
 	local EMBEDDED_CONFIG_LIST = {}
 	for _, szFile in ipairs(CPath.GetFileList(CUSTOM_EMBEDDED_CONFIG_ROOT) or {}) do
-		local config = X.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW_E'] .. 'MY') })
+		local dataset = X.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW_E'] .. 'MY') })
 			or X.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = string.char(0xd3, 0x62, 0x5, 0x0, 0x0, 0x0, 0x0, 0xd3, 0x68, 0xfa, 0x20, 0xa6, 0xd0, 0xf4, 0x40, 0x79, 0x38, 0xee, 0x60, 0x4c, 0xa0, 0xe8, 0x80, 0x1f, 0x8, 0xe2, 0xa0, 0xf2, 0x70, 0xdc, 0xc0, 0xc5, 0xd8, 0xd6, 0xe0, 0x98, 0x40, 0xd0, 0x0, 0x6b, 0xa8, 0xca, 0x20, 0x3e, 0x10, 0xc4, 0x40, 0x11, 0x78, 0xbe, 0x60, 0xe4, 0xe0, 0xb8, 0x80, 0xb7, 0x48, 0xb2, 0xa0, 0x8a, 0xb0, 0xac, 0xc0, 0x5d, 0x18, 0xa6, 0xe0, 0x30, 0x80, 0xa0, 0x0, 0x3, 0xe8, 0x9a, 0x20, 0xd6, 0x50, 0x94, 0x40, 0xa9, 0xb8, 0x8e, 0x60, 0x7c, 0x20, 0x88, 0x80, 0x4f, 0x88, 0x82, 0xa0, 0x22, 0xf0, 0x7c, 0xc0, 0xf5, 0x58, 0x76, 0xe0, 0xc8, 0xc0, 0x70, 0x0, 0x9b, 0x28, 0x6a, 0x20, 0x6e, 0x90, 0x64, 0x40, 0x41, 0xf8, 0x5e, 0x60, 0x14, 0x60, 0x58, 0x80, 0xe7, 0xc8, 0x52, 0xa0, 0xba, 0x30, 0x4c, 0xc0, 0x8d, 0x98, 0x46, 0xe0, 0x60, 0x0, 0x40, 0x0, 0x33, 0x68, 0x3a, 0x20, 0x6, 0xd0, 0x34, 0x40, 0xd9, 0x38, 0x2e, 0x60, 0xac, 0xa0, 0x28, 0x80, 0x7f, 0x8, 0x22, 0xa0, 0x52, 0x70, 0x1c, 0xc0, 0x25, 0xd8, 0x16, 0xe0, 0xf8, 0x40, 0x10, 0x0, 0xcb, 0xa8, 0xa, 0x20, 0x9e, 0x10, 0x4, 0x40, 0x71, 0x78, 0xfe, 0x60, 0x44, 0xe0, 0xf8, 0x80, 0x17, 0x48, 0xf2, 0xa0, 0xea, 0xb0, 0xec, 0xc0, 0xbd, 0x18, 0xe6, 0xe0, 0x90, 0x80, 0xe0, 0x0, 0x63, 0xe8, 0xda, 0x20, 0x36, 0x50, 0xd4, 0x40) })
 			or X.LoadLUAData(CUSTOM_EMBEDDED_CONFIG_ROOT .. szFile)
-		if X.IsTable(config) and config.uuid and szFile:sub(1, -#'.jx3dat' - 1) == config.uuid and config.group and config.sort and config.monitors then
-			table.insert(EMBEDDED_CONFIG_LIST, config)
+		if X.IsTable(dataset) and dataset.uuid and szFile:sub(1, -#'.jx3dat' - 1) == dataset.uuid and dataset.group and dataset.sort and dataset.monitors then
+			table.insert(EMBEDDED_CONFIG_LIST, dataset)
 		end
 	end
 	table.sort(EMBEDDED_CONFIG_LIST, function(a, b)
@@ -265,8 +265,8 @@ function D.ImportAncientData(fnCallback)
 		return b.group > a.group
 	end)
 	local EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH = {}, {}
-	for _, config in ipairs(EMBEDDED_CONFIG_LIST) do
-		local embedded = config
+	for _, dataset in ipairs(EMBEDDED_CONFIG_LIST) do
+		local embedded = dataset
 		if embedded then
 			local tMon = {}
 			for _, mon in ipairs(embedded.monitors) do
@@ -283,48 +283,48 @@ function D.ImportAncientData(fnCallback)
 		or X.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = string.char(0xd5, 0xa6, 0xd, 0x0, 0x0, 0x0, 0x0, 0xf7, 0x48, 0x32, 0xa0, 0xee, 0x90, 0x64, 0x40, 0xe5, 0xd8, 0x96, 0xe0, 0xdc, 0x20, 0xc8, 0x80, 0xd3, 0x68, 0xfa, 0x20, 0xca, 0xb0, 0x2c, 0xc0, 0xc1, 0xf8, 0x5e, 0x60, 0xb8, 0x40, 0x90, 0x0, 0xaf, 0x88, 0xc2, 0xa0, 0xa6, 0xd0, 0xf4, 0x40, 0x9d, 0x18, 0x26, 0xe0, 0x94, 0x60, 0x58, 0x80, 0x8b, 0xa8, 0x8a, 0x20, 0x82, 0xf0, 0xbc, 0xc0, 0x79, 0x38, 0xee, 0x60, 0x70, 0x80, 0x20, 0x0, 0x67, 0xc8, 0x52, 0xa0, 0x5e, 0x10, 0x84, 0x40, 0x55, 0x58, 0xb6, 0xe0, 0x4c, 0xa0, 0xe8, 0x80, 0x43, 0xe8, 0x1a, 0x20, 0x3a, 0x30, 0x4c, 0xc0, 0x31, 0x78, 0x7e, 0x60, 0x28, 0xc0, 0xb0, 0x0, 0x1f, 0x8, 0xe2, 0xa0, 0x16, 0x50, 0x14, 0x40, 0xd, 0x98, 0x46, 0xe0, 0x4, 0xe0, 0x78, 0x80, 0xfb, 0x28, 0xaa, 0x20, 0xf2, 0x70, 0xdc, 0xc0, 0xe9, 0xb8, 0xe, 0x60, 0xe0, 0x0, 0x40, 0x0, 0xd7, 0x48, 0x72, 0xa0, 0xce, 0x90, 0xa4, 0x40, 0xc5, 0xd8, 0xd6, 0xe0, 0xbc, 0x20, 0x8, 0x80, 0xb3, 0x68, 0x3a, 0x20, 0xaa, 0xb0, 0x6c, 0xc0, 0xa1, 0xf8, 0x9e, 0x60, 0x98, 0x40, 0xd0, 0x0, 0x8f, 0x88, 0x2, 0xa0, 0x86, 0xd0, 0x34, 0x40, 0x7d, 0x18, 0x66, 0xe0, 0x74, 0x60, 0x98, 0x80, 0x6b, 0xa8, 0xca, 0x20, 0x62, 0xf0, 0xfc, 0xc0, 0x59, 0x38, 0x2e, 0x60, 0x50, 0x80, 0x60, 0x0, 0x47, 0xc8, 0x92, 0xa0, 0x3e, 0x10, 0xc4, 0x40) })
 		or X.LoadLUAData(ROLE_CONFIG_FILE)
 		or {}
-	local aConfig, tLoaded = {}, {}
+	local aDataset, tLoaded = {}, {}
 	for i, patch in ipairs(aPatch) do
 		if patch.uuid and not tLoaded[patch.uuid] then
-			local config = D.AncientPatchToConfig(patch, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH)
-			if config then
-				table.insert(aConfig, config)
+			local dataset = D.AncientPatchToDataset(patch, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH)
+			if dataset then
+				table.insert(aDataset, dataset)
 			end
 			tLoaded[patch.uuid] = true
 		end
 	end
 	for i, embedded in ipairs(EMBEDDED_CONFIG_LIST) do
 		if embedded.uuid and not tLoaded[embedded.uuid] then
-			local config = X.Clone(embedded)
-			if config then
-				config.embedded = true
-				table.insert(aConfig, config)
+			local dataset = X.Clone(embedded)
+			if dataset then
+				dataset.embedded = true
+				table.insert(aDataset, dataset)
 			end
-			tLoaded[config.uuid] = true
+			tLoaded[dataset.uuid] = true
 		end
 	end
 	-- 转换数据
 	local aResult = {}
-	for i, config in ipairs(aConfig) do
-		table.insert(aResult, D.ConvertAncientConfig(config))
+	for i, dataset in ipairs(aDataset) do
+		table.insert(aResult, D.ConvertAncientDataset(dataset))
 	end
 	-- 导入数据
-	for _, config in ipairs(aResult) do
+	for _, dataset in ipairs(aResult) do
 		local bExist = false
-		for i, v in ipairs(D.CONFIG_LIST) do
-			if v.szUUID == config.szUUID then
-				v.aMonitor = config.aMonitor
-				v.szTitle = config.szTitle
-				v.szAuthor = config.szAuthor
-				v.szVersion = config.szVersion
+		for i, v in ipairs(D.DATASET_LIST) do
+			if v.szUUID == dataset.szUUID then
+				v.aMonitor = dataset.aMonitor
+				v.szTitle = dataset.szTitle
+				v.szAuthor = dataset.szAuthor
+				v.szVersion = dataset.szVersion
 				bExist = true
 			end
 		end
 		if not bExist then
-			table.insert(D.CONFIG_LIST, config)
+			table.insert(D.DATASET_LIST, dataset)
 		end
 	end
-	FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_RELOAD')
+	FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD')
 	if fnCallback then
 		fnCallback(aResult)
 	end
@@ -335,7 +335,7 @@ function D.SaveUserData()
 	X.SaveLUAData(
 		GetUserDataPath(),
 		{
-			data = D.CONFIG_LIST,
+			data = D.DATASET_LIST,
 		})
 end
 
@@ -343,27 +343,27 @@ end
 function D.LoadUserData()
 	local data = X.LoadLUAData(GetUserDataPath())
 	if X.IsTable(data) then
-		D.CONFIG_LIST = data.data or {}
-		FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_RELOAD')
+		D.DATASET_LIST = data.data or {}
+		FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD')
 	else
 		D.ImportAncientData()
 	end
 end
 
-function D.ImportConfigFile(szFile, tOption)
-	local aConfig = X.LoadLUAData(szFile, { passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW'] .. 'MY') })
+function D.ImportDatasetFile(szFile, tOption)
+	local aDataset = X.LoadLUAData(szFile, { passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW'] .. 'MY') })
 		or X.LoadLUAData(szFile, { passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW_E'] .. 'MY') })
 		or X.LoadLUAData(szFile, { passphrase = false })
-	if not X.IsArray(aConfig) then
-		X.Sysmsg(_L['MY_TargetMon'], _L('Load config failed: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.ERROR)
+	if not X.IsArray(aDataset) then
+		X.Sysmsg(_L['MY_TargetMon'], _L('Load dataset failed: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.ERROR)
 		return
 	end
-	for i, config in ipairs(aConfig) do
-		if config.uuid then
-			aConfig[i] = D.ConvertAncientConfig(config)
+	for i, dataset in ipairs(aDataset) do
+		if dataset.uuid then
+			aDataset[i] = D.ConvertAncientDataset(dataset)
 		end
 	end
-	if #aConfig == 0 then
+	if #aDataset == 0 then
 		return
 	end
 	local tUUID = {}
@@ -372,35 +372,35 @@ function D.ImportConfigFile(szFile, tOption)
 			tUUID[szUUID] = true
 		end
 	else
-		for _, config in ipairs(aConfig) do
-			tUUID[config.szUUID] = true
+		for _, dataset in ipairs(aDataset) do
+			tUUID[dataset.szUUID] = true
 		end
 	end
 	local function fnAction()
-		for _, config in ipairs(aConfig) do
-			if tUUID[config.szUUID] then
+		for _, dataset in ipairs(aDataset) do
+			if tUUID[dataset.szUUID] then
 				local bExist = false
-				for i, v in ipairs(D.CONFIG_LIST) do
-					if v.szUUID == config.szUUID then
-						v.aMonitor = config.aMonitor
-						v.szTitle = config.szTitle
-						v.szAuthor = config.szAuthor
-						v.szVersion = config.szVersion
+				for i, v in ipairs(D.DATASET_LIST) do
+					if v.szUUID == dataset.szUUID then
+						v.aMonitor = dataset.aMonitor
+						v.szTitle = dataset.szTitle
+						v.szAuthor = dataset.szAuthor
+						v.szVersion = dataset.szVersion
 						bExist = true
 					end
 				end
 				if not bExist then
-					table.insert(D.CONFIG_LIST, config)
+					table.insert(D.DATASET_LIST, dataset)
 				end
 			end
 		end
-		FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
-		X.Sysmsg(_L['MY_TargetMon'], _L('Load config success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
+		FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
+		X.Sysmsg(_L['MY_TargetMon'], _L('Load dataset success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
 		if tOption and tOption.fnCallback then
 			local aImported = {}
-			for _, config in ipairs(aConfig) do
-				if tUUID[config.szUUID] then
-					table.insert(aImported, config)
+			for _, dataset in ipairs(aDataset) do
+				if tUUID[dataset.szUUID] then
+					table.insert(aImported, dataset)
 				end
 			end
 			tOption.fnCallback(aImported)
@@ -412,15 +412,15 @@ function D.ImportConfigFile(szFile, tOption)
 		local nHeight = 50
 		local ui = X.UI.CreateFrame('MY_TargetMon_ImportConfirm', {
 			w = 460, close = true,
-			text = _L['Are you sure to import configs below?'],
+			text = _L['Are you sure to import datasets below?'],
 		})
-		for _, config in ipairs(aConfig) do
+		for _, dataset in ipairs(aDataset) do
 			ui:Append('WndCheckBox', {
 				x = 30, y = nHeight, w = 400,
-				text = MY_TargetMonConfig.GetConfigTitle(config),
-				checked = tUUID[config.szUUID],
+				text = MY_TargetMonConfig.GetDatasetTitle(dataset),
+				checked = tUUID[dataset.szUUID],
 				onCheck = function(bChecked)
-					tUUID[config.szUUID] = bChecked
+					tUUID[dataset.szUUID] = bChecked
 				end,
 			})
 			nHeight = nHeight + 30
@@ -440,17 +440,17 @@ function D.ImportConfigFile(szFile, tOption)
 	end
 end
 
-function D.ExportConfigFile(aUUID, bIndent)
-	local tConfig = {}
-	for _, config in ipairs(D.CONFIG_LIST) do
-		tConfig[config.szUUID] = config
+function D.ExportDatasetFile(aUUID, bIndent)
+	local tDataset = {}
+	for _, dataset in ipairs(D.DATASET_LIST) do
+		tDataset[dataset.szUUID] = dataset
 	end
 	local aExport = {}
 	for _, szUUID in ipairs(aUUID) do
-		table.insert(aExport, tConfig[szUUID])
+		table.insert(aExport, tDataset[szUUID])
 	end
 	if #aExport == 0 then
-		X.Topmsg(_L['Please select at least one config to export'])
+		X.Topmsg(_L['Please select at least one dataset to export'])
 		return
 	end
 	local szFile = X.FormatPath(
@@ -470,31 +470,31 @@ function D.ExportConfigFile(aUUID, bIndent)
 			passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW'] .. 'MY'),
 		})
 	end
-	X.Alert(_L('Export config success: %s', tostring(szFile)))
-	X.Sysmsg(_L['MY_TargetMon'], _L('Export config success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
+	X.Alert(_L('Export dataset success: %s', tostring(szFile)))
+	X.Sysmsg(_L['MY_TargetMon'], _L('Export dataset success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
 	return true
 end
 
-function D.SetConfigList(aList)
-	D.CONFIG_LIST = aList
+function D.SetDatasetList(aList)
+	D.DATASET_LIST = aList
 end
 
-function D.GetConfigList()
-	return D.CONFIG_LIST
+function D.GetDatasetList()
+	return D.DATASET_LIST
 end
 
-function D.GetConfig(szUUID)
-	for i, v in ipairs(D.CONFIG_LIST) do
+function D.GetDataset(szUUID)
+	for i, v in ipairs(D.DATASET_LIST) do
 		if v.szUUID == szUUID then
 			return v
 		end
 	end
 end
 
-function D.CreateConfig()
-	table.insert(D.CONFIG_LIST, {
+function D.CreateDataset()
+	table.insert(D.DATASET_LIST, {
 		szUUID = X.GetUUID(),
-		szTitle = _L['New target mon config'] .. '#' .. (#D.CONFIG_LIST + 1),
+		szTitle = _L['New target mon dataset'] .. '#' .. (#D.DATASET_LIST + 1),
 		szAuthor = X.GetUserRoleName(),
 		szVersion = X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd'),
 		szType = 'BUFF',
@@ -527,43 +527,43 @@ function D.CreateConfig()
 		tAnchor = { y = 152, x = -343, s = 'TOPLEFT', r = 'CENTER' },
 		aMonitor = {},
 	})
-	FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
+	FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 end
 
-function D.DeleteConfig(szUUID)
-	for i, v in ipairs(D.CONFIG_LIST) do
+function D.DeleteDataset(szUUID)
+	for i, v in ipairs(D.DATASET_LIST) do
 		if v.szUUID == szUUID then
-			table.remove(D.CONFIG_LIST, i)
-			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
+			table.remove(D.DATASET_LIST, i)
+			FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 			return
 		end
 	end
 end
 
-function D.DeleteAllConfig()
-	for i, _ in X.ipairs_r(D.CONFIG_LIST) do
-		table.remove(D.CONFIG_LIST, i)
+function D.DeleteAllDataset()
+	for i, _ in X.ipairs_r(D.DATASET_LIST) do
+		table.remove(D.DATASET_LIST, i)
 	end
-	FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
+	FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 end
 
 function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
-	local config = D.GetConfig(szUUID)
-	if not config then
+	local dataset = D.GetDataset(szUUID)
+	if not dataset then
 		return
 	end
 	if not nIndex then
-		nIndex = #config.aMonitor
+		nIndex = #dataset.aMonitor
 	end
 	local szNote, nIconID = '', nil
-	if config.szType == 'BUFF' then
+	if dataset.szType == 'BUFF' then
 		szNote = X.GetBuffName(dwID, nLevel == 0 and 1 or nLevel) or ''
 		nIconID = X.GetBuffIconID(dwID, nLevel == 0 and 1 or nLevel)
-	elseif config.szType == 'SKILL' then
+	elseif dataset.szType == 'SKILL' then
 		szNote = X.GetSkillName(dwID, nLevel) or ''
 		nIconID = X.GetSkillIconID(dwID, nLevel)
 	end
-	table.insert(config.aMonitor, nIndex, {
+	table.insert(dataset.aMonitor, nIndex, {
 		szUUID = X.GetUUID(),
 		szGroupID = nil,
 		bEnable = true,
@@ -583,7 +583,7 @@ function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
 		aSoundDisappear = nil,
 		szExtentAnimate = nil,
 	})
-	FireUIEvent('MY_TARGET_MON_CONFIG__MONITOR_MODIFY')
+	FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY')
 end
 
 -- Global exports
@@ -603,14 +603,14 @@ local settings = {
 				DEFAULT_MONITOR_ICON_ID = DEFAULT_MONITOR_ICON_ID,
 				HasAncientData = D.HasAncientData,
 				ImportAncientData = D.ImportAncientData,
-				ImportConfigFile = D.ImportConfigFile,
-				ExportConfigFile = D.ExportConfigFile,
-				GetConfigTitle = D.GetConfigTitle,
-				GetConfigList = D.GetConfigList,
-				GetConfig = D.GetConfig,
-				CreateConfig = D.CreateConfig,
-				DeleteConfig = D.DeleteConfig,
-				DeleteAllConfig = D.DeleteAllConfig,
+				ImportDatasetFile = D.ImportDatasetFile,
+				ExportDatasetFile = D.ExportDatasetFile,
+				GetDatasetTitle = D.GetDatasetTitle,
+				GetDatasetList = D.GetDatasetList,
+				GetDataset = D.GetDataset,
+				CreateDataset = D.CreateDataset,
+				DeleteDataset = D.DeleteDataset,
+				DeleteAllDataset = D.DeleteAllDataset,
 				CreateMonitor = D.CreateMonitor,
 			},
 		},
@@ -631,11 +631,11 @@ MY_TargetMonConfig = X.CreateModule(settings)
 end
 
 do
-local function DelaySaveConfig()
-	X.DelayCall('MY_TargetMon#SaveConfig', 500, D.SaveUserData)
+local function DelaySaveUserData()
+	X.DelayCall('MY_TargetMon#SaveUserData', 500, D.SaveUserData)
 end
-X.RegisterEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY', 'MY_TargetMonConfig', DelaySaveConfig)
-X.RegisterEvent('MY_TARGET_MON_CONFIG__MONITOR_MODIFY', 'MY_TargetMonConfig', DelaySaveConfig)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMonConfig', DelaySaveUserData)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMonConfig', DelaySaveUserData)
 end
 
 X.RegisterInit('MY_TargetMonConfig', D.LoadUserData)

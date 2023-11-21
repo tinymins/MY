@@ -48,7 +48,7 @@ function D.UpdateConfigActiveState(frame)
 end
 
 function D.DrawConfigList(frame)
-	local aConfig = MY_TargetMonConfig.GetConfigList()
+	local aConfig = MY_TargetMonConfig.GetDatasetList()
 	local szActiveConfigUUID
 	-- 选中数据
 	for _, config in ipairs(aConfig) do
@@ -77,7 +77,7 @@ function D.DrawConfigList(frame)
 end
 
 function D.DrawMonitorList(frame)
-	local config = MY_TargetMonConfig.GetConfig(frame.szActiveConfigUUID)
+	local config = MY_TargetMonConfig.GetDataset(frame.szActiveConfigUUID)
 	local hList = frame:Lookup('Wnd_Total/WndScroll_Monitor', 'Handle_Monitor_List')
 	local szSearchMonitor = frame.szSearchMonitor
 	if config then
@@ -113,7 +113,7 @@ function D.DrawMonitorList(frame)
 end
 
 function D.CreateMonitor(frame, nIndex)
-	local config = MY_TargetMonConfig.GetConfig(frame.szActiveConfigUUID)
+	local config = MY_TargetMonConfig.GetDataset(frame.szActiveConfigUUID)
 	if not config then
 		return
 	end
@@ -142,9 +142,9 @@ function D.OnFrameCreate()
 	this:Lookup('Wnd_Total/Btn_ImportConfig', 'Text_ImportConfig'):SetText(_L['Import Export'])
 	this:Lookup('Wnd_Total/Btn_CreateMonitor', 'Text_CreateMonitor'):SetText(_L['Create Monitor'])
 	this:Lookup('Wnd_Total/Wnd_SearchMonitor/Edit_SearchMonitor'):SetPlaceholderText(_L['Search Monitor'])
-	this:RegisterEvent('MY_TARGET_MON_CONFIG__CONFIG_RELOAD')
-	this:RegisterEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
-	this:RegisterEvent('MY_TARGET_MON_CONFIG__MONITOR_MODIFY')
+	this:RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD')
+	this:RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
+	this:RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, -100)
 	D.DrawConfigList(this)
 end
@@ -155,7 +155,7 @@ function D.OnLButtonClick()
 	if name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
 	elseif name == 'Btn_CreateConfig' then
-		MY_TargetMonConfig.CreateConfig()
+		MY_TargetMonConfig.CreateDataset()
 	elseif name == 'Btn_CreateMonitor' then
 		D.CreateMonitor(frame, nil)
 	elseif name == 'Btn_ImportConfig' then
@@ -172,14 +172,14 @@ function D.OnLButtonClick()
 				if X.IsEmpty(szFile) then
 					return
 				end
-				MY_TargetMonConfig.ImportConfigFile(szFile)
+				MY_TargetMonConfig.ImportDatasetFile(szFile)
 			end,
 		})
 		local t1 = { szOption = _L['Export local data'] }
 		local aExportUUID = {}
-		for _, config in ipairs(MY_TargetMonConfig.GetConfigList()) do
+		for _, config in ipairs(MY_TargetMonConfig.GetDatasetList()) do
 			table.insert(t1, {
-				szOption = MY_TargetMonConfig.GetConfigTitle(config),
+				szOption = MY_TargetMonConfig.GetDatasetTitle(config),
 				bCheck = true,
 				fnAction = function(_, bChecked)
 					for i, v in ipairs(aExportUUID) do
@@ -198,7 +198,7 @@ function D.OnLButtonClick()
 		table.insert(t1, {
 			szOption = _L['Ensure export'],
 			fnAction = function()
-				if MY_TargetMonConfig.ExportConfigFile(aExportUUID) then
+				if MY_TargetMonConfig.ExportDatasetFile(aExportUUID) then
 					X.UI.ClosePopupMenu()
 				end
 			end,
@@ -206,7 +206,7 @@ function D.OnLButtonClick()
 		table.insert(t1, {
 			szOption = _L['Ensure export (with indent)'],
 			fnAction = function()
-				if MY_TargetMonConfig.ExportConfigFile(aExportUUID, true) then
+				if MY_TargetMonConfig.ExportDatasetFile(aExportUUID, true) then
 					X.UI.ClosePopupMenu()
 				end
 			end,
@@ -221,7 +221,7 @@ function D.OnLButtonClick()
 						MY_TargetMonConfig.ImportAncientData(function(aConfig)
 							local aName = {}
 							for _, config in ipairs(aConfig) do
-								table.insert(aName, MY_TargetMonConfig.GetConfigTitle(config))
+								table.insert(aName, MY_TargetMonConfig.GetDatasetTitle(config))
 							end
 							X.Alert(_L['Ancient configs import success:'] .. '\n\n' .. table.concat(aName, '\n'))
 						end)
@@ -235,7 +235,7 @@ function D.OnLButtonClick()
 			rgb = {255, 0, 0},
 			fnAction = function()
 				X.Confirm(_L['Sure to delete all config data? This operation can not be undone.'], function()
-					MY_TargetMonConfig.DeleteAllConfig()
+					MY_TargetMonConfig.DeleteAllDataset()
 					X.UI.ClosePopupMenu()
 				end)
 			end,
@@ -323,7 +323,7 @@ function D.OnItemRButtonClick()
 			bCheck = true, bChecked = config.bEnable,
 			fnAction = function()
 				config.bEnable = not config.bEnable
-				FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
+				FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 			end,
 		})
 		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
@@ -332,7 +332,7 @@ function D.OnItemRButtonClick()
 			rgb = { 255, 0, 0 },
 			fnAction = function()
 				X.Confirm(_L['Sure to delete config? This operation can not be undone.'], function()
-					MY_TargetMonConfig.DeleteConfig(config.szUUID)
+					MY_TargetMonConfig.DeleteDataset(config.szUUID)
 				end)
 			end,
 		})
@@ -433,7 +433,7 @@ function D.OnItemLButtonDragEnd()
 		if szDragUUID == szDropUUID then
 			return
 		end
-		local aConfig = MY_TargetMonConfig.GetConfigList()
+		local aConfig = MY_TargetMonConfig.GetDatasetList()
 		local nPosition, dragConfig = 0, nil
 		for _, config in ipairs(aConfig) do
 			if config.szUUID == szDragUUID then
@@ -455,7 +455,7 @@ function D.OnItemLButtonDragEnd()
 				break
 			end
 		end
-		FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
+		FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 	elseif name == 'Handle_MonitorItem' then
 		if not X.UI.IsDragDropOpened() then
 			return
@@ -470,7 +470,7 @@ function D.OnItemLButtonDragEnd()
 		if szDragUUID == szDropUUID then
 			return
 		end
-		local config = MY_TargetMonConfig.GetConfig(frame.szActiveConfigUUID)
+		local config = MY_TargetMonConfig.GetDataset(frame.szActiveConfigUUID)
 		local nPosition, dragConfig = 0, nil
 		for _, mon in ipairs(config.aMonitor) do
 			if mon.szUUID == szDragUUID then
@@ -492,17 +492,17 @@ function D.OnItemLButtonDragEnd()
 				break
 			end
 		end
-		FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
+		FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 	end
 end
 
 function D.OnEvent(event)
-	if event == 'MY_TARGET_MON_CONFIG__CONFIG_MODIFY' or event == 'MY_TARGET_MON_CONFIG__CONFIG_RELOAD' then
+	if event == 'MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY' or event == 'MY_TARGET_MON_CONFIG__DATASET_RELOAD' then
 		local frame = this
 		X.DelayCall('MY_TargetMon_PS_DrawConfigList', 100, function()
 			D.DrawConfigList(frame)
 		end)
-	elseif event == 'MY_TARGET_MON_CONFIG__MONITOR_MODIFY' then
+	elseif event == 'MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY' then
 		local frame = this
 		X.DelayCall('MY_TargetMon_PS_DrawConfigList', 300, function()
 			D.DrawMonitorList(frame)

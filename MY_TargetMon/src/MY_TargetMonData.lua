@@ -49,16 +49,16 @@ local function FilterMonitors(aMonitor, dwMapID, dwKungfuID)
 	return ret
 end
 local CACHE_CONFIG
-function D.GetConfigList()
+function D.GetDatasetList()
 	if not CACHE_CONFIG then
 		local me = X.GetClientPlayer()
 		if not me then
-			return MY_TargetMonConfig.GetConfigList()
+			return MY_TargetMonConfig.GetDatasetList()
 		end
 		local aConfig = {}
 		local dwMapID = me.GetMapID() or 0
 		local dwKungfuID = me.GetKungfuMountID() or 0
-		for i, config in ipairs(MY_TargetMonConfig.GetConfigList()) do
+		for i, config in ipairs(MY_TargetMonConfig.GetDatasetList()) do
 			aConfig[i] = setmetatable(
 				{
 					aMonitor = FilterMonitors(config.aMonitor, dwMapID, dwKungfuID),
@@ -83,9 +83,9 @@ local function onTargetMonReload()
 	onFilterChange()
 	D.OnTargetMonReload()
 end
-X.RegisterEvent('MY_TARGET_MON_CONFIG__CONFIG_RELOAD', 'MY_TargetMonData', onTargetMonReload)
-X.RegisterEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)
-X.RegisterEvent('MY_TARGET_MON_CONFIG__MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
 end
 
 do
@@ -425,7 +425,7 @@ do
 local fUIScale, fFontScaleBase
 function UpdateView()
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
-	for _, config in ipairs(D.GetConfigList()) do
+	for _, config in ipairs(D.GetDatasetList()) do
 		if config.bEnable then
 			local dwTarType, dwTarID = D.GetTarget(config.szTarget, config.szType)
 			local KObject = X.GetObject(dwTarType, dwTarID)
@@ -445,7 +445,7 @@ function UpdateView()
 			view.szUUID               = config.szUUID
 			view.szType               = config.szType
 			view.szTarget             = config.szTarget
-			view.szCaption            = MY_TargetMonConfig.GetConfigTitle(config)
+			view.szCaption            = MY_TargetMonConfig.GetDatasetTitle(config)
 			view.tAnchor              = config.tAnchor
 			view.bIgnoreSystemUIScale = config.bIgnoreSystemUIScale
 			view.fUIScale             = fUIScale
@@ -588,7 +588,7 @@ end
 local function OnFrameCall()
 	local tExistBuffMonitorTargetType = {}
 	local tExistSkillMonitorTargetType = {}
-	for _, config in ipairs(MY_TargetMonConfig.GetConfigList()) do
+	for _, config in ipairs(MY_TargetMonConfig.GetDatasetList()) do
 		if config.bEnable then
 			if config.szType == 'BUFF' then
 				tExistBuffMonitorTargetType[config.szTarget] = true
