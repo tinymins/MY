@@ -595,7 +595,7 @@ function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
 		aSoundDisappear = nil,
 		szExtentAnimate = nil,
 	})
-	FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY')
+	FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', szUUID)
 end
 
 function D.SendBgMsg(...)
