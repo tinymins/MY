@@ -349,7 +349,7 @@ function D.LoadUserData()
 	end
 end
 
-function D.ImportConfigFile(szFile)
+function D.ImportConfigFile(szFile, tOption)
 	local aConfig = X.LoadLUAData(szFile, { passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW'] .. 'MY') })
 		or X.LoadLUAData(szFile, { passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW_E'] .. 'MY') })
 		or X.LoadLUAData(szFile, { passphrase = false })
@@ -365,29 +365,78 @@ function D.ImportConfigFile(szFile)
 	if #aConfig == 0 then
 		return
 	end
-	local aTitle = {}
-	for _, config in ipairs(aConfig) do
-		table.insert(aTitle, D.GetConfigTitle(config))
-	end
-	X.Confirm(_L['Are you sure to import configs below?'] .. '\n\n' .. table.concat(aTitle, '\n'), function()
+	local tUUID = {}
+	if tOption and tOption.aUUID then
+		for _, szUUID in ipairs(tOption.aUUID) do
+			tUUID[szUUID] = true
+		end
+	else
 		for _, config in ipairs(aConfig) do
-			local bExist = false
-			for i, v in ipairs(D.CONFIG_LIST) do
-				if v.szUUID == config.szUUID then
-					v.aMonitor = config.aMonitor
-					v.szTitle = config.szTitle
-					v.szAuthor = config.szAuthor
-					v.szVersion = config.szVersion
-					bExist = true
+			tUUID[config.szUUID] = true
+		end
+	end
+	local function fnAction()
+		for _, config in ipairs(aConfig) do
+			if tUUID[config.szUUID] then
+				local bExist = false
+				for i, v in ipairs(D.CONFIG_LIST) do
+					if v.szUUID == config.szUUID then
+						v.aMonitor = config.aMonitor
+						v.szTitle = config.szTitle
+						v.szAuthor = config.szAuthor
+						v.szVersion = config.szVersion
+						bExist = true
+					end
 				end
-			end
-			if not bExist then
-				table.insert(D.CONFIG_LIST, config)
+				if not bExist then
+					table.insert(D.CONFIG_LIST, config)
+				end
 			end
 		end
 		FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		X.Sysmsg(_L['MY_TargetMon'], _L('Load config success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
-	end)
+		if tOption and tOption.fnCallback then
+			local aImported = {}
+			for _, config in ipairs(aConfig) do
+				if tUUID[config.szUUID] then
+					table.insert(aImported, config)
+				end
+			end
+			tOption.fnCallback(aImported)
+		end
+	end
+	if tOption and tOption.bConfirmed then
+		fnAction()
+	else
+		local nHeight = 50
+		local ui = X.UI.CreateFrame('MY_TargetMon_ImportConfirm', {
+			w = 460, close = true,
+			text = _L['Are you sure to import configs below?'],
+		})
+		for _, config in ipairs(aConfig) do
+			ui:Append('WndCheckBox', {
+				x = 30, y = nHeight, w = 400,
+				text = MY_TargetMonConfig.GetConfigTitle(config),
+				checked = tUUID[config.szUUID],
+				onCheck = function(bChecked)
+					tUUID[config.szUUID] = bChecked
+				end,
+			})
+			nHeight = nHeight + 30
+		end
+		nHeight = nHeight + 10
+		ui:Append('WndButton', {
+			x = 180, y = nHeight, w = 100, h = 40,
+			text = _L['Confirm Import'],
+			buttonStyle = 'FLAT',
+			onClick = function()
+				fnAction()
+				ui:Remove()
+			end,
+		})
+		nHeight = nHeight + 40
+		ui:Height(nHeight + 30)
+	end
 end
 
 function D.ExportConfigFile(aUUID, bIndent)

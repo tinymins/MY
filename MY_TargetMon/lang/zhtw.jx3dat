@@ -143,6 +143,7 @@ return {
 	['Sure to import ancient config? Current data with same uuid will be overwritten.'] = '確定要導入舊版數據嗎？當前數據如有UUID與舊版數據相同的監控，將會被舊版監控數據覆蓋。',
     ['Ancient configs import success:'] = '舊版數據導入成功：',
     ['Are you sure to import configs below?'] = '確定要載入以下數據嗎？',
+    ['Confirm Import'] = '確認導入',
 	['Load config success: %s'] = '數據載入成功：%s',
 	['Load config failed: %s'] = '數據載入失敗：%s',
     ['Ensure export'] = '確認導出',
