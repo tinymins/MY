@@ -48,7 +48,7 @@ function D.SaveAnchor(frame)
 	local config = MY_TargetMonConfig.GetConfig(frame.tViewData.szUUID)
 	if config then
 		config.tAnchor = tAnchor
-		FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+		FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 	end
 end
 
@@ -469,7 +469,7 @@ local function onDataInit()
 		end
 	end
 end
-X.RegisterEvent('MY_TARGET_MON_DATA_INIT', 'MY_TargetMonView', onDataInit)
+X.RegisterEvent('MY_TARGET_MON_DATA__INIT', 'MY_TargetMonView', onDataInit)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

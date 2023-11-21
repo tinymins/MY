@@ -142,9 +142,9 @@ function D.OnFrameCreate()
 	this:Lookup('Wnd_Total/Btn_ImportConfig', 'Text_ImportConfig'):SetText(_L['Import Export'])
 	this:Lookup('Wnd_Total/Btn_CreateMonitor', 'Text_CreateMonitor'):SetText(_L['Create Monitor'])
 	this:Lookup('Wnd_Total/Wnd_SearchMonitor/Edit_SearchMonitor'):SetPlaceholderText(_L['Search Monitor'])
-	this:RegisterEvent('MY_TARGET_MON_CONFIG_RELOAD')
-	this:RegisterEvent('MY_TARGET_MON_CONFIG_MODIFY')
-	this:RegisterEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
+	this:RegisterEvent('MY_TARGET_MON_CONFIG__CONFIG_RELOAD')
+	this:RegisterEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
+	this:RegisterEvent('MY_TARGET_MON_CONFIG__MONITOR_MODIFY')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, -100)
 	D.DrawConfigList(this)
 end
@@ -323,7 +323,7 @@ function D.OnItemRButtonClick()
 			bCheck = true, bChecked = config.bEnable,
 			fnAction = function()
 				config.bEnable = not config.bEnable
-				FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+				FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 			end,
 		})
 		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
@@ -455,7 +455,7 @@ function D.OnItemLButtonDragEnd()
 				break
 			end
 		end
-		FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+		FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 	elseif name == 'Handle_MonitorItem' then
 		if not X.UI.IsDragDropOpened() then
 			return
@@ -492,17 +492,17 @@ function D.OnItemLButtonDragEnd()
 				break
 			end
 		end
-		FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+		FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 	end
 end
 
 function D.OnEvent(event)
-	if event == 'MY_TARGET_MON_CONFIG_MODIFY' or event == 'MY_TARGET_MON_CONFIG_RELOAD' then
+	if event == 'MY_TARGET_MON_CONFIG__CONFIG_MODIFY' or event == 'MY_TARGET_MON_CONFIG__CONFIG_RELOAD' then
 		local frame = this
 		X.DelayCall('MY_TargetMon_PS_DrawConfigList', 100, function()
 			D.DrawConfigList(frame)
 		end)
-	elseif event == 'MY_TARGET_MON_CONFIG_MONITOR_MODIFY' then
+	elseif event == 'MY_TARGET_MON_CONFIG__MONITOR_MODIFY' then
 		local frame = this
 		X.DelayCall('MY_TargetMon_PS_DrawConfigList', 300, function()
 			D.DrawMonitorList(frame)

@@ -122,7 +122,7 @@ function D.Open(szConfigUUID)
 		r = 255, g = 255, b = 0, text = config.szTitle,
 		onChange = function(val)
 			config.szTitle = val
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 	}):Width() + 5
 	nX = nX + uiWnd:Append('Text', {
@@ -135,7 +135,7 @@ function D.Open(szConfigUUID)
 		r = 255, g = 255, b = 0, text = config.szAuthor,
 		onChange = function(val)
 			config.szAuthor = val
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 	}):Width() + 5
 	nX = nX + uiWnd:Append('Text', {
@@ -148,7 +148,7 @@ function D.Open(szConfigUUID)
 		r = 255, g = 255, b = 0, text = config.szVersion,
 		onChange = function(val)
 			config.szVersion = val
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 	}):Width() + 5
 	nY = nY + 40
@@ -161,7 +161,7 @@ function D.Open(szConfigUUID)
 		checked = config.bEnable,
 		onCheck = function(bChecked)
 			config.bEnable = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 	})
 
@@ -175,7 +175,7 @@ function D.Open(szConfigUUID)
 		checked = config.bHideOthers,
 		onCheck = function(bChecked)
 			config.bHideOthers = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function()
 			return config.bEnable and config.szType == 'BUFF'
@@ -188,7 +188,7 @@ function D.Open(szConfigUUID)
 		checked = config.bHideVoid,
 		onCheck = function(bChecked)
 			config.bHideVoid = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -201,7 +201,7 @@ function D.Open(szConfigUUID)
 		checked = config.bPenetrable,
 		onCheck = function(bChecked)
 			config.bPenetrable = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -212,7 +212,7 @@ function D.Open(szConfigUUID)
 		checked = not config.bDraggable,
 		onCheck = function(bChecked)
 			config.bDraggable = not bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable and not config.bPenetrable end,
 	})
@@ -223,7 +223,7 @@ function D.Open(szConfigUUID)
 		checked = config.bIgnoreSystemUIScale,
 		onCheck = function(bChecked)
 			config.bIgnoreSystemUIScale = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -236,7 +236,7 @@ function D.Open(szConfigUUID)
 		checked = config.bCdCircle,
 		onCheck = function(bChecked)
 			config.bCdCircle = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -247,7 +247,7 @@ function D.Open(szConfigUUID)
 		checked = config.bCdFlash,
 		onCheck = function(bChecked)
 			config.bCdFlash = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -258,7 +258,7 @@ function D.Open(szConfigUUID)
 		checked = config.bCdReadySpark,
 		onCheck = function(bChecked)
 			config.bCdReadySpark = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable and not config.bHideVoid end,
 	})
@@ -271,7 +271,7 @@ function D.Open(szConfigUUID)
 		checked = config.bCdBar,
 		onCheck = function(bChecked)
 			config.bCdBar = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -282,7 +282,7 @@ function D.Open(szConfigUUID)
 		checked = config.bShowName,
 		onCheck = function(bChecked)
 			config.bShowName = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -293,7 +293,7 @@ function D.Open(szConfigUUID)
 		checked = config.bShowTime,
 		onCheck = function(bChecked)
 			config.bShowTime = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -306,7 +306,7 @@ function D.Open(szConfigUUID)
 		checked = config.bPlaySound,
 		onCheck = function(bChecked)
 			config.bPlaySound = bChecked
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -322,7 +322,7 @@ function D.Open(szConfigUUID)
 					szOption = p[2] or p[1],
 					fnAction = function()
 						config.szBoxBgUITex = p[1]
-						FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+						FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 						X.UI.ClosePopupMenu()
 					end,
 					szIcon = szIcon,
@@ -353,7 +353,7 @@ function D.Open(szConfigUUID)
 					szOption = text,
 					fnAction = function()
 						config.szCdBarUITex = text
-						FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+						FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 						X.UI.ClosePopupMenu()
 					end,
 					szIcon = szIcon,
@@ -391,7 +391,7 @@ function D.Open(szConfigUUID)
 					end,
 					fnAction = function()
 						config.szTarget = eType
-						FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+						FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 					end,
 				})
 			end
@@ -402,7 +402,7 @@ function D.Open(szConfigUUID)
 					bCheck = true, bMCheck = true, bChecked = eType == config.szType,
 					fnAction = function()
 						config.szType = eType
-						FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+						FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 					end,
 				})
 			end
@@ -413,7 +413,7 @@ function D.Open(szConfigUUID)
 					bCheck = true, bMCheck = true, bChecked = eType == config.szAlignment,
 					fnAction = function()
 						config.szAlignment = eType
-						FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+						FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 					end,
 				})
 			end
@@ -431,7 +431,7 @@ function D.Open(szConfigUUID)
 		textFormatter = function(val) return _L('Display %d eachline.', val) end,
 		onChange = function(val)
 			config.nMaxLineCount = val
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -445,7 +445,7 @@ function D.Open(szConfigUUID)
 		textFormatter = function(val) return _L('UI scale %d%%.', val) end,
 		onChange = function(val)
 			config.fScale = val / 100
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -459,7 +459,7 @@ function D.Open(szConfigUUID)
 		textFormatter = function(val) return _L('Icon font scale %d%%.', val) end,
 		onChange = function(val)
 			config.fIconFontScale = val / 100
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -473,7 +473,7 @@ function D.Open(szConfigUUID)
 		textFormatter = function(val) return _L('Other font scale %d%%.', val) end,
 		onChange = function(val)
 			config.fOtherFontScale = val / 100
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -487,7 +487,7 @@ function D.Open(szConfigUUID)
 		textFormatter = function(val) return _L('CD width %dpx.', val) end,
 		onChange = function(val)
 			config.nCdBarWidth = val
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})
@@ -509,7 +509,7 @@ function D.Open(szConfigUUID)
 		end,
 		onChange = function(val)
 			config.nDecimalTime = val
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		end,
 		autoEnable = function() return config.bEnable end,
 	})

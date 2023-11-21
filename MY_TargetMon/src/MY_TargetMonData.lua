@@ -83,9 +83,9 @@ local function onTargetMonReload()
 	onFilterChange()
 	D.OnTargetMonReload()
 end
-X.RegisterEvent('MY_TARGET_MON_CONFIG_RELOAD', 'MY_TargetMonData', onTargetMonReload)
-X.RegisterEvent('MY_TARGET_MON_CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)
-X.RegisterEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__CONFIG_RELOAD', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
 end
 
 do
@@ -717,7 +717,7 @@ end
 
 function D.OnTargetMonReload()
 	OnFrameCall()
-	FireUIEvent('MY_TARGET_MON_DATA_INIT')
+	FireUIEvent('MY_TARGET_MON_DATA__INIT')
 	X.FrameCall('MY_TargetMonData', 2, OnFrameCall)
 end
 end

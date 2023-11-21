@@ -322,7 +322,7 @@ function D.ImportAncientData(fnCallback)
 			table.insert(D.CONFIG_LIST, config)
 		end
 	end
-	FireUIEvent('MY_TARGET_MON_CONFIG_RELOAD')
+	FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_RELOAD')
 	if fnCallback then
 		fnCallback(aResult)
 	end
@@ -342,7 +342,7 @@ function D.LoadUserData()
 	local data = X.LoadLUAData(GetUserDataPath())
 	if X.IsTable(data) then
 		D.CONFIG_LIST = data.data or {}
-		FireUIEvent('MY_TARGET_MON_CONFIG_RELOAD')
+		FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_RELOAD')
 	else
 		D.ImportAncientData()
 	end
@@ -384,7 +384,7 @@ function D.ImportConfigFile(szFile)
 				table.insert(D.CONFIG_LIST, config)
 			end
 		end
-		FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+		FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 		X.Sysmsg(_L['MY_TargetMon'], _L('Load config success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
 	end)
 end
@@ -477,14 +477,14 @@ function D.CreateConfig()
 		tAnchor = { y = 152, x = -343, s = 'TOPLEFT', r = 'CENTER' },
 		aMonitor = {},
 	})
-	FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+	FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 end
 
 function D.DeleteConfig(szUUID)
 	for i, v in ipairs(D.CONFIG_LIST) do
 		if v.szUUID == szUUID then
 			table.remove(D.CONFIG_LIST, i)
-			FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+			FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 			return
 		end
 	end
@@ -494,7 +494,7 @@ function D.DeleteAllConfig()
 	for i, _ in X.ipairs_r(D.CONFIG_LIST) do
 		table.remove(D.CONFIG_LIST, i)
 	end
-	FireUIEvent('MY_TARGET_MON_CONFIG_MODIFY')
+	FireUIEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY')
 end
 
 function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
@@ -525,7 +525,7 @@ function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
 		aSoundDisappear = nil,
 		szExtentAnimate = nil,
 	})
-	FireUIEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY')
+	FireUIEvent('MY_TARGET_MON_CONFIG__MONITOR_MODIFY')
 end
 
 -- Global exports
@@ -574,8 +574,8 @@ do
 local function DelaySaveConfig()
 	X.DelayCall('MY_TargetMon#SaveConfig', 500, D.SaveUserData)
 end
-X.RegisterEvent('MY_TARGET_MON_CONFIG_MODIFY', 'MY_TargetMonConfig', DelaySaveConfig)
-X.RegisterEvent('MY_TARGET_MON_CONFIG_MONITOR_MODIFY', 'MY_TargetMonConfig', DelaySaveConfig)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__CONFIG_MODIFY', 'MY_TargetMonConfig', DelaySaveConfig)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__MONITOR_MODIFY', 'MY_TargetMonConfig', DelaySaveConfig)
 end
 
 X.RegisterInit('MY_TargetMonConfig', D.LoadUserData)
