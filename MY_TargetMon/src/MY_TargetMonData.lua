@@ -114,7 +114,7 @@ function D.GetTarget(eTarType, eMonType)
 			return X.GetTarget(KTarget)
 		end
 	elseif TEAM_MARK[eTarType] then
-		local mark = GetClientTeam().GetTeamMark()
+		local mark = X.GetTeamMark()
 		if mark then
 			for dwID, nMark in pairs(mark) do
 				if TEAM_MARK[eTarType] == nMark then
