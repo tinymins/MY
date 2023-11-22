@@ -347,6 +347,7 @@ function D.OnItemRButtonClick()
 			fnAction = function()
 				config.bEnable = not config.bEnable
 				FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
+				X.UI.ClosePopupMenu()
 			end,
 		})
 		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
@@ -357,6 +358,7 @@ function D.OnItemRButtonClick()
 				X.Confirm(_L['Sure to delete monitor? This operation can not be undone.'], function()
 					MY_TargetMonConfig.DeleteDataset(config.szUUID)
 				end)
+				X.UI.ClosePopupMenu()
 			end,
 		})
 		local nX, nY = this:GetAbsPos()
