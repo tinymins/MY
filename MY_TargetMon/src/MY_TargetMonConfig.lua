@@ -34,7 +34,7 @@ local D = {
 }
 local REMOTE_DATA_ROOT = X.FormatPath({'userdata/target_mon/remote/', X.PATH_TYPE.GLOBAL})
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
-local DEFAULT_MONITOR_ICON_ID = 13
+local DEFAULT_MONITOR_ICON_ID = 572
 
 local function GetUserDataPath()
 	local ePathType = O.bCommon and X.PATH_TYPE.GLOBAL or X.PATH_TYPE.ROLE
