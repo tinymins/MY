@@ -62,6 +62,9 @@ local META_LIST_JSON_SCHEMA = X.Schema.Record({
 		total = X.Schema.Number,
 	}, true),
 }, true)
+local FEEDS_LIST_JSON_SCHEMA = X.Schema.Record({
+	data = X.Schema.Collection(META_JSON_SCHEMA),
+}, true)
 
 -- 陆服环境下，以下缩写均对等
 -- tinymins
@@ -845,57 +848,89 @@ X.RegisterInit('MY_TargetMon_Subscribe_Data', function()
 	if X.IsDebugServer() then
 		return
 	end
-	-- -- 订阅数据自动更新
-	-- X.DelayCall(8000, function()
-	-- 	local szLastURL = MY_TargetMonConfig.GetUserConfig('MY_TargetMon_Subscribe_Data.LastURL')
-	-- 	local bDataNotModified = MY_TargetMonConfig.GetUserConfig('MY_TargetMon_Subscribe_Data.DataNotModified')
-	-- 	local aType = MY_TargetMonConfig.GetUserConfig('MY_TargetMon_Subscribe_Data.LastType')
-	-- 	if X.IsEmpty(szLastURL)
-	-- 	or not bDataNotModified
-	-- 	or not X.IsTable(aType) or X.IsEmpty(aType) then
-	-- 		return
-	-- 	end
-	-- 	local function ParseVersion(szVersion)
-	-- 		if X.IsString(szVersion) then
-	-- 			local nPos = X.StringFindW(szVersion, '.')
-	-- 			if nPos then
-	-- 				local szMajorVersion = szVersion:sub(1, nPos)
-	-- 				local szMinorVersion = szVersion:sub(nPos + 1)
-	-- 				return szMajorVersion, szMinorVersion
-	-- 			end
-	-- 			return szVersion, ''
-	-- 		end
-	-- 		return '', ''
-	-- 	end
-	-- 	D.FetchSubscribeItem(
-	-- 		szLastURL,
-	-- 		function(info)
-	-- 			local szPrimaryVersion = ParseVersion(info.szVersion)
-	-- 			local szLastPrimaryVersion = ParseVersion(MY_TargetMonConfig.GetUserConfig('MY_TargetMon_Subscribe_Data.LastVersion'))
-	-- 			if X.IsEmpty(szPrimaryVersion) or szPrimaryVersion == szLastPrimaryVersion then
-	-- 				return
-	-- 			end
-	-- 			--[[#DEBUG BEGIN]]
-	-- 			local nTime = GetTime()
-	-- 			X.Debug(
-	-- 				'MY_TargetMon_Subscribe_Data',
-	-- 				'Auto update confirmed: ' .. szLastPrimaryVersion
-	-- 					.. ' -> ' .. szPrimaryVersion
-	-- 					.. ' (' .. table.concat(aType, ',') .. ')',
-	-- 				X.DEBUG_LEVEL.LOG)
-	-- 			--[[#DEBUG END]]
-	-- 			D.Subscribe(info, true)
-	-- 				:Then(function()
-	-- 					--[[#DEBUG BEGIN]]
-	-- 					X.Debug(
-	-- 						'MY_TargetMon_Subscribe_Data',
-	-- 						'Auto update complete, cost time ' .. (GetTime() - nTime) .. 'ms',
-	-- 						X.DEBUG_LEVEL.LOG)
-	-- 					--[[#DEBUG END]]
-	-- 					X.Sysmsg(_L('Upgrade TargetMon data to latest: %s', info.szTitle))
-	-- 				end)
-	-- 		end)
-	-- end)
+	-- 订阅数据自动更新
+	X.DelayCall(8000, function()
+		local tSubscribed = MY_TargetMonConfig.GetUserConfig('MY_TargetMon_Subscribe_Data.Subscribed') or {}
+		local aKey = {}
+		for _, tInfo in ipairs(tSubscribed) do
+			table.insert(aKey, tInfo.szKey)
+		end
+		if X.IsEmpty(aKey) then
+			return
+		end
+		local function ParseVersion(szVersion)
+			if X.IsString(szVersion) then
+				local nPos = X.StringFindW(szVersion, '.')
+				if nPos then
+					local szMajorVersion = szVersion:sub(1, nPos)
+					local szMinorVersion = szVersion:sub(nPos + 1)
+					return szMajorVersion, szMinorVersion
+				end
+				return szVersion, ''
+			end
+			return '', ''
+		end
+		X.Ajax({
+			url = 'https://pull.j3cx.com/api/dbm/feeds?',
+			data = {
+				l = X.ENVIRONMENT.GAME_LANG,
+				L = X.ENVIRONMENT.GAME_EDITION,
+				type = 2,
+				keys = table.concat(aKey, '|'),
+			},
+			success = function(szHTML)
+				local res = X.DecodeJSON(szHTML)
+				local errs = X.Schema.CheckSchema(res, FEEDS_LIST_JSON_SCHEMA)
+				if errs then
+					return
+				end
+				local aUpdateInfo = {}
+				for _, info in ipairs(res.data) do
+					info.url = 'https://pull.j3cx.com/api/dbm/feed?'
+						.. X.EncodeQuerystring(X.ConvertToUTF8({
+							l = X.ENVIRONMENT.GAME_LANG,
+							L = X.ENVIRONMENT.GAME_EDITION,
+							type = 2,
+							key = info.key,
+						}))
+					info = D.FormatMetaInfo(info)
+					if info then
+						local tLastInfo = tSubscribed[D.GetShortURL(info.szURL) or info.szURL]
+						local szPrimaryVersion = ParseVersion(info.szVersion)
+						local szLastPrimaryVersion = ParseVersion(tLastInfo.szVersion)
+						if szPrimaryVersion ~= szLastPrimaryVersion then
+							info.bEmbedded = true
+							table.insert(aUpdateInfo, info)
+						end
+					end
+				end
+				--[[#DEBUG BEGIN]]
+				local nTime = GetTime()
+				local aUpdateLog = {}
+				for _, tInfo in ipairs(aUpdateInfo) do
+					local tLastInfo = tSubscribed[D.GetShortURL(tInfo.szURL) or tInfo.szURL]
+					table.insert(aUpdateLog, tInfo.szKey .. '(' .. tLastInfo.szVersion .. '->' .. tInfo.szVersion .. ')')
+				end
+				X.Debug(
+					'MY_TargetMon_Subscribe_Data',
+					'Auto update confirmed: ' .. table.concat(aUpdateLog, '; '),
+					X.DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
+				for _, tInfo in ipairs(aUpdateInfo) do
+					D.Subscribe(tInfo, true)
+						:Then(function()
+							--[[#DEBUG BEGIN]]
+							X.Debug(
+								'MY_TargetMon_Subscribe_Data',
+								'Auto update [' .. tInfo.szKey .. '] complete, cost time ' .. (GetTime() - nTime) .. 'ms',
+								X.DEBUG_LEVEL.LOG)
+							--[[#DEBUG END]]
+							X.Sysmsg(_L('Upgrade TargetMon data to latest: %s', tInfo.szTitle))
+						end)
+				end
+			end,
+		})
+	end)
 end)
 
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMon_Subscribe_Data', function()
