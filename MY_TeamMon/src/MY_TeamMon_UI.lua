@@ -541,6 +541,13 @@ function D.OnItemLButtonUp()
 		this.bMouseDown = nil
 		D.UpdateMapNodeMouseState(this)
 	end
+	-- DragEnd bug fix
+	X.DelayCall(50, function()
+		if not DragPanelIsOpened() then
+			return
+		end
+		CloseDragPanel()
+	end)
 end
 
 function D.OnItemLButtonClick()
