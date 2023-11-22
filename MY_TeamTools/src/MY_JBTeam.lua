@@ -30,7 +30,7 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 	end
 	local me = X.GetClientPlayer()
 	X.Ajax({
-		url = 'https://push.j3cx.com/team/' .. (szAction == 'join' and 'join' or 'quit'),
+		url = MY_RSS.PUSH_BASE_URL .. '/team/' .. (szAction == 'join' and 'join' or 'quit'),
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

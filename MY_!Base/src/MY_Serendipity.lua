@@ -83,7 +83,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 				.. szName .. '#' .. szNameCRC .. ' via ' .. szReporter, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			X.EnsureAjax({
-				url = 'https://push.j3cx.com/api/serendipity/uploads',
+				url = MY_RSS.PUSH_BASE_URL .. '/api/serendipity/uploads',
 				data = {
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,
@@ -254,7 +254,7 @@ function D.Fetch(szName, fnAction)
 		X.KGUIEncrypt(X.SECRET['J3CX::SERENDIPITY'])
 	))
 	X.Ajax({
-		url = 'https://pull.j3cx.com/api/serendipity',
+		url = MY_RSS.PULL_BASE_URL .. '/api/serendipity',
 		data = {
 			server = X.GetServerOriginName(),
 			role = szName,

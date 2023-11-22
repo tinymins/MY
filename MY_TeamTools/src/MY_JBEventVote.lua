@@ -63,7 +63,7 @@ local VOTE_SCHEMA = X.Schema.Record({
 
 function D.FetchEventList(frame)
 	X.Ajax({
-		url = 'https://pull.j3cx.com/event/list',
+		url = MY_RSS.PULL_BASE_URL .. '/event/list',
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
@@ -135,7 +135,7 @@ end
 
 function D.FetchRankList(frame, szEventID)
 	X.Ajax({
-		url = 'https://pull.j3cx.com/rank/list',
+		url = MY_RSS.PULL_BASE_URL .. '/rank/list',
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
@@ -227,7 +227,7 @@ end
 
 function D.Vote(frame, szEventID, szTeamID)
 	X.Ajax({
-		url = 'https://push.j3cx.com/rank/vote',
+		url = MY_RSS.PUSH_BASE_URL .. '/rank/vote',
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

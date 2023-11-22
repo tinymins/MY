@@ -25,6 +25,8 @@ local RSS_FILE = {'temporary/rss.jx3dat', X.PATH_TYPE.GLOBAL}
 local RSS_DATA = X.LoadLUAData(RSS_FILE)
 local RSS_ADAPTER = {}
 local RSS_DATA_CACHE = {}
+local RSS_PULL_BASE_URL = 'https://pull.j3cx.com'
+local RSS_PUSH_BASE_URL = 'https://pull.j3cx.com'
 
 function D.Get(szKey)
 	if not RSS_DATA then
@@ -51,7 +53,7 @@ end
 
 function D.Sync()
 	X.Ajax({
-		url = 'https://pull.j3cx.com/config/all'
+		url = RSS_PULL_BASE_URL .. '/config/all'
 			.. '?l=' .. X.ENVIRONMENT.GAME_LANG
 			.. '&L=' .. X.ENVIRONMENT.GAME_EDITION
 			.. '&_=' .. GetCurrentTime(),
@@ -88,6 +90,8 @@ local settings = {
 				'RegisterAdapter',
 				'Get',
 				'Sync',
+				PULL_BASE_URL = RSS_PULL_BASE_URL,
+				PUSH_BASE_URL = RSS_PUSH_BASE_URL,
 			},
 			root = D,
 		},

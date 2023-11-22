@@ -77,7 +77,7 @@ X.RegisterEvent('MY_RSS_UPDATE', function()
 			end
 			local szArgs = X.EncodeJSON(argv)
 			X.EnsureAjax({
-				url = 'https://push.j3cx.com/api/share-event',
+				url = MY_RSS.PUSH_BASE_URL .. '/api/share-event',
 				data = {
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,
@@ -271,7 +271,7 @@ X.BreatheCall('MY_ShareKnowledge__UI', 1000, function()
 	end
 	if not X.IsEmpty(res) then
 		X.EnsureAjax({
-			url = 'https://push.j3cx.com/api/share-ui',
+			url = MY_RSS.PUSH_BASE_URL .. '/api/share-ui',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
@@ -329,7 +329,7 @@ X.RegisterEvent('OPEN_WINDOW', 'MY_ShareKnowledge__Npc', function()
 	local szDelayID
 	local function fnAction(line)
 		X.EnsureAjax({
-			url = 'https://push.j3cx.com/api/share-npc-chat',
+			url = MY_RSS.PUSH_BASE_URL .. '/api/share-npc-chat',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
@@ -406,7 +406,7 @@ X.RegisterMsgMonitor('MSG_SYS', 'MY_ShareKnowledge__Sysmsg', function(szChannel,
 	for _, szPattern in ipairs(rss) do
 		if string.find(szMsg, szPattern) then
 			X.EnsureAjax({
-				url = 'https://push.j3cx.com/api/share-sysmsg',
+				url = MY_RSS.PUSH_BASE_URL .. '/api/share-sysmsg',
 				data = {
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,
@@ -484,7 +484,7 @@ X.RegisterEvent('MY_RSS_UPDATE', function()
 			for _, s in ipairs(p) do
 				if string.find(szMsg, s) then
 					X.EnsureAjax({
-						url = 'https://push.j3cx.com/api/share-msg',
+						url = MY_RSS.PUSH_BASE_URL .. '/api/share-msg',
 						data = {
 							l = X.ENVIRONMENT.GAME_LANG,
 							L = X.ENVIRONMENT.GAME_EDITION,
@@ -586,7 +586,7 @@ local function BreatheFlushShopCache()
 				local szItems = table.concat(aItem, '~')
 
 				X.EnsureAjax({
-					url = 'https://push.j3cx.com/api/share-shop',
+					url = MY_RSS.PUSH_BASE_URL .. '/api/share-shop',
 					data = {
 						l = X.ENVIRONMENT.GAME_LANG,
 						L = X.ENVIRONMENT.GAME_EDITION,

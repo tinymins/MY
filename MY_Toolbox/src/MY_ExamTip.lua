@@ -80,7 +80,7 @@ local function QueryData(szQues)
 	end
 
 	X.Ajax({
-		url = 'https://pull.j3cx.com/api/exam?'
+		url = MY_RSS.PULL_BASE_URL .. '/api/exam?'
 			.. X.EncodeQuerystring(X.ConvertToUTF8({
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
@@ -148,7 +148,7 @@ function D.SubmitData(tExamData, bAllRight)
 		return
 	end
 	X.Ajax({
-		url = 'https://push.j3cx.com/api/exam/uploads',
+		url = MY_RSS.PUSH_BASE_URL .. '/api/exam/uploads',
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

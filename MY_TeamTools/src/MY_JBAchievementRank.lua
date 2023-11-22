@@ -87,7 +87,7 @@ end)
 
 function D.ShareBKR(p, bOnymous, onfulfilled, oncomplete)
 	local tConfig = {
-		url = 'https://push.j3cx.com/api/achievement-rank/uploads',
+		url = MY_RSS.PUSH_BASE_URL .. '/api/achievement-rank/uploads',
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

@@ -55,7 +55,7 @@ function D.Hook()
 			end
 			X.Alert('MY_YunMacro', _L['Macro update started, please keep panel opened and wait.'], nil, _L['Got it'])
 			X.Ajax({
-				url = 'https://pull.j3cx.com/api/macro/query',
+				url = MY_RSS.PULL_BASE_URL .. '/api/macro/query',
 				data = {
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,

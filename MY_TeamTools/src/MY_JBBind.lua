@@ -29,7 +29,7 @@ function D.FetchBindStatus(resolve, reject)
 	if X.IsNil(O.uid) then
 		O.pending = true
 		X.Ajax({
-			url = 'https://pull.j3cx.com/role/query',
+			url = MY_RSS.PULL_BASE_URL .. '/role/query',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
@@ -68,7 +68,7 @@ function D.Bind(szToken, resolve, reject)
 	end
 	local me = X.GetClientPlayer()
 	X.Ajax({
-		url = 'https://push.j3cx.com/role/bind',
+		url = MY_RSS.PUSH_BASE_URL .. '/role/bind',
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
@@ -97,7 +97,7 @@ end
 
 function D.Unbind(resolve, reject)
 	X.Ajax({
-		url = 'https://push.j3cx.com/role/unbind',
+		url = MY_RSS.PUSH_BASE_URL .. '/role/unbind',
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

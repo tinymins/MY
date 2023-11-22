@@ -131,7 +131,7 @@ function D.FetchPacketList(szType, nPage)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
 	return X.Promise:new(function(resolve, reject)
 		X.Ajax({
-			url = 'https://pull.j3cx.com/api/dbm/game/vpk',
+			url = MY_RSS.PULL_BASE_URL .. '/api/dbm/game/vpk',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
@@ -212,7 +212,7 @@ function D.FetchSlugList()
 			return
 		end
 		X.Ajax({
-			url = 'https://pull.j3cx.com/api/dbm/game/vpk/slugs',
+			url = MY_RSS.PULL_BASE_URL .. '/api/dbm/game/vpk/slugs',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
@@ -306,8 +306,8 @@ function D.FetchVoiceList(szType, bDownload)
 		local dwPacketID = szType == 'OFFICIAL' and O.dwOfficialVoicePacketID or O.dwCustomVoicePacketID
 		X.Ajax({
 			url = bDownload
-				and 'https://pull.j3cx.com/api/dbm/game/vpk/voices/d'
-				or 'https://pull.j3cx.com/api/dbm/game/vpk/voices',
+				and MY_RSS.PULL_BASE_URL .. '/api/dbm/game/vpk/voices/d'
+				or MY_RSS.PULL_BASE_URL .. '/api/dbm/game/vpk/voices',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
@@ -548,7 +548,7 @@ function D.ShowVoiceRecommendation(szOfficialVoicePacketUUID, szCustomVoicePacke
 		end
 		if szOfficialVoicePacketUUID then
 			X.Ajax({
-				url = 'https://pull.j3cx.com/api/dbm/game/vpk',
+				url = MY_RSS.PULL_BASE_URL .. '/api/dbm/game/vpk',
 				data = {
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,
@@ -571,7 +571,7 @@ function D.ShowVoiceRecommendation(szOfficialVoicePacketUUID, szCustomVoicePacke
 		end
 		if szCustomVoicePacketUUID then
 			X.Ajax({
-				url = 'https://pull.j3cx.com/api/dbm/game/vpk',
+				url = MY_RSS.PULL_BASE_URL .. '/api/dbm/game/vpk',
 				data = {
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,

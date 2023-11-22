@@ -101,12 +101,12 @@ local PROVIDER_PARAMS = {
 	},
 	jx3box = {
 		bSimple = true,
-		szRawURL = 'https://pull.j3cx.com/api/dbm/feed?key=%s',
+		szRawURL = MY_RSS.PULL_BASE_URL .. '/api/dbm/feed?key=%s',
 		szRawURL_T = {
-			'^https://pull%.j3cx%.com/api/dbm/feed%?.*&key%=([^&]+)&.*$',
-			'^https://pull%.j3cx%.com/api/dbm/feed%?key%=([^&]+)&.*$',
-			'^https://pull%.j3cx%.com/api/dbm/feed%?.*&key%=([^&]+)$',
-			'^https://pull%.j3cx%.com/api/dbm/feed%?key%=([^&]+)$',
+			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/dbm/feed%?.*&key%=([^&]+)&.*$',
+			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/dbm/feed%?key%=([^&]+)&.*$',
+			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/dbm/feed%?.*&key%=([^&]+)$',
+			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/dbm/feed%?key%=([^&]+)$',
 		},
 	},
 }
@@ -314,7 +314,7 @@ end
 function D.FetchSubscribeList(nPage)
 	return X.Promise:new(function(resolve, reject)
 		X.Ajax({
-			url = 'https://pull.j3cx.com/api/dbm/subscribe/all',
+			url = MY_RSS.PULL_BASE_URL .. '/api/dbm/subscribe/all',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
@@ -341,7 +341,7 @@ function D.FetchSubscribeList(nPage)
 				}
 				local aMetaInfo = {}
 				for _, info in ipairs(res.data) do
-					info.url = 'https://pull.j3cx.com/api/dbm/feed?'
+					info.url = MY_RSS.PULL_BASE_URL .. '/api/dbm/feed?'
 						.. X.EncodeQuerystring(X.ConvertToUTF8({
 							l = X.ENVIRONMENT.GAME_LANG,
 							L = X.ENVIRONMENT.GAME_EDITION,

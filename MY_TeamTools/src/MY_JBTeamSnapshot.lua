@@ -51,7 +51,7 @@ function D.CreateSnapshot()
 	end
 	local me = X.GetClientPlayer()
 	X.Ajax({
-		url = 'https://push.j3cx.com/team/snapshot',
+		url = MY_RSS.PUSH_BASE_URL .. '/team/snapshot',
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

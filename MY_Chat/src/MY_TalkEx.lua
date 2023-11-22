@@ -274,7 +274,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['Search'],
 		onClick = function()
 			X.Ajax({
-				url = 'https://pull.j3cx.com/joke/random',
+				url = MY_RSS.PULL_BASE_URL .. '/joke/random',
 				data = {
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,
@@ -317,7 +317,7 @@ function PS.OnPanelActive(wnd)
 		onClick = function()
 			local function fnAction(bAnonymous)
 				X.Ajax({
-					url = 'https://push.j3cx.com/joke',
+					url = MY_RSS.PUSH_BASE_URL .. '/joke',
 					data = {
 						l = X.ENVIRONMENT.GAME_LANG,
 						L = X.ENVIRONMENT.GAME_EDITION,
