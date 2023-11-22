@@ -308,6 +308,20 @@ function D.OnItemMouseOut()
 	end
 end
 
+function D.OnItemLButtonUp()
+	local name = this:GetName()
+	if name == 'Handle_ConfigItem'
+	or name == 'Handle_MonitorItem' then
+		-- DragEnd bug fix
+		X.DelayCall(50, function()
+			if not X.UI.IsDragDropOpened() then
+				return
+			end
+			X.UI.CloseDragDrop()
+		end)
+	end
+end
+
 function D.OnItemLButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
