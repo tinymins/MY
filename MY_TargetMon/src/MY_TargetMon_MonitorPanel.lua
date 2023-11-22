@@ -67,6 +67,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 						box:SetObjectIcon(nIconID)
 					end)
+					X.UI.ClosePopupMenu()
 				end,
 			}
 			if mon.nIconID then
@@ -78,6 +79,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 					mon.nIconID = nil
 					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 					box:SetObjectIcon(MY_TargetMonConfig.DEFAULT_MONITOR_ICON_ID)
+					X.UI.ClosePopupMenu()
 				end
 			end
 			table.insert(menu, t1)
