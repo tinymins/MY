@@ -2698,6 +2698,16 @@ function OO:Drag(...)
 						end
 						X.SafeCall(GetComponentProp(dropEl, 'OnDrop'), szDragGroupID, xData)
 					end
+					raw.OnItemLButtonUp = function()
+						-- DragEnd bug fix
+						X.DelayCall(50, function()
+							if not X.UI.IsDragDropOpened() then
+								return
+							end
+							X.UI.CloseDragDrop()
+						end)
+					end
+					raw:RegisterEvent(X.UI.ITEM_EVENT.L_BUTTON_UP)
 					raw:RegisterEvent(X.UI.ITEM_EVENT.L_BUTTON_DRAG)
 					raw:RegisterEvent(X.UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
 				end
