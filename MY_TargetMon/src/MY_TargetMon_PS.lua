@@ -164,8 +164,8 @@ function D.OnLButtonClick()
 			table.insert(menu, {
 				szOption = _L['Subscribe remote data'],
 				fnAction = function()
-					X.UI.ClosePopupMenu()
 					MY_TargetMon_Subscribe.OpenPanel()
+					X.UI.ClosePopupMenu()
 				end,
 			})
 			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
@@ -173,16 +173,15 @@ function D.OnLButtonClick()
 		table.insert(menu, {
 			szOption = _L['Import local data'],
 			fnAction = function()
-				X.UI.ClosePopupMenu()
 				local szFile = GetOpenFileName(
 					_L['Please select data file.'],
 					'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
 					X.GetAbsolutePath(MY_TargetMonConfig.REMOTE_DATA_ROOT)
 				)
-				if X.IsEmpty(szFile) then
-					return
+				if not X.IsEmpty(szFile) then
+					MY_TargetMonConfig.ImportDatasetFile(szFile)
 				end
-				MY_TargetMonConfig.ImportDatasetFile(szFile)
+				X.UI.ClosePopupMenu()
 			end,
 		})
 		local t1 = { szOption = _L['Export local data'] }
@@ -235,8 +234,8 @@ function D.OnLButtonClick()
 							end
 							X.Alert(_L['Ancient configs import success:'] .. '\n\n' .. table.concat(aName, '\n'))
 						end)
-						X.UI.ClosePopupMenu()
 					end)
+					X.UI.ClosePopupMenu()
 				end,
 			})
 		end
@@ -246,8 +245,8 @@ function D.OnLButtonClick()
 			fnAction = function()
 				X.Confirm(_L['Sure to delete all config data? This operation can not be undone.'], function()
 					MY_TargetMonConfig.DeleteAllDataset()
-					X.UI.ClosePopupMenu()
 				end)
+				X.UI.ClosePopupMenu()
 			end,
 		})
 		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
