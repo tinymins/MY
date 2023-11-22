@@ -148,17 +148,26 @@ function D.OnFrameCreate()
 			if szLang == 'zhcn' or szLang == 'zhtw' then
 				table.insert(menu, {
 					szOption = _L['Subscribe data'],
-					fnAction = MY_TeamMon_Subscribe.OpenPanel,
+					fnAction = function()
+						MY_TeamMon_Subscribe.OpenPanel()
+						MY.UI.ClosePopupMenu()
+					end,
 				})
 				table.insert(menu, {
 					szOption = _L['Merge data slice'],
-					fnAction = MY_TeamMon_Subscribe_MergeDataSlice.OpenPanel,
+					fnAction = function()
+						MY_TeamMon_Subscribe_MergeDataSlice.OpenPanel()
+						MY.UI.ClosePopupMenu()
+					end,
 				})
 				table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			end
 			table.insert(menu, {
 				szOption = _L['Import local data'],
-				fnAction = function() D.OpenImportPanel() end, -- 有传参 不要改
+				fnAction = function()
+					D.OpenImportPanel()
+					MY.UI.ClosePopupMenu()
+				end, -- 有传参 不要改
 			})
 			table.insert(menu, { szOption = _L['Export local data'], fnAction = D.OpenExportPanel })
 			table.insert(menu, {
@@ -170,6 +179,7 @@ function D.OnFrameCreate()
 							MY_TeamMon.RemoveMeta()
 						end
 					end)
+					MY.UI.ClosePopupMenu()
 				end,
 			})
 			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
@@ -177,6 +187,7 @@ function D.OnFrameCreate()
 				local szRoot = X.GetAbsolutePath(MY_TEAM_MON_REMOTE_DATA_ROOT):gsub('/', '\\')
 				X.OpenFolder(szRoot)
 				X.UI.OpenTextEditor(szRoot)
+				MY.UI.ClosePopupMenu()
 			end })
 			return menu
 		end,
