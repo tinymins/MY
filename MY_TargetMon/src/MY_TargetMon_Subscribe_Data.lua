@@ -62,9 +62,7 @@ local META_LIST_JSON_SCHEMA = X.Schema.Record({
 		total = X.Schema.Number,
 	}, true),
 }, true)
-local FEEDS_LIST_JSON_SCHEMA = X.Schema.Record({
-	data = X.Schema.Collection(META_JSON_SCHEMA),
-}, true)
+local FEEDS_LIST_JSON_SCHEMA = X.Schema.Collection(META_JSON_SCHEMA)
 
 -- 陆服环境下，以下缩写均对等
 -- tinymins
@@ -288,7 +286,7 @@ function D.FormatMetaInfo(res)
 	local info = {
 		szURL = szURL,
 		szDataURL = D.GetAttachRawURL(res.szDataURL or res.data_url or './data.jx3dat', szURL),
-		szKey = D.GetShortURL(szURL) or ('H' .. GetStringCRC(szURL)),
+		szKey = res.szKey or res.key or D.GetShortURL(szURL) or ('H' .. GetStringCRC(szURL)),
 		szAuthor = res.szAuthor or res.author or '',
 		szTitle = res.szTitle or res.name or '',
 		szUpdateTime = res.szUpdateTime or res.update or '',
@@ -852,7 +850,7 @@ X.RegisterInit('MY_TargetMon_Subscribe_Data', function()
 	X.DelayCall(8000, function()
 		local tSubscribed = MY_TargetMonConfig.GetUserConfig('MY_TargetMon_Subscribe_Data.Subscribed') or {}
 		local aKey = {}
-		for _, tInfo in ipairs(tSubscribed) do
+		for _, tInfo in pairs(tSubscribed) do
 			table.insert(aKey, tInfo.szKey)
 		end
 		if X.IsEmpty(aKey) then
@@ -871,12 +869,12 @@ X.RegisterInit('MY_TargetMon_Subscribe_Data', function()
 			return '', ''
 		end
 		X.Ajax({
-			url = 'https://pull.j3cx.com/api/dbm/feeds?',
+			url = 'https://pull.j3cx.com/api/dbm/monitor/feed?',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
 				type = 2,
-				keys = table.concat(aKey, '|'),
+				key = table.concat(aKey, '|'),
 			},
 			success = function(szHTML)
 				local res = X.DecodeJSON(szHTML)
@@ -885,7 +883,7 @@ X.RegisterInit('MY_TargetMon_Subscribe_Data', function()
 					return
 				end
 				local aUpdateInfo = {}
-				for _, info in ipairs(res.data) do
+				for _, info in ipairs(res) do
 					info.url = 'https://pull.j3cx.com/api/dbm/feed?'
 						.. X.EncodeQuerystring(X.ConvertToUTF8({
 							l = X.ENVIRONMENT.GAME_LANG,
@@ -893,14 +891,14 @@ X.RegisterInit('MY_TargetMon_Subscribe_Data', function()
 							type = 2,
 							key = info.key,
 						}))
-					info = D.FormatMetaInfo(info)
-					if info then
-						local tLastInfo = tSubscribed[D.GetShortURL(info.szURL) or info.szURL]
-						local szPrimaryVersion = ParseVersion(info.szVersion)
+					local tInfo = D.FormatMetaInfo(info)
+					if tInfo then
+						local tLastInfo = tSubscribed[D.GetShortURL(tInfo.szURL) or tInfo.szURL]
+						local szPrimaryVersion = ParseVersion(tInfo.szVersion)
 						local szLastPrimaryVersion = ParseVersion(tLastInfo.szVersion)
 						if szPrimaryVersion ~= szLastPrimaryVersion then
-							info.bEmbedded = true
-							table.insert(aUpdateInfo, info)
+							tInfo.bEmbedded = true
+							table.insert(aUpdateInfo, tInfo)
 						end
 					end
 				end
