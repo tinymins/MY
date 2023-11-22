@@ -565,7 +565,7 @@ function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
 		return
 	end
 	if not nIndex then
-		nIndex = #dataset.aMonitor
+		nIndex = #dataset.aMonitor + 1
 	end
 	local szNote, nIconID = '', nil
 	if dataset.szType == 'BUFF' then
