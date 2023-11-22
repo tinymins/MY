@@ -100,12 +100,12 @@ local PROVIDER_PARAMS = {
 	},
 	jx3box = {
 		bSimple = true,
-		szRawURL = MY_RSS.PULL_BASE_URL .. '/api/dbm/feed?key=%s&type=2',
+		szRawURL = MY_RSS.PULL_BASE_URL .. '/api/addon/target-monitor/subscribe/feed?key=%s',
 		szRawURL_T = {
-			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/dbm/feed%?.*&key%=([^&]+)&.*$',
-			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/dbm/feed%?key%=([^&]+)&.*$',
-			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/dbm/feed%?.*&key%=([^&]+)$',
-			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/dbm/feed%?key%=([^&]+)$',
+			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/addon/target-monitor/subscribe/feed%?.*&key%=([^&]+)&.*$',
+			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/addon/target-monitor/subscribe/feed%?key%=([^&]+)&.*$',
+			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/addon/target-monitor/subscribe/feed%?.*&key%=([^&]+)$',
+			'^' .. X.EscapeString(MY_RSS.PULL_BASE_URL) .. '/api/addon/target-monitor/subscribe/feed%?key%=([^&]+)$',
 		},
 	},
 }
@@ -315,11 +315,10 @@ end
 function D.FetchSubscribeList(nPage)
 	return X.Promise:new(function(resolve, reject)
 		X.Ajax({
-			url = MY_RSS.PULL_BASE_URL .. '/api/dbm/subscribe/all',
+			url = MY_RSS.PULL_BASE_URL .. '/api/addon/target-monitor/subscribe/all',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
-				type = 2,
 				page = nPage,
 				pageSize = 15,
 			},
@@ -343,11 +342,10 @@ function D.FetchSubscribeList(nPage)
 				}
 				local aMetaInfo = {}
 				for _, info in ipairs(res.data) do
-					info.url = MY_RSS.PULL_BASE_URL .. '/api/dbm/feed?'
+					info.url = MY_RSS.PULL_BASE_URL .. '/api/addon/target-monitor/subscribe/feed?'
 						.. X.EncodeQuerystring(X.ConvertToUTF8({
 							l = X.ENVIRONMENT.GAME_LANG,
 							L = X.ENVIRONMENT.GAME_EDITION,
-							type = 2,
 							key = info.key,
 						}))
 					info = D.FormatMetaInfo(info)
@@ -869,11 +867,10 @@ X.RegisterInit('MY_TargetMon_Subscribe_Data', function()
 			return '', ''
 		end
 		X.Ajax({
-			url = MY_RSS.PULL_BASE_URL .. '/api/dbm/monitor/feed?',
+			url = MY_RSS.PULL_BASE_URL .. '/api/addon/target-monitor/subscribe/feeds?',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
-				type = 2,
 				key = table.concat(aKey, '|'),
 			},
 			success = function(szHTML)
@@ -884,11 +881,10 @@ X.RegisterInit('MY_TargetMon_Subscribe_Data', function()
 				end
 				local aUpdateInfo = {}
 				for _, info in ipairs(res) do
-					info.url = MY_RSS.PULL_BASE_URL .. '/api/dbm/feed?'
+					info.url = MY_RSS.PULL_BASE_URL .. '/api/addon/target-monitor/subscribe/feed?'
 						.. X.EncodeQuerystring(X.ConvertToUTF8({
 							l = X.ENVIRONMENT.GAME_LANG,
 							L = X.ENVIRONMENT.GAME_EDITION,
-							type = 2,
 							key = info.key,
 						}))
 					local tInfo = D.FormatMetaInfo(info)

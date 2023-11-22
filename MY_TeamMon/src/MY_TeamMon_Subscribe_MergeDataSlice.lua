@@ -31,7 +31,7 @@ function D.OpenPanel(szModule)
 				return
 			end
 			X.Ajax({
-				url = MY_RSS.PULL_BASE_URL .. '/api/dbm/game/item/info',
+				url = MY_RSS.PULL_BASE_URL .. '/api/addon/team-monitor/slice',
 				data = {
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,
