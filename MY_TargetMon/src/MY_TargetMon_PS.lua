@@ -160,14 +160,16 @@ function D.OnLButtonClick()
 		D.CreateMonitor(frame, nil)
 	elseif name == 'Btn_ImportConfig' then
 		local menu = {}
-		table.insert(menu, {
-			szOption = _L['Subscribe remote data'],
-			fnAction = function()
-				X.UI.ClosePopupMenu()
-				MY_TargetMon_Subscribe.OpenPanel()
-			end,
-		})
-		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+		if GetCurrentTime() > 1700953200 then
+			table.insert(menu, {
+				szOption = _L['Subscribe remote data'],
+				fnAction = function()
+					X.UI.ClosePopupMenu()
+					MY_TargetMon_Subscribe.OpenPanel()
+				end,
+			})
+			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+		end
 		table.insert(menu, {
 			szOption = _L['Import local data'],
 			fnAction = function()
