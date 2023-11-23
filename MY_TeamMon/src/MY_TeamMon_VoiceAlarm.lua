@@ -528,10 +528,10 @@ function D.ShowVoiceRecommendation(szOfficialVoicePacketUUID, szCustomVoicePacke
 				return
 			end
 			local szName = ''
-			if szOfficialVoicePacketName then
+			if szOfficialVoicePacketName and szOfficialVoicePacketName ~= D.GetCurrentPacketUUID('OFFICIAL') then
 				szName = szOfficialVoicePacketName
 			end
-			if szCustomVoicePacketName then
+			if szCustomVoicePacketName and szCustomVoicePacketName ~= D.GetCurrentPacketUUID('CUSTOM') then
 				if szName ~= '' then
 					szName = szName .. _L.AND_COMMA
 				end
