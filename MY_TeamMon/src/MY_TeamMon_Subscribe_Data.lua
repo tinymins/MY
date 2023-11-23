@@ -287,6 +287,7 @@ function D.FormatMetaInfo(res)
 	local info = {
 		szURL = szURL,
 		szDataURL = D.GetAttachRawURL(res.szDataURL or res.data_url or './data.jx3dat', szURL),
+		bPlain = res.bPlain or res.is_raw == 0 or false,
 		szKey = D.GetShortURL(szURL) or ('H' .. GetStringCRC(szURL)),
 		szAuthor = res.szAuthor or res.author or '',
 		szTitle = res.szTitle or res.name or '',
@@ -403,10 +404,12 @@ function D.FetchSubscribeItem(szURL)
 end
 
 function D.Subscribe(info, bSilent)
+	Output(info)
 	local szUUID = 'r-'
 		.. ('%08x'):format(GetStringCRC(info.szDataURL))
 		.. ('%08x'):format(GetStringCRC(info.szVersion))
 	local LUA_CONFIG = { passphrase = D.PW, crc = true, compress = true }
+	local PLAIN_LUA_CONFIG = { passphrase = false }
 	local szMetaFilePath = MY_TEAM_MON_REMOTE_DATA_ROOT .. szUUID .. '.meta.jx3dat'
 	local szDataFilePath = MY_TEAM_MON_REMOTE_DATA_ROOT .. szUUID .. '.jx3dat'
 	local aType = bSilent and MY_TeamMon.GetUserConfig('MY_TeamMon_Subscribe_Data.LastType') or nil
@@ -430,7 +433,7 @@ function D.Subscribe(info, bSilent)
 			--[[#DEBUG END]]
 			DATA_DOWNLOADING[info.szKey] = true
 			FireUIEvent('MY_TEAM_MON__SUBSCRIBE_DATA__DOWNLOAD_UPDATE')
-			X.FetchLUAData(info.szDataURL, LUA_CONFIG)
+			X.FetchLUAData(info.szDataURL, info.bPlain and PLAIN_LUA_CONFIG or LUA_CONFIG)
 				:Then(function(data)
 					DATA_DOWNLOADING[info.szKey] = nil
 					FireUIEvent('MY_TEAM_MON__SUBSCRIBE_DATA__DOWNLOAD_UPDATE')
