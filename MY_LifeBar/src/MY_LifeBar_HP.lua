@@ -328,7 +328,9 @@ local function onBreathe()
 		if not (hList and hList:IsValid()) then
 			hList = X.UI.GetShadowHandle('MY_LifeBar')
 		end
-		hList:Sort()
+		if hList:GetItemCount() ~= 0 then
+			hList:Sort()
+		end
 		REQUIRE_SORT = false
 	end
 end
