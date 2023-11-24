@@ -432,6 +432,7 @@ function D.ImportDatasetFile(szFile, tOption)
 				local bExist = false
 				for i, v in ipairs(D.DATASET_LIST) do
 					if v.szUUID == dataset.szUUID then
+						v.tMap = dataset.tMap
 						v.aMonitor = dataset.aMonitor
 						v.szTitle = dataset.szTitle
 						v.szAuthor = dataset.szAuthor
@@ -552,6 +553,7 @@ function D.CreateDataset()
 		szAlignment = 'LEFT',
 
 		bEnable = true,
+		tMap = nil,
 		bHideOthers = false,
 		bHideVoid = false,
 		bPenetrable = false,

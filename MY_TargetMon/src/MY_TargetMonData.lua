@@ -33,6 +33,33 @@ local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 local MY_TARGET_MON_MAP_TYPE = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE
 
 do
+local function FilterDatasets(aDataset, dwMapID, dwKungfuID)
+	local ret = {}
+	for i, dataset in ipairs(aDataset) do
+		if dataset.bEnable
+		and (X.IsEmpty(dataset.tMap) or (
+			dataset.tMap.bAll or dataset.tMap[dwMapID]
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.CITY        ] and X.IsCityMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.DUNGEON     ] and X.IsDungeonMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.TEAM_DUNGEON] and X.IsTeam_dungeonMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.RAID_DUNGEON] and X.IsRaid_dungeonMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.STARVE      ] and X.IsStarveMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.VILLAGE     ] and X.IsVillageMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.ARENA       ] and X.IsArenaMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.BATTLEFIELD ] and X.IsBattlefieldMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.PUBG        ] and X.IsPubgMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.ZOMBIE      ] and X.IsZombieMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.MONSTER     ] and X.IsMonsterMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.MOBA        ] and X.IsMobaMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.HOMELAND    ] and X.IsHomelandMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.ROGUELIKE   ] and X.IsRoguelikeMap(dwMapID))
+			or (dataset.tMap[MY_TARGET_MON_MAP_TYPE.COMPETITION ] and X.IsCompetitionMap(dwMapID))
+		)) then
+			table.insert(ret, dataset)
+		end
+	end
+	return ret
+end
 local function FilterMonitors(aMonitor, dwMapID, dwKungfuID)
 	local ret = {}
 	for i, mon in ipairs(aMonitor) do
@@ -76,7 +103,7 @@ function D.GetDatasetList()
 		local aConfig = {}
 		local dwMapID = me.GetMapID() or 0
 		local dwKungfuID = me.GetKungfuMountID() or 0
-		for i, dataset in ipairs(MY_TargetMonConfig.GetDatasetList()) do
+		for i, dataset in ipairs(FilterDatasets(MY_TargetMonConfig.GetDatasetList(), dwMapID, dwKungfuID)) do
 			aConfig[i] = setmetatable(
 				{
 					aMonitor = FilterMonitors(dataset.aMonitor, dwMapID, dwKungfuID),
@@ -444,157 +471,155 @@ local fUIScale, fFontScaleBase
 function UpdateView()
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
 	for _, dataset in ipairs(D.GetDatasetList()) do
-		if dataset.bEnable then
-			local dwTarType, dwTarID = D.GetTarget(dataset.szTarget, dataset.szType)
-			local KObject = X.GetObject(dwTarType, dwTarID)
-			local dwTarKungfuID = KObject
-				and (dwTarType == TARGET.PLAYER
-					and (KObject.GetKungfuMountID() or 0)
-					or 'npc'
-				)
-				or 0
-			local view = VIEW_LIST[nViewIndex]
-			if not view then
-				view = {}
-				VIEW_LIST[nViewIndex] = view
-			end
-			fUIScale = (dataset.bIgnoreSystemUIScale and 1 or Station.GetUIScale()) * dataset.fScale
-			fFontScaleBase = fUIScale * X.GetFontScale() * dataset.fScale
-			view.szUUID               = dataset.szUUID
-			view.szType               = dataset.szType
-			view.szTarget             = dataset.szTarget
-			view.szCaption            = MY_TargetMonConfig.GetDatasetTitle(dataset)
-			view.tAnchor              = dataset.tAnchor
-			view.bIgnoreSystemUIScale = dataset.bIgnoreSystemUIScale
-			view.fUIScale             = fUIScale
-			view.fIconFontScale       = fFontScaleBase * dataset.fIconFontScale
-			view.fOtherFontScale      = fFontScaleBase * dataset.fOtherFontScale
-			view.bPenetrable          = dataset.bPenetrable
-			view.bDraggable           = dataset.bDraggable
-			view.szAlignment          = dataset.szAlignment
-			view.nMaxLineCount        = dataset.nMaxLineCount
-			view.bCdCircle            = dataset.bCdCircle
-			view.bCdFlash             = dataset.bCdFlash
-			view.bCdReadySpark        = dataset.bCdReadySpark
-			view.bCdBar               = dataset.bCdBar
-			view.nCdBarWidth          = dataset.nCdBarWidth
-			-- view.playSound         = dataset.bPlaySound
-			view.szCdBarUITex         = dataset.szCdBarUITex
-			view.szBoxBgUITex         = dataset.szBoxBgUITex
-			local tMonGroupFallbackUUID = view.tMonGroupFallbackUUID
-			if not tMonGroupFallbackUUID then
-				tMonGroupFallbackUUID = {}
-				for _, mon in ipairs(dataset.aMonitor) do
-					if mon.szGroup then
-						tMonGroupFallbackUUID[mon.szGroup] = mon.szUUID
-					end
-				end
-				view.tMonGroupFallbackUUID = tMonGroupFallbackUUID
-			end
-			local tMonGroupActiveUUID = view.tMonGroupActiveUUID
-			if not tMonGroupActiveUUID then
-				tMonGroupActiveUUID = {}
-				view.tMonGroupActiveUUID = tMonGroupActiveUUID
-			end
-			local aItem = view.aItem
-			if not aItem then
-				aItem = {}
-				view.aItem = aItem
-			end
-			local nItemIndex, nItemCount = 1, #aItem
-			local tMonExist, tMonLast = {}, MON_EXIST_CACHE[dataset.szUUID]
-			if dataset.szType == 'BUFF' then
-				local tBuff = KObject and BUFF_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
-				for _, mon in ipairs(dataset.aMonitor) do
-					if Buff_MonVisible(mon, dwTarKungfuID) then
-						-- 通过监控项生成视图列表
-						local buff = Buff_MonMatch(tBuff, mon, dataset)
-						if mon.szGroup and (
-							tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
-							or tMonGroupActiveUUID[mon.szGroup] == tMonGroupFallbackUUID[mon.szGroup]
-						) then
-							tMonGroupActiveUUID[mon.szGroup] = nil
-						end
-						if (
-							not mon.szGroup -- 无同组项设置
-							or (
-								not tMonGroupActiveUUID[mon.szGroup] -- 不存在激活的同组项
-								and (
-									(buff and buff.bCool) -- 并且当前 BUFF 激活
-									or tMonGroupFallbackUUID[mon.szGroup] == mon.szUUID -- 或者当前是同组项最后一个显示项
-								)
-							)
-						)
-						and ((buff and buff.bCool) or not dataset.bHideVoid == not mon.bFlipHideVoid) then
-							local item = aItem[nItemIndex]
-							if not item then
-								item = {}
-								aItem[nItemIndex] = item
-							end
-							Buff_MonToView(mon, buff, item, KObject, dataset, tMonExist, tMonLast)
-							if mon.szGroup then
-								tMonGroupActiveUUID[mon.szGroup] = mon.szUUID
-							end
-							nItemIndex = nItemIndex + 1
-						end
-					end
-				end
-			elseif dataset.szType == 'SKILL' then
-				local tSkill = KObject and SKILL_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
-				for _, mon in ipairs(dataset.aMonitor) do
-					if Skill_ShowMon(mon, dwTarKungfuID) then
-						-- 通过监控项生成视图列表
-						local skill = Skill_MatchMon(tSkill, mon, dataset)
-						if mon.szGroup and (
-							tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
-							or tMonGroupActiveUUID[mon.szGroup] == tMonGroupFallbackUUID[mon.szGroup]
-						) then
-							tMonGroupActiveUUID[mon.szGroup] = nil
-						end
-						if (
-							not mon.szGroup -- 无同组项设置
-							or (
-								not tMonGroupActiveUUID[mon.szGroup] -- 不存在激活的同组项
-								and (
-									(skill and skill.bCool) -- 并且当前 技能CD 激活
-									or tMonGroupFallbackUUID[mon.szGroup] == mon.szUUID -- 或者当前是同组项最后一个显示项
-								)
-							)
-						)
-						and (skill and skill.bCool) or not dataset.bHideVoid == not mon.bFlipHideVoid then
-							local item = aItem[nItemIndex]
-							if not item then
-								item = {}
-								aItem[nItemIndex] = item
-							end
-							if mon.szGroup then
-								tMonGroupActiveUUID[mon.szGroup] = mon.szUUID
-							end
-							Skill_MonToView(mon, skill, item, KObject, dataset, tMonExist, tMonLast)
-							nItemIndex = nItemIndex + 1
-						end
-					end
-				end
-			end
-			for i = nItemIndex, nItemCount do
-				aItem[i] = nil
-			end
-			if tMonLast then
-				for uuid, mon in pairs(tMonLast) do
-					if not tMonExist[uuid] and dataset.bPlaySound and mon.aSoundDisappear then
-						local dwSoundID = X.RandomChild(mon.aSoundDisappear)
-						if dwSoundID then
-							local szSoundPath = X.GetSoundPath(dwSoundID)
-							if szSoundPath then
-								X.PlaySound(SOUND.UI_SOUND, szSoundPath, false)
-							end
-						end
-					end
-				end
-			end
-			MON_EXIST_CACHE[dataset.szUUID] = tMonExist
-			nViewIndex = nViewIndex + 1
+		local dwTarType, dwTarID = D.GetTarget(dataset.szTarget, dataset.szType)
+		local KObject = X.GetObject(dwTarType, dwTarID)
+		local dwTarKungfuID = KObject
+			and (dwTarType == TARGET.PLAYER
+				and (KObject.GetKungfuMountID() or 0)
+				or 'npc'
+			)
+			or 0
+		local view = VIEW_LIST[nViewIndex]
+		if not view then
+			view = {}
+			VIEW_LIST[nViewIndex] = view
 		end
+		fUIScale = (dataset.bIgnoreSystemUIScale and 1 or Station.GetUIScale()) * dataset.fScale
+		fFontScaleBase = fUIScale * X.GetFontScale() * dataset.fScale
+		view.szUUID               = dataset.szUUID
+		view.szType               = dataset.szType
+		view.szTarget             = dataset.szTarget
+		view.szCaption            = MY_TargetMonConfig.GetDatasetTitle(dataset)
+		view.tAnchor              = dataset.tAnchor
+		view.bIgnoreSystemUIScale = dataset.bIgnoreSystemUIScale
+		view.fUIScale             = fUIScale
+		view.fIconFontScale       = fFontScaleBase * dataset.fIconFontScale
+		view.fOtherFontScale      = fFontScaleBase * dataset.fOtherFontScale
+		view.bPenetrable          = dataset.bPenetrable
+		view.bDraggable           = dataset.bDraggable
+		view.szAlignment          = dataset.szAlignment
+		view.nMaxLineCount        = dataset.nMaxLineCount
+		view.bCdCircle            = dataset.bCdCircle
+		view.bCdFlash             = dataset.bCdFlash
+		view.bCdReadySpark        = dataset.bCdReadySpark
+		view.bCdBar               = dataset.bCdBar
+		view.nCdBarWidth          = dataset.nCdBarWidth
+		-- view.playSound         = dataset.bPlaySound
+		view.szCdBarUITex         = dataset.szCdBarUITex
+		view.szBoxBgUITex         = dataset.szBoxBgUITex
+		local tMonGroupFallbackUUID = view.tMonGroupFallbackUUID
+		if not tMonGroupFallbackUUID then
+			tMonGroupFallbackUUID = {}
+			for _, mon in ipairs(dataset.aMonitor) do
+				if mon.szGroup then
+					tMonGroupFallbackUUID[mon.szGroup] = mon.szUUID
+				end
+			end
+			view.tMonGroupFallbackUUID = tMonGroupFallbackUUID
+		end
+		local tMonGroupActiveUUID = view.tMonGroupActiveUUID
+		if not tMonGroupActiveUUID then
+			tMonGroupActiveUUID = {}
+			view.tMonGroupActiveUUID = tMonGroupActiveUUID
+		end
+		local aItem = view.aItem
+		if not aItem then
+			aItem = {}
+			view.aItem = aItem
+		end
+		local nItemIndex, nItemCount = 1, #aItem
+		local tMonExist, tMonLast = {}, MON_EXIST_CACHE[dataset.szUUID]
+		if dataset.szType == 'BUFF' then
+			local tBuff = KObject and BUFF_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
+			for _, mon in ipairs(dataset.aMonitor) do
+				if Buff_MonVisible(mon, dwTarKungfuID) then
+					-- 通过监控项生成视图列表
+					local buff = Buff_MonMatch(tBuff, mon, dataset)
+					if mon.szGroup and (
+						tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
+						or tMonGroupActiveUUID[mon.szGroup] == tMonGroupFallbackUUID[mon.szGroup]
+					) then
+						tMonGroupActiveUUID[mon.szGroup] = nil
+					end
+					if (
+						not mon.szGroup -- 无同组项设置
+						or (
+							not tMonGroupActiveUUID[mon.szGroup] -- 不存在激活的同组项
+							and (
+								(buff and buff.bCool) -- 并且当前 BUFF 激活
+								or tMonGroupFallbackUUID[mon.szGroup] == mon.szUUID -- 或者当前是同组项最后一个显示项
+							)
+						)
+					)
+					and ((buff and buff.bCool) or not dataset.bHideVoid == not mon.bFlipHideVoid) then
+						local item = aItem[nItemIndex]
+						if not item then
+							item = {}
+							aItem[nItemIndex] = item
+						end
+						Buff_MonToView(mon, buff, item, KObject, dataset, tMonExist, tMonLast)
+						if mon.szGroup then
+							tMonGroupActiveUUID[mon.szGroup] = mon.szUUID
+						end
+						nItemIndex = nItemIndex + 1
+					end
+				end
+			end
+		elseif dataset.szType == 'SKILL' then
+			local tSkill = KObject and SKILL_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
+			for _, mon in ipairs(dataset.aMonitor) do
+				if Skill_ShowMon(mon, dwTarKungfuID) then
+					-- 通过监控项生成视图列表
+					local skill = Skill_MatchMon(tSkill, mon, dataset)
+					if mon.szGroup and (
+						tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
+						or tMonGroupActiveUUID[mon.szGroup] == tMonGroupFallbackUUID[mon.szGroup]
+					) then
+						tMonGroupActiveUUID[mon.szGroup] = nil
+					end
+					if (
+						not mon.szGroup -- 无同组项设置
+						or (
+							not tMonGroupActiveUUID[mon.szGroup] -- 不存在激活的同组项
+							and (
+								(skill and skill.bCool) -- 并且当前 技能CD 激活
+								or tMonGroupFallbackUUID[mon.szGroup] == mon.szUUID -- 或者当前是同组项最后一个显示项
+							)
+						)
+					)
+					and (skill and skill.bCool) or not dataset.bHideVoid == not mon.bFlipHideVoid then
+						local item = aItem[nItemIndex]
+						if not item then
+							item = {}
+							aItem[nItemIndex] = item
+						end
+						if mon.szGroup then
+							tMonGroupActiveUUID[mon.szGroup] = mon.szUUID
+						end
+						Skill_MonToView(mon, skill, item, KObject, dataset, tMonExist, tMonLast)
+						nItemIndex = nItemIndex + 1
+					end
+				end
+			end
+		end
+		for i = nItemIndex, nItemCount do
+			aItem[i] = nil
+		end
+		if tMonLast then
+			for uuid, mon in pairs(tMonLast) do
+				if not tMonExist[uuid] and dataset.bPlaySound and mon.aSoundDisappear then
+					local dwSoundID = X.RandomChild(mon.aSoundDisappear)
+					if dwSoundID then
+						local szSoundPath = X.GetSoundPath(dwSoundID)
+						if szSoundPath then
+							X.PlaySound(SOUND.UI_SOUND, szSoundPath, false)
+						end
+					end
+				end
+			end
+		end
+		MON_EXIST_CACHE[dataset.szUUID] = tMonExist
+		nViewIndex = nViewIndex + 1
 	end
 	for i = nViewIndex, nViewCount do
 		VIEW_LIST[i] = nil

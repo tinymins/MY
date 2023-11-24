@@ -929,8 +929,8 @@ X.RegisterInit('MY_TargetMon_Subscribe_Data', function()
 	end)
 end)
 
-X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMon_Subscribe_Data', function()
-	local szModifiedUUID = arg0
+do
+local function OnDatasetChange(szModifiedUUID)
 	local tSubscribed = MY_TargetMonConfig.GetUserConfig('MY_TargetMon_Subscribe_Data.Subscribed') or {}
 	for _, tInfo in pairs(tSubscribed) do
 		for _, szUUID in ipairs(tInfo.aUUID) do
@@ -940,6 +940,15 @@ X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMon_Su
 		end
 	end
 	MY_TargetMonConfig.SetUserConfig('MY_TargetMon_Subscribe_Data.Subscribed', tSubscribed)
+end
+X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMon_Subscribe_Data', function()
+	if arg1 == 'tMap' then
+		OnDatasetChange(arg0)
+	end
 end)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMon_Subscribe_Data', function()
+	OnDatasetChange(arg0)
+end)
+end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

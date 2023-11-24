@@ -37,6 +37,7 @@ return {
     ['Play sound'] = '播放聲音',
     ['Icon style'] = '圖標風格',
     ['Set target'] = '設置目標',
+    ['Only enable in those maps'] = '僅在指定地圖啟用',
     ['Set monitor'] = '設置監控',
     ['Ids'] = 'ID列表',
     ['All ids'] = '監控全部',

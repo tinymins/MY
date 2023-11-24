@@ -21,6 +21,8 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 local D = {}
+local MY_TARGET_MON_MAP_TYPE = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE
+local MY_TARGET_MON_MAP_TYPE_NAME = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE_NAME
 local TARGET_TYPE_LIST = {
 	'CLIENT_PLAYER'  ,
 	'CONTROL_PLAYER' ,
@@ -375,9 +377,9 @@ function D.Open(szConfigUUID)
 
 	nY = nPaddingY + 40
 	local nDeltaY = 21
-	local xr = nW - 300
+	local xr = nW - 340
 	uiWnd:Append('WndComboBox', {
-		x = xr, y = nY, w = 135,
+		x = xr, y = nY, w = 100,
 		text = _L['Set target'],
 		menu = function()
 			local t = {}
@@ -418,6 +420,75 @@ function D.Open(szConfigUUID)
 				})
 			end
 			return t
+		end,
+		autoEnable = function() return dataset.bEnable end,
+	})
+	uiWnd:Append('WndComboBox', {
+		x = xr + 105, y = nY, w = 165,
+		text = _L['Only enable in those maps'],
+		menu = function()
+			local menu = X.GetDungeonMenu({
+				fnAction = function(p)
+					if not dataset.tMap then
+						dataset.tMap = {}
+					end
+					dataset.tMap[p.dwID] = not dataset.tMap[p.dwID]
+					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', dataset.szUUID, 'tMap')
+				end,
+				tChecked = dataset.tMap or {},
+			})
+			for i, p in ipairs(menu) do
+				p.fnDisable = function() return X.IsEmpty(dataset.tMap) or dataset.tMap.bAll end
+			end
+			local t1 = {
+				szOption = _L['Monitor Map Requirement By Type'],
+				fnDisable = function() return X.IsEmpty(dataset.tMap) or dataset.tMap.bAll end,
+			}
+			for _, eMapType in ipairs({
+				MY_TARGET_MON_MAP_TYPE.CITY, -- 主城
+				MY_TARGET_MON_MAP_TYPE.VILLAGE, -- 野外
+				MY_TARGET_MON_MAP_TYPE.DUNGEON, -- 秘境
+				MY_TARGET_MON_MAP_TYPE.TEAM_DUNGEON, -- 小队秘境
+				MY_TARGET_MON_MAP_TYPE.RAID_DUNGEON, -- 团队秘境
+				MY_TARGET_MON_MAP_TYPE.COMPETITION, -- 竞技
+				MY_TARGET_MON_MAP_TYPE.STARVE, -- 浪客行
+				MY_TARGET_MON_MAP_TYPE.ARENA, -- 名剑大会
+				MY_TARGET_MON_MAP_TYPE.BATTLEFIELD, -- 战场
+				MY_TARGET_MON_MAP_TYPE.PUBG, -- 绝境战场
+				MY_TARGET_MON_MAP_TYPE.ZOMBIE, -- 李渡鬼域
+				MY_TARGET_MON_MAP_TYPE.MONSTER, -- 百战
+				MY_TARGET_MON_MAP_TYPE.MOBA, -- 列星虚境
+				MY_TARGET_MON_MAP_TYPE.HOMELAND, -- 家园
+				MY_TARGET_MON_MAP_TYPE.ROGUELIKE, -- 八荒衡鉴
+			}) do
+				table.insert(t1, {
+					szOption = MY_TARGET_MON_MAP_TYPE_NAME[eMapType],
+					bCheck = true,
+					bChecked = dataset.tMap and dataset.tMap[eMapType],
+					fnAction = function(_, bChecked)
+						if not dataset.tMap then
+							dataset.tMap = {}
+						end
+						dataset.tMap[eMapType] = bChecked
+						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', dataset.szUUID, 'tMap')
+					end,
+					fnDisable = function() return X.IsEmpty(dataset.tMap) or dataset.tMap.bAll end,
+				})
+			end
+			table.insert(menu, 1, t1)
+			table.insert(menu, 1, {
+				szOption = _L['Monitor All Maps'],
+				bCheck = true,
+				bChecked = X.IsEmpty(dataset.tMap) or dataset.tMap.bAll,
+				fnAction = function(_, bChecked)
+					if not dataset.tMap then
+						dataset.tMap = {}
+					end
+					dataset.tMap.bAll = bChecked
+					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', dataset.szUUID, 'tMap')
+				end,
+			})
+			return menu
 		end,
 		autoEnable = function() return dataset.bEnable end,
 	})
