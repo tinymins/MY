@@ -27,6 +27,8 @@ local CUSTOM_BOX_EXTENT_ANIMATE = {
 	{'ui/Image/Common/Box.UITex|20'},
 }
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
+local MY_TARGET_MON_MAP_TYPE = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE
+local MY_TARGET_MON_MAP_TYPE_NAME = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE_NAME
 
 function D.Open(szConfigUUID, szMonitorUUID)
 	local dataset = MY_TargetMonConfig.GetDataset(szConfigUUID)
@@ -363,6 +365,42 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			for i, p in ipairs(menu) do
 				p.fnDisable = function() return X.IsEmpty(mon.tMap) or mon.tMap.bAll end
 			end
+			local t1 = {
+				szOption = _L['Monitor Map Requirement By Type'],
+				fnDisable = function() return X.IsEmpty(mon.tMap) or mon.tMap.bAll end,
+			}
+			for _, eMapType in ipairs({
+				MY_TARGET_MON_MAP_TYPE.CITY, -- 主城
+				MY_TARGET_MON_MAP_TYPE.VILLAGE, -- 野外
+				MY_TARGET_MON_MAP_TYPE.DUNGEON, -- 秘境
+				MY_TARGET_MON_MAP_TYPE.TEAM_DUNGEON, -- 小队秘境
+				MY_TARGET_MON_MAP_TYPE.RAID_DUNGEON, -- 团队秘境
+				MY_TARGET_MON_MAP_TYPE.COMPETITION, -- 竞技
+				MY_TARGET_MON_MAP_TYPE.STARVE, -- 浪客行
+				MY_TARGET_MON_MAP_TYPE.ARENA, -- 名剑大会
+				MY_TARGET_MON_MAP_TYPE.BATTLEFIELD, -- 战场
+				MY_TARGET_MON_MAP_TYPE.PUBG, -- 绝境战场
+				MY_TARGET_MON_MAP_TYPE.ZOMBIE, -- 李渡鬼域
+				MY_TARGET_MON_MAP_TYPE.MONSTER, -- 百战
+				MY_TARGET_MON_MAP_TYPE.MOBA, -- 列星虚境
+				MY_TARGET_MON_MAP_TYPE.HOMELAND, -- 家园
+				MY_TARGET_MON_MAP_TYPE.ROGUELIKE, -- 八荒衡鉴
+			}) do
+				table.insert(t1, {
+					szOption = MY_TARGET_MON_MAP_TYPE_NAME[eMapType],
+					bCheck = true,
+					bChecked = mon.tMap and mon.tMap[eMapType],
+					fnAction = function(_, bChecked)
+						if not mon.tMap then
+							mon.tMap = {}
+						end
+						mon.tMap[eMapType] = bChecked
+						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
+					end,
+					fnDisable = function() return X.IsEmpty(mon.tMap) or mon.tMap.bAll end,
+				})
+			end
+			table.insert(menu, 1, t1)
 			table.insert(menu, 1, {
 				szOption = _L['Monitor All Maps'],
 				bCheck = true,

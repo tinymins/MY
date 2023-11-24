@@ -30,13 +30,31 @@ local SKILL_CACHE = {} -- ÏÂ±êÎªÄ¿±êIDµÄÄ¿±ê¼¼ÄÜ»º´æÊý×é ·´ÕýID²»¿ÉÄÜÊÇdoodad²»»
 local SKILL_INFO = {} -- ¼¼ÄÜ·´ÏòË÷Òý
 local VIEW_LIST = {}
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
+local MY_TARGET_MON_MAP_TYPE = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE
 
 do
 local function FilterMonitors(aMonitor, dwMapID, dwKungfuID)
 	local ret = {}
 	for i, mon in ipairs(aMonitor) do
 		if mon.bEnable
-		and (X.IsEmpty(mon.tMap) or mon.tMap.bAll or mon.tMap[dwMapID])
+		and (X.IsEmpty(mon.tMap) or (
+			mon.tMap.bAll or mon.tMap[dwMapID]
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.CITY        ] and X.IsCityMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.DUNGEON     ] and X.IsDungeonMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.TEAM_DUNGEON] and X.IsTeam_dungeonMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.RAID_DUNGEON] and X.IsRaid_dungeonMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.STARVE      ] and X.IsStarveMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.VILLAGE     ] and X.IsVillageMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.ARENA       ] and X.IsArenaMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.BATTLEFIELD ] and X.IsBattlefieldMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.PUBG        ] and X.IsPubgMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.ZOMBIE      ] and X.IsZombieMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.MONSTER     ] and X.IsMonsterMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.MOBA        ] and X.IsMobaMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.HOMELAND    ] and X.IsHomelandMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.ROGUELIKE   ] and X.IsRoguelikeMap(dwMapID))
+			or (mon.tMap[MY_TARGET_MON_MAP_TYPE.COMPETITION ] and X.IsCompetitionMap(dwMapID))
+		))
 		and (X.IsEmpty(mon.tKungfu) or mon.tKungfu.bAll or mon.tKungfu[dwKungfuID]
 			or ( -- ²Ø½£²»Çø·ÖÐÄ·¨
 				(dwKungfuID == X.CONSTANT.KUNGFU_TYPE.WEN_SHUI or dwKungfuID == X.CONSTANT.KUNGFU_TYPE.SHAN_JU)

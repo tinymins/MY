@@ -131,6 +131,24 @@ return {
     ['(Embedded caption cannot be changed)'] = '（內置數據標題不可更改）',
     ['Press ctrl to delete embedded data permanently.'] = '按住CTRL點擊可徹底刪除該內置數據。',
 
+    -- MY_TargetMonConfig.lua
+	['Common map'] = '通用地圖',
+	['City map'] = '主城地圖',
+	['Dungeon map'] = '秘境地圖',
+	['Team dungeon map'] = '小隊秘境地圖',
+	['Raid dungeon map'] = '團隊秘境地圖',
+	['Starve map'] = '浪客行地圖',
+	['Village map'] = '野外地圖',
+	['Arena map'] = '名劍大會地圖',
+	['Battlefield map'] = '戰場地圖',
+	['Pubg map'] = '絕境戰場地圖',
+	['Zombie map'] = '李渡鬼域地圖',
+	['Monster map'] = '百戰地圖',
+	['Moba map'] = '列星虛境地圖',
+	['Homeland map'] = '家園地圖',
+	['Roguelike map'] = '八荒衡鑒地圖',
+	['Competition map'] = '競技地圖',
+
     -- MY_TargetMon_PS.lua
     ['MY_TargetMon_PS'] = '目標監控設置面板',
     ['Create Config'] = '新建監控',
@@ -202,6 +220,7 @@ return {
     ['Monitor Target Kungfu Requirement'] = '目標心法要求',
     ['Monitor All Kungfu'] = '全部心法',
     ['Monitor Map Requirement'] = '所在地圖要求',
+    ['Monitor Map Requirement By Type'] = '按地圖類型',
     ['Monitor All Maps'] = '全部地圖',
     ['Monitor Show Even Void'] = '消失仍然顯示',
     ['Monitor Hide If Void'] = '消失則不顯示',
