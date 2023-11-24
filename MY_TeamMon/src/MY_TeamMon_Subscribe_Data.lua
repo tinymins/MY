@@ -404,7 +404,6 @@ function D.FetchSubscribeItem(szURL)
 end
 
 function D.Subscribe(info, bSilent)
-	Output(info)
 	local szUUID = 'r-'
 		.. ('%08x'):format(GetStringCRC(info.szDataURL))
 		.. ('%08x'):format(GetStringCRC(info.szVersion))
