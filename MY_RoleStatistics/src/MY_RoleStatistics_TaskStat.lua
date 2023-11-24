@@ -75,7 +75,7 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_TaskStat', _L['General']
 			'stronghold_trade', -- 据点贸易
 			'dragon_gate_despair', -- 龙门绝境
 			'lexus_reality', -- 列星虚境
-			'lidu_ghost_town', -- 李渡鬼城
+			'lidu_ghost_town', -- 李渡鬼域
 			'public_routine', -- 公共日常
 			'force_routine', -- 勤修不辍
 			'rookie_routine', -- 浪客行
@@ -390,7 +390,7 @@ local function InitTaskList(bReload)
 		eType = TASK_TYPE.DAILY,
 		aQuestInfo = X.CONSTANT.QUEST_INFO.LEXUS_REALITY,
 	})
-	-- 李渡鬼城
+	-- 李渡鬼域
 	table.insert(aTask, {
 		id = 'lidu_ghost_town',
 		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
