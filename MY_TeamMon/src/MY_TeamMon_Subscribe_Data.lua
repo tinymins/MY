@@ -32,6 +32,7 @@ local DATA_PAGINATION = {
 	nIndex = 1,
 	nSize = 30,
 	nTotal = 1,
+	nPageTotal = 1,
 }
 local DATA_LIST = {}
 local DATA_SELECTED_KEY
