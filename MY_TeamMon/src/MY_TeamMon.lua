@@ -61,24 +61,42 @@ local MY_TEAM_MON_TYPE = {
 }
 local MY_TEAM_MON_SCRUTINY_TYPE = { SELF = 1, TEAM = 2, ENEMY = 3, TARGET = 4 }
 local MY_TEAM_MON_SPECIAL_MAP = {
-	COMMON = -1, -- 通用
-	CITY = -2, -- 主城
-	DUNGEON = -3, -- 秘境
-	TEAM_DUNGEON = -4, -- 小队秘境
-	RAID_DUNGEON = -5, -- 团队秘境
-	STARVE = -6, -- 浪客行
-	VILLAGE = -7, -- 野外
-	RECYCLE_BIN = -9, -- 回收站
+	COMMON       =  -1, -- 通用
+	CITY         =  -2, -- 主城
+	DUNGEON      =  -3, -- 秘境
+	TEAM_DUNGEON =  -4, -- 小队秘境
+	RAID_DUNGEON =  -5, -- 团队秘境
+	STARVE       =  -6, -- 浪客行
+	VILLAGE      =  -7, -- 野外
+	ARENA        =  -8, -- 名剑大会
+	BATTLEFIELD  = -10, -- 战场
+	PUBG         = -11, -- 绝境战场
+	ZOMBIE       = -12, -- 李渡鬼域
+	MONSTER      = -13, -- 百战
+	MOBA         = -14, -- 列星虚境
+	HOMELAND     = -15, -- 家园
+	ROGUELIKE    = -16, -- 八荒衡鉴
+	COMPETITION  = -17, -- 竞技
+	RECYCLE_BIN  =  -9, -- 回收站
 }
 local MY_TEAM_MON_SPECIAL_MAP_NAME = {
-	[MY_TEAM_MON_SPECIAL_MAP.COMMON] = _L['Common data'],
-	[MY_TEAM_MON_SPECIAL_MAP.CITY] = _L['City data'],
-	[MY_TEAM_MON_SPECIAL_MAP.VILLAGE] = _L['Village data'],
-	[MY_TEAM_MON_SPECIAL_MAP.DUNGEON] = _L['Dungeon data'],
+	[MY_TEAM_MON_SPECIAL_MAP.COMMON      ] = _L['Common data'],
+	[MY_TEAM_MON_SPECIAL_MAP.CITY        ] = _L['City data'],
+	[MY_TEAM_MON_SPECIAL_MAP.DUNGEON     ] = _L['Dungeon data'],
 	[MY_TEAM_MON_SPECIAL_MAP.TEAM_DUNGEON] = _L['Team dungeon data'],
 	[MY_TEAM_MON_SPECIAL_MAP.RAID_DUNGEON] = _L['Raid dungeon data'],
-	[MY_TEAM_MON_SPECIAL_MAP.STARVE] = _L['Starve data'],
-	[MY_TEAM_MON_SPECIAL_MAP.RECYCLE_BIN] = _L['Recycle bin data'],
+	[MY_TEAM_MON_SPECIAL_MAP.STARVE      ] = _L['Starve data'],
+	[MY_TEAM_MON_SPECIAL_MAP.VILLAGE     ] = _L['Village data'],
+	[MY_TEAM_MON_SPECIAL_MAP.ARENA       ] = _L['Arena data'],
+	[MY_TEAM_MON_SPECIAL_MAP.BATTLEFIELD ] = _L['Battlefield data'],
+	[MY_TEAM_MON_SPECIAL_MAP.PUBG        ] = _L['Pubg data'],
+	[MY_TEAM_MON_SPECIAL_MAP.ZOMBIE      ] = _L['Zombie data'],
+	[MY_TEAM_MON_SPECIAL_MAP.MONSTER     ] = _L['Monster data'],
+	[MY_TEAM_MON_SPECIAL_MAP.MOBA        ] = _L['Moba data'],
+	[MY_TEAM_MON_SPECIAL_MAP.HOMELAND    ] = _L['Homeland data'],
+	[MY_TEAM_MON_SPECIAL_MAP.ROGUELIKE   ] = _L['Roguelike data'],
+	[MY_TEAM_MON_SPECIAL_MAP.COMPETITION ] = _L['Competition data'],
+	[MY_TEAM_MON_SPECIAL_MAP.RECYCLE_BIN ] = _L['Recycle bin data'],
 }
 local MY_TEAM_MON_SPECIAL_MAP_INFO = {}
 for _, dwMapID in pairs(MY_TEAM_MON_SPECIAL_MAP) do
@@ -2144,6 +2162,9 @@ function D.IterTable(data, dwMapID, bIterItem, bReverse)
 		if data[MY_TEAM_MON_SPECIAL_MAP.COMMON] then
 			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.COMMON])
 		end
+		if X.IsCompetitionMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.COMPETITION])
+		end
 		if X.IsDungeonMap(dwMapID) then
 			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.DUNGEON])
 		end
@@ -2161,6 +2182,30 @@ function D.IterTable(data, dwMapID, bIterItem, bReverse)
 		end
 		if X.IsStarveMap(dwMapID) then
 			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.STARVE])
+		end
+		if X.IsArenaMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.ARENA])
+		end
+		if X.IsBattlefieldMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.BATTLEFIELD])
+		end
+		if X.IsPubgMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.PUBG])
+		end
+		if X.IsZombieMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.ZOMBIE])
+		end
+		if X.IsMonsterMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.MONSTER])
+		end
+		if X.IsMobaMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.MOBA])
+		end
+		if X.IsHomelandMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.HOMELAND])
+		end
+		if X.IsRoguelikeMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.ROGUELIKE])
 		end
 		if data[dwMapID] then
 			table.insert(res, data[dwMapID])
