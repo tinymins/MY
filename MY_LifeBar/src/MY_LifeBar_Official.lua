@@ -233,7 +233,7 @@ function D.DrawLifeBar(dwID)
 end
 
 X.BreatheCall('MY_LifeBar', function()
-	if D.bRestricted and (X.IsInArena() or X.IsInBattleField() or X.IsInPubg()) then
+	if D.bRestricted and X.IsInCompetitionMap() then
 		return
 	end
 	for dwID, _ in pairs(COUNTDOWN_CACHE) do

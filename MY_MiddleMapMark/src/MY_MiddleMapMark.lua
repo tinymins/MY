@@ -327,7 +327,7 @@ local function FlushDB()
 	DB:Execute('END TRANSACTION')
 end
 local function onLoadingEnding()
-	l_tempMap = X.IsInZombieMap() or X.IsInPubg() or X.IsInArena() or X.IsInBattleField() or false
+	l_tempMap = X.IsInCompetitionMap() or false
 	if l_tempMap then
 		local dwMapID = X.GetClientPlayer().GetMapID()
 		DBN_DM:ClearBindings()

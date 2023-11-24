@@ -680,11 +680,8 @@ end
 -- 更新当前地图使用条件
 function D.UpdateShieldStatus()
 	local bRestricted = X.IsRestricted('MY_TeamMon.MapRestriction')
-	local bRestrictedMap = bRestricted and (
-		X.IsInArena() or X.IsInBattleField()
-		or X.IsInPubg() or X.IsInZombieMap()
-		or X.IsInMobaMap())
-	local bPvpMap = bRestricted and not X.IsInDungeon()
+	local bRestrictedMap = bRestricted and X.IsInCompetitionMap()
+	local bPvpMap = bRestricted and not X.IsInDungeonMap()
 	if bRestrictedMap then
 		X.Sysmsg(_L['MY_TeamMon is blocked in this map, temporary disabled.'])
 	end

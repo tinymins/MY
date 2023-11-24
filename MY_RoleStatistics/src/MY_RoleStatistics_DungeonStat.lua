@@ -1320,7 +1320,7 @@ end)
 
 -- 首领死亡刷新秘境进度（秘境内同步拾取则视为进度更新）
 X.RegisterEvent('SYNC_LOOT_LIST', 'MY_RoleStatistics_DungeonStat__UpdateMapCopy', function()
-	if not D.bReady or not X.IsInDungeon() then
+	if not D.bReady or not X.IsInDungeonMap() then
 		return
 	end
 	local me = X.GetClientPlayer()

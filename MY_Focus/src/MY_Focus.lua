@@ -578,7 +578,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 
 		-- 判断名剑大会
 		if not bFocus then
-			if X.IsInArena() or X.IsInPubg() or X.IsInZombieMap() then
+			if X.IsInCompetitionMap() and not X.IsInBattlefieldMap() then
 				if dwType == TARGET.PLAYER then
 					if O.bFocusJJCEnemy and O.bFocusJJCParty then
 						table.insert(aVia, {
@@ -616,7 +616,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					end
 				end
 			else
-				if not O.bOnlyPublicMap or (not X.IsInBattleField() and not X.IsInDungeon() and not X.IsInArena()) then
+				if not O.bOnlyPublicMap or not X.IsInCompetitionMap() then
 					-- 判断角色备注
 					if dwType == TARGET.PLAYER
 					and O.bFocusAnmerkungen
@@ -693,7 +693,7 @@ function D.OnObjectLeaveScene(dwType, dwID)
 		if dwType == TARGET.NPC then
 			if D.bReady and O.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
-			and X.IsInArena() and not (IsEnemy(X.GetClientPlayerID(), dwID) and X.IsRestricted('MY_Focus.SHILDED_NPC')) then
+			and X.IsInCompetitionMap() and not (IsEnemy(X.GetClientPlayerID(), dwID) and X.IsRestricted('MY_Focus.SHILDED_NPC')) then
 				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, X.GetObjectName(KObject, 'never'), _L['Auto focus party in arena'])
 			end
 		end

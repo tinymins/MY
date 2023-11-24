@@ -518,7 +518,7 @@ function D.CreateControlBar()
 		container:AppendContentFromIni(szIniFile, 'WndButton_WorldMark')
 	end
 	-- ”Ô“Ù∞¥≈•
-	if X.GVoiceBase_IsOpen() then --X.IsInBattleField() or X.IsInArena() or X.IsInPubg() or X.IsInDungeon() then
+	if X.GVoiceBase_IsOpen() then
 		local nSpeakerState = X.GVoiceBase_GetSpeakerState()
 		container:AppendContentFromIni(szIniFile, 'Wnd_Speaker')
 			:Lookup('WndButton_Speaker').nSpeakerState = nSpeakerState

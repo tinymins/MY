@@ -359,7 +359,7 @@ end)
 X.RegisterEvent('LOADING_END',function()
 	local ds = D.GetDS()
 	if not ds:IsEmpty() then
-		if X.IsInDungeon() and MY_GKP.bAlertMessage then
+		if X.IsInDungeonMap() and MY_GKP.bAlertMessage then
 			X.Confirm(_L['Do you want to wipe the previous data when you enter the dungeon\'s map?'], D.NewDS)
 		end
 	else

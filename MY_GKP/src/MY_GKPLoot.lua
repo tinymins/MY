@@ -303,13 +303,13 @@ function D.IsEnabled()
 	if O.bInTeamDungeon and O.bInRaidDungeon and O.bInBattlefield and O.bInOtherMap then
 		return true
 	end
-	if X.IsInDungeon(false) then
+	if X.IsInDungeonMap(false) then
 		return O.bInTeamDungeon
 	end
-	if X.IsInDungeon(true) then
+	if X.IsInDungeonMap(true) then
 		return O.bInRaidDungeon
 	end
-	if X.IsInBattleField() or X.IsInPubg() or X.IsInZombieMap() then
+	if X.IsInBattlefieldMap() or X.IsInPubgMap() or X.IsInZombieMap() then
 		return O.bInBattlefield
 	end
 	return O.bInOtherMap

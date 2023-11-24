@@ -194,7 +194,7 @@ function D.ProcessDialogInfo(frame, aInfo, dwTarType, dwTarID, dwIndex)
 			end
 		end
 	end
-	if not X.IsInDungeon() then
+	if not X.IsInDungeonMap() then
 		if not option and O.bAutoSelectSp and #dialog.aOptions == 1 and dialog.aOptions[1].szContext == '' then
 			option = dialog.aOptions[1]
 			nRepeat = 1

@@ -139,11 +139,11 @@ local LOG_TYPE = {
 function D.UpdateEnable()
 	local bEnable = D.bReady and O.bEnable
 	if bEnable then
-		if X.IsInDungeon() then
+		if X.IsInDungeonMap() then
 			bEnable = O.bEnableInDungeon
-		elseif X.IsInArena() then
+		elseif X.IsInArenaMap() then
 			bEnable = O.bEnableInArena
-		elseif X.IsInBattleField() then
+		elseif X.IsInBattlefieldMap() then
 			bEnable = O.bEnableInBattleField
 		else
 			bEnable = O.bEnableInOtherMaps
@@ -156,7 +156,7 @@ function D.UpdateEnable()
 	end
 	LOG_ENABLE = bEnable
 	LOG_TARGET_INFORMATION_ENABLE = false
-	if bEnable and O.bTargetInformation and X.IsInArena() then
+	if bEnable and O.bTargetInformation and X.IsInArenaMap() then
 		LOG_TARGET_INFORMATION_ENABLE = true
 	end
 	LOG_TARGET_INFORMATION_THROTTLE = O.nTargetInformationThrottle
@@ -343,7 +343,7 @@ function D.OnTargetUpdate(dwID, bForce)
 		return
 	end
 	local bIsPlayer = X.IsPlayer(dwID)
-	if bIsPlayer and not X.IsParty(dwID) and not X.IsInArena() and not X.IsInBattleField() then
+	if bIsPlayer and not X.IsParty(dwID) and not X.IsInArenaMap() and not X.IsInBattlefieldMap() then
 		return
 	end
 	if not bIsPlayer then
@@ -503,7 +503,7 @@ X.RegisterEvent('SYS_MSG', function()
 			D.InsertLog(LOG_TYPE.SYS_MSG_UI_OME_SKILL_CAST_RESPOND_LOG, { arg1, arg2, arg3, arg4 })
 		end
 	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
-		-- if not X.IsInArena() then
+		-- if not X.IsInArenaMap() then
 		-- 技能最终产生的效果（生命值的变化）；
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
 		-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合

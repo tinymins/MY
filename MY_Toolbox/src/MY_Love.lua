@@ -1035,7 +1035,7 @@ end
 do
 local function OnPlayerEnterScene()
 	if D.bReady and O.bAutoFocus and arg0 == D.lover.dwID
-	and MY_Focus and MY_Focus.SetFocusID and not X.IsInArena() then
+	and MY_Focus and MY_Focus.SetFocusID and not X.IsInArenaMap() then
 		MY_Focus.SetFocusID(TARGET.PLAYER, arg0)
 	end
 end

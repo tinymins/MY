@@ -326,7 +326,7 @@ function MY_CataclysmParty_Base.OnItemLButtonDragEnd()
 end
 
 function D.SetTargetTeammate(dwID, info)
-	if X.IsInPubg() and X.GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
+	if X.IsInPubgMap() and X.GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
 		BattleField_MatchPlayer(dwID)
 	elseif info.bIsOnLine and CanTarget(dwID) then -- ÓÐ´ý¿¼Ö¤
 		if CFG.bTempTargetEnable then

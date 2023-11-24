@@ -74,7 +74,7 @@ function GetConfigComputeValue(key, relation, force, bFight, bPet, bCurrentTarge
 	return true
 end
 X.RegisterEvent('LOADING_ENDING', 'MY_LifeBar__GetConfigComputeValue', function()
-	bInDungeon = X.IsInDungeon()
+	bInDungeon = X.IsInDungeonMap()
 end)
 end
 -----------------------------------------------------------------------------------------
@@ -246,9 +246,9 @@ function D.IsMapEnabled()
 			Config.bOnlyInArena or
 			Config.bOnlyInBattleField
 		) or (
-			(Config.bOnlyInDungeon     and X.IsInDungeon()) or
-			(Config.bOnlyInArena       and X.IsInArena()) or
-			(Config.bOnlyInBattleField and (X.IsInBattleField() or X.IsInPubg() or X.IsInZombieMap()))
+			(Config.bOnlyInDungeon     and X.IsInDungeonMap()) or
+			(Config.bOnlyInArena       and X.IsInArenaMap()) or
+			(Config.bOnlyInBattleField and (X.IsInBattlefieldMap() or X.IsInPubgMap() or X.IsInZombieMap()))
 		)
 	)
 end
@@ -451,7 +451,7 @@ local function IsSpecialNpcVisible(dwID, me, object)
 		if object.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID and (not bRestrictedVersion or not IsEnemy(me.dwID, dwID)) then
 			bSpecialNpcVisible = true
 		elseif not bRestrictedVersion
-		and Config.bShowSpecialNpc and (not bRestrictedVersion or X.IsInDungeon())
+		and Config.bShowSpecialNpc and (not bRestrictedVersion or X.IsInDungeonMap())
 		and (not Config.bShowSpecialNpcOnlyEnemy or IsEnemy(me.dwID, dwID)) then
 			bSpecialNpcVisible = true
 		end

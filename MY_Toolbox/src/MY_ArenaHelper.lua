@@ -58,7 +58,7 @@ local function RestoreTeam()
 	if not l_tTeamInfo
 	or not O.bRestoreAuthorityInfo
 	or not X.IsLeader()
-	or not me.IsInParty() or not X.IsInArena() then
+	or not me.IsInParty() or not X.IsInArenaMap() then
 		return
 	end
 	X.SetTeamInfo(l_tTeamInfo)
@@ -67,7 +67,7 @@ X.RegisterEvent('PARTY_ADD_MEMBER', RestoreTeam)
 
 local function SaveTeam()
 	local me, team = X.GetClientPlayer(), GetClientTeam()
-	if not me.IsInParty() or not X.IsInArena() or l_bConfigEnd then
+	if not me.IsInParty() or not X.IsInArenaMap() or l_bConfigEnd then
 		return
 	end
 	l_tTeamInfo = X.GetTeamInfo()
@@ -83,9 +83,9 @@ X.RegisterEvent('LOADING_END', 'MY_ArenaHelper_ShowTargetModel', function()
 		return
 	end
 	local bHasValue = X.IsBoolean(l_bShowNpc) and X.IsBoolean(l_bShowPlayer) and X.IsBoolean(l_bShowPartyOverride)
-	if (X.IsInArena() and O.bAutoShowModel)
-	or (X.IsInBattleField() and O.bAutoShowModelBattlefield)
-	or (X.IsInPubg() and O.bAutoShowModelPubg) then
+	if (X.IsInArenaMap() and O.bAutoShowModel)
+	or (X.IsInBattlefieldMap() and O.bAutoShowModelBattlefield)
+	or (X.IsInPubgMap() and O.bAutoShowModelPubg) then
 		if not bHasValue then
 			l_bShowNpc = X.GetNpcVisibility()
 			l_bShowPlayer, l_bShowPartyOverride = X.GetPlayerVisibility()

@@ -594,7 +594,7 @@ function D.UpdateIsRecEverything()
 		X.DelayCall(500, function() D.UpdateIsRecEverything() end)
 		return
 	end
-	D.bRecEverything = O.bRecEverything and (not O.bREOnlyDungeon or X.IsInDungeon())
+	D.bRecEverything = O.bRecEverything and (not O.bREOnlyDungeon or X.IsInDungeonMap())
 end
 
 -- 过图清除当前战斗数据
@@ -809,8 +809,8 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 	if dwCaster ~= me.dwID                 -- 释放者不是自己
 	and dwTarget ~= me.dwID                -- 承受者不是自己
 	and dwTargetEmployer ~= me.dwID        -- 承受者主人不是自己
-	and not X.IsInArena()                -- 不在名剑大会
-	and not X.IsInBattleField()          -- 不在战场
+	and not X.IsInArenaMap()               -- 不在名剑大会
+	and not X.IsInBattlefieldMap()         -- 不在战场
 	and not me.IsPlayerInMyParty(dwCaster) -- 且释放者不是队友
 	and not me.IsPlayerInMyParty(dwTarget) -- 且承受者不是队友
 	and not (dwTargetEmployer and me.IsPlayerInMyParty(dwTargetEmployer)) -- 且承受者主人不是队友
@@ -1531,7 +1531,7 @@ X.RegisterEvent('SYS_MSG', function()
 		-- (arg3)dwLevel：技能等级 (arg4)nRespond：见枚举型[[SKILL_RESULT_CODE]]
 		-- D.OnSkillCastRespond(arg1, arg2, arg3, arg4)
 	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
-		-- if not X.IsInArena() then
+		-- if not X.IsInArenaMap() then
 		-- 技能最终产生的效果（生命值的变化）；
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
 		-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合
@@ -1598,7 +1598,7 @@ end
 
 -- JJC中使用的数据源（不能记录溢出数据）
 -- X.RegisterEvent('SKILL_EFFECT_TEXT', function(event)
---     if X.IsInArena() then
+--     if X.IsInArenaMap() then
 --         local dwCasterID      = arg0
 --         local dwTargetID      = arg1
 --         local bCriticalStrike = arg2

@@ -282,7 +282,7 @@ function D.UpdateUI(frame)
 	local eTimeChannel = MY_Recount_UI.bSysTimeMode and STAT_TYPE_KEY[MY_Recount_UI.nChannel]
 	local nTimeCount = MY_Recount_DS.GeneFightTime(data, eTimeChannel)
 	local szTimeCount = X.FormatDuration(nTimeCount, 'SYMBOL', { mode = 'fixed-except-leading', maxUnit = 'minute', keepUnit = 'minute' })
-	if X.IsInArena() then
+	if X.IsInArenaMap() then
 		szTimeCount = X.GetFightTime('M:ss')
 	end
 	-- 自己的记录
