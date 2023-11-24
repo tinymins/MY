@@ -366,14 +366,49 @@ function D.OnItemRButtonClick()
 		menu.nMiniWidth = nW
 		X.UI.PopupMenu(menu)
 	elseif name == 'Handle_MonitorItem' then
+		local dataset = MY_TargetMonConfig.GetDataset(frame.szActiveDatasetUUID)
+		local mon = this.mon
 		local nMonitorIndex = this.nMonitorIndex
 		local menu = {}
 		table.insert(menu, {
 			szOption = _L['Insert'],
 			fnAction = function()
 				D.CreateMonitor(frame, nMonitorIndex)
+				MY.UI.ClosePopupMenu()
 			end,
 		})
+		if this.nMonitorIndex ~= 1 then
+			table.insert(menu, {
+				szOption = _L['Move to top'],
+				fnAction = function()
+					for i, m in ipairs(dataset.aMonitor) do
+						if m == mon then
+							table.remove(dataset.aMonitor, i)
+							break
+						end
+					end
+					table.insert(dataset.aMonitor, 1, mon)
+					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
+					MY.UI.ClosePopupMenu()
+				end,
+			})
+		end
+		if this.nMonitorIndex ~= #dataset.aMonitor then
+			table.insert(menu, {
+				szOption = _L['Move to bottom'],
+				fnAction = function()
+					for i, m in ipairs(dataset.aMonitor) do
+						if m == mon then
+							table.remove(dataset.aMonitor, i)
+							break
+						end
+					end
+					table.insert(dataset.aMonitor, mon)
+					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
+					MY.UI.ClosePopupMenu()
+				end,
+			})
+		end
 		local nX, nY = Cursor.GetPos()
 		local nW, nH = 40, 40
 		menu.x = nX
