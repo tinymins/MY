@@ -2285,9 +2285,9 @@ function X.IsFighting()
 		return
 	end
 	local bFightState = me.bFightState
-	if not bFightState and X.IsInArena() and ARENA_START then
+	if not bFightState and X.IsInArenaMap() and ARENA_START then
 		bFightState = true
-	elseif not bFightState and X.IsInDungeon() then
+	elseif not bFightState and X.IsInDungeonMap() then
 		-- 在秘境且附近队友进战且附近敌对NPC进战则判断处于战斗状态
 		local bPlayerFighting, bNpcFighting
 		for _, p in ipairs(X.GetNearPlayer()) do
@@ -3519,24 +3519,6 @@ function X.IsInRaid()
 	return me and me.IsInRaid()
 end
 
--- 判断当前地图是不是名剑大会
--- (bool) X.IsInArena()
-function X.IsInArena()
-	local me = X.GetClientPlayer()
-	return me and (
-		me.GetScene().bIsArenaMap or -- 名剑大会
-		me.GetMapID() == 173 or      -- 齐物阁
-		me.GetMapID() == 181         -- 狼影殿
-	)
-end
-
--- 判断当前地图是不是战场
--- (bool) X.IsInBattleField()
-function X.IsInBattleField()
-	local me = X.GetClientPlayer()
-	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not X.IsInArena()
-end
-
 do
 local MAP_LIST
 local function GenerateMapInfo()
@@ -3566,26 +3548,6 @@ local function GenerateMapInfo()
 	return MAP_LIST
 end
 
--- 判断一个地图是不是秘境
--- (bool) X.IsDungeonMap(szMapName, bRaid)
--- (bool) X.IsDungeonMap(dwMapID, bRaid)
-function X.IsDungeonMap(dwMapID, bRaid)
-	if not MAP_LIST then
-		GenerateMapInfo()
-	end
-	local map = MAP_LIST[dwMapID]
-	if map then
-		dwMapID = map.dwMapID
-	end
-	if bRaid == true then -- 严格判断25人本
-		return map and map.bDungeon
-	elseif bRaid == false then -- 严格判断5人本
-		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON and not (map and map.bDungeon)
-	else -- 只判断地图的类型
-		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON
-	end
-end
-
 -- 获取一个地图的信息
 -- (table) X.GetMapInfo(dwMapID)
 -- (table) X.GetMapInfo(szMapName)
@@ -3612,48 +3574,135 @@ function X.GetMapNameList()
 	return aList
 end
 
--- 判断一个地图是不是个人CD秘境
+-- 获取主角当前所在地图
+-- (number) X.GetMapID(bool bFix) 是否做修正
+function X.GetMapID(bFix)
+	local dwMapID = X.GetClientPlayer().GetMapID()
+	return bFix and X.CONSTANT.MAP_MERGE[dwMapID] or dwMapID
+end
+
+do
+local ARENA_MAP
+-- 判断一个地图是不是名剑大会地图
+-- (bool) X.IsArenaMap(dwID)
+function X.IsArenaMap(dwID)
+	if not ARENA_MAP then
+		ARENA_MAP = {}
+		local tTitle = {
+			{f = 'i', t = 'dwMapID'},
+			{f = 'i', t = 'nEnableGroup0'},
+			{f = 'i', t = 'nEnableGroup1'},
+			{f = 'i', t = 'nEnableGroup2'},
+			{f = 'i', t = 'nEnableGroup3'},
+			{f = 'i', t = 'dwPQTemplateID'},
+			{f = 'i', t = 'nVisitorCount'},
+			{f = 'i', t = 'nGMVisitorCount'},
+			{f = 's', t = 'szScript'},
+			{f = 'i', t = 'nCritical'},
+			X.ENVIRONMENT.GAME_BRANCH == 'classic' and {f = 'i', t = 'nIs1V1'} or false,
+		}
+		for i, v in X.ipairs_r(tTitle) do
+			if not v then
+				table.remove(tTitle, i)
+			end
+		end
+		local tab = KG_Table.Load('settings\\ArenaMap.tab', tTitle, FILE_OPEN_MODE.NORMAL)
+		local nRow = tab:GetRowCount()
+		for i = 1, nRow do
+			local tLine = tab:GetRow(i)
+			ARENA_MAP[tLine.dwMapID] = true
+		end
+	end
+	return ARENA_MAP[dwID]
+end
+end
+
+-- 判断当前地图是不是名剑大会地图
+-- (bool) X.IsInArenaMap()
+function X.IsInArenaMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsArenaMap(me.GetMapID())
+end
+
+-- 判断一个地图是不是战场地图
+-- (bool) X.IsBattlefieldMap(dwMapID)
+function X.IsBattlefieldMap(dwMapID)
+	return select(2, GetMapParams(dwMapID)) == MAP_TYPE.BATTLE_FIELD and not X.IsArenaMap(dwMapID)
+end
+
+-- 判断当前地图是不是战场地图
+-- (bool) X.IsInBattlefieldMap()
+function X.IsInBattlefieldMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsBattlefieldMap(me.GetMapID())
+end
+
+-- 判断一个地图是不是秘境地图
+-- (bool) X.IsDungeonMap(szMapName, bRaid)
+-- (bool) X.IsDungeonMap(dwMapID, bRaid)
+function X.IsDungeonMap(dwMapID, bRaid)
+	local map = X.GetMapInfo(dwMapID)
+	if map then
+		dwMapID = map.dwMapID
+	end
+	if bRaid == true then -- 严格判断25人本
+		return map and map.bDungeon
+	elseif bRaid == false then -- 严格判断5人本
+		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON and not (map and map.bDungeon)
+	else -- 只判断地图的类型
+		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON
+	end
+end
+
+-- 判断当前地图是不是秘境地图
+-- (bool) X.IsInDungeonMap(bool bRaid)
+function X.IsInDungeonMap(bRaid)
+	local me = X.GetClientPlayer()
+	return me and X.IsDungeonMap(me.GetMapID(), bRaid)
+end
+
+-- 判断一个地图是不是个人CD秘境地图
 -- (bool) X.IsDungeonRoleProgressMap(dwMapID)
 function X.IsDungeonRoleProgressMap(dwMapID)
 	return (select(8, GetMapParams(dwMapID)))
 end
 
--- 判断当前地图是不是秘境
--- (bool) X.IsInDungeon(bool bRaid)
-function X.IsInDungeon(bRaid)
+-- 判断当前地图是不是个人CD秘境地图
+-- (bool) X.IsInDungeonRoleProgressMap()
+function X.IsInDungeonRoleProgressMap()
 	local me = X.GetClientPlayer()
-	return me and X.IsDungeonMap(me.GetMapID(), bRaid)
+	return me and X.IsDungeonRoleProgressMap(me.GetMapID())
 end
 
--- 判断一个地图是不是主城
+-- 判断一个地图是不是主城地图
 -- (bool) X.IsCityMap(dwMapID)
 function X.IsCityMap(dwMapID)
 	local tType = Table_GetMapType(dwMapID)
 	return tType and tType.CITY and true or false
 end
 
--- 判断当前地图是不是主城
--- (bool) X.IsInCity()
-function X.IsInCity()
+-- 判断当前地图是不是主城地图
+-- (bool) X.IsInCityMap()
+function X.IsInCityMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsCityMap(me.GetMapID())
 end
 
--- 判断一个地图是不是野外
+-- 判断一个地图是不是野外地图
 -- (bool) X.IsVillageMap(dwMapID)
 function X.IsVillageMap(dwMapID)
 	local tType = Table_GetMapType(dwMapID)
 	return tType and tType.VILLAGE and true or false
 end
 
--- 判断当前地图是不是野外
--- (bool) X.IsInVillage()
-function X.IsInVillage()
+-- 判断当前地图是不是野外地图
+-- (bool) X.IsInVillageMap()
+function X.IsInVillageMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsVillageMap(me.GetMapID())
 end
 
--- 判断地图是不是PUBG
+-- 判断地图是不是PUBG地图
 -- (bool) X.IsPubgMap(dwMapID)
 do
 local PUBG_MAP = {}
@@ -3665,9 +3714,9 @@ function X.IsPubgMap(dwMapID)
 end
 end
 
--- 判断当前地图是不是PUBG
--- (bool) X.IsInPubg()
-function X.IsInPubg()
+-- 判断当前地图是不是PUBG地图
+-- (bool) X.IsInPubgMap()
+function X.IsInPubgMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsPubgMap(me.GetMapID())
 end
@@ -3802,18 +3851,11 @@ function X.IsShieldedMap(dwMapID)
 	return false
 end
 
--- 判断当前地图是不是PUBG
+-- 判断当前地图是不是功能屏蔽地图
 -- (bool) X.IsInShieldedMap()
 function X.IsInShieldedMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsShieldedMap(me.GetMapID())
-end
-
--- 获取主角当前所在地图
--- (number) X.GetMapID(bool bFix) 是否做修正
-function X.GetMapID(bFix)
-	local dwMapID = X.GetClientPlayer().GetMapID()
-	return bFix and X.CONSTANT.MAP_MERGE[dwMapID] or dwMapID
 end
 
 -- 设置标记目标
