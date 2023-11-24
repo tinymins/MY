@@ -3839,6 +3839,23 @@ function X.IsInExtraBagMap()
 	return me and X.IsExtraBagMap(me.GetMapID())
 end
 
+-- 判断一个地图是不是比赛地图
+-- (bool) X.IsCompetitionMap(dwMapID)
+function X.IsCompetitionMap(dwMapID)
+	return X.IsArenaMap(dwMapID) or X.IsBattlefieldMap(dwMapID)
+		or X.IsPubgMap(dwMapID) or X.IsZombieMap(dwMapID)
+		or X.IsMobaMap(dwMapID)
+		or dwMapID == 173 -- 齐物阁
+		or dwMapID == 181 -- 狼影殿
+end
+
+-- 判断当前地图是不是比赛地图
+-- (bool) X.IsInCompetitionMap()
+function X.IsInCompetitionMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsCompetitionMap(me.GetMapID())
+end
+
 -- 判断地图是不是功能屏蔽地图
 -- (bool) X.IsShieldedMap(dwMapID)
 function X.IsShieldedMap(dwMapID)
