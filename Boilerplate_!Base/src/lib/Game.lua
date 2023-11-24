@@ -3702,7 +3702,7 @@ function X.IsInVillageMap()
 	return me and X.IsVillageMap(me.GetMapID())
 end
 
--- 判断地图是不是PUBG地图
+-- 判断地图是不是绝境战场地图
 -- (bool) X.IsPubgMap(dwMapID)
 do
 local PUBG_MAP = {}
@@ -3714,14 +3714,14 @@ function X.IsPubgMap(dwMapID)
 end
 end
 
--- 判断当前地图是不是PUBG地图
+-- 判断当前地图是不是绝境战场地图
 -- (bool) X.IsInPubgMap()
 function X.IsInPubgMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsPubgMap(me.GetMapID())
 end
 
--- 判断地图是不是僵尸地图
+-- 判断地图是不是李渡鬼域地图
 -- (bool) X.IsZombieMap(dwMapID)
 do
 local ZOMBIE_MAP = {}
@@ -3734,7 +3734,7 @@ function X.IsZombieMap(dwMapID)
 end
 end
 
--- 判断当前地图是不是僵尸地图
+-- 判断当前地图是不是李渡鬼域地图
 -- (bool) X.IsInZombieMap()
 function X.IsInZombieMap()
 	local me = X.GetClientPlayer()
@@ -3764,13 +3764,13 @@ function X.IsInMonsterMap()
 	return me and X.IsMonsterMap(me.GetMapID())
 end
 
--- 判断地图是不是MOBA地图
+-- 判断地图是不是列星虚境地图
 -- (bool) X.IsMobaMap(dwMapID)
 function X.IsMobaMap(dwMapID)
 	return X.CONSTANT.MOBA_MAP[dwMapID] or false
 end
 
--- 判断当前地图是不是MOBA地图
+-- 判断当前地图是不是列星虚境地图
 -- (bool) X.IsInMobaMap()
 function X.IsInMobaMap()
 	local me = X.GetClientPlayer()
