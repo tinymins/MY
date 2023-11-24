@@ -3548,9 +3548,11 @@ local function GenerateMapInfo()
 	return MAP_LIST
 end
 
--- 获取一个地图的信息
--- (table) X.GetMapInfo(dwMapID)
--- (table) X.GetMapInfo(szMapName)
+---获取一个地图的信息
+---(table) X.GetMapInfo(dwMapID)
+---(table) X.GetMapInfo(szMapName)
+---@param arg0 number | string @地图ID或地图名称
+---@return table @地图信息
 function X.GetMapInfo(arg0)
 	if not MAP_LIST then
 		GenerateMapInfo()
@@ -3574,8 +3576,9 @@ function X.GetMapNameList()
 	return aList
 end
 
--- 获取主角当前所在地图
--- (number) X.GetMapID(bool bFix) 是否做修正
+---获取主角当前所在地图
+---@param bFix boolean @是否做修正
+---@return number @所在地图ID
 function X.GetMapID(bFix)
 	local dwMapID = X.GetClientPlayer().GetMapID()
 	return bFix and X.CONSTANT.MAP_MERGE[dwMapID] or dwMapID
@@ -3583,9 +3586,10 @@ end
 
 do
 local ARENA_MAP
--- 判断一个地图是不是名剑大会地图
--- (bool) X.IsArenaMap(dwID)
-function X.IsArenaMap(dwID)
+---判断一个地图是不是名剑大会地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是名剑大会地图
+function X.IsArenaMap(dwMapID)
 	if not ARENA_MAP then
 		ARENA_MAP = {}
 		local tTitle = {
@@ -3613,33 +3617,35 @@ function X.IsArenaMap(dwID)
 			ARENA_MAP[tLine.dwMapID] = true
 		end
 	end
-	return ARENA_MAP[dwID]
+	return ARENA_MAP[dwMapID]
 end
 end
 
--- 判断当前地图是不是名剑大会地图
--- (bool) X.IsInArenaMap()
+---判断当前地图是不是名剑大会地图
+---@return boolean @当前地图是否是名剑大会地图
 function X.IsInArenaMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsArenaMap(me.GetMapID())
 end
 
--- 判断一个地图是不是战场地图
--- (bool) X.IsBattlefieldMap(dwMapID)
+---判断一个地图是不是战场地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是战场地图
 function X.IsBattlefieldMap(dwMapID)
 	return select(2, GetMapParams(dwMapID)) == MAP_TYPE.BATTLE_FIELD and not X.IsArenaMap(dwMapID)
 end
 
--- 判断当前地图是不是战场地图
--- (bool) X.IsInBattlefieldMap()
+---判断当前地图是不是战场地图
+---@return boolean @当前地图是否是战场地图
 function X.IsInBattlefieldMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsBattlefieldMap(me.GetMapID())
 end
 
--- 判断一个地图是不是秘境地图
--- (bool) X.IsDungeonMap(szMapName, bRaid)
--- (bool) X.IsDungeonMap(dwMapID, bRaid)
+---判断一个地图是不是秘境地图
+---@param dwMapID number | string @要判断的地图ID或地图名称
+---@param bRaid boolean @是否强制要求团队秘境或小队秘境
+---@return boolean @是否是秘境地图
 function X.IsDungeonMap(dwMapID, bRaid)
 	local map = X.GetMapInfo(dwMapID)
 	if map then
@@ -3654,58 +3660,63 @@ function X.IsDungeonMap(dwMapID, bRaid)
 	end
 end
 
--- 判断当前地图是不是秘境地图
--- (bool) X.IsInDungeonMap(bool bRaid)
+---判断当前地图是不是秘境地图
+---@param bRaid boolean @是否强制要求团队秘境或小队秘境
+---@return boolean @当前地图是否是秘境地图
 function X.IsInDungeonMap(bRaid)
 	local me = X.GetClientPlayer()
 	return me and X.IsDungeonMap(me.GetMapID(), bRaid)
 end
 
--- 判断一个地图是不是个人CD秘境地图
--- (bool) X.IsDungeonRoleProgressMap(dwMapID)
+---判断一个地图是不是个人CD秘境地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是个人CD秘境地图
 function X.IsDungeonRoleProgressMap(dwMapID)
 	return (select(8, GetMapParams(dwMapID)))
 end
 
--- 判断当前地图是不是个人CD秘境地图
--- (bool) X.IsInDungeonRoleProgressMap()
+---判断当前地图是不是个人CD秘境地图
+---@return boolean @当前地图是否是个人CD秘境地图
 function X.IsInDungeonRoleProgressMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsDungeonRoleProgressMap(me.GetMapID())
 end
 
--- 判断一个地图是不是主城地图
--- (bool) X.IsCityMap(dwMapID)
+---判断一个地图是不是主城地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是主城地图
 function X.IsCityMap(dwMapID)
 	local tType = Table_GetMapType(dwMapID)
 	return tType and tType.CITY and true or false
 end
 
--- 判断当前地图是不是主城地图
--- (bool) X.IsInCityMap()
+---判断当前地图是不是主城地图
+---@return boolean @当前地图是否是主城地图
 function X.IsInCityMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsCityMap(me.GetMapID())
 end
 
--- 判断一个地图是不是野外地图
--- (bool) X.IsVillageMap(dwMapID)
+---判断一个地图是不是野外地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是野外地图
 function X.IsVillageMap(dwMapID)
 	local tType = Table_GetMapType(dwMapID)
 	return tType and tType.VILLAGE and true or false
 end
 
--- 判断当前地图是不是野外地图
--- (bool) X.IsInVillageMap()
+---判断当前地图是不是野外地图
+---@return boolean @当前地图是否是野外地图
 function X.IsInVillageMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsVillageMap(me.GetMapID())
 end
 
--- 判断地图是不是PUBG地图
--- (bool) X.IsPubgMap(dwMapID)
 do
 local PUBG_MAP = {}
+---判断地图是不是绝境战场地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是绝境战场地图
 function X.IsPubgMap(dwMapID)
 	if PUBG_MAP[dwMapID] == nil then
 		PUBG_MAP[dwMapID] = X.Table_IsTreasureBattleFieldMap(dwMapID) or false
@@ -3714,17 +3725,18 @@ function X.IsPubgMap(dwMapID)
 end
 end
 
--- 判断当前地图是不是PUBG地图
--- (bool) X.IsInPubgMap()
+---判断当前地图是不是绝境战场地图
+---@return boolean @当前地图是否是绝境战场地图
 function X.IsInPubgMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsPubgMap(me.GetMapID())
 end
 
--- 判断地图是不是僵尸地图
--- (bool) X.IsZombieMap(dwMapID)
 do
 local ZOMBIE_MAP = {}
+---判断地图是不是李渡鬼域地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是李渡鬼域地图
 function X.IsZombieMap(dwMapID)
 	if ZOMBIE_MAP[dwMapID] == nil then
 		ZOMBIE_MAP[dwMapID] = Table_IsZombieBattleFieldMap
@@ -3734,17 +3746,18 @@ function X.IsZombieMap(dwMapID)
 end
 end
 
--- 判断当前地图是不是僵尸地图
--- (bool) X.IsInZombieMap()
+---判断当前地图是不是李渡鬼域地图
+---@return boolean @当前地图是否是李渡鬼域地图
 function X.IsInZombieMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsZombieMap(me.GetMapID())
 end
 
--- 判断地图是不是百战地图
--- (bool) X.IsMonsterMap(dwMapID)
 do
 local MONSTER_MAP = {}
+---判断地图是不是百战地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是百战地图
 function X.IsMonsterMap(dwMapID)
 	if MONSTER_MAP[dwMapID] == nil then
 		if GDAPI_SpiritEndurance_IsSEMap then
@@ -3757,56 +3770,61 @@ function X.IsMonsterMap(dwMapID)
 end
 end
 
--- 判断当前地图是不是百战地图
--- (bool) X.IsInMonsterMap()
+---判断当前地图是不是百战地图
+---@return boolean @当前地图是否是百战地图
 function X.IsInMonsterMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsMonsterMap(me.GetMapID())
 end
 
--- 判断地图是不是MOBA地图
+---判断地图是不是列星虚境地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是列星虚境地图
 -- (bool) X.IsMobaMap(dwMapID)
 function X.IsMobaMap(dwMapID)
 	return X.CONSTANT.MOBA_MAP[dwMapID] or false
 end
 
--- 判断当前地图是不是MOBA地图
--- (bool) X.IsInMobaMap()
+---判断当前地图是不是列星虚境地图
+---@return boolean @当前地图是否是列星虚境地图
 function X.IsInMobaMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsMobaMap(me.GetMapID())
 end
 
--- 判断地图是不是浪客行地图
--- (bool) X.IsStarveMap(dwMapID)
+---判断地图是不是浪客行地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是浪客行地图
 function X.IsStarveMap(dwMapID)
 	return X.CONSTANT.STARVE_MAP[dwMapID] or false
 end
 
--- 判断当前地图是不是浪客行地图
--- (bool) X.IsInStarveMap()
+---判断当前地图是不是浪客行地图
+---@return boolean @当前地图是否是浪客行地图
 function X.IsInStarveMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsStarveMap(me.GetMapID())
 end
 
--- 判断地图是不是家园地图
--- (bool) X.IsHomelandMap(dwMapID)
+---判断地图是不是家园地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是家园地图
 function X.IsHomelandMap(dwMapID)
 	return select(2, GetMapParams(dwMapID)) == MAP_TYPE.COMMUNITY
 end
 
--- 判断当前地图是不是家园地图
--- (bool) X.IsInHomelandMap()
+---判断当前地图是不是家园地图
+---@return boolean @当前地图是否是家园地图
 function X.IsInHomelandMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsHomelandMap(me.GetMapID())
 end
 
--- 判断地图是不是八荒衡鉴地图
--- (bool) X.IsMonsterMap(dwMapID)
 do
 local ROGUELIKE_MAP = {}
+---判断地图是不是八荒衡鉴地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是八荒衡地图
 function X.IsRoguelikeMap(dwMapID)
 	if ROGUELIKE_MAP[dwMapID] == nil then
 		if Table_IsRougeLikeMap then
@@ -3819,28 +3837,30 @@ function X.IsRoguelikeMap(dwMapID)
 end
 end
 
--- 判断当前地图是不是八荒衡鉴地图
--- (bool) X.IsInMonsterMap()
+---判断当前地图是不是八荒衡鉴地图
+---@return boolean @当前地图是否是八荒衡鉴地图
 function X.IsInRoguelikeMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsRoguelikeMap(me.GetMapID())
 end
 
--- 判断地图是不是新背包地图
--- (bool) X.IsExtraBagMap(dwMapID)
+---判断地图是不是新背包地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是新背包地图
 function X.IsExtraBagMap(dwMapID)
 	return X.IsPubgMap(dwMapID) or X.IsMobaMap(dwMapID) or X.IsStarveMap(dwMapID)
 end
 
--- 判断当前地图是不是新背包地图
--- (bool) X.IsInExtraBagMap()
+---判断当前地图是不是新背包地图
+---@return boolean @当前地图是否是新背包地图
 function X.IsInExtraBagMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsExtraBagMap(me.GetMapID())
 end
 
--- 判断一个地图是不是比赛地图
--- (bool) X.IsCompetitionMap(dwMapID)
+---判断一个地图是不是比赛地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是比赛地图
 function X.IsCompetitionMap(dwMapID)
 	return X.IsArenaMap(dwMapID) or X.IsBattlefieldMap(dwMapID)
 		or X.IsPubgMap(dwMapID) or X.IsZombieMap(dwMapID)
@@ -3849,15 +3869,16 @@ function X.IsCompetitionMap(dwMapID)
 		or dwMapID == 181 -- 狼影殿
 end
 
--- 判断当前地图是不是比赛地图
--- (bool) X.IsInCompetitionMap()
+---判断当前地图是不是比赛地图
+---@return boolean @当前地图是否是比赛地图
 function X.IsInCompetitionMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsCompetitionMap(me.GetMapID())
 end
 
--- 判断地图是不是功能屏蔽地图
--- (bool) X.IsShieldedMap(dwMapID)
+---判断地图是不是功能屏蔽地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是功能屏蔽地图
 function X.IsShieldedMap(dwMapID)
 	if X.IsPubgMap(dwMapID) or X.IsZombieMap(dwMapID) then
 		return true
@@ -3868,8 +3889,8 @@ function X.IsShieldedMap(dwMapID)
 	return false
 end
 
--- 判断当前地图是不是功能屏蔽地图
--- (bool) X.IsInShieldedMap()
+---判断当前地图是不是功能屏蔽地图
+---@return boolean @当前地图是否是功能屏蔽地图
 function X.IsInShieldedMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsShieldedMap(me.GetMapID())
