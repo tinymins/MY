@@ -21,6 +21,7 @@ if IsLocalFileExist(X.FormatPath({'config/restriction/lifebar.jx3dat', X.PATH_TY
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+X.RegisterRestriction('MY_LifeBar_Official.MapRestriction', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local D = {}
@@ -232,6 +233,9 @@ function D.DrawLifeBar(dwID)
 end
 
 X.BreatheCall('MY_LifeBar', function()
+	if D.bRestricted and (X.IsInArena() or X.IsInBattleField() or X.IsInPubg()) then
+		return
+	end
 	for dwID, _ in pairs(COUNTDOWN_CACHE) do
 		D.DrawLifeBar(dwID)
 	end
@@ -271,6 +275,13 @@ X.RegisterEvent({'PLAYER_ENTER_SCENE', 'NPC_ENTER_SCENE'}, 'MY_LifeBar', functio
 	X.DelayCall(function() ApplyCaption(dwID) end)
 	X.DelayCall(200, function() ApplyCaption(dwID) end)
 	X.DelayCall(500, function() ApplyCaption(dwID) end)
+end)
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_LifeBar_Official.MapRestriction', function()
+	if arg0 and arg0 ~= 'MY_LifeBar_Official.MapRestriction' then
+		return
+	end
+	D.bRestricted = X.IsRestricted('MY_LifeBar_Official.MapRestriction')
 end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
