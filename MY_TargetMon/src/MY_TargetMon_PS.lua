@@ -39,50 +39,50 @@ function D.TogglePanel()
 	end
 end
 
-function D.UpdateConfigActiveState(frame)
-	local hList = frame:Lookup('Wnd_Total/WndScroll_Config', 'Handle_ConfigList')
+function D.UpdateDatasetActiveState(frame)
+	local hList = frame:Lookup('Wnd_Total/WndScroll_Dataset', 'Handle_DatasetList')
 	for i = 0, hList:GetItemCount() - 1 do
 		local hItem = hList:Lookup(i)
-		hItem:Lookup('Image_ConfigItemBg_Sel'):SetVisible(hItem.config.szUUID == frame.szActiveConfigUUID)
+		hItem:Lookup('Image_DatasetItemBg_Sel'):SetVisible(hItem.dataset.szUUID == frame.szActiveDatasetUUID)
 	end
 end
 
-function D.DrawConfigList(frame)
-	local aConfig = MY_TargetMonConfig.GetDatasetList()
-	local szActiveConfigUUID
+function D.DrawDatasetList(frame)
+	local aDataset = MY_TargetMonConfig.GetDatasetList()
+	local szActiveDatasetUUID
 	-- 选中数据
-	for _, config in ipairs(aConfig) do
-		if not szActiveConfigUUID or config.szUUID == frame.szActiveConfigUUID then
-			szActiveConfigUUID = config.szUUID
+	for _, dataset in ipairs(aDataset) do
+		if not szActiveDatasetUUID or dataset.szUUID == frame.szActiveDatasetUUID then
+			szActiveDatasetUUID = dataset.szUUID
 		end
 	end
-	frame.szActiveConfigUUID = szActiveConfigUUID
+	frame.szActiveDatasetUUID = szActiveDatasetUUID
 	-- 渲染列表
-	local hList = frame:Lookup('Wnd_Total/WndScroll_Config', 'Handle_ConfigList')
+	local hList = frame:Lookup('Wnd_Total/WndScroll_Dataset', 'Handle_DatasetList')
 	hList:Clear()
-	for _, config in ipairs(aConfig) do
-		local hItem = hList:AppendItemFromIni(INI_FILE, 'Handle_ConfigItem')
-		local aTextColor = config.bEnable and {255, 255, 255} or {192, 192, 192}
-		hItem:Lookup('Text_ConfigItemTitle'):SetText(config.szTitle)
-		hItem:Lookup('Text_ConfigItemTitle'):SetFontColor(X.Unpack(aTextColor))
-		hItem:Lookup('Text_ConfigItemAuthor'):SetText(config.szAuthor)
-		hItem:Lookup('Text_ConfigItemAuthor'):SetFontColor(X.Unpack(aTextColor))
-		hItem:Lookup('Text_ConfigItemVersion'):SetText(config.szVersion)
-		hItem:Lookup('Text_ConfigItemVersion'):SetFontColor(X.Unpack(aTextColor))
-		hItem:Lookup('Image_ConfigItemBg_Sel'):SetVisible(config.szUUID == szActiveConfigUUID)
-		hItem.config = config
+	for _, dataset in ipairs(aDataset) do
+		local hItem = hList:AppendItemFromIni(INI_FILE, 'Handle_DatasetItem')
+		local aTextColor = dataset.bEnable and {255, 255, 255} or {192, 192, 192}
+		hItem:Lookup('Text_DatasetItemTitle'):SetText(dataset.szTitle)
+		hItem:Lookup('Text_DatasetItemTitle'):SetFontColor(X.Unpack(aTextColor))
+		hItem:Lookup('Text_DatasetItemAuthor'):SetText(dataset.szAuthor)
+		hItem:Lookup('Text_DatasetItemAuthor'):SetFontColor(X.Unpack(aTextColor))
+		hItem:Lookup('Text_DatasetItemVersion'):SetText(dataset.szVersion)
+		hItem:Lookup('Text_DatasetItemVersion'):SetFontColor(X.Unpack(aTextColor))
+		hItem:Lookup('Image_DatasetItemBg_Sel'):SetVisible(dataset.szUUID == szActiveDatasetUUID)
+		hItem.dataset = dataset
 	end
 	hList:FormatAllItemPos()
 	D.DrawMonitorList(frame)
 end
 
 function D.DrawMonitorList(frame)
-	local config = MY_TargetMonConfig.GetDataset(frame.szActiveConfigUUID)
+	local dataset = MY_TargetMonConfig.GetDataset(frame.szActiveDatasetUUID)
 	local hList = frame:Lookup('Wnd_Total/WndScroll_Monitor', 'Handle_Monitor_List')
 	local szSearchMonitor = frame.szSearchMonitor
-	if config then
+	if dataset then
 		local nCount = 0
-		for i, mon in ipairs(config.aMonitor) do
+		for i, mon in ipairs(dataset.aMonitor) do
 			if not szSearchMonitor
 			or szSearchMonitor == ''
 			or (mon.szNote and mon.szNote:find(szSearchMonitor))
@@ -99,7 +99,7 @@ function D.DrawMonitorList(frame)
 				hItem:SetAlpha(mon.bEnable and 255 or 128)
 				hItem.mon = mon
 				hItem.nMonitorIndex = i
-				hItem.szType = config.szType
+				hItem.szType = dataset.szType
 				nCount = nCount + 1
 			end
 		end
@@ -113,24 +113,24 @@ function D.DrawMonitorList(frame)
 end
 
 function D.CreateMonitor(frame, nIndex)
-	local config = MY_TargetMonConfig.GetDataset(frame.szActiveConfigUUID)
-	if not config then
+	local dataset = MY_TargetMonConfig.GetDataset(frame.szActiveDatasetUUID)
+	if not dataset then
 		return
 	end
-	GetUserInput(config.szType == 'BUFF' and _L['Please Input Monitor Buff Id'] or _L['Please Input Monitor Skill Id'], function(szID)
+	GetUserInput(dataset.szType == 'BUFF' and _L['Please Input Monitor Buff Id'] or _L['Please Input Monitor Skill Id'], function(szID)
 		local dwID = tonumber(szID)
 		if not dwID then
 			X.Alert(_L['Invalid Input Number'])
 			return
 		end
 		X.DelayCall(function()
-			GetUserInput(config.szType == 'BUFF' and _L['Please Input Monitor Buff Level'] or _L['Please Input Monitor Skill Level'], function(szLevel)
+			GetUserInput(dataset.szType == 'BUFF' and _L['Please Input Monitor Buff Level'] or _L['Please Input Monitor Skill Level'], function(szLevel)
 				local nLevel = tonumber(szLevel)
 				if not nLevel then
 					X.Alert(_L['Invalid Input Number'])
 					return
 				end
-				MY_TargetMonConfig.CreateMonitor(config.szUUID, nIndex, dwID, nLevel)
+				MY_TargetMonConfig.CreateMonitor(dataset.szUUID, nIndex, dwID, nLevel)
 			end)
 		end)
 	end)
@@ -138,15 +138,15 @@ end
 
 function D.OnFrameCreate()
 	this:Lookup('', 'Text_Title'):SetText(_L['MY_TargetMon_PS'])
-	this:Lookup('Wnd_Total/Btn_CreateConfig', 'Text_CreateConfig'):SetText(_L['Create Config'])
-	this:Lookup('Wnd_Total/Btn_ImportConfig', 'Text_ImportConfig'):SetText(_L['Import Export'])
+	this:Lookup('Wnd_Total/Btn_CreateDataset', 'Text_CreateDataset'):SetText(_L['Create Config'])
+	this:Lookup('Wnd_Total/Btn_ImportExportDataset', 'Text_ImportExportDataset'):SetText(_L['Import Export'])
 	this:Lookup('Wnd_Total/Btn_CreateMonitor', 'Text_CreateMonitor'):SetText(_L['Create Monitor'])
 	this:Lookup('Wnd_Total/Wnd_SearchMonitor/Edit_SearchMonitor'):SetPlaceholderText(_L['Search Monitor'])
 	this:RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD')
 	this:RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 	this:RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, -100)
-	D.DrawConfigList(this)
+	D.DrawDatasetList(this)
 end
 
 function D.OnLButtonClick()
@@ -154,11 +154,11 @@ function D.OnLButtonClick()
 	local frame = this:GetRoot()
 	if name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
-	elseif name == 'Btn_CreateConfig' then
+	elseif name == 'Btn_CreateDataset' then
 		MY_TargetMonConfig.CreateDataset()
 	elseif name == 'Btn_CreateMonitor' then
 		D.CreateMonitor(frame, nil)
-	elseif name == 'Btn_ImportConfig' then
+	elseif name == 'Btn_ImportExportDataset' then
 		local menu = {}
 		table.insert(menu, {
 			szOption = _L['Subscribe remote data'],
@@ -184,19 +184,19 @@ function D.OnLButtonClick()
 		})
 		local t1 = { szOption = _L['Export local data'] }
 		local aExportUUID = {}
-		for _, config in ipairs(MY_TargetMonConfig.GetDatasetList()) do
+		for _, dataset in ipairs(MY_TargetMonConfig.GetDatasetList()) do
 			table.insert(t1, {
-				szOption = MY_TargetMonConfig.GetDatasetTitle(config),
+				szOption = MY_TargetMonConfig.GetDatasetTitle(dataset),
 				bCheck = true,
 				fnAction = function(_, bChecked)
 					for i, v in ipairs(aExportUUID) do
-						if v == config.szUUID then
+						if v == dataset.szUUID then
 							table.remove(aExportUUID, i)
 							break
 						end
 					end
 					if bChecked then
-						table.insert(aExportUUID, config.szUUID)
+						table.insert(aExportUUID, dataset.szUUID)
 					end
 				end,
 			})
@@ -224,13 +224,13 @@ function D.OnLButtonClick()
 			table.insert(menu, {
 				szOption = _L['Import ancient data'],
 				fnAction = function()
-					X.Confirm(_L['Sure to import ancient config? Current data with same uuid will be overwritten.'], function()
-						MY_TargetMonConfig.ImportAncientData(function(aConfig)
+					X.Confirm(_L['Sure to import ancient dataset? Current data with same uuid will be overwritten.'], function()
+						MY_TargetMonConfig.ImportAncientData(function(aDataset)
 							local aName = {}
-							for _, config in ipairs(aConfig) do
-								table.insert(aName, MY_TargetMonConfig.GetDatasetTitle(config))
+							for _, dataset in ipairs(aDataset) do
+								table.insert(aName, MY_TargetMonConfig.GetDatasetTitle(dataset))
 							end
-							X.Alert(_L['Ancient configs import success:'] .. '\n\n' .. table.concat(aName, '\n'))
+							X.Alert(_L['Ancient datasets import success:'] .. '\n\n' .. table.concat(aName, '\n'))
 						end)
 					end)
 					X.UI.ClosePopupMenu()
@@ -238,10 +238,10 @@ function D.OnLButtonClick()
 			})
 		end
 		table.insert(menu, {
-			szOption = _L['Delete all config data'],
+			szOption = _L['Delete all datasets'],
 			rgb = {255, 0, 0},
 			fnAction = function()
-				X.Confirm(_L['Sure to delete all config data? This operation can not be undone.'], function()
+				X.Confirm(_L['Sure to delete all datasets? This operation can not be undone.'], function()
 					MY_TargetMonConfig.DeleteAllDataset()
 				end)
 				X.UI.ClosePopupMenu()
@@ -289,7 +289,7 @@ function D.OnItemMouseIn()
 			local x, y = this:GetAbsX(), this:GetAbsY()
 			X.OutputSkillTip({x, y, w, h}, this.mon.dwID, this.mon.nLevel)
 		end
-	elseif name == 'Image_ConfigItemConfig' then
+	elseif name == 'Image_DatasetItemConfig' then
 		this:SetFrame(106)
 	end
 end
@@ -300,14 +300,14 @@ function D.OnItemMouseOut()
 		this:Lookup('Image_MonitorItem'):Show()
 		this:Lookup('Box_MonitorItem'):SetObjectMouseOver(false)
 		X.HideTip()
-	elseif name == 'Image_ConfigItemConfig' then
+	elseif name == 'Image_DatasetItemConfig' then
 		this:SetFrame(105)
 	end
 end
 
 function D.OnItemLButtonUp()
 	local name = this:GetName()
-	if name == 'Handle_ConfigItem'
+	if name == 'Handle_DatasetItem'
 	or name == 'Handle_MonitorItem' then
 		-- DragEnd bug fix
 		X.DelayCall(50, function()
@@ -322,28 +322,28 @@ end
 function D.OnItemLButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
-	if name == 'Handle_ConfigItem' then
-		frame.szActiveConfigUUID = this.config.szUUID
-		D.UpdateConfigActiveState(frame)
+	if name == 'Handle_DatasetItem' then
+		frame.szActiveDatasetUUID = this.dataset.szUUID
+		D.UpdateDatasetActiveState(frame)
 		D.DrawMonitorList(frame)
 	elseif name == 'Handle_MonitorItem' then
-		MY_TargetMon_MonitorPanel.Open(frame.szActiveConfigUUID, this.mon.szUUID)
-	elseif name == 'Image_ConfigItemConfig' then
-		MY_TargetMon_ConfigPanel.Open(this:GetParent().config.szUUID)
+		MY_TargetMon_MonitorPanel.Open(frame.szActiveDatasetUUID, this.mon.szUUID)
+	elseif name == 'Image_DatasetItemConfig' then
+		MY_TargetMon_ConfigPanel.Open(this:GetParent().dataset.szUUID)
 	end
 end
 
 function D.OnItemRButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
-	if name == 'Image_ConfigItemConfig' then
-		local config = this:GetParent().config
+	if name == 'Image_DatasetItemConfig' then
+		local dataset = this:GetParent().dataset
 		local menu = {}
 		table.insert(menu, {
 			szOption = _L['Enable'],
-			bCheck = true, bChecked = config.bEnable,
+			bCheck = true, bChecked = dataset.bEnable,
 			fnAction = function()
-				config.bEnable = not config.bEnable
+				dataset.bEnable = not dataset.bEnable
 				FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 				X.UI.ClosePopupMenu()
 			end,
@@ -354,7 +354,7 @@ function D.OnItemRButtonClick()
 			rgb = { 255, 0, 0 },
 			fnAction = function()
 				X.Confirm(_L['Sure to delete monitor? This operation can not be undone.'], function()
-					MY_TargetMonConfig.DeleteDataset(config.szUUID)
+					MY_TargetMonConfig.DeleteDataset(dataset.szUUID)
 				end)
 				X.UI.ClosePopupMenu()
 			end,
@@ -386,11 +386,11 @@ end
 function D.OnItemLButtonDrag()
 	local name = this:GetName()
 	local frame = this:GetRoot()
-	if name == 'Handle_ConfigItem' then
+	if name == 'Handle_DatasetItem' then
 		if not X.IsEmpty(frame.szSearchMonitor) then
 			return
 		end
-		X.UI.OpenDragDrop(this, this, 'MY_TargetMon_PS#Handle_ConfigItem', this.config.szUUID)
+		X.UI.OpenDragDrop(this, this, 'MY_TargetMon_PS#Handle_DatasetItem', this.dataset.szUUID)
 	elseif name == 'Handle_MonitorItem' then
 		if not X.IsEmpty(frame.szSearchMonitor) then
 			return
@@ -401,12 +401,12 @@ end
 
 function D.OnItemMouseHover()
 	local name = this:GetName()
-	if name == 'Handle_ConfigItem' then
+	if name == 'Handle_DatasetItem' then
 		if not X.UI.IsDragDropOpened() then
 			return
 		end
 		local szDragGroupID = X.UI.GetDragDropData()
-		if szDragGroupID == 'MY_TargetMon_PS#Handle_ConfigItem' then
+		if szDragGroupID == 'MY_TargetMon_PS#Handle_DatasetItem' then
 			X.UI.SetDragDropHoverEl(
 				this,
 				{
@@ -442,39 +442,39 @@ D.OnItemMouseEnter = D.OnItemMouseHover
 function D.OnItemLButtonDragEnd()
 	local name = this:GetName()
 	local frame = this:GetRoot()
-	if name == 'Handle_ConfigItem' then
+	if name == 'Handle_DatasetItem' then
 		if not X.UI.IsDragDropOpened() then
 			return
 		end
 		local dropEl, szDragGroupID, xData = X.UI.CloseDragDrop()
-		if szDragGroupID ~= 'MY_TargetMon_PS#Handle_ConfigItem'
-		or not dropEl or dropEl:GetName() ~= 'Handle_ConfigItem' or dropEl:GetRoot() ~= frame then
+		if szDragGroupID ~= 'MY_TargetMon_PS#Handle_DatasetItem'
+		or not dropEl or dropEl:GetName() ~= 'Handle_DatasetItem' or dropEl:GetRoot() ~= frame then
 			return
 		end
 		local szDragUUID = xData
-		local szDropUUID = dropEl.config.szUUID
+		local szDropUUID = dropEl.dataset.szUUID
 		if szDragUUID == szDropUUID then
 			return
 		end
-		local aConfig = MY_TargetMonConfig.GetDatasetList()
-		local nPosition, dragConfig = 0, nil
-		for _, config in ipairs(aConfig) do
-			if config.szUUID == szDragUUID then
+		local aDataset = MY_TargetMonConfig.GetDatasetList()
+		local nPosition, dragDataset = 0, nil
+		for _, dataset in ipairs(aDataset) do
+			if dataset.szUUID == szDragUUID then
 				nPosition = 1
 				break
-			elseif config.szUUID == szDropUUID then
+			elseif dataset.szUUID == szDropUUID then
 				break
 			end
 		end
-		for i, config in ipairs(aConfig) do
-			if config.szUUID == szDragUUID then
-				dragConfig = table.remove(aConfig, i)
+		for i, dataset in ipairs(aDataset) do
+			if dataset.szUUID == szDragUUID then
+				dragDataset = table.remove(aDataset, i)
 				break
 			end
 		end
-		for i, config in ipairs(aConfig) do
-			if config.szUUID == szDropUUID then
-				table.insert(aConfig, i + nPosition, dragConfig)
+		for i, dataset in ipairs(aDataset) do
+			if dataset.szUUID == szDropUUID then
+				table.insert(aDataset, i + nPosition, dragDataset)
 				break
 			end
 		end
@@ -493,9 +493,9 @@ function D.OnItemLButtonDragEnd()
 		if szDragUUID == szDropUUID then
 			return
 		end
-		local config = MY_TargetMonConfig.GetDataset(frame.szActiveConfigUUID)
-		local nPosition, dragConfig = 0, nil
-		for _, mon in ipairs(config.aMonitor) do
+		local dataset = MY_TargetMonConfig.GetDataset(frame.szActiveDatasetUUID)
+		local nPosition, dragDataset = 0, nil
+		for _, mon in ipairs(dataset.aMonitor) do
 			if mon.szUUID == szDragUUID then
 				nPosition = 1
 				break
@@ -503,19 +503,19 @@ function D.OnItemLButtonDragEnd()
 				break
 			end
 		end
-		for i, mon in ipairs(config.aMonitor) do
+		for i, mon in ipairs(dataset.aMonitor) do
 			if mon.szUUID == szDragUUID then
-				dragConfig = table.remove(config.aMonitor, i)
+				dragDataset = table.remove(dataset.aMonitor, i)
 				break
 			end
 		end
-		for i, mon in ipairs(config.aMonitor) do
+		for i, mon in ipairs(dataset.aMonitor) do
 			if mon.szUUID == szDropUUID then
-				table.insert(config.aMonitor, i + nPosition, dragConfig)
+				table.insert(dataset.aMonitor, i + nPosition, dragDataset)
 				break
 			end
 		end
-		FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
+		FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 	end
 end
 
@@ -523,7 +523,7 @@ function D.OnEvent(event)
 	if event == 'MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY' or event == 'MY_TARGET_MON_CONFIG__DATASET_RELOAD' then
 		local frame = this
 		X.DelayCall('MY_TargetMon_PS_DrawConfigList', 100, function()
-			D.DrawConfigList(frame)
+			D.DrawDatasetList(frame)
 		end)
 	elseif event == 'MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY' then
 		local frame = this
