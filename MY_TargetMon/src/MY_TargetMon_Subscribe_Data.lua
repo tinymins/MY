@@ -339,6 +339,7 @@ function D.FetchSubscribeList(nPage)
 					nIndex = res.page.index,
 					nSize = res.page.size,
 					nTotal = res.page.total,
+					nPageTotal = math.ceil(res.page.total / res.page.size),
 				}
 				local aMetaInfo = {}
 				for _, info in ipairs(res.data) do
@@ -609,7 +610,7 @@ function D.UpdateList(page)
 	-- ÍÆ¼öÒ³Âë
 	page:Lookup('Wnd_Total/Btn_PrevPage'):Enable(DATA_PAGINATION.nIndex > 1)
 	page:Lookup('Wnd_Total/Btn_NextPage'):Enable(DATA_PAGINATION.nIndex < DATA_PAGINATION.nTotal)
-	page:Lookup('Wnd_Total', 'Text_Page'):SetText(DATA_PAGINATION.nIndex .. ' / ' .. DATA_PAGINATION.nTotal)
+	page:Lookup('Wnd_Total', 'Text_Page'):SetText(DATA_PAGINATION.nIndex .. ' / ' .. DATA_PAGINATION.nPageTotal)
 end
 
 function D.SwitchPage(nPage)
