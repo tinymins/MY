@@ -685,7 +685,9 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 	x = x + ui:Append('WndComboBox', {
 		name = 'WndComboBox_StackOp',
 		x = x, y = y, w = 90, h = 25,
-		text = rec.szStackOp or (rec.nStackNum and '>=' or _L['No limit']),
+		text = rec.szStackOp
+			and X.GetOperatorName(rec.szStackOp)
+			or (rec.nStackNum and X.GetOperatorName('>=') or _L['No limit']),
 		menu = function()
 			local this = this
 			local menu = {{
@@ -695,19 +697,19 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 					ui:Children('#WndEditBox_StackNum'):Text('')
 					onChangeNotify(rec)
 					X.UI(this):Text(_L['No limit'])
+					X.UI.ClosePopupMenu()
 				end,
 			}}
-			for _, op in ipairs({ '>=', '=', '!=', '<', '<=', '>', '>=' }) do
-				table.insert(menu, {
-					szOption = op,
-					fnAction = function()
-						rec.szStackOp = op
-						onChangeNotify(rec)
-						X.UI(this):Text(op)
-					end,
-				})
-			end
-			return menu
+			return X.InsertOperatorMenu(
+				menu,
+				rec.szStackOp,
+				function(szOp)
+					rec.szStackOp = szOp
+					onChangeNotify(rec)
+					X.UI(this):Text(X.GetOperatorName(szOp))
+					X.UI.ClosePopupMenu()
+				end
+			)
 		end,
 	}):Width() + 5
 	x = x + ui:Append('WndEditBox', {
@@ -720,7 +722,7 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 			if rec.nStackNum then
 				if not rec.szStackOp then
 					rec.szStackOp = '>='
-					ui:Children('#WndComboBox_StackOp'):Text('>=')
+					ui:Children('#WndComboBox_StackOp'):Text(X.GetOperatorName('>='))
 				end
 			end
 			onChangeNotify(rec)
