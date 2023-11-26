@@ -1574,7 +1574,7 @@ end
 end
 
 function X.GetOperatorText(szOperator, L)
-	return L and L[op] or _L.OPERATOR[szOperator]
+	return L and L[szOperator] or _L.OPERATOR[szOperator]
 end
 
 function X.InsertOperatorMenu(t, szOperator, fnAction, aOperator, L)
