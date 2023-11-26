@@ -1573,6 +1573,10 @@ function X.SetMemberFunctionHook(t, xArg1, xArg2, xArg3, xArg4)
 end
 end
 
+function X.GetOperatorText(szOp, L)
+	return L and L[op] or _L.OPERATOR[szOp]
+end
+
 function X.InsertOperatorMenu(t, opt, action, opts, L)
 	for _, op in ipairs(opts or { '==', '!=', '<', '>=', '>', '<=' }) do
 		table.insert(t, {
