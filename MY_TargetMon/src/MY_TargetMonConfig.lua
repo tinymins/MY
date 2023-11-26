@@ -622,6 +622,7 @@ function D.CreateMonitor(szUUID, nIndex, dwID, nLevel)
 		dwID = dwID,
 		nLevel = nLevel,
 		nStackNum = 0,
+		nStackNumOp = nil,
 		szNote = szNote,
 		szContent = '',
 		aContentColor = nil,

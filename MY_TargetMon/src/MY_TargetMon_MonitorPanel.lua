@@ -153,16 +153,41 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			x = nX, y = nY - 3, w = 'auto',
 			text = _L['Monitor StackNum'],
 		}):Width() + 5
+		nX = nX + uiWnd:Append('WndComboBox', {
+			x = nX, y = nY, w = 90, h = 25,
+			text = X.GetOperatorName(mon.nStackNumOp or '=='),
+			menu = function()
+				local this = this
+				return X.InsertOperatorMenu(
+					{},
+					mon.nStackNumOp,
+					function(szOp)
+						mon.nStackNumOp = szOp
+						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
+						X.UI(this):Text(X.GetOperatorName(szOp))
+						X.UI.ClosePopupMenu()
+					end
+				)
+			end,
+			tip = {
+				render = _L['Monitor op value set to 0, means no limit, operator will be ignored.'],
+				position = X.UI.TIP_POSITION.TOP_BOTTOM,
+			},
+		}):Width() + 5
 		nX = nX + uiWnd:Append('WndEditBox', {
 			x = nX, y = nY, w = 50, h = 22,
 			text = mon.nStackNum,
-			onChange = function(val)
-				local nValue = tonumber(val)
+			onChange = function(szValue)
+				local nValue = tonumber(szValue)
 				if nValue then
 					mon.nStackNum = nValue
 					FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
 				end
 			end,
+			tip = {
+				render = _L['Monitor op value set to 0, means no limit, operator will be ignored.'],
+				position = X.UI.TIP_POSITION.TOP_BOTTOM,
+			},
 		}):Width() + 5
 	end
 	nY = nY + nDeltaY

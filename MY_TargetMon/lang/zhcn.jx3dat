@@ -217,6 +217,7 @@ return {
     ['Monitor ID'] = 'ID',
     ['Monitor Level'] = '等级',
     ['Monitor StackNum'] = '层数',
+    ['Monitor op value set to 0, means no limit, operator will be ignored.'] = '比较数值设置为0表示任何条件均满足要求。',
     ['Monitor Self Kungfu Requirement'] = '自身心法要求',
     ['Monitor Target Kungfu Requirement'] = '目标心法要求',
     ['Monitor All Kungfu'] = '全部心法',

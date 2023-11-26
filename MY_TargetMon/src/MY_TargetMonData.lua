@@ -363,7 +363,7 @@ local function Buff_MonMatch(tAllBuff, mon, dataset)
 				)
 				and (not D.IsShieldedBuff(buff.dwID, buff.nLevel))
 				and (mon.nLevel == 0 or mon.nLevel == buff.nLevel)
-				and (not mon.nStackNum or mon.nStackNum == 0 or mon.nStackNum == buff.nStackNum) then
+				and (not mon.nStackNum or mon.nStackNum == 0 or X.JudgeOperator(mon.nStackNumOp or '=', buff.nStackNum, mon.nStackNum)) then
 					return buff
 				end
 			end
