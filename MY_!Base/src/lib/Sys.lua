@@ -1573,31 +1573,35 @@ function X.SetMemberFunctionHook(t, xArg1, xArg2, xArg3, xArg4)
 end
 end
 
-function X.InsertOperatorMenu(t, opt, action, opts, L)
-	for _, op in ipairs(opts or { '==', '!=', '<', '>=', '>', '<=' }) do
+function X.GetOperatorText(szOperator, L)
+	return L and L[szOperator] or _L.OPERATOR[szOperator]
+end
+
+function X.InsertOperatorMenu(t, szOperator, fnAction, aOperator, L)
+	for _, szOp in ipairs(aOperator or { '==', '!=', '<', '>=', '>', '<=' }) do
 		table.insert(t, {
-			szOption = L and L[op] or _L.OPERATOR[op],
+			szOption = L and L[szOp] or _L.OPERATOR[szOp],
 			bCheck = true, bMCheck = true,
-			bChecked = opt == op,
-			fnAction = function() action(op) end,
+			bChecked = szOperator == szOp,
+			fnAction = function() fnAction(szOp) end,
 		})
 	end
 	return t
 end
 
-function X.JudgeOperator(opt, lval, rval, ...)
-	if opt == '>' then
-		return lval > rval
-	elseif opt == '>=' then
-		return lval >= rval
-	elseif opt == '<' then
-		return lval < rval
-	elseif opt == '<=' then
-		return lval <= rval
-	elseif opt == '=' or opt == '==' or opt == '===' then
-		return lval == rval
-	elseif opt == '<>' or opt == '~=' or opt == '!=' or opt == '!==' then
-		return lval ~= rval
+function X.JudgeOperator(szOperator, dwLeftValue, dwRightValue)
+	if szOperator == '>' then
+		return dwLeftValue > dwRightValue
+	elseif szOperator == '>=' then
+		return dwLeftValue >= dwRightValue
+	elseif szOperator == '<' then
+		return dwLeftValue < dwRightValue
+	elseif szOperator == '<=' then
+		return dwLeftValue <= dwRightValue
+	elseif szOperator == '=' or szOperator == '==' or szOperator == '===' then
+		return dwLeftValue == dwRightValue
+	elseif szOperator == '<>' or szOperator == '~=' or szOperator == '!=' or szOperator == '!==' then
+		return dwLeftValue ~= dwRightValue
 	end
 end
 
