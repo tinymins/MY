@@ -976,12 +976,19 @@ function D.OpenRuleEditor(tData, onChangeNotify, bHideBase)
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
 	nX = ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 200,
-		text = _L['Operator'],
+		text = X.GetOperatorName(tData.tLife.szOperator or '=='),
 		menu = function()
-			return X.InsertOperatorMenu({}, tData.tLife.szOperator, function(op)
-				tData.tLife.szOperator = op
-				onChangeNotify(tData)
-			end)
+			local this = this
+			return X.InsertOperatorMenu(
+				{},
+				tData.tLife.szOperator,
+				function(szOp)
+					tData.tLife.szOperator = szOp
+					onChangeNotify(tData)
+					X.UI(this):Text(X.GetOperatorName(szOp))
+					X.UI.ClosePopupMenu()
+				end
+			)
 		end,
 		autoEnable = function() return tData.tLife.bEnable end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 5
