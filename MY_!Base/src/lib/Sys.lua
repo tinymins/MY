@@ -1573,7 +1573,7 @@ function X.SetMemberFunctionHook(t, xArg1, xArg2, xArg3, xArg4)
 end
 end
 
-function X.GetOperatorText(szOperator, L)
+function X.GetOperatorName(szOperator, L)
 	return L and L[szOperator] or _L.OPERATOR[szOperator]
 end
 
