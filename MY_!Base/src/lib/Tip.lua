@@ -706,7 +706,7 @@ function X.OutputTableTip(tOptions)
 	if hTarget then
 		hTable = hTarget:AppendItemFromIni(INI_PATH, 'Handle_Table')
 	else
-		frame = Wnd.OpenWindow(INI_PATH, X.NSFormatString('{$NS}_OutputTableTip'))
+		frame = X.UI.OpenFrame(INI_PATH, X.NSFormatString('{$NS}_OutputTableTip'))
 		hTotal = frame:Lookup('', '')
 		imgBg = hTotal:Lookup('Image_Bg')
 		hTable = hTotal:Lookup('Handle_Table')
@@ -912,7 +912,7 @@ function X.OutputTableTip(tOptions)
 		X.RegisterEsc(
 			X.NSFormatString('{$NS}_OutputTableTip'),
 			function() return frame:IsValid() and frame:IsVisible() end,
-			function() Wnd.CloseWindow(frame) end)
+			function() X.UI.CloseFrame(frame) end)
 		frame:SetSize(
 			nTableWidth + nFramePaddingLeft + nFramePaddingRight,
 			nTableHeight + nFramePaddingTop + nFramePaddingBottom)
@@ -927,10 +927,10 @@ function X.HideTableTip(bAnimate)
 	end
 	if bAnimate then
 		X.UI(frame):FadeOut(2000, function()
-			Wnd.CloseWindow(frame)
+			X.UI.CloseFrame(frame)
 		end)
 	else
-		Wnd.CloseWindow(frame)
+		X.UI.CloseFrame(frame)
 	end
 end
 

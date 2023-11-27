@@ -55,11 +55,11 @@ function D.Open(raw, capture, ...)
 	end
 	local nCaptureW, nCaptureH = captureEl:GetW(), captureEl:GetH()
 	-- 拽入位置提示
-	local frame = Wnd.OpenWindow(X.PACKET_INFO.FRAMEWORK_ROOT .. '/ui/DragDrop.ini', DROP_FRAME_NAME)
+	local frame = X.UI.OpenFrame(X.PACKET_INFO.FRAMEWORK_ROOT .. '/ui/DragDrop.ini', DROP_FRAME_NAME)
 	frame:SetAlpha(150)
 	frame:Hide()
 	-- 拖拽状态提示
-	local frame = Wnd.OpenWindow(X.PACKET_INFO.FRAMEWORK_ROOT .. '/ui/DragDrop.ini', DRAG_FRAME_NAME)
+	local frame = X.UI.OpenFrame(X.PACKET_INFO.FRAMEWORK_ROOT .. '/ui/DragDrop.ini', DRAG_FRAME_NAME)
 	frame:Lookup('', ''):SetSize(nW + 4, nH + 4)
 	frame:Lookup('', 'Image_Background'):SetSize(nW + 4, nH + 4)
 	frame:Lookup('', 'Handle_ScreenShot'):SetSize(nW, nH)
@@ -89,8 +89,8 @@ function D.Close()
 		X.DelayCall(X.NSFormatString('{$NS}_UI__DragDrop_Clear'), 50, function() DATA = nil end) -- 由于 Click 在 DragEnd 之后
 		Cursor.Switch(X.UI.CURSOR.NORMAL)
 		frame:EndMoving()
-		Wnd.CloseWindow(DRAG_FRAME_NAME)
-		Wnd.CloseWindow(DROP_FRAME_NAME)
+		X.UI.CloseFrame(DRAG_FRAME_NAME)
+		X.UI.CloseFrame(DROP_FRAME_NAME)
 		return dropEl, X.Unpack(xData)
 	end
 end

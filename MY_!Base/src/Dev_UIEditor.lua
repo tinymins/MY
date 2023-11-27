@@ -148,7 +148,7 @@ function D.OnLButtonClick()
 		menu.szLayer = 'Topmost2'
 		X.UI.PopupMenu(menu)
 	elseif name == 'Btn_Close' then
-		Wnd.CloseWindow(this:GetRoot())
+		X.UI.CloseFrame(this:GetRoot())
 	elseif name == 'Btn_Setting' then
 		local frame = this:GetRoot()
 		GetUserInput('', function(szTreePath)
@@ -453,7 +453,7 @@ function D.GetTipInfo(el)
 end
 
 function D.CreateFrame()
-	return Wnd.OpenWindow(UI_INIFILE, FRAME_NAME)
+	return X.UI.OpenFrame(UI_INIFILE, FRAME_NAME)
 end
 
 function D.SetElement(frame, el)

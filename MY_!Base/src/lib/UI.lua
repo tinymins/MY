@@ -2293,7 +2293,7 @@ function OO:Remove(onRemove)
 			local onRemove = GetComponentProp(raw, 'onRemove')
 			if not onRemove or not onRemove(raw) then
 				if raw:GetType() == 'WndFrame' then
-					Wnd.CloseWindow(raw)
+					X.UI.CloseFrame(raw)
 				elseif raw:GetBaseType() == 'Wnd' then
 					raw:Destroy()
 				else
@@ -2408,7 +2408,7 @@ function OO:Append(arg0, arg1)
 			else
 				szFile = X.PACKET_INFO.UI_COMPONENT_ROOT .. szFile .. '.ini'
 			end
-			local frame = Wnd.OpenWindow(szFile, X.NSFormatString('{$NS}_TempWnd#') .. _nTempWndCount)
+			local frame = X.UI.OpenFrame(szFile, X.NSFormatString('{$NS}_TempWnd#') .. _nTempWndCount)
 			if not frame then
 				return X.Debug(X.NSFormatString('{$NS}#UI#Append'), _L('Unable to open ini file [%s]', szFile), X.DEBUG_LEVEL.ERROR)
 			end
@@ -2441,7 +2441,7 @@ function OO:Append(arg0, arg1)
 			else
 				X.Debug(X.NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), X.DEBUG_LEVEL.ERROR)
 			end
-			Wnd.CloseWindow(frame)
+			X.UI.CloseFrame(frame)
 		end
 	end
 	return ApplyUIArguments(ui, tArg)
@@ -6288,9 +6288,9 @@ function X.UI.CreateFrame(szName, opt)
 	-- close and reopen exist frame
 	local frm = Station.Lookup(opt.level .. '/' .. szName)
 	if frm then
-		Wnd.CloseWindow(frm)
+		X.UI.CloseFrame(frm)
 	end
-	frm = Wnd.OpenWindow(szIniFile, szName)
+	frm = X.UI.OpenFrame(szIniFile, szName)
 	if not opt.simple and not opt.empty then
 		frm:Lookup('', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_UITEX, X.PACKET_INFO.LOGO_MAIN_FRAME)
 	end
@@ -6308,7 +6308,7 @@ function X.UI.CreateFrame(szName, opt)
 					return
 				end
 			end
-			Wnd.CloseWindow(frm)
+			X.UI.CloseFrame(frm)
 			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 			X.RegisterEsc('Frame_Close_' .. szName)
 		end)
@@ -6480,6 +6480,25 @@ function X.UI.CreateFrame(szName, opt)
 		opt.anchor = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 	end
 	return ApplyUIArguments(ui, opt)
+end
+
+---打开窗口，可以规避游戏退出时创建界面带来的虚拟机异常问题
+---@param szPath string @INI文件路径
+---@param szName string @窗口名称
+---@return userdata | nil @打开成功返回窗口句柄，打开失败返回 nil
+function X.UI.OpenFrame(szPath, szName)
+	if X.IsGameExiting() then
+		return
+	end
+	if not szName then
+		szName = szPath:gsub('.*/', ''):gsub('.*\\', ''):gsub('%.ini$', '')
+	end
+	return Wnd.OpenWindow(szPath, szName)
+end
+
+---关闭窗口
+function X.UI.CloseFrame(...)
+	return Wnd.CloseWindow(...)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

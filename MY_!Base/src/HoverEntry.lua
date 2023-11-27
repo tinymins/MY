@@ -60,7 +60,7 @@ function D.Popup()
 end
 
 function D.CheckEnable()
-	Wnd.CloseWindow(FRAME_NAME)
+	X.UI.CloseFrame(FRAME_NAME)
 	if O.bEnable then
 		local frame = X.UI.CreateFrame(FRAME_NAME, {
 			empty = true,

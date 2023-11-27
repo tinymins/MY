@@ -39,7 +39,7 @@ local function CreateWebPageFrame()
 	--[[#DEBUG BEGIN]]
 	X.Debug('CreateWebPageFrame: ' .. szRequestID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	hFrame = Wnd.OpenWindow(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndWebPage.ini', X.NSFormatString('{$NS}RRWP_') .. szRequestID)
+	hFrame = X.UI.OpenFrame(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndWebPage.ini', X.NSFormatString('{$NS}RRWP_') .. szRequestID)
 	hFrame:Hide()
 	return szRequestID, hFrame
 end
@@ -356,7 +356,7 @@ function X.Ajax(settings)
 		-- create page
 		if not hFrame then
 			RequestID = ('%X_%X'):format(GetTickCount(), X.Random(0x1000, 0xEFFF))
-			hFrame = Wnd.OpenWindow(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndWebCef.ini', X.NSFormatString('{$NS}RRWC_') .. RequestID)
+			hFrame = X.UI.OpenFrame(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndWebCef.ini', X.NSFormatString('{$NS}RRWC_') .. RequestID)
 			hFrame:Hide()
 		end
 		local wWebCef = hFrame:Lookup('WndWebCef')
@@ -374,7 +374,7 @@ function X.Ajax(settings)
 			settings.callback(szContent, 200)
 			-- 有宕机问题，禁用 FREE 池，直接销毁句柄
 			-- table.insert(RRWC_FREE, RequestID)
-			Wnd.CloseWindow(this:GetRoot())
+			X.UI.CloseFrame(this:GetRoot())
 		end
 
 		-- do with this remote request
@@ -391,7 +391,7 @@ function X.Ajax(settings)
 				settings.callback()
 				-- 有宕机问题，禁用 FREE 池，直接销毁句柄
 				-- table.insert(RRWC_FREE, RequestID)
-				Wnd.CloseWindow(hFrame)
+				X.UI.CloseFrame(hFrame)
 			end)
 		end
 
@@ -414,7 +414,7 @@ function X.Ajax(settings)
 					settings.callback(szContent, 200)
 					-- 有宕机问题，禁用 FREE 池，直接销毁句柄
 					table.insert(RRWP_FREE, RequestID)
-					-- Wnd.CloseWindow(this:GetRoot())
+					-- X.UI.CloseFrame(this:GetRoot())
 				end
 			end
 			-- do with this remote request
@@ -430,7 +430,7 @@ function X.Ajax(settings)
 					settings.callback()
 					-- 有宕机问题，禁用 FREE 池，直接销毁句柄
 					table.insert(RRWP_FREE, RequestID)
-					-- Wnd.CloseWindow(hFrame)
+					-- X.UI.CloseFrame(hFrame)
 				end)
 			end
 			-- start ie navigate

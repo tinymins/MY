@@ -221,9 +221,9 @@ function D.Open(url, options)
 		szKey = tostring(szKey)
 	end
 	if WINDOWS[szKey] then
-		Wnd.CloseWindow(WINDOWS[szKey])
+		X.UI.CloseFrame(WINDOWS[szKey])
 	end
-	WINDOWS[szKey] = Wnd.OpenWindow(X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', FRAME_NAME)
+	WINDOWS[szKey] = X.UI.OpenFrame(X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', FRAME_NAME)
 	OPTIONS[WINDOWS[szKey]] = options
 	--[[#DEBUG BEGIN]]
 	X.Debug(X.PACKET_INFO.NAME_SPACE, 'UI.OpenBrowser #' .. szKey .. ': ' .. url, X.DEBUG_LEVEL.LOG)
@@ -245,7 +245,7 @@ function D.Open(url, options)
 	end
 	if ui:Fetch('Wnd_Web/WndWeb'):Count() == 0 then
 		X.Debug(X.NSFormatString('{$NS}.UI.Browser'), 'Create WndWebPage/WndWebCef failed!', X.DEBUG_LEVEL.ERROR)
-		Wnd.CloseWindow(frame)
+		X.UI.CloseFrame(frame)
 		return
 	end
 	if options.controls == false then
@@ -284,7 +284,7 @@ function D.Close(szKey)
 		if not WINDOWS[szKey] then
 			return
 		end
-		Wnd.CloseWindow(WINDOWS[szKey])
+		X.UI.CloseFrame(WINDOWS[szKey])
 		WINDOWS[szKey] = nil
 	else
 		for k, v in pairs(WINDOWS) do
@@ -292,7 +292,7 @@ function D.Close(szKey)
 				WINDOWS[k] = nil
 			end
 		end
-		Wnd.CloseWindow(szKey)
+		X.UI.CloseFrame(szKey)
 	end
 end
 
