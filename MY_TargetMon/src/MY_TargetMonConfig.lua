@@ -25,7 +25,7 @@ local O = X.CreateUserSettingsModule('MY_TargetMon', _L['Target'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TargetMon'],
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue = false,
 	},
 })
 local D = {
