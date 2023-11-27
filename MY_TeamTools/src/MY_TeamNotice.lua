@@ -331,7 +331,7 @@ end)
 X.RegisterEvent('LOADING_END', 'TEAM_NOTICE', function()
 	local frame = TI.GetFrame()
 	if frame and X.IsInZombieMap() then
-		Wnd.CloseWindow(frame)
+		X.UI.CloseFrame(frame)
 		X.Topmsg(_L['TeamNotice is disabled in this map.'])
 	end
 end)
@@ -341,7 +341,7 @@ X.RegisterEvent({'PARTY_DISBAND', 'PARTY_DELETE_MEMBER'}, 'TEAM_NOTICE', functio
 	if e == 'PARTY_DISBAND' or (e == 'PARTY_DELETE_MEMBER' and arg1 == X.GetClientPlayerID()) then
 		local frame = TI.GetFrame()
 		if frame then
-			Wnd.CloseWindow(frame)
+			X.UI.CloseFrame(frame)
 		end
 		TI.szYY = nil
 		TI.szNote = nil

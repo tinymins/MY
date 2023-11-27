@@ -164,7 +164,7 @@ function MY_Recount_DT.OnFrameCreate()
 			frame.szSelectedTarget = nil
 		else
 			X.RegisterEsc(frame:GetName())
-			Wnd.CloseWindow(frame)
+			X.UI.CloseFrame(frame)
 		end
 	end
 	X.RegisterEsc(frame:GetName(), canEsc, onEsc)
@@ -464,7 +464,7 @@ function MY_Recount_DT.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		X.RegisterEsc(this:GetRoot():GetTreePath())
-		Wnd.CloseWindow(this:GetRoot())
+		X.UI.CloseFrame(this:GetRoot())
 	elseif name == 'Btn_Switch' then
 		if this:GetRoot().szPrimarySort == DK_REC_STAT.SKILL then
 			this:GetRoot().szPrimarySort = DK_REC_STAT.TARGET
@@ -504,7 +504,7 @@ function MY_Recount_DT.OnItemRButtonClick()
 			table.insert(menu, {
 				szOption = STAT_TYPE_NAME[STAT_TYPE[k]],
 				fnAction = function()
-					Wnd.OpenWindow(SZ_INI, 'MY_Recount_DT#' .. szKey .. '_' .. STAT_TYPE[k])
+					X.UI.OpenFrame(SZ_INI, 'MY_Recount_DT#' .. szKey .. '_' .. STAT_TYPE[k])
 				end,
 			})
 		end
@@ -516,12 +516,12 @@ function MY_Recount_DT.OnItemLButtonDBClick()
 	local name = this:GetName()
 	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == DK_REC_STAT.TARGET)
 	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == DK_REC_STAT.SKILL) then
-		Wnd.OpenWindow(SZ_INI, 'MY_Recount_DT#' .. this.szKey .. '_' .. this:GetRoot().nChannel)
+		X.UI.OpenFrame(SZ_INI, 'MY_Recount_DT#' .. this.szKey .. '_' .. this:GetRoot().nChannel)
 	end
 end
 
 function MY_Recount_DT_Open(id, nChannel)
-	Wnd.OpenWindow(SZ_INI, 'MY_Recount_DT#' .. id .. '_' .. nChannel)
+	X.UI.OpenFrame(SZ_INI, 'MY_Recount_DT#' .. id .. '_' .. nChannel)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

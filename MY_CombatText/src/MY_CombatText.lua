@@ -1082,14 +1082,14 @@ function D.CheckEnable()
 		COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[O.nStyle] and COMBAT_TEXT_STYLES[O.nStyle] or COMBAT_TEXT_STYLES[0]
 		D.LoadConfig()
 		if ui then
-			Wnd.CloseWindow(ui)
+			X.UI.CloseFrame(ui)
 		end
-		Wnd.OpenWindow(COMBAT_TEXT_INIFILE, 'MY_CombatText')
+		X.UI.OpenFrame(COMBAT_TEXT_INIFILE, 'MY_CombatText')
 		D.HideOfficialCombat()
 	else
 		if ui then
 			D.FreeQueue()
-			Wnd.CloseWindow(ui)
+			X.UI.CloseFrame(ui)
 			X.BreatheCall('COMBAT_TEXT_CACHE', false)
 			collectgarbage('collect')
 		end

@@ -385,11 +385,11 @@ function ST:RemoveItem()
 end
 
 function D.CheckEnable()
-	Wnd.CloseWindow('MY_TeamMon_SpellTimer')
+	X.UI.CloseFrame('MY_TeamMon_SpellTimer')
 	if X.IsRestricted('MY_TeamMon_SpellTimer') then
 		return
 	end
-	Wnd.OpenWindow(ST_INI_FILE, 'MY_TeamMon_SpellTimer')
+	X.UI.OpenFrame(ST_INI_FILE, 'MY_TeamMon_SpellTimer')
 end
 
 function D.Init()

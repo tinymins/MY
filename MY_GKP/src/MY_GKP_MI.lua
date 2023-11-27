@@ -163,7 +163,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 		if data[1] == 'GKP_CONSUMPTION' or data[1] == 'GKP_DEBT' then
 			local szFrameName = data[1] == 'GKP_CONSUMPTION' and 'MY_GKP_Consumption' or 'MY_GKP_Debt'
 			if data[2] == 'BEGIN' then
-				Wnd.CloseWindow(szFrameName)
+				X.UI.CloseFrame(szFrameName)
 				local ui = X.UI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = 'CENTER' })
 				local x, y = 20, 50
 				local szCaption = data[1] == 'GKP_CONSUMPTION' and _L['--- Consumption ---'] or _L['Information on Debt']
@@ -309,7 +309,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 						end
 						frm.done = true
 					elseif data[1] == 'GKP_DEBT' and not frm:IsVisible() then
-						Wnd.CloseWindow(frm)
+						X.UI.CloseFrame(frm)
 					end
 				end
 				FireUIEvent('MY_GKP_SEND_FINISH')

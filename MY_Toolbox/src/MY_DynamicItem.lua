@@ -109,14 +109,14 @@ function D.CheckEnable()
 		return
 	end
 	if D.bReady and O.bEnable then
-		Wnd.OpenWindow(SZ_INI, MODULE_NAME)
+		X.UI.OpenFrame(SZ_INI, MODULE_NAME)
 	else
-		Wnd.CloseWindow(MODULE_NAME)
+		X.UI.CloseFrame(MODULE_NAME)
 	end
 end
 
 function D.Reinit()
-	Wnd.CloseWindow(MODULE_NAME)
+	X.UI.CloseFrame(MODULE_NAME)
 	D.CheckEnable()
 end
 

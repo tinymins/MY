@@ -30,13 +30,13 @@ local SZ_INI = PLUGIN_ROOT .. '/ui/MY_TeamTools.ini'
 local SZ_MOD_INI = PLUGIN_ROOT .. '/ui/MY_TeamTools.Mod.ini'
 
 function D.Open(szModule)
-	local frame = Wnd.OpenWindow(SZ_INI, 'MY_TeamTools')
+	local frame = X.UI.OpenFrame(SZ_INI, 'MY_TeamTools')
 	frame:BringToTop()
 	D.ActivePage(frame, szModule or 1, true)
 end
 
 function D.Close()
-	Wnd.CloseWindow('MY_TeamTools')
+	X.UI.CloseFrame('MY_TeamTools')
 end
 
 function D.IsOpened()
@@ -76,12 +76,12 @@ function D.InitPageSet(frame)
 	frame.bInitPageset = true
 	local pageset = frame:Lookup('PageSet_All')
 	for i, m in ipairs(O.aModule) do
-		local frameMod = Wnd.OpenWindow(SZ_MOD_INI, 'MY_TeamToolsMod')
+		local frameMod = X.UI.OpenFrame(SZ_MOD_INI, 'MY_TeamToolsMod')
 		local checkbox = frameMod:Lookup('PageSet_Total/WndCheck_Default')
 		local page = frameMod:Lookup('PageSet_Total/Page_Default')
 		checkbox:ChangeRelation(pageset, true, true)
 		page:ChangeRelation(pageset, true, true)
-		Wnd.CloseWindow(frameMod)
+		X.UI.CloseFrame(frameMod)
 		pageset:AddPage(page, checkbox)
 		checkbox:Show()
 		checkbox:Lookup('', 'Text_CheckDefault'):SetText(m.szName)

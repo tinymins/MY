@@ -52,13 +52,13 @@ end
 function D.OpenPanel()
 	local frame = D.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(INI_PATH, 'MY_TargetDirection')
+		frame = X.UI.OpenFrame(INI_PATH, 'MY_TargetDirection')
 	end
 	return frame
 end
 
 function D.ClosePanel()
-	Wnd.CloseWindow('MY_TargetDirection')
+	X.UI.CloseFrame('MY_TargetDirection')
 end
 
 function D.UpdateAnchor()

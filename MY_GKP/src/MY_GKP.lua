@@ -223,7 +223,7 @@ function D.Bidding(nMoney)
 		end
 	end
 	team.SetTeamLootMode(PARTY_LOOT_MODE.BIDDING)
-	local LeaderAddMoney = Wnd.OpenWindow('GoldTeamAddMoney')
+	local LeaderAddMoney = X.UI.OpenFrame('GoldTeamAddMoney')
 	local fx, fy = Station.GetClientSize()
 	local w2, h2 = LeaderAddMoney:GetSize()
 	LeaderAddMoney:SetAbsPos((fx - w2) / 2, (fy - h2) / 2)

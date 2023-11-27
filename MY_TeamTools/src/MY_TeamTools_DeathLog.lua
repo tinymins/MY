@@ -376,12 +376,12 @@ function D.UpdateList(page, dwID)
 end
 
 function D.OnInitPage()
-	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_TeamTools_DeathLog')
+	local frameTemp = X.UI.OpenFrame(SZ_INI, 'MY_TeamTools_DeathLog')
 	local wnd = frameTemp:Lookup('Wnd_DeathLog')
 	wnd:Lookup('Btn_All', 'Text_BtnAll'):SetText(_L['Show all'])
 	wnd:Lookup('Btn_Clear', 'Text_BtnClear'):SetText(_L['Clear record'])
 	wnd:ChangeRelation(this, true, true)
-	Wnd.CloseWindow(frameTemp)
+	X.UI.CloseFrame(frameTemp)
 
 	local frame = this:GetRoot()
 	frame:RegisterEvent('MY_TEAMTOOLS_DEATHLOG')

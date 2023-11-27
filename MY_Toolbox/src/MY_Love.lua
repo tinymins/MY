@@ -544,7 +544,7 @@ function D.SetLover(dwID, nType)
 					if bSuccess then
 						D.SaveLover(D.lover.nLoverTime, D.lover.dwID, D.lover.nLoverType, p.nItem, D.lover.nReceiveItem)
 						X.SendBgMsg(aInfo.name, 'MY_LOVE', {'LOVE_FIREWORK', p.nItem})
-						Wnd.CloseWindow('MY_Love_SetLover')
+						X.UI.CloseFrame('MY_Love_SetLover')
 					else
 						X.Systopmsg(_L['Failed to light firework.'])
 					end
@@ -889,7 +889,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 							X.Systopmsg(_L['Fix lover is a sensitive action, please unlock to continue.'])
 							return false
 						end
-						Wnd.CloseWindow('MY_Love_SetLover')
+						X.UI.CloseFrame('MY_Love_SetLover')
 						D.SaveLover(tonumber(data[1]), dwTalkerID, 1, data[3], data[2])
 						X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
 						X.Systopmsg(_L('Congratulations, love relation with [%s] has been fixed!', szTalkerName))
@@ -927,7 +927,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 					X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
 					X.SendBgMsg(aInfo.name, 'MY_LOVE', {'LOVE_ANS_CONF', nItem})
 					X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', aInfo.name))
-					Wnd.CloseWindow('MY_Love_SetLover')
+					X.UI.CloseFrame('MY_Love_SetLover')
 				else
 					X.Systopmsg(_L['Failed to attach love, light firework failed.'])
 				end
@@ -1023,8 +1023,8 @@ local function OnPlayerFellowshipLogin()
 			D.OutputLoverMsg(D.FormatLoverString(_L('Warm tip: Your {$type} lover [{$name}] offline, hurry doing like doing.'), D.lover))
 		end
 		if not Station.Lookup('Normal/SocialPanel') then
-			Wnd.OpenWindow('SocialPanel')
-			Wnd.CloseWindow('SocialPanel')
+			X.UI.OpenFrame('SocialPanel')
+			X.UI.CloseFrame('SocialPanel')
 		end
 	end
 end

@@ -184,7 +184,7 @@ local function OpenRaidDragPanel(dwMemberID)
 	if not tMemberInfo then
 		return
 	end
-	local hFrame = Wnd.OpenWindow('RaidDragPanel')
+	local hFrame = X.UI.OpenFrame('RaidDragPanel')
 
 	local nX, nY = Cursor.GetPos()
 	hFrame:SetAbsPos(nX, nY)
@@ -222,7 +222,7 @@ local function CloseRaidDragPanel()
 	local hFrame = Station.Lookup('Normal/RaidDragPanel')
 	if hFrame then
 		hFrame:EndMoving()
-		Wnd.CloseWindow(hFrame)
+		X.UI.CloseFrame(hFrame)
 	end
 end
 
@@ -641,7 +641,7 @@ function CTM:CreatePanel(nIndex)
 	local me = X.GetClientPlayer()
 	local frame = self:GetPartyFrame(nIndex)
 	if not frame then
-		frame = Wnd.OpenWindow(
+		frame = X.UI.OpenFrame(
 			X.PACKET_INFO.ROOT .. 'MY_Cataclysm/ui/MY_CataclysmParty.' .. CFG.eFrameStyle .. '.ini',
 			'MY_CataclysmParty_' .. nIndex
 		)
@@ -1230,12 +1230,12 @@ end
 function CTM:CloseParty(nIndex)
 	if nIndex then
 		if self:GetPartyFrame(nIndex) then
-			Wnd.CloseWindow(self:GetPartyFrame(nIndex))
+			X.UI.CloseFrame(self:GetPartyFrame(nIndex))
 		end
 	else
 		for i = 0, CTM_GROUP_COUNT do
 			if self:GetPartyFrame(i) then
-				Wnd.CloseWindow(self:GetPartyFrame(i))
+				X.UI.CloseFrame(self:GetPartyFrame(i))
 			end
 		end
 	end

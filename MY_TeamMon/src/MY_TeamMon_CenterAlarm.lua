@@ -109,11 +109,11 @@ function D.UpdateAnchor(frame)
 end
 
 function D.CheckEnable()
-	Wnd.CloseWindow('MY_TeamMon_CenterAlarm')
+	X.UI.CloseFrame('MY_TeamMon_CenterAlarm')
 	if X.IsRestricted('MY_TeamMon_CenterAlarm') then
 		return
 	end
-	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_CenterAlarm'):Hide()
+	X.UI.OpenFrame(INI_FILE, 'MY_TeamMon_CenterAlarm'):Hide()
 end
 
 function D.Init()

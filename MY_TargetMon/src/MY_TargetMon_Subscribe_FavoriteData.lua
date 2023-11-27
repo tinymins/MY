@@ -182,11 +182,11 @@ function D.UpdateList(page)
 end
 
 function D.OnInitPage()
-	local frameTemp = Wnd.OpenWindow(INI_PATH, 'MY_TargetMon_Subscribe_FavoriteData')
+	local frameTemp = X.UI.OpenFrame(INI_PATH, 'MY_TargetMon_Subscribe_FavoriteData')
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(this, true, true)
 	wnd:SetRelPos(0, 0)
-	Wnd.CloseWindow(frameTemp)
+	X.UI.CloseFrame(frameTemp)
 
 	wnd:Lookup('', 'Text_Break1'):SetText(_L['Author'])
 	wnd:Lookup('', 'Text_Break2'):SetText(_L['Title'])

@@ -410,9 +410,9 @@ end
 --------------------------------------------------------------------------
 -- ÷ÿ‘ÿΩÁ√Ê
 MYDev_Snaplines.ReloadUI = function()
-	Wnd.CloseWindow('MYDev_Snaplines')
+	X.UI.CloseFrame('MYDev_Snaplines')
 	if O.bEnable then
-		Wnd.OpenWindow(X.PACKET_INFO.ROOT .. 'MYDev_Snaplines/ui/MYDev_Snaplines.ini', 'MYDev_Snaplines')
+		X.UI.OpenFrame(X.PACKET_INFO.ROOT .. 'MYDev_Snaplines/ui/MYDev_Snaplines.ini', 'MYDev_Snaplines')
 	end
 end
 X.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)

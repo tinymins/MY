@@ -46,7 +46,7 @@ function D.OpenPanel(szModule)
 end
 
 function D.ClosePanel()
-	Wnd.CloseWindow('MY_TargetMon_Subscribe')
+	X.UI.CloseFrame('MY_TargetMon_Subscribe')
 end
 
 function D.IsPanelOpened()

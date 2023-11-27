@@ -864,10 +864,10 @@ X.RegisterBgMsg('MY_MAP_COPY_ID', function(_, data, nChannel, dwID, szName, bIsS
 end)
 
 function D.OnInitPage()
-	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_TeamTools_Summary')
+	local frameTemp = X.UI.OpenFrame(SZ_INI, 'MY_TeamTools_Summary')
 	local wnd = frameTemp:Lookup('Wnd_Summary')
 	wnd:ChangeRelation(this, true, true)
-	Wnd.CloseWindow(frameTemp)
+	X.UI.CloseFrame(frameTemp)
 
 	local page = this
 	local frame = page:GetRoot()

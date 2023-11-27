@@ -45,7 +45,7 @@ function D.Open(tConfig)
 			tConfig = tConfig,
 			aRecord = {},
 		}
-		local frame = Wnd.OpenWindow(INI_PATH, 'MY_Bidding#' .. tConfig.szKey)
+		local frame = X.UI.OpenFrame(INI_PATH, 'MY_Bidding#' .. tConfig.szKey)
 		if not frame then
 			return
 		end
@@ -61,7 +61,7 @@ function D.Open(tConfig)
 end
 
 function D.Close(szKey)
-	Wnd.CloseWindow('MY_Bidding#' .. szKey)
+	X.UI.CloseFrame('MY_Bidding#' .. szKey)
 end
 
 function D.GetFrame(szKey)
@@ -390,7 +390,7 @@ X.RegisterBgMsg('MY_BIDDING_START', function(_, tConfig, nChannel, dwTalkerID, s
 		tConfig = tConfig,
 		aRecord = {},
 	}
-	local frame = Wnd.OpenWindow(INI_PATH, 'MY_Bidding#' .. tConfig.szKey)
+	local frame = X.UI.OpenFrame(INI_PATH, 'MY_Bidding#' .. tConfig.szKey)
 	if not frame then
 		return
 	end
@@ -500,10 +500,10 @@ end
 
 function MY_BiddingBase.OnEvent(event)
 	if event == 'PARTY_DISBAND' then
-		Wnd.CloseWindow(this)
+		X.UI.CloseFrame(this)
 	elseif event == 'PARTY_DELETE_MEMBER' then
 		if X.GetClientPlayerID() == arg1 then
-			Wnd.CloseWindow(this)
+			X.UI.CloseFrame(this)
 		end
 	elseif event == 'TEAM_AUTHORITY_CHANGED' then
 		D.UpdateAuthourize(this)
@@ -518,7 +518,7 @@ function MY_BiddingBase.OnLButtonClick()
 			return X.Systopmsg(_L['You are distributor, Please finish this bidding!'])
 		end
 		X.Confirm(_L['Sure cancel this bidding? You will not able to bidding this item.'], function()
-			Wnd.CloseWindow(frame)
+			X.UI.CloseFrame(frame)
 		end)
 	elseif name == 'Btn_Option' then
 		if not X.IsDistributor() then

@@ -583,11 +583,11 @@ function D.SwitchPage(nPage)
 end
 
 function D.OnInitPage()
-	local frameTemp = Wnd.OpenWindow(INI_PATH, 'MY_TeamMon_Subscribe_Data')
+	local frameTemp = X.UI.OpenFrame(INI_PATH, 'MY_TeamMon_Subscribe_Data')
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(this, true, true)
 	wnd:SetRelPos(0, 0)
-	Wnd.CloseWindow(frameTemp)
+	X.UI.CloseFrame(frameTemp)
 
 	wnd:Lookup('', 'Text_Break1'):SetText(_L['Author'])
 	wnd:Lookup('', 'Text_Break2'):SetText(_L['Title'])

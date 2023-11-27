@@ -730,10 +730,10 @@ function D.UpdateItems(page)
 end
 
 function D.OnInitPage()
-	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_EquipStat')
+	local frameTemp = X.UI.OpenFrame(SZ_INI, 'MY_RoleStatistics_EquipStat')
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(this, true, true)
-	Wnd.CloseWindow(frameTemp)
+	X.UI.CloseFrame(frameTemp)
 
 	local container = wnd:Lookup('Wnd_ItemPage/WndScroll_PageNum/WndContainer_PageNum')
 	container:Clear()
@@ -886,11 +886,11 @@ function D.ApplyFloatEntry(bFloatEntry)
 		if btn then
 			return
 		end
-		local frameTemp = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_EquipEntry.ini', 'MY_RoleStatistics_EquipEntry')
+		local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_EquipEntry.ini', 'MY_RoleStatistics_EquipEntry')
 		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_EquipEntry')
 		btn:ChangeRelation(frame, true, true)
 		btn:SetRelPos(40, 8)
-		Wnd.CloseWindow(frameTemp)
+		X.UI.CloseFrame(frameTemp)
 		btn.OnLButtonClick = function()
 			MY_RoleStatistics.Open('EquipStat')
 		end

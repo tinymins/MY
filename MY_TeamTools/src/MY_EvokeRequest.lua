@@ -150,7 +150,7 @@ function D.OnMessageBoxOpen()
 				frame.fnAutoClose = nil
 				frame.fnCancelAction = nil
 				frame.szCloseSound = nil
-				Wnd.CloseWindow(frame)
+				X.UI.CloseFrame(frame)
 			end
 		end
 	end

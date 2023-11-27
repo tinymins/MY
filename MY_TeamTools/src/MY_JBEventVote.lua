@@ -74,7 +74,7 @@ function D.FetchEventList(frame)
 			local res, err = X.DecodeJSON(szHTML)
 			if not res then
 				X.Alert(_L['ERR: Decode eventlist content as json failed!'] .. err)
-				Wnd.CloseWindow(frame)
+				X.UI.CloseFrame(frame)
 				return
 			end
 			local errs = X.Schema.CheckSchema(res, EVENT_LIST_SCHEMA)
@@ -84,7 +84,7 @@ function D.FetchEventList(frame)
 					table.insert(aErrmsgs, '  ' .. i .. '. ' .. err.message)
 				end
 				X.Alert(_L['ERR: Eventlist content is illegal!'] .. '\n\n' .. X.ReplaceSensitiveWord(table.concat(aErrmsgs, '\n')))
-				Wnd.CloseWindow(frame)
+				X.UI.CloseFrame(frame)
 				return
 			end
 			D.aEventList = res.data
@@ -93,13 +93,13 @@ function D.FetchEventList(frame)
 		error = function(html, status)
 			if status == 404 then
 				X.Alert(_L['ERR404: Eventlist address not found!'])
-				Wnd.CloseWindow(frame)
+				X.UI.CloseFrame(frame)
 				return
 			end
 			--[[#DEBUG BEGIN]]
 			X.Debug(_L['MY_JBEventVote'], 'ERROR Get Eventlist: ' .. status .. '\n' .. UTF8ToAnsi(html), X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
-			Wnd.CloseWindow(frame)
+			X.UI.CloseFrame(frame)
 		end,
 	})
 end
@@ -108,7 +108,7 @@ function D.UpdateEventList(frame)
 	frame.bInitPageset = true
 	local pageset = frame:Lookup('PageSet_All')
 	for i, eve in ipairs(D.aEventList) do
-		local frameMod = Wnd.OpenWindow(SZ_MOD_INI, 'MY_JBEventVote__Mod')
+		local frameMod = X.UI.OpenFrame(SZ_MOD_INI, 'MY_JBEventVote__Mod')
 		local checkbox = frameMod:Lookup('PageSet_All/WndCheck_Event')
 		local page = frameMod:Lookup('PageSet_All/Page_Event')
 		page:Lookup('Wnd_Event/WndScroll_Event', 'Handle_EventColumns/Handle_EventColumn_Name/Handle_EventColumn_Name_Title/Text_EventColumn_Name_Title'):SetText(_L['Team Name'])
@@ -119,7 +119,7 @@ function D.UpdateEventList(frame)
 		page:Lookup('Wnd_Event/WndScroll_Event/WndContainer_List'):Clear()
 		checkbox:ChangeRelation(pageset, true, true)
 		page:ChangeRelation(pageset, true, true)
-		Wnd.CloseWindow(frameMod)
+		X.UI.CloseFrame(frameMod)
 		pageset:AddPage(page, checkbox)
 		checkbox:Show()
 		checkbox:Lookup('', 'Text_CheckEvent'):SetText(X.ReplaceSensitiveWord(eve.name))
@@ -285,7 +285,7 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
-		Wnd.CloseWindow(this:GetRoot())
+		X.UI.CloseFrame(this:GetRoot())
 	elseif name == 'Btn_Info' then
 		X.OpenBrowser(this:GetParent().team.link)
 	elseif name == 'Btn_Vote' then
@@ -357,7 +357,7 @@ function D.OnActivePage()
 end
 
 function D.Open()
-	Wnd.OpenWindow(INI_PATH, 'MY_JBEventVote'):BringToTop()
+	X.UI.OpenFrame(INI_PATH, 'MY_JBEventVote'):BringToTop()
 end
 
 function D.GetFrame()
@@ -365,7 +365,7 @@ function D.GetFrame()
 end
 
 function D.Close()
-	Wnd.CloseWindow('MY_JBEventVote')
+	X.UI.CloseFrame('MY_JBEventVote')
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)

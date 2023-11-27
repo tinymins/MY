@@ -938,7 +938,7 @@ end
 function MY_Recount_FP.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
-		Wnd.CloseWindow(this:GetRoot())
+		X.UI.CloseFrame(this:GetRoot())
 	elseif name == 'Btn_Refresh' then
 		D.UpdateData(this:GetRoot())
 		D.DrawData(this:GetRoot())
@@ -1029,7 +1029,7 @@ do
 local nIndex = 0
 function MY_Recount_FP_Open(data)
 	nIndex = nIndex + 1
-	Wnd.OpenWindow(SZ_INI, 'MY_Recount_FP#' .. nIndex):SetDS(data)
+	X.UI.OpenFrame(SZ_INI, 'MY_Recount_FP#' .. nIndex):SetDS(data)
 end
 end
 

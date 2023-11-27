@@ -65,7 +65,7 @@ function D.Hook()
 end
 
 function D.Unhook()
-	Wnd.CloseWindow('FriendTip')
+	X.UI.CloseFrame('FriendTip')
 end
 
 function D.CheckEnable()

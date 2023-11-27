@@ -251,7 +251,7 @@ function D.UpdateFrame(frame)
 	end
 	local tViewData = MY_TargetMonData.GetViewData(frame.nIndex)
 	if not tViewData then
-		return Wnd.CloseWindow(frame)
+		return X.UI.CloseFrame(frame)
 	end
 	local bRequireFormatPos = false
 	if frame.tViewData ~= tViewData then
@@ -465,7 +465,7 @@ do
 local function onDataInit()
 	for nIndex, _ in ipairs(MY_TargetMonData.GetViewData()) do
 		if not Station.Lookup('Normal/' .. 'MY_TargetMon#' .. nIndex) then
-			Wnd.OpenWindow(INI_PATH, 'MY_TargetMon#' .. nIndex)
+			X.UI.OpenFrame(INI_PATH, 'MY_TargetMon#' .. nIndex)
 		end
 	end
 end

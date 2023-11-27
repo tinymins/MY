@@ -59,7 +59,7 @@ function D.Open(szModule)
 end
 
 function D.Close()
-	Wnd.CloseWindow('MY_RoleStatistics')
+	X.UI.CloseFrame('MY_RoleStatistics')
 end
 
 function D.IsOpened()

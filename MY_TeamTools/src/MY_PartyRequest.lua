@@ -266,7 +266,7 @@ function D.OpenPanel()
 	if D.GetFrame() then
 		return
 	end
-	Wnd.OpenWindow(PR_INI_PATH, 'MY_PartyRequest')
+	X.UI.OpenFrame(PR_INI_PATH, 'MY_PartyRequest')
 end
 
 -- 判断是否需要更新界面
@@ -406,7 +406,7 @@ function D.OnMessageBoxOpen()
 		frame.fnAutoClose = nil
 		frame.fnCancelAction = nil
 		frame.szCloseSound = nil
-		Wnd.CloseWindow(frame)
+		X.UI.CloseFrame(frame)
 	end
 end
 

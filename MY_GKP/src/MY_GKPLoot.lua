@@ -489,7 +489,7 @@ function D.OnEvent(szEvent)
 		D.RemoveLootList(arg0)
 	elseif szEvent == 'PARTY_LOOT_MODE_CHANGED' then
 		if arg1 ~= PARTY_LOOT_MODE.DISTRIBUTE then
-			-- Wnd.CloseWindow(this)
+			-- X.UI.CloseFrame(this)
 		end
 	elseif szEvent == 'PARTY_DISBAND' or szEvent == 'PARTY_DELETE_MEMBER' then
 		if szEvent == 'PARTY_DELETE_MEMBER' and arg1 ~= X.GetClientPlayerID() then
@@ -1761,7 +1761,7 @@ end
 function D.OpenFrame()
 	local frame = D.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(GKP_LOOT_INIFILE, 'MY_GKPLoot')
+		frame = X.UI.OpenFrame(GKP_LOOT_INIFILE, 'MY_GKPLoot')
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
 	return frame
@@ -1771,7 +1771,7 @@ end
 function D.CloseFrame(dwID)
 	local frame = D.GetFrame(dwID)
 	if frame then
-		Wnd.CloseWindow(frame)
+		X.UI.CloseFrame(frame)
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
 end
@@ -1958,7 +1958,7 @@ function D.HideSystemLoot()
 		if frame and frame:GetAbsX() ~= 4096 then
 			frame:SetAbsPos(4096, 4096)
 		end
-		-- Wnd.CloseWindow(szName)
+		-- X.UI.CloseFrame(szName)
 	end
 end
 

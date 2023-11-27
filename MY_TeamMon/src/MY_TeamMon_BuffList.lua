@@ -211,11 +211,11 @@ function D.UpdateAnchor(frame)
 end
 
 function D.CheckEnable()
-	Wnd.CloseWindow('MY_TeamMon_BuffList')
+	X.UI.CloseFrame('MY_TeamMon_BuffList')
 	if X.IsRestricted('MY_TeamMon_BuffList') then
 		return
 	end
-	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_BuffList')
+	X.UI.OpenFrame(INI_FILE, 'MY_TeamMon_BuffList')
 end
 
 function D.Init()

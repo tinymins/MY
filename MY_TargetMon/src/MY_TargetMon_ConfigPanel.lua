@@ -607,13 +607,13 @@ function D.Open(szConfigUUID)
 end
 
 function D.Close()
-	Wnd.CloseWindow('MY_TargetMon_ConfigPanel')
+	X.UI.CloseFrame('MY_TargetMon_ConfigPanel')
 end
 
 function D.OnFrameBreathe()
 	local parent = Station.Lookup('Normal/MY_TargetMon_PS')
 	if not parent then
-		Wnd.CloseWindow(this)
+		X.UI.CloseFrame(this)
 		return
 	end
 	local frame, bBehindParent = parent:GetNext(), true

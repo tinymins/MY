@@ -130,11 +130,11 @@ function D.OnBreathe()
 end
 
 function D.CheckEnable()
-	Wnd.CloseWindow('MY_TeamMon_LargeTextAlarm')
+	X.UI.CloseFrame('MY_TeamMon_LargeTextAlarm')
 	if X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 		return
 	end
-	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_LargeTextAlarm')
+	X.UI.OpenFrame(INI_FILE, 'MY_TeamMon_LargeTextAlarm')
 end
 
 function D.Init()

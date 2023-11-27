@@ -38,7 +38,7 @@ function D.SetDS(frame, szFilePath)
 		D.DrawAuctionPage(frame)
 		D.DrawPaymentPage(frame)
 	else
-		Wnd.CloseWindow(frame)
+		X.UI.CloseFrame(frame)
 		X.Alert('MY_GKP_UI', _L['Load data source failed!'])
 	end
 end
@@ -671,7 +671,7 @@ function MY_GKP_UI.OnFrameCreate()
 			X.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()
 				MY_GKP_MI.LoadHistory(frame.ds:GetFilePath())
 				MY_GKP_MI.OpenPanel()
-				Wnd.CloseWindow(frame)
+				X.UI.CloseFrame(frame)
 				X.Alert('MY_GKP_UI', _L['Reocrd Recovered.'])
 			end)
 		end,
@@ -788,7 +788,7 @@ end
 
 function MY_GKP_UI.OnFrameKeyDown()
 	if GetKeyName(Station.GetMessageKey()) == 'Esc' then
-		Wnd.CloseWindow(this:GetRoot())
+		X.UI.CloseFrame(this:GetRoot())
 		return 1
 	end
 end
@@ -796,7 +796,7 @@ end
 function MY_GKP_UI.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
-		Wnd.CloseWindow(this:GetRoot())
+		X.UI.CloseFrame(this:GetRoot())
 	end
 end
 
@@ -873,7 +873,7 @@ function MY_GKP_Open(szFilePath)
 		nIndex = nIndex + 1
 		szName = szName .. '#' .. nIndex
 	end
-	local frame = Wnd.OpenWindow(SZ_INI, szName)
+	local frame = X.UI.OpenFrame(SZ_INI, szName)
 	frame:SetDS(szFilePath)
 	frame:BringToTop()
 end

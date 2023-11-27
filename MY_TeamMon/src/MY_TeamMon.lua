@@ -1982,7 +1982,7 @@ function D.Init()
 		D[k] = X[K](D[k] .. string.char(77, 89))
 	end
 	D.LoadUserData()
-	Wnd.OpenWindow(MY_TEAM_MON_INI_FILE, 'MY_TeamMon')
+	X.UI.OpenFrame(MY_TEAM_MON_INI_FILE, 'MY_TeamMon')
 end
 
 -- 保存用户监控数据、配置

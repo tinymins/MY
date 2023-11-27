@@ -182,12 +182,12 @@ function D.UpdateList(page, dwMapID)
 end
 
 function D.OnInitPage()
-	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_TeamTools_EnterMap')
+	local frameTemp = X.UI.OpenFrame(SZ_INI, 'MY_TeamTools_EnterMap')
 	local wnd = frameTemp:Lookup('Wnd_EnterMap')
 	wnd:Lookup('Btn_All', 'Text_BtnAll'):SetText(_L['Show all'])
 	wnd:Lookup('Btn_Clear', 'Text_BtnClear'):SetText(_L['Clear record'])
 	wnd:ChangeRelation(this, true, true)
-	Wnd.CloseWindow(frameTemp)
+	X.UI.CloseFrame(frameTemp)
 
 	local frame = this:GetRoot()
 	frame:RegisterEvent('MY_TEAMTOOLS_ENTERMAP')

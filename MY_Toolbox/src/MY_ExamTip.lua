@@ -284,7 +284,7 @@ X.RegisterEvent('OPEN_WINDOW', 'MY_EXAMTIP', function()
 end)
 
 X.RegisterReload('MY_ExamTip', function()
-	Wnd.CloseWindow('ExaminationPanel')
+	X.UI.CloseFrame('ExaminationPanel')
 end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -1191,11 +1191,11 @@ function D.ApplyFloatEntry(bFloatEntry)
 		if btn then
 			return
 		end
-		local frameTemp = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_DungeonEntry.ini', 'MY_RoleStatistics_DungeonEntry')
+		local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_DungeonEntry.ini', 'MY_RoleStatistics_DungeonEntry')
 		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_DungeonEntry')
 		btn:ChangeRelation(frame, true, true)
 		btn:SetRelPos(72, 13)
-		Wnd.CloseWindow(frameTemp)
+		X.UI.CloseFrame(frameTemp)
 		btn.OnMouseEnter = function()
 			local rec = D.GetClientPlayerRec(true)
 			if not rec then

@@ -135,8 +135,8 @@ function PS.OnPanelActive(wnd)
 			ui:Append('Text', { text = _L['(Online required, notify anonymous)'], x = nX + 5, y = nY })
 		else
 			-- sync social data
-			Wnd.OpenWindow('SocialPanel')
-			Wnd.CloseWindow('SocialPanel')
+			X.UI.OpenFrame('SocialPanel')
+			X.UI.CloseFrame('SocialPanel')
 			-- show lover
 			nX = nPaddingX + 10
 			nX = ui:Append('Text', { text = lover.szName, font = 19, x = nX, y = nY, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')

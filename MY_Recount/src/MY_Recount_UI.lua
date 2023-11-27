@@ -231,11 +231,11 @@ function D.OnForceColorUpdate()
 end
 
 function D.Open()
-	Wnd.OpenWindow(SZ_INI, 'MY_Recount_UI')
+	X.UI.OpenFrame(SZ_INI, 'MY_Recount_UI')
 end
 
 function D.Close()
-	Wnd.CloseWindow('MY_Recount_UI')
+	X.UI.CloseFrame('MY_Recount_UI')
 end
 
 function D.CheckOpen()

@@ -533,7 +533,7 @@ function D.Apply()
 		return X.DelayCall('MY_EnergyBar#Apply', 300, D.Apply)
 	end
 	if not O.bEnable then
-		Wnd.CloseWindow('MY_EnergyBar')
+		X.UI.CloseFrame('MY_EnergyBar')
 	else
 		local frame = Station.Lookup('Normal/MY_EnergyBar')
 		if not frame then

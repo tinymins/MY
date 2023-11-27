@@ -307,7 +307,7 @@ end
 function _TS.OpenPanel()
 	local frame = _TS.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(TS_INIFILE, 'MY_ThreatRank')
+		frame = X.UI.OpenFrame(TS_INIFILE, 'MY_ThreatRank')
 		local dwType = Target_GetTargetData()
 		if dwType ~= TARGET.NPC then
 			frame:Hide()
@@ -318,7 +318,7 @@ end
 
 function _TS.ClosePanel()
 	if _TS.GetFrame() then
-		Wnd.CloseWindow(_TS.GetFrame())
+		X.UI.CloseFrame(_TS.GetFrame())
 	end
 end
 

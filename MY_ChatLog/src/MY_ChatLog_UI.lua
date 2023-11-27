@@ -90,7 +90,7 @@ end
 function MY_ChatLog_UI.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
-		Wnd.CloseWindow(this:GetRoot())
+		X.UI.CloseFrame(this:GetRoot())
 	elseif name == 'Btn_Only' then
 		local wnd = this:GetParent()
 		local parent = wnd:GetParent()
@@ -363,7 +363,7 @@ function MY_ChatLog_Open(szRoot)
 		return
 	end
 	nIndex = nIndex + 1
-	Wnd.OpenWindow(SZ_INI, 'MY_ChatLog#' .. nIndex):SetDS(szRoot)
+	X.UI.OpenFrame(SZ_INI, 'MY_ChatLog#' .. nIndex):SetDS(szRoot)
 end
 end
 

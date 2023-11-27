@@ -150,9 +150,9 @@ end
 function D.Apply()
 	local bEnable = O.bEnable
 	if bEnable then
-		Wnd.OpenWindow(INI_PATH, 'MY_TeamBalloon')
+		X.UI.OpenFrame(INI_PATH, 'MY_TeamBalloon')
 	else
-		Wnd.CloseWindow('MY_TeamBalloon')
+		X.UI.CloseFrame('MY_TeamBalloon')
 	end
 end
 

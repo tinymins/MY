@@ -268,7 +268,7 @@ function D.OnEvent(event)
 end
 
 function D.Open()
-	Wnd.OpenWindow(INI_PATH, 'MY_VisualSkill')
+	X.UI.OpenFrame(INI_PATH, 'MY_VisualSkill')
 end
 
 function D.GetFrame()
@@ -276,7 +276,7 @@ function D.GetFrame()
 end
 
 function D.Close()
-	Wnd.CloseWindow('MY_VisualSkill')
+	X.UI.CloseFrame('MY_VisualSkill')
 end
 
 function D.Reload()

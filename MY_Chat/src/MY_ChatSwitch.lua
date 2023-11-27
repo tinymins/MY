@@ -640,11 +640,11 @@ end
 X.RegisterEvent('ON_CHAT_SET_ATR', OnChatSetATR)
 
 function D.ReInitUI()
-	Wnd.CloseWindow('MY_ChatSwitch')
+	X.UI.CloseFrame('MY_ChatSwitch')
 	if not O.bDisplayPanel then
 		return
 	end
-	Wnd.OpenWindow(INI_PATH, 'MY_ChatSwitch')
+	X.UI.OpenFrame(INI_PATH, 'MY_ChatSwitch')
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)

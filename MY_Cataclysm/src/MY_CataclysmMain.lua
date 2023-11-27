@@ -375,10 +375,10 @@ function D.RaidPanel_Switch(bOpen)
 		if frame then
 			-- 有一点问题 会被加呼吸 根据判断
 			if not D.GetTeammateFrame() then
-				Wnd.OpenWindow('Teammate')
+				X.UI.OpenFrame('Teammate')
 			end
 			CloseRaidPanel()
-			Wnd.CloseWindow('Teammate')
+			X.UI.CloseFrame('Teammate')
 		end
 	end
 end
@@ -586,13 +586,13 @@ function D.OpenCataclysmPanel()
 		if CFG.eCss == '' then
 			D.ConfirmRestoreConfig()
 		end
-		Wnd.OpenWindow(INI_ROOT .. 'MY_CataclysmMain.ini', 'MY_CataclysmMain')
+		X.UI.OpenFrame(INI_ROOT .. 'MY_CataclysmMain.ini', 'MY_CataclysmMain')
 	end
 end
 
 function D.CloseCataclysmPanel()
 	if D.GetFrame() then
-		Wnd.CloseWindow(D.GetFrame())
+		X.UI.CloseFrame(D.GetFrame())
 		MY_CataclysmParty:CloseParty()
 		MY_Cataclysm.bFold = false
 		FireUIEvent('CTM_SET_FOLD')

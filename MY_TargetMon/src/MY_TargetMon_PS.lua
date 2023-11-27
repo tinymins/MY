@@ -24,11 +24,11 @@ local INI_FILE = X.PACKET_INFO.ROOT .. 'MY_TargetMon/ui/MY_TargetMon_PS.ini'
 local D = {}
 
 function D.OpenPanel()
-	Wnd.OpenWindow(INI_FILE, 'MY_TargetMon_PS')
+	X.UI.OpenFrame(INI_FILE, 'MY_TargetMon_PS')
 end
 
 function D.ClosePanel()
-	Wnd.CloseWindow('MY_TargetMon_PS')
+	X.UI.CloseFrame('MY_TargetMon_PS')
 end
 
 function D.TogglePanel()
@@ -153,7 +153,7 @@ function D.OnLButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
 	if name == 'Btn_Close' then
-		Wnd.CloseWindow(this:GetRoot())
+		X.UI.CloseFrame(this:GetRoot())
 	elseif name == 'Btn_CreateDataset' then
 		MY_TargetMonConfig.CreateDataset()
 	elseif name == 'Btn_CreateMonitor' then

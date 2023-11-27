@@ -97,13 +97,13 @@ function D.CreateList(frame)
 end
 
 function D.Open()
-	Wnd.OpenWindow(INI_PATH, 'MY_FocusUI')
+	X.UI.OpenFrame(INI_PATH, 'MY_FocusUI')
 end
 
 function D.Close()
 	local hFrame = D.GetFrame()
 	if hFrame then
-		Wnd.CloseWindow(hFrame)
+		X.UI.CloseFrame(hFrame)
 	end
 end
 

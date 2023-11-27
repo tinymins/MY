@@ -1265,11 +1265,11 @@ function D.ApplyFloatEntry(bFloatEntry)
 		if btn then
 			return
 		end
-		local frameTemp = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_RoleEntry.ini', 'MY_RoleStatistics_RoleEntry')
+		local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_RoleEntry.ini', 'MY_RoleStatistics_RoleEntry')
 		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_RoleEntry')
 		btn:ChangeRelation(frame, true, true)
 		btn:SetRelPos(55, -8)
-		Wnd.CloseWindow(frameTemp)
+		X.UI.CloseFrame(frameTemp)
 		btn.OnMouseEnter = function()
 			D.OutputFloatEntryTip(this)
 		end

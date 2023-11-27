@@ -168,13 +168,13 @@ function D.HookPlayerViewPanel()
 	-- attach page
 	if bHook then
 		if not mPage.bMYLoved then
-			local frame = Wnd.OpenWindow(PLUGIN_ROOT .. '\\ui\\MY_Love.ini', 'MY_Love')
+			local frame = X.UI.OpenFrame(PLUGIN_ROOT .. '\\ui\\MY_Love.ini', 'MY_Love')
 			local pageset = frame:Lookup('Page_Main')
 			local checkbox = pageset:Lookup('CheckBox_Love')
 			local page = pageset:Lookup('Page_Love')
 			checkbox:ChangeRelation(mPage, true, true)
 			page:ChangeRelation(mPage, true, true)
-			Wnd.CloseWindow(frame)
+			X.UI.CloseFrame(frame)
 			checkbox:SetRelPos(270, 510)
 			page:SetRelPos(0, 0)
 			mPage:AddPage(page, checkbox)
@@ -241,14 +241,14 @@ function D.HookPlayerViewPanel()
 			mPage:ActivePage('Page_Love')
 		end
 	elseif not bHook and mPage.bMYLoved then
-		local frame = Wnd.OpenWindow(PLUGIN_ROOT .. '\\ui\\MY_Love.ini', 'MY_Love')
+		local frame = X.UI.OpenFrame(PLUGIN_ROOT .. '\\ui\\MY_Love.ini', 'MY_Love')
 		local pageset = frame:Lookup('Page_Main')
 		local checkbox = mPage:Lookup('CheckBox_Love')
 		local page = mPage:Lookup('Page_Love')
 		pageset:AddPage(page, checkbox)
 		checkbox:ChangeRelation(pageset, true, true)
 		page:ChangeRelation(pageset, true, true)
-		Wnd.CloseWindow(frame)
+		X.UI.CloseFrame(frame)
 		mPage.dwPlayer = nil
 		mPage.bMYLoved = nil
 	end
@@ -302,6 +302,6 @@ X.RegisterTargetAddonMenu('MY_Love', onMenu)
 end
 
 -- close player view when reload
-X.RegisterReload('MY_Love', function() Wnd.CloseWindow('PlayerView') end)
+X.RegisterReload('MY_Love', function() X.UI.CloseFrame('PlayerView') end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

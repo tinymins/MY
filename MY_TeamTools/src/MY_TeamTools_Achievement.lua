@@ -678,10 +678,10 @@ function D.OnInitPage()
 		D.tMapName = tMapName
 		D.tMapID = X.FlipObjectKV(tMapName)
 	end
-	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_TeamTools_Achievement')
+	local frameTemp = X.UI.OpenFrame(SZ_INI, 'MY_TeamTools_Achievement')
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(this, true, true)
-	Wnd.CloseWindow(frameTemp)
+	X.UI.CloseFrame(frameTemp)
 
 	local nX = 20
 	nX = nX + X.UI(wnd):Append('WndAutocomplete', {

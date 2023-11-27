@@ -33,7 +33,7 @@ function MY_GKP_Chat.OnEvent(szEvent)
 		Chat.CloseFrame(GetItem(arg1))
 	elseif szEvent == 'DOODAD_LEAVE_SCENE' then
 		if arg0 == this.box.data.dwDoodadID then
-			Wnd.CloseWindow(this)
+			X.UI.CloseFrame(this)
 		end
 	end
 end
@@ -93,7 +93,7 @@ end
 function Chat.OpenFrame(item, menu, data)
 	local frame = Chat.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(X.PACKET_INFO.ROOT .. 'MY_GKP/ui/MY_GKP_Chat.ini', 'MY_GKP_Chat')
+		frame = X.UI.OpenFrame(X.PACKET_INFO.ROOT .. 'MY_GKP/ui/MY_GKP_Chat.ini', 'MY_GKP_Chat')
 		local ui = X.UI(frame):Anchor('CENTER')
 		ui:Append('WndButton', {
 			x = 380, y = 38,
@@ -134,7 +134,7 @@ function Chat.CloseFrame(bCheck)
 			end
 		end
 		UnRegisterMsgMonitor(Chat.OnMsgArrive)
-		Wnd.CloseWindow(frame)
+		X.UI.CloseFrame(frame)
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
 end

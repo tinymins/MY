@@ -43,7 +43,7 @@ function D.SetFont(tIDs, szName, szFile, nSize, tStyle)
 		local szName1, szFile1, nSize1, tStyle1 = Font.GetFont(dwID)
 		Font.SetFont(dwID, szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1)
 		if dwID == Font.GetChatFontID() then
-			Wnd.OpenWindow('ChatSettingPanel')
+			X.UI.OpenFrame('ChatSettingPanel')
 			OutputWarningMessage('MSG_REWARD_GREEN', _L['Please click apply or sure button to save change!'], 10)
 		end
 		CONFIG[dwID] = {szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1}

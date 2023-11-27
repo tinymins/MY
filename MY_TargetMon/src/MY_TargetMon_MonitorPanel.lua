@@ -590,13 +590,13 @@ function D.Open(szConfigUUID, szMonitorUUID)
 end
 
 function D.Close()
-	Wnd.CloseWindow('MY_TargetMon_MonitorPanel')
+	X.UI.CloseFrame('MY_TargetMon_MonitorPanel')
 end
 
 function D.OnFrameBreathe()
 	local parent = Station.Lookup('Normal/MY_TargetMon_PS')
 	if not parent or Station.Lookup('Normal/MY_TargetMon_ConfigPanel') then
-		Wnd.CloseWindow(this)
+		X.UI.CloseFrame(this)
 		return
 	end
 	local frame, bBehindParent = parent:GetNext(), true

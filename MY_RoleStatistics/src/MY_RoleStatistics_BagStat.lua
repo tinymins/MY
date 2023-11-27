@@ -829,10 +829,10 @@ function D.UpdateItems(page)
 end
 
 function D.OnInitPage()
-	local frameTemp = Wnd.OpenWindow(SZ_INI, 'MY_RoleStatistics_BagStat')
+	local frameTemp = X.UI.OpenFrame(SZ_INI, 'MY_RoleStatistics_BagStat')
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(this, true, true)
-	Wnd.CloseWindow(frameTemp)
+	X.UI.CloseFrame(frameTemp)
 
 	local page = this
 	local ui = X.UI(page)
@@ -1095,11 +1095,11 @@ function D.ApplyFloatEntry(bFloatEntry)
 		if btn then
 			return
 		end
-		local frameTemp = Wnd.OpenWindow(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_BagEntry.ini', 'MY_RoleStatistics_BagEntry')
+		local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_BagEntry.ini', 'MY_RoleStatistics_BagEntry')
 		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_BagEntry')
 		btn:ChangeRelation(frame, true, true)
 		btn:SetRelPos(90, 7)
-		Wnd.CloseWindow(frameTemp)
+		X.UI.CloseFrame(frameTemp)
 		btn.OnLButtonClick = function()
 			MY_RoleStatistics.Open('BagStat')
 		end

@@ -73,7 +73,7 @@ setmetatable(MY_TEAM_MON__UI__DOODAD_ICON, { __index = function(me, key)
 end })
 
 local function OpenDragPanel(el)
-	local frame = Wnd.OpenWindow(X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_DRAG.ini', 'MY_TeamMon_UI_DRAG')
+	local frame = X.UI.OpenFrame(X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_UI_DRAG.ini', 'MY_TeamMon_UI_DRAG')
 	local x, y = Cursor.GetPos()
 	local w, h = el:GetSize()
 	-- local x, y = el:GetAbsPos()
@@ -95,7 +95,7 @@ local function CloseDragPanel()
 	local frame = Station.Lookup('Normal1/MY_TeamMon_UI_DRAG')
 	if frame then
 		frame:EndMoving()
-		Wnd.CloseWindow(frame)
+		X.UI.CloseFrame(frame)
 		return frame.data, frame.szName
 	end
 end
@@ -3420,7 +3420,7 @@ function D.OpenPanel(szType)
 		if szType then
 			MY_TEAM_MON__UI__SELECT_TYPE = szType
 		end
-		Wnd.OpenWindow(MY_TEAM_MON__UI__INI_FILE, 'MY_TeamMon_UI')
+		X.UI.OpenFrame(MY_TEAM_MON__UI__INI_FILE, 'MY_TeamMon_UI')
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
 end
@@ -3428,7 +3428,7 @@ end
 function D.ClosePanel()
 	if D.IsOpened() then
 		FireUIEvent('MY_TEAM_MON__UI__FREE_CACHE')
-		Wnd.CloseWindow(D.GetFrame())
+		X.UI.CloseFrame(D.GetFrame())
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 		X.RegisterEsc('MY_TeamMon')
 	end

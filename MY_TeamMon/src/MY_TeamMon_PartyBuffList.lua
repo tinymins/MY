@@ -211,7 +211,7 @@ function D.SwitchPanel(nCount)
 end
 
 function D.ClosePanel()
-	Wnd.CloseWindow(D.frame)
+	X.UI.CloseFrame(D.frame)
 	D.frame = nil
 end
 
@@ -301,11 +301,11 @@ function D.OnTableInsert(dwID, dwBuffID, nLevel, nIcon)
 end
 
 function D.CheckEnable()
-	Wnd.CloseWindow('MY_TeamMon_PartyBuffList')
+	X.UI.CloseFrame('MY_TeamMon_PartyBuffList')
 	if X.IsRestricted('MY_TeamMon_PartyBuffList') then
 		return
 	end
-	Wnd.OpenWindow(PBL_INI_FILE, 'MY_TeamMon_PartyBuffList')
+	X.UI.OpenFrame(PBL_INI_FILE, 'MY_TeamMon_PartyBuffList')
 	D.SwitchPanel(0)
 end
 

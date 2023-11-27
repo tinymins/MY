@@ -190,11 +190,11 @@ function FS:RemoveItem()
 end
 
 function D.CheckEnable()
-	Wnd.CloseWindow('MY_TeamMon_FullScreenAlarm')
+	X.UI.CloseFrame('MY_TeamMon_FullScreenAlarm')
 	if X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 		return
 	end
-	Wnd.OpenWindow(INI_FILE, 'MY_TeamMon_FullScreenAlarm'):Hide()
+	X.UI.OpenFrame(INI_FILE, 'MY_TeamMon_FullScreenAlarm'):Hide()
 end
 
 function D.Init()
