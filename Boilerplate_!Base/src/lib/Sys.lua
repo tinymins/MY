@@ -12,6 +12,18 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Sys')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
+do
+local bExiting = false
+X.RegisterEvent('PLAYER_EXIT_GAME', function()
+	bExiting = true
+end)
+---游戏是否处于退出状态
+---@return boolean 是否正在退出
+function X.IsGameExiting()
+	return bExiting
+end
+end
+
 -- #######################################################################################################
 --       #       #               #         #           #           #
 --       #       #               #     # # # # # #     # #       # # # #
