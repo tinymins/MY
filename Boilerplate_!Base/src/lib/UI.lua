@@ -6482,4 +6482,18 @@ function X.UI.CreateFrame(szName, opt)
 	return ApplyUIArguments(ui, opt)
 end
 
+---打开窗口，可以规避游戏退出时创建界面带来的虚拟机异常问题
+---@param szPath string @INI文件路径
+---@param szName string @窗口名称
+---@return userdata | nil @打开成功返回窗口句柄，打开失败返回 nil
+function X.UI.OpenFrame(szPath, szName)
+	if X.IsGameExiting() then
+		return
+	end
+	if not szName then
+		szName = szPath:gsub('.*/', ''):gsub('.*\\', ''):gsub('%.ini$', '')
+	end
+	return Wnd.OpenWindow(szPath, szName)
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
