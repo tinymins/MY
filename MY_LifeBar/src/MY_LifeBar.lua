@@ -387,6 +387,9 @@ function D.UpdateShadowHandleParam()
 end
 
 function D.Reset()
+	if not D.bUserPreferencesReady then
+		return
+	end
 	-- ÷ÿ÷√ª∫¥Ê
 	LB_CACHE = {}
 	LB('clear')
@@ -923,6 +926,10 @@ end)
 
 X.RegisterEvent('PLAYER_SAY', function()
 	OnCharacterSay(arg1, arg2, arg0)
+end)
+
+X.RegisterEvent('FIRST_SYNC_USER_PREFERENCES_END', function()
+	D.bUserPreferencesReady = true
 end)
 
 X.RegisterUserSettingsInit('MY_LifeBar', function()
