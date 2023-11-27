@@ -6496,4 +6496,9 @@ function X.UI.OpenFrame(szPath, szName)
 	return Wnd.OpenWindow(szPath, szName)
 end
 
+---¹Ø±Õ´°¿Ú
+function X.UI.CloseFrame(...)
+	return Wnd.CloseWindow(...)
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
