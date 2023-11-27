@@ -336,7 +336,7 @@ function X.GetTargetContextMenu(dwType, szName, dwID)
 			szOption = g_tStrings.LOOKUP_CORPS,
 			-- fnDisable = function() return not X.GetPlayer(dwID) end,
 			fnAction = function()
-				Wnd.CloseWindow('ArenaCorpsPanel')
+				X.UI.CloseFrame('ArenaCorpsPanel')
 				OpenArenaCorpsPanel(true, dwID)
 			end,
 		})
@@ -4174,9 +4174,9 @@ function X.GetCharInfo()
 		local frame = Station.Lookup('Normal/CharInfo')
 		if not frame or not frame:IsVisible() then
 			if frame then
-				Wnd.CloseWindow('CharInfo') -- 强制kill
+				X.UI.CloseFrame('CharInfo') -- 强制kill
 			end
-			Wnd.OpenWindow('CharInfo'):Hide()
+			X.UI.OpenFrame('CharInfo'):Hide()
 		end
 		local hCharInfo = Station.Lookup('Normal/CharInfo')
 		local handle = hCharInfo:Lookup('WndScroll_Property', '')
@@ -5007,7 +5007,7 @@ end
 do
 	local function PeekPlayer(dwID)
 		X.SafeCall(ViewOtherZhenPaiSkill, dwID, true)
-		X.SafeCall(Wnd.CloseWindow, 'ZhenPaiSkill')
+		X.SafeCall(X.UI.CloseFrame, 'ZhenPaiSkill')
 	end
 	local EVENT_KEY = nil
 	local PEEK_PLAYER_ZHEN_PAI_STATE = {}

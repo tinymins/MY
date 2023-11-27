@@ -32,7 +32,7 @@ function X.OpenPanel()
 	end
 	local frame = X.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(INI_PATH, FRAME_NAME)
+		frame = X.UI.OpenFrame(INI_PATH, FRAME_NAME)
 		frame:Hide()
 		frame.bVisible = false
 		X.CheckTutorial()
@@ -47,7 +47,7 @@ function X.ClosePanel()
 	end
 	X.SwitchTab('Welcome')
 	X.HidePanel(false, true)
-	Wnd.CloseWindow(frame)
+	X.UI.CloseFrame(frame)
 end
 
 function X.ReopenPanel()

@@ -42,7 +42,7 @@ local function GetMenu(ui)
 					frame:Show()
 				end
 				if IsCtrlKeyDown() then
-					Wnd.CloseWindow(frame)
+					X.UI.CloseFrame(frame)
 				end
 			end
 		})

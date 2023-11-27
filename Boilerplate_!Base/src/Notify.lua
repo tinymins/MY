@@ -93,7 +93,7 @@ function X.DismissNotify(...)
 end
 
 function D.OpenPanel()
-	Wnd.OpenWindow(INI_PATH, FRAME_NAME)
+	X.UI.OpenFrame(INI_PATH, FRAME_NAME)
 end
 
 function D.HookEntry()
@@ -228,7 +228,7 @@ end
 
 function D.DrawNotifies(bAutoClose)
 	if bAutoClose and #NOTIFY_LIST == 0 then
-		return Wnd.CloseWindow(FRAME_NAME)
+		return X.UI.CloseFrame(FRAME_NAME)
 	end
 	local hList = Station.Lookup('Normal/' .. FRAME_NAME .. '/Window_Main/WndScroll_Notify', 'Handle_Notifies')
 	if not hList then
@@ -312,7 +312,7 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
-		Wnd.CloseWindow(this:GetRoot())
+		X.UI.CloseFrame(this:GetRoot())
 	end
 end
 

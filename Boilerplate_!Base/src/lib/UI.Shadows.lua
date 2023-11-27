@@ -63,11 +63,11 @@ end
 function X.UI.GetShadowHandle(szName)
 	local frame = Station.SearchFrame(FRAME_NAME)
 	if frame and not X.IsElement(frame) then -- 关闭无效的 frame 句柄
-		Wnd.CloseWindow(FRAME_NAME)
+		X.UI.CloseFrame(FRAME_NAME)
 		frame = nil
 	end
 	if not frame then
-		frame = Wnd.OpenWindow(INI_PATH, FRAME_NAME)
+		frame = X.UI.OpenFrame(INI_PATH, FRAME_NAME)
 	end
 	local sh = frame:Lookup('', szName)
 	if sh and not X.IsElement(sh) then -- 关闭无效的 sh 句柄

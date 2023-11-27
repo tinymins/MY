@@ -81,7 +81,7 @@ function D.Open(menu)
 		if not menu.bDisableSound then
 			PlaySound(SOUND.UI_SOUND,g_sound.OpenFrame)
 		end
-		frame = Wnd.OpenWindow(SZ_INI, PLUGIN_NAME)
+		frame = X.UI.OpenFrame(SZ_INI, PLUGIN_NAME)
 	end
 	if not menu.bShowKillFocus then
 		Station.SetFocusWindow(frame)
@@ -93,9 +93,9 @@ end
 function D.Close()
 	local frame = D.GetFrame()
 	if frame then
-		Wnd.CloseWindow(frame)
+		X.UI.CloseFrame(frame)
 	end
-	Wnd.CloseWindow('PopupMenuPanel')
+	X.UI.CloseFrame('PopupMenuPanel')
 end
 
 function D.GetFrame()
@@ -146,7 +146,7 @@ function D.UpdateDS(frame)
 end
 
 function D.AppendContentFromIni(parentWnd, szIni, szPath, szName)
-	local frameTemp = Wnd.OpenWindow(szIni, PLUGIN_NAME .. '__TempWnd')
+	local frameTemp = X.UI.OpenFrame(szIni, PLUGIN_NAME .. '__TempWnd')
 	local wnd = frameTemp:Lookup(szPath)
 	if wnd then
 		if szName then
@@ -154,7 +154,7 @@ function D.AppendContentFromIni(parentWnd, szIni, szPath, szName)
 		end
 		wnd:ChangeRelation(parentWnd, true, true)
 	end
-	Wnd.CloseWindow(frameTemp)
+	X.UI.CloseFrame(frameTemp)
 	return wnd
 end
 
@@ -595,7 +595,7 @@ end
 
 function D.FireAction(frame, menu, fnAction, ...)
 	if fnAction and fnAction(menu.UserData, ...) == 0 then
-		Wnd.CloseWindow(frame)
+		X.UI.CloseFrame(frame)
 	end
 end
 
@@ -622,14 +622,14 @@ function D.OnFrameBreathe()
 				top.fnCancel()
 			end
 			if this.bColorPicker then
-				Wnd.CloseWindow(COLOR_TABLE_NAME)
-				Wnd.CloseWindow(COLOR_PICKER_NAME)
+				X.UI.CloseFrame(COLOR_TABLE_NAME)
+				X.UI.CloseFrame(COLOR_PICKER_NAME)
 			end
-			return Wnd.CloseWindow(this)
+			return X.UI.CloseFrame(this)
 		end
 	end
 	if top.fnAutoClose and top.fnAutoClose() then
-		return Wnd.CloseWindow(this)
+		return X.UI.CloseFrame(this)
 	end
 	D.CalcDisable(top)
 	D.UpdateDS(this)

@@ -25,7 +25,7 @@ end
 function D.Open()
 	local frame = D.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(INI_PATH, FRAME_NAME)
+		frame = X.UI.OpenFrame(INI_PATH, FRAME_NAME)
 	end
 	return frame
 end
@@ -33,7 +33,7 @@ end
 function D.Close(bCompulsory)
 	local function fnAction()
 		REQUEST_LIST = {}
-		Wnd.CloseWindow(D.GetFrame())
+		X.UI.CloseFrame(D.GetFrame())
 		for _, v in pairs(REQUEST_HANDLER) do
 			X.SafeCall(v.OnClear)
 		end

@@ -25,7 +25,7 @@ function D.Open(bImport)
 		end
 		tSettings = X.LoadLUAData(szPath, { passphrase = false }) or {}
 	end
-	Wnd.CloseWindow(FRAME_NAME)
+	X.UI.CloseFrame(FRAME_NAME)
 	local W, H = 400, 600
 	local uiFrame = X.UI.CreateFrame(FRAME_NAME, {
 		w = W, h = H,

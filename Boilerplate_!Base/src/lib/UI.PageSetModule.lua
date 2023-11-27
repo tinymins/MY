@@ -59,13 +59,13 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 		end
 		ps.bInitPageSet = true
 		for i, m in ipairs(Modules) do
-			local frameTemp = Wnd.OpenWindow(INI_PATH, X.NSFormatString('{$NS}#PageSetModuleTemp'))
+			local frameTemp = X.UI.OpenFrame(INI_PATH, X.NSFormatString('{$NS}#PageSetModuleTemp'))
 			local checkbox = frameTemp and frameTemp:Lookup('PageSet_Total/WndCheck_Default')
 			local page = frameTemp and frameTemp:Lookup('PageSet_Total/Page_Default')
 			if checkbox and page then
 				checkbox:ChangeRelation(ps, true, true)
 				page:ChangeRelation(ps, true, true)
-				Wnd.CloseWindow(frameTemp)
+				X.UI.CloseFrame(frameTemp)
 				checkbox:SetName('WndCheck_Default')
 				page:SetName('Page_Default')
 				ps:AddPage(page, checkbox)
@@ -85,7 +85,7 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 				end
 				page.nIndex = i
 			else
-				Wnd.CloseWindow(frameTemp)
+				X.UI.CloseFrame(frameTemp)
 			end
 		end
 		ps.bInitPageSet = nil

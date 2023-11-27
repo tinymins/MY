@@ -85,7 +85,7 @@ function X.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 
 		local frame = Station.Lookup('Topmost/HotkeyPanel')
 		if not frame then
-			frame = Wnd.OpenWindow('HotkeyPanel')
+			frame = X.UI.OpenFrame('HotkeyPanel')
 		elseif not frame:IsVisible() then
 			frame:Show()
 		end
@@ -432,7 +432,7 @@ local function CaptureSoundVolumes()
 	local frame = Station.SearchFrame('SoundSettingPanel')
 	local bClose = not frame
 	if not frame then
-		frame = Wnd.OpenWindow('SoundSettingPanel')
+		frame = X.UI.OpenFrame('SoundSettingPanel')
 	end
 	local chkMainMute = frame and frame:Lookup('CheckBox_Silence')
 	local scrollMainVolume = frame and frame:Lookup('Scroll_MainVolume')
@@ -480,7 +480,7 @@ local function CaptureSoundVolumes()
 		and (scrollHelpVolume:GetScrollPos() / scrollHelpVolume:GetStepCount())
 		or 0
 	if bClose then
-		Wnd.CloseWindow('SoundSettingPanel')
+		X.UI.CloseFrame('SoundSettingPanel')
 	end
 	SOUND_VOLUME_CACHE = {
 		[SOUND.BG_MUSIC       ] = nBgVolume    * nMainVolume,
@@ -1708,13 +1708,13 @@ function X.GetAccount()
 			end
 		end
 		if not CURRENT_ACCOUNT then
-			local bSuccess, hFrame = X.XpCall(function() return Wnd.OpenWindow('LoginPassword') end)
+			local bSuccess, hFrame = X.XpCall(function() return X.UI.OpenFrame('LoginPassword') end)
 			if bSuccess and hFrame then
 				local hEdit = hFrame:Lookup('WndPassword/Edit_Account')
 				if hEdit then
 					CURRENT_ACCOUNT = hEdit:GetText()
 				end
-				Wnd.CloseWindow(hFrame)
+				X.UI.CloseFrame(hFrame)
 			end
 		end
 		if not CURRENT_ACCOUNT then
