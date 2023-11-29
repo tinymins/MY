@@ -12,13 +12,13 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/UI.IconPicker')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
-local ICON_PAGE, MAX_ICON
+local ICON_PAGE, MAX_ICON_ID
 local ICON_ROW_COUNT = 10
 local ICON_COLUMN_COUNT = 20
 local ICON_PAGE_SIZE = ICON_ROW_COUNT * ICON_COLUMN_COUNT
 -- iconÑ¡ÔñÆ÷
-function X.UI.OpenIconPicker(fnAction)
-	if not MAX_ICON then
+function X.UI.OpenIconPicker(fnAction, nCurrentIconID)
+	if not MAX_ICON_ID then
 		local szPath = 'ui\\Scheme\\Case\\icon.txt'
 		local tTitle = {
 			{ f = 'i', t = 'dwID'       },
@@ -49,7 +49,7 @@ function X.UI.OpenIconPicker(fnAction)
 				else
 					if bMaxL and not bMaxR then
 						if nMaxL + 1 == nMaxR then
-							MAX_ICON = nMaxL
+							MAX_ICON_ID = nMaxL
 							break
 						else
 							local nCur = math.floor(nMaxR - (nMaxR - nMaxL) / 2)
@@ -73,15 +73,45 @@ function X.UI.OpenIconPicker(fnAction)
 				nCount = nCount + 1
 			end
 		end
-		MAX_ICON = MAX_ICON or 50000
+		MAX_ICON_ID = MAX_ICON_ID or 50000
 	end
-	local nMaxIcon, aBox, aTxt = MAX_ICON, {}, {}
+	if X.IsNumber(nCurrentIconID) and nCurrentIconID > 0 then
+		ICON_PAGE = math.floor((nCurrentIconID - 1) / ICON_PAGE_SIZE) + 1
+	end
+	local nMaxIconID, aBox, aTxt = MAX_ICON_ID, {}, {}
 	local ui = X.UI.CreateFrame(X.NSFormatString('{$NS}_IconPanel'), {
 		w = ICON_COLUMN_COUNT * 50 + 20,
 		h = ICON_ROW_COUNT * 70 + 90,
 		text = _L['Icon Picker'],
 		simple = true, close = true, esc = true,
 	})
+	local function OnSelectIcon(nIconID)
+		if fnAction then
+			fnAction(nIconID)
+		end
+		ui:Remove()
+	end
+	for i = 1, ICON_PAGE_SIZE do
+		local nX = ((i - 1) % ICON_COLUMN_COUNT) * 50 + 10
+		local nY = math.floor((i - 1) / ICON_COLUMN_COUNT) * 70 + 10
+		aBox[i] = ui:Append('Box', {
+			x = nX, y = nY,
+			w = 48, h = 48,
+			icon = -1,
+			onHover = function(bHover)
+				this:SetObjectMouseOver(bHover)
+			end,
+			onClick = function()
+				OnSelectIcon(this:GetObjectIcon())
+			end,
+		}):Raw()
+		aTxt[i] = ui:Append('Text', {
+			x = nX, y = nY + 48,
+			w = 48, h = 20,
+			text = '',
+			align = 1,
+		}):Raw()
+	end
 	local function GetPage(nPage, bInit)
 		if nPage == ICON_PAGE and not bInit then
 			return
@@ -89,38 +119,31 @@ function X.UI.OpenIconPicker(fnAction)
 		ICON_PAGE = nPage
 		local nStart = (nPage - 1) * ICON_PAGE_SIZE
 		for i = 1, ICON_PAGE_SIZE do
-			local x = ((i - 1) % ICON_COLUMN_COUNT) * 50 + 10
-			local y = math.floor((i - 1) / ICON_COLUMN_COUNT) * 70 + 10
-			if aBox[i] then
-				local nIcon = nStart + i
-				if nIcon > nMaxIcon then
-					aBox[i]:Toggle(false)
-					aTxt[i]:Toggle(false)
-				else
-					aBox[i]:Icon(-1)
-					aTxt[i]:Text(nIcon):Toggle(true)
-					X.DelayCall(function()
-						if math.ceil(nIcon / ICON_PAGE_SIZE) == ICON_PAGE and aBox[i] then
-							aBox[i]:Icon(nIcon):Toggle(true)
-						end
-					end)
-				end
+			local nIconID = nStart + i
+			local box = aBox[i]
+			local txt = aTxt[i]
+			if nIconID > nMaxIconID then
+				box:SetVisible(false)
+				txt:SetVisible(false)
 			else
-				aBox[i] = ui:Append('Box', {
-					w = 48, h = 48, x = x, y = y, icon = nStart + i,
-					onHover = function(bHover)
-						this:SetObjectMouseOver(bHover)
-					end,
-					onClick = function()
-						if fnAction then
-							fnAction(this:GetObjectIcon())
-						end
-						ui:Remove()
-					end,
-				})
-				aTxt[i] = ui:Append('Text', { w = 48, h = 20, x = x, y = y + 48, text = nStart + i, align = 1 })
+				box:SetObjectIcon(-1)
+				box:SetObjectStaring(nIconID == nCurrentIconID)
 			end
 		end
+		X.DelayCall(X.NSFormatString('{$NS}#UI.IconPicker.DelayRender'), function()
+			if nPage ~= ICON_PAGE then
+				return
+			end
+			for i = 1, ICON_PAGE_SIZE do
+				local nIconID = nStart + i
+				local box = aBox[i]
+				local txt = aTxt[i]
+				box:SetObjectIcon(nIconID)
+				box:SetVisible(true)
+				txt:SetText(nIconID)
+				txt:SetVisible(true)
+			end
+		end)
 	end
 	ui:Append('WndEditBox', { name = 'Icon', x = ICON_COLUMN_COUNT * 50 + 20 - 190, y = ICON_ROW_COUNT * 70 + 90 - 70, w = 50, h = 25, editType = 0 })
 	ui:Append('WndButton', {
@@ -131,10 +154,7 @@ function X.UI.OpenIconPicker(fnAction)
 		onClick = function()
 			local nIcon = tonumber(ui:Children('#Icon'):Text())
 			if nIcon then
-				if fnAction then
-					fnAction(nIcon)
-				end
-				ui:Remove()
+				OnSelectIcon(nIcon)
 			end
 		end,
 	})
@@ -142,7 +162,7 @@ function X.UI.OpenIconPicker(fnAction)
 		x = 10, y = ICON_ROW_COUNT * 70 + 90 - 70,
 		w = 500, h = 25,
 		textFormatter = ' Page: %d',
-		range = {1, math.ceil(nMaxIcon / ICON_PAGE_SIZE)}, value = ICON_PAGE or 21,
+		range = {1, math.ceil(nMaxIconID / ICON_PAGE_SIZE)}, value = ICON_PAGE or 21,
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		onChange = function(nVal)
 			X.DelayCall(function() GetPage(nVal) end)
