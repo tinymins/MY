@@ -1858,12 +1858,15 @@ function D.OpenSettingPanel(data, szType)
 		end
 		if szType ~= 'NPC' and szType ~= 'TALK' and szType ~= 'CHAT' then
 			table.insert(menu, { szOption = _L['Edit icon'], fnAction = function()
-				X.UI.OpenIconPicker(function(nNewIcon)
-					nIcon = nNewIcon
-					data.nIcon = nNewIcon
-					FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-					box:SetObjectIcon(nNewIcon)
-				end)
+				X.UI.OpenIconPicker(
+					function(nNewIcon)
+						nIcon = nNewIcon
+						data.nIcon = nNewIcon
+						FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+						box:SetObjectIcon(nNewIcon)
+					end,
+					data.nIcon
+				)
 			end})
 			table.insert(menu, { bDevide = true })
 		end
@@ -2926,11 +2929,14 @@ function D.OpenSettingPanel(data, szType)
 				onHover = function(bHover) this:SetObjectMouseOver(bHover) end,
 				onClick = function()
 					local box = this
-					X.UI.OpenIconPicker(function(nIcon)
-						v.nIcon = nIcon
-						FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-						box:SetObjectIcon(nIcon)
-					end)
+					X.UI.OpenIconPicker(
+						function(nIcon)
+							v.nIcon = nIcon
+							FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
+							box:SetObjectIcon(nIcon)
+						end,
+						v.nIcon
+					)
 				end,
 			}):Pos('BOTTOMRIGHT')
 			-- ∂”ŒÈ∆µµ¿±®æØ

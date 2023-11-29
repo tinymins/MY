@@ -64,11 +64,14 @@ function D.Open(szConfigUUID, szMonitorUUID)
 			local t1 = {
 				szOption = _L['Monitor Change Icon'],
 				fnAction = function()
-					X.UI.OpenIconPicker(function(nIconID)
-						mon.nIconID = nIconID
-						FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
-						box:SetObjectIcon(nIconID)
-					end)
+					X.UI.OpenIconPicker(
+						function(nIconID)
+							mon.nIconID = nIconID
+							FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', dataset.szUUID)
+							box:SetObjectIcon(nIconID)
+						end,
+						mon.nIconID
+					)
 					X.UI.ClosePopupMenu()
 				end,
 			}
