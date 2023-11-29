@@ -53,7 +53,7 @@ function D.Open(dwAchievement)
 	if not achi then
 		return
 	end
-	local szURL = 'https://page.j3cx.com/wiki/' .. dwAchievement .. '?'
+	local szURL = MY_RSS.PAGE_BASE_URL .. '/wiki/' .. dwAchievement .. '?'
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

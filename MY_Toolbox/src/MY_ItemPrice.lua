@@ -63,7 +63,7 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 	if nBookID then
 		table.insert(aPath, nBookID)
 	end
-	local szURL = 'https://page.j3cx.com/item/' .. table.concat(aPath, '/') .. '/price?'
+	local szURL = MY_RSS.PAGE_BASE_URL .. '/item/' .. table.concat(aPath, '/') .. '/price?'
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

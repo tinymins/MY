@@ -53,7 +53,7 @@ function D.Open(dwQuest)
 	if not quest then
 		return
 	end
-	local szURL = 'https://page.j3cx.com/quest/' .. dwQuest .. '?'
+	local szURL = MY_RSS.PAGE_BASE_URL .. '/quest/' .. dwQuest .. '?'
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

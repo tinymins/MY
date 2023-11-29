@@ -1271,7 +1271,7 @@ X.BreatheCall(X.NSFormatString('{$NS}#STORAGE_DATA'), 200, function()
 	end
 	m_nStorageVer = X.LoadLUAData({'config/storageversion.jx3dat', X.PATH_TYPE.ROLE}) or {}
 	X.Ajax({
-		url = 'https://storage.j3cx.com/api/storage',
+		url = 'https://pull.storage.j3cx.com/api/storage',
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
@@ -1325,7 +1325,7 @@ function X.StorageData(szKey, oData)
 			return
 		end
 		X.Ajax({
-			url = 'https://storage.uploads.j3cx.com/api/storage/uploads',
+			url = 'https://push.storage.j3cx.com/api/storage/uploads',
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,

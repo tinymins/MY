@@ -56,7 +56,7 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 	if not szName then
 		return
 	end
-	local szURL = 'https://page.j3cx.com/item/' .. table.concat({dwTabType, dwTabIndex, nBookID}, '/') .. '?'
+	local szURL = MY_RSS.PAGE_BASE_URL .. '/item/' .. table.concat({dwTabType, dwTabIndex, nBookID}, '/') .. '?'
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

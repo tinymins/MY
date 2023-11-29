@@ -53,7 +53,7 @@ function D.Open(dwTabType, dwTabIndex)
 	if not item then
 		return
 	end
-	local szURL = 'https://page.j3cx.com/ride/' .. dwTabType .. '/' .. dwTabIndex .. '?'
+	local szURL = MY_RSS.PAGE_BASE_URL .. '/ride/' .. dwTabType .. '/' .. dwTabIndex .. '?'
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

@@ -106,7 +106,7 @@ function D.Hook()
 			if X.IsEmpty(szName) then
 				return X.Alert(_L['Please input macro name first.'])
 			end
-			local szURL = 'https://page.j3cx.com/macro/details?'
+			local szURL = MY_RSS.PAGE_BASE_URL .. '/macro/details?'
 				.. X.EncodeQuerystring(X.ConvertToUTF8({
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,
@@ -121,7 +121,7 @@ function D.Hook()
 		w = btnNew:GetW(), h = btnNew:GetH(),
 		text = _L['Top yun macro'],
 		onClick = function()
-			local szURL = 'https://page.j3cx.com/macro/tops?'
+			local szURL = MY_RSS.PAGE_BASE_URL .. '/macro/tops?'
 				.. X.EncodeQuerystring(X.ConvertToUTF8({
 					l = X.ENVIRONMENT.GAME_LANG,
 					L = X.ENVIRONMENT.GAME_EDITION,

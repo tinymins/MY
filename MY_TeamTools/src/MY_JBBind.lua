@@ -193,7 +193,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nX, y = nY + 2, w = 120,
 		buttonStyle = 'FLAT', text = _L['Login team platform'],
 		onClick = function()
-			X.OpenBrowser('https://page.j3cx.com/jx3box/team/platform')
+			X.OpenBrowser(MY_RSS.PAGE_BASE_URL .. '/jx3box/team/platform')
 		end,
 	})
 	nX = nX + uiBtnCCLink:Width()

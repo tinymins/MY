@@ -53,7 +53,7 @@ function D.Open(dwPetIndex)
 	if not tPet then
 		return
 	end
-	local szURL = 'https://page.j3cx.com/pet/' .. dwPetIndex .. '?'
+	local szURL = MY_RSS.PAGE_BASE_URL .. '/pet/' .. dwPetIndex .. '?'
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
