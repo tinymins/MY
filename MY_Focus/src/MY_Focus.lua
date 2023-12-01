@@ -616,7 +616,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					end
 				end
 			else
-				if not O.bOnlyPublicMap or not X.IsInCompetitionMap() then
+				if not O.bOnlyPublicMap or (not X.IsInCompetitionMap() and not X.IsInDungeonMap()) then
 					-- ÅÐ¶Ï½ÇÉ«±¸×¢
 					if dwType == TARGET.PLAYER
 					and O.bFocusAnmerkungen
