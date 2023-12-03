@@ -197,22 +197,24 @@ end
 --------------------------------------------------------------------------------
 -- Module exports
 --------------------------------------------------------------------------------
--- do
--- local settings = {
--- 	name = 'MY_TeamMon_Subscribe_VoicePacket_Custom',
--- 	exports = {
--- 		{
--- 			preset = 'UIEvent',
--- 			fields = {
--- 				'OnInitPage',
--- 				'OnResizePage',
--- 			},
--- 			root = D,
--- 		},
--- 	},
--- }
--- MY_TeamMon_Subscribe.RegisterModule('Subscribe_VoicePacket_Custom', _L['Voice packet custom'], X.CreateModule(settings))
--- end
+do
+if X.ENVIRONMENT.GAME_BRANCH ~= 'remake' then
+local settings = {
+	name = 'MY_TeamMon_Subscribe_VoicePacket_Custom',
+	exports = {
+		{
+			preset = 'UIEvent',
+			fields = {
+				'OnInitPage',
+				'OnResizePage',
+			},
+			root = D,
+		},
+	},
+}
+MY_TeamMon_Subscribe.RegisterModule('Subscribe_VoicePacket_Custom', _L['Voice packet custom'], X.CreateModule(settings))
+end
+end
 
 --------------------------------------------------------------------------------
 -- Global exports
