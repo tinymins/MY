@@ -521,10 +521,10 @@ function D.ShowVoiceRecommendation(szOfficialVoicePacketUUID, szCustomVoicePacke
 		local dwOfficialVoicePacketID, szOfficialVoicePacketName
 		local dwCustomVoicePacketID, szCustomVoicePacketName
 		local function CheckConfirm()
-			if szOfficialVoicePacketUUID and not dwOfficialVoicePacketID then
+			if not X.IsEmpty(szOfficialVoicePacketUUID) and not dwOfficialVoicePacketID then
 				return
 			end
-			if szCustomVoicePacketUUID and not dwCustomVoicePacketID then
+			if not X.IsEmpty(szCustomVoicePacketUUID) and not dwCustomVoicePacketID then
 				return
 			end
 			local szName = ''
@@ -546,7 +546,7 @@ function D.ShowVoiceRecommendation(szOfficialVoicePacketUUID, szCustomVoicePacke
 				end
 			end)
 		end
-		if szOfficialVoicePacketUUID then
+		if not X.IsEmpty(szOfficialVoicePacketUUID) then
 			X.Ajax({
 				url = MY_RSS.PULL_BASE_URL .. '/api/addon/team-monitor/vpk',
 				data = {
@@ -569,7 +569,7 @@ function D.ShowVoiceRecommendation(szOfficialVoicePacketUUID, szCustomVoicePacke
 				end,
 			})
 		end
-		if szCustomVoicePacketUUID then
+		if not X.IsEmpty(szCustomVoicePacketUUID) then
 			X.Ajax({
 				url = MY_RSS.PULL_BASE_URL .. '/api/addon/team-monitor/vpk',
 				data = {
