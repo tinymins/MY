@@ -22,16 +22,17 @@ end
 --------------------------------------------------------------------------
 
 local D = {
-	GetRawURL          = MY_TeamMon_Subscribe_Data.GetRawURL         ,
-	GetBlobURL         = MY_TeamMon_Subscribe_Data.GetBlobURL        ,
-	GetShortURL        = MY_TeamMon_Subscribe_Data.GetShortURL       ,
-	GetAttachRawURL    = MY_TeamMon_Subscribe_Data.GetAttachRawURL   ,
-	GetAttachBlobURL   = MY_TeamMon_Subscribe_Data.GetAttachBlobURL  ,
-	IsDownloading      = MY_TeamMon_Subscribe_Data.IsDownloading     ,
-	IsSubscripted      = MY_TeamMon_Subscribe_Data.IsSubscripted     ,
-	Subscribe          = MY_TeamMon_Subscribe_Data.Subscribe         ,
-	FetchSubscribeItem = MY_TeamMon_Subscribe_Data.FetchSubscribeItem,
-	SyncTeam           = MY_TeamMon_Subscribe_Data.SyncTeam          ,
+	GetRawURL              = MY_TeamMon_Subscribe_Data.GetRawURL             ,
+	GetBlobURL             = MY_TeamMon_Subscribe_Data.GetBlobURL            ,
+	GetShortURL            = MY_TeamMon_Subscribe_Data.GetShortURL           ,
+	GetAttachRawURL        = MY_TeamMon_Subscribe_Data.GetAttachRawURL       ,
+	GetAttachBlobURL       = MY_TeamMon_Subscribe_Data.GetAttachBlobURL      ,
+	IsDownloading          = MY_TeamMon_Subscribe_Data.IsDownloading         ,
+	IsSubscripted          = MY_TeamMon_Subscribe_Data.IsSubscripted         ,
+	Subscribe              = MY_TeamMon_Subscribe_Data.Subscribe             ,
+	SubscribeEventTracking = MY_TeamMon_Subscribe_Data.SubscribeEventTracking,
+	FetchSubscribeItem     = MY_TeamMon_Subscribe_Data.FetchSubscribeItem    ,
+	SyncTeam               = MY_TeamMon_Subscribe_Data.SyncTeam              ,
 }
 
 local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_Subscribe_FavoriteData.ini'
@@ -161,7 +162,10 @@ function D.UpdateList(page)
 						or _L['Can update']))
 				or _L['Download'],
 			enable = not META_DOWNLOADING[info.szKey] and not D.IsDownloading(info.szKey),
-			onClick = function() D.Subscribe(info) end,
+			onClick = function()
+				D.Subscribe(info)
+				D.SubscribeEventTracking(info, 'FAVORITE')
+			end,
 		})
 		wnd.info = info
 	end

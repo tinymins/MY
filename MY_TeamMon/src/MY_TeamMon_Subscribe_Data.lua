@@ -405,6 +405,20 @@ function D.FetchSubscribeItem(szURL)
 	end)
 end
 
+function D.SubscribeEventTracking(info, from)
+	X.Ajax({
+		url = MY_RSS.PUSH_BASE_URL .. '/addon/statistics/monitor',
+		data = {
+			l = X.ENVIRONMENT.GAME_LANG,
+			L = X.ENVIRONMENT.GAME_EDITION,
+			data_url = info.szDataURL,
+			from = from == 'FAVORITE' and 2 or 1,
+			player_id = X.GetClientPlayerGlobalID(),
+		},
+		signature = X.SECRET['J3CX::TEAM_MON_STATISTICS'],
+	})
+end
+
 function D.Subscribe(info, bSilent)
 	local szUUID = 'r-'
 		.. ('%08x'):format(GetStringCRC(info.szDataURL))
@@ -559,7 +573,10 @@ function D.UpdateList(page)
 						or _L['Can update']))
 				or _L['Download'],
 			enable = not DATA_DOWNLOADING[info.szKey],
-			onClick = function() D.Subscribe(info) end,
+			onClick = function()
+				D.Subscribe(info)
+				D.SubscribeEventTracking(info, 'SUBSCRIBE')
+			end,
 		})
 		wnd.info = info
 	end
@@ -757,6 +774,7 @@ local settings = {
 				'IsDownloading',
 				'IsSubscripted',
 				'Subscribe',
+				'SubscribeEventTracking',
 				'FetchSubscribeItem',
 				'SyncTeam',
 			},
@@ -793,6 +811,7 @@ X.RegisterBgMsg('MY_TeamMon_Subscribe_Data', function(_, data, _, _, szTalker, _
 				function()
 					-- D.AddFavMetaInfo(info) TODO
 					D.Subscribe(info)
+					D.SubscribeEventTracking(info, 'SHARE')
 				end)
 		end
 	elseif action == 'LOAD' then
@@ -857,6 +876,7 @@ X.RegisterInit('MY_TeamMon_Subscribe_Data', function()
 						--[[#DEBUG END]]
 						X.Sysmsg(_L('Upgrade TeamMon data to latest: %s', info.szTitle))
 					end)
+				D.SubscribeEventTracking(info, 'UPDATE')
 			end)
 	end)
 end)
