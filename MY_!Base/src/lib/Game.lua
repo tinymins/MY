@@ -779,7 +779,7 @@ local function LoadCustomList()
 	end
 end
 local function SaveCustomList()
-	X.SaveLUAData(CUSTOM_PATH, BOSS_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
+	X.SaveLUAData(CUSTOM_PATH, BOSS_LIST_CUSTOM, { indent = IsDebugClient() and '\t' or nil })
 end
 local function GenerateList(bForceRefresh)
 	LoadCustomList()
@@ -903,7 +903,7 @@ local function LoadCustomList()
 	end
 end
 local function SaveCustomList()
-	X.SaveLUAData({'config/inpclist.jx3dat', X.PATH_TYPE.GLOBAL}, INPC_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
+	X.SaveLUAData({'config/inpclist.jx3dat', X.PATH_TYPE.GLOBAL}, INPC_LIST_CUSTOM, { indent = IsDebugClient() and '\t' or nil })
 end
 local function GenerateList(bForceRefresh)
 	LoadCustomList()

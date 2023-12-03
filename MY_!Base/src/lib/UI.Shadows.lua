@@ -84,6 +84,18 @@ function X.UI.GetShadowHandle(szName)
 	return sh
 end
 
+function X.UI.ClearShadowHandle(szName)
+	local frame = Station.SearchFrame(FRAME_NAME)
+	if not frame then
+		return
+	end
+	local sh = frame:Lookup('', szName)
+	if not sh then
+		return
+	end
+	sh:Clear()
+end
+
 function X.UI.SetShadowHandleParam(szName, tParam)
 	local sh = X.UI.GetShadowHandle(szName)
 	for k, v in pairs(tParam) do
