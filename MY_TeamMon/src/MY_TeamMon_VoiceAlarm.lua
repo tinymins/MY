@@ -189,7 +189,20 @@ function D.SetCurrentPacketID(szType, dwID)
 	else
 		O.dwCustomVoicePacketID = dwID
 	end
-	D.DownloadPacket(szType)
+	if dwID ~= 0 then
+		D.DownloadPacket(szType)
+			:Then(function()
+				if szType == 'OFFICIAL' and not O.bPreferOfficial then
+					X.Confirm(_L['Official voice packet download success, but your settings prefer use custom voice packet, do you want to change it?'], function()
+						O.bPreferOfficial = true
+					end)
+				elseif szType == 'CUSTOM' and O.bPreferOfficial then
+					X.Confirm(_L['Custom voice packet download success, but your settings prefer use official voice packet, do you want to change it?'], function()
+						O.bPreferOfficial = false
+					end)
+				end
+			end)
+	end
 	FireUIEvent('MY_TEAM_MON__VOICE_ALARM__CURRENT_PACKET_UPDATE', szType, dwID)
 end
 

@@ -321,6 +321,8 @@ return {
 
 	-- MY_TeamMon_VoiceAlarm.lua
 	['Current loaded data recommend voice packet %s, do you want to download and use?'] = '当前数据推荐使用语音包：%s，是否下载并启用推荐的语音包？',
+	['Official voice packet download success, but your settings prefer use custom voice packet, do you want to change it?'] = '官方语音包下载成功，但当前设置为优先使用非官方语音包，是否一键修改为优先使用官方语音包？',
+	['Custom voice packet download success, but your settings prefer use official voice packet, do you want to change it?'] = '语音包下载成功，但当前设置为优先使用官方语音包，是否一键修改为优先使用非官方语音包？',
 	['AND_COMMA'] = '、',
 
 	-- MY_TeamMon_Subscribe_VoicePacket_Official.lua --
