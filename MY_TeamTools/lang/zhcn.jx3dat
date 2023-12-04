@@ -131,6 +131,8 @@ return {
 	['Please input custom name, multiple split with ",[]":'] = '请输入自定义角色名称，多个角色名请使用半角逗号或方括号分隔：',
 	['Auto refuse %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.']
 		= '自动拒绝了 %s 的同乘请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
+	['Auto accept %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
+		'自动通过了 %s 的同乘请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
 	['Auto accept party %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
 		'自动通过了队友 %s 的同乘请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
 	['Auto accept friend %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
