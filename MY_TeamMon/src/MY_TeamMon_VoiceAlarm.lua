@@ -27,6 +27,12 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_VoiceAlarm', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bPreferOfficial=  {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 	dwOfficialVoicePacketID = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
@@ -246,6 +252,12 @@ function D.FetchSlugList()
 						szRemark = slug.remark,
 					})
 				end
+				table.sort(aSlugGroup, function(g1, g2)
+					if g1.bOfficial and not g2.bOfficial then
+						return true
+					end
+					return false
+				end)
 				D.aSlugGroup = aSlugGroup
 				D.SaveCache()
 				resolve(aSlugGroup)
@@ -255,26 +267,22 @@ function D.FetchSlugList()
 end
 
 function D.GetSlugList(szType)
-	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
+	assert(szType == 'OFFICIAL' or szType == 'CUSTOM' or X.IsNil(szType), 'Invalid type: ' .. tostring(szType))
 	local aSlugGroup = {}
 	for _, tSlugGroup in ipairs(D.aSlugGroup) do
 		if (szType == 'OFFICIAL' and tSlugGroup.bOfficial)
-		or szType == 'CUSTOM' then
+		or szType == 'CUSTOM' or X.IsNil(szType) then
 			table.insert(aSlugGroup, X.Clone(tSlugGroup))
 		end
 	end
 	return aSlugGroup
 end
 
-function D.GetSlugRemark(szType, szSlug)
-	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
+function D.GetSlugRemark(szSlug)
 	for _, tSlugGroup in ipairs(D.aSlugGroup) do
-		if (szType == 'OFFICIAL' and tSlugGroup.bOfficial)
-		or szType == 'CUSTOM' then
-			for _, v in ipairs(tSlugGroup) do
-				if v.szSlug == szSlug then
-					return v.szRemark
-				end
+		for _, v in ipairs(tSlugGroup) do
+			if v.szSlug == szSlug then
+				return v.szRemark
 			end
 		end
 	end
@@ -480,15 +488,13 @@ end
 
 function D.PlayVoice(szType, szSlug)
 	assert(szType == 'OFFICIAL' or szType == 'CUSTOM', 'Invalid type: ' .. tostring(szType))
+	-- 根据优先级获取要播放的语音条目
 	local tVoiceInfo = X.IIf(szType == 'OFFICIAL', D.tOfficialPacketInfo, D.tCustomPacketInfo)
-	if X.ENVIRONMENT.SOUND_DRIVER == 'WWISE' and tVoiceInfo and tVoiceInfo.szName ~= '' then
-		PlaySound(SOUND.UI_SOUND, 'UserPluginAudio_Interface' .. tVoiceInfo.szName .. '_' .. szSlug)
-		return
-	end
 	local tVoiceCache = X.IIf(szType == 'OFFICIAL', D.tOfficialVoiceCache, D.tCustomVoiceCache)
 	local dwPacketID = szType == 'OFFICIAL' and O.dwOfficialVoicePacketID or O.dwCustomVoicePacketID
 	local voice = tVoiceCache and tVoiceCache[szSlug]
 	if not voice or dwPacketID == 0 then
+		tVoiceInfo = X.IIf(szType ~= 'OFFICIAL', D.tOfficialPacketInfo, D.tCustomPacketInfo)
 		tVoiceCache = X.IIf(szType ~= 'OFFICIAL', D.tOfficialVoiceCache, D.tCustomVoiceCache)
 		dwPacketID = szType ~= 'OFFICIAL' and O.dwOfficialVoicePacketID or O.dwCustomVoicePacketID
 		voice = tVoiceCache and tVoiceCache[szSlug]
@@ -499,6 +505,12 @@ function D.PlayVoice(szType, szSlug)
 			return
 		end
 	end
+	-- WWISE 引擎下官方语音走 WWISE 事件播放
+	if X.ENVIRONMENT.SOUND_DRIVER == 'WWISE' and tVoiceInfo == D.tOfficialPacketInfo and tVoiceInfo and tVoiceInfo.szName ~= '' then
+		PlaySound(SOUND.UI_SOUND, 'UserPluginAudio_Interface' .. tVoiceInfo.szName .. '_' .. szSlug)
+		return
+	end
+	-- 其他情况走普通播放
 	local szPath = MY_TEAM_MON_VA_VOICE_ROOT .. dwPacketID .. '/' .. voice.dwID .. '.ogg'
 	local dwCRC = GetFileCRC(szPath)
 	if dwCRC ~= voice.dwCRC then
@@ -620,6 +632,7 @@ local settings = {
 		{
 			fields = {
 				'bEnable',
+				'bPreferOfficial',
 			},
 			root = O,
 		},
@@ -628,6 +641,7 @@ local settings = {
 		{
 			fields = {
 				'bEnable',
+				'bPreferOfficial',
 			},
 			triggers = {
 				bEnable = D.CheckEnable,
@@ -650,7 +664,7 @@ X.RegisterInit('MY_TeamMon_VoiceAlarm', function()
 end)
 
 X.RegisterEvent('MY_TEAM_MON__VOICE_ALARM', 'MY_TeamMon_VoiceAlarm', function()
-	D.PlayVoice(arg0 and 'OFFICIAL' or 'CUSTOM', arg1)
+	D.PlayVoice(O.bPreferOfficial and 'OFFICIAL' or 'CUSTOM', arg0)
 end)
 
 D.LoadCache()

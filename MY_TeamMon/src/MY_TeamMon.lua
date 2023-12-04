@@ -333,18 +333,14 @@ local function ParseCountdown(szCountdown)
 			if #aParams >= 2 then
 				local nTime = tonumber(aParams[1])
 				local szContent = aParams[2]
-				local szVoice, bVoiceOfficial
+				local szVoice
 				local szParam, bUnknownParam, bParamRecognized
 				for i = 3, #aParams do
 					szParam = aParams[i]
 					bParamRecognized = false
 					if not szVoice and not bParamRecognized then
-						if szParam:sub(1, 3) == 'VO:' then
-							bVoiceOfficial = true
-							szVoice = szParam:sub(4)
-							bParamRecognized = true
-						elseif szParam:sub(1, 3) == 'VC:' then
-							bVoiceOfficial = false
+						if szParam:sub(1, 3) == 'VO:'
+						or szParam:sub(1, 3) == 'VC:' then
 							szVoice = szParam:sub(4)
 							bParamRecognized = true
 						end
@@ -358,7 +354,6 @@ local function ParseCountdown(szCountdown)
 						nTime = nTime,
 						szContent = szContent,
 						szVoice = szVoice,
-						bVoiceOfficial = bVoiceOfficial,
 					})
 					bPartError = false
 				end
@@ -397,18 +392,14 @@ local function ParseHPCountdown(szString)
 				end
 				local szContent = aParams[2]
 				local nTime
-				local szVoice, bVoiceOfficial
+				local szVoice
 				local szParam, bUnknownParam, bParamRecognized
 				for i = 3, #aParams do
 					szParam = aParams[i]
 					bParamRecognized = false
 					if not szVoice and not bParamRecognized then
-						if szParam:sub(1, 3) == 'VO:' then
-							bVoiceOfficial = true
-							szVoice = szParam:sub(4)
-							bParamRecognized = true
-						elseif szParam:sub(1, 3) == 'VC:' then
-							bVoiceOfficial = false
+						if szParam:sub(1, 3) == 'VO:'
+						or szParam:sub(1, 3) == 'VC:' then
 							szVoice = szParam:sub(4)
 							bParamRecognized = true
 						end
@@ -430,7 +421,6 @@ local function ParseHPCountdown(szString)
 						szContent = szContent,
 						nTime = nTime,
 						szVoice = szVoice,
-						bVoiceOfficial = bVoiceOfficial,
 					})
 					bPartError = false
 				end
@@ -1070,7 +1060,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 			end
 			-- 语音报警
 			if O.bPushVoiceAlarm and cfg.szVoice and (not cfg.bVoiceSelfOnly or dwOwner == MY_TEAM_MON_CORE_PLAYERID) then
-				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bVoiceOfficial, cfg.szVoice)
+				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.szVoice)
 			end
 
 			-- 获得处理
@@ -1241,7 +1231,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			end
 			-- 语音报警
 			if O.bPushVoiceAlarm and cfg.szVoice then
-				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bVoiceOfficial, cfg.szVoice)
+				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.szVoice)
 			end
 			-- 头顶报警
 			if O.bPushScreenHead and cfg.bScreenHead then
@@ -1399,7 +1389,7 @@ function D.OnNpcEvent(npc, bEnter)
 			end
 			-- 语音报警
 			if O.bPushVoiceAlarm and cfg.szVoice then
-				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bVoiceOfficial, cfg.szVoice)
+				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.szVoice)
 			end
 
 			if O.bPushTeamChannel and cfg.bTeamChannel then
@@ -1546,7 +1536,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 			end
 			-- 语音报警
 			if O.bPushVoiceAlarm and cfg.szVoice then
-				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bVoiceOfficial, cfg.szVoice)
+				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.szVoice)
 			end
 
 			if O.bPushTeamChannel and cfg.bTeamChannel then
@@ -1733,7 +1723,7 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 			end
 			-- 语音报警
 			if O.bPushVoiceAlarm and cfg.szVoice then
-				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.bVoiceOfficial, cfg.szVoice)
+				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.szVoice)
 			end
 			if O.bPushFullScreen and cfg.bFullScreen then
 				if not dwReceiverID or dwReceiverID == me.dwID then
@@ -1838,7 +1828,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 							D.Talk('RAID', szText)
 						end
 						if O.bPushVoiceAlarm and tHpCd.szVoice then
-							FireUIEvent('MY_TEAM_MON__VOICE_ALARM', tHpCd.bVoiceOfficial, tHpCd.szVoice)
+							FireUIEvent('MY_TEAM_MON__VOICE_ALARM', tHpCd.szVoice)
 						end
 						if tHpCd.nTime then
 							local nType, szKey = v.nClass, v.key

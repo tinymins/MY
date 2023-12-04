@@ -1674,97 +1674,81 @@ function D.OpenSettingPanel(data, szType)
 			})
 			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 		end
-		table.insert(menu, {
+
+		local menuVoice = {}
+		local function UpdateVoiceSelection()
+			local szVoice = nil
+			if data[nClass] then
+				szVoice = data[nClass].szVoice
+			end
+			for _, m1 in ipairs(menuVoice) do
+				if m1.szOption then
+					m1.rgb = nil
+					for _, m2 in ipairs(m1) do
+						if m2.bCheck then
+							if m2.UserData == szVoice then
+								m2.bChecked = true
+								m1.rgb = { 255, 255, 0 }
+							else
+								m2.bChecked = false
+							end
+						end
+					end
+					if m1.bCheck then
+						m1.bChecked = m1.UserData == szVoice
+					end
+				end
+			end
+		end
+
+		table.insert(menuVoice, {
 			szOption = _L['No voice'],
 			bCheck = true,
 			bMCheck = true,
 			bChecked = not data[nClass] or not data[nClass].szVoice,
 			fnAction = function(_, bCheck)
 				if data[nClass] then
-					data[nClass].bVoiceOfficial = nil
 					data[nClass].szVoice = nil
+					UpdateVoiceSelection()
 				end
 			end,
+			UserData = nil,
 		})
-		-- local m1 = { szOption = _L['Official voice'] }
-		local m1 = menu
-		for _, tGroup in ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('OFFICIAL')) do
-			local m2 = { szOption = tGroup.szGroupName }
+
+		table.insert(menuVoice, X.CONSTANT.MENU_DIVIDER)
+		local bOfficial = true
+		for _, tGroup in ipairs(MY_TeamMon_VoiceAlarm.GetSlugList()) do
+			local m1 = { szOption = tGroup.szGroupName }
 			for _, tSlug in ipairs(tGroup) do
-				local bChecked = data[nClass] and data[nClass].bVoiceOfficial and data[nClass].szVoice == tSlug.szSlug
+				local bChecked = data[nClass] and data[nClass].szVoice == tSlug.szSlug
 				if bChecked then
+					menu.rgb = { 255, 255, 0 }
 					m1.rgb = { 255, 255, 0 }
-					m2.rgb = { 255, 255, 0 }
 				end
-				table.insert(m2, {
+				table.insert(m1, {
 					szOption = tSlug.szRemark,
 					bCheck = true,
 					bMCheck = true,
 					bChecked = bChecked,
 					fnAction = function(_, bCheck)
-						for _, v in ipairs(menu) do
-							for _, vv in ipairs(v) do
-								for _, vvv in ipairs(vv) do
-									vvv.bChecked = v.szOption == m1.szOption and vv.szOption == m2.szOption and vvv.szOption == tSlug.szRemark
-								end
-							end
-							if v.szOption then
-								v.rgb = v.szOption == m1.szOption and { 255, 255, 0 } or nil
-							end
-						end
-						for _, v in ipairs(m1) do
-							if v.szOption then
-								v.rgb = v.szOption == m2.szOption and { 255, 255, 0 } or nil
-							end
-						end
 						data[nClass] = data[nClass] or {}
-						data[nClass].bVoiceOfficial = true
 						data[nClass].szVoice = tSlug.szSlug
+						UpdateVoiceSelection()
 					end,
+					UserData = tSlug.szSlug,
 				})
 			end
-			table.insert(m1, m2)
+			if bOfficial and not tGroup.bOfficial then
+				table.insert(menuVoice, X.CONSTANT.MENU_DIVIDER)
+				bOfficial = false
+			end
+			table.insert(menuVoice, m1)
 		end
-		-- table.insert(menu, m1)
-		-- local m1 = { szOption = _L['Custom voice'] }
-		-- for _, tGroup in ipairs(MY_TeamMon_VoiceAlarm.GetSlugList('CUSTOM')) do
-		-- 	local m2 = { szOption = tGroup.szGroupName }
-		-- 	for _, tSlug in ipairs(tGroup) do
-		-- 		local bChecked = data[nClass] and not data[nClass].bVoiceOfficial and data[nClass].szVoice == tSlug.szSlug
-		-- 		if bChecked then
-		-- 			m1.rgb = { 255, 255, 0 }
-		-- 			m2.rgb = { 255, 255, 0 }
-		-- 		end
-		-- 		table.insert(m2, {
-		-- 			szOption = tSlug.szRemark,
-		-- 			bCheck = true,
-		-- 			bMCheck = true,
-		-- 			bChecked = bChecked,
-		-- 			fnAction = function(_, bCheck)
-		-- 				for _, v in ipairs(menu) do
-		-- 					for _, vv in ipairs(v) do
-		-- 						for _, vvv in ipairs(vv) do
-		-- 							vvv.bChecked = v.szOption == m1.szOption and vv.szOption == m2.szOption and vvv.szOption == tSlug.szRemark
-		-- 						end
-		-- 					end
-		-- 					if v.szOption then
-		-- 						v.rgb = v.szOption == m1.szOption and { 255, 255, 0 } or nil
-		-- 					end
-		-- 				end
-		-- 				for _, v in ipairs(m1) do
-		-- 					if v.szOption then
-		-- 						v.rgb = v.szOption == m2.szOption and { 255, 255, 0 } or nil
-		-- 					end
-		-- 				end
-		-- 				data[nClass] = data[nClass] or {}
-		-- 				data[nClass].bVoiceOfficial = false
-		-- 				data[nClass].szVoice = tSlug.szSlug
-		-- 			end,
-		-- 		})
-		-- 	end
-		-- 	table.insert(m1, m2)
-		-- end
-		-- table.insert(menu, m1)
+		UpdateVoiceSelection()
+
+		for _, m in ipairs(menuVoice) do
+			table.insert(menu, m)
+		end
 		return menu
 	end
 	local function SetDataClass(nClass, key, value)
@@ -2993,9 +2977,8 @@ function D.OpenSettingPanel(data, szType)
 										.. (
 											vv.szVoice
 											and (
-												' - ['
-												.. (vv.bVoiceOfficial and _L['Official voice'] or _L['Custom voice']) .. ']'
-												.. (MY_TeamMon_VoiceAlarm.GetSlugRemark(vv.bVoiceOfficial and 'OFFICIAL' or 'CUSTOM',vv.szVoice) or _L['Unknown voice'])
+												' - [' .. _L['Voice'] .. ']'
+												.. (MY_TeamMon_VoiceAlarm.GetSlugRemark(vv.szVoice) or _L['Unknown voice'])
 												.. '(' .. vv.szVoice .. ')'
 											)
 											or ''
@@ -3029,7 +3012,7 @@ function D.OpenSettingPanel(data, szType)
 						table.insert(aText, '\n\n')
 						table.insert(aText, _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'])
 						table.insert(aText, '\n\n')
-						table.insert(aText, _L['Notice: spell timer starts with VO: means play official voice while this part active, starts with VC: means play custom voice while this part active.'])
+						table.insert(aText, _L['Notice: spell timer starts with VO: means play voice while this part active.'])
 						return table.concat(aText)
 					end,
 					position = X.UI.TIP_POSITION.RIGHT_LEFT,

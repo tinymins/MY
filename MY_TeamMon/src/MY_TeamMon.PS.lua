@@ -155,14 +155,23 @@ function PS.OnPanelActive(wnd)
 	nX = nPaddingX
 	nY = nY + uiContainer:Height()
 
-	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Etc function enable'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndCheckBox', {
-		x = nPaddingX + 10, y = nY, text = _L['Show voice recommendation confirm on load data'],
+	nX, nY = ui:Append('Text', { x = nX, y = nY + 5, w = 'auto', text = _L['Voice alarm function'], font = 27 }):Pos('BOTTOMRIGHT')
+	nX = nPaddingX + 10
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Show voice recommendation confirm on load data'],
 		checked = MY_TeamMon.bShowVoicePacketRecommendation,
 		onCheck = function(bCheck)
 			MY_TeamMon.bShowVoicePacketRecommendation = bCheck
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	}):Width() + 5
+	nX, nY = ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto', text = _L['Prefer use official voice'],
+		checked = MY_TeamMon_VoiceAlarm.bPreferOfficial,
+		onCheck = function(bCheck)
+			MY_TeamMon_VoiceAlarm.bPreferOfficial = bCheck
+		end,
+	}):Pos('BOTTOMRIGHT')
 
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndCheckBox', {
