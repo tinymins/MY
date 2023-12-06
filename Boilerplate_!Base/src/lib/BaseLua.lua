@@ -781,6 +781,7 @@ X.Promise = X.Class('Promise', {
 	end,
 
 	__PROCESS_TASK__ = function(self)
+		local task = self.task
 		local function onResolve(res)
 			if self.status ~= 'PENDING' then
 				return
@@ -797,7 +798,12 @@ X.Promise = X.Class('Promise', {
 			self.error = error
 			self:__PROCESS_CHAIN__()
 		end
-		self.task(onResolve, onReject)
+		self.task = nil
+		if X.IsTable(task) and tostring(task) == 'Promise (class instance)' then
+			task:Then(onResolve):Catch(onReject)
+		else
+			task(onResolve, onReject)
+		end
 	end,
 
 	__PROCESS_CHAIN__ = function(self)
@@ -823,7 +829,12 @@ X.Promise = X.Class('Promise', {
 				local bSuccess = res[1]
 				if bSuccess then
 					local szStatus, vData = res[2], res[3]
-					if szStatus == 'RESOLVED' then
+					if X.IsTable(szStatus) and tostring(szStatus) == 'Promise (class instance)' then
+						self.task = szStatus
+						self.status = 'PENDING'
+						self:__PROCESS_TASK__()
+						break
+					elseif szStatus == 'RESOLVED' then
 						self.result = vData
 						self.status = 'RESOLVED'
 					elseif szStatus == 'REJECTED' then
