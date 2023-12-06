@@ -288,7 +288,6 @@ function D.FormatMetaInfo(res)
 	local info = {
 		szURL = szURL,
 		szDataURL = D.GetAttachRawURL(res.szDataURL or res.data_url or './data.jx3dat', szURL),
-		bPlain = res.bPlain or res.is_raw == 0 or false,
 		szKey = D.GetShortURL(szURL) or ('H' .. GetStringCRC(szURL)),
 		szAuthor = res.szAuthor or res.author or '',
 		szTitle = res.szTitle or res.name or '',
@@ -448,7 +447,14 @@ function D.Subscribe(info, bSilent)
 			--[[#DEBUG END]]
 			DATA_DOWNLOADING[info.szKey] = true
 			FireUIEvent('MY_TEAM_MON__SUBSCRIBE_DATA__DOWNLOAD_UPDATE')
-			X.FetchLUAData(info.szDataURL, info.bPlain and PLAIN_LUA_CONFIG or LUA_CONFIG)
+			X.FetchLUAFile(info.szDataURL)
+				:Then(function(szPath)
+					return X.Promise:new(function(resolve, reject)
+						local data = X.LoadLUAData(szPath, LUA_CONFIG)
+							or X.LoadLUAData(szPath, PLAIN_LUA_CONFIG)
+						resolve(data)
+					end)
+				end)
 				:Then(function(data)
 					DATA_DOWNLOADING[info.szKey] = nil
 					FireUIEvent('MY_TEAM_MON__SUBSCRIBE_DATA__DOWNLOAD_UPDATE')
