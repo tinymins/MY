@@ -593,8 +593,20 @@ end)
 end
 
 function X.FetchLUAFile(szURL)
+	if CURL_DownloadFile then
+		return X.Promise:new(function(resolve, reject)
+			local szRoot = X.FormatPath({'temporary/downloader/', X.PATH_TYPE.GLOBAL})
+			local szPath = szRoot .. 'fetch_lua_file_' .. GetStringCRC(szURL) .. '_' .. GetTime() .. '.jx3dat'
+			CPath.MakeDir(szRoot)
+			X.DownloadFile(szURL, szPath)
+				:Then(function()
+					resolve(szPath)
+				end)
+				:Catch(reject)
+		end)
+	end
 	return X.Promise:new(function(resolve, reject)
-		local downloader = X.UI.GetTempElement('Image', X.NSFormatString('{$NS}Lib__DownloadLUAFile-') .. GetStringCRC(szURL) .. '#' .. GetTime())
+		local downloader = X.UI.GetTempElement('Image', X.NSFormatString('{$NS}Lib__FetchLUAFile-') .. GetStringCRC(szURL) .. '#' .. GetTime())
 		downloader.FromTextureFile = function(_, szPath)
 			resolve(szPath)
 		end
