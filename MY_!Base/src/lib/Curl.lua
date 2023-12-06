@@ -592,19 +592,41 @@ RegisterEvent('CURL_DOWNLOAD_RESULT', function()
 end)
 end
 
-function X.FetchLUAData(szURL, tOptions)
+function X.FetchLUAFile(szURL)
+	if CURL_DownloadFile then
+		return X.Promise:new(function(resolve, reject)
+			local szRoot = X.FormatPath({'temporary/downloader/', X.PATH_TYPE.GLOBAL})
+			local szPath = szRoot .. 'fetch_lua_file_' .. GetStringCRC(szURL) .. '_' .. GetTime() .. '.jx3dat'
+			CPath.MakeDir(szRoot)
+			X.DownloadFile(szURL, szPath)
+				:Then(function()
+					resolve(szPath)
+				end)
+				:Catch(reject)
+		end)
+	end
 	return X.Promise:new(function(resolve, reject)
-		local downloader = X.UI.GetTempElement('Image', X.NSFormatString('{$NS}Lib__DownloadLUAData-') .. GetStringCRC(szURL) .. '#' .. GetTime())
+		local downloader = X.UI.GetTempElement('Image', X.NSFormatString('{$NS}Lib__FetchLUAFile-') .. GetStringCRC(szURL) .. '#' .. GetTime())
 		downloader.FromTextureFile = function(_, szPath)
-			local data = X.LoadLUAData(szPath, tOptions)
-			resolve(data)
+			resolve(szPath)
 		end
 		downloader:FromRemoteFile(szURL, false, function(image, szImageURL, szAbsPath, bSuccess)
 			if not bSuccess then
-				reject(X.Error:new('FetchLUAData failed.'))
+				reject(X.Error:new('FetchLUAFile failed.'))
 			end
 			downloader:GetParent():RemoveItem(downloader)
 		end)
+	end)
+end
+
+function X.FetchLUAData(szURL, tOptions)
+	return X.Promise:new(function(resolve, reject)
+		X.FetchLUAFile(szURL)
+			:Then(function(szPath)
+				local data = X.LoadLUAData(szPath, tOptions)
+				resolve(data)
+			end)
+			:Catch(reject)
 	end)
 end
 
