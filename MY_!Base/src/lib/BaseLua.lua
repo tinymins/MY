@@ -743,27 +743,14 @@ X.Promise = X.Class('Promise', {
 
 	-- 构造函数
 	constructor = function(self, task, ...)
+		-- 实例成员变量
 		self.ctor = function() end
+		self.task = task
 		self.chains = {}
 		self.status = 'PENDING'
-		local function onResolve(res)
-			if self.status ~= 'PENDING' then
-				return
-			end
-			self.status = 'RESOLVED'
-			self.result = res
-			self:__PROCESS__()
-		end
-		local function onReject(error)
-			if self.status ~= 'PENDING' then
-				return
-			end
-			self.status = 'REJECTED'
-			self.error = error
-			self:__PROCESS__()
-		end
+		-- 事务触发器
 		local function fnAction()
-			task(onResolve, onReject)
+			self:__PROCESS_TASK__()
 		end
 		if X.DelayCall then
 			X.DelayCall(1, fnAction)
@@ -780,7 +767,7 @@ X.Promise = X.Class('Promise', {
 			type = 'then',
 			handler = onResolve,
 		})
-		self:__PROCESS__()
+		self:__PROCESS_CHAIN__()
 		return self
 	end,
 
@@ -789,11 +776,37 @@ X.Promise = X.Class('Promise', {
 			type = 'catch',
 			handler = onReject,
 		})
-		self:__PROCESS__()
+		self:__PROCESS_CHAIN__()
 		return self
 	end,
 
-	__PROCESS__ = function(self)
+	__PROCESS_TASK__ = function(self)
+		local task = self.task
+		local function onResolve(res)
+			if self.status ~= 'PENDING' then
+				return
+			end
+			self.status = 'RESOLVED'
+			self.result = res
+			self:__PROCESS_CHAIN__()
+		end
+		local function onReject(error)
+			if self.status ~= 'PENDING' then
+				return
+			end
+			self.status = 'REJECTED'
+			self.error = error
+			self:__PROCESS_CHAIN__()
+		end
+		self.task = nil
+		if X.IsTable(task) and tostring(task) == 'Promise (class instance)' then
+			task:Then(onResolve):Catch(onReject)
+		else
+			task(onResolve, onReject)
+		end
+	end,
+
+	__PROCESS_CHAIN__ = function(self)
 		if self.status == 'PENDING' then
 			return
 		end
@@ -816,7 +829,12 @@ X.Promise = X.Class('Promise', {
 				local bSuccess = res[1]
 				if bSuccess then
 					local szStatus, vData = res[2], res[3]
-					if szStatus == 'RESOLVED' then
+					if X.IsTable(szStatus) and tostring(szStatus) == 'Promise (class instance)' then
+						self.task = szStatus
+						self.status = 'PENDING'
+						self:__PROCESS_TASK__()
+						break
+					elseif szStatus == 'RESOLVED' then
 						self.result = vData
 						self.status = 'RESOLVED'
 					elseif szStatus == 'REJECTED' then
