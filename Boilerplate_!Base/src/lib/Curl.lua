@@ -592,19 +592,29 @@ RegisterEvent('CURL_DOWNLOAD_RESULT', function()
 end)
 end
 
-function X.FetchLUAData(szURL, tOptions)
+function X.FetchLUAFile(szURL)
 	return X.Promise:new(function(resolve, reject)
-		local downloader = X.UI.GetTempElement('Image', X.NSFormatString('{$NS}Lib__DownloadLUAData-') .. GetStringCRC(szURL) .. '#' .. GetTime())
+		local downloader = X.UI.GetTempElement('Image', X.NSFormatString('{$NS}Lib__DownloadLUAFile-') .. GetStringCRC(szURL) .. '#' .. GetTime())
 		downloader.FromTextureFile = function(_, szPath)
-			local data = X.LoadLUAData(szPath, tOptions)
-			resolve(data)
+			resolve(szPath)
 		end
 		downloader:FromRemoteFile(szURL, false, function(image, szImageURL, szAbsPath, bSuccess)
 			if not bSuccess then
-				reject(X.Error:new('FetchLUAData failed.'))
+				reject(X.Error:new('FetchLUAFile failed.'))
 			end
 			downloader:GetParent():RemoveItem(downloader)
 		end)
+	end)
+end
+
+function X.FetchLUAData(szURL, tOptions)
+	return X.Promise:new(function(resolve, reject)
+		X.FetchLUAFile(szURL)
+			:Then(function(szPath)
+				local data = X.LoadLUAData(szPath, tOptions)
+				resolve(data)
+			end)
+			:Catch(reject)
 	end)
 end
 
