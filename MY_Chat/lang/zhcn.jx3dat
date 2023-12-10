@@ -110,7 +110,6 @@ return {
     ['Channels'] = '频道设置',
     ['Enable'] = '启用',
     ['Team building'] = '团队招募',
-    ['Due to system limit, team building filter only work in plain mode, and ignores all logics below'] = '由于游戏接口限制，团队招募屏蔽仅支持搜索结果纯文本过滤，且下方所有忽略配置项都无法在招募屏蔽中生效。',
     ['Edit'] = '编辑',
     ['Please input keyword:'] = '请输入关键字：',
     ['Add'] = '添加',

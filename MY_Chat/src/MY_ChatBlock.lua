@@ -142,7 +142,11 @@ function D.TeamBuildingGetText(res, edit)
 	if D.bReady and D.aBlockWords then
 		local szFilter = ''
 		for _, bw in ipairs(D.aBlockWords) do
-			if bw.bTeamBuilding then
+			if bw.bTeamBuilding
+			and not X.StringFindW(bw.szKeyword, ',')
+			and not X.StringFindW(bw.szKeyword, ';')
+			and not X.StringFindW(bw.szKeyword, '|')
+			and not X.StringFindW(bw.szKeyword, '!') then
 				if szFilter ~= '' then
 					szFilter = szFilter .. ','
 				end
@@ -165,11 +169,36 @@ end
 
 function D.OnTeamBuildingCreate(frame)
 	local edit = frame:Lookup('PageSet_TeamBuild/Page_TeamFinding/Edit_TeamFind')
-	if not edit then
+	local hList = frame:Lookup('PageSet_TeamBuild/Page_TeamFinding/WndScroll_TeamInfo', '')
+	if not edit or not hList then
 		return
 	end
 	edit:SetLimit(-1)
 	HookTableFunc(edit, 'GetText', D.TeamBuildingGetText, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+	HookTableFunc(hList, 'FormatAllItemPos', D.ApplyTeamBuildingFilters, { bAfterOrigin = false })
+end
+
+function D.ApplyTeamBuildingFilters()
+	if not D.bReady or not D.aBlockWords then
+		return
+	end
+	local hList = Station.Lookup('Normal/TeamBuilding/PageSet_TeamBuild/Page_TeamFinding/WndScroll_TeamInfo', '')
+	if hList then
+		for i = 0, hList:GetItemCount() - 1 do
+			local hItem = hList:Lookup(i)
+			local szText = hItem:Lookup('Text_Desc'):GetText()
+			local bVisible = true
+			for _, bw in ipairs(D.aBlockWords) do
+				if bw.bTeamBuilding
+				and X.StringSimpleMatch(szText, bw.szKeyword, not bw.bIgnoreCase, not bw.bIgnoreEnEm, bw.bIgnoreSpace) then
+					bVisible = false
+					break
+				end
+			end
+			hItem:SetVisible(bVisible)
+		end
+		hList:SetIgnoreInvisibleChild(true)
+	end
 end
 
 -- Global exports
@@ -325,15 +354,6 @@ function PS.OnPanelActive(wnd)
 		table.insert(menu, {
 			szOption = _L['Team building'],
 			bCheck = true, bChecked = data.bTeamBuilding,
-			fnMouseEnter = function()
-				local nX, nY = this:GetAbsX(), this:GetAbsY()
-				local nW, nH = this:GetW(), this:GetH()
-				local szText = GetFormatText(_L['Due to system limit, team building filter only work in plain mode, and ignores all logics below'], nil, 255, 255, 0)
-				OutputTip(szText, 400, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
-			end,
-			fnMouseLeave = function()
-				HideTip()
-			end,
 			fnAction = function()
 				data.bTeamBuilding = not data.bTeamBuilding
 				SaveBlockWords()
