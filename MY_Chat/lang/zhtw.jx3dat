@@ -109,6 +109,8 @@ return {
 
     ['Channels'] = '頻道設置',
     ['Enable'] = '啟用',
+    ['Team building'] = '團隊招募',
+    ['Due to system limit, team building filter only work in plain mode, and ignores all logics below'] = '由於游戲介面限制，團隊招募屏蔽僅支持搜索結果純文本過濾，且下方所有忽略配置項都無法在招募屏蔽中生效。',
     ['Edit'] = '編輯',
     ['Please input keyword:'] = '請輸入關鍵字：',
     ['Add'] = '添加',

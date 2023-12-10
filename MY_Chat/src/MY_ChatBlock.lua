@@ -64,6 +64,7 @@ local O = X.CreateUserSettingsModule('MY_ChatBlock', _L['Chat'], {
 			uuid = X.Schema.Optional(X.Schema.String),
 			szKeyword = X.Schema.String,
 			tMsgType = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
+			bTeamBuilding = X.Schema.Optional(X.Schema.Boolean),
 			bIgnoreAcquaintance = X.Schema.Boolean,
 			bIgnoreCase = X.Schema.Boolean,
 			bIgnoreEnEm = X.Schema.Boolean,
@@ -136,6 +137,41 @@ function D.CheckEnable()
 	end
 end
 
+function D.TeamBuildingGetText(res, edit)
+	local szText = res[1]
+	if D.bReady and D.aBlockWords then
+		local szFilter = ''
+		for _, bw in ipairs(D.aBlockWords) do
+			if bw.bTeamBuilding then
+				if szFilter ~= '' then
+					szFilter = szFilter .. ','
+				end
+				szFilter = szFilter .. '!' .. bw.szKeyword
+			end
+		end
+		if szFilter ~= '' then
+			local aText = X.SplitString(szText, ';')
+			for i, v in ipairs(aText) do
+				if v ~= '' then
+					v = v .. ','
+				end
+				aText[i] = v .. szFilter
+			end
+			szText = table.concat(aText, ';')
+		end
+	end
+	return szText
+end
+
+function D.OnTeamBuildingCreate(frame)
+	local edit = frame:Lookup('PageSet_TeamBuild/Page_TeamFinding/Edit_TeamFind')
+	if not edit then
+		return
+	end
+	edit:SetLimit(-1)
+	HookTableFunc(edit, 'GetText', D.TeamBuildingGetText, { bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+end
+
 -- Global exports
 do
 local settings = {
@@ -164,6 +200,9 @@ end)
 X.RegisterUserSettingsRelease('MY_ChatBlock', function()
 	D.bReady = false
 	D.CheckEnable()
+end)
+X.RegisterFrameCreate('TeamBuilding', 'MY_ChatBlock', function(name, frame)
+	D.OnTeamBuildingCreate(frame)
 end)
 
 --------------------------------------------------------------------------------
@@ -281,6 +320,23 @@ function PS.OnPanelActive(wnd)
 						SaveBlockWords()
 					end
 				end, nil, nil, nil, data.szKeyword)
+			end,
+		})
+		table.insert(menu, {
+			szOption = _L['Team building'],
+			bCheck = true, bChecked = data.bTeamBuilding,
+			fnMouseEnter = function()
+				local nX, nY = this:GetAbsX(), this:GetAbsY()
+				local nW, nH = this:GetW(), this:GetH()
+				local szText = GetFormatText(_L['Due to system limit, team building filter only work in plain mode, and ignores all logics below'], nil, 255, 255, 0)
+				OutputTip(szText, 400, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
+			end,
+			fnMouseLeave = function()
+				HideTip()
+			end,
+			fnAction = function()
+				data.bTeamBuilding = not data.bTeamBuilding
+				SaveBlockWords()
 			end,
 		})
 		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
