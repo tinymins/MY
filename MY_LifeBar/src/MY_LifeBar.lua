@@ -792,6 +792,9 @@ X.RegisterEvent('PLAYER_LEAVE_SCENE',function()
 end)
 
 local function PrioritySorter(a, b)
+	if a.nPriority == b.nPriority then
+		return false
+	end
 	if not b.nPriority then
 		return true
 	end
