@@ -28,7 +28,9 @@ local BUFF_TIME = {} -- BUFF最长持续时间
 local SKILL_EXTRA = {} -- 缓存自己放过的技能用于扫描
 local SKILL_CACHE = {} -- 下标为目标ID的目标技能缓存数组 反正ID不可能是doodad不会冲突
 local SKILL_INFO = {} -- 技能反向索引
-local VIEW_LIST = {}
+local SHIELDED
+local CONFIG_CACHE
+local VIEW_LIST_CACHE = {}
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 local MY_TARGET_MON_MAP_TYPE = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE
 
@@ -93,9 +95,8 @@ local function FilterMonitors(aMonitor, dwMapID, dwKungfuID)
 	end
 	return ret
 end
-local CACHE_CONFIG
 function D.GetDatasetList()
-	if not CACHE_CONFIG then
+	if not CONFIG_CACHE then
 		local me = X.GetClientPlayer()
 		if not me then
 			return {}
@@ -111,21 +112,10 @@ function D.GetDatasetList()
 				{ __index = dataset }
 			)
 		end
-		CACHE_CONFIG = aConfig
+		CONFIG_CACHE = aConfig
 	end
-	return CACHE_CONFIG
+	return CONFIG_CACHE
 end
-
-local function onTargetMonReload()
-	VIEW_LIST = {}
-	CACHE_CONFIG = nil
-	D.OnTargetMonReload()
-end
-X.RegisterKungfuMount('MY_TargetMonData', onTargetMonReload)
-X.RegisterEvent('LOADING_ENDING', 'MY_TargetMonData', onTargetMonReload)
-X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD', 'MY_TargetMonData', onTargetMonReload)
-X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)
-X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
 end
 
 do
@@ -184,25 +174,11 @@ function D.FireDataUpdateEvent()
 end
 end
 
-do
-local SHIELDED
 function D.IsShielded()
 	if SHIELDED == nil then
 		SHIELDED = X.IsRestricted('MY_TargetMon.MapRestriction') and X.IsInArenaMap()
 	end
 	return SHIELDED
-end
-
-local function onShieldedReset()
-	SHIELDED = nil
-end
-X.RegisterEvent('MY_RESTRICTION', 'MY_TargetMonData_Shield', function()
-	if arg0 and arg0 ~= 'MY_TargetMon.MapRestriction' then
-		return
-	end
-	onShieldedReset()
-end)
-X.RegisterEvent('LOADING_END', 'MY_TargetMonData_Shield', onShieldedReset)
 end
 
 do
@@ -242,7 +218,7 @@ local function OnSysMsg(event)
 		OnSkill(arg5, arg6)
 	end
 end
-X.RegisterEvent('SYS_MSG', 'MY_TargetMon_SKILL', OnSysMsg)
+X.RegisterEvent('SYS_MSG', 'MY_TargetMonData__SKILL', OnSysMsg)
 end
 
 -- 更新BUFF数据 更新监控条
@@ -464,7 +440,7 @@ local UpdateView
 do
 local fUIScale, fFontScaleBase
 function UpdateView()
-	local nViewIndex, nViewCount = 1, #VIEW_LIST
+	local nViewIndex, nViewCount = 1, #VIEW_LIST_CACHE
 	for _, dataset in ipairs(D.GetDatasetList()) do
 		local dwTarType, dwTarID = D.GetTarget(dataset.szTarget, dataset.szType)
 		local KObject = X.GetObject(dwTarType, dwTarID)
@@ -474,10 +450,10 @@ function UpdateView()
 				or 'npc'
 			)
 			or 0
-		local view = VIEW_LIST[nViewIndex]
+		local view = VIEW_LIST_CACHE[nViewIndex]
 		if not view then
 			view = {}
-			VIEW_LIST[nViewIndex] = view
+			VIEW_LIST_CACHE[nViewIndex] = view
 		end
 		fUIScale = (dataset.bIgnoreSystemUIScale and 1 or Station.GetUIScale()) * dataset.fScale
 		fFontScaleBase = fUIScale * X.GetFontScale() * dataset.fScale
@@ -617,7 +593,7 @@ function UpdateView()
 		nViewIndex = nViewIndex + 1
 	end
 	for i = nViewIndex, nViewCount do
-		VIEW_LIST[i] = nil
+		VIEW_LIST_CACHE[i] = nil
 	end
 	D.FireDataUpdateEvent()
 end
@@ -748,15 +724,15 @@ end
 function D.OnTargetMonReload()
 	OnFrameCall()
 	FireUIEvent('MY_TARGET_MON_DATA__INIT')
-	X.FrameCall('MY_TargetMonData', 2, OnFrameCall)
+	X.FrameCall('MY_TargetMonData', MY_TargetMonConfig.nInterval, OnFrameCall)
 end
 end
 
 function D.GetViewData(nIndex)
 	if nIndex then
-		return VIEW_LIST[nIndex]
+		return VIEW_LIST_CACHE[nIndex]
 	end
-	return VIEW_LIST
+	return VIEW_LIST_CACHE
 end
 
 ----------------------------------------------------------------------------------------------
@@ -810,5 +786,31 @@ local settings = {
 }
 MY_TargetMonData = X.CreateModule(settings)
 end
+
+----------------------------------------------------------------------------------------------
+-- 事件注册
+----------------------------------------------------------------------------------------------
+
+local function onShieldedReset()
+	SHIELDED = nil
+end
+X.RegisterEvent('MY_RESTRICTION', 'MY_TargetMonData__Shield', function()
+	if arg0 and arg0 ~= 'MY_TargetMon.MapRestriction' then
+		return
+	end
+	onShieldedReset()
+end)
+X.RegisterEvent('LOADING_END', 'MY_TargetMonData__Shield', onShieldedReset)
+
+local function onTargetMonReload()
+	VIEW_LIST_CACHE = {}
+	CONFIG_CACHE = nil
+	D.OnTargetMonReload()
+end
+X.RegisterKungfuMount('MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('LOADING_ENDING', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
