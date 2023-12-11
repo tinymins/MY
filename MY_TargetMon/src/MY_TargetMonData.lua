@@ -813,4 +813,9 @@ X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD', 'MY_TargetMonData', onTa
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
 
+local function onTargetMonIntervalChange()
+	X.FrameCall('MY_TargetMonData', MY_TargetMonConfig.nInterval)
+end
+X.RegisterEvent('MY_TARGET_MON_CONFIG__INTERVAL_CHANGE', onTargetMonIntervalChange)
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

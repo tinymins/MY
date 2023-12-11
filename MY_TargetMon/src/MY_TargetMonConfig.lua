@@ -27,6 +27,12 @@ local O = X.CreateUserSettingsModule('MY_TargetMon', _L['Target'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	nInterval = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TargetMon'],
+		xSchema = X.Schema.Number,
+		xDefaultValue = 2,
+	},
 })
 local D = {
 	CONFIG = {},
@@ -651,6 +657,7 @@ local settings = {
 		{
 			fields = {
 				'bCommon',
+				'nInterval',
 			},
 			root = O,
 		},
@@ -681,9 +688,11 @@ local settings = {
 		{
 			fields = {
 				'bCommon',
+				'nInterval',
 			},
 			triggers = {
 				bCommon = D.LoadUserData,
+				nInterval = function() FireUIEvent('MY_TARGET_MON_CONFIG__INTERVAL_CHANGE') end,
 			},
 			root = O,
 		},

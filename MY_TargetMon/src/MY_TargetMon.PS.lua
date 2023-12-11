@@ -43,6 +43,21 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nY = nY + 10
 
+	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['View render config'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+	nX = nPaddingX + 10
+	nX, nY = ui:Append('WndTrackbar', {
+		x = nPaddingX, y = nY, w = 100, h = 25,
+		text = _L['Use common data'],
+		value = MY_TargetMonConfig.nInterval,
+		range = {1, 16},
+		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		textFormatter = function(v) return _L('View render interval: every %d frame', v) end,
+		onChange = function(val)
+			MY_TargetMonConfig.nInterval = val
+		end,
+	}):AutoWidth():Pos('BOTTOMRIGHT')
+	nY = nY + 10
+
 	nX = nPaddingX
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Data settings'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = nPaddingX + 10
