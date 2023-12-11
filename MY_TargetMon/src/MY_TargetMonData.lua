@@ -98,7 +98,7 @@ function D.GetDatasetList()
 	if not CACHE_CONFIG then
 		local me = X.GetClientPlayer()
 		if not me then
-			return MY_TargetMonConfig.GetDatasetList()
+			return {}
 		end
 		local aConfig = {}
 		local dwMapID = me.GetMapID() or 0
@@ -116,18 +116,13 @@ function D.GetDatasetList()
 	return CACHE_CONFIG
 end
 
-local function onFilterChange()
-	CACHE_CONFIG = nil
-end
-X.RegisterInit('MY_TargetMonData', onFilterChange)
-X.RegisterKungfuMount('MY_TargetMonData', onFilterChange)
-X.RegisterEvent('LOADING_ENDING', 'MY_TargetMonData', onFilterChange)
-
 local function onTargetMonReload()
 	VIEW_LIST = {}
-	onFilterChange()
+	CACHE_CONFIG = nil
 	D.OnTargetMonReload()
 end
+X.RegisterKungfuMount('MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('LOADING_ENDING', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
@@ -631,13 +626,11 @@ end
 local function OnFrameCall()
 	local tExistBuffMonitorTargetType = {}
 	local tExistSkillMonitorTargetType = {}
-	for _, dataset in ipairs(MY_TargetMonConfig.GetDatasetList()) do
-		if dataset.bEnable then
-			if dataset.szType == 'BUFF' then
-				tExistBuffMonitorTargetType[dataset.szTarget] = true
-			elseif dataset.szType == 'SKILL' then
-				tExistSkillMonitorTargetType[dataset.szTarget] = true
-			end
+	for _, dataset in ipairs(D.GetDatasetList()) do
+		if dataset.szType == 'BUFF' then
+			tExistBuffMonitorTargetType[dataset.szTarget] = true
+		elseif dataset.szType == 'SKILL' then
+			tExistSkillMonitorTargetType[dataset.szTarget] = true
 		end
 	end
 	-- 更新各目标BUFF数据
