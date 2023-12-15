@@ -621,9 +621,10 @@ function X.GetActivityQuest(szType)
 		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_RAID_DUNGEON)
 		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_WEEK_PUBLIC_QUEST) then
 			for _, szQuestID in ipairs(X.SplitString(p.szQuestID, ';')) do
-				local tLine = Table_GetCalenderActivityQuest(szQuestID)
+				local dwQuestID = tonumber(szQuestID)
+				local tLine = dwQuestID and Table_GetCalenderActivityQuest(dwQuestID)
 				if tLine and tLine.nNpcTemplateID ~= -1 then
-					local nQuestID = select(2, me.RandomByDailyQuest(szQuestID, tLine.nNpcTemplateID))
+					local nQuestID = select(2, me.RandomByDailyQuest(dwQuestID, tLine.nNpcTemplateID))
 					if nQuestID then
 						table.insert(aQuestID, {nQuestID, tLine.nNpcTemplateID})
 					end
