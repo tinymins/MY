@@ -591,30 +591,47 @@ function X.GetRegionGroupMap()
 	return aRegion
 end
 
--- {{武林通鉴 szType 枚举}}
--- WEEK_TEAM_DUNGEON 武林通鉴·秘境
--- WEEK_RAID_DUNGEON 武林通鉴·团队秘境
--- WEEK_PUBLIC_QUEST 武林通鉴·公共任务
+-- {{活动任务 szType 枚举}}
+-- DAILY_BIG_WAR      大战·系列任务
+-- DAILY_CAMP_ROUTINE 阵营日常
+-- WEEK_TEAM_DUNGEON  武林通鉴·秘境
+-- WEEK_RAID_DUNGEON  武林通鉴·团队秘境
+-- WEEK_PUBLIC_QUEST  武林通鉴·公共任务
 
 -- 获取指定活动任务列表
--- szType枚举值见 @{{武林通鉴 szType 枚举}}
+---@param szType string @szType枚举值见 {{活动任务 szType 枚举}}
+---@return table @活动任务列表
 function X.GetActivityQuest(szType)
 	local aQuestID = {}
 	local me = X.GetClientPlayer()
 	local date = TimeToDate(GetCurrentTime())
 	local aActive = Table_GetActivityOfDay(date.year, date.month, date.day, ACTIVITY_UI.CALENDER)
 	for _, p in ipairs(aActive) do
-		if (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_TEAM_DUNGEON)
+		if (szType == 'DAILY_BIG_WAR' and p.szName == _L.ACTIVITY_DAILY_BIG_WAR)
+		or (szType == 'DAILY_CAMP_ROUTINE' and p.szName == _L.ACTIVITY_DAILY_CAMP_ROUTINE)
+		or (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_TEAM_DUNGEON)
 		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_RAID_DUNGEON)
-		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_WEEK_PUBLIC_QUEST) then
+		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_WEEK_PUBLIC_QUEST)
+		or (szType == p.szName) then
 			for _, szQuestID in ipairs(X.SplitString(p.szQuestID, ';')) do
-				local tLine = Table_GetCalenderActivityQuest(szQuestID)
+				local dwQuestID = tonumber(szQuestID)
+				local tLine = dwQuestID and Table_GetCalenderActivityQuest(dwQuestID)
 				if tLine and tLine.nNpcTemplateID ~= -1 then
-					local nQuestID = select(2, me.RandomByDailyQuest(szQuestID, tLine.nNpcTemplateID))
+					local nQuestID = select(2, me.RandomByDailyQuest(dwQuestID, tLine.nNpcTemplateID))
 					if nQuestID then
 						table.insert(aQuestID, {nQuestID, tLine.nNpcTemplateID})
 					end
 				end
+			end
+		end
+	end
+	if szType == 'DAILY_BIG_WAR' and #aQuestID == 0 then
+		local szPattern = '^' .. _L['Big war']
+		local tLine
+		for nLine = 1, g_tTable.Quests:GetRowCount() do
+			tLine = g_tTable.Quests:GetRow(nLine)
+			if tLine.szName:find(szPattern) then
+				table.insert(aQuestID, {tLine.nID, 869})
 			end
 		end
 	end
