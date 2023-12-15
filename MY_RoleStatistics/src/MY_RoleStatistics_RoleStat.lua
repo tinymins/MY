@@ -20,77 +20,6 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 -------------------------------------------------------------------------------------------------------
 
-local STAT_DATA_FILE = {'userdata/role_statistics/role_stat.jx3dat', X.PATH_TYPE.GLOBAL}
-local PLAYER_REC_FILE = {'userdata/role_statistics/role_stat.jx3dat', X.PATH_TYPE.ROLE}
-local PLAYER_REC_INITIAL, PLAYER_REC = nil, nil
-
--------------------------------------------------------------------------------------------------------
-
-local function GetFormatSysmsgText(szText)
-	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
-end
-
-local DATA_ENV = setmetatable(
-	{
-		_L                         = _L                          ,
-		math                       = math                        ,
-		pairs                      = pairs                       ,
-		ipairs                     = ipairs                      ,
-		tonumber                   = tonumber                    ,
-		wstring                    = X.wstring                   ,
-		count_c                    = X.count_c                   ,
-		pairs_c                    = X.pairs_c                   ,
-		ipairs_c                   = X.ipairs_c                  ,
-		ipairs_r                   = X.ipairs_r                  ,
-		spairs                     = X.spairs                    ,
-		spairs_r                   = X.spairs_r                  ,
-		sipairs                    = X.sipairs                   ,
-		sipairs_r                  = X.sipairs_r                 ,
-		IsArray                    = X.IsArray                   ,
-		IsDictionary               = X.IsDictionary              ,
-		IsEquals                   = X.IsEquals                  ,
-		IsNil                      = X.IsNil                     ,
-		IsBoolean                  = X.IsBoolean                 ,
-		IsNumber                   = X.IsNumber                  ,
-		IsUserdata                 = X.IsUserdata                ,
-		IsHugeNumber               = X.IsHugeNumber              ,
-		IsElement                  = X.IsElement                 ,
-		IsEmpty                    = X.IsEmpty                   ,
-		IsString                   = X.IsString                  ,
-		IsTable                    = X.IsTable                   ,
-		IsFunction                 = X.IsFunction                ,
-		IsInMonsterMap             = X.IsInMonsterMap            ,
-		GetBuff                    = X.GetBuff                   ,
-		GetAccount                 = X.GetAccount                ,
-		GetServerOriginName        = X.GetServerOriginName       ,
-		GetItemAmountInAllPackages = X.GetItemAmountInAllPackages,
-		RegisterEvent              = X.RegisterEvent             ,
-		RegisterFrameCreate        = X.RegisterFrameCreate       ,
-		ITEM_TABLE_TYPE            = ITEM_TABLE_TYPE             ,
-		GetFormatSysmsgText        = GetFormatSysmsgText         ,
-		GetFormatText              = GetFormatText               ,
-		GetMoneyText               = GetMoneyText                ,
-		GetMsgFont                 = GetMsgFont                  ,
-		GetMsgFontColor            = GetMsgFontColor             ,
-		MoneyOptAdd                = MoneyOptAdd                 ,
-		MoneyOptCmp                = MoneyOptCmp                 ,
-		MoneyOptSub                = MoneyOptSub                 ,
-		Output                     = Output                      ,
-		GetEightWastersAwardNum    = X.IsTable(KGlobalScripts) and KGlobalScripts.EightWastersInterfaceGetAwardNum,
-	},
-	{
-		__index = function(t, k)
-			if k == 'me' then
-				return X.GetClientPlayer()
-			end
-			if k:find('^arg%d+$') then
-				return _G[k]
-			end
-		end,
-	})
-
--------------------------------------------------------------------------------------------------------
-
 local O = X.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General'], {
 	aColumn = {
 		ePathType = X.PATH_TYPE.GLOBAL,
@@ -178,6 +107,77 @@ local D = {
 	dwLastAlertTime = 0,
 }
 
+local STAT_DATA_FILE = {'userdata/role_statistics/role_stat.jx3dat', X.PATH_TYPE.GLOBAL}
+local PLAYER_REC_FILE = {'userdata/role_statistics/role_stat.jx3dat', X.PATH_TYPE.ROLE}
+local PLAYER_REC_INITIAL, PLAYER_REC = nil, nil
+
+-------------------------------------------------------------------------------------------------------
+
+local function GetFormatSysmsgText(szText)
+	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
+end
+
+local DATA_ENV = setmetatable(
+	{
+		_L                         = _L                          ,
+		math                       = math                        ,
+		pairs                      = pairs                       ,
+		ipairs                     = ipairs                      ,
+		tonumber                   = tonumber                    ,
+		wstring                    = X.wstring                   ,
+		count_c                    = X.count_c                   ,
+		pairs_c                    = X.pairs_c                   ,
+		ipairs_c                   = X.ipairs_c                  ,
+		ipairs_r                   = X.ipairs_r                  ,
+		spairs                     = X.spairs                    ,
+		spairs_r                   = X.spairs_r                  ,
+		sipairs                    = X.sipairs                   ,
+		sipairs_r                  = X.sipairs_r                 ,
+		IsArray                    = X.IsArray                   ,
+		IsDictionary               = X.IsDictionary              ,
+		IsEquals                   = X.IsEquals                  ,
+		IsNil                      = X.IsNil                     ,
+		IsBoolean                  = X.IsBoolean                 ,
+		IsNumber                   = X.IsNumber                  ,
+		IsUserdata                 = X.IsUserdata                ,
+		IsHugeNumber               = X.IsHugeNumber              ,
+		IsElement                  = X.IsElement                 ,
+		IsEmpty                    = X.IsEmpty                   ,
+		IsString                   = X.IsString                  ,
+		IsTable                    = X.IsTable                   ,
+		IsFunction                 = X.IsFunction                ,
+		IsInMonsterMap             = X.IsInMonsterMap            ,
+		GetBuff                    = X.GetBuff                   ,
+		GetAccount                 = X.GetAccount                ,
+		GetServerOriginName        = X.GetServerOriginName       ,
+		GetItemAmountInAllPackages = X.GetItemAmountInAllPackages,
+		RegisterEvent              = X.RegisterEvent             ,
+		RegisterFrameCreate        = X.RegisterFrameCreate       ,
+		ITEM_TABLE_TYPE            = ITEM_TABLE_TYPE             ,
+		GetFormatSysmsgText        = GetFormatSysmsgText         ,
+		GetFormatText              = GetFormatText               ,
+		GetMoneyText               = GetMoneyText                ,
+		GetMsgFont                 = GetMsgFont                  ,
+		GetMsgFontColor            = GetMsgFontColor             ,
+		MoneyOptAdd                = MoneyOptAdd                 ,
+		MoneyOptCmp                = MoneyOptCmp                 ,
+		MoneyOptSub                = MoneyOptSub                 ,
+		Output                     = Output                      ,
+		GetEightWastersAwardNum    = X.IsTable(KGlobalScripts) and KGlobalScripts.EightWastersInterfaceGetAwardNum,
+	},
+	{
+		__index = function(t, k)
+			if k == 'me' then
+				return X.GetClientPlayer()
+			end
+			if k:find('^arg%d+$') then
+				return _G[k]
+			end
+		end,
+	})
+
+-------------------------------------------------------------------------------------------------------
+
 local COLUMN_LIST = {
 	-- guid
 	{
@@ -196,6 +196,7 @@ local COLUMN_LIST = {
 	-- 大区
 	{
 		szKey = 'region',
+		szTitle = _L['Region'],
 		bTable = true,
 		bRowTip = true,
 		bFloatTip = false,
@@ -208,6 +209,7 @@ local COLUMN_LIST = {
 	-- 服务器
 	{
 		szKey = 'server',
+		szTitle = _L['Server'],
 		bTable = true,
 		bRowTip = true,
 		bFloatTip = false,
@@ -220,6 +222,7 @@ local COLUMN_LIST = {
 	-- 名字
 	{
 		szKey = 'name',
+		szTitle = _L['Name'],
 		bTable = true,
 		bRowTip = true,
 		bFloatTip = false,
@@ -244,6 +247,7 @@ local COLUMN_LIST = {
 	-- 门派
 	{
 		szKey = 'force',
+		szTitle = _L['Force'],
 		bTable = true,
 		bRowTip = true,
 		bFloatTip = false,
@@ -265,6 +269,7 @@ local COLUMN_LIST = {
 	-- 等级
 	{
 		szKey = 'level',
+		szTitle = _L['Level'],
 		bTable = true,
 		bRowTip = true,
 		bFloatTip = false,
@@ -299,6 +304,7 @@ end
 -- 时间
 table.insert(COLUMN_LIST, {
 	szKey = 'time',
+	szTitle = _L['Cache time'],
 	bTable = true,
 	bRowTip = true,
 	bFloatTip = false,
@@ -320,6 +326,7 @@ table.insert(COLUMN_LIST, {
 -- 时间计时
 table.insert(COLUMN_LIST, {
 	szKey = 'time_days',
+	szTitle = _L['Cache time days'],
 	bTable = true,
 	bRowTip = true,
 	bFloatTip = false,
@@ -373,8 +380,6 @@ table.insert(COLUMN_LIST, {
 
 local COLUMN_DICT = {}
 for _, col in ipairs(COLUMN_LIST) do
-	col.szTitle = _L.COLUMN_TITLE[col.szKey]
-	col.szTitleAbbr = _L.COLUMN_TITLE_ABBR[col.szKey] or _L.COLUMN_TITLE[col.szKey]
 	if not col.GetFormatText then
 		col.GetFormatText = function(v, rec)
 			if not v then
@@ -403,8 +408,8 @@ for _, col in ipairs(COLUMN_LIST) do
 				return
 			end
 			local f = v1 <= v2
-				and _L.COLUMN_COMPARE_INCREASE[col.szKey]
-				or _L.COLUMN_COMPARE_DECREASE[col.szKey]
+				and col.szCompareIncreaseText
+				or col.szCompareDecreaseText
 			if not f then
 				return
 			end
@@ -699,8 +704,12 @@ function D.GetTableColumns()
 			or (nIndex >= nRFixIndex and 'right' or nil)
 		local c = {
 			key = col.szKey,
-			title = col.szTitleAbbr,
-			titleTip = col.szTitle,
+			title = col.szTitleAbbr or col.szTitle,
+			titleTip = col.szTitleTip
+				or (col.GetTitleFormatTip and function()
+					return col.GetTitleFormatTip(), true
+				end)
+				or col.szTitle,
 			alignHorizontal = col.szAlignHorizontal or 'center',
 			render = col.GetFormatText
 				and function(value, record, index)
@@ -710,6 +719,11 @@ function D.GetTableColumns()
 			sorter = col.Compare
 				and function(v1, v2, r1, r2)
 					return col.Compare(v1, v2, r1, r2)
+				end
+				or nil,
+			tip = col.GetFormatTip
+				and function(value, record, index)
+					return col.GetFormatTip(value, record), true
 				end
 				or nil,
 			draggable = true,
@@ -805,7 +819,7 @@ function D.GetRowTip(rec)
 	return table.concat(aXml)
 end
 
-function D.OutputFloatEntryTip(this, rec)
+function D.OutputFloatEntryTip(this)
 	local rec = D.GetClientPlayerRec()
 	if not rec then
 		return
@@ -853,10 +867,11 @@ function D.OnInitPage()
 		menu = function()
 			local t = {}
 			local function UpdateMenu()
-				local c = {}
+				local tChecked = {}
 				for i = 1, #t do
 					t[i] = nil
 				end
+				-- 已添加的
 				for nIndex, szKey in ipairs(O.aColumn) do
 					local col = COLUMN_DICT[szKey]
 					if col then
@@ -927,11 +942,12 @@ function D.OnInitPage()
 								rgb = { 255, 128, 128 },
 							},
 						})
-						c[szKey] = true
 					end
+					tChecked[szKey] = true
 				end
+				-- 未添加的
 				for _, col in ipairs(COLUMN_LIST) do
-					if col.bTable and not c[col.szKey] then
+					if col.bTable and not tChecked[col.szKey] then
 						table.insert(t, {
 							szOption = col.szTitle,
 							fnAction = function()

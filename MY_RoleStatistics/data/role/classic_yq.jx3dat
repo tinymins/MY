@@ -3,11 +3,15 @@ return function(env)
 		-- 装分
 		{
 			szKey = 'equip_score',
+			szTitle = '装备分数',
+			szTitleAbbr = '装分',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
 			bAlertChange = true,
 			nMinWidth = 55,
+			szCompareIncreaseText = '装备分数提升了%s分',
+			szCompareDecreaseText = '装备分数降低了%s分',
 			GetValue = function(prevVal, prevRec)
 				return env.me.GetBaseEquipScore() + env.me.GetStrengthEquipScore() + env.me.GetMountsEquipScore()
 			end,
@@ -18,11 +22,15 @@ return function(env)
 		-- 宠物分
 		{
 			szKey = 'pet_score',
+			szTitle = '宠物分数',
+			szTitleAbbr = '宠物',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
 			bAlertChange = true,
 			nMinWidth = 55,
+			szCompareIncreaseText = '宠物分数增加了%s分',
+			szCompareDecreaseText = '宠物分数降低了%s分',
 			GetValue = function(prevVal, prevRec)
 				return env.me.GetAcquiredFellowPetScore() + env.me.GetAcquiredFellowPetMedalScore()
 			end,
@@ -33,6 +41,7 @@ return function(env)
 		-- 金钱
 		{
 			szKey = 'money',
+			szTitle = '金钱',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
@@ -72,7 +81,7 @@ return function(env)
 				local f = env.GetMsgFont('MSG_SYS')
 				local r, g, b = env.GetMsgFontColor('MSG_SYS')
 				local szExtra = 'font=' .. f .. ' r=' .. r .. ' g=' .. g .. ' b=' .. b
-				local szPrefix = nCompare >= 0 and env._L.COLUMN_COMPARE_INCREASE['money'] or env._L.COLUMN_COMPARE_DECREASE['money']
+				local szPrefix = nCompare >= 0 and '获得金钱' or '消耗金钱'
 				local moneyAbs = { nGold = env.math.abs(money.nGold), nSilver = env.math.abs(money.nSilver), nCopper = env.math.abs(money.nCopper) }
 				return env.GetFormatSysmsgText(szPrefix)
 					.. env.GetMoneyText(moneyAbs, szExtra)
@@ -81,11 +90,15 @@ return function(env)
 		-- 侠义
 		{
 			szKey = 'justice',
+			szTitle = '侠行点',
+			szTitleAbbr = '侠行',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
 			bAlertChange = true,
 			nMinWidth = 60,
+			szCompareIncreaseText = '获得侠行点%s点',
+			szCompareDecreaseText = '消耗侠行点%s点',
 			GetValue = function(prevVal, prevRec)
 				return env.me.nJustice
 			end,
@@ -93,6 +106,8 @@ return function(env)
 		-- 侠义周余
 		{
 			szKey = 'justice_remain',
+			szTitle = '侠行点周上限',
+			szTitleAbbr = '侠行周',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
@@ -106,11 +121,15 @@ return function(env)
 		-- 威望
 		{
 			szKey = 'prestige',
+			szTitle = '威名点',
+			szTitleAbbr = '威名',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
 			bAlertChange = true,
 			nMinWidth = 70,
+			szCompareIncreaseText = '获得威名点%s点',
+			szCompareDecreaseText = '消耗威名点%s点',
 			GetValue = function(prevVal, prevRec)
 				return env.me.nCurrentPrestige
 			end,
@@ -118,6 +137,8 @@ return function(env)
 		-- 威望周余
 		{
 			szKey = 'prestige_remain',
+			szTitle = '威名点周上限',
+			szTitleAbbr = '威名周',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
@@ -131,12 +152,15 @@ return function(env)
 		-- 战阶积分
 		{
 			szKey = 'camp_point',
+			szTitle = '战阶积分',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
 			bAlertChange = true,
 			nMinWidth = 70,
 			szRefreshCircle = 'weekly',
+			szCompareIncreaseText = '获得战阶积分%s点',
+			szCompareDecreaseText = '消耗战阶积分%s点',
 			GetValue = function(prevVal, prevRec)
 				return env.me.nTitlePoint
 			end,
@@ -144,6 +168,7 @@ return function(env)
 		-- 战阶等级
 		{
 			szKey = 'camp_level',
+			szTitle = '战阶等级',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
@@ -177,11 +202,15 @@ return function(env)
 		-- 资历
 		{
 			szKey = 'achievement_score',
+			szTitle = '江湖资历',
+			szTitleAbbr = '资历',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
 			bAlertChange = true,
 			nMinWidth = 70,
+			szCompareIncreaseText = '获得江湖资历值%s点',
+			szCompareDecreaseText = '消耗江湖资历值%s点',
 			GetValue = function(prevVal, prevRec)
 				return env.me.GetAchievementRecord()
 			end,
@@ -189,6 +218,7 @@ return function(env)
 		-- 通宝
 		{
 			szKey = 'coin',
+			szTitle = '通宝',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
@@ -232,18 +262,23 @@ return function(env)
 		-- 师徒分
 		{
 			szKey = 'mentor_score',
+			szTitle = '师徒',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
 			bAlertChange = true,
 			nMinWidth = 70,
+			szCompareIncreaseText = '获得师徒值%s点',
+			szCompareDecreaseText = '消耗师徒值%s点',
 			GetValue = function(prevVal, prevRec)
 				return env.me.dwTAEquipsScore
 			end,
 		},
-		-- 师徒分
+		-- 八荒
 		{
 			szKey = 'eight_wasters_award',
+			szTitle = '八荒衡鉴（普通模式奖励 + 挑战模式奖励）',
+			szTitleAbbr = '八荒',
 			bTable = true,
 			bRowTip = true,
 			bFloatTip = true,
