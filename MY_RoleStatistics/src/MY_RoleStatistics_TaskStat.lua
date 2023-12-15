@@ -20,47 +20,6 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
-CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
-
-local DB = X.SQLiteConnect(_L['MY_RoleStatistics_TaskStat'], {'userdata/role_statistics/task_stat.v3.db', X.PATH_TYPE.GLOBAL})
-if not DB then
-	return X.Sysmsg(_L['MY_RoleStatistics_TaskStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
-end
-
-DB:Execute([[
-	CREATE TABLE IF NOT EXISTS Task (
-		guid NVARCHAR(20) NOT NULL,
-		name NVARCHAR(255) NOT NULL,
-		task_info NVARCHAR(65535) NOT NULL,
-		extra TEXT NOT NULL,
-		PRIMARY KEY(guid)
-	)
-]])
-local DB_TaskW = DB:Prepare('REPLACE INTO Task (guid, name, task_info, extra) VALUES (?, ?, ?, ?)')
-local DB_TaskR = DB:Prepare('SELECT * FROM Task')
-local DB_TaskD = DB:Prepare('DELETE FROM Task WHERE guid = ?')
-DB:Execute([[
-	CREATE TABLE IF NOT EXISTS TaskInfo (
-		guid NVARCHAR(20) NOT NULL,
-		account NVARCHAR(255) NOT NULL,
-		region NVARCHAR(20) NOT NULL,
-		server NVARCHAR(20) NOT NULL,
-		name NVARCHAR(20) NOT NULL,
-		force INTEGER NOT NULL,
-		camp INTEGER NOT NULL,
-		level INTEGER NOT NULL,
-		task_info NVARCHAR(65535) NOT NULL,
-		buff_info NVARCHAR(65535) NOT NULL,
-		time INTEGER NOT NULL,
-		extra TEXT NOT NULL,
-		PRIMARY KEY(guid)
-	)
-]])
-local DB_TaskInfoW = DB:Prepare('REPLACE INTO TaskInfo (guid, account, region, server, name, force, camp, level, task_info, buff_info, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-local DB_TaskInfoG = DB:Prepare('SELECT * FROM TaskInfo WHERE guid = ?')
-local DB_TaskInfoR = DB:Prepare('SELECT * FROM TaskInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
-local DB_TaskInfoD = DB:Prepare('DELETE FROM TaskInfo WHERE guid = ?')
-
 local O = X.CreateUserSettingsModule('MY_RoleStatistics_TaskStat', _L['General'], {
 	aColumn = {
 		ePathType = X.PATH_TYPE.GLOBAL,
@@ -125,6 +84,10 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_TaskStat', _L['General']
 	},
 })
 local D = {}
+
+local STAT_DATA_FILE = {'userdata/role_statistics/task_stat.jx3dat', X.PATH_TYPE.GLOBAL}
+local PLAYER_REC_FILE = {'userdata/role_statistics/task_stat.jx3dat', X.PATH_TYPE.ROLE}
+local PLAYER_REC_INITIAL, PLAYER_REC = nil, nil
 
 local TASK_TYPE = {
 	DAILY = 1,
@@ -272,31 +235,55 @@ local DATA_ENV = setmetatable(
 -------------------------------------------------------------------------------------------------------
 
 local COLUMN_LIST = {
-	-- guid,
-	-- account,
-	{ -- 大区
+	-- guid
+	{
+		szKey = 'guid',
+		GetValue = function(prevVal, prevRec)
+			return X.GetPlayerGUID()
+		end,
+	},
+	-- account
+	{
+		szKey = 'account',
+		GetValue = function(prevVal, prevRec)
+			return X.GetAccount() or ''
+		end,
+	},
+	-- 大区
+	{
 		szKey = 'region',
 		szTitle = _L['Region'],
 		bTable = true,
 		bRowTip = true,
 		nMinWidth = 100,
 		nMaxWidth = 100,
+		GetValue = function(prevVal, prevRec)
+			return X.GetRegionOriginName()
+		end,
 	},
-	{ -- 服务器
+	-- 服务器
+	{
 		szKey = 'server',
 		szTitle = _L['Server'],
 		bTable = true,
 		bRowTip = true,
 		nMinWidth = 100,
 		nMaxWidth = 100,
+		GetValue = function(prevVal, prevRec)
+			return X.GetServerOriginName()
+		end,
 	},
-	{ -- 名字
+	-- 名字
+	{
 		szKey = 'name',
 		szTitle = _L['Name'],
 		bTable = true,
 		bRowTip = true,
 		nMinWidth = 110,
 		nMaxWidth = 200,
+		GetValue = function(prevVal, prevRec)
+			return X.GetClientPlayer().szName
+		end,
 		GetFormatText = function(name, rec)
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
@@ -304,35 +291,47 @@ local COLUMN_LIST = {
 			return GetFormatText(name, 162, X.GetForceColor(rec.force, 'foreground'))
 		end,
 	},
-	{ -- 门派
+	-- 门派
+	{
 		szKey = 'force',
 		szTitle = _L['Force'],
 		bTable = true,
 		bRowTip = true,
 		nMinWidth = 50,
 		nMaxWidth = 70,
+		GetValue = function(prevVal, prevRec)
+			return X.GetClientPlayer().dwForceID
+		end,
 		GetFormatText = function(force, rec)
 			return GetFormatText(g_tStrings.tForceTitle[force], 162, 255, 255, 255)
 		end,
 	},
-	{ -- 阵营
+	-- 阵营
+	{
 		szKey = 'camp',
 		szTitle = _L['Camp'],
 		bTable = true,
 		bRowTip = true,
 		nMinWidth = 50,
 		nMaxWidth = 50,
+		GetValue = function(prevVal, prevRec)
+			return X.GetClientPlayer().nCamp
+		end,
 		GetFormatText = function(camp, rec)
 			return GetFormatText(g_tStrings.STR_CAMP_TITLE[camp], 162, 255, 255, 255)
 		end,
 	},
-	{ -- 等级
+	-- 等级
+	{
 		szKey = 'level',
 		szTitle = _L['Level'],
 		bTable = true,
 		bRowTip = true,
 		nMinWidth = 50,
 		nMaxWidth = 50,
+		GetValue = function(prevVal, prevRec)
+			return X.GetClientPlayer().nLevel
+		end,
 	},
 }
 -- 分版本列配置
@@ -393,8 +392,8 @@ do
 						local tTaskState = {}
 						local function CountTaskState(aQuestInfo)
 							for _, aInfo in ipairs(aQuestInfo) do
-								if rec.task_info[aInfo[1]] then
-									tTaskState[rec.task_info[aInfo[1]]] = (tTaskState[rec.task_info[aInfo[1]]] or 0) + 1
+								if rec.tTaskInfo[aInfo[1]] then
+									tTaskState[rec.tTaskInfo[aInfo[1]]] = (tTaskState[rec.tTaskInfo[aInfo[1]]] or 0) + 1
 								end
 							end
 						end
@@ -414,8 +413,8 @@ do
 						if aBuffInfo then
 							for _, aInfo in ipairs(aBuffInfo) do
 								local szKey = aInfo[1] .. '_' .. (aInfo[2] or 0)
-								if rec.buff_info[szKey] then
-									tTaskState[rec.buff_info[szKey]] = (tTaskState[rec.buff_info[szKey]] or 0) + 1
+								if rec.tBuffInfo[szKey] then
+									tTaskState[rec.tBuffInfo[szKey]] = (tTaskState[rec.tBuffInfo[szKey]] or 0) + 1
 								end
 							end
 						end
@@ -450,15 +449,15 @@ do
 								table.insert(aXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
 							end
 							table.insert(aXml, GetFormatText('[' .. X.Get(Table_GetQuestStringInfo(aInfo[1]), 'szName', '') .. ']: ', 162, 255, 255, 0))
-							if rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTABLE then
+							if rec.tTaskInfo[aInfo[1]] == TASK_STATE.ACCEPTABLE then
 								table.insert(aXml, GetFormatText(_L['Acceptable'] .. '\n', 162, 255, 255, 255))
-							elseif rec.task_info[aInfo[1]] == TASK_STATE.UNACCEPTABLE then
+							elseif rec.tTaskInfo[aInfo[1]] == TASK_STATE.UNACCEPTABLE then
 								table.insert(aXml, GetFormatText(_L['Unacceptable'] .. '\n', 162, 255, 255, 255))
-							elseif rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTED then
+							elseif rec.tTaskInfo[aInfo[1]] == TASK_STATE.ACCEPTED then
 								table.insert(aXml, GetFormatText(_L['Accepted'] .. '\n', 162, 255, 255, 255))
-							elseif rec.task_info[aInfo[1]] == TASK_STATE.FINISHED then
+							elseif rec.tTaskInfo[aInfo[1]] == TASK_STATE.FINISHED then
 								table.insert(aXml, GetFormatText(_L['Finished'] .. '\n', 162, 255, 255, 255))
-							elseif rec.task_info[aInfo[1]] == TASK_STATE.FINISHABLE then
+							elseif rec.tTaskInfo[aInfo[1]] == TASK_STATE.FINISHABLE then
 								table.insert(aXml, GetFormatText(_L['Finishable'] .. '\n', 162, 255, 255, 255))
 							else
 								table.insert(aXml, GetFormatText(_L['Unknown'] .. '\n', 162, 255, 255, 255))
@@ -498,30 +497,30 @@ do
 						local aQuestInfo = col.aQuestInfo or (col.GetQuestInfo and col.GetQuestInfo())
 						if aQuestInfo then
 							for _, aInfo in ipairs(aQuestInfo) do
-								k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
-								k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
+								k1 = k1 + (r1.tTaskInfo[aInfo[1]] and tWeight[r1.tTaskInfo[aInfo[1]]] or 0)
+								k2 = k2 + (r2.tTaskInfo[aInfo[1]] and tWeight[r2.tTaskInfo[aInfo[1]]] or 0)
 							end
 						end
 						local tCampQuestInfo = col.tCampQuestInfo or (col.GetCampQuestInfo and col.GetCampQuestInfo())
 						if tCampQuestInfo and tCampQuestInfo[r1.camp] then
 							for _, aInfo in ipairs(tCampQuestInfo[r1.camp]) do
-								k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
+								k1 = k1 + (r1.tTaskInfo[aInfo[1]] and tWeight[r1.tTaskInfo[aInfo[1]]] or 0)
 							end
 						end
 						if tCampQuestInfo and tCampQuestInfo[r2.camp] then
 							for _, aInfo in ipairs(tCampQuestInfo[r2.camp]) do
-								k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
+								k2 = k2 + (r2.tTaskInfo[aInfo[1]] and tWeight[r2.tTaskInfo[aInfo[1]]] or 0)
 							end
 						end
 						local tForceQuestInfo = col.tForceQuestInfo or (col.GetForceQuestInfo and col.GetForceQuestInfo())
 						if tForceQuestInfo and tForceQuestInfo[r1.force] then
 							for _, aInfo in ipairs(tForceQuestInfo[r1.force]) do
-								k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
+								k1 = k1 + (r1.tTaskInfo[aInfo[1]] and tWeight[r1.tTaskInfo[aInfo[1]]] or 0)
 							end
 						end
 						if tForceQuestInfo and tForceQuestInfo[r2.force] then
 							for _, aInfo in ipairs(tForceQuestInfo[r2.force]) do
-								k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
+								k2 = k2 + (r2.tTaskInfo[aInfo[1]] and tWeight[r2.tTaskInfo[aInfo[1]]] or 0)
 							end
 						end
 						if not IsInSamePeriod(r1.time, col.eType) then
@@ -541,18 +540,23 @@ do
 		end
 	end
 end
-table.insert(COLUMN_LIST, { -- 时间
+-- 时间
+table.insert(COLUMN_LIST, {
 	szKey = 'time',
 	szTitle = _L['Cache time'],
 	bTable = true,
 	bRowTip = true,
 	nMinWidth = 165,
 	nMaxWidth = 200,
+	GetValue = function(prevVal, prevRec)
+		return GetCurrentTime()
+	end,
 	GetFormatText = function(time, rec)
 		return GetFormatText(X.FormatTime(time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
 	end,
 })
-table.insert(COLUMN_LIST, { -- 时间计时
+-- 时间计时
+table.insert(COLUMN_LIST, {
 	szKey = 'time_days',
 	szTitle = _L['Cache time days'],
 	bTable = true,
@@ -623,50 +627,70 @@ for _, col in ipairs(COLUMN_LIST) do
 	COLUMN_DICT[col.szKey] = col
 end
 
-do
-local REC_CACHE
+for _, col in ipairs(COLUMN_LIST) do
+	X.SafeCall(col.Collector)
+end
+
+-- 移除不在同一个刷新周期内的数据字段
+function D.FilterColumnCircle(rec)
+	if X.IsNumber(rec.time) then
+		for _, col in ipairs(COLUMN_LIST) do
+			if col.szRefreshCircle then
+				local dwTime, dwCircle = X.GetRefreshTime(col.szRefreshCircle)
+				if dwTime - dwCircle >= rec.time then
+					rec[col.szKey] = nil
+				end
+			end
+		end
+	end
+end
+
+function D.GetPlayerRecords()
+	local result = X.LoadLUAData(STAT_DATA_FILE) or {}
+	for _, rec in pairs(result) do
+		D.FilterColumnCircle(rec)
+	end
+	return result
+end
+
 function D.GetClientPlayerRec()
 	local me = X.GetClientPlayer()
 	if not me then
 		return
 	end
-	local rec = REC_CACHE
-	local guid = X.GetPlayerGUID()
-	if not rec then
-		rec = {}
-		REC_CACHE = rec
+	-- 缓存数据
+	if not PLAYER_REC_INITIAL then
+		PLAYER_REC_INITIAL = X.LoadLUAData(PLAYER_REC_FILE) or {}
+		D.FilterColumnCircle(PLAYER_REC_INITIAL)
+		PLAYER_REC = X.Clone(PLAYER_REC_INITIAL)
+		D.FilterColumnCircle(PLAYER_REC)
 	end
-
-	-- 基础信息
-	rec.guid = guid
-	rec.account = X.GetAccount() or ''
-	rec.region = X.GetRegionOriginName()
-	rec.server = X.GetServerOriginName()
-	rec.name = me.szName
-	rec.force = me.dwForceID
-	rec.camp = me.nCamp
-	rec.level = me.nLevel
-	rec.time = GetCurrentTime()
-	rec.task_info = {}
-	rec.buff_info = {}
-
+	-- 获取各列数据
+	for _, col in ipairs(COLUMN_LIST) do
+		if col.GetValue then
+			PLAYER_REC[col.szKey] = col.GetValue(PLAYER_REC_INITIAL[col.szKey], PLAYER_REC_INITIAL)
+		end
+	end
+	-- 获取任务、BUFF状态
+	local tTaskInfo = {}
+	local tBuffInfo = {}
 	for _, col in ipairs(COLUMN_LIST) do
 		local aQuestInfo = col.aQuestInfo or (col.GetQuestInfo and col.GetQuestInfo())
 		if aQuestInfo then
 			for _, aInfo in ipairs(aQuestInfo) do
-				rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
+				tTaskInfo[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 			end
 		end
 		local tCampQuestInfo = col.tCampQuestInfo or (col.GetCampQuestInfo and col.GetCampQuestInfo())
 		if tCampQuestInfo and tCampQuestInfo[me.nCamp] then
 			for _, aInfo in ipairs(tCampQuestInfo[me.nCamp]) do
-				rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
+				tTaskInfo[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 			end
 		end
 		local tForceQuestInfo = col.tForceQuestInfo or (col.GetForceQuestInfo and col.GetForceQuestInfo())
 		if tForceQuestInfo and tForceQuestInfo[me.dwForceID] then
 			for _, aInfo in ipairs(tForceQuestInfo[me.dwForceID]) do
-				rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
+				tTaskInfo[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 			end
 		end
 		local aBuffInfo = col.aBuffInfo or (col.GetBuffInfo and col.GetBuffInfo())
@@ -676,94 +700,101 @@ function D.GetClientPlayerRec()
 					and TASK_STATE.FINISHED
 					or TASK_STATE.UNKNOWN
 				if nState == TASK_STATE.FINISHED then
-					rec.buff_info[aInfo[1] .. '_0'] = TASK_STATE.FINISHED
+					tBuffInfo[aInfo[1] .. '_0'] = TASK_STATE.FINISHED
 				end
-				rec.buff_info[aInfo[1] .. '_' .. (aInfo[2] or 0)] = nState
+				tBuffInfo[aInfo[1] .. '_' .. (aInfo[2] or 0)] = nState
 			end
 		end
 	end
-	return rec
-end
+	PLAYER_REC.tTaskInfo = tTaskInfo
+	PLAYER_REC.tBuffInfo = tBuffInfo
+
+	return X.Clone(PLAYER_REC)
 end
 
 function D.Migration()
 	local DB_V2_PATH = X.FormatPath({'userdata/role_statistics/task_stat.v2.db', X.PATH_TYPE.GLOBAL})
-	if not IsLocalFileExist(DB_V2_PATH) then
+	local DB_V3_PATH = X.FormatPath({'userdata/role_statistics/task_stat.v3.db', X.PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
 		return
 	end
 	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
+			local data = X.LoadLUAData(STAT_DATA_FILE) or {}
 			-- 转移V2旧版数据
 			if IsLocalFileExist(DB_V2_PATH) then
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
 				if DB_V2 then
-					DB:Execute('BEGIN TRANSACTION')
-					local aTask = DB_V2:Execute('SELECT * FROM Task WHERE guid IS NOT NULL AND name IS NOT NULL')
-					if aTask then
-						for _, rec in ipairs(aTask) do
-							DB_TaskW:ClearBindings()
-							DB_TaskW:BindAll(
-								rec.guid,
-								rec.name,
-								rec.task_info,
-								''
-							)
-							DB_TaskW:Execute()
-						end
-						DB_TaskW:Reset()
-					end
-					local aTaskInfo = DB_V2:Execute('SELECT * FROM TaskInfo WHERE guid IS NOT NULL AND name IS NOT NULL')
+					local aTaskInfo = X.ConvertToAnsi(DB_V2:Execute('SELECT * FROM TaskInfo WHERE guid IS NOT NULL AND name IS NOT NULL'))
 					if aTaskInfo then
 						for _, rec in ipairs(aTaskInfo) do
-							DB_TaskInfoW:ClearBindings()
-							DB_TaskInfoW:BindAll(
-								rec.guid,
-								rec.account,
-								rec.region,
-								rec.server,
-								rec.name,
-								rec.force,
-								rec.camp,
-								rec.level,
-								rec.task_info,
-								rec.buff_info,
-								rec.time,
-								''
-							)
-							DB_TaskInfoW:Execute()
+							if not data[rec.guid] or data[rec.guid].time <= rec.time then
+								data[rec.guid] = {
+									guid = rec.guid,
+									account = rec.account,
+									region = rec.region,
+									server = rec.server,
+									name = rec.name,
+									force = rec.force,
+									camp = rec.camp,
+									level = rec.level,
+									tTaskInfo = X.DecodeLUAData(rec.task_info or '') or {},
+									tBuffInfo = X.DecodeLUAData(rec.buff_info or '') or {},
+									time = rec.time,
+								}
+							end
 						end
-						DB_TaskInfoW:Reset()
 					end
-					DB:Execute('END TRANSACTION')
 					DB_V2:Release()
 				end
 				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
+			-- 转移V3旧版数据
+			if IsLocalFileExist(DB_V3_PATH) then
+				local DB_V3 = SQLite3_Open(DB_V3_PATH)
+				if DB_V3 then
+					local aTaskInfo = X.ConvertToAnsi(DB_V3:Execute('SELECT * FROM TaskInfo WHERE guid IS NOT NULL AND name IS NOT NULL'))
+					if aTaskInfo then
+						for _, rec in ipairs(aTaskInfo) do
+							if not data[rec.guid] or data[rec.guid].time <= rec.time then
+								data[rec.guid] = {
+									guid = rec.guid,
+									account = rec.account,
+									region = rec.region,
+									server = rec.server,
+									name = rec.name,
+									force = rec.force,
+									camp = rec.camp,
+									level = rec.level,
+									tTaskInfo = X.DecodeLUAData(rec.task_info or '') or {},
+									tBuffInfo = X.DecodeLUAData(rec.buff_info or '') or {},
+									time = rec.time,
+								}
+							end
+						end
+					end
+					DB_V3:Release()
+				end
+				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			X.SaveLUAData(STAT_DATA_FILE, data)
 			FireUIEvent('MY_ROLE_STAT_TASK_UPDATE')
 			X.Alert(_L['Migrate succeed!'])
 		end)
 end
 
 function D.FlushDB()
-	if not O.bSaveDB then
-		return
-	end
 	--[[#DEBUG BEGIN]]
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
-	local rec = X.Clone(D.GetClientPlayerRec())
-	D.EncodeRow(rec)
-
-	DB:Execute('BEGIN TRANSACTION')
-	DB_TaskInfoW:ClearBindings()
-	DB_TaskInfoW:BindAll(
-		rec.guid, rec.account, rec.region, rec.server,
-		rec.name, rec.force, rec.camp, rec.level,
-		rec.task_info, rec.buff_info, rec.time, '')
-	DB_TaskInfoW:Execute()
-	DB:Execute('END TRANSACTION')
-
+	local rec = D.GetClientPlayerRec()
+	if O.bSaveDB then
+		local data = X.LoadLUAData(STAT_DATA_FILE) or {}
+		data[X.GetPlayerGUID()] = D.GetClientPlayerRec()
+		X.SaveLUAData(STAT_DATA_FILE, data)
+	end
+	X.SaveLUAData(PLAYER_REC_FILE, rec)
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
 	X.Debug('MY_RoleStatistics_TaskStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
@@ -782,9 +813,9 @@ function D.UpdateSaveDB()
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_TaskStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		DB_TaskInfoD:ClearBindings()
-		DB_TaskInfoD:BindAll(AnsiToUTF8(X.GetPlayerGUID()))
-		DB_TaskInfoD:Execute()
+		local data = X.LoadLUAData(STAT_DATA_FILE) or {}
+		data[X.GetPlayerGUID()] = nil
+		X.SaveLUAData(STAT_DATA_FILE, data)
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_TaskStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -867,41 +898,32 @@ function D.GetTableColumns()
 	return aTableColumn
 end
 
+function D.GetResult(szSearch)
+	-- 搜索
+	local data = D.GetPlayerRecords()
+	local result = {}
+	for _, rec in pairs(data) do
+		if not X.IsString(szSearch)
+		or szSearch == ''
+		or X.StringFindW(tostring(rec.account or ''), szSearch)
+		or X.StringFindW(tostring(rec.name or ''), szSearch)
+		or X.StringFindW(tostring(rec.region or ''), szSearch)
+		or X.StringFindW(tostring(rec.server or ''), szSearch) then
+			table.insert(result, rec)
+		end
+	end
+	return result
+end
+
 function D.UpdateUI(page)
 	local ui = X.UI(page)
 
 	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
-	local szUSearch = AnsiToUTF8('%' .. szSearch .. '%')
-	DB_TaskInfoR:ClearBindings()
-	DB_TaskInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
-	local result = DB_TaskInfoR:GetAll()
-	DB_TaskInfoR:Reset()
-
-	for _, rec in ipairs(result) do
-		D.DecodeRow(rec)
-	end
+	local result = D.GetResult(szSearch)
 
 	ui:Fetch('WndTable_Stat')
 		:Columns(D.GetTableColumns())
 		:DataSource(result)
-end
-
-function D.EncodeRow(rec)
-	rec.guid   = AnsiToUTF8(rec.guid)
-	rec.name   = AnsiToUTF8(rec.name)
-	rec.region = AnsiToUTF8(rec.region)
-	rec.server = AnsiToUTF8(rec.server)
-	rec.task_info = X.EncodeLUAData(rec.task_info)
-	rec.buff_info = X.EncodeLUAData(rec.buff_info)
-end
-
-function D.DecodeRow(rec)
-	rec.guid   = UTF8ToAnsi(rec.guid)
-	rec.name   = UTF8ToAnsi(rec.name)
-	rec.region = UTF8ToAnsi(rec.region)
-	rec.server = UTF8ToAnsi(rec.server)
-	rec.task_info = X.DecodeLUAData(rec.task_info or '') or {}
-	rec.buff_info = X.DecodeLUAData(rec.buff_info or '') or {}
 end
 
 function D.GetRowTip(rec)
