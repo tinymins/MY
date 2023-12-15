@@ -599,7 +599,8 @@ end
 -- WEEK_PUBLIC_QUEST 武林通鉴·公共任务
 
 -- 获取指定活动任务列表
--- szType枚举值见 @{{活动任务 szType 枚举}}
+---@param szType string @szType枚举值见 {{活动任务 szType 枚举}}
+---@return table @活动任务列表
 function X.GetActivityQuest(szType)
 	local aQuestID = {}
 	if szType == 'DAILY_BIG_WAR' or szType == 'DAILY_BOUNTY' then
@@ -619,7 +620,8 @@ function X.GetActivityQuest(szType)
 	for _, p in ipairs(aActive) do
 		if (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_TEAM_DUNGEON)
 		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_RAID_DUNGEON)
-		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_WEEK_PUBLIC_QUEST) then
+		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_WEEK_PUBLIC_QUEST)
+		or (szType == p.szName) then
 			for _, szQuestID in ipairs(X.SplitString(p.szQuestID, ';')) do
 				local dwQuestID = tonumber(szQuestID)
 				local tLine = dwQuestID and Table_GetCalenderActivityQuest(dwQuestID)
