@@ -31,7 +31,7 @@ local O = X.CreateUserSettingsModule('MY_BigWarChecker', _L['General'], {
 local D = {}
 
 local function IsBigWarFinishable(me)
-	for _, aQuestInfo in ipairs(X.CONSTANT.QUEST_INFO.BIG_WARS) do
+	for _, aQuestInfo in ipairs(X.GetActivityQuest('DAILY_BIG_WAR')) do
 		local info = me.GetQuestTraceInfo(aQuestInfo[1])
 		if info then
 			local finished = false
@@ -164,7 +164,7 @@ X.RegisterEvent('LOADING_END', 'MY_BigWarChecker', function()
 	local dwMapID = me.GetMapID()
 	-- 分析大战本状态数据
 	local aQuestInfo = {}
-	for _, v in ipairs(X.CONSTANT.QUEST_INFO.BIG_WARS) do
+	for _, v in ipairs(X.GetActivityQuest('DAILY_BIG_WAR')) do
 		local szPos = Table_GetQuestPosInfo(v[1], 'quest_state', 1)
 		local szMap = szPos and szPos:match('N (%d+),')
 		local dwMap = szMap and tonumber(szMap)
