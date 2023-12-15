@@ -68,7 +68,7 @@ local DIFF_KEYS = { -- 用于自动扫描菜单数据是否有更新的键
 			{
 				szOption = 'Option 1',
 				fnAction = function()
-					Output('1')
+					X.Output('1')
 				end,
 			},
 		},

@@ -414,7 +414,7 @@ X.RegisterBgMsg(X.NSFormatString('{$NS}_OUTPUT_BUFF'), function(_, data, nChanne
 	for _, buff in X.ipairs_c(X.GetBuffList(me)) do
 		table.insert(aRes, X.CloneBuff(buff, {}))
 	end
-	Output(aRes)
+	X.Output(aRes)
 end)
 
 

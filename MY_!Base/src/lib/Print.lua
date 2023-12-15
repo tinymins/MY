@@ -117,6 +117,34 @@ local function OutputMessageEx(szType, eTheme, oTitle, oContent, bEcho)
 	OutputMessage(szType, table.concat(aMsg), true)
 end
 
+function X.Output(...)
+	local argv = {...}
+	local argc = select('#', ...)
+
+	local t = {}
+	table.insert(t, '{')
+	if argc > 0 then
+		table.insert(t, '\n')
+		for i = 1, argc do
+			table.insert(t, '\t[')
+			table.insert(t, i)
+			table.insert(t, '] = ')
+			table.insert(t, X.EncodeLUAData(argv[i], '\t', 1))
+			table.insert(t, ',\n')
+		end
+	end
+	table.insert(t, '}')
+
+	local szMsg = table.concat(t)
+	if Log then
+		Log("[UI DEBUG]" .. szMsg)
+	end
+	if OutputMessage then
+		OutputMessage("MSG_SYS", GetFormatText(szMsg .. '\n'), true)
+	end
+	print(szMsg)
+end
+
 -- 显示本地信息 X.Sysmsg(oTitle, oContent, eTheme)
 --   X.Sysmsg({'Error!', wrap = true}, '内容', X.CONSTANT.MSG_THEME.ERROR)
 --   X.Sysmsg({'New message', r = 0, g = 0, b = 0, wrap = true}, '内容')
