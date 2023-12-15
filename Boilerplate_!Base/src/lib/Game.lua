@@ -592,11 +592,12 @@ function X.GetRegionGroupMap()
 end
 
 -- {{活动任务 szType 枚举}}
--- DAILY_BIG_WAR     大战·系列任务
--- DAILY_BOUNTY      赏金·系列任务
--- WEEK_TEAM_DUNGEON 武林通鉴·秘境
--- WEEK_RAID_DUNGEON 武林通鉴·团队秘境
--- WEEK_PUBLIC_QUEST 武林通鉴·公共任务
+-- DAILY_BIG_WAR      大战·系列任务
+-- DAILY_BOUNTY       赏金·系列任务
+-- DAILY_CAMP_ROUTINE 阵营日常
+-- WEEK_TEAM_DUNGEON  武林通鉴·秘境
+-- WEEK_RAID_DUNGEON  武林通鉴·团队秘境
+-- WEEK_PUBLIC_QUEST  武林通鉴·公共任务
 
 -- 获取指定活动任务列表
 ---@param szType string @szType枚举值见 {{活动任务 szType 枚举}}
@@ -608,6 +609,7 @@ function X.GetActivityQuest(szType)
 	local aActive = Table_GetActivityOfDay(date.year, date.month, date.day, ACTIVITY_UI.CALENDER)
 	for _, p in ipairs(aActive) do
 		if (szType == 'DAILY_BIG_WAR' and p.szName == _L.ACTIVITY_DAILY_BIG_WAR)
+		or (szType == 'DAILY_CAMP_ROUTINE' and p.szName == _L.ACTIVITY_DAILY_CAMP_ROUTINE)
 		or (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_TEAM_DUNGEON)
 		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_RAID_DUNGEON)
 		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_WEEK_PUBLIC_QUEST)
