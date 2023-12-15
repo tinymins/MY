@@ -607,12 +607,14 @@ function X.GetActivityQuest(szType)
 	local date = TimeToDate(GetCurrentTime())
 	local aActive = Table_GetActivityOfDay(date.year, date.month, date.day, ACTIVITY_UI.CALENDER)
 	for _, p in ipairs(aActive) do
-		if (szType == 'DAILY_BIG_WAR' and p.szName == _L.ACTIVITY_DAILY_BIG_WAR)
-		or (szType == 'DAILY_CAMP_ROUTINE' and p.szName == _L.ACTIVITY_DAILY_CAMP_ROUTINE)
-		or (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_TEAM_DUNGEON)
-		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_RAID_DUNGEON)
-		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_WEEK_PUBLIC_QUEST)
-		or (szType == p.szName) then
+		if p.szQuestID and (
+			(szType == p.szName)
+			or (szType == 'DAILY_BIG_WAR' and p.szName == _L.ACTIVITY_DAILY_BIG_WAR)
+			or (szType == 'DAILY_CAMP_ROUTINE' and p.szName == _L.ACTIVITY_DAILY_CAMP_ROUTINE)
+			or (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_TEAM_DUNGEON)
+			or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_RAID_DUNGEON)
+			or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_WEEK_PUBLIC_QUEST)
+		) then
 			for _, szQuestID in ipairs(X.SplitString(p.szQuestID, ';')) do
 				local dwQuestID = tonumber(szQuestID)
 				local tLine = dwQuestID and Table_GetCalenderActivityQuest(dwQuestID)
