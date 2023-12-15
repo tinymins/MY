@@ -348,7 +348,7 @@ end
 if X.PACKET_INFO.DEBUG_LEVEL < X.DEBUG_LEVEL.NONE then
 	if not X.SHARED_MEMORY.ECHO_LUA_ERROR then
 		RegisterEvent('CALL_LUA_ERROR', function()
-			OutputMessage('MSG_SYS', GetFormatText('CALL_LUA_ERROR:\n' .. arg0 .. '\n'), true)
+			OutputMessage('MSG_SYS', GetFormatText('CALL_LUA_ERROR:\n' .. arg0 .. '\n', nil, 255, 170, 170), true)
 		end)
 		X.SHARED_MEMORY.ECHO_LUA_ERROR = X.PACKET_INFO.NAME_SPACE
 	end
