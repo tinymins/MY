@@ -593,7 +593,6 @@ end
 
 -- {{活动任务 szType 枚举}}
 -- DAILY_BIG_WAR      大战·系列任务
--- DAILY_BOUNTY       赏金·系列任务
 -- DAILY_CAMP_ROUTINE 阵营日常
 -- WEEK_TEAM_DUNGEON  武林通鉴·秘境
 -- WEEK_RAID_DUNGEON  武林通鉴·团队秘境
@@ -626,8 +625,8 @@ function X.GetActivityQuest(szType)
 			end
 		end
 	end
-	if (szType == 'DAILY_BIG_WAR' or szType == 'DAILY_BOUNTY') and #aQuestID == 0 then
-		local szPattern = '^' .. (szType == 'DAILY_BIG_WAR' and _L['Big war'] or _L['Bounty'])
+	if szType == 'DAILY_BIG_WAR' and #aQuestID == 0 then
+		local szPattern = '^' .. _L['Big war']
 		local tLine
 		for nLine = 1, g_tTable.Quests:GetRowCount() do
 			tLine = g_tTable.Quests:GetRow(nLine)

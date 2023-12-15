@@ -72,9 +72,7 @@ return {
 	['TEAM_MARK_FAN'  ] = '扇子',
 
 	['Big war'] = '大戰',
-	['Bounty'] = '賞金',
 	['DAILY_BIG_WAR'] = '大戰·系列任務',
-	['DAILY_BOUNTY'] = '賞金·系列任務',
 	['ACTIVITY_DAILY_BIG_WAR'] = '秘境日常',
 	['ACTIVITY_DAILY_CAMP_ROUTINE'] = '陣營日常',
 	['ACTIVITY_WEEK_TEAM_DUNGEON'] = '武林通鑒·秘境',
