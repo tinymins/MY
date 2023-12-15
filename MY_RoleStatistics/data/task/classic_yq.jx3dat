@@ -41,12 +41,6 @@ return function(env)
 				[env.FORCE_TYPE.TANG_MEN ] = {{8353, 16747}, {8404, 16747}}, -- 唐门
 				[env.FORCE_TYPE.MING_JIAO] = {{9796, 16747}, {9797, 16747}}, -- 明教
 				[env.FORCE_TYPE.GAI_BANG ] = {{11245, 16747}, {11246, 16747}}, -- 丐帮
-				[env.FORCE_TYPE.CANG_YUN ] = {{12701, 16747}, {12702, 16747}}, -- 苍云
-				[env.FORCE_TYPE.CHANG_GE ] = {{14731, 16747}, {14732, 16747}}, -- 长歌
-				[env.FORCE_TYPE.BA_DAO   ] = {{16205, 16747}, {16206, 16747}}, -- 霸刀
-				[env.FORCE_TYPE.PENG_LAI ] = {{19225, 16747}, {19226, 16747}}, -- 蓬莱
-				[env.FORCE_TYPE.LING_XUE ] = {{21067, 16747}, {21068, 16747}}, -- 凌雪
-				[env.FORCE_TYPE.YAN_TIAN ] = {{22775, 16747}, {22776, 16747}}, -- 衍天
 			},
 		},
 		{ -- 公共日常
