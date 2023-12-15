@@ -7,12 +7,9 @@ return function(env)
 			eType = env.TASK_TYPE.DAILY,
 			bRowTip = true,
 			bFloatTip = true,
-			aQuestInfo = {
-				{25449, 869}, -- 大战！英雄幽藤馆！
-				{25450, 869}, -- 大战！英雄镇海阁地井！
-				{25451, 869}, -- 大战！英雄江天夜宴！
-				{25452, 869}, -- 大战！英雄沃石院！
-			},
+			GetQuestInfo = function()
+				return env.GetActivityQuest('DAILY_BIG_WAR')
+			end,
 		},
 		{ -- 茶馆
 			szKey = 'teahouse',
