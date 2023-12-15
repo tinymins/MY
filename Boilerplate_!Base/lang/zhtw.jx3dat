@@ -75,6 +75,7 @@ return {
 	['Bounty'] = '賞金',
 	['DAILY_BIG_WAR'] = '大戰·系列任務',
 	['DAILY_BOUNTY'] = '賞金·系列任務',
+	['ACTIVITY_DAILY_BIG_WAR'] = '秘境日常',
 	['ACTIVITY_WEEK_TEAM_DUNGEON'] = '武林通鑒·秘境',
 	['ACTIVITY_WEEK_RAID_DUNGEON'] = '武林通鑒·團隊秘境',
 	['ACTIVITY_WEEK_PUBLIC_QUEST'] = '武林通鑒·公共任務',

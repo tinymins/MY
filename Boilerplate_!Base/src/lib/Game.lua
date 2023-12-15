@@ -603,22 +603,12 @@ end
 ---@return table @活动任务列表
 function X.GetActivityQuest(szType)
 	local aQuestID = {}
-	if szType == 'DAILY_BIG_WAR' or szType == 'DAILY_BOUNTY' then
-		local szPattern = '^' .. (szType == 'DAILY_BIG_WAR' and _L['Big war'] or _L['Bounty'])
-		local tLine
-		for nLine = 1, g_tTable.Quests:GetRowCount() do
-			tLine = g_tTable.Quests:GetRow(nLine)
-			if tLine.szName:find(szPattern) then
-				table.insert(aQuestID, {tLine.nID, 869})
-			end
-		end
-		return aQuestID
-	end
 	local me = X.GetClientPlayer()
 	local date = TimeToDate(GetCurrentTime())
 	local aActive = Table_GetActivityOfDay(date.year, date.month, date.day, ACTIVITY_UI.CALENDER)
 	for _, p in ipairs(aActive) do
-		if (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_TEAM_DUNGEON)
+		if (szType == 'DAILY_BIG_WAR' and p.szName == _L.ACTIVITY_DAILY_BIG_WAR)
+		or (szType == 'WEEK_TEAM_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_TEAM_DUNGEON)
 		or (szType == 'WEEK_RAID_DUNGEON' and p.szName == _L.ACTIVITY_WEEK_RAID_DUNGEON)
 		or (szType == 'WEEK_PUBLIC_QUEST' and p.szName == _L.ACTIVITY_WEEK_PUBLIC_QUEST)
 		or (szType == p.szName) then
@@ -631,6 +621,16 @@ function X.GetActivityQuest(szType)
 						table.insert(aQuestID, {nQuestID, tLine.nNpcTemplateID})
 					end
 				end
+			end
+		end
+	end
+	if (szType == 'DAILY_BIG_WAR' or szType == 'DAILY_BOUNTY') and #aQuestID == 0 then
+		local szPattern = '^' .. (szType == 'DAILY_BIG_WAR' and _L['Big war'] or _L['Bounty'])
+		local tLine
+		for nLine = 1, g_tTable.Quests:GetRowCount() do
+			tLine = g_tTable.Quests:GetRow(nLine)
+			if tLine.szName:find(szPattern) then
+				table.insert(aQuestID, {tLine.nID, 869})
 			end
 		end
 	end
