@@ -332,9 +332,6 @@ table.insert(COLUMN_LIST, {
 	bFloatTip = false,
 	nMinWidth = 120,
 	nMaxWidth = 120,
-	GetValue = function(prevVal, prevRec)
-		return GetCurrentTime()
-	end,
 	GetSummaryValue = function()
 		return 'SUMMARY'
 	end,
@@ -473,7 +470,9 @@ function D.GetClientPlayerRec()
 	end
 	-- 获取各列数据
 	for _, col in ipairs(COLUMN_LIST) do
-		PLAYER_REC[col.szKey] = col.GetValue(PLAYER_REC_INITIAL[col.szKey], PLAYER_REC_INITIAL)
+		if col.GetValue then
+			PLAYER_REC[col.szKey] = col.GetValue(PLAYER_REC_INITIAL[col.szKey], PLAYER_REC_INITIAL)
+		end
 	end
 	return X.Clone(PLAYER_REC)
 end
