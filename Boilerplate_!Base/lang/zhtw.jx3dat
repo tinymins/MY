@@ -71,6 +71,10 @@ return {
 	['TEAM_MARK_DART' ] = '飛鏢',
 	['TEAM_MARK_FAN'  ] = '扇子',
 
+	['Big war'] = '大戰',
+	['Bounty'] = '賞金',
+	['DAILY_BIG_WAR'] = '大戰·系列任務',
+	['DAILY_BOUNTY'] = '賞金·系列任務',
 	['ACTIVITY_WEEK_TEAM_DUNGEON'] = '武林通鑒·秘境',
 	['ACTIVITY_WEEK_RAID_DUNGEON'] = '武林通鑒·團隊秘境',
 	['ACTIVITY_WEEK_PUBLIC_QUEST'] = '武林通鑒·公共任務',

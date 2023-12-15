@@ -591,15 +591,28 @@ function X.GetRegionGroupMap()
 	return aRegion
 end
 
--- {{武林通鉴 szType 枚举}}
+-- {{活动任务 szType 枚举}}
+-- DAILY_BIG_WAR     大战·系列任务
+-- DAILY_BOUNTY      赏金·系列任务
 -- WEEK_TEAM_DUNGEON 武林通鉴·秘境
 -- WEEK_RAID_DUNGEON 武林通鉴·团队秘境
 -- WEEK_PUBLIC_QUEST 武林通鉴·公共任务
 
 -- 获取指定活动任务列表
--- szType枚举值见 @{{武林通鉴 szType 枚举}}
+-- szType枚举值见 @{{活动任务 szType 枚举}}
 function X.GetActivityQuest(szType)
 	local aQuestID = {}
+	if szType == 'DAILY_BIG_WAR' or szType == 'DAILY_BOUNTY' then
+		local szPattern = '^' .. (szType == 'DAILY_BIG_WAR' and _L['Big war'] or _L['Bounty'])
+		local tLine
+		for nLine = 1, g_tTable.Quests:GetRowCount() do
+			tLine = g_tTable.Quests:GetRow(nLine)
+			if tLine.szName:find(szPattern) then
+				table.insert(aQuestID, {tLine.nID, 869})
+			end
+		end
+		return aQuestID
+	end
 	local me = X.GetClientPlayer()
 	local date = TimeToDate(GetCurrentTime())
 	local aActive = Table_GetActivityOfDay(date.year, date.month, date.day, ACTIVITY_UI.CALENDER)
