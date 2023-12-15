@@ -1,0 +1,242 @@
+return function(env)
+	local swap = {}
+	return {
+		{ -- 大战
+			szKey = 'big_war',
+			szTitle = '大战',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {
+				{25449, 869}, -- 大战！英雄幽藤馆！
+				{25450, 869}, -- 大战！英雄镇海阁地井！
+				{25451, 869}, -- 大战！英雄江天夜宴！
+				{25452, 869}, -- 大战！英雄沃石院！
+			},
+		},
+		{ -- 茶馆
+			szKey = 'teahouse',
+			szTitle = '茶馆',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {
+				-- 90级
+				-- {11115}, -- 乱世烽烟江湖行
+				-- 95级
+				-- {14246, 45009}, -- 快马江湖杯中茶
+				-- 100级
+				-- {19514, 63734}, -- 沧海云帆闻茶香
+				-- 110级
+				{22700, 101195}, -- 江湖烟雨任平生
+			},
+		},
+		{ -- 勤修不辍
+			szKey = 'force_routine',
+			szTitle = '勤修不辍',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			tForceQuestInfo = {
+				[env.FORCE_TYPE.TIAN_CE  ] = {{8206, 16747}, {11254, 16747}, {11255, 16747}}, -- 天策
+				[env.FORCE_TYPE.CHUN_YANG] = {{8347, 16747}, {8398, 16747}}, -- 纯阳
+				[env.FORCE_TYPE.WAN_HUA  ] = {{8348, 16747}, {8399, 16747}, {22842, 16747}, {22929, 16747}}, -- 万花
+				[env.FORCE_TYPE.SHAO_LIN ] = {{8349, 16747}, {8400, 16747}, {22851, 16747}, {22930, 16747}}, -- 少林
+				[env.FORCE_TYPE.QI_XIU   ] = {{8350, 16747}, {8401, 16747}, {22757, 16747}, {22758, 16747}}, -- 七秀
+				[env.FORCE_TYPE.CANG_JIAN] = {{8351, 16747}, {8402, 16747}, {22766, 16747}, {22767, 16747}}, -- 藏剑
+				[env.FORCE_TYPE.WU_DU    ] = {{8352, 16747}, {8403, 16747}}, -- 五毒
+				[env.FORCE_TYPE.TANG_MEN ] = {{8353, 16747}, {8404, 16747}}, -- 唐门
+				[env.FORCE_TYPE.MING_JIAO] = {{9796, 16747}, {9797, 16747}}, -- 明教
+				[env.FORCE_TYPE.GAI_BANG ] = {{11245, 16747}, {11246, 16747}}, -- 丐帮
+				[env.FORCE_TYPE.CANG_YUN ] = {{12701, 16747}, {12702, 16747}}, -- 苍云
+				[env.FORCE_TYPE.CHANG_GE ] = {{14731, 16747}, {14732, 16747}}, -- 长歌
+				[env.FORCE_TYPE.BA_DAO   ] = {{16205, 16747}, {16206, 16747}}, -- 霸刀
+				[env.FORCE_TYPE.PENG_LAI ] = {{19225, 16747}, {19226, 16747}}, -- 蓬莱
+				[env.FORCE_TYPE.LING_XUE ] = {{21067, 16747}, {21068, 16747}}, -- 凌雪
+				[env.FORCE_TYPE.YAN_TIAN ] = {{22775, 16747}, {22776, 16747}}, -- 衍天
+			},
+		},
+		{ -- 浪客行
+			szKey = 'rookie_routine',
+			szTitle = '浪客行',
+			eType = env.TASK_TYPE.WEEKLY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {
+				{21433, 67083},
+			},
+		},
+		{ -- 晶矿争夺
+			szKey = 'crystal_scramble',
+			szTitle = '晶矿争夺',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			tCampQuestInfo = {
+				[env.CAMP.GOOD] = {
+					-- {14727, 46968}, -- 戈壁晶矿引烽烟
+					-- {14729, 46968}, -- 戈壁晶矿引烽烟
+					-- {14893, 62002}, -- 浩气盟！木兰洲上烽烟起
+					-- {18904, 62002}, -- 道源蓝晶起波涛
+					-- {19200, 62002}, -- 道源蓝晶起波涛
+					-- {19310, 62002}, -- 道源蓝晶起波涛
+					-- {19719, 62002}, -- 经首道源寻物资
+					-- 100级后
+					-- {20306, 67195}, -- 木兰洲上烽烟起
+					-- {20307, 67195}, -- 木兰洲上烽烟起
+					-- {20308, 67195}, -- 木兰洲上烽烟起
+					-- 110级
+					{22195, 100967}, -- 西子湖畔危机潜
+					{22196, 100967}, -- 西子湖畔危机潜
+					{22197, 100967}, -- 西子湖畔危机潜
+					{22680, 67195}, -- 观澜泽畔夺神兵
+				},
+				[env.CAMP.EVIL] = {
+					-- {14728, 46969}, -- 戈壁晶矿引烽烟
+					-- {14730, 46969}, -- 戈壁晶矿引烽烟
+					-- {14894, 62039}, -- 恶人谷！木兰洲上烽烟起
+					-- {18936, 62039}, -- 道源蓝晶起波涛
+					-- {19201, 62039}, -- 道源蓝晶起波涛
+					-- {19311, 62039}, -- 道源蓝晶起波涛
+					-- {19720, 62039}, -- 经首道源寻物资
+					-- 100级后
+					-- {20309, 67196}, -- 木兰洲上烽烟起
+					-- {20310, 67196}, -- 木兰洲上烽烟起
+					-- {20311, 67196}, -- 木兰洲上烽烟起
+					-- 110级
+					{22198, 100961}, -- 西子湖畔危机潜
+					{22199, 100961}, -- 西子湖畔危机潜
+					{22200, 100961}, -- 西子湖畔危机潜
+					{22679, 67196}, -- 观澜泽畔夺神兵
+				},
+			},
+		},
+		{ -- 据点贸易
+			szKey = 'stronghold_trade',
+			szTitle = '据点贸易',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			tCampQuestInfo = {
+				[env.CAMP.GOOD] = {
+					{11864, 36388}, -- 据点贸易！浩气盟
+				},
+				[env.CAMP.EVIL] = {
+					{11991, 36387}, -- 据点贸易！恶人谷
+				},
+			},
+		},
+		{ -- 龙门绝境
+			szKey = 'dragon_gate_despair',
+			szTitle = '龙门绝境',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {
+				{17895, 59149},
+			},
+		},
+		{ -- 列星虚境
+			szKey = 'lexus_reality',
+			szTitle = '列星虚境',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {
+				{20220, 64489},
+			},
+		},
+		{ -- 李渡鬼域
+			szKey = 'lidu_ghost_town',
+			szTitle = '李渡鬼域',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {
+				{18317, 64489},
+			},
+		},
+		{ -- 公共日常
+			szKey = 'public_routine',
+			szTitle = '公共日常',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {
+				{14831, 869}, -- 江湖道远侠义天下
+			},
+		},
+		{ -- 采仙草
+			szKey = 'picking_fairy_grass',
+			szTitle = '采仙草',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {{8332, 16747}},
+		},
+		{ -- 寻龙脉
+			szKey = 'find_dragon_veins',
+			szTitle = '寻龙脉',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {{13600, 16747}},
+		},
+		{ -- 美人图
+			szKey = 'illustration_routine',
+			szTitle = '美人图',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {{8440, 15675}},
+		},
+		{ -- 美人图潜行
+			szKey = 'sneak_routine',
+			szTitle = '美人图潜行',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {{7669, 16747}},
+		},
+		{ -- 省试
+			szKey = 'exam_sheng',
+			szTitle = '省试',
+			eType = env.TASK_TYPE.WEEKLY,
+			bRowTip = true,
+			bFloatTip = true,
+			aBuffInfo = {{10936, 0}},
+		},
+		{ -- 会试
+			szKey = 'exam_hui',
+			szTitle = '会试',
+			eType = env.TASK_TYPE.WEEKLY,
+			bRowTip = true,
+			bFloatTip = true,
+			aBuffInfo = {{4125, 0}},
+		},
+		{ -- 武林通鉴·秘境
+			szKey = 'week_team_dungeon',
+			szTitle = '武林通鉴·秘境',
+			eType = env.TASK_TYPE.WEEKLY,
+			bRowTip = true,
+			bFloatTip = true,
+			GetQuestInfo = function() return env.GetActivityQuest('WEEK_TEAM_DUNGEON') end,
+		},
+		{ -- 武林通鉴·团队秘境
+			szKey = 'week_raid_dungeon',
+			szTitle = '武林通鉴·团队秘境',
+			eType = env.TASK_TYPE.WEEKLY,
+			bRowTip = true,
+			bFloatTip = true,
+			GetQuestInfo = function() return env.GetActivityQuest('WEEK_RAID_DUNGEON') end,
+		},
+		{ -- 武林通鉴·公共任务
+			szKey = 'week_public_quest',
+			szTitle = '武林通鉴·公共任务',
+			eType = env.TASK_TYPE.WEEKLY,
+			bRowTip = true,
+			bFloatTip = true,
+			GetQuestInfo = function() return env.GetActivityQuest('WEEK_PUBLIC_QUEST') end,
+		},
+	}
+end

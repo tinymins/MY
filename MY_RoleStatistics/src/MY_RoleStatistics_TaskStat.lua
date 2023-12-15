@@ -200,513 +200,428 @@ end
 
 local TASK_MIN_WIDTH = 50
 local TASK_MAX_WIDTH = 150
-local function GeneCommonFormatText(id)
-	return function(r)
-		return GetFormatText(r[id], 162, 255, 255, 255)
-	end
+
+-------------------------------------------------------------------------------------------------------
+
+local function GetFormatSysmsgText(szText)
+	return GetFormatText(szText, GetMsgFont('MSG_SYS'), GetMsgFontColor('MSG_SYS'))
 end
-local function GeneCommonCompare(id)
-	return function(r1, r2)
-		if r1[id] == r2[id] then
-			return 0
-		end
-		return r1[id] > r2[id] and 1 or -1
-	end
-end
+
+local DATA_ENV = setmetatable(
+	{
+		_L                         = _L                          ,
+		math                       = math                        ,
+		pairs                      = pairs                       ,
+		ipairs                     = ipairs                      ,
+		tonumber                   = tonumber                    ,
+		wstring                    = X.wstring                   ,
+		count_c                    = X.count_c                   ,
+		pairs_c                    = X.pairs_c                   ,
+		ipairs_c                   = X.ipairs_c                  ,
+		ipairs_r                   = X.ipairs_r                  ,
+		spairs                     = X.spairs                    ,
+		spairs_r                   = X.spairs_r                  ,
+		sipairs                    = X.sipairs                   ,
+		sipairs_r                  = X.sipairs_r                 ,
+		IsArray                    = X.IsArray                   ,
+		IsDictionary               = X.IsDictionary              ,
+		IsEquals                   = X.IsEquals                  ,
+		IsNil                      = X.IsNil                     ,
+		IsBoolean                  = X.IsBoolean                 ,
+		IsNumber                   = X.IsNumber                  ,
+		IsUserdata                 = X.IsUserdata                ,
+		IsHugeNumber               = X.IsHugeNumber              ,
+		IsElement                  = X.IsElement                 ,
+		IsEmpty                    = X.IsEmpty                   ,
+		IsString                   = X.IsString                  ,
+		IsTable                    = X.IsTable                   ,
+		IsFunction                 = X.IsFunction                ,
+		IsInMonsterMap             = X.IsInMonsterMap            ,
+		GetBuff                    = X.GetBuff                   ,
+		GetAccount                 = X.GetAccount                ,
+		GetServerOriginName        = X.GetServerOriginName       ,
+		GetItemAmountInAllPackages = X.GetItemAmountInAllPackages,
+		RegisterEvent              = X.RegisterEvent             ,
+		RegisterFrameCreate        = X.RegisterFrameCreate       ,
+		ITEM_TABLE_TYPE            = ITEM_TABLE_TYPE             ,
+		FORCE_TYPE                 = X.CONSTANT.FORCE_TYPE       ,
+		CAMP                       = CAMP                        ,
+		TASK_TYPE                  = TASK_TYPE                   ,
+		GetActivityQuest           = X.GetActivityQuest          ,
+		GetFormatSysmsgText        = GetFormatSysmsgText         ,
+		GetFormatText              = GetFormatText               ,
+		GetMoneyText               = GetMoneyText                ,
+		GetMsgFont                 = GetMsgFont                  ,
+		GetMsgFontColor            = GetMsgFontColor             ,
+		MoneyOptAdd                = MoneyOptAdd                 ,
+		MoneyOptCmp                = MoneyOptCmp                 ,
+		MoneyOptSub                = MoneyOptSub                 ,
+		Output                     = Output                      ,
+	},
+	{
+		__index = function(t, k)
+			if k == 'me' then
+				return X.GetClientPlayer()
+			end
+			if k:find('^arg%d+$') then
+				return _G[k]
+			end
+		end,
+	})
+
+-------------------------------------------------------------------------------------------------------
+
 local COLUMN_LIST = {
 	-- guid,
 	-- account,
 	{ -- 大区
-		id = 'region',
-		bHideInFloat = true,
+		szKey = 'region',
 		szTitle = _L['Region'],
-		nMinWidth = 100, nMaxWidth = 100,
-		GetFormatText = GeneCommonFormatText('region'),
-		Compare = GeneCommonCompare('region'),
+		bTable = true,
+		bRowTip = true,
+		nMinWidth = 100,
+		nMaxWidth = 100,
 	},
 	{ -- 服务器
-		id = 'server',
-		bHideInFloat = true,
+		szKey = 'server',
 		szTitle = _L['Server'],
-		nMinWidth = 100, nMaxWidth = 100,
-		GetFormatText = GeneCommonFormatText('server'),
-		Compare = GeneCommonCompare('server'),
+		bTable = true,
+		bRowTip = true,
+		nMinWidth = 100,
+		nMaxWidth = 100,
 	},
 	{ -- 名字
-		id = 'name',
-		bHideInFloat = true,
+		szKey = 'name',
 		szTitle = _L['Name'],
-		nMinWidth = 110, nMaxWidth = 200,
-		GetFormatText = function(rec)
-			local name = rec.name
+		bTable = true,
+		bRowTip = true,
+		nMinWidth = 110,
+		nMaxWidth = 200,
+		GetFormatText = function(name, rec)
 			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 				name = MY_ChatMosaics.MosaicsString(name)
 			end
 			return GetFormatText(name, 162, X.GetForceColor(rec.force, 'foreground'))
 		end,
-		Compare = GeneCommonCompare('name'),
 	},
 	{ -- 门派
-		id = 'force',
-		bHideInFloat = true,
+		szKey = 'force',
 		szTitle = _L['Force'],
-		nMinWidth = 50, nMaxWidth = 70,
-		GetFormatText = function(rec)
-			return GetFormatText(g_tStrings.tForceTitle[rec.force], 162, 255, 255, 255)
+		bTable = true,
+		bRowTip = true,
+		nMinWidth = 50,
+		nMaxWidth = 70,
+		GetFormatText = function(force, rec)
+			return GetFormatText(g_tStrings.tForceTitle[force], 162, 255, 255, 255)
 		end,
-		Compare = GeneCommonCompare('force'),
 	},
 	{ -- 阵营
-		id = 'camp',
-		bHideInFloat = true,
+		szKey = 'camp',
 		szTitle = _L['Camp'],
-		nMinWidth = 50, nMaxWidth = 50,
-		GetFormatText = function(rec)
-			return GetFormatText(g_tStrings.STR_CAMP_TITLE[rec.camp], 162, 255, 255, 255)
+		bTable = true,
+		bRowTip = true,
+		nMinWidth = 50,
+		nMaxWidth = 50,
+		GetFormatText = function(camp, rec)
+			return GetFormatText(g_tStrings.STR_CAMP_TITLE[camp], 162, 255, 255, 255)
 		end,
-		Compare = GeneCommonCompare('camp'),
 	},
 	{ -- 等级
-		id = 'level',
-		bHideInFloat = true,
+		szKey = 'level',
 		szTitle = _L['Level'],
-		nMinWidth = 50, nMaxWidth = 50,
-		GetFormatText = GeneCommonFormatText('level'),
-		Compare = GeneCommonCompare('level'),
-	},
-	{ -- 时间
-		id = 'time',
-		bHideInFloat = true,
-		szTitle = _L['Cache time'],
-		nMinWidth = 165, nMaxWidth = 200,
-		GetFormatText = function(rec)
-			return GetFormatText(X.FormatTime(rec.time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
-		end,
-		Compare = GeneCommonCompare('time'),
-	},
-	{ -- 时间计时
-		id = 'time_days',
-		bHideInFloat = true,
-		szTitle = _L['Cache time days'],
-		nMinWidth = 120, nMaxWidth = 120,
-		GetFormatText = function(rec)
-			local nTime = GetCurrentTime() - rec.time
-			local nSeconds = math.floor(nTime)
-			local nMinutes = math.floor(nSeconds / 60)
-			local nHours   = math.floor(nMinutes / 60)
-			local nDays    = math.floor(nHours / 24)
-			local nYears   = math.floor(nDays / 365)
-			local nDay     = nDays % 365
-			local nHour    = nHours % 24
-			local nMinute  = nMinutes % 60
-			local nSecond  = nSeconds % 60
-			if nYears > 0 then
-				return GetFormatText(_L('%d years %d days before', nYears, nDay), 162, 255, 255, 255)
-			end
-			if nDays > 0 then
-				return GetFormatText(_L('%d days %d hours before', nDays, nHour), 162, 255, 255, 255)
-			end
-			if nHours > 0 then
-				return GetFormatText(_L('%d hours %d mins before', nHours, nMinute), 162, 255, 255, 255)
-			end
-			if nMinutes > 0 then
-				return GetFormatText(_L('%d mins %d secs before', nMinutes, nSecond), 162, 255, 255, 255)
-			end
-			if nSecond > 10 then
-				return GetFormatText(_L('%d secs before', nSecond), 162, 255, 255, 255)
-			end
-			return GetFormatText(_L['Just now'], 162, 255, 255, 255)
-		end,
-		Compare = GeneCommonCompare('time'),
+		bTable = true,
+		bRowTip = true,
+		nMinWidth = 50,
+		nMaxWidth = 50,
 	},
 }
-local TASK_LIST, TASK_HASH
-local function InitTaskList(bReload)
-	if TASK_LIST and not bReload then
-		return
-	end
-	local aTask = {}
-	-- 内嵌数据
-	-- 大战
-	table.insert(aTask, {
-		id = 'big_war',
-		szTitle = X.ENVIRONMENT.GAME_BRANCH == 'classic'
-			and _L['Bounty']
-			or _L['Big war'],
-		eType = TASK_TYPE.DAILY,
-		aQuestInfo = X.CONSTANT.QUEST_INFO.BIG_WARS,
-	})
-	-- 茶馆
-	table.insert(aTask, {
-		id = 'teahouse',
-		szTitle = _L['Teahouse'],
-		eType = TASK_TYPE.DAILY,
-		aQuestInfo = X.CONSTANT.QUEST_INFO.TEAHOUSE_ROUTINE,
-	})
-	-- 勤修不辍
-	table.insert(aTask, {
-		id = 'force_routine',
-		szTitle = _L['Force routine'],
-		eType = TASK_TYPE.DAILY,
-		tForceQuestInfo = X.CONSTANT.QUEST_INFO.FORCE_ROUTINE,
-	})
-	-- 浪客行
-	table.insert(aTask, {
-		id = 'rookie_routine',
-		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Rookie routine'],
-		eType = TASK_TYPE.WEEKLY,
-		aQuestInfo = X.CONSTANT.QUEST_INFO.ROOKIE_ROUTINE,
-	})
-	-- 晶矿争夺
-	table.insert(aTask, {
-		id = 'crystal_scramble',
-		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Crystal scramble'],
-		eType = TASK_TYPE.DAILY,
-		tCampQuestInfo = X.CONSTANT.QUEST_INFO.CAMP_CRYSTAL_SCRAMBLE,
-	})
-	-- 据点贸易
-	table.insert(aTask, {
-		id = 'stronghold_trade',
-		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Stronghold trade'],
-		eType = TASK_TYPE.DAILY,
-		tCampQuestInfo = X.CONSTANT.QUEST_INFO.CAMP_STRONGHOLD_TRADE,
-	})
-	-- 龙门绝境
-	table.insert(aTask, {
-		id = 'dragon_gate_despair',
-		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Dragon gate despair'],
-		eType = TASK_TYPE.DAILY,
-		aQuestInfo = X.CONSTANT.QUEST_INFO.DRAGON_GATE_DESPAIR,
-	})
-	-- 列星虚境
-	table.insert(aTask, {
-		id = 'lexus_reality',
-		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Lexus reality'],
-		eType = TASK_TYPE.DAILY,
-		aQuestInfo = X.CONSTANT.QUEST_INFO.LEXUS_REALITY,
-	})
-	-- 李渡鬼域
-	table.insert(aTask, {
-		id = 'lidu_ghost_town',
-		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Lidu ghost town'],
-		eType = TASK_TYPE.DAILY,
-		aQuestInfo = X.CONSTANT.QUEST_INFO.LIDU_GHOST_TOWN,
-	})
-	-- 公共日常
-	table.insert(aTask, {
-		id = 'public_routine',
-		szTitle = _L['Public routine'],
-		eType = TASK_TYPE.DAILY,
-		aQuestInfo = X.CONSTANT.QUEST_INFO.PUBLIC_ROUTINE,
-	})
-	-- 采仙草
-	table.insert(aTask, {
-		id = 'picking_fairy_grass',
-		szTitle = _L['Picking fairy grass'],
-		eType = TASK_TYPE.DAILY,
-		aQuestInfo = X.CONSTANT.QUEST_INFO.PICKING_FAIRY_GRASS,
-	})
-	-- 寻龙脉
-	table.insert(aTask, {
-		id = 'find_dragon_veins',
-		bVisible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic',
-		szTitle = _L['Find dragon veins'],
-		eType = TASK_TYPE.DAILY,
-		aQuestInfo = X.CONSTANT.QUEST_INFO.FIND_DRAGON_VEINS,
-	})
-	-- 美人图
-	table.insert(aTask, {
-		id = 'illustration_routine',
-		szTitle = _L['Illustration routine'],
-		eType = TASK_TYPE.DAILY,
-		aQuestInfo = X.CONSTANT.QUEST_INFO.ILLUSTRATION_ROUTINE,
-	})
-	-- 美人图潜行
-	table.insert(aTask, {
-		id = 'sneak_routine',
-		szTitle = _L['Sneak routine'],
-		eType = TASK_TYPE.DAILY,
-		aQuestInfo = X.CONSTANT.QUEST_INFO.SNEAK_ROUTINE,
-	})
-	-- 省试
-	table.insert(aTask, {
-		id = 'exam_sheng',
-		szTitle = _L['Exam sheng'],
-		eType = TASK_TYPE.WEEKLY,
-		aBuffInfo = X.CONSTANT.BUFF_INFO.EXAM_SHENG,
-	})
-	-- 会试
-	table.insert(aTask, {
-		id = 'exam_hui',
-		szTitle = _L['Exam hui'],
-		eType = TASK_TYPE.WEEKLY,
-		aBuffInfo = X.CONSTANT.BUFF_INFO.EXAM_HUI,
-	})
-	-- 用户自定义数据
-	DB_TaskR:ClearBindings()
-	DB_TaskR:BindAll()
-	local aRes = DB_TaskR:GetAll()
-	DB_TaskR:Reset()
-	for _, v in ipairs(aRes) do
-		local tTaskInfo = X.DecodeLUAData(v.task_info) or {}
-		table.insert(aTask, {
-			id = v.guid,
-			szTitle = v.name,
-			eType = tTaskInfo.type or TASK_TYPE.DAILY,
-			aQuestInfo = tTaskInfo.quests,
-			tCampQuestInfo = tTaskInfo.camp_quests,
-			tForceQuestInfo = tTaskInfo.force_quests,
-			aBuffInfo = tTaskInfo.buffs,
-			tCampBuffInfo = tTaskInfo.camp_buffs,
-			tForceBuffInfo = tTaskInfo.force_buffs,
-		})
-	end
-	aTask = X.lodash.filter(aTask, function(p) return p.bVisible ~= false end)
-	TASK_LIST = aTask
-	-- 高速id键索引
-	local tTask = setmetatable({}, {
-		__index = function(_, id)
-			if X.ENVIRONMENT.GAME_BRANCH == 'classic' then
-				return
+-- 分版本列配置
+do
+	local f = X.LoadLUAData(PLUGIN_ROOT .. '/data/task/{$edition}.jx3dat')
+	if X.IsFunction(f) then
+		local t = f(DATA_ENV)
+		if X.IsTable(t) then
+			for _, col in ipairs(t) do
+				if not col.nMinWidth then
+					col.nMinWidth = TASK_MIN_WIDTH
+				end
+				if not col.nMaxWidth then
+					col.nMaxWidth = TASK_MAX_WIDTH
+				end
+				if not col.GetTitleFormatTip then
+					col.GetTitleFormatTip = function()
+						local aTitleTipXml = {
+							GetFormatText(col.szTitle .. '\n', 162, 255, 255, 255),
+							GetFormatText(_L['Refresh type:'] .. TASK_TYPE_STRING[col.eType] .. '\n', 162, 255, 128, 0)
+						}
+						local function InsertTitleTipXml(aInfo)
+							local info = Table_GetQuestStringInfo(aInfo[1])
+							if info then
+								if IsCtrlKeyDown() then
+									table.insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
+								end
+								table.insert(aTitleTipXml, GetFormatText('[' .. info.szName .. ']\n', 162, 255, 255, 0))
+							end
+						end
+						local aQuestInfo = col.aQuestInfo or (col.GetQuestInfo and col.GetQuestInfo())
+						if aQuestInfo then
+							for _, aInfo in ipairs(aQuestInfo) do
+								InsertTitleTipXml(aInfo)
+							end
+						end
+						local tCampQuestInfo = col.tCampQuestInfo or (col.GetCampQuestInfo and col.GetCampQuestInfo())
+						if tCampQuestInfo then
+							for _, aCampQuestInfo in pairs(tCampQuestInfo) do
+								for _, aInfo in ipairs(aCampQuestInfo) do
+									InsertTitleTipXml(aInfo)
+								end
+							end
+						end
+						local tForceQuestInfo = col.tForceQuestInfo or (col.GetForceQuestInfo and col.GetForceQuestInfo())
+						if tForceQuestInfo then
+							for _, aForceQuestInfo in pairs(tForceQuestInfo) do
+								for _, aInfo in ipairs(aForceQuestInfo) do
+									InsertTitleTipXml(aInfo)
+								end
+							end
+						end
+						return table.concat(aTitleTipXml)
+					end
+				end
+				if not col.GetFormatText then
+					col.GetFormatText = function(val, rec)
+						local tTaskState = {}
+						local function CountTaskState(aQuestInfo)
+							for _, aInfo in ipairs(aQuestInfo) do
+								if rec.task_info[aInfo[1]] then
+									tTaskState[rec.task_info[aInfo[1]]] = (tTaskState[rec.task_info[aInfo[1]]] or 0) + 1
+								end
+							end
+						end
+						local aQuestInfo = col.aQuestInfo or (col.GetQuestInfo and col.GetQuestInfo())
+						if aQuestInfo then
+							CountTaskState(aQuestInfo)
+						end
+						local tCampQuestInfo = col.tCampQuestInfo or (col.GetCampQuestInfo and col.GetCampQuestInfo())
+						if tCampQuestInfo and tCampQuestInfo[rec.camp] then
+							CountTaskState(tCampQuestInfo[rec.camp])
+						end
+						local tForceQuestInfo = col.tForceQuestInfo or (col.GetForceQuestInfo and col.GetForceQuestInfo())
+						if tForceQuestInfo and tForceQuestInfo[rec.force] then
+							CountTaskState(tForceQuestInfo[rec.force])
+						end
+						local aBuffInfo = col.aBuffInfo or (col.GetBuffInfo and col.GetBuffInfo())
+						if aBuffInfo then
+							for _, aInfo in ipairs(aBuffInfo) do
+								local szKey = aInfo[1] .. '_' .. (aInfo[2] or 0)
+								if rec.buff_info[szKey] then
+									tTaskState[rec.buff_info[szKey]] = (tTaskState[rec.buff_info[szKey]] or 0) + 1
+								end
+							end
+						end
+						-- local tCampBuffInfo = col.aCampBuffInfo or (col.GetCampBuffInfo and col.GetCampBuffInfo())
+						-- local tForceBuffInfo = col.aForceBuffInfo or (col.GetForceBuffInfo and col.GetForceBuffInfo())
+						local szState, r, g, b
+						if not IsInSamePeriod(rec.time, col.eType) then
+							szState = _L['--']
+						elseif tTaskState[TASK_STATE.FINISHABLE] then
+							szState = _L['Finishable']
+						elseif tTaskState[TASK_STATE.ACCEPTED] then
+							szState = _L['Accepted']
+						elseif tTaskState[TASK_STATE.ACCEPTABLE] then
+							szState = _L['Acceptable']
+						elseif tTaskState[TASK_STATE.FINISHED] then
+							szState, r, g, b = _L['Finished'], 128, 255, 128
+						elseif tTaskState[TASK_STATE.UNACCEPTABLE] then
+							szState = _L['Unacceptable']
+						elseif tTaskState[TASK_STATE.UNKNOWN] then
+							szState = _L['--']
+						else
+							szState = _L['None']
+						end
+						return GetFormatText(szState, 162, r, g, b)
+					end
+				end
+				if not col.GetFormatTip then
+					col.GetFormatTip = function(val, rec)
+						local aXml = {}
+						local function InsertTaskState(aInfo)
+							if IsCtrlKeyDown() then
+								table.insert(aXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
+							end
+							table.insert(aXml, GetFormatText('[' .. X.Get(Table_GetQuestStringInfo(aInfo[1]), 'szName', '') .. ']: ', 162, 255, 255, 0))
+							if rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTABLE then
+								table.insert(aXml, GetFormatText(_L['Acceptable'] .. '\n', 162, 255, 255, 255))
+							elseif rec.task_info[aInfo[1]] == TASK_STATE.UNACCEPTABLE then
+								table.insert(aXml, GetFormatText(_L['Unacceptable'] .. '\n', 162, 255, 255, 255))
+							elseif rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTED then
+								table.insert(aXml, GetFormatText(_L['Accepted'] .. '\n', 162, 255, 255, 255))
+							elseif rec.task_info[aInfo[1]] == TASK_STATE.FINISHED then
+								table.insert(aXml, GetFormatText(_L['Finished'] .. '\n', 162, 255, 255, 255))
+							elseif rec.task_info[aInfo[1]] == TASK_STATE.FINISHABLE then
+								table.insert(aXml, GetFormatText(_L['Finishable'] .. '\n', 162, 255, 255, 255))
+							else
+								table.insert(aXml, GetFormatText(_L['Unknown'] .. '\n', 162, 255, 255, 255))
+							end
+						end
+						local aQuestInfo = col.aQuestInfo or (col.GetQuestInfo and col.GetQuestInfo())
+						if aQuestInfo then
+							for _, aInfo in ipairs(aQuestInfo) do
+								InsertTaskState(aInfo)
+							end
+						end
+						local tCampQuestInfo = col.tCampQuestInfo or (col.GetCampQuestInfo and col.GetCampQuestInfo())
+						if tCampQuestInfo and tCampQuestInfo[rec.camp] then
+							for _, aInfo in ipairs(tCampQuestInfo[rec.camp]) do
+								InsertTaskState(aInfo)
+							end
+						end
+						local tForceQuestInfo = col.tForceQuestInfo or (col.GetForceQuestInfo and col.GetForceQuestInfo())
+						if tForceQuestInfo and tForceQuestInfo[rec.force] then
+							for _, aInfo in ipairs(tForceQuestInfo[rec.force]) do
+								InsertTaskState(aInfo)
+							end
+						end
+						return table.concat(aXml)
+					end
+				end
+				if not col.Compare then
+					col.Compare = function(v1, v2, r1, r2)
+						local k1, k2 = 0, 0
+						local tWeight = {
+							[TASK_STATE.FINISHABLE] = 10000,
+							[TASK_STATE.ACCEPTED] = 1000,
+							[TASK_STATE.ACCEPTABLE] = 100,
+							[TASK_STATE.UNACCEPTABLE] = 10,
+							[TASK_STATE.FINISHED] = 1,
+						}
+						local aQuestInfo = col.aQuestInfo or (col.GetQuestInfo and col.GetQuestInfo())
+						if aQuestInfo then
+							for _, aInfo in ipairs(aQuestInfo) do
+								k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
+								k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
+							end
+						end
+						local tCampQuestInfo = col.tCampQuestInfo or (col.GetCampQuestInfo and col.GetCampQuestInfo())
+						if tCampQuestInfo and tCampQuestInfo[r1.camp] then
+							for _, aInfo in ipairs(tCampQuestInfo[r1.camp]) do
+								k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
+							end
+						end
+						if tCampQuestInfo and tCampQuestInfo[r2.camp] then
+							for _, aInfo in ipairs(tCampQuestInfo[r2.camp]) do
+								k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
+							end
+						end
+						local tForceQuestInfo = col.tForceQuestInfo or (col.GetForceQuestInfo and col.GetForceQuestInfo())
+						if tForceQuestInfo and tForceQuestInfo[r1.force] then
+							for _, aInfo in ipairs(tForceQuestInfo[r1.force]) do
+								k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
+							end
+						end
+						if tForceQuestInfo and tForceQuestInfo[r2.force] then
+							for _, aInfo in ipairs(tForceQuestInfo[r2.force]) do
+								k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
+							end
+						end
+						if not IsInSamePeriod(r1.time, col.eType) then
+							k1 = 0
+						end
+						if not IsInSamePeriod(r2.time, col.eType) then
+							k2 = 0
+						end
+						if k1 == k2 then
+							return 0
+						end
+						return k1 > k2 and 1 or -1
+					end
+				end
+				table.insert(COLUMN_LIST, col)
 			end
-			if id == 'week_team_dungeon' then
-				return {
-					id = id,
-					szTitle = _L.ACTIVITY_WEEK_TEAM_DUNGEON,
-					eType = TASK_TYPE.WEEKLY,
-					aQuestInfo = X.GetActivityQuest('WEEK_TEAM_DUNGEON'),
-				}
-			elseif id == 'week_raid_dungeon' then
-				return {
-					id = id,
-					szTitle = _L.ACTIVITY_WEEK_RAID_DUNGEON,
-					eType = TASK_TYPE.WEEKLY,
-					aQuestInfo = X.GetActivityQuest('WEEK_RAID_DUNGEON'),
-				}
-			elseif id == 'week_public_quest' then
-				return {
-					id = id,
-					szTitle = _L.ACTIVITY_WEEK_PUBLIC_QUEST,
-					eType = TASK_TYPE.WEEKLY,
-					aQuestInfo = X.GetActivityQuest('WEEK_PUBLIC_QUEST'),
-				}
-			end
-		end,
-	})
-	for _, v in ipairs(aTask) do
-		tTask[v.id] = v
+		end
 	end
-	TASK_HASH = tTask
 end
+table.insert(COLUMN_LIST, { -- 时间
+	szKey = 'time',
+	szTitle = _L['Cache time'],
+	bTable = true,
+	bRowTip = true,
+	nMinWidth = 165,
+	nMaxWidth = 200,
+	GetFormatText = function(time, rec)
+		return GetFormatText(X.FormatTime(time, '%yyyy/%MM/%dd %hh:%mm:%ss'), 162, 255, 255, 255)
+	end,
+})
+table.insert(COLUMN_LIST, { -- 时间计时
+	szKey = 'time_days',
+	szTitle = _L['Cache time days'],
+	bTable = true,
+	bRowTip = true,
+	nMinWidth = 120,
+	nMaxWidth = 120,
+	Compare = function(v1, v2, r1, r2)
+		v1, v2 = r1.time, r2.time
+		if v1 == v2 then
+			return 0
+		end
+		return v1 > v2 and 1 or -1
+	end,
+	GetFormatText = function(v, rec)
+		local nTime = GetCurrentTime() - rec.time
+		local nSeconds = math.floor(nTime)
+		local nMinutes = math.floor(nSeconds / 60)
+		local nHours   = math.floor(nMinutes / 60)
+		local nDays    = math.floor(nHours / 24)
+		local nYears   = math.floor(nDays / 365)
+		local nDay     = nDays % 365
+		local nHour    = nHours % 24
+		local nMinute  = nMinutes % 60
+		local nSecond  = nSeconds % 60
+		if nYears > 0 then
+			return GetFormatText(_L('%d years %d days before', nYears, nDay), 162, 255, 255, 255)
+		end
+		if nDays > 0 then
+			return GetFormatText(_L('%d days %d hours before', nDays, nHour), 162, 255, 255, 255)
+		end
+		if nHours > 0 then
+			return GetFormatText(_L('%d hours %d mins before', nHours, nMinute), 162, 255, 255, 255)
+		end
+		if nMinutes > 0 then
+			return GetFormatText(_L('%d mins %d secs before', nMinutes, nSecond), 162, 255, 255, 255)
+		end
+		if nSecond > 10 then
+			return GetFormatText(_L('%d secs before', nSecond), 162, 255, 255, 255)
+		end
+		return GetFormatText(_L['Just now'], 162, 255, 255, 255)
+	end,
+})
 
-local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
-	if not TASK_HASH then
-		InitTaskList()
+local COLUMN_DICT = {}
+for _, col in ipairs(COLUMN_LIST) do
+	if not col.GetFormatText then
+		col.GetFormatText = function(v, rec)
+			if not v then
+				return GetFormatText('--', 162, 255, 255, 255)
+			end
+			return GetFormatText(v, 162, 255, 255, 255)
+		end
 	end
-	local task = TASK_HASH[id]
-	if task then
-		local col = { -- 秘境CD
-			id = id,
-			szTitle = task.szTitle,
-			nMinWidth = TASK_MIN_WIDTH,
-			nMaxWidth = TASK_MAX_WIDTH,
-		}
-		col.GetTitleFormatTip = function()
-			local aTitleTipXml = {
-				GetFormatText(task.szTitle .. '\n', 162, 255, 255, 255),
-				GetFormatText(_L['Refresh type:'] .. TASK_TYPE_STRING[task.eType] .. '\n', 162, 255, 128, 0)
-			}
-			local function InsertTitleTipXml(aInfo)
-				local info = Table_GetQuestStringInfo(aInfo[1])
-				if info then
-					if IsCtrlKeyDown() then
-						table.insert(aTitleTipXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
-					end
-					table.insert(aTitleTipXml, GetFormatText('[' .. info.szName .. ']\n', 162, 255, 255, 0))
-				end
-			end
-			if task.aQuestInfo then
-				for _, aInfo in ipairs(task.aQuestInfo) do
-					InsertTitleTipXml(aInfo)
-				end
-			end
-			if task.tCampQuestInfo then
-				for _, aCampQuestInfo in pairs(task.tCampQuestInfo) do
-					for _, aInfo in ipairs(aCampQuestInfo) do
-						InsertTitleTipXml(aInfo)
-					end
-				end
-			end
-			if task.tForceQuestInfo then
-				for _, aForceQuestInfo in pairs(task.tForceQuestInfo) do
-					for _, aInfo in ipairs(aForceQuestInfo) do
-						InsertTitleTipXml(aInfo)
-					end
-				end
-			end
-			return table.concat(aTitleTipXml)
-		end
-		col.GetFormatText = function(rec)
-			local tTaskState = {}
-			local function CountTaskState(aQuestInfo)
-				for _, aInfo in ipairs(aQuestInfo) do
-					if rec.task_info[aInfo[1]] then
-						tTaskState[rec.task_info[aInfo[1]]] = (tTaskState[rec.task_info[aInfo[1]]] or 0) + 1
-					end
-				end
-			end
-			if task.aQuestInfo then
-				CountTaskState(task.aQuestInfo)
-			end
-			if task.tCampQuestInfo and task.tCampQuestInfo[rec.camp] then
-				CountTaskState(task.tCampQuestInfo[rec.camp])
-			end
-			if task.tForceQuestInfo and task.tForceQuestInfo[rec.force] then
-				CountTaskState(task.tForceQuestInfo[rec.force])
-			end
-			if task.aBuffInfo then
-				for _, aInfo in ipairs(task.aBuffInfo) do
-					local szKey = aInfo[1] .. '_' .. (aInfo[2] or 0)
-					if rec.buff_info[szKey] then
-						tTaskState[rec.buff_info[szKey]] = (tTaskState[rec.buff_info[szKey]] or 0) + 1
-					end
-				end
-			end
-			local szState, r, g, b
-			if not IsInSamePeriod(rec.time, task.eType) then
-				szState = _L['--']
-			elseif tTaskState[TASK_STATE.FINISHABLE] then
-				szState = _L['Finishable']
-			elseif tTaskState[TASK_STATE.ACCEPTED] then
-				szState = _L['Accepted']
-			elseif tTaskState[TASK_STATE.ACCEPTABLE] then
-				szState = _L['Acceptable']
-			elseif tTaskState[TASK_STATE.FINISHED] then
-				szState, r, g, b = _L['Finished'], 128, 255, 128
-			elseif tTaskState[TASK_STATE.UNACCEPTABLE] then
-				szState = _L['Unacceptable']
-			elseif tTaskState[TASK_STATE.UNKNOWN] then
-				szState = _L['--']
-			else
-				szState = _L['None']
-			end
-			return GetFormatText(szState, 162, r, g, b)
-		end
-		col.GetFormatTip = function(rec)
-			local aXml = {}
-			local function InsertTaskState(aInfo)
-				if IsCtrlKeyDown() then
-					table.insert(aXml, GetFormatText('(' .. aInfo[1] .. ')', 162, 255, 128, 0))
-				end
-				table.insert(aXml, GetFormatText('[' .. X.Get(Table_GetQuestStringInfo(aInfo[1]), 'szName', '') .. ']: ', 162, 255, 255, 0))
-				if rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTABLE then
-					table.insert(aXml, GetFormatText(_L['Acceptable'] .. '\n', 162, 255, 255, 255))
-				elseif rec.task_info[aInfo[1]] == TASK_STATE.UNACCEPTABLE then
-					table.insert(aXml, GetFormatText(_L['Unacceptable'] .. '\n', 162, 255, 255, 255))
-				elseif rec.task_info[aInfo[1]] == TASK_STATE.ACCEPTED then
-					table.insert(aXml, GetFormatText(_L['Accepted'] .. '\n', 162, 255, 255, 255))
-				elseif rec.task_info[aInfo[1]] == TASK_STATE.FINISHED then
-					table.insert(aXml, GetFormatText(_L['Finished'] .. '\n', 162, 255, 255, 255))
-				elseif rec.task_info[aInfo[1]] == TASK_STATE.FINISHABLE then
-					table.insert(aXml, GetFormatText(_L['Finishable'] .. '\n', 162, 255, 255, 255))
-				else
-					table.insert(aXml, GetFormatText(_L['Unknown'] .. '\n', 162, 255, 255, 255))
-				end
-			end
-			if task.aQuestInfo then
-				for _, aInfo in ipairs(task.aQuestInfo) do
-					InsertTaskState(aInfo)
-				end
-			end
-			if task.tCampQuestInfo and task.tCampQuestInfo[rec.camp] then
-				for _, aInfo in ipairs(task.tCampQuestInfo[rec.camp]) do
-					InsertTaskState(aInfo)
-				end
-			end
-			if task.tForceQuestInfo and task.tForceQuestInfo[rec.force] then
-				for _, aInfo in ipairs(task.tForceQuestInfo[rec.force]) do
-					InsertTaskState(aInfo)
-				end
-			end
-			return table.concat(aXml)
-		end
-		col.Compare = function(r1, r2)
-			local k1, k2 = 0, 0
-			local tWeight = {
-				[TASK_STATE.FINISHABLE] = 10000,
-				[TASK_STATE.ACCEPTED] = 1000,
-				[TASK_STATE.ACCEPTABLE] = 100,
-				[TASK_STATE.UNACCEPTABLE] = 10,
-				[TASK_STATE.FINISHED] = 1,
-			}
-			if task.aQuestInfo then
-				for _, aInfo in ipairs(task.aQuestInfo) do
-					k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
-					k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
-				end
-			end
-			if task.tCampQuestInfo and task.tCampQuestInfo[r1.camp] then
-				for _, aInfo in ipairs(task.tCampQuestInfo[r1.camp]) do
-					k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
-				end
-			end
-			if task.tCampQuestInfo and task.tCampQuestInfo[r2.camp] then
-				for _, aInfo in ipairs(task.tCampQuestInfo[r2.camp]) do
-					k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
-				end
-			end
-			if task.tForceQuestInfo and task.tForceQuestInfo[r1.force] then
-				for _, aInfo in ipairs(task.tForceQuestInfo[r1.force]) do
-					k1 = k1 + (r1.task_info[aInfo[1]] and tWeight[r1.task_info[aInfo[1]]] or 0)
-				end
-			end
-			if task.tForceQuestInfo and task.tForceQuestInfo[r2.force] then
-				for _, aInfo in ipairs(task.tForceQuestInfo[r2.force]) do
-					k2 = k2 + (r2.task_info[aInfo[1]] and tWeight[r2.task_info[aInfo[1]]] or 0)
-				end
-			end
-			if not IsInSamePeriod(r1.time, task.eType) then
-				k1 = 0
-			end
-			if not IsInSamePeriod(r2.time, task.eType) then
-				k2 = 0
-			end
-			if k1 == k2 then
+	if not col.Compare then
+		col.Compare = function(v1, v2)
+			if v1 == v2 then
 				return 0
 			end
-			return k1 > k2 and 1 or -1
+			if not v1 then
+				return -1
+			end
+			if not v2 then
+				return 1
+			end
+			return v1 > v2 and 1 or -1
 		end
-		return col
 	end
-end })
-for _, p in ipairs(COLUMN_LIST) do
-	COLUMN_DICT[p.id] = p
+	COLUMN_DICT[col.szKey] = col
 end
-
-local ACTIVITY_LIST = {
-	'week_team_dungeon',
-	'week_raid_dungeon',
-	'week_public_quest',
-}
-
-local TIP_COLUMN = {
-	'region',
-	'server',
-	'name',
-	'force',
-	'camp',
-	'level',
-	'TASK',
-	'ACTIVITY',
-	'time',
-	'time_days',
-}
 
 do
 local REC_CACHE
@@ -721,7 +636,6 @@ function D.GetClientPlayerRec()
 		rec = {}
 		REC_CACHE = rec
 	end
-	InitTaskList()
 
 	-- 基础信息
 	rec.guid = guid
@@ -736,34 +650,28 @@ function D.GetClientPlayerRec()
 	rec.task_info = {}
 	rec.buff_info = {}
 
-	local aTask = {}
-	-- 任务选项
-	for _, task in ipairs(TASK_LIST) do
-		table.insert(aTask, task)
-	end
-	-- 动态活动秘境选项
-	for _, szType in ipairs(ACTIVITY_LIST) do
-		table.insert(aTask, TASK_HASH[szType])
-	end
-
-	for _, task in ipairs(aTask) do
-		if task.aQuestInfo then
-			for _, aInfo in ipairs(task.aQuestInfo) do
+	for _, col in ipairs(COLUMN_LIST) do
+		local aQuestInfo = col.aQuestInfo or (col.GetQuestInfo and col.GetQuestInfo())
+		if aQuestInfo then
+			for _, aInfo in ipairs(aQuestInfo) do
 				rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 			end
 		end
-		if task.tCampQuestInfo and task.tCampQuestInfo[me.nCamp] then
-			for _, aInfo in ipairs(task.tCampQuestInfo[me.nCamp]) do
+		local tCampQuestInfo = col.tCampQuestInfo or (col.GetCampQuestInfo and col.GetCampQuestInfo())
+		if tCampQuestInfo and tCampQuestInfo[me.nCamp] then
+			for _, aInfo in ipairs(tCampQuestInfo[me.nCamp]) do
 				rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 			end
 		end
-		if task.tForceQuestInfo and task.tForceQuestInfo[me.dwForceID] then
-			for _, aInfo in ipairs(task.tForceQuestInfo[me.dwForceID]) do
+		local tForceQuestInfo = col.tForceQuestInfo or (col.GetForceQuestInfo and col.GetForceQuestInfo())
+		if tForceQuestInfo and tForceQuestInfo[me.dwForceID] then
+			for _, aInfo in ipairs(tForceQuestInfo[me.dwForceID]) do
 				rec.task_info[aInfo[1]] = GetTaskState(me, aInfo[1], aInfo[2])
 			end
 		end
-		if task.aBuffInfo then
-			for _, aInfo in ipairs(task.aBuffInfo) do
+		local aBuffInfo = col.aBuffInfo or (col.GetBuffInfo and col.GetBuffInfo())
+		if aBuffInfo then
+			for _, aInfo in ipairs(aBuffInfo) do
 				local nState = me.GetBuff(aInfo[1], aInfo[2] or 0)
 					and TASK_STATE.FINISHED
 					or TASK_STATE.UNKNOWN
@@ -884,26 +792,21 @@ function D.UpdateSaveDB()
 	FireUIEvent('MY_ROLE_STAT_TASK_UPDATE')
 end
 
-function D.GetColumns()
-	local aCol = {}
-	for _, id in ipairs(O.aColumn) do
-		local col = COLUMN_DICT[id]
+function D.GetTableColumns()
+	local aColumn = {}
+	for nIndex, szKey in ipairs(O.aColumn) do
+		local col = COLUMN_DICT[szKey]
 		if col then
-			table.insert(aCol, col)
+			table.insert(aColumn, col)
 		end
 	end
-	return aCol
-end
-
-function D.GetTableColumns()
-	local aColumn = D.GetColumns()
 	local nLFixIndex, nLFixWidth = -1, 0
 	for nIndex, col in ipairs(aColumn) do
 		nLFixWidth = nLFixWidth + (col.nMinWidth or 100)
 		if nLFixWidth > 450 then
 			break
 		end
-		if col.id == 'name' then
+		if col.szKey == 'name' then
 			nLFixIndex = nIndex
 			break
 		end
@@ -917,7 +820,7 @@ function D.GetTableColumns()
 		if nRFixWidth > 300 then
 			break
 		end
-		if col.id == 'time' or col.id == 'time_days' then
+		if col.szKey == 'time' or col.szKey == 'time_days' then
 			nRFixIndex = nIndex
 		end
 	end
@@ -927,27 +830,27 @@ function D.GetTableColumns()
 			and 'left'
 			or (nIndex >= nRFixIndex and 'right' or nil)
 		local c = {
-			key = col.id,
-			title = col.szTitle,
+			key = col.szKey,
+			title = col.szTitleAbbr or col.szTitle,
 			titleTip = col.szTitleTip
 				or (col.GetTitleFormatTip and function()
 					return col.GetTitleFormatTip(), true
 				end)
 				or col.szTitle,
-			alignHorizontal = 'center',
+			alignHorizontal = col.szAlignHorizontal or 'center',
 			render = col.GetFormatText
 				and function(value, record, index)
-					return col.GetFormatText(record)
+					return col.GetFormatText(value, record)
 				end
 				or nil,
 			sorter = col.Compare
 				and function(v1, v2, r1, r2)
-					return col.Compare(r1, r2)
+					return col.Compare(v1, v2, r1, r2)
 				end
 				or nil,
 			tip = col.GetFormatTip
 				and function(value, record, index)
-					return col.GetFormatTip(record), true
+					return col.GetFormatTip(value, record), true
 				end
 				or nil,
 			draggable = true,
@@ -1001,51 +904,39 @@ function D.DecodeRow(rec)
 	rec.buff_info = X.DecodeLUAData(rec.buff_info or '') or {}
 end
 
-function D.GetRowTip(rec, bFloat)
+function D.GetRowTip(rec)
 	local aXml = {}
-	local tActivity = X.FlipObjectKV(ACTIVITY_LIST)
-	for _, id in ipairs(TIP_COLUMN) do
-		if id == 'TASK' then
-			for _, col in ipairs(D.GetColumns()) do
-				if TASK_HASH[col.id] and not tActivity[col.id] then
-					table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-					table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-					table.insert(aXml, col.GetFormatText(rec))
-					table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
-				end
-			end
-		elseif id == 'ACTIVITY' then
-			for _, szType in ipairs(ACTIVITY_LIST) do
-				local col = COLUMN_DICT[szType]
-				if col and (not bFloat or not col.bHideInFloat) then
-					table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-					table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-					table.insert(aXml, col.GetFormatText(rec))
-					table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
-				end
-			end
-		else
-			local col = COLUMN_DICT[id]
-			if col and (not bFloat or not col.bHideInFloat) then
-				table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
-				table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
-				table.insert(aXml, col.GetFormatText(rec))
-				table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
-			end
+	for _, col in ipairs(COLUMN_LIST) do
+		if col.bRowTip then
+			table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+			table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+			table.insert(aXml, col.GetFormatText(rec[col.szKey], rec))
+			table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
 		end
 	end
 	return table.concat(aXml)
 end
 
-function D.OutputRowTip(this, rec)
-	local bFloat = this:GetRoot():GetName() ~= 'MY_RoleStatistics'
+function D.OutputFloatEntryTip(this)
+	local rec = D.GetClientPlayerRec()
+	if not rec then
+		return
+	end
+	local aXml = {}
+	for _, col in ipairs(COLUMN_LIST) do
+		if col.bFloatTip then
+			table.insert(aXml, GetFormatText(col.szTitle, 162, 255, 255, 0))
+			table.insert(aXml, GetFormatText(':  ', 162, 255, 255, 0))
+			table.insert(aXml, col.GetFormatText(rec[col.szKey], rec))
+			table.insert(aXml, GetFormatText('\n', 162, 255, 255, 255))
+		end
+	end
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	local nPosType = bFloat and X.UI.TIP_POSITION.TOP_BOTTOM or X.UI.TIP_POSITION.RIGHT_LEFT
-	OutputTip(D.GetRowTip(rec, bFloat), 450, {x, y, w, h}, nPosType)
+	OutputTip(table.concat(aXml), 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 end
 
-function D.CloseRowTip()
+function D.CloseFloatEntryTip()
 	HideTip()
 end
 
@@ -1066,6 +957,7 @@ function D.OnInitPage()
 		end,
 	})
 
+	-- 显示列
 	ui:Append('WndComboBox', {
 		name = 'WndComboBox_DisplayColumns',
 		x = 800, y = 20, w = 180,
@@ -1078,8 +970,8 @@ function D.OnInitPage()
 					t[i] = nil
 				end
 				-- 已添加的
-				for nIndex, id in ipairs(aColumn) do
-					local col = COLUMN_DICT[id]
+				for nIndex, szKey in ipairs(aColumn) do
+					local col = COLUMN_DICT[szKey]
 					if col then
 						table.insert(t, {
 							szOption = col.szTitle,
@@ -1147,68 +1039,22 @@ function D.OnInitPage()
 						})
 						nMinW = nMinW + col.nMinWidth
 					end
-					tChecked[id] = true
+					tChecked[szKey] = true
 				end
 				-- 未添加的
-				local function fnAction(id, nWidth)
-					local bExist = false
-					for i, v in ipairs(aColumn) do
-						if v == id then
-							table.remove(aColumn, i)
-							O.aColumn = aColumn
-							bExist = true
-							break
-						end
-					end
-					if not bExist then
-						table.insert(aColumn, id)
-						O.aColumn = aColumn
-					end
-					UpdateMenu()
-					D.FlushDB()
-					D.UpdateUI(page)
-				end
-				-- 普通选项
 				for _, col in ipairs(COLUMN_LIST) do
-					if not tChecked[col.id] then
+					if col.bTable and not tChecked[col.szKey] then
 						table.insert(t, {
 							szOption = col.szTitle,
 							fnAction = function()
-								fnAction(col.id, col.nMinWidth)
+								local aColumn = O.aColumn
+								table.insert(aColumn, col.szKey)
+								O.aColumn = aColumn
+								UpdateMenu()
+								D.FlushDB()
+								D.UpdateUI(page)
 							end,
 						})
-					end
-				end
-				-- 任务选项
-				for _, task in ipairs(TASK_LIST) do
-					if not tChecked[task.id] then
-						local col = COLUMN_DICT[task.id]
-						if col then
-							table.insert(t, {
-								szOption = col.szTitle,
-								bCheck = true, bChecked = tChecked[col.id],
-								fnAction = function()
-									fnAction(col.id, col.nMinWidth)
-								end,
-							})
-						end
-						tChecked[task.id] = true
-					end
-				end
-				-- 动态活动秘境选项
-				for _, szType in ipairs(ACTIVITY_LIST) do
-					if not tChecked[szType] then
-						local col = COLUMN_DICT[szType]
-						if col then
-							table.insert(t, {
-								szOption = col.szTitle,
-								bCheck = true, bChecked = tChecked[col.id],
-								fnAction = function()
-									fnAction(col.id, col.nMinWidth)
-								end,
-							})
-							tChecked[szType] = true
-						end
 					end
 				end
 			end
@@ -1227,7 +1073,7 @@ function D.OnInitPage()
 		end,
 		rowTip = {
 			render = function(rec)
-				return D.GetRowTip(rec, false), true
+				return D.GetRowTip(rec), true
 			end,
 			position = X.UI.TIP_POSITION.RIGHT_LEFT,
 		},
@@ -1337,34 +1183,6 @@ function D.OnLButtonClick()
 	end
 end
 
-function D.OnItemLButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_TaskStatColumn' then
-		if this.col.id then
-			local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-			if O.szSort == this.col.id then
-				O.szSortOrder = O.szSortOrder == 'asc' and 'desc' or 'asc'
-			else
-				O.szSort = this.col.id
-			end
-			D.UpdateUI(page)
-		end
-	end
-end
-
-function D.OnItemMouseEnter()
-	if this.tip then
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)
-	end
-end
-D.OnItemRefreshTip = D.OnItemMouseEnter
-
-function D.OnItemMouseLeave()
-	HideTip()
-end
-
 -- 浮动框
 function D.ApplyFloatEntry(bFloatEntry)
 	local frame = Station.Lookup('Normal/SprintPower')
@@ -1372,6 +1190,9 @@ function D.ApplyFloatEntry(bFloatEntry)
 		return
 	end
 	local btn = frame:Lookup('Btn_MY_RoleStatistics_TaskEntry')
+	if X.IsNil(bFloatEntry) then
+		bFloatEntry = O.bFloatEntry
+	end
 	if bFloatEntry then
 		if btn then
 			return
@@ -1382,14 +1203,10 @@ function D.ApplyFloatEntry(bFloatEntry)
 		btn:SetRelPos(72, 37)
 		X.UI.CloseFrame(frameTemp)
 		btn.OnMouseEnter = function()
-			local rec = D.GetClientPlayerRec()
-			if not rec then
-				return
-			end
-			D.OutputRowTip(this, rec)
+			D.OutputFloatEntryTip(this)
 		end
 		btn.OnMouseLeave = function()
-			D.CloseRowTip()
+			D.CloseFloatEntryTip()
 		end
 		btn.OnLButtonClick = function()
 			MY_RoleStatistics.Open('TaskStat')
@@ -1484,6 +1301,10 @@ X.RegisterUserSettingsInit('MY_RoleStatistics_TaskStat', function()
 	D.UpdateFloatEntry()
 end)
 
+X.RegisterFlush('MY_RoleStatistics_TaskStat', function()
+	D.FlushDB()
+end)
+
 X.RegisterExit('MY_RoleStatistics_TaskStat', function()
 	if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 		D.UpdateSaveDB()
@@ -1493,10 +1314,6 @@ end)
 
 X.RegisterReload('MY_RoleStatistics_TaskStat', function()
 	D.ApplyFloatEntry(false)
-end)
-
-X.RegisterFlush('MY_RoleStatistics_TaskStat', function()
-	D.FlushDB()
 end)
 
 X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_TaskStat',  function()

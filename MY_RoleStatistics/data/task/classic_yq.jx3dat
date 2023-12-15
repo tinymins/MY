@@ -1,0 +1,103 @@
+return function(env)
+	local swap = {}
+	return {
+		{ -- 大战
+			szKey = 'big_war',
+			szTitle = '大战',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {
+				{11200, 869}, -- 大战！英雄一线天！
+				{11201, 869}, -- 大战！英雄华清宫！
+				{11202, 869}, -- 大战！华清宫回忆录！
+				{11203, 869}, -- 大战！英雄流离岛！
+			},
+		},
+		{ -- 茶馆
+			szKey = 'teahouse',
+			szTitle = '茶馆',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {
+				{11115, 101195}, -- 乱世烽烟江湖行
+			},
+		},
+		{ -- 勤修不辍
+			szKey = 'force_routine',
+			szTitle = '勤修不辍',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			tForceQuestInfo = {
+				[env.FORCE_TYPE.TIAN_CE  ] = {{8206, 16747}, {11254, 16747}, {11255, 16747}}, -- 天策
+				[env.FORCE_TYPE.CHUN_YANG] = {{8347, 16747}, {8398, 16747}}, -- 纯阳
+				[env.FORCE_TYPE.WAN_HUA  ] = {{8348, 16747}, {8399, 16747}, {22842, 16747}, {22929, 16747}}, -- 万花
+				[env.FORCE_TYPE.SHAO_LIN ] = {{8349, 16747}, {8400, 16747}, {22851, 16747}, {22930, 16747}}, -- 少林
+				[env.FORCE_TYPE.QI_XIU   ] = {{8350, 16747}, {8401, 16747}, {22757, 16747}, {22758, 16747}}, -- 七秀
+				[env.FORCE_TYPE.CANG_JIAN] = {{8351, 16747}, {8402, 16747}, {22766, 16747}, {22767, 16747}}, -- 藏剑
+				[env.FORCE_TYPE.WU_DU    ] = {{8352, 16747}, {8403, 16747}}, -- 五毒
+				[env.FORCE_TYPE.TANG_MEN ] = {{8353, 16747}, {8404, 16747}}, -- 唐门
+				[env.FORCE_TYPE.MING_JIAO] = {{9796, 16747}, {9797, 16747}}, -- 明教
+				[env.FORCE_TYPE.GAI_BANG ] = {{11245, 16747}, {11246, 16747}}, -- 丐帮
+				[env.FORCE_TYPE.CANG_YUN ] = {{12701, 16747}, {12702, 16747}}, -- 苍云
+				[env.FORCE_TYPE.CHANG_GE ] = {{14731, 16747}, {14732, 16747}}, -- 长歌
+				[env.FORCE_TYPE.BA_DAO   ] = {{16205, 16747}, {16206, 16747}}, -- 霸刀
+				[env.FORCE_TYPE.PENG_LAI ] = {{19225, 16747}, {19226, 16747}}, -- 蓬莱
+				[env.FORCE_TYPE.LING_XUE ] = {{21067, 16747}, {21068, 16747}}, -- 凌雪
+				[env.FORCE_TYPE.YAN_TIAN ] = {{22775, 16747}, {22776, 16747}}, -- 衍天
+			},
+		},
+		{ -- 公共日常
+			szKey = 'public_routine',
+			szTitle = '公共日常',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {
+				{14831, 869}, -- 江湖道远侠义天下
+			},
+		},
+		{ -- 采仙草
+			szKey = 'picking_fairy_grass',
+			szTitle = '采仙草',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {{8332, 16747}},
+		},
+		{ -- 美人图
+			szKey = 'illustration_routine',
+			szTitle = '美人图',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {{8440, 15675}},
+		},
+		{ -- 美人图潜行
+			szKey = 'sneak_routine',
+			szTitle = '美人图潜行',
+			eType = env.TASK_TYPE.DAILY,
+			bRowTip = true,
+			bFloatTip = true,
+			aQuestInfo = {{7669, 16747}},
+		},
+		{ -- 省试
+			szKey = 'exam_sheng',
+			szTitle = '省试',
+			eType = env.TASK_TYPE.WEEKLY,
+			bRowTip = true,
+			bFloatTip = true,
+			aBuffInfo = {{10936, 0}},
+		},
+		{ -- 会试
+			szKey = 'exam_hui',
+			szTitle = '会试',
+			eType = env.TASK_TYPE.WEEKLY,
+			bRowTip = true,
+			bFloatTip = true,
+			aBuffInfo = {{4125, 0}},
+		},
+	}
+end
