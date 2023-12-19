@@ -221,7 +221,13 @@ function X.CopyChatLine(hTime, bTextEditor, bRichText)
 						if bBegin == nil then
 							bBegin = false
 						end
-						edit:InsertObj(szText, { type = 'name', text = szText, name = string.match(szText, '%[(.*)%]') })
+						local szName = string.match(szText, '%[(.*)%]')
+						-- ¹ýÂË»»ÐÐ·û
+						if X.IsRestricted('X.CHAT_CRLF') then
+							szName = X.StringReplaceW(szName, '\n', '')
+							szText = X.StringReplaceW(szText, '\n', '')
+						end
+						edit:InsertObj(szText, { type = 'name', text = szText, name = szName })
 					elseif szName == 'questlink' then
 						edit:InsertObj(szText, { type = 'quest', text = szText, questid = p:GetUserData() })
 					elseif szName == 'recipelink' then
