@@ -21,7 +21,7 @@ return function(env)
 			bRowTip = true,
 			bFloatTip = true,
 			aQuestInfo = {
-				{11115, 101195}, -- 乱世烽烟江湖行
+				{11115, 23669}, -- 乱世烽烟江湖行
 			},
 		},
 		{ -- 勤修不辍
