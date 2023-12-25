@@ -60,6 +60,12 @@ function D.OnEvent(event)
 	end
 end
 
+local SH_FUNC = {
+	ShowWhenUIHide = function(sh, bShowWhenUIHide)
+		sh.bShowWhenUIHide = bShowWhenUIHide
+	end,
+}
+
 function X.UI.GetShadowHandle(szName)
 	local frame = Station.SearchFrame(FRAME_NAME)
 	if frame and not X.IsElement(frame) then -- 关闭无效的 frame 句柄
@@ -80,6 +86,9 @@ function X.UI.GetShadowHandle(szName)
 		X.Debug('UI', 'Create sh # ' .. szName, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		sh = frame:Lookup('', szName)
+		for k, v in pairs(SH_FUNC) do
+			sh[k] = v
+		end
 	end
 	return sh
 end
@@ -96,33 +105,20 @@ function X.UI.ClearShadowHandle(szName)
 	sh:Clear()
 end
 
-function X.UI.SetShadowHandleParam(szName, tParam)
-	local sh = X.UI.GetShadowHandle(szName)
-	for k, v in pairs(tParam) do
-		sh[k] = v
-	end
-end
-
-do local VISIBLES = {}
-function X.UI.TempSetShadowHandleVisible(bVisible)
+function X.UI.SetShadowHandleVisible(szName, bVisible)
 	local frame = Station.SearchFrame(FRAME_NAME)
 	if not frame then
-		return table.insert(VISIBLES, true)
-	end
-	table.insert(VISIBLES, frame:IsVisible() or false)
-	frame:SetVisible(bVisible)
-end
-
-function X.UI.RevertShadowHandleVisible()
-	if #VISIBLES == 0 then
 		return
 	end
-	local bVisible = table.remove(VISIBLES)
-	local frame = Station.SearchFrame(FRAME_NAME)
-	if frame then
+	if szName == '*' then
 		frame:SetVisible(bVisible)
+		return
 	end
-end
+	local sh = frame:Lookup('', szName)
+	if not sh then
+		return
+	end
+	sh:SetVisible(bVisible)
 end
 
 -- Global exports
