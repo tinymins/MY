@@ -61,8 +61,11 @@ function D.OnEvent(event)
 end
 
 local SH_FUNC = {
-	ShowWhenUIHide = function(sh, bShowWhenUIHide)
-		sh.bShowWhenUIHide = bShowWhenUIHide
+	ShowWhenUIHide = function(sh)
+		sh.bShowWhenUIHide = true
+	end,
+	HideWhenUIHide = function(sh)
+		sh.bShowWhenUIHide = nil
 	end,
 }
 
