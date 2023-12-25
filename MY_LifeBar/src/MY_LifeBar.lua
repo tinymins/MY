@@ -383,7 +383,15 @@ end
 X.RegisterEvent('UI_SCALED', D.Repaint)
 
 function D.UpdateShadowHandleParam()
-	X.UI.SetShadowHandleParam('MY_LifeBar', { bShowWhenUIHide = Config.bShowWhenUIHide })
+	local sh = X.UI.GetShadowHandle('MY_LifeBar')
+	if not sh then
+		return
+	end
+	if Config.bShowWhenUIHide then
+		sh:ShowWhenUIHide()
+	else
+		sh:HideWhenUIHide()
+	end
 end
 
 function D.Reset()
