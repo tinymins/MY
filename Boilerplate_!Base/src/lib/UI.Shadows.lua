@@ -105,26 +105,20 @@ function X.UI.ClearShadowHandle(szName)
 	sh:Clear()
 end
 
-do local VISIBLES = {}
-function X.UI.TempSetShadowHandleVisible(bVisible)
+function X.UI.SetShadowHandleVisible(szName, bVisible)
 	local frame = Station.SearchFrame(FRAME_NAME)
 	if not frame then
-		return table.insert(VISIBLES, true)
-	end
-	table.insert(VISIBLES, frame:IsVisible() or false)
-	frame:SetVisible(bVisible)
-end
-
-function X.UI.RevertShadowHandleVisible()
-	if #VISIBLES == 0 then
 		return
 	end
-	local bVisible = table.remove(VISIBLES)
-	local frame = Station.SearchFrame(FRAME_NAME)
-	if frame then
+	if szName == '*' then
 		frame:SetVisible(bVisible)
+		return
 	end
-end
+	local sh = frame:Lookup('', szName)
+	if not sh then
+		return
+	end
+	sh:SetVisible(bVisible)
 end
 
 -- Global exports
