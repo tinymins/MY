@@ -60,6 +60,12 @@ function D.OnEvent(event)
 	end
 end
 
+local SH_FUNC = {
+	ShowWhenUIHide = function(sh, bShowWhenUIHide)
+		sh.bShowWhenUIHide = bShowWhenUIHide
+	end,
+}
+
 function X.UI.GetShadowHandle(szName)
 	local frame = Station.SearchFrame(FRAME_NAME)
 	if frame and not X.IsElement(frame) then -- 关闭无效的 frame 句柄
@@ -80,6 +86,9 @@ function X.UI.GetShadowHandle(szName)
 		X.Debug('UI', 'Create sh # ' .. szName, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		sh = frame:Lookup('', szName)
+		for k, v in pairs(SH_FUNC) do
+			sh[k] = v
+		end
 	end
 	return sh
 end
@@ -94,13 +103,6 @@ function X.UI.ClearShadowHandle(szName)
 		return
 	end
 	sh:Clear()
-end
-
-function X.UI.SetShadowHandleParam(szName, tParam)
-	local sh = X.UI.GetShadowHandle(szName)
-	for k, v in pairs(tParam) do
-		sh[k] = v
-	end
 end
 
 do local VISIBLES = {}
