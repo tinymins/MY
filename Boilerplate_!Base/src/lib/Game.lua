@@ -3829,7 +3829,7 @@ end
 ---@param dwMapID number @要判断的地图ID
 ---@return boolean @是否是家园地图
 function X.IsHomelandMap(dwMapID)
-	return select(2, GetMapParams(dwMapID)) == MAP_TYPE.COMMUNITY
+	return select(2, GetMapParams(dwMapID)) == MAP_TYPE.HOMELAND
 end
 
 ---判断当前地图是不是家园地图
