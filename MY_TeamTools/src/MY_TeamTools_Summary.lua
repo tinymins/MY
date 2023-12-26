@@ -891,6 +891,7 @@ function D.OnInitPage()
 	RT_SELECT_KUNGFU = nil
 	page.hPlayer = frame:CreateItemData(SZ_INI, 'Handle_Item_Player')
 	page.hList = page:Lookup('Wnd_Summary/Scroll_Player', '')
+	local hSummaryTotal = page:Lookup('Wnd_Summary', '')
 
 	this.tScore = {}
 	-- 排序
@@ -921,6 +922,7 @@ function D.OnInitPage()
 	this.hProgress   = page:Lookup('Wnd_Summary', 'Handle_Progress')
 	-- 秘境信息
 	local hDungeon = page:Lookup('Wnd_Summary', 'Handle_Dungeon')
+	local hKungfu = page:Lookup('Wnd_Summary', 'Handle_Kungfu')
 	D.UpdateDungeonInfo(hDungeon)
 	this.hKungfuList = page:Lookup('Wnd_Summary', 'Handle_Kungfu/Handle_Kungfu_List')
 	this.hKungfu     = frame:CreateItemData(SZ_INI, 'Handle_Kungfu_Item')
@@ -960,6 +962,11 @@ function D.OnInitPage()
 		end
 	end
 	this.hKungfuList:FormatAllItemPos()
+	local nH = select(2, this.hKungfuList:GetAllItemSize())
+	this.hKungfuList:SetH(nH)
+	hKungfu:SetH(nH + 10)
+	hDungeon:SetRelY(hKungfu:GetRelY() + nH + 10)
+	hSummaryTotal:FormatAllItemPos()
 	-- ui 临时变量
 	this.tViewInvite = {} -- 请求装备队列
 	this.tDataCache  = {} -- 临时数据
