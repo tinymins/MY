@@ -220,9 +220,9 @@ function D.UpdateList(page)
 		D.CountScore(v, tScore)
 		if not RT_SELECT_KUNGFU or (RT_SELECT_KUNGFU and v.dwMountKungfuID == RT_SELECT_KUNGFU) then
 			local szName = 'P' .. v.dwID
-			local h = page.hList:Lookup(szName)
+			local h = page.hPlayerList:Lookup(szName)
 			if not h then
-				h = page.hList:AppendItemFromData(page.hPlayer)
+				h = page.hPlayerList:AppendItemFromData(page.hItemDataPlayer)
 			end
 			h:SetUserData(k)
 			h:SetName(szName)
@@ -515,13 +515,13 @@ function D.UpdateList(page)
 			end
 		end
 	end
-	page.hList:FormatAllItemPos()
-	for i = 0, page.hList:GetItemCount() - 1, 1 do
-		local item = page.hList:Lookup(i)
+	page.hPlayerList:FormatAllItemPos()
+	for i = 0, page.hPlayerList:GetItemCount() - 1, 1 do
+		local item = page.hPlayerList:Lookup(i)
 		if item and item:IsValid() then
 			if not MY_IsParty(item.dwID) and item.dwID ~= me.dwID then
-				page.hList:RemoveItem(item)
-				page.hList:FormatAllItemPos()
+				page.hPlayerList:RemoveItem(item)
+				page.hPlayerList:FormatAllItemPos()
 			end
 		end
 	end
@@ -889,11 +889,12 @@ function D.OnInitPage()
 	frame:RegisterEvent('MY_RAIDTOOLS_MAPID_CHANGE')
 	-- 重置心法选择
 	RT_SELECT_KUNGFU = nil
-	page.hPlayer = frame:CreateItemData(SZ_INI, 'Handle_Item_Player')
-	page.hList = page:Lookup('Wnd_Summary/Scroll_Player', '')
+	local hPlayerList = page:Lookup('Wnd_Summary/Scroll_Player', '')
 	local hSummaryTotal = page:Lookup('Wnd_Summary', '')
+	page.hPlayerList = hPlayerList
+	page.hItemDataPlayer = frame:CreateItemData(SZ_INI, 'Handle_Item_Player')
 
-	this.tScore = {}
+	page.tScore = {}
 	-- 排序
 	local hTitle = page:Lookup('Wnd_Summary', 'Handle_Player_BG')
 	for k, v in ipairs({'dwForceID', 'tFood', 'tBuff', 'tEquip', 'nEquipScore', 'tBossKill', 'nFightState'}) do
@@ -913,22 +914,22 @@ function D.OnInitPage()
 			end
 			RT_SORT_FIELD = v
 			D.UpdateList(page) -- set userdata
-			page.hList:Sort()
-			page.hList:FormatAllItemPos()
+			page.hPlayerList:Sort()
+			page.hPlayerList:FormatAllItemPos()
 		end
 	end
 	-- 装备分
-	this.hTotalScore = page:Lookup('Wnd_Summary', 'Handle_Score/Text_TotalScore')
-	this.hProgress   = page:Lookup('Wnd_Summary', 'Handle_Progress')
+	page.hTotalScore = page:Lookup('Wnd_Summary', 'Handle_Score/Text_TotalScore')
+	page.hProgress   = page:Lookup('Wnd_Summary', 'Handle_Progress')
 	-- 秘境信息
 	local hDungeon = page:Lookup('Wnd_Summary', 'Handle_Dungeon')
 	local hKungfu = page:Lookup('Wnd_Summary', 'Handle_Kungfu')
 	D.UpdateDungeonInfo(hDungeon)
-	this.hKungfuList = page:Lookup('Wnd_Summary', 'Handle_Kungfu/Handle_Kungfu_List')
-	this.hKungfu     = frame:CreateItemData(SZ_INI, 'Handle_Kungfu_Item')
-	this.hKungfuList:Clear()
+	local hKungfuList     = page:Lookup('Wnd_Summary', 'Handle_Kungfu/Handle_Kungfu_List')
+	local hItemDataKungfu = frame:CreateItemData(SZ_INI, 'Handle_Kungfu_Item')
+	hKungfuList:Clear()
 	for k, kungfu in pairs(X.CONSTANT.KUNGFU_LIST) do
-		local h = this.hKungfuList:AppendItemFromData(this.hKungfu, kungfu.dwID)
+		local h = hKungfuList:AppendItemFromData(hItemDataKungfu, kungfu.dwID)
 		local img = h:Lookup('Image_Force')
 		img:FromIconID(select(2, MY_GetSkillName(kungfu.dwID)))
 		h:Lookup('Text_Num'):SetText(0)
@@ -945,7 +946,7 @@ function D.OnInitPage()
 			if this:GetAlpha() ~= 255 then
 				return
 			end
-			page.hList:Clear()
+			page.hPlayerList:Clear()
 			if RT_SELECT_KUNGFU then
 				if RT_SELECT_KUNGFU == tonumber(this:GetName()) then
 					RT_SELECT_KUNGFU = nil
@@ -961,15 +962,16 @@ function D.OnInitPage()
 			D.UpdateList(page)
 		end
 	end
-	this.hKungfuList:FormatAllItemPos()
-	local nH = select(2, this.hKungfuList:GetAllItemSize())
-	this.hKungfuList:SetH(nH)
+	hKungfuList:FormatAllItemPos()
+	local nH = select(2, hKungfuList:GetAllItemSize())
+	hKungfuList:SetH(nH)
 	hKungfu:SetH(nH + 10)
 	hDungeon:SetRelY(hKungfu:GetRelY() + nH + 10)
 	hSummaryTotal:FormatAllItemPos()
+	page.hKungfuList = hKungfuList
 	-- ui 临时变量
-	this.tViewInvite = {} -- 请求装备队列
-	this.tDataCache  = {} -- 临时数据
+	page.tViewInvite = {} -- 请求装备队列
+	page.tDataCache  = {} -- 临时数据
 	-- lang
 	page:Lookup('Wnd_Summary', 'Handle_Player_BG/Text_Title_3'):SetText(_L['BUFF'])
 	page:Lookup('Wnd_Summary', 'Handle_Player_BG/Text_Title_4'):SetText(_L['Equip'])
@@ -1014,13 +1016,13 @@ function D.OnEvent(szEvent)
 		local me = X.GetClientPlayer()
 		if me.dwID == arg1 then
 			this.tDataCache = {}
-			this.hList:Clear()
+			this.hPlayerList:Clear()
 		else
 			this.tDataCache[arg1] = nil
 		end
 	elseif szEvent == 'LOADING_END' or szEvent == 'PARTY_DISBAND' then
 		this.tDataCache = {}
-		this.hList:Clear()
+		this.hPlayerList:Clear()
 		-- 秘境信息
 		local hDungeon = this:Lookup('Wnd_Summary', 'Handle_Dungeon')
 		D.UpdateDungeonInfo(hDungeon)
@@ -1034,8 +1036,8 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'MY_RAIDTOOLS_SUCCESS' then
 		if RT_SORT_FIELD == 'nEquipScore' then
 			D.UpdateList(this)
-			this.hList:Sort()
-			this.hList:FormatAllItemPos()
+			this.hPlayerList:Sort()
+			this.hPlayerList:FormatAllItemPos()
 		end
 	end
 end
