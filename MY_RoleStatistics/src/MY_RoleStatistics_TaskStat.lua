@@ -1104,9 +1104,9 @@ function D.OnInitPage()
 				{
 					szOption = _L['Delete'],
 					fnAction = function()
-						DB_TaskInfoD:ClearBindings()
-						DB_TaskInfoD:BindAll(AnsiToUTF8(rec.guid))
-						DB_TaskInfoD:Execute()
+						local data = X.LoadLUAData(STAT_DATA_FILE) or {}
+						data[rec.guid] = nil
+						X.SaveLUAData(STAT_DATA_FILE, data)
 						D.UpdateUI(page)
 					end,
 					rgb = { 255, 128, 128 },
@@ -1193,16 +1193,6 @@ end
 
 function D.OnLButtonClick()
 	local name = this:GetName()
-	if name == 'Btn_Delete' then
-		local wnd = this:GetParent()
-		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
-			DB_TaskInfoD:ClearBindings()
-			DB_TaskInfoD:BindAll(AnsiToUTF8(wnd.guid))
-			DB_TaskInfoD:Execute()
-			D.UpdateUI(page)
-		end)
-	end
 end
 
 -- ¸¡¶¯¿ò

@@ -1210,13 +1210,6 @@ end
 
 function D.OnLButtonClick()
 	local name = this:GetName()
-	if name == 'Btn_Delete' then
-		local wnd = this:GetParent()
-		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
-		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
-			D.UpdateUI(page)
-		end)
-	end
 end
 
 function D.InitAlert()
