@@ -165,13 +165,21 @@ X.RegisterEvent('LOADING_END', 'MY_BigWarChecker', function()
 	-- 分析大战本状态数据
 	local aQuestInfo = {}
 	for _, v in ipairs(X.GetActivityQuest('DAILY_BIG_WAR')) do
+		local tMap = {}
 		local szPos = Table_GetQuestPosInfo(v[1], 'quest_state', 1)
-		local szMap = szPos and szPos:match('N (%d+),')
-		local dwMap = szMap and tonumber(szMap)
+		local szMaps = szPos and szPos:match('N ([%d|]+),')
+		if szMaps then
+			for _, szMap in ipairs(X.SplitString(szMaps, '|')) do
+				local dwMap = szMap and tonumber(szMap)
+				if dwMap then
+					tMap[dwMap] = true
+				end
+			end
+		end
 		table.insert(aQuestInfo, {
 			dwQuestID = v[1],
 			dwNpcTemplateID = v[2],
-			dwMapID = dwMap,
+			tMap = tMap,
 			eState = GetTaskState(me, v[1], v[2]),
 		})
 	end
@@ -182,13 +190,13 @@ X.RegisterEvent('LOADING_END', 'MY_BigWarChecker', function()
 			return
 		end
 		-- 如果有可接的大战但是不在这个地图则返回
-		if v.eState == TASK_STATE.ACCEPTABLE and v.dwMapID ~= dwMapID then
+		if v.eState == TASK_STATE.ACCEPTABLE and not v.tMap[dwMapID] then
 			return
 		end
 	end
 	-- 否则如果没接当前地图大战就报警
 	for _, v in ipairs(aQuestInfo) do
-		if v.dwMapID == dwMapID and v.eState ~= TASK_STATE.ACCEPTED and v.eState ~= TASK_STATE.FINISHED then
+		if v.tMap[dwMapID] and v.eState ~= TASK_STATE.ACCEPTED and v.eState ~= TASK_STATE.FINISHED then
 			local function fnAction()
 				OutputWarningMessage('MSG_WARNING_RED', _L['This map is big war map and you did not accepted the quest, is that correct?'])
 				PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
