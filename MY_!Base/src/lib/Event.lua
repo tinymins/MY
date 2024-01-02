@@ -873,41 +873,40 @@ end
 local FPS_SLOW_TIME = 1000 / X.ENVIRONMENT.GAME_FPS * 1.5
 local l_nLastBreatheTime = GetTime()
 local function onBreathe()
-	if not coroutine then
-		return
-	end
-	local nBeginTime, pCallback = GetTime()
-	if nBeginTime - l_nLastBreatheTime < FPS_SLOW_TIME then
-		while GetTime() - nBeginTime < COROUTINE_TIME and next(COROUTINE_LIST) do
-			for k, p in pairs(COROUTINE_LIST) do
-				if GetTime() - nBeginTime > COROUTINE_TIME then
-					break
-				end
-				if coroutine.status(p.coAction) == 'suspended' then
-					local res = X.Pack(coroutine.resume(p.coAction))
-					if res[1] == true then
-						p.bSuccess = true
-						p.aReturn = X.Pack(select(2, X.Unpack(res)))
-					elseif not res[1] then
-						X.ErrorLog('OnCoroutine: ' .. p.szID .. ', Error: ' .. res[2])
+	if coroutine and next(COROUTINE_LIST) then
+		local nBeginTime = GetTime()
+		if nBeginTime - l_nLastBreatheTime < FPS_SLOW_TIME then
+			while GetTime() - nBeginTime < COROUTINE_TIME and next(COROUTINE_LIST) do
+				for k, p in pairs(COROUTINE_LIST) do
+					if GetTime() - nBeginTime > COROUTINE_TIME then
+						break
 					end
-				end
-				if coroutine.status(p.coAction) == 'dead' then
-					if p.fnCallback then
-						X.Call(p.fnCallback, p.bSuccess or false, X.Unpack(p.aReturn or X.CONSTANT.EMPTY_TABLE))
+					if coroutine.status(p.coAction) == 'suspended' then
+						local res = X.Pack(coroutine.resume(p.coAction))
+						if res[1] == true then
+							p.bSuccess = true
+							p.aReturn = X.Pack(select(2, X.Unpack(res)))
+						elseif not res[1] then
+							X.ErrorLog('OnCoroutine: ' .. p.szID .. ', Error: ' .. res[2])
+						end
 					end
-					COROUTINE_LIST[k] = nil
+					if coroutine.status(p.coAction) == 'dead' then
+						if p.fnCallback then
+							X.Call(p.fnCallback, p.bSuccess or false, X.Unpack(p.aReturn or X.CONSTANT.EMPTY_TABLE))
+						end
+						COROUTINE_LIST[k] = nil
+					end
 				end
 			end
 		end
+		--[[#DEBUG BEGIN]]
+		if GetTime() - nBeginTime > COROUTINE_TIME then
+			X.Debug(_L['PMTool'], _L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), X.DEBUG_LEVEL.PM_LOG)
+		elseif nBeginTime - l_nLastBreatheTime > FPS_SLOW_TIME then
+			X.Debug(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), X.DEBUG_LEVEL.PM_LOG)
+		end
+		--[[#DEBUG END]]
 	end
-	--[[#DEBUG BEGIN]]
-	if GetTime() - nBeginTime > COROUTINE_TIME then
-		X.Debug(_L['PMTool'], _L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), X.DEBUG_LEVEL.PM_LOG)
-	elseif nBeginTime - l_nLastBreatheTime > FPS_SLOW_TIME then
-		X.Debug(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), X.DEBUG_LEVEL.PM_LOG)
-	end
-	--[[#DEBUG END]]
 	l_nLastBreatheTime = nBeginTime
 end
 X.BreatheCall(X.NSFormatString('{$NS}#COROUTINE'), onBreathe)
