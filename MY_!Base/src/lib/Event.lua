@@ -870,7 +870,7 @@ function X.RegisterCoroutine(szKey, fnAction, fnCallback)
 	end
 	return szKey
 end
-local FPS_SLOW_TIME = 1000 / X.ENVIRONMENT.GAME_FPS * 1.2
+local FPS_SLOW_TIME = 1000 / X.ENVIRONMENT.GAME_FPS * 1.5
 local l_nLastBreatheTime = GetTime()
 local function onBreathe()
 	if not coroutine then
