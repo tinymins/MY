@@ -2298,4 +2298,10 @@ function X.Han2Pinyin(szText)
 end
 end
 
+function X.IsMobileClient(nClientVersionType)
+	return nClientVersionType == X.CONSTANT.CLIENT_VERSION_TYPE.MOBILE_ANDROID
+		or nClientVersionType == X.CONSTANT.CLIENT_VERSION_TYPE.MOBILE_IOS
+		or nClientVersionType == X.CONSTANT.CLIENT_VERSION_TYPE.MOBILE_PC
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
