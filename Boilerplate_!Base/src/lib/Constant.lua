@@ -766,6 +766,14 @@ local CONSTANT = {
 		[TEAM_MARK.DART ] = _L['TEAM_MARK_DART' ],
 		[TEAM_MARK.FAN  ] = _L['TEAM_MARK_FAN'  ],
 	},
+	CLIENT_VERSION_TYPE = _G.CLIENT_VERSION_TYPE or X.SetmetaReadonly({
+		NORMAL         = 0,
+		WEGAME         = 1,
+		STREAMING      = 2,
+		MOBILE_ANDROID = 3,
+		MOBILE_IOS     = 4,
+		MOBILE_PC      = 5,
+	}),
 	MACHINE_GPU_TYPE = X.SetmetaReadonly({
 		LOW    = 1,
 		NORMAL = 2,
