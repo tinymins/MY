@@ -421,16 +421,20 @@ function MY_CataclysmParty_Base.OnItemMouseEnter()
 	if CTM_DRAG and this:Lookup('Image_Slot') and this:Lookup('Image_Slot'):IsValid() then
 		this:Lookup('Image_Slot'):Show()
 	end
+	local name = this:GetName()
+	local bTip = not CFG.bHideTipInFight or not X.IsFighting()
+	if name == 'Handle_Platform' then
+		if bTip then
+			local nX, nY = this:GetAbsPos()
+			local nW, nH = this:GetSize()
+			local szTip = GetFormatText(_L['Wujie online'], 101)
+			OutputTip(szTip, 400, { nX, nY, nW, nH })
+		end
+	end
 	OnItemRefreshTip()
 	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
-	if dwID == CTM_TEMP_TARGET_ID then
-		return
-	end
-	local info = CTM:GetMemberInfo(dwID)
-	if not info then
-		return
-	end
-	if info.bIsOnLine and CanTarget(dwID) and CFG.bTempTargetEnable then
+	local info = dwID ~= CTM_TEMP_TARGET_ID and CTM:GetMemberInfo(dwID) or nil
+	if info and info.bIsOnLine and CanTarget(dwID) and CFG.bTempTargetEnable then
 		X.DelayCall('MY_Cataclysm_TempTarget', false)
 		local function fnAction()
 			if not CTM_TEMP_TARGET_TYPE then
@@ -1140,6 +1144,8 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 		img:SetVisible(bVisible)
 		bLayout = true
 	end
+	-- 刷新平台
+	h:Lookup('Handle_Platform'):SetVisible(X.IsMobileClient(info.nClientVersionType))
 	-- 刷新名字
 	if bLayout then
 		local txtName = h:Lookup('Text_Name')

@@ -150,4 +150,6 @@ return {
 
 	['Load ancient config'] = '載入舊版數據',
 	['Please input ancient config name:'] = '請輸入舊版數據配置名：',
+
+	['Wujie online'] = '無界端在線',
 }
