@@ -414,7 +414,7 @@ function D.OnApplyRequest(event)
 	if not O.bEnable then
 		return
 	end
-	local szName, nCamp, dwForce, nLevel, nType = arg0, arg1, arg2, arg3, arg4
+	local szName, nCamp, dwForce, nLevel, nType, nClientVersionType = arg0, arg1, arg2, arg3, arg4, arg10
 	local info = PR_PARTY_REQUEST[szName]
 	if not info then
 		info = {}
@@ -430,6 +430,7 @@ function D.OnApplyRequest(event)
 	info.bFriend     = X.IsFriend(szName)
 	info.bTongMember = X.IsTongMember(szName)
 	info.bSameCamp   = info.nCamp == me.nCamp
+	info.nClientVersionType = nClientVersionType
 	info.dwDelayTime = nil
 	-- ªÒ»°dwID
 	local tar = X.GetObject(TARGET.PLAYER, szName)
@@ -567,6 +568,10 @@ function R.Drawer(container, info)
 		hItem:Lookup('Handle_Status/Handle_Camp/Image_Camp'):FromUITex(szCampImg, nCampFrame)
 	end
 	hItem:Lookup('Handle_Status/Handle_Camp'):SetVisible(not not szCampImg)
+
+	hItem:Lookup('Handle_Status/Handle_Mobile'):SetVisible(X.IsMobileClient(info.nClientVersionType))
+
+	hItem:Lookup('Handle_Status'):FormatAllItemPos()
 
 	if info.bDetail and info.bEx == 'Author' then
 		hItem:Lookup('Text_Name'):SetFontColor(255, 255, 0)
