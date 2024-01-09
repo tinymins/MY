@@ -939,7 +939,7 @@ X.RegisterEvent('PLAYER_SAY', function()
 	OnCharacterSay(arg1, arg2, arg0)
 end)
 
-X.RegisterEvent('FIRST_SYNC_USER_PREFERENCES_END', function()
+X.RegisterEvent({'FIRST_SYNC_USER_PREFERENCES_END', 'RELOAD_UI_ADDON_END'}, function()
 	D.bUserPreferencesReady = true
 end)
 
