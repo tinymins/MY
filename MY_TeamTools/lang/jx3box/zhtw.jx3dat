@@ -40,6 +40,9 @@ return {
 	['Share boss kill success: %s - %ds (%s).'] = '成功分享：%s，戰鬥%d秒，%s。',
 	['Full win'] = '全勝',
 
+    -- JBAchievementSync.lua
+    ['Sync achievement'] = '同步成就',
+
     -- MY_JBEventVote.lua
     ['Dungeon Vote'] = '賽事投票',
     ['MY_JBEventVote'] = '團隊投票',
@@ -87,4 +90,7 @@ return {
     ['>> View Snapshots <<'] = '>> 查看快照 <<',
     ['Upload snapshot succeed!'] = '快照上傳成功！',
     ['Upload snapshot failed!'] = '快照上傳失敗！',
+
+    -- MY_JB.PS.lua
+    ['Data sync'] = '數據同步',
 }

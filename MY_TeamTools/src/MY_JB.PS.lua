@@ -53,6 +53,14 @@ function PS.OnPanelActive(wnd)
 	nX, nY, nLFY = MY_JBAchievementRank.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
 	nX, nY, nLFY = MY_CombatLogs.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
 
+	-- 数据同步
+	nLFY = nLFY + 5
+	nX = nPaddingX
+	nY = nLFY
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Data sync'], font = 27 }):Height() + 2
+	nX = nPaddingX + 10
+	nX, nY, nLFY = MY_JBAchievementSync.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
+
 	-- 赛事投票
 	nX = nPaddingX
 	nLFY = nLFY + 5
