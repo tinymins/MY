@@ -43,6 +43,15 @@ return {
     -- JBAchievementSync.lua
     ['Sync achievement'] = '同步成就',
 
+    -- MY_JBLoverSync.lua
+    ['Sync lover'] = '同步情緣',
+    ['Sync lover request sent, please wait for peer to agree.'] = '同步情緣信息請求已發送至對方，請等待情緣同意請求。',
+    ['[%s] want to sync lover relation to jx3box, do you agree?'] = '[%s] 請求同步情緣信息到魔盒平臺中，是否同意同步？',
+    ['Sync lover is a sensitive action, please unlock to continue.'] = '同步情緣信息為敏感操作，請先解除聊天鎖。',
+    ['Peer is not your lover, please check, or do fix lover first.'] = '對方不是您的情緣，請先檢查或修複情緣狀態。',
+    ['[%s] disabled ui config sync, unable to read data.'] = '[%s] 關閉了界面設置同步，無法獲取情緣狀態信息。',
+    ['Request failed.'] = '請求失敗',
+
     -- MY_JBEventVote.lua
     ['Dungeon Vote'] = '賽事投票',
     ['MY_JBEventVote'] = '團隊投票',
