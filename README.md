@@ -22,7 +22,7 @@
 * 安装方法：在角色登陆页，依次点击`插件管理`,`插件下载`，然后点击`下载`按钮下载各组件。
 * 官方网站：<https://jx3.derzh.com/>
 * 更新日志：<https://github.com/tinymins/jx3my/commits/master>
-* 建议&BUG报告：[问题反馈](https://j3cx.com/feedback) [【一名宅。】](https://zhaiyiming.com/index.php/jx3-my) [【微博留言】](https://weibo.com/zymah)
+* 建议&BUG报告：[问题反馈](https://zhaiyiming.com/feedback) [【一名宅。】](https://zhaiyiming.com/archives/jx3-my.html) [【微博留言】](https://weibo.com/zymah)
 
 ## 主要功能
 
@@ -50,7 +50,7 @@
 
 ## 其它
 
-* 本插件开源免费，本人出于兴趣和朋友需求制作，作者微博 [@茗伊](http://weibo.com/zymah)、[问题反馈](https://j3cx.com/feedback)。
+* 本插件开源免费，本人出于兴趣和朋友需求制作，作者微博 [@茗伊](http://weibo.com/zymah)、[问题反馈](https://zhaiyiming.com/feedback)。
 * 本插件遵循简单实用原则，完全遵守白名单API，收集部分玩家角色公开信息如玩家ID，角色体型，帮会名称，装备分数等公开非敏感信息做玩家偏好数据统计。
 * 安装使用视为 _同意以上内容_ 。
 

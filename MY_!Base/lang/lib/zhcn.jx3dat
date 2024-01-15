@@ -3,7 +3,7 @@ return {
 	PLUGIN_SHORT_NAME          = '茗伊插件',
 	PLUGIN_AUTHOR              = '茗伊 @ 梦江南',
 	PLUGIN_AUTHOR_FEEDBACK     = '茗伊',
-	PLUGIN_AUTHOR_FEEDBACK_URL = 'https://j3cx.com/feedback',
+	PLUGIN_AUTHOR_FEEDBACK_URL = 'https://zhaiyiming.com/feedback',
 	PLUGIN_AUTHOR_SIGNATURE    = '茗伊 @梦江南',
 
 	['%s, welcome to use %s!'] = '欢迎%s使用%s！',
