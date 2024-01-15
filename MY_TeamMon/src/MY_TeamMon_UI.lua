@@ -1064,7 +1064,7 @@ function D.OpenExportPanel()
 		text = _L['Lua formated'], group = 'type',
 		checked = false,
 		onCheck = function()
-			szFormat = 'LUA_FORMATED'
+			szFormat = 'LUA_FORMATTED'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndRadioBox', {
