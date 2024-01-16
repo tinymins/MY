@@ -2138,7 +2138,7 @@ local ERROR_MSG = {}
 if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 	local KEY = '/' .. X.StringReplaceW(X.PACKET_INFO.ROOT, '\\', '/'):gsub('/+$', ''):gsub('^.*/', ''):lower() .. '/'
 	local function SaveErrorMessage()
-		X.SaveLUAData(FILE_PATH, ERROR_MSG, { passphrase = false, crc = false, indent = '\t' })
+		X.SaveLUAData(FILE_PATH, ERROR_MSG, { encoder = 'luatext', passphrase = false, crc = false, indent = '\t' })
 	end
 	local BROKEN_KGUI = IsDebugClient() and not X.IsDebugServer() and not X.IsDebugClient(true)
 	local BROKEN_KGUI_ECHO = false

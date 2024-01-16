@@ -1213,7 +1213,7 @@ function X.CreateDataRoot(ePathType)
 				time = GetCurrentTime(),
 				time_str = X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'),
 			},
-			{ crc = false, passphrase = false })
+			{ encoder = 'luatext', crc = false, passphrase = false })
 		local szRoleName = X.GetUserRoleName()
 		if szRoleName then
 			CPath.MakeDir(X.FormatPath({szRoleName .. '/', X.PATH_TYPE.ROLE}))

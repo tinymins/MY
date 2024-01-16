@@ -286,7 +286,7 @@ function X.Ajax(settings)
 		X.DelayCall(bridgekey, false)
 		X.RegisterExit(bridgekey, false)
 	end
-	X.SaveLUAData(bridgein, config, { crc = false, passphrase = false })
+	X.SaveLUAData(bridgein, config, { encoder = 'luatext', passphrase = false })
 	X.BreatheCall(bridgekey, 200, function()
 		local data = X.LoadLUAData(bridgeout, { passphrase = false })
 		if X.IsTable(data) then
