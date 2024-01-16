@@ -89,7 +89,7 @@ function D.SaveMapConfig()
 	X.SaveLUAData(
 		{'userdata/dynamic_item/' .. D.GetMapID() .. '.jx3dat', X.PATH_TYPE.GLOBAL},
 		D.aList,
-		{ passphrase = false, crc = false })
+		{ encoder = 'luatext', passphrase = false, crc = false })
 end
 
 function D.LoadMapConfig()

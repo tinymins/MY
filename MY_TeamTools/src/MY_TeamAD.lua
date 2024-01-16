@@ -43,7 +43,7 @@ function D.LoadLUAData()
 end
 
 function D.SaveLUAData()
-	X.SaveLUAData(O.szDataFile, O.tADList, { indent = '\t', passphrase = false, crc = false })
+	X.SaveLUAData(O.szDataFile, O.tADList, { encoder = 'luatext', indent = '\t', passphrase = false, crc = false })
 end
 
 local PS = {}

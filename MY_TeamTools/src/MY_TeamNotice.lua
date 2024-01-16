@@ -52,7 +52,7 @@ local O = X.CreateUserSettingsModule('MY_TeamNotice', _L['Raid'], {
 })
 
 function TI.SaveList()
-	X.SaveLUAData({'config/yy.jx3dat', X.PATH_TYPE.GLOBAL}, TI.tList, { indent = '\t', passphrase = false, crc = false })
+	X.SaveLUAData({'config/yy.jx3dat', X.PATH_TYPE.GLOBAL}, TI.tList, { encoder = 'luatext', indent = '\t', passphrase = false, crc = false })
 end
 
 function TI.GetList()

@@ -438,7 +438,7 @@ local Data          -- 当前战斗数据记录
 local HISTORY_CACHE = setmetatable({}, { __mode = 'v' }) -- 历史战斗记录缓存 { [szFile] = Data }
 local KEPT_CACHE = {} -- 保存了但是剔除了复盘记录的战斗记录缓存 { [szFile] = Data }
 local UNSAVED_CACHE = {} -- 未保存的战斗记录缓存 { [szFile] = Data }
-local DS_DATA_CONFIG = { passphrase = false, crc = false }
+local DS_DATA_CONFIG = { passphrase = false }
 local DS_ROOT = {'userdata/fight_stat/', X.PATH_TYPE.ROLE}
 local SZ_CFG_FILE = {'userdata/fight_stat/config.jx3dat', X.PATH_TYPE.ROLE}
 local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
@@ -583,7 +583,7 @@ function D.SaveHistory()
 			end
 			KEPT_CACHE[szFilePath] = data -- 加入复盘数据保护数组防止被GC
 		end
-		AsyncSaveLuaData(szFilePath, saveData, { crc = false })
+		AsyncSaveLuaData(szFilePath, saveData)
 	end
 	D.LimitHistoryFile()
 	UNSAVED_CACHE = {}

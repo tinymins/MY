@@ -518,6 +518,7 @@ function D.ExportDatasetFile(aUUID, bIndent)
 	)
 	if bIndent then
 		X.SaveLUAData(szFile, aExport, {
+			encoder = 'luatext',
 			indent = '\t',
 			passphrase = false,
 			crc = false,

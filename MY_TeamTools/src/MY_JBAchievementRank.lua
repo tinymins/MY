@@ -157,7 +157,7 @@ function D.ShotAchievementAcquire()
 			end
 		end
 	end
-	X.SaveLUAData({'userdata/achievement_acquire_shot.jx3dat', X.PATH_TYPE.ROLE}, aAcquired, { crc = false, passphrase = false })
+	X.SaveLUAData({'userdata/achievement_acquire_shot.jx3dat', X.PATH_TYPE.ROLE}, aAcquired, { encoder = 'luatext', crc = false, passphrase = false })
 end
 
 function D.UpdateMapBossAchieveAcquire()
