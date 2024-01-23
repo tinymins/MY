@@ -189,8 +189,9 @@ return {
     ['Sure to delete monitor? This operation can not be undone.'] = '您确定要删除该数据吗？数据删除操作确认后无法撤销。',
     ['Move to top'] = '移动到顶部',
     ['Move to bottom'] = '移动到底部',
-    ['Current dataset active monitors count is %d, visible monitors count is %d'] = '数据集在当前角色状态包含激活数据%d条，当前显示%d条',
-    ['Current dataset is not active'] = '数据集在当前角色状态下未激活',
+    ['Current dataset total monitor count is %d, active monitors count is %d, visible monitors count is %d.'] = '数据集包含总数据%d条，当前角色激活数据%d条，当前显示数据%d条。',
+    ['Current dataset is not active.'] = '数据集在当前角色状态下未激活。',
+    ['Total monitors reaches max limit: %d/%d.'] = '所有监控数据集总条目数量已超出最大限制：%d/%d，部分监控条目将不会显示。',
 
     -- MY_TargetMon_MonitorPanel.lua
     ['MY_TargetMon_MonitorPanel'] = '目标监控条目设置面板',

@@ -439,16 +439,27 @@ function D.OnItemMouseHover()
 	if name == 'Handle_DatasetItem' then
 		if not X.UI.IsDragDropOpened() then
 			local aView, view = MY_TargetMonData.GetViewData(), nil
+			local nMonitorCount = 0
 			for _, v in ipairs(aView) do
 				if v.szUUID == this.dataset.szUUID then
 					view = v
-					break
 				end
+				nMonitorCount = nMonitorCount + #v.aMonitor
 			end
-			local szText = view
-				and _L('Current dataset active monitors count is %d, visible monitors count is %d', #view.aMonitor, #view.aItem)
-				or  _L['Current dataset is not active']
-			X.OutputTip(this, szText, nil, X.UI.TIP_POSITION.TOP_BOTTOM)
+			local szText = GetFormatText(
+				view
+					and _L('Current dataset total monitor count is %d, active monitors count is %d, visible monitors count is %d.', #this.dataset.aMonitor, #view.aMonitor, #view.aItem)
+					or  _L['Current dataset is not active.'],
+				162, 255, 255, 255
+			)
+			if nMonitorCount > MY_TargetMonData.MY_TARGET_MON_DATA_MAX_LIMIT then
+				szText = szText
+					.. GetFormatText(
+						'\n' .. _L('Total monitors reaches max limit: %d/%d.', nMonitorCount, MY_TargetMonData.MY_TARGET_MON_DATA_MAX_LIMIT),
+						162, 255, 86, 86
+					)
+			end
+			X.OutputTip(this, szText, true, X.UI.TIP_POSITION.TOP_BOTTOM)
 			return
 		end
 		local szDragGroupID = X.UI.GetDragDropData()

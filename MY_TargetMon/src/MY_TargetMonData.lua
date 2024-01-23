@@ -33,6 +33,7 @@ local CONFIG_CACHE
 local VIEW_LIST_CACHE = {}
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 local MY_TARGET_MON_MAP_TYPE = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE
+local MY_TARGET_MON_DATA_MAX_LIMIT = 680
 
 do
 local function FilterDatasets(aDataset, dwMapID, dwKungfuID)
@@ -440,7 +441,7 @@ local UpdateView
 do
 local fUIScale, fFontScaleBase
 function UpdateView()
-	local nViewIndex, nViewCount = 1, #VIEW_LIST_CACHE
+	local nViewIndex, nViewCount, nMonitorCount = 1, #VIEW_LIST_CACHE, 0
 	for _, dataset in ipairs(D.GetDatasetList()) do
 		local dwTarType, dwTarID = D.GetTarget(dataset.szTarget, dataset.szType)
 		local KObject = X.GetObject(dwTarType, dwTarID)
@@ -504,6 +505,10 @@ function UpdateView()
 		if dataset.szType == 'BUFF' then
 			local tBuff = KObject and BUFF_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
 			for _, mon in ipairs(dataset.aMonitor) do
+				if nMonitorCount > MY_TARGET_MON_DATA_MAX_LIMIT then
+					break
+				end
+				nMonitorCount = nMonitorCount + 1
 				if Buff_MonVisible(mon, dwTarKungfuID) then
 					-- 通过监控项生成视图列表
 					local buff = Buff_MonMatch(tBuff, mon, dataset)
@@ -540,6 +545,10 @@ function UpdateView()
 		elseif dataset.szType == 'SKILL' then
 			local tSkill = KObject and SKILL_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
 			for _, mon in ipairs(dataset.aMonitor) do
+				if nMonitorCount > MY_TARGET_MON_DATA_MAX_LIMIT then
+					break
+				end
+				nMonitorCount = nMonitorCount + 1
 				if Skill_MonVisible(mon, dwTarKungfuID) then
 					-- 通过监控项生成视图列表
 					local skill = Skill_MonMatch(tSkill, mon, dataset)
@@ -778,6 +787,7 @@ local settings = {
 	exports = {
 		{
 			fields = {
+				MY_TARGET_MON_DATA_MAX_LIMIT = MY_TARGET_MON_DATA_MAX_LIMIT,
 				GetTarget = D.GetTarget,
 				GetViewData = D.GetViewData,
 				RegisterDataUpdateEvent = D.RegisterDataUpdateEvent,

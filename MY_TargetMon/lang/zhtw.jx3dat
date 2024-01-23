@@ -189,8 +189,9 @@ return {
     ['Sure to delete monitor? This operation can not be undone.'] = '您確定要刪除該數據嗎？數據刪除操作確認後無法撤銷。',
     ['Move to top'] = '移動到頂部',
     ['Move to bottom'] = '移動到底部',
-    ['Current dataset active monitors count is %d, visible monitors count is %d'] = '數據集在當前角色狀態包含激活數據%d條，當前顯示%d條',
-    ['Current dataset is not active'] = '數據集在當前角色狀態下未激活',
+    ['Current dataset total monitor count is %d, active monitors count is %d, visible monitors count is %d.'] = '數據集包含總數據%d條，當前角色激活數據%d條，當前顯示數據%d條。',
+    ['Current dataset is not active.'] = '數據集在當前角色狀態下未激活。',
+    ['Total monitors reaches max limit: %d/%d.'] = '所有監控數據集總條目數量已超出最大限制：%d/%d，部分監控條目將不會顯示。',
 
     -- MY_TargetMon_MonitorPanel.lua
     ['MY_TargetMon_MonitorPanel'] = '目標監控條目設置面板',
