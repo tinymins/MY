@@ -2127,6 +2127,7 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 			crc = szFormat == 'LUA_ENCRYPTED',
 			compress = szFormat == 'LUA_ENCRYPTED',
 			indent = szFormat == 'LUA_FORMATTED' and '\t' or nil,
+			encoder = szFormat == 'LUA_FORMATTED' and 'luatext' or nil,
 		}
 		X.SaveLUAData(szPath, data, option)
 	end
