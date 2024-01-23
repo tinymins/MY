@@ -42,6 +42,8 @@ return {
 
     -- JBAchievementSync.lua
     ['Sync achievement'] = '同步成就',
+    ['Sync success.'] = '同步成功',
+    ['Request failed.'] = '请求失败',
 
     -- MY_JBLoverSync.lua
     ['Sync lover'] = '同步情缘',
@@ -50,6 +52,7 @@ return {
     ['Sync lover is a sensitive action, please unlock to continue.'] = '同步情缘信息为敏感操作，请先解除聊天锁。',
     ['Peer is not your lover, please check, or do fix lover first.'] = '对方不是您的情缘，请先检查或修复情缘状态。',
     ['[%s] disabled ui config sync, unable to read data.'] = '[%s] 关闭了界面设置同步，无法获取情缘状态信息。',
+    ['Sync success.'] = '同步成功',
     ['Request failed.'] = '请求失败',
 
     -- MY_JBEventVote.lua

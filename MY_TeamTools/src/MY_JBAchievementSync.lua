@@ -54,7 +54,9 @@ function D.Sync(resolve, reject)
 		signature = X.SECRET['J3CX::ACHIEVEMENT_SYNC'],
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
+			Output(szHTML)
 			if X.Get(res, {'code'}) == 0 then
+				X.Alert((X.Get(res, {'msg'}, _L['Sync success.'])))
 				X.SafeCall(resolve)
 			else
 				X.Alert((X.Get(res, {'msg'}, _L['Request failed.'])))

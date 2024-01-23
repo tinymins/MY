@@ -68,6 +68,7 @@ function D.SyncLover(szLoverName, szLoverUUID, resolve, reject)
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then
+				X.Alert((X.Get(res, {'msg'}, _L['Sync success.'])))
 				X.SafeCall(resolve)
 			else
 				X.Alert((X.Get(res, {'msg'}, _L['Request failed.'])))
