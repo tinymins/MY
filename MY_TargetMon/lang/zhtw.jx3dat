@@ -189,6 +189,8 @@ return {
     ['Sure to delete monitor? This operation can not be undone.'] = '您確定要刪除該數據嗎？數據刪除操作確認後無法撤銷。',
     ['Move to top'] = '移動到頂部',
     ['Move to bottom'] = '移動到底部',
+    ['Current dataset active monitors count is %d, visible monitors count is %d'] = '數據集在當前角色狀態包含激活數據%d條，當前顯示%d條',
+    ['Current dataset is not active'] = '數據集在當前角色狀態下未激活',
 
     -- MY_TargetMon_MonitorPanel.lua
     ['MY_TargetMon_MonitorPanel'] = '目標監控條目設置面板',

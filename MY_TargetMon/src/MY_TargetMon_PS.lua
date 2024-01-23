@@ -438,6 +438,17 @@ function D.OnItemMouseHover()
 	local name = this:GetName()
 	if name == 'Handle_DatasetItem' then
 		if not X.UI.IsDragDropOpened() then
+			local aView, view = MY_TargetMonData.GetViewData(), nil
+			for _, v in ipairs(aView) do
+				if v.szUUID == this.dataset.szUUID then
+					view = v
+					break
+				end
+			end
+			local szText = view
+				and _L('Current dataset active monitors count is %d, visible monitors count is %d', #view.aMonitor, #view.aItem)
+				or  _L['Current dataset is not active']
+			X.OutputTip(this, szText, nil, X.UI.TIP_POSITION.TOP_BOTTOM)
 			return
 		end
 		local szDragGroupID = X.UI.GetDragDropData()

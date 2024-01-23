@@ -385,11 +385,11 @@ local function Buff_MonToView(mon, buff, item, KObject, dataset, tMonExist, tMon
 	Base_MonToView(mon, buff, item, KObject, dataset, tMonExist, tMonLast)
 end
 -- 技能：判断监控项是否显示
-local function Skill_ShowMon(mon, dwTarKungfuID)
+local function Skill_MonVisible(mon, dwTarKungfuID)
 	return Base_MonVisible(mon, dwTarKungfuID)
 end
 -- 技能：监控项匹配 BUFF 对象
-local function Skill_MatchMon(tSkill, mon, dataset)
+local function Skill_MonMatch(tSkill, mon, dataset)
 	local skill = tSkill[mon.dwID]
 	if skill and (mon.nLevel == 0 or mon.nLevel == skill.nLevel) then
 		return skill
@@ -478,6 +478,7 @@ function UpdateView()
 		-- view.playSound         = dataset.bPlaySound
 		view.szCdBarUITex         = dataset.szCdBarUITex
 		view.szBoxBgUITex         = dataset.szBoxBgUITex
+		view.aMonitor             = dataset.aMonitor
 		local tMonGroupFallbackUUID = view.tMonGroupFallbackUUID
 		if not tMonGroupFallbackUUID then
 			tMonGroupFallbackUUID = {}
@@ -539,9 +540,9 @@ function UpdateView()
 		elseif dataset.szType == 'SKILL' then
 			local tSkill = KObject and SKILL_CACHE[KObject.dwID] or X.CONSTANT.EMPTY_TABLE
 			for _, mon in ipairs(dataset.aMonitor) do
-				if Skill_ShowMon(mon, dwTarKungfuID) then
+				if Skill_MonVisible(mon, dwTarKungfuID) then
 					-- 通过监控项生成视图列表
-					local skill = Skill_MatchMon(tSkill, mon, dataset)
+					local skill = Skill_MonMatch(tSkill, mon, dataset)
 					if mon.szGroup and (
 						tMonGroupActiveUUID[mon.szGroup] == mon.szUUID
 						or tMonGroupActiveUUID[mon.szGroup] == tMonGroupFallbackUUID[mon.szGroup]
