@@ -1080,7 +1080,7 @@ function D.OpenExportPanel()
 		text = _L['JSON formated'], group = 'type',
 		checked = false,
 		onCheck = function()
-			szFormat = 'JSON_FORMATED'
+			szFormat = 'JSON_FORMATTED'
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {

@@ -2109,12 +2109,12 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 	data.__meta.szOfficialVoicePacketUUID = MY_TeamMon_VoiceAlarm.GetCurrentPacketUUID('OFFICIAL')
 	data.__meta.szCustomVoicePacketUUID = MY_TeamMon_VoiceAlarm.GetCurrentPacketUUID('CUSTOM')
 	local szPath = MY_TEAM_MON_REMOTE_DATA_ROOT .. szFileName
-	if szFormat == 'JSON' or szFormat == 'JSON_FORMATED' then
+	if szFormat == 'JSON' or szFormat == 'JSON_FORMATTED' then
 		if szFormat ~= 'JSON' then
 			szPath = szPath .. '.' .. szFormat:lower():sub(6)
 		end
 		szPath = szPath .. '.json'
-		SaveDataToFile(X.EncodeJSON(data, szFormat == 'JSON_FORMATED'), szPath)
+		SaveDataToFile(X.EncodeJSON(data, szFormat == 'JSON_FORMATTED'), szPath)
 	else
 		if szFormat ~= 'LUA' then
 			szPath = szPath .. '.' .. szFormat:lower():sub(5)
