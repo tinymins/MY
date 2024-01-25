@@ -58,21 +58,12 @@ X.RegisterFrameCreate('ExitPanel', 'BIG_WAR_CHECK', function(name, frame)
 	if me then
 		local ui = X.UI(frame)
 		if IsBigWarFinishable(me) then
-			OutputWarningMessage(
-				'MSG_WARNING_RED',
-				X.ENVIRONMENT.GAME_BRANCH == 'classic'
-					and _L['Warning: Bounty has been finished but not handed yet!']
-					or _L['Warning: Bigwar has been finished but not handed yet!']
-			)
+			OutputWarningMessage('MSG_WARNING_RED', _L['Warning: Bigwar has been finished but not handed yet!'])
 			PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 			if ui:Children('#Text_MY_Tip'):Count() == 0 then
 				ui:Append('Text', { name = 'Text_MY_Tip', y = ui:Height(), w = ui:Width(), color = {255, 255, 0}, font = 199, alignHorizontal = 1})
 			end
-			ui:Children('#Text_MY_Tip'):Text(
-				X.ENVIRONMENT.GAME_BRANCH == 'classic'
-					and _L['Warning: Bounty has been finished but not handed yet!']
-					or _L['Warning: Bigwar has been finished but not handed yet!']
-			)
+			ui:Children('#Text_MY_Tip'):Text(_L['Warning: Bigwar has been finished but not handed yet!'])
 			local nTick = GetTime()
 			local el = ui:Children('#Text_MY_Tip')[1]
 			local SCALE_ANIMATE_TIME, SHAKE_ANIMATE_TIME = 200, 200
@@ -102,11 +93,7 @@ X.RegisterFrameCreate('OptionPanel', 'BIG_WAR_CHECK', function(name, frame)
 				ui:Append('Text', { name = 'Text_MY_Tip', y = -20, w = ui:Width(), color = {255, 255, 0}, font = 199, alignHorizontal = 1})
 			end
 			ui:Children('#Text_MY_Tip')
-				:Text(
-					X.ENVIRONMENT.GAME_BRANCH == 'classic'
-						and _L['Warning: Bounty has been finished but not handed yet!']
-						or _L['Warning: Bigwar has been finished but not handed yet!']
-					)
+				:Text(_L['Warning: Bigwar has been finished but not handed yet!'])
 				:Shake(10, 10, 10, 1000)
 		else
 			ui:Children('#Text_MY_Tip'):Remove()

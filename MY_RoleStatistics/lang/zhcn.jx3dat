@@ -94,7 +94,6 @@ return {
     ['Unacceptable'] = '不可',
 
     ['Big war'] = '大战',
-    ['Bounty'] = '赏金',
     ['Teahouse'] = '茶馆',
     ['Force routine'] = '勤修不辍',
     ['Rookie routine'] = '浪客行',

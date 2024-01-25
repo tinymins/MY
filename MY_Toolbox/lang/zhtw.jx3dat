@@ -144,7 +144,6 @@ return {
     -- MY_BigWarChecker
     ['MY_BigWarChecker'] = '大戰提醒',
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大戰還沒交！',
-    ['Warning: Bounty has been finished but not handed yet!'] = '茗伊提示：賞金任務還沒交！',
     ['This map is big war map and you did not accepted the quest, is that correct?'] = '提示：檢測到角色沒有接受當前地圖秘境大戰系列任務！',
     ['This map is bounty map and you did not accepted the quest, is that correct?'] = '提示：檢測到角色沒有接受當前地圖秘境賞金系列任務！',
 
