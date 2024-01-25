@@ -43,6 +43,39 @@ local PRESET_ANIMATION_KEY_FRAME = {
 }
 local FLOAT_TEXT_LIST = {}
 
+function D.FormatKeyFrames(tKf)
+	local aKf = {}
+	for fPercent, kf in pairs(tKf) do
+		table.insert(aKf, { fPercent, kf })
+	end
+	table.sort(aKf, function(kf1, kf2) return kf2[1] > kf1[1] end)
+	tKf = {}
+	local kfPrev
+	for _, v in ipairs(aKf) do
+		local fPercent = v[1]
+		local kf = X.Clone(v[2])
+		if kfPrev then
+			for k, v in pairs(kfPrev) do
+				if X.IsNil(kf[k]) then
+					kf[k] = v
+				end
+			end
+		else
+			kf.nOffsetX = kf.nOffsetX or 0
+			kf.nOffsetY = kf.nOffsetY or 0
+			kf.nAlpha = kf.nAlpha or 255
+			kf.fScale = kf.fScale or 1
+		end
+		kfPrev = kf
+		tKf[fPercent] = kf
+	end
+	return tKf
+end
+
+for k, v in pairs(PRESET_ANIMATION_KEY_FRAME) do
+	PRESET_ANIMATION_KEY_FRAME[k] = D.FormatKeyFrames(v)
+end
+
 function D.GetLinearValue(nPrev, nNext, fProgress)
 	if not nPrev then
 		return
@@ -261,7 +294,7 @@ function D.CreateFloatText(szText, nDuration, tOptions)
 		nOffsetX = nOffsetX,
 		nOffsetY = nOffsetY,
 		fScale = fScale,
-		tKeyFrame = tKeyFrame,
+		tKeyFrame = D.FormatKeyFrames(tKeyFrame),
 		nStartTime = GetTime(),
 	})
 end
