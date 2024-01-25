@@ -14,7 +14,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 local D = {}
 local PRESET_ANIMATION_KEY_FRAME = {
-	ZOOM_IN_FADE_OUT = {
+	ZOOM_IN_FADE_IN_OUT = {
 		[0] = {
 			nOffsetX = 0,
 			nOffsetY = 0,
