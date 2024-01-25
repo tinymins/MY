@@ -87,7 +87,7 @@ function D.OnFrameRender()
 		local nTime = GetTime() - ft.nStartTime
 		local fProgress = nTime / ft.nDuration
 		local kfPrev, kfNext, fKfPrevProgress, fKfNextProgress
-		for fKfProgress, kf in pairs(ft.aKeyFrame) do
+		for fKfProgress, kf in pairs(ft.tKeyFrame) do
 			if fKfProgress <= fProgress and (not fKfPrevProgress or fKfPrevProgress < fKfProgress) then
 				kfPrev = kf
 				fKfPrevProgress = fKfProgress
@@ -165,9 +165,9 @@ function D.CreateFloatText(szText, nDuration, tOptions)
 	local nOffsetX = tOptions.nOffsetX or 0
 	local nOffsetY = tOptions.nOffsetY or 0
 	local fScale = tOptions.fScale or 1
-	local aKeyFrame = tOptions.aKeyFrame or {}
+	local tKeyFrame = tOptions.tKeyFrame or {}
 	if tOptions.szAnimation then
-		aKeyFrame = PRESET_ANIMATION_KEY_FRAME[tOptions.szAnimation] or {}
+		tKeyFrame = PRESET_ANIMATION_KEY_FRAME[tOptions.szAnimation] or {}
 	end
 	if szAnchor == 'TOPLEFT' then
 		if not szVAlign then
@@ -261,7 +261,7 @@ function D.CreateFloatText(szText, nDuration, tOptions)
 		nOffsetX = nOffsetX,
 		nOffsetY = nOffsetY,
 		fScale = fScale,
-		aKeyFrame = aKeyFrame,
+		tKeyFrame = tKeyFrame,
 		nStartTime = GetTime(),
 	})
 end
