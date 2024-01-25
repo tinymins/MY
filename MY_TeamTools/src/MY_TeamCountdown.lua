@@ -65,7 +65,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX = nPaddingX + 10
 	nY = nY + 5
 	nX = ui:Append('WndButton', {
-		x = nX + 5, y = nY, w = 300,
+		x = nX + 5, y = nY, w = 200,
 		text = _L['Send team countdown'],
 		buttonStyle = 'FLAT',
 		onClick = D.Open,
@@ -102,7 +102,9 @@ X.RegisterBgMsg('MY_TeamCountdown', function(_, data, nChannel, dwTalkerID, szTa
 	end
 	local nCountdown = data[1]
 	if X.IsNumber(nCountdown) and nCountdown >= 1 and nCountdown <= 10 then
-		X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['[TeamCountdown] Fight Countdown Begin!'])
+		if X.IsLeader() then
+			X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['[TeamCountdown] Fight Countdown Begin!'])
+		end
 		X.BreatheCall('MY_TeamCountdown', 1000, function()
 			local szText = nCountdown == 0 and _L['Fight Begin'] or tostring(nCountdown)
 			X.UI.CreateFloatText(szText, 1000, {
@@ -113,12 +115,14 @@ X.RegisterBgMsg('MY_TeamCountdown', function(_, data, nChannel, dwTalkerID, szTa
 				nB = 0,
 				szAnimation = 'ZOOM_IN_FADE_IN_OUT',
 			})
-			X.SendChat(
-				PLAYER_TALK_CHANNEL.RAID,
-				nCountdown == 0
-					and _L['[TeamCountdown] Fight Begin!']
-					or _L('[TeamCountdown] %ds!', nCountdown)
-			)
+			if X.IsLeader() then
+				X.SendChat(
+					PLAYER_TALK_CHANNEL.RAID,
+					nCountdown == 0
+						and _L['[TeamCountdown] Fight Begin!']
+						or _L('[TeamCountdown] %ds!', nCountdown)
+				)
+			end
 			-- º°»°
 			if nCountdown <= 0 then
 				return 0
