@@ -78,6 +78,7 @@ function PS.OnPanelActive(wnd)
 	nX, nY = MY_RideRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX, nY = MY_EvokeRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX, nY = MY_SocialRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX, nY = MY_TeamCountdown.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX, nY = MY_TeamRestore.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 end
 X.RegisterPanel(_L['Raid'], 'MY_TeamTools', _L['MY_TeamTools'], 5962, PS)

@@ -211,6 +211,20 @@ return {
 	['Save Advertising Name'] = '保存名(如：燭龍殿2/HG) 5字內',
 	['Advertising List'] = '喊話列表 （左鍵導入聊天框，右鍵更多選項）',
 
+	-- MY_TeamCountdown.lua --
+	['MY_TeamCountdown'] = '團隊倒計時',
+	['You are not leader!'] = '你不是隊長！',
+	['Please unlock safety talk lock first!'] = '請先解除聊天鎖！',
+	['Team countdown seconds'] = '團隊倒計時秒數：',
+	['Invalid countdown time input.'] = '輸入的秒數不是純數字！',
+	['Countdown time cannot be more than %ds.'] = '秒數不能超過%d秒！',
+	['Countdown time cannot be less than %ds.'] = '秒數不能低於%d秒！',
+	['Send team countdown'] = '發送團隊倒計時',
+	['Fight Begin'] = '戰鬥開始',
+	['[TeamCountdown] Fight Begin!'] = '【團隊倒計時】戰鬥開始！',
+	['[TeamCountdown] Fight Countdown Begin!'] = '【團隊倒計時】開始倒數！',
+	['[TeamCountdown] %ds!'] = '【團隊倒計時】%d！',
+
     -- MY_CombatLogs.lua
     ['MY_CombatLogs'] = '戰鬥事件記錄',
     ['Enable in dungeon'] = '在秘境地圖中啟用',

@@ -1085,6 +1085,11 @@ function D.OnLButtonClick()
 		end
 		-- ·ÖÅä
 		D.InsertDistributeMenu(menu, not X.IsDistributor())
+		if MY_TeamCountdown then
+			table.insert(menu, { szOption = _L['Open team countdown'], fnAction = function()
+				MY_TeamCountdown.Open()
+			end })
+		end
 		table.insert(menu, { bDevide = true })
 		if me.IsInRaid() then
 			-- ±à¼­Ä£Ê½

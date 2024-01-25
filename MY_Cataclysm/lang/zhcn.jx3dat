@@ -1,6 +1,7 @@
 return {
 	-- MY_CataclysmMain.lua --
 	['MY_Cataclysm'] = '团队面板',
+	['Open team countdown'] = '团队倒计时',
 	['Interface settings'] = '界面设置',
 	['Upload team snapshot'] = '团队快照上传',
 	['Cataclysm'] = '团队面板',
