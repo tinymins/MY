@@ -114,6 +114,7 @@ function D.OnFrameRender()
 		if not ft.txt then
 			hTotal:AppendItemFromString('<text>text=""</text>')
 			ft.txt = hTotal:Lookup(hTotal:GetItemCount() - 1)
+			ft.txt:SetSize(0, 0)
 			ft.txt:SetAbsPos(nX, nY)
 			ft.txt:SetRelPos(nX, nY)
 			ft.txt:SetText(ft.szText)
