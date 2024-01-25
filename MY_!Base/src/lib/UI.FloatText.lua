@@ -43,6 +43,39 @@ local PRESET_ANIMATION_KEY_FRAME = {
 }
 local FLOAT_TEXT_LIST = {}
 
+function D.FormatKeyFrames(tKf)
+	local aKf = {}
+	for fPercent, kf in pairs(tKf) do
+		table.insert(aKf, { fPercent, kf })
+	end
+	table.sort(aKf, function(kf1, kf2) return kf2[1] > kf1[1] end)
+	tKf = {}
+	local kfPrev
+	for _, v in ipairs(aKf) do
+		local fPercent = v[1]
+		local kf = X.Clone(v[2])
+		if kfPrev then
+			for k, v in pairs(kfPrev) do
+				if X.IsNil(kf[k]) then
+					kf[k] = v
+				end
+			end
+		else
+			kf.nOffsetX = kf.nOffsetX or 0
+			kf.nOffsetY = kf.nOffsetY or 0
+			kf.nAlpha = kf.nAlpha or 255
+			kf.fScale = kf.fScale or 1
+		end
+		kfPrev = kf
+		tKf[fPercent] = kf
+	end
+	return tKf
+end
+
+for k, v in pairs(PRESET_ANIMATION_KEY_FRAME) do
+	PRESET_ANIMATION_KEY_FRAME[k] = D.FormatKeyFrames(v)
+end
+
 function D.GetLinearValue(nPrev, nNext, fProgress)
 	if not nPrev then
 		return
@@ -87,7 +120,7 @@ function D.OnFrameRender()
 		local nTime = GetTime() - ft.nStartTime
 		local fProgress = nTime / ft.nDuration
 		local kfPrev, kfNext, fKfPrevProgress, fKfNextProgress
-		for fKfProgress, kf in pairs(ft.aKeyFrame) do
+		for fKfProgress, kf in pairs(ft.tKeyFrame) do
 			if fKfProgress <= fProgress and (not fKfPrevProgress or fKfPrevProgress < fKfProgress) then
 				kfPrev = kf
 				fKfPrevProgress = fKfProgress
@@ -165,9 +198,9 @@ function D.CreateFloatText(szText, nDuration, tOptions)
 	local nOffsetX = tOptions.nOffsetX or 0
 	local nOffsetY = tOptions.nOffsetY or 0
 	local fScale = tOptions.fScale or 1
-	local aKeyFrame = tOptions.aKeyFrame or {}
+	local tKeyFrame = tOptions.tKeyFrame or {}
 	if tOptions.szAnimation then
-		aKeyFrame = PRESET_ANIMATION_KEY_FRAME[tOptions.szAnimation] or {}
+		tKeyFrame = PRESET_ANIMATION_KEY_FRAME[tOptions.szAnimation] or {}
 	end
 	if szAnchor == 'TOPLEFT' then
 		if not szVAlign then
@@ -261,7 +294,7 @@ function D.CreateFloatText(szText, nDuration, tOptions)
 		nOffsetX = nOffsetX,
 		nOffsetY = nOffsetY,
 		fScale = fScale,
-		aKeyFrame = aKeyFrame,
+		tKeyFrame = D.FormatKeyFrames(tKeyFrame),
 		nStartTime = GetTime(),
 	})
 end
