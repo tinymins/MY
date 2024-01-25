@@ -1013,37 +1013,27 @@ local function OnPlayerFellowshipLogin()
 	end
 	if not arg2 and arg1 == D.lover.szName and D.lover.szName ~= '' then
 		if arg0 then
-			X.UI.CreateFloatText('情缘提示：茗伊@白帝城上线了', 1500, {
+			X.UI.CreateFloatText(_L('Love tip: %s is online now', D.lover.szName), 1500, {
 				nFont = 19,
 				fScale = 2.5,
 				nR = 255,
 				nG = 0,
 				nB = 255,
 				nOffsetY = 100,
-				aKeyFrame = {
+				tKeyFrame = {
 					[0] = {
-						nOffsetX = 0,
 						nOffsetY = 200,
 						nAlpha = 0,
 						fScale = 0.2,
 					},
 					[0.08] = {
-						nOffsetX = 0,
 						nOffsetY = 0,
 						nAlpha = 255,
 						fScale = 1,
 					},
-					[0.7] = {
-						nOffsetX = 0,
-						nOffsetY = 0,
-						nAlpha = 255,
-						fScale = 1,
-					},
+					[0.7] = {},
 					[1] = {
-						nOffsetX = 0,
-						nOffsetY = 0,
 						nAlpha = 0,
-						fScale = 1,
 					},
 				},
 			})
