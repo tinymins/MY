@@ -81,8 +81,8 @@ function D.OnFrameRender()
 		elseif ft.szAnchor == 'BOTTOMRIGHT' then
 			nX, nY = nScreenW, nScreenH
 		end
-		nX = nX + ft.nDeltaX
-		nY = nY + ft.nDeltaY
+		nX = nX + ft.nOffsetX
+		nY = nY + ft.nOffsetY
 		-- 通过关键帧计算当前帧数据
 		local nTime = GetTime() - ft.nStartTime
 		local fProgress = nTime / ft.nDuration
@@ -161,8 +161,8 @@ function D.CreateFloatText(szText, nDuration, tOptions)
 	local szAnchor = tOptions.szAnchor or 'CENTER'
 	local szVAlign = tOptions.szVAlign
 	local szHAlign = tOptions.szHAlign
-	local nDeltaX = tOptions.nDeltaX or 0
-	local nDeltaY = tOptions.nDeltaY or 0
+	local nOffsetX = tOptions.nOffsetX or 0
+	local nOffsetY = tOptions.nOffsetY or 0
 	local fScale = tOptions.fScale or 1
 	local aKeyFrame = tOptions.aKeyFrame or {}
 	if tOptions.szAnimation then
@@ -257,8 +257,8 @@ function D.CreateFloatText(szText, nDuration, tOptions)
 		szAnchor = szAnchor,
 		nHAlign = nHAlign,
 		nVAlign = nVAlign,
-		nDeltaX = nDeltaX,
-		nDeltaY = nDeltaY,
+		nOffsetX = nOffsetX,
+		nOffsetY = nOffsetY,
 		fScale = fScale,
 		aKeyFrame = aKeyFrame,
 		nStartTime = GetTime(),
