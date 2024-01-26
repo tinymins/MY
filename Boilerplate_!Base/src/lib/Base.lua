@@ -143,6 +143,32 @@ function X.NSFormatString(s)
 	return NS_FORMAT_STRING_CACHE[s]
 end
 
+-- 锁定命名空间
+---@param ns table @需要锁定的命名空间
+---@param szNSString string @需要锁定的命名空间的字符串描述名
+---@param mt table @额外的命名空间元表
+---@return table @命名空间锁定后读写代理对象
+function X.NSLock(ns, szNSString, mt)
+	local PROXY = {}
+	for k, v in pairs(ns) do
+		PROXY[k] = v
+		ns[k] = nil
+	end
+	local t = {
+		__metatable = true,
+		__index = PROXY,
+		__newindex = function() assert(false, 'DO NOT modify ' .. szNSString .. ' after initialized!!!') end,
+		__tostring = function(t) return szNSString end,
+	}
+	if mt then
+		for k, v in pairs(mt) do
+			t[k] = v
+		end
+	end
+	setmetatable(ns, t)
+	return PROXY
+end
+
 -- 加载语言包
 ---@param szLangFolder string @语言包文件夹
 ---@return table<string, any> @语言包

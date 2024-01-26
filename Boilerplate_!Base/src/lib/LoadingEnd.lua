@@ -10,23 +10,12 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/LoadingEnd')
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
-local PROXY = {}
+local PROXY = X.NSLock(X, X.NSFormatString('{$NS} (base library)'))
 if IsDebugClient() then
 function PROXY.DebugSetVal(szKey, oVal)
 	PROXY[szKey] = oVal
 end
 end
-
-for k, v in pairs(X) do
-	PROXY[k] = v
-	X[k] = nil
-end
-setmetatable(X, {
-	__metatable = true,
-	__index = PROXY,
-	__newindex = function() assert(false, X.NSFormatString('DO NOT modify {$NS} after initialized!!!')) end,
-	__tostring = function(t) return X.NSFormatString('{$NS} (base library)') end,
-})
 FireUIEvent(X.NSFormatString('{$NS}_BASE_LOADING_END'))
 
 X.RegisterInit(X.NSFormatString('{$NS}#AUTHOR_TIP'), function()
