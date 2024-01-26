@@ -6223,17 +6223,8 @@ setmetatable(X.UI, {
 	__tostring = function(t) return X.NSFormatString('{$NS}_UI (class prototype)') end,
 })
 X.RegisterEvent(X.NSFormatString('{$NS}_BASE_LOADING_END'), function()
-	local PROXY = {}
-	for k, v in pairs(X.UI) do
-		PROXY[k] = v
-		X.UI[k] = nil
-	end
-	setmetatable(X.UI, {
-		__metatable = true,
+	X.NSLock(X.UI, X.NSFormatString('{$NS}_UI (class prototype)'), {
 		__call = function (t, ...) return OO:ctor(...) end,
-		__index = PROXY,
-		__newindex = function() assert(false, X.NSFormatString('DO NOT modify {$NS}.UI after initialized!!!')) end,
-		__tostring = function(t) return X.NSFormatString('{$NS}_UI (class prototype)') end,
 	})
 end)
 
