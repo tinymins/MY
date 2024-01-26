@@ -33,7 +33,7 @@ local CONFIG_CACHE
 local VIEW_LIST_CACHE = {}
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 local MY_TARGET_MON_MAP_TYPE = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE
-local MY_TARGET_MON_DATA_MAX_LIMIT = 680
+local MY_TARGET_MON_DATA_MAX_LIMIT = 2000
 
 do
 local function FilterDatasets(aDataset, dwMapID, dwKungfuID)
