@@ -358,7 +358,7 @@ function D.UpdateList(page)
 					local w, h = this:GetSize()
 					local desc = ''
 					if vv.CommonEnchant then
-						desc = X.Table_GetCommonEnchantDesc(vv.dwTemporaryEnchantID)
+						desc = X.Table.GetCommonEnchantDesc(vv.dwTemporaryEnchantID)
 					else
 						-- ... ¹Ù·½¸ãµÄÌ«Âé·³ÁË
 						local tEnchant = GetItemEnchantAttrib(vv.dwTemporaryEnchantID)
@@ -645,7 +645,7 @@ function D.GetEquipCache(page, KPlayer)
 					dwTemporaryEnchantID         = item.dwTemporaryEnchantID,
 					nTemporaryEnchantLeftSeconds = item.GetTemporaryEnchantLeftSeconds()
 				}
-				if X.Table_GetCommonEnchantDesc(item.dwTemporaryEnchantID) then
+				if X.Table.GetCommonEnchantDesc(item.dwTemporaryEnchantID) then
 					dat.CommonEnchant = true
 				end
 				table.insert(aInfo.tTemporaryEnchant, dat)
