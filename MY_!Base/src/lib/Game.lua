@@ -3157,15 +3157,6 @@ do
 local CACHE = {}
 local REPLACE = {}
 local function OnSkillReplace()
-	for _, aList in pairs(CACHE) do
-		for _, group in ipairs(aList) do
-			for i, v in ipairs(group) do
-				if v == arg0 then
-					group[i] = arg1
-				end
-			end
-		end
-	end
 	CACHE = {}
 	REPLACE[arg0] = arg1
 	REPLACE[arg1] = nil
@@ -3313,11 +3304,12 @@ function X.GetSkillMountList(bIncludePassive)
 	return bIncludePassive and LIST_ALL or LIST
 end
 
-local function onKungfuChange()
+local function onCacheExpired()
 	LIST, LIST_ALL = nil, nil
 end
-X.RegisterEvent('SKILL_MOUNT_KUNG_FU', onKungfuChange)
-X.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', onKungfuChange)
+X.RegisterEvent('ON_SKILL_REPLACE', onCacheExpired)
+X.RegisterEvent('SKILL_MOUNT_KUNG_FU', onCacheExpired)
+X.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', onCacheExpired)
 end
 
 -- 判断两个心法ID是不是同一心法，藏剑视为单心法
