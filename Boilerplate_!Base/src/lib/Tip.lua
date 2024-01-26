@@ -413,9 +413,9 @@ function X.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 				end
 
 				if doodadTemplate.dwCraftID == 1 or doodadTemplate.dwCraftID == 2 or doodadTemplate.dwCraftID == 3 then --采金 神农 庖丁
-					table.insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_BEST_CRAFT, X.Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
+					table.insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_BEST_CRAFT, X.Table.GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
 				elseif doodadTemplate.dwCraftID ~= 8 then --8 读碑文
-					table.insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_CRAFT, X.Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
+					table.insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_CRAFT, X.Table.GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
 				end
 
 				if recipe.nCraftType == ALL_CRAFT_TYPE.READ then

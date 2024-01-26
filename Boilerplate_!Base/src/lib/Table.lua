@@ -10,7 +10,9 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Table')
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
-function X.Table_GetCommonEnchantDesc(enchant_id)
+X.Table = {}
+
+function X.Table.GetCommonEnchantDesc(enchant_id)
 	if X.IsFunction(_G.Table_GetCommonEnchantDesc) then
 		return _G.Table_GetCommonEnchantDesc(enchant_id)
 	end
@@ -23,7 +25,7 @@ function X.Table_GetCommonEnchantDesc(enchant_id)
 	end
 end
 
-function X.Table_GetProfessionName(dwProfessionID)
+function X.Table.GetProfessionName(dwProfessionID)
 	if X.IsFunction(_G.Table_GetProfessionName) then
 		return _G.Table_GetProfessionName(dwProfessionID)
 	end
@@ -38,7 +40,7 @@ function X.Table_GetProfessionName(dwProfessionID)
 	return szName
 end
 
-function X.Table_GetDoodadTemplateName(dwTemplateID)
+function X.Table.GetDoodadTemplateName(dwTemplateID)
 	if X.IsFunction(_G.Table_GetDoodadTemplateName) then
 		return _G.Table_GetDoodadTemplateName(dwTemplateID)
 	end
@@ -53,14 +55,14 @@ function X.Table_GetDoodadTemplateName(dwTemplateID)
 	return szName
 end
 
-function X.Table_IsTreasureBattleFieldMap(dwMapID)
+function X.Table.IsTreasureBattleFieldMap(dwMapID)
 	if X.IsFunction(_G.Table_IsTreasureBattleFieldMap) then
 		return _G.Table_IsTreasureBattleFieldMap(dwMapID)
 	end
 	return false
 end
 
-function X.Table_GetTeamRecruit()
+function X.Table.GetTeamRecruit()
 	if X.IsFunction(_G.Table_GetTeamRecruit) then
 		return _G.Table_GetTeamRecruit()
 	end
@@ -91,7 +93,7 @@ function X.Table_GetTeamRecruit()
 	return res
 end
 
-function X.Table_IsSimplePlayer(dwTemplateID)
+function X.Table.IsSimplePlayer(dwTemplateID)
 	if X.IsFunction(_G.Table_IsSimplePlayer) then
 		return _G.Table_IsSimplePlayer(dwTemplateID)
 	end
@@ -107,7 +109,7 @@ end
 
 do
 local cache = {}
-function X.Table_GetSkillExtCDID(dwID)
+function X.Table.GetSkillExtCDID(dwID)
 	if X.IsFunction(_G.Table_GetSkillExtCDID) then
 		return _G.Table_GetSkillExtCDID(dwID)
 	end
@@ -121,5 +123,7 @@ function X.Table_GetSkillExtCDID(dwID)
 	return cache[dwID] and cache[dwID] or nil
 end
 end
+
+X.NSLock(X.Table, X.NSFormatString('{$NS}.Table (table library)'))
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

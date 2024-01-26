@@ -424,7 +424,7 @@ end
 ---@return table @选择菜单数据
 function X.GetDungeonMenu(tOptions)
 	local t = {}
-	for _, p in ipairs(X.Table_GetTeamRecruit() or {}) do
+	for _, p in ipairs(X.Table.GetTeamRecruit() or {}) do
 		table.insert(t, RecruitItemToDungeonMenu(p, tOptions or {}))
 	end
 	return t
@@ -1453,7 +1453,7 @@ function X.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 					szName = X.GetTemplateName(TARGET.NPC, KObject.dwTemplateID)
 				end
 				if KObject.dwEmployer and KObject.dwEmployer ~= 0 then
-					if X.Table_IsSimplePlayer(KObject.dwTemplateID) then -- 长歌影子
+					if X.Table.IsSimplePlayer(KObject.dwTemplateID) then -- 长歌影子
 						szName = X.GetObjectName(X.GetPlayer(KObject.dwEmployer), eRetID)
 					elseif not X.IsEmpty(szName) then
 						local szEmpName = X.GetObjectName(
@@ -1474,7 +1474,7 @@ function X.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 		elseif szType == 'DOODAD' then
 			szDispType = 'D'
 			if KObject and X.IsEmpty(szName) then
-				szName = X.Table_GetDoodadTemplateName(KObject.dwTemplateID)
+				szName = X.Table.GetDoodadTemplateName(KObject.dwTemplateID)
 				if szName then
 					szName = szName:gsub('^%s*(.-)%s*$', '%1')
 				end
@@ -3353,7 +3353,7 @@ function X.GetSkill(dwID, nLevel)
 			nLevel = nLevel,
 			bLearned = nLevel > 0,
 			nIcon = Table_GetSkillIconID(dwID, nLevel),
-			dwExtID = X.Table_GetSkillExtCDID(dwID),
+			dwExtID = X.Table.GetSkillExtCDID(dwID),
 			bFormation = Table_IsSkillFormation(dwID, nLevel),
 		}
 		SKILL_PROXY[szKey] = setmetatable({}, { __index = SKILL_CACHE[szKey], __newindex = reject })
@@ -3744,7 +3744,7 @@ local PUBG_MAP = {}
 ---@return boolean @是否是绝境战场地图
 function X.IsPubgMap(dwMapID)
 	if PUBG_MAP[dwMapID] == nil then
-		PUBG_MAP[dwMapID] = X.Table_IsTreasureBattleFieldMap(dwMapID) or false
+		PUBG_MAP[dwMapID] = X.Table.IsTreasureBattleFieldMap(dwMapID) or false
 	end
 	return PUBG_MAP[dwMapID]
 end
