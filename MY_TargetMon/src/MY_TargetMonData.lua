@@ -30,8 +30,8 @@ local SKILL_CACHE = {} -- ÏÂ±êÎªÄ¿±êIDµÄÄ¿±ê¼¼ÄÜ»º´æÊý×é ·´ÕýID²»¿ÉÄÜÊÇdoodad²»»
 local SKILL_INFO = {} -- ¼¼ÄÜ·´ÏòË÷Òý
 local SHIELDED
 local CONFIG_CACHE
-local NEARBY_TARGET_KUNGFU_CACHE = {} -- ¸½½üÄ¿±êÐÄ·¨»º´æ
-local NEARBY_KUNGFU_STAT_CACHE = {} -- ¸½¼þÄ¿±êÐÄ·¨Í³¼Æ»º´æ
+local NEARBY_TARGET_FORCE_CACHE = {} -- ¸½½üÄ¿±êÃÅÅÉ»º´æ
+local NEARBY_FORCE_STAT_CACHE = {} -- ¸½¼þÄ¿±êÃÅÅÉÍ³¼Æ»º´æ
 local VIEW_LIST_CACHE = {}
 local DEFAULT_CONTENT_COLOR = {255, 255, 0}
 local MY_TARGET_MON_MAP_TYPE = MY_TargetMonConfig.MY_TARGET_MON_MAP_TYPE
@@ -68,11 +68,8 @@ end
 local function HasNearbyKungfu(tKungfu)
 	for dwKungfuID, bEnable in pairs(tKungfu) do
 		if bEnable then
-			if NEARBY_KUNGFU_STAT_CACHE[dwKungfuID]
-			or ( -- ²Ø½£²»Çø·ÖÐÄ·¨
-				(dwKungfuID == X.CONSTANT.KUNGFU_TYPE.WEN_SHUI or dwKungfuID == X.CONSTANT.KUNGFU_TYPE.SHAN_JU)
-				and (NEARBY_KUNGFU_STAT_CACHE[X.CONSTANT.KUNGFU_TYPE.WEN_SHUI] or NEARBY_KUNGFU_STAT_CACHE[X.CONSTANT.KUNGFU_TYPE.SHAN_JU])
-			) then
+			local dwForceID = X.CONSTANT.KUNGFU_FORCE_TYPE[dwKungfuID]
+			if dwForceID and NEARBY_FORCE_STAT_CACHE[dwForceID] then
 				return true
 			end
 		end
@@ -843,57 +840,33 @@ X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD', 'MY_TargetMonData', onTa
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
 
-X.RegisterEvent('UPDATE_PLAYER_SCHOOL_ID', 'MY_TargetMonData', function()
-	local dwPrevKungfuID = NEARBY_TARGET_KUNGFU_CACHE[arg0]
-	local bStatChange = false
-	if dwPrevKungfuID then
-		NEARBY_KUNGFU_STAT_CACHE[dwPrevKungfuID] = NEARBY_KUNGFU_STAT_CACHE[dwPrevKungfuID] - 1
-		if NEARBY_KUNGFU_STAT_CACHE[dwPrevKungfuID] == 0 then
-			NEARBY_KUNGFU_STAT_CACHE[dwPrevKungfuID] = nil
-			bStatChange = true
-		end
-	end
-	NEARBY_TARGET_KUNGFU_CACHE[arg0] = arg1
-	if NEARBY_KUNGFU_STAT_CACHE[arg1] then
-		NEARBY_KUNGFU_STAT_CACHE[arg1] = NEARBY_KUNGFU_STAT_CACHE[arg1] + 1
-	else
-		NEARBY_KUNGFU_STAT_CACHE[arg1] = 1
-		bStatChange = true
-	end
-	if bStatChange then
-		VIEW_LIST_CACHE = {}
-		CONFIG_CACHE = nil
-	end
-end)
-
 X.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_TargetMonData', function()
-	local player = GetPlayer(arg0)
-	if not player then
-		return
-	end
-	local kungfu = player.GetKungfuMount()
-	if not kungfu then
-		return
-	end
-	NEARBY_TARGET_KUNGFU_CACHE[arg0] = kungfu.dwSkillID
-	if NEARBY_KUNGFU_STAT_CACHE[kungfu.dwSkillID] then
-		NEARBY_KUNGFU_STAT_CACHE[kungfu.dwSkillID] = NEARBY_KUNGFU_STAT_CACHE[kungfu.dwSkillID] + 1
-	else
-		NEARBY_KUNGFU_STAT_CACHE[kungfu.dwSkillID] = 1
-		VIEW_LIST_CACHE = {}
-		CONFIG_CACHE = nil
-	end
+	local dwID = arg0
+	X.DelayCall(function()
+		local player = GetPlayer(dwID)
+		if not player then
+			return
+		end
+		NEARBY_TARGET_FORCE_CACHE[dwID] = player.dwForceID
+		if NEARBY_FORCE_STAT_CACHE[player.dwForceID] then
+			NEARBY_FORCE_STAT_CACHE[player.dwForceID] = NEARBY_FORCE_STAT_CACHE[player.dwForceID] + 1
+		else
+			NEARBY_FORCE_STAT_CACHE[player.dwForceID] = 1
+			VIEW_LIST_CACHE = {}
+			CONFIG_CACHE = nil
+		end
+	end)
 end)
 
 X.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_TargetMonData', function()
-	local dwKungfuID = NEARBY_TARGET_KUNGFU_CACHE[arg0]
-	if not dwKungfuID then
+	local dwForceID = NEARBY_TARGET_FORCE_CACHE[arg0]
+	if not dwForceID then
 		return
 	end
-	NEARBY_KUNGFU_STAT_CACHE[dwKungfuID] = NEARBY_KUNGFU_STAT_CACHE[dwKungfuID] - 1
-	NEARBY_TARGET_KUNGFU_CACHE[arg0] = nil
-	if NEARBY_KUNGFU_STAT_CACHE[dwKungfuID] == 0 then
-		NEARBY_KUNGFU_STAT_CACHE[dwKungfuID] = nil
+	NEARBY_FORCE_STAT_CACHE[dwForceID] = NEARBY_FORCE_STAT_CACHE[dwForceID] - 1
+	NEARBY_TARGET_FORCE_CACHE[arg0] = nil
+	if NEARBY_FORCE_STAT_CACHE[dwForceID] == 0 then
+		NEARBY_FORCE_STAT_CACHE[dwForceID] = nil
 		VIEW_LIST_CACHE = {}
 		CONFIG_CACHE = nil
 	end
