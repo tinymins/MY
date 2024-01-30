@@ -248,13 +248,15 @@ local EXTENT_ANIMATE = {
 local MON_EXIST_CACHE = {}
 -- 通用：判断监控项是否显示
 local function Base_MonVisible(mon, dwTarKungfuID)
-	if not X.IsEmpty(mon.tTargetKungfu) and not mon.tTargetKungfu.bAll and not mon.tTargetKungfu[dwTarKungfuID] or ( -- 藏剑不区分心法
+	if X.IsEmpty(mon.tTargetKungfu) or mon.tTargetKungfu.bAll
+	or mon.tTargetKungfu[dwTarKungfuID]
+	or ( -- 藏剑不区分心法
 		(dwTarKungfuID == X.CONSTANT.KUNGFU_TYPE.WEN_SHUI or dwTarKungfuID == X.CONSTANT.KUNGFU_TYPE.SHAN_JU)
 		and (mon.tTargetKungfu[X.CONSTANT.KUNGFU_TYPE.WEN_SHUI] or mon.tTargetKungfu[X.CONSTANT.KUNGFU_TYPE.SHAN_JU])
 	) then
-		return
+		return true
 	end
-	return true
+	return false
 end
 -- 通用：监控项转视图数据
 local function Base_MonToView(mon, info, item, KObject, dataset, tMonExist, tMonLast)
