@@ -66,6 +66,9 @@ local function FilterDatasets(aDataset, dwMapID, dwKungfuID)
 	return ret
 end
 local function HasNearbyKungfu(tKungfu)
+	if tKungfu.bAll or tKungfu.bNpc then
+		return true
+	end
 	for dwKungfuID, bEnable in pairs(tKungfu) do
 		if bEnable then
 			local dwForceID = X.CONSTANT.KUNGFU_FORCE_TYPE[dwKungfuID]
@@ -464,7 +467,7 @@ function UpdateView()
 		local dwTarKungfuID = KObject
 			and (dwTarType == TARGET.PLAYER
 				and (KObject.GetKungfuMountID() or 0)
-				or 'npc'
+				or 'bNpc'
 			)
 			or 0
 		local view = VIEW_LIST_CACHE[nViewIndex]
