@@ -72,7 +72,18 @@ local function GetCopyLinkScript(opt)
 	if opt.lclick ~= false then
 		szScript = szScript .. 'this.bLButton=true;this.OnItemLButtonDown='.. handlerEntry .. '.OnCopyLClick;'
 		if opt.richtext and not X.ContainsEchoMsgHeader(opt.richtext) then
-			szScript = szScript .. 'this.szRichText=' .. X.EncodeLUAData(opt.richtext or '') .. ';'
+			local RichTexts = X.ChatLinkEventHandlers.RichTexts
+			if RichTexts[RichTexts.nIndex] then
+				RichTexts[RichTexts[RichTexts.nIndex]] = nil
+			end
+			local szRichTextUUID = X.GetUUID()
+			RichTexts[RichTexts.nIndex] = szRichTextUUID
+			RichTexts[szRichTextUUID] = opt.richtext or ''
+			RichTexts.nIndex = RichTexts.nIndex + 1
+			if RichTexts.nIndex > 800 then
+				RichTexts.nIndex = 1
+			end
+			szScript = szScript .. 'this.szRichText=' .. handlerEntry .. '.RichTexts["' .. szRichTextUUID .. '"] or ""' .. ';'
 		end
 	end
 	if opt.mclick then
@@ -410,13 +421,17 @@ local ChatLinkEvents = {
 X.ChatLinkEvents = X.SetmetaReadonly(ChatLinkEvents)
 
 -- 聊天界面元素通用事件绑定函数（this）
-local ChatLinkEventHandlers = {}
+X.ChatLinkEventHandlers = {
+	RichTexts = {
+		nIndex = 1,
+	},
+}
 for k, f in pairs(ChatLinkEvents) do
-	ChatLinkEventHandlers[k] = function()
+	X.ChatLinkEventHandlers[k] = function()
 		f(this)
 	end
 end
-X.ChatLinkEventHandlers = X.SetmetaReadonly(ChatLinkEventHandlers)
+X.NSLock(X.ChatLinkEventHandlers)
 
 -- 绑定link事件响应
 -- (userdata) X.RenderChatLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
