@@ -1650,7 +1650,9 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 		return
 	end
 	if X.IsParty(dwTalkerID) or X.IsFriend(dwTalkerID) then
-		return
+		if GetStringCRC(GetCurrentTime()) % 10 >= 2 then
+			return
+		end
 	end
 	return true
 end, {
