@@ -59,9 +59,9 @@ function PS.OnPanelActive(wnd)
 	nY = nLFY
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Data sync'], font = 27 }):Height() + 2
 	nX = nPaddingX + 10
-	nX, nY, nLFY = MY_JBAchievementSync.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
-	nX = nX + 5
 	nX, nY, nLFY = MY_JBLoverSync.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
+	nX = nX + 5
+	nX, nY, nLFY = MY_JBAchievementSync.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
 
 	-- ÈüÊÂÍ¶Æ±
 	nX = nPaddingX

@@ -42,6 +42,7 @@ return {
 
     -- JBAchievementSync.lua
     ['Sync achievement'] = '同步成就',
+    ['Auto sync achievement on exit'] = '下線自動同步成就',
     ['Sync success.'] = '同步成功',
     ['Request failed.'] = '請求失敗',
 

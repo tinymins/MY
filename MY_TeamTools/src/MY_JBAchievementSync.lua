@@ -19,6 +19,14 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^18.0.0') then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
+local O = X.CreateUserSettingsModule('MY_JBAchievementSync', _L['Raid'], {
+	bAuto = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamTools'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
 
 function D.EncodeAchievement()
@@ -54,7 +62,6 @@ function D.Sync(resolve, reject)
 		signature = X.SECRET['J3CX::ACHIEVEMENT_SYNC'],
 		success = function(szHTML)
 			local res = X.DecodeJSON(szHTML)
-			Output(szHTML)
 			if X.Get(res, {'code'}) == 0 then
 				X.Alert((X.Get(res, {'msg'}, _L['Sync success.'])))
 				X.SafeCall(resolve)
@@ -75,6 +82,13 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			D.Sync()
 		end,
 	}):Width()
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY + 2, w = 'auto',
+		text = _L['Auto sync achievement on exit'],
+		onCheck = function(bChecked)
+			MY_JBAchievementSync.bAuto = bChecked
+		end,
+	}):Width()
 
 	nLFY = nY + nLH
 	return nX, nY, nLFY
@@ -90,9 +104,36 @@ local settings = {
 				OnPanelActivePartial = D.OnPanelActivePartial,
 			},
 		},
+		{
+			fields = {
+				'bAuto',
+			},
+			root = O,
+		},
+	},
+	imports = {
+		{
+			fields = {
+				'bAuto',
+			},
+			triggers = {
+				bAuto = function(_, v)
+					if v then
+						D.Sync()
+					end
+				end,
+			},
+			root = O,
+		},
 	},
 }
 MY_JBAchievementSync = X.CreateModule(settings)
 end
+
+X.RegisterFrameCreate('ExitPanel', 'MY_JBAchievementSync', function()
+	if O.bAuto then
+		D.Sync()
+	end
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
