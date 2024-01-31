@@ -518,6 +518,10 @@ function X.CopyChatItem(p)
 		elseif szName == 'iteminfolink' then
 			edit:InsertObj(szText, { type = 'iteminfo', text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
 		elseif szName == 'namelink' or string.sub(szName, 1, 9) == 'namelink_' then
+			-- ¹ýÂË»»ÐÐ·û
+			if X.IsRestricted('X.CHAT_CRLF') then
+				szText = X.StringReplaceW(szText, '\n', '')
+			end
 			edit:InsertObj(szText, { type = 'name', text = szText, name = string.match(szText, '%[(.*)%]') })
 		elseif szName == 'questlink' then
 			edit:InsertObj(szText, { type = 'quest', text = szText, questid = p:GetUserData() })
