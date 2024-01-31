@@ -50,7 +50,7 @@ function D.EncodeAchievement()
 	return szCompressBinBase64
 end
 
-function D.Sync(resolve, reject)
+function D.Sync(bSilent, resolve, reject)
 	X.Ajax({
 		url = MY_RSS.PUSH_BASE_URL .. '/api/achievements',
 		data = {
@@ -61,6 +61,9 @@ function D.Sync(resolve, reject)
 		},
 		signature = X.SECRET['J3CX::ACHIEVEMENT_SYNC'],
 		success = function(szHTML)
+			if bSilent then
+				return
+			end
 			local res = X.DecodeJSON(szHTML)
 			if X.Get(res, {'code'}) == 0 then
 				X.Alert((X.Get(res, {'msg'}, _L['Sync success.'])))
@@ -119,7 +122,7 @@ local settings = {
 			triggers = {
 				bAuto = function(_, v)
 					if v then
-						D.Sync()
+						D.Sync(true)
 					end
 				end,
 			},
@@ -132,7 +135,7 @@ end
 
 X.RegisterFrameCreate('ExitPanel', 'MY_JBAchievementSync', function()
 	if O.bAuto then
-		D.Sync()
+		D.Sync(true)
 	end
 end)
 
