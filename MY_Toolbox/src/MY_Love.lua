@@ -386,10 +386,10 @@ function D.GetLover()
 		return
 	end
 	local dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem = X.GetRemoteStorage('MY_Love')
-	local aGroup = me.GetFellowshipGroupInfo() or {}
+	local aGroup = X.GetFellowshipGroupInfo() or {}
 	table.insert(aGroup, 1, { id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND })
 	for _, v in ipairs(aGroup) do
-		local aFriend = me.GetFellowshipInfo(v.id) or {}
+		local aFriend = X.GetFellowshipInfo(v.id) or {}
 		for i = #aFriend, 1, -1 do
 			local info = aFriend[i]
 			if nLoverTime == 0 then -- 时间为非0表示不是第一次了 拒绝加载海鳗数据

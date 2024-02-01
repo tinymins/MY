@@ -49,10 +49,10 @@ local PS = { IsRestricted = MY_Love.IsShielded }
 -- 获取可情缘好友列表
 function D.GetLoverMenu(nType)
 	local me, m0 = X.GetClientPlayer(), {}
-	local aGroup = me.GetFellowshipGroupInfo() or {}
+	local aGroup = X.GetFellowshipGroupInfo() or {}
 	table.insert(aGroup, 1, {id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND})
 	for _, v in ipairs(aGroup) do
-		local aFriend = me.GetFellowshipInfo(v.id) or {}
+		local aFriend = X.GetFellowshipInfo(v.id) or {}
 		for _, vv in ipairs(aFriend) do
 			if vv.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or vv.attraction >= MY_Love.nDoubleLoveAttraction) then
 				table.insert(m0, {

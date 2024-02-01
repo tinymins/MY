@@ -694,7 +694,7 @@ function D.UpdateMapProgress(bForceUpdate)
 	end
 	-- 获取这些地图的进度
 	for dwID, _ in pairs(tProgressBossMapID) do
-		local aProgressBoss = dwID and X.IsDungeonRoleProgressMap(dwID) and Table_GetCDProcessBoss(dwID)
+		local aProgressBoss = dwID and X.IsDungeonRoleProgressMap(dwID) and X.GetCDProcessInfo(dwID)
 		if aProgressBoss then
 			-- 强制刷新秘境进度，或者进度数据已过期并且5秒内未请求过，则发起请求
 			if bForceUpdate or (not D.tMapProgressValid[dwID] and GetTime() - D.tMapProgressRequestTime[dwID] > 5000) then
@@ -1160,7 +1160,7 @@ function D.OnItemMouseEnter()
 		if name == 'Image_ProgressBoss' then
 			table.insert(aText, '')
 			local aBossKill = X.SplitString(this.progress_info, ',')
-			for i, boss in ipairs(Table_GetCDProcessBoss(this.mapid)) do
+			for i, boss in ipairs(X.GetCDProcessInfo(this.mapid)) do
 				table.insert(aText, boss.szName .. '\t' .. _L[aBossKill[i] == '1' and 'x' or 'r'])
 			end
 		end
