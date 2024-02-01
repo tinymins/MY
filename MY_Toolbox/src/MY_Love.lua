@@ -432,7 +432,7 @@ function D.GetLover()
 					dwAvatar = card.dwMiniAvatarID,
 					dwForceID = card.dwForceID,
 					nRoleType = card.nRoleType,
-					dwMapID = card.dwMapID,
+					dwMapID = X.GetFellowshipMapID(info.id),
 					bOnline = X.IsRoleOnline(info.id),
 				}
 				return 0

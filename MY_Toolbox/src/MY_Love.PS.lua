@@ -56,7 +56,7 @@ function D.GetLoverMenu(nType)
 		if rei and info.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or info.attraction >= MY_Love.nDoubleLoveAttraction) then
 			table.insert(m0, {
 				szOption = rei.szName,
-				fnDisable = function() return not rei.bOnline end,
+				fnDisable = function() return not X.IsRoleOnline(info.id) end,
 				fnAction = function()
 					D.SetLover(rei.dwPlayerID, nType)
 					X.UI.ClosePopupMenu()
@@ -143,8 +143,8 @@ function PS.OnPanelActive(wnd)
 			if not X.IsEmpty(lover.szLoverTitle) then
 				nX = ui:Append('Text', { text = '<' .. lover.szLoverTitle .. '>', x = nX, y = nY, font = 80, r = 255, g = 128, b = 255 }):AutoWidth():Pos('BOTTOMRIGHT')
 			end
-			if map and map.szName then
-				ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_ONLINE .. ': ' .. map.szName .. ')', font = 80, x = nX + 10, y = nY })
+			if lover.bOnline then
+				ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_ONLINE .. ': ' .. (map and map.szName or '#' .. lover.dwMapID)  .. ')', font = 80, x = nX + 10, y = nY })
 			else
 				ui:Append('Text', { text = '(' .. g_tStrings.STR_GUILD_OFFLINE .. ')', font = 62, x = nX + 10, y = nY })
 			end
