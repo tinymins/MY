@@ -2113,7 +2113,7 @@ function X.ApplyFellowshipCard(szGlobalID)
 	end
 	local fcc = X.GetFellowshipCardClient()
 	if fcc then
-		return fcc.ApplyFellowshipCard(szGlobalID)
+		return fcc.ApplyFellowshipCard(255, szGlobalID)
 	end
 end
 
