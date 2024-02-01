@@ -53,7 +53,7 @@ function D.Hook()
 			local info = txtName and X.GetFriend(txtName:GetText())
 			local card = info and X.GetFellowshipCardInfo(info.id)
 			if card and ((card.bIsTwoWayFriend and info.attraction >= 200) or not X.IsRestricted('MY_FriendTipLocation.LV2')) then
-				szText = Table_GetMapName(card.dwMapID)
+				szText = Table_GetMapName(X.GetFellowshipMapID(info.id))
 				if (me.nCamp == CAMP.EVIL and card.nCamp == CAMP.GOOD)
 				or (me.nCamp == CAMP.GOOD and card.nCamp == CAMP.EVIL) then
 					szText = szText .. _L['(Different camp)']
