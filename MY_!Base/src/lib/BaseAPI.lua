@@ -161,6 +161,18 @@ function X.GetClientPlayerGlobalID()
 	return CLIENT_PLAYER_GLOBAL_ID
 end
 
+-- 获取好友卡片管理器对象
+---@return userdata | nil @好友卡片管理器对象，获取失败返回空
+function X.GetFellowshipCardClient()
+	return GetFellowshipCardClient and GetFellowshipCardClient()
+end
+
+-- 获取社交管理器对象
+---@return userdata | nil @社交管理器对象，获取失败返回空
+function X.GetSocialManagerClient()
+	return GetSocialManagerClient and GetSocialManagerClient()
+end
+
 local LOG_MAX_FILE = 30
 local LOG_MAX_LINE = 5000
 local LOG_LINE_COUNT = 0
