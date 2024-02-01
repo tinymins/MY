@@ -51,8 +51,8 @@ function D.Hook()
 		txtLocation.__MY_SetText = txtLocation.SetText
 		txtLocation.SetText = function(_, szText)
 			local info = txtName and X.GetFriend(txtName:GetText())
-			local card = info and info.isonline and GetFellowshipCardClient().GetFellowshipCardInfo(info.id)
-			if card and ((info.istwoway and info.attraction >= 200) or not X.IsRestricted('MY_FriendTipLocation.LV2')) then
+			local card = info and X.GetFellowshipCardInfo(info.id)
+			if card and ((card.bIsTwoWayFriend and info.attraction >= 200) or not X.IsRestricted('MY_FriendTipLocation.LV2')) then
 				szText = Table_GetMapName(card.dwMapID)
 				if (me.nCamp == CAMP.EVIL and card.nCamp == CAMP.GOOD)
 				or (me.nCamp == CAMP.GOOD and card.nCamp == CAMP.EVIL) then

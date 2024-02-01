@@ -79,9 +79,10 @@ function D.Apply()
 				return
 			end
 			local p = X.GetFriend(dwID)
-			if p then
+			local rei = X.GetRoleEntryInfo(p.id)
+			if rei then
 				if O.bFriendNav and Navigator_SetID then
-					Navigator_SetID('MY_FRIEND_TIP.' .. dwID, TARGET.PLAYER, dwID, p.name)
+					Navigator_SetID('MY_FRIEND_TIP.' .. dwID, TARGET.PLAYER, dwID, rei.szName)
 				else
 					local sha = hShaList:Lookup(tostring(dwID))
 					if not sha then
@@ -89,7 +90,7 @@ function D.Apply()
 						sha = hShaList:Lookup(tostring(dwID))
 					end
 					local r, g, b, a = 255,255,255,255
-					local szTip = '>> ' .. p.name .. ' <<'
+					local szTip = '>> ' .. rei.szName .. ' <<'
 					sha:ClearTriangleFanPoint()
 					sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 					sha:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)

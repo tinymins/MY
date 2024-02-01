@@ -238,9 +238,9 @@ end
 function R.GetIcon(info, szImage, nFrame)
 	if info.szType == 'A2M' or info.szType == 'M2A' then
 		local info = X.GetFriend(info.szName)
-		local card = info and GetFellowshipCardClient().GetFellowshipCardInfo(info.id)
-		if card then
-			local szAvatarFile, nAvatarFrame, bAnimate = X.GetPlayerAvatar(card.dwForceID, card.nRoleType, card.dwMiniAvatarID)
+		local rei = info and X.GetRoleEntryInfo(info.id)
+		if rei then
+			local szAvatarFile, nAvatarFrame, bAnimate = X.GetPlayerAvatar(rei.nForceID, rei.nRoleType, rei.dwMiniAvatarID)
 			if szAvatarFile and not bAnimate then
 				szImage, nFrame = szAvatarFile, nAvatarFrame
 			end
