@@ -388,61 +388,58 @@ function D.GetLover()
 		return
 	end
 	local dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem = X.GetRemoteStorage('MY_Love')
-	local aGroup = X.GetFellowshipGroupInfo() or {}
-	table.insert(aGroup, 1, { id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND })
-	for _, v in ipairs(aGroup) do
-		local aFriend = X.GetFellowshipInfo(v.id) or {}
-		for i = #aFriend, 1, -1 do
-			local info = aFriend[i]
-			if nLoverTime == 0 and info.remark then -- 时间为非0表示不是第一次了 拒绝加载海鳗数据
-				local bMatch = string.sub(info.remark, 1, string.len(szKey)) == szKey
-				-- fetch data
-				-- 兼容海鳗：情缘信息从好友备注中提取数据
-				if bMatch then
-					local szData = D.DecodeHMString(string.sub(info.remark, string.len(szKey) + 1))
-					if not X.IsEmpty(szData) then
-						local data = X.SplitString(szData, '#')
-						local nType = data[1] and tonumber(data[1])
-						local nTime = data[2] and tonumber(data[2])
-						if nType and nTime and (nType == 0 or nType == 1) and (nTime > 0 and nTime < GetCurrentTime()) then
-							dwLoverID = info.id
-							nLoverType = nType
-							nLoverTime = nTime
-							nSendItem = 0
-							nReceiveItem = 0
-							X.SetRemoteStorage('MY_Love', dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem)
-							D.UpdateProtectData()
-						end
+	local lover
+	X.WalkFriend(function(info)
+		if nLoverTime == 0 and info.remark then -- 时间为非0表示不是第一次了 拒绝加载海鳗数据
+			local bMatch = string.sub(info.remark, 1, string.len(szKey)) == szKey
+			-- fetch data
+			-- 兼容海鳗：情缘信息从好友备注中提取数据
+			if bMatch then
+				local szData = D.DecodeHMString(string.sub(info.remark, string.len(szKey) + 1))
+				if not X.IsEmpty(szData) then
+					local data = X.SplitString(szData, '#')
+					local nType = data[1] and tonumber(data[1])
+					local nTime = data[2] and tonumber(data[2])
+					if nType and nTime and (nType == 0 or nType == 1) and (nTime > 0 and nTime < GetCurrentTime()) then
+						dwLoverID = info.id
+						nLoverType = nType
+						nLoverTime = nTime
+						nSendItem = 0
+						nReceiveItem = 0
+						X.SetRemoteStorage('MY_Love', dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem)
+						D.UpdateProtectData()
 					end
-					me.SetFellowshipRemark(info.id, '')
 				end
-			end
-			-- 遍历到情缘，获取基础信息并返回
-			if info.id == dwLoverID and info.istwoway then
-				local card = X.GetFellowshipCardInfo(info.id)
-				local rei = X.GetRoleEntryInfo(info.id)
-				if not card or (X.GetFellowshipMapID(info.id) == 0 and X.IsRoleOnline(info.id)) then
-					X.ApplyFellowshipCard(info.id)
-				else
-					return {
-						dwID = dwLoverID,
-						szName = rei.szName,
-						szTitle = D.tLoverItem[D.lover.nSendItem] and D.tLoverItem[D.lover.nSendItem].szTitle or '',
-						nSendItem = nSendItem,
-						nReceiveItem = nReceiveItem,
-						nLoverType = nLoverType,
-						nLoverTime = nLoverTime,
-						szLoverTitle = D.tLoverItem[D.lover.nReceiveItem] and D.tLoverItem[D.lover.nReceiveItem].szTitle or '',
-						dwAvatar = card.dwMiniAvatarID,
-						dwForceID = card.dwForceID,
-						nRoleType = card.nRoleType,
-						dwMapID = card.dwMapID,
-						bOnline = X.IsRoleOnline(info.id),
-					}
-				end
+				me.SetFellowshipRemark(info.id, '')
 			end
 		end
-	end
+		-- 遍历到情缘，获取基础信息并返回
+		local rei = X.GetRoleEntryInfo(info.id)
+		if rei.dwPlayerID == dwLoverID  then
+			local card = X.GetFellowshipCardInfo(info.id)
+			if not card then
+				X.ApplyFellowshipCard(info.id)
+			elseif card.bIsTwoWayFriend then
+				lover = {
+					dwID = dwLoverID,
+					szName = rei.szName,
+					szTitle = D.tLoverItem[D.lover.nSendItem] and D.tLoverItem[D.lover.nSendItem].szTitle or '',
+					nSendItem = nSendItem,
+					nReceiveItem = nReceiveItem,
+					nLoverType = nLoverType,
+					nLoverTime = nLoverTime,
+					szLoverTitle = D.tLoverItem[D.lover.nReceiveItem] and D.tLoverItem[D.lover.nReceiveItem].szTitle or '',
+					dwAvatar = card.dwMiniAvatarID,
+					dwForceID = card.dwForceID,
+					nRoleType = card.nRoleType,
+					dwMapID = card.dwMapID,
+					bOnline = X.IsRoleOnline(info.id),
+				}
+				return 0
+			end
+		end
+	end)
+	return lover
 end
 
 -- 转换好友信息为情缘信息
