@@ -1953,7 +1953,7 @@ local function GeneFriendListCache()
 	if not FRIEND_LIST_BY_GROUP then
 		local me = X.GetClientPlayer()
 		if me then
-			local infos = me.GetFellowshipGroupInfo()
+			local infos = X.GetFellowshipGroupInfo()
 			if infos then
 				FRIEND_LIST_BY_ID = {}
 				FRIEND_LIST_BY_NAME = {}
@@ -1962,7 +1962,7 @@ local function GeneFriendListCache()
 					table.insert(FRIEND_LIST_BY_GROUP, group)
 				end
 				for _, group in ipairs(FRIEND_LIST_BY_GROUP) do
-					for _, p in ipairs(me.GetFellowshipInfo(group.id) or {}) do
+					for _, p in ipairs(X.GetFellowshipInfo(group.id) or {}) do
 						table.insert(group, p)
 						FRIEND_LIST_BY_ID[p.id] = p
 						FRIEND_LIST_BY_NAME[p.name] = p
@@ -2030,6 +2030,25 @@ end
 function X.IsFriend(arg0)
 	return X.GetFriend(arg0) and true or false
 end
+end
+
+---获取好友分组
+---@return table @好友分组列表
+function X.GetFellowshipGroupInfo()
+	if GetSocialManagerClient then
+		return GetSocialManagerClient().GetFellowshipGroupInfo()
+	end
+	return GetClientPlayer().GetFellowshipGroupInfo()
+end
+
+---获取组好友信息列表
+---@param dwGroupID number @要获取的好友分组ID
+---@return table @分组好友信息列表
+function X.GetFellowshipInfo(dwGroupID)
+	if GetSocialManagerClient then
+		return GetSocialManagerClient().GetFellowshipInfo(dwGroupID)
+	end
+	return GetClientPlayer().GetFellowshipInfo(dwGroupID)
 end
 
 do
@@ -3697,6 +3716,26 @@ end
 function X.IsInDungeonRoleProgressMap()
 	local me = X.GetClientPlayer()
 	return me and X.IsDungeonRoleProgressMap(me.GetMapID())
+end
+
+---获取地图秘境进度
+---@param dwMapID number @要获取的地图ID
+---@param nProcessID number @要获取的进度ID
+---@return table @秘境首领与进度状态列表
+function X.GetCDProcessInfo(dwMapID, nProcessID)
+	if GetCDProcessInfo then
+		local aInfo = {}
+		for _, v in ipairs(GetCDProcessInfo(dwMapID, nProcessID)) do
+			table.insert(aInfo, {
+				dwBossIndex = v.BossIndex,
+				dwMapID = v.MapID,
+				szName = v.Name,
+				dwProgressID = v.ProgressID,
+			})
+		end
+		return aInfo
+	end
+	return Table_GetCDProcessBoss(dwMapID, nProcessID)
 end
 
 ---判断一个地图是不是主城地图
