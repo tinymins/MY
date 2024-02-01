@@ -48,23 +48,22 @@ local PS = { IsRestricted = MY_Love.IsShielded }
 
 -- 获取可情缘好友列表
 function D.GetLoverMenu(nType)
-	local me, m0 = X.GetClientPlayer(), {}
+	local m0 = {}
 	local aGroup = X.GetFellowshipGroupInfo() or {}
 	table.insert(aGroup, 1, {id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND})
-	for _, v in ipairs(aGroup) do
-		local aFriend = X.GetFellowshipInfo(v.id) or {}
-		for _, vv in ipairs(aFriend) do
-			if vv.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or vv.attraction >= MY_Love.nDoubleLoveAttraction) then
-				table.insert(m0, {
-					szOption = vv.name,
-					fnDisable = function() return not vv.isonline end,
-					fnAction = function()
-						D.SetLover(vv.id, nType)
-					end
-				})
-			end
+	X.WalkFriend(function(info)
+		local rei = X.GetRoleEntryInfo(info.id)
+		if rei and info.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or info.attraction >= MY_Love.nDoubleLoveAttraction) then
+			table.insert(m0, {
+				szOption = rei.szName,
+				fnDisable = function() return not rei.bOnline end,
+				fnAction = function()
+					D.SetLover(rei.dwPlayerID, nType)
+					X.UI.ClosePopupMenu()
+				end
+			})
 		end
-	end
+	end)
 	if #m0 == 0 then
 		table.insert(m0, { szOption = _L['<Non-avaiable>'] })
 	end

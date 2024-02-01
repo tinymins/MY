@@ -419,28 +419,26 @@ function D.GetLover()
 			end
 			-- 遍历到情缘，获取基础信息并返回
 			if info.id == dwLoverID and info.istwoway then
-				local fellowClient = GetFellowshipCardClient()
-				if fellowClient then
-					local card = fellowClient.GetFellowshipCardInfo(info.id)
-					if not card or (card.dwMapID == 0 and info.isonline) then
-						fellowClient.ApplyFellowshipCard(255, {info.id})
-					else
-						return {
-							dwID = dwLoverID,
-							szName = info.name,
-							szTitle = D.tLoverItem[D.lover.nSendItem] and D.tLoverItem[D.lover.nSendItem].szTitle or '',
-							nSendItem = nSendItem,
-							nReceiveItem = nReceiveItem,
-							nLoverType = nLoverType,
-							nLoverTime = nLoverTime,
-							szLoverTitle = D.tLoverItem[D.lover.nReceiveItem] and D.tLoverItem[D.lover.nReceiveItem].szTitle or '',
-							dwAvatar = card.dwMiniAvatarID,
-							dwForceID = card.dwForceID,
-							nRoleType = card.nRoleType,
-							dwMapID = card.dwMapID,
-							bOnline = info.isonline,
-						}
-					end
+				local card = X.GetFellowshipCardInfo(info.id)
+				local rei = X.GetRoleEntryInfo(info.id)
+				if not card or (X.GetFellowshipMapID(info.id) == 0 and X.IsRoleOnline(info.id)) then
+					X.ApplyFellowshipCard(info.id)
+				else
+					return {
+						dwID = dwLoverID,
+						szName = rei.szName,
+						szTitle = D.tLoverItem[D.lover.nSendItem] and D.tLoverItem[D.lover.nSendItem].szTitle or '',
+						nSendItem = nSendItem,
+						nReceiveItem = nReceiveItem,
+						nLoverType = nLoverType,
+						nLoverTime = nLoverTime,
+						szLoverTitle = D.tLoverItem[D.lover.nReceiveItem] and D.tLoverItem[D.lover.nReceiveItem].szTitle or '',
+						dwAvatar = card.dwMiniAvatarID,
+						dwForceID = card.dwForceID,
+						nRoleType = card.nRoleType,
+						dwMapID = card.dwMapID,
+						bOnline = X.IsRoleOnline(info.id),
+					}
 				end
 			end
 		end
@@ -535,6 +533,7 @@ function D.SetLover(dwID, nType)
 		end
 		return X.Alert(_L['Lover must be a online friend'])
 	end
+	local rei = X.GetRoleEntryInfo(info.id)
 	if nType == -1 then
 		-- 重复放烟花刷新称号
 		if dwID == D.lover.dwID then
@@ -545,7 +544,7 @@ function D.SetLover(dwID, nType)
 				D.UseDoubleLoveItem(info, p.aUIID, function(bSuccess)
 					if bSuccess then
 						D.SaveLover(D.lover.nLoverTime, D.lover.dwID, D.lover.nLoverType, p.nItem, D.lover.nReceiveItem)
-						X.SendBgMsg(info.name, 'MY_LOVE', {'LOVE_FIREWORK', p.nItem})
+						X.SendBgMsg(rei.szName, 'MY_LOVE', {'LOVE_FIREWORK', p.nItem})
 						X.UI.CloseFrame('MY_Love_SetLover')
 					else
 						X.Systopmsg(_L['Failed to light firework.'])
@@ -559,7 +558,7 @@ function D.SetLover(dwID, nType)
 		if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 			return X.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
 		end
-		X.Confirm(_L('Do you want to blind love with [%s]?', info.name), function()
+		X.Confirm(_L('Do you want to blind love with [%s]?', rei.szName), function()
 			local info = X.GetFriend(dwID)
 			if not info or not X.IsRoleOnline(info.id) then
 				return X.Alert(_L['Lover must be a online friend'])
@@ -568,7 +567,7 @@ function D.SetLover(dwID, nType)
 				return X.Alert(_L['Inadequate conditions, requiring Lv2 friend'])
 			end
 			D.SaveLover(GetCurrentTime(), dwID, nType, 0, 0)
-			X.SendBgMsg(info.name, 'MY_LOVE', {'LOVE0'})
+			X.SendBgMsg(rei.szName, 'MY_LOVE', {'LOVE0'})
 		end)
 	else
 		-- 设置成为情缘（在线好友）
@@ -581,13 +580,13 @@ function D.SetLover(dwID, nType)
 			if not info or not X.IsRoleOnline(info.id) then
 				return X.Alert(_L['Lover must be a online friend'])
 			end
-			X.Confirm(_L('Do you want to mutual love with [%s]?', info.name), function()
+			X.Confirm(_L('Do you want to mutual love with [%s]?', rei.szName), function()
 				if not D.GetDoubleLoveItem(info, p.aUIID) then
 					return X.Alert(_L('Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s', p.szName))
 				end
 				D.nPendingItem = p.nItem
-				X.SendBgMsg(info.name, 'MY_LOVE', {'LOVE_ASK'})
-				X.Systopmsg(_L('Love request has been sent to [%s], wait please', info.name))
+				X.SendBgMsg(rei.szName, 'MY_LOVE', {'LOVE_ASK'})
+				X.Systopmsg(_L('Love request has been sent to [%s], wait please', rei.szName))
 			end)
 		end)
 	end
@@ -932,7 +931,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 					D.SaveLover(GetCurrentTime(), dwTalkerID, 1, nItem, 0)
 					X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
 					X.SendBgMsg(rei.szName, 'MY_LOVE', {'LOVE_ANS_CONF', nItem})
-					X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', info.name))
+					X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', rei.szName))
 					X.UI.CloseFrame('MY_Love_SetLover')
 				else
 					X.Systopmsg(_L['Failed to attach love, light firework failed.'])
