@@ -392,7 +392,7 @@ function D.GetLover()
 		local aFriend = X.GetFellowshipInfo(v.id) or {}
 		for i = #aFriend, 1, -1 do
 			local info = aFriend[i]
-			if nLoverTime == 0 then -- 时间为非0表示不是第一次了 拒绝加载海鳗数据
+			if nLoverTime == 0 and info.remark then -- 时间为非0表示不是第一次了 拒绝加载海鳗数据
 				local bMatch = string.sub(info.remark, 1, string.len(szKey)) == szKey
 				-- fetch data
 				-- 兼容海鳗：情缘信息从好友备注中提取数据
