@@ -2148,7 +2148,8 @@ end
 function X.IsRoleOnline(szGlobalID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		return smc.IsRoleOnline(szGlobalID)
+		local rei = X.GetRoleEntryInfo(szGlobalID)
+		return smc.IsRoleOnline(szGlobalID) or (rei and rei.bOnline) or false
 	end
 	local rei = X.GetRoleEntryInfo(szGlobalID)
 	if rei then
