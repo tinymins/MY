@@ -2032,6 +2032,21 @@ end
 function X.IsFriend(arg0)
 	return X.GetFriend(arg0) and true or false
 end
+
+-- 遍历好友
+---@param fnWalker function @迭代器，返回0时停止迭代
+function X.WalkFriend(fnWalker)
+	local aGroup = X.GetFellowshipGroupInfo() or {}
+	table.insert(aGroup, 1, { id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND })
+	for _, v in ipairs(aGroup) do
+		local aFriend = X.GetFellowshipInfo(v.id) or {}
+		for _, info in ipairs(aFriend) do
+			if fnWalker(info, v.id) == 0 then
+				return
+			end
+		end
+	end
+end
 end
 
 ---获取好友分组
