@@ -2104,6 +2104,19 @@ function X.GetRoleEntryInfo(szGlobalID)
 	end
 end
 
+---申请好友名片
+---@param szGlobalID string | string[] @要申请的玩家唯一ID或者唯一ID列表（缘起为 dwID）
+function X.ApplyFellowshipCard(szGlobalID)
+	local smc = X.GetSocialManagerClient()
+	if smc then
+		return smc.ApplyFellowshipCard(szGlobalID)
+	end
+	local fcc = X.GetFellowshipCardClient()
+	if fcc then
+		return fcc.ApplyFellowshipCard(szGlobalID)
+	end
+end
+
 ---获取玩家名片信息
 ---@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return table @玩家的名片信息
