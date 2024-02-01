@@ -2156,6 +2156,22 @@ function X.IsRoleOnline(szGlobalID)
 	end
 end
 
+---获取玩家所在地图
+---@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
+---@return boolean @玩家所在地图
+function X.GetFellowshipMapID(szGlobalID)
+	local smc = X.GetSocialManagerClient()
+	if smc then
+		return smc.GetFellowshipMapID(szGlobalID)
+	end
+	local info = X.GetFriend(szGlobalID)
+	local fcc = X.GetFellowshipCardClient()
+	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
+	if card then
+		return card.dwMapID
+	end
+end
+
 do
 local FOE_LIST, FOE_LIST_BY_ID, FOE_LIST_BY_NAME
 local function GeneFoeListCache()
