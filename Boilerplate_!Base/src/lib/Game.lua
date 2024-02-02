@@ -1857,94 +1857,143 @@ function X.InteractDoodad(dwID)
 	end)
 end
 
+--------------------------------------------------------------------------------
+-- 角色信息相关接口
+--------------------------------------------------------------------------------
+
 -- 获取玩家自身信息（缓存）
-do local m_ClientInfo
-function X.GetClientInfo(arg0)
-	if arg0 == true or not (m_ClientInfo and m_ClientInfo.dwID) then
-		local me = X.GetClientPlayer()
-		if me then -- 确保获取到玩家
-			if not m_ClientInfo then
-				m_ClientInfo = {}
-			end
-			if not IsRemotePlayer(me.dwID) then -- 确保不在战场
-				m_ClientInfo.dwID   = me.dwID
-				m_ClientInfo.szName = me.szName
-			end
-			m_ClientInfo.nX                = me.nX
-			m_ClientInfo.nY                = me.nY
-			m_ClientInfo.nZ                = me.nZ
-			m_ClientInfo.nFaceDirection    = me.nFaceDirection
-			m_ClientInfo.szTitle           = me.szTitle
-			m_ClientInfo.dwForceID         = me.dwForceID
-			m_ClientInfo.nLevel            = me.nLevel
-			m_ClientInfo.nExperience       = me.nExperience
-			m_ClientInfo.nCurrentStamina   = me.nCurrentStamina
-			m_ClientInfo.nCurrentThew      = me.nCurrentThew
-			m_ClientInfo.nMaxStamina       = me.nMaxStamina
-			m_ClientInfo.nMaxThew          = me.nMaxThew
-			m_ClientInfo.nBattleFieldSide  = me.nBattleFieldSide
-			m_ClientInfo.dwSchoolID        = me.dwSchoolID
-			m_ClientInfo.nCurrentTrainValue= me.nCurrentTrainValue
-			m_ClientInfo.nMaxTrainValue    = me.nMaxTrainValue
-			m_ClientInfo.nUsedTrainValue   = me.nUsedTrainValue
-			m_ClientInfo.nDirectionXY      = me.nDirectionXY
-			m_ClientInfo.nCurrentLife      = me.nCurrentLife
-			m_ClientInfo.nMaxLife          = me.nMaxLife
-			m_ClientInfo.fCurrentLife64,
-			m_ClientInfo.fMaxLife64        = X.GetObjectLife(me)
-			m_ClientInfo.nMaxLifeBase      = me.nMaxLifeBase
-			m_ClientInfo.nCurrentMana      = me.nCurrentMana
-			m_ClientInfo.nMaxMana          = me.nMaxMana
-			m_ClientInfo.nMaxManaBase      = me.nMaxManaBase
-			m_ClientInfo.nCurrentEnergy    = me.nCurrentEnergy
-			m_ClientInfo.nMaxEnergy        = me.nMaxEnergy
-			m_ClientInfo.nEnergyReplenish  = me.nEnergyReplenish
-			m_ClientInfo.bCanUseBigSword   = me.bCanUseBigSword
-			m_ClientInfo.nAccumulateValue  = me.nAccumulateValue
-			m_ClientInfo.nCamp             = me.nCamp
-			m_ClientInfo.bCampFlag         = me.bCampFlag
-			m_ClientInfo.bOnHorse          = me.bOnHorse
-			m_ClientInfo.nMoveState        = me.nMoveState
-			m_ClientInfo.dwTongID          = me.dwTongID
-			m_ClientInfo.nGender           = me.nGender
-			m_ClientInfo.nCurrentRage      = me.nCurrentRage
-			m_ClientInfo.nMaxRage          = me.nMaxRage
-			m_ClientInfo.nCurrentPrestige  = me.nCurrentPrestige
-			m_ClientInfo.bFightState       = me.bFightState
-			m_ClientInfo.nRunSpeed         = me.nRunSpeed
-			m_ClientInfo.nRunSpeedBase     = me.nRunSpeedBase
-			m_ClientInfo.dwTeamID          = me.dwTeamID
-			m_ClientInfo.nRoleType         = me.nRoleType
-			m_ClientInfo.nContribution     = me.nContribution
-			m_ClientInfo.nCoin             = me.nCoin
-			m_ClientInfo.nJustice          = me.nJustice
-			m_ClientInfo.nExamPrint        = me.nExamPrint
-			m_ClientInfo.nArenaAward       = me.nArenaAward
-			m_ClientInfo.nActivityAward    = me.nActivityAward
-			m_ClientInfo.bHideHat          = me.bHideHat
-			m_ClientInfo.bRedName          = me.bRedName
-			m_ClientInfo.dwKillCount       = me.dwKillCount
-			m_ClientInfo.nRankPoint        = me.nRankPoint
-			m_ClientInfo.nTitle            = me.nTitle
-			m_ClientInfo.nTitlePoint       = me.nTitlePoint
-			m_ClientInfo.dwPetID           = me.dwPetID
-			m_ClientInfo.dwMapID           = me.GetMapID()
-			m_ClientInfo.szMapName         = Table_GetMapName(me.GetMapID())
+do
+local CLIENT_PLAYER_INFO
+local function GeneClientPlayerInfo(bForce)
+	if not bForce and CLIENT_PLAYER_INFO and CLIENT_PLAYER_INFO.dwID then
+		return
+	end
+	local me = X.GetClientPlayer()
+	if me then -- 确保获取到玩家
+		if not CLIENT_PLAYER_INFO then
+			CLIENT_PLAYER_INFO = {}
 		end
+		if not IsRemotePlayer(me.dwID) then -- 确保不在战场
+			CLIENT_PLAYER_INFO.dwID   = me.dwID
+			CLIENT_PLAYER_INFO.szName = me.szName
+		end
+		CLIENT_PLAYER_INFO.nX                = me.nX
+		CLIENT_PLAYER_INFO.nY                = me.nY
+		CLIENT_PLAYER_INFO.nZ                = me.nZ
+		CLIENT_PLAYER_INFO.nFaceDirection    = me.nFaceDirection
+		CLIENT_PLAYER_INFO.szTitle           = me.szTitle
+		CLIENT_PLAYER_INFO.dwForceID         = me.dwForceID
+		CLIENT_PLAYER_INFO.nLevel            = me.nLevel
+		CLIENT_PLAYER_INFO.nExperience       = me.nExperience
+		CLIENT_PLAYER_INFO.nCurrentStamina   = me.nCurrentStamina
+		CLIENT_PLAYER_INFO.nCurrentThew      = me.nCurrentThew
+		CLIENT_PLAYER_INFO.nMaxStamina       = me.nMaxStamina
+		CLIENT_PLAYER_INFO.nMaxThew          = me.nMaxThew
+		CLIENT_PLAYER_INFO.nBattleFieldSide  = me.nBattleFieldSide
+		CLIENT_PLAYER_INFO.dwSchoolID        = me.dwSchoolID
+		CLIENT_PLAYER_INFO.nCurrentTrainValue= me.nCurrentTrainValue
+		CLIENT_PLAYER_INFO.nMaxTrainValue    = me.nMaxTrainValue
+		CLIENT_PLAYER_INFO.nUsedTrainValue   = me.nUsedTrainValue
+		CLIENT_PLAYER_INFO.nDirectionXY      = me.nDirectionXY
+		CLIENT_PLAYER_INFO.nCurrentLife      = me.nCurrentLife
+		CLIENT_PLAYER_INFO.nMaxLife          = me.nMaxLife
+		CLIENT_PLAYER_INFO.fCurrentLife64,
+		CLIENT_PLAYER_INFO.fMaxLife64        = X.GetObjectLife(me)
+		CLIENT_PLAYER_INFO.nMaxLifeBase      = me.nMaxLifeBase
+		CLIENT_PLAYER_INFO.nCurrentMana      = me.nCurrentMana
+		CLIENT_PLAYER_INFO.nMaxMana          = me.nMaxMana
+		CLIENT_PLAYER_INFO.nMaxManaBase      = me.nMaxManaBase
+		CLIENT_PLAYER_INFO.nCurrentEnergy    = me.nCurrentEnergy
+		CLIENT_PLAYER_INFO.nMaxEnergy        = me.nMaxEnergy
+		CLIENT_PLAYER_INFO.nEnergyReplenish  = me.nEnergyReplenish
+		CLIENT_PLAYER_INFO.bCanUseBigSword   = me.bCanUseBigSword
+		CLIENT_PLAYER_INFO.nAccumulateValue  = me.nAccumulateValue
+		CLIENT_PLAYER_INFO.nCamp             = me.nCamp
+		CLIENT_PLAYER_INFO.bCampFlag         = me.bCampFlag
+		CLIENT_PLAYER_INFO.bOnHorse          = me.bOnHorse
+		CLIENT_PLAYER_INFO.nMoveState        = me.nMoveState
+		CLIENT_PLAYER_INFO.dwTongID          = me.dwTongID
+		CLIENT_PLAYER_INFO.nGender           = me.nGender
+		CLIENT_PLAYER_INFO.nCurrentRage      = me.nCurrentRage
+		CLIENT_PLAYER_INFO.nMaxRage          = me.nMaxRage
+		CLIENT_PLAYER_INFO.nCurrentPrestige  = me.nCurrentPrestige
+		CLIENT_PLAYER_INFO.bFightState       = me.bFightState
+		CLIENT_PLAYER_INFO.nRunSpeed         = me.nRunSpeed
+		CLIENT_PLAYER_INFO.nRunSpeedBase     = me.nRunSpeedBase
+		CLIENT_PLAYER_INFO.dwTeamID          = me.dwTeamID
+		CLIENT_PLAYER_INFO.nRoleType         = me.nRoleType
+		CLIENT_PLAYER_INFO.nContribution     = me.nContribution
+		CLIENT_PLAYER_INFO.nCoin             = me.nCoin
+		CLIENT_PLAYER_INFO.nJustice          = me.nJustice
+		CLIENT_PLAYER_INFO.nExamPrint        = me.nExamPrint
+		CLIENT_PLAYER_INFO.nArenaAward       = me.nArenaAward
+		CLIENT_PLAYER_INFO.nActivityAward    = me.nActivityAward
+		CLIENT_PLAYER_INFO.bHideHat          = me.bHideHat
+		CLIENT_PLAYER_INFO.bRedName          = me.bRedName
+		CLIENT_PLAYER_INFO.dwKillCount       = me.dwKillCount
+		CLIENT_PLAYER_INFO.nRankPoint        = me.nRankPoint
+		CLIENT_PLAYER_INFO.nTitle            = me.nTitle
+		CLIENT_PLAYER_INFO.nTitlePoint       = me.nTitlePoint
+		CLIENT_PLAYER_INFO.dwPetID           = me.dwPetID
+		CLIENT_PLAYER_INFO.dwMapID           = me.GetMapID()
+		CLIENT_PLAYER_INFO.szMapName         = Table_GetMapName(me.GetMapID())
 	end
-	if not m_ClientInfo then
-		return {}
+end
+X.RegisterEvent('LOADING_ENDING', function()
+	GeneClientPlayerInfo(true)
+end)
+---获取玩家自身信息（缓存）
+---@param bForce boolean @是否强制刷新缓存
+---@return unknown @玩家的自身信息，或自身信息子字段数据
+function X.GetClientPlayerInfo(bForce)
+	GeneClientPlayerInfo(bForce)
+	if not CLIENT_PLAYER_INFO then
+		return X.CONSTANT.EMPTY_TABLE
 	end
-	if X.IsString(arg0) then
-		return m_ClientInfo[arg0]
-	end
-	return m_ClientInfo
+	return CLIENT_PLAYER_INFO
+end
 end
 
-local function onLoadingEnding()
-	X.GetClientInfo(true)
+---获取玩家基本信息
+---@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
+---@return table @玩家的基本信息
+function X.GetRoleEntryInfo(szGlobalID)
+	local smc = X.GetSocialManagerClient()
+	if smc then
+		return smc.GetRoleEntryInfo(szGlobalID)
+	end
+	local info = X.GetFriend(szGlobalID)
+	local fcc = X.GetFellowshipCardClient()
+	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
+	if card then
+		return {
+			nCamp = card.nCamp,
+			bOnline = info.isonline,
+			nRoleType = card.nRoleType,
+			nLevel = card.nLevel,
+			szSignature = card.szSignature,
+			nForceID = card.dwForceID,
+			dwMiniAvatarID = card.dwMiniAvatarID,
+			dwPlayerID = info.id,
+			szName = card.szName,
+			nSkinID = card.dwSkinID,
+			dwCenterID = 0,
+		}
+	end
 end
-X.RegisterEvent('LOADING_ENDING', onLoadingEnding)
+
+---获取玩家是否在线
+---@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
+---@return boolean @玩家是否在线
+function X.IsRoleOnline(szGlobalID)
+	local smc = X.GetSocialManagerClient()
+	if smc then
+		return smc.IsRoleOnline(szGlobalID)
+	end
+	local rei = X.GetRoleEntryInfo(szGlobalID)
+	if rei then
+		return rei.bOnline
+	end
 end
 
 do
@@ -2076,34 +2125,6 @@ function X.GetFellowshipInfo(dwGroupID)
 	end
 end
 
----获取玩家基本信息
----@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
----@return table @玩家的基本信息
-function X.GetRoleEntryInfo(szGlobalID)
-	local smc = X.GetSocialManagerClient()
-	if smc then
-		return smc.GetRoleEntryInfo(szGlobalID)
-	end
-	local info = X.GetFriend(szGlobalID)
-	local fcc = X.GetFellowshipCardClient()
-	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
-	if card then
-		return {
-			nCamp = card.nCamp,
-			bOnline = info.isonline,
-			nRoleType = card.nRoleType,
-			nLevel = card.nLevel,
-			szSignature = card.szSignature,
-			nForceID = card.dwForceID,
-			dwMiniAvatarID = card.dwMiniAvatarID,
-			dwPlayerID = info.id,
-			szName = card.szName,
-			nSkinID = card.dwSkinID,
-			dwCenterID = 0,
-		}
-	end
-end
-
 ---申请好友名片
 ---@param szGlobalID string | string[] @要申请的玩家唯一ID或者唯一ID列表（缘起为 dwID）
 function X.ApplyFellowshipCard(szGlobalID)
@@ -2142,20 +2163,6 @@ function X.GetFellowshipCardInfo(szGlobalID)
 	end
 end
 
----获取玩家是否在线
----@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
----@return boolean @玩家是否在线
-function X.IsRoleOnline(szGlobalID)
-	local smc = X.GetSocialManagerClient()
-	if smc then
-		return smc.IsRoleOnline(szGlobalID)
-	end
-	local rei = X.GetRoleEntryInfo(szGlobalID)
-	if rei then
-		return rei.bOnline
-	end
-end
-
 ---获取玩家所在地图
 ---@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return boolean @玩家所在地图
@@ -2173,7 +2180,7 @@ function X.GetFellowshipMapID(szGlobalID)
 end
 
 --------------------------------------------------------------------------------
--- 仇人相关逻辑
+-- 仇人相关接口
 --------------------------------------------------------------------------------
 do
 local FOE_LIST, FOE_CACHE
