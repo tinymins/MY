@@ -2224,20 +2224,27 @@ X.RegisterEvent('PLAYER_FOE_UPDATE', OnFoeUpdate)
 
 -- 获取仇人列表
 ---@return table @仇人列表
-function X.GetFoeList()
+function X.GetFoeInfoList()
 	if GeneFoeCache() then
 		return X.Clone(FOE_LIST)
 	end
 end
 
 -- 获取仇人
----@param arg0 string | number @仇人名称或仇人ID
+---@param xRoleID number | string @仇人名称或仇人ID
 ---@return userdata @仇人对象
-function X.GetFoe(arg0)
-	if arg0 and GeneFoeCache() then
-		return FOE_CACHE[arg0]
+function X.GetFoeInfo(xRoleID)
+	if xRoleID and GeneFoeCache() then
+		return FOE_CACHE[xRoleID]
 	end
 end
+end
+
+-- 判断是否是仇人
+---@param xRoleID number | string @要判断的玩家名称或ID
+---@return boolean @是否是仇人
+function X.IsFoe(xRoleID)
+	return X.GetFoeInfo(xRoleID) and true or false
 end
 
 --------------------------------------------------------------------------------
@@ -2353,7 +2360,7 @@ function X.GetRelation(dwSelfID, dwPeerID)
 	elseif IsNeutrality(dwSrcID, dwTarID) then
 		return 'Neutrality'
 	elseif IsEnemy(dwSrcID, dwTarID) then -- 敌对关系
-		if X.GetFoe(dwPeerID) then
+		if X.GetFoeInfo(dwPeerID) then
 			return 'Foe'
 		else
 			return 'Enemy'
