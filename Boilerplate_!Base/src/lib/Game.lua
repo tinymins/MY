@@ -2223,8 +2223,16 @@ function X.GetFoe(arg0)
 end
 end
 
--- 获取好友列表
-function X.GetTongMemberList(bShowOffLine, szSorter, bAsc)
+--------------------------------------------------------------------------------
+-- 帮会成员相关接口
+--------------------------------------------------------------------------------
+
+-- 获取帮会成员列表
+---@param bShowOffLine boolean @是否显示离线成员
+---@param szSorter string @排序字段
+---@param bAsc boolean @是否升序排序
+---@return table @帮会成员列表
+function X.GetTongMemberInfoList(bShowOffLine, szSorter, bAsc)
 	if bShowOffLine == nil then bShowOffLine = false  end
 	if szSorter     == nil then szSorter     = 'name' end
 	if bAsc         == nil then bAsc         = true   end
@@ -2241,6 +2249,9 @@ function X.GetTongMemberList(bShowOffLine, szSorter, bAsc)
 	return GetTongClient().GetMemberList(bShowOffLine, szSorter or 'name', bAsc, -1, -1)
 end
 
+-- 获取帮会名称
+---@param dwTongID number @帮会ID
+---@return string @帮会名称
 function X.GetTongName(dwTongID)
 	local szTongName
 	if not dwTongID then
@@ -2255,16 +2266,20 @@ function X.GetTongName(dwTongID)
 end
 
 -- 获取帮会成员
-function X.GetTongMember(arg0)
+---@param arg0 string | number @帮会成员ID或名称
+---@return table @帮会成员信息
+function X.GetTongMemberInfo(arg0)
 	if not arg0 then
 		return
 	end
-
 	return GetTongClient().GetMemberInfo(arg0)
 end
 
+-- 判断是否是帮会成员
+---@param arg0 string | number @帮会成员ID或名称
+---@return boolean @是否是帮会成员
 function X.IsTongMember(arg0)
-	return X.GetTongMember(arg0) and true or false
+	return X.GetTongMemberInfo(arg0) and true or false
 end
 
 -- 判断是不是队友
