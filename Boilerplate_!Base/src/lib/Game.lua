@@ -1962,7 +1962,7 @@ function X.GetRoleEntryInfo(szGlobalID)
 	if smc then
 		return smc.GetRoleEntryInfo(szGlobalID)
 	end
-	local info = X.GetFriend(szGlobalID)
+	local info = X.GetFellowshipInfo(szGlobalID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
@@ -1996,30 +1996,34 @@ function X.IsRoleOnline(szGlobalID)
 	end
 end
 
+--------------------------------------------------------------------------------
+-- 好友相关接口
+--------------------------------------------------------------------------------
+
 do
-local FRIEND_CACHE, FRIEND_LIST_GROUP_CACHE
-local function GeneFriendCache()
-	if not FRIEND_CACHE then
+local FELLOWSHIP_GROUP_LIST_CACHE, FELLOWSHIP_CACHE
+local function GeneFellowshipCache()
+	if not FELLOWSHIP_GROUP_LIST_CACHE then
 		local me = X.GetClientPlayer()
 		if me then
-			local infos = X.GetFellowshipGroupInfo()
+			local infos = X.GetFellowshipGroupInfoList()
 			if infos then
-				FRIEND_CACHE = {}
-				FRIEND_LIST_GROUP_CACHE = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or '' }} -- 默认分组
+				FELLOWSHIP_GROUP_LIST_CACHE = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or '' }} -- 默认分组
+				FELLOWSHIP_CACHE = {}
 				for _, group in ipairs(infos) do
-					table.insert(FRIEND_LIST_GROUP_CACHE, group)
+					table.insert(FELLOWSHIP_GROUP_LIST_CACHE, group)
 				end
-				for _, group in ipairs(FRIEND_LIST_GROUP_CACHE) do
-					for _, p in ipairs(X.GetFellowshipInfo(group.id) or {}) do
+				for _, group in ipairs(FELLOWSHIP_GROUP_LIST_CACHE) do
+					for _, p in ipairs(X.GetFellowshipInfoList(group.id) or {}) do
 						table.insert(group, p)
-						FRIEND_CACHE[p.id] = p
+						FELLOWSHIP_CACHE[p.id] = p
 						if p.name then
-							FRIEND_CACHE[p.name] = p
+							FELLOWSHIP_CACHE[p.name] = p
 						else
 							local info = X.GetRoleEntryInfo(p.id)
 							if info then
-								FRIEND_CACHE[info.dwPlayerID] = p
-								FRIEND_CACHE[info.szName] = p
+								FELLOWSHIP_CACHE[info.dwPlayerID] = p
+								FELLOWSHIP_CACHE[info.szName] = p
 							end
 						end
 					end
@@ -2031,36 +2035,64 @@ local function GeneFriendCache()
 	end
 	return true
 end
-local function OnFriendListChange()
-	FRIEND_CACHE = nil
-	FRIEND_LIST_GROUP_CACHE = nil
+local function OnFellowshipUpdate()
+	FELLOWSHIP_GROUP_LIST_CACHE = nil
+	FELLOWSHIP_CACHE = nil
 end
-X.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , OnFriendListChange)
-X.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , OnFriendListChange)
-X.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , OnFriendListChange)
-X.RegisterEvent('PLAYER_FOE_UPDATE'            , OnFriendListChange)
-X.RegisterEvent('PLAYER_BLACK_LIST_UPDATE'     , OnFriendListChange)
-X.RegisterEvent('DELETE_FELLOWSHIP'            , OnFriendListChange)
-X.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFriendListChange)
--- 获取好友列表
--- X.GetFriendList()         获取所有好友列表
--- X.GetFriendList(1)        获取第一个分组好友列表
--- X.GetFriendList('挽月堂') 获取分组名称为挽月堂的好友列表
-function X.GetFriendList(arg0)
+X.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_FOE_UPDATE'            , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_BLACK_LIST_UPDATE'     , OnFellowshipUpdate)
+X.RegisterEvent('DELETE_FELLOWSHIP'            , OnFellowshipUpdate)
+X.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFellowshipUpdate)
+
+---获取好友分组
+---@return table @好友分组列表
+function X.GetFellowshipGroupInfoList()
+	local smc = X.GetSocialManagerClient()
+	if smc then
+		return smc.GetFellowshipGroupInfo()
+	end
+	local me = X.GetClientPlayer()
+	if me then
+		return me.GetFellowshipGroupInfo()
+	end
+end
+
+---获取好友列表
+-- X.GetFellowshipInfoList()         获取所有好友列表
+-- X.GetFellowshipInfoList(1)        获取第一个分组好友列表
+-- X.GetFellowshipInfoList('挽月堂') 获取分组名称为挽月堂的好友列表
+---@param xGroupID number | string | void @要获取的玩家所在组名或组ID，不传表示所有组
+---@return table @符合条件的玩家信息列表
+function X.GetFellowshipInfoList(xGroupID)
+	-- 组ID可以直接调用官方接口
+	if X.IsNumber(xGroupID) then
+		local smc = X.GetSocialManagerClient()
+		if smc then
+			return smc.GetFellowshipInfo(xGroupID)
+		end
+		local me = X.GetClientPlayer()
+		if me then
+			return me.GetFellowshipInfo(xGroupID)
+		end
+	end
+	-- 其他类型走缓存
 	local t = {}
 	local n = 0
 	local tGroup = {}
-	if GeneFriendCache() then
-		if type(arg0) == 'number' then
-			table.insert(tGroup, FRIEND_LIST_GROUP_CACHE[arg0])
-		elseif type(arg0) == 'string' then
-			for _, group in ipairs(FRIEND_LIST_GROUP_CACHE) do
-				if group.name == arg0 then
+	if GeneFellowshipCache() then
+		if type(xGroupID) == 'number' then
+			table.insert(tGroup, FELLOWSHIP_GROUP_LIST_CACHE[xGroupID])
+		elseif type(xGroupID) == 'string' then
+			for _, group in ipairs(FELLOWSHIP_GROUP_LIST_CACHE) do
+				if group.name == xGroupID then
 					table.insert(tGroup, X.Clone(group))
 				end
 			end
 		else
-			tGroup = FRIEND_LIST_GROUP_CACHE
+			tGroup = FELLOWSHIP_GROUP_LIST_CACHE
 		end
 		for _, group in ipairs(tGroup) do
 			for _, p in ipairs(group) do
@@ -2072,57 +2104,35 @@ function X.GetFriendList(arg0)
 end
 
 -- 获取好友
-function X.GetFriend(arg0)
-	if arg0 and GeneFriendCache() then
-		return X.Clone(FRIEND_CACHE[arg0])
+---@param xRoleID number | string @要获取的玩家名称或ID
+---@return table @匹配的玩家信息
+function X.GetFellowshipInfo(xRoleID)
+	if xRoleID and GeneFellowshipCache() then
+		return X.Clone(FELLOWSHIP_CACHE[xRoleID])
 	end
 end
 
-function X.IsFriend(arg0)
-	return X.GetFriend(arg0) and true or false
+-- 判断是否是好友
+---@param xRoleID number | string @要判断的玩家名称或ID
+---@return boolean @是否是好友
+function X.IsFellowship(xRoleID)
+	return X.GetFellowshipInfo(xRoleID) and true or false
 end
 
 -- 遍历好友
 ---@param fnWalker function @迭代器，返回0时停止迭代
-function X.WalkFriend(fnWalker)
-	local aGroup = X.GetFellowshipGroupInfo() or {}
+function X.WalkFellowshipInfo(fnWalker)
+	local aGroup = X.GetFellowshipGroupInfoList() or {}
 	table.insert(aGroup, 1, { id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND })
 	for _, v in ipairs(aGroup) do
-		local aFriend = X.GetFellowshipInfo(v.id) or {}
-		for _, info in ipairs(aFriend) do
+		local aFellowshipInfo = X.GetFellowshipInfoList(v.id) or {}
+		for _, info in ipairs(aFellowshipInfo) do
 			if fnWalker(info, v.id) == 0 then
 				return
 			end
 		end
 	end
 end
-end
-
----获取好友分组
----@return table @好友分组列表
-function X.GetFellowshipGroupInfo()
-	local smc = X.GetSocialManagerClient()
-	if smc then
-		return smc.GetFellowshipGroupInfo()
-	end
-	local me = X.GetClientPlayer()
-	if me then
-		return me.GetFellowshipGroupInfo()
-	end
-end
-
----获取组好友信息列表
----@param dwGroupID number @要获取的好友分组ID
----@return table @分组好友信息列表
-function X.GetFellowshipInfo(dwGroupID)
-	local smc = X.GetSocialManagerClient()
-	if smc then
-		return smc.GetFellowshipInfo(dwGroupID)
-	end
-	local me = X.GetClientPlayer()
-	if me then
-		return me.GetFellowshipInfo(dwGroupID)
-	end
 end
 
 ---申请好友名片
@@ -2146,7 +2156,7 @@ function X.GetFellowshipCardInfo(szGlobalID)
 	if smc then
 		return smc.GetFellowshipCardInfo(szGlobalID)
 	end
-	local info = X.GetFriend(szGlobalID)
+	local info = X.GetFellowshipInfo(szGlobalID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
@@ -2171,7 +2181,7 @@ function X.GetFellowshipMapID(szGlobalID)
 	if smc then
 		return smc.GetFellowshipMapID(szGlobalID)
 	end
-	local info = X.GetFriend(szGlobalID)
+	local info = X.GetFellowshipInfo(szGlobalID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
