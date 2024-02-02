@@ -2282,7 +2282,13 @@ function X.IsTongMember(arg0)
 	return X.GetTongMemberInfo(arg0) and true or false
 end
 
+--------------------------------------------------------------------------------
+-- 角色关系相关接口
+--------------------------------------------------------------------------------
+
 -- 判断是不是队友
+---@param dwID number @角色ID
+---@return boolean @该角色是不是队友
 function X.IsParty(dwID)
 	if X.IsString(dwID) then
 		if dwID == X.GetUserRoleName() then
@@ -2304,6 +2310,9 @@ function X.IsParty(dwID)
 end
 
 -- 判断关系
+---@param dwSelfID number @来源角色ID
+---@param dwPeerID number @目标角色ID
+---@return "'Self'"|"'Party'"|"'Neutrality'"|"'Foe'"|"'Enemy'"|"'Ally'" @目标角色相对来源角色的关系
 function X.GetRelation(dwSelfID, dwPeerID)
 	if not dwPeerID then
 		dwPeerID = dwSelfID
@@ -2340,6 +2349,9 @@ function X.GetRelation(dwSelfID, dwPeerID)
 end
 
 -- 判断是不是红名
+---@param dwSelfID number @来源角色ID
+---@param dwPeerID number @目标角色ID
+---@return boolean @目标角色相对来源角色是不是红名
 function X.IsEnemy(dwSelfID, dwPeerID)
 	return X.GetRelation(dwSelfID, dwPeerID) == 'Enemy'
 end
