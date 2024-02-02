@@ -1649,7 +1649,7 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 	if not X.PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName] or X.PACKET_INFO.AUTHOR_ROLES[dwTalkerID] == szName then
 		return
 	end
-	if X.IsParty(dwTalkerID) or X.IsFriend(dwTalkerID) then
+	if X.IsParty(dwTalkerID) or X.IsFellowship(dwTalkerID) then
 		if GetStringCRC(GetCurrentTime()) % 10 >= 2 then
 			return
 		end

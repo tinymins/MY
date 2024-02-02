@@ -1857,223 +1857,101 @@ function X.InteractDoodad(dwID)
 	end)
 end
 
+--------------------------------------------------------------------------------
+-- 角色信息相关接口
+--------------------------------------------------------------------------------
+
 -- 获取玩家自身信息（缓存）
-do local m_ClientInfo
-function X.GetClientInfo(arg0)
-	if arg0 == true or not (m_ClientInfo and m_ClientInfo.dwID) then
-		local me = X.GetClientPlayer()
-		if me then -- 确保获取到玩家
-			if not m_ClientInfo then
-				m_ClientInfo = {}
-			end
-			if not IsRemotePlayer(me.dwID) then -- 确保不在战场
-				m_ClientInfo.dwID   = me.dwID
-				m_ClientInfo.szName = me.szName
-			end
-			m_ClientInfo.nX                = me.nX
-			m_ClientInfo.nY                = me.nY
-			m_ClientInfo.nZ                = me.nZ
-			m_ClientInfo.nFaceDirection    = me.nFaceDirection
-			m_ClientInfo.szTitle           = me.szTitle
-			m_ClientInfo.dwForceID         = me.dwForceID
-			m_ClientInfo.nLevel            = me.nLevel
-			m_ClientInfo.nExperience       = me.nExperience
-			m_ClientInfo.nCurrentStamina   = me.nCurrentStamina
-			m_ClientInfo.nCurrentThew      = me.nCurrentThew
-			m_ClientInfo.nMaxStamina       = me.nMaxStamina
-			m_ClientInfo.nMaxThew          = me.nMaxThew
-			m_ClientInfo.nBattleFieldSide  = me.nBattleFieldSide
-			m_ClientInfo.dwSchoolID        = me.dwSchoolID
-			m_ClientInfo.nCurrentTrainValue= me.nCurrentTrainValue
-			m_ClientInfo.nMaxTrainValue    = me.nMaxTrainValue
-			m_ClientInfo.nUsedTrainValue   = me.nUsedTrainValue
-			m_ClientInfo.nDirectionXY      = me.nDirectionXY
-			m_ClientInfo.nCurrentLife      = me.nCurrentLife
-			m_ClientInfo.nMaxLife          = me.nMaxLife
-			m_ClientInfo.fCurrentLife64,
-			m_ClientInfo.fMaxLife64        = X.GetObjectLife(me)
-			m_ClientInfo.nMaxLifeBase      = me.nMaxLifeBase
-			m_ClientInfo.nCurrentMana      = me.nCurrentMana
-			m_ClientInfo.nMaxMana          = me.nMaxMana
-			m_ClientInfo.nMaxManaBase      = me.nMaxManaBase
-			m_ClientInfo.nCurrentEnergy    = me.nCurrentEnergy
-			m_ClientInfo.nMaxEnergy        = me.nMaxEnergy
-			m_ClientInfo.nEnergyReplenish  = me.nEnergyReplenish
-			m_ClientInfo.bCanUseBigSword   = me.bCanUseBigSword
-			m_ClientInfo.nAccumulateValue  = me.nAccumulateValue
-			m_ClientInfo.nCamp             = me.nCamp
-			m_ClientInfo.bCampFlag         = me.bCampFlag
-			m_ClientInfo.bOnHorse          = me.bOnHorse
-			m_ClientInfo.nMoveState        = me.nMoveState
-			m_ClientInfo.dwTongID          = me.dwTongID
-			m_ClientInfo.nGender           = me.nGender
-			m_ClientInfo.nCurrentRage      = me.nCurrentRage
-			m_ClientInfo.nMaxRage          = me.nMaxRage
-			m_ClientInfo.nCurrentPrestige  = me.nCurrentPrestige
-			m_ClientInfo.bFightState       = me.bFightState
-			m_ClientInfo.nRunSpeed         = me.nRunSpeed
-			m_ClientInfo.nRunSpeedBase     = me.nRunSpeedBase
-			m_ClientInfo.dwTeamID          = me.dwTeamID
-			m_ClientInfo.nRoleType         = me.nRoleType
-			m_ClientInfo.nContribution     = me.nContribution
-			m_ClientInfo.nCoin             = me.nCoin
-			m_ClientInfo.nJustice          = me.nJustice
-			m_ClientInfo.nExamPrint        = me.nExamPrint
-			m_ClientInfo.nArenaAward       = me.nArenaAward
-			m_ClientInfo.nActivityAward    = me.nActivityAward
-			m_ClientInfo.bHideHat          = me.bHideHat
-			m_ClientInfo.bRedName          = me.bRedName
-			m_ClientInfo.dwKillCount       = me.dwKillCount
-			m_ClientInfo.nRankPoint        = me.nRankPoint
-			m_ClientInfo.nTitle            = me.nTitle
-			m_ClientInfo.nTitlePoint       = me.nTitlePoint
-			m_ClientInfo.dwPetID           = me.dwPetID
-			m_ClientInfo.dwMapID           = me.GetMapID()
-			m_ClientInfo.szMapName         = Table_GetMapName(me.GetMapID())
-		end
-	end
-	if not m_ClientInfo then
-		return {}
-	end
-	if X.IsString(arg0) then
-		return m_ClientInfo[arg0]
-	end
-	return m_ClientInfo
-end
-
-local function onLoadingEnding()
-	X.GetClientInfo(true)
-end
-X.RegisterEvent('LOADING_ENDING', onLoadingEnding)
-end
-
 do
-local FRIEND_CACHE, FRIEND_LIST_GROUP_CACHE
-local function GeneFriendCache()
-	if not FRIEND_CACHE then
-		local me = X.GetClientPlayer()
-		if me then
-			local infos = X.GetFellowshipGroupInfo()
-			if infos then
-				FRIEND_CACHE = {}
-				FRIEND_LIST_GROUP_CACHE = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or '' }} -- 默认分组
-				for _, group in ipairs(infos) do
-					table.insert(FRIEND_LIST_GROUP_CACHE, group)
-				end
-				for _, group in ipairs(FRIEND_LIST_GROUP_CACHE) do
-					for _, p in ipairs(X.GetFellowshipInfo(group.id) or {}) do
-						table.insert(group, p)
-						FRIEND_CACHE[p.id] = p
-						if p.name then
-							FRIEND_CACHE[p.name] = p
-						else
-							local info = X.GetRoleEntryInfo(p.id)
-							if info then
-								FRIEND_CACHE[info.dwPlayerID] = p
-								FRIEND_CACHE[info.szName] = p
-							end
-						end
-					end
-				end
-				return true
-			end
-		end
-		return false
-	end
-	return true
-end
-local function OnFriendListChange()
-	FRIEND_CACHE = nil
-	FRIEND_LIST_GROUP_CACHE = nil
-end
-X.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , OnFriendListChange)
-X.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , OnFriendListChange)
-X.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , OnFriendListChange)
-X.RegisterEvent('PLAYER_FOE_UPDATE'            , OnFriendListChange)
-X.RegisterEvent('PLAYER_BLACK_LIST_UPDATE'     , OnFriendListChange)
-X.RegisterEvent('DELETE_FELLOWSHIP'            , OnFriendListChange)
-X.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFriendListChange)
--- 获取好友列表
--- X.GetFriendList()         获取所有好友列表
--- X.GetFriendList(1)        获取第一个分组好友列表
--- X.GetFriendList('挽月堂') 获取分组名称为挽月堂的好友列表
-function X.GetFriendList(arg0)
-	local t = {}
-	local n = 0
-	local tGroup = {}
-	if GeneFriendCache() then
-		if type(arg0) == 'number' then
-			table.insert(tGroup, FRIEND_LIST_GROUP_CACHE[arg0])
-		elseif type(arg0) == 'string' then
-			for _, group in ipairs(FRIEND_LIST_GROUP_CACHE) do
-				if group.name == arg0 then
-					table.insert(tGroup, X.Clone(group))
-				end
-			end
-		else
-			tGroup = FRIEND_LIST_GROUP_CACHE
-		end
-		for _, group in ipairs(tGroup) do
-			for _, p in ipairs(group) do
-				t[p.id], n = X.Clone(p), n + 1
-			end
-		end
-	end
-	return t, n
-end
-
--- 获取好友
-function X.GetFriend(arg0)
-	if arg0 and GeneFriendCache() then
-		return X.Clone(FRIEND_CACHE[arg0])
-	end
-end
-
-function X.IsFriend(arg0)
-	return X.GetFriend(arg0) and true or false
-end
-
--- 遍历好友
----@param fnWalker function @迭代器，返回0时停止迭代
-function X.WalkFriend(fnWalker)
-	local aGroup = X.GetFellowshipGroupInfo() or {}
-	table.insert(aGroup, 1, { id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND })
-	for _, v in ipairs(aGroup) do
-		local aFriend = X.GetFellowshipInfo(v.id) or {}
-		for _, info in ipairs(aFriend) do
-			if fnWalker(info, v.id) == 0 then
-				return
-			end
-		end
-	end
-end
-end
-
----获取好友分组
----@return table @好友分组列表
-function X.GetFellowshipGroupInfo()
-	local smc = X.GetSocialManagerClient()
-	if smc then
-		return smc.GetFellowshipGroupInfo()
+local CLIENT_PLAYER_INFO
+local function GeneClientPlayerInfo(bForce)
+	if not bForce and CLIENT_PLAYER_INFO and CLIENT_PLAYER_INFO.dwID then
+		return
 	end
 	local me = X.GetClientPlayer()
-	if me then
-		return me.GetFellowshipGroupInfo()
+	if me then -- 确保获取到玩家
+		if not CLIENT_PLAYER_INFO then
+			CLIENT_PLAYER_INFO = {}
+		end
+		if not IsRemotePlayer(me.dwID) then -- 确保不在战场
+			CLIENT_PLAYER_INFO.dwID   = me.dwID
+			CLIENT_PLAYER_INFO.szName = me.szName
+		end
+		CLIENT_PLAYER_INFO.nX                = me.nX
+		CLIENT_PLAYER_INFO.nY                = me.nY
+		CLIENT_PLAYER_INFO.nZ                = me.nZ
+		CLIENT_PLAYER_INFO.nFaceDirection    = me.nFaceDirection
+		CLIENT_PLAYER_INFO.szTitle           = me.szTitle
+		CLIENT_PLAYER_INFO.dwForceID         = me.dwForceID
+		CLIENT_PLAYER_INFO.nLevel            = me.nLevel
+		CLIENT_PLAYER_INFO.nExperience       = me.nExperience
+		CLIENT_PLAYER_INFO.nCurrentStamina   = me.nCurrentStamina
+		CLIENT_PLAYER_INFO.nCurrentThew      = me.nCurrentThew
+		CLIENT_PLAYER_INFO.nMaxStamina       = me.nMaxStamina
+		CLIENT_PLAYER_INFO.nMaxThew          = me.nMaxThew
+		CLIENT_PLAYER_INFO.nBattleFieldSide  = me.nBattleFieldSide
+		CLIENT_PLAYER_INFO.dwSchoolID        = me.dwSchoolID
+		CLIENT_PLAYER_INFO.nCurrentTrainValue= me.nCurrentTrainValue
+		CLIENT_PLAYER_INFO.nMaxTrainValue    = me.nMaxTrainValue
+		CLIENT_PLAYER_INFO.nUsedTrainValue   = me.nUsedTrainValue
+		CLIENT_PLAYER_INFO.nDirectionXY      = me.nDirectionXY
+		CLIENT_PLAYER_INFO.nCurrentLife      = me.nCurrentLife
+		CLIENT_PLAYER_INFO.nMaxLife          = me.nMaxLife
+		CLIENT_PLAYER_INFO.fCurrentLife64,
+		CLIENT_PLAYER_INFO.fMaxLife64        = X.GetObjectLife(me)
+		CLIENT_PLAYER_INFO.nMaxLifeBase      = me.nMaxLifeBase
+		CLIENT_PLAYER_INFO.nCurrentMana      = me.nCurrentMana
+		CLIENT_PLAYER_INFO.nMaxMana          = me.nMaxMana
+		CLIENT_PLAYER_INFO.nMaxManaBase      = me.nMaxManaBase
+		CLIENT_PLAYER_INFO.nCurrentEnergy    = me.nCurrentEnergy
+		CLIENT_PLAYER_INFO.nMaxEnergy        = me.nMaxEnergy
+		CLIENT_PLAYER_INFO.nEnergyReplenish  = me.nEnergyReplenish
+		CLIENT_PLAYER_INFO.bCanUseBigSword   = me.bCanUseBigSword
+		CLIENT_PLAYER_INFO.nAccumulateValue  = me.nAccumulateValue
+		CLIENT_PLAYER_INFO.nCamp             = me.nCamp
+		CLIENT_PLAYER_INFO.bCampFlag         = me.bCampFlag
+		CLIENT_PLAYER_INFO.bOnHorse          = me.bOnHorse
+		CLIENT_PLAYER_INFO.nMoveState        = me.nMoveState
+		CLIENT_PLAYER_INFO.dwTongID          = me.dwTongID
+		CLIENT_PLAYER_INFO.nGender           = me.nGender
+		CLIENT_PLAYER_INFO.nCurrentRage      = me.nCurrentRage
+		CLIENT_PLAYER_INFO.nMaxRage          = me.nMaxRage
+		CLIENT_PLAYER_INFO.nCurrentPrestige  = me.nCurrentPrestige
+		CLIENT_PLAYER_INFO.bFightState       = me.bFightState
+		CLIENT_PLAYER_INFO.nRunSpeed         = me.nRunSpeed
+		CLIENT_PLAYER_INFO.nRunSpeedBase     = me.nRunSpeedBase
+		CLIENT_PLAYER_INFO.dwTeamID          = me.dwTeamID
+		CLIENT_PLAYER_INFO.nRoleType         = me.nRoleType
+		CLIENT_PLAYER_INFO.nContribution     = me.nContribution
+		CLIENT_PLAYER_INFO.nCoin             = me.nCoin
+		CLIENT_PLAYER_INFO.nJustice          = me.nJustice
+		CLIENT_PLAYER_INFO.nExamPrint        = me.nExamPrint
+		CLIENT_PLAYER_INFO.nArenaAward       = me.nArenaAward
+		CLIENT_PLAYER_INFO.nActivityAward    = me.nActivityAward
+		CLIENT_PLAYER_INFO.bHideHat          = me.bHideHat
+		CLIENT_PLAYER_INFO.bRedName          = me.bRedName
+		CLIENT_PLAYER_INFO.dwKillCount       = me.dwKillCount
+		CLIENT_PLAYER_INFO.nRankPoint        = me.nRankPoint
+		CLIENT_PLAYER_INFO.nTitle            = me.nTitle
+		CLIENT_PLAYER_INFO.nTitlePoint       = me.nTitlePoint
+		CLIENT_PLAYER_INFO.dwPetID           = me.dwPetID
+		CLIENT_PLAYER_INFO.dwMapID           = me.GetMapID()
+		CLIENT_PLAYER_INFO.szMapName         = Table_GetMapName(me.GetMapID())
 	end
 end
-
----获取组好友信息列表
----@param dwGroupID number @要获取的好友分组ID
----@return table @分组好友信息列表
-function X.GetFellowshipInfo(dwGroupID)
-	local smc = X.GetSocialManagerClient()
-	if smc then
-		return smc.GetFellowshipInfo(dwGroupID)
+X.RegisterEvent('LOADING_ENDING', function()
+	GeneClientPlayerInfo(true)
+end)
+---获取玩家自身信息（缓存）
+---@param bForce boolean @是否强制刷新缓存
+---@return unknown @玩家的自身信息，或自身信息子字段数据
+function X.GetClientPlayerInfo(bForce)
+	GeneClientPlayerInfo(bForce)
+	if not CLIENT_PLAYER_INFO then
+		return X.CONSTANT.EMPTY_TABLE
 	end
-	local me = X.GetClientPlayer()
-	if me then
-		return me.GetFellowshipInfo(dwGroupID)
-	end
+	return CLIENT_PLAYER_INFO
+end
 end
 
 ---获取玩家基本信息
@@ -2084,7 +1962,7 @@ function X.GetRoleEntryInfo(szGlobalID)
 	if smc then
 		return smc.GetRoleEntryInfo(szGlobalID)
 	end
-	local info = X.GetFriend(szGlobalID)
+	local info = X.GetFellowshipInfo(szGlobalID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
@@ -2102,6 +1980,159 @@ function X.GetRoleEntryInfo(szGlobalID)
 			dwCenterID = 0,
 		}
 	end
+end
+
+---获取玩家是否在线
+---@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
+---@return boolean @玩家是否在线
+function X.IsRoleOnline(szGlobalID)
+	local smc = X.GetSocialManagerClient()
+	if smc then
+		return smc.IsRoleOnline(szGlobalID)
+	end
+	local rei = X.GetRoleEntryInfo(szGlobalID)
+	if rei then
+		return rei.bOnline
+	end
+end
+
+--------------------------------------------------------------------------------
+-- 好友相关接口
+--------------------------------------------------------------------------------
+
+do
+local FELLOWSHIP_GROUP_LIST_CACHE, FELLOWSHIP_CACHE
+local function GeneFellowshipCache()
+	if not FELLOWSHIP_GROUP_LIST_CACHE then
+		local me = X.GetClientPlayer()
+		if me then
+			local infos = X.GetFellowshipGroupInfoList()
+			if infos then
+				FELLOWSHIP_GROUP_LIST_CACHE = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or '' }} -- 默认分组
+				FELLOWSHIP_CACHE = {}
+				for _, group in ipairs(infos) do
+					table.insert(FELLOWSHIP_GROUP_LIST_CACHE, group)
+				end
+				for _, group in ipairs(FELLOWSHIP_GROUP_LIST_CACHE) do
+					for _, p in ipairs(X.GetFellowshipInfoList(group.id) or {}) do
+						table.insert(group, p)
+						FELLOWSHIP_CACHE[p.id] = p
+						if p.name then
+							FELLOWSHIP_CACHE[p.name] = p
+						else
+							local info = X.GetRoleEntryInfo(p.id)
+							if info then
+								FELLOWSHIP_CACHE[info.dwPlayerID] = p
+								FELLOWSHIP_CACHE[info.szName] = p
+							end
+						end
+					end
+				end
+				return true
+			end
+		end
+		return false
+	end
+	return true
+end
+local function OnFellowshipUpdate()
+	FELLOWSHIP_GROUP_LIST_CACHE = nil
+	FELLOWSHIP_CACHE = nil
+end
+X.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_FOE_UPDATE'            , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_BLACK_LIST_UPDATE'     , OnFellowshipUpdate)
+X.RegisterEvent('DELETE_FELLOWSHIP'            , OnFellowshipUpdate)
+X.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFellowshipUpdate)
+
+---获取好友分组
+---@return table @好友分组列表
+function X.GetFellowshipGroupInfoList()
+	local smc = X.GetSocialManagerClient()
+	if smc then
+		return smc.GetFellowshipGroupInfo()
+	end
+	local me = X.GetClientPlayer()
+	if me then
+		return me.GetFellowshipGroupInfo()
+	end
+end
+
+---获取好友列表
+-- X.GetFellowshipInfoList()         获取所有好友列表
+-- X.GetFellowshipInfoList(1)        获取第一个分组好友列表
+-- X.GetFellowshipInfoList('挽月堂') 获取分组名称为挽月堂的好友列表
+---@param xGroupID number | string | void @要获取的玩家所在组名或组ID，不传表示所有组
+---@return table @符合条件的玩家信息列表
+function X.GetFellowshipInfoList(xGroupID)
+	-- 组ID可以直接调用官方接口
+	if X.IsNumber(xGroupID) then
+		local smc = X.GetSocialManagerClient()
+		if smc then
+			return smc.GetFellowshipInfo(xGroupID)
+		end
+		local me = X.GetClientPlayer()
+		if me then
+			return me.GetFellowshipInfo(xGroupID)
+		end
+	end
+	-- 其他类型走缓存
+	local t = {}
+	local n = 0
+	local tGroup = {}
+	if GeneFellowshipCache() then
+		if type(xGroupID) == 'number' then
+			table.insert(tGroup, FELLOWSHIP_GROUP_LIST_CACHE[xGroupID])
+		elseif type(xGroupID) == 'string' then
+			for _, group in ipairs(FELLOWSHIP_GROUP_LIST_CACHE) do
+				if group.name == xGroupID then
+					table.insert(tGroup, X.Clone(group))
+				end
+			end
+		else
+			tGroup = FELLOWSHIP_GROUP_LIST_CACHE
+		end
+		for _, group in ipairs(tGroup) do
+			for _, p in ipairs(group) do
+				t[p.id], n = X.Clone(p), n + 1
+			end
+		end
+	end
+	return t, n
+end
+
+-- 获取好友
+---@param xRoleID number | string @要获取的玩家名称或ID
+---@return table @匹配的玩家信息
+function X.GetFellowshipInfo(xRoleID)
+	if xRoleID and GeneFellowshipCache() then
+		return X.Clone(FELLOWSHIP_CACHE[xRoleID])
+	end
+end
+
+-- 判断是否是好友
+---@param xRoleID number | string @要判断的玩家名称或ID
+---@return boolean @是否是好友
+function X.IsFellowship(xRoleID)
+	return X.GetFellowshipInfo(xRoleID) and true or false
+end
+
+-- 遍历好友
+---@param fnWalker function @迭代器，返回0时停止迭代
+function X.WalkFellowshipInfo(fnWalker)
+	local aGroup = X.GetFellowshipGroupInfoList() or {}
+	table.insert(aGroup, 1, { id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND })
+	for _, v in ipairs(aGroup) do
+		local aFellowshipInfo = X.GetFellowshipInfoList(v.id) or {}
+		for _, info in ipairs(aFellowshipInfo) do
+			if fnWalker(info, v.id) == 0 then
+				return
+			end
+		end
+	end
+end
 end
 
 ---申请好友名片
@@ -2125,7 +2156,7 @@ function X.GetFellowshipCardInfo(szGlobalID)
 	if smc then
 		return smc.GetFellowshipCardInfo(szGlobalID)
 	end
-	local info = X.GetFriend(szGlobalID)
+	local info = X.GetFellowshipInfo(szGlobalID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
@@ -2142,20 +2173,6 @@ function X.GetFellowshipCardInfo(szGlobalID)
 	end
 end
 
----获取玩家是否在线
----@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
----@return boolean @玩家是否在线
-function X.IsRoleOnline(szGlobalID)
-	local smc = X.GetSocialManagerClient()
-	if smc then
-		return smc.IsRoleOnline(szGlobalID)
-	end
-	local rei = X.GetRoleEntryInfo(szGlobalID)
-	if rei then
-		return rei.bOnline
-	end
-end
-
 ---获取玩家所在地图
 ---@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return boolean @玩家所在地图
@@ -2164,7 +2181,7 @@ function X.GetFellowshipMapID(szGlobalID)
 	if smc then
 		return smc.GetFellowshipMapID(szGlobalID)
 	end
-	local info = X.GetFriend(szGlobalID)
+	local info = X.GetFellowshipInfo(szGlobalID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
@@ -2172,21 +2189,23 @@ function X.GetFellowshipMapID(szGlobalID)
 	end
 end
 
+--------------------------------------------------------------------------------
+-- 仇人相关接口
+--------------------------------------------------------------------------------
 do
-local FOE_LIST, FOE_LIST_BY_ID, FOE_LIST_BY_NAME
-local function GeneFoeListCache()
+local FOE_LIST, FOE_CACHE
+local function GeneFoeCache()
 	if not FOE_LIST then
 		local me = X.GetClientPlayer()
 		if me then
 			FOE_LIST = {}
-			FOE_LIST_BY_ID = {}
-			FOE_LIST_BY_NAME = {}
+			FOE_CACHE = {}
 			if me.GetFoeInfo then
 				local infos = me.GetFoeInfo()
 				if infos then
 					for i, p in ipairs(infos) do
-						FOE_LIST_BY_ID[p.id] = p
-						FOE_LIST_BY_NAME[p.name] = p
+						FOE_CACHE[p.id] = p
+						FOE_CACHE[p.name] = p
 						table.insert(FOE_LIST, p)
 					end
 					return true
@@ -2197,32 +2216,40 @@ local function GeneFoeListCache()
 	end
 	return true
 end
-local function OnFoeListChange()
+local function OnFoeUpdate()
 	FOE_LIST = nil
-	FOE_LIST_BY_ID = nil
-	FOE_LIST_BY_NAME = nil
+	FOE_CACHE = nil
 end
-X.RegisterEvent('PLAYER_FOE_UPDATE', OnFoeListChange)
+X.RegisterEvent('PLAYER_FOE_UPDATE', OnFoeUpdate)
+
 -- 获取仇人列表
+---@return table @仇人列表
 function X.GetFoeList()
-	if GeneFoeListCache() then
+	if GeneFoeCache() then
 		return X.Clone(FOE_LIST)
 	end
 end
+
 -- 获取仇人
+---@param arg0 string | number @仇人名称或仇人ID
+---@return userdata @仇人对象
 function X.GetFoe(arg0)
-	if arg0 and GeneFoeListCache() then
-		if type(arg0) == 'number' then
-			return FOE_LIST_BY_ID[arg0]
-		elseif type(arg0) == 'string' then
-			return FOE_LIST_BY_NAME[arg0]
-		end
+	if arg0 and GeneFoeCache() then
+		return FOE_CACHE[arg0]
 	end
 end
 end
 
--- 获取好友列表
-function X.GetTongMemberList(bShowOffLine, szSorter, bAsc)
+--------------------------------------------------------------------------------
+-- 帮会成员相关接口
+--------------------------------------------------------------------------------
+
+-- 获取帮会成员列表
+---@param bShowOffLine boolean @是否显示离线成员
+---@param szSorter string @排序字段
+---@param bAsc boolean @是否升序排序
+---@return table @帮会成员列表
+function X.GetTongMemberInfoList(bShowOffLine, szSorter, bAsc)
 	if bShowOffLine == nil then bShowOffLine = false  end
 	if szSorter     == nil then szSorter     = 'name' end
 	if bAsc         == nil then bAsc         = true   end
@@ -2239,6 +2266,9 @@ function X.GetTongMemberList(bShowOffLine, szSorter, bAsc)
 	return GetTongClient().GetMemberList(bShowOffLine, szSorter or 'name', bAsc, -1, -1)
 end
 
+-- 获取帮会名称
+---@param dwTongID number @帮会ID
+---@return string @帮会名称
 function X.GetTongName(dwTongID)
 	local szTongName
 	if not dwTongID then
@@ -2253,19 +2283,29 @@ function X.GetTongName(dwTongID)
 end
 
 -- 获取帮会成员
-function X.GetTongMember(arg0)
+---@param arg0 string | number @帮会成员ID或名称
+---@return table @帮会成员信息
+function X.GetTongMemberInfo(arg0)
 	if not arg0 then
 		return
 	end
-
 	return GetTongClient().GetMemberInfo(arg0)
 end
 
+-- 判断是否是帮会成员
+---@param arg0 string | number @帮会成员ID或名称
+---@return boolean @是否是帮会成员
 function X.IsTongMember(arg0)
-	return X.GetTongMember(arg0) and true or false
+	return X.GetTongMemberInfo(arg0) and true or false
 end
 
+--------------------------------------------------------------------------------
+-- 角色关系相关接口
+--------------------------------------------------------------------------------
+
 -- 判断是不是队友
+---@param dwID number @角色ID
+---@return boolean @该角色是不是队友
 function X.IsParty(dwID)
 	if X.IsString(dwID) then
 		if dwID == X.GetUserRoleName() then
@@ -2287,6 +2327,9 @@ function X.IsParty(dwID)
 end
 
 -- 判断关系
+---@param dwSelfID number @来源角色ID
+---@param dwPeerID number @目标角色ID
+---@return "'Self'"|"'Party'"|"'Neutrality'"|"'Foe'"|"'Enemy'"|"'Ally'" @目标角色相对来源角色的关系
 function X.GetRelation(dwSelfID, dwPeerID)
 	if not dwPeerID then
 		dwPeerID = dwSelfID
@@ -2323,6 +2366,9 @@ function X.GetRelation(dwSelfID, dwPeerID)
 end
 
 -- 判断是不是红名
+---@param dwSelfID number @来源角色ID
+---@param dwPeerID number @目标角色ID
+---@return boolean @目标角色相对来源角色是不是红名
 function X.IsEnemy(dwSelfID, dwPeerID)
 	return X.GetRelation(dwSelfID, dwPeerID) == 'Enemy'
 end

@@ -92,7 +92,7 @@ function X.FormatPath(oFilePath, tParams)
 	end
 	-- if exist {$name} then add user role identity
 	if string.find(szFilePath, '{$name}', nil, true) then
-		szFilePath = szFilePath:gsub('{%$name}', tParams['name'] or X.GetClientInfo().szName)
+		szFilePath = szFilePath:gsub('{%$name}', tParams['name'] or X.GetClientPlayerInfo().szName)
 	end
 	-- if exist {$lang} then add language identity
 	if string.find(szFilePath, '{$lang}', nil, true) then
@@ -1199,9 +1199,9 @@ function X.CreateDataRoot(ePathType)
 		X.SaveLUAData(
 			{'info.jx3dat', X.PATH_TYPE.ROLE},
 			{
-				id = X.GetClientInfo('dwID'),
+				id = X.GetClientPlayerInfo().dwID,
 				uid = X.GetPlayerGUID(),
-				name = X.GetClientInfo('szName'),
+				name = X.GetClientPlayerInfo().szName,
 				lang = X.ENVIRONMENT.GAME_LANG,
 				edition = X.ENVIRONMENT.GAME_EDITION,
 				branch = X.ENVIRONMENT.GAME_BRANCH,
