@@ -415,7 +415,7 @@ function D.GetLover()
 		end
 		-- 遍历到情缘，获取基础信息并返回
 		local rei = X.GetRoleEntryInfo(info.id)
-		if rei.dwPlayerID == dwLoverID  then
+		if rei and rei.dwPlayerID == dwLoverID  then
 			local card = X.GetFellowshipCardInfo(info.id)
 			if not card then
 				X.ApplyFellowshipCard(info.id)
@@ -524,13 +524,13 @@ function D.SetLover(dwID, nType)
 		return X.Alert(_L['Please enable sync common ui config first'])
 	end
 	local info = X.GetFriend(dwID)
-	if not info or not X.IsRoleOnline(info.id) then
+	local rei = info and X.GetRoleEntryInfo(info.id)
+	if not info or not rei or not X.IsRoleOnline(info.id) then
 		if nType == -1 then
 			return X.Alert(_L['Lover must online'])
 		end
 		return X.Alert(_L['Lover must be a online friend'])
 	end
-	local rei = X.GetRoleEntryInfo(info.id)
 	if nType == -1 then
 		-- 重复放烟花刷新称号
 		if dwID == D.lover.dwID then
