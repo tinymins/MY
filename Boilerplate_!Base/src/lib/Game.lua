@@ -2172,21 +2172,23 @@ function X.GetFellowshipMapID(szGlobalID)
 	end
 end
 
+--------------------------------------------------------------------------------
+-- 仇人相关逻辑
+--------------------------------------------------------------------------------
 do
-local FOE_LIST, FOE_LIST_BY_ID, FOE_LIST_BY_NAME
-local function GeneFoeListCache()
+local FOE_LIST, FOE_CACHE
+local function GeneFoeCache()
 	if not FOE_LIST then
 		local me = X.GetClientPlayer()
 		if me then
 			FOE_LIST = {}
-			FOE_LIST_BY_ID = {}
-			FOE_LIST_BY_NAME = {}
+			FOE_CACHE = {}
 			if me.GetFoeInfo then
 				local infos = me.GetFoeInfo()
 				if infos then
 					for i, p in ipairs(infos) do
-						FOE_LIST_BY_ID[p.id] = p
-						FOE_LIST_BY_NAME[p.name] = p
+						FOE_CACHE[p.id] = p
+						FOE_CACHE[p.name] = p
 						table.insert(FOE_LIST, p)
 					end
 					return true
@@ -2197,26 +2199,26 @@ local function GeneFoeListCache()
 	end
 	return true
 end
-local function OnFoeListChange()
+local function OnFoeUpdate()
 	FOE_LIST = nil
-	FOE_LIST_BY_ID = nil
-	FOE_LIST_BY_NAME = nil
+	FOE_CACHE = nil
 end
-X.RegisterEvent('PLAYER_FOE_UPDATE', OnFoeListChange)
+X.RegisterEvent('PLAYER_FOE_UPDATE', OnFoeUpdate)
+
 -- 获取仇人列表
+---@return table @仇人列表
 function X.GetFoeList()
-	if GeneFoeListCache() then
+	if GeneFoeCache() then
 		return X.Clone(FOE_LIST)
 	end
 end
+
 -- 获取仇人
+---@param arg0 string | number @仇人名称或仇人ID
+---@return userdata @仇人对象
 function X.GetFoe(arg0)
-	if arg0 and GeneFoeListCache() then
-		if type(arg0) == 'number' then
-			return FOE_LIST_BY_ID[arg0]
-		elseif type(arg0) == 'string' then
-			return FOE_LIST_BY_NAME[arg0]
-		end
+	if arg0 and GeneFoeCache() then
+		return FOE_CACHE[arg0]
 	end
 end
 end
