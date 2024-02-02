@@ -631,7 +631,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					-- ≈–∂œ∫√”—
 					if dwType == TARGET.PLAYER
 					and O.bFocusFriend
-					and X.GetFriend(dwID) then
+					and X.IsFellowship(dwID) then
 						table.insert(aVia, {
 							bDeletable = false,
 							szVia = _L['Friend focus'],
@@ -641,8 +641,8 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					-- ≈–∂œÕ¨∞Ôª·
 					if dwType == TARGET.PLAYER
 					and O.bFocusTong
-					and dwID ~= X.GetClientInfo().dwID
-					and X.GetTongMember(dwID) then
+					and dwID ~= X.GetClientPlayerInfo().dwID
+					and X.IsTongMember(dwID) then
 						table.insert(aVia, {
 							bDeletable = false,
 							szVia = _L['Tong member focus'],

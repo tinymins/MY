@@ -77,7 +77,7 @@ local D = {}
 
 function D.IsBlockMsg(szText, szMsgType, dwTalkerID)
 	local bAcquaintance = dwTalkerID
-		and (X.GetFriend(dwTalkerID) or X.GetFoe(dwTalkerID) or X.GetTongMember(dwTalkerID))
+		and (X.IsFellowship(dwTalkerID) or X.IsFoe(dwTalkerID) or X.IsTongMember(dwTalkerID))
 		or false
 	for _, bw in ipairs(D.aBlockWords) do
 		if bw.tMsgType[szMsgType] and (not bAcquaintance or not bw.bIgnoreAcquaintance)

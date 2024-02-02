@@ -138,7 +138,7 @@ function PS.OnPanelActive(wnd)
 		name = 'WndButton_SerendipitySearch',
 		text = _L['serendipity'],
 		onClick = function()
-			local szNameU = AnsiToUTF8(X.GetClientInfo().szName)
+			local szNameU = AnsiToUTF8(X.GetClientPlayerInfo().szName)
 			local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
 			X.UI.OpenBrowser(
 				'https://j3cx.com/serendipity/?'
@@ -148,7 +148,7 @@ function PS.OnPanelActive(wnd)
 							L = X.ENVIRONMENT.GAME_EDITION,
 							S = X.GetRegionOriginName(),
 							s = X.GetServerOriginName(),
-							n = X.GetClientInfo().szName,
+							n = X.GetClientPlayerInfo().szName,
 							N = szNameCRC,
 						}),
 						X.KGUIEncrypt(X.SECRET['J3CX::SERENDIPITY'])

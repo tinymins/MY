@@ -465,7 +465,7 @@ function D.UpdateUI(frame)
 	-- ³õÊ¼»¯ÑÕÉ«
 	if not hItem.bInited then
 		hItem.OnItemRefreshTip = D.OnItemRefreshTip
-		local dwForceID = (X.GetClientInfo() or {}).dwForceID
+		local dwForceID = X.GetClientPlayerInfo().dwForceID
 		if dwForceID then
 			local css = FORCE_BAR_CSS[O.nCss][dwForceID] or {}
 			if css.image and css.frame then -- uitex, frame

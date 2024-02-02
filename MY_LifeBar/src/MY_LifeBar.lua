@@ -267,7 +267,7 @@ function D.GetRelation(dwSrcID, dwTarID, KSrc, KTar)
 			return 'Self'
 		elseif IsParty(dwSrcID, dwTarID) then
 			return 'Party'
-		elseif X.GetFoe(dwTarID) then
+		elseif X.IsFoe(dwTarID) then
 			return 'Foe'
 		elseif KTar.nCamp == Config.nCamp then
 			return 'Ally'

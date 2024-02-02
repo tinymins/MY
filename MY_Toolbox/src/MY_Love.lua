@@ -389,7 +389,7 @@ function D.GetLover()
 	end
 	local dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem = X.GetRemoteStorage('MY_Love')
 	local lover
-	X.WalkFriend(function(info)
+	X.WalkFellowshipInfo(function(info)
 		if nLoverTime == 0 and info.remark then -- 时间为非0表示不是第一次了 拒绝加载海鳗数据
 			local bMatch = string.sub(info.remark, 1, string.len(szKey)) == szKey
 			-- fetch data
@@ -523,7 +523,7 @@ function D.SetLover(dwID, nType)
 	if not X.CanUseOnlineRemoteStorage() then
 		return X.Alert(_L['Please enable sync common ui config first'])
 	end
-	local info = X.GetFriend(dwID)
+	local info = X.GetFellowshipInfo(dwID)
 	local rei = info and X.GetRoleEntryInfo(info.id)
 	if not info or not rei or not X.IsRoleOnline(info.id) then
 		if nType == -1 then
@@ -556,7 +556,7 @@ function D.SetLover(dwID, nType)
 			return X.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
 		end
 		X.Confirm(_L('Do you want to blind love with [%s]?', rei.szName), function()
-			local info = X.GetFriend(dwID)
+			local info = X.GetFellowshipInfo(dwID)
 			if not info or not X.IsRoleOnline(info.id) then
 				return X.Alert(_L['Lover must be a online friend'])
 			end
@@ -573,7 +573,7 @@ function D.SetLover(dwID, nType)
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
 			end
-			local info = X.GetFriend(dwID)
+			local info = X.GetFellowshipInfo(dwID)
 			if not info or not X.IsRoleOnline(info.id) then
 				return X.Alert(_L['Lover must be a online friend'])
 			end
@@ -607,7 +607,7 @@ function D.RemoveLover()
 		if lover.nLoverType == 0 then -- 单向
 			X.Confirm(_L('Are you sure to cut blind love with [%s]?', lover.szName), function()
 				-- 单向只通知在线的
-				local info = X.GetFriend(lover.dwID)
+				local info = X.GetFellowshipInfo(lover.dwID)
 				if info and X.IsRoleOnline(info.id) then
 					X.SendBgMsg(lover.szName, 'MY_LOVE', {'REMOVE0'})
 				end
@@ -877,7 +877,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 			end
 		elseif szKey == 'FIX1' or szKey == 'FIX2' then
 			if D.lover.dwID == 0 or (D.lover.dwID == dwTalkerID and D.lover.nLoverType ~= 1) then
-				local info = X.GetFriend(dwTalkerID)
+				local info = X.GetFellowshipInfo(dwTalkerID)
 				if info then
 					local szText = szKey == 'FIX1'
 						and _L('[%s] want to repair love relation with you, OK?', szTalkerName)
@@ -918,7 +918,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 			if X.IsEmpty(aUIID) then
 				return
 			end
-			local info = X.GetFriend(dwTalkerID)
+			local info = X.GetFellowshipInfo(dwTalkerID)
 			local rei = info and X.GetRoleEntryInfo(info.id)
 			if not info or not rei then
 				return
@@ -935,7 +935,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 				end
 			end)
 		elseif szKey == 'LOVE_ANS_CONF' then
-			local info = X.GetFriend(dwTalkerID)
+			local info = X.GetFellowshipInfo(dwTalkerID)
 			local rei = info and X.GetRoleEntryInfo(info.id)
 			if rei then
 				D.SaveLover(GetCurrentTime(), dwTalkerID, 1, 0, data)
@@ -943,7 +943,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 				X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', rei.szName))
 			end
 		elseif szKey == 'LOVE_FIREWORK' then
-			local info = X.GetFriend(dwTalkerID)
+			local info = X.GetFellowshipInfo(dwTalkerID)
 			if info and D.lover.dwID == dwTalkerID then
 				D.SaveLover(D.lover.nLoverTime, dwTalkerID, D.lover.nLoverType, D.lover.nSendItem, data)
 			end

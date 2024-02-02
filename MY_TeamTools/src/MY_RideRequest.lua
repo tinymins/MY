@@ -319,7 +319,7 @@ function D.OnMessageBoxOpen()
 				info.szName = szName
 				info.szDesc = szMsg
 				info.bParty      = X.IsParty(szName)
-				info.bFriend     = X.IsFriend(szName)
+				info.bFriend     = X.IsFellowship(szName)
 				info.bTongMember = X.IsTongMember(szName)
 				info.fnAccept = function()
 					RIDE_LIST[szName] = nil

@@ -78,7 +78,7 @@ function D.Apply()
 			or X.IsIsolated(tar) ~= X.IsIsolated(me) then
 				return
 			end
-			local p = X.GetFriend(dwID)
+			local p = X.GetFellowshipInfo(dwID)
 			local rei = X.GetRoleEntryInfo(p.id)
 			if rei then
 				if O.bFriendNav and Navigator_SetID then

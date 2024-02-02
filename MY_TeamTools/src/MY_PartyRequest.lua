@@ -420,14 +420,14 @@ function D.OnApplyRequest(event)
 		info = {}
 		PR_PARTY_REQUEST[szName] = info
 	end
-	local me = X.GetClientInfo()
+	local me = X.GetClientPlayerInfo()
 	-- 判断对方是否已在进组列表中
 	info.szType      = event == 'PARTY_INVITE_REQUEST' and 'invite' or 'request'
 	info.szName      = szName
 	info.nCamp       = nCamp
 	info.dwForce     = dwForce
 	info.nLevel      = nLevel
-	info.bFriend     = X.IsFriend(szName)
+	info.bFriend     = X.IsFellowship(szName)
 	info.bTongMember = X.IsTongMember(szName)
 	info.bSameCamp   = info.nCamp == me.nCamp
 	info.nClientVersionType = nClientVersionType

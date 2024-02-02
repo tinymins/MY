@@ -237,7 +237,7 @@ end
 
 function R.GetIcon(info, szImage, nFrame)
 	if info.szType == 'A2M' or info.szType == 'M2A' then
-		local info = X.GetFriend(info.szName)
+		local info = X.GetFellowshipInfo(info.szName)
 		local rei = info and X.GetRoleEntryInfo(info.id)
 		if rei then
 			local szAvatarFile, nAvatarFrame, bAnimate = X.GetPlayerAvatar(rei.nForceID, rei.nRoleType, rei.dwMiniAvatarID)

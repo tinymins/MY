@@ -50,7 +50,7 @@ function D.Hook()
 	if not txtLocation.__MY_SetText then
 		txtLocation.__MY_SetText = txtLocation.SetText
 		txtLocation.SetText = function(_, szText)
-			local info = txtName and X.GetFriend(txtName:GetText())
+			local info = txtName and X.GetFellowshipInfo(txtName:GetText())
 			local card = info and X.GetFellowshipCardInfo(info.id)
 			if card and ((card.bIsTwoWayFriend and info.attraction >= 200) or not X.IsRestricted('MY_FriendTipLocation.LV2')) then
 				szText = Table_GetMapName(X.GetFellowshipMapID(info.id))

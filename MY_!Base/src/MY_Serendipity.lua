@@ -69,7 +69,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 	local szKey = szName .. '_' .. szSerendipity .. '_' .. dwTime
 	local szRegion = X.GetRegionOriginName()
 	local szServer = X.GetServerOriginName()
-	local bSelf = szName == X.GetClientInfo().szName
+	local bSelf = szName == X.GetClientPlayerInfo().szName
 	local szNameU = AnsiToUTF8(szName)
 	local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
 	local nCount = bSelf and 0 or 1
@@ -234,7 +234,7 @@ end
 local FETCH_CACHE = {}
 function D.Fetch(szName, fnAction)
 	if not X.IsString(szName) then
-		szName, fnAction = X.GetClientInfo().szName, szName
+		szName, fnAction = X.GetClientPlayerInfo().szName, szName
 	end
 	if FETCH_CACHE[szName] then
 		fnAction(X.Clone(FETCH_CACHE[szName]))

@@ -49,9 +49,9 @@ local PS = { IsRestricted = MY_Love.IsShielded }
 -- 获取可情缘好友列表
 function D.GetLoverMenu(nType)
 	local m0 = {}
-	local aGroup = X.GetFellowshipGroupInfo() or {}
+	local aGroup = X.GetFellowshipGroupInfoList() or {}
 	table.insert(aGroup, 1, {id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND})
-	X.WalkFriend(function(info)
+	X.WalkFellowshipInfo(function(info)
 		local rei = X.GetRoleEntryInfo(info.id)
 		if rei and info.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or info.attraction >= MY_Love.nDoubleLoveAttraction) then
 			table.insert(m0, {
