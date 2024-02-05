@@ -351,6 +351,7 @@ function D.OnTargetUpdate(dwID, bForce)
 			LOG_NAMING_COUNT[dwID] = {
 				nCount = 0,
 				szName = '',
+				dwTemplateID = 0,
 			}
 		end
 		LOG_NAMING_COUNT[dwID].nCount = LOG_NAMING_COUNT[dwID].nCount + 1
