@@ -79,7 +79,7 @@ function D.Apply()
 				return
 			end
 			local p = X.GetFellowshipInfo(dwID)
-			local rei = X.GetRoleEntryInfo(p.id)
+			local rei = p and X.GetRoleEntryInfo(p.id)
 			if rei then
 				if O.bFriendNav and Navigator_SetID then
 					Navigator_SetID('MY_FRIEND_TIP.' .. dwID, TARGET.PLAYER, dwID, rei.szName)
