@@ -329,6 +329,9 @@ function D.MonitorZP(szChannel, szMsg)
 end
 
 function D.OnLootItem()
+	if not D.bEnable then
+		return
+	end
 	if arg0 == X.GetClientPlayer().dwID and arg2 > 2 and GetItem(arg1).szName == MEILIANGYUQIAN then
 		D.nPoint = 0
 		D.bWaitPoint = false
