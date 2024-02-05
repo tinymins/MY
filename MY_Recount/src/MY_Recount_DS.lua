@@ -37,7 +37,6 @@ local DK = {
 	HEAL        = DEBUG and 'Heal'        or 13, -- 治疗统计
 	BE_HEAL     = DEBUG and 'BeHeal'      or 14, -- 承疗统计
 	BE_DAMAGE   = DEBUG and 'BeDamage'    or 15, -- 承伤统计
-	EVERYTHING  = DEBUG and 'Everything'  or 16, -- 战斗复盘
 	ABSORB      = DEBUG and 'Absorb'      or 17, -- 化解统计
 	PLAYER_LIST = DEBUG and 'Playerlist'  or 18, -- 玩家信息缓存
 	SERVER      = DEBUG and 'Server'      or 19, -- 所在服务器
@@ -345,7 +344,6 @@ local ABSORB_BUFF = {
 	[10266] = 9999, -- 长歌_梅花三弄
 	[11187] = 9999, -- 苍云特殊武器_斗气加护
 	[11530] = 9999, -- 峰值_变身加盾
-	[15415] = 9999, -- 新附魔T衣服伤害吸收盾
 	[15415] = 9999, -- 新附魔T衣服伤害吸收盾凌雪藏锋
 	[15948] = 9999, -- 孤影伤害吸收盾
 	[16441] = 9999, -- 少林特殊武器_佛化金身
@@ -367,23 +365,9 @@ local AWAYTIME_TYPE = {
 	OFFLINE        = 1,
 	HALFWAY_JOINED = 2,
 }
-local EVERYTHING_TYPE = {
-	SKILL_EFFECT = 1,
-	FIGHT_TIME = 2,
-	DEATH = 3,
-	ONLINE = 4,
-	BUFF_UPDATE = 5,
-	ENTER_LEAVE_SCENE = 6,
-	SYS_MSG = 7,
-	PLAYER_SAY = 8,
-	WARNING_MESSAGE = 9,
-	FIGHT_HINT = 10,
-}
 local VERSION = 2
 
-local D = {
-	bRecEverything = false, -- 计算出来的是否采集复盘数据开关，过图重算
-}
+local D = {}
 local O = X.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
 	bEnable = { -- 数据记录总开关 防止官方SB技能BUFF脚本瞎几把写超高频太卡甩锅给界面逻辑
 		ePathType = X.PATH_TYPE.ROLE,
@@ -415,32 +399,18 @@ local O = X.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
 		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},
-	bRecEverything = { -- 是否采集复盘数据
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Recount_FP'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
-	},
 	bREOnlyDungeon = { -- 仅在秘境中启用
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount_FP'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
-	bSaveEverything = { -- 保存战斗记录时是否存储复盘数据
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Recount_FP'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
-	},
 })
 local Data          -- 当前战斗数据记录
 local HISTORY_CACHE = setmetatable({}, { __mode = 'v' }) -- 历史战斗记录缓存 { [szFile] = Data }
-local KEPT_CACHE = {} -- 保存了但是剔除了复盘记录的战斗记录缓存 { [szFile] = Data }
 local UNSAVED_CACHE = {} -- 未保存的战斗记录缓存 { [szFile] = Data }
 local DS_DATA_CONFIG = { passphrase = false }
 local DS_ROOT = {'userdata/fight_stat/', X.PATH_TYPE.ROLE}
-local SZ_CFG_FILE = {'userdata/fight_stat/config.jx3dat', X.PATH_TYPE.ROLE}
 local SKILL_EFFECT_CACHE = {} -- 最近的技能效果缓存 （进战时候将最近的数据压进来）
 local BUFF_UPDATE_CACHE = {} -- 最近的BUFF效果缓存 （进战时候将最近的数据压进来）
 local ABSORB_CACHE = {} -- 目标盾来源与状态缓存表
@@ -549,7 +519,6 @@ function D.LimitHistoryFile()
 		CPath.DelFile(aFiles[i].fullpath)
 		HISTORY_CACHE[aFiles[i].fullpath] = nil
 		UNSAVED_CACHE[aFiles[i].fullpath] = nil
-		KEPT_CACHE[aFiles[i].fullpath] = nil
 	end
 end
 
@@ -570,31 +539,10 @@ function D.SaveHistory()
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_Recount_DS.SaveHistory: ' .. szFilePath, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		local saveData = data
-		if not O.bSaveEverything then -- 保存数据时剔除复盘数据（防止卡）
-			--[[#DEBUG BEGIN]]
-			X.Debug('MY_Recount_DS.SaveHistoryWithoutEverything: ' .. szFilePath, X.DEBUG_LEVEL.LOG)
-			--[[#DEBUG END]]
-			saveData = {}
-			for k, v in pairs(data) do
-				saveData[k] = k == DK.EVERYTHING
-					and {}
-					or v
-			end
-			KEPT_CACHE[szFilePath] = data -- 加入复盘数据保护数组防止被GC
-		end
-		AsyncSaveLuaData(szFilePath, saveData)
+		AsyncSaveLuaData(szFilePath, data)
 	end
 	D.LimitHistoryFile()
 	UNSAVED_CACHE = {}
-end
-
-function D.UpdateIsRecEverything()
-	if not D.bReady then
-		X.DelayCall(500, function() D.UpdateIsRecEverything() end)
-		return
-	end
-	D.bRecEverything = O.bRecEverything and (not O.bREOnlyDungeon or X.IsInDungeonMap())
 end
 
 -- 过图清除当前战斗数据
@@ -603,7 +551,6 @@ X.RegisterEvent({'LOADING_ENDING', 'RELOAD_UI_ADDON_END', 'BATTLE_FIELD_END', 'A
 	SKILL_EFFECT_CACHE = {}
 	BUFF_UPDATE_CACHE = {}
 	ABSORB_CACHE = {}
-	D.UpdateIsRecEverything()
 	D.InitData()
 	FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 end)
@@ -613,20 +560,13 @@ X.RegisterEvent('MY_FIGHT_HINT', function()
 	if not Data or not D.bReady or not O.bEnable then
 		return
 	end
-	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-	local bFighting, szUUID, nDuring = arg0, arg1, arg2
-	if not bFighting then
-		D.InsertEverything(Data, nLFC, nTime, nTick, EVERYTHING_TYPE.FIGHT_TIME, bFighting, szUUID, nDuring)
-	end
+	local bFighting, szUUID = arg0, arg1
 	if bFighting and szUUID ~= Data[DK.UUID] then -- 进入新的战斗
 		D.InitData()
 		D.ReplayRecentLog()
 		FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 	else
 		D.Flush()
-	end
-	if bFighting then
-		D.InsertEverything(Data, nLFC, nTime, nTick, EVERYTHING_TYPE.FIGHT_TIME, bFighting, szUUID, nDuring)
 	end
 end)
 
@@ -691,7 +631,6 @@ function D.Del(data)
 		CPath.DelFile(data)
 		HISTORY_CACHE[data] = nil
 		UNSAVED_CACHE[data] = nil
-		KEPT_CACHE[data] = nil
 	else
 		for szFilePath, v in pairs(HISTORY_CACHE) do
 			if v.data == data then
@@ -702,11 +641,6 @@ function D.Del(data)
 		for szFilePath, v in pairs(UNSAVED_CACHE) do
 			if v.data == data then
 				UNSAVED_CACHE[szFilePath] = nil
-			end
-		end
-		for szFilePath, v in pairs(KEPT_CACHE) do
-			if v.data == data then
-				KEPT_CACHE[szFilePath] = nil
 			end
 		end
 	end
@@ -836,13 +770,6 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 					(tResult[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   ] or 0)   -- 反弹伤害
 	nEffectDamage = tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0
 
-	D.InsertEverything(Data,
-		nLFC, nTime, nTick,
-		EVERYTHING_TYPE.SKILL_EFFECT, dwCaster, dwTarget,
-		nEffectType, dwEffectID, dwEffectLevel, szEffectID,
-		nSkillResult, nTherapy, nEffectTherapy, nDamage, nEffectDamage,
-		tResult)
-
 	if nSkillResult == SKILL_RESULT.HIT -- 击中
 		or nSkillResult == SKILL_RESULT.CRITICAL -- 会心
 	then
@@ -883,20 +810,15 @@ function D.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLe
 end
 end
 
-do local KCaster, szEffectID
+do local KCaster
 function D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
 	KCaster = X.GetObject(dwCaster)
 	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
 		dwCaster = KCaster.dwEmployer
 	end
-	szEffectID = D.InitEffectData(Data, SKILL_EFFECT_TYPE.BUFF, dwBuffID, dwBuffLevel)
+	D.InitEffectData(Data, SKILL_EFFECT_TYPE.BUFF, dwBuffID, dwBuffLevel)
 	D.InitObjectData(Data, dwCaster)
 	D.InitObjectData(Data, dwTarget)
-	D.InsertEverything(
-		Data,
-		nLFC, nTime, nTick,
-		EVERYTHING_TYPE.BUFF_UPDATE,
-		dwCaster, dwTarget, dwBuffID, dwBuffLevel, szEffectID, bDelete, nStackNum, nEndFrame, bCanCancel)
 end
 end
 
@@ -994,14 +916,6 @@ function D.IsParty(id)
 		return false
 	end
 end
-end
-
--- 插入复盘数据
-function D.InsertEverything(data, nLFC, nTime, nTick, szName, ...)
-	if not D.bRecEverything then
-		return
-	end
-	table.insert(data[DK.EVERYTHING], {nLFC, nTime, nTick, szName, ...})
 end
 
 -- 将一条记录插入数组
@@ -1305,67 +1219,6 @@ function D.AddAbsorbRecord(data, dwCaster, dwTarget, szEffectID, nAbsorb, nSkill
 	D.InsertRecord(data, DK.ABSORB, dwCaster, dwTarget, szEffectID, nAbsorb, nAbsorb, nSkillResult)
 end
 
--- 保存玩家信息
-function D.SavePlayerInfo(data, dwID, bRefresh)
-	if X.ENVIRONMENT.RUNTIME_OPTIMIZE then
-		return
-	end
-	if not D.bRecEverything then
-		return
-	end
-	if (bRefresh or not data[DK.PLAYER_LIST][dwID]) and X.IsPlayer(dwID) then
-		local player, info = D.GetPlayer(dwID)
-		if player and info and not X.IsEmpty(info.dwMountKungfuID) then
-			local tPlayerList = data[DK.PLAYER_LIST]
-			tPlayerList[dwID] = {}
-			local nEquipScore, aEquip, aTalent
-			local function OnGet()
-				if not nEquipScore or not aEquip or not aTalent then
-					return
-				end
-				local aInfo = {
-					info.dwMountKungfuID,
-					nEquipScore,
-					aEquip,
-					aTalent,
-				}
-				tPlayerList[dwID] = aInfo
-			end
-			X.GetPlayerEquipScore(dwID, function(nScore)
-				nEquipScore = nScore
-				OnGet()
-			end)
-			X.GetPlayerEquipInfo(dwID, function(tEquip)
-				aEquip = {}
-				for nEquipIndex, tEquipInfo in pairs(tEquip) do
-					table.insert(aEquip, {
-						nEquipIndex,
-						tEquipInfo.dwTabType,
-						tEquipInfo.dwTabIndex,
-						tEquipInfo.nStrengthLevel,
-						tEquipInfo.aSlotItem,
-						tEquipInfo.dwPermanentEnchantID,
-						tEquipInfo.dwTemporaryEnchantID,
-						tEquipInfo.dwTemporaryEnchantLeftSeconds,
-					})
-				end
-				OnGet()
-			end)
-			X.GetPlayerTalentInfo(dwID, function(a)
-				aTalent = {}
-				for i, p in ipairs(a) do
-					aTalent[i] = {
-						p.nIndex,
-						p.dwSkillID,
-						p.dwSkillLevel,
-					}
-				end
-				OnGet()
-			end)
-		end
-	end
-end
-
 -- 确认对象数据已创建（未创建则创建）
 function D.InitObjectData(data, dwID, szChannel)
 	-- 名称缓存
@@ -1393,8 +1246,6 @@ function D.InitObjectData(data, dwID, szChannel)
 			[DK_REC_STAT.TARGET      ] = {}, -- 该玩家具体对谁造成输出的统计
 		}
 	end
-	-- 玩家信息缓存
-	D.SavePlayerInfo(data, dwID)
 end
 
 do local szKey
@@ -1449,7 +1300,6 @@ function D.InitData()
 		[DK.BE_HEAL    ] = GeneTypeNS(),                      -- 承疗统计
 		[DK.BE_DAMAGE  ] = GeneTypeNS(),                      -- 承伤统计
 		[DK.ABSORB     ] = GeneTypeNS(),                      -- 化解统计
-		[DK.EVERYTHING ] = {},                                -- 战斗复盘
 	}
 end
 end
@@ -1759,158 +1609,10 @@ X.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
 		D.OnTeammateStateChange(arg1, info.bDeathFlag, AWAYTIME_TYPE.DEATH, false)
 	end
 end)
-for _, v in ipairs({
-	{'NPC_ENTER_SCENE', TARGET.NPC, 1},
-	{'NPC_LEAVE_SCENE', TARGET.NPC, 0},
-	{'DOODAD_ENTER_SCENE', TARGET.DOODAD, 1},
-	{'DOODAD_LEAVE_SCENE', TARGET.DOODAD, 0},
-	{'PLAYER_ENTER_SCENE', TARGET.PLAYER, 1},
-	{'PLAYER_LEAVE_SCENE', TARGET.PLAYER, 0},
-}) do
-	local szEvent, dwType, nEnter = unpack(v)
-	X.RegisterEvent(szEvent, function()
-		if not Data or not D.bReady or not O.bEnable then
-			return
-		end
-		-- 插入数据到日志
-		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-		local dwID, dwTemplateID = arg0, 0
-		local KObject = X.GetObject(dwType, dwID)
-		local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = 0, 0
-		if KObject and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) then
-			fCurrentLife, fMaxLife = X.GetObjectLife(KObject)
-			nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
-		end
-		if dwType == TARGET.NPC or dwType == TARGET.DOODAD then
-			if KObject then
-				dwTemplateID = KObject.dwTemplateID
-			end
-		elseif dwType == TARGET.PLAYER then
-			if not X.IsParty(dwID) then
-				return
-			end
-			D.SavePlayerInfo(Data, dwID, true)
-		end
-		D.InsertEverything(
-			Data, nLFC, nTime, nTick,
-			EVERYTHING_TYPE.ENTER_LEAVE_SCENE, nEnter,
-			TARGET.NPC, dwID,
-			X.GetObjectName(TARGET.NPC, dwID, 'never'), dwTemplateID,
-			fCurrentLife, fMaxLife, nCurrentMana, nMaxMana
-		)
-	end)
-end
--- 系统消息日志
-X.RegisterMsgMonitor('MSG_SYS', 'MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
-	if not Data or not D.bReady or not O.bEnable then
-		return
-	end
-	if bRich then
-		szMsg = X.GetPureText(szMsg)
-	end
-	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-	D.InsertEverything(
-		Data, nLFC, nTime, nTick,
-		EVERYTHING_TYPE.SYS_MSG, szMsg:gsub('\r', '')
-	)
-end)
--- 角色喊话日志
-X.RegisterEvent('PLAYER_SAY', function()
-	if not Data or not D.bReady or not O.bEnable then
-		return
-	end
-	if not X.IsPlayer(arg1) then
-		local szText = X.GetPureText(arg0)
-		if szText and szText ~= '' then
-			local npc = X.GetNpc(arg1)
-			local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-			D.InsertEverything(
-				Data, nLFC, nTime, nTick,
-				EVERYTHING_TYPE.PLAYER_SAY,
-				-- szContent, dwNpcID, szNpcName, dwNpcTemplateID
-				szText, arg1, arg3 == '' and '%' or arg3, npc and npc.dwTemplateID or 0
-			)
-		end
-	end
-end)
--- 系统警告框日志
-X.RegisterEvent('ON_WARNING_MESSAGE', function()
-	if not Data or not D.bReady or not O.bEnable then
-		return
-	end
-	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-	D.InsertEverything(
-		Data, nLFC, nTime, nTick,
-		EVERYTHING_TYPE.WARNING_MESSAGE,
-		-- szContent
-		arg1
-	)
-end)
--- 进入退出战斗日志
-X.RegisterEvent({'MY_NPC_FIGHT_HINT', 'MY_PLAYER_FIGHT_HINT'}, function(e)
-	if not Data or not D.bReady or not O.bEnable then
-		return
-	end
-	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-	local dwType = e == 'MY_NPC_FIGHT_HINT' and TARGET.NPC or TARGET.PLAYER
-	local dwID, bFight, dwTemplateID = arg0, arg1, 0
-	local KObject = X.GetObject(dwType, dwID)
-	local szName = X.GetObjectName(KObject, 'never') or ''
-	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = 0, 0
-	if KObject then
-		fCurrentLife, fMaxLife = X.GetObjectLife(KObject)
-		nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
-	end
-	if dwType == TARGET.NPC or dwType == TARGET.DOODAD then
-		if KObject then
-			dwTemplateID = KObject.dwTemplateID
-		end
-	elseif dwType == TARGET.PLAYER then
-		if not X.IsParty(dwID) then
-			return
-		end
-		D.SavePlayerInfo(Data, dwID, true)
-	end
-	D.InsertEverything(
-		Data, nLFC, nTime, nTick,
-		EVERYTHING_TYPE.FIGHT_HINT,
-		dwType, dwID, bFight,
-		szName, dwTemplateID,
-		fCurrentLife, fMaxLife, nCurrentMana, nMaxMana
-	)
-end)
--- 死亡日志
-X.RegisterEvent('SYS_MSG', function()
-	if not Data or not D.bReady or not O.bEnable then
-		return
-	end
-	if arg0 ~= 'UI_OME_DEATH_NOTIFY' then
-		return
-	end
-	-- 插入数据到日志
-	local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-	local dwID, dwKiller = arg1, arg2
-	if X.IsParty(dwID) or X.IsParty(dwKiller) then
-		D.InsertEverything(
-			Data, nLFC, nTime, nTick,
-			EVERYTHING_TYPE.DEATH, dwID, dwKiller,
-			X.GetObjectName(X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID),
-			X.GetObjectName(X.IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller)
-		)
-	end
-end)
 -- 上线下线日志
 X.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
 	if not Data or not D.bReady or not O.bEnable then
 		return
-	end
-	if X.IsParty(arg1) then
-		local nLFC, nTime, nTick = GetLogicFrameCount(), GetCurrentTime(), GetTime()
-		D.InsertEverything(
-			Data, nLFC, nTime, nTick,
-			EVERYTHING_TYPE.ONLINE, arg1, arg2,
-			X.GetObjectName(TARGET.PLAYER, arg1)
-		)
 	end
 	if arg2 == 0 then -- 有人掉线
 		D.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.OFFLINE, false)
@@ -2265,7 +1967,6 @@ local settings = {
 			fields = {
 				SKILL_RESULT = SKILL_RESULT,
 				SKILL_RESULT_NAME = SKILL_RESULT_NAME,
-				EVERYTHING_TYPE = EVERYTHING_TYPE,
 				DK = DK,
 				DK_REC = DK_REC,
 				DK_REC_STAT = DK_REC_STAT,
@@ -2297,9 +1998,7 @@ local settings = {
 				'bSaveHistoryOnExFi',
 				'nMaxHistory',
 				'nMinFightTime',
-				'bRecEverything',
 				'bREOnlyDungeon',
-				'bSaveEverything',
 			},
 			root = O,
 		},
@@ -2312,17 +2011,11 @@ local settings = {
 				'bSaveHistoryOnExFi',
 				'nMaxHistory',
 				'nMinFightTime',
-				'bRecEverything',
 				'bREOnlyDungeon',
-				'bSaveEverything',
 			},
 			triggers = {
 				bEnable = function()
-					D.UpdateIsRecEverything()
 					MY_Recount_UI.CheckOpen()
-				end,
-				bREOnlyDungeon = function()
-					D.UpdateIsRecEverything()
 				end,
 			},
 			root = O,

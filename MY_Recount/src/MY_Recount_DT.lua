@@ -21,9 +21,6 @@ end
 --------------------------------------------------------------------------
 
 local DK = MY_Recount_DS.DK
-local DK_REC = MY_Recount_DS.DK_REC
-local DK_REC_STAT = MY_Recount_DS.DK_REC_STAT
-local DK_REC_STAT_DETAIL = MY_Recount_DS.DK_REC_STAT_DETAIL
 local DK_REC_STAT_SKILL = MY_Recount_DS.DK_REC_STAT_SKILL
 local DK_REC_STAT_SKILL_DETAIL = MY_Recount_DS.DK_REC_STAT_SKILL_DETAIL
 local DK_REC_STAT_SKILL_TARGET = MY_Recount_DS.DK_REC_STAT_SKILL_TARGET
@@ -33,7 +30,6 @@ local DK_REC_STAT_TARGET_SKILL = MY_Recount_DS.DK_REC_STAT_TARGET_SKILL
 
 local DK_REC_STAT = MY_Recount_DS.DK_REC_STAT
 local D = {}
-local O = {}
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_Recount_DT.ini'
 local STAT_TYPE = MY_Recount.STAT_TYPE
 local STAT_TYPE_LIST = MY_Recount.STAT_TYPE_LIST

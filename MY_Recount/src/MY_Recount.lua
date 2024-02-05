@@ -21,15 +21,9 @@ end
 --------------------------------------------------------------------------
 
 local DK = MY_Recount_DS.DK
-local DK_REC = MY_Recount_DS.DK_REC
 local DK_REC_STAT = MY_Recount_DS.DK_REC_STAT
-local DK_REC_STAT_DETAIL = MY_Recount_DS.DK_REC_STAT_DETAIL
 local DK_REC_STAT_SKILL = MY_Recount_DS.DK_REC_STAT_SKILL
-local DK_REC_STAT_SKILL_DETAIL = MY_Recount_DS.DK_REC_STAT_SKILL_DETAIL
-local DK_REC_STAT_SKILL_TARGET = MY_Recount_DS.DK_REC_STAT_SKILL_TARGET
 local DK_REC_STAT_TARGET = MY_Recount_DS.DK_REC_STAT_TARGET
-local DK_REC_STAT_TARGET_DETAIL = MY_Recount_DS.DK_REC_STAT_TARGET_DETAIL
-local DK_REC_STAT_TARGET_SKILL = MY_Recount_DS.DK_REC_STAT_TARGET_SKILL
 local SKILL_RESULT = MY_Recount_DS.SKILL_RESULT
 local SKILL_RESULT_NAME = MY_Recount_DS.SKILL_RESULT_NAME
 
@@ -265,44 +259,40 @@ function D.GetMenu()
 			end,
 			fnDisable = IsUIDisabled,
 		},
-		{
-			szOption = _L['Record everything'],
-			bCheck = true,
-			bChecked = MY_Recount_DS.bRecEverything,
-			fnAction = function()
-				MY_Recount_DS.bRecEverything = not MY_Recount_DS.bRecEverything
-			end,
-			fnDisable = IsUIDisabled,
-		},
-		{   -- 切换统计类型
-			szOption = _L['Switch recount mode'],
-			fnDisable = IsUIDisabled,
-			{
-				szOption = _L['Display only npc record'],
-				bCheck = true, bMCheck = true,
-				bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.NPC,
-				fnAction = function()
-					MY_Recount_UI.nDisplayMode = MY_Recount_UI.DISPLAY_MODE.NPC
-				end,
-			},
-			{
-				szOption = _L['Display only player record'],
-				bCheck = true, bMCheck = true,
-				bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.PLAYER,
-				fnAction = function()
-					MY_Recount_UI.nDisplayMode = MY_Recount_UI.DISPLAY_MODE.PLAYER
-				end,
-			},
-			{
-				szOption = _L['Display all record'],
-				bCheck = true, bMCheck = true,
-				bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.BOTH,
-				fnAction = function()
-					MY_Recount_UI.nDisplayMode = MY_Recount_UI.DISPLAY_MODE.BOTH
-				end,
-			}
-		}
 	}
+
+	if MY_CombatLogs.GetOptionsMenu then
+		table.insert(t, MY_CombatLogs.GetOptionsMenu())
+	end
+
+	table.insert(t, {   -- 切换统计类型
+		szOption = _L['Switch recount mode'],
+		fnDisable = IsUIDisabled,
+		{
+			szOption = _L['Display only npc record'],
+			bCheck = true, bMCheck = true,
+			bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.NPC,
+			fnAction = function()
+				MY_Recount_UI.nDisplayMode = MY_Recount_UI.DISPLAY_MODE.NPC
+			end,
+		},
+		{
+			szOption = _L['Display only player record'],
+			bCheck = true, bMCheck = true,
+			bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.PLAYER,
+			fnAction = function()
+				MY_Recount_UI.nDisplayMode = MY_Recount_UI.DISPLAY_MODE.PLAYER
+			end,
+		},
+		{
+			szOption = _L['Display all record'],
+			bCheck = true, bMCheck = true,
+			bChecked = MY_Recount_UI.nDisplayMode == MY_Recount_UI.DISPLAY_MODE.BOTH,
+			fnAction = function()
+				MY_Recount_UI.nDisplayMode = MY_Recount_UI.DISPLAY_MODE.BOTH
+			end,
+		}
+	})
 
 	-- 过滤短时间记录
 	local t1 = {
@@ -415,23 +405,8 @@ function D.GetHistoryMenu()
 		szOption = _L['Current fight'],
 		rgb = (MY_Recount_DS.Get('CURRENT') == DataDisplay and {255, 255, 0}) or nil,
 		fnAction = function()
-			if IsCtrlKeyDown() then
-				MY_Recount_FP_Open(MY_Recount_DS.Get('CURRENT'))
-			else
-				D.SetDisplayData('CURRENT')
-			end
+			D.SetDisplayData('CURRENT')
 			X.UI.ClosePopupMenu()
-		end,
-		fnMouseEnter = function()
-			if not MY_Recount_DS.bRecEverything then
-				return
-			end
-			local nX, nY = this:GetAbsX(), this:GetAbsY()
-			local nW, nH = this:GetW(), this:GetH()
-			OutputTip(GetFormatText(_L['Hold ctrl click to review whole fight'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
-		end,
-		fnMouseLeave = function()
-			HideTip()
 		end,
 	}}
 
@@ -445,11 +420,7 @@ function D.GetHistoryMenu()
 			rgb = (file.time == DataDisplay[DK.TIME_BEGIN] and {255, 255, 0}) or nil,
 			fnAction = function()
 				local data = MY_Recount_DS.Get(file.fullpath)
-				if IsCtrlKeyDown() then
-					MY_Recount_FP_Open(data)
-				else
-					D.SetDisplayData(data)
-				end
+				D.SetDisplayData(data)
 				X.UI.ClosePopupMenu()
 			end,
 			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
@@ -466,9 +437,6 @@ function D.GetHistoryMenu()
 				local aXml = {}
 				table.insert(aXml, GetFormatText(file.bossname .. '(' .. X.FormatDuration(file.during, 'SYMBOL', { mode = 'fixed-except-leading', maxUnit = 'minute', keepUnit = 'minute' }) .. ')\n', nil, 255, 255, 255))
 				table.insert(aXml, GetFormatText(X.FormatTime(file.time, '%yyyy/%MM/%dd %hh:%mm:%ss\n'), nil, 255, 255, 255))
-				if MY_Recount_DS.bRecEverything then
-					table.insert(aXml, GetFormatText('\n' .. _L['Hold ctrl click to review whole fight'], nil, 255, 255, 0))
-				end
 				local nX, nY = this:GetAbsX(), this:GetAbsY()
 				local nW, nH = this:GetW(), this:GetH()
 				OutputTip(table.concat(aXml), 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
@@ -483,17 +451,6 @@ function D.GetHistoryMenu()
 	table.insert(t, tt)
 
 	table.insert(t, { bDevide = true })
-	if MY_Recount_DS.bRecEverything and (not MY_Recount_DS.bREOnlyDungeon or IsShiftKeyDown()) then
-		table.insert(t, {
-			szOption = _L['Rec everything only in dungeon'],
-			bCheck = true,
-			bChecked = MY_Recount_DS.bREOnlyDungeon,
-			fnAction = function()
-				MY_Recount_DS.bREOnlyDungeon = not MY_Recount_DS.bREOnlyDungeon
-			end,
-			fnDisable = function() return not MY_Recount_DS.bRecEverything end,
-		})
-	end
 	table.insert(t, {
 		szOption = _L['Save history on exit'],
 		bCheck = true, bChecked = MY_Recount_DS.bSaveHistoryOnExit,
@@ -509,19 +466,6 @@ function D.GetHistoryMenu()
 			MY_Recount_DS.bSaveHistoryOnExFi = not MY_Recount_DS.bSaveHistoryOnExFi
 		end,
 	})
-	if MY_Recount_DS.bSaveEverything or IsShiftKeyDown() then
-		table.insert(t, {
-			szOption = _L['Do not save history everything'],
-			bCheck = true,
-			bChecked = not MY_Recount_DS.bSaveEverything,
-			fnAction = function()
-				MY_Recount_DS.bSaveEverything = not MY_Recount_DS.bSaveEverything
-			end,
-			fnDisable = function()
-				return not MY_Recount_DS.bSaveHistoryOnExit and not MY_Recount_DS.bSaveHistoryOnExFi
-			end,
-		})
-	end
 
 	return t
 end

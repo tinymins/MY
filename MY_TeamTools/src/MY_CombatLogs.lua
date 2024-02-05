@@ -650,7 +650,7 @@ X.RegisterEvent('DOODAD_LEAVE_SCENE', function()
 end)
 
 -- 系统消息日志
-X.RegisterMsgMonitor('MSG_SYS', 'MY_Recount_DS_Everything', function(szChannel, szMsg, nFont, bRich)
+X.RegisterMsgMonitor('MSG_SYS', 'MY_CombatLogs', function(szChannel, szMsg, nFont, bRich)
 	if not LOG_ENABLE then
 		return
 	end
@@ -776,6 +776,131 @@ X.RegisterEvent('PARTY_ADD_MEMBER', function()
 	end
 end)
 
+function D.GetOptionsMenu()
+	local menu = {
+		szOption = _L['MY_CombatLogs'],
+		bCheck = true,
+		bChecked = MY_CombatLogs.bEnable,
+		fnAction = function()
+			MY_CombatLogs.bEnable = not MY_CombatLogs.bEnable
+		end,
+	}
+	table.insert(menu, {
+		szOption = _L['Enable in dungeon'],
+		bCheck = true,
+		bChecked = MY_CombatLogs.bEnableInDungeon,
+		fnAction = function()
+			MY_CombatLogs.bEnableInDungeon = not MY_CombatLogs.bEnableInDungeon
+		end,
+		fnDisable = function() return not MY_CombatLogs.bEnable end,
+	})
+	table.insert(menu, {
+		szOption = _L['Enable in arena'],
+		bCheck = true,
+		bChecked = MY_CombatLogs.bEnableInArena,
+		fnAction = function()
+			MY_CombatLogs.bEnableInArena = not MY_CombatLogs.bEnableInArena
+		end,
+		fnDisable = function() return not MY_CombatLogs.bEnable end,
+	})
+	table.insert(menu, {
+		szOption = _L['Enable in battlefield'],
+		bCheck = true,
+		bChecked = MY_CombatLogs.bEnableInBattleField,
+		fnAction = function()
+			MY_CombatLogs.bEnableInBattleField = not MY_CombatLogs.bEnableInBattleField
+		end,
+		fnDisable = function() return not MY_CombatLogs.bEnable end,
+	})
+	table.insert(menu, {
+		szOption = _L['Enable in other maps'],
+		bCheck = true,
+		bChecked = MY_CombatLogs.bEnableInOtherMaps,
+		fnAction = function()
+			MY_CombatLogs.bEnableInOtherMaps = not MY_CombatLogs.bEnableInOtherMaps
+		end,
+		fnDisable = function() return not MY_CombatLogs.bEnable end,
+	})
+	table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+	table.insert(menu, {
+		szOption = _L['Save all nearby records'],
+		bCheck = true,
+		bChecked = MY_CombatLogs.bNearbyAll,
+		fnAction = function()
+			MY_CombatLogs.bNearbyAll = not MY_CombatLogs.bNearbyAll
+		end,
+		fnMouseEnter = function()
+			local nX, nY = this:GetAbsX(), this:GetAbsY()
+			local nW, nH = this:GetW(), this:GetH()
+			OutputTip(GetFormatText(_L['Check to save all nearby records, otherwise only save records related to me'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.TOP_BOTTOM)
+		end,
+		fnMouseLeave = function()
+			HideTip()
+		end,
+		fnDisable = function() return not MY_CombatLogs.bEnable end,
+	})
+	table.insert(menu, {
+		szOption = _L['PVP mode'],
+		bCheck = true,
+		bChecked = MY_CombatLogs.bTargetInformation,
+		fnAction = function()
+			MY_CombatLogs.bTargetInformation = not MY_CombatLogs.bTargetInformation
+		end,
+		fnMouseEnter = function()
+			local nX, nY = this:GetAbsX(), this:GetAbsY()
+			local nW, nH = this:GetW(), this:GetH()
+			OutputTip(GetFormatText(_L['Save target information on event\n(Only in arena)'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.TOP_BOTTOM)
+		end,
+		fnMouseLeave = function()
+			HideTip()
+		end,
+		fnDisable = function() return not MY_CombatLogs.bEnable end,
+	})
+	table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+	local m0 = {
+		szOption = _L['Max history'],
+		fnDisable = function() return not MY_CombatLogs.bEnable end,
+	}
+	for _, i in ipairs({10, 20, 30, 50, 100, 200, 300, 500, 1000, 2000, 5000}) do
+		table.insert(m0, {
+			szOption = tostring(i),
+			fnAction = function()
+				MY_CombatLogs.nMaxHistory = i
+			end,
+			bCheck = true,
+			bMCheck = true,
+			bChecked = MY_CombatLogs.nMaxHistory == i,
+		})
+	end
+	table.insert(menu, m0)
+	local m0 = {
+		szOption = _L['Min fight time'],
+		fnDisable = function() return not MY_CombatLogs.bEnable end,
+	}
+	for _, i in ipairs({10, 20, 30, 60, 90, 120, 180, 240}) do
+		table.insert(m0, {
+			szOption = _L('%s second(s)', i),
+			fnAction = function()
+				MY_CombatLogs.nMinFightTime = i
+			end,
+			bCheck = true,
+			bMCheck = true,
+			bChecked = MY_CombatLogs.nMinFightTime == i,
+		})
+	end
+	table.insert(menu, m0)
+	table.insert(menu, {
+		szOption = _L['Show data files'],
+		fnAction = function()
+			local szRoot = X.GetAbsolutePath(DS_ROOT)
+			X.OpenFolder(szRoot)
+			X.UI.OpenTextEditor(szRoot)
+		end,
+		fnDisable = function() return not MY_CombatLogs.bEnable end,
+	})
+	return menu
+end
+
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
@@ -790,110 +915,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nX, y = nY, w = 25, h = 25,
 		buttonStyle = 'OPTION',
 		autoEnable = function() return MY_CombatLogs.bEnable end,
-		menu = function()
-			local menu = {}
-			table.insert(menu, {
-				szOption = _L['Enable in dungeon'],
-				bCheck = true,
-				bChecked = MY_CombatLogs.bEnableInDungeon,
-				fnAction = function()
-					MY_CombatLogs.bEnableInDungeon = not MY_CombatLogs.bEnableInDungeon
-				end,
-			})
-			table.insert(menu, {
-				szOption = _L['Enable in arena'],
-				bCheck = true,
-				bChecked = MY_CombatLogs.bEnableInArena,
-				fnAction = function()
-					MY_CombatLogs.bEnableInArena = not MY_CombatLogs.bEnableInArena
-				end,
-			})
-			table.insert(menu, {
-				szOption = _L['Enable in battlefield'],
-				bCheck = true,
-				bChecked = MY_CombatLogs.bEnableInBattleField,
-				fnAction = function()
-					MY_CombatLogs.bEnableInBattleField = not MY_CombatLogs.bEnableInBattleField
-				end,
-			})
-			table.insert(menu, {
-				szOption = _L['Enable in other maps'],
-				bCheck = true,
-				bChecked = MY_CombatLogs.bEnableInOtherMaps,
-				fnAction = function()
-					MY_CombatLogs.bEnableInOtherMaps = not MY_CombatLogs.bEnableInOtherMaps
-				end,
-			})
-			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
-			table.insert(menu, {
-				szOption = _L['Save all nearby records'],
-				bCheck = true,
-				bChecked = MY_CombatLogs.bNearbyAll,
-				fnAction = function()
-					MY_CombatLogs.bNearbyAll = not MY_CombatLogs.bNearbyAll
-				end,
-				fnMouseEnter = function()
-					local nX, nY = this:GetAbsX(), this:GetAbsY()
-					local nW, nH = this:GetW(), this:GetH()
-					OutputTip(GetFormatText(_L['Check to save all nearby records, otherwise only save records related to me'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.TOP_BOTTOM)
-				end,
-				fnMouseLeave = function()
-					HideTip()
-				end,
-			})
-			table.insert(menu, {
-				szOption = _L['PVP mode'],
-				bCheck = true,
-				bChecked = MY_CombatLogs.bTargetInformation,
-				fnAction = function()
-					MY_CombatLogs.bTargetInformation = not MY_CombatLogs.bTargetInformation
-				end,
-				fnMouseEnter = function()
-					local nX, nY = this:GetAbsX(), this:GetAbsY()
-					local nW, nH = this:GetW(), this:GetH()
-					OutputTip(GetFormatText(_L['Save target information on event\n(Only in arena)'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.TOP_BOTTOM)
-				end,
-				fnMouseLeave = function()
-					HideTip()
-				end,
-			})
-			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
-			local m0 = { szOption = _L['Max history'] }
-			for _, i in ipairs({10, 20, 30, 50, 100, 200, 300, 500, 1000, 2000, 5000}) do
-				table.insert(m0, {
-					szOption = tostring(i),
-					fnAction = function()
-						MY_CombatLogs.nMaxHistory = i
-					end,
-					bCheck = true,
-					bMCheck = true,
-					bChecked = MY_CombatLogs.nMaxHistory == i,
-				})
-			end
-			table.insert(menu, m0)
-			local m0 = { szOption = _L['Min fight time'] }
-			for _, i in ipairs({10, 20, 30, 60, 90, 120, 180, 240}) do
-				table.insert(m0, {
-					szOption = _L('%s second(s)', i),
-					fnAction = function()
-						MY_CombatLogs.nMinFightTime = i
-					end,
-					bCheck = true,
-					bMCheck = true,
-					bChecked = MY_CombatLogs.nMinFightTime == i,
-				})
-			end
-			table.insert(menu, m0)
-			table.insert(menu, {
-				szOption = _L['Show data files'],
-				fnAction = function()
-					local szRoot = X.GetAbsolutePath(DS_ROOT)
-					X.OpenFolder(szRoot)
-					X.UI.OpenTextEditor(szRoot)
-				end,
-			})
-			return menu
-		end,
+		menu = D.GetOptionsMenu,
 	}):AutoWidth():Width() + 5
 
 	nLFY = nY + nLH
@@ -909,6 +931,7 @@ local settings = {
 	exports = {
 		{
 			fields = {
+				'GetOptionsMenu',
 				'OnPanelActivePartial',
 			},
 			root = D,
