@@ -706,6 +706,11 @@ function D.OnFrameCreate()
 	D.CreateItemData()
 	D.CreateControlBar()
 	this:EnableDrag(CFG.bDrag)
+	X.BreatheCall('MY_CataclysmMain__TeamSwitchPanel', D.UpdateOfficialTeamSwitchPanel)
+end
+
+function D.OnFrameDestroy()
+	X.BreatheCall('MY_CataclysmMain__TeamSwitchPanel', false)
 end
 
 -------------------------------------------------
@@ -986,6 +991,23 @@ function D.FrameBuffRefreshCall()
 	end
 	i = i + 1
 end
+end
+
+function D.UpdateOfficialTeamSwitchPanel()
+	local frame = D.GetFrame()
+	if not frame then
+		return
+	end
+	local frmSwitch = Station.Lookup('Normal/TeamSwitchBtn')
+	local imgSwitchTeam = frmSwitch and frmSwitch:Lookup('Wnd_TeamSwitch', 'Handle_Team/Image_Selected')
+	local chkSwitchControl = frmSwitch:Lookup('Wnd_TeamSwitch/CheckBox_Control')
+	local bVisible = not imgSwitchTeam or not chkSwitchControl or (imgSwitchTeam:IsVisible() and chkSwitchControl:IsCheckBoxChecked()) or false
+	if bVisible and frmSwitch then
+		local nX, nY = frame:GetRelPos()
+		frmSwitch:SetRelPos(nX - frmSwitch:GetW(), nY)
+	end
+	frame:SetVisible(bVisible)
+	MY_CataclysmParty:SetVisible(bVisible)
 end
 
 function D.UpdateOTAction(frame)

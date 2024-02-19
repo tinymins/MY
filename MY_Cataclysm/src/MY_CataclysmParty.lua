@@ -624,6 +624,15 @@ function CTM:GetPartyFrame(nIndex) -- 获得组队面板
 	return Station.Lookup('Normal/MY_CataclysmParty_' .. nIndex)
 end
 
+function CTM:SetVisible(bVisible)
+	MY_CataclysmMain.GetFrame():BringToTop()
+	for i = 0, CTM_GROUP_COUNT do
+		if self:GetPartyFrame(i) then
+			self:GetPartyFrame(i):SetVisible(bVisible)
+		end
+	end
+end
+
 function CTM:BringToTop()
 	MY_CataclysmMain.GetFrame():BringToTop()
 	for i = 0, CTM_GROUP_COUNT do
