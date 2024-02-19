@@ -392,7 +392,10 @@ function D.UpdateUI(frame)
 			hItem:Lookup('Image_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
 			hItem:Lookup('Shadow_PerFore'):SetAlpha(css.a or 255)
 			hItem:Lookup('Shadow_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
-			hItem:Lookup('Text_L'):SetText(MY_Recount.GetTargetShowName(p.szName, p.dwForceID ~= -1))
+			local szTargetName = MY_Recount.GetTargetShowName(p.szName, p.dwForceID ~= -1)
+			szTargetName = szTargetName:gsub('@.*$', '')
+			szTargetName = szTargetName:gsub(g_tStrings.STR_CONNECT .. '.*$', '')
+			hItem:Lookup('Text_L'):SetText(szTargetName)
 			hItem.id = p.id
 		end
 		if hItem:GetIndex() ~= i - 1 then
