@@ -4929,6 +4929,9 @@ end
 
 do
 	local function PeekPlayer(dwID)
+		--[[#DEBUG BEGIN]]
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'EquipScore Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		if PeekOtherPlayerEquipSimpleInfo then
 			X.SafeCall(PeekOtherPlayerEquipSimpleInfo, dwID)
 		else
@@ -5006,15 +5009,15 @@ do
 				end)
 			end
 		end
-		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'EquipScore Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
-		--[[#DEBUG END]]
 		PeekPlayer(dwID)
 	end
 end
 
 do
 	local function PeekPlayer(dwID)
+		--[[#DEBUG BEGIN]]
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'EquipInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		if PeekOtherPlayer then
 			X.SafeCall(PeekOtherPlayer, dwID)
 		else
@@ -5121,15 +5124,15 @@ do
 				end
 			end)
 		end
-		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'EquipInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
-		--[[#DEBUG END]]
 		PeekPlayer(dwID)
 	end
 end
 
 do
 	local function PeekPlayer(dwID)
+		--[[#DEBUG BEGIN]]
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'TelentInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		if X.ENVIRONMENT.GAME_BRANCH == 'classic' then
 			X.SafeCall(PeekOtherPlayerTalent, dwID)
 		else
@@ -5227,15 +5230,15 @@ do
 				end
 			end)
 		end
-		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'TelentInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
-		--[[#DEBUG END]]
 		PeekPlayer(dwID)
 	end
 end
 
 do
 	local function PeekPlayer(dwID)
+		--[[#DEBUG BEGIN]]
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'ZhenPaiInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
 		X.SafeCall(ViewOtherZhenPaiSkill, dwID, true)
 		X.SafeCall(X.UI.CloseFrame, 'ZhenPaiSkill')
 	end
@@ -5337,9 +5340,6 @@ do
 				OnGetPlayerZhenPaiInfoPeekPlayer(player)
 			end)
 		end
-		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'ZhenPaiInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
-		--[[#DEBUG END]]
 		PeekPlayer(dwID)
 	end
 end
