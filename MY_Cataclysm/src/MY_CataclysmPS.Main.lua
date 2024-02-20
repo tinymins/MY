@@ -72,7 +72,7 @@ function PS.OnPanelActive(frame)
 			end
 			local me = X.GetClientPlayer()
 			if me.IsInParty() and not me.IsInRaid() then
-				FireUIEvent('CTM_PANEL_TEAMATE', CFG.bShowInRaid)
+				FireUIEvent('MY_CATACLYSM_PANEL_TEAMMATE', CFG.bShowInRaid)
 			end
 		end,
 	}):AutoWidth():Width() + 5

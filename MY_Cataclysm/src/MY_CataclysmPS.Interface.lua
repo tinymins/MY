@@ -115,7 +115,7 @@ function PS.OnPanelActive(frame)
 			onChange = function(nVal)
 				CFG.nAlpha = nVal
 				if MY_CataclysmMain.GetFrame() then
-					FireUIEvent('CTM_SET_ALPHA')
+					FireUIEvent('MY_CATACLYSM_SET_ALPHA')
 				end
 			end,
 			textFormatter = function(val) return _L('%d%%', val / 255 * 100) end,

@@ -967,10 +967,10 @@ local settings = {
 			},
 			triggers = {
 				bVisible = function()
-					FireUIEvent('CTM_SET_VISIBLE')
+					FireUIEvent('MY_CATACLYSM_SET_VISIBLE')
 				end,
 				bFold = function()
-					FireUIEvent('CTM_SET_FOLD')
+					FireUIEvent('MY_CATACLYSM_SET_FOLD')
 				end,
 			},
 			root = D,

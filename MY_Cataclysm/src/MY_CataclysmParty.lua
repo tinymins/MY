@@ -261,16 +261,16 @@ MY_CataclysmParty_Base = class()
 
 function MY_CataclysmParty_Base.OnFrameCreate()
 	this:Lookup('', 'Handle_BG/Shadow_BG'):SetAlpha(CFG.nAlpha)
-	this:RegisterEvent('CTM_SET_VISIBLE')
-	this:RegisterEvent('CTM_SET_FOLD')
-	this:RegisterEvent('CTM_SET_ALPHA')
+	this:RegisterEvent('MY_CATACLYSM_SET_VISIBLE')
+	this:RegisterEvent('MY_CATACLYSM_SET_FOLD')
+	this:RegisterEvent('MY_CATACLYSM_SET_ALPHA')
 	this:SetVisible(MY_Cataclysm.bVisible and not MY_Cataclysm.bFold)
 end
 
 function MY_CataclysmParty_Base.OnEvent(szEvent)
-	if szEvent == 'CTM_SET_VISIBLE' or szEvent == 'CTM_SET_FOLD' then
+	if szEvent == 'MY_CATACLYSM_SET_VISIBLE' or szEvent == 'MY_CATACLYSM_SET_FOLD' then
 		this:SetVisible(MY_Cataclysm.bVisible and not MY_Cataclysm.bFold)
-	elseif szEvent == 'CTM_SET_ALPHA' then
+	elseif szEvent == 'MY_CATACLYSM_SET_ALPHA' then
 		this:Lookup('', 'Handle_BG/Shadow_BG'):SetAlpha(CFG.nAlpha)
 	end
 end
@@ -1052,7 +1052,7 @@ function CTM:KungFuSwitch(dwID)
 	local handle = CTM_CACHE[dwID]
 	if handle and handle:IsValid() then
 		if X.GetPlayer(dwID) then
-			local key = 'CTM_KUNFU_' .. dwID
+			local key = 'MY_CATACLYSM_KUNGFU_' .. dwID
 			local img = handle:Lookup('Image_Icon')
 			X.BreatheCall(key, function()
 				local player = X.GetPlayer(dwID)
@@ -1690,7 +1690,7 @@ function D.UpdateCharaterBuff(p, handle, tKeep)
 				CTM_SCREEN_HEAD[dwCharID] = {}
 			end
 			if not CTM_SCREEN_HEAD[dwCharID][tRule.szKey] then
-				local szCountdownKey = 'CTM_' .. tBuff.dwID .. '_' .. tRule.szKey
+				local szCountdownKey = 'MY_CATACLYSM_' .. tBuff.dwID .. '_' .. tRule.szKey
 				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCharID, 'BUFF', szCountdownKey, {
 					dwBuffID = tBuff.dwID,
 					szText = tBuff.szName,
@@ -2017,7 +2017,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			lifeFade:SetAlpha(240)
 			lifeFade:Show()
 
-			local key = 'CTM_HIT_' .. dwID
+			local key = 'MY_CATACLYSM_HIT_' .. dwID
 			X.BreatheCall(key, false)
 			X.BreatheCall(key, function()
 				if lifeFade:IsValid() then
@@ -2256,7 +2256,7 @@ function CTM:ChangeTeamVoteState(eType, dwID, status)
 		local h = CTM_CACHE[dwID]
 		h:Lookup(opt.awaitPath):Hide()
 		if status == 'resolve' and opt.resolvePath then
-			local key = 'CTM_READY_' .. eType .. '_' .. dwID
+			local key = 'MY_CATACLYSM_READY_' .. eType .. '_' .. dwID
 			h:Lookup(opt.resolvePath):Show()
 			h:Lookup(opt.resolvePath):SetAlpha(240)
 			X.BreatheCall(key, function()

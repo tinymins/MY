@@ -87,7 +87,7 @@ function D.UpdateBuffListCache()
 		end
 		Raid_MonitorBuffs(aBuff)
 	end
-	FireUIEvent('CTM_BUFF_LIST_CACHE_UPDATE')
+	FireUIEvent('MY_CATACLYSM_BUFF_LIST_CACHE_UPDATE')
 end
 end
 
@@ -681,9 +681,9 @@ function D.OnFrameCreate()
 	this:RegisterEvent('CHARACTER_THREAT_RANKLIST')
 	this:RegisterEvent('BUFF_UPDATE')
 	this:RegisterEvent('PLAYER_ENTER_SCENE')
-	this:RegisterEvent('CTM_BUFF_LIST_CACHE_UPDATE')
-	this:RegisterEvent('CTM_SET_VISIBLE')
-	this:RegisterEvent('CTM_SET_FOLD')
+	this:RegisterEvent('MY_CATACLYSM_BUFF_LIST_CACHE_UPDATE')
+	this:RegisterEvent('MY_CATACLYSM_SET_VISIBLE')
+	this:RegisterEvent('MY_CATACLYSM_SET_FOLD')
 	-- 拍团部分 arg0 0=T人 1=分工资
 	this:RegisterEvent('TEAM_VOTE_REQUEST')
 	-- arg0 回应状态 arg1 dwID arg2 同意=1 反对=0
@@ -928,7 +928,7 @@ function D.OnEvent(szEvent)
 			end
 		end
 		X.DelayCall(update, 75)
-	elseif szEvent == 'CTM_BUFF_LIST_CACHE_UPDATE' then
+	elseif szEvent == 'MY_CATACLYSM_BUFF_LIST_CACHE_UPDATE' then
 		local team = GetClientTeam()
 		if not team then
 			return
@@ -942,9 +942,9 @@ function D.OnEvent(szEvent)
 				end
 			end
 		end
-	elseif szEvent == 'CTM_SET_VISIBLE' then
+	elseif szEvent == 'MY_CATACLYSM_SET_VISIBLE' then
 		this:SetVisible(MY_Cataclysm.bVisible)
-	elseif szEvent == 'CTM_SET_FOLD' then
+	elseif szEvent == 'MY_CATACLYSM_SET_FOLD' then
 		D.UpdatePrepareBarPos()
 	elseif szEvent == 'MY_CAMP_COLOR_UPDATE'
 	or szEvent == 'MY_FORCE_COLOR_UPDATE' then
@@ -1287,9 +1287,9 @@ function D.CheckEnableTeamPanel()
 	if not MY_Cataclysm.bEnable then
 		local me = X.GetClientPlayer()
 		if me.IsInRaid() then
-			FireUIEvent('CTM_PANEL_RAID', true)
+			FireUIEvent('MY_CATACLYSM_PANEL_RAID', true)
 		elseif me.IsInParty() then
-			FireUIEvent('CTM_PANEL_TEAMATE', true)
+			FireUIEvent('MY_CATACLYSM_PANEL_TEAMMATE', true)
 		end
 	end
 end
@@ -1360,10 +1360,10 @@ local settings = {
 MY_CataclysmMain = X.CreateModule(settings)
 end
 
-X.RegisterEvent('CTM_PANEL_TEAMATE', function()
+X.RegisterEvent('MY_CATACLYSM_PANEL_TEAMMATE', function()
 	D.TeammatePanel_Switch(arg0)
 end)
-X.RegisterEvent('CTM_PANEL_RAID', function()
+X.RegisterEvent('MY_CATACLYSM_PANEL_RAID', function()
 	D.RaidPanel_Switch(arg0)
 end)
 
