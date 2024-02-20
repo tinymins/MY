@@ -1000,7 +1000,7 @@ function D.UpdateOfficialTeamSwitchPanel()
 	end
 	local frmSwitch = Station.Lookup('Normal/TeamSwitchBtn')
 	local imgSwitchTeam = frmSwitch and frmSwitch:Lookup('Wnd_TeamSwitch', 'Handle_Team/Image_Selected')
-	local chkSwitchControl = frmSwitch:Lookup('Wnd_TeamSwitch/CheckBox_Control')
+	local chkSwitchControl = frmSwitch and frmSwitch:Lookup('Wnd_TeamSwitch/CheckBox_Control')
 	local bVisible = not imgSwitchTeam or not chkSwitchControl or (imgSwitchTeam:IsVisible() and chkSwitchControl:IsCheckBoxChecked()) or false
 	if bVisible and frmSwitch then
 		local nX, nY = frame:GetRelPos()
