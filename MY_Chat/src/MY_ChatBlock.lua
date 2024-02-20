@@ -186,7 +186,7 @@ function D.ApplyTeamBuildingFilters()
 	if hList then
 		for i = 0, hList:GetItemCount() - 1 do
 			local hItem = hList:Lookup(i)
-			local szText = hItem:Lookup('Text_Desc'):GetText()
+			local szText = hItem:Lookup('Text_Leader'):GetText() .. '\n' .. hItem:Lookup('Text_Desc'):GetText()
 			local bVisible = true
 			for _, bw in ipairs(D.aBlockWords) do
 				if bw.bTeamBuilding
