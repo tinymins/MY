@@ -595,7 +595,6 @@ function D.CloseCataclysmPanel()
 		X.UI.CloseFrame(D.GetFrame())
 		MY_CataclysmParty:CloseParty()
 		MY_Cataclysm.bFold = false
-		FireUIEvent('CTM_SET_FOLD')
 	end
 end
 
@@ -683,6 +682,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('BUFF_UPDATE')
 	this:RegisterEvent('PLAYER_ENTER_SCENE')
 	this:RegisterEvent('CTM_BUFF_LIST_CACHE_UPDATE')
+	this:RegisterEvent('CTM_SET_VISIBLE')
 	this:RegisterEvent('CTM_SET_FOLD')
 	-- 拍团部分 arg0 0=T人 1=分工资
 	this:RegisterEvent('TEAM_VOTE_REQUEST')
@@ -706,6 +706,7 @@ function D.OnFrameCreate()
 	D.CreateItemData()
 	D.CreateControlBar()
 	this:EnableDrag(CFG.bDrag)
+	this:SetVisible(MY_Cataclysm.bVisible)
 	X.BreatheCall('MY_CataclysmMain__TeamSwitchPanel', D.UpdateOfficialTeamSwitchPanel)
 end
 
@@ -941,6 +942,8 @@ function D.OnEvent(szEvent)
 				end
 			end
 		end
+	elseif szEvent == 'CTM_SET_VISIBLE' then
+		this:SetVisible(MY_Cataclysm.bVisible)
 	elseif szEvent == 'CTM_SET_FOLD' then
 		D.UpdatePrepareBarPos()
 	elseif szEvent == 'MY_CAMP_COLOR_UPDATE'
@@ -1006,8 +1009,9 @@ function D.UpdateOfficialTeamSwitchPanel()
 		local nX, nY = frame:GetRelPos()
 		frmSwitch:SetRelPos(nX - frmSwitch:GetW(), nY)
 	end
-	frame:SetVisible(bVisible)
-	MY_CataclysmParty:SetVisible(bVisible)
+	if MY_Cataclysm.bVisible ~= bVisible then
+		MY_Cataclysm.bVisible = bVisible
+	end
 end
 
 function D.UpdateOTAction(frame)
@@ -1208,7 +1212,6 @@ function D.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Fold' then
 		MY_Cataclysm.bFold = true
-		FireUIEvent('CTM_SET_FOLD')
 	end
 end
 
@@ -1216,7 +1219,6 @@ function D.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Fold' then
 		MY_Cataclysm.bFold = false
-		FireUIEvent('CTM_SET_FOLD')
 	end
 end
 

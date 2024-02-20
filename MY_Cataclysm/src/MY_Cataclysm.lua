@@ -499,6 +499,7 @@ local O = X.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 })
 local D = {
 	CFG = O,
+	bVisible = true,
 	bFold = false,
 	BG_COLOR_MODE = {
 		SAME_COLOR = 0,
@@ -940,6 +941,7 @@ local settings = {
 		{
 			fields = {
 				'CFG',
+				'bVisible',
 				'bFold',
 				'BG_COLOR_MODE',
 				'EncodeBuffRule',
@@ -959,8 +961,17 @@ local settings = {
 		{
 			fields = {
 				'CFG',
+				'bVisible',
 				'bFold',
 				'BG_COLOR_MODE',
+			},
+			triggers = {
+				bVisible = function()
+					FireUIEvent('CTM_SET_VISIBLE')
+				end,
+				bFold = function()
+					FireUIEvent('CTM_SET_FOLD')
+				end,
 			},
 			root = D,
 		},

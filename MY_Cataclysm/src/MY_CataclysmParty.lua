@@ -261,16 +261,17 @@ MY_CataclysmParty_Base = class()
 
 function MY_CataclysmParty_Base.OnFrameCreate()
 	this:Lookup('', 'Handle_BG/Shadow_BG'):SetAlpha(CFG.nAlpha)
-	this:RegisterEvent('CTM_SET_ALPHA')
+	this:RegisterEvent('CTM_SET_VISIBLE')
 	this:RegisterEvent('CTM_SET_FOLD')
-	this:SetVisible(not MY_Cataclysm.bFold)
+	this:RegisterEvent('CTM_SET_ALPHA')
+	this:SetVisible(MY_Cataclysm.bVisible and not MY_Cataclysm.bFold)
 end
 
 function MY_CataclysmParty_Base.OnEvent(szEvent)
-	if szEvent == 'CTM_SET_ALPHA' then
+	if szEvent == 'CTM_SET_VISIBLE' or szEvent == 'CTM_SET_FOLD' then
+		this:SetVisible(MY_Cataclysm.bVisible and not MY_Cataclysm.bFold)
+	elseif szEvent == 'CTM_SET_ALPHA' then
 		this:Lookup('', 'Handle_BG/Shadow_BG'):SetAlpha(CFG.nAlpha)
-	elseif szEvent == 'CTM_SET_FOLD' then
-		this:SetVisible(not MY_Cataclysm.bFold)
 	end
 end
 
@@ -624,15 +625,6 @@ function CTM:GetPartyFrame(nIndex) -- 获得组队面板
 	return Station.Lookup('Normal/MY_CataclysmParty_' .. nIndex)
 end
 
-function CTM:SetVisible(bVisible)
-	MY_CataclysmMain.GetFrame():BringToTop()
-	for i = 0, CTM_GROUP_COUNT do
-		if self:GetPartyFrame(i) then
-			self:GetPartyFrame(i):SetVisible(bVisible)
-		end
-	end
-end
-
 function CTM:BringToTop()
 	MY_CataclysmMain.GetFrame():BringToTop()
 	for i = 0, CTM_GROUP_COUNT do
@@ -659,7 +651,7 @@ function CTM:CreatePanel(nIndex)
 			'MY_CataclysmParty_' .. nIndex
 		)
 		frame:Scale(CFG.fScaleX, CFG.fScaleY)
-		frame:SetVisible(not MY_Cataclysm.bFold)
+		frame:SetVisible(MY_Cataclysm.bVisible and not MY_Cataclysm.bFold)
 	end
 	self:AutoLinkAllPanel()
 	self:RefreshGroupText()
