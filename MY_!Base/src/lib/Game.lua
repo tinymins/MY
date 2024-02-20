@@ -5066,7 +5066,7 @@ do
 				}
 			end
 		end
-		if X.IsEmpty(tEquipInfo) then
+		if X.IsEmpty(tEquipInfo) and PEEK_PLAYER_EQUIP_STATE[player.dwID] ~= 'SUCCESS' then
 			PeekPlayer(player.dwID)
 			return
 		end
