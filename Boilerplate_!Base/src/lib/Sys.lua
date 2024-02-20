@@ -1870,7 +1870,7 @@ local PRESETS = {
 local function FormatModuleProxy(options, name)
 	local entries = {} -- entries
 	local interceptors = {} -- before trigger, return anything if want to intercept
-	local triggers = {} -- aftet trigger, will not be called while intercepted by interceptors
+	local triggers = {} -- after trigger, will not be called while intercepted by interceptors
 	if options then
 		local statics = {} -- static root
 		for _, option in ipairs(options) do
