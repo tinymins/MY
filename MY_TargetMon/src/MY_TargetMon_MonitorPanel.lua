@@ -412,6 +412,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 				MY_TARGET_MON_MAP_TYPE.MONSTER, -- 百战
 				MY_TARGET_MON_MAP_TYPE.MOBA, -- 列星虚境
 				MY_TARGET_MON_MAP_TYPE.HOMELAND, -- 家园
+				MY_TARGET_MON_MAP_TYPE.GUILD_TERRITORY, -- 帮会领地
 				MY_TARGET_MON_MAP_TYPE.ROGUELIKE, -- 八荒衡鉴
 			}) do
 				table.insert(t1, {

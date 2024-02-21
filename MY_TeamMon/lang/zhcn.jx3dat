@@ -47,6 +47,7 @@ return {
 	['Homeland data'] = '家园的数据',
 	['Roguelike data'] = '八荒衡鉴的数据',
 	['Competition data'] = '竞技地图的数据',
+	['Guild territory data'] = '帮会领地的数据',
 	['Recycle bin'] = '回收站',
 	['Recycle bin data'] = '回收站的数据',
 	['['] = '【',
