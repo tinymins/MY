@@ -4050,6 +4050,20 @@ function X.IsInHomelandMap()
 	return me and X.IsHomelandMap(me.GetMapID())
 end
 
+---判断地图是不是帮会地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是帮会地图
+function X.IsGuildTerritoryMap(dwMapID)
+	return dwMapID == 74
+end
+
+---判断当前地图是不是帮会地图
+---@return boolean @当前地图是否是帮会地图
+function X.IsInGuildTerritoryMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsGuildTerritoryMap(me.GetMapID())
+end
+
 do
 local ROGUELIKE_MAP = {}
 ---判断地图是不是八荒衡鉴地图
