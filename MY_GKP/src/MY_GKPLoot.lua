@@ -20,6 +20,7 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 X.RegisterRestriction('MY_GKPLoot.FastLoot', { ['*'] = true })
 X.RegisterRestriction('MY_GKPLoot.ForceLoot', { ['*'] = true })
+X.RegisterRestriction('MY_GKPLoot.ShowUndialogable', { ['*'] = true })
 --------------------------------------------------------------------------
 
 local DEBUG_LOOT = false -- 测试拾取分配 强制进入分配模式并最终不调用分配接口
@@ -429,7 +430,10 @@ end
 function D.OnFrameBreathe()
 	local nLFC = GetLogicFrameCount()
 	local me = X.GetClientPlayer()
-	local wnd = this:Lookup('Scroll_DoodadList/WndContainer_DoodadList'):LookupContent(0)
+	local container = this:Lookup('Scroll_DoodadList/WndContainer_DoodadList')
+	local wnd = container:LookupContent(0)
+	local bNeedFormat = false
+	local bHideUndialogable = X.IsInPubgMap() and not X.IsRestricted('MY_GKPLoot.ShowUndialogable')
 	while wnd do
 		local doodad = X.GetDoodad(wnd.dwDoodadID)
 		-- 拾取判定
@@ -445,6 +449,10 @@ function D.OnFrameBreathe()
 			end
 		end
 		wnd:Lookup('', 'Image_DoodadTitleBg'):SetFrame(bCanDialog and 0 or 3)
+		if bHideUndialogable and bCanDialog ~= wnd:IsVisible() then
+			wnd:SetVisible(bCanDialog)
+			bNeedFormat = true
+		end
 		-- 目标距离
 		local nDistance = 0
 		if me and doodad then
@@ -481,6 +489,9 @@ function D.OnFrameBreathe()
 		wnd:Lookup('', 'Handle_Compass/Image_PointGreen'):SetRelPos(nX, nY)
 		wnd:Lookup('', 'Handle_Compass'):FormatAllItemPos()
 		wnd = wnd:GetNext()
+	end
+	if bNeedFormat then
+		container:FormatAllContentPos()
 	end
 end
 
