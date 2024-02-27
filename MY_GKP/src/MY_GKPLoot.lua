@@ -433,7 +433,7 @@ function D.OnFrameBreathe()
 	local container = this:Lookup('Scroll_DoodadList/WndContainer_DoodadList')
 	local wnd = container:LookupContent(0)
 	local bNeedFormat = false
-	local bHideUndialogable = X.IsInPubgMap() and not X.IsRestricted('MY_GKPLoot.ShowUndialogable')
+	local bHideUndialogable = X.IsInPubgMap() and X.IsRestricted('MY_GKPLoot.ShowUndialogable')
 	while wnd do
 		local doodad = X.GetDoodad(wnd.dwDoodadID)
 		-- Ê°È¡ÅÐ¶¨
