@@ -719,6 +719,7 @@ end
 -------------------------------------------------
 
 function D.OnFrameDragSetPosEnd()
+	D.UpdateOfficialTeamSwitchPanel(true)
 	MY_CataclysmParty:AutoLinkAllPanel()
 end
 
@@ -996,7 +997,7 @@ function D.FrameBuffRefreshCall()
 end
 end
 
-function D.UpdateOfficialTeamSwitchPanel()
+function D.UpdateOfficialTeamSwitchPanel(bFollowCataclysm)
 	local frame = D.GetFrame()
 	if not frame then
 		return
@@ -1006,8 +1007,20 @@ function D.UpdateOfficialTeamSwitchPanel()
 	local chkSwitchControl = frmSwitch and frmSwitch:Lookup('Wnd_TeamSwitch/CheckBox_Control')
 	local bVisible = not imgSwitchTeam or not chkSwitchControl or (imgSwitchTeam:IsVisible() and chkSwitchControl:IsCheckBoxChecked()) or false
 	if bVisible and frmSwitch then
-		local nX, nY = frame:GetRelPos()
-		frmSwitch:SetRelPos(nX - frmSwitch:GetW(), nY)
+		if bFollowCataclysm then
+			local nX, nY = frame:GetRelPos()
+			nX = nX - frmSwitch:GetW()
+			if nX ~= frmSwitch:GetRelX() or nY ~= frmSwitch:GetRelY() then
+				frmSwitch:SetRelPos(nX, nY)
+			end
+		else
+			local nX, nY = frmSwitch:GetRelPos()
+			nX = nX + frmSwitch:GetW()
+			if nX ~= frame:GetRelX() or nY ~= frame:GetRelY() then
+				frame:SetRelPos(nX, nY)
+				MY_CataclysmParty:AutoLinkAllPanel()
+			end
+		end
 	end
 	if MY_Cataclysm.bVisible ~= bVisible then
 		MY_Cataclysm.bVisible = bVisible
