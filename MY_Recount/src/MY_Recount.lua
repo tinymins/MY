@@ -261,7 +261,7 @@ function D.GetMenu()
 		},
 	}
 
-	if MY_CombatLogs.GetOptionsMenu then
+	if MY_CombatLogs and MY_CombatLogs.GetOptionsMenu then
 		table.insert(t, MY_CombatLogs.GetOptionsMenu())
 	end
 
