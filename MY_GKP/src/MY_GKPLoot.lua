@@ -432,8 +432,7 @@ function D.OnFrameBreathe()
 	local me = X.GetClientPlayer()
 	local container = this:Lookup('Scroll_DoodadList/WndContainer_DoodadList')
 	local wnd = container:LookupContent(0)
-	local bNeedFormat = false
-	local bHideUndialogable = X.IsInPubgMap() and X.IsRestricted('MY_GKPLoot.ShowUndialogable')
+	local bRemoveUndialogable = X.IsInPubgMap() and X.IsRestricted('MY_GKPLoot.ShowUndialogable')
 	while wnd do
 		local doodad = X.GetDoodad(wnd.dwDoodadID)
 		-- 拾取判定
@@ -449,10 +448,6 @@ function D.OnFrameBreathe()
 			end
 		end
 		wnd:Lookup('', 'Image_DoodadTitleBg'):SetFrame(bCanDialog and 0 or 3)
-		if bHideUndialogable and bCanDialog ~= wnd:IsVisible() then
-			wnd:SetVisible(bCanDialog)
-			bNeedFormat = true
-		end
 		-- 目标距离
 		local nDistance = 0
 		if me and doodad then
@@ -488,10 +483,11 @@ function D.OnFrameBreathe()
 		local nY = nRadius - 3 - nRadius * math.sin(nRotate)
 		wnd:Lookup('', 'Handle_Compass/Image_PointGreen'):SetRelPos(nX, nY)
 		wnd:Lookup('', 'Handle_Compass'):FormatAllItemPos()
+		-- 移除不可交互的掉落
+		if bRemoveUndialogable and not bCanDialog then
+			D.RemoveLootList(wnd.dwDoodadID)
+		end
 		wnd = wnd:GetNext()
-	end
-	if bNeedFormat then
-		container:FormatAllContentPos()
 	end
 end
 
