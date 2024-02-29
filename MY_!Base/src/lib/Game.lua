@@ -3899,7 +3899,7 @@ end
 function X.GetCDProcessInfo(dwMapID, nProcessID)
 	if GetCDProcessInfo then
 		local aInfo = {}
-		for _, v in ipairs(GetCDProcessInfo(dwMapID, nProcessID)) do
+		for _, v in ipairs(GetCDProcessInfo(dwMapID, nProcessID) or X.CONSTANT.EMPTY_TABLE) do
 			table.insert(aInfo, {
 				dwBossIndex = v.BossIndex,
 				dwMapID = v.MapID,
