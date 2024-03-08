@@ -4140,6 +4140,17 @@ function X.IsInShieldedMap()
 	return me and X.IsShieldedMap(me.GetMapID())
 end
 
+---判断当前团队、房间切换状态
+---@return '"TEAM"' | '"ROOM"' @当前地图、房间切换激活标签
+function X.GetCurrentTeamSwitchType()
+	if TeamSwitchBtn_IsCheckRoom then
+		return TeamSwitchBtn_IsCheckRoom()
+			and 'ROOM'
+			or 'TEAM'
+	end
+	return 'TEAM'
+end
+
 -- 设置标记目标
 ---@param nMark number @标记索引
 ---@param dwID number @目标ID
