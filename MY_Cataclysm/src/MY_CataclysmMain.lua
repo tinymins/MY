@@ -697,6 +697,8 @@ function D.OnFrameCreate()
 	this:RegisterEvent('GVOICE_MIC_STATE_CHANGED')
 	this:RegisterEvent('GVOICE_SPEAKER_STATE_CHANGED')
 	this:RegisterEvent('ON_MY_MOSAICS_RESET')
+	this:RegisterEvent('ON_TEAMSWICTH_FRAMEDRAG')
+	this:RegisterEvent('TEAM_SWICTH_ROOM')
 	if X.GetClientPlayer() then
 		D.UpdateAnchor(this)
 		MY_CataclysmParty:AutoLinkAllPanel()
@@ -707,11 +709,6 @@ function D.OnFrameCreate()
 	D.CreateControlBar()
 	this:EnableDrag(CFG.bDrag)
 	this:SetVisible(MY_Cataclysm.bVisible)
-	X.BreatheCall('MY_CataclysmMain__TeamSwitchPanel', D.UpdateOfficialTeamSwitchPanel)
-end
-
-function D.OnFrameDestroy()
-	X.BreatheCall('MY_CataclysmMain__TeamSwitchPanel', false)
 end
 
 -------------------------------------------------
@@ -958,6 +955,10 @@ function D.OnEvent(szEvent)
 		D.CreateControlBar()
 	elseif szEvent == 'ON_MY_MOSAICS_RESET' then
 		D.ReloadCataclysmPanel()
+	elseif szEvent == 'ON_TEAMSWICTH_FRAMEDRAG' then
+		D.UpdateOfficialTeamSwitchPanel()
+	elseif szEvent == 'TEAM_SWICTH_ROOM' then
+		D.UpdateOfficialTeamSwitchPanel()
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)
 		MY_CataclysmParty:RefreshSFX()
@@ -1002,16 +1003,13 @@ function D.UpdateOfficialTeamSwitchPanel(bFollowCataclysm)
 	if not frame then
 		return
 	end
+	local bVisible = X.GetCurrentTeamSwitchType() == 'TEAM'
 	local frmSwitch = Station.Lookup('Normal/TeamSwitchBtn')
-	local imgSwitchTeam = frmSwitch and frmSwitch:Lookup('Wnd_TeamSwitch', 'Handle_Team/Image_Selected')
-	local chkSwitchControl = frmSwitch and frmSwitch:Lookup('Wnd_TeamSwitch/CheckBox_Control')
-	local bVisible = not imgSwitchTeam or not chkSwitchControl or (imgSwitchTeam:IsVisible() and chkSwitchControl:IsCheckBoxChecked()) or false
 	if bVisible and frmSwitch then
 		if bFollowCataclysm then
-			local nX, nY = frame:GetRelPos()
-			nX = nX - frmSwitch:GetW()
-			if nX ~= frmSwitch:GetRelX() or nY ~= frmSwitch:GetRelY() then
-				frmSwitch:SetRelPos(nX, nY)
+			if TeamSwitchBtn_SetAbsPos then
+				local nX, nY = frame:GetRelPos()
+				TeamSwitchBtn_SetAbsPos(nX, nY)
 			end
 		else
 			local nX, nY = frmSwitch:GetRelPos()
