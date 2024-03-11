@@ -147,6 +147,9 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 end
 
 X.RegisterEvent('LOADING_END', 'MY_BigWarChecker', function()
+	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+		return
+	end
 	local me = X.GetClientPlayer()
 	local dwMapID = me.GetMapID()
 	-- 分析大战本状态数据

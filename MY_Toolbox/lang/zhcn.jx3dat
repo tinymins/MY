@@ -145,7 +145,6 @@ return {
     ['MY_BigWarChecker'] = '大战提醒',
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大战还没交！',
     ['This map is big war map and you did not accepted the quest, is that correct?'] = '提示：检测到角色没有接受当前地图秘境大战系列任务！',
-    ['This map is bounty map and you did not accepted the quest, is that correct?'] = '提示：检测到角色没有接受当前地图秘境赏金系列任务！',
 
     -- MY_ArenaHelper
     ['MY_ArenaHelper'] = '名剑大会助手',
