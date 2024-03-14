@@ -88,6 +88,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY + 2, w = 'auto',
 		text = _L['Auto sync achievement on exit'],
+		checked = MY_JBAchievementSync.bAuto,
 		onCheck = function(bChecked)
 			MY_JBAchievementSync.bAuto = bChecked
 		end,
