@@ -1750,6 +1750,7 @@ end
 do
 local PRESETS = {
 	UIEvent = {
+		'___submodule',
 		'OnActivePage',
 		'OnBeforeNavigate',
 		'OnCheckBoxCheck',
