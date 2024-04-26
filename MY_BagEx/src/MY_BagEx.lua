@@ -233,9 +233,16 @@ local function Hook()
 	local frame = Station.Lookup('Normal/BigBankPanel')
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
+
+		local nX = 277
+		local img = Station.Lookup('Normal/BigBankPanel', 'Image_BagBox6')
+		if img then
+			nX = img:GetRelX() + img:GetW() + 5
+		end
+
 		X.UI(frame):Append('WndEditBox', {
 			name = 'WndEditBox_KeyWord',
-			w = 150, h = 21, x = 280, y = 80,
+			w = 150, h = 21, x = nX + 3, y = 80,
 			text = l_szBankFilter,
 			placeholder = _L['Search'],
 			onChange = function(txt)
@@ -250,7 +257,7 @@ local function Hook()
 
 		X.UI(frame):Append('WndCheckBox', {
 			name = 'WndCheckBox_Compare',
-			w = 100, x = 340, y = 56,
+			w = 100, x = nX + 63, y = 56,
 			text = _L['Compare with bag'],
 			checked = l_bCompareBank,
 			onCheck = function(bChecked)
@@ -264,7 +271,7 @@ local function Hook()
 
 		X.UI(frame):Append('WndCheckBox', {
 			name = 'CheckBox_TimeLtd',
-			w = 60, x = 277, y = 56, alpha = 200,
+			w = 60, x = nX, y = 56, alpha = 200,
 			text = _L['Time Limited'],
 			checked = l_bBankTimeLtd,
 			onCheck = function(bChecked)
@@ -297,9 +304,15 @@ local function Hook()
 			end,
 		})
 
+		local nY = 475
+		local btn = Station.Lookup('Normal/GuildBankPanel/Btn_Refresh')
+		if btn then
+			nY = btn:GetRelY()
+		end
+
 		X.UI('Normal/GuildBankPanel'):Append('WndCheckBox', {
 			name = 'WndCheckBox_Compare',
-			w = 100, x = 20, y = 475,
+			w = 100, x = 20, y = nY,
 			text = _L['Compare with bag'],
 			checked = l_bCompareGuild,
 			onCheck = function(bChecked)
