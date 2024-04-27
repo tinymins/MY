@@ -160,6 +160,9 @@ function D.HookPlayerViewPanel()
 	end
 	local txtName = mPage:Lookup('Page_Battle', 'Text_PlayerName')
 	if not txtName then
+		txtName = Station.Lookup('Normal/PersonalCard_ShowData/Wnd_Card/Wnd_Information', 'Handle_Player/Text_Name')
+	end
+	if not txtName then
 		return
 	end
 	local szName = txtName:GetText()
@@ -172,11 +175,31 @@ function D.HookPlayerViewPanel()
 			local pageset = frame:Lookup('Page_Main')
 			local checkbox = pageset:Lookup('CheckBox_Love')
 			local page = pageset:Lookup('Page_Love')
+			-- 计算checkbox的X值
+			local chk = mPage:GetFirstChild()
+			local aX, nW = {}, 78
+			while chk do
+				if chk:GetType() == 'WndCheckBox' then
+					table.insert(aX, chk:GetRelX())
+					nW = chk:GetW()
+				end
+				chk = chk:GetNext()
+			end
+			table.sort(aX, function(a, b) return b < a end)
+			local nX = #aX > 1 and (aX[1] - aX[2] + aX[1]) or 270
 			checkbox:ChangeRelation(mPage, true, true)
 			page:ChangeRelation(mPage, true, true)
 			X.UI.CloseFrame(frame)
-			checkbox:SetRelPos(270, 510)
-			page:SetRelPos(0, 0)
+			checkbox:SetRelPos(nX, 510)
+			checkbox:SetW(nW)
+			checkbox:Lookup('', 'Text_LoveCaptical'):SetW(nW)
+			-- 计算page的X值
+			local nX = 0
+			local hPageBattle = mPage:Lookup('Wnd_PageBattle', '')
+			if hPageBattle then
+				nX = hPageBattle:GetRelX()
+			end
+			page:SetRelPos(nX, 0)
 			mPage:AddPage(page, checkbox)
 			checkbox:Show()
 			mPage.bMYLoved = true
