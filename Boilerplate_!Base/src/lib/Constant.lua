@@ -753,6 +753,17 @@ local CONSTANT = {
 		SELL_LOOK_UP   = 3,
 		AVG_LOOK_UP    = 4,
 	}),
+	LOOT_ITEM_TYPE = _G.LOOT_ITEM_TYPE or X.SetmetaReadonly({
+		INVALID               = 0,
+		OWNER_LOOT            = 1,
+		OVER_TIME_LOOTER_FREE = 2,
+		ABSOLUTE_FREE         = 3,
+		LOOTER_FREE           = 4,
+		NEED_DISTRIBUTE       = 5,
+		NEED_ROLL             = 6,
+		NEED_BIDDING          = 7,
+		TOTAL                 = 8,
+	}),
 	TEAM_MARK,
 	TEAM_MARK_NAME = {
 		[TEAM_MARK.CLOUD] = _L['TEAM_MARK_CLOUD'],

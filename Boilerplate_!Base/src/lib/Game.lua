@@ -1858,6 +1858,59 @@ function X.InteractDoodad(dwID)
 	end)
 end
 
+-- 获取掉落拾取金钱数量
+---@param dwDoodadID number @掉落拾取ID
+---@return number @掉落拾取金钱数量
+function X.GetDoodadLootMoney(dwDoodadID)
+	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+		local me = X.GetClientPlayer()
+		local scene = me and me.GetScene()
+		return scene and scene.GetLootMoney(dwDoodadID)
+	else
+		local doodad = X.GetDoodad(dwDoodadID)
+		return doodad and doodad.GetLootMoney()
+	end
+end
+
+-- 获取掉落拾取物品数量
+---@param dwDoodadID number @掉落拾取ID
+---@return number @掉落拾取物品数量
+function X.GetDoodadLootItemCount(dwDoodadID)
+	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+		local me = X.GetClientPlayer()
+		local scene = me and me.GetScene()
+		local aLoot = scene and scene.GetLootList(dwDoodadID)
+		return aLoot and #aLoot + 1 or nil
+	else
+		local doodad = X.GetDoodad(dwDoodadID)
+		return doodad and doodad.GetItemListCount()
+	end
+end
+
+-- 获取掉落拾取物品
+---@param dwDoodadID number @掉落拾取ID
+---@return KItem,boolean,boolean,boolean @掉落拾取物品,是否需要Roll点,是否需要分配,是否需要拍卖
+function X.GetDoodadLootItem(dwDoodadID, nIndex)
+	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+		local me = X.GetClientPlayer()
+		local scene = me and me.GetScene()
+		local aLoot = scene and scene.GetLootList(dwDoodadID)
+		local it = aLoot and aLoot[nIndex - 1]
+		if it then
+			local bNeedRoll = it.LootType == X.CONSTANT.LOOT_ITEM_TYPE.NEED_ROLL
+			local bDist = it.LootType == X.CONSTANT.LOOT_ITEM_TYPE.NEED_DISTRIBUTE
+			local bBidding = it.LootType == X.CONSTANT.LOOT_ITEM_TYPE.NEED_BIDDING
+			return it.Item, bNeedRoll, bDist, bBidding
+		end
+	else
+		local me = X.GetClientPlayer()
+		local doodad = X.GetDoodad(dwDoodadID)
+		if doodad then
+			return doodad.GetLootItem(nIndex - 1, me)
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 -- 角色信息相关接口
 --------------------------------------------------------------------------------
