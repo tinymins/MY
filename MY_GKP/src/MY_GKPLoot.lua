@@ -1887,7 +1887,7 @@ local function GetItemDataType(data)
 end
 
 function D.GetItemData(me, d, i)
-	local item, bNeedRoll, bDist, bBidding = d.GetLootItem(i, me)
+	local item, bNeedRoll, bDist, bBidding = X.GetDoodadLootItem(d.dwID, i)
 	if item then
 		-- itemData
 		local data = {
@@ -1933,8 +1933,8 @@ function D.GetDoodadLootInfo(dwID)
 	local bSpecial = false
 	local nMoney, szName = 0, ''
 	if me and d then
-		local nLootItemCount = d.GetItemListCount()
-		for i = 0, nLootItemCount - 1 do
+		local nLootItemCount = X.GetDoodadLootItemCount(dwID) or 0
+		for i = 1, nLootItemCount do
 			local data = D.GetItemData(me, d, i)
 			if data then
 				if data.bSpecial then
@@ -1943,7 +1943,7 @@ function D.GetDoodadLootInfo(dwID)
 				table.insert(aItemData, data)
 			end
 		end
-		nMoney = d.GetLootMoney() or 0
+		nMoney = X.GetDoodadLootMoney(dwID) or 0
 		szName = d.szName
 	end
 	table.sort(aItemData, LootItemSorter)
@@ -2004,8 +2004,7 @@ X.RegisterEvent('OPEN_DOODAD', function()
 	if arg1 ~= X.GetClientPlayerID() then
 		return
 	end
-	local doodad = X.GetDoodad(arg0)
-	local nM = doodad.GetLootMoney() or 0
+	local nM = X.GetDoodadLootMoney(arg0) or 0
 	if nM > 0 then
 		LootMoney(arg0)
 		PlaySound(SOUND.UI_SOUND, g_sound.PickupMoney)

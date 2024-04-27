@@ -357,12 +357,12 @@ function D.OnOpenDoodad()
 	if D.bEnable or D.bReachLimit then
 		local d = X.GetDoodad(D.dwDoodadID)
 		if d and d.szName == TAOGUAN then
-			local nQ, nM, me = 1, d.GetLootMoney(), X.GetClientPlayer()
+			local nQ, nM = 1, X.GetDoodadLootMoney(D.dwDoodadID)
 			if nM > 0 then
 				LootMoney(d.dwID)
 			end
-			for i = 0, 31 do
-				local it, bRoll, bDist = d.GetLootItem(i, me)
+			for i = 1, 32 do
+				local it, bRoll, bDist = X.GetDoodadLootItem(D.dwDoodadID, i)
 				if not it then
 					break
 				end
