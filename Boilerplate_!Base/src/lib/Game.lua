@@ -1879,8 +1879,8 @@ function X.GetDoodadLootItemCount(dwDoodadID)
 	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
 		local me = X.GetClientPlayer()
 		local scene = me and me.GetScene()
-		local aLoot = scene and scene.GetLootList(dwDoodadID)
-		return aLoot and #aLoot + 1 or nil
+		local tLoot = scene and scene.GetLootList(dwDoodadID)
+		return tLoot and tLoot.nItemCount or nil
 	else
 		local doodad = X.GetDoodad(dwDoodadID)
 		return doodad and doodad.GetItemListCount()
@@ -1894,8 +1894,8 @@ function X.GetDoodadLootItem(dwDoodadID, nIndex)
 	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
 		local me = X.GetClientPlayer()
 		local scene = me and me.GetScene()
-		local aLoot = scene and scene.GetLootList(dwDoodadID)
-		local it = aLoot and aLoot[nIndex - 1]
+		local tLoot = scene and scene.GetLootList(dwDoodadID)
+		local it = tLoot and tLoot[nIndex - 1]
 		if it then
 			local bNeedRoll = it.LootType == X.CONSTANT.LOOT_ITEM_TYPE.NEED_ROLL
 			local bDist = it.LootType == X.CONSTANT.LOOT_ITEM_TYPE.NEED_DISTRIBUTE
