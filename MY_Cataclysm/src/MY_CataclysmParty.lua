@@ -520,7 +520,7 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 		local t = {}
 		InsertTargetMenu(t, dwID)
 		for _, v in ipairs(t) do
-			if v.szOption == g_tStrings.LOOKUP_INFO then
+			if v.szOption == g_tStrings.LOOKUP_INFO or v.szOption == g_tStrings.STR_LOOKUP_MORE then
 				for _, vv in ipairs(v) do
 					if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then -- ∆Ê—®
 						table.insert(menu, vv)
