@@ -884,22 +884,8 @@ end
 -- (void) X.SwitchChatChannel(number nChannel)
 -- (void) X.SwitchChatChannel(string szHeader)
 -- (void) X.SwitchChatChannel(string szName)
-do
-local TALK_CHANNEL_HEADER = {
-	[PLAYER_TALK_CHANNEL.NEARBY] = '/s ',
-	[PLAYER_TALK_CHANNEL.FRIENDS] = '/o ',
-	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = '/a ',
-	[PLAYER_TALK_CHANNEL.TEAM] = '/p ',
-	[PLAYER_TALK_CHANNEL.RAID] = '/t ',
-	[PLAYER_TALK_CHANNEL.BATTLE_FIELD] = '/b ',
-	[PLAYER_TALK_CHANNEL.TONG] = '/g ',
-	[PLAYER_TALK_CHANNEL.SENCE] = '/y ',
-	[PLAYER_TALK_CHANNEL.FORCE] = '/f ',
-	[PLAYER_TALK_CHANNEL.CAMP] = '/c ',
-	[PLAYER_TALK_CHANNEL.WORLD] = '/h ',
-}
 function X.SwitchChatChannel(nChannel)
-	local szHeader = TALK_CHANNEL_HEADER[nChannel]
+	local szHeader = X.CONSTANT.PLAYER_TALK_CHANNEL_HEADER[nChannel]
 	if szHeader then
 		SwitchChatChannel(szHeader)
 	elseif nChannel == PLAYER_TALK_CHANNEL.WHISPER then
@@ -926,7 +912,6 @@ function X.SwitchChatChannel(nChannel)
 			SwitchChatChannel('/w ' .. string.gsub(nChannel,'[%[%]]','') .. ' ')
 		end
 	end
-end
 end
 
 do
