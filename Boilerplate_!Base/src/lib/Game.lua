@@ -1930,6 +1930,24 @@ function X.DistributeDoodadItem(dwDoodadID, dwItemID, dwTargetPlayerID)
 	end
 end
 
+-- 获取掉落可拾取玩家列表
+---@param dwDoodadID number @掉落拾取ID
+---@return number[] @可拾取玩家列表
+function X.GetDoodadLooterList(dwDoodadID)
+	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+		local me = X.GetClientPlayer()
+		local scene = me and me.GetScene()
+		if scene then
+			return scene.GetLooterList(dwDoodadID)
+		end
+	else
+		local doodad = X.GetDoodad(dwDoodadID)
+		if doodad then
+			return doodad.GetLooterList()
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 -- 角色信息相关接口
 --------------------------------------------------------------------------------
