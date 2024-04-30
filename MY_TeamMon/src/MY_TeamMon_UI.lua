@@ -653,7 +653,7 @@ function D.OnItemRButtonClick()
 			end
 		end })
 		table.insert(menu, { bDevide = true })
-		table.insert(menu, { szOption = g_tStrings.STR_FRIEND_DEL, rgb = { 255, 0, 0 }, fnAction = function()
+		table.insert(menu, { szOption = _L['Delete'], rgb = { 255, 0, 0 }, fnAction = function()
 			D.RemoveData(t.dwMapID, t.nIndex, name)
 		end })
 		PopupMenu(menu)
@@ -3371,7 +3371,7 @@ function D.OpenSettingPanel(data, szType)
 	-- }):Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 335, y = nY + 10,
-		text = g_tStrings.STR_FRIEND_DEL, color = { 255, 0, 0 },
+		text = _L['Delete'], color = { 255, 0, 0 },
 		buttonStyle = 'FLAT',
 		onClick = function()
 			X.Confirm(_L['Sure to delete?'], function()
