@@ -1458,42 +1458,31 @@ function X.GetChatChannelDailyLimit(nLevel, nChannel)
 end
 end
 
-function X.GetMsgTypeMenu(fnAction, tChecked)
-	local t = {}
-	for _, cg in ipairs(X.CONSTANT.MSG_TYPE_MENU) do
-		local t1 = { szOption = cg.szCaption }
-		if cg.tChannels[1] then
-			for _, szChannel in ipairs(cg.tChannels) do
-				table.insert(t1,{
-					szOption = g_tStrings.tChannelName[szChannel],
-					rgb = GetMsgFontColor(szChannel, true),
-					UserData = szChannel,
-					fnAction = fnAction,
-					bCheck = true,
-					bChecked = tChecked[szChannel],
-				})
-			end
-		else
-			for szPrefix, tChannels in pairs(cg.tChannels) do
-				if #t1 > 0 then
-					table.insert(t1,{ bDevide = true })
-				end
-				table.insert(t1,{ szOption = szPrefix, bDisable = true })
-				for _, szChannel in ipairs(tChannels) do
-					table.insert(t1,{
-						szOption = g_tStrings.tChannelName[szChannel],
-						rgb = GetMsgFontColor(szChannel, true),
-						UserData = szChannel,
-						fnAction = fnAction,
-						bCheck = true,
-						bChecked = tChecked[szChannel],
-					})
-				end
-			end
+local function GenerateMsgTypeMenu(node, fnAction, tChecked)
+	local t = { szOption = node.szOption }
+	for _, v in ipairs(node) do
+		if X.IsString(v) then
+			table.insert(t, {
+				szOption = g_tStrings.tChannelName[v],
+				rgb = GetMsgFontColor(v, true),
+				UserData = v,
+				fnAction = fnAction,
+				bCheck = true,
+				bChecked = tChecked[v],
+			})
+		elseif X.IsTable(v) then
+			table.insert(t, GenerateMsgTypeMenu(v, fnAction, tChecked))
 		end
-		table.insert(t, t1)
 	end
 	return t
+end
+
+function X.GetMsgTypeMenu(fnAction, tChecked)
+	return GenerateMsgTypeMenu(
+		X.CONSTANT.MSG_TYPE_MENU,
+		fnAction,
+		tChecked or X.CONSTANT.EMPTY_TABLE
+	)
 end
 
 -----------------------------------------------------------------------------------------
