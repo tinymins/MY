@@ -155,10 +155,7 @@ X.RegisterEvent('MY_LOVE_OTHER_UPDATE', D.UpdatePage)
 -- 查看别人装备、情缘
 function D.HookPlayerViewPanel()
 	local mPage = Station.Lookup('Normal/PlayerView/Page_Main')
-	if not mPage then
-		return
-	end
-	local txtName = mPage:Lookup('Page_Battle', 'Text_PlayerName')
+	local txtName = mPage and mPage:Lookup('Page_Battle', 'Text_PlayerName')
 	if not txtName then
 		txtName = Station.Lookup('Normal/PersonalCard_ShowData/Wnd_Card/Wnd_Information', 'Handle_Player/Text_Name')
 	end
@@ -167,6 +164,16 @@ function D.HookPlayerViewPanel()
 	end
 	local szName = txtName:GetText()
 	local dwID = O.tID2Name[szName]
+	-- 常驻时钟监听角色名刷新 防止过快获取错误信息
+	X.BreatheCall('MY_Love__PV__HookPlayerViewPanel', function()
+		if X.IsElement(txtName) then
+			if txtName:GetText() ~= szName then
+				D.HookPlayerViewPanel()
+			end
+			return
+		end
+		X.BreatheCall('MY_Love__PV__HookPlayerViewPanel', false)
+	end, 200)
 	local bHook = MY_Love.bHookPlayerView and dwID and not IsRemotePlayer(dwID) and not MY_Love.IsShielded()
 	-- attach page
 	if bHook then
@@ -278,17 +285,20 @@ function D.HookPlayerViewPanel()
 end
 
 function D.OnPeekOtherPlayer()
-	if arg0 ~= 1 or IsRemotePlayer(arg1) then
+	local nResult, dwPlayerID = arg0, arg1
+	if nResult ~= 1 or IsRemotePlayer(dwPlayerID) then
 		return
 	end
-	local tar = X.GetPlayer(arg1)
+	local tar = X.GetPlayer(dwPlayerID)
 	if not tar then
 		return
 	end
-	O.tID2Name[tar.szName] = arg1
+	O.tID2Name[tar.szName] = dwPlayerID
 	D.HookPlayerViewPanel()
 end
 X.RegisterEvent('PEEK_OTHER_PLAYER', 'MY_Love__PV', D.OnPeekOtherPlayer)
+X.RegisterFrameCreate('PlayerView', 'MY_Love__PV', D.HookPlayerViewPanel)
+X.RegisterFrameCreate('PersonalCard_ShowData', 'MY_Love__PV', D.HookPlayerViewPanel)
 
 function D.OnActiveLoveChange()
 	O.tActiveLove[arg0] = arg1 and true or nil
