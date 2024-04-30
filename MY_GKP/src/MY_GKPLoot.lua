@@ -1292,7 +1292,7 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 		if DEBUG_LOOT then
 			return X.Sysmsg('LOOT: ' .. info.dwID .. '->' .. dwID) -- !!! Debug
 		end
-		doodad.DistributeItem(info.dwID, dwID)
+		X.DistributeDoodadItem(doodad.dwID, info.dwID, dwID)
 	else
 		X.Sysmsg(_L['Userdata is overdue, distribut failed, please try again.'])
 	end
