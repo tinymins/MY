@@ -725,6 +725,20 @@ local CONSTANT = {
 		return CollectMsgType(MSG_TYPE_MENU)
 	end)(),
 	MSG_TYPE_MENU = MSG_TYPE_MENU,
+	PLAYER_TALK_CHANNEL_HEADER = KvpToObject({
+		{ PLAYER_TALK_CHANNEL.NEARBY       , '/s '  },
+		{ PLAYER_TALK_CHANNEL.FRIENDS      , '/o '  },
+		{ PLAYER_TALK_CHANNEL.TONG_ALLIANCE, '/a '  },
+		{ PLAYER_TALK_CHANNEL.TEAM         , '/p '  },
+		{ PLAYER_TALK_CHANNEL.RAID         , '/t '  },
+		{ PLAYER_TALK_CHANNEL.ROOM         , '/gr ' },
+		{ PLAYER_TALK_CHANNEL.BATTLE_FIELD , '/b '  },
+		{ PLAYER_TALK_CHANNEL.TONG         , '/g '  },
+		{ PLAYER_TALK_CHANNEL.SENCE        , '/y '  },
+		{ PLAYER_TALK_CHANNEL.FORCE        , '/f '  },
+		{ PLAYER_TALK_CHANNEL.CAMP         , '/c '  },
+		{ PLAYER_TALK_CHANNEL.WORLD        , '/h '  },
+	}),
 	INVENTORY_INDEX = INVENTORY_INDEX,
 	INVENTORY_EQUIP_LIST = {
 		INVENTORY_INDEX.EQUIP,
