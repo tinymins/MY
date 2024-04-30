@@ -1191,7 +1191,7 @@ function D.GetaPartyMember(aDoodadID)
 		if not tDoodadID[dwDoodadID] then
 			local doodad = X.GetDoodad(dwDoodadID)
 			if doodad then
-				local aLooterList = doodad.GetLooterList()
+				local aLooterList = X.GetDoodadLooterList(dwDoodadID)
 				if aLooterList then
 					for _, p in ipairs(aLooterList) do
 						if not tPartyMember[p.dwID] then
