@@ -74,10 +74,21 @@ local LOG_TYPE = {
 	{ szKey = 'guild_a', szTitle = g_tStrings.tChannelName['MSG_GUILD_ALLIANCE'], aChannel = {'MSG_GUILD_ALLIANCE'} },
 	{ szKey = 'death'  , szTitle = _L['Death Log'], aChannel = {'MSG_SELF_DEATH', 'MSG_SELF_KILL', 'MSG_PARTY_DEATH', 'MSG_PARTY_KILL'} },
 	{
-		szKey = 'journal', szTitle = _L['Journal Log'], aChannel = {
-			'MSG_MONEY', 'MSG_ITEM', --'MSG_EXP', 'MSG_REPUTATION', 'MSG_CONTRIBUTE', 'MSG_ATTRACTION', 'MSG_PRESTIGE',
-			-- 'MSG_TRAIN', 'MSG_MENTOR_VALUE', 'MSG_THEW_STAMINA', 'MSG_TONG_FUND'
-		},
+		szKey = 'journal', szTitle = _L['Journal Log'], aChannel = (function()
+			for _, v in ipairs(X.CONSTANT.MSG_TYPE_MENU) do
+				if v.szOption == g_tStrings.EARN then
+					local a = {}
+					for _, vv in ipairs(v) do
+						table.insert(a, vv)
+					end
+					return a
+				end
+			end
+			return {
+				'MSG_MONEY', 'MSG_ITEM', --'MSG_EXP', 'MSG_REPUTATION', 'MSG_CONTRIBUTE', 'MSG_ATTRACTION', 'MSG_PRESTIGE',
+				-- 'MSG_TRAIN', 'MSG_MENTOR_VALUE', 'MSG_THEW_STAMINA', 'MSG_TONG_FUND'
+			}
+		end)(),
 	},
 	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aChannel = {'MSG_MY_MONITOR'} },
 }
