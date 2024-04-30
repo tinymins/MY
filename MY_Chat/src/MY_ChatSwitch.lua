@@ -145,7 +145,6 @@ local CHANNEL_LIST = {
 	{ -- 说
 		id = 'nearby',
 		title = _L['SAY'],
-		head = '/s ',
 		channel = PLAYER_TALK_CHANNEL.NEARBY,
 		cd = 0,
 		color = {255, 255, 255},
@@ -153,7 +152,6 @@ local CHANNEL_LIST = {
 	{ -- 地
 		id = 'sence',
 		title = _L['MAP'],
-		head = '/y ',
 		channel = PLAYER_TALK_CHANNEL.SENCE,
 		cd = 10,
 		color = {255, 126, 126},
@@ -161,7 +159,6 @@ local CHANNEL_LIST = {
 	{ -- 世
 		id = 'world',
 		title = _L['WORLD'],
-		head = '/h ',
 		channel = PLAYER_TALK_CHANNEL.WORLD,
 		cd = 60,
 		color = {252, 204, 204},
@@ -169,7 +166,6 @@ local CHANNEL_LIST = {
 	{ -- 队
 		id = 'team',
 		title = _L['PARTY'],
-		head = '/p ',
 		channel = PLAYER_TALK_CHANNEL.TEAM,
 		cd = 0,
 		color = {140, 178, 253},
@@ -177,15 +173,20 @@ local CHANNEL_LIST = {
 	{ -- 团
 		id = 'raid',
 		title = _L['TEAM'],
-		head = '/t ',
 		channel = PLAYER_TALK_CHANNEL.RAID,
+		cd = 0,
+		color = { 73, 168, 241},
+	},
+	{ -- 房
+		id = 'room',
+		title = _L['ROOM'],
+		channel = PLAYER_TALK_CHANNEL.ROOM,
 		cd = 0,
 		color = { 73, 168, 241},
 	},
 	{ -- 战
 		id = 'battle_field',
 		title = _L['BATTLE'],
-		head = '/b ',
 		channel = PLAYER_TALK_CHANNEL.BATTLE_FIELD,
 		cd = 0,
 		color = {255, 126, 126},
@@ -193,7 +194,6 @@ local CHANNEL_LIST = {
 	{ -- 帮
 		id = 'tong',
 		title = _L['FACTION'],
-		head = '/g ',
 		channel = PLAYER_TALK_CHANNEL.TONG,
 		cd = 0,
 		color = {  0, 200,  72},
@@ -201,7 +201,6 @@ local CHANNEL_LIST = {
 	{ -- 派
 		id = 'force',
 		title = _L['SCHOOL'],
-		head = '/f ',
 		channel = PLAYER_TALK_CHANNEL.FORCE,
 		cd = 20,
 		color = {  0, 255, 255},
@@ -209,7 +208,6 @@ local CHANNEL_LIST = {
 	{ -- 阵
 		id = 'camp',
 		title = _L['CAMP'],
-		head = '/c ',
 		channel = PLAYER_TALK_CHANNEL.CAMP,
 		cd = 30,
 		color = {155, 230,  58},
@@ -217,7 +215,6 @@ local CHANNEL_LIST = {
 	{ -- 友
 		id = 'friends',
 		title = _L['FRIEND'],
-		head = '/o ',
 		channel = PLAYER_TALK_CHANNEL.FRIENDS,
 		cd = 10,
 		color = {241, 114, 183},
@@ -225,7 +222,6 @@ local CHANNEL_LIST = {
 	{ -- 盟
 		id = 'tong_alliance',
 		title = _L['ALLIANCE'],
-		head = '/a ',
 		channel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE,
 		cd = 0,
 		color = {178, 240, 164},
@@ -468,20 +464,20 @@ function D.OnFrameCreate()
 	for i, v in ipairs(CHANNEL_LIST) do
 		if O.tChennalVisible[v.id] ~= false then
 			local wnd, chk, txtTitle, txtCooldown, shaCount
-			if v.head then
-				wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Channel')
-				chk = wnd:Lookup('WndRadioChannel')
-				txtTitle = chk:Lookup('', 'Text_Channel')
-				txtCooldown = chk:Lookup('', 'Text_CD')
-				shaCount = chk:Lookup('', 'Shadow_Count')
-				chk.OnCheckBoxCheck = OnChannelCheck
-			elseif v.onClick then
+			if v.onClick then
 				wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Channel')
 				chk = wnd:Lookup('WndRadioChannel')
 				txtTitle = chk:Lookup('', 'Text_Channel')
 				txtCooldown = chk:Lookup('', 'Text_CD')
 				shaCount = chk:Lookup('', 'Shadow_Count')
 				chk.OnCheckBoxCheck = v.onClick
+			elseif v.channel and X.CONSTANT.PLAYER_TALK_CHANNEL_HEADER[v.channel] then
+				wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_Channel')
+				chk = wnd:Lookup('WndRadioChannel')
+				txtTitle = chk:Lookup('', 'Text_Channel')
+				txtCooldown = chk:Lookup('', 'Text_CD')
+				shaCount = chk:Lookup('', 'Shadow_Count')
+				chk.OnCheckBoxCheck = OnChannelCheck
 			else
 				wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_CheckBox')
 				chk = wnd:Lookup('WndCheckBox')

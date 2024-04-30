@@ -13,6 +13,7 @@ return {
     ['WORLD']    = '世',
     ['PARTY']    = '隊',
     ['TEAM']     = '團',
+    ['ROOM']     = '房',
     ['BATTLE']   = '戰',
     ['FACTION']  = '幫',
     ['SCHOOL']   = '派',
