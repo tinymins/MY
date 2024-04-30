@@ -69,6 +69,7 @@ local LOG_TYPE = {
 	{ szKey = 'whisper', szTitle = g_tStrings.tChannelName['MSG_WHISPER'], aChannel = {'MSG_WHISPER', 'MSG_SSG_WHISPER'} },
 	{ szKey = 'party'  , szTitle = g_tStrings.tChannelName['MSG_PARTY'], aChannel = {'MSG_PARTY'} },
 	{ szKey = 'team'   , szTitle = g_tStrings.tChannelName['MSG_TEAM'], aChannel = {'MSG_TEAM'} },
+	{ szKey = 'room'   , szTitle = g_tStrings.tChannelName['MSG_ROOM'], aChannel = {'MSG_ROOM'} },
 	{ szKey = 'friend' , szTitle = g_tStrings.tChannelName['MSG_FRIEND'], aChannel = {'MSG_FRIEND'} },
 	{ szKey = 'guild'  , szTitle = g_tStrings.tChannelName['MSG_GUILD'], aChannel = {'MSG_GUILD'} },
 	{ szKey = 'guild_a', szTitle = g_tStrings.tChannelName['MSG_GUILD_ALLIANCE'], aChannel = {'MSG_GUILD_ALLIANCE'} },
@@ -92,10 +93,15 @@ local LOG_TYPE = {
 	},
 	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aChannel = {'MSG_MY_MONITOR'} },
 }
+for i, v in X.ipairs_r(LOG_TYPE) do
+	if not v or not v.szTitle then
+		table.remove(LOG_TYPE, i)
+	end
+end
 local LOG_LIMIT = (X.ENVIRONMENT.GAME_PROVIDER == 'remote' and not X.IsDebugClient())
 	and {
 		{ aKey = {'whisper'}, nLimit = 5000 },
-		{ aKey = {'party', 'team'}, nLimit = 5000 },
+		{ aKey = {'party', 'team', 'room'}, nLimit = 5000 },
 		{ aKey = {'friend'}, nLimit = 5000 },
 		{ aKey = {'guild', 'guild_a'}, nLimit = 1000 },
 		{ aKey = {'death', 'journal'}, nLimit = 1000 },
