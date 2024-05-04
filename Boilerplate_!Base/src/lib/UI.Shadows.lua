@@ -89,9 +89,12 @@ function X.UI.GetShadowHandle(szName)
 		X.Debug('UI', 'Create sh # ' .. szName, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		sh = frame:Lookup('', szName)
+	end
+	if not sh.bInit then
 		for k, v in pairs(SH_FUNC) do
 			sh[k] = v
 		end
+		sh.bInit = true
 	end
 	return sh
 end
