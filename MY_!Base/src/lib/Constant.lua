@@ -180,7 +180,7 @@ local TEAM_MARK = {
 	FAN   = 10,
 }
 
-local MSG_TYPE_MENU = _G.CHANNEL_POPUP_SETTING_TABLE or {
+local MSG_TYPE_MENU = X.Clone(_G.CHANNEL_POPUP_SETTING_TABLE) or {
 	{
 		szOption = g_tStrings.CHANNEL,
 		'MSG_NORMAL', 'MSG_PARTY', 'MSG_MAP', 'MSG_BATTLE_FILED', 'MSG_GUILD',
@@ -234,6 +234,7 @@ local MSG_TYPE_MENU = _G.CHANNEL_POPUP_SETTING_TABLE or {
 		'MSG_NPC_NEARBY', 'MSG_NPC_YELL', 'MSG_NPC_PARTY', 'MSG_NPC_WHISPER', 'MSG_NPC_FACE',
 	},
 }
+table.insert(MSG_TYPE_MENU[1], 1, 'MSG_SYS')
 
 local CONSTANT = {
 	MENU_DIVIDER = X.SetmetaReadonly({ bDevide = true }),
