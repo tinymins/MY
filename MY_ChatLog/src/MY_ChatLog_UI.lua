@@ -87,6 +87,30 @@ function MY_ChatLog_UI.OnEvent(event)
 	end
 end
 
+function MY_ChatLog_UI.OnMouseIn()
+	local name = this:GetName()
+	if name == 'Wnd_ChatChannel' then
+		local szText = ''
+		for _, szChannel in ipairs(this.aChannel) do
+			local szChannelName = g_tStrings.tChannelName[szChannel]
+			if IsCtrlKeyDown() then
+				szChannelName = (szChannelName or '') .. '(' .. szChannel .. ')'
+			end
+			if szChannelName then
+				szText = szText .. GetFormatText(szChannelName .. '\n', 162, GetMsgFontColor(szChannel))
+			end
+		end
+		X.OutputTip(this, szText, true, X.UI.TIP_POSITION.LEFT_RIGHT)
+	end
+end
+
+function MY_ChatLog_UI.OnMouseOut()
+	local name = this:GetName()
+	if name == 'Wnd_ChatChannel' then
+		X.HideTip()
+	end
+end
+
 function MY_ChatLog_UI.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
