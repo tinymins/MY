@@ -180,7 +180,7 @@ local TEAM_MARK = {
 	FAN   = 10,
 }
 
-local MSG_TYPE_MENU = X.Clone(_G.CHANNEL_POPUP_SETTING_TABLE) or {
+local MSG_TYPE_MENU = X.Clone(_G.UI_CHANNEL_POPUP_SETTING_TABLE) or {
 	{
 		szOption = g_tStrings.CHANNEL,
 		'MSG_NORMAL', 'MSG_PARTY', 'MSG_MAP', 'MSG_BATTLE_FILED', 'MSG_GUILD',
