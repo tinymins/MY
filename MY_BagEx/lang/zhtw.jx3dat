@@ -1,6 +1,12 @@
 return {
     ['MY_BagEx'] = '背包助手',
 
+    -- MY_BagEx_GenericFilters.lua --
+    ['Search'] = '搜索',
+    ['Time Limited'] = '限時',
+    ['Generic package searcher and filters'] = '背包、倉庫搜索與對比',
+    ['Compare with bag'] = '對比背包',
+
     -- MY_BagEx_Bag.lua --
     ['Bag package sort and stack'] = '背包整理與堆疊',
 
@@ -30,10 +36,4 @@ return {
 
     -- MY_BagEx_GuildBankStack.lua --
     ['Stack'] = '堆疊',
-
-    -- MY_BagEx_BagBankFilters.lua --
-    ['Search'] = '搜索',
-    ['Time Limited'] = '限時',
-    ['Package searcher'] = '背包倉庫搜索',
-    ['Compare with bag'] = '對比背包',
 }

@@ -411,7 +411,7 @@ end
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
-		text = _L['Package searcher'],
+		text = _L['Generic package searcher and filters'],
 		checked = O.bEnable,
 		onCheck = function(bChecked)
 			D.Enable(bChecked)
