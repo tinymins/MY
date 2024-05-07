@@ -126,16 +126,31 @@ function D.SortBag()
 	if nItemCount == 0 then
 		return
 	end
+	-- 避开锁定格子
+	local aMovableInfo = {}
+	for i, info in ipairs(aInfo) do
+		local tPos = aBagPos[i]
+		if not MY_BagEx_Bag.IsItemBoxLocked(tPos.dwBox, tPos.dwX) then
+			table.insert(aMovableInfo, info)
+		end
+	end
 	-- 排序格子列表
 	if IsShiftKeyDown() then
-		for i = 1, #aInfo do
-			local j = X.Random(1, #aInfo)
+		for i = 1, #aMovableInfo do
+			local j = X.Random(1, #aMovableInfo)
 			if i ~= j then
-				aInfo[i], aInfo[j] = aInfo[j], aInfo[i]
+				aMovableInfo[i], aMovableInfo[j] = aMovableInfo[j], aMovableInfo[i]
 			end
 		end
 	else
-		table.sort(aInfo, D.ItemSorter)
+		table.sort(aMovableInfo, D.ItemSorter)
+	end
+	-- 合成避开锁定格子后的排序结果
+	for i, _ in X.ipairs_r(aInfo) do
+		local tPos = aBagPos[i]
+		if not MY_BagEx_Bag.IsItemBoxLocked(tPos.dwBox, tPos.dwX) then
+			aInfo[i] = table.remove(aMovableInfo)
+		end
 	end
 	-- 结束清理环境、恢复控件状态
 	local function fnFinish()
@@ -167,7 +182,7 @@ function D.SortBag()
 						local dwBox1, dwX1 = tBagPos1.dwBox, tBagPos1.dwX
 						local item1 = GetPlayerItem(me, dwBox1, dwX1)
 						-- 匹配到用于交换的格子
-						if not item1 or item1.nUiId ~= item.nUiId then
+						if not MY_BagEx_Bag.IsItemBoxLocked(dwBox1, dwX1) and (not item1 or item1.nUiId ~= item.nUiId) then
 							szState = 'Exchanging'
 							if item then
 								--[[#DEBUG BEGIN]]
@@ -192,7 +207,7 @@ function D.SortBag()
 					local dwBox1, dwX1 = tBagPos1.dwBox, tBagPos1.dwX
 					local item1 = GetPlayerItem(me, dwBox1, dwX1)
 					-- 匹配到预期物品所在位置
-					if D.IsSameItem(item1, info) then
+					if not MY_BagEx_Bag.IsItemBoxLocked(dwBox1, dwX1) and D.IsSameItem(item1, info) then
 						szState = 'Exchanging'
 						if item then
 							--[[#DEBUG BEGIN]]
