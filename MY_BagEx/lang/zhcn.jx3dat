@@ -10,6 +10,11 @@ return {
     ['Press shift for random'] = '按住SHIFT随机打乱',
     ['Bag package sort'] = '背包整理',
 
+    -- MY_BagEx_BagStack.lua --
+    ['Put new item in bag detected, stack exited!'] = '背包放入新物品，停止堆叠！',
+    ['Stack'] = '堆叠',
+    ['Bag package stack'] = '背包堆叠',
+
     -- MY_BagEx_GuildBankSort.lua --
     ['Guild box closed or page changed, sort exited!'] = '帮会仓库已关闭或页码发生变化，停止整理！',
     ['Cannot find item temp position, guild bag is full, sort exited!'] = '无法获取临时位置，仓库可能已满，停止整理！',

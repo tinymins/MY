@@ -1,17 +1,17 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : ²Ö¿â¶Ñµþ
+-- @desc     : ±³°ü¶Ñµþ
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_BagEx/MY_BagEx_GuildBankStack'
+local MODULE_PATH = 'MY_BagEx/MY_BagEx_BagStack'
 local PLUGIN_NAME = 'MY_BagEx'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_BagEx_GuildBankStack'
+local MODULE_NAME = 'MY_BagEx_BagStack'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^19.0.0-alpha.0') then
@@ -25,48 +25,54 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_BagEx'],
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue = false,
 	},
 })
 local D = {}
 
--- °ï»á²Ö¿â¶Ñµþ
-function D.StackGuildBank()
-	local frame = Station.Lookup('Normal/GuildBankPanel')
+-- ±³°ü¶Ñµþ
+function D.StackBag()
+	local frame = Station.Lookup('Normal/BigBagPanel')
 	if not frame then
 		return
 	end
-	local nPage = frame.nPage or 0
 	local bTrigger
 	local fnFinish = function()
-		X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagEx_GuildBankStack__Stack', false)
-		X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagEx_GuildBankStack__Stack', false)
+		X.RegisterEvent('BAG_ITEM_UPDATE', 'MY_BagEx_BagStack__Stack', false)
 		FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', false)
 	end
 	local function fnNext()
 		bTrigger = true
 		local me, tList = X.GetClientPlayer(), {}
-		for i = 1, X.GetGuildBankBagSize(nPage) do
-			local dwBox, dwX = X.GetGuildBankBagPos(nPage, i)
-			local item = GetPlayerItem(me, dwBox, dwX)
-			if item and item.bCanStack and item.nStackNum < item.nMaxStackNum then
-				local szKey = X.GetItemKey(item)
-				local dwX2 = tList[szKey]
-				if not dwX2 then
-					tList[szKey] = dwX
-				else
-					OnExchangeItem(dwBox, dwX, INVENTORY_GUILD_BANK, dwX2)
-					return
+		local nIndex = X.GetBagPackageIndex()
+		for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
+			for dwX = 0, me.GetBoxSize(dwBox) - 1 do
+				local item = GetPlayerItem(me, dwBox, dwX)
+				if item and item.bCanStack and item.nStackNum < item.nMaxStackNum then
+					local szKey = X.GetItemKey(item)
+					local tPos = tList[szKey]
+					if tPos then
+						local dwBox1, dwX1 = tPos.dwBox, tPos.dwX
+						--[[#DEBUG BEGIN]]
+						X.Debug('MY_BagEx_BagStack', 'OnExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
+						--[[#DEBUG END]]
+						OnExchangeItem(dwBox, dwX, dwBox1, dwX1)
+						return
+					else
+						tList[szKey] = { dwBox = dwBox, dwX = dwX }
+					end
 				end
 			end
 		end
 		fnFinish()
 	end
-	X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagEx_GuildBankStack__Stack', fnNext)
-	X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagEx_GuildBankStack__Stack', function()
-		-- TONG_EVENT_CODE.TAKE_REPERTORY_ITEM_PERMISSION_DENY_ERROR
-		if arg0 == TONG_EVENT_CODE.PUT_ITEM_IN_REPERTORY_SUCCESS then
+	X.RegisterEvent('BAG_ITEM_UPDATE', 'MY_BagEx_BagStack__Stack', function()
+		local dwBox, dwX, bNewAdd = arg0, arg1, arg2
+		if bNewAdd then
+			X.Systopmsg(_L['Put new item in bag detected, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			fnFinish()
+		else
+			X.DelayCall('MY_BagEx_BagStack__Stack', fnNext)
 		end
 	end)
 	X.DelayCall(1000, function()
@@ -83,41 +89,44 @@ end
 function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and O.bEnable then
 		-- Ö²Èë¶Ñµþ°´Å¦
-		-- guild bank stack
-		local btnRef = Station.Lookup('Normal/GuildBankPanel/Btn_MY_Sort')
-			or Station.Lookup('Normal/GuildBankPanel/Btn_Refresh')
-		local btnNew = Station.Lookup('Normal/GuildBankPanel/Btn_MY_Stack')
-		if btnRef then
-			if not btnNew then
-				local nX, nY = btnRef:GetRelPos()
-				local nW, nH = btnRef:GetSize()
-				btnNew = X.UI('Normal/GuildBankPanel')
-					:Append('WndButton', {
-						name = 'Btn_MY_Stack',
-						x = nX - nW, y = nY, w = nW, h = nH,
-						text = _L['Stack'],
-						onClick = D.StackGuildBank,
-					})
-					:Raw()
-			end
+		local btnRef = Station.Lookup('Normal/BigBagPanel/Btn_Stack')
+		local btnNew = Station.Lookup('Normal/BigBagPanel/Btn_MY_Stack')
+		if not btnRef then
+			return
 		end
-		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_GuildBankStack__Injection', function()
+		local nX, nY = btnRef:GetRelPos()
+		local nW, nH = btnRef:GetSize()
+		if not btnNew then
+			btnNew = X.UI('Normal/BigBagPanel')
+				:Append('WndButton', {
+					name = 'Btn_MY_Stack',
+					w = nW, h = nH,
+					text = _L['Stack'],
+					onClick = D.StackBag,
+				})
+				:Raw()
+		end
+		if not btnNew then
+			return
+		end
+		btnNew:SetRelPos(nX, nY - 1)
+		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_BagStack__Injection', function()
 			if not btnNew then
 				return
 			end
 			btnNew:Enable(not arg0)
 		end)
 	else
-		-- ÒÆ³ý¶ÑµþÕûÀí°´Å¦]
-		X.UI('Normal/GuildBankPanel/Btn_MY_Stack'):Remove()
-		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_GuildBankStack__Injection', false)
+		-- ÒÆ³ý¶Ñµþ°´Å¦
+		X.UI('Normal/BigBagPanel/Btn_MY_Stack'):Remove()
+		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_BagStack__Injection', false)
 	end
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
-		text = _L['Guild package stack'],
+		text = _L['Bag package stack'],
 		checked = O.bEnable,
 		onCheck = function(bChecked)
 			O.bEnable = bChecked
@@ -132,7 +141,7 @@ end
 ---------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_BagEx_GuildBankStack',
+	name = 'MY_BagEx_BagStack',
 	exports = {
 		{
 			fields = {
@@ -141,15 +150,21 @@ local settings = {
 		},
 	},
 }
-MY_BagEx_GuildBankStack = X.CreateModule(settings)
+MY_BagEx_BagStack = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------------------------------
 
-X.RegisterUserSettingsInit('MY_BagEx_GuildBankStack', function() D.CheckInjection() end)
-X.RegisterFrameCreate('GuildBankPanel', 'MY_BagEx_GuildBankStack', function() D.CheckInjection() end)
-X.RegisterReload('MY_BagEx_GuildBankStack', function() D.CheckInjection(true) end)
+X.RegisterEvent('SCROLL_UPDATE_LIST', 'MY_BagEx_BagStack', function()
+	if (arg0 == 'Handle_Bag_Compact' or arg0 == 'Handle_Bag_Normal')
+	and arg1 == 'BigBagPanel' then
+		D.CheckInjection()
+	end
+end)
+X.RegisterUserSettingsInit('MY_BagEx_BagStack', function() D.CheckInjection() end)
+X.RegisterFrameCreate('BigBagPanel', 'MY_BagEx_BagStack', function() D.CheckInjection() end)
+X.RegisterReload('MY_BagEx_BagStack', function() D.CheckInjection(true) end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

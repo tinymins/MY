@@ -226,7 +226,7 @@ function D.SortBag()
 			fnFinish()
 		elseif szState == 'Exchanging' then
 			szState = 'Idle'
-			X.DelayCall(fnNext)
+			X.DelayCall('MY_BagEx_BagSort__Sort', fnNext)
 		end
 	end)
 	FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', true)
@@ -309,14 +309,14 @@ end
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------------------------------
 
-X.RegisterUserSettingsInit('MY_BagEx_BagSort', function() D.CheckInjection() end)
-X.RegisterFrameCreate('BigBagPanel', 'MY_BagEx_BagSort', function() D.CheckInjection() end)
-X.RegisterReload('MY_BagEx_BagSort', function() D.CheckInjection(true) end)
 X.RegisterEvent('SCROLL_UPDATE_LIST', 'MY_BagEx_BagSort', function()
 	if (arg0 == 'Handle_Bag_Compact' or arg0 == 'Handle_Bag_Normal')
 	and arg1 == 'BigBagPanel' then
 		D.CheckInjection()
 	end
 end)
+X.RegisterUserSettingsInit('MY_BagEx_BagSort', function() D.CheckInjection() end)
+X.RegisterFrameCreate('BigBagPanel', 'MY_BagEx_BagSort', function() D.CheckInjection() end)
+X.RegisterReload('MY_BagEx_BagSort', function() D.CheckInjection(true) end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
