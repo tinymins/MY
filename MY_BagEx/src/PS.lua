@@ -30,8 +30,7 @@ function PS.OnPanelActive(wnd)
 
 	nX, nY = MY_BagEx_BagBankFilters.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 	nX, nY = MY_BagEx_Bag.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
-	nX, nY = MY_BagEx_GuildBankSort.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
-	nX, nY = MY_BagEx_GuildBankStack.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
+	nX, nY = MY_BagEx_GuildBank.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 end
 X.RegisterPanel(_L['General'], 'MY_BagEx', _L['MY_BagEx'], 374, PS)
 

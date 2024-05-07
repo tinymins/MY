@@ -20,14 +20,7 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
-local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
-	bEnable = {
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_BagEx'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
-	},
-})
+local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {})
 local D = {}
 
 -- °ï»á²Ö¿â¶Ñµþ
@@ -81,7 +74,7 @@ end
 
 -- ¼ì²â¶Ñµþ°´Å¦
 function D.CheckInjection(bRemoveInjection)
-	if not bRemoveInjection and O.bEnable then
+	if not bRemoveInjection and MY_BagEx_GuildBank.bEnable then
 		-- Ö²Èë¶Ñµþ°´Å¦
 		-- guild bank stack
 		local btnRef = Station.Lookup('Normal/GuildBankPanel/Btn_MY_Sort')
@@ -114,19 +107,6 @@ function D.CheckInjection(bRemoveInjection)
 	end
 end
 
-function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
-	nX = nX + ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 200,
-		text = _L['Guild package stack'],
-		checked = O.bEnable,
-		onCheck = function(bChecked)
-			O.bEnable = bChecked
-			D.CheckInjection()
-		end,
-	}):AutoWidth():Width() + 5
-	return nX, nY
-end
-
 ---------------------------------------------------------------------
 -- Global exports
 ---------------------------------------------------------------------
@@ -136,7 +116,7 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				CheckInjection = D.CheckInjection,
 			},
 		},
 	},
