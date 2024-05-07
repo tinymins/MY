@@ -1,6 +1,9 @@
 return {
     ['MY_BagEx'] = '背包助手',
 
+    -- MY_BagEx_Bag.lua --
+    ['Bag package sort and stack'] = '背包整理與堆疊',
+
     -- MY_BagEx_BagSort.lua --
     ['Bag panel closed, sort exited!'] = '背包界面已關閉，停止整理！',
     ['Cannot find item temp position, bag is full, sort exited!'] = '無法獲取臨時位置，背包可能已滿，停止整理！',
@@ -8,12 +11,10 @@ return {
     ['Put new item in bag detected, sort exited!'] = '背包放入新物品，停止整理！',
     ['Sort'] = '整理',
     ['Press shift for random'] = '按住SHIFT隨機打亂',
-    ['Bag package sort'] = '背包整理',
 
     -- MY_BagEx_BagStack.lua --
     ['Put new item in bag detected, stack exited!'] = '背包放入新物品，停止堆疊！',
     ['Stack'] = '堆疊',
-    ['Bag package stack'] = '背包堆疊',
 
     -- MY_BagEx_GuildBankSort.lua --
     ['Guild box closed or page changed, sort exited!'] = '幫會倉庫已關閉或頁碼發生變化，停止整理！',

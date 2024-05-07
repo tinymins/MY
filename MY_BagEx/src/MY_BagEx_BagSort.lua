@@ -20,14 +20,7 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
-local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
-	bEnable = {
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_BagEx'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
-	},
-})
+local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {})
 local D = {
 	-- 物品排序顺序
 	aGenre = {
@@ -235,7 +228,7 @@ end
 
 -- 检测增加按纽
 function D.CheckInjection(bRemoveInjection)
-	if not bRemoveInjection and O.bEnable then
+	if not bRemoveInjection and MY_BagEx_Bag.bEnable then
 		-- 植入整理按纽
 		local btnRef = Station.Lookup('Normal/BigBagPanel/Btn_CU')
 		local btnNew = Station.Lookup('Normal/BigBagPanel/Btn_MY_Sort')
@@ -275,19 +268,6 @@ function D.CheckInjection(bRemoveInjection)
 	end
 end
 
-function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
-	nX = nX + ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 200,
-		text = _L['Bag package sort'],
-		checked = O.bEnable,
-		onCheck = function(bChecked)
-			O.bEnable = bChecked
-			D.CheckInjection()
-		end,
-	}):AutoWidth():Width() + 5
-	return nX, nY
-end
-
 ---------------------------------------------------------------------
 -- Global exports
 ---------------------------------------------------------------------
@@ -297,7 +277,7 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				CheckInjection = D.CheckInjection,
 			},
 		},
 	},

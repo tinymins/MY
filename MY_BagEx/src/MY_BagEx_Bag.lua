@@ -1,0 +1,112 @@
+--------------------------------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : ±³°ü¶Ñµþ
+-- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------------------------------
+local X = MY
+--------------------------------------------------------------------------------
+local MODULE_PATH = 'MY_BagEx/MY_BagEx_Bag'
+local PLUGIN_NAME = 'MY_BagEx'
+local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
+local MODULE_NAME = 'MY_BagEx_Bag'
+local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
+--------------------------------------------------------------------------------
+if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^19.0.0-alpha.0') then
+	return
+end
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
+
+local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
+	bEnable = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_BagEx'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
+local D = {}
+
+-- ¼ì²â³åÍ»
+function D.CheckConflict(bRestore)
+	if not bRestore and O.bEnable then
+		-- Òþ²Ø³åÍ»µÄÏµÍ³°´Å¥
+		for _, szPath in ipairs({
+			'Normal/BigBagPanel/Btn_CU',
+			'Normal/BigBagPanel/Btn_Stack',
+			'Normal/BigBagPanel/Btn_LockSort',
+		}) do
+			local el = Station.Lookup(szPath)
+			if el then
+				el:Hide()
+			end
+		end
+	else
+		-- »Ö¸´³åÍ»µÄÏµÍ³°´Å¥
+		for _, szPath in ipairs({
+			'Normal/BigBagPanel/Btn_CU',
+			'Normal/BigBagPanel/Btn_Stack',
+			'Normal/BigBagPanel/Btn_LockSort',
+		}) do
+			local el = Station.Lookup(szPath)
+			if el then
+				el:Show()
+			end
+		end
+	end
+end
+
+function D.OnEnableChange()
+	D.CheckConflict()
+	MY_BagEx_BagSort.CheckInjection()
+	MY_BagEx_BagStack.CheckInjection()
+end
+
+function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200,
+		text = _L['Bag package sort and stack'],
+		checked = O.bEnable,
+		onCheck = function(bChecked)
+			O.bEnable = bChecked
+			D.OnEnableChange()
+		end,
+	}):AutoWidth():Width() + 5
+	return nX, nY
+end
+
+---------------------------------------------------------------------
+-- Global exports
+---------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_BagEx_Bag',
+	exports = {
+		{
+			fields = {
+				OnPanelActivePartial = D.OnPanelActivePartial,
+			},
+		},
+		{
+			fields = {
+				'bEnable',
+			},
+			root = O,
+		},
+	},
+}
+MY_BagEx_Bag = X.CreateModule(settings)
+end
+
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit('MY_BagEx_Bag', function() D.CheckConflict() end)
+X.RegisterFrameCreate('BigBagPanel', 'MY_BagEx_Bag', function() D.CheckConflict() end)
+X.RegisterReload('MY_BagEx_Bag', function() D.CheckConflict(true) end)
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
