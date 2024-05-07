@@ -31,7 +31,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_BagEx'],
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
+		xDefaultValue = true,
 	},
 	tLock = {
 		ePathType = X.PATH_TYPE.ROLE,
