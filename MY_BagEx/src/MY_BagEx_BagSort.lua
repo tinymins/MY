@@ -173,7 +173,9 @@ function D.SortBag()
 			local dwBox, dwX = tBagPos.dwBox, tBagPos.dwX
 			local item = GetPlayerItem(me, dwBox, dwX)
 			if D.IsSameItem(item, info) then
-				MY_BagEx_Bag.HideItemShadow(frame, dwBox, dwX)
+				if not MY_BagEx_Bag.IsItemBoxLocked(dwBox, dwX) then
+					MY_BagEx_Bag.HideItemShadow(frame, dwBox, dwX)
+				end
 			else -- 当前格子和预期不符 需要交换
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
 				if item and info.dwID and item.nUiId == info.nUiId and item.bCanStack and item.nStackNum ~= info.nStackNum then
