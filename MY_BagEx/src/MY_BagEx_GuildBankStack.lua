@@ -123,8 +123,6 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			D.CheckInjection()
 		end,
 	}):AutoWidth():Width() + 5
-	nX = nPaddingX
-	nY = nY + nLH
 	return nX, nY
 end
 

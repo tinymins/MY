@@ -32,6 +32,6 @@ function PS.OnPanelActive(wnd)
 	nX, nY = MY_BagEx_GuildBankSort.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 	nX, nY = MY_BagEx_GuildBankStack.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 end
-X.RegisterPanel(_L['General'], 'MY_BagEx', _L['MY_BagEx'], 134, PS)
+X.RegisterPanel(_L['General'], 'MY_BagEx', _L['MY_BagEx'], 'ui/Image/button/SystemButton_1.UITex|48', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
