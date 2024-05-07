@@ -183,7 +183,7 @@ function D.SortBag()
 							return
 						end
 					end
-					X.Systopmsg(_L['Cannot find item temp position, guild bag is full, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+					X.Systopmsg(_L['Cannot find item temp position, bag is full, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 					return fnFinish()
 				end
 				-- 寻找预期物品所在位置
@@ -208,7 +208,7 @@ function D.SortBag()
 						return
 					end
 				end
-				X.Systopmsg(_L['Exchange item match failed, guild bag may changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+				X.Systopmsg(_L['Exchange item match failed, bag may changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 				return fnFinish()
 			end
 		end
