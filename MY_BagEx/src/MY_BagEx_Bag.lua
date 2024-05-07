@@ -36,6 +36,70 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 })
 local D = {}
 
+function D.ShowItemShadow(frame, dwBox, dwX)
+	for _, szPath in ipairs({
+		'Handle_Bag_Compact/Mode_' .. dwBox .. '_' .. dwX .. '/' .. dwBox .. '_' .. dwX,
+		'Handle_Bag_Normal/Handle_Bag' .. dwBox .. '/Handle_Bag_Content' .. dwBox .. '/Mode_' .. dwX .. '/' .. dwBox .. '_' .. dwX
+	}) do
+		local box = frame:Lookup('', szPath)
+		if box then
+			local sha = box:GetParent():Lookup('Shadow_MY_BagEx')
+			if not sha then
+				sha = X.UI(box:GetParent()):Append('Shadow', { name = 'Shadow_MY_BagEx' }):Raw()
+				sha:SetColorRGB(255, 255, 255)
+				sha:SetAlpha(50)
+				sha:SetSize(box:GetSize())
+				sha:SetRelPos(box:GetRelPos())
+				sha:SetAbsPos(box:GetAbsPos())
+			end
+			sha:Show()
+		end
+	end
+end
+
+function D.ShowAllItemShadow()
+	local frame = Station.Lookup('Normal/BigBagPanel')
+	if not frame then
+		return
+	end
+	local me = X.GetClientPlayer()
+	local nIndex = X.GetBagPackageIndex()
+	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
+		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
+			D.ShowItemShadow(frame, dwBox, dwX)
+		end
+	end
+end
+
+function D.HideItemShadow(frame, dwBox, dwX)
+	for _, szPath in ipairs({
+		'Handle_Bag_Compact/Mode_' .. dwBox .. '_' .. dwX .. '/' .. dwBox .. '_' .. dwX,
+		'Handle_Bag_Normal/Handle_Bag' .. dwBox .. '/Handle_Bag_Content' .. dwBox .. '/Mode_' .. dwX .. '/' .. dwBox .. '_' .. dwX
+	}) do
+		local box = frame:Lookup('', szPath)
+		if box then
+			local sha = box:GetParent():Lookup('Shadow_MY_BagEx')
+			if sha then
+				sha:Hide()
+			end
+		end
+	end
+end
+
+function D.HideAllItemShadow()
+	local frame = Station.Lookup('Normal/BigBagPanel')
+	if not frame then
+		return
+	end
+	local me = X.GetClientPlayer()
+	local nIndex = X.GetBagPackageIndex()
+	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
+		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
+			D.HideItemShadow(frame, dwBox, dwX)
+		end
+	end
+end
+
 -- ¼ì²â³åÍ»
 function D.CheckConflict(bRestore)
 	if not bRestore and O.bEnable then
@@ -102,6 +166,10 @@ local settings = {
 		{
 			fields = {
 				OnPanelActivePartial = D.OnPanelActivePartial,
+				ShowItemShadow = D.ShowItemShadow,
+				ShowAllItemShadow = D.ShowAllItemShadow,
+				HideItemShadow = D.HideItemShadow,
+				HideAllItemShadow = D.HideAllItemShadow,
 			},
 		},
 		{

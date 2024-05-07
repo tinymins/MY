@@ -39,14 +39,20 @@ function D.StackBag()
 	local bTrigger
 	local fnFinish = function()
 		X.RegisterEvent('BAG_ITEM_UPDATE', 'MY_BagEx_BagStack__Stack', false)
+		MY_BagEx_Bag.HideAllItemShadow()
 		FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', false)
 	end
 	local function fnNext()
 		bTrigger = true
+		if not frame then
+			X.Systopmsg(_L['Bag panel closed, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
+			return fnFinish()
+		end
 		local me, tList = X.GetClientPlayer(), {}
 		local nIndex = X.GetBagPackageIndex()
 		for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
 			for dwX = 0, me.GetBoxSize(dwBox) - 1 do
+				MY_BagEx_Bag.HideItemShadow(frame, dwBox, dwX)
 				local item = GetPlayerItem(me, dwBox, dwX)
 				if item and item.bCanStack and item.nStackNum < item.nMaxStackNum then
 					local szKey = X.GetItemKey(item)
@@ -103,8 +109,9 @@ function D.CheckInjection(bRemoveInjection)
 					w = nW, h = nH - 2,
 					text = _L['Stack'],
 					onClick = function()
+						MY_BagEx_Bag.ShowAllItemShadow()
 						if MY_BagEx_Bag.bConfirm then
-							X.Confirm(_L['Sure to start bag stack?'], D.StackBag)
+							X.Confirm(_L['Sure to start bag stack?'], D.StackBag, MY_BagEx_Bag.HideAllItemShadow, MY_BagEx_Bag.HideAllItemShadow)
 						else
 							D.StackBag()
 						end

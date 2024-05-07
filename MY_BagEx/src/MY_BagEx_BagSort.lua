@@ -93,7 +93,7 @@ function D.SortBag()
 	if not frame then
 		return
 	end
-	local nPage, szState = frame.nPage or 0, 'Idle'
+	local szState = 'Idle'
 	-- 加载格子列表
 	local me, aInfo, nItemCount = X.GetClientPlayer(), {}, 0
 	local aBagPos = {}
@@ -141,6 +141,7 @@ function D.SortBag()
 	local function fnFinish()
 		szState = 'Idle'
 		X.RegisterEvent('BAG_ITEM_UPDATE', 'MY_BagEx_BagSort__Sort', false)
+		MY_BagEx_Bag.HideAllItemShadow()
 		FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', false)
 	end
 	-- 根据排序结果与当前状态交换物品
@@ -156,8 +157,9 @@ function D.SortBag()
 			local tBagPos = aBagPos[i]
 			local dwBox, dwX = tBagPos.dwBox, tBagPos.dwX
 			local item = GetPlayerItem(me, dwBox, dwX)
-			-- 当前格子和预期不符 需要交换
-			if not D.IsSameItem(item, info) then
+			if D.IsSameItem(item, info) then
+				MY_BagEx_Bag.HideItemShadow(frame, dwBox, dwX)
+			else -- 当前格子和预期不符 需要交换
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
 				if item and info.dwID and item.nUiId == info.nUiId and item.bCanStack and item.nStackNum ~= info.nStackNum then
 					for j = #aBagPos, i + 1, -1 do
@@ -248,8 +250,9 @@ function D.CheckInjection(bRemoveInjection)
 						position = X.UI.TIP_POSITION.BOTTOM_TOP,
 					},
 					onClick = function()
+						MY_BagEx_Bag.ShowAllItemShadow()
 						if MY_BagEx_Bag.bConfirm then
-							X.Confirm(_L['Sure to start bag sort?'], D.SortBag)
+							X.Confirm(_L['Sure to start bag sort?'], D.SortBag, MY_BagEx_Bag.HideAllItemShadow, MY_BagEx_Bag.HideAllItemShadow)
 						else
 							D.SortBag()
 						end

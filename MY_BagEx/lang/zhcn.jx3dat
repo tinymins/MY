@@ -21,6 +21,7 @@ return {
     ['Sure to start bag sort?'] = '确认要进行背包物品整理吗？',
 
     -- MY_BagEx_BagStack.lua --
+    ['Bag panel closed, stack exited!'] = '背包界面已关闭，停止堆叠！',
     ['Put new item in bag detected, stack exited!'] = '背包放入新物品，停止堆叠！',
     ['Stack'] = '堆叠',
     ['Sure to start bag stack?'] = '确认要进行背包物品堆叠吗？',
