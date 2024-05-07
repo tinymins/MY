@@ -100,7 +100,7 @@ function D.CheckInjection(bRemoveInjection)
 			btnNew = X.UI('Normal/BigBagPanel')
 				:Append('WndButton', {
 					name = 'Btn_MY_Stack',
-					w = nW, h = nH,
+					w = nW, h = nH - 2,
 					text = _L['Stack'],
 					onClick = function()
 						if MY_BagEx_Bag.bConfirm then

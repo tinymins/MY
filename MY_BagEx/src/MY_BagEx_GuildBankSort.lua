@@ -245,7 +245,7 @@ function D.CheckInjection(bRemoveInjection)
 				btnNew = X.UI('Normal/GuildBankPanel')
 					:Append('WndButton', {
 						name = 'Btn_MY_Sort',
-						x = nX - nW, y = nY, w = nW, h = nH,
+						x = nX - nW, y = nY, w = nW, h = nH - 2,
 						text = _L['Sort'],
 						tip = {
 							render = _L['Press shift for random'],

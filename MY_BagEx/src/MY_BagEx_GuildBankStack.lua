@@ -87,7 +87,7 @@ function D.CheckInjection(bRemoveInjection)
 				btnNew = X.UI('Normal/GuildBankPanel')
 					:Append('WndButton', {
 						name = 'Btn_MY_Stack',
-						x = nX - nW, y = nY, w = nW, h = nH,
+						x = nX - nW, y = nY, w = nW, h = nH - 2,
 						text = _L['Stack'],
 						onClick = function()
 							if MY_BagEx_Bag.bConfirm then

@@ -241,7 +241,7 @@ function D.CheckInjection(bRemoveInjection)
 			btnNew = X.UI('Normal/BigBagPanel')
 				:Append('WndButton', {
 					name = 'Btn_MY_Sort',
-					w = nW, h = nH - 1,
+					w = nW, h = nH - 2,
 					text = _L['Sort'],
 					tip = {
 						render = _L['Press shift for random'],
