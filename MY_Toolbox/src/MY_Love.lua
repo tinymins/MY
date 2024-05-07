@@ -261,7 +261,7 @@ end
 function D.GetBagItemPos(aUIID)
 	local me = X.GetClientPlayer()
 	local nIndex = X.GetBagPackageIndex()
-	for dwBox = nIndex, nIndex + X.GetBagPackageCount() do
+	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local it = me.GetItem(dwBox, dwX)
 			if it then

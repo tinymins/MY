@@ -102,7 +102,7 @@ function D.AutoSellItem(nNpcID, nShopID, bIgnoreGray)
 	local me = X.GetClientPlayer()
 	local nIndex = X.GetBagPackageIndex()
 	local aSell = {}
-	for dwBox = nIndex, nIndex + X.GetBagPackageCount() do
+	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
 		local dwSize = me.GetBoxSize(dwBox) - 1
 		for dwX = 0, dwSize do
 			local item = me.GetItem(dwBox, dwX)

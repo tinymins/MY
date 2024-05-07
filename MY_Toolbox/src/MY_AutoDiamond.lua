@@ -91,7 +91,7 @@ end
 -- 扫描背包石头及空位信息（存在 buggy cache）
 function D.LoadBagDiamond()
 	local me, t = X.GetClientPlayer(), {}
-	for dwBox = 1, X.GetBagPackageCount() do
+	for dwBox = X.GetBagPackageIndex(), X.GetBagPackageIndex() + X.GetBagPackageCount() - 1 do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local d = D.GetDiamondData(dwBox, dwX)
 			if not d.id or d.level then
