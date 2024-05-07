@@ -46,7 +46,7 @@ function D.StackBag()
 		for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
 			for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 				MY_BagEx_Bag.HideItemShadow(frame, dwBox, dwX)
-				local item = GetPlayerItem(me, dwBox, dwX)
+				local item = not MY_BagEx_Bag.IsItemBoxLocked(dwBox, dwX) and GetPlayerItem(me, dwBox, dwX)
 				if item and item.bCanStack and item.nStackNum < item.nMaxStackNum then
 					local szKey = X.GetItemKey(item)
 					local tPos = tList[szKey]

@@ -152,6 +152,11 @@ function D.HideAllItemShadow()
 	end
 end
 
+function D.IsItemBoxLocked(dwBox, dwX)
+	local szKey = dwBox .. '_' .. dwX
+	return O.tLock[szKey] or false
+end
+
 -- ¼ì²â³åÍ»
 function D.CheckConflict(bRestore)
 	if not bRestore and O.bEnable then
@@ -223,6 +228,7 @@ local settings = {
 				ShowAllItemShadow = D.ShowAllItemShadow,
 				HideItemShadow = D.HideItemShadow,
 				HideAllItemShadow = D.HideAllItemShadow,
+				IsItemBoxLocked = D.IsItemBoxLocked,
 			},
 		},
 		{
