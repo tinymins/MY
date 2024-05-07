@@ -2881,7 +2881,7 @@ end
 function X.GetFreeBagBoxNum()
 	local me, nFree = X.GetClientPlayer(), 0
 	local nIndex = X.GetBagPackageIndex()
-	for i = nIndex, nIndex + X.GetBagPackageCount() do
+	for i = nIndex, nIndex + X.GetBagPackageCount() - 1 do
 		nFree = nFree + me.GetBoxFreeRoomSize(i)
 	end
 	return nFree
@@ -2892,7 +2892,7 @@ end
 function X.GetFreeBagBox()
 	local me = X.GetClientPlayer()
 	local nIndex = X.GetBagPackageIndex()
-	for i = nIndex, nIndex + X.GetBagPackageCount() do
+	for i = nIndex, nIndex + X.GetBagPackageCount() - 1 do
 		if me.GetBoxFreeRoomSize(i) > 0 then
 			for j = 0, me.GetBoxSize(i) - 1 do
 				if not me.GetItem(i, j) then
@@ -2908,7 +2908,7 @@ end
 function X.WalkBagItem(fnWalker)
 	local me = X.GetClientPlayer()
 	local nIndex = X.GetBagPackageIndex()
-	for dwBox = nIndex, nIndex + X.GetBagPackageCount() do
+	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local it = me.GetItem(dwBox, dwX)
 			if it and fnWalker(it, dwBox, dwX) == 0 then
