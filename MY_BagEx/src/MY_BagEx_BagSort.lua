@@ -250,6 +250,9 @@ function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and MY_BagEx_Bag.bEnable then
 		-- 植入整理按纽
 		local frame = Station.Lookup('Normal/BigBagPanel')
+		if not frame then
+			return
+		end
 		local btnRef = frame:Lookup('Btn_CU')
 		local btnNew = frame:Lookup('Btn_MY_Sort')
 		if not btnRef then

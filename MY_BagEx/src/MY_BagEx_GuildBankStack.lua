@@ -77,6 +77,9 @@ function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and MY_BagEx_GuildBank.bEnable then
 		-- Ö²Èë¶Ñµþ°´Å¦
 		local frame = Station.Lookup('Normal/GuildBankPanel')
+		if not frame then
+			return
+		end
 		local btnRef = frame:Lookup('Btn_MY_Sort') or frame:Lookup('Btn_Refresh')
 		local btnNew = frame:Lookup('Btn_MY_Stack')
 		if btnRef then
@@ -89,6 +92,10 @@ function D.CheckInjection(bRemoveInjection)
 						x = nX - nW, y = nY, w = nW, h = nH - 2,
 						text = _L['Stack'],
 						onClick = function()
+							if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TONG_REPERTORY) then
+								X.Systopmsg(_L['Please unlock mibao first.'])
+								return
+							end
 							if MY_BagEx_Bag.bConfirm then
 								X.Confirm(_L['Sure to start guild bank stack?'], {
 									x = frame:GetAbsX() + frame:GetW() / 2,

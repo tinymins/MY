@@ -236,6 +236,9 @@ function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and MY_BagEx_GuildBank.bEnable then
 		-- 植入整理按纽
 		local frame = Station.Lookup('Normal/GuildBankPanel')
+		if not frame then
+			return
+		end
 		local btnRef = frame:Lookup('Btn_Refresh')
 		local btnNew = frame:Lookup('Btn_MY_Sort')
 		if btnRef then
@@ -252,6 +255,10 @@ function D.CheckInjection(bRemoveInjection)
 							position = X.UI.TIP_POSITION.BOTTOM_TOP,
 						},
 						onClick = function()
+							if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TONG_REPERTORY) then
+								X.Systopmsg(_L['Please unlock mibao first.'])
+								return
+							end
 							if MY_BagEx_Bag.bConfirm then
 								X.Confirm(_L['Sure to start guild bank sort?'], {
 									x = frame:GetAbsX() + frame:GetW() / 2,

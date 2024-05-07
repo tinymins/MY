@@ -28,6 +28,9 @@ function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and MY_BagEx_Bag.bEnable then
 		-- Ö²Èë¶Ñµþ°´Å¦
 		local frame = Station.Lookup('Normal/BigBagPanel')
+		if not frame then
+			return
+		end
 		local btnRef1 = frame:Lookup('Btn_Split')
 		local btnRef2 = frame:Lookup('Btn_Stack')
 		local btnNew = frame:Lookup('Btn_MY_Lock')
