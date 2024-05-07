@@ -1,7 +1,7 @@
 return {
     ['MY_BagEx'] = '背包助手',
 
-    ['MY_BagSort'] = '背包整理',
+    -- MY_BagEx_BankSort.lua --
     ['Guild box closed or page changed, sort exited!'] = '幫會倉庫已關閉或頁碼發生變化，停止整理！',
     ['Cannot find item temp position, guild bag is full, sort exited!'] = '無法獲取臨時位置，倉庫可能已滿，停止整理！',
     ['Exchange item match failed, guild bag may changed, sort exited!'] = '找不到整理的物品，倉庫可能被他人操作過，停止整理！',
@@ -12,6 +12,7 @@ return {
     ['Stack'] = '堆疊',
     ['Guild package sort and stack'] = '幫會倉庫整理與堆疊',
 
+    -- MY_BagEx_BagBankFilters.lua --
     ['Search'] = '搜索',
     ['Time Limited'] = '限時',
     ['Package searcher'] = '背包倉庫搜索',
