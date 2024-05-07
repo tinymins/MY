@@ -8,10 +8,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_BagEx/MY_BagEx'
+local MODULE_PATH = 'MY_BagEx/MY_BagEx_BagBankFilters'
 local PLUGIN_NAME = 'MY_BagEx'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_BagEx'
+local MODULE_NAME = 'MY_BagEx_BagBankFilters'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^19.0.0-alpha.0') then
@@ -23,7 +23,7 @@ end
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Toolbox'],
+		szLabel = _L['MY_BagEx'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -404,7 +404,7 @@ X.RegisterEvent({'BAG_ITEM_UPDATE', 'GUILD_BANK_PANEL_UPDATE', 'LOADING_END'}, f
 	if not O.bEnable then
 		return
 	end
-	X.DelayCall('MY_BagEx', 100, OnBagItemUpdate)
+	X.DelayCall('MY_BagEx_BagBankFilters', 100, OnBagItemUpdate)
 end)
 end
 
@@ -426,7 +426,7 @@ end
 --------------------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_BagEx',
+	name = 'MY_BagEx_BagBankFilters',
 	exports = {
 		{
 			fields = {
@@ -435,7 +435,7 @@ local settings = {
 		},
 	},
 }
-MY_BagEx = X.CreateModule(settings)
+MY_BagEx_BagBankFilters = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------

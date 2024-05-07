@@ -72,8 +72,8 @@ function PS.OnPanelActive(wnd)
 
 	nX, nY = nPaddingX + 10, nY + nLH
 	nX, nY = MY_AutoDiamond.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
-	if MY_BagEx then
-		nX, nY = MY_BagEx.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
+	if MY_BagEx_BagBankFilters then
+		nX, nY = MY_BagEx_BagBankFilters.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 	end
 	if MY_BagSort then
 		nX, nY = MY_BagSort.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)

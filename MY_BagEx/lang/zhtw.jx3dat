@@ -1,6 +1,5 @@
 return {
     ['MY_BagEx'] = '背包助手',
-    ['MY_Toolbox'] = '常用工具',
 
     ['MY_BagSort'] = '背包整理',
     ['Guild box closed or page changed, sort exited!'] = '幫會倉庫已關閉或頁碼發生變化，停止整理！',
