@@ -63,6 +63,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		onCheck = function(bChecked)
 			O.bConfirm = bChecked
 		end,
+		autoEnable = function() return O.bEnable end,
 	}):AutoWidth():Width() + 5
 	return nX, nY
 end
