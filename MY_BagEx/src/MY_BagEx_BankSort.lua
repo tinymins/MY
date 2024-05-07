@@ -279,7 +279,7 @@ function D.CheckInjection(bRemoveInjection)
 						end
 						MY_BagEx_Bank.ShowAllItemShadow()
 						if MY_BagEx_Bank.bConfirm then
-							X.Confirm(_L['Sure to start bank sort?'], {
+							X.Confirm('MY_BagEx_BankSort', _L['Sure to start bank sort?'], {
 								x = frame:GetAbsX() + frame:GetW() / 2,
 								y = frame:GetAbsY() + frame:GetH() / 2,
 								fnResolve = D.SortBank,

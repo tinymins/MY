@@ -117,7 +117,7 @@ function D.CheckInjection(bRemoveInjection)
 						end
 						MY_BagEx_Bank.ShowAllItemShadow()
 						if MY_BagEx_Bank.bConfirm then
-							X.Confirm(_L['Sure to start bank stack?'], {
+							X.Confirm('MY_BagEx_BankStack', _L['Sure to start bank stack?'], {
 								x = frame:GetAbsX() + frame:GetW() / 2,
 								y = frame:GetAbsY() + frame:GetH() / 2,
 								fnResolve = D.StackBag,

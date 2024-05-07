@@ -260,7 +260,7 @@ function D.CheckInjection(bRemoveInjection)
 								return
 							end
 							if MY_BagEx_Bag.bConfirm then
-								X.Confirm(_L['Sure to start guild bank sort?'], {
+								X.Confirm('MY_BagEx_GuildBankSort', _L['Sure to start guild bank sort?'], {
 									x = frame:GetAbsX() + frame:GetW() / 2,
 									y = frame:GetAbsY() + frame:GetH() / 2,
 									fnResolve = D.SortGuildBank,
