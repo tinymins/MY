@@ -34,6 +34,9 @@ function PS.OnPanelActive(wnd)
 	nX, nY = MY_BagEx_Bag.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nPaddingX
 	nY = nY + nLH
+	nX, nY = MY_BagEx_Bank.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
+	nX = nPaddingX
+	nY = nY + nLH
 	nX, nY = MY_BagEx_GuildBank.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 end
 X.RegisterPanel(_L['General'], 'MY_BagEx', _L['MY_BagEx'], 374, PS)

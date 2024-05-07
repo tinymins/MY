@@ -29,11 +29,36 @@ return {
     -- MY_BagEx_BagLock.lua --
     ['Lock'] = '鎖定',
 
+    -- MY_BagEx_Bank.lua --
+    ['Bank package sort and stack'] = '倉庫整理與堆疊',
+    ['Need confirm'] = '需要二次確認',
+
+    -- MY_BagEx_BankSort.lua --
+    ['Please unlock mibao first.'] = '請先解除密保鎖。',
+    ['Bank panel closed, sort exited!'] = '倉庫界面已關閉，停止整理！',
+    ['Cannot find item temp position, bank is full, sort exited!'] = '無法獲取臨時位置，倉庫可能已滿，停止整理！',
+    ['Exchange item match failed, bank may changed, sort exited!'] = '找不到整理的物品，倉庫可能被操作過，停止整理！',
+    ['Put new item in bank detected, sort exited!'] = '倉庫放入新物品，停止整理！',
+    ['Sort'] = '整理',
+    ['Press shift for random'] = '按住SHIFT隨機打亂',
+    ['Sure to start bank sort?'] = '確認要進行倉庫物品整理嗎？',
+
+    -- MY_BagEx_BankStack.lua --
+    ['Please unlock mibao first.'] = '請先解除密保鎖。',
+    ['Bank panel closed, stack exited!'] = '倉庫界面已關閉，停止堆疊！',
+    ['Put new item in bank detected, stack exited!'] = '倉庫放入新物品，停止堆疊！',
+    ['Stack'] = '堆疊',
+    ['Sure to start bank stack?'] = '確認要進行倉庫物品堆疊嗎？',
+
+    -- MY_BagEx_BankLock.lua --
+    ['Lock'] = '鎖定',
+
     -- MY_BagEx_GuildBank.lua --
     ['Guild package sort and stack'] = '幫會倉庫整理與堆疊',
     ['Need confirm'] = '需要二次確認',
 
     -- MY_BagEx_GuildBankSort.lua --
+    ['Please unlock mibao first.'] = '請先解除密保鎖。',
     ['Guild box closed or page changed, sort exited!'] = '幫會倉庫已關閉或頁碼發生變化，停止整理！',
     ['Cannot find item temp position, guild bag is full, sort exited!'] = '無法獲取臨時位置，倉庫可能已滿，停止整理！',
     ['Exchange item match failed, guild bag may changed, sort exited!'] = '找不到整理的物品，倉庫可能被他人操作過，停止整理！',
@@ -45,5 +70,6 @@ return {
 
     -- MY_BagEx_GuildBankStack.lua --
     ['Stack'] = '堆疊',
+    ['Please unlock mibao first.'] = '請先解除密保鎖。',
     ['Sure to start guild bank stack?'] = '確認要進行幫會倉庫物品堆疊嗎？',
 }
