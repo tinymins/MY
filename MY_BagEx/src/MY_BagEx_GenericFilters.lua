@@ -291,7 +291,8 @@ local function Hook()
 		frame.bMYBagExHook = true
 		X.UI('Normal/GuildBankPanel'):Append('WndEditBox', {
 			name = 'WndEditBox_KeyWord',
-			w = 100, h = 21, x = 60, y = 25,
+			x = X.ENVIRONMENT.GAME_BRANCH == 'remake' and 20 or 60, y = 25,
+			w = 100, h = 21,
 			text = l_szGuildBankFilter,
 			placeholder = _L['Search'],
 			onChange = function(txt)
