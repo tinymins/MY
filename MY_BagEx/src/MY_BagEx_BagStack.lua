@@ -100,7 +100,7 @@ function D.CheckInjection(bRemoveInjection)
 			btnNew = X.UI('Normal/BigBagPanel')
 				:Append('WndButton', {
 					name = 'Btn_MY_Stack',
-					w = nW, h = nH - 2,
+					w = nW, h = nH - 3,
 					text = _L['Stack'],
 					onClick = function()
 						MY_BagEx_Bag.ShowAllItemShadow()
@@ -122,7 +122,7 @@ function D.CheckInjection(bRemoveInjection)
 		if not btnNew then
 			return
 		end
-		btnNew:SetRelPos(nX, nY - 1)
+		btnNew:SetRelPos(nX, nY)
 		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_BagStack__Injection', function()
 			if not btnNew then
 				return

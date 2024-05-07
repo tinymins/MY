@@ -244,7 +244,7 @@ function D.CheckInjection(bRemoveInjection)
 			btnNew = X.UI('Normal/BigBagPanel')
 				:Append('WndButton', {
 					name = 'Btn_MY_Sort',
-					w = nW, h = nH - 2,
+					w = nW, h = nH - 3,
 					text = _L['Sort'],
 					tip = {
 						render = _L['Press shift for random'],
@@ -270,7 +270,7 @@ function D.CheckInjection(bRemoveInjection)
 		if not btnNew then
 			return
 		end
-		btnNew:SetRelPos(nX, nY - 1)
+		btnNew:SetRelPos(nX, nY)
 		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_BagSort__Injection', function()
 			if not btnNew then
 				return
