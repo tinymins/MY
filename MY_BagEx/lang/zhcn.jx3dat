@@ -1,16 +1,19 @@
 return {
     ['MY_BagEx'] = '背包助手',
 
-    -- MY_BagEx_BankSort.lua --
+    -- MY_BagEx_GuildBankSort.lua --
     ['Guild box closed or page changed, sort exited!'] = '帮会仓库已关闭或页码发生变化，停止整理！',
     ['Cannot find item temp position, guild bag is full, sort exited!'] = '无法获取临时位置，仓库可能已满，停止整理！',
     ['Exchange item match failed, guild bag may changed, sort exited!'] = '找不到整理的物品，仓库可能被他人操作过，停止整理！',
     ['Put item in guild detected, sort exited!'] = '帮会仓库放入新物品，停止整理！',
-    ['Unknown exception occured, sort exited!'] = '发生未知错误，停止整理！',
+    ['Unknown exception occurred, sort exited!'] = '发生未知错误，停止整理！',
     ['Sort'] = '整理',
     ['Press shift for random'] = '按住SHIFT随机打乱',
+    ['Guild package sort'] = '帮会仓库整理',
+
+    -- MY_BagEx_GuildBankStack.lua --
     ['Stack'] = '堆叠',
-    ['Guild package sort and stack'] = '帮会仓库整理与堆叠',
+    ['Guild package stack'] = '帮会仓库堆叠',
 
     -- MY_BagEx_BagBankFilters.lua --
     ['Search'] = '搜索',

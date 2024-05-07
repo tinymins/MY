@@ -72,13 +72,8 @@ function PS.OnPanelActive(wnd)
 
 	nX, nY = nPaddingX + 10, nY + nLH
 	nX, nY = MY_AutoDiamond.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
-	if MY_BagEx_BagBankFilters then
-		nX, nY = MY_BagEx_BagBankFilters.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
-	end
-	if MY_BagEx_BankSort then
-		nX, nY = MY_BagEx_BankSort.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
-	end
 
+	nX, nY = nPaddingX + 10, nY + nLH
 	nX, nY = MY_HideAnnounceBg.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 	nX, nY = MY_FriendTipLocation.OnPanelActivePartial(ui, nPaddingX + 10, nPaddingY, nW, nH, nX, nY, nLH)
 

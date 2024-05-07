@@ -5,5 +5,6 @@ default=1
 version=1.0
 dependence=MY_!Base
 lua_0=src\MY_BagEx_BagBankFilters.lua
-lua_1=src\MY_BagEx_BankSort.lua
+lua_1=src\MY_BagEx_GuildBankSort.lua
+lua_2=src\MY_BagEx_GuildBankStack.lua
 package=MY

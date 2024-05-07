@@ -8,10 +8,10 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_BagEx/MY_BagEx_BankSort'
+local MODULE_PATH = 'MY_BagEx/MY_BagEx_GuildBankSort'
 local PLUGIN_NAME = 'MY_BagEx'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_BagEx_BankSort'
+local MODULE_NAME = 'MY_BagEx_GuildBankSort'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^19.0.0-alpha.0') then
@@ -21,7 +21,7 @@ end
 --------------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
-	bGuildBank = {
+	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_BagEx'],
 		xSchema = X.Schema.Boolean,
@@ -44,60 +44,6 @@ local D = {
 		[EQUIPMENT_SUB.RANGE_WEAPON] = 4,
 	},
 }
-
--- 帮会仓库堆叠
-function D.StackGuildBank()
-	local frame = Station.Lookup('Normal/GuildBankPanel')
-	if not frame then
-		return
-	end
-	local nPage = frame.nPage or 0
-	local bTrigger
-	local fnFinish = function()
-		local btn = Station.Lookup('Normal/GuildBankPanel/Btn_MY_Stack')
-		if btn then
-			btn:Enable(1)
-			Station.Lookup('Normal/GuildBankPanel/Btn_MY_Sort'):Enable(1)
-		end
-		X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagEx_BankSort__Stack', false)
-		X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagEx_BankSort__Stack', false)
-	end
-	local function fnLoop()
-		local me, tList = X.GetClientPlayer(), {}
-		bTrigger = true
-		for i = 1, X.GetGuildBankBagSize(nPage) do
-			local dwPos, dwX = X.GetGuildBankBagPos(nPage, i)
-			local item = GetPlayerItem(me, dwPos, dwX)
-			if item and item.bCanStack and item.nStackNum < item.nMaxStackNum then
-				local szKey = tostring(item.dwTabType) .. '_' .. tostring(item.dwIndex)
-				local dwX2 = tList[szKey]
-				if not dwX2 then
-					tList[szKey] = dwX
-				else
-					OnExchangeItem(dwPos, dwX, INVENTORY_GUILD_BANK, dwX2)
-					return
-				end
-			end
-		end
-		fnFinish()
-	end
-	frame:Lookup('Btn_MY_Stack'):Enable(0)
-	frame:Lookup('Btn_MY_Sort'):Enable(0)
-	X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagEx_BankSort__Stack', fnLoop)
-	X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagEx_BankSort__Stack', function()
-		-- TONG_EVENT_CODE.TAKE_REPERTORY_ITEM_PERMISSION_DENY_ERROR
-		if arg0 == TONG_EVENT_CODE.PUT_ITEM_IN_REPERTORY_SUCCESS then
-			fnFinish()
-		end
-	end)
-	X.DelayCall(1000, function()
-		if not bTrigger then
-			fnFinish()
-		end
-	end)
-	fnLoop()
-	bTrigger = false
-end
 
 -- 背包整理格子排序函数
 function D.ItemSorter(a, b)
@@ -197,13 +143,9 @@ function D.SortGuildBank()
 	-- 结束清理环境、恢复控件状态
 	local function fnFinish()
 		szState = 'Idle'
-		local btn = Station.Lookup('Normal/GuildBankPanel/Btn_MY_Sort')
-		if btn then
-			btn:Enable(1)
-			Station.Lookup('Normal/GuildBankPanel/Btn_MY_Stack'):Enable(1)
-		end
-		X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagEx_BankSort__Sort', false)
-		X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagEx_BankSort__Sort', false)
+		X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagEx_GuildBankSort__Sort', false)
+		X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagEx_GuildBankSort__Sort', false)
+		FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', false)
 	end
 	-- 根据排序结果与当前状态交换物品
 	local function fnNext()
@@ -229,12 +171,12 @@ function D.SortGuildBank()
 							szState = 'Exchanging'
 							if item then
 								--[[#DEBUG BEGIN]]
-								X.Debug('MY_BagEx_BankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
+								X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
 								OnExchangeItem(dwPos, dwX, dwPos1, dwX1)
 							else
 								--[[#DEBUG BEGIN]]
-								X.Debug('MY_BagEx_BankSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
+								X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
 								OnExchangeItem(dwPos1, dwX1, dwPos, dwX)
 							end
@@ -242,7 +184,7 @@ function D.SortGuildBank()
 						end
 					end
 					X.Systopmsg(_L['Cannot find item temp position, guild bag is full, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
-					return
+					return fnFinish()
 				end
 				-- 寻找预期物品所在位置
 				for j = X.GetGuildBankBagSize(nPage), i + 1, -1 do
@@ -253,12 +195,12 @@ function D.SortGuildBank()
 						szState = 'Exchanging'
 						if item then
 							--[[#DEBUG BEGIN]]
-							X.Debug('MY_BagEx_BankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <N1>', X.DEBUG_LEVEL.LOG)
+							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <N1>', X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
 							OnExchangeItem(dwPos, dwX, dwPos1, dwX1)
 						else
 							--[[#DEBUG BEGIN]]
-							X.Debug('MY_BagEx_BankSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N1>', X.DEBUG_LEVEL.LOG)
+							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N1>', X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
 							OnExchangeItem(dwPos1, dwX1, dwPos, dwX)
 						end
@@ -266,20 +208,20 @@ function D.SortGuildBank()
 					end
 				end
 				X.Systopmsg(_L['Exchange item match failed, guild bag may changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
-				return
+				return fnFinish()
 			end
 		end
 		fnFinish()
 	end
 	frame:Lookup('Btn_MY_Sort'):Enable(0)
 	frame:Lookup('Btn_MY_Stack'):Enable(0)
-	X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagEx_BankSort__Sort', function()
+	X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagEx_GuildBankSort__Sort', function()
 		if szState == 'Refreshing' then
 			szState = 'Idle'
 			fnNext()
 		end
 	end)
-	X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagEx_BankSort__Sort', function()
+	X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagEx_GuildBankSort__Sort', function()
 		-- TONG_EVENT_CODE.TAKE_REPERTORY_ITEM_PERMISSION_DENY_ERROR
 		if arg0 == TONG_EVENT_CODE.EXCHANGE_REPERTORY_ITEM_SUCCESS then
 			szState = 'Refreshing'
@@ -287,64 +229,59 @@ function D.SortGuildBank()
 			X.Systopmsg(_L['Put item in guild detected, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			fnFinish()
 		else
-			X.Systopmsg(_L['Unknown exception occured, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.Systopmsg(_L['Unknown exception occurred, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			fnFinish()
 			--[[#DEBUG BEGIN]]
-			X.Debug('MY_BagEx_BankSort', 'TONG_EVENT_NOTIFY: ' .. arg0, X.DEBUG_LEVEL.LOG)
+			X.Debug('MY_BagEx_GuildBankSort', 'TONG_EVENT_NOTIFY: ' .. arg0, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 	end)
+	FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', true)
 	fnNext()
 end
 
--- 检测增加堆叠按纽
+-- 检测增加按纽
 function D.CheckInjection(bRemoveInjection)
-	if not bRemoveInjection and O.bGuildBank then
-		-- 植入堆叠整理按纽
-		-- guild bank sort/stack
-		local btn1 = X.UI('Normal/GuildBankPanel/Btn_Refresh')
-		local btn2 = X.UI('Normal/GuildBankPanel/Btn_MY_Sort')
-		local btn3 = X.UI('Normal/GuildBankPanel/Btn_MY_Stack')
-		if btn1:Count() > 0 then
-			if btn2:Count() == 0 then
-				local x, y = btn1:Pos()
-				local w, h = btn1:Size()
-				btn2 = X.UI('Normal/GuildBankPanel'):Append('WndButton', {
-					name = 'Btn_MY_Sort',
-					x = x - w, y = y, w = w, h = h,
-					text = _L['Sort'],
-					tip = {
-						render = _L['Press shift for random'],
-						position = X.UI.TIP_POSITION.BOTTOM_TOP,
-					},
-					onClick = D.SortGuildBank,
-				})
-			end
-			if btn3:Count() == 0 then
-				local x, y = btn2:Pos()
-				local w, h = btn2:Size()
-				btn3 = X.UI('Normal/GuildBankPanel'):Append('WndButton', {
-					name = 'Btn_MY_Stack',
-					x = x - w, y = y, w = w, h = h,
-					text = _L['Stack'],
-					onClick = D.StackGuildBank,
-				})
+	if not bRemoveInjection and O.bEnable then
+		-- 植入整理按纽
+		-- guild bank sort
+		local btnRef = Station.Lookup('Normal/GuildBankPanel/Btn_Refresh')
+		local btnNew = Station.Lookup('Normal/GuildBankPanel/Btn_MY_Sort')
+		if btnRef then
+			if not btnNew then
+				local nX, nY = btnRef:GetRelPos()
+				local nW, nH = btnRef:GetSize()
+				btnNew = X.UI('Normal/GuildBankPanel')
+					:Append('WndButton', {
+						name = 'Btn_MY_Sort',
+						x = nX - nW, y = nY, w = nW, h = nH,
+						text = _L['Sort'],
+						tip = {
+							render = _L['Press shift for random'],
+							position = X.UI.TIP_POSITION.BOTTOM_TOP,
+						},
+						onClick = D.SortGuildBank,
+					})
+					:Raw()
 			end
 		end
+		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_GuildBankSort__Injection', function()
+			btnNew:Enable(not arg0)
+		end)
 	else
-		-- 移除堆叠整理按纽
+		-- 移除整理按纽
 		X.UI('Normal/GuildBankPanel/Btn_MY_Sort'):Remove()
-		X.UI('Normal/GuildBankPanel/Btn_MY_Stack'):Remove()
+		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_GuildBankSort__Injection', false)
 	end
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
-		text = _L['Guild package sort and stack'],
-		checked = O.bGuildBank,
+		text = _L['Guild package sort'],
+		checked = O.bEnable,
 		onCheck = function(bChecked)
-			O.bGuildBank = bChecked
+			O.bEnable = bChecked
 			D.CheckInjection()
 		end,
 	}):AutoWidth():Width() + 5
@@ -358,7 +295,7 @@ end
 ---------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_BagEx_BankSort',
+	name = 'MY_BagEx_GuildBankSort',
 	exports = {
 		{
 			fields = {
@@ -367,15 +304,15 @@ local settings = {
 		},
 	},
 }
-MY_BagEx_BankSort = X.CreateModule(settings)
+MY_BagEx_GuildBankSort = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
 -- 事件注册
 --------------------------------------------------------------------------------
 
-X.RegisterUserSettingsInit('MY_BagEx_BankSort', function() D.CheckInjection() end)
-X.RegisterFrameCreate('GuildBankPanel', 'MY_BagEx_BankSort', function() D.CheckInjection() end)
-X.RegisterReload('MY_BagEx_BankSort', function() D.CheckInjection(true) end)
+X.RegisterUserSettingsInit('MY_BagEx_GuildBankSort', function() D.CheckInjection() end)
+X.RegisterFrameCreate('GuildBankPanel', 'MY_BagEx_GuildBankSort', function() D.CheckInjection() end)
+X.RegisterReload('MY_BagEx_GuildBankSort', function() D.CheckInjection(true) end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
