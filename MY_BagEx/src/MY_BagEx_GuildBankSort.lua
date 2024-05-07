@@ -235,9 +235,9 @@ end
 function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and MY_BagEx_GuildBank.bEnable then
 		-- 植入整理按纽
-		-- guild bank sort
-		local btnRef = Station.Lookup('Normal/GuildBankPanel/Btn_Refresh')
-		local btnNew = Station.Lookup('Normal/GuildBankPanel/Btn_MY_Sort')
+		local frame = Station.Lookup('Normal/GuildBankPanel')
+		local btnRef = frame:Lookup('Btn_Refresh')
+		local btnNew = frame:Lookup('Btn_MY_Sort')
 		if btnRef then
 			if not btnNew then
 				local nX, nY = btnRef:GetRelPos()
@@ -253,7 +253,11 @@ function D.CheckInjection(bRemoveInjection)
 						},
 						onClick = function()
 							if MY_BagEx_Bag.bConfirm then
-								X.Confirm(_L['Sure to start guild bank sort?'], D.SortGuildBank)
+								X.Confirm(_L['Sure to start guild bank sort?'], {
+									x = frame:GetAbsX() + frame:GetW() / 2,
+									y = frame:GetAbsY() + frame:GetH() / 2,
+									fnResolve = D.SortGuildBank,
+								})
 							else
 								D.SortGuildBank()
 							end

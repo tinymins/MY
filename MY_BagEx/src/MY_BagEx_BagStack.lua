@@ -95,8 +95,9 @@ end
 function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and MY_BagEx_Bag.bEnable then
 		-- Ö²Èë¶Ñµþ°´Å¦
-		local btnRef = Station.Lookup('Normal/BigBagPanel/Btn_Stack')
-		local btnNew = Station.Lookup('Normal/BigBagPanel/Btn_MY_Stack')
+		local frame = Station.Lookup('Normal/BigBagPanel')
+		local btnRef = frame:Lookup('Btn_Stack')
+		local btnNew = frame:Lookup('Btn_MY_Stack')
 		if not btnRef then
 			return
 		end
@@ -111,7 +112,13 @@ function D.CheckInjection(bRemoveInjection)
 					onClick = function()
 						MY_BagEx_Bag.ShowAllItemShadow()
 						if MY_BagEx_Bag.bConfirm then
-							X.Confirm(_L['Sure to start bag stack?'], D.StackBag, MY_BagEx_Bag.HideAllItemShadow, MY_BagEx_Bag.HideAllItemShadow)
+							X.Confirm(_L['Sure to start bag stack?'], {
+								x = frame:GetAbsX() + frame:GetW() / 2,
+								y = frame:GetAbsY() + frame:GetH() / 2,
+								fnResolve = D.StackBag,
+								fnReject = MY_BagEx_Bag.HideAllItemShadow,
+								fnCancel = MY_BagEx_Bag.HideAllItemShadow,
+							})
 						else
 							D.StackBag()
 						end

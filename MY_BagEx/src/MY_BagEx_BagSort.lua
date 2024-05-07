@@ -232,8 +232,9 @@ end
 function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and MY_BagEx_Bag.bEnable then
 		-- 植入整理按纽
-		local btnRef = Station.Lookup('Normal/BigBagPanel/Btn_CU')
-		local btnNew = Station.Lookup('Normal/BigBagPanel/Btn_MY_Sort')
+		local frame = Station.Lookup('Normal/BigBagPanel')
+		local btnRef = frame:Lookup('Btn_CU')
+		local btnNew = frame:Lookup('Btn_MY_Sort')
 		if not btnRef then
 			return
 		end
@@ -252,7 +253,13 @@ function D.CheckInjection(bRemoveInjection)
 					onClick = function()
 						MY_BagEx_Bag.ShowAllItemShadow()
 						if MY_BagEx_Bag.bConfirm then
-							X.Confirm(_L['Sure to start bag sort?'], D.SortBag, MY_BagEx_Bag.HideAllItemShadow, MY_BagEx_Bag.HideAllItemShadow)
+							X.Confirm(_L['Sure to start bag sort?'], {
+								x = frame:GetAbsX() + frame:GetW() / 2,
+								y = frame:GetAbsY() + frame:GetH() / 2,
+								fnResolve = D.SortBag,
+								fnReject = MY_BagEx_Bag.HideAllItemShadow,
+								fnCancel = MY_BagEx_Bag.HideAllItemShadow,
+							})
 						else
 							D.SortBag()
 						end

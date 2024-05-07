@@ -76,10 +76,9 @@ end
 function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and MY_BagEx_GuildBank.bEnable then
 		-- Ö²Èë¶Ñµþ°´Å¦
-		-- guild bank stack
-		local btnRef = Station.Lookup('Normal/GuildBankPanel/Btn_MY_Sort')
-			or Station.Lookup('Normal/GuildBankPanel/Btn_Refresh')
-		local btnNew = Station.Lookup('Normal/GuildBankPanel/Btn_MY_Stack')
+		local frame = Station.Lookup('Normal/GuildBankPanel')
+		local btnRef = frame:Lookup('Btn_MY_Sort') or frame:Lookup('Btn_Refresh')
+		local btnNew = frame:Lookup('Btn_MY_Stack')
 		if btnRef then
 			if not btnNew then
 				local nX, nY = btnRef:GetRelPos()
@@ -91,7 +90,11 @@ function D.CheckInjection(bRemoveInjection)
 						text = _L['Stack'],
 						onClick = function()
 							if MY_BagEx_Bag.bConfirm then
-								X.Confirm(_L['Sure to start guild bank stack?'], D.StackGuildBank)
+								X.Confirm(_L['Sure to start guild bank stack?'], {
+									x = frame:GetAbsX() + frame:GetW() / 2,
+									y = frame:GetAbsY() + frame:GetH() / 2,
+									fnResolve = D.StackGuildBank,
+								})
 							else
 								D.StackGuildBank()
 							end
