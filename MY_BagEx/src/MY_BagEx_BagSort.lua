@@ -239,24 +239,29 @@ function D.CheckInjection(bRemoveInjection)
 		-- 植入整理按纽
 		local btnRef = Station.Lookup('Normal/BigBagPanel/Btn_CU')
 		local btnNew = Station.Lookup('Normal/BigBagPanel/Btn_MY_Sort')
-		if btnRef then
-			if not btnNew then
-				local nX, nY = btnRef:GetRelPos()
-				local nW, nH = btnRef:GetSize()
-				btnNew = X.UI('Normal/BigBagPanel')
-					:Append('WndButton', {
-						name = 'Btn_MY_Sort',
-						x = nX, y = nY - 1, w = nW, h = nH - 1,
-						text = _L['Sort'],
-						tip = {
-							render = _L['Press shift for random'],
-							position = X.UI.TIP_POSITION.BOTTOM_TOP,
-						},
-						onClick = D.SortBag,
-					})
-					:Raw()
-			end
+		if not btnRef then
+			return
 		end
+		local nX, nY = btnRef:GetRelPos()
+		local nW, nH = btnRef:GetSize()
+		if not btnNew then
+			btnNew = X.UI('Normal/BigBagPanel')
+				:Append('WndButton', {
+					name = 'Btn_MY_Sort',
+					w = nW, h = nH - 1,
+					text = _L['Sort'],
+					tip = {
+						render = _L['Press shift for random'],
+						position = X.UI.TIP_POSITION.BOTTOM_TOP,
+					},
+					onClick = D.SortBag,
+				})
+				:Raw()
+		end
+		if not btnNew then
+			return
+		end
+		btnNew:SetRelPos(nX, nY - 1)
 		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_BagSort__Injection', function()
 			if not btnNew then
 				return
@@ -307,5 +312,11 @@ end
 X.RegisterUserSettingsInit('MY_BagEx_BagSort', function() D.CheckInjection() end)
 X.RegisterFrameCreate('BigBagPanel', 'MY_BagEx_BagSort', function() D.CheckInjection() end)
 X.RegisterReload('MY_BagEx_BagSort', function() D.CheckInjection(true) end)
+X.RegisterEvent('SCROLL_UPDATE_LIST', 'MY_BagEx_BagSort', function()
+	if (arg0 == 'Handle_Bag_Compact' or arg0 == 'Handle_Bag_Normal')
+	and arg1 == 'BigBagPanel' then
+		D.CheckInjection()
+	end
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
