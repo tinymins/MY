@@ -1345,6 +1345,8 @@ end
 -- X.Alert([szKey, ]szMsg[, tOpt])
 -- 	@param szKey {string} 唯一标识符，不传自动生成
 -- 	@param szMsg {string} 正文
+-- 	@param tOpt.x {number} 出现位置x坐标
+-- 	@param tOpt.y {number} 出现位置y坐标
 -- 	@param tOpt.szResolve {string} 按钮文案
 -- 	@param tOpt.fnResolve {function} 按钮回调
 -- 	@param tOpt.nResolveCountDown {number} 确定按钮倒计时
@@ -1359,6 +1361,7 @@ function X.Alert(szKey, szMsg, fnResolve)
 		tOpt = { fnResolve = fnResolve }
 	end
 	return X.MessageBox(szKey, {
+		x = tOpt.x, y = tOpt.y,
 		szMessage = szMsg,
 		fnCancelAction = tOpt.fnCancel,
 		{
@@ -1375,6 +1378,8 @@ end
 -- X.Confirm([szKey, ]szMsg[, tOpt])
 -- 	@param szKey {string} 唯一标识符，不传自动生成
 -- 	@param szMsg {string} 正文
+-- 	@param tOpt.x {number} 出现位置x坐标
+-- 	@param tOpt.y {number} 出现位置y坐标
 -- 	@param tOpt.szResolve {string} 确定按钮文案
 -- 	@param tOpt.fnResolve {function} 确定回调
 -- 	@param tOpt.szReject {string} 取消按钮文案
@@ -1394,6 +1399,7 @@ function X.Confirm(szKey, szMsg, fnResolve, fnReject, fnCancel)
 		}
 	end
 	return X.MessageBox(szKey, {
+		x = tOpt.x, y = tOpt.y,
 		szMessage = szMsg,
 		fnCancelAction = tOpt.fnCancel,
 		{ szOption = tOpt.szResolve or g_tStrings.STR_HOTKEY_SURE, fnAction = tOpt.fnResolve },
