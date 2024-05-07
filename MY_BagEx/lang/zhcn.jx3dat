@@ -9,6 +9,7 @@ return {
 
     -- MY_BagEx_Bag.lua --
     ['Bag package sort and stack'] = '背包整理与堆叠',
+    ['Need confirm'] = '需要二次确认',
 
     -- MY_BagEx_BagSort.lua --
     ['Bag panel closed, sort exited!'] = '背包界面已关闭，停止整理！',
@@ -17,13 +18,16 @@ return {
     ['Put new item in bag detected, sort exited!'] = '背包放入新物品，停止整理！',
     ['Sort'] = '整理',
     ['Press shift for random'] = '按住SHIFT随机打乱',
+    ['Sure to start bag sort?'] = '确认要进行背包物品整理吗？',
 
     -- MY_BagEx_BagStack.lua --
     ['Put new item in bag detected, stack exited!'] = '背包放入新物品，停止堆叠！',
     ['Stack'] = '堆叠',
+    ['Sure to start bag stack?'] = '确认要进行背包物品堆叠吗？',
 
     -- MY_BagEx_GuildBank.lua --
     ['Guild package sort and stack'] = '帮会仓库整理与堆叠',
+    ['Need confirm'] = '需要二次确认',
 
     -- MY_BagEx_GuildBankSort.lua --
     ['Guild box closed or page changed, sort exited!'] = '帮会仓库已关闭或页码发生变化，停止整理！',
@@ -33,7 +37,9 @@ return {
     ['Unknown exception occurred, sort exited!'] = '发生未知错误，停止整理！',
     ['Sort'] = '整理',
     ['Press shift for random'] = '按住SHIFT随机打乱',
+    ['Sure to start guild bank sort?'] = '确认要进行帮会仓库物品整理吗？',
 
     -- MY_BagEx_GuildBankStack.lua --
     ['Stack'] = '堆叠',
+    ['Sure to start guild bank stack?'] = '确认要进行帮会仓库物品堆叠吗？',
 }

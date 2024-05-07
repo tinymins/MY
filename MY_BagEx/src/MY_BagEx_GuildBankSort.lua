@@ -251,7 +251,13 @@ function D.CheckInjection(bRemoveInjection)
 							render = _L['Press shift for random'],
 							position = X.UI.TIP_POSITION.BOTTOM_TOP,
 						},
-						onClick = D.SortGuildBank,
+						onClick = function()
+							if MY_BagEx_Bag.bConfirm then
+								X.Confirm(_L['Sure to start guild bank sort?'], D.SortGuildBank)
+							else
+								D.SortGuildBank()
+							end
+						end,
 					})
 					:Raw()
 			end

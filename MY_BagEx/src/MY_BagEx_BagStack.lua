@@ -102,7 +102,13 @@ function D.CheckInjection(bRemoveInjection)
 					name = 'Btn_MY_Stack',
 					w = nW, h = nH,
 					text = _L['Stack'],
-					onClick = D.StackBag,
+					onClick = function()
+						if MY_BagEx_Bag.bConfirm then
+							X.Confirm(_L['Sure to start bag stack?'], D.StackBag)
+						else
+							D.StackBag()
+						end
+					end,
 				})
 				:Raw()
 		end

@@ -27,6 +27,12 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bConfirm = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_BagEx'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
 })
 local D = {}
 
@@ -50,6 +56,14 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			D.OnEnableChange()
 		end,
 	}):AutoWidth():Width() + 5
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200,
+		text = _L['Need confirm'],
+		checked = O.bConfirm,
+		onCheck = function(bChecked)
+			O.bConfirm = bChecked
+		end,
+	}):AutoWidth():Width() + 5
 	return nX, nY
 end
 
@@ -68,6 +82,7 @@ local settings = {
 		{
 			fields = {
 				'bEnable',
+				'bConfirm',
 			},
 			root = O,
 		},

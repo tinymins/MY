@@ -89,7 +89,13 @@ function D.CheckInjection(bRemoveInjection)
 						name = 'Btn_MY_Stack',
 						x = nX - nW, y = nY, w = nW, h = nH,
 						text = _L['Stack'],
-						onClick = D.StackGuildBank,
+						onClick = function()
+							if MY_BagEx_Bag.bConfirm then
+								X.Confirm(_L['Sure to start guild bank stack?'], D.StackGuildBank)
+							else
+								D.StackGuildBank()
+							end
+						end,
 					})
 					:Raw()
 			end
