@@ -33,31 +33,59 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	tLock = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_BagEx'],
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
+		xDefaultValue = {},
+	},
 })
 local D = {}
 
-function D.ShowItemShadow(frame, dwBox, dwX)
+function D.ShowItemShadow(frame, dwBox, dwX, bEditLock)
 	for _, szPath in ipairs({
 		'Handle_Bag_Compact/Mode_' .. dwBox .. '_' .. dwX .. '/' .. dwBox .. '_' .. dwX,
 		'Handle_Bag_Normal/Handle_Bag' .. dwBox .. '/Handle_Bag_Content' .. dwBox .. '/Mode_' .. dwX .. '/' .. dwBox .. '_' .. dwX
 	}) do
 		local box = frame:Lookup('', szPath)
 		if box then
+			local szKey = dwBox .. '_' .. dwX
 			local sha = box:GetParent():Lookup('Shadow_MY_BagEx')
 			if not sha then
 				sha = X.UI(box:GetParent()):Append('Shadow', { name = 'Shadow_MY_BagEx' }):Raw()
-				sha:SetColorRGB(255, 255, 255)
-				sha:SetAlpha(50)
 				sha:SetSize(box:GetSize())
 				sha:SetRelPos(box:GetRelPos())
 				sha:SetAbsPos(box:GetAbsPos())
 			end
 			sha:Show()
+			if O.tLock[szKey] then
+				sha:SetAlpha(192)
+				sha:SetColorRGB(0, 0, 0)
+			else
+				sha:SetAlpha(50)
+				sha:SetColorRGB(255, 255, 255)
+			end
+			if bEditLock then
+				sha.OnItemLButtonClick = function()
+					local tLock = O.tLock
+					tLock[szKey] = not tLock[szKey] or nil
+					if tLock[szKey] then
+						sha:SetAlpha(192)
+						sha:SetColorRGB(0, 0, 0)
+					else
+						sha:SetAlpha(50)
+						sha:SetColorRGB(255, 255, 255)
+					end
+					O.tLock = tLock
+				end
+			else
+				sha.OnItemLButtonClick = nil
+			end
 		end
 	end
 end
 
-function D.ShowAllItemShadow()
+function D.ShowAllItemShadow(bEditLock)
 	local frame = Station.Lookup('Normal/BigBagPanel')
 	if not frame then
 		return
@@ -81,7 +109,7 @@ function D.ShowAllItemShadow()
 	local nIndex = X.GetBagPackageIndex()
 	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
-			D.ShowItemShadow(frame, dwBox, dwX)
+			D.ShowItemShadow(frame, dwBox, dwX, bEditLock)
 		end
 	end
 end
@@ -157,6 +185,7 @@ function D.OnEnableChange()
 	D.CheckConflict()
 	MY_BagEx_BagSort.CheckInjection()
 	MY_BagEx_BagStack.CheckInjection()
+	MY_BagEx_BagLock.CheckInjection()
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)

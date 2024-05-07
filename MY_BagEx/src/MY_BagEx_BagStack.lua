@@ -20,14 +20,7 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
-local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
-	bEnable = {
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_BagEx'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
-	},
-})
+local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {})
 local D = {}
 
 -- ±³°ü¶Ñµþ

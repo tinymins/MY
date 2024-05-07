@@ -26,6 +26,9 @@ return {
     ['Stack'] = '堆疊',
     ['Sure to start bag stack?'] = '確認要進行背包物品堆疊嗎？',
 
+    -- MY_BagEx_BagLock.lua --
+    ['Lock'] = '鎖定',
+
     -- MY_BagEx_GuildBank.lua --
     ['Guild package sort and stack'] = '幫會倉庫整理與堆疊',
     ['Need confirm'] = '需要二次確認',
