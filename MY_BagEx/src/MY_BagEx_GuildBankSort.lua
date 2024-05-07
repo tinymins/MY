@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : 仓库堆叠整理
+-- @desc     : 仓库整理
 -- @author   : 茗伊 @双梦镇 @追风蹑影
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -200,7 +200,7 @@ function D.SortGuildBank()
 							OnExchangeItem(dwPos, dwX, dwPos1, dwX1)
 						else
 							--[[#DEBUG BEGIN]]
-							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N1>', X.DEBUG_LEVEL.LOG)
+							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N2>', X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
 							OnExchangeItem(dwPos1, dwX1, dwPos, dwX)
 						end
@@ -213,8 +213,6 @@ function D.SortGuildBank()
 		end
 		fnFinish()
 	end
-	frame:Lookup('Btn_MY_Sort'):Enable(0)
-	frame:Lookup('Btn_MY_Stack'):Enable(0)
 	X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagEx_GuildBankSort__Sort', function()
 		if szState == 'Refreshing' then
 			szState = 'Idle'
@@ -266,6 +264,9 @@ function D.CheckInjection(bRemoveInjection)
 			end
 		end
 		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_GuildBankSort__Injection', function()
+			if not btnNew then
+				return
+			end
 			btnNew:Enable(not arg0)
 		end)
 	else

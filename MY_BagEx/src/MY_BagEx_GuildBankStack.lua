@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Mingyi Plugin.
 -- @link     : https://jx3.derzh.com/
--- @desc     : ²Ö¿â¶ÑµþÕûÀí
+-- @desc     : ²Ö¿â¶Ñµþ
 -- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
@@ -62,8 +62,6 @@ function D.StackGuildBank()
 		end
 		fnFinish()
 	end
-	frame:Lookup('Btn_MY_Stack'):Enable(0)
-	frame:Lookup('Btn_MY_Sort'):Enable(0)
 	X.RegisterEvent('UPDATE_TONG_REPERTORY_PAGE', 'MY_BagEx_GuildBankStack__Stack', fnLoop)
 	X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagEx_GuildBankStack__Stack', function()
 		-- TONG_EVENT_CODE.TAKE_REPERTORY_ITEM_PERMISSION_DENY_ERROR
@@ -104,6 +102,9 @@ function D.CheckInjection(bRemoveInjection)
 			end
 		end
 		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_GuildBankStack__Injection', function()
+			if not btnNew then
+				return
+			end
 			btnNew:Enable(not arg0)
 		end)
 	else
