@@ -62,6 +62,21 @@ function D.ShowAllItemShadow()
 	if not frame then
 		return
 	end
+	-- 遮罩背包列表
+	local h = frame:Lookup('', 'Handle_BagList')
+	if h then
+		local sha = h:Lookup('Shadow_MY_BagEx')
+		if not sha then
+			sha = X.UI(h):Append('Shadow', { name = 'Shadow_MY_BagEx' }):Raw()
+			sha:SetColorRGB(255, 255, 255)
+			sha:SetAlpha(0)
+			sha:SetSize(h:GetSize())
+			sha:SetRelPos(0, 0)
+			sha:SetAbsPos(h:GetAbsPos())
+		end
+		sha:Show()
+	end
+	-- 遮罩背包物品
 	local me = X.GetClientPlayer()
 	local nIndex = X.GetBagPackageIndex()
 	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
@@ -91,6 +106,15 @@ function D.HideAllItemShadow()
 	if not frame then
 		return
 	end
+	-- 遮罩背包列表
+	local h = frame:Lookup('', 'Handle_BagList')
+	if h then
+		local sha = h:Lookup('Shadow_MY_BagEx')
+		if sha then
+			sha:Hide()
+		end
+	end
+	-- 遮罩背包物品
 	local me = X.GetClientPlayer()
 	local nIndex = X.GetBagPackageIndex()
 	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
