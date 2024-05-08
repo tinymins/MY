@@ -2285,23 +2285,36 @@ end
 --------------------------------------------------------------------------------
 do
 local FOE_LIST, FOE_CACHE
+local function GetFoeInfo()
+	local smc = X.GetSocialManagerClient()
+	if smc then
+		return smc.GetFoeInfo()
+	end
+	local me = X.GetClientPlayer()
+	if me and me.GetFoeInfo then
+		return me.GetFoeInfo()
+	end
+end
 local function GeneFoeCache()
 	if not FOE_LIST then
-		local me = X.GetClientPlayer()
-		if me then
+		local aInfo = GetFoeInfo()
+		if aInfo then
 			FOE_LIST = {}
 			FOE_CACHE = {}
-			if me.GetFoeInfo then
-				local infos = me.GetFoeInfo()
-				if infos then
-					for i, p in ipairs(infos) do
-						FOE_CACHE[p.id] = p
-						FOE_CACHE[p.name] = p
-						table.insert(FOE_LIST, p)
+			for i, p in ipairs(aInfo) do
+				FOE_CACHE[p.id] = p
+				if p.name then
+					FOE_CACHE[p.name] = p
+				else
+					local info = X.GetRoleEntryInfo(p.id)
+					if info then
+						FOE_CACHE[info.dwPlayerID] = p
+						FOE_CACHE[info.szName] = p
 					end
-					return true
 				end
+				table.insert(FOE_LIST, p)
 			end
+			return true
 		end
 		return false
 	end
