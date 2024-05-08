@@ -59,7 +59,7 @@ function D.ShowItemShadow(frame, dwBox, dwX, bEditLock)
 			end
 			sha:Show()
 			if O.tLock[szKey] then
-				sha:SetAlpha(192)
+				sha:SetAlpha(128)
 				sha:SetColorRGB(0, 0, 0)
 			else
 				sha:SetAlpha(50)
@@ -70,7 +70,7 @@ function D.ShowItemShadow(frame, dwBox, dwX, bEditLock)
 					local tLock = O.tLock
 					tLock[szKey] = not tLock[szKey] or nil
 					if tLock[szKey] then
-						sha:SetAlpha(192)
+						sha:SetAlpha(128)
 						sha:SetColorRGB(0, 0, 0)
 					else
 						sha:SetAlpha(50)
