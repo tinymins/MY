@@ -28,7 +28,7 @@ local D = {
 		[ITEM_GENRE.EQUIPMENT] = 2,
 		[ITEM_GENRE.BOOK] = 3,
 		[ITEM_GENRE.POTION] = 4,
-		[ITEM_GENRE.MATERIAL] = 5
+		[ITEM_GENRE.MATERIAL] = 5,
 	},
 	aSub = {
 		[EQUIPMENT_SUB.HORSE] = 1,
@@ -40,36 +40,51 @@ local D = {
 
 -- 背包整理格子排序函数
 function D.ItemSorter(a, b)
+	-- 空白格子靠后
 	if not a.dwID then
 		return false
 	end
 	if not b.dwID then
 		return true
 	end
-	local gA, gB = D.aGenre[a.nGenre] or (100 + a.nGenre), D.aGenre[b.nGenre] or (100 + b.nGenre)
-	if gA == gB then
-		if b.nUiId == a.nUiId and b.bCanStack then
-			return a.nStackNum > b.nStackNum
-		elseif a.nGenre == ITEM_GENRE.EQUIPMENT then
-			local sA, sB = D.aSub[a.nSub] or (100 + a.nSub), D.aSub[b.nSub] or (100 + b.nSub)
-			if sA == sB then
-				if b.nSub == EQUIPMENT_SUB.MELEE_WEAPON or b.nSub == EQUIPMENT_SUB.RANGE_WEAPON then
-					if a.nDetail < b.nDetail then
-						return true
-					end
-				elseif b.nSub == EQUIPMENT_SUB.PACKAGE then
-					if a.nCurrentDurability > b.nCurrentDurability then
-						return true
-					elseif a.nCurrentDurability < b.nCurrentDurability then
-						return false
-					end
+	-- 类型不同按类型排序
+	local nGenreA = D.aGenre[a.nGenre] or (100 + a.nGenre)
+	local nGenreB = D.aGenre[b.nGenre] or (100 + b.nGenre)
+	if nGenreA ~= nGenreB then
+		return nGenreA < nGenreB
+	end
+	-- 相同物品按堆叠数量排序
+	if a.nUiId == b.nUiId and b.bCanStack then
+		return a.nStackNum > b.nStackNum
+	end
+	-- 装备类比较
+	if a.nGenre == ITEM_GENRE.EQUIPMENT then
+		local nSubA = D.aSub[a.nSub] or (100 + a.nSub)
+		local nSubB = D.aSub[b.nSub] or (100 + b.nSub)
+		if nSubA == nSubB then
+			-- 武器按照类型排列
+			if b.nSub == EQUIPMENT_SUB.MELEE_WEAPON or b.nSub == EQUIPMENT_SUB.RANGE_WEAPON then
+				if a.nDetail ~= b.nDetail then
+					return a.nDetail < b.nDetail
+				end
+			end
+			-- 包裹容量大的排在后面
+			if b.nSub == EQUIPMENT_SUB.PACKAGE then
+				if a.nCurrentDurability ~= b.nCurrentDurability then
+					return a.nCurrentDurability > b.nCurrentDurability
 				end
 			end
 		end
-		return a.nQuality > b.nQuality or (a.nQuality == b.nQuality and (a.dwTabType < b.dwTabType or (a.dwTabType == b.dwTabType and a.dwIndex < b.dwIndex)))
-	else
-		return gA < gB
 	end
+	-- 处理品质比较
+	if a.nQuality ~= b.nQuality then
+		return a.nQuality > b.nQuality
+	end
+	-- 按照表下标排序
+	if a.dwTabType ~= b.dwTabType then
+		return a.dwTabType < b.dwTabType
+	end
+	return a.dwIndex < b.dwIndex
 end
 
 function D.IsSameItem(item1, item2)
