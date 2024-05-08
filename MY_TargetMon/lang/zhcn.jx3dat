@@ -149,6 +149,7 @@ return {
 	['Homeland map'] = '家园地图',
 	['Roguelike map'] = '八荒衡鉴地图',
 	['Competition map'] = '竞技地图',
+	['Camp map'] = '阵营地图',
 	['Guild territory map'] = '帮会领地地图',
 
     -- MY_TargetMon_PS.lua

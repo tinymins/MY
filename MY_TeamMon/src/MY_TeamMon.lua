@@ -78,6 +78,7 @@ local MY_TEAM_MON_SPECIAL_MAP = {
 	ROGUELIKE       = -16, -- 八荒衡鉴
 	COMPETITION     = -17, -- 竞技
 	GUILD_TERRITORY = -18, -- 帮会领地
+	CAMP            = -19, -- 阵营地图
 	RECYCLE_BIN     =  -9, -- 回收站
 }
 local MY_TEAM_MON_SPECIAL_MAP_NAME = {
@@ -98,6 +99,7 @@ local MY_TEAM_MON_SPECIAL_MAP_NAME = {
 	[MY_TEAM_MON_SPECIAL_MAP.GUILD_TERRITORY] = _L['Guild territory data'],
 	[MY_TEAM_MON_SPECIAL_MAP.ROGUELIKE      ] = _L['Roguelike data'],
 	[MY_TEAM_MON_SPECIAL_MAP.COMPETITION    ] = _L['Competition data'],
+	[MY_TEAM_MON_SPECIAL_MAP.CAMP           ] = _L['Camp data'],
 	[MY_TEAM_MON_SPECIAL_MAP.RECYCLE_BIN    ] = _L['Recycle bin data'],
 }
 local MY_TEAM_MON_SPECIAL_MAP_INFO = {}
@@ -2172,6 +2174,9 @@ function D.IterTable(data, dwMapID, bIterItem, bReverse)
 		end
 		if X.IsVillageMap(dwMapID) then
 			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.VILLAGE])
+		end
+		if X.IsCampMap(dwMapID) then
+			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.CAMP])
 		end
 		if X.IsStarveMap(dwMapID) then
 			table.insert(res, data[MY_TEAM_MON_SPECIAL_MAP.STARVE])
