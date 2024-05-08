@@ -4046,6 +4046,21 @@ function X.IsInVillageMap()
 	return me and X.IsVillageMap(me.GetMapID())
 end
 
+---判断一个地图是不是阵营地图
+---@param dwMapID number @要判断的地图ID
+---@return boolean @是否是阵营地图
+function X.IsCampMap(dwMapID)
+	local tType = Table_GetMapType(dwMapID)
+	return tType and tType.CAMP and true or false
+end
+
+---判断当前地图是不是阵营地图
+---@return boolean @当前地图是否是阵营地图
+function X.IsInCampMap()
+	local me = X.GetClientPlayer()
+	return me and X.IsCampMap(me.GetMapID())
+end
+
 do
 local PUBG_MAP = {}
 ---判断地图是不是绝境战场地图
