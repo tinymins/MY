@@ -21,71 +21,7 @@ end
 --------------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {})
-local D = {
-	-- 物品排序顺序
-	aGenre = {
-		[ITEM_GENRE.TASK_ITEM] = 1,
-		[ITEM_GENRE.EQUIPMENT] = 2,
-		[ITEM_GENRE.BOOK] = 3,
-		[ITEM_GENRE.POTION] = 4,
-		[ITEM_GENRE.MATERIAL] = 5
-	},
-	aSub = {
-		[EQUIPMENT_SUB.HORSE] = 1,
-		[EQUIPMENT_SUB.PACKAGE] = 2,
-		[EQUIPMENT_SUB.MELEE_WEAPON] = 3,
-		[EQUIPMENT_SUB.RANGE_WEAPON] = 4,
-	},
-}
-
--- 背包整理格子排序函数
-function D.ItemSorter(a, b)
-	if not a.dwID then
-		return false
-	end
-	if not b.dwID then
-		return true
-	end
-	local gA, gB = D.aGenre[a.nGenre] or (100 + a.nGenre), D.aGenre[b.nGenre] or (100 + b.nGenre)
-	if gA == gB then
-		if b.nUiId == a.nUiId and b.bCanStack then
-			return a.nStackNum > b.nStackNum
-		elseif a.nGenre == ITEM_GENRE.EQUIPMENT then
-			local sA, sB = D.aSub[a.nSub] or (100 + a.nSub), D.aSub[b.nSub] or (100 + b.nSub)
-			if sA == sB then
-				if b.nSub == EQUIPMENT_SUB.MELEE_WEAPON or b.nSub == EQUIPMENT_SUB.RANGE_WEAPON then
-					if a.nDetail < b.nDetail then
-						return true
-					end
-				elseif b.nSub == EQUIPMENT_SUB.PACKAGE then
-					if a.nCurrentDurability > b.nCurrentDurability then
-						return true
-					elseif a.nCurrentDurability < b.nCurrentDurability then
-						return false
-					end
-				end
-			end
-		end
-		return a.nQuality > b.nQuality or (a.nQuality == b.nQuality and (a.dwTabType < b.dwTabType or (a.dwTabType == b.dwTabType and a.dwIndex < b.dwIndex)))
-	else
-		return gA < gB
-	end
-end
-
-function D.IsSameItem(item1, item2)
-	if (not item1 or not item1.dwID) and (not item2 or not item2.dwID) then
-		return true
-	end
-	if item1 and item2 and item1.dwID and item2.dwID then
-		if item1.dwID == item2.dwID then
-			return true
-		end
-		if item1.nUiId == item2.nUiId and (not item1.bCanStack or item1.nStackNum == item2.nStackNum) then
-			return true
-		end
-	end
-	return false
-end
+local D = {}
 
 -- 帮会仓库整理
 function D.SortBag()
@@ -143,7 +79,7 @@ function D.SortBag()
 			end
 		end
 	else
-		table.sort(aMovableInfo, D.ItemSorter)
+		table.sort(aMovableInfo, MY_BagEx.ItemSorter)
 	end
 	-- 合成避开锁定格子后的排序结果
 	for i, _ in X.ipairs_r(aInfo) do
@@ -172,7 +108,7 @@ function D.SortBag()
 			local tBagPos = aBagPos[i]
 			local dwBox, dwX = tBagPos.dwBox, tBagPos.dwX
 			local item = GetPlayerItem(me, dwBox, dwX)
-			if D.IsSameItem(item, info) then
+			if MY_BagEx.IsSameItem(item, info) then
 				if not MY_BagEx_Bag.IsItemBoxLocked(dwBox, dwX) then
 					MY_BagEx_Bag.HideItemShadow(frame, dwBox, dwX)
 				end
@@ -209,7 +145,7 @@ function D.SortBag()
 					local dwBox1, dwX1 = tBagPos1.dwBox, tBagPos1.dwX
 					local item1 = GetPlayerItem(me, dwBox1, dwX1)
 					-- 匹配到预期物品所在位置
-					if not MY_BagEx_Bag.IsItemBoxLocked(dwBox1, dwX1) and D.IsSameItem(item1, info) then
+					if not MY_BagEx_Bag.IsItemBoxLocked(dwBox1, dwX1) and MY_BagEx.IsSameItem(item1, info) then
 						szState = 'Exchanging'
 						if item then
 							--[[#DEBUG BEGIN]]
