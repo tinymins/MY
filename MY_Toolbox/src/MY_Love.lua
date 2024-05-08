@@ -1014,8 +1014,9 @@ local function OnPlayerFellowshipLogin()
 	if MY_Love.IsShielded() then
 		return
 	end
-	if not arg2 and arg1 == D.lover.szName and D.lover.szName ~= '' then
-		if arg0 then
+	local bLoad, szName, bFoe = arg0, arg1, arg2
+	if not bFoe and szName == D.lover.szName and D.lover.szName ~= '' then
+		if bLoad then
 			X.UI.CreateFloatText(_L('Love tip: %s is online now', D.lover.szName), 1500, {
 				nFont = 19,
 				fScale = 2.5,
