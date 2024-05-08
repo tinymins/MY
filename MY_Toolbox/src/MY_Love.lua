@@ -413,30 +413,43 @@ function D.GetLover()
 				me.SetFellowshipRemark(info.id, '')
 			end
 		end
-		-- 遍历到情缘，获取基础信息并返回
+		-- 没有情缘不需要遍历
+		if dwLoverID == 0 then
+			return
+		end
+		-- 获取当前好友基础信息
 		local rei = X.GetRoleEntryInfo(info.id)
-		if rei and rei.dwPlayerID == dwLoverID  then
-			local card = X.GetFellowshipCardInfo(info.id)
-			if not card then
-				X.ApplyFellowshipCard(info.id)
-			elseif card.bIsTwoWayFriend then
-				lover = {
-					dwID = dwLoverID,
-					szName = rei.szName,
-					szTitle = D.tLoverItem[D.lover.nSendItem] and D.tLoverItem[D.lover.nSendItem].szTitle or '',
-					nSendItem = nSendItem,
-					nReceiveItem = nReceiveItem,
-					nLoverType = nLoverType,
-					nLoverTime = nLoverTime,
-					szLoverTitle = D.tLoverItem[D.lover.nReceiveItem] and D.tLoverItem[D.lover.nReceiveItem].szTitle or '',
-					dwAvatar = card.dwMiniAvatarID,
-					dwForceID = card.dwForceID,
-					nRoleType = card.nRoleType,
-					dwMapID = X.GetFellowshipMapID(info.id),
-					bOnline = X.IsRoleOnline(info.id),
-				}
-				return 0
-			end
+		-- 获取失败或者是跨服好友则跳过
+		if not rei or rei.dwPlayerID == 0 then
+			return
+		end
+		-- 不是情缘则跳过
+		if rei.dwPlayerID ~= dwLoverID then
+			return
+		end
+		-- 遍历到情缘，获取基础信息并返回
+		local card = X.GetFellowshipCardInfo(info.id)
+		if not card then
+			X.ApplyFellowshipCard(info.id)
+			return
+		end
+		if card.bIsTwoWayFriend then
+			lover = {
+				dwID = dwLoverID,
+				szName = rei.szName,
+				szTitle = D.tLoverItem[D.lover.nSendItem] and D.tLoverItem[D.lover.nSendItem].szTitle or '',
+				nSendItem = nSendItem,
+				nReceiveItem = nReceiveItem,
+				nLoverType = nLoverType,
+				nLoverTime = nLoverTime,
+				szLoverTitle = D.tLoverItem[D.lover.nReceiveItem] and D.tLoverItem[D.lover.nReceiveItem].szTitle or '',
+				dwAvatar = card.dwMiniAvatarID,
+				dwForceID = card.dwForceID,
+				nRoleType = card.nRoleType,
+				dwMapID = X.GetFellowshipMapID(info.id),
+				bOnline = X.IsRoleOnline(info.id),
+			}
+			return 0
 		end
 	end)
 	return lover
