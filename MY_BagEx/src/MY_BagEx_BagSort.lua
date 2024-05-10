@@ -35,6 +35,15 @@ function D.SortBag()
 	local aBagPos = {}
 	local nIndex = X.GetBagPackageIndex()
 	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
+		local dwGenre = me.GetContainType(dwBox)
+		if dwGenre == ITEM_GENRE.BOOK then
+			X.Systopmsg(_L['Bag contains book only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
+			return
+		end
+		if dwGenre == ITEM_GENRE.MATERIAL then
+			X.Systopmsg(_L['Bag contains material only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
+			return
+		end
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local item = GetPlayerItem(me, dwBox, dwX)
 			if item then

@@ -34,6 +34,15 @@ function D.SortBank()
 	local me, aInfo, nItemCount = X.GetClientPlayer(), {}, 0
 	local aBagPos = {}
 	for _, dwBox in ipairs(X.CONSTANT.INVENTORY_BANK_LIST) do
+		local dwGenre = me.GetContainType(dwBox)
+		if dwGenre == ITEM_GENRE.BOOK then
+			X.Systopmsg(_L['Bank contains book only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
+			return
+		end
+		if dwGenre == ITEM_GENRE.MATERIAL then
+			X.Systopmsg(_L['Bank contains material only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
+			return
+		end
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local item = GetPlayerItem(me, dwBox, dwX)
 			if item then

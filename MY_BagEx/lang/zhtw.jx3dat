@@ -12,6 +12,8 @@ return {
     ['Need confirm'] = '需要二次確認',
 
     -- MY_BagEx_BagSort.lua --
+    ['Bag contains book only, use official sort please!'] = '整理失敗，背包包含書包，請使用官方整理功能！',
+    ['Bag contains material only, use official sort please!'] = '整理失敗，背包包含礦石包，請使用官方整理功能！',
     ['Bag panel closed, sort exited!'] = '背包界面已關閉，停止整理！',
     ['Cannot find item temp position, bag is full, sort exited!'] = '無法獲取臨時位置，背包可能已滿，停止整理！',
     ['Exchange item match failed, bag may changed, sort exited!'] = '找不到整理的物品，背包可能被操作過，停止整理！',
@@ -35,6 +37,8 @@ return {
 
     -- MY_BagEx_BankSort.lua --
     ['Please unlock mibao first.'] = '請先解除密保鎖。',
+    ['Bank contains book only, use official sort please!'] = '整理失敗，倉庫包含書包，請使用官方整理功能！',
+    ['Bank contains material only, use official sort please!'] = '整理失敗，倉庫包含礦石包，請使用官方整理功能！',
     ['Bank panel closed, sort exited!'] = '倉庫界面已關閉，停止整理！',
     ['Cannot find item temp position, bank is full, sort exited!'] = '無法獲取臨時位置，倉庫可能已滿，停止整理！',
     ['Exchange item match failed, bank may changed, sort exited!'] = '找不到整理的物品，倉庫可能被操作過，停止整理！',
