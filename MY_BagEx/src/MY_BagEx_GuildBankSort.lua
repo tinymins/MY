@@ -35,10 +35,8 @@ function D.SortGuildBank()
 	for i = 1, X.GetGuildBankBagSize(nPage) do
 		local dwPos, dwX = X.GetGuildBankBagPos(nPage, i)
 		local kItem = GetPlayerItem(me, dwPos, dwX)
-		local tDesc = kItem
-			and MY_BagEx.GetItemDesc(kItem)
-			or X.CONSTANT.EMPTY_TABLE
-		if tDesc ~= X.CONSTANT.EMPTY_TABLE then
+		local tDesc = MY_BagEx.GetItemDesc(kItem)
+		if not X.IsEmpty(tDesc) then
 			nItemCount = nItemCount + 1
 		end
 		table.insert(aItemDesc, tDesc)

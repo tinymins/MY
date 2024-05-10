@@ -39,6 +39,9 @@ local D = {
 }
 
 function D.GetItemDesc(kItem)
+	if not kItem then
+		return X.CONSTANT.EMPTY_TABLE
+	end
 	return {
 		dwID = kItem.dwID,
 		nUiId = kItem.nUiId,

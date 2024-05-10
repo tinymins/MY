@@ -45,10 +45,8 @@ function D.SortBank()
 		end
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
 			local kItem = GetPlayerItem(me, dwBox, dwX)
-			local tDesc = kItem
-				and MY_BagEx.GetItemDesc(kItem)
-				or X.CONSTANT.EMPTY_TABLE
-			if tDesc ~= X.CONSTANT.EMPTY_TABLE then
+			local tDesc = MY_BagEx.GetItemDesc(kItem)
+			if not X.IsEmpty(tDesc) then
 				nItemCount = nItemCount + 1
 			end
 			table.insert(aItemDesc, tDesc)
