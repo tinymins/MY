@@ -8,7 +8,7 @@ return {
     ['Compare with bag'] = '對比背包',
 
     -- MY_BagEx_Bag.lua --
-    ['Bag package sort and stack'] = '背包整理與堆疊',
+    ['Bag package sort and stack'] = '背包整理、堆疊、鎖定',
     ['Need confirm'] = '需要二次確認',
 
     -- MY_BagEx_BagSort.lua --
@@ -32,7 +32,7 @@ return {
     ['Lock'] = '鎖定',
 
     -- MY_BagEx_Bank.lua --
-    ['Bank package sort and stack'] = '倉庫整理與堆疊',
+    ['Bank package sort and stack'] = '倉庫整理、堆疊、鎖定',
     ['Need confirm'] = '需要二次確認',
 
     -- MY_BagEx_BankSort.lua --
