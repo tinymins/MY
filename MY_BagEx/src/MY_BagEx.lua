@@ -38,25 +38,25 @@ local D = {
 	},
 }
 
-function D.GetItemDescription(KItem)
+function D.GetItemDesc(kItem)
 	return {
-		dwID = KItem.dwID,
-		nUiId = KItem.nUiId,
-		dwTabType = KItem.dwTabType,
-		dwIndex = KItem.dwIndex,
-		nGenre = KItem.nGenre,
-		nSub = KItem.nSub,
-		nDetail = KItem.nDetail,
-		nQuality = KItem.nQuality,
-		bCanStack = KItem.bCanStack,
-		nStackNum = KItem.nStackNum,
-		nCurrentDurability = KItem.nCurrentDurability,
-		szName = X.GetObjectName('ITEM', KItem),
+		dwID = kItem.dwID,
+		nUiId = kItem.nUiId,
+		dwTabType = kItem.dwTabType,
+		dwIndex = kItem.dwIndex,
+		nGenre = kItem.nGenre,
+		nSub = kItem.nSub,
+		nDetail = kItem.nDetail,
+		nQuality = kItem.nQuality,
+		bCanStack = kItem.bCanStack,
+		nStackNum = kItem.nStackNum,
+		nCurrentDurability = kItem.nCurrentDurability,
+		szName = X.GetObjectName('ITEM', kItem),
 	}
 end
 
 -- 背包整理格子排序函数
-function D.ItemSorter(a, b)
+function D.ItemDescSorter(a, b)
 	-- 空白格子靠后
 	if not a.dwID then
 		return false
@@ -109,16 +109,16 @@ function D.ItemSorter(a, b)
 	return false
 end
 
-function D.IsSameItem(item1, item2)
-	if (not item1 or not item1.dwID) and (not item2 or not item2.dwID) then
+function D.IsSameItemDesc(a, b)
+	if (not a or not a.dwID) and (not b or not b.dwID) then
 		return true
 	end
-	if item1 and item2 and item1.dwID and item2.dwID then
-		if item1.dwID == item2.dwID then
+	if a and b and a.dwID and b.dwID then
+		if a.dwID == b.dwID then
 			return true
 		end
-		if (item1.dwTabType == item2.dwTabType and item1.dwIndex == item2.dwIndex)
-		and (not item1.bCanStack or item1.nStackNum == item2.nStackNum) then
+		if (a.dwTabType == b.dwTabType and a.dwIndex == b.dwIndex)
+		and (not a.bCanStack or a.nStackNum == b.nStackNum) then
 			return true
 		end
 	end
@@ -134,9 +134,9 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				GetItemDescription = D.GetItemDescription,
-				ItemSorter = D.ItemSorter,
-				IsSameItem = D.IsSameItem,
+				GetItemDesc = D.GetItemDesc,
+				ItemDescSorter = D.ItemDescSorter,
+				IsSameItemDesc = D.IsSameItemDesc,
 			},
 		},
 	},

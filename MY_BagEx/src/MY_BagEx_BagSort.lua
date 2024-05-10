@@ -25,16 +25,16 @@ local D = {}
 
 -- 帮会仓库整理
 function D.SortBag()
-	local frame = Station.Lookup('Normal/BigBagPanel')
-	if not frame then
+	local hFrame = Station.Lookup('Normal/BigBagPanel')
+	if not hFrame then
 		return
 	end
 	local szState = 'Idle'
 	-- 加载格子列表
-	local me, aInfo, nItemCount = X.GetClientPlayer(), {}, 0
+	local me, aItemDesc, nItemCount = X.GetClientPlayer(), {}, 0
 	local aBagPos = {}
-	local nIndex = X.GetBagPackageIndex()
-	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
+	local nBagPackageIndex = X.GetBagPackageIndex()
+	for dwBox = nBagPackageIndex, nBagPackageIndex + X.GetBagPackageCount() - 1 do
 		local dwGenre = me.GetContainType(dwBox)
 		if dwGenre == ITEM_GENRE.BOOK then
 			X.Systopmsg(_L['Bag contains book only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
@@ -45,14 +45,14 @@ function D.SortBag()
 			return
 		end
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
-			local KItem = GetPlayerItem(me, dwBox, dwX)
-			local info = KItem
-				and MY_BagEx.GetItemDescription(KItem)
+			local kItem = GetPlayerItem(me, dwBox, dwX)
+			local tDesc = kItem
+				and MY_BagEx.GetItemDesc(kItem)
 				or X.CONSTANT.EMPTY_TABLE
-			if info ~= X.CONSTANT.EMPTY_TABLE then
+			if tDesc ~= X.CONSTANT.EMPTY_TABLE then
 				nItemCount = nItemCount + 1
 			end
-			table.insert(aInfo, info)
+			table.insert(aItemDesc, tDesc)
 			table.insert(aBagPos, { dwBox = dwBox, dwX = dwX })
 		end
 	end
@@ -60,29 +60,29 @@ function D.SortBag()
 		return
 	end
 	-- 避开锁定格子
-	local aMovableInfo = {}
-	for i, info in ipairs(aInfo) do
-		local tPos = aBagPos[i]
+	local aMovableItemDesc = {}
+	for nIndex, tDesc in ipairs(aItemDesc) do
+		local tPos = aBagPos[nIndex]
 		if not MY_BagEx_Bag.IsItemBoxLocked(tPos.dwBox, tPos.dwX) then
-			table.insert(aMovableInfo, info)
+			table.insert(aMovableItemDesc, tDesc)
 		end
 	end
 	-- 排序格子列表
 	if IsShiftKeyDown() then
-		for i = 1, #aMovableInfo do
-			local j = X.Random(1, #aMovableInfo)
-			if i ~= j then
-				aMovableInfo[i], aMovableInfo[j] = aMovableInfo[j], aMovableInfo[i]
+		for nIndex = 1, #aMovableItemDesc do
+			local nExcIndex = X.Random(1, #aMovableItemDesc)
+			if nIndex ~= nExcIndex then
+				aMovableItemDesc[nIndex], aMovableItemDesc[nExcIndex] = aMovableItemDesc[nExcIndex], aMovableItemDesc[nIndex]
 			end
 		end
 	else
-		table.sort(aMovableInfo, MY_BagEx.ItemSorter)
+		table.sort(aMovableItemDesc, MY_BagEx.ItemDescSorter)
 	end
 	-- 合成避开锁定格子后的排序结果
-	for i, _ in X.ipairs_r(aInfo) do
-		local tPos = aBagPos[i]
+	for nIndex, _ in X.ipairs_r(aItemDesc) do
+		local tPos = aBagPos[nIndex]
 		if not MY_BagEx_Bag.IsItemBoxLocked(tPos.dwBox, tPos.dwX) then
-			aInfo[i] = table.remove(aMovableInfo)
+			aItemDesc[nIndex] = table.remove(aMovableItemDesc)
 		end
 	end
 	-- 结束清理环境、恢复控件状态
@@ -94,41 +94,42 @@ function D.SortBag()
 	end
 	-- 根据排序结果与当前状态交换物品
 	local function fnNext()
-		if not frame then
+		if not hFrame then
 			X.Systopmsg(_L['Bag panel closed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			return fnFinish()
 		end
 		if szState == 'Exchanging' then
 			return
 		end
-		for i, info in ipairs(aInfo) do
-			local tBagPos = aBagPos[i]
+		for nIndex, tDesc in ipairs(aItemDesc) do
+			local tBagPos = aBagPos[nIndex]
 			local dwBox, dwX = tBagPos.dwBox, tBagPos.dwX
-			local item = GetPlayerItem(me, dwBox, dwX)
-			if MY_BagEx.IsSameItem(item, info) then
+			local kCurItem = GetPlayerItem(me, dwBox, dwX)
+			local tCurDesc = MY_BagEx.GetItemDesc(kCurItem)
+			if MY_BagEx.IsSameItemDesc(tDesc, tCurDesc) then
 				if not MY_BagEx_Bag.IsItemBoxLocked(dwBox, dwX) then
-					MY_BagEx_Bag.HideItemShadow(frame, dwBox, dwX)
+					MY_BagEx_Bag.HideItemShadow(hFrame, dwBox, dwX)
 				end
 			else -- 当前格子和预期不符 需要交换
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
-				if item and info.dwID and item.nUiId == info.nUiId and item.bCanStack and item.nStackNum ~= info.nStackNum then
-					for j = #aBagPos, i + 1, -1 do
-						local tBagPos1 = aBagPos[j]
-						local dwBox1, dwX1 = tBagPos1.dwBox, tBagPos1.dwX
-						local item1 = GetPlayerItem(me, dwBox1, dwX1)
+				if kCurItem and tDesc.dwID and kCurItem.nUiId == tDesc.nUiId and kCurItem.bCanStack and kCurItem.nStackNum ~= tDesc.nStackNum then
+					for nExcIndex = #aBagPos, nIndex + 1, -1 do
+						local tExcBagPos = aBagPos[nExcIndex]
+						local dwExcBox, dwExcX = tExcBagPos.dwBox, tExcBagPos.dwX
+						local kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
 						-- 匹配到用于交换的格子
-						if not MY_BagEx_Bag.IsItemBoxLocked(dwBox1, dwX1) and (not item1 or item1.nUiId ~= item.nUiId) then
+						if not MY_BagEx_Bag.IsItemBoxLocked(dwExcBox, dwExcX) and (not kExcItem or kExcItem.nUiId ~= kCurItem.nUiId) then
 							szState = 'Exchanging'
-							if item then
+							if kCurItem then
 								--[[#DEBUG BEGIN]]
-								X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
+								X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwExcBox .. ',' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
-								OnExchangeItem(dwBox, dwX, dwBox1, dwX1)
+								OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
 							else
 								--[[#DEBUG BEGIN]]
-								X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwBox1 .. ',' .. dwX1 .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
+								X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwExcBox .. ',' .. dwExcX .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
-								OnExchangeItem(dwBox1, dwX1, dwBox, dwX)
+								OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
 							end
 							return
 						end
@@ -137,23 +138,24 @@ function D.SortBag()
 					return fnFinish()
 				end
 				-- 寻找预期物品所在位置
-				for j = #aBagPos, i + 1, -1 do
-					local tBagPos1 = aBagPos[j]
-					local dwBox1, dwX1 = tBagPos1.dwBox, tBagPos1.dwX
-					local item1 = GetPlayerItem(me, dwBox1, dwX1)
+				for nExcIndex = #aBagPos, nIndex + 1, -1 do
+					local tExcBagPos = aBagPos[nExcIndex]
+					local dwExcBox, dwExcX = tExcBagPos.dwBox, tExcBagPos.dwX
+					local kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
+					local tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 					-- 匹配到预期物品所在位置
-					if not MY_BagEx_Bag.IsItemBoxLocked(dwBox1, dwX1) and MY_BagEx.IsSameItem(item1, info) then
+					if not MY_BagEx_Bag.IsItemBoxLocked(dwExcBox, dwExcX) and MY_BagEx.IsSameItemDesc(tDesc, tExcDesc) then
 						szState = 'Exchanging'
-						if item then
+						if kCurItem then
 							--[[#DEBUG BEGIN]]
-							X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <N1>', X.DEBUG_LEVEL.LOG)
+							X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwExcBox .. ',' .. dwExcX .. ' <N1>', X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
-							OnExchangeItem(dwBox, dwX, dwBox1, dwX1)
+							OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
 						else
 							--[[#DEBUG BEGIN]]
-							X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwBox1 .. ',' .. dwX1 .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <N2>', X.DEBUG_LEVEL.LOG)
+							X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwExcBox .. ',' .. dwExcX .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <N2>', X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
-							OnExchangeItem(dwBox1, dwX1, dwBox, dwX)
+							OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
 						end
 						return
 					end
@@ -182,19 +184,19 @@ end
 function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and MY_BagEx_Bag.bEnable then
 		-- 植入整理按纽
-		local frame = Station.Lookup('Normal/BigBagPanel')
-		if not frame then
+		local hFrame = Station.Lookup('Normal/BigBagPanel')
+		if not hFrame then
 			return
 		end
-		local btnRef = frame:Lookup('Btn_CU')
-		local btnNew = frame:Lookup('Btn_MY_Sort')
-		if not btnRef then
+		local hBtnRef = hFrame:Lookup('Btn_CU')
+		local hBtnNew = hFrame:Lookup('Btn_MY_Sort')
+		if not hBtnRef then
 			return
 		end
-		local nX, nY = btnRef:GetRelPos()
-		local nW, nH = btnRef:GetSize()
-		if not btnNew then
-			btnNew = X.UI('Normal/BigBagPanel')
+		local nX, nY = hBtnRef:GetRelPos()
+		local nW, nH = hBtnRef:GetSize()
+		if not hBtnNew then
+			hBtnNew = X.UI('Normal/BigBagPanel')
 				:Append('WndButton', {
 					name = 'Btn_MY_Sort',
 					w = nW, h = nH - 3,
@@ -207,8 +209,8 @@ function D.CheckInjection(bRemoveInjection)
 						MY_BagEx_Bag.ShowAllItemShadow()
 						if MY_BagEx_Bag.bConfirm then
 							X.Confirm('MY_BagEx_BagSort', _L['Sure to start bag sort?'], {
-								x = frame:GetAbsX() + frame:GetW() / 2,
-								y = frame:GetAbsY() + frame:GetH() / 2,
+								x = hFrame:GetAbsX() + hFrame:GetW() / 2,
+								y = hFrame:GetAbsY() + hFrame:GetH() / 2,
 								fnResolve = D.SortBag,
 								fnReject = MY_BagEx_Bag.HideAllItemShadow,
 								fnCancel = MY_BagEx_Bag.HideAllItemShadow,
@@ -220,15 +222,15 @@ function D.CheckInjection(bRemoveInjection)
 				})
 				:Raw()
 		end
-		if not btnNew then
+		if not hBtnNew then
 			return
 		end
-		btnNew:SetRelPos(nX, nY)
+		hBtnNew:SetRelPos(nX, nY)
 		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_BagSort__Injection', function()
-			if not btnNew then
+			if not hBtnNew then
 				return
 			end
-			btnNew:Enable(not arg0)
+			hBtnNew:Enable(not arg0)
 		end)
 	else
 		-- 移除整理按纽

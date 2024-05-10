@@ -25,37 +25,37 @@ local D = {}
 
 -- 帮会仓库整理
 function D.SortGuildBank()
-	local frame = Station.Lookup('Normal/GuildBankPanel')
-	if not frame then
+	local hFrame = Station.Lookup('Normal/GuildBankPanel')
+	if not hFrame then
 		return
 	end
-	local nPage, szState = frame.nPage or 0, 'Idle'
+	local nPage, szState = hFrame.nPage or 0, 'Idle'
 	-- 加载格子列表
-	local me, aInfo, nItemCount = X.GetClientPlayer(), {}, 0
+	local me, aItemDesc, nItemCount = X.GetClientPlayer(), {}, 0
 	for i = 1, X.GetGuildBankBagSize(nPage) do
 		local dwPos, dwX = X.GetGuildBankBagPos(nPage, i)
-		local KItem = GetPlayerItem(me, dwPos, dwX)
-		local info = KItem
-			and MY_BagEx.GetItemDescription(KItem)
+		local kItem = GetPlayerItem(me, dwPos, dwX)
+		local tDesc = kItem
+			and MY_BagEx.GetItemDesc(kItem)
 			or X.CONSTANT.EMPTY_TABLE
-		if info ~= X.CONSTANT.EMPTY_TABLE then
+		if tDesc ~= X.CONSTANT.EMPTY_TABLE then
 			nItemCount = nItemCount + 1
 		end
-		table.insert(aInfo, info)
+		table.insert(aItemDesc, tDesc)
 	end
 	if nItemCount == 0 then
 		return
 	end
 	-- 排序格子列表
 	if IsShiftKeyDown() then
-		for i = 1, #aInfo do
-			local j = X.Random(1, #aInfo)
-			if i ~= j then
-				aInfo[i], aInfo[j] = aInfo[j], aInfo[i]
+		for nIndex = 1, #aItemDesc do
+			local nExcIndex = X.Random(1, #aItemDesc)
+			if nIndex ~= nExcIndex then
+				aItemDesc[nIndex], aItemDesc[nExcIndex] = aItemDesc[nExcIndex], aItemDesc[nIndex]
 			end
 		end
 	else
-		table.sort(aInfo, MY_BagEx.ItemSorter)
+		table.sort(aItemDesc, MY_BagEx.ItemDescSorter)
 	end
 	-- 结束清理环境、恢复控件状态
 	local function fnFinish()
@@ -66,36 +66,37 @@ function D.SortGuildBank()
 	end
 	-- 根据排序结果与当前状态交换物品
 	local function fnNext()
-		if not frame or (frame.nPage or 0) ~= nPage then
+		if not hFrame or (hFrame.nPage or 0) ~= nPage then
 			X.Systopmsg(_L['Guild box closed or page changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			return fnFinish()
 		end
 		if szState == 'Exchanging' or szState == 'Refreshing' then
 			return
 		end
-		for i, info in ipairs(aInfo) do
-			local dwPos, dwX = X.GetGuildBankBagPos(nPage, i)
-			local item = GetPlayerItem(me, dwPos, dwX)
+		for nIndex, tDesc in ipairs(aItemDesc) do
+			local dwPos, dwX = X.GetGuildBankBagPos(nPage, nIndex)
+			local kCurItem = GetPlayerItem(me, dwPos, dwX)
+			local tCurDesc = MY_BagEx.GetItemDesc(kCurItem)
 			-- 当前格子和预期不符 需要交换
-			if not MY_BagEx.IsSameItem(item, info) then
+			if not MY_BagEx.IsSameItemDesc(tDesc, tCurDesc) then
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
-				if item and info.dwID and item.nUiId == info.nUiId and item.bCanStack and item.nStackNum ~= info.nStackNum then
-					for j = X.GetGuildBankBagSize(nPage), i + 1, -1 do
-						local dwPos1, dwX1 = X.GetGuildBankBagPos(nPage, j)
-						local item1 = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwX1)
+				if kCurItem and tDesc.dwID and kCurItem.nUiId == tDesc.nUiId and kCurItem.bCanStack and kCurItem.nStackNum ~= tDesc.nStackNum then
+					for nExcIndex = X.GetGuildBankBagSize(nPage), nIndex + 1, -1 do
+						local dwExcPos, dwExcX = X.GetGuildBankBagPos(nPage, nExcIndex)
+						local kExcItem = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwExcX)
 						-- 匹配到用于交换的格子
-						if not item1 or item1.nUiId ~= item.nUiId then
+						if not kExcItem or kExcItem.nUiId ~= kCurItem.nUiId then
 							szState = 'Exchanging'
-							if item then
+							if kCurItem then
 								--[[#DEBUG BEGIN]]
-								X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
+								X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
-								OnExchangeItem(dwPos, dwX, dwPos1, dwX1)
+								OnExchangeItem(dwPos, dwX, dwExcPos, dwExcX)
 							else
 								--[[#DEBUG BEGIN]]
-								X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
+								X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwExcX .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
-								OnExchangeItem(dwPos1, dwX1, dwPos, dwX)
+								OnExchangeItem(dwExcPos, dwExcX, dwPos, dwX)
 							end
 							return
 						end
@@ -104,22 +105,23 @@ function D.SortGuildBank()
 					return fnFinish()
 				end
 				-- 寻找预期物品所在位置
-				for j = X.GetGuildBankBagSize(nPage), i + 1, -1 do
-					local dwPos1, dwX1 = X.GetGuildBankBagPos(nPage, j)
-					local item1 = GetPlayerItem(me, dwPos1, dwX1)
+				for nExcIndex = X.GetGuildBankBagSize(nPage), nIndex + 1, -1 do
+					local dwExcPos, dwExcX = X.GetGuildBankBagPos(nPage, nExcIndex)
+					local kExcItem = GetPlayerItem(me, dwExcPos, dwExcX)
+					local tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 					-- 匹配到预期物品所在位置
-					if MY_BagEx.IsSameItem(item1, info) then
+					if MY_BagEx.IsSameItemDesc(tDesc, tExcDesc) then
 						szState = 'Exchanging'
-						if item then
+						if kCurItem then
 							--[[#DEBUG BEGIN]]
-							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwX1 .. ' <N1>', X.DEBUG_LEVEL.LOG)
+							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwExcX .. ' <N1>', X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
-							OnExchangeItem(dwPos, dwX, dwPos1, dwX1)
+							OnExchangeItem(dwPos, dwX, dwExcPos, dwExcX)
 						else
 							--[[#DEBUG BEGIN]]
-							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX1 .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N2>', X.DEBUG_LEVEL.LOG)
+							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwExcX .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N2>', X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
-							OnExchangeItem(dwPos1, dwX1, dwPos, dwX)
+							OnExchangeItem(dwExcPos, dwExcX, dwPos, dwX)
 						end
 						return
 					end
@@ -159,17 +161,17 @@ end
 function D.CheckInjection(bRemoveInjection)
 	if not bRemoveInjection and MY_BagEx_GuildBank.bEnable then
 		-- 植入整理按纽
-		local frame = Station.Lookup('Normal/GuildBankPanel')
-		if not frame then
+		local hFrame = Station.Lookup('Normal/GuildBankPanel')
+		if not hFrame then
 			return
 		end
-		local btnRef = frame:Lookup('Btn_Refresh')
-		local btnNew = frame:Lookup('Btn_MY_Sort')
-		if btnRef then
-			if not btnNew then
-				local nX, nY = btnRef:GetRelPos()
-				local nW, nH = btnRef:GetSize()
-				btnNew = X.UI('Normal/GuildBankPanel')
+		local hBtnRef = hFrame:Lookup('Btn_Refresh')
+		local hBtnNew = hFrame:Lookup('Btn_MY_Sort')
+		if hBtnRef then
+			if not hBtnNew then
+				local nX, nY = hBtnRef:GetRelPos()
+				local nW, nH = hBtnRef:GetSize()
+				hBtnNew = X.UI('Normal/GuildBankPanel')
 					:Append('WndButton', {
 						name = 'Btn_MY_Sort',
 						x = nX - nW, y = nY, w = nW, h = nH - 2,
@@ -185,8 +187,8 @@ function D.CheckInjection(bRemoveInjection)
 							end
 							if MY_BagEx_Bag.bConfirm then
 								X.Confirm('MY_BagEx_GuildBankSort', _L['Sure to start guild bank sort?'], {
-									x = frame:GetAbsX() + frame:GetW() / 2,
-									y = frame:GetAbsY() + frame:GetH() / 2,
+									x = hFrame:GetAbsX() + hFrame:GetW() / 2,
+									y = hFrame:GetAbsY() + hFrame:GetH() / 2,
 									fnResolve = D.SortGuildBank,
 								})
 							else
@@ -198,10 +200,10 @@ function D.CheckInjection(bRemoveInjection)
 			end
 		end
 		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_GuildBankSort__Injection', function()
-			if not btnNew then
+			if not hBtnNew then
 				return
 			end
-			btnNew:Enable(not arg0)
+			hBtnNew:Enable(not arg0)
 		end)
 	else
 		-- 移除整理按纽
