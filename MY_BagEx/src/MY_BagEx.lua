@@ -45,7 +45,7 @@ function D.GetItemDesc(kItem)
 	return {
 		dwID = kItem.dwID,
 		dwTabType = kItem.dwTabType,
-		dwIndex = kItem.dwIndex,
+		dwTabIndex = kItem.dwIndex,
 		nGenre = kItem.nGenre,
 		nSub = kItem.nSub,
 		nDetail = kItem.nDetail,
@@ -66,7 +66,7 @@ function D.IsSameItemDesc(a, b)
 		if a.dwID == b.dwID then
 			return true
 		end
-		if (a.dwTabType == b.dwTabType and a.dwIndex == b.dwIndex)
+		if (a.dwTabType == b.dwTabType and a.dwTabIndex == b.dwTabIndex)
 		and (not a.bCanStack or a.nStackNum == b.nStackNum) then
 			return true
 		end
@@ -78,7 +78,7 @@ function D.CanItemDescStack(a, b)
 	if not a or not b or not a.dwID or not b.dwID then
 		return false
 	end
-	if a.dwTabType ~= b.dwTabType or a.dwIndex ~= b.dwIndex then
+	if a.dwTabType ~= b.dwTabType or a.dwTabIndex ~= b.dwTabIndex then
 		return false
 	end
 	return a.bCanStack
@@ -128,8 +128,8 @@ function D.ItemDescSorter(a, b)
 	if a.dwTabType ~= b.dwTabType then
 		return a.dwTabType < b.dwTabType
 	end
-	if a.dwIndex ~= b.dwIndex then
-		return a.dwIndex < b.dwIndex
+	if a.dwTabIndex ~= b.dwTabIndex then
+		return a.dwTabIndex < b.dwTabIndex
 	end
 	-- °´¶ÑµþÊýÁ¿ÅÅÐò
 	if b.bCanStack then
