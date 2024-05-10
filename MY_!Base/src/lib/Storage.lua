@@ -1115,7 +1115,7 @@ function X.CreateUserSettingsProxy(xProxy)
 		__newindex = function(_, k, v)
 			X.SetUserSettings(GetGlobalKey(k), v)
 		end,
-		__call = function(_, cmd, arg0)
+		__call = function(t, cmd, arg0)
 			if cmd == 'load' then
 				if not X.IsTable(arg0) then
 					arg0 = {}
@@ -1146,6 +1146,8 @@ function X.CreateUserSettingsProxy(xProxy)
 				for _, k in ipairs(arg0) do
 					X.ReloadUserSettings(GetGlobalKey(k))
 				end
+			elseif cmd == 'flush' then
+				t[arg0] = t[arg0]
 			end
 		end,
 	})
