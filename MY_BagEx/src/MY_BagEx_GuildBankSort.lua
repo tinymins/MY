@@ -85,63 +85,62 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 			return
 		end
 		for nIndex, tDesc in ipairs(aItemDesc) do
-			local dwBox, dwX = X.GetGuildBankBagPos(nPage, nIndex)
+			local tBoxPos = aBoxPos[nIndex]
+			local dwBox, dwX = tBoxPos.dwBox, tBoxPos.dwX
 			local kCurItem = GetPlayerItem(me, dwBox, dwX)
 			local tCurDesc = MY_BagEx.GetItemDesc(kCurItem)
 			-- 当前格子和预期不符 需要交换
 			if not MY_BagEx.IsSameItemDesc(tDesc, tCurDesc) then
+				local tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
 				if MY_BagEx.CanItemDescStack(tCurDesc, tDesc) then
 					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
-						local tExcBagPos = aBoxPos[nExcIndex]
-						local dwExcBox, dwExcX = tExcBagPos.dwBox, tExcBagPos.dwX
-						local kExcItem = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwExcX)
-						local tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
+						tExcBoxPos = aBoxPos[nExcIndex]
+						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
+						kExcItem = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwExcX)
+						tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 						-- 匹配到用于交换的格子
 						if not MY_BagEx.CanItemDescStack(tCurDesc, tExcDesc) then
-							szState = 'Exchanging'
-							if kCurItem then
-								--[[#DEBUG BEGIN]]
-								X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
-								--[[#DEBUG END]]
-								OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
-							else
-								--[[#DEBUG BEGIN]]
-								X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwExcX .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
-								--[[#DEBUG END]]
-								OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
-							end
-							return
+							break
 						end
+						tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc = nil, nil, nil, nil, nil
 					end
-					X.Systopmsg(_L['Cannot find item temp position, guild bag is full, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
-					return fnFinish()
+					if not dwExcBox then
+						X.Systopmsg(_L['Cannot find item temp position, guild bag is full, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+						return fnFinish()
+					end
 				end
 				-- 寻找预期物品所在位置
-				for nExcIndex = #aBoxPos, nIndex + 1, -1 do
-					local tExcBagPos = aBoxPos[nExcIndex]
-					local dwExcBox, dwExcX = tExcBagPos.dwBox, tExcBagPos.dwX
-					local kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
-					local tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
-					-- 匹配到预期物品所在位置
-					if MY_BagEx.IsSameItemDesc(tDesc, tExcDesc) then
-						szState = 'Exchanging'
-						if kCurItem then
-							--[[#DEBUG BEGIN]]
-							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwExcX .. ' <N1>', X.DEBUG_LEVEL.LOG)
-							--[[#DEBUG END]]
-							OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
-						else
-							--[[#DEBUG BEGIN]]
-							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwExcX .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N2>', X.DEBUG_LEVEL.LOG)
-							--[[#DEBUG END]]
-							OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
+				if not dwExcBox then
+					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
+						tExcBoxPos = aBoxPos[nExcIndex]
+						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
+						kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
+						tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
+						-- 匹配到预期物品所在位置
+						if MY_BagEx.IsSameItemDesc(tDesc, tExcDesc) then
+							break
 						end
-						return
+						tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc = nil, nil, nil, nil, nil
+					end
+					if not dwExcBox then
+						X.Systopmsg(_L['Exchange item match failed, guild bag may changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+						return fnFinish()
 					end
 				end
-				X.Systopmsg(_L['Exchange item match failed, guild bag may changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
-				return fnFinish()
+				szState = 'Exchanging'
+				if kCurItem then
+					--[[#DEBUG BEGIN]]
+					X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
+					OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
+				else
+					--[[#DEBUG BEGIN]]
+					X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwExcX .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
+					OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
+				end
+				return
 			end
 		end
 		fnFinish()

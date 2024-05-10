@@ -30,8 +30,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	end
 	local szState = 'Idle'
 	-- 加载格子列表
-	local me, aItemDesc, nItemCount = X.GetClientPlayer(), {}, 0
-	local aBagPos = {}
+	local me, aItemDesc, nItemCount, aBoxPos = X.GetClientPlayer(), {}, 0, {}
 	local nBagPackageIndex = X.GetBagPackageIndex()
 	for dwBox = nBagPackageIndex, nBagPackageIndex + X.GetBagPackageCount() - 1 do
 		local dwGenre = me.GetContainType(dwBox)
@@ -50,7 +49,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 				nItemCount = nItemCount + 1
 			end
 			table.insert(aItemDesc, tDesc)
-			table.insert(aBagPos, { dwBox = dwBox, dwX = dwX })
+			table.insert(aBoxPos, { dwBox = dwBox, dwX = dwX })
 		end
 	end
 	-- 导出蓝图
@@ -71,7 +70,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 		-- 避开锁定格子
 		local aMovableItemDesc = {}
 		for nIndex, tDesc in ipairs(aItemDesc) do
-			local tPos = aBagPos[nIndex]
+			local tPos = aBoxPos[nIndex]
 			if not MY_BagEx_Bag.IsItemBoxLocked(tPos.dwBox, tPos.dwX) then
 				table.insert(aMovableItemDesc, tDesc)
 			end
@@ -89,7 +88,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 		end
 		-- 合成避开锁定格子后的排序结果
 		for nIndex, _ in X.ipairs_r(aItemDesc) do
-			local tPos = aBagPos[nIndex]
+			local tPos = aBoxPos[nIndex]
 			if not MY_BagEx_Bag.IsItemBoxLocked(tPos.dwBox, tPos.dwX) then
 				aItemDesc[nIndex] = table.remove(aMovableItemDesc)
 			end
@@ -112,8 +111,8 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 			return
 		end
 		for nIndex, tDesc in ipairs(aItemDesc) do
-			local tBagPos = aBagPos[nIndex]
-			local dwBox, dwX = tBagPos.dwBox, tBagPos.dwX
+			local tBoxPos = aBoxPos[nIndex]
+			local dwBox, dwX = tBoxPos.dwBox, tBoxPos.dwX
 			local kCurItem = GetPlayerItem(me, dwBox, dwX)
 			local tCurDesc = MY_BagEx.GetItemDesc(kCurItem)
 			if MY_BagEx.IsSameItemDesc(tDesc, tCurDesc) then
@@ -121,58 +120,57 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 					MY_BagEx_Bag.HideItemShadow(hFrame, dwBox, dwX)
 				end
 			else -- 当前格子和预期不符 需要交换
+				local tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
 				if MY_BagEx.CanItemDescStack(tCurDesc, tDesc) then
-					for nExcIndex = #aBagPos, nIndex + 1, -1 do
-						local tExcBagPos = aBagPos[nExcIndex]
-						local dwExcBox, dwExcX = tExcBagPos.dwBox, tExcBagPos.dwX
-						local kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
-						local tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
+					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
+						tExcBoxPos = aBoxPos[nExcIndex]
+						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
+						kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
+						tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 						-- 匹配到用于交换的格子
 						if not MY_BagEx_Bag.IsItemBoxLocked(dwExcBox, dwExcX) and not MY_BagEx.CanItemDescStack(tCurDesc, tExcDesc) then
-							szState = 'Exchanging'
-							if kCurItem then
-								--[[#DEBUG BEGIN]]
-								X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwExcBox .. ',' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
-								--[[#DEBUG END]]
-								OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
-							else
-								--[[#DEBUG BEGIN]]
-								X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwExcBox .. ',' .. dwExcX .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
-								--[[#DEBUG END]]
-								OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
-							end
-							return
+							break
 						end
+						tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc = nil, nil, nil, nil, nil
 					end
-					X.Systopmsg(_L['Cannot find item temp position, bag is full, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
-					return fnFinish()
+					if not dwExcBox then
+						X.Systopmsg(_L['Cannot find item temp position, bag is full, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+						return fnFinish()
+					end
 				end
 				-- 寻找预期物品所在位置
-				for nExcIndex = #aBagPos, nIndex + 1, -1 do
-					local tExcBagPos = aBagPos[nExcIndex]
-					local dwExcBox, dwExcX = tExcBagPos.dwBox, tExcBagPos.dwX
-					local kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
-					local tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
-					-- 匹配到预期物品所在位置
-					if not MY_BagEx_Bag.IsItemBoxLocked(dwExcBox, dwExcX) and MY_BagEx.IsSameItemDesc(tDesc, tExcDesc) then
-						szState = 'Exchanging'
-						if kCurItem then
-							--[[#DEBUG BEGIN]]
-							X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwExcBox .. ',' .. dwExcX .. ' <N1>', X.DEBUG_LEVEL.LOG)
-							--[[#DEBUG END]]
-							OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
-						else
-							--[[#DEBUG BEGIN]]
-							X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' ..dwExcBox .. ',' .. dwExcX .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <N2>', X.DEBUG_LEVEL.LOG)
-							--[[#DEBUG END]]
-							OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
+				if not dwExcBox then
+					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
+						tExcBoxPos = aBoxPos[nExcIndex]
+						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
+						kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
+						tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
+						-- 匹配到预期物品所在位置
+						if not MY_BagEx_Bag.IsItemBoxLocked(dwExcBox, dwExcX) and MY_BagEx.IsSameItemDesc(tDesc, tExcDesc) then
+							break
 						end
-						return
+						tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc = nil, nil, nil, nil, nil
+					end
+					if not dwExcBox then
+						X.Systopmsg(_L['Exchange item match failed, bag may changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+						return fnFinish()
 					end
 				end
-				X.Systopmsg(_L['Exchange item match failed, bag may changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
-				return fnFinish()
+				-- 执行物品互换
+				szState = 'Exchanging'
+				if kCurItem then
+					--[[#DEBUG BEGIN]]
+					X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' .. dwBox .. ',' .. dwX .. ' <-> ' ..dwExcBox .. ',' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
+					OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
+				else
+					--[[#DEBUG BEGIN]]
+					X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' .. dwExcBox .. ',' .. dwExcX .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
+					OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
+				end
+				return
 			end
 		end
 		fnFinish()
