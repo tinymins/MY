@@ -80,12 +80,13 @@ function D.SortGuildBank()
 			-- 当前格子和预期不符 需要交换
 			if not MY_BagEx.IsSameItemDesc(tDesc, tCurDesc) then
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
-				if kCurItem and tDesc.dwID and kCurItem.nUiId == tDesc.nUiId and kCurItem.bCanStack and kCurItem.nStackNum ~= tDesc.nStackNum then
+				if MY_BagEx.CanItemDescStack(tCurDesc, tDesc) then
 					for nExcIndex = X.GetGuildBankBagSize(nPage), nIndex + 1, -1 do
 						local dwExcPos, dwExcX = X.GetGuildBankBagPos(nPage, nExcIndex)
 						local kExcItem = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwExcX)
+						local tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 						-- 匹配到用于交换的格子
-						if not kExcItem or kExcItem.nUiId ~= kCurItem.nUiId then
+						if not MY_BagEx.CanItemDescStack(tCurDesc, tExcDesc) then
 							szState = 'Exchanging'
 							if kCurItem then
 								--[[#DEBUG BEGIN]]

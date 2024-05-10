@@ -112,13 +112,14 @@ function D.SortBag()
 				end
 			else -- 当前格子和预期不符 需要交换
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
-				if kCurItem and tDesc.dwID and kCurItem.nUiId == tDesc.nUiId and kCurItem.bCanStack and kCurItem.nStackNum ~= tDesc.nStackNum then
+				if MY_BagEx.CanItemDescStack(tCurDesc, tDesc) then
 					for nExcIndex = #aBagPos, nIndex + 1, -1 do
 						local tExcBagPos = aBagPos[nExcIndex]
 						local dwExcBox, dwExcX = tExcBagPos.dwBox, tExcBagPos.dwX
 						local kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
+						local tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 						-- 匹配到用于交换的格子
-						if not MY_BagEx_Bag.IsItemBoxLocked(dwExcBox, dwExcX) and (not kExcItem or kExcItem.nUiId ~= kCurItem.nUiId) then
+						if not MY_BagEx_Bag.IsItemBoxLocked(dwExcBox, dwExcX) and not MY_BagEx.CanItemDescStack(tCurDesc, tExcDesc) then
 							szState = 'Exchanging'
 							if kCurItem then
 								--[[#DEBUG BEGIN]]

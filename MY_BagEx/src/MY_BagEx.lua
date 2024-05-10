@@ -51,8 +51,35 @@ function D.GetItemDesc(kItem)
 		bCanStack = kItem.bCanStack,
 		nStackNum = kItem.nStackNum,
 		nCurrentDurability = kItem.nCurrentDurability,
+		bBind = kItem.bBind,
 		szName = X.GetObjectName('ITEM', kItem),
 	}
+end
+
+function D.IsSameItemDesc(a, b)
+	if (not a or not a.dwID) and (not b or not b.dwID) then
+		return true
+	end
+	if a and b and a.dwID and b.dwID then
+		if a.dwID == b.dwID then
+			return true
+		end
+		if (a.dwTabType == b.dwTabType and a.dwIndex == b.dwIndex)
+		and (not a.bCanStack or a.nStackNum == b.nStackNum) then
+			return true
+		end
+	end
+	return false
+end
+
+function D.CanItemDescStack(a, b)
+	if not a or not b or not a.dwID or not b.dwID then
+		return false
+	end
+	if a.nUiId ~= b.nUiId then
+		return false
+	end
+	return a.bCanStack
 end
 
 -- 背包整理格子排序函数
@@ -109,22 +136,6 @@ function D.ItemDescSorter(a, b)
 	return false
 end
 
-function D.IsSameItemDesc(a, b)
-	if (not a or not a.dwID) and (not b or not b.dwID) then
-		return true
-	end
-	if a and b and a.dwID and b.dwID then
-		if a.dwID == b.dwID then
-			return true
-		end
-		if (a.dwTabType == b.dwTabType and a.dwIndex == b.dwIndex)
-		and (not a.bCanStack or a.nStackNum == b.nStackNum) then
-			return true
-		end
-	end
-	return false
-end
-
 ---------------------------------------------------------------------
 -- Global exports
 ---------------------------------------------------------------------
@@ -135,8 +146,9 @@ local settings = {
 		{
 			fields = {
 				GetItemDesc = D.GetItemDesc,
-				ItemDescSorter = D.ItemDescSorter,
 				IsSameItemDesc = D.IsSameItemDesc,
+				CanItemDescStack = D.CanItemDescStack,
+				ItemDescSorter = D.ItemDescSorter,
 			},
 		},
 	},
