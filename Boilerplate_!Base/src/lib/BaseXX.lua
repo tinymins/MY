@@ -321,8 +321,8 @@ X.DecodeCrockford = basexx.from_crockford
 X.EncodeCrockford = basexx.to_crockford
 X.DecodeBase64 = basexx.from_base64
 X.EncodeBase64 = basexx.to_base64
-X.DecodeUrl64 = basexx.from_url64
-X.EncodeUrl64 = basexx.to_url64
+X.DecodeURIComponentBase64 = basexx.from_url64
+X.EncodeURIComponentBase64 = basexx.to_url64
 X.DecodeZ85 = basexx.from_z85
 X.EncodeZ85 = basexx.to_z85
 
