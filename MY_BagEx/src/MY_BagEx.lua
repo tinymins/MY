@@ -43,7 +43,6 @@ function D.GetItemDesc(kItem)
 		return X.CONSTANT.EMPTY_TABLE
 	end
 	return {
-		dwID = kItem.dwID,
 		dwTabType = kItem.dwTabType,
 		dwTabIndex = kItem.dwIndex,
 		nGenre = kItem.nGenre,
@@ -59,23 +58,26 @@ function D.GetItemDesc(kItem)
 end
 
 function D.IsSameItemDesc(a, b)
-	if (not a or not a.dwID) and (not b or not b.dwID) then
+	if X.IsEmpty(a) and X.IsEmpty(b) then
 		return true
 	end
-	if a and b and a.dwID and b.dwID then
-		if a.dwID == b.dwID then
-			return true
-		end
-		if (a.dwTabType == b.dwTabType and a.dwTabIndex == b.dwTabIndex)
-		and (not a.bCanStack or a.nStackNum == b.nStackNum) then
-			return true
-		end
+	if X.IsEmpty(a) or X.IsEmpty(b) then
+		return false
 	end
-	return false
+	if a.dwTabType ~= b.dwTabType or a.dwTabIndex ~= b.dwTabIndex then
+		return false
+	end
+	if a.bCanStack and a.nStackNum ~= b.nStackNum then
+		return false
+	end
+	if a.bBind ~= b.bBind then
+		return false
+	end
+	return true
 end
 
 function D.CanItemDescStack(a, b)
-	if not a or not b or not a.dwID or not b.dwID then
+	if X.IsEmpty(a) or X.IsEmpty(b) then
 		return false
 	end
 	if a.dwTabType ~= b.dwTabType or a.dwTabIndex ~= b.dwTabIndex then
@@ -87,10 +89,10 @@ end
 -- 背包整理格子排序函数
 function D.ItemDescSorter(a, b)
 	-- 空白格子靠后
-	if not a.dwID then
+	if X.IsEmpty(a) then
 		return false
 	end
-	if not b.dwID then
+	if X.IsEmpty(b) then
 		return true
 	end
 	-- 类型不同按类型排序
