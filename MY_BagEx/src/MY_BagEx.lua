@@ -44,7 +44,6 @@ function D.GetItemDesc(kItem)
 	end
 	return {
 		dwID = kItem.dwID,
-		nUiId = kItem.nUiId,
 		dwTabType = kItem.dwTabType,
 		dwIndex = kItem.dwIndex,
 		nGenre = kItem.nGenre,
@@ -79,7 +78,7 @@ function D.CanItemDescStack(a, b)
 	if not a or not b or not a.dwID or not b.dwID then
 		return false
 	end
-	if a.nUiId ~= b.nUiId then
+	if a.dwTabType ~= b.dwTabType or a.dwIndex ~= b.dwIndex then
 		return false
 	end
 	return a.bCanStack
