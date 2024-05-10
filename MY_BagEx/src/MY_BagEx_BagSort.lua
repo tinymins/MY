@@ -245,6 +245,7 @@ function D.CheckInjection(bRemoveInjection)
 									GetUserInput(_L['Please input blueprint'], function(szBlueprint)
 										local aBlueprint = MY_BagEx.DecodeItemDescList(szBlueprint)
 										if aBlueprint then
+											MY_BagEx_Bag.ShowAllItemShadow()
 											D.Operate(false, false, aBlueprint)
 										else
 											X.Systopmsg(_L['Invalid blueprint data'])
