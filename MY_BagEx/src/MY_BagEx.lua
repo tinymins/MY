@@ -53,7 +53,6 @@ function D.GetItemDesc(kItem)
 		nStackNum = kItem.nStackNum,
 		nCurrentDurability = kItem.nCurrentDurability,
 		bBind = kItem.bBind,
-		szName = X.GetObjectName('ITEM', kItem),
 	}
 end
 
