@@ -34,26 +34,14 @@ function D.SortGuildBank()
 	local me, aInfo, nItemCount = X.GetClientPlayer(), {}, 0
 	for i = 1, X.GetGuildBankBagSize(nPage) do
 		local dwPos, dwX = X.GetGuildBankBagPos(nPage, i)
-		local item = GetPlayerItem(me, dwPos, dwX)
-		if item then
-			table.insert(aInfo, {
-				dwID = item.dwID,
-				nUiId = item.nUiId,
-				dwTabType = item.dwTabType,
-				dwIndex = item.dwIndex,
-				nGenre = item.nGenre,
-				nSub = item.nSub,
-				nDetail = item.nDetail,
-				nQuality = item.nQuality,
-				bCanStack = item.bCanStack,
-				nStackNum = item.nStackNum,
-				nCurrentDurability = item.nCurrentDurability,
-				szName = X.GetObjectName('ITEM', item),
-			})
+		local KItem = GetPlayerItem(me, dwPos, dwX)
+		local info = KItem
+			and MY_BagEx.GetItemDescription(KItem)
+			or X.CONSTANT.EMPTY_TABLE
+		if info ~= X.CONSTANT.EMPTY_TABLE then
 			nItemCount = nItemCount + 1
-		else
-			table.insert(aInfo, X.CONSTANT.EMPTY_TABLE)
 		end
+		table.insert(aInfo, info)
 	end
 	if nItemCount == 0 then
 		return

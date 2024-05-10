@@ -44,26 +44,14 @@ function D.SortBank()
 			return
 		end
 		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
-			local item = GetPlayerItem(me, dwBox, dwX)
-			if item then
-				table.insert(aInfo, {
-					dwID = item.dwID,
-					nUiId = item.nUiId,
-					dwTabType = item.dwTabType,
-					dwIndex = item.dwIndex,
-					nGenre = item.nGenre,
-					nSub = item.nSub,
-					nDetail = item.nDetail,
-					nQuality = item.nQuality,
-					bCanStack = item.bCanStack,
-					nStackNum = item.nStackNum,
-					nCurrentDurability = item.nCurrentDurability,
-					szName = X.GetObjectName('ITEM', item),
-				})
+			local KItem = GetPlayerItem(me, dwBox, dwX)
+			local info = KItem
+				and MY_BagEx.GetItemDescription(KItem)
+				or X.CONSTANT.EMPTY_TABLE
+			if info ~= X.CONSTANT.EMPTY_TABLE then
 				nItemCount = nItemCount + 1
-			else
-				table.insert(aInfo, X.CONSTANT.EMPTY_TABLE)
 			end
+			table.insert(aInfo, info)
 			table.insert(aBagPos, { dwBox = dwBox, dwX = dwX })
 		end
 	end

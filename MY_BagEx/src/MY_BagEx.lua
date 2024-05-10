@@ -38,6 +38,23 @@ local D = {
 	},
 }
 
+function D.GetItemDescription(KItem)
+	return {
+		dwID = KItem.dwID,
+		nUiId = KItem.nUiId,
+		dwTabType = KItem.dwTabType,
+		dwIndex = KItem.dwIndex,
+		nGenre = KItem.nGenre,
+		nSub = KItem.nSub,
+		nDetail = KItem.nDetail,
+		nQuality = KItem.nQuality,
+		bCanStack = KItem.bCanStack,
+		nStackNum = KItem.nStackNum,
+		nCurrentDurability = KItem.nCurrentDurability,
+		szName = X.GetObjectName('ITEM', KItem),
+	}
+end
+
 -- 背包整理格子排序函数
 function D.ItemSorter(a, b)
 	-- 空白格子靠后
@@ -85,8 +102,8 @@ function D.ItemSorter(a, b)
 	if a.dwIndex ~= b.dwIndex then
 		return a.dwIndex < b.dwIndex
 	end
-	-- 相同物品按堆叠数量排序
-	if a.nUiId == b.nUiId and b.bCanStack then
+	-- 按堆叠数量排序
+	if b.bCanStack then
 		return a.nStackNum > b.nStackNum
 	end
 	return false
@@ -100,7 +117,8 @@ function D.IsSameItem(item1, item2)
 		if item1.dwID == item2.dwID then
 			return true
 		end
-		if item1.nUiId == item2.nUiId and (not item1.bCanStack or item1.nStackNum == item2.nStackNum) then
+		if (item1.dwTabType == item2.dwTabType and item1.dwIndex == item2.dwIndex)
+		and (not item1.bCanStack or item1.nStackNum == item2.nStackNum) then
 			return true
 		end
 	end
@@ -116,6 +134,7 @@ local settings = {
 	exports = {
 		{
 			fields = {
+				GetItemDescription = D.GetItemDescription,
 				ItemSorter = D.ItemSorter,
 				IsSameItem = D.IsSameItem,
 			},
