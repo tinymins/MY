@@ -174,6 +174,20 @@ function X.SimpleDecodeString(szCipher, bTripSlashes)
 	return table.concat(aText)
 end
 
+function X.CompressLUAData(xData)
+	local szBin = X.EncodeLUAData(xData)
+	local szCompressBin = X.Deflate:CompressZlib(szBin)
+	local szCompressBinBase64 = X.Base64Encode(szCompressBin)
+	return szCompressBinBase64
+end
+
+function X.DecompressLUAData(szCompressBinBase64)
+	local szCompressBin = X.Base64Decode(szCompressBinBase64)
+	local szBin = X.Deflate:DecompressZlib(szCompressBin)
+	local xData = X.DecodeLUAData(szBin)
+	return xData
+end
+
 function X.KGUIEncrypt(szText)
 	if not X.IsString(szText) then
 		return
