@@ -38,6 +38,22 @@ local D = {
 	},
 }
 
+local ITEM_DESC_LIST_SCHEMA = X.Schema.Collection(X.Schema.OneOf(
+	X.Schema.Record({
+		dwTabType = X.Schema.Number,
+		dwTabIndex = X.Schema.Number,
+		nGenre = X.Schema.Number,
+		nSub = X.Schema.Number,
+		nDetail = X.Schema.Number,
+		nQuality = X.Schema.Number,
+		bCanStack = X.Schema.Boolean,
+		nStackNum = X.Schema.Number,
+		nCurrentDurability = X.Schema.Number,
+		bBind = X.Schema.Boolean,
+	}, false),
+	X.Schema.Record({}, false)
+))
+
 function D.GetItemDesc(kItem)
 	if not kItem then
 		return X.CONSTANT.EMPTY_TABLE
@@ -139,6 +155,18 @@ function D.ItemDescSorter(a, b)
 	return false
 end
 
+function D.EncodeItemDescList(aItemDesc)
+	return X.CompressLUAData(aItemDesc)
+end
+
+function D.DecodeItemDescList(szBin)
+	local aItemDesc = X.DecompressLUAData(szBin)
+	local errs = X.Schema.CheckSchema(aItemDesc, ITEM_DESC_LIST_SCHEMA)
+	if not errs then
+		return aItemDesc
+	end
+end
+
 ---------------------------------------------------------------------
 -- Global exports
 ---------------------------------------------------------------------
@@ -152,6 +180,8 @@ local settings = {
 				IsSameItemDesc = D.IsSameItemDesc,
 				CanItemDescStack = D.CanItemDescStack,
 				ItemDescSorter = D.ItemDescSorter,
+				EncodeItemDescList = D.EncodeItemDescList,
+				DecodeItemDescList = D.DecodeItemDescList,
 			},
 		},
 	},

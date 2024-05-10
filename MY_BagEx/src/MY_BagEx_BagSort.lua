@@ -23,8 +23,7 @@ end
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {})
 local D = {}
 
--- 帮会仓库整理
-function D.SortBag()
+function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	local hFrame = Station.Lookup('Normal/BigBagPanel')
 	if not hFrame then
 		return
@@ -54,33 +53,46 @@ function D.SortBag()
 			table.insert(aBagPos, { dwBox = dwBox, dwX = dwX })
 		end
 	end
+	-- 导出蓝图
+	if bExportBlueprint then
+		X.UI.OpenTextEditor(MY_BagEx.EncodeItemDescList(aItemDesc))
+		return
+	end
+	-- 没物品不需要操作
 	if nItemCount == 0 then
 		return
 	end
-	-- 避开锁定格子
-	local aMovableItemDesc = {}
-	for nIndex, tDesc in ipairs(aItemDesc) do
-		local tPos = aBagPos[nIndex]
-		if not MY_BagEx_Bag.IsItemBoxLocked(tPos.dwBox, tPos.dwX) then
-			table.insert(aMovableItemDesc, tDesc)
-		end
-	end
-	-- 排序格子列表
-	if IsShiftKeyDown() then
-		for nIndex = 1, #aMovableItemDesc do
-			local nExcIndex = X.Random(1, #aMovableItemDesc)
-			if nIndex ~= nExcIndex then
-				aMovableItemDesc[nIndex], aMovableItemDesc[nExcIndex] = aMovableItemDesc[nExcIndex], aMovableItemDesc[nIndex]
-			end
+	-- 导入蓝图
+	if aBlueprint then
+		for nIndex, tDesc in ipairs(aItemDesc) do
+			aItemDesc[nIndex] = aBlueprint[nIndex] or MY_BagEx.GetItemDesc()
 		end
 	else
-		table.sort(aMovableItemDesc, MY_BagEx.ItemDescSorter)
-	end
-	-- 合成避开锁定格子后的排序结果
-	for nIndex, _ in X.ipairs_r(aItemDesc) do
-		local tPos = aBagPos[nIndex]
-		if not MY_BagEx_Bag.IsItemBoxLocked(tPos.dwBox, tPos.dwX) then
-			aItemDesc[nIndex] = table.remove(aMovableItemDesc)
+		-- 避开锁定格子
+		local aMovableItemDesc = {}
+		for nIndex, tDesc in ipairs(aItemDesc) do
+			local tPos = aBagPos[nIndex]
+			if not MY_BagEx_Bag.IsItemBoxLocked(tPos.dwBox, tPos.dwX) then
+				table.insert(aMovableItemDesc, tDesc)
+			end
+		end
+		-- 排序格子列表
+		if bRandom then
+			for nIndex = 1, #aMovableItemDesc do
+				local nExcIndex = X.Random(1, #aMovableItemDesc)
+				if nIndex ~= nExcIndex then
+					aMovableItemDesc[nIndex], aMovableItemDesc[nExcIndex] = aMovableItemDesc[nExcIndex], aMovableItemDesc[nIndex]
+				end
+			end
+		else
+			table.sort(aMovableItemDesc, MY_BagEx.ItemDescSorter)
+		end
+		-- 合成避开锁定格子后的排序结果
+		for nIndex, _ in X.ipairs_r(aItemDesc) do
+			local tPos = aBagPos[nIndex]
+			if not MY_BagEx_Bag.IsItemBoxLocked(tPos.dwBox, tPos.dwX) then
+				aItemDesc[nIndex] = table.remove(aMovableItemDesc)
+			end
 		end
 	end
 	-- 结束清理环境、恢复控件状态
@@ -204,19 +216,43 @@ function D.CheckInjection(bRemoveInjection)
 						render = _L['Press shift for random'],
 						position = X.UI.TIP_POSITION.BOTTOM_TOP,
 					},
-					onClick = function()
+					onLClick = function()
+						local bRandom = IsShiftKeyDown()
 						MY_BagEx_Bag.ShowAllItemShadow()
 						if MY_BagEx_Bag.bConfirm then
 							X.Confirm('MY_BagEx_BagSort', _L['Sure to start bag sort?'], {
 								x = hFrame:GetAbsX() + hFrame:GetW() / 2,
 								y = hFrame:GetAbsY() + hFrame:GetH() / 2,
-								fnResolve = D.SortBag,
+								fnResolve = function() D.Operate(bRandom) end,
 								fnReject = MY_BagEx_Bag.HideAllItemShadow,
 								fnCancel = MY_BagEx_Bag.HideAllItemShadow,
 							})
 						else
-							D.SortBag()
+							D.Operate(bRandom)
 						end
+					end,
+					menuRClick = function()
+						return {
+							{
+								szOption = _L['Export blueprint'],
+								fnAction = function()
+									D.Operate(false, true)
+								end,
+							},
+							{
+								szOption = _L['Import blueprint'],
+								fnAction = function()
+									GetUserInput(_L['Please input blueprint'], function(szBlueprint)
+										local aBlueprint = MY_BagEx.DecodeItemDescList(szBlueprint)
+										if aBlueprint then
+											D.Operate(false, false, aBlueprint)
+										else
+											X.Systopmsg(_L['Invalid blueprint data'])
+										end
+									end, nil, nil, nil, '')
+								end,
+							},
+						}
 					end,
 				})
 				:Raw()

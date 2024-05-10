@@ -23,8 +23,7 @@ end
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {})
 local D = {}
 
--- 帮会仓库整理
-function D.SortGuildBank()
+function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	local hFrame = Station.Lookup('Normal/GuildBankPanel')
 	if not hFrame then
 		return
@@ -41,19 +40,32 @@ function D.SortGuildBank()
 		end
 		table.insert(aItemDesc, tDesc)
 	end
+	-- 导出蓝图
+	if bExportBlueprint then
+		X.UI.OpenTextEditor(MY_BagEx.EncodeItemDescList(aItemDesc))
+		return
+	end
+	-- 没物品不需要操作
 	if nItemCount == 0 then
 		return
 	end
-	-- 排序格子列表
-	if IsShiftKeyDown() then
-		for nIndex = 1, #aItemDesc do
-			local nExcIndex = X.Random(1, #aItemDesc)
-			if nIndex ~= nExcIndex then
-				aItemDesc[nIndex], aItemDesc[nExcIndex] = aItemDesc[nExcIndex], aItemDesc[nIndex]
-			end
+	-- 导入蓝图
+	if aBlueprint then
+		for nIndex, tDesc in ipairs(aItemDesc) do
+			aItemDesc[nIndex] = aBlueprint[nIndex] or MY_BagEx.GetItemDesc()
 		end
 	else
-		table.sort(aItemDesc, MY_BagEx.ItemDescSorter)
+		-- 排序格子列表
+		if bRandom then
+			for nIndex = 1, #aItemDesc do
+				local nExcIndex = X.Random(1, #aItemDesc)
+				if nIndex ~= nExcIndex then
+					aItemDesc[nIndex], aItemDesc[nExcIndex] = aItemDesc[nExcIndex], aItemDesc[nIndex]
+				end
+			end
+		else
+			table.sort(aItemDesc, MY_BagEx.ItemDescSorter)
+		end
 	end
 	-- 结束清理环境、恢复控件状态
 	local function fnFinish()
@@ -179,20 +191,44 @@ function D.CheckInjection(bRemoveInjection)
 							render = _L['Press shift for random'],
 							position = X.UI.TIP_POSITION.BOTTOM_TOP,
 						},
-						onClick = function()
+						onLClick = function()
 							if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TONG_REPERTORY) then
 								X.Systopmsg(_L['Please unlock mibao first.'])
 								return
 							end
+							local bRandom = IsShiftKeyDown()
 							if MY_BagEx_Bag.bConfirm then
 								X.Confirm('MY_BagEx_GuildBankSort', _L['Sure to start guild bank sort?'], {
 									x = hFrame:GetAbsX() + hFrame:GetW() / 2,
 									y = hFrame:GetAbsY() + hFrame:GetH() / 2,
-									fnResolve = D.SortGuildBank,
+									fnResolve = function() D.Operate(bRandom) end,
 								})
 							else
-								D.SortGuildBank()
+								D.Operate(bRandom)
 							end
+						end,
+						menuRClick = function()
+							return {
+								{
+									szOption = _L['Export blueprint'],
+									fnAction = function()
+										D.Operate(false, true)
+									end,
+								},
+								{
+									szOption = _L['Import blueprint'],
+									fnAction = function()
+										GetUserInput(_L['Please input blueprint'], function(szBlueprint)
+											local aBlueprint = MY_BagEx.DecodeItemDescList(szBlueprint)
+											if aBlueprint then
+												D.Operate(false, false, aBlueprint)
+											else
+												X.Systopmsg(_L['Invalid blueprint data'])
+											end
+										end, nil, nil, nil, '')
+									end,
+								},
+							}
 						end,
 					})
 					:Raw()

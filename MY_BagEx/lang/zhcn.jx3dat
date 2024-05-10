@@ -21,6 +21,10 @@ return {
     ['Sort'] = '整理',
     ['Press shift for random'] = '按住SHIFT随机打乱',
     ['Sure to start bag sort?'] = '确认要进行背包物品整理吗？',
+    ['Export blueprint'] = '导出蓝图',
+    ['Import blueprint'] = '导入蓝图',
+    ['Please input blueprint'] = '请输入蓝图数据',
+    ['Invalid blueprint data'] = '蓝图数据解析失败',
 
     -- MY_BagEx_BagStack.lua --
     ['Bag panel closed, stack exited!'] = '背包界面已关闭，停止堆叠！',
@@ -46,6 +50,10 @@ return {
     ['Sort'] = '整理',
     ['Press shift for random'] = '按住SHIFT随机打乱',
     ['Sure to start bank sort?'] = '确认要进行仓库物品整理吗？',
+    ['Export blueprint'] = '导出蓝图',
+    ['Import blueprint'] = '导入蓝图',
+    ['Please input blueprint'] = '请输入蓝图数据',
+    ['Invalid blueprint data'] = '蓝图数据解析失败',
 
     -- MY_BagEx_BankStack.lua --
     ['Please unlock mibao first.'] = '请先解除密保锁。',
@@ -71,6 +79,10 @@ return {
     ['Sort'] = '整理',
     ['Press shift for random'] = '按住SHIFT随机打乱',
     ['Sure to start guild bank sort?'] = '确认要进行帮会仓库物品整理吗？',
+    ['Export blueprint'] = '导出蓝图',
+    ['Import blueprint'] = '导入蓝图',
+    ['Please input blueprint'] = '请输入蓝图数据',
+    ['Invalid blueprint data'] = '蓝图数据解析失败',
 
     -- MY_BagEx_GuildBankStack.lua --
     ['Stack'] = '堆叠',
