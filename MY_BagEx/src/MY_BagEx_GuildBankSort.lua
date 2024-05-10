@@ -30,15 +30,16 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	end
 	local nPage, szState = hFrame.nPage or 0, 'Idle'
 	-- 加载格子列表
-	local me, aItemDesc, nItemCount = X.GetClientPlayer(), {}, 0
-	for i = 1, X.GetGuildBankBagSize(nPage) do
-		local dwPos, dwX = X.GetGuildBankBagPos(nPage, i)
-		local kItem = GetPlayerItem(me, dwPos, dwX)
+	local me, aItemDesc, nItemCount, aBoxPos = X.GetClientPlayer(), {}, 0, {}
+	for nIndex = 1, X.GetGuildBankBagSize(nPage) do
+		local dwBox, dwX = X.GetGuildBankBagPos(nPage, nIndex)
+		local kItem = GetPlayerItem(me, dwBox, dwX)
 		local tDesc = MY_BagEx.GetItemDesc(kItem)
 		if not X.IsEmpty(tDesc) then
 			nItemCount = nItemCount + 1
 		end
 		table.insert(aItemDesc, tDesc)
+		table.insert(aBoxPos, { dwBox = dwBox, dwX = dwX })
 	end
 	-- 导出蓝图
 	if bExportBlueprint then
@@ -84,15 +85,16 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 			return
 		end
 		for nIndex, tDesc in ipairs(aItemDesc) do
-			local dwPos, dwX = X.GetGuildBankBagPos(nPage, nIndex)
-			local kCurItem = GetPlayerItem(me, dwPos, dwX)
+			local dwBox, dwX = X.GetGuildBankBagPos(nPage, nIndex)
+			local kCurItem = GetPlayerItem(me, dwBox, dwX)
 			local tCurDesc = MY_BagEx.GetItemDesc(kCurItem)
 			-- 当前格子和预期不符 需要交换
 			if not MY_BagEx.IsSameItemDesc(tDesc, tCurDesc) then
 				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
 				if MY_BagEx.CanItemDescStack(tCurDesc, tDesc) then
-					for nExcIndex = X.GetGuildBankBagSize(nPage), nIndex + 1, -1 do
-						local dwExcPos, dwExcX = X.GetGuildBankBagPos(nPage, nExcIndex)
+					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
+						local tExcBagPos = aBoxPos[nExcIndex]
+						local dwExcBox, dwExcX = tExcBagPos.dwBox, tExcBagPos.dwX
 						local kExcItem = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwExcX)
 						local tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 						-- 匹配到用于交换的格子
@@ -102,12 +104,12 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 								--[[#DEBUG BEGIN]]
 								X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
-								OnExchangeItem(dwPos, dwX, dwExcPos, dwExcX)
+								OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
 							else
 								--[[#DEBUG BEGIN]]
 								X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwExcX .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
 								--[[#DEBUG END]]
-								OnExchangeItem(dwExcPos, dwExcX, dwPos, dwX)
+								OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
 							end
 							return
 						end
@@ -116,9 +118,10 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 					return fnFinish()
 				end
 				-- 寻找预期物品所在位置
-				for nExcIndex = X.GetGuildBankBagSize(nPage), nIndex + 1, -1 do
-					local dwExcPos, dwExcX = X.GetGuildBankBagPos(nPage, nExcIndex)
-					local kExcItem = GetPlayerItem(me, dwExcPos, dwExcX)
+				for nExcIndex = #aBoxPos, nIndex + 1, -1 do
+					local tExcBagPos = aBoxPos[nExcIndex]
+					local dwExcBox, dwExcX = tExcBagPos.dwBox, tExcBagPos.dwX
+					local kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
 					local tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 					-- 匹配到预期物品所在位置
 					if MY_BagEx.IsSameItemDesc(tDesc, tExcDesc) then
@@ -127,12 +130,12 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 							--[[#DEBUG BEGIN]]
 							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwExcX .. ' <N1>', X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
-							OnExchangeItem(dwPos, dwX, dwExcPos, dwExcX)
+							OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
 						else
 							--[[#DEBUG BEGIN]]
 							X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwExcX .. ' <-> ' .. 'GUILD,' .. dwX .. ' <N2>', X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
-							OnExchangeItem(dwExcPos, dwExcX, dwPos, dwX)
+							OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
 						end
 						return
 					end
