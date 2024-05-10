@@ -53,26 +53,24 @@ function D.ItemSorter(a, b)
 	if nGenreA ~= nGenreB then
 		return nGenreA < nGenreB
 	end
-	-- 相同物品按堆叠数量排序
-	if a.nUiId == b.nUiId and b.bCanStack then
-		return a.nStackNum > b.nStackNum
-	end
 	-- 装备类比较
 	if a.nGenre == ITEM_GENRE.EQUIPMENT then
 		local nSubA = D.aSub[a.nSub] or (100 + a.nSub)
 		local nSubB = D.aSub[b.nSub] or (100 + b.nSub)
-		if nSubA == nSubB then
-			-- 武器按照类型排列
-			if b.nSub == EQUIPMENT_SUB.MELEE_WEAPON or b.nSub == EQUIPMENT_SUB.RANGE_WEAPON then
-				if a.nDetail ~= b.nDetail then
-					return a.nDetail < b.nDetail
-				end
+		-- 按装备类型排序
+		if nSubA ~= nSubB then
+			return nSubA > nSubB
+		end
+		-- 武器按照类型排列
+		if a.nSub == EQUIPMENT_SUB.MELEE_WEAPON or a.nSub == EQUIPMENT_SUB.RANGE_WEAPON then
+			if a.nDetail ~= b.nDetail then
+				return a.nDetail < b.nDetail
 			end
-			-- 包裹容量大的排在后面
-			if b.nSub == EQUIPMENT_SUB.PACKAGE then
-				if a.nCurrentDurability ~= b.nCurrentDurability then
-					return a.nCurrentDurability > b.nCurrentDurability
-				end
+		end
+		-- 包裹容量大的排在前面
+		if b.nSub == EQUIPMENT_SUB.PACKAGE then
+			if a.nCurrentDurability ~= b.nCurrentDurability then
+				return a.nCurrentDurability > b.nCurrentDurability
 			end
 		end
 	end
@@ -80,11 +78,18 @@ function D.ItemSorter(a, b)
 	if a.nQuality ~= b.nQuality then
 		return a.nQuality > b.nQuality
 	end
-	-- 按照表下标排序
+	-- 按照物品表下标排序
 	if a.dwTabType ~= b.dwTabType then
 		return a.dwTabType < b.dwTabType
 	end
-	return a.dwIndex < b.dwIndex
+	if a.dwIndex ~= b.dwIndex then
+		return a.dwIndex < b.dwIndex
+	end
+	-- 相同物品按堆叠数量排序
+	if a.nUiId == b.nUiId and b.bCanStack then
+		return a.nStackNum > b.nStackNum
+	end
+	return false
 end
 
 function D.IsSameItem(item1, item2)
