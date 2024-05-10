@@ -177,12 +177,12 @@ end
 function X.CompressLUAData(xData)
 	local szBin = X.EncodeLUAData(xData)
 	local szCompressBin = X.Deflate:CompressZlib(szBin)
-	local szCompressBinBase64 = X.Base64Encode(szCompressBin)
+	local szCompressBinBase64 = X.EncodeURIComponentBase64(szCompressBin)
 	return szCompressBinBase64
 end
 
 function X.DecompressLUAData(szCompressBinBase64)
-	local szCompressBin = X.Base64Decode(szCompressBinBase64)
+	local szCompressBin = X.DecodeURIComponentBase64(szCompressBinBase64)
 	local szBin = X.Deflate:DecompressZlib(szCompressBin)
 	local xData = X.DecodeLUAData(szBin)
 	return xData
