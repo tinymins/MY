@@ -42,6 +42,7 @@ local ITEM_DESC_LIST_SCHEMA = X.Schema.Collection(X.Schema.OneOf(
 	X.Schema.Record({
 		dwTabType = X.Schema.Number,
 		dwTabIndex = X.Schema.Number,
+		nBookID = X.Schema.Number,
 		nGenre = X.Schema.Number,
 		nSub = X.Schema.Number,
 		nDetail = X.Schema.Number,
@@ -61,6 +62,7 @@ function D.GetItemDesc(kItem)
 	return {
 		dwTabType = kItem.dwTabType,
 		dwTabIndex = kItem.dwIndex,
+		nBookID = kItem.nBookID,
 		nGenre = kItem.nGenre,
 		nSub = kItem.nSub,
 		nDetail = kItem.nDetail,
@@ -82,6 +84,9 @@ function D.IsSameItemDesc(a, b, bIgnoreStackNum)
 	if a.dwTabType ~= b.dwTabType or a.dwTabIndex ~= b.dwTabIndex then
 		return false
 	end
+	if a.nGenre == ITEM_GENRE.BOOK and a.nBookID ~= b.nBookID then
+		return false
+	end
 	if not bIgnoreStackNum and a.bCanStack and a.nStackNum ~= b.nStackNum then
 		return false
 	end
@@ -96,6 +101,9 @@ function D.CanItemDescStack(a, b)
 		return false
 	end
 	if a.dwTabType ~= b.dwTabType or a.dwTabIndex ~= b.dwTabIndex then
+		return false
+	end
+	if a.nGenre == ITEM_GENRE.BOOK and a.nBookID ~= b.nBookID then
 		return false
 	end
 	return a.bCanStack
@@ -147,6 +155,9 @@ function D.ItemDescSorter(a, b)
 	end
 	if a.dwTabIndex ~= b.dwTabIndex then
 		return a.dwTabIndex < b.dwTabIndex
+	end
+	if a.nGenre == ITEM_GENRE.BOOK and a.nBookID ~= b.nBookID then
+		return a.nBookID < b.nBookID
 	end
 	-- °´¶ÑµþÊýÁ¿ÅÅÐò
 	if b.bCanStack then
