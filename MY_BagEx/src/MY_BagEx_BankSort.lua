@@ -101,6 +101,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 		FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', false)
 	end
 	-- 根据排序结果与当前状态交换物品
+	local nIndex, bChanged = 1, false
 	local function fnNext()
 		if not hFrame then
 			X.Systopmsg(_L['Bank panel closed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
@@ -109,7 +110,8 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 		if szState == 'Exchanging' then
 			return
 		end
-		for nIndex, tDesc in ipairs(aItemDesc) do
+		while nIndex <= #aItemDesc do
+			local tDesc = aItemDesc[nIndex]
 			local tBoxPos = aBoxPos[nIndex]
 			local dwBox, dwX = tBoxPos.dwBox, tBoxPos.dwX
 			local kCurItem = X.GetInventoryItem(me, dwBox, dwX)
@@ -118,26 +120,9 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 				if not MY_BagEx_Bank.IsItemBoxLocked(dwBox, dwX) then
 					MY_BagEx_Bank.HideItemShadow(hFrame, dwBox, dwX)
 				end
+				nIndex = nIndex + 1
 			else -- 当前格子和预期不符 需要交换
 				local tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc
-				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
-				if MY_BagEx.CanItemDescStack(tCurDesc, tDesc) then
-					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
-						tExcBoxPos = aBoxPos[nExcIndex]
-						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
-						kExcItem = X.GetInventoryItem(me, dwExcBox, dwExcX)
-						tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
-						-- 匹配到用于交换的格子
-						if not MY_BagEx_Bank.IsItemBoxLocked(dwExcBox, dwExcX) and not MY_BagEx.CanItemDescStack(tCurDesc, tExcDesc) then
-							break
-						end
-						tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc = nil, nil, nil, nil, nil
-					end
-					if not dwExcBox then
-						X.Systopmsg(_L['Cannot find item temp position, bank is full, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
-						return fnFinish()
-					end
-				end
 				-- 寻找预期物品所在位置
 				if not dwExcBox then
 					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
@@ -152,7 +137,67 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 						tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc = nil, nil, nil, nil, nil
 					end
 					if not dwExcBox then
-						X.Systopmsg(_L['Exchange item match failed, bank may changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+						bChanged = true
+					end
+				end
+				-- 寻找堆叠数不同的预期物品所在位置
+				if not dwExcBox then
+					for nExcIndex = nIndex, #aBoxPos do
+						tExcBoxPos = aBoxPos[nExcIndex]
+						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
+						kExcItem = X.GetInventoryItem(me, dwExcBox, dwExcX)
+						tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
+						-- 匹配到预期物品所在位置
+						if not MY_BagEx_Bank.IsItemBoxLocked(dwExcBox, dwExcX) and MY_BagEx.IsSameItemDesc(tDesc, tExcDesc, true) then
+							break
+						end
+						tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc = nil, nil, nil, nil, nil
+					end
+				end
+				-- 符合要求不用交換
+				if dwBox == dwExcBox and dwX == dwExcX then
+					nIndex = nIndex + 1
+					X.DelayCall(fnNext)
+					return
+				end
+				-- 当前格子和预期物品可堆叠 先拿个别的东西替换过来否则会导致物品合并
+				if dwExcBox and MY_BagEx.CanItemDescStack(tCurDesc, tDesc) then
+					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
+						tExcBoxPos = aBoxPos[nExcIndex]
+						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
+						kExcItem = X.GetInventoryItem(me, dwExcBox, dwExcX)
+						tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
+						-- 匹配到用于交换的格子
+						if not MY_BagEx_Bank.IsItemBoxLocked(dwExcBox, dwExcX) and not MY_BagEx.CanItemDescStack(tCurDesc, tExcDesc) then
+							break
+						end
+						tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc = nil, nil, nil, nil, nil
+					end
+					if not dwExcBox then
+						local szMsg = bChanged
+							and _L['Bank item changed, sort finished, result may not be perfect!']
+							or _L['Cannot find item temp position, bank is full, sort exited!']
+						X.Systopmsg(szMsg, X.CONSTANT.MSG_THEME.ERROR)
+						return fnFinish()
+					end
+				end
+				-- 还是没有匹配到 将当前物品找个空格子移走
+				if not dwExcBox then
+					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
+						tExcBoxPos = aBoxPos[nExcIndex]
+						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
+						kExcItem = X.GetInventoryItem(me, dwExcBox, dwExcX)
+						-- 匹配到用于交换的格子
+						if not MY_BagEx_Bank.IsItemBoxLocked(dwExcBox, dwExcX) and not kExcItem then
+							break
+						end
+						tExcBoxPos, dwExcBox, dwExcX, kExcItem, tExcDesc = nil, nil, nil, nil, nil
+					end
+					if not dwExcBox then
+						local szMsg = bChanged
+							and _L['Bank item changed, sort finished, result may not be perfect!']
+							or _L['Cannot find item temp position, bank is full, sort exited!']
+						X.Systopmsg(szMsg, X.CONSTANT.MSG_THEME.ERROR)
 						return fnFinish()
 					end
 				end
@@ -213,7 +258,7 @@ function D.CheckInjection(bRemoveInjection)
 					w = nW, h = nH - 3,
 					text = _L['Sort'],
 					tip = {
-						render = _L['Press shift for random'],
+						render = _L['Press shift for random, right click to import and export'],
 						position = X.UI.TIP_POSITION.BOTTOM_TOP,
 					},
 					onLClick = function()
@@ -241,6 +286,7 @@ function D.CheckInjection(bRemoveInjection)
 								szOption = _L['Export blueprint'],
 								fnAction = function()
 									D.Operate(false, true)
+									X.UI.ClosePopupMenu()
 								end,
 							},
 							{

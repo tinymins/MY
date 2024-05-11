@@ -72,7 +72,7 @@ function D.GetItemDesc(kItem)
 	}
 end
 
-function D.IsSameItemDesc(a, b)
+function D.IsSameItemDesc(a, b, bIgnoreStackNum)
 	if X.IsEmpty(a) and X.IsEmpty(b) then
 		return true
 	end
@@ -82,7 +82,7 @@ function D.IsSameItemDesc(a, b)
 	if a.dwTabType ~= b.dwTabType or a.dwTabIndex ~= b.dwTabIndex then
 		return false
 	end
-	if a.bCanStack and a.nStackNum ~= b.nStackNum then
+	if not bIgnoreStackNum and a.bCanStack and a.nStackNum ~= b.nStackNum then
 		return false
 	end
 	if a.bBind ~= b.bBind then
