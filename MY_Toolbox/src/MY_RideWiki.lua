@@ -85,7 +85,7 @@ function D.HookPlayerViewFrame(frame)
 				local _, _, dwBox, dwBoxIndex, dwPlayerID = this:GetObject()
 				local tar = X.GetPlayer(dwPlayerID)
 				if tar then
-					local item = GetPlayerItem(tar, dwBox, dwBoxIndex)
+					local item = X.GetInventoryItem(tar, dwBox, dwBoxIndex)
 					if item then
 						D.Open(item.dwTabType, item.dwIndex)
 					end
@@ -131,7 +131,7 @@ function D.HookHorsePanel(frame)
 				local _, _, dwBox, dwBoxIndex = this:GetObject()
 				local tar = X.GetClientPlayer()
 				if tar then
-					local item = GetPlayerItem(tar, dwBox, dwBoxIndex)
+					local item = X.GetInventoryItem(tar, dwBox, dwBoxIndex)
 					if item then
 						D.Open(item.dwTabType, item.dwIndex)
 					end
@@ -161,7 +161,7 @@ function D.HookHorsePanel(frame)
 				local _, _, dwBox, dwBoxIndex = this:GetObject()
 				local tar = X.GetClientPlayer()
 				if tar then
-					local item = GetPlayerItem(tar, dwBox, dwBoxIndex)
+					local item = X.GetInventoryItem(tar, dwBox, dwBoxIndex)
 					if item then
 						D.Open(item.dwTabType, item.dwIndex)
 					end

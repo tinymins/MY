@@ -43,20 +43,20 @@ function D.StackBag()
 		end
 		local me, tList = X.GetClientPlayer(), {}
 		for _, dwBox in ipairs(X.CONSTANT.INVENTORY_BANK_LIST) do
-			for dwX = 0, me.GetBoxSize(dwBox) - 1 do
+			for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
 				if not MY_BagEx_Bank.IsItemBoxLocked(dwBox, dwX) then
 					MY_BagEx_Bank.HideItemShadow(frame, dwBox, dwX)
 				end
-				local item = not MY_BagEx_Bank.IsItemBoxLocked(dwBox, dwX) and GetPlayerItem(me, dwBox, dwX)
-				if item and item.bCanStack and item.nStackNum < item.nMaxStackNum then
-					local szKey = X.GetItemKey(item)
+				local kItem = not MY_BagEx_Bank.IsItemBoxLocked(dwBox, dwX) and X.GetInventoryItem(me, dwBox, dwX)
+				if kItem and kItem.bCanStack and kItem.nStackNum < kItem.nMaxStackNum then
+					local szKey = X.GetItemKey(kItem)
 					local tPos = tList[szKey]
 					if tPos then
 						local dwBox1, dwX1 = tPos.dwBox, tPos.dwX
 						--[[#DEBUG BEGIN]]
-						X.Debug('MY_BagEx_BankStack', 'OnExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
+						X.Debug('MY_BagEx_BankStack', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
-						OnExchangeItem(dwBox, dwX, dwBox1, dwX1)
+						X.ExchangeInventoryItem(dwBox, dwX, dwBox1, dwX1)
 						return
 					else
 						tList[szKey] = { dwBox = dwBox, dwX = dwX }

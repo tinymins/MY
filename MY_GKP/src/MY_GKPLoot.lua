@@ -346,7 +346,9 @@ function D.IsItemDisplay(itemData, config)
 			end
 		end
 		if config.bFilterBookHave then
-			if X.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) > 0 then
+			local nAmount = X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.PACKAGE, itemData.dwTabType, itemData.dwIndex, itemData.nBookID)
+				+ X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.BANK, itemData.dwTabType, itemData.dwIndex, itemData.nBookID)
+			if nAmount > 0 then
 				return false
 			end
 		end
@@ -364,10 +366,14 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 	end
 	-- 超过可拾取上限则不捡
 	local itemInfo = GetItemInfo(itemData.dwTabType, itemData.dwIndex)
-	if itemInfo and itemInfo.nMaxExistAmount > 0
-	and X.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) + itemData.nStackNum > itemInfo.nMaxExistAmount then
-		return false
+	if itemInfo and itemInfo.nMaxExistAmount > 0 then
+		local nAmount = X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.PACKAGE, itemData.dwTabType, itemData.dwIndex, itemData.nBookID)
+			+ X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.BANK, itemData.dwTabType, itemData.dwIndex, itemData.nBookID)
+		if nAmount > itemInfo.nMaxExistAmount then
+			return false
+		end
 	end
+
 	-- 不拾取已读、已有书籍
 	if (config.bAutoPickupFilterBookRead or config.bAutoPickupFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
 		local me = X.GetClientPlayer()
@@ -378,7 +384,9 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 			end
 		end
 		if config.bAutoPickupFilterBookHave then
-			if X.GetItemAmountInAllPackages(itemData.dwTabType, itemData.dwIndex, itemData.nBookID) > 0 then
+			local nAmount = X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.PACKAGE, itemData.dwTabType, itemData.dwIndex, itemData.nBookID)
+				+ X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.BANK, itemData.dwTabType, itemData.dwIndex, itemData.nBookID)
+			if nAmount > 0 then
 				return false
 			end
 		end

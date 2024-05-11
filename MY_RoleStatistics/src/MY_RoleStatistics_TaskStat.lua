@@ -203,7 +203,10 @@ local DATA_ENV = setmetatable(
 		GetBuff                    = X.GetBuff                   ,
 		GetAccount                 = X.GetAccount                ,
 		GetServerOriginName        = X.GetServerOriginName       ,
-		GetItemAmountInAllPackages = X.GetItemAmountInAllPackages,
+		GetItemAmountInAllPackages = function(...)
+			return X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.PACKAGE, ...)
+				+ X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.BANK, ...)
+		end,
 		RegisterEvent              = X.RegisterEvent             ,
 		RegisterFrameCreate        = X.RegisterFrameCreate       ,
 		ITEM_TABLE_TYPE            = ITEM_TABLE_TYPE             ,

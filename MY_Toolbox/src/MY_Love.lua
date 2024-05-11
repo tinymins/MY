@@ -260,10 +260,9 @@ end
 -- 获取背包指定ID物品列表
 function D.GetBagItemPos(aUIID)
 	local me = X.GetClientPlayer()
-	local nIndex = X.GetBagPackageIndex()
-	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
-		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
-			local it = me.GetItem(dwBox, dwX)
+	for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.PACKAGE)) do
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
+			local it = X.GetInventoryItem(me, dwBox, dwX)
 			if it then
 				for _, nUIID in ipairs(aUIID) do
 					if it.nUiId == nUIID then
@@ -277,7 +276,7 @@ end
 
 -- 根据背包坐标获取物品及数量
 function D.GetBagItemNum(dwBox, dwX)
-	local item = GetPlayerItem(X.GetClientPlayer(), dwBox, dwX)
+	local item = X.GetInventoryItem(X.GetClientPlayer(), dwBox, dwX)
 	if not item then
 		return 0
 	elseif not item.bCanStack then
@@ -304,7 +303,7 @@ function D.UseDoubleLoveItem(info, aUIID, callback)
 	if rei and dwBox then
 		local nNum = D.GetBagItemNum(dwBox, dwX)
 		SetTarget(TARGET.PLAYER, rei.dwPlayerID)
-		OnUseItem(dwBox, dwX)
+		X.UseInventoryItem(dwBox, dwX)
 		local nFinishTime = GetTime() + 500
 		X.BreatheCall(function()
 			local me = X.GetClientPlayer()

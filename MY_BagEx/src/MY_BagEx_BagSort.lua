@@ -31,8 +31,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	local szState = 'Idle'
 	-- 加载格子列表
 	local me, aItemDesc, nItemCount, aBoxPos = X.GetClientPlayer(), {}, 0, {}
-	local nBagPackageIndex = X.GetBagPackageIndex()
-	for dwBox = nBagPackageIndex, nBagPackageIndex + X.GetBagPackageCount() - 1 do
+	for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.PACKAGE)) do
 		local dwGenre = me.GetContainType(dwBox)
 		if dwGenre == ITEM_GENRE.BOOK then
 			X.Systopmsg(_L['Bag contains book only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
@@ -42,8 +41,8 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 			X.Systopmsg(_L['Bag contains material only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
 			return
 		end
-		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
-			local kItem = GetPlayerItem(me, dwBox, dwX)
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
+			local kItem = X.GetInventoryItem(me, dwBox, dwX)
 			local tDesc = MY_BagEx.GetItemDesc(kItem)
 			if not X.IsEmpty(tDesc) then
 				nItemCount = nItemCount + 1
@@ -113,7 +112,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 		for nIndex, tDesc in ipairs(aItemDesc) do
 			local tBoxPos = aBoxPos[nIndex]
 			local dwBox, dwX = tBoxPos.dwBox, tBoxPos.dwX
-			local kCurItem = GetPlayerItem(me, dwBox, dwX)
+			local kCurItem = X.GetInventoryItem(me, dwBox, dwX)
 			local tCurDesc = MY_BagEx.GetItemDesc(kCurItem)
 			if MY_BagEx.IsSameItemDesc(tDesc, tCurDesc) then
 				if not MY_BagEx_Bag.IsItemBoxLocked(dwBox, dwX) then
@@ -126,7 +125,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
 						tExcBoxPos = aBoxPos[nExcIndex]
 						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
-						kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
+						kExcItem = X.GetInventoryItem(me, dwExcBox, dwExcX)
 						tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 						-- 匹配到用于交换的格子
 						if not MY_BagEx_Bag.IsItemBoxLocked(dwExcBox, dwExcX) and not MY_BagEx.CanItemDescStack(tCurDesc, tExcDesc) then
@@ -144,7 +143,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
 						tExcBoxPos = aBoxPos[nExcIndex]
 						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
-						kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
+						kExcItem = X.GetInventoryItem(me, dwExcBox, dwExcX)
 						tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 						-- 匹配到预期物品所在位置
 						if not MY_BagEx_Bag.IsItemBoxLocked(dwExcBox, dwExcX) and MY_BagEx.IsSameItemDesc(tDesc, tExcDesc) then
@@ -161,14 +160,14 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 				szState = 'Exchanging'
 				if kCurItem then
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' .. dwBox .. ',' .. dwX .. ' <-> ' ..dwExcBox .. ',' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
+					X.Debug('MY_BagEx_BagSort', 'ExchangeItem: ' .. dwBox .. ',' .. dwX .. ' <-> ' ..dwExcBox .. ',' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
-					OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
+					X.ExchangeInventoryItem(dwBox, dwX, dwExcBox, dwExcX)
 				else
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_BagEx_BagSort', 'OnExchangeItem: ' .. dwExcBox .. ',' .. dwExcX .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
+					X.Debug('MY_BagEx_BagSort', 'ExchangeItem: ' .. dwExcBox .. ',' .. dwExcX .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
-					OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
+					X.ExchangeInventoryItem(dwExcBox, dwExcX, dwBox, dwX)
 				end
 				return
 			end

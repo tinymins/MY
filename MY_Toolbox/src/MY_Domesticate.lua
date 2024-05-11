@@ -193,8 +193,8 @@ function D.CheckAutoFeedEnable()
 				nRound = 1
 			end
 			for _ = 1, nRound do
-				X.WalkBagItem(function(item, dwBox, dwX)
-					if item.dwTabType == O.dwAutoFeedFoodTabType and item.dwIndex == O.dwAutoFeedFoodTabIndex then
+				X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(kItem, dwBox, dwX)
+					if kItem.dwTabType == O.dwAutoFeedFoodTabType and kItem.dwIndex == O.dwAutoFeedFoodTabIndex then
 						domesticate.Feed(dwBox, dwX)
 						bFeed = true
 						return 0

@@ -602,7 +602,7 @@ function D.GetEquipCache(page, KPlayer)
 		tPermanentEnchant = {},
 		tTemporaryEnchant = {}
 	}
-	-- 装备 Output(X.GetClientPlayer().GetItem(0,0).GetMagicAttrib())
+	-- 装备 Output(X.GetInventoryItem(X.GetClientPlayer(),0,0).GetMagicAttrib())
 	for _, equip in ipairs(RT_EQUIP_TOTAL) do
 		-- if #aInfo.tEquip >= 3 then break end
 		-- 藏剑只看重剑
@@ -610,7 +610,7 @@ function D.GetEquipCache(page, KPlayer)
 			equip = 'BIG_SWORD'
 		end
 		local dwBox, dwX = INVENTORY_INDEX.EQUIP, X.CONSTANT.EQUIPMENT_INVENTORY[equip]
-		local item = KPlayer.GetItem(dwBox, dwX)
+		local item = X.GetInventoryItem(KPlayer, dwBox, dwX)
 		if item then
 			if RT_EQUIP_SPECIAL[equip] then
 				if item.dwSkillID ~= 0 then

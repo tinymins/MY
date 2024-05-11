@@ -30,6 +30,7 @@ function D.StackGuildBank()
 		return
 	end
 	local nPage = frame.nPage or 0
+	local dwBox = X.CONSTANT.INVENTORY_GUILD_BANK_LIST[nPage + 1]
 	local bTrigger
 	local fnFinish = function()
 		X.RegisterEvent('TONG_EVENT_NOTIFY', 'MY_BagEx_GuildBankStack__Stack', false)
@@ -39,17 +40,20 @@ function D.StackGuildBank()
 	local function fnNext()
 		bTrigger = true
 		local me, tList = X.GetClientPlayer(), {}
-		for i = 1, X.GetGuildBankBagSize(nPage) do
-			local dwBox, dwX = X.GetGuildBankBagPos(nPage, i)
-			local item = GetPlayerItem(me, dwBox, dwX)
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
+			local item = X.GetInventoryItem(me, dwBox, dwX)
 			if item and item.bCanStack and item.nStackNum < item.nMaxStackNum then
 				local szKey = X.GetItemKey(item)
-				local dwX2 = tList[szKey]
-				if not dwX2 then
-					tList[szKey] = dwX
-				else
-					OnExchangeItem(dwBox, dwX, INVENTORY_GUILD_BANK, dwX2)
+				local tPos = tList[szKey]
+				if tPos then
+					local dwBox1, dwX1 = tPos.dwBox, tPos.dwX
+					--[[#DEBUG BEGIN]]
+					X.Debug('MY_BagEx_GuildBankStack', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
+					--[[#DEBUG END]]
+					X.ExchangeInventoryItem(dwBox, dwX, dwBox1, dwX1)
 					return
+				else
+					tList[szKey] = { dwBox = dwBox, dwX = dwX }
 				end
 			end
 		end

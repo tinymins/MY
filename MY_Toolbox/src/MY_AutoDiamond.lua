@@ -43,7 +43,7 @@ function D.GetDiamondData(dwBox, dwX)
 	if not dwX then
 		dwBox, dwX = select(2, dwBox:GetObjectData())
 	end
-	local d, item = {}, X.GetClientPlayer().GetItem(dwBox, dwX)
+	local d, item = {}, X.GetInventoryItem(X.GetClientPlayer(), dwBox, dwX)
 	d.dwBox, d.dwX = dwBox, dwX
 	if item then
 		d.level = string.match(item.szName, _L['DIAMOND_REGEX'])
@@ -90,9 +90,9 @@ end
 
 -- 扫描背包石头及空位信息（存在 buggy cache）
 function D.LoadBagDiamond()
-	local me, t = X.GetClientPlayer(), {}
-	for dwBox = X.GetBagPackageIndex(), X.GetBagPackageIndex() + X.GetBagPackageCount() - 1 do
-		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
+	local t = {}
+	for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.PACKAGE)) do
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
 			local d = D.GetDiamondData(dwBox, dwX)
 			if not d.id or d.level then
 				for _, v in ipairs(D.dFormula) do
@@ -114,7 +114,7 @@ function D.RestoreBagDiamond(d)
 	local me = X.GetClientPlayer()
 	local tBag = D.tBagCache
 	-- move box item
-	local item = me.GetItem(d.dwBox, d.dwX)
+	local item = X.GetInventoryItem(me, d.dwBox, d.dwX)
 	-- to stack
 	if item then
 		for k, v in ipairs(tBag) do
@@ -458,7 +458,7 @@ X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond', function()
 	if nResult == DIAMOND_RESULT_CODE.SUCCESS then
 		local d = D.dFormula and D.dFormula[1]
 		if d and d.detail and d.detail > 0 then
-			local KItem = GetPlayerItem(X.GetClientPlayer(), d.dwBox, d.dwX)
+			local KItem = X.GetInventoryItem(X.GetClientPlayer(), d.dwBox, d.dwX)
 			if KItem then
 				if KItem.nDetail > d.detail then
 					bSuccess = true

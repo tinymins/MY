@@ -77,7 +77,7 @@ local function FilterBags(szTreePath, szFilter, bTimeLtd)
 			local bMatch = true
 			local szBoxType, nUiId, dwBox, dwX, suitIndex, dwTabType, dwIndex = this:GetObject()
 			if szBoxType == UI_OBJECT_ITEM then
-				local item = GetPlayerItem(X.GetClientPlayer(), dwBox, dwX)
+				local item = X.GetInventoryItem(X.GetClientPlayer(), dwBox, dwX)
 				if item then
 					if bTimeLtd and item.GetLeftExistTime() == 0 then
 						bMatch = false

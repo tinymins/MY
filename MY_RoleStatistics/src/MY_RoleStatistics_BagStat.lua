@@ -117,8 +117,17 @@ local BOX_TYPE = X.KvpToObject({
 	{X.CONSTANT.INVENTORY_INDEX.BANK_PACKAGE3, 303},
 	{X.CONSTANT.INVENTORY_INDEX.BANK_PACKAGE4, 304},
 	{X.CONSTANT.INVENTORY_INDEX.BANK_PACKAGE5, 305},
-	-- 400 - 499: Guild Bank
-	{X.CONSTANT.INVENTORY_GUILD_BANK, 400}
+	-- 400 Deprecated Guild Bank
+	-- 401 - 499: Guild Bank
+	{X.CONSTANT.INVENTORY_INDEX.GUILD_BANK, 401},
+	{X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE1, 402},
+	{X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE2, 403},
+	{X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE3, 404},
+	{X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE4, 405},
+	{X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE5, 406},
+	{X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE6, 407},
+	{X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE7, 408},
+	{X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE8, 409},
 })
 
 local O = X.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'], {
@@ -205,10 +214,12 @@ end
 local l_guildcache = {}
 local function UpdateTongRepertoryPage()
 	local nPage = arg0
+	local dwBox = X.CONSTANT.INVENTORY_GUILD_BANK_LIST[nPage + 1]
 	local me = X.GetClientPlayer()
-	for nIndex = 1, X.GetGuildBankBagSize(nPage) do
-		local boxtype, boxindex = X.GetGuildBankBagPos(nPage, nIndex)
-		local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex), 'BANK')
+	for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
+		local kItem = X.GetInventoryItem(me, dwBox, dwX)
+		local boxtype, boxindex = dwBox, dwX
+		local aItemData, aItemInfoData = D.ItemToData(kItem, 'BANK')
 		l_guildcache[boxtype .. ',' .. boxindex] = {
 			boxtype = boxtype,
 			boxindex = boxindex,
@@ -462,9 +473,9 @@ function D.FlushDB()
 	for _, boxtype in ipairs(aPackageBoxType) do
 		local sboxtype = BOX_TYPE[boxtype]
 		if sboxtype then
-			local count = me.GetBoxSize(boxtype)
+			local count = X.GetInventoryBoxSize(boxtype)
 			for boxindex = 0, count - 1 do
-				local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex))
+				local aItemData, aItemInfoData = D.ItemToData(X.GetInventoryItem(me, boxtype, boxindex))
 				if aItemInfoData then
 					DB_ItemInfoW:ClearBindings()
 					DB_ItemInfoW:BindAll(unpack(aItemInfoData))
@@ -496,9 +507,9 @@ function D.FlushDB()
 	for _, boxtype in ipairs(X.CONSTANT.INVENTORY_BANK_LIST) do
 		local sboxtype = BOX_TYPE[boxtype]
 		if sboxtype then
-			local count = me.GetBoxSize(boxtype)
+			local count = X.GetInventoryBoxSize(boxtype)
 			for boxindex = 0, count - 1 do
-				local aItemData, aItemInfoData = D.ItemToData(GetPlayerItem(me, boxtype, boxindex), 'BANK')
+				local aItemData, aItemInfoData = D.ItemToData(X.GetInventoryItem(me, boxtype, boxindex), 'BANK')
 				if aItemInfoData then
 					DB_ItemInfoW:ClearBindings()
 					DB_ItemInfoW:BindAll(unpack(aItemInfoData))
@@ -657,7 +668,9 @@ function D.UpdateItems(page)
 			LEFT JOIN ItemInfo
 				AS I
 			ON
-				B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?) ]] .. sqlfilter .. [[
+				B.tabtype = I.tabtype AND B.tabindex = I.tabindex
+			WHERE
+				B.tabtype != -1 AND B.tabindex != -1 AND B.boxtype != 400 AND (I.name LIKE ? OR I.desc LIKE ?) ]] .. sqlfilter .. [[
 		)
 			AS C
 		LEFT JOIN OwnerInfo

@@ -105,10 +105,8 @@ function D.ShowAllItemShadow(bEditLock)
 		sha:Show()
 	end
 	-- 遮罩背包物品
-	local me = X.GetClientPlayer()
-	local nIndex = X.GetBagPackageIndex()
-	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
-		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
+	for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.PACKAGE)) do
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
 			D.ShowItemShadow(frame, dwBox, dwX, bEditLock)
 		end
 	end
@@ -143,10 +141,8 @@ function D.HideAllItemShadow()
 		end
 	end
 	-- 遮罩背包物品
-	local me = X.GetClientPlayer()
-	local nIndex = X.GetBagPackageIndex()
-	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
-		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
+	for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.PACKAGE)) do
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
 			D.HideItemShadow(frame, dwBox, dwX)
 		end
 	end

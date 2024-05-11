@@ -137,7 +137,7 @@ Box_AppendAddonMenu({function(box)
 	if not dwBox or not dwX then
 		return
 	end
-	local item = GetPlayerItem(X.GetClientPlayer(), dwBox, dwX)
+	local item = X.GetInventoryItem(X.GetClientPlayer(), dwBox, dwX)
 	if not item then
 		return
 	end

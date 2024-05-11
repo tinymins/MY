@@ -29,11 +29,11 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 		return
 	end
 	local nPage, szState = hFrame.nPage or 0, 'Idle'
+	local dwBox = X.CONSTANT.INVENTORY_GUILD_BANK_LIST[nPage + 1]
 	-- 加载格子列表
 	local me, aItemDesc, nItemCount, aBoxPos = X.GetClientPlayer(), {}, 0, {}
-	for nIndex = 1, X.GetGuildBankBagSize(nPage) do
-		local dwBox, dwX = X.GetGuildBankBagPos(nPage, nIndex)
-		local kItem = GetPlayerItem(me, dwBox, dwX)
+	for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
+		local kItem = X.GetInventoryItem(me, dwBox, dwX)
 		local tDesc = MY_BagEx.GetItemDesc(kItem)
 		if not X.IsEmpty(tDesc) then
 			nItemCount = nItemCount + 1
@@ -87,7 +87,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 		for nIndex, tDesc in ipairs(aItemDesc) do
 			local tBoxPos = aBoxPos[nIndex]
 			local dwBox, dwX = tBoxPos.dwBox, tBoxPos.dwX
-			local kCurItem = GetPlayerItem(me, dwBox, dwX)
+			local kCurItem = X.GetInventoryItem(me, dwBox, dwX)
 			local tCurDesc = MY_BagEx.GetItemDesc(kCurItem)
 			-- 当前格子和预期不符 需要交换
 			if not MY_BagEx.IsSameItemDesc(tDesc, tCurDesc) then
@@ -97,7 +97,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
 						tExcBoxPos = aBoxPos[nExcIndex]
 						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
-						kExcItem = GetPlayerItem(me, INVENTORY_GUILD_BANK, dwExcX)
+						kExcItem = X.GetInventoryItem(me, dwExcBox, dwExcX)
 						tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 						-- 匹配到用于交换的格子
 						if not MY_BagEx.CanItemDescStack(tCurDesc, tExcDesc) then
@@ -115,7 +115,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 					for nExcIndex = #aBoxPos, nIndex + 1, -1 do
 						tExcBoxPos = aBoxPos[nExcIndex]
 						dwExcBox, dwExcX = tExcBoxPos.dwBox, tExcBoxPos.dwX
-						kExcItem = GetPlayerItem(me, dwExcBox, dwExcX)
+						kExcItem = X.GetInventoryItem(me, dwExcBox, dwExcX)
 						tExcDesc = MY_BagEx.GetItemDesc(kExcItem)
 						-- 匹配到预期物品所在位置
 						if MY_BagEx.IsSameItemDesc(tDesc, tExcDesc) then
@@ -131,14 +131,14 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 				szState = 'Exchanging'
 				if kCurItem then
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
+					X.Debug('MY_BagEx_GuildBankSort', 'ExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
-					OnExchangeItem(dwBox, dwX, dwExcBox, dwExcX)
+					X.ExchangeInventoryItem(dwBox, dwX, dwExcBox, dwExcX)
 				else
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_BagEx_GuildBankSort', 'OnExchangeItem: GUILD,' .. dwExcX .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
+					X.Debug('MY_BagEx_GuildBankSort', 'ExchangeItem: GUILD,' .. dwExcX .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
-					OnExchangeItem(dwExcBox, dwExcX, dwBox, dwX)
+					X.ExchangeInventoryItem(dwExcBox, dwExcX, dwBox, dwX)
 				end
 				return
 			end

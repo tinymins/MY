@@ -375,9 +375,9 @@ function D.FlushDB()
 	for suitindex, _ in ipairs(X.CONSTANT.INVENTORY_EQUIP_LIST) do
 		local boxtype = tSuitIndexToBoxType[suitindex]
 		if boxtype then
-			local count = me.GetBoxSize(boxtype)
+			local count = X.GetInventoryBoxSize(boxtype)
 			for boxindex = 0, count - 1 do
-				local KItem = GetPlayerItem(me, boxtype, boxindex)
+				local KItem = X.GetInventoryItem(me, boxtype, boxindex)
 				DB_ItemsW:ClearBindings()
 				local itemid, tabtype, tabindex, tabsubindex = -1, -1, -1, -1
 				local stacknum, uiid, strength, durability = 0, 0, 0, 0

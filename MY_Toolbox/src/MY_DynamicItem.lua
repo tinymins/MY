@@ -240,7 +240,7 @@ function D.UpdateList(frame)
 		local data = D.aList[i]
 		if data then
 			if data[1] == UI_OBJECT.ITEM_INFO then
-				local nAmount = X.GetItemAmount(data[2], data[3], data[4])
+				local nAmount = X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.PACKAGE, data[2], data[3], data[4])
 				UpdateBoxObject(box, UI_OBJECT.ITEM_INFO, nil, data[2], data[3], data[4] or nAmount)
 				box:EnableObject(nAmount > 0)
 			elseif data[1] == UI_OBJECT.ITEM then
@@ -264,7 +264,7 @@ function D.ParseBoxItem(box)
 	local me = X.GetClientPlayer()
 	local data, tItem = {box:GetObject()}
 	if data[1] == UI_OBJECT.ITEM then
-		local KItem = GetPlayerItem(me, data[3], data[4])
+		local KItem = X.GetInventoryItem(me, data[3], data[4])
 		if KItem then
 			if data[3] == 0 then -- 玩家身上的装备
 				tItem = {UI_OBJECT.ITEM, data[3], data[4]}
@@ -375,18 +375,18 @@ function D.OnItemLButtonClick()
 			local data = {this:GetObject()}
 			if data[1] == UI_OBJECT.ITEM_INFO then
 				local dwTabType, dwIndex, nBookID = data[4], data[5], data[7]
-				X.WalkBagItem(function(item, dwBox, dwX)
-					if item.dwTabType == dwTabType and item.dwIndex == dwIndex then
-						if item.nGenre == ITEM_GENRE.BOOK and item.nBookID ~= nBookID then
+				X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(kItem, dwBox, dwX)
+					if kItem.dwTabType == dwTabType and kItem.dwIndex == dwIndex then
+						if kItem.nGenre == ITEM_GENRE.BOOK and kItem.nBookID ~= nBookID then
 							return
 						end
-						OnUseItem(dwBox, dwX)
+						X.UseInventoryItem(dwBox, dwX)
 						return 0
 					end
 				end)
 			elseif data[1] == UI_OBJECT.ITEM then
 				local dwBox, dwX = data[3], data[4]
-				OnUseItem(dwBox, dwX)
+				X.UseInventoryItem(dwBox, dwX)
 			end
 		else
 			X.ExecuteWithThis(this, D.OnItemLButtonDragEnd)

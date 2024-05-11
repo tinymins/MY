@@ -86,7 +86,7 @@ RegisterCustomData('MY_AutoSell.tProtectItem')
 
 function D.SellItem(nNpcID, nShopID, dwBox, dwX, nCount, szReason, szName, nUiId)
 	local me = X.GetClientPlayer()
-	local item = me.GetItem(dwBox, dwX)
+	local item = X.GetInventoryItem(me, dwBox, dwX)
 	if not item or item.nUiId ~= nUiId then
 		return
 	end
@@ -100,12 +100,10 @@ function D.AutoSellItem(nNpcID, nShopID, bIgnoreGray)
 		return
 	end
 	local me = X.GetClientPlayer()
-	local nIndex = X.GetBagPackageIndex()
 	local aSell = {}
-	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
-		local dwSize = me.GetBoxSize(dwBox) - 1
-		for dwX = 0, dwSize do
-			local item = me.GetItem(dwBox, dwX)
+	for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.PACKAGE)) do
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
+			local item = X.GetInventoryItem(me, dwBox, dwX)
 			if item and item.bCanTrade then
 				local bSell, szReason = false, ''
 				local szName = X.GetObjectName(item)
