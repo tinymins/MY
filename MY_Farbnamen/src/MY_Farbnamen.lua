@@ -542,8 +542,8 @@ function D.GetTip(szName)
 			table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 		end
 		-- 帮会
-		if tInfo.szTongID and #tInfo.szTongID > 0 then
-			table.insert(tTip, GetFormatText('[' .. tInfo.szTongID .. ']', 136))
+		if tInfo.szTongName and #tInfo.szTongName > 0 then
+			table.insert(tTip, GetFormatText('[' .. tInfo.szTongName .. ']', 136))
 			table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 		end
 		-- 门派 体型 阵营
@@ -680,15 +680,16 @@ function D.Get(szKey)
 	end
 	if info then
 		return {
-			dwID      = info.id,
-			szName    = info.name,
-			dwForceID = info.force,
-			nRoleType = info.role,
-			nLevel    = info.level,
-			szTitle   = info.title,
-			nCamp     = info.camp,
-			szTongID  = GetTongName(info.tong) or '',
-			rgb       = X.IsNumber(info.force) and { X.GetForceColor(info.force, 'foreground') } or { 255, 255, 255 },
+			dwID       = info.id,
+			szName     = info.name,
+			dwForceID  = info.force,
+			nRoleType  = info.role,
+			nLevel     = info.level,
+			szTitle    = info.title,
+			nCamp      = info.camp,
+			dwTongID   = info.tong,
+			szTongName = GetTongName(info.tong) or '',
+			rgb        = X.IsNumber(info.force) and { X.GetForceColor(info.force, 'foreground') } or { 255, 255, 255 },
 		}
 	end
 end
