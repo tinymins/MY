@@ -65,6 +65,7 @@ local O = X.CreateUserSettingsModule('MY_ChatBlock', _L['Chat'], {
 			szKeyword = X.Schema.String,
 			tMsgType = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 			bTeamBuilding = X.Schema.Optional(X.Schema.Boolean),
+			bTongName = X.Schema.Optional(X.Schema.Boolean),
 			bIgnoreAcquaintance = X.Schema.Boolean,
 			bIgnoreCase = X.Schema.Boolean,
 			bIgnoreEnEm = X.Schema.Boolean,
@@ -80,9 +81,16 @@ function D.IsBlockMsg(szText, szMsgType, dwTalkerID)
 		and (X.IsFellowship(dwTalkerID) or X.IsFoe(dwTalkerID) or X.IsTongMember(dwTalkerID))
 		or false
 	for _, bw in ipairs(D.aBlockWords) do
-		if bw.tMsgType[szMsgType] and (not bAcquaintance or not bw.bIgnoreAcquaintance)
-		and X.StringSimpleMatch(szText, bw.szKeyword, not bw.bIgnoreCase, not bw.bIgnoreEnEm, bw.bIgnoreSpace) then
-			return true
+		if bw.tMsgType[szMsgType] and (not bAcquaintance or not bw.bIgnoreAcquaintance) then
+			if X.StringSimpleMatch(szText, bw.szKeyword, not bw.bIgnoreCase, not bw.bIgnoreEnEm, bw.bIgnoreSpace) then
+				return true
+			end
+			if bw.bTongName and _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
+				local info = _G.MY_Farbnamen.Get(dwTalkerID)
+				if info and info.szTongName == bw.szKeyword then
+					return true
+				end
+			end
 		end
 	end
 	return false
@@ -357,6 +365,22 @@ function PS.OnPanelActive(wnd)
 			fnAction = function()
 				data.bTeamBuilding = not data.bTeamBuilding
 				SaveBlockWords()
+			end,
+		})
+		table.insert(menu, {
+			szOption = _L['From tong name'],
+			bCheck = true, bChecked = data.bTongName,
+			fnAction = function()
+				data.bTongName = not data.bTongName
+				SaveBlockWords()
+			end,
+			fnMouseEnter = function()
+				local nX, nY = this:GetAbsX(), this:GetAbsY()
+				local nW, nH = this:GetW(), this:GetH()
+				OutputTip(GetFormatText(_L['If talker\'s tong name equals with keyword, chat message will be blocked, only apply for target you\'ve met.'], nil, 255, 255, 0), 400, {nX, nY, nW, nH}, ALW.LEFT_RIGHT)
+			end,
+			fnMouseLeave = function()
+				HideTip()
 			end,
 		})
 		table.insert(menu, X.CONSTANT.MENU_DIVIDER)

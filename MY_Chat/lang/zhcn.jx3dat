@@ -111,6 +111,8 @@ return {
     ['Channels'] = '频道设置',
     ['Enable'] = '启用',
     ['Team building'] = '团队招募',
+    ['From tong name'] = '所属帮会',
+    ['If talker\'s tong name equals with keyword, chat message will be blocked, only apply for target you\'ve met.'] = '如果发言者帮会名称与关键字相同则过滤发言，注意该功能仅对遇见过的侠士生效。',
     ['Edit'] = '编辑',
     ['Please input keyword:'] = '请输入关键字：',
     ['Add'] = '添加',

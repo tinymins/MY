@@ -111,6 +111,8 @@ return {
     ['Channels'] = '頻道設置',
     ['Enable'] = '啟用',
     ['Team building'] = '團隊招募',
+    ['From tong name'] = '所屬幫會',
+    ['If talker\'s tong name equals with keyword, chat message will be blocked, only apply for target you\'ve met.'] = '如果發言者幫會名稱與關鍵字相同則過濾發言，注意該功能僅對遇見過的俠士生效。',
     ['Edit'] = '編輯',
     ['Please input keyword:'] = '請輸入關鍵字：',
     ['Add'] = '添加',
