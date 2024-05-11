@@ -2869,85 +2869,20 @@ function X.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
 	end
 end
 
-function X.GetBagPackageIndex()
-	return X.IsInExtraBagMap()
-		and INVENTORY_INDEX.LIMITED_PACKAGE
-		or INVENTORY_INDEX.PACKAGE
-end
-
-function X.GetBagPackageCount()
-	if _G.Bag_GetPacketCount then
-		return _G.Bag_GetPacketCount()
-	end
-	return X.IsInExtraBagMap()
-		and #X.CONSTANT.INVENTORY_LIMITED_PACKAGE_LIST
-		or #X.CONSTANT.INVENTORY_PACKAGE_LIST
-end
-
-function X.GetBankPackageCount()
-	local me = X.GetClientPlayer()
-	return me.GetBankPackageCount() + 1 -- 逻辑写挫了 返回的比真实的少一个
-end
-
--- 获取背包空位总数
--- (number) X.GetFreeBagBoxNum()
-function X.GetFreeBagBoxNum()
-	local me, nFree = X.GetClientPlayer(), 0
-	local nIndex = X.GetBagPackageIndex()
-	for i = nIndex, nIndex + X.GetBagPackageCount() - 1 do
-		nFree = nFree + me.GetBoxFreeRoomSize(i)
-	end
-	return nFree
-end
-
--- 获取第一个背包空位
--- (number, number) X.GetFreeBagBox()
-function X.GetFreeBagBox()
-	local me = X.GetClientPlayer()
-	local nIndex = X.GetBagPackageIndex()
-	for i = nIndex, nIndex + X.GetBagPackageCount() - 1 do
-		if me.GetBoxFreeRoomSize(i) > 0 then
-			for j = 0, me.GetBoxSize(i) - 1 do
-				if not me.GetItem(i, j) then
-					return i, j
-				end
-			end
-		end
-	end
-end
-
--- 遍历背包物品
--- (number dwBox, number dwX) X.WalkBagItem(fnWalker)
-function X.WalkBagItem(fnWalker)
-	local me = X.GetClientPlayer()
-	local nIndex = X.GetBagPackageIndex()
-	for dwBox = nIndex, nIndex + X.GetBagPackageCount() - 1 do
-		for dwX = 0, me.GetBoxSize(dwBox) - 1 do
-			local it = me.GetItem(dwBox, dwX)
-			if it and fnWalker(it, dwBox, dwX) == 0 then
-				return
-			end
-		end
-	end
-end
-
--- 获取一样东西在背包的数量
-function X.GetItemAmount(dwTabType, dwIndex, nBookID)
-	local me = X.GetClientPlayer()
-	if not me then
-		return
-	end
-	if nBookID then
-		local nBookID, nSegmentID = X.RecipeToSegmentID(nBookID)
-		return me.GetItemAmount(dwTabType, dwIndex, nBookID, nSegmentID)
-	end
-	return me.GetItemAmount(dwTabType, dwIndex)
-end
+--------------------------------------------------------------------------------
+-- 物品、物品存储格：身上、背包、仓库、帮会仓库
+--------------------------------------------------------------------------------
 
 do local CACHE = {}
+-- 获取指定物品的唯一键
 -- X.GetItemKey(dwTabType, dwIndex, nBookID)
 -- X.GetItemKey(KItem)
 -- X.GetItemKey(KItemInfo, nBookID)
+---@param dwTabType number @物品表类型
+---@param dwIndex number @物品表下标
+---@param nBookID number @物品为书籍时的书籍ID
+---@param KItem usedata @物品对象
+---@param KItemInfo usedata @物品模板对象
 function X.GetItemKey(dwTabType, dwIndex, nBookID)
 	local it, nGenre
 	if X.IsUserdata(dwTabType) then
@@ -2981,105 +2916,234 @@ function X.GetItemKey(dwTabType, dwIndex, nBookID)
 end
 end
 
-do local CACHE, NO_LIMITED_CACHE
-local function InsertItem(cache, it)
-	if it then
-		local szKey = X.GetItemKey(it)
-		cache[szKey] = (cache[szKey] or 0) + (it.bCanStack and it.nStackNum or 1)
+-- 插件物品存储位置转换为官方物品存储位置
+---@param dwBox number @物品存储格
+---@param dwX number @存储格中指定物品下标
+---@return number,number @官方存储格位置(dwBox),官方存储格中指定物品的下标(dwX)
+local function GetOfficialInventoryBoxPos(dwBox, dwX)
+	-- 帮会仓库格为虚拟位置，特殊处理
+	if dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE1
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE2
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE3
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE4
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE5
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE6
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE7
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE8
+	then
+		local nPage = dwBox - X.CONSTANT.INVENTORY_INDEX.GUILD_BANK
+		local nPageSize = INVENTORY_GUILD_PAGE_SIZE or 100
+		return INVENTORY_GUILD_BANK or INVENTORY_INDEX.TOTAL + 1, nPage * nPageSize + dwX
+	end
+	return dwBox, dwX
+end
+
+-- 获取指定类型物品存储格位置列表
+---@param eType number @物品存储格指定类型
+---@return number[] @存储格位置列表
+function X.GetInventoryBoxList(eType)
+	-- 身上装备格
+	if eType == X.CONSTANT.INVENTORY_TYPE.EQUIP then
+		return X.Clone(X.CONSTANT.INVENTORY_EQUIP_LIST)
+	end
+	-- 背包格
+	if eType == X.CONSTANT.INVENTORY_TYPE.PACKAGE then
+		if X.IsInInventoryPackageLimitedMap() then
+			return X.Clone(X.CONSTANT.INVENTORY_LIMITED_PACKAGE_LIST)
+		end
+		return X.Clone(X.CONSTANT.INVENTORY_PACKAGE_LIST)
+	end
+	-- 仓库格
+	if eType == X.CONSTANT.INVENTORY_TYPE.BANK then
+		local me, aList = X.GetClientPlayer(), {}
+		for i = 1, me.GetBankPackageCount() + 1 do
+			aList[i] = X.CONSTANT.INVENTORY_BANK_LIST[i]
+		end
+		return aList
+	end
+	-- 帮会仓库格（虚拟位置不可用于离线存储）
+	if eType == X.CONSTANT.INVENTORY_TYPE.GUILD_BANK then
+		return X.Clone(X.CONSTANT.INVENTORY_GUILD_BANK_LIST)
+	end
+	-- 原始背包格
+	if eType == X.CONSTANT.INVENTORY_TYPE.ORIGIN_PACKAGE then
+		return X.Clone(X.CONSTANT.INVENTORY_PACKAGE_LIST)
+	end
+	-- 额外背包格
+	if eType == X.CONSTANT.INVENTORY_TYPE.LIMITED_PACKAGE then
+		return X.Clone(X.CONSTANT.INVENTORY_LIMITED_PACKAGE_LIST)
 	end
 end
--- 获取一样东西在背包、装备、仓库的数量
--- dwTabType   物品表类型
--- dwIndex     物品在表内地址
--- nBookID     书籍ID
--- bNoLimited  无视地图限制（部分地图内限制使用临时背包）
-function X.GetItemAmountInAllPackages(dwTabType, dwIndex, nBookID, bNoLimited)
-	if X.IsBoolean(nBookID) then
-		nBookID, bNoLimited = nil, nBookID
+
+-- 获取指定物品存储格可存放物品数量（指定位置装备包的大小）
+---@param dwBox number @物品存储格位置
+---@return number @存储格可存放物品数量
+function X.GetInventoryBoxSize(dwBox)
+	-- 帮会仓库格为虚拟位置，特殊处理
+	if dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE1
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE2
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE3
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE4
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE5
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE6
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE7
+	or dwBox == X.CONSTANT.INVENTORY_INDEX.GUILD_BANK_PACKAGE8
+	then
+		return 98
 	end
-	if X.IsNil(bNoLimited) then
-		bNoLimited = not X.IsInExtraBagMap()
-	end
-	local cache = CACHE
-	if bNoLimited then
-		cache = NO_LIMITED_CACHE
-	end
-	if not cache then
-		cache = {}
-		local me = X.GetClientPlayer()
-		if not me then
-			return
-		end
-		for _, dwBox in ipairs(bNoLimited and X.CONSTANT.INVENTORY_PACKAGE_LIST or X.CONSTANT.INVENTORY_LIMITED_PACKAGE_LIST)  do
-			for dwX = 0, me.GetBoxSize(dwBox) - 1 do
-				InsertItem(cache, me.GetItem(dwBox, dwX))
-			end
-		end
-		for _, dwBox in ipairs(X.CONSTANT.INVENTORY_BANK_LIST) do
-			for dwX = 0,  me.GetBoxSize(dwBox) - 1 do
-				InsertItem(cache, GetPlayerItem(me, dwBox, dwX))
-			end
-		end
-		for _, dwBox in ipairs(X.CONSTANT.INVENTORY_EQUIP_LIST) do
-			for dwX = 0, EQUIPMENT_INVENTORY.TOTAL - 1 do
-				InsertItem(cache, GetPlayerItem(me, dwBox, dwX))
-			end
-		end
-		if bNoLimited then
-			NO_LIMITED_CACHE = cache
-		else
-			CACHE = cache
-		end
-	end
-	return cache[X.GetItemKey(dwTabType, dwIndex, nBookID)] or 0
+	-- 其它格走接口获取
+	local me = X.GetClientPlayer()
+	return me.GetBoxSize(dwBox)
 end
-X.RegisterEvent({'BAG_ITEM_UPDATE', 'BANK_ITEM_UPDATE', 'LOADING_ENDING'}, 'LIB#GetItemAmountInAllPackages', function() CACHE, NO_LIMITED_CACHE = nil, nil end)
+
+-- 获取指定物品存储格位置的物品对象
+---@param me userdata @玩家对象
+---@param dwBox number @物品存储格
+---@param dwX number @存储格中指定物品下标
+---@return userdata|nil @指定位置的物品，不存在则返回空
+function X.GetInventoryItem(me, dwBox, dwX)
+	dwBox, dwX = GetOfficialInventoryBoxPos(dwBox, dwX)
+	return GetPlayerItem(me, dwBox, dwX)
+end
+
+-- 交換两个物品存储格位置的物品对象
+---@param dwBox1 number @物品存储格1
+---@param dwX1 number @存储格中指定物品1下标
+---@param dwBox2 number @物品存储格2
+---@param dwX2 number @存储格中指定物品2下标
+function X.ExchangeInventoryItem(dwBox1, dwX1, dwBox2, dwX2)
+	dwBox1, dwX1 = GetOfficialInventoryBoxPos(dwBox1, dwX1)
+	dwBox2, dwX2 = GetOfficialInventoryBoxPos(dwBox2, dwX2)
+	OnExchangeItem(dwBox1, dwX1, dwBox2, dwX2)
+end
+
+-- 获取指定类型物品存储格空位总数
+---@param eType number @物品存储格指定类型
+---@return number @存储格空位总数
+function X.GetInventoryEmptyItemCount(eType)
+	local me, nCount = X.GetClientPlayer(), 0
+	for _, dwBox in ipairs(X.GetInventoryBoxList(eType)) do
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
+			if not X.GetInventoryItem(me, dwBox, dwX) then
+				nCount = nCount + 1
+			end
+		end
+	end
+	return nCount
+end
+
+-- 获取指定类型物品存储格第一个空位位置
+---@param eType number @物品存储格指定类型
+---@return number,number @存储格第一个空位位置，已满返回空
+function X.GetInventoryEmptyItemPos(eType)
+	local me = X.GetClientPlayer()
+	for _, dwBox in ipairs(X.GetInventoryBoxList(eType)) do
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
+			if not X.GetInventoryItem(me, dwBox, dwX) then
+				return dwBox, dwX
+			end
+		end
+	end
+end
+
+-- 遍历指定类型物品存储格所有物品
+---@param eType number @物品存储格指定类型
+---@param fnIter function @遍历迭代器，返回0停止遍历
+function X.IterInventoryItem(eType, fnIter)
+	local me = X.GetClientPlayer()
+	for _, dwBox in ipairs(X.GetInventoryBoxList(eType)) do
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
+			local kItem = X.GetInventoryItem(me, dwBox, dwX)
+			if kItem and fnIter(kItem, dwBox, dwX) == 0 then
+				return
+			end
+		end
+	end
+end
+
+do local CACHE = {}
+-- 获取指定物品在指定类型的物品存储格中的总数量
+---@param eType number @物品存储格指定类型
+---@param dwTabType number @指定物品的表类型
+---@param dwIndex number @指定物品的表下标
+---@param nBookID number @指定物品为书籍情况下的书籍ID
+---@return number @指定物品的总数量
+function X.GetInventoryItemAmount(eType, dwTabType, dwIndex, nBookID)
+	if not CACHE[eType] then
+		CACHE[eType] = {}
+	end
+	local szKey = X.GetItemKey(dwTabType, dwIndex, nBookID)
+	if not CACHE[eType][szKey] then
+		local nAmount = 0
+		X.IterInventoryItem(eType, function(kItem)
+			if szKey == X.GetItemKey(kItem) then
+				nAmount = nAmount + (kItem.bCanStack and kItem.nStackNum or 1)
+			end
+		end)
+		CACHE[eType][szKey] = nAmount
+	end
+	return CACHE[eType][szKey]
+end
+X.RegisterEvent({'BAG_ITEM_UPDATE', 'BANK_ITEM_UPDATE', 'LOADING_ENDING'}, 'LIB#GetInventoryItemAmount', function() CACHE = {} end)
 end
 
 -- 装备指定名字的装备
--- (void) X.Equip(szName)
--- szName  装备名称
-function X.Equip(szName)
-	X.WalkBagItem(function(it, dwBox, dwX)
+---@param szName string @装备名称
+---@return boolean @是否找到并装备物品
+function X.EquipInventoryItem(szName)
+	local bEquip = false
+	X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(it, dwBox, dwX)
 		if X.GetItemNameByUIID(it.nUiId) == szName then
 			if szName == g_tStrings.tBulletDetail[BULLET_DETAIL.SNARE]
 			or szName == g_tStrings.tBulletDetail[BULLET_DETAIL.BOLT] then
 				local me = X.GetClientPlayer()
 				for nIndex = 0, 15 do
 					if me.GetItem(INVENTORY_INDEX.BULLET_PACKAGE, nIndex) == nil then
-						OnExchangeItem(dwBox, dwX, INVENTORY_INDEX.BULLET_PACKAGE, nIndex)
+						bEquip = true
+						X.ExchangeInventoryItem(dwBox, dwX, INVENTORY_INDEX.BULLET_PACKAGE, nIndex)
 						break
 					end
 				end
 			else
+				bEquip = true
 				local nEquipPos = select(2, X.GetClientPlayer().GetEquipPos(dwBox, dwX))
-				OnExchangeItem(dwBox, dwX, INVENTORY_INDEX.EQUIP, nEquipPos)
+				X.ExchangeInventoryItem(dwBox, dwX, INVENTORY_INDEX.EQUIP, nEquipPos)
 			end
 			return 0
 		end
 	end)
+	return bEquip
 end
 
 -- 使用物品
--- (bool) X.UseItem(szName)
--- (bool) X.UseItem(dwTabType, dwIndex, nBookID)
-function X.UseItem(dwTabType, dwIndex, nBookID)
+-- X.UseInventoryItem(szName)
+-- X.UseInventoryItem(dwTabType, dwIndex, nBookID)
+---@param szName string @要使用的物品名称
+---@param dwTabType number @要使用的物品表类型
+---@param dwIndex number @要使用的物品表下标
+---@param nBookID number @要使用的物品为书籍时的书籍ID
+---@return boolean @是否找到并使用物品
+function X.UseInventoryItem(dwTabType, dwIndex, nBookID)
 	local bUse = false
 	if X.IsString(dwTabType) then
-		X.WalkBagItem(function(item, dwBox, dwX)
-			if X.GetObjectName('ITEM', item) == dwTabType then
+		X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(kItem, dwBox, dwX)
+			if X.GetObjectName('ITEM', kItem) == dwTabType then
 				bUse = true
+				dwBox, dwX = GetOfficialInventoryBoxPos(dwBox, dwX)
 				OnUseItem(dwBox, dwX)
 				return 0
 			end
 		end)
 	else
-		X.WalkBagItem(function(item, dwBox, dwX)
-			if item.dwTabType == dwTabType and item.dwIndex == dwIndex then
-				if item.nGenre == ITEM_GENRE.BOOK and item.nBookID ~= nBookID then
+		X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(kItem, dwBox, dwX)
+			if kItem.dwTabType == dwTabType and kItem.dwIndex == dwIndex then
+				if kItem.nGenre == ITEM_GENRE.BOOK and kItem.nBookID ~= nBookID then
 					return
 				end
 				bUse = true
+				dwBox, dwX = GetOfficialInventoryBoxPos(dwBox, dwX)
 				OnUseItem(dwBox, dwX)
 				return 0
 			end
@@ -3087,6 +3151,10 @@ function X.UseItem(dwTabType, dwIndex, nBookID)
 	end
 	return bUse
 end
+
+--------------------------------------------------------------------------------
+-- 气劲
+--------------------------------------------------------------------------------
 
 do
 -- “气劲下标” 到 “气劲” 的映射缓存
@@ -3271,6 +3339,10 @@ function X.IsVisibleBuff(dwID, nLevel)
 	return false
 end
 
+--------------------------------------------------------------------------------
+-- 角色状态
+--------------------------------------------------------------------------------
+
 -- 获取对象是否无敌
 -- (mixed) X.IsInvincible([object KObject])
 -- @return <nil >: invalid KObject
@@ -3306,6 +3378,10 @@ function X.IsIsolated(...)
 	end
 	return KObject.bIsolated
 end
+
+--------------------------------------------------------------------------------
+-- 招式
+--------------------------------------------------------------------------------
 
 -- 获取对象运功状态
 do local bNewAPI
@@ -4210,15 +4286,15 @@ end
 ---判断地图是不是新背包地图
 ---@param dwMapID number @要判断的地图ID
 ---@return boolean @是否是新背包地图
-function X.IsExtraBagMap(dwMapID)
+function X.IsInventoryPackageLimitedMap(dwMapID)
 	return X.IsPubgMap(dwMapID) or X.IsMobaMap(dwMapID) or X.IsStarveMap(dwMapID)
 end
 
 ---判断当前地图是不是新背包地图
 ---@return boolean @当前地图是否是新背包地图
-function X.IsInExtraBagMap()
+function X.IsInInventoryPackageLimitedMap()
 	local me = X.GetClientPlayer()
-	return me and X.IsExtraBagMap(me.GetMapID())
+	return me and X.IsInventoryPackageLimitedMap(me.GetMapID())
 end
 
 ---判断一个地图是不是比赛地图
@@ -4914,14 +4990,6 @@ function X.GetItemIconByUIID(nUiId)
 	end
 	return ITEM_CACHE[nUiId]
 end
-end
-
-function X.GetGuildBankBagSize(nPage)
-	return X.CONSTANT.INVENTORY_GUILD_PAGE_BOX_COUNT
-end
-
-function X.GetGuildBankBagPos(nPage, nIndex)
-	return X.CONSTANT.INVENTORY_GUILD_BANK, nPage * X.CONSTANT.INVENTORY_GUILD_PAGE_SIZE + nIndex - 1
 end
 
 function X.IsSelf(dwSrcID, dwTarID)
