@@ -43,11 +43,6 @@ local ITEM_DESC_LIST_SCHEMA = X.Schema.Collection(X.Schema.OneOf(
 		dwTabType = X.Schema.Number,
 		dwTabIndex = X.Schema.Number,
 		nBookID = X.Schema.Number,
-		nGenre = X.Schema.Number,
-		nSub = X.Schema.Number,
-		nDetail = X.Schema.Number,
-		nQuality = X.Schema.Number,
-		bCanStack = X.Schema.Boolean,
 		nStackNum = X.Schema.Number,
 		nCurrentDurability = X.Schema.Number,
 		bBind = X.Schema.Boolean,
@@ -167,13 +162,47 @@ function D.ItemDescSorter(a, b)
 end
 
 function D.EncodeItemDescList(aItemDesc)
-	return X.CompressLUAData(aItemDesc)
+	local aList = {}
+	for nIndex, tDesc in ipairs(aItemDesc) do
+		-- 仅保留自定义属性
+		aList[nIndex] = {
+			dwTabType = tDesc.dwTabType,
+			dwTabIndex = tDesc.dwTabIndex,
+			nBookID = tDesc.nBookID,
+			nStackNum = tDesc.nStackNum,
+			nCurrentDurability = tDesc.nCurrentDurability,
+			bBind = tDesc.bBind,
+		}
+	end
+	return X.CompressLUAData(aList)
 end
 
 function D.DecodeItemDescList(szBin)
-	local aItemDesc = X.DecompressLUAData(szBin)
-	local errs = X.Schema.CheckSchema(aItemDesc, ITEM_DESC_LIST_SCHEMA)
+	local aList = X.DecompressLUAData(szBin)
+	local errs = X.Schema.CheckSchema(aList, ITEM_DESC_LIST_SCHEMA)
 	if not errs then
+		local aItemDesc = {}
+		for nIndex, tItem in ipairs(aList) do
+			local kItemInfo = GetItemInfo(tItem.dwTabType, tItem.dwTabIndex)
+			if kItemInfo then
+				aItemDesc[nIndex] = {
+					dwTabType = tItem.dwTabType,
+					dwTabIndex = tItem.dwTabIndex,
+					nBookID = tItem.nBookID,
+					nStackNum = tItem.nStackNum,
+					nCurrentDurability = tItem.nCurrentDurability,
+					bBind = tItem.bBind,
+					-- 从 ItemInfo 中恢复公有属性
+					nGenre = kItemInfo.nGenre,
+					nSub = kItemInfo.nSub,
+					nDetail = kItemInfo.nDetail,
+					nQuality = kItemInfo.nQuality,
+					bCanStack = kItemInfo.bCanStack,
+				}
+			else
+				aItemDesc[nIndex] = {}
+			end
+		end
 		return aItemDesc
 	end
 end
