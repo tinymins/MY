@@ -41,7 +41,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 		table.insert(aItemDesc, tDesc)
 		table.insert(aBoxPos, { dwBox = dwBox, dwX = dwX })
 	end
-	-- 导出蓝图
+	-- 导出布局
 	if bExportBlueprint then
 		X.UI.OpenTextEditor(MY_BagEx.EncodeItemDescList(aItemDesc))
 		return
@@ -50,7 +50,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	if nItemCount == 0 then
 		return
 	end
-	-- 导入蓝图
+	-- 导入布局
 	if aBlueprint then
 		for nIndex, tDesc in ipairs(aItemDesc) do
 			aItemDesc[nIndex] = aBlueprint[nIndex] or MY_BagEx.GetItemDesc()

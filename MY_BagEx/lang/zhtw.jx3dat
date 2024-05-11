@@ -21,10 +21,10 @@ return {
     ['Sort'] = '整理',
     ['Press shift for random, right click to import and export'] = '按住SHIFT隨機打亂，點擊右鍵導入導出',
     ['Sure to start bag sort?'] = '確認要進行背包物品整理嗎？',
-    ['Export blueprint'] = '導出藍圖',
-    ['Import blueprint'] = '導入藍圖',
-    ['Please input blueprint'] = '請輸入藍圖數據',
-    ['Invalid blueprint data'] = '藍圖數據解析失敗',
+    ['Export blueprint'] = '導出佈局',
+    ['Import blueprint'] = '導入佈局',
+    ['Please input blueprint'] = '請輸入佈局數據',
+    ['Invalid blueprint data'] = '佈局數據解析失敗',
 
     -- MY_BagEx_BagStack.lua --
     ['Bag panel closed, stack exited!'] = '背包界面已關閉，停止堆疊！',
@@ -50,10 +50,10 @@ return {
     ['Sort'] = '整理',
     ['Press shift for random, right click to import and export'] = '按住SHIFT隨機打亂，點擊右鍵導入導出',
     ['Sure to start bank sort?'] = '確認要進行倉庫物品整理嗎？',
-    ['Export blueprint'] = '導出藍圖',
-    ['Import blueprint'] = '導入藍圖',
-    ['Please input blueprint'] = '請輸入藍圖數據',
-    ['Invalid blueprint data'] = '藍圖數據解析失敗',
+    ['Export blueprint'] = '導出佈局',
+    ['Import blueprint'] = '導入佈局',
+    ['Please input blueprint'] = '請輸入佈局數據',
+    ['Invalid blueprint data'] = '佈局數據解析失敗',
 
     -- MY_BagEx_BankStack.lua --
     ['Please unlock mibao first.'] = '請先解除密保鎖。',
@@ -79,10 +79,10 @@ return {
     ['Sort'] = '整理',
     ['Press shift for random, right click to import and export'] = '按住SHIFT隨機打亂，點擊右鍵導入導出',
     ['Sure to start guild bank sort?'] = '確認要進行幫會倉庫物品整理嗎？',
-    ['Export blueprint'] = '導出藍圖',
-    ['Import blueprint'] = '導入藍圖',
-    ['Please input blueprint'] = '請輸入藍圖數據',
-    ['Invalid blueprint data'] = '藍圖數據解析失敗',
+    ['Export blueprint'] = '導出佈局',
+    ['Import blueprint'] = '導入佈局',
+    ['Please input blueprint'] = '請輸入佈局數據',
+    ['Invalid blueprint data'] = '佈局數據解析失敗',
 
     -- MY_BagEx_GuildBankStack.lua --
     ['Stack'] = '堆疊',
