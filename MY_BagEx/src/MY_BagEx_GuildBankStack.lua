@@ -100,7 +100,7 @@ function D.CheckInjection(bRemoveInjection)
 								X.Systopmsg(_L['Please unlock mibao first.'])
 								return
 							end
-							if MY_BagEx_Bag.bConfirm then
+							if MY_BagEx_GuildBank.bConfirm then
 								X.Confirm('MY_BagEx_GuildBankStack', _L['Sure to start guild bank stack?'], {
 									x = frame:GetAbsX() + frame:GetW() / 2,
 									y = frame:GetAbsY() + frame:GetH() / 2,

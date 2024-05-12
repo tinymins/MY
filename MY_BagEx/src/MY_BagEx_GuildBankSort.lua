@@ -245,7 +245,7 @@ function D.CheckInjection(bRemoveInjection)
 								return
 							end
 							local bRandom = IsShiftKeyDown()
-							if MY_BagEx_Bag.bConfirm then
+							if MY_BagEx_GuildBank.bConfirm then
 								X.Confirm('MY_BagEx_GuildBankSort', _L['Sure to start guild bank sort?'], {
 									x = hFrame:GetAbsX() + hFrame:GetW() / 2,
 									y = hFrame:GetAbsY() + hFrame:GetH() / 2,
