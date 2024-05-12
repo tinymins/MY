@@ -14,16 +14,36 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Math')
 -- 将一个数值转换成一个Bit表（低位在前 高位在后）
 do
 local metatable = { __index = function() return 0 end }
+local function StringNumberDivideByTwo(szNumber)
+    local szResult = ""
+    local nCarry = 0
+    for i = 1, #szNumber do
+        local nNum = tonumber(szNumber:sub(i, i)) + nCarry * 10
+        nCarry = nNum % 2
+        szResult = szResult .. tostring(math.floor(nNum / 2))
+    end
+    if string.sub(szResult, 1, 1) == "0" and #szResult > 1 then
+        szResult = string.sub(szResult, 2)
+    end
+    return szResult, nCarry
+end
 function X.Number2Bitmap(n)
 	local t = {}
 	if n == 0 then
 		table.insert(t, 0)
-	else
+	elseif X.IsNumber(n) then
 		while n > 0 do
 			local nValue = n % 2
 			table.insert(t, nValue)
 			n = math.floor(n / 2)
 		end
+	elseif X.IsString(n) then
+		while #n > 1 or tonumber(n) > 0 do
+			local szNew, nBit = StringNumberDivideByTwo(n)
+			table.insert(t, nBit)
+			n = szNew
+		end
+		return t
 	end
 	return setmetatable(t, metatable)
 end
