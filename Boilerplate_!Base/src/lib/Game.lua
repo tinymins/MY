@@ -2045,13 +2045,29 @@ function X.GetClientPlayerInfo(bForce)
 end
 end
 
+do
+local PLAYER_NAME
+---获取玩家自身角色名
+---@return string @玩家的自身角色名
+function X.GetClientPlayerName()
+	if X.IsFunction(GetUserRoleName) then
+		return GetUserRoleName()
+	end
+	local me = X.GetClientPlayer()
+	if me and not IsRemotePlayer(me.dwID) then
+		PLAYER_NAME = me.szName
+	end
+	return PLAYER_NAME
+end
+end
+
 ---获取玩家基本信息
----@param xRoleID number @要获取的玩家唯一ID（缘起为 dwID）
+---@param xPlayerID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return table @玩家的基本信息
-function X.GetRoleEntryInfo(xRoleID)
+function X.GetPlayerEntryInfo(xPlayerID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		local info = smc.GetRoleEntryInfo(xRoleID)
+		local info = smc.GetRoleEntryInfo(xPlayerID)
 		if info then
 			local szServerName = X.GetServerNameByID(info.dwCenterID)
 			if szServerName ~= X.GetServerOriginName() then
@@ -2060,7 +2076,7 @@ function X.GetRoleEntryInfo(xRoleID)
 		end
 		return info
 	end
-	local info = X.GetFellowshipInfo(xRoleID)
+	local info = X.GetFellowshipInfo(xPlayerID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
@@ -2081,16 +2097,16 @@ function X.GetRoleEntryInfo(xRoleID)
 end
 
 ---获取玩家是否在线
----@param xRoleID number @要获取的玩家唯一ID（缘起为 dwID）
+---@param xPlayerID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return boolean @玩家是否在线
-function X.IsRoleOnline(xRoleID)
+function X.IsPlayerOnline(xPlayerID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		return smc.IsRoleOnline(xRoleID)
+		return smc.IsRoleOnline(xPlayerID)
 	end
-	local rei = X.GetRoleEntryInfo(xRoleID)
-	if rei then
-		return rei.bOnline
+	local tPei = X.GetPlayerEntryInfo(xPlayerID)
+	if tPei then
+		return tPei.bOnline
 	end
 end
 
@@ -2153,7 +2169,7 @@ local function GeneFellowshipCache()
 						if tInfo.name then
 							FELLOWSHIP_CACHE[tInfo.name] = tInfo
 						else
-							local info = X.GetRoleEntryInfo(tInfo.id)
+							local info = X.GetPlayerEntryInfo(tInfo.id)
 							if info then
 								FELLOWSHIP_CACHE[info.dwPlayerID] = tInfo
 								FELLOWSHIP_CACHE[info.szName] = tInfo
@@ -2180,19 +2196,19 @@ X.RegisterEvent('DELETE_FELLOWSHIP'            , OnFellowshipUpdate)
 X.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFellowshipUpdate)
 
 -- 获取好友
----@param xRoleID number | string @要获取的玩家名称或ID
+---@param xPlayerID number | string @要获取的玩家名称或ID
 ---@return table @匹配的玩家信息
-function X.GetFellowshipInfo(xRoleID)
-	if xRoleID and GeneFellowshipCache() then
-		return X.Clone(FELLOWSHIP_CACHE[xRoleID])
+function X.GetFellowshipInfo(xPlayerID)
+	if xPlayerID and GeneFellowshipCache() then
+		return X.Clone(FELLOWSHIP_CACHE[xPlayerID])
 	end
 end
 
 -- 判断是否是好友
----@param xRoleID number | string @要判断的玩家名称或ID
+---@param xPlayerID number | string @要判断的玩家名称或ID
 ---@return boolean @是否是好友
-function X.IsFellowship(xRoleID)
-	return X.GetFellowshipInfo(xRoleID) and true or false
+function X.IsFellowship(xPlayerID)
+	return X.GetFellowshipInfo(xPlayerID) and true or false
 end
 
 -- 遍历好友
@@ -2212,27 +2228,27 @@ end
 end
 
 ---申请好友名片
----@param xRoleID string | string[] @要申请的玩家唯一ID或者唯一ID列表（缘起为 dwID）
-function X.ApplyFellowshipCard(xRoleID)
+---@param xPlayerID string | string[] @要申请的玩家唯一ID或者唯一ID列表（缘起为 dwID）
+function X.ApplyFellowshipCard(xPlayerID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		return smc.ApplyFellowshipCard(xRoleID)
+		return smc.ApplyFellowshipCard(xPlayerID)
 	end
 	local fcc = X.GetFellowshipCardClient()
 	if fcc then
-		return fcc.ApplyFellowshipCard(255, xRoleID)
+		return fcc.ApplyFellowshipCard(255, xPlayerID)
 	end
 end
 
 ---获取玩家名片信息
----@param xRoleID number @要获取的玩家唯一ID（缘起为 dwID）
+---@param xPlayerID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return table @玩家的名片信息
-function X.GetFellowshipCardInfo(xRoleID)
+function X.GetFellowshipCardInfo(xPlayerID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		return smc.GetFellowshipCardInfo(xRoleID)
+		return smc.GetFellowshipCardInfo(xPlayerID)
 	end
-	local info = X.GetFellowshipInfo(xRoleID)
+	local info = X.GetFellowshipInfo(xPlayerID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
@@ -2250,14 +2266,14 @@ function X.GetFellowshipCardInfo(xRoleID)
 end
 
 ---获取玩家所在地图
----@param xRoleID number @要获取的玩家唯一ID（缘起为 dwID）
+---@param xPlayerID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return boolean @玩家所在地图
-function X.GetFellowshipMapID(xRoleID)
+function X.GetFellowshipMapID(xPlayerID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		return smc.GetFellowshipMapID(xRoleID)
+		return smc.GetFellowshipMapID(xPlayerID)
 	end
-	local info = X.GetFellowshipInfo(xRoleID)
+	local info = X.GetFellowshipInfo(xPlayerID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
@@ -2291,7 +2307,7 @@ local function GeneFoeCache()
 				if p.name then
 					FOE_CACHE[p.name] = p
 				else
-					local info = X.GetRoleEntryInfo(p.id)
+					local info = X.GetPlayerEntryInfo(p.id)
 					if info then
 						FOE_CACHE[info.dwPlayerID] = p
 						FOE_CACHE[info.szName] = p
@@ -2320,20 +2336,20 @@ function X.GetFoeInfoList()
 end
 
 -- 获取仇人
----@param xRoleID number | string @仇人名称或仇人ID
+---@param xPlayerID number | string @仇人名称或仇人ID
 ---@return userdata @仇人对象
-function X.GetFoeInfo(xRoleID)
-	if xRoleID and GeneFoeCache() then
-		return FOE_CACHE[xRoleID]
+function X.GetFoeInfo(xPlayerID)
+	if xPlayerID and GeneFoeCache() then
+		return FOE_CACHE[xPlayerID]
 	end
 end
 end
 
 -- 判断是否是仇人
----@param xRoleID number | string @要判断的玩家名称或ID
+---@param xPlayerID number | string @要判断的玩家名称或ID
 ---@return boolean @是否是仇人
-function X.IsFoe(xRoleID)
-	return X.GetFoeInfo(xRoleID) and true or false
+function X.IsFoe(xPlayerID)
+	return X.GetFoeInfo(xPlayerID) and true or false
 end
 
 --------------------------------------------------------------------------------
@@ -2404,7 +2420,7 @@ end
 ---@return boolean @该角色是不是队友
 function X.IsParty(dwID)
 	if X.IsString(dwID) then
-		if dwID == X.GetUserRoleName() then
+		if dwID == X.GetClientPlayerName() then
 			return true
 		end
 		local team = GetClientTeam()
@@ -4922,19 +4938,6 @@ function X.GetCampImage(eCamp, bFight) -- ui\Image\UICommon\CommonPanel2.UITex
 	return szUITex, nFrame
 end
 
-do local _RoleName
-function X.GetUserRoleName()
-	if X.IsFunction(GetUserRoleName) then
-		return GetUserRoleName()
-	end
-	local me = X.GetClientPlayer()
-	if me and not IsRemotePlayer(me.dwID) then
-		_RoleName = me.szName
-	end
-	return _RoleName
-end
-end
-
 do local ITEM_CACHE = {}
 function X.GetItemNameByUIID(nUiId)
 	if not ITEM_CACHE[nUiId] then
@@ -5728,7 +5731,7 @@ do
 	local function PatternReplacer(szContent, tVar, bKeepNMTS, bReplaceSensitiveWord)
 		-- 由于涉及缓存，所以该函数仅允许替换静态映射关系
 		if szContent == 'me' then
-			return X.GetUserRoleName()
+			return X.GetClientPlayerName()
 		end
 		if X.IsTable(tVar) then
 			if not X.IsNil(tVar[szContent]) then

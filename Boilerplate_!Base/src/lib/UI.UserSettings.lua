@@ -158,7 +158,7 @@ function D.Open(bImport)
 					X.Systopmsg(_L['No custom setting found, nothing to export.'], X.CONSTANT.MSG_THEME.ERROR)
 					return
 				end
-				local szPath = X.FormatPath({'export/settings/' .. X.GetUserRoleName() .. '_' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. '.us.jx3dat', X.PATH_TYPE.GLOBAL})
+				local szPath = X.FormatPath({'export/settings/' .. X.GetClientPlayerName() .. '_' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. '.us.jx3dat', X.PATH_TYPE.GLOBAL})
 				X.SaveLUAData(szPath, tKvp, { encoder = 'luatext', compress = false, crc = false, passphrase = false })
 				X.Systopmsg(_L('%d settings exported, file saved in %s.', nExport, szPath))
 			end

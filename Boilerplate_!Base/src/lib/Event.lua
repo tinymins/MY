@@ -301,7 +301,7 @@ X.RegisterEvent('LOADING_ENDING', function()
 	--[[#DEBUG END]]
 	INIT_EVENT = nil
 	-- œ‘ æª∂”≠–≈œ¢
-	X.Sysmsg(_L('%s, welcome to use %s!', X.GetUserRoleName(), X.PACKET_INFO.NAME)
+	X.Sysmsg(_L('%s, welcome to use %s!', X.GetClientPlayerName(), X.PACKET_INFO.NAME)
 		.. _L(' v%s Build %s', X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD))
 end)
 
