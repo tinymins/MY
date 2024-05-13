@@ -287,22 +287,22 @@ function D.GetBagItemNum(dwBox, dwX)
 end
 
 -- 是否可结双向好友，并返回真橙之心的位置
-function D.GetDoubleLoveItem(info, aUIID)
-	local tPei = info and X.GetPlayerEntryInfo(info.id)
+function D.GetDoubleLoveItem(tFellowship, aUIID)
+	local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
 	if tPei then
-		local tar = X.GetPlayer(tPei.dwPlayerID)
-		if info.attraction >= D.nDoubleLoveAttraction and tar and X.IsParty(tar.dwID) and X.GetDistance(tar) <= 4 then
+		local tar = X.GetPlayer(tPei.dwID)
+		if tFellowship.nAttraction >= D.nDoubleLoveAttraction and tar and X.IsParty(tar.dwID) and X.GetDistance(tar) <= 4 then
 			return D.GetBagItemPos(aUIID)
 		end
 	end
 end
 
-function D.UseDoubleLoveItem(info, aUIID, callback)
-	local dwBox, dwX = D.GetDoubleLoveItem(info, aUIID)
-	local tPei = info and X.GetPlayerEntryInfo(info.id)
+function D.UseDoubleLoveItem(tFellowship, aUIID, callback)
+	local dwBox, dwX = D.GetDoubleLoveItem(tFellowship, aUIID)
+	local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
 	if tPei and dwBox then
 		local nNum = D.GetBagItemNum(dwBox, dwX)
-		SetTarget(TARGET.PLAYER, tPei.dwPlayerID)
+		SetTarget(TARGET.PLAYER, tPei.dwID)
 		X.UseInventoryItem(dwBox, dwX)
 		local nFinishTime = GetTime() + 500
 		X.BreatheCall(function()
@@ -389,18 +389,18 @@ function D.GetLover()
 	local dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem = X.GetRemoteStorage('MY_Love')
 	local lover
 	X.IterFellowshipInfo(function(tFellowship)
-		if nLoverTime == 0 and tFellowship.remark then -- 时间为非0表示不是第一次了 拒绝加载海鳗数据
-			local bMatch = string.sub(tFellowship.remark, 1, string.len(szKey)) == szKey
+		if nLoverTime == 0 and tFellowship.szRemark then -- 时间为非0表示不是第一次了 拒绝加载海鳗数据
+			local bMatch = string.sub(tFellowship.szRemark, 1, string.len(szKey)) == szKey
 			-- fetch data
 			-- 兼容海鳗：情缘信息从好友备注中提取数据
 			if bMatch then
-				local szData = D.DecodeHMString(string.sub(tFellowship.remark, string.len(szKey) + 1))
+				local szData = D.DecodeHMString(string.sub(tFellowship.szRemark, string.len(szKey) + 1))
 				if not X.IsEmpty(szData) then
 					local data = X.SplitString(szData, '#')
 					local nType = data[1] and tonumber(data[1])
 					local nTime = data[2] and tonumber(data[2])
 					if nType and nTime and (nType == 0 or nType == 1) and (nTime > 0 and nTime < GetCurrentTime()) then
-						dwLoverID = tFellowship.id
+						dwLoverID = tFellowship.xID
 						nLoverType = nType
 						nLoverTime = nTime
 						nSendItem = 0
@@ -409,7 +409,7 @@ function D.GetLover()
 						D.UpdateProtectData()
 					end
 				end
-				me.SetFellowshipRemark(tFellowship.id, '')
+				me.SetFellowshipRemark(tFellowship.xID, '')
 			end
 		end
 		-- 没有情缘不需要遍历
@@ -417,22 +417,22 @@ function D.GetLover()
 			return
 		end
 		-- 获取当前好友基础信息
-		local tPei = X.GetPlayerEntryInfo(tFellowship.id)
+		local tPei = X.GetPlayerEntryInfo(tFellowship.xID)
 		-- 获取失败或者是跨服好友则跳过
-		if not tPei or tPei.dwPlayerID == 0 then
+		if not tPei or tPei.dwID == 0 then
 			return
 		end
 		-- 不是情缘则跳过
-		if tPei.dwPlayerID ~= dwLoverID then
+		if tPei.dwID ~= dwLoverID then
 			return
 		end
 		-- 遍历到情缘，获取基础信息并返回
-		local card = X.GetFellowshipCardInfo(tFellowship.id)
-		if not card then
-			X.ApplyFellowshipCard(tFellowship.id)
+		local tCard = X.GetFellowshipCardInfo(tFellowship.xID)
+		if not tCard then
+			X.ApplyFellowshipCard(tFellowship.xID)
 			return
 		end
-		if card.bIsTwoWayFriend then
+		if tCard.bTwoWay then
 			lover = {
 				dwID = dwLoverID,
 				szName = tPei.szName,
@@ -442,11 +442,11 @@ function D.GetLover()
 				nLoverType = nLoverType,
 				nLoverTime = nLoverTime,
 				szLoverTitle = D.tLoverItem[D.lover.nReceiveItem] and D.tLoverItem[D.lover.nReceiveItem].szTitle or '',
-				dwAvatar = card.dwMiniAvatarID,
-				dwForceID = card.dwForceID,
-				nRoleType = card.nRoleType,
-				dwMapID = X.GetFellowshipMapID(tFellowship.id),
-				bOnline = X.IsPlayerOnline(tFellowship.id),
+				dwAvatar = tCard.dwMiniAvatarID,
+				dwForceID = tCard.dwForceID,
+				nRoleType = tCard.nRoleType,
+				dwMapID = X.GetFellowshipMapID(tFellowship.xID),
+				bOnline = X.IsPlayerOnline(tFellowship.xID),
 			}
 			return 0
 		end
@@ -535,9 +535,9 @@ function D.SetLover(dwID, nType)
 	if not X.CanUseOnlineRemoteStorage() then
 		return X.Alert(_L['Please enable sync common ui config first'])
 	end
-	local info = X.GetFellowshipInfo(dwID)
-	local tPei = info and X.GetPlayerEntryInfo(info.id)
-	if not info or not tPei or not X.IsPlayerOnline(info.id) then
+	local tFellowship = X.GetFellowshipInfo(dwID)
+	local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
+	if not tFellowship or not tPei or not X.IsPlayerOnline(tFellowship.xID) then
 		if nType == -1 then
 			return X.Alert(_L['Lover must online'])
 		end
@@ -550,7 +550,7 @@ function D.SetLover(dwID, nType)
 				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 					return X.Systopmsg(_L['Light firework is a sensitive action, please unlock to continue.'])
 				end
-				D.UseDoubleLoveItem(info, p.aUIID, function(bSuccess)
+				D.UseDoubleLoveItem(tFellowship, p.aUIID, function(bSuccess)
 					if bSuccess then
 						D.SaveLover(D.lover.nLoverTime, D.lover.dwID, D.lover.nLoverType, p.nItem, D.lover.nReceiveItem)
 						X.SendBgMsg(tPei.szName, 'MY_LOVE', {'LOVE_FIREWORK', p.nItem})
@@ -568,11 +568,11 @@ function D.SetLover(dwID, nType)
 			return X.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
 		end
 		X.Confirm(_L('Do you want to blind love with [%s]?', tPei.szName), function()
-			local info = X.GetFellowshipInfo(dwID)
-			if not info or not X.IsPlayerOnline(info.id) then
+			local tFellowship = X.GetFellowshipInfo(dwID)
+			if not tFellowship or not X.IsPlayerOnline(tFellowship.xID) then
 				return X.Alert(_L['Lover must be a online friend'])
 			end
-			if info.attraction < MY_Love.nLoveAttraction then
+			if tFellowship.nAttraction < MY_Love.nLoveAttraction then
 				return X.Alert(_L['Inadequate conditions, requiring Lv2 friend'])
 			end
 			D.SaveLover(GetCurrentTime(), dwID, nType, 0, 0)
@@ -585,12 +585,12 @@ function D.SetLover(dwID, nType)
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
 			end
-			local info = X.GetFellowshipInfo(dwID)
-			if not info or not X.IsPlayerOnline(info.id) then
+			local tFellowship = X.GetFellowshipInfo(dwID)
+			if not tFellowship or not X.IsPlayerOnline(tFellowship.xID) then
 				return X.Alert(_L['Lover must be a online friend'])
 			end
 			X.Confirm(_L('Do you want to mutual love with [%s]?', tPei.szName), function()
-				if not D.GetDoubleLoveItem(info, p.aUIID) then
+				if not D.GetDoubleLoveItem(tFellowship, p.aUIID) then
 					return X.Alert(_L('Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s', p.szName))
 				end
 				D.nPendingItem = p.nItem
@@ -619,8 +619,8 @@ function D.RemoveLover()
 		if lover.nLoverType == 0 then -- 单向
 			X.Confirm(_L('Are you sure to cut blind love with [%s]?', lover.szName), function()
 				-- 单向只通知在线的
-				local info = X.GetFellowshipInfo(lover.dwID)
-				if info and X.IsPlayerOnline(info.id) then
+				local tFellowship = X.GetFellowshipInfo(lover.dwID)
+				if tFellowship and X.IsPlayerOnline(tFellowship.xID) then
 					X.SendBgMsg(lover.szName, 'MY_LOVE', {'REMOVE0'})
 				end
 				D.SaveLover(0, 0, 0, 0, 0)
@@ -930,12 +930,12 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 			if X.IsEmpty(aUIID) then
 				return
 			end
-			local info = X.GetFellowshipInfo(dwTalkerID)
-			local tPei = info and X.GetPlayerEntryInfo(info.id)
-			if not info or not tPei then
+			local tFellowship = X.GetFellowshipInfo(dwTalkerID)
+			local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
+			if not tFellowship or not tPei then
 				return
 			end
-			D.UseDoubleLoveItem(info, aUIID, function(bSuccess)
+			D.UseDoubleLoveItem(tFellowship, aUIID, function(bSuccess)
 				if bSuccess then
 					D.SaveLover(GetCurrentTime(), dwTalkerID, 1, nItem, 0)
 					X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
@@ -947,16 +947,16 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 				end
 			end)
 		elseif szKey == 'LOVE_ANS_CONF' then
-			local info = X.GetFellowshipInfo(dwTalkerID)
-			local tPei = info and X.GetPlayerEntryInfo(info.id)
+			local tFellowship = X.GetFellowshipInfo(dwTalkerID)
+			local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
 			if tPei then
 				D.SaveLover(GetCurrentTime(), dwTalkerID, 1, 0, data)
 				X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
 				X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', tPei.szName))
 			end
 		elseif szKey == 'LOVE_FIREWORK' then
-			local info = X.GetFellowshipInfo(dwTalkerID)
-			if info and D.lover.dwID == dwTalkerID then
+			local tFellowship = X.GetFellowshipInfo(dwTalkerID)
+			if tFellowship and D.lover.dwID == dwTalkerID then
 				D.SaveLover(D.lover.nLoverTime, dwTalkerID, D.lover.nLoverType, D.lover.nSendItem, data)
 			end
 		elseif szKey == 'REPLY' then

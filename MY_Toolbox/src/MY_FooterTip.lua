@@ -78,8 +78,8 @@ function D.Apply()
 			or X.IsIsolated(tar) ~= X.IsIsolated(me) then
 				return
 			end
-			local p = X.GetFellowshipInfo(dwID)
-			local tPei = p and X.GetPlayerEntryInfo(p.id)
+			local tFellowship = X.GetFellowshipInfo(dwID)
+			local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
 			if tPei then
 				if O.bFriendNav and Navigator_SetID then
 					Navigator_SetID('MY_FRIEND_TIP.' .. dwID, TARGET.PLAYER, dwID, tPei.szName)

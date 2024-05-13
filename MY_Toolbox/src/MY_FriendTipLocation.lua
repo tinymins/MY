@@ -50,12 +50,12 @@ function D.Hook()
 	if not txtLocation.__MY_SetText then
 		txtLocation.__MY_SetText = txtLocation.SetText
 		txtLocation.SetText = function(_, szText)
-			local info = txtName and X.GetFellowshipInfo(txtName:GetText())
-			local card = info and X.GetFellowshipCardInfo(info.id)
-			if card and ((card.bIsTwoWayFriend and info.attraction >= 200) or not X.IsRestricted('MY_FriendTipLocation.LV2')) then
-				szText = Table_GetMapName(X.GetFellowshipMapID(info.id))
-				if (me.nCamp == CAMP.EVIL and card.nCamp == CAMP.GOOD)
-				or (me.nCamp == CAMP.GOOD and card.nCamp == CAMP.EVIL) then
+			local tFellowship = txtName and X.GetFellowshipInfo(txtName:GetText())
+			local tCard = tFellowship and X.GetFellowshipCardInfo(tFellowship.xID)
+			if tCard and ((tCard.bTwoWay and tFellowship.nAttraction >= 200) or not X.IsRestricted('MY_FriendTipLocation.LV2')) then
+				szText = Table_GetMapName(X.GetFellowshipMapID(tFellowship.xID))
+				if (me.nCamp == CAMP.EVIL and tCard.nCamp == CAMP.GOOD)
+				or (me.nCamp == CAMP.GOOD and tCard.nCamp == CAMP.EVIL) then
 					szText = szText .. _L['(Different camp)']
 				end
 			end

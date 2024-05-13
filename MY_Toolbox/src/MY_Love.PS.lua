@@ -50,13 +50,13 @@ local PS = { IsRestricted = MY_Love.IsShielded }
 function D.GetLoverMenu(nType)
 	local m0 = {}
 	X.IterFellowshipInfo(function(tFellowship)
-		local tPei = X.GetPlayerEntryInfo(tFellowship.id)
-		if tPei and tFellowship.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or tFellowship.attraction >= MY_Love.nDoubleLoveAttraction) then
+		local tPei = X.GetPlayerEntryInfo(tFellowship.xID)
+		if tPei and tFellowship.nAttraction >= MY_Love.nLoveAttraction and (nType ~= 1 or tFellowship.nAttraction >= MY_Love.nDoubleLoveAttraction) then
 			table.insert(m0, {
 				szOption = tPei.szName,
-				fnDisable = function() return not X.IsPlayerOnline(tFellowship.id) end,
+				fnDisable = function() return not X.IsPlayerOnline(tFellowship.xID) end,
 				fnAction = function()
-					D.SetLover(tPei.dwPlayerID, nType)
+					D.SetLover(tPei.dwID, nType)
 					X.UI.ClosePopupMenu()
 				end
 			})
