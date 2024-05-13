@@ -12,6 +12,17 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Sys')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
+-- 登出游戏
+-- (void) X.Logout(bCompletely)
+-- bCompletely 为true返回登陆页 为false返回角色页 默认为false
+function X.Logout(bCompletely)
+	if bCompletely then
+		ReInitUI(LOAD_LOGIN_REASON.RETURN_GAME_LOGIN)
+	else
+		ReInitUI(LOAD_LOGIN_REASON.RETURN_ROLE_LIST)
+	end
+end
+
 do
 local bExiting = false
 X.RegisterEvent('PLAYER_EXIT_GAME', function()
@@ -1158,6 +1169,13 @@ function X.FormatTime(nTimestamp, szFormat)
 	szFormat = X.StringReplaceW(szFormat, '%m', t.minute)
 	szFormat = X.StringReplaceW(szFormat, '%s', t.second)
 	return szFormat
+end
+
+function X.GetEndTime(nEndFrame, bAllowNegative)
+	if bAllowNegative then
+		return (nEndFrame - GetLogicFrameCount()) / X.ENVIRONMENT.GAME_FPS
+	end
+	return math.max(0, nEndFrame - GetLogicFrameCount()) / X.ENVIRONMENT.GAME_FPS
 end
 
 function X.DateToTime(nYear, nMonth, nDay, nHour, nMin, nSec)
