@@ -10,40 +10,47 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Math')
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
--- (table) X.Number2Bitmap(number n)
--- 将一个数值转换成一个Bit表（低位在前 高位在后）
 do
 local metatable = { __index = function() return 0 end }
+-- 将一个数值转换成一个Bit表（低位在前 高位在后）
+---@param n number @要转换的数值
+---@return table @数值的比特表
+function X.Number2Bitmap(n)
+	local t = {}
+	if n == 0 then
+		table.insert(t, 0)
+	else
+		while n > 0 do
+			local nValue = n % 2
+			table.insert(t, nValue)
+			n = math.floor(n / 2)
+		end
+	end
+	return setmetatable(t, metatable)
+end
+
 local function StringNumberDivideByTwo(szNumber)
-    local szResult = ""
+    local szResult = ''
     local nCarry = 0
     for i = 1, #szNumber do
         local nNum = tonumber(szNumber:sub(i, i)) + nCarry * 10
         nCarry = nNum % 2
         szResult = szResult .. tostring(math.floor(nNum / 2))
     end
-    if string.sub(szResult, 1, 1) == "0" and #szResult > 1 then
+    if string.sub(szResult, 1, 1) == '0' and #szResult > 1 then
         szResult = string.sub(szResult, 2)
     end
     return szResult, nCarry
 end
-function X.Number2Bitmap(n)
+-- 将一个字符串数值转换成一个Bit表（低位在前 高位在后）
+---@param n string @要转换的数值字符串
+---@return table @数值的比特表
+function X.NumericString2Bitmap(n)
 	local t = {}
-	if n == 0 then
-		table.insert(t, 0)
-	elseif X.IsNumber(n) then
-		while n > 0 do
-			local nValue = n % 2
-			table.insert(t, nValue)
-			n = math.floor(n / 2)
-		end
-	elseif X.IsString(n) then
-		while #n > 1 or tonumber(n) > 0 do
-			local szNew, nBit = StringNumberDivideByTwo(n)
-			table.insert(t, nBit)
-			n = szNew
-		end
-		return t
+	while #n > 1 or tonumber(n) > 0 do
+		local szNew, nBit = StringNumberDivideByTwo(n)
+		table.insert(t, nBit)
+		n = szNew
 	end
 	return setmetatable(t, metatable)
 end
