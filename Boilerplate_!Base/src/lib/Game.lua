@@ -2211,14 +2211,14 @@ function X.IsFellowship(xRoleID)
 end
 
 -- 遍历好友
----@param fnWalker function @迭代器，返回0时停止迭代
-function X.WalkFellowshipInfo(fnWalker)
+---@param fnIter function @迭代器，返回0时停止迭代
+function X.IterFellowshipInfo(fnIter)
 	local aGroup = X.GetFellowshipGroupInfoList() or {}
 	table.insert(aGroup, 1, { id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND })
 	for _, v in ipairs(aGroup) do
 		local aFellowshipInfo = X.GetFellowshipInfoList(v.id) or {}
 		for _, info in ipairs(aFellowshipInfo) do
-			if fnWalker(info, v.id) == 0 then
+			if fnIter(info, v.id) == 0 then
 				return
 			end
 		end
