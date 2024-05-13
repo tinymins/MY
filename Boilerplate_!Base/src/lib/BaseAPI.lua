@@ -82,6 +82,16 @@ function X.GetServerOriginName()
 	return szServerOriginName or szServerDisplayName
 end
 
+-- 通过跨服服务器ID获取服务器名称
+---@param dwServerID number @服务器ID
+---@return string|nil @服务器名称，不存在则返回空
+function X.GetServerNameByID(dwServerID)
+	if not GetCenterNameByCenterID then
+		return
+	end
+	GetCenterNameByCenterID(dwServerID)
+end
+
 -- 获取 ID 是否为玩家（区别于 NPC）
 ---@param dwID number @ID
 ---@return boolean @是否为玩家
