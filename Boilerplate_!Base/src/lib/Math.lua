@@ -68,6 +68,43 @@ function X.Bitmap2Number(t)
 	return n
 end
 
+-- 将一个Bit表（低位在前 高位在后）转换成一个数值字符串
+---@param aBit table @数值的比特表
+---@return number @要转换的数值
+function X.Bitmap2NumericString(aBit)
+	local szResult = '0'
+	for i = #aBit, 1, -1 do
+		-- 字符串表示的数乘以2
+		local szDoubled = ''
+		local nCarry = 0
+		for j = #szResult, 1, -1 do
+			local nNum = tonumber(szResult:sub(j, j)) * 2 + nCarry
+			nCarry = math.floor(nNum / 10)
+			szDoubled = tostring(nNum % 10) .. szDoubled
+		end
+		if nCarry > 0 then
+			szDoubled = tostring(nCarry) .. szDoubled
+		end
+		-- 如果当前位是1，则结果加1
+		if aBit[i] == 1 then
+			local szSum = ''
+			nCarry = 1  -- 从1开始加，因为我们要加的是1
+			for j = #szDoubled, 1, -1 do
+				local nNum = tonumber(szDoubled:sub(j, j)) + nCarry
+				nCarry = math.floor(nNum / 10)
+				szSum = tostring(nNum % 10) .. szSum
+			end
+			if nCarry > 0 then
+				szSum = tostring(nCarry) .. szSum
+			end
+			szResult = szSum
+		else
+			szResult = szDoubled
+		end
+	end
+	return szResult
+end
+
 -- (number) SetBit(number n, number i, bool/0/1 b)
 -- 设置一个数值的指定比特位
 function X.SetNumberBit(n, i, b)
