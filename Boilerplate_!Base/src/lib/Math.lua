@@ -29,28 +29,26 @@ function X.Number2Bitmap(n)
 	return setmetatable(t, metatable)
 end
 
-local function StringNumberDivideByTwo(szNumber)
-    local szResult = ''
-    local nCarry = 0
-    for i = 1, #szNumber do
-        local nNum = tonumber(szNumber:sub(i, i)) + nCarry * 10
-        nCarry = nNum % 2
-        szResult = szResult .. tostring(math.floor(nNum / 2))
-    end
-    if string.sub(szResult, 1, 1) == '0' and #szResult > 1 then
-        szResult = string.sub(szResult, 2)
-    end
-    return szResult, nCarry
-end
 -- 将一个字符串数值转换成一个Bit表（低位在前 高位在后）
 ---@param n string @要转换的数值字符串
 ---@return table @数值的比特表
 function X.NumericString2Bitmap(n)
 	local t = {}
+	local szResult = ''
+	local nCarry = 0
 	while #n > 1 or tonumber(n) > 0 do
-		local szNew, nBit = StringNumberDivideByTwo(n)
-		table.insert(t, nBit)
-		n = szNew
+		szResult = ''
+		nCarry = 0
+		for i = 1, #n do
+			local nNum = tonumber(n:sub(i, i)) + nCarry * 10
+			nCarry = nNum % 2
+			szResult = szResult .. tostring(math.floor(nNum / 2))
+		end
+		if string.sub(szResult, 1, 1) == '0' and #szResult > 1 then
+			szResult = string.sub(szResult, 2)
+		end
+		table.insert(t, nCarry)
+		n = szResult
 	end
 	return setmetatable(t, metatable)
 end
