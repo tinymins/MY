@@ -2051,7 +2051,14 @@ end
 function X.GetRoleEntryInfo(szGlobalID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		return smc.GetRoleEntryInfo(szGlobalID)
+		local info = smc.GetRoleEntryInfo(szGlobalID)
+		if info then
+			local szServerName = X.GetServerNameByID(info.dwCenterID)
+			if szServerName ~= X.GetServerOriginName() then
+				info.dwPlayerID = info.dwPlayerID .. g_tStrings.STR_CONNECT .. szServerName
+			end
+		end
+		return info
 	end
 	local info = X.GetFellowshipInfo(szGlobalID)
 	local fcc = X.GetFellowshipCardClient()
