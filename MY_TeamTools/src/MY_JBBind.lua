@@ -33,7 +33,7 @@ function D.FetchBindStatus(resolve, reject)
 			data = {
 				l = X.ENVIRONMENT.GAME_LANG,
 				L = X.ENVIRONMENT.GAME_EDITION,
-				jx3id = X.GetPlayerGUID(),
+				jx3id = X.GetClientPlayerGlobalID(),
 			},
 			signature = X.SECRET['J3CX::ROLE_QUERY'],
 			success = function(szHTML)
@@ -74,7 +74,7 @@ function D.Bind(szToken, resolve, reject)
 			L = X.ENVIRONMENT.GAME_EDITION,
 			token = szToken,
 			cguid = X.GetClientGUID(),
-			jx3id = X.GetPlayerGUID(),
+			jx3id = X.GetClientPlayerGlobalID(),
 			server = X.GetServerOriginName(),
 			id = dwID,
 			name = X.GetClientPlayerName(),
@@ -101,7 +101,7 @@ function D.Unbind(resolve, reject)
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			jx3id = X.GetPlayerGUID(),
+			jx3id = X.GetClientPlayerGlobalID(),
 		},
 		signature = X.SECRET['J3CX::ROLE_UNBIND'],
 		success = function(szHTML)

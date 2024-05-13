@@ -225,14 +225,14 @@ X.RegisterEvent({
 				-- мет╠
 				for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 					local info = team.GetMemberInfo(dwTarID)
-					local guid = X.GetPlayerGUID(dwTarID) or 0
+					local guid = X.GetPlayerGlobalID(dwTarID) or 0
 					if info then
 						table.insert(aTeammate, info.szName .. ',' .. info.dwMountKungfuID .. ',' .. guid .. ',' .. dwTarID)
 					end
 				end
 			else
 				szLeader = me.szName
-				table.insert(aTeammate, me.szName .. ',' .. UI_GetPlayerMountKungfuID() .. ',' .. X.GetPlayerGUID() .. ',' .. X.GetClientPlayerID())
+				table.insert(aTeammate, me.szName .. ',' .. UI_GetPlayerMountKungfuID() .. ',' .. X.GetClientPlayerGlobalID() .. ',' .. X.GetClientPlayerID())
 			end
 			local rec = {
 				szServer = X.GetServerOriginName(),

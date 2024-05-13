@@ -457,7 +457,7 @@ function D.FlushDB()
 	--[[#DEBUG END]]
 	local me = X.GetClientPlayer()
 	local time = GetCurrentTime()
-	local ownerkey = AnsiToUTF8(X.GetPlayerGUID())
+	local ownerkey = AnsiToUTF8(X.GetClientPlayerGlobalID())
 	local ownername = AnsiToUTF8(me.szName)
 	local servername = AnsiToUTF8(X.GetServerOriginName())
 	DB:Execute('BEGIN TRANSACTION')
@@ -585,7 +585,7 @@ function D.UpdateSaveDB()
 		X.Debug('MY_RoleStatistics_BagStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, guid in ipairs({
-			AnsiToUTF8(X.GetPlayerGUID()),
+			AnsiToUTF8(X.GetClientPlayerGlobalID()),
 			'tong' .. me.dwTongID,
 		}) do
 			DB_ItemsDA:ClearBindings()
@@ -604,7 +604,7 @@ function D.UpdateSaveDB()
 	FireUIEvent('MY_ROLE_STAT_BAG_UPDATE')
 end
 X.RegisterInit('MY_RoleStatistics_BagUpdateSaveDB', function()
-	D.tCheckedNames[X.GetPlayerGUID()] = true
+	D.tCheckedNames[X.GetClientPlayerGlobalID()] = true
 	INIT = true
 end)
 end

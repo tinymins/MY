@@ -56,7 +56,7 @@ function D.Sync(bSilent, resolve, reject)
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			jx3id = X.GetPlayerGUID(),
+			jx3id = X.GetClientPlayerGlobalID(),
 			achievements = D.EncodeAchievement(),
 		},
 		signature = X.SECRET['J3CX::ACHIEVEMENT_SYNC'],

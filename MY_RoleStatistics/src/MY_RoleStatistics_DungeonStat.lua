@@ -409,7 +409,7 @@ function D.GetClientPlayerRec(bForceUpdate)
 		return
 	end
 	local rec = REC_CACHE
-	local guid = X.GetPlayerGUID()
+	local guid = X.GetClientPlayerGlobalID()
 	if not rec then
 		rec = {}
 		REC_CACHE = rec
@@ -532,7 +532,7 @@ function D.InitDB()
 	local me = X.GetClientPlayer()
 	if me then
 		DB_DungeonInfoG:ClearBindings()
-		DB_DungeonInfoG:BindAll(AnsiToUTF8(X.GetPlayerGUID()))
+		DB_DungeonInfoG:BindAll(AnsiToUTF8(X.GetClientPlayerGlobalID()))
 		local result = DB_DungeonInfoG:GetAll()
 		DB_DungeonInfoG:Reset()
 		local rec = result[1]
@@ -557,7 +557,7 @@ function D.UpdateSaveDB()
 		X.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB_DungeonInfoD:ClearBindings()
-		DB_DungeonInfoD:BindAll(AnsiToUTF8(X.GetPlayerGUID()))
+		DB_DungeonInfoD:BindAll(AnsiToUTF8(X.GetClientPlayerGlobalID()))
 		DB_DungeonInfoD:Execute()
 		DB_DungeonInfoD:Reset()
 		--[[#DEBUG BEGIN]]

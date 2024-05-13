@@ -36,7 +36,7 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 			L = X.ENVIRONMENT.GAME_EDITION,
 			team = szTeam,
 			cguid = X.GetClientGUID(),
-			jx3id = X.GetPlayerGUID(),
+			jx3id = X.GetClientPlayerGlobalID(),
 			server = X.GetServerOriginName(),
 			id = dwID,
 			name = X.GetClientPlayerName(),

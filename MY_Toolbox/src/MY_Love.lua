@@ -730,7 +730,7 @@ function D.BackupLover(...)
 			local szPath = X.FormatPath(
 				{
 					'export/lover_backup/'
-						.. X.GetClientPlayerName() .. '_' .. X.GetPlayerGUID() .. '-'
+						.. X.GetClientPlayerName() .. '_' .. X.GetClientPlayerGlobalID() .. '-'
 						.. szLoverName .. '_' .. szLoverUUID .. '-'
 						.. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss')
 						.. '.lover.jx3dat',
@@ -740,7 +740,7 @@ function D.BackupLover(...)
 				szPath,
 				{
 					szName = X.GetClientPlayerName(),
-					szUUID = X.GetPlayerGUID(),
+					szUUID = X.GetClientPlayerGlobalID(),
 					szLoverName = szLoverName,
 					szLoverUUID = szLoverUUID,
 					nLoverType = lover.nLoverType,
@@ -775,7 +775,7 @@ function D.RestoreLover(szFilePath)
 	if errs then
 		return X.Alert(_L['Error: file is not a valid lover backup!'])
 	end
-	if data.szUUID == X.GetPlayerGUID() then
+	if data.szUUID == X.GetClientPlayerGlobalID() then
 		GetUserInput(_L['Please input your lover\'s current name:'], function(szLoverName)
 			szLoverName = X.StringReplaceW(X.StringReplaceW(X.TrimString(szLoverName), '[', ''), ']', '')
 			X.Confirm(
@@ -979,7 +979,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 						X.Systopmsg(_L['Backup lover is a sensitive action, please unlock to continue.'])
 						return false
 					end
-					X.SendBgMsg(szTalkerName, 'MY_LOVE', {'BACKUP_ANS', X.GetPlayerGUID()})
+					X.SendBgMsg(szTalkerName, 'MY_LOVE', {'BACKUP_ANS', X.GetClientPlayerGlobalID()})
 				end)
 			else
 				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'BACKUP_ANS_NOT_LOVER'})
@@ -989,7 +989,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 		elseif szKey == 'BACKUP_ANS_NOT_LOVER' then
 			X.Alert(_L['Peer is not your lover, please check, or do fix lover first.'])
 		elseif szKey == 'RESTORE' then
-			if data.szLoverUUID == X.GetPlayerGUID() then
+			if data.szLoverUUID == X.GetClientPlayerGlobalID() then
 				X.Confirm(_L('[%s] want to restore lover relation with you, do you agree?', szTalkerName), function()
 					if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 						X.Systopmsg(_L['Restore lover is a sensitive action, please unlock to continue.'])
@@ -1001,7 +1001,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'RESTORE_NOT_ME', data})
 			end
 		elseif szKey == 'RESTORE_AGREE' then
-			if X.GetPlayerGUID() == data.szUUID and not X.Schema.CheckSchema(data, BACKUP_DATA_SCHEMA) then
+			if X.GetClientPlayerGlobalID() == data.szUUID and not X.Schema.CheckSchema(data, BACKUP_DATA_SCHEMA) then
 				D.SaveLover(data.nLoverTime, dwTalkerID, data.nLoverType, data.nSendItem, data.nReceiveItem)
 				X.Alert(_L['Restore lover succeed!'])
 			end

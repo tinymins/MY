@@ -242,7 +242,7 @@ local COLUMN_LIST = {
 	{
 		szKey = 'guid',
 		GetValue = function(prevVal, prevRec)
-			return X.GetPlayerGUID()
+			return X.GetClientPlayerGlobalID()
 		end,
 	},
 	-- account
@@ -794,7 +794,7 @@ function D.FlushDB()
 	local rec = D.GetClientPlayerRec()
 	if O.bSaveDB then
 		local data = X.LoadLUAData(STAT_DATA_FILE) or {}
-		data[X.GetPlayerGUID()] = D.GetClientPlayerRec()
+		data[X.GetClientPlayerGlobalID()] = D.GetClientPlayerRec()
 		X.SaveLUAData(STAT_DATA_FILE, data)
 	end
 	X.SaveLUAData(PLAYER_REC_FILE, rec)
@@ -817,7 +817,7 @@ function D.UpdateSaveDB()
 		X.Debug('MY_RoleStatistics_TaskStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local data = X.LoadLUAData(STAT_DATA_FILE) or {}
-		data[X.GetPlayerGUID()] = nil
+		data[X.GetClientPlayerGlobalID()] = nil
 		X.SaveLUAData(STAT_DATA_FILE, data)
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_TaskStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)

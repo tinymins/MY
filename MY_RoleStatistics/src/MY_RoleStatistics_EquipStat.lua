@@ -339,7 +339,7 @@ function D.FlushDB()
 	--[[#DEBUG END]]
 	local me = X.GetClientPlayer()
 	local time = GetCurrentTime()
-	local ownerkey = AnsiToUTF8(X.GetPlayerGUID())
+	local ownerkey = AnsiToUTF8(X.GetClientPlayerGlobalID())
 	local ownername = AnsiToUTF8(me.szName)
 	local servername = AnsiToUTF8(X.GetServerOriginName())
 	local rec = REC_CACHE
@@ -458,7 +458,7 @@ function D.UpdateSaveDB()
 		--[[#DEBUG BEGIN]]
 		X.Debug('MY_RoleStatistics_EquipStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		local guid = AnsiToUTF8(X.GetPlayerGUID())
+		local guid = AnsiToUTF8(X.GetClientPlayerGlobalID())
 		DB_ItemsDA:ClearBindings()
 		DB_ItemsDA:BindAll(guid)
 		DB_ItemsDA:Execute()

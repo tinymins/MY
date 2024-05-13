@@ -381,7 +381,7 @@ function D.OnTargetUpdate(dwID, bForce)
 				end
 			end
 		end
-		local szGUID = X.GetPlayerGUID(dwID) or ''
+		local szGUID = X.GetPlayerGlobalID(dwID) or ''
 		local aEquip, nEquipScore, aTalent, tZhenPai
 		local function OnGet()
 			D.InsertLog(LOG_TYPE.PLAYER_INFO, { dwID, szName, dwForceID, dwMountKungfuID, nEquipScore, aEquip, aTalent, szGUID, tZhenPai })

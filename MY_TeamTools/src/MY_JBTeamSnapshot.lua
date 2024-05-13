@@ -45,7 +45,7 @@ function D.CreateSnapshot()
 	if team then
 		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 			local info = team.GetMemberInfo(dwTarID)
-			local guid = X.GetPlayerGUID(dwTarID) or 0
+			local guid = X.GetPlayerGlobalID(dwTarID) or 0
 			table.insert(aTeammate, info.szName .. ',' .. dwTarID .. ',' .. guid .. ',' .. info.dwMountKungfuID)
 		end
 	end
@@ -57,7 +57,7 @@ function D.CreateSnapshot()
 			L = X.ENVIRONMENT.GAME_EDITION,
 			team = O.szTeam,
 			cguid = X.GetClientGUID(),
-			jx3id = X.GetPlayerGUID(),
+			jx3id = X.GetClientPlayerGlobalID(),
 			server = X.GetServerOriginName(),
 			teammate = table.concat(aTeammate, ';'),
 		},

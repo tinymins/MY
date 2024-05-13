@@ -67,7 +67,7 @@ function D.FetchEventList(frame)
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			jx3id = X.GetPlayerGUID(),
+			jx3id = X.GetClientPlayerGlobalID(),
 		},
 		signature = X.SECRET['J3CX::EVENT_LIST'],
 		success = function(szHTML)
@@ -139,7 +139,7 @@ function D.FetchRankList(frame, szEventID)
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			jx3id = X.GetPlayerGUID(),
+			jx3id = X.GetClientPlayerGlobalID(),
 			event_id = szEventID,
 		},
 		signature = X.SECRET['J3CX::RANK_LIST'],
@@ -231,7 +231,7 @@ function D.Vote(frame, szEventID, szTeamID)
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			jx3id = X.GetPlayerGUID(),
+			jx3id = X.GetClientPlayerGlobalID(),
 			event_id = szEventID,
 			team_id = szTeamID,
 		},

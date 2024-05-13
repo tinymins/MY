@@ -39,7 +39,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 						X.Systopmsg(_L['Sync lover is a sensitive action, please unlock to continue.'])
 						return false
 					end
-					X.SendBgMsg(szTalkerName, 'MY_JB_LOVER_SYNC', {'SYNC_ANS', X.GetPlayerGUID()})
+					X.SendBgMsg(szTalkerName, 'MY_JB_LOVER_SYNC', {'SYNC_ANS', X.GetClientPlayerGlobalID()})
 				end)
 			else
 				X.SendBgMsg(szTalkerName, 'MY_JB_LOVER_SYNC', {'SYNC_ANS_NOT_LOVER'})
@@ -61,7 +61,7 @@ function D.SyncLover(szLoverName, szLoverUUID, resolve, reject)
 		data = {
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			role1 = X.GetPlayerGUID(),
+			role1 = X.GetClientPlayerGlobalID(),
 			role2 = szLoverUUID,
 		},
 		signature = X.SECRET['J3CX::LOVER_SYNC'],
