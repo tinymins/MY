@@ -29,31 +29,50 @@ function X.GetFellowshipGroupInfoList()
 			aList = me.GetFellowshipGroupInfo()
 		end
 	end
+	if not aList then
+		return
+	end
 	-- 默认分组
-	if aList then
-		table.insert(aList, 1, {
-			id = 0,
-			name = g_tStrings.STR_FRIEND_GOOF_FRIEND or '',
+	local aRes = {{ nID = 0, szName = g_tStrings.STR_FRIEND_GOOF_FRIEND or '' }}
+	for _, tGroup in ipairs(aList) do
+		table.insert(aRes, {
+			nID = tGroup.id,
+			szName = tGroup.name,
 		})
 	end
-	return aList
+	return aRes
 end
 
 ---获取指定好友分组的好友列表
 ---@param nGroupID number @要获取的好友分组ID
 ---@return table @该分组下的玩家信息列表
 function X.GetFellowshipInfoList(nGroupID)
-	-- 组ID可以直接调用官方接口
-	if X.IsNumber(nGroupID) then
-		local smc = X.GetSocialManagerClient()
-		if smc then
-			return smc.GetFellowshipInfo(nGroupID)
-		end
+	local aList
+	local smc = X.GetSocialManagerClient()
+	if smc then
+		aList = smc.GetFellowshipInfo(nGroupID)
+	else
 		local me = X.GetClientPlayer()
 		if me then
-			return me.GetFellowshipInfo(nGroupID)
+			aList = me.GetFellowshipInfo(nGroupID)
 		end
 	end
+	if not aList then
+		return
+	end
+	local aRes = {}
+	for _, info in ipairs(aList) do
+		table.insert(aRes, {
+			xID = info.id, -- 重制版为 szGlobalID，缘起为 dwID
+			szName = info.name, -- 重制版为 nil
+			nAttraction = info.attraction,
+			bTwoWay = info.istwoway == 1 or info.istwoway == true,
+			szRemark = info.remark,
+			nGroupID = info.groupid,
+			bOnline = info.isonline, -- 重制版为 nil
+		})
+	end
+	return aRes
 end
 
 do
@@ -80,15 +99,15 @@ function X.GetFellowshipInfo(xPlayerID)
 			if aGroupInfo then
 				FELLOWSHIP_CACHE = {}
 				for _, tGroup in ipairs(aGroupInfo) do
-					for _, tInfo in ipairs(X.GetFellowshipInfoList(tGroup.id) or {}) do
-						FELLOWSHIP_CACHE[tInfo.id] = tInfo
-						if tInfo.name then
-							FELLOWSHIP_CACHE[tInfo.name] = tInfo
+					for _, tFellowship in ipairs(X.GetFellowshipInfoList(tGroup.nID) or {}) do
+						FELLOWSHIP_CACHE[tFellowship.xID] = tFellowship
+						if tFellowship.szName then
+							FELLOWSHIP_CACHE[tFellowship.szName] = tFellowship
 						else
-							local info = X.GetPlayerEntryInfo(tInfo.id)
-							if info then
-								FELLOWSHIP_CACHE[info.dwPlayerID] = tInfo
-								FELLOWSHIP_CACHE[info.szName] = tInfo
+							local tPei = X.GetPlayerEntryInfo(tFellowship.xID)
+							if tPei then
+								FELLOWSHIP_CACHE[tPei.dwID] = tFellowship
+								FELLOWSHIP_CACHE[tPei.szName] = tFellowship
 							end
 						end
 					end
@@ -110,11 +129,10 @@ end
 ---@param fnIter function @迭代器，返回0时停止迭代
 function X.IterFellowshipInfo(fnIter)
 	local aGroup = X.GetFellowshipGroupInfoList() or {}
-	table.insert(aGroup, 1, { id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND })
-	for _, v in ipairs(aGroup) do
-		local aFellowshipInfo = X.GetFellowshipInfoList(v.id) or {}
-		for _, info in ipairs(aFellowshipInfo) do
-			if fnIter(info, v.id) == 0 then
+	for _, tGroup in ipairs(aGroup) do
+		local aFellowshipInfo = X.GetFellowshipInfoList(tGroup.nID) or {}
+		for _, tFellowship in ipairs(aFellowshipInfo) do
+			if fnIter(tFellowship, tGroup) == 0 then
 				return
 			end
 		end
@@ -141,21 +159,34 @@ end
 function X.GetFellowshipCardInfo(xPlayerID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		return smc.GetFellowshipCardInfo(xPlayerID)
+		local tCard = smc.GetFellowshipCardInfo(xPlayerID)
+		if tCard then
+			tCard = {
+				bTwoWay = tCard.bIsTwoWayFriend == 1,
+				-- dwLandMapID = v.dwLandMapID,
+				-- nLandIndex = v.nLandIndex,
+				-- Praiseinfo = v.Praiseinfo,
+				-- nPHomeCopyIndex = v.nPHomeCopyIndex,
+				-- nLandCopyIndex = v.nLandCopyIndex,
+				-- dwPHomeSkin = v.dwPHomeSkin,
+				-- dwPHomeMapID = v.dwPHomeMapID,
+			}
+		end
+		return tCard
 	end
-	local info = X.GetFellowshipInfo(xPlayerID)
+	local tFellowship = X.GetFellowshipInfo(xPlayerID)
 	local fcc = X.GetFellowshipCardClient()
-	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
-	if card then
+	local tCard = tFellowship and fcc and fcc.GetFellowshipCardInfo(tFellowship.id)
+	if tCard then
 		return {
-			dwLandMapID = card.dwLandMapID,
-			nLandIndex = card.nLandIndex,
-			Praiseinfo = card.Praiseinfo,
-			nPHomeCopyIndex = card.nPHomeCopyIndex,
-			nLandCopyIndex = card.nLandCopyIndex,
-			dwPHomeSkin = card.dwPHomeSkin,
-			bIsTwoWayFriend = info.istwoway,
-			dwPHomeMapID = card.dwPHomeMapID,
+			bTwoWay = tFellowship.istwoway,
+			-- dwLandMapID = tCard.dwLandMapID,
+			-- nLandIndex = tCard.nLandIndex,
+			-- Praiseinfo = tCard.Praiseinfo,
+			-- nPHomeCopyIndex = tCard.nPHomeCopyIndex,
+			-- nLandCopyIndex = tCard.nLandCopyIndex,
+			-- dwPHomeSkin = tCard.dwPHomeSkin,
+			-- dwPHomeMapID = tCard.dwPHomeMapID,
 		}
 	end
 end
@@ -168,11 +199,11 @@ function X.GetFellowshipMapID(xPlayerID)
 	if smc then
 		return smc.GetFellowshipMapID(xPlayerID)
 	end
-	local info = X.GetFellowshipInfo(xPlayerID)
+	local tFellowship = X.GetFellowshipInfo(xPlayerID)
 	local fcc = X.GetFellowshipCardClient()
-	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
-	if card then
-		return card.dwMapID
+	local tCard = tFellowship and fcc and fcc.GetFellowshipCardInfo(tFellowship.id)
+	if tCard then
+		return tCard.dwMapID
 	end
 end
 
@@ -202,10 +233,10 @@ local function GeneFoeCache()
 				if p.name then
 					FOE_CACHE[p.name] = p
 				else
-					local info = X.GetPlayerEntryInfo(p.id)
-					if info then
-						FOE_CACHE[info.dwPlayerID] = p
-						FOE_CACHE[info.szName] = p
+					local tPei = X.GetPlayerEntryInfo(p.id)
+					if tPei then
+						FOE_CACHE[tPei.dwID] = p
+						FOE_CACHE[tPei.szName] = p
 					end
 				end
 				table.insert(FOE_LIST, p)
