@@ -189,67 +189,65 @@ end
 X.RegisterEvent({'BAG_ITEM_UPDATE', 'BANK_ITEM_UPDATE', 'LOADING_ENDING'}, 'LIB#GetInventoryItemAmount', function() CACHE = {} end)
 end
 
--- 装备指定名字的装备
----@param szName string @装备名称
----@return boolean @是否找到并装备物品
-function X.EquipInventoryItem(szName)
-	local bEquip = false
-	X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(it, dwBox, dwX)
-		if X.GetItemNameByUIID(it.nUiId) == szName then
-			if szName == g_tStrings.tBulletDetail[BULLET_DETAIL.SNARE]
-			or szName == g_tStrings.tBulletDetail[BULLET_DETAIL.BOLT] then
-				local me = X.GetClientPlayer()
-				for nIndex = 0, 15 do
-					if me.GetItem(INVENTORY_INDEX.BULLET_PACKAGE, nIndex) == nil then
-						bEquip = true
-						X.ExchangeInventoryItem(dwBox, dwX, INVENTORY_INDEX.BULLET_PACKAGE, nIndex)
-						break
-					end
-				end
-			else
-				bEquip = true
-				local nEquipPos = select(2, X.GetClientPlayer().GetEquipPos(dwBox, dwX))
-				X.ExchangeInventoryItem(dwBox, dwX, INVENTORY_INDEX.EQUIP, nEquipPos)
-			end
-			return 0
-		end
-	end)
-	return bEquip
-end
-
--- 使用物品
--- X.UseInventoryItem(szName)
--- X.UseInventoryItem(dwTabType, dwIndex, nBookID)
+-- 寻找物品位置
+-- X.GetInventoryItemPos(eType, szName)
+-- X.GetInventoryItemPos(eType, dwTabType, dwIndex, nBookID)
+---@param eType number @物品存储格指定类型
 ---@param szName string @要使用的物品名称
 ---@param dwTabType number @要使用的物品表类型
 ---@param dwIndex number @要使用的物品表下标
 ---@param nBookID number @要使用的物品为书籍时的书籍ID
----@return boolean @是否找到并使用物品
-function X.UseInventoryItem(dwTabType, dwIndex, nBookID)
-	local bUse = false
+---@return number,number @物品坐标，找不到返回空
+function X.GetInventoryItemPos(eType, dwTabType, dwIndex, nBookID)
+	local dwRetBox, dwRetX = nil, nil
 	if X.IsString(dwTabType) then
-		X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(kItem, dwBox, dwX)
+		X.IterInventoryItem(eType, function(kItem, dwBox, dwX)
 			if X.GetObjectName('ITEM', kItem) == dwTabType then
-				bUse = true
-				dwBox, dwX = GetOfficialInventoryBoxPos(dwBox, dwX)
-				OnUseItem(dwBox, dwX)
+				dwRetBox, dwRetX = dwBox, dwX
 				return 0
 			end
 		end)
 	else
-		X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(kItem, dwBox, dwX)
+		X.IterInventoryItem(eType, function(kItem, dwBox, dwX)
 			if kItem.dwTabType == dwTabType and kItem.dwIndex == dwIndex then
 				if kItem.nGenre == ITEM_GENRE.BOOK and kItem.nBookID ~= nBookID then
 					return
 				end
-				bUse = true
-				dwBox, dwX = GetOfficialInventoryBoxPos(dwBox, dwX)
-				OnUseItem(dwBox, dwX)
+				dwRetBox, dwRetX = dwBox, dwX
 				return 0
 			end
 		end)
 	end
-	return bUse
+	return dwRetBox, dwRetX
+end
+
+-- 装备指定存储格的装备
+---@param dwBox number @物品存储格
+---@param dwX number @存储格中指定物品下标
+function X.EquipInventoryItem(dwBox, dwX)
+	local me = X.GetClientPlayer()
+	local kItem = X.GetInventoryItem(me, dwBox, dwX)
+	local szName = X.GetItemNameByUIID(kItem.nUiId)
+	if szName == g_tStrings.tBulletDetail[BULLET_DETAIL.SNARE]
+	or szName == g_tStrings.tBulletDetail[BULLET_DETAIL.BOLT] then
+		for dwBulletX = 0, 15 do
+			if me.GetItem(INVENTORY_INDEX.BULLET_PACKAGE, dwBulletX) == nil then
+				X.ExchangeInventoryItem(dwBox, dwX, INVENTORY_INDEX.BULLET_PACKAGE, dwBulletX)
+				break
+			end
+		end
+	else
+		local dwEquipX = select(2, me.GetEquipPos(GetOfficialInventoryBoxPos(dwBox, dwX)))
+		X.ExchangeInventoryItem(dwBox, dwX, INVENTORY_INDEX.EQUIP, dwEquipX)
+	end
+end
+
+-- 使用物品
+---@param dwBox number @物品存储格
+---@param dwX number @存储格中指定物品下标
+function X.UseInventoryItem(dwBox, dwX)
+	dwBox, dwX = GetOfficialInventoryBoxPos(dwBox, dwX)
+	OnUseItem(dwBox, dwX)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
