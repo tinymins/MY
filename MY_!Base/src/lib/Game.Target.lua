@@ -1321,18 +1321,9 @@ X.RegisterBgMsg(X.NSFormatString('{$NS}_GLOBAL_ID'), function(_, data, nChannel,
 	PLAYER_GUID[dwTalkerID] = data
 end)
 -- 获取唯一标识符
-function X.GetPlayerGUID(...)
-	local dwID = ...
-	if select('#', ...) == 0 then
-		dwID = X.GetClientPlayerID()
-	end
-	if not dwID then
-		return
-	end
-	if not PLAYER_GUID[dwID] then
-		if dwID == X.GetClientPlayerID() then
-			PLAYER_GUID[dwID] = X.GetClientPlayerGlobalID()
-		end
+function X.GetPlayerGlobalID(dwID)
+	if dwID == X.GetClientPlayerID() then
+		return X.GetClientPlayerGlobalID()
 	end
 	return PLAYER_GUID[dwID]
 end

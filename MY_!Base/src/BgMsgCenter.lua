@@ -475,7 +475,7 @@ do
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then
-			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_GLOBAL_ID'), X.GetPlayerGUID(), true)
+			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_GLOBAL_ID'), X.GetClientPlayerGlobalID(), true)
 			LAST_TIME = GetCurrentTime()
 		end
 	end)

@@ -1202,7 +1202,7 @@ function X.CreateDataRoot(ePathType)
 			{'info.jx3dat', X.PATH_TYPE.ROLE},
 			{
 				id = X.GetClientPlayerInfo().dwID,
-				uid = X.GetPlayerGUID(),
+				uid = X.GetClientPlayerGlobalID(),
 				name = X.GetClientPlayerInfo().szName,
 				lang = X.ENVIRONMENT.GAME_LANG,
 				edition = X.ENVIRONMENT.GAME_EDITION,
