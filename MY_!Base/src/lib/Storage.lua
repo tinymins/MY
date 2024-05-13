@@ -1251,7 +1251,7 @@ do
 local function FormatStorageData(me, d)
 	return X.EncryptString(X.ConvertToUTF8(X.EncodeJSON({
 		g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
-		n = X.GetUserRoleName(), i = X.GetClientPlayerID(), c = me.nCamp,
+		n = X.GetClientPlayerName(), i = X.GetClientPlayerID(), c = me.nCamp,
 		S = X.GetRegionOriginName(), s = X.GetServerOriginName(), r = me.nRoleType,
 		_ = GetCurrentTime(), t = X.GetTongName(), d = d,
 		m = X.ENVIRONMENT.GAME_PROVIDER == 'remote' and 1 or 0, v = X.PACKET_INFO.VERSION,

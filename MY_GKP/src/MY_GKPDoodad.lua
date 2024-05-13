@@ -683,7 +683,7 @@ function D.UpdateMiniFlag()
 			elseif info.dwCraftID == X.CONSTANT.CRAFT_TYPE.HERBALISM then -- …Ò≈©¿‡
 				nF1 = 2
 			end
-			X.UpdateMiniFlag(dwType, doodad, nF1, nF2)
+			X.UpdateMinimapArrowPoint(dwType, doodad, nF1, nF2)
 		end
 	end
 end

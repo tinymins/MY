@@ -1022,7 +1022,7 @@ function D.OpenExportPanel()
 		nX = ui:Append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }):AutoWidth():Pos('BOTTOMRIGHT')
 	end
 	nY = 110
-	local szAuthor = GetUserRoleName()
+	local szAuthor = X.GetClientPlayerName()
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['Author name'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndEditBox', {
 		x = 25, y = nY, w = 500, h = 25,

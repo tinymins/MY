@@ -73,7 +73,7 @@ function CharInfo.UpdateFrame(frame, status, data)
 	elseif status == 'PROGRESS' then
 		ui:Children('#Text_Info'):Text(_L('Syncing: %.2f%%.', data)):Show()
 	elseif status == 'ACCEPT' and data and type(data) == 'table' then
-		local self_data = X.GetCharInfo()
+		local self_data = X.GetClientPlayerCharInfo()
 		local function GetSelfValue(label, value)
 			for i = 1, #self_data do
 				local v = self_data[i]

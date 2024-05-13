@@ -77,7 +77,7 @@ function D.Bind(szToken, resolve, reject)
 			jx3id = X.GetPlayerGUID(),
 			server = X.GetServerOriginName(),
 			id = dwID,
-			name = X.GetUserRoleName(),
+			name = X.GetClientPlayerName(),
 			mount = me.GetKungfuMount().dwMountType,
 			type = me.nRoleType,
 		},
@@ -148,7 +148,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Character Certification'], font = 27 }):Height() + 2
 
 	nX = nPaddingX + 10
-	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L('Current character: %s', GetUserRoleName()) }):Width() + 20
+	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L('Current character: %s', X.GetClientPlayerName()) }):Width() + 20
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Status: '] }):Width()
 	uiCCStatus = ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Loading'] })
 	nX = nX + uiCCStatus:Width()

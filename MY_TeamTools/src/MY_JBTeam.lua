@@ -39,7 +39,7 @@ function D.ApplyAPI(szAction, szTeam, resolve, reject)
 			jx3id = X.GetPlayerGUID(),
 			server = X.GetServerOriginName(),
 			id = dwID,
-			name = X.GetUserRoleName(),
+			name = X.GetClientPlayerName(),
 			mount = me.GetKungfuMount().dwMountType,
 			body_type = me.nRoleType,
 		},

@@ -2107,7 +2107,7 @@ function D.ExportDataToFile(szFileName, aType, szFormat, szAuthor, fnAction)
 	data.__meta = X.Clone(D.META)
 	-- HM.20170504: add meta data
 	data.__meta.szEdition = X.ENVIRONMENT.GAME_EDITION
-	data.__meta.szAuthor = not X.IsEmpty(szAuthor) and szAuthor or GetUserRoleName()
+	data.__meta.szAuthor = not X.IsEmpty(szAuthor) and szAuthor or X.GetClientPlayerName()
 	data.__meta.szServer = select(4, GetUserServer())
 	data.__meta.nTimeStamp = GetCurrentTime()
 	data.__meta.szOfficialVoicePacketUUID = MY_TeamMon_VoiceAlarm.GetCurrentPacketUUID('OFFICIAL')

@@ -57,7 +57,7 @@ function D.Open(dwTabType, dwTabIndex)
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			player = GetUserRoleName(),
+			player = X.GetClientPlayerName(),
 		}))
 	local szKey = 'RideWiki_' .. dwTabType .. '_' .. dwTabIndex
 	local szTitle = item.szName

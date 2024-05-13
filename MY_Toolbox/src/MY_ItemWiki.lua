@@ -60,7 +60,7 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			player = GetUserRoleName(),
+			player = X.GetClientPlayerName(),
 		}))
 	local szKey = 'ItemWiki_' .. table.concat({dwTabType, dwTabIndex, nBookID}, '_')
 	local szTitle = szName

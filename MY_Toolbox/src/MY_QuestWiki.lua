@@ -57,7 +57,7 @@ function D.Open(dwQuest)
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			player = GetUserRoleName(),
+			player = X.GetClientPlayerName(),
 		}))
 	local szKey = 'QuestWiki_' .. dwQuest
 	local szTitle = quest.szName

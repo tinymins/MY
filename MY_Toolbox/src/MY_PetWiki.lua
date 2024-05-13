@@ -57,7 +57,7 @@ function D.Open(dwPetIndex)
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			player = GetUserRoleName(),
+			player = X.GetClientPlayerName(),
 		}))
 	local szKey = 'PetsWiki_' .. dwPetIndex
 	local szTitle = tPet.szName .. ' - ' .. X.XMLGetPureText(tPet.szDesc)

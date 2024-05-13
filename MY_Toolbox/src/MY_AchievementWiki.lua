@@ -57,7 +57,7 @@ function D.Open(dwAchievement)
 		.. X.EncodeQuerystring(X.ConvertToUTF8({
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
-			player = GetUserRoleName(),
+			player = X.GetClientPlayerName(),
 		}))
 	local szKey = 'AchievementWiki_' .. dwAchievement
 	local szTitle = achi.szName .. ' - ' .. achi.szDesc

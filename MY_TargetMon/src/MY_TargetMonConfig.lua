@@ -557,7 +557,7 @@ function D.CreateDataset()
 	table.insert(D.DATASET_LIST, {
 		szUUID = X.GetUUID(),
 		szTitle = _L['New target mon dataset'] .. '#' .. (#D.DATASET_LIST + 1),
-		szAuthor = X.GetUserRoleName(),
+		szAuthor = X.GetClientPlayerName(),
 		szVersion = X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd'),
 		szType = 'BUFF',
 		szTarget = 'CLIENT_PLAYER',

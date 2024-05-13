@@ -323,7 +323,7 @@ function PS.OnPanelActive(wnd)
 						L = X.ENVIRONMENT.GAME_EDITION,
 						content = D.szJokeText or '',
 						server = X.GetServerOriginName(),
-						role = bAnonymous and '' or X.GetUserRoleName(),
+						role = bAnonymous and '' or X.GetClientPlayerName(),
 						id = bAnonymous and '' or X.GetClientPlayerID(),
 						jx3id = bAnonymous and '' or X.GetPlayerGUID(),
 					},

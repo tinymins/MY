@@ -68,7 +68,7 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,
 			server = line and line.szCenterName or X.GetServerOriginName(),
-			player = GetUserRoleName(),
+			player = X.GetClientPlayerName(),
 			item = szName,
 		}))
 	local szKey = 'ItemPrice_' .. table.concat(aPath, '_')

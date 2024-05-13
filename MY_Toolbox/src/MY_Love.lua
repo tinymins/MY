@@ -288,9 +288,9 @@ end
 
 -- 是否可结双向好友，并返回真橙之心的位置
 function D.GetDoubleLoveItem(info, aUIID)
-	local rei = info and X.GetRoleEntryInfo(info.id)
-	if rei then
-		local tar = X.GetPlayer(rei.dwPlayerID)
+	local tPei = info and X.GetPlayerEntryInfo(info.id)
+	if tPei then
+		local tar = X.GetPlayer(tPei.dwPlayerID)
 		if info.attraction >= D.nDoubleLoveAttraction and tar and X.IsParty(tar.dwID) and X.GetDistance(tar) <= 4 then
 			return D.GetBagItemPos(aUIID)
 		end
@@ -299,10 +299,10 @@ end
 
 function D.UseDoubleLoveItem(info, aUIID, callback)
 	local dwBox, dwX = D.GetDoubleLoveItem(info, aUIID)
-	local rei = info and X.GetRoleEntryInfo(info.id)
-	if rei and dwBox then
+	local tPei = info and X.GetPlayerEntryInfo(info.id)
+	if tPei and dwBox then
 		local nNum = D.GetBagItemNum(dwBox, dwX)
-		SetTarget(TARGET.PLAYER, rei.dwPlayerID)
+		SetTarget(TARGET.PLAYER, tPei.dwPlayerID)
 		X.UseInventoryItem(dwBox, dwX)
 		local nFinishTime = GetTime() + 500
 		X.BreatheCall(function()
@@ -417,13 +417,13 @@ function D.GetLover()
 			return
 		end
 		-- 获取当前好友基础信息
-		local rei = X.GetRoleEntryInfo(tFellowship.id)
+		local tPei = X.GetPlayerEntryInfo(tFellowship.id)
 		-- 获取失败或者是跨服好友则跳过
-		if not rei or rei.dwPlayerID == 0 then
+		if not tPei or tPei.dwPlayerID == 0 then
 			return
 		end
 		-- 不是情缘则跳过
-		if rei.dwPlayerID ~= dwLoverID then
+		if tPei.dwPlayerID ~= dwLoverID then
 			return
 		end
 		-- 遍历到情缘，获取基础信息并返回
@@ -435,7 +435,7 @@ function D.GetLover()
 		if card.bIsTwoWayFriend then
 			lover = {
 				dwID = dwLoverID,
-				szName = rei.szName,
+				szName = tPei.szName,
 				szTitle = D.tLoverItem[D.lover.nSendItem] and D.tLoverItem[D.lover.nSendItem].szTitle or '',
 				nSendItem = nSendItem,
 				nReceiveItem = nReceiveItem,
@@ -446,7 +446,7 @@ function D.GetLover()
 				dwForceID = card.dwForceID,
 				nRoleType = card.nRoleType,
 				dwMapID = X.GetFellowshipMapID(tFellowship.id),
-				bOnline = X.IsRoleOnline(tFellowship.id),
+				bOnline = X.IsPlayerOnline(tFellowship.id),
 			}
 			return 0
 		end
@@ -536,8 +536,8 @@ function D.SetLover(dwID, nType)
 		return X.Alert(_L['Please enable sync common ui config first'])
 	end
 	local info = X.GetFellowshipInfo(dwID)
-	local rei = info and X.GetRoleEntryInfo(info.id)
-	if not info or not rei or not X.IsRoleOnline(info.id) then
+	local tPei = info and X.GetPlayerEntryInfo(info.id)
+	if not info or not tPei or not X.IsPlayerOnline(info.id) then
 		if nType == -1 then
 			return X.Alert(_L['Lover must online'])
 		end
@@ -553,7 +553,7 @@ function D.SetLover(dwID, nType)
 				D.UseDoubleLoveItem(info, p.aUIID, function(bSuccess)
 					if bSuccess then
 						D.SaveLover(D.lover.nLoverTime, D.lover.dwID, D.lover.nLoverType, p.nItem, D.lover.nReceiveItem)
-						X.SendBgMsg(rei.szName, 'MY_LOVE', {'LOVE_FIREWORK', p.nItem})
+						X.SendBgMsg(tPei.szName, 'MY_LOVE', {'LOVE_FIREWORK', p.nItem})
 						X.UI.CloseFrame('MY_Love_SetLover')
 					else
 						X.Systopmsg(_L['Failed to light firework.'])
@@ -567,16 +567,16 @@ function D.SetLover(dwID, nType)
 		if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 			return X.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
 		end
-		X.Confirm(_L('Do you want to blind love with [%s]?', rei.szName), function()
+		X.Confirm(_L('Do you want to blind love with [%s]?', tPei.szName), function()
 			local info = X.GetFellowshipInfo(dwID)
-			if not info or not X.IsRoleOnline(info.id) then
+			if not info or not X.IsPlayerOnline(info.id) then
 				return X.Alert(_L['Lover must be a online friend'])
 			end
 			if info.attraction < MY_Love.nLoveAttraction then
 				return X.Alert(_L['Inadequate conditions, requiring Lv2 friend'])
 			end
 			D.SaveLover(GetCurrentTime(), dwID, nType, 0, 0)
-			X.SendBgMsg(rei.szName, 'MY_LOVE', {'LOVE0'})
+			X.SendBgMsg(tPei.szName, 'MY_LOVE', {'LOVE0'})
 		end)
 	else
 		-- 设置成为情缘（在线好友）
@@ -586,16 +586,16 @@ function D.SetLover(dwID, nType)
 				return X.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
 			end
 			local info = X.GetFellowshipInfo(dwID)
-			if not info or not X.IsRoleOnline(info.id) then
+			if not info or not X.IsPlayerOnline(info.id) then
 				return X.Alert(_L['Lover must be a online friend'])
 			end
-			X.Confirm(_L('Do you want to mutual love with [%s]?', rei.szName), function()
+			X.Confirm(_L('Do you want to mutual love with [%s]?', tPei.szName), function()
 				if not D.GetDoubleLoveItem(info, p.aUIID) then
 					return X.Alert(_L('Inadequate conditions, requiring Lv6 friend/party/4-feet distance/%s', p.szName))
 				end
 				D.nPendingItem = p.nItem
-				X.SendBgMsg(rei.szName, 'MY_LOVE', {'LOVE_ASK'})
-				X.Systopmsg(_L('Love request has been sent to [%s], wait please', rei.szName))
+				X.SendBgMsg(tPei.szName, 'MY_LOVE', {'LOVE_ASK'})
+				X.Systopmsg(_L('Love request has been sent to [%s], wait please', tPei.szName))
 			end)
 		end)
 	end
@@ -620,7 +620,7 @@ function D.RemoveLover()
 			X.Confirm(_L('Are you sure to cut blind love with [%s]?', lover.szName), function()
 				-- 单向只通知在线的
 				local info = X.GetFellowshipInfo(lover.dwID)
-				if info and X.IsRoleOnline(info.id) then
+				if info and X.IsPlayerOnline(info.id) then
 					X.SendBgMsg(lover.szName, 'MY_LOVE', {'REMOVE0'})
 				end
 				D.SaveLover(0, 0, 0, 0, 0)
@@ -730,7 +730,7 @@ function D.BackupLover(...)
 			local szPath = X.FormatPath(
 				{
 					'export/lover_backup/'
-						.. X.GetUserRoleName() .. '_' .. X.GetPlayerGUID() .. '-'
+						.. X.GetClientPlayerName() .. '_' .. X.GetPlayerGUID() .. '-'
 						.. szLoverName .. '_' .. szLoverUUID .. '-'
 						.. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss')
 						.. '.lover.jx3dat',
@@ -739,7 +739,7 @@ function D.BackupLover(...)
 			X.SaveLUAData(
 				szPath,
 				{
-					szName = X.GetUserRoleName(),
+					szName = X.GetClientPlayerName(),
 					szUUID = X.GetPlayerGUID(),
 					szLoverName = szLoverName,
 					szLoverUUID = szLoverUUID,
@@ -931,16 +931,16 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 				return
 			end
 			local info = X.GetFellowshipInfo(dwTalkerID)
-			local rei = info and X.GetRoleEntryInfo(info.id)
-			if not info or not rei then
+			local tPei = info and X.GetPlayerEntryInfo(info.id)
+			if not info or not tPei then
 				return
 			end
 			D.UseDoubleLoveItem(info, aUIID, function(bSuccess)
 				if bSuccess then
 					D.SaveLover(GetCurrentTime(), dwTalkerID, 1, nItem, 0)
 					X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
-					X.SendBgMsg(rei.szName, 'MY_LOVE', {'LOVE_ANS_CONF', nItem})
-					X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', rei.szName))
+					X.SendBgMsg(tPei.szName, 'MY_LOVE', {'LOVE_ANS_CONF', nItem})
+					X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', tPei.szName))
 					X.UI.CloseFrame('MY_Love_SetLover')
 				else
 					X.Systopmsg(_L['Failed to attach love, light firework failed.'])
@@ -948,11 +948,11 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 			end)
 		elseif szKey == 'LOVE_ANS_CONF' then
 			local info = X.GetFellowshipInfo(dwTalkerID)
-			local rei = info and X.GetRoleEntryInfo(info.id)
-			if rei then
+			local tPei = info and X.GetPlayerEntryInfo(info.id)
+			if tPei then
 				D.SaveLover(GetCurrentTime(), dwTalkerID, 1, 0, data)
 				X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
-				X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', rei.szName))
+				X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', tPei.szName))
 			end
 		elseif szKey == 'LOVE_FIREWORK' then
 			local info = X.GetFellowshipInfo(dwTalkerID)
