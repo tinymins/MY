@@ -67,7 +67,7 @@ X.RegisterBgMsg('CHAR_INFO', function(_, data, nChannel, dwID, szName, bIsSelf)
 	if not bIsSelf and data[2] == X.GetClientPlayerID() then
 		if data[1] == 'ASK'  then
 			if not _G.MY_CharInfo or _G.MY_CharInfo.bEnable or data[3] == 'DEBUG' then
-				local aInfo = X.GetCharInfo()
+				local aInfo = X.GetClientPlayerCharInfo()
 				if not X.IsParty(dwID) and not data[3] == 'DEBUG' then
 					for _, v in ipairs(aInfo) do
 						v.tip = nil
