@@ -2156,7 +2156,21 @@ end
 
 do
 local FELLOWSHIP_CACHE
-local function GeneFellowshipCache()
+local function OnFellowshipUpdate()
+	FELLOWSHIP_CACHE = nil
+end
+X.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_FOE_UPDATE'            , OnFellowshipUpdate)
+X.RegisterEvent('PLAYER_BLACK_LIST_UPDATE'     , OnFellowshipUpdate)
+X.RegisterEvent('DELETE_FELLOWSHIP'            , OnFellowshipUpdate)
+X.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFellowshipUpdate)
+
+-- 获取好友
+---@param xPlayerID number | string @要获取的玩家名称或ID
+---@return table @匹配的玩家信息
+function X.GetFellowshipInfo(xPlayerID)
 	if not FELLOWSHIP_CACHE then
 		local me = X.GetClientPlayer()
 		if me then
@@ -2177,31 +2191,10 @@ local function GeneFellowshipCache()
 						end
 					end
 				end
-				return true
 			end
 		end
-		return false
 	end
-	return true
-end
-local function OnFellowshipUpdate()
-	FELLOWSHIP_CACHE = nil
-end
-X.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , OnFellowshipUpdate)
-X.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , OnFellowshipUpdate)
-X.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , OnFellowshipUpdate)
-X.RegisterEvent('PLAYER_FOE_UPDATE'            , OnFellowshipUpdate)
-X.RegisterEvent('PLAYER_BLACK_LIST_UPDATE'     , OnFellowshipUpdate)
-X.RegisterEvent('DELETE_FELLOWSHIP'            , OnFellowshipUpdate)
-X.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFellowshipUpdate)
-
--- 获取好友
----@param xPlayerID number | string @要获取的玩家名称或ID
----@return table @匹配的玩家信息
-function X.GetFellowshipInfo(xPlayerID)
-	if xPlayerID and GeneFellowshipCache() then
-		return X.Clone(FELLOWSHIP_CACHE[xPlayerID])
-	end
+	return FELLOWSHIP_CACHE and X.Clone(FELLOWSHIP_CACHE[xPlayerID])
 end
 
 -- 判断是否是好友
