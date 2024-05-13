@@ -375,15 +375,10 @@ function D.OnItemLButtonClick()
 			local data = {this:GetObject()}
 			if data[1] == UI_OBJECT.ITEM_INFO then
 				local dwTabType, dwIndex, nBookID = data[4], data[5], data[7]
-				X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(kItem, dwBox, dwX)
-					if kItem.dwTabType == dwTabType and kItem.dwIndex == dwIndex then
-						if kItem.nGenre == ITEM_GENRE.BOOK and kItem.nBookID ~= nBookID then
-							return
-						end
-						X.UseInventoryItem(dwBox, dwX)
-						return 0
-					end
-				end)
+				local dwBox, dwX = X.GetInventoryItemPos(X.CONSTANT.INVENTORY_TYPE.PACKAGE, dwTabType, dwIndex, nBookID)
+				if dwBox then
+					X.UseInventoryItem(dwBox, dwX)
+				end
 			elseif data[1] == UI_OBJECT.ITEM then
 				local dwBox, dwX = data[3], data[4]
 				X.UseInventoryItem(dwBox, dwX)
