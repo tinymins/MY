@@ -49,14 +49,12 @@ local PS = { IsRestricted = MY_Love.IsShielded }
 -- 获取可情缘好友列表
 function D.GetLoverMenu(nType)
 	local m0 = {}
-	local aGroup = X.GetFellowshipGroupInfoList() or {}
-	table.insert(aGroup, 1, {id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND})
-	X.WalkFellowshipInfo(function(info)
-		local rei = X.GetRoleEntryInfo(info.id)
-		if rei and info.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or info.attraction >= MY_Love.nDoubleLoveAttraction) then
+	X.IterFellowshipInfo(function(tFellowship)
+		local rei = X.GetRoleEntryInfo(tFellowship.id)
+		if rei and tFellowship.attraction >= MY_Love.nLoveAttraction and (nType ~= 1 or tFellowship.attraction >= MY_Love.nDoubleLoveAttraction) then
 			table.insert(m0, {
 				szOption = rei.szName,
-				fnDisable = function() return not X.IsRoleOnline(info.id) end,
+				fnDisable = function() return not X.IsRoleOnline(tFellowship.id) end,
 				fnAction = function()
 					D.SetLover(rei.dwPlayerID, nType)
 					X.UI.ClosePopupMenu()

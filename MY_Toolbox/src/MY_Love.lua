@@ -388,19 +388,19 @@ function D.GetLover()
 	end
 	local dwLoverID, nLoverTime, nLoverType, nSendItem, nReceiveItem = X.GetRemoteStorage('MY_Love')
 	local lover
-	X.WalkFellowshipInfo(function(info)
-		if nLoverTime == 0 and info.remark then -- 时间为非0表示不是第一次了 拒绝加载海鳗数据
-			local bMatch = string.sub(info.remark, 1, string.len(szKey)) == szKey
+	X.IterFellowshipInfo(function(tFellowship)
+		if nLoverTime == 0 and tFellowship.remark then -- 时间为非0表示不是第一次了 拒绝加载海鳗数据
+			local bMatch = string.sub(tFellowship.remark, 1, string.len(szKey)) == szKey
 			-- fetch data
 			-- 兼容海鳗：情缘信息从好友备注中提取数据
 			if bMatch then
-				local szData = D.DecodeHMString(string.sub(info.remark, string.len(szKey) + 1))
+				local szData = D.DecodeHMString(string.sub(tFellowship.remark, string.len(szKey) + 1))
 				if not X.IsEmpty(szData) then
 					local data = X.SplitString(szData, '#')
 					local nType = data[1] and tonumber(data[1])
 					local nTime = data[2] and tonumber(data[2])
 					if nType and nTime and (nType == 0 or nType == 1) and (nTime > 0 and nTime < GetCurrentTime()) then
-						dwLoverID = info.id
+						dwLoverID = tFellowship.id
 						nLoverType = nType
 						nLoverTime = nTime
 						nSendItem = 0
@@ -409,7 +409,7 @@ function D.GetLover()
 						D.UpdateProtectData()
 					end
 				end
-				me.SetFellowshipRemark(info.id, '')
+				me.SetFellowshipRemark(tFellowship.id, '')
 			end
 		end
 		-- 没有情缘不需要遍历
@@ -417,7 +417,7 @@ function D.GetLover()
 			return
 		end
 		-- 获取当前好友基础信息
-		local rei = X.GetRoleEntryInfo(info.id)
+		local rei = X.GetRoleEntryInfo(tFellowship.id)
 		-- 获取失败或者是跨服好友则跳过
 		if not rei or rei.dwPlayerID == 0 then
 			return
@@ -427,9 +427,9 @@ function D.GetLover()
 			return
 		end
 		-- 遍历到情缘，获取基础信息并返回
-		local card = X.GetFellowshipCardInfo(info.id)
+		local card = X.GetFellowshipCardInfo(tFellowship.id)
 		if not card then
-			X.ApplyFellowshipCard(info.id)
+			X.ApplyFellowshipCard(tFellowship.id)
 			return
 		end
 		if card.bIsTwoWayFriend then
@@ -445,8 +445,8 @@ function D.GetLover()
 				dwAvatar = card.dwMiniAvatarID,
 				dwForceID = card.dwForceID,
 				nRoleType = card.nRoleType,
-				dwMapID = X.GetFellowshipMapID(info.id),
-				bOnline = X.IsRoleOnline(info.id),
+				dwMapID = X.GetFellowshipMapID(tFellowship.id),
+				bOnline = X.IsRoleOnline(tFellowship.id),
 			}
 			return 0
 		end
