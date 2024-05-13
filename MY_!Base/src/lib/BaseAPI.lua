@@ -89,7 +89,7 @@ function X.GetServerNameByID(dwServerID)
 	if not GetCenterNameByCenterID then
 		return
 	end
-	GetCenterNameByCenterID(dwServerID)
+	return GetCenterNameByCenterID(dwServerID)
 end
 
 -- 获取 ID 是否为玩家（区别于 NPC）

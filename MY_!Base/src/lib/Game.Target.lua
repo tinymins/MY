@@ -1347,7 +1347,7 @@ function X.GetPlayerEntryInfo(xPlayerID)
 		local info = smc.GetRoleEntryInfo(xPlayerID)
 		if info then
 			local szServerName = X.GetServerNameByID(info.dwCenterID)
-			if szServerName ~= X.GetServerOriginName() then
+			if szServerName and szServerName ~= X.GetServerOriginName() then
 				info.dwPlayerID = info.dwPlayerID .. g_tStrings.STR_CONNECT .. szServerName
 			end
 		end
