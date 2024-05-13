@@ -2046,12 +2046,12 @@ end
 end
 
 ---获取玩家基本信息
----@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
+---@param xRoleID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return table @玩家的基本信息
-function X.GetRoleEntryInfo(szGlobalID)
+function X.GetRoleEntryInfo(xRoleID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		local info = smc.GetRoleEntryInfo(szGlobalID)
+		local info = smc.GetRoleEntryInfo(xRoleID)
 		if info then
 			local szServerName = X.GetServerNameByID(info.dwCenterID)
 			if szServerName ~= X.GetServerOriginName() then
@@ -2060,7 +2060,7 @@ function X.GetRoleEntryInfo(szGlobalID)
 		end
 		return info
 	end
-	local info = X.GetFellowshipInfo(szGlobalID)
+	local info = X.GetFellowshipInfo(xRoleID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
@@ -2081,14 +2081,14 @@ function X.GetRoleEntryInfo(szGlobalID)
 end
 
 ---获取玩家是否在线
----@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
+---@param xRoleID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return boolean @玩家是否在线
-function X.IsRoleOnline(szGlobalID)
+function X.IsRoleOnline(xRoleID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		return smc.IsRoleOnline(szGlobalID)
+		return smc.IsRoleOnline(xRoleID)
 	end
-	local rei = X.GetRoleEntryInfo(szGlobalID)
+	local rei = X.GetRoleEntryInfo(xRoleID)
 	if rei then
 		return rei.bOnline
 	end
@@ -2212,27 +2212,27 @@ end
 end
 
 ---申请好友名片
----@param szGlobalID string | string[] @要申请的玩家唯一ID或者唯一ID列表（缘起为 dwID）
-function X.ApplyFellowshipCard(szGlobalID)
+---@param xRoleID string | string[] @要申请的玩家唯一ID或者唯一ID列表（缘起为 dwID）
+function X.ApplyFellowshipCard(xRoleID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		return smc.ApplyFellowshipCard(szGlobalID)
+		return smc.ApplyFellowshipCard(xRoleID)
 	end
 	local fcc = X.GetFellowshipCardClient()
 	if fcc then
-		return fcc.ApplyFellowshipCard(255, szGlobalID)
+		return fcc.ApplyFellowshipCard(255, xRoleID)
 	end
 end
 
 ---获取玩家名片信息
----@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
+---@param xRoleID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return table @玩家的名片信息
-function X.GetFellowshipCardInfo(szGlobalID)
+function X.GetFellowshipCardInfo(xRoleID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		return smc.GetFellowshipCardInfo(szGlobalID)
+		return smc.GetFellowshipCardInfo(xRoleID)
 	end
-	local info = X.GetFellowshipInfo(szGlobalID)
+	local info = X.GetFellowshipInfo(xRoleID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
@@ -2250,14 +2250,14 @@ function X.GetFellowshipCardInfo(szGlobalID)
 end
 
 ---获取玩家所在地图
----@param szGlobalID number @要获取的玩家唯一ID（缘起为 dwID）
+---@param xRoleID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return boolean @玩家所在地图
-function X.GetFellowshipMapID(szGlobalID)
+function X.GetFellowshipMapID(xRoleID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		return smc.GetFellowshipMapID(szGlobalID)
+		return smc.GetFellowshipMapID(xRoleID)
 	end
-	local info = X.GetFellowshipInfo(szGlobalID)
+	local info = X.GetFellowshipInfo(xRoleID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
