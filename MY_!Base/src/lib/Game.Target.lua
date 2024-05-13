@@ -1335,31 +1335,44 @@ end
 function X.GetPlayerEntryInfo(xPlayerID)
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		local info = smc.GetRoleEntryInfo(xPlayerID)
-		if info then
-			local szServerName = X.GetServerNameByID(info.dwCenterID)
+		local tPei = smc.GetRoleEntryInfo(xPlayerID)
+		if tPei then
+			tPei = {
+				dwID = tPei.dwPlayerID,
+				szName = tPei.szName,
+				nLevel = tPei.nLevel,
+				nRoleType = tPei.nRoleType,
+				dwForceID = tPei.nForceID,
+				nCamp = tPei.nCamp,
+				szSignature = tPei.szSignature,
+				bOnline = tPei.bOnline,
+				dwMiniAvatarID = tPei.dwMiniAvatarID,
+				nSkinID = tPei.nSkinID,
+				dwServerID = tPei.dwCenterID,
+			}
+			local szServerName = X.GetServerNameByID(tPei.dwServerID)
 			if szServerName and szServerName ~= X.GetServerOriginName() then
-				info.dwPlayerID = info.dwPlayerID .. g_tStrings.STR_CONNECT .. szServerName
+				tPei.szName = tPei.szName .. g_tStrings.STR_CONNECT .. szServerName
 			end
 		end
-		return info
+		return tPei
 	end
 	local info = X.GetFellowshipInfo(xPlayerID)
 	local fcc = X.GetFellowshipCardClient()
 	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
 	if card then
 		return {
-			nCamp = card.nCamp,
-			bOnline = info.isonline,
-			nRoleType = card.nRoleType,
-			nLevel = card.nLevel,
-			szSignature = card.szSignature,
-			nForceID = card.dwForceID,
-			dwMiniAvatarID = card.dwMiniAvatarID,
-			dwPlayerID = info.id,
+			dwID = info.id,
 			szName = card.szName,
+			nLevel = card.nLevel,
+			nRoleType = card.nRoleType,
+			dwForceID = card.dwForceID,
+			nCamp = card.nCamp,
+			szSignature = card.szSignature,
+			bOnline = info.isonline,
+			dwMiniAvatarID = card.dwMiniAvatarID,
 			nSkinID = card.dwSkinID,
-			dwCenterID = 0,
+			dwServerID = 0,
 		}
 	end
 end
