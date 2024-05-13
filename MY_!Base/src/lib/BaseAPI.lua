@@ -207,7 +207,7 @@ function X.Log(...)
 	local szLog = string.format('%04d/%02d/%02d_%02d:%02d:%02d %s%s\n', tTime.year, tTime.month, tTime.day, tTime.hour, tTime.minute, tTime.second, szType, szText)
 	if LOG_DATE ~= szDate or LOG_LINE_COUNT >= LOG_MAX_LINE then
 		-- 系统未初始化完成，加入缓存数组等待写入
-		if not X.GetClientPlayerGlobalID or not X.GetClientPlayerGlobalID() then
+		if not X.FormatPath or not X.GetClientPlayerGlobalID or not X.GetClientPlayerGlobalID() then
 			if not LOG_CACHE then
 				LOG_CACHE = {}
 			end
