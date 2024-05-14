@@ -527,9 +527,9 @@ function D.GetLover()
 				nLoverType = nLoverType,
 				nLoverTime = nLoverTime,
 				szLoverTitle = D.tLoverItem[D.lover.nReceiveItem] and D.tLoverItem[D.lover.nReceiveItem].szTitle or '',
-				dwAvatar = tCard.dwMiniAvatarID,
-				dwForceID = tCard.dwForceID,
-				nRoleType = tCard.nRoleType,
+				dwAvatar = tPei.dwMiniAvatarID,
+				dwForceID = tPei.dwForceID,
+				nRoleType = tPei.nRoleType,
 				dwMapID = X.GetFellowshipMapID(tFellowship.xID),
 				bOnline = X.IsPlayerOnline(tFellowship.xID),
 			}
