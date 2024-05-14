@@ -28,7 +28,7 @@ local D = {
 }
 local O = {
 	tActiveLove = {},
-	tID2Name = {},
+	tName2ID = {},
 }
 
 function D.CanSeeLovePage(dwPlayerID, szPlayerName)
@@ -172,13 +172,14 @@ function D.GetPlayerViewTargetBaseInfo()
 		return
 	end
 	local szName = txtName:GetText()
-	local dwID = O.tID2Name[szName]
+	local dwID = O.tName2ID[szName]
 	local hWnd = Station.Lookup('Normal/PersonalCard_ShowData/Wnd_Card')
 	if hWnd and hWnd.szGlobalID then
 		local tFellowship = X.GetFellowshipInfo(hWnd.szGlobalID)
 		local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
 		if tPei then
 			szName = tPei.szName
+			dwID = O.tName2ID[szName] or dwID
 		end
 	end
 	return dwID, szName
@@ -326,14 +327,14 @@ function D.OnPeekOtherPlayer()
 	if not D.CanSeeLovePage(dwPlayerID, tar.szName) then
 		return
 	end
-	O.tID2Name[tar.szName] = dwPlayerID
+	O.tName2ID[tar.szName] = dwPlayerID
 	D.HookPlayerViewPanel()
 end
 X.RegisterEvent('PEEK_OTHER_PLAYER', 'MY_Love__PV', D.OnPeekOtherPlayer)
 X.RegisterFrameCreate('PlayerView', 'MY_Love__PV', D.HookPlayerViewPanel)
 X.RegisterFrameCreate('PersonalCard_ShowData', 'MY_Love__PV', D.HookPlayerViewPanel)
 
-X.RegisterEvent('LOADING_ENDING', function() O.tID2Name = {} end)
+X.RegisterEvent('LOADING_ENDING', function() O.tName2ID = {} end)
 
 function D.OnActiveLoveChange()
 	O.tActiveLove[arg0] = arg1 and true or nil
