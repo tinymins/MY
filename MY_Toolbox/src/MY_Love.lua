@@ -94,7 +94,7 @@ local D = X.SetmetaLazyload({
 		_L['Other side gave up love you.'],
 	},
 	lover = X.Clone(NO_LOVER),
-	tOtherLover = {}, -- 查看的情缘数据
+	tOtherLover = {}, -- 查看的情缘数据（跨服下聊天频道对方ID为实际ID；查看装备对方ID为临时ID，所以KEY必须为对方角色名称）
 	tViewer = {}, -- 等候查看您的玩家列表
 	aLoverItem = { -- 可用于结缘的烟花信息
 		{ nItem = 1, szTitle = _L['FIREWORK_TITLE_67291'], aUIID = {67291, 151179, 160465, 163486} }, -- 真橙之心
@@ -741,11 +741,12 @@ function D.RequestOtherLover(dwID, nX, nY, fnAutoClose)
 	if not kTarget then
 		return
 	end
+	local szName = kTarget.szName
 	if nX == true or X.IsParty(dwID) then
-		if not D.tOtherLover[dwID] then
-			D.tOtherLover[dwID] = {}
+		if not D.tOtherLover[szName] then
+			D.tOtherLover[szName] = {}
 		end
-		FireUIEvent('MY_LOVE_OTHER_UPDATE', dwID)
+		FireUIEvent('MY_LOVE_OTHER_UPDATE', szName)
 		if kTarget.bFightState and not X.IsParty(kTarget.dwID) then
 			FireUIEvent('MY_LOVE_PV_ACTIVE_CHANGE', kTarget.dwID, false)
 			return X.Systopmsg(_L('[%s] is in fighting, no time for you.', kTarget.szName))
@@ -770,8 +771,8 @@ function D.RequestOtherLover(dwID, nX, nY, fnAutoClose)
 	end
 end
 
-function D.GetOtherLover(dwID)
-	return D.tOtherLover[dwID]
+function D.GetOtherLover(szName)
+	return D.tOtherLover[szName]
 end
 
 function D.BackupLover(...)
@@ -1036,7 +1037,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 				D.SaveLover(D.lover.nLoverTime, tFellowship.xID, D.lover.nLoverType, D.lover.nSendItem, data)
 			end
 		elseif szKey == 'REPLY' then
-			D.tOtherLover[dwTalkerID] = {
+			D.tOtherLover[szTalkerName] = {
 				xID = data[1] or 0,
 				szName = data[2] or '',
 				dwAvatar = tonumber(data[3]) or 0,
@@ -1047,7 +1048,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 				nLoverTime = tonumber(data[8]) or 0,
 				szLoverTitle = data[9] or '',
 			}
-			FireUIEvent('MY_LOVE_OTHER_UPDATE', dwTalkerID)
+			FireUIEvent('MY_LOVE_OTHER_UPDATE', szTalkerName)
 		elseif szKey == 'BACKUP' then
 			if not tFellowship then
 				return

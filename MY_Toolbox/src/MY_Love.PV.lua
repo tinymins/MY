@@ -46,7 +46,7 @@ function D.PvRequestOtherLover(frame)
 	local nX, nY = frame:GetAbsPos()
 	local nW, nH = frame:GetSize()
 	local pageset = frame:Lookup('Page_Main')
-	return D.RequestOtherLover(pageset.dwPlayer, nX + nW / 2, nY + nH / 3, function() return not Station.Lookup('Normal/PlayerView/Page_Main') end)
+	return D.RequestOtherLover(pageset.dwPlayerID, nX + nW / 2, nY + nH / 3, function() return not Station.Lookup('Normal/PlayerView/Page_Main') end)
 end
 
 -- 更新情缘面板信息
@@ -55,11 +55,11 @@ function D.UpdatePage()
 	if not p then
 		return
 	end
-	local tar = D.GetPlayerInfo(p:GetParent().dwPlayer)
+	local tar = D.GetPlayerInfo(p:GetParent().dwPlayerID)
 	if not tar then
 		return p:GetRoot():Hide()
 	end
-	local h, t = p:Lookup('', ''), D.GetOtherLover(tar.dwID)
+	local h, t = p:Lookup('', ''), D.GetOtherLover(tar.szName)
 	local bNoData, xID, szName, dwAvatar, szSign, dwForceID, nRoleType, nLoverType, nLoverTime, szLoverTitle = not t
 	if t then
 		xID = t.xID
@@ -184,7 +184,7 @@ function D.HookPlayerViewPanel()
 		end
 		X.BreatheCall('MY_Love__PV__HookPlayerViewPanel', false)
 	end, 200)
-	local bHook = MY_Love.bHookPlayerView and dwID and D.CanSeeLovePage(dwPlayerID)
+	local bHook = MY_Love.bHookPlayerView and dwID and D.CanSeeLovePage(dwID)
 	-- attach page
 	if bHook then
 		if not mPage.bMYLoved then
@@ -231,8 +231,8 @@ function D.HookPlayerViewPanel()
 			end
 			page:Lookup('Btn_LoveYou').OnLButtonClick = function()
 				local mp = this:GetParent():GetParent()
-				if D.GetOtherLover(mp.dwPlayer) then
-					local tar = D.GetPlayerInfo(mp.dwPlayer)
+				if D.GetOtherLover(mp.szPlayerName) then
+					local tar = D.GetPlayerInfo(mp.szPlayerName)
 					if tar then
 						X.SendChat(tar.szName, MY_Love.szJabber)
 					end
@@ -242,7 +242,7 @@ function D.HookPlayerViewPanel()
 			end
 			page:Lookup('Btn_LoveYou').OnRButtonClick = function()
 				local mp = this:GetParent():GetParent()
-				local tar = D.GetPlayerInfo(mp.dwPlayer)
+				local tar = D.GetPlayerInfo(mp.dwPlayerID)
 				if tar then
 					local m0, me = {}, X.GetClientPlayer()
 					InsertInviteTeamMenu(m0, tar.szName)
@@ -274,7 +274,8 @@ function D.HookPlayerViewPanel()
 			checkbox:Lookup('', 'Text_LoveCaptical'):SetText(_L['Lover'])
 		end
 		-- update page
-		mPage.dwPlayer = dwID
+		mPage.dwPlayerID = dwID
+		mPage.szPlayerName = szName
 		-- active page
 		if O.tActiveLove[dwID] then
 			O.tActiveLove[dwID] = nil
@@ -289,7 +290,8 @@ function D.HookPlayerViewPanel()
 		checkbox:ChangeRelation(pageset, true, true)
 		page:ChangeRelation(pageset, true, true)
 		X.UI.CloseFrame(frame)
-		mPage.dwPlayer = nil
+		mPage.dwPlayerID = nil
+		mPage.szPlayerName = nil
 		mPage.bMYLoved = nil
 	end
 end
