@@ -39,6 +39,7 @@ local NEARBY_NPC = {}      -- 附近的NPC
 local NEARBY_PET = {}      -- 附近的PET
 local NEARBY_BOSS = {}     -- 附近的首领
 local NEARBY_PLAYER = {}   -- 附近的玩家
+local NEARBY_PLAYER_SYNCING = {} -- 刚进入同步范围还在同步数据的玩家
 local NEARBY_DOODAD = {}   -- 附近的物品
 local NEARBY_FIGHT = {}    -- 附近玩家和NPC战斗状态缓存
 
@@ -657,6 +658,7 @@ end)
 X.RegisterEvent('PLAYER_ENTER_SCENE', function()
 	local player = X.GetPlayer(arg0)
 	NEARBY_PLAYER[arg0] = player
+	NEARBY_PLAYER_SYNCING[arg0] = player
 	NEARBY_FIGHT[arg0] = player and player.bFightState or false
 	if X.GetClientPlayerID() == arg0 then
 		FireUIEvent(X.NSFormatString('{$NS}_CLIENT_PLAYER_ENTER_SCENE'))
@@ -667,7 +669,16 @@ X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
 		FireUIEvent(X.NSFormatString('{$NS}_CLIENT_PLAYER_LEAVE_SCENE'))
 	end
 	NEARBY_PLAYER[arg0] = nil
+	NEARBY_PLAYER_SYNCING[arg0] = nil
 	NEARBY_FIGHT[arg0] = nil
+end)
+X.FrameCall('LIB#NEARBY_PLAYER_SYNCING', function()
+	for dwID, kTarget in pairs(NEARBY_PLAYER_SYNCING) do
+		if kTarget.szName ~= '' then
+			NEARBY_PLAYER_SYNCING[dwID] = nil
+			FireUIEvent(X.NSFormatString('{$NS}_PLAYER_ENTER_SCENE'), dwID)
+		end
+	end
 end)
 X.RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = X.GetDoodad(arg0) end)
 X.RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil end)
