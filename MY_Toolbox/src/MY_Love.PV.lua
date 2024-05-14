@@ -327,7 +327,15 @@ function D.OnPeekOtherPlayer()
 	if not D.CanSeeLovePage(dwPlayerID, tar.szName) then
 		return
 	end
-	O.tName2ID[tar.szName] = dwPlayerID
+	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+		local szGlobalID = tar.GetGlobalID()
+		local tPei = X.GetPlayerEntryInfo(szGlobalID)
+		if tPei then
+			O.tName2ID[tPei.szName] = dwPlayerID
+		end
+	else
+		O.tName2ID[tar.szName] = dwPlayerID
+	end
 	D.HookPlayerViewPanel()
 end
 X.RegisterEvent('PEEK_OTHER_PLAYER', 'MY_Love__PV', D.OnPeekOtherPlayer)
