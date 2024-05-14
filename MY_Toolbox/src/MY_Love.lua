@@ -497,7 +497,7 @@ function D.GetLover()
 	if xLoverID == 0 or xLoverID == '0' then
 		return
 	end
-	local lover
+	local lover, bSyncing = nil, false
 	X.IterFellowshipInfo(function(tFellowship)
 		-- 获取当前好友基础信息
 		local tPei = X.GetPlayerEntryInfo(tFellowship.xID)
@@ -512,6 +512,7 @@ function D.GetLover()
 		-- 遍历到情缘，获取基础信息并返回
 		local tCard = X.GetFellowshipCardInfo(tFellowship.xID)
 		if not tCard then
+			bSyncing = true
 			X.ApplyFellowshipCard(tFellowship.xID)
 			return
 		end
@@ -535,7 +536,7 @@ function D.GetLover()
 			return 0
 		end
 	end)
-	return lover
+	return lover, bSyncing
 end
 
 -- 转换好友信息为情缘信息
@@ -543,7 +544,12 @@ function D.UpdateLocalLover()
 	if MY_Love.IsShielded() then
 		return
 	end
-	local lover = D.GetLover()
+	local lover, bSyncing = D.GetLover()
+	if bSyncing then
+		X.DelayCall(1000, function()
+			D.UpdateLocalLover()
+		end)
+	end
 	if not lover then
 		lover = NO_LOVER
 	end
