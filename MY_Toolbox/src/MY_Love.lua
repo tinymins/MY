@@ -769,12 +769,13 @@ function D.GetPlayerInfo(dwID)
 			end
 		end
 	else
-		local aCard = GetFellowshipCardClient().GetFellowshipCardInfo(dwID)
-		if aCard and aCard.bExist then
+		local tFellowship = X.GetFellowshipInfo(dwID)
+		local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
+		if tPei then
 			tPlayerInfo = {
 				dwID = dwID,
-				szName = aCard.szName,
-				nGender = X.IIf(aCard.nRoleType == 2 or aCard.nRoleType == 4 or aCard.nRoleType == 6, 2, 1),
+				szName = tPei.szName,
+				nGender = X.IIf(tPei.nRoleType == 2 or tPei.nRoleType == 4 or tPei.nRoleType == 6, 2, 1),
 			}
 		end
 	end
