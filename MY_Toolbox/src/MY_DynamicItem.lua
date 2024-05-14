@@ -136,7 +136,11 @@ function D.InitList(frame)
 		local box = hItem:Lookup('Box_Item')
 		box.nIndex = i
 		box.__bDrag = true
-		box.__tType = { [UI_OBJECT.ITEM] = true, [UI_OBJECT.ITEM_INFO] = true }
+		box.__tType = X.KvpToObject({
+			{ UI_OBJECT.ITEM     , true },
+			{ UI_OBJECT.ITEM_INFO, true },
+			{ UI_OBJECT.TOY      , true },
+		})
 		box.__szTypeErrorMsg = _L['Only item can be draged in']
 		-- bind events
 		UpdateBoxObject(box, UI_OBJECT.MONEY, 0)
@@ -226,6 +230,18 @@ function D.UpdateListCD(frame)
 				nTime = UpdataItemCDProgress(me, box, 0, data[2], data[3]) or 0
 			elseif data[1] == UI_OBJECT.ITEM then
 				nTime = UpdataItemCDProgress(me, box, data[2], data[3]) or 0
+			elseif data[1] == UI_OBJECT.TOY then
+				local toy = Table_GetToyBox(data[2])
+				if toy then
+					local bCool, szType, nLeft, nInterval, nTotal = X.GetSkillCDProgress(me, toy.nSkillID, toy.nSkillLevel)
+					if bCool and nLeft > 0 then
+						box:SetObjectCoolDown(true)
+						box:SetCoolDownPercentage(1 - nLeft / nTotal)
+					else
+						box:SetObjectCoolDown(false)
+					end
+					nTime = nLeft
+				end
 			end
 		end
 		D.UpdateCDText(hItem:Lookup('Text_CD'), bShowCD and nTime or 0)
@@ -238,6 +254,7 @@ function D.UpdateList(frame)
 		local hItem = hList:Lookup(i - 1)
 		local box = hItem:Lookup('Box_Item')
 		local data = D.aList[i]
+		box.__OnItemClick = nil
 		if data then
 			if data[1] == UI_OBJECT.ITEM_INFO then
 				local nAmount = X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.PACKAGE, data[2], data[3], data[4])
@@ -245,6 +262,9 @@ function D.UpdateList(frame)
 				box:EnableObject(nAmount > 0)
 			elseif data[1] == UI_OBJECT.ITEM then
 				UpdateBoxObject(box, UI_OBJECT.ITEM, data[2], data[3])
+			elseif data[1] == UI_OBJECT.TOY then
+				UpdateBoxObject(box, UI_OBJECT.TOY, data[2], false)
+				box.__OnItemClick = box.OnItemRButtonClick
 			else
 				UpdateBoxObject(box, UI_OBJECT.NONE)
 			end
@@ -285,6 +305,8 @@ function D.ParseBoxItem(box)
 				tItem = {UI_OBJECT.ITEM_INFO, data[4], data[5]}
 			end
 		end
+	elseif data[1] == UI_OBJECT.TOY then
+		tItem = {UI_OBJECT.TOY, data[2]}
 	end
 	D.aList[box.nIndex] = tItem or {}
 end
@@ -382,6 +404,8 @@ function D.OnItemLButtonClick()
 			elseif data[1] == UI_OBJECT.ITEM then
 				local dwBox, dwX = data[3], data[4]
 				X.UseInventoryItem(dwBox, dwX)
+			elseif this.__OnItemClick then
+				this.__OnItemClick()
 			end
 		else
 			X.ExecuteWithThis(this, D.OnItemLButtonDragEnd)
