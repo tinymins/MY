@@ -134,6 +134,7 @@ end
 X.RegisterRemoteStorage(
 	'MY_Love', 32, 15 * 8,
 	function(aBit)
+		-- 转 Byte 表
 		local aByte = {}
 		for i = 1, #aBit, 8 do
 			local nByte = 0
@@ -162,19 +163,15 @@ X.RegisterRemoteStorage(
 				dwIDL = X.NumberBitShl(dwIDL, 8)
 				dwIDL = X.NumberBitOr(dwIDL, aByte[i])
 			end
-			if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
-				local tBit = X.Number2Bitmap(dwIDL)
-				for i = #tBit + 1, 32 do
-					tBit[i] = 0
-				end
-				local tBitH = X.Number2Bitmap(dwIDH)
-				for i, nBit in ipairs(tBitH) do
-					tBit[i + 32] = nBit
-				end
-				xID = X.Bitmap2NumericString(tBit)
-			else
-				xID = dwIDL
+			local tBit = X.Number2Bitmap(dwIDL)
+			for i = #tBit + 1, 32 do
+				tBit[i] = 0
 			end
+			local tBitH = X.Number2Bitmap(dwIDH)
+			for i, nBit in ipairs(tBitH) do
+				tBit[i + 32] = nBit
+			end
+			xID = X.Bitmap2NumericString(tBit)
 			-- 10 - 13 nTime
 			for i = 13, 10, -1 do
 				nTime = X.NumberBitShl(nTime, 8)
@@ -220,7 +217,7 @@ X.RegisterRemoteStorage(
 	end,
 	function(...)
 		local xID, nTime, nType, nSendItem, nReceiveItem = ...
-		if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+		if X.IsString(xID) then
 			assert(not xID:find('[^0-9]'), 'Value of xID out of 64bit unsigned int string range!')
 		else
 			assert(xID >= 0 and xID <= 0xffffffff, 'Value of xID out of 32bit unsigned int range!')
@@ -229,9 +226,14 @@ X.RegisterRemoteStorage(
 		assert(nType >= 0 and nType <= 0xf, 'Value of nType out of range 4bit unsigned int range!')
 		assert(nSendItem >= 0 and nSendItem <= 0x3f, 'Value of nSendItem out of 6bit unsigned int range!')
 		assert(nReceiveItem >= 0 and nReceiveItem <= 0x3f, 'Value of nReceiveItem out of 6bit unsigned int range!')
-		local aByte, nCrc = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 7
-		local dwIDH, dwIDL = 0, 0
-		if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+		-- 生成 Byte 表
+		local aByte = {}
+		if X.IsString(xID) then
+			---------------
+			-- Version 2 --
+			---------------
+			local aByte, nCrc = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 7
+			local dwIDH, dwIDL = 0, 0
 			local tIDBit = X.NumericString2Bitmap(xID)
 			local tIDHBit, tIDLBit = {}, {}
 			for i = 1, 32 do
@@ -242,34 +244,57 @@ X.RegisterRemoteStorage(
 			end
 			dwIDH = X.Bitmap2Number(tIDHBit)
 			dwIDL = X.Bitmap2Number(tIDLBit)
+			-- 2 - 5 dwIDH
+			for i = 2, 5 do
+				aByte[i] = X.NumberBitAnd(dwIDH, 0xff)
+				dwIDH = X.NumberBitShr(dwIDH, 8)
+			end
+			-- 6 - 9 dwIDL
+			for i = 6, 9 do
+				aByte[i] = X.NumberBitAnd(dwIDL, 0xff)
+				dwIDL = X.NumberBitShr(dwIDL, 8)
+			end
+			-- 10 - 13 nTime
+			for i = 10, 13 do
+				aByte[i] = X.NumberBitAnd(nTime, 0xff)
+				nTime = X.NumberBitShr(nTime, 8)
+			end
+			-- 14 (nType << 4) | ((nSendItem >> 2) & 0xf)
+			aByte[14] = X.NumberBitOr(X.NumberBitShl(nType, 4), X.NumberBitAnd(X.NumberBitShr(nSendItem, 2), 0xf))
+			-- 15 (nSendItem & 0x3) << 6 | (nReceiveItem & 0x3f)
+			aByte[15] = X.NumberBitOr(X.NumberBitShl(X.NumberBitAnd(nSendItem, 0x3), 6), X.NumberBitAnd(nReceiveItem, 0x3f))
+			-- 1 crc
+			for i = 2, #aByte do
+				nCrc = X.NumberBitXor(nCrc, aByte[i])
+			end
+			aByte[1] = nCrc
 		else
-			dwIDL = xID
+			---------------
+			-- Version 1 --
+			---------------
+			local aByte, nCrc = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 6
+			local dwID = xID
+			-- 2 - 5 dwID
+			for i = 2, 5 do
+				aByte[i] = X.NumberBitAnd(dwID, 0xff)
+				dwID = X.NumberBitShr(dwID, 8)
+			end
+			-- 6 - 9 nTime
+			for i = 6, 9 do
+				aByte[i] = X.NumberBitAnd(nTime, 0xff)
+				nTime = X.NumberBitShr(nTime, 8)
+			end
+			-- 10 (nType << 4) | ((nSendItem >> 2) & 0xf)
+			aByte[10] = X.NumberBitOr(X.NumberBitShl(nType, 4), X.NumberBitAnd(X.NumberBitShr(nSendItem, 2), 0xf))
+			-- 11 (nSendItem & 0x3) << 6 | (nReceiveItem & 0x3f)
+			aByte[11] = X.NumberBitOr(X.NumberBitShl(X.NumberBitAnd(nSendItem, 0x3), 6), X.NumberBitAnd(nReceiveItem, 0x3f))
+			-- 1 crc
+			for i = 2, #aByte do
+				nCrc = X.NumberBitXor(nCrc, aByte[i])
+			end
+			aByte[1] = nCrc
 		end
-		-- 2 - 5 dwIDH
-		for i = 2, 5 do
-			aByte[i] = X.NumberBitAnd(dwIDH, 0xff)
-			dwIDH = X.NumberBitShr(dwIDH, 8)
-		end
-		-- 6 - 9 dwIDL
-		for i = 6, 9 do
-			aByte[i] = X.NumberBitAnd(dwIDL, 0xff)
-			dwIDL = X.NumberBitShr(dwIDL, 8)
-		end
-		-- 10 - 13 nTime
-		for i = 10, 13 do
-			aByte[i] = X.NumberBitAnd(nTime, 0xff)
-			nTime = X.NumberBitShr(nTime, 8)
-		end
-		-- 14 (nType << 4) | ((nSendItem >> 2) & 0xf)
-		aByte[14] = X.NumberBitOr(X.NumberBitShl(nType, 4), X.NumberBitAnd(X.NumberBitShr(nSendItem, 2), 0xf))
-		-- 15 (nSendItem & 0x3) << 6 | (nReceiveItem & 0x3f)
-		aByte[15] = X.NumberBitOr(X.NumberBitShl(X.NumberBitAnd(nSendItem, 0x3), 6), X.NumberBitAnd(nReceiveItem, 0x3f))
-		-- 1 crc
-		for i = 2, #aByte do
-			nCrc = X.NumberBitXor(nCrc, aByte[i])
-		end
-		aByte[1] = nCrc
-
+		-- 转 Bit 表
 		local aBit = {}
 		for _, nByte in ipairs(aByte) do
 			local aByteBit = { 0, 0, 0, 0, 0, 0, 0, 0 }
