@@ -67,7 +67,7 @@ function D.GetLoverMenu(nType)
 			szOption = tPei.szName,
 			fnDisable = function() return not X.IsPlayerOnline(tFellowship.xID) end,
 			fnAction = function()
-				D.SetLover(tPei.dwID, nType)
+				D.SetLover(tFellowship.xID, nType)
 				X.UI.ClosePopupMenu()
 			end
 		})
