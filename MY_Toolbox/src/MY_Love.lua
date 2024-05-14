@@ -1181,7 +1181,7 @@ local function OnPlayerEnterScene()
 		MY_Focus.SetFocusID(TARGET.PLAYER, arg0)
 	end
 end
-X.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_Love', OnPlayerEnterScene)
+X.RegisterEvent('MY_PLAYER_ENTER_SCENE', 'MY_Love', OnPlayerEnterScene)
 end
 
 -- on init
