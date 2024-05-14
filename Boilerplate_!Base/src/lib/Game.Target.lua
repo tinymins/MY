@@ -1333,6 +1333,7 @@ end
 ---@param xPlayerID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return table @玩家的基本信息
 function X.GetPlayerEntryInfo(xPlayerID)
+	local me = X.GetClientPlayer()
 	local smc = X.GetSocialManagerClient()
 	if smc then
 		local tPei = smc.GetRoleEntryInfo(xPlayerID)
@@ -1351,7 +1352,7 @@ function X.GetPlayerEntryInfo(xPlayerID)
 				dwServerID = tPei.dwCenterID,
 			}
 			local szServerName = X.GetServerNameByID(tPei.dwServerID)
-			if szServerName and szServerName ~= X.GetServerOriginName() then
+			if szServerName and (szServerName ~= X.GetServerOriginName() or IsRemotePlayer(me.dwID)) then
 				tPei.szName = tPei.szName .. g_tStrings.STR_CONNECT .. szServerName
 			end
 		end

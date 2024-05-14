@@ -80,6 +80,7 @@ local FELLOWSHIP_CACHE
 local function OnFellowshipUpdate()
 	FELLOWSHIP_CACHE = nil
 end
+X.RegisterEvent('LOADING_ENDING'               , OnFellowshipUpdate)
 X.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , OnFellowshipUpdate)
 X.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , OnFellowshipUpdate)
 X.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , OnFellowshipUpdate)
