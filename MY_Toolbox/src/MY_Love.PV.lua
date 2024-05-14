@@ -31,6 +31,16 @@ local O = {
 	tID2Name = {},
 }
 
+function D.CanSeeLovePage(dwPlayerID)
+	if MY_Love.IsShielded() then
+		return false
+	end
+	if X.ENVIRONMENT.GAME_BRANCH ~= 'remake' and IsRemotePlayer(dwPlayerID) then
+		return false
+	end
+	return true
+end
+
 -- 请求别人情缘数据
 function D.PvRequestOtherLover(frame)
 	local nX, nY = frame:GetAbsPos()
@@ -50,9 +60,9 @@ function D.UpdatePage()
 		return p:GetRoot():Hide()
 	end
 	local h, t = p:Lookup('', ''), D.GetOtherLover(tar.dwID)
-	local bNoData, dwID, szName, dwAvatar, szSign, dwForceID, nRoleType, nLoverType, nLoverTime, szLoverTitle = not t
+	local bNoData, xID, szName, dwAvatar, szSign, dwForceID, nRoleType, nLoverType, nLoverTime, szLoverTitle = not t
 	if t then
-		dwID = t.dwID
+		xID = t.xID
 		szName = t.szName
 		dwAvatar = t.dwAvatar
 		szSign = t.szSign
@@ -89,7 +99,7 @@ function D.UpdatePage()
 	-- avatar
 	local szFile, nFrame, bAnimate = X.GetPlayerAvatar(dwForceID, nRoleType, dwAvatar)
 	local img, ani = h:Lookup('Image_Lover'), h:Lookup('Animate_Lover')
-	if X.IsEmpty(dwID) or X.IsEmpty(szFile) then
+	if xID == 0 or xID == '0' or X.IsEmpty(szFile) then
 		img:Hide()
 		ani:Hide()
 		txt:SetRelPos(42, 92)
@@ -174,7 +184,7 @@ function D.HookPlayerViewPanel()
 		end
 		X.BreatheCall('MY_Love__PV__HookPlayerViewPanel', false)
 	end, 200)
-	local bHook = MY_Love.bHookPlayerView and dwID and not IsRemotePlayer(dwID) and not MY_Love.IsShielded()
+	local bHook = MY_Love.bHookPlayerView and dwID and D.CanSeeLovePage(dwPlayerID)
 	-- attach page
 	if bHook then
 		if not mPage.bMYLoved then
@@ -286,7 +296,10 @@ end
 
 function D.OnPeekOtherPlayer()
 	local nResult, dwPlayerID = arg0, arg1
-	if nResult ~= 1 or IsRemotePlayer(dwPlayerID) then
+	if nResult ~= 1 then
+		return
+	end
+	if not D.CanSeeLovePage(dwPlayerID) then
 		return
 	end
 	local tar = X.GetPlayer(dwPlayerID)
@@ -299,6 +312,8 @@ end
 X.RegisterEvent('PEEK_OTHER_PLAYER', 'MY_Love__PV', D.OnPeekOtherPlayer)
 X.RegisterFrameCreate('PlayerView', 'MY_Love__PV', D.HookPlayerViewPanel)
 X.RegisterFrameCreate('PersonalCard_ShowData', 'MY_Love__PV', D.HookPlayerViewPanel)
+
+X.RegisterEvent('LOADING_ENDING', function() O.tID2Name = {} end)
 
 function D.OnActiveLoveChange()
 	O.tActiveLove[arg0] = arg1 and true or nil

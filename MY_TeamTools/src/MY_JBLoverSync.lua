@@ -33,7 +33,8 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 		local szKey, data = aData[1], aData[2]
 		if szKey == 'SYNC' then
 			local lover = MY_Love.GetLover()
-			if lover.dwID == dwTalkerID then
+			local tFellowship = X.GetFellowshipInfo(dwTalkerID)
+			if lover and tFellowship and lover.xID == tFellowship.xID then
 				X.Confirm(_L('[%s] want to sync lover relation to jx3box, do you agree?', szTalkerName), function()
 					if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 						X.Systopmsg(_L['Sync lover is a sensitive action, please unlock to continue.'])

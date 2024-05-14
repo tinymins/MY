@@ -50,17 +50,27 @@ local PS = { IsRestricted = MY_Love.IsShielded }
 function D.GetLoverMenu(nType)
 	local m0 = {}
 	X.IterFellowshipInfo(function(tFellowship)
-		local tPei = X.GetPlayerEntryInfo(tFellowship.xID)
-		if tPei and tFellowship.nAttraction >= MY_Love.nLoveAttraction and (nType ~= 1 or tFellowship.nAttraction >= MY_Love.nDoubleLoveAttraction) then
-			table.insert(m0, {
-				szOption = tPei.szName,
-				fnDisable = function() return not X.IsPlayerOnline(tFellowship.xID) end,
-				fnAction = function()
-					D.SetLover(tPei.dwID, nType)
-					X.UI.ClosePopupMenu()
-				end
-			})
+		if not tFellowship.bTwoWay then
+			return
 		end
+		local tPei = X.GetPlayerEntryInfo(tFellowship.xID)
+		if not tPei then
+			return
+		end
+		if nType == 0 and tFellowship.nAttraction < MY_Love.nLoveAttraction then
+			return
+		end
+		if nType == 1 and tFellowship.nAttraction < MY_Love.nDoubleLoveAttraction then
+			return
+		end
+		table.insert(m0, {
+			szOption = tPei.szName,
+			fnDisable = function() return not X.IsPlayerOnline(tFellowship.xID) end,
+			fnAction = function()
+				D.SetLover(tPei.dwID, nType)
+				X.UI.ClosePopupMenu()
+			end
+		})
 	end)
 	if #m0 == 0 then
 		table.insert(m0, { szOption = _L['<Non-avaiable>'] })
@@ -94,7 +104,7 @@ function PS.OnPanelActive(wnd)
 			end,
 		}):Height() + 20
 	else
-		if not lover or not lover.dwID or lover.dwID == 0 then
+		if not lover or not lover.xID or lover.xID == 0 or lover.xID == '0' then
 			nX = nPaddingX + 10
 			nX = ui:Append('Text', { text = _L['No lover :-('], font = 19, x = nX, y = nY }):Pos('BOTTOMRIGHT')
 			nX = ui:Append('Text', {
@@ -154,7 +164,7 @@ function PS.OnPanelActive(wnd)
 					x = nX + 10, y = nY,
 					text = _L['[Light firework]'],
 					onClick = function()
-						D.SetLover(lover.dwID, -1)
+						D.SetLover(lover.xID, -1)
 					end,
 				}):AutoWidth():Pos('BOTTOMRIGHT')
 			end
