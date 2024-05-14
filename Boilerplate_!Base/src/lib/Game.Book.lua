@@ -5,7 +5,7 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Game.Fellowship')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Game.Book')
 --------------------------------------------------------------------------------
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
