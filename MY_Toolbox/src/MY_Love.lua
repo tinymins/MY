@@ -421,7 +421,7 @@ function D.UseDoubleLoveItem(tFellowship, aUIID, fnCallback)
 	local kTarget = tPei and D.GetNearbyPlayerByName(tPei.szName)
 	if tPei and kTarget and dwBox then
 		local nNum = D.GetBagItemNum(dwBox, dwX)
-		SetTarget(TARGET.PLAYER, tPei.dwID)
+		SetTarget(TARGET.PLAYER, kTarget.dwID)
 		X.UseInventoryItem(dwBox, dwX)
 		local nFinishTime = GetTime() + 500
 		X.BreatheCall(function()
