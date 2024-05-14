@@ -227,12 +227,12 @@ X.RegisterRemoteStorage(
 		assert(nSendItem >= 0 and nSendItem <= 0x3f, 'Value of nSendItem out of 6bit unsigned int range!')
 		assert(nReceiveItem >= 0 and nReceiveItem <= 0x3f, 'Value of nReceiveItem out of 6bit unsigned int range!')
 		-- Éú³É Byte ±í
-		local aByte = {}
+		local aByte = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 		if X.IsString(xID) then
 			---------------
 			-- Version 2 --
 			---------------
-			local aByte, nCrc = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 7
+			local nCrc = 7
 			local dwIDH, dwIDL = 0, 0
 			local tIDBit = X.NumericString2Bitmap(xID)
 			local tIDHBit, tIDLBit = {}, {}
@@ -272,7 +272,7 @@ X.RegisterRemoteStorage(
 			---------------
 			-- Version 1 --
 			---------------
-			local aByte, nCrc = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 6
+			local nCrc = 6
 			local dwID = xID
 			-- 2 - 5 dwID
 			for i = 2, 5 do
