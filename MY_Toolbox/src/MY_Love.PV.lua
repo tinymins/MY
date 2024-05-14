@@ -31,7 +31,7 @@ local O = {
 	tID2Name = {},
 }
 
-function D.CanSeeLovePage(dwPlayerID)
+function D.CanSeeLovePage(dwPlayerID, szPlayerName)
 	if MY_Love.IsShielded() then
 		return false
 	end
@@ -184,7 +184,7 @@ function D.HookPlayerViewPanel()
 		end
 		X.BreatheCall('MY_Love__PV__HookPlayerViewPanel', false)
 	end, 200)
-	local bHook = MY_Love.bHookPlayerView and dwID and D.CanSeeLovePage(dwID)
+	local bHook = MY_Love.bHookPlayerView and dwID and D.CanSeeLovePage(dwID, szName)
 	-- attach page
 	if bHook then
 		if not mPage.bMYLoved then
@@ -301,11 +301,11 @@ function D.OnPeekOtherPlayer()
 	if nResult ~= 1 then
 		return
 	end
-	if not D.CanSeeLovePage(dwPlayerID) then
-		return
-	end
 	local tar = X.GetPlayer(dwPlayerID)
 	if not tar then
+		return
+	end
+	if not D.CanSeeLovePage(dwPlayerID, tar.szName) then
 		return
 	end
 	O.tID2Name[tar.szName] = dwPlayerID
