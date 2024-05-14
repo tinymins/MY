@@ -969,7 +969,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 			return
 		end
 		local kTarget = D.GetNearbyPlayerByName(szTalkerName)
-		local tFellowship = X.GetFellowshipInfo(dwTalkerID)
+		local tFellowship = X.GetFellowshipInfo(dwTalkerID) or X.GetFellowshipInfo(szTalkerName)
 		local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
 		local szKey, data = aData[1], aData[2]
 		if szKey == 'VIEW' then
