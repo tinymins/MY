@@ -747,42 +747,57 @@ end
 
 -- 获取查看目标
 function D.GetPlayerInfo(dwID)
-	local kTarget = X.GetPlayer(dwID)
-	if not kTarget then
-		local aCard = GetFellowshipCardClient().GetFellowshipCardInfo(dwID)
-		if aCard and aCard.bExist then
-			kTarget = { dwID = dwID, szName = aCard.szName, nGender = 1 }
-			if aCard.nRoleType == 2 or aCard.nRoleType == 4 or aCard.nRoleType == 6 then
-				kTarget.nGender = 2
+	local kTarget, tPlayerInfo = X.GetPlayer(dwID), nil
+	if kTarget then
+		tPlayerInfo = {
+			dwID = kTarget.dwID,
+			szName = kTarget.szName,
+			nGender = kTarget.nGender,
+		}
+		-- 远程查看跨服好友需要手动补充后缀
+		if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+			local szGlobalID = kTarget.GetGlobalID()
+			local tPei = X.GetPlayerEntryInfo(szGlobalID)
+			if tPei then
+				tPlayerInfo.szName = tPei.szName
 			end
 		end
+	else
+		local aCard = GetFellowshipCardClient().GetFellowshipCardInfo(dwID)
+		if aCard and aCard.bExist then
+			tPlayerInfo = {
+				dwID = dwID,
+				szName = aCard.szName,
+				nGender = X.IIf(aCard.nRoleType == 2 or aCard.nRoleType == 4 or aCard.nRoleType == 6, 2, 1),
+			}
+		end
 	end
-	return kTarget
+	return tPlayerInfo
 end
 
 -- 后台请求别人的情缘数据
 function D.RequestOtherLover(dwID, nX, nY, fnAutoClose)
-	local kTarget = D.GetPlayerInfo(dwID)
-	if not kTarget then
+	local tPlayerInfo = D.GetPlayerInfo(dwID)
+	if not tPlayerInfo then
 		return
 	end
-	local szName = kTarget.szName
+	local szName = tPlayerInfo.szName
 	if nX == true or X.IsParty(dwID) then
 		if not D.tOtherLover[szName] then
 			D.tOtherLover[szName] = {}
 		end
 		FireUIEvent('MY_LOVE_OTHER_UPDATE', szName)
-		if kTarget.bFightState and not X.IsParty(kTarget.dwID) then
-			FireUIEvent('MY_LOVE_PV_ACTIVE_CHANGE', kTarget.dwID, false)
-			return X.Systopmsg(_L('[%s] is in fighting, no time for you.', kTarget.szName))
+		if tPlayerInfo.bFightState and not X.IsParty(dwID) then
+			FireUIEvent('MY_LOVE_PV_ACTIVE_CHANGE', dwID, false)
+			return X.Systopmsg(_L('[%s] is in fighting, no time for you.', szName))
 		end
 		local me = X.GetClientPlayer()
-		X.SendBgMsg(kTarget.szName, 'MY_LOVE', {'VIEW', X.PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'})
+		X.SendBgMsg(szName, 'MY_LOVE', {'VIEW', X.PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'})
 	else
 		local tMsg = {
 			x = nX, y = nY,
 			szName = 'MY_Love_Confirm',
-			szMessage = _L('[%s] is not in your party, do you want to send a request for accessing data?', kTarget.szName),
+			szMessage = _L('[%s] is not in your party, do you want to send a request for accessing data?', szName),
 			szAlignment = 'CENTER',
 			fnAutoClose = fnAutoClose,
 			{

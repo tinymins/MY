@@ -162,8 +162,7 @@ function D.UpdatePage()
 end
 X.RegisterEvent('MY_LOVE_OTHER_UPDATE', D.UpdatePage)
 
--- 查看别人装备、情缘
-function D.HookPlayerViewPanel()
+function D.GetPlayerViewTargetBaseInfo()
 	local mPage = Station.Lookup('Normal/PlayerView/Page_Main')
 	local txtName = mPage and mPage:Lookup('Page_Battle', 'Text_PlayerName')
 	if not txtName then
@@ -174,10 +173,29 @@ function D.HookPlayerViewPanel()
 	end
 	local szName = txtName:GetText()
 	local dwID = O.tID2Name[szName]
+	local hWnd = Station.Lookup('Normal/PersonalCard_ShowData/Wnd_Card')
+	if hWnd and hWnd.szGlobalID then
+		local tFellowship = X.GetFellowshipInfo(hWnd.szGlobalID)
+		local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
+		if tPei then
+			szName = tPei.szName
+		end
+	end
+	return dwID, szName
+end
+
+-- 查看别人装备、情缘
+function D.HookPlayerViewPanel()
+	local mPage = Station.Lookup('Normal/PlayerView/Page_Main')
+	local dwID, szName = D.GetPlayerViewTargetBaseInfo()
+	if not dwID or not szName then
+		return
+	end
 	-- 常驻时钟监听角色名刷新 防止过快获取错误信息
 	X.BreatheCall('MY_Love__PV__HookPlayerViewPanel', function()
-		if X.IsElement(txtName) then
-			if txtName:GetText() ~= szName then
+		local dwCurrentID, szCurrentName = D.GetPlayerViewTargetBaseInfo()
+		if dwCurrentID and szCurrentName then
+			if dwCurrentID ~= dwID or szCurrentName ~= szName then
 				D.HookPlayerViewPanel()
 			end
 			return
@@ -232,7 +250,7 @@ function D.HookPlayerViewPanel()
 			page:Lookup('Btn_LoveYou').OnLButtonClick = function()
 				local mp = this:GetParent():GetParent()
 				if D.GetOtherLover(mp.szPlayerName) then
-					local tar = D.GetPlayerInfo(mp.szPlayerName)
+					local tar = D.GetPlayerInfo(mp.dwPlayerID)
 					if tar then
 						X.SendChat(tar.szName, MY_Love.szJabber)
 					end
