@@ -549,6 +549,15 @@ function D.UpdateLocalLover()
 		X.DelayCall(1000, function()
 			D.UpdateLocalLover()
 		end)
+	elseif lover and X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+		-- ÇéÔµ°æ±¾Ç¨ÒÆ V1 => V2
+		local xLoverID = X.GetRemoteStorage('MY_Love')
+		if X.IsNumber(xLoverID) and xLoverID ~= 0 then
+			--[[#DEBUG BEGIN]]
+			X.Debug(X.PACKET_INFO.NAME_SPACE, 'MY_Love migrate v1 to v2: ' .. xLoverID .. ' => ' .. X.EncodeLUAData(lover), X.DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
+			D.SaveLover(lover.nLoverTime, lover.xID, lover.nLoverType, lover.nSendItem, lover.nReceiveItem)
+		end
 	end
 	if not lover then
 		lover = NO_LOVER
