@@ -369,7 +369,7 @@ function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
 	if itemInfo and itemInfo.nMaxExistAmount > 0 then
 		local nAmount = X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.PACKAGE, itemData.dwTabType, itemData.dwIndex, itemData.nBookID)
 			+ X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.BANK, itemData.dwTabType, itemData.dwIndex, itemData.nBookID)
-		if nAmount > itemInfo.nMaxExistAmount then
+		if nAmount + itemData.nStackNum > itemInfo.nMaxExistAmount then
 			return false
 		end
 	end
