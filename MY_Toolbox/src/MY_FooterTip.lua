@@ -79,10 +79,10 @@ function D.Apply()
 				return
 			end
 			local tFellowship = X.GetFellowshipInfo(dwID)
-			local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
-			if tPei then
+			local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
+			if tFei then
 				if O.bFriendNav and Navigator_SetID then
-					Navigator_SetID('MY_FRIEND_TIP.' .. dwID, TARGET.PLAYER, dwID, tPei.szName)
+					Navigator_SetID('MY_FRIEND_TIP.' .. dwID, TARGET.PLAYER, dwID, tFei.szName)
 				else
 					local sha = hShaList:Lookup(tostring(dwID))
 					if not sha then
@@ -90,7 +90,7 @@ function D.Apply()
 						sha = hShaList:Lookup(tostring(dwID))
 					end
 					local r, g, b, a = 255,255,255,255
-					local szTip = '>> ' .. tPei.szName .. ' <<'
+					local szTip = '>> ' .. tFei.szName .. ' <<'
 					sha:ClearTriangleFanPoint()
 					sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 					sha:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)

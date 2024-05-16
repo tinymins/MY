@@ -53,8 +53,8 @@ function D.GetLoverMenu(nType)
 		if not tFellowship.bTwoWay then
 			return
 		end
-		local tPei = X.GetPlayerEntryInfo(tFellowship.xID)
-		if not tPei then
+		local tFei = X.GetFellowshipEntryInfo(tFellowship.xID)
+		if not tFei then
 			return
 		end
 		if nType == 0 and tFellowship.nAttraction < MY_Love.nLoveAttraction then
@@ -64,8 +64,8 @@ function D.GetLoverMenu(nType)
 			return
 		end
 		table.insert(m0, {
-			szOption = tPei.szName,
-			fnDisable = function() return not X.IsPlayerOnline(tFellowship.xID) end,
+			szOption = tFei.szName,
+			fnDisable = function() return not X.IsFellowshipOnline(tFellowship.xID) end,
 			fnAction = function()
 				D.SetLover(tFellowship.xID, nType)
 				X.UI.ClosePopupMenu()

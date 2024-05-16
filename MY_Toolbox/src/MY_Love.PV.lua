@@ -176,9 +176,9 @@ function D.GetPlayerViewTargetBaseInfo()
 	local hWnd = Station.Lookup('Normal/PersonalCard_ShowData/Wnd_Card')
 	if hWnd and hWnd.szGlobalID then
 		local tFellowship = X.GetFellowshipInfo(hWnd.szGlobalID)
-		local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
-		if tPei then
-			szName = tPei.szName
+		local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
+		if tFei then
+			szName = tFei.szName
 			dwID = O.tName2ID[szName] or dwID
 		end
 	end
@@ -336,9 +336,9 @@ function D.OnPeekOtherPlayer()
 	end
 	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
 		local szGlobalID = tar.GetGlobalID()
-		local tPei = X.GetPlayerEntryInfo(szGlobalID)
-		if tPei then
-			O.tName2ID[tPei.szName] = dwPlayerID
+		local tFei = X.GetFellowshipEntryInfo(szGlobalID)
+		if tFei then
+			O.tName2ID[tFei.szName] = dwPlayerID
 		end
 		O.tName2ID[tar.szName] = dwPlayerID
 	else

@@ -238,9 +238,9 @@ end
 function R.GetIcon(info, szImage, nFrame)
 	if info.szType == 'A2M' or info.szType == 'M2A' then
 		local tFellowship = X.GetFellowshipInfo(info.szName)
-		local tPei = tFellowship and X.GetPlayerEntryInfo(tFellowship.xID)
-		if tPei then
-			local szAvatarFile, nAvatarFrame, bAnimate = X.GetPlayerAvatar(tPei.dwForceID, tPei.nRoleType, tPei.dwMiniAvatarID)
+		local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
+		if tFei then
+			local szAvatarFile, nAvatarFrame, bAnimate = X.GetPlayerAvatar(tFei.dwForceID, tFei.nRoleType, tFei.dwMiniAvatarID)
 			if szAvatarFile and not bAnimate then
 				szImage, nFrame = szAvatarFile, nAvatarFrame
 			end
