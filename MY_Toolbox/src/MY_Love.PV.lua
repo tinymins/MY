@@ -315,6 +315,13 @@ function D.HookPlayerViewPanel()
 	end
 end
 
+function D.CheckHookPlayerViewPanel()
+	D.HookPlayerViewPanel()
+	X.DelayCall(500, D.HookPlayerViewPanel)
+	X.DelayCall(1000, D.HookPlayerViewPanel)
+	X.DelayCall(2000, D.HookPlayerViewPanel)
+end
+
 function D.OnPeekOtherPlayer()
 	local nResult, dwPlayerID = arg0, arg1
 	if nResult ~= 1 then
@@ -333,16 +340,21 @@ function D.OnPeekOtherPlayer()
 		if tPei then
 			O.tName2ID[tPei.szName] = dwPlayerID
 		end
+		O.tName2ID[tar.szName] = dwPlayerID
 	else
 		O.tName2ID[tar.szName] = dwPlayerID
 	end
-	D.HookPlayerViewPanel()
+	D.CheckHookPlayerViewPanel()
 end
 X.RegisterEvent('PEEK_OTHER_PLAYER', 'MY_Love__PV', D.OnPeekOtherPlayer)
-X.RegisterFrameCreate('PlayerView', 'MY_Love__PV', D.HookPlayerViewPanel)
-X.RegisterFrameCreate('PersonalCard_ShowData', 'MY_Love__PV', D.HookPlayerViewPanel)
+X.RegisterFrameCreate('PlayerView', 'MY_Love__PV', D.CheckHookPlayerViewPanel)
+X.RegisterFrameCreate('PersonalCard_ShowData', 'MY_Love__PV', D.CheckHookPlayerViewPanel)
 
-X.RegisterEvent('LOADING_ENDING', function() O.tName2ID = {} end)
+X.RegisterEvent('PLAYER_LEAVE_SCENE', function()
+	if arg0 == UI_GetClientPlayerID() then
+		O.tName2ID = {}
+	end
+end)
 
 function D.OnActiveLoveChange()
 	O.tActiveLove[arg0] = arg1 and true or nil
@@ -350,7 +362,7 @@ end
 X.RegisterEvent('MY_LOVE_PV_ACTIVE_CHANGE', D.OnActiveLoveChange)
 
 function D.OnPVHookChange()
-	D.HookPlayerViewPanel()
+	D.CheckHookPlayerViewPanel()
 end
 X.RegisterEvent('MY_LOVE_PV_HOOK', D.OnPVHookChange)
 
