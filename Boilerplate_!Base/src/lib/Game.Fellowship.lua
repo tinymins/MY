@@ -105,7 +105,7 @@ function X.GetFellowshipInfo(xPlayerID)
 						if tFellowship.szName then
 							FELLOWSHIP_CACHE[tFellowship.szName] = tFellowship
 						else
-							local tPei = X.GetPlayerEntryInfo(tFellowship.xID)
+							local tPei = X.GetFellowshipEntryInfo(tFellowship.xID)
 							if tPei then
 								FELLOWSHIP_CACHE[tPei.dwID] = tFellowship
 								FELLOWSHIP_CACHE[tPei.szName] = tFellowship
@@ -208,6 +208,69 @@ function X.GetFellowshipMapID(xPlayerID)
 	end
 end
 
+---获取玩家基本信息
+---@param xPlayerID number @要获取的玩家唯一ID（缘起为 dwID）
+---@return table @玩家的基本信息
+function X.GetFellowshipEntryInfo(xPlayerID)
+	local me = X.GetClientPlayer()
+	local smc = X.GetSocialManagerClient()
+	if smc then
+		local tPei = smc.GetRoleEntryInfo(xPlayerID)
+		if tPei then
+			tPei = {
+				dwID = tPei.dwPlayerID,
+				szName = tPei.szName,
+				nLevel = tPei.nLevel,
+				nRoleType = tPei.nRoleType,
+				dwForceID = tPei.nForceID,
+				nCamp = tPei.nCamp,
+				szSignature = tPei.szSignature,
+				bOnline = tPei.bOnline,
+				dwMiniAvatarID = tPei.dwMiniAvatarID,
+				nSkinID = tPei.nSkinID,
+				dwServerID = tPei.dwCenterID,
+			}
+			local szServerName = X.GetServerNameByID(tPei.dwServerID)
+			if szServerName and (szServerName ~= X.GetServerOriginName() or IsRemotePlayer(me.dwID)) then
+				tPei.szName = tPei.szName .. g_tStrings.STR_CONNECT .. szServerName
+			end
+		end
+		return tPei
+	end
+	local info = X.GetFellowshipInfo(xPlayerID)
+	local fcc = X.GetFellowshipCardClient()
+	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
+	if card then
+		return {
+			dwID = info.id,
+			szName = card.szName,
+			nLevel = card.nLevel,
+			nRoleType = card.nRoleType,
+			dwForceID = card.dwForceID,
+			nCamp = card.nCamp,
+			szSignature = card.szSignature,
+			bOnline = info.isonline,
+			dwMiniAvatarID = card.dwMiniAvatarID,
+			nSkinID = card.dwSkinID,
+			dwServerID = 0,
+		}
+	end
+end
+
+---获取玩家是否在线
+---@param xPlayerID number @要获取的玩家唯一ID（缘起为 dwID）
+---@return boolean @玩家是否在线
+function X.IsFellowshipOnline(xPlayerID)
+	local smc = X.GetSocialManagerClient()
+	if smc then
+		return smc.IsRoleOnline(xPlayerID)
+	end
+	local tPei = X.GetFellowshipEntryInfo(xPlayerID)
+	if tPei then
+		return tPei.bOnline
+	end
+end
+
 --------------------------------------------------------------------------------
 -- 仇人相关接口
 --------------------------------------------------------------------------------
@@ -234,7 +297,7 @@ local function GeneFoeCache()
 				if p.name then
 					FOE_CACHE[p.name] = p
 				else
-					local tPei = X.GetPlayerEntryInfo(p.id)
+					local tPei = X.GetFellowshipEntryInfo(p.id)
 					if tPei then
 						FOE_CACHE[tPei.dwID] = p
 						FOE_CACHE[tPei.szName] = p
