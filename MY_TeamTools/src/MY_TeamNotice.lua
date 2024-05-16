@@ -291,6 +291,9 @@ function TI.CreateFrame(szInitYY, szInitNote)
 end
 
 function TI.OpenFrame()
+	if MY_TeamNoticeOfficial.bEnable then
+		return MY_TeamNoticeOfficial.OpenFrame()
+	end
 	if X.IsInZombieMap() then
 		return X.Topmsg(_L['TeamNotice is disabled in this map.'])
 	end
@@ -315,7 +318,7 @@ X.RegisterEvent('PARTY_LEVEL_UP_RAID', 'TEAM_NOTICE', function()
 	if X.IsLeader() then
 		X.Confirm(_L['Edit team info?'], function()
 			O.bEnable = true
-			TI.CreateFrame()
+			TI.OpenFrame()
 		end)
 	end
 end)
