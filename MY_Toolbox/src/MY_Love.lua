@@ -975,179 +975,180 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if MY_Love.IsShielded() then
 		return
 	end
-	if not bSelf then
-		if not X.CanUseOnlineRemoteStorage() then
-			X.SendBgMsg(szTalkerName, 'MY_LOVE', {'DATA_NOT_SYNC'})
+	if bSelf then
+		return
+	end
+	if not X.CanUseOnlineRemoteStorage() then
+		X.SendBgMsg(szTalkerName, 'MY_LOVE', {'DATA_NOT_SYNC'})
+		return
+	end
+	local kTarget = D.GetNearbyPlayerByName(szTalkerName)
+	local tFellowship = X.GetFellowshipInfo(dwTalkerID) or X.GetFellowshipInfo(szTalkerName)
+	local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
+	local szKey, data = aData[1], aData[2]
+	if szKey == 'VIEW' then
+		if X.IsParty(dwTalkerID) or data == 'Author' or O.bAutoReplyLover then
+			D.tViewer[dwTalkerID] = szTalkerName
+			D.ReplyLove()
+		elseif not X.GetClientPlayer().bFightState and not O.bQuiet then
+			D.tViewer[dwTalkerID] = szTalkerName
+			X.Confirm(
+				_L('[%s] want to see your lover info, OK?', szTalkerName),
+				function() D.ReplyLove() end,
+				function() D.ReplyLove(true) end
+			)
+		end
+	elseif szKey == 'LOVE0' or szKey == 'REMOVE0' then
+		local i = X.Random(1, math.floor(table.getn(D.aAutoSay)/2)) * 2
+		if szKey == 'LOVE0' then
+			i = i - 1
+		end
+		OutputMessage('MSG_WHISPER', _L['[Mystery] quietly said:'] .. D.aAutoSay[i] .. '\n')
+		PlaySound(SOUND.UI_SOUND,g_sound.Whisper)
+	elseif szKey == 'LOVE_ASK' then
+		if not tFellowship or not kTarget then
 			return
 		end
-		local kTarget = D.GetNearbyPlayerByName(szTalkerName)
-		local tFellowship = X.GetFellowshipInfo(dwTalkerID) or X.GetFellowshipInfo(szTalkerName)
-		local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
-		local szKey, data = aData[1], aData[2]
-		if szKey == 'VIEW' then
-			if X.IsParty(dwTalkerID) or data == 'Author' or O.bAutoReplyLover then
-				D.tViewer[dwTalkerID] = szTalkerName
-				D.ReplyLove()
-			elseif not X.GetClientPlayer().bFightState and not O.bQuiet then
-				D.tViewer[dwTalkerID] = szTalkerName
-				X.Confirm(
-					_L('[%s] want to see your lover info, OK?', szTalkerName),
-					function() D.ReplyLove() end,
-					function() D.ReplyLove(true) end
-				)
-			end
-		elseif szKey == 'LOVE0' or szKey == 'REMOVE0' then
-			local i = X.Random(1, math.floor(table.getn(D.aAutoSay)/2)) * 2
-			if szKey == 'LOVE0' then
-				i = i - 1
-			end
-			OutputMessage('MSG_WHISPER', _L['[Mystery] quietly said:'] .. D.aAutoSay[i] .. '\n')
-			PlaySound(SOUND.UI_SOUND,g_sound.Whisper)
-		elseif szKey == 'LOVE_ASK' then
-			if not tFellowship or not kTarget then
-				return
-			end
-			if D.lover.xID == tFellowship.xID and D.lover.nLoverType == 1 then
-				-- 已是情缘发起修复
-				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'FIX2', {
-					D.lover.nLoverTime,
-					D.lover.nSendItem,
-					D.lover.nReceiveItem,
-				}})
-			elseif D.lover.xID ~= 0 and D.lover.xID ~= '0' and (D.lover.xID ~= tFellowship.xID or D.lover.nLoverType == 1) then
-				-- 已有情缘直接拒绝
-				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_EXISTS'})
-			else
-				-- 询问意见
-				X.Confirm(_L('[%s] want to mutual love with you, OK?', szTalkerName), function()
-					X.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_YES'})
-				end, function()
-					X.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_NO'})
-				end)
-			end
-		elseif szKey == 'FIX1' or szKey == 'FIX2' then
-			if not tFellowship or not kTarget then
-				return
-			end
-			if D.lover.xID == 0 or D.lover.xID == '0' or (D.lover.xID == tFellowship.xID and D.lover.nLoverType ~= 1) then
-				if tFellowship then
-					local szText = szKey == 'FIX1'
-						and _L('[%s] want to repair love relation with you, OK?', szTalkerName)
-						or _L('[%s] is already your lover, fix it now?', szTalkerName)
-					X.Confirm(szText, function()
-						if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-							X.Systopmsg(_L['Fix lover is a sensitive action, please unlock to continue.'])
-							return false
-						end
-						X.UI.CloseFrame('MY_Love_SetLover')
-						D.SaveLover(tonumber(data[1]), tFellowship.xID, 1, data[3], data[2])
-						X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
-						X.Systopmsg(_L('Congratulations, love relation with [%s] has been fixed!', szTalkerName))
-					end)
-				end
-			elseif szKey == 'FIX1' then
-				if D.lover.xID == tFellowship.xID then
-					X.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_ALREADY'})
-				else
-					X.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_EXISTS'})
-				end
-			end
-		elseif szKey == 'LOVE_ANS_EXISTS' then
-			local szMsg = _L['Unfortunately the other has lover, but you can still blind love him!']
-			X.Sysmsg(szMsg)
-			X.Alert(szMsg)
-		elseif szKey == 'LOVE_ANS_ALREADY' then
-			local szMsg = _L['The other is already your lover!']
-			X.Sysmsg(szMsg)
-			X.Alert(szMsg)
-		elseif szKey == 'LOVE_ANS_NO' then
-			local szMsg = _L['The other refused you without reason, but you can still blind love him!']
-			X.Sysmsg(szMsg)
-			X.Alert(szMsg)
-		elseif szKey == 'LOVE_ANS_YES' then
-			local nItem = D.nPendingItem
-			local aUIID = nItem and D.tLoverItem[nItem] and D.tLoverItem[nItem].aUIID
-			if X.IsEmpty(aUIID) then
-				return
-			end
-			if not tFellowship or not tFei then
-				return
-			end
-			D.UseDoubleLoveItem(tFellowship, aUIID, function(bSuccess)
-				if bSuccess then
-					D.SaveLover(GetCurrentTime(), tFellowship.xID, 1, nItem, 0)
-					X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
-					X.SendBgMsg(tFei.szName, 'MY_LOVE', {'LOVE_ANS_CONF', nItem})
-					X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', tFei.szName))
-					X.UI.CloseFrame('MY_Love_SetLover')
-				else
-					X.Systopmsg(_L['Failed to attach love, light firework failed.'])
-				end
+		if D.lover.xID == tFellowship.xID and D.lover.nLoverType == 1 then
+			-- 已是情缘发起修复
+			X.SendBgMsg(szTalkerName, 'MY_LOVE', {'FIX2', {
+				D.lover.nLoverTime,
+				D.lover.nSendItem,
+				D.lover.nReceiveItem,
+			}})
+		elseif D.lover.xID ~= 0 and D.lover.xID ~= '0' and (D.lover.xID ~= tFellowship.xID or D.lover.nLoverType == 1) then
+			-- 已有情缘直接拒绝
+			X.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_EXISTS'})
+		else
+			-- 询问意见
+			X.Confirm(_L('[%s] want to mutual love with you, OK?', szTalkerName), function()
+				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_YES'})
+			end, function()
+				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_NO'})
 			end)
-		elseif szKey == 'LOVE_ANS_CONF' then
-			if tFei then
-				D.SaveLover(GetCurrentTime(), tFellowship.xID, 1, 0, data)
-				X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
-				X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', tFei.szName))
-			end
-		elseif szKey == 'LOVE_FIREWORK' then
-			if tFellowship and D.lover.xID == tFellowship.xID then
-				D.SaveLover(D.lover.nLoverTime, tFellowship.xID, D.lover.nLoverType, D.lover.nSendItem, data)
-			end
-		elseif szKey == 'REPLY' then
-			D.tOtherLover[szTalkerName] = {
-				xID = data[1] or 0,
-				szName = data[2] or '',
-				dwAvatar = tonumber(data[3]) or 0,
-				szSign = data[4] or '',
-				dwForceID = tonumber(data[5]),
-				nRoleType = tonumber(data[6]) or 1,
-				nLoverType = tonumber(data[7]) or 0,
-				nLoverTime = tonumber(data[8]) or 0,
-				szLoverTitle = data[9] or '',
-			}
-			FireUIEvent('MY_LOVE_OTHER_UPDATE', szTalkerName)
-		elseif szKey == 'BACKUP' then
-			if not tFellowship then
-				return
-			end
-			if D.lover.xID == tFellowship.xID then
-				X.Confirm(_L('[%s] want to backup lover relation with you, do you agree?', szTalkerName), function()
-					if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-						X.Systopmsg(_L['Backup lover is a sensitive action, please unlock to continue.'])
-						return false
-					end
-					X.SendBgMsg(szTalkerName, 'MY_LOVE', {'BACKUP_ANS', X.GetClientPlayerGlobalID()})
-				end)
-			else
-				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'BACKUP_ANS_NOT_LOVER'})
-			end
-		elseif szKey == 'BACKUP_ANS' then
-			D.BackupLover(szTalkerName, data)
-		elseif szKey == 'BACKUP_ANS_NOT_LOVER' then
-			X.Alert(_L['Peer is not your lover, please check, or do fix lover first.'])
-		elseif szKey == 'RESTORE' then
-			if data.szLoverUUID == X.GetClientPlayerGlobalID() then
-				X.Confirm(_L('[%s] want to restore lover relation with you, do you agree?', szTalkerName), function()
-					if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-						X.Systopmsg(_L['Restore lover is a sensitive action, please unlock to continue.'])
-						return false
-					end
-					X.SendBgMsg(szTalkerName, 'MY_LOVE', {'RESTORE_AGREE', data})
-				end)
-			else
-				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'RESTORE_NOT_ME', data})
-			end
-		elseif szKey == 'RESTORE_AGREE' then
-			if X.GetClientPlayerGlobalID() == data.szUUID and not X.Schema.CheckSchema(data, BACKUP_DATA_SCHEMA) and tFellowship then
-				D.SaveLover(data.nLoverTime, tFellowship.xID, data.nLoverType, data.nSendItem, data.nReceiveItem)
-				X.Alert(_L['Restore lover succeed!'])
-			end
-		elseif szKey == 'RESTORE_NOT_ME' then
-			X.Alert(_L['Peer is not your lover in this backup, please check.'])
-		elseif szKey == 'DATA_NOT_SYNC' then
-			X.Alert(_L('[%s] disabled ui config sync, unable to read data.', szTalkerName))
 		end
+	elseif szKey == 'FIX1' or szKey == 'FIX2' then
+		if not tFellowship or not kTarget then
+			return
+		end
+		if D.lover.xID == 0 or D.lover.xID == '0' or (D.lover.xID == tFellowship.xID and D.lover.nLoverType ~= 1) then
+			if tFellowship then
+				local szText = szKey == 'FIX1'
+					and _L('[%s] want to repair love relation with you, OK?', szTalkerName)
+					or _L('[%s] is already your lover, fix it now?', szTalkerName)
+				X.Confirm(szText, function()
+					if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+						X.Systopmsg(_L['Fix lover is a sensitive action, please unlock to continue.'])
+						return false
+					end
+					X.UI.CloseFrame('MY_Love_SetLover')
+					D.SaveLover(tonumber(data[1]), tFellowship.xID, 1, data[3], data[2])
+					X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
+					X.Systopmsg(_L('Congratulations, love relation with [%s] has been fixed!', szTalkerName))
+				end)
+			end
+		elseif szKey == 'FIX1' then
+			if D.lover.xID == tFellowship.xID then
+				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_ALREADY'})
+			else
+				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'LOVE_ANS_EXISTS'})
+			end
+		end
+	elseif szKey == 'LOVE_ANS_EXISTS' then
+		local szMsg = _L['Unfortunately the other has lover, but you can still blind love him!']
+		X.Sysmsg(szMsg)
+		X.Alert(szMsg)
+	elseif szKey == 'LOVE_ANS_ALREADY' then
+		local szMsg = _L['The other is already your lover!']
+		X.Sysmsg(szMsg)
+		X.Alert(szMsg)
+	elseif szKey == 'LOVE_ANS_NO' then
+		local szMsg = _L['The other refused you without reason, but you can still blind love him!']
+		X.Sysmsg(szMsg)
+		X.Alert(szMsg)
+	elseif szKey == 'LOVE_ANS_YES' then
+		local nItem = D.nPendingItem
+		local aUIID = nItem and D.tLoverItem[nItem] and D.tLoverItem[nItem].aUIID
+		if X.IsEmpty(aUIID) then
+			return
+		end
+		if not tFellowship or not tFei then
+			return
+		end
+		D.UseDoubleLoveItem(tFellowship, aUIID, function(bSuccess)
+			if bSuccess then
+				D.SaveLover(GetCurrentTime(), tFellowship.xID, 1, nItem, 0)
+				X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
+				X.SendBgMsg(tFei.szName, 'MY_LOVE', {'LOVE_ANS_CONF', nItem})
+				X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', tFei.szName))
+				X.UI.CloseFrame('MY_Love_SetLover')
+			else
+				X.Systopmsg(_L['Failed to attach love, light firework failed.'])
+			end
+		end)
+	elseif szKey == 'LOVE_ANS_CONF' then
+		if tFei then
+			D.SaveLover(GetCurrentTime(), tFellowship.xID, 1, 0, data)
+			X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
+			X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', tFei.szName))
+		end
+	elseif szKey == 'LOVE_FIREWORK' then
+		if tFellowship and D.lover.xID == tFellowship.xID then
+			D.SaveLover(D.lover.nLoverTime, tFellowship.xID, D.lover.nLoverType, D.lover.nSendItem, data)
+		end
+	elseif szKey == 'REPLY' then
+		D.tOtherLover[szTalkerName] = {
+			xID = data[1] or 0,
+			szName = data[2] or '',
+			dwAvatar = tonumber(data[3]) or 0,
+			szSign = data[4] or '',
+			dwForceID = tonumber(data[5]),
+			nRoleType = tonumber(data[6]) or 1,
+			nLoverType = tonumber(data[7]) or 0,
+			nLoverTime = tonumber(data[8]) or 0,
+			szLoverTitle = data[9] or '',
+		}
+		FireUIEvent('MY_LOVE_OTHER_UPDATE', szTalkerName)
+	elseif szKey == 'BACKUP' then
+		if not tFellowship then
+			return
+		end
+		if D.lover.xID == tFellowship.xID then
+			X.Confirm(_L('[%s] want to backup lover relation with you, do you agree?', szTalkerName), function()
+				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+					X.Systopmsg(_L['Backup lover is a sensitive action, please unlock to continue.'])
+					return false
+				end
+				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'BACKUP_ANS', X.GetClientPlayerGlobalID()})
+			end)
+		else
+			X.SendBgMsg(szTalkerName, 'MY_LOVE', {'BACKUP_ANS_NOT_LOVER'})
+		end
+	elseif szKey == 'BACKUP_ANS' then
+		D.BackupLover(szTalkerName, data)
+	elseif szKey == 'BACKUP_ANS_NOT_LOVER' then
+		X.Alert(_L['Peer is not your lover, please check, or do fix lover first.'])
+	elseif szKey == 'RESTORE' then
+		if data.szLoverUUID == X.GetClientPlayerGlobalID() then
+			X.Confirm(_L('[%s] want to restore lover relation with you, do you agree?', szTalkerName), function()
+				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+					X.Systopmsg(_L['Restore lover is a sensitive action, please unlock to continue.'])
+					return false
+				end
+				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'RESTORE_AGREE', data})
+			end)
+		else
+			X.SendBgMsg(szTalkerName, 'MY_LOVE', {'RESTORE_NOT_ME', data})
+		end
+	elseif szKey == 'RESTORE_AGREE' then
+		if X.GetClientPlayerGlobalID() == data.szUUID and not X.Schema.CheckSchema(data, BACKUP_DATA_SCHEMA) and tFellowship then
+			D.SaveLover(data.nLoverTime, tFellowship.xID, data.nLoverType, data.nSendItem, data.nReceiveItem)
+			X.Alert(_L['Restore lover succeed!'])
+		end
+	elseif szKey == 'RESTORE_NOT_ME' then
+		X.Alert(_L['Peer is not your lover in this backup, please check.'])
+	elseif szKey == 'DATA_NOT_SYNC' then
+		X.Alert(_L('[%s] disabled ui config sync, unable to read data.', szTalkerName))
 	end
 end
 X.RegisterBgMsg('MY_LOVE', OnBgTalk)
