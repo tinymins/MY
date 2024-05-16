@@ -1255,6 +1255,8 @@ local settings = {
 				'nDoubleLoveAttraction',
 				'nMinBreakLoveTime',
 				'IsShielded',
+				'GetNearbyPlayerByName',
+				'GetNearbyPlayerByXID',
 				'GetLover',
 				'SetLover',
 				'FixLover',

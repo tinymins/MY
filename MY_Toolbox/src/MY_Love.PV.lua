@@ -175,6 +175,11 @@ function D.GetPlayerViewTargetBaseInfo()
 	local dwID = O.tName2ID[szName]
 	local hWnd = Station.Lookup('Normal/PersonalCard_ShowData/Wnd_Card')
 	if hWnd and hWnd.szGlobalID then
+		local kTarget = MY_Love.GetNearbyPlayerByXID(hWnd.szGlobalID)
+		if kTarget then
+			szName = kTarget.szName
+			dwID = O.tName2ID[szName] or dwID
+		end
 		local tFellowship = X.GetFellowshipInfo(hWnd.szGlobalID)
 		local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
 		if tFei then
@@ -339,8 +344,9 @@ function D.OnPeekOtherPlayer()
 		local tFei = X.GetFellowshipEntryInfo(szGlobalID)
 		if tFei then
 			O.tName2ID[tFei.szName] = dwPlayerID
+		else
+			O.tName2ID[tar.szName] = dwPlayerID
 		end
-		O.tName2ID[tar.szName] = dwPlayerID
 	else
 		O.tName2ID[tar.szName] = dwPlayerID
 	end
