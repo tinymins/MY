@@ -368,10 +368,10 @@ end
 
 -- 获取同步范围内指定 xID 的角色对象
 function D.GetNearbyPlayerByXID(xID)
-	local tFellowship = X.GetFellowshipInfo(xID)
-	local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
-	if tFei then
-		return D.GetNearbyPlayerByName(tFei.szName)
+	for _, p in ipairs(X.GetNearPlayer()) do
+		if p.dwID == xID or X.GetPlayerGlobalID(p.dwID) == xID then
+			return p
+		end
 	end
 end
 
