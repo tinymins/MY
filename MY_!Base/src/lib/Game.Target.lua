@@ -1301,42 +1301,53 @@ end
 
 do
 local REQUEST_TIME = {}
-local PLAYER_GUID = {}
-local function RequestTeammateGUID()
+local PLAYER_GLOBAL_ID = {}
+local function RequestTeammateGlobalID()
 	local me = X.GetClientPlayer()
 	local team = GetClientTeam()
 	if not me or IsRemotePlayer(me.dwID) or not team or not me.IsInParty() then
 		return
 	end
 	local nTime = GetTime()
-	local aRequestGUID = {}
+	local aRequestGlobalID = {}
 	for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 		local info = team.GetMemberInfo(dwTarID)
-		if not PLAYER_GUID[dwTarID]
+		if not PLAYER_GLOBAL_ID[dwTarID]
 		and (info and info.bIsOnLine)
 		and (not REQUEST_TIME[dwTarID] or nTime - REQUEST_TIME[dwTarID] > 2000) then
-			table.insert(aRequestGUID, dwTarID)
+			table.insert(aRequestGlobalID, dwTarID)
 			REQUEST_TIME[dwTarID] = nTime
 		end
 	end
-	if not X.IsEmpty(aRequestGUID) then
-		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_GLOBAL_ID_REQUEST'), {aRequestGUID}, true)
+	if not X.IsEmpty(aRequestGlobalID) then
+		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_GLOBAL_ID_REQUEST'), {aRequestGlobalID}, true)
 	end
 end
-X.RegisterEvent('LOADING_END', RequestTeammateGUID)
-X.RegisterEvent('PARTY_UPDATE_BASE_INFO', RequestTeammateGUID)
-X.RegisterEvent('PARTY_LEVEL_UP_RAID', RequestTeammateGUID)
-X.RegisterEvent('PARTY_ADD_MEMBER', RequestTeammateGUID)
-X.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', RequestTeammateGUID)
+X.RegisterEvent('LOADING_END', RequestTeammateGlobalID)
+X.RegisterEvent('PARTY_UPDATE_BASE_INFO', RequestTeammateGlobalID)
+X.RegisterEvent('PARTY_LEVEL_UP_RAID', RequestTeammateGlobalID)
+X.RegisterEvent('PARTY_ADD_MEMBER', RequestTeammateGlobalID)
+X.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', RequestTeammateGlobalID)
 X.RegisterBgMsg(X.NSFormatString('{$NS}_GLOBAL_ID'), function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
-	PLAYER_GUID[dwTalkerID] = data
+	PLAYER_GLOBAL_ID[dwTalkerID] = data
 end)
 -- 获取唯一标识符
 function X.GetPlayerGlobalID(dwID)
 	if dwID == X.GetClientPlayerID() then
 		return X.GetClientPlayerGlobalID()
 	end
-	return PLAYER_GUID[dwID]
+	local szGlobalID = PLAYER_GLOBAL_ID[dwID]
+	if not szGlobalID then
+		local kTarget = X.GetPlayer(dwID)
+		if kTarget then
+			szGlobalID = kTarget.GetGlobalID()
+		end
+		if szGlobalID == '0' then
+			szGlobalID = nil
+		end
+		PLAYER_GLOBAL_ID[dwID] = szGlobalID
+	end
+	return szGlobalID
 end
 end
 
