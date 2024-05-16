@@ -207,7 +207,7 @@ function D.HookPlayerViewPanel()
 	-- attach page
 	if bHook then
 		if not mPage.bMYLoved then
-			local frame = X.UI.OpenFrame(PLUGIN_ROOT .. '\\ui\\MY_Love.ini', 'MY_Love')
+			local frame = X.UI.OpenFrame(PLUGIN_ROOT .. '\\ui\\MY_Love.ini', 'MY_Love_TempFrame')
 			local pageset = frame:Lookup('Page_Main')
 			local checkbox = pageset:Lookup('CheckBox_Love')
 			local page = pageset:Lookup('Page_Love')
