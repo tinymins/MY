@@ -933,10 +933,10 @@ end
 -- 回复情缘信息
 function D.ReplyLove(bCancel)
 	local szName, szNameSuffix = D.lover.szName, ''
-	if D.lover.xID == 0 or D.lover.xID == '0' then
-		szName = '<' .. O.szNone .. '>'
-	elseif bCancel then
+	if bCancel then
 		szName = _L['<Not tell you>']
+	elseif D.lover.xID == 0 or D.lover.xID == '0' then
+		szName = '<' .. O.szNone .. '>'
 	else
 		if not X.StringFindW(szName, g_tStrings.STR_CONNECT) then
 			local tFellowship = X.GetFellowshipInfo(D.lover.xID)
