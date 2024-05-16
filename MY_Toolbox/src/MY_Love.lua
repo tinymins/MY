@@ -938,6 +938,7 @@ function D.ReplyLove(bCancel)
 	elseif D.lover.xID == 0 or D.lover.xID == '0' then
 		szName = '<' .. O.szNone .. '>'
 	else
+		-- 计算情缘名字后的服务器后缀
 		if not X.StringFindW(szName, g_tStrings.STR_CONNECT) then
 			local tFellowship = X.GetFellowshipInfo(D.lover.xID)
 			local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
@@ -949,6 +950,7 @@ function D.ReplyLove(bCancel)
 	end
 	for dwTalkerID, szTalkerName in pairs(D.tViewer) do
 		local szLoverName = szName
+		-- 如果请求来源是跨服，则回复名字也携带跨服后缀
 		if X.StringFindW(szTalkerName, g_tStrings.STR_CONNECT) then
 			szLoverName = szLoverName .. szNameSuffix
 		end
