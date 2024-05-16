@@ -802,11 +802,15 @@ function D.RequestOtherLover(dwID, nX, nY, fnAutoClose)
 		if not D.tOtherLover[szName] then
 			D.tOtherLover[szName] = {}
 		end
-		FireUIEvent('MY_LOVE_OTHER_UPDATE', szName)
 		if tPlayerInfo.bFightState and not X.IsParty(dwID) then
+			FireUIEvent('MY_LOVE_OTHER_UPDATE', szName)
 			FireUIEvent('MY_LOVE_PV_ACTIVE_CHANGE', dwID, false)
 			return X.Systopmsg(_L('[%s] is in fighting, no time for you.', szName))
 		end
+		-- 先清除缓存
+		D.tOtherLover[szName] = {}
+		FireUIEvent('MY_LOVE_OTHER_UPDATE', szName)
+		-- 再刷新
 		local me = X.GetClientPlayer()
 		X.SendBgMsg(szName, 'MY_LOVE', {'VIEW', X.PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'})
 	else
