@@ -1491,6 +1491,19 @@ function X.IsSelf(dwSrcID, dwTarID)
 	return dwSrcID ~= 0 and dwSrcID == dwTarID and X.IsPlayer(dwSrcID) and X.IsPlayer(dwTarID)
 end
 
+function X.IsAuthor(dwID, szName)
+	local kTarget = X.GetPlayer(dwID)
+	if kTarget then
+		if X.PACKET_INFO.AUTHOR_GLOBAL_IDS[kTarget.GetGlobalID()] then
+			return true
+		end
+		if not szName then
+			szName = kTarget.szName
+		end
+	end
+	return X.PACKET_INFO.AUTHOR_ROLES[dwID] == szName
+end
+
 --------------------------------------------------------------------------------
 -- 目标获取相关接口
 --------------------------------------------------------------------------------
