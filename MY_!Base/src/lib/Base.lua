@@ -221,6 +221,8 @@ X.PACKET_INFO.AUTHOR_ROLES          = {
 	[     143] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 神都洛阳@缘起一区
 	[    1259] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 天宝盛世@缘起一区
 }
+X.PACKET_INFO.AUTHOR_GLOBAL_IDS     = {
+}
 X.PACKET_INFO.AUTHOR_PROTECT_NAMES  = {
 	[string.char(0xDC, 0xF8, 0xD2, 0xC1)] = true, -- 简体
 	[string.char(0xDC, 0xF8, 0xD2, 0xC1, 0xD2, 0xC1)] = true, -- 简体
