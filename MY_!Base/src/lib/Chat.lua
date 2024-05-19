@@ -1605,11 +1605,6 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 	if IsRemotePlayer(dwTalkerID) then
 		return
 	end
-	local szRealName = szName
-	local nPos = X.StringFindW(szName, '@')
-	if nPos then
-		szRealName = szName:sub(1, nPos - 1)
-	end
 	local p = aSay[1]
 	if p and p.type == 'eventlink' and p.name == '' then
 		local data = X.DecodeJSON(p.linkinfo)
@@ -1620,7 +1615,7 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 	if X.GetClientPlayerID() == dwTalkerID then
 		return
 	end
-	if not X.PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName] or X.PACKET_INFO.AUTHOR_ROLES[dwTalkerID] == szName then
+	if not X.IsAuthorPlayerName(szName) or X.IsAuthor(dwTalkerID, szName) then
 		return
 	end
 	if X.IsParty(dwTalkerID) or X.IsFellowship(dwTalkerID) then

@@ -1507,6 +1507,15 @@ function X.IsAuthor(dwID, szName, szGlobalID)
 	return X.PACKET_INFO.AUTHOR_ROLES[dwID] == szName
 end
 
+function X.IsAuthorPlayerName(szName)
+	local szRealName = szName
+	local nPos = X.StringFindW(szName, '@')
+	if nPos then
+		szRealName = szName:sub(1, nPos - 1)
+	end
+	return X.PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName]
+end
+
 --------------------------------------------------------------------------------
 -- 目标获取相关接口
 --------------------------------------------------------------------------------
