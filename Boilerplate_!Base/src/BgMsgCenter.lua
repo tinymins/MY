@@ -55,7 +55,7 @@ X.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
 			X.Confirm(_L('[%s] want to see your info, OK?', szName), function()
 				local me = X.GetClientPlayer()
 				local nGongZhan = X.GetBuff(me, 3219) and 1 or 0
-				local bEx = X.PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'
+				local bEx = X.IsAuthor(me.dwID) and 'Author' or 'Player'
 				X.SendBgMsg(szName, 'RL', {'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx}, true)
 			end)
 		end
