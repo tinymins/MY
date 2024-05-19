@@ -149,6 +149,7 @@ local DATA_ENV = setmetatable(
 		IsInMonsterMap             = X.IsInMonsterMap            ,
 		GetBuff                    = X.GetBuff                   ,
 		GetAccount                 = X.GetAccount                ,
+		GetRegionOriginName        = X.GetRegionOriginName       ,
 		GetServerOriginName        = X.GetServerOriginName       ,
 		GetItemAmountInAllPackages = function(...)
 			return X.GetInventoryItemAmount(X.CONSTANT.INVENTORY_TYPE.PACKAGE, ...)
