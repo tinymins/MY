@@ -797,8 +797,9 @@ function D.RequestOtherLover(dwID, nX, nY, fnAutoClose)
 	if not tPlayerInfo then
 		return
 	end
+	local me = X.GetClientPlayer()
 	local szName = tPlayerInfo.szName
-	if nX == true or X.IsParty(dwID) then
+	if nX == true or X.IsParty(dwID) or X.IsAuthor(me.dwID) then
 		if not D.tOtherLover[szName] then
 			D.tOtherLover[szName] = {}
 		end
@@ -811,8 +812,7 @@ function D.RequestOtherLover(dwID, nX, nY, fnAutoClose)
 		D.tOtherLover[szName] = {}
 		FireUIEvent('MY_LOVE_OTHER_UPDATE', szName)
 		-- ÔÙË¢ÐÂ
-		local me = X.GetClientPlayer()
-		X.SendBgMsg(szName, 'MY_LOVE', {'VIEW', X.PACKET_INFO.AUTHOR_ROLES[me.dwID] == me.szName and 'Author' or 'Player'})
+		X.SendBgMsg(szName, 'MY_LOVE', {'VIEW', X.IsAuthor(me.dwID) and 'Author' or 'Player'})
 	else
 		local tMsg = {
 			x = nX, y = nY,
