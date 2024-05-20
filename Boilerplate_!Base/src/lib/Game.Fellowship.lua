@@ -93,30 +93,38 @@ X.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFellowshipUpdate)
 ---@param xPlayerID number | string @要获取的玩家名称或ID
 ---@return table @匹配的玩家信息
 function X.GetFellowshipInfo(xPlayerID)
+	local tFellowship = FELLOWSHIP_CACHE and FELLOWSHIP_CACHE[xPlayerID]
 	if not FELLOWSHIP_CACHE then
 		local me = X.GetClientPlayer()
 		if me then
 			local aGroupInfo = X.GetFellowshipGroupInfoList()
 			if aGroupInfo then
-				FELLOWSHIP_CACHE = {}
+				local tCache = {}
+				local bSyncing = false
 				for _, tGroup in ipairs(aGroupInfo) do
 					for _, tFellowship in ipairs(X.GetFellowshipInfoList(tGroup.nID) or {}) do
-						FELLOWSHIP_CACHE[tFellowship.xID] = tFellowship
+						tCache[tFellowship.xID] = tFellowship
 						if tFellowship.szName then
-							FELLOWSHIP_CACHE[tFellowship.szName] = tFellowship
+							tCache[tFellowship.szName] = tFellowship
 						else
 							local tPei = X.GetFellowshipEntryInfo(tFellowship.xID)
 							if tPei then
-								FELLOWSHIP_CACHE[tPei.dwID] = tFellowship
-								FELLOWSHIP_CACHE[tPei.szName] = tFellowship
+								tCache[tPei.dwID] = tFellowship
+								tCache[tPei.szName] = tFellowship
+							else
+								bSyncing = true
 							end
 						end
 					end
 				end
+				if not bSyncing then
+					FELLOWSHIP_CACHE = tCache
+				end
+				tFellowship = tCache[xPlayerID]
 			end
 		end
 	end
-	return FELLOWSHIP_CACHE and X.Clone(FELLOWSHIP_CACHE[xPlayerID])
+	return X.Clone(tFellowship)
 end
 
 -- 判断是否是好友
