@@ -48,7 +48,7 @@ function D.StackBag()
 					MY_BagEx_Bank.HideItemShadow(frame, dwBox, dwX)
 				end
 				local kItem = not MY_BagEx_Bank.IsItemBoxLocked(dwBox, dwX) and X.GetInventoryItem(me, dwBox, dwX)
-				if kItem and kItem.bCanStack and kItem.nStackNum < kItem.nMaxStackNum then
+				if kItem and kItem.bCanStack and kItem.nStackNum < kItem.nMaxStackNum and me.GetTradeItemLeftTime(kItem.dwID) == 0 then
 					local szKey = X.GetItemKey(kItem)
 					local tPos = tList[szKey]
 					if tPos then
