@@ -503,6 +503,10 @@ function D.GetLover()
 		local tFei = X.GetFellowshipEntryInfo(tFellowship.xID)
 		-- 获取失败则跳过
 		if not tFei then
+			--[[#DEBUG BEGIN]]
+			X.Debug(X.PACKET_INFO.NAME_SPACE, 'MY_Love GetFellowshipEntryInfo ' .. tFellowship.xID .. ' failed.', X.DEBUG_LEVEL.ERROR)
+			--[[#DEBUG END]]
+			bSyncing = true
 			return
 		end
 		-- 不是情缘则跳过
