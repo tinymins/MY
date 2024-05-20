@@ -1406,13 +1406,18 @@ function X.RegisterRemoteStorage(szKey, nBitPos, nBitNum, fnGetter, fnSetter, bF
 	}
 end
 
-function X.SetRemoteStorage(szKey, ...)
+local function SetRemoteStorage(szKey, bSkipSetter, ...)
 	local st = REMOTE_STORAGE_REGISTER[szKey]
 	if not st then
 		assert(false, 'unknown storage key: ' .. szKey)
 	end
 
-	local aBit = st.fnSetter(...)
+	local aBit
+	if bSkipSetter then
+		aBit = ...
+	else
+		aBit = st.fnSetter(...)
+	end
 	if #aBit ~= st.nBitNum then
 		assert(false, 'storage setter bit number mismatch: ' .. szKey)
 	end
@@ -1438,7 +1443,7 @@ function X.SetRemoteStorage(szKey, ...)
 	OnRemoteStorageChange(szKey)
 end
 
-function X.GetRemoteStorage(szKey)
+local function GetRemoteStorage(szKey, bSkipGetter)
 	local st = REMOTE_STORAGE_REGISTER[szKey]
 	if not st then
 		assert(false, 'unknown storage key: ' .. szKey)
@@ -1457,7 +1462,26 @@ function X.GetRemoteStorage(szKey)
 		local nOffset = nBitPos % BIT_NUMBER + 1
 		table.insert(aBit, aByte[nIndex][nOffset])
 	end
+	if bSkipGetter then
+		return aBit
+	end
 	return st.fnGetter(aBit)
+end
+
+function X.SetRemoteStorage(szKey, ...)
+	return SetRemoteStorage(szKey, false, ...)
+end
+
+function X.GetRemoteStorage(szKey)
+	return GetRemoteStorage(szKey, false)
+end
+
+function X.RawSetRemoteStorage(szKey, ...)
+	return SetRemoteStorage(szKey, true, ...)
+end
+
+function X.RawGetRemoteStorage(szKey)
+	return GetRemoteStorage(szKey, true)
 end
 
 -- 判断是否可以访问同步设置项（ESC-游戏设置-综合-服务器同步设置-界面常规设置）
