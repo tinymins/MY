@@ -122,7 +122,7 @@ local D = X.SetmetaLazyload({
 	},
 	tLoverItem = {},
 	nPendingItem = 0, -- «Î«ÛΩ·‘µ—Ãª®nItem–Ú∫≈ª∫¥Ê
-	aStorageData = nil, -- ∑¿÷π±ªª÷∏¥ΩÁ√Ê≈‰÷√¥€∏ƒ
+	aRawStorageData = nil, -- ∑¿÷π±ªª÷∏¥ΩÁ√Ê≈‰÷√¥€∏ƒ
 }, {
 	PW = function() return X.SECRET['FILE::LOVE_BACKUP_PW'] end,
 })
@@ -1240,11 +1240,11 @@ end
 -- protect data
 do
 function D.UpdateProtectData()
-	D.aStorageData = {X.GetRemoteStorage('MY_Love')}
+	D.aRawStorageData = X.RawGetRemoteStorage('MY_Love')
 end
 local function onSyncUserPreferencesEnd()
-	if D.aStorageData then
-		X.SetRemoteStorage('MY_Love', unpack(D.aStorageData))
+	if D.aRawStorageData then
+		X.RawSetRemoteStorage('MY_Love', D.aRawStorageData)
 	else
 		D.UpdateProtectData()
 	end
