@@ -35,6 +35,7 @@ function D.StackBag()
 		MY_BagEx_Bag.HideAllItemShadow()
 		FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', false)
 	end
+	local bStackLeftExistTime = false
 	local function fnNext()
 		bTrigger = true
 		if not frame then
@@ -50,39 +51,89 @@ function D.StackBag()
 				local kItem = not MY_BagEx_Bag.IsItemBoxLocked(dwBox, dwX) and X.GetInventoryItem(me, dwBox, dwX)
 				if kItem and kItem.bCanStack and kItem.nStackNum < kItem.nMaxStackNum and me.GetTradeItemLeftTime(kItem.dwID) == 0 then
 					local szKey = X.GetItemKey(kItem)
-					local tPos = tList[szKey]
+					local nLeftExistTime = bStackLeftExistTime and 0 or kItem.GetLeftExistTime()
+					local tPos = tList[szKey] and tList[szKey][nLeftExistTime]
 					if tPos then
 						local dwBox1, dwX1 = tPos.dwBox, tPos.dwX
 						--[[#DEBUG BEGIN]]
 						X.Debug('MY_BagEx_BagStack', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
-						X.ExchangeInventoryItem(dwBox, dwX, dwBox1, dwX1)
+						me.ExchangeItem(dwBox, dwX, dwBox1, dwX1)
 						return
 					else
-						tList[szKey] = { dwBox = dwBox, dwX = dwX }
+						if not tList[szKey] then
+							tList[szKey] = {}
+						end
+						tList[szKey][nLeftExistTime] = { dwBox = dwBox, dwX = dwX }
 					end
 				end
 			end
 		end
 		fnFinish()
 	end
-	X.RegisterEvent('BAG_ITEM_UPDATE', 'MY_BagEx_BagStack__Stack', function()
-		local dwBox, dwX, bNewAdd = arg0, arg1, arg2
-		if bNewAdd then
-			X.Systopmsg(_L['Put new item in bag detected, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
-			fnFinish()
-		else
-			X.DelayCall('MY_BagEx_BagStack__Stack', fnNext)
-		end
-	end)
-	X.DelayCall(1000, function()
-		if not bTrigger then
-			fnFinish()
-		end
-	end)
+	local function fnStart()
+		X.RegisterEvent('BAG_ITEM_UPDATE', 'MY_BagEx_BagStack__Stack', function()
+			local dwBox, dwX, bNewAdd = arg0, arg1, arg2
+			if bNewAdd then
+				X.Systopmsg(_L['Put new item in bag detected, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
+				fnFinish()
+			else
+				X.DelayCall('MY_BagEx_BagStack__Stack', fnNext)
+			end
+		end)
+		X.DelayCall(1000, function()
+			if not bTrigger then
+				fnFinish()
+			end
+		end)
+		fnNext()
+	end
 	FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', true)
-	fnNext()
 	bTrigger = false
+
+	local me, tCache = X.GetClientPlayer(), {}
+	local bLeftExistTime = false
+	for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.PACKAGE)) do
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
+			if not MY_BagEx_Bag.IsItemBoxLocked(dwBox, dwX) then
+				local kItem = X.GetInventoryItem(me, dwBox, dwX)
+				if kItem then
+					local szKey = X.GetItemKey(kItem)
+					local nTimeLimited = kItem.GetLeftExistTime()
+					if tCache[szKey] then
+						if tCache[szKey] ~= nTimeLimited then
+							bLeftExistTime = true
+						end
+					else
+						tCache[szKey] = nTimeLimited
+					end
+				end
+			end
+		end
+	end
+	if bLeftExistTime then
+		MessageBox({
+			szMessage = g_tStrings.STR_STACK_BAG_JUDGE,
+			szName = 'BigBagPanel_StackBox',
+			fnAutoClose = function() return frame and frame:IsVisible() end,
+			fnCancelAction = fnFinish,
+			{
+				szOption = g_tStrings.STR_HOTKEY_SURE,
+				fnAction = function()
+					bStackLeftExistTime = true
+					fnStart()
+				end,
+			}, {
+				szOption = g_tStrings.STR_HOTKEY_CANCEL,
+				fnAction = function()
+					bStackLeftExistTime = false
+					fnStart()
+				end,
+			},
+		})
+	else
+		fnStart()
+	end
 end
 
 -- ¼ì²â¶Ñµþ°´Å¦
