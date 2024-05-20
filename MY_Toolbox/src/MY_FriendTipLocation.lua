@@ -52,8 +52,7 @@ function D.Hook()
 		txtLocation.SetText = function(_, szText)
 			local tFellowship = txtName and X.GetFellowshipInfo(txtName:GetText())
 			local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
-			local tCard = tFellowship and X.GetFellowshipCardInfo(tFellowship.xID)
-			if tCard and tFei and ((tCard.bTwoWay and tFellowship.nAttraction >= 200) or not X.IsRestricted('MY_FriendTipLocation.LV2')) then
+			if tFei and ((X.IsFellowshipTwoWay(tFellowship.xID) and tFellowship.nAttraction >= 200) or not X.IsRestricted('MY_FriendTipLocation.LV2')) then
 				szText = Table_GetMapName(X.GetFellowshipMapID(tFellowship.xID))
 				if (me.nCamp == CAMP.EVIL and tFei.nCamp == CAMP.GOOD)
 				or (me.nCamp == CAMP.GOOD and tFei.nCamp == CAMP.EVIL) then

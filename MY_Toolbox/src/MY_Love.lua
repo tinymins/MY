@@ -521,9 +521,8 @@ function D.GetLover()
 		if not tCard then
 			bSyncing = true
 			X.ApplyFellowshipCard(tFellowship.xID)
-			return
 		end
-		if tCard.bTwoWay then
+		if X.IsFellowshipTwoWay(tFellowship.xID) then
 			lover = {
 				xID = tFellowship.xID,
 				dwID = tFei.dwPlayerID,

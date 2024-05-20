@@ -50,7 +50,7 @@ local PS = { IsRestricted = MY_Love.IsShielded }
 function D.GetLoverMenu(nType)
 	local m0 = {}
 	X.IterFellowshipInfo(function(tFellowship)
-		if not tFellowship.bTwoWay then
+		if not X.IsFellowshipTwoWay(tFellowship.xID) then
 			return
 		end
 		local tFei = X.GetFellowshipEntryInfo(tFellowship.xID)
