@@ -75,7 +75,7 @@ return {
     ['Ensure export (with indent)'] = '确认导出（格式化输出）',
     ['Ensure export (as embedded)'] = '确认导出（保存为内置数据）',
     ['Data exported, file saved at %s.'] = '数据导出成功，文件存放在目录：%s。',
-    ['Import successed, %d imported and %d replaced.'] = '成功导入数据%d条，其中覆盖同名数据%d条。',
+    ['Import succeed, %d imported and %d replaced.'] = '成功导入数据%d条，其中覆盖同名数据%d条。',
     ['Import failed, cannot decode file.'] = '导入失败，文件无法解析。',
     ['Insert'] = '插入',
     ['Delete'] = '删除',
