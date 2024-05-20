@@ -565,6 +565,12 @@ function D.UpdateLocalLover()
 			D.SaveLover(lover.nLoverTime, lover.xID, lover.nLoverType, lover.nSendItem, lover.nReceiveItem)
 		end
 	end
+	if lover and X.IsString(lover.xID) then
+		--[[#DEBUG BEGIN]]
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'MY_Love auto backup: ' .. X.EncodeLUAData(lover), X.DEBUG_LEVEL.LOG)
+		--[[#DEBUG END]]
+		D.BackupLover(lover.szName, lover.xID, true)
+	end
 	if not lover then
 		lover = NO_LOVER
 	end
@@ -841,56 +847,64 @@ function D.GetOtherLover(szName)
 	return D.tOtherLover[szName]
 end
 
-function D.BackupLover(...)
-	local szLoverName, szLoverUUID = ...
-	if not X.CanUseOnlineRemoteStorage() then
-		return X.Alert(_L['Please enable sync common ui config first'])
-	end
+function D.RequestBackupLover()
 	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		return X.Systopmsg(_L['Backup lover is a sensitive action, please unlock to continue.'])
 	end
-	local lover = X.Clone(D.lover)
-	if select('#', ...) == 2 then
-		if szLoverName == lover.szName and szLoverUUID then
-			local szPath = X.FormatPath(
-				{
-					'export/lover_backup/'
-						.. X.GetClientPlayerName() .. '_' .. X.GetClientPlayerGlobalID() .. '-'
-						.. szLoverName .. '_' .. szLoverUUID .. '-'
-						.. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss')
-						.. '.lover.jx3dat',
-					X.PATH_TYPE.ROLE
-				})
-			X.SaveLUAData(
-				szPath,
-				{
-					szName = X.GetClientPlayerName(),
-					szUUID = X.GetClientPlayerGlobalID(),
-					szLoverName = szLoverName,
-					szLoverUUID = szLoverUUID,
-					nLoverType = lover.nLoverType,
-					nLoverTime = lover.nLoverTime,
-					nSendItem = lover.nSendItem,
-					nReceiveItem = lover.nReceiveItem,
-				},
-				{ passphrase = D.PW }
-			)
-			local szFullPath = X.GetAbsolutePath(szPath)
-			X.Alert(_L('Backup lover successed, file located at: %s.', szFullPath))
-			X.Sysmsg(_L('Backup lover successed, file located at: %s.', szFullPath))
+	if lover.nLoverType == 1 then -- Ë«Ïò
+		local kTarget = D.GetNearbyPlayerByXID(lover.xID)
+		local info = kTarget and GetClientTeam().GetMemberInfo(kTarget.dwID)
+		if not info or not info.bIsOnLine then
+			X.Systopmsg(_L['Lover must in your team and online to do backup.'])
+		else
+			X.SendBgMsg(lover.szName, 'MY_LOVE', {'BACKUP'})
+			X.Systopmsg(_L['Backup request has been sent, wait please.'])
 		end
 	else
-		if lover.nLoverType == 1 then -- Ë«Ïò
-			local kTarget = D.GetNearbyPlayerByXID(lover.xID)
-			local info = kTarget and GetClientTeam().GetMemberInfo(kTarget.dwID)
-			if not info or not info.bIsOnLine then
-				X.Systopmsg(_L['Lover must in your team and online to do backup.'])
-			else
-				X.SendBgMsg(lover.szName, 'MY_LOVE', {'BACKUP'})
-				X.Systopmsg(_L['Backup request has been sent, wait please.'])
-			end
-		else
-			X.Systopmsg(_L['Backup feature only supports mutual love!'])
+		X.Systopmsg(_L['Backup feature only supports mutual love!'])
+	end
+end
+
+function D.BackupLover(szLoverName, szLoverUUID, bAutoBackup)
+	if not X.CanUseOnlineRemoteStorage() then
+		if not bAutoBackup then
+			X.Alert(_L['Please enable sync common ui config first'])
+		end
+		return
+	end
+	local lover = X.Clone(D.lover)
+	if szLoverName == lover.szName and szLoverUUID then
+		local szPath = X.FormatPath(
+			{
+				'export/lover_backup/'
+					.. X.GetClientPlayerName() .. '_' .. X.GetClientPlayerGlobalID() .. '-'
+					.. szLoverName .. '_' .. szLoverUUID
+					.. (
+						bAutoBackup
+						and ''
+						or ('-' ..  X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+					)
+					.. '.lover.jx3dat',
+				X.PATH_TYPE.ROLE
+			})
+		X.SaveLUAData(
+			szPath,
+			{
+				szName = X.GetClientPlayerName(),
+				szUUID = X.GetClientPlayerGlobalID(),
+				szLoverName = szLoverName,
+				szLoverUUID = szLoverUUID,
+				nLoverType = lover.nLoverType,
+				nLoverTime = lover.nLoverTime,
+				nSendItem = lover.nSendItem,
+				nReceiveItem = lover.nReceiveItem,
+			},
+			{ passphrase = D.PW }
+		)
+		if not bAutoBackup then
+			local szFullPath = X.GetAbsolutePath(szPath)
+			X.Alert(_L('Backup lover succeed, file located at: %s.', szFullPath))
+			X.Sysmsg(_L('Backup lover succeed, file located at: %s.', szFullPath))
 		end
 	end
 end
@@ -1270,6 +1284,7 @@ local settings = {
 				'GetLover',
 				'SetLover',
 				'FixLover',
+				'RequestBackupLover',
 				'BackupLover',
 				'RestoreLover',
 				'RemoveLover',

@@ -24,7 +24,7 @@ local D = {
 	GetLover = MY_Love.GetLover,
 	SetLover = MY_Love.SetLover,
 	FixLover = MY_Love.FixLover,
-	BackupLover = MY_Love.BackupLover,
+	RequestBackupLover = MY_Love.RequestBackupLover,
 	RestoreLover = MY_Love.RestoreLover,
 	RemoveLover = MY_Love.RemoveLover,
 	FormatLoverString = MY_Love.FormatLoverString,
@@ -171,7 +171,7 @@ function PS.OnPanelActive(wnd)
 			nX = ui:Append('Text', { text = _L['[Break love]'], x = nX + 10, y = nY, onClick = D.RemoveLover }):AutoWidth():Pos('BOTTOMRIGHT')
 			if lover.nLoverType == 1 then
 				nX = ui:Append('Text', { text = _L['[Recovery]'], x = nX + 10, y = nY, onClick = D.FixLover }):AutoWidth():Pos('BOTTOMRIGHT')
-				nX = ui:Append('Text', { text = _L['[Backup]'], x = nX + 10, y = nY, onClick = D.BackupLover }):AutoWidth():Pos('BOTTOMRIGHT')
+				nX = ui:Append('Text', { text = _L['[Backup]'], x = nX + 10, y = nY, onClick = D.RequestBackupLover }):AutoWidth():Pos('BOTTOMRIGHT')
 			end
 			ui:Append('WndCheckBox', {
 				x = nX + 10, y = nY + 2,

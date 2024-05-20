@@ -236,7 +236,7 @@ return {
 	['Repair request has been sent, wait please.'] = '修複請求已發送給對方，請稍候。',
 
     ['Backup lover is a sensitive action, please unlock to continue.'] = '請先解鎖後，方可備份情緣證。',
-    ['Backup lover successed, file located at: %s.'] = '情緣證數據備份完成，數據文件位於：%s。',
+    ['Backup lover succeed, file located at: %s.'] = '情緣證數據備份完成，數據文件位於：%s。',
     ['Lover must in your team and online to do backup.'] = '必須與情緣組隊並保持雙方在線，方可進行備份操作。',
     ['Backup request has been sent, wait please.'] = '情緣證備份請求已發送，請等待對方同意。',
     ['Backup feature only supports mutual love!'] = '情緣證備份功能只支持相戀情緣關係！',
