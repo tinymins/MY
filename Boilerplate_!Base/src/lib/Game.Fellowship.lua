@@ -279,6 +279,21 @@ function X.IsFellowshipOnline(xPlayerID)
 	end
 end
 
+---获取玩家是否是双向好友
+---@param xPlayerID number @要获取的玩家唯一ID（缘起为 dwID）
+---@return boolean @玩家是否是双向好友
+function X.IsFellowshipTwoWay(xPlayerID)
+	local tFellowship = X.GetFellowshipInfo(xPlayerID)
+	if not tFellowship then
+		return
+	end
+	local tCard = X.GetFellowshipCardInfo(tFellowship.xID)
+	if tCard then
+		return tCard.bTwoWay
+	end
+	return tFellowship.bTwoWay
+end
+
 --------------------------------------------------------------------------------
 -- 仇人相关接口
 --------------------------------------------------------------------------------
