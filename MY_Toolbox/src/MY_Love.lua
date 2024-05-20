@@ -226,6 +226,9 @@ X.RegisterRemoteStorage(
 		assert(nType >= 0 and nType <= 0xf, 'Value of nType out of range 4bit unsigned int range!')
 		assert(nSendItem >= 0 and nSendItem <= 0x3f, 'Value of nSendItem out of 6bit unsigned int range!')
 		assert(nReceiveItem >= 0 and nReceiveItem <= 0x3f, 'Value of nReceiveItem out of 6bit unsigned int range!')
+		-- 输出日志
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'MY_Love SetRemoteStorage current: ' .. X.EncodeLUAData({X.GetRemoteStorage('MY_Love')}), X.DEBUG_LEVEL.LOG)
+		X.Debug(X.PACKET_INFO.NAME_SPACE, 'MY_Love SetRemoteStorage new: ' .. X.EncodeLUAData({...}), X.DEBUG_LEVEL.LOG)
 		-- 生成 Byte 表
 		local aByte = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 		if X.IsString(xID) then
