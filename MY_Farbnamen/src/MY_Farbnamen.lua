@@ -75,7 +75,7 @@ local function InitDB()
 	if DB_ERR_COUNT > DB_MAX_ERR_COUNT then
 		return false
 	end
-	DB = X.SQLiteConnect(_L['MY_Farbnamen'], {'cache/farbnamen.v4.db', X.PATH_TYPE.SERVER})
+	DB = X.SQLiteConnect(_L['MY_Farbnamen'], {'cache/farbnamen.v5.db', X.PATH_TYPE.SERVER})
 	if not DB then
 		local szMsg = _L['Cannot connect to database!!!']
 		if DB_ERR_COUNT > 0 then
@@ -89,6 +89,7 @@ local function InitDB()
 		CREATE TABLE IF NOT EXISTS InfoCache (
 			id INTEGER NOT NULL,
 			name NVARCHAR(20) NOT NULL,
+			guid NVARCHAR(20) NOT NULL,
 			force INTEGER NOT NULL,
 			role INTEGER NOT NULL,
 			level INTEGER NOT NULL,
@@ -100,9 +101,10 @@ local function InitDB()
 		)
 	]])
 	DB:Execute('CREATE UNIQUE INDEX IF NOT EXISTS info_cache_name_uidx ON InfoCache(name)')
-	DBI_W  = DB:Prepare('REPLACE INTO InfoCache (id, name, force, role, level, title, camp, tong, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-	DBI_RI = DB:Prepare('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE id = ?')
-	DBI_RN = DB:Prepare('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE name = ?')
+	DB:Execute('CREATE INDEX IF NOT EXISTS info_cache_guid_uidx ON InfoCache(guid)')
+	DBI_W  = DB:Prepare('REPLACE INTO InfoCache (id, name, guid, force, role, level, title, camp, tong, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+	DBI_RI = DB:Prepare('SELECT id, name, guid, force, role, level, title, camp, tong FROM InfoCache WHERE id = ?')
+	DBI_RN = DB:Prepare('SELECT id, name, guid, force, role, level, title, camp, tong FROM InfoCache WHERE name = ?')
 	DB:Execute([[
 		CREATE TABLE IF NOT EXISTS TongCache (
 			id INTEGER NOT NULL,
@@ -126,7 +128,7 @@ local function InitDB()
 			if data then
 				for id, p in pairs(data) do
 					DBI_W:ClearBindings()
-					DBI_W:BindAll(p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], '')
+					DBI_W:BindAll(p[1], p[2], '', p[3], p[4], p[5], p[6], p[7], p[8], '')
 					DBI_W:Execute()
 				end
 			end
@@ -175,7 +177,8 @@ function D.Migration()
 	local DB_V1_PATH = X.FormatPath({'cache/player_info.db', X.PATH_TYPE.SERVER})
 	local DB_V2_PATH = X.FormatPath({'cache/player_info.v2.db', X.PATH_TYPE.SERVER})
 	local DB_V3_PATH = X.FormatPath({'cache/farbnamen.v3.db', X.PATH_TYPE.SERVER})
-	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) then
+	local DB_V4_PATH = X.FormatPath({'cache/farbnamen.v4.db', X.PATH_TYPE.SERVER})
+	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) and not IsLocalFileExist(DB_V4_PATH) then
 		return
 	end
 	X.Confirm(
@@ -194,6 +197,7 @@ function D.Migration()
 							DBI_W:BindAll(
 								p.id,
 								AnsiToUTF8(p.name),
+								'',
 								p.force or -1,
 								p.role or -1,
 								p.level or -1,
@@ -242,6 +246,7 @@ function D.Migration()
 									DBI_W:BindAll(
 										rec.id,
 										AnsiToUTF8(rec.name),
+										'',
 										rec.force or -1,
 										rec.role or -1,
 										rec.level or -1,
@@ -294,6 +299,7 @@ function D.Migration()
 									DBI_W:BindAll(
 										rec.id,
 										AnsiToUTF8(rec.name),
+										'',
 										rec.force or -1,
 										rec.role or -1,
 										rec.level or -1,
@@ -330,6 +336,59 @@ function D.Migration()
 					DB_V3:Release()
 				end
 				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			end
+			-- ×ªÒÆV4¾É°æÊý¾Ý
+			if IsLocalFileExist(DB_V4_PATH) then
+				local DB_V4 = SQLite3_Open(DB_V4_PATH)
+				if DB_V4 then
+					DB:Execute('BEGIN TRANSACTION')
+					local nCount, nPageSize = X.Get(DB_V4:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					for i = 0, nCount / nPageSize do
+						local aInfoCache = DB_V4:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+						if aInfoCache then
+							for _, rec in ipairs(aInfoCache) do
+								if rec.id and rec.name then
+									DBI_W:ClearBindings()
+									DBI_W:BindAll(
+										rec.id,
+										AnsiToUTF8(rec.name),
+										'',
+										rec.force or -1,
+										rec.role or -1,
+										rec.level or -1,
+										AnsiToUTF8(rec.title or ''),
+										rec.camp or -1,
+										rec.tong or -1,
+										rec.extra or ''
+									)
+									DBI_W:Execute()
+								end
+							end
+							DBI_W:Reset()
+						end
+					end
+					local nCount, nPageSize = X.Get(DB_V4:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					for i = 0, nCount / nPageSize do
+						local aTongCache = DB_V4:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+						if aTongCache then
+							for _, rec in ipairs(aTongCache) do
+								if rec.id and rec.name then
+									DBT_W:ClearBindings()
+									DBT_W:BindAll(
+										rec.id,
+										AnsiToUTF8(rec.name),
+										rec.extra or ''
+									)
+									DBT_W:Execute()
+								end
+							end
+							DBT_W:Reset()
+						end
+					end
+					DB:Execute('END TRANSACTION')
+					DB_V4:Release()
+				end
+				CPath.Move(DB_V4_PATH, DB_V4_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			X.Alert(_L['Migrate succeed!'])
 		end)
@@ -620,7 +679,7 @@ local function Flush()
 		DB:Execute('BEGIN TRANSACTION')
 		for i, p in pairs(l_infocache_w) do
 			DBI_W:ClearBindings()
-			DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong, '')
+			DBI_W:BindAll(p.id, p.name, p.guid, p.force, p.role, p.level, p.title, p.camp, p.tong, '')
 			DBI_W:Execute()
 		end
 		DBI_W:Reset()
@@ -708,6 +767,7 @@ function D.AddAusID(dwID)
 		local info = l_infocache[player.dwID] or {}
 		info.id    = player.dwID
 		info.name  = player.szName
+		info.guid  = X.GetPlayerGlobalID(player.dwID) or ''
 		info.force = player.dwForceID or -1
 		info.role  = player.nRoleType or -1
 		info.level = player.nLevel or -1
@@ -867,7 +927,7 @@ local function OnPeekPlayer()
 	end
 end
 X.RegisterEvent('PEEK_OTHER_PLAYER', OnPeekPlayer)
-X.RegisterEvent('PLAYER_ENTER_SCENE', function() l_peeklist[arg0] = 0 end)
+X.RegisterEvent('MY_PLAYER_ENTER_SCENE', function() l_peeklist[arg0] = 0 end)
 X.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() l_tongnames[arg1], l_tongnames_w[arg1] = arg2, AnsiToUTF8(arg2) end)
 end
 
