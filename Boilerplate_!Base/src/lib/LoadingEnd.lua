@@ -24,6 +24,9 @@ X.RegisterInit(X.NSFormatString('{$NS}#AUTHOR_TIP'), function()
 		for dwID, szName in X.pairs_c(X.PACKET_INFO.AUTHOR_ROLES) do
 			Farbnamen.RegisterHeader(szName, dwID, X.PACKET_INFO.AUTHOR_HEADER)
 		end
+		for szGlobalID, _ in X.pairs_c(X.PACKET_INFO.AUTHOR_GLOBAL_IDS) do
+			Farbnamen.RegisterHeader(szGlobalID, X.PACKET_INFO.AUTHOR_HEADER)
+		end
 		for szName, _ in X.pairs_c(X.PACKET_INFO.AUTHOR_PROTECT_NAMES) do
 			Farbnamen.RegisterHeader(szName, '*', X.PACKET_INFO.AUTHOR_FAKE_HEADER)
 		end
