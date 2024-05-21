@@ -502,6 +502,8 @@ function D.CreateControlBar()
 		container:AppendContentFromIni(szIniFile, 'Wnd_TeamTools')
 		container:AppendContentFromIni(szIniFile, 'Wnd_TeamNotice')
 	end
+	-- 团队监控
+	container:AppendContentFromIni(szIniFile, 'Wnd_TeamMon_Subscribe')
 	-- 分配模式
 	local hLootMode = container:AppendContentFromIni(szIniFile, 'WndButton_LootMode')
 	if CTM_LOOT_MODE[nLootMode] then
@@ -552,7 +554,7 @@ function D.CreateControlBar()
 	container:AppendContentFromIni(szIniFile, 'Wnd_Fold')
 		:Lookup('CheckBox_Fold'):Check(MY_Cataclysm.bFold, WNDEVENT_FIRETYPE.PREVENT)
 	-- 自动计算宽度
-	local nW, wnd = 0
+	local nW, wnd = 0, nil
 	for i = 0, container:GetAllContentCount() - 1 do
 		wnd = container:LookupContent(i)
 		wnd:SetRelX(nW)
@@ -1191,6 +1193,11 @@ function D.OnLButtonClick()
 			return X.Alert(_L['Please install and load MY_TeamNotice addon first.'])
 		end
 		MY_TeamNotice.OpenFrame()
+	elseif szName == 'Wnd_TeamMon_Subscribe' then
+		if not MY_TeamMon then
+			return X.Alert(_L['Please install and load MY_TeamMon addon first.'])
+		end
+		MY_TeamMon_Subscribe.OpenPanel()
 	elseif szName == 'WndButton_LootMode' or szName == 'WndButton_LootQuality' then
 		if X.IsDistributor() then
 			local menu = {}
@@ -1233,21 +1240,6 @@ function D.OnCheckBoxUncheck()
 	end
 end
 
-function D.OnMouseLeave()
-	local szName = this:GetName()
-	if szName == 'WndButton_GKP'
-	or szName == 'WndButton_LootMode'
-	or szName == 'WndButton_LootQuality'
-	or szName == 'Wnd_TeamTools'
-	or szName == 'Wnd_TeamNotice' then
-		this:SetAlpha(220)
-	end
-	if not IsKeyDown('LButton') then
-		D.SetFrameSize()
-	end
-	HideTip()
-end
-
 local SPEAKER_TIP = {
 	[X.CONSTANT.SPEAKER_STATE.OPEN ] = g_tStrings.GVOICE_SPEAKER_OPEN_TIP,
 	[X.CONSTANT.SPEAKER_STATE.CLOSE] = g_tStrings.GVOICE_SPEAKER_CLOSE_TIP,
@@ -1271,24 +1263,50 @@ local MIC_TIP = setmetatable({
 })
 
 function D.OnMouseEnter()
-	local szName = this:GetName()
-	if szName == 'WndButton_GKP'
-	or szName == 'WndButton_LootMode'
-	or szName == 'WndButton_LootQuality'
-	or szName == 'Wnd_TeamTools'
-	or szName == 'Wnd_TeamNotice' then
+	local name = this:GetName()
+	if name == 'WndButton_GKP'
+	or name == 'WndButton_LootMode'
+	or name == 'WndButton_LootQuality'
+	or name == 'Wnd_TeamTools'
+	or name == 'Wnd_TeamNotice'
+	or name == 'Wnd_TeamMon_Subscribe' then
 		this:SetAlpha(255)
 	end
-	if szName == 'WndButton_Speaker' then
+	if name == 'WndButton_GKP' then
+		X.OutputTip(this, _L['MY_GKP'])
+	elseif name == 'Wnd_TeamTools' then
+		X.OutputTip(this, _L['MY_TeamTools'])
+	elseif name == 'Wnd_TeamNotice' then
+		X.OutputTip(this, _L['MY_TeamNotice'])
+	elseif name == 'Wnd_TeamMon_Subscribe' then
+		X.OutputTip(this, _L['MY_TeamMon_Subscribe'])
+	elseif name == 'WndButton_Speaker' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(GetFormatText(SPEAKER_TIP[this.nSpeakerState]), 400, { x, y, w, h }, ALW.TOP_BOTTOM)
-	elseif szName == 'WndButton_Microphone' then
+	elseif name == 'WndButton_Microphone' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(GetFormatText(MIC_TIP[this.nMicState]), 400, { x, y, w, h }, ALW.TOP_BOTTOM)
 	end
 	D.SetFrameSize(true)
+end
+
+function D.OnMouseLeave()
+	local name = this:GetName()
+	if name == 'WndButton_GKP'
+	or name == 'WndButton_LootMode'
+	or name == 'WndButton_LootQuality'
+	or name == 'Wnd_TeamTools'
+	or name == 'Wnd_TeamNotice'
+	or name == 'Wnd_TeamMon_Subscribe' then
+		this:SetAlpha(220)
+		X.HideTip()
+	end
+	if not IsKeyDown('LButton') then
+		D.SetFrameSize()
+	end
+	HideTip()
 end
 
 function D.CheckEnableTeamPanel()
