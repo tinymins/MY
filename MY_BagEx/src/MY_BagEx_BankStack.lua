@@ -66,26 +66,72 @@ function D.StackBag()
 		end
 		fnFinish()
 	end
-	X.RegisterEvent({'BAG_ITEM_UPDATE', 'BANK_ITEM_UPDATE'}, 'MY_BagEx_BankStack__Stack', function(event)
-		local dwBox, dwX, bNewAdd = arg0, arg1, arg2
-		if (event == 'BAG_ITEM_UPDATE' and dwBox >= INVENTORY_INDEX.BANK_PACKAGE1 and dwBox <= INVENTORY_INDEX.BANK_PACKAGE5)
-		or event == 'BANK_ITEM_UPDATE' then
-			if bNewAdd then
-				X.Systopmsg(_L['Put new item in bank detected, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
+	local function fnStart()
+		X.RegisterEvent({'BAG_ITEM_UPDATE', 'BANK_ITEM_UPDATE'}, 'MY_BagEx_BankStack__Stack', function(event)
+			local dwBox, dwX, bNewAdd = arg0, arg1, arg2
+			if (event == 'BAG_ITEM_UPDATE' and dwBox >= INVENTORY_INDEX.BANK_PACKAGE1 and dwBox <= INVENTORY_INDEX.BANK_PACKAGE5)
+			or event == 'BANK_ITEM_UPDATE' then
+				if bNewAdd then
+					X.Systopmsg(_L['Put new item in bank detected, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
+					fnFinish()
+				else
+					X.DelayCall('MY_BagEx_BankStack__Stack', fnNext)
+				end
+			end
+		end)
+		X.DelayCall(1000, function()
+			if not bTrigger then
 				fnFinish()
-			else
-				X.DelayCall('MY_BagEx_BankStack__Stack', fnNext)
+			end
+		end)
+		fnNext()
+	end
+	FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', true)
+	bTrigger = false
+
+	local me, tCache = X.GetClientPlayer(), {}
+	local bLeftExistTime = false
+	for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.INVENTORY_BANK_LIST)) do
+		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
+			if not MY_BagEx_Bank.IsItemBoxLocked(dwBox, dwX) then
+				local kItem = X.GetInventoryItem(me, dwBox, dwX)
+				if kItem then
+					local szKey = X.GetItemKey(kItem)
+					local nTimeLimited = kItem.GetLeftExistTime()
+					if tCache[szKey] then
+						if tCache[szKey] ~= nTimeLimited then
+							bLeftExistTime = true
+						end
+					else
+						tCache[szKey] = nTimeLimited
+					end
+				end
 			end
 		end
-	end)
-	X.DelayCall(1000, function()
-		if not bTrigger then
-			fnFinish()
-		end
-	end)
-	FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', true)
-	fnNext()
-	bTrigger = false
+	end
+	if bLeftExistTime then
+		MessageBox({
+			szMessage = g_tStrings.STR_STACK_BANK_JUDGE,
+			szName = 'BigBankPanel_StackBox',
+			fnAutoClose = function() return frame and frame:IsVisible() end,
+			fnCancelAction = fnFinish,
+			{
+				szOption = g_tStrings.STR_HOTKEY_SURE,
+				fnAction = function()
+					bStackLeftExistTime = true
+					fnStart()
+				end,
+			}, {
+				szOption = g_tStrings.STR_HOTKEY_CANCEL,
+				fnAction = function()
+					bStackLeftExistTime = false
+					fnStart()
+				end,
+			},
+		})
+	else
+		fnStart()
+	end
 end
 
 -- ¼ì²â¶Ñµþ°´Å¦
