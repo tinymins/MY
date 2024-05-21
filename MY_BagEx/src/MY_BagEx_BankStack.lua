@@ -41,7 +41,7 @@ function D.Operate()
 			return fnFinish()
 		end
 		local me, tList = X.GetClientPlayer(), {}
-		for _, dwBox in ipairs(X.CONSTANT.INVENTORY_BANK_LIST) do
+		for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.BANK)) do
 			for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
 				if not MY_BagEx_Bank.IsItemBoxLocked(dwBox, dwX) then
 					MY_BagEx_Bank.HideItemShadow(frame, dwBox, dwX)
@@ -90,7 +90,7 @@ function D.Operate()
 
 	local me, tCache = X.GetClientPlayer(), {}
 	local bLeftExistTime = false
-	for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.INVENTORY_BANK_LIST)) do
+	for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.BANK)) do
 		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
 			if not MY_BagEx_Bank.IsItemBoxLocked(dwBox, dwX) then
 				local kItem = X.GetInventoryItem(me, dwBox, dwX)
