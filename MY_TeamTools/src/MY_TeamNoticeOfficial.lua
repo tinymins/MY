@@ -25,6 +25,14 @@ local TI = {
 	szNote = '',
 }
 
+function D.ApplyNoticeBoard()
+	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+		X.DelayCall('MY_TeamNoticeOfficial__ApplyNoticeBoard', 500, D.ApplyNoticeBoard)
+		return
+	end
+	ApplyNoticeBoard(1)
+end
+
 function TI.OpenFrame()
 	if not TI.bEnable then
 		return
@@ -33,7 +41,7 @@ function TI.OpenFrame()
 		if X.IsLeader() then
 			NoticeBoard_Open(1)
 		else
-			ApplyNoticeBoard(1)
+			D.ApplyNoticeBoard()
 			X.Sysmsg(_L['Asking..., If no response in longtime, team leader not enable plug-in.'])
 		end
 	end
@@ -124,7 +132,7 @@ X.RegisterEvent('FIRST_LOADING_END', 'TEAM_NOTICE', function()
 	end
 	-- 不存在队长不队长的问题了
 	if X.IsInParty() then
-		ApplyNoticeBoard(1)
+		D.ApplyNoticeBoard()
 	end
 end)
 
