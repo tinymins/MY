@@ -58,7 +58,7 @@ function D.StackBag()
 						--[[#DEBUG BEGIN]]
 						X.Debug('MY_BagEx_BagStack', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
-						me.ExchangeItem(dwBox, dwX, dwBox1, dwX1)
+						X.ExchangeInventoryItem(dwBox, dwX, dwBox1, dwX1)
 						return
 					else
 						if not tList[szKey] then
