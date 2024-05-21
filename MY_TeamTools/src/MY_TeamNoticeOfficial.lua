@@ -19,7 +19,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^21.0.0') then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
-local TI = {
+local D = {
 	bEnable = not not NoticeBoard_Open,
 	szYY = '',
 	szNote = '',
@@ -33,8 +33,8 @@ function D.ApplyNoticeBoard()
 	ApplyNoticeBoard(1)
 end
 
-function TI.OpenFrame()
-	if not TI.bEnable then
+function D.OpenFrame()
+	if not D.bEnable then
 		return
 	end
 	if X.IsInParty() then
@@ -47,7 +47,7 @@ function TI.OpenFrame()
 	end
 end
 
-function TI.UpdateHookFrame(hFrame, bForce)
+function D.UpdateHookFrame(hFrame, bForce)
 	if not hFrame then
 		return
 	end
@@ -108,10 +108,10 @@ function TI.UpdateHookFrame(hFrame, bForce)
 	uiBtnTeamMon:Pos(nX + (nItemW + 5) * 2, nY):Width(nItemW)
 end
 
-function TI.UpdateHook(bForce)
+function D.UpdateHook(bForce)
 	for i = 1, 2 do
 		local hFrame = Station.Lookup('Normal/NoticeBoard' .. i)
-		TI.UpdateHookFrame(hFrame, bForce)
+		D.UpdateHookFrame(hFrame, bForce)
 	end
 end
 
@@ -122,7 +122,7 @@ X.RegisterEvent('PARTY_LEVEL_UP_RAID', 'TEAM_NOTICE', function()
 	if X.IsLeader() then
 		X.Confirm(_L['Edit team info?'], function()
 			MY_TeamNotice.bEnable = true
-			TI.OpenFrame()
+			D.OpenFrame()
 		end)
 	end
 end)
@@ -147,15 +147,15 @@ local settings = {
 				'bEnable',
 				'OpenFrame',
 			},
-			root = TI,
+			root = D,
 		},
 	},
 }
 MY_TeamNoticeOfficial = X.CreateModule(settings)
 end
 
-if TI.bEnable then
-	X.BreatheCall('MY_TeamNoticeOfficial', function() TI.UpdateHook() end)
+if D.bEnable then
+	X.BreatheCall('MY_TeamNoticeOfficial', function() D.UpdateHook() end)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

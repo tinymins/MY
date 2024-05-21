@@ -19,7 +19,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^21.0.0') then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
-local TI = {
+local D = {
 	szYY = '',
 	szNote = '',
 }
@@ -51,29 +51,29 @@ local O = X.CreateUserSettingsModule('MY_TeamNotice', _L['Raid'], {
 	},
 })
 
-function TI.SaveList()
-	X.SaveLUAData({'config/yy.jx3dat', X.PATH_TYPE.GLOBAL}, TI.tList, { encoder = 'luatext', indent = '\t', passphrase = false, crc = false })
+function D.SaveList()
+	X.SaveLUAData({'config/yy.jx3dat', X.PATH_TYPE.GLOBAL}, D.tList, { encoder = 'luatext', indent = '\t', passphrase = false, crc = false })
 end
 
-function TI.GetList()
-	if not TI.tList then
-		TI.tList = X.LoadLUAData({'config/yy.jx3dat', X.PATH_TYPE.GLOBAL}, { passphrase = false }) or {}
+function D.GetList()
+	if not D.tList then
+		D.tList = X.LoadLUAData({'config/yy.jx3dat', X.PATH_TYPE.GLOBAL}, { passphrase = false }) or {}
 	end
-	return TI.tList
+	return D.tList
 end
 
-function TI.GetFrame()
+function D.GetFrame()
 	return Station.Lookup('Normal/MY_TeamNotice')
 end
 
-function TI.CreateFrame(szInitYY, szInitNote)
+function D.CreateFrame(szInitYY, szInitNote)
 	if X.IsInZombieMap() then
 		return
 	end
 	if szInitNote then
 		szInitNote = X.ReplaceSensitiveWord(szInitNote)
 	end
-	local ui = TI.GetFrame()
+	local ui = D.GetFrame()
 	if ui then
 		ui = X.UI(ui)
 		ui:Children('#YY'):Text(szInitYY, WNDEVENT_FIRETYPE.PREVENT)
@@ -126,26 +126,26 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			end,
 			onBlur = function()
 				local szText = X.UI(this):Text()
-				if TI.szYY == szText then
+				if D.szYY == szText then
 					return
 				end
 				if X.IsLeader() then
 					if not X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-						TI.szYY = szText
+						D.szYY = szText
 						X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'Edit', szText, ui:Children('#Message'):Text()})
 						return
 					end
 					X.Systopmsg(_L['Please unlock talk lock first.'])
 				end
-				ui:Fetch('YY'):Text(TI.szYY, WNDEVENT_FIRETYPE.PREVENT)
+				ui:Fetch('YY'):Text(D.szYY, WNDEVENT_FIRETYPE.PREVENT)
 			end,
 			autocomplete = {
 				{
 					'option', 'beforeSearch', function(text)
 						local source = {}
 						if X.IsLeader() then
-							TI.tList = TI.GetList()
-							for k, v in pairs(TI.tList) do
+							D.tList = D.GetList()
+							for k, v in pairs(D.tList) do
 								table.insert(source, k)
 							end
 							if #source == 1 and tostring(source[1]) == text then
@@ -157,8 +157,8 @@ function TI.CreateFrame(szInitYY, szInitNote)
 				},
 				{
 					'option', 'beforeDelete', function(szOption)
-						TI.tList[tonumber(szOption)] = nil
-						TI.SaveList()
+						D.tList[tonumber(szOption)] = nil
+						D.SaveList()
 					end,
 				},
 			},
@@ -176,10 +176,10 @@ function TI.CreateFrame(szInitYY, szInitNote)
 						return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 					end
 					if tonumber(yy) then
-						TI.tList = TI.GetList()
-						if not TI.tList[tonumber(yy)] then
-							TI.tList[tonumber(yy)] = true
-							TI.SaveList()
+						D.tList = D.GetList()
+						if not D.tList[tonumber(yy)] then
+							D.tList[tonumber(yy)] = true
+							D.SaveList()
 						end
 					end
 					if yy ~= '' then
@@ -204,18 +204,18 @@ function TI.CreateFrame(szInitYY, szInitNote)
 			text = szInitNote,
 			onBlur = function()
 				local szText = X.ReplaceSensitiveWord(X.UI(this):Text())
-				if TI.szNote == szText then
+				if D.szNote == szText then
 					return
 				end
 				if X.IsLeader() then
 					if not X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-						TI.szNote = szText
+						D.szNote = szText
 						X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'Edit', ui:Children('#YY'):Text(), szText})
 						return
 					end
 					X.Systopmsg(_L['Please unlock talk lock first.'])
 				end
-				ui:Fetch('Message'):Text(TI.szNote, WNDEVENT_FIRETYPE.PREVENT)
+				ui:Fetch('Message'):Text(D.szNote, WNDEVENT_FIRETYPE.PREVENT)
 			end,
 		})
 		x, y = 11, 130
@@ -250,7 +250,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 		end
 		FormatAllContentPos()
 		-- 注册事件
-		local frame = TI.GetFrame()
+		local frame = D.GetFrame()
 		frame.OnFrameKeyDown = nil -- esc close --> nil
 		frame:RegisterEvent('PARTY_DISBAND')
 		frame:RegisterEvent('PARTY_DELETE_MEMBER')
@@ -269,7 +269,7 @@ function TI.CreateFrame(szInitYY, szInitNote)
 					if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 						return
 					end
-					X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'reply', arg1, TI.szYY, TI.szNote})
+					X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'reply', arg1, D.szYY, D.szNote})
 				end
 			elseif szEvent == 'UI_SCALED' then
 				ui:Anchor(O.anchor)
@@ -286,11 +286,11 @@ function TI.CreateFrame(szInitYY, szInitNote)
 		end
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
-	TI.szYY   = szInitYY or TI.szYY
-	TI.szNote = szInitNote or TI.szNote
+	D.szYY   = szInitYY or D.szYY
+	D.szNote = szInitNote or D.szNote
 end
 
-function TI.OpenFrame()
+function D.OpenFrame()
 	if MY_TeamNoticeOfficial.bEnable then
 		return MY_TeamNoticeOfficial.OpenFrame()
 	end
@@ -300,7 +300,7 @@ function TI.OpenFrame()
 	O.bEnable = true
 	if X.IsInParty() then
 		if X.IsLeader() then
-			TI.CreateFrame()
+			D.CreateFrame()
 		else
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
@@ -318,7 +318,7 @@ X.RegisterEvent('PARTY_LEVEL_UP_RAID', 'TEAM_NOTICE', function()
 	if X.IsLeader() then
 		X.Confirm(_L['Edit team info?'], function()
 			O.bEnable = true
-			TI.OpenFrame()
+			D.OpenFrame()
 		end)
 	end
 end)
@@ -332,7 +332,7 @@ X.RegisterEvent('FIRST_LOADING_END', 'TEAM_NOTICE', function()
 	end
 end)
 X.RegisterEvent('LOADING_END', 'TEAM_NOTICE', function()
-	local frame = TI.GetFrame()
+	local frame = D.GetFrame()
 	if frame and X.IsInZombieMap() then
 		X.UI.CloseFrame(frame)
 		X.Topmsg(_L['TeamNotice is disabled in this map.'])
@@ -342,12 +342,12 @@ end)
 -- 退队时清空团队告示
 X.RegisterEvent({'PARTY_DISBAND', 'PARTY_DELETE_MEMBER'}, 'TEAM_NOTICE', function(e)
 	if e == 'PARTY_DISBAND' or (e == 'PARTY_DELETE_MEMBER' and arg1 == X.GetClientPlayerID()) then
-		local frame = TI.GetFrame()
+		local frame = D.GetFrame()
 		if frame then
 			X.UI.CloseFrame(frame)
 		end
-		TI.szYY = nil
-		TI.szNote = nil
+		D.szYY = nil
+		D.szNote = nil
 	end
 end)
 
@@ -364,7 +364,7 @@ X.RegisterEvent('ON_BG_CHANNEL_MSG', 'LR_TeamNotice', function()
 	end
 	local szCmd, szText = aMsg[1], aMsg[2]
 	if szCmd == 'SEND' then
-		TI.CreateFrame('', szText)
+		D.CreateFrame('', szText)
 	end
 end)
 
@@ -377,17 +377,17 @@ X.RegisterBgMsg('TI', function(_, data, nChannel, dwID, szName, bIsSelf)
 		local team = GetClientTeam()
 		if team then
 			if data[1] == 'ASK' and X.IsLeader() then
-				if TI.GetFrame() then
-					X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'reply', szName, TI.szYY, TI.szNote}, true)
+				if D.GetFrame() then
+					X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'reply', szName, D.szYY, D.szNote}, true)
 				end
 			else
 				if not X.IsLeader(dwID) then
 					return
 				end
 				if data[1] == 'Edit' then
-					TI.CreateFrame(data[2], data[3])
+					D.CreateFrame(data[2], data[3])
 				elseif data[1] == 'reply' and (tonumber(data[2]) == X.GetClientPlayerID() or data[2] == me.szName) then
-					TI.CreateFrame(data[3], data[4])
+					D.CreateFrame(data[3], data[4])
 				end
 			end
 		end
@@ -400,7 +400,7 @@ X.RegisterAddonMenu(function()
 		fnDisable = function()
 			return not X.IsInParty()
 		end,
-		fnAction = TI.OpenFrame,
+		fnAction = D.OpenFrame,
 	}}
 end)
 
@@ -414,7 +414,7 @@ local settings = {
 			fields = {
 				'OpenFrame',
 			},
-			root = TI,
+			root = D,
 		},
 		{
 			fields = {
