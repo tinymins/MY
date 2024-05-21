@@ -23,8 +23,7 @@ end
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {})
 local D = {}
 
--- °ï»á²Ö¿â¶Ñµþ
-function D.StackGuildBank()
+function D.Operate()
 	local frame = Station.Lookup('Normal/GuildBankPanel')
 	if not frame then
 		return
@@ -41,9 +40,9 @@ function D.StackGuildBank()
 		bTrigger = true
 		local me, tList = X.GetClientPlayer(), {}
 		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
-			local item = X.GetInventoryItem(me, dwBox, dwX)
-			if item and item.bCanStack and item.nStackNum < item.nMaxStackNum then
-				local szKey = X.GetItemKey(item)
+			local kItem = X.GetInventoryItem(me, dwBox, dwX)
+			if kItem and kItem.bCanStack and kItem.nStackNum < kItem.nMaxStackNum then
+				local szKey = X.GetItemKey(kItem)
 				local tPos = tList[szKey]
 				if tPos then
 					local dwBox1, dwX1 = tPos.dwBox, tPos.dwX
@@ -104,10 +103,10 @@ function D.CheckInjection(bRemoveInjection)
 								X.Confirm('MY_BagEx_GuildBankStack', _L['Sure to start guild bank stack?'], {
 									x = frame:GetAbsX() + frame:GetW() / 2,
 									y = frame:GetAbsY() + frame:GetH() / 2,
-									fnResolve = D.StackGuildBank,
+									fnResolve = D.Operate,
 								})
 							else
-								D.StackGuildBank()
+								D.Operate()
 							end
 						end,
 					})

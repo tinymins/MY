@@ -23,8 +23,7 @@ end
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {})
 local D = {}
 
--- ±³°ü¶Ñµþ
-function D.StackBag()
+function D.Operate()
 	local frame = Station.Lookup('Normal/BigBankPanel')
 	if not frame then
 		return
@@ -166,12 +165,12 @@ function D.CheckInjection(bRemoveInjection)
 							X.Confirm('MY_BagEx_BankStack', _L['Sure to start bank stack?'], {
 								x = frame:GetAbsX() + frame:GetW() / 2,
 								y = frame:GetAbsY() + frame:GetH() / 2,
-								fnResolve = D.StackBag,
+								fnResolve = D.Operate,
 								fnReject = MY_BagEx_Bank.HideAllItemShadow,
 								fnCancel = MY_BagEx_Bank.HideAllItemShadow,
 							})
 						else
-							D.StackBag()
+							D.Operate()
 						end
 					end,
 				})
