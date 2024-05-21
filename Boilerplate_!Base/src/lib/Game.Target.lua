@@ -1351,6 +1351,28 @@ function X.GetPlayerGlobalID(dwID)
 end
 end
 
+-- 格式化原始角色名
+---@param szName string @角色名
+---@return string @去除跨服服务器后缀的角色名
+function X.FormatOriginPlayerName(szName)
+	local nPos = X.StringFindW(szName, g_tStrings.STR_CONNECT)
+	if nPos then
+		szName = szName:sub(1, nPos - 1)
+	end
+	return szName
+end
+
+-- 格式化基础角色名
+---@param szName string @角色名
+---@return string @去除跨服服务器后缀和转服后缀的角色名
+function X.FormatBasePlayerName(szName)
+	local nPos = X.StringFindW(szName, '@')
+	if nPos then
+		szName = szName:sub(1, nPos - 1)
+	end
+	return X.FormatOriginPlayerName(szName)
+end
+
 --------------------------------------------------------------------------------
 -- 帮会成员相关接口
 --------------------------------------------------------------------------------
@@ -1492,7 +1514,7 @@ function X.IsSelf(dwSrcID, dwTarID)
 end
 
 function X.IsAuthor(dwID, szName, szGlobalID)
-	local kTarget = X.GetPlayer(dwID)
+	local kTarget = dwID and X.GetPlayer(dwID)
 	if kTarget then
 		if not szGlobalID then
 			szGlobalID = kTarget.GetGlobalID()
@@ -1501,19 +1523,16 @@ function X.IsAuthor(dwID, szName, szGlobalID)
 			szName = kTarget.szName
 		end
 	end
-	if X.PACKET_INFO.AUTHOR_GLOBAL_IDS[szGlobalID] then
+	if szGlobalID and X.PACKET_INFO.AUTHOR_GLOBAL_IDS[szGlobalID] then
 		return true
 	end
-	return X.PACKET_INFO.AUTHOR_ROLES[dwID] == szName
+	return dwID and X.PACKET_INFO.AUTHOR_ROLES[dwID] == szName
 end
 
 function X.IsAuthorPlayerName(szName)
-	local szRealName = szName
-	local nPos = X.StringFindW(szName, '@')
-	if nPos then
-		szRealName = szName:sub(1, nPos - 1)
-	end
-	return X.PACKET_INFO.AUTHOR_PROTECT_NAMES[szRealName]
+	return X.PACKET_INFO.AUTHOR_PROTECT_NAMES[szName]
+		or X.PACKET_INFO.AUTHOR_PROTECT_NAMES[X.FormatOriginPlayerName(szName)]
+		or X.PACKET_INFO.AUTHOR_PROTECT_NAMES[X.FormatBasePlayerName(szName)]
 end
 
 --------------------------------------------------------------------------------
