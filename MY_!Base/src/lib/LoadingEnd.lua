@@ -20,15 +20,20 @@ FireUIEvent(X.NSFormatString('{$NS}_BASE_LOADING_END'))
 
 X.RegisterInit(X.NSFormatString('{$NS}#AUTHOR_TIP'), function()
 	local Farbnamen = _G.MY_Farbnamen
-	if Farbnamen and Farbnamen.RegisterHeader then
+	if not Farbnamen then
+		return
+	end
+	if Farbnamen.RegisterNameIDHeader then
 		for dwID, szName in X.pairs_c(X.PACKET_INFO.AUTHOR_ROLES) do
-			Farbnamen.RegisterHeader(szName, dwID, X.PACKET_INFO.AUTHOR_HEADER)
-		end
-		for szGlobalID, _ in X.pairs_c(X.PACKET_INFO.AUTHOR_GLOBAL_IDS) do
-			Farbnamen.RegisterHeader(szGlobalID, X.PACKET_INFO.AUTHOR_HEADER)
+			Farbnamen.RegisterNameIDHeader(szName, dwID, X.PACKET_INFO.AUTHOR_HEADER)
 		end
 		for szName, _ in X.pairs_c(X.PACKET_INFO.AUTHOR_PROTECT_NAMES) do
-			Farbnamen.RegisterHeader(szName, '*', X.PACKET_INFO.AUTHOR_FAKE_HEADER)
+			Farbnamen.RegisterNameIDHeader(szName, '*', X.PACKET_INFO.AUTHOR_FAKE_HEADER)
+		end
+	end
+	if Farbnamen.RegisterGlobalIDHeader then
+		for szGlobalID, _ in X.pairs_c(X.PACKET_INFO.AUTHOR_GLOBAL_IDS) do
+			Farbnamen.RegisterGlobalIDHeader(szGlobalID, X.PACKET_INFO.AUTHOR_HEADER)
 		end
 	end
 end)
