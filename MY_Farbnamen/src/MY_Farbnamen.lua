@@ -44,9 +44,7 @@ local O = X.CreateUserSettingsModule('MY_Farbnamen', _L['General'], {
 		xDefaultValue = 20,
 	},
 })
-local D = {}
-
-local _MY_Farbnamen = {
+local D = {
 	tForceString = X.Clone(g_tStrings.tForceTitle),
 	tRoleType    = {
 		[ROLE_TYPE.STANDARD_MALE  ] = _L['Man'],
@@ -548,9 +546,9 @@ function D.GetTip(szName)
 		end
 		-- 门派 体型 阵营
 		table.insert(tTip, GetFormatText(
-			(_MY_Farbnamen.tForceString[tInfo.dwForceID] or tInfo.dwForceID or _L['Unknown force']) .. _L.SPLIT_DOT ..
-			(_MY_Farbnamen.tRoleType[tInfo.nRoleType] or tInfo.nRoleType or  _L['Unknown gender'])    .. _L.SPLIT_DOT ..
-			(_MY_Farbnamen.tCampString[tInfo.nCamp] or tInfo.nCamp or  _L['Unknown camp']), 136
+			(D.tForceString[tInfo.dwForceID] or tInfo.dwForceID or _L['Unknown force']) .. _L.SPLIT_DOT ..
+			(D.tRoleType[tInfo.nRoleType] or tInfo.nRoleType or  _L['Unknown gender'])    .. _L.SPLIT_DOT ..
+			(D.tCampString[tInfo.nCamp] or tInfo.nCamp or  _L['Unknown camp']), 136
 		))
 		table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 		-- 随身便笺
