@@ -56,17 +56,9 @@ local D = {
 	aPlayerQueu = {},
 }
 local NAME_ID_HEADER_XML = {}
+local GUID_HEADER_XML = {}
 local DB_ERR_COUNT, DB_MAX_ERR_COUNT = 0, 5
 local DB, DBI_W, DBI_RI, DBI_RN, DBT_W, DBT_RI
-
-local function GetRealName(szName)
-	local szRealName = szName
-	local nPos = X.StringFindW(szName, '@')
-	if nPos then
-		szRealName = szName:sub(1, nPos - 1)
-	end
-	return szRealName
-end
 
 local function InitDB()
 	if DB then
@@ -351,12 +343,12 @@ function D.Migration()
 									DBI_W:ClearBindings()
 									DBI_W:BindAll(
 										rec.id,
-										AnsiToUTF8(rec.name),
+										rec.name,
 										'',
 										rec.force or -1,
 										rec.role or -1,
 										rec.level or -1,
-										AnsiToUTF8(rec.title or ''),
+										rec.title or '',
 										rec.camp or -1,
 										rec.tong or -1,
 										rec.extra or ''
@@ -554,20 +546,24 @@ X.HookChatPanel('BEFORE', 'MY_FARBNAMEN', function(h, szMsg, ...)
 	return szMsg
 end)
 
-function D.RegisterHeader(xArg1, xArg2, xArg3)
-	if X.IsString(xArg1) and X.IsNumber(xArg2) and X.IsString(xArg3) then
-		local szName, dwID, szHeaderXml = xArg1, xArg2, xArg3
-		if not NAME_ID_HEADER_XML[szName] then
-			NAME_ID_HEADER_XML[szName] = {}
-		end
-		if NAME_ID_HEADER_XML[szName][dwID] then
-			return X.Debug('ERROR', 'MY_Farbnamen Conflicted Name-ID: ' .. szName .. '(' .. dwID .. ')', X.DEBUG_LEVEL.ERROR)
-		end
-		if dwID == '*' then
-			szName = GetRealName(szName)
-		end
-		NAME_ID_HEADER_XML[szName][dwID] = szHeaderXml
+function D.RegisterNameIDHeader(szName, dwID, szHeaderXml)
+	if not NAME_ID_HEADER_XML[szName] then
+		NAME_ID_HEADER_XML[szName] = {}
 	end
+	if NAME_ID_HEADER_XML[szName][dwID] then
+		return X.Debug('ERROR', 'MY_Farbnamen Conflicted Name-ID: ' .. szName .. '(' .. dwID .. ')', X.DEBUG_LEVEL.ERROR)
+	end
+	if dwID == '*' then
+		szName = X.FormatBasePlayerName(szName)
+	end
+	NAME_ID_HEADER_XML[szName][dwID] = szHeaderXml
+end
+
+function D.RegisterGlobalIDHeader(szGlobalID, szHeaderXml)
+	if GUID_HEADER_XML[szGlobalID] then
+		return X.Debug('ERROR', 'MY_Farbnamen Conflicted GUID: ' .. szGlobalID, X.DEBUG_LEVEL.ERROR)
+	end
+	GUID_HEADER_XML[szGlobalID] = szHeaderXml
 end
 
 function D.GetTip(szName)
@@ -576,12 +572,13 @@ function D.GetTip(szName)
 		local tTip = {}
 		-- author info
 		if tInfo.dwID and tInfo.szName then
-			local szHeaderXml = NAME_ID_HEADER_XML[tInfo.szName] and NAME_ID_HEADER_XML[tInfo.szName][tInfo.dwID]
+			local szHeaderXml = GUID_HEADER_XML[tInfo.szGlobalID]
+				or (NAME_ID_HEADER_XML[tInfo.szName] and NAME_ID_HEADER_XML[tInfo.szName][tInfo.dwID])
 			if szHeaderXml then
 				table.insert(tTip, szHeaderXml)
 				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 			elseif tInfo.dwID ~= X.GetClientPlayerID() then
-				local szName = GetRealName(tInfo.szName)
+				local szName = X.FormatBasePlayerName(tInfo.szName)
 				local szHeaderXml = NAME_ID_HEADER_XML[szName] and NAME_ID_HEADER_XML[szName]['*']
 				if szHeaderXml then
 					table.insert(tTip, szHeaderXml)
@@ -734,14 +731,19 @@ function D.Get(szKey)
 		if info then
 			info.name = UTF8ToAnsi(info.name)
 			info.title = UTF8ToAnsi(info.title)
+			info.guid = UTF8ToAnsi(info.guid)
 			l_infocache[info.id] = info
 			l_infocache[info.name] = info
+			if info.guid ~= '' and info.guid ~= '0' then
+				l_infocache[info.guid] = info
+			end
 		end
 	end
 	if info then
 		return {
 			dwID       = info.id,
 			szName     = info.name,
+			szGlobalID = info.guid,
 			dwForceID  = info.force,
 			nRoleType  = info.role,
 			nLevel     = info.level,
@@ -767,7 +769,12 @@ function D.AddAusID(dwID)
 	if not player or not player.szName or player.szName == '' then
 		return false
 	else
-		local info = l_infocache[player.dwID] or {}
+		local info
+		if IsRemotePlayer(player.dwID) then
+			info = l_remoteinfocache[player.dwID] or {}
+		else
+			info = l_infocache[player.dwID] or {}
+		end
 		info.id    = player.dwID
 		info.name  = player.szName
 		info.guid  = X.GetPlayerGlobalID(player.dwID) or ''
@@ -779,8 +786,8 @@ function D.AddAusID(dwID)
 		info.tong  = player.dwTongID or -1
 
 		if IsRemotePlayer(info.id) then
-			l_infocache[info.id] = info
-			l_infocache[info.name] = info
+			l_remoteinfocache[info.id] = info
+			l_remoteinfocache[info.name] = info
 		else
 			local dwTongID = player.dwTongID
 			if dwTongID and dwTongID ~= 0 then
@@ -792,9 +799,13 @@ function D.AddAusID(dwID)
 			end
 			l_infocache[info.id] = info
 			l_infocache[info.name] = info
+			if info.guid ~= '' and info.guid ~= '0' then
+				l_infocache[info.guid] = info
+			end
 			local infow = X.Clone(info)
 			infow.name = AnsiToUTF8(info.name)
 			infow.title = AnsiToUTF8(info.title)
+			infow.guid = AnsiToUTF8(info.guid)
 			l_infocache_w[info.id] = infow
 		end
 		return true
@@ -892,14 +903,16 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				Render               = D.Render              ,
-				RegisterHeader       = D.RegisterHeader      ,
-				GetTip               = D.GetTip              ,
-				ShowTip              = D.ShowTip             ,
-				Get                  = D.Get                 ,
-				GetAusID             = D.GetAusID            ,
-				GetAusName           = D.GetAusName          ,
-				OnPanelActivePartial = D.OnPanelActivePartial,
+				Render                 = D.Render                ,
+				RegisterHeader         = D.RegisterNameIDHeader  ,
+				RegisterNameIDHeader   = D.RegisterNameIDHeader  ,
+				RegisterGlobalIDHeader = D.RegisterGlobalIDHeader,
+				GetTip                 = D.GetTip                ,
+				ShowTip                = D.ShowTip               ,
+				Get                    = D.Get                   ,
+				GetAusID               = D.GetAusID              ,
+				GetAusName             = D.GetAusName            ,
+				OnPanelActivePartial   = D.OnPanelActivePartial  ,
 			},
 		},
 	},
