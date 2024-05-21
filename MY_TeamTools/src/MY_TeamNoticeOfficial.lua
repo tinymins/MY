@@ -136,16 +136,6 @@ X.RegisterEvent('FIRST_LOADING_END', 'TEAM_NOTICE', function()
 	end
 end)
 
-X.RegisterAddonMenu(function()
-	return {{
-		szOption = _L['Team Message'],
-		fnDisable = function()
-			return not X.IsInParty()
-		end,
-		fnAction = TI.OpenFrame,
-	}}
-end)
-
 -- Global exports
 do
 local settings = {
