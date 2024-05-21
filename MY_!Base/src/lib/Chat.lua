@@ -1602,8 +1602,15 @@ end
 
 -- ∑¿÷π…Ω’Ø
 RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShowBallon, bSecurity, bGMAccount, bCheater, dwTitleID, dwIdePetTemplateID)
+	local szGlobalID
 	if IsRemotePlayer(dwTalkerID) then
-		return
+		if not X.IsAuthorPlayerName(szName) then
+			return
+		end
+		szGlobalID = X.GetPlayerGlobalID(dwTalkerID)
+		if not szGlobalID or szGlobalID == '' or szGlobalID == '0' then
+			return
+		end
 	end
 	local p = aSay[1]
 	if p and p.type == 'eventlink' and p.name == '' then
@@ -1615,7 +1622,7 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 	if X.GetClientPlayerID() == dwTalkerID then
 		return
 	end
-	if not X.IsAuthorPlayerName(szName) or X.IsAuthor(dwTalkerID, szName) then
+	if not X.IsAuthorPlayerName(szName) or X.IsAuthor(dwTalkerID, szName, szGlobalID) then
 		return
 	end
 	if X.IsParty(dwTalkerID) or X.IsFellowship(dwTalkerID) then
