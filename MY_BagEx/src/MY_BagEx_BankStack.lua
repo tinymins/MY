@@ -34,6 +34,7 @@ function D.Operate()
 		MY_BagEx_Bank.HideAllItemShadow()
 		FireUIEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', false)
 	end
+	local bStackLeftExistTime = false
 	local function fnNext()
 		bTrigger = true
 		if not frame then
@@ -49,7 +50,8 @@ function D.Operate()
 				local kItem = not MY_BagEx_Bank.IsItemBoxLocked(dwBox, dwX) and X.GetInventoryItem(me, dwBox, dwX)
 				if kItem and kItem.bCanStack and kItem.nStackNum < kItem.nMaxStackNum and me.GetTradeItemLeftTime(kItem.dwID) == 0 then
 					local szKey = X.GetItemKey(kItem)
-					local tPos = tList[szKey]
+					local nLeftExistTime = bStackLeftExistTime and 0 or kItem.GetLeftExistTime()
+					local tPos = tList[szKey] and tList[szKey][nLeftExistTime]
 					if tPos then
 						local dwBox1, dwX1 = tPos.dwBox, tPos.dwX
 						--[[#DEBUG BEGIN]]
@@ -58,7 +60,10 @@ function D.Operate()
 						X.ExchangeInventoryItem(dwBox, dwX, dwBox1, dwX1)
 						return
 					else
-						tList[szKey] = { dwBox = dwBox, dwX = dwX }
+						if not tList[szKey] then
+							tList[szKey] = {}
+						end
+						tList[szKey][nLeftExistTime] = { dwBox = dwBox, dwX = dwX }
 					end
 				end
 			end
