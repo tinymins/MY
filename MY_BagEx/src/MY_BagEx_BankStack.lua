@@ -117,7 +117,7 @@ function D.Operate()
 		MessageBox({
 			szMessage = g_tStrings.STR_STACK_BANK_JUDGE,
 			szName = 'BigBankPanel_StackBox',
-			fnAutoClose = function() return frame and frame:IsVisible() end,
+			fnAutoClose = function() return not frame or not frame:IsVisible() end,
 			fnCancelAction = fnFinish,
 			{
 				szOption = g_tStrings.STR_HOTKEY_SURE,
