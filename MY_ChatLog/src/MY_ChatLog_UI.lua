@@ -152,6 +152,23 @@ function MY_ChatLog_UI.OnCheckBoxUncheck()
 	D.UpdatePage(this:GetRoot())
 end
 
+function MY_ChatLog_UI.OnItemMouseIn()
+	local name = this:GetName()
+	if name == 'Handle_ChatLog' then
+		if IsCtrlKeyDown() and g_tStrings.tChannelName[this.channel] then
+			local szXml = GetFormatText(g_tStrings.tChannelName[this.channel] .. ' (' .. this.channel .. ')', 162, GetMsgFontColor(this.channel))
+			X.OutputTip( this, szXml, true)
+		end
+	end
+end
+
+function MY_ChatLog_UI.OnItemMouseOut()
+	local name = this:GetName()
+	if name == 'Handle_ChatLog' then
+		X.HideTip()
+	end
+end
+
 function MY_ChatLog_UI.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Index' then
@@ -243,12 +260,13 @@ function MY_ChatLog_UI.OnItemRButtonClick()
 					this:GetRoot().nLastClickIndex = nil
 					D.UpdatePage(this:GetRoot(), true)
 				end,
-			}, {
+			},
+			{
 				szOption = _L['Copy this record'],
 				fnAction = function()
 					X.CopyChatLine(this:Lookup('Handle_ChatLog_Msg'):Lookup(0), true)
 				end,
-			}
+			},
 		}
 		PopupMenu(menu)
 	end
@@ -364,6 +382,7 @@ function D.UpdatePage(frame, bKeepScroll)
 			hItem.hash = rec.szHash
 			hItem.time = rec.nTime
 			hItem.text = rec.szText
+			hItem.channel = rec.szChannel
 			if not frame.nLastClickIndex then
 				hItem:Lookup('Shadow_ChatLogSelect'):Hide()
 			end
