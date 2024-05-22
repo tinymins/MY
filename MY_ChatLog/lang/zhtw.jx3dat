@@ -41,7 +41,7 @@ return {
     ['Journal Log'] = '交易流水',
     ['MY Monitor'] = '聊天監控',
 
-    ['You need to upgrade chatlog database before using, that may take a while and cannot be break, do you want to do it now?'] = '聊天記錄需要優化更新資料庫後方可使用，更新可能導致客戶端無響應一段時間，希望現在開始更新嗎？',
+    ['Ancient chatlog detected, you can migrate chatlog database from them, that may take a while and cannot be break, do you want to do it now?'] = '發現舊版聊天記錄，是否立即導入，導入可能導致客戶端無響應一段時間，希望現在開始導入嗎？',
     ['Problem(s) detected on your chatlog database and must be fixed before use, would you like to do this now?'] = '檢測到您的聊天記錄數據受損，需要修複後方可使用，修複可能導致客戶端無響應一段時間，是否立即開始修複？',
     ['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'] = '請點擊確定開始操作，客戶端可能失去響應，請耐心等待。請勿隨意結束客戶端，否則您的聊天記錄可能會永久丟失。',
 

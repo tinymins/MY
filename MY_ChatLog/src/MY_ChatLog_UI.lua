@@ -73,10 +73,13 @@ function MY_ChatLog_UI.OnFrameCreate()
 
 	this:RegisterEvent('ON_MY_MOSAICS_RESET')
 	this:RegisterEvent('ON_MY_CHATLOG_INSERT_MSG')
+	this:RegisterEvent('ON_MY_CHAT_LOG_RELEASE_DB')
 
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:BringToTop()
 	this.SetDS = D.SetDS
+
+	MY_ChatLog.MigrateDB()
 end
 
 function MY_ChatLog_UI.OnEvent(event)
@@ -84,6 +87,8 @@ function MY_ChatLog_UI.OnEvent(event)
 		D.UpdatePage(this, true)
 	elseif event == 'ON_MY_CHATLOG_INSERT_MSG' then
 		D.UpdatePage(this, true)
+	elseif event == 'ON_MY_CHAT_LOG_RELEASE_DB' then
+		this:Destroy()
 	end
 end
 

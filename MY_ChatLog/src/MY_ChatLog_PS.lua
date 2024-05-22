@@ -286,6 +286,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 		end
 		db:SetMinTime(0)
 		db:SetMaxTime(math.huge)
+		db:SetInfo('version', '2')
 		db:SetInfo('user_global_id', X.GetClientPlayer().GetGlobalID())
 		l_bExporting = true
 

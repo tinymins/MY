@@ -113,6 +113,33 @@ local MSGTYPE_COLOR = setmetatable({
 }, {__index = function(t, k) return GetMsgFontColor(k, true) end})
 local UNSAVED_MSG_LIST, MAIN_DS = {}
 
+-- 旧版数据频道对应数据库中数值
+local MSG_CHANNEL_MAP = {
+	[1] = 'MSG_WHISPER',
+	[2] = 'MSG_PARTY',
+	[3] = 'MSG_TEAM',
+	[4] = 'MSG_FRIEND',
+	[5] = 'MSG_GUILD',
+	[6] = 'MSG_GUILD_ALLIANCE',
+	[7] = 'MSG_SELF_DEATH',
+	[8] = 'MSG_SELF_KILL',
+	[9] = 'MSG_PARTY_DEATH',
+	[10] = 'MSG_PARTY_KILL',
+	[11] = 'MSG_MONEY',
+	[12] = 'MSG_EXP',
+	[13] = 'MSG_ITEM',
+	[14] = 'MSG_REPUTATION',
+	[15] = 'MSG_CONTRIBUTE',
+	[16] = 'MSG_ATTRACTION',
+	[17] = 'MSG_PRESTIGE',
+	[18] = 'MSG_TRAIN',
+	[19] = 'MSG_MENTOR_VALUE',
+	[20] = 'MSG_THEW_STAMINA',
+	[21] = 'MSG_TONG_FUND',
+	[22] = 'MSG_MY_MONITOR',
+	[23] = 'MSG_SSG_WHISPER',
+}
+
 function D.GetRoot()
 	local szRoot = X.FormatPath({'userdata/chat_log/', X.PATH_TYPE.ROLE})
 	if not IsLocalFileExist(szRoot) then
@@ -134,9 +161,6 @@ function D.InitDB(szMode)
 	end
 	if szMode == 'silent' and not X.IsRestricted('MY_ChatLog.DEVELOP') then
 		szMode = 'sure'
-	end
-	if not D.UpgradeDB(szMode) then
-		return
 	end
 	local ds, bSuccess = MY_ChatLog_DS(D.GetRoot()), true
 	if not ds:InitDB() then
@@ -162,85 +186,90 @@ function D.InitDB(szMode)
 	return bSuccess
 end
 
--- 检查升级数据库版本
-function D.UpgradeDB(szMode)
-	local szPath, bSuccess = X.FormatPath({'userdata/chat_log.db', X.PATH_TYPE.ROLE}), true
-	if IsLocalFileExist(szPath) then
-		bSuccess = false
-		if szMode == 'ask' then
-			X.Confirm(_L['You need to upgrade chatlog database before using, that may take a while and cannot be break, do you want to do it now?'], function()
-				X.Alert(_L['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'], function()
-					D.InitDB('sure')
-				end)
-			end)
-		elseif szMode == 'sure' then
-			D.ImportDB(szPath)
-			CPath.Move(szPath, szPath .. '.bak' .. GetCurrentTime())
-			MY.Alert(_L['Upgrade succeed!'])
-			bSuccess = true
-		end
-	end
-	return bSuccess
-end
-X.RegisterInit('MY_ChatLog_UpgradeDB', D.UpgradeDB)
-
 -- 导入数据
-function D.ImportDB(szPath)
-	local odb, nImportCount = X.SQLiteConnect(_L['MY_ChatLog'], szPath), 0
-	if odb then
-		-- 老版分表机制
-		local dwGlobalID = X.Get(odb:Execute('SELECT * FROM ChatLogInfo WHERE key = "userguid"'), {1, 'value'})
-		if dwGlobalID == X.GetClientPlayer().GetGlobalID() then
-			for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex WHERE name IS NOT NULL ORDER BY stime ASC') or X.CONSTANT.EMPTY_TABLE) do
-				if info.etime == -1 then
-					info.etime = 0
-				end
-				local db = MY_ChatLog_DB(D.GetRoot() .. info.name .. '.db')
-				db:SetMinTime(info.stime)
-				db:SetMaxTime(info.etime)
-				db:SetInfo('user_global_id', dwGlobalID)
-				for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' WHERE talker IS NOT NULL ORDER BY time ASC') or X.CONSTANT.EMPTY_TABLE) do
-					nImportCount = nImportCount + 1
-					db:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
-				end
-				db:Flush()
-				db:Disconnect()
-			end
-		end
-		-- 新版导出数据
-		local dwGlobalID = X.Get(odb:Execute('SELECT value FROM ChatInfo WHERE key = "user_global_id"'), {1, 'value'}, ''):gsub('"', '')
-		if dwGlobalID == X.GetClientPlayer().GetGlobalID() then
-			local nCount = X.Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
-			if nCount > 0 then
-				local szRoot, nOffset, nLimit, szNewPath, dbNew = D.GetRoot(), 0, 20000
-				local stmt, aRes = odb:Prepare('SELECT * FROM ChatLog WHERE talker IS NOT NULL ORDER BY time ASC LIMIT ' .. nLimit .. ' OFFSET ?')
-				while nOffset < nCount do
-					stmt:ClearBindings()
-					stmt:BindAll(nOffset)
-					aRes = stmt:GetAll()
-					if #aRes > 0 then
-						repeat
-							szNewPath = szRoot .. ('chatlog_%x'):format(X.Random(0x100000, 0xFFFFFF)) .. '.db'
-						until not IsLocalFileExist(szNewPath)
-						dbNew = MY_ChatLog_DB(szNewPath)
-						dbNew:SetMinTime(aRes[1].time)
-						dbNew:SetMaxTime(aRes[#aRes].time)
-						dbNew:SetInfo('user_global_id', dwGlobalID)
-						for _, p in ipairs(aRes) do
-							nImportCount = nImportCount + 1
-							dbNew:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
-						end
-						dbNew:Flush()
-						dbNew:Disconnect()
-					end
-					nOffset = nOffset + nLimit
-				end
-				stmt:Reset()
-			end
-		end
-		odb:Release()
+function D.ImportDB(aPath)
+	if X.IsString(aPath) then
+		aPath = {aPath}
 	end
-	MY_ChatLog_DS(D.GetRoot()):InitDB(true):OptimizeDB()
+	-- 先释放存储集群防止出现缓存同步问题
+	D.ReleaseDB()
+	-- 开始导入
+	local nImportCount = 0
+	for _, szPath in ipairs(aPath) do
+		local odb = X.SQLiteConnect(_L['MY_ChatLog'], szPath)
+		if odb then
+			-- 老版分表机制
+			local szGlobalID = X.Get(odb:Execute('SELECT * FROM ChatLogInfo WHERE key = "userguid"'), {1, 'value'})
+			if szGlobalID == X.GetClientPlayer().GetGlobalID() then
+				for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex WHERE name IS NOT NULL ORDER BY stime ASC') or X.CONSTANT.EMPTY_TABLE) do
+					if info.etime == -1 then
+						info.etime = 0
+					end
+					local db = MY_ChatLog_DB(D.GetRoot() .. info.name .. '.v2.db')
+					db:SetMinTime(info.stime)
+					db:SetMaxTime(info.etime)
+					db:SetInfo('version', '2')
+					db:SetInfo('user_global_id', szGlobalID)
+					for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' WHERE talker IS NOT NULL ORDER BY time ASC') or X.CONSTANT.EMPTY_TABLE) do
+						local szChannel = MSG_CHANNEL_MAP[p.channel]
+						if szChannel then
+							nImportCount = nImportCount + 1
+							db:InsertMsg(szChannel, p.text, p.msg, p.talker, p.time, p.hash)
+						end
+					end
+					db:Flush()
+					db:Disconnect()
+				end
+			end
+			-- 新版导出数据
+			local szGlobalID = X.Get(odb:Execute('SELECT value FROM ChatInfo WHERE key = "user_global_id"'), {1, 'value'}, ''):gsub('"', '')
+			if szGlobalID == X.GetClientPlayer().GetGlobalID() then
+				local szVersion = X.Get(odb:Execute('SELECT value FROM ChatInfo WHERE key = "version"'), {1, 'value'}, '')
+				local nCount = X.Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
+				if nCount > 0 then
+					local szRoot, nOffset, nLimit, szNewPath, dbNew = D.GetRoot(), 0, 20000
+					local stmt, aRes = odb:Prepare('SELECT * FROM ChatLog WHERE talker IS NOT NULL ORDER BY time ASC LIMIT ' .. nLimit .. ' OFFSET ?')
+					while nOffset < nCount do
+						stmt:ClearBindings()
+						stmt:BindAll(nOffset)
+						aRes = stmt:GetAll()
+						if #aRes > 0 then
+							repeat
+								szNewPath = szRoot .. ('chatlog_%x'):format(X.Random(0x100000, 0xFFFFFF)) .. '.v2.db'
+							until not IsLocalFileExist(szNewPath)
+							dbNew = MY_ChatLog_DB(szNewPath)
+							dbNew:SetMinTime(aRes[1].time)
+							dbNew:SetMaxTime(aRes[#aRes].time)
+							dbNew:SetInfo('version', '2')
+							dbNew:SetInfo('user_global_id', szGlobalID)
+							for _, p in ipairs(aRes) do
+								if szVersion == '2' then
+									nImportCount = nImportCount + 1
+									dbNew:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
+								else
+									local szChannel = MSG_CHANNEL_MAP[p.channel]
+									if szChannel then
+										nImportCount = nImportCount + 1
+										dbNew:InsertMsg(szChannel, p.text, p.msg, p.talker, p.time, p.hash)
+									end
+								end
+							end
+							dbNew:Flush()
+							dbNew:Disconnect()
+						end
+						nOffset = nOffset + nLimit
+					end
+					stmt:Reset()
+				end
+			end
+			odb:Release()
+		end
+	end
+	-- 优化集群数据
+	local ds = MY_ChatLog_DS(D.GetRoot())
+	ds:InitDB(true)
+	ds:OptimizeDB()
+	ds:ReleaseDB()
 	return nImportCount
 end
 
@@ -249,6 +278,34 @@ function D.OptimizeDB()
 		return
 	end
 	MAIN_DS:OptimizeDB()
+end
+
+-- 检查升级数据库版本
+function D.MigrateDB()
+	local aImportPath = {}
+	-- 旧版单文件
+	local DB_V0_PATH = X.FormatPath({'userdata/chat_log.db', X.PATH_TYPE.ROLE})
+	if IsLocalFileExist(DB_V0_PATH) then
+		table.insert(aImportPath, DB_V0_PATH)
+	end
+	-- 旧版集群V1
+	for _, szName in ipairs(CPath.GetFileList(D.GetRoot()) or {}) do
+		if szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.db$') then
+			table.insert(aImportPath, D.GetRoot() .. szName)
+		end
+	end
+	if X.IsEmpty(aImportPath) then
+		return
+	end
+	X.Confirm(_L['Ancient chatlog detected, you can migrate chatlog database from them, that may take a while and cannot be break, do you want to do it now?'], function()
+		X.Alert(_L['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'], function()
+			D.ImportDB(aImportPath)
+			for _, szPath in ipairs(aImportPath) do
+				CPath.Move(szPath, szPath .. '.bak' .. GetCurrentTime())
+			end
+			MY.Alert(_L['Upgrade succeed!'])
+		end)
+	end)
 end
 
 (function()
@@ -349,6 +406,7 @@ function D.FlushDB(bCheckExceed)
 end
 
 function D.ReleaseDB()
+	FireUIEvent('ON_MY_CHAT_LOG_RELEASE_DB')
 	D.FlushDB(true)
 	if not MAIN_DS then
 		return
@@ -382,6 +440,7 @@ local settings = {
 				'Open',
 				'GetRoot',
 				'InitDB',
+				'MigrateDB',
 				'OptimizeDB',
 				'ImportDB',
 			},

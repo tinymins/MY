@@ -21,7 +21,7 @@ end
 --------------------------------------------------------------------------
 local DB = class()
 local DB_CACHE = setmetatable({}, {__mode = 'v'})
-local SELECT_MSG = 'SELECT hash AS szHash, channel AS nChannel, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog'
+local SELECT_MSG = 'SELECT hash AS szHash, channel AS szChannel, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog'
 local DELETE_MSG = 'DELETE FROM ChatLog'
 
 local function FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
@@ -47,9 +47,9 @@ local function AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nM
 	local szWhere = ''
 	local aWhere = {}
 	if aChannel then
-		for _, nChannel in ipairs(aChannel) do
+		for _, szChannel in ipairs(aChannel) do
 			table.insert(aWhere, 'channel = ?')
-			table.insert(aValue, nChannel)
+			table.insert(aValue, szChannel)
 		end
 	end
 	if #aWhere > 0 then
@@ -146,7 +146,7 @@ function DB:Connect(bCheck)
 			self.db:Execute([[
 				CREATE TABLE IF NOT EXISTS ChatLog (
 					hash INTEGER NOT NULL,
-					channel INTEGER NOT NULL,
+					channel VARCHAR(64) NOT NULL,
 					time INTEGER NOT NULL,
 					talker NVARCHAR(20) NOT NULL,
 					text NVARCHAR(400) NOT NULL,
@@ -157,7 +157,7 @@ function DB:Connect(bCheck)
 			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_channel_idx ON ChatLog(channel)')
 			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_talker_idx ON ChatLog(talker)')
 			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_text_idx ON ChatLog(text)')
-			self.stmtCount = self.db:Prepare('SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog WHERE talker LIKE ? OR text LIKE ? GROUP BY nChannel')
+			self.stmtCount = self.db:Prepare('SELECT channel AS szChannel, COUNT(*) AS nCount FROM ChatLog WHERE talker LIKE ? OR text LIKE ? GROUP BY szChannel')
 			self.stmtInsert = self.db:Prepare('REPLACE INTO ChatLog (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)')
 			self.stmtDelete = self.db:Prepare('DELETE FROM ChatLog WHERE hash = ? AND time = ?')
 		end
@@ -281,14 +281,14 @@ function DB:GetMaxTime()
 	return self._nMaxTime
 end
 
-function DB:InsertMsg(nChannel, szText, szMsg, szTalker, nTime, szHash)
+function DB:InsertMsg(szChannel, szText, szMsg, szTalker, nTime, szHash)
 	local nMinTime, nMaxTime = self:GetMinTime(), self:GetMaxTime()
 	assert(nTime >= nMinTime and nTime <= nMaxTime,
 		'[MY_ChatLog_DB:InsertMsg] Time(' ..nTime .. ') must between MinTime(' .. nMinTime .. ') and MaxTime(' .. nMaxTime .. ').')
-	if not nChannel or not nTime or X.IsEmpty(szMsg) or not szText or X.IsEmpty(szHash) then
+	if not szChannel or not nTime or X.IsEmpty(szMsg) or not szText or X.IsEmpty(szHash) then
 		return
 	end
-	table.insert(self.aInsertQueue, {szHash = szHash, nChannel = nChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
+	table.insert(self.aInsertQueue, {szHash = szHash, szChannel = szChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
 end
 
 function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
@@ -318,9 +318,9 @@ function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 	if not tCount then
 		local aResult
 		if X.IsEmpty(szSearch) then
-			aResult = self.db:Execute('SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog GROUP BY channel')
+			aResult = self.db:Execute('SELECT channel AS szChannel, COUNT(*) AS nCount FROM ChatLog GROUP BY channel')
 		elseif bMinTime or bMaxTime then
-			local szSQL = 'SELECT channel AS nChannel, COUNT(*) AS nCount FROM ChatLog'
+			local szSQL = 'SELECT channel AS szChannel, COUNT(*) AS nCount FROM ChatLog'
 			local aValue = {}
 			szSQL = AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nMaxTime)
 			local stmt = self.db:Prepare(szSQL)
@@ -336,14 +336,14 @@ function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 		end
 		tCount = {}
 		for _, rec in ipairs(aResult) do
-			tCount[rec.nChannel] = rec.nCount
+			tCount[rec.szChannel] = rec.nCount
 		end
 		self.tCountCache[szKey] = tCount
 	end
 	local nCount = 0
 	if aChannel then
-		for _, nChannel in ipairs(aChannel) do
-			nCount = nCount + (tCount[nChannel] or 0)
+		for _, szChannel in ipairs(aChannel) do
+			nCount = nCount + (tCount[szChannel] or 0)
 		end
 	else
 		for _, n in pairs(tCount) do
@@ -429,7 +429,7 @@ function DB:Flush()
 		-- ²åÈë¼ÇÂ¼
 		for _, data in ipairs(self.aInsertQueue) do
 			self.stmtInsert:ClearBindings()
-			self.stmtInsert:BindAll(data.szHash, data.nChannel, data.nTime, data.szTalker, data.szText, data.szMsg)
+			self.stmtInsert:BindAll(data.szHash, data.szChannel, data.nTime, data.szTalker, data.szText, data.szMsg)
 			self.stmtInsert:Execute()
 		end
 		self.stmtInsert:Reset()
