@@ -114,6 +114,8 @@ function D.Operate()
 		MessageBox({
 			szMessage = g_tStrings.STR_STACK_BAG_JUDGE,
 			szName = 'BigBagPanel_StackBox',
+			x = frame:GetAbsX() + frame:GetW() / 2,
+			y = frame:GetAbsY() + frame:GetH() / 2,
 			fnAutoClose = function() return not frame or not frame:IsVisible() end,
 			fnCancelAction = fnFinish,
 			{
