@@ -10,6 +10,7 @@ return {
     ['[Teammate]'] = '〔隊友〕',
     ['Load default setting'] = '恢復默認設置',
     ['Player ID: %d'] = '玩家ID：%d',
+    ['Player GUID: %s'] = '玩家唯一ID：%s',
     ['Cannot connect to database!!!'] = '無法連接到角色資料庫！',
     ['Retry time: %d'] = '第%d次重試連接……',
     ['Unknown force'] = '未知門派',
