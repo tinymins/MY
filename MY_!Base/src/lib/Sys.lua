@@ -1382,6 +1382,7 @@ function X.Alert(szKey, szMsg, fnResolve)
 		x = tOpt.x, y = tOpt.y,
 		szMessage = szMsg,
 		fnCancelAction = tOpt.fnCancel,
+		fnAutoClose = tOpt.fnAutoClose,
 		{
 			szOption = tOpt.szResolve or g_tStrings.STR_HOTKEY_SURE,
 			fnAction = tOpt.fnResolve,
@@ -1420,6 +1421,7 @@ function X.Confirm(szKey, szMsg, fnResolve, fnReject, fnCancel)
 		x = tOpt.x, y = tOpt.y,
 		szMessage = szMsg,
 		fnCancelAction = tOpt.fnCancel,
+		fnAutoClose = tOpt.fnAutoClose,
 		{ szOption = tOpt.szResolve or g_tStrings.STR_HOTKEY_SURE, fnAction = tOpt.fnResolve },
 		{ szOption = tOpt.szReject or g_tStrings.STR_HOTKEY_CANCEL, fnAction = tOpt.fnReject },
 	})
