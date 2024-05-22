@@ -851,6 +851,7 @@ function D.RequestBackupLover()
 	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		return X.Systopmsg(_L['Backup lover is a sensitive action, please unlock to continue.'])
 	end
+	local lover = X.Clone(D.lover)
 	if lover.nLoverType == 1 then -- Ë«Ïò
 		local kTarget = D.GetNearbyPlayerByXID(lover.xID)
 		local info = kTarget and GetClientTeam().GetMemberInfo(kTarget.dwID)
