@@ -104,6 +104,7 @@ function D.CheckInjection(bRemoveInjection)
 									x = frame:GetAbsX() + frame:GetW() / 2,
 									y = frame:GetAbsY() + frame:GetH() / 2,
 									fnResolve = D.Operate,
+									fnAutoClose = function() return not frame or not frame:IsVisible() end,
 								})
 							else
 								D.Operate()

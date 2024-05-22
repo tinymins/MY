@@ -250,6 +250,7 @@ function D.CheckInjection(bRemoveInjection)
 									x = hFrame:GetAbsX() + hFrame:GetW() / 2,
 									y = hFrame:GetAbsY() + hFrame:GetH() / 2,
 									fnResolve = function() D.Operate(bRandom) end,
+									fnAutoClose = function() return not hFrame or not hFrame:IsVisible() end,
 								})
 							else
 								D.Operate(bRandom)

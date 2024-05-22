@@ -275,6 +275,7 @@ function D.CheckInjection(bRemoveInjection)
 								fnResolve = function() D.Operate(bRandom) end,
 								fnReject = MY_BagEx_Bank.HideAllItemShadow,
 								fnCancel = MY_BagEx_Bank.HideAllItemShadow,
+								fnAutoClose = function() return not hFrame or not hFrame:IsVisible() end,
 							})
 						else
 							D.Operate(bRandom)

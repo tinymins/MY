@@ -167,6 +167,7 @@ function D.CheckInjection(bRemoveInjection)
 								fnResolve = D.Operate,
 								fnReject = MY_BagEx_Bag.HideAllItemShadow,
 								fnCancel = MY_BagEx_Bag.HideAllItemShadow,
+								fnAutoClose = function() return not frame or not frame:IsVisible() end,
 							})
 						else
 							D.Operate()
