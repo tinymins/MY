@@ -363,7 +363,7 @@ local CHANNEL_LIST = {
 				Station.SetFocusWindow(edit)
 			end
 		end,
-		onuncheck = function()
+		onUncheck = function()
 			X.SwitchChatChannel('/cafk')
 		end,
 		tip = function()
@@ -392,7 +392,7 @@ local CHANNEL_LIST = {
 				Station.SetFocusWindow(edit)
 			end
 		end,
-		onuncheck = function()
+		onUncheck = function()
 			X.SwitchChatChannel('/catr')
 		end,
 		tip = function()
@@ -408,7 +408,7 @@ local CHANNEL_LIST = {
 		onCheck = function()
 			MY_ChatMosaics.bEnabled = true
 		end,
-		onuncheck = function()
+		onUncheck = function()
 			MY_ChatMosaics.bEnabled = false
 		end,
 		color = {255, 255, 255},
@@ -478,12 +478,12 @@ function D.OnFrameCreate()
 				txtCooldown = chk:Lookup('', 'Text_CD')
 				shaCount = chk:Lookup('', 'Shadow_Count')
 				chk.OnCheckBoxCheck = OnChannelCheck
-			else
+			elseif v.onCheck or v.onUncheck then
 				wnd = container:AppendContentFromIni(INI_PATH, 'Wnd_CheckBox')
 				chk = wnd:Lookup('WndCheckBox')
 				txtTitle = chk:Lookup('', 'Text_CheckBox')
 				chk.OnCheckBoxCheck = v.onCheck
-				chk.OnCheckBoxUncheck = v.onuncheck
+				chk.OnCheckBoxUncheck = v.onUncheck
 			end
 			wnd:SetRelX(nWidth)
 			nWidth = nWidth + math.ceil(wnd:GetW())
