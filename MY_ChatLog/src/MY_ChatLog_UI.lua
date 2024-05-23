@@ -286,7 +286,7 @@ function D.UpdatePage(hFrame, bKeepScroll)
 	hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index', 'Image_Index'):SetW(nW - 215)
 	hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index', 'Handle_IndexesOuter'):SetW(nW - 360)
 	hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index/Wnd_IndexEdit'):SetRelX(nW - 270)
-	hFrame:Lookup('Wnd_Total/Wnd_Main/Btn_ChatChannelAll'):SetRelY(nH - 27)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/Btn_ChatChannelAll'):SetRelY(nH - 17)
 	-- ÷ÿ–¬‰÷»æ
 	local container = hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatChanel/WndContainer_ChatChanel')
 	local aMsgType = {}
@@ -437,8 +437,8 @@ function D.Open(szRoot)
 		close = true,
 		maximize = true,
 		resize = true,
-		minWidth = 1000,
-		minHeight = 700,
+		minWidth = 600,
+		minHeight = 400,
 		text = _L['MY - MY_ChatLog'],
 		anchor = 'CENTER',
 		onSizeChange = function()
