@@ -72,7 +72,6 @@ function D.OnFrameCreate()
 
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:BringToTop()
-	this.SetDS = D.SetDS
 
 	MY_ChatLog.MigrateDB()
 end
@@ -409,8 +408,8 @@ function D.Open(szRoot)
 		nIndex = nIndex + 1
 	end
 	local hFrame = X.UI.OpenFrame(SZ_INI, 'MY_ChatLog_UI')
-	hFrame:SetDS(szRoot)
 	hFrame:SetName('MY_ChatLog_UI#' .. nIndex)
+	D.SetDS(hFrame, szRoot)
 end
 
 --------------------------------------------------------------------------------
