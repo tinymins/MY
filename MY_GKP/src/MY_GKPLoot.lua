@@ -255,8 +255,6 @@ local ITEM_CONFIG = setmetatable({}, {
 		end
 	end,
 })
-RegisterCustomData('MY_GKP_Loot.tConfirm')
-RegisterCustomData('MY_GKP_Loot.tItemConfig')
 
 function D.UpdateShielded()
 	GKP_AUTO_LOOT_DEBOUNCE_TIME = X.IsRestricted('MY_GKPLoot.FastLoot')
@@ -2217,25 +2215,6 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	nLFY = nY + nLH
 
 	return nX, nY, nLFY
-end
-
---------------------------------------------------------------------------------
--- 全局导出
---------------------------------------------------------------------------------
-do
-local settings = {
-	name = 'MY_GKP_Loot',
-	imports = {
-		{
-			fields = {
-				'tConfirm',
-				'tItemConfig',
-			},
-			root = D,
-		},
-	},
-}
-MY_GKP_Loot = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
