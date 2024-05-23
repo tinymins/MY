@@ -23,8 +23,7 @@ X.RegisterRestriction('MY_ChatLog.RealtimeCommit', { ['*'] = true, intl = false 
 
 local D = {}
 local EXPORT_SLICE = 100
-local LOG_TYPE = MY_ChatLog.LOG_TYPE
-local MSGTYPE_COLOR = MY_ChatLog.MSGTYPE_COLOR
+local MSG_TYPE_COLOR = MY_ChatLog.MSG_TYPE_COLOR
 
 ------------------------------------------------------------------------------------------------------
 -- 数据导出
@@ -200,7 +199,7 @@ function D.ExportConfirm()
 	local nPaddingX, nPaddingY = 10, 10
 	local x, y = nPaddingX, nPaddingY
 	local nMaxWidth = 0
-	for nGroup, info in ipairs(LOG_TYPE) do
+	for nGroup, info in ipairs(MY_ChatLog.aChannel) do
 		x = x + ui:Append('WndCheckBox', {
 			x = x, y = y, w = 100,
 			text = info.szTitle,
@@ -209,7 +208,7 @@ function D.ExportConfirm()
 				tChannels[nGroup] = bChecked
 				local bEnable = bChecked
 				if not bChecked then
-					for nGroup, _ in ipairs(LOG_TYPE) do
+					for nGroup, _ in ipairs(MY_ChatLog.aChannel) do
 						if tChannels[nGroup] then
 							bEnable = true
 							break
@@ -220,7 +219,7 @@ function D.ExportConfirm()
 			end,
 		}):AutoWidth():Width()
 		nMaxWidth = math.max(nMaxWidth, x + nPaddingX)
-		if nGroup % 2 == 0 or nGroup == #LOG_TYPE then
+		if nGroup % 2 == 0 or nGroup == #MY_ChatLog.aChannel then
 			x = nPaddingX
 			y = y + 30
 		else
@@ -240,10 +239,10 @@ function D.ExportConfirm()
 			end
 			local function doExport(szSuffix)
 				local aMsgType = {}
-				for nGroup, info in ipairs(LOG_TYPE) do
+				for nGroup, info in ipairs(MY_ChatLog.aChannel) do
 					if tChannels[nGroup] then
-						for _, szChannel in ipairs(info.aMsgType) do
-							table.insert(aMsgType, szChannel)
+						for _, szMsgType in ipairs(info.aMsgType) do
+							table.insert(aMsgType, szMsgType)
 						end
 					end
 				end
@@ -334,7 +333,7 @@ function D.Export(szExportFile, aMsgType, nPerSec, onProgress)
 			local data = ds:SelectMsg(aMsgType, '', nil, nil, nPage * EXPORT_SLICE, EXPORT_SLICE)
 			for i, rec in ipairs(data) do
 				local f = GetMsgFont(rec.szMsgType)
-				local r, g, b = unpack(MSGTYPE_COLOR[rec.szMsgType])
+				local r, g, b = unpack(MSG_TYPE_COLOR[rec.szMsgType])
 				Log(szExportFile, convertXml2Html(X.GetChatTimeXML(rec.nTime, {r=r, g=g, b=b, f=f, s='[%yyyy/%MM/%dd][%hh:%mm:%ss]'})))
 				Log(szExportFile, convertXml2Html(rec.szMsg))
 			end
@@ -367,13 +366,104 @@ function PS.OnPanelActive(wnd)
 	nY = nY + dy
 	nX = nPaddingX + 10
 
+	ui:Append('WndComboBox', {
+		x = nX, y = nY, w = wr, h = 25,
+		text = _L['Channel settings'],
+		menu = function()
+			local menu = {}
+			for _, tChannel in ipairs(MY_ChatLog.aChannel) do
+				local tMsgTypeChecked = {}
+				for _, szMsgType in ipairs(tChannel.aMsgType) do
+					tMsgTypeChecked[szMsgType] = true
+				end
+				local m = {
+					szOption = tChannel.szTitle,
+					{
+						szOption = _L['Rename channel'],
+						fnAction = function()
+							GetUserInput(_L['Please input new channel name:'], function(szTitle)
+								tChannel.szTitle = szTitle
+								MY_ChatLog.aChannel = MY_ChatLog.aChannel
+							end, nil, nil, nil, tChannel.szTitle)
+							X.UI.ClosePopupMenu()
+						end,
+					},
+					X.CONSTANT.MENU_DIVIDER,
+				}
+				for _, v in ipairs(X.GetMsgTypeMenu(function(szMsgType)
+					for i, v in ipairs(tChannel.aMsgType) do
+						if v == szMsgType then
+							table.remove(tChannel.aMsgType, i)
+							MY_ChatLog.aChannel = MY_ChatLog.aChannel
+							return
+						end
+					end
+					table.insert(tChannel.aMsgType, szMsgType)
+					MY_ChatLog.aChannel = MY_ChatLog.aChannel
+				end, tMsgTypeChecked)) do
+					table.insert(m, v)
+				end
+				local m1 = { szOption = _L['Other channel'] }
+				for _, szMsgType in ipairs(MY_ChatLog.MSG_TYPE_CUSTOM) do
+					table.insert(m1, {
+						szOption = MY_ChatLog.MSG_TYPE_TITLE[szMsgType],
+						rgb = MY_ChatLog.MSG_TYPE_COLOR[szMsgType],
+						bCheck = true, bChecked = tMsgTypeChecked[szMsgType],
+						fnAction = function()
+							for i, v in ipairs(tChannel.aMsgType) do
+								if v == szMsgType then
+									table.remove(v, i)
+									MY_ChatLog.aChannel = MY_ChatLog.aChannel
+									return
+								end
+							end
+							table.insert(tChannel.aMsgType, szMsgType)
+							MY_ChatLog.aChannel = MY_ChatLog.aChannel
+						end,
+					})
+				end
+				table.insert(m, m1)
+				table.insert(menu, m)
+			end
+			if #menu > 0 then
+				table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+			end
+			table.insert(menu, {
+				szOption = _L['New channel'],
+				fnAction = function()
+					GetUserInput(_L['Please input new channel name:'], function(szTitle)
+						table.insert(MY_ChatLog.aChannel, {
+							szKey = X.GetUUID(),
+							szTitle = szTitle,
+							aMsgType = {},
+						})
+						MY_ChatLog.aChannel = MY_ChatLog.aChannel
+					end, nil, nil, nil, _L['New channel'])
+					X.UI.ClosePopupMenu()
+				end,
+			})
+			table.insert(menu, {
+				szOption = _L['Reset channel'],
+				rgb = {255, 0, 0},
+				fnAction = function()
+					X.Confirm(_L['Are you sure to reset channel settings? Al custom channel settings will be lost.'], function()
+						MY_ChatLog.ResetChannel()
+					end)
+					X.UI.ClosePopupMenu()
+				end,
+			})
+			return menu
+		end,
+	})
+	nY = nY + dy
+
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = wr,
 		text = _L['Filter tong member log message'],
 		checked = MY_ChatLog.bIgnoreTongMemberLogMsg,
 		onCheck = function(bChecked)
 			MY_ChatLog.bIgnoreTongMemberLogMsg = bChecked
-		end
+		end,
 	})
 	nY = nY + dy
 
@@ -383,7 +473,7 @@ function PS.OnPanelActive(wnd)
 		checked = MY_ChatLog.bIgnoreTongOnlineMsg,
 		onCheck = function(bChecked)
 			MY_ChatLog.bIgnoreTongOnlineMsg = bChecked
-		end
+		end,
 	})
 	nY = nY + dy
 
@@ -394,7 +484,7 @@ function PS.OnPanelActive(wnd)
 			checked = MY_ChatLog.bRealtimeCommit,
 			onCheck = function(bChecked)
 				MY_ChatLog.bRealtimeCommit = bChecked
-			end
+			end,
 		})
 		nY = nY + dy
 	end
@@ -405,7 +495,7 @@ function PS.OnPanelActive(wnd)
 		checked = MY_ChatLog.bAutoConnectDB,
 		onCheck = function(bChecked)
 			MY_ChatLog.bAutoConnectDB = bChecked
-		end
+		end,
 	})
 	nY = nY + dy
 

@@ -21,6 +21,18 @@ end
 X.RegisterRestriction('MY_ChatLog.DEVELOP', { ['*'] = true })
 --------------------------------------------------------------------------
 
+local MSG_TYPE_CUSTOM = {
+	'MSG_MY_MONITOR',
+}
+
+local MSG_TYPE_TITLE = setmetatable({
+	['MSG_MY_MONITOR'] = _L['MY Monitor'],
+}, {__index = g_tStrings.tChannelName})
+
+local MSG_TYPE_COLOR = setmetatable({
+	['MSG_MY_MONITOR'] = {255, 255, 0},
+}, {__index = function(t, k) return GetMsgFontColor(k, true) end})
+
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	bIgnoreTongOnlineMsg = { -- 帮会上线通知
 		ePathType = X.PATH_TYPE.ROLE,
@@ -46,6 +58,53 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	aChannel = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatLog'],
+		xSchema = X.Schema.Collection(
+			X.Schema.Record({
+				szKey = X.Schema.String,
+				szTitle = X.Schema.String,
+				aMsgType = X.Schema.Collection(X.Schema.String),
+			})
+		),
+		xDefaultValue = (function()
+			local aChannel = {
+				{ szKey = 'whisper', szTitle = MSG_TYPE_TITLE['MSG_WHISPER'], aMsgType = {'MSG_WHISPER', 'MSG_SSG_WHISPER'} },
+				{ szKey = 'party'  , szTitle = MSG_TYPE_TITLE['MSG_PARTY'], aMsgType = {'MSG_PARTY'} },
+				{ szKey = 'team'   , szTitle = MSG_TYPE_TITLE['MSG_TEAM'], aMsgType = {'MSG_TEAM'} },
+				{ szKey = 'room'   , szTitle = MSG_TYPE_TITLE['MSG_ROOM'], aMsgType = {'MSG_ROOM'} },
+				{ szKey = 'friend' , szTitle = MSG_TYPE_TITLE['MSG_FRIEND'], aMsgType = {'MSG_FRIEND'} },
+				{ szKey = 'guild'  , szTitle = MSG_TYPE_TITLE['MSG_GUILD'], aMsgType = {'MSG_GUILD'} },
+				{ szKey = 'guild_a', szTitle = MSG_TYPE_TITLE['MSG_GUILD_ALLIANCE'], aMsgType = {'MSG_GUILD_ALLIANCE'} },
+				{ szKey = 'death'  , szTitle = _L['Death Log'], aMsgType = {'MSG_SELF_DEATH', 'MSG_SELF_KILL', 'MSG_PARTY_DEATH', 'MSG_PARTY_KILL'} },
+				{
+					szKey = 'journal', szTitle = _L['Journal Log'], aMsgType = (function()
+						for _, v in ipairs(X.CONSTANT.MSG_TYPE_MENU) do
+							if v.szOption == g_tStrings.EARN then
+								local a = {}
+								for _, vv in ipairs(v) do
+									table.insert(a, vv)
+								end
+								return a
+							end
+						end
+						return {
+							'MSG_MONEY', 'MSG_ITEM', --'MSG_EXP', 'MSG_REPUTATION', 'MSG_CONTRIBUTE', 'MSG_ATTRACTION', 'MSG_PRESTIGE',
+							-- 'MSG_TRAIN', 'MSG_MENTOR_VALUE', 'MSG_THEW_STAMINA', 'MSG_TONG_FUND'
+						}
+					end)(),
+				},
+				{ szKey = 'monitor', szTitle = MSG_TYPE_TITLE['MSG_MY_MONITOR'], aMsgType = {'MSG_MY_MONITOR'} },
+			}
+			for i, v in X.ipairs_r(aChannel) do
+				if not v or not v.szTitle then
+					table.remove(aChannel, i)
+				end
+			end
+			return aChannel
+		end)(),
+	},
 	tUncheckedChannel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatLog'],
@@ -65,39 +124,6 @@ local TONG_MEMBER_LOGOUT_MSG = '^' .. X.EscapeString(g_tStrings.STR_GUILD_MEMBER
 ------------------------------------------------------------------------------------------------------
 -- 数据库控制器
 ------------------------------------------------------------------------------------------------------
-local LOG_TYPE = {
-	{ szKey = 'whisper', szTitle = g_tStrings.tChannelName['MSG_WHISPER'], aMsgType = {'MSG_WHISPER', 'MSG_SSG_WHISPER'} },
-	{ szKey = 'party'  , szTitle = g_tStrings.tChannelName['MSG_PARTY'], aMsgType = {'MSG_PARTY'} },
-	{ szKey = 'team'   , szTitle = g_tStrings.tChannelName['MSG_TEAM'], aMsgType = {'MSG_TEAM'} },
-	{ szKey = 'room'   , szTitle = g_tStrings.tChannelName['MSG_ROOM'], aMsgType = {'MSG_ROOM'} },
-	{ szKey = 'friend' , szTitle = g_tStrings.tChannelName['MSG_FRIEND'], aMsgType = {'MSG_FRIEND'} },
-	{ szKey = 'guild'  , szTitle = g_tStrings.tChannelName['MSG_GUILD'], aMsgType = {'MSG_GUILD'} },
-	{ szKey = 'guild_a', szTitle = g_tStrings.tChannelName['MSG_GUILD_ALLIANCE'], aMsgType = {'MSG_GUILD_ALLIANCE'} },
-	{ szKey = 'death'  , szTitle = _L['Death Log'], aMsgType = {'MSG_SELF_DEATH', 'MSG_SELF_KILL', 'MSG_PARTY_DEATH', 'MSG_PARTY_KILL'} },
-	{
-		szKey = 'journal', szTitle = _L['Journal Log'], aMsgType = (function()
-			for _, v in ipairs(X.CONSTANT.MSG_TYPE_MENU) do
-				if v.szOption == g_tStrings.EARN then
-					local a = {}
-					for _, vv in ipairs(v) do
-						table.insert(a, vv)
-					end
-					return a
-				end
-			end
-			return {
-				'MSG_MONEY', 'MSG_ITEM', --'MSG_EXP', 'MSG_REPUTATION', 'MSG_CONTRIBUTE', 'MSG_ATTRACTION', 'MSG_PRESTIGE',
-				-- 'MSG_TRAIN', 'MSG_MENTOR_VALUE', 'MSG_THEW_STAMINA', 'MSG_TONG_FUND'
-			}
-		end)(),
-	},
-	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aMsgType = {'MSG_MY_MONITOR'} },
-}
-for i, v in X.ipairs_r(LOG_TYPE) do
-	if not v or not v.szTitle then
-		table.remove(LOG_TYPE, i)
-	end
-end
 local LOG_LIMIT = (X.ENVIRONMENT.GAME_PROVIDER == 'remote' and not X.IsDebugClient())
 	and {
 		{ aKey = {'whisper'}, nLimit = 5000 },
@@ -108,9 +134,6 @@ local LOG_LIMIT = (X.ENVIRONMENT.GAME_PROVIDER == 'remote' and not X.IsDebugClie
 		{ aKey = {'monitor'}, nLimit = 1000 },
 	}
 	or {}
-local MSGTYPE_COLOR = setmetatable({
-	['MSG_MY_MONITOR'] = {255, 255, 0},
-}, {__index = function(t, k) return GetMsgFontColor(k, true) end})
 local UNSAVED_MSG_LIST, MAIN_DS = {}
 
 -- 旧版数据频道对应数据库中数值
@@ -150,6 +173,12 @@ end
 
 function D.Open()
 	MY_ChatLog_Open(D.GetRoot())
+end
+
+function D.ResetChannel()
+	O('reset', { 'aChannel' })
+	D.RegisterMsgMonitor()
+	FireUIEvent('ON_MY_CHAT_LOG_CHANNEL_CHANGE')
 end
 
 function D.InitDB(szMode)
@@ -308,9 +337,13 @@ function D.MigrateDB()
 	end)
 end
 
-(function()
+local REGISTER_MONITOR_MSG_TYPE = {}
+function D.RegisterMsgMonitor()
+	for szMsgType, _ in pairs(REGISTER_MONITOR_MSG_TYPE) do
+		X.RegisterMsgMonitor(szMsgType, 'MY_ChatLog', false)
+	end
 	local tMsgType = {}
-	for _, info in ipairs(LOG_TYPE) do
+	for _, info in ipairs(MY_ChatLog.aChannel) do
 		for _, szMsgType in ipairs(info.aMsgType) do
 			tMsgType[szMsgType] = true
 		end
@@ -344,7 +377,8 @@ end
 			end
 		end)
 	end
-end)()
+	REGISTER_MONITOR_MSG_TYPE = tMsgType
+end
 
 X.RegisterEvent('LOADING_ENDING', 'MY_ChatLog_Save', function()
 	if MAIN_DS then
@@ -382,7 +416,7 @@ function D.FlushDB(bCheckExceed)
 	for _, p in ipairs(LOG_LIMIT) do
 		local aMsgType = {}
 		for _, szKey in ipairs(p.aKey) do
-			for _, info in ipairs(LOG_TYPE) do
+			for _, info in ipairs(MY_ChatLog.aChannel) do
 				if info.szKey == szKey then
 					for _, szMsgType in ipairs(info.aMsgType) do
 						table.insert(aMsgType, szMsgType)
@@ -412,16 +446,19 @@ function D.ReleaseDB()
 	end
 	MAIN_DS:ReleaseDB()
 end
-X.RegisterExit('MY_Chat_Release', D.ReleaseDB)
+X.RegisterExit('MY_ChatLog_Release', D.ReleaseDB)
 
-X.RegisterEvent('DISCONNECT', 'MY_Chat_Release', function()
+X.RegisterInit('MY_ChatLog_InitMsgMonitor', D.RegisterMsgMonitor)
+X.RegisterUserSettingsInit('MY_ChatLog_InitMsgMonitor', D.RegisterMsgMonitor)
+
+X.RegisterEvent('DISCONNECT', 'MY_ChatLog_Release', function()
 	if X.IsRestricted('MY_ChatLog.DEVELOP') then
 		return
 	end
 	D.ReleaseDB()
 end)
 
-X.RegisterAddonMenu('MY_CHATLOG_MENU', {
+X.RegisterAddonMenu('MY_ChatLog_Menu', {
 	szOption = _L['MY_ChatLog'],
 	fnAction = D.Open,
 })
@@ -434,14 +471,16 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				LOG_TYPE = LOG_TYPE,
-				MSGTYPE_COLOR = MSGTYPE_COLOR,
+				MSG_TYPE_CUSTOM = MSG_TYPE_CUSTOM,
+				MSG_TYPE_TITLE = MSG_TYPE_TITLE,
+				MSG_TYPE_COLOR = MSG_TYPE_COLOR,
 				'Open',
 				'GetRoot',
 				'InitDB',
 				'MigrateDB',
 				'OptimizeDB',
 				'ImportDB',
+				'ResetChannel',
 			},
 			root = D,
 		},
@@ -451,6 +490,7 @@ local settings = {
 				'bIgnoreTongMemberLogMsg',
 				'bRealtimeCommit',
 				'bAutoConnectDB',
+				'aChannel',
 				'tUncheckedChannel',
 			},
 			root = O,
@@ -463,7 +503,14 @@ local settings = {
 				'bIgnoreTongMemberLogMsg',
 				'bRealtimeCommit',
 				'bAutoConnectDB',
+				'aChannel',
 				'tUncheckedChannel',
+			},
+			triggers = {
+				aChannel = function()
+					D.RegisterMsgMonitor()
+					FireUIEvent('ON_MY_CHAT_LOG_CHANNEL_CHANGE')
+				end,
 			},
 			root = O,
 		},

@@ -29,8 +29,7 @@ MY_ChatLog_UI = class()
 local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_ChatLog/ui/MY_ChatLog.ini'
 local PAGE_AMOUNT = 150
 local PAGE_DISPLAY = 14
-local LOG_TYPE = MY_ChatLog.LOG_TYPE
-local MSGTYPE_COLOR = MY_ChatLog.MSGTYPE_COLOR
+local MSG_TYPE_COLOR = MY_ChatLog.MSG_TYPE_COLOR
 
 function D.SetDS(frame, szRoot)
 	frame.ds = MY_ChatLog_DS(szRoot)
@@ -38,19 +37,16 @@ function D.SetDS(frame, szRoot)
 end
 
 function MY_ChatLog_UI.OnFrameCreate()
-	if type(MY_ChatLog.tUncheckedChannel) ~= 'table' then
-		MY_ChatLog.tUncheckedChannel = {}
-	end
 	this.tUncheckedChannel = X.Clone(MY_ChatLog.tUncheckedChannel)
 	local container = this:Lookup('Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel')
 	container:Clear()
-	for _, info in pairs(LOG_TYPE) do
+	for _, info in pairs(MY_ChatLog.aChannel) do
 		local wnd = container:AppendContentFromIni(SZ_INI, 'Wnd_ChatChannel')
 		wnd.szKey = info.szKey
 		wnd.aMsgType = info.aMsgType
 		wnd:Lookup('CheckBox_ChatChannel'):Check(not this.tUncheckedChannel[info.szKey], WNDEVENT_FIRETYPE.PREVENT)
 		wnd:Lookup('CheckBox_ChatChannel', 'Text_ChatChannel'):SetText(info.szTitle)
-		wnd:Lookup('CheckBox_ChatChannel', 'Text_ChatChannel'):SetFontColor(unpack(MSGTYPE_COLOR[info.aMsgType[1]]))
+		wnd:Lookup('CheckBox_ChatChannel', 'Text_ChatChannel'):SetFontColor(unpack(MSG_TYPE_COLOR[info.aMsgType[1]]))
 	end
 	container:FormatAllContentPos()
 
@@ -74,6 +70,7 @@ function MY_ChatLog_UI.OnFrameCreate()
 	this:RegisterEvent('ON_MY_MOSAICS_RESET')
 	this:RegisterEvent('ON_MY_CHATLOG_INSERT_MSG')
 	this:RegisterEvent('ON_MY_CHAT_LOG_RELEASE_DB')
+	this:RegisterEvent('ON_MY_CHAT_LOG_CHANNEL_CHANGE')
 
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:BringToTop()
@@ -88,6 +85,8 @@ function MY_ChatLog_UI.OnEvent(event)
 	elseif event == 'ON_MY_CHATLOG_INSERT_MSG' then
 		D.UpdatePage(this, true)
 	elseif event == 'ON_MY_CHAT_LOG_RELEASE_DB' then
+		this:Destroy()
+	elseif event == 'ON_MY_CHAT_LOG_CHANNEL_CHANGE' then
 		this:Destroy()
 	end
 end
@@ -347,7 +346,7 @@ function D.UpdatePage(frame, bKeepScroll)
 		local hItem = handle:Lookup(i - 1)
 		if rec then
 			local f = GetMsgFont(rec.szMsgType)
-			local r, g, b = unpack(MSGTYPE_COLOR[rec.szMsgType])
+			local r, g, b = unpack(MSG_TYPE_COLOR[rec.szMsgType])
 			local h = hItem:Lookup('Handle_ChatLog_Msg')
 			h:Clear()
 			h:AppendItemFromString(X.GetChatTimeXML(rec.nTime, {
