@@ -26,17 +26,22 @@ local D = {}
 ------------------------------------------------------------------------------------------------------
 local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_ChatLog/ui/MY_ChatLog.ini'
 local PAGE_AMOUNT = 150
-local PAGE_DISPLAY = 14
 local MSG_TYPE_COLOR = MY_ChatLog.MSG_TYPE_COLOR
 
-function D.SetDS(frame, szRoot)
-	frame.ds = MY_ChatLog_DS(szRoot)
-	D.UpdatePage(frame)
+function D.SetDS(hFrame, szRoot)
+	hFrame.ds = MY_ChatLog_DS(szRoot)
+	D.UpdatePage(hFrame)
 end
 
 function D.OnFrameCreate()
+	local hFrameTemp = X.UI.OpenFrame(SZ_INI, 'MY_ChatLog_UI_Temp')
+	local hWndMain = hFrameTemp:Lookup('Wnd_Main')
+	hWndMain:ChangeRelation(this:Lookup('Wnd_Total'), true, true)
+	hWndMain:SetRelPos(20, 55)
+	X.UI.CloseFrame(hFrameTemp)
+
 	this.tUncheckedChannel = X.Clone(MY_ChatLog.tUncheckedChannel)
-	local container = this:Lookup('Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel')
+	local container = this:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatChanel/WndContainer_ChatChanel')
 	container:Clear()
 	for _, info in pairs(MY_ChatLog.aChannel) do
 		local wnd = container:AppendContentFromIni(SZ_INI, 'Wnd_ChatChannel')
@@ -48,22 +53,14 @@ function D.OnFrameCreate()
 	end
 	container:FormatAllContentPos()
 
-	local handle = this:Lookup('Window_Main/Wnd_Index', 'Handle_IndexesOuter/Handle_Indexes')
-	handle:Clear()
-	for i = 1, PAGE_DISPLAY do
-		handle:AppendItemFromIni(SZ_INI, 'Handle_Index')
-	end
-	handle:FormatAllItemPos()
-
-	local handle = this:Lookup('Window_Main/WndScroll_ChatLog', 'Handle_ChatLogs')
+	local handle = this:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatLog', 'Handle_ChatLogs')
 	handle:Clear()
 	for i = 1, PAGE_AMOUNT do
 		handle:AppendItemFromIni(SZ_INI, 'Handle_ChatLog')
 	end
 	handle:FormatAllItemPos()
 
-	this:Lookup('', 'Text_Title'):SetText(_L['MY - MY_ChatLog'])
-	this:Lookup('Window_Main/Wnd_Search/Edit_Search'):SetPlaceholderText(_L['Press enter to search ...'])
+	this:Lookup('Wnd_Total/Wnd_Main/Wnd_Search/Edit_Search'):SetPlaceholderText(_L['Press enter to search ...'])
 
 	this:RegisterEvent('ON_MY_MOSAICS_RESET')
 	this:RegisterEvent('ON_MY_CHATLOG_INSERT_MSG')
@@ -268,8 +265,30 @@ function D.OnItemRButtonClick()
 	end
 end
 
-function D.UpdatePage(frame, bKeepScroll)
-	local container = frame:Lookup('Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel')
+function D.UpdatePage(hFrame, bKeepScroll)
+	-- 更新大小
+	local nW, nH = hFrame:GetW() - 40, hFrame:GetH() - 75
+	hFrame:Lookup('Wnd_Total/Wnd_Main'):SetSize(nW, nH)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatChanel'):SetH(nH - 25)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatChanel', ''):SetH(nH - 25)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatChanel', 'Image_ChatChanel'):SetH(nH - 25)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatChanel/WndContainer_ChatChanel'):SetH(nH - 60)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatChanel/Scroll_ChatChanel'):SetH(nH - 25)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatLog'):SetSize(nW - 200, nH - 30)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatLog', ''):SetSize(nW - 215, nH - 30)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatLog', 'Image_ChatLog'):SetSize(nW - 215, nH - 30)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatLog', 'Handle_ChatLogs'):SetSize(nW - 215, nH - 40)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatLog/Scroll_ChatLog'):SetRelX(nW - 215)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatLog/Scroll_ChatLog'):SetH(nH - 30)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index'):SetRelY(nH - 25)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index'):SetW(nW - 215)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index', ''):SetW(nW - 215)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index', 'Image_Index'):SetW(nW - 215)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index', 'Handle_IndexesOuter'):SetW(nW - 360)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index/Wnd_IndexEdit'):SetRelX(nW - 270)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/Btn_ChatChannelAll'):SetRelY(nH - 27)
+	-- 重新渲染
+	local container = hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatChanel/WndContainer_ChatChanel')
 	local aMsgType = {}
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
@@ -277,21 +296,26 @@ function D.UpdatePage(frame, bKeepScroll)
 			for _, szMsgType in ipairs(wnd.aMsgType) do
 				table.insert(aMsgType, szMsgType)
 			end
-			frame.tUncheckedChannel[wnd.szKey] = nil
+			hFrame.tUncheckedChannel[wnd.szKey] = nil
 		else
-			frame.tUncheckedChannel[wnd.szKey] = true
+			hFrame.tUncheckedChannel[wnd.szKey] = true
 		end
 	end
-	local szSearch = frame:Lookup('Window_Main/Wnd_Search/Edit_Search'):GetText()
-	local nCount = frame.ds:CountMsg(aMsgType, szSearch)
+	local szSearch = hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Search/Edit_Search'):GetText()
+	local nCount = hFrame.ds:CountMsg(aMsgType, szSearch)
 	local nPageCount = math.ceil(nCount / PAGE_AMOUNT)
-	local bInit = not frame.nCurrentPage
-	local nCurrentPage = bInit and nPageCount or math.min(math.max(frame.nCurrentPage, 1), nPageCount)
-	frame:Lookup('Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(nCurrentPage)
-	frame:Lookup('Window_Main/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['Total %d pages'], nPageCount)
+	local bInit = not hFrame.nCurrentPage
+	local nCurrentPage = bInit and nPageCount or math.min(math.max(hFrame.nCurrentPage, 1), nPageCount)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(nCurrentPage)
+	hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['Total %d pages'], nPageCount)
 
-	local hOuter = frame:Lookup('Window_Main/Wnd_Index', 'Handle_IndexesOuter')
+	local hOuter = hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Index', 'Handle_IndexesOuter')
 	local handle = hOuter:Lookup('Handle_Indexes')
+	local PAGE_DISPLAY = math.floor((hOuter:GetW() - 10) / 48)
+	handle:Clear()
+	for i = 1, PAGE_DISPLAY do
+		handle:AppendItemFromIni(SZ_INI, 'Handle_Index')
+	end
 	if nPageCount <= PAGE_DISPLAY then
 		for i = 0, PAGE_DISPLAY - 1 do
 			local hItem = handle:Lookup(i)
@@ -334,14 +358,18 @@ function D.UpdatePage(frame, bKeepScroll)
 	handle:SetSizeByAllItemSize()
 	hOuter:FormatAllItemPos()
 
-	local data = frame.ds:SelectMsg(aMsgType, szSearch, nil, nil, (nCurrentPage - 1) * PAGE_AMOUNT, PAGE_AMOUNT)
-	local scroll = frame:Lookup('Window_Main/WndScroll_ChatLog/Scroll_ChatLog')
+	local data = hFrame.ds:SelectMsg(aMsgType, szSearch, nil, nil, (nCurrentPage - 1) * PAGE_AMOUNT, PAGE_AMOUNT)
+	local scroll = hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatLog/Scroll_ChatLog')
 	local bScrollBottom = scroll:GetScrollPos() == scroll:GetStepCount()
-	local handle = frame:Lookup('Window_Main/WndScroll_ChatLog', 'Handle_ChatLogs')
+	local handle = hFrame:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatLog', 'Handle_ChatLogs')
 	for i = 1, PAGE_AMOUNT do
 		local rec = data[i]
 		local hItem = handle:Lookup(i - 1)
 		if rec then
+			hItem:SetW(nW - 215)
+			hItem:Lookup('Shadow_ChatLogHover'):SetW(nW - 215)
+			hItem:Lookup('Shadow_ChatLogSelect'):SetW(nW - 215)
+			hItem:Lookup('Handle_ChatLog_Msg'):SetW(nW - 215)
 			local f = GetMsgFont(rec.szMsgType)
 			local r, g, b = unpack(MSG_TYPE_COLOR[rec.szMsgType])
 			local h = hItem:Lookup('Handle_ChatLog_Msg')
@@ -379,7 +407,7 @@ function D.UpdatePage(frame, bKeepScroll)
 			hItem.time = rec.nTime
 			hItem.text = rec.szText --TODO
 			hItem.szMsgType = rec.szMsgType
-			if not frame.nLastClickIndex then
+			if not hFrame.nLastClickIndex then
 				hItem:Lookup('Shadow_ChatLogSelect'):Hide()
 			end
 			hItem:Show()
@@ -396,18 +424,32 @@ function D.UpdatePage(frame, bKeepScroll)
 	else
 		scroll:SetScrollPos(bInit and scroll:GetStepCount() or 0)
 	end
-	MY_ChatLog.tUncheckedChannel = X.Clone(frame.tUncheckedChannel)
+	MY_ChatLog.tUncheckedChannel = X.Clone(hFrame.tUncheckedChannel)
 end
 
 function D.Open(szRoot)
 	if not MY_ChatLog.InitDB() then
 		return
 	end
+	-- 创建窗体
+	local hFrame = X.UI.CreateFrame('MY_ChatLog_UI', {
+		w = 1000, h = 700,
+		close = true,
+		maximize = true,
+		resize = true,
+		minWidth = 1000,
+		minHeight = 700,
+		text = _L['MY - MY_ChatLog'],
+		anchor = 'CENTER',
+		onSizeChange = function()
+			D.UpdatePage(this)
+		end,
+	}):Raw()
+	-- 更新窗体数据
 	local nIndex = 0
 	while Station.Lookup('Normal/MY_ChatLog_UI#' .. nIndex) do
 		nIndex = nIndex + 1
 	end
-	local hFrame = X.UI.OpenFrame(SZ_INI, 'MY_ChatLog_UI')
 	hFrame:SetName('MY_ChatLog_UI#' .. nIndex)
 	D.SetDS(hFrame, szRoot)
 end
