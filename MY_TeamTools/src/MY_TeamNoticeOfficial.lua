@@ -123,7 +123,9 @@ X.RegisterEvent('FIRST_LOADING_END', 'TEAM_NOTICE', function()
 	end
 end)
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TeamNoticeOfficial',

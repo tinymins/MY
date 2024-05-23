@@ -606,7 +606,9 @@ end
 X.RegisterHotKey('MY_GKP', _L['Open/Close Golden Team Record'], D.TogglePanel)
 X.RegisterAddonMenu({ szOption = _L['Golden Team Record'], fnAction = D.OpenPanel })
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_GKP_MI',

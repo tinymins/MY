@@ -451,7 +451,9 @@ local settings = {
 MY_TeamTools.RegisterModule('DeathLog', _L['MY_TeamTools_DeathLog'], X.CreateModule(settings))
 end
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TeamTools_DeathLog',

@@ -1224,9 +1224,9 @@ function D.UpdateFloatEntry()
 	D.ApplyFloatEntry(O.bFloatEntry)
 end
 
---------------------------------------------------------
--- Module exports
---------------------------------------------------------
+--------------------------------------------------------------------------------
+-- 模块导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_DungeonStat',
@@ -1246,9 +1246,9 @@ local settings = {
 MY_RoleStatistics.RegisterModule('DungeonStat', _L['MY_RoleStatistics_DungeonStat'], X.CreateModule(settings))
 end
 
---------------------------------------------------------
--- Global exports
---------------------------------------------------------
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_RoleStatistics_DungeonStat',

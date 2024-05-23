@@ -192,7 +192,9 @@ function D.OnFrameDragEnd()
 	O.tAnchor = GetFrameAnchor(this)
 end
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TargetDirection',

@@ -846,7 +846,9 @@ function D.OnItemMouseLeave()
 	HideTip()
 end
 
--- Module exports
+--------------------------------------------------------------------------------
+-- 模块导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TeamTools_Achievement_Module',
@@ -864,7 +866,9 @@ local settings = {
 MY_TeamTools.RegisterModule('Achievement', _L['MY_TeamTools_Achievement'], X.CreateModule(settings))
 end
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TeamTools_Achievement',

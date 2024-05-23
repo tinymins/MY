@@ -257,7 +257,9 @@ local settings = {
 MY_TeamTools.RegisterModule('EnterMap', _L['MY_TeamTools_EnterMap'], X.CreateModule(settings))
 end
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TeamTools_EnterMap',

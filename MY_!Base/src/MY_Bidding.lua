@@ -366,7 +366,9 @@ function D.GetMoneyChatText(nGold)
 	return _L('%d gold', nGold)
 end
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_Bidding',

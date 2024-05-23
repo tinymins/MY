@@ -592,7 +592,9 @@ end
 
 X.RegisterHotKey('MY_TargetMon_PS', _L['Open/close MY_TargetMon'], D.TogglePanel)
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TargetMon_PS',

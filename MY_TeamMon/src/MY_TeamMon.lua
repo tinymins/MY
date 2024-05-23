@@ -2475,7 +2475,9 @@ end)
 X.RegisterFlush('MY_TeamMon', D.SaveUserData)
 X.RegisterBgMsg('MY_TEAM_MON_SHARE', D.OnShare)
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_TeamMon',

@@ -464,7 +464,9 @@ X.RegisterAddonMenu('MY_ChatLog_Menu', {
 })
 X.RegisterHotKey('MY_ChatLog', _L['MY_ChatLog'], D.Open, nil)
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = 'MY_ChatLog',
