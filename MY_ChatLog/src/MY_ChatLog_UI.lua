@@ -24,7 +24,7 @@ local D = {}
 ------------------------------------------------------------------------------------------------------
 -- Êý¾Ý¿âºËÐÄ
 ------------------------------------------------------------------------------------------------------
-local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_ChatLog/ui/MY_ChatLog.ini'
+local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_ChatLog/ui/MY_ChatLog_UI.ini'
 local PAGE_AMOUNT = 150
 local MSG_TYPE_COLOR = MY_ChatLog.MSG_TYPE_COLOR
 
