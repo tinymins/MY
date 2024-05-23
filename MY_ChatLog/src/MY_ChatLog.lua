@@ -172,7 +172,7 @@ function D.GetRoot()
 end
 
 function D.Open()
-	MY_ChatLog_Open(D.GetRoot())
+	MY_ChatLog_UI.Open(D.GetRoot())
 end
 
 function D.ResetChannel()

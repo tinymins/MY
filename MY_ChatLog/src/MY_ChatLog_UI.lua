@@ -21,8 +21,6 @@ end
 --------------------------------------------------------------------------
 local D = {}
 
-MY_ChatLog_UI = class()
-
 ------------------------------------------------------------------------------------------------------
 -- 数据库核心
 ------------------------------------------------------------------------------------------------------
@@ -36,7 +34,7 @@ function D.SetDS(frame, szRoot)
 	D.UpdatePage(frame)
 end
 
-function MY_ChatLog_UI.OnFrameCreate()
+function D.OnFrameCreate()
 	this.tUncheckedChannel = X.Clone(MY_ChatLog.tUncheckedChannel)
 	local container = this:Lookup('Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel')
 	container:Clear()
@@ -79,7 +77,7 @@ function MY_ChatLog_UI.OnFrameCreate()
 	MY_ChatLog.MigrateDB()
 end
 
-function MY_ChatLog_UI.OnEvent(event)
+function D.OnEvent(event)
 	if event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdatePage(this, true)
 	elseif event == 'ON_MY_CHATLOG_INSERT_MSG' then
@@ -91,7 +89,7 @@ function MY_ChatLog_UI.OnEvent(event)
 	end
 end
 
-function MY_ChatLog_UI.OnMouseIn()
+function D.OnMouseIn()
 	local name = this:GetName()
 	if name == 'Wnd_ChatChannel' then
 		local szText = ''
@@ -108,14 +106,14 @@ function MY_ChatLog_UI.OnMouseIn()
 	end
 end
 
-function MY_ChatLog_UI.OnMouseOut()
+function D.OnMouseOut()
 	local name = this:GetName()
 	if name == 'Wnd_ChatChannel' then
 		X.HideTip()
 	end
 end
 
-function MY_ChatLog_UI.OnLButtonClick()
+function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		X.UI.CloseFrame(this:GetRoot())
@@ -139,19 +137,19 @@ function MY_ChatLog_UI.OnLButtonClick()
 	end
 end
 
-function MY_ChatLog_UI.OnCheckBoxCheck()
+function D.OnCheckBoxCheck()
 	this:GetRoot().nCurrentPage = nil
 	this:GetRoot().nLastClickIndex = nil
 	D.UpdatePage(this:GetRoot())
 end
 
-function MY_ChatLog_UI.OnCheckBoxUncheck()
+function D.OnCheckBoxUncheck()
 	this:GetRoot().nCurrentPage = nil
 	this:GetRoot().nLastClickIndex = nil
 	D.UpdatePage(this:GetRoot())
 end
 
-function MY_ChatLog_UI.OnItemMouseIn()
+function D.OnItemMouseIn()
 	local name = this:GetName()
 	if name == 'Handle_ChatLog' then
 		if IsCtrlKeyDown() and g_tStrings.tChannelName[this.szMsgType] then
@@ -161,14 +159,14 @@ function MY_ChatLog_UI.OnItemMouseIn()
 	end
 end
 
-function MY_ChatLog_UI.OnItemMouseOut()
+function D.OnItemMouseOut()
 	local name = this:GetName()
 	if name == 'Handle_ChatLog' then
 		X.HideTip()
 	end
 end
 
-function MY_ChatLog_UI.OnItemLButtonClick()
+function D.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Index' then
 		this:GetRoot().nCurrentPage = this.nPage
@@ -201,7 +199,7 @@ function MY_ChatLog_UI.OnItemLButtonClick()
 	end
 end
 
-function MY_ChatLog_UI.OnEditSpecialKeyDown()
+function D.OnEditSpecialKeyDown()
 	local name = this:GetName()
 	local frame = this:GetRoot()
 	local szKey = GetKeyName(Station.GetMessageKey())
@@ -214,7 +212,7 @@ function MY_ChatLog_UI.OnEditSpecialKeyDown()
 	end
 end
 
-function MY_ChatLog_UI.OnItemRButtonClick()
+function D.OnItemRButtonClick()
 	local this = this
 	local name = this:GetName()
 	local frame = this:GetRoot()
@@ -402,16 +400,36 @@ function D.UpdatePage(frame, bKeepScroll)
 	MY_ChatLog.tUncheckedChannel = X.Clone(frame.tUncheckedChannel)
 end
 
-
-do
-local nIndex = 0
-function MY_ChatLog_Open(szRoot)
+function D.Open(szRoot)
 	if not MY_ChatLog.InitDB() then
 		return
 	end
-	nIndex = nIndex + 1
-	X.UI.OpenFrame(SZ_INI, 'MY_ChatLog#' .. nIndex):SetDS(szRoot)
+	local nIndex = 0
+	while Station.Lookup('Normal/MY_ChatLog_UI#' .. nIndex) do
+		nIndex = nIndex + 1
+	end
+	local hFrame = X.UI.OpenFrame(SZ_INI, 'MY_ChatLog_UI')
+	hFrame:SetDS(szRoot)
+	hFrame:SetName('MY_ChatLog_UI#' .. nIndex)
 end
+
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_ChatLog_UI',
+	exports = {
+		{
+			preset = 'UIEvent',
+			fields = {
+				'Open',
+			},
+			root = D,
+		},
+	},
+}
+MY_ChatLog_UI = X.CreateModule(settings)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
