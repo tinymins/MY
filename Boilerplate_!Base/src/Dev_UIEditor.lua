@@ -551,7 +551,9 @@ table.insert(SHARED_MEMORY.UI_EDITOR, function()
 	return {{ szOption = _L['Dev_UIEditor'], fnAction = D.CreateFrame }}
 end)
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = FRAME_NAME,

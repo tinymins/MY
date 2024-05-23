@@ -142,7 +142,9 @@ function D.SetHoverEl(el, rect, bAcceptable, eCursor)
 	HOVER_EL = el
 end
 
--- Global exports
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
 do
 local settings = {
 	name = PLUGIN_NAME,

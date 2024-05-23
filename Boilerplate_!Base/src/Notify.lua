@@ -422,7 +422,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 end
 
 --------------------------------------------------------------------------------
--- Global exports
+-- 全局导出
 --------------------------------------------------------------------------------
 do
 local settings = {
