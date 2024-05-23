@@ -1772,7 +1772,7 @@ function X.OpenBrowser(szAddr, szMode)
 	X.UI.OpenBrowser(szAddr)
 end
 
--- Global exports
+-- 全局导出
 do
 local PRESETS = {
 	UIEvent = {
