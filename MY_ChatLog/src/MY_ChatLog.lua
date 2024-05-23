@@ -66,16 +66,16 @@ local TONG_MEMBER_LOGOUT_MSG = '^' .. X.EscapeString(g_tStrings.STR_GUILD_MEMBER
 -- 数据库控制器
 ------------------------------------------------------------------------------------------------------
 local LOG_TYPE = {
-	{ szKey = 'whisper', szTitle = g_tStrings.tChannelName['MSG_WHISPER'], aChannel = {'MSG_WHISPER', 'MSG_SSG_WHISPER'} },
-	{ szKey = 'party'  , szTitle = g_tStrings.tChannelName['MSG_PARTY'], aChannel = {'MSG_PARTY'} },
-	{ szKey = 'team'   , szTitle = g_tStrings.tChannelName['MSG_TEAM'], aChannel = {'MSG_TEAM'} },
-	{ szKey = 'room'   , szTitle = g_tStrings.tChannelName['MSG_ROOM'], aChannel = {'MSG_ROOM'} },
-	{ szKey = 'friend' , szTitle = g_tStrings.tChannelName['MSG_FRIEND'], aChannel = {'MSG_FRIEND'} },
-	{ szKey = 'guild'  , szTitle = g_tStrings.tChannelName['MSG_GUILD'], aChannel = {'MSG_GUILD'} },
-	{ szKey = 'guild_a', szTitle = g_tStrings.tChannelName['MSG_GUILD_ALLIANCE'], aChannel = {'MSG_GUILD_ALLIANCE'} },
-	{ szKey = 'death'  , szTitle = _L['Death Log'], aChannel = {'MSG_SELF_DEATH', 'MSG_SELF_KILL', 'MSG_PARTY_DEATH', 'MSG_PARTY_KILL'} },
+	{ szKey = 'whisper', szTitle = g_tStrings.tChannelName['MSG_WHISPER'], aMsgType = {'MSG_WHISPER', 'MSG_SSG_WHISPER'} },
+	{ szKey = 'party'  , szTitle = g_tStrings.tChannelName['MSG_PARTY'], aMsgType = {'MSG_PARTY'} },
+	{ szKey = 'team'   , szTitle = g_tStrings.tChannelName['MSG_TEAM'], aMsgType = {'MSG_TEAM'} },
+	{ szKey = 'room'   , szTitle = g_tStrings.tChannelName['MSG_ROOM'], aMsgType = {'MSG_ROOM'} },
+	{ szKey = 'friend' , szTitle = g_tStrings.tChannelName['MSG_FRIEND'], aMsgType = {'MSG_FRIEND'} },
+	{ szKey = 'guild'  , szTitle = g_tStrings.tChannelName['MSG_GUILD'], aMsgType = {'MSG_GUILD'} },
+	{ szKey = 'guild_a', szTitle = g_tStrings.tChannelName['MSG_GUILD_ALLIANCE'], aMsgType = {'MSG_GUILD_ALLIANCE'} },
+	{ szKey = 'death'  , szTitle = _L['Death Log'], aMsgType = {'MSG_SELF_DEATH', 'MSG_SELF_KILL', 'MSG_PARTY_DEATH', 'MSG_PARTY_KILL'} },
 	{
-		szKey = 'journal', szTitle = _L['Journal Log'], aChannel = (function()
+		szKey = 'journal', szTitle = _L['Journal Log'], aMsgType = (function()
 			for _, v in ipairs(X.CONSTANT.MSG_TYPE_MENU) do
 				if v.szOption == g_tStrings.EARN then
 					local a = {}
@@ -91,7 +91,7 @@ local LOG_TYPE = {
 			}
 		end)(),
 	},
-	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aChannel = {'MSG_MY_MONITOR'} },
+	{ szKey = 'monitor', szTitle = _L['MY Monitor'], aMsgType = {'MSG_MY_MONITOR'} },
 }
 for i, v in X.ipairs_r(LOG_TYPE) do
 	if not v or not v.szTitle then
@@ -114,7 +114,7 @@ local MSGTYPE_COLOR = setmetatable({
 local UNSAVED_MSG_LIST, MAIN_DS = {}
 
 -- 旧版数据频道对应数据库中数值
-local MSG_CHANNEL_MAP = {
+local V1_MSG_TYPE_MAP = {
 	[1] = 'MSG_WHISPER',
 	[2] = 'MSG_PARTY',
 	[3] = 'MSG_TEAM',
@@ -211,10 +211,10 @@ function D.ImportDB(aPath)
 					db:SetInfo('version', '2')
 					db:SetInfo('user_global_id', szGlobalID)
 					for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' WHERE talker IS NOT NULL ORDER BY time ASC') or X.CONSTANT.EMPTY_TABLE) do
-						local szChannel = MSG_CHANNEL_MAP[p.channel]
-						if szChannel then
+						local szMsgType = V1_MSG_TYPE_MAP[p.channel]
+						if szMsgType then
 							nImportCount = nImportCount + 1
-							db:InsertMsg(szChannel, p.text, p.msg, p.talker, p.time, p.hash)
+							db:InsertMsg(szMsgType, p.text, p.msg, p.talker, p.time, p.hash)
 						end
 					end
 					db:Flush()
@@ -247,10 +247,10 @@ function D.ImportDB(aPath)
 									nImportCount = nImportCount + 1
 									dbNew:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
 								else
-									local szChannel = MSG_CHANNEL_MAP[p.channel]
-									if szChannel then
+									local szMsgType = V1_MSG_TYPE_MAP[p.channel]
+									if szMsgType then
 										nImportCount = nImportCount + 1
-										dbNew:InsertMsg(szChannel, p.text, p.msg, p.talker, p.time, p.hash)
+										dbNew:InsertMsg(szMsgType, p.text, p.msg, p.talker, p.time, p.hash)
 									end
 								end
 							end
@@ -309,14 +309,14 @@ function D.MigrateDB()
 end
 
 (function()
-	local tChannels, aChannels = {}, {}
+	local tMsgType = {}
 	for _, info in ipairs(LOG_TYPE) do
-		for _, szChannel in ipairs(info.aChannel) do
-			tChannels[szChannel] = true
+		for _, szMsgType in ipairs(info.aMsgType) do
+			tMsgType[szMsgType] = true
 		end
 	end
-	for szChannel, _ in pairs(tChannels) do
-		X.RegisterMsgMonitor(szChannel, 'MY_ChatLog', function(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szTalker)
+	for szMsgType, _ in pairs(tMsgType) do
+		X.RegisterMsgMonitor(szMsgType, 'MY_ChatLog', function(szMsgType, szMsg, nFont, bRich, r, g, b, dwTalkerID, szTalker)
 			local szText = szMsg
 			if bRich then
 				szText = GetPureText(szMsg)
@@ -324,7 +324,7 @@ end
 				szMsg = GetFormatText(szMsg, nFont, r, g, b)
 			end
 			-- filters
-			if szChannel == 'MSG_GUILD' then
+			if szMsgType == 'MSG_GUILD' then
 				if D.bReady and O.bIgnoreTongOnlineMsg and szText:find(TONG_ONLINE_MSG) then
 					return
 				end
@@ -335,16 +335,15 @@ end
 				end
 			end
 			if MAIN_DS then
-				MAIN_DS:InsertMsg(szChannel, szText, szMsg, szTalker, GetCurrentTime())
+				MAIN_DS:InsertMsg(szMsgType, szText, szMsg, szTalker, GetCurrentTime())
 				if D.bReady and O.bRealtimeCommit and not X.IsRestricted('MY_ChatLog.RealtimeCommit') then
 					MAIN_DS:FlushDB()
 				end
 			else
-				table.insert(UNSAVED_MSG_LIST, {szChannel, szText, szMsg, szTalker, GetCurrentTime()})
+				table.insert(UNSAVED_MSG_LIST, {szMsgType, szText, szMsg, szTalker, GetCurrentTime()})
 			end
 		end)
 	end
-	return aChannels
 end)()
 
 X.RegisterEvent('LOADING_ENDING', 'MY_ChatLog_Save', function()
@@ -381,22 +380,22 @@ function D.FlushDB(bCheckExceed)
 	end
 	local bExceed = false
 	for _, p in ipairs(LOG_LIMIT) do
-		local aChannel = {}
+		local aMsgType = {}
 		for _, szKey in ipairs(p.aKey) do
 			for _, info in ipairs(LOG_TYPE) do
 				if info.szKey == szKey then
-					for _, szChannel in ipairs(info.aChannel) do
-						table.insert(aChannel, szChannel)
+					for _, szMsgType in ipairs(info.aMsgType) do
+						table.insert(aMsgType, szMsgType)
 					end
 				end
 			end
 		end
-		local nCount = MAIN_DS:CountMsg(aChannel)
+		local nCount = MAIN_DS:CountMsg(aMsgType)
 		if nCount > p.nLimit then
-			local aMsg = MAIN_DS:SelectMsg(aChannel, nil, nil, nil, nCount - p.nLimit, 1)
+			local aMsg = MAIN_DS:SelectMsg(aMsgType, nil, nil, nil, nCount - p.nLimit, 1)
 			if aMsg and aMsg[1] then
 				bExceed = true
-				MAIN_DS:DeleteMsgInterval(aChannel, '', 0, aMsg[1].nTime)
+				MAIN_DS:DeleteMsgInterval(aMsgType, '', 0, aMsg[1].nTime)
 			end
 		end
 	end

@@ -21,7 +21,7 @@ end
 --------------------------------------------------------------------------
 local DB = class()
 local DB_CACHE = setmetatable({}, {__mode = 'v'})
-local SELECT_MSG = 'SELECT hash AS szHash, channel AS szChannel, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog'
+local SELECT_MSG = 'SELECT hash AS szHash, type AS szMsgType, time AS nTime, talker AS szTalker, text AS szText, msg AS szMsg FROM ChatLog'
 local DELETE_MSG = 'DELETE FROM ChatLog'
 
 local function FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
@@ -43,13 +43,13 @@ local function FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
 	return szSearch, nMinTime, nMaxTime, nOffset, nLimit
 end
 
-local function AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nMaxTime)
+local function AppendCommonWhere(szSQL, aValue, aMsgType, szSearch, nMinTime, nMaxTime)
 	local szWhere = ''
 	local aWhere = {}
-	if aChannel then
-		for _, szChannel in ipairs(aChannel) do
-			table.insert(aWhere, 'channel = ?')
-			table.insert(aValue, szChannel)
+	if aMsgType then
+		for _, szMsgType in ipairs(aMsgType) do
+			table.insert(aWhere, 'type = ?')
+			table.insert(aValue, szMsgType)
 		end
 	end
 	if #aWhere > 0 then
@@ -146,7 +146,7 @@ function DB:Connect(bCheck)
 			self.db:Execute([[
 				CREATE TABLE IF NOT EXISTS ChatLog (
 					hash INTEGER NOT NULL,
-					channel VARCHAR(64) NOT NULL,
+					type VARCHAR(64) NOT NULL,
 					time INTEGER NOT NULL,
 					talker NVARCHAR(20) NOT NULL,
 					text NVARCHAR(400) NOT NULL,
@@ -154,11 +154,11 @@ function DB:Connect(bCheck)
 					PRIMARY KEY (time, hash)
 				)
 			]])
-			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_channel_idx ON ChatLog(channel)')
+			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_type_idx ON ChatLog(type)')
 			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_talker_idx ON ChatLog(talker)')
 			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_text_idx ON ChatLog(text)')
-			self.stmtCount = self.db:Prepare('SELECT channel AS szChannel, COUNT(*) AS nCount FROM ChatLog WHERE talker LIKE ? OR text LIKE ? GROUP BY szChannel')
-			self.stmtInsert = self.db:Prepare('REPLACE INTO ChatLog (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)')
+			self.stmtCount = self.db:Prepare('SELECT type AS szMsgType, COUNT(*) AS nCount FROM ChatLog WHERE talker LIKE ? OR text LIKE ? GROUP BY szMsgType')
+			self.stmtInsert = self.db:Prepare('REPLACE INTO ChatLog (hash, type, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)')
 			self.stmtDelete = self.db:Prepare('DELETE FROM ChatLog WHERE hash = ? AND time = ?')
 		end
 		if self:IsConnected() then
@@ -281,28 +281,28 @@ function DB:GetMaxTime()
 	return self._nMaxTime
 end
 
-function DB:InsertMsg(szChannel, szText, szMsg, szTalker, nTime, szHash)
+function DB:InsertMsg(szMsgType, szText, szMsg, szTalker, nTime, szHash)
 	local nMinTime, nMaxTime = self:GetMinTime(), self:GetMaxTime()
 	assert(nTime >= nMinTime and nTime <= nMaxTime,
 		'[MY_ChatLog_DB:InsertMsg] Time(' ..nTime .. ') must between MinTime(' .. nMinTime .. ') and MaxTime(' .. nMaxTime .. ').')
-	if not szChannel or not nTime or X.IsEmpty(szMsg) or not szText or X.IsEmpty(szHash) then
+	if not szMsgType or not nTime or X.IsEmpty(szMsg) or not szText or X.IsEmpty(szHash) then
 		return
 	end
-	table.insert(self.aInsertQueue, {szHash = szHash, szChannel = szChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
+	table.insert(self.aInsertQueue, {szHash = szHash, szMsgType = szMsgType, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
 end
 
-function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
+function DB:CountMsg(aMsgType, szSearch, nMinTime, nMaxTime)
 	if not self:Connect() then
 		return false
 	end
 	self:Flush()
-	if X.IsTable(aChannel) and X.IsEmpty(aChannel) then
+	if X.IsTable(aMsgType) and X.IsEmpty(aMsgType) then
 		return 0
 	end
 	szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
 	local bMinTime = not X.IsEmpty(nMinTime) and self:GetMinTime() >= nMinTime
 	local bMaxTime = not X.IsEmpty(nMaxTime) and not X.IsHugeNumber(nMaxTime) and self:GetMaxTime() >= nMaxTime
-	if not aChannel and X.IsEmpty(szSearch) and not bMinTime and not bMaxTime then
+	if not aMsgType and X.IsEmpty(szSearch) and not bMinTime and not bMaxTime then
 		if not self.nCountCache then
 			self.nCountCache = X.Get(self.db:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 		end
@@ -318,11 +318,11 @@ function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 	if not tCount then
 		local aResult
 		if X.IsEmpty(szSearch) then
-			aResult = self.db:Execute('SELECT channel AS szChannel, COUNT(*) AS nCount FROM ChatLog GROUP BY channel')
+			aResult = self.db:Execute('SELECT type AS szMsgType, COUNT(*) AS nCount FROM ChatLog GROUP BY type')
 		elseif bMinTime or bMaxTime then
-			local szSQL = 'SELECT channel AS szChannel, COUNT(*) AS nCount FROM ChatLog'
+			local szSQL = 'SELECT type AS szMsgType, COUNT(*) AS nCount FROM ChatLog'
 			local aValue = {}
-			szSQL = AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nMaxTime)
+			szSQL = AppendCommonWhere(szSQL, aValue, aMsgType, szSearch, nMinTime, nMaxTime)
 			local stmt = self.db:Prepare(szSQL)
 			stmt:ClearBindings()
 			stmt:BindAll(unpack(aValue))
@@ -336,14 +336,14 @@ function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 		end
 		tCount = {}
 		for _, rec in ipairs(aResult) do
-			tCount[rec.szChannel] = rec.nCount
+			tCount[rec.szMsgType] = rec.nCount
 		end
 		self.tCountCache[szKey] = tCount
 	end
 	local nCount = 0
-	if aChannel then
-		for _, szChannel in ipairs(aChannel) do
-			nCount = nCount + (tCount[szChannel] or 0)
+	if aMsgType then
+		for _, szMsgType in ipairs(aMsgType) do
+			nCount = nCount + (tCount[szMsgType] or 0)
 		end
 	else
 		for _, n in pairs(tCount) do
@@ -353,17 +353,17 @@ function DB:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 	return nCount
 end
 
-function DB:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit)
+function DB:SelectMsg(aMsgType, szSearch, nMinTime, nMaxTime, nOffset, nLimit)
 	if not self:Connect() then
 		return false
 	end
 	self:Flush()
-	if X.IsTable(aChannel) and X.IsEmpty(aChannel) then
+	if X.IsTable(aMsgType) and X.IsEmpty(aMsgType) then
 		return {}
 	end
 	szSearch, nMinTime, nMaxTime, nOffset, nLimit = FormatCommonParam(szSearch, nMinTime, nMaxTime, nOffset, nLimit)
 	local szSQL, aValue = SELECT_MSG, {}
-	szSQL = AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nMaxTime)
+	szSQL = AppendCommonWhere(szSQL, aValue, aMsgType, szSearch, nMinTime, nMaxTime)
 	szSQL = szSQL .. ' ORDER BY nTime ASC'
 	szSQL = AppendCommonLimit(szSQL, aValue, nOffset, nLimit)
 	local stmt = self.db:Prepare(szSQL)
@@ -398,17 +398,17 @@ function DB:DeleteMsg(szHash, nTime)
 	end
 end
 
-function DB:DeleteMsgInterval(aChannel, szSearch, nMinTime, nMaxTime)
+function DB:DeleteMsgInterval(aMsgType, szSearch, nMinTime, nMaxTime)
 	if not self:Connect() then
 		return false
 	end
 	self:Flush()
-	if X.IsTable(aChannel) and X.IsEmpty(aChannel) then
+	if X.IsTable(aMsgType) and X.IsEmpty(aMsgType) then
 		return true
 	end
 	szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
 	local szSQL, aValue = DELETE_MSG, {}
-	szSQL = AppendCommonWhere(szSQL, aValue, aChannel, szSearch, nMinTime, nMaxTime)
+	szSQL = AppendCommonWhere(szSQL, aValue, aMsgType, szSearch, nMinTime, nMaxTime)
 	if szSQL ~= DELETE_MSG then
 		local stmt = self.db:Prepare(szSQL)
 		stmt:ClearBindings()
@@ -429,7 +429,7 @@ function DB:Flush()
 		-- ²åÈë¼ÇÂ¼
 		for _, data in ipairs(self.aInsertQueue) do
 			self.stmtInsert:ClearBindings()
-			self.stmtInsert:BindAll(data.szHash, data.szChannel, data.nTime, data.szTalker, data.szText, data.szMsg)
+			self.stmtInsert:BindAll(data.szHash, data.szMsgType, data.nTime, data.szTalker, data.szText, data.szMsg)
 			self.stmtInsert:Execute()
 		end
 		self.stmtInsert:Reset()

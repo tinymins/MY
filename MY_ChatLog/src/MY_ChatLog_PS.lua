@@ -239,17 +239,17 @@ function D.ExportConfirm()
 				return X.Alert(_L['Streaming client does not support export!'])
 			end
 			local function doExport(szSuffix)
-				local aChannels = {}
+				local aMsgType = {}
 				for nGroup, info in ipairs(LOG_TYPE) do
 					if tChannels[nGroup] then
-						for _, szChannel in ipairs(info.aChannel) do
-							table.insert(aChannels, szChannel)
+						for _, szChannel in ipairs(info.aMsgType) do
+							table.insert(aMsgType, szChannel)
 						end
 					end
 				end
 				D.Export(
 					X.FormatPath({'export/ChatLog/{$name}@{$server}@' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. szSuffix, X.PATH_TYPE.ROLE}),
-					aChannels, 10,
+					aMsgType, 10,
 					function(title, progress)
 						OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Exporting chatlog: %s, %.2f%%.', title, progress * 100))
 					end
@@ -268,7 +268,7 @@ function D.ExportConfirm()
 	ui:Anchor({s = 'CENTER', r = 'CENTER', x = 0, y = 0})
 end
 
-function D.Export(szExportFile, aChannels, nPerSec, onProgress)
+function D.Export(szExportFile, aMsgType, nPerSec, onProgress)
 	if l_bExporting then
 		return X.Sysmsg(_L['Already exporting, please wait.'])
 	end
@@ -290,7 +290,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 		db:SetInfo('user_global_id', X.GetClientPlayer().GetGlobalID())
 		l_bExporting = true
 
-		local nPage, nPageCount = 0, math.ceil(ds:CountMsg(aChannels, '') / EXPORT_SLICE)
+		local nPage, nPageCount = 0, math.ceil(ds:CountMsg(aMsgType, '') / EXPORT_SLICE)
 		local function Export()
 			if nPage > nPageCount then
 				l_bExporting = false
@@ -300,9 +300,9 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 				X.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0
 			end
-			local data = ds:SelectMsg(aChannels, '', nil, nil, nPage * EXPORT_SLICE, EXPORT_SLICE, true)
+			local data = ds:SelectMsg(aMsgType, '', nil, nil, nPage * EXPORT_SLICE, EXPORT_SLICE, true)
 			for i, rec in ipairs(data) do
-				db:InsertMsg(rec.nChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+				db:InsertMsg(rec.szMsgType, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 			end
 			if onProgress then
 				onProgress(_L['exporting'], nPage / nPageCount)
@@ -318,7 +318,7 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 		end
 		l_bExporting = true
 
-		local nPage, nPageCount = 0, math.ceil(ds:CountMsg(aChannels, '') / EXPORT_SLICE)
+		local nPage, nPageCount = 0, math.ceil(ds:CountMsg(aMsgType, '') / EXPORT_SLICE)
 		local function Export()
 			if nPage > nPageCount then
 				l_bExporting = false
@@ -331,10 +331,10 @@ function D.Export(szExportFile, aChannels, nPerSec, onProgress)
 				X.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0
 			end
-			local data = ds:SelectMsg(aChannels, '', nil, nil, nPage * EXPORT_SLICE, EXPORT_SLICE)
+			local data = ds:SelectMsg(aMsgType, '', nil, nil, nPage * EXPORT_SLICE, EXPORT_SLICE)
 			for i, rec in ipairs(data) do
-				local f = GetMsgFont(rec.szChannel)
-				local r, g, b = unpack(MSGTYPE_COLOR[rec.szChannel])
+				local f = GetMsgFont(rec.szMsgType)
+				local r, g, b = unpack(MSGTYPE_COLOR[rec.szMsgType])
 				Log(szExportFile, convertXml2Html(X.GetChatTimeXML(rec.nTime, {r=r, g=g, b=b, f=f, s='[%yyyy/%MM/%dd][%hh:%mm:%ss]'})))
 				Log(szExportFile, convertXml2Html(rec.szMsg))
 			end

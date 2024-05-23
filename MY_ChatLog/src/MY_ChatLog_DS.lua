@@ -186,7 +186,7 @@ function DS:InitDB(bFixProblem)
 						--[[#DEBUG END]]
 					elseif db1:GetMaxTime() >= db2:GetMaxTime() then -- 覆盖区冲突 右侧区域完全被左侧区域包裹 将右侧节点并入左侧节点中
 						for _, rec in ipairs(db2:SelectMsg()) do
-							db1:InsertMsg(rec.szChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+							db1:InsertMsg(rec.szMsgType, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 						end
 						db1:Flush()
 						db2:DeleteDB()
@@ -198,7 +198,7 @@ function DS:InitDB(bFixProblem)
 					else -- 覆盖区域冲突 将右侧节点的冲突区域数据移动到左侧节点中
 						db1:SetMaxTime(db1:GetMaxRecTime())
 						for _, rec in ipairs(db2:SelectMsg(nil, nil, 0, db1:GetMaxTime())) do
-							db1:InsertMsg(rec.szChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+							db1:InsertMsg(rec.szMsgType, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 						end
 						db1:Flush()
 						db2:DeleteMsgInterval(nil, nil, 0, db1:GetMaxTime())
@@ -313,7 +313,7 @@ function DS:OptimizeDB()
 						(aRec[nOffset + SINGLE_DB_AMOUNT + 1] or aRec[nOffset + SINGLE_DB_AMOUNT]).nTime)
 					for i = 1, SINGLE_DB_AMOUNT do
 						rec = aRec[nOffset + i]
-						dbNew:InsertMsg(rec.szChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+						dbNew:InsertMsg(rec.szMsgType, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 						db:DeleteMsg(rec.szHash, rec.nTime)
 					end
 					dbNew:Flush()
@@ -349,7 +349,7 @@ function DS:OptimizeDB()
 					for i = nOffset + 1, nCount do
 						rec = aRec[i]
 						db:DeleteMsg(rec.szHash, rec.nTime)
-						dbNext:InsertMsg(rec.szChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+						dbNext:InsertMsg(rec.szMsgType, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 					end
 					dbNext:Flush()
 					--[[#DEBUG BEGIN]]
@@ -374,7 +374,7 @@ function DS:OptimizeDB()
 					local dbNext = self.aDB[i + 1]
 					dbNext:SetMinTime(db:GetMinTime())
 					for _, rec in ipairs(db:SelectMsg()) do
-						dbNext:InsertMsg(rec.szChannel, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
+						dbNext:InsertMsg(rec.szMsgType, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 					end
 					dbNext:Flush()
 					--[[#DEBUG BEGIN]]
@@ -396,7 +396,7 @@ function DS:OptimizeDB()
 	return self
 end
 
-function DS:InsertMsg(szChannel, szText, szMsg, szTalker, nTime)
+function DS:InsertMsg(szMsgType, szText, szMsg, szTalker, nTime)
 	if not szTalker then
 		szTalker = ''
 	end
@@ -405,17 +405,17 @@ function DS:InsertMsg(szChannel, szText, szMsg, szTalker, nTime)
 		local szuText   = AnsiToUTF8(szText)
 		local szHash    = GetStringCRC(szMsg)
 		local szuTalker = AnsiToUTF8(szTalker)
-		if szChannel and nTime and not X.IsEmpty(szMsg) and szText and not X.IsEmpty(szHash) then
-			table.insert(self.aInsertQueue, {szHash = szHash, szChannel = szChannel, nTime = nTime, szTalker = szuTalker, szText = szuText, szMsg = szuMsg})
-			table.insert(self.aInsertQueueAnsi, {szHash = szHash, szChannel = szChannel, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
+		if szMsgType and nTime and not X.IsEmpty(szMsg) and szText and not X.IsEmpty(szHash) then
+			table.insert(self.aInsertQueue, {szHash = szHash, szMsgType = szMsgType, nTime = nTime, szTalker = szuTalker, szText = szuText, szMsg = szuMsg})
+			table.insert(self.aInsertQueueAnsi, {szHash = szHash, szMsgType = szMsgType, nTime = nTime, szTalker = szTalker, szText = szText, szMsg = szMsg})
 		end
 	end
 	FireUIEvent('ON_MY_CHATLOG_INSERT_MSG', self.szRoot)
 	return self
 end
 
-function DS:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
-	if X.IsTable(aChannel) and X.IsEmpty(aChannel) then
+function DS:CountMsg(aMsgType, szSearch, nMinTime, nMaxTime)
+	if X.IsTable(aMsgType) and X.IsEmpty(aMsgType) then
 		return 0
 	end
 	if not self:InitDB() then
@@ -425,11 +425,11 @@ function DS:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 	local szuSearch = X.IsEmpty(szSearch) and '' or AnsiToUTF8('%' .. szSearch .. '%')
 	local nCount = 0
 	for _, db in ipairs(self.aDB) do
-		nCount = nCount + db:CountMsg(aChannel, szuSearch, nMinTime, nMaxTime)
+		nCount = nCount + db:CountMsg(aMsgType, szuSearch, nMinTime, nMaxTime)
 	end
-	local tChannel = aChannel and X.FlipObjectKV(aChannel)
+	local tMsgType = aMsgType and X.FlipObjectKV(aMsgType)
 	for _, rec in ipairs(self.aInsertQueueAnsi) do
-		if (not tChannel or tChannel[rec.szChannel])
+		if (not tMsgType or tMsgType[rec.szMsgType])
 		and (szSearch == '' or X.StringFindW(rec.szText, szSearch) or X.StringFindW(rec.szTalker, szSearch)) then
 			nCount = nCount + 1
 		end
@@ -437,8 +437,8 @@ function DS:CountMsg(aChannel, szSearch, nMinTime, nMaxTime)
 	return nCount
 end
 
-function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, bUTF8)
-	if X.IsTable(aChannel) and X.IsEmpty(aChannel) then
+function DS:SelectMsg(aMsgType, szSearch, nMinTime, nMaxTime, nOffset, nLimit, bUTF8)
+	if X.IsTable(aMsgType) and X.IsEmpty(aMsgType) then
 		return {}
 	end
 	if not self:InitDB() then
@@ -451,16 +451,16 @@ function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, b
 		if nLimit == 0 then
 			break
 		end
-		local nCount = db:CountMsg(aChannel, szuSearch, nMinTime, nMaxTime)
+		local nCount = db:CountMsg(aMsgType, szuSearch, nMinTime, nMaxTime)
 		if nOffset < nCount then
-			local res = db:SelectMsg(aChannel, szuSearch, nMinTime, nMaxTime, nOffset, nLimit)
+			local res = db:SelectMsg(aMsgType, szuSearch, nMinTime, nMaxTime, nOffset, nLimit)
 			if bUTF8 then
 				for _, p in ipairs(res) do
 					table.insert(aResult, p)
 				end
 			else
 				for _, p in ipairs(res) do
-					p.szChannel = p.szChannel
+					p.szMsgType = p.szMsgType
 					p.szTalker = UTF8ToAnsi(p.szTalker)
 					p.szText = UTF8ToAnsi(p.szText)
 					p.szMsg = UTF8ToAnsi(p.szMsg)
@@ -474,12 +474,12 @@ function DS:SelectMsg(aChannel, szSearch, nMinTime, nMaxTime, nOffset, nLimit, b
 		nOffset = math.max(nOffset - nCount, 0)
 	end
 	if X.IsHugeNumber(nLimit) or nLimit > 0 then
-		local tChannel = aChannel and X.FlipObjectKV(aChannel)
+		local tMsgType = aMsgType and X.FlipObjectKV(aMsgType)
 		for i, rec in ipairs(self.aInsertQueueAnsi) do
 			if nLimit == 0 then
 				break
 			end
-			if (not tChannel or tChannel[rec.szChannel])
+			if (not tMsgType or tMsgType[rec.szMsgType])
 			and (szSearch == '' or X.StringFindW(rec.szText, szSearch) or X.StringFindW(rec.szTalker, szSearch)) then
 				if nOffset > 0 then
 					nOffset = nOffset - 1
@@ -506,7 +506,7 @@ function DS:DeleteMsg(szHash, nTime)
 	return self
 end
 
-function DS:DeleteMsgInterval(aChannel, szSearch, nMinTime, nMaxTime)
+function DS:DeleteMsgInterval(aMsgType, szSearch, nMinTime, nMaxTime)
 	if self:InitDB() then
 		self:FlushDB()
 		szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
@@ -514,7 +514,7 @@ function DS:DeleteMsgInterval(aChannel, szSearch, nMinTime, nMaxTime)
 		for _, db in ipairs(self.aDB) do
 			if (X.IsEmpty(nMaxTime) or X.IsHugeNumber(nMaxTime) or db:GetMinTime() <= nMaxTime)
 			and (X.IsEmpty(nMinTime) or db:GetMaxTime() >= nMinTime) then
-				db:DeleteMsgInterval(aChannel, szuSearch, nMinTime, nMaxTime)
+				db:DeleteMsgInterval(aMsgType, szuSearch, nMinTime, nMaxTime)
 			end
 		end
 	end
@@ -532,7 +532,7 @@ function DS:FlushDB()
 				db = self.aDB[i]
 			end
 			assert(db, 'ChatLog db indexing error while FlushDB: [i]' .. i .. ' [time]' .. p.nTime)
-			db:InsertMsg(p.szChannel, p.szText, p.szMsg, p.szTalker, p.nTime, p.szHash)
+			db:InsertMsg(p.szMsgType, p.szText, p.szMsg, p.szTalker, p.nTime, p.szHash)
 		end
 		self.aInsertQueue = {}
 		self.aInsertQueueAnsi = {}
