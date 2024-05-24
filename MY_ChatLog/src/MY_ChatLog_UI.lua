@@ -246,7 +246,7 @@ function D.OnItemRButtonClick()
 					for i = 0, hList:GetItemCount() - 1 do
 						hItem = hList:Lookup(i)
 						if hItem:IsVisible() and hItem:Lookup('Shadow_ChatLogSelect'):IsVisible() then
-							frame.ds:DeleteMsg(hItem.hash, hItem.time)
+							frame.ds:DeleteMsg(hItem.szHash, hItem.nTime)
 						end
 					end
 					frame.ds:FlushDB()
@@ -403,9 +403,9 @@ function D.UpdatePage(hFrame, bKeepScroll)
 			hItem:Lookup('Shadow_ChatLogHover'):SetH(nH + 3)
 			hItem:Lookup('Shadow_ChatLogSelect'):SetH(nH + 3)
 			hItem:SetH(nH + 3)
-			hItem.hash = rec.szHash
-			hItem.time = rec.nTime
-			hItem.text = rec.szText --TODO
+			hItem.szHash = rec.szHash
+			hItem.nTime = rec.nTime
+			hItem.szText = rec.szText
 			hItem.szMsgType = rec.szMsgType
 			if not hFrame.nLastClickIndex then
 				hItem:Lookup('Shadow_ChatLogSelect'):Hide()
