@@ -96,7 +96,7 @@ function X.IsArenaMap(dwMapID)
 			{f = 'i', t = 'nGMVisitorCount'},
 			{f = 's', t = 'szScript'},
 			{f = 'i', t = 'nCritical'},
-			X.ENVIRONMENT.GAME_BRANCH == 'classic' and {f = 'i', t = 'nIs1V1'} or false,
+			X.IS_CLASSIC and {f = 'i', t = 'nIs1V1'} or false,
 		}
 		for i, v in X.ipairs_r(tTitle) do
 			if not v then

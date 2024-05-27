@@ -1,10 +1,4 @@
 return {
-	-- globalcolor
-	['Global color'] = '全局配色',
-	['Force color'] = '门派配色',
-	['Camp color'] = '阵营配色',
-	['Restore default'] = '恢复默认',
-
 	-- globalconfig
 	['GlobalConfig'] = '全局设置',
 	['Distance type'] = '默认距离计算方式',

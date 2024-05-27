@@ -162,7 +162,7 @@ end
 ---@param KPlayer userdata @物品所属角色
 ---@return number, number, number @[有效精炼等级, 物品精炼等级, 装备栏精炼等级]
 function X.GetItemStrengthLevel(KItem, KPlayer)
-	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+	if X.IS_REMAKE then
 		if not KPlayer then
 			KPlayer = X.GetClientPlayer()
 		end
@@ -185,7 +185,7 @@ end
 ---@param KPlayer userdata @物品所属角色
 ---@return number, number, number @[有效熔嵌孔五行石ID, 物品熔嵌孔五行石ID, 装备栏熔嵌孔五行石ID]
 function X.GetItemMountDiamondEnchantID(KItem, nSlotIndex, KPlayer)
-	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+	if X.IS_REMAKE then
 		if not KPlayer then
 			KPlayer = X.GetClientPlayer()
 		end
