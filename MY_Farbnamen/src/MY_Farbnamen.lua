@@ -368,7 +368,7 @@ function D.Migration()
 									DBT_W:ClearBindings()
 									DBT_W:BindAll(
 										rec.id,
-										AnsiToUTF8(rec.name),
+										rec.name,
 										rec.extra or ''
 									)
 									DBT_W:Execute()
