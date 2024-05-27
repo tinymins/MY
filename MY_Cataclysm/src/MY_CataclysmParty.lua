@@ -1162,7 +1162,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 		elseif CFG.nColoredName == 2 then
 			r, g, b = X.GetCampColor(info.nCamp, 'foreground')
 		end
-		local szName = info.szName
+		local szName = X.FormatOriginPlayerName(info.szName)
 		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
 			szName = MY_ChatMosaics.MosaicsString(szName)
 		end
