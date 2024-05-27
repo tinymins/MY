@@ -693,8 +693,6 @@ function D.OnFrameCreate()
 	this:RegisterEvent('TEAM_INCOMEMONEY_CHANGE_NOTIFY')
 	this:RegisterEvent('SYS_MSG')
 	this:RegisterEvent('MY_RAID_REC_BUFF')
-	this:RegisterEvent('MY_CAMP_COLOR_UPDATE')
-	this:RegisterEvent('MY_FORCE_COLOR_UPDATE')
 	this:RegisterEvent('GKP_RECORD_TOTAL')
 	this:RegisterEvent('GVOICE_MIC_STATE_CHANGED')
 	this:RegisterEvent('GVOICE_SPEAKER_STATE_CHANGED')
@@ -946,9 +944,6 @@ function D.OnEvent(szEvent)
 		this:SetVisible(MY_Cataclysm.bVisible)
 	elseif szEvent == 'MY_CATACLYSM_SET_FOLD' then
 		D.UpdatePrepareBarPos()
-	elseif szEvent == 'MY_CAMP_COLOR_UPDATE'
-	or szEvent == 'MY_FORCE_COLOR_UPDATE' then
-		D.ReloadCataclysmPanel()
 	elseif szEvent == 'GKP_RECORD_TOTAL' then
 		GKP_RECORD_TOTAL = arg0
 	elseif szEvent == 'GVOICE_MIC_STATE_CHANGED' then

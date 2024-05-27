@@ -826,10 +826,6 @@ end
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------------------------------
 
-X.RegisterEvent('MY_FORCE_COLOR_UPDATE', 'MY_Recount_UI', function()
-	D.OnForceColorUpdate()
-end)
-
 X.RegisterUserSettingsInit('MY_Recount_UI', function()
 	D.CheckOpen()
 	D.OnForceColorUpdate()
