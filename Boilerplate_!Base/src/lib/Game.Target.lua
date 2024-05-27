@@ -126,8 +126,8 @@ function X.GetObjectLife(obj)
 	if not obj then
 		return
 	end
-	return X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and obj.fCurrentLife64 or obj.nCurrentLife,
-		X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and obj.fMaxLife64 or obj.nMaxLife
+	return X.IS_REMAKE and obj.fCurrentLife64 or obj.nCurrentLife,
+		X.IS_REMAKE and obj.fMaxLife64 or obj.nMaxLife
 end
 
 -- 获取目标内力和最大内力
@@ -712,7 +712,7 @@ end
 ---@param dwDoodadID number @掉落拾取ID
 ---@return number @掉落拾取金钱数量
 function X.GetDoodadLootMoney(dwDoodadID)
-	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+	if X.IS_REMAKE then
 		local me = X.GetClientPlayer()
 		local scene = me and me.GetScene()
 		return scene and scene.GetLootMoney(dwDoodadID)
@@ -726,7 +726,7 @@ end
 ---@param dwDoodadID number @掉落拾取ID
 ---@return number @掉落拾取物品数量
 function X.GetDoodadLootItemCount(dwDoodadID)
-	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+	if X.IS_REMAKE then
 		local me = X.GetClientPlayer()
 		local scene = me and me.GetScene()
 		local tLoot = scene and scene.GetLootList(dwDoodadID)
@@ -741,7 +741,7 @@ end
 ---@param dwDoodadID number @掉落拾取ID
 ---@return KItem,boolean,boolean,boolean @掉落拾取物品,是否需要Roll点,是否需要分配,是否需要拍卖
 function X.GetDoodadLootItem(dwDoodadID, nIndex)
-	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+	if X.IS_REMAKE then
 		local me = X.GetClientPlayer()
 		local scene = me and me.GetScene()
 		local tLoot = scene and scene.GetLootList(dwDoodadID)
@@ -766,7 +766,7 @@ end
 ---@param dwItemID number @掉落物品ID
 ---@param dwTargetPlayerID number @被分配者ID
 function X.DistributeDoodadItem(dwDoodadID, dwItemID, dwTargetPlayerID)
-	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+	if X.IS_REMAKE then
 		local me = X.GetClientPlayer()
 		local scene = me and me.GetScene()
 		if scene then
@@ -784,7 +784,7 @@ end
 ---@param dwDoodadID number @掉落拾取ID
 ---@return number[] @可拾取玩家列表
 function X.GetDoodadLooterList(dwDoodadID)
-	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+	if X.IS_REMAKE then
 		local me = X.GetClientPlayer()
 		local scene = me and me.GetScene()
 		if scene then
@@ -1809,7 +1809,7 @@ function X.IsIsolated(...)
 	if not KObject then
 		return false
 	end
-	if X.ENVIRONMENT.GAME_BRANCH == 'classic' then
+	if X.IS_CLASSIC then
 		return false
 	end
 	return KObject.bIsolated

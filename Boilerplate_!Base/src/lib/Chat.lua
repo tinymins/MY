@@ -1393,7 +1393,7 @@ local function GetRegisterChannelLimitTable()
 				{f = 'i', t = 'CampChannelDailyLimit'},
 				{f = 'i', t = 'MaxContribution'},
 				{f = 'i', t = 'WhisperDailyLimit'},
-				X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'IdentityChannelDailyLimit'} or false,
+				X.IS_REMAKE and {f = 'i', t = 'IdentityChannelDailyLimit'} or false,
 				{f = 'i', t = 'SprintPowerMax'},
 				{f = 'i', t = 'SprintPowerCost'},
 				{f = 'i', t = 'SprintPowerRevive'},
@@ -1405,8 +1405,8 @@ local function GetRegisterChannelLimitTable()
 				{f = 'i', t = 'HorseSprintPowerRevive'},
 				{f = 'i', t = 'SceneChannelDailyLimit'},
 				{f = 'i', t = 'NearbyChannelDailyLimit'},
-				X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitByVIP'} or false,
-				X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and {f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'} or false,
+				X.IS_REMAKE and {f = 'i', t = 'WorldChannelDailyLimitByVIP'} or false,
+				X.IS_REMAKE and {f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'} or false,
 			}
 			for i, v in X.ipairs_r(tTitle) do
 				if not v then

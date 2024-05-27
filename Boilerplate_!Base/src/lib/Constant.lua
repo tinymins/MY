@@ -13,8 +13,6 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
 local KvpToObject = X.KvpToObject
-local bStream = X.ENVIRONMENT.GAME_PROVIDER == 'remote'
-local bClassic = X.ENVIRONMENT.GAME_BRANCH == 'classic'
 
 local function PickBranch(tData)
 	return tData[X.ENVIRONMENT.GAME_BRANCH] or tData['remake']
@@ -533,11 +531,11 @@ local CONSTANT = {
 			{ FORCE_TYPE.CANG_JIAN, { 214, 249,  93 } }, -- ≤ÿΩ£
 			{ FORCE_TYPE.GAI_BANG , { 205, 133,  63 } }, -- ÿ§∞Ô
 			{ FORCE_TYPE.MING_JIAO, { 240,  70,  96 } }, -- √˜ΩÃ
-			{ FORCE_TYPE.CANG_YUN , bStream and { 255, 143, 80 } or { 180, 60, 0 } }, -- ≤‘‘∆
+			{ FORCE_TYPE.CANG_YUN , X.IS_REMOTE and { 255, 143, 80 } or { 180, 60, 0 } }, -- ≤‘‘∆
 			{ FORCE_TYPE.CHANG_GE , { 100, 250, 180 } }, -- ≥§∏Ë
 			{ FORCE_TYPE.BA_DAO   , { 106, 108, 189 } }, -- ∞‘µ∂
 			{ FORCE_TYPE.PENG_LAI , { 171, 227, 250 } }, -- ≈Ó¿≥
-			{ FORCE_TYPE.LING_XUE , bStream and { 253, 86, 86 } or { 161,   9,  34 } }, -- ¡Ë—©
+			{ FORCE_TYPE.LING_XUE , X.IS_REMOTE and { 253, 86, 86 } or { 161,   9,  34 } }, -- ¡Ë—©
 			{ FORCE_TYPE.YAN_TIAN , { 166,  83, 251 } }, -- —‹ÃÏ
 			{ FORCE_TYPE.YAO_ZONG , {   0, 172, 153 } }, -- “©◊⁄
 			{ FORCE_TYPE.DAO_ZONG , { 107, 183, 242 } }, -- µ∂◊⁄
@@ -582,7 +580,7 @@ local CONSTANT = {
 		KvpToObject({
 			{ CAMP.NEUTRAL, { 255, 255, 255 } }, -- ÷–¡¢
 			{ CAMP.GOOD   , {  60, 128, 220 } }, -- ∫∆∆¯√À
-			{ CAMP.EVIL   , bStream and { 255, 63, 63 } or { 160, 30, 30 } }, -- ∂Ò»Àπ»
+			{ CAMP.EVIL   , X.IS_REMOTE and { 255, 63, 63 } or { 160, 30, 30 } }, -- ∂Ò»Àπ»
 		}),
 		{
 			__index = function(t, k)
@@ -770,7 +768,7 @@ local CONSTANT = {
 		INVENTORY_INDEX.EQUIP,
 		INVENTORY_INDEX.EQUIP_BACKUP1,
 		INVENTORY_INDEX.EQUIP_BACKUP2,
-		X.IIf(bClassic, nil, INVENTORY_INDEX.EQUIP_BACKUP3),
+		X.IIf(X.IS_CLASSIC, nil, INVENTORY_INDEX.EQUIP_BACKUP3),
 	},
 	INVENTORY_PACKAGE_LIST = {
 		INVENTORY_INDEX.PACKAGE,

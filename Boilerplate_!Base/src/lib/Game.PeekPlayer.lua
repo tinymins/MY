@@ -218,7 +218,7 @@ local function PeekPlayer(dwID)
 	--[[#DEBUG BEGIN]]
 	X.Debug(X.PACKET_INFO.NAME_SPACE, 'TelentInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
-	if X.ENVIRONMENT.GAME_BRANCH == 'classic' then
+	if X.IS_CLASSIC then
 		X.SafeCall(PeekOtherPlayerTalent, dwID)
 	else
 		X.SafeCall(PeekOtherPlayerTalent, dwID, 0xffffffff)
