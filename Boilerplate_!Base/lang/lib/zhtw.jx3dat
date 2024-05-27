@@ -194,5 +194,4 @@ return {
 	['%d settings exported, file saved in %s.'] = '成功導出 %d 條配置項，文件位於：%s。',
 
 	['Global config'] = '全局設置',
-	['Global color'] = '全局配色',
 }

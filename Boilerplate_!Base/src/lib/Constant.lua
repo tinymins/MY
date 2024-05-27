@@ -520,7 +520,7 @@ local CONSTANT = {
 		[3115] = '{$I5,11092}', -- 仙崖石花
 		[3116] = '{$I5,11093}', -- 顾渚紫笋
 	},
-	FORCE_COLOR_FG_DEFAULT = setmetatable(
+	FORCE_FOREGROUND_COLOR = setmetatable(
 		KvpToObject({
 			{ FORCE_TYPE.JIANG_HU , { 255, 255, 255 } }, -- 江湖
 			{ FORCE_TYPE.SHAO_LIN , { 255, 178,  95 } }, -- 少林
@@ -549,7 +549,7 @@ local CONSTANT = {
 			end,
 			__metatable = true,
 		}),
-	FORCE_COLOR_BG_DEFAULT = setmetatable(
+	FORCE_BACKGROUND_COLOR = setmetatable(
 		KvpToObject({
 			{ FORCE_TYPE.JIANG_HU , { 220, 220, 220 } }, -- 江湖
 			{ FORCE_TYPE.SHAO_LIN , { 125, 112,  10 } }, -- 少林
@@ -578,7 +578,7 @@ local CONSTANT = {
 			end,
 			__metatable = true,
 		}),
-	CAMP_COLOR_FG_DEFAULT = setmetatable(
+	CAMP_FOREGROUND_COLOR = setmetatable(
 		KvpToObject({
 			{ CAMP.NEUTRAL, { 255, 255, 255 } }, -- 中立
 			{ CAMP.GOOD   , {  60, 128, 220 } }, -- 浩气盟
@@ -590,7 +590,7 @@ local CONSTANT = {
 			end,
 			__metatable = true,
 		}),
-	CAMP_COLOR_BG_DEFAULT = setmetatable(
+	CAMP_BACKGROUND_COLOR = setmetatable(
 		KvpToObject({
 			{ CAMP.NEUTRAL, { 255, 255, 255 } }, -- 中立
 			{ CAMP.GOOD   , {  60, 128, 220 } }, -- 浩气盟

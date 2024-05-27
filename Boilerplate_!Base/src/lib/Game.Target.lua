@@ -1048,87 +1048,26 @@ X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#ImportantNpclist'), funct
 end)
 end
 
-do
-local O = X.CreateUserSettingsModule('LIB', _L['System'], {
-	tForceForegroundColor = {
-		ePathType = X.PATH_TYPE.ROLE,
-		bDataSet = true,
-		szLabel = _L['Global color'],
-		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
-		xDefaultValue = X.CONSTANT.FORCE_COLOR_FG_DEFAULT['*'],
-		tDataSetDefaultValue = X.CONSTANT.FORCE_COLOR_FG_DEFAULT,
-	},
-	tForceBackgroundColor = {
-		ePathType = X.PATH_TYPE.ROLE,
-		bDataSet = true,
-		szLabel = _L['Global color'],
-		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
-		xDefaultValue = X.CONSTANT.FORCE_COLOR_BG_DEFAULT['*'],
-		tDataSetDefaultValue = X.CONSTANT.FORCE_COLOR_BG_DEFAULT,
-	},
-	tCampForegroundColor = {
-		ePathType = X.PATH_TYPE.ROLE,
-		bDataSet = true,
-		szLabel = _L['Global color'],
-		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
-		xDefaultValue = X.CONSTANT.CAMP_COLOR_FG_DEFAULT['*'],
-		tDataSetDefaultValue = X.CONSTANT.CAMP_COLOR_FG_DEFAULT,
-	},
-	tCampBackgroundColor = {
-		ePathType = X.PATH_TYPE.ROLE,
-		bDataSet = true,
-		szLabel = _L['Global color'],
-		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
-		xDefaultValue = X.CONSTANT.CAMP_COLOR_BG_DEFAULT['*'],
-		tDataSetDefaultValue = X.CONSTANT.CAMP_COLOR_BG_DEFAULT,
-	},
-})
-
-local function initForceCustom()
-	FireUIEvent(X.NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
-end
-X.RegisterUserSettingsInit(X.NSFormatString('{$NS}#ForceColor'), initForceCustom)
-
+---获取门派配色
+---@param dwForce number @要获取的门派ID
+---@param szType 'background'|'foreground' @获取背景色还是前景色
+---@return number,number,number @配色RGB
 function X.GetForceColor(dwForce, szType)
 	if szType == 'background' then
-		return X.Unpack(O.tForceBackgroundColor[dwForce])
+		return X.Unpack(X.CONSTANT.FORCE_BACKGROUND_COLOR[dwForce])
 	end
-	return X.Unpack(O.tForceForegroundColor[dwForce])
+	return X.Unpack(X.CONSTANT.FORCE_FOREGROUND_COLOR[dwForce])
 end
 
-function X.SetForceColor(dwForce, szType, tCol)
-	if dwForce == 'reset' then
-		O('reset', { 'tForceForegroundColor', 'tForceBackgroundColor' })
-	elseif szType == 'background' then
-		O.tForceBackgroundColor[dwForce] = tCol
-	else
-		O.tForceForegroundColor[dwForce] = tCol
-	end
-	FireUIEvent(X.NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
-end
-
-local function initCampCustom()
-	FireUIEvent(X.NSFormatString('{$NS}_FORCE_COLOR_UPDATE'))
-end
-X.RegisterUserSettingsInit(X.NSFormatString('{$NS}#CampColor'), initCampCustom)
-
+---获取阵营配色
+---@param nCamp number @要获取的阵营
+---@param szType 'background'|'foreground' @获取背景色还是前景色
+---@return number,number,number @配色RGB
 function X.GetCampColor(nCamp, szType)
 	if szType == 'background' then
-		return X.Unpack(O.tCampBackgroundColor[nCamp])
+		return X.Unpack(X.CONSTANT.CAMP_BACKGROUND_COLOR[nCamp])
 	end
-	return X.Unpack(O.tCampForegroundColor[nCamp])
-end
-
-function X.SetCampColor(nCamp, szType, tCol)
-	if nCamp == 'reset' then
-		O('reset', { 'tCampForegroundColor', 'tCampBackgroundColor' })
-	elseif szType == 'background' then
-		O.tCampBackgroundColor[nCamp] = tCol
-	else
-		O.tCampForegroundColor[nCamp] = tCol
-	end
-	FireUIEvent(X.NSFormatString('{$NS}_CAMP_COLOR_UPDATE'))
-end
+	return X.Unpack(X.CONSTANT.CAMP_FOREGROUND_COLOR[nCamp])
 end
 
 --------------------------------------------------------------------------------
