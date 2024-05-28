@@ -24,8 +24,9 @@ return {
     ['Total player count: %d'] = '角色總數量：%d個',
     ['Total tong count: %d'] = '幫會總數量：%d個',
     ['Camp analysis:'] = '———— 陣營統計 ————',
-    ['Force analysis:'] = '———— 門派統計 ————',
+    ['Force analysis:'] = '————————— 門派統計 —————————',
     ['Top 10 tong member count analysis:'] = '———— 幫會成員數量前十統計 ————',
     ['%6d players'] = '%6d人',
+    ['---------------------------------------------'] = '———————————————————————————',
     ['Counts based on local cache, only players you met will be analyzed.'] = '統計基於本地緩存，即只有你遇到過的角色才能參與統計。',
 }

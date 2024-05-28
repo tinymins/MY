@@ -815,32 +815,78 @@ function D.AddAusID(dwID)
 end
 
 function D.ShowAnalysis()
-	local szAnalysis = ''
-	szAnalysis = szAnalysis .. _L('Total player count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM InfoCache]]), {1, 'count'}, 0)) .. '\n'
-	szAnalysis = szAnalysis .. _L('Total tong count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM TongCache]]), {1, 'count'}, 0)) .. '\n'
-	szAnalysis = szAnalysis .. '\n'
-	szAnalysis = szAnalysis .. _L['Camp analysis:'] .. '\n'
+	local ui = X.UI.CreateFrame('MY_Farbnamen__Analysis', {
+		simple = true, close = true,
+		text = _L['MY_Farbnamen__Analysis'],
+	})
+	local nPaddingX = 20
+	local nX, nY = nPaddingX, 30
+	local nDeltaY = 30
+	ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L('Total player count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM InfoCache]]), {1, 'count'}, 0)),
+	})
+	nY = nY + nDeltaY
+	ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L('Total tong count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM TongCache]]), {1, 'count'}, 0)),
+	})
+	nY = nY + nDeltaY
+	nY = nY + nDeltaY
+
+	ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L['Camp analysis:'],
+	})
+	nY = nY + nDeltaY
+
 	for _, v in ipairs(DB:Execute([[SELECT camp, COUNT(*) AS count FROM InfoCache GROUP BY camp]]) or {}) do
-		local szName = g_tStrings.STR_CAMP_TITLE[v.camp] or ''
-		szAnalysis = szAnalysis .. szName .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(6 - X.StringLenW(szName)) .. _L('%6d players', v.count) .. '\n'
+		ui:Append('Text', {
+			x = nX, y = nY,
+			text = g_tStrings.STR_CAMP_TITLE[v.camp] or '',
+		})
+		ui:Append('Text', {
+			x = nX + 65, y = nY,
+			text = _L('%6d players', v.count),
+		})
+		nY = nY + nDeltaY
 	end
-	szAnalysis = szAnalysis .. '\n'
-	szAnalysis = szAnalysis .. _L['Force analysis:'] .. '\n'
+	nY = nY + nDeltaY
+
+	ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L['Force analysis:'],
+	})
+	nY = nY + nDeltaY
+
 	local aForce = DB:Execute([[SELECT force, COUNT(*) AS count FROM InfoCache GROUP BY force]]) or {}
 	for i = 1, #aForce, 2 do
-		local v1 = aForce[i]
-		local v2 = aForce[i + 1]
-		local szName = g_tStrings.tForceTitle[v1.force] or ''
-		szAnalysis = szAnalysis .. szName .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(4 - X.StringLenW(szName)) .. _L('%6d players', v1.count)
-		if v2 then
-			local szName = g_tStrings.tForceTitle[v2.force] or ''
-			szAnalysis = szAnalysis .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(4)
-			szAnalysis = szAnalysis .. szName .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(4 - X.StringLenW(szName)) .. _L('%6d players', v2.count)
+		nX = nPaddingX
+		for j = 0, 1 do
+			local v = aForce[i + j]
+			if v then
+				ui:Append('Text', {
+					x = nX, y = nY,
+					text = g_tStrings.tForceTitle[v.force] or '',
+				})
+				ui:Append('Text', {
+					x = nX + 65, y = nY,
+					text = _L('%6d players', v.count),
+				})
+				nX = nX + 250
+			end
 		end
-		szAnalysis = szAnalysis .. '\n'
+		nY = nY + nDeltaY
 	end
-	szAnalysis = szAnalysis .. '\n'
-	szAnalysis = szAnalysis .. _L['Top 10 tong member count analysis:'] .. '\n'
+	nX = nPaddingX
+	nY = nY + nDeltaY
+
+	ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L['Top 10 tong member count analysis:'],
+	})
+	nY = nY + nDeltaY
+
 	for _, v in ipairs(DB:Execute([[
 		SELECT TongCache.name, COUNT(InfoCache.id) AS count
 		FROM InfoCache
@@ -849,24 +895,31 @@ function D.ShowAnalysis()
 		ORDER BY count DESC
 		LIMIT 10;
 	]]) or {}) do
-		local szName = UTF8ToAnsi(v.name)
-		szAnalysis = szAnalysis .. szName .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(9 - X.StringLenW(szName)) .. _L('%6d players', v.count) .. '\n'
-	end
-	szAnalysis = szAnalysis .. '\n'
-	szAnalysis = szAnalysis .. _L['Counts based on local cache, only players you met will be analyzed.']
-	local ui = X.UI.CreateFrame('MY_Farbnamen__Analysis', {
-		simple = true, close = true, w = 640, text = _L['MY_Farbnamen__Analysis'],
-	})
-	ui:Height(
 		ui:Append('Text', {
-			x = 20, y = 30, w = 600,
-			alignHorizontal = 0,
-			multiline = true,
-			text = szAnalysis,
+			x = nX, y = nY,
+			text = UTF8ToAnsi(v.name),
 		})
-		:AutoHeight()
-		:Height() + 80
-	)
+		ui:Append('Text', {
+			x = nX + 250, y = nY,
+			text = _L('%6d players', v.count),
+		})
+		nY = nY + nDeltaY
+	end
+	nY = nY + nDeltaY
+
+	ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L['---------------------------------------------'],
+	})
+	nY = nY + nDeltaY
+
+	ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L['Counts based on local cache, only players you met will be analyzed.'],
+	})
+	nY = nY + nDeltaY
+
+	ui:Size(640, nY + 50)
 	ui:Anchor('CENTER')
 end
 
