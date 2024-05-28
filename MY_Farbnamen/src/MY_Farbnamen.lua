@@ -814,6 +814,62 @@ function D.AddAusID(dwID)
 	end
 end
 
+function D.ShowAnalysis()
+	local szAnalysis = ''
+	szAnalysis = szAnalysis .. _L('Total player count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM InfoCache]]), {1, 'count'}, 0)) .. '\n'
+	szAnalysis = szAnalysis .. _L('Total tong count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM TongCache]]), {1, 'count'}, 0)) .. '\n'
+	szAnalysis = szAnalysis .. '\n'
+	szAnalysis = szAnalysis .. _L['Camp analysis:'] .. '\n'
+	for _, v in ipairs(DB:Execute([[SELECT camp, COUNT(*) AS count FROM InfoCache GROUP BY camp]]) or {}) do
+		local szName = g_tStrings.STR_CAMP_TITLE[v.camp] or ''
+		szAnalysis = szAnalysis .. szName .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(6 - X.StringLenW(szName)) .. _L('%6d players', v.count) .. '\n'
+	end
+	szAnalysis = szAnalysis .. '\n'
+	szAnalysis = szAnalysis .. _L['Force analysis:'] .. '\n'
+	local aForce = DB:Execute([[SELECT force, COUNT(*) AS count FROM InfoCache GROUP BY force]]) or {}
+	for i = 1, #aForce, 2 do
+		local v1 = aForce[i]
+		local v2 = aForce[i + 1]
+		local szName = g_tStrings.tForceTitle[v1.force] or ''
+		szAnalysis = szAnalysis .. szName .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(4 - X.StringLenW(szName)) .. _L('%6d players', v1.count)
+		if v2 then
+			local szName = g_tStrings.tForceTitle[v2.force] or ''
+			szAnalysis = szAnalysis .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(4)
+			szAnalysis = szAnalysis .. szName .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(4 - X.StringLenW(szName)) .. _L('%6d players', v2.count)
+		end
+		szAnalysis = szAnalysis .. '\n'
+	end
+	szAnalysis = szAnalysis .. '\n'
+	szAnalysis = szAnalysis .. _L['Top 10 tong member count analysis:'] .. '\n'
+	for _, v in ipairs(DB:Execute([[
+		SELECT TongCache.name, COUNT(InfoCache.id) AS count
+		FROM InfoCache
+		JOIN TongCache ON InfoCache.tong = TongCache.id
+		GROUP BY InfoCache.tong
+		ORDER BY count DESC
+		LIMIT 10;
+	]]) or {}) do
+		local szName = UTF8ToAnsi(v.name)
+		szAnalysis = szAnalysis .. szName .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(9 - X.StringLenW(szName)) .. _L('%6d players', v.count) .. '\n'
+	end
+	szAnalysis = szAnalysis .. '\n'
+	szAnalysis = szAnalysis .. _L['Counts based on local cache, only players you met will be analyzed.']
+	local ui = X.UI.CreateFrame('MY_Farbnamen__Analysis', {
+		simple = true, close = true, w = 640, text = _L['MY_Farbnamen__Analysis'],
+	})
+	ui:Height(
+		ui:Append('Text', {
+			x = 20, y = 30, w = 600,
+			alignHorizontal = 0,
+			multiline = true,
+			text = szAnalysis,
+		})
+		:AutoHeight()
+		:Height() + 80
+	)
+	ui:Anchor('CENTER')
+end
+
 --------------------------------------------------------------
 -- ²Ëµ¥
 --------------------------------------------------------------
@@ -861,11 +917,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, w = 'auto',
 		buttonStyle = 'FLAT',
-		text = _L['Customize color'],
+		text = _L['Show analysis'],
 		onClick = function()
-			X.ShowPanel()
-			X.FocusPanel()
-			X.SwitchTab('GlobalColor')
+			D.ShowAnalysis()
 		end,
 		autoEnable = function()
 			return O.bEnable
