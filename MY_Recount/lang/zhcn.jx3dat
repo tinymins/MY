@@ -53,5 +53,4 @@ return {
     ['effect: '] = '有效：',
 
     ['Away count: %d, away time: %ds'] = '暂离次数：%d次　暂离时间：%d秒',
-    ['Global Color'] = '全局配色',
 }

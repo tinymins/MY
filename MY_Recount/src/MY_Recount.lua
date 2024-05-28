@@ -337,18 +337,6 @@ function D.GetMenu()
 			end,
 			fnDisable = IsUIDisabled,
 		}
-		if i == 1 then
-			t2.szOption = _L['Global Color']
-			t2.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
-			t2.nFrame = 105
-			t2.nMouseOverFrame = 106
-			t2.szLayer = 'ICON_RIGHT'
-			t2.fnClickIcon = function()
-				X.ShowPanel()
-				X.FocusPanel()
-				X.SwitchTab('GlobalColor')
-			end
-		end
 		table.insert(t1, t2)
 	end
 	table.insert(t, t1)
