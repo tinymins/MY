@@ -218,11 +218,12 @@ function D.HookPlayerViewPanel()
 			local page = pageset:Lookup('Page_Love')
 			-- 计算checkbox的X值
 			local chk = mPage:GetFirstChild()
-			local aX, nW = {}, 78
+			local aX, nW, nY = {}, 78, 510
 			while chk do
 				if chk:GetType() == 'WndCheckBox' then
 					table.insert(aX, chk:GetRelX())
 					nW = chk:GetW()
+					nY = chk:GetRelY()
 				end
 				chk = chk:GetNext()
 			end
@@ -231,7 +232,7 @@ function D.HookPlayerViewPanel()
 			checkbox:ChangeRelation(mPage, true, true)
 			page:ChangeRelation(mPage, true, true)
 			X.UI.CloseFrame(frame)
-			checkbox:SetRelPos(nX, 510)
+			checkbox:SetRelPos(nX, nY)
 			checkbox:SetW(nW)
 			checkbox:Lookup('', 'Text_LoveCaptical'):SetW(nW)
 			-- 计算page的X值
