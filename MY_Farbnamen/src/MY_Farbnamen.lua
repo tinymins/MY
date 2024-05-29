@@ -166,6 +166,15 @@ end
 InitDB()
 
 function D.Migration()
+	local szRoot = X.FormatPath({'cache/', X.PATH_TYPE.SERVER})
+	-- 修复V4版本导入乱码问题
+	for _, szFileName in ipairs(CPath.GetFileList(szRoot)) do
+		local szTime = select(3, ('farbnamen.v4.db.bak20210715210715'):find('^farbnamen%.v4%.db%.bak(%d+)$'))
+		local nTime = szTime and tonumber(szTime)
+		if nTime and nTime < 1717034400 then
+			CPath.Move(szRoot .. szFileName, szRoot .. 'farbnamen.v4.db')
+		end
+	end
 	local DB_V1_PATH = X.FormatPath({'cache/player_info.db', X.PATH_TYPE.SERVER})
 	local DB_V2_PATH = X.FormatPath({'cache/player_info.v2.db', X.PATH_TYPE.SERVER})
 	local DB_V3_PATH = X.FormatPath({'cache/farbnamen.v3.db', X.PATH_TYPE.SERVER})
