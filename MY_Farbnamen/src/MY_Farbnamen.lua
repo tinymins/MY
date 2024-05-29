@@ -782,7 +782,7 @@ function D.ShowAnalysis()
 	for _, v in ipairs(DB:Execute([[SELECT camp, COUNT(*) AS count FROM InfoCache GROUP BY camp]]) or {}) do
 		ui:Append('Text', {
 			x = nX, y = nY,
-			text = g_tStrings.STR_CAMP_TITLE[v.camp] or '',
+			text = g_tStrings.STR_CAMP_TITLE[v.camp] or _L('Unknown(%d)', v.camp),
 		})
 		ui:Append('Text', {
 			x = nX + 65, y = nY,
@@ -806,7 +806,7 @@ function D.ShowAnalysis()
 			if v then
 				ui:Append('Text', {
 					x = nX, y = nY,
-					text = g_tStrings.tForceTitle[v.force] or '',
+					text = g_tStrings.tForceTitle[v.force] or _L('Unknown(%d)', v.force),
 				})
 				ui:Append('Text', {
 					x = nX + 65, y = nY,
