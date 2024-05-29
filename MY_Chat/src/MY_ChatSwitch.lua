@@ -485,33 +485,35 @@ function D.OnFrameCreate()
 				chk.OnCheckBoxCheck = v.onCheck
 				chk.OnCheckBoxUncheck = v.onUncheck
 			end
-			wnd:SetRelX(nWidth)
-			nWidth = nWidth + math.ceil(wnd:GetW())
-			nHeight = math.max(nHeight, math.ceil(wnd:GetH()))
-			chk.txtTitle = txtTitle
-			chk.txtCooldown = txtCooldown
-			chk.shaCount = shaCount
-			if v.channel then
-				this.tRadios[v.channel] = chk
+			if wnd and chk then
+				wnd:SetRelX(nWidth)
+				nWidth = nWidth + math.ceil(wnd:GetW())
+				nHeight = math.max(nHeight, math.ceil(wnd:GetH()))
+				chk.txtTitle = txtTitle
+				chk.txtCooldown = txtCooldown
+				chk.shaCount = shaCount
+				if v.channel then
+					this.tRadios[v.channel] = chk
+				end
+				if v.tip then
+					X.UI(chk):Tip(v.tip, X.UI.TIP_POSITION.CENTER)
+				end
+				if txtTitle then
+					txtTitle:SetText(v.title)
+					txtTitle:SetFontScheme(197)
+					txtTitle:SetFontColor(unpack(v.color or {255, 255, 255}))
+				end
+				if txtCooldown then
+					txtCooldown:SetText('')
+					txtCooldown:SetFontScheme(197)
+					txtCooldown:SetFontColor(unpack(v.color or {255, 255, 255}))
+				end
+				if shaCount then
+					X.UI(shaCount):DrawCircle(0, 0, 0)
+				end
+				chk.info = v
+				UpdateChannelDailyLimit(chk)
 			end
-			if v.tip then
-				X.UI(chk):Tip(v.tip, X.UI.TIP_POSITION.CENTER)
-			end
-			if txtTitle then
-				txtTitle:SetText(v.title)
-				txtTitle:SetFontScheme(197)
-				txtTitle:SetFontColor(unpack(v.color or {255, 255, 255}))
-			end
-			if txtCooldown then
-				txtCooldown:SetText('')
-				txtCooldown:SetFontScheme(197)
-				txtCooldown:SetFontColor(unpack(v.color or {255, 255, 255}))
-			end
-			if shaCount then
-				X.UI(shaCount):DrawCircle(0, 0, 0)
-			end
-			chk.info = v
-			UpdateChannelDailyLimit(chk)
 		end
 	end
 	container:SetSize(nWidth, nHeight)
