@@ -609,8 +609,7 @@ local function GetTongName(dwID)
 	return info and info.name
 end
 
-do
-local function Flush()
+function D.Flush()
 	if not InitDB() then
 		return
 	end
@@ -635,8 +634,7 @@ local function Flush()
 		DB:Execute('END TRANSACTION')
 	end
 end
-X.RegisterFlush('MY_Farbnamen_Save', Flush)
-end
+X.RegisterFlush('MY_Farbnamen_Save', D.Flush)
 
 do
 local function OnExit()
@@ -921,6 +919,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		buttonStyle = 'FLAT',
 		text = _L['Show analysis'],
 		onClick = function()
+			D.Flush()
 			D.ShowAnalysis()
 		end,
 		autoEnable = function()
