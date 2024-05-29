@@ -175,6 +175,97 @@ local function InitDB()
 end
 InitDB()
 
+function D.Import(aFilePath)
+	for _, szFilePath in ipairs(aFilePath) do
+		local db = SQLite3_Open(szFilePath)
+		if db then
+			local nVersion = X.Get(db:Execute([[SELECT value FROM Info WHERE key = 'version']]), {1, 'value'}, nil)
+			if not nVersion then
+				local szSQL = X.Get(db:Execute([[SELECT sql FROM sqlite_master WHERE type='table' AND name='InfoCache']]), {1, 'sql'}, ''):gsub('[%s]+', ' ')
+				if szSQL == 'CREATE TABLE InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)' then
+					nVersion = 2
+				elseif szSQL == 'CREATE TABLE InfoCache ( id INTEGER NOT NULL, name VARCHAR(20) NOT NULL, force INTEGER NOT NULL, role INTEGER NOT NULL, level INTEGER NOT NULL, title VARCHAR(20) NOT NULL, camp INTEGER NOT NULL, tong INTEGER NOT NULL, extra TEXT NOT NULL, PRIMARY KEY (id) )' then
+					nVersion = 3
+				elseif szSQL == 'CREATE TABLE InfoCache ( id INTEGER NOT NULL, name NVARCHAR(20) NOT NULL, force INTEGER NOT NULL, role INTEGER NOT NULL, level INTEGER NOT NULL, title NVARCHAR(20) NOT NULL, camp INTEGER NOT NULL, tong INTEGER NOT NULL, extra TEXT NOT NULL, PRIMARY KEY (id) )' then
+					nVersion = 4
+				elseif szSQL == 'CREATE TABLE InfoCache ( id INTEGER NOT NULL, name NVARCHAR(20) NOT NULL, guid NVARCHAR(20) NOT NULL, force INTEGER NOT NULL, role INTEGER NOT NULL, level INTEGER NOT NULL, title NVARCHAR(20) NOT NULL, camp INTEGER NOT NULL, tong INTEGER NOT NULL, extra TEXT NOT NULL, PRIMARY KEY (id) )' then
+					nVersion = 5
+				end
+			end
+			if nVersion then
+				local bUTF8 = nVersion > 3
+				local ProcessString = bUTF8
+					and function(s) return s end
+					or function(s) return AnsiToUTF8(s) or '' end
+				DB:Execute('BEGIN TRANSACTION')
+				local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+				for i = 0, nCount / nPageSize do
+					local aInfoCache = db:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+					if aInfoCache then
+						for _, rec in ipairs(aInfoCache) do
+							if rec.id and rec.name then
+								DBI_RI:ClearBindings()
+								DBI_RI:BindAll(rec.id)
+								local data = DBI_RI:GetNext()
+								DBI_RI:Reset()
+								local nTime = data and (data.time or 0) or -1
+								local nRecTime = rec.time or 0
+								if nRecTime > nTime then
+									DBI_W:ClearBindings()
+									DBI_W:BindAll(
+										rec.id,
+										ProcessString(rec.name),
+										ProcessString(rec.guid or ''),
+										rec.force or -1,
+										rec.role or -1,
+										rec.level or -1,
+										ProcessString(rec.title or ''),
+										rec.camp or -1,
+										rec.tong or -1,
+										rec.extra or '',
+										0
+									)
+									DBI_W:Execute()
+								end
+							end
+						end
+						DBI_W:Reset()
+					end
+				end
+				local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+				for i = 0, nCount / nPageSize do
+					local aTongCache = db:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+					if aTongCache then
+						for _, rec in ipairs(aTongCache) do
+							if rec.id and rec.name then
+								DBT_RI:ClearBindings()
+								DBT_RI:BindAll(rec.id)
+								local data = DBT_RI:GetNext()
+								DBT_RI:Reset()
+								local nTime = data and (data.time or 0) or -1
+								local nRecTime = rec.time or 0
+								if nRecTime > nTime then
+									DBT_W:ClearBindings()
+									DBT_W:BindAll(
+										rec.id,
+										ProcessString(rec.name),
+										rec.extra or '',
+										0
+									)
+									DBT_W:Execute()
+								end
+							end
+						end
+						DBT_W:Reset()
+					end
+				end
+				DB:Execute('END TRANSACTION')
+			end
+			db:Release()
+		end
+	end
+end
+
 function D.Migration()
 	local szRoot = X.FormatPath({'cache/', X.PATH_TYPE.SERVER})
 	-- 修复V4版本导入乱码问题
@@ -185,301 +276,27 @@ function D.Migration()
 			CPath.Move(szRoot .. szFileName, szRoot .. 'farbnamen.v4.db')
 		end
 	end
-	local DB_V1_PATH = X.FormatPath({'cache/player_info.db', X.PATH_TYPE.SERVER})
-	local DB_V2_PATH = X.FormatPath({'cache/player_info.v2.db', X.PATH_TYPE.SERVER})
-	local DB_V3_PATH = X.FormatPath({'cache/farbnamen.v3.db', X.PATH_TYPE.SERVER})
-	local DB_V4_PATH = X.FormatPath({'cache/farbnamen.v4.db', X.PATH_TYPE.SERVER})
-	local DB_V5_PATH = X.FormatPath({'cache/farbnamen.v5.db', X.PATH_TYPE.SERVER})
-	if not IsLocalFileExist(DB_V1_PATH) and not IsLocalFileExist(DB_V2_PATH) and not IsLocalFileExist(DB_V3_PATH) and not IsLocalFileExist(DB_V4_PATH) and not IsLocalFileExist(DB_V5_PATH) then
+	local aFilePath = {}
+	for _, szFilePath in ipairs({
+		X.FormatPath({'cache/player_info.db', X.PATH_TYPE.SERVER}),
+		X.FormatPath({'cache/player_info.v2.db', X.PATH_TYPE.SERVER}),
+		X.FormatPath({'cache/farbnamen.v3.db', X.PATH_TYPE.SERVER}),
+		X.FormatPath({'cache/farbnamen.v4.db', X.PATH_TYPE.SERVER}),
+		X.FormatPath({'cache/farbnamen.v5.db', X.PATH_TYPE.SERVER}),
+	}) do
+		if IsLocalFileExist(szFilePath) then
+			table.insert(aFilePath, szFilePath)
+		end
+	end
+	if X.IsEmpty(aFilePath) then
 		return
 	end
 	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
-			-- 转移V1旧版数据
-			if IsLocalFileExist(DB_V1_PATH) then
-				local DB_V1 = SQLite3_Open(DB_V1_PATH)
-				if DB_V1 then
-					-- 角色缓存
-					local nCount, nPageSize = X.Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM InfoCache'), {1, 'count'}, 0), 10000
-					DB:Execute('BEGIN TRANSACTION')
-					for i = 0, nCount / nPageSize do
-						for _, p in ipairs(DB_V1:Execute('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
-							DBI_W:ClearBindings()
-							DBI_W:BindAll(
-								p.id,
-								AnsiToUTF8(p.name),
-								'',
-								p.force or -1,
-								p.role or -1,
-								p.level or -1,
-								AnsiToUTF8(p.title),
-								p.camp or -1,
-								p.tong or -1,
-								'',
-								0
-							)
-							DBI_W:Execute()
-						end
-					end
-					DBI_W:Reset()
-					DB:Execute('END TRANSACTION')
-					-- 帮会缓存
-					local nCount, nPageSize = X.Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM TongCache'), {1, 'count'}, 0), 10000
-					DB:Execute('BEGIN TRANSACTION')
-					for i = 0, nCount / nPageSize do
-						for _, p in ipairs(DB_V1:Execute('SELECT id, name FROM TongCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
-							DBT_W:ClearBindings()
-							DBT_W:BindAll(
-								p.id,
-								AnsiToUTF8(p.name),
-								'',
-								0
-							)
-							DBT_W:Execute()
-						end
-					end
-					DBT_W:Reset()
-					DB:Execute('END TRANSACTION')
-					DB_V1:Release()
-				end
-				CPath.Move(DB_V1_PATH, DB_V1_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
-			end
-			-- 转移V2旧版数据
-			if IsLocalFileExist(DB_V2_PATH) then
-				local DB_V2 = SQLite3_Open(DB_V2_PATH)
-				if DB_V2 then
-					DB:Execute('BEGIN TRANSACTION')
-					local nCount, nPageSize = X.Get(DB_V2:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
-					for i = 0, nCount / nPageSize do
-						local aInfoCache = DB_V2:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
-						if aInfoCache then
-							for _, rec in ipairs(aInfoCache) do
-								if rec.id and rec.name then
-									DBI_W:ClearBindings()
-									DBI_W:BindAll(
-										rec.id,
-										AnsiToUTF8(rec.name),
-										'',
-										rec.force or -1,
-										rec.role or -1,
-										rec.level or -1,
-										AnsiToUTF8(rec.title or ''),
-										rec.camp or -1,
-										rec.tong or -1,
-										'',
-										0
-									)
-									DBI_W:Execute()
-								end
-							end
-							DBI_W:Reset()
-						end
-					end
-					local nCount, nPageSize = X.Get(DB_V2:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
-					for i = 0, nCount / nPageSize do
-						local aTongCache = DB_V2:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
-						if aTongCache then
-							for _, rec in ipairs(aTongCache) do
-								if rec.id and rec.name then
-									DBT_W:ClearBindings()
-									DBT_W:BindAll(
-										rec.id,
-										AnsiToUTF8(rec.name or ''),
-										'',
-										0
-									)
-									DBT_W:Execute()
-								end
-							end
-							DBT_W:Reset()
-						end
-					end
-					DB:Execute('END TRANSACTION')
-					DB_V2:Release()
-				end
-				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
-			end
-			-- 转移V3旧版数据
-			if IsLocalFileExist(DB_V3_PATH) then
-				local DB_V3 = SQLite3_Open(DB_V3_PATH)
-				if DB_V3 then
-					DB:Execute('BEGIN TRANSACTION')
-					local nCount, nPageSize = X.Get(DB_V3:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
-					for i = 0, nCount / nPageSize do
-						local aInfoCache = DB_V3:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
-						if aInfoCache then
-							for _, rec in ipairs(aInfoCache) do
-								if rec.id and rec.name then
-									DBI_W:ClearBindings()
-									DBI_W:BindAll(
-										rec.id,
-										AnsiToUTF8(rec.name),
-										'',
-										rec.force or -1,
-										rec.role or -1,
-										rec.level or -1,
-										AnsiToUTF8(rec.title or ''),
-										rec.camp or -1,
-										rec.tong or -1,
-										'',
-										0
-									)
-									DBI_W:Execute()
-								end
-							end
-							DBI_W:Reset()
-						end
-					end
-					local nCount, nPageSize = X.Get(DB_V3:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
-					for i = 0, nCount / nPageSize do
-						local aTongCache = DB_V3:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
-						if aTongCache then
-							for _, rec in ipairs(aTongCache) do
-								if rec.id and rec.name then
-									DBT_W:ClearBindings()
-									DBT_W:BindAll(
-										rec.id,
-										AnsiToUTF8(rec.name),
-										'',
-										0
-									)
-									DBT_W:Execute()
-								end
-							end
-							DBT_W:Reset()
-						end
-					end
-					DB:Execute('END TRANSACTION')
-					DB_V3:Release()
-				end
-				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
-			end
-			-- 转移V4旧版数据
-			if IsLocalFileExist(DB_V4_PATH) then
-				local DB_V4 = SQLite3_Open(DB_V4_PATH)
-				if DB_V4 then
-					DB:Execute('BEGIN TRANSACTION')
-					local nCount, nPageSize = X.Get(DB_V4:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
-					for i = 0, nCount / nPageSize do
-						local aInfoCache = DB_V4:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
-						if aInfoCache then
-							for _, rec in ipairs(aInfoCache) do
-								if rec.id and rec.name then
-									DBI_W:ClearBindings()
-									DBI_W:BindAll(
-										rec.id,
-										rec.name,
-										'',
-										rec.force or -1,
-										rec.role or -1,
-										rec.level or -1,
-										rec.title or '',
-										rec.camp or -1,
-										rec.tong or -1,
-										rec.extra or '',
-										0
-									)
-									DBI_W:Execute()
-								end
-							end
-							DBI_W:Reset()
-						end
-					end
-					local nCount, nPageSize = X.Get(DB_V4:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
-					for i = 0, nCount / nPageSize do
-						local aTongCache = DB_V4:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
-						if aTongCache then
-							for _, rec in ipairs(aTongCache) do
-								if rec.id and rec.name then
-									DBT_W:ClearBindings()
-									DBT_W:BindAll(
-										rec.id,
-										rec.name,
-										rec.extra or '',
-										0
-									)
-									DBT_W:Execute()
-								end
-							end
-							DBT_W:Reset()
-						end
-					end
-					DB:Execute('END TRANSACTION')
-					DB_V4:Release()
-				end
-				CPath.Move(DB_V4_PATH, DB_V4_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
-			end
-			-- 转移V5旧版数据
-			if IsLocalFileExist(DB_V5_PATH) then
-				local DB_V5 = SQLite3_Open(DB_V5_PATH)
-				if DB_V5 then
-					DB:Execute('BEGIN TRANSACTION')
-					local nCount, nPageSize = X.Get(DB_V5:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
-					for i = 0, nCount / nPageSize do
-						local aInfoCache = DB_V5:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
-						if aInfoCache then
-							for _, rec in ipairs(aInfoCache) do
-								if rec.id and rec.name then
-									DBT_RI:ClearBindings()
-									DBT_RI:BindAll(rec.id)
-									local data = DBT_RI:GetNext()
-									DBT_RI:Reset()
-									local nTime = data and (data.time or 0) or -1
-									local nRecTime = rec.time or 0
-									if nRecTime > nTime then
-										DBI_W:ClearBindings()
-										DBI_W:BindAll(
-											rec.id,
-											rec.name,
-											rec.guid or '',
-											rec.force or -1,
-											rec.role or -1,
-											rec.level or -1,
-											rec.title or '',
-											rec.camp or -1,
-											rec.tong or -1,
-											rec.extra or '',
-											0
-										)
-										DBI_W:Execute()
-									end
-								end
-							end
-							DBI_W:Reset()
-						end
-					end
-					local nCount, nPageSize = X.Get(DB_V5:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
-					for i = 0, nCount / nPageSize do
-						local aTongCache = DB_V5:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
-						if aTongCache then
-							for _, rec in ipairs(aTongCache) do
-								if rec.id and rec.name then
-									DBI_RI:ClearBindings()
-									DBI_RI:BindAll(rec.id)
-									local data = DBI_RI:GetNext()
-									DBT_RI:Reset()
-									local nTime = data and (data.time or 0) or -1
-									local nRecTime = rec.time or 0
-									if nRecTime > nTime then
-										DBT_W:ClearBindings()
-										DBT_W:BindAll(
-											rec.id,
-											rec.name,
-											rec.extra or '',
-											0
-										)
-										DBT_W:Execute()
-									end
-								end
-							end
-							DBT_W:Reset()
-						end
-					end
-					DB:Execute('END TRANSACTION')
-					DB_V5:Release()
-				end
-				CPath.Move(DB_V5_PATH, DB_V5_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+			D.Import(aFilePath)
+			for _, szFilePath in ipairs(aFilePath) do
+				CPath.Move(szFilePath, szFilePath .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
 			X.Alert(_L['Migrate succeed!'])
 		end)
