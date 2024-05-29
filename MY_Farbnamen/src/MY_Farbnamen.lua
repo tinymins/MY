@@ -949,6 +949,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, w = 'auto',
+		buttonStyle = 'FLAT',
 		text = _L['Import data'],
 		onClick = function()
 			local szRoot = X.FormatPath({'cache/', X.PATH_TYPE.SERVER})
