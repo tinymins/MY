@@ -281,9 +281,9 @@ function D.Migration()
 	local szRoot = X.FormatPath({'cache/', X.PATH_TYPE.SERVER})
 	-- 修复V4版本导入乱码问题
 	for _, szFileName in ipairs(CPath.GetFileList(szRoot)) do
-		local szTime = select(3, ('farbnamen.v4.db.bak20210715210715'):find('^farbnamen%.v4%.db%.bak(%d+)$'))
+		local szTime = select(3, szFileName:find('^farbnamen%.v4%.db%.bak(%d+)$'))
 		local nTime = szTime and tonumber(szTime)
-		if nTime and nTime < 1717034400 then
+		if nTime and nTime < 20240530100000 then
 			CPath.Move(szRoot .. szFileName, szRoot .. 'farbnamen.v4.db')
 		end
 	end
