@@ -176,6 +176,10 @@ end
 InitDB()
 
 function D.Import(aFilePath)
+	if X.IsString(aFilePath) then
+		aFilePath = {aFilePath}
+	end
+	local nImportChar, nSkipChar, nImportTong, nSkipTong = 0, 0, 0, 0
 	for _, szFilePath in ipairs(aFilePath) do
 		local db = SQLite3_Open(szFilePath)
 		if db then
@@ -226,6 +230,9 @@ function D.Import(aFilePath)
 										0
 									)
 									DBI_W:Execute()
+									nImportChar = nImportChar + 1
+								else
+									nSkipChar = nSkipChar + 1
 								end
 							end
 						end
@@ -253,6 +260,9 @@ function D.Import(aFilePath)
 										0
 									)
 									DBT_W:Execute()
+									nImportTong = nImportTong + 1
+								else
+									nSkipTong = nSkipTong + 1
 								end
 							end
 						end
@@ -264,6 +274,7 @@ function D.Import(aFilePath)
 			db:Release()
 		end
 	end
+	return nImportChar, nSkipChar, nImportTong, nSkipTong
 end
 
 function D.Migration()
@@ -922,6 +933,22 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		end,
 		autoEnable = function()
 			return O.bEnable
+		end,
+	}):Width() + 5
+
+
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Import data'],
+		onClick = function()
+			local szRoot = X.FormatPath({'cache/', X.PATH_TYPE.SERVER})
+			local file = GetOpenFileName(_L['Please select your farbnamen database file.'], 'Database File(*.db)\0*.db\0\0', szRoot)
+			if not X.IsEmpty(file) then
+				X.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+					local nImportChar, nSkipChar, nImportTong, nSkipTong = D.Import(file)
+					X.Alert(_L('%d chars imported, %d chars skipped, %d tongs imported, %d tongs skipped!', nImportChar, nSkipChar, nImportTong, nSkipTong))
+				end)
+			end
 		end,
 	}):Width() + 5
 
