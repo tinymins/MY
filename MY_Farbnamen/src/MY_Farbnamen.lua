@@ -84,7 +84,8 @@ local function InitDB()
 			PRIMARY KEY (key)
 		)
 	]])
-	DB:Execute([[REPLACE INTO Info (key, value) VALUES ('version', '6')]])
+	DB:Execute([[INSERT INTO Info (key, value) VALUES ('version', '6')]])
+	DB:Execute([[INSERT INTO Info (key, value) VALUES ('server', ']] .. AnsiToUTF8(X.GetServerOriginName()) .. [[')]])
 	DB:Execute([[
 		CREATE TABLE IF NOT EXISTS InfoCache (
 			id INTEGER NOT NULL,
@@ -183,8 +184,14 @@ function D.Import(aFilePath)
 	for _, szFilePath in ipairs(aFilePath) do
 		local db = SQLite3_Open(szFilePath)
 		if db then
+			local szServer = X.Get(db:Execute([[SELECT value FROM Info WHERE key = 'server']]), {1, 'value'}, nil)
+			if szServer then
+				szServer = UTF8ToAnsi(szServer)
+			end
 			local nVersion = X.Get(db:Execute([[SELECT value FROM Info WHERE key = 'version']]), {1, 'value'}, nil)
-			if not nVersion then
+			if nVersion then
+				nVersion = tonumber(nVersion)
+			else
 				local szSQL = X.Get(db:Execute([[SELECT sql FROM sqlite_master WHERE type='table' AND name='InfoCache']]), {1, 'sql'}, ''):gsub('[%s]+', ' ')
 				if szSQL == 'CREATE TABLE InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)' then
 					nVersion = 2
@@ -196,7 +203,10 @@ function D.Import(aFilePath)
 					nVersion = 5
 				end
 			end
-			if nVersion then
+			if nVersion and nVersion < 6 then
+				szServer = X.GetServerOriginName()
+			end
+			if szServer == X.GetServerOriginName() and nVersion then
 				local bUTF8 = nVersion > 3
 				local ProcessString = bUTF8
 					and function(s) return s end
