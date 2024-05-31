@@ -762,7 +762,7 @@ function D.AddTong(dwID, szName)
 end
 
 function D.ShowAnalysis(nTimeLimit, szSubTitle)
-	local szTitle = _L['MY_Farbnamen__Analysis']
+	local szTitle = _L['MY_Farbnamen__Analysis'] .. g_tStrings.STR_CONNECT .. X.GetServerOriginName()
 	if szSubTitle then
 		szTitle = szTitle .. g_tStrings.STR_CONNECT .. szSubTitle
 	end
