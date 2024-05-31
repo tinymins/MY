@@ -761,22 +761,31 @@ function D.AddTong(dwID, szName)
 	l_tongcache_w[info.id] = infow
 end
 
-function D.ShowAnalysis()
+function D.ShowAnalysis(nTimeLimit, szSubTitle)
+	local szTitle = _L['MY_Farbnamen__Analysis']
+	if szSubTitle then
+		szTitle = szTitle .. g_tStrings.STR_CONNECT .. szSubTitle
+	end
+	local szWhere, szJoinWhere = '', ''
+	if nTimeLimit then
+		szWhere = ' WHERE time > ' .. (GetCurrentTime() - nTimeLimit) .. ' '
+		szJoinWhere = ' WHERE InfoCache.time > ' .. (GetCurrentTime() - nTimeLimit) .. ' '
+	end
 	local ui = X.UI.CreateFrame('MY_Farbnamen__Analysis', {
 		simple = true, close = true,
-		text = _L['MY_Farbnamen__Analysis'],
+		text = szTitle,
 	})
 	local nPaddingX = 20
 	local nX, nY = nPaddingX, 30
 	local nDeltaY = 30
 	ui:Append('Text', {
 		x = nX, y = nY,
-		text = _L('Total player count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM InfoCache]]), {1, 'count'}, 0)),
+		text = _L('Total player count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM InfoCache]] .. szWhere), {1, 'count'}, 0)),
 	})
 	nY = nY + nDeltaY
 	ui:Append('Text', {
 		x = nX, y = nY,
-		text = _L('Total tong count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM TongCache]]), {1, 'count'}, 0)),
+		text = _L('Total tong count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM TongCache]] .. szWhere), {1, 'count'}, 0)),
 	})
 	nY = nY + nDeltaY
 	nY = nY + nDeltaY
@@ -787,7 +796,7 @@ function D.ShowAnalysis()
 	})
 	nY = nY + nDeltaY
 
-	for _, v in ipairs(DB:Execute([[SELECT camp, COUNT(*) AS count FROM InfoCache GROUP BY camp]]) or {}) do
+	for _, v in ipairs(DB:Execute([[SELECT camp, COUNT(*) AS count FROM InfoCache]] .. szWhere .. [[ GROUP BY camp]]) or {}) do
 		ui:Append('Text', {
 			x = nX, y = nY,
 			text = g_tStrings.STR_CAMP_TITLE[v.camp] or _L('Unknown(%d)', v.camp),
@@ -806,7 +815,7 @@ function D.ShowAnalysis()
 	})
 	nY = nY + nDeltaY
 
-	local aForce = DB:Execute([[SELECT force, COUNT(*) AS count FROM InfoCache GROUP BY force]]) or {}
+	local aForce = DB:Execute([[SELECT force, COUNT(*) AS count FROM InfoCache]] .. szWhere .. [[ GROUP BY force]]) or {}
 	for i = 1, #aForce, 2 do
 		nX = nPaddingX
 		for j = 0, 1 do
@@ -838,6 +847,7 @@ function D.ShowAnalysis()
 		SELECT TongCache.name, COUNT(InfoCache.id) AS count
 		FROM InfoCache
 		JOIN TongCache ON InfoCache.tong = TongCache.id
+		]] .. szJoinWhere .. [[
 		GROUP BY InfoCache.tong
 		ORDER BY count DESC
 		LIMIT 10;
@@ -918,9 +928,42 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		x = nX, y = nY, w = 'auto',
 		buttonStyle = 'FLAT',
 		text = _L['Show analysis'],
-		onClick = function()
+		onLClick = function()
 			D.Flush()
 			D.ShowAnalysis()
+			X.UI.ClosePopupMenu()
+		end,
+		menuRClick = function()
+			local menu = {}
+			for _, nHour in ipairs({ 12, 24, 48, 72 }) do
+				table.insert(menu, {
+					szOption = _L('Show analysis of %d hours', nHour),
+					fnAction = function()
+						D.Flush()
+						D.ShowAnalysis(nHour * 3600, _L('last %d hours', nHour))
+						X.UI.ClosePopupMenu()
+					end,
+				})
+			end
+			table.insert(menu, {
+				szOption = _L['Show analysis of last week'],
+				fnAction = function()
+					D.Flush()
+					D.ShowAnalysis(7 * 24 * 3600, _L['last week'])
+					X.UI.ClosePopupMenu()
+				end,
+			})
+			for _, nDay in ipairs({ 30, 60, 90, 180, 365, 730 }) do
+				table.insert(menu, {
+					szOption = _L('Show analysis of last %d days', nDay),
+					fnAction = function()
+						D.Flush()
+						D.ShowAnalysis(nDay * 24 * 3600, _L('last %d days', nDay))
+						X.UI.ClosePopupMenu()
+					end,
+				})
+			end
+			return menu
 		end,
 		autoEnable = function()
 			return O.bEnable

@@ -34,4 +34,10 @@ return {
     ['%6d players'] = '%6d人',
     ['---------------------------------------------'] = '———————————————————————————',
     ['Counts based on local cache, only players you met will be analyzed.'] = '統計基於本地緩存，即只有你遇到過的角色才能參與統計。',
+    ['Show analysis of %d hours'] = '統計最近%d小時',
+    ['last %d hours'] = '最近%d小時',
+    ['Show analysis of last week'] = '統計最近一周',
+    ['last week'] = '最近一周',
+    ['Show analysis of last %d days'] = '統計最近%d天',
+    ['last %d days'] = '最近%d天',
 }
