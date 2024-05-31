@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 -- This file is part of the JX3 Plugin Project.
--- @desc     : 游戏环境库
+-- @desc     : 插件库自定义函数
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Game.Hook')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/PacketExtend')
 --------------------------------------------------------------------------------
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
