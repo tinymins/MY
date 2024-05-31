@@ -5,7 +5,7 @@
 --------------------------------------------------------------------------------
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Game.Hook')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/PacketExtend')
 --------------------------------------------------------------------------------
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
