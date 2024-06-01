@@ -120,7 +120,7 @@ X.UI.TRACKBAR_STYLE = X.SetmetaReadonly({
 	SHOW_VALUE    = false,
 	SHOW_PERCENT  = true,
 })
-X.UI.IMAGE_TYPE = IMAGE_TYPE or X.SetmetaReadonly({
+X.UI.IMAGE_TYPE = IMAGE or X.SetmetaReadonly({
 	NORMAL             = 0,
 	LEFT_RIGHT         = 1,
 	RIGHT_LEFT         = 2,
@@ -3404,7 +3404,6 @@ function OO:Columns(aColumns)
 							break
 						end
 					end
-							table.insert(aFixedRColumns, col)
 					for i = 1, #aColumns do
 						if i <= nFixedLIndex then
 							table.insert(aFixedLColumns, aColumns[i])

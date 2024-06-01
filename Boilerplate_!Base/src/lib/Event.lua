@@ -906,8 +906,8 @@ local function onBreathe()
 			X.Debug(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), X.DEBUG_LEVEL.PM_LOG)
 		end
 		--[[#DEBUG END]]
+		l_nLastBreatheTime = nBeginTime
 	end
-	l_nLastBreatheTime = nBeginTime
 end
 X.BreatheCall(X.NSFormatString('{$NS}#COROUTINE'), onBreathe)
 
