@@ -264,7 +264,7 @@ function PS.OnPanelActive(frame)
 			MY_CataclysmMain.UpdateBuffListCache()
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
-		autoEnable = function() return MY_Resource and true end,
+		autoEnable = function() return _G.MY_Resource and true end,
 	}):AutoWidth():Width() + 5
 	y = y + 30
 
@@ -279,7 +279,7 @@ function PS.OnPanelActive(frame)
 				MY_CataclysmMain.UpdateBuffListCache()
 				X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 			end,
-			autoEnable = function() return MY_Resource and true end,
+			autoEnable = function() return _G.MY_Resource and true end,
 		}):AutoWidth():Width() + 5
 		y = y + 30
 	end

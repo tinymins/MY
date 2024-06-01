@@ -241,7 +241,7 @@ function PS.OnPanelActive(wnd)
 			MY_TeamMon.bCommon = bCheck
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT')
-	if szLang == 'zhcn' or szLang == 'zhtw' then
+	if X.ENVIRONMENT.GAME_LANG == 'zhcn' or X.ENVIRONMENT.GAME_LANG == 'zhtw' then
 		nX = ui:Append('WndButton', {
 			x = nX + 5, y = nY + 15, text = _L['Subscribe data'],
 			buttonStyle = 'FLAT',

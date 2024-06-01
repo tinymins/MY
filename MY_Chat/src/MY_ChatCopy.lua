@@ -278,7 +278,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			D.CheckNamelinkEnable()
 		end,
 		tip = {
-			render == _L['Alt show equip, shift select.'],
+			render = _L['Alt show equip, shift select.'],
 			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 	})

@@ -103,7 +103,7 @@ local O = setmetatable({}, {
 		elseif OR.bUseGlobalConfig then
 			OR[k .. '_Global'] = v
 		else
-			OG[k .. '_Role'] = v
+			OR[k .. '_Role'] = v
 		end
 	end,
 })

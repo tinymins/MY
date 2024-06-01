@@ -239,7 +239,7 @@ function D.CreateFrame(szInitYY, szInitNote)
 				end
 			end,
 		}):AutoWidth():Width() + 5
-		if bTeamMon then
+		if MY_TeamMon_Subscribe then
 			x = x + ui:Append('WndButton', {
 				name = 'WndBtn_TeamMon',
 				x = x, y = y, w = 96,
