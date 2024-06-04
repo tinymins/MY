@@ -79,4 +79,37 @@ function X.OpenBrowser(szAddr, szMode)
 	X.UI.OpenBrowser(szAddr)
 end
 
+-- 打开事件链接
+---@param szLinkInfo string @需要打开的事件链接内容
+function X.OpenEventLink(szLinkInfo)
+	if IsCtrlKeyDown() then
+		X.BreatheCall(function()
+			if IsCtrlKeyDown() then
+				return
+			end
+			X.OpenEventLink(szLinkInfo)
+			return 0
+		end)
+		return
+	end
+	local h = X.UI.GetTempElement('Handle', 'LIB#OpenEventLink')
+	if not h then
+		return
+	end
+	h:Clear()
+	h:AppendItemFromString(GetFormatText(
+		'',
+		10, 255, 255, 255, nil,
+		'this.szLinkInfo=' .. X.EncodeLUAData(szLinkInfo),
+		'eventlink',
+		nil,
+		szLinkInfo
+	))
+	local hItem = h:Lookup(0)
+	if not hItem then
+		return
+	end
+	OnItemLinkDown(hItem)
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
