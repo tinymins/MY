@@ -970,6 +970,36 @@ function X.SafeCallWithThis(context, fnAction, ...)
 	return X.Unpack(rtc)
 end
 
+-- 设置上下文的安全调用，常规输出错误日志，界面组件支持字符串调用方法
+---@param fnAction string | fun(...) @调用函数
+---@param ... any @调用参数
+---@return boolean, any @调用结果
+function X.ExecuteWithThis(context, fnAction, ...)
+	-- 界面组件支持字符串调用方法
+	if X.IsString(fnAction) and X.IsElement(context) then
+		if context[fnAction] then
+			fnAction = context[fnAction]
+		else
+			local szFrame = context:GetRoot():GetName()
+			fnAction = X.IsTable(_G[szFrame]) and _G[szFrame][fnAction]
+		end
+	end
+	if not X.IsFunction(fnAction) then
+		return false
+	end
+	return X.CallWithThis(context, fnAction, ...)
+end
+
+-- 测试用
+if loadstring then
+function X.ProcessCommand(cmd)
+	local ls = loadstring('return ' .. cmd)
+	if ls then
+		return ls()
+	end
+end
+end
+
 -----------------------------------------------
 -- 宽字符
 -----------------------------------------------

@@ -1,8 +1,8 @@
 [MY_Resource]
+package=MY
 name=資源包
 desc=附加圖像、音頻等資源文件
 default=1
 version=1.0
 dependence=MY_!Base
-package=MY
 lua_0=src/MY_Resource.lua

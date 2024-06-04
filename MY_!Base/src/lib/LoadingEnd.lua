@@ -40,6 +40,9 @@ end)
 
 do
 local function OnKeyPanelBtnLButtonUp()
+	if not X.SECRET['HASH::AUTH_KEY_CODE'] then
+		return
+	end
 	local frame = Station.SearchFrame('KeyPanel')
 	if not frame then
 		return
