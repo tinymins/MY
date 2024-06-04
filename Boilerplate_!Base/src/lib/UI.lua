@@ -4088,7 +4088,8 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			if bAutoHeight then
 				nHeight = nH
 			end
-		elseif componentType == 'WndCheckBox'
+		elseif componentType == 'WndButton'
+			or componentType == 'WndCheckBox'
 			or componentType == 'WndRadioBox'
 			or componentType == 'WndComboBox'
 			or componentType == 'WndTrackbar'
