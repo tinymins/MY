@@ -177,7 +177,10 @@ local BUTTON_STYLE_CONFIG = {
 		nWidth = 100,
 		nHeight = 26,
 		nMarginBottom = -3,
+		nPaddingTop = 3,
+		nPaddingRight = 10,
 		nPaddingBottom = 3,
+		nPaddingLeft = 10,
 		szImage = 'ui/Image/UICommon/CommonPanel.UITex',
 		nNormalGroup = 25,
 		nMouseOverGroup = 26,
@@ -188,7 +191,10 @@ local BUTTON_STYLE_CONFIG = {
 		nWidth = 44,
 		nHeight = 23,
 		nMarginBottom = 0,
-		nPaddingBottom = 0,
+		nPaddingTop = 3,
+		nPaddingRight = 5,
+		nPaddingBottom = 3,
+		nPaddingLeft = 5,
 		szImage = X.PACKET_INFO.FRAMEWORK_ROOT .. 'img/UIComponents.UITex',
 		nNormalGroup = 0,
 		nMouseOverGroup = 1,
@@ -198,6 +204,10 @@ local BUTTON_STYLE_CONFIG = {
 	LINK = X.SetmetaReadonly({
 		nWidth = 60,
 		nHeight = 25,
+		nPaddingTop = 3,
+		nPaddingRight = 5,
+		nPaddingBottom = 3,
+		nPaddingLeft = 5,
 		szImage = 'ui/Image/UICommon/CommonPanel.UITex',
 		nNormalGroup = -1,
 		nMouseOverGroup = -1,
@@ -207,6 +217,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseOverFont = 0,
 		nMouseDownFont = 162,
 		nDisableFont = 161,
+		fAnimateScale = 1.2,
 	}),
 	OPTION = {
 		nWidth = 22,
@@ -4089,6 +4100,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 				nHeight = nH
 			end
 		elseif componentType == 'WndButton'
+			or componentType == 'WndButtonBox'
 			or componentType == 'WndCheckBox'
 			or componentType == 'WndRadioBox'
 			or componentType == 'WndComboBox'
@@ -4255,6 +4267,9 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		local txt = GetComponentElement(raw, 'TEXT')
 		local nMarginTop, nMarginRight, nMarginBottom, nMarginLeft = 0, 0, 0, 0 -- 按钮外部边距
 		local nPaddingTop, nPaddingRight, nPaddingBottom, nPaddingLeft = 0, 0, 0, 0 -- 按钮内部边距
+		local nMarginTopPercent, nMarginRightPercent, nMarginBottomPercent, nMarginLeftPercent = 0, 0, 0, 0 -- 按钮外部百分比边距
+		local nPaddingTopPercent, nPaddingRightPercent, nPaddingBottomPercent, nPaddingLeftPercent = 0, 0, 0, 0 -- 按钮内部百分比边距
+		local fAnimateScale = 1 -- 按钮动画最大缩放
 		local eStyle = GetButtonStyleName(btn)
 		local tStyle = GetButtonStyleConfig(eStyle)
 		if tStyle then
@@ -4262,20 +4277,48 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			nMarginRight = tStyle.nMarginRight or 0
 			nMarginBottom = tStyle.nMarginBottom or 0
 			nMarginLeft = tStyle.nMarginLeft or 0
+			nMarginTopPercent = tStyle.nMarginTopPercent or 0
+			nMarginRightPercent = tStyle.nMarginRightPercent or 0
+			nMarginBottomPercent = tStyle.nMarginBottomPercent or 0
+			nMarginLeftPercent = tStyle.nMarginLeftPercent or 0
 			nPaddingTop = tStyle.nPaddingTop or 0
 			nPaddingRight = tStyle.nPaddingRight or 0
 			nPaddingBottom = tStyle.nPaddingBottom or 0
 			nPaddingLeft = tStyle.nPaddingLeft or 0
-			local fScaleX = nWidth / (tStyle.nWidth + nMarginRight + nMarginLeft + nPaddingRight + nPaddingLeft)
-			local fScaleY = nHeight / (tStyle.nHeight + nMarginTop + nMarginBottom + nPaddingTop + nPaddingBottom)
-			nMarginTop = nMarginTop * fScaleY
-			nMarginRight = nMarginRight * fScaleX
-			nMarginBottom = nMarginBottom * fScaleY
-			nMarginLeft = nMarginLeft * fScaleX
-			nPaddingTop = nPaddingTop * fScaleY
-			nPaddingRight = nPaddingRight * fScaleX
-			nPaddingBottom = nPaddingBottom * fScaleY
-			nPaddingLeft = nPaddingLeft * fScaleX
+			nPaddingTopPercent = tStyle.nPaddingTopPercent or 0
+			nPaddingRightPercent = tStyle.nPaddingRightPercent or 0
+			nPaddingBottomPercent = tStyle.nPaddingBottomPercent or 0
+			nPaddingLeftPercent = tStyle.nPaddingLeftPercent or 0
+			fAnimateScale = tStyle.fAnimateScale or 1
+		end
+		if txt and (bAutoWidth or bAutoHeight) then
+			local nOriginW, nOriginH = txt:GetSize()
+			txt:SetSize(1000, 1000)
+			txt:AutoSize()
+			local nTextW, nTextH = txt:GetSize()
+			if fAnimateScale then
+				nTextW = nTextW * fAnimateScale
+				nTextH = nTextH * fAnimateScale
+			end
+			if bAutoWidth then
+				nWidth = nTextW + nPaddingLeft + nPaddingRight + nTextW * (nPaddingLeftPercent + nPaddingRightPercent)
+			end
+			if bAutoHeight then
+				nHeight = nTextH + nPaddingTop + nPaddingBottom + nTextH * (nPaddingTopPercent + nPaddingBottomPercent)
+			end
+			txt:SetSize(nOriginW, nOriginH)
+		end
+		if tStyle then
+			local nTextW = (nWidth - nPaddingLeft - nPaddingRight) / (1 + nPaddingLeftPercent + nPaddingRightPercent)
+			local nTextH = (nHeight - nPaddingTop - nPaddingBottom) / (1 + nPaddingTopPercent + nPaddingBottomPercent)
+			nMarginTop = nMarginTop + nMarginTopPercent * nTextH
+			nMarginRight = nMarginRight + nMarginRightPercent * nTextW
+			nMarginBottom = nMarginBottom + nMarginBottomPercent * nTextH
+			nMarginLeft = nMarginLeft + nMarginLeftPercent * nTextW
+			nPaddingTop = nPaddingTop + nPaddingTopPercent * nTextH
+			nPaddingRight = nPaddingRight + nPaddingRightPercent * nTextW
+			nPaddingBottom = nPaddingBottom + nPaddingBottomPercent * nTextH
+			nPaddingLeft = nPaddingLeft + nPaddingLeftPercent * nTextW
 		end
 		if componentType == 'WndButtonBox' then
 			raw:SetSize(nWidth, nHeight)
