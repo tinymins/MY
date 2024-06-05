@@ -2455,6 +2455,13 @@ function OO:Append(arg0, arg1)
 			X.UI.CloseFrame(frame)
 		end
 	end
+	local tArg = X.Clone(tArg)
+	if not tArg.w then
+		tArg.w = 'auto'
+	end
+	if not tArg.h then
+		tArg.h = 'auto'
+	end
 	return ApplyUIArguments(ui, tArg)
 end
 
