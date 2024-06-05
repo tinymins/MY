@@ -4405,7 +4405,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		wnd:SetSize(nWidth, nHeight)
 		hdl:SetSize(nWidth, nHeight)
 		img:SetSize(nWidth, nHeight)
-		txt:SetSize(txt:GetW() + nDeltaW, nHeight)
+		txt:SetSize(txt:GetW() + nDeltaW, nHeight - 4)
 		hdl:FormatAllItemPos()
 	elseif componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
