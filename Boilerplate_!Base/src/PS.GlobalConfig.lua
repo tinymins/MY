@@ -61,7 +61,7 @@ function PS.OnPanelActive(wnd)
 	nX, nY = nPaddingX, nY + 30
 
 	nX = nX + ui:Append('WndComboBox', {
-		x = nX, y = nY,
+		x = nX, y = nY, h = 30,
 		text = _L['Use preset user settings'],
 		menu = function()
 			local szCurrentID = X.GetUserSettingsPresetID()
@@ -156,7 +156,7 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Width() + 5
 
 	nX = nX + ui:Append('WndButtonBox', {
-		x = nX, y = nY,
+		x = nX, y = nY, h = 30,
 		text = _L['Export data'],
 		onClick = function()
 			X.OpenUserSettingsExportPanel()
@@ -164,7 +164,7 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Width() + 5
 
 	nX = nX + ui:Append('WndButtonBox', {
-		x = nX, y = nY,
+		x = nX, y = nY, h = 30,
 		text = _L['Import data'],
 		onClick = function()
 			X.OpenUserSettingsImportPanel()
@@ -172,20 +172,20 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Width() + 5
 
 	nX = nX + ui:Append('WndButtonBox', {
-		x = nX, y = nY,
+		x = nX, y = nY, h = 30,
 		text = _L['Backup folder'],
 		onClick = function()
 			X.OpenFolder(X.GetAbsolutePath({'export/settings/', X.PATH_TYPE.GLOBAL}))
 		end,
 	}):AutoWidth():Width() + 5
-	nX, nY = nPaddingX, nY + 30
+	nX, nY = nPaddingX, nY + 35
 
 	ui:Append('Text', {
 		x = nPaddingX - 10, y = nY,
 		text = _L['System Info'],
 		color = { 255, 255, 0 },
 	}):AutoWidth()
-	nY = nY + 30
+	nY = nY + 40
 
 	local uiMemory = ui:Append('Text', {
 		x = nX, y = nY, w = 150,
