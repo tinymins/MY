@@ -2456,11 +2456,13 @@ function OO:Append(arg0, arg1)
 		end
 	end
 	local tArg = X.Clone(tArg)
-	if not tArg.w then
-		tArg.w = 'auto'
-	end
-	if not tArg.h then
-		tArg.h = 'auto'
+	if tArg then
+		if not tArg.w then
+			tArg.w = 'auto'
+		end
+		if not tArg.h then
+			tArg.h = 'auto'
+		end
 	end
 	return ApplyUIArguments(ui, tArg)
 end
