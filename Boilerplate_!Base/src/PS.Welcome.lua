@@ -48,7 +48,7 @@ function PS.OnPanelActive(wnd)
 	local x = 7
 	-- Êý¾ÝÎ»ÖÃ
 	x = x + ui:Append('WndButton', {
-		x = x, y = 405, h = 30,
+		x = x, h = 30,
 		name = 'WndButton_UserPreference',
 		text = _L['User preference storage'],
 		menu = function()
@@ -133,7 +133,7 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndButton', {
 		name = 'WndButton_AddonErrorMessage',
-		x = x, y = 405, h = 30,
+		x = x, h = 30,
 		text = _L['Error message'],
 		menu = function()
 			local menu = {
