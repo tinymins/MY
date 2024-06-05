@@ -4117,15 +4117,15 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 				local bWillAffectRaw = componentType == 'WndCheckBox'
 					or componentType == 'WndRadioBox'
 					or componentType == 'WndComboBox'
-				local txt = GetComponentElement(raw, 'TEXT')
-				if txt then
+				local hText = GetComponentElement(raw, 'TEXT')
+				if hText then
 					local ui = X.UI(raw)
 					local nW, nH, nRawW, nRawH = ui:Size()
-					local nOriginW, nOriginH = txt:GetSize()
-					txt:SetSize(1000, 1000)
-					txt:AutoSize()
-					local nDeltaW = txt:GetW() - nOriginW
-					local nDeltaH = txt:GetH() - nOriginH
+					local nTextW, nTextH = hText:GetSize()
+					hText:SetSize(1000, 1000)
+					hText:AutoSize()
+					local nDeltaW = hText:GetW() - nTextW
+					local nDeltaH = hText:GetH() - nTextH
 					if bAutoWidth then
 						if nRawW and bWillAffectRaw then
 							nRawW = nRawW + nDeltaW
@@ -4140,7 +4140,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 						nH = nH + nDeltaH
 						nHeight, nInnerHeight = nH, nRawH
 					end
-					txt:SetSize(nOriginW, nOriginH)
+					hText:SetSize(nTextW, nTextH)
 				end
 		elseif componentType == 'WndContainer' then
 			local nW, nH = raw:GetAllContentSize()
