@@ -199,19 +199,19 @@ function PS.OnPanelActive(wnd)
 
 	nX = nPaddingX + 10
 	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY, w = 120,
+		x = nX, y = nY,
 		text = _L['Return to role list'], buttonStyle = 'FLAT',
 		onClick = function() Logoff(false) end,
 	}):Width() + 5
 
 	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY, w = 170,
+		x = nX, y = nY,
 		text = _L['Return to role list while not fight'], buttonStyle = 'FLAT',
 		onClick = function() Logoff(false,true) end,
 	}):Width() + 5
 
 	ui:Append('WndButton', {
-		x = nX, y = nY, w = 100,
+		x = nX, y = nY,
 		text = _L['Hotkey setting'], buttonStyle = 'FLAT',
 		onClick = function() X.SetHotKey() end,
 	})
@@ -219,12 +219,12 @@ function PS.OnPanelActive(wnd)
 
 	nX = nPaddingX + 10
 	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY, w = 120,
+		x = nX, y = nY,
 		text = _L['Return to game login'], buttonStyle = 'FLAT',
 		onClick = function() Logoff(true) end,
 	}):Width() + 5
 	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY, w = 170,
+		x = nX, y = nY,
 		text = _L['Return to game login while not fight'], buttonStyle = 'FLAT',
 		onClick = function() Logoff(true,true) end,
 	}):Width() + 5

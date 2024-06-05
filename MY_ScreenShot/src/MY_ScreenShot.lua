@@ -178,53 +178,96 @@ function PS.OnPanelActive(wnd)
 		ui:Children('#WndEditBox_SsRoot'):Text(O.szFilePath)
 	end
 
-	ui:Append('WndCheckBox', 'WndCheckBox_UseGlobal'):Pos(30,30):Width(200)
-	  :Text(_L['Use global config']):Tip(_L['Check to use global config, otherwise use private setting.'])
-	  :Check(function(bChecked) O.bUseGlobalConfig = bChecked fnRefreshPanel(ui) end)
-	  :Check(O.bUseGlobalConfig)
+	ui:Append('WndCheckBox', {
+		name = 'WndCheckBox_UseGlobal',
+		x = 30, y = 30, w = 200,
+		text = _L['Use global config'],
+		tip = {
+			render = _L['Check to use global config, otherwise use private setting.'],
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
+		},
+		checked = O.bUseGlobalConfig,
+		onCheck = function(bChecked)
+			O.bUseGlobalConfig = bChecked fnRefreshPanel(ui)
+		end,
+	})
 
-	ui:Append('WndCheckBox', 'WndCheckBox_HideUI'):Pos(30,70)
-	  :Text(_L['auto hide ui while shot screen']):Tip(_L['Check it if you want to hide ui automatic.'])
-	  :Check(function(bChecked) O.bAutoHideUI = bChecked end)
-	  :Check(O.bAutoHideUI)
+	ui:Append('WndCheckBox', {
+		name = 'WndCheckBox_HideUI',
+		x = 30, y = 70,
+		text = _L['auto hide ui while shot screen'],
+		tip = {
+			render = _L['Check it if you want to hide ui automatic.'],
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
+		},
+		checked = O.bAutoHideUI,
+		onCheck = function(bChecked) O.bAutoHideUI = bChecked end,
+	})
 
-	ui:Append('Text', 'Text_FileExName'):Text(_L['file format']):Pos(30,110)
-	ui:Append('WndComboBox', 'WndCombo_FileExName'):Pos(110,110):Width(80)
-	  :Menu(function()
-		return {
-			{szOption = 'jpg', bChecked = O.szFileExName=='jpg', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'jpg' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
-			{szOption = 'png', bChecked = O.szFileExName=='png', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'png' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
-			{szOption = 'bmp', bChecked = O.szFileExName=='bmp', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'bmp' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
-			{szOption = 'tga', bChecked = O.szFileExName=='tga', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'tga' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
-		}
-	  end)
-	  :Text(O.szFileExName)
+	ui:Append('Text', { name = 'Text_FileExName', x = 30, y = 110, text = _L['file format'] })
 
-	ui:Append('Text', 'Text_Quality'):Text(_L['set quality (0-100)']):Pos(30,150)
-	ui:Append('WndTrackbar', 'WndTrackbar_Quality'):Pos(180,150)
-	  :TrackbarStyle(false):Range(0, 100)
-	  :Tip(_L['Set screenshot quality(0-100): the larger number, the image will use more hdd space.'])
-	  :Change(function(nValue) O.nQuality = nValue end)
+	ui:Append('WndComboBox', {
+		name = 'WndCombo_FileExName',
+		x = 110, y = 110, w = 80,
+		text = O.szFileExName,
+		menu = function()
+			return {
+				{szOption = 'jpg', bChecked = O.szFileExName=='jpg', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'jpg' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
+				{szOption = 'png', bChecked = O.szFileExName=='png', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'png' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
+				{szOption = 'bmp', bChecked = O.szFileExName=='bmp', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'bmp' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
+				{szOption = 'tga', bChecked = O.szFileExName=='tga', rgb = GetMsgFontColor('MSG_SYS', true), fnAction = function() O.szFileExName = 'tga' ui:Children('#WndCombo_FileExName'):Text(O.szFileExName) end, fnAutoClose = function() return true end},
+			}
+		end,
+	})
 
-	ui:Append('Text', 'Text_SsRoot'):Text(_L['set folder']):Pos(30,190)
-	ui:Append('WndEditBox', 'WndEditBox_SsRoot'):Pos(30,220):Size(620,100)
-	  :Text(O.szFilePath)
-	  :Change(function(szValue)
-		szValue = string.gsub(szValue, '^%s*(.-)%s*$', '%1')
-		szValue = string.gsub(szValue, '\\', '/')
-		szValue = string.gsub(szValue, '^(.-)/*$', '%1')
-		szValue = szValue..((#szValue>0 and '/') or '')
-		O.szFilePath = szValue
-	  end)
-	  :Tip(_L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],X.UI.TIP_POSITION.TOP_BOTTOM)
+	ui:Append('Text', { name = 'Text_Quality', x = 30, y = 150, text = _L['set quality (0-100)'] })
+	ui:Append('WndTrackbar', {
+		name = 'WndTrackbar_Quality',
+		x = 180, y = 150,
+		trackbarStyle = false,
+		range = {0, 100},
+		tip = {
+			render = _L['Set screenshot quality(0-100): the larger number, the image will use more hdd space.'],
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
+		},
+		onChange = function(nValue) O.nQuality = nValue end,
+	})
 
-	ui:Append('WndButton', 'WndButton_HotkeyCheck'):Pos(w-180, 30):ButtonStyle('FLAT'):Width(170)
-	  :Text(_L['set default screenshot tool'])
-	  :Click(function() X.SetHotKey('MY_ScreenShot_Hotkey',1,44,false,false,false) end)
+	ui:Append('Text', { name = 'Text_SsRoot', x = 30, y = 190, text = _L['set folder'] })
+	ui:Append('WndEditBox', {
+		name = 'WndEditBox_SsRoot',
+		x = 30, y = 220, w = 620, h = 100,
+		text = O.szFilePath,
+		tip = {
+			render = _L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
+		},
+		onChange = function(szValue)
+			szValue = string.gsub(szValue, '^%s*(.-)%s*$', '%1')
+			szValue = string.gsub(szValue, '\\', '/')
+			szValue = string.gsub(szValue, '^(.-)/*$', '%1')
+			szValue = szValue..((#szValue>0 and '/') or '')
+			O.szFilePath = szValue
+		end,
+	})
 
-	ui:Append('Text', 'Text_SetHotkey'):Pos(w-140, 60):Color(255,255,0)
-	  :Text(_L['>> Set hotkey <<'])
-	  :Click(function() X.SetHotKey() end)
+	ui:Append('WndButton', {
+		name = 'WndButton_HotkeyCheck',
+		x = w - 180, y = 30,
+		buttonStyle = 'FLAT',
+		text = _L['set default screenshot tool'],
+		onClick = function()
+			X.SetHotKey('MY_ScreenShot_Hotkey',1,44,false,false,false)
+		end,
+	})
+
+	ui:Append('Text', {
+		name = 'Text_SetHotkey',
+		x = w - 140, y = 60,
+		text = _L['>> Set hotkey <<'],
+		r = 255, g = 255, b = 0,
+		onClick = function() X.SetHotKey() end,
+	})
 
 	fnRefreshPanel(ui)
 

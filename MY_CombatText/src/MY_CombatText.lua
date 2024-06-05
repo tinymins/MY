@@ -1303,8 +1303,8 @@ function PS.OnPanelActive(frame)
 	ui:Append('Text', { x = nX, y = nY, text = _L['Critical style'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	nX = nX + 70
 
-	ui:Append('WndRadioBox', {
-		x = nX, y = nY + 5, text = _L['Hit feel'],
+	nX = nX + ui:Append('WndRadioBox', {
+		x = nX, y = nY, text = _L['Hit feel'],
 		group = 'style',
 		checked = O.nStyle == 0,
 		onCheck = function()
@@ -1312,11 +1312,10 @@ function PS.OnPanelActive(frame)
 			COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[0]
 		end,
 		autoEnable = IsEnabled,
-	})
-	nX = nX + 90
+	}):Width() + 5
 
-	ui:Append('WndRadioBox', {
-		x = nX, y = nY + 5, text = _L['Low hit feel'],
+	nX = nX + ui:Append('WndRadioBox', {
+		x = nX, y = nY, text = _L['Low hit feel'],
 		group = 'style',
 		checked = O.nStyle == 1,
 		onCheck = function()
@@ -1324,11 +1323,10 @@ function PS.OnPanelActive(frame)
 			COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[1]
 		end,
 		autoEnable = IsEnabled,
-	})
-	nX = nX + 90
+	}):Width() + 5
 
-	ui:Append('WndRadioBox', {
-		x = nX, y = nY + 5, text = _L['Soft'],
+	nX = nX + ui:Append('WndRadioBox', {
+		x = nX, y = nY, text = _L['Soft'],
 		group = 'style',
 		checked = O.nStyle == 2,
 		onCheck = function()
@@ -1336,11 +1334,10 @@ function PS.OnPanelActive(frame)
 			COMBAT_TEXT_SCALE.CRITICAL = COMBAT_TEXT_STYLES[2]
 		end,
 		autoEnable = IsEnabled,
-	})
-	nX = nX + 60
+	}):Width() + 5
 
 	ui:Append('WndRadioBox', {
-		x = nX, y = nY + 5, text = _L['Scale only'],
+		x = nX, y = nY, text = _L['Scale only'],
 		group = 'style',
 		checked = O.nStyle == 3,
 		onCheck = function()
@@ -1431,7 +1428,9 @@ function PS.OnPanelActive(frame)
 	nX = nX + 140
 
 	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY, text = _L['Font edit'],
+		x = nX, y = nY, h = 24,
+		text = _L['Font edit'],
+		buttonStyle = 'FLAT',
 		onClick = function()
 			X.UI.OpenFontPicker(function(nFont)
 				O.nFont = nFont
@@ -1463,8 +1462,9 @@ function PS.OnPanelActive(frame)
 		autoEnable = IsEnabled,
 	}):Width() + 10
 	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY + 2, w = 'auto',
+		x = nX, y = nY + 2, w = 'auto', h = 24,
 		text = _L['Reset color'],
+		buttonStyle = 'FLAT',
 		onClick = function()
 			O('reset', { 'tColor', 'tCriticalColor' })
 			X.ShowPanel()
@@ -1582,7 +1582,7 @@ function PS.OnPanelActive(frame)
 
 	if IsFileExist(COMBAT_TEXT_CONFIG) then
 		ui:Append('WndButton', {
-			x = W - 120 - nPaddingX, y = 15, w = 120, h = 40,
+			x = W - 130 - nPaddingX, y = 15, h = 40,
 			text = _L['Reload combat text config'],
 			buttonStyle = 'SKEUOMORPHISM_LACE_BORDER',
 			onClick = D.CheckEnable,

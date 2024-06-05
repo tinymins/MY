@@ -614,7 +614,8 @@ function PS.OnPanelActive(wnd)
 
 	l_uiBtn = ui:Append('WndButton', {
 		name = 'Button_ChatMonitor_Switcher',
-		x = w - 134, y = 15, w = 50,
+		x = w - 134, y = 15, w = 50, h = 25,
+		buttonStyle = 'FLAT',
 		text = (O.bCapture and _L['stop']) or _L['start'],
 		onClick = function()
 			if O.bCapture then
@@ -628,7 +629,8 @@ function PS.OnPanelActive(wnd)
 	})
 
 	ui:Append('WndButton', {
-		x = w - 79, y = 15, w = 50,
+		x = w - 79, y = 15, w = 50, h = 25,
+		buttonStyle = 'FLAT',
 		text = _L['clear'],
 		onClick = function()
 			RECORD_LIST = {}

@@ -153,7 +153,7 @@ end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndCheckBox', {
-		x = nX, y = nY,
+		x = nX, y = nY, h = 24,
 		text = _L['Memo (Role)'],
 		checked = D.IsEnable(false),
 		onCheck = function(bChecked)
@@ -162,8 +162,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	}):AutoWidth():Width() + 5
 
 	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY,
+		x = nX, y = nY, h = 24,
 		text = _L['Font'],
+		buttonStyle = 'FLAT',
 		onClick = function()
 			X.UI.OpenFontPicker(function(nFont)
 				D.SetFont(false, nFont)
@@ -172,7 +173,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	}):AutoWidth():Width() + 5
 
 	nX = nX + ui:Append('WndCheckBox', {
-		x = nX, y = nY,
+		x = nX, y = nY, h = 24,
 		text = _L['Memo (Global)'],
 		checked = D.IsEnable(true),
 		onCheck = function(bChecked)
@@ -181,8 +182,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	}):AutoWidth():Width() + 5
 
 	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY,
+		x = nX, y = nY, h = 24,
 		text = _L['Font'],
+		buttonStyle = 'FLAT',
 		onClick = function()
 			X.UI.OpenFontPicker(function(nFont)
 				D.SetFont(true, nFont)

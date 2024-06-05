@@ -133,7 +133,7 @@ end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
-	local x, y = 10, 30
+	local nPaddingX, nPaddingY = 10, 30
 	local w, h = ui:Size()
 	local aFontList = X.GetFontList()
 	local aFontName, aFontPath = {}, {}
@@ -153,12 +153,11 @@ function PS.OnPanelActive(wnd)
 			btnApply:Enable(bFileExist and szNewFile ~= szFontFile)
 		end
 
-		x = 10
-		ui:Append('Text', { text = _L[' * '] .. p.szTitle, x = x, y = y })
-		y = y + 40
+		ui:Append('Text', { text = _L[' * '] .. p.szTitle, x = nPaddingX, y = nPaddingY })
+		nPaddingY = nPaddingY + 40
 
 		acFontFile = ui:Append('WndAutocomplete', {
-			x = x, y = y, w = w - 180 - 30,
+			x = nPaddingX, y = nPaddingY, w = w - nPaddingX - 60 - 150 - 5 - 35 - 5 - nPaddingX - 5, h = 25,
 			text = szFontFile,
 			onChange = function(szText)
 				UpdateBtnEnable()
@@ -184,8 +183,9 @@ function PS.OnPanelActive(wnd)
 		})
 
 		ui:Append('WndButton', {
-			x = w - 180 - x - 10, y = y, w = 25,
+			x = w - nPaddingX - 60 - 150 - 5 - 35 - 5, y = nPaddingY, w = 35, h = 25,
 			text = '...',
+			buttonStyle = 'FLAT',
 			onClick = function()
 				local file = GetOpenFileName(_L['Please select your font file.'], 'Font File(*.ttf;*.otf;*.fon)\0*.ttf;*.otf;*.fon\0All Files(*.*)\0*.*\0\0')
 				if not X.IsEmpty(file) then
@@ -196,7 +196,7 @@ function PS.OnPanelActive(wnd)
 		})
 
 		acFontName = ui:Append('WndAutocomplete', {
-			w = 100, h = 25, x = w - 180 + x, y = y,
+			x = w - nPaddingX - 60 - 150 - 5, y = nPaddingY, w = 150, h = 25,
 			text = szFontName,
 			onChange = function(szText)
 				UpdateBtnEnable()
@@ -220,8 +220,9 @@ function PS.OnPanelActive(wnd)
 		})
 
 		btnApply = ui:Append('WndButton', {
-			w = 60, h = 25, x = w - 60, y = y,
+			x = w - nPaddingX - 60, y = nPaddingY, w = 60, h = 25,
 			text = _L['Apply'], enable = false,
+			buttonStyle = 'FLAT',
 			onClick = function()
 				p.Set(acFontName:Text(), acFontFile:Text())
 				szFontName, szFontFile = p.Get()
@@ -230,7 +231,7 @@ function PS.OnPanelActive(wnd)
 				UpdateBtnEnable()
 			end
 		})
-		y = y + 60
+		nPaddingY = nPaddingY + 60
 	end
 end
 X.RegisterPanel(_L['System'], 'MY_Font', _L['MY_Font'], 'ui/Image/UICommon/CommonPanel7.UITex|36', PS)

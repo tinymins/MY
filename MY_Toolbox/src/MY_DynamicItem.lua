@@ -510,7 +510,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	}):Width() + 5
 
 	nX = nX + ui:Append('WndTrackbar', {
-		x = nX, y = nY, h = 25, w = 220,
+		x = nX, y = nY, h = 25, w = 250,
 		range = {1, 32}, value = MY_DynamicItem.nNum,
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textFormatter = function(v) return _L('Box number: %d', v) end,
@@ -521,7 +521,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	}):Width() + 5
 
 	nX = nX + ui:Append('WndTrackbar', {
-		x = nX, y = nY, h = 25, w = 220,
+		x = nX, y = nY, h = 25, w = 250,
 		range = {1, 32}, value = MY_DynamicItem.nCol,
 		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
 		textFormatter = function(v) return _L('Col number: %d', v) end,

@@ -113,7 +113,7 @@ function PS.OnPanelActive(frame)
 	end
 	-- Ãû×Ö×ÖÌåÐÞ¸Ä
 	x = x + ui:Append('WndButton', {
-		x = x, y = y - 3,
+		x = x, y = y, h = 24,
 		text = _L['Name font'],
 		buttonStyle = 'FLAT',
 		onClick = function()
@@ -228,7 +228,7 @@ function PS.OnPanelActive(frame)
 		}):AutoWidth():Width() + 5
 	end
 	ui:Append('WndButton', {
-		x = x, y = y - 1,
+		x = x, y = y, h = 24,
 		text = _L['Life font'],
 		buttonStyle = 'FLAT',
 		onClick = function()
@@ -280,7 +280,7 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Width() + 5
 
 	x = x + ui:Append('WndButton', {
-		x = x, y = y,
+		x = x, y = y, h = 24,
 		text = g_tStrings.STR_SKILL_MANA .. g_tStrings.FONT,
 		buttonStyle = 'FLAT',
 		onClick = function()

@@ -48,7 +48,7 @@ function PS.OnPanelActive(wnd)
 	local x = 7
 	-- 奇遇分享
 	x = x + ui:Append('WndCheckBox', {
-		x = x, y = 375,
+		x = x, h = 25,
 		name = 'WndCheckBox_SerendipityNotify',
 		text = _L['Show share notify.'],
 		checked = MY_Serendipity.bEnable,
@@ -70,7 +70,7 @@ function PS.OnPanelActive(wnd)
 		},
 	}):AutoWidth():Width()
 	local xS0 = x + ui:Append('WndCheckBox', {
-		x = x, y = 375,
+		x = x, h = 25,
 		name = 'WndCheckBox_SerendipityAutoShare',
 		text = _L['Auto share.'],
 		checked = MY_Serendipity.bAutoShare,
@@ -82,7 +82,7 @@ function PS.OnPanelActive(wnd)
 	-- 自动分享子项
 	x = xS0
 	x = x + ui:Append('WndCheckBox', {
-		x = x, y = 375,
+		x = x, h = 25,
 		name = 'WndCheckBox_SerendipitySilentMode',
 		text = _L['Silent mode.'],
 		checked = MY_Serendipity.bSilentMode,
@@ -94,7 +94,7 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Width()
 	x = x + 5
 	x = x + ui:Append('WndEditBox', {
-		x = x, y = 375, w = 105, h = 25,
+		x = x, w = 105 + 3, h = 28,
 		name = 'WndEditBox_SerendipitySilentMode',
 		placeholder = _L['Realname, leave blank for anonymous.'],
 		tip = {
@@ -112,7 +112,7 @@ function PS.OnPanelActive(wnd)
 	-- 手动分享子项
 	x = xS0
 	x = x + ui:Append('WndCheckBox', {
-		x = x, y = 375,
+		x = x, h = 25,
 		name = 'WndCheckBox_SerendipityNotifyTip',
 		text = _L['Show notify tip.'],
 		checked = MY_Serendipity.bPreview,
@@ -123,7 +123,7 @@ function PS.OnPanelActive(wnd)
 		autoEnable = function() return MY_Serendipity.bEnable end,
 	}):AutoWidth():Width()
 	x = x + ui:Append('WndCheckBox', {
-		x = x, y = 375,
+		x = x, h = 25,
 		name = 'WndCheckBox_SerendipityNotifySound',
 		text = _L['Play notify sound.'],
 		checked = MY_Serendipity.bSound,
@@ -134,7 +134,7 @@ function PS.OnPanelActive(wnd)
 		autoVisible = function() return not MY_Serendipity.bAutoShare end,
 	}):AutoWidth():Width()
 	x = x + ui:Append('WndButton', {
-		x = x, y = 375,
+		x = x, h = 30,
 		name = 'WndButton_SerendipitySearch',
 		text = _L['serendipity'],
 		onClick = function()
@@ -337,12 +337,12 @@ function PS.OnPanelResize(wnd)
 		ui:Fetch('Text_Adv'):Pos(10, scaleH + 10)
 		ui:Fetch('Text_Svr'):Pos(10, scaleH + 35)
 	end
-	ui:Fetch('WndCheckBox_SerendipityNotify'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipityAutoShare'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipitySilentMode'):Top(scaleH + 65)
+	ui:Fetch('WndCheckBox_SerendipityNotify'):Top(scaleH + 66.5)
+	ui:Fetch('WndCheckBox_SerendipityAutoShare'):Top(scaleH + 66.5)
+	ui:Fetch('WndCheckBox_SerendipitySilentMode'):Top(scaleH + 66.5)
 	ui:Fetch('WndEditBox_SerendipitySilentMode'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipityNotifyTip'):Top(scaleH + 65)
-	ui:Fetch('WndCheckBox_SerendipityNotifySound'):Top(scaleH + 65)
+	ui:Fetch('WndCheckBox_SerendipityNotifyTip'):Top(scaleH + 66.5)
+	ui:Fetch('WndCheckBox_SerendipityNotifySound'):Top(scaleH + 66.5)
 	ui:Fetch('WndButton_SerendipitySearch'):Top(scaleH + 65)
 	ui:Fetch('WndButton_UserPreference'):Top(scaleH + 65)
 	ui:Fetch('WndButton_AddonErrorMessage'):Top(scaleH + 65)

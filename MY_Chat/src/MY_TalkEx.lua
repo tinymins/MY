@@ -270,7 +270,7 @@ function PS.OnPanelActive(wnd)
 	-- 骚话内容搜索按钮
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY,
-		w = 50, h = 25,
+		w = 'auto', h = 25,
 		text = _L['Search'],
 		onClick = function()
 			X.Ajax({
@@ -297,7 +297,7 @@ function PS.OnPanelActive(wnd)
 	-- 骚话复制按钮
 	nX = ui:Append('WndButton', {
 		x = nX, y = nY,
-		w = 50, h = 25,
+		w = 'auto', h = 25,
 		text = _L['Copy'],
 		onClick = function()
 			X.SetChatInput(D.szJokeText)
@@ -312,7 +312,7 @@ function PS.OnPanelActive(wnd)
 	-- 骚话分享按钮
 	nX = ui:Append('WndButton', {
 		x = nX, y = nY,
-		w = 50, h = 25,
+		w = 'auto', h = 25,
 		text = _L['Share'],
 		onClick = function()
 			local function fnAction(bAnonymous)
@@ -454,7 +454,7 @@ function PS.OnPanelActive(wnd)
 	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', h = 25, text = _L['Send to'] }):Width() + 5
 	-- 调侃发送频道
 	nX = nX + ui:Append('WndComboBox', {
-		x = nX, y = nY, w = 100, h = 25,
+		x = nX, y = nY, w = 'auto', h = 25,
 		text = X.Get(X.lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'szName', '???'),
 		color = X.Get(X.lodash.find(TRICK_CHANNEL_LIST, function(p) return p.nChannel == O.nTrickChannel end), 'tCol'),
 		menu = function()

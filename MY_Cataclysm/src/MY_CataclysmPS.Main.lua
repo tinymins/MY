@@ -31,7 +31,7 @@ function PS.OnPanelActive(frame)
 
 	nX = nPaddingX + 10
 	nX = nX + ui:Append('WndButton', {
-		x = nX, y = nY + 3, w = 120, h = 25,
+		x = nX, y = nY + 3, w = 120,
 		buttonStyle = 'FLAT',
 		text = _L['Load ancient config'],
 		onClick = function()

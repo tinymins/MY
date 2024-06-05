@@ -150,7 +150,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	nX, nY, nLFY = MY_GKPLoot.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLineHeightM, nX, nY, nLFY)
-	nX, nY = nPaddingX, nLFY
+	nX, nY = nPaddingX, nLFY + 10
 
 	ui:Append('Text', { x = nX, y = nY, text = _L['Preference Setting'], font = 27 })
 	nY = nY + 28
@@ -225,6 +225,7 @@ function PS.OnPanelActive(wnd)
 	nY = nY + 28
 
 	nX = nPaddingX
+	nY = nY + 10
 	ui:Append('Text', { x = nX, y = nY, text = _L['Money Record'], font = 27 })
 	nY = nY + 28
 

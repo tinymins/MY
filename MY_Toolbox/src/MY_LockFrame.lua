@@ -185,7 +185,7 @@ end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	ui:Append('WndComboBox', {
-		x = nW - 140, y = 65, w = 130,
+		x = nW - 140, y = 65,
 		text = _L['Lock frame position'],
 		menu = function()
 			local t = {

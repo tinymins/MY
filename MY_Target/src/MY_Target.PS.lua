@@ -42,7 +42,7 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Width()
 
 	ui:Append('WndComboBox', {
-		x = nX, y = nY, w = 200, text = _L['Distance type'],
+		x = nX, y = nY, w = 200, text = _L['Distance type'], h = 24,
 		menu = function()
 			return X.GetDistanceTypeMenu(true, MY_TargetDirection.eDistanceType, function(p)
 				MY_TargetDirection.eDistanceType = p.szType

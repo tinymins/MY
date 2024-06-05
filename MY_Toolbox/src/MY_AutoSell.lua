@@ -218,7 +218,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 
 	-- 按类型出售
 	nX = nX + ui:Append('WndComboBox', {
-		x = nX, y = nY, w = 'auto',
+		x = nX, y = nY, w = 'auto', h = 24,
 		text = _L['Auto sell by type'],
 		menu = function()
 			local m0 = {
@@ -248,7 +248,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 
 	-- 按名称出售
 	nX = nX + ui:Append('WndComboBox', {
-		x = nX, y = nY, w = 'auto',
+		x = nX, y = nY, w = 'auto', h = 24,
 		text = _L['Auto sell by name'],
 		menu = function()
 			local m1 = {
@@ -294,7 +294,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 
 	-- 保护不被出售的物品
 	nX = nX + ui:Append('WndComboBox', {
-		x = nX, y = nY, w = 'auto',
+		x = nX, y = nY, w = 'auto', h = 24,
 		text = _L['Protect specified items'],
 		menu = function()
 			local m1 = {

@@ -896,7 +896,8 @@ function PS.OnPanelActive(frame)
 		}):Pos('BOTTOMRIGHT') + 5
 
 		nX = nX + ui:Append('WndButton', {
-			x = nX, y = nY, w = 65,
+			x = nX, y = nY, w = 65, h = 24,
+			buttonStyle = 'FLAT',
 			text = _L['Font'],
 			onClick = function()
 				X.UI.OpenFontPicker(function(nFont)

@@ -643,9 +643,9 @@ function PS.OnPanelActive(wnd)
 		})
 		x = x + 70
 
-		ui:Append('WndButton', {
+		x = x + ui:Append('WndButton', {
 			name = 'WndButton_InfoTipFont_' .. data.id,
-			x = x, y = y, w = 50,
+			x = x, y = y, h = 24,
 			text = _L['Font'],
 			onClick = function()
 				X.UI.OpenFontPicker(function(f)
@@ -653,12 +653,11 @@ function PS.OnPanelActive(wnd)
 					D.ReinitUI()
 				end)
 			end,
-		})
-		x = x + 60
+		}):Width() + 5
 
 		ui:Append('Shadow', {
 			name = 'Shadow_InfoTipColor_' .. data.id,
-			x = x, y = y, w = 20, h = 20,
+			x = x, y = y, w = 24, h = 24,
 			color = data.config.rgb or {255, 255, 255},
 			onClick = function()
 				local el = this
