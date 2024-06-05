@@ -4131,15 +4131,16 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 							nRawW = nRawW + nDeltaW
 						end
 						nW = nW + nDeltaW
+						nWidth, nInnerWidth = nW, nRawW
 					end
 					if bAutoHeight then
 						if nRawH and bWillAffectRaw then
 							nRawH = nRawH + nDeltaH
 						end
 						nH = nH + nDeltaH
+						nHeight, nInnerHeight = nH, nRawH
 					end
 					txt:SetSize(nOriginW, nOriginH)
-					nWidth, nHeight, nInnerWidth, nInnerHeight = nW, nH, nRawW, nRawH
 				end
 		elseif componentType == 'WndContainer' then
 			local nW, nH = raw:GetAllContentSize()
