@@ -177,7 +177,7 @@ local BUTTON_STYLE_CONFIG = {
 		nWidth = 100,
 		nHeight = 26,
 		nMarginBottom = -3,
-		nPaddingTop = 3,
+		nPaddingTop = 2,
 		nPaddingRight = 10,
 		nPaddingBottom = 3,
 		nPaddingLeft = 10,
@@ -4117,29 +4117,30 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 				local bWillAffectRaw = componentType == 'WndCheckBox'
 					or componentType == 'WndRadioBox'
 					or componentType == 'WndComboBox'
-				local txt = GetComponentElement(raw, 'TEXT')
-				if txt then
+				local hText = GetComponentElement(raw, 'TEXT')
+				if hText then
 					local ui = X.UI(raw)
 					local nW, nH, nRawW, nRawH = ui:Size()
-					local nOriginW, nOriginH = txt:GetSize()
-					txt:SetSize(1000, 1000)
-					txt:AutoSize()
-					local nDeltaW = txt:GetW() - nOriginW
-					local nDeltaH = txt:GetH() - nOriginH
+					local nTextW, nTextH = hText:GetSize()
+					hText:SetSize(1000, 1000)
+					hText:AutoSize()
+					local nDeltaW = hText:GetW() - nTextW
+					local nDeltaH = hText:GetH() - nTextH
 					if bAutoWidth then
 						if nRawW and bWillAffectRaw then
 							nRawW = nRawW + nDeltaW
 						end
 						nW = nW + nDeltaW
+						nWidth, nInnerWidth = nW, nRawW
 					end
 					if bAutoHeight then
 						if nRawH and bWillAffectRaw then
 							nRawH = nRawH + nDeltaH
 						end
 						nH = nH + nDeltaH
+						nHeight, nInnerHeight = nH, nRawH
 					end
-					txt:SetSize(nOriginW, nOriginH)
-					nWidth, nHeight, nInnerWidth, nInnerHeight = nW, nH, nRawW, nRawH
+					hText:SetSize(nTextW, nTextH)
 				end
 		elseif componentType == 'WndContainer' then
 			local nW, nH = raw:GetAllContentSize()
@@ -4404,7 +4405,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		wnd:SetSize(nWidth, nHeight)
 		hdl:SetSize(nWidth, nHeight)
 		img:SetSize(nWidth, nHeight)
-		txt:SetSize(txt:GetW() + nDeltaW, nHeight)
+		txt:SetSize(txt:GetW() + nDeltaW, nHeight - 4)
 		hdl:FormatAllItemPos()
 	elseif componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
