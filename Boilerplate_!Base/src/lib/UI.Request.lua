@@ -47,7 +47,7 @@ end
 
 function D.RegisterRequest(szType, tHandler)
 	if REQUEST_HANDLER[szType] then
-		return X.Debug(FRAME_NAME, szType .. ' type already registered!', X.DEBUG_LEVEL.ERROR)
+		return X.OutputDebugMessage(FRAME_NAME, szType .. ' type already registered!', X.DEBUG_LEVEL.ERROR)
 	end
 	REQUEST_HANDLER[szType] = {
 		szIconUITex = tHandler.szIconUITex,
@@ -62,7 +62,7 @@ end
 
 function D.Replace(szType, szKey, data)
 	if not REQUEST_HANDLER[szType] then
-		return X.Debug(FRAME_NAME, szType .. ' type not registered yet!', X.DEBUG_LEVEL.ERROR)
+		return X.OutputDebugMessage(FRAME_NAME, szType .. ' type not registered yet!', X.DEBUG_LEVEL.ERROR)
 	end
 	local bExist
 	for i, v in X.ipairs_r(REQUEST_LIST) do
@@ -117,7 +117,7 @@ function D.RedrawList()
 			wnd:Lookup('', ''):FormatAllItemPos()
 			wnd:SetH(nH)
 		else
-			X.Debug(FRAME_NAME, info.szType .. '#' .. info.szKey .. ' drawer does not return a wnd!', X.DEBUG_LEVEL.ERROR)
+			X.OutputDebugMessage(FRAME_NAME, info.szType .. '#' .. info.szKey .. ' drawer does not return a wnd!', X.DEBUG_LEVEL.ERROR)
 		end
 		local szIconUITex, nIconFrame = handler.szIconUITex, handler.nIconFrame
 		if handler.GetIcon then

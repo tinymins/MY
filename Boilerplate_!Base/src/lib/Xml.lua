@@ -83,7 +83,7 @@ local XMLDecodeComponent = _G.DecodeComponentsString
 				if byte_current >= 64 and byte_current <= 254 then
 					b_partial_gbk = false
 				else
-					X.Debug('XML decode component error: partial GBK character detected at ' .. i .. ' on `' .. str .. '`', X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage('XML decode component error: partial GBK character detected at ' .. i .. ' on `' .. str .. '`', X.DEBUG_LEVEL.LOG)
 					return
 				end
 			elseif X.ENVIRONMENT.CODE_PAGE == X.CODE_PAGE.GBK and byte_current >= 129 and byte_current <= 254 then
@@ -245,7 +245,7 @@ local function XMLDecode(xml)
 				if byte_current >= 64 and byte_current <= 254 then
 					b_partial_gbk = false
 				else
-					X.Debug('XML decode error: partial GBK character detected at ' .. pos .. ' on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage('XML decode error: partial GBK character detected at ' .. pos .. ' on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
 					return
 				end
 			elseif X.ENVIRONMENT.CODE_PAGE == X.CODE_PAGE.GBK and byte_current >= 129 and byte_current <= 254 then
@@ -371,7 +371,7 @@ local function XMLDecode(xml)
 				if byte_current >= 64 and byte_current <= 254 then
 					b_partial_gbk = false
 				else
-					X.Debug('XML decode error: partial GBK character detected at ' .. pos .. ' on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage('XML decode error: partial GBK character detected at ' .. pos .. ' on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
 					return
 				end
 			elseif X.ENVIRONMENT.CODE_PAGE == X.CODE_PAGE.GBK and byte_current >= 129 and byte_current <= 254 then
@@ -453,7 +453,7 @@ local function XMLDecode(xml)
 		pos = pos + 1
 	end
 	if #stack ~= 0 then
-		X.Debug('XML decode error: unclosed elements detected. ' .. #stack .. ' stacks on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('XML decode error: unclosed elements detected. ' .. #stack .. ' stacks on `' .. xml .. '`', X.DEBUG_LEVEL.LOG)
 		return
 	end
 	return t.children

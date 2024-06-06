@@ -143,10 +143,10 @@ function D.Open(bImport)
 			end
 			if bImport then
 				local nSuccess = X.ImportUserSettings(tKvp)
-				X.Systopmsg(_L('%d settings imported.', nSuccess))
+				X.OutputSystemAnnounceMessage(_L('%d settings imported.', nSuccess))
 			else
 				if #aKey == 0 then
-					X.Systopmsg(_L['No custom setting selected, nothing to export.'], X.CONSTANT.MSG_THEME.ERROR)
+					X.OutputSystemAnnounceMessage(_L['No custom setting selected, nothing to export.'], X.CONSTANT.MSG_THEME.ERROR)
 					return
 				end
 				tKvp = X.ExportUserSettings(aKey)
@@ -155,12 +155,12 @@ function D.Open(bImport)
 					nExport = nExport + 1
 				end
 				if nExport == 0 then
-					X.Systopmsg(_L['No custom setting found, nothing to export.'], X.CONSTANT.MSG_THEME.ERROR)
+					X.OutputSystemAnnounceMessage(_L['No custom setting found, nothing to export.'], X.CONSTANT.MSG_THEME.ERROR)
 					return
 				end
 				local szPath = X.FormatPath({'export/settings/' .. X.GetClientPlayerName() .. '_' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss') .. '.us.jx3dat', X.PATH_TYPE.GLOBAL})
 				X.SaveLUAData(szPath, tKvp, { encoder = 'luatext', compress = false, crc = false, passphrase = false })
-				X.Systopmsg(_L('%d settings exported, file saved in %s.', nExport, szPath))
+				X.OutputSystemAnnounceMessage(_L('%d settings exported, file saved in %s.', nExport, szPath))
 			end
 			uiFrame:Remove()
 		end,

@@ -196,7 +196,7 @@ function PS.OnPanelActive(wnd)
 						X.IsDebugClient('Dev_UIManager', true, true)
 						X.IsDebugClient('Dev_UIFindStation', true, true)
 						X.IsDebugClient('Dev_DebugLogs', true, true)
-						X.Systopmsg(_L['Debug tools has been enabled...'])
+						X.OutputSystemAnnounceMessage(_L['Debug tools has been enabled...'])
 						X.ReopenPanel()
 						X.UI.ClosePopupMenu()
 					end,

@@ -62,7 +62,7 @@ function X.UI.OpenIconPicker(fnAction, nCurrentIconID)
 						end
 					elseif not bMaxL and bMaxR then
 						--[[#DEBUG BEGIN]]
-						X.Debug('ERROR CALC MAX_ICON!', X.DEBUG_LEVEL.ERROR)
+						X.OutputDebugMessage('ERROR CALC MAX_ICON!', X.DEBUG_LEVEL.ERROR)
 						--[[#DEBUG END]]
 						break
 					end

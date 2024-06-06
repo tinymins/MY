@@ -15,7 +15,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 do
 local function PeekPlayer(dwID)
 	--[[#DEBUG BEGIN]]
-	X.Debug(X.PACKET_INFO.NAME_SPACE, 'EquipScore Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'EquipScore Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	if PeekOtherPlayerEquipSimpleInfo then
 		X.SafeCall(PeekOtherPlayerEquipSimpleInfo, dwID)
@@ -101,7 +101,7 @@ end
 do
 local function PeekPlayer(dwID)
 	--[[#DEBUG BEGIN]]
-	X.Debug(X.PACKET_INFO.NAME_SPACE, 'EquipInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'EquipInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	if PeekOtherPlayer then
 		X.SafeCall(PeekOtherPlayer, dwID)
@@ -216,7 +216,7 @@ end
 do
 local function PeekPlayer(dwID)
 	--[[#DEBUG BEGIN]]
-	X.Debug(X.PACKET_INFO.NAME_SPACE, 'TelentInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'TelentInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	if X.IS_CLASSIC then
 		X.SafeCall(PeekOtherPlayerTalent, dwID)
@@ -256,7 +256,7 @@ local function OnGetPlayerTalnetInfoPeekPlayer(player)
 	end
 	if X.IsEmpty(aTalent) and (not PEEK_PLAYER_TALENT_TIME[player.dwID] or GetTime() - PEEK_PLAYER_TALENT_TIME[player.dwID] > 60000) then
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Talent Peek player: ' .. player.dwID, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Talent Peek player: ' .. player.dwID, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		PeekPlayer(player.dwID)
 		return
@@ -322,7 +322,7 @@ end
 do
 local function PeekPlayer(dwID)
 	--[[#DEBUG BEGIN]]
-	X.Debug(X.PACKET_INFO.NAME_SPACE, 'ZhenPaiInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'ZhenPaiInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	X.SafeCall(ViewOtherZhenPaiSkill, dwID, true)
 	X.SafeCall(X.UI.CloseFrame, 'ZhenPaiSkill')

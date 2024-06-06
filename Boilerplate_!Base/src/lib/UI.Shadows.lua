@@ -86,7 +86,7 @@ function X.UI.GetShadowHandle(szName)
 	if not sh then
 		frame:Lookup('', ''):AppendItemFromString(string.format('<handle> name="%s" </handle>', szName))
 		--[[#DEBUG BEGIN]]
-		X.Debug('UI', 'Create sh # ' .. szName, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('UI', 'Create sh # ' .. szName, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		sh = frame:Lookup('', szName)
 	end

@@ -2421,7 +2421,7 @@ function OO:Append(arg0, arg1)
 			end
 			local frame = X.UI.OpenFrame(szFile, X.NSFormatString('{$NS}_TempWnd#') .. _nTempWndCount)
 			if not frame then
-				return X.Debug(X.NSFormatString('{$NS}#UI#Append'), _L('Unable to open ini file [%s]', szFile), X.DEBUG_LEVEL.ERROR)
+				return X.OutputDebugMessage(X.NSFormatString('{$NS}#UI#Append'), _L('Unable to open ini file [%s]', szFile), X.DEBUG_LEVEL.ERROR)
 			end
 			_nTempWndCount = _nTempWndCount + 1
 			-- start ui append
@@ -2450,7 +2450,7 @@ function OO:Append(arg0, arg1)
 				ui = ui:Add(raw)
 				X.UI(raw):Hover(OnCommonComponentHover):Change(OnCommonComponentMouseEnter)
 			else
-				X.Debug(X.NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), X.DEBUG_LEVEL.ERROR)
+				X.OutputDebugMessage(X.NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), X.DEBUG_LEVEL.ERROR)
 			end
 			X.UI.CloseFrame(frame)
 		end
@@ -3618,7 +3618,7 @@ function OO:FadeTo(nTime, nOpacity, callback)
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime() - nStartTime)
 				ui:Alpha(nCurrentAlpha)
 				--[[#DEBUG BEGIN]]
-				-- X.Debug('fade', string.format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), X.DEBUG_LEVEL.LOG)
+				-- X.OutputDebugMessage('fade', string.format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
 					ui:Alpha(nOpacity)
@@ -3682,7 +3682,7 @@ function OO:SlideTo(nTime, nHeight, callback)
 				local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
 				ui:Height(nCurrentValue)
 				--[[#DEBUG BEGIN]]
-				-- X.Debug('slide', string.format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), X.DEBUG_LEVEL.LOG)
+				-- X.OutputDebugMessage('slide', string.format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
 					ui:Height(nHeight):Toggle( nHeight ~= 0 )
@@ -4163,7 +4163,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 	end
 	if not X.IsNumber(nWidth) or not X.IsNumber(nHeight) then
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Set size of ' .. raw:GetName() .. '(' .. GetComponentType(raw) .. ') failed: ' .. X.EncodeLUAData(nWidth) .. ', ' .. X.EncodeLUAData(nHeight), X.DEBUG_LEVEL.ERROR)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Set size of ' .. raw:GetName() .. '(' .. GetComponentType(raw) .. ') failed: ' .. X.EncodeLUAData(nWidth) .. ', ' .. X.EncodeLUAData(nHeight), X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end
@@ -5539,7 +5539,7 @@ function OO:UIEvent(szEvent, szKey, fnEvent)
 									rets = res
 								--[[#DEBUG BEGIN]]
 								else
-									X.Debug(
+									X.OutputDebugMessage(
 										'UI:UIEvent#' .. szEvent .. ':' .. (p.szKey or 'Unnamed'),
 										_L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', X.UI.GetTreePath(raw)),
 										X.DEBUG_LEVEL.WARNING
@@ -6158,7 +6158,7 @@ function OO:Check(fnAction, eEventFireType)
 		end
 	--[[#DEBUG BEGIN]]
 	else
-		X.Debug('ERROR UI:Check', 'fnAction: ' .. type(fnAction), X.DEBUG_LEVEL.ERROR)
+		X.OutputDebugMessage('ERROR UI:Check', 'fnAction: ' .. type(fnAction), X.DEBUG_LEVEL.ERROR)
 	--[[#DEBUG END]]
 	end
 end

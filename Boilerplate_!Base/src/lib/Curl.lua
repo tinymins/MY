@@ -37,7 +37,7 @@ local function CreateWebPageFrame()
 		szRequestID = ('%X%X'):format(GetTickCount(), X.Random(0x1000, 0xEFFF))
 	until not Station.Lookup(X.NSFormatString('Lowest/{$NS}RRWP_') .. szRequestID)
 	--[[#DEBUG BEGIN]]
-	X.Debug('CreateWebPageFrame: ' .. szRequestID, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage('CreateWebPageFrame: ' .. szRequestID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	hFrame = X.UI.OpenFrame(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndWebPage.ini', X.NSFormatString('{$NS}RRWP_') .. szRequestID)
 	hFrame:Hide()
@@ -216,7 +216,7 @@ function X.Ajax(settings)
 			.. (xdata and (' [BODY]' .. X.EncodeQuerystring(xdata) .. '[/BODY]') or '')
 	)
 	--[[#DEBUG BEGIN]]
-	X.Debug(
+	X.OutputDebugMessage(
 		'AJAX',
 		xurl .. ' - ' .. config.driver .. '/' .. config.method
 			.. ' (' .. driver .. '/' .. method .. ')'
@@ -231,7 +231,7 @@ function X.Ajax(settings)
 	settings.callback = function(html, status)
 		if fulfilled then
 			--[[#DEBUG BEGIN]]
-			X.Debug(
+			X.OutputDebugMessage(
 				'AJAX_DUP_CB',
 				config.url .. ' - ' .. config.driver .. '/' .. config.method
 					.. ' (' .. driver .. '/' .. method .. ')'
@@ -244,7 +244,7 @@ function X.Ajax(settings)
 		end
 		local connected = html and status
 		--[[#DEBUG BEGIN]]
-		X.Debug(
+		X.OutputDebugMessage(
 			'AJAX',
 			config.url .. ' - ' .. config.driver .. '/' .. config.method
 				.. ' (' .. driver .. '/' .. method .. ')'
@@ -300,7 +300,7 @@ function X.Ajax(settings)
 
 	local canajax, errmsg = X.CanAjax(driver, method)
 	if not canajax then
-		X.Debug(X.NSFormatString('{$NS}_AJAX'), errmsg, X.DEBUG_LEVEL.WARNING)
+		X.OutputDebugMessage(X.NSFormatString('{$NS}_AJAX'), errmsg, X.DEBUG_LEVEL.WARNING)
 		settings.callback()
 		return
 	end
@@ -366,7 +366,7 @@ function X.Ajax(settings)
 			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			local szContent = ''
 			--[[#DEBUG BEGIN]]
-			-- X.Debug(X.NSFormatString('{$NS}RRWC::OnDocumentComplete'), string.format('%s - %s', szTitle, szUrl), X.DEBUG_LEVEL.LOG)
+			-- X.OutputDebugMessage(X.NSFormatString('{$NS}RRWC::OnDocumentComplete'), string.format('%s - %s', szTitle, szUrl), X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			-- 注销超时处理时钟
 			X.DelayCall(X.NSFormatString('{$NS}RRWC_TO_') .. RequestID, false)
@@ -379,13 +379,13 @@ function X.Ajax(settings)
 
 		-- do with this remote request
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.NSFormatString('{$NS}RRWC'), config.url, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.NSFormatString('{$NS}RRWC'), config.url, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- register request timeout clock
 		if config.timeout > 0 then
 			X.DelayCall(X.NSFormatString('{$NS}RRWC_TO_') .. RequestID, config.timeout, function()
 				--[[#DEBUG BEGIN]]
-				X.Debug(X.NSFormatString('{$NS}RRWC::Timeout'), config.url, X.DEBUG_LEVEL.WARNING) -- log
+				X.OutputDebugMessage(X.NSFormatString('{$NS}RRWC::Timeout'), config.url, X.DEBUG_LEVEL.WARNING) -- log
 				--[[#DEBUG END]]
 				-- request timeout, call timeout function.
 				settings.callback()
@@ -406,7 +406,7 @@ function X.Ajax(settings)
 				local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 				if szUrl ~= szTitle or szContent ~= '' then
 					--[[#DEBUG BEGIN]]
-					X.Debug(X.NSFormatString('{$NS}RRWP::OnDocumentComplete'), string.format('%s - %s', szTitle, szUrl), X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage(X.NSFormatString('{$NS}RRWP::OnDocumentComplete'), string.format('%s - %s', szTitle, szUrl), X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					-- 注销超时处理时钟
 					X.DelayCall(X.NSFormatString('{$NS}RRWP_TO_') .. RequestID, false)
@@ -419,13 +419,13 @@ function X.Ajax(settings)
 			end
 			-- do with this remote request
 			--[[#DEBUG BEGIN]]
-			X.Debug(X.NSFormatString('{$NS}RRWP'), config.url, X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(X.NSFormatString('{$NS}RRWP'), config.url, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			-- register request timeout clock
 			if config.timeout > 0 then
 				X.DelayCall(X.NSFormatString('{$NS}RRWP_TO_') .. RequestID, config.timeout, function()
 					--[[#DEBUG BEGIN]]
-					X.Debug(X.NSFormatString('{$NS}RRWP::Timeout'), config.url, X.DEBUG_LEVEL.WARNING) -- log
+					X.OutputDebugMessage(X.NSFormatString('{$NS}RRWP::Timeout'), config.url, X.DEBUG_LEVEL.WARNING) -- log
 					--[[#DEBUG END]]
 					settings.callback()
 					-- 有宕机问题，禁用 FREE 池，直接销毁句柄
@@ -642,7 +642,7 @@ function X.EnsureAjax(options)
 		end
 	end
 	--[[#DEBUG BEGIN]]
-	X.Debug('Ensure ajax ' .. key .. ' preparing: ' .. options.url, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage('Ensure ajax ' .. key .. ' preparing: ' .. options.url, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	local function TryUploadWithNextDriver()
 		local config = configs[i]
@@ -652,7 +652,7 @@ function X.EnsureAjax(options)
 		end
 		local driver, method = X.Unpack(config)
 		--[[#DEBUG BEGIN]]
-		X.Debug('Ensure ajax ' .. key .. ' try mode ' .. driver .. '/' .. method, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('Ensure ajax ' .. key .. ' try mode ' .. driver .. '/' .. method, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		dc, i = X.DelayCall(30000, TryUploadWithNextDriver), i + 1 -- 必须先发起保护再请求，因为请求可能会立刻失败触发gc
 		local opt = {
@@ -663,14 +663,14 @@ function X.EnsureAjax(options)
 			signature = options.signature,
 			fulfilled = function(...)
 				--[[#DEBUG BEGIN]]
-				X.Debug('Ensure ajax ' .. key .. ' succeed with mode ' .. driver .. '/' .. method, X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage('Ensure ajax ' .. key .. ' succeed with mode ' .. driver .. '/' .. method, X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				X.DelayCall(dc, false)
 				X.SafeCall(options.fulfilled, ...)
 			end,
 			error = function()
 				--[[#DEBUG BEGIN]]
-				X.Debug('Ensure ajax ' .. key .. ' failed with mode ' .. driver .. '/' .. method, X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage('Ensure ajax ' .. key .. ' failed with mode ' .. driver .. '/' .. method, X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				X.DelayCall(dc, false)
 				TryUploadWithNextDriver()

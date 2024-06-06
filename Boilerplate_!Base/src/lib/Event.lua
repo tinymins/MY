@@ -172,7 +172,7 @@ local function FireEventRec(E, p, ...)
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
 	if nTickCount > 50 then
-		X.Debug(
+		X.OutputDebugMessage(
 			_L['PMTool'],
 			_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], nTickCount),
 			X.DEBUG_LEVEL.PM_LOG)
@@ -301,7 +301,7 @@ X.RegisterEvent('LOADING_ENDING', function()
 	--[[#DEBUG END]]
 	INIT_EVENT = nil
 	-- ÏÔÊ¾»¶Ó­ÐÅÏ¢
-	X.Sysmsg(_L('%s, welcome to use %s!', X.GetClientPlayerName(), X.PACKET_INFO.NAME)
+	X.OutputSystemMessage(_L('%s, welcome to use %s!', X.GetClientPlayerName(), X.PACKET_INFO.NAME)
 		.. _L(' v%s Build %s', X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD))
 end)
 
@@ -510,7 +510,7 @@ function X.RegisterModuleEvent(arg0, arg1)
 			end
 			MODULE_LIST[szModule] = nil
 			--[[#DEBUG BEGIN]]
-			X.Debug(X.NSFormatString('{$NS}#EVENT'), 'Uninit # '  .. szModule .. ' # Events Removed # ' .. nCount, X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(X.NSFormatString('{$NS}#EVENT'), 'Uninit # '  .. szModule .. ' # Events Removed # ' .. nCount, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 	elseif X.IsTable(arg1) then
@@ -531,7 +531,7 @@ function X.RegisterModuleEvent(arg0, arg1)
 			tEvent[szEvent] = { szEvent = szEvent }
 		end
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.NSFormatString('{$NS}#EVENT'), 'Init # '  .. szModule .. ' # Events Added # ' .. nCount, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.NSFormatString('{$NS}#EVENT'), 'Init # '  .. szModule .. ' # Events Added # ' .. nCount, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 end
@@ -682,7 +682,7 @@ local function OnBgMsg()
 			CommonEventFirer(BG_MSG_EVENT, szMsgID, aData[1], nChannel, dwID, szName, bSelf)
 		--[[#DEBUG BEGIN]]
 		else
-			X.Debug('BG_EVENT#' .. szMsgID, X.GetTraceback('Cannot decode BgMsg: ' .. szPlain), X.DEBUG_LEVEL.ERROR)
+			X.OutputDebugMessage('BG_EVENT#' .. szMsgID, X.GetTraceback('Cannot decode BgMsg: ' .. szPlain), X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		end
 		BG_MSG_PART[szMsgUUID] = nil
@@ -748,7 +748,7 @@ function X.SendBgMsg(nChannel, szMsgID, oData, bSilent)
 	local szStatus = GetSenderStatus(me)
 	if szStatus ~= 'READY' then
 		if szStatus == 'TALK_LOCK' and not bSilent then
-			X.Systopmsg(_L['BgMsg cannot be send due to talk lock, data will be sent as soon as talk unlocked.'])
+			X.OutputSystemAnnounceMessage(_L['BgMsg cannot be send due to talk lock, data will be sent as soon as talk unlocked.'])
 		end
 		table.insert(BG_MSG_QUEUE, X.Pack(nChannel, szMsgID, oData))
 		X.BreatheCall(X.NSFormatString('{$NS}#BG_MSG_QUEUE'), ProcessQueue)
@@ -901,9 +901,9 @@ local function onBreathe()
 		end
 		--[[#DEBUG BEGIN]]
 		if GetTime() - nBeginTime > COROUTINE_TIME then
-			X.Debug(_L['PMTool'], _L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), X.DEBUG_LEVEL.PM_LOG)
+			X.OutputDebugMessage(_L['PMTool'], _L('Coroutine time exceed limit: %dms.', GetTime() - nBeginTime), X.DEBUG_LEVEL.PM_LOG)
 		elseif nBeginTime - l_nLastBreatheTime > FPS_SLOW_TIME then
-			X.Debug(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), X.DEBUG_LEVEL.PM_LOG)
+			X.OutputDebugMessage(_L['PMTool'], _L('System breathe too slow(%dms), coroutine suspended.', nBeginTime - l_nLastBreatheTime), X.DEBUG_LEVEL.PM_LOG)
 		end
 		--[[#DEBUG END]]
 		l_nLastBreatheTime = nBeginTime

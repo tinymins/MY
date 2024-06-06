@@ -692,7 +692,7 @@ end
 function X.OpenDoodad(me, doodad)
 	X.Throttle(X.NSFormatString('{$NS}#OpenDoodad') .. doodad.dwID, 375, function()
 		--[[#DEBUG BEGIN]]
-		X.Debug('Open Doodad ' .. doodad.dwID .. ' [' .. doodad.szName .. '] at ' .. GetLogicFrameCount() .. '.', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('Open Doodad ' .. doodad.dwID .. ' [' .. doodad.szName .. '] at ' .. GetLogicFrameCount() .. '.', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		OpenDoodad(me, doodad)
 	end)
@@ -702,7 +702,7 @@ end
 function X.InteractDoodad(dwID)
 	X.Throttle(X.NSFormatString('{$NS}#InteractDoodad') .. dwID, 375, function()
 		--[[#DEBUG BEGIN]]
-		X.Debug('Open Doodad ' .. dwID .. ' at ' .. GetLogicFrameCount() .. '.', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('Open Doodad ' .. dwID .. ' at ' .. GetLogicFrameCount() .. '.', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		InteractDoodad(dwID)
 	end)
@@ -1637,7 +1637,7 @@ function X.SetTarget(arg0, arg1)
 	if dwType == TARGET.PLAYER then
 		if X.IsInShieldedMap() and not X.IsParty(dwID) and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			X.Debug('SetTarget', 'Set target to player is forbiden in current map.', X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('SetTarget', 'Set target to player is forbiden in current map.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
@@ -1645,14 +1645,14 @@ function X.SetTarget(arg0, arg1)
 		local npc = X.GetNpc(dwID)
 		if npc and not npc.IsSelectable() and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			X.Debug('SetTarget', 'Set target to unselectable npc.', X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('SetTarget', 'Set target to unselectable npc.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
 	elseif dwType == TARGET.DOODAD then
 		if X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			X.Debug('SetTarget', 'Set target to doodad.', X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('SetTarget', 'Set target to doodad.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end

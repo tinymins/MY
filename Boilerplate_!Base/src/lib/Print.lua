@@ -145,84 +145,12 @@ function X.Output(...)
 	print(szMsg)
 end
 
--- 显示本地信息 X.Sysmsg(oTitle, oContent, eTheme)
---   X.Sysmsg({'Error!', wrap = true}, '内容', X.CONSTANT.MSG_THEME.ERROR)
---   X.Sysmsg({'New message', r = 0, g = 0, b = 0, wrap = true}, '内容')
---   X.Sysmsg({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, '内容')
---   X.Sysmsg('New message', {'内容', '内容2', r = 0, g = 0, b = 0})
-function X.Sysmsg(...)
-	local argc, oTitle, oContent, eTheme = select('#', ...), nil, nil, nil
-	if argc == 1 then
-		oContent = ...
-		oTitle, eTheme = nil, nil
-	elseif argc == 2 then
-		if X.IsNumber(select(2, ...)) then
-			oContent, eTheme = ...
-			oTitle = nil
-		else
-			oTitle, oContent = ...
-			eTheme = nil
-		end
-	elseif argc == 3 then
-		oTitle, oContent, eTheme = ...
-	end
-	if not oTitle then
-		oTitle = X.PACKET_INFO.SHORT_NAME
-	end
-	if not X.IsNumber(eTheme) then
-		eTheme = X.CONSTANT.MSG_THEME.NORMAL
-	end
-	return OutputMessageEx('MSG_SYS', eTheme, oTitle, oContent)
-end
-
--- 显示中央信息 X.Topmsg(oTitle, oContent, eTheme)
---   参见 X.Sysmsg 参数解释
-function X.Topmsg(...)
-	local argc, oTitle, oContent, eTheme = select('#', ...), nil, nil, nil
-	if argc == 1 then
-		oContent = ...
-		oTitle, eTheme = nil, nil
-	elseif argc == 2 then
-		if X.IsNumber(select(2, ...)) then
-			oContent, eTheme = ...
-			oTitle = nil
-		else
-			oTitle, oContent = ...
-			eTheme = nil
-		end
-	elseif argc == 3 then
-		oTitle, oContent, eTheme = ...
-	end
-	if not oTitle then
-		oTitle = X.CONSTANT.EMPTY_TABLE
-	end
-	if not X.IsNumber(eTheme) then
-		eTheme = X.CONSTANT.MSG_THEME.NORMAL
-	end
-	local szType = eTheme == X.CONSTANT.MSG_THEME.ERROR
-		and 'MSG_ANNOUNCE_RED'
-		or 'MSG_ANNOUNCE_YELLOW'
-	return OutputMessageEx(szType, eTheme, oTitle, oContent)
-end
-
-function X.Systopmsg(...)
-	X.Topmsg(...)
-	X.Sysmsg(...)
-end
-
--- 输出一条密聊信息
-function X.OutputWhisper(szMsg, szHead)
-	szHead = szHead or X.PACKET_INFO.SHORT_NAME
-	OutputMessage('MSG_WHISPER', '[' .. szHead .. ']' .. g_tStrings.STR_TALK_HEAD_WHISPER .. szMsg .. '\n')
-	PlaySound(SOUND.UI_SOUND, g_sound.Whisper)
-end
-
 -- Debug输出
--- (void)X.Debug(szTitle, oContent, nLevel)
+-- (void)X.OutputDebugMessage(szTitle, oContent, nLevel)
 -- szTitle  Debug头
 -- oContent Debug信息
 -- nLevel   Debug级别[低于当前设置值将不会输出]
-function X.Debug(...)
+function X.OutputDebugMessage(...)
 	local argc, oTitle, oContent, nLevel, szTitle, szContent, eTheme = select('#', ...), nil, nil, nil, nil, nil, nil
 	if argc == 1 then
 		oContent = ...
@@ -260,6 +188,78 @@ function X.Debug(...)
 	if nLevel >= X.PACKET_INFO.LOG_LEVEL then
 		X.Log('DEBUG', 'LEVEL_' .. nLevel, szTitle, szContent)
 	end
+end
+
+-- 显示本地信息 X.OutputSystemMessage(oTitle, oContent, eTheme)
+--   X.OutputSystemMessage({'Error!', wrap = true}, '内容', X.CONSTANT.MSG_THEME.ERROR)
+--   X.OutputSystemMessage({'New message', r = 0, g = 0, b = 0, wrap = true}, '内容')
+--   X.OutputSystemMessage({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, '内容')
+--   X.OutputSystemMessage('New message', {'内容', '内容2', r = 0, g = 0, b = 0})
+function X.OutputSystemMessage(...)
+	local argc, oTitle, oContent, eTheme = select('#', ...), nil, nil, nil
+	if argc == 1 then
+		oContent = ...
+		oTitle, eTheme = nil, nil
+	elseif argc == 2 then
+		if X.IsNumber(select(2, ...)) then
+			oContent, eTheme = ...
+			oTitle = nil
+		else
+			oTitle, oContent = ...
+			eTheme = nil
+		end
+	elseif argc == 3 then
+		oTitle, oContent, eTheme = ...
+	end
+	if not oTitle then
+		oTitle = X.PACKET_INFO.SHORT_NAME
+	end
+	if not X.IsNumber(eTheme) then
+		eTheme = X.CONSTANT.MSG_THEME.NORMAL
+	end
+	return OutputMessageEx('MSG_SYS', eTheme, oTitle, oContent)
+end
+
+-- 显示中央信息 X.OutputAnnounceMessage(oTitle, oContent, eTheme)
+--   参见 X.OutputSystemMessage 参数解释
+function X.OutputAnnounceMessage(...)
+	local argc, oTitle, oContent, eTheme = select('#', ...), nil, nil, nil
+	if argc == 1 then
+		oContent = ...
+		oTitle, eTheme = nil, nil
+	elseif argc == 2 then
+		if X.IsNumber(select(2, ...)) then
+			oContent, eTheme = ...
+			oTitle = nil
+		else
+			oTitle, oContent = ...
+			eTheme = nil
+		end
+	elseif argc == 3 then
+		oTitle, oContent, eTheme = ...
+	end
+	if not oTitle then
+		oTitle = X.CONSTANT.EMPTY_TABLE
+	end
+	if not X.IsNumber(eTheme) then
+		eTheme = X.CONSTANT.MSG_THEME.NORMAL
+	end
+	local szType = eTheme == X.CONSTANT.MSG_THEME.ERROR
+		and 'MSG_ANNOUNCE_RED'
+		or 'MSG_ANNOUNCE_YELLOW'
+	return OutputMessageEx(szType, eTheme, oTitle, oContent)
+end
+
+function X.OutputSystemAnnounceMessage(...)
+	X.OutputAnnounceMessage(...)
+	X.OutputSystemMessage(...)
+end
+
+-- 输出一条密聊信息
+function X.OutputWhisperMessage(szMsg, szHead)
+	szHead = szHead or X.PACKET_INFO.SHORT_NAME
+	OutputMessage('MSG_WHISPER', '[' .. szHead .. ']' .. g_tStrings.STR_TALK_HEAD_WHISPER .. szMsg .. '\n')
+	PlaySound(SOUND.UI_SOUND, g_sound.Whisper)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -226,7 +226,7 @@ function D.Open(url, options)
 	WINDOWS[szKey] = X.UI.OpenFrame(X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', FRAME_NAME)
 	OPTIONS[WINDOWS[szKey]] = options
 	--[[#DEBUG BEGIN]]
-	X.Debug(X.PACKET_INFO.NAME_SPACE, 'UI.OpenBrowser #' .. szKey .. ': ' .. url, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'UI.OpenBrowser #' .. szKey .. ': ' .. url, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 
 	local frame = WINDOWS[szKey]
@@ -244,7 +244,7 @@ function D.Open(url, options)
 		ui:Fetch('Wnd_Web'):Append('WndWebPage', { name = 'WndWeb' })
 	end
 	if ui:Fetch('Wnd_Web/WndWeb'):Count() == 0 then
-		X.Debug(X.NSFormatString('{$NS}.UI.Browser'), 'Create WndWebPage/WndWebCef failed!', X.DEBUG_LEVEL.ERROR)
+		X.OutputDebugMessage(X.NSFormatString('{$NS}.UI.Browser'), 'Create WndWebPage/WndWebCef failed!', X.DEBUG_LEVEL.ERROR)
 		X.UI.CloseFrame(frame)
 		return
 	end

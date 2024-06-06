@@ -302,7 +302,7 @@ function X.SaveLUAData(oFilePath, oData, tConfig)
 	--[[#DEBUG BEGIN]]
 	nStartTick = GetTickCount() - nStartTick
 	if nStartTick > 5 then
-		X.Debug('PMTool', _L('%s saved during %dms.', szFilePath, nStartTick), X.DEBUG_LEVEL.PM_LOG)
+		X.OutputDebugMessage('PMTool', _L('%s saved during %dms.', szFilePath, nStartTick), X.DEBUG_LEVEL.PM_LOG)
 	end
 	--[[#DEBUG END]]
 	return data
@@ -329,7 +329,7 @@ function X.LoadLUAData(oFilePath, tConfig)
 	--[[#DEBUG BEGIN]]
 	nStartTick = GetTickCount() - nStartTick
 	if nStartTick > 5 then
-		X.Debug('PMTool', _L('%s loaded during %dms.', szFilePath, nStartTick), X.DEBUG_LEVEL.PM_LOG)
+		X.OutputDebugMessage('PMTool', _L('%s loaded during %dms.', szFilePath, nStartTick), X.DEBUG_LEVEL.PM_LOG)
 	end
 	--[[#DEBUG END]]
 	return data
@@ -539,7 +539,7 @@ local function SetInstanceInfoData(inst, info, data, version)
 		--[[#DEBUG END]]
 		db:Set(info.szDataKey, { d = data, v = version })
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, _L('User settings %s saved during %dms.', info.szDataKey, GetTickCount() - nStartTick), X.DEBUG_LEVEL.PM_LOG)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, _L('User settings %s saved during %dms.', info.szDataKey, GetTickCount() - nStartTick), X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 	end
 end
@@ -553,7 +553,7 @@ local function GetInstanceInfoData(inst, info)
 	--[[#DEBUG END]]
 	local res = db and db:Get(info.szDataKey)
 	--[[#DEBUG BEGIN]]
-	X.Debug(X.PACKET_INFO.NAME_SPACE, _L('User settings %s loaded during %dms.', info.szDataKey, GetTickCount() - nStartTick), X.DEBUG_LEVEL.PM_LOG)
+	X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, _L('User settings %s loaded during %dms.', info.szDataKey, GetTickCount() - nStartTick), X.DEBUG_LEVEL.PM_LOG)
 	--[[#DEBUG END]]
 	if res then
 		return res
@@ -596,10 +596,10 @@ function X.ConnectUserSettingsDB()
 			)
 			local pUserDataDB = X.NoSQLiteConnect(X.FormatPath({'userdata/userdata.db', ePathType}))
 			if not pSettingsDB then
-				X.Debug(X.PACKET_INFO.NAME_SPACE, 'Connect user settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
+				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect user settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
 			end
 			if not pUserDataDB then
-				X.Debug(X.PACKET_INFO.NAME_SPACE, 'Connect userdata database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
+				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect userdata database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
 			end
 			DATABASE_INSTANCE[ePathType] = {
 				pSettingsDB = pSettingsDB,
@@ -931,7 +931,7 @@ function X.SetUserSettings(szKey, ...)
 	end
 	local inst = DATABASE_INSTANCE[info.ePathType]
 	if not inst and X.IsDebugClient() then
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'SetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): Database not connected!!!', X.DEBUG_LEVEL.WARNING)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'SetUserSettings KEY(' .. X.EncodeLUAData(szKey) .. '): Database not connected!!!', X.DEBUG_LEVEL.WARNING)
 		return false
 	end
 	if not inst then
@@ -1434,13 +1434,13 @@ end
 
 local function DuplicateDatabase(DB_SRC, DB_DST, szCaption)
 	--[[#DEBUG BEGIN]]
-	X.Debug(szCaption, 'Duplicate database start.', X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(szCaption, 'Duplicate database start.', X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	-- 运行 DDL 语句 创建表和索引等
 	for _, rec in ipairs(DB_SRC:Execute('SELECT sql FROM sqlite_master')) do
 		DB_DST:Execute(rec.sql)
 		--[[#DEBUG BEGIN]]
-		X.Debug(szCaption, 'Duplicating database: ' .. rec.sql, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(szCaption, 'Duplicating database: ' .. rec.sql, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	-- 读取表名 依次复制
@@ -1455,7 +1455,7 @@ local function DuplicateDatabase(DB_SRC, DB_DST, szCaption)
 		local nCount, nPageSize = X.Get(DB_SRC:Execute('SELECT COUNT(*) AS count FROM ' .. szTableName), {1, 'count'}, 0), 10000
 		local DB_W = DB_DST:Prepare('REPLACE INTO ' .. szTableName .. ' (' .. szColumns .. ') VALUES (' .. szPlaceholders .. ')')
 		--[[#DEBUG BEGIN]]
-		X.Debug(szCaption, 'Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(szCaption, 'Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		-- 开始读取和写入数据
 		DB_DST:Execute('BEGIN TRANSACTION')
@@ -1473,19 +1473,19 @@ local function DuplicateDatabase(DB_SRC, DB_DST, szCaption)
 		DB_W:Reset()
 		DB_DST:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
-		X.Debug(szCaption, 'Duplicating table finished: ' .. szTableName, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(szCaption, 'Duplicating table finished: ' .. szTableName, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 end
 
 local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 	--[[#DEBUG BEGIN]]
-	X.Debug(szCaption, 'Fixing malformed database...', X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(szCaption, 'Fixing malformed database...', X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	local szMalformedPath = RenameDatabase(szCaption, szPath)
 	if not szMalformedPath then
 		--[[#DEBUG BEGIN]]
-		X.Debug(szCaption, 'Fixing malformed database failed... Move file failed...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(szCaption, 'Fixing malformed database failed... Move file failed...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		return 'FILE_LOCKED'
 	else
@@ -1496,12 +1496,12 @@ local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
 			DB_SRC:Release()
 			CPath.DelFile(szMalformedPath)
 			--[[#DEBUG BEGIN]]
-			X.Debug(szCaption, 'Fixing malformed database finished...', X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(szCaption, 'Fixing malformed database finished...', X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			return 'SUCCESS', DB_DST
 		elseif not DB_SRC then
 			--[[#DEBUG BEGIN]]
-			X.Debug(szCaption, 'Connect malformed database failed...', X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(szCaption, 'Connect malformed database failed...', X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			return 'TRANSFER_FAILED', DB_DST
 		end
@@ -1512,7 +1512,7 @@ function X.SQLiteConnect(szCaption, oPath, fnAction)
 	-- 尝试连接数据库
 	local szPath = X.FormatPath(oPath)
 	--[[#DEBUG BEGIN]]
-	X.Debug(szCaption, 'Connect database: ' .. szPath, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(szCaption, 'Connect database: ' .. szPath, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	local DB = SQLite3_Open(szPath)
 	if not DB then
@@ -1521,7 +1521,7 @@ function X.SQLiteConnect(szCaption, oPath, fnAction)
 			DB = SQLite3_Open(szPath)
 		end
 		if not DB then
-			X.Debug(szCaption, 'Cannot connect to database!!!', X.DEBUG_LEVEL.ERROR)
+			X.OutputDebugMessage(szCaption, 'Cannot connect to database!!!', X.DEBUG_LEVEL.ERROR)
 			if fnAction then
 				fnAction()
 			end
@@ -1538,9 +1538,9 @@ function X.SQLiteConnect(szCaption, oPath, fnAction)
 		return DB
 	else
 		-- 记录错误日志
-		X.Debug(szCaption, 'Malformed database detected...', X.DEBUG_LEVEL.ERROR)
+		X.OutputDebugMessage(szCaption, 'Malformed database detected...', X.DEBUG_LEVEL.ERROR)
 		for _, rec in ipairs(aRes or {}) do
-			X.Debug(szCaption, X.EncodeLUAData(rec), X.DEBUG_LEVEL.ERROR)
+			X.OutputDebugMessage(szCaption, X.EncodeLUAData(rec), X.DEBUG_LEVEL.ERROR)
 		end
 		DB:Release()
 		-- 准备尝试修复
