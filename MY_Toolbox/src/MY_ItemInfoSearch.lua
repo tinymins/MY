@@ -32,7 +32,7 @@ function D.Init()
 					while true do
 						if nMaxL < 1 then
 							--[[#DEBUG BEGIN]]
-							X.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (TOO SMALL)', X.DEBUG_LEVEL.ERROR)
+							X.OutputDebugMessage(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (TOO SMALL)', X.DEBUG_LEVEL.ERROR)
 							--[[#DEBUG END]]
 							break
 						elseif bMaxL and bMaxR then
@@ -57,14 +57,14 @@ function D.Init()
 								end
 							elseif not bMaxL and bMaxR then
 								--[[#DEBUG BEGIN]]
-								X.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (NOT EXIST)', X.DEBUG_LEVEL.ERROR)
+								X.OutputDebugMessage(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (NOT EXIST)', X.DEBUG_LEVEL.ERROR)
 								--[[#DEBUG END]]
 								break
 							end
 						end
 						if nCount >= nMaxCount then
 							--[[#DEBUG BEGIN]]
-							X.Debug(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (OVERFLOW)', X.DEBUG_LEVEL.ERROR)
+							X.OutputDebugMessage(_L['MY_ItemInfoSearch'], 'ERROR CALC ITEM_TYPE_MAX: ' .. dwTabType .. ' (OVERFLOW)', X.DEBUG_LEVEL.ERROR)
 							--[[#DEBUG END]]
 							break
 						end

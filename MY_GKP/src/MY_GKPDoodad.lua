@@ -600,7 +600,7 @@ function D.AutoInteractDoodad()
 		end
 		if bOpen and doodad.CanLoot(me.dwID) then
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_GKPDoodad'], 'Auto open [' .. doodad.szName .. '].', X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(_L['MY_GKPDoodad'], 'Auto open [' .. doodad.szName .. '].', X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			D.dwOpenDoodadID = dwID
 			D.bUpdateLabel = true
@@ -611,7 +611,7 @@ function D.AutoInteractDoodad()
 		end
 		if bIntr and not doodad.CanLoot(me.dwID) then
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_GKPDoodad'], 'Auto interact [' .. doodad.szName .. '].', X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(_L['MY_GKPDoodad'], 'Auto interact [' .. doodad.szName .. '].', X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			D.dwAutoInteractDoodadTime = GetTime() + 500
 			return X.InteractDoodad(dwID)
@@ -644,7 +644,7 @@ function D.OnOpenDoodad(dwID)
 	if doodad and (info.eRuleType ~= 'loot' or D.IsCustomDoodad(doodad) or D.IsRecentDoodad(doodad)) then
 		D.TryAdd(dwID)
 	end
-	X.Debug(_L['MY_GKPDoodad'], 'OnOpenDoodad [' .. X.GetObjectName(TARGET.DOODAD, dwID, 'always') .. ']', X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(_L['MY_GKPDoodad'], 'OnOpenDoodad [' .. X.GetObjectName(TARGET.DOODAD, dwID, 'always') .. ']', X.DEBUG_LEVEL.LOG)
 end
 
 -- save manual doodad

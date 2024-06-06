@@ -537,7 +537,7 @@ function D.SaveHistory()
 	end
 	for szFilePath, data in pairs(UNSAVED_CACHE) do
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_Recount_DS.SaveHistory: ' .. szFilePath, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_Recount_DS.SaveHistory: ' .. szFilePath, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		AsyncSaveLuaData(szFilePath, data)
 	end
@@ -615,7 +615,7 @@ function D.Get(szFilePath)
 	end
 	if not HISTORY_CACHE[szFilePath] then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_Recount_DS.CacheMiss: ' .. szFilePath, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_Recount_DS.CacheMiss: ' .. szFilePath, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		HISTORY_CACHE[szFilePath] = X.LoadLUAData(szFilePath, DS_DATA_CONFIG)
 	end

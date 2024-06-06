@@ -205,7 +205,7 @@ end
 function D.ProduceDiamond()
 	if not D.fnProduceAction then
 		D.StopProduce()
-		X.Systopmsg(_L['Produce failed, action not exist.'], X.CONSTANT.MSG_THEME.ERROR)
+		X.OutputSystemAnnounceMessage(_L['Produce failed, action not exist.'], X.CONSTANT.MSG_THEME.ERROR)
 		return
 	end
 	D.bAwaitDuang = true
@@ -261,7 +261,7 @@ function D.DoAutoDiamond()
 	X.DelayCall(50, function()
 		if not box:IsValid() then
 			D.StopProduce()
-			X.Systopmsg(_L['Casting panel closed, produce stopped.'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Casting panel closed, produce stopped.'], X.CONSTANT.MSG_THEME.ERROR)
 			return
 		end
 		local dwBox, dwX = select(2, box:GetObjectData())
@@ -273,7 +273,7 @@ function D.DoAutoDiamond()
 	X.DelayCall(200, function()
 		if not box:IsValid() then
 			D.StopProduce()
-			X.Systopmsg(_L['Casting panel closed, produce stopped.'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Casting panel closed, produce stopped.'], X.CONSTANT.MSG_THEME.ERROR)
 			return
 		end
 		if D.nAutoCount <= 0 then
@@ -285,7 +285,7 @@ function D.DoAutoDiamond()
 		for _, v in ipairs(D.dFormula) do
 			if not D.RestoreBagDiamond(v) then
 				D.StopProduce()
-				X.Systopmsg(_L['Restore bag failed, material may not enough.'], X.CONSTANT.MSG_THEME.ERROR)
+				X.OutputSystemAnnounceMessage(_L['Restore bag failed, material may not enough.'], X.CONSTANT.MSG_THEME.ERROR)
 				return
 			end
 		end
@@ -493,7 +493,7 @@ X.RegisterEvent('DIAMON_UPDATE', 'MY_AutoDiamond', function()
 			D.StopProduce()
 		elseif arg0 ~= DIAMOND_RESULT_CODE.SUCCESS then
 			D.StopProduce()
-			X.Systopmsg(_L['Casting failed, auto cast stopped.'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Casting failed, auto cast stopped.'], X.CONSTANT.MSG_THEME.ERROR)
 		else
 			D.DoAutoDiamond()
 		end

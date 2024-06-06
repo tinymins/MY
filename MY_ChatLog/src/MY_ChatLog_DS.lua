@@ -78,7 +78,7 @@ function DS:InitDB(bFixProblem)
 		-- 初始化数据库集群列表
 		local aDB = {}
 		--[[#DEBUG BEGIN]]
-		X.Debug(_L['MY_ChatLog'], 'Init node list...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(_L['MY_ChatLog'], 'Init node list...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, szName in ipairs(CPath.GetFileList(self.szRoot) or {}) do
 			local db, bConn = szName:find('^chatlog_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]%.v2%.db$') and MY_ChatLog_DB(self.szRoot .. szName)
@@ -87,25 +87,25 @@ function DS:InitDB(bFixProblem)
 					bConn = db:Connect(true)
 					if bConn then
 						--[[#DEBUG BEGIN]]
-						X.Debug(_L['MY_ChatLog'], 'Checking malformed node ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
+						X.OutputDebugMessage(_L['MY_ChatLog'], 'Checking malformed node ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 						local nMinTime, nMinRecTime = db:GetMinTime(), db:GetMinRecTime()
 						if nMinRecTime < nMinTime then
 							--[[#DEBUG BEGIN]]
-							X.Debug(_L['MY_ChatLog'], 'Fix min time of ' .. db:ToString() .. ' from ' .. nMinTime .. ' to ' .. nMinRecTime, X.DEBUG_LEVEL.WARNING)
+							X.OutputDebugMessage(_L['MY_ChatLog'], 'Fix min time of ' .. db:ToString() .. ' from ' .. nMinTime .. ' to ' .. nMinRecTime, X.DEBUG_LEVEL.WARNING)
 							--[[#DEBUG END]]
 							db:SetMinTime(nMinRecTime)
 						end
 						local nMaxTime, nMaxRecTime = db:GetMaxTime(), db:GetMaxRecTime()
 						if nMaxRecTime > nMaxTime then
 							--[[#DEBUG BEGIN]]
-							X.Debug(_L['MY_ChatLog'], 'Fix max time of ' .. db:ToString() .. ' from ' .. nMaxTime .. ' to ' .. nMaxRecTime, X.DEBUG_LEVEL.WARNING)
+							X.OutputDebugMessage(_L['MY_ChatLog'], 'Fix max time of ' .. db:ToString() .. ' from ' .. nMaxTime .. ' to ' .. nMaxRecTime, X.DEBUG_LEVEL.WARNING)
 							--[[#DEBUG END]]
 							db:SetMaxTime(nMaxRecTime)
 						end
 					else
 						--[[#DEBUG BEGIN]]
-						X.Debug(_L['MY_ChatLog'], 'Connect failed for checking malformed node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
+						X.OutputDebugMessage(_L['MY_ChatLog'], 'Connect failed for checking malformed node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 						--[[#DEBUG END]]
 					end
 				else
@@ -113,17 +113,17 @@ function DS:InitDB(bFixProblem)
 				end
 				if not bConn then
 					--[[#DEBUG BEGIN]]
-					X.Debug(_L['MY_ChatLog'], 'Ignore unconnectable node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
+					X.OutputDebugMessage(_L['MY_ChatLog'], 'Ignore unconnectable node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 					--[[#DEBUG END]]
 					db:Disconnect()
 				elseif db:GetInfo('user_global_id') ~= X.GetClientPlayer().GetGlobalID() then
 					--[[#DEBUG BEGIN]]
-					X.Debug(_L['MY_ChatLog'], 'Ignore foreign node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
+					X.OutputDebugMessage(_L['MY_ChatLog'], 'Ignore foreign node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 					--[[#DEBUG END]]
 					db:Disconnect()
 				elseif db:GetInfo('version') ~= '2' then
 					--[[#DEBUG BEGIN]]
-					X.Debug(_L['MY_ChatLog'], 'Ignore other version node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
+					X.OutputDebugMessage(_L['MY_ChatLog'], 'Ignore other version node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 					--[[#DEBUG END]]
 					db:Disconnect()
 				else
@@ -134,12 +134,12 @@ function DS:InitDB(bFixProblem)
 		SortDB(aDB)
 		-- 删除集群中错误的空节点
 		--[[#DEBUG BEGIN]]
-		X.Debug(_L['MY_ChatLog'], 'Check empty node...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(_L['MY_ChatLog'], 'Check empty node...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for i, db in X.ipairs_r(aDB) do
 			if not (i == #aDB and X.IsHugeNumber(db:GetMaxTime())) and db:CountMsg() == 0 then
 				--[[#DEBUG BEGIN]]
-				X.Debug(_L['MY_ChatLog'], 'Removing unexpected empty node: ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage(_L['MY_ChatLog'], 'Removing unexpected empty node: ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				db:DeleteDB()
 				table.remove(aDB, i)
@@ -147,7 +147,7 @@ function DS:InitDB(bFixProblem)
 		end
 		-- 修复覆盖区域不连续的节点（覆盖区中断问题、分段冲突问题）
 		--[[#DEBUG BEGIN]]
-		X.Debug(_L['MY_ChatLog'], 'Check node continuously...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(_L['MY_ChatLog'], 'Check node continuously...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		do
 			local i = 1
@@ -156,20 +156,20 @@ function DS:InitDB(bFixProblem)
 				-- 检测中间节点最大值
 				if X.IsHugeNumber(db1:GetMaxTime()) then
 					--[[#DEBUG BEGIN]]
-					X.Debug(_L['MY_ChatLog'], 'Unexpected huge MaxTime: ' .. db1:ToString(), X.DEBUG_LEVEL.WARNING)
+					X.OutputDebugMessage(_L['MY_ChatLog'], 'Unexpected huge MaxTime: ' .. db1:ToString(), X.DEBUG_LEVEL.WARNING)
 					--[[#DEBUG END]]
 					if not bFixProblem then
 						return false
 					end
 					db1:SetMaxTime(db1:GetMaxRecTime())
 					--[[#DEBUG BEGIN]]
-					X.Debug(_L['MY_ChatLog'], 'Fix unexpected huge MaxTime: ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage(_L['MY_ChatLog'], 'Fix unexpected huge MaxTime: ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 				end
 				-- 检测区域连续性
 				if db1:GetMaxTime() ~= db2:GetMinTime() then
 					--[[#DEBUG BEGIN]]
-					X.Debug(_L['MY_ChatLog'], 'Unexpected noncontinuously time between ' .. db1:ToString() .. ' and ' .. db2:ToString(), X.DEBUG_LEVEL.WARNING)
+					X.OutputDebugMessage(_L['MY_ChatLog'], 'Unexpected noncontinuously time between ' .. db1:ToString() .. ' and ' .. db2:ToString(), X.DEBUG_LEVEL.WARNING)
 					--[[#DEBUG END]]
 					if not bFixProblem then
 						return false
@@ -177,12 +177,12 @@ function DS:InitDB(bFixProblem)
 					if db1:GetMaxRecTime() <= db2:GetMinTime() then -- 覆盖区中断 扩充左侧区域
 						db1:SetMaxTime(db2:GetMinTime())
 						--[[#DEBUG BEGIN]]
-						X.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by modify ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
+						X.OutputDebugMessage(_L['MY_ChatLog'], 'Fix noncontinuously time by modify ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 					elseif db1:GetMaxTime() <= db2:GetMinRecTime() then -- 覆盖区中断 扩充右侧区域
 						db2:SetMinTime(db1:GetMaxTime())
 						--[[#DEBUG BEGIN]]
-						X.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by modify ' .. db2:ToString(), X.DEBUG_LEVEL.LOG)
+						X.OutputDebugMessage(_L['MY_ChatLog'], 'Fix noncontinuously time by modify ' .. db2:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 					elseif db1:GetMaxTime() >= db2:GetMaxTime() then -- 覆盖区冲突 右侧区域完全被左侧区域包裹 将右侧节点并入左侧节点中
 						for _, rec in ipairs(db2:SelectMsg()) do
@@ -191,7 +191,7 @@ function DS:InitDB(bFixProblem)
 						db1:Flush()
 						db2:DeleteDB()
 						--[[#DEBUG BEGIN]]
-						X.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by merge ' .. db2:ToString() .. ' to ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
+						X.OutputDebugMessage(_L['MY_ChatLog'], 'Fix noncontinuously time by merge ' .. db2:ToString() .. ' to ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 						table.remove(aDB, i + 1)
 						i = i - 1
@@ -204,7 +204,7 @@ function DS:InitDB(bFixProblem)
 						db2:DeleteMsgInterval(nil, nil, 0, db1:GetMaxTime())
 						db2:SetMinTime(db1:GetMaxTime())
 						--[[#DEBUG BEGIN]]
-						X.Debug(_L['MY_ChatLog'], 'Fix noncontinuously time by moving data from ' .. db2:ToString() .. ' to ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
+						X.OutputDebugMessage(_L['MY_ChatLog'], 'Fix noncontinuously time by moving data from ' .. db2:ToString() .. ' to ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 					end
 				end
@@ -213,7 +213,7 @@ function DS:InitDB(bFixProblem)
 		end
 		-- 检查集群最新活跃节点是否存在
 		--[[#DEBUG BEGIN]]
-		X.Debug(_L['MY_ChatLog'], 'Check latest node...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(_L['MY_ChatLog'], 'Check latest node...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local db = aDB[#aDB]
 		if db and X.IsHugeNumber(db:GetMaxTime()) then -- 存在： 检查集群最新活跃节点压力是否超限
@@ -222,7 +222,7 @@ function DS:InitDB(bFixProblem)
 				local dbNew = NewDB(self.szRoot, db:GetMaxTime(), math.huge)
 				table.insert(aDB, dbNew)
 				--[[#DEBUG BEGIN]]
-				X.Debug(_L['MY_ChatLog'], 'Create new empty active node ' .. dbNew:ToString() .. ' after ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage(_L['MY_ChatLog'], 'Create new empty active node ' .. dbNew:ToString() .. ' after ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			end
 		else -- 不存在： 创建
@@ -235,21 +235,21 @@ function DS:InitDB(bFixProblem)
 			local dbNew = NewDB(self.szRoot, nMinTime, math.huge)
 			table.insert(aDB, dbNew)
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_ChatLog'], 'Create new empty active node ' .. dbNew:ToString(), X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(_L['MY_ChatLog'], 'Create new empty active node ' .. dbNew:ToString(), X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 		-- 检查集群最久远节点开始时间是否为0
 		--[[#DEBUG BEGIN]]
-		X.Debug(_L['MY_ChatLog'], 'Check oldest node...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(_L['MY_ChatLog'], 'Check oldest node...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local db = aDB[1]
 		if db:GetMinTime() ~= 0 then
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_ChatLog'], 'Unexpected MinTime for first DB: ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage(_L['MY_ChatLog'], 'Unexpected MinTime for first DB: ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			db:SetMinTime(0)
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_ChatLog'], 'Fix unexpected MinTime for first DB: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(_L['MY_ChatLog'], 'Fix unexpected MinTime for first DB: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 		self.aDB = aDB
@@ -266,31 +266,31 @@ end
 
 function DS:OptimizeDB()
 	--[[#DEBUG BEGIN]]
-	X.Debug(_L['MY_ChatLog'], 'OptimizeDB Start!', X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(_L['MY_ChatLog'], 'OptimizeDB Start!', X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	if self:ReinitDB(true) then
 		--[[#DEBUG BEGIN]]
-		X.Debug(_L['MY_ChatLog'], 'Checking node time zone overflow...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(_L['MY_ChatLog'], 'Checking node time zone overflow...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, db in ipairs(self.aDB) do
 			local nMinTime, nMinRecTime = db:GetMinTime(), db:GetMinRecTime()
 			if nMinTime > nMinRecTime then
 				--[[#DEBUG BEGIN]]
-				X.Debug(_L['MY_ChatLog'], 'Node logic error detected: MinTime > MinRecTime in ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage(_L['MY_ChatLog'], 'Node logic error detected: MinTime > MinRecTime in ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				db:SetMinTime(nMinRecTime)
 				--[[#DEBUG BEGIN]]
-				X.Debug(_L['MY_ChatLog'], 'Fix logic error: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage(_L['MY_ChatLog'], 'Fix logic error: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			end
 			local nMaxTime, nMaxRecTime = db:GetMaxTime(), db:GetMaxRecTime()
 			if nMaxTime < nMaxRecTime then
 				--[[#DEBUG BEGIN]]
-				X.Debug(_L['MY_ChatLog'], 'Node logic error detected: MaxTime < MaxRecTime in ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage(_L['MY_ChatLog'], 'Node logic error detected: MaxTime < MaxRecTime in ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				db:SetMaxTime(nMaxRecTime)
 				--[[#DEBUG BEGIN]]
-				X.Debug(_L['MY_ChatLog'], 'Fix logic error: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage(_L['MY_ChatLog'], 'Fix logic error: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			end
 		end
@@ -300,7 +300,7 @@ function DS:OptimizeDB()
 			local db = self.aDB[i]
 			if db:CountMsg() > SINGLE_DB_AMOUNT then -- 单个节点压力过大 转移超出部分到下一个节点
 				--[[#DEBUG BEGIN]]
-				X.Debug(_L['MY_ChatLog'], 'Node count exceed limit: ' .. db:ToString() .. ' ' .. db:CountMsg(), X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage(_L['MY_ChatLog'], 'Node count exceed limit: ' .. db:ToString() .. ' ' .. db:CountMsg(), X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				local aRec = db:SelectMsg(nil, nil, nil, nil, SINGLE_DB_AMOUNT)
 				local nMaxTime, nMinTime = aRec[1].nTime, aRec[#aRec].nTime
@@ -321,7 +321,7 @@ function DS:OptimizeDB()
 					i = i + 1
 					table.insert(self.aDB, i, dbNew)
 					--[[#DEBUG BEGIN]]
-					X.Debug(_L['MY_ChatLog'], 'Moving ' .. SINGLE_DB_AMOUNT .. ' records from ' .. db:ToString() .. ' to ' .. dbNew:ToString(), X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage(_L['MY_ChatLog'], 'Moving ' .. SINGLE_DB_AMOUNT .. ' records from ' .. db:ToString() .. ' to ' .. dbNew:ToString(), X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 				end
 				-- 处理剩下不超过单个节点最大负载的结果
@@ -332,7 +332,7 @@ function DS:OptimizeDB()
 						i = i + 1
 						table.insert(self.aDB, i, dbNew)
 						--[[#DEBUG BEGIN]]
-						X.Debug(_L['MY_ChatLog'], 'Create new active node: ' .. dbNew:ToString(), X.DEBUG_LEVEL.LOG)
+						X.OutputDebugMessage(_L['MY_ChatLog'], 'Create new active node: ' .. dbNew:ToString(), X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 					end
 				else
@@ -353,23 +353,23 @@ function DS:OptimizeDB()
 					end
 					dbNext:Flush()
 					--[[#DEBUG BEGIN]]
-					X.Debug(_L['MY_ChatLog'], 'Moving ' .. #aRec .. ' records from ' .. db:ToString() .. ' to ' .. dbNext:ToString(), X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage(_L['MY_ChatLog'], 'Moving ' .. #aRec .. ' records from ' .. db:ToString() .. ' to ' .. dbNext:ToString(), X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 				end
 				db:Flush()
 				db:SetMaxTime(nMaxTime)
 				--[[#DEBUG BEGIN]]
-				X.Debug(_L['MY_ChatLog'], 'Modify node property: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage(_L['MY_ChatLog'], 'Modify node property: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				-- 压缩数据库
 				db:GarbageCollection()
 				--[[#DEBUG BEGIN]]
-				X.Debug(_L['MY_ChatLog'], 'Node GarbageCollection: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage(_L['MY_ChatLog'], 'Node GarbageCollection: ' .. db:ToString(), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			elseif db:CountMsg() < SINGLE_DB_AMOUNT then -- 单个节点压力过小 与下个节点合并
 				if i < #self.aDB then
 					--[[#DEBUG BEGIN]]
-					X.Debug(_L['MY_ChatLog'], 'Node count insufficient: ' .. db:ToString() .. ' ' .. db:CountMsg(), X.DEBUG_LEVEL.WARNING)
+					X.OutputDebugMessage(_L['MY_ChatLog'], 'Node count insufficient: ' .. db:ToString() .. ' ' .. db:CountMsg(), X.DEBUG_LEVEL.WARNING)
 					--[[#DEBUG END]]
 					local dbNext = self.aDB[i + 1]
 					dbNext:SetMinTime(db:GetMinTime())
@@ -378,7 +378,7 @@ function DS:OptimizeDB()
 					end
 					dbNext:Flush()
 					--[[#DEBUG BEGIN]]
-					X.Debug(_L['MY_ChatLog'], 'Merge node ' .. db:ToString() .. ' to ' .. dbNext:ToString(), X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage(_L['MY_ChatLog'], 'Merge node ' .. db:ToString() .. ' to ' .. dbNext:ToString(), X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					db:DeleteDB()
 					table.remove(self.aDB, i)
@@ -388,9 +388,9 @@ function DS:OptimizeDB()
 			i = i + 1
 		end
 	--[[#DEBUG BEGIN]]
-		X.Debug(_L['MY_ChatLog'], 'OptimizeDB Finished!', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(_L['MY_ChatLog'], 'OptimizeDB Finished!', X.DEBUG_LEVEL.LOG)
 	else
-		X.Debug(_L['MY_ChatLog'], 'OptimizeDB Failed! ReinitDB Failed!', X.DEBUG_LEVEL.WARNING)
+		X.OutputDebugMessage(_L['MY_ChatLog'], 'OptimizeDB Failed! ReinitDB Failed!', X.DEBUG_LEVEL.WARNING)
 	--[[#DEBUG END]]
 	end
 	return self

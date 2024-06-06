@@ -24,7 +24,7 @@ X.CreateDataRoot(X.PATH_TYPE.GLOBAL)
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
 local DB = X.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v5.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return X.Sysmsg(_L['MY_MiddleMapMark'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
+	return X.OutputSystemMessage(_L['MY_MiddleMapMark'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
 DB:Execute([[
 	CREATE TABLE IF NOT EXISTS NpcInfo (
@@ -125,7 +125,7 @@ function D.Migration()
 						end
 						DBD_W:Reset()
 						--[[#DEBUG BEGIN]]
-						X.Debug('MY_MiddleMapMark', 'MiddleMapMark cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
+						X.OutputDebugMessage('MY_MiddleMapMark', 'MiddleMapMark cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 					end
 				end

@@ -47,7 +47,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				local aGongZhan = {} -- 扫描到的共战数据
 				local nCount, nIndex = #aPendingID, 1
 				local function Echo(nIndex, nCount)
-					X.Topmsg(_L('Scanning gongzhan: %d/%d', nIndex, nCount))
+					X.OutputAnnounceMessage(_L('Scanning gongzhan: %d/%d', nIndex, nCount))
 				end
 				X.RenderCall('MY_GongzhanCheck', function()
 					local bTermial, bStep

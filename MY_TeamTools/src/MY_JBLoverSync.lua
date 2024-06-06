@@ -37,7 +37,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 			if lover and tFellowship and lover.xID == tFellowship.xID then
 				X.Confirm(_L('[%s] want to sync lover relation to jx3box, do you agree?', szTalkerName), function()
 					if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-						X.Systopmsg(_L['Sync lover is a sensitive action, please unlock to continue.'])
+						X.OutputSystemAnnounceMessage(_L['Sync lover is a sensitive action, please unlock to continue.'])
 						return false
 					end
 					X.SendBgMsg(szTalkerName, 'MY_JB_LOVER_SYNC', {'SYNC_ANS', X.GetClientPlayerGlobalID()})
@@ -87,7 +87,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		onClick = function()
 			local lover = MY_Love.GetLover()
 			if lover then
-				X.Systopmsg(_L['Sync lover request sent, please wait for peer to agree.'])
+				X.OutputSystemAnnounceMessage(_L['Sync lover request sent, please wait for peer to agree.'])
 				X.SendBgMsg(lover.szName, 'MY_JB_LOVER_SYNC', {'SYNC'})
 			else
 				D.SyncLover('', '')

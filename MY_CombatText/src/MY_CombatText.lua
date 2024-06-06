@@ -1064,9 +1064,9 @@ function D.LoadConfig()
 			COMBAT_TEXT_SKILL_TYPE_IGNORE = data.COMBAT_TEXT_SKILL_TYPE_IGNORE   or {}
 			COMBAT_TEXT_COLOR             = data.COMBAT_TEXT_COLOR               or COMBAT_TEXT_COLOR
 			COMBAT_TEXT_CRITICAL_COLOR    = data.COMBAT_TEXT_CRITICAL_COLOR      or COMBAT_TEXT_CRITICAL_COLOR
-			X.Sysmsg(_L['Combat text config loaded.'])
+			X.OutputSystemMessage(_L['Combat text config loaded.'])
 		else
-			X.Sysmsg(_L['Combat text config failed.'])
+			X.OutputSystemMessage(_L['Combat text config failed.'])
 		end
 	end
 end
@@ -1599,14 +1599,14 @@ local function OnLoadingEnding()
 	local me = X.GetControlPlayer()
 	if not me then
 		--[[#DEBUG BEGIN]]
-		X.Debug('CombatText get player id failed!!! try again', X.DEBUG_LEVEL.ERROR)
+		X.OutputDebugMessage('CombatText get player id failed!!! try again', X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		X.DelayCall(1000, OnLoadingEnding)
 		return
 	end
 	COMBAT_TEXT_PLAYERID = me.dwID
 	--[[#DEBUG BEGIN]]
-	-- X.Debug('CombatText get player id ' .. me.dwID, X.DEBUG_LEVEL.LOG)
+	-- X.OutputDebugMessage('CombatText get player id ' .. me.dwID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	COMBAT_TEXT_IN_ROGUELIKE_MAP = X.IsInRoguelikeMap()
 end

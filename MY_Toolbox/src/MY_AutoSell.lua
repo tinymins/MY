@@ -91,7 +91,7 @@ function D.SellItem(nNpcID, nShopID, dwBox, dwX, nCount, szReason, szName, nUiId
 		return
 	end
 	SellItem(nNpcID, nShopID, dwBox, dwX, nCount)
-	X.Sysmsg(_L('Auto sell %s item: %s.', szReason, szName))
+	X.OutputSystemMessage(_L('Auto sell %s item: %s.', szReason, szName))
 end
 
 -- 自动售出物品

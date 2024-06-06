@@ -155,7 +155,7 @@ function D.FetchPacketList(szType, nPage)
 						table.insert(aErrmsg, i .. '. ' .. err.message)
 					end
 					local szErrmsg = _L['Fetch repo meta list failed.'] .. '\n' .. table.concat(aErrmsg, '\n')
-					X.Debug(_L['MY_TeamMon_VoiceAlarm'], szErrmsg, X.DEBUG_LEVEL.WARNING)
+					X.OutputDebugMessage(_L['MY_TeamMon_VoiceAlarm'], szErrmsg, X.DEBUG_LEVEL.WARNING)
 					reject(X.Error:new(szErrmsg))
 					return
 				end
@@ -245,7 +245,7 @@ function D.FetchSlugList()
 						table.insert(aErrmsg, i .. '. ' .. err.message)
 					end
 					local szErrmsg = _L['Fetch repo meta list failed.'] .. '\n' .. table.concat(aErrmsg, '\n')
-					X.Debug(_L['MY_TeamMon_VoiceAlarm'], szErrmsg, X.DEBUG_LEVEL.WARNING)
+					X.OutputDebugMessage(_L['MY_TeamMon_VoiceAlarm'], szErrmsg, X.DEBUG_LEVEL.WARNING)
 					reject(X.Error:new(szErrmsg))
 					return
 				end
@@ -344,7 +344,7 @@ function D.FetchVoiceList(szType, bDownload)
 						table.insert(aErrmsg, i .. '. ' .. err.message)
 					end
 					local szErrmsg = _L['Fetch repo meta list failed.'] .. '\n' .. table.concat(aErrmsg, '\n')
-					X.Debug(_L['MY_TeamMon_VoiceAlarm'], szErrmsg, X.DEBUG_LEVEL.WARNING)
+					X.OutputDebugMessage(_L['MY_TeamMon_VoiceAlarm'], szErrmsg, X.DEBUG_LEVEL.WARNING)
 					reject(X.Error:new(szErrmsg))
 					return
 				end
@@ -393,7 +393,7 @@ function D.DownloadPacket(szType)
 		return DOWNLOADER_CACHE[dwPacketID]
 	end
 	--[[#DEBUG BEGIN]]
-	X.Debug('MY_TeamMon_VoiceAlarm', 'DownloadPacket ' .. szType .. ' ' .. dwPacketID, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage('MY_TeamMon_VoiceAlarm', 'DownloadPacket ' .. szType .. ' ' .. dwPacketID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	DOWNLOADER_CACHE[dwPacketID] = X.ProgressPromise:new(function(resolve, reject, progress)
 		if dwPacketID == 0 then
@@ -439,7 +439,7 @@ function D.DownloadPacket(szType)
 				CPath.MakeDir(szRoot)
 
 				--[[#DEBUG BEGIN]]
-				X.Debug('MY_TeamMon_VoiceAlarm', 'DownloadPacket ' .. szType .. ' (ID' .. dwPacketID .. ') ' .. #aVoice .. ' voices', X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage('MY_TeamMon_VoiceAlarm', 'DownloadPacket ' .. szType .. ' (ID' .. dwPacketID .. ') ' .. #aVoice .. ' voices', X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 
 				local function FetchNext()
@@ -465,7 +465,7 @@ function D.DownloadPacket(szType)
 						return
 					end
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_TeamMon_VoiceAlarm', 'DownloadPacket Voice ' .. szURL .. ' to ' .. szPath, X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage('MY_TeamMon_VoiceAlarm', 'DownloadPacket Voice ' .. szURL .. ' to ' .. szPath, X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					X.DownloadFile(szURL, szPath)
 						:Then(function()
@@ -484,7 +484,7 @@ function D.DownloadPacket(szType)
 			end)
 			:Catch(function(error)
 				--[[#DEBUG BEGIN]]
-				X.Debug('MY_TeamMon_VoiceAlarm', 'DownloadPacket ERROR ' .. szType .. ' ' .. dwPacketID .. '\n' .. error.message, X.DEBUG_LEVEL.ERROR)
+				X.OutputDebugMessage('MY_TeamMon_VoiceAlarm', 'DownloadPacket ERROR ' .. szType .. ' ' .. dwPacketID .. '\n' .. error.message, X.DEBUG_LEVEL.ERROR)
 				--[[#DEBUG END]]
 				return X.Promise.Reject(error)
 			end)
@@ -513,7 +513,7 @@ function D.PlayVoice(szType, szSlug)
 		voice = tVoiceCache and tVoiceCache[szSlug]
 		if not voice or dwPacketID == 0 then
 			--[[#DEBUG BEGIN]]
-			X.Debug('MY_TeamMon_VoiceAlarm', 'PlayVoice ERROR ' .. szType .. ' ' .. szSlug .. ' ' .. ' voice not found', X.DEBUG_LEVEL.ERROR)
+			X.OutputDebugMessage('MY_TeamMon_VoiceAlarm', 'PlayVoice ERROR ' .. szType .. ' ' .. szSlug .. ' ' .. ' voice not found', X.DEBUG_LEVEL.ERROR)
 			--[[#DEBUG END]]
 			return
 		end
@@ -528,7 +528,7 @@ function D.PlayVoice(szType, szSlug)
 	local dwCRC = GetFileCRC(szPath)
 	if dwCRC ~= voice.dwCRC then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_TeamMon_VoiceAlarm', 'PlayVoice ERROR ' .. szType .. ' ' .. szSlug .. ' ' .. szPath .. ' CRC mismatch ' .. tostring(dwCRC) .. ' ~= ' .. voice.dwCRC, X.DEBUG_LEVEL.ERROR)
+		X.OutputDebugMessage('MY_TeamMon_VoiceAlarm', 'PlayVoice ERROR ' .. szType .. ' ' .. szSlug .. ' ' .. szPath .. ' CRC mismatch ' .. tostring(dwCRC) .. ' ~= ' .. voice.dwCRC, X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end

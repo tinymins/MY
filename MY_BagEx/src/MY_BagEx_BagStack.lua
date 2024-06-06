@@ -38,7 +38,7 @@ function D.Operate()
 	local function fnNext()
 		bTrigger = true
 		if not frame then
-			X.Systopmsg(_L['Bag panel closed, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Bag panel closed, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			return fnFinish()
 		end
 		local me, tList = X.GetClientPlayer(), {}
@@ -55,7 +55,7 @@ function D.Operate()
 					if tPos then
 						local dwBox1, dwX1 = tPos.dwBox, tPos.dwX
 						--[[#DEBUG BEGIN]]
-						X.Debug('MY_BagEx_BagStack', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
+						X.OutputDebugMessage('MY_BagEx_BagStack', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 						X.ExchangeInventoryItem(dwBox, dwX, dwBox1, dwX1)
 						return
@@ -74,7 +74,7 @@ function D.Operate()
 		X.RegisterEvent('BAG_ITEM_UPDATE', 'MY_BagEx_BagStack__Stack', function()
 			local dwBox, dwX, bNewAdd = arg0, arg1, arg2
 			if bNewAdd then
-				X.Systopmsg(_L['Put new item in bag detected, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
+				X.OutputSystemAnnounceMessage(_L['Put new item in bag detected, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
 				fnFinish()
 			else
 				X.DelayCall('MY_BagEx_BagStack__Stack', fnNext)

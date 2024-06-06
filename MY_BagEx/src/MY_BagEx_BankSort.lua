@@ -34,11 +34,11 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	for _, dwBox in ipairs(X.CONSTANT.INVENTORY_BANK_LIST) do
 		local dwGenre = me.GetContainType(dwBox)
 		if dwGenre == ITEM_GENRE.BOOK then
-			X.Systopmsg(_L['Bank contains book only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Bank contains book only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
 			return
 		end
 		if dwGenre == ITEM_GENRE.MATERIAL then
-			X.Systopmsg(_L['Bank contains material only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Bank contains material only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
 			return
 		end
 		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
@@ -104,7 +104,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	local nIndex, bChanged = 1, false
 	local function fnNext()
 		if not hFrame then
-			X.Systopmsg(_L['Bank panel closed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Bank panel closed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			return fnFinish()
 		end
 		if szState == 'Exchanging' then
@@ -177,7 +177,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 						local szMsg = bChanged
 							and _L['Bank item changed, sort finished, result may not be perfect!']
 							or _L['Cannot find item temp position, bank is full, sort exited!']
-						X.Systopmsg(szMsg, X.CONSTANT.MSG_THEME.ERROR)
+						X.OutputSystemAnnounceMessage(szMsg, X.CONSTANT.MSG_THEME.ERROR)
 						return fnFinish()
 					end
 				end
@@ -197,7 +197,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 						local szMsg = bChanged
 							and _L['Bank item changed, sort finished, result may not be perfect!']
 							or _L['Cannot find item temp position, bank is full, sort exited!']
-						X.Systopmsg(szMsg, X.CONSTANT.MSG_THEME.ERROR)
+						X.OutputSystemAnnounceMessage(szMsg, X.CONSTANT.MSG_THEME.ERROR)
 						return fnFinish()
 					end
 				end
@@ -205,12 +205,12 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 				szState = 'Exchanging'
 				if kCurItem then
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_BagEx_BankSort', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwExcBox .. ',' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage('MY_BagEx_BankSort', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwExcBox .. ',' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					X.ExchangeInventoryItem(dwBox, dwX, dwExcBox, dwExcX)
 				else
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_BagEx_BankSort', 'ExchangeItem: ' ..dwExcBox .. ',' .. dwExcX .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage('MY_BagEx_BankSort', 'ExchangeItem: ' ..dwExcBox .. ',' .. dwExcX .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					X.ExchangeInventoryItem(dwExcBox, dwExcX, dwBox, dwX)
 				end
@@ -224,7 +224,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 		if (event == 'BAG_ITEM_UPDATE' and dwBox >= INVENTORY_INDEX.BANK_PACKAGE1 and dwBox <= INVENTORY_INDEX.BANK_PACKAGE5)
 		or event == 'BANK_ITEM_UPDATE' then
 			if bNewAdd then
-				X.Systopmsg(_L['Put new item in bank detected, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+				X.OutputSystemAnnounceMessage(_L['Put new item in bank detected, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 				fnFinish()
 			elseif szState == 'Exchanging' then
 				szState = 'Idle'
@@ -263,7 +263,7 @@ function D.CheckInjection(bRemoveInjection)
 					},
 					onLClick = function()
 						if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.BANK) then
-							X.Systopmsg(_L['Please unlock mibao first.'])
+							X.OutputSystemAnnounceMessage(_L['Please unlock mibao first.'])
 							return
 						end
 						local bRandom = IsShiftKeyDown()
@@ -299,7 +299,7 @@ function D.CheckInjection(bRemoveInjection)
 											MY_BagEx_Bank.ShowAllItemShadow()
 											D.Operate(false, false, aBlueprint)
 										else
-											X.Systopmsg(_L['Invalid blueprint data'])
+											X.OutputSystemAnnounceMessage(_L['Invalid blueprint data'])
 										end
 									end, nil, nil, nil, '')
 								end,

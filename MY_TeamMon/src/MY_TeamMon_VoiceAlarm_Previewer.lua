@@ -107,7 +107,7 @@ function D.OnItemLButtonClick()
 		MY_TeamMon_VoiceAlarm.PlayVoice(this:GetRoot().szType, this.szSlug)
 	elseif name == 'Text_Preview_Title' then
 		SetDataToClip(this.szSlug)
-		MY.Topmsg(_L['Voice slug name has been copied to clipboard'])
+		MY.OutputAnnounceMessage(_L['Voice slug name has been copied to clipboard'])
 	end
 end
 

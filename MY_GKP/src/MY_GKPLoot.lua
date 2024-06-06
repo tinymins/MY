@@ -315,7 +315,7 @@ function D.IsEnabled()
 end
 
 function D.OutputEnable()
-	X.Systopmsg(
+	X.OutputSystemAnnounceMessage(
 		D.IsEnabled()
 			and _L['MY_GKPLoot enabled in current map']
 			or _L['MY_GKPLoot disabled in current map']
@@ -642,7 +642,7 @@ function D.OnLButtonClick()
 		X.UI.PopupMenu(menu)
 	elseif szName == 'Btn_Boss' then
 		if not D.AuthCheck(this:GetParent().dwDoodadID) then
-			return X.Topmsg(_L['You are not the distrubutor.'])
+			return X.OutputAnnounceMessage(_L['You are not the distrubutor.'])
 		end
 		D.GetBossAction(this:GetParent().dwDoodadID, type(MY_GKP_LOOT_BOSS) == 'nil')
 	end
@@ -754,13 +754,13 @@ function D.OnItemLButtonClick()
 			if doodad.CanLoot(me.dwID) then
 				X.OpenDoodad(me, doodad)
 			elseif not doodad.CanDialog(me) then
-				X.Topmsg(g_tStrings.TIP_TOO_FAR)
+				X.OutputAnnounceMessage(g_tStrings.TIP_TOO_FAR)
 			end
 		end
 		if data.bDist then
 			if not doodad then
 				--[[#DEBUG BEGIN]]
-				X.Debug('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				return D.RemoveLootList(dwDoodadID)
 			end
@@ -772,9 +772,9 @@ function D.OnItemLButtonClick()
 			if team.nLootMode ~= PARTY_LOOT_MODE.BIDDING then
 				return OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_BID_LOOT)
 			end
-			X.Sysmsg(_L['GKP does not support bidding, please re open loot list.'])
+			X.OutputSystemMessage(_L['GKP does not support bidding, please re open loot list.'])
 		elseif data.bNeedRoll then
-			X.Topmsg(g_tStrings.ERROR_LOOT_ROLL)
+			X.OutputAnnounceMessage(g_tStrings.ERROR_LOOT_ROLL)
 		else -- зѓМќУўзп
 			LootItem(dwDoodadID, data.dwID)
 		end
@@ -794,12 +794,12 @@ function D.OnItemLButtonClick()
 			local doodad     = X.GetDoodad(dwDoodadID)
 			if not doodad then
 				--[[#DEBUG BEGIN]]
-				X.Debug('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				return D.RemoveLootList(dwDoodadID)
 			end
 			if not D.AuthCheck(dwDoodadID) then
-				return X.Topmsg(_L['You are not the distrubutor.'])
+				return X.OutputAnnounceMessage(_L['You are not the distrubutor.'])
 			end
 		end
 		return X.UI.PopupMenu(D.GetDistributeMenu(aItemData, hItem.itemData.szType))
@@ -1163,7 +1163,7 @@ function D.AuthCheck(dwID)
 	local doodad         = X.GetDoodad(dwID)
 	if not doodad then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_GKPLoot:AuthCheck', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
+		X.OutputDebugMessage('MY_GKPLoot:AuthCheck', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		return
 	end
@@ -1206,7 +1206,7 @@ function D.GetaPartyMember(aDoodadID)
 						end
 					end
 				else
-					X.Sysmsg(_L['Pick up time limit exceeded, please try again.'])
+					X.OutputSystemMessage(_L['Pick up time limit exceeded, please try again.'])
 				end
 			end
 			tDoodadID[dwDoodadID] = true
@@ -1243,14 +1243,14 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 	local item = GetItem(info.dwID)
 	if not item then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_GKPLoot', 'Item does not exist, check!!', X.DEBUG_LEVEL.WARNING)
+		X.OutputDebugMessage('MY_GKPLoot', 'Item does not exist, check!!', X.DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		local aItemData = D.GetDoodadLootInfo(info.dwDoodadID)
 		for k, v in ipairs(aItemData) do
 			if v.nQuality == info.nQuality and X.GetItemNameByItem(v.item) == info.szName then
 				info.dwID = v.item.dwID
 				--[[#DEBUG BEGIN]]
-				X.Debug('MY_GKPLoot', 'Item matching, ' .. X.GetItemNameByItem(v.item), X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage('MY_GKPLoot', 'Item matching, ' .. X.GetItemNameByItem(v.item), X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				break
 			end
@@ -1296,11 +1296,11 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 			GKP_LOOT_RECENT[szAutoDistType] = dwID
 		end
 		if DEBUG_LOOT then
-			return X.Sysmsg('LOOT: ' .. info.dwID .. '->' .. dwID) -- !!! Debug
+			return X.OutputSystemMessage('LOOT: ' .. info.dwID .. '->' .. dwID) -- !!! Debug
 		end
 		X.DistributeDoodadItem(doodad.dwID, info.dwID, dwID)
 	else
-		X.Sysmsg(_L['Userdata is overdue, distribut failed, please try again.'])
+		X.OutputSystemMessage(_L['Userdata is overdue, distribut failed, please try again.'])
 	end
 end
 
@@ -1655,14 +1655,14 @@ function D.DrawLootList(dwID, bRemove)
 			end
 		end
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_GKPLoot', ('Doodad %d, items %d, display %d.'):format(dwID, #aItemData, nCount), X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_GKPLoot', ('Doodad %d, items %d, display %d.'):format(dwID, #aItemData, nCount), X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 
 		if not szName or nCount == 0 then
 			if not szName then
 				D.RemoveLootList(dwID)
 				--[[#DEBUG BEGIN]]
-				X.Debug('MY_GKPLoot:DrawLootList', 'Doodad does not exist!', X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage('MY_GKPLoot:DrawLootList', 'Doodad does not exist!', X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			elseif frame then
 				D.DrawLootList(dwID, true)
@@ -1749,7 +1749,7 @@ function D.DrawLootList(dwID, bRemove)
 		X.ExecuteWithThis(frame, D.OnFrameBreathe)
 		--[[#DEBUG BEGIN]]
 		nTickCount = GetTickCount() - nTickCount
-		X.Debug(
+		X.OutputDebugMessage(
 			_L['PMTool'],
 			_L('DrawLootList %d in %dms.', dwID, nTickCount),
 			X.DEBUG_LEVEL.PM_LOG)
@@ -2020,7 +2020,7 @@ X.RegisterEvent('OPEN_DOODAD', function()
 		return D.DrawLootList(arg0, true)
 	end
 	--[[#DEBUG BEGIN]]
-	X.Debug('MY_GKPLoot', 'Open Doodad: ' .. arg0, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage('MY_GKPLoot', 'Open Doodad: ' .. arg0, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	D.InsertLootList(arg0)
 	D.HideSystemLoot()

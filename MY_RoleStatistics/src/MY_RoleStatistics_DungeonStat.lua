@@ -23,7 +23,7 @@ CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
 local DB = X.SQLiteConnect(_L['MY_RoleStatistics_DungeonStat'], {'userdata/role_statistics/dungeon_stat.v3.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return X.Sysmsg(_L['MY_RoleStatistics_DungeonStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
+	return X.OutputSystemMessage(_L['MY_RoleStatistics_DungeonStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 
@@ -440,7 +440,7 @@ function D.ProcessProgressRequestQueue()
 			if dwID then
 				D.tMapProgressRequestTime[dwID] = GetTime()
 				--[[#DEBUG BEGIN]]
-				X.Debug(
+				X.OutputDebugMessage(
 					_L['PMTool'],
 					_L('[MY_RoleStatistics_DungeonStat] ApplyDungeonRoleProgress: %d.', dwID),
 					X.DEBUG_LEVEL.PM_LOG)
@@ -523,7 +523,7 @@ function D.FlushDB(bForceUpdate)
 
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	X.Debug('MY_RoleStatistics_DungeonStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
+	X.OutputDebugMessage('MY_RoleStatistics_DungeonStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
 	--[[#DEBUG END]]
 end
 X.RegisterFlush('MY_RoleStatistics_DungeonStat', function() D.FlushDB() end)
@@ -554,14 +554,14 @@ function D.UpdateSaveDB()
 	end
 	if not O.bSaveDB then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_RoleStatistics_DungeonStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB_DungeonInfoD:ClearBindings()
 		DB_DungeonInfoD:BindAll(AnsiToUTF8(X.GetClientPlayerGlobalID()))
 		DB_DungeonInfoD:Execute()
 		DB_DungeonInfoD:Reset()
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_RoleStatistics_DungeonStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_RoleStatistics_DungeonStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_DUNGEON_UPDATE')

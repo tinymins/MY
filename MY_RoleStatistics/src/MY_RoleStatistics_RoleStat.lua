@@ -642,7 +642,7 @@ function D.FlushDB()
 	X.SaveLUAData(PLAYER_REC_FILE, rec)
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	X.Debug('MY_RoleStatistics_RoleStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
+	X.OutputDebugMessage('MY_RoleStatistics_RoleStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
 	--[[#DEBUG END]]
 end
 
@@ -656,13 +656,13 @@ function D.UpdateSaveDB()
 	end
 	if not O.bSaveDB then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_RoleStatistics_RoleStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_RoleStatistics_RoleStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local data = X.LoadLUAData(STAT_DATA_FILE) or {}
 		data[X.GetClientPlayerGlobalID()] = nil
 		X.SaveLUAData(STAT_DATA_FILE, data)
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_RoleStatistics_RoleStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_RoleStatistics_RoleStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_ROLE_UPDATE')
@@ -1252,10 +1252,10 @@ function D.OutputAlert()
 	local szText, szDailyText = table.concat(aText, GetFormatSysmsgText(_L[','])), table.concat(aDailyText, GetFormatSysmsgText(_L[',']))
 	if GetTime() - D.dwLastAlertTime > 10000 or D.szLastAlert ~= szText or D.szLastDailyAlert ~= szDailyText then
 		if not X.IsEmpty(szText) and szText ~= szDailyText then
-			X.Sysmsg({ GetFormatSysmsgText(_L['Current online ']) .. szText .. GetFormatSysmsgText(_L['.']), rich = true })
+			X.OutputSystemMessage({ GetFormatSysmsgText(_L['Current online ']) .. szText .. GetFormatSysmsgText(_L['.']), rich = true })
 		end
 		if not X.IsEmpty(szDailyText) then
-			X.Sysmsg({ GetFormatSysmsgText(_L['Today online ']) .. szDailyText .. GetFormatSysmsgText(_L['.']), rich = true })
+			X.OutputSystemMessage({ GetFormatSysmsgText(_L['Today online ']) .. szDailyText .. GetFormatSysmsgText(_L['.']), rich = true })
 		end
 		D.dwLastAlertTime = GetTime()
 		D.szLastAlert = szText

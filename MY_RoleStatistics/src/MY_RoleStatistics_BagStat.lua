@@ -24,7 +24,7 @@ CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
 local DB = X.SQLiteConnect(_L['MY_RoleStatistics_BagStat'], {'userdata/role_statistics/bag_stat.v4.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return X.Sysmsg(_L['MY_RoleStatistics_BagStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
+	return X.OutputSystemMessage(_L['MY_RoleStatistics_BagStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
 local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_BagStat.ini'
 local PAGE_DISPLAY = 15
@@ -490,7 +490,7 @@ function D.FlushDB()
 			DB_ItemsDL:Execute()
 			--[[#DEBUG BEGIN]]
 		else
-			X.Debug('MY_RoleStatistics_BagStat', 'bag boxtype not in static map: ' .. boxtype, X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('MY_RoleStatistics_BagStat', 'bag boxtype not in static map: ' .. boxtype, X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 		end
 	end
@@ -524,7 +524,7 @@ function D.FlushDB()
 			DB_ItemsDL:Execute()
 			--[[#DEBUG BEGIN]]
 		else
-			X.Debug('MY_RoleStatistics_BagStat', 'bank boxtype not in static map: ' .. boxtype, X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('MY_RoleStatistics_BagStat', 'bank boxtype not in static map: ' .. boxtype, X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 		end
 	end
@@ -549,7 +549,7 @@ function D.FlushDB()
 				DB_ItemsW:Execute()
 				--[[#DEBUG BEGIN]]
 			else
-				X.Debug('MY_RoleStatistics_BagStat', 'guild bank boxtype not in static map: ' .. info.boxtype, X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage('MY_RoleStatistics_BagStat', 'guild bank boxtype not in static map: ' .. info.boxtype, X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 			end
 		end
@@ -565,7 +565,7 @@ function D.FlushDB()
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	X.Debug('MY_RoleStatistics_BagStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
+	X.OutputDebugMessage('MY_RoleStatistics_BagStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
 	--[[#DEBUG END]]
 end
 X.RegisterFlush('MY_RoleStatistics_BagStat', D.FlushDB)
@@ -582,7 +582,7 @@ function D.UpdateSaveDB()
 	end
 	if not O.bSaveDB then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_RoleStatistics_BagStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_RoleStatistics_BagStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		for _, guid in ipairs({
 			AnsiToUTF8(X.GetClientPlayerGlobalID()),
@@ -598,7 +598,7 @@ function D.UpdateSaveDB()
 		DB_ItemsDA:Reset()
 		DB_OwnerInfoD:Reset()
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_RoleStatistics_BagStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_RoleStatistics_BagStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_BAG_UPDATE')
@@ -832,7 +832,7 @@ function D.UpdateItems(page)
 			end
 		--[[#DEBUG BEGIN]]
 		else
-			X.Debug('MY_RoleStatistics_BagStat', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('MY_RoleStatistics_BagStat', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, X.DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		end
 	end

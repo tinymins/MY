@@ -67,7 +67,7 @@ local MY_TEAM_MON__UI__DOODAD_ICON = {
 }
 setmetatable(MY_TEAM_MON__UI__DOODAD_ICON, { __index = function(me, key)
 	--[[#DEBUG BEGIN]]
-	X.Debug(_L['MY_TeamMon'], 'Unknown Kind: ' .. key, X.DEBUG_LEVEL.WARNING)
+	X.OutputDebugMessage(_L['MY_TeamMon'], 'Unknown Kind: ' .. key, X.DEBUG_LEVEL.WARNING)
 	--[[#DEBUG END]]
 	return 369
 end })
@@ -298,7 +298,7 @@ function D.ConflictCheck()
 						for kkk, vvv in ipairs(vv) do
 							if not vvv.bCheckLevel then
 								bMsg = true
-								X.Sysmsg(
+								X.OutputSystemMessage(
 									_L['MY_TeamMon'],
 									_L['Data conflict'] .. ' ' .. _L[MY_TEAM_MON__UI__SELECT_TYPE] .. ' '
 										.. MY_TeamMon.GetMapName(k) .. ' :: ' .. vvv.dwID .. ' :: '
@@ -312,7 +312,7 @@ function D.ConflictCheck()
 			end
 		end
 		if bMsg then
-			X.Sysmsg(_L['MY_TeamMon'], _L['Data conflict, please check.'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemMessage(_L['MY_TeamMon'], _L['Data conflict, please check.'], X.CONSTANT.MSG_THEME.ERROR)
 		end
 	end
 end
@@ -648,7 +648,7 @@ function D.OnItemRButtonClick()
 			end
 			if X.IsLeader() or X.IsDebugClient(true) then
 				MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAM_MON_SHARE', {MY_TEAM_MON__UI__SELECT_TYPE, t.dwMapID, t})
-				X.Topmsg(g_tStrings.STR_MAIL_SUCCEED)
+				X.OutputAnnounceMessage(g_tStrings.STR_MAIL_SUCCEED)
 			else
 				return X.Alert(_L['You are not team leader.'])
 			end
@@ -979,7 +979,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 				function(bStatus, ...)
 					if bStatus then
 						local szFilePath, aType, szMode, tMeta = ...
-						X.Sysmsg(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szFilePath)), X.CONSTANT.MSG_THEME.SUCCESS)
+						X.OutputSystemMessage(_L['MY_TeamMon'], _L('Load config success: %s', tostring(szFilePath)), X.CONSTANT.MSG_THEME.SUCCESS)
 						-- local function fnAlert2()
 						-- 	local szAuthor = tMeta and X.ReplaceSensitiveWord(tostring(tMeta.szAuthor)) or _L['Unknown author']
 						-- 	X.Alert(
@@ -1005,7 +1005,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 					else
 						-- bStatus, szMsg
 						local szMsg = ...
-						X.Sysmsg(_L['MY_TeamMon'], _L('Load config failed: %s', _L[szMsg]), X.CONSTANT.MSG_THEME.ERROR)
+						X.OutputSystemMessage(_L['MY_TeamMon'], _L('Load config failed: %s', _L[szMsg]), X.CONSTANT.MSG_THEME.ERROR)
 						X.Alert(_L('Import failed: %s', szTitle or _L[szMsg]))
 						X.SafeCall(fnAction, bStatus, szMsg)
 					end
@@ -1103,7 +1103,7 @@ function D.OpenExportPanel()
 				function(szPath)
 					local szMsg = _L('Export success: %s', szPath)
 					X.Alert(szMsg)
-					X.Sysmsg(szMsg)
+					X.OutputSystemMessage(szMsg)
 					ui:Remove()
 				end)
 		end,

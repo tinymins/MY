@@ -135,7 +135,7 @@ function D.CreateFrame(szInitYY, szInitNote)
 						X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'Edit', szText, ui:Children('#Message'):Text()})
 						return
 					end
-					X.Systopmsg(_L['Please unlock talk lock first.'])
+					X.OutputSystemAnnounceMessage(_L['Please unlock talk lock first.'])
 				end
 				ui:Fetch('YY'):Text(D.szYY, WNDEVENT_FIRETYPE.PREVENT)
 			end,
@@ -193,7 +193,7 @@ function D.CreateFrame(szInitYY, szInitNote)
 					end
 				else
 					SetDataToClip(yy)
-					X.Topmsg(_L['Channel number has been copied to clipboard'])
+					X.OutputAnnounceMessage(_L['Channel number has been copied to clipboard'])
 				end
 			end,
 		}):Height() + 5
@@ -213,7 +213,7 @@ function D.CreateFrame(szInitYY, szInitNote)
 						X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'Edit', ui:Children('#YY'):Text(), szText})
 						return
 					end
-					X.Systopmsg(_L['Please unlock talk lock first.'])
+					X.OutputSystemAnnounceMessage(_L['Please unlock talk lock first.'])
 				end
 				ui:Fetch('Message'):Text(D.szNote, WNDEVENT_FIRETYPE.PREVENT)
 			end,
@@ -295,7 +295,7 @@ function D.OpenFrame()
 		return MY_TeamNoticeOfficial.OpenFrame()
 	end
 	if X.IsInZombieMap() then
-		return X.Topmsg(_L['TeamNotice is disabled in this map.'])
+		return X.OutputAnnounceMessage(_L['TeamNotice is disabled in this map.'])
 	end
 	O.bEnable = true
 	if X.IsInParty() then
@@ -306,7 +306,7 @@ function D.OpenFrame()
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
 			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'ASK'})
-			X.Sysmsg(_L['Asking..., If no response in longtime, team leader not enable plug-in.'])
+			X.OutputSystemMessage(_L['Asking..., If no response in longtime, team leader not enable plug-in.'])
 		end
 	end
 end
@@ -335,7 +335,7 @@ X.RegisterEvent('LOADING_END', 'TEAM_NOTICE', function()
 	local frame = D.GetFrame()
 	if frame and X.IsInZombieMap() then
 		X.UI.CloseFrame(frame)
-		X.Topmsg(_L['TeamNotice is disabled in this map.'])
+		X.OutputAnnounceMessage(_L['TeamNotice is disabled in this map.'])
 	end
 end)
 

@@ -1204,7 +1204,7 @@ function D.OnLButtonClick()
 				PopupMenu(menu[2])
 			end
 		else
-			return X.Sysmsg(_L['You are not the distrubutor.'])
+			return X.OutputSystemMessage(_L['You are not the distrubutor.'])
 		end
 	elseif szName == 'WndButton_Speaker' then
 		X.GVoiceBase_SwitchSpeakerState()

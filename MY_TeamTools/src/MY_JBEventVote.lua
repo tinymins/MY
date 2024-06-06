@@ -97,7 +97,7 @@ function D.FetchEventList(frame)
 				return
 			end
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_JBEventVote'], 'ERROR Get Eventlist: ' .. status .. '\n' .. UTF8ToAnsi(html), X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage(_L['MY_JBEventVote'], 'ERROR Get Eventlist: ' .. status .. '\n' .. UTF8ToAnsi(html), X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			X.UI.CloseFrame(frame)
 		end,
@@ -168,7 +168,7 @@ function D.FetchRankList(frame, szEventID)
 				return
 			end
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_JBEventVote'], 'ERROR Get Rankdata: ' .. status .. '\n' .. UTF8ToAnsi(html), X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage(_L['MY_JBEventVote'], 'ERROR Get Rankdata: ' .. status .. '\n' .. UTF8ToAnsi(html), X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 		end,
 	})
@@ -260,7 +260,7 @@ function D.Vote(frame, szEventID, szTeamID)
 				return
 			end
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_JBEventVote'], 'ERROR Push Vote: ' .. status .. '\n' .. UTF8ToAnsi(html), X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage(_L['MY_JBEventVote'], 'ERROR Push Vote: ' .. status .. '\n' .. UTF8ToAnsi(html), X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 		end,
 	})

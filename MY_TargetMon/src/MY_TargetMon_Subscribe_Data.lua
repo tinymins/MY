@@ -332,7 +332,7 @@ function D.FetchSubscribeList(nPage)
 						table.insert(aErrmsg, i .. '. ' .. err.message)
 					end
 					local szErrmsg = _L['Fetch repo meta list failed.'] .. '\n' .. table.concat(aErrmsg, '\n')
-					X.Debug(_L['MY_TargetMon_Subscribe_Data'], szErrmsg, X.DEBUG_LEVEL.WARNING)
+					X.OutputDebugMessage(_L['MY_TargetMon_Subscribe_Data'], szErrmsg, X.DEBUG_LEVEL.WARNING)
 					reject(X.Error:new(szErrmsg))
 					return
 				end
@@ -397,7 +397,7 @@ function D.FetchSubscribeItem(szURL)
 					return
 				end
 				--[[#DEBUG BEGIN]]
-				X.Debug(_L['MY_TargetMon_Subscribe_Data'], 'ERROR Get MetaInfo: ' .. X.EncodeLUAData(status) .. '\n' .. (X.ConvertToAnsi(html) or ''), X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage(_L['MY_TargetMon_Subscribe_Data'], 'ERROR Get MetaInfo: ' .. X.EncodeLUAData(status) .. '\n' .. (X.ConvertToAnsi(html) or ''), X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				reject(X.Error:new(_L['ERR: Get MetaInfo failed!']))
 			end,
@@ -436,7 +436,7 @@ function D.Subscribe(info, bSilent)
 				return
 			end
 			--[[#DEBUG BEGIN]]
-			X.Debug(
+			X.OutputDebugMessage(
 				'MY_TargetMon_Subscribe_Data',
 				'Start download file. info: ' .. X.EncodeLUAData(info)
 					.. ' uuids: ' .. X.EncodeLUAData(aUUID),
@@ -464,7 +464,7 @@ function D.Subscribe(info, bSilent)
 		end)
 			:Then(function()
 				--[[#DEBUG BEGIN]]
-				X.Debug(
+				X.OutputDebugMessage(
 					'MY_TargetMon_Subscribe_Data',
 					'Load configure file ' .. szDataFilePath
 						.. ' info: ' .. X.EncodeLUAData(info)
@@ -507,7 +507,7 @@ function D.Subscribe(info, bSilent)
 			end)
 			:Catch(function(error)
 				if not bSilent then
-					X.Topmsg(error.message)
+					X.OutputAnnounceMessage(error.message)
 				end
 				reject(error)
 			end)
@@ -539,7 +539,7 @@ function D.SyncTeam(info)
 		elseif not X.IsLeader() and not X.IsDebugClient(true) then
 			X.Alert(_L['You are not team leader.'])
 		elseif not info then
-			MY.Topmsg(_L['Please select one dataset first!'])
+			MY.OutputAnnounceMessage(_L['Please select one dataset first!'])
 		else
 			return true
 		end
@@ -724,7 +724,7 @@ function D.OnItemRButtonClick()
 			szOption = _L['Add favorite'],
 			fnAction = function()
 				MY_TargetMon_Subscribe_FavoriteData.Add(wnd.info)
-				X.Systopmsg(_L['Add favorite success, you can switch to favorite page to see.'])
+				X.OutputSystemAnnounceMessage(_L['Add favorite success, you can switch to favorite page to see.'])
 			end,
 		})
 		PopupMenu(t)
@@ -838,7 +838,7 @@ X.RegisterBgMsg('MY_TargetMon_Subscribe_Data', function(_, data, _, _, szTalker,
 				end)
 		end
 	elseif action == 'LOAD' then
-		X.Sysmsg(_L('%s loaded %s', szTalker, data[2]))
+		X.OutputSystemMessage(_L('%s loaded %s', szTalker, data[2]))
 	end
 end)
 
@@ -907,7 +907,7 @@ X.RegisterInit('MY_TargetMon_Subscribe_Data', function()
 					local tLastInfo = tSubscribed[D.GetShortURL(tInfo.szURL) or tInfo.szURL]
 					table.insert(aUpdateLog, tInfo.szKey .. '(' .. tLastInfo.szVersion .. '->' .. tInfo.szVersion .. ')')
 				end
-				X.Debug(
+				X.OutputDebugMessage(
 					'MY_TargetMon_Subscribe_Data',
 					'Auto update confirmed: ' .. table.concat(aUpdateLog, '; '),
 					X.DEBUG_LEVEL.LOG)
@@ -916,12 +916,12 @@ X.RegisterInit('MY_TargetMon_Subscribe_Data', function()
 					D.Subscribe(tInfo, true)
 						:Then(function()
 							--[[#DEBUG BEGIN]]
-							X.Debug(
+							X.OutputDebugMessage(
 								'MY_TargetMon_Subscribe_Data',
 								'Auto update [' .. tInfo.szKey .. '] complete, cost time ' .. (GetTime() - nTime) .. 'ms',
 								X.DEBUG_LEVEL.LOG)
 							--[[#DEBUG END]]
-							X.Sysmsg(_L('Upgrade TargetMon data to latest: %s', tInfo.szTitle))
+							X.OutputSystemMessage(_L('Upgrade TargetMon data to latest: %s', tInfo.szTitle))
 						end)
 				end
 			end,

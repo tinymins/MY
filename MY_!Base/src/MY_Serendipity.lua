@@ -79,7 +79,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, eStatus, dwTi
 		end
 		local function DoUpload()
 			--[[#DEBUG BEGIN]]
-			X.Debug('Prepare for uploading serendipity ' .. szSerendipity .. ' by '
+			X.OutputDebugMessage('Prepare for uploading serendipity ' .. szSerendipity .. ' by '
 				.. szName .. '#' .. szNameCRC .. ' via ' .. szReporter, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			X.EnsureAjax({

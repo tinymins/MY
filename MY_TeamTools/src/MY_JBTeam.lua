@@ -71,14 +71,14 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		buttonStyle = 'FLAT', text = _L['Apply join team'],
 		onClick = function()
 			if bLoading then
-				return X.Systopmsg(_L['Processing, please wait.'])
+				return X.OutputSystemAnnounceMessage(_L['Processing, please wait.'])
 			end
 			local szTeam = uiInput:Text()
 			if X.IsEmpty(szTeam) then
 				return X.Alert(_L['Please input team name/id.'])
 			end
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
-				return X.Topmsg(_L['Please unlock equip lock first!'], X.CONSTANT.MSG_THEME.ERROR)
+				return X.OutputAnnounceMessage(_L['Please unlock equip lock first!'], X.CONSTANT.MSG_THEME.ERROR)
 			end
 			X.Confirm(_L('Sure to apply join team %s?', szTeam), function()
 				bLoading = true
@@ -102,14 +102,14 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		buttonStyle = 'FLAT', text = _L['Apply quit team'],
 		onClick = function()
 			if bLoading then
-				return X.Systopmsg('Processing, please wait.')
+				return X.OutputSystemAnnounceMessage('Processing, please wait.')
 			end
 			local szTeam = uiInput:Text()
 			if X.IsEmpty(szTeam) then
 				return X.Alert(_L['Please input team name/id.'])
 			end
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
-				return X.Topmsg(_L['Please unlock equip lock first!'], X.CONSTANT.MSG_THEME.ERROR)
+				return X.OutputAnnounceMessage(_L['Please unlock equip lock first!'], X.CONSTANT.MSG_THEME.ERROR)
 			end
 			X.Confirm(_L('Sure to apply quit team %s?', szTeam), function()
 				bLoading = true

@@ -38,7 +38,7 @@ local O = X.CreateUserSettingsModule('MY_Logoff', _L['System'], {
 local function Logoff(bCompletely, bUnfight, bNotDead)
 	if X.BreatheCall('MY_LOGOFF') then
 		X.BreatheCall('MY_LOGOFF', false)
-		X.Sysmsg(_L['Logoff has been cancelled.'])
+		X.OutputSystemMessage(_L['Logoff has been cancelled.'])
 		return
 	end
 	local function onBreatheCall()
@@ -56,7 +56,7 @@ local function Logoff(bCompletely, bUnfight, bNotDead)
 	end
 	onBreatheCall()
 	if bUnfight then
-		X.Sysmsg(_L['Logoff is ready for your casting unfight skill.'])
+		X.OutputSystemMessage(_L['Logoff is ready for your casting unfight skill.'])
 	end
 	X.BreatheCall('MY_LOGOFF', onBreatheCall)
 end
@@ -64,7 +64,7 @@ end
 local function IdleOff()
 	if not O.bIdleOff then
 		if X.BreatheCall('MY_LOGOFF_IDLE') then
-			X.Sysmsg(_L['Idle off has been cancelled.'])
+			X.OutputSystemMessage(_L['Idle off has been cancelled.'])
 			X.BreatheCall('MY_LOGOFF_IDLE', false)
 		end
 		return
@@ -92,13 +92,13 @@ local function IdleOff()
 			if remainTime <= 10 then
 				OutputMessage('MSG_ANNOUNCE_YELLOW', szMessage)
 			end
-			X.Sysmsg(szMessage)
+			X.OutputSystemMessage(szMessage)
 		else
-			X.Sysmsg(_L('Idle off notice: you\'ll auto logoff if you keep idle for %dm %ds.', remainTime / 60, remainTime % 60))
+			X.OutputSystemMessage(_L('Idle off notice: you\'ll auto logoff if you keep idle for %dm %ds.', remainTime / 60, remainTime % 60))
 		end
 	end
 	X.BreatheCall('MY_LOGOFF_IDLE', 1000, onBreatheCall)
-	X.Sysmsg(_L('Idle off has been started, you\'ll auto logoff if you keep idle for %dm.', O.nIdleOffTime))
+	X.OutputSystemMessage(_L('Idle off has been started, you\'ll auto logoff if you keep idle for %dm.', O.nIdleOffTime))
 end
 
 --------------------------------------------------------------------------------

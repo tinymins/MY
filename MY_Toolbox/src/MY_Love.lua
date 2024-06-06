@@ -227,8 +227,8 @@ X.RegisterRemoteStorage(
 		assert(nSendItem >= 0 and nSendItem <= 0x3f, 'Value of nSendItem out of 6bit unsigned int range!')
 		assert(nReceiveItem >= 0 and nReceiveItem <= 0x3f, 'Value of nReceiveItem out of 6bit unsigned int range!')
 		-- 输出日志
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'MY_Love SetRemoteStorage current: ' .. X.EncodeLUAData({X.GetRemoteStorage('MY_Love')}), X.DEBUG_LEVEL.LOG)
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'MY_Love SetRemoteStorage new: ' .. X.EncodeLUAData({...}), X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'MY_Love SetRemoteStorage current: ' .. X.EncodeLUAData({X.GetRemoteStorage('MY_Love')}), X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'MY_Love SetRemoteStorage new: ' .. X.EncodeLUAData({...}), X.DEBUG_LEVEL.LOG)
 		-- 生成 Byte 表
 		local aByte = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 		if X.IsString(xID) then
@@ -507,7 +507,7 @@ function D.GetLover()
 		-- 获取失败则跳过
 		if not tFei then
 			--[[#DEBUG BEGIN]]
-			X.Debug(X.PACKET_INFO.NAME_SPACE, 'MY_Love GetFellowshipEntryInfo ' .. tFellowship.xID .. ' failed.', X.DEBUG_LEVEL.ERROR)
+			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'MY_Love GetFellowshipEntryInfo ' .. tFellowship.xID .. ' failed.', X.DEBUG_LEVEL.ERROR)
 			--[[#DEBUG END]]
 			bSyncing = true
 			return
@@ -560,14 +560,14 @@ function D.UpdateLocalLover()
 		local xLoverID = X.GetRemoteStorage('MY_Love')
 		if X.IsNumber(xLoverID) and xLoverID ~= 0 and lover.xID ~= 0 and lover.xID ~= '0' then
 			--[[#DEBUG BEGIN]]
-			X.Debug(X.PACKET_INFO.NAME_SPACE, 'MY_Love migrate v1 to v2: ' .. xLoverID .. ' => ' .. X.EncodeLUAData(lover), X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'MY_Love migrate v1 to v2: ' .. xLoverID .. ' => ' .. X.EncodeLUAData(lover), X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			D.SaveLover(lover.nLoverTime, lover.xID, lover.nLoverType, lover.nSendItem, lover.nReceiveItem)
 		end
 	end
 	if lover and X.IsString(lover.xID) then
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'MY_Love auto backup: ' .. X.EncodeLUAData(lover), X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'MY_Love auto backup: ' .. X.EncodeLUAData(lover), X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		D.BackupLover(lover.szName, lover.xID, true)
 	end
@@ -659,7 +659,7 @@ function D.SetLover(xID, nType)
 		if xID == D.lover.xID then
 			D.CreateFireworkSelect(function(p)
 				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-					return X.Systopmsg(_L['Light firework is a sensitive action, please unlock to continue.'])
+					return X.OutputSystemAnnounceMessage(_L['Light firework is a sensitive action, please unlock to continue.'])
 				end
 				D.UseDoubleLoveItem(tFellowship, p.aUIID, function(bSuccess)
 					if bSuccess then
@@ -667,7 +667,7 @@ function D.SetLover(xID, nType)
 						X.SendBgMsg(tFei.szName, 'MY_LOVE', {'LOVE_FIREWORK', p.nItem})
 						X.UI.CloseFrame('MY_Love_SetLover')
 					else
-						X.Systopmsg(_L['Failed to light firework.'])
+						X.OutputSystemAnnounceMessage(_L['Failed to light firework.'])
 					end
 				end)
 			end)
@@ -676,7 +676,7 @@ function D.SetLover(xID, nType)
 		-- 设置成为情缘（在线好友）
 		-- 单向情缘（简单）
 		if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-			return X.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
+			return X.OutputSystemAnnounceMessage(_L['Set lover is a sensitive action, please unlock to continue.'])
 		end
 		X.Confirm(_L('Do you want to blind love with [%s]?', tFei.szName), function()
 			if not tFellowship or not X.IsFellowshipOnline(tFellowship.xID) then
@@ -693,7 +693,7 @@ function D.SetLover(xID, nType)
 		-- 双向情缘（在线，组队一起，并且在4尺内，发起方带有一个指定烟花）
 		D.CreateFireworkSelect(function(p)
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-				return X.Systopmsg(_L['Set lover is a sensitive action, please unlock to continue.'])
+				return X.OutputSystemAnnounceMessage(_L['Set lover is a sensitive action, please unlock to continue.'])
 			end
 			if not tFellowship or not X.IsFellowshipOnline(tFellowship.xID) then
 				return X.Alert(_L['Lover must be a online friend'])
@@ -704,7 +704,7 @@ function D.SetLover(xID, nType)
 				end
 				D.nPendingItem = p.nItem
 				X.SendBgMsg(tFei.szName, 'MY_LOVE', {'LOVE_ASK'})
-				X.Systopmsg(_L('Love request has been sent to [%s], wait please', tFei.szName))
+				X.OutputSystemAnnounceMessage(_L('Love request has been sent to [%s], wait please', tFei.szName))
 			end)
 		end)
 	end
@@ -716,7 +716,7 @@ function D.RemoveLover()
 		return X.Alert(_L['Please enable sync common ui config first'])
 	end
 	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-		return X.Systopmsg(_L['Remove lover is a sensitive action, please unlock to continue.'])
+		return X.OutputSystemAnnounceMessage(_L['Remove lover is a sensitive action, please unlock to continue.'])
 	end
 	local lover = X.Clone(D.lover)
 	if lover.xID ~= 0 and lover.xID ~= '0' then
@@ -733,7 +733,7 @@ function D.RemoveLover()
 					X.SendBgMsg(lover.szName, 'MY_LOVE', {'REMOVE0'})
 				end
 				D.SaveLover(0, NO_LOVER.xID, 0, 0, 0)
-				X.Sysmsg(_L['Congratulations, cut blind love finish.'])
+				X.OutputSystemMessage(_L['Congratulations, cut blind love finish.'])
 			end)
 		elseif lover.nLoverType == 1 then -- 双向
 			X.Confirm(_L('Are you sure to cut mutual love with [%s]?', lover.szName), function()
@@ -745,7 +745,7 @@ function D.RemoveLover()
 								X.SendChat(lover.szName, _L['Sorry, I decided to just a swordman, bye my plugin lover'])
 								D.SaveLover(0, NO_LOVER.xID, 0, 0, 0)
 								-- X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('A blade and cut, no longer meet with [%s].', lover.szName))
-								X.Sysmsg(_L['Congratulations, do not repeat the same mistakes ah.'])
+								X.OutputSystemMessage(_L['Congratulations, do not repeat the same mistakes ah.'])
 							end)
 						end)
 					end)
@@ -769,7 +769,7 @@ function D.FixLover()
 		D.lover.nSendItem,
 		D.lover.nReceiveItem,
 	}})
-	X.Systopmsg(_L['Repair request has been sent, wait please.'])
+	X.OutputSystemAnnounceMessage(_L['Repair request has been sent, wait please.'])
 end
 
 -- 获取查看目标
@@ -818,7 +818,7 @@ function D.RequestOtherLover(dwID, nX, nY, fnAutoClose)
 		if tPlayerInfo.bFightState and not X.IsParty(dwID) then
 			FireUIEvent('MY_LOVE_OTHER_UPDATE', szName)
 			FireUIEvent('MY_LOVE_PV_ACTIVE_CHANGE', dwID, false)
-			return X.Systopmsg(_L('[%s] is in fighting, no time for you.', szName))
+			return X.OutputSystemAnnounceMessage(_L('[%s] is in fighting, no time for you.', szName))
 		end
 		-- 先清除缓存
 		D.tOtherLover[szName] = {}
@@ -849,20 +849,20 @@ end
 
 function D.RequestBackupLover()
 	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-		return X.Systopmsg(_L['Backup lover is a sensitive action, please unlock to continue.'])
+		return X.OutputSystemAnnounceMessage(_L['Backup lover is a sensitive action, please unlock to continue.'])
 	end
 	local lover = X.Clone(D.lover)
 	if lover.nLoverType == 1 then -- 双向
 		local kTarget = D.GetNearbyPlayerByXID(lover.xID)
 		local info = kTarget and GetClientTeam().GetMemberInfo(kTarget.dwID)
 		if not info or not info.bIsOnLine then
-			X.Systopmsg(_L['Lover must in your team and online to do backup.'])
+			X.OutputSystemAnnounceMessage(_L['Lover must in your team and online to do backup.'])
 		else
 			X.SendBgMsg(lover.szName, 'MY_LOVE', {'BACKUP'})
-			X.Systopmsg(_L['Backup request has been sent, wait please.'])
+			X.OutputSystemAnnounceMessage(_L['Backup request has been sent, wait please.'])
 		end
 	else
-		X.Systopmsg(_L['Backup feature only supports mutual love!'])
+		X.OutputSystemAnnounceMessage(_L['Backup feature only supports mutual love!'])
 	end
 end
 
@@ -905,7 +905,7 @@ function D.BackupLover(szLoverName, szLoverUUID, bAutoBackup)
 		if not bAutoBackup then
 			local szFullPath = X.GetAbsolutePath(szPath)
 			X.Alert(_L('Backup lover succeed, file located at: %s.', szFullPath))
-			X.Sysmsg(_L('Backup lover succeed, file located at: %s.', szFullPath))
+			X.OutputSystemMessage(_L('Backup lover succeed, file located at: %s.', szFullPath))
 		end
 	end
 end
@@ -1063,13 +1063,13 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 					or _L('[%s] is already your lover, fix it now?', szTalkerName)
 				X.Confirm(szText, function()
 					if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-						X.Systopmsg(_L['Fix lover is a sensitive action, please unlock to continue.'])
+						X.OutputSystemAnnounceMessage(_L['Fix lover is a sensitive action, please unlock to continue.'])
 						return false
 					end
 					X.UI.CloseFrame('MY_Love_SetLover')
 					D.SaveLover(tonumber(data[1]), tFellowship.xID, 1, data[3], data[2])
 					X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
-					X.Systopmsg(_L('Congratulations, love relation with [%s] has been fixed!', szTalkerName))
+					X.OutputSystemAnnounceMessage(_L('Congratulations, love relation with [%s] has been fixed!', szTalkerName))
 				end)
 			end
 		elseif szKey == 'FIX1' then
@@ -1081,15 +1081,15 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 		end
 	elseif szKey == 'LOVE_ANS_EXISTS' then
 		local szMsg = _L['Unfortunately the other has lover, but you can still blind love him!']
-		X.Sysmsg(szMsg)
+		X.OutputSystemMessage(szMsg)
 		X.Alert(szMsg)
 	elseif szKey == 'LOVE_ANS_ALREADY' then
 		local szMsg = _L['The other is already your lover!']
-		X.Sysmsg(szMsg)
+		X.OutputSystemMessage(szMsg)
 		X.Alert(szMsg)
 	elseif szKey == 'LOVE_ANS_NO' then
 		local szMsg = _L['The other refused you without reason, but you can still blind love him!']
-		X.Sysmsg(szMsg)
+		X.OutputSystemMessage(szMsg)
 		X.Alert(szMsg)
 	elseif szKey == 'LOVE_ANS_YES' then
 		local nItem = D.nPendingItem
@@ -1105,17 +1105,17 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 				D.SaveLover(GetCurrentTime(), tFellowship.xID, 1, nItem, 0)
 				X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
 				X.SendBgMsg(tFei.szName, 'MY_LOVE', {'LOVE_ANS_CONF', nItem})
-				X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', tFei.szName))
+				X.OutputSystemAnnounceMessage(_L('Congratulations, success to attach love with [%s]!', tFei.szName))
 				X.UI.CloseFrame('MY_Love_SetLover')
 			else
-				X.Systopmsg(_L['Failed to attach love, light firework failed.'])
+				X.OutputSystemAnnounceMessage(_L['Failed to attach love, light firework failed.'])
 			end
 		end)
 	elseif szKey == 'LOVE_ANS_CONF' then
 		if tFei then
 			D.SaveLover(GetCurrentTime(), tFellowship.xID, 1, 0, data)
 			X.SendChat(PLAYER_TALK_CHANNEL.TONG, _L('From now on, my heart lover is [%s]', szTalkerName))
-			X.Systopmsg(_L('Congratulations, success to attach love with [%s]!', tFei.szName))
+			X.OutputSystemAnnounceMessage(_L('Congratulations, success to attach love with [%s]!', tFei.szName))
 		end
 	elseif szKey == 'LOVE_FIREWORK' then
 		if tFellowship and D.lover.xID == tFellowship.xID then
@@ -1141,7 +1141,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 		if D.lover.xID == tFellowship.xID then
 			X.Confirm(_L('[%s] want to backup lover relation with you, do you agree?', szTalkerName), function()
 				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-					X.Systopmsg(_L['Backup lover is a sensitive action, please unlock to continue.'])
+					X.OutputSystemAnnounceMessage(_L['Backup lover is a sensitive action, please unlock to continue.'])
 					return false
 				end
 				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'BACKUP_ANS', X.GetClientPlayerGlobalID()})
@@ -1157,7 +1157,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 		if data.szLoverUUID == X.GetClientPlayerGlobalID() then
 			X.Confirm(_L('[%s] want to restore lover relation with you, do you agree?', szTalkerName), function()
 				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) or X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-					X.Systopmsg(_L['Restore lover is a sensitive action, please unlock to continue.'])
+					X.OutputSystemAnnounceMessage(_L['Restore lover is a sensitive action, please unlock to continue.'])
 					return false
 				end
 				X.SendBgMsg(szTalkerName, 'MY_LOVE', {'RESTORE_AGREE', data})

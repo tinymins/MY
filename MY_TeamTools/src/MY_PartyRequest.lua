@@ -213,7 +213,7 @@ function D.OnLButtonClick()
 			X.SendBgMsg(info.szName, 'RL', {'ASK'})
 			this:Enable(false)
 			this:Lookup('', 'Text_Lookup'):SetText(_L['loading...'])
-			X.Sysmsg(_L['If it is always loading, the target may not install plugin or refuse.'])
+			X.OutputSystemMessage(_L['If it is always loading, the target may not install plugin or refuse.'])
 		elseif info.dwID then
 			ViewInviteToPlayer(info.dwID)
 		end
@@ -372,7 +372,7 @@ function D.DoAutoAction(info)
 			D.AcceptRequest(info)
 		end
 		if szMsg then
-			X.Sysmsg(szMsg)
+			X.OutputSystemMessage(szMsg)
 		end
 	end
 	return bAction, szStatus, szMsg

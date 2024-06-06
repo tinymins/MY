@@ -40,7 +40,7 @@ function D.OpenFrame()
 			NoticeBoard_Open(1)
 		else
 			D.ApplyNoticeBoard()
-			X.Sysmsg(_L['Asking..., If no response in longtime, team leader not enable plug-in.'])
+			X.OutputSystemMessage(_L['Asking..., If no response in longtime, team leader not enable plug-in.'])
 		end
 	end
 end

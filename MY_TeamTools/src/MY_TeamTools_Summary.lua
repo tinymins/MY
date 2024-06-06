@@ -700,7 +700,7 @@ function D.RequestTeamData()
 	local bIsDungeonRoleProgressMap = X.IsDungeonRoleProgressMap(RT_MAPID)
 	--[[#DEBUG BEGIN]]
 	if bIsDungeonRoleProgressMap then
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Update team map progress.', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Update team map progress.', X.DEBUG_LEVEL.LOG)
 	end
 	--[[#DEBUG END]]
 	local aTeamMemberList = D.GetTeamMemberList(true)
@@ -720,13 +720,13 @@ function D.RequestTeamData()
 	end
 	if not X.IsEmpty(aRequestID) or not X.IsEmpty(aRefreshID) then
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Request team map copy id.', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Request team map copy id.', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		if #aRequestID == #aTeamMemberList then
 			aRequestID = nil
 		end
 		if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-			X.Systopmsg(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
+			X.OutputSystemAnnounceMessage(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
 		else
 			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', {RT_MAPID, aRequestID, nil})
 		end

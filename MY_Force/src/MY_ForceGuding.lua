@@ -76,8 +76,8 @@ local D = {
 
 --[[#DEBUG BEGIN]]
 -- debug
-function D.Debug(szMsg)
-	X.Debug(_L['MY_ForceGuding'], szMsg, X.DEBUG_LEVEL.LOG)
+function D.OutputDebugMessage(szMsg)
+	X.OutputDebugMessage(_L['MY_ForceGuding'], szMsg, X.DEBUG_LEVEL.LOG)
 end
 --[[#DEBUG END]]
 
@@ -112,7 +112,7 @@ function D.OnSkillCast(dwCaster, dwSkillID, dwLevel, szEvent)
 	if player and dwSkillID == D.dwSkillID and (dwCaster == X.GetClientPlayerID() or X.IsParty(dwCaster)) then
 		table.insert(D.tCast, { dwCaster = dwCaster, dwTime = GetTime(), szEvent = szEvent })
 		--[[#DEBUG BEGIN]]
-		D.Debug('[' .. player.szName .. '] cast [' .. X.GetSkillName(dwSkillID, dwLevel) .. '#' .. szEvent .. ']')
+		D.OutputDebugMessage('[' .. player.szName .. '] cast [' .. X.GetSkillName(dwSkillID, dwLevel) .. '#' .. szEvent .. ']')
 		--[[#DEBUG END]]
 	end
 end
@@ -124,19 +124,19 @@ function D.OnDoodadEnter()
 		return
 	end
 	--[[#DEBUG BEGIN]]
-	D.Debug('[' .. tar.szName .. '] enter scene')
+	D.OutputDebugMessage('[' .. tar.szName .. '] enter scene')
 	--[[#DEBUG END]]
 	-- find caster
 	for k, v in ipairs(D.tCast) do
 		local nTime = GetTime() - v.dwTime
 		--[[#DEBUG BEGIN]]
-		D.Debug('checking [#' .. v.dwCaster .. '], delay [' .. nTime .. ']')
+		D.OutputDebugMessage('checking [#' .. v.dwCaster .. '], delay [' .. nTime .. ']')
 		--[[#DEBUG END]]
 		if nTime < D.nMaxDelay then
 			table.remove(D.tCast, k)
 			D.AddToList(tar, v.dwCaster, v.dwTime, v.szEvent)
 			--[[#DEBUG BEGIN]]
-			D.Debug('matched [' .. tar.szName .. '] casted by [#' .. v.dwCaster .. ']')
+			D.OutputDebugMessage('matched [' .. tar.szName .. '] casted by [#' .. v.dwCaster .. ']')
 			--[[#DEBUG END]]
 			return
 		end
@@ -156,7 +156,7 @@ function D.OnSkillNotify(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 		if not D.tList[dwID] then
 			D.tList[dwID] = { dwCaster = tonumber(data[2]), dwTime = GetTime() }
 			--[[#DEBUG BEGIN]]
-			D.Debug('received notify from [#' .. data[2] .. ']')
+			D.OutputDebugMessage('received notify from [#' .. data[2] .. ']')
 			--[[#DEBUG END]]
 		end
 	end
@@ -278,7 +278,7 @@ function D.OnUseManaChange()
 				if doo and X.GetDistance(doo) < 6 then
 					D.nManaFrame = GetLogicFrameCount()
 					X.InteractDoodad(doo.dwID)
-					X.Sysmsg(_L['Auto eat GUDING'])
+					X.OutputSystemMessage(_L['Auto eat GUDING'])
 					break
 				end
 			end

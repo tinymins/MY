@@ -79,7 +79,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	local nIndex, bChanged = 1, false
 	local function fnNext()
 		if not hFrame or (hFrame.nPage or 0) ~= nPage then
-			X.Systopmsg(_L['Guild box closed or page changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Guild box closed or page changed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			return fnFinish()
 		end
 		if szState == 'Exchanging' or szState == 'Refreshing' then
@@ -150,7 +150,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 						local szMsg = bChanged
 							and _L['Guild bank item changed, sort finished, result may not be perfect!']
 							or _L['Cannot find item temp position, guild bank is full, sort exited!']
-						X.Systopmsg(szMsg, X.CONSTANT.MSG_THEME.ERROR)
+						X.OutputSystemAnnounceMessage(szMsg, X.CONSTANT.MSG_THEME.ERROR)
 						return fnFinish()
 					end
 				end
@@ -170,19 +170,19 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 						local szMsg = bChanged
 							and _L['Guild bank item changed, sort finished, result may not be perfect!']
 							or _L['Cannot find item temp position, guild bank is full, sort exited!']
-						X.Systopmsg(szMsg, X.CONSTANT.MSG_THEME.ERROR)
+						X.OutputSystemAnnounceMessage(szMsg, X.CONSTANT.MSG_THEME.ERROR)
 						return fnFinish()
 					end
 				end
 				szState = 'Exchanging'
 				if kCurItem then
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_BagEx_GuildBankSort', 'ExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage('MY_BagEx_GuildBankSort', 'ExchangeItem: GUILD,' .. dwX .. ' <-> ' .. 'GUILD,' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					X.ExchangeInventoryItem(dwBox, dwX, dwExcBox, dwExcX)
 				else
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_BagEx_GuildBankSort', 'ExchangeItem: GUILD,' .. dwExcX .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage('MY_BagEx_GuildBankSort', 'ExchangeItem: GUILD,' .. dwExcX .. ' <-> ' .. 'GUILD,' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					X.ExchangeInventoryItem(dwExcBox, dwExcX, dwBox, dwX)
 				end
@@ -202,13 +202,13 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 		if arg0 == TONG_EVENT_CODE.EXCHANGE_REPERTORY_ITEM_SUCCESS then
 			szState = 'Refreshing'
 		elseif arg0 == TONG_EVENT_CODE.PUT_ITEM_IN_REPERTORY_SUCCESS then
-			X.Systopmsg(_L['Put item in guild detected, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Put item in guild detected, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			fnFinish()
 		else
-			X.Systopmsg(_L['Unknown exception occurred, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Unknown exception occurred, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			fnFinish()
 			--[[#DEBUG BEGIN]]
-			X.Debug('MY_BagEx_GuildBankSort', 'TONG_EVENT_NOTIFY: ' .. arg0, X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage('MY_BagEx_GuildBankSort', 'TONG_EVENT_NOTIFY: ' .. arg0, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 		end
 	end)
@@ -241,7 +241,7 @@ function D.CheckInjection(bRemoveInjection)
 						},
 						onLClick = function()
 							if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TONG_REPERTORY) then
-								X.Systopmsg(_L['Please unlock mibao first.'])
+								X.OutputSystemAnnounceMessage(_L['Please unlock mibao first.'])
 								return
 							end
 							local bRandom = IsShiftKeyDown()
@@ -273,7 +273,7 @@ function D.CheckInjection(bRemoveInjection)
 											if aBlueprint then
 												D.Operate(false, false, aBlueprint)
 											else
-												X.Systopmsg(_L['Invalid blueprint data'])
+												X.OutputSystemAnnounceMessage(_L['Invalid blueprint data'])
 											end
 										end, nil, nil, nil, '')
 									end,

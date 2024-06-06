@@ -61,7 +61,7 @@ function D.CheckEnable()
 		if O.bEnable then
 			X.RegisterEvent({'OPEN_BOOK', 'OPEN_BOOK_NOTIFY'}, 'MY_AutoMemorizeBook', function(event)
 				if IsShiftKeyDown() then
-					return X.Systopmsg(_L['Auto memorize book has been disabled due to SHIFT key pressed.'])
+					return X.OutputSystemAnnounceMessage(_L['Auto memorize book has been disabled due to SHIFT key pressed.'])
 				end
 				local me = X.GetClientPlayer()
 				if not me then

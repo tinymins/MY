@@ -34,11 +34,11 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	for _, dwBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.PACKAGE)) do
 		local dwGenre = me.GetContainType(dwBox)
 		if dwGenre == ITEM_GENRE.BOOK then
-			X.Systopmsg(_L['Bag contains book only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Bag contains book only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
 			return
 		end
 		if dwGenre == ITEM_GENRE.MATERIAL then
-			X.Systopmsg(_L['Bag contains material only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Bag contains material only, use official sort please!'], X.CONSTANT.MSG_THEME.ERROR)
 			return
 		end
 		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
@@ -104,7 +104,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	local nIndex, bChanged = 1, false
 	local function fnNext()
 		if not hFrame then
-			X.Systopmsg(_L['Bag panel closed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Bag panel closed, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			return fnFinish()
 		end
 		if szState == 'Exchanging' then
@@ -177,7 +177,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 						local szMsg = bChanged
 							and _L['Bag item changed, sort finished, result may not be perfect!']
 							or _L['Cannot find item temp position, bag is full, sort exited!']
-						X.Systopmsg(szMsg, X.CONSTANT.MSG_THEME.ERROR)
+						X.OutputSystemAnnounceMessage(szMsg, X.CONSTANT.MSG_THEME.ERROR)
 						return fnFinish()
 					end
 				end
@@ -197,7 +197,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 						local szMsg = bChanged
 							and _L['Bag item changed, sort finished, result may not be perfect!']
 							or _L['Cannot find item temp position, bag is full, sort exited!']
-						X.Systopmsg(szMsg, X.CONSTANT.MSG_THEME.ERROR)
+						X.OutputSystemAnnounceMessage(szMsg, X.CONSTANT.MSG_THEME.ERROR)
 						return fnFinish()
 					end
 				end
@@ -205,12 +205,12 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 				szState = 'Exchanging'
 				if kCurItem then
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_BagEx_BagSort', 'ExchangeItem: ' .. dwBox .. ',' .. dwX .. ' <-> ' ..dwExcBox .. ',' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage('MY_BagEx_BagSort', 'ExchangeItem: ' .. dwBox .. ',' .. dwX .. ' <-> ' ..dwExcBox .. ',' .. dwExcX .. ' <T1>', X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					X.ExchangeInventoryItem(dwBox, dwX, dwExcBox, dwExcX)
 				else
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_BagEx_BagSort', 'ExchangeItem: ' .. dwExcBox .. ',' .. dwExcX .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage('MY_BagEx_BagSort', 'ExchangeItem: ' .. dwExcBox .. ',' .. dwExcX .. ' <-> ' ..dwBox .. ',' .. dwX .. ' <T2>', X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					X.ExchangeInventoryItem(dwExcBox, dwExcX, dwBox, dwX)
 				end
@@ -222,7 +222,7 @@ function D.Operate(bRandom, bExportBlueprint, aBlueprint)
 	X.RegisterEvent('BAG_ITEM_UPDATE', 'MY_BagEx_BagSort__Sort', function()
 		local dwBox, dwX, bNewAdd = arg0, arg1, arg2
 		if bNewAdd then
-			X.Systopmsg(_L['Put new item in bag detected, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Put new item in bag detected, sort exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			fnFinish()
 		elseif szState == 'Exchanging' then
 			szState = 'Idle'
@@ -292,7 +292,7 @@ function D.CheckInjection(bRemoveInjection)
 											MY_BagEx_Bag.ShowAllItemShadow()
 											D.Operate(false, false, aBlueprint)
 										else
-											X.Systopmsg(_L['Invalid blueprint data'])
+											X.OutputSystemAnnounceMessage(_L['Invalid blueprint data'])
 										end
 									end, nil, nil, nil, '')
 								end,

@@ -286,7 +286,7 @@ function D.DoAutoAction(info)
 		D.AcceptRequest(info)
 	end
 	if szMsg then
-		X.Sysmsg(szMsg)
+		X.OutputSystemMessage(szMsg)
 	end
 	return bAction, szStatus, szMsg
 end

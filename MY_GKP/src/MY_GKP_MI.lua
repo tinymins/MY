@@ -21,7 +21,7 @@ end
 --------------------------------------------------------------------------
 
 local D = {
-	Sysmsg = MY_GKP.Sysmsg,
+	Sysmsg = MY_GKP.OutputSystemMessage,
 	GetTimeString = MY_GKP.GetTimeString,
 	GetMoneyTipText = MY_GKP.GetMoneyTipText,
 	GetFormatLink = MY_GKP.GetFormatLink,
@@ -98,7 +98,7 @@ end
 function D.SyncSend(dwID, bSilent)
 	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 		if not bSilent then
-			X.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+			X.OutputSystemAnnounceMessage(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 		end
 		return
 	end
@@ -123,7 +123,7 @@ X.RegisterBgMsg('MY_GKP_SYNC_START', function(_, aData, nChannel, dwID, szName, 
 		X.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, szKey, function(_, aData, nChannel, dwID, szName, bIsSelf)
 			local dwID, tab = aData[1], aData[2]
 			if dwID == X.GetClientPlayerID() or dwID == 0 then
-				X.Topmsg(_L['Sychoronization Complete'])
+				X.OutputAnnounceMessage(_L['Sychoronization Complete'])
 				if tab then
 					X.Confirm(_L('Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]\'s data or not? \n data of team bidding: %s\n transation data: %s', szName, #tab.GKP_Record, #tab.GKP_Account), function()
 						local ds = D.GetDS()
@@ -131,13 +131,13 @@ X.RegisterBgMsg('MY_GKP_SYNC_START', function(_, aData, nChannel, dwID, szName, 
 						ds:SetPaymentList(tab.GKP_Account)
 					end)
 				else
-					D.Sysmsg(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
+					D.OutputSystemMessage(_L['Abnormal with Data Sharing, Please contact and make feed back with the writer.'])
 				end
 			end
 			X.RegisterBgMsg('MY_GKP_SYNC_CONTENT_' .. szKey, szKey, false)
 		end, function(szMsgID, nSegCount, nSegRecv, nSegIndex, nChannel, dwID, szName, bIsSelf)
 			local fPercent = nSegRecv / nSegCount
-			X.Topmsg(_L('Sychoronizing data please wait %d%% loaded.', fPercent * 100))
+			X.OutputAnnounceMessage(_L('Sychoronizing data please wait %d%% loaded.', fPercent * 100))
 		end)
 	end
 end)
@@ -156,7 +156,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 				tab.bSync = true
 				ds:SetAuctionRec(tab)
 				--[[#DEBUG BEGIN]]
-				X.Debug('MY_GKP', '#MY_GKP# Sync Success', X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage('MY_GKP', '#MY_GKP# Sync Success', X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			end
 		end
@@ -190,7 +190,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 			end
 			if data[2] == 'RECORD' then
 				if data[4] == me.szName and tonumber(data[5]) and tonumber(data[5]) < 0 then
-					X.OutputWhisper(data[4] .. g_tStrings.STR_COLON .. data[5] .. g_tStrings.STR_GOLD, _L['MY_GKP'])
+					X.OutputWhisperMessage(data[4] .. g_tStrings.STR_COLON .. data[5] .. g_tStrings.STR_GOLD, _L['MY_GKP'])
 				end
 				local frm = Station.SearchFrame(szFrameName)
 				if frm and frm.key == data[3] then
@@ -351,7 +351,7 @@ X.RegisterEvent('ON_BG_CHANNEL_MSG', 'LR_GKP', function()
 		}
 		ds:SetAuctionRec(tab)
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_GKP', '#MY_GKP# Sync From LR Success', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_GKP', '#MY_GKP# Sync From LR Success', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 end)
@@ -549,7 +549,7 @@ function D.SyncSystemGKP()
 	end
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	X.Debug(
+	X.OutputDebugMessage(
 		_L['PMTool'],
 		_L('MY_GKP_MI SyncSystemGKP in %dms.', nTickCount),
 		X.DEBUG_LEVEL.PM_LOG)

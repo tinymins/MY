@@ -124,7 +124,7 @@ function D.CheckUpdateAcquire()
 			local szAchieve = X.GetAchievement(p.dwAchieveID).szName
 			local szTime = X.FormatTime(p.dwTime, '%yyyy-%MM-%dd %hh:%mm:%ss')
 			p.bPending = true
-			X.Sysmsg(_L('Try share boss kill: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
+			X.OutputSystemMessage(_L('Try share boss kill: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
 			D.ShareBKR(p, true,
 				function()
 					for i, v in X.ipairs_r(BOSS_ACHIEVE_ACQUIRE_LOG) do
@@ -132,7 +132,7 @@ function D.CheckUpdateAcquire()
 							table.remove(BOSS_ACHIEVE_ACQUIRE_LOG, i)
 						end
 					end
-					X.Sysmsg(_L('Share boss kill success: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
+					X.OutputSystemMessage(_L('Share boss kill success: %s - %ds (%s).', szAchieve, p.nFightTime / 1000, szTime))
 				end,
 				function()
 					for _, v in X.ipairs_r(BOSS_ACHIEVE_ACQUIRE_LOG) do
@@ -192,7 +192,7 @@ function D.UpdateMapBossAchieveAcquire()
 	end
 	--[[#DEBUG BEGIN]]
 	if not X.IsEmpty(tBossAchieveAcquireState) then
-		X.Debug('Current map boss achieve: ' .. X.EncodeQuerystring(tBossAchieveAcquireState) .. '.', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('Current map boss achieve: ' .. X.EncodeQuerystring(tBossAchieveAcquireState) .. '.', X.DEBUG_LEVEL.LOG)
 	end
 	--[[#DEBUG END]]
 	BOSS_ACHIEVE_ACQUIRE_STATE = tBossAchieveAcquireState

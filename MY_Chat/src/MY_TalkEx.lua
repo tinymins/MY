@@ -108,7 +108,7 @@ local TRICK_CHANNEL_LIST = {
 
 function D.Talk()
 	if #O.szTalkText == 0 then
-		return X.Systopmsg(_L['Please input something.'], X.CONSTANT.MSG_THEME.ERROR)
+		return X.OutputSystemAnnounceMessage(_L['Please input something.'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	-- µ÷ÊÔ¹¤¾ß
 	if X.ProcessCommand and string.sub(O.szTalkText, 1, 8) == '/script ' then
@@ -135,7 +135,7 @@ X.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], D.Talk, nil)
 
 function D.Trick()
 	if #O.szTrickText == 0 then
-		return X.Sysmsg(_L['Please input something.'], X.CONSTANT.MSG_THEME.ERROR)
+		return X.OutputSystemMessage(_L['Please input something.'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	local t = {}
 	local me = X.GetClientPlayer()
@@ -167,7 +167,7 @@ function D.Trick()
 	end
 	-- none target
 	if #t == 0 then
-		return X.Systopmsg(_L['No trick target found.'], X.CONSTANT.MSG_THEME.ERROR)
+		return X.OutputSystemAnnounceMessage(_L['No trick target found.'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	-- start tricking
 	if #O.szTrickTextBegin > 0 then
@@ -333,7 +333,7 @@ function PS.OnPanelActive(wnd)
 						if X.IsTable(res) then
 							X.Alert(X.ReplaceSensitiveWord(res.msg))
 						else
-							X.Systopmsg(_L['Share error: server error.'], X.CONSTANT.MSG_THEME.ERROR)
+							X.OutputSystemAnnounceMessage(_L['Share error: server error.'], X.CONSTANT.MSG_THEME.ERROR)
 						end
 					end,
 				})

@@ -200,7 +200,7 @@ function D.DrawAuctionPage(frame, szKey, szSort)
 					frame.ds:SetAuctionRec(v)
 					if X.IsDistributor() then
 						if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-							X.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+							X.OutputSystemAnnounceMessage(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 						end
 						X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'edit', v}, true)
 					end

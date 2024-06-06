@@ -47,7 +47,7 @@ function D.Operate()
 				if tPos then
 					local dwBox1, dwX1 = tPos.dwBox, tPos.dwX
 					--[[#DEBUG BEGIN]]
-					X.Debug('MY_BagEx_GuildBankStack', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
+					X.OutputDebugMessage('MY_BagEx_GuildBankStack', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
 					--[[#DEBUG END]]
 					X.ExchangeInventoryItem(dwBox, dwX, dwBox1, dwX1)
 					return
@@ -96,7 +96,7 @@ function D.CheckInjection(bRemoveInjection)
 						text = _L['Stack'],
 						onClick = function()
 							if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TONG_REPERTORY) then
-								X.Systopmsg(_L['Please unlock mibao first.'])
+								X.OutputSystemAnnounceMessage(_L['Please unlock mibao first.'])
 								return
 							end
 							if MY_BagEx_GuildBank.bConfirm then

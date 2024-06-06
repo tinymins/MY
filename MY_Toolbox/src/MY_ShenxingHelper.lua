@@ -237,7 +237,7 @@ function D.CheckAvoidBlackShenxingEnable()
 			) and dwSkillID == 3691) then
 				return
 			end
-			X.Sysmsg(_L['Shenxing has been cancelled, cause you got the zhenyan.'])
+			X.OutputSystemMessage(_L['Shenxing has been cancelled, cause you got the zhenyan.'])
 			player.StopCurrentAction()
 		end)
 	else

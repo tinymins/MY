@@ -75,7 +75,7 @@ end
 
 function D.Remove(info)
 	-- if info.bEmbedded then
-	-- 	X.Topmsg(_L['Embedded dataset cannot be removed!'])
+	-- 	X.OutputAnnounceMessage(_L['Embedded dataset cannot be removed!'])
 	-- 	return
 	-- end
 	X.Confirm(_L['Confirm?'], function()
@@ -102,7 +102,7 @@ function D.Fetch()
 				FireUIEvent('MY_TEAM_MON__SUBSCRIBE_FAVORITE_DATA__FETCH_UPDATE')
 			end)
 			:Catch(function(err)
-				X.Debug(
+				X.OutputDebugMessage(
 					_L['MY_TeamMon_Subscribe_FavoriteData'],
 					err.message ..'\n' ..  info.szURL,
 					X.DEBUG_LEVEL.WARNING)
@@ -249,7 +249,7 @@ function D.OnLButtonClick()
 	elseif name == 'Btn_RemoveUrl' then
 		local info = D.GetSelectedInfo()
 		if not info then
-			return X.Topmsg(_L['Please select one dataset first!'])
+			return X.OutputAnnounceMessage(_L['Please select one dataset first!'])
 		end
 		D.Remove(info)
 	elseif name == 'Btn_ExportUrl' then

@@ -24,7 +24,7 @@ CPath.MakeDir(X.FormatPath({'userdata/role_statistics', X.PATH_TYPE.GLOBAL}))
 
 local DB = X.SQLiteConnect(_L['MY_RoleStatistics_EquipStat'], {'userdata/role_statistics/equip_stat.v3.db', X.PATH_TYPE.GLOBAL})
 if not DB then
-	return X.Sysmsg(_L['MY_RoleStatistics_EquipStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
+	return X.OutputSystemMessage(_L['MY_RoleStatistics_EquipStat'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
 local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_EquipStat.ini'
 
@@ -442,7 +442,7 @@ function D.FlushDB()
 	DB:Execute('END TRANSACTION')
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	X.Debug('MY_RoleStatistics_EquipStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
+	X.OutputDebugMessage('MY_RoleStatistics_EquipStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
 	--[[#DEBUG END]]
 end
 
@@ -456,7 +456,7 @@ function D.UpdateSaveDB()
 	end
 	if not O.bSaveDB then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_RoleStatistics_EquipStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_RoleStatistics_EquipStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local guid = AnsiToUTF8(X.GetClientPlayerGlobalID())
 		DB_ItemsDA:ClearBindings()
@@ -468,7 +468,7 @@ function D.UpdateSaveDB()
 		DB_OwnerInfoD:Execute()
 		DB_OwnerInfoD:Reset()
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_RoleStatistics_EquipStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_RoleStatistics_EquipStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_EQUIP_UPDATE')
@@ -674,7 +674,7 @@ function D.UpdateItems(page)
 				end
 			--[[#DEBUG BEGIN]]
 			else
-				X.Debug('MY_RoleStatistics_EquipStat', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage('MY_RoleStatistics_EquipStat', 'KItemInfo not found: ' .. rec.tabtype .. ', ' .. rec.tabindex, X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			end
 		else

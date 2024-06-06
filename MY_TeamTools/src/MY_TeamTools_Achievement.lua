@@ -375,7 +375,7 @@ function D.RequestTeamData()
 			aRequestID = nil
 		end
 		if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-			X.Systopmsg(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
+			X.OutputSystemAnnounceMessage(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
 		else
 			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aRequestID, nil})
 		end
@@ -739,7 +739,7 @@ function D.OnInitPage()
 		text = _L['Refresh'],
 		onClick = function()
 			D.RequestTeamData()
-			X.Systopmsg(_L['Team achievement request sent.'])
+			X.OutputSystemAnnounceMessage(_L['Team achievement request sent.'])
 		end,
 	})
 

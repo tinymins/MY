@@ -128,7 +128,7 @@ function D.HookDomesticatePanel()
 					fnAction = function()
 						if D.IsAutoFeedValid(me) then
 							D.SetAutoFeed()
-							X.Systopmsg(_L['Auto feed domesticate cancelled.'])
+							X.OutputSystemAnnounceMessage(_L['Auto feed domesticate cancelled.'])
 						else
 							local domesticate = X.GetClientPlayer().GetDomesticate()
 							local dwCubTabType, dwCubTabIndex = domesticate.dwCubTabType, domesticate.dwCubTabIndex
@@ -141,12 +141,12 @@ function D.HookDomesticatePanel()
 							local szFoodName = X.GetObjectName('ITEM_INFO', dwFoodTabType, dwFoodTabIndex)
 							local szDomesticateName = X.GetObjectName('ITEM_INFO', dwCubTabType, dwCubTabIndex)
 							if D.IsAutoFeedValid(me) then
-								X.Systopmsg(_L('Set domesticate auto feed %s to %s succeed, will auto feed when hunger point reach %d.',
+								X.OutputSystemAnnounceMessage(_L('Set domesticate auto feed %s to %s succeed, will auto feed when hunger point reach %d.',
 									szFoodName,
 									szDomesticateName,
 									O.nAutoFeedFoodMeasure))
 							else
-								X.Systopmsg(_L('Set domesticate auto feed %s to %s failed.', szFoodName, szDomesticateName))
+								X.OutputSystemAnnounceMessage(_L('Set domesticate auto feed %s to %s failed.', szFoodName, szDomesticateName))
 							end
 						end
 					end,
@@ -183,7 +183,7 @@ function D.CheckAutoFeedEnable()
 			end
 			if domesticate.nGrowthLevel >= domesticate.nMaxGrowthLevel then
 				local szDomesticate = X.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
-				X.Systopmsg(_L('Your domesticate %s is growth up!', szDomesticate))
+				X.OutputSystemAnnounceMessage(_L('Your domesticate %s is growth up!', szDomesticate))
 				return
 			end
 			local nMeasure = domesticate.nMaxFullMeasure - domesticate.nFullMeasure
@@ -204,7 +204,7 @@ function D.CheckAutoFeedEnable()
 			if nRound > 0 and not bFeed then
 				local szFood = X.GetObjectName('ITEM_INFO', O.dwAutoFeedFoodTabType, O.dwAutoFeedFoodTabIndex)
 				local szDomesticate = X.GetObjectName('ITEM_INFO', O.dwAutoFeedCubTabType, O.dwAutoFeedCubTabIndex)
-				X.Systopmsg(_L('No enough %s to feed %s!', szFood, szDomesticate))
+				X.OutputSystemAnnounceMessage(_L('No enough %s to feed %s!', szFood, szDomesticate))
 			end
 		end)
 	else

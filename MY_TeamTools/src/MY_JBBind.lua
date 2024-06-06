@@ -172,7 +172,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 						end)
 				end)
 			elseif X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.EQUIP) then
-				X.Topmsg(_L['Please unlock equip lock first!'], X.CONSTANT.MSG_THEME.ERROR)
+				X.OutputAnnounceMessage(_L['Please unlock equip lock first!'], X.CONSTANT.MSG_THEME.ERROR)
 			else
 				X.Confirm(_L['Sure to unbind character certification?'], function()
 					uiBtnCCStatus:Enable(false)

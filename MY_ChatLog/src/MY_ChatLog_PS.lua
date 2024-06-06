@@ -188,7 +188,7 @@ end
 local l_bExporting
 function D.ExportConfirm()
 	if l_bExporting then
-		return X.Sysmsg(_L['Already exporting, please wait.'])
+		return X.OutputSystemMessage(_L['Already exporting, please wait.'])
 	end
 	local ui = X.UI.CreateFrame('MY_ChatLog_Export', {
 		simple = true, esc = true, close = true, w = 140,
@@ -269,7 +269,7 @@ end
 
 function D.Export(szExportFile, aMsgType, nPerSec, onProgress)
 	if l_bExporting then
-		return X.Sysmsg(_L['Already exporting, please wait.'])
+		return X.OutputSystemMessage(_L['Already exporting, please wait.'])
 	end
 	local ds = MY_ChatLog_DS(MY_ChatLog.GetRoot())
 	if not ds then
@@ -296,7 +296,7 @@ function D.Export(szExportFile, aMsgType, nPerSec, onProgress)
 				db:Disconnect()
 				local szFile = GetRootPath() .. szExportFile:gsub('/', '\\')
 				X.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
-				X.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
+				X.OutputSystemMessage(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0
 			end
 			local data = ds:SelectMsg(aMsgType, '', nil, nil, nPage * EXPORT_SLICE, EXPORT_SLICE, true)
@@ -313,7 +313,7 @@ function D.Export(szExportFile, aMsgType, nPerSec, onProgress)
 	elseif szExportFile:sub(-5) == '.html' then
 		local status = Log(szExportFile, getHeader(), 'clear')
 		if status ~= 'SUCCEED' then
-			return X.Sysmsg(_L('Error: open file error %s [%s]', szExportFile, status))
+			return X.OutputSystemMessage(_L('Error: open file error %s [%s]', szExportFile, status))
 		end
 		l_bExporting = true
 
@@ -327,7 +327,7 @@ function D.Export(szExportFile, aMsgType, nPerSec, onProgress)
 				end
 				local szFile = X.GetAbsolutePath(szExportFile)
 				X.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
-				X.Sysmsg(_L('Chatlog export succeed, file saved as %s', szFile))
+				X.OutputSystemMessage(_L('Chatlog export succeed, file saved as %s', szFile))
 				return 0
 			end
 			local data = ds:SelectMsg(aMsgType, '', nil, nil, nPage * EXPORT_SLICE, EXPORT_SLICE)

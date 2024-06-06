@@ -21,7 +21,7 @@ local BIDDING_CACHE = {}
 
 function D.CheckChatLock()
 	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-		X.Systopmsg(_L['Please unlock safety talk lock first!'])
+		X.OutputSystemAnnounceMessage(_L['Please unlock safety talk lock first!'])
 		return false
 	end
 	return true
@@ -35,7 +35,7 @@ function D.Open(tConfig)
 		tConfig.szKey = X.GetUUID()
 	end
 	if not X.IsDistributor() then
-		return X.Systopmsg(_L['You are not distributor!'])
+		return X.OutputSystemAnnounceMessage(_L['You are not distributor!'])
 	end
 	if not D.CheckChatLock() then
 		return
@@ -205,17 +205,17 @@ function D.RaiseBidding(szKey, nPrice)
 	end
 	local nNextPrice, nMyPrice, bPassed = D.GetQuickBiddingPrice(szKey)
 	if nMyPrice then
-		X.Systopmsg(_L('You already have a valid price at %s.', D.GetMoneyChatText(nMyPrice)))
+		X.OutputSystemAnnounceMessage(_L('You already have a valid price at %s.', D.GetMoneyChatText(nMyPrice)))
 		return false
 	end
 	if bPassed then
-		X.Systopmsg(_L['You have already p.'])
+		X.OutputSystemAnnounceMessage(_L['You have already p.'])
 		return false
 	end
 	local nPriceNear = math.max(nNextPrice, math.floor(((nPrice - tConfig.nPriceMin) / tConfig.nPriceStep)) * tConfig.nPriceStep + tConfig.nPriceMin)
 	if nPrice ~= nPriceNear then
-		X.Systopmsg(_L['Not a valid price'])
-		X.Systopmsg(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceStep))
+		X.OutputSystemAnnounceMessage(_L['Not a valid price'])
+		X.OutputSystemAnnounceMessage(_L('Nearest price is %d and %d', nPriceNear, nPriceNear + tConfig.nPriceStep))
 		return false
 	end
 	local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
@@ -517,14 +517,14 @@ function MY_BiddingBase.OnLButtonClick()
 	local frame = this:GetRoot()
 	if name == 'Btn_Close' then
 		if X.IsDistributor() then
-			return X.Systopmsg(_L['You are distributor, Please finish this bidding!'])
+			return X.OutputSystemAnnounceMessage(_L['You are distributor, Please finish this bidding!'])
 		end
 		X.Confirm(_L['Sure cancel this bidding? You will not able to bidding this item.'], function()
 			X.UI.CloseFrame(frame)
 		end)
 	elseif name == 'Btn_Option' then
 		if not X.IsDistributor() then
-			return X.Systopmsg(_L['You are not distributor!'])
+			return X.OutputSystemAnnounceMessage(_L['You are not distributor!'])
 		end
 		local szKey = D.GetKey(frame)
 		frame.tUnsavedConfig = X.Clone(BIDDING_CACHE[szKey].tConfig)
@@ -551,7 +551,7 @@ function MY_BiddingBase.OnLButtonClick()
 		X.UI.PopupMenu(menu)
 	elseif name == 'WndButton_ConfigSubmit' then
 		if not X.IsDistributor() then
-			return X.Systopmsg(_L['You are not distributor!'])
+			return X.OutputSystemAnnounceMessage(_L['You are not distributor!'])
 		end
 		if not D.CheckChatLock() then
 			return
@@ -589,13 +589,13 @@ function MY_BiddingBase.OnLButtonClick()
 			end
 		end
 		if not bExist then
-			return X.Systopmsg(_L['You have not bidding a price yet.'])
+			return X.OutputSystemAnnounceMessage(_L['You have not bidding a price yet.'])
 		end
 		if bP then
-			return X.Systopmsg(_L['You have already p.'])
+			return X.OutputSystemAnnounceMessage(_L['You have already p.'])
 		end
 		if bValid then
-			return X.Systopmsg(_L['You cannot p cause you have a valid price.'])
+			return X.OutputSystemAnnounceMessage(_L['You cannot p cause you have a valid price.'])
 		end
 		local aSay = D.ConfigToEditStruct(BIDDING_CACHE[szKey].tConfig)
 		table.insert(aSay, 1, { type = 'text', text = _L['Exit from bidding '] })
@@ -606,7 +606,7 @@ function MY_BiddingBase.OnLButtonClick()
 		local szKey = D.GetKey(frame)
 		local nNextPrice, nMyPrice, bPassed = D.GetQuickBiddingPrice(szKey)
 		if bPassed then
-			return X.Systopmsg(_L['You have already p.'])
+			return X.OutputSystemAnnounceMessage(_L['You have already p.'])
 		end
 		if IsShiftKeyDown() then
 			D.RaiseBidding(szKey, nNextPrice)
@@ -726,7 +726,7 @@ function MY_BiddingBase.OnRButtonClick()
 				end,
 				fnAction = function()
 					if bPassed then
-						return X.Systopmsg(_L['You have already p.'])
+						return X.OutputSystemAnnounceMessage(_L['You have already p.'])
 					end
 					local msg = {
 						szName = 'MY_Bidding_Confirm',
@@ -787,7 +787,7 @@ function MY_BiddingBase.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_RowItemDelete' then
 		if not X.IsDistributor() then
-			return X.Systopmsg(_L['You are not distributor!'])
+			return X.OutputSystemAnnounceMessage(_L['You are not distributor!'])
 		end
 		if not D.CheckChatLock() then
 			return
@@ -804,7 +804,7 @@ function MY_BiddingBase.OnItemLButtonClick()
 		table.insert(aSay, { type = 'text', text = _L[' \'s invalid price .'] })
 		X.Confirm(_L('Sure to delete %s\'s bidding record?', rec.szTalkerName), function()
 			if not X.IsDistributor() then
-				return X.Systopmsg(_L['You are not distributor!'])
+				return X.OutputSystemAnnounceMessage(_L['You are not distributor!'])
 			end
 			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_DELETE', { szKey = szKey, dwTalkerID = rec.dwTalkerID })
 			X.SendChat(PLAYER_TALK_CHANNEL.RAID, aSay, { parsers = { name = false } })

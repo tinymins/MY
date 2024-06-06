@@ -800,7 +800,7 @@ function D.FlushDB()
 	X.SaveLUAData(PLAYER_REC_FILE, rec)
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
-	X.Debug('MY_RoleStatistics_TaskStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
+	X.OutputDebugMessage('MY_RoleStatistics_TaskStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
 	--[[#DEBUG END]]
 end
 
@@ -814,13 +814,13 @@ function D.UpdateSaveDB()
 	end
 	if not O.bSaveDB then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_RoleStatistics_TaskStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_RoleStatistics_TaskStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local data = X.LoadLUAData(STAT_DATA_FILE) or {}
 		data[X.GetClientPlayerGlobalID()] = nil
 		X.SaveLUAData(STAT_DATA_FILE, data)
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_RoleStatistics_TaskStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_RoleStatistics_TaskStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	FireUIEvent('MY_ROLE_STAT_TASK_UPDATE')

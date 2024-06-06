@@ -126,12 +126,12 @@ function DB:Connect(bCheck)
 			self.db = X.SQLiteConnect(_L['MY_ChatLog'], self.szFilePath)
 		else
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_ChatLog'], 'Quick connect database: ' .. self.szFilePath, X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(_L['MY_ChatLog'], 'Quick connect database: ' .. self.szFilePath, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			self.db = SQLite3_Open(self.szFilePath)
 		end
 		--[[#DEBUG BEGIN]]
-		X.Debug(_L['MY_ChatLog'], 'Init database with STMT', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(_L['MY_ChatLog'], 'Init database with STMT', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		if self.db then
 			self.db:Execute([[
@@ -163,12 +163,12 @@ function DB:Connect(bCheck)
 		end
 		if self:IsConnected() then
 			--[[#DEBUG BEGIN]]
-			X.Debug(_L['MY_ChatLog'], 'Init database finished: ' .. self.szFilePath, X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(_L['MY_ChatLog'], 'Init database finished: ' .. self.szFilePath, X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			return true
 		end
 		--[[#DEBUG BEGIN]]
-		X.Debug(_L['MY_ChatLog'], 'Init database failed: ' .. self.szFilePath, X.DEBUG_LEVEL.WARNING)
+		X.OutputDebugMessage(_L['MY_ChatLog'], 'Init database failed: ' .. self.szFilePath, X.DEBUG_LEVEL.WARNING)
 		--[[#DEBUG END]]
 		self:Disconnect()
 		return false

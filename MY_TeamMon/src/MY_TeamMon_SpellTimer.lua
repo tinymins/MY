@@ -104,7 +104,7 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 			tParam.nTime = aCountdown
 			tParam.nRefresh = tParam.nRefresh or aCountdown[#aCountdown].nTime - 3 -- 最大时间内防止重复刷新 但是脱离战斗的NPC需要手动删除
 		else
-			return X.Sysmsg(
+			return X.OutputSystemMessage(
 				_L['MY_TeamMon'],
 				_L['Countdown format error']
 					.. ' TYPE: ' .. _L['Countdown TYPE ' .. nType]
@@ -112,7 +112,7 @@ local function CreateCountdown(nType, szKey, tParam, szSender, szReceiver)
 				X.CONSTANT.MSG_THEME.ERROR)
 		end
 	else
-		return X.Sysmsg(
+		return X.OutputSystemMessage(
 			_L['MY_TeamMon'],
 			_L['Countdown format error']
 				.. ' TYPE: ' .. _L['Countdown TYPE ' .. nType]

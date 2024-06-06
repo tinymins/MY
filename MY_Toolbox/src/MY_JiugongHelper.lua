@@ -98,7 +98,7 @@ function D.Apply()
 				else
 					szText = _L['Failed to calc.']
 				end
-				X.Sysmsg(szText)
+				X.OutputSystemMessage(szText)
 				OutputWarningMessage('MSG_WARNING_RED', szText, 10)
 			end)
 		end)

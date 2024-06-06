@@ -724,7 +724,7 @@ function D.Init()
 	}) do
 		local config = LoadDefaultTemplate(p.name)
 		if not config then
-			X.Debug(_L['MY_LifeBar'], _L['Default config cannot be loaded, please reinstall!!!'] .. ' (' .. p.name .. ')', X.DEBUG_LEVEL.ERROR)
+			X.OutputDebugMessage(_L['MY_LifeBar'], _L['Default config cannot be loaded, please reinstall!!!'] .. ' (' .. p.name .. ')', X.DEBUG_LEVEL.ERROR)
 		end
 		CONFIG_DEFAULTS[p.key] = config
 	end

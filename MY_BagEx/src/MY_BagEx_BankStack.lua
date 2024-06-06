@@ -38,7 +38,7 @@ function D.Operate()
 	local function fnNext()
 		bTrigger = true
 		if not frame then
-			X.Systopmsg(_L['Bank panel closed, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
+			X.OutputSystemAnnounceMessage(_L['Bank panel closed, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
 			return fnFinish()
 		end
 		local me, tList = X.GetClientPlayer(), {}
@@ -55,7 +55,7 @@ function D.Operate()
 					if tPos then
 						local dwBox1, dwX1 = tPos.dwBox, tPos.dwX
 						--[[#DEBUG BEGIN]]
-						X.Debug('MY_BagEx_BankStack', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
+						X.OutputDebugMessage('MY_BagEx_BankStack', 'ExchangeItem: ' ..dwBox .. ',' .. dwX .. ' <-> ' ..dwBox1 .. ',' .. dwX1 .. ' <T1>', X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 						X.ExchangeInventoryItem(dwBox, dwX, dwBox1, dwX1)
 						return
@@ -76,7 +76,7 @@ function D.Operate()
 			if (event == 'BAG_ITEM_UPDATE' and dwBox >= INVENTORY_INDEX.BANK_PACKAGE1 and dwBox <= INVENTORY_INDEX.BANK_PACKAGE5)
 			or event == 'BANK_ITEM_UPDATE' then
 				if bNewAdd then
-					X.Systopmsg(_L['Put new item in bank detected, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
+					X.OutputSystemAnnounceMessage(_L['Put new item in bank detected, stack exited!'], X.CONSTANT.MSG_THEME.ERROR)
 					fnFinish()
 				else
 					X.DelayCall('MY_BagEx_BankStack__Stack', fnNext)
@@ -164,7 +164,7 @@ function D.CheckInjection(bRemoveInjection)
 					text = _L['Stack'],
 					onClick = function()
 						if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.BANK) then
-							X.Systopmsg(_L['Please unlock mibao first.'])
+							X.OutputSystemAnnounceMessage(_L['Please unlock mibao first.'])
 							return
 						end
 						MY_BagEx_Bank.ShowAllItemShadow()

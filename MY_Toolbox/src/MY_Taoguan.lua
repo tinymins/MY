@@ -204,7 +204,7 @@ function D.UseBagItem(szName, bWarn)
 		local it = GetPlayerItem(me, i, j)
 			if it and it.szName == szName then
 				--[[#DEBUG BEGIN]]
-				X.Debug('MY_Taoguan', 'UseItem: ' .. i .. ',' .. j .. ' ' .. szName, X.DEBUG_LEVEL.LOG)
+				X.OutputDebugMessage('MY_Taoguan', 'UseItem: ' .. i .. ',' .. j .. ' ' .. szName, X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				OnUseItem(i, j)
 				return true
@@ -212,7 +212,7 @@ function D.UseBagItem(szName, bWarn)
 		end
 	end
 	if bWarn then
-		X.Systopmsg(_L('Auto taoguan: missing [%s]!', szName))
+		X.OutputSystemAnnounceMessage(_L('Auto taoguan: missing [%s]!', szName))
 	end
 end
 
@@ -321,7 +321,7 @@ function D.MonitorZP(szChannel, szMsg)
 		if D.nPoint >= O.nPausePoint then
 			D.Stop()
 			D.bReachLimit = true
-			X.Systopmsg(_L['Auto taoguan: reach limit!'])
+			X.OutputSystemAnnounceMessage(_L['Auto taoguan: reach limit!'])
 		end
 		D.bWaitPoint = false
 		D.nUseHammerLFC = GetLogicFrameCount()
@@ -335,7 +335,7 @@ function D.OnLootItem()
 	if arg0 == X.GetClientPlayer().dwID and arg2 > 2 and GetItem(arg1).szName == MEILIANGYUQIAN then
 		D.nPoint = 0
 		D.bWaitPoint = false
-		X.Systopmsg(_L['Auto taoguan: score clear!'])
+		X.OutputSystemAnnounceMessage(_L['Auto taoguan: score clear!'])
 	end
 end
 
@@ -372,7 +372,7 @@ function D.OnOpenDoodad()
 				then
 					LootItem(d.dwID, it.dwID)
 				else
-					X.Systopmsg(_L('Auto taoguan: filter item [%s].', szName))
+					X.OutputSystemAnnounceMessage(_L('Auto taoguan: filter item [%s].', szName))
 				end
 			end
 			local hL = Station.Lookup('Normal/LootList', 'Handle_LootList')
@@ -403,7 +403,7 @@ function D.Start()
 			D.dwDoodadID = 0
 		end
 	end)
-	X.Systopmsg(_L['Auto taoguan: on.'])
+	X.OutputSystemAnnounceMessage(_L['Auto taoguan: on.'])
 end
 
 -- 砸罐子关闭（注销事件）
@@ -418,7 +418,7 @@ function D.Stop()
 	-- X.RegisterEvent('LOOT_ITEM', 'MY_Taoguan', false) -- 积分清零监听不可注销，否则下次启动会错误判定
 	X.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_Taoguan', false)
 	X.RegisterEvent('HELP_EVENT', 'MY_Taoguan', false)
-	X.Systopmsg(_L['Auto taoguan: off.'])
+	X.OutputSystemAnnounceMessage(_L['Auto taoguan: off.'])
 end
 
 -- 砸罐子开关

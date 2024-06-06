@@ -74,7 +74,7 @@ local function InitDB()
 			szMsg = szMsg .. _L(' Retry time: %d', DB_ERR_COUNT)
 		end
 		DB_ERR_COUNT = DB_ERR_COUNT + 1
-		X.Sysmsg(_L['MY_Farbnamen'], szMsg, X.CONSTANT.MSG_THEME.ERROR)
+		X.OutputSystemMessage(_L['MY_Farbnamen'], szMsg, X.CONSTANT.MSG_THEME.ERROR)
 		return false
 	end
 	DB:Execute([[
@@ -123,7 +123,7 @@ local function InitDB()
 	local SZ_IC_PATH = X.FormatPath({'cache/PLAYER_INFO/{$server_origin}/', X.PATH_TYPE.DATA})
 	if IsLocalFileExist(SZ_IC_PATH) then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite start!', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite start!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 999 do
@@ -139,11 +139,11 @@ local function InitDB()
 		DBI_W:Reset()
 		DB:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite start!', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite start!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 128 do
@@ -161,15 +161,15 @@ local function InitDB()
 		DBT_W:Reset()
 		DB:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_Farbnamen', 'Farbnamen cleaning file cache start: ' .. SZ_IC_PATH, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen cleaning file cache start: ' .. SZ_IC_PATH, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		CPath.DelDir(SZ_IC_PATH)
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_Farbnamen', 'Farbnamen cleaning file cache finished!', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen cleaning file cache finished!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end
 	return true
@@ -488,7 +488,7 @@ function D.RegisterNameIDHeader(szName, dwID, szHeaderXml)
 		NAME_ID_HEADER_XML[szName] = {}
 	end
 	if NAME_ID_HEADER_XML[szName][dwID] then
-		return X.Debug('ERROR', 'MY_Farbnamen Conflicted Name-ID: ' .. szName .. '(' .. dwID .. ')', X.DEBUG_LEVEL.ERROR)
+		return X.OutputDebugMessage('ERROR', 'MY_Farbnamen Conflicted Name-ID: ' .. szName .. '(' .. dwID .. ')', X.DEBUG_LEVEL.ERROR)
 	end
 	if dwID == '*' then
 		szName = X.FormatBasePlayerName(szName)
@@ -498,7 +498,7 @@ end
 
 function D.RegisterGlobalIDHeader(szGlobalID, szHeaderXml)
 	if GUID_HEADER_XML[szGlobalID] then
-		return X.Debug('ERROR', 'MY_Farbnamen Conflicted GUID: ' .. szGlobalID, X.DEBUG_LEVEL.ERROR)
+		return X.OutputDebugMessage('ERROR', 'MY_Farbnamen Conflicted GUID: ' .. szGlobalID, X.DEBUG_LEVEL.ERROR)
 	end
 	GUID_HEADER_XML[szGlobalID] = szHeaderXml
 end
@@ -980,7 +980,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 					return
 				end
 				DB:Execute('DELETE FROM InfoCache')
-				X.Sysmsg(_L['MY_Farbnamen'], _L['Cache data deleted.'])
+				X.OutputSystemMessage(_L['MY_Farbnamen'], _L['Cache data deleted.'])
 			end)
 		end,
 		autoEnable = function()

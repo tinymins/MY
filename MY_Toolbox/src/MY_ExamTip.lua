@@ -27,7 +27,7 @@ local LAST_REMOTE_QUERY -- 最后一次网络查询的题目（防止重查）
 local D = {}
 
 local function DisplayMessage(szText)
-	X.Sysmsg(_L['Exam tip'], szText)
+	X.OutputSystemMessage(_L['Exam tip'], szText)
 end
 
 local function IsCurrentQuestion(szQues)
@@ -161,7 +161,7 @@ function D.SubmitData(tExamData, bAllRight)
 			if X.IsRestricted('MY_ExamTip') or not res then
 				return
 			end
-			X.Sysmsg(_L['Exam tip'], _L('%s record(s) commited, %s record(s) accepted!', res.received, res.accepted))
+			X.OutputSystemMessage(_L['Exam tip'], _L('%s record(s) commited, %s record(s) accepted!', res.received, res.accepted))
 		end,
 	})
 end

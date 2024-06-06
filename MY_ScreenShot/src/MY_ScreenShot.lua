@@ -111,14 +111,14 @@ local D = {}
 
 function D.ShotScreen(szFilePath, nQuality)
 	local szFullPath = ScreenShot(szFilePath, nQuality)
-	X.Sysmsg(_L('Shot screen succeed, file saved as %s .', szFullPath))
+	X.OutputSystemMessage(_L('Shot screen succeed, file saved as %s .', szFullPath))
 end
 
 function D.ShotScreenEx(nShowUI)
 	-- 生成可使用的完整截图目录
 	local szFolderPath = O.szFilePath
 	if szFolderPath~='' and not (string.sub(szFolderPath,2,2)==':' and IsFileExist(szFolderPath)) then
-		X.Sysmsg(_L('Shotscreen destination folder error: %s not exist. File has been save to default folder.', szFolderPath))
+		X.OutputSystemMessage(_L('Shotscreen destination folder error: %s not exist. File has been save to default folder.', szFolderPath))
 		szFolderPath = ''
 	end
 	local szFilePath

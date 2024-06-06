@@ -41,7 +41,7 @@ end
 function D.Save(nIndex, szName)
 	local tList, tList2, me, team = {}, {}, X.GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
-		return X.Sysmsg(_L['You are not in a team'], X.CONSTANT.MSG_THEME.ERROR)
+		return X.OutputSystemMessage(_L['You are not in a team'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	local tSave = {}
 	tSave.szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
@@ -83,7 +83,7 @@ function D.Save(nIndex, szName)
 	end
 	O.SaveList[nIndex] = tSave
 	D.SaveLUAData()
-	X.Sysmsg(_L['Team list data saved'])
+	X.OutputSystemMessage(_L['Team list data saved'])
 end
 function D.Delete(nIndex)
 	table.remove(O.SaveList, nIndex)
@@ -92,11 +92,11 @@ end
 function D.SyncMember(team, dwID, szName, state)
 	if O.bKeepForm and state.bForm then --如果这货之前有阵眼
 		team.SetTeamFormationLeader(dwID, state.nGroup) -- 阵眼给他
-		X.Sysmsg(_L('Restore formation of %d group: %s', state.nGroup + 1, szName))
+		X.OutputSystemMessage(_L('Restore formation of %d group: %s', state.nGroup + 1, szName))
 	end
 	if O.bKeepMark and state.nMark then -- 如果这货之前有标记
 		X.SetTeamMarkTarget(state.nMark, dwID) -- 标记给他
-		X.Sysmsg(_L('Restore player marked as [%s]: %s', X.CONSTANT.TEAM_MARK_NAME[state.nMark] or '?', szName))
+		X.OutputSystemMessage(_L('Restore player marked as [%s]: %s', X.CONSTANT.TEAM_MARK_NAME[state.nMark] or '?', szName))
 	end
 end
 
@@ -115,15 +115,15 @@ function D.Restore(n)
 	D.LoadLUAData()
 
 	if not me or not me.IsInParty() then
-		return X.Sysmsg(_L['You are not in a team'], X.CONSTANT.MSG_THEME.ERROR)
+		return X.OutputSystemMessage(_L['You are not in a team'], X.CONSTANT.MSG_THEME.ERROR)
 	elseif not O.SaveList[n] then
-		return X.Sysmsg(_L['You have not saved team list data'], X.CONSTANT.MSG_THEME.ERROR)
+		return X.OutputSystemMessage(_L['You have not saved team list data'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	-- get perm
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) ~= me.dwID then
 		local nGroup = team.GetMemberGroupIndex(me.dwID) + 1
 		local szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
-		return X.Sysmsg(_L['You are not team leader, permission denied'], X.CONSTANT.MSG_THEME.ERROR)
+		return X.OutputSystemMessage(_L['You are not team leader, permission denied'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) ~= me.dwID then
@@ -138,7 +138,7 @@ function D.Restore(n)
 		for _, dwID in pairs(tGroupInfo.MemberList) do
 			local szName = team.GetClientTeamMemberName(dwID)
 			if not szName then
-				X.Sysmsg(_L('Unable get player of %d group: #%d', nGroup + 1, dwID), X.CONSTANT.MSG_THEME.ERROR)
+				X.OutputSystemMessage(_L('Unable get player of %d group: #%d', nGroup + 1, dwID), X.CONSTANT.MSG_THEME.ERROR)
 			else
 				if not tSaved[szName] then
 					szName = string.gsub(szName, '@.*', '')
@@ -146,10 +146,10 @@ function D.Restore(n)
 				local state = tSaved[szName]
 				if not state then
 					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = nil })
-					X.Sysmsg(_L('Unknown status: %s', szName))
+					X.OutputSystemMessage(_L('Unknown status: %s', szName))
 				elseif state.nGroup == nGroup then
 					D.SyncMember(team, dwID, szName, state)
-					X.Sysmsg(_L('Need not adjust: %s', szName))
+					X.OutputSystemMessage(_L('Need not adjust: %s', szName))
 				else
 					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = state })
 				end
@@ -161,7 +161,7 @@ function D.Restore(n)
 				end
 				if szName == O.SaveList[n].szDistribute and dwID ~= team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) then
 					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE,dwID)
-					X.Sysmsg(_L('Restore distributor: %s', szName))
+					X.OutputSystemMessage(_L('Restore distributor: %s', szName))
 				end
 			end
 		end
@@ -184,11 +184,11 @@ function D.Restore(n)
 				if not dst.state or dst.state.nGroup ~= nGroup then
 					table.insert(tWrong[nGroup], dst)
 				else -- bingo
-					X.Sysmsg(_L('Change group of [%s] to %d', dst.szName, nGroup + 1))
+					X.OutputSystemMessage(_L('Change group of [%s] to %d', dst.szName, nGroup + 1))
 					D.SyncMember(team, dst.dwID, dst.szName, dst.state)
 				end
 			end
-			X.Sysmsg(_L('Change group of [%s] to %d', src.szName, src.state.nGroup + 1))
+			X.OutputSystemMessage(_L('Change group of [%s] to %d', src.szName, src.state.nGroup + 1))
 			D.SyncMember(team, src.dwID, src.szName, src.state)
 			nIndex = D.GetWrongIndex(tWrong[nGroup], true) -- update nIndex
 		end
@@ -199,28 +199,28 @@ function D.Restore(n)
 	end
 	if dwMark ~= 0 and dwMark ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwMark)
-		X.Sysmsg(_L('Restore team marker: %s', O.SaveList[n].szMark))
+		X.OutputSystemMessage(_L('Restore team marker: %s', O.SaveList[n].szMark))
 	end
 	if dwLeader ~= 0 and dwLeader ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwLeader)
-		X.Sysmsg(_L('Restore team leader: %s', O.SaveList[n].szLeader))
+		X.OutputSystemMessage(_L('Restore team leader: %s', O.SaveList[n].szLeader))
 	end
-	X.Sysmsg(_L['Team list restored'])
+	X.OutputSystemMessage(_L['Team list restored'])
 end
 
 function D.Restore2(n)
 	D.LoadLUAData()
 	local me, team = X.GetClientPlayer(), GetClientTeam()
 	if not me or not me.IsInParty() then
-		return X.Sysmsg(_L['You are not in a team'], X.CONSTANT.MSG_THEME.ERROR)
+		return X.OutputSystemMessage(_L['You are not in a team'], X.CONSTANT.MSG_THEME.ERROR)
 	elseif not O.SaveList[n] then
-		return X.Sysmsg(_L['You have not saved team list data'], X.CONSTANT.MSG_THEME.ERROR)
+		return X.OutputSystemMessage(_L['You have not saved team list data'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 	-- get perm
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) ~= me.dwID then
 		local nGroup = team.GetMemberGroupIndex(me.dwID) + 1
 		local szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
-		return X.Sysmsg(_L['You are not team leader, permission denied'], X.CONSTANT.MSG_THEME.ERROR)
+		return X.OutputSystemMessage(_L['You are not team leader, permission denied'], X.CONSTANT.MSG_THEME.ERROR)
 	end
 
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) ~= me.dwID then
@@ -255,13 +255,13 @@ function D.Restore2(n)
 				local info = team.GetMemberInfo(dwID)
 				if nGroup == tab.nGroup then
 					tWrong[dwID] = nil
-					X.Sysmsg(_L('Need not adjust: %s', info.szName))
+					X.OutputSystemMessage(_L('Need not adjust: %s', info.szName))
 					D.SyncMember(team, dwID, info.szName, v)
 				else
 					if #tGroupInfo.MemberList < 5 then
 						team.ChangeMemberGroup(dwID,nGroup,0)
 						tWrong[dwID] = nil
-						X.Sysmsg(_L('Change group of [%s] to %d', info.szName, nGroup + 1))
+						X.OutputSystemMessage(_L('Change group of [%s] to %d', info.szName, nGroup + 1))
 						D.SyncMember(team, dwID, info.szName, v)
 					else
 						local ddwID,dtab = fnAction(false,nGroup,dwID)
@@ -269,7 +269,7 @@ function D.Restore2(n)
 							team.ChangeMemberGroup(dwID,nGroup,ddwID)
 							tWrong[ddwID].nGroup = tab.nGroup -- update
 							tWrong[dwID] = nil
-							X.Sysmsg(_L('Change group of [%s] to %d', info.szName, nGroup + 1))
+							X.OutputSystemMessage(_L('Change group of [%s] to %d', info.szName, nGroup + 1))
 							D.SyncMember(team, dwID, info.szName, v)
 						end
 					end
@@ -283,13 +283,13 @@ function D.Restore2(n)
 	end
 	if dwMark ~= 0 and dwMark ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwMark)
-		X.Sysmsg(_L('Restore team marker: %s', O.SaveList[n].szMark))
+		X.OutputSystemMessage(_L('Restore team marker: %s', O.SaveList[n].szMark))
 	end
 	if dwLeader ~= 0 and dwLeader ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwLeader)
-		X.Sysmsg(_L('Restore team leader: %s', O.SaveList[n].szLeader))
+		X.OutputSystemMessage(_L('Restore team leader: %s', O.SaveList[n].szLeader))
 	end
-	X.Sysmsg(_L['Team list restored'])
+	X.OutputSystemMessage(_L['Team list restored'])
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)

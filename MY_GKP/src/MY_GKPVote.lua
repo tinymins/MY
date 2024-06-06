@@ -45,7 +45,7 @@ X.RegisterEvent('TEAM_VOTE_RESPOND', function()
 				agree = agree + 1
 			end
 		end
-		X.Topmsg(_L('Team Members: %d, %d agree %d%%', num, agree, agree / num * 100))
+		X.OutputAnnounceMessage(_L('Team Members: %d, %d agree %d%%', num, agree, agree / num * 100))
 	end
 end)
 

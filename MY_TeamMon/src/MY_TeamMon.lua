@@ -288,7 +288,7 @@ local function GetUserDataPath()
 		})
 		CPath.DelFile(szPathV1)
 	end
-	X.Debug('[MY_TeamMon] Data path: ' .. szPath, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage('[MY_TeamMon] Data path: ' .. szPath, X.DEBUG_LEVEL.LOG)
 	return szPath
 end
 
@@ -591,7 +591,7 @@ function D.OnEvent(szEvent)
 			if szText and szText ~= '' then
 				D.OnCallMessage('TALK', szText, arg1, arg3 == '' and '%' or arg3)
 			else
-				X.Debug(_L['MY_TeamMon'], 'GetPureText ERROR: ' .. arg0, X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage(_L['MY_TeamMon'], 'GetPureText ERROR: ' .. arg0, X.DEBUG_LEVEL.WARNING)
 			end
 		end
 	elseif szEvent == 'ON_WARNING_MESSAGE' then
@@ -669,7 +669,7 @@ function D.Talk(szType, szMsg, szTarget)
 			szMsg = X.StringReplaceW(szMsg, _L['['] .. szTarget .. _L[']'], _L['['] .. g_tStrings.STR_YOU .. _L[']'])
 		end
 		if szTarget == me.szName then
-			X.OutputWhisper(szMsg, _L['MY_TeamMon'])
+			X.OutputWhisperMessage(szMsg, _L['MY_TeamMon'])
 		else
 			D.SendChat(szTarget, szMsg, { uuid = szKey .. GetStringCRC(szType .. szMsg) })
 		end
@@ -680,7 +680,7 @@ function D.Talk(szType, szMsg, szTarget)
 				local szName = team.GetClientTeamMemberName(v)
 				local szText = X.StringReplaceW(szMsg, '[' .. szName .. ']', _L['['] .. g_tStrings.STR_YOU ..  _L[']'])
 				if szName == me.szName then
-					X.OutputWhisper(szText, _L['MY_TeamMon'])
+					X.OutputWhisperMessage(szText, _L['MY_TeamMon'])
 				else
 					D.SendChat(szName, szText, { uuid = szKey .. GetStringCRC(szType .. szText .. szName) })
 				end
@@ -695,7 +695,7 @@ function D.UpdateShieldStatus()
 	local bRestrictedMap = bRestricted and X.IsInCompetitionMap()
 	local bPvpMap = bRestricted and not X.IsInDungeonMap()
 	if bRestrictedMap then
-		X.Sysmsg(_L['MY_TeamMon is blocked in this map, temporary disabled.'])
+		X.OutputSystemMessage(_L['MY_TeamMon is blocked in this map, temporary disabled.'])
 	end
 	MY_TEAM_MON_SHIELDED_MAP, MY_TEAM_MON_PVP_MAP = bRestrictedMap, bPvpMap
 end
@@ -794,7 +794,7 @@ function D.CreateData(szEvent)
 						cache.HIT[v.szContent][v.szTarget or 'sys'] = v
 					end
 				else
-					X.Debug('MY_TeamMon', '[Warning] ' .. vType .. ' data is not szContent #' .. k .. ', please do check it!', X.DEBUG_LEVEL.WARNING)
+					X.OutputDebugMessage('MY_TeamMon', '[Warning] ' .. vType .. ' data is not szContent #' .. k .. ', please do check it!', X.DEBUG_LEVEL.WARNING)
 				end
 			end
 			D.Log('create ' .. vType .. ' data success!')
@@ -1913,7 +1913,7 @@ function D.RegisterMessage(bEnable)
 			end
 			-- local res, err = pcall(D.OnCallMessage, 'CHAT', szMsg:gsub('\r', ''))
 			-- if not res then
-			-- 	return X.Debug(err, X.DEBUG_LEVEL.WARNING)
+			-- 	return X.OutputDebugMessage(err, X.DEBUG_LEVEL.WARNING)
 			-- end
 			szMsg = szMsg:gsub('\r', '')
 			D.OnCallMessage('CHAT', szMsg)
@@ -1958,7 +1958,7 @@ function D.Enable(bEnable, bFireUIEvent)
 	if D.bReady and bEnable then
 		local res, err = pcall(D.Open)
 		if not res then
-			return X.Debug(err, X.DEBUG_LEVEL.WARNING)
+			return X.OutputDebugMessage(err, X.DEBUG_LEVEL.WARNING)
 		end
 		if bFireUIEvent then
 			FireUIEvent('MY_TEAM_MON_LOADING_END')

@@ -138,8 +138,8 @@ function D.LoadConfig()
 	end
 end
 
-function D.Sysmsg(szMsg)
-	X.Sysmsg(_L['MY GKP'], szMsg)
+function D.OutputSystemMessage(szMsg)
+	X.OutputSystemMessage(_L['MY GKP'], szMsg)
 end
 
 function D.GetTimeString(nTime, year)

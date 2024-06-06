@@ -165,13 +165,13 @@ function D.CheckAllFrame()
 		X.RegisterSpecialKeyEvent('*', 'MY_LockFrame', function()
 			if IsCtrlKeyDown() and (IsShiftKeyDown() or IsAltKeyDown()) then
 				if not D.bTempDisable then
-					X.Topmsg(_L['MY_LockFrame has been temporary disabled.'])
+					X.OutputAnnounceMessage(_L['MY_LockFrame has been temporary disabled.'])
 					D.bTempDisable = true
 					D.CheckAllFrame()
 				end
 			else
 				if D.bTempDisable then
-					X.Topmsg(_L['MY_LockFrame has been enabled.'])
+					X.OutputAnnounceMessage(_L['MY_LockFrame has been enabled.'])
 					D.bTempDisable = false
 					D.CheckAllFrame()
 				end

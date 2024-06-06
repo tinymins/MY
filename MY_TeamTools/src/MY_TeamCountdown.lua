@@ -32,25 +32,25 @@ local D = {}
 
 function D.Open()
 	if not X.IsLeader() then
-		X.Topmsg(_L['You are not leader!'])
+		X.OutputAnnounceMessage(_L['You are not leader!'])
 		return
 	end
 	if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-		X.Topmsg(_L['Please unlock safety talk lock first!'])
+		X.OutputAnnounceMessage(_L['Please unlock safety talk lock first!'])
 		return
 	end
 	GetUserInput(_L['Team countdown seconds'], function(text)
 		local nCountdown = tonumber(text)
 		if not nCountdown then
-			X.Topmsg(_L['Invalid countdown time input.'])
+			X.OutputAnnounceMessage(_L['Invalid countdown time input.'])
 			return
 		end
 		if nCountdown > 10 then
-			X.Topmsg(_L('Countdown time cannot be more than %ds.', 10))
+			X.OutputAnnounceMessage(_L('Countdown time cannot be more than %ds.', 10))
 			return
 		end
 		if nCountdown < 1 then
-			X.Topmsg(_L('Countdown time cannot be less than %ds.', 1))
+			X.OutputAnnounceMessage(_L('Countdown time cannot be less than %ds.', 1))
 			return
 		end
 		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TeamCountdown', {nCountdown}, true)

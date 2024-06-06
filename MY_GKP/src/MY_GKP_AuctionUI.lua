@@ -145,7 +145,7 @@ function D.Open(ds, tab, szMode)
 				this.szText = szText
 				ui:Color(D.GetMoneyCol(szText))
 			else
-				X.Sysmsg(_L['Please enter numbers'])
+				X.OutputSystemMessage(_L['Please enter numbers'])
 				ui:Text(this.szText or '')
 			end
 		end,
@@ -214,7 +214,7 @@ function D.Open(ds, tab, szMode)
 		if tab and type(item) == 'userdata' and szMode ~= 'EDIT' then
 			if X.IsDistributor() then
 				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-					X.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+					X.OutputSystemAnnounceMessage(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else
 					X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 						D.GetFormatLink(tab),
@@ -231,7 +231,7 @@ function D.Open(ds, tab, szMode)
 			tab.bEdit = true
 			if X.IsDistributor() then
 				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-					X.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+					X.OutputSystemAnnounceMessage(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else
 					X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 						D.GetFormatLink(tab.szPlayer, true),
@@ -245,7 +245,7 @@ function D.Open(ds, tab, szMode)
 		else
 			if X.IsDistributor() then
 				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-					X.Systopmsg(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
+					X.OutputSystemAnnounceMessage(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else
 					X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 						D.GetFormatLink(tab.szName),

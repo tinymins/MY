@@ -41,7 +41,7 @@ function D.OnInit()
 					if state == 'PASSWORD_LOCK' then
 						local me = X.GetClientPlayer()
 						local szText = me and me.GetGlobalID and _L.LOCK_TIP[me.GetGlobalID()] or _L['You have been loged in for 2min, you can unlock bag locker now.']
-						X.Sysmsg(szText)
+						X.OutputSystemMessage(szText)
 						OutputWarningMessage('MSG_REWARD_GREEN', szText, 10)
 					end
 				end)

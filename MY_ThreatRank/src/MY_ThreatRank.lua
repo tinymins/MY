@@ -237,7 +237,7 @@ function TS.OnFrameBreathe()
 						local name = MY_GetObjName(p)
 						local oContent = {_L('Well done! %s in %d group first to attack %s!!', nGroup, szMember, name), r = 150, g = 250, b = 230}
 						local oTitle = {g_tStrings.HATRED_COLLECT, r = 150, g = 250, b = 230}
-						X.Sysmsg(oTitle, oContent)
+						X.OutputSystemMessage(oTitle, oContent)
 					end
 				end
 			end)
@@ -398,7 +398,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			if MY_GetClientPlayerID() == v.id then
 				if O.nOTAlertLevel > 0 and GetNpcIntensity(KGnpc) > 2 then
 					if this.bSelfTreatRank < O.nOTAlertLevel and v.val / nTopRank >= O.nOTAlertLevel then
-						X.Topmsg(_L('** You Threat more than %d, 120% is Out of Taunt! **', O.nOTAlertLevel * 100))
+						X.OutputAnnounceMessage(_L('** You Threat more than %d, 120% is Out of Taunt! **', O.nOTAlertLevel * 100))
 						if O.bOTAlertSound then
 							PlaySound(SOUND.UI_SOUND, _L['SOUND_nat_view2'])
 						end

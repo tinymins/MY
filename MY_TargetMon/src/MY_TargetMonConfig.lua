@@ -87,7 +87,7 @@ local MY_TARGET_MON_MAP_TYPE_NAME = {
 local function GetUserDataPath()
 	local ePathType = O.bCommon and X.PATH_TYPE.GLOBAL or X.PATH_TYPE.ROLE
 	local szPath = X.FormatPath({'userdata/target_mon/local.jx3dat', ePathType})
-	X.Debug('[MY_TargetMon] Data path: ' .. szPath, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage('[MY_TargetMon] Data path: ' .. szPath, X.DEBUG_LEVEL.LOG)
 	return szPath
 end
 
@@ -415,7 +415,7 @@ function D.ImportDatasetFile(szFile, tOption)
 		or X.LoadLUAData(szFile, { passphrase = X.KE(X.SECRET['FILE::TARGET_MON_DATA_PW_E'] .. 'MY') })
 		or X.LoadLUAData(szFile, { passphrase = false })
 	if not X.IsArray(aDataset) then
-		X.Sysmsg(_L['MY_TargetMon'], _L('Load dataset failed: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.ERROR)
+		X.OutputSystemMessage(_L['MY_TargetMon'], _L('Load dataset failed: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.ERROR)
 		return
 	end
 	for i, dataset in ipairs(aDataset) do
@@ -456,7 +456,7 @@ function D.ImportDatasetFile(szFile, tOption)
 			end
 		end
 		FireUIEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
-		X.Sysmsg(_L['MY_TargetMon'], _L('Load dataset success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
+		X.OutputSystemMessage(_L['MY_TargetMon'], _L('Load dataset success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
 		if tOption and tOption.fnCallback then
 			local aImported = {}
 			for _, dataset in ipairs(aDataset) do
@@ -511,7 +511,7 @@ function D.ExportDatasetFile(aUUID, bIndent)
 		table.insert(aExport, tDataset[szUUID])
 	end
 	if #aExport == 0 then
-		X.Topmsg(_L['Please select at least one dataset to export'])
+		X.OutputAnnounceMessage(_L['Please select at least one dataset to export'])
 		return
 	end
 	local szFile = X.FormatPath(
@@ -533,7 +533,7 @@ function D.ExportDatasetFile(aUUID, bIndent)
 		})
 	end
 	X.Alert(_L('Export dataset success: %s', tostring(szFile)))
-	X.Sysmsg(_L['MY_TargetMon'], _L('Export dataset success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
+	X.OutputSystemMessage(_L['MY_TargetMon'], _L('Export dataset success: %s', tostring(szFile)), X.CONSTANT.MSG_THEME.SUCCESS)
 	return true
 end
 

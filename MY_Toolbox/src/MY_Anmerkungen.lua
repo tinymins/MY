@@ -272,7 +272,7 @@ local function CheckPartyPlayer(dwID)
 			})
 		end
 		if t.bTipWhenGroup then
-			X.Sysmsg(_L('Tip: [%s] is in your team.\nNote: %s', t.szName, t.szContent))
+			X.OutputSystemMessage(_L('Tip: [%s] is in your team.\nNote: %s', t.szName, t.szContent))
 		end
 	end
 end
@@ -304,7 +304,7 @@ end
 function MY_Anmerkungen.LoadConfig()
 	if not X.GetClientPlayer() then
 		--[[#DEBUG BEGIN]]
-		X.Debug('MY_Anmerkungen.LoadConfig', 'Client player not exist! Cannot load config!', X.DEBUG_LEVEL.ERROR)
+		X.OutputDebugMessage('MY_Anmerkungen.LoadConfig', 'Client player not exist! Cannot load config!', X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end
