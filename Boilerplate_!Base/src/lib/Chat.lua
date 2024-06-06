@@ -364,6 +364,9 @@ local ChatLinkEvents = {
 		if not link then
 			link = element
 		end
+		if GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
+			return X.Systopmsg(_L['First week of WuJie, chat copy not available.'])
+		end
 		X.CopyChatLine(link, IsCtrlKeyDown(), IsCtrlKeyDown() and IsShiftKeyDown())
 	end,
 	OnCopyMClick = function(element, link)
@@ -375,6 +378,9 @@ local ChatLinkEvents = {
 	OnCopyRClick = function(element, link)
 		if not link then
 			link = element
+		end
+		if GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
+			return X.Systopmsg(_L['First week of WuJie, chat copy not available.'])
 		end
 		X.RepeatChatLine(link)
 	end,

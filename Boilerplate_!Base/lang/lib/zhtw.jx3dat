@@ -194,4 +194,6 @@ return {
 	['%d settings exported, file saved in %s.'] = '成功導出 %d 條配置項，文件位於：%s。',
 
 	['Global config'] = '全局設置',
+
+	['First week of WuJie, chat copy not available.'] = '無界新開啟一周內暫時無法使用聊天複製功能。',
 }
