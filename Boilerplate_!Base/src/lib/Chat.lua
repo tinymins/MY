@@ -364,8 +364,8 @@ local ChatLinkEvents = {
 		if not link then
 			link = element
 		end
-		if GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
-			return X.Systopmsg(_L['First week of WuJie, chat copy not available.'])
+		if X.IS_REMAKE and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
+			return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
 		end
 		X.CopyChatLine(link, IsCtrlKeyDown(), IsCtrlKeyDown() and IsShiftKeyDown())
 	end,
@@ -379,8 +379,8 @@ local ChatLinkEvents = {
 		if not link then
 			link = element
 		end
-		if GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
-			return X.Systopmsg(_L['First week of WuJie, chat copy not available.'])
+		if X.IS_REMAKE and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
+			return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
 		end
 		X.RepeatChatLine(link)
 	end,
