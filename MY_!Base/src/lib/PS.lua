@@ -218,7 +218,7 @@ function X.SwitchTab(szKey, bForceUpdate)
 	if not tTab then
 		--[[#DEBUG BEGIN]]
 		if not tTab then
-			X.Debug(X.NSFormatString('{$NS}.SwitchTab'), _L('Cannot find tab: %s', szKey), X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage(X.NSFormatString('{$NS}.SwitchTab'), _L('Cannot find tab: %s', szKey), X.DEBUG_LEVEL.WARNING)
 		end
 		--[[#DEBUG END]]
 		return

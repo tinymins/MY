@@ -203,7 +203,7 @@ local COMPONENT_SAMPLE = {
 			sort = 'price',
 			sortOrder = 'asc',
 			onSortChange = function(szSort, szSortOrder)
-				X.Systopmsg('Sort: ' .. szSort .. ' (order) ' .. szSortOrder)
+				X.OutputSystemAnnounceMessage('Sort: ' .. szSort .. ' (order) ' .. szSortOrder)
 			end,
 			rowTip = {
 				render = function(rec)
@@ -216,7 +216,7 @@ local COMPONENT_SAMPLE = {
 					{
 						szOption = _L['Delete'],
 						fnAction = function()
-							X.Systopmsg('Delete: ' .. rec.name .. ' (index) ' .. index)
+							X.OutputSystemAnnounceMessage('Delete: ' .. rec.name .. ' (index) ' .. index)
 						end,
 						rgb = { 255, 128, 128 },
 					},
@@ -228,7 +228,7 @@ local COMPONENT_SAMPLE = {
 				for _, v in ipairs(aColumns) do
 					table.insert(aKeys, v.key)
 				end
-				X.Sysmsg('ColumnsChange: ' .. table.concat(aKeys, ','))
+				X.OutputSystemMessage('ColumnsChange: ' .. table.concat(aKeys, ','))
 			end,
 		},
 	},
@@ -242,7 +242,7 @@ local COMPONENT_SAMPLE = {
 				return 'data 1', this
 			end,
 			onDrop = function(dragID, data)
-				X.Sysmsg('Drop 1, ' .. tostring(dragID) .. ', ' .. X.EncodeLUAData(data))
+				X.OutputSystemMessage('Drop 1, ' .. tostring(dragID) .. ', ' .. X.EncodeLUAData(data))
 			end,
 		},
 	},
@@ -274,7 +274,7 @@ local COMPONENT_SAMPLE = {
 				return rect
 			end,
 			onDrop = function(dragID, data)
-				X.Sysmsg('Drop 2, ' .. tostring(dragID) .. ', ' .. X.EncodeLUAData(data))
+				X.OutputSystemMessage('Drop 2, ' .. tostring(dragID) .. ', ' .. X.EncodeLUAData(data))
 			end,
 		},
 	},

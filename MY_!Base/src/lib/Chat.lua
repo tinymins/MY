@@ -1280,7 +1280,7 @@ function X.SendChat(nChannel, szText, tOptions)
 	local aSay = StandardizeChatData(szText, parserOptions)
 	if bSystem then
 		local szXml = X.XmlifyChatData(aSay, GetMsgFontColor('MSG_SYS'))
-		return X.Sysmsg({ szXml, rich = true })
+		return X.OutputSystemMessage({ szXml, rich = true })
 	end
 	-- Ç©Ãû²¢·¢ËÍ
 	local aSignSay = SignChatData(aSay, tOptions.uuid, me)
@@ -1324,7 +1324,7 @@ function X.SendTabChat(nChannel, aTable, aAlignment)
 				aSay[j] = szText .. MergeHW(szFixL .. szFixR)
 			end
 		end
-		-- X.Sysmsg(table.concat(aSay, '|'))
+		-- X.OutputSystemMessage(table.concat(aSay, '|'))
 		X.SendChat(nChannel, (table.concat(aSay, ' ')))
 	end
 end

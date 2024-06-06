@@ -20,7 +20,7 @@ function X.Random(...)
 	-- do random
 	local fValue = math.random()
 	while fValue == RANDOM_VALUE do
-		X.Debug(
+		X.OutputDebugMessage(
 			X.PACKET_INFO.NAME_SPACE,
 			'Random: math.random get same value: ' .. fValue
 				.. ', this is abnormal, you should be attention about this!',
@@ -1046,7 +1046,7 @@ X.StringFindW = StringFindW
 		end
 		--[[#DEBUG BEGIN]]
 		if szNeedle == '' then
-			X.Debug(X.PACKET_INFO.NAME_SPACE, X.GetTraceback('Call StringFindW with empty needle!'), X.DEBUG_LEVEL.ERROR)
+			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, X.GetTraceback('Call StringFindW with empty needle!'), X.DEBUG_LEVEL.ERROR)
 		end
 		--[[#DEBUG END]]
 		-- 官方 StringFindW 有缺陷，当目标串 szHaystack 包含乱码时，查找结果可能低于偏移位置

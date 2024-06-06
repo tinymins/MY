@@ -56,7 +56,7 @@ function X.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
 		local cache = CACHE[szCtcKey]
 		--[[#DEBUG BEGIN]]
 		if not cache then
-			X.Debug(X.NSFormatString('{$NS}#SYS'), _L('Error: `%s` has not be registed!', szCtcKey), X.DEBUG_LEVEL.ERROR)
+			X.OutputDebugMessage(X.NSFormatString('{$NS}#SYS'), _L('Error: `%s` has not be registed!', szCtcKey), X.DEBUG_LEVEL.ERROR)
 		end
 		--[[#DEBUG END]]
 		return CThreadCoor_Get(cache.ctcid) -- nX, nY, bFront

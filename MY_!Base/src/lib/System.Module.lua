@@ -206,7 +206,7 @@ function X.CreateModule(options)
 			local root = exportEntries[k]
 			if not root then
 				--[[#DEBUG BEGIN]]
-				X.Debug(X.PACKET_INFO.NAME_SPACE, 'Module `' .. name .. '`: get value failed, unregistered property `' .. k .. '`.', X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Module `' .. name .. '`: get value failed, unregistered property `' .. k .. '`.', X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				return
 			end

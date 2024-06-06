@@ -608,14 +608,14 @@ function X.OutputTableTip(tOptions)
 	end
 	-- 数据源不可为空
 	if #aDataSource == 0 then
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip aDataSource is empty.', X.DEBUG_LEVEL.WARNING)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip aDataSource is empty.', X.DEBUG_LEVEL.WARNING)
 		return
 	end
 	-- 计算列数
 	for iCol, aCol in ipairs(aDataSource) do
 		local nCol = #aCol
 		if nCol == 0 then
-			X.Debug(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip row ' .. iCol .. ' is empty.', X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip row ' .. iCol .. ' is empty.', X.DEBUG_LEVEL.WARNING)
 			return
 		end
 		if nCol ~= 1 then
@@ -623,7 +623,7 @@ function X.OutputTableTip(tOptions)
 				nTableColumn = nCol
 			end
 			if nCol ~= nTableColumn then
-				X.Debug(
+				X.OutputDebugMessage(
 					X.PACKET_INFO.NAME_SPACE,
 					'X.OutputTableTip row '
 						.. iCol .. ' columns count ('
@@ -650,7 +650,7 @@ function X.OutputTableTip(tOptions)
 			col.nMaxWidth = col.nWidth
 		end
 		if col.nMinWidth and col.nMaxWidth and col.nMinWidth > col.nMaxWidth then
-			X.Debug(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip column ' .. iCol .. ' min width ' .. col.nMinWidth
+			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip column ' .. iCol .. ' min width ' .. col.nMinWidth
 				.. ' should be smaller than max width ' .. col.nMaxWidth .. '.', X.DEBUG_LEVEL.WARNING)
 			return
 		end
@@ -676,7 +676,7 @@ function X.OutputTableTip(tOptions)
 		end
 	end
 	if nTableMaxWidth and nTableColumnMinWidthSum > nTableMaxWidth then
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip summary of columns min width (including horizontal paddings) ' .. nTableColumnMinWidthSum
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'X.OutputTableTip summary of columns min width (including horizontal paddings) ' .. nTableColumnMinWidthSum
 			.. ' should be smaller than table max width ' .. nTableMaxWidth .. '.', X.DEBUG_LEVEL.WARNING)
 		return
 	end

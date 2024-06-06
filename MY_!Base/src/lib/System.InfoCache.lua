@@ -142,7 +142,7 @@ function X.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 							X.SaveLUAData((SZ_DATA_PATH:gsub('<SEG>', szSegID)), tInfos[szSegID])
 						--[[#DEBUG BEGIN]]
 						else
-							X.Debug('InfoCache', 'INFO Unloaded: ' .. szSegID, X.DEBUG_LEVEL.LOG)
+							X.OutputDebugMessage('InfoCache', 'INFO Unloaded: ' .. szSegID, X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 						end
 						if bCollect then

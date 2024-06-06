@@ -40,8 +40,8 @@ end
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
 	local w, h = ui:Size()
-	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, color = { 140, 140, 140 } })
-	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT })
+	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, w = 0, h = 0, color = { 140, 140, 140 } })
+	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, w = 0, h = 0, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT })
 	ui:Append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
 	ui:Append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), alignHorizontal = 2 })
 	ui:Append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = GetSvrText(), alpha = 220 })
@@ -158,7 +158,7 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Width() + 5
 	-- Êý¾ÝÎ»ÖÃ
 	x = x + ui:Append('WndButton', {
-		x = x, y = 405,
+		x = x, h = 30,
 		name = 'WndButton_UserPreference',
 		text = _L['User preference storage'],
 		menu = function()
@@ -243,7 +243,7 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Width() + 5
 	x = x + ui:Append('WndButton', {
 		name = 'WndButton_AddonErrorMessage',
-		x = x, y = 405,
+		x = x, h = 30,
 		text = _L['Error message'],
 		menu = function()
 			local menu = {
@@ -306,7 +306,7 @@ function PS.OnPanelActive(wnd)
 						X.IsDebugClient('Dev_UIManager', true, true)
 						X.IsDebugClient('Dev_UIFindStation', true, true)
 						X.IsDebugClient('Dev_DebugLogs', true, true)
-						X.Systopmsg(_L['Debug tools has been enabled...'])
+						X.OutputSystemAnnounceMessage(_L['Debug tools has been enabled...'])
 						X.ReopenPanel()
 						X.UI.ClosePopupMenu()
 					end,

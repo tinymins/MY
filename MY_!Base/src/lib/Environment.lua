@@ -14,7 +14,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 function X.AssertVersion(szKey, szCaption, szRequireVersion)
 	if not X.IsString(szRequireVersion) then
-		X.Debug(
+		X.OutputDebugMessage(
 			X.PACKET_INFO.NAME_SPACE,
 			_L(
 				'%s requires a invalid base library version value: %s.',
@@ -24,7 +24,7 @@ function X.AssertVersion(szKey, szCaption, szRequireVersion)
 		return IsDebugClient() or false
 	end
 	if not (X.Semver(X.PACKET_INFO.VERSION) % szRequireVersion) then
-		X.Debug(
+		X.OutputDebugMessage(
 			X.PACKET_INFO.NAME_SPACE,
 			_L(
 				'%s requires base library version at %s, current at %s.',
@@ -54,7 +54,7 @@ function X.RegisterRestriction(szKey, tBranchRestricted)
 	end
 	if not X.IsBoolean(bRestricted) then
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Restriction should be a boolean value: ' .. szKey, X.DEBUG_LEVEL.ERROR)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Restriction should be a boolean value: ' .. szKey, X.DEBUG_LEVEL.ERROR)
 		--[[#DEBUG END]]
 		return
 	end

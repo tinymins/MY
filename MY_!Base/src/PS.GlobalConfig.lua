@@ -140,7 +140,7 @@ function PS.OnPanelActive(wnd)
 						function(szText)
 							local szErrmsg = X.SetUserSettingsPresetID(szText)
 							if szErrmsg then
-								X.Systopmsg(szErrmsg, X.CONSTANT.MSG_THEME.ERROR)
+								X.OutputSystemAnnounceMessage(szErrmsg, X.CONSTANT.MSG_THEME.ERROR)
 								X.Alert(szErrmsg)
 							end
 						end,

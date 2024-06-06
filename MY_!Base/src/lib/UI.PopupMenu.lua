@@ -460,7 +460,7 @@ end
 
 function D.DrawWnd(wnd, top, menu, nLevel)
 	--[[#DEBUG BEGIN]]
-	X.Debug(PLUGIN_NAME, 'Draw wnd at level ' .. nLevel, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(PLUGIN_NAME, 'Draw wnd at level ' .. nLevel, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	-- ªÊ÷∆¡–±Ì
 	local scroll = wnd:Lookup('WndScroll_Menu')

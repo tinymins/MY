@@ -122,7 +122,7 @@ do
 	X.RegisterBgMsg(X.NSFormatString('{$NS}_MAP_COPY_ID_REQUEST'), function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 		if bSelf then
 			--[[#DEBUG BEGIN]]
-			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Team map copy id request sent.', X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Team map copy id request sent.', X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			return
 		end
@@ -166,7 +166,7 @@ do
 			end
 		end
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Team map copy id request from ' .. szTalkerName
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Team map copy id request from ' .. szTalkerName
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then
@@ -209,7 +209,7 @@ do
 		if dwTime then
 			szDebug = szDebug .. ' @' .. dwTime
 		end
-		X.Debug(X.PACKET_INFO.NAME_SPACE, szDebug, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, szDebug, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_SWITCH_MAP'), {dwMapID, dwSubID, aMapCopy, dwTime}, true)
 	end
@@ -233,7 +233,7 @@ do
 		if dwSwitchTime then
 			szDebug = szDebug .. ' <- ' .. dwSwitchTime
 		end
-		X.Debug(X.PACKET_INFO.NAME_SPACE, szDebug, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, szDebug, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_ENTER_MAP'), {dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime, nCopyIndex}, true)
 	end
@@ -271,7 +271,7 @@ do
 			HookTableFunc(btn, 'OnLButtonUp', OnCrossMapGoFB, { bAfterOrigin = true })
 		end
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Cross panel hooked.', X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Cross panel hooked.', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 	end)
 
@@ -304,7 +304,7 @@ do
 			return
 		end
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Enter map request from ' .. szTalkerName, X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Enter map request from ' .. szTalkerName, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local me = X.GetClientPlayer()
 		local dwMapID = me.GetMapID()
@@ -324,7 +324,7 @@ do
 	X.RegisterBgMsg(X.NSFormatString('{$NS}_TEAMTOOLS_ACHI_REQ'), function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 		if bSelf then
 			--[[#DEBUG BEGIN]]
-			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Team achievement request sent.', X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Team achievement request sent.', X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			return
 		end
@@ -381,7 +381,7 @@ do
 			end
 		end
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Achievement request from ' .. szTalkerName
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Achievement request from ' .. szTalkerName
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then
@@ -424,7 +424,7 @@ do
 	X.RegisterBgMsg(X.NSFormatString('{$NS}_GLOBAL_ID_REQUEST'), function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 		if bSelf then
 			--[[#DEBUG BEGIN]]
-			X.Debug(X.PACKET_INFO.NAME_SPACE, 'Global id request sent.', X.DEBUG_LEVEL.LOG)
+			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Global id request sent.', X.DEBUG_LEVEL.LOG)
 			--[[#DEBUG END]]
 			return
 		end
@@ -471,7 +471,7 @@ do
 			end
 		end
 		--[[#DEBUG BEGIN]]
-		X.Debug(X.PACKET_INFO.NAME_SPACE, 'Global id request from ' .. szTalkerName
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Global id request from ' .. szTalkerName
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then

@@ -249,7 +249,7 @@ RegisterEvent(NS .. '_BASE_LOADING_END', function()
 			alignHorizontal = 0, alignVertical = 0,
 			multiline = true,
 			onClick = function()
-				_G[NS].Topmsg(_L['LuaWatcher'], _L['Copied to clipboard'])
+				_G[NS].OutputAnnounceMessage(_L['LuaWatcher'], _L['Copied to clipboard'])
 				_G[NS].UI.OpenTextEditor(D.GetRankString(SORT_KEY))
 			end,
 		})

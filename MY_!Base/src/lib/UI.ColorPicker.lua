@@ -101,7 +101,7 @@ function X.UI.OpenColorPicker(callback, t)
 		if GetRGBValue() then
 			fnClick(GetRGBValue())
 		else
-			X.Sysmsg(_L['RGB value error'])
+			X.OutputSystemMessage(_L['RGB value error'])
 		end
 	end})
 	x = x + 50
