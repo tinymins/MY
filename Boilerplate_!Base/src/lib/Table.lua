@@ -124,6 +124,13 @@ function X.Table.GetSkillExtCDID(dwID)
 end
 end
 
+function X.Table.GetAllPartnerNpcInfo()
+	if not Table_GetAllPartnerNpcInfo then
+		return
+	end
+	return Table_GetAllPartnerNpcInfo()
+end
+
 X.NSLock(X.Table, X.NSFormatString('{$NS}.Table (table library)'))
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -997,6 +997,20 @@ function X.IsShieldedNpc(dwTemplateID, szType)
 	return bShieldFocus or bShieldSpeak
 end
 
+local PARTNER_NPC
+---获取一个NPC模板ID是否是侠客
+---@param dwTemplateID number @模板ID
+---@return boolean @是否是侠客
+function X.IsPartnerNpc(dwTemplateID)
+	if not PARTNER_NPC then
+		PARTNER_NPC = {}
+		for _, v in ipairs(X.Table.GetAllPartnerNpcInfo() or {}) do
+			PARTNER_NPC[v.szName] = true
+		end
+	end
+	return PARTNER_NPC[X.GetTemplateName(TARGET.NPC, dwTemplateID)] or false
+end
+
 X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#ImportantNpclist'), function()
 	local dwType, dwID = X.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
