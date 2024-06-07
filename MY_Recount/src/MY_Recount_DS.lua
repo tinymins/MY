@@ -725,7 +725,7 @@ do local KCaster, KTarget, dwTargetEmployer, me, szEffectID, nTherapy, nEffectTh
 function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	-- 获取释放对象和承受对象
 	KCaster = X.GetObject(dwCaster)
-	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
+	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 and not X.IsPartnerNpc(KCaster.dwTemplateID) then -- 宠物的数据算在主人统计中，侠客除外
 		KCaster = X.GetObject(KCaster.dwEmployer)
 	end
 	KTarget, dwTargetEmployer = X.GetObject(dwTarget), nil
