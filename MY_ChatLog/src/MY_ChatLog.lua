@@ -380,18 +380,6 @@ function D.RegisterMsgMonitor()
 	REGISTER_MONITOR_MSG_TYPE = tMsgType
 end
 
-X.RegisterEvent('LOADING_ENDING', 'MY_ChatLog_Save', function()
-	if MAIN_DS then
-		MAIN_DS:FlushDB()
-	end
-end)
-
-X.RegisterIdle('MY_ChatLog_Save', function()
-	if MAIN_DS and not X.IsRestricted('MY_ChatLog.DEVELOP') then
-		MAIN_DS:FlushDB()
-	end
-end)
-
 function D.OnInit()
 	if not X.GetClientPlayer() then
 		return X.DelayCall(500, D.OnInit)
@@ -401,7 +389,6 @@ function D.OnInit()
 	end
 	D.bReady = true
 end
-X.RegisterInit('MY_ChatLog_InitDB', D.OnInit)
 
 function D.FlushDB(bCheckExceed)
 	if not D.InitDB('silent') then
@@ -446,24 +433,6 @@ function D.ReleaseDB()
 	end
 	MAIN_DS:ReleaseDB()
 end
-X.RegisterExit('MY_ChatLog_Release', D.ReleaseDB)
-
-X.RegisterInit('MY_ChatLog_InitMsgMonitor', D.RegisterMsgMonitor)
-X.RegisterUserSettingsInit('MY_ChatLog_InitMsgMonitor', D.RegisterMsgMonitor)
-
-X.RegisterEvent('DISCONNECT', 'MY_ChatLog_Release', function()
-	if X.IsRestricted('MY_ChatLog.DEVELOP') then
-		return
-	end
-	D.ReleaseDB()
-end)
-
-X.RegisterAddonMenu('MY_ChatLog_Menu', {
-	szOption = _L['MY_ChatLog'],
-	fnAction = D.Open,
-})
-X.RegisterHotKey('MY_ChatLog', _L['MY_ChatLog'], D.Open, nil)
-
 --------------------------------------------------------------------------------
 -- 全局导出
 --------------------------------------------------------------------------------
@@ -520,6 +489,41 @@ local settings = {
 }
 MY_ChatLog = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+X.RegisterEvent('LOADING_ENDING', 'MY_ChatLog_Save', function()
+	if MAIN_DS then
+		MAIN_DS:FlushDB()
+	end
+end)
+
+X.RegisterIdle('MY_ChatLog_Save', function()
+	if MAIN_DS and not X.IsRestricted('MY_ChatLog.DEVELOP') then
+		MAIN_DS:FlushDB()
+	end
+end)
+
+X.RegisterInit('MY_ChatLog_InitDB', D.OnInit)
+X.RegisterExit('MY_ChatLog_Release', D.ReleaseDB)
+
+X.RegisterInit('MY_ChatLog_InitMsgMonitor', D.RegisterMsgMonitor)
+X.RegisterUserSettingsInit('MY_ChatLog_InitMsgMonitor', D.RegisterMsgMonitor)
+
+X.RegisterEvent('DISCONNECT', 'MY_ChatLog_Release', function()
+	if X.IsRestricted('MY_ChatLog.DEVELOP') then
+		return
+	end
+	D.ReleaseDB()
+end)
+
+X.RegisterAddonMenu('MY_ChatLog_Menu', {
+	szOption = _L['MY_ChatLog'],
+	fnAction = D.Open,
+})
+X.RegisterHotKey('MY_ChatLog', _L['MY_ChatLog'], D.Open, nil)
 
 -- ===== 性能测试 =====
 -- X.RegisterInit(function()
