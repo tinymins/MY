@@ -721,12 +721,15 @@ end
 -- (number) nSkillResult: 造成的效果结果（SKILL_RESULT枚举 如HIT,MISS）
 -- (number) nResultCount: 造成效果的数值数量（tResult长度）
 -- (table ) tResult     : 所有效果数值集合
-do local KCaster, KTarget, dwTargetEmployer, me, szEffectID, nTherapy, nEffectTherapy, nDamage, nEffectDamage, szType
+do local KCaster, dwCasterEmployer, KTarget, dwTargetEmployer, me, szEffectID, nTherapy, nEffectTherapy, nDamage, nEffectDamage, szType
 function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	-- 获取释放对象和承受对象
-	KCaster = X.GetObject(dwCaster)
-	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 and not X.IsPartnerNpc(KCaster.dwTemplateID) then -- 宠物的数据算在主人统计中，侠客除外
-		KCaster = X.GetObject(KCaster.dwEmployer)
+	KCaster, dwCasterEmployer = X.GetObject(dwCaster), nil
+	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then
+		if not X.IsPartnerNpc(KCaster.dwTemplateID) then -- 宠物的数据算在主人统计中，侠客除外
+			KCaster = X.GetObject(KCaster.dwEmployer)
+		end
+		dwCasterEmployer = KCaster.dwEmployer
 	end
 	KTarget, dwTargetEmployer = X.GetObject(dwTarget), nil
 	if KTarget and not X.IsPlayer(dwTarget) and KTarget.dwEmployer and KTarget.dwEmployer ~= 0 then
@@ -740,14 +743,16 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 
 	-- 过滤掉不是队友的以及不是首领的
 	me = X.GetClientPlayer()
-	if dwCaster ~= me.dwID                 -- 释放者不是自己
-	and dwTarget ~= me.dwID                -- 承受者不是自己
-	and dwTargetEmployer ~= me.dwID        -- 承受者主人不是自己
-	and not X.IsInArenaMap()               -- 不在名剑大会
-	and not X.IsInBattlefieldMap()         -- 不在战场
-	and not me.IsPlayerInMyParty(dwCaster) -- 且释放者不是队友
-	and not me.IsPlayerInMyParty(dwTarget) -- 且承受者不是队友
-	and not (dwTargetEmployer and me.IsPlayerInMyParty(dwTargetEmployer)) -- 且承受者主人不是队友
+	if dwCaster ~= me.dwID                                                -- 释放者不是自己
+	and dwCasterEmployer ~= me.dwID                                       -- 释放者主人不是自己
+	and dwTarget ~= me.dwID                                               -- 承受者不是自己
+	and dwTargetEmployer ~= me.dwID                                       -- 承受者主人不是自己
+	and not me.IsPlayerInMyParty(dwCaster)                                -- 释放者不是队友
+	and not (dwCasterEmployer and me.IsPlayerInMyParty(dwCasterEmployer)) -- 释放者主人不是队友
+	and not me.IsPlayerInMyParty(dwTarget)                                -- 承受者不是队友
+	and not (dwTargetEmployer and me.IsPlayerInMyParty(dwTargetEmployer)) -- 承受者主人不是队友
+	and not X.IsInArenaMap()                                              -- 不在名剑大会
+	and not X.IsInBattlefieldMap()                                        -- 不在战场
 	then -- 则忽视
 		return
 	end
@@ -813,7 +818,7 @@ end
 do local KCaster
 function D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
 	KCaster = X.GetObject(dwCaster)
-	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
+	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 and not X.IsPartnerNpc(KCaster.dwTemplateID) then -- 宠物的数据算在主人统计中，侠客除外
 		dwCaster = KCaster.dwEmployer
 	end
 	D.InitEffectData(Data, SKILL_EFFECT_TYPE.BUFF, dwBuffID, dwBuffLevel)
