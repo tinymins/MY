@@ -123,15 +123,17 @@ function D.GetDatasetList()
 			return {}
 		end
 		local aConfig = {}
-		local dwMapID = me.GetMapID() or 0
-		local dwKungfuID = me.GetKungfuMountID() or 0
-		for i, dataset in ipairs(FilterDatasets(MY_TargetMonConfig.GetDatasetList(), dwMapID, dwKungfuID)) do
-			aConfig[i] = setmetatable(
-				{
-					aMonitor = FilterMonitors(dataset.aMonitor, dwMapID, dwKungfuID),
-				},
-				{ __index = dataset }
-			)
+		if not X.IsClientPlayerMountMobileKungfu() then
+			local dwMapID = me.GetMapID() or 0
+			local dwKungfuID = me.GetKungfuMountID() or 0
+			for i, dataset in ipairs(FilterDatasets(MY_TargetMonConfig.GetDatasetList(), dwMapID, dwKungfuID)) do
+				aConfig[i] = setmetatable(
+					{
+						aMonitor = FilterMonitors(dataset.aMonitor, dwMapID, dwKungfuID),
+					},
+					{ __index = dataset }
+				)
+			end
 		end
 		CONFIG_CACHE = aConfig
 	end
