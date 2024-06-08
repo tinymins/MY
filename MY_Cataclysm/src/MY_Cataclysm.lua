@@ -986,4 +986,10 @@ local settings = {
 MY_Cataclysm = X.CreateModule(settings)
 end
 
+X.RegisterKungfuMount('MY_Cataclysm', function()
+	if X.IsClientPlayerMountMobileKungfu() then
+		X.OutputSystemAnnounceMessage(_L['MY_Cataclysm_Buff is blocked in current kungfu, temporary disabled.'])
+	end
+end)
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

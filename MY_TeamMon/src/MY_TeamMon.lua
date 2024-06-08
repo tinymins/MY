@@ -697,9 +697,9 @@ function D.UpdateShieldStatus()
 	local bPvpMap = bRestricted and not X.IsInDungeonMap()
 	if not MY_TEAM_MON_SHIELDED then
 		if bRestrictedKungfu then
-			X.OutputSystemMessage(_L['MY_TeamMon is blocked in current kungfu, temporary disabled.'])
+			X.OutputSystemAnnounceMessage(_L['MY_TeamMon is blocked in current kungfu, temporary disabled.'])
 		elseif bRestrictedMap then
-			X.OutputSystemMessage(_L['MY_TeamMon is blocked in this map, temporary disabled.'])
+			X.OutputSystemAnnounceMessage(_L['MY_TeamMon is blocked in this map, temporary disabled.'])
 		end
 	end
 	MY_TEAM_MON_SHIELDED, MY_TEAM_MON_PVP_MAP = bRestrictedMap or bRestrictedKungfu, bPvpMap

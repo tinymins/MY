@@ -847,7 +847,12 @@ local function onTargetMonReload()
 	CONFIG_CACHE = nil
 	D.OnTargetMonReload()
 end
-X.RegisterKungfuMount('MY_TargetMonData', onTargetMonReload)
+X.RegisterKungfuMount('MY_TargetMonData', function()
+	if X.IsClientPlayerMountMobileKungfu() then
+		X.OutputSystemAnnounceMessage(_L['MY_TargetMon is blocked in current kungfu, temporary disabled.'])
+	end
+	onTargetMonReload()
+end)
 X.RegisterEvent('LOADING_ENDING', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)

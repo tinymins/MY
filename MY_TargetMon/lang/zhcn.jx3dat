@@ -103,6 +103,7 @@ return {
     ['Hotkey cancel is only allowed for buff.'] = '快捷键只能取消气劲不能施展招式',
     ['Cannot find target to cancel buff.'] = '找不到需要卸除气劲的目标',
     ['Cannot find buff to cancel.'] = '需要卸除的气劲不存在',
+    ['MY_TargetMon is blocked in current kungfu, temporary disabled.'] = '当前心法禁止使用目标监控，相关功能已暂时关闭。',
     ['Please input id:'] = '请输入ID：',
     ['Manual add id'] = '手动添加ID',
     ['Please input level:'] = '请输入等级：',

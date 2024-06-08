@@ -145,6 +145,7 @@ return {
 	['Sure'] = '確定',
 	['Delete'] = '刪除',
 	['Delete [%s]?'] = '刪除[%s]？',
+	['MY_Cataclysm_Buff is blocked in current kungfu, temporary disabled.'] = '當前心法禁止使用團隊面板氣勁監控，相關功能已暫時關閉。',
 
 	['From MY_TeamMon data'] = '來自團隊監控數據',
 	['From official raid buff data'] = '來自官方團隊氣勁數據',
