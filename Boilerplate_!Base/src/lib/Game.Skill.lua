@@ -536,4 +536,10 @@ function X.ForceIDToKungfuIDs(dwForceID)
 end
 end
 
+---获取当前心法是否为移动端心法
+---@return boolean @是否是移动端心法
+function X.IsInMobileKungfu()
+	return IsMobileKungfu and IsMobileKungfu() or false
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
