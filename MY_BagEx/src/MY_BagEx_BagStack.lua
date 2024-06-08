@@ -145,18 +145,19 @@ function D.CheckInjection(bRemoveInjection)
 		if not frame then
 			return
 		end
-		local btnRef = frame:Lookup('Btn_Stack')
-		local btnNew = frame:Lookup('Btn_MY_Stack')
-		if not btnRef then
+		local hWndRef = frame:Lookup('Wnd_MY_Split')
+		local hBtnNew = frame:Lookup('Btn_MY_Stack')
+		if not hWndRef then
 			return
 		end
-		local nX, nY = btnRef:GetRelPos()
-		local nW, nH = btnRef:GetSize()
-		if not btnNew then
-			btnNew = X.UI('Normal/BigBagPanel')
+		local nX = hWndRef:GetRelX() + hWndRef:GetW() + 3
+		local nY = hWndRef:GetRelY()
+		local nH = hWndRef:GetH()
+		if not hBtnNew then
+			hBtnNew = X.UI('Normal/BigBagPanel')
 				:Append('WndButton', {
 					name = 'Btn_MY_Stack',
-					w = nW, h = nH - 3,
+					w = 'auto', h = nH,
 					text = _L['Stack'],
 					onClick = function()
 						MY_BagEx_Bag.ShowAllItemShadow()
@@ -176,15 +177,15 @@ function D.CheckInjection(bRemoveInjection)
 				})
 				:Raw()
 		end
-		if not btnNew then
+		if not hBtnNew then
 			return
 		end
-		btnNew:SetRelPos(nX, nY)
+		hBtnNew:SetRelPos(nX, nY)
 		X.RegisterEvent('MY_BAG_EX__SORT_STACK_PROGRESSING', 'MY_BagEx_BagStack__Injection', function()
-			if not btnNew then
+			if not hBtnNew then
 				return
 			end
-			btnNew:Enable(not arg0)
+			hBtnNew:Enable(not arg0)
 		end)
 	else
 		-- ÒÆ³ý¶Ñµþ°´Å¦

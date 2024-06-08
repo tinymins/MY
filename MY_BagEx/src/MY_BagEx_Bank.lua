@@ -63,7 +63,7 @@ function D.ShowItemShadow(frame, dwBox, dwX, bEditLock)
 			if v.bNew then
 				sha = box:GetParent():Lookup('Shadow_MY_BagEx')
 				if not sha then
-					sha = X.UI(box:GetParent()):Append('Shadow', { name = 'Shadow_MY_BagEx' }):Raw()
+					sha = X.UI(box:GetParent()):Append('Shadow', { name = 'Shadow_MY_BagEx', w = 0, h = 0 }):Raw()
 					sha:SetSize(box:GetSize())
 					sha:SetRelPos(box:GetRelPos())
 					sha:SetAbsPos(box:GetAbsPos())
@@ -79,7 +79,7 @@ function D.ShowItemShadow(frame, dwBox, dwX, bEditLock)
 				h:SetSize(box:GetParent():GetSize())
 				sha = h:Lookup(dwBox .. '_' .. dwX)
 				if not sha then
-					sha = X.UI(h):Append('Shadow', { name = dwBox .. '_' .. dwX }):Raw()
+					sha = X.UI(h):Append('Shadow', { name = dwBox .. '_' .. dwX, w = 0, h = 0 }):Raw()
 					sha:SetSize(box:GetSize())
 					D.PreventItemUIEvent(sha)
 				end
@@ -148,7 +148,7 @@ function D.ShowAllItemShadow(bEditLock)
 		end
 		local sha = h:Lookup('Shadow_MY_BagEx')
 		if not sha then
-			sha = X.UI(h):Append('Shadow', { name = 'Shadow_MY_BagEx' }):Raw()
+			sha = X.UI(h):Append('Shadow', { name = 'Shadow_MY_BagEx', w = 0, h = 0 }):Raw()
 			sha:SetColorRGB(255, 255, 255)
 			sha:SetAlpha(0)
 			sha:SetSize(nW, nH)

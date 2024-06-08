@@ -26,6 +26,10 @@ return {
     ['Please input blueprint'] = '请输入布局数据',
     ['Invalid blueprint data'] = '布局数据解析失败',
 
+    -- MY_BagEx_BagSplit.lua --
+    ['Split'] = '拆分',
+    ['Split stacked items (hotkey SHIFT+LClick)'] = '拆分叠加的物品（快捷方式：Shift+鼠标左键）',
+
     -- MY_BagEx_BagStack.lua --
     ['Bag panel closed, stack exited!'] = '背包界面已关闭，停止堆叠！',
     ['Put new item in bag detected, stack exited!'] = '背包放入新物品，停止堆叠！',

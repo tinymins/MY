@@ -52,7 +52,7 @@ function D.ShowItemShadow(frame, dwBox, dwX, bEditLock)
 			local szKey = dwBox .. '_' .. dwX
 			local sha = box:GetParent():Lookup('Shadow_MY_BagEx')
 			if not sha then
-				sha = X.UI(box:GetParent()):Append('Shadow', { name = 'Shadow_MY_BagEx' }):Raw()
+				sha = X.UI(box:GetParent()):Append('Shadow', { name = 'Shadow_MY_BagEx', w = 0, h = 0 }):Raw()
 				sha:SetSize(box:GetSize())
 				sha:SetRelPos(box:GetRelPos())
 				sha:SetAbsPos(box:GetAbsPos())
@@ -95,7 +95,7 @@ function D.ShowAllItemShadow(bEditLock)
 	if h then
 		local sha = h:Lookup('Shadow_MY_BagEx')
 		if not sha then
-			sha = X.UI(h):Append('Shadow', { name = 'Shadow_MY_BagEx' }):Raw()
+			sha = X.UI(h):Append('Shadow', { name = 'Shadow_MY_BagEx', w = 0, h = 0 }):Raw()
 			sha:SetColorRGB(255, 255, 255)
 			sha:SetAlpha(0)
 			sha:SetSize(h:GetSize())
@@ -159,6 +159,7 @@ function D.CheckConflict(bRestore)
 		-- 隐藏冲突的系统按钮
 		for _, szPath in ipairs({
 			'Normal/BigBagPanel/Btn_CU',
+			'Normal/BigBagPanel/Btn_Split',
 			'Normal/BigBagPanel/Btn_Stack',
 			'Normal/BigBagPanel/Btn_LockSort',
 		}) do
@@ -171,6 +172,7 @@ function D.CheckConflict(bRestore)
 		-- 恢复冲突的系统按钮
 		for _, szPath in ipairs({
 			'Normal/BigBagPanel/Btn_CU',
+			'Normal/BigBagPanel/Btn_Split',
 			'Normal/BigBagPanel/Btn_Stack',
 			'Normal/BigBagPanel/Btn_LockSort',
 		}) do
@@ -185,6 +187,7 @@ end
 function D.OnEnableChange()
 	D.CheckConflict()
 	MY_BagEx_BagSort.CheckInjection()
+	MY_BagEx_BagSplit.CheckInjection()
 	MY_BagEx_BagStack.CheckInjection()
 	MY_BagEx_BagLock.CheckInjection()
 end

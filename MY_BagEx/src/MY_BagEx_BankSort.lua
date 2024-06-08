@@ -250,12 +250,11 @@ function D.CheckInjection(bRemoveInjection)
 			return
 		end
 		local nX, nY = hBtnRef:GetRelPos()
-		local nW, nH = 44, 26
 		if not hBtnNew then
 			hBtnNew = X.UI('Normal/BigBankPanel')
 				:Append('WndButton', {
 					name = 'Btn_MY_Sort',
-					w = nW, h = nH - 3,
+					w = 'auto', h = 'auto',
 					text = _L['Sort'],
 					tip = {
 						render = _L['Press shift for random, right click to import and export'],

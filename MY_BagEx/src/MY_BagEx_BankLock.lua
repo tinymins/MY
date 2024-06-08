@@ -38,13 +38,12 @@ function D.CheckInjection(bRemoveInjection)
 		end
 		local nX = btnRef:GetRelX() + btnRef:GetW() + 5
 		local nY = btnRef:GetRelY()
-		local nW, nH = btnRef:GetSize()
 		if not btnNew then
 			local bEdit = false
 			btnNew = X.UI('Normal/BigBankPanel')
 				:Append('WndButton', {
 					name = 'Btn_MY_Lock',
-					w = nW, h = nH - 3,
+					w = 'auto', h = 'auto',
 					text = _L['Lock'],
 					onClick = function()
 						bEdit = not bEdit

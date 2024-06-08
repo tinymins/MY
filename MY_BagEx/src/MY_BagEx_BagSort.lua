@@ -246,13 +246,14 @@ function D.CheckInjection(bRemoveInjection)
 		if not hBtnRef then
 			return
 		end
-		local nX, nY = hBtnRef:GetRelPos()
-		local nW, nH = hBtnRef:GetSize()
+		local nX = hBtnRef:GetRelX()
+		local nY = hBtnRef:GetRelY()
+		local nH = hBtnRef:GetH()
 		if not hBtnNew then
 			hBtnNew = X.UI('Normal/BigBagPanel')
 				:Append('WndButton', {
 					name = 'Btn_MY_Sort',
-					w = nW, h = nH - 3,
+					w = 'auto', h = nH,
 					text = _L['Sort'],
 					tip = {
 						render = _L['Press shift for random, right click to import and export'],

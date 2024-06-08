@@ -155,12 +155,11 @@ function D.CheckInjection(bRemoveInjection)
 		end
 		local nX = btnRef:GetRelX() + btnRef:GetW() + 5
 		local nY = btnRef:GetRelY()
-		local nW, nH = btnRef:GetSize()
 		if not btnNew then
 			btnNew = X.UI('Normal/BigBankPanel')
 				:Append('WndButton', {
 					name = 'Btn_MY_Stack',
-					w = nW, h = nH - 3,
+					w = 'auto', h = 'auto',
 					text = _L['Stack'],
 					onClick = function()
 						if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.BANK) then
