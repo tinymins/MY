@@ -538,7 +538,7 @@ end
 
 ---获取当前心法是否为移动端心法
 ---@return boolean @是否是移动端心法
-function X.IsInMobileKungfu()
+function X.IsClientPlayerMountMobileKungfu()
 	return IsMobileKungfu and IsMobileKungfu() or false
 end
 
