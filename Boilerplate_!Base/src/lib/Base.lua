@@ -119,8 +119,9 @@ local X = {
 		}, { __index = GLOBAL }),
 		__newindex = function() end,
 	}),
-	SECRET = setmetatable(LoadLUAData(_ADDON_ROOT_ .. 'secret.jx3dat') or {}, {
-		__index = function(_, k) return k end,
+	SECRET = setmetatable({}, {
+		__index = LoadLUAData(_ADDON_ROOT_ .. 'secret.jx3dat') or {},
+		__newindex = function() end,
 	}),
 	SHARED_MEMORY = PLUGIN_SHARED_MEMORY,
 }
