@@ -1,0 +1,7 @@
+return {
+	['KeyPanel'] = '激活生成',
+	['Input role names, split by comma:'] = '輸入角色名，使用半形逗號分隔多個：',
+	['Input expire seconds, 0 for no expire:'] = '輸入過期時間（當前時間開始秒數），輸入0表示不過期：',
+	['Input restrict keys, split by comma:'] = '輸入激活功能KEY，使用半形逗號分隔多個：',
+	['Result:'] = '結果：',
+}

@@ -9,7 +9,7 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/PS.GlobalConfig')
 --------------------------------------------------------------------------------
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
-local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/ps/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/PS/')
 --------------------------------------------------------------------------------
 
 local PS = {}

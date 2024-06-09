@@ -15,7 +15,7 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/Notify')
 local MODULE_NAME = X.NSFormatString('{$NS}_Notify')
 local PLUGIN_NAME = X.NSFormatString('{$NS}_Notify')
 local PLUGIN_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT
-local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/notify/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/Notify/')
 
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	anchor = {

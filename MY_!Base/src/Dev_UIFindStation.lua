@@ -9,7 +9,7 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/UIFindStation')
 --------------------------------------------------------------------------------
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
-local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. '/lang/devs/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. '/lang/Dev/')
 --------------------------------------------------------------------------------
 
 local O = {

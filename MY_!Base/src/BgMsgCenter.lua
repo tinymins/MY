@@ -9,7 +9,7 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/BgMsgCenter')
 --------------------------------------------------------------------------------
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
-local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/bgmsg/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/BgMsgCenter/')
 --------------------------------------------------------------------------------
 
 -- 测试用（请求共享位置）
