@@ -1575,7 +1575,7 @@ local function DispSorter(a, b)
 	return a.nPriority < b.nPriority
 end
 function D.UpdateCharaterBuff(p, handle, tKeep)
-	if X.IsClientPlayerMountMobileKungfu() then
+	if X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu() then
 		return
 	end
 	local dwCharID = p.dwID

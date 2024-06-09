@@ -509,6 +509,14 @@ local D = {
 	},
 }
 
+function D.AnnounceShielded()
+	local bBlock = X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()
+	if bBlock and not D.bBlockMessageAnnounced then
+		X.OutputSystemAnnounceMessage(_L['MY_Cataclysm_Buff is blocked in current kungfu, temporary disabled.'])
+	end
+	D.bBlockMessageAnnounced = bBlock
+end
+
 -- ½âÎö
 function D.EncodeBuffRule(v, bNoBasic)
 	local a = {}
@@ -986,10 +994,7 @@ local settings = {
 MY_Cataclysm = X.CreateModule(settings)
 end
 
-X.RegisterKungfuMount('MY_Cataclysm', function()
-	if X.IsClientPlayerMountMobileKungfu() then
-		X.OutputSystemAnnounceMessage(_L['MY_Cataclysm_Buff is blocked in current kungfu, temporary disabled.'])
-	end
-end)
+X.RegisterEvent('LOADING_END', 'MY_Cataclysm__AnnounceShielded', D.AnnounceShielded)
+X.RegisterKungfuMount('MY_Cataclysm__AnnounceShielded', D.AnnounceShielded)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

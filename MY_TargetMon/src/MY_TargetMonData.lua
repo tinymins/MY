@@ -123,7 +123,7 @@ function D.GetDatasetList()
 			return {}
 		end
 		local aConfig = {}
-		if not X.IsClientPlayerMountMobileKungfu() then
+		if not (X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()) then
 			local dwMapID = me.GetMapID() or 0
 			local dwKungfuID = me.GetKungfuMountID() or 0
 			for i, dataset in ipairs(FilterDatasets(MY_TargetMonConfig.GetDatasetList(), dwMapID, dwKungfuID)) do
@@ -217,6 +217,14 @@ function D.IsShieldedBuff(dwID, nLevel)
 	end
 	return false
 end
+end
+
+function D.AnnounceShielded()
+	local bBlock = X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()
+	if bBlock and not D.bBlockMessageAnnounced then
+		X.OutputSystemAnnounceMessage(_L['MY_TargetMon is blocked in current kungfu, temporary disabled.'])
+	end
+	D.bBlockMessageAnnounced = bBlock
 end
 
 do
@@ -842,17 +850,14 @@ X.RegisterEvent('MY_RESTRICTION', 'MY_TargetMonData__Shield', function()
 end)
 X.RegisterEvent('LOADING_END', 'MY_TargetMonData__Shield', onShieldedReset)
 
+X.RegisterEvent('LOADING_END', 'MY_TargetMonData__AnnounceShielded', D.AnnounceShielded)
+X.RegisterKungfuMount('MY_TargetMonData__AnnounceShielded', D.AnnounceShielded)
+
 local function onTargetMonReload()
 	VIEW_LIST_CACHE = {}
 	CONFIG_CACHE = nil
 	D.OnTargetMonReload()
 end
-X.RegisterKungfuMount('MY_TargetMonData', function()
-	if X.IsClientPlayerMountMobileKungfu() then
-		X.OutputSystemAnnounceMessage(_L['MY_TargetMon is blocked in current kungfu, temporary disabled.'])
-	end
-	onTargetMonReload()
-end)
 X.RegisterEvent('LOADING_ENDING', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)

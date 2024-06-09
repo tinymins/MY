@@ -693,7 +693,7 @@ end
 function D.UpdateShieldStatus()
 	local bRestricted = X.IsRestricted('MY_TeamMon.MapRestriction')
 	local bRestrictedMap = bRestricted and X.IsInCompetitionMap()
-	local bRestrictedKungfu = bRestricted and X.IsClientPlayerMountMobileKungfu()
+	local bRestrictedKungfu = bRestricted and bRestrictedMap and X.IsClientPlayerMountMobileKungfu()
 	local bPvpMap = bRestricted and not X.IsInDungeonMap()
 	if not MY_TEAM_MON_SHIELDED then
 		if bRestrictedKungfu then
