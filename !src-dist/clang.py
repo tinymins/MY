@@ -63,9 +63,9 @@ def __is_path_include(pkg_name, cwd, d):
         if os.path.basename(cwd) == pkg_name:
             return True
         elif os.path.exists(os.path.join(cwd, 'package.ini')):
-            return 'dependence=' + pkg_name in open(os.path.join(cwd, 'package.ini')).read()
+            return 'dependence=' + pkg_name in open(os.path.join(cwd, 'package.ini'), encoding='GBK').read()
         elif os.path.exists(os.path.join(cwd, 'info.ini')):
-            return 'dependence=' + pkg_name in open(os.path.join(cwd, 'info.ini')).read()
+            return 'dependence=' + pkg_name in open(os.path.join(cwd, 'info.ini'), encoding='GBK').read()
         return False
     return True
 
