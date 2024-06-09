@@ -15,7 +15,7 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/KeyPanel')
 local MODULE_NAME = X.NSFormatString('{$NS}_KeyPanel')
 local PLUGIN_NAME = X.NSFormatString('{$NS}_KeyPanel')
 local PLUGIN_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT
-local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/keypanel/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/KeyPanel/')
 
 local D = {}
 

@@ -183,7 +183,7 @@ function D.RemoveBreathe()
 end
 
 RegisterEvent(NS .. '_BASE_LOADING_END', function()
-	local _L = _G[NS].LoadLangPack(_G[NS].PACKET_INFO.FRAMEWORK_ROOT .. 'lang/devs/')
+	local _L = _G[NS].LoadLangPack(_G[NS].PACKET_INFO.FRAMEWORK_ROOT .. 'lang/Dev/')
 	local PS = {}
 	local bInitRunning = RUNNING
 

@@ -12,7 +12,7 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/HoverEntry')
 local MODULE_NAME = X.NSFormatString('{$NS}_HoverEntry')
 local PLUGIN_NAME = X.NSFormatString('{$NS}_HoverEntry')
 local PLUGIN_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT
-local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/hoverentry/')
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/HoverEntry/')
 
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	bEnable = {
