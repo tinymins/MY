@@ -185,7 +185,7 @@ return {
 	['Clear color'] = '清空顏色',
 	['Edit name'] = '修改名稱',
 	['MY_TeamMon is blocked in current kungfu, temporary disabled.'] = '當前心法禁止使用團隊監控，相關功能已暫時關閉。',
-	['MY_TeamMon is blocked in this map, temporary disabled.'] = '當前地圖禁止使用團隊監控，相關功能已暫時關閉。',
+	['MY_TeamMon is shielded other player in this map, temporary disabled.'] = '當前地圖禁止使用團隊監控其他玩家，相關功能已暫時關閉。',
 	['Add to monitor list'] = '添加到監控列表',
 	['(player)'] = '（玩家）',
 	['Subscribe data'] = '訂閱在線數據、語音包',

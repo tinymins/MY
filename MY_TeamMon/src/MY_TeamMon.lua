@@ -124,8 +124,9 @@ local MY_TEAM_MON_INI_FILE      = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMo
 local MY_TEAM_MON_SHARE_QUEUE  = {}
 local MY_TEAM_MON_MARK_QUEUE   = {}
 local MY_TEAM_MON_MARK_IDLE    = true -- 标记空闲
-local MY_TEAM_MON_SHIELDED     = false -- 标记当前在功能限制状态 限制所有功能监听
-local MY_TEAM_MON_PVP_MAP      = false -- 标记当前在可能发生PVP战斗的地图 限制战斗功能监听
+
+local MY_TEAM_MON_SHIELDED_TOTAL        = false -- 标记当前在功能限制状态 限制所有功能监听
+local MY_TEAM_MON_SHIELDED_OTHER_PLAYER = false -- 标记当前在可能发生PVP战斗的地图 限制他人战斗功能监听
 ----
 local MY_TEAM_MON_LEFT_BRACKET      = _L['[']
 local MY_TEAM_MON_RIGHT_BRACKET     = _L[']']
@@ -692,17 +693,14 @@ end
 -- 更新当前地图使用条件
 function D.UpdateShieldStatus()
 	local bRestricted = X.IsRestricted('MY_TeamMon.MapRestriction')
-	local bRestrictedMap = bRestricted and X.IsInCompetitionMap()
-	local bRestrictedKungfu = bRestricted and bRestrictedMap and X.IsClientPlayerMountMobileKungfu()
-	local bPvpMap = bRestricted and not X.IsInDungeonMap()
-	if not MY_TEAM_MON_SHIELDED then
-		if bRestrictedKungfu then
-			X.OutputSystemAnnounceMessage(_L['MY_TeamMon is blocked in current kungfu, temporary disabled.'])
-		elseif bRestrictedMap then
-			X.OutputSystemAnnounceMessage(_L['MY_TeamMon is blocked in this map, temporary disabled.'])
-		end
+	local bShieldedTotal = bRestricted and X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()
+	local bShieldedOtherPlayer = bRestricted and not X.IsInDungeonMap()
+	if not MY_TEAM_MON_SHIELDED_TOTAL and bShieldedTotal then
+		X.OutputSystemAnnounceMessage(_L['MY_TeamMon is blocked in current kungfu, temporary disabled.'])
+	elseif not MY_TEAM_MON_SHIELDED_OTHER_PLAYER and bShieldedOtherPlayer then
+		X.OutputSystemAnnounceMessage(_L['MY_TeamMon is shielded other player in this map, temporary disabled.'])
 	end
-	MY_TEAM_MON_SHIELDED, MY_TEAM_MON_PVP_MAP = bRestrictedMap or bRestrictedKungfu, bPvpMap
+	MY_TEAM_MON_SHIELDED_TOTAL, MY_TEAM_MON_SHIELDED_OTHER_PLAYER = bShieldedTotal, bShieldedOtherPlayer
 end
 
 local function CreateCache(szType, tab)
@@ -983,7 +981,7 @@ end
 -- local a=GetTime();for i=1, 10000 do FireUIEvent('BUFF_UPDATE',X.GetClientPlayerID(),false,1,true,i,1,1,1,1,0) end;Output(GetTime()-a)
 -- 事件操作
 function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dwSkillSrcID)
-	if MY_TEAM_MON_SHIELDED or (MY_TEAM_MON_PVP_MAP and dwOwner ~= MY_TEAM_MON_CORE_PLAYERID) then
+	if MY_TEAM_MON_SHIELDED_TOTAL or (MY_TEAM_MON_SHIELDED_OTHER_PLAYER and dwOwner ~= MY_TEAM_MON_CORE_PLAYERID) then
 		return
 	end
 	local szType = bCanCancel and 'BUFF' or 'DEBUFF'
@@ -1138,7 +1136,7 @@ end
 
 -- 技能事件
 function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
-	if MY_TEAM_MON_SHIELDED or (MY_TEAM_MON_PVP_MAP and dwCaster ~= MY_TEAM_MON_CORE_PLAYERID) then
+	if MY_TEAM_MON_SHIELDED_TOTAL or (MY_TEAM_MON_SHIELDED_OTHER_PLAYER and dwCaster ~= MY_TEAM_MON_CORE_PLAYERID) then
 		return
 	end
 	local key = dwCastID .. '_' .. dwLevel
@@ -1319,7 +1317,7 @@ function D.OnNpcEvent(npc, bEnter)
 			end
 		end
 	end
-	if MY_TEAM_MON_SHIELDED then
+	if MY_TEAM_MON_SHIELDED_TOTAL then
 		return
 	end
 	if data then
@@ -1469,7 +1467,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 			end
 		end
 	end
-	if MY_TEAM_MON_SHIELDED then
+	if MY_TEAM_MON_SHIELDED_TOTAL then
 		return
 	end
 	if data then
@@ -1565,7 +1563,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 end
 
 function D.OnDoodadAllLeave(dwTemplateID)
-	if MY_TEAM_MON_SHIELDED then
+	if MY_TEAM_MON_SHIELDED_TOTAL then
 		return
 	end
 	local data = D.GetData('DOODAD', dwTemplateID)
@@ -1579,7 +1577,7 @@ end
 -- 系统和NPC喊话处理
 -- OutputMessage('MSG_SYS', 1..'\n')
 function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
-	if MY_TEAM_MON_SHIELDED then
+	if MY_TEAM_MON_SHIELDED_TOTAL then
 		return
 	end
 	if dwNpcID and not X.IsPlayer(dwNpcID) then
@@ -1752,7 +1750,7 @@ end
 
 -- NPC死亡事件 触发倒计时
 function D.OnDeath(dwCharacterID, dwKiller)
-	if MY_TEAM_MON_SHIELDED then
+	if MY_TEAM_MON_SHIELDED_TOTAL then
 		return
 	end
 	local npc = X.GetNpc(dwCharacterID)
@@ -1782,7 +1780,7 @@ end
 
 -- NPC进出战斗事件 触发倒计时
 function D.OnNpcFight(dwTemplateID, bFight)
-	if MY_TEAM_MON_SHIELDED then
+	if MY_TEAM_MON_SHIELDED_TOTAL then
 		return
 	end
 	local data = D.GetData('NPC', dwTemplateID)
@@ -1804,7 +1802,7 @@ end
 
 -- 不该放在倒计时中 需要重构
 function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
-	if MY_TEAM_MON_SHIELDED then
+	if MY_TEAM_MON_SHIELDED_TOTAL then
 		return
 	end
 	local data = D.GetData('NPC', dwTemplateID)
@@ -1866,7 +1864,7 @@ end
 
 -- NPC 全部消失的倒计时处理
 function D.OnNpcAllLeave(dwTemplateID)
-	if MY_TEAM_MON_SHIELDED then
+	if MY_TEAM_MON_SHIELDED_TOTAL then
 		return
 	end
 	local data = D.GetData('NPC', dwTemplateID)
@@ -1907,7 +1905,7 @@ end
 function D.RegisterMessage(bEnable)
 	if bEnable then
 		X.RegisterMsgMonitor('MSG_SYS', 'MY_TeamMon_MON', function(szChannel, szMsg, nFont, bRich)
-			if MY_TEAM_MON_SHIELDED then
+			if MY_TEAM_MON_SHIELDED_TOTAL then
 				return
 			end
 			if not X.GetClientPlayer() then
