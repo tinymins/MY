@@ -366,6 +366,23 @@ function PS.OnPanelActive(wnd)
 	nY = nY + dy
 	nX = nPaddingX + 10
 
+	local function InsertMsgTypeMenu(m, fnAction, tMsgTypeChecked)
+		for _, v in ipairs(X.GetMsgTypeMenu(fnAction, tMsgTypeChecked)) do
+			table.insert(m, v)
+		end
+		local m1 = { szOption = _L['Other channel'] }
+		for _, szMsgType in ipairs(MY_ChatLog.MSG_TYPE_CUSTOM) do
+			table.insert(m1, {
+				szOption = MY_ChatLog.MSG_TYPE_TITLE[szMsgType],
+				rgb = MY_ChatLog.MSG_TYPE_COLOR[szMsgType],
+				bCheck = true, bChecked = tMsgTypeChecked[szMsgType],
+				fnAction = fnAction,
+			})
+		end
+		table.insert(m, m1)
+		return m
+	end
+
 	ui:Append('WndComboBox', {
 		x = nX, y = nY, w = wr, h = 25,
 		text = _L['Channel settings'],
@@ -390,7 +407,7 @@ function PS.OnPanelActive(wnd)
 					},
 					X.CONSTANT.MENU_DIVIDER,
 				}
-				for _, v in ipairs(X.GetMsgTypeMenu(function(szMsgType)
+				InsertMsgTypeMenu(m, function(szMsgType)
 					for i, v in ipairs(tChannel.aMsgType) do
 						if v == szMsgType then
 							table.remove(tChannel.aMsgType, i)
@@ -400,29 +417,7 @@ function PS.OnPanelActive(wnd)
 					end
 					table.insert(tChannel.aMsgType, szMsgType)
 					MY_ChatLog.aChannel = MY_ChatLog.aChannel
-				end, tMsgTypeChecked)) do
-					table.insert(m, v)
-				end
-				local m1 = { szOption = _L['Other channel'] }
-				for _, szMsgType in ipairs(MY_ChatLog.MSG_TYPE_CUSTOM) do
-					table.insert(m1, {
-						szOption = MY_ChatLog.MSG_TYPE_TITLE[szMsgType],
-						rgb = MY_ChatLog.MSG_TYPE_COLOR[szMsgType],
-						bCheck = true, bChecked = tMsgTypeChecked[szMsgType],
-						fnAction = function()
-							for i, v in ipairs(tChannel.aMsgType) do
-								if v == szMsgType then
-									table.remove(v, i)
-									MY_ChatLog.aChannel = MY_ChatLog.aChannel
-									return
-								end
-							end
-							table.insert(tChannel.aMsgType, szMsgType)
-							MY_ChatLog.aChannel = MY_ChatLog.aChannel
-						end,
-					})
-				end
-				table.insert(m, m1)
+				end, tMsgTypeChecked)
 				table.insert(menu, m)
 			end
 			if #menu > 0 then
@@ -442,6 +437,7 @@ function PS.OnPanelActive(wnd)
 					X.UI.ClosePopupMenu()
 				end,
 			})
+			table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			table.insert(menu, {
 				szOption = _L['Reset channel'],
 				rgb = {255, 0, 0},
@@ -452,6 +448,23 @@ function PS.OnPanelActive(wnd)
 					X.UI.ClosePopupMenu()
 				end,
 			})
+			table.insert(
+				menu,
+				InsertMsgTypeMenu(
+					{
+						szOption = _L['Clear chat log'],
+						rgb = {255, 0, 0},
+					},
+					function(szMsgType)
+						X.Confirm(_L('Are you sure to clear msg type chat log of %s? All chat logs in this msg type will be lost.', MY_ChatLog.MSG_TYPE_TITLE[szMsgType] or g_tStrings.tChannelName[szMsgType] or szMsgType), function()
+							local ds = MY_ChatLog_DS(MY_ChatLog.GetRoot())
+							ds:DeleteMsgInterval({szMsgType}, '', 0, math.huge)
+						end)
+						X.UI.ClosePopupMenu()
+					end,
+					{}
+				)
+			)
 			return menu
 		end,
 	})

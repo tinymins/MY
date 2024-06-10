@@ -6,6 +6,8 @@ return {
     ['Other channel'] = '其它',
     ['Please input new channel name:'] = '請輸入新的頻道名稱：',
     ['New channel'] = '新建頻道',
+    ['Clear chat log'] = '清空記錄',
+    ['Are you sure to clear msg type chat log of %s? All chat logs in this msg type will be lost.'] = '確認要清空頻道類型為[%s]的聊天記錄嗎？該頻道下的聊天記錄將會被徹底刪除，確認後操作將無法撤銷。',
     ['Reset channel'] = '重置頻道',
     ['Are you sure to reset channel settings? Al custom channel settings will be lost.'] = '所有自定義頻道設置將會丟失，確認要重置頻道設置嗎？',
     ['Filter tong member log message'] = '過濾幫會成員上線提示',
@@ -43,6 +45,8 @@ return {
     ['Open chatlog'] = '打開聊天記錄',
     ['MY - MY_ChatLog'] = '茗伊插件集 - 聊天記錄',
     ['Press enter to search ...'] = '輸入回車鍵搜索...',
+    ['Clear channel chat log'] = '清空當前分類聊天記錄',
+    ['Are you sure to clear channel chat log of %s? All chat logs in this channel will be lost.'] = '確認要清空[%s]分類的聊天記錄嗎？該分類聊天記錄將會被徹底刪除，確認後操作將無法撤銷。',
 
     ['Death Log'] = '重傷記錄',
     ['Journal Log'] = '交易流水',

@@ -45,6 +45,7 @@ function D.OnFrameCreate()
 	container:Clear()
 	for _, info in pairs(MY_ChatLog.aChannel) do
 		local wnd = container:AppendContentFromIni(SZ_INI, 'Wnd_ChatChannel')
+		wnd.szTitle = info.szTitle
 		wnd.szKey = info.szKey
 		wnd.aMsgType = info.aMsgType
 		wnd:Lookup('CheckBox_ChatChannel'):Check(not this.tUncheckedChannel[info.szKey], WNDEVENT_FIRETYPE.PREVENT)
@@ -130,6 +131,26 @@ function D.OnLButtonClick()
 		this:GetRoot().nCurrentPage = nil
 		this:GetRoot().nLastClickIndex = nil
 		D.UpdatePage(this:GetRoot())
+	end
+end
+
+function D.OnRButtonClick()
+	local name = this:GetName()
+	if name == 'CheckBox_ChatChannel' then
+		local hWnd = this:GetParent()
+		local hFrame = this:GetRoot()
+		local aMsgType = hWnd.aMsgType
+		local szSearch = hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Search/Edit_Search'):GetText()
+		X.UI.PopupMenu({{
+			szOption = _L['Clear channel chat log'],
+			rgb = {255, 0, 0},
+			fnAction = function()
+				X.Confirm(_L('Are you sure to clear channel chat log of %s? All chat logs in this channel will be lost.', hWnd.szTitle), function()
+					hFrame.ds:DeleteMsgInterval(aMsgType, szSearch, 0, math.huge)
+				end)
+				X.UI.ClosePopupMenu()
+			end,
+		}})
 	end
 end
 
