@@ -45,7 +45,7 @@ return {
     ['Open chatlog'] = '打開聊天記錄',
     ['MY - MY_ChatLog'] = '茗伊插件集 - 聊天記錄',
     ['Press enter to search ...'] = '輸入回車鍵搜索...',
-    ['Clear channel chat log'] = '清空當前分類聊天記錄',
+    ['Clear channel chat log'] = '清空該分類聊天記錄',
     ['Are you sure to clear channel chat log of %s? All chat logs in this channel will be lost.'] = '確認要清空[%s]分類的聊天記錄嗎？該分類聊天記錄將會被徹底刪除，確認後操作將無法撤銷。',
 
     ['Death Log'] = '重傷記錄',
