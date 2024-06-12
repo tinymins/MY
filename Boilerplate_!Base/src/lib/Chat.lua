@@ -335,6 +335,9 @@ local ChatLinkEvents = {
 			InsertInviteTeamMenu(menu, (X.UI(link):Text():gsub('[%[%]]', '')))
 			menu[1].fnAction()
 		elseif IsCtrlKeyDown() then
+			if X.IS_REMAKE and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
+				return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
+			end
 			X.CopyChatItem(link)
 		elseif IsShiftKeyDown() then
 			X.SetTarget(TARGET.PLAYER, X.UI(link):Text())
