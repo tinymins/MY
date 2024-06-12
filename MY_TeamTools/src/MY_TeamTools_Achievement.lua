@@ -685,7 +685,7 @@ function D.OnInitPage()
 
 	local nX = 20
 	nX = nX + X.UI(wnd):Append('WndAutocomplete', {
-		x = nX, y = 20, w = 250,
+		x = nX, y = 20, w = 250, h = 25,
 		name = 'WndAutocomplete_Map',
 		onChange = function(szText)
 			if D.tMapID[szText] then
@@ -700,7 +700,7 @@ function D.OnInitPage()
 	}):Width() + 5
 
 	nX = nX + X.UI(wnd):Append('WndAutocomplete', {
-		x = nX, y = 20, w = 200,
+		x = nX, y = 20, w = 200, h = 25,
 		name = 'WndAutocomplete_Search',
 		text = D.szSearch,
 		placeholder = _L['Search'],
