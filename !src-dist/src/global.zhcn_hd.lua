@@ -564,6 +564,7 @@ GetKeyName = FunctionType
 GetKeyShow = FunctionType
 GetKeyValue = FunctionType
 GetKungfuSchoolColor = FunctionType
+GetKungfuTypeByKungfuID = FunctionType
 GetLevelUpData = FunctionType
 GetLocalTimeText = FunctionType
 GetLogicFrameCount = FunctionType
