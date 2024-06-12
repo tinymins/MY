@@ -199,6 +199,9 @@ end
 
 -- ∏¥÷∆¡ƒÃÏ––
 function X.CopyChatLine(hTime, bTextEditor, bRichText)
+	if X.IS_REMAKE and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
+		return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
+	end
 	local edit = X.GetChatInput()
 	if bTextEditor then
 		edit = X.UI.OpenTextEditor():Find('.WndEdit')[1]
@@ -366,9 +369,6 @@ local ChatLinkEvents = {
 	OnCopyLClick = function(element, link)
 		if not link then
 			link = element
-		end
-		if X.IS_REMAKE and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
-			return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
 		end
 		X.CopyChatLine(link, IsCtrlKeyDown(), IsCtrlKeyDown() and IsShiftKeyDown())
 	end,
