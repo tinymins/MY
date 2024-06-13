@@ -512,7 +512,7 @@ local D = {
 function D.AnnounceShielded()
 	local bBlock = X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()
 	if bBlock and not D.bBlockMessageAnnounced then
-		X.OutputSystemAnnounceMessage(_L['MY_Cataclysm_Buff is blocked in current kungfu, temporary disabled.'])
+		X.OutputSystemMessage(_L['MY_Cataclysm_Buff is blocked in current kungfu, temporary disabled.'])
 	end
 	D.bBlockMessageAnnounced = bBlock
 end

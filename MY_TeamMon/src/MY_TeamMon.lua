@@ -696,9 +696,9 @@ function D.UpdateShieldStatus()
 	local bShieldedTotal = bRestricted and X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()
 	local bShieldedOtherPlayer = bRestricted and not X.IsInDungeonMap()
 	if not MY_TEAM_MON_SHIELDED_TOTAL and bShieldedTotal then
-		X.OutputSystemAnnounceMessage(_L['MY_TeamMon is blocked in current kungfu, temporary disabled.'])
+		X.OutputSystemMessage(_L['MY_TeamMon is blocked in current kungfu, temporary disabled.'])
 	elseif not MY_TEAM_MON_SHIELDED_OTHER_PLAYER and bShieldedOtherPlayer then
-		X.OutputSystemAnnounceMessage(_L['MY_TeamMon is shielded other player in this map, temporary disabled.'])
+		X.OutputSystemMessage(_L['MY_TeamMon is shielded other player in this map, temporary disabled.'])
 	end
 	MY_TEAM_MON_SHIELDED_TOTAL, MY_TEAM_MON_SHIELDED_OTHER_PLAYER = bShieldedTotal, bShieldedOtherPlayer
 end

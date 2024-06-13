@@ -222,7 +222,7 @@ end
 function D.AnnounceShielded()
 	local bBlock = X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()
 	if bBlock and not D.bBlockMessageAnnounced then
-		X.OutputSystemAnnounceMessage(_L['MY_TargetMon is blocked in current kungfu, temporary disabled.'])
+		X.OutputSystemMessage(_L['MY_TargetMon is blocked in current kungfu, temporary disabled.'])
 	end
 	D.bBlockMessageAnnounced = bBlock
 end
