@@ -40,7 +40,7 @@ local COMPONENT_SAMPLE = {
 		'WndFrame Simple',
 		'WndButton',
 		{
-			w = 100, h = COMPONENT_H, name = 'WndButton_CreateSimpleFrame', text = 'Create',
+			w = 'auto', h = COMPONENT_H, name = 'WndButton_CreateSimpleFrame', text = 'Create',
 			onClick = function()
 				X.UI.CreateFrame('SampleFrame', {
 					simple = true,
@@ -56,25 +56,25 @@ local COMPONENT_SAMPLE = {
 		'UI.Browser',
 		'WndButton',
 		{
-			w = 100, h = COMPONENT_H, name = 'WndButton_CreateUIBrowser', text = 'Create',
+			w = 'auto', h = COMPONENT_H, name = 'WndButton_CreateUIBrowser', text = 'Create',
 			onClick = function()
 				X.UI.OpenBrowser('https://jx3.xoyo.com')
 			end,
 		},
 	},
 	{'WndAutocomplete', 'WndAutocomplete', { w = 200, h = COMPONENT_H, font = 162, text = 'WndAutocomplete' }},
-	{'WndButtonBox', 'WndButtonBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndButtonBox' }},
-	{'WndButtonBox Themed', 'WndButtonBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndButtonBox', buttonStyle = 'FLAT' }},
+	{'WndButtonBox', 'WndButtonBox', { w = 'auto', h = 'auto', font = 162, text = 'WndButtonBox' }},
+	{'WndButtonBox Themed', 'WndButtonBox', { w = 'auto', h = 'auto', font = 162, text = 'WndButtonBox', buttonStyle = 'FLAT' }},
 	{'WndButtonBox Option', 'WndButtonBox', { w = COMPONENT_H, h = COMPONENT_H, font = 162, buttonStyle = 'OPTION' }},
-	{'WndButton', 'WndButton', { w = 100, h = COMPONENT_H, font = 162, text = 'WndButton' }},
-	{'WndCheckBox', 'WndCheckBox', { w = 100, h = COMPONENT_H, font = 162, text = 'WndCheckBox' }},
-	{'WndComboBox', 'WndComboBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndComboBox' }},
+	{'WndButton', 'WndButton', { w = 'auto', h = 'auto', font = 162, text = 'WndButton' }},
+	{'WndCheckBox', 'WndCheckBox', { w = 'auto', h = 'auto', font = 162, text = 'WndCheckBox' }},
+	{'WndComboBox', 'WndComboBox', { w = 'auto', h = 'auto', font = 162, text = 'WndComboBox' }},
 	{'WndEditBox', 'WndEditBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditBox' }},
 	{'WndEditBox Left Search', 'WndEditBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditBox', appearance = 'SEARCH_LEFT' }},
 	{'WndEditBox Right Search', 'WndEditBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditBox', appearance = 'SEARCH_RIGHT' }},
 	{'WndEditComboBox', 'WndEditComboBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditComboBox' }},
 	-- WndListBox
-	{'WndRadioBox', 'WndRadioBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndRadioBox' }},
+	{'WndRadioBox', 'WndRadioBox', { w = 'auto', h = 'auto', font = 162, text = 'WndRadioBox' }},
 	-- WndScrollHandleBox
 	-- WndScrollWindowBox
 	{'WndTrackbar', 'WndTrackbar', { w = 200, h = COMPONENT_H, font = 162, text = 'WndTrackbar' }},
@@ -300,16 +300,14 @@ function PS.OnPanelActive(wnd)
 
 	for _, v in ipairs(COMPONENT_SAMPLE) do
 		nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', h = COMPONENT_H, font = 162, text = v[1] .. ': ' }):Width() + 5
-		if v[3].h > COMPONENT_H then
+		if X.IsNumber(v[3].h) and v[3].h > COMPONENT_H then
 			nX = nPaddingX
 			nY = nY + COMPONENT_H
-			ui:Append('Shadow', { x = nPaddingX, y = nY + v[3].h + 5, w = W - nPaddingX * 2, h = 1, color = { 255, 255, 255 }, alpha = 50 })
-		else
-			ui:Append('Shadow', { x = nPaddingX, y = nY + 22, w = W - nPaddingX * 2, h = 1, color = { 255, 255, 255 }, alpha = 50 })
 		end
-		nX = nX + ui:Append(v[2], v[3]):Pos(nX, nY):Width() + 5
+		nY = nY + math.max(LH, ui:Append(v[2], v[3]):Pos(nX, nY):Height() + 5)
 		nX = nPaddingX
-		nY = nY + math.max(LH, v[3].h + 5)
+		ui:Append('Shadow', { x = nPaddingX, y = nY, w = W - nPaddingX * 2, h = 1, color = { 255, 255, 255 }, alpha = 50 })
+		nY = nY + 3
 	end
 
 	ui:Append('WndWindow', { x = 0, y = nY + COMPONENT_H, w = W, h = H / 3 })
