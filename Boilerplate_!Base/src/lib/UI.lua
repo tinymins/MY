@@ -4152,6 +4152,10 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 					if bAutoWidth and X.IsNumber(nHeight) then
 						nWidth = nHeight + nTextW + 1
 					end
+				elseif componentType == 'ColorBox' then
+					if bAutoWidth and X.IsNumber(nHeight) then
+						nWidth = nHeight + nTextW + 5
+					end
 				end
 				hText:SetSize(nTextOriginW, nTextOriginH)
 			end
@@ -4388,19 +4392,10 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local sha = GetComponentElement(raw, 'SHADOW')
 		local txt = GetComponentElement(raw, 'TEXT')
-		local inner = GetComponentElement(raw, 'INNER_RAW')
-		if not nInnerWidth then
-			nInnerWidth = nHeight
-		end
-		if not nInnerHeight then
-			nInnerHeight = nHeight
-		end
-		local nGap = math.min(nInnerWidth * 0.3, 8)
-		nWidth = math.max(nWidth, nInnerWidth + nGap)
-		sha:SetSize(nInnerWidth, nInnerHeight)
-		sha:SetRelPos(0, (nHeight - nInnerHeight) / 2)
-		txt:SetSize(nWidth - nInnerWidth - nGap, nHeight)
-		txt:SetRelPos(nInnerWidth + nGap, 0)
+		sha:SetSize(nHeight - 4, nHeight - 4)
+		sha:SetRelPos(2, 2)
+		txt:SetSize(nWidth - nHeight - 5, nHeight)
+		txt:SetRelPos(nHeight + 5, 0)
 		hdl:SetSize(nWidth, nHeight)
 		hdl:FormatAllItemPos()
 	elseif componentType == 'WndComboBox' then
