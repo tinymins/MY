@@ -4148,6 +4148,10 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 					if bAutoWidth and X.IsNumber(nHeight) then
 						nWidth = nHeight + nTextW + 1
 					end
+				elseif componentType == 'WndCheckBox' then
+					if bAutoWidth and X.IsNumber(nHeight) then
+						nWidth = nHeight + nTextW + 1
+					end
 				end
 				hText:SetSize(nTextOriginW, nTextOriginH)
 			end
