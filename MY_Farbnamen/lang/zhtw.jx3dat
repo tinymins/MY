@@ -7,7 +7,7 @@ return {
 	['Reset data'] = '重置數據',
 	['Import data'] = '導入數據',
     ['Please select your farbnamen database file.'] = '請選擇你要導入的門派染色數據文件：',
-    ['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下來如有頓卡請耐心等待，不要結束進程，否則您的資料庫可能造成不可逆的數據損壞，點擊確認開始操作。',
+    ['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下來如有客戶端失去響應、角色掉線，請耐心等待，勿隨意結束客戶端，否則您的資料庫可能造成不可逆的數據損壞，點擊確認開始操作。',
     ['%d chars imported, %d chars skipped, %d tongs imported, %d tongs skipped!'] = '成功導入%d條角色數據、跳過%d條角色數據，導入%d條幫會數據、跳過%d條幫會數據。',
     ['Cache data deleted.'] = '緩存已清除。',
     ['Show analysis'] = '顯示統計',

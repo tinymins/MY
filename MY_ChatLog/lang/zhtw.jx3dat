@@ -17,10 +17,10 @@ return {
     ['Export chatlog'] = '導出聊天記錄',
 	['Streaming client does not support export!'] = '雲端客戶端不支持導出功能！',
     ['Optimize datebase'] = '優化資料庫',
-    ['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'] = '優化資料庫可以加快查詢速度解決部分頓卡問題，但如果本地聊天記錄較多操作可能會造成臨時頓卡掉線，是否繼續？',
-    ['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下來如有頓卡請耐心等待，不要結束進程，否則您的聊天記錄可能造成不可逆的數據損壞，點擊確認開始操作。',
+    ['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'] = '優化資料庫可以加快查詢速度解決部分頓卡問題，但如果本地聊天記錄較多操作可能會造成客戶端失去響應、角色掉線，請耐心等待，勿隨意結束客戶端，是否繼續？',
+    ['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下來如有客戶端失去響應、角色掉線，請耐心等待，勿隨意結束客戶端，否則您的聊天記錄可能造成不可逆的數據損壞，點擊確認開始操作。',
     ['Optimize finished!'] = '優化壓縮處理完成！',
-    ['Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '資料庫已損壞，需要修複後方可使用，但是修複可能造成臨時頓卡掉線,是否立即修複？',
+    ['Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '資料庫已損壞，需要修複後方可使用，但是修複可能造成客戶端失去響應、角色掉線，請耐心等待，勿隨意結束客戶端，是否立即修複？',
     ['Please select your chatlog database file.'] = '請選擇需要導入的聊天記錄文件',
     ['%d chatlogs imported!'] = '成功導入%d條聊天記錄',
     ['Import chatlog'] = '導入聊天記錄',
@@ -54,7 +54,7 @@ return {
 
     ['Ancient chatlog detected, you can migrate chatlog database from them, that may take a while and cannot be break, do you want to do it now?'] = '發現舊版聊天記錄，是否立即導入，導入可能導致客戶端無響應一段時間，希望現在開始導入嗎？',
     ['Problem(s) detected on your chatlog database and must be fixed before use, would you like to do this now?'] = '檢測到您的聊天記錄數據受損，需要修複後方可使用，修複可能導致客戶端無響應一段時間，是否立即開始修複？',
-    ['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'] = '請點擊確定開始操作，客戶端可能失去響應，請耐心等待。請勿隨意結束客戶端，否則您的聊天記錄可能會永久丟失。',
+    ['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'] = '請點擊確定開始操作，客戶端可能失去響應、角色可能會掉線，請耐心等待。請勿隨意結束客戶端，否則您的聊天記錄可能會永久丟失。',
 
     ['Settings'] = '設置',
     ['Tips'] = '說明',

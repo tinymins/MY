@@ -7,7 +7,7 @@ return {
 	['Reset data'] = '重置数据',
 	['Import data'] = '导入数据',
     ['Please select your farbnamen database file.'] = '请选择你要导入的门派染色数据文件：',
-    ['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下来如有顿卡请耐心等待，不要结束进程，否则您的数据库可能造成不可逆的数据损坏，点击确认开始操作。',
+    ['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下来如有客户端失去响应、角色掉线，请耐心等待，勿随意结束客户端，否则您的数据库可能造成不可逆的数据损坏，点击确认开始操作。',
     ['%d chars imported, %d chars skipped, %d tongs imported, %d tongs skipped!'] = '成功导入%d条角色数据、跳过%d条角色数据，导入%d条帮会数据、跳过%d条帮会数据。',
     ['Cache data deleted.'] = '缓存已清除。',
     ['Show analysis'] = '显示统计',

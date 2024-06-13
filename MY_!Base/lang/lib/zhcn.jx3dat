@@ -86,7 +86,7 @@ return {
 
 	['User settings preset id cannot contains special character (/?*:|\\<>).'] = '本地共用数据方案名称不能包含特殊符号（/?*:|\\<>）。',
 
-	['%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '%s数据库已损坏，需要修复后方可使用，但是修复可能造成临时顿卡掉线,是否立即修复？',
+	['%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '%s数据库已损坏，需要修复后方可使用，但是修复可能造成客户端失去响应、角色掉线，请耐心等待，勿随意结束客户端，是否立即修复？',
 	['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下来如有顿卡请耐心等待，不要结束进程，否则您的数据库可能造成不可逆的数据损坏，点击确认开始操作。',
 	['Database file locked, repair database failed! : %s'] = '数据库文件被占用，修复失败！(%s)',
 	['%s Database repair finished!'] = '%s数据库修复完成！',

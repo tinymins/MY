@@ -17,10 +17,10 @@ return {
     ['Export chatlog'] = '导出聊天记录',
 	['Streaming client does not support export!'] = '云端客户端不支持导出功能！',
     ['Optimize datebase'] = '优化数据库',
-    ['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'] = '优化数据库可以加快查询速度解决部分顿卡问题，但如果本地聊天记录较多操作可能会造成临时顿卡掉线，是否继续？',
-    ['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下来如有顿卡请耐心等待，不要结束进程，否则您的聊天记录可能造成不可逆的数据损坏，点击确认开始操作。',
+    ['Optimize datebase will take a long time and may cause a disconnection, are you sure to continue?'] = '优化数据库可以加快查询速度解决部分顿卡问题，但如果本地聊天记录较多操作可能会造成客户端失去响应、角色掉线，请耐心等待，勿随意结束客户端，是否继续？',
+    ['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下来如有客户端失去响应、角色掉线，请耐心等待，勿随意结束客户端，否则您的聊天记录可能造成不可逆的数据损坏，点击确认开始操作。',
     ['Optimize finished!'] = '优化压缩处理完成！',
-    ['Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '数据库已损坏，需要修复后方可使用，但是修复可能造成临时顿卡掉线,是否立即修复？',
+    ['Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '数据库已损坏，需要修复后方可使用，但是修复可能造成客户端失去响应、角色掉线，请耐心等待，勿随意结束客户端，是否立即修复？',
     ['Please select your chatlog database file.'] = '请选择需要导入的聊天记录文件',
     ['%d chatlogs imported!'] = '成功导入%d条聊天记录',
     ['Import chatlog'] = '导入聊天记录',
@@ -54,7 +54,7 @@ return {
 
     ['Ancient chatlog detected, you can migrate chatlog database from them, that may take a while and cannot be break, do you want to do it now?'] = '发现旧版聊天记录，是否立即导入，导入可能导致客户端无响应一段时间，希望现在开始导入吗？',
     ['Problem(s) detected on your chatlog database and must be fixed before use, would you like to do this now?'] = '检测到您的聊天记录数据受损，需要修复后方可使用，修复可能导致客户端无响应一段时间，是否立即开始修复？',
-    ['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'] = '请点击确定开始操作，客户端可能失去响应，请耐心等待。请勿随意结束客户端，否则您的聊天记录可能会永久丢失。',
+    ['Your client may get no responding, please wait until it finished, otherwise your chatlog data may got lost, press yes to start.'] = '请点击确定开始操作，客户端可能失去响应、角色可能会掉线，请耐心等待。请勿随意结束客户端，否则您的聊天记录可能会永久丢失。',
 
     ['Settings'] = '设置',
     ['Tips'] = '说明',
