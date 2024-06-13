@@ -199,7 +199,7 @@ end
 
 -- 复制聊天行
 function X.CopyChatLine(hTime, bTextEditor, bRichText)
-	if X.IS_REMAKE and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
+	if X.IS_REMAKE and X.IsRestricted('X.CHAT_WUJIE') and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
 		return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
 	end
 	local edit = X.GetChatInput()
@@ -338,7 +338,7 @@ local ChatLinkEvents = {
 			InsertInviteTeamMenu(menu, (X.UI(link):Text():gsub('[%[%]]', '')))
 			menu[1].fnAction()
 		elseif IsCtrlKeyDown() then
-			if X.IS_REMAKE and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
+			if X.IS_REMAKE and X.IsRestricted('X.CHAT_WUJIE') and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
 				return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
 			end
 			X.CopyChatItem(link)
@@ -382,7 +382,7 @@ local ChatLinkEvents = {
 		if not link then
 			link = element
 		end
-		if X.IS_REMAKE and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
+		if X.IS_REMAKE and X.IsRestricted('X.CHAT_WUJIE') and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
 			return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
 		end
 		X.RepeatChatLine(link)
@@ -1151,6 +1151,7 @@ end
 
 X.RegisterRestriction('X.CHAT_CRLF', { ['*'] = true })
 X.RegisterRestriction('X.CHAT_LEN', { ['*'] = true })
+X.RegisterRestriction('X.CHAT_WUJIE', { ['*'] = true })
 
 -- 格式化聊天内容
 -- szText        -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
