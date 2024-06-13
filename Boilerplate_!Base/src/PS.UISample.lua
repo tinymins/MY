@@ -40,7 +40,7 @@ local COMPONENT_SAMPLE = {
 		'WndFrame Simple',
 		'WndButton',
 		{
-			w = 100, h = COMPONENT_H, name = 'WndButton_CreateSimpleFrame', text = 'Create',
+			w = 'auto', h = COMPONENT_H, name = 'WndButton_CreateSimpleFrame', text = 'Create',
 			onClick = function()
 				X.UI.CreateFrame('SampleFrame', {
 					simple = true,
@@ -56,7 +56,7 @@ local COMPONENT_SAMPLE = {
 		'UI.Browser',
 		'WndButton',
 		{
-			w = 100, h = COMPONENT_H, name = 'WndButton_CreateUIBrowser', text = 'Create',
+			w = 'auto', h = COMPONENT_H, name = 'WndButton_CreateUIBrowser', text = 'Create',
 			onClick = function()
 				X.UI.OpenBrowser('https://jx3.xoyo.com')
 			end,
@@ -66,8 +66,8 @@ local COMPONENT_SAMPLE = {
 	{'WndButtonBox', 'WndButtonBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndButtonBox' }},
 	{'WndButtonBox Themed', 'WndButtonBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndButtonBox', buttonStyle = 'FLAT' }},
 	{'WndButtonBox Option', 'WndButtonBox', { w = COMPONENT_H, h = COMPONENT_H, font = 162, buttonStyle = 'OPTION' }},
-	{'WndButton', 'WndButton', { w = 100, h = COMPONENT_H, font = 162, text = 'WndButton' }},
-	{'WndCheckBox', 'WndCheckBox', { w = 100, h = COMPONENT_H, font = 162, text = 'WndCheckBox' }},
+	{'WndButton', 'WndButton', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndButton' }},
+	{'WndCheckBox', 'WndCheckBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndCheckBox' }},
 	{'WndComboBox', 'WndComboBox', { w = 'auto', h = COMPONENT_H, font = 162, text = 'WndComboBox' }},
 	{'WndEditBox', 'WndEditBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditBox' }},
 	{'WndEditBox Left Search', 'WndEditBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditBox', appearance = 'SEARCH_LEFT' }},
