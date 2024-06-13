@@ -470,7 +470,7 @@ local function GetComponentElement(raw, elementType)
 		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' or componentType == 'CheckBox' then
 			element = raw
 		end
-	elseif elementType == 'COMBOBOX' then -- 获取下拉框UI实例
+	elseif elementType == 'COMBO_BOX' then -- 获取下拉框UI实例
 		if componentType == 'WndComboBox' or componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
 			element = raw:Lookup('Btn_ComboBox')
 		end
@@ -2607,7 +2607,7 @@ local function SetComponentEnable(raw, bEnable)
 		sha:SetColorRGB(math.ceil(r * ratio), math.ceil(g * ratio), math.ceil(b * ratio))
 	end
 	-- set sub elements enable
-	local combo = GetComponentElement(raw, 'COMBOBOX')
+	local combo = GetComponentElement(raw, 'COMBO_BOX')
 	if combo then
 		combo:Enable(bEnable)
 	end
@@ -4401,7 +4401,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		hdl:FormatAllItemPos()
 	elseif componentType == 'WndComboBox' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-		local cmb = GetComponentElement(raw, 'COMBOBOX')
+		local cmb = GetComponentElement(raw, 'COMBO_BOX')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local txt = GetComponentElement(raw, 'TEXT')
 		local img = GetComponentElement(raw, 'IMAGE')
@@ -4418,7 +4418,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		hdl:FormatAllItemPos()
 	elseif componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-		local cmb = GetComponentElement(raw, 'COMBOBOX')
+		local cmb = GetComponentElement(raw, 'COMBO_BOX')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local img = GetComponentElement(raw, 'IMAGE')
 		local edt = GetComponentElement(raw, 'EDIT')
@@ -5736,7 +5736,7 @@ function OO:LClick(...)
 				if GetComponentType(raw) == 'WndScrollHandleBox' then
 					X.UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemLButtonClick', fnAction)
 				else
-					local cmb = GetComponentElement(raw, 'COMBOBOX')
+					local cmb = GetComponentElement(raw, 'COMBO_BOX')
 					local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 					local itm = GetComponentElement(raw, 'ITEM')
 					local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
@@ -5787,7 +5787,7 @@ end
 					if GetComponentType(raw) == 'WndScrollHandleBox' then
 						X.UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemMButtonClick', fnAction)
 					else
-						local cmb = GetComponentElement(raw, 'COMBOBOX')
+						local cmb = GetComponentElement(raw, 'COMBO_BOX')
 						local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 						local itm = GetComponentElement(raw, 'ITEM')
 						local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
@@ -5838,7 +5838,7 @@ function OO:RClick(...)
 				if GetComponentType(raw) == 'WndScrollHandleBox' then
 					X.UI(GetComponentElement(raw, 'MAIN_HANDLE')):UIEvent('OnItemRButtonClick', fnAction)
 				else
-					local cmb = GetComponentElement(raw, 'COMBOBOX')
+					local cmb = GetComponentElement(raw, 'COMBO_BOX')
 					local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 					local itm = GetComponentElement(raw, 'ITEM')
 					local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
