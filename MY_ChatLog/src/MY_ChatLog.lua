@@ -373,7 +373,9 @@ function D.RegisterMsgMonitor()
 					return
 				end
 			elseif szMsgType == 'MSG_ACHIEVEMENT' or szMsgType == 'MSG_DESGNATION' then
-				if D.bReady and O.bIgnoreOthersAchievementDesignation and not szText:find('[' .. X.GetClientPlayerName() .. ']', nil, true) then
+				if D.bReady and O.bIgnoreOthersAchievementDesignation
+				and not szText:find(_L['You\'ve achieved'])
+				and not szText:find('[' .. X.GetClientPlayerName() .. ']', nil, true) then
 					return
 				end
 			end
