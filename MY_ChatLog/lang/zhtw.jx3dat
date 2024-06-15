@@ -27,6 +27,7 @@ return {
     ['Import chatlog'] = '導入聊天記錄',
     ['Upgrade succeed!'] = '升級成功！',
     ['You\'ve achieved'] = '你完成了隱元秘鑒',
+    ['You got designation'] = '你獲得稱號後綴',
     ['Fix succeed!'] = '修複成功！',
     ['Preparing'] = '準備中',
     ['Export succeed'] = '導出完成！',
