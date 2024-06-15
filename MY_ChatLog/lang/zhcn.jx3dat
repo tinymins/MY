@@ -12,6 +12,7 @@ return {
     ['Are you sure to reset channel settings? Al custom channel settings will be lost.'] = '所有自定义频道设置将会丢失，确认要重置频道设置吗？',
     ['Filter tong member log message'] = '过滤帮会成员上线提示',
     ['Filter tong online message'] = '过滤帮会上线公告提示',
+    ['Filter other player achievement and designation'] = '过滤其他角色成就称号',
     ['Realtime database commit'] = '聊天记录实时写入数据库',
     ['Auto connect database'] = '登录时自动连接数据库',
     ['Export chatlog'] = '导出聊天记录',

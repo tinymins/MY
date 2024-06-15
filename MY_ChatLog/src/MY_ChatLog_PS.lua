@@ -490,6 +490,16 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + dy
 
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = wr,
+		text = _L['Filter other player achievement and designation'],
+		checked = MY_ChatLog.bIgnoreOthersAchievementDesignation,
+		onCheck = function(bChecked)
+			MY_ChatLog.bIgnoreOthersAchievementDesignation = bChecked
+		end,
+	})
+	nY = nY + dy
+
 	if not X.IsRestricted('MY_ChatLog.RealtimeCommit') then
 		ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = wr,

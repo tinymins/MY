@@ -46,6 +46,12 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bIgnoreOthersAchievementDesignation = { -- 其他玩家成就称号
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatLog'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 	bRealtimeCommit = { -- 实时写入数据库
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatLog'],
@@ -366,6 +372,10 @@ function D.RegisterMsgMonitor()
 				) then
 					return
 				end
+			elseif szMsgType == 'MSG_ACHIEVEMENT' or szMsgType == 'MSG_DESGNATION' then
+				if D.bReady and O.bIgnoreOthersAchievementDesignation and not szText:find('[' .. X.GetClientPlayerName() .. ']', nil, true) then
+					return
+				end
 			end
 			if MAIN_DS then
 				MAIN_DS:InsertMsg(szMsgType, szText, szMsg, szTalker, GetCurrentTime())
@@ -459,6 +469,7 @@ local settings = {
 			fields = {
 				'bIgnoreTongOnlineMsg',
 				'bIgnoreTongMemberLogMsg',
+				'bIgnoreOthersAchievementDesignation',
 				'bRealtimeCommit',
 				'bAutoConnectDB',
 				'aChannel',
@@ -472,6 +483,7 @@ local settings = {
 			fields = {
 				'bIgnoreTongOnlineMsg',
 				'bIgnoreTongMemberLogMsg',
+				'bIgnoreOthersAchievementDesignation',
 				'bRealtimeCommit',
 				'bAutoConnectDB',
 				'aChannel',
