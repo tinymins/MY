@@ -62,6 +62,16 @@ local COMPONENT_SAMPLE = {
 			end,
 		},
 	},
+	{
+		'UI.TextEditor',
+		'WndButton',
+		{
+			w = 'auto', h = COMPONENT_H, name = 'WndButton_TextEditor', text = 'Create',
+			onClick = function()
+				X.UI.OpenTextEditor('Hello world!')
+			end,
+		},
+	},
 	{'WndAutocomplete', 'WndAutocomplete', { w = 200, h = COMPONENT_H, font = 162, text = 'WndAutocomplete' }},
 	{'WndButtonBox', 'WndButtonBox', { w = 'auto', h = 'auto', font = 162, text = 'WndButtonBox' }},
 	{'WndButtonBox Themed', 'WndButtonBox', { w = 'auto', h = 'auto', font = 162, text = 'WndButtonBox', buttonStyle = 'FLAT' }},
