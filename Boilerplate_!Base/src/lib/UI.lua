@@ -21,7 +21,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 -------------------------------------------------------------------------------------------------------
 
-X.UI.ITEM_EVENT = X.SetmetaReadonly({
+X.UI.ITEM_EVENT = X.FreezeTable({
 	L_BUTTON_DOWN     = 0x00000001,
 	R_BUTTON_DOWN     = 0x00000002,
 	L_BUTTON_UP       = 0x00000004,
@@ -46,7 +46,7 @@ X.UI.ITEM_EVENT = X.SetmetaReadonly({
 	M_BUTTON_DRAG     = 0x00200000,
 	MOUSE_IN_OUT      = 0x00400000,
 })
-X.UI.CURSOR = CURSOR or X.SetmetaReadonly({
+X.UI.CURSOR = CURSOR or X.FreezeTable({
 	NORMAL              = 0,
 	CAST                = 1,
 	UNABLECAST          = 2,
@@ -97,12 +97,12 @@ X.UI.CURSOR = CURSOR or X.SetmetaReadonly({
 	HOMELAND_BRUSH      = 65,
 	HOMELAND_DIG_CELLAR = 66,
 })
-X.UI.MOUSE_BUTTON = X.SetmetaReadonly({
+X.UI.MOUSE_BUTTON = X.FreezeTable({
 	LEFT   = 1,
 	MIDDLE = 0,
 	RIGHT  = -1,
 })
-X.UI.TIP_POSITION = X.SetmetaReadonly({
+X.UI.TIP_POSITION = X.FreezeTable({
 	FOLLOW_MOUSE              = -1,
 	CENTER                    = ALW.CENTER,
 	LEFT_RIGHT                = ALW.LEFT_RIGHT,
@@ -111,16 +111,16 @@ X.UI.TIP_POSITION = X.SetmetaReadonly({
 	BOTTOM_TOP                = ALW.BOTTOM_TOP,
 	RIGHT_LEFT_AND_BOTTOM_TOP = ALW.RIGHT_LEFT_AND_BOTTOM_TOP,
 })
-X.UI.TIP_HIDE_WAY = X.SetmetaReadonly({
+X.UI.TIP_HIDE_WAY = X.FreezeTable({
 	NO_HIDE      = 100,
 	HIDE         = 101,
 	ANIMATE_HIDE = 102,
 })
-X.UI.SLIDER_STYLE = X.SetmetaReadonly({
+X.UI.SLIDER_STYLE = X.FreezeTable({
 	SHOW_VALUE    = false,
 	SHOW_PERCENT  = true,
 })
-X.UI.IMAGE_TYPE = IMAGE or X.SetmetaReadonly({
+X.UI.IMAGE_TYPE = IMAGE or X.FreezeTable({
 	NORMAL             = 0,
 	LEFT_RIGHT         = 1,
 	RIGHT_LEFT         = 2,
@@ -138,7 +138,7 @@ X.UI.IMAGE_TYPE = IMAGE or X.SetmetaReadonly({
 	REVERSE_TIMER_HIDE = 14,
 	REVERSE_TIMER_SHOW = 15,
 })
-X.UI.WND_SIDE = X.SetmetaReadonly({
+X.UI.WND_SIDE = X.FreezeTable({
 	TOP           = 0,
 	BOTTOM        = 1,
 	LEFT          = 2,
@@ -153,19 +153,19 @@ X.UI.WND_SIDE = X.SetmetaReadonly({
 	TOP_CENTER    = 1,
 	BOTTOM_CENTER = 1,
 })
-X.UI.EDIT_TYPE = X.SetmetaReadonly({
+X.UI.EDIT_TYPE = X.FreezeTable({
 	NUMBER = 0, -- 数字
 	ASCII = 1, -- 英文
 	WIDE_CHAR = 2, -- 中英文
 })
-X.UI.WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or X.SetmetaReadonly({
+X.UI.WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or X.FreezeTable({
 	CUSTOM = 0,
 	LEFT_TOP = 1,
 	LEFT_BOTTOM = 2,
 	RIGHT_TOP = 3,
 	RIGHT_BOTTOM = 4,
 })
-X.UI.FRAME_VISUAL_STATE = X.SetmetaReadonly({
+X.UI.FRAME_VISUAL_STATE = X.FreezeTable({
 	NORMAL = 0, -- 普通
 	MINIMIZE = 1, -- 最小化
 	MAXIMIZE = 2, -- 最大化
@@ -201,7 +201,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 2,
 		nDisableGroup = 3,
 	},
-	LINK = X.SetmetaReadonly({
+	LINK = X.FreezeTable({
 		nWidth = 60,
 		nHeight = 25,
 		nPaddingTop = 3,

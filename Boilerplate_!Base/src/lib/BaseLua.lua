@@ -357,11 +357,11 @@ end
 ---@generic T
 ---@param t T 想要设为只读的表
 ---@return T 设为只读的表
-function X.SetmetaReadonly(t)
+function X.FreezeTable(t)
 	local p = setmetatable({}, { __index = t })
 	for k, v in pairs(t) do
 		if type(v) == 'table' then
-			p[k] = X.SetmetaReadonly(v)
+			p[k] = X.FreezeTable(v)
 		else
 			p[k] = v
 		end

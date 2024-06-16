@@ -19,7 +19,7 @@ local function PickBranch(tData)
 end
 
 local FORCE_TYPE = (function()
-	local FORCE_TYPE = _G.FORCE_TYPE or X.SetmetaReadonly({
+	local FORCE_TYPE = _G.FORCE_TYPE or X.FreezeTable({
 		JIANG_HU  = 0 , -- 江湖
 		SHAO_LIN  = 1 , -- 少林
 		WAN_HUA   = 2 , -- 万花
@@ -47,7 +47,7 @@ local FORCE_TYPE = (function()
 			res[k] = v
 		end
 	end
-	return X.SetmetaReadonly(res)
+	return X.FreezeTable(res)
 end)()
 
 local FORCE_LIST = {
@@ -118,7 +118,7 @@ local KUNGFU_TYPE = (function()
 			res[k] = v
 		end
 	end
-	return X.SetmetaReadonly(res)
+	return X.FreezeTable(res)
 end)()
 
 -- skillid, uitex, frame
@@ -252,11 +252,11 @@ local INVENTORY_INDEX_INDEX = setmetatable(
 local INVENTORY_INDEX = setmetatable({}, { __index = INVENTORY_INDEX_INDEX, __newindex = function() end })
 
 local CONSTANT = {
-	MENU_DIVIDER = X.SetmetaReadonly({ bDevide = true }),
-	EMPTY_TABLE = X.SetmetaReadonly({}),
+	MENU_DIVIDER = X.FreezeTable({ bDevide = true }),
+	EMPTY_TABLE = X.FreezeTable({}),
 	XML_LINE_BREAKER = GetFormatText('\n'),
 	MAX_PLAYER_LEVEL = 50,
-	UI_OBJECT = UI_OBJECT or X.SetmetaReadonly({
+	UI_OBJECT = UI_OBJECT or X.FreezeTable({
 		NONE             = -1, -- 空Box
 		ITEM             = 0 , -- 身上有的物品。nUiId, dwBox, dwX, nItemVersion, nTabType, nIndex
 		SHOP_ITEM        = 1 , -- 商店里面出售的物品 nUiId, dwID, dwShopID, dwIndex
@@ -279,7 +279,7 @@ local CONSTANT = {
 		TRAIN            = 21, -- 修为
 		EMOTION_ACTION   = 22, -- 动作表情
 	}),
-	GLOBAL_HEAD = GLOBAL_HEAD or X.SetmetaReadonly({
+	GLOBAL_HEAD = GLOBAL_HEAD or X.FreezeTable({
 		CLIENTPLAYER = 0,
 		OTHERPLAYER  = 1,
 		NPC          = 2,
@@ -289,7 +289,7 @@ local CONSTANT = {
 		NAME         = 3,
 		MARK         = 4,
 	}),
-	EQUIPMENT_SUB = EQUIPMENT_SUB or X.SetmetaReadonly({
+	EQUIPMENT_SUB = EQUIPMENT_SUB or X.FreezeTable({
 		MELEE_WEAPON      = 0 , -- 近战武器
 		RANGE_WEAPON      = 1 , -- 远程武器
 		CHEST             = 2 , -- 上衣
@@ -315,7 +315,7 @@ local CONSTANT = {
 		BACK_CLOAK_EXTEND = 22, -- 披风
 		TOTAL             = 23, --
 	}),
-	EQUIPMENT_INVENTORY = EQUIPMENT_INVENTORY or X.SetmetaReadonly({
+	EQUIPMENT_INVENTORY = EQUIPMENT_INVENTORY or X.FreezeTable({
 		MELEE_WEAPON  = 1 , -- 普通近战武器
 		BIG_SWORD     = 2 , -- 重剑
 		RANGE_WEAPON  = 3 , -- 远程武器
@@ -360,7 +360,7 @@ local CONSTANT = {
 			{ __index = _G.CHARACTER_OTACTION_TYPE }),
 		__newindex = function() end,
 	}),
-	ROLE_TYPE_LABEL = X.SetmetaReadonly({
+	ROLE_TYPE_LABEL = X.FreezeTable({
 		[ROLE_TYPE.STANDARD_MALE  ] = _L['Man'],
 		[ROLE_TYPE.STANDARD_FEMALE] = _L['Woman'],
 		[ROLE_TYPE.LITTLE_BOY     ] = _L['Boy'],
@@ -399,7 +399,7 @@ local CONSTANT = {
 		return res
 	end)()),
 	KUNGFU_MOUNT_TYPE = (function()
-		local KUNGFU_MOUNT_TYPE = _G.KUNGFU_TYPE or X.SetmetaReadonly({
+		local KUNGFU_MOUNT_TYPE = _G.KUNGFU_TYPE or X.FreezeTable({
 			TIAN_CE     = 1,      -- 天策内功
 			WAN_HUA     = 2,      -- 万花内功
 			CHUN_YANG   = 3,      -- 纯阳内功
@@ -423,27 +423,27 @@ local CONSTANT = {
 				res[k] = v
 			end
 		end
-		return X.SetmetaReadonly(res)
+		return X.FreezeTable(res)
 	end)(),
-	PEEK_OTHER_PLAYER_RESPOND = PEEK_OTHER_PLAYER_RESPOND or X.SetmetaReadonly({
+	PEEK_OTHER_PLAYER_RESPOND = PEEK_OTHER_PLAYER_RESPOND or X.FreezeTable({
 		INVALID             = 0,
 		SUCCESS             = 1,
 		FAILED              = 2,
 		CAN_NOT_FIND_PLAYER = 3,
 		TOO_FAR             = 4,
 	}),
-	MIC_STATE = MIC_STATE or X.SetmetaReadonly({
+	MIC_STATE = MIC_STATE or X.FreezeTable({
 		NOT_AVIAL = 1,
 		CLOSE_NOT_IN_ROOM = 2,
 		CLOSE_IN_ROOM = 3,
 		KEY = 4,
 		FREE = 5,
 	}),
-	SPEAKER_STATE = SPEAKER_STATE or X.SetmetaReadonly({
+	SPEAKER_STATE = SPEAKER_STATE or X.FreezeTable({
 		OPEN = 1,
 		CLOSE = 2,
 	}),
-	ITEM_QUALITY = X.SetmetaReadonly({
+	ITEM_QUALITY = X.FreezeTable({
 		GRAY    = 0, -- 灰色
 		WHITE   = 1, -- 白色
 		GREEN   = 2, -- 绿色
@@ -600,7 +600,7 @@ local CONSTANT = {
 			end,
 			__metatable = true,
 		}),
-	MSG_THEME = X.SetmetaReadonly({
+	MSG_THEME = X.FreezeTable({
 		NORMAL = 0,
 		ERROR = 1,
 		WARNING = 2,
@@ -800,14 +800,14 @@ local CONSTANT = {
 		INVENTORY_INDEX.GUILD_BANK_PACKAGE7,
 		INVENTORY_INDEX.GUILD_BANK_PACKAGE8,
 	},
-	AUCTION_ITEM_LIST_TYPE = _G.AUCTION_ITEM_LIST_TYPE or X.SetmetaReadonly({
+	AUCTION_ITEM_LIST_TYPE = _G.AUCTION_ITEM_LIST_TYPE or X.FreezeTable({
 		NORMAL_LOOK_UP = 0,
 		PRICE_LOOK_UP  = 1,
 		DETAIL_LOOK_UP = 2,
 		SELL_LOOK_UP   = 3,
 		AVG_LOOK_UP    = 4,
 	}),
-	LOOT_ITEM_TYPE = _G.LOOT_ITEM_TYPE or X.SetmetaReadonly({
+	LOOT_ITEM_TYPE = _G.LOOT_ITEM_TYPE or X.FreezeTable({
 		INVALID               = 0,
 		OWNER_LOOT            = 1,
 		OVER_TIME_LOOTER_FREE = 2,
@@ -831,7 +831,7 @@ local CONSTANT = {
 		[TEAM_MARK.DART ] = _L['TEAM_MARK_DART' ],
 		[TEAM_MARK.FAN  ] = _L['TEAM_MARK_FAN'  ],
 	},
-	CLIENT_VERSION_TYPE = _G.CLIENT_VERSION_TYPE or X.SetmetaReadonly({
+	CLIENT_VERSION_TYPE = _G.CLIENT_VERSION_TYPE or X.FreezeTable({
 		NORMAL         = 0,
 		WEGAME         = 1,
 		STREAMING      = 2,
@@ -839,11 +839,11 @@ local CONSTANT = {
 		MOBILE_IOS     = 4,
 		MOBILE_PC      = 5,
 	}),
-	MACHINE_GPU_TYPE = X.SetmetaReadonly({
+	MACHINE_GPU_TYPE = X.FreezeTable({
 		LOW    = 1,
 		NORMAL = 2,
 	}),
-	MACHINE_GPU_LEVEL = X.SetmetaReadonly({
+	MACHINE_GPU_LEVEL = X.FreezeTable({
 		ENABLE     =  0,
 		ATTEND     =  1,
 		LOWEST     =  2, -- 最简

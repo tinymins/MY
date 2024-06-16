@@ -36,7 +36,7 @@ local function GenerateMapInfo()
 			MAP_LIST[map.dwID] = map
 			MAP_LIST[map.szName] = map
 		end
-		MAP_LIST = X.SetmetaReadonly(MAP_LIST)
+		MAP_LIST = X.FreezeTable(MAP_LIST)
 	end
 	return MAP_LIST
 end

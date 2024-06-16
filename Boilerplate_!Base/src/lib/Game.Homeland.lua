@@ -39,7 +39,7 @@ X.RegisterEvent('HOME_LAND_RESULT_CODE_INT', 'LIB#HL', function()
 				szCenterName = info.szCenterName
 			end
 		end
-		table.insert(HL_INFO_CACHE, X.SetmetaReadonly({
+		table.insert(HL_INFO_CACHE, X.FreezeTable({
 			dwMapID = dwMapID,
 			nCopyIndex = nCopyIndex,
 			dwCenterID = dwCenterID,
@@ -89,7 +89,7 @@ function X.GetFurnitureInfo(szKey, oVal)
 			for i = 2, HomelandFurnitureInfo:GetRowCount() do
 				local tLine = HomelandFurnitureInfo:GetRow(i)
 				if tLine and tLine[szKey] then
-					CACHE[szKey][tLine[szKey]] = X.SetmetaReadonly(tLine)
+					CACHE[szKey][tLine[szKey]] = X.FreezeTable(tLine)
 				end
 			end
 		end
