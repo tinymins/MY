@@ -134,11 +134,11 @@ function PS.OnPanelActive(wnd)
 			autoEnable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 		}):AutoWidth():Width()
 
-		ui:Append('WndTrackbar', {
+		ui:Append('WndSlider', {
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetLine.nLineWidth,
 			range = {1, 5},
-			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+			sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%d px', val) end,
 			onChange = function(val) MY_TargetLine.nLineWidth = val end,
 			autoEnable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
@@ -163,11 +163,11 @@ function PS.OnPanelActive(wnd)
 			autoEnable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 		}):AutoWidth():Width()
 
-		ui:Append('WndTrackbar', {
+		ui:Append('WndSlider', {
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetLine.nLineAlpha,
 			range = {1, 255},
-			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+			sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 			onChange = function(val) MY_TargetLine.nLineAlpha = val end,
 			autoEnable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 		})
@@ -235,11 +235,11 @@ function PS.OnPanelActive(wnd)
 		nX, nY = nPaddingX + 37, nY + nLH
 		nX = nX + ui:Append('Text', { text = _L['The sector angle'], x = nX, y = nY }):AutoWidth():Width()
 
-		ui:Append('WndTrackbar', {
+		ui:Append('WndSlider', {
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetFace.nSectorDegree,
 			range = {30, 180},
-			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+			sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%d degree', val) end,
 			onChange = function(val) MY_TargetFace.nSectorDegree = val end,
 		})
@@ -247,11 +247,11 @@ function PS.OnPanelActive(wnd)
 		nX, nY = nPaddingX + 37, nY + nLH
 		nX = nX + ui:Append('Text', { text = _L['The sector radius'], x = nX, y = nY }):AutoWidth():Width()
 
-		ui:Append('WndTrackbar', {
+		ui:Append('WndSlider', {
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetFace.nSectorRadius,
 			range = {1, 26},
-			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+			sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%d feet', val) end,
 			onChange = function(val) MY_TargetFace.nSectorRadius = val end,
 		})
@@ -259,11 +259,11 @@ function PS.OnPanelActive(wnd)
 		nX, nY = nPaddingX + 37, nY + nLH
 		nX = nX + ui:Append('Text', { text = _L['The sector transparency'], x = nX, y = nY }):AutoWidth():Width()
 
-		ui:Append('WndTrackbar', {
+		ui:Append('WndSlider', {
 			x = nX + 2, y = nY + 2,
 			value = math.ceil((200 - MY_TargetFace.nSectorAlpha) / 2),
 			range = {0, 100},
-			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+			sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%d %%', val) end,
 			onChange = function(val) MY_TargetFace.nSectorAlpha = (100 - val) * 2 end,
 		})
@@ -312,11 +312,11 @@ function PS.OnPanelActive(wnd)
 		nX, nY = nPaddingX + 37, nY + nLH
 		nX = nX + ui:Append('Text', { text = _L['The foot shape radius'], x = nX, y = nY }):AutoWidth():Width()
 
-		ui:Append('WndTrackbar', {
+		ui:Append('WndSlider', {
 			x = nX + 2, y = nY + 2,
 			value = MY_TargetFace.nShapeRadius,
 			range = {1, 26},
-			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+			sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%.1f feet', val / 2) end,
 			onChange = function(val) MY_TargetFace.nShapeRadius = val end,
 		})
@@ -324,11 +324,11 @@ function PS.OnPanelActive(wnd)
 		nX, nY = nPaddingX + 37, nY + nLH
 		nX = nX + ui:Append('Text', { text = _L['The foot shape transparency'], x = nX, y = nY }):AutoWidth():Width()
 
-		ui:Append('WndTrackbar', {
+		ui:Append('WndSlider', {
 			x = nX + 2, y = nY + 2,
 			value = math.ceil((200 - MY_TargetFace.nShapeAlpha) / 2),
 			range = {0, 100},
-			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+			sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 			textFormatter = function(val) return _L('%d %%', val) end,
 			onChange = function(val) MY_TargetFace.nShapeAlpha = (100 - val) * 2 end,
 		})

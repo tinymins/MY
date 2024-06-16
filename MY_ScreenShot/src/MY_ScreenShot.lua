@@ -174,7 +174,7 @@ function PS.OnPanelActive(wnd)
 	local fnRefreshPanel = function(ui)
 		ui:Children('#WndCheckBox_HideUI'):Check(O.bAutoHideUI)
 		ui:Children('#WndCombo_FileExName'):Text(O.szFileExName)
-		ui:Children('#WndTrackbar_Quality'):Value(O.nQuality)
+		ui:Children('#WndSlider_Quality'):Value(O.nQuality)
 		ui:Children('#WndEditBox_SsRoot'):Text(O.szFilePath)
 	end
 
@@ -221,10 +221,10 @@ function PS.OnPanelActive(wnd)
 	})
 
 	ui:Append('Text', { name = 'Text_Quality', x = 30, y = 150, text = _L['set quality (0-100)'] })
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_Quality',
+	ui:Append('WndSlider', {
+		name = 'WndSlider_Quality',
 		x = 180, y = 150,
-		trackbarStyle = false,
+		sliderStyle = false,
 		range = {0, 100},
 		tip = {
 			render = _L['Set screenshot quality(0-100): the larger number, the image will use more hdd space.'],

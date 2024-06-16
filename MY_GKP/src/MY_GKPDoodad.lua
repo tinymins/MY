@@ -908,11 +908,11 @@ function PS.OnPanelActive(frame)
 			autoEnable = function() return O.bShowName end,
 		}):Width() + 5
 
-		nX = nX + ui:Append('WndTrackbar', {
+		nX = nX + ui:Append('WndSlider', {
 			x = nX, y = nY, w = 150,
 			textFormatter = function(val) return _L('Font scale is %d%%.', val) end,
 			range = {10, 500},
-			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+			sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 			value = O.fNameScale * 100,
 			onChange = function(val)
 				O.fNameScale = val / 100

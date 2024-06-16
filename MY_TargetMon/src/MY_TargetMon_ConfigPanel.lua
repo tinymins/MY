@@ -496,9 +496,9 @@ function D.Open(szConfigUUID)
 	})
 	nY = nY + 24
 
-	uiWnd:Append('WndTrackbar', {
+	uiWnd:Append('WndSlider', {
 		x = xr, y = nY,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		range = {1, 32},
 		value = dataset.nMaxLineCount,
 		textFormatter = function(val) return _L('Display %d eachline.', val) end,
@@ -510,9 +510,9 @@ function D.Open(szConfigUUID)
 	})
 	nY = nY + nDeltaY
 
-	uiWnd:Append('WndTrackbar', {
+	uiWnd:Append('WndSlider', {
 		x = xr, y = nY,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = dataset.fScale * 100,
 		textFormatter = function(val) return _L('UI scale %d%%.', val) end,
@@ -524,9 +524,9 @@ function D.Open(szConfigUUID)
 	})
 	nY = nY + nDeltaY
 
-	uiWnd:Append('WndTrackbar', {
+	uiWnd:Append('WndSlider', {
 		x = xr, y = nY,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = dataset.fIconFontScale * 100,
 		textFormatter = function(val) return _L('Icon font scale %d%%.', val) end,
@@ -538,9 +538,9 @@ function D.Open(szConfigUUID)
 	})
 	nY = nY + nDeltaY
 
-	uiWnd:Append('WndTrackbar', {
+	uiWnd:Append('WndSlider', {
 		x = xr, y = nY,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		range = {1, 300},
 		value = dataset.fOtherFontScale * 100,
 		textFormatter = function(val) return _L('Other font scale %d%%.', val) end,
@@ -552,9 +552,9 @@ function D.Open(szConfigUUID)
 	})
 	nY = nY + nDeltaY
 
-	uiWnd:Append('WndTrackbar', {
+	uiWnd:Append('WndSlider', {
 		x = xr, y = nY,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		range = {50, 1000},
 		value = dataset.nCdBarWidth,
 		textFormatter = function(val) return _L('CD width %dpx.', val) end,
@@ -566,9 +566,9 @@ function D.Open(szConfigUUID)
 	})
 	nY = nY + nDeltaY
 
-	uiWnd:Append('WndTrackbar', {
+	uiWnd:Append('WndSlider', {
 		x = xr, y = nY,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		range = {-1, 30},
 		value = dataset.nDecimalTime,
 		textFormatter = function(val)

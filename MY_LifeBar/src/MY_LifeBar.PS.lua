@@ -38,26 +38,26 @@ local D = {
 
 local PS = { nPriority = 1, szRestriction = 'MY_LifeBar' }
 local function LoadUI(ui)
-	ui:Children('#WndTrackbar_GlobalUIScale'):Value(Config.fGlobalUIScale * 100 * X.GetUIScale())
-	ui:Children('#WndTrackbar_LifeBarWidth'):Value(Config.nLifeWidth)
-	ui:Children('#WndTrackbar_LifeBarHeight'):Value(Config.nLifeHeight)
-	ui:Children('#WndTrackbar_LifeBarOffsetX'):Value(Config.nLifeOffsetX)
-	ui:Children('#WndTrackbar_LifeBarOffsetY'):Value(Config.nLifeOffsetY)
-	ui:Children('#WndTrackbar_LifeBarPadding'):Value(Config.nLifePadding)
-	ui:Children('#WndTrackbar_LifeBarBorder'):Value(Config.nLifeBorder)
+	ui:Children('#WndSlider_GlobalUIScale'):Value(Config.fGlobalUIScale * 100 * X.GetUIScale())
+	ui:Children('#WndSlider_LifeBarWidth'):Value(Config.nLifeWidth)
+	ui:Children('#WndSlider_LifeBarHeight'):Value(Config.nLifeHeight)
+	ui:Children('#WndSlider_LifeBarOffsetX'):Value(Config.nLifeOffsetX)
+	ui:Children('#WndSlider_LifeBarOffsetY'):Value(Config.nLifeOffsetY)
+	ui:Children('#WndSlider_LifeBarPadding'):Value(Config.nLifePadding)
+	ui:Children('#WndSlider_LifeBarBorder'):Value(Config.nLifeBorder)
 	ui:Children('#Shadow_LifeBarBorderRGB'):Color(Config.nLifeBorderR, Config.nLifeBorderG, Config.nLifeBorderB)
-	ui:Children('#WndTrackbar_TextOffsetY'):Value(Config.nTextOffsetY)
-	ui:Children('#WndTrackbar_TextLineHeight'):Value(Config.nTextLineHeight)
-	ui:Children('#WndTrackbar_TextScale'):Value(Config.fTextScale * 40)
-	ui:Children('#WndTrackbar_TextSpacing'):Value(Config.fTextSpacing * 10)
-	ui:Children('#WndTrackbar_TitleEffectScale'):Value(Config.fTitleEffectScale * 100)
-	ui:Children('#WndTrackbar_TitleEffectOffsetY'):Value(Config.nTitleEffectOffsetY)
-	ui:Children('#WndTrackbar_BalloonOffsetY'):Value(Config.nBalloonOffsetY)
-	ui:Children('#WndTrackbar_LifePerOffsetX'):Value(Config.nLifePerOffsetX)
-	ui:Children('#WndTrackbar_LifePerOffsetY'):Value(Config.nLifePerOffsetY)
-	ui:Children('#WndTrackbar_Distance'):Value(math.sqrt(Config.nDistance) / 64)
-	ui:Children('#WndTrackbar_VerticalDistance'):Value(Config.nVerticalDistance / 8 / 64)
-	ui:Children('#WndTrackbar_Alpha'):Value(Config.nAlpha)
+	ui:Children('#WndSlider_TextOffsetY'):Value(Config.nTextOffsetY)
+	ui:Children('#WndSlider_TextLineHeight'):Value(Config.nTextLineHeight)
+	ui:Children('#WndSlider_TextScale'):Value(Config.fTextScale * 40)
+	ui:Children('#WndSlider_TextSpacing'):Value(Config.fTextSpacing * 10)
+	ui:Children('#WndSlider_TitleEffectScale'):Value(Config.fTitleEffectScale * 100)
+	ui:Children('#WndSlider_TitleEffectOffsetY'):Value(Config.nTitleEffectOffsetY)
+	ui:Children('#WndSlider_BalloonOffsetY'):Value(Config.nBalloonOffsetY)
+	ui:Children('#WndSlider_LifePerOffsetX'):Value(Config.nLifePerOffsetX)
+	ui:Children('#WndSlider_LifePerOffsetY'):Value(Config.nLifePerOffsetY)
+	ui:Children('#WndSlider_Distance'):Value(math.sqrt(Config.nDistance) / 64)
+	ui:Children('#WndSlider_VerticalDistance'):Value(Config.nVerticalDistance / 8 / 64)
+	ui:Children('#WndSlider_Alpha'):Value(Config.nAlpha)
 	ui:Children('#WndCheckBox_IgnoreUIScale'):Check(not Config.bSystemUIScale)
 	ui:Children('#WndCheckBox_ShowWhenUIHide'):Check(Config.bShowWhenUIHide)
 	ui:Children('#WndCheckBox_ShowObjectID'):Check(Config.bShowObjectID)
@@ -166,9 +166,9 @@ function PS.OnPanelActive(wnd)
 	nX, nY = nPaddingX + 15, nPaddingY
 	nLH = 23.6
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_LifeBarWidth',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 5, 150 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_LifeBarWidth',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 5, 150 },
 		text = function(value) return _L('Lifebar width: %s px.', value) end, -- 血条宽度
 		value = Config.nLifeWidth,
 		onChange = function(value)
@@ -178,9 +178,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_LifeBarHeight',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 1, 150 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_LifeBarHeight',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 1, 150 },
 		text = function(value) return _L('Lifebar height: %s px.', value) end, -- 血条高度
 		value = Config.nLifeHeight,
 		onChange = function(value)
@@ -190,9 +190,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_LifeBarOffsetX',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_LifeBarOffsetX',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { -150, 150 },
 		text = function(value) return _L('Lifebar offset-x: %d px.', value) end, -- 血条水平偏移
 		value = Config.nLifeOffsetX,
 		onChange = function(value)
@@ -202,9 +202,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_LifeBarOffsetY',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_LifeBarOffsetY',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('Lifebar offset-y: %d px.', value) end, -- 血条竖直偏移
 		value = Config.nLifeOffsetY,
 		onChange = function(value)
@@ -214,9 +214,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_LifeBarPadding',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 10 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_LifeBarPadding',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 10 },
 		text = function(value) return _L('Lifebar padding: %d px.', value) end, -- 血条边框宽度
 		value = Config.nLifePadding,
 		onChange = function(value)
@@ -226,9 +226,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_LifeBarBorder',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 10 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_LifeBarBorder',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 10 },
 		text = function(value) return _L('Lifebar border: %d px.', value) end, -- 血条边框宽度
 		value = Config.nLifeBorder,
 		onChange = function(value)
@@ -238,9 +238,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_LifePerOffsetX',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_LifePerOffsetX',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { -150, 150 },
 		text = function(value) return _L('Life percentage offset-x: %d px.', value) end, -- 血量百分比水平偏移
 		value = Config.nLifePerOffsetX,
 		onChange = function(value)
@@ -250,9 +250,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_LifePerOffsetY',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_LifePerOffsetY',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('Life percentage offset-y: %d px.', value) end, -- 血量百分比竖直偏移
 		value = Config.nLifePerOffsetY,
 		onChange = function(value)
@@ -262,9 +262,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_TextOffsetY',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_TextOffsetY',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('Text offset-y: %d px.', value) end, -- 第一行字高度
 		value = Config.nTextOffsetY,
 		onChange = function(value)
@@ -274,9 +274,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_TextLineHeight',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 150 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_TextLineHeight',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 150 },
 		text = function(value) return _L('Text line height: %d px.', value) end, -- 字行高度
 		value = Config.nTextLineHeight,
 		onChange = function(value)
@@ -286,9 +286,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_TextScale',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 200 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_TextScale',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 200 },
 		text = function(value) return _L('Text scale: %.1f%%.', value / 40 * 100) end, -- 字缩放
 		value = Config.fTextScale * 40,
 		onChange = function(value)
@@ -298,9 +298,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_TextSpacing',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_TextSpacing',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 300 },
 		text = function(value) return _L('Text spacing: %.1f.', value / 10) end, -- 字间距
 		value = Config.fTextSpacing * 10,
 		onChange = function(value)
@@ -310,9 +310,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_TitleEffectScale',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 200 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_TitleEffectScale',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 200 },
 		text = function(value) return _L('Title effect scale: %.2f%%.', value / 100) end, -- 头顶特效缩放
 		value = Config.fTitleEffectScale * 100,
 		onChange = function(value)
@@ -322,9 +322,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_TitleEffectOffsetY',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_TitleEffectOffsetY',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { -150, 150 },
 		text = function(value) return _L('Title effect offset y: %d px.', value) end, -- 头顶特效间距
 		value = Config.nTitleEffectOffsetY,
 		onChange = function(value)
@@ -334,9 +334,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_BalloonOffsetY',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { -150, 150 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_BalloonOffsetY',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { -150, 150 },
 		text = function(value) return _L('Balloon offset y: %d px.', value) end, -- 头顶特效间距
 		value = Config.nBalloonOffsetY,
 		onChange = function(value)
@@ -346,9 +346,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_Distance',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_Distance',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 300 },
 		text = function(value) return value == 0 and _L['Max Distance: Unlimited.'] or _L('Max Distance: %s foot.', value) end,
 		value = math.sqrt(Config.nDistance) / 64,
 		onChange = function(value)
@@ -358,9 +358,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_VerticalDistance',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 0, 300 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_VerticalDistance',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 300 },
 		text = function(value) return value == 0 and _L['Max Vertical Distance: Unlimited.'] or _L('Max Vertical Distance: %s foot.', value) end,
 		value = Config.nVerticalDistance / 8 / 64,
 		onChange = function(value)
@@ -370,9 +370,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_Alpha',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_PERCENT, range = { 0, 255 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_Alpha',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_PERCENT, range = { 0, 255 },
 		text = function(value) return _L('Alpha: %.0f%%.', value) end, -- 透明度
 		value = Config.nAlpha,
 		onChange = function(value)
@@ -382,9 +382,9 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nLH
 
-	ui:Append('WndTrackbar', {
-		name = 'WndTrackbar_GlobalUIScale',
-		x = nX, y = nY, trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = { 1, 200 },
+	ui:Append('WndSlider', {
+		name = 'WndSlider_GlobalUIScale',
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 1, 200 },
 		text = function(value) return _L('Global UI scale: %.2f.', value / 100) end, -- 字缩放
 		value = Config.fGlobalUIScale * 100 * X.GetUIScale(),
 		onChange = function(value)

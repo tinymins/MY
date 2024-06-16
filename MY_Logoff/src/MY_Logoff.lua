@@ -178,11 +178,11 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):AutoWidth():Width() + 5
 
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = nX, y = nY, w = 150,
 		textFormatter = function(val) return _L('Auto logoff when keep idle for %dmin.', val) end,
 		range = {1, 1440},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		value = O.nIdleOffTime,
 		onChange = function(val)
 			O.nIdleOffTime = val

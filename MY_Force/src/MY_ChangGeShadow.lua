@@ -180,11 +180,11 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				return me and me.dwForceID == X.CONSTANT.FORCE_TYPE.CHANG_GE
 			end,
 		}):Width() + 5
-		ui:Append('WndTrackbar', {
+		ui:Append('WndSlider', {
 			x = nX, y = nY, w = 150,
 			textFormatter = function(val) return _L('Scale: %d%%.', val) end,
 			range = {10, 800},
-			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+			sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 			value = O.fScale * 100,
 			onChange = function(val)
 				O.fScale = val / 100

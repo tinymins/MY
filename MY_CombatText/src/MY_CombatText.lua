@@ -1200,10 +1200,10 @@ function PS.OnPanelActive(frame)
 	nX = nPaddingX + 10
 	ui:Append('Text', { x = nX, y = nY, text = g_tStrings.STR_QUESTTRACE_CHANGE_ALPHA, color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	nX = nX + 70
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = nX, y = nY, text = '',
 		range = {1, 255},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		value = O.nMaxAlpha,
 		onChange = function(nVal)
 			O.nMaxAlpha = nVal
@@ -1214,10 +1214,10 @@ function PS.OnPanelActive(frame)
 	nX = nX + 180
 	ui:Append('Text', { x = nX, y = nY, text = _L['Hold time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	nX = nX + 70
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = nX, y = nY, textFormatter = function(val) return val .. _L['ms'] end,
 		range = {700, 2500},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		value = O.nTime * COMBAT_TEXT_TOTAL,
 		onChange = function(nVal)
 			O.nTime = nVal / COMBAT_TEXT_TOTAL
@@ -1229,10 +1229,10 @@ function PS.OnPanelActive(frame)
 	nX = nPaddingX + 10
 	ui:Append('Text', { x = nX, y = nY, text = _L['Fade in time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	nX = nX + 70
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = nX, y = nY, textFormatter = function(val) return val .. _L['frame'] end,
 		range = {0, 15},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		value = O.nFadeIn,
 		onChange = function(nVal)
 			O.nFadeIn = nVal
@@ -1243,10 +1243,10 @@ function PS.OnPanelActive(frame)
 	nX = nX + 180
 	ui:Append('Text', { x = nX, y = nY, text = _L['Fade out time'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	nX = nX + 70
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = nX, y = nY, textFormatter = function(val) return val .. _L['frame'] end,
 		rang = {0, 15},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		value = O.nFadeOut,
 		onChange = function(nVal)
 			O.nFadeOut = nVal
@@ -1258,10 +1258,10 @@ function PS.OnPanelActive(frame)
 	nX = nPaddingX + 10
 	ui:Append('Text', { x = nX, y = nY, text = _L['Font size'], color = { 255, 255, 200 }, autoEnable = IsEnabled })
 	nX = nX + 70
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = nX, y = nY, textFormatter = function(val) return (val / 100) .. _L['times'] end,
 		range = {50, 200},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		value = O.fScale * 100,
 		onChange = function(nVal)
 			O.fScale = nVal / 100
@@ -1282,7 +1282,7 @@ function PS.OnPanelActive(frame)
 		autoEnable = IsEnabled,
 	})
 	nX = nX + 70
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = nX, y = nY, text = '',
 		textFormatter = function(val)
 			return val == 0
@@ -1290,7 +1290,7 @@ function PS.OnPanelActive(frame)
 				or _L('Limit to %d', val)
 		end,
 		range = {0, 500},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		value = O.nMaxCount,
 		onChange = function(nVal)
 			O.nMaxCount = nVal

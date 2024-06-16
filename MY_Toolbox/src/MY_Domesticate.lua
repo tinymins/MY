@@ -261,11 +261,11 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			MY_Domesticate.bAlert = bChecked
 		end,
 	}):Width() + 5
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = nX, y = nY, w = 130,
 		value = O.nAlertNum,
 		range = {0, 1000},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		textFormatter = function(val)
 			if val == 0 then
 				return _L['Alert when measure is empty']

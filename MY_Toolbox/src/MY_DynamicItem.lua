@@ -509,10 +509,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		autoEnable = function() return MY_DynamicItem.bEnable end,
 	}):Width() + 5
 
-	nX = nX + ui:Append('WndTrackbar', {
+	nX = nX + ui:Append('WndSlider', {
 		x = nX, y = nY, h = 25, w = 250,
 		range = {1, 32}, value = MY_DynamicItem.nNum,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		textFormatter = function(v) return _L('Box number: %d', v) end,
 		onChange = function(nVal)
 			X.DelayCall(function() MY_DynamicItem.nNum = nVal end)
@@ -520,10 +520,10 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		autoEnable = function() return MY_DynamicItem.bEnable end,
 	}):Width() + 5
 
-	nX = nX + ui:Append('WndTrackbar', {
+	nX = nX + ui:Append('WndSlider', {
 		x = nX, y = nY, h = 25, w = 250,
 		range = {1, 32}, value = MY_DynamicItem.nCol,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		textFormatter = function(v) return _L('Col number: %d', v) end,
 		onChange = function(nVal)
 			X.DelayCall(function() MY_DynamicItem.nCol = nVal end)

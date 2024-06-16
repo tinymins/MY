@@ -65,11 +65,11 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			O.bFixSize = bChecked
 		end,
 	}):AutoWidth():Width() + 5
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = nX, y = nY, w = 100, h = 25,
 		value = O.nSize,
 		range = {1, 300},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		textFormatter = function(v) return _L('Size: %d', v) end,
 		onChange = function(val)
 			O.nSize = val

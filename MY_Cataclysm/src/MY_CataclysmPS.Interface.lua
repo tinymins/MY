@@ -57,11 +57,11 @@ function PS.OnPanelActive(frame)
 
 	x = nPaddingX + 10
 	x = x + ui:Append('Text', { x = x, y = y, text = _L['Interface Width']}):AutoWidth():Width() + 5
-	y = y + ui:Append('WndTrackbar', {
+	y = y + ui:Append('WndSlider', {
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = CFG.fScaleX * 100,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		onChange = function(nVal)
 			nVal = nVal / 100
 			local nNewX, nNewY = nVal / CFG.fScaleX, CFG.fScaleY / CFG.fScaleY
@@ -75,11 +75,11 @@ function PS.OnPanelActive(frame)
 
 	x = nPaddingX + 10
 	x = x + ui:Append('Text', { x = x, y = y, text = _L['Interface Height']}):AutoWidth():Width() + 5
-	y = y + ui:Append('WndTrackbar', {
+	y = y + ui:Append('WndSlider', {
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = CFG.fScaleY * 100,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		onChange = function(nVal)
 			nVal = nVal / 100
 			local nNewX, nNewY = CFG.fScaleX / CFG.fScaleX, nVal / CFG.fScaleY
@@ -107,11 +107,11 @@ function PS.OnPanelActive(frame)
 
 	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
 		x = x + ui:Append('Text', { x = x, y = y, text = g_tStrings.STR_ALPHA }):AutoWidth():Width() + 5
-		y = y + ui:Append('WndTrackbar', {
+		y = y + ui:Append('WndSlider', {
 			x = x, y = y + 3,
 			range = {0, 255},
 			value = CFG.nAlpha,
-			trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+			sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 			onChange = function(nVal)
 				CFG.nAlpha = nVal
 				if MY_CataclysmMain.GetFrame() then

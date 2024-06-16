@@ -692,7 +692,7 @@ function PS.OnPanelActive(frame)
 	ui:Append('Text', { x = nX, y = nY, text = g_tStrings.STR_RAID_MENU_BG_ALPHA, autoEnable = IsEnabled })
 	nX = nX + 5
 	nY = nY + 28
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = nX, y = nY, text = '',
 		range = {0, 100},
 		value = O.nBGAlpha,

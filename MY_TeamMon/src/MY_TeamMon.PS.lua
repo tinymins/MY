@@ -212,11 +212,11 @@ function PS.OnPanelActive(wnd)
 	end
 
 	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Countdown configure'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndTrackbar', {
+	nX, nY = ui:Append('WndSlider', {
 		x = nPaddingX + 10, y = nY, w = nW - nPaddingX * 2, rw = nW / 3, h = 22,
 		range = {0, 3601},
 		value = MY_TeamMon_SpellTimer.nBelowDecimal,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		onChange = function(val)
 			X.DelayCall('MY_TeamMon_SpellTimer_nBelowDecimal', 300, function()
 				MY_TeamMon_SpellTimer.nBelowDecimal = val

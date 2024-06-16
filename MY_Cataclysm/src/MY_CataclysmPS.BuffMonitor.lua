@@ -156,13 +156,13 @@ function PS.OnPanelActive(frame)
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndTrackbar', {
+	x = x + ui:Append('WndSlider', {
 		x = x, y = y, h = 25, rw = 80,
 		enable = not CFG.bAutoBuffSize,
 		autoEnable = function() return not CFG.bAutoBuffSize end,
 		range = {50, 200},
 		value = CFG.fBuffScale * 100,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		onChange = function(nVal)
 			CFG.fBuffScale = nVal / 100
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
@@ -173,11 +173,11 @@ function PS.OnPanelActive(frame)
 	x = nPaddingX
 	y = y + 30
 	x = x + ui:Append('Text', { x = x, y = y, h = 25, text = _L['Max count']}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndTrackbar', {
+	x = x + ui:Append('WndSlider', {
 		x = x, y = y, h = 25, rw = 80, text = '',
 		range = {0, 10},
 		value = CFG.nMaxShowBuff,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		onChange = function(nVal)
 			CFG.nMaxShowBuff = nVal
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)

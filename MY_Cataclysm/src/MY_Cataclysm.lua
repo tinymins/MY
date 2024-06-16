@@ -864,10 +864,10 @@ function D.OpenBuffRuleEditor(rec, onChangeNotify, onCloseNotify, bHideBase)
 		text = _L['Border alpha'],
 		autoEnable = function() return not rec.bDelete end,
 	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndTrackbar', {
+	x = x + ui:Append('WndSlider', {
 		x = x, y = y, text = '',
 		range = {0, 255},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		value = rec.col and select(4, X.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
 		onChange = function(nVal)
 			if rec.col then

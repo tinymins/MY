@@ -909,11 +909,11 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		end,
 	}):Width() + 5
 
-	nX = nX + ui:Append('WndTrackbar', {
+	nX = nX + ui:Append('WndSlider', {
 		x = nX, y = nY, w = 100, h = 25,
 		value = O.nInsertIconSize,
 		range = {1, 300},
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		textFormatter = function(v) return _L('Icon size: %dpx', v) end,
 		onChange = function(val)
 			O.nInsertIconSize = val

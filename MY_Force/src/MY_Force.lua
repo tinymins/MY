@@ -354,7 +354,7 @@ function PS.OnPanelActive(frame)
 				MY_ForceGuding.bUseMana = bChecked
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
-		x = ui:Append('WndTrackbar', {
+		x = ui:Append('WndSlider', {
 			x = x, y = y, w = 70, h = 25,
 			range = {0, 100, 50},
 			value = MY_ForceGuding.nManaMp,
@@ -365,7 +365,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y - 3,
 			text = _L[', or life below '],
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
-		x = ui:Append('WndTrackbar', {
+		x = ui:Append('WndSlider', {
 			x = x, y = y, w = 70, h = 25,
 			range = {0, 100, 50},
 			value = MY_ForceGuding.nManaHp,

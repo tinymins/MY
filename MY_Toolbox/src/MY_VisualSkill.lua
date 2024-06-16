@@ -303,9 +303,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		end,
 	}):Width() + 5
 
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = nX, y = nY,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE, range = {1, 32},
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = {1, 32},
 		value = MY_VisualSkill.nVisualSkillBoxCount,
 		text = _L('Display %d skills.', MY_VisualSkill.nVisualSkillBoxCount),
 		textFormatter = function(val) return _L('Display %d skills.', val) end,

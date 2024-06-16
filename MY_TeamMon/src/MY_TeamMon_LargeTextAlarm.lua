@@ -204,7 +204,7 @@ function PS.OnPanelActive(frame)
 
 	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['MY_TeamMon_LargeTextAlarm'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX = ui:Append('Text', { text = _L['Font scale'], x = nPaddingX + 10, y = nY + 10 }):Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndTrackbar', {
+	nX, nY = ui:Append('WndSlider', {
 		x = nX + 10, y = nY + 13, text = '',
 		range = {1, 2, 10}, value = O.fScale,
 		onChange = function(nVal)
@@ -214,7 +214,7 @@ function PS.OnPanelActive(frame)
 	}):Pos('BOTTOMRIGHT')
 
 	nX = ui:Append('Text', { text = _L['Pause time'], x = nPaddingX + 10, y = nY }):Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndTrackbar', {
+	nX, nY = ui:Append('WndSlider', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0.5, 3, 25}, value = O.fPause,
 		onChange = function(nVal)
@@ -223,7 +223,7 @@ function PS.OnPanelActive(frame)
 	}):Pos('BOTTOMRIGHT')
 
 	nX = ui:Append('Text', { text = _L['FadeOut time'], x = nPaddingX + 10, y = nY }):Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndTrackbar', {
+	nX, nY = ui:Append('WndSlider', {
 		x = nX + 10, y = nY + 3, text = _L['s'],
 		range = {0, 3, 30}, value = O.fFadeOut,
 		onChange = function(nVal)
