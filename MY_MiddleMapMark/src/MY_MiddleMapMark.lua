@@ -766,8 +766,8 @@ function PS.OnPanelActive(wnd)
 	D.Migration()
 
 	local ui = X.UI(wnd)
-	local x, y = 0, 0
-	local w, h = ui:Size()
+	local nX, nY = 0, 0
+	local nW, nH = ui:Size()
 
 	local list, muProgress
 	local function UpdateList(szText)
@@ -824,26 +824,26 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndEditBox', {
 		name = 'WndEdit_Search',
-		x = x, y = y,
-		w = w, h = 25,
+		x = nX, y = nY,
+		w = nW, h = 25,
 		onChange = function(szText)
 			UpdateList(szText)
 		end,
 	})
-	y = y + 25
+	nY = nY + 25
 
 	muProgress = ui:Append('Image', {
 		name = 'Image_Progress',
-		x = x, y = y,
-		w = w, h = 4,
+		x = nX, y = nY,
+		w = nW, h = 4,
 		image = 'ui/Image/UICommon/RaidTotal.UITex|45',
 	})
-	y = y + 4
+	nY = nY + 4
 
 	list = ui:Append('WndListBox', {
 		name = 'WndListBox_1',
-		x = x, y = y,
-		w = w, h = h - y,
+		x = nX, y = nY,
+		w = nW, h = nH - nY,
 		listBox = {
 			{
 				'onhover',
@@ -875,12 +875,12 @@ end
 
 function PS.OnPanelResize(wnd)
 	local ui = X.UI(wnd)
-	local x, y = ui:Pos()
-	local w, h = ui:Size()
+	local nX, nY = ui:Pos()
+	local nW, nH = ui:Size()
 
-	ui:Children('#WndListBox_1'):Size(w - 32, h - 50)
-	ui:Children('#Image_Progress'):Size(w - 30, 4)
-	ui:Children('#WndEdit_Search'):Size(w - 26, 25)
+	ui:Children('#WndListBox_1'):Size(nW - 32, nH - 50)
+	ui:Children('#Image_Progress'):Size(nW - 30, 4)
+	ui:Children('#WndEdit_Search'):Size(nW - 26, 25)
 end
 
 X.RegisterPanel(_L['General'], 'MY_MiddleMapMark', _L['middle map mark'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)

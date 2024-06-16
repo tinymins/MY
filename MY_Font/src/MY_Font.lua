@@ -134,7 +134,7 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
 	local nPaddingX, nPaddingY = 10, 30
-	local w, h = ui:Size()
+	local nW, nH = ui:Size()
 	local aFontList = X.GetFontList()
 	local aFontName, aFontPath = {}, {}
 
@@ -157,7 +157,7 @@ function PS.OnPanelActive(wnd)
 		nPaddingY = nPaddingY + 40
 
 		acFontFile = ui:Append('WndAutocomplete', {
-			x = nPaddingX, y = nPaddingY, w = w - nPaddingX - 60 - 150 - 5 - 35 - 5 - nPaddingX - 5, h = 25,
+			x = nPaddingX, y = nPaddingY, w = nW - nPaddingX - 60 - 150 - 5 - 35 - 5 - nPaddingX - 5, h = 25,
 			text = szFontFile,
 			onChange = function(szText)
 				UpdateBtnEnable()
@@ -183,7 +183,7 @@ function PS.OnPanelActive(wnd)
 		})
 
 		ui:Append('WndButton', {
-			x = w - nPaddingX - 60 - 150 - 5 - 35 - 5, y = nPaddingY, w = 35, h = 25,
+			x = nW - nPaddingX - 60 - 150 - 5 - 35 - 5, y = nPaddingY, w = 35, h = 25,
 			text = '...',
 			buttonStyle = 'FLAT',
 			onClick = function()
@@ -196,7 +196,7 @@ function PS.OnPanelActive(wnd)
 		})
 
 		acFontName = ui:Append('WndAutocomplete', {
-			x = w - nPaddingX - 60 - 150 - 5, y = nPaddingY, w = 150, h = 25,
+			x = nW - nPaddingX - 60 - 150 - 5, y = nPaddingY, w = 150, h = 25,
 			text = szFontName,
 			onChange = function(szText)
 				UpdateBtnEnable()
@@ -220,7 +220,7 @@ function PS.OnPanelActive(wnd)
 		})
 
 		btnApply = ui:Append('WndButton', {
-			x = w - nPaddingX - 60, y = nPaddingY, w = 60, h = 25,
+			x = nW - nPaddingX - 60, y = nPaddingY, w = 60, h = 25,
 			text = _L['Apply'], enable = false,
 			buttonStyle = 'FLAT',
 			onClick = function()

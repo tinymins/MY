@@ -75,14 +75,14 @@ end
 function PS.OnPanelActive(frame)
 	local ui = X.UI(frame)
 	local nPaddingX, nPaddingY = 10, 10
-	local x, y = nPaddingX, nPaddingY
-	local w, h = ui:Size()
+	local nX, nY = nPaddingX, nPaddingY
+	local nW, nH = ui:Size()
 	local bRestricted = X.IsRestricted('MY_Cataclysm_BuffMonitor')
 
 	if not bRestricted then
-		x = nPaddingX
-		x = x + ui:Append('WndButton', {
-			x = x, y = y, w = 100,
+		nX = nPaddingX
+		nX = nX + ui:Append('WndButton', {
+			x = nX, y = nY, w = 100,
 			buttonStyle = 'FLAT',
 			text = _L['Add'],
 			onClick = function()
@@ -92,8 +92,8 @@ function PS.OnPanelActive(frame)
 				OpenBuffRuleEditor(rec)
 			end,
 		}):AutoHeight():Width() + 5
-		x = x + ui:Append('WndButton', {
-			x = x, y = y, w = 100,
+		nX = nX + ui:Append('WndButton', {
+			x = nX, y = nY, w = 100,
 			buttonStyle = 'FLAT',
 			text = _L['Edit'],
 			onClick = function()
@@ -124,12 +124,12 @@ function PS.OnPanelActive(frame)
 				})
 			end,
 		}):AutoHeight():Width() + 5
-		x = nPaddingX
-		y = y + 30
+		nX = nPaddingX
+		nY = nY + 30
 
 		l_list = ui:Append('WndListBox', {
-			x = x, y = y,
-			w = w - 240 - 20, h = h - y - 5,
+			x = nX, y = nY,
+			w = nW - 240 - 20, h = nH - nY - 5,
 			listBox = {{
 				'onlclick',
 				function(id, szText, data, bSelected)
@@ -141,14 +141,14 @@ function PS.OnPanelActive(frame)
 		for _, rec in ipairs(CFG.aBuffList) do
 			l_list:ListBox('insert', { id = rec, text = MY_Cataclysm.EncodeBuffRule(rec), data = rec })
 		end
-		y = h
+		nY = nH
 	end
 
-	nPaddingX = X.IIf(bRestricted, 30, w - 240)
-	x = nPaddingX
-	y = nPaddingY + 25
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y,
+	nPaddingX = X.IIf(bRestricted, 30, nW - 240)
+	nX = nPaddingX
+	nY = nPaddingY + 25
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['Auto scale'],
 		checked = CFG.bAutoBuffSize,
 		onCheck = function(bCheck)
@@ -156,8 +156,8 @@ function PS.OnPanelActive(frame)
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndSlider', {
-		x = x, y = y, h = 25, rw = 80,
+	nX = nX + ui:Append('WndSlider', {
+		x = nX, y = nY, h = 25, rw = 80,
 		enable = not CFG.bAutoBuffSize,
 		autoEnable = function() return not CFG.bAutoBuffSize end,
 		range = {50, 200},
@@ -170,11 +170,11 @@ function PS.OnPanelActive(frame)
 		textFormatter = function(val) return _L('%d%%', val) end,
 	}):AutoWidth():Width() + 10
 
-	x = nPaddingX
-	y = y + 30
-	x = x + ui:Append('Text', { x = x, y = y, h = 25, text = _L['Max count']}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndSlider', {
-		x = x, y = y, h = 25, rw = 80, text = '',
+	nX = nPaddingX
+	nY = nY + 30
+	nX = nX + ui:Append('Text', { x = nX, y = nY, h = 25, text = _L['Max count']}):AutoWidth():Width() + 5
+	nX = nX + ui:Append('WndSlider', {
+		x = nX, y = nY, h = 25, rw = 80, text = '',
 		range = {0, 10},
 		value = CFG.nMaxShowBuff,
 		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
@@ -184,10 +184,10 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 8
 
-	x = nPaddingX
-	y = y + 30
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Push buff to official'],
+	nX = nPaddingX
+	nY = nY + 30
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Push buff to official'],
 		checked = CFG.bBuffPushToOfficial,
 		onCheck = function(bCheck)
 			CFG.bBuffPushToOfficial = bCheck
@@ -195,8 +195,8 @@ function PS.OnPanelActive(frame)
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Buff Staring'],
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Buff Staring'],
 		checked = CFG.bStaring,
 		onCheck = function(bCheck)
 			CFG.bStaring = bCheck
@@ -204,18 +204,18 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = nPaddingX
-	y = y + 30
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show Buff Time'],
+	nX = nPaddingX
+	nY = nY + 30
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show Buff Time'],
 		checked = CFG.bShowBuffTime,
 		onCheck = function(bCheck)
 			CFG.bShowBuffTime = bCheck
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y,
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['Over mana bar'],
 		checked = not CFG.bBuffAboveMana,
 		onCheck = function(bCheck)
@@ -224,18 +224,18 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = nPaddingX
-	y = y + 30
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show Buff Num'],
+	nX = nPaddingX
+	nY = nY + 30
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show Buff Num'],
 		checked = CFG.bShowBuffNum,
 		onCheck = function(bCheck)
 			CFG.bShowBuffNum = bCheck
 			X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
 		end,
 	}):AutoWidth():Width() + 5
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Show Buff Reminder'],
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Show Buff Reminder'],
 		checked = CFG.bShowBuffReminder,
 		onCheck = function(bCheck)
 			CFG.bShowBuffReminder = bCheck
@@ -243,20 +243,20 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Width() + 5
 
-	x = nPaddingX
-	y = y + 30
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y, text = _L['Alt Click Publish'],
+	nX = nPaddingX
+	nY = nY + 30
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Alt Click Publish'],
 		checked = CFG.bBuffAltPublish,
 		onCheck = function(bCheck)
 			CFG.bBuffAltPublish = bCheck
 		end,
 	}):AutoWidth():Width() + 5
-	y = y + 30
+	nY = nY + 30
 
-	x = nPaddingX
-	x = x + ui:Append('WndCheckBox', {
-		x = x, y = y,
+	nX = nPaddingX
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['Enable official data'],
 		checked = CFG.bBuffDataOfficial,
 		onCheck = function(bCheck)
@@ -266,12 +266,12 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = function() return _G.MY_Resource and true end,
 	}):AutoWidth():Width() + 5
-	y = y + 30
+	nY = nY + 30
 
 	if not bRestricted then
-		x = nPaddingX
-		x = x + ui:Append('WndCheckBox', {
-			x = x, y = y,
+		nX = nPaddingX
+		nX = nX + ui:Append('WndCheckBox', {
+			x = nX, y = nY,
 			text = _L['Enable MY_TeamMon data'],
 			checked = CFG.bBuffDataTeamMon,
 			onCheck = function(bCheck)
@@ -281,7 +281,7 @@ function PS.OnPanelActive(frame)
 			end,
 			autoEnable = function() return _G.MY_Resource and true end,
 		}):AutoWidth():Width() + 5
-		y = y + 30
+		nY = nY + 30
 	end
 end
 function PS.OnPanelDeactive()

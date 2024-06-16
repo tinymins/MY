@@ -579,23 +579,23 @@ local PS = {}
 
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
-	local w, h = ui:Size()
-	local x, y = 45, 40
+	local nW, nH = ui:Size()
+	local nX, nY = 45, 40
 
 	ui:Append('Text', {
 		name = 'Text_InfoTip',
-		x = x, y = y, w = 350,
+		x = nX, y = nY, w = 350,
 		text = _L['Infomation tips'],
 		color = {255, 255, 0},
 	})
-	y = y + 5
+	nY = nY + 5
 
 	for _, data in ipairs(INFO_TIP_LIST) do
-		x, y = 60, y + 30
+		nX, nY = 60, nY + 30
 
 		ui:Append('WndCheckBox', {
 			name = 'WndCheckBox_InfoTip_' .. data.id,
-			x = x, y = y, w = 250,
+			x = nX, y = nY, w = 250,
 			text = data.i18n.name,
 			checked = data.config.bEnable or false,
 			onCheck = function(bChecked)
@@ -603,12 +603,12 @@ function PS.OnPanelActive(wnd)
 				D.ReinitUI()
 			end,
 		})
-		x = x + 220
+		nX = nX + 220
 
 		if data.options.bPlaceholder then
 			ui:Append('WndCheckBox', {
 				name = 'WndCheckBox_InfoTipPlaceholder_' .. data.id,
-				x = x, y = y, w = 100,
+				x = nX, y = nY, w = 100,
 				text = _L['Placeholder'],
 				checked = data.config.bPlaceholder or false,
 				onCheck = function(bChecked)
@@ -617,11 +617,11 @@ function PS.OnPanelActive(wnd)
 				end,
 			})
 		end
-		x = x + 100
+		nX = nX + 100
 
 		ui:Append('WndCheckBox', {
 			name = 'WndCheckBox_InfoTipTitle_' .. data.id,
-			x = x, y = y, w = 60,
+			x = nX, y = nY, w = 60,
 			text = _L['Title'],
 			checked = data.config.bShowTitle or false,
 			onCheck = function(bChecked)
@@ -629,11 +629,11 @@ function PS.OnPanelActive(wnd)
 				D.ReinitUI()
 			end,
 		})
-		x = x + 70
+		nX = nX + 70
 
 		ui:Append('WndCheckBox', {
 			name = 'WndCheckBox_InfoTipBg_' .. data.id,
-			x = x, y = y, w = 60,
+			x = nX, y = nY, w = 60,
 			text = _L['Background'],
 			checked = data.config.bShowBg or false,
 			onCheck = function(bChecked)
@@ -641,11 +641,11 @@ function PS.OnPanelActive(wnd)
 				D.ReinitUI()
 			end,
 		})
-		x = x + 70
+		nX = nX + 70
 
-		x = x + ui:Append('WndButton', {
+		nX = nX + ui:Append('WndButton', {
 			name = 'WndButton_InfoTipFont_' .. data.id,
-			x = x, y = y, h = 24,
+			x = nX, y = nY, h = 24,
 			text = _L['Font'],
 			onClick = function()
 				X.UI.OpenFontPicker(function(f)
@@ -657,7 +657,7 @@ function PS.OnPanelActive(wnd)
 
 		ui:Append('Shadow', {
 			name = 'Shadow_InfoTipColor_' .. data.id,
-			x = x, y = y, w = 24, h = 24,
+			x = nX, y = nY, w = 24, h = 24,
 			color = data.config.rgb or {255, 255, 255},
 			onClick = function()
 				local el = this

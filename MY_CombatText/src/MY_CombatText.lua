@@ -1131,7 +1131,7 @@ end
 local PS = {}
 function PS.OnPanelActive(frame)
 	local ui = X.UI(frame)
-	local W, H = ui:Size()
+	local nW, nH = ui:Size()
 	local nPaddingX, nPaddingY = 20, 10
 	local nX, nY = nPaddingX, nPaddingY
 	local nDeltaY = 28
@@ -1488,7 +1488,7 @@ function PS.OnPanelActive(frame)
 		COMBAT_TEXT_TYPE.POISON_DAMAGE        ,
 		COMBAT_TEXT_TYPE.REFLECTED_DAMAGE     ,
 	}) do
-		if nX > W - 100 then
+		if nX > nW - 100 then
 			nX = nPaddingX + 20
 			nY = nY + 25
 		end
@@ -1553,7 +1553,7 @@ function PS.OnPanelActive(frame)
 		COMBAT_TEXT_TYPE.MSG                  ,
 		COMBAT_TEXT_TYPE.CRITICAL_MSG         ,
 	}) do
-		if nX > W - 100 then
+		if nX > nW - 100 then
 			nX = nPaddingX + 20
 			nY = nY + 25
 		end
@@ -1578,11 +1578,11 @@ function PS.OnPanelActive(frame)
 	end
 	nY = nY + 30
 
-	ui:Append('WndWindow', { x = nX, y = nY + 10, w = W, h = 0 }) -- 剑三的滚动有问题，必须使用一个 Wnd 才能触发滚动。。
+	ui:Append('WndWindow', { x = nX, y = nY + 10, w = nW, h = 0 }) -- 剑三的滚动有问题，必须使用一个 Wnd 才能触发滚动。。
 
 	if IsFileExist(COMBAT_TEXT_CONFIG) then
 		ui:Append('WndButton', {
-			x = W - 130 - nPaddingX, y = 15, h = 40,
+			x = nW - 130 - nPaddingX, y = 15, h = 40,
 			text = _L['Reload combat text config'],
 			buttonStyle = 'SKEUOMORPHISM_LACE_BORDER',
 			onClick = D.CheckEnable,

@@ -30,10 +30,10 @@ local function onFrameCreate()
 	if config then
 		local frame, ui, nOriX, nOriY, nOriW, nOriH = arg0, X.UI(arg0), 0, 0, 0, 0
 		local function Fullscreen()
-			local nCurW, nCurH = ui:Size()
-			local nCW, nCH = Station.GetClientSize()
-			local fCoefficient = math.min(nCW / nCurW, nCH / nCurH)
-			local fAbsCoefficient = nCurW / nOriW * fCoefficient
+			local nCurrentW, nCurrentH = ui:Size()
+			local nClientW, nClientH = Station.GetClientSize()
+			local fCoefficient = math.min(nClientW / nCurrentW, nClientH / nCurrentH)
+			local fAbsCoefficient = nCurrentW / nOriW * fCoefficient
 			frame:EnableDrag(true)
 			frame:SetDragArea(0, 0, frame:GetW(), 50 * fAbsCoefficient)
 			frame:Scale(fCoefficient, fCoefficient)

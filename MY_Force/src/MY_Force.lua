@@ -270,17 +270,17 @@ local PS = { szRestriction = 'MY_Force' }
 function PS.OnPanelActive(frame)
 	local ui = X.UI(frame)
 	local nPaddingX, nPaddingY = 25, 25
-	local x, y = nPaddingX, nPaddingY
-	local W, H = ui:Size()
+	local nX, nY = nPaddingX, nPaddingY
+	local nW, nH = ui:Size()
 	-- wu du
 	---------------
-	ui:Append('Text', { text = g_tStrings.tForceTitle[X.CONSTANT.FORCE_TYPE.WU_DU], x = x, y = y, font = 27 })
+	ui:Append('Text', { text = g_tStrings.tForceTitle[X.CONSTANT.FORCE_TYPE.WU_DU], x = nX, y = nY, font = 27 })
 	-- crlf
-	x = nPaddingX + 10
-	y = y + 28
+	nX = nPaddingX + 10
+	nY = nY + 28
 	-- disappear
-	x = ui:Append('WndCheckBox', {
-		x = x, y = y,
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['Alert when pet disappear unexpectedly (for 5D)'],
 		checked = O.bAlertPet,
 		onCheck = function(bChecked)
@@ -290,7 +290,7 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	-- mark pet
 	ui:Append('WndCheckBox', {
-		x = x, y = y,
+		x = nX, y = nY,
 		text = _L['Mark pet'],
 		checked = O.bMarkPet,
 		onCheck = function(bChecked)
@@ -299,19 +299,19 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth()
 	-- crlf
-	x = nPaddingX + 10
-	y = y + 28
+	nX = nPaddingX + 10
+	nY = nY + 28
 	-- guding
-	x = ui:Append('WndCheckBox', {
-		x = x, y = y,
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['Display GUDING of teammate, change color'],
 		checked = MY_ForceGuding.bEnable,
 		onCheck = function(bChecked)
 			MY_ForceGuding.bEnable = bChecked
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 2
-	x = ui:Append('Shadow', {
-		x = x, y = y + 2, w = 18, h = 18,
+	nX = ui:Append('Shadow', {
+		x = nX, y = nY + 2, w = 18, h = 18,
 		color = MY_ForceGuding.color,
 		onClick = function()
 			local ui = X.UI(this)
@@ -322,7 +322,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):Pos('BOTTOMRIGHT') + 10
 	ui:Append('WndCheckBox', {
-		x = x, y = y,
+		x = nX, y = nY,
 		text = _L['Auto talk in team channel after puting GUDING'],
 		checked = MY_ForceGuding.bAutoSay,
 		autoEnable = function() return MY_ForceGuding.bEnable end,
@@ -330,10 +330,10 @@ function PS.OnPanelActive(frame)
 			MY_ForceGuding.bAutoSay = bChecked
 		end,
 	})
-	x = nPaddingX + 10
-	y = y + 28
+	nX = nPaddingX + 10
+	nY = nY + 28
 	ui:Append('WndEditBox', {
-		x = x, y = y, w = W - x * 2, h = 50,
+		x = nX, y = nY, w = nW - nX * 2, h = 50,
 		multiline = true, limit = 512,
 		text = MY_ForceGuding.szSay,
 		autoEnable = function() return MY_ForceGuding.bAutoSay end,
@@ -342,49 +342,49 @@ function PS.OnPanelActive(frame)
 		end,
 	})
 	-- crlf
-	y = y + 54
+	nY = nY + 54
 	if not X.IsRestricted('MY_ForceGuding') then
 		-- crlf
-		x = nPaddingX + 10
-		x = ui:Append('WndCheckBox', {
-			x = x, y = y,
+		nX = nPaddingX + 10
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY,
 			checked = MY_ForceGuding.bUseMana,
 			text = _L['Automatic eat GUDING when mana below '],
 			onCheck = function(bChecked)
 				MY_ForceGuding.bUseMana = bChecked
 			end,
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
-		x = ui:Append('WndSlider', {
-			x = x, y = y, w = 70, h = 25,
+		nX = ui:Append('WndSlider', {
+			x = nX, y = nY, w = 70, h = 25,
 			range = {0, 100, 50},
 			value = MY_ForceGuding.nManaMp,
 			onChange = function(nVal) MY_ForceGuding.nManaMp = nVal end,
 			autoEnable = function() return MY_ForceGuding.bUseMana end,
 		}):Pos('BOTTOMRIGHT') + 65
-		x = ui:Append('Text', {
-			x = x, y = y - 3,
+		nX = ui:Append('Text', {
+			x = nX, y = nY - 3,
 			text = _L[', or life below '],
 		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
-		x = ui:Append('WndSlider', {
-			x = x, y = y, w = 70, h = 25,
+		nX = ui:Append('WndSlider', {
+			x = nX, y = nY, w = 70, h = 25,
 			range = {0, 100, 50},
 			value = MY_ForceGuding.nManaHp,
 			onChange = function(nVal) MY_ForceGuding.nManaHp = nVal end,
 			autoEnable = function() return MY_ForceGuding.bUseMana end,
 		}):Pos('BOTTOMRIGHT')
-		y = y + 36
+		nY = nY + 36
 	end
 	-- other
 	---------------
-	x = nPaddingX
-	ui:Append('Text', { text = _L['Others'], x = x, y = y, font = 27 })
+	nX = nPaddingX
+	ui:Append('Text', { text = _L['Others'], x = nX, y = nY, font = 27 })
 	-- crlf
-	x = nPaddingX + 10
-	y = y + 28
-	x, y = MY_EnergyBar.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y)
+	nX = nPaddingX + 10
+	nY = nY + 28
+	nX, nY = MY_EnergyBar.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	-- hungry
-	x = ui:Append('WndCheckBox', {
-		x = x, y = y,
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['Alert when horse is hungry'],
 		checked = O.bFeedHorse,
 		onCheck = function(bChecked)
@@ -393,11 +393,11 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	-- crlf
-	x = nPaddingX + 10
-	y = y + 28
+	nX = nPaddingX + 10
+	nY = nY + 28
 	-- be wanted alert
 	ui:Append('WndCheckBox', {
-		x = x, y = y,
+		x = nX, y = nY,
 		text = _L['Alert when I am wanted publishing online'],
 		checked = O.bAlertWanted,
 		onCheck = function(bChecked)
@@ -406,11 +406,11 @@ function PS.OnPanelActive(frame)
 		end,
 	})
 	-- crlf
-	x = nPaddingX + 10
-	y = y + 28
+	nX = nPaddingX + 10
+	nY = nY + 28
 	-- debuff type num
-	x = ui:Append('WndCheckBox', {
-		x = x, y = y,
+	nX = ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['Alert when my same type of debuff reached a certain number '],
 		checked = O.bWarningDebuff,
 		onCheck = function(bChecked)
@@ -419,7 +419,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 	ui:Append('WndComboBox', {
-		x = x, y = y, w = 50, h = 25,
+		x = nX, y = nY, w = 50, h = 25,
 		autoEnable = function() return O.bWarningDebuff end,
 		text = tostring(O.nDebuffNum),
 		menu = function()
@@ -438,9 +438,9 @@ function PS.OnPanelActive(frame)
 		end,
 	})
 	-- crlf
-	x = nPaddingX + 10
-	y = y + 28
-	x, y = MY_ChangGeShadow.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, x, y)
+	nX = nPaddingX + 10
+	nY = nY + 28
+	nX, nY = MY_ChangGeShadow.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 end
 X.RegisterPanel(_L['Target'], 'MY_Force', _L['MY_Force'], 327, PS)
 

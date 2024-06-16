@@ -394,12 +394,12 @@ local PS = {}
 
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
-	local w, h = ui:Size()
+	local nW, nH = ui:Size()
 
 	ui:Append('Text', { x = 22, y = 15, w = 100, h = 25, text = _L['key words:'] })
 
 	ui:Append('WndComboBox', {
-		x = 80, y = 15, w = w - 246, h = 25,
+		x = 80, y = 15, w = nW - 246, h = 25,
 		text = _L['Click to config monitors'],
 		menu = function()
 			local aKeyword = O.aKeyword
@@ -508,7 +508,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('Image', {
 		image = 'UI/Image/UICommon/Commonpanel2.UITex', imageFrame = 48,
-		x = w - 160, y = 18, w = 20, h = 20, alpha = 180,
+		x = nW - 160, y = 18, w = 20, h = 20, alpha = 180,
 		onHover = function(bIn) this:SetAlpha(bIn and 255 or 180) end,
 		onClick = function()
 			local szText = GetFormatText(_L['CHAT_MONITOR_TIP'], 162)
@@ -519,7 +519,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	ui:Append('WndButton', {
-		x = w - 26, y = 15, w = 25, h = 25,
+		x = nW - 26, y = 15, w = 25, h = 25,
 		buttonStyle = 'OPTION',
 		menu = function()
 			local t = {
@@ -614,7 +614,7 @@ function PS.OnPanelActive(wnd)
 
 	l_uiBtn = ui:Append('WndButton', {
 		name = 'Button_ChatMonitor_Switcher',
-		x = w - 134, y = 15, w = 50, h = 25,
+		x = nW - 134, y = 15, w = 50, h = 25,
 		buttonStyle = 'FLAT',
 		text = (O.bCapture and _L['stop']) or _L['start'],
 		onClick = function()
@@ -629,7 +629,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	ui:Append('WndButton', {
-		x = w - 79, y = 15, w = 50, h = 25,
+		x = nW - 79, y = 15, w = 50, h = 25,
 		buttonStyle = 'FLAT',
 		text = _L['clear'],
 		onClick = function()
@@ -641,7 +641,7 @@ function PS.OnPanelActive(wnd)
 
 	l_uiBoard = ui:Append('WndScrollHandleBox', {
 		name = 'WndScrollHandleBox_TalkList',
-		x = 20, y = 50, w = w - 21, h = h - 70, handleStyle = 3,
+		x = 20, y = 50, w = nW - 21, h = nH - 70, handleStyle = 3,
 	})
 
 	for i = 1, #RECORD_LIST, 1 do

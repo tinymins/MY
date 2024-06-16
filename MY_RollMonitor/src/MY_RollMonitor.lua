@@ -399,7 +399,7 @@ end
 -- 标签激活响应函数
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
-	local w, h = ui:Size()
+	local nW, nH = ui:Size()
 	-- 记录模式
 	ui:Append('WndComboBox', {
 		x = 20, y = 10, w = 180,
@@ -444,7 +444,7 @@ function PS.OnPanelActive(wnd)
 	})
 	-- 清空
 	ui:Append('WndButton', {
-		x = w - 176, y = 10, w = 90, text = _L['restart'],
+		x = nW - 176, y = 10, w = 90, text = _L['restart'],
 		onLClick = function(nButton) D.Clear() end,
 		menuRClick = function()
 			local t = {{
@@ -471,7 +471,7 @@ function PS.OnPanelActive(wnd)
 	})
 	-- 发布
 	ui:Append('WndButton', {
-		x = w - 86, y = 10, w = 80, text = _L['publish'],
+		x = nW - 86, y = 10, w = 80, text = _L['publish'],
 		onLClick = function() D.Echo() end,
 		menuRClick = function()
 			local t = { {
@@ -517,7 +517,7 @@ function PS.OnPanelActive(wnd)
 	})
 	-- 输出板
 	m_uiBoard = ui:Append('WndScrollHandleBox',{
-		x = 20,  y = 40, w = w - 26, h = h - 60,
+		x = 20,  y = 40, w = nW - 26, h = nH - 60,
 		handleStyle = 3, text = _L['average score with out pole']
 	})
 	D.DrawBoard()

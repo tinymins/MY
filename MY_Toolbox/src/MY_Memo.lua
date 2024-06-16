@@ -59,13 +59,13 @@ function D.Reload(bGlobal)
 				CFG.nWidth  = ui:Width()
 				CFG.anchor  = ui:Anchor()
 				CFG.nHeight = ui:Height()
-				local nInnerW, nInnerH = select(3, ui:Size())
-				ui:Children('#WndEditBox_Memo'):Size(nInnerW, nInnerH)
+				local nW, nH = ui:ContainerSize()
+				ui:Children('#WndEditBox_Memo'):Size(nW, nH)
 			end,
 			onFrameVisualStateChange = function()
 				local ui = X.UI(this)
-				local nInnerW, nInnerH = select(3, ui:Size())
-				ui:Children('#WndEditBox_Memo'):Size(nInnerW, nInnerH)
+				local nW, nH = ui:ContainerSize()
+				ui:Children('#WndEditBox_Memo'):Size(nW, nH)
 			end,
 			w = CFG.nWidth, h = CFG.nHeight, text = TITLE,
 			draggable = true, dragArea = {0, 0, CFG.nWidth, 30},

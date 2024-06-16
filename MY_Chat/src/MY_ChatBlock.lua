@@ -251,11 +251,11 @@ end)
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
-	local w, h = ui:Size()
-	local x, y = 0, 0
+	local nW, nH = ui:Size()
+	local nX, nY = 0, 0
 
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = 70,
+		x = nX, y = nY, w = 70,
 		text = _L['Enable'],
 		checked = O.bBlockWords,
 		onCheck = function(bCheck)
@@ -263,14 +263,14 @@ function PS.OnPanelActive(wnd)
 			D.CheckEnable()
 		end,
 	})
-	x = x + 70
+	nX = nX + 70
 
 	local edit = ui:Append('WndEditBox', {
 		name = 'WndEditBox_Keyword',
-		x = x, y = y, w = w - 160 - x, h = 25,
+		x = nX, y = nY, w = nW - 160 - nX, h = 25,
 		placeholder = _L['Type keyword, right click list to config.'],
 	})
-	x, y = 0, y + 30
+	nX, nY = 0, nY + 30
 
 	local aBlockWords = O.aBlockWords
 	local function SeekBlockWord(uuid)
@@ -289,7 +289,7 @@ function PS.OnPanelActive(wnd)
 		end
 	end
 
-	local list = ui:Append('WndListBox', { x = x, y = y, w = w, h = h - 30 })
+	local list = ui:Append('WndListBox', { x = nX, y = nY, w = nW, h = nH - 30 })
 	local function ReloadBlockWords()
 		O('reload', {'aBlockWords'})
 		aBlockWords = O.aBlockWords
@@ -446,7 +446,7 @@ function PS.OnPanelActive(wnd)
 	end)
 	-- add
 	ui:Append('WndButton', {
-		x = w - 160, y=  0, w = 80,
+		x = nW - 160, y=  0, w = 80,
 		text = _L['Add'],
 		onClick = function()
 			local szText = X.TrimString(edit:Text())
@@ -463,7 +463,7 @@ function PS.OnPanelActive(wnd)
 	})
 	-- del
 	ui:Append('WndButton', {
-		x = w - 80, y =  0, w = 80,
+		x = nW - 80, y =  0, w = 80,
 		text = _L['Delete'],
 		onClick = function()
 			O('reload', {'aBlockWords'})

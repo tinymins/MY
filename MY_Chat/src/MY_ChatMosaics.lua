@@ -199,34 +199,34 @@ local PS = {}
 
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
-	local w, h = ui:Size()
-	local x, y = 20, 30
+	local nW, nH = ui:Size()
+	local nX, nY = 20, 30
 
 	ui:Append('WndCheckBox', {
 		text = _L['chat mosaics (mosaics names in chat panel)'],
-		x = x, y = y, w = 400,
+		x = nX, y = nY, w = 400,
 		checked = MY_ChatMosaics.bEnabled,
 		onCheck = function(bCheck)
 			MY_ChatMosaics.bEnabled = bCheck
 			D.ResetMosaics()
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 
 	ui:Append('WndCheckBox', {
 		text = _L['no mosaics on my own name'],
-		x = x, y = y, w = 400,
+		x = nX, y = nY, w = 400,
 		checked = O.bIgnoreOwnName,
 		onCheck = function(bCheck)
 			O.bIgnoreOwnName = bCheck
 			D.ResetMosaics()
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 
 	ui:Append('WndRadioBox', {
 		text = _L['part mosaics A (mosaics except 1st and last character)'],
-		x = x, y = y, w = 400,
+		x = nX, y = nY, w = 400,
 		group = 'PART_MOSAICS',
 		checked = O.nMosaicsMode == 1,
 		onCheck = function(bCheck)
@@ -236,11 +236,11 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 
 	ui:Append('WndRadioBox', {
 		text = _L['part mosaics B (mosaics except 1st character)'],
-		x = x, y = y, w = 400,
+		x = nX, y = nY, w = 400,
 		group = 'PART_MOSAICS',
 		checked = O.nMosaicsMode == 2,
 		onCheck = function(bCheck)
@@ -250,11 +250,11 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 
 	ui:Append('WndRadioBox', {
 		text = _L['part mosaics C (mosaics except last character)'],
-		x = x, y = y, w = 400,
+		x = nX, y = nY, w = 400,
 		group = 'PART_MOSAICS',
 		checked = O.nMosaicsMode == 3,
 		onCheck = function(bCheck)
@@ -264,11 +264,11 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 
 	ui:Append('WndRadioBox', {
 		text = _L['part mosaics D (mosaics all character)'],
-		x = x, y = y, w = 400,
+		x = nX, y = nY, w = 400,
 		group = 'PART_MOSAICS',
 		checked = O.nMosaicsMode == 4,
 		onCheck = function(bCheck)
@@ -278,11 +278,11 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 
 	ui:Append('WndEditBox', {
 		placeholder = _L['mosaics character'],
-		x = x, y = y, w = w - 2 * x, h = 25,
+		x = nX, y = nY, w = nW - 2 * nX, h = 25,
 		text = D.szMosaics,
 		onChange = function(szText)
 			if szText == '' then
@@ -293,11 +293,11 @@ function PS.OnPanelActive(wnd)
 			D.ResetMosaics()
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 
 	ui:Append('WndEditBox', {
 		placeholder = _L['unmosaics names (split by comma)'],
-		x = x, y = y, w = w - 2 * x, h = h - y - 50,
+		x = nX, y = nY, w = nW - 2 * nX, h = nH - nY - 50,
 		text = (function()
 			local t = {}
 			for szName, _ in pairs(O.tIgnoreNames) do
@@ -314,7 +314,7 @@ function PS.OnPanelActive(wnd)
 			D.ResetMosaics()
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 end
 
 X.RegisterPanel(_L['Chat'], 'MY_Chat_ChatMosaics', _L['chat mosaics'], 'ui/Image/UICommon/yirong3.UITex|50', PS)

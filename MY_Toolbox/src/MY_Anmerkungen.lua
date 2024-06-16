@@ -389,11 +389,11 @@ X.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
-	local w, h = ui:Size()
-	local x, y = 0, 0
+	local nW, nH = ui:Size()
+	local nX, nY = 0, 0
 
 	ui:Append('WndButton', {
-		x = x, y = y, w = 110,
+		x = nX, y = nY, w = 110,
 		text = _L['Create'],
 		buttonStyle = 'FLAT',
 		onClick = function()
@@ -404,7 +404,7 @@ function PS.OnPanelActive(wnd)
 	if not MY.IsRestricted('MY_Anmerkungen.Export') then
 		local szOriginServer = X.GetRegionOriginName() .. '_' .. X.GetServerOriginName()
 		ui:Append('WndButton', {
-			x = w - 230, y = y, w = 110,
+			x = nW - 230, y = nY, w = 110,
 			text = _L['Import'],
 			buttonStyle = 'FLAT',
 			onClick = function()
@@ -474,7 +474,7 @@ function PS.OnPanelActive(wnd)
 		})
 
 		ui:Append('WndButton', {
-			x = w - 110, y = y, w = 110,
+			x = nW - 110, y = nY, w = 110,
 			text = _L['Export'],
 			buttonStyle = 'FLAT',
 			onClick = function()
@@ -489,10 +489,10 @@ function PS.OnPanelActive(wnd)
 		})
 	end
 
-	y = y + 30
+	nY = nY + 30
 	local list = ui:Append('WndListBox', {
-		x = x, y = y,
-		w = w, h = h - 30,
+		x = nX, y = nY,
+		w = nW, h = nH - 30,
 		listBox = {{
 			'onlclick',
 			function(szID, szText, data, bSelected)

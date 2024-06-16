@@ -88,14 +88,14 @@ function D.CreateFrame(szInitYY, szInitNote)
 				O.nHeight = ui:Height()
 				O.anchor  = ui:Anchor()
 			end)
-			local W, H = select(3, ui:Size())
+			local nW, nH = ui:ContainerSize()
 			ui:Fetch('YY'):Width(ui:Width() - 160)
 			local uiBtn = ui:Fetch('Btn_YY')
-			uiBtn:Left(W - uiBtn:Width() - 10)
+			uiBtn:Left(nW - uiBtn:Width() - 10)
 			local uiBtns = ui:Fetch('WndBtn_RaidTools'):Add(ui:Fetch('WndBtn_GKP')):Add(ui:Fetch('WndBtn_TeamMon'))
-			uiBtns:Top(H - uiBtns:Height() - 10)
+			uiBtns:Top(nH - uiBtns:Height() - 10)
 			local uiMessage = ui:Fetch('Message')
-			uiMessage:Size(W - 20, uiBtns:Top() - uiMessage:Top() - 10)
+			uiMessage:Size(nW - 20, uiBtns:Top() - uiMessage:Top() - 10)
 		end
 		ui = X.UI.CreateFrame('MY_TeamNotice', {
 			w = O.nWidth, h = O.nHeight,

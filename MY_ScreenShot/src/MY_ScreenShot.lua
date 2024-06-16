@@ -170,7 +170,7 @@ local PS = {}
 
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
-	local w, h = ui:Size()
+	local nW, nH = ui:Size()
 	local fnRefreshPanel = function(ui)
 		ui:Children('#WndCheckBox_HideUI'):Check(O.bAutoHideUI)
 		ui:Children('#WndCombo_FileExName'):Text(O.szFileExName)
@@ -253,7 +253,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('WndButton', {
 		name = 'WndButton_HotkeyCheck',
-		x = w - 180, y = 30,
+		x = nW - 180, y = 30,
 		buttonStyle = 'FLAT',
 		text = _L['set default screenshot tool'],
 		onClick = function()
@@ -263,7 +263,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:Append('Text', {
 		name = 'Text_SetHotkey',
-		x = w - 140, y = 60,
+		x = nW - 140, y = 60,
 		text = _L['>> Set hotkey <<'],
 		r = 255, g = 255, b = 0,
 		onClick = function() X.SetHotKey() end,

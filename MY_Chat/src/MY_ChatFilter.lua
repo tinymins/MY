@@ -203,41 +203,41 @@ local PS = {}
 
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
-	local w, h = ui:Size()
-	local x, y = 20, 30
+	local nW, nH = ui:Size()
+	local nX, nY = 20, 30
 
 	ui:Append('WndCheckBox', {
 		text = _L['filter duplicate chat'],
-		x = x, y = y, w = 400,
+		x = nX, y = nY, w = 400,
 		checked = O.bFilterDuplicate,
 		onCheck = function(bCheck)
 			O.bFilterDuplicate = bCheck
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 
 	ui:Append('WndCheckBox', {
 		text = _L['filter duplicate chat ignore id'],
-		x = x, y = y, w = 400,
+		x = nX, y = nY, w = 400,
 		checked = O.bFilterDuplicateIgnoreID,
 		onCheck = function(bCheck)
 			O.bFilterDuplicateIgnoreID = bCheck
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 
 	ui:Append('WndCheckBox', {
 		text = _L['only filter continuous duplicate chat'],
-		x = x, y = y, w = 400,
+		x = nX, y = nY, w = 400,
 		checked = O.bFilterDuplicateContinuous,
 		onCheck = function(bCheck)
 			O.bFilterDuplicateContinuous = bCheck
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 
 	ui:Append('WndComboBox', {
-		x = x, y = y, w = 330, h = 25,
+		x = nX, y = nY, w = 330, h = 25,
 		menu = function()
 			local t = {}
 			for szChannelID, bFilter in pairs(O.tApplyDuplicateChannels) do
@@ -255,17 +255,17 @@ function PS.OnPanelActive(wnd)
 		end,
 		text = _L['select duplicate channels'],
 	})
-	y = y + 50
+	nY = nY + 50
 
 	ui:Append('WndCheckBox', {
 		text = _L['filter duplicate addon message'],
-		x = x, y = y, w = 400,
+		x = nX, y = nY, w = 400,
 		checked = O.bFilterDuplicateAddonTalk,
 		onCheck = function(bCheck)
 			O.bFilterDuplicateAddonTalk = bCheck
 		end,
 	})
-	y = y + 30
+	nY = nY + 30
 end
 
 X.RegisterPanel(_L['Chat'], 'MY_DuplicateChatFilter', _L['duplicate chat filter'], 'ui/Image/UICommon/yirong3.UITex|104', PS)
