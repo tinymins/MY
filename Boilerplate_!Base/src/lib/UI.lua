@@ -501,11 +501,11 @@ local function GetComponentElement(raw, elementType)
 		or componentType == 'WndWebCef' then
 			element = raw
 		end
-	elseif elementType == 'WEBPAGE' then -- 获取IE浏览器UI实例
+	elseif elementType == 'WEB_PAGE' then -- 获取IE浏览器UI实例
 		if componentType == 'WndWebPage' then
 			element = raw
 		end
-	elseif elementType == 'WEBCEF' then -- 获取Chrome浏览器UI实例
+	elseif elementType == 'WEB_CEF' then -- 获取Chrome浏览器UI实例
 		if componentType == 'WndWebCef' then
 			element = raw
 		end
@@ -6079,11 +6079,11 @@ function OO:Complete(fnOnComplete)
 	self:_checksum()
 	if fnOnComplete then
 		for _, raw in ipairs(self.raws) do
-			local wnd = GetComponentElement(raw, 'WEBPAGE')
+			local wnd = GetComponentElement(raw, 'WEB_PAGE')
 			if wnd then
 				X.UI(wnd):UIEvent('OnDocumentComplete', fnOnComplete)
 			end
-			local wnd = GetComponentElement(raw, 'WEBCEF')
+			local wnd = GetComponentElement(raw, 'WEB_CEF')
 			if wnd then
 				X.UI(wnd):UIEvent('OnWebLoadEnd', fnOnComplete)
 			end
