@@ -467,6 +467,14 @@ local function GetComponentElement(raw, elementType)
 				element = wnd:Lookup('', '')
 			end
 		end
+	elseif elementType == 'MAIN_CONTAINER' then -- 放置子组件的容器
+		if componentType == 'WndFrame' then
+			element = GetComponentElement(raw, 'MAIN_WINDOW')
+		elseif componentType == 'WndScrollHandleBox' then
+			element = GetComponentElement(raw, 'MAIN_HANDLE')
+		elseif componentType == 'WndScrollWindowBox' then
+			element = GetComponentElement(raw, 'CONTAINER')
+		end
 	elseif elementType == 'CHECKBOX' then -- 获取复选框UI实例
 		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' or componentType == 'CheckBox' then
 			element = raw
@@ -4622,6 +4630,17 @@ function OO:Size(...)
 			end
 		end
 		return w, h
+	end
+end
+
+-- (number nW, number nH) Instance:ContainerSize() -- Get container size
+function OO:ContainerSize()
+	local raw = self.raws[1]
+	if raw then
+		raw = GetComponentElement(raw, 'MAIN_CONTAINER')
+		if raw then
+			return raw:GetSize()
+		end
 	end
 end
 
