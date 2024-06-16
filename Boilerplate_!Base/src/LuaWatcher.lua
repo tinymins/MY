@@ -196,11 +196,11 @@ RegisterEvent(NS .. '_BASE_LOADING_END', function()
 
 	function PS.OnPanelActive(wnd)
 		local ui = _G[NS].UI(wnd)
-		local x, y = 10, 10
-		local w, h = ui:Size()
+		local nX, nY = 10, 10
+		local nW, nH = ui:Size()
 
 		BTN = ui:Append('WndButton', {
-			x = x, y = y,
+			x = nX, y = nY,
 			text = RUNNING and _L['Stop'] or _L['Start'],
 			onClick = function()
 				if RUNNING then
@@ -216,14 +216,14 @@ RegisterEvent(NS .. '_BASE_LOADING_END', function()
 			end,
 		})
 		ui:Append('WndButton', {
-			x = x + 100, y = y,
+			x = nX + 100, y = nY,
 			text = _L['Refresh'],
 			onClick = function()
 				TXT:Text(D.GetRankString(SORT_KEY))
 			end,
 		})
 		ui:Append('WndButton', {
-			x = x + 200, y = y,
+			x = nX + 200, y = nY,
 			text = SORT_KEY,
 			onClick = function()
 				if SORT_KEY == 'TIME' then
@@ -236,16 +236,16 @@ RegisterEvent(NS .. '_BASE_LOADING_END', function()
 			end,
 		})
 		ui:Append('WndButton', {
-			x = x + 300, y = y,
+			x = nX + 300, y = nY,
 			text = _L['Reset'],
 			onClick = function()
 				D.Reset()
 			end,
 		})
-		y = y + 30
+		nY = nY + 30
 
 		TXT = ui:Append('Text', {
-			x = x, y = y, w = w, h = h - y,
+			x = nX, y = nY, w = nW, h = nH - nY,
 			alignHorizontal = 0, alignVertical = 0,
 			multiline = true,
 			onClick = function()

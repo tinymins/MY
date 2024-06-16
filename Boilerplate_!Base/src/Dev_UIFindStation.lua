@@ -158,35 +158,35 @@ end
 function PS.OnPanelActive(frame)
 	local ui = X.UI(frame)
 	local nPaddingX, nPaddingY = 20, 20
-	local x, y = nPaddingX, nPaddingY
-	local w, h = ui:Size()
+	local nX, nY = nPaddingX, nPaddingY
+	local nW, nH = ui:Size()
 
-	ui:Append('Text', { x = x, y = y, text = _L['Find component'], font = 27 })
+	ui:Append('Text', { x = nX, y = nY, text = _L['Find component'], font = 27 })
 	ui:Append('WndCheckBox', {
-		x = x + 10, y = y + 28,
+		x = nX + 10, y = nY + 28,
 		text = _L['Enable button search, mouseover it will show its path'],
 		checked = O.bButton, onCheck = D.UpdateButton,
 	}):AutoWidth()
 	ui:Append('WndCheckBox', {
-		x = x + 10, y = y + 56,
+		x = nX + 10, y = nY + 56,
 		text = _L['Enable box search, mouseover it will show its path'],
 		checked = O.bBox, onCheck = D.UpdateBox,
 	}):AutoWidth()
-	ui:Append('Text', { x = x + 0, y = y + 92, text = _L['Find by text'], font = 27 })
+	ui:Append('Text', { x = nX + 0, y = nY + 92, text = _L['Find by text'], font = 27 })
 
 	local nX = nPaddingX + 10
 	nX = nX + ui:Append('Text', {
-		x = nX, y = y + 120,
+		x = nX, y = nY + 120,
 		text = _L['Keyword: '],
 	}):AutoWidth():Width() + 5
 	nX = nX + ui:Append('WndEditBox', {
 		name = 'Edit_Query',
-		x = nX, y = y + 120, w = 200, h = 27,
+		x = nX, y = nY + 120, w = 200, h = 27,
 		limit = 256,
 		text = O.szQuery,
 	}):Width() + 5
 	nX = nX + ui:Append('WndButton', {
-		x = nX, y = y + 120,
+		x = nX, y = nY + 120,
 		text = _L['Search'],
 		onClick = function()
 			ui:Children('#Edit_Result'):Text(_L['Searching, please wait...'])
@@ -195,8 +195,8 @@ function PS.OnPanelActive(frame)
 			ui:Children('#Edit_Result'):Text(O.szResult)
 		end,
 	}):Width() + 5
-	ui:Append('Text', { x = nX, y = y + 120, text = _L['(Supports Lua regex)'] })
-	ui:Append('WndEditBox', { name = 'Edit_Result', x = x + 10, y = y + 150, limit = 9999, w = 480, h = 200, multiline = true, text = O.szResult })
+	ui:Append('Text', { x = nX, y = nY + 120, text = _L['(Supports Lua regex)'] })
+	ui:Append('WndEditBox', { name = 'Edit_Result', x = nX + 10, y = nY + 150, limit = 9999, w = 480, h = 200, multiline = true, text = O.szResult })
 end
 
 X.RegisterPanel(_L['Development'], 'Dev_UIFindStation', _L['Dev_UIFindStation'], 2791, PS)

@@ -39,7 +39,7 @@ end
 
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
-	local w, h = ui:Size()
+	local nW, nH = ui:Size()
 	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, w = 0, h = 0, color = { 140, 140, 140 } })
 	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, w = 0, h = 0, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT })
 	ui:Append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
@@ -211,24 +211,24 @@ end
 
 function PS.OnPanelResize(wnd)
 	local ui = X.UI(wnd)
-	local w, h = ui:Size()
-	local scaleH = w / 557 * 278
-	local bottomH = 90
-	if scaleH > h - bottomH then
-		ui:Fetch('Shadow_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
-		ui:Fetch('Image_Adv'):Size((h - bottomH) / 278 * 557, (h - bottomH))
-		ui:Fetch('Text_Memory'):Pos(w - 150, h - bottomH + 10)
-		ui:Fetch('Text_Adv'):Pos(10, h - bottomH + 10)
-		ui:Fetch('Text_Svr'):Pos(10, h - bottomH + 35)
+	local nW, nH = ui:Size()
+	local fScaleH = nW / 557 * 278
+	local nBottomH = 90
+	if fScaleH > nH - nBottomH then
+		ui:Fetch('Shadow_Adv'):Size((nH - nBottomH) / 278 * 557, (nH - nBottomH))
+		ui:Fetch('Image_Adv'):Size((nH - nBottomH) / 278 * 557, (nH - nBottomH))
+		ui:Fetch('Text_Memory'):Pos(nW - 150, nH - nBottomH + 10)
+		ui:Fetch('Text_Adv'):Pos(10, nH - nBottomH + 10)
+		ui:Fetch('Text_Svr'):Pos(10, nH - nBottomH + 35)
 	else
-		ui:Fetch('Shadow_Adv'):Size(w, scaleH)
-		ui:Fetch('Image_Adv'):Size(w, scaleH)
-		ui:Fetch('Text_Memory'):Pos(w - 150, scaleH + 10)
-		ui:Fetch('Text_Adv'):Pos(10, scaleH + 10)
-		ui:Fetch('Text_Svr'):Pos(10, scaleH + 35)
+		ui:Fetch('Shadow_Adv'):Size(nW, fScaleH)
+		ui:Fetch('Image_Adv'):Size(nW, fScaleH)
+		ui:Fetch('Text_Memory'):Pos(nW - 150, fScaleH + 10)
+		ui:Fetch('Text_Adv'):Pos(10, fScaleH + 10)
+		ui:Fetch('Text_Svr'):Pos(10, fScaleH + 35)
 	end
-	ui:Fetch('WndButton_UserPreference'):Top(scaleH + 65)
-	ui:Fetch('WndButton_AddonErrorMessage'):Top(scaleH + 65)
+	ui:Fetch('WndButton_UserPreference'):Top(fScaleH + 65)
+	ui:Fetch('WndButton_AddonErrorMessage'):Top(fScaleH + 65)
 end
 
 function PS.OnPanelBreathe(wnd)
