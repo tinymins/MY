@@ -746,7 +746,7 @@ local function InitComponent(raw, szType)
 			scroll:ScrollNext(-Station.GetMessageWheelDelta() * 2)
 			return 1
 		end
-		scroll:Lookup('Btn_Track').OnMouseWheel = function()
+		scroll:Lookup('Btn_Slider').OnMouseWheel = function()
 			scroll:ScrollNext(-Station.GetMessageWheelDelta())
 			return 1
 		end
@@ -4523,8 +4523,8 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		wnd:SetSize(nWidth, nHeight)
 		sld:SetSize(nRawWidth, nRawHeight)
 		local nBtnWidth = math.min(34, nRawWidth * 0.6)
-		sld:Lookup('Btn_Track'):SetSize(nBtnWidth, nRawHeight)
-		sld:Lookup('Btn_Track'):SetRelX((nRawWidth - nBtnWidth) * sld:GetScrollPos() / sld:GetStepCount())
+		sld:Lookup('Btn_Slider'):SetSize(nBtnWidth, nRawHeight)
+		sld:Lookup('Btn_Slider'):SetRelX((nRawWidth - nBtnWidth) * sld:GetScrollPos() / sld:GetStepCount())
 		hdl:SetSize(nWidth, nHeight)
 		hdl:Lookup('Image_BG'):SetSize(nRawWidth, nRawHeight - 2)
 		txt:SetRelX(nRawWidth + 5)
