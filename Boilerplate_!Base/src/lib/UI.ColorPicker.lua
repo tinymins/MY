@@ -199,7 +199,7 @@ function X.UI.OpenColorPickerEx(fnAction)
 	wnd:Append('Shadow', { name = 'Select', w = 25, h = 25, x = 20, y = 10, color = { 255, 255, 255 } })
 	wnd:Append('Text', { name = 'Select_Text', x = 50, y = 10, text = g_tStrings.STR_NONE })
 	wnd:Append('WndSlider', {
-		x = 20, y = 35, h = 25, w = 306, rw = 272,
+		x = 20, y = 35, h = 25, w = 306, sliderWidth = 272,
 		textFormatter = function(val) return ('%d H'):format(val) end,
 		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		value = COLOR_HUE, range = {0, 360},

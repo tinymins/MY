@@ -18,7 +18,7 @@ local COMPONENT_SAMPLE = {
 	{'Text', 'Text', { w = 'auto', h = COMPONENT_H, font = 162, text = 'Text' }},
 	{'CheckBox', 'CheckBox', { w = 'auto', h = COMPONENT_H, text = 'CheckBox' }},
 	{'ColorBox', 'ColorBox', { w = 'auto', h = COMPONENT_H, text = 'ColorBox', color = {255, 255, 0} }},
-	{'ColorBox Sized', 'ColorBox', { w = 'auto', h = COMPONENT_H, rw = 50, rh = 18, text = 'ColorBox', color = {255, 255, 0} }},
+	{'ColorBox Sized', 'ColorBox', { w = 'auto', h = COMPONENT_H, text = 'ColorBox', color = {255, 255, 0} }},
 	{'Handle', 'Handle', { w = COMPONENT_H, h = COMPONENT_H }},
 	{'Box', 'Box', { w = COMPONENT_H, h = COMPONENT_H, frame = 233 }},
 	{'Image', 'Image', { w = COMPONENT_H, h = COMPONENT_H, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT }},
@@ -78,7 +78,7 @@ local COMPONENT_SAMPLE = {
 	-- WndScrollHandleBox
 	-- WndScrollWindowBox
 	{'WndSlider', 'WndSlider', { w = 200, h = COMPONENT_H, font = 162, text = 'WndSlider' }},
-	{'WndSlider Sized', 'WndSlider', { w = 600, h = COMPONENT_H, rw = 400, font = 162, text = 'WndSlider' }},
+	{'WndSlider Sized', 'WndSlider', { w = 600, h = COMPONENT_H, sliderWidth = 400, font = 162, text = 'WndSlider' }},
 	-- WndWebCef
 	-- WndWebPage
 	-- WndWindow

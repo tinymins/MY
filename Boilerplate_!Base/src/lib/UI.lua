@@ -329,9 +329,10 @@ local function ApplyUIArguments(ui, arg)
 		if arg.sort or arg.sortOrder     then ui:Sort             (arg.sort, arg.sortOrder                         ) end
 		if arg.dataSource                then ui:DataSource       (arg.dataSource                                  ) end
 		if arg.summary                   then ui:Summary          (arg.summary                                     ) end
-		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then        -- must after :Text() because w/h can be 'auto'
-			ui:Size(arg.w, arg.h, arg.rw, arg.rh)
+		if arg.sliderWidth ~= nil or arg.sliderHeight ~= nil then -- must after :Text() because w/h can be 'auto', must before :Size() because size depends on this
+			ui:SliderSize(arg.sliderWidth, arg.sliderHeight)
 		end
+		if arg.w ~= nil or arg.h ~= nil  then ui:Size             (arg.w, arg.h                                    ) end -- must after :Text() because w/h can be 'auto'
 		if arg.alignHorizontal or arg.alignVertical then -- must after :Size()
 			ui:Align(arg.alignHorizontal, arg.alignVertical)
 		end
@@ -4060,23 +4061,23 @@ end
 
 -- (number) Instance:Width()
 -- (self) Instance:Width(number[, number])
-function OO:Width(nWidth, nRawWidth)
+function OO:Width(nWidth)
 	if nWidth then
-		return self:Size(nWidth, nil, nRawWidth, nil)
+		return self:Size(nWidth, nil)
 	else
-		local w, h, rw, rh = self:Size()
-		return w, rw
+		local nW = self:Size()
+		return nW
 	end
 end
 
 -- (number) Instance:Height()
 -- (self) Instance:Height(number[, number])
-function OO:Height(nHeight, nRawHeight)
+function OO:Height(nHeight)
 	if nHeight then
-		return self:Size(nil, nHeight, nil, nRawHeight)
+		return self:Size(nil, nHeight)
 	else
-		local w, h, rw, rh = self:Size()
-		return h, rh
+		local _, nH = self:Size()
+		return nH
 	end
 end
 
@@ -4512,24 +4513,20 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
 		raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
 	elseif componentType == 'WndSlider' then
-		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-		local sld = GetComponentElement(raw, 'SLIDER')
-		local txt = GetComponentElement(raw, 'TEXT')
+		local hWnd = GetComponentElement(raw, 'MAIN_WINDOW')
+		local hHandle = GetComponentElement(raw, 'MAIN_HANDLE')
+		local hSlider = GetComponentElement(raw, 'SLIDER')
+		local hText = GetComponentElement(raw, 'TEXT')
+		local hImage = hHandle:Lookup('Image_BG')
 		local nWidth = nWidth or math.max(nWidth, (nInnerWidth or 0) + 5)
 		local nHeight = nHeight or math.max(nHeight, (nInnerHeight or 0) + 5)
-		local nRawWidth = math.min(nWidth, nInnerWidth or sld:GetW())
-		local nRawHeight = math.min(nHeight, nInnerHeight or sld:GetH())
-		wnd:SetSize(nWidth, nHeight)
-		sld:SetSize(nRawWidth, nRawHeight)
-		local nBtnWidth = math.min(34, nRawWidth * 0.6)
-		sld:Lookup('Btn_Slider'):SetSize(nBtnWidth, nRawHeight)
-		sld:Lookup('Btn_Slider'):SetRelX((nRawWidth - nBtnWidth) * sld:GetScrollPos() / sld:GetStepCount())
-		hdl:SetSize(nWidth, nHeight)
-		hdl:Lookup('Image_BG'):SetSize(nRawWidth, nRawHeight - 2)
-		txt:SetRelX(nRawWidth + 5)
-		txt:SetSize(nWidth - nRawWidth - 5, nHeight)
-		hdl:FormatAllItemPos()
+		local nRawWidth, nRawHeight = hSlider:GetSize()
+		hWnd:SetSize(nWidth, nHeight)
+		hHandle:SetSize(nWidth, nHeight)
+		hText:SetSize(nWidth - nRawWidth - 5, nHeight)
+		hSlider:SetRelY((nHeight - nRawHeight) / 2)
+		hImage:SetRelY(hSlider:GetRelY() + 1)
+		hHandle:FormatAllItemPos()
 	elseif componentType == 'WndTable' then
 		raw:SetSize(nWidth, nHeight)
 		GetComponentProp(raw, 'UpdateTableRect')()
@@ -4598,14 +4595,13 @@ end
 function OO:Size(...)
 	self:_checksum()
 	if select('#', ...) > 0 then
-		local arg0, arg1, arg2, arg3 = ...
+		local arg0, arg1 = ...
 		if X.IsFunction(arg0) then
 			for _, raw in ipairs(self.raws) do
 				X.UI(raw):UIEvent('OnSizeChange', arg0)
 			end
 		else
 			local nWidth, nHeight = arg0, arg1
-			local nRawWidth, nRawHeight = arg2, arg3
 			local bAutoWidth = nWidth == 'auto'
 			local bStaticWidth = X.IsNumber(nWidth)
 			local bAutoHeight = nHeight == 'auto'
@@ -4616,7 +4612,7 @@ function OO:Size(...)
 			if bAutoHeight then
 				nHeight = nil
 			end
-			if X.IsNumber(nWidth) or bAutoWidth or X.IsNumber(nHeight) or bAutoHeight or X.IsNumber(nRawWidth) or X.IsNumber(nRawHeight) then
+			if X.IsNumber(nWidth) or bAutoWidth or X.IsNumber(nHeight) or bAutoHeight then
 				for _, raw in ipairs(self.raws) do
 					if bAutoWidth or bStaticWidth then
 						SetComponentProp(raw, 'AutoWidth', bAutoWidth)
@@ -4624,13 +4620,13 @@ function OO:Size(...)
 					if bAutoHeight or bStaticHeight then
 						SetComponentProp(raw, 'AutoHeight', bAutoHeight)
 					end
-					SetComponentSize(raw, bAutoWidth and 'auto' or nWidth, bAutoHeight and 'auto' or nHeight, nRawWidth, nRawHeight)
+					SetComponentSize(raw, bAutoWidth and 'auto' or nWidth, bAutoHeight and 'auto' or nHeight)
 				end
 			end
 		end
 		return self
 	else
-		local raw, w, h, rw, rh = self.raws[1], nil, nil, nil, nil
+		local raw, w, h = self.raws[1], nil, nil
 		if raw then
 			if raw.IsDummyWnd and raw:IsDummyWnd() then
 				raw = raw:Lookup('', '') or raw
@@ -4638,12 +4634,8 @@ function OO:Size(...)
 			if raw.GetSize then
 				w, h = raw:GetSize()
 			end
-			raw = GetComponentElement(raw, 'INNER_RAW')
-			if raw then
-				rw, rh = raw:GetSize()
-			end
 		end
-		return w, h, rw, rh
+		return w, h
 	end
 end
 
@@ -4761,6 +4753,79 @@ function OO:AutoSize(arg0, arg1)
 		end
 	end
 	return self
+end
+
+-- (self) Instance:SliderSize() -- get slider size
+-- (self) Instance:SliderSize(number nWidth, number nHeight) -- set slider size
+function OO:SliderSize(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nWidth, nHeight = ...
+		for _, raw in ipairs(self.raws) do
+			local componentType = GetComponentType(raw)
+			if componentType == 'WndSlider' then
+				local hSlider = GetComponentElement(raw, 'SLIDER')
+				local hHandle = GetComponentElement(raw, 'MAIN_HANDLE')
+				local hText = GetComponentElement(raw, 'TEXT')
+				local hButton = hSlider:Lookup('Btn_Slider')
+				local hImage = hHandle:Lookup('Image_BG')
+				local nOriginWidth, nOriginHeight = hSlider:GetSize()
+				if not nWidth then
+					nWidth = nOriginWidth
+				end
+				if not nHeight then
+					nHeight = nOriginHeight
+				end
+				if nWidth ~= nOriginWidth or nHeight ~= nOriginHeight then
+					hSlider:SetSize(nWidth, nHeight)
+					hSlider:SetRelY(hSlider:GetRelY() - (nHeight - nOriginHeight) / 2)
+					local nBtnWidth = math.min(34, nWidth * 0.6)
+					hButton:SetSize(nBtnWidth, nHeight)
+					hButton:SetRelX((nWidth - nBtnWidth) * hSlider:GetScrollPos() / hSlider:GetStepCount())
+					hText:SetRelX(nWidth + 5)
+					hImage:SetSize(nWidth, nHeight - 2)
+					hImage:SetRelY(hSlider:GetRelY() + 1)
+					hHandle:SetW(nWidth + 5 + hText:GetW())
+					hHandle:FormatAllItemPos()
+				end
+			end
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'SLIDER')
+			if raw then
+				return raw:GetSize()
+			end
+		end
+	end
+end
+
+-- (self) Instance:SliderWidth() -- get slider width
+-- (self) Instance:SliderWidth(number nWidth) -- set slider width
+function OO:SliderWidth(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nWidth = ...
+		return self:SliderSize(nWidth, nil)
+	else
+		local nWidth = self:SliderSize()
+		return nWidth
+	end
+end
+
+-- (self) Instance:SliderHeight() -- get slider height
+-- (self) Instance:SliderHeight(number nHeight) -- set slider height
+function OO:SliderHeight(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nHeight = ...
+		return self:SliderSize(nil, nHeight)
+	else
+		local _, nHeight = self:SliderSize()
+		return nHeight
+	end
 end
 
 -- (bool) Instance:FrameVisualState() -- get frame visual state
