@@ -7,6 +7,9 @@ return {
     ['Generic package searcher and filters'] = '背包、倉庫搜索與對比',
     ['Compare with bag'] = '對比背包',
 
+    -- MY_BagEx_BagNewItem.lua --
+    ['Put new bag item to bottom'] = '背包新獲得物品放置到最後面',
+
     -- MY_BagEx_Bag.lua --
     ['Bag package sort and stack'] = '背包整理、堆疊、鎖定',
     ['Need confirm'] = '需要二次確認',
