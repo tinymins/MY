@@ -158,12 +158,12 @@ function X.UI.OpenIconPicker(fnAction, nCurrentIconID)
 			end
 		end,
 	})
-	ui:Append('WndTrackbar', {
+	ui:Append('WndSlider', {
 		x = 10, y = ICON_ROW_COUNT * 70 + 90 - 70,
 		w = 500, h = 25,
 		textFormatter = ' Page: %d',
 		range = {1, math.ceil(nMaxIconID / ICON_PAGE_SIZE)}, value = ICON_PAGE or 21,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		onChange = function(nVal)
 			X.DelayCall(function() GetPage(nVal) end)
 		end,
