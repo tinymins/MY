@@ -198,10 +198,10 @@ function X.UI.OpenColorPickerEx(fnAction)
 	wnd:Append('Image', { name = 'Select_Image', w = 9, h = 9, x = 0, y = 0 }):Image('ui/Image/Common/Box.Uitex', 9):Toggle(false)
 	wnd:Append('Shadow', { name = 'Select', w = 25, h = 25, x = 20, y = 10, color = { 255, 255, 255 } })
 	wnd:Append('Text', { name = 'Select_Text', x = 50, y = 10, text = g_tStrings.STR_NONE })
-	wnd:Append('WndTrackbar', {
+	wnd:Append('WndSlider', {
 		x = 20, y = 35, h = 25, w = 306, rw = 272,
 		textFormatter = function(val) return ('%d H'):format(val) end,
-		trackbarStyle = X.UI.TRACKBAR_STYLE.SHOW_VALUE,
+		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		value = COLOR_HUE, range = {0, 360},
 		onChange = function(nVal)
 			COLOR_HUE = nVal

@@ -77,8 +77,8 @@ local COMPONENT_SAMPLE = {
 	{'WndRadioBox', 'WndRadioBox', { w = 'auto', h = 'auto', font = 162, text = 'WndRadioBox' }},
 	-- WndScrollHandleBox
 	-- WndScrollWindowBox
-	{'WndTrackbar', 'WndTrackbar', { w = 200, h = COMPONENT_H, font = 162, text = 'WndTrackbar' }},
-	{'WndTrackbar Sized', 'WndTrackbar', { w = 600, h = COMPONENT_H, rw = 400, font = 162, text = 'WndTrackbar' }},
+	{'WndSlider', 'WndSlider', { w = 200, h = COMPONENT_H, font = 162, text = 'WndSlider' }},
+	{'WndSlider Sized', 'WndSlider', { w = 600, h = COMPONENT_H, rw = 400, font = 162, text = 'WndSlider' }},
 	-- WndWebCef
 	-- WndWebPage
 	-- WndWindow
