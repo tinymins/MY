@@ -21,7 +21,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 -------------------------------------------------------------------------------------------------------
 
-X.UI.ITEM_EVENT = X.SetmetaReadonly({
+X.UI.ITEM_EVENT = X.FreezeTable({
 	L_BUTTON_DOWN     = 0x00000001,
 	R_BUTTON_DOWN     = 0x00000002,
 	L_BUTTON_UP       = 0x00000004,
@@ -46,7 +46,7 @@ X.UI.ITEM_EVENT = X.SetmetaReadonly({
 	M_BUTTON_DRAG     = 0x00200000,
 	MOUSE_IN_OUT      = 0x00400000,
 })
-X.UI.CURSOR = CURSOR or X.SetmetaReadonly({
+X.UI.CURSOR = CURSOR or X.FreezeTable({
 	NORMAL              = 0,
 	CAST                = 1,
 	UNABLECAST          = 2,
@@ -97,12 +97,12 @@ X.UI.CURSOR = CURSOR or X.SetmetaReadonly({
 	HOMELAND_BRUSH      = 65,
 	HOMELAND_DIG_CELLAR = 66,
 })
-X.UI.MOUSE_BUTTON = X.SetmetaReadonly({
+X.UI.MOUSE_BUTTON = X.FreezeTable({
 	LEFT   = 1,
 	MIDDLE = 0,
 	RIGHT  = -1,
 })
-X.UI.TIP_POSITION = X.SetmetaReadonly({
+X.UI.TIP_POSITION = X.FreezeTable({
 	FOLLOW_MOUSE              = -1,
 	CENTER                    = ALW.CENTER,
 	LEFT_RIGHT                = ALW.LEFT_RIGHT,
@@ -111,16 +111,16 @@ X.UI.TIP_POSITION = X.SetmetaReadonly({
 	BOTTOM_TOP                = ALW.BOTTOM_TOP,
 	RIGHT_LEFT_AND_BOTTOM_TOP = ALW.RIGHT_LEFT_AND_BOTTOM_TOP,
 })
-X.UI.TIP_HIDE_WAY = X.SetmetaReadonly({
+X.UI.TIP_HIDE_WAY = X.FreezeTable({
 	NO_HIDE      = 100,
 	HIDE         = 101,
 	ANIMATE_HIDE = 102,
 })
-X.UI.SLIDER_STYLE = X.SetmetaReadonly({
+X.UI.SLIDER_STYLE = X.FreezeTable({
 	SHOW_VALUE    = false,
 	SHOW_PERCENT  = true,
 })
-X.UI.IMAGE_TYPE = IMAGE or X.SetmetaReadonly({
+X.UI.IMAGE_TYPE = IMAGE or X.FreezeTable({
 	NORMAL             = 0,
 	LEFT_RIGHT         = 1,
 	RIGHT_LEFT         = 2,
@@ -138,7 +138,7 @@ X.UI.IMAGE_TYPE = IMAGE or X.SetmetaReadonly({
 	REVERSE_TIMER_HIDE = 14,
 	REVERSE_TIMER_SHOW = 15,
 })
-X.UI.WND_SIDE = X.SetmetaReadonly({
+X.UI.WND_SIDE = X.FreezeTable({
 	TOP           = 0,
 	BOTTOM        = 1,
 	LEFT          = 2,
@@ -153,19 +153,19 @@ X.UI.WND_SIDE = X.SetmetaReadonly({
 	TOP_CENTER    = 1,
 	BOTTOM_CENTER = 1,
 })
-X.UI.EDIT_TYPE = X.SetmetaReadonly({
+X.UI.EDIT_TYPE = X.FreezeTable({
 	NUMBER = 0, -- 数字
 	ASCII = 1, -- 英文
 	WIDE_CHAR = 2, -- 中英文
 })
-X.UI.WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or X.SetmetaReadonly({
+X.UI.WND_CONTAINER_STYLE = _G.WND_CONTAINER_STYLE or X.FreezeTable({
 	CUSTOM = 0,
 	LEFT_TOP = 1,
 	LEFT_BOTTOM = 2,
 	RIGHT_TOP = 3,
 	RIGHT_BOTTOM = 4,
 })
-X.UI.FRAME_VISUAL_STATE = X.SetmetaReadonly({
+X.UI.FRAME_VISUAL_STATE = X.FreezeTable({
 	NORMAL = 0, -- 普通
 	MINIMIZE = 1, -- 最小化
 	MAXIMIZE = 2, -- 最大化
@@ -201,7 +201,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 2,
 		nDisableGroup = 3,
 	},
-	LINK = X.SetmetaReadonly({
+	LINK = X.FreezeTable({
 		nWidth = 60,
 		nHeight = 25,
 		nPaddingTop = 3,
@@ -329,9 +329,10 @@ local function ApplyUIArguments(ui, arg)
 		if arg.sort or arg.sortOrder     then ui:Sort             (arg.sort, arg.sortOrder                         ) end
 		if arg.dataSource                then ui:DataSource       (arg.dataSource                                  ) end
 		if arg.summary                   then ui:Summary          (arg.summary                                     ) end
-		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then        -- must after :Text() because w/h can be 'auto'
-			ui:Size(arg.w, arg.h, arg.rw, arg.rh)
+		if arg.sliderWidth ~= nil or arg.sliderHeight ~= nil then -- must after :Text() because w/h can be 'auto', must before :Size() because size depends on this
+			ui:SliderSize(arg.sliderWidth, arg.sliderHeight)
 		end
+		if arg.w ~= nil or arg.h ~= nil  then ui:Size             (arg.w, arg.h                                    ) end -- must after :Text() because w/h can be 'auto'
 		if arg.alignHorizontal or arg.alignVertical then -- must after :Size()
 			ui:Align(arg.alignHorizontal, arg.alignVertical)
 		end
@@ -466,6 +467,14 @@ local function GetComponentElement(raw, elementType)
 				element = wnd:Lookup('', '')
 			end
 		end
+	elseif elementType == 'MAIN_CONTAINER' then -- 放置子组件的容器
+		if componentType == 'WndFrame' then
+			element = GetComponentElement(raw, 'MAIN_WINDOW')
+		elseif componentType == 'WndScrollHandleBox' then
+			element = GetComponentElement(raw, 'MAIN_HANDLE')
+		elseif componentType == 'WndScrollWindowBox' then
+			element = GetComponentElement(raw, 'CONTAINER')
+		end
 	elseif elementType == 'CHECKBOX' then -- 获取复选框UI实例
 		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' or componentType == 'CheckBox' then
 			element = raw
@@ -500,11 +509,11 @@ local function GetComponentElement(raw, elementType)
 		or componentType == 'WndWebCef' then
 			element = raw
 		end
-	elseif elementType == 'WEBPAGE' then -- 获取IE浏览器UI实例
+	elseif elementType == 'WEB_PAGE' then -- 获取IE浏览器UI实例
 		if componentType == 'WndWebPage' then
 			element = raw
 		end
-	elseif elementType == 'WEBCEF' then -- 获取Chrome浏览器UI实例
+	elseif elementType == 'WEB_CEF' then -- 获取Chrome浏览器UI实例
 		if componentType == 'WndWebCef' then
 			element = raw
 		end
@@ -555,20 +564,6 @@ local function GetComponentElement(raw, elementType)
 	elseif elementType == 'BOX' then -- 获取游戏盒子UI实例
 		if componentType == 'Box' then
 			element = raw
-		end
-	elseif elementType == 'INNER_RAW' then -- 获取可设置内部大小的子组件
-		if componentType == 'WndFrame' then
-			element = GetComponentElement(raw, 'MAIN_WINDOW')
-		elseif componentType == 'WndSlider' then
-			element = raw:Lookup('WndNewScrollBar_Default')
-		elseif componentType == 'CheckBox' then
-			element = raw:Lookup('Image_Default')
-		elseif componentType == 'ColorBox' then
-			element = raw:Lookup('Shadow_Default')
-		elseif componentType == 'WndScrollHandleBox' then
-			element = GetComponentElement(raw, 'MAIN_HANDLE')
-		elseif componentType == 'WndScrollWindowBox' then
-			element = GetComponentElement(raw, 'CONTAINER')
 		end
 	end
 	return element
@@ -746,7 +741,7 @@ local function InitComponent(raw, szType)
 			scroll:ScrollNext(-Station.GetMessageWheelDelta() * 2)
 			return 1
 		end
-		scroll:Lookup('Btn_Track').OnMouseWheel = function()
+		scroll:Lookup('Btn_Slider').OnMouseWheel = function()
 			scroll:ScrollNext(-Station.GetMessageWheelDelta())
 			return 1
 		end
@@ -4060,23 +4055,23 @@ end
 
 -- (number) Instance:Width()
 -- (self) Instance:Width(number[, number])
-function OO:Width(nWidth, nRawWidth)
+function OO:Width(nWidth)
 	if nWidth then
-		return self:Size(nWidth, nil, nRawWidth, nil)
+		return self:Size(nWidth, nil)
 	else
-		local w, h, rw, rh = self:Size()
-		return w, rw
+		local nW = self:Size()
+		return nW
 	end
 end
 
 -- (number) Instance:Height()
 -- (self) Instance:Height(number[, number])
-function OO:Height(nHeight, nRawHeight)
+function OO:Height(nHeight)
 	if nHeight then
-		return self:Size(nil, nHeight, nil, nRawHeight)
+		return self:Size(nil, nHeight)
 	else
-		local w, h, rw, rh = self:Size()
-		return h, rh
+		local _, nH = self:Size()
+		return nH
 	end
 end
 
@@ -4512,24 +4507,20 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
 		raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
 	elseif componentType == 'WndSlider' then
-		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-		local sld = GetComponentElement(raw, 'SLIDER')
-		local txt = GetComponentElement(raw, 'TEXT')
+		local hWnd = GetComponentElement(raw, 'MAIN_WINDOW')
+		local hHandle = GetComponentElement(raw, 'MAIN_HANDLE')
+		local hSlider = GetComponentElement(raw, 'SLIDER')
+		local hText = GetComponentElement(raw, 'TEXT')
+		local hImage = hHandle:Lookup('Image_BG')
 		local nWidth = nWidth or math.max(nWidth, (nInnerWidth or 0) + 5)
 		local nHeight = nHeight or math.max(nHeight, (nInnerHeight or 0) + 5)
-		local nRawWidth = math.min(nWidth, nInnerWidth or sld:GetW())
-		local nRawHeight = math.min(nHeight, nInnerHeight or sld:GetH())
-		wnd:SetSize(nWidth, nHeight)
-		sld:SetSize(nRawWidth, nRawHeight)
-		local nBtnWidth = math.min(34, nRawWidth * 0.6)
-		sld:Lookup('Btn_Track'):SetSize(nBtnWidth, nRawHeight)
-		sld:Lookup('Btn_Track'):SetRelX((nRawWidth - nBtnWidth) * sld:GetScrollPos() / sld:GetStepCount())
-		hdl:SetSize(nWidth, nHeight)
-		hdl:Lookup('Image_BG'):SetSize(nRawWidth, nRawHeight - 2)
-		txt:SetRelX(nRawWidth + 5)
-		txt:SetSize(nWidth - nRawWidth - 5, nHeight)
-		hdl:FormatAllItemPos()
+		local nRawWidth, nRawHeight = hSlider:GetSize()
+		hWnd:SetSize(nWidth, nHeight)
+		hHandle:SetSize(nWidth, nHeight)
+		hText:SetSize(nWidth - nRawWidth - 5, nHeight)
+		hSlider:SetRelY((nHeight - nRawHeight) / 2)
+		hImage:SetRelY(hSlider:GetRelY() + 1)
+		hHandle:FormatAllItemPos()
 	elseif componentType == 'WndTable' then
 		raw:SetSize(nWidth, nHeight)
 		GetComponentProp(raw, 'UpdateTableRect')()
@@ -4598,14 +4589,13 @@ end
 function OO:Size(...)
 	self:_checksum()
 	if select('#', ...) > 0 then
-		local arg0, arg1, arg2, arg3 = ...
+		local arg0, arg1 = ...
 		if X.IsFunction(arg0) then
 			for _, raw in ipairs(self.raws) do
 				X.UI(raw):UIEvent('OnSizeChange', arg0)
 			end
 		else
 			local nWidth, nHeight = arg0, arg1
-			local nRawWidth, nRawHeight = arg2, arg3
 			local bAutoWidth = nWidth == 'auto'
 			local bStaticWidth = X.IsNumber(nWidth)
 			local bAutoHeight = nHeight == 'auto'
@@ -4616,7 +4606,7 @@ function OO:Size(...)
 			if bAutoHeight then
 				nHeight = nil
 			end
-			if X.IsNumber(nWidth) or bAutoWidth or X.IsNumber(nHeight) or bAutoHeight or X.IsNumber(nRawWidth) or X.IsNumber(nRawHeight) then
+			if X.IsNumber(nWidth) or bAutoWidth or X.IsNumber(nHeight) or bAutoHeight then
 				for _, raw in ipairs(self.raws) do
 					if bAutoWidth or bStaticWidth then
 						SetComponentProp(raw, 'AutoWidth', bAutoWidth)
@@ -4624,13 +4614,13 @@ function OO:Size(...)
 					if bAutoHeight or bStaticHeight then
 						SetComponentProp(raw, 'AutoHeight', bAutoHeight)
 					end
-					SetComponentSize(raw, bAutoWidth and 'auto' or nWidth, bAutoHeight and 'auto' or nHeight, nRawWidth, nRawHeight)
+					SetComponentSize(raw, bAutoWidth and 'auto' or nWidth, bAutoHeight and 'auto' or nHeight)
 				end
 			end
 		end
 		return self
 	else
-		local raw, w, h, rw, rh = self.raws[1], nil, nil, nil, nil
+		local raw, w, h = self.raws[1], nil, nil
 		if raw then
 			if raw.IsDummyWnd and raw:IsDummyWnd() then
 				raw = raw:Lookup('', '') or raw
@@ -4638,12 +4628,19 @@ function OO:Size(...)
 			if raw.GetSize then
 				w, h = raw:GetSize()
 			end
-			raw = GetComponentElement(raw, 'INNER_RAW')
-			if raw then
-				rw, rh = raw:GetSize()
-			end
 		end
-		return w, h, rw, rh
+		return w, h
+	end
+end
+
+-- (number nW, number nH) Instance:ContainerSize() -- Get container size
+function OO:ContainerSize()
+	local raw = self.raws[1]
+	if raw then
+		raw = GetComponentElement(raw, 'MAIN_CONTAINER')
+		if raw then
+			return raw:GetSize()
+		end
 	end
 end
 
@@ -4761,6 +4758,79 @@ function OO:AutoSize(arg0, arg1)
 		end
 	end
 	return self
+end
+
+-- (self) Instance:SliderSize() -- get slider size
+-- (self) Instance:SliderSize(number nWidth, number nHeight) -- set slider size
+function OO:SliderSize(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nWidth, nHeight = ...
+		for _, raw in ipairs(self.raws) do
+			local componentType = GetComponentType(raw)
+			if componentType == 'WndSlider' then
+				local hSlider = GetComponentElement(raw, 'SLIDER')
+				local hHandle = GetComponentElement(raw, 'MAIN_HANDLE')
+				local hText = GetComponentElement(raw, 'TEXT')
+				local hButton = hSlider:Lookup('Btn_Slider')
+				local hImage = hHandle:Lookup('Image_BG')
+				local nOriginWidth, nOriginHeight = hSlider:GetSize()
+				if not nWidth then
+					nWidth = nOriginWidth
+				end
+				if not nHeight then
+					nHeight = nOriginHeight
+				end
+				if nWidth ~= nOriginWidth or nHeight ~= nOriginHeight then
+					hSlider:SetSize(nWidth, nHeight)
+					hSlider:SetRelY(hSlider:GetRelY() - (nHeight - nOriginHeight) / 2)
+					local nBtnWidth = math.min(34, nWidth * 0.6)
+					hButton:SetSize(nBtnWidth, nHeight)
+					hButton:SetRelX((nWidth - nBtnWidth) * hSlider:GetScrollPos() / hSlider:GetStepCount())
+					hText:SetRelX(nWidth + 5)
+					hImage:SetSize(nWidth, nHeight - 2)
+					hImage:SetRelY(hSlider:GetRelY() + 1)
+					hHandle:SetW(nWidth + 5 + hText:GetW())
+					hHandle:FormatAllItemPos()
+				end
+			end
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'SLIDER')
+			if raw then
+				return raw:GetSize()
+			end
+		end
+	end
+end
+
+-- (self) Instance:SliderWidth() -- get slider width
+-- (self) Instance:SliderWidth(number nWidth) -- set slider width
+function OO:SliderWidth(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nWidth = ...
+		return self:SliderSize(nWidth, nil)
+	else
+		local nWidth = self:SliderSize()
+		return nWidth
+	end
+end
+
+-- (self) Instance:SliderHeight() -- get slider height
+-- (self) Instance:SliderHeight(number nHeight) -- set slider height
+function OO:SliderHeight(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nHeight = ...
+		return self:SliderSize(nil, nHeight)
+	else
+		local _, nHeight = self:SliderSize()
+		return nHeight
+	end
 end
 
 -- (bool) Instance:FrameVisualState() -- get frame visual state
@@ -6028,11 +6098,11 @@ function OO:Complete(fnOnComplete)
 	self:_checksum()
 	if fnOnComplete then
 		for _, raw in ipairs(self.raws) do
-			local wnd = GetComponentElement(raw, 'WEBPAGE')
+			local wnd = GetComponentElement(raw, 'WEB_PAGE')
 			if wnd then
 				X.UI(wnd):UIEvent('OnDocumentComplete', fnOnComplete)
 			end
-			local wnd = GetComponentElement(raw, 'WEBCEF')
+			local wnd = GetComponentElement(raw, 'WEB_CEF')
 			if wnd then
 				X.UI(wnd):UIEvent('OnWebLoadEnd', fnOnComplete)
 			end
@@ -6439,10 +6509,10 @@ function X.UI.CreateFrame(szName, opt)
 				frm:Lookup('Wnd_Total'):Show()
 				frm:Lookup('WndContainer_TitleBtnL'):Show()
 				frm:Lookup('WndContainer_TitleBtnR'):Show()
-				local w, h = this:GetRelPos()
-				w = math.max(w + 16, opt.minWidth)
-				h = math.max(h + 16, opt.minHeight)
-				X.UI(frm):Size(w, h)
+				local nW, nH = this:GetRelPos()
+				nW = math.max(nW + 16, opt.minWidth)
+				nH = math.max(nH + 16, opt.minHeight)
+				X.UI(frm):Size(nW, nH)
 			end
 			frm:Lookup('Btn_Drag'):RegisterLButtonDrag()
 		end
@@ -6518,10 +6588,10 @@ function X.UI.CreateFrame(szName, opt)
 				frm:Lookup('', ''):Show()
 				frm:Lookup('Wnd_Total'):Show()
 				frm:Lookup('WndContainer_TitleBtnR'):Show()
-				local w, h = this:GetRelPos()
-				w = math.max(w + 16, GetComponentProp(frm, 'minWidth'))
-				h = math.max(h + 16, GetComponentProp(frm, 'minHeight'))
-				X.UI(frm):Size(w, h)
+				local nW, nH = this:GetRelPos()
+				nW = math.max(nW + 16, GetComponentProp(frm, 'minWidth'))
+				nH = math.max(nH + 16, GetComponentProp(frm, 'minHeight'))
+				X.UI(frm):Size(nW, nH)
 			end
 			frm:Lookup('Btn_Drag'):RegisterLButtonDrag()
 		end

@@ -26,7 +26,7 @@ function X.UI.OpenTextEditor(szText, opt)
 	end
 	local w, h, ui = opt.w or 400, opt.h or 300, nil
 	local function OnResize()
-		local nW, nH = select(3, ui:Size())
+		local nW, nH = ui:ContainerSize()
 		ui:Fetch('WndEditBox'):Size(nW, nH)
 	end
 	ui = X.UI.CreateFrame(szFrameName, {

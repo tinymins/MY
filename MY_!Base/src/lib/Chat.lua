@@ -427,7 +427,7 @@ local ChatLinkEvents = {
 		end
 	end,
 }
-X.ChatLinkEvents = X.SetmetaReadonly(ChatLinkEvents)
+X.ChatLinkEvents = X.FreezeTable(ChatLinkEvents)
 
 -- 聊天界面元素通用事件绑定函数（this）
 X.ChatLinkEventHandlers = {
@@ -1110,19 +1110,19 @@ end
 -- parserOptions.len     (boolean)        聊天最大长度限制校验，默认不校验
 local StandardizeParserOptions
 do
-local DEFAULT_PARSER_OPTIONS = X.SetmetaReadonly({
+local DEFAULT_PARSER_OPTIONS = X.FreezeTable({
 	name = true,
 	emotion = true,
 	sws = false,
 	len = true,
 })
-local FULL_PARSER_OPTIONS = X.SetmetaReadonly({
+local FULL_PARSER_OPTIONS = X.FreezeTable({
 	name = true,
 	emotion = true,
 	sws = true,
 	len = true,
 })
-local NULL_PARSER_OPTIONS = X.SetmetaReadonly({
+local NULL_PARSER_OPTIONS = X.FreezeTable({
 	name = false,
 	emotion = false,
 	sws = false,

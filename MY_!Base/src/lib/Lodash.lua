@@ -2318,6 +2318,6 @@ _.range = function(start, ...)
     return t
 end
 
-X.lodash = X.SetmetaReadonly(_)
+X.lodash = X.FreezeTable(_)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

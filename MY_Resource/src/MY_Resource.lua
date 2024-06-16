@@ -54,7 +54,7 @@ end
 
 do
 local BUTTON_STYLE_CONFIG = {
-	FLAT = X.SetmetaReadonly({
+	FLAT = X.FreezeTable({
 		nWidth = 100,
 		nHeight = 25,
 		nPaddingTop = 3,
@@ -67,7 +67,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 10,
 		nDisableGroup = 11,
 	}),
-	FLAT_LACE_BORDER = X.SetmetaReadonly({
+	FLAT_LACE_BORDER = X.FreezeTable({
 		nWidth = 148,
 		nHeight = 33,
 		nPaddingTop = 3,
@@ -80,7 +80,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 2,
 		nDisableGroup = 3,
 	}),
-	SKEUOMORPHISM = X.SetmetaReadonly({
+	SKEUOMORPHISM = X.FreezeTable({
 		nWidth = 148,
 		nHeight = 33,
 		nPaddingTop = 3,
@@ -93,7 +93,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 6,
 		nDisableGroup = 7,
 	}),
-	SKEUOMORPHISM_LACE_BORDER = X.SetmetaReadonly({
+	SKEUOMORPHISM_LACE_BORDER = X.FreezeTable({
 		nWidth = 224,
 		nHeight = 64,
 		nPaddingTop = 2,
@@ -106,7 +106,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 14,
 		nDisableGroup = 15,
 	}),
-	QUESTION = X.SetmetaReadonly({
+	QUESTION = X.FreezeTable({
 		nWidth = 20,
 		nHeight = 20,
 		szImage = PLUGIN_ROOT .. '/img/WndButton.UITex',
@@ -115,7 +115,7 @@ local BUTTON_STYLE_CONFIG = {
 		nMouseDownGroup = 18,
 		nDisableGroup = 19,
 	}),
-	UNDERLINE_LINK = X.SetmetaReadonly({
+	UNDERLINE_LINK = X.FreezeTable({
 		nWidth = 60,
 		nHeight = 26,
 		nMarginTop = 14,
