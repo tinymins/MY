@@ -557,20 +557,6 @@ local function GetComponentElement(raw, elementType)
 		if componentType == 'Box' then
 			element = raw
 		end
-	elseif elementType == 'INNER_RAW' then -- 获取可设置内部大小的子组件
-		if componentType == 'WndFrame' then
-			element = GetComponentElement(raw, 'MAIN_WINDOW')
-		elseif componentType == 'WndSlider' then
-			element = raw:Lookup('WndNewScrollBar_Default')
-		elseif componentType == 'CheckBox' then
-			element = raw:Lookup('Image_Default')
-		elseif componentType == 'ColorBox' then
-			element = raw:Lookup('Shadow_Default')
-		elseif componentType == 'WndScrollHandleBox' then
-			element = GetComponentElement(raw, 'MAIN_HANDLE')
-		elseif componentType == 'WndScrollWindowBox' then
-			element = GetComponentElement(raw, 'CONTAINER')
-		end
 	end
 	return element
 end
