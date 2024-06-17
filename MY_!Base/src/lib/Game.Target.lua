@@ -1527,9 +1527,6 @@ function X.GetTargetContextMenu(dwType, szName, dwID)
 		table.insert(t, {
 			szOption = _L['Copy'],
 			fnAction = function()
-				if X.IS_REMAKE and X.IsRestricted('X.CHAT_WUJIE') and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
-					return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
-				end
 				X.SendChat(X.GetClientPlayer().szName, '[' .. szName .. ']')
 			end,
 		})

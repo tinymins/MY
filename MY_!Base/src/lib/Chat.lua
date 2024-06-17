@@ -199,9 +199,6 @@ end
 
 -- ∏¥÷∆¡ƒÃÏ––
 function X.CopyChatLine(hTime, bTextEditor, bRichText)
-	if X.IS_REMAKE and X.IsRestricted('X.CHAT_WUJIE') and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
-		return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
-	end
 	local edit = X.GetChatInput()
 	if bTextEditor then
 		edit = X.UI.OpenTextEditor():Find('.WndEdit')[1]
@@ -338,9 +335,6 @@ local ChatLinkEvents = {
 			InsertInviteTeamMenu(menu, (X.UI(link):Text():gsub('[%[%]]', '')))
 			menu[1].fnAction()
 		elseif IsCtrlKeyDown() then
-			if X.IS_REMAKE and X.IsRestricted('X.CHAT_WUJIE') and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
-				return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
-			end
 			X.CopyChatItem(link)
 		elseif IsShiftKeyDown() then
 			X.SetTarget(TARGET.PLAYER, X.UI(link):Text())
@@ -381,9 +375,6 @@ local ChatLinkEvents = {
 	OnCopyRClick = function(element, link)
 		if not link then
 			link = element
-		end
-		if X.IS_REMAKE and X.IsRestricted('X.CHAT_WUJIE') and GetCurrentTime() < 1718578800 and GetCurrentTime() > 1718146800 then
-			return X.OutputSystemAnnounceMessage(_L['First week of WuJie, chat copy not available.'])
 		end
 		X.RepeatChatLine(link)
 	end,
