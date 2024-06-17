@@ -238,7 +238,9 @@ local CHANNEL_LIST = {
 						return
 					end
 					X.SwitchChatChannel(szName)
+					X.DelayCall(X.FocusChatInput)
 				end, nil, nil, nil, '')
+				return
 			end
 			local t = {}
 			for i, whisper in ipairs(D.aWhisper) do
