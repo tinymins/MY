@@ -16,7 +16,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -- 好友相关接口
 --------------------------------------------------------------------------------
 
-local FELLOWSHIP_ROLE_ENTRY_UPDATE = false
+local FELLOWSHIP_ROLE_ENTRY_UPDATE = nil
 
 ---获取好友分组
 ---@return table @好友分组列表
@@ -225,7 +225,10 @@ function X.GetFellowshipEntryInfo(xPlayerID)
 	local me = X.GetClientPlayer()
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		local tPei = FELLOWSHIP_ROLE_ENTRY_UPDATE and smc.GetRoleEntryInfo(xPlayerID)
+		if FELLOWSHIP_ROLE_ENTRY_UPDATE == false then
+			return
+		end
+		local tPei = smc.GetRoleEntryInfo(xPlayerID)
 		if tPei then
 			tPei = {
 				dwID = tPei.dwPlayerID,
@@ -244,6 +247,9 @@ function X.GetFellowshipEntryInfo(xPlayerID)
 			if szServerName and (szServerName ~= X.GetServerOriginName() or IsRemotePlayer(me.dwID)) then
 				tPei.szName = tPei.szName .. g_tStrings.STR_CONNECT .. szServerName
 			end
+			FELLOWSHIP_ROLE_ENTRY_UPDATE = true
+		else
+			FELLOWSHIP_ROLE_ENTRY_UPDATE = false
 		end
 		return tPei
 	end
