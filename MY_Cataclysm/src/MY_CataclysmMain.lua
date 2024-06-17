@@ -519,6 +519,10 @@ function D.CreateControlBar()
 	if X.IsLeader() then
 		container:AppendContentFromIni(szIniFile, 'WndButton_WorldMark')
 	end
+	-- ’Ÿ«ÎÕÊº“
+	if X.IsLeader() and EnvokeAllTeammates then
+		container:AppendContentFromIni(szIniFile, 'Wnd_EnvokeAllTeammates')
+	end
 	-- ”Ô“Ù∞¥≈•
 	if X.GVoiceBase_IsOpen() then
 		local nSpeakerState = X.GVoiceBase_GetSpeakerState()
@@ -1206,6 +1210,8 @@ function D.OnLButtonClick()
 		else
 			return X.OutputSystemMessage(_L['You are not the distrubutor.'])
 		end
+	elseif szName == 'WndButton_EnvokeAllTeammates' then
+		EnvokeAllTeammates()
 	elseif szName == 'WndButton_Speaker' then
 		X.GVoiceBase_SwitchSpeakerState()
 	elseif szName == 'WndButton_Microphone' then
@@ -1275,6 +1281,8 @@ function D.OnMouseEnter()
 		X.OutputTip(this, _L['MY_TeamNotice'])
 	elseif name == 'Wnd_TeamMon_Subscribe' then
 		X.OutputTip(this, _L['MY_TeamMon_Subscribe'])
+	elseif name == 'WndButton_EnvokeAllTeammates' then
+		X.OutputTip(this, _L['EnvokeAllTeammates'])
 	elseif name == 'WndButton_Speaker' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
