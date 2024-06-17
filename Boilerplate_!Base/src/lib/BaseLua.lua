@@ -381,7 +381,7 @@ end
 ---@param _keyLoader table<string, fun(k: string): any> @表数据的懒加载函数
 ---@param fallbackLoader fun(k: string): any @表数据的通用懒加载函数
 ---@return T @设为懒加载的表
-function X.SetmetaLazyload(t, _keyLoader, fallbackLoader)
+function X.LazyLoadingTable(t, _keyLoader, fallbackLoader)
 	local keyLoader = X.Clone(_keyLoader)
 	local p = setmetatable({}, { __index = t })
 	for k, v in pairs(t) do
