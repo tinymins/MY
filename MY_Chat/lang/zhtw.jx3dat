@@ -25,6 +25,7 @@ return {
     ['AWAY']     = '離',
     ['BUSY']     = '擾',
     ['MOSAICS']  = '馬',
+    ['Please input whisper name'] = '請輸入密聊角色名',
     ['Today: %d\nDaily limit: %d'] = '當日已發：%d\n每日上限：%d',
     ['Today: %d\nDaily limit: no limitation'] = '當日已發：%d\n每日上限：無限制',
 

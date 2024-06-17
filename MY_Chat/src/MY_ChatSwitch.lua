@@ -232,6 +232,14 @@ local CHANNEL_LIST = {
 		channel = PLAYER_TALK_CHANNEL.WHISPER,
 		cd = 0,
 		onClick = function()
+			if IsCtrlKeyDown() then
+				GetUserInput(_L['Please input whisper name'], function(szName)
+					if szName == '' then
+						return
+					end
+					X.SwitchChatChannel(szName)
+				end, nil, nil, nil, '')
+			end
 			local t = {}
 			for i, whisper in ipairs(D.aWhisper) do
 				local info = MY_Farbnamen and MY_Farbnamen.Get(whisper[1])
