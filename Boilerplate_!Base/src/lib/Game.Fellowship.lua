@@ -249,7 +249,11 @@ function X.GetFellowshipEntryInfo(xPlayerID)
 			end
 			FELLOWSHIP_ROLE_ENTRY_UPDATE = true
 		else
-			FELLOWSHIP_ROLE_ENTRY_UPDATE = false
+			X.IterFellowshipInfo(function(tFellowship)
+				if tFellowship.xID == xPlayerID then
+					FELLOWSHIP_ROLE_ENTRY_UPDATE = false
+				end
+			end)
 		end
 		return tPei
 	end
