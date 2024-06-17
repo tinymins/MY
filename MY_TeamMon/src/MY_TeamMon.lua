@@ -104,7 +104,7 @@ local MY_TEAM_MON_SPECIAL_MAP_NAME = {
 }
 local MY_TEAM_MON_SPECIAL_MAP_INFO = {}
 for _, dwMapID in pairs(MY_TEAM_MON_SPECIAL_MAP) do
-	local map = X.SetmetaReadonly({
+	local map = X.FreezeTable({
 		dwID = dwMapID,
 		dwMapID = dwMapID,
 		szName = MY_TEAM_MON_SPECIAL_MAP_NAME[dwMapID],
@@ -170,7 +170,7 @@ local CACHE = {
 	HP_CD_STR   = {},
 }
 
-local D = X.SetmetaLazyload({
+local D = X.LazyLoadingTable({
 	FILE   = {}, -- 文件原始数据
 	META   = {}, -- 文件原信息
 	CONFIG = {}, -- 文件原始配置项

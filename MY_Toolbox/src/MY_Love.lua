@@ -81,7 +81,7 @@ local O = X.CreateUserSettingsModule('MY_Love', _L['Target'], {
 		xDefaultValue = true,
 	},
 })
-local D = X.SetmetaLazyload({
+local D = X.LazyLoadingTable({
 	-- 导出常量
 	nLoveAttraction = 200,
 	nDoubleLoveAttraction = 800,

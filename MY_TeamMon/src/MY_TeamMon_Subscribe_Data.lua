@@ -22,7 +22,7 @@ end
 --------------------------------------------------------------------------
 
 local INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamMon/ui/MY_TeamMon_Subscribe_Data.ini'
-local D = X.SetmetaLazyload({}, {
+local D = X.LazyLoadingTable({}, {
 	PW = function() return X.SECRET['FILE::TEAM_MON_DATA_PW'] end,
 })
 
