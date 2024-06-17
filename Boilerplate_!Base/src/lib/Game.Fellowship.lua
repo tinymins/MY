@@ -16,6 +16,8 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -- 好友相关接口
 --------------------------------------------------------------------------------
 
+local FELLOWSHIP_ROLE_ENTRY_UPDATE = false
+
 ---获取好友分组
 ---@return table @好友分组列表
 function X.GetFellowshipGroupInfoList()
@@ -223,7 +225,7 @@ function X.GetFellowshipEntryInfo(xPlayerID)
 	local me = X.GetClientPlayer()
 	local smc = X.GetSocialManagerClient()
 	if smc then
-		local tPei = smc.GetRoleEntryInfo(xPlayerID)
+		local tPei = FELLOWSHIP_ROLE_ENTRY_UPDATE and smc.GetRoleEntryInfo(xPlayerID)
 		if tPei then
 			tPei = {
 				dwID = tPei.dwPlayerID,
@@ -364,5 +366,9 @@ end
 function X.IsFoe(xPlayerID)
 	return X.GetFoeInfo(xPlayerID) and true or false
 end
+
+RegisterEvent('FELLOWSHIP_ROLE_ENTRY_UPDATE', function()
+	FELLOWSHIP_ROLE_ENTRY_UPDATE = true
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
