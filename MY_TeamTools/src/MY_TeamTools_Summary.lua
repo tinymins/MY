@@ -428,7 +428,7 @@ function D.UpdateList(page)
 							D.GetTotalEquipScore(page, v.dwID)
 							OutputItemTip(UI_OBJECT_ITEM_INFO, X.ENVIRONMENT.CURRENT_ITEM_VERSION, vv.dwTabType, vv.dwIndex, {x, y, w, h})
 						else
-							OutputItemTip(UI_OBJECT_ITEM_ONLY_ID, vv.dwID, nil, nil, { x, y, w, h })
+							OutputItemTip(UI_OBJECT_ITEM_ONLY_ID, vv.dwID, nil, nil, { x, y, w, h }, nil, nil, nil, nil, nil, v.dwID)
 						end
 					end
 					box:Show()
