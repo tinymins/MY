@@ -729,6 +729,9 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 		if not X.IsPartnerNpc(KCaster.dwTemplateID) then -- 宠物的数据算在主人统计中，侠客除外
 			KCaster = X.GetObject(KCaster.dwEmployer)
 		end
+		if not KCaster then
+			return
+		end
 		dwCasterEmployer = KCaster.dwEmployer
 	end
 	KTarget, dwTargetEmployer = X.GetObject(dwTarget), nil
