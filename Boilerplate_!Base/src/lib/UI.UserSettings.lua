@@ -39,7 +39,7 @@ function D.Open(bImport)
 		w = W - 20, h = H - 60 - 40,
 		containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP,
 	})
-	local nW = select(2, uiContainer:Width())
+	local nW = uiContainer:ContainerWidth()
 	local aGroup, tItemAll = {}, {}
 	for _, us in ipairs(X.GetRegisterUserSettingsList()) do
 		if us.szGroup and us.szLabel and (not bImport or tSettings[us.szKey]) then
