@@ -4635,6 +4635,7 @@ end
 
 -- (number nW, number nH) Instance:ContainerSize() -- Get container size
 function OO:ContainerSize()
+	self:_checksum()
 	local raw = self.raws[1]
 	if raw then
 		raw = GetComponentElement(raw, 'MAIN_CONTAINER')
@@ -4642,6 +4643,16 @@ function OO:ContainerSize()
 			return raw:GetSize()
 		end
 	end
+end
+
+-- (number nW) Instance:ContainerWidth() -- Get container width
+function OO:ContainerWidth()
+	return (self:ContainerSize())
+end
+
+-- (number nH) Instance:ContainerHeight() -- Get container height
+function OO:ContainerHeight()
+	return (select(2, self:ContainerSize()))
 end
 
 -- (self) Instance:MinSize() -- Get element min size
