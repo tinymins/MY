@@ -33,6 +33,12 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bIgnoreNewStackItem = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_BagEx'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 })
 local D = {}
 local BAG_ITEM_CACHE = {}
@@ -68,8 +74,11 @@ function D.OnBagItemUpdate(dwBox, dwX)
 	local me = X.GetClientPlayer()
 	local kItem = X.GetInventoryItem(me, dwBox, dwX)
 	if kItem then
-		if BAG_ITEM_CACHE[kItem.dwID] and BAG_ITEM_CACHE[kItem.dwID] == (kItem.bCanStack and kItem.nStackNum or 1) then
-			if NEW_ITEM_FLAG_TIME[kItem.dwID] and NEW_ITEM_FLAG_TIME[kItem.dwID] > GetCurrentTime() then
+		local bNewItem = not BAG_ITEM_CACHE[kItem.dwID]
+		local bNewStack = BAG_ITEM_CACHE[kItem.dwID] and BAG_ITEM_CACHE[kItem.dwID] ~= (kItem.bCanStack and kItem.nStackNum or 1)
+		if not bNewItem and (not bNewStack or O.bIgnoreNewStackItem) then
+			local bNewFlag = NEW_ITEM_FLAG_TIME[kItem.dwID] and NEW_ITEM_FLAG_TIME[kItem.dwID] > GetCurrentTime()
+			if bNewFlag or bNewStack then
 				D.ShowNewItemFlag(dwBox, dwX)
 			end
 		elseif O.bNewToBottom then
@@ -124,6 +133,14 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		checked = O.bAvoidLock,
 		onCheck = function(bChecked)
 			O.bAvoidLock = bChecked
+		end,
+	}):AutoWidth():Width() + 5
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200,
+		text = _L['Ignore exist item'],
+		checked = O.bIgnoreNewStackItem,
+		onCheck = function(bChecked)
+			O.bIgnoreNewStackItem = bChecked
 		end,
 	}):AutoWidth():Width() + 5
 	return nX, nY
