@@ -59,7 +59,7 @@ function D.CreateBagItemCache()
 	BAG_ITEM_CACHE = {}
 	X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(kItem, dwBox, dwX)
 		if kItem then
-			BAG_ITEM_CACHE[kItem.dwID] = true
+			BAG_ITEM_CACHE[kItem.dwID] = kItem.bCanStack and kItem.nStackNum or 1
 		end
 	end)
 end
@@ -68,7 +68,7 @@ function D.OnBagItemUpdate(dwBox, dwX)
 	local me = X.GetClientPlayer()
 	local kItem = X.GetInventoryItem(me, dwBox, dwX)
 	if kItem then
-		if BAG_ITEM_CACHE[kItem.dwID] then
+		if BAG_ITEM_CACHE[kItem.dwID] and BAG_ITEM_CACHE[kItem.dwID] == (kItem.bCanStack and kItem.nStackNum or 1) then
 			if NEW_ITEM_FLAG_TIME[kItem.dwID] and NEW_ITEM_FLAG_TIME[kItem.dwID] > GetCurrentTime() then
 				D.ShowNewItemFlag(dwBox, dwX)
 			end
@@ -98,6 +98,11 @@ function D.OnBagItemUpdate(dwBox, dwX)
 				X.OutputDebugMessage('MY_BagEx_BagNewItem', 'ExchangeItem: ' .. dwBox .. ',' .. dwX .. ' <-> ' .. dwExcBox .. ',' .. dwExcX, X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 				X.ExchangeInventoryItem(dwBox, dwX, dwExcBox, dwExcX)
+			else
+				--[[#DEBUG BEGIN]]
+				X.OutputDebugMessage('MY_BagEx_BagNewItem', 'NotExchangeItem: ' .. dwBox .. ',' .. dwX, X.DEBUG_LEVEL.LOG)
+				--[[#DEBUG END]]
+				D.ShowNewItemFlag(dwBox, dwX)
 			end
 		end
 	end
