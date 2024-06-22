@@ -27,6 +27,12 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bAvoidLock = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_BagEx'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 })
 local D = {}
 local BAG_ITEM_CACHE = {}
@@ -77,7 +83,10 @@ function D.OnBagItemUpdate(dwBox, dwX)
 						)
 						or (dwIterBox == dwBox and dwIterX == dwX)
 					)
-					and not MY_BagEx_Bag.IsItemBoxLocked(dwIterBox, dwIterX) then
+					and (
+						not MY_BagEx_Bag.IsItemBoxLocked(dwIterBox, dwIterX)
+						or not O.bAvoidLock
+					) then
 						dwExcBox, dwExcX = dwIterBox, dwIterX
 					end
 				end
@@ -102,6 +111,14 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		checked = O.bNewToBottom,
 		onCheck = function(bChecked)
 			O.bNewToBottom = bChecked
+		end,
+	}):AutoWidth():Width() + 5
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200,
+		text = _L['Avoid locked bag box'],
+		checked = O.bAvoidLock,
+		onCheck = function(bChecked)
+			O.bAvoidLock = bChecked
 		end,
 	}):AutoWidth():Width() + 5
 	return nX, nY

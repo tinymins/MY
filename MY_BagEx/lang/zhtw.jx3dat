@@ -9,6 +9,7 @@ return {
 
     -- MY_BagEx_BagNewItem.lua --
     ['Put new bag item to bottom'] = '背包新獲得物品放置到最後面',
+    ['Avoid locked bag box'] = '避開鎖定的背包格子',
 
     -- MY_BagEx_Bag.lua --
     ['Bag package sort and stack'] = '背包整理、堆疊、鎖定',
