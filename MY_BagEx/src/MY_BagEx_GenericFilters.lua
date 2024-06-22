@@ -234,15 +234,49 @@ local function Hook()
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
 
-		local nX = 277
+		local nPaddingX = 277
 		local img = Station.Lookup('Normal/BigBankPanel', 'Image_BagBox6')
 		if img then
-			nX = img:GetRelX() + img:GetW() + 5
+			nPaddingX = img:GetRelX() + img:GetW() + 5
 		end
 
-		X.UI(frame):Append('WndEditBox', {
+		local ui = X.UI(frame)
+		local nX = nPaddingX
+
+		nX = nX + ui:Append('WndCheckBox', {
+			name = 'CheckBox_TimeLtd',
+			x = nX, y = 56, alpha = 200,
+			text = _L['Time Limited'],
+			checked = l_bBankTimeLtd,
+			onCheck = function(bChecked)
+				if bChecked then
+					X.UI('Normal/BigBankPanel/WndCheckBox_Compare'):Check(false)
+				end
+				l_bBankTimeLtd = bChecked
+				DoFilterBank(true)
+			end
+		}):Width() + 3
+
+		nX = nX + ui:Append('WndCheckBox', {
+			name = 'WndCheckBox_Compare',
+			x = nX, y = 56,
+			text = _L['Compare with bag'],
+			checked = l_bCompareBank,
+			onCheck = function(bChecked)
+				if bChecked then
+					X.UI('Normal/BigBankPanel/CheckBox_TimeLtd'):Check(false)
+				end
+				l_bCompareBank = bChecked
+				DoCompareBank(true)
+			end
+		}):Width() + 3
+
+		local nW = nX - nPaddingX
+		nX = nPaddingX
+
+		ui:Append('WndEditBox', {
 			name = 'WndEditBox_KeyWord',
-			w = 150, h = 21, x = nX + 3, y = 80,
+			x = nX + 3, y = 80, w = nW, h = 21,
 			text = l_szBankFilter,
 			placeholder = _L['Search'],
 			onChange = function(txt)
@@ -253,34 +287,6 @@ local function Hook()
 				l_szBankFilter = txt
 				DoFilterBank(true)
 			end,
-		})
-
-		X.UI(frame):Append('WndCheckBox', {
-			name = 'WndCheckBox_Compare',
-			w = 100, x = nX + 63, y = 56,
-			text = _L['Compare with bag'],
-			checked = l_bCompareBank,
-			onCheck = function(bChecked)
-				if bChecked then
-					X.UI('Normal/BigBankPanel/CheckBox_TimeLtd'):Check(false)
-				end
-				l_bCompareBank = bChecked
-				DoCompareBank(true)
-			end
-		})
-
-		X.UI(frame):Append('WndCheckBox', {
-			name = 'CheckBox_TimeLtd',
-			w = 60, x = nX, y = 56, alpha = 200,
-			text = _L['Time Limited'],
-			checked = l_bBankTimeLtd,
-			onCheck = function(bChecked)
-				if bChecked then
-					X.UI('Normal/BigBankPanel/WndCheckBox_Compare'):Check(false)
-				end
-				l_bBankTimeLtd = bChecked
-				DoFilterBank(true)
-			end
 		})
 
 		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, { bHookReturn = true })
