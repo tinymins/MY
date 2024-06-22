@@ -31,6 +31,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 local D = {}
 local BAG_ITEM_CACHE = {}
 local NEW_ITEM_FLAG_TIME = {}
+local EXCHANGE_BOX_TIME = {}
 
 function D.ShowNewItemFlag(dwBox, dwX)
 	local frame = Station.Lookup('Normal/BigBagPanel')
@@ -70,7 +71,10 @@ function D.OnBagItemUpdate(dwBox, dwX)
 			for _, dwIterBox in ipairs(X.GetInventoryBoxList(X.CONSTANT.INVENTORY_TYPE.PACKAGE)) do
 				for dwIterX = 0, X.GetInventoryBoxSize(dwIterBox) - 1 do
 					if (
-						not X.GetInventoryItem(me, dwIterBox, dwIterX)
+						(
+							not X.GetInventoryItem(me, dwIterBox, dwIterX)
+							and ((EXCHANGE_BOX_TIME[dwIterBox .. ',' .. dwIterX] or 0) < GetCurrentTime())
+						)
 						or (dwIterBox == dwBox and dwIterX == dwX)
 					)
 					and not MY_BagEx_Bag.IsItemBoxLocked(dwIterBox, dwIterX) then
@@ -79,6 +83,7 @@ function D.OnBagItemUpdate(dwBox, dwX)
 				end
 			end
 			if dwExcBox and dwExcX and dwExcBox ~= dwBox or dwExcX ~= dwX then
+				EXCHANGE_BOX_TIME[dwExcBox .. ',' .. dwExcX] = GetCurrentTime() + 1 -- 保证一秒内不同时交换两个物品到同一个格子导致失败
 				NEW_ITEM_FLAG_TIME[kItem.dwID] = GetCurrentTime() + 5 -- 五秒内始终认为该物品为新物品
 				--[[#DEBUG BEGIN]]
 				X.OutputDebugMessage('MY_BagEx_BagNewItem', 'ExchangeItem: ' .. dwBox .. ',' .. dwX .. ' <-> ' .. dwExcBox .. ',' .. dwExcX, X.DEBUG_LEVEL.LOG)
