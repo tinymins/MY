@@ -82,6 +82,15 @@ function X.GetServerOriginName()
 	return szServerOriginName or szServerDisplayName
 end
 
+-- 获取服务器ID
+---@return number @服务器ID
+function X.GetServerID()
+	if not GetCenterID then
+		return 0
+	end
+	return GetCenterID() or 0
+end
+
 -- 通过跨服服务器ID获取服务器名称
 ---@param dwServerID number @服务器ID
 ---@return string|nil @服务器名称，不存在则返回空
