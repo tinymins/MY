@@ -12,6 +12,13 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/BgMsgCenter')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/BgMsgCenter/')
 --------------------------------------------------------------------------------
 
+local function GetReplyChannel(nChannel, szTalkerName)
+	if nChannel == PLAYER_TALK_CHANNEL.WHISPER then
+		return szTalkerName
+	end
+	return nChannel
+end
+
 -- 测试用（请求共享位置）
 X.RegisterBgMsg('ASK_CURRENT_LOC', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf then
@@ -22,7 +29,8 @@ X.RegisterBgMsg('ASK_CURRENT_LOC', function(_, data, nChannel, dwTalkerID, szTal
 		szMessage = _L('[%s] wants to get your location, would you like to share?', szTalkerName), {
 			szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
 				local me = X.GetClientPlayer()
-				X.SendBgMsg(szTalkerName, 'REPLY_CURRENT_LOC', { me.GetMapID(), me.nX, me.nY, me.nZ }, true)
+				local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+				X.SendBgMsg(nReplyChannel, 'REPLY_CURRENT_LOC', { me.GetMapID(), me.nX, me.nY, me.nZ }, true)
 			end
 		}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
 	})
@@ -37,7 +45,8 @@ X.RegisterBgMsg(X.NSFormatString('{$NS}_VERSION_CHECK'), function(_, oData, nCha
 	if not bSilent and X.IsInParty() then
 		X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed %s v%s', X.PACKET_INFO.NAME, X.PACKET_INFO.VERSION))
 	end
-	X.SendBgMsg(szTalkerName, X.NSFormatString('{$NS}_VERSION_REPLY'), {X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD}, true)
+	local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+	X.SendBgMsg(nReplyChannel, X.NSFormatString('{$NS}_VERSION_REPLY'), {X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD}, true)
 end)
 
 -- 测试用（调试工具）
@@ -49,47 +58,52 @@ X.RegisterBgMsg(X.NSFormatString('{$NS}_GFN_CHECK'), function(_, oData, nChannel
 end)
 
 -- 进组查看属性
-X.RegisterBgMsg('RL', function(_, data, nChannel, dwID, szName, bIsSelf)
+X.RegisterBgMsg('RL', function(_, data, nChannel, dwTalkerID, szTalkerName, bIsSelf)
 	if not bIsSelf then
+		local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
 		if data[1] == 'ASK' then
-			X.Confirm(_L('[%s] want to see your info, OK?', szName), function()
+			X.Confirm(_L('[%s] want to see your info, OK?', szTalkerName), function()
 				local me = X.GetClientPlayer()
 				local nGongZhan = X.GetBuff(me, 3219) and 1 or 0
 				local bEx = X.IsAuthor(me.dwID) and 'Author' or 'Player'
-				X.SendBgMsg(szName, 'RL', {'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx}, true)
+				X.SendBgMsg(nReplyChannel, 'RL', {'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx}, true)
 			end)
 		end
 	end
 end)
 
 -- 查看完整属性
-X.RegisterBgMsg('CHAR_INFO', function(_, data, nChannel, dwID, szName, bIsSelf)
+X.RegisterBgMsg('CHAR_INFO', function(_, data, nChannel, dwTalkerID, szTalkerName, bIsSelf)
 	if not bIsSelf and data[2] == X.GetClientPlayerID() then
+		local nReplyChannel = X.IsParty(dwTalkerID)
+			and PLAYER_TALK_CHANNEL.RAID
+			or GetReplyChannel(nChannel, szTalkerName)
 		if data[1] == 'ASK'  then
 			if not _G.MY_CharInfo or _G.MY_CharInfo.bEnable or data[3] == 'DEBUG' then
 				local aInfo = X.GetClientPlayerCharInfo()
-				if not X.IsParty(dwID) and not data[3] == 'DEBUG' then
+				if not X.IsParty(dwTalkerID) and not data[3] == 'DEBUG' then
 					for _, v in ipairs(aInfo) do
 						v.tip = nil
 					end
 				end
-				X.SendBgMsg(X.IsParty(dwID) and PLAYER_TALK_CHANNEL.RAID or szName, 'CHAR_INFO', {'ACCEPT', dwID, aInfo}, true)
+				X.SendBgMsg(nReplyChannel, 'CHAR_INFO', {'ACCEPT', dwTalkerID, aInfo}, true)
 			else
-				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', {'REFUSE', dwID}, true)
+				X.SendBgMsg(nReplyChannel, 'CHAR_INFO', {'REFUSE', dwTalkerID}, true)
 			end
 		end
 	end
 end)
 
 -- 搬运JH_ABOUT
-X.RegisterBgMsg(X.NSFormatString('{$NS}_ABOUT'), function(_, data, nChannel, dwID, szName, bIsSelf)
+X.RegisterBgMsg(X.NSFormatString('{$NS}_ABOUT'), function(_, data, nChannel, dwTalkerID, szTalkerName, bIsSelf)
+	local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
 	if data[1] == 'Author' then -- 版本检查 自用 可以绘制详细表格
 		local me, szTong = X.GetClientPlayer(), ''
 		if me.dwTongID > 0 then
 			szTong = GetTongClient().ApplyGetTongName(me.dwTongID) or 'Failed'
 		end
 		local szServer = select(2, GetUserServer())
-		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_ABOUT'), {'info',
+		X.SendBgMsg(nReplyChannel, X.NSFormatString('{$NS}_ABOUT'), {'info',
 			me.GetTotalEquipScore(),
 			me.GetMapID(),
 			szTong,
@@ -100,15 +114,15 @@ X.RegisterBgMsg(X.NSFormatString('{$NS}_ABOUT'), function(_, data, nChannel, dwI
 		}, true)
 	elseif data[1] == 'TeamAuth' then -- 防止有人睡着 遇到了不止一次了
 		local team = GetClientTeam()
-		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwID)
-		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwID)
-		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
+		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwTalkerID)
+		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwTalkerID)
+		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwTalkerID)
 	elseif data[1] == 'TeamLeader' then
-		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwID)
+		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwTalkerID)
 	elseif data[1] == 'TeamMark' then
-		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwID)
+		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwTalkerID)
 	elseif data[1] == 'TeamDistribute' then
-		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
+		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwTalkerID)
 	elseif data[1] == 'RESTRICTION' then
 		X.IsRestricted(data[2], data[3])
 	elseif data[1] == 'DEBUG' then
@@ -171,7 +185,8 @@ do
 		--[[#DEBUG END]]
 		if bResponse then
 			local function fnAction(tMapID)
-				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_MAP_COPY_ID'), {dwMapID, tMapID[dwMapID] or -1}, true)
+				local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+				X.SendBgMsg(nReplyChannel, X.NSFormatString('{$NS}_MAP_COPY_ID'), {dwMapID, tMapID[dwMapID] or -1}, true)
 			end
 			X.GetMapSaveCopy(fnAction)
 			LAST_TIME[dwMapID] = GetCurrentTime()
@@ -212,6 +227,7 @@ do
 		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, szDebug, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_SWITCH_MAP'), {dwMapID, dwSubID, aMapCopy, dwTime}, true)
+		X.SendBgMsg(PLAYER_TALK_CHANNEL.ROOM, X.NSFormatString('{$NS}_SWITCH_MAP'), {dwMapID, dwSubID, aMapCopy, dwTime}, true)
 	end
 
 	-- 成功进入某地图并加载完成（进入后）
@@ -236,6 +252,7 @@ do
 		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, szDebug, X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_ENTER_MAP'), {dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime, nCopyIndex}, true)
+		X.SendBgMsg(PLAYER_TALK_CHANNEL.ROOM, X.NSFormatString('{$NS}_ENTER_MAP'), {dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime, nCopyIndex}, true)
 	end
 
 	local function OnCrossMapGoFB()
@@ -386,7 +403,8 @@ do
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then
-			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_GLOBAL_ID'), X.GetClientPlayerGlobalID(), true)
+			local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+			X.SendBgMsg(nReplyChannel, X.NSFormatString('{$NS}_GLOBAL_ID'), X.GetClientPlayerGlobalID(), true)
 			LAST_TIME = GetCurrentTime()
 		end
 	end)
