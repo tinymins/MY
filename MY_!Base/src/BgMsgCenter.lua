@@ -397,7 +397,7 @@ end
 
 do
 	local LAST_ACHI_TIME, LAST_COUNTER_TIME = {}, {}
-	X.RegisterBgMsg(X.NSFormatString('{$NS}_TEAMTOOLS_ACHI_REQ'), function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	X.RegisterBgMsg('MY_TEAMTOOLS_ACHI_REQ', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 		if bSelf then
 			--[[#DEBUG BEGIN]]
 			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Team achievement request sent.', X.DEBUG_LEVEL.LOG)
@@ -471,7 +471,7 @@ do
 				LAST_COUNTER_TIME[dwCounterID] = GetCurrentTime()
 				table.insert(aCounterRes, {dwCounterID, me.GetAchievementCount(dwCounterID)})
 			end
-			X.SendBgMsg(nChannel, X.NSFormatString('{$NS}_TEAMTOOLS_ACHI_RES'), {aAchieveRes, aCounterRes}, true)
+			X.SendBgMsg(nChannel, 'MY_TEAMTOOLS_ACHI_RES', {aAchieveRes, aCounterRes}, true)
 		end
 	end)
 	X.RegisterEvent({
