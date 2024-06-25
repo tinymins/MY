@@ -430,7 +430,7 @@ function D.DelayRequestTeamData()
 end
 
 X.RegisterBgMsg('MY_TEAMTOOLS_ACHI_RES', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
-	local aAchieveRes, aCounterRes = data[1], data[2]
+	local aAchieveRes, aCounterRes, szGlobalID = data[1], data[2], data[3]
 	if not ACHIEVE_CACHE[dwTalkerID] then
 		ACHIEVE_CACHE[dwTalkerID] = {}
 	end
@@ -443,11 +443,9 @@ X.RegisterBgMsg('MY_TEAMTOOLS_ACHI_RES', function(_, data, nChannel, dwTalkerID,
 	for _, v in ipairs(aCounterRes) do
 		COUNTER_CACHE[dwTalkerID][v[1]] = v[2]
 	end
-	for _, tMember in pairs(D.GetMemberList()) do
-		if not tMember.dwID and tMember.szGlobalID and tMember.szName == szTalkerName then
-			ACHIEVE_CACHE[tMember.szGlobalID] = ACHIEVE_CACHE[dwTalkerID]
-			COUNTER_CACHE[tMember.szGlobalID] = COUNTER_CACHE[dwTalkerID]
-		end
+	if X.IsString(szGlobalID) then
+		ACHIEVE_CACHE[szGlobalID] = ACHIEVE_CACHE[dwTalkerID]
+		COUNTER_CACHE[szGlobalID] = COUNTER_CACHE[dwTalkerID]
 	end
 	FireUIEvent('MY_TEAMTOOLS_ACHI')
 end)

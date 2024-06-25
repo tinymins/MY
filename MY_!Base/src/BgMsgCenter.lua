@@ -471,7 +471,7 @@ do
 				LAST_COUNTER_TIME[dwCounterID] = GetCurrentTime()
 				table.insert(aCounterRes, {dwCounterID, me.GetAchievementCount(dwCounterID)})
 			end
-			X.SendBgMsg(nChannel, 'MY_TEAMTOOLS_ACHI_RES', {aAchieveRes, aCounterRes}, true)
+			X.SendBgMsg(nChannel, 'MY_TEAMTOOLS_ACHI_RES', {aAchieveRes, aCounterRes, X.GetClientPlayerGlobalID()}, true)
 		end
 	end)
 	X.RegisterEvent({
