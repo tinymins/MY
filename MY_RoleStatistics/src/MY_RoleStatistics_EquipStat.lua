@@ -396,7 +396,7 @@ function D.FlushDB()
 					strength = X.GetItemStrengthLevel(KItem, me)
 					durability = KItem.nCurrentDurability
 					diamond_enchant = AnsiToUTF8(X.EncodeJSON(aDiamondEnchant)) -- 五行石
-					fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and KItem.GetMountFEAEnchantID() or 0 -- 五彩石
+					fea_enchant = KItem.nSub == EQUIPMENT_SUB.MELEE_WEAPON and X.GetItemMountFEAEnchantID(KItem) or 0 -- 五彩石
 					permanent_enchant = KItem.dwPermanentEnchantID -- 附魔
 					desc = AnsiToUTF8(X.GetItemTip(KItem) or '')
 				end
@@ -747,6 +747,7 @@ function D.OnInitPage()
 	local frame = this:GetRoot()
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 	frame:RegisterEvent('MY_ROLE_STAT_EQUIP_UPDATE')
+	frame:RegisterEvent('WEAPON_BIND_COLOR_DIAMOND')
 
 	D.OnResizePage()
 end
@@ -788,7 +789,8 @@ end
 function D.OnEvent(event)
 	if event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdateNames(this)
-	elseif event == 'MY_ROLE_STAT_EQUIP_UPDATE' then
+	elseif event == 'MY_ROLE_STAT_EQUIP_UPDATE'
+		or event == 'WEAPON_BIND_COLOR_DIAMOND' then
 		D.FlushDB()
 		D.UpdateNames(this)
 	end
