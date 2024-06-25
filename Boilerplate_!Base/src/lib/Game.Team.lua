@@ -120,6 +120,7 @@ function X.GetTeamMemberInfo(dwID)
 				bDeathFlag = info.bDeathFlag,
 				nCamp = info.nCamp,
 				dwForceID = info.dwForceID,
+				dwKungfuID = info.dwMountKungfuID,
 				nMaxLife = info.nMaxLife,
 				nCurrentLife = info.nCurrentLife,
 				nMaxMana = info.nMaxMana,
@@ -131,7 +132,6 @@ function X.GetTeamMemberInfo(dwID)
 				nRoleType = info.nRoleType,
 				nFormationCoefficient = info.nFormationCoefficient,
 				dwMiniAvatarID = info.dwMiniAvatarID,
-				dwMountKungfuID = info.dwMountKungfuID,
 				-- nVipType = info.nVipType,
 				bIdentityVisible = info.bIdentityVisiable,
 				dwIdentityVisible = info.dwIdentityVisiable,
@@ -141,13 +141,14 @@ function X.GetTeamMemberInfo(dwID)
 	end
 	if dwID == UI_GetClientPlayerID() then
 		return {
-			szGlobalID = me.GetGlobalID(),
+			szGlobalID = X.GetClientPlayerGlobalID(),
 			szName = me.szName,
 			nLevel = me.nLevel,
 			bOnLine = true,
 			bDeathFlag = me.nMoveState == MOVE_STATE.ON_DEATH,
 			nCamp = me.nCamp,
 			dwForceID = me.dwForceID,
+			dwKungfuID = UI_GetPlayerMountKungfuID(),
 			nMaxLife = me.nMaxLife,
 			nCurrentLife = me.nCurrentLife,
 			nMaxMana = me.nMaxMana,
@@ -159,10 +160,73 @@ function X.GetTeamMemberInfo(dwID)
 			nRoleType = me.nRoleType,
 			nFormationCoefficient = 0,
 			dwMiniAvatarID = me.dwMiniAvatarID,
-			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
 			-- nVipType = info.nVipType,
 			bIdentityVisible = true,
 			dwIdentityVisible = 0,
+		}
+	end
+end
+
+-- 获取房间成员GlobalID列表
+---@return table @成员GlobalID列表
+function X.GetRoomMemberList()
+	if RoomBase_GetRoomInfo then
+		local info = RoomBase_GetRoomInfo()
+		if info then
+			local aList = {}
+			for _, v in ipairs(info) do
+				table.insert(aList, v.szGlobalID)
+			end
+			return aList
+		end
+	end
+	return { X.GetClientPlayerGlobalID() }
+end
+
+-- 获取房间成员信息
+---@param szGlobalID string @需要获取的角色GlobalID
+---@return table @成员信息，获取失败返回空
+function X.GetRoomMemberInfo(szGlobalID)
+	if RoomBase_GetRoomInfo then
+		local info = RoomBase_GetRoomInfo()
+		if info then
+			for _, v in ipairs(info) do
+				if v.szGlobalID == szGlobalID then
+					return {
+						szGlobalID = v.szGlobalID,
+						szName = v.szName,
+						nLevel = v.nLevel,
+						nCamp = v.nCamp,
+						nRoleType = v.nRoleType,
+						dwForceID = v.dwForceID,
+						dwKungfuID = v.dwKungfuID,
+						nEquipScore = v.nEquipScore,
+						dwMiniAvatarID = v.dwMiniAvatarID,
+						nMemberIndex = v.nMemberIndex,
+						dwServerID = v.dwCenterID,
+						nProcess = v.nProcess,
+						nClientVersionType = v.nClientVersionType,
+					}
+				end
+			end
+		end
+	end
+	local me = X.GetClientPlayer()
+	if szGlobalID == X.GetClientPlayerGlobalID() then
+		return {
+			szGlobalID = X.GetClientPlayerGlobalID(),
+			szName = me.szName,
+			nLevel = me.nLevel,
+			nCamp = me.nCamp,
+			nRoleType = me.nRoleType,
+			dwForceID = me.dwForceID,
+			dwKungfuID = UI_GetPlayerMountKungfuID(),
+			nEquipScore = me.GetTotalEquipScore() or 0,
+			dwMiniAvatarID = me.dwMiniAvatarID,
+			nMemberIndex = 0,
+			dwServerID = X.GetServerID(),
+			nProcess = 0,
+			nClientVersionType = 0,
 		}
 	end
 end
