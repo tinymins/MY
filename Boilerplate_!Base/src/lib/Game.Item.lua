@@ -201,6 +201,17 @@ function X.GetItemMountDiamondEnchantID(KItem, nSlotIndex, KPlayer)
 	return dwItemEnchantID, dwItemEnchantID, 0
 end
 
+-- 获取物品五彩石孔镶嵌信息
+---@param kItem userdata @物品对象
+---@return number @有效熔嵌孔五彩石ID
+function X.GetItemMountFEAEnchantID(kItem)
+	if X.IS_REMAKE then
+		return GetFEAEnchantID(kItem)
+	end
+	local dwItemFEAEnchantID = kItem.GetMountFEAEnchantID() or 0
+	return dwItemFEAEnchantID
+end
+
 -- * 获取物品对应身上装备的位置
 function X.GetItemEquipPos(item, nIndex)
 	if not nIndex then
