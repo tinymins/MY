@@ -319,95 +319,6 @@ do
 	end)
 end
 
-do
-	local LAST_ACHI_TIME, LAST_COUNTER_TIME = {}, {}
-	X.RegisterBgMsg(X.NSFormatString('{$NS}_TEAMTOOLS_ACHI_REQ'), function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
-		if bSelf then
-			--[[#DEBUG BEGIN]]
-			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Team achievement request sent.', X.DEBUG_LEVEL.LOG)
-			--[[#DEBUG END]]
-			return
-		end
-		local aAchieveID, aCounterID, aRequestID, aRefreshID = data[1], data[2], data[3], data[4]
-		local dwID = X.GetClientPlayerID()
-		local bRequest, bRefresh, bResponse = false, false, false
-		if not bResponse then
-			if aRequestID then
-				for _, v in ipairs(aRequestID) do
-					if bRequest then
-						break
-					end
-					if v == dwID then
-						bRequest = true
-					end
-				end
-			else
-				bRequest = true
-			end
-			if bRequest then
-				bResponse = true
-			end
-		end
-		if not bResponse then
-			if aRefreshID then
-				for _, v in ipairs(aRefreshID) do
-					if bRefresh then
-						break
-					end
-					if v == dwID then
-						bRefresh = true
-					end
-				end
-			else
-				bRefresh = true
-			end
-			if bRefresh then
-				for _, vv in ipairs(aAchieveID) do
-					if bResponse then
-						break
-					end
-					if not LAST_ACHI_TIME[vv] then
-						bResponse = true
-					end
-				end
-				for _, vv in ipairs(aCounterID) do
-					if bResponse then
-						break
-					end
-					if not LAST_COUNTER_TIME[vv] then
-						bResponse = true
-					end
-				end
-			end
-		end
-		--[[#DEBUG BEGIN]]
-		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Achievement request from ' .. szTalkerName
-			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
-		--[[#DEBUG END]]
-		if bResponse then
-			local me = X.GetClientPlayer()
-			local aAchieveRes, aCounterRes = {}, {}
-			for _, dwAchieveID in ipairs(aAchieveID) do
-				LAST_ACHI_TIME[dwAchieveID] = GetCurrentTime()
-				table.insert(aAchieveRes, {dwAchieveID, me.IsAchievementAcquired(dwAchieveID)})
-			end
-			for _, dwCounterID in ipairs(aCounterID) do
-				LAST_COUNTER_TIME[dwCounterID] = GetCurrentTime()
-				table.insert(aCounterRes, {dwCounterID, me.GetAchievementCount(dwCounterID)})
-			end
-			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, X.NSFormatString('{$NS}_TEAMTOOLS_ACHI_RES'), {aAchieveRes, aCounterRes}, true)
-		end
-	end)
-	X.RegisterEvent({
-		'NEW_ACHIEVEMENT',
-		'SYNC_ACHIEVEMENT_DATA',
-		'UPDATE_ACHIEVEMENT_POINT',
-		'UPDATE_ACHIEVEMENT_COUNT',
-	}, function()
-		LAST_ACHI_TIME, LAST_COUNTER_TIME = {}, {}
-	end)
-end
-
 X.RegisterBgMsg(X.NSFormatString('{$NS}_OUTPUT_BUFF'), function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	local aRes = {}
 	local me = X.GetClientPlayer()
@@ -480,5 +391,10 @@ do
 		end
 	end)
 end
+--------------------------------------------------------------------------------
+--- 子插件自定义背景通讯
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
