@@ -98,7 +98,7 @@ function D.GetColumns()
 						szText, nR, nG, nB = _L['--'], 173, 173, 173
 					end
 					return GetFormatText(szText, 162, nR, nG, nB, 786,
-						'this.playerid=' .. rec.id .. ';this.achieveid=' .. dwAchieveID, 'Text_Achieve')
+						'this.playerid=' .. X.EncodeLUAData(rec.id) .. ';this.achieveid=' .. X.EncodeLUAData(dwAchieveID), 'Text_Achieve')
 				end,
 				Compare = function(r1, r2)
 					local szStat1, aProgressCounter1 = D.GetPlayerAchievementStat(r1.id, dwAchieveID)
@@ -218,26 +218,34 @@ X.RegisterEvent('LOADING_ENDING', function()
 	D.UpdateAchievementID()
 end)
 
--- 获取团队成员列表
-function D.GetTeamMemberList(bIsOnLine)
-	local me   = X.GetClientPlayer()
-	local team = GetClientTeam()
-	if me.IsInParty() then
-		if bIsOnLine then
-			local tTeam = {}
-			for k, v in ipairs(team.GetTeamMemberList()) do
-				local info = team.GetMemberInfo(v)
-				if info and info.bIsOnLine then
-					table.insert(tTeam, v)
-				end
-			end
-			return tTeam
-		else
-			return team.GetTeamMemberList()
+-- 获取成员列表
+function D.GetMemberList(bIsOnLine)
+	local aList, tList = {}, {}
+	for _, dwID in ipairs(X.GetTeamMemberList()) do
+		local tMember = X.GetTeamMemberInfo(dwID)
+		if tMember and (not bIsOnLine or tMember.bOnline) then
+			table.insert(aList, {
+				dwID = tMember.dwID,
+				szGlobalID = tMember.szGlobalID,
+				szName = tMember.szName,
+				dwForceID = tMember.dwForceID,
+			})
+			tList[tMember.szGlobalID] = true
 		end
-	else
-		return { me.dwID }
 	end
+	for _, szGlobalID in ipairs(X.GetRoomMemberList()) do
+		local tMember = X.GetRoomMemberInfo(szGlobalID)
+		local szServerName = tMember and X.GetServerNameByID(tMember.dwServerID)
+		if tMember and szServerName and not tList[tMember.szGlobalID] then
+			table.insert(aList, {
+				szGlobalID = tMember.szGlobalID,
+				szName = tMember.szName .. g_tStrings.STR_CONNECT .. szServerName,
+				dwForceID = tMember.dwForceID,
+			})
+			tList[tMember.szGlobalID] = true
+		end
+	end
+	return aList
 end
 
 function D.GetPlayerAchievementStat(dwID, dwAchieveID)
@@ -347,37 +355,70 @@ end
 function D.RequestTeamData()
 	-- 计算强制请求和刷新请求列表
 	local aAchieveID, aCounterID = D.AnalysisAchievementRequest(D.aAchievement)
-	local aRequestID, aRefreshID, tRequestID = {}, {}, {}
-	local aTeamMemberList = D.GetTeamMemberList(true)
-	for _, dwID in ipairs(aTeamMemberList) do
+	local aTeamRequestID, aTeamRefreshID, tTeamRequestID = {}, {}, {}
+	local aRoomRequestID, aRoomRefreshID, tRoomRequestID = {}, {}, {}
+	local aMemberList = D.GetMemberList(true)
+	for _, tMember in ipairs(aMemberList) do
 		for _, dwAchieveID in ipairs(aAchieveID) do
-			if not ACHIEVE_CACHE[dwID] or X.IsNil(ACHIEVE_CACHE[dwID][dwAchieveID]) then
-				tRequestID[dwID] = true
+			if tMember.dwID then
+				if not ACHIEVE_CACHE[tMember.dwID] or X.IsNil(ACHIEVE_CACHE[tMember.dwID][dwAchieveID]) then
+					tTeamRequestID[tMember.dwID] = true
+				end
+			elseif tMember.szGlobalID then
+				if not ACHIEVE_CACHE[tMember.szGlobalID] or X.IsNil(ACHIEVE_CACHE[tMember.szGlobalID][dwAchieveID]) then
+					tRoomRequestID[tMember.szGlobalID] = true
+				end
 			end
 		end
 		for _, dwCounterID in ipairs(aCounterID) do
-			if not COUNTER_CACHE[dwID] or X.IsNil(COUNTER_CACHE[dwID][dwCounterID]) then
-				tRequestID[dwID] = true
+			if tMember.dwID then
+				if not COUNTER_CACHE[tMember.dwID] or X.IsNil(COUNTER_CACHE[tMember.dwID][dwCounterID]) then
+					tTeamRequestID[tMember.dwID] = true
+				end
+			elseif tMember.szGlobalID then
+				if not COUNTER_CACHE[tMember.szGlobalID] or X.IsNil(COUNTER_CACHE[tMember.szGlobalID][dwCounterID]) then
+					tRoomRequestID[tMember.szGlobalID] = true
+				end
 			end
 		end
 	end
-	for _, dwID in ipairs(aTeamMemberList) do
-		if dwID ~= X.GetClientPlayerID() then
-			if tRequestID[dwID] then
-				table.insert(aRequestID, dwID)
+	for _, tMember in ipairs(aMemberList) do
+		if tMember.dwID ~= X.GetClientPlayerID() and tMember.szGlobalID ~= X.GetClientPlayerGlobalID() then
+			if tMember.dwID then
+				if tTeamRequestID[tMember.dwID] then
+					table.insert(aTeamRequestID, tMember.dwID)
+				else
+					table.insert(aTeamRefreshID, tMember.dwID)
+				end
+			elseif tMember.szGlobalID then
+				if tRoomRequestID[tMember.szGlobalID] then
+					table.insert(aRoomRequestID, tMember.szGlobalID)
+				else
+					table.insert(aRoomRefreshID, tMember.szGlobalID)
+				end
+			end
+		end
+	end
+	if not X.IsEmpty(aAchieveID) or not X.IsEmpty(aCounterID) then
+		if not X.IsEmpty(aTeamRequestID) or not X.IsEmpty(aTeamRefreshID) then
+			if #aTeamRequestID == #aMemberList - 1 then
+				aTeamRequestID = nil
+			end
+			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+				X.OutputSystemAnnounceMessage(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
 			else
-				table.insert(aRefreshID, dwID)
+				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aTeamRequestID, nil})
 			end
 		end
-	end
-	if (not X.IsEmpty(aAchieveID) or not X.IsEmpty(aCounterID)) and (not X.IsEmpty(aRequestID) or not X.IsEmpty(aRefreshID)) then
-		if #aRequestID == #aTeamMemberList - 1 then
-			aRequestID = nil
-		end
-		if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
-			X.OutputSystemAnnounceMessage(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
-		else
-			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aRequestID, nil})
+		if not X.IsEmpty(aRoomRequestID) or not X.IsEmpty(aRoomRefreshID) then
+			if #aRoomRequestID == #aMemberList - 1 then
+				aRoomRequestID = nil
+			end
+			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
+				X.OutputSystemAnnounceMessage(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
+			else
+				X.SendBgMsg(PLAYER_TALK_CHANNEL.ROOM, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aRoomRequestID, nil})
+			end
 		end
 	end
 	-- 刷新自己的
@@ -401,6 +442,12 @@ X.RegisterBgMsg('MY_TEAMTOOLS_ACHI_RES', function(_, data, nChannel, dwTalkerID,
 	end
 	for _, v in ipairs(aCounterRes) do
 		COUNTER_CACHE[dwTalkerID][v[1]] = v[2]
+	end
+	for _, tMember in pairs(D.GetMemberList()) do
+		if not tMember.dwID and tMember.szGlobalID and tMember.szName == szTalkerName then
+			ACHIEVE_CACHE[tMember.szGlobalID] = ACHIEVE_CACHE[dwTalkerID]
+			COUNTER_CACHE[tMember.szGlobalID] = COUNTER_CACHE[dwTalkerID]
+		end
 	end
 	FireUIEvent('MY_TEAMTOOLS_ACHI')
 end)
@@ -569,21 +616,17 @@ function D.UpdatePage(page)
 	end
 	hCols:FormatAllItemPos()
 
-	local me = X.GetClientPlayer()
-	local team = GetClientTeam()
-	local bIsInParty = X.IsInParty()
 	local aRec = {}
-	local aTeamMemberList = D.GetTeamMemberList()
-	for _, dwID in ipairs(aTeamMemberList) do
-		local info = bIsInParty and team.GetMemberInfo(dwID)
-		if info or dwID == me.dwID then
-			table.insert(aRec, {
-				id = dwID,
-				name = info and info.szName or me.szName,
-				force = info and info.dwForceID or me.dwForceID,
-				achi = ACHIEVE_CACHE[dwID] or X.CONSTANT.EMPTY_TABLE,
-			})
-		end
+	local aMemberList = D.GetMemberList()
+	for _, tMember in ipairs(aMemberList) do
+		table.insert(aRec, {
+			id = tMember.dwID or tMember.szGlobalID,
+			name = tMember.szName,
+			force = tMember.dwForceID,
+			achi = (tMember.dwID and ACHIEVE_CACHE[tMember.dwID])
+				or (tMember.szGlobalID and ACHIEVE_CACHE[tMember.szGlobalID])
+				or X.CONSTANT.EMPTY_TABLE,
+		})
 	end
 
 	if Sorter then
