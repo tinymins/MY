@@ -92,6 +92,81 @@ function X.GetTargetTeamMark(dwID)
 	return GetClientTeam().GetMarkIndex(dwID)
 end
 
+-- 获取团队成员ID列表
+---@return table @成员ID列表
+function X.GetTeamMemberList()
+	local me   = X.GetClientPlayer()
+	local team = GetClientTeam()
+	if me.IsInParty() then
+		return team.GetTeamMemberList()
+	end
+	return { me.dwID }
+end
+
+-- 获取团队成员信息
+---@param dwID number @需要获取的角色ID
+---@return table @成员信息，获取失败返回空
+function X.GetTeamMemberInfo(dwID)
+	local me = X.GetClientPlayer()
+	if me.IsInParty() then
+		local team = GetClientTeam()
+		local info = team.GetMemberInfo(dwID)
+		if info then
+			return {
+				szGlobalID = info.szGlobalID,
+				szName = info.szName,
+				nLevel = info.nLevel,
+				bOnLine = info.bIsOnLine,
+				bDeathFlag = info.bDeathFlag,
+				nCamp = info.nCamp,
+				dwForceID = info.dwForceID,
+				nMaxLife = info.nMaxLife,
+				nCurrentLife = info.nCurrentLife,
+				nMaxMana = info.nMaxMana,
+				nCurrentMana = info.nCurrentMana,
+				dwMapID = info.dwMapID,
+				nMapCopyIndex = info.nMapCopyIndex,
+				nPosX = info.nPosX,
+				nPosY = info.nPosY,
+				nRoleType = info.nRoleType,
+				nFormationCoefficient = info.nFormationCoefficient,
+				dwMiniAvatarID = info.dwMiniAvatarID,
+				dwMountKungfuID = info.dwMountKungfuID,
+				-- nVipType = info.nVipType,
+				bIdentityVisible = info.bIdentityVisiable,
+				dwIdentityVisible = info.dwIdentityVisiable,
+			}
+		end
+		return
+	end
+	if dwID == UI_GetClientPlayerID() then
+		return {
+			szGlobalID = me.GetGlobalID(),
+			szName = me.szName,
+			nLevel = me.nLevel,
+			bOnLine = true,
+			bDeathFlag = me.nMoveState == MOVE_STATE.ON_DEATH,
+			nCamp = me.nCamp,
+			dwForceID = me.dwForceID,
+			nMaxLife = me.nMaxLife,
+			nCurrentLife = me.nCurrentLife,
+			nMaxMana = me.nMaxMana,
+			nCurrentMana = me.nCurrentMana,
+			dwMapID = me.GetMapID(),
+			nMapCopyIndex = X.GetMapSaveCopy(me.GetMapID()) or 0,
+			nPosX = me.nX,
+			nPosY = me.nY,
+			nRoleType = me.nRoleType,
+			nFormationCoefficient = 0,
+			dwMiniAvatarID = me.dwMiniAvatarID,
+			dwMountKungfuID = UI_GetPlayerMountKungfuID(),
+			-- nVipType = info.nVipType,
+			bIdentityVisible = true,
+			dwIdentityVisible = 0,
+		}
+	end
+end
+
 -- 保存当前团队信息
 -- (table) X.GetTeamInfo([table tTeamInfo])
 function X.GetTeamInfo(tTeamInfo)
