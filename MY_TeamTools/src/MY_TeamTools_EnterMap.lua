@@ -212,6 +212,7 @@ function D.OnLButtonClick()
 	if szName == 'Btn_All' then
 		if IsCtrlKeyDown() or IsShiftKeyDown() then
 			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_MAP_REQ', nil, true)
+			X.SendBgMsg(PLAYER_TALK_CHANNEL.ROOM, 'MY_ENTER_MAP_REQ', nil, true)
 		else
 			RT_SELECT_MAP = nil
 			D.UpdatePage(this:GetParent():GetParent())
