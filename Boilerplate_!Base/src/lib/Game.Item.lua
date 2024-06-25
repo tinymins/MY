@@ -56,15 +56,15 @@ end
 end
 
 -- * 当前道具是否满足装备要求：包括身法，体型，门派，性别，等级，根骨，力量，体质
-function X.DoesEquipmentSuit(item, bIsItem, player)
-	if not player then
-		player = X.GetClientPlayer()
+function X.DoesEquipmentSuit(kItem, bIsItem, kPlayer)
+	if not kPlayer then
+		kPlayer = X.GetClientPlayer()
 	end
-	local requireAttrib = item.GetRequireAttrib()
+	local requireAttrib = kItem.GetRequireAttrib()
 	for k, v in pairs(requireAttrib) do
-		if bIsItem and not player.SatisfyRequire(v.nID, v.nValue1, v.nValue2) then
+		if bIsItem and not kPlayer.SatisfyRequire(v.nID, v.nValue1, v.nValue2) then
 			return false
-		elseif not bIsItem and not player.SatisfyRequire(v.nID, v.nValue) then
+		elseif not bIsItem and not kPlayer.SatisfyRequire(v.nID, v.nValue) then
 			return false
 		end
 	end
@@ -94,9 +94,9 @@ local m_MountTypeToWeapon = X.KvpToObject({
 	--WEAPON_DETAIL.MACH_DART = 机关暗器
 	--WEAPON_DETAIL.SLING_SHOT = 投掷
 })
-function X.IsItemFitKungfu(itemInfo, ...)
-	if X.GetObjectType(itemInfo) == 'ITEM' then
-		itemInfo = GetItemInfo(itemInfo.dwTabType, itemInfo.dwIndex)
+function X.IsItemFitKungfu(kItemInfo, ...)
+	if X.GetObjectType(kItemInfo) == 'ITEM' then
+		kItemInfo = GetItemInfo(kItemInfo.dwTabType, kItemInfo.dwIndex)
 	end
 	local kungfu = ...
 	local me = X.GetClientPlayer()
@@ -105,37 +105,37 @@ function X.IsItemFitKungfu(itemInfo, ...)
 	elseif X.IsNumber(kungfu) then
 		kungfu = GetSkill(kungfu, me.GetSkillLevel(kungfu) or 1)
 	end
-	if itemInfo.nSub == X.CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
+	if kItemInfo.nSub == X.CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
 		if not kungfu then
 			return false
 		end
-		if itemInfo.nDetail == WEAPON_DETAIL.BIG_SWORD and kungfu.dwMountType == 6 then
+		if kItemInfo.nDetail == WEAPON_DETAIL.BIG_SWORD and kungfu.dwMountType == 6 then
 			return true
 		end
 
-		if (m_MountTypeToWeapon[kungfu.dwMountType] ~= itemInfo.nDetail) then
+		if (m_MountTypeToWeapon[kungfu.dwMountType] ~= kItemInfo.nDetail) then
 			return false
 		end
 
-		if not itemInfo.nRecommendID or itemInfo.nRecommendID == 0 then
+		if not kItemInfo.nRecommendID or kItemInfo.nRecommendID == 0 then
 			return true
 		end
 	end
 
-	if not itemInfo.nRecommendID then
+	if not kItemInfo.nRecommendID then
 		return
 	end
-	local aRecommendKungfuID = CACHE[itemInfo.nRecommendID]
+	local aRecommendKungfuID = CACHE[kItemInfo.nRecommendID]
 	if not aRecommendKungfuID then
 		local EquipRecommend = X.GetGameTable('EquipRecommend', true)
 		if EquipRecommend then
-			local res = EquipRecommend:Search(itemInfo.nRecommendID)
+			local res = EquipRecommend:Search(kItemInfo.nRecommendID)
 			aRecommendKungfuID = {}
 			for i, v in ipairs(X.SplitString(res.kungfu_ids, '|')) do
 				table.insert(aRecommendKungfuID, tonumber(v))
 			end
 		end
-		CACHE[itemInfo.nRecommendID] = aRecommendKungfuID
+		CACHE[kItemInfo.nRecommendID] = aRecommendKungfuID
 	end
 
 	if not aRecommendKungfuID or not aRecommendKungfuID[1] then
@@ -158,46 +158,46 @@ end
 end
 
 -- 获取物品精炼等级
----@param KItem userdata @物品对象
----@param KPlayer userdata @物品所属角色
+---@param kItem userdata @物品对象
+---@param kPlayer userdata @物品所属角色
 ---@return number, number, number @[有效精炼等级, 物品精炼等级, 装备栏精炼等级]
-function X.GetItemStrengthLevel(KItem, KPlayer)
+function X.GetItemStrengthLevel(kItem, kPlayer)
 	if X.IS_REMAKE then
-		if not KPlayer then
-			KPlayer = X.GetClientPlayer()
+		if not kPlayer then
+			kPlayer = X.GetClientPlayer()
 		end
-		local dwPackage, dwBox = X.GetItemEquipPos(KItem)
-		if dwPackage == INVENTORY_INDEX.EQUIP and KPlayer.GetEquipBoxStrength then
-			local KItemInfo = GetItemInfo(KItem.dwTabType, KItem.dwIndex)
+		local dwPackage, dwBox = X.GetItemEquipPos(kItem)
+		if dwPackage == INVENTORY_INDEX.EQUIP and kPlayer.GetEquipBoxStrength then
+			local KItemInfo = GetItemInfo(kItem.dwTabType, kItem.dwIndex)
 			local nMaxStrengthLevel = KItemInfo.nMaxStrengthLevel
-			local nBoxStrengthLevel = KPlayer.GetEquipBoxStrength(dwBox)
-			local nItemStrengthLevel = KItem.nStrengthLevel
+			local nBoxStrengthLevel = kPlayer.GetEquipBoxStrength(dwBox)
+			local nItemStrengthLevel = kItem.nStrengthLevel
 			local nStrengthLevel = math.min(math.max(nItemStrengthLevel, nBoxStrengthLevel), nMaxStrengthLevel)
 			return nStrengthLevel, nItemStrengthLevel, nBoxStrengthLevel
 		end
 	end
-	return KItem.nStrengthLevel, KItem.nStrengthLevel, 0
+	return kItem.nStrengthLevel, kItem.nStrengthLevel, 0
 end
 
 -- 获取物品熔嵌孔镶嵌信息
----@param KItem userdata @物品对象
+---@param kItem userdata @物品对象
 ---@param nSlotIndex string @熔嵌孔下标
----@param KPlayer userdata @物品所属角色
+---@param kPlayer userdata @物品所属角色
 ---@return number, number, number @[有效熔嵌孔五行石ID, 物品熔嵌孔五行石ID, 装备栏熔嵌孔五行石ID]
-function X.GetItemMountDiamondEnchantID(KItem, nSlotIndex, KPlayer)
+function X.GetItemMountDiamondEnchantID(kItem, nSlotIndex, kPlayer)
 	if X.IS_REMAKE then
-		if not KPlayer then
-			KPlayer = X.GetClientPlayer()
+		if not kPlayer then
+			kPlayer = X.GetClientPlayer()
 		end
-		local dwPackage, dwBox = X.GetItemEquipPos(KItem)
-		if dwPackage == INVENTORY_INDEX.EQUIP and KPlayer.GetEquipBoxMountDiamondEnchantID then
-			local dwBoxEnchantID, nBoxQuality = KPlayer.GetEquipBoxMountDiamondEnchantID(dwBox, nSlotIndex)
-            local dwItemEnchantID = KItem.GetMountDiamondEnchantID(nSlotIndex)
-            local dwEnchantID = KItem.GetAdaptedDiamondEnchantID(nSlotIndex, KItem.nLevel, dwBoxEnchantID)
+		local dwPackage, dwBox = X.GetItemEquipPos(kItem)
+		if dwPackage == INVENTORY_INDEX.EQUIP and kPlayer.GetEquipBoxMountDiamondEnchantID then
+			local dwBoxEnchantID, nBoxQuality = kPlayer.GetEquipBoxMountDiamondEnchantID(dwBox, nSlotIndex)
+            local dwItemEnchantID = kItem.GetMountDiamondEnchantID(nSlotIndex)
+            local dwEnchantID = kItem.GetAdaptedDiamondEnchantID(nSlotIndex, kItem.nLevel, dwBoxEnchantID)
 			return dwEnchantID, dwItemEnchantID, dwBoxEnchantID
 		end
 	end
-	local dwItemEnchantID = KItem.GetMountDiamondEnchantID(nSlotIndex)
+	local dwItemEnchantID = kItem.GetMountDiamondEnchantID(nSlotIndex)
 	return dwItemEnchantID, dwItemEnchantID, 0
 end
 
@@ -213,73 +213,73 @@ function X.GetItemMountFEAEnchantID(kItem)
 end
 
 -- * 获取物品对应身上装备的位置
-function X.GetItemEquipPos(item, nIndex)
+function X.GetItemEquipPos(kItem, nIndex)
 	if not nIndex then
 		nIndex = 1
 	end
 	local dwPackage, dwBox, nCount = INVENTORY_INDEX.EQUIP, 0, 1
-	if item.nSub == X.CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
-		if item.nDetail == WEAPON_DETAIL.BIG_SWORD then
+	if kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
+		if kItem.nDetail == WEAPON_DETAIL.BIG_SWORD then
 			dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.BIG_SWORD
 		else
 			dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.MELEE_WEAPON
 		end
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.RANGE_WEAPON then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.RANGE_WEAPON
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.ARROW then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.ARROW then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.ARROW
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.CHEST then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.CHEST then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.CHEST
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.HELM then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.HELM then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.HELM
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.AMULET then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.AMULET then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.AMULET
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.RING then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.RING then
 		if nIndex == 1 then
 			dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.LEFT_RING
 		else
 			dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.RIGHT_RING
 		end
 		nCount = 2
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.WAIST then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.WAIST then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.WAIST
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.PENDANT then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.PENDANT then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.PENDANT
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.PANTS then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.PANTS then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.PANTS
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.BOOTS then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.BOOTS then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.BOOTS
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.BANGLE then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.BANGLE then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.BANGLE
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.WAIST_EXTEND
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.BACK_EXTEND then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.BACK_EXTEND then
 		dwBox = X.CONSTANT.EQUIPMENT_INVENTORY.BACK_EXTEND
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.FACE_EXTEND then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.FACE_EXTEND then
 		dwBox = X.CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
-	elseif item.nSub == X.CONSTANT.EQUIPMENT_SUB.HORSE then
+	elseif kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.HORSE then
 		dwPackage, dwBox = X.GetClientPlayer().GetEquippedHorsePos()
 	end
 	return dwPackage, dwBox, nIndex, nCount
 end
 
 -- * 当前装备是否是比身上已经装备的更好
-function X.IsBetterEquipment(item, dwPackage, dwBox)
-	if item.nGenre ~= ITEM_GENRE.EQUIPMENT
-	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND
-	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.BACK_EXTEND
-	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
-	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.BULLET
-	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.MINI_AVATAR
-	or item.nSub == X.CONSTANT.EQUIPMENT_SUB.PET then
+function X.IsBetterEquipment(kItem, dwPackage, dwBox)
+	if kItem.nGenre ~= ITEM_GENRE.EQUIPMENT
+	or kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.WAIST_EXTEND
+	or kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.BACK_EXTEND
+	or kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.FACE_EXTEND
+	or kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.BULLET
+	or kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.MINI_AVATAR
+	or kItem.nSub == X.CONSTANT.EQUIPMENT_SUB.PET then
 		return false
 	end
 
 	if not dwPackage or not dwBox then
 		local nIndex, nCount = 0, 1
 		while nIndex < nCount do
-			dwPackage, dwBox, nIndex, nCount = X.GetItemEquipPos(item, nIndex + 1)
-			if X.IsBetterEquipment(item, dwPackage, dwBox) then
+			dwPackage, dwBox, nIndex, nCount = X.GetItemEquipPos(kItem, nIndex + 1)
+			if X.IsBetterEquipment(kItem, dwPackage, dwBox) then
 				return true
 			end
 		end
@@ -292,9 +292,9 @@ function X.IsBetterEquipment(item, dwPackage, dwBox)
 		return false
 	end
 	if me.nLevel < me.nMaxLevel then
-		return item.nEquipScore > equipedItem.nEquipScore
+		return kItem.nEquipScore > equipedItem.nEquipScore
 	end
-	return (item.nEquipScore > equipedItem.nEquipScore) or (item.nLevel > equipedItem.nLevel and item.nQuality >= equipedItem.nQuality)
+	return (kItem.nEquipScore > equipedItem.nEquipScore) or (kItem.nLevel > equipedItem.nLevel and kItem.nQuality >= equipedItem.nQuality)
 end
 
 do local ITEM_CACHE = {}
@@ -310,20 +310,20 @@ function X.GetItemNameByUIID(nUiId)
 end
 end
 
-function X.GetItemNameByItem(item)
-	if item.nGenre == ITEM_GENRE.BOOK then
-		local nBookID, nSegID = X.RecipeToSegmentID(item.nBookID)
+function X.GetItemNameByItem(kItem)
+	if kItem.nGenre == ITEM_GENRE.BOOK then
+		local nBookID, nSegID = X.RecipeToSegmentID(kItem.nBookID)
 		return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
 	end
-	return X.GetItemNameByUIID(item.nUiId)
+	return X.GetItemNameByUIID(kItem.nUiId)
 end
 
-function X.GetItemNameByItemInfo(itemInfo, nBookInfo)
-	if itemInfo.nGenre == ITEM_GENRE.BOOK and nBookInfo then
+function X.GetItemNameByItemInfo(kItemInfo, nBookInfo)
+	if kItemInfo.nGenre == ITEM_GENRE.BOOK and nBookInfo then
 		local nBookID, nSegID = X.RecipeToSegmentID(nBookInfo)
 		return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
 	end
-	return X.GetItemNameByUIID(itemInfo.nUiId)
+	return X.GetItemNameByUIID(kItemInfo.nUiId)
 end
 
 do local ITEM_CACHE = {}
@@ -339,7 +339,7 @@ function X.GetItemIconByUIID(nUiId)
 end
 end
 
-function X.UpdateItemBoxExtend(box, nQuality)
+function X.UpdateItemBoxExtend(hBox, nQuality)
 	local szImage = 'ui/Image/Common/Box.UITex'
 	local nFrame
 	if nQuality == 2 then
@@ -351,12 +351,12 @@ function X.UpdateItemBoxExtend(box, nQuality)
 	elseif nQuality == 5 then
 		nFrame = 17
 	end
-	box:ClearExtentImage()
-	box:ClearExtentAnimate()
+	hBox:ClearExtentImage()
+	hBox:ClearExtentAnimate()
 	if nFrame and nQuality < 5 then
-		box:SetExtentImage(szImage, nFrame)
+		hBox:SetExtentImage(szImage, nFrame)
 	elseif nQuality == 5 then
-		box:SetExtentAnimate(szImage, nFrame, -1)
+		hBox:SetExtentAnimate(szImage, nFrame, -1)
 	end
 end
 
