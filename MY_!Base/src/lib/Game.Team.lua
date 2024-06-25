@@ -113,6 +113,7 @@ function X.GetTeamMemberInfo(dwID)
 		local info = team.GetMemberInfo(dwID)
 		if info then
 			return {
+				dwID = dwID,
 				szGlobalID = info.szGlobalID,
 				szName = info.szName,
 				nLevel = info.nLevel,
@@ -141,6 +142,7 @@ function X.GetTeamMemberInfo(dwID)
 	end
 	if dwID == UI_GetClientPlayerID() then
 		return {
+			dwID = dwID,
 			szGlobalID = X.GetClientPlayerGlobalID(),
 			szName = me.szName,
 			nLevel = me.nLevel,
