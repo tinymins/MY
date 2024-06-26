@@ -184,14 +184,14 @@ function X.GetMapCDProgress(dwMapID, dwPlayerID, fnAction)
 		MAP_CD_PROGRESS_REQUEST_FRAME[szKey] = GetLogicFrameCount()
 		if fnAction then
 			table.insert(MAP_CD_PROGRESS_PENDING_ACTION, {
-				dwMapID = dwMapID, dwPlayerID = dwPlayerID, fnAction = fnAction,
+				dwMapID = dwMapID, dwPlayerID = dwPlayerID, fnAction = fnAction, nExpireTime = GetCurrentTime() + 2,
 			})
 		end
 		ApplyDungeonRoleProgress(dwMapID, dwPlayerID) -- 成功回调 UPDATE_DUNGEON_ROLE_PROGRESS(dwMapID, dwPlayerID)
 	end
 	return tProgress
 end
-X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', 'LIB#MapCDProgress', function()
+X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', X.NSFormatString('{$NS}#MapCDProgress'), function()
 	local dwMapID, dwPlayerID = arg0, arg1
 	local aProgress = {}
 	for _, tInfo in ipairs(X.GetMapCDProgressInfo(dwMapID) or X.CONSTANT.EMPTY_TABLE) do
@@ -199,11 +199,30 @@ X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', 'LIB#MapCDProgress', function()
 	end
 	for _, v in ipairs(MAP_CD_PROGRESS_PENDING_ACTION) do
 		if v.dwMapID == dwMapID and v.dwPlayerID == dwPlayerID then
-			v.fnAction(aProgress)
+			X.SafeCall(v.fnAction, aProgress)
 		end
 	end
 	for i, v in X.ipairs_r(MAP_CD_PROGRESS_PENDING_ACTION) do
 		if v.dwMapID == dwMapID and v.dwPlayerID == dwPlayerID then
+			table.remove(MAP_CD_PROGRESS_PENDING_ACTION, i)
+		end
+	end
+	MAP_CD_PROGRESS_UPDATE_RECEIVE[dwMapID .. '||' .. dwPlayerID] = true
+end)
+X.BreatheCall(X.NSFormatString('{$NS}#MapCDProgress'), 1000, function()
+	local tExpire = {}
+	for _, v in ipairs(MAP_CD_PROGRESS_PENDING_ACTION) do
+		if v.nExpireTime < GetCurrentTime() then
+			local aProgress = {}
+			for _, tInfo in ipairs(X.GetMapCDProgressInfo(v.dwMapID) or X.CONSTANT.EMPTY_TABLE) do
+				aProgress[tInfo.dwProgressID] = GetDungeonRoleProgress(v.dwMapID, v.dwPlayerID, tInfo.dwProgressID)
+			end
+			X.SafeCall(v.fnAction, aProgress)
+			tExpire[v] = true
+		end
+	end
+	for i, v in X.ipairs_r(MAP_CD_PROGRESS_PENDING_ACTION) do
+		if tExpire[v] then
 			table.remove(MAP_CD_PROGRESS_PENDING_ACTION, i)
 		end
 	end
