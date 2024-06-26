@@ -146,7 +146,7 @@ end
 
 ---获取地图秘境进度信息
 ---@param dwMapID number @要获取的地图ID
----@param nProcessID number @要获取的进度ID
+---@param nProcessID number @要获取的进度ID，不传则获取所有进度
 ---@return table @秘境首领与进度状态列表
 function X.GetMapCDProcessInfo(dwMapID, nProcessID)
 	if GetCDProcessInfo then
