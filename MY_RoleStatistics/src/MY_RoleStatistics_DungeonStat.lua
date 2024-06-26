@@ -283,7 +283,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 					col.szTitleTip = col.szTitle .. ' (' .. colVia.szTitle .. ')'
 				end
 			end
-			if X.IsDungeonRoleProgressMap(map.dwID) then
+			if X.IsCDProgressMap(map.dwID) then
 				col.GetFormatText = function(rec)
 					local aCopyID = rec.copy_info[map.dwID]
 					local aBossKill = rec.progress_info[map.dwID]
@@ -694,7 +694,7 @@ function D.UpdateMapProgress(bForceUpdate)
 	end
 	-- 获取这些地图的进度
 	for dwID, _ in pairs(tProgressBossMapID) do
-		local aProgressBoss = dwID and X.IsDungeonRoleProgressMap(dwID) and X.GetMapCDProcessInfo(dwID)
+		local aProgressBoss = dwID and X.IsCDProgressMap(dwID) and X.GetMapCDProgressInfo(dwID)
 		if aProgressBoss then
 			-- 强制刷新秘境进度，或者进度数据已过期并且5秒内未请求过，则发起请求
 			if bForceUpdate or (not D.tMapProgressValid[dwID] and GetTime() - D.tMapProgressRequestTime[dwID] > 5000) then
@@ -1160,7 +1160,7 @@ function D.OnItemMouseEnter()
 		if name == 'Image_ProgressBoss' then
 			table.insert(aText, '')
 			local aBossKill = X.SplitString(this.progress_info, ',')
-			for i, boss in ipairs(X.GetMapCDProcessInfo(this.mapid)) do
+			for i, boss in ipairs(X.GetMapCDProgressInfo(this.mapid)) do
 				table.insert(aText, boss.szName .. '\t' .. _L[aBossKill[i] == '1' and 'x' or 'r'])
 			end
 		end

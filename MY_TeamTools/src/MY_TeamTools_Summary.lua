@@ -165,7 +165,7 @@ end
 function D.CalculateSort(tInfo)
 	local nCount = -2
 	if RT_SORT_FIELD == 'tBossKill' then
-		if X.IsDungeonRoleProgressMap(RT_MAPID) then
+		if X.IsCDProgressMap(RT_MAPID) then
 			nCount = 0
 			for _, p in ipairs(tInfo[RT_SORT_FIELD]) do
 				if p then
@@ -470,7 +470,7 @@ function D.UpdateList(page)
 			end
 			local hCopyID = h:Lookup('Text_CopyID')
 			local hBossKills = h:Lookup('Handle_BossKills')
-			if X.IsDungeonRoleProgressMap(RT_MAPID) then
+			if X.IsCDProgressMap(RT_MAPID) then
 				for nIndex, bKill in ipairs(v.tBossKill) do
 					local szName = tostring(nIndex)
 					local hBossKill = hBossKills:Lookup(szName)
@@ -484,7 +484,7 @@ function D.UpdateList(page)
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
 						local texts = {}
-						for i, boss in ipairs(X.GetMapCDProcessInfo(RT_MAPID)) do
+						for i, boss in ipairs(X.GetMapCDProgressInfo(RT_MAPID)) do
 							table.insert(texts, boss.szName .. '\t' .. _L[v.tBossKill[i] and 'x' or 'r'])
 						end
 						OutputTip(GetFormatText(table.concat(texts, '\n')), 400, { x, y, w, h })
@@ -697,7 +697,7 @@ function D.RequestTeamData()
 	end
 	local aRequestID, aRefreshID = {}, {}
 	local bDungeonMap = X.IsDungeonMap(RT_MAPID)
-	local bIsDungeonRoleProgressMap = X.IsDungeonRoleProgressMap(RT_MAPID)
+	local bIsDungeonRoleProgressMap = X.IsCDProgressMap(RT_MAPID)
 	--[[#DEBUG BEGIN]]
 	if bIsDungeonRoleProgressMap then
 		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Update team map progress.', X.DEBUG_LEVEL.LOG)
@@ -741,8 +741,8 @@ function D.GetTeam(page)
 	local team  = GetClientTeam()
 	local aList = {}
 	local bIsInParty = X.IsInParty()
-	local bIsDungeonRoleProgressMap = X.IsDungeonRoleProgressMap(RT_MAPID)
-	local aProgressMapBoss = bIsDungeonRoleProgressMap and X.GetMapCDProcessInfo(RT_MAPID)
+	local bIsDungeonRoleProgressMap = X.IsCDProgressMap(RT_MAPID)
+	local aProgressMapBoss = bIsDungeonRoleProgressMap and X.GetMapCDProgressInfo(RT_MAPID)
 	local aRequestMapCopyID = {}
 	local aTeamMemberList = D.GetTeamMemberList()
 	for _, dwID in ipairs(aTeamMemberList) do
