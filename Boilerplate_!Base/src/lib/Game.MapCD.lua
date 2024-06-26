@@ -163,4 +163,59 @@ function X.GetMapCDProcessInfo(dwMapID)
 	return Table_GetCDProcessBoss(dwMapID)
 end
 
+do
+local MAP_CD_PROGRESS_REQUEST_FRAME = {}
+local MAP_CD_PROGRESS_UPDATE_RECEIVE = {}
+local MAP_CD_PROGRESS_PENDING_ACTION = {}
+---获取角色地图秘境进度
+---@param dwMapID number @要获取的地图ID
+---@param dwPlayerID number @要获取进度的角色ID
+---@param fnAction function @获取成功回调函数
+---@return table @角色秘境进度状态
+function X.GetMapCDProgress(dwMapID, dwPlayerID, fnAction)
+	local szKey = dwMapID .. '||' .. dwPlayerID
+	local tProgress = {}
+	for _, tInfo in ipairs(X.GetMapCDProcessInfo(dwMapID) or X.CONSTANT.EMPTY_TABLE) do
+		tProgress[tInfo.dwProgressID] = GetDungeonRoleProgress(dwMapID, dwPlayerID, tInfo.dwProgressID)
+	end
+	if MAP_CD_PROGRESS_UPDATE_RECEIVE[szKey] then
+		fnAction(tProgress)
+	elseif MAP_CD_PROGRESS_REQUEST_FRAME[szKey] ~= GetLogicFrameCount() then
+		MAP_CD_PROGRESS_REQUEST_FRAME[szKey] = GetLogicFrameCount()
+		if fnAction then
+			table.insert(MAP_CD_PROGRESS_PENDING_ACTION, {
+				dwMapID = dwMapID, dwPlayerID = dwPlayerID, fnAction = fnAction,
+			})
+		end
+		ApplyDungeonRoleProgress(dwMapID, dwPlayerID) -- 成功回调 UPDATE_DUNGEON_ROLE_PROGRESS(dwMapID, dwPlayerID)
+	end
+	return tProgress
+end
+X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', 'LIB#MapCDProgress', function()
+	local dwMapID, dwPlayerID = arg0, arg1
+	local aProgress = {}
+	for _, tInfo in ipairs(X.GetMapCDProcessInfo(dwMapID) or X.CONSTANT.EMPTY_TABLE) do
+		aProgress[tInfo.dwProgressID] = GetDungeonRoleProgress(dwMapID, dwPlayerID, tInfo.dwProgressID)
+	end
+	for _, v in ipairs(MAP_CD_PROGRESS_PENDING_ACTION) do
+		if v.dwMapID == dwMapID and v.dwPlayerID == dwPlayerID then
+			v.fnAction(aProgress)
+		end
+	end
+	for i, v in X.ipairs_r(MAP_CD_PROGRESS_PENDING_ACTION) do
+		if v.dwMapID == dwMapID and v.dwPlayerID == dwPlayerID then
+			table.remove(MAP_CD_PROGRESS_PENDING_ACTION, i)
+		end
+	end
+end)
+end
+
+---获取自身地图秘境进度
+---@param dwMapID number @要获取的地图ID
+---@param fnAction function @获取成功回调函数
+---@return table @自身秘境进度状态
+function X.GetClientPlayerMapCDProgress(dwMapID, fnAction)
+	return X.GetMapCDProgress(dwMapID, X.GetClientPlayerID(), fnAction)
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
