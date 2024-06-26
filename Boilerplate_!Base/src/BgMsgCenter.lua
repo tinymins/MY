@@ -12,14 +12,16 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/BgMsgCenter')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/BgMsgCenter/')
 --------------------------------------------------------------------------------
 
-local function GetReplyChannel(nChannel, szTalkerName)
+local D = {}
+
+function D.GetReplyChannel(nChannel, szTalkerName)
 	if nChannel == PLAYER_TALK_CHANNEL.WHISPER then
 		return szTalkerName
 	end
 	return nChannel
 end
 
-local function NeedReply(aRequestID, aRefreshID, dwID, szGlobalID, bNotChange)
+function D.NeedReply(aRequestID, aRefreshID, dwID, szGlobalID, bNotChange)
 	if not aRequestID then
 		return true
 	end
@@ -52,7 +54,7 @@ X.RegisterBgMsg('ASK_CURRENT_LOC', function(_, data, nChannel, dwTalkerID, szTal
 		szMessage = _L('[%s] wants to get your location, would you like to share?', szTalkerName), {
 			szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
 				local me = X.GetClientPlayer()
-				local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+				local nReplyChannel = D.GetReplyChannel(nChannel, szTalkerName)
 				X.SendBgMsg(nReplyChannel, 'REPLY_CURRENT_LOC', { me.GetMapID(), me.nX, me.nY, me.nZ }, true)
 			end
 		}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
@@ -68,7 +70,7 @@ X.RegisterBgMsg(X.NSFormatString('{$NS}_VERSION_CHECK'), function(_, oData, nCha
 	if not bSilent and X.IsInParty() then
 		X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed %s v%s', X.PACKET_INFO.NAME, X.PACKET_INFO.VERSION))
 	end
-	local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+	local nReplyChannel = D.GetReplyChannel(nChannel, szTalkerName)
 	X.SendBgMsg(nReplyChannel, X.NSFormatString('{$NS}_VERSION_REPLY'), {X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD}, true)
 end)
 
@@ -83,7 +85,7 @@ end)
 -- 进组查看属性
 X.RegisterBgMsg('RL', function(_, data, nChannel, dwTalkerID, szTalkerName, bIsSelf)
 	if not bIsSelf then
-		local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+		local nReplyChannel = D.GetReplyChannel(nChannel, szTalkerName)
 		if data[1] == 'ASK' then
 			X.Confirm(_L('[%s] want to see your info, OK?', szTalkerName), function()
 				local me = X.GetClientPlayer()
@@ -100,7 +102,7 @@ X.RegisterBgMsg('CHAR_INFO', function(_, data, nChannel, dwTalkerID, szTalkerNam
 	if not bIsSelf and data[2] == X.GetClientPlayerID() then
 		local nReplyChannel = X.IsParty(dwTalkerID)
 			and PLAYER_TALK_CHANNEL.RAID
-			or GetReplyChannel(nChannel, szTalkerName)
+			or D.GetReplyChannel(nChannel, szTalkerName)
 		if data[1] == 'ASK'  then
 			if not _G.MY_CharInfo or _G.MY_CharInfo.bEnable or data[3] == 'DEBUG' then
 				local aInfo = X.GetClientPlayerCharInfo()
@@ -119,7 +121,7 @@ end)
 
 -- 搬运JH_ABOUT
 X.RegisterBgMsg(X.NSFormatString('{$NS}_ABOUT'), function(_, data, nChannel, dwTalkerID, szTalkerName, bIsSelf)
-	local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+	local nReplyChannel = D.GetReplyChannel(nChannel, szTalkerName)
 	if data[1] == 'Author' then -- 版本检查 自用 可以绘制详细表格
 		local me, szTong = X.GetClientPlayer(), ''
 		if me.dwTongID > 0 then
@@ -315,13 +317,13 @@ do
 		local aRequestID, aRefreshID = data[1], data[2]
 		local dwID = X.GetClientPlayerID()
 		local szGlobalID = X.GetClientPlayerGlobalID()
-		local bResponse = NeedReply(aRequestID, aRefreshID, dwID, szGlobalID, not X.IsNil(LAST_TIME))
+		local bResponse = D.NeedReply(aRequestID, aRefreshID, dwID, szGlobalID, not X.IsNil(LAST_TIME))
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Global id request from ' .. szTalkerName
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then
-			local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+			local nReplyChannel = D.GetReplyChannel(nChannel, szTalkerName)
 			X.SendBgMsg(nReplyChannel, X.NSFormatString('{$NS}_GLOBAL_ID'), X.GetClientPlayerGlobalID(), true)
 			LAST_TIME = GetCurrentTime()
 		end
