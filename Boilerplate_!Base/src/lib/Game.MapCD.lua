@@ -144,11 +144,11 @@ function X.GetDungeonRefreshTime(dwMapID)
 	return 0, 0
 end
 
----获取地图秘境进度
+---获取地图秘境进度信息
 ---@param dwMapID number @要获取的地图ID
 ---@param nProcessID number @要获取的进度ID
 ---@return table @秘境首领与进度状态列表
-function X.GetCDProcessInfo(dwMapID, nProcessID)
+function X.GetMapCDProcessInfo(dwMapID, nProcessID)
 	if GetCDProcessInfo then
 		local aInfo = {}
 		for _, v in ipairs(GetCDProcessInfo(dwMapID, nProcessID) or X.CONSTANT.EMPTY_TABLE) do
