@@ -346,50 +346,16 @@ do
 		end
 		local dwMapID, aRequestID, aRefreshID = data[1], data[2], data[3]
 		local dwID = X.GetClientPlayerID()
-		local bRequest, bRefresh, bResponse = false, false, false
-		if not bResponse then
-			if aRequestID then
-				for _, v in ipairs(aRequestID) do
-					if bRequest then
-						break
-					end
-					if v == dwID then
-						bRequest = true
-					end
-				end
-			else
-				bRequest = true
-			end
-			if bRequest then
-				bResponse = true
-			end
-		end
-		if not bResponse then
-			if aRefreshID then
-				for _, v in ipairs(aRefreshID) do
-					if bRefresh then
-						break
-					end
-					if v == dwID then
-						bRefresh = true
-					end
-				end
-			else
-				bRefresh = true
-			end
-			if bRefresh then
-				if not LAST_TIME[dwMapID] then
-					bResponse = true
-				end
-			end
-		end
+		local szGlobalID = X.GetClientPlayerGlobalID()
+		local bNotChange = not X.IsNil(LAST_TIME[dwMapID])
+		local bResponse = D.NeedReply(aRequestID, aRefreshID, dwID, szGlobalID, bNotChange)
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Team map copy id request from ' .. szTalkerName
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then
 			local function fnAction(tMapID)
-				local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+				local nReplyChannel = D.GetReplyChannel(nChannel, szTalkerName)
 				X.SendBgMsg(nReplyChannel, 'MY_MAP_COPY_ID', {dwMapID, tMapID[dwMapID] or -1}, true)
 			end
 			X.GetMapSaveCopy(fnAction)
@@ -404,6 +370,7 @@ do
 	end)
 end
 
+-- 团队工具·成就统计
 do
 	local LAST_ACHI_TIME, LAST_COUNTER_TIME = {}, {}
 	X.RegisterBgMsg('MY_TEAMTOOLS_ACHI_REQ', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
@@ -415,56 +382,19 @@ do
 		end
 		local aAchieveID, aCounterID, aRequestID, aRefreshID = data[1], data[2], data[3], data[4]
 		local dwID = X.GetClientPlayerID()
-		local bRequest, bRefresh, bResponse = false, false, false
-		if not bResponse then
-			if aRequestID then
-				for _, v in ipairs(aRequestID) do
-					if bRequest then
-						break
-					end
-					if v == dwID then
-						bRequest = true
-					end
-				end
-			else
-				bRequest = true
-			end
-			if bRequest then
-				bResponse = true
+		local szGlobalID = X.GetClientPlayerGlobalID()
+		local bNotChange = true
+		for _, vv in ipairs(aAchieveID) do
+			if not LAST_ACHI_TIME[vv] then
+				bNotChange = false
 			end
 		end
-		if not bResponse then
-			if aRefreshID then
-				for _, v in ipairs(aRefreshID) do
-					if bRefresh then
-						break
-					end
-					if v == dwID then
-						bRefresh = true
-					end
-				end
-			else
-				bRefresh = true
-			end
-			if bRefresh then
-				for _, vv in ipairs(aAchieveID) do
-					if bResponse then
-						break
-					end
-					if not LAST_ACHI_TIME[vv] then
-						bResponse = true
-					end
-				end
-				for _, vv in ipairs(aCounterID) do
-					if bResponse then
-						break
-					end
-					if not LAST_COUNTER_TIME[vv] then
-						bResponse = true
-					end
-				end
+		for _, vv in ipairs(aCounterID) do
+			if not LAST_COUNTER_TIME[vv] then
+				bNotChange = false
 			end
 		end
+		local bResponse = D.NeedReply(aRequestID, aRefreshID, dwID, szGlobalID, bNotChange)
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Achievement request from ' .. szTalkerName
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
@@ -480,7 +410,7 @@ do
 				LAST_COUNTER_TIME[dwCounterID] = GetCurrentTime()
 				table.insert(aCounterRes, {dwCounterID, me.GetAchievementCount(dwCounterID)})
 			end
-			local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+			local nReplyChannel = D.GetReplyChannel(nChannel, szTalkerName)
 			X.SendBgMsg(nReplyChannel, 'MY_TEAMTOOLS_ACHI_RES', {aAchieveRes, aCounterRes, X.GetClientPlayerGlobalID()}, true)
 		end
 	end)
