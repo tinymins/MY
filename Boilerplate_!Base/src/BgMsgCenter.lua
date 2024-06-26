@@ -19,6 +19,29 @@ local function GetReplyChannel(nChannel, szTalkerName)
 	return nChannel
 end
 
+local function NeedReply(aRequestID, aRefreshID, dwID, szGlobalID, bNotChange)
+	if not aRequestID then
+		return true
+	end
+	for _, v in ipairs(aRequestID) do
+		if v == dwID or v == szGlobalID then
+			return true
+		end
+	end
+	if bNotChange then
+		return false
+	end
+	if not aRefreshID then
+		return true
+	end
+	for _, v in ipairs(aRefreshID) do
+		if v == dwID or v == szGlobalID then
+			return true
+		end
+	end
+	return false
+end
+
 -- 测试用（请求共享位置）
 X.RegisterBgMsg('ASK_CURRENT_LOC', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf then
@@ -291,43 +314,8 @@ do
 		end
 		local aRequestID, aRefreshID = data[1], data[2]
 		local dwID = X.GetClientPlayerID()
-		local bRequest, bRefresh, bResponse = false, false, false
-		if not bResponse then
-			if aRequestID then
-				for _, v in ipairs(aRequestID) do
-					if bRequest then
-						break
-					end
-					if v == dwID then
-						bRequest = true
-					end
-				end
-			else
-				bRequest = true
-			end
-			if bRequest then
-				bResponse = true
-			end
-		end
-		if not bResponse then
-			if aRefreshID then
-				for _, v in ipairs(aRefreshID) do
-					if bRefresh then
-						break
-					end
-					if v == dwID then
-						bRefresh = true
-					end
-				end
-			else
-				bRefresh = true
-			end
-			if bRefresh then
-				if not LAST_TIME then
-					bResponse = true
-				end
-			end
-		end
+		local szGlobalID = X.GetClientPlayerGlobalID()
+		local bResponse = NeedReply(aRequestID, aRefreshID, dwID, szGlobalID, not X.IsNil(LAST_TIME))
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Global id request from ' .. szTalkerName
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
