@@ -46,6 +46,7 @@ return {
 	['Enchant score'] = '附魔得分',
 	['Special equip score'] = '特效得分',
 	['Too far'] = '距離太遠',
+	['Loading'] = '載入中',
 	['Equip'] = '裝備',
 	['Dungeon CD'] = '秘境刷新',
 	['Fight'] = '戰鬥',

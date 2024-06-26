@@ -337,7 +337,7 @@ end
 -- 团队工具·团队秘境CD
 do
 	local LAST_TIME = {}
-	X.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	X.RegisterBgMsg('MY_TEAM_TOOLS__MAP_CD_REQ', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 		if bSelf then
 			--[[#DEBUG BEGIN]]
 			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Team map copy id request sent.', X.DEBUG_LEVEL.LOG)
@@ -354,12 +354,34 @@ do
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 		if bResponse then
-			local function fnAction(tMapID)
+			local tProgress, aCopyID
+			local function fnAction()
+				if not tProgress or not aCopyID then
+					return
+				end
 				local nReplyChannel = D.GetReplyChannel(nChannel, szTalkerName)
-				X.SendBgMsg(nReplyChannel, 'MY_MAP_COPY_ID', {dwMapID, tMapID[dwMapID] or -1}, true)
+				X.SendBgMsg(nReplyChannel, 'MY_TEAM_TOOLS__MAP_CD_RES', {X.GetClientPlayerGlobalID(), dwMapID, aCopyID, tProgress}, true)
 			end
-			X.GetMapSaveCopy(fnAction)
+			local bCDProgressMap = X.IsCDProgressMap(dwMapID)
+			if bCDProgressMap then
+				X.GetClientPlayerMapCDProgress(dwMapID, function(t)
+					tProgress = t
+					fnAction()
+				end)
+			else
+				tProgress = {}
+			end
+			X.GetMapSaveCopy(function(tMapID)
+				aCopyID = tMapID[dwMapID] or {}
+				fnAction()
+			end)
 			LAST_TIME[dwMapID] = GetCurrentTime()
+		end
+	end)
+	X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', function()
+		local dwMapID, dwPlayerID = arg0, arg1
+		if dwPlayerID == X.GetClientPlayerID() then
+			LAST_TIME[dwMapID] = nil
 		end
 	end)
 	X.RegisterEvent({
