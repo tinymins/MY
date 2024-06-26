@@ -156,7 +156,7 @@ function D.UpdateSearchAC()
 	D.aSearchAC = info
 		and X.SplitString(info.szBossInfo, ' ', true)
 		or {}
-	FireUIEvent('MY_TEAMTOOLS_ACHI_SEARCH_AC')
+	FireUIEvent('MY_TEAM_TOOLS__ACHIEVE_SEARCH_AC')
 end
 
 function D.AchievementSorter(a, b)
@@ -205,7 +205,7 @@ function D.UpdateAchievementID()
 		aAchievement[i] = achi.dwID
 	end
 	D.aAchievement = aAchievement
-	FireUIEvent('MY_TEAMTOOLS_ACHI')
+	FireUIEvent('MY_TEAM_TOOLS__ACHIEVE')
 end
 
 X.RegisterEvent('LOADING_ENDING', function()
@@ -353,7 +353,7 @@ function D.UpdateSelfData()
 	end
 	ACHIEVE_CACHE[szGlobalID] = ACHIEVE_CACHE[dwID]
 	COUNTER_CACHE[szGlobalID] = COUNTER_CACHE[dwID]
-	FireUIEvent('MY_TEAMTOOLS_ACHI')
+	FireUIEvent('MY_TEAM_TOOLS__ACHIEVE')
 end
 
 function D.RequestTeamData()
@@ -391,7 +391,7 @@ function D.RequestTeamData()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				X.OutputSystemAnnounceMessage(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
 			else
-				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aTeamRequestID, nil})
+				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAM_TOOLS__ACHIEVE_REQ', {aAchieveID, aCounterID, aTeamRequestID, nil})
 			end
 		end
 	elseif MY_TeamTools.szStatRange == 'ROOM' then
@@ -423,7 +423,7 @@ function D.RequestTeamData()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				X.OutputSystemAnnounceMessage(_L['Fetch teammate\'s data failed, please unlock talk and reopen.'])
 			else
-				X.SendBgMsg(PLAYER_TALK_CHANNEL.ROOM, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aRoomRequestID, nil})
+				X.SendBgMsg(PLAYER_TALK_CHANNEL.ROOM, 'MY_TEAM_TOOLS__ACHIEVE_REQ', {aAchieveID, aCounterID, aRoomRequestID, nil})
 			end
 		end
 	end
@@ -435,7 +435,7 @@ function D.DelayRequestTeamData()
 	X.DelayCall('MY_TeamTools_Achievement_DelayReq', 1000, D.RequestTeamData)
 end
 
-X.RegisterBgMsg('MY_TEAMTOOLS_ACHI_RES', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+X.RegisterBgMsg('MY_TEAM_TOOLS__ACHIEVE_RES', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 	local aAchieveRes, aCounterRes, szGlobalID = data[1], data[2], data[3]
 	if not ACHIEVE_CACHE[dwTalkerID] then
 		ACHIEVE_CACHE[dwTalkerID] = {}
@@ -453,7 +453,7 @@ X.RegisterBgMsg('MY_TEAMTOOLS_ACHI_RES', function(_, data, nChannel, dwTalkerID,
 		ACHIEVE_CACHE[szGlobalID] = ACHIEVE_CACHE[dwTalkerID]
 		COUNTER_CACHE[szGlobalID] = COUNTER_CACHE[dwTalkerID]
 	end
-	FireUIEvent('MY_TEAMTOOLS_ACHI')
+	FireUIEvent('MY_TEAM_TOOLS__ACHIEVE')
 end)
 
 function D.OutputRowTip(this, rec)
@@ -791,8 +791,8 @@ function D.OnInitPage()
 	})
 
 	local frame = this:GetRoot()
-	frame:RegisterEvent('MY_TEAMTOOLS_ACHI')
-	frame:RegisterEvent('MY_TEAMTOOLS_ACHI_SEARCH_AC')
+	frame:RegisterEvent('MY_TEAM_TOOLS__ACHIEVE')
+	frame:RegisterEvent('MY_TEAM_TOOLS__ACHIEVE_SEARCH_AC')
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 	frame:RegisterEvent('NEW_ACHIEVEMENT')
 	frame:RegisterEvent('SYNC_ACHIEVEMENT_DATA')
@@ -812,9 +812,9 @@ function D.OnActivePage()
 end
 
 function D.OnEvent(event)
-	if event == 'MY_TEAMTOOLS_ACHI' then
+	if event == 'MY_TEAM_TOOLS__ACHIEVE' then
 		D.DelayUpdatePage(this)
-	elseif event == 'MY_TEAMTOOLS_ACHI_SEARCH_AC' then
+	elseif event == 'MY_TEAM_TOOLS__ACHIEVE_SEARCH_AC' then
 		X.UI(this):Fetch('Wnd_Total/WndAutocomplete_Search'):Autocomplete('option', 'source', D.aSearchAC)
 	elseif event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdatePage(this)

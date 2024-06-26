@@ -372,8 +372,8 @@ end
 
 -- 团队工具·成就统计
 do
-	local LAST_ACHI_TIME, LAST_COUNTER_TIME = {}, {}
-	X.RegisterBgMsg('MY_TEAMTOOLS_ACHI_REQ', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	local LAST_ACHIEVE_TIME, LAST_COUNTER_TIME = {}, {}
+	X.RegisterBgMsg('MY_TEAM_TOOLS__ACHIEVE_REQ', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
 		if bSelf then
 			--[[#DEBUG BEGIN]]
 			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Team achievement request sent.', X.DEBUG_LEVEL.LOG)
@@ -385,7 +385,7 @@ do
 		local szGlobalID = X.GetClientPlayerGlobalID()
 		local bNotChange = true
 		for _, vv in ipairs(aAchieveID) do
-			if not LAST_ACHI_TIME[vv] then
+			if not LAST_ACHIEVE_TIME[vv] then
 				bNotChange = false
 			end
 		end
@@ -403,7 +403,7 @@ do
 			local me = X.GetClientPlayer()
 			local aAchieveRes, aCounterRes = {}, {}
 			for _, dwAchieveID in ipairs(aAchieveID) do
-				LAST_ACHI_TIME[dwAchieveID] = GetCurrentTime()
+				LAST_ACHIEVE_TIME[dwAchieveID] = GetCurrentTime()
 				table.insert(aAchieveRes, {dwAchieveID, me.IsAchievementAcquired(dwAchieveID)})
 			end
 			for _, dwCounterID in ipairs(aCounterID) do
@@ -411,7 +411,7 @@ do
 				table.insert(aCounterRes, {dwCounterID, me.GetAchievementCount(dwCounterID)})
 			end
 			local nReplyChannel = D.GetReplyChannel(nChannel, szTalkerName)
-			X.SendBgMsg(nReplyChannel, 'MY_TEAMTOOLS_ACHI_RES', {aAchieveRes, aCounterRes, X.GetClientPlayerGlobalID()}, true)
+			X.SendBgMsg(nReplyChannel, 'MY_TEAM_TOOLS__ACHIEVE_RES', {aAchieveRes, aCounterRes, X.GetClientPlayerGlobalID()}, true)
 		end
 	end)
 	X.RegisterEvent({
@@ -420,7 +420,7 @@ do
 		'UPDATE_ACHIEVEMENT_POINT',
 		'UPDATE_ACHIEVEMENT_COUNT',
 	}, function()
-		LAST_ACHI_TIME, LAST_COUNTER_TIME = {}, {}
+		LAST_ACHIEVE_TIME, LAST_COUNTER_TIME = {}, {}
 	end)
 end
 
