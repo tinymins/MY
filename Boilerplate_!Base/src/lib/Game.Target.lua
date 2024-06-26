@@ -1412,6 +1412,21 @@ function X.IsParty(dwID)
 	return me and me.IsPlayerInMyParty(dwID)
 end
 
+-- 判断是不是在同房间
+---@param szGlobalID string @角色全局ID
+---@return boolean @该角色是不是房间成员
+function X.IsRoommate(szGlobalID)
+	if szGlobalID == X.GetClientPlayerGlobalID() then
+		return true
+	end
+	for _, s in ipairs(X.GetRoomMemberList()) do
+		if szGlobalID == s then
+			return true
+		end
+	end
+	return false
+end
+
 -- 判断关系
 ---@param dwSelfID number @来源角色ID
 ---@param dwPeerID number @目标角色ID
