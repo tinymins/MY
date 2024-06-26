@@ -105,12 +105,12 @@ local RT_BUFF_ID = {
 	[2313] = true,
 	[5970] = true,
 }
-local RT_GONGZHAN_ID = 3219
+local RT_IGONG_ZHAN_D = 3219
 -- default sort
-local RT_SORT_MODE    = 'DESC'
-local RT_SORT_FIELD   = 'nEquipScore'
-local RT_MAPID = 0
-local RT_PLAYER_MAP_COPYID = {}
+local RT_SORT_MODE = 'DESC'
+local RT_SORT_FIELD = 'nEquipScore'
+local RT_MAP_ID = 0
+local RT_PLAYER_MAP_COPY_ID = {}
 local RT_MAP_CD_PROGRESS = {}
 local RT_SELECT_PAGE = 0
 local RT_SELECT_KUNGFU
@@ -120,13 +120,13 @@ local RT_SCORE_FULL = 30000
 
 function D.UpdateDungeonInfo(hDungeon)
 	local me = X.GetClientPlayer()
-	local szText = Table_GetMapName(RT_MAPID)
-	if me.GetMapID() == RT_MAPID and X.IsDungeonMap(RT_MAPID) then
+	local szText = Table_GetMapName(RT_MAP_ID)
+	if me.GetMapID() == RT_MAP_ID and X.IsDungeonMap(RT_MAP_ID) then
 		szText = szText .. '\n' .. 'ID:(' .. me.GetScene().nCopyIndex  ..')'
 	else
 		local tCD = X.GetMapSaveCopy()
-		if tCD and tCD[RT_MAPID] then
-			szText = szText .. '\n' .. 'ID:(' .. tCD[RT_MAPID][1]  ..')'
+		if tCD and tCD[RT_MAP_ID] then
+			szText = szText .. '\n' .. 'ID:(' .. tCD[RT_MAP_ID][1]  ..')'
 		end
 	end
 	hDungeon:Lookup('Text_Dungeon'):SetText(szText)
@@ -166,7 +166,7 @@ end
 function D.CalculateSort(tInfo)
 	local nCount = -2
 	if RT_SORT_FIELD == 'tBossKill' then
-		if X.IsCDProgressMap(RT_MAPID) then
+		if X.IsCDProgressMap(RT_MAP_ID) then
 			nCount = 0
 			for _, p in ipairs(tInfo[RT_SORT_FIELD]) do
 				if p then
@@ -204,7 +204,7 @@ end
 function D.UpdateList(page)
 	local me = X.GetClientPlayer()
 	if not me then return end
-	local aTeam, tKungfu = D.GetTeam(page), {}
+	local aTeam, tKungfu = D.GetTeamData(page), {}
 	local tScore = {
 		Equip   = 0,
 		Buff    = 0,
@@ -339,7 +339,7 @@ function D.UpdateList(page)
 					hBox.OnItemMouseEnter = function()
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
-						local kBuff = X.GetBuff(v.KPlayer, RT_GONGZHAN_ID)
+						local kBuff = X.GetBuff(v.KPlayer, RT_GONG_ZHAN_ID)
 						if kBuff then
 							X.OutputBuffTip({ x, y, w, h }, kBuff.dwID, kBuff.nLevel)
 						end
@@ -429,7 +429,7 @@ function D.UpdateList(page)
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
 						if not GetItem(vv.dwID) then
-							D.GetTotalEquipScore(page, v.dwID)
+							D.ApplyRemotePlayerView(page, v.dwID)
 							OutputItemTip(UI_OBJECT_ITEM_INFO, X.ENVIRONMENT.CURRENT_ITEM_VERSION, vv.dwTabType, vv.dwIndex, {x, y, w, h})
 						else
 							OutputItemTip(UI_OBJECT_ITEM_ONLY_ID, vv.dwID, nil, nil, { x, y, w, h }, nil, nil, nil, nil, nil, v.dwID)
@@ -476,7 +476,7 @@ function D.UpdateList(page)
 			end
 			local hCopyID = h:Lookup('Text_CopyID')
 			local hBossKills = h:Lookup('Handle_BossKills')
-			if X.IsCDProgressMap(RT_MAPID) then
+			if X.IsCDProgressMap(RT_MAP_ID) then
 				for nIndex, bKill in ipairs(v.tBossKill) do
 					local szName = tostring(nIndex)
 					local hBossKill = hBossKills:Lookup(szName)
@@ -490,7 +490,7 @@ function D.UpdateList(page)
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
 						local texts = {}
-						for i, boss in ipairs(X.GetMapCDProgressInfo(RT_MAPID)) do
+						for i, boss in ipairs(X.GetMapCDProgressInfo(RT_MAP_ID)) do
 							table.insert(texts, boss.szName .. '\t' .. _L[v.tBossKill[i] and 'x' or 'r'])
 						end
 						OutputTip(GetFormatText(table.concat(texts, '\n')), 400, { x, y, w, h })
@@ -545,7 +545,7 @@ function D.UpdateList(page)
 		nScore = nScore + v
 	end
 	page.hTotalScore:SetText(math.floor(nScore))
-	local nNum      = #D.GetTeamMemberList(true)
+	local nNum      = #D.GetMemberList(true)
 	local nAvgScore = nScore / nNum
 	page.hProgress:Lookup('Image_Progress'):SetPercentage(nAvgScore / RT_SCORE_FULL)
 	page.hProgress:Lookup('Text_Progress'):SetText(_L('Team strength(%d/%d)', math.floor(nAvgScore), RT_SCORE_FULL))
@@ -610,7 +610,7 @@ function D.GetEquipCache(page, KPlayer)
 		return
 	end
 	local me = X.GetClientPlayer()
-	local aInfo = {
+	local tInfo = {
 		tEquip            = {},
 		tPermanentEnchant = {},
 		tTemporaryEnchant = {}
@@ -627,11 +627,11 @@ function D.GetEquipCache(page, KPlayer)
 		if item then
 			if RT_EQUIP_SPECIAL[equip] then
 				if item.dwSkillID ~= 0 then
-					table.insert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
+					table.insert(tInfo.tEquip, CreateItemTable(item, dwBox, dwX))
 				elseif equip == 'PENDANT' then
 					local desc = Table_GetItemDesc(item.nUiId)
 					if desc and (desc:find(_L['Use:']) or desc:find(_L['Use: ']) or desc:find('15 seconds')) then
-						table.insert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
+						table.insert(tInfo.tEquip, CreateItemTable(item, dwBox, dwX))
 					end
 				-- elseif item.nQuality == 5 then -- 橙色装备
 				-- 	table.insert(tInfo.tEquip, CreateItemTable(item))
@@ -640,7 +640,7 @@ function D.GetEquipCache(page, KPlayer)
 					local aMagicAttrib = item.GetMagicAttrib()
 					for _, tAttrib in ipairs(aMagicAttrib) do
 						if tAttrib.nID == ATTRIBUTE_TYPE.SKILL_EVENT_HANDLER then
-							table.insert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
+							table.insert(tInfo.tEquip, CreateItemTable(item, dwBox, dwX))
 							break
 						end
 					end
@@ -648,7 +648,7 @@ function D.GetEquipCache(page, KPlayer)
 			end
 			-- 永久的附魔 用于评分
 			if item.dwPermanentEnchantID and item.dwPermanentEnchantID ~= 0 then
-				table.insert(aInfo.tPermanentEnchant, {
+				table.insert(tInfo.tPermanentEnchant, {
 					dwPermanentEnchantID = item.dwPermanentEnchantID,
 				})
 			end
@@ -661,28 +661,28 @@ function D.GetEquipCache(page, KPlayer)
 				if X.Table.GetCommonEnchantDesc(item.dwTemporaryEnchantID) then
 					dat.CommonEnchant = true
 				end
-				table.insert(aInfo.tTemporaryEnchant, dat)
+				table.insert(tInfo.tTemporaryEnchant, dat)
 			end
 		end
 	end
 	-- 这些都是一次性的缓存数据
 	page.tDataCache[KPlayer.dwID] = {
-		tEquip            = aInfo.tEquip,
-		tPermanentEnchant = aInfo.tPermanentEnchant,
-		tTemporaryEnchant = aInfo.tTemporaryEnchant,
+		tEquip            = tInfo.tEquip,
+		tPermanentEnchant = tInfo.tPermanentEnchant,
+		tTemporaryEnchant = tInfo.tTemporaryEnchant,
 		nEquipScore       = KPlayer.GetTotalEquipScore()
 	}
 	page.tViewInvite[KPlayer.dwID] = nil
 	if X.IsEmpty(page.tViewInvite) then
 		if KPlayer.dwID ~= me.dwID then
-			FireUIEvent('MY_RAIDTOOLS_SUCCESS') -- 装备请求完毕
+			FireUIEvent('MY_TEAM_TOOLS__SUMMARY__SUCCESS') -- 装备请求完毕
 		end
 	else
 		ViewInviteToPlayer(next(page.tViewInvite), true)
 	end
 end
 
-function D.GetTotalEquipScore(page, dwID)
+function D.ApplyRemotePlayerView(page, dwID)
 	if not page.tViewInvite[dwID] then
 		page.tViewInvite[dwID] = true
 		ViewInviteToPlayer(dwID, true)
@@ -690,27 +690,27 @@ function D.GetTotalEquipScore(page, dwID)
 end
 
 function D.UpdateSelfData()
-	local dwMapID = RT_MAPID
+	local dwMapID = RT_MAP_ID
 	local dwID = X.GetClientPlayerID()
 	local szGlobalID = X.GetClientPlayerGlobalID()
 	X.GetMapSaveCopy(function(tMapID)
 		local aCopyID = tMapID[dwMapID]
-		if not RT_PLAYER_MAP_COPYID[dwID] then
-			RT_PLAYER_MAP_COPYID[dwID] = {}
+		if not RT_PLAYER_MAP_COPY_ID[dwID] then
+			RT_PLAYER_MAP_COPY_ID[dwID] = {}
 		end
-		if not RT_PLAYER_MAP_COPYID[szGlobalID] then
-			RT_PLAYER_MAP_COPYID[szGlobalID] = {}
+		if not RT_PLAYER_MAP_COPY_ID[szGlobalID] then
+			RT_PLAYER_MAP_COPY_ID[szGlobalID] = {}
 		end
-		RT_PLAYER_MAP_COPYID[dwID][dwMapID] = X.IsTable(aCopyID) and aCopyID[1] or -1
-		RT_PLAYER_MAP_COPYID[szGlobalID][dwMapID] = X.IsTable(aCopyID) and aCopyID[1] or -1
-		FireUIEvent('MY_TEAMTOOLS_SUMMARY')
+		RT_PLAYER_MAP_COPY_ID[dwID][dwMapID] = X.IsTable(aCopyID) and aCopyID[1] or -1
+		RT_PLAYER_MAP_COPY_ID[szGlobalID][dwMapID] = X.IsTable(aCopyID) and aCopyID[1] or -1
+		FireUIEvent('MY_TEAM_TOOLS__SUMMARY__UPDATE')
 	end)
 	X.GetClientPlayerMapCDProgress(dwMapID, function(tProgress)
 		if not RT_MAP_CD_PROGRESS[szGlobalID] then
 			RT_MAP_CD_PROGRESS[szGlobalID] = {}
 		end
 		RT_MAP_CD_PROGRESS[szGlobalID][dwMapID] = tProgress
-		FireUIEvent('MY_TEAMTOOLS_SUMMARY')
+		FireUIEvent('MY_TEAM_TOOLS__SUMMARY__UPDATE')
 	end)
 end
 
@@ -720,23 +720,23 @@ function D.RequestTeamData()
 		return
 	end
 	local aRequestID, aRefreshID = {}, {}
-	local bDungeonMap = X.IsDungeonMap(RT_MAPID)
-	local bCDProgressMap = X.IsCDProgressMap(RT_MAPID)
+	local bDungeonMap = X.IsDungeonMap(RT_MAP_ID)
+	local bCDProgressMap = X.IsCDProgressMap(RT_MAP_ID)
 	--[[#DEBUG BEGIN]]
 	if MY_TeamTools.szStatRange == 'RAID' and bCDProgressMap then
 		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Update team map progress.', X.DEBUG_LEVEL.LOG)
 	end
 	--[[#DEBUG END]]
-	local aMemberList = D.GetTeamMemberList(true)
+	local aMemberList = D.GetMemberList(true)
 	if MY_TeamTools.szStatRange == 'RAID' then
 		for _, tMember in ipairs(aMemberList) do
 			if bCDProgressMap then -- 秘境进度
-				ApplyDungeonRoleProgress(RT_MAPID, tMember.dwID) -- 成功回调 UPDATE_DUNGEON_ROLE_PROGRESS(dwMapID, dwPlayerID)
+				ApplyDungeonRoleProgress(RT_MAP_ID, tMember.dwID) -- 成功回调 UPDATE_DUNGEON_ROLE_PROGRESS(dwMapID, dwPlayerID)
 			elseif bDungeonMap then -- 秘境CDID
-				if not RT_PLAYER_MAP_COPYID[tMember.dwID] then
-					RT_PLAYER_MAP_COPYID[tMember.dwID] = {}
+				if not RT_PLAYER_MAP_COPY_ID[tMember.dwID] then
+					RT_PLAYER_MAP_COPY_ID[tMember.dwID] = {}
 				end
-				if RT_PLAYER_MAP_COPYID[tMember.dwID][RT_MAPID] then
+				if RT_PLAYER_MAP_COPY_ID[tMember.dwID][RT_MAP_ID] then
 					table.insert(aRefreshID, tMember.dwID)
 				else
 					table.insert(aRequestID, tMember.dwID)
@@ -746,14 +746,14 @@ function D.RequestTeamData()
 	elseif MY_TeamTools.szStatRange == 'ROOM' then
 		for _, tMember in ipairs(aMemberList) do
 			if bDungeonMap then -- 秘境CDID
-				if not RT_PLAYER_MAP_COPYID[tMember.szGlobalID] then
-					RT_PLAYER_MAP_COPYID[tMember.szGlobalID] = {}
+				if not RT_PLAYER_MAP_COPY_ID[tMember.szGlobalID] then
+					RT_PLAYER_MAP_COPY_ID[tMember.szGlobalID] = {}
 				end
 				if not RT_MAP_CD_PROGRESS[tMember.szGlobalID] then
 					RT_MAP_CD_PROGRESS[tMember.szGlobalID] = {}
 				end
-				if RT_PLAYER_MAP_COPYID[tMember.szGlobalID][RT_MAPID]
-				and RT_MAP_CD_PROGRESS[tMember.szGlobalID][RT_MAPID] then
+				if RT_PLAYER_MAP_COPY_ID[tMember.szGlobalID][RT_MAP_ID]
+				and RT_MAP_CD_PROGRESS[tMember.szGlobalID][RT_MAP_ID] then
 					table.insert(aRefreshID, tMember.szGlobalID)
 				else
 					table.insert(aRequestID, tMember.szGlobalID)
@@ -774,7 +774,7 @@ function D.RequestTeamData()
 			local nChannel = MY_TeamTools.szStatRange == 'RAID'
 				and PLAYER_TALK_CHANNEL.RAID
 				or PLAYER_TALK_CHANNEL.ROOM
-			X.SendBgMsg(nChannel, 'MY_TEAM_TOOLS__MAP_CD_REQ', {RT_MAPID, aRequestID, nil})
+			X.SendBgMsg(nChannel, 'MY_TEAM_TOOLS__MAP_CD_REQ', {RT_MAP_ID, aRequestID, nil})
 		end
 	end
 	-- 刷新自己的
@@ -782,15 +782,15 @@ function D.RequestTeamData()
 end
 
 -- 获取团队大部分情况 非缓存
-function D.GetTeam(page)
+function D.GetTeamData(page)
 	local me    = X.GetClientPlayer()
 	local team  = GetClientTeam()
 	local aList = {}
 	local bIsInParty = X.IsInParty()
-	local bCDProgressMap = X.IsCDProgressMap(RT_MAPID)
-	local aProgressMapBoss = bCDProgressMap and X.GetMapCDProgressInfo(RT_MAPID)
+	local bCDProgressMap = X.IsCDProgressMap(RT_MAP_ID)
+	local aProgressMapBoss = bCDProgressMap and X.GetMapCDProgressInfo(RT_MAP_ID)
 	local aRequestMapCopyID = {}
-	local aMemberList = D.GetTeamMemberList()
+	local aMemberList = D.GetMemberList()
 	for _, tMember in ipairs(aMemberList) do
 		local KPlayer = MY_TeamTools.szStatRange == 'RAID' and X.GetPlayer(tMember.dwID)
 		local tInfo = {
@@ -826,7 +826,7 @@ function D.GetTeam(page)
 				if RT_BUFF_ID[buff.dwID] then
 					table.insert(tInfo.tBuff, buff)
 				end
-				if buff.dwID == RT_GONGZHAN_ID then -- grandpa
+				if buff.dwID == RT_GONG_ZHAN_ID then -- grandpa
 					tInfo.bGrandpa = true
 				end
 			end
@@ -838,17 +838,17 @@ function D.GetTeam(page)
 		if MY_TeamTools.szStatRange == 'RAID' then
 			if tInfo.bIsOnLine and bCDProgressMap then
 				for i, boss in ipairs(aProgressMapBoss) do
-					tInfo.tBossKill[i] = GetDungeonRoleProgress(RT_MAPID, tMember.dwID, boss.dwProgressID)
+					tInfo.tBossKill[i] = GetDungeonRoleProgress(RT_MAP_ID, tMember.dwID, boss.dwProgressID)
 				end
 			end
-			tInfo.nCopyID = X.Get(RT_PLAYER_MAP_COPYID, {tMember.dwID, RT_MAPID})
+			tInfo.nCopyID = X.Get(RT_PLAYER_MAP_COPY_ID, {tMember.dwID, RT_MAP_ID})
 		elseif MY_TeamTools.szStatRange == 'ROOM' then
 			if bCDProgressMap then
 				for i, boss in ipairs(aProgressMapBoss) do
-					tInfo.tBossKill[i] = X.Get(RT_MAP_CD_PROGRESS, {tMember.szGlobalID, RT_MAPID, boss.dwProgressID})
+					tInfo.tBossKill[i] = X.Get(RT_MAP_CD_PROGRESS, {tMember.szGlobalID, RT_MAP_ID, boss.dwProgressID})
 				end
 			end
-			tInfo.nCopyID = X.Get(RT_PLAYER_MAP_COPYID, {tMember.szGlobalID, RT_MAPID})
+			tInfo.nCopyID = X.Get(RT_PLAYER_MAP_COPY_ID, {tMember.szGlobalID, RT_MAP_ID})
 		end
 		setmetatable(tInfo, { __index = page.tDataCache[tMember.dwID] })
 		table.insert(aList, tInfo)
@@ -863,11 +863,11 @@ function D.ApplyTeamEquip(page)
 			return
 		end
 		local team = GetClientTeam()
-		for _, tMember in ipairs(D.GetTeamMemberList()) do
+		for _, tMember in ipairs(D.GetMemberList()) do
 			if tMember.dwID ~= X.GetClientPlayerID() then
 				local info = team.GetMemberInfo(tMember.dwID)
 				if info.bIsOnLine then
-					D.GetTotalEquipScore(page, tMember.dwID)
+					D.ApplyRemotePlayerView(page, tMember.dwID)
 				end
 			end
 		end
@@ -875,7 +875,7 @@ function D.ApplyTeamEquip(page)
 end
 
 -- 获取团队成员列表
-function D.GetTeamMemberList(bIsOnLine)
+function D.GetMemberList(bIsOnLine)
 	local aList = {}
 	if MY_TeamTools.szStatRange == 'RAID' then
 		for _, dwID in ipairs(X.GetTeamMemberList()) do
@@ -909,11 +909,11 @@ function D.GetTeamMemberList(bIsOnLine)
 end
 
 function D.SetMapID(dwMapID)
-	if RT_MAPID == dwMapID then
+	if RT_MAP_ID == dwMapID then
 		return
 	end
-	RT_MAPID = dwMapID
-	FireUIEvent('MY_RAIDTOOLS_MAPID_CHANGE')
+	RT_MAP_ID = dwMapID
+	FireUIEvent('MY_TEAM_TOOLS__SUMMARY__MAP_ID_CHANGE')
 end
 
 X.RegisterEvent('LOADING_END', function()
@@ -922,21 +922,21 @@ end)
 
 X.RegisterBgMsg('MY_TEAM_TOOLS__MAP_CD_RES', function(_, data, nChannel, dwID, szName, bIsSelf)
 	local szGlobalID, dwMapID, aCopyID, tProgress = data[1], data[2], data[3], data[4]
-	if not RT_PLAYER_MAP_COPYID[dwID] then
-		RT_PLAYER_MAP_COPYID[dwID] = {}
+	if not RT_PLAYER_MAP_COPY_ID[dwID] then
+		RT_PLAYER_MAP_COPY_ID[dwID] = {}
 	end
-	RT_PLAYER_MAP_COPYID[dwID][dwMapID] = X.IsTable(aCopyID) and aCopyID[1] or -1
-	if not RT_PLAYER_MAP_COPYID[szGlobalID] then
-		RT_PLAYER_MAP_COPYID[szGlobalID] = {}
+	RT_PLAYER_MAP_COPY_ID[dwID][dwMapID] = X.IsTable(aCopyID) and aCopyID[1] or -1
+	if not RT_PLAYER_MAP_COPY_ID[szGlobalID] then
+		RT_PLAYER_MAP_COPY_ID[szGlobalID] = {}
 	end
-	RT_PLAYER_MAP_COPYID[szGlobalID][dwMapID] = X.IsTable(aCopyID) and aCopyID[1] or -1
+	RT_PLAYER_MAP_COPY_ID[szGlobalID][dwMapID] = X.IsTable(aCopyID) and aCopyID[1] or -1
 	if X.IsCDProgressMap(dwMapID) then
 		if not RT_MAP_CD_PROGRESS[szGlobalID] then
 			RT_MAP_CD_PROGRESS[szGlobalID] = {}
 		end
 		RT_MAP_CD_PROGRESS[szGlobalID][dwMapID] = X.IsTable(tProgress) and tProgress or nil
 	end
-	FireUIEvent('MY_TEAMTOOLS_SUMMARY')
+	FireUIEvent('MY_TEAM_TOOLS__SUMMARY__UPDATE')
 end)
 
 function D.OnInitPage()
@@ -958,12 +958,10 @@ function D.OnInitPage()
 	-- 团长变更 重新请求标签
 	frame:RegisterEvent('TEAM_AUTHORITY_CHANGED')
 	-- 自定义事件
-	frame:RegisterEvent('MY_TEAMTOOLS_SUMMARY')
-	frame:RegisterEvent('MY_RAIDTOOLS_SUCCESS')
-	frame:RegisterEvent('MY_RAIDTOOLS_DEATH')
-	frame:RegisterEvent('MY_RAIDTOOLS_ENTER_MAP')
-	frame:RegisterEvent('MY_RAIDTOOLS_MAPID_CHANGE')
 	frame:RegisterEvent('MY_TEAM_TOOLS__MODE_CHANGE')
+	frame:RegisterEvent('MY_TEAM_TOOLS__SUMMARY__UPDATE')
+	frame:RegisterEvent('MY_TEAM_TOOLS__SUMMARY__SUCCESS')
+	frame:RegisterEvent('MY_TEAM_TOOLS__SUMMARY__MAP_ID_CHANGE')
 	-- 重置心法选择
 	RT_SELECT_KUNGFU = nil
 	local hPlayerList = page:Lookup('Wnd_Summary/Scroll_Player', '')
@@ -1062,18 +1060,18 @@ function D.OnActivePage()
 		hView:Hide()
 	end
 	X.BreatheCall('MY_RaidTools_Draw', 1000, D.UpdateList, this)
-	X.BreatheCall('MY_RaidTools_GetEquip', 3000, D.ApplyTeamEquip, this)
+	X.BreatheCall('MY_RaidTools_RequestMemberEquip', 3000, D.ApplyTeamEquip, this)
 	X.BreatheCall('MY_RaidTools_RequestTeamData', 30000, D.RequestTeamData, this)
 end
 
 function D.OnDeactivePage()
 	X.BreatheCall('MY_RaidTools_Draw', false)
-	X.BreatheCall('MY_RaidTools_GetEquip', false)
+	X.BreatheCall('MY_RaidTools_RequestMemberEquip', false)
 	X.BreatheCall('MY_RaidTools_RequestTeamData', false)
 end
 
 function D.OnEvent(szEvent)
-	if szEvent == 'MY_TEAMTOOLS_SUMMARY' then
+	if szEvent == 'MY_TEAM_TOOLS__SUMMARY__UPDATE' then
 		D.UpdateList(this)
 	elseif szEvent == 'UPDATE_DUNGEON_ROLE_PROGRESS' then
 		D.UpdateList(this)
@@ -1103,14 +1101,14 @@ function D.OnEvent(szEvent)
 		-- 秘境信息
 		local hDungeon = this:Lookup('Wnd_Summary', 'Handle_Dungeon')
 		D.UpdateDungeonInfo(hDungeon)
-	elseif szEvent == 'MY_RAIDTOOLS_MAPID_CHANGE' then
+	elseif szEvent == 'MY_TEAM_TOOLS__SUMMARY__MAP_ID_CHANGE' then
 		D.RequestTeamData() -- 地图变化刷新
 		local hDungeon = this:Lookup('Wnd_Summary', 'Handle_Dungeon')
 		D.UpdateDungeonInfo(hDungeon)
 	elseif szEvent == 'ON_APPLY_PLAYER_SAVED_COPY_RESPOND' then
 		local hDungeon = this:Lookup('Wnd_Summary', 'Handle_Dungeon')
 		D.UpdateDungeonInfo(hDungeon)
-	elseif szEvent == 'MY_RAIDTOOLS_SUCCESS' then
+	elseif szEvent == 'MY_TEAM_TOOLS__SUMMARY__SUCCESS' then
 		if RT_SORT_FIELD == 'nEquipScore' then
 			D.UpdateList(this)
 			this.hPlayerList:Sort()
