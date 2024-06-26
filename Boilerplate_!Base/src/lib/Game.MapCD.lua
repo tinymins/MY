@@ -146,12 +146,11 @@ end
 
 ---获取地图秘境进度信息
 ---@param dwMapID number @要获取的地图ID
----@param nProcessID number @要获取的进度ID，不传则获取所有进度
 ---@return table @秘境首领与进度状态列表
-function X.GetMapCDProcessInfo(dwMapID, nProcessID)
+function X.GetMapCDProcessInfo(dwMapID)
 	if GetCDProcessInfo then
 		local aInfo = {}
-		for _, v in ipairs(GetCDProcessInfo(dwMapID, nProcessID) or X.CONSTANT.EMPTY_TABLE) do
+		for _, v in ipairs(GetCDProcessInfo(dwMapID) or X.CONSTANT.EMPTY_TABLE) do
 			table.insert(aInfo, {
 				dwBossIndex = v.BossIndex,
 				dwMapID = v.MapID,
@@ -161,7 +160,7 @@ function X.GetMapCDProcessInfo(dwMapID, nProcessID)
 		end
 		return aInfo
 	end
-	return Table_GetCDProcessBoss(dwMapID, nProcessID)
+	return Table_GetCDProcessBoss(dwMapID)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
