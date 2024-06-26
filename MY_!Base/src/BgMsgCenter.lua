@@ -343,6 +343,76 @@ end
 --- 子插件自定义背景通讯
 --------------------------------------------------------------------------------
 
+-- 团队工具·团队秘境CD
+do
+	local LAST_TIME = {}
+	X.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+		if bSelf then
+			--[[#DEBUG BEGIN]]
+			X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Team map copy id request sent.', X.DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
+			return
+		end
+		local dwMapID, aRequestID, aRefreshID = data[1], data[2], data[3]
+		local dwID = X.GetClientPlayerID()
+		local bRequest, bRefresh, bResponse = false, false, false
+		if not bResponse then
+			if aRequestID then
+				for _, v in ipairs(aRequestID) do
+					if bRequest then
+						break
+					end
+					if v == dwID then
+						bRequest = true
+					end
+				end
+			else
+				bRequest = true
+			end
+			if bRequest then
+				bResponse = true
+			end
+		end
+		if not bResponse then
+			if aRefreshID then
+				for _, v in ipairs(aRefreshID) do
+					if bRefresh then
+						break
+					end
+					if v == dwID then
+						bRefresh = true
+					end
+				end
+			else
+				bRefresh = true
+			end
+			if bRefresh then
+				if not LAST_TIME[dwMapID] then
+					bResponse = true
+				end
+			end
+		end
+		--[[#DEBUG BEGIN]]
+		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Team map copy id request from ' .. szTalkerName
+			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
+		--[[#DEBUG END]]
+		if bResponse then
+			local function fnAction(tMapID)
+				local nReplyChannel = GetReplyChannel(nChannel, szTalkerName)
+				X.SendBgMsg(nReplyChannel, 'MY_MAP_COPY_ID', {dwMapID, tMapID[dwMapID] or -1}, true)
+			end
+			X.GetMapSaveCopy(fnAction)
+			LAST_TIME[dwMapID] = GetCurrentTime()
+		end
+	end)
+	X.RegisterEvent({
+		'ON_RESET_MAP_RESPOND',
+		'ON_APPLY_PLAYER_SAVED_COPY_RESPOND',
+	}, function()
+		LAST_TIME = {}
+	end)
+end
+
 do
 	local LAST_ACHI_TIME, LAST_COUNTER_TIME = {}, {}
 	X.RegisterBgMsg('MY_TEAMTOOLS_ACHI_REQ', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
