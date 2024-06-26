@@ -317,7 +317,8 @@ do
 		local aRequestID, aRefreshID = data[1], data[2]
 		local dwID = X.GetClientPlayerID()
 		local szGlobalID = X.GetClientPlayerGlobalID()
-		local bResponse = D.NeedReply(aRequestID, aRefreshID, dwID, szGlobalID, not X.IsNil(LAST_TIME))
+		local bNotChange = not X.IsNil(LAST_TIME)
+		local bResponse = D.NeedReply(aRequestID, aRefreshID, dwID, szGlobalID, bNotChange)
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Global id request from ' .. szTalkerName
 			.. ', will ' .. (bResponse and '' or 'not ') .. 'response.', X.DEBUG_LEVEL.PM_LOG)
