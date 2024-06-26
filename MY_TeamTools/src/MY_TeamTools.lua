@@ -20,8 +20,7 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
-local D = {}
-local O = {
+local D = {
 	aModule = {},
 	nActivePageIndex = nil,
 }
@@ -53,13 +52,13 @@ end
 
 -- ×¢²á×ÓÄ£¿é
 function D.RegisterModule(szID, szName, env)
-	for i, v in X.ipairs_r(O.aModule) do
+	for i, v in X.ipairs_r(D.aModule) do
 		if v.szID == szID then
-			table.remove(O.aModule, i)
+			table.remove(D.aModule, i)
 		end
 	end
 	if szName and env then
-		table.insert(O.aModule, {
+		table.insert(D.aModule, {
 			szID = szID,
 			szName = szName,
 			env = env,
@@ -75,7 +74,7 @@ end
 function D.InitPageSet(frame)
 	frame.bInitPageset = true
 	local pageset = frame:Lookup('PageSet_All')
-	for i, m in ipairs(O.aModule) do
+	for i, m in ipairs(D.aModule) do
 		local frameMod = X.UI.OpenFrame(SZ_MOD_INI, 'MY_TeamToolsMod')
 		local checkbox = frameMod:Lookup('PageSet_Total/WndCheck_Default')
 		local page = frameMod:Lookup('PageSet_Total/Page_Default')
@@ -96,8 +95,8 @@ function D.ActivePage(frame, szModule, bFirst)
 	local pageset = frame:Lookup('PageSet_All')
 	local pageActive = pageset:GetActivePage()
 	local nActiveIndex, nToIndex = pageActive.nIndex, nil
-	for i, m in ipairs(O.aModule) do
-		if m.szID == szModule or i == szModule or i == O.nActivePageIndex then
+	for i, m in ipairs(D.aModule) do
+		if m.szID == szModule or i == szModule or i == D.nActivePageIndex then
 			nToIndex = i
 		end
 	end
@@ -113,7 +112,7 @@ function D.ActivePage(frame, szModule, bFirst)
 		else
 			pageset:ActivePage(nToIndex - 1)
 		end
-		O.nActivePageIndex = nToIndex
+		D.nActivePageIndex = nToIndex
 	end
 end
 
@@ -132,7 +131,7 @@ function Framework.OnLButtonClick()
 			end,
 		})
 		local tFloatEntryMenu = { szOption = _L['Float panel'] }
-		for _, m in ipairs(O.aModule) do
+		for _, m in ipairs(D.aModule) do
 			if m and m.env.szFloatEntry then
 				table.insert(tFloatEntryMenu, {
 					szOption = m.szName,
@@ -147,7 +146,7 @@ function Framework.OnLButtonClick()
 			table.insert(menu, tFloatEntryMenu)
 		end
 		local tSaveDBMenu = { szOption = _L['Save DB'] }
-		for _, m in ipairs(O.aModule) do
+		for _, m in ipairs(D.aModule) do
 			if m and m.env.szSaveDB then
 				table.insert(tSaveDBMenu, {
 					szOption = m.szName,
@@ -182,7 +181,7 @@ function Framework.OnActivePage()
 		local page = this:GetActivePage()
 		if page.nIndex then
 			if X.IsElement(frame.pActivePage) then
-				local m = O.aModule[frame.pActivePage.nIndex]
+				local m = D.aModule[frame.pActivePage.nIndex]
 				if m and m.env.OnDeactivePage then
 					local _this = this
 					this = frame.pActivePage
@@ -190,7 +189,7 @@ function Framework.OnActivePage()
 					this = _this
 				end
 			end
-			local m = O.aModule[page.nIndex]
+			local m = D.aModule[page.nIndex]
 			if not page.bInit then
 				if m and m.env.OnInitPage then
 					local _this = this
@@ -207,7 +206,7 @@ function Framework.OnActivePage()
 				this = _this
 			end
 			frame.pActivePage = page
-			O.nActivePageIndex = page.nIndex
+			D.nActivePageIndex = page.nIndex
 		end
 	end
 end
@@ -234,7 +233,7 @@ end
 
 function Framework.OnFrameDestroy()
 	if X.IsElement(this.pActivePage) then
-		local m = O.aModule[this.pActivePage.nIndex]
+		local m = D.aModule[this.pActivePage.nIndex]
 		if m and m.env.OnDeactivePage then
 			local _this = this
 			this = this.pActivePage
@@ -278,7 +277,7 @@ for _, szEvent in ipairs({
 		local page = this:Lookup('PageSet_All'):GetFirstChild()
 		while page do
 			if page:GetName() == 'Page_Default' and page.bInit then
-				local m = O.aModule[page.nIndex]
+				local m = D.aModule[page.nIndex]
 				if m and m.env[szEvent] then
 					local _this = this
 					this = page
@@ -343,7 +342,7 @@ for _, szEvent in ipairs({
 			end
 		end
 		if page and page ~= this then
-			local m = O.aModule[page.nIndex]
+			local m = D.aModule[page.nIndex]
 			if m and m.env[szEvent] then
 				return m.env[szEvent](...)
 			end
