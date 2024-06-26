@@ -221,7 +221,7 @@ end)
 -- 获取成员列表
 function D.GetMemberList(bIsOnLine)
 	local aList = {}
-	if MY_TeamTools.szMode == 'RAID' then
+	if MY_TeamTools.szStatRange == 'RAID' then
 		for _, dwID in ipairs(X.GetTeamMemberList()) do
 			local tMember = X.GetTeamMemberInfo(dwID)
 			if tMember and (not bIsOnLine or tMember.bOnline) then
@@ -233,7 +233,7 @@ function D.GetMemberList(bIsOnLine)
 				})
 			end
 		end
-	elseif MY_TeamTools.szMode == 'ROOM' then
+	elseif MY_TeamTools.szStatRange == 'ROOM' then
 		for _, szGlobalID in ipairs(X.GetRoomMemberList()) do
 			local tMember = X.GetRoomMemberInfo(szGlobalID)
 			local szServerName = tMember and X.GetServerNameByID(tMember.dwServerID)
@@ -362,7 +362,7 @@ function D.RequestTeamData()
 	local aTeamRequestID, aTeamRefreshID, tTeamRequestID = {}, {}, {}
 	local aRoomRequestID, aRoomRefreshID, tRoomRequestID = {}, {}, {}
 	local aMemberList = D.GetMemberList(true)
-	if MY_TeamTools.szMode == 'RAID' then
+	if MY_TeamTools.szStatRange == 'RAID' then
 		for _, tMember in ipairs(aMemberList) do
 			for _, dwAchieveID in ipairs(aAchieveID) do
 				if not ACHIEVE_CACHE[tMember.dwID] or X.IsNil(ACHIEVE_CACHE[tMember.dwID][dwAchieveID]) then
@@ -394,7 +394,7 @@ function D.RequestTeamData()
 				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aTeamRequestID, nil})
 			end
 		end
-	elseif MY_TeamTools.szMode == 'ROOM' then
+	elseif MY_TeamTools.szStatRange == 'ROOM' then
 		for _, tMember in ipairs(aMemberList) do
 			for _, dwAchieveID in ipairs(aAchieveID) do
 				if not ACHIEVE_CACHE[tMember.szGlobalID] or X.IsNil(ACHIEVE_CACHE[tMember.szGlobalID][dwAchieveID]) then
@@ -910,7 +910,7 @@ local settings = {
 			fields = {
 				'OnInitPage',
 				'OnDeactivePage',
-				bMode = true,
+				bStatRange = true,
 			},
 			root = D,
 		},

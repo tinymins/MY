@@ -23,7 +23,7 @@ end
 local D = {
 	aModule = {},
 	nActivePageIndex = nil,
-	szMode = 'RAID',
+	szStatRange = 'RAID',
 }
 local Framework = {}
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_TeamTools.ini'
@@ -206,7 +206,7 @@ function Framework.OnActivePage()
 				m.env.OnActivePage()
 				this = _this
 			end
-			frame:Lookup('WndComboBox_Mode'):SetVisible(m and m.env and m.env.bMode or false)
+			frame:Lookup('WndComboBox_Mode'):SetVisible(m and m.env and m.env.bStatRange or false)
 			frame.pActivePage = page
 			D.nActivePageIndex = page.nIndex
 		end
@@ -229,7 +229,7 @@ function Framework.OnFrameCreate()
 	end
 	this:Lookup('', 'Text_Title'):SetText(szTitle)
 	-- Ä£Ê½Ñ¡Ôñ
-	local aMode = {
+	local aStatRange = {
 		{ szKey = 'RAID', szName = _L['Raid Stat'] },
 		{ szKey = 'ROOM', szName = _L['Room Stat'] },
 	}
@@ -237,21 +237,21 @@ function Framework.OnFrameCreate()
 		name = 'WndComboBox_Mode',
 		x = 930, y = 52, w = 110, h = 26,
 		text = (function()
-			for _, v in ipairs(aMode) do
-				if v.szKey == D.szMode then
+			for _, v in ipairs(aStatRange) do
+				if v.szKey == D.szStatRange then
 					return v.szName
 				end
 			end
-			return aMode[1].szName
+			return aStatRange[1].szName
 		end)(),
 		menu = function()
 			local menu = {}
 			local ui = X.UI(this)
-			for _, tMode in ipairs(aMode) do
+			for _, tMode in ipairs(aStatRange) do
 				table.insert(menu, {
 					szOption = tMode.szName,
 					fnAction = function()
-						D.szMode = tMode.szKey
+						D.szStatRange = tMode.szKey
 						FireUIEvent('MY_TEAM_TOOLS__MODE_CHANGE')
 						ui:Text(tMode.szName)
 						X.UI.ClosePopupMenu()
@@ -408,7 +408,7 @@ local settings = {
 		{
 			root = D,
 			fields = {
-				'szMode',
+				'szStatRange',
 			},
 			preset = 'UIEvent'
 		},

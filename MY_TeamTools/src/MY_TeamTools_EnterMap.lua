@@ -100,10 +100,10 @@ end)
 -- ÷ÿ…Àº«¬º
 function D.UpdatePage(page)
 	local tInfoCache, aEnterMapLog = {}, {}
-	if MY_TeamTools.szMode == 'RAID' then
+	if MY_TeamTools.szStatRange == 'RAID' then
 		tInfoCache = INFO_CACHE.RAID
 		aEnterMapLog = ENTER_MAP_LOG.RAID
-	elseif MY_TeamTools.szMode == 'ROOM' then
+	elseif MY_TeamTools.szStatRange == 'ROOM' then
 		tInfoCache = INFO_CACHE.ROOM
 		aEnterMapLog = ENTER_MAP_LOG.ROOM
 	end
@@ -157,10 +157,10 @@ end
 
 function D.UpdateList(page, dwMapID)
 	local tInfoCache, aEnterMapLog = {}, {}
-	if MY_TeamTools.szMode == 'RAID' then
+	if MY_TeamTools.szStatRange == 'RAID' then
 		tInfoCache = INFO_CACHE.RAID
 		aEnterMapLog = ENTER_MAP_LOG.RAID
-	elseif MY_TeamTools.szMode == 'ROOM' then
+	elseif MY_TeamTools.szStatRange == 'ROOM' then
 		tInfoCache = INFO_CACHE.ROOM
 		aEnterMapLog = ENTER_MAP_LOG.ROOM
 	end
@@ -277,7 +277,7 @@ local settings = {
 			fields = {
 				'OnInitPage',
 				'OnDeactivePage',
-				bMode = true,
+				bStatRange = true,
 			},
 			root = D,
 		},
