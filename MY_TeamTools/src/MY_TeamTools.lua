@@ -23,6 +23,7 @@ end
 local D = {
 	aModule = {},
 	nActivePageIndex = nil,
+	szMode = 'RAID',
 }
 local Framework = {}
 local SZ_INI = PLUGIN_ROOT .. '/ui/MY_TeamTools.ini'
@@ -226,6 +227,38 @@ function Framework.OnFrameCreate()
 		szTitle = _L('%s\'s Team', info.szName) .. ' (' .. team.GetTeamSize() .. '/' .. team.nGroupNum * 5  .. ')'
 	end
 	this:Lookup('', 'Text_Title'):SetText(szTitle)
+	-- 模式选择
+	local aMode = {
+		{ szKey = 'RAID', szName = _L['Raid Stat'] },
+		{ szKey = 'ROOM', szName = _L['Room Stat'] },
+	}
+	X.UI(this):Append('WndComboBox', {
+		x = 930, y = 52, w = 110, h = 26,
+		text = (function()
+			for _, v in ipairs(aMode) do
+				if v.szKey == D.szMode then
+					return v.szName
+				end
+			end
+			return aMode[1].szName
+		end)(),
+		menu = function()
+			local menu = {}
+			local ui = X.UI(this)
+			for _, tMode in ipairs(aMode) do
+				table.insert(menu, {
+					szOption = tMode.szName,
+					fnAction = function()
+						D.szMode = tMode.szKey
+						FireUIEvent('MY_TEAM_TOOLS__MODE_CHANGE')
+						ui:Text(tMode.szName)
+						X.UI.ClosePopupMenu()
+					end,
+				})
+			end
+			return menu
+		end,
+	})
 	-- 注册关闭
 	X.RegisterEsc('MY_TeamTools', D.IsOpened, D.Close)
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
@@ -372,6 +405,9 @@ local settings = {
 		},
 		{
 			root = D,
+			fields = {
+				'szMode',
+			},
 			preset = 'UIEvent'
 		},
 	},

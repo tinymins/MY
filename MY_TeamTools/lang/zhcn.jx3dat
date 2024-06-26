@@ -6,6 +6,8 @@ return {
 	['Option'] = '设置',
 	['Open Panel'] = '打开界面',
 	['Please unlock talk lock first.'] = '请先解除聊天锁。',
+	['Raid Stat'] = '团队统计',
+	['Room Stat'] = '房间统计',
 	-- MY_TeamTools_DeathLog
 	['MY_TeamTools_DeathLog'] = '重伤记录',
 	['OUTER GUEST'] = '天外来客',

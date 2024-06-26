@@ -220,29 +220,30 @@ end)
 
 -- 获取成员列表
 function D.GetMemberList(bIsOnLine)
-	local aList, tList = {}, {}
-	for _, dwID in ipairs(X.GetTeamMemberList()) do
-		local tMember = X.GetTeamMemberInfo(dwID)
-		if tMember and (not bIsOnLine or tMember.bOnline) then
-			table.insert(aList, {
-				dwID = tMember.dwID,
-				szGlobalID = tMember.szGlobalID,
-				szName = tMember.szName,
-				dwForceID = tMember.dwForceID,
-			})
-			tList[tMember.szGlobalID] = true
+	local aList = {}
+	if MY_TeamTools.szMode == 'RAID' then
+		for _, dwID in ipairs(X.GetTeamMemberList()) do
+			local tMember = X.GetTeamMemberInfo(dwID)
+			if tMember and (not bIsOnLine or tMember.bOnline) then
+				table.insert(aList, {
+					dwID = tMember.dwID,
+					szGlobalID = tMember.szGlobalID,
+					szName = tMember.szName,
+					dwForceID = tMember.dwForceID,
+				})
+			end
 		end
-	end
-	for _, szGlobalID in ipairs(X.GetRoomMemberList()) do
-		local tMember = X.GetRoomMemberInfo(szGlobalID)
-		local szServerName = tMember and X.GetServerNameByID(tMember.dwServerID)
-		if tMember and szServerName and not tList[tMember.szGlobalID] then
-			table.insert(aList, {
-				szGlobalID = tMember.szGlobalID,
-				szName = tMember.szName .. g_tStrings.STR_CONNECT .. szServerName,
-				dwForceID = tMember.dwForceID,
-			})
-			tList[tMember.szGlobalID] = true
+	elseif MY_TeamTools.szMode == 'ROOM' then
+		for _, szGlobalID in ipairs(X.GetRoomMemberList()) do
+			local tMember = X.GetRoomMemberInfo(szGlobalID)
+			local szServerName = tMember and X.GetServerNameByID(tMember.dwServerID)
+			if tMember and szServerName then
+				table.insert(aList, {
+					szGlobalID = tMember.szGlobalID,
+					szName = tMember.szName .. g_tStrings.STR_CONNECT .. szServerName,
+					dwForceID = tMember.dwForceID,
+				})
+			end
 		end
 	end
 	return aList
@@ -336,19 +337,22 @@ end
 
 function D.UpdateSelfData()
 	local aAchieveID, aCounterID = D.AnalysisAchievementRequest(D.aAchievement)
+	local dwID, szGlobalID = X.GetClientPlayerID(), X.GetClientPlayerGlobalID()
 	local me = X.GetClientPlayer()
-	if not ACHIEVE_CACHE[me.dwID] then
-		ACHIEVE_CACHE[me.dwID] = {}
+	if not ACHIEVE_CACHE[dwID] then
+		ACHIEVE_CACHE[dwID] = {}
 	end
-	if not COUNTER_CACHE[me.dwID] then
-		COUNTER_CACHE[me.dwID] = {}
+	if not COUNTER_CACHE[dwID] then
+		COUNTER_CACHE[dwID] = {}
 	end
 	for _, dwAchieveID in ipairs(aAchieveID) do
-		ACHIEVE_CACHE[me.dwID][dwAchieveID] = me.IsAchievementAcquired(dwAchieveID)
+		ACHIEVE_CACHE[dwID][dwAchieveID] = me.IsAchievementAcquired(dwAchieveID)
 	end
 	for _, dwCounterID in ipairs(aCounterID) do
-		COUNTER_CACHE[me.dwID][dwCounterID] = me.GetAchievementCount(dwCounterID)
+		COUNTER_CACHE[dwID][dwCounterID] = me.GetAchievementCount(dwCounterID)
 	end
+	ACHIEVE_CACHE[szGlobalID] = ACHIEVE_CACHE[dwID]
+	COUNTER_CACHE[szGlobalID] = COUNTER_CACHE[dwID]
 	FireUIEvent('MY_TEAMTOOLS_ACHI')
 end
 
@@ -358,49 +362,29 @@ function D.RequestTeamData()
 	local aTeamRequestID, aTeamRefreshID, tTeamRequestID = {}, {}, {}
 	local aRoomRequestID, aRoomRefreshID, tRoomRequestID = {}, {}, {}
 	local aMemberList = D.GetMemberList(true)
-	for _, tMember in ipairs(aMemberList) do
-		for _, dwAchieveID in ipairs(aAchieveID) do
-			if tMember.dwID then
+	if MY_TeamTools.szMode == 'RAID' then
+		for _, tMember in ipairs(aMemberList) do
+			for _, dwAchieveID in ipairs(aAchieveID) do
 				if not ACHIEVE_CACHE[tMember.dwID] or X.IsNil(ACHIEVE_CACHE[tMember.dwID][dwAchieveID]) then
 					tTeamRequestID[tMember.dwID] = true
 				end
-			elseif tMember.szGlobalID then
-				if not ACHIEVE_CACHE[tMember.szGlobalID] or X.IsNil(ACHIEVE_CACHE[tMember.szGlobalID][dwAchieveID]) then
-					tRoomRequestID[tMember.szGlobalID] = true
-				end
 			end
-		end
-		for _, dwCounterID in ipairs(aCounterID) do
-			if tMember.dwID then
+			for _, dwCounterID in ipairs(aCounterID) do
 				if not COUNTER_CACHE[tMember.dwID] or X.IsNil(COUNTER_CACHE[tMember.dwID][dwCounterID]) then
 					tTeamRequestID[tMember.dwID] = true
 				end
-			elseif tMember.szGlobalID then
-				if not COUNTER_CACHE[tMember.szGlobalID] or X.IsNil(COUNTER_CACHE[tMember.szGlobalID][dwCounterID]) then
-					tRoomRequestID[tMember.szGlobalID] = true
-				end
 			end
 		end
-	end
-	for _, tMember in ipairs(aMemberList) do
-		if tMember.dwID ~= X.GetClientPlayerID() and tMember.szGlobalID ~= X.GetClientPlayerGlobalID() then
-			if tMember.dwID then
+		for _, tMember in ipairs(aMemberList) do
+			if tMember.dwID ~= X.GetClientPlayerID() then
 				if tTeamRequestID[tMember.dwID] then
 					table.insert(aTeamRequestID, tMember.dwID)
 				else
 					table.insert(aTeamRefreshID, tMember.dwID)
 				end
-			elseif tMember.szGlobalID then
-				if tRoomRequestID[tMember.szGlobalID] then
-					table.insert(aRoomRequestID, tMember.szGlobalID)
-				else
-					table.insert(aRoomRefreshID, tMember.szGlobalID)
-				end
 			end
 		end
-	end
-	if not X.IsEmpty(aAchieveID) or not X.IsEmpty(aCounterID) then
-		if not X.IsEmpty(aTeamRequestID) or not X.IsEmpty(aTeamRefreshID) then
+		if (not X.IsEmpty(aAchieveID) or not X.IsEmpty(aCounterID)) and (not X.IsEmpty(aTeamRequestID) or not X.IsEmpty(aTeamRefreshID)) then
 			if #aTeamRequestID == #aMemberList - 1 then
 				aTeamRequestID = nil
 			end
@@ -410,7 +394,29 @@ function D.RequestTeamData()
 				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAMTOOLS_ACHI_REQ', {aAchieveID, aCounterID, aTeamRequestID, nil})
 			end
 		end
-		if not X.IsEmpty(aRoomRequestID) or not X.IsEmpty(aRoomRefreshID) then
+	elseif MY_TeamTools.szMode == 'ROOM' then
+		for _, tMember in ipairs(aMemberList) do
+			for _, dwAchieveID in ipairs(aAchieveID) do
+				if not ACHIEVE_CACHE[tMember.szGlobalID] or X.IsNil(ACHIEVE_CACHE[tMember.szGlobalID][dwAchieveID]) then
+					tRoomRequestID[tMember.szGlobalID] = true
+				end
+			end
+			for _, dwCounterID in ipairs(aCounterID) do
+				if not COUNTER_CACHE[tMember.szGlobalID] or X.IsNil(COUNTER_CACHE[tMember.szGlobalID][dwCounterID]) then
+					tRoomRequestID[tMember.szGlobalID] = true
+				end
+			end
+		end
+		for _, tMember in ipairs(aMemberList) do
+			if tMember.szGlobalID ~= X.GetClientPlayerGlobalID() then
+				if tRoomRequestID[tMember.szGlobalID] then
+					table.insert(aRoomRequestID, tMember.szGlobalID)
+				else
+					table.insert(aRoomRefreshID, tMember.szGlobalID)
+				end
+			end
+		end
+		if (not X.IsEmpty(aAchieveID) or not X.IsEmpty(aCounterID)) and (not X.IsEmpty(aRoomRequestID) or not X.IsEmpty(aRoomRefreshID)) then
 			if #aRoomRequestID == #aMemberList - 1 then
 				aRoomRequestID = nil
 			end
@@ -792,6 +798,9 @@ function D.OnInitPage()
 	frame:RegisterEvent('SYNC_ACHIEVEMENT_DATA')
 	frame:RegisterEvent('UPDATE_ACHIEVEMENT_POINT')
 	frame:RegisterEvent('UPDATE_ACHIEVEMENT_COUNT')
+	frame:RegisterEvent('PARTY_DELETE_MEMBER')
+	frame:RegisterEvent('PARTY_DISBAND')
+	frame:RegisterEvent('MY_TEAM_TOOLS__MODE_CHANGE')
 	this.hRowData = frame:CreateItemData(SZ_INI, 'Handle_Row')
 	this.hItemData = frame:CreateItemData(SZ_INI, 'Handle_Item')
 	this.hStatColumnData = frame:CreateItemData(SZ_INI, 'Handle_StatColumn')
@@ -810,8 +819,10 @@ function D.OnEvent(event)
 	elseif event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdatePage(this)
 	elseif event == 'NEW_ACHIEVEMENT' or event == 'SYNC_ACHIEVEMENT_DATA'
-	or event == 'UPDATE_ACHIEVEMENT_POINT' or event == 'UPDATE_ACHIEVEMENT_COUNT'
-	or event == 'PARTY_DELETE_MEMBER' or event == 'PARTY_DISBAND' then
+		or event == 'UPDATE_ACHIEVEMENT_POINT' or event == 'UPDATE_ACHIEVEMENT_COUNT'
+		or event == 'PARTY_DELETE_MEMBER' or event == 'PARTY_DISBAND'
+		or event == 'MY_TEAM_TOOLS__MODE_CHANGE'
+	then
 		D.UpdateSelfData()
 		D.DelayUpdatePage(this)
 		D.DelayRequestTeamData()
