@@ -147,7 +147,7 @@ end
 ---获取地图秘境进度信息
 ---@param dwMapID number @要获取的地图ID
 ---@return table @秘境首领与进度状态列表
-function X.GetMapCDProcessInfo(dwMapID)
+function X.GetMapCDProgressInfo(dwMapID)
 	if GetCDProcessInfo then
 		local aInfo = {}
 		for _, v in ipairs(GetCDProcessInfo(dwMapID) or X.CONSTANT.EMPTY_TABLE) do
@@ -175,7 +175,7 @@ local MAP_CD_PROGRESS_PENDING_ACTION = {}
 function X.GetMapCDProgress(dwMapID, dwPlayerID, fnAction)
 	local szKey = dwMapID .. '||' .. dwPlayerID
 	local tProgress = {}
-	for _, tInfo in ipairs(X.GetMapCDProcessInfo(dwMapID) or X.CONSTANT.EMPTY_TABLE) do
+	for _, tInfo in ipairs(X.GetMapCDProgressInfo(dwMapID) or X.CONSTANT.EMPTY_TABLE) do
 		tProgress[tInfo.dwProgressID] = GetDungeonRoleProgress(dwMapID, dwPlayerID, tInfo.dwProgressID)
 	end
 	if MAP_CD_PROGRESS_UPDATE_RECEIVE[szKey] then
@@ -194,7 +194,7 @@ end
 X.RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS', 'LIB#MapCDProgress', function()
 	local dwMapID, dwPlayerID = arg0, arg1
 	local aProgress = {}
-	for _, tInfo in ipairs(X.GetMapCDProcessInfo(dwMapID) or X.CONSTANT.EMPTY_TABLE) do
+	for _, tInfo in ipairs(X.GetMapCDProgressInfo(dwMapID) or X.CONSTANT.EMPTY_TABLE) do
 		aProgress[tInfo.dwProgressID] = GetDungeonRoleProgress(dwMapID, dwPlayerID, tInfo.dwProgressID)
 	end
 	for _, v in ipairs(MAP_CD_PROGRESS_PENDING_ACTION) do
