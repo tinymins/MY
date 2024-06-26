@@ -164,15 +164,15 @@ end
 ---判断一个地图是不是个人CD秘境地图
 ---@param dwMapID number @要判断的地图ID
 ---@return boolean @是否是个人CD秘境地图
-function X.IsDungeonRoleProgressMap(dwMapID)
+function X.IsCDProgressMap(dwMapID)
 	return (select(8, GetMapParams(dwMapID)))
 end
 
 ---判断当前地图是不是个人CD秘境地图
 ---@return boolean @当前地图是否是个人CD秘境地图
-function X.IsInDungeonRoleProgressMap()
+function X.IsInCDProgressMap()
 	local me = X.GetClientPlayer()
-	return me and X.IsDungeonRoleProgressMap(me.GetMapID())
+	return me and X.IsCDProgressMap(me.GetMapID())
 end
 
 ---判断一个地图是不是主城地图
