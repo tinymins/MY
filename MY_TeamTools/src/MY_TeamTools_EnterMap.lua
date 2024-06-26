@@ -23,13 +23,13 @@ local D = {}
 local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_TeamTools_EnterMap.ini'
 
 local PLAYER_ID  = 0
-local ENTER_MAP_LOG = {}
-local INFO_CACHE = {}
+local ENTER_MAP_LOG = { RAID = {}, ROOM = {} }
+local INFO_CACHE = { RAID = {}, ROOM = {} }
 local RT_SELECT_MAP
 
 function D.ClearEnterMapLog()
-	ENTER_MAP_LOG = {}
-	INFO_CACHE = {}
+	ENTER_MAP_LOG = { RAID = {}, ROOM = {} }
+	INFO_CACHE = { RAID = {}, ROOM = {} }
 	FireUIEvent('MY_TEAMTOOLS_ENTERMAP')
 end
 
@@ -39,13 +39,21 @@ end)
 
 X.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 	local dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime, nCopyIndex = aData[1], aData[2], aData[3], aData[4], aData[5], aData[6]
+	local tInfoCache, aEnterMapLog = {}, {}
+	if nChannel == PLAYER_TALK_CHANNEL.RAID then
+		aEnterMapLog = ENTER_MAP_LOG.RAID
+		tInfoCache = INFO_CACHE.RAID
+	elseif nChannel == PLAYER_TALK_CHANNEL.ROOM then
+		aEnterMapLog = ENTER_MAP_LOG.ROOM
+		tInfoCache = INFO_CACHE.ROOM
+	end
 	local key = dwTalkerID == PLAYER_ID
 		and 'self'
 		or dwTalkerID
-	if not INFO_CACHE[dwTalkerID] then
+	if not tInfoCache[dwTalkerID] then
 		if key == 'self' then
 			local me = X.GetClientPlayer()
-			INFO_CACHE[dwTalkerID] = {
+			tInfoCache[dwTalkerID] = {
 				szName = me.szName,
 				dwForceID = me.dwForceID,
 				dwMountKungfuID = UI_GetPlayerMountKungfuID(),
@@ -54,7 +62,7 @@ X.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTalke
 			local team = GetClientTeam()
 			local info = team.GetMemberInfo(dwTalkerID)
 			if info then
-				INFO_CACHE[dwTalkerID] = {
+				tInfoCache[dwTalkerID] = {
 					szName = info.szName,
 					dwForceID = info.dwForceID,
 					dwMountKungfuID = info.dwMountKungfuID,
@@ -71,12 +79,12 @@ X.RegisterBgMsg('MY_ENTER_MAP', function(_, aData, nChannel, dwTalkerID, szTalke
 	if not nCopyIndex then
 		nCopyIndex = 0
 	end
-	for i, v in X.ipairs_r(ENTER_MAP_LOG) do -- 删除重复发送的过图
+	for i, v in X.ipairs_r(aEnterMapLog) do -- 删除重复发送的过图
 		if v.dwID == key and v.dwMapID == dwMapID and v.dwSubID == dwSubID and v.dwTime == dwTime then
-			table.remove(ENTER_MAP_LOG, i)
+			table.remove(aEnterMapLog, i)
 		end
 	end
-	table.insert(ENTER_MAP_LOG, {
+	table.insert(aEnterMapLog, {
 		dwID = key,
 		szName = szTalkerName,
 		dwMapID = dwMapID,
@@ -91,9 +99,17 @@ end)
 
 -- 重伤记录
 function D.UpdatePage(page)
+	local tInfoCache, aEnterMapLog = {}, {}
+	if MY_TeamTools.szMode == 'RAID' then
+		tInfoCache = INFO_CACHE.RAID
+		aEnterMapLog = ENTER_MAP_LOG.RAID
+	elseif MY_TeamTools.szMode == 'ROOM' then
+		tInfoCache = INFO_CACHE.ROOM
+		aEnterMapLog = ENTER_MAP_LOG.ROOM
+	end
 	local hDeathList = page:Lookup('Wnd_EnterMap/Scroll_Player_List', '')
 	local aList, tList = {}, {}
-	for _, v in ipairs(ENTER_MAP_LOG) do
+	for _, v in ipairs(aEnterMapLog) do
 		if tList[v.dwMapID] then
 			tList[v.dwMapID].nCount = tList[v.dwMapID].nCount + 1
 		else
@@ -140,11 +156,19 @@ function D.OnAppendEdit()
 end
 
 function D.UpdateList(page, dwMapID)
+	local tInfoCache, aEnterMapLog = {}, {}
+	if MY_TeamTools.szMode == 'RAID' then
+		tInfoCache = INFO_CACHE.RAID
+		aEnterMapLog = ENTER_MAP_LOG.RAID
+	elseif MY_TeamTools.szMode == 'ROOM' then
+		tInfoCache = INFO_CACHE.ROOM
+		aEnterMapLog = ENTER_MAP_LOG.ROOM
+	end
 	local hDeathMsg = page:Lookup('Wnd_EnterMap/Scroll_Death_Info', '')
 	local me = X.GetClientPlayer()
 	local team = GetClientTeam()
 	local aRec = {}
-	local aEnterMapLog = X.Clone(ENTER_MAP_LOG)
+	local aEnterMapLog = X.Clone(aEnterMapLog)
 	for _, v in ipairs(aEnterMapLog) do
 		if not dwMapID or v.dwMapID == dwMapID then
 			if v.dwID == 'self' then
@@ -156,7 +180,7 @@ function D.UpdateList(page, dwMapID)
 	table.sort(aRec, function(a, b) return a.dwSwitchTime < b.dwSwitchTime end)
 	hDeathMsg:Clear()
 	for _, data in ipairs(aRec) do
-		local info = INFO_CACHE[data.dwID]
+		local info = tInfoCache[data.dwID]
 		local map = X.GetMapInfo(data.dwMapID)
 		if map then
 			local aXml = {}
@@ -192,6 +216,7 @@ function D.OnInitPage()
 	local frame = this:GetRoot()
 	frame:RegisterEvent('MY_TEAMTOOLS_ENTERMAP')
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
+	frame:RegisterEvent('MY_TEAM_TOOLS__MODE_CHANGE')
 	this.hEnterMap = frame:CreateItemData(SZ_INI, 'Handle_Item_EnterMap')
 end
 
@@ -203,6 +228,8 @@ function D.OnEvent(event)
 	if event == 'MY_TEAMTOOLS_ENTERMAP' then
 		D.UpdatePage(this)
 	elseif event == 'ON_MY_MOSAICS_RESET' then
+		D.UpdatePage(this)
+	elseif event == 'MY_TEAM_TOOLS__MODE_CHANGE' then
 		D.UpdatePage(this)
 	end
 end
