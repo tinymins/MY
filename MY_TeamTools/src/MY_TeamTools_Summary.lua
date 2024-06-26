@@ -484,7 +484,7 @@ function D.UpdateList(page)
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
 						local texts = {}
-						for i, boss in ipairs(X.GetCDProcessInfo(RT_MAPID)) do
+						for i, boss in ipairs(X.GetMapCDProcessInfo(RT_MAPID)) do
 							table.insert(texts, boss.szName .. '\t' .. _L[v.tBossKill[i] and 'x' or 'r'])
 						end
 						OutputTip(GetFormatText(table.concat(texts, '\n')), 400, { x, y, w, h })
@@ -742,7 +742,7 @@ function D.GetTeam(page)
 	local aList = {}
 	local bIsInParty = X.IsInParty()
 	local bIsDungeonRoleProgressMap = X.IsDungeonRoleProgressMap(RT_MAPID)
-	local aProgressMapBoss = bIsDungeonRoleProgressMap and X.GetCDProcessInfo(RT_MAPID)
+	local aProgressMapBoss = bIsDungeonRoleProgressMap and X.GetMapCDProcessInfo(RT_MAPID)
 	local aRequestMapCopyID = {}
 	local aTeamMemberList = D.GetTeamMemberList()
 	for _, dwID in ipairs(aTeamMemberList) do
