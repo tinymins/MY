@@ -206,6 +206,7 @@ function Framework.OnActivePage()
 				m.env.OnActivePage()
 				this = _this
 			end
+			frame:Lookup('WndComboBox_Mode'):SetVisible(m and m.env and m.env.bMode or false)
 			frame.pActivePage = page
 			D.nActivePageIndex = page.nIndex
 		end
@@ -233,6 +234,7 @@ function Framework.OnFrameCreate()
 		{ szKey = 'ROOM', szName = _L['Room Stat'] },
 	}
 	X.UI(this):Append('WndComboBox', {
+		name = 'WndComboBox_Mode',
 		x = 930, y = 52, w = 110, h = 26,
 		text = (function()
 			for _, v in ipairs(aMode) do

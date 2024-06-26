@@ -277,6 +277,7 @@ local settings = {
 			fields = {
 				'OnInitPage',
 				'OnDeactivePage',
+				bMode = true,
 			},
 			root = D,
 		},
