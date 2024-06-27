@@ -194,6 +194,9 @@ function X.GetRoomMemberList()
 			for _, v in ipairs(info) do
 				table.insert(aList, v.szGlobalID)
 			end
+			if #aList == 0 then
+				table.insert(aList, X.GetClientPlayerGlobalID())
+			end
 			return aList
 		end
 	end
