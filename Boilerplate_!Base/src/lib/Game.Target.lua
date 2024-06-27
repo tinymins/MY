@@ -1390,26 +1390,27 @@ end
 --------------------------------------------------------------------------------
 
 -- 判断是不是队友
----@param dwID number @角色ID
+---@param xKey number | string @角色ID、角色名、角色唯一ID
 ---@return boolean @该角色是不是队友
-function X.IsParty(dwID)
-	if X.IsString(dwID) then
-		if dwID == X.GetClientPlayerName() then
+function X.IsParty(xKey)
+	if X.IsString(xKey) then
+		if xKey == X.GetClientPlayerName() or xKey == X.GetClientPlayerGlobalID() then
 			return true
 		end
 		local team = GetClientTeam()
 		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
-			if dwID == team.GetClientTeamMemberName(dwTarID) then
+			local tMember = X.GetTeamMemberInfo(dwTarID)
+			if xKey == tMember.szName or xKey == tMember.szGlobalID then
 				return true
 			end
 		end
 		return false
 	end
-	if dwID == X.GetClientPlayerID() then
+	if xKey == X.GetClientPlayerID() then
 		return true
 	end
 	local me = X.GetClientPlayer()
-	return me and me.IsPlayerInMyParty(dwID)
+	return me and me.IsPlayerInMyParty(xKey)
 end
 
 -- 判断是不是在同房间
