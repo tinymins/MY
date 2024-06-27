@@ -845,7 +845,7 @@ function D.GetTeamData(page)
 		elseif MY_TeamTools.szStatRange == 'ROOM' then
 			if bCDProgressMap then
 				for i, boss in ipairs(aProgressMapBoss) do
-					tInfo.tBossKill[i] = X.Get(RT_MAP_CD_PROGRESS, {tMember.szGlobalID, RT_MAP_ID, boss.dwProgressID})
+					tInfo.tBossKill[i] = X.Get(RT_MAP_CD_PROGRESS, {tMember.szGlobalID, RT_MAP_ID, boss.dwProgressID}, tMember.tMapCDProgress[boss.dwProgressID])
 				end
 			end
 			tInfo.nCopyID = X.Get(RT_PLAYER_MAP_COPY_ID, {tMember.szGlobalID, RT_MAP_ID})
@@ -902,6 +902,7 @@ function D.GetMemberList(bIsOnLine)
 					dwForceID = tMember.dwForceID,
 					dwKungfuID = tMember.dwKungfuID,
 					nEquipScore = tMember.nEquipScore,
+					tMapCDProgress = X.DecodeMapCDProgress(tMember.nMapCDProgress),
 				})
 			end
 		end
