@@ -908,6 +908,16 @@ function D.GetMemberList(bIsOnLine)
 	return aList
 end
 
+function D.SetMapByRoomInfo()
+	if MY_TeamTools.szStatRange ~= 'ROOM' then
+		return
+	end
+	local tInfo = X.GetRoomInfo()
+	if tInfo then
+		D.SetMapID(tInfo.nTargetMapID)
+	end
+end
+
 function D.SetMapID(dwMapID)
 	if RT_MAP_ID == dwMapID then
 		return
@@ -955,6 +965,7 @@ function D.OnInitPage()
 	frame:RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND')
 	frame:RegisterEvent('UPDATE_DUNGEON_ROLE_PROGRESS')
 	frame:RegisterEvent('LOADING_END')
+	frame:RegisterEvent('GLOBAL_ROOM_DETAIL_INFO')
 	-- 团长变更 重新请求标签
 	frame:RegisterEvent('TEAM_AUTHORITY_CHANGED')
 	-- 自定义事件
@@ -1115,8 +1126,11 @@ function D.OnEvent(szEvent)
 			this.hPlayerList:FormatAllItemPos()
 		end
 	elseif szEvent == 'MY_TEAM_TOOLS__MODE_CHANGE' then
+		D.SetMapByRoomInfo()
 		D.RequestTeamData()
 		D.UpdateList(this)
+	elseif szEvent == 'GLOBAL_ROOM_DETAIL_INFO' then
+		D.SetMapByRoomInfo()
 	end
 end
 
@@ -1156,6 +1170,10 @@ end
 function D.OnItemLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Handle_Dungeon' then
+		if MY_TeamTools.szStatRange == 'ROOM' then
+			X.OutputAnnounceMessage(_L['Room stat map will follow system room dest, cannot be customized.'])
+			return
+		end
 		local menu = X.GetDungeonMenu({
 			fnAction = function(p)
 				D.SetMapID(p.dwID)

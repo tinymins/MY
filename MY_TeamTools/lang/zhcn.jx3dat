@@ -49,6 +49,7 @@ return {
 	['Loading'] = '加载中',
 	['Equip'] = '装备',
 	['Dungeon CD'] = '秘境刷新',
+	['Room stat map will follow system room dest, cannot be customized.'] = '房间统计模式下地图仅支持跟随房间设置。',
 	['Fight'] = '战斗',
 	['None'] = '无',
 	['Unknown'] = '未知',
