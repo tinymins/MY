@@ -169,6 +169,21 @@ function X.GetTeamMemberInfo(dwID)
 	end
 end
 
+-- 获取房间信息
+---@return table @房间信息
+function X.GetRoomInfo()
+	if RoomBase_GetRoomInfo then
+		local info = RoomBase_GetRoomInfo()
+		return {
+			eRoomState    = info.eRoomState   , -- 1
+			nRoomProgress = info.nRoomProgress, -- 31
+			nTargetMapID  = info.nTargetMapID , -- 668
+			szOwnerID     = info.szOwnerID    , -- "432345564230575012"
+			bBiddingMode  = info.bBiddingMode , -- false
+		}
+	end
+end
+
 -- 获取房间成员GlobalID列表
 ---@return table @成员GlobalID列表
 function X.GetRoomMemberList()
