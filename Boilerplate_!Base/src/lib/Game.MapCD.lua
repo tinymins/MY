@@ -237,4 +237,27 @@ function X.GetClientPlayerMapCDProgress(dwMapID, fnAction)
 	return X.GetMapCDProgress(dwMapID, X.GetClientPlayerID(), fnAction)
 end
 
+---编码地图秘境进度到数字
+---@param tProgress table @要编码的秘境进度表
+---@return number @编码后的秘境进度
+function X.EncodeMapCDProgress(tProgress)
+	local t = {}
+	for k, v in pairs(tProgress) do
+		t[k] = v and 1 or 0
+	end
+	return X.Bitmap2Number(t)
+end
+
+---从数字解码地图秘境进度
+---@param nProgress number @要解码的秘境进度
+---@return table @解码后的秘境进度表
+function X.DecodeMapCDProgress(nProgress)
+	-- GetDungeonRoleSimpleProgress(nProgress, nIndex)
+	local t = setmetatable({}, { __index = function() return false end })
+	for k, v in pairs(X.Number2Bitmap(nProgress)) do
+		t[k] = v == 1
+	end
+	return t
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
