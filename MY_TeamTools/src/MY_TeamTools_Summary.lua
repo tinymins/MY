@@ -105,7 +105,7 @@ local RT_BUFF_ID = {
 	[2313] = true,
 	[5970] = true,
 }
-local RT_IGONG_ZHAN_D = 3219
+local RT_GZ_BUFF_ID = 3219 -- ¹²Õ½½­ºþ
 -- default sort
 local RT_SORT_MODE = 'DESC'
 local RT_SORT_FIELD = 'nEquipScore'
@@ -339,7 +339,7 @@ function D.UpdateList(page)
 					hBox.OnItemMouseEnter = function()
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
-						local kBuff = X.GetBuff(v.KPlayer, RT_GONG_ZHAN_ID)
+						local kBuff = X.GetBuff(v.KPlayer, RT_GZ_BUFF_ID)
 						if kBuff then
 							X.OutputBuffTip({ x, y, w, h }, kBuff.dwID, kBuff.nLevel)
 						end
@@ -826,7 +826,7 @@ function D.GetTeamData(page)
 				if RT_BUFF_ID[buff.dwID] then
 					table.insert(tInfo.tBuff, buff)
 				end
-				if buff.dwID == RT_GONG_ZHAN_ID then -- grandpa
+				if buff.dwID == RT_GZ_BUFF_ID then -- grandpa
 					tInfo.bGrandpa = true
 				end
 			end
