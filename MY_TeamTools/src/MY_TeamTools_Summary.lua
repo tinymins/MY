@@ -805,7 +805,7 @@ function D.GetTeamData(page)
 			-- tEquip            = {}, -- 特效装备
 			tBuff             = {}, -- 增益BUFF
 			tFood             = {}, -- 小吃和附魔
-			-- nEquipScore       = -1,  -- 装备分
+			nEquipScore       = tMember.nEquipScore, -- 装备分，仅 ROOM 下有值
 			nCopyID           = nil, -- 秘境ID
 			tBossKill         = {}, -- 秘境进度
 			nFightState       = KPlayer and KPlayer.bFightState and 1 or 0, -- 战斗状态
@@ -901,6 +901,7 @@ function D.GetMemberList(bIsOnLine)
 					szName = tMember.szName .. g_tStrings.STR_CONNECT .. szServerName,
 					dwForceID = tMember.dwForceID,
 					dwKungfuID = tMember.dwKungfuID,
+					nEquipScore = tMember.nEquipScore,
 				})
 			end
 		end
