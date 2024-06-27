@@ -175,11 +175,11 @@ function X.GetRoomInfo()
 	if RoomBase_GetRoomInfo then
 		local info = RoomBase_GetRoomInfo()
 		return {
-			eRoomState    = info.eRoomState   , -- 1
-			nRoomProgress = info.nRoomProgress, -- 31
-			nTargetMapID  = info.nTargetMapID , -- 668
-			szOwnerID     = info.szOwnerID    , -- "432345564230575012"
-			bBiddingMode  = info.bBiddingMode , -- false
+			eRoomState     = info.eRoomState   , -- 1
+			nMapCDProgress = info.nRoomProgress, -- 31
+			nTargetMapID   = info.nTargetMapID , -- 668
+			szOwnerID      = info.szOwnerID    , -- "432345564230575012"
+			bBiddingMode   = info.bBiddingMode , -- false
 		}
 	end
 end
@@ -221,7 +221,7 @@ function X.GetRoomMemberInfo(szGlobalID)
 						dwMiniAvatarID = v.dwMiniAvatarID,
 						nMemberIndex = v.nMemberIndex,
 						dwServerID = v.dwCenterID,
-						nProcess = v.nProcess,
+						nMapCDProgress = v.nProcess,
 						nClientVersionType = v.nClientVersionType,
 					}
 				end
