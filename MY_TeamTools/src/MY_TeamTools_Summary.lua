@@ -792,7 +792,7 @@ function D.GetTeamData(page)
 	local aRequestMapCopyID = {}
 	local aMemberList = D.GetMemberList()
 	for _, tMember in ipairs(aMemberList) do
-		local KPlayer = MY_TeamTools.szStatRange == 'RAID' and X.GetPlayer(tMember.dwID)
+		local KPlayer = tMember.dwID and X.GetPlayer(tMember.dwID)
 		local tInfo = {
 			KPlayer           = KPlayer,
 			szName            = tMember.szName or _L['Loading...'],
@@ -892,11 +892,19 @@ function D.GetMemberList(bIsOnLine)
 			end
 		end
 	elseif MY_TeamTools.szStatRange == 'ROOM' then
+		local tGlobalID2ID = {}
+		for _, dwID in ipairs(X.GetTeamMemberList()) do
+			local tMember = X.GetTeamMemberInfo(dwID)
+			if tMember and tMember.szGlobalID then
+				tGlobalID2ID[tMember.szGlobalID] = tMember.dwID
+			end
+		end
 		for _, szGlobalID in ipairs(X.GetRoomMemberList()) do
 			local tMember = X.GetRoomMemberInfo(szGlobalID)
 			local szServerName = tMember and X.GetServerNameByID(tMember.dwServerID)
 			if tMember and szServerName then
 				table.insert(aList, {
+					dwID = tGlobalID2ID[tMember.szGlobalID],
 					szGlobalID = tMember.szGlobalID,
 					szName = tMember.szName .. g_tStrings.STR_CONNECT .. szServerName,
 					dwForceID = tMember.dwForceID,
