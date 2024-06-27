@@ -233,6 +233,7 @@ function X.GetRoomMemberInfo(szGlobalID)
 	end
 	local me = X.GetClientPlayer()
 	if szGlobalID == X.GetClientPlayerGlobalID() then
+		local tInfo = X.GetRoomInfo()
 		return {
 			szGlobalID = X.GetClientPlayerGlobalID(),
 			szName = me.szName,
@@ -245,7 +246,7 @@ function X.GetRoomMemberInfo(szGlobalID)
 			dwMiniAvatarID = me.dwMiniAvatarID,
 			nMemberIndex = 0,
 			dwServerID = X.GetServerID(),
-			nProcess = 0,
+			nMapCDProgress = tInfo and tInfo.nMapCDProgress or 0,
 			nClientVersionType = 0,
 		}
 	end
