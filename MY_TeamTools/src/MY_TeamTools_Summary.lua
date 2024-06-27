@@ -970,7 +970,7 @@ function D.OnInitPage()
 	-- 团长变更 重新请求标签
 	frame:RegisterEvent('TEAM_AUTHORITY_CHANGED')
 	-- 自定义事件
-	frame:RegisterEvent('MY_TEAM_TOOLS__MODE_CHANGE')
+	frame:RegisterEvent('MY_TEAM_TOOLS__STAT_RANGE_CHANGE')
 	frame:RegisterEvent('MY_TEAM_TOOLS__SUMMARY__UPDATE')
 	frame:RegisterEvent('MY_TEAM_TOOLS__SUMMARY__SUCCESS')
 	frame:RegisterEvent('MY_TEAM_TOOLS__SUMMARY__MAP_ID_CHANGE')
@@ -1126,7 +1126,7 @@ function D.OnEvent(szEvent)
 			this.hPlayerList:Sort()
 			this.hPlayerList:FormatAllItemPos()
 		end
-	elseif szEvent == 'MY_TEAM_TOOLS__MODE_CHANGE' then
+	elseif szEvent == 'MY_TEAM_TOOLS__STAT_RANGE_CHANGE' then
 		D.SetMapByRoomInfo()
 		D.RequestTeamData()
 		D.UpdateList(this)

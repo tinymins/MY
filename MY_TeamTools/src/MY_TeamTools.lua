@@ -252,7 +252,7 @@ function Framework.OnFrameCreate()
 					szOption = tMode.szName,
 					fnAction = function()
 						D.szStatRange = tMode.szKey
-						FireUIEvent('MY_TEAM_TOOLS__MODE_CHANGE')
+						FireUIEvent('MY_TEAM_TOOLS__STAT_RANGE_CHANGE')
 						ui:Text(tMode.szName)
 						X.UI.ClosePopupMenu()
 					end,

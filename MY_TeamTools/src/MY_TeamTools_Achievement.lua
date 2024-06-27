@@ -800,7 +800,7 @@ function D.OnInitPage()
 	frame:RegisterEvent('UPDATE_ACHIEVEMENT_COUNT')
 	frame:RegisterEvent('PARTY_DELETE_MEMBER')
 	frame:RegisterEvent('PARTY_DISBAND')
-	frame:RegisterEvent('MY_TEAM_TOOLS__MODE_CHANGE')
+	frame:RegisterEvent('MY_TEAM_TOOLS__STAT_RANGE_CHANGE')
 	this.hRowData = frame:CreateItemData(SZ_INI, 'Handle_Row')
 	this.hItemData = frame:CreateItemData(SZ_INI, 'Handle_Item')
 	this.hStatColumnData = frame:CreateItemData(SZ_INI, 'Handle_StatColumn')
@@ -821,7 +821,7 @@ function D.OnEvent(event)
 	elseif event == 'NEW_ACHIEVEMENT' or event == 'SYNC_ACHIEVEMENT_DATA'
 		or event == 'UPDATE_ACHIEVEMENT_POINT' or event == 'UPDATE_ACHIEVEMENT_COUNT'
 		or event == 'PARTY_DELETE_MEMBER' or event == 'PARTY_DISBAND'
-		or event == 'MY_TEAM_TOOLS__MODE_CHANGE'
+		or event == 'MY_TEAM_TOOLS__STAT_RANGE_CHANGE'
 	then
 		D.UpdateSelfData()
 		D.DelayUpdatePage(this)

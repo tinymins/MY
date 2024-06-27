@@ -216,7 +216,7 @@ function D.OnInitPage()
 	local frame = this:GetRoot()
 	frame:RegisterEvent('MY_TEAMTOOLS_ENTERMAP')
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
-	frame:RegisterEvent('MY_TEAM_TOOLS__MODE_CHANGE')
+	frame:RegisterEvent('MY_TEAM_TOOLS__STAT_RANGE_CHANGE')
 	this.hEnterMap = frame:CreateItemData(SZ_INI, 'Handle_Item_EnterMap')
 end
 
@@ -229,7 +229,7 @@ function D.OnEvent(event)
 		D.UpdatePage(this)
 	elseif event == 'ON_MY_MOSAICS_RESET' then
 		D.UpdatePage(this)
-	elseif event == 'MY_TEAM_TOOLS__MODE_CHANGE' then
+	elseif event == 'MY_TEAM_TOOLS__STAT_RANGE_CHANGE' then
 		D.UpdatePage(this)
 	end
 end
