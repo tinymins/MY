@@ -224,6 +224,7 @@ function D.UpdateList(page)
 			local h = page.hPlayerList:Lookup(szName)
 			if not h then
 				h = page.hPlayerList:AppendItemFromData(page.hItemDataPlayer)
+				h.bPlayerItem = true
 			end
 			h:SetUserData(k)
 			h:SetName(szName)
@@ -1178,8 +1179,8 @@ function D.OnItemMouseLeave()
 end
 
 function D.OnItemLButtonClick()
-	local szName = this:GetName()
-	if szName == 'Handle_Dungeon' then
+	local name = this:GetName()
+	if name == 'Handle_Dungeon' then
 		if MY_TeamTools.szStatRange == 'ROOM' then
 			X.OutputAnnounceMessage(_L['Room stat map will follow system room dest, cannot be customized.'])
 			return
@@ -1191,19 +1192,23 @@ function D.OnItemLButtonClick()
 		})
 		menu.x, menu.y = Cursor.GetPos(true)
 		PopupMenu(menu)
-	elseif tonumber(szName:find('P(%d+)')) then
-		local dwID = tonumber(szName:match('P(%d+)'))
+	elseif this.bPlayerItem then
 		if IsCtrlKeyDown() then
 			X.EditBox_AppendLinkPlayer(this.szName)
 		else
-			D.ViewInviteToPlayer(this:GetParent():GetParent():GetParent():GetParent(), dwID)
+			local dwID = this.dwID
+			if dwID then
+				D.ViewInviteToPlayer(this:GetParent():GetParent():GetParent():GetParent(), dwID)
+			end
 		end
 	end
 end
 
 function D.OnItemRButtonClick()
-	local szName = this:GetName()
-	local dwID = tonumber(szName:match('P(%d+)'))
+	if not this.bPlayerItem then
+		return
+	end
+	local dwID = this.dwID
 	local me = X.GetClientPlayer()
 	if dwID and dwID ~= me.dwID then
 		local page = this:GetParent():GetParent():GetParent():GetParent()
