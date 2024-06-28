@@ -3,6 +3,7 @@
 -- @desc     : ÏµÍ³º¯Êý¿â¡¤»º´æ
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
+---@type Boilerplate
 local X = Boilerplate
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/System.Cache')

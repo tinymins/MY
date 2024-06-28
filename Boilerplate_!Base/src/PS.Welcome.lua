@@ -3,6 +3,7 @@
 -- @desc     : »¶Ó­Ò³
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
+---@type Boilerplate
 local X = Boilerplate
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/PS.Welcome')

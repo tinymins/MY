@@ -7,6 +7,7 @@
 -- Sourced from http://en.wikipedia.org/wiki/Base64
 -- https://github.com/toastdriven/lua-base64/blob/master/base64.lua
 --------------------------------------------------------------------------------
+---@type Boilerplate
 local X = Boilerplate
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Base64')

@@ -3,6 +3,7 @@
 -- @desc     : 背景通讯处理函数集成
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
+---@type Boilerplate
 local X = Boilerplate
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/BgMsgCenter')
