@@ -6,8 +6,8 @@
 -- Base64-encoding
 -- Sourced from https://github.com/aiq/basexx/blob/master/lib/basexx.lua
 --------------------------------------------------------------------------------
----@type Boilerplate
-local X = Boilerplate
+---@type MY
+local X = MY
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/BaseXX')
 --------------------------------------------------------------------------------

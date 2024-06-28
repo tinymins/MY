@@ -3,8 +3,8 @@
 -- @desc     : 二进制资源
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
----@type Boilerplate
-local X = Boilerplate
+---@type MY
+local X = MY
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_Resource')
 local MODULE_NAME = X.NSFormatString('{$NS}_Resource')

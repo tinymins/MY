@@ -64,7 +64,7 @@ local _DEBUG_LEVEL_           = DEBUG_LEVEL[LoadLUAData(_DATA_ROOT_ .. 'debug.le
 local _LOG_LEVEL_             = math.min(DEBUG_LEVEL[LoadLUAData(_DATA_ROOT_ .. 'log.level.jx3dat') or 'ERROR'] or DEBUG_LEVEL.ERROR, _DEBUG_LEVEL_)
 
 -- 基础库命名空间
----@type Boilerplate
+---@type MY
 local X = {
 	UI = {},
 	DEBUG_LEVEL = DEBUG_LEVEL,
@@ -283,5 +283,5 @@ X.PACKET_INFO.AUTHOR_PROTECT_NAMES  = {
 }
 
 -- 导出命名空间
----@class Boilerplate
-Boilerplate = X
+---@class MY
+MY = X
