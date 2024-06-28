@@ -3,7 +3,8 @@
 -- @desc     : LUA »ù´¡º¯Êý
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
-local X = MY
+---@type Boilerplate
+local X = Boilerplate
 --------------------------------------------------------------------------------
 
 local RANDOM_VALUE = nil

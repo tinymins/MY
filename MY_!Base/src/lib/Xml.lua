@@ -8,7 +8,8 @@
 -- local aXMLNode = X.XMLDecode(szXML: string)
 -- local szXML = X.XMLEncode(xml: aXMLNode | XMLNode)
 --------------------------------------------------------------------------------
-local X = MY
+---@type Boilerplate
+local X = Boilerplate
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Xml')
 --------------------------------------------------------------------------------

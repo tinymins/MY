@@ -4,7 +4,8 @@
 -- @ref      : https://github.com/sschoener/lua-schema
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
-local X = MY
+---@type Boilerplate
+local X = Boilerplate
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Schema')
 --------------------------------------------------------------------------------
