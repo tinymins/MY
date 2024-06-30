@@ -448,22 +448,26 @@ function PS.OnPanelActive(wnd)
 					X.UI.ClosePopupMenu()
 				end,
 			})
-			table.insert(
-				menu,
-				InsertMsgTypeMenu(
-					{
-						szOption = _L['Clear chat log'],
-						rgb = {255, 0, 0},
-					},
-					function(szMsgType)
-						X.Confirm(_L('Are you sure to clear msg type chat log of %s? All chat logs in this msg type will be lost.', MY_ChatLog.MSG_TYPE_TITLE[szMsgType] or g_tStrings.tChannelName[szMsgType] or szMsgType), function()
-							local ds = MY_ChatLog_DS(MY_ChatLog.GetRoot())
-							ds:DeleteMsgInterval({szMsgType}, '', 0, math.huge)
-						end)
-						X.UI.ClosePopupMenu()
-					end,
-					{}
-				)
+			return menu
+		end,
+	})
+	nY = nY + dy
+
+	ui:Append('WndComboBox', {
+		x = nX, y = nY, w = wr, h = 25,
+		text = _L['Clear chat log'],
+		r = 255, g = 0, b = 0,
+		menu = function()
+			local menu = InsertMsgTypeMenu(
+				{},
+				function(szMsgType)
+					X.Confirm(_L('Are you sure to clear msg type chat log of %s? All chat logs in this msg type will be lost.', MY_ChatLog.MSG_TYPE_TITLE[szMsgType] or g_tStrings.tChannelName[szMsgType] or szMsgType), function()
+						local ds = MY_ChatLog_DS(MY_ChatLog.GetRoot())
+						ds:DeleteMsgInterval({szMsgType}, '', 0, math.huge)
+					end)
+					X.UI.ClosePopupMenu()
+				end,
+				{}
 			)
 			return menu
 		end,
