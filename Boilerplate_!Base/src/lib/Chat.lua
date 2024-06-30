@@ -1474,14 +1474,15 @@ local function GenerateMsgTypeMenu(node, xInject)
 	return t
 end
 
----获取消息频道菜单
+---插入消息频道菜单
+---@param tMenu table @要插入的目标表
 ---@param xInject function | table @叶子菜单数据注入，如果为 table 类型则直接覆盖，如果为 方法则执行后获取结果再进行覆盖
 ---@return table @完整的消息频道菜单
-function X.GetMsgTypeMenu(xInject)
-	return GenerateMsgTypeMenu(
-		X.CONSTANT.MSG_TYPE_MENU,
-		xInject
-	)
+function X.InsertMsgTypeMenu(tMenu, xInject)
+	for _, v in ipairs(GenerateMsgTypeMenu(X.CONSTANT.MSG_TYPE_MENU, xInject)) do
+		table.insert(tMenu, v)
+	end
+	return tMenu
 end
 
 -----------------------------------------------------------------------------------------
