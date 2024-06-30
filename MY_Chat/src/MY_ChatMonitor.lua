@@ -405,11 +405,17 @@ function PS.OnPanelActive(wnd)
 			local aKeyword = O.aKeyword
 			local menu = { bAlignWidth = true }
 			for i, p in ipairs(aKeyword) do
-				local m = X.GetMsgTypeMenu(function(szChannel)
-					p.tChannel[szChannel] = not p.tChannel[szChannel]
-					O.aKeyword = aKeyword
-					D.RegisterMsgMonitor()
-				end, p.tChannel)
+				local m = {}
+				X.InsertMsgTypeMenu(m, function(szMsgType)
+					return {
+						fnAction = function(szChannel)
+							p.tChannel[szChannel] = not p.tChannel[szChannel]
+							O.aKeyword = aKeyword
+							D.RegisterMsgMonitor()
+						end,
+						bChecked = p.tChannel[szMsgType],
+					}
+				end)
 				for _, mm in ipairs(m) do
 					mm.fnDisable = function()
 						return not p.bEnable

@@ -366,18 +366,29 @@ function PS.OnPanelActive(wnd)
 	nY = nY + dy
 	nX = nPaddingX + 10
 
-	local function InsertMsgTypeMenu(m, fnAction, tMsgTypeChecked)
-		for _, v in ipairs(X.GetMsgTypeMenu(fnAction, tMsgTypeChecked)) do
-			table.insert(m, v)
-		end
+	local function InsertChatLogMsgTypeMenu(m, xInject)
+		-- 通用
+		X.InsertMsgTypeMenu(m, xInject)
+		-- 自定义
 		local m1 = { szOption = _L['Other channel'] }
 		for _, szMsgType in ipairs(MY_ChatLog.MSG_TYPE_CUSTOM) do
-			table.insert(m1, {
+			local tInject
+			if X.IsFunction(xInject) then
+				tInject = xInject(szMsgType)
+			elseif X.IsTable(xInject) then
+				tInject = xInject
+			end
+			local t1 = {
 				szOption = MY_ChatLog.MSG_TYPE_TITLE[szMsgType],
 				rgb = MY_ChatLog.MSG_TYPE_COLOR[szMsgType],
-				bCheck = true, bChecked = tMsgTypeChecked[szMsgType],
-				fnAction = fnAction,
-			})
+				bCheck = true,
+			}
+			if tInject then
+				for k, v in pairs(tInject) do
+					t1[k] = v
+				end
+			end
+			table.insert(m1, t1)
 		end
 		table.insert(m, m1)
 		return m
@@ -407,17 +418,22 @@ function PS.OnPanelActive(wnd)
 					},
 					X.CONSTANT.MENU_DIVIDER,
 				}
-				InsertMsgTypeMenu(m, function(szMsgType)
-					for i, v in ipairs(tChannel.aMsgType) do
-						if v == szMsgType then
-							table.remove(tChannel.aMsgType, i)
+				InsertChatLogMsgTypeMenu(m, function(szMsgType)
+					return {
+						fnAction = function(szMsgType)
+							for i, v in ipairs(tChannel.aMsgType) do
+								if v == szMsgType then
+									table.remove(tChannel.aMsgType, i)
+									MY_ChatLog.aChannel = MY_ChatLog.aChannel
+									return
+								end
+							end
+							table.insert(tChannel.aMsgType, szMsgType)
 							MY_ChatLog.aChannel = MY_ChatLog.aChannel
-							return
-						end
-					end
-					table.insert(tChannel.aMsgType, szMsgType)
-					MY_ChatLog.aChannel = MY_ChatLog.aChannel
-				end, tMsgTypeChecked)
+						end,
+						bChecked = tMsgTypeChecked[szMsgType],
+					}
+				end)
 				table.insert(menu, m)
 			end
 			if #menu > 0 then
@@ -458,16 +474,17 @@ function PS.OnPanelActive(wnd)
 		text = _L['Clear chat log'],
 		r = 255, g = 0, b = 0,
 		menu = function()
-			local menu = InsertMsgTypeMenu(
+			local menu = InsertChatLogMsgTypeMenu(
 				{},
-				function(szMsgType)
-					X.Confirm(_L('Are you sure to clear msg type chat log of %s? All chat logs in this msg type will be lost.', MY_ChatLog.MSG_TYPE_TITLE[szMsgType] or g_tStrings.tChannelName[szMsgType] or szMsgType), function()
-						local ds = MY_ChatLog_DS(MY_ChatLog.GetRoot())
-						ds:DeleteMsgInterval({szMsgType}, '', 0, math.huge)
-					end)
-					X.UI.ClosePopupMenu()
-				end,
-				{}
+				{
+					fnAction = function(szMsgType)
+						X.Confirm(_L('Are you sure to clear msg type chat log of %s? All chat logs in this msg type will be lost.', MY_ChatLog.MSG_TYPE_TITLE[szMsgType] or g_tStrings.tChannelName[szMsgType] or szMsgType), function()
+							local ds = MY_ChatLog_DS(MY_ChatLog.GetRoot())
+							ds:DeleteMsgInterval({szMsgType}, '', 0, math.huge)
+						end)
+						X.UI.ClosePopupMenu()
+					end,
+				}
 			)
 			return menu
 		end,

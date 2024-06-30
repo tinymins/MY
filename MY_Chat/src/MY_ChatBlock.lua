@@ -333,17 +333,23 @@ function PS.OnPanelActive(wnd)
 	end
 
 	list:ListBox('onmenu', function(id, text, data)
-		local menu = X.GetMsgTypeMenu(function(szType)
-			local bw = SeekBlockWord(id)
-			if bw then
-				if bw.tMsgType[szType] then
-					bw.tMsgType[szType] = nil
-				else
-					bw.tMsgType[szType] = true
-				end
-				SaveBlockWords()
-			end
-		end, data.tMsgType)
+		local menu = {}
+		X.InsertMsgTypeMenu(menu, function(szMsgType)
+			return {
+				fnAction = function(szType)
+					local bw = SeekBlockWord(id)
+					if bw then
+						if bw.tMsgType[szType] then
+							bw.tMsgType[szType] = nil
+						else
+							bw.tMsgType[szType] = true
+						end
+						SaveBlockWords()
+					end
+				end,
+				bChecked = data.tMsgType[szMsgType]
+			}
+		end)
 		table.insert(menu, 1, X.CONSTANT.MENU_DIVIDER)
 		table.insert(menu, 1, {
 			szOption = _L['Edit'],
