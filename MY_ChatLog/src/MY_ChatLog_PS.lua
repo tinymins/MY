@@ -357,13 +357,13 @@ function PS.OnPanelActive(wnd)
 	local nW, nH = ui:Size()
 	local nPaddingX, nPaddingY = 25, 25
 	local nX, nY = nPaddingX, nPaddingY
-	local dy = 35
-	local wr = 200
+	local nDeltaY = 35
+	local nComponentW = 200
 
 	-- 左侧
 	nX = nPaddingX
 	ui:Append('Text', { x = nX, y = nY, text = _L['Settings'], font = 27 })
-	nY = nY + dy
+	nY = nY + nDeltaY
 	nX = nPaddingX + 10
 
 	local function InsertChatLogMsgTypeMenu(m, xInject)
@@ -395,7 +395,7 @@ function PS.OnPanelActive(wnd)
 	end
 
 	ui:Append('WndComboBox', {
-		x = nX, y = nY, w = wr, h = 25,
+		x = nX, y = nY, w = nComponentW, h = 25,
 		text = _L['Channel settings'],
 		menu = function()
 			local menu = {}
@@ -467,10 +467,152 @@ function PS.OnPanelActive(wnd)
 			return menu
 		end,
 	})
-	nY = nY + dy
+	nY = nY + nDeltaY
 
 	ui:Append('WndComboBox', {
-		x = nX, y = nY, w = wr, h = 25,
+		x = nX, y = nY, w = nComponentW, h = 25,
+		text = _L['Chat log filter'],
+		menu = function()
+			return InsertChatLogMsgTypeMenu(
+				{},
+				function(szMsgType)
+					local t1 = {}
+					-- 消息必须不包含下列任何：
+					local aExcludeFilter = MY_ChatLog.tExcludeFilter[szMsgType] or {}
+					if #aExcludeFilter > 0 then
+						table.insert(t1, {
+							szOption = _L['Message must exclude:'],
+							bDisable = true,
+						})
+					end
+					for nIndex, tFilter in ipairs(aExcludeFilter) do
+						table.insert(t1, {
+							szOption = tFilter.szText,
+							{
+								szOption = _L['Pattern match'],
+								bCheck = true, bChecked = tFilter.bPattern,
+								fnAction = function()
+									tFilter.bPattern = not tFilter.bPattern
+									MY_ChatLog.tExcludeFilter[szMsgType] = aExcludeFilter
+									MY_ChatLog.tExcludeFilter = MY_ChatLog.tExcludeFilter
+								end,
+							},
+							{
+								szOption = _L['Edit'],
+								fnAction = function()
+									GetUserInput('', function(szFilter)
+										aExcludeFilter[nIndex].szText = szFilter
+										MY_ChatLog.tExcludeFilter[szMsgType] = aExcludeFilter
+										MY_ChatLog.tExcludeFilter = MY_ChatLog.tExcludeFilter
+									end, nil, nil, nil, tFilter.szText)
+									X.UI.ClosePopupMenu()
+								end,
+							},
+							{
+								szOption = _L['Delete'],
+								rgb = {255, 0, 0},
+								fnAction = function()
+									X.Confirm(_L['Are you sure to delete this filter?'] .. '\n\n' .. tFilter.szText, function()
+										table.remove(aExcludeFilter, nIndex)
+										MY_ChatLog.tExcludeFilter[szMsgType] = aExcludeFilter
+										MY_ChatLog.tExcludeFilter = MY_ChatLog.tExcludeFilter
+									end)
+									X.UI.ClosePopupMenu()
+								end,
+							},
+						})
+					end
+					if #t1 > 0 then
+						table.insert(t1, X.CONSTANT.MENU_DIVIDER)
+					end
+					-- 消息必须包含下列任何：
+					local aIncludeFilter = MY_ChatLog.tIncludeFilter[szMsgType] or {}
+					if #aIncludeFilter > 0 then
+						table.insert(t1, {
+							szOption = _L['Message must include:'],
+							bDisable = true,
+						})
+					end
+					for nIndex, tFilter in ipairs(aIncludeFilter) do
+						table.insert(t1, {
+							szOption = tFilter.szText,
+							{
+								szOption = _L['Pattern match'],
+								bCheck = true, bChecked = tFilter.bPattern,
+								fnAction = function()
+									tFilter.bPattern = not tFilter.bPattern
+									MY_ChatLog.tIncludeFilter[szMsgType] = aIncludeFilter
+									MY_ChatLog.tIncludeFilter = MY_ChatLog.tIncludeFilter
+								end,
+							},
+							{
+								szOption = _L['Edit'],
+								fnAction = function()
+									GetUserInput('', function(szFilter)
+										aIncludeFilter[nIndex].szText = szFilter
+										MY_ChatLog.tIncludeFilter[szMsgType] = aIncludeFilter
+										MY_ChatLog.tIncludeFilter = MY_ChatLog.tIncludeFilter
+									end, nil, nil, nil, tFilter.szText)
+									X.UI.ClosePopupMenu()
+								end,
+							},
+							{
+								szOption = _L['Delete'],
+								rgb = {255, 0, 0},
+								fnAction = function()
+									X.Confirm(_L['Are you sure to delete this filter?'] .. '\n\n' .. tFilter.szText, function()
+										table.remove(aIncludeFilter, nIndex)
+										MY_ChatLog.tIncludeFilter[szMsgType] = aIncludeFilter
+										MY_ChatLog.tIncludeFilter = MY_ChatLog.tIncludeFilter
+									end)
+									X.UI.ClosePopupMenu()
+								end,
+							},
+						})
+					end
+					if #t1 > 0 then
+						table.insert(t1, X.CONSTANT.MENU_DIVIDER)
+					end
+					-- 添加
+					table.insert(t1, {
+						szOption = _L['Add'],
+						fnAction = function()
+							X.Confirm('MY_ChatLog_PS_Filter_Add', _L['Which kind of filter do you want to add?'], {
+								szResolve = _L['Message exclude'],
+								fnResolve = function ()
+									GetUserInput('', function(szFilter)
+										table.insert(aExcludeFilter, {
+											szText = szFilter,
+											bPattern = false,
+										})
+										MY_ChatLog.tExcludeFilter[szMsgType] = aExcludeFilter
+										MY_ChatLog.tExcludeFilter = MY_ChatLog.tExcludeFilter
+									end, nil, nil, nil, '')
+								end,
+								szReject = _L['Message include'],
+								fnReject = function ()
+									GetUserInput('', function(szFilter)
+										table.insert(aIncludeFilter, {
+											szText = szFilter,
+											bPattern = false,
+										})
+										MY_ChatLog.tIncludeFilter[szMsgType] = aIncludeFilter
+										MY_ChatLog.tIncludeFilter = MY_ChatLog.tIncludeFilter
+									end, nil, nil, nil, '')
+								end,
+							})
+							X.UI.ClosePopupMenu()
+						end,
+					})
+					return t1
+				end
+			)
+		end,
+	})
+	nY = nY + nDeltaY
+
+	ui:Append('WndComboBox', {
+		x = nX, y = nY, w = nComponentW, h = 25,
 		text = _L['Clear chat log'],
 		r = 255, g = 0, b = 0,
 		menu = function()
@@ -489,59 +631,29 @@ function PS.OnPanelActive(wnd)
 			return menu
 		end,
 	})
-	nY = nY + dy
-
-	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = wr,
-		text = _L['Filter tong member log message'],
-		checked = MY_ChatLog.bIgnoreTongMemberLogMsg,
-		onCheck = function(bChecked)
-			MY_ChatLog.bIgnoreTongMemberLogMsg = bChecked
-		end,
-	})
-	nY = nY + dy
-
-	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = wr,
-		text = _L['Filter tong online message'],
-		checked = MY_ChatLog.bIgnoreTongOnlineMsg,
-		onCheck = function(bChecked)
-			MY_ChatLog.bIgnoreTongOnlineMsg = bChecked
-		end,
-	})
-	nY = nY + dy
-
-	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = wr,
-		text = _L['Filter other player achievement and designation'],
-		checked = MY_ChatLog.bIgnoreOthersAchievementDesignation,
-		onCheck = function(bChecked)
-			MY_ChatLog.bIgnoreOthersAchievementDesignation = bChecked
-		end,
-	})
-	nY = nY + dy
+	nY = nY + nDeltaY
 
 	if not X.IsRestricted('MY_ChatLog.RealtimeCommit') then
 		ui:Append('WndCheckBox', {
-			x = nX, y = nY, w = wr,
+			x = nX, y = nY,
 			text = _L['Realtime database commit'],
 			checked = MY_ChatLog.bRealtimeCommit,
 			onCheck = function(bChecked)
 				MY_ChatLog.bRealtimeCommit = bChecked
 			end,
 		})
-		nY = nY + dy
+		nY = nY + nDeltaY
 	end
 
 	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = wr,
+		x = nX, y = nY,
 		text = _L['Auto connect database'],
 		checked = MY_ChatLog.bAutoConnectDB,
 		onCheck = function(bChecked)
 			MY_ChatLog.bAutoConnectDB = bChecked
 		end,
 	})
-	nY = nY + dy
+	nY = nY + nDeltaY
 
 	nX = nPaddingX
 	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['Tips'], font = 27, multiline = true, alignVertical = 0 })
@@ -552,7 +664,7 @@ function PS.OnPanelActive(wnd)
 	-- 右侧
 	nX = nW - 150
 	nY = nPaddingY
-	dy = 40
+	nDeltaY = 40
 	ui:Append('WndButton', {
 		x = nX, y = nY, w = 125, h = 35,
 		text = _L['Open chatlog'],
@@ -560,7 +672,7 @@ function PS.OnPanelActive(wnd)
 			MY_ChatLog.Open()
 		end,
 	})
-	nY = nY + dy
+	nY = nY + nDeltaY
 
 	ui:Append('WndButton', {
 		x = nX, y = nY, w = 125, h = 35,
@@ -569,7 +681,7 @@ function PS.OnPanelActive(wnd)
 			D.ExportConfirm()
 		end,
 	})
-	nY = nY + dy
+	nY = nY + nDeltaY
 
 	ui:Append('WndButton', {
 		x = nX, y = nY, w = 125, h = 35,
@@ -583,7 +695,7 @@ function PS.OnPanelActive(wnd)
 			end)
 		end,
 	})
-	nY = nY + dy
+	nY = nY + nDeltaY
 
 	ui:Append('WndButton', {
 		x = nX, y = nY, w = 125, h = 35,
@@ -604,7 +716,7 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 	})
-	nY = nY + dy
+	nY = nY + nDeltaY
 end
 X.RegisterPanel(_L['Chat'], 'ChatLog', _L['MY_ChatLog'], 'ui/Image/button/SystemButton.UITex|43', PS)
 

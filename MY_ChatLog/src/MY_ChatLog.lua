@@ -34,24 +34,6 @@ local MSG_TYPE_COLOR = setmetatable({
 }, {__index = function(t, k) return GetMsgFontColor(k, true) end})
 
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
-	bIgnoreTongOnlineMsg = { -- 帮会上线通知
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatLog'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
-	},
-	bIgnoreTongMemberLogMsg = { -- 帮会成员上线下线提示
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatLog'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
-	},
-	bIgnoreOthersAchievementDesignation = { -- 其他玩家成就称号
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_ChatLog'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
-	},
 	bRealtimeCommit = { -- 实时写入数据库
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatLog'],
@@ -116,6 +98,52 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 		szLabel = _L['MY_ChatLog'],
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
+	},
+	tExcludeFilter = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatLog'],
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Collection(X.Schema.Record({
+			szText = X.Schema.String,
+			bPattern = X.Schema.Boolean,
+		}))),
+		xDefaultValue = {
+			['MSG_GUILD'] = {
+				{
+					szText = '^' .. X.EscapeString(g_tStrings.STR_TALK_HEAD_TONG .. g_tStrings.STR_GUILD_ONLINE_MSG),
+					bPattern = true,
+				},
+				{
+					szText = '^' .. X.EscapeString(g_tStrings.STR_GUILD_MEMBER_LOGIN):gsub('<link 0>', '.-'):gsub('\n', '%%s') .. '$',
+					bPattern = true,
+				},
+				{
+					szText = '^' .. X.EscapeString(g_tStrings.STR_GUILD_MEMBER_LOGOUT):gsub('<link 0>', '.-'):gsub('\n', '%%s') .. '$',
+					bPattern = true,
+				},
+			},
+		},
+	},
+	tIncludeFilter = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_ChatLog'],
+		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Collection(X.Schema.Record({
+			szText = X.Schema.String,
+			bPattern = X.Schema.Boolean,
+		}))),
+		xDefaultValue = {
+			['MSG_ACHIEVEMENT'] = {
+				{
+					szText = _L['You\'ve achieved'],
+					bPattern = false,
+				},
+			},
+			['MSG_DESGNATION'] = {
+				{
+					szText = _L['You got designation'],
+					bPattern = false,
+				},
+			},
+		},
 	},
 })
 local D = {}
@@ -363,24 +391,25 @@ function D.RegisterMsgMonitor()
 				szMsg = GetFormatText(szMsg, nFont, r, g, b)
 			end
 			-- filters
-			if szMsgType == 'MSG_GUILD' then
-				if D.bReady and O.bIgnoreTongOnlineMsg and szText:find(TONG_ONLINE_MSG) then
-					return
+			if D.bReady then
+				local aExcludeFilter = O.tExcludeFilter[szMsgType] or {}
+				for _, v in ipairs(aExcludeFilter) do
+					if szText:find(v.szText, nil, not v.bPattern) then
+						return
+					end
 				end
-				if D.bReady and O.bIgnoreTongMemberLogMsg and (
-					szText:find(TONG_MEMBER_LOGIN_MSG) or szText:find(TONG_MEMBER_LOGOUT_MSG)
-				) then
-					return
-				end
-			elseif szMsgType == 'MSG_ACHIEVEMENT' then
-				if D.bReady and O.bIgnoreOthersAchievementDesignation
-				and not szText:find(_L['You\'ve achieved'], nil, true) then
-					return
-				end
-			elseif szMsgType == 'MSG_DESGNATION' then
-				if D.bReady and O.bIgnoreOthersAchievementDesignation
-				and not szText:find(_L['You got designation'], nil, true) then
-					return
+				local aIncludeFilter = O.tIncludeFilter[szMsgType] or {}
+				if #aIncludeFilter > 0 then
+					local bPass = false
+					for _, v in ipairs(aIncludeFilter) do
+						if szText:find(v.szText, nil, not v.bPattern) then
+							bPass = true
+							break
+						end
+					end
+					if not bPass then
+						return
+					end
 				end
 			end
 			if MAIN_DS then
@@ -473,13 +502,12 @@ local settings = {
 		},
 		{
 			fields = {
-				'bIgnoreTongOnlineMsg',
-				'bIgnoreTongMemberLogMsg',
-				'bIgnoreOthersAchievementDesignation',
 				'bRealtimeCommit',
 				'bAutoConnectDB',
 				'aChannel',
 				'tUncheckedChannel',
+				'tExcludeFilter',
+				'tIncludeFilter',
 			},
 			root = O,
 		},
@@ -487,13 +515,12 @@ local settings = {
 	imports = {
 		{
 			fields = {
-				'bIgnoreTongOnlineMsg',
-				'bIgnoreTongMemberLogMsg',
-				'bIgnoreOthersAchievementDesignation',
 				'bRealtimeCommit',
 				'bAutoConnectDB',
 				'aChannel',
 				'tUncheckedChannel',
+				'tExcludeFilter',
+				'tIncludeFilter',
 			},
 			triggers = {
 				aChannel = function()
