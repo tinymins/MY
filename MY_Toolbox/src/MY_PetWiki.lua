@@ -142,21 +142,21 @@ function D.HookPetFrame(frame)
 	local hPreferList = frame:Lookup('PageSet_All/Page_MyPet/WndScroll_Pets/WndContainer_Pets/Wnd_Prefer', '')
 	if hPreferList then
 		local function OnPetItemLButtonClick()
-			if O.bEnable and this.tPet and not IsCtrlKeyDown() and not IsAltKeyDown() and this:Lookup('Image_PreferSelect'):IsVisible() then
-				D.Open(this.tPet.dwPetIndex)
+			if O.bEnable and this:GetParent().tPet and not IsCtrlKeyDown() and not IsAltKeyDown() and this:IsObjectSelected() then
+				D.Open(this:GetParent().tPet.dwPetIndex)
 				return
 			end
 			return X.UI.FormatUIEventMask(false, true)
 		end
 		for i = 0, hPreferList:GetItemCount() - 1 do
-			local hPet = hPreferList:Lookup(i)
+			local hBox = hPreferList:Lookup(i):Lookup('Box_Prefer')
 			X.SetMemberFunctionHook(
-				hPet,
+				hBox,
 				'OnItemLButtonClick',
 				'MY_PetWiki',
 				OnPetItemLButtonClick,
 				{ bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
-			hPet:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
+			hBox:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
 		end
 	end
 
