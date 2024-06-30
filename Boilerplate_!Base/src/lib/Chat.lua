@@ -1445,30 +1445,42 @@ function X.GetChatChannelDailyLimit(nLevel, nChannel)
 end
 end
 
-local function GenerateMsgTypeMenu(node, fnAction, tChecked)
+local function GenerateMsgTypeMenu(node, xInject)
 	local t = { szOption = node.szOption }
 	for _, v in ipairs(node) do
 		if X.IsString(v) then
-			table.insert(t, {
+			local tInject
+			if X.IsFunction(xInject) then
+				tInject = xInject(v)
+			elseif X.IsTable(xInject) then
+				tInject = xInject
+			end
+			local t1 = {
 				szOption = g_tStrings.tChannelName[v],
 				rgb = GetMsgFontColor(v, true),
 				UserData = v,
-				fnAction = fnAction,
 				bCheck = true,
-				bChecked = tChecked[v],
-			})
+			}
+			if tInject then
+				for k, v in pairs(tInject) do
+					t1[k] = v
+				end
+			end
+			table.insert(t, t1)
 		elseif X.IsTable(v) then
-			table.insert(t, GenerateMsgTypeMenu(v, fnAction, tChecked))
+			table.insert(t, GenerateMsgTypeMenu(v, xInject))
 		end
 	end
 	return t
 end
 
-function X.GetMsgTypeMenu(fnAction, tChecked)
+---获取消息频道菜单
+---@param xInject function | table @叶子菜单数据注入，如果为 table 类型则直接覆盖，如果为 方法则执行后获取结果再进行覆盖
+---@return table @完整的消息频道菜单
+function X.GetMsgTypeMenu(xInject)
 	return GenerateMsgTypeMenu(
 		X.CONSTANT.MSG_TYPE_MENU,
-		fnAction,
-		tChecked or X.CONSTANT.EMPTY_TABLE
+		xInject
 	)
 end
 
