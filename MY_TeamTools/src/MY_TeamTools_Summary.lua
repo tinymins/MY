@@ -112,6 +112,7 @@ local RT_SORT_FIELD = 'nEquipScore'
 local RT_MAP_ID = 0
 local RT_PLAYER_MAP_COPY_ID = {}
 local RT_MAP_CD_PROGRESS = {}
+local RT_GLOBAL_ID_TO_ID = {}
 local RT_SELECT_PAGE = 0
 local RT_SELECT_KUNGFU
 local RT_SELECT_DEATH
@@ -150,7 +151,7 @@ function D.OpenOtherCharacterPanel(page, dwID, dwServerID, szGlobalID)
 		if szGlobalID == me.GetGlobalID() then
 			return
 		end
-		page.tViewInvite[szGlobalID] = true
+		page.tViewInvite[szGlobalID] = dwServerID
 		ViewInviteToPlayer(nil, nil, dwServerID, szGlobalID)
 	end
 end
@@ -443,7 +444,7 @@ function D.UpdateList(page)
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
 						if not GetItem(vv.dwID) then
-							D.ApplyRemotePlayerView(page, v.dwID)
+							D.ApplyRemotePlayerView(page, v.dwID, v.dwServerID, v.szGlobalID)
 							OutputItemTip(UI_OBJECT_ITEM_INFO, X.ENVIRONMENT.CURRENT_ITEM_VERSION, vv.dwTabType, vv.dwIndex, {x, y, w, h})
 						else
 							OutputItemTip(UI_OBJECT_ITEM_ONLY_ID, vv.dwID, nil, nil, { x, y, w, h }, nil, nil, nil, nil, nil, v.dwID)
@@ -696,14 +697,22 @@ function D.GetEquipCache(page, KPlayer)
 			FireUIEvent('MY_TEAM_TOOLS__SUMMARY__SUCCESS') -- 装备请求完毕
 		end
 	else
-		ViewInviteToPlayer(next(page.tViewInvite), true)
+		local xID = next(page.tViewInvite)
+		if X.IsNumber(xID) then
+			ViewInviteToPlayer(xID, true)
+		elseif X.IsString(xID) then
+			ViewInviteToPlayer(nil, true, page.tViewInvite[xID], xID)
+		end
 	end
 end
 
-function D.ApplyRemotePlayerView(page, dwID)
-	if not page.tViewInvite[dwID] then
+function D.ApplyRemotePlayerView(page, dwID, dwServerID, szGlobalID)
+	if dwID and not page.tViewInvite[dwID] then
 		page.tViewInvite[dwID] = true
 		ViewInviteToPlayer(dwID, true)
+	elseif dwServerID and szGlobalID then
+		page.tViewInvite[szGlobalID] = dwServerID
+		ViewInviteToPlayer(nil, true, dwServerID, szGlobalID)
 	end
 end
 
@@ -810,11 +819,15 @@ function D.GetTeamData(page)
 	local aRequestMapCopyID = {}
 	local aMemberList = D.GetMemberList()
 	for _, tMember in ipairs(aMemberList) do
-		local KPlayer = tMember.dwID and X.GetPlayer(tMember.dwID)
+		local dwID = tMember.dwID
+		if not dwID and tMember.szGlobalID then
+			dwID = RT_GLOBAL_ID_TO_ID[tMember.szGlobalID]
+		end
+		local KPlayer = dwID and X.GetPlayer(dwID)
 		local tInfo = {
 			KPlayer           = KPlayer,
 			szName            = tMember.szName or _L['Loading...'],
-			dwID              = tMember.dwID,  -- ID
+			dwID              = dwID,  -- ID
 			szGlobalID        = tMember.szGlobalID,
 			dwServerID        = tMember.dwServerID,
 			dwForceID         = tMember.dwForceID, -- 门派ID
@@ -886,7 +899,7 @@ function D.ApplyTeamEquip(page)
 			if tMember.dwID ~= X.GetClientPlayerID() then
 				local info = team.GetMemberInfo(tMember.dwID)
 				if info.bIsOnLine then
-					D.ApplyRemotePlayerView(page, tMember.dwID)
+					D.ApplyRemotePlayerView(page, tMember.dwID, tMember.dwServerID, tMember.szGlobalID)
 				end
 			end
 		end
@@ -1121,6 +1134,7 @@ function D.OnEvent(szEvent)
 		if eState == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 			local kPlayer = GetPlayer(dwID)
 			if this.tViewInvite[dwID] or this.tViewInvite[kPlayer.GetGlobalID()] then
+				RT_GLOBAL_ID_TO_ID[kPlayer.GetGlobalID()] = dwID
 				D.GetEquipCache(this, X.GetPlayer(dwID)) -- 抓取所有数据
 			end
 		else
