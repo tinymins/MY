@@ -136,13 +136,25 @@ function D.GetPlayerView()
 	return Station.Lookup('Normal/PlayerView')
 end
 
-function D.ViewInviteToPlayer(page, dwID)
+-- 打开查看装备界面
+function D.OpenOtherCharacterPanel(page, dwID, dwServerID, szGlobalID)
 	local me = X.GetClientPlayer()
-	if dwID ~= me.dwID then
+	if dwID then
+		if dwID == me.dwID then
+			return
+		end
 		page.tViewInvite[dwID] = true
 		ViewInviteToPlayer(dwID)
 	end
+	if dwServerID and szGlobalID then
+		if szGlobalID == me.GetGlobalID() then
+			return
+		end
+		page.tViewInvite[szGlobalID] = true
+		ViewInviteToPlayer(nil, nil, dwServerID, szGlobalID)
+	end
 end
+
 -- 分数计算
 function D.CountScore(tab, tScore)
 	tScore.Food = tScore.Food + #tab.tFood * 100
@@ -229,6 +241,7 @@ function D.UpdateList(page)
 			h:SetUserData(k)
 			h:SetName(szName)
 			h.dwID       = v.dwID
+			h.dwServerID = v.dwServerID
 			h.szGlobalID = v.szGlobalID
 			h.szName     = v.szName
 			-- 心法名字
@@ -674,6 +687,10 @@ function D.GetEquipCache(page, KPlayer)
 		nEquipScore       = KPlayer.GetTotalEquipScore()
 	}
 	page.tViewInvite[KPlayer.dwID] = nil
+	local szGlobalID = KPlayer.GetGlobalID()
+	if szGlobalID ~= '0' then
+		page.tViewInvite[szGlobalID] = nil
+	end
 	if X.IsEmpty(page.tViewInvite) then
 		if KPlayer.dwID ~= me.dwID then
 			FireUIEvent('MY_TEAM_TOOLS__SUMMARY__SUCCESS') -- 装备请求完毕
@@ -799,6 +816,7 @@ function D.GetTeamData(page)
 			szName            = tMember.szName or _L['Loading...'],
 			dwID              = tMember.dwID,  -- ID
 			szGlobalID        = tMember.szGlobalID,
+			dwServerID        = tMember.dwServerID,
 			dwForceID         = tMember.dwForceID, -- 门派ID
 			dwMountKungfuID   = tMember.dwKungfuID, -- 内功
 			-- tPermanentEnchant = {}, -- 附魔
@@ -906,6 +924,7 @@ function D.GetMemberList(bIsOnLine)
 			if tMember and szServerName then
 				table.insert(aList, {
 					dwID = tGlobalID2ID[tMember.szGlobalID],
+					dwServerID = tMember.dwServerID,
 					szGlobalID = tMember.szGlobalID,
 					szName = tMember.szName .. g_tStrings.STR_CONNECT .. szServerName,
 					dwForceID = tMember.dwForceID,
@@ -1098,12 +1117,14 @@ function D.OnEvent(szEvent)
 	elseif szEvent == 'UPDATE_DUNGEON_ROLE_PROGRESS' then
 		D.UpdateList(this)
 	elseif szEvent == 'PEEK_OTHER_PLAYER' then
-		if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
-			if this.tViewInvite[arg1] then
-				D.GetEquipCache(this, X.GetPlayer(arg1)) -- 抓取所有数据
+		local eState, dwID = arg0, arg1
+		if eState == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+			local kPlayer = GetPlayer(dwID)
+			if this.tViewInvite[dwID] or this.tViewInvite[kPlayer.GetGlobalID()] then
+				D.GetEquipCache(this, X.GetPlayer(dwID)) -- 抓取所有数据
 			end
 		else
-			this.tViewInvite[arg1] = nil
+			this.tViewInvite[dwID] = nil
 		end
 	elseif szEvent == 'PARTY_SET_MEMBER_ONLINE_FLAG' then
 		if arg2 == 0 then
@@ -1197,9 +1218,9 @@ function D.OnItemLButtonClick()
 			X.EditBox_AppendLinkPlayer(this.szName)
 		else
 			local dwID = this.dwID
-			if dwID then
-				D.ViewInviteToPlayer(this:GetParent():GetParent():GetParent():GetParent(), dwID)
-			end
+			local dwServerID = this.dwServerID
+			local szGlobalID = this.szGlobalID
+			D.OpenOtherCharacterPanel(this:GetParent():GetParent():GetParent():GetParent(), dwID, dwServerID, szGlobalID)
 		end
 	end
 end
@@ -1209,8 +1230,10 @@ function D.OnItemRButtonClick()
 		return
 	end
 	local dwID = this.dwID
+	local dwServerID = this.dwServerID
+	local szGlobalID = this.szGlobalID
 	local me = X.GetClientPlayer()
-	if dwID and dwID ~= me.dwID then
+	if (dwID and dwID ~= me.dwID) or (szGlobalID and szGlobalID ~= me.GetGlobalID()) then
 		local page = this:GetParent():GetParent():GetParent():GetParent()
 		local menu = {
 			{ szOption = this.szName, bDisable = true },
@@ -1219,7 +1242,7 @@ function D.OnItemRButtonClick()
 		InsertPlayerCommonMenu(menu, dwID, this.szName)
 		menu[#menu] = {
 			szOption = g_tStrings.STR_LOOKUP, fnAction = function()
-				D.ViewInviteToPlayer(page, dwID)
+				D.OpenOtherCharacterPanel(page, dwID, dwServerID, szGlobalID)
 			end
 		}
 		local t = {}
