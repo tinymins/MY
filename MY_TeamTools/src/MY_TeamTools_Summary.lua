@@ -820,9 +820,9 @@ function D.GetTeamData(page)
 	local aMemberList = D.GetMemberList()
 	for _, tMember in ipairs(aMemberList) do
 		local dwID = tMember.dwID
-		if not dwID and tMember.szGlobalID then
-			dwID = RT_GLOBAL_ID_TO_ID[tMember.szGlobalID]
-		end
+		-- if not dwID and tMember.szGlobalID then
+		-- 	dwID = RT_GLOBAL_ID_TO_ID[tMember.szGlobalID]
+		-- end
 		local KPlayer = dwID and X.GetPlayer(dwID)
 		local tInfo = {
 			KPlayer           = KPlayer,
