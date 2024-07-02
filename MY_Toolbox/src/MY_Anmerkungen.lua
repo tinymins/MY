@@ -20,21 +20,20 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 X.RegisterRestriction('MY_Anmerkungen.Export', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
-local _C = {}
+local D = {}
 local LOADED = false
 local PUBLIC_PLAYER_IDS = {}
 local PUBLIC_PLAYER_NOTES = {}
 local PRIVATE_PLAYER_IDS = {}
 local PRIVATE_PLAYER_NOTES = {}
-MY_Anmerkungen = MY_Anmerkungen or {}
 -- dwID : { dwID = dwID, szName = szName, szContent = szContent, bAlertWhenGroup, bTipWhenGroup }
 
 -- 打开一个玩家的记录编辑器
-function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
+function D.OpenPlayerNoteEditPanel(dwID, szName)
 	if not MY_Farbnamen then
 		return X.Alert(_L['MY_Farbnamen not detected! Please check addon load!'])
 	end
-	local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
+	local note = D.GetPlayerNote(dwID) or {}
 
 	local w, h = 340, 300
 	local ui = X.UI.CreateFrame('MY_Anmerkungen_PlayerNoteEdit_' .. (dwID or 0), {
@@ -64,7 +63,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 		x = x + 60, y = y, w = 200, h = 25,
 		multiline = false, text = szName or note.szName or '',
 		onChange = function(szName)
-			local rec = MY_Anmerkungen.GetPlayerNote(szName) or {}
+			local rec = D.GetPlayerNote(szName) or {}
 			local info = MY_Farbnamen and MY_Farbnamen.GetAusName(szName)
 			if info and rec.dwID ~= info.dwID then
 				rec.dwID = info.dwID
@@ -123,7 +122,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 		x = x + 58, y = y, w = 80,
 		text = _L['sure'],
 		onClick = function()
-			MY_Anmerkungen.SetPlayerNote(
+			D.SetPlayerNote(
 				ui:Children('#WndEditBox_ID'):Text(),
 				ui:Children('#WndEditBox_Name'):Text(),
 				ui:Children('#WndEditBox_Content'):Text(),
@@ -143,7 +142,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 		text = _L['Delete'], color = {255,0,0},
 		onHover = function(bIn) X.UI(this):Alpha((bIn and 255) or 200) end,
 		onClick = function()
-			MY_Anmerkungen.SetPlayerNote(ui:Children('#WndEditBox_ID'):Text())
+			D.SetPlayerNote(ui:Children('#WndEditBox_ID'):Text())
 			ui:Remove()
 		end,
 	})
@@ -163,7 +162,7 @@ local function onMenu()
 			szOption = _L['Edit player note'],
 			fnAction = function()
 				X.DelayCall(1, function()
-					MY_Anmerkungen.OpenPlayerNoteEditPanel(p.dwID, p.szName)
+					D.OpenPlayerNoteEditPanel(p.dwID, p.szName)
 				end)
 			end
 		}
@@ -187,9 +186,9 @@ end
 -- 获取一个玩家的记录
 -- MY_Anmerkungen.GetPlayerNote(dwID)
 -- MY_Anmerkungen.GetPlayerNote(szName)
-function MY_Anmerkungen.GetPlayerNote(dwID)
+function D.GetPlayerNote(dwID)
 	if not LOADED then
-		MY_Anmerkungen.LoadConfig()
+		D.LoadConfig()
 	end
 	local t, rec
 	rec = PRIVATE_PLAYER_NOTES[PRIVATE_PLAYER_IDS[dwID] or dwID]
@@ -207,12 +206,12 @@ function MY_Anmerkungen.GetPlayerNote(dwID)
 end
 
 -- 设置一个玩家的记录
-function MY_Anmerkungen.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate)
+function D.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate)
 	dwID = dwID and tonumber(dwID)
 	if not dwID then
 		return nil
 	end
-	MY_Anmerkungen.LoadConfig()
+	D.LoadConfig()
 	-- remove
 	local rec = PRIVATE_PLAYER_NOTES[dwID]
 	if rec then
@@ -240,17 +239,17 @@ function MY_Anmerkungen.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bA
 			PUBLIC_PLAYER_NOTES[dwID] = t
 			PUBLIC_PLAYER_IDS[szName] = dwID
 		end
-		if _C.list then
-			_C.list:ListBox('update', 'id', dwID, {'text', 'data'}, { _L('[%s] %s', t.szName, t.szContent), t })
+		if D.uiList then
+			D.uiList:ListBox('update', 'id', dwID, {'text', 'data'}, { _L('[%s] %s', t.szName, t.szContent), t })
 		end
-	elseif _C.list then
-		_C.list:ListBox('delete', 'id', dwID)
+	elseif D.uiList then
+		D.uiList:ListBox('delete', 'id', dwID)
 	end
 	FireUIEvent('MY_ANMERKUNGEN_UPDATE')
 	if X.GetCurrentTabID() == 'MY_Anmerkungen_Player_Note' then
 		X.SwitchTab('MY_Anmerkungen_Player_Note', true)
 	end
-	MY_Anmerkungen.SaveConfig()
+	D.SaveConfig()
 end
 
 -- 当有玩家进队时
@@ -260,7 +259,7 @@ local function CheckPartyPlayer(dwID)
 	local szName = team.GetClientTeamMemberName(dwID)
 	local dwLeaderID = team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER)
 	-- local szLeaderName = team.GetClientTeamMemberName(dwLeader)
-	local t = MY_Anmerkungen.GetPlayerNote(dwID)
+	local t = D.GetPlayerNote(dwID)
 	if t then
 		if t.bAlertWhenGroup then
 			MessageBox({
@@ -301,7 +300,7 @@ end
 end
 
 -- 读取公共数据
-function MY_Anmerkungen.LoadConfig()
+function D.LoadConfig()
 	if not X.GetClientPlayer() then
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage('MY_Anmerkungen.LoadConfig', 'Client player not exist! Cannot load config!', X.DEBUG_LEVEL.ERROR)
@@ -336,7 +335,7 @@ function MY_Anmerkungen.LoadConfig()
 			end
 		end
 		CPath.DelFile(szFilePath)
-		MY_Anmerkungen.SaveConfig()
+		D.SaveConfig()
 	end
 
 	local data = X.LoadLUAData({'config/anmerkungen.jx3dat', X.PATH_TYPE.ROLE})
@@ -366,12 +365,12 @@ function MY_Anmerkungen.LoadConfig()
 			end
 		end
 		CPath.DelFile(szFilePath)
-		MY_Anmerkungen.SaveConfig()
+		D.SaveConfig()
 	end
 	LOADED = true
 end
 -- 保存公共数据
-function MY_Anmerkungen.SaveConfig()
+function D.SaveConfig()
 	local data = {
 		ids = PUBLIC_PLAYER_IDS,
 		data = PUBLIC_PLAYER_NOTES,
@@ -384,8 +383,29 @@ function MY_Anmerkungen.SaveConfig()
 	}
 	X.SaveLUAData({'config/anmerkungen.jx3dat', X.PATH_TYPE.ROLE}, data)
 end
-X.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
+X.RegisterInit('MY_ANMERKUNGEN', D.LoadConfig)
 
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_Anmerkungen',
+	exports = {
+		{
+			fields = {
+				'GetPlayerNote',
+			},
+			root = D,
+		},
+	},
+}
+MY_Anmerkungen = X.CreateModule(settings)
+end
+
+--------------------------------------------------------------------------------
+-- 界面注册
+--------------------------------------------------------------------------------
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
@@ -397,7 +417,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['Create'],
 		buttonStyle = 'FLAT',
 		onClick = function()
-			MY_Anmerkungen.OpenPlayerNoteEditPanel()
+			D.OpenPlayerNoteEditPanel()
 		end,
 	})
 
@@ -459,7 +479,7 @@ function PS.OnPanelActive(wnd)
 									PRIVATE_PLAYER_NOTES[k] = v
 								end
 							end
-							MY_Anmerkungen.SaveConfig()
+							D.SaveConfig()
 							X.SwitchTab('MY_Anmerkungen_Player_Note', true)
 						end
 						X.Dialog(_L['Prefer old data or new data?'], {
@@ -496,7 +516,7 @@ function PS.OnPanelActive(wnd)
 		listBox = {{
 			'onlclick',
 			function(szID, szText, data, bSelected)
-				MY_Anmerkungen.OpenPlayerNoteEditPanel(data.dwID, data.szName)
+				D.OpenPlayerNoteEditPanel(data.dwID, data.szName)
 				return false
 			end,
 		}},
@@ -506,10 +526,10 @@ function PS.OnPanelActive(wnd)
 			list:ListBox('insert', { id = t.dwID, text = _L('[%s] %s', t.szName, t.szContent), data = t })
 		end
 	end
-	_C.list = list
+	D.uiList = list
 end
 function PS.OnPanelDeactive()
-	_C.list = nil
+	D.uiList = nil
 end
 X.RegisterPanel(_L['Target'], 'MY_Anmerkungen_Player_Note', _L['Player note'], 'ui/Image/button/ShopButton.UITex|12', PS)
 
