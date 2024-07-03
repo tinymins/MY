@@ -1496,7 +1496,14 @@ function X.IsAuthor(dwID, szName, szGlobalID)
 	if szGlobalID and X.PACKET_INFO.AUTHOR_GLOBAL_IDS[szGlobalID] then
 		return true
 	end
-	return dwID and X.PACKET_INFO.AUTHOR_ROLES[dwID] == szName
+	if dwID and (
+		X.PACKET_INFO.AUTHOR_ROLES[dwID] == szName
+			or X.PACKET_INFO.AUTHOR_ROLES[dwID] == X.FormatOriginPlayerName(szName)
+			or X.PACKET_INFO.AUTHOR_ROLES[dwID] == X.FormatBasePlayerName(szName)
+	) then
+		return true
+	end
+	return false
 end
 
 function X.IsAuthorPlayerName(szName)
