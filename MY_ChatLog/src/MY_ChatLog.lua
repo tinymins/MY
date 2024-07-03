@@ -432,7 +432,6 @@ function D.OnInit()
 	if O.bAutoConnectDB then
 		D.InitDB('ask')
 	end
-	D.bReady = true
 end
 
 function D.FlushDB(bCheckExceed)
@@ -555,7 +554,14 @@ X.RegisterInit('MY_ChatLog_InitDB', D.OnInit)
 X.RegisterExit('MY_ChatLog_Release', D.ReleaseDB)
 
 X.RegisterInit('MY_ChatLog_InitMsgMonitor', D.RegisterMsgMonitor)
-X.RegisterUserSettingsInit('MY_ChatLog_InitMsgMonitor', D.RegisterMsgMonitor)
+
+X.RegisterUserSettingsInit('MY_ChatLog', function()
+	D.bReady = true
+	D.RegisterMsgMonitor()
+end)
+X.RegisterUserSettingsRelease('MY_ChatLog', function()
+	D.bReady = false
+end)
 
 X.RegisterEvent('DISCONNECT', 'MY_ChatLog_Release', function()
 	if X.IsRestricted('MY_ChatLog.DEVELOP') then
