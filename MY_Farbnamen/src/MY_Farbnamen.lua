@@ -181,7 +181,7 @@ local function InitDB()
 end
 InitDB()
 
-function D.Import(aFilePath)
+function D.Import(aFilePath, bTimes)
 	if X.IsString(aFilePath) then
 		aFilePath = {aFilePath}
 	end
@@ -246,7 +246,7 @@ function D.Import(aFilePath)
 											ProcessString(rec.title or ''),
 											rec.camp or -1,
 											rec.tong or -1,
-											data and data.time or 0,
+											nRecTime,
 											data and data.times or 0,
 											rec.extra or ''
 										)
@@ -278,7 +278,7 @@ function D.Import(aFilePath)
 											AnsiToUTF8(szServer),
 											rec.id,
 											ProcessString(rec.name),
-											data and data.time or 0,
+											nRecTime,
 											data and data.times or 0,
 											rec.extra or ''
 										)
@@ -321,8 +321,8 @@ function D.Import(aFilePath)
 										rec.title or '',
 										rec.camp or -1,
 										rec.tong or -1,
-										data and data.time or 0,
-										data and data.times or 0,
+										nRecTime,
+										data and data.times or (bTimes and rec.time or 0),
 										rec.extra or ''
 									)
 									DBP_W:Execute()
@@ -353,8 +353,8 @@ function D.Import(aFilePath)
 										rec.server,
 										rec.id,
 										rec.name,
-										data and data.time or 0,
-										data and data.times or 0,
+										nRecTime,
+										data and data.times or (bTimes and rec.time or 0),
 										rec.extra or ''
 									)
 									DBT_W:Execute()
@@ -395,7 +395,7 @@ function D.Migration()
 	X.Confirm(
 		_L['Ancient database detected, do you want to migrate data from it?'],
 		function()
-			D.Import(aFilePath)
+			D.Import(aFilePath, true)
 			for _, szFilePath in ipairs(aFilePath) do
 				CPath.Move(szFilePath, szFilePath .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 			end
@@ -1176,7 +1176,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			local file = GetOpenFileName(_L['Please select your farbnamen database file.'], 'Database File(*.db)\0*.db\0\0', szRoot)
 			if not X.IsEmpty(file) then
 				X.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
-					local nImportChar, nSkipChar, nImportTong, nSkipTong = D.Import(file)
+					local nImportChar, nSkipChar, nImportTong, nSkipTong = D.Import(file, false)
 					X.Alert(_L('%d chars imported, %d chars skipped, %d tongs imported, %d tongs skipped!', nImportChar, nSkipChar, nImportTong, nSkipTong))
 				end)
 			end
