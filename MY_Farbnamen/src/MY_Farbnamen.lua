@@ -790,7 +790,7 @@ function D.GetPlayerInfo(xKey)
 	end
 	-- ¸üÐÂÄÚ´æ»º´æ
 	if tPlayer then
-		if tPlayer.id ~= 0 and tPlayer.server == X.GetServerOriginName() then
+		if tPlayer.id and tPlayer.id ~= 0 and tPlayer.server == X.GetServerOriginName() then
 			PLAYER_INFO[tPlayer.id] = tPlayer
 		end
 		if tPlayer.name and tPlayer.server then
@@ -861,6 +861,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	end
 	tPlayer.server = szServerName
 	tPlayer.id = X.IIf(IsRemotePlayer(dwID), tPlayer.id, dwID)
+	tPlayer.remoteID = X.IIf(IsRemotePlayer(dwID), dwID, nil)
 	tPlayer.name = szName
 	tPlayer.guid = IsGlobalID(szGlobalID) and szGlobalID or tPlayer.guid or ''
 	tPlayer.force = dwForceID or tPlayer.force or -1
@@ -874,6 +875,9 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	tPlayer.times = (tPlayer.times or 0) + (bTimes and 1 or 0)
 	if IsGlobalID(tPlayer.guid) then
 		PLAYER_INFO[tPlayer.guid] = tPlayer
+	end
+	if tPlayer.remoteID then
+		PLAYER_INFO[tPlayer.remoteID] = tPlayer
 	end
 	if not tPlayer.server or not tPlayer.id then
 		return
