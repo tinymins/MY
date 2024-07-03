@@ -836,7 +836,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	tPlayer.camp = nCamp or tPlayer.camp or -1
 	tPlayer.tong = dwTongID or tPlayer.tong or -1
 	tPlayer.extra = tPlayer.extra or ''
-	tPlayer.time = GetCurrentTime()
+	tPlayer.time = bTimes and GetCurrentTime() or tPlayer.time or 0
 	tPlayer.times = (tPlayer.times or 0) + (bTimes and 1 or 0)
 	if IsValidGlobalID(tPlayer.guid) then
 		PLAYER_INFO[tPlayer.guid] = tPlayer
@@ -1241,6 +1241,24 @@ X.RegisterEvent('PEEK_OTHER_PLAYER', OnPeekPlayer)
 X.RegisterEvent('MY_PLAYER_ENTER_SCENE', function() PEEK_LIST[arg0] = { nRetryCount = 0, bTimes = arg0 ~= X.GetClientPlayerID() } end)
 X.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() D.RecordTongInfo(arg1, arg2, true) end)
 end
+
+X.RegisterEvent('PLAYER_CHAT', function ()
+	local dwSenderID    = arg1
+	local szSenderName  = arg2
+	local szGlobalID    = arg10
+	-- local dwAvatar      = arg11
+	local dwForceID     = arg12
+	local nLevel        = arg13
+	local nCamp         = arg14
+	local nRoleType     = arg15
+	if not dwSenderID or not szSenderName or not dwForceID then
+		return
+	end
+	if szGlobalID == X.GetClientPlayerGlobalID() then -- 密聊频道自己发言回显数据对不上
+		return
+	end
+	D.RecordPlayerInfo(nil, dwSenderID, szSenderName, szGlobalID, dwForceID, nRoleType, nLevel, nil, nCamp, nRoleType, false)
+end)
 
 X.RegisterUserSettingsInit('MY_Farbnamen', function() D.bReady = true end)
 
