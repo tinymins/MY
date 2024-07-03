@@ -1239,7 +1239,7 @@ local function OnPeekPlayer()
 end
 X.RegisterEvent('PEEK_OTHER_PLAYER', OnPeekPlayer)
 X.RegisterEvent('MY_PLAYER_ENTER_SCENE', function() PEEK_LIST[arg0] = { nRetryCount = 0, bTimes = arg0 ~= X.GetClientPlayerID() } end)
-X.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() D.RecordTongInfo(arg1, arg2, true) end)
+X.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() D.RecordTongInfo(X.GetServerOriginName(), arg1, arg2, true) end)
 end
 
 X.RegisterEvent('PLAYER_CHAT', function ()
