@@ -856,7 +856,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	end
 	if not tPlayer then
 		tPlayer = szServerName == X.GetServerOriginName() and D.GetPlayerInfo(dwID)
-			or D.GetPlayerInfo(szName .. g_tStrings.STR_CONNECT .. szServerName)
+			or (szServerName and D.GetPlayerInfo(szName .. g_tStrings.STR_CONNECT .. szServerName))
 			or {}
 	end
 	tPlayer.server = szServerName
