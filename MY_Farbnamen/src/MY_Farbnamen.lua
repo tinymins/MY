@@ -13,16 +13,16 @@ local PLUGIN_NAME = 'MY_Farbnamen'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Farbnamen'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^24.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
---------------------------------------------------------------------------
----------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 设置和数据
----------------------------------------------------------------
-X.CreateDataRoot(X.PATH_TYPE.SERVER)
+--------------------------------------------------------------------------------
+X.CreateDataRoot(X.PATH_TYPE.GLOBAL)
 
 local O = X.CreateUserSettingsModule('MY_Farbnamen', _L['General'], {
 	bEnable = {
@@ -58,7 +58,7 @@ local D = {
 local NAME_ID_HEADER_XML = {}
 local GUID_HEADER_XML = {}
 local DB_ERR_COUNT, DB_MAX_ERR_COUNT = 0, 5
-local DB, DBI_W, DBI_RI, DBI_RN, DBT_W, DBT_RI
+local DB, DBP_W, DBP_RI, DBP_RN, DBP_RGI, DBT_W, DBT_RI
 
 local function InitDB()
 	if DB then
@@ -67,7 +67,7 @@ local function InitDB()
 	if DB_ERR_COUNT > DB_MAX_ERR_COUNT then
 		return false
 	end
-	DB = X.SQLiteConnect(_L['MY_Farbnamen'], {'cache/farbnamen.v6.db', X.PATH_TYPE.SERVER})
+	DB = X.SQLiteConnect(_L['MY_Farbnamen'], {'cache/farbnamen.v7.db', X.PATH_TYPE.GLOBAL})
 	if not DB then
 		local szMsg = _L['Cannot connect to database!!!']
 		if DB_ERR_COUNT > 0 then
@@ -84,10 +84,10 @@ local function InitDB()
 			PRIMARY KEY (key)
 		)
 	]])
-	DB:Execute([[INSERT INTO Info (key, value) VALUES ('version', '6')]])
-	DB:Execute([[INSERT INTO Info (key, value) VALUES ('server', ']] .. AnsiToUTF8(X.GetServerOriginName()) .. [[')]])
+	DB:Execute([[INSERT INTO Info (key, value) VALUES ('version', '7')]])
 	DB:Execute([[
-		CREATE TABLE IF NOT EXISTS InfoCache (
+		CREATE TABLE IF NOT EXISTS PlayerInfo (
+			server NVARCHAR(10) NOT NULL,
 			id INTEGER NOT NULL,
 			name NVARCHAR(20) NOT NULL,
 			guid NVARCHAR(20) NOT NULL,
@@ -97,27 +97,31 @@ local function InitDB()
 			title NVARCHAR(20) NOT NULL,
 			camp INTEGER NOT NULL,
 			tong INTEGER NOT NULL,
-			extra TEXT NOT NULL,
 			time INTEGER NOT NULL,
-			PRIMARY KEY (id)
+			times INTEGER NOT NULL,
+			extra TEXT NOT NULL,
+			PRIMARY KEY (server, id)
 		)
 	]])
-	DB:Execute('CREATE UNIQUE INDEX IF NOT EXISTS info_cache_name_uidx ON InfoCache(name)')
-	DB:Execute('CREATE INDEX IF NOT EXISTS info_cache_guid_uidx ON InfoCache(guid)')
-	DBI_W  = DB:Prepare('REPLACE INTO InfoCache (id, name, guid, force, role, level, title, camp, tong, extra, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-	DBI_RI = DB:Prepare('SELECT id, name, guid, force, role, level, title, camp, tong, extra, time FROM InfoCache WHERE id = ?')
-	DBI_RN = DB:Prepare('SELECT id, name, guid, force, role, level, title, camp, tong, extra, time FROM InfoCache WHERE name = ?')
+	DB:Execute('CREATE UNIQUE INDEX IF NOT EXISTS player_info_server_name_u_idx ON PlayerInfo(server, name)')
+	DB:Execute('CREATE INDEX IF NOT EXISTS player_info_guid_idx ON PlayerInfo(guid)')
+	DBP_W  = DB:Prepare('REPLACE INTO PlayerInfo (server, id, name, guid, force, role, level, title, camp, tong, time, times, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+	DBP_RI = DB:Prepare('SELECT id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND id = ?')
+	DBP_RN = DB:Prepare('SELECT id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND name = ?')
+	DBP_RGI = DB:Prepare('SELECT id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE guid = ? ORDER BY time DESC')
 	DB:Execute([[
-		CREATE TABLE IF NOT EXISTS TongCache (
+		CREATE TABLE IF NOT EXISTS TongInfo (
+			server NVARCHAR(10) NOT NULL,
 			id INTEGER NOT NULL,
 			name NVARCHAR(20) NOT NULL,
-			extra TEXT NOT NULL,
 			time INTEGER NOT NULL,
-			PRIMARY KEY(id)
+			times INTEGER NOT NULL,
+			extra TEXT NOT NULL,
+			PRIMARY KEY(server, id)
 		)
 	]])
-	DBT_W  = DB:Prepare('REPLACE INTO TongCache (id, name, extra, time) VALUES (?, ?, ?, ?)')
-	DBT_RI = DB:Prepare('SELECT id, name, extra, time FROM TongCache WHERE id = ?')
+	DBT_W  = DB:Prepare('REPLACE INTO TongInfo (server, id, name, time, times, extra) VALUES (?, ?, ?, ?, ?, ?)')
+	DBT_RI = DB:Prepare('SELECT id, name, time, times, extra FROM TongInfo WHERE server = ? AND id = ?')
 
 	-- 旧版文件缓存转换
 	local SZ_IC_PATH = X.FormatPath({'cache/PLAYER_INFO/{$server_origin}/', X.PATH_TYPE.DATA})
@@ -125,18 +129,19 @@ local function InitDB()
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite start!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
+		local szServer = X.GetServerOriginName()
 		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 999 do
 			local data = X.LoadLUAData({'cache/PLAYER_INFO/{$server_origin}/DAT2/' .. i .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 			if data then
 				for id, p in pairs(data) do
-					DBI_W:ClearBindings()
-					DBI_W:BindAll(p[1], p[2], '', p[3], p[4], p[5], p[6], p[7], p[8], '', 0)
-					DBI_W:Execute()
+					DBP_W:ClearBindings()
+					DBP_W:BindAll(szServer, p[1], AnsiToUTF8(p[2]), '', p[3], p[4], p[5], AnsiToUTF8(p[6]), p[7], p[8], 0, 0, '')
+					DBP_W:Execute()
 				end
 			end
 		end
-		DBI_W:Reset()
+		DBP_W:Reset()
 		DB:Execute('END TRANSACTION')
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
@@ -152,7 +157,7 @@ local function InitDB()
 				if data then
 					for id, name in pairs(data) do
 						DBT_W:ClearBindings()
-						DBT_W:BindAll(id, AnsiToUTF8(name), '', 0)
+						DBT_W:BindAll(szServer, id, AnsiToUTF8(name), 0, 0, '')
 						DBT_W:Execute()
 					end
 				end
@@ -184,10 +189,6 @@ function D.Import(aFilePath)
 	for _, szFilePath in ipairs(aFilePath) do
 		local db = SQLite3_Open(szFilePath)
 		if db then
-			local szServer = X.Get(db:Execute([[SELECT value FROM Info WHERE key = 'server']]), {1, 'value'}, nil)
-			if szServer then
-				szServer = UTF8ToAnsi(szServer)
-			end
 			local nVersion = X.Get(db:Execute([[SELECT value FROM Info WHERE key = 'version']]), {1, 'value'}, nil)
 			if nVersion then
 				nVersion = tonumber(nVersion)
@@ -203,57 +204,142 @@ function D.Import(aFilePath)
 					nVersion = 5
 				end
 			end
-			if nVersion and nVersion < 6 then
-				szServer = X.GetServerOriginName()
+			if not nVersion then
+				nVersion = 0
 			end
-			if szServer == X.GetServerOriginName() and nVersion then
-				local bUTF8 = nVersion > 3
-				local ProcessString = bUTF8
-					and function(s) return s end
-					or function(s) return AnsiToUTF8(s) or '' end
+			if nVersion > 0 and nVersion <= 6 then
+				local szServer = X.Get(db:Execute([[SELECT value FROM Info WHERE key = 'server']]), {1, 'value'}, nil)
+				if szServer then
+					szServer = UTF8ToAnsi(szServer)
+				end
+				if nVersion and nVersion < 6 then
+					szServer = X.GetServerOriginName()
+				end
+				if szServer == X.GetServerOriginName() then
+					local bUTF8 = nVersion > 3
+					local ProcessString = bUTF8
+						and function(s) return s end
+						or function(s) return AnsiToUTF8(s) or '' end
+					DB:Execute('BEGIN TRANSACTION')
+					local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					for i = 0, nCount / nPageSize do
+						local aInfoCache = db:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+						if aInfoCache then
+							for _, rec in ipairs(aInfoCache) do
+								if rec.id and rec.name then
+									DBP_RI:ClearBindings()
+									DBP_RI:BindAll(rec.id)
+									local data = DBP_RI:GetNext()
+									DBP_RI:Reset()
+									local nTime = data and (data.time or 0) or -1
+									local nRecTime = rec.time or 0
+									if nRecTime > nTime then
+										DBP_W:ClearBindings()
+										DBP_W:BindAll(
+											AnsiToUTF8(szServer),
+											rec.id,
+											ProcessString(rec.name),
+											ProcessString(rec.guid or ''),
+											rec.force or -1,
+											rec.role or -1,
+											rec.level or -1,
+											ProcessString(rec.title or ''),
+											rec.camp or -1,
+											rec.tong or -1,
+											data and data.time or 0,
+											data and data.times or 0,
+											rec.extra or ''
+										)
+										DBP_W:Execute()
+										nImportChar = nImportChar + 1
+									else
+										nSkipChar = nSkipChar + 1
+									end
+								end
+							end
+							DBP_W:Reset()
+						end
+					end
+					local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					for i = 0, nCount / nPageSize do
+						local aTongCache = db:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+						if aTongCache then
+							for _, rec in ipairs(aTongCache) do
+								if rec.id and rec.name then
+									DBT_RI:ClearBindings()
+									DBT_RI:BindAll(rec.id)
+									local data = DBT_RI:GetNext()
+									DBT_RI:Reset()
+									local nTime = data and (data.time or 0) or -1
+									local nRecTime = rec.time or 0
+									if nRecTime > nTime then
+										DBT_W:ClearBindings()
+										DBT_W:BindAll(
+											AnsiToUTF8(szServer),
+											rec.id,
+											ProcessString(rec.name),
+											data and data.time or 0,
+											data and data.times or 0,
+											rec.extra or ''
+										)
+										DBT_W:Execute()
+										nImportTong = nImportTong + 1
+									else
+										nSkipTong = nSkipTong + 1
+									end
+								end
+							end
+							DBT_W:Reset()
+						end
+					end
+					DB:Execute('END TRANSACTION')
+				end
+			elseif nVersion == 7 then
 				DB:Execute('BEGIN TRANSACTION')
-				local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+				local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM PlayerInfo WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
 				for i = 0, nCount / nPageSize do
-					local aInfoCache = db:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
-					if aInfoCache then
-						for _, rec in ipairs(aInfoCache) do
-							if rec.id and rec.name then
-								DBI_RI:ClearBindings()
-								DBI_RI:BindAll(rec.id)
-								local data = DBI_RI:GetNext()
-								DBI_RI:Reset()
+					local aPlayerInfo = db:Execute('SELECT * FROM PlayerInfo WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+					if aPlayerInfo then
+						for _, rec in ipairs(aPlayerInfo) do
+							if rec.server and rec.id and rec.name then
+								DBP_RI:ClearBindings()
+								DBP_RI:BindAll(rec.id)
+								local data = DBP_RI:GetNext()
+								DBP_RI:Reset()
 								local nTime = data and (data.time or 0) or -1
 								local nRecTime = rec.time or 0
 								if nRecTime > nTime then
-									DBI_W:ClearBindings()
-									DBI_W:BindAll(
+									DBP_W:ClearBindings()
+									DBP_W:BindAll(
+										rec.server,
 										rec.id,
-										ProcessString(rec.name),
-										ProcessString(rec.guid or ''),
+										rec.name,
+										rec.guid or '',
 										rec.force or -1,
 										rec.role or -1,
 										rec.level or -1,
-										ProcessString(rec.title or ''),
+										rec.title or '',
 										rec.camp or -1,
 										rec.tong or -1,
-										rec.extra or '',
-										0
+										data and data.time or 0,
+										data and data.times or 0,
+										rec.extra or ''
 									)
-									DBI_W:Execute()
+									DBP_W:Execute()
 									nImportChar = nImportChar + 1
 								else
 									nSkipChar = nSkipChar + 1
 								end
 							end
 						end
-						DBI_W:Reset()
+						DBP_W:Reset()
 					end
 				end
-				local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+				local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM TongInfo WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
 				for i = 0, nCount / nPageSize do
-					local aTongCache = db:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
-					if aTongCache then
-						for _, rec in ipairs(aTongCache) do
+					local aTongInfo = db:Execute('SELECT * FROM TongInfo WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+					if aTongInfo then
+						for _, rec in ipairs(aTongInfo) do
 							if rec.id and rec.name then
 								DBT_RI:ClearBindings()
 								DBT_RI:BindAll(rec.id)
@@ -264,10 +350,12 @@ function D.Import(aFilePath)
 								if nRecTime > nTime then
 									DBT_W:ClearBindings()
 									DBT_W:BindAll(
+										rec.server,
 										rec.id,
-										ProcessString(rec.name),
-										rec.extra or '',
-										0
+										rec.name,
+										data and data.time or 0,
+										data and data.times or 0,
+										rec.extra or ''
 									)
 									DBT_W:Execute()
 									nImportTong = nImportTong + 1
@@ -288,15 +376,6 @@ function D.Import(aFilePath)
 end
 
 function D.Migration()
-	local szRoot = X.FormatPath({'cache/', X.PATH_TYPE.SERVER})
-	-- 修复V4版本导入乱码问题
-	for _, szFileName in ipairs(CPath.GetFileList(szRoot)) do
-		local szTime = select(3, szFileName:find('^farbnamen%.v4%.db%.bak(%d+)$'))
-		local nTime = szTime and tonumber(szTime)
-		if nTime and nTime < 20240530100000 then
-			CPath.Move(szRoot .. szFileName, szRoot .. 'farbnamen.v4.db')
-		end
-	end
 	local aFilePath = {}
 	for _, szFilePath in ipairs({
 		X.FormatPath({'cache/player_info.db', X.PATH_TYPE.SERVER}),
@@ -304,6 +383,7 @@ function D.Migration()
 		X.FormatPath({'cache/farbnamen.v3.db', X.PATH_TYPE.SERVER}),
 		X.FormatPath({'cache/farbnamen.v4.db', X.PATH_TYPE.SERVER}),
 		X.FormatPath({'cache/farbnamen.v5.db', X.PATH_TYPE.SERVER}),
+		X.FormatPath({'cache/farbnamen.v6.db', X.PATH_TYPE.SERVER}),
 	}) do
 		if IsLocalFileExist(szFilePath) then
 			table.insert(aFilePath, szFilePath)
@@ -386,10 +466,10 @@ function D.RenderXml(szMsg, tOption)
 	return szMsg
 end
 
-function D.RenderNamelink(namelink, tOption)
-	local ui, nNumOffset = X.UI(namelink), 0
+function D.RenderNameLink(hNameLink, tOption)
+	local ui, nNumOffset = X.UI(hNameLink), 0
 	if tOption.bColor or tOption.bInsertIcon then
-		local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
+		local szName = string.gsub(hNameLink:GetText(), '[%[%]]', '')
 		local tInfo = D.GetAusName(szName)
 		if tInfo then
 			if tOption.bColor then
@@ -398,8 +478,8 @@ function D.RenderNamelink(namelink, tOption)
 			if tOption.bInsertIcon then
 				local szIcon, nFrame = GetForceImage(tInfo.dwForceID)
 				if szIcon and nFrame then
-					namelink:GetParent():InsertItemFromString(
-						namelink:GetIndex(),
+					hNameLink:GetParent():InsertItemFromString(
+						hNameLink:GetIndex(),
 						false,
 						'<image>w=' .. tOption.nInsertIconSize .. ' h=' .. tOption.nInsertIconSize
 							.. ' path="' .. szIcon .. '" frame=' .. nFrame .. '</image>')
@@ -417,7 +497,7 @@ function D.RenderNamelink(namelink, tOption)
 			end
 		end)
 	end
-	return namelink, nNumOffset
+	return hNameLink, nNumOffset
 end
 
 function D.RenderHandle(h, tOption, bIgnoreRange)
@@ -435,7 +515,7 @@ function D.RenderEl(el, tOption, bIgnoreRange)
 	if el:GetType() == 'Text' then
 		local name = el:GetName()
 		if name == 'namelink' or name:sub(1, 9) == 'namelink_' then
-			return D.RenderNamelink(el, tOption)
+			return D.RenderNameLink(el, tOption)
 		end
 	end
 	if el:GetType() == 'Handle' then
@@ -567,71 +647,66 @@ function D.GetTip(szName)
 	end
 end
 
-function D.ShowTip(namelink)
-	if type(namelink) ~= 'table' then
-		namelink = this
+function D.ShowTip(hNameLink)
+	if type(hNameLink) ~= 'table' then
+		hNameLink = this
 	end
-	if not namelink then
+	if not hNameLink then
 		return
 	end
-	local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
-	local x, y = namelink:GetAbsPos()
-	local w, h = namelink:GetSize()
+	local szName = string.gsub(hNameLink:GetText(), '[%[%]]', '')
+	local x, y = hNameLink:GetAbsPos()
+	local w, h = hNameLink:GetSize()
 
 	local szTip = D.GetTip(szName)
 	if szTip then
 		OutputTip(szTip, 450, {x, y, w, h}, X.UI.TIP_POSITION.TOP_BOTTOM)
 	end
 end
+
 ---------------------------------------------------------------
 -- 数据存储
 ---------------------------------------------------------------
-local l_infocache       = {} -- 读取数据缓存
-local l_infocache_w     = {} -- 修改数据缓存（UTF8）
-local l_remoteinfocache = {} -- 跨服数据缓存
-local l_tongcache       = {} -- 帮会数据缓存
-local l_tongcache_w     = {} -- 帮会修改数据缓存（UTF8）
-local function GetTongName(dwID)
-	if not dwID then
-		return
+local PLAYER_INFO   = {} -- 读取数据缓存
+local PLAYER_INFO_W = {} -- 修改数据缓存（UTF8）
+local TONG_INFO     = {} -- 帮会数据缓存
+local TONG_INFO_W   = {} -- 帮会修改数据缓存（UTF8）
+local function IsValidGlobalID(szGlobalID)
+	return szGlobalID and szGlobalID ~= '' and szGlobalID ~= '0'
+end
+local function ExtractNameServer(szName, bFallbackServer)
+	local a = X.SplitString(szName, g_tStrings.STR_CONNECT)
+	if bFallbackServer and not a[2] then
+		a[2] = X.GetServerOriginName()
 	end
-	local info = l_tongcache[dwID]
-	if not info and InitDB() then
-		DBT_RI:ClearBindings()
-		DBT_RI:BindAll(dwID)
-		info = DBT_RI:GetNext()
-		if info then
-			info.name = UTF8ToAnsi(info.name)
-			l_tongcache[info.id] = info
-		end
-		DBT_RI:Reset()
-	end
-	return info and info.name
+	return a[1], a[2]
 end
 
 function D.Flush()
 	if not InitDB() then
 		return
 	end
-	if DBI_W then
+	if DBP_W then
 		DB:Execute('BEGIN TRANSACTION')
-		for i, p in pairs(l_infocache_w) do
-			DBI_W:ClearBindings()
-			DBI_W:BindAll(p.id, p.name, p.guid, p.force, p.role, p.level, p.title, p.camp, p.tong, '', p.time)
-			DBI_W:Execute()
+		for i, p in pairs(PLAYER_INFO_W) do
+			DBP_W:ClearBindings()
+			DBP_W:BindAll(p.server, p.id, p.name, p.guid, p.force, p.role, p.level, p.title, p.camp, p.tong, p.time, p.times, '')
+			DBP_W:Execute()
 		end
-		DBI_W:Reset()
+		DBP_W:Reset()
 		DB:Execute('END TRANSACTION')
+		PLAYER_INFO_W = {}
 	end
 	if DBT_W then
 		DB:Execute('BEGIN TRANSACTION')
-		for _, p in pairs(l_tongcache_w) do
+		for _, p in pairs(TONG_INFO_W) do
 			DBT_W:ClearBindings()
-			DBT_W:BindAll(p.id, p.name, '', p.time)
+			DBT_W:BindAll(p.server, p.id, p.name, p.time, p.times, '')
 			DBT_W:Execute()
 		end
 		DBT_W:Reset()
 		DB:Execute('END TRANSACTION')
+		TONG_INFO_W = {}
 	end
 end
 X.RegisterFlush('MY_Farbnamen_Save', D.Flush)
@@ -646,121 +721,224 @@ end
 X.RegisterExit('MY_Farbnamen_Save', OnExit)
 end
 
--- 通过szName获取信息
-function D.Get(szKey)
-	local info = l_remoteinfocache[szKey] or l_infocache[szKey]
-	if not info then
-		if type(szKey) == 'string' then
-			if InitDB() then
-				DBI_RN:ClearBindings()
-				DBI_RN:BindAll(AnsiToUTF8(szKey))
-				info = DBI_RN:GetNext()
-				DBI_RN:Reset()
-			end
-		elseif type(szKey) == 'number' then
-			if InitDB() then
-				DBI_RI:ClearBindings()
-				DBI_RI:BindAll(szKey)
-				info = DBI_RI:GetNext()
-				DBI_RI:Reset()
-			end
+---从数据库与缓存中获取指定角色的信息表
+---@param xKey string | number @角色名、角色ID或角色唯一ID，其中通过ID只能获取当前服务器角色信息或跨服玩家角色信息，通过角色名或角色唯一ID可以获取其他服务器角色信息
+---@return table | nil @获取成功返回信息，否则返回空
+function D.GetPlayerInfo(xKey)
+	local tPlayer
+	if X.IsNumber(xKey) then
+		tPlayer = PLAYER_INFO[xKey]
+		if not tPlayer and InitDB() then
+			local szServer = X.GetServerOriginName()
+			DBP_RI:ClearBindings()
+			DBP_RI:BindAll(AnsiToUTF8(szServer), xKey)
+			tPlayer = X.ConvertToAnsi((DBP_RI:GetNext()))
+			DBP_RI:Reset()
 		end
-		if info then
-			info.name = UTF8ToAnsi(info.name)
-			info.title = UTF8ToAnsi(info.title)
-			info.guid = UTF8ToAnsi(info.guid)
-			l_infocache[info.id] = info
-			l_infocache[info.name] = info
-			if info.guid ~= '' and info.guid ~= '0' then
-				l_infocache[info.guid] = info
+	elseif X.IsString(xKey) and string.find(xKey, '^[0-9]+$') then
+		tPlayer = PLAYER_INFO[xKey]
+		if not tPlayer and InitDB() then
+			DBP_RGI:ClearBindings()
+			DBP_RGI:BindAll(AnsiToUTF8(xKey))
+			tPlayer = X.ConvertToAnsi((DBP_RGI:GetNext()))
+			DBP_RGI:Reset()
+		end
+	elseif X.IsString(xKey) then
+		local szName, szServer = ExtractNameServer(xKey, true)
+		xKey = szName .. g_tStrings.STR_CONNECT .. szServer
+		tPlayer = PLAYER_INFO[xKey]
+		if not tPlayer and InitDB() then
+			DBP_RN:ClearBindings()
+			DBP_RN:BindAll(AnsiToUTF8(szServer), AnsiToUTF8(szName))
+			tPlayer = X.ConvertToAnsi((DBP_RN:GetNext()))
+			DBP_RN:Reset()
+		end
+	end
+	-- 更新内存缓存
+	if tPlayer then
+		if tPlayer.id ~= 0 and tPlayer.server == X.GetServerOriginName() then
+			PLAYER_INFO[tPlayer.id] = tPlayer
+		end
+		if tPlayer.name and tPlayer.server then
+			PLAYER_INFO[tPlayer.name .. g_tStrings.STR_CONNECT .. tPlayer.server] = tPlayer
+		end
+		if IsValidGlobalID(tPlayer.guid) then
+			PLAYER_INFO[tPlayer.guid] = tPlayer
+		end
+	end
+	return tPlayer
+end
+
+---从数据库与缓存中获取指定帮会的信息表
+---@param szServerName string @所在服务器
+---@param dwTongID number @帮会ID
+---@return table | nil @获取成功返回信息，否则返回空
+function D.GetTongInfo(szServerName, dwTongID)
+	if not szServerName or not dwTongID or dwTongID == 0 then
+		return
+	end
+	local tTong = TONG_INFO[szServerName .. g_tStrings.STR_CONNECT .. dwTongID]
+	-- 从数据库读取
+	if not tTong and InitDB() then
+		DBT_RI:ClearBindings()
+		DBT_RI:BindAll(X.ConvertToUTF8(szServerName), dwTongID)
+		tTong = X.ConvertToAnsi((DBT_RI:GetNext()))
+		DBT_RI:Reset()
+	end
+	-- 更新内存缓存
+	if tTong then
+		TONG_INFO[szServerName .. g_tStrings.STR_CONNECT .. dwTongID] = tTong
+	end
+	return tTong
+end
+
+---记录一个角色信息，提供自动适配跨服、部分信息等情况的逻辑
+---@param szServerName string @要记录的角色所在服务器
+---@param dwID number @要记录的角色ID
+---@param szName string @要记录的角色名称
+---@param szGlobalID string @要记录的角色唯一ID
+---@param dwForceID number @要记录的角色门派
+---@param nRoleType number @要记录的角色体型
+---@param nLevel number @要记录的角色等级
+---@param szTitle string @要记录的角色称号
+---@param nCamp number @要记录的角色阵营
+---@param dwTongID number @要记录的角色帮会ID
+---@param bTimes boolean @是否增加偶遇次数
+function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, nRoleType, nLevel, szTitle, nCamp, dwTongID, bTimes)
+	-- 自动跨服处理
+	do
+		local szNameExt, szServerNameExt = ExtractNameServer(szName, false)
+		if szServerNameExt then
+			szServerName = szServerNameExt
+			szName = szNameExt
+		elseif not szServerName and dwID ~= 0 and not IsRemotePlayer(dwID) then
+			szServerName = X.GetServerOriginName()
+		end
+	end
+	-- 更新角色信息缓存
+	local tPlayer
+	if IsValidGlobalID(szGlobalID) then
+		tPlayer = D.GetPlayerInfo(szGlobalID)
+	end
+	if not tPlayer then
+		tPlayer = szServerName == X.GetServerOriginName() and D.GetPlayerInfo(dwID)
+			or D.GetPlayerInfo(szName .. g_tStrings.STR_CONNECT .. szServerName)
+			or {}
+	end
+	tPlayer.server = szServerName
+	tPlayer.id = X.IIf(IsRemotePlayer(dwID), tPlayer.id, dwID)
+	tPlayer.name = szName
+	tPlayer.guid = IsValidGlobalID(szGlobalID) and szGlobalID or tPlayer.guid or ''
+	tPlayer.force = dwForceID or tPlayer.force or -1
+	tPlayer.role = nRoleType or tPlayer.role or -1
+	tPlayer.level = nLevel or tPlayer.level or -1
+	tPlayer.title = szTitle or tPlayer.title or ''
+	tPlayer.camp = nCamp or tPlayer.camp or -1
+	tPlayer.tong = dwTongID or tPlayer.tong or -1
+	tPlayer.extra = tPlayer.extra or ''
+	tPlayer.time = GetCurrentTime()
+	tPlayer.times = (tPlayer.times or 0) + (bTimes and 1 or 0)
+	if IsValidGlobalID(tPlayer.guid) then
+		PLAYER_INFO[tPlayer.guid] = tPlayer
+	end
+	if not tPlayer.server or not tPlayer.id then
+		return
+	end
+	if tPlayer.server == X.GetServerOriginName() then
+		PLAYER_INFO[tPlayer.id] = tPlayer
+	end
+	PLAYER_INFO[tPlayer.server .. g_tStrings.STR_CONNECT .. tPlayer.name] = tPlayer
+	PLAYER_INFO_W[tPlayer.server .. g_tStrings.STR_CONNECT .. tPlayer.name] = X.ConvertToUTF8(tPlayer)
+	-- 更新帮会信息
+	if tPlayer.server == X.GetServerOriginName() and not IsRemotePlayer(tPlayer.id) then
+		if tPlayer.tong and tPlayer.tong ~= 0 then
+			local szTongName = GetTongClient().ApplyGetTongName(tPlayer.tong, 254)
+			if szTongName and szTongName ~= '' then
+				D.RecordTongInfo(tPlayer.server, tPlayer.tong, szTongName, bTimes)
 			end
 		end
 	end
-	if info then
+end
+
+---记录一个帮会信息
+---@param szServerName string @要记录的帮会所在服务器
+---@param dwTongID number @要记录的帮会ID
+---@param szTongName string @要记录的帮会名称
+---@param bTimes boolean @是否增加偶遇次数
+function D.RecordTongInfo(szServerName, dwTongID, szTongName, bTimes)
+	local tTong = D.GetTongInfo(szServerName, dwTongID) or {}
+	tTong.server = szServerName
+	tTong.id = dwTongID
+	tTong.name = szTongName
+	tTong.extra = tTong.extra or ''
+	tTong.time = GetCurrentTime()
+	tTong.times = (tTong.times or 0) + (bTimes and 1 or 0)
+	TONG_INFO[szServerName .. g_tStrings.STR_CONNECT .. tTong.id] = tTong
+	TONG_INFO_W[tTong.id] = X.ConvertToUTF8(tTong)
+end
+
+-- 保存指定dwID的玩家
+function D.AddAusID(dwID, bTimes)
+	local player = X.GetPlayer(dwID)
+	if not player or not player.szName or player.szName == '' then
+		return false
+	end
+	D.RecordPlayerInfo(
+		nil,
+		player.dwID,
+		player.szName,
+		X.GetPlayerGlobalID(player.dwID),
+		player.dwForceID,
+		player.nRoleType,
+		player.nLevel,
+		player.nX ~= 0 and player.szTitle or nil,
+		player.nCamp,
+		player.dwTongID,
+		bTimes
+	)
+	return true
+end
+
+--------------------------------------------------------------------------------
+-- 公共接口
+--------------------------------------------------------------------------------
+
+---通过角色、ID或角色唯一ID获取信息，提供混合角色与帮会数据后的结果给外部使用
+---@param xKey string | number @角色名、角色ID或角色唯一ID，其中通过ID只能获取当前服务器角色信息或跨服玩家角色信息，通过角色名或角色唯一ID可以获取其他服务器角色信息
+---@return table | nil @获取成功返回信息，否则返回空
+function D.Get(xKey)
+	local tPlayer = D.GetPlayerInfo(xKey)
+	if tPlayer then
+		local tTong = D.GetTongInfo(tPlayer.server, tPlayer.tong)
 		return {
-			dwID       = info.id,
-			szName     = info.name,
-			szGlobalID = info.guid,
-			dwForceID  = info.force,
-			nRoleType  = info.role,
-			nLevel     = info.level,
-			szTitle    = info.title,
-			nCamp      = info.camp,
-			dwTongID   = info.tong,
-			szTongName = GetTongName(info.tong) or '',
-			rgb        = X.IsNumber(info.force) and { X.GetForceColor(info.force, 'foreground') } or { 255, 255, 255 },
+			szServerName = tPlayer.server,
+			dwID         = tPlayer.id,
+			szName       = tPlayer.name,
+			szGlobalID   = tPlayer.guid,
+			dwForceID    = tPlayer.force,
+			nRoleType    = tPlayer.role,
+			nLevel       = tPlayer.level,
+			szTitle      = tPlayer.title,
+			nCamp        = tPlayer.camp,
+			dwTongID     = tPlayer.tong,
+			szTongName   = tTong and tTong.name or '',
+			rgb          = X.IsNumber(tPlayer.force) and { X.GetForceColor(tPlayer.force, 'foreground') } or { 255, 255, 255 },
 		}
 	end
 end
 D.GetAusName = D.Get
 
--- 通过dwID获取信息
+---通过角色ID获取信息
+---@param dwID number @角色ID
+---@return table | nil @获取到的角色信息，失败返回空
 function D.GetAusID(dwID)
-	D.AddAusID(dwID)
+	D.AddAusID(dwID, false)
 	return D.Get(dwID)
 end
 
--- 保存指定dwID的玩家
-function D.AddAusID(dwID)
-	local player = X.GetPlayer(dwID)
-	if not player or not player.szName or player.szName == '' then
-		return false
-	else
-		local info
-		if IsRemotePlayer(player.dwID) then
-			info = l_remoteinfocache[player.dwID] or {}
-		else
-			info = l_infocache[player.dwID] or {}
-		end
-		info.id    = player.dwID
-		info.name  = player.szName
-		info.guid  = X.GetPlayerGlobalID(player.dwID) or ''
-		info.force = player.dwForceID or -1
-		info.role  = player.nRoleType or -1
-		info.level = player.nLevel or -1
-		info.title = player.nX ~= 0 and player.szTitle or info.title or ''
-		info.camp  = player.nCamp or -1
-		info.tong  = player.dwTongID or -1
-
-		if IsRemotePlayer(info.id) then
-			l_remoteinfocache[info.id] = info
-			l_remoteinfocache[info.name] = info
-		else
-			local dwTongID = player.dwTongID
-			if dwTongID and dwTongID ~= 0 then
-				local szTong = GetTongClient().ApplyGetTongName(dwTongID, 254)
-				if szTong and szTong ~= '' then
-					D.AddTong(dwTongID, szTong)
-				end
-			end
-			l_infocache[info.id] = info
-			l_infocache[info.name] = info
-			if info.guid ~= '' and info.guid ~= '0' then
-				l_infocache[info.guid] = info
-			end
-			local infow = X.Clone(info)
-			infow.name = AnsiToUTF8(info.name)
-			infow.title = AnsiToUTF8(info.title)
-			infow.guid = AnsiToUTF8(info.guid)
-			infow.time = GetCurrentTime()
-			l_infocache_w[info.id] = infow
-		end
-		return true
-	end
-end
-
-function D.AddTong(dwID, szName)
-	local info = l_tongcache[dwID] or {}
-	info.id = dwID
-	info.name = szName
-	info.extra = ''
-	info.time = GetCurrentTime()
-	l_tongcache[info.id] = info
-	local infow = X.Clone(info)
-	infow.name = AnsiToUTF8(info.name)
-	l_tongcache_w[info.id] = infow
-end
-
+--------------------------------------------------------------------------------
+-- 统计界面
+--------------------------------------------------------------------------------
 function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	local szTitle = _L['MY_Farbnamen__Analysis'] .. g_tStrings.STR_CONNECT .. X.GetServerOriginName()
 	if szSubTitle then
@@ -769,7 +947,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	local szWhere, szJoinWhere = '', ''
 	if nTimeLimit then
 		szWhere = ' WHERE time > ' .. (GetCurrentTime() - nTimeLimit) .. ' '
-		szJoinWhere = ' WHERE InfoCache.time > ' .. (GetCurrentTime() - nTimeLimit) .. ' '
+		szJoinWhere = ' WHERE PlayerInfo.time > ' .. (GetCurrentTime() - nTimeLimit) .. ' '
 	end
 	local ui = X.UI.CreateFrame('MY_Farbnamen__Analysis', {
 		simple = true, close = true,
@@ -780,12 +958,12 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	local nDeltaY = 30
 	ui:Append('Text', {
 		x = nX, y = nY,
-		text = _L('Total player count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM InfoCache]] .. szWhere), {1, 'count'}, 0)),
+		text = _L('Total player count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM PlayerInfo]] .. szWhere), {1, 'count'}, 0)),
 	})
 	nY = nY + nDeltaY
 	ui:Append('Text', {
 		x = nX, y = nY,
-		text = _L('Total tong count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM TongCache]] .. szWhere), {1, 'count'}, 0)),
+		text = _L('Total tong count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM TongInfo]] .. szWhere), {1, 'count'}, 0)),
 	})
 	nY = nY + nDeltaY
 	nY = nY + nDeltaY
@@ -796,7 +974,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	})
 	nY = nY + nDeltaY
 
-	for _, v in ipairs(DB:Execute([[SELECT camp, COUNT(*) AS count FROM InfoCache]] .. szWhere .. [[ GROUP BY camp]]) or {}) do
+	for _, v in ipairs(DB:Execute([[SELECT camp, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY camp]]) or {}) do
 		ui:Append('Text', {
 			x = nX, y = nY,
 			text = g_tStrings.STR_CAMP_TITLE[v.camp] or _L('Unknown(%d)', v.camp),
@@ -815,7 +993,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	})
 	nY = nY + nDeltaY
 
-	local aForce = DB:Execute([[SELECT force, COUNT(*) AS count FROM InfoCache]] .. szWhere .. [[ GROUP BY force]]) or {}
+	local aForce = DB:Execute([[SELECT force, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY force]]) or {}
 	for i = 1, #aForce, 2 do
 		nX = nPaddingX
 		for j = 0, 1 do
@@ -844,11 +1022,11 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	nY = nY + nDeltaY
 
 	for _, v in ipairs(DB:Execute([[
-		SELECT TongCache.name, COUNT(InfoCache.id) AS count
-		FROM InfoCache
-		JOIN TongCache ON InfoCache.tong = TongCache.id
+		SELECT TongInfo.name, COUNT(PlayerInfo.id) AS count
+		FROM PlayerInfo
+		JOIN TongInfo ON PlayerInfo.tong = TongInfo.id
 		]] .. szJoinWhere .. [[
-		GROUP BY InfoCache.tong
+		GROUP BY PlayerInfo.tong
 		ORDER BY count DESC
 		LIMIT 10;
 	]]) or {}) do
@@ -880,9 +1058,9 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	ui:Anchor('CENTER')
 end
 
---------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 菜单
---------------------------------------------------------------
+--------------------------------------------------------------------------------
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	D.Migration()
 
@@ -979,7 +1157,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 				if not InitDB() then
 					return
 				end
-				DB:Execute('DELETE FROM InfoCache')
+				DB:Execute('DELETE FROM PlayerInfo')
 				X.OutputSystemMessage(_L['MY_Farbnamen'], _L['Cache data deleted.'])
 			end)
 		end,
@@ -1042,13 +1220,13 @@ end
 --------------------------------------------------------------------------------
 
 do
-local l_peeklist = {}
+local PEEK_LIST = {}
 local function onBreathe()
-	for dwID, nRetryCount in pairs(l_peeklist) do
-		if D.AddAusID(dwID) or nRetryCount > 5 then
-			l_peeklist[dwID] = nil
+	for dwID, v in pairs(PEEK_LIST) do
+		if D.AddAusID(dwID, v.bTimes) or v.nRetryCount > 5 then
+			PEEK_LIST[dwID] = nil
 		else
-			l_peeklist[dwID] = nRetryCount + 1
+			PEEK_LIST[dwID].nRetryCount = v.nRetryCount + 1
 		end
 	end
 end
@@ -1056,12 +1234,12 @@ X.BreatheCall(250, onBreathe)
 
 local function OnPeekPlayer()
 	if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
-		l_peeklist[arg1] = 0
+		PEEK_LIST[arg1] = { nRetryCount = 0, bTimes = false }
 	end
 end
 X.RegisterEvent('PEEK_OTHER_PLAYER', OnPeekPlayer)
-X.RegisterEvent('MY_PLAYER_ENTER_SCENE', function() l_peeklist[arg0] = 0 end)
-X.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() D.AddTong(arg1, arg2) end)
+X.RegisterEvent('MY_PLAYER_ENTER_SCENE', function() PEEK_LIST[arg0] = { nRetryCount = 0, bTimes = arg0 ~= X.GetClientPlayerID() } end)
+X.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() D.RecordTongInfo(arg1, arg2, true) end)
 end
 
 X.RegisterUserSettingsInit('MY_Farbnamen', function() D.bReady = true end)
