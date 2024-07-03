@@ -1212,9 +1212,7 @@ local function SignChatData(aSay, uuid, me)
 	local dwTime = GetCurrentTime()
 	local szLinkInfo = X.EncodeJSON({
 		_ = dwTime,
-		c = (X.IsDebugClient(true) and X.SECRET['HASH::AUTH_CHAT_SIGNATURE'])
-			and GetStringCRC(me.szName .. dwTime .. X.SECRET['HASH::AUTH_CHAT_SIGNATURE'])
-			or nil,
+		a = X.IsDebugClient(true) and 1 or nil,
 		via = X.PACKET_INFO.NAME_SPACE,
 		uuid = uuid and tostring(uuid),
 	})
@@ -1628,9 +1626,9 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 		end
 	end
 	local p = aSay[1]
-	if p and p.type == 'eventlink' and p.name == '' and X.SECRET['HASH::AUTH_CHAT_SIGNATURE'] then
+	if p and p.type == 'eventlink' and p.name == '' then
 		local data = X.DecodeJSON(p.linkinfo)
-		if data and data._ and data.c and data.c == GetStringCRC(szName .. data._ .. X.SECRET['HASH::AUTH_CHAT_SIGNATURE']) then
+		if data and data.a == 1 then
 			return
 		end
 	end
