@@ -1606,6 +1606,7 @@ Table_GetItemMutiUseTip = FunctionType
 Table_GetItemName = FunctionType
 Table_GetItemSoundID = FunctionType
 Table_GetItemSourceList = FunctionType
+Table_GetJoinCampReward = FunctionType
 Table_GetJX3LibraryContent = FunctionType
 Table_GetJX3LibraryList = FunctionType
 Table_GetKungfuData = FunctionType
