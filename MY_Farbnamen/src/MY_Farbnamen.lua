@@ -60,6 +60,26 @@ local GUID_HEADER_XML = {}
 local DB_ERR_COUNT, DB_MAX_ERR_COUNT = 0, 5
 local DB, DBP_W, DBP_RI, DBP_RN, DBP_RGI, DBT_W, DBT_RI
 
+local function IsGlobalID(szGlobalID)
+	return szGlobalID and szGlobalID ~= '' and szGlobalID ~= '0'
+end
+
+local function IsPositiveNumber(nNumber)
+	return nNumber and nNumber > 0
+end
+
+local function IsNonEmptyString(szString)
+	return szString and szString ~= ''
+end
+
+local function ExtractNameServer(szName, bFallbackServer)
+	local a = X.SplitString(szName, g_tStrings.STR_CONNECT)
+	if bFallbackServer and not a[2] then
+		a[2] = X.GetServerOriginName()
+	end
+	return a[1], a[2]
+end
+
 local function InitDB()
 	if DB then
 		return true
@@ -239,13 +259,25 @@ function D.Import(aFilePath, bTimes)
 											AnsiToUTF8(szServer),
 											rec.id,
 											ProcessString(rec.name),
-											ProcessString(rec.guid or ''),
+											X.IIf(
+												IsGlobalID(rec.guid),
+												ProcessString(rec.guid),
+												data and data.guid or ''
+											),
 											rec.force or -1,
 											rec.role or -1,
 											rec.level or -1,
-											ProcessString(rec.title or ''),
+											X.IIf(
+												IsNonEmptyString(rec.title),
+												ProcessString(rec.title),
+												data and data.title or ''
+											),
 											rec.camp or -1,
-											rec.tong or -1,
+											X.IIf(
+												IsPositiveNumber(rec.tong),
+												rec.tong,
+												data and data.tong or -1
+											),
 											nRecTime,
 											data and data.times or 0,
 											rec.extra or ''
@@ -314,13 +346,25 @@ function D.Import(aFilePath, bTimes)
 										rec.server,
 										rec.id,
 										rec.name,
-										rec.guid or '',
+										X.IIf(
+											IsGlobalID(rec.guid),
+											rec.guid,
+											data and data.guid or ''
+										),
 										rec.force or -1,
 										rec.role or -1,
 										rec.level or -1,
-										rec.title or '',
+										X.IIf(
+											IsNonEmptyString(rec.title),
+											rec.title,
+											data and data.title or ''
+										),
 										rec.camp or -1,
-										rec.tong or -1,
+										X.IIf(
+											IsPositiveNumber(rec.tong),
+											rec.tong,
+											data and data.tong or -1
+										),
 										nRecTime,
 										data and data.times or (bTimes and rec.time or 0),
 										rec.extra or ''
@@ -671,16 +715,6 @@ local PLAYER_INFO   = {} -- 读取数据缓存
 local PLAYER_INFO_W = {} -- 修改数据缓存（UTF8）
 local TONG_INFO     = {} -- 帮会数据缓存
 local TONG_INFO_W   = {} -- 帮会修改数据缓存（UTF8）
-local function IsValidGlobalID(szGlobalID)
-	return szGlobalID and szGlobalID ~= '' and szGlobalID ~= '0'
-end
-local function ExtractNameServer(szName, bFallbackServer)
-	local a = X.SplitString(szName, g_tStrings.STR_CONNECT)
-	if bFallbackServer and not a[2] then
-		a[2] = X.GetServerOriginName()
-	end
-	return a[1], a[2]
-end
 
 function D.Flush()
 	if not InitDB() then
@@ -762,7 +796,7 @@ function D.GetPlayerInfo(xKey)
 		if tPlayer.name and tPlayer.server then
 			PLAYER_INFO[tPlayer.name .. g_tStrings.STR_CONNECT .. tPlayer.server] = tPlayer
 		end
-		if IsValidGlobalID(tPlayer.guid) then
+		if IsGlobalID(tPlayer.guid) then
 			PLAYER_INFO[tPlayer.guid] = tPlayer
 		end
 	end
@@ -817,7 +851,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	end
 	-- 更新角色信息缓存
 	local tPlayer
-	if IsValidGlobalID(szGlobalID) then
+	if IsGlobalID(szGlobalID) then
 		tPlayer = D.GetPlayerInfo(szGlobalID)
 	end
 	if not tPlayer then
@@ -828,7 +862,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	tPlayer.server = szServerName
 	tPlayer.id = X.IIf(IsRemotePlayer(dwID), tPlayer.id, dwID)
 	tPlayer.name = szName
-	tPlayer.guid = IsValidGlobalID(szGlobalID) and szGlobalID or tPlayer.guid or ''
+	tPlayer.guid = IsGlobalID(szGlobalID) and szGlobalID or tPlayer.guid or ''
 	tPlayer.force = dwForceID or tPlayer.force or -1
 	tPlayer.role = nRoleType or tPlayer.role or -1
 	tPlayer.level = nLevel or tPlayer.level or -1
@@ -838,7 +872,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	tPlayer.extra = tPlayer.extra or ''
 	tPlayer.time = bTimes and GetCurrentTime() or tPlayer.time or 0
 	tPlayer.times = (tPlayer.times or 0) + (bTimes and 1 or 0)
-	if IsValidGlobalID(tPlayer.guid) then
+	if IsGlobalID(tPlayer.guid) then
 		PLAYER_INFO[tPlayer.guid] = tPlayer
 	end
 	if not tPlayer.server or not tPlayer.id then
