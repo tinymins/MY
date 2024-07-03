@@ -240,76 +240,76 @@ local CHANNEL_LIST = {
 					X.SwitchChatChannel(szName)
 					X.DelayCall(X.FocusChatInput)
 				end, nil, nil, nil, '')
-				return
-			end
-			local t = {}
-			for i, whisper in ipairs(D.aWhisper) do
-				local info = MY_Farbnamen and MY_Farbnamen.Get(whisper[1])
-				table.insert(t, {
-					szOption = whisper[1],
-					rgb = info and info.rgb or {202, 126, 255},
-					fnAction = function()
-						X.SwitchChatChannel(whisper[1])
-						X.DelayCall(X.FocusChatInput)
-					end,
-					szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
-					nFrame = 49,
-					nMouseOverFrame = 51,
-					nIconWidth = 17,
-					nIconHeight = 17,
-					szLayer = 'ICON_RIGHTMOST',
-					fnClickIcon = function()
-						for i = #D.aWhisper, 1, -1 do
-							if D.aWhisper[i][1] == whisper[1] then
-								table.remove(D.aWhisper, i)
-								X.UI.ClosePopupMenu()
-							end
-						end
-						O.aWhisper = D.aWhisper
-						D.bWhisperChanged = false
-					end,
-					fnMouseEnter = function()
-						local t = {}
-						local today = X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd')
-						local r, g, b = GetMsgFontColor('MSG_WHISPER')
-						for _, v in ipairs(whisper[2]) do
-							if X.IsString(v) then
-								table.insert(t, v)
-							elseif X.IsTable(v) and X.IsString(v[1]) then
-								if today == X.FormatTime(v[2], '%yyyy%MM%dd') then
-									table.insert(t, X.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}) .. v[1])
-								else
-									table.insert(t, X.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}) .. v[1])
+			else
+				local t = {}
+				for i, whisper in ipairs(D.aWhisper) do
+					local info = MY_Farbnamen and MY_Farbnamen.Get(whisper[1])
+					table.insert(t, {
+						szOption = whisper[1],
+						rgb = info and info.rgb or {202, 126, 255},
+						fnAction = function()
+							X.SwitchChatChannel(whisper[1])
+							X.DelayCall(X.FocusChatInput)
+						end,
+						szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+						nFrame = 49,
+						nMouseOverFrame = 51,
+						nIconWidth = 17,
+						nIconHeight = 17,
+						szLayer = 'ICON_RIGHTMOST',
+						fnClickIcon = function()
+							for i = #D.aWhisper, 1, -1 do
+								if D.aWhisper[i][1] == whisper[1] then
+									table.remove(D.aWhisper, i)
+									X.UI.ClosePopupMenu()
 								end
 							end
-						end
-						local szMsg = table.concat(t, '')
-						if MY_ChatEmotion and MY_ChatEmotion.Render then
-							szMsg = MY_ChatEmotion.Render(szMsg)
-						end
-						if MY_Farbnamen then
-							szMsg = MY_Farbnamen.Render(szMsg)
-						end
-						OutputTip(szMsg, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
-					end,
-				})
-			end
-			local x, y = this:GetAbsPos()
-			t.x = x
-			t.y = y - #D.aWhisper * 24 - 24 - 20 - 8
-			if #t > 0 then
-				table.insert(t, 1, X.CONSTANT.MENU_DIVIDER)
-				table.insert(t, 1, {
-					szOption = g_tStrings.CHANNEL_WHISPER_SIGN,
-					rgb = {202, 126, 255},
-					fnAction = function()
-						X.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
-						X.DelayCall(X.FocusChatInput)
-					end,
-				})
-				PopupMenu(t)
-			else
-				X.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
+							O.aWhisper = D.aWhisper
+							D.bWhisperChanged = false
+						end,
+						fnMouseEnter = function()
+							local t = {}
+							local today = X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd')
+							local r, g, b = GetMsgFontColor('MSG_WHISPER')
+							for _, v in ipairs(whisper[2]) do
+								if X.IsString(v) then
+									table.insert(t, v)
+								elseif X.IsTable(v) and X.IsString(v[1]) then
+									if today == X.FormatTime(v[2], '%yyyy%MM%dd') then
+										table.insert(t, X.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%hh:%mm:%ss]'}) .. v[1])
+									else
+										table.insert(t, X.GetChatTimeXML(v[2], {r = r, g = g, b = b, s = '[%M.%dd.%hh:%mm:%ss]'}) .. v[1])
+									end
+								end
+							end
+							local szMsg = table.concat(t, '')
+							if MY_ChatEmotion and MY_ChatEmotion.Render then
+								szMsg = MY_ChatEmotion.Render(szMsg)
+							end
+							if MY_Farbnamen then
+								szMsg = MY_Farbnamen.Render(szMsg)
+							end
+							OutputTip(szMsg, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+						end,
+					})
+				end
+				local x, y = this:GetAbsPos()
+				t.x = x
+				t.y = y - #D.aWhisper * 24 - 24 - 20 - 8
+				if #t > 0 then
+					table.insert(t, 1, X.CONSTANT.MENU_DIVIDER)
+					table.insert(t, 1, {
+						szOption = g_tStrings.CHANNEL_WHISPER_SIGN,
+						rgb = {202, 126, 255},
+						fnAction = function()
+							X.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
+							X.DelayCall(X.FocusChatInput)
+						end,
+					})
+					PopupMenu(t)
+				else
+					X.SwitchChatChannel(PLAYER_TALK_CHANNEL.WHISPER)
+				end
 			end
 			this:Check(false)
 		end,
