@@ -117,12 +117,12 @@ function X.RenderTemplateString(szTemplate, tVar, nMaxLen, bReplaceSensitiveWord
 				end
 				nPos = nEnd + 1
 			end
-			if #CACHE_KEY >= MAX_CACHE then
-				CACHE[table.remove(CACHE_KEY, 1)] = nil
-			end
-			CACHE[szKey] = szText
-			table.insert(CACHE_KEY, szKey)
 		end
+		if #CACHE_KEY >= MAX_CACHE then
+			CACHE[table.remove(CACHE_KEY, 1)] = nil
+		end
+		CACHE[szKey] = szText
+		table.insert(CACHE_KEY, szKey)
 	end
 	return CACHE[szKey]
 end
