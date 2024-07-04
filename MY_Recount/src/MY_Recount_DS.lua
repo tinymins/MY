@@ -723,27 +723,27 @@ end
 -- (table ) tResult     : 所有效果数值集合
 do local KCaster, dwCasterEmployer, KTarget, dwTargetEmployer, me, szEffectID, nTherapy, nEffectTherapy, nDamage, nEffectDamage, szType
 function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
-	-- 获取释放对象和承受对象
+	-- 获取释放对象
 	KCaster, dwCasterEmployer = X.GetObject(dwCaster), nil
-	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then
-		if not X.IsPartnerNpc(KCaster.dwTemplateID) then -- 宠物的数据算在主人统计中，侠客除外
-			KCaster = X.GetObject(KCaster.dwEmployer)
-		end
+	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 and not X.IsPartnerNpc(KCaster.dwTemplateID) then -- 宠物的数据算在主人统计中，侠客除外
+		KCaster = X.GetObject(KCaster.dwEmployer)
 	end
 	if not KCaster then
 		return
 	end
-	if not X.IsPlayer(KCaster.dwID) then
+	if not X.IsPlayer(KCaster.dwID) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then
 		dwCasterEmployer = KCaster.dwEmployer
 	end
+	dwCaster = KCaster.dwID
+
+	-- 获取承受对象
 	KTarget, dwTargetEmployer = X.GetObject(dwTarget), nil
-	if KTarget and not X.IsPlayer(dwTarget) and KTarget.dwEmployer and KTarget.dwEmployer ~= 0 then
-		dwTargetEmployer = KTarget.dwEmployer
-	end
-	if not (KCaster and KTarget) then
+	if not KTarget then
 		return
 	end
-	dwCaster = KCaster.dwID
+	if not X.IsPlayer(dwTarget) and KTarget.dwEmployer and KTarget.dwEmployer ~= 0 then
+		dwTargetEmployer = KTarget.dwEmployer
+	end
 	dwTarget = KTarget.dwID
 
 	-- 过滤掉不是队友的以及不是首领的
