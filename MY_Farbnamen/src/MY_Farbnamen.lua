@@ -80,6 +80,10 @@ local function ExtractNameServer(szName, bFallbackServer)
 	return a[1], a[2]
 end
 
+local function CombineNameServer(szName, szServerName)
+	return szName .. g_tStrings.STR_CONNECT .. szServerName
+end
+
 local function InitDB()
 	if DB then
 		return true
@@ -599,14 +603,6 @@ function D.Render(szMsg, tOption)
 	return szMsg
 end
 
--- 插入聊天内容的 HOOK （过滤、加入时间 ）
-X.HookChatPanel('BEFORE', 'MY_FARBNAMEN', function(h, szMsg, ...)
-	if D.bReady and O.bEnable then
-		szMsg = D.Render(szMsg, true)
-	end
-	return szMsg
-end)
-
 function D.RegisterNameIDHeader(szName, dwID, szHeaderXml)
 	if not NAME_ID_HEADER_XML[szName] then
 		NAME_ID_HEADER_XML[szName] = {}
@@ -779,7 +775,7 @@ function D.GetPlayerInfo(xKey)
 		end
 	elseif X.IsString(xKey) then
 		local szName, szServer = ExtractNameServer(xKey, true)
-		xKey = szName .. g_tStrings.STR_CONNECT .. szServer
+		xKey = CombineNameServer(szName, szServer)
 		tPlayer = PLAYER_INFO[xKey]
 		if not tPlayer and InitDB() then
 			DBP_RN:ClearBindings()
@@ -794,7 +790,7 @@ function D.GetPlayerInfo(xKey)
 			PLAYER_INFO[tPlayer.id] = tPlayer
 		end
 		if tPlayer.name and tPlayer.server then
-			PLAYER_INFO[tPlayer.name .. g_tStrings.STR_CONNECT .. tPlayer.server] = tPlayer
+			PLAYER_INFO[CombineNameServer(tPlayer.name, tPlayer.server)] = tPlayer
 		end
 		if IsGlobalID(tPlayer.guid) then
 			PLAYER_INFO[tPlayer.guid] = tPlayer
@@ -856,7 +852,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	end
 	if not tPlayer then
 		tPlayer = szServerName == X.GetServerOriginName() and D.GetPlayerInfo(dwID)
-			or (szServerName and D.GetPlayerInfo(szName .. g_tStrings.STR_CONNECT .. szServerName))
+			or (szServerName and D.GetPlayerInfo(CombineNameServer(szName, szServerName)))
 			or {}
 	end
 	tPlayer.server = szServerName
@@ -885,8 +881,8 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	if tPlayer.server == X.GetServerOriginName() then
 		PLAYER_INFO[tPlayer.id] = tPlayer
 	end
-	PLAYER_INFO[tPlayer.server .. g_tStrings.STR_CONNECT .. tPlayer.name] = tPlayer
-	PLAYER_INFO_W[tPlayer.server .. g_tStrings.STR_CONNECT .. tPlayer.name] = X.ConvertToUTF8(tPlayer)
+	PLAYER_INFO[CombineNameServer(tPlayer.name, tPlayer.server)] = tPlayer
+	PLAYER_INFO_W[CombineNameServer(tPlayer.name, tPlayer.server)] = X.ConvertToUTF8(tPlayer)
 	-- 更新帮会信息
 	if tPlayer.server == X.GetServerOriginName() and not IsRemotePlayer(tPlayer.id) then
 		if tPlayer.tong and tPlayer.tong ~= 0 then
@@ -1295,8 +1291,23 @@ X.RegisterEvent('PLAYER_CHAT', function ()
 	if szGlobalID == X.GetClientPlayerGlobalID() then -- 密聊频道自己发言回显数据对不上
 		return
 	end
-	D.RecordPlayerInfo(nil, dwSenderID, szSenderName, szGlobalID, dwForceID, nRoleType, nLevel, nil, nCamp, nRoleType, false)
+	D.RecordPlayerInfo(nil, dwSenderID, szSenderName, szGlobalID, dwForceID, nRoleType, nLevel, nil, nCamp, nil, false)
 end)
+
+-- 插入聊天内容的 HOOK （过滤、加入时间 ）
+X.HookChatPanel('BEFORE', 'MY_FARBNAMEN', function(h, szMsg, ...)
+	if D.bReady and O.bEnable then
+		szMsg = D.Render(szMsg, true)
+	end
+	return szMsg
+end)
+-- X.HookChatPanel('AFTER', 'MY_FARBNAMEN', function(h, nIndex)
+-- 	if D.bReady and O.bEnable then
+-- 		for i = h:GetItemCount() - 1, nIndex, -1 do
+-- 			D.Render(h:Lookup(i), true)
+-- 		end
+-- 	end
+-- end)
 
 X.RegisterUserSettingsInit('MY_Farbnamen', function() D.bReady = true end)
 
