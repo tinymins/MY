@@ -91,7 +91,8 @@ local function InitDB()
 	if DB_ERR_COUNT > DB_MAX_ERR_COUNT then
 		return false
 	end
-	DB = X.SQLiteConnect(_L['MY_Farbnamen'], {'cache/farbnamen.v7.db', X.PATH_TYPE.GLOBAL})
+	CPath.MakeDir(X.FormatPath({'cache/farbnamen/', X.PATH_TYPE.GLOBAL}))
+	DB = X.SQLiteConnect(_L['MY_Farbnamen'], {'cache/farbnamen/farbnamen.v7.db', X.PATH_TYPE.GLOBAL})
 	if not DB then
 		local szMsg = _L['Cannot connect to database!!!']
 		if DB_ERR_COUNT > 0 then
@@ -1214,6 +1215,16 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 					X.Alert(_L('%d chars imported, %d chars skipped, %d tongs imported, %d tongs skipped!', nImportChar, nSkipChar, nImportTong, nSkipTong))
 				end)
 			end
+		end,
+	}):Width() + 5
+
+	nX = nX + ui:Append('WndButton', {
+		x = nX, y = nY, w = 'auto',
+		buttonStyle = 'FLAT',
+		text = _L['Export data'],
+		onClick = function()
+			X.OpenFolder(X.GetAbsolutePath({'cache/farbnamen/farbnamen.v7.db', X.PATH_TYPE.GLOBAL}))
+			X.Alert(_L['Copy .db file to share.'])
 		end,
 	}):Width() + 5
 
