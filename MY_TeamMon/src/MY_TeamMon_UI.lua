@@ -992,9 +992,6 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 						-- X.Alert(_L('Import success: %s', szTitle or szFilePath), fnAlert2, nil, fnAlert2)
 						X.Alert(_L('Import success: %s', szTitle or szFilePath))
 						ui:Remove()
-						if MY_LifeBar and not MY_LifeBar.bEnabled then
-							MY_LifeBar.bEnabled = true
-						end
 						if MY_TeamMon and not MY_TeamMon.bEnable then
 							MY_TeamMon.bEnable = true
 						end

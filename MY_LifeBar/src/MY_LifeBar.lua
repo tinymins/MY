@@ -916,6 +916,11 @@ local settings = {
 				'bEnabled',
 				'bAutoHideSysHeadtop',
 			},
+			triggers = {
+				bEnabled = function()
+					D.Reset(true)
+				end,
+			},
 			root = O,
 		},
 	},

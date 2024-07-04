@@ -84,7 +84,6 @@ function PS.OnPanelActive(wnd)
 		checked = MY_LifeBar.bEnabled,
 		onCheck = function(bChecked)
 			MY_LifeBar.bEnabled = bChecked
-			D.Reset(true)
 		end,
 		tip = function()
 			if D.IsShielded() then
