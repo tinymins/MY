@@ -1206,7 +1206,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		buttonStyle = 'FLAT',
 		text = _L['Import data'],
 		onClick = function()
-			local szRoot = X.FormatPath({'cache/', X.PATH_TYPE.SERVER})
+			local szRoot = X.FormatPath({'cache/', X.PATH_TYPE.GLOBAL})
 			local file = GetOpenFileName(_L['Please select your farbnamen database file.'], 'Database File(*.db)\0*.db\0\0', szRoot)
 			if not X.IsEmpty(file) then
 				X.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
