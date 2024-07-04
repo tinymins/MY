@@ -1552,18 +1552,27 @@ local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChan
 	return h, szMsg, ...
 end
 
+local function GetAfterChatAppendStartIndex(h)
+	local nIndex = -1
+	if l_hPrevItem == 0 then
+		nIndex = 0
+	elseif l_hPrevItem and l_hPrevItem:IsValid() and l_hPrevItem:GetParent() == h then
+		nIndex = l_hPrevItem:GetIndex() + 1
+	end
+	return nIndex
+end
+
 local function AfterChatAppendItemFromString(h, ...)
 	if l_hPrevItem then
 		local nCount = h:GetItemCount()
-		local nStart = -1
-		if l_hPrevItem == 0 then
-			nStart = 0
-		elseif l_hPrevItem and l_hPrevItem:IsValid() then
-			nStart = l_hPrevItem:GetIndex() + 1
-		end
+		local nStart = GetAfterChatAppendStartIndex(h)
 		if nStart >= 0 and nStart < nCount then
 			for szKey, fnAction in pairs(CHAT_HOOK.AFTER) do
-				local res, err, trace = X.XpCall(fnAction, h, nStart, ...)
+				local nIndex = GetAfterChatAppendStartIndex(h)
+				if nIndex == -1 then
+					break
+				end
+				local res, err, trace = X.XpCall(fnAction, h, nIndex, ...)
 				if not res then
 					X.ErrorLog(err, 'HookChatPanel.AFTER: ' .. szKey, trace)
 				end
