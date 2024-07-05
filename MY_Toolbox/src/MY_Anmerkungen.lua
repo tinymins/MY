@@ -24,8 +24,6 @@ local D = {}
 local LOADED = false
 local PUBLIC_PLAYER_IDS = {}
 local PUBLIC_PLAYER_NOTES = {}
-local PRIVATE_PLAYER_IDS = {}
-local PRIVATE_PLAYER_NOTES = {}
 -- dwID : { dwID = dwID, szName = szName, szContent = szContent, bAlertWhenGroup, bTipWhenGroup }
 
 -- 打开一个玩家的记录编辑器
@@ -190,34 +188,17 @@ function D.GetPlayerNote(dwID)
 	if not LOADED then
 		D.LoadConfig()
 	end
-	local t, rec
-	rec = PRIVATE_PLAYER_NOTES[PRIVATE_PLAYER_IDS[dwID] or dwID]
-	if rec then
-		t = X.Clone(rec)
-		t.bPrivate = true
-		return t
-	end
-	rec = PUBLIC_PLAYER_NOTES[PUBLIC_PLAYER_IDS[dwID] or dwID]
-	if rec then
-		t = X.Clone(rec)
-		t.bPrivate = false
-		return t
-	end
+	return X.Clone(PUBLIC_PLAYER_NOTES[PUBLIC_PLAYER_IDS[dwID] or dwID])
 end
 
 -- 设置一个玩家的记录
-function D.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate)
+function D.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup)
 	dwID = dwID and tonumber(dwID)
 	if not dwID then
 		return nil
 	end
 	D.LoadConfig()
 	-- remove
-	local rec = PRIVATE_PLAYER_NOTES[dwID]
-	if rec then
-		PRIVATE_PLAYER_IDS[rec.szName] = nil
-		PRIVATE_PLAYER_NOTES[dwID] = nil
-	end
 	local rec = PUBLIC_PLAYER_NOTES[dwID]
 	if rec then
 		PUBLIC_PLAYER_IDS[rec.szName] = nil
@@ -232,13 +213,8 @@ function D.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup
 			bTipWhenGroup = bTipWhenGroup,
 			bAlertWhenGroup = bAlertWhenGroup,
 		}
-		if bPrivate then
-			PRIVATE_PLAYER_NOTES[dwID] = t
-			PRIVATE_PLAYER_IDS[szName] = dwID
-		else
-			PUBLIC_PLAYER_NOTES[dwID] = t
-			PUBLIC_PLAYER_IDS[szName] = dwID
-		end
+		PUBLIC_PLAYER_NOTES[dwID] = t
+		PUBLIC_PLAYER_IDS[szName] = dwID
 		if D.uiList then
 			D.uiList:ListBox('update', 'id', dwID, {'text', 'data'}, { _L('[%s] %s', t.szName, t.szContent), t })
 		end
@@ -313,6 +289,7 @@ function D.LoadConfig()
 		PUBLIC_PLAYER_IDS = data.ids or {}
 		PUBLIC_PLAYER_NOTES = data.data or {}
 	end
+
 	local szOrgFile = X.GetLUADataPath({'config/PLAYER_NOTES/{$server_origin}.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 	local szFilePath = X.GetLUADataPath({'config/playernotes.jx3dat', X.PATH_TYPE.SERVER})
 	if IsLocalFileExist(szOrgFile) then
@@ -338,35 +315,6 @@ function D.LoadConfig()
 		D.SaveConfig()
 	end
 
-	local data = X.LoadLUAData({'config/anmerkungen.jx3dat', X.PATH_TYPE.ROLE})
-	if data then
-		PRIVATE_PLAYER_IDS = data.ids or {}
-		PRIVATE_PLAYER_NOTES = data.data or {}
-	end
-	local szOrgFile = X.GetLUADataPath({'config/PLAYER_NOTES/{$uid}.{$lang}.jx3dat', X.PATH_TYPE.DATA})
-	local szFilePath = X.GetLUADataPath({'config/playernotes.jx3dat', X.PATH_TYPE.ROLE})
-	if IsLocalFileExist(szOrgFile) then
-		CPath.Move(szOrgFile, szFilePath)
-	end
-	if IsLocalFileExist(szFilePath) then
-		local data = X.LoadLUAData(szFilePath) or {}
-		if type(data) == 'string' then
-			data = X.DecodeJSON(data)
-		end
-		for k, v in pairs(data) do
-			if type(v) == 'table' then
-				k = tonumber(k)
-				if k then
-					v.dwID = tonumber(v.dwID)
-					PRIVATE_PLAYER_NOTES[k] = v
-				end
-			else
-				PRIVATE_PLAYER_IDS[k] = tonumber(v)
-			end
-		end
-		CPath.DelFile(szFilePath)
-		D.SaveConfig()
-	end
 	LOADED = true
 end
 -- 保存公共数据
@@ -376,12 +324,6 @@ function D.SaveConfig()
 		data = PUBLIC_PLAYER_NOTES,
 	}
 	X.SaveLUAData({'config/anmerkungen.jx3dat', X.PATH_TYPE.SERVER}, data)
-
-	local data = {
-		ids = PRIVATE_PLAYER_IDS,
-		data = PRIVATE_PLAYER_NOTES,
-	}
-	X.SaveLUAData({'config/anmerkungen.jx3dat', X.PATH_TYPE.ROLE}, data)
 end
 X.RegisterInit('MY_ANMERKUNGEN', D.LoadConfig)
 
@@ -430,7 +372,7 @@ function PS.OnPanelActive(wnd)
 			onClick = function()
 				GetUserInput(_L['Please input import data:'], function(szVal)
 					local config = X.DecodeLUAData(szVal)
-					if config and config.server and config.public and config.private then
+					if config and config.server and config.public then
 						if config.server ~= szOriginServer then
 							return X.Alert(_L['Server not match!'])
 						end
@@ -457,28 +399,6 @@ function PS.OnPanelActive(wnd)
 									PUBLIC_PLAYER_NOTES[k] = v
 								end
 							end
-							for k, v in pairs(config.private) do
-								if type(v) == 'table' then
-									k = tonumber(k)
-									if not PRIVATE_PLAYER_NOTES[k] or usenew then
-										v.dwID = tonumber(v.dwID)
-										PRIVATE_PLAYER_NOTES[k] = v
-									end
-								else
-									v = tonumber(v)
-									PRIVATE_PLAYER_IDS[k] = v
-								end
-							end
-							for k, v in pairs(config.privatei) do
-								if not PRIVATE_PLAYER_IDS[k] or usenew then
-									PRIVATE_PLAYER_IDS[k] = v
-								end
-							end
-							for k, v in pairs(config.privated) do
-								if not PRIVATE_PLAYER_NOTES[k] or usenew then
-									PRIVATE_PLAYER_NOTES[k] = v
-								end
-							end
 							D.SaveConfig()
 							X.SwitchTab('MY_Anmerkungen_Player_Note', true)
 						end
@@ -502,8 +422,6 @@ function PS.OnPanelActive(wnd)
 					server   = szOriginServer,
 					publici  = PUBLIC_PLAYER_IDS,
 					publicd  = PUBLIC_PLAYER_NOTES,
-					privatei = PRIVATE_PLAYER_IDS,
-					privated = PRIVATE_PLAYER_NOTES,
 				}))
 			end,
 		})
