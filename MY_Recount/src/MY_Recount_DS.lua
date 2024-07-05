@@ -22,25 +22,26 @@ end
 local DEBUG = false
 
 local DK = {
-	UUID        = DEBUG and 'UUID'        or  1, -- 战斗唯一标识
-	BOSSNAME    = DEBUG and 'szBossName'  or  2, -- 日志名字
-	VERSION     = DEBUG and 'nVersion'    or  3, -- 数据版本号
-	TIME_BEGIN  = DEBUG and 'nTimeBegin'  or  4, -- 战斗开始时间
-	TICK_BEGIN  = DEBUG and 'nTickBegin'  or  5, -- 战斗开始毫秒时间
-	TIME_DURING = DEBUG and 'nTimeDuring' or  6, -- 战斗持续时间
-	TICK_DURING = DEBUG and 'nTickDuring' or  7, -- 战斗持续毫秒时间
-	AWAYTIME    = DEBUG and 'Awaytime'    or  8, -- 死亡/掉线时间节点
-	NAME_LIST   = DEBUG and 'Namelist'    or  9, -- 名称缓存
-	FORCE_LIST  = DEBUG and 'Forcelist'   or 10, -- 势力缓存
-	EFFECT_LIST = DEBUG and 'Effectlist'  or 11, -- 效果信息缓存
-	DAMAGE      = DEBUG and 'Damage'      or 12, -- 输出统计
-	HEAL        = DEBUG and 'Heal'        or 13, -- 治疗统计
-	BE_HEAL     = DEBUG and 'BeHeal'      or 14, -- 承疗统计
-	BE_DAMAGE   = DEBUG and 'BeDamage'    or 15, -- 承伤统计
-	ABSORB      = DEBUG and 'Absorb'      or 17, -- 化解统计
-	PLAYER_LIST = DEBUG and 'Playerlist'  or 18, -- 玩家信息缓存
-	SERVER      = DEBUG and 'Server'      or 19, -- 所在服务器
-	MAP         = DEBUG and 'Map'         or 20, -- 所在地图
+	UUID           = DEBUG and 'UUID'         or  1, -- 战斗唯一标识
+	BOSSNAME       = DEBUG and 'szBossName'   or  2, -- 日志名字
+	VERSION        = DEBUG and 'nVersion'     or  3, -- 数据版本号
+	TIME_BEGIN     = DEBUG and 'nTimeBegin'   or  4, -- 战斗开始时间
+	TICK_BEGIN     = DEBUG and 'nTickBegin'   or  5, -- 战斗开始毫秒时间
+	TIME_DURING    = DEBUG and 'nTimeDuring'  or  6, -- 战斗持续时间
+	TICK_DURING    = DEBUG and 'nTickDuring'  or  7, -- 战斗持续毫秒时间
+	AWAYTIME       = DEBUG and 'Awaytime'     or  8, -- 死亡/掉线时间节点
+	NAME_LIST      = DEBUG and 'Namelist'     or  9, -- 名称缓存
+	FORCE_LIST     = DEBUG and 'Forcelist'    or 10, -- 势力缓存
+	EFFECT_LIST    = DEBUG and 'Effectlist'   or 11, -- 效果信息缓存
+	DAMAGE         = DEBUG and 'Damage'       or 12, -- 输出统计
+	HEAL           = DEBUG and 'Heal'         or 13, -- 治疗统计
+	BE_HEAL        = DEBUG and 'BeHeal'       or 14, -- 承疗统计
+	BE_DAMAGE      = DEBUG and 'BeDamage'     or 15, -- 承伤统计
+	ABSORB         = DEBUG and 'Absorb'       or 17, -- 化解统计
+	PLAYER_LIST    = DEBUG and 'Playerlist'   or 18, -- 玩家信息缓存
+	SERVER         = DEBUG and 'Server'       or 19, -- 所在服务器
+	MAP            = DEBUG and 'Map'          or 20, -- 所在地图
+	BASE_NAME_LIST = DEBUG and 'BaseNamelist' or 21, -- 短名称缓存
 }
 
 local DK_REC = {
@@ -874,6 +875,16 @@ function D.GetNameAusID(data, dwID)
 	return data[DK.NAME_LIST][dwID] or g_tStrings.STR_NAME_UNKNOWN
 end
 
+-- 通过ID计算基础名字
+function D.GetBaseNameAusID(data, dwID)
+	if not data or not dwID then
+		return
+	end
+	return (data[DK.BASE_NAME_LIST] and data[DK.BASE_NAME_LIST][dwID])
+		or data[DK.NAME_LIST][dwID]
+		or g_tStrings.STR_NAME_UNKNOWN
+end
+
 -- 通过ID计算势力
 function D.GetForceAusID(data, dwID)
 	if not data or not dwID then
@@ -1235,6 +1246,19 @@ function D.InitObjectData(data, dwID, szChannel)
 	if not data[DK.NAME_LIST][dwID] then
 		data[DK.NAME_LIST][dwID] = X.GetObjectName(X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, 'never') -- 名称缓存
 	end
+	-- 短名称缓存
+	if not data[DK.BASE_NAME_LIST][dwID] and data[DK.NAME_LIST][dwID] then
+		if X.IsPlayer(dwID) then
+			data[DK.BASE_NAME_LIST][dwID] = X.FormatBasePlayerName(data[DK.NAME_LIST][dwID])
+		else
+			local kNpc = X.GetNpc(dwID)
+			if kNpc and kNpc.dwEmployer ~= 0 then
+				local szEmployerName = X.GetObjectName(TARGET.PLAYER, kNpc.dwEmployer, 'never')
+				local szEmployerBaseName = X.FormatBasePlayerName(szEmployerName)
+				data[DK.BASE_NAME_LIST][dwID] = X.StringReplaceW(data[DK.NAME_LIST][dwID], szEmployerName, szEmployerBaseName)
+			end
+		end
+	end
 	-- 势力缓存
 	if not data[DK.FORCE_LIST][dwID] then
 		if X.IsPlayer(dwID) then
@@ -1292,24 +1316,25 @@ function D.InitData()
 	local bFighting = X.IsFighting()
 	local nFightTick = bFighting and X.GetFightTime() or 0
 	Data = {
-		[DK.UUID       ] = X.GetFightUUID(),                -- 战斗唯一标识
-		[DK.VERSION    ] = VERSION,                           -- 数据版本号
-		[DK.SERVER     ] = X.GetServerOriginName(),              -- 所在服务器
-		[DK.MAP        ] = X.GetMapID(),                    -- 所在地图
-		[DK.TIME_BEGIN ] = GetCurrentTime(),                  -- 战斗开始时间
-		[DK.TICK_BEGIN ] = GetTime(),                         -- 战斗开始毫秒时间
-		[DK.TIME_DURING] = - (nFightTick / 1000) - 1,         -- 战斗持续时间 负数表示本次战斗尚未结束 其数值为记录开始时负的战斗秒数减一
-		[DK.TICK_DURING] = - nFightTick - 1,                  -- 战斗持续毫秒时间 负数表示本次战斗尚未结束 其数值为记录开始时负的战斗毫秒数减一
-		[DK.AWAYTIME   ] = {},                                -- 死亡/掉线时间节点
-		[DK.NAME_LIST  ] = {},                                -- 名称缓存
-		[DK.FORCE_LIST ] = {},                                -- 势力缓存
-		[DK.PLAYER_LIST] = {},                                -- 玩家信息缓存
-		[DK.EFFECT_LIST] = {},                                -- 效果信息缓存
-		[DK.DAMAGE     ] = GeneTypeNS(),                      -- 输出统计
-		[DK.HEAL       ] = GeneTypeNS(),                      -- 治疗统计
-		[DK.BE_HEAL    ] = GeneTypeNS(),                      -- 承疗统计
-		[DK.BE_DAMAGE  ] = GeneTypeNS(),                      -- 承伤统计
-		[DK.ABSORB     ] = GeneTypeNS(),                      -- 化解统计
+		[DK.UUID          ] = X.GetFightUUID(),                -- 战斗唯一标识
+		[DK.VERSION       ] = VERSION,                           -- 数据版本号
+		[DK.SERVER        ] = X.GetServerOriginName(),              -- 所在服务器
+		[DK.MAP           ] = X.GetMapID(),                    -- 所在地图
+		[DK.TIME_BEGIN    ] = GetCurrentTime(),                  -- 战斗开始时间
+		[DK.TICK_BEGIN    ] = GetTime(),                         -- 战斗开始毫秒时间
+		[DK.TIME_DURING   ] = - (nFightTick / 1000) - 1,         -- 战斗持续时间 负数表示本次战斗尚未结束 其数值为记录开始时负的战斗秒数减一
+		[DK.TICK_DURING   ] = - nFightTick - 1,                  -- 战斗持续毫秒时间 负数表示本次战斗尚未结束 其数值为记录开始时负的战斗毫秒数减一
+		[DK.AWAYTIME      ] = {},                                -- 死亡/掉线时间节点
+		[DK.NAME_LIST     ] = {},                                -- 名称缓存
+		[DK.BASE_NAME_LIST] = {},                                -- 基础名称缓存
+		[DK.FORCE_LIST    ] = {},                                -- 势力缓存
+		[DK.PLAYER_LIST   ] = {},                                -- 玩家信息缓存
+		[DK.EFFECT_LIST   ] = {},                                -- 效果信息缓存
+		[DK.DAMAGE        ] = GeneTypeNS(),                      -- 输出统计
+		[DK.HEAL          ] = GeneTypeNS(),                      -- 治疗统计
+		[DK.BE_HEAL       ] = GeneTypeNS(),                      -- 承疗统计
+		[DK.BE_DAMAGE     ] = GeneTypeNS(),                      -- 承伤统计
+		[DK.ABSORB        ] = GeneTypeNS(),                      -- 化解统计
 	}
 end
 end
@@ -1993,6 +2018,7 @@ local settings = {
 				'GeneAwayTime',
 				'GeneFightTime',
 				'GetNameAusID',
+				'GetBaseNameAusID',
 				'GetForceAusID',
 				'GetEffectInfoAusID',
 				'GetEffectNameAusID',

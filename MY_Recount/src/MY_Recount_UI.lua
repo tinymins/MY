@@ -236,11 +236,12 @@ function D.UpdateUI(frame)
 				tRec.nEffectValue = tRec.nEffectValue + (rec[DK_REC_STAT.TOTAL_EFFECT] or 0)
 			else -- 新数据
 				tRec = {
-					id           = id                                      ,
-					szName       = MY_Recount_DS.GetNameAusID(data, dwID)  ,
-					dwForceID    = MY_Recount_DS.GetForceAusID(data, dwID) ,
-					nValue       = rec[DK_REC_STAT.TOTAL] or 0             ,
-					nEffectValue = rec[DK_REC_STAT.TOTAL_EFFECT] or 0      ,
+					id           = id                                        ,
+					szName       = MY_Recount_DS.GetNameAusID(data, dwID)    ,
+					szBaseName   = MY_Recount_DS.GetBaseNameAusID(data, dwID),
+					dwForceID    = MY_Recount_DS.GetForceAusID(data, dwID)   ,
+					nValue       = rec[DK_REC_STAT.TOTAL] or 0               ,
+					nEffectValue = rec[DK_REC_STAT.TOTAL_EFFECT] or 0        ,
 					nTimeCount   = math.max( -- 计算战斗时间 防止计算DPS时除以0
 						MY_Recount_UI.bAwayMode
 							and MY_Recount_DS.GeneFightTime(data, eTimeChannel, dwID) -- 删去死亡时间
@@ -261,6 +262,7 @@ function D.UpdateUI(frame)
 				table.insert(aResult, {
 					id             = dwID              ,
 					szName         = info.szName       ,
+					szBaseName     = X.FormatBasePlayerName(info.szName),
 					dwForceID      = info.dwForceID    ,
 					nValue         = 0                 ,
 					nEffectValue   = 0                 ,
@@ -324,10 +326,7 @@ function D.UpdateUI(frame)
 			hItem:Lookup('Image_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
 			hItem:Lookup('Shadow_PerFore'):SetAlpha(css.a or 255)
 			hItem:Lookup('Shadow_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
-			local szTargetName = MY_Recount.GetTargetShowName(p.szName, p.dwForceID ~= -1)
-			szTargetName = szTargetName:gsub('@.*$', '')
-			szTargetName = szTargetName:gsub(g_tStrings.STR_CONNECT .. '.*$', '')
-			hItem:Lookup('Text_L'):SetText(szTargetName)
+			hItem:Lookup('Text_L'):SetText(MY_Recount.GetTargetShowName(p.szBaseName, p.dwForceID ~= -1))
 			hItem.id = p.id
 		end
 		if hItem:GetIndex() ~= i - 1 then
