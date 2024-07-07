@@ -115,7 +115,7 @@ function X.GetFellowshipInfo(xPlayerID)
 						else
 							local tPei = X.GetFellowshipEntryInfo(tFellowship.xID)
 							if tPei then
-								local szName, szServerName = X.DisassemblePlayerGlobalName(tFellowship.szName, true)
+								local szName, szServerName = X.DisassemblePlayerGlobalName(tPei.szName, true)
 								local szGlobalName = X.AssemblePlayerGlobalName(szName, szServerName)
 								tCache[tPei.dwID] = tFellowship
 								tCache[szName] = tFellowship
