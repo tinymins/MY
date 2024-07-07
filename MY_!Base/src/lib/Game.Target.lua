@@ -1305,6 +1305,30 @@ function X.GetPlayerGlobalID(dwID)
 end
 end
 
+-- 拼接角色跨服名
+---@param szName string @角色原始名
+---@param szServerName string @角色服务器名
+---@return string @角色跨服名
+function X.AssemblePlayerGlobalName(szName, szServerName)
+	return szName .. g_tStrings.STR_CONNECT .. szServerName
+end
+
+-- 拆分角色名与角色服务器
+---@param szGlobalName string @角色跨服名，本服可不加后缀
+---@param bFallbackServerName boolean @角色名不包含服务器时是否视为当前主服务器角色
+---@return string, string | nil @去除跨服服务器后缀的角色名, 角色所在服务器名
+function X.DisassemblePlayerGlobalName(szGlobalName, bFallbackServerName)
+	local nPos, szServerName = X.StringFindW(szGlobalName, g_tStrings.STR_CONNECT), nil
+	if nPos then
+		szGlobalName = szGlobalName:sub(1, nPos - 1)
+		szServerName = szGlobalName:sub(nPos + #g_tStrings.STR_CONNECT)
+	end
+	if bFallbackServerName and not szServerName then
+		szServerName = X.GetServerOriginName()
+	end
+	return szGlobalName, szServerName
+end
+
 -- 格式化原始角色名
 ---@param szName string @角色名
 ---@return string @去除跨服服务器后缀的角色名
