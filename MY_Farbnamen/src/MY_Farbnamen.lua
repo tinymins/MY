@@ -840,7 +840,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 		tPlayer = D.GetPlayerInfo(szGlobalID)
 	end
 	if not tPlayer then
-		tPlayer = szServerName == X.GetServerOriginName() and D.GetPlayerInfo(dwID)
+		tPlayer = szServerName == X.GetServerOriginName() and not IsRemotePlayer(dwID) and D.GetPlayerInfo(dwID)
 			or (szServerName and D.GetPlayerInfo(X.AssemblePlayerGlobalName(szName, szServerName)))
 			or {}
 	end
@@ -864,16 +864,16 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	if tPlayer.remoteID then
 		PLAYER_INFO[tPlayer.remoteID] = tPlayer
 	end
-	if not tPlayer.server or not tPlayer.id then
+	if not tPlayer.server then
 		return
 	end
-	if tPlayer.server == X.GetServerOriginName() then
+	if tPlayer.id and tPlayer.server == X.GetServerOriginName() then
 		PLAYER_INFO[tPlayer.id] = tPlayer
 	end
 	PLAYER_INFO[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = tPlayer
 	PLAYER_INFO_W[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = X.ConvertToUTF8(tPlayer)
 	-- 更新帮会信息
-	if tPlayer.server == X.GetServerOriginName() and not IsRemotePlayer(tPlayer.id) then
+	if tPlayer.id and tPlayer.server == X.GetServerOriginName() then
 		if tPlayer.tong and tPlayer.tong ~= 0 then
 			local szTongName = GetTongClient().ApplyGetTongName(tPlayer.tong, 254)
 			if szTongName and szTongName ~= '' then
