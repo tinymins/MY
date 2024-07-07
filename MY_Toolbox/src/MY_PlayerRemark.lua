@@ -239,6 +239,26 @@ function D.CheckPartyPlayer(dwID)
 	end
 end
 
+-- 当有玩家进房间时
+function D.CheckRoomPlayer(szGlobalID)
+	local tMember = X.GetRoomMemberInfo(szGlobalID)
+	local szServerName = tMember and X.GetServerNameByID(tMember.dwServerID)
+	local tPlayer = (tMember and D.Get(tMember.szGlobalID))
+		or (szServerName and D.Get(CombineNameServer(tMember.szName, szServerName)))
+	if tPlayer then
+		if tPlayer.bAlertWhenGroup then
+			MessageBox({
+				szName = 'MY_PlayerRemark_' .. tPlayer.dwID,
+				szMessage = _L('Tip: [%s] is in your room.\nRemark: %s', tPlayer.szName, tPlayer.szRemark),
+				{szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function() end},
+			})
+		end
+		if tPlayer.bTipWhenGroup then
+			X.OutputSystemMessage(_L('Tip: [%s] is in your team.\nRemark: %s', tPlayer.szName, tPlayer.szRemark))
+		end
+	end
+end
+
 -- 打开一个玩家的记录编辑器
 function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 	if not MY_Farbnamen then
@@ -473,6 +493,29 @@ X.RegisterEvent('PARTY_UPDATE_BASE_INFO', 'MY_PlayerRemark', function()
 	for _, dwID in ipairs(team.GetTeamMemberList()) do
 		D.CheckPartyPlayer(dwID)
 	end
+end)
+
+X.RegisterEvent('JOIN_GLOBAL_ROOM', 'MY_PlayerRemark', function()
+	X.DelayCall(2000, function()
+		for _, szGlobalID in ipairs(X.GetRoomMemberList()) do
+			D.CheckRoomPlayer(szGlobalID)
+		end
+	end)
+end)
+
+X.RegisterEvent('GLOBAL_ROOM_MEMBER_CHANGE', 'MY_PlayerRemark', function()
+	local szGlobalID = arg1
+	local bJoin = arg2
+	local szName = arg3
+	local dwSeverID = arg4
+	if not bJoin then
+		return
+	end
+	local szServerName = X.GetServerNameByID(dwSeverID)
+	if not szServerName then
+		return
+	end
+	D.CheckRoomPlayer(szGlobalID)
 end)
 
 X.RegisterEvent('MY_PLAYER_REMARK_UPDATE', 'MY_PlayerRemark', function()

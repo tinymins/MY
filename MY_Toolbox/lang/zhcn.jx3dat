@@ -96,6 +96,7 @@ return {
 	['cancel'] = '取消',
     ['Tip: [%s] is in your team.\nRemark: %s'] = '提示：[%s]进入你所在的队伍。\n备注：%s',
     ['Tip: [%s](Leader) is in your team.\nRemark: %s'] = '提示：[%s]（团长）进入你所在的队伍。\n备注：%s',
+    ['Tip: [%s] is in your room.\nRemark: %s'] = '提示：[%s]进入你所在的房间。\n备注：%s',
     ['Import'] = '导入',
     ['Please input import data:'] = '请输入导入的数据：',
     ['Server not match!'] = '服务器不匹配！',
