@@ -1320,8 +1320,8 @@ end
 function X.DisassemblePlayerGlobalName(szGlobalName, bFallbackServerName)
 	local nPos, szServerName = X.StringFindW(szGlobalName, g_tStrings.STR_CONNECT), nil
 	if nPos then
-		szGlobalName = szGlobalName:sub(1, nPos - 1)
 		szServerName = szGlobalName:sub(nPos + #g_tStrings.STR_CONNECT)
+		szGlobalName = szGlobalName:sub(1, nPos - 1)
 	end
 	if bFallbackServerName and not szServerName then
 		szServerName = X.GetServerOriginName()
