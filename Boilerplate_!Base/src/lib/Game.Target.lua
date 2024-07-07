@@ -1308,7 +1308,7 @@ end
 -- 格式化原始角色名
 ---@param szName string @角色名
 ---@return string @去除跨服服务器后缀的角色名
-function X.FormatOriginPlayerName(szName)
+function X.ExtractPlayerOriginName(szName)
 	local nPos = X.StringFindW(szName, g_tStrings.STR_CONNECT)
 	if nPos then
 		szName = szName:sub(1, nPos - 1)
@@ -1319,12 +1319,12 @@ end
 -- 格式化基础角色名
 ---@param szName string @角色名
 ---@return string @去除跨服服务器后缀和转服后缀的角色名
-function X.FormatBasePlayerName(szName)
+function X.ExtractPlayerBaseName(szName)
 	local nPos = X.StringFindW(szName, '@')
 	if nPos then
 		szName = szName:sub(1, nPos - 1)
 	end
-	return X.FormatOriginPlayerName(szName)
+	return X.ExtractPlayerOriginName(szName)
 end
 
 --------------------------------------------------------------------------------
@@ -1498,8 +1498,8 @@ function X.IsAuthor(dwID, szName, szGlobalID)
 	end
 	if dwID and (
 		X.PACKET_INFO.AUTHOR_ROLES[dwID] == szName
-			or X.PACKET_INFO.AUTHOR_ROLES[dwID] == X.FormatOriginPlayerName(szName)
-			or X.PACKET_INFO.AUTHOR_ROLES[dwID] == X.FormatBasePlayerName(szName)
+			or X.PACKET_INFO.AUTHOR_ROLES[dwID] == X.ExtractPlayerOriginName(szName)
+			or X.PACKET_INFO.AUTHOR_ROLES[dwID] == X.ExtractPlayerBaseName(szName)
 	) then
 		return true
 	end
@@ -1508,8 +1508,8 @@ end
 
 function X.IsAuthorPlayerName(szName)
 	return X.PACKET_INFO.AUTHOR_PROTECT_NAMES[szName]
-		or X.PACKET_INFO.AUTHOR_PROTECT_NAMES[X.FormatOriginPlayerName(szName)]
-		or X.PACKET_INFO.AUTHOR_PROTECT_NAMES[X.FormatBasePlayerName(szName)]
+		or X.PACKET_INFO.AUTHOR_PROTECT_NAMES[X.ExtractPlayerOriginName(szName)]
+		or X.PACKET_INFO.AUTHOR_PROTECT_NAMES[X.ExtractPlayerBaseName(szName)]
 end
 
 --------------------------------------------------------------------------------
