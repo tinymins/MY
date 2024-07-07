@@ -148,7 +148,7 @@ local function onInit()
 	D.Reload(true)
 	D.Reload(false)
 end
-X.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', onInit)
+X.RegisterInit('MY_Memo', onInit)
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)

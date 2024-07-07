@@ -208,7 +208,7 @@ function D.UpdateItem(hItem, p)
 		end
 	end
 	-- 角色备注
-	hInfoList:Lookup('Handle_Anmerkungen'):SetVisible(szVia == _L['Anmerkungen'])
+	hInfoList:Lookup('Handle_MY_PlayerRemark'):SetVisible(szVia == _L['MY_PlayerRemark'])
 	hInfoList:FormatAllItemPos()
 
 	-- 目标距离

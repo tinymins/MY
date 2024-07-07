@@ -314,10 +314,10 @@ function PS.OnPanelActive(wnd)
 		autoEnable = function() return MY_Focus.IsEnabled() end,
 	})
 	ui:Append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['Anmerkungen auto focus'],
-		checked = MY_Focus.bFocusAnmerkungen,
+		x = x, y = y, w = wr, text = _L['MY_PlayerRemark auto focus'],
+		checked = MY_Focus.bFocusPlayerRemark,
 		onCheck = function(bChecked)
-			MY_Focus.bFocusAnmerkungen = bChecked
+			MY_Focus.bFocusPlayerRemark = bChecked
 			MY_Focus.RescanNearby()
 		end,
 		autoEnable = function() return MY_Focus.IsEnabled() end,

@@ -112,7 +112,7 @@ local O = X.CreateUserSettingsModule('MY_Focus', _L['Target'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
-	bFocusAnmerkungen = { -- 焦点角色备注记录在案的目标
+	bFocusPlayerRemark = { -- 焦点角色备注记录在案的目标
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Focus'],
 		xSchema = X.Schema.Boolean,
@@ -466,7 +466,7 @@ function D.RescanNearby()
 	D.ClearFocus()
 	D.ScanNearby()
 end
-X.RegisterEvent('MY_ANMERKUNGEN_UPDATE', 'MY_Focus', D.RescanNearby)
+X.RegisterEvent('MY_PLAYER_REMARK_UPDATE', 'MY_Focus', D.RescanNearby)
 
 function D.GetEligibleRules(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 	local aRule = {}
@@ -619,12 +619,13 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				if not O.bOnlyPublicMap or (not X.IsInCompetitionMap() and not X.IsInDungeonMap()) then
 					-- 判断角色备注
 					if dwType == TARGET.PLAYER
-					and O.bFocusAnmerkungen
-					and MY_Anmerkungen
-					and MY_Anmerkungen.GetPlayerNote(dwID) then
+					and O.bFocusPlayerRemark
+					and MY_PlayerRemark
+					and MY_PlayerRemark.Get
+					and MY_PlayerRemark.Get(szName) then
 						table.insert(aVia, {
 							bDeletable = false,
-							szVia = _L['Anmerkungen'],
+							szVia = _L['MY_PlayerRemark'],
 						})
 						bFocus = true
 					end
@@ -1171,7 +1172,7 @@ local settings = {
 				'bOnlyPublicMap',
 				'bSortByDistance',
 				'bFocusEnemy',
-				'bFocusAnmerkungen',
+				'bFocusPlayerRemark',
 				'bAutoHide',
 				'nMaxDisplay',
 				'bAutoFocus',
@@ -1203,7 +1204,7 @@ local settings = {
 				'bOnlyPublicMap',
 				'bSortByDistance',
 				'bFocusEnemy',
-				'bFocusAnmerkungen',
+				'bFocusPlayerRemark',
 				'bAutoHide',
 				'nMaxDisplay',
 				'bAutoFocus',
@@ -1231,7 +1232,7 @@ local settings = {
 				bOnlyPublicMap = D.OnConfigChange,
 				bSortByDistance = D.OnConfigChange,
 				bFocusEnemy = D.OnConfigChange,
-				bFocusAnmerkungen = D.OnConfigChange,
+				bFocusPlayerRemark = D.OnConfigChange,
 				bAutoHide = D.OnConfigChange,
 				nMaxDisplay = D.OnConfigChange,
 				bAutoFocus = D.OnConfigChange,

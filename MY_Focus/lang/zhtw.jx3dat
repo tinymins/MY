@@ -14,7 +14,7 @@ return {
     ['Auto focus enemy'] = '焦點附近敵對玩家',
     ['Auto focus party in arena'] = '焦點名劍大會友方隊員',
     ['Auto focus enemy in arena'] = '焦點名劍大會敵方隊員',
-    ['Anmerkungen auto focus'] = '焦點角色備注中的目標',
+    ['MY_PlayerRemark auto focus'] = '焦點角色備注中的目標',
     ['Show focus\'s target'] = '顯示目標的目標',
     ['Show 3d distance'] = '顯示三維坐標距離',
 	['Distance type'] = '默認距離計算方式',
@@ -91,7 +91,7 @@ return {
     ['Tong member focus'] = '幫會自動焦點',
     ['Enemy focus'] = '敵對玩家自動焦點',
     ['Important npc focus'] = '重要NPC自動焦點',
-    ['Anmerkungen'] = '角色備注自動焦點',
+    ['MY_PlayerRemark'] = '角色備注自動焦點',
 
     ['Would you like to use MY focus?'] = '是否啟用焦點列表？',
     ['Use'] = '使用',

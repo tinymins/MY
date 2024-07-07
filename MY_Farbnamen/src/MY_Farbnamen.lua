@@ -669,10 +669,10 @@ function D.GetTip(szName)
 		))
 		table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 		-- ÀÊ…Ì±„º„
-		if MY_Anmerkungen and MY_Anmerkungen.GetPlayerNote then
-			local note = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
-			if note and note.szContent ~= '' then
-				table.insert(tTip, GetFormatText(note.szContent, 0))
+		if MY_PlayerRemark and MY_PlayerRemark.Get then
+			local tPlayer = MY_PlayerRemark.Get(tInfo.szGlobalID) or MY_PlayerRemark.Get(tInfo.dwID)
+			if tPlayer and tPlayer.szRemark ~= '' then
+				table.insert(tTip, GetFormatText(tPlayer.szRemark, 0))
 				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 			end
 		end

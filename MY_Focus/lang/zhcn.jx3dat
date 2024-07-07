@@ -14,7 +14,7 @@ return {
     ['Auto focus enemy'] = '焦点附近敌对玩家',
     ['Auto focus party in arena'] = '焦点名剑大会友方队员',
     ['Auto focus enemy in arena'] = '焦点名剑大会敌方队员',
-    ['Anmerkungen auto focus'] = '焦点角色备注中的目标',
+    ['MY_PlayerRemark auto focus'] = '焦点角色备注中的目标',
     ['Show focus\'s target'] = '显示目标的目标',
     ['Show 3d distance'] = '显示三维坐标距离',
 	['Distance type'] = '默认距离计算方式',
@@ -91,7 +91,7 @@ return {
     ['Tong member focus'] = '帮会自动焦点',
     ['Enemy focus'] = '敌对玩家自动焦点',
     ['Important npc focus'] = '重要NPC自动焦点',
-    ['Anmerkungen'] = '角色备注自动焦点',
+    ['MY_PlayerRemark'] = '角色备注自动焦点',
 
     ['Would you like to use MY focus?'] = '是否启用焦点列表？',
     ['Use'] = '使用',
