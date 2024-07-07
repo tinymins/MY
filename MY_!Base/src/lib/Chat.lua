@@ -344,7 +344,12 @@ local ChatLinkEvents = {
 				local info = _G.MY_Farbnamen.Get((X.UI(link):Text():gsub('[%[%]]', '')))
 				if info then
 					PEEK_PLAYER[info.dwID] = true
-					ViewInviteToPlayer(info.dwID)
+					local dwServerID = info.szServerName and X.GetServerIDByName(info.szServerName)
+					if info.szGlobalID and dwServerID then
+						ViewInviteToPlayer(nil, nil, dwServerID, info.szGlobalID)
+					elseif info.dwID then
+						ViewInviteToPlayer(info.dwID)
+					end
 				end
 			end
 		else

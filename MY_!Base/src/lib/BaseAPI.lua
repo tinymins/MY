@@ -102,6 +102,25 @@ function X.GetServerNameByID(dwServerID)
 	return GetCenterNameByCenterID(dwServerID)
 end
 
+local SERVER_ID_NAME
+-- 通过跨服服务器名称获取服务器ID
+---@param szServerName string @服务器ID
+---@return number|nil @服务器ID，不存在则返回空
+function X.GetServerIDByName(szServerName)
+	if not SERVER_ID_NAME then
+		SERVER_ID_NAME = {}
+		if GetCenterNameByCenterID then
+			for i = 1, 511 do
+				local szServerName = GetCenterNameByCenterID(i)
+				if szServerName then
+					SERVER_ID_NAME[szServerName] = i
+				end
+			end
+		end
+	end
+	return SERVER_ID_NAME[szServerName]
+end
+
 -- 获取 ID 是否为玩家（区别于 NPC）
 ---@param dwID number @ID
 ---@return boolean @是否为玩家
