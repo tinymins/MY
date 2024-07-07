@@ -4174,12 +4174,12 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		return
 	end
 	-- Set
-	local nMinWidth = GetComponentProp(raw, 'minWidth')
-	local nMinHeight = GetComponentProp(raw, 'minHeight')
-	if nMinWidth and nWidth < nMinWidth then
+	local nMinWidth = GetComponentProp(raw, 'minWidth') or 0
+	local nMinHeight = GetComponentProp(raw, 'minHeight') or 0
+	if nWidth < nMinWidth then
 		nWidth = nMinWidth
 	end
-	if nMinHeight and nHeight < nMinHeight then
+	if nHeight < nMinHeight then
 		nHeight = nMinHeight
 	end
 	if componentType == 'WndFrame' then
@@ -4324,10 +4324,10 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 				nTextH = nTextH * fAnimateScale
 			end
 			if bAutoWidth then
-				nWidth = nTextW + nPaddingLeft + nPaddingRight + nTextW * (nPaddingLeftPercent + nPaddingRightPercent)
+				nWidth = math.max(nTextW + nPaddingLeft + nPaddingRight + nTextW * (nPaddingLeftPercent + nPaddingRightPercent), nMinWidth)
 			end
 			if bAutoHeight then
-				nHeight = nTextH + nPaddingTop + nPaddingBottom + nTextH * (nPaddingTopPercent + nPaddingBottomPercent)
+				nHeight = math.max(nTextH + nPaddingTop + nPaddingBottom + nTextH * (nPaddingTopPercent + nPaddingBottomPercent), nMinHeight)
 			end
 			txt:SetSize(nOriginW, nOriginH)
 		end
