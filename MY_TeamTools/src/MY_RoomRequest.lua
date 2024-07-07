@@ -31,6 +31,12 @@ local O = X.CreateUserSettingsModule('MY_RoomRequest', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bAcceptTeam = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamTools'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
 	bAcceptTong = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
@@ -85,6 +91,14 @@ function D.GetMenu()
 			bCheck = true, bChecked = O.bAcceptFriend,
 			fnAction = function()
 				O.bAcceptFriend = not O.bAcceptFriend
+			end,
+			fnDisable = function() return not O.bEnable end,
+		},
+		{
+			szOption = _L['Auto accept team member'],
+			bCheck = true, bChecked = O.bAcceptTeam,
+			fnAction = function()
+				O.bAcceptTeam = not O.bAcceptTeam
 			end,
 			fnDisable = function() return not O.bEnable end,
 		},
@@ -284,6 +298,10 @@ function D.GetRequestStatus(info)
 		szStatus = 'accept'
 		szMsg = _L('Auto accept friend %s(%s %d%s) room request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 			info.szGlobalName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
+	elseif info.bTeamMember and O.bAcceptTeam then
+		szStatus = 'accept'
+		szMsg = _L('Auto tong member friend %s(%s %d%s) room request, go to MY/raid/teamtools panel if you want to turn off this feature.',
+			info.szGlobalName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 	elseif info.bTongMember and O.bAcceptTong then
 		szStatus = 'accept'
 		szMsg = _L('Auto tong member friend %s(%s %d%s) room request, go to MY/raid/teamtools panel if you want to turn off this feature.',
@@ -363,6 +381,14 @@ function D.OnApplyRequest(event)
 	local me = X.GetClientPlayerInfo()
 	local szServerName = X.GetServerNameByID(dwServerID)
 	-- 判断对方是否已在进组列表中
+	local bTeamMember = false
+	for _, dwID in ipairs(X.GetTeamMemberList()) do
+		local tMember = X.GetTeamMemberInfo(dwID)
+		if tMember and tMember.szGlobalID == szGlobalID then
+			bTeamMember = true
+			break
+		end
+	end
 	info.szType       = eType == GLOBAL_ROOM_JOIN_TYPE.INVITE and 'invite' or 'request'
 	info.szGlobalID   = szGlobalID
 	info.dwServerID   = dwServerID
@@ -372,6 +398,7 @@ function D.OnApplyRequest(event)
 	info.dwForce      = tPlayer and tPlayer.dwForceID or -1
 	info.nLevel       = tPlayer and tPlayer.nLevel or -1
 	info.bFriend      = X.IsFellowship(info.szGlobalName)
+	info.bTeamMember  = bTeamMember
 	info.bTongMember  = szServerName == X.GetServerOriginName() and X.IsTongMember(szName)
 	info.bSameCamp    = info.nCamp == me.nCamp
 	info.dwDelayTime  = nil

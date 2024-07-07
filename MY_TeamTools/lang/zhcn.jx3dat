@@ -125,6 +125,7 @@ return {
 	['MY_RoomRequest'] = '房间助手',
 	['Enable'] = '启用',
 	['Auto accept friend'] = '自动通过好友',
+	['Auto accept team member'] = '自动通过团队成员',
 	['Auto accept tong member'] = '自动通过帮会成员',
 	['Auto accept same camp'] = '自动通过相同阵营角色',
 	['Auto accept all'] = '自动通过所有人',
