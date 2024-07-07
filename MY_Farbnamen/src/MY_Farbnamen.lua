@@ -871,7 +871,9 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 		PLAYER_INFO[tPlayer.id] = tPlayer
 	end
 	PLAYER_INFO[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = tPlayer
-	PLAYER_INFO_W[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = X.ConvertToUTF8(tPlayer)
+	if tPlayer.id then
+		PLAYER_INFO_W[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = X.ConvertToUTF8(tPlayer)
+	end
 	-- 更新帮会信息
 	if tPlayer.id and tPlayer.server == X.GetServerOriginName() then
 		if tPlayer.tong and tPlayer.tong ~= 0 then
