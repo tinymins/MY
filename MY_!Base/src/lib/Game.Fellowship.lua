@@ -108,12 +108,18 @@ function X.GetFellowshipInfo(xPlayerID)
 					for _, tFellowship in ipairs(X.GetFellowshipInfoList(tGroup.nID) or {}) do
 						tCache[tFellowship.xID] = tFellowship
 						if tFellowship.szName then
-							tCache[tFellowship.szName] = tFellowship
+							local szName, szServerName = X.DisassemblePlayerGlobalName(tFellowship.szName, true)
+							local szGlobalName = X.AssemblePlayerGlobalName(szName, szServerName)
+							tCache[szName] = tFellowship
+							tCache[szGlobalName] = tFellowship
 						else
 							local tPei = X.GetFellowshipEntryInfo(tFellowship.xID)
 							if tPei then
+								local szName, szServerName = X.DisassemblePlayerGlobalName(tFellowship.szName, true)
+								local szGlobalName = X.AssemblePlayerGlobalName(szName, szServerName)
 								tCache[tPei.dwID] = tFellowship
-								tCache[tPei.szName] = tFellowship
+								tCache[szName] = tFellowship
+								tCache[szGlobalName] = tFellowship
 							else
 								bSyncing = true
 							end
