@@ -333,6 +333,8 @@ local function ApplyUIArguments(ui, arg)
 		if arg.sliderWidth ~= nil or arg.sliderHeight ~= nil then -- must after :Text() because w/h can be 'auto', must before :Size() because size depends on this
 			ui:SliderSize(arg.sliderWidth, arg.sliderHeight)
 		end
+		if arg.minWidth          ~= nil  then ui:MinWidth         (arg.minWidth                                    ) end
+		if arg.minHeight         ~= nil  then ui:MinHeight        (arg.minHeight                                   ) end
 		if arg.w ~= nil or arg.h ~= nil  then ui:Size             (arg.w, arg.h                                    ) end -- must after :Text() because w/h can be 'auto'
 		if arg.alignHorizontal or arg.alignVertical then -- must after :Size()
 			ui:Align(arg.alignHorizontal, arg.alignVertical)
