@@ -667,9 +667,9 @@ function D.GetTip(szName)
 		-- 调试信息
 		if IsCtrlKeyDown() then
 			table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
-			table.insert(tTip, GetFormatText(_L('Player ID: %d', tInfo.dwID), 102))
+			table.insert(tTip, GetFormatText(_L('Player ID: %d', tInfo.dwID or 0), 102))
 			table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
-			table.insert(tTip, GetFormatText(_L('Player GUID: %s', tInfo.szGlobalID), 102))
+			table.insert(tTip, GetFormatText(_L('Player GUID: %s', tInfo.szGlobalID or 0), 102))
 		end
 		-- 组装Tip
 		return table.concat(tTip)
