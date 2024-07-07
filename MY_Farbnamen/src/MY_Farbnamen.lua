@@ -72,18 +72,6 @@ local function IsNonEmptyString(szString)
 	return szString and szString ~= ''
 end
 
-local function ExtractNameServer(szName, bFallbackServer)
-	local a = X.SplitString(szName, g_tStrings.STR_CONNECT)
-	if bFallbackServer and not a[2] then
-		a[2] = X.GetServerOriginName()
-	end
-	return a[1], a[2]
-end
-
-local function CombineNameServer(szName, szServerName)
-	return szName .. g_tStrings.STR_CONNECT .. szServerName
-end
-
 local function InitDB()
 	if DB then
 		return true
@@ -775,8 +763,8 @@ function D.GetPlayerInfo(xKey)
 			DBP_RGI:Reset()
 		end
 	elseif X.IsString(xKey) then
-		local szName, szServer = ExtractNameServer(xKey, true)
-		xKey = CombineNameServer(szName, szServer)
+		local szName, szServer = X.DisassemblePlayerGlobalName(xKey, true)
+		xKey = X.AssemblePlayerGlobalName(szName, szServer)
 		tPlayer = PLAYER_INFO[xKey]
 		if not tPlayer and InitDB() then
 			DBP_RN:ClearBindings()
@@ -791,7 +779,7 @@ function D.GetPlayerInfo(xKey)
 			PLAYER_INFO[tPlayer.id] = tPlayer
 		end
 		if tPlayer.name and tPlayer.server then
-			PLAYER_INFO[CombineNameServer(tPlayer.name, tPlayer.server)] = tPlayer
+			PLAYER_INFO[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = tPlayer
 		end
 		if IsGlobalID(tPlayer.guid) then
 			PLAYER_INFO[tPlayer.guid] = tPlayer
@@ -838,7 +826,7 @@ end
 function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, nRoleType, nLevel, szTitle, nCamp, dwTongID, bTimes)
 	-- 自动跨服处理
 	do
-		local szNameExt, szServerNameExt = ExtractNameServer(szName, false)
+		local szNameExt, szServerNameExt = X.DisassemblePlayerGlobalName(szName, false)
 		if szServerNameExt then
 			szServerName = szServerNameExt
 			szName = szNameExt
@@ -853,7 +841,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	end
 	if not tPlayer then
 		tPlayer = szServerName == X.GetServerOriginName() and D.GetPlayerInfo(dwID)
-			or (szServerName and D.GetPlayerInfo(CombineNameServer(szName, szServerName)))
+			or (szServerName and D.GetPlayerInfo(X.AssemblePlayerGlobalName(szName, szServerName)))
 			or {}
 	end
 	tPlayer.server = szServerName
@@ -882,8 +870,8 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	if tPlayer.server == X.GetServerOriginName() then
 		PLAYER_INFO[tPlayer.id] = tPlayer
 	end
-	PLAYER_INFO[CombineNameServer(tPlayer.name, tPlayer.server)] = tPlayer
-	PLAYER_INFO_W[CombineNameServer(tPlayer.name, tPlayer.server)] = X.ConvertToUTF8(tPlayer)
+	PLAYER_INFO[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = tPlayer
+	PLAYER_INFO_W[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = X.ConvertToUTF8(tPlayer)
 	-- 更新帮会信息
 	if tPlayer.server == X.GetServerOriginName() and not IsRemotePlayer(tPlayer.id) then
 		if tPlayer.tong and tPlayer.tong ~= 0 then

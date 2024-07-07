@@ -28,18 +28,6 @@ local function IsGlobalID(szGlobalID)
 	return szGlobalID and szGlobalID ~= '' and szGlobalID ~= '0'
 end
 
-local function ExtractNameServer(szName, bFallbackServer)
-	local a = X.SplitString(szName, g_tStrings.STR_CONNECT)
-	if bFallbackServer and not a[2] then
-		a[2] = X.GetServerOriginName()
-	end
-	return a[1], a[2]
-end
-
-local function CombineNameServer(szName, szServerName)
-	return szName .. g_tStrings.STR_CONNECT .. szServerName
-end
-
 local function InitDB()
 	if DB then
 		return true
@@ -164,8 +152,8 @@ function D.Get(xKey)
 		tInfo = X.ConvertToAnsi((DBP_RGI:GetNext()))
 		DBP_RGI:Reset()
 	elseif X.IsString(xKey) then
-		local szName, szServer = ExtractNameServer(xKey, true)
-		xKey = CombineNameServer(szName, szServer)
+		local szName, szServer = X.DisassemblePlayerGlobalName(xKey, true)
+		xKey = X.AssemblePlayerGlobalName(szName, szServer)
 		DBP_RN:ClearBindings()
 		DBP_RN:BindAll(AnsiToUTF8(szServer), AnsiToUTF8(szName))
 		tInfo = X.ConvertToAnsi((DBP_RN:GetNext()))
@@ -244,7 +232,7 @@ function D.CheckRoomPlayer(szGlobalID)
 	local tMember = X.GetRoomMemberInfo(szGlobalID)
 	local szServerName = tMember and X.GetServerNameByID(tMember.dwServerID)
 	local tPlayer = (tMember and D.Get(tMember.szGlobalID))
-		or (szServerName and D.Get(CombineNameServer(tMember.szName, szServerName)))
+		or (szServerName and D.Get(X.AssemblePlayerGlobalName(tMember.szName, szServerName)))
 	if tPlayer then
 		if tPlayer.bAlertWhenGroup then
 			MessageBox({
@@ -271,7 +259,7 @@ function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 			tInfo = D.Get(szGlobalID)
 		end
 		if not tInfo then
-			tInfo = D.Get(CombineNameServer(szName, szServerName))
+			tInfo = D.Get(X.AssemblePlayerGlobalName(szName, szServerName))
 		end
 		if not tInfo and not IsRemotePlayer(dwID) then
 			tInfo = D.Get(dwID)
@@ -462,7 +450,7 @@ X.RegisterTargetAddonMenu('MY_PlayerRemark', function()
 		return {
 			szOption = _L['Edit player remark'],
 			fnAction = function()
-				local szName, szServerName = ExtractNameServer(kPlayer.szName, true)
+				local szName, szServerName = X.DisassemblePlayerGlobalName(kPlayer.szName, true)
 				local szGlobalID = X.GetPlayerGlobalID(dwID)
 				D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 			end
@@ -552,8 +540,8 @@ function PS.OnPanelActive(wnd)
 	})
 	for _, tInfo in ipairs(D.GetAll()) do
 		list:ListBox('insert', {
-			id = CombineNameServer(tInfo.szName, tInfo.szServerName),
-			text = _L('[%s] %s', CombineNameServer(tInfo.szName, tInfo.szServerName), tInfo.szRemark),
+			id = X.AssemblePlayerGlobalName(tInfo.szName, tInfo.szServerName),
+			text = _L('[%s] %s', X.AssemblePlayerGlobalName(tInfo.szName, tInfo.szServerName), tInfo.szRemark),
 			data = tInfo,
 		})
 	end
