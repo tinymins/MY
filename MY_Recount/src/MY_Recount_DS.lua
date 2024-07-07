@@ -1249,12 +1249,12 @@ function D.InitObjectData(data, dwID, szChannel)
 	-- ¶ÌÃû³Æ»º´æ
 	if not data[DK.BASE_NAME_LIST][dwID] and data[DK.NAME_LIST][dwID] then
 		if X.IsPlayer(dwID) then
-			data[DK.BASE_NAME_LIST][dwID] = X.FormatBasePlayerName(data[DK.NAME_LIST][dwID])
+			data[DK.BASE_NAME_LIST][dwID] = X.ExtractPlayerBaseName(data[DK.NAME_LIST][dwID])
 		else
 			local kNpc = X.GetNpc(dwID)
 			if kNpc and kNpc.dwEmployer ~= 0 then
 				local szEmployerName = X.GetObjectName(TARGET.PLAYER, kNpc.dwEmployer, 'never')
-				local szEmployerBaseName = X.FormatBasePlayerName(szEmployerName)
+				local szEmployerBaseName = X.ExtractPlayerBaseName(szEmployerName)
 				data[DK.BASE_NAME_LIST][dwID] = X.StringReplaceW(data[DK.NAME_LIST][dwID], szEmployerName, szEmployerBaseName)
 			end
 		end

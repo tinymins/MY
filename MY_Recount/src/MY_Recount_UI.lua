@@ -262,7 +262,7 @@ function D.UpdateUI(frame)
 				table.insert(aResult, {
 					id             = dwID              ,
 					szName         = info.szName       ,
-					szBaseName     = X.FormatBasePlayerName(info.szName),
+					szBaseName     = X.ExtractPlayerBaseName(info.szName),
 					dwForceID      = info.dwForceID    ,
 					nValue         = 0                 ,
 					nEffectValue   = 0                 ,

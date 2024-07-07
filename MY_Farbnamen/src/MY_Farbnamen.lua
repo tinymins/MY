@@ -612,7 +612,7 @@ function D.RegisterNameIDHeader(szName, dwID, szHeaderXml)
 		return X.OutputDebugMessage('ERROR', 'MY_Farbnamen Conflicted Name-ID: ' .. szName .. '(' .. dwID .. ')', X.DEBUG_LEVEL.ERROR)
 	end
 	if dwID == '*' then
-		szName = X.FormatBasePlayerName(szName)
+		szName = X.ExtractPlayerBaseName(szName)
 	end
 	NAME_ID_HEADER_XML[szName][dwID] = szHeaderXml
 end
@@ -636,7 +636,7 @@ function D.GetTip(szName)
 				table.insert(tTip, szHeaderXml)
 				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 			elseif tInfo.dwID ~= X.GetClientPlayerID() then
-				local szName = X.FormatBasePlayerName(tInfo.szName)
+				local szName = X.ExtractPlayerBaseName(tInfo.szName)
 				local szHeaderXml = NAME_ID_HEADER_XML[szName] and NAME_ID_HEADER_XML[szName]['*']
 				if szHeaderXml then
 					table.insert(tTip, szHeaderXml)
