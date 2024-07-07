@@ -928,7 +928,7 @@ function D.AddAusID(dwID, bTimes)
 		player.nLevel,
 		player.nX ~= 0 and player.szTitle or nil,
 		player.nCamp,
-		player.dwTongID,
+		X.IIf(IsRemotePlayer(dwID), nil, player.dwTongID),
 		bTimes
 	)
 	return true
