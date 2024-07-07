@@ -106,20 +106,47 @@ return {
 		= '自動拒絕了 %s(%s %d%s) 的組隊請求，裝備分數：%d，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
 	['Auto refuse %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.']
 		= '自動拒絕了 %s(%s %d%s) 的組隊請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
-	['Auto accept %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
-		'自動通過了 %s(%s %d%s) 的組隊請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
-	['Auto accept friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
-		'自動通過了好友 %s(%s %d%s) 的組隊請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
-	['Auto tong member friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
-		'自動通過了幫會成員 %s(%s %d%s) 的組隊請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
-	['Auto camp %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
-		'自動通過了同陣營角色 %s(%s %d%s) 的組隊請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
-	['Auto accept %s(%s %d%s) custom party request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
-		'自動通過了指定角色 %s(%s %d%s) 的組隊請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto accept %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了 %s(%s %d%s) 的組隊請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto accept friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了好友 %s(%s %d%s) 的組隊請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto tong member friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了幫會成員 %s(%s %d%s) 的組隊請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto camp %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了同陣營角色 %s(%s %d%s) 的組隊請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto accept %s(%s %d%s) custom party request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了指定角色 %s(%s %d%s) 的組隊請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
 	['Asking...'] = '正在徵詢對方意見\n如果長時間未響應可能是對方沒有安裝插件。',
 	['Syncing: %.2f%%.'] = '正在同步數據(%.2f%%)...',
 	['Refuse request'] = '對方拒絕了您的請求！',
 	['Party limit'] = '必須和對方組隊',
+
+	-- MY_RoomRequest
+	['MY_RoomRequest'] = '房間助手',
+	['Enable'] = '啟用',
+	['Auto accept friend'] = '自動通過好友',
+	['Auto accept tong member'] = '自動通過幫會成員',
+	['Auto accept same camp'] = '自動通過相同陣營角色',
+	['Auto accept all'] = '自動通過所有人',
+	['Auto accept specific names'] = '自動通過指定角色',
+	['Add'] = '添加',
+	['Please input custom name, multiple split with ",[]":'] = '請輸入自定義角色名稱，多個角色名請使用半形逗號或方括弧分隔：',
+	['Please unlock talk lock first.'] = '請先解除聊天鎖。',
+	['loading...'] = '讀取中..',
+	['If it is always loading, the target may not install plugin or refuse.'] = '如果一直提示載入中，可能是對方沒有安裝插件或者拒絕了您的請求',
+	['Press ctrl and click to ask detail.'] = '按住CTRL點擊左鍵可詢問詳情',
+	['Auto accept %s(%s %d%s) room request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了 %s(%s %d%s) 的房間請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto accept %s(%s %d%s) custom room request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了指定角色 %s(%s %d%s) 的房間請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto accept friend %s(%s %d%s) room request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了好友 %s(%s %d%s) 的房間請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto tong member friend %s(%s %d%s) room request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了幫會成員 %s(%s %d%s) 的房間請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto camp %s(%s %d%s) room request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了同陣營角色 %s(%s %d%s) 的房間請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Room invite request.'] = '對方邀請你加入房間。',
+	['Room apply request.'] = '對方申請加入你的房間。',
 
 	-- MY_RideRequest
 	['MY_RideRequest'] = '同乘助手',
@@ -135,16 +162,16 @@ return {
 	['Please input custom name, multiple split with ",[]":'] = '請輸入自定義角色名稱，多個角色名請使用半形逗號或方括弧分隔：',
 	['Auto refuse %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.']
 		= '自動拒絕了 %s 的同乘請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
-	['Auto accept %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
-		'自動通過了 %s 的同乘請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
-	['Auto accept party %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
-		'自動通過了隊友 %s 的同乘請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
-	['Auto accept friend %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
-		'自動通過了好友 %s 的同乘請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
-	['Auto tong member friend %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
-		'自動通過了幫會成員 %s 的同乘請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
-	['Auto accept %s custom ride request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
-		'自動通過了指定角色 %s 的同乘請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto accept %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了 %s 的同乘請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto accept party %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了隊友 %s 的同乘請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto accept friend %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了好友 %s 的同乘請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto tong member friend %s ride request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了幫會成員 %s 的同乘請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
+	['Auto accept %s custom ride request, go to MY/raid/teamtools panel if you want to turn off this feature.']
+		= '自動通過了指定角色 %s 的同乘請求，如需關閉該功能請前往茗伊插件/團隊/團隊工具取消勾選對應項。',
 
 	-- MY_EvokeRequest
 	['MY_EvokeRequest'] = '召請助手',

@@ -75,6 +75,7 @@ function PS.OnPanelActive(wnd)
 	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Party Request'], font = 27 }):Height() + 5
 	nX = nPaddingX + 10
 	nX, nY = MY_PartyRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
+	nX, nY = MY_RoomRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX, nY = MY_RideRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX, nY = MY_EvokeRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX, nY = MY_SocialRequest.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
