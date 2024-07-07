@@ -466,7 +466,7 @@ function D.RenderXml(szMsg, tOption)
 			if name and name:sub(1, 9) == 'namelink_' then
 				if tOption.bColor or tOption.bInsertIcon then
 					local szName = string.gsub(X.XMLGetNodeData(node, 'text'), '[%[%]]', '')
-					local tInfo = D.GetAusName(szName)
+					local tInfo = D.Get(szName)
 					if tInfo then
 						if tOption.bColor then
 							X.XMLSetNodeData(node, 'r', tInfo.rgb[1])
@@ -500,7 +500,7 @@ function D.RenderXml(szMsg, tOption)
 	end
 	-- szMsg = string.gsub( szMsg, '<text>([^<]-)text='([^<]-)'([^<]-name='namelink_%d-'[^<]-)</text>', function (szExtra1, szName, szExtra2)
 	--     szName = string.gsub(szName, '[%[%]]', '')
-	--     local tInfo = D.GetAusName(szName)
+	--     local tInfo = D.Get(szName)
 	--     if tInfo then
 	--         szExtra1 = string.gsub(szExtra1, '[rgb]=%d+', '')
 	--         szExtra2 = string.gsub(szExtra2, '[rgb]=%d+', '')
@@ -519,7 +519,7 @@ function D.RenderNameLink(hNameLink, tOption)
 	local ui, nNumOffset = X.UI(hNameLink), 0
 	if tOption.bColor or tOption.bInsertIcon then
 		local szName = string.gsub(hNameLink:GetText(), '[%[%]]', '')
-		local tInfo = D.GetAusName(szName)
+		local tInfo = D.Get(szName)
 		if tInfo then
 			if tOption.bColor then
 				ui:Color(tInfo.rgb)
@@ -625,7 +625,7 @@ function D.RegisterGlobalIDHeader(szGlobalID, szHeaderXml)
 end
 
 function D.GetTip(szName)
-	local tInfo = D.GetAusName(szName)
+	local tInfo = D.Get(szName)
 	if tInfo then
 		local tTip = {}
 		-- author info
@@ -961,7 +961,6 @@ function D.Get(xKey)
 		}
 	end
 end
-D.GetAusName = D.Get
 
 ---通过角色ID获取信息
 ---@param dwID number @角色ID
@@ -1251,7 +1250,7 @@ local settings = {
 				ShowTip                = D.ShowTip               ,
 				Get                    = D.Get                   ,
 				GetAusID               = D.GetAusID              ,
-				GetAusName             = D.GetAusName            ,
+				GetAusName             = D.Get                   ,
 				OnPanelActivePartial   = D.OnPanelActivePartial  ,
 			},
 		},
