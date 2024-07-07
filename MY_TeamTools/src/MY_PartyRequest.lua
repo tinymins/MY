@@ -212,7 +212,7 @@ function D.OnLButtonClick()
 			end
 			X.SendBgMsg(info.szName, 'RL', {'ASK'})
 			this:Enable(false)
-			this:Lookup('', 'Text_Lookup'):SetText(_L['loading...'])
+			this:Lookup('', 'Text_Default'):SetText(_L['loading...'])
 			X.OutputSystemMessage(_L['If it is always loading, the target may not install plugin or refuse.'])
 		elseif info.dwID then
 			ViewInviteToPlayer(info.dwID)
