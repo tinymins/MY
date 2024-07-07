@@ -1585,8 +1585,8 @@ function X.GetTargetContextMenu(dwType, szName, dwID)
 			InsertInviteTeamMenu(t, szName)
 		end
 		-- get dwID
-		if not dwID and _G.MY_Farbnamen and _G.MY_Farbnamen.GetAusName then
-			local tInfo = _G.MY_Farbnamen.GetAusName(szName)
+		if not dwID and _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
+			local tInfo = _G.MY_Farbnamen.Get(szName)
 			if tInfo then
 				dwID = tonumber(tInfo.dwID)
 			end
