@@ -107,9 +107,9 @@ local function InitDB()
 	DB:Execute('CREATE UNIQUE INDEX IF NOT EXISTS player_info_server_name_u_idx ON PlayerInfo(server, name)')
 	DB:Execute('CREATE INDEX IF NOT EXISTS player_info_guid_idx ON PlayerInfo(guid)')
 	DBP_W  = DB:Prepare('REPLACE INTO PlayerInfo (server, id, name, guid, force, role, level, title, camp, tong, time, times, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-	DBP_RI = DB:Prepare('SELECT id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND id = ?')
-	DBP_RN = DB:Prepare('SELECT id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND name = ?')
-	DBP_RGI = DB:Prepare('SELECT id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE guid = ? ORDER BY time DESC')
+	DBP_RI = DB:Prepare('SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND id = ?')
+	DBP_RN = DB:Prepare('SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND name = ?')
+	DBP_RGI = DB:Prepare('SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE guid = ? ORDER BY time DESC')
 	DB:Execute([[
 		CREATE TABLE IF NOT EXISTS TongInfo (
 			server NVARCHAR(10) NOT NULL,
