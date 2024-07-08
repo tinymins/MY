@@ -101,6 +101,7 @@ function X.GetFellowshipInfo(xPlayerID)
 		local me = X.GetClientPlayer()
 		if me then
 			local aGroupInfo = X.GetFellowshipGroupInfoList()
+			local szCurrentServerName = X.GetServerOriginName()
 			if aGroupInfo then
 				local tCache = {}
 				local bSyncing = false
@@ -110,16 +111,20 @@ function X.GetFellowshipInfo(xPlayerID)
 						if tFellowship.szName then
 							local szName, szServerName = X.DisassemblePlayerGlobalName(tFellowship.szName, true)
 							local szGlobalName = X.AssemblePlayerGlobalName(szName, szServerName)
-							tCache[szName] = tFellowship
+							if szServerName == szCurrentServerName then
+								tCache[szName] = tFellowship
+							end
 							tCache[szGlobalName] = tFellowship
 						else
 							local tPei = X.GetFellowshipEntryInfo(tFellowship.xID)
 							if tPei then
 								local szName, szServerName = X.DisassemblePlayerGlobalName(tPei.szName, true)
 								local szGlobalName = X.AssemblePlayerGlobalName(szName, szServerName)
-								tCache[tPei.dwID] = tFellowship
-								tCache[szName] = tFellowship
+								if szServerName == szCurrentServerName then
+									tCache[szName] = tFellowship
+								end
 								tCache[szGlobalName] = tFellowship
+								tCache[tPei.dwID] = tFellowship
 							else
 								bSyncing = true
 							end
