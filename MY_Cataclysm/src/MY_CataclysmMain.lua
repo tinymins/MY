@@ -523,6 +523,10 @@ function D.CreateControlBar()
 	if X.IsLeader() and EnvokeAllTeammates then
 		container:AppendContentFromIni(szIniFile, 'Wnd_EnvokeAllTeammates')
 	end
+	-- µπº∆ ±
+	if X.IsLeader() and MY_TeamCountdown then
+		container:AppendContentFromIni(szIniFile, 'Wnd_TeamCountdown')
+	end
 	-- ”Ô“Ù∞¥≈•
 	if X.GVoiceBase_IsOpen() then
 		local nSpeakerState = X.GVoiceBase_GetSpeakerState()
@@ -1212,6 +1216,8 @@ function D.OnLButtonClick()
 		end
 	elseif szName == 'WndButton_EnvokeAllTeammates' then
 		EnvokeAllTeammates()
+	elseif szName == 'Wnd_TeamCountdown' then
+		MY_TeamCountdown.Open()
 	elseif szName == 'WndButton_Speaker' then
 		X.GVoiceBase_SwitchSpeakerState()
 	elseif szName == 'WndButton_Microphone' then
@@ -1270,7 +1276,8 @@ function D.OnMouseEnter()
 	or name == 'WndButton_LootQuality'
 	or name == 'Wnd_TeamTools'
 	or name == 'Wnd_TeamNotice'
-	or name == 'Wnd_TeamMon_Subscribe' then
+	or name == 'Wnd_TeamMon_Subscribe'
+	or name == 'Wnd_TeamCountdown' then
 		this:SetAlpha(255)
 	end
 	if name == 'WndButton_GKP' then
@@ -1283,6 +1290,8 @@ function D.OnMouseEnter()
 		X.OutputTip(this, _L['MY_TeamMon_Subscribe'])
 	elseif name == 'WndButton_EnvokeAllTeammates' then
 		X.OutputTip(this, _L['EnvokeAllTeammates'])
+	elseif name == 'Wnd_TeamCountdown' then
+		X.OutputTip(this, _L['TeamCountdown'])
 	elseif name == 'WndButton_Speaker' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
@@ -1302,7 +1311,8 @@ function D.OnMouseLeave()
 	or name == 'WndButton_LootQuality'
 	or name == 'Wnd_TeamTools'
 	or name == 'Wnd_TeamNotice'
-	or name == 'Wnd_TeamMon_Subscribe' then
+	or name == 'Wnd_TeamMon_Subscribe'
+	or name == 'Wnd_TeamCountdown' then
 		this:SetAlpha(220)
 		X.HideTip()
 	end

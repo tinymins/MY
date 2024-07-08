@@ -98,6 +98,7 @@ return {
 	['MY_TeamMon_Subscribe'] = '团队监控导入数据',
 	['Please install and load MY_TeamMon addon first.'] = '未检测到团队监控插件，请先返回角色选择界面进入插件管理界面，安装并加载茗伊团队监控子插件。',
 	['EnvokeAllTeammates'] = '召请队友前往',
+	['TeamCountdown'] = '发起团队倒计时',
 	['You are not the distrubutor.'] = '你不是分配者。',
 	['Official team frame style'] = '官方样式',
 	['Cataclysm team frame style'] = 'Cataclysm样式',
