@@ -42,15 +42,15 @@ local function InitDB()
 		X.OutputSystemMessage(_L['MY_PlayerRemark'], szMsg, X.CONSTANT.MSG_THEME.ERROR)
 		return false
 	end
-	DB:Execute([[
+	X.SQLiteExecute(DB, [[
 		CREATE TABLE IF NOT EXISTS Info (
 			key NVARCHAR(128) NOT NULL,
 			value NVARCHAR(4096) NOT NULL,
 			PRIMARY KEY (key)
 		)
 	]])
-	DB:Execute([[INSERT INTO Info (key, value) VALUES ('version', '3')]])
-	DB:Execute([[
+	X.SQLiteExecute(DB, [[INSERT INTO Info (key, value) VALUES ('version', '3')]])
+	X.SQLiteExecute(DB, [[
 		CREATE TABLE IF NOT EXISTS PlayerRemark (
 			server NVARCHAR(10) NOT NULL,
 			id INTEGER NOT NULL,
@@ -61,15 +61,15 @@ local function InitDB()
 			PRIMARY KEY (server, id)
 		)
 	]])
-	DB:Execute('CREATE UNIQUE INDEX IF NOT EXISTS player_info_server_name_u_idx ON PlayerRemark(server, name)')
-	DB:Execute('CREATE INDEX IF NOT EXISTS player_info_guid_idx ON PlayerRemark(guid)')
-	DBP_W = DB:Prepare('REPLACE INTO PlayerRemark (server, id, name, guid, remark, extra) VALUES (?, ?, ?, ?, ?, ?)')
-	DBP_DN = DB:Prepare('DELETE FROM PlayerRemark WHERE server = ? AND name = ?')
-	DBP_DG = DB:Prepare('DELETE FROM PlayerRemark WHERE guid = ?')
-	DBP_R = DB:Prepare('SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark')
-	DBP_RI = DB:Prepare('SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE server = ? AND id = ?')
-	DBP_RN = DB:Prepare('SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE server = ? AND name = ?')
-	DBP_RGI = DB:Prepare('SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE guid = ?')
+	X.SQLiteExecute(DB, 'CREATE UNIQUE INDEX IF NOT EXISTS player_info_server_name_u_idx ON PlayerRemark(server, name)')
+	X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS player_info_guid_idx ON PlayerRemark(guid)')
+	DBP_W = X.SQLitePrepare(DB, 'REPLACE INTO PlayerRemark (server, id, name, guid, remark, extra) VALUES (?, ?, ?, ?, ?, ?)')
+	DBP_DN = X.SQLitePrepare(DB, 'DELETE FROM PlayerRemark WHERE server = ? AND name = ?')
+	DBP_DG = X.SQLitePrepare(DB, 'DELETE FROM PlayerRemark WHERE guid = ?')
+	DBP_R = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark')
+	DBP_RI = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE server = ? AND id = ?')
+	DBP_RN = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE server = ? AND name = ?')
+	DBP_RGI = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE guid = ?')
 
 	return true
 end
@@ -98,8 +98,8 @@ function D.Migrate()
 		local data = X.LoadLUAData(szFilePath)
 		if data then
 			for _, v in pairs(data.data or {}) do
-				DBP_W:ClearBindings()
-				DBP_W:BindAll(
+				X.SQLitePrepareExecute(
+					DBP_W,
 					AnsiToUTF8(szServerName),
 					v.dwID,
 					AnsiToUTF8(v.szName),
@@ -110,7 +110,6 @@ function D.Migrate()
 						bAlertWhenGroup = v.bAlertWhenGroup,
 					})
 				)
-				DBP_W:Execute()
 			end
 		end
 		-- CPath.Move(szFilePath, szFilePath .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
@@ -122,10 +121,7 @@ function D.GetAll()
 	if not InitDB() then
 		return
 	end
-	DBP_R:ClearBindings()
-	local aInfo = X.ConvertToANSI((DBP_R:GetAll()))
-	DBP_R:Reset()
-	return aInfo
+	return X.SQLitePrepareGetAllANSI(DBP_R)
 end
 
 ---通过角色、ID或角色唯一ID获取信息，获取角色的记录
@@ -138,22 +134,13 @@ function D.Get(xKey)
 	local tInfo
 	if X.IsNumber(xKey) then
 		local szServer = X.GetServerOriginName()
-		DBP_RI:ClearBindings()
-		DBP_RI:BindAll(AnsiToUTF8(szServer), xKey)
-		tInfo = X.ConvertToANSI((DBP_RI:GetNext()))
-		DBP_RI:Reset()
+		tInfo = X.SQLitePrepareGetOneANSI(DBP_RI, szServer, xKey)
 	elseif X.IsGlobalID(xKey) then
-		DBP_RGI:ClearBindings()
-		DBP_RGI:BindAll(AnsiToUTF8(xKey))
-		tInfo = X.ConvertToANSI((DBP_RGI:GetNext()))
-		DBP_RGI:Reset()
+		tInfo = X.SQLitePrepareGetOneANSI(DBP_RGI, xKey)
 	elseif X.IsString(xKey) then
 		local szName, szServer = X.DisassemblePlayerGlobalName(xKey, true)
 		xKey = X.AssemblePlayerGlobalName(szName, szServer)
-		DBP_RN:ClearBindings()
-		DBP_RN:BindAll(AnsiToUTF8(szServer), AnsiToUTF8(szName))
-		tInfo = X.ConvertToANSI((DBP_RN:GetNext()))
-		DBP_RN:Reset()
+		tInfo = X.SQLitePrepareGetOneANSI(DBP_RN, szServer, szName)
 	end
 	if tInfo then
 		local tExtra = X.DecodeLUAData(tInfo.szExtra) or {}
@@ -166,38 +153,28 @@ end
 
 -- 设置一个玩家的记录
 function D.Set(szServerName, dwID, szName, szGlobalID, szRemark, bTipWhenGroup, bAlertWhenGroup)
-	DBP_W:ClearBindings()
-	DBP_W:BindAll(
-		AnsiToUTF8(szServerName),
+	X.SQLitePrepareExecuteANSI(
+		DBP_W,
+		szServerName,
 		dwID,
-		AnsiToUTF8(szName),
-		AnsiToUTF8(szGlobalID),
-		AnsiToUTF8(szRemark),
+		szName,
+		szGlobalID,
+		szRemark,
 		X.EncodeLUAData({
 			bTipWhenGroup = bTipWhenGroup,
 			bAlertWhenGroup = bAlertWhenGroup,
 		})
 	)
-	DBP_W:Execute()
 	FireUIEvent('MY_PLAYER_REMARK_UPDATE')
 end
 
 ---删除一个玩家的记录
 function D.Delete(szServerName, szName, szGlobalID)
 	if szServerName and szName then
-		DBP_DN:ClearBindings()
-		DBP_DN:BindAll(
-			AnsiToUTF8(szServerName),
-			AnsiToUTF8(szName)
-		)
-		DBP_DN:Execute()
+		X.SQLitePrepareExecuteANSI(DBP_DN, szServerName, szName)
 	end
 	if szGlobalID then
-		DBP_DG:ClearBindings()
-		DBP_DG:BindAll(
-			AnsiToUTF8(szGlobalID)
-		)
-		DBP_DG:Execute()
+		X.SQLitePrepareExecuteANSI(DBP_DG, szGlobalID)
 	end
 	FireUIEvent('MY_PLAYER_REMARK_UPDATE')
 end
