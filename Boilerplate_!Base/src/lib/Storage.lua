@@ -214,10 +214,6 @@ function X.OpenFolder(szPath)
 	end
 end
 
-function X.IsURL(szURL)
-	return szURL:sub(1, 8):lower() == 'https://' or szURL:gsub(1, 7):lower() == 'http://'
-end
-
 -- 插件数据存储默认密钥
 local GetLUADataPathPassphrase
 do
