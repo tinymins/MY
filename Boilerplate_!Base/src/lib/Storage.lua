@@ -1568,6 +1568,32 @@ function X.SQLiteDisconnect(db)
 	db:Release()
 end
 
+function X.SQLiteExecute(db, szSQL)
+	return db:Execute(szSQL)
+end
+
+function X.SQLitePrepareExecute(p, ...)
+	p:ClearBindings()
+	p:BindAll(...)
+	p:Execute()
+end
+
+function X.SQLitePrepareGetOne(p, ...)
+	p:ClearBindings()
+	p:BindAll(...)
+	local data = p:GetNext()
+	p:Reset()
+	return data
+end
+
+function X.SQLitePrepareGetAll(p, ...)
+	p:ClearBindings()
+	p:BindAll(...)
+	local data = p:GetAll()
+	p:Reset()
+	return data
+end
+
 ------------------------------------------------------------------------------
 -- 基于 SQLite 的 NoSQLite 封装
 ------------------------------------------------------------------------------
