@@ -199,12 +199,50 @@ function X.SQLitePrepareGetOne(stmt, ...)
 	return data
 end
 
-function X.SQLitePrepareGetAll(p, ...)
-	p:ClearBindings()
-	p:BindAll(...)
-	local data = p:GetAll()
-	p:Reset()
+function X.SQLitePrepareGetAll(stmt, ...)
+	stmt:ClearBindings()
+	stmt:BindAll(...)
+	local data = stmt:GetAll()
+	stmt:Reset()
 	return data
+end
+
+function X.SQLiteExecuteANSI(db, szSQL, ...)
+	local szSQL = X.ConvertToUTF8(szSQL)
+	local aParams = X.ConvertToUTF8({...})
+	return X.ConvertToAnsi(X.SQLiteExecute(db, szSQL, X.Unpack(aParams)))
+end
+
+function X.SQLiteGetOneANSI(db, szSQL, ...)
+	local szSQL = X.ConvertToUTF8(szSQL)
+	local aParams = X.ConvertToUTF8({...})
+	return X.ConvertToAnsi(X.SQLiteGetOne(db, szSQL, X.Unpack(aParams)))
+end
+
+function X.SQLiteGetAllANSI(db, szSQL, ...)
+	local szSQL = X.ConvertToUTF8(szSQL)
+	local aParams = X.ConvertToUTF8({...})
+	return X.ConvertToAnsi(X.SQLiteGetAll(db, szSQL, X.Unpack(aParams)))
+end
+
+function X.SQLitePrepareANSI(db, szPrepareSQL)
+	local szPrepareSQL = X.ConvertToUTF8(szPrepareSQL)
+	return X.ConvertToAnsi(X.SQLitePrepare(db, szPrepareSQL))
+end
+
+function X.SQLitePrepareExecuteANSI(stmt, ...)
+	local aParams = X.ConvertToUTF8({...})
+	return X.ConvertToAnsi(X.SQLitePrepareExecute(stmt, X.Unpack(aParams)))
+end
+
+function X.SQLitePrepareGetOneANSI(stmt, ...)
+	local aParams = X.ConvertToUTF8({...})
+	return X.ConvertToAnsi(X.SQLitePrepareGetOne(stmt, X.Unpack(aParams)))
+end
+
+function X.SQLitePrepareGetAllANSI(stmt, ...)
+	local aParams = X.ConvertToUTF8({...})
+	return X.ConvertToAnsi(X.SQLitePrepareGetAll(stmt, X.Unpack(aParams)))
 end
 
 ------------------------------------------------------------------------------
