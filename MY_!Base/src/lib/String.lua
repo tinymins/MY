@@ -331,14 +331,14 @@ local function ConvertToUTF8(data)
 end
 X.ConvertToUTF8 = ConvertToUTF8
 
-local function ConvertToAnsi(data)
+local function ConvertToANSI(data)
 	if type(data) == 'table' then
 		local t = {}
 		for k, v in pairs(data) do
 			if type(k) == 'string' then
-				t[ConvertToAnsi(k)] = ConvertToAnsi(v)
+				t[ConvertToANSI(k)] = ConvertToANSI(v)
 			else
-				t[k] = ConvertToAnsi(v)
+				t[k] = ConvertToANSI(v)
 			end
 		end
 		return t
@@ -348,7 +348,7 @@ local function ConvertToAnsi(data)
 		return data
 	end
 end
-X.ConvertToAnsi = ConvertToAnsi
+X.ConvertToANSI = ConvertToANSI
 
 local m_simpleMatchCache = setmetatable({}, { __mode = 'v' })
 function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgnoreSpace)
