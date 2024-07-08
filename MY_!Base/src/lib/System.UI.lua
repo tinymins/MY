@@ -59,6 +59,16 @@ function X.GetOriginUIScale()
 	return GetUserPreferences(3775, 'c') / 100 -- TODO: 不同步设置就GG了 要通过实时数值反向计算 缺少API
 end
 
+function X.OpenFolder(szPath)
+	local OpenFolder = X.GetGameAPI('OpenFolder')
+	if X.IsFunction(OpenFolder) then
+		OpenFolder(szPath)
+	else
+		X.SafeCall(SetDataToClip, szPath)
+		X.UI.OpenTextEditor(szPath)
+	end
+end
+
 -- X.OpenBrowser(szAddr, 'auto')
 -- X.OpenBrowser(szAddr, 'outer')
 -- X.OpenBrowser(szAddr, 'inner')

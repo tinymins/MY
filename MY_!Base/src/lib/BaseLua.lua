@@ -370,6 +370,13 @@ function X.IsGlobalID(var)
 		or false
 end
 
+-- 判断数据是否为URL
+---@param var any @需要判断的数据
+---@return boolean @是否为URL
+function X.IsURL(var)
+	return X.IsString(var) and var:sub(1, 8):lower() == 'https://' or var:gsub(1, 7):lower() == 'http://'
+end
+
 -- 表数据设为只读
 ---@generic T
 ---@param t T 想要设为只读的表
