@@ -307,24 +307,6 @@ function X.CopyChatLine(hTime, bTextEditor, bRichText)
 	Station.SetFocusWindow(edit)
 end
 
--- 聊天界面元素通用事件查看角色装备标记位
-local PEEK_PLAYER = {}
-X.RegisterEvent('PEEK_OTHER_PLAYER', function()
-	if not PEEK_PLAYER[arg1] then
-		return
-	end
-	if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.INVALID then
-		OutputMessage('MSG_ANNOUNCE_RED', _L['Invalid player ID!'])
-	elseif arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.FAILED then
-		OutputMessage('MSG_ANNOUNCE_RED', _L['Peek other player failed!'])
-	elseif arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.CAN_NOT_FIND_PLAYER then
-		OutputMessage('MSG_ANNOUNCE_RED', _L['Can not find player to peek!'])
-	elseif arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.TOO_FAR then
-		OutputMessage('MSG_ANNOUNCE_RED', _L['Player is too far to peek!'])
-	end
-	PEEK_PLAYER[arg1] = nil
-end)
-
 -- 聊天界面元素通用事件绑定函数
 local ChatLinkEvents = {
 	OnNameLClick = function(element, link)
@@ -343,12 +325,22 @@ local ChatLinkEvents = {
 			if _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
 				local info = _G.MY_Farbnamen.Get((X.UI(link):Text():gsub('[%[%]]', '')))
 				if info then
-					PEEK_PLAYER[info.dwID] = true
 					local dwServerID = info.szServerName and X.GetServerIDByName(info.szServerName)
+					local function OnPeekOtherPlayerResult(xKey, eState)
+						if eState == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.INVALID then
+							OutputMessage('MSG_ANNOUNCE_RED', _L['Invalid player ID!'])
+						elseif eState == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.FAILED then
+							OutputMessage('MSG_ANNOUNCE_RED', _L['Peek other player failed!'])
+						elseif eState == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.CAN_NOT_FIND_PLAYER then
+							OutputMessage('MSG_ANNOUNCE_RED', _L['Can not find player to peek!'])
+						elseif eState == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.TOO_FAR then
+							OutputMessage('MSG_ANNOUNCE_RED', _L['Player is too far to peek!'])
+						end
+					end
 					if info.szGlobalID and dwServerID then
-						ViewInviteToPlayer(nil, nil, dwServerID, info.szGlobalID)
+						X.PeekOtherPlayerByGlobalID(dwServerID, info.szGlobalID, OnPeekOtherPlayerResult)
 					elseif info.dwID then
-						ViewInviteToPlayer(info.dwID)
+						X.PeekOtherPlayerByID(info.dwID, OnPeekOtherPlayerResult)
 					end
 				end
 			end
