@@ -1627,7 +1627,7 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 			return
 		end
 		szGlobalID = X.GetPlayerGlobalID(dwTalkerID)
-		if not szGlobalID or szGlobalID == '' or szGlobalID == '0' then
+		if not X.IsGlobalID(szGlobalID) then
 			return
 		end
 	end
