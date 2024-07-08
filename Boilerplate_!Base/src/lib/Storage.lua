@@ -1568,25 +1568,38 @@ function X.SQLiteDisconnect(db)
 	db:Release()
 end
 
-function X.SQLiteExecute(db, szSQL)
-	return db:Execute(szSQL)
+function X.SQLiteExecute(db, szSQL, ...)
+	if select('#', ...) == 0 then
+		return db:Execute(szSQL)
+	end
+	return X.SQLitePrepareExecute(X.SQLitePrepare(db, szSQL), ...)
+end
+
+function X.SQLiteGetOne(db, szSQL, ...)
+	local stmt = X.SQLitePrepare(db, szSQL)
+	return X.SQLitePrepareGetOne(stmt, ...)
+end
+
+function X.SQLiteGetAll(db, szSQL, ...)
+	local stmt = X.SQLitePrepare(db, szSQL)
+	return X.SQLitePrepareGetAll(stmt, ...)
 end
 
 function X.SQLitePrepare(db, szPrepareSQL)
 	return db:Prepare(szPrepareSQL)
 end
 
-function X.SQLitePrepareExecute(p, ...)
-	p:ClearBindings()
-	p:BindAll(...)
-	p:Execute()
+function X.SQLitePrepareExecute(stmt, ...)
+	stmt:ClearBindings()
+	stmt:BindAll(...)
+	stmt:Execute()
 end
 
-function X.SQLitePrepareGetOne(p, ...)
-	p:ClearBindings()
-	p:BindAll(...)
-	local data = p:GetNext()
-	p:Reset()
+function X.SQLitePrepareGetOne(stmt, ...)
+	stmt:ClearBindings()
+	stmt:BindAll(...)
+	local data = stmt:GetNext()
+	stmt:Reset()
 	return data
 end
 
