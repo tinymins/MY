@@ -242,7 +242,7 @@ function D.Fetch(szName, fnAction)
 	end
 	local szNameU = AnsiToUTF8(szName)
 	local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
-	local qs = X.ConvertToAnsi(X.SignPostData(X.ConvertToUTF8(
+	local qs = X.ConvertToANSI(X.SignPostData(X.ConvertToUTF8(
 		{
 			l = X.ENVIRONMENT.GAME_LANG,
 			L = X.ENVIRONMENT.GAME_EDITION,

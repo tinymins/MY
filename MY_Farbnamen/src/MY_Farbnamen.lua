@@ -739,7 +739,7 @@ function D.GetPlayerInfo(xKey)
 			local szServer = X.GetServerOriginName()
 			DBP_RI:ClearBindings()
 			DBP_RI:BindAll(AnsiToUTF8(szServer), xKey)
-			tPlayer = X.ConvertToAnsi((DBP_RI:GetNext()))
+			tPlayer = X.ConvertToANSI((DBP_RI:GetNext()))
 			DBP_RI:Reset()
 		end
 	elseif X.IsGlobalID(xKey) then
@@ -747,7 +747,7 @@ function D.GetPlayerInfo(xKey)
 		if not tPlayer and InitDB() then
 			DBP_RGI:ClearBindings()
 			DBP_RGI:BindAll(AnsiToUTF8(xKey))
-			tPlayer = X.ConvertToAnsi((DBP_RGI:GetNext()))
+			tPlayer = X.ConvertToANSI((DBP_RGI:GetNext()))
 			DBP_RGI:Reset()
 		end
 	elseif X.IsString(xKey) then
@@ -757,7 +757,7 @@ function D.GetPlayerInfo(xKey)
 		if not tPlayer and InitDB() then
 			DBP_RN:ClearBindings()
 			DBP_RN:BindAll(AnsiToUTF8(szServer), AnsiToUTF8(szName))
-			tPlayer = X.ConvertToAnsi((DBP_RN:GetNext()))
+			tPlayer = X.ConvertToANSI((DBP_RN:GetNext()))
 			DBP_RN:Reset()
 		end
 	end
@@ -789,7 +789,7 @@ function D.GetTongInfo(szServerName, dwTongID)
 	if not tTong and InitDB() then
 		DBT_RI:ClearBindings()
 		DBT_RI:BindAll(X.ConvertToUTF8(szServerName), dwTongID)
-		tTong = X.ConvertToAnsi((DBT_RI:GetNext()))
+		tTong = X.ConvertToANSI((DBT_RI:GetNext()))
 		DBT_RI:Reset()
 	end
 	-- ¸üÐÂÄÚ´æ»º´æ

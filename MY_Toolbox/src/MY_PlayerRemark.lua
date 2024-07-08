@@ -123,7 +123,7 @@ function D.GetAll()
 		return
 	end
 	DBP_R:ClearBindings()
-	local aInfo = X.ConvertToAnsi((DBP_R:GetAll()))
+	local aInfo = X.ConvertToANSI((DBP_R:GetAll()))
 	DBP_R:Reset()
 	return aInfo
 end
@@ -140,19 +140,19 @@ function D.Get(xKey)
 		local szServer = X.GetServerOriginName()
 		DBP_RI:ClearBindings()
 		DBP_RI:BindAll(AnsiToUTF8(szServer), xKey)
-		tInfo = X.ConvertToAnsi((DBP_RI:GetNext()))
+		tInfo = X.ConvertToANSI((DBP_RI:GetNext()))
 		DBP_RI:Reset()
 	elseif X.IsGlobalID(xKey) then
 		DBP_RGI:ClearBindings()
 		DBP_RGI:BindAll(AnsiToUTF8(xKey))
-		tInfo = X.ConvertToAnsi((DBP_RGI:GetNext()))
+		tInfo = X.ConvertToANSI((DBP_RGI:GetNext()))
 		DBP_RGI:Reset()
 	elseif X.IsString(xKey) then
 		local szName, szServer = X.DisassemblePlayerGlobalName(xKey, true)
 		xKey = X.AssemblePlayerGlobalName(szName, szServer)
 		DBP_RN:ClearBindings()
 		DBP_RN:BindAll(AnsiToUTF8(szServer), AnsiToUTF8(szName))
-		tInfo = X.ConvertToAnsi((DBP_RN:GetNext()))
+		tInfo = X.ConvertToANSI((DBP_RN:GetNext()))
 		DBP_RN:Reset()
 	end
 	if tInfo then

@@ -396,7 +396,7 @@ function D.FetchSubscribeItem(szURL)
 					return
 				end
 				--[[#DEBUG BEGIN]]
-				X.OutputDebugMessage(_L['MY_TeamMon_Subscribe_Data'], 'ERROR Get MetaInfo: ' .. X.EncodeLUAData(status) .. '\n' .. (X.ConvertToAnsi(html) or ''), X.DEBUG_LEVEL.WARNING)
+				X.OutputDebugMessage(_L['MY_TeamMon_Subscribe_Data'], 'ERROR Get MetaInfo: ' .. X.EncodeLUAData(status) .. '\n' .. (X.ConvertToANSI(html) or ''), X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 				reject(X.Error:new(_L['ERR: Get MetaInfo failed!']))
 			end,

@@ -179,19 +179,19 @@ function D.Get(xKey)
 		local szServer = X.GetServerOriginName()
 		DBP_RI:ClearBindings()
 		DBP_RI:BindAll(AnsiToUTF8(szServer), xKey)
-		tMemo = X.ConvertToAnsi((DBP_RI:GetNext()))
+		tMemo = X.ConvertToANSI((DBP_RI:GetNext()))
 		DBP_RI:Reset()
 	elseif X.IsGlobalID(xKey) then
 		DBP_RGI:ClearBindings()
 		DBP_RGI:BindAll(AnsiToUTF8(xKey))
-		tMemo = X.ConvertToAnsi((DBP_RGI:GetNext()))
+		tMemo = X.ConvertToANSI((DBP_RGI:GetNext()))
 		DBP_RGI:Reset()
 	elseif X.IsString(xKey) then
 		local szName, szServer = ExtractNameServer(xKey, true)
 		xKey = CombineNameServer(szName, szServer)
 		DBP_RN:ClearBindings()
 		DBP_RN:BindAll(AnsiToUTF8(szServer), AnsiToUTF8(szName))
-		tMemo = X.ConvertToAnsi((DBP_RN:GetNext()))
+		tMemo = X.ConvertToANSI((DBP_RN:GetNext()))
 		DBP_RN:Reset()
 	end
 	if tMemo then

@@ -729,7 +729,7 @@ function D.Migration()
 			if IsLocalFileExist(DB_V2_PATH) then
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
 				if DB_V2 then
-					local aTaskInfo = X.ConvertToAnsi(DB_V2:Execute('SELECT * FROM TaskInfo WHERE guid IS NOT NULL AND name IS NOT NULL'))
+					local aTaskInfo = X.ConvertToANSI(DB_V2:Execute('SELECT * FROM TaskInfo WHERE guid IS NOT NULL AND name IS NOT NULL'))
 					if aTaskInfo then
 						for _, rec in ipairs(aTaskInfo) do
 							if not data[rec.guid] or data[rec.guid].time <= rec.time then
@@ -757,7 +757,7 @@ function D.Migration()
 			if IsLocalFileExist(DB_V3_PATH) then
 				local DB_V3 = SQLite3_Open(DB_V3_PATH)
 				if DB_V3 then
-					local aTaskInfo = X.ConvertToAnsi(DB_V3:Execute('SELECT * FROM TaskInfo WHERE guid IS NOT NULL AND name IS NOT NULL'))
+					local aTaskInfo = X.ConvertToANSI(DB_V3:Execute('SELECT * FROM TaskInfo WHERE guid IS NOT NULL AND name IS NOT NULL'))
 					if aTaskInfo then
 						for _, rec in ipairs(aTaskInfo) do
 							if not data[rec.guid] or data[rec.guid].time <= rec.time then
