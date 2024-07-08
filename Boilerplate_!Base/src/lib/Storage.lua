@@ -1572,6 +1572,10 @@ function X.SQLiteExecute(db, szSQL)
 	return db:Execute(szSQL)
 end
 
+function X.SQLitePrepare(db, szPrepareSQL)
+	return db:Prepare(szPrepareSQL)
+end
+
 function X.SQLitePrepareExecute(p, ...)
 	p:ClearBindings()
 	p:BindAll(...)
