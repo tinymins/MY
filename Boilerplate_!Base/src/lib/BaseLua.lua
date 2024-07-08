@@ -310,6 +310,13 @@ function X.IsNumber(var)
 	return type(var) == 'number'
 end
 
+-- 判断数据是否为正数
+---@param var any @需要判断的数据
+---@return boolean @是否为正数
+function X.IsPositiveNumber(var)
+	return X.IsNumber(var) and var > 0
+end
+
 -- 判断数据是否为字符串
 ---@param var any @需要判断的数据
 ---@return boolean @是否为字符串
@@ -351,6 +358,15 @@ end
 function X.IsElement(var)
 	return type(var) == 'table' and var.IsValid
 		and var:IsValid()
+		or false
+end
+
+-- 判断数据是否为角色唯一ID
+---@param var any @需要判断的数据
+---@return boolean @是否为角色唯一ID
+function X.IsGlobalID(var)
+	return X.IsString(var) and var ~= '' and var ~= '0' and string.find(var, '^[0-9]+$')
+		and true
 		or false
 end
 
