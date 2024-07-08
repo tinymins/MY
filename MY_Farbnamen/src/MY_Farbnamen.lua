@@ -60,18 +60,6 @@ local GUID_HEADER_XML = {}
 local DB_ERR_COUNT, DB_MAX_ERR_COUNT = 0, 5
 local DB, DBP_W, DBP_RI, DBP_RN, DBP_RGI, DBT_W, DBT_RI
 
-local function IsGlobalID(szGlobalID)
-	return szGlobalID and szGlobalID ~= '' and szGlobalID ~= '0'
-end
-
-local function IsPositiveNumber(nNumber)
-	return nNumber and nNumber > 0
-end
-
-local function IsNonEmptyString(szString)
-	return szString and szString ~= ''
-end
-
 local function InitDB()
 	if DB then
 		return true
@@ -253,7 +241,7 @@ function D.Import(aFilePath, bTimes)
 											rec.id,
 											ProcessString(rec.name),
 											X.IIf(
-												IsGlobalID(rec.guid),
+												X.IsGlobalID(rec.guid),
 												ProcessString(rec.guid),
 												data and data.guid or ''
 											),
@@ -261,13 +249,13 @@ function D.Import(aFilePath, bTimes)
 											rec.role or -1,
 											rec.level or -1,
 											X.IIf(
-												IsNonEmptyString(rec.title),
+												not X.IsEmpty(rec.title),
 												ProcessString(rec.title),
 												data and data.title or ''
 											),
 											rec.camp or -1,
 											X.IIf(
-												IsPositiveNumber(rec.tong),
+												X.IsPositiveNumber(rec.tong),
 												rec.tong,
 												data and data.tong or -1
 											),
@@ -340,7 +328,7 @@ function D.Import(aFilePath, bTimes)
 										rec.id,
 										rec.name,
 										X.IIf(
-											IsGlobalID(rec.guid),
+											X.IsGlobalID(rec.guid),
 											rec.guid,
 											data and data.guid or ''
 										),
@@ -348,13 +336,13 @@ function D.Import(aFilePath, bTimes)
 										rec.role or -1,
 										rec.level or -1,
 										X.IIf(
-											IsNonEmptyString(rec.title),
+											not X.IsEmpty(rec.title),
 											rec.title,
 											data and data.title or ''
 										),
 										rec.camp or -1,
 										X.IIf(
-											IsPositiveNumber(rec.tong),
+											X.IsPositiveNumber(rec.tong),
 											rec.tong,
 											data and data.tong or -1
 										),
@@ -754,7 +742,7 @@ function D.GetPlayerInfo(xKey)
 			tPlayer = X.ConvertToAnsi((DBP_RI:GetNext()))
 			DBP_RI:Reset()
 		end
-	elseif X.IsString(xKey) and string.find(xKey, '^[0-9]+$') then
+	elseif X.IsGlobalID(xKey) then
 		tPlayer = PLAYER_INFO[xKey]
 		if not tPlayer and InitDB() then
 			DBP_RGI:ClearBindings()
@@ -781,7 +769,7 @@ function D.GetPlayerInfo(xKey)
 		if tPlayer.name and tPlayer.server then
 			PLAYER_INFO[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = tPlayer
 		end
-		if IsGlobalID(tPlayer.guid) then
+		if X.IsGlobalID(tPlayer.guid) then
 			PLAYER_INFO[tPlayer.guid] = tPlayer
 		end
 	end
@@ -836,7 +824,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	end
 	-- 更新角色信息缓存
 	local tPlayer
-	if IsGlobalID(szGlobalID) then
+	if X.IsGlobalID(szGlobalID) then
 		tPlayer = D.GetPlayerInfo(szGlobalID)
 	end
 	if not tPlayer then
@@ -848,7 +836,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	tPlayer.id = X.IIf(IsRemotePlayer(dwID), tPlayer.id, dwID)
 	tPlayer.remoteID = X.IIf(IsRemotePlayer(dwID), dwID, nil)
 	tPlayer.name = szName
-	tPlayer.guid = IsGlobalID(szGlobalID) and szGlobalID or tPlayer.guid or ''
+	tPlayer.guid = X.IsGlobalID(szGlobalID) and szGlobalID or tPlayer.guid or ''
 	tPlayer.force = dwForceID or tPlayer.force or -1
 	tPlayer.role = nRoleType or tPlayer.role or -1
 	tPlayer.level = nLevel or tPlayer.level or -1
@@ -858,7 +846,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	tPlayer.extra = tPlayer.extra or ''
 	tPlayer.time = bTimes and GetCurrentTime() or tPlayer.time or 0
 	tPlayer.times = (tPlayer.times or 0) + (bTimes and 1 or 0)
-	if IsGlobalID(tPlayer.guid) then
+	if X.IsGlobalID(tPlayer.guid) then
 		PLAYER_INFO[tPlayer.guid] = tPlayer
 	end
 	if tPlayer.remoteID then

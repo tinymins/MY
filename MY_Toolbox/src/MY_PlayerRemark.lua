@@ -24,10 +24,6 @@ local D = {}
 local DB_ERR_COUNT, DB_MAX_ERR_COUNT = 0, 5
 local DB, DBP_W, DBP_DN, DBP_DG, DBP_R, DBP_RI, DBP_RN, DBP_RGI
 
-local function IsGlobalID(szGlobalID)
-	return szGlobalID and szGlobalID ~= '' and szGlobalID ~= '0'
-end
-
 local function InitDB()
 	if DB then
 		return true
@@ -146,7 +142,7 @@ function D.Get(xKey)
 		DBP_RI:BindAll(AnsiToUTF8(szServer), xKey)
 		tInfo = X.ConvertToAnsi((DBP_RI:GetNext()))
 		DBP_RI:Reset()
-	elseif X.IsString(xKey) and string.find(xKey, '^[0-9]+$') then
+	elseif X.IsGlobalID(xKey) then
 		DBP_RGI:ClearBindings()
 		DBP_RGI:BindAll(AnsiToUTF8(xKey))
 		tInfo = X.ConvertToAnsi((DBP_RGI:GetNext()))
@@ -255,7 +251,7 @@ function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 	local szRemark, bTipWhenGroup, bAlertWhenGroup = '', false, false
 	do
 		local tInfo
-		if not tInfo and IsGlobalID(szGlobalID) then
+		if not tInfo and X.IsGlobalID(szGlobalID) then
 			tInfo = D.Get(szGlobalID)
 		end
 		if not tInfo then
