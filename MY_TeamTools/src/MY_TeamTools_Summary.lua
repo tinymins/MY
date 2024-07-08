@@ -145,14 +145,14 @@ function D.OpenOtherCharacterPanel(page, dwID, dwServerID, szGlobalID)
 			return
 		end
 		page.tViewInvite[dwID] = true
-		ViewInviteToPlayer(dwID)
+		X.ViewOtherPlayerByID(dwID)
 	end
 	if dwServerID and szGlobalID then
 		if szGlobalID == me.GetGlobalID() then
 			return
 		end
 		page.tViewInvite[szGlobalID] = dwServerID
-		ViewInviteToPlayer(nil, nil, dwServerID, szGlobalID)
+		X.ViewOtherPlayerByGlobalID(dwServerID, szGlobalID)
 	end
 end
 
@@ -699,9 +699,9 @@ function D.GetEquipCache(page, KPlayer)
 	else
 		local xID = next(page.tViewInvite)
 		if X.IsNumber(xID) then
-			ViewInviteToPlayer(xID, true)
+			X.PeekOtherPlayerByID(xID)
 		elseif X.IsString(xID) then
-			ViewInviteToPlayer(nil, true, page.tViewInvite[xID], xID)
+			X.PeekOtherPlayerByGlobalID(page.tViewInvite[xID], xID)
 		end
 	end
 end
@@ -709,10 +709,10 @@ end
 function D.ApplyRemotePlayerView(page, dwID, dwServerID, szGlobalID)
 	if dwID and not page.tViewInvite[dwID] then
 		page.tViewInvite[dwID] = true
-		ViewInviteToPlayer(dwID, true)
+		X.PeekOtherPlayerByID(dwID)
 	elseif dwServerID and szGlobalID then
 		page.tViewInvite[szGlobalID] = dwServerID
-		ViewInviteToPlayer(nil, true, dwServerID, szGlobalID)
+		X.PeekOtherPlayerByGlobalID(dwServerID, szGlobalID)
 	end
 end
 

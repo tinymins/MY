@@ -21,7 +21,6 @@ end
 --------------------------------------------------------------------------
 local D = {}
 local PR_INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_RoomRequest.ini'
-local PR_EQUIP_REQUEST = {}
 local PR_ROOM_REQUEST = {}
 
 local O = X.CreateUserSettingsModule('MY_RoomRequest', _L['Raid'], {
@@ -193,14 +192,14 @@ function D.OnLButtonClick()
 			this:Lookup('', 'Text_Default'):SetText(_L['loading...'])
 			X.OutputSystemMessage(_L['If it is always loading, the target may not install plugin or refuse.'])
 		elseif info.szGlobalID then
-			ViewInviteToPlayer(nil, nil, info.dwServerID, info.szGlobalID)
+			X.ViewOtherPlayerByGlobalID(info.dwServerID, info.szGlobalID)
 		end
 	elseif this.info then
 		local info = this.info
 		if IsCtrlKeyDown() then
 			X.EditBox_AppendLinkPlayer(info.szGlobalName)
 		elseif IsAltKeyDown() then
-			ViewInviteToPlayer(nil, nil, info.dwServerID, info.szGlobalID)
+			X.ViewOtherPlayerByGlobalID(info.dwServerID, info.szGlobalID)
 		end
 	end
 end
@@ -251,25 +250,20 @@ function D.CheckRequestUpdate(info)
 	end
 end
 
-function D.OnPeekPlayer()
-	local kPlayer = X.GetPlayer(arg1)
-	if kPlayer and PR_EQUIP_REQUEST[kPlayer.GetGlobalID()] then
-		if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
-			local me = X.GetClientPlayer()
-			local dwType, dwID = me.GetTarget()
-			X.SetTarget(TARGET.PLAYER, arg1)
-			X.SetTarget(dwType, dwID)
-			local mnt = kPlayer.GetKungfuMount()
-			local data = { nil, arg1, mnt and mnt.dwSkillID or nil, false }
-			D.Feedback(kPlayer.szName, data, false)
-		end
-		PR_EQUIP_REQUEST[arg1] = nil
+function D.OnPeekPlayer(szGlobalID, eState, kPlayer)
+	if kPlayer and eState == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+		local me = X.GetClientPlayer()
+		local dwType, dwID = me.GetTarget()
+		X.SetTarget(TARGET.PLAYER, kPlayer.dwID)
+		X.SetTarget(dwType, dwID)
+		local mnt = kPlayer.GetKungfuMount()
+		local data = { nil, kPlayer.dwID, mnt and mnt.dwSkillID or nil, false }
+		D.Feedback(kPlayer.szName, data, false)
 	end
 end
 
 function D.PeekPlayer(szGlobalID, dwServerID)
-	PR_EQUIP_REQUEST[szGlobalID] = true
-	ViewInviteToPlayer(nil, true, szGlobalID, dwServerID)
+	X.PeekOtherPlayerByGlobalID(szGlobalID, dwServerID, D.OnPeekPlayer)
 end
 
 function D.AcceptRequest(info)

@@ -377,7 +377,7 @@ X.RegisterEvent('MY_LOVE_PV_HOOK', D.OnPVHookChange)
 function D.PeekOther(dwID)
 	MY_Love.bHookPlayerView = true
 	O.tActiveLove[dwID] = true
-	ViewInviteToPlayer(dwID)
+	X.ViewOtherPlayerByID(dwID)
 end
 
 -- add target menu

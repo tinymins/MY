@@ -55,7 +55,7 @@ function CharInfo.CreateFrame(dwID, szName)
 		text = g_tStrings.STR_LOOKUP,
 		buttonStyle = 'FLAT',
 		onClick = function()
-			ViewInviteToPlayer(dwID)
+			X.ViewOtherPlayerByID(dwID)
 		end,
 	})
 	ui:Append('Text', { name = 'Text_Info', x = 20, y = 72, text = _L['Asking...'], w = 200, h = 70, font = 27, multiline = true })

@@ -21,7 +21,6 @@ end
 --------------------------------------------------------------------------
 local D = {}
 local PR_INI_PATH = X.PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
-local PR_EQUIP_REQUEST = {}
 local PR_PARTY_REQUEST = {}
 
 local O = X.CreateUserSettingsModule('MY_PartyRequest', _L['Raid'], {
@@ -215,13 +214,13 @@ function D.OnLButtonClick()
 			this:Lookup('', 'Text_Default'):SetText(_L['loading...'])
 			X.OutputSystemMessage(_L['If it is always loading, the target may not install plugin or refuse.'])
 		elseif info.dwID then
-			ViewInviteToPlayer(info.dwID)
+			X.ViewOtherPlayerByID(info.dwID)
 		end
 	elseif this.info then
 		if IsCtrlKeyDown() then
 			X.EditBox_AppendLinkPlayer(this.info.szName)
 		elseif IsAltKeyDown() and this.info.dwID then
-			ViewInviteToPlayer(this.info.dwID)
+			X.ViewOtherPlayerByID(this.info.dwID)
 		end
 	end
 end
@@ -278,27 +277,23 @@ function D.CheckRequestUpdate(info)
 	end
 end
 
-function D.OnPeekPlayer()
-	if PR_EQUIP_REQUEST[arg1] then
-		if arg0 == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
-			local me = X.GetClientPlayer()
-			local dwType, dwID = me.GetTarget()
-			X.SetTarget(TARGET.PLAYER, arg1)
-			X.SetTarget(dwType, dwID)
-			local p = X.GetPlayer(arg1)
-			if p then
-				local mnt = p.GetKungfuMount()
-				local data = { nil, arg1, mnt and mnt.dwSkillID or nil, false }
-				D.Feedback(p.szName, data, false)
-			end
+function D.OnPeekPlayer(dwID, eState, kPlayer)
+	if eState == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+		local me = X.GetClientPlayer()
+		local dwTarType, dwTarID = me.GetTarget()
+		X.SetTarget(TARGET.PLAYER, dwID)
+		X.SetTarget(dwTarType, dwTarID)
+		local p = X.GetPlayer(dwID)
+		if p then
+			local mnt = p.GetKungfuMount()
+			local data = { nil, dwID, mnt and mnt.dwSkillID or nil, false }
+			D.Feedback(p.szName, data, false)
 		end
-		PR_EQUIP_REQUEST[arg1] = nil
 	end
 end
 
 function D.PeekPlayer(dwID)
-	PR_EQUIP_REQUEST[dwID] = true
-	ViewInviteToPlayer(dwID, true)
+	X.PeekOtherPlayerByID(dwID, D.OnPeekPlayer)
 end
 
 function D.AcceptRequest(info)

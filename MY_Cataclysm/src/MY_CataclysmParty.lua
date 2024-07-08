@@ -387,7 +387,7 @@ function MY_CataclysmParty_Base.OnItemLButtonClick()
 					MY_CharInfo.ViewCharInfoToPlayer(dwID)
 				end
 			else
-				ViewInviteToPlayer(dwID)
+				X.ViewOtherPlayerByID(dwID)
 			end
 		else
 			D.SetTargetTeammate(dwID, info)
@@ -533,7 +533,7 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 			end
 		end
 		table.insert(menu, { szOption = g_tStrings.STR_LOOKUP, bDisable = not info.bIsOnLine, fnAction = function()
-			ViewInviteToPlayer(dwID)
+			X.ViewOtherPlayerByID(dwID)
 		end })
 		if MY_CharInfo and MY_CharInfo.ViewCharInfoToPlayer then
 			table.insert(menu, {
