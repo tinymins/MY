@@ -202,8 +202,8 @@ function X.Ajax(settings)
 	-- correct ansi url and data
 	-------------------------------
 	if config.charset == 'utf8' then
-		config.url  = X.ConvertToAnsi(xurl)
-		config.data = X.ConvertToAnsi(xdata)
+		config.url  = X.ConvertToANSI(xurl)
+		config.data = X.ConvertToANSI(xdata)
 	end
 
 	-------------------------------
