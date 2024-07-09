@@ -172,6 +172,10 @@ function X.SQLiteEndTransaction(db)
 	db:Execute('END TRANSACTION')
 end
 
+function X.SQLiteGarbageCollection(db)
+	db:Execute('VACUUM')
+end
+
 function X.SQLiteExecute(db, szSQL, ...)
 	if select('#', ...) == 0 then
 		return db:Execute(szSQL)
