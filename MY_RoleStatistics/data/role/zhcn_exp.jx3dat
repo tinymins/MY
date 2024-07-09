@@ -360,8 +360,8 @@ return function(env)
 				return n1 > n2 and 1 or -1
 			end,
 			GetCompareText = function(v1, v2, r1, r2)
-				local n1 = v1[1] + v1[2]
-				local n2 = v2[1] + v2[2]
+				local n1 = v1 and (v1[1] + v1[2]) or 0
+				local n2 = v2 and (v2[1] + v2[2]) or 0
 				local nCompare = n2 - n1
 				if nCompare == 0 then
 					return
