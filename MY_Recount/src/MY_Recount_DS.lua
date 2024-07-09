@@ -400,12 +400,6 @@ local O = X.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
 		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},
-	bREOnlyDungeon = { -- 仅在秘境中启用
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Recount_FP'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
-	},
 })
 local Data          -- 当前战斗数据记录
 local HISTORY_CACHE = setmetatable({}, { __mode = 'v' }) -- 历史战斗记录缓存 { [szFile] = Data }
@@ -2034,7 +2028,6 @@ local settings = {
 				'bSaveHistoryOnExFi',
 				'nMaxHistory',
 				'nMinFightTime',
-				'bREOnlyDungeon',
 			},
 			root = O,
 		},
@@ -2047,7 +2040,6 @@ local settings = {
 				'bSaveHistoryOnExFi',
 				'nMaxHistory',
 				'nMinFightTime',
-				'bREOnlyDungeon',
 			},
 			triggers = {
 				bEnable = function()
