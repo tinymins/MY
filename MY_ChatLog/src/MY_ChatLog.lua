@@ -262,9 +262,9 @@ function D.ImportDB(aPath)
 		local odb = X.SQLiteConnect(_L['MY_ChatLog'], szPath)
 		if odb then
 			-- 老版分表机制
-			local szGlobalID = X.Get(odb:Execute('SELECT * FROM ChatLogInfo WHERE key = "userguid"'), {1, 'value'})
+			local szGlobalID = X.Get(X.SQLiteGetAll(odb, 'SELECT * FROM ChatLogInfo WHERE key = "userguid"'), {1, 'value'})
 			if szGlobalID == X.GetClientPlayer().GetGlobalID() then
-				for _, info in ipairs(odb:Execute('SELECT * FROM ChatLogIndex WHERE name IS NOT NULL ORDER BY stime ASC') or X.CONSTANT.EMPTY_TABLE) do
+				for _, info in ipairs(X.SQLiteGetAll(odb, 'SELECT * FROM ChatLogIndex WHERE name IS NOT NULL ORDER BY stime ASC') or X.CONSTANT.EMPTY_TABLE) do
 					if info.etime == -1 then
 						info.etime = 0
 					end
@@ -273,7 +273,7 @@ function D.ImportDB(aPath)
 					db:SetMaxTime(info.etime)
 					db:SetInfo('version', '2')
 					db:SetInfo('user_global_id', szGlobalID)
-					for _, p in ipairs(odb:Execute('SELECT * FROM ' .. info.name .. ' WHERE talker IS NOT NULL ORDER BY time ASC') or X.CONSTANT.EMPTY_TABLE) do
+					for _, p in ipairs(X.SQLiteGetAll(odb, 'SELECT * FROM ' .. info.name .. ' WHERE talker IS NOT NULL ORDER BY time ASC') or X.CONSTANT.EMPTY_TABLE) do
 						local szMsgType = V1_MSG_TYPE_MAP[p.channel]
 						if szMsgType then
 							nImportCount = nImportCount + 1
@@ -285,17 +285,15 @@ function D.ImportDB(aPath)
 				end
 			end
 			-- 新版导出数据
-			local szGlobalID = X.Get(odb:Execute('SELECT value FROM ChatInfo WHERE key = "user_global_id"'), {1, 'value'}, ''):gsub('"', '')
+			local szGlobalID = X.Get(X.SQLiteGetAll(odb, 'SELECT value FROM ChatInfo WHERE key = "user_global_id"'), {1, 'value'}, ''):gsub('"', '')
 			if szGlobalID == X.GetClientPlayer().GetGlobalID() then
-				local szVersion = X.Get(odb:Execute('SELECT value FROM ChatInfo WHERE key = "version"'), {1, 'value'}, '')
-				local nCount = X.Get(odb:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
+				local szVersion = X.Get(X.SQLiteGetAll(odb, 'SELECT value FROM ChatInfo WHERE key = "version"'), {1, 'value'}, '')
+				local nCount = X.Get(X.SQLiteGetAll(odb, 'SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 				if nCount > 0 then
 					local szRoot, nOffset, nLimit, szNewPath, dbNew = D.GetRoot(), 0, 20000
-					local stmt, aRes = odb:Prepare('SELECT * FROM ChatLog WHERE talker IS NOT NULL ORDER BY time ASC LIMIT ' .. nLimit .. ' OFFSET ?')
+					local stmt, aRes = X.SQLitePrepare(odb, 'SELECT * FROM ChatLog WHERE talker IS NOT NULL ORDER BY time ASC LIMIT ' .. nLimit .. ' OFFSET ?')
 					while nOffset < nCount do
-						stmt:ClearBindings()
-						stmt:BindAll(nOffset)
-						aRes = stmt:GetAll()
+						aRes = X.SQLitePrepareGetAll(stmt, nOffset)
 						if #aRes > 0 then
 							repeat
 								szNewPath = szRoot .. ('chatlog_%x'):format(X.Random(0x100000, 0xFFFFFF)) .. '.v2.db'
@@ -322,7 +320,6 @@ function D.ImportDB(aPath)
 						end
 						nOffset = nOffset + nLimit
 					end
-					stmt:Reset()
 				end
 			end
 			odb:Release()

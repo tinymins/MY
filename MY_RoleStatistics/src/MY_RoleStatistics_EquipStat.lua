@@ -28,7 +28,7 @@ if not DB then
 end
 local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_EquipStat.ini'
 
-DB:Execute([[
+X.SQLiteExecute(DB, [[
 	CREATE TABLE IF NOT EXISTS EquipItems (
 		ownerkey NVARCHAR(20) NOT NULL,
 		suitindex INTEGER NOT NULL,
@@ -51,17 +51,17 @@ DB:Execute([[
 		PRIMARY KEY(ownerkey, boxtype, boxindex)
 	)
 ]])
-DB:Execute('CREATE INDEX IF NOT EXISTS EquipItems_tab_idx ON EquipItems(tabtype, tabindex, tabsubindex)')
-local DB_ItemsW = DB:Prepare([[
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS EquipItems_tab_idx ON EquipItems(tabtype, tabindex, tabsubindex)')
+local DB_ItemsW = X.SQLitePrepare(DB, [[
 	REPLACE INTO
 	EquipItems (ownerkey, suitindex, boxtype, boxindex, itemid, tabtype, tabindex, tabsubindex, stacknum, uiid, strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc, extra, time, extra)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ]])
-local DB_ItemsR = DB:Prepare('SELECT * FROM EquipItems WHERE ownerkey = ? and suitindex = ?')
-local DB_ItemsDL = DB:Prepare('DELETE FROM EquipItems WHERE ownerkey = ? AND boxtype = ? AND boxindex >= ?')
-local DB_ItemsDA = DB:Prepare('DELETE FROM EquipItems WHERE ownerkey = ?')
+local DB_ItemsR = X.SQLitePrepare(DB, 'SELECT * FROM EquipItems WHERE ownerkey = ? and suitindex = ?')
+local DB_ItemsDL = X.SQLitePrepare(DB, 'DELETE FROM EquipItems WHERE ownerkey = ? AND boxtype = ? AND boxindex >= ?')
+local DB_ItemsDA = X.SQLitePrepare(DB, 'DELETE FROM EquipItems WHERE ownerkey = ?')
 
-DB:Execute([[
+X.SQLiteExecute(DB, [[
 	CREATE TABLE IF NOT EXISTS OwnerInfo (
 		ownerkey NVARCHAR(20) NOT NULL,
 		ownername NVARCHAR(20) NOT NULL,
@@ -76,12 +76,12 @@ DB:Execute([[
 		PRIMARY KEY(ownerkey)
 	)
 ]])
-DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_ownername_idx ON OwnerInfo(ownername)')
-DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_servername_idx ON OwnerInfo(servername)')
-local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, ownerscore, ownersuitindex, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-local DB_OwnerInfoR = DB:Prepare('SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC')
-local DB_OwnerInfoG = DB:Prepare('SELECT * FROM OwnerInfo WHERE ownerkey = ?')
-local DB_OwnerInfoD = DB:Prepare('DELETE FROM OwnerInfo WHERE ownerkey = ?')
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS OwnerInfo_ownername_idx ON OwnerInfo(ownername)')
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS OwnerInfo_servername_idx ON OwnerInfo(servername)')
+local DB_OwnerInfoW = X.SQLitePrepare(DB, 'REPLACE INTO OwnerInfo (ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, ownerscore, ownersuitindex, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+local DB_OwnerInfoR = X.SQLitePrepare(DB, 'SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC')
+local DB_OwnerInfoG = X.SQLitePrepare(DB, 'SELECT * FROM OwnerInfo WHERE ownerkey = ?')
+local DB_OwnerInfoD = X.SQLitePrepare(DB, 'DELETE FROM OwnerInfo WHERE ownerkey = ?')
 
 local EQUIPMENT_ITEM_LIST = {
 	{
@@ -258,12 +258,12 @@ function D.Migration()
 			if IsLocalFileExist(DB_V2_PATH) then
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
 				if DB_V2 then
-					DB:Execute('BEGIN TRANSACTION')
-					local aEquipItems = DB_V2:Execute('SELECT * FROM EquipItems WHERE ownerkey IS NOT NULL AND suitindex IS NOT NULL AND boxtype IS NOT NULL')
+					X.SQLiteBeginTransaction(DB)
+					local aEquipItems = X.SQLiteGetAll(DB_V2, 'SELECT * FROM EquipItems WHERE ownerkey IS NOT NULL AND suitindex IS NOT NULL AND boxtype IS NOT NULL')
 					if aEquipItems then
 						for _, rec in ipairs(aEquipItems) do
-							DB_ItemsW:ClearBindings()
-							DB_ItemsW:BindAll(
+							X.SQLitePrepareExecute(
+								DB_ItemsW,
 								rec.ownerkey,
 								rec.suitindex,
 								rec.boxtype,
@@ -284,15 +284,13 @@ function D.Migration()
 								rec.time,
 								''
 							)
-							DB_ItemsW:Execute()
 						end
-						DB_ItemsW:Reset()
 					end
-					local aOwnerInfo = DB_V2:Execute('SELECT * FROM OwnerInfo WHERE ownerkey IS NOT NULL AND ownername IS NOT NULL AND servername IS NOT NULL')
+					local aOwnerInfo = X.SQLiteGetAll(DB_V2, 'SELECT * FROM OwnerInfo WHERE ownerkey IS NOT NULL AND ownername IS NOT NULL AND servername IS NOT NULL')
 					if aOwnerInfo then
 						for _, rec in ipairs(aOwnerInfo) do
-							DB_OwnerInfoW:ClearBindings()
-							DB_OwnerInfoW:BindAll(
+							X.SQLitePrepareExecute(
+								DB_OwnerInfoW,
 								rec.ownerkey,
 								rec.ownername,
 								rec.servername,
@@ -304,11 +302,9 @@ function D.Migration()
 								rec.time,
 								''
 							)
-							DB_OwnerInfoW:Execute()
 						end
-						DB_OwnerInfoW:Reset()
 					end
-					DB:Execute('END TRANSACTION')
+					X.SQLiteEndTransaction(DB)
 					DB_V2:Release()
 				end
 				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
@@ -347,10 +343,7 @@ function D.FlushDB()
 		rec = {
 			ownerscore = {},
 		}
-		DB_OwnerInfoG:ClearBindings()
-		DB_OwnerInfoG:BindAll(ownerkey)
-		local result = DB_OwnerInfoG:GetAll()
-		DB_OwnerInfoG:Reset()
+		local result = X.SQLitePrepareGetAll(DB_OwnerInfoG, ownerkey)
 		if result and result[1] and result[1].ownerscore then
 			local d = X.DecodeLUAData(result[1].ownerscore)
 			if X.IsTable(d) then
@@ -365,7 +358,7 @@ function D.FlushDB()
 	local ownerscore = rec.ownerscore
 	local ownersuitindex = 0
 	local ownerextra = ''
-	DB:Execute('BEGIN TRANSACTION')
+	X.SQLiteBeginTransaction(DB)
 
 	-- 背包
 	local tSuitIndexToBoxType = {}
@@ -378,7 +371,6 @@ function D.FlushDB()
 			local count = X.GetInventoryBoxSize(boxtype)
 			for boxindex = 0, count - 1 do
 				local KItem = X.GetInventoryItem(me, boxtype, boxindex)
-				DB_ItemsW:ClearBindings()
 				local itemid, tabtype, tabindex, tabsubindex = -1, -1, -1, -1
 				local stacknum, uiid, strength, durability = 0, 0, 0, 0
 				local diamond_enchant, fea_enchant, permanent_enchant, desc, extra = 0, 0, 0, '', ''
@@ -400,19 +392,16 @@ function D.FlushDB()
 					permanent_enchant = KItem.dwPermanentEnchantID -- 附魔
 					desc = AnsiToUTF8(X.GetItemTip(KItem) or '')
 				end
-				DB_ItemsW:BindAll(
+				X.SQLitePrepareExecute(
+					DB_ItemsW,
 					ownerkey, suitindex, boxtype, boxindex, itemid,
 					tabtype, tabindex, tabsubindex, stacknum, uiid,
-					strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc, extra, time, '')
-				DB_ItemsW:Execute()
+					strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc, extra, time, ''
+				)
 			end
-			DB_ItemsDL:ClearBindings()
-			DB_ItemsDL:BindAll(ownerkey, boxtype, count)
-			DB_ItemsDL:Execute()
+			X.SQLitePrepareExecute(DB_ItemsDL, ownerkey, boxtype, count)
 		end
 	end
-	DB_ItemsW:Reset()
-	DB_ItemsDL:Reset()
 
 	-- 挂饰、其它
 	ownerforce = me.dwForceID
@@ -434,12 +423,21 @@ function D.FlushDB()
 		penpet = { ITEM_TABLE_TYPE.CUST_TRINKET, X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetEquippedPendentPet() or 0 },
 	}))
 
-	DB_OwnerInfoW:ClearBindings()
-	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, ownerforce, ownerrole, ownerlevel, X.EncodeLUAData(ownerscore), ownersuitindex, time, ownerextra)
-	DB_OwnerInfoW:Execute()
-	DB_OwnerInfoW:Reset()
+	X.SQLitePrepareExecute(
+		DB_OwnerInfoW,
+		ownerkey,
+		ownername,
+		servername,
+		ownerforce,
+		ownerrole,
+		ownerlevel,
+		X.EncodeLUAData(ownerscore),
+		ownersuitindex,
+		time,
+		ownerextra
+	)
 
-	DB:Execute('END TRANSACTION')
+	X.SQLiteExecute(DB, 'END TRANSACTION')
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
 	X.OutputDebugMessage('MY_RoleStatistics_EquipStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
@@ -459,14 +457,8 @@ function D.UpdateSaveDB()
 		X.OutputDebugMessage('MY_RoleStatistics_EquipStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local guid = AnsiToUTF8(X.GetClientPlayerGlobalID())
-		DB_ItemsDA:ClearBindings()
-		DB_ItemsDA:BindAll(guid)
-		DB_ItemsDA:Execute()
-		DB_ItemsDA:Reset()
-		DB_OwnerInfoD:ClearBindings()
-		DB_OwnerInfoD:BindAll(guid)
-		DB_OwnerInfoD:Execute()
-		DB_OwnerInfoD:Reset()
+		X.SQLitePrepareExecute(DB_ItemsDA, guid)
+		X.SQLitePrepareExecute(DB_OwnerInfoD, guid)
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage('MY_RoleStatistics_EquipStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -476,10 +468,7 @@ end
 
 function D.UpdateNames(page)
 	local searchname = page:Lookup('Wnd_Total/Wnd_SearchName/Edit_SearchName'):GetText()
-	DB_OwnerInfoR:ClearBindings()
-	DB_OwnerInfoR:BindAll(AnsiToUTF8('%' .. searchname .. '%'), AnsiToUTF8('%' .. searchname .. '%'))
-	local result = DB_OwnerInfoR:GetAll()
-	DB_OwnerInfoR:Reset()
+	local result = X.SQLitePrepareGetAll(DB_OwnerInfoR, AnsiToUTF8('%' .. searchname .. '%'), AnsiToUTF8('%' .. searchname .. '%'))
 
 	local container = page:Lookup('Wnd_Total/WndScroll_Name/WndContainer_Name')
 	container:Clear()
@@ -550,11 +539,8 @@ function D.UpdateItems(page)
 	local aXml = {}
 
 	-- 绘制装备
-	DB_ItemsR:ClearBindings()
-	DB_ItemsR:BindAll(AnsiToUTF8(D.szCurrentOwnerKey), D.dwCurrentSuitIndex)
 	local tResult = {}
-	local aRes = DB_ItemsR:GetAll()
-	DB_ItemsR:Reset()
+	local aRes = X.SQLitePrepareGetAll(DB_ItemsR, AnsiToUTF8(D.szCurrentOwnerKey), D.dwCurrentSuitIndex)
 	for _, rec in ipairs(aRes) do
 		for k, v in pairs(rec) do
 			if X.IsString(v) then
@@ -828,14 +814,8 @@ function D.OnLButtonClick()
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
 		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.ownerinfo.ownername), function()
-			DB_ItemsDA:ClearBindings()
-			DB_ItemsDA:BindAll(wnd.ownerinfo.ownerkey)
-			DB_ItemsDA:Execute()
-			DB_ItemsDA:Reset()
-			DB_OwnerInfoD:ClearBindings()
-			DB_OwnerInfoD:BindAll(wnd.ownerinfo.ownerkey)
-			DB_OwnerInfoD:Execute()
-			DB_OwnerInfoD:Reset()
+			X.SQLitePrepareExecute(DB_ItemsDA, wnd.ownerinfo.ownerkey)
+			X.SQLitePrepareExecute(DB_OwnerInfoD, wnd.ownerinfo.ownerkey)
 			D.UpdateNames(page)
 		end)
 	end

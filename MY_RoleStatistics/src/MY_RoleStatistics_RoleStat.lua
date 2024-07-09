@@ -495,7 +495,7 @@ function D.Migration()
 			if IsLocalFileExist(DB_V2_PATH) then
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
 				if DB_V2 then
-					local aRoleInfo = X.ConvertToANSI(DB_V2:Execute('SELECT * FROM RoleInfo WHERE guid IS NOT NULL AND name IS NOT NULL'))
+					local aRoleInfo = X.SQLiteExecuteANSI(DB_V2, 'SELECT * FROM RoleInfo WHERE guid IS NOT NULL AND name IS NOT NULL')
 					if aRoleInfo then
 						for _, rec in ipairs(aRoleInfo) do
 							if not data[rec.guid] or data[rec.guid].time <= rec.time then
@@ -561,7 +561,7 @@ function D.Migration()
 			if IsLocalFileExist(DB_V3_PATH) then
 				local DB_V3 = SQLite3_Open(DB_V3_PATH)
 				if DB_V3 then
-					local aRoleInfo = X.ConvertToANSI(DB_V3:Execute('SELECT * FROM RoleInfo WHERE guid IS NOT NULL AND name IS NOT NULL'))
+					local aRoleInfo = X.SQLiteExecuteANSI(DB_V3, 'SELECT * FROM RoleInfo WHERE guid IS NOT NULL AND name IS NOT NULL')
 					if aRoleInfo then
 						for _, rec in ipairs(aRoleInfo) do
 							if not data[rec.guid] or data[rec.guid].time <= rec.time then

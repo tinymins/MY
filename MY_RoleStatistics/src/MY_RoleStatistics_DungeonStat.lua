@@ -27,7 +27,7 @@ if not DB then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 
-DB:Execute([[
+X.SQLiteExecute(DB, [[
 	CREATE TABLE IF NOT EXISTS DungeonInfo (
 		guid NVARCHAR(20) NOT NULL,
 		account NVARCHAR(255) NOT NULL,
@@ -44,10 +44,10 @@ DB:Execute([[
 		PRIMARY KEY(guid)
 	)
 ]])
-local DB_DungeonInfoW = DB:Prepare('REPLACE INTO DungeonInfo (guid, account, region, server, name, force, level, equip_score, copy_info, progress_info, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-local DB_DungeonInfoG = DB:Prepare('SELECT * FROM DungeonInfo WHERE guid = ?')
-local DB_DungeonInfoR = DB:Prepare('SELECT * FROM DungeonInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
-local DB_DungeonInfoD = DB:Prepare('DELETE FROM DungeonInfo WHERE guid = ?')
+local DB_DungeonInfoW = X.SQLitePrepare(DB, 'REPLACE INTO DungeonInfo (guid, account, region, server, name, force, level, equip_score, copy_info, progress_info, time, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+local DB_DungeonInfoG = X.SQLitePrepare(DB, 'SELECT * FROM DungeonInfo WHERE guid = ?')
+local DB_DungeonInfoR = X.SQLitePrepare(DB, 'SELECT * FROM DungeonInfo WHERE account LIKE ? OR name LIKE ? OR region LIKE ? OR server LIKE ? ORDER BY time DESC')
+local DB_DungeonInfoD = X.SQLitePrepare(DB, 'DELETE FROM DungeonInfo WHERE guid = ?')
 
 local O = X.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['General'], {
 	aColumn = {
@@ -467,12 +467,12 @@ function D.Migration()
 			if IsLocalFileExist(DB_V2_PATH) then
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
 				if DB_V2 then
-					DB:Execute('BEGIN TRANSACTION')
-					local aDungeonInfo = DB_V2:Execute('SELECT * FROM DungeonInfo WHERE guid IS NOT NULL AND name IS NOT NULL')
+					X.SQLiteBeginTransaction(DB)
+					local aDungeonInfo = X.SQLiteGetAll(DB_V2, 'SELECT * FROM DungeonInfo WHERE guid IS NOT NULL AND name IS NOT NULL')
 					if aDungeonInfo then
 						for _, rec in ipairs(aDungeonInfo) do
-							DB_DungeonInfoW:ClearBindings()
-							DB_DungeonInfoW:BindAll(
+							X.SQLitePrepareExecute(
+								DB_DungeonInfoW,
 								rec.guid,
 								rec.account,
 								rec.region,
@@ -486,11 +486,9 @@ function D.Migration()
 								rec.time,
 								''
 							)
-							DB_DungeonInfoW:Execute()
 						end
-						DB_DungeonInfoW:Reset()
 					end
-					DB:Execute('END TRANSACTION')
+					X.SQLiteEndTransaction(DB)
 					DB_V2:Release()
 				end
 				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
@@ -511,15 +509,14 @@ function D.FlushDB(bForceUpdate)
 	local rec = X.Clone(D.GetClientPlayerRec(bForceUpdate))
 	D.EncodeRow(rec)
 
-	DB:Execute('BEGIN TRANSACTION')
-	DB_DungeonInfoW:ClearBindings()
-	DB_DungeonInfoW:BindAll(
+	X.SQLiteBeginTransaction(DB)
+	X.SQLitePrepareExecute(
+		DB_DungeonInfoW,
 		rec.guid, rec.account, rec.region, rec.server,
 		rec.name, rec.force, rec.level, rec.equip_score,
-		rec.copy_info, rec.progress_info, rec.time, '')
-	DB_DungeonInfoW:Execute()
-	DB_DungeonInfoW:Reset()
-	DB:Execute('END TRANSACTION')
+		rec.copy_info, rec.progress_info, rec.time, ''
+	)
+	X.SQLiteEndTransaction(DB)
 
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
@@ -531,10 +528,7 @@ X.RegisterFlush('MY_RoleStatistics_DungeonStat', function() D.FlushDB() end)
 function D.InitDB()
 	local me = X.GetClientPlayer()
 	if me then
-		DB_DungeonInfoG:ClearBindings()
-		DB_DungeonInfoG:BindAll(AnsiToUTF8(X.GetClientPlayerGlobalID()))
-		local result = DB_DungeonInfoG:GetAll()
-		DB_DungeonInfoG:Reset()
+		local result = X.SQLitePrepareGetAll(DB_DungeonInfoG, AnsiToUTF8(X.GetClientPlayerGlobalID()))
 		local rec = result[1]
 		if rec then
 			D.DecodeRow(rec)
@@ -556,10 +550,7 @@ function D.UpdateSaveDB()
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage('MY_RoleStatistics_DungeonStat', 'Remove from database...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		DB_DungeonInfoD:ClearBindings()
-		DB_DungeonInfoD:BindAll(AnsiToUTF8(X.GetClientPlayerGlobalID()))
-		DB_DungeonInfoD:Execute()
-		DB_DungeonInfoD:Reset()
+		X.SQLitePrepareExecute(DB_DungeonInfoD, AnsiToUTF8(X.GetClientPlayerGlobalID()))
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage('MY_RoleStatistics_DungeonStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -659,10 +650,7 @@ function D.UpdateUI(page)
 
 	local szSearch = ui:Fetch('WndEditBox_Search'):Text()
 	local szUSearch = AnsiToUTF8('%' .. szSearch .. '%')
-	DB_DungeonInfoR:ClearBindings()
-	DB_DungeonInfoR:BindAll(szUSearch, szUSearch, szUSearch, szUSearch)
-	local result = DB_DungeonInfoR:GetAll()
-	DB_DungeonInfoR:Reset()
+	local result = X.SQLitePrepareGetAll(DB_DungeonInfoR, szUSearch, szUSearch, szUSearch, szUSearch)
 
 	for _, rec in ipairs(result) do
 		D.DecodeRow(rec)
@@ -1024,10 +1012,7 @@ function D.OnInitPage()
 				{
 					szOption = _L['Delete'],
 					fnAction = function()
-						DB_DungeonInfoD:ClearBindings()
-						DB_DungeonInfoD:BindAll(AnsiToUTF8(rec.guid))
-						DB_DungeonInfoD:Execute()
-						DB_DungeonInfoD:Reset()
+						X.SQLitePrepareExecute(DB_DungeonInfoD, AnsiToUTF8(rec.guid))
 						D.UpdateUI(page)
 					end,
 					rgb = { 255, 128, 128 },
@@ -1133,10 +1118,7 @@ function D.OnLButtonClick()
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
 		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.name), function()
-			DB_DungeonInfoD:ClearBindings()
-			DB_DungeonInfoD:BindAll(AnsiToUTF8(wnd.guid))
-			DB_DungeonInfoD:Execute()
-			DB_DungeonInfoD:Reset()
+			X.SQLitePrepareExecute(DB_DungeonInfoD, AnsiToUTF8(wnd.guid))
 			D.UpdateUI(page)
 		end)
 	end

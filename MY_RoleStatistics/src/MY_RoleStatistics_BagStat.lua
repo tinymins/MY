@@ -30,7 +30,7 @@ local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_RoleStatistics/ui/MY_RoleStatistics_Bag
 local PAGE_DISPLAY = 15
 local NORMAL_MODE_PAGE_SIZE = 50
 local COMPACT_MODE_PAGE_SIZE = 150
-DB:Execute([[
+X.SQLiteExecute(DB, [[
 	CREATE TABLE IF NOT EXISTS BagItems (
 		ownerkey NVARCHAR(20) NOT NULL,
 		boxtype INTEGER NOT NULL,
@@ -54,17 +54,17 @@ DB:Execute([[
 		PRIMARY KEY(ownerkey, boxtype, boxindex)
 	)
 ]])
-DB:Execute('CREATE INDEX IF NOT EXISTS BagItems_tab_idx ON BagItems(tabtype, tabindex, tabsubindex)')
-local DB_ItemsW = DB:Prepare([[
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS BagItems_tab_idx ON BagItems(tabtype, tabindex, tabsubindex)')
+local DB_ItemsW = X.SQLitePrepare(DB, [[
 	REPLACE INTO BagItems (
 		ownerkey, boxtype, boxindex, tabtype, tabindex, tabsubindex, bagcount, bankcount,
 		itemid, uiid, exist_time, strength, durability, diamond_enchant, fea_enchant, permanent_enchant, desc,
 		time, extra
 	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ]])
-local DB_ItemsDL = DB:Prepare('DELETE FROM BagItems WHERE ownerkey = ? AND boxtype = ? AND boxindex >= ?')
-local DB_ItemsDA = DB:Prepare('DELETE FROM BagItems WHERE ownerkey = ?')
-DB:Execute([[
+local DB_ItemsDL = X.SQLitePrepare(DB, 'DELETE FROM BagItems WHERE ownerkey = ? AND boxtype = ? AND boxindex >= ?')
+local DB_ItemsDA = X.SQLitePrepare(DB, 'DELETE FROM BagItems WHERE ownerkey = ?')
+X.SQLiteExecute(DB, [[
 	CREATE TABLE IF NOT EXISTS OwnerInfo (
 		ownerkey NVARCHAR(20) NOT NULL,
 		ownername NVARCHAR(20) NOT NULL,
@@ -74,12 +74,12 @@ DB:Execute([[
 		PRIMARY KEY(ownerkey)
 	)
 ]])
-DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_ownername_idx ON OwnerInfo(ownername)')
-DB:Execute('CREATE INDEX IF NOT EXISTS OwnerInfo_servername_idx ON OwnerInfo(servername)')
-local DB_OwnerInfoW = DB:Prepare('REPLACE INTO OwnerInfo (ownerkey, ownername, servername, time, extra) VALUES (?, ?, ?, ?, ?)')
-local DB_OwnerInfoR = DB:Prepare('SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC')
-local DB_OwnerInfoD = DB:Prepare('DELETE FROM OwnerInfo WHERE ownerkey = ?')
-DB:Execute([[
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS OwnerInfo_ownername_idx ON OwnerInfo(ownername)')
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS OwnerInfo_servername_idx ON OwnerInfo(servername)')
+local DB_OwnerInfoW = X.SQLitePrepare(DB, 'REPLACE INTO OwnerInfo (ownerkey, ownername, servername, time, extra) VALUES (?, ?, ?, ?, ?)')
+local DB_OwnerInfoR = X.SQLitePrepare(DB, 'SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC')
+local DB_OwnerInfoD = X.SQLitePrepare(DB, 'DELETE FROM OwnerInfo WHERE ownerkey = ?')
+X.SQLiteExecute(DB, [[
 	CREATE TABLE IF NOT EXISTS ItemInfo (
 		tabtype INTEGER NOT NULL,
 		tabindex INTEGER NOT NULL,
@@ -93,9 +93,9 @@ DB:Execute([[
 		PRIMARY KEY(tabtype, tabindex, tabsubindex)
 	)
 ]])
-DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_name_idx ON ItemInfo(name)')
-DB:Execute('CREATE INDEX IF NOT EXISTS ItemInfo_desc_idx ON ItemInfo(desc)')
-local DB_ItemInfoW = DB:Prepare('REPLACE INTO ItemInfo (tabtype, tabindex, tabsubindex, name, genre, quality, exist_type, desc, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS ItemInfo_name_idx ON ItemInfo(name)')
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS ItemInfo_desc_idx ON ItemInfo(desc)')
+local DB_ItemInfoW = X.SQLitePrepare(DB, 'REPLACE INTO ItemInfo (tabtype, tabindex, tabsubindex, name, genre, quality, exist_type, desc, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
 
 local BOX_TYPE = X.KvpToObject({
 	-- 100 - 199: Equip
@@ -243,14 +243,14 @@ function D.Migration()
 			if IsLocalFileExist(DB_V2_PATH) then
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
 				if DB_V2 then
-					DB:Execute('BEGIN TRANSACTION')
-					local aBagItems = DB_V2:Execute('SELECT * FROM BagItems WHERE ownerkey IS NOT NULL AND boxtype IS NOT NULL AND tabtype IS NOT NULL')
+					X.SQLiteBeginTransaction(DB)
+					local aBagItems = X.SQLiteGetAll(DB_V2, 'SELECT * FROM BagItems WHERE ownerkey IS NOT NULL AND boxtype IS NOT NULL AND tabtype IS NOT NULL')
 					if aBagItems then
 						for _, rec in ipairs(aBagItems) do
 							local sboxtype = BOX_TYPE[rec.boxtype]
 							if sboxtype then
-								DB_ItemsW:ClearBindings()
-								DB_ItemsW:BindAll(
+								X.SQLitePrepareExecute(
+									DB_ItemsW,
 									rec.ownerkey,
 									sboxtype,
 									rec.boxindex,
@@ -271,31 +271,27 @@ function D.Migration()
 									rec.time,
 									''
 								)
-								DB_ItemsW:Execute()
 							end
 						end
-						DB_ItemsW:Reset()
 					end
-					local aOwnerInfo = DB_V2:Execute('SELECT * FROM OwnerInfo WHERE ownerkey IS NOT NULL')
+					local aOwnerInfo = X.SQLiteGetAll(DB_V2, 'SELECT * FROM OwnerInfo WHERE ownerkey IS NOT NULL')
 					if aOwnerInfo then
 						for _, rec in ipairs(aOwnerInfo) do
-							DB_OwnerInfoW:ClearBindings()
-							DB_OwnerInfoW:BindAll(
+							X.SQLitePrepareExecute(
+								DB_OwnerInfoW,
 								rec.ownerkey,
 								rec.ownername,
 								rec.servername,
 								rec.time,
 								''
 							)
-							DB_OwnerInfoW:Execute()
 						end
-						DB_OwnerInfoW:Reset()
 					end
-					local aItemInfo = DB_V2:Execute('SELECT * FROM ItemInfo WHERE tabtype IS NOT NULL')
+					local aItemInfo = X.SQLiteGetAll(DB_V2, 'SELECT * FROM ItemInfo WHERE tabtype IS NOT NULL')
 					if aItemInfo then
 						for _, rec in ipairs(aItemInfo) do
-							DB_ItemInfoW:ClearBindings()
-							DB_ItemInfoW:BindAll(
+							X.SQLitePrepareExecute(
+								DB_ItemInfoW,
 								rec.tabtype,
 								rec.tabindex,
 								rec.tabsubindex,
@@ -306,11 +302,9 @@ function D.Migration()
 								rec.desc,
 								''
 							)
-							DB_ItemInfoW:Execute()
 						end
-						DB_ItemInfoW:Reset()
 					end
-					DB:Execute('END TRANSACTION')
+					X.SQLiteEndTransaction(DB)
 					DB_V2:Release()
 				end
 				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
@@ -319,14 +313,14 @@ function D.Migration()
 			if IsLocalFileExist(DB_V3_PATH) then
 				local DB_V3 = SQLite3_Open(DB_V3_PATH)
 				if DB_V3 then
-					DB:Execute('BEGIN TRANSACTION')
-					local aBagItems = DB_V3:Execute('SELECT * FROM BagItems WHERE ownerkey IS NOT NULL AND boxtype IS NOT NULL AND tabtype IS NOT NULL')
+					X.SQLiteBeginTransaction(DB)
+					local aBagItems = X.SQLiteGetAll(DB_V3, 'SELECT * FROM BagItems WHERE ownerkey IS NOT NULL AND boxtype IS NOT NULL AND tabtype IS NOT NULL')
 					if aBagItems then
 						for _, rec in ipairs(aBagItems) do
 							local sboxtype = BOX_TYPE[rec.boxtype]
 							if sboxtype then
-								DB_ItemsW:ClearBindings()
-								DB_ItemsW:BindAll(
+								X.SQLitePrepareExecute(
+									DB_ItemsW,
 									rec.ownerkey,
 									sboxtype,
 									rec.boxindex,
@@ -347,31 +341,27 @@ function D.Migration()
 									rec.time,
 									rec.extra
 								)
-								DB_ItemsW:Execute()
 							end
 						end
-						DB_ItemsW:Reset()
 					end
-					local aOwnerInfo = DB_V3:Execute('SELECT * FROM OwnerInfo WHERE ownerkey IS NOT NULL')
+					local aOwnerInfo = X.SQLiteGetAll(DB_V3, 'SELECT * FROM OwnerInfo WHERE ownerkey IS NOT NULL')
 					if aOwnerInfo then
 						for _, rec in ipairs(aOwnerInfo) do
-							DB_OwnerInfoW:ClearBindings()
-							DB_OwnerInfoW:BindAll(
+							X.SQLitePrepareExecute(
+								DB_OwnerInfoW,
 								rec.ownerkey,
 								rec.ownername,
 								rec.servername,
 								rec.time,
 								rec.extra
 							)
-							DB_OwnerInfoW:Execute()
 						end
-						DB_OwnerInfoW:Reset()
 					end
-					local aItemInfo = DB_V3:Execute('SELECT * FROM ItemInfo WHERE tabtype IS NOT NULL')
+					local aItemInfo = X.SQLiteGetAll(DB_V3, 'SELECT * FROM ItemInfo WHERE tabtype IS NOT NULL')
 					if aItemInfo then
 						for _, rec in ipairs(aItemInfo) do
-							DB_ItemInfoW:ClearBindings()
-							DB_ItemInfoW:BindAll(
+							X.SQLitePrepareExecute(
+								DB_ItemInfoW,
 								rec.tabtype,
 								rec.tabindex,
 								rec.tabsubindex,
@@ -382,11 +372,9 @@ function D.Migration()
 								rec.desc,
 								rec.extra
 							)
-							DB_ItemInfoW:Execute()
 						end
-						DB_ItemInfoW:Reset()
 					end
-					DB:Execute('END TRANSACTION')
+					X.SQLiteEndTransaction(DB)
 					DB_V3:Release()
 				end
 				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
@@ -460,7 +448,7 @@ function D.FlushDB()
 	local ownerkey = AnsiToUTF8(X.GetClientPlayerGlobalID())
 	local ownername = AnsiToUTF8(me.szName)
 	local servername = AnsiToUTF8(X.GetServerOriginName())
-	DB:Execute('BEGIN TRANSACTION')
+	X.SQLiteBeginTransaction(DB)
 
 	-- ±³°ü
 	local aPackageBoxType = {}
@@ -477,31 +465,19 @@ function D.FlushDB()
 			for boxindex = 0, count - 1 do
 				local aItemData, aItemInfoData = D.ItemToData(X.GetInventoryItem(me, boxtype, boxindex))
 				if aItemInfoData then
-					DB_ItemInfoW:ClearBindings()
-					DB_ItemInfoW:BindAll(unpack(aItemInfoData))
-					DB_ItemInfoW:Execute()
+					X.SQLitePrepareExecute(DB_ItemInfoW, unpack(aItemInfoData))
 				end
-				DB_ItemsW:ClearBindings()
-				DB_ItemsW:BindAll(ownerkey, sboxtype, boxindex, unpack(aItemData))
-				DB_ItemsW:Execute()
+				X.SQLitePrepareExecute(DB_ItemsW, ownerkey, sboxtype, boxindex, unpack(aItemData))
 			end
-			DB_ItemsDL:ClearBindings()
-			DB_ItemsDL:BindAll(ownerkey, sboxtype, count)
-			DB_ItemsDL:Execute()
+			X.SQLitePrepareExecute(DB_ItemsDL, ownerkey, sboxtype, count)
 			--[[#DEBUG BEGIN]]
 		else
 			X.OutputDebugMessage('MY_RoleStatistics_BagStat', 'bag boxtype not in static map: ' .. boxtype, X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 		end
 	end
-	DB_ItemInfoW:Reset()
-	DB_ItemsW:Reset()
-	DB_ItemsDL:Reset()
 
-	DB_OwnerInfoW:ClearBindings()
-	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, time, '')
-	DB_OwnerInfoW:Execute()
-	DB_OwnerInfoW:Reset()
+	X.SQLitePrepareExecute(DB_OwnerInfoW, ownerkey, ownername, servername, time, '')
 
 	-- ²Ö¿â
 	for _, boxtype in ipairs(X.CONSTANT.INVENTORY_BANK_LIST) do
@@ -511,26 +487,17 @@ function D.FlushDB()
 			for boxindex = 0, count - 1 do
 				local aItemData, aItemInfoData = D.ItemToData(X.GetInventoryItem(me, boxtype, boxindex), 'BANK')
 				if aItemInfoData then
-					DB_ItemInfoW:ClearBindings()
-					DB_ItemInfoW:BindAll(unpack(aItemInfoData))
-					DB_ItemInfoW:Execute()
+					X.SQLitePrepareExecute(DB_ItemInfoW, unpack(aItemInfoData))
 				end
-				DB_ItemsW:ClearBindings()
-				DB_ItemsW:BindAll(ownerkey, sboxtype, boxindex, unpack(aItemData))
-				DB_ItemsW:Execute()
+				X.SQLitePrepareExecute(DB_ItemsW, ownerkey, sboxtype, boxindex, unpack(aItemData))
 			end
-			DB_ItemsDL:ClearBindings()
-			DB_ItemsDL:BindAll(ownerkey, sboxtype, count)
-			DB_ItemsDL:Execute()
+			X.SQLitePrepareExecute(DB_ItemsDL, ownerkey, sboxtype, count)
 			--[[#DEBUG BEGIN]]
 		else
 			X.OutputDebugMessage('MY_RoleStatistics_BagStat', 'bank boxtype not in static map: ' .. boxtype, X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 		end
 	end
-	DB_ItemInfoW:Reset()
-	DB_ItemsW:Reset()
-	DB_ItemsDL:Reset()
 
 	-- °ï»á²Ö¿â
 	if not X.IsEmpty(l_guildcache) then
@@ -540,29 +507,20 @@ function D.FlushDB()
 			local sboxtype = BOX_TYPE[info.boxtype]
 			if sboxtype then
 				if info.aItemInfoData then
-					DB_ItemInfoW:ClearBindings()
-					DB_ItemInfoW:BindAll(unpack(info.aItemInfoData))
-					DB_ItemInfoW:Execute()
+					X.SQLitePrepareExecute(DB_ItemInfoW, unpack(info.aItemInfoData))
 				end
-				DB_ItemsW:ClearBindings()
-				DB_ItemsW:BindAll(ownerkey, sboxtype, info.boxindex, unpack(info.aItemData))
-				DB_ItemsW:Execute()
+				X.SQLitePrepareExecute(DB_ItemsW, ownerkey, sboxtype, info.boxindex, unpack(info.aItemData))
 				--[[#DEBUG BEGIN]]
 			else
 				X.OutputDebugMessage('MY_RoleStatistics_BagStat', 'guild bank boxtype not in static map: ' .. info.boxtype, X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
 			end
 		end
-		DB_ItemInfoW:Reset()
-		DB_ItemsW:Reset()
 
-		DB_OwnerInfoW:ClearBindings()
-		DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, time, '')
-		DB_OwnerInfoW:Execute()
-		DB_OwnerInfoW:Reset()
+		X.SQLitePrepareExecute(DB_OwnerInfoW, ownerkey, ownername, servername, time, '')
 	end
 
-	DB:Execute('END TRANSACTION')
+	X.SQLiteEndTransaction(DB)
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
 	X.OutputDebugMessage('MY_RoleStatistics_BagStat', _L('Flushing to database costs %dms...', nTickCount), X.DEBUG_LEVEL.PM_LOG)
@@ -588,15 +546,9 @@ function D.UpdateSaveDB()
 			AnsiToUTF8(X.GetClientPlayerGlobalID()),
 			'tong' .. me.dwTongID,
 		}) do
-			DB_ItemsDA:ClearBindings()
-			DB_ItemsDA:BindAll(guid)
-			DB_ItemsDA:Execute()
-			DB_OwnerInfoD:ClearBindings()
-			DB_OwnerInfoD:BindAll(guid)
-			DB_OwnerInfoD:Execute()
+			X.SQLitePrepareExecute(DB_ItemsDA, guid)
+			X.SQLitePrepareExecute(DB_OwnerInfoD, guid)
 		end
-		DB_ItemsDA:Reset()
-		DB_OwnerInfoD:Reset()
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage('MY_RoleStatistics_BagStat', 'Remove from database finished...', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -611,10 +563,11 @@ end
 
 function D.UpdateNames(page)
 	local searchname = page:Lookup('Wnd_Total/Wnd_SearchName/Edit_SearchName'):GetText()
-	DB_OwnerInfoR:ClearBindings()
-	DB_OwnerInfoR:BindAll(AnsiToUTF8('%' .. searchname .. '%'), AnsiToUTF8('%' .. searchname .. '%'))
-	local result = DB_OwnerInfoR:GetAll()
-	DB_OwnerInfoR:Reset()
+	local result = X.SQLitePrepareGetAll(
+		DB_OwnerInfoR,
+		AnsiToUTF8('%' .. searchname .. '%'),
+		AnsiToUTF8('%' .. searchname .. '%')
+	)
 
 	local container = page:Lookup('Wnd_Total/WndScroll_Name/WndContainer_Name')
 	container:Clear()
@@ -714,11 +667,13 @@ function D.UpdateItems(page)
 	sqlc = sqlc .. sqlwhere .. sqlgroup
 
 	-- »æÖÆÒ³Âë
-	local DB_CountR = DB:Prepare(sqlc)
-	DB_CountR:ClearBindings()
-	DB_CountR:BindAll(searchitem, searchitem, unpack(ownerkeys))
-	local nCount = #DB_CountR:GetAll()
-	DB_CountR:Reset()
+	local DB_CountR = X.SQLitePrepare(DB, sqlc)
+	local nCount = #X.SQLitePrepareGetAll(
+		DB_CountR,
+		searchitem,
+		searchitem,
+		unpack(ownerkeys)
+	)
 	local nPageCount = math.floor(nCount / nPageSize) + 1
 	page:Lookup('Wnd_Total/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(page.nCurrentPage)
 	page:Lookup('Wnd_Total/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['%d pages'], nPageCount)
@@ -766,15 +721,17 @@ function D.UpdateItems(page)
 	hOuter:FormatAllItemPos()
 
 	-- »æÖÆÁÐ±í
-	local DB_ItemInfoR = DB:Prepare(sql)
-	DB_ItemInfoR:ClearBindings()
-	DB_ItemInfoR:BindAll(searchitem, searchitem, unpack(ownerkeys))
-	local result = DB_ItemInfoR:GetAll()
-	DB_ItemInfoR:Reset()
+	local result = X.SQLiteGetAll(
+		DB,
+		sql,
+		searchitem,
+		searchitem,
+		unpack(ownerkeys)
+	)
 
 	local sqlbelongs = 'SELECT * FROM (SELECT ownerkey, SUM(bagcount) AS bagcount, SUM(bankcount) AS bankcount FROM BagItems WHERE tabtype = ? AND tabindex = ? AND tabsubindex = ? GROUP BY ownerkey) AS B LEFT JOIN OwnerInfo AS O ON B.ownerkey = O.ownerkey WHERE '
 	sqlbelongs = sqlbelongs .. ((#wheres == 0 and ' 1 = 0 ') or ('(' .. table.concat(wheres, ' OR ') .. ')'))
-	local DB_BelongsR = DB:Prepare(sqlbelongs)
+	local DB_BelongsR = X.SQLitePrepare(DB, sqlbelongs)
 
 	local handle = page:Lookup('Wnd_Total/WndScroll_Item', 'Handle_Items')
 	local scroll = page:Lookup('Wnd_Total/WndScroll_Item/Scroll_Item')
@@ -786,10 +743,7 @@ function D.UpdateItems(page)
 			if O.bCompactMode then
 				local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_ItemCompact')
 				local box = hItem:Lookup('Box_ItemCompact')
-
-				DB_BelongsR:ClearBindings()
-				DB_BelongsR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
-				local result = DB_BelongsR:GetAll()
+				local result = X.SQLitePrepareGetAll(DB_BelongsR, rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
 				local count = 0
 				for _, rec in ipairs(result) do
 					count = count + rec.bankcount + rec.bagcount
@@ -815,9 +769,7 @@ function D.UpdateItems(page)
 				end
 				hItem:Lookup('Handle_ItemInfo'):FormatAllItemPos()
 
-				DB_BelongsR:ClearBindings()
-				DB_BelongsR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
-				local result = DB_BelongsR:GetAll()
+				local result = X.SQLitePrepareGetAll(DB_BelongsR, rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
 				local hBelongsList = hItem:Lookup('Handle_ItemBelongs')
 				hBelongsList:Clear()
 				for _, rec in ipairs(result) do
@@ -836,7 +788,6 @@ function D.UpdateItems(page)
 		--[[#DEBUG END]]
 		end
 	end
-	DB_BelongsR:Reset()
 	handle:FormatAllItemPos()
 	scroll:SetScrollPos(0)
 end
@@ -985,14 +936,8 @@ function D.OnLButtonClick()
 		local wnd = this:GetParent()
 		local page = this:GetParent():GetParent():GetParent():GetParent():GetParent()
 		X.Confirm(_L('Are you sure to delete item record of %s?', wnd.ownername), function()
-			DB_ItemsDA:ClearBindings()
-			DB_ItemsDA:BindAll(wnd.ownerkey)
-			DB_ItemsDA:Execute()
-			DB_ItemsDA:Reset()
-			DB_OwnerInfoD:ClearBindings()
-			DB_OwnerInfoD:BindAll(wnd.ownerkey)
-			DB_OwnerInfoD:Execute()
-			DB_OwnerInfoD:Reset()
+			X.SQLitePrepareExecute(DB_ItemsDA, wnd.ownerkey)
+			X.SQLitePrepareExecute(DB_OwnerInfoD, wnd.ownerkey)
 			D.UpdateNames(page)
 		end)
 	elseif name == 'Btn_SwitchMode' then

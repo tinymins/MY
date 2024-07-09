@@ -78,15 +78,15 @@ local function InitDB()
 		X.OutputSystemMessage(_L['MY_Farbnamen'], szMsg, X.CONSTANT.MSG_THEME.ERROR)
 		return false
 	end
-	DB:Execute([[
+	X.SQLiteExecute(DB, [[
 		CREATE TABLE IF NOT EXISTS Info (
 			key NVARCHAR(128) NOT NULL,
 			value NVARCHAR(4096) NOT NULL,
 			PRIMARY KEY (key)
 		)
 	]])
-	DB:Execute([[INSERT INTO Info (key, value) VALUES ('version', '7')]])
-	DB:Execute([[
+	X.SQLiteExecute(DB, [[INSERT INTO Info (key, value) VALUES ('version', '7')]])
+	X.SQLiteExecute(DB, [[
 		CREATE TABLE IF NOT EXISTS PlayerInfo (
 			server NVARCHAR(10) NOT NULL,
 			id INTEGER NOT NULL,
@@ -104,13 +104,13 @@ local function InitDB()
 			PRIMARY KEY (server, id)
 		)
 	]])
-	DB:Execute('CREATE UNIQUE INDEX IF NOT EXISTS player_info_server_name_u_idx ON PlayerInfo(server, name)')
-	DB:Execute('CREATE INDEX IF NOT EXISTS player_info_guid_idx ON PlayerInfo(guid)')
-	DBP_W  = DB:Prepare('REPLACE INTO PlayerInfo (server, id, name, guid, force, role, level, title, camp, tong, time, times, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-	DBP_RI = DB:Prepare('SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND id = ?')
-	DBP_RN = DB:Prepare('SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND name = ?')
-	DBP_RGI = DB:Prepare('SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE guid = ? ORDER BY time DESC')
-	DB:Execute([[
+	X.SQLiteExecute(DB, 'CREATE UNIQUE INDEX IF NOT EXISTS player_info_server_name_u_idx ON PlayerInfo(server, name)')
+	X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS player_info_guid_idx ON PlayerInfo(guid)')
+	DBP_W  = X.SQLitePrepare(DB, 'REPLACE INTO PlayerInfo (server, id, name, guid, force, role, level, title, camp, tong, time, times, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+	DBP_RI = X.SQLitePrepare(DB, 'SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND id = ?')
+	DBP_RN = X.SQLitePrepare(DB, 'SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND name = ?')
+	DBP_RGI = X.SQLitePrepare(DB, 'SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE guid = ? ORDER BY time DESC')
+	X.SQLiteExecute(DB, [[
 		CREATE TABLE IF NOT EXISTS TongInfo (
 			server NVARCHAR(10) NOT NULL,
 			id INTEGER NOT NULL,
@@ -121,8 +121,8 @@ local function InitDB()
 			PRIMARY KEY(server, id)
 		)
 	]])
-	DBT_W  = DB:Prepare('REPLACE INTO TongInfo (server, id, name, time, times, extra) VALUES (?, ?, ?, ?, ?, ?)')
-	DBT_RI = DB:Prepare('SELECT id, name, time, times, extra FROM TongInfo WHERE server = ? AND id = ?')
+	DBT_W  = X.SQLitePrepare(DB, 'REPLACE INTO TongInfo (server, id, name, time, times, extra) VALUES (?, ?, ?, ?, ?, ?)')
+	DBT_RI = X.SQLitePrepare(DB, 'SELECT id, name, time, times, extra FROM TongInfo WHERE server = ? AND id = ?')
 
 	-- 旧版文件缓存转换
 	local SZ_IC_PATH = X.FormatPath({'cache/PLAYER_INFO/{$server_origin}/', X.PATH_TYPE.DATA})
@@ -131,19 +131,16 @@ local function InitDB()
 		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite start!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		local szServer = X.GetServerOriginName()
-		DB:Execute('BEGIN TRANSACTION')
+		X.SQLiteBeginTransaction(DB)
 		for i = 0, 999 do
 			local data = X.LoadLUAData({'cache/PLAYER_INFO/{$server_origin}/DAT2/' .. i .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 			if data then
 				for id, p in pairs(data) do
-					DBP_W:ClearBindings()
-					DBP_W:BindAll(szServer, p[1], AnsiToUTF8(p[2]), '', p[3], p[4], p[5], AnsiToUTF8(p[6]), p[7], p[8], 0, 0, '')
-					DBP_W:Execute()
+					X.SQLitePrepareExecuteANSI(DBP_W, szServer, p[1], p[2], '', p[3], p[4], p[5], p[6], p[7], p[8], 0, 0, '')
 				end
 			end
 		end
-		DBP_W:Reset()
-		DB:Execute('END TRANSACTION')
+		X.SQLiteEndTransaction(DB)
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen info cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -151,21 +148,18 @@ local function InitDB()
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite start!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
-		DB:Execute('BEGIN TRANSACTION')
+		X.SQLiteBeginTransaction(DB)
 		for i = 0, 128 do
 			for j = 0, 128 do
 				local data = X.LoadLUAData({'cache/PLAYER_INFO/{$server_origin}/TONG/' .. i .. '-' .. j .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 				if data then
 					for id, name in pairs(data) do
-						DBT_W:ClearBindings()
-						DBT_W:BindAll(szServer, id, AnsiToUTF8(name), 0, 0, '')
-						DBT_W:Execute()
+						X.SQLitePrepareExecuteANSI(DBT_W, szServer, id, name, 0, 0, '')
 					end
 				end
 			end
 		end
-		DBT_W:Reset()
-		DB:Execute('END TRANSACTION')
+		X.SQLiteEndTransaction(DB)
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage('MY_Farbnamen', 'Farbnamen tong cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
@@ -190,11 +184,11 @@ function D.Import(aFilePath, bTimes)
 	for _, szFilePath in ipairs(aFilePath) do
 		local db = SQLite3_Open(szFilePath)
 		if db then
-			local nVersion = X.Get(db:Execute([[SELECT value FROM Info WHERE key = 'version']]), {1, 'value'}, nil)
+			local nVersion = X.Get(X.SQLiteGetAll(db, [[SELECT value FROM Info WHERE key = 'version']]), {1, 'value'}, nil)
 			if nVersion then
 				nVersion = tonumber(nVersion)
 			else
-				local szSQL = X.Get(db:Execute([[SELECT sql FROM sqlite_master WHERE type='table' AND name='InfoCache']]), {1, 'sql'}, ''):gsub('[%s]+', ' ')
+				local szSQL = X.Get(X.SQLiteGetAll(db, [[SELECT sql FROM sqlite_master WHERE type='table' AND name='InfoCache']]), {1, 'sql'}, ''):gsub('[%s]+', ' ')
 				if szSQL == 'CREATE TABLE InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)' then
 					nVersion = 2
 				elseif szSQL == 'CREATE TABLE InfoCache ( id INTEGER NOT NULL, name VARCHAR(20) NOT NULL, force INTEGER NOT NULL, role INTEGER NOT NULL, level INTEGER NOT NULL, title VARCHAR(20) NOT NULL, camp INTEGER NOT NULL, tong INTEGER NOT NULL, extra TEXT NOT NULL, PRIMARY KEY (id) )' then
@@ -209,7 +203,7 @@ function D.Import(aFilePath, bTimes)
 				nVersion = 0
 			end
 			if nVersion > 0 and nVersion <= 6 then
-				local szServer = X.Get(db:Execute([[SELECT value FROM Info WHERE key = 'server']]), {1, 'value'}, nil)
+				local szServer = X.Get(X.SQLiteGetAll(db, [[SELECT value FROM Info WHERE key = 'server']]), {1, 'value'}, nil)
 				if szServer then
 					szServer = UTF8ToAnsi(szServer)
 				end
@@ -221,22 +215,19 @@ function D.Import(aFilePath, bTimes)
 					local ProcessString = bUTF8
 						and function(s) return s end
 						or function(s) return AnsiToUTF8(s) or '' end
-					DB:Execute('BEGIN TRANSACTION')
-					local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					X.SQLiteBeginTransaction(DB)
+					local nCount, nPageSize = X.Get(X.SQLiteGetAll(db, 'SELECT COUNT(*) AS count FROM InfoCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
 					for i = 0, nCount / nPageSize do
-						local aInfoCache = db:Execute('SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+						local aInfoCache = X.SQLiteGetAll(db, 'SELECT * FROM InfoCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
 						if aInfoCache then
 							for _, rec in ipairs(aInfoCache) do
 								if rec.id and rec.name then
-									DBP_RI:ClearBindings()
-									DBP_RI:BindAll(rec.id)
-									local data = DBP_RI:GetNext()
-									DBP_RI:Reset()
+									local data = X.SQLitePrepareGetOne(DBP_RI, rec.id)
 									local nTime = data and (data.time or 0) or -1
 									local nRecTime = rec.time or 0
 									if nRecTime > nTime then
-										DBP_W:ClearBindings()
-										DBP_W:BindAll(
+										X.SQLitePrepareExecute(
+											DBP_W,
 											AnsiToUTF8(szServer),
 											rec.id,
 											ProcessString(rec.name),
@@ -263,31 +254,26 @@ function D.Import(aFilePath, bTimes)
 											data and data.times or 0,
 											rec.extra or ''
 										)
-										DBP_W:Execute()
 										nImportChar = nImportChar + 1
 									else
 										nSkipChar = nSkipChar + 1
 									end
 								end
 							end
-							DBP_W:Reset()
 						end
 					end
-					local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+					local nCount, nPageSize = X.Get(X.SQLiteGetAll(db, 'SELECT COUNT(*) AS count FROM TongCache WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
 					for i = 0, nCount / nPageSize do
-						local aTongCache = db:Execute('SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+						local aTongCache = X.SQLiteGetAll(db, 'SELECT * FROM TongCache WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
 						if aTongCache then
 							for _, rec in ipairs(aTongCache) do
 								if rec.id and rec.name then
-									DBT_RI:ClearBindings()
-									DBT_RI:BindAll(rec.id)
-									local data = DBT_RI:GetNext()
-									DBT_RI:Reset()
+									local data = X.SQLitePrepareGetOne(DBT_RI, rec.id)
 									local nTime = data and (data.time or 0) or -1
 									local nRecTime = rec.time or 0
 									if nRecTime > nTime then
-										DBT_W:ClearBindings()
-										DBT_W:BindAll(
+										X.SQLitePrepareExecute(
+											DBT_W,
 											AnsiToUTF8(szServer),
 											rec.id,
 											ProcessString(rec.name),
@@ -295,35 +281,30 @@ function D.Import(aFilePath, bTimes)
 											data and data.times or 0,
 											rec.extra or ''
 										)
-										DBT_W:Execute()
 										nImportTong = nImportTong + 1
 									else
 										nSkipTong = nSkipTong + 1
 									end
 								end
 							end
-							DBT_W:Reset()
 						end
 					end
-					DB:Execute('END TRANSACTION')
+					X.SQLiteEndTransaction(DB)
 				end
 			elseif nVersion == 7 then
-				DB:Execute('BEGIN TRANSACTION')
-				local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM PlayerInfo WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+				X.SQLiteBeginTransaction(DB)
+				local nCount, nPageSize = X.Get(X.SQLiteGetAll(db, 'SELECT COUNT(*) AS count FROM PlayerInfo WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
 				for i = 0, nCount / nPageSize do
-					local aPlayerInfo = db:Execute('SELECT * FROM PlayerInfo WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+					local aPlayerInfo = X.SQLiteGetAll(db, 'SELECT * FROM PlayerInfo WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
 					if aPlayerInfo then
 						for _, rec in ipairs(aPlayerInfo) do
 							if rec.server and rec.id and rec.name then
-								DBP_RI:ClearBindings()
-								DBP_RI:BindAll(rec.id)
-								local data = DBP_RI:GetNext()
-								DBP_RI:Reset()
+								local data = X.SQLitePrepareGetOne(DBP_RI, rec.id)
 								local nTime = data and (data.time or 0) or -1
 								local nRecTime = rec.time or 0
 								if nRecTime > nTime then
-									DBP_W:ClearBindings()
-									DBP_W:BindAll(
+									X.SQLitePrepareExecute(
+										DBP_W,
 										rec.server,
 										rec.id,
 										rec.name,
@@ -350,31 +331,26 @@ function D.Import(aFilePath, bTimes)
 										data and data.times or (bTimes and rec.time or 0),
 										rec.extra or ''
 									)
-									DBP_W:Execute()
 									nImportChar = nImportChar + 1
 								else
 									nSkipChar = nSkipChar + 1
 								end
 							end
 						end
-						DBP_W:Reset()
 					end
 				end
-				local nCount, nPageSize = X.Get(db:Execute('SELECT COUNT(*) AS count FROM TongInfo WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
+				local nCount, nPageSize = X.Get(X.SQLiteGetAll(db, 'SELECT COUNT(*) AS count FROM TongInfo WHERE id IS NOT NULL'), {1, 'count'}, 0), 10000
 				for i = 0, nCount / nPageSize do
-					local aTongInfo = db:Execute('SELECT * FROM TongInfo WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
+					local aTongInfo = X.SQLiteGetAll(db, 'SELECT * FROM TongInfo WHERE id IS NOT NULL LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))
 					if aTongInfo then
 						for _, rec in ipairs(aTongInfo) do
 							if rec.id and rec.name then
-								DBT_RI:ClearBindings()
-								DBT_RI:BindAll(rec.id)
-								local data = DBT_RI:GetNext()
-								DBT_RI:Reset()
+								local data = X.SQLitePrepareGetOne(DBT_RI, rec.id)
 								local nTime = data and (data.time or 0) or -1
 								local nRecTime = rec.time or 0
 								if nRecTime > nTime then
-									DBT_W:ClearBindings()
-									DBT_W:BindAll(
+									X.SQLitePrepareExecute(
+										DBT_W,
 										rec.server,
 										rec.id,
 										rec.name,
@@ -382,17 +358,15 @@ function D.Import(aFilePath, bTimes)
 										data and data.times or (bTimes and rec.time or 0),
 										rec.extra or ''
 									)
-									DBT_W:Execute()
 									nImportTong = nImportTong + 1
 								else
 									nSkipTong = nSkipTong + 1
 								end
 							end
 						end
-						DBT_W:Reset()
 					end
 				end
-				DB:Execute('END TRANSACTION')
+				X.SQLiteEndTransaction(DB)
 			end
 			db:Release()
 		end
@@ -694,25 +668,42 @@ function D.Flush()
 		return
 	end
 	if DBP_W then
-		DB:Execute('BEGIN TRANSACTION')
+		X.SQLiteBeginTransaction(DB)
 		for i, p in pairs(PLAYER_INFO_W) do
-			DBP_W:ClearBindings()
-			DBP_W:BindAll(p.server, p.id, p.name, p.guid, p.force, p.role, p.level, p.title, p.camp, p.tong, p.time, p.times, '')
-			DBP_W:Execute()
+			X.SQLitePrepareExecute(
+				DBP_W,
+				p.server,
+				p.id,
+				p.name,
+				p.guid,
+				p.force,
+				p.role,
+				p.level,
+				p.title,
+				p.camp,
+				p.tong,
+				p.time,
+				p.times,
+				''
+			)
 		end
-		DBP_W:Reset()
-		DB:Execute('END TRANSACTION')
+		X.SQLiteEndTransaction(DB)
 		PLAYER_INFO_W = {}
 	end
 	if DBT_W then
-		DB:Execute('BEGIN TRANSACTION')
+		X.SQLiteBeginTransaction(DB)
 		for _, p in pairs(TONG_INFO_W) do
-			DBT_W:ClearBindings()
-			DBT_W:BindAll(p.server, p.id, p.name, p.time, p.times, '')
-			DBT_W:Execute()
+			X.SQLitePrepareExecute(
+				DBT_W,
+				p.server,
+				p.id,
+				p.name,
+				p.time,
+				p.times,
+				''
+			)
 		end
-		DBT_W:Reset()
-		DB:Execute('END TRANSACTION')
+		X.SQLiteEndTransaction(DB)
 		TONG_INFO_W = {}
 	end
 end
@@ -737,28 +728,30 @@ function D.GetPlayerInfo(xKey)
 		tPlayer = PLAYER_INFO[xKey]
 		if not tPlayer and InitDB() then
 			local szServer = X.GetServerOriginName()
-			DBP_RI:ClearBindings()
-			DBP_RI:BindAll(AnsiToUTF8(szServer), xKey)
-			tPlayer = X.ConvertToANSI((DBP_RI:GetNext()))
-			DBP_RI:Reset()
+			tPlayer = X.SQLitePrepareGetOneANSI(
+				DBP_RI,
+				szServer,
+				xKey
+			)
 		end
 	elseif X.IsGlobalID(xKey) then
 		tPlayer = PLAYER_INFO[xKey]
 		if not tPlayer and InitDB() then
-			DBP_RGI:ClearBindings()
-			DBP_RGI:BindAll(AnsiToUTF8(xKey))
-			tPlayer = X.ConvertToANSI((DBP_RGI:GetNext()))
-			DBP_RGI:Reset()
+			tPlayer = X.SQLitePrepareGetOneANSI(
+				DBP_RGI,
+				xKey
+			)
 		end
 	elseif X.IsString(xKey) then
 		local szName, szServer = X.DisassemblePlayerGlobalName(xKey, true)
 		xKey = X.AssemblePlayerGlobalName(szName, szServer)
 		tPlayer = PLAYER_INFO[xKey]
 		if not tPlayer and InitDB() then
-			DBP_RN:ClearBindings()
-			DBP_RN:BindAll(AnsiToUTF8(szServer), AnsiToUTF8(szName))
-			tPlayer = X.ConvertToANSI((DBP_RN:GetNext()))
-			DBP_RN:Reset()
+			tPlayer = X.SQLitePrepareGetOneANSI(
+				DBP_RN,
+				szServer,
+				szName
+			)
 		end
 	end
 	-- 更新内存缓存
@@ -787,10 +780,11 @@ function D.GetTongInfo(szServerName, dwTongID)
 	local tTong = TONG_INFO[szServerName .. g_tStrings.STR_CONNECT .. dwTongID]
 	-- 从数据库读取
 	if not tTong and InitDB() then
-		DBT_RI:ClearBindings()
-		DBT_RI:BindAll(X.ConvertToUTF8(szServerName), dwTongID)
-		tTong = X.ConvertToANSI((DBT_RI:GetNext()))
-		DBT_RI:Reset()
+		tTong = X.SQLitePrepareGetOneANSI(
+			DBT_RI,
+			szServerName,
+			dwTongID
+		)
 	end
 	-- 更新内存缓存
 	if tTong then
@@ -970,12 +964,12 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	local nDeltaY = 30
 	ui:Append('Text', {
 		x = nX, y = nY,
-		text = _L('Total player count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM PlayerInfo]] .. szWhere), {1, 'count'}, 0)),
+		text = _L('Total player count: %d', X.Get(X.SQLiteGetAll(DB, [[SELECT COUNT(*) AS count FROM PlayerInfo]] .. szWhere), {1, 'count'}, 0)),
 	})
 	nY = nY + nDeltaY
 	ui:Append('Text', {
 		x = nX, y = nY,
-		text = _L('Total tong count: %d', X.Get(DB:Execute([[SELECT COUNT(*) AS count FROM TongInfo]] .. szWhere), {1, 'count'}, 0)),
+		text = _L('Total tong count: %d', X.Get(X.SQLiteGetAll(DB, [[SELECT COUNT(*) AS count FROM TongInfo]] .. szWhere), {1, 'count'}, 0)),
 	})
 	nY = nY + nDeltaY
 	nY = nY + nDeltaY
@@ -986,7 +980,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	})
 	nY = nY + nDeltaY
 
-	for _, v in ipairs(DB:Execute([[SELECT camp, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY camp]]) or {}) do
+	for _, v in ipairs(X.SQLiteGetAll(DB, [[SELECT camp, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY camp]]) or {}) do
 		ui:Append('Text', {
 			x = nX, y = nY,
 			text = g_tStrings.STR_CAMP_TITLE[v.camp] or _L('Unknown(%d)', v.camp),
@@ -1005,7 +999,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	})
 	nY = nY + nDeltaY
 
-	local aForce = DB:Execute([[SELECT force, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY force]]) or {}
+	local aForce = X.SQLiteGetAll(DB, [[SELECT force, COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ GROUP BY force]]) or {}
 	for i = 1, #aForce, 2 do
 		nX = nPaddingX
 		for j = 0, 1 do
@@ -1033,7 +1027,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 	})
 	nY = nY + nDeltaY
 
-	for _, v in ipairs(DB:Execute([[
+	for _, v in ipairs(X.SQLiteGetAll(DB, [[
 		SELECT TongInfo.name, COUNT(PlayerInfo.id) AS count
 		FROM PlayerInfo
 		JOIN TongInfo ON PlayerInfo.tong = TongInfo.id
@@ -1169,7 +1163,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 				if not InitDB() then
 					return
 				end
-				DB:Execute('DELETE FROM PlayerInfo')
+				X.SQLiteExecute(DB, 'DELETE FROM PlayerInfo')
 				X.OutputSystemMessage(_L['MY_Farbnamen'], _L['Cache data deleted.'])
 			end)
 		end,

@@ -134,16 +134,16 @@ function DB:Connect(bCheck)
 		X.OutputDebugMessage(_L['MY_ChatLog'], 'Init database with STMT', X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 		if self.db then
-			self.db:Execute([[
+			X.SQLiteExecute(self.db, [[
 				CREATE TABLE IF NOT EXISTS ChatInfo (
 					key NVARCHAR(128) NOT NULL,
 					value NVARCHAR(4096) NOT NULL,
 					PRIMARY KEY (key)
 				)
 			]])
-			self.stmtInfoGet = self.db:Prepare('SELECT value FROM ChatInfo WHERE key = ?')
-			self.stmtInfoSet = self.db:Prepare('REPLACE INTO ChatInfo (key, value) VALUES (?, ?)')
-			self.db:Execute([[
+			self.stmtInfoGet = X.SQLitePrepare(self.db, 'SELECT value FROM ChatInfo WHERE key = ?')
+			self.stmtInfoSet = X.SQLitePrepare(self.db, 'REPLACE INTO ChatInfo (key, value) VALUES (?, ?)')
+			X.SQLiteExecute(self.db, [[
 				CREATE TABLE IF NOT EXISTS ChatLog (
 					hash INTEGER NOT NULL,
 					type VARCHAR(64) NOT NULL,
@@ -154,12 +154,12 @@ function DB:Connect(bCheck)
 					PRIMARY KEY (time, hash)
 				)
 			]])
-			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_type_idx ON ChatLog(type)')
-			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_talker_idx ON ChatLog(talker)')
-			self.db:Execute('CREATE INDEX IF NOT EXISTS ChatLog_text_idx ON ChatLog(text)')
-			self.stmtCount = self.db:Prepare('SELECT type AS szMsgType, COUNT(*) AS nCount FROM ChatLog WHERE talker LIKE ? OR text LIKE ? GROUP BY szMsgType')
-			self.stmtInsert = self.db:Prepare('REPLACE INTO ChatLog (hash, type, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)')
-			self.stmtDelete = self.db:Prepare('DELETE FROM ChatLog WHERE hash = ? AND time = ?')
+			X.SQLiteExecute(self.db, 'CREATE INDEX IF NOT EXISTS ChatLog_type_idx ON ChatLog(type)')
+			X.SQLiteExecute(self.db, 'CREATE INDEX IF NOT EXISTS ChatLog_talker_idx ON ChatLog(talker)')
+			X.SQLiteExecute(self.db, 'CREATE INDEX IF NOT EXISTS ChatLog_text_idx ON ChatLog(text)')
+			self.stmtCount = X.SQLitePrepare(self.db, 'SELECT type AS szMsgType, COUNT(*) AS nCount FROM ChatLog WHERE talker LIKE ? OR text LIKE ? GROUP BY szMsgType')
+			self.stmtInsert = X.SQLitePrepare(self.db, 'REPLACE INTO ChatLog (hash, type, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)')
+			self.stmtDelete = X.SQLitePrepare(self.db, 'DELETE FROM ChatLog WHERE hash = ? AND time = ?')
 		end
 		if self:IsConnected() then
 			--[[#DEBUG BEGIN]]
@@ -200,7 +200,7 @@ function DB:GarbageCollection()
 	if not self:Connect() then
 		return false
 	end
-	self.db:Execute('VACUUM')
+	X.SQLiteExecute(self.db, 'VACUUM')
 	return true
 end
 
@@ -216,10 +216,7 @@ function DB:SetInfo(szKey, oValue)
 	if not self:Connect() then
 		return false
 	end
-	self.stmtInfoSet:ClearBindings()
-	self.stmtInfoSet:BindAll(szKey, X.EncodeLUAData(oValue))
-	self.stmtInfoSet:GetAll()
-	self.stmtInfoSet:Reset()
+	X.SQLitePrepareExecute(self.stmtInfoSet, szKey, X.EncodeLUAData(oValue))
 	return true
 end
 
@@ -227,10 +224,7 @@ function DB:GetInfo(szKey)
 	if not self:Connect() then
 		return nil, false
 	end
-	self.stmtInfoGet:ClearBindings()
-	self.stmtInfoGet:BindAll(szKey)
-	local res, success = X.Get(self.stmtInfoGet:GetAll(), {1, 'value'})
-	self.stmtInfoGet:Reset()
+	local res, success = X.Get(X.SQLitePrepareGetOne(self.stmtInfoGet, szKey), {'value'})
 	if success then
 		res = X.DecodeLUAData(res)
 	end
@@ -304,7 +298,7 @@ function DB:CountMsg(aMsgType, szSearch, nMinTime, nMaxTime)
 	local bMaxTime = not X.IsEmpty(nMaxTime) and not X.IsHugeNumber(nMaxTime) and self:GetMaxTime() >= nMaxTime
 	if not aMsgType and X.IsEmpty(szSearch) and not bMinTime and not bMaxTime then
 		if not self.nCountCache then
-			self.nCountCache = X.Get(self.db:Execute('SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
+			self.nCountCache = X.Get(X.SQLiteGetAll(self.db, 'SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 		end
 		return self.nCountCache
 	end
@@ -318,21 +312,14 @@ function DB:CountMsg(aMsgType, szSearch, nMinTime, nMaxTime)
 	if not tCount then
 		local aResult
 		if X.IsEmpty(szSearch) then
-			aResult = self.db:Execute('SELECT type AS szMsgType, COUNT(*) AS nCount FROM ChatLog GROUP BY type')
+			aResult = X.SQLiteGetAll(self.db, 'SELECT type AS szMsgType, COUNT(*) AS nCount FROM ChatLog GROUP BY type')
 		elseif bMinTime or bMaxTime then
 			local szSQL = 'SELECT type AS szMsgType, COUNT(*) AS nCount FROM ChatLog'
 			local aValue = {}
 			szSQL = AppendCommonWhere(szSQL, aValue, aMsgType, szSearch, nMinTime, nMaxTime)
-			local stmt = self.db:Prepare(szSQL)
-			stmt:ClearBindings()
-			stmt:BindAll(unpack(aValue))
-			aResult = stmt:GetAll()
-			stmt:Reset()
+			aResult = X.SQLitePrepareGetAll(X.SQLitePrepare(self.db, szSQL), unpack(aValue))
 		else
-			self.stmtCount:ClearBindings()
-			self.stmtCount:BindAll(szSearch, szSearch)
-			aResult = self.stmtCount:GetAll()
-			self.stmtCount:Reset()
+			aResult = X.SQLitePrepareGetAll(self.stmtCount, szSearch, szSearch)
 		end
 		tCount = {}
 		for _, rec in ipairs(aResult) do
@@ -366,12 +353,7 @@ function DB:SelectMsg(aMsgType, szSearch, nMinTime, nMaxTime, nOffset, nLimit)
 	szSQL = AppendCommonWhere(szSQL, aValue, aMsgType, szSearch, nMinTime, nMaxTime)
 	szSQL = szSQL .. ' ORDER BY nTime ASC'
 	szSQL = AppendCommonLimit(szSQL, aValue, nOffset, nLimit)
-	local stmt = self.db:Prepare(szSQL)
-	stmt:ClearBindings()
-	stmt:BindAll(unpack(aValue))
-	local res = stmt:GetAll()
-	stmt:Reset()
-	return res
+	return X.SQLiteGetAll(self.db, szSQL, unpack(aValue))
 end
 
 function DB:GetMinRecTime()
@@ -379,7 +361,7 @@ function DB:GetMinRecTime()
 		return false
 	end
 	self:Flush()
-	local rec = self.db:Execute('SELECT time AS nTime FROM ChatLog ORDER BY nTime ASC LIMIT 1')[1]
+	local rec = X.SQLiteGetAll(self.db, 'SELECT time AS nTime FROM ChatLog ORDER BY nTime ASC LIMIT 1')[1]
 	return rec and rec.nTime or -1
 end
 
@@ -388,7 +370,7 @@ function DB:GetMaxRecTime()
 		return false
 	end
 	self:Flush()
-	local rec = self.db:Execute('SELECT time AS nTime FROM ChatLog ORDER BY nTime DESC LIMIT 1')[1]
+	local rec = X.SQLiteGetAll(self.db, 'SELECT time AS nTime FROM ChatLog ORDER BY nTime DESC LIMIT 1')[1]
 	return rec and rec.nTime or -1
 end
 
@@ -410,10 +392,7 @@ function DB:DeleteMsgInterval(aMsgType, szSearch, nMinTime, nMaxTime)
 	local szSQL, aValue = DELETE_MSG, {}
 	szSQL = AppendCommonWhere(szSQL, aValue, aMsgType, szSearch, nMinTime, nMaxTime)
 	if szSQL ~= DELETE_MSG then
-		local stmt = self.db:Prepare(szSQL)
-		stmt:ClearBindings()
-		stmt:BindAll(unpack(aValue))
-		stmt:GetAll()
+		X.SQLiteGetAll(self.db, szSQL, unpack(aValue))
 		self:FlushCache()
 		return true
 	end
@@ -425,24 +404,18 @@ function DB:Flush()
 		if not self:Connect() then
 			return false
 		end
-		self.db:Execute('BEGIN TRANSACTION')
+		X.SQLiteBeginTransaction(self.db)
 		-- ²åÈë¼ÇÂ¼
 		for _, data in ipairs(self.aInsertQueue) do
-			self.stmtInsert:ClearBindings()
-			self.stmtInsert:BindAll(data.szHash, data.szMsgType, data.nTime, data.szTalker, data.szText, data.szMsg)
-			self.stmtInsert:Execute()
+			X.SQLitePrepareExecute(self.stmtInsert, data.szHash, data.szMsgType, data.nTime, data.szTalker, data.szText, data.szMsg)
 		end
-		self.stmtInsert:Reset()
 		self.aInsertQueue = {}
 		-- É¾³ý¼ÇÂ¼
 		for _, data in ipairs(self.aDeleteQueue) do
-			self.stmtDelete:ClearBindings()
-			self.stmtDelete:BindAll(data.szHash, data.nTime)
-			self.stmtDelete:Execute()
+			X.SQLitePrepareExecute(self.stmtDelete, data.szHash, data.nTime)
 		end
-		self.stmtDelete:Reset()
 		self.aDeleteQueue = {}
-		self.db:Execute('END TRANSACTION')
+		X.SQLiteEndTransaction(self.db)
 		self:FlushCache()
 	end
 	return true

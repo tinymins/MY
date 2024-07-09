@@ -26,7 +26,7 @@ local DB = X.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v5.db'
 if not DB then
 	return X.OutputSystemMessage(_L['MY_MiddleMapMark'], _L['Cannot connect to database!!!'], X.CONSTANT.MSG_THEME.ERROR)
 end
-DB:Execute([[
+X.SQLiteExecute(DB, [[
 	CREATE TABLE IF NOT EXISTS NpcInfo (
 		templateid INTEGER NOT NULL,
 		poskey INTEGER NOT NULL,
@@ -41,15 +41,15 @@ DB:Execute([[
 		PRIMARY KEY(templateid, poskey)
 	)
 ]])
-DB:Execute('CREATE INDEX IF NOT EXISTS mmm_name_idx ON NpcInfo(name, mapid)')
-DB:Execute('CREATE INDEX IF NOT EXISTS mmm_title_idx ON NpcInfo(title, mapid)')
-DB:Execute('CREATE INDEX IF NOT EXISTS mmm_template_idx ON NpcInfo(templateid, mapid)')
-local DBN_W  = DB:Prepare('REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, z, name, title, level, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-local DBN_DM  = DB:Prepare('DELETE FROM NpcInfo WHERE mapid = ?')
-local DBN_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name, title, level FROM NpcInfo WHERE templateid = ?')
-local DBN_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name, title, level FROM NpcInfo WHERE name LIKE ? OR title LIKE ?')
-local DBN_RNM = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name, title, level FROM NpcInfo WHERE (name LIKE ? AND mapid = ?) OR (title LIKE ? AND mapid = ?)')
-DB:Execute([[
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS mmm_name_idx ON NpcInfo(name, mapid)')
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS mmm_title_idx ON NpcInfo(title, mapid)')
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS mmm_template_idx ON NpcInfo(templateid, mapid)')
+local DBN_W  = X.SQLitePrepare(DB, 'REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, z, name, title, level, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+local DBN_DM  = X.SQLitePrepare(DB, 'DELETE FROM NpcInfo WHERE mapid = ?')
+local DBN_RI = X.SQLitePrepare(DB, 'SELECT templateid, poskey, mapid, x, y, z, name, title, level FROM NpcInfo WHERE templateid = ?')
+local DBN_RN = X.SQLitePrepare(DB, 'SELECT templateid, poskey, mapid, x, y, z, name, title, level FROM NpcInfo WHERE name LIKE ? OR title LIKE ?')
+local DBN_RNM = X.SQLitePrepare(DB, 'SELECT templateid, poskey, mapid, x, y, z, name, title, level FROM NpcInfo WHERE (name LIKE ? AND mapid = ?) OR (title LIKE ? AND mapid = ?)')
+X.SQLiteExecute(DB, [[
 	CREATE TABLE IF NOT EXISTS DoodadInfo (
 		templateid INTEGER NOT NULL,
 		poskey INTEGER NOT NULL,
@@ -62,12 +62,12 @@ DB:Execute([[
 		PRIMARY KEY (templateid, poskey)
 	)
 ]])
-DB:Execute('CREATE INDEX IF NOT EXISTS mmm_name_idx ON DoodadInfo(name, mapid)')
-local DBD_W  = DB:Prepare('REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, z, name, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-local DBD_DM  = DB:Prepare('DELETE FROM DoodadInfo WHERE mapid = ?')
-local DBD_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name FROM DoodadInfo WHERE templateid = ?')
-local DBD_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name FROM DoodadInfo WHERE name LIKE ?')
-local DBD_RNM = DB:Prepare('SELECT templateid, poskey, mapid, x, y, z, name FROM DoodadInfo WHERE name LIKE ? AND mapid = ?')
+X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS mmm_name_idx ON DoodadInfo(name, mapid)')
+local DBD_W  = X.SQLitePrepare(DB, 'REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, z, name, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+local DBD_DM  = X.SQLitePrepare(DB, 'DELETE FROM DoodadInfo WHERE mapid = ?')
+local DBD_RI = X.SQLitePrepare(DB, 'SELECT templateid, poskey, mapid, x, y, z, name FROM DoodadInfo WHERE templateid = ?')
+local DBD_RN = X.SQLitePrepare(DB, 'SELECT templateid, poskey, mapid, x, y, z, name FROM DoodadInfo WHERE name LIKE ?')
+local DBD_RNM = X.SQLitePrepare(DB, 'SELECT templateid, poskey, mapid, x, y, z, name FROM DoodadInfo WHERE name LIKE ? AND mapid = ?')
 
 local D = {}
 
@@ -105,7 +105,7 @@ function D.Migration()
 		function()
 			-- 转移V1旧版数据
 			if IsLocalFileExist(DB_V1_PATH) then
-				DB:Execute('BEGIN TRANSACTION')
+				X.SQLiteBeginTransaction(DB)
 				for _, dwMapID in ipairs(GetMapList()) do
 					local data = X.LoadLUAData({DB_V1_ROOT .. dwMapID .. '.{$lang}.jx3dat', X.PATH_TYPE.DATA})
 					if type(data) == 'string' then
@@ -113,36 +113,52 @@ function D.Migration()
 					end
 					if data then
 						for _, p in ipairs(data.Npc) do
-							DBN_W:ClearBindings()
-							DBN_W:BindAll(p.dwTemplateID, GeneNpcInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, -1, AnsiToUTF8(p.szName), AnsiToUTF8(p.szTitle), p.nLevel, '')
-							DBN_W:Execute()
+							X.SQLitePrepareExecute(
+								DBN_W,
+								p.dwTemplateID,
+								GeneNpcInfoPosKey(dwMapID, p.nX, p.nY),
+								dwMapID,
+								p.nX,
+								p.nY,
+								-1,
+								AnsiToUTF8(p.szName),
+								AnsiToUTF8(p.szTitle),
+								p.nLevel,
+								''
+							)
 						end
-						DBN_W:Reset()
 						for _, p in ipairs(data.Doodad) do
-							DBD_W:ClearBindings()
-							DBD_W:BindAll(p.dwTemplateID, GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, -1, AnsiToUTF8(p.szName), '')
-							DBD_W:Execute()
+							X.SQLitePrepareExecute(
+								DBD_W,
+								p.dwTemplateID,
+								GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY),
+								dwMapID,
+								p.nX,
+								p.nY,
+								-1,
+								AnsiToUTF8(p.szName),
+								''
+							)
 						end
-						DBD_W:Reset()
 						--[[#DEBUG BEGIN]]
 						X.OutputDebugMessage('MY_MiddleMapMark', 'MiddleMapMark cache trans from file to sqlite finished!', X.DEBUG_LEVEL.LOG)
 						--[[#DEBUG END]]
 					end
 				end
-				DB:Execute('END TRANSACTION')
+				X.SQLiteEndTransaction(DB)
 				CPath.DelDir(X.FormatPath({DB_V1_ROOT, X.PATH_TYPE.DATA}))
 			end
 			-- 转移V2旧版数据
 			if IsLocalFileExist(DB_V2_PATH) then
 				local DB_V2 = SQLite3_Open(DB_V2_PATH)
 				if DB_V2 then
-					DB:Execute('BEGIN TRANSACTION')
-					local aNpcInfo = DB_V2:Execute('SELECT * FROM NpcInfo WHERE templateid IS NOT NULL')
+					X.SQLiteBeginTransaction(DB)
+					local aNpcInfo = X.SQLiteGetAll(DB_V2, 'SELECT * FROM NpcInfo WHERE templateid IS NOT NULL')
 					if aNpcInfo then
 						for _, rec in ipairs(aNpcInfo) do
 							if rec.templateid and rec.poskey then
-								DBN_W:ClearBindings()
-								DBN_W:BindAll(
+								X.SQLitePrepareExecute(
+									DBN_W,
 									rec.templateid,
 									rec.poskey,
 									rec.mapid or -1,
@@ -154,17 +170,15 @@ function D.Migration()
 									rec.level or -1,
 									''
 								)
-								DBN_W:Execute()
 							end
 						end
-						DBN_W:Reset()
 					end
-					local aDoodadInfo = DB_V2:Execute('SELECT * FROM DoodadInfo WHERE templateid IS NOT NULL')
+					local aDoodadInfo = X.SQLiteGetAll(DB_V2, 'SELECT * FROM DoodadInfo WHERE templateid IS NOT NULL')
 					if aDoodadInfo then
 						for _, rec in ipairs(aDoodadInfo) do
 							if rec.templateid and rec.poskey then
-								DBD_W:ClearBindings()
-								DBD_W:BindAll(
+								X.SQLitePrepareExecute(
+									DBD_W,
 									rec.templateid,
 									rec.poskey,
 									rec.mapid or -1,
@@ -174,12 +188,10 @@ function D.Migration()
 									rec.name or '',
 									''
 								)
-								DBD_W:Execute()
 							end
 						end
-						DBD_W:Reset()
 					end
-					DB:Execute('END TRANSACTION')
+					X.SQLiteEndTransaction(DB)
 					DB_V2:Release()
 				end
 				CPath.Move(DB_V2_PATH, DB_V2_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
@@ -188,13 +200,13 @@ function D.Migration()
 			if IsLocalFileExist(DB_V3_PATH) then
 				local DB_V3 = SQLite3_Open(DB_V3_PATH)
 				if DB_V3 then
-					DB:Execute('BEGIN TRANSACTION')
-					local aNpcInfo = DB_V3:Execute('SELECT * FROM NpcInfo WHERE templateid IS NOT NULL')
+					X.SQLiteBeginTransaction(DB)
+					local aNpcInfo = X.SQLiteGetAll(DB_V3, 'SELECT * FROM NpcInfo WHERE templateid IS NOT NULL')
 					if aNpcInfo then
 						for _, rec in ipairs(aNpcInfo) do
 							if rec.templateid and rec.poskey then
-								DBN_W:ClearBindings()
-								DBN_W:BindAll(
+								X.SQLitePrepareExecute(
+									DBN_W,
 									rec.templateid,
 									rec.poskey,
 									rec.mapid or -1,
@@ -206,17 +218,15 @@ function D.Migration()
 									rec.level or -1,
 									''
 								)
-								DBN_W:Execute()
 							end
 						end
-						DBN_W:Reset()
 					end
-					local aDoodadInfo = DB_V3:Execute('SELECT * FROM DoodadInfo WHERE templateid IS NOT NULL')
+					local aDoodadInfo = X.SQLiteGetAll(DB_V3, 'SELECT * FROM DoodadInfo WHERE templateid IS NOT NULL')
 					if aDoodadInfo then
 						for _, rec in ipairs(aDoodadInfo) do
 							if rec.templateid and rec.poskey then
-								DBD_W:ClearBindings()
-								DBD_W:BindAll(
+								X.SQLitePrepareExecute(
+									DBD_W,
 									rec.templateid,
 									rec.poskey,
 									rec.mapid or -1,
@@ -226,12 +236,10 @@ function D.Migration()
 									rec.name or '',
 									''
 								)
-								DBD_W:Execute()
 							end
 						end
-						DBD_W:Reset()
 					end
-					DB:Execute('END TRANSACTION')
+					X.SQLiteEndTransaction(DB)
 					DB_V3:Release()
 				end
 				CPath.Move(DB_V3_PATH, DB_V3_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
@@ -240,13 +248,13 @@ function D.Migration()
 			if IsLocalFileExist(DB_V4_PATH) then
 				local DB_V4 = SQLite3_Open(DB_V4_PATH)
 				if DB_V4 then
-					DB:Execute('BEGIN TRANSACTION')
-					local aNpcInfo = DB_V4:Execute('SELECT * FROM NpcInfo WHERE templateid IS NOT NULL')
+					X.SQLiteBeginTransaction(DB)
+					local aNpcInfo = X.SQLiteGetAll(DB_V4, 'SELECT * FROM NpcInfo WHERE templateid IS NOT NULL')
 					if aNpcInfo then
 						for _, rec in ipairs(aNpcInfo) do
 							if rec.templateid and rec.poskey then
-								DBN_W:ClearBindings()
-								DBN_W:BindAll(
+								X.SQLitePrepareExecute(
+									DBN_W,
 									rec.templateid,
 									rec.poskey,
 									rec.mapid or -1,
@@ -258,17 +266,15 @@ function D.Migration()
 									rec.level or -1,
 									''
 								)
-								DBN_W:Execute()
 							end
 						end
-						DBN_W:Reset()
 					end
-					local aDoodadInfo = DB_V4:Execute('SELECT * FROM DoodadInfo WHERE templateid IS NOT NULL')
+					local aDoodadInfo = X.SQLiteGetAll(DB_V4, 'SELECT * FROM DoodadInfo WHERE templateid IS NOT NULL')
 					if aDoodadInfo then
 						for _, rec in ipairs(aDoodadInfo) do
 							if rec.templateid and rec.poskey then
-								DBD_W:ClearBindings()
-								DBD_W:BindAll(
+								X.SQLitePrepareExecute(
+									DBD_W,
 									rec.templateid,
 									rec.poskey,
 									rec.mapid or -1,
@@ -278,12 +284,10 @@ function D.Migration()
 									rec.name or '',
 									''
 								)
-								DBD_W:Execute()
 							end
 						end
-						DBD_W:Reset()
 					end
-					DB:Execute('END TRANSACTION')
+					X.SQLiteEndTransaction(DB)
 					DB_V4:Release()
 				end
 				CPath.Move(DB_V4_PATH, DB_V4_PATH .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
@@ -302,42 +306,52 @@ local function FlushDB()
 	if X.IsEmpty(l_npc) and X.IsEmpty(l_doodad) then
 		return
 	end
-	DB:Execute('BEGIN TRANSACTION')
+	X.SQLiteBeginTransaction(DB)
 
 	for i, p in pairs(l_npc) do
 		if not p.temp then
-			DBN_W:ClearBindings()
-			DBN_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, p.z, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level, '')
-			DBN_W:Execute()
+			X.SQLitePrepareExecute(
+				DBN_W,
+				p.templateid,
+				p.poskey,
+				p.mapid,
+				p.x,
+				p.y,
+				p.z,
+				AnsiToUTF8(p.name),
+				AnsiToUTF8(p.title),
+				p.level,
+				''
+			)
 		end
 	end
-	DBN_W:Reset()
 	l_npc = {}
 
 	for i, p in pairs(l_doodad) do
 		if not p.temp then
-			DBD_W:ClearBindings()
-			DBD_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, p.z, AnsiToUTF8(p.name), '')
-			DBD_W:Execute()
+			X.SQLitePrepareExecute(
+				DBD_W,
+				p.templateid,
+				p.poskey,
+				p.mapid,
+				p.x,
+				p.y,
+				p.z,
+				AnsiToUTF8(p.name),
+				''
+			)
 		end
 	end
-	DBD_W:Reset()
 	l_doodad = {}
 
-	DB:Execute('END TRANSACTION')
+	X.SQLiteEndTransaction(DB)
 end
 local function onLoadingEnding()
 	l_tempMap = X.IsInCompetitionMap() or false
 	if l_tempMap then
 		local dwMapID = X.GetClientPlayer().GetMapID()
-		DBN_DM:ClearBindings()
-		DBN_DM:BindAll(dwMapID)
-		DBN_DM:Execute()
-		DBN_DM:Reset()
-		DBD_DM:ClearBindings()
-		DBD_DM:BindAll(dwMapID)
-		DBD_DM:Execute()
-		DBD_DM:Reset()
+		X.SQLitePrepareExecute(DBN_DM, dwMapID)
+		X.SQLitePrepareExecute(DBD_DM, dwMapID)
 	end
 	FlushDB()
 end
@@ -476,15 +490,19 @@ function D.SearchNpc(szText, dwMapID)
 	local aInfos
 	local szSearch = AnsiToUTF8('%' .. szText .. '%')
 	if dwMapID then
-		DBN_RNM:ClearBindings()
-		DBN_RNM:BindAll(szSearch, dwMapID, szSearch, dwMapID)
-		aInfos = DBN_RNM:GetAll()
-		DBN_RNM:Reset()
+		aInfos = X.SQLitePrepareGetAll(
+			DBN_RNM,
+			szSearch,
+			dwMapID,
+			szSearch,
+			dwMapID
+		)
 	else
-		DBN_RN:ClearBindings()
-		DBN_RN:BindAll(szSearch, szSearch)
-		aInfos = DBN_RN:GetAll()
-		DBN_RN:Reset()
+		aInfos = X.SQLitePrepareGetAll(
+			DBN_RN,
+			szSearch,
+			szSearch
+		)
 	end
 	for i = #aInfos, 1, -1 do
 		local p = aInfos[i]
@@ -506,15 +524,9 @@ function D.SearchDoodad(szText, dwMapID)
 	local aInfos
 	local szSearch = AnsiToUTF8('%' .. szText .. '%')
 	if dwMapID then
-		DBD_RNM:ClearBindings()
-		DBD_RNM:BindAll(szSearch, dwMapID)
-		aInfos = DBD_RNM:GetAll()
-		DBD_RNM:Reset()
+		aInfos = X.SQLitePrepareGetAll(DBD_RNM, szSearch, dwMapID)
 	else
-		DBD_RN:ClearBindings()
-		DBD_RN:BindAll(szSearch)
-		aInfos = DBD_RN:GetAll()
-		DBD_RN:Reset()
+		aInfos = X.SQLitePrepareGetAll(DBD_RN, szSearch)
 	end
 	for i = #aInfos, 1, -1 do
 		local p = aInfos[i]
