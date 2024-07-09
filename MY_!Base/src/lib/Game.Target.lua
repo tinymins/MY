@@ -1873,7 +1873,7 @@ end)
 
 -- 获取其他角色对象
 ---@param dwID number @要获取的角色ID
----@param fnAction fun(dwID: number, eState: number, kPlayer: userdata?): void @回调函数
+---@param fnAction? fun(dwID: number, eState: number, kPlayer: userdata?): void @回调函数
 function X.PeekOtherPlayerByID(dwID, fnAction)
 	if not PEEK_PLAYER_ACTION[dwID] then
 		PEEK_PLAYER_ACTION[dwID] = {}
@@ -1887,7 +1887,7 @@ end
 
 -- 获取其他角色对象
 ---@param szGlobalID string @要获取的角色唯一ID
----@param fnAction fun(szGlobalID: string, eState: number, kPlayer: userdata?): void @回调函数
+---@param fnAction? fun(szGlobalID: string, eState: number, kPlayer: userdata?): void @回调函数
 function X.PeekOtherPlayerByGlobalID(dwServerID, szGlobalID, fnAction)
 	if not PEEK_PLAYER_ACTION[szGlobalID] then
 		PEEK_PLAYER_ACTION[szGlobalID] = {}
@@ -1901,13 +1901,29 @@ end
 
 -- 查看其他角色装备
 ---@param dwID number @要查看的角色ID
-function X.ViewOtherPlayerByID(dwID)
+---@param fnAction? fun(dwID: number, eState: number, kPlayer: userdata?): void @回调函数
+function X.ViewOtherPlayerByID(dwID, fnAction)
+	if not PEEK_PLAYER_ACTION[dwID] then
+		PEEK_PLAYER_ACTION[dwID] = {}
+	end
+	table.insert(PEEK_PLAYER_ACTION[dwID], fnAction)
+	X.DelayCall('LIB#PeekOtherPlayer#' .. dwID, 1000, function()
+		OnPeekOtherPlayerResult(dwID, X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.FAILED)
+	end)
 	ViewInviteToPlayer(dwID, false)
 end
 
 -- 查看其他角色装备
 ---@param szGlobalID string @要查看的角色唯一ID
-function X.ViewOtherPlayerByGlobalID(dwServerID, szGlobalID)
+---@param fnAction? fun(szGlobalID: string, eState: number, kPlayer: userdata?): void @回调函数
+function X.ViewOtherPlayerByGlobalID(dwServerID, szGlobalID, fnAction)
+	if not PEEK_PLAYER_ACTION[szGlobalID] then
+		PEEK_PLAYER_ACTION[szGlobalID] = {}
+	end
+	table.insert(PEEK_PLAYER_ACTION[szGlobalID], fnAction)
+	X.DelayCall('LIB#PeekOtherPlayer#' .. szGlobalID, 1000, function()
+		OnPeekOtherPlayerResult(szGlobalID, X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.FAILED)
+	end)
 	ViewInviteToPlayer(nil, false, dwServerID, szGlobalID)
 end
 
