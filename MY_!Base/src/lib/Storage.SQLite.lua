@@ -164,6 +164,18 @@ function X.SQLiteDisconnect(db)
 	db:Release()
 end
 
+function X.SQLiteBeginTransaction(db)
+	db:Execute('BEGIN TRANSACTION')
+end
+
+function X.SQLiteEndTransaction(db)
+	db:Execute('END TRANSACTION')
+end
+
+function X.SQLiteGarbageCollection(db)
+	db:Execute('VACUUM')
+end
+
 function X.SQLiteExecute(db, szSQL, ...)
 	if select('#', ...) == 0 then
 		return db:Execute(szSQL)
