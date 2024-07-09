@@ -132,4 +132,6 @@ X.RegisterBgMsg('MY_TeamCountdown', function(_, data, nChannel, dwTalkerID, szTa
 	end
 end)
 
+X.RegisterHotKey('MY_TeamCountdown', _L['Open MY_TeamCountdown'], D.Open, nil)
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

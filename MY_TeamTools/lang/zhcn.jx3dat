@@ -256,6 +256,7 @@ return {
 	['[TeamCountdown] Fight Begin!'] = '【团队倒计时】战斗开始！',
 	['[TeamCountdown] Fight Countdown Begin!'] = '【团队倒计时】开始倒数！',
 	['[TeamCountdown] %ds!'] = '【团队倒计时】%d！',
+	['Open MY_TeamCountdown'] = '打开团队倒计时',
 
     -- MY_CombatLogs.lua
     ['MY_CombatLogs'] = '战斗事件记录',
