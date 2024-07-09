@@ -338,9 +338,9 @@ local ChatLinkEvents = {
 						end
 					end
 					if info.szGlobalID and dwServerID then
-						X.PeekOtherPlayerByGlobalID(dwServerID, info.szGlobalID, OnPeekOtherPlayerResult)
+						X.ViewOtherPlayerByGlobalID(dwServerID, info.szGlobalID, OnPeekOtherPlayerResult)
 					elseif info.dwID then
-						X.PeekOtherPlayerByID(info.dwID, OnPeekOtherPlayerResult)
+						X.ViewOtherPlayerByID(info.dwID, OnPeekOtherPlayerResult)
 					end
 				end
 			end
