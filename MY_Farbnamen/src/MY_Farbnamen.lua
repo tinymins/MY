@@ -106,10 +106,27 @@ local function InitDB()
 	]])
 	X.SQLiteExecute(DB, 'CREATE UNIQUE INDEX IF NOT EXISTS player_info_server_name_u_idx ON PlayerInfo(server, name)')
 	X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS player_info_guid_idx ON PlayerInfo(guid)')
+	local szSelectPlayerInfo = [[
+		SELECT
+			server as szServerName,
+			id as dwID,
+			name as szName,
+			guid as szGlobalID,
+			force as dwForceID,
+			role as nRoleType,
+			level as nLevel,
+			title as szTitle,
+			camp as nCamp,
+			tong as dwTongID,
+			time as dwTime,
+			times as nTimes,
+			extra as szExtra
+		FROM PlayerInfo
+	]]
 	DBP_W  = X.SQLitePrepare(DB, 'REPLACE INTO PlayerInfo (server, id, name, guid, force, role, level, title, camp, tong, time, times, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-	DBP_RI = X.SQLitePrepare(DB, 'SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND id = ?')
-	DBP_RN = X.SQLitePrepare(DB, 'SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE server = ? AND name = ?')
-	DBP_RGI = X.SQLitePrepare(DB, 'SELECT server, id, name, guid, force, role, level, title, camp, tong, time, times, extra FROM PlayerInfo WHERE guid = ? ORDER BY time DESC')
+	DBP_RI = X.SQLitePrepare(DB, szSelectPlayerInfo .. ' WHERE server = ? AND id = ?')
+	DBP_RN = X.SQLitePrepare(DB, szSelectPlayerInfo .. ' WHERE server = ? AND name = ?')
+	DBP_RGI = X.SQLitePrepare(DB, szSelectPlayerInfo .. ' WHERE guid = ? ORDER BY time DESC')
 	X.SQLiteExecute(DB, [[
 		CREATE TABLE IF NOT EXISTS TongInfo (
 			server NVARCHAR(10) NOT NULL,
@@ -121,8 +138,17 @@ local function InitDB()
 			PRIMARY KEY(server, id)
 		)
 	]])
+	local szSelectTongInfo = [[
+		SELECT
+			id as dwID,
+			name as szName,
+			time as dwTime,
+			times as nTimes,
+			extra as szExtra
+		FROM TongInfo
+	]]
 	DBT_W  = X.SQLitePrepare(DB, 'REPLACE INTO TongInfo (server, id, name, time, times, extra) VALUES (?, ?, ?, ?, ?, ?)')
-	DBT_RI = X.SQLitePrepare(DB, 'SELECT id, name, time, times, extra FROM TongInfo WHERE server = ? AND id = ?')
+	DBT_RI = X.SQLitePrepare(DB, szSelectTongInfo .. ' WHERE server = ? AND id = ?')
 
 	-- 旧版文件缓存转换
 	local SZ_IC_PATH = X.FormatPath({'cache/PLAYER_INFO/{$server_origin}/', X.PATH_TYPE.DATA})
@@ -223,7 +249,7 @@ function D.Import(aFilePath, bTimes)
 							for _, rec in ipairs(aInfoCache) do
 								if rec.id and rec.name then
 									local data = X.SQLitePrepareGetOne(DBP_RI, rec.id)
-									local nTime = data and (data.time or 0) or -1
+									local nTime = data and (data.dwTime or 0) or -1
 									local nRecTime = rec.time or 0
 									if nRecTime > nTime then
 										X.SQLitePrepareExecute(
@@ -234,7 +260,7 @@ function D.Import(aFilePath, bTimes)
 											X.IIf(
 												X.IsGlobalID(rec.guid),
 												ProcessString(rec.guid),
-												data and data.guid or ''
+												data and data.szGlobalID or ''
 											),
 											rec.force or -1,
 											rec.role or -1,
@@ -242,16 +268,16 @@ function D.Import(aFilePath, bTimes)
 											X.IIf(
 												not X.IsEmpty(rec.title),
 												ProcessString(rec.title),
-												data and data.title or ''
+												data and data.szTitle or ''
 											),
 											rec.camp or -1,
 											X.IIf(
 												X.IsPositiveNumber(rec.tong),
 												rec.tong,
-												data and data.tong or -1
+												data and data.dwTongID or -1
 											),
 											nRecTime,
-											data and data.times or 0,
+											data and data.nTimes or 0,
 											rec.extra or ''
 										)
 										nImportChar = nImportChar + 1
@@ -269,7 +295,7 @@ function D.Import(aFilePath, bTimes)
 							for _, rec in ipairs(aTongCache) do
 								if rec.id and rec.name then
 									local data = X.SQLitePrepareGetOne(DBT_RI, rec.id)
-									local nTime = data and (data.time or 0) or -1
+									local nTime = data and (data.dwTime or 0) or -1
 									local nRecTime = rec.time or 0
 									if nRecTime > nTime then
 										X.SQLitePrepareExecute(
@@ -278,7 +304,7 @@ function D.Import(aFilePath, bTimes)
 											rec.id,
 											ProcessString(rec.name),
 											nRecTime,
-											data and data.times or 0,
+											data and data.nTimes or 0,
 											rec.extra or ''
 										)
 										nImportTong = nImportTong + 1
@@ -300,7 +326,7 @@ function D.Import(aFilePath, bTimes)
 						for _, rec in ipairs(aPlayerInfo) do
 							if rec.server and rec.id and rec.name then
 								local data = X.SQLitePrepareGetOne(DBP_RI, rec.id)
-								local nTime = data and (data.time or 0) or -1
+								local nTime = data and (data.dwTime or 0) or -1
 								local nRecTime = rec.time or 0
 								if nRecTime > nTime then
 									X.SQLitePrepareExecute(
@@ -311,7 +337,7 @@ function D.Import(aFilePath, bTimes)
 										X.IIf(
 											X.IsGlobalID(rec.guid),
 											rec.guid,
-											data and data.guid or ''
+											data and data.szGlobalID or ''
 										),
 										rec.force or -1,
 										rec.role or -1,
@@ -319,16 +345,16 @@ function D.Import(aFilePath, bTimes)
 										X.IIf(
 											not X.IsEmpty(rec.title),
 											rec.title,
-											data and data.title or ''
+											data and data.szTitle or ''
 										),
 										rec.camp or -1,
 										X.IIf(
 											X.IsPositiveNumber(rec.tong),
 											rec.tong,
-											data and data.tong or -1
+											data and data.dwTongID or -1
 										),
 										nRecTime,
-										data and data.times or (bTimes and rec.time or 0),
+										data and data.nTimes or (bTimes and rec.time or 0),
 										rec.extra or ''
 									)
 									nImportChar = nImportChar + 1
@@ -346,7 +372,7 @@ function D.Import(aFilePath, bTimes)
 						for _, rec in ipairs(aTongInfo) do
 							if rec.id and rec.name then
 								local data = X.SQLitePrepareGetOne(DBT_RI, rec.id)
-								local nTime = data and (data.time or 0) or -1
+								local nTime = data and (data.dwTime or 0) or -1
 								local nRecTime = rec.time or 0
 								if nRecTime > nTime then
 									X.SQLitePrepareExecute(
@@ -355,7 +381,7 @@ function D.Import(aFilePath, bTimes)
 										rec.id,
 										rec.name,
 										nRecTime,
-										data and data.times or (bTimes and rec.time or 0),
+										data and data.nTimes or (bTimes and rec.time or 0),
 										rec.extra or ''
 									)
 									nImportTong = nImportTong + 1
@@ -672,18 +698,18 @@ function D.Flush()
 		for i, p in pairs(PLAYER_INFO_W) do
 			X.SQLitePrepareExecute(
 				DBP_W,
-				p.server,
-				p.id,
-				p.name,
-				p.guid,
-				p.force,
-				p.role,
-				p.level,
-				p.title,
-				p.camp,
-				p.tong,
-				p.time,
-				p.times,
+				p.szServerName,
+				p.dwID,
+				p.szName,
+				p.szGlobalID,
+				p.dwForceID,
+				p.nRoleType,
+				p.nLevel,
+				p.szTitle,
+				p.nCamp,
+				p.dwTongID,
+				p.dwTime,
+				p.nTimes,
 				''
 			)
 		end
@@ -695,11 +721,11 @@ function D.Flush()
 		for _, p in pairs(TONG_INFO_W) do
 			X.SQLitePrepareExecute(
 				DBT_W,
-				p.server,
-				p.id,
-				p.name,
-				p.time,
-				p.times,
+				p.szServerName,
+				p.dwID,
+				p.szName,
+				p.dwTime,
+				p.nTimes,
 				''
 			)
 		end
@@ -756,14 +782,14 @@ function D.GetPlayerInfo(xKey)
 	end
 	-- 更新内存缓存
 	if tPlayer then
-		if tPlayer.id and tPlayer.id ~= 0 and tPlayer.server == X.GetServerOriginName() then
-			PLAYER_INFO[tPlayer.id] = tPlayer
+		if tPlayer.dwID and tPlayer.dwID ~= 0 and tPlayer.szServerName == X.GetServerOriginName() then
+			PLAYER_INFO[tPlayer.dwID] = tPlayer
 		end
-		if tPlayer.name and tPlayer.server then
-			PLAYER_INFO[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = tPlayer
+		if tPlayer.szName and tPlayer.szServerName then
+			PLAYER_INFO[X.AssemblePlayerGlobalName(tPlayer.szName, tPlayer.szServerName)] = tPlayer
 		end
-		if X.IsGlobalID(tPlayer.guid) then
-			PLAYER_INFO[tPlayer.guid] = tPlayer
+		if X.IsGlobalID(tPlayer.szGlobalID) then
+			PLAYER_INFO[tPlayer.szGlobalID] = tPlayer
 		end
 	end
 	return tPlayer
@@ -826,42 +852,42 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 			or (szServerName and D.GetPlayerInfo(X.AssemblePlayerGlobalName(szName, szServerName)))
 			or {}
 	end
-	tPlayer.server = szServerName
-	tPlayer.id = X.IIf(IsRemotePlayer(dwID), tPlayer.id, dwID)
-	tPlayer.remoteID = X.IIf(IsRemotePlayer(dwID), dwID, nil)
-	tPlayer.name = szName
-	tPlayer.guid = X.IsGlobalID(szGlobalID) and szGlobalID or tPlayer.guid or ''
-	tPlayer.force = dwForceID or tPlayer.force or -1
-	tPlayer.role = nRoleType or tPlayer.role or -1
-	tPlayer.level = nLevel or tPlayer.level or -1
-	tPlayer.title = szTitle or tPlayer.title or ''
-	tPlayer.camp = nCamp or tPlayer.camp or -1
-	tPlayer.tong = dwTongID or tPlayer.tong or -1
-	tPlayer.extra = tPlayer.extra or ''
-	tPlayer.time = bTimes and GetCurrentTime() or tPlayer.time or 0
-	tPlayer.times = (tPlayer.times or 0) + (bTimes and 1 or 0)
-	if X.IsGlobalID(tPlayer.guid) then
-		PLAYER_INFO[tPlayer.guid] = tPlayer
+	tPlayer.szServerName = szServerName
+	tPlayer.dwID = X.IIf(IsRemotePlayer(dwID), tPlayer.dwID, dwID)
+	tPlayer.dwRemoteID = X.IIf(IsRemotePlayer(dwID), dwID, nil)
+	tPlayer.szName = szName
+	tPlayer.szGlobalID = X.IsGlobalID(szGlobalID) and szGlobalID or tPlayer.szGlobalID or ''
+	tPlayer.dwForceID = dwForceID or tPlayer.dwForceID or -1
+	tPlayer.nRoleType = nRoleType or tPlayer.nRoleType or -1
+	tPlayer.nLevel = nLevel or tPlayer.nLevel or -1
+	tPlayer.szTitle = szTitle or tPlayer.szTitle or ''
+	tPlayer.nCamp = nCamp or tPlayer.nCamp or -1
+	tPlayer.dwTongID = dwTongID or tPlayer.dwTongID or -1
+	tPlayer.szExtra = tPlayer.szExtra or ''
+	tPlayer.dwTime = bTimes and GetCurrentTime() or tPlayer.dwTime or 0
+	tPlayer.nTimes = (tPlayer.nTimes or 0) + (bTimes and 1 or 0)
+	if X.IsGlobalID(tPlayer.szGlobalID) then
+		PLAYER_INFO[tPlayer.szGlobalID] = tPlayer
 	end
-	if tPlayer.remoteID then
-		PLAYER_INFO[tPlayer.remoteID] = tPlayer
+	if tPlayer.dwRemoteID then
+		PLAYER_INFO[tPlayer.dwRemoteID] = tPlayer
 	end
-	if not tPlayer.server then
+	if not tPlayer.szServerName then
 		return
 	end
-	if tPlayer.id and tPlayer.server == X.GetServerOriginName() then
-		PLAYER_INFO[tPlayer.id] = tPlayer
+	if tPlayer.dwID and tPlayer.szServerName == X.GetServerOriginName() then
+		PLAYER_INFO[tPlayer.dwID] = tPlayer
 	end
-	PLAYER_INFO[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = tPlayer
-	if tPlayer.id then
-		PLAYER_INFO_W[X.AssemblePlayerGlobalName(tPlayer.name, tPlayer.server)] = X.ConvertToUTF8(tPlayer)
+	PLAYER_INFO[X.AssemblePlayerGlobalName(tPlayer.szName, tPlayer.szServerName)] = tPlayer
+	if tPlayer.dwID then
+		PLAYER_INFO_W[X.AssemblePlayerGlobalName(tPlayer.szName, tPlayer.szServerName)] = X.ConvertToUTF8(tPlayer)
 	end
 	-- 更新帮会信息
-	if tPlayer.id and tPlayer.server == X.GetServerOriginName() then
-		if tPlayer.tong and tPlayer.tong ~= 0 then
-			local szTongName = GetTongClient().ApplyGetTongName(tPlayer.tong, 254)
+	if tPlayer.dwID and tPlayer.szServerName == X.GetServerOriginName() then
+		if tPlayer.dwTongID and tPlayer.dwTongID ~= 0 then
+			local szTongName = GetTongClient().ApplyGetTongName(tPlayer.dwTongID, 254)
 			if szTongName and szTongName ~= '' then
-				D.RecordTongInfo(tPlayer.server, tPlayer.tong, szTongName, bTimes)
+				D.RecordTongInfo(tPlayer.szServerName, tPlayer.dwTongID, szTongName, bTimes)
 			end
 		end
 	end
@@ -874,14 +900,14 @@ end
 ---@param bTimes boolean @是否增加偶遇次数
 function D.RecordTongInfo(szServerName, dwTongID, szTongName, bTimes)
 	local tTong = D.GetTongInfo(szServerName, dwTongID) or {}
-	tTong.server = szServerName
-	tTong.id = dwTongID
-	tTong.name = szTongName
-	tTong.extra = tTong.extra or ''
-	tTong.time = GetCurrentTime()
-	tTong.times = (tTong.times or 0) + (bTimes and 1 or 0)
-	TONG_INFO[szServerName .. g_tStrings.STR_CONNECT .. tTong.id] = tTong
-	TONG_INFO_W[tTong.id] = X.ConvertToUTF8(tTong)
+	tTong.szServerName = szServerName
+	tTong.dwID = dwTongID
+	tTong.szName = szTongName
+	tTong.szExtra = tTong.extra or ''
+	tTong.dwTime = GetCurrentTime()
+	tTong.nTimes = (tTong.nTimes or 0) + (bTimes and 1 or 0)
+	TONG_INFO[szServerName .. g_tStrings.STR_CONNECT .. tTong.dwID] = tTong
+	TONG_INFO_W[tTong.dwID] = X.ConvertToUTF8(tTong)
 end
 
 -- 保存指定dwID的玩家
@@ -916,20 +942,20 @@ end
 function D.Get(xKey)
 	local tPlayer = D.GetPlayerInfo(xKey)
 	if tPlayer then
-		local tTong = D.GetTongInfo(tPlayer.server, tPlayer.tong)
+		local tTong = D.GetTongInfo(tPlayer.szServerName, tPlayer.dwTongID)
 		return {
-			szServerName = tPlayer.server,
-			dwID         = tPlayer.id,
-			szName       = tPlayer.name,
-			szGlobalID   = tPlayer.guid,
-			dwForceID    = tPlayer.force,
-			nRoleType    = tPlayer.role,
-			nLevel       = tPlayer.level,
-			szTitle      = tPlayer.title,
-			nCamp        = tPlayer.camp,
-			dwTongID     = tPlayer.tong,
-			szTongName   = tTong and tTong.name or '',
-			rgb          = X.IsNumber(tPlayer.force) and { X.GetForceColor(tPlayer.force, 'foreground') } or { 255, 255, 255 },
+			szServerName = tPlayer.szServerName,
+			dwID         = tPlayer.dwID,
+			szName       = tPlayer.szName,
+			szGlobalID   = tPlayer.szGlobalID,
+			dwForceID    = tPlayer.dwForceID,
+			nRoleType    = tPlayer.nRoleType,
+			nLevel       = tPlayer.nLevel,
+			szTitle      = tPlayer.szTitle,
+			nCamp        = tPlayer.nCamp,
+			dwTongID     = tPlayer.dwTongID,
+			szTongName   = tTong and tTong.szName or '',
+			rgb          = X.IsNumber(tPlayer.dwForceID) and { X.GetForceColor(tPlayer.dwForceID, 'foreground') } or { 255, 255, 255 },
 		}
 	end
 end
