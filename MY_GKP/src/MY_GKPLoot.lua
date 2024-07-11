@@ -499,6 +499,9 @@ end
 
 function D.OnEvent(szEvent)
 	if szEvent == 'DOODAD_LEAVE_SCENE' then
+		if X.IsInDungeonMap() then
+			return
+		end
 		D.RemoveLootList(arg0)
 	elseif szEvent == 'PARTY_LOOT_MODE_CHANGED' then
 		if arg1 ~= PARTY_LOOT_MODE.DISTRIBUTE then
@@ -1158,9 +1161,9 @@ function D.GetBossAction(dwDoodadID, bMenu)
 	end
 end
 
-function D.AuthCheck(dwID)
+function D.AuthCheck(dwDoodadID)
 	local me, team       = X.GetClientPlayer(), GetClientTeam()
-	local doodad         = X.GetDoodad(dwID)
+	local doodad         = X.GetDoodad(dwDoodadID)
 	if not doodad then
 		--[[#DEBUG BEGIN]]
 		X.OutputDebugMessage('MY_GKPLoot:AuthCheck', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
@@ -1555,18 +1558,18 @@ function D.AdjustWnd(wnd)
 	wnd:Lookup('Btn_Close'):SetRelX(nOuterW - 28)
 end
 
-function D.GetDoodadWnd(frame, dwID, bCreate)
+function D.GetDoodadWnd(frame, dwDoodadID, bCreate)
 	if not frame then
 		return
 	end
 	local container = frame:Lookup('Scroll_DoodadList/WndContainer_DoodadList')
 	local wnd = container:LookupContent(0)
-	while wnd and wnd.dwDoodadID ~= dwID do
+	while wnd and wnd.dwDoodadID ~= dwDoodadID do
 		wnd = wnd:GetNext()
 	end
 	if not wnd and bCreate then
 		wnd = container:AppendContentFromIni(GKP_LOOT_INIFILE, 'Wnd_Doodad')
-		wnd.dwDoodadID = dwID
+		wnd.dwDoodadID = dwDoodadID
 	end
 	return wnd
 end
@@ -1607,26 +1610,26 @@ local function IsItemDataSuitable(data)
 	end
 end
 
-function D.InsertLootList(dwID)
+function D.InsertLootList(dwDoodadID)
 	local bExist = false
 	for _, v in ipairs(D.aDoodadID) do
-		if v == dwID then
+		if v == dwDoodadID then
 			bExist = true
 			break
 		end
 	end
 	if not bExist then
-		table.insert(D.aDoodadID, dwID)
+		table.insert(D.aDoodadID, dwDoodadID)
 	end
-	D.DrawLootList(dwID)
+	D.DrawLootList(dwDoodadID)
 end
 
-function D.DrawLootList(dwID, bRemove)
+function D.DrawLootList(dwDoodadID, bRemove)
 	--[[#DEBUG BEGIN]]
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
 	local frame = D.GetFrame()
-	local wnd = D.GetDoodadWnd(frame, dwID)
+	local wnd = D.GetDoodadWnd(frame, dwDoodadID)
 
 	if bRemove then
 		if wnd then
@@ -1641,9 +1644,9 @@ function D.DrawLootList(dwID, bRemove)
 	else
 		local config = ITEM_CONFIG
 		-- 计算掉落
-		local aItemData, nMoney, szName, bSpecial = D.GetDoodadLootInfo(dwID)
+		local aItemData, nMoney, szName, bSpecial = D.GetDoodadLootInfo(dwDoodadID)
 		if nMoney > 0 then
-			LootMoney(dwID)
+			LootMoney(dwDoodadID)
 		end
 		local nCount = #aItemData
 		if not X.IsEmpty(config.tFilterQuality) or config.bFilterBookRead or config.bFilterBookHave or config.bFilterGrayItem then
@@ -1655,17 +1658,17 @@ function D.DrawLootList(dwID, bRemove)
 			end
 		end
 		--[[#DEBUG BEGIN]]
-		X.OutputDebugMessage('MY_GKPLoot', ('Doodad %d, items %d, display %d.'):format(dwID, #aItemData, nCount), X.DEBUG_LEVEL.LOG)
+		X.OutputDebugMessage('MY_GKPLoot', ('Doodad %d, items %d, display %d.'):format(dwDoodadID, #aItemData, nCount), X.DEBUG_LEVEL.LOG)
 		--[[#DEBUG END]]
 
 		if not szName or nCount == 0 then
 			if not szName then
-				D.RemoveLootList(dwID)
+				D.RemoveLootList(dwDoodadID)
 				--[[#DEBUG BEGIN]]
 				X.OutputDebugMessage('MY_GKPLoot:DrawLootList', 'Doodad does not exist!', X.DEBUG_LEVEL.LOG)
 				--[[#DEBUG END]]
 			elseif frame then
-				D.DrawLootList(dwID, true)
+				D.DrawLootList(dwDoodadID, true)
 			end
 			return
 		end
@@ -1675,7 +1678,7 @@ function D.DrawLootList(dwID, bRemove)
 			frame = D.OpenFrame()
 		end
 		if not wnd then
-			wnd = D.GetDoodadWnd(frame, dwID, true)
+			wnd = D.GetDoodadWnd(frame, dwDoodadID, true)
 		end
 
 		-- 修改UI元素
@@ -1751,20 +1754,20 @@ function D.DrawLootList(dwID, bRemove)
 		nTickCount = GetTickCount() - nTickCount
 		X.OutputDebugMessage(
 			_L['PMTool'],
-			_L('DrawLootList %d in %dms.', dwID, nTickCount),
+			_L('DrawLootList %d in %dms.', dwDoodadID, nTickCount),
 			X.DEBUG_LEVEL.PM_LOG)
 		--[[#DEBUG END]]
 	end
 end
 
-function D.RemoveLootList(dwID)
+function D.RemoveLootList(dwDoodadID)
 	for i, v in ipairs(D.aDoodadID) do
-		if dwID == v then
+		if dwDoodadID == v then
 			table.remove(D.aDoodadID, i)
 			break
 		end
 	end
-	D.DrawLootList(dwID, true)
+	D.DrawLootList(dwDoodadID, true)
 end
 
 function D.GetFrame()
@@ -1781,8 +1784,8 @@ function D.OpenFrame()
 end
 
 -- 手动关闭 不适用自定关闭
-function D.CloseFrame(dwID)
-	local frame = D.GetFrame(dwID)
+function D.CloseFrame()
+	local frame = D.GetFrame()
 	if frame then
 		X.UI.CloseFrame(frame)
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
@@ -1794,8 +1797,8 @@ function D.ReloadFrame()
 		D.CloseFrame()
 	else
 		D.OpenFrame()
-		for _, dwID in ipairs(D.aDoodadID) do
-			D.DrawLootList(dwID)
+		for _, dwDoodadID in ipairs(D.aDoodadID) do
+			D.DrawLootList(dwDoodadID)
 		end
 	end
 end
@@ -1932,14 +1935,14 @@ local function LootItemSorter(data1, data2)
 end
 
 -- 检查物品
-function D.GetDoodadLootInfo(dwID)
+function D.GetDoodadLootInfo(dwDoodadID)
 	local me = X.GetClientPlayer()
-	local d  = X.GetDoodad(dwID)
+	local d  = X.GetDoodad(dwDoodadID)
 	local aItemData = {}
 	local bSpecial = false
 	local nMoney, szName = 0, ''
 	if me and d then
-		local nLootItemCount = X.GetDoodadLootItemCount(dwID) or 0
+		local nLootItemCount = X.GetDoodadLootItemCount(dwDoodadID) or 0
 		for i = 1, nLootItemCount do
 			local data = D.GetItemData(me, d, i)
 			if data then
@@ -1949,7 +1952,7 @@ function D.GetDoodadLootInfo(dwID)
 				table.insert(aItemData, data)
 			end
 		end
-		nMoney = X.GetDoodadLootMoney(dwID) or 0
+		nMoney = X.GetDoodadLootMoney(dwDoodadID) or 0
 		szName = d.szName
 	end
 	table.sort(aItemData, LootItemSorter)
