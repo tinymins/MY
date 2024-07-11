@@ -322,8 +322,9 @@ function D.OutputEnable()
 	)
 end
 
-function D.CanDialog(tar, doodad)
-	return doodad.CanDialog(tar)
+function D.CanDialog(tar, dwDoodadID)
+	local doodad = X.GetDoodad(dwDoodadID)
+	return doodad and doodad.CanDialog(tar)
 end
 
 function D.IsItemDisplay(itemData, config)
@@ -358,7 +359,7 @@ function D.IsItemDisplay(itemData, config)
 	return true
 end
 
-function D.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
+function D.IsItemAutoPickup(itemData, config, doodadData, bCanDialog)
 	if not bCanDialog then
 		return false
 	end
@@ -440,14 +441,14 @@ function D.OnFrameBreathe()
 	local wnd = container:LookupContent(0)
 	local bRemoveUndialogable = X.IsInPubgMap() and X.IsRestricted('MY_GKPLoot.ShowUndialogable')
 	while wnd do
-		local doodad = X.GetDoodad(wnd.dwDoodadID)
+		local doodadData = wnd.doodadData
 		-- 拾取判定
-		local bCanDialog = D.CanDialog(me, doodad)
+		local bCanDialog = D.CanDialog(me, doodadData.dwID)
 		local hList, hItem = wnd:Lookup('', 'Handle_ItemList')
 		for i = 0, hList:GetItemCount() - 1 do
 			hItem = hList:Lookup(i)
 			if (not hItem.nAutoLootLFC or nLFC - hItem.nAutoLootLFC >= GKP_AUTO_LOOT_DEBOUNCE_TIME)
-			and D.IsItemAutoPickup(hItem.itemData, ITEM_CONFIG, doodad, bCanDialog)
+			and D.IsItemAutoPickup(hItem.itemData, ITEM_CONFIG, doodadData, bCanDialog)
 			and not hItem.itemData.bDist and not hItem.itemData.bNeedRoll and not hItem.itemData.bBidding then
 				X.ExecuteWithThis(hItem, D.OnItemLButtonClick)
 				hItem.nAutoLootLFC = nLFC
@@ -456,8 +457,8 @@ function D.OnFrameBreathe()
 		wnd:Lookup('', 'Image_DoodadTitleBg'):SetFrame(bCanDialog and 0 or 3)
 		-- 目标距离
 		local nDistance = 0
-		if me and doodad then
-			nDistance = math.floor(math.sqrt(math.pow(me.nX - doodad.nX, 2) + math.pow(me.nY - doodad.nY, 2)) * 10 / 64) / 10
+		if me then
+			nDistance = math.floor(math.sqrt(math.pow(me.nX - doodadData.nX, 2) + math.pow(me.nY - doodadData.nY, 2)) * 10 / 64) / 10
 		end
 		wnd:Lookup('', 'Handle_Compass/Compass_Distance'):SetText(nDistance < 4 and '' or nDistance .. '"')
 		-- 自身面向
@@ -467,21 +468,21 @@ function D.OnFrameBreathe()
 		end
 		-- 物品位置
 		local nRotate, nRadius = 0, 10.125
-		if me and doodad and nDistance > 0 then
+		if me and nDistance > 0 then
 			-- 特判角度
-			if me.nX == doodad.nX then
-				if me.nY > doodad.nY then
+			if me.nX == doodadData.nX then
+				if me.nY > doodadData.nY then
 					nRotate = math.pi / 2
 				else
 					nRotate = - math.pi / 2
 				end
 			else
-				nRotate = math.atan((me.nY - doodad.nY) / (me.nX - doodad.nX))
+				nRotate = math.atan((me.nY - doodadData.nY) / (me.nX - doodadData.nX))
 			end
 			if nRotate < 0 then
 				nRotate = nRotate + math.pi
 			end
-			if doodad.nY < me.nY then
+			if doodadData.nY < me.nY then
 				nRotate = math.pi + nRotate
 			end
 		end
@@ -753,7 +754,7 @@ function D.OnItemLButtonClick()
 		local me, team   = X.GetClientPlayer(), GetClientTeam()
 		local dwDoodadID = data.dwDoodadID
 		local doodad     = X.GetDoodad(dwDoodadID)
-		if not data.bDist and not data.bNeedRoll and not data.bBidding then
+		if doodad and not data.bDist and not data.bNeedRoll and not data.bBidding then
 			if doodad.CanLoot(me.dwID) then
 				X.OpenDoodad(me, doodad)
 			elseif not doodad.CanDialog(me) then
@@ -765,7 +766,10 @@ function D.OnItemLButtonClick()
 				--[[#DEBUG BEGIN]]
 				X.OutputDebugMessage('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
-				return D.RemoveLootList(dwDoodadID)
+				if not X.IsInDungeonMap() then
+					D.RemoveLootList(dwDoodadID)
+				end
+				return
 			end
 			if not D.AuthCheck(dwDoodadID) then
 				return
@@ -799,7 +803,10 @@ function D.OnItemLButtonClick()
 				--[[#DEBUG BEGIN]]
 				X.OutputDebugMessage('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
-				return D.RemoveLootList(dwDoodadID)
+				if not X.IsInDungeonMap() then
+					D.RemoveLootList(dwDoodadID)
+				end
+				return
 			end
 			if not D.AuthCheck(dwDoodadID) then
 				return X.OutputAnnounceMessage(_L['You are not the distrubutor.'])
@@ -1198,19 +1205,16 @@ function D.GetaPartyMember(aDoodadID)
 	local aPartyMember = {}
 	for _, dwDoodadID in ipairs(aDoodadID) do
 		if not tDoodadID[dwDoodadID] then
-			local doodad = X.GetDoodad(dwDoodadID)
-			if doodad then
-				local aLooterList = X.GetDoodadLooterList(dwDoodadID)
-				if aLooterList then
-					for _, p in ipairs(aLooterList) do
-						if not tPartyMember[p.dwID] then
-							table.insert(aPartyMember, p)
-							tPartyMember[p.dwID] = true
-						end
+			local aLooterList = X.GetDoodadLooterList(dwDoodadID)
+			if aLooterList then
+				for _, p in ipairs(aLooterList) do
+					if not tPartyMember[p.dwID] then
+						table.insert(aPartyMember, p)
+						tPartyMember[p.dwID] = true
 					end
-				else
-					X.OutputSystemMessage(_L['Pick up time limit exceeded, please try again.'])
 				end
+			else
+				X.OutputSystemMessage(_L['Pick up time limit exceeded, please try again.'])
 			end
 			tDoodadID[dwDoodadID] = true
 		end
@@ -1238,7 +1242,6 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 		end
 		return
 	end
-	local doodad = X.GetDoodad(info.dwDoodadID)
 	if not D.AuthCheck(info.dwDoodadID) then
 		return
 	end
@@ -1277,8 +1280,8 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 			szPlayer   = player.szName,
 			dwID       = item.dwID,
 			nUiId      = item.nUiId,
-			szNpcName  = doodad.szName,
-			dwDoodadID = doodad.dwID,
+			szNpcName  = info.szDoodadName,
+			dwDoodadID = info.dwDoodadID,
 			dwTabType  = item.dwTabType,
 			dwIndex    = item.dwIndex,
 			nVersion   = item.nVersion,
@@ -1301,7 +1304,7 @@ function D.DistributeItem(dwID, info, szAutoDistType, bSkipRecordPanel)
 		if DEBUG_LOOT then
 			return X.OutputSystemMessage('LOOT: ' .. info.dwID .. '->' .. dwID) -- !!! Debug
 		end
-		X.DistributeDoodadItem(doodad.dwID, info.dwID, dwID)
+		X.DistributeDoodadItem(info.dwDoodadID, info.dwID, dwID)
 	else
 		X.OutputSystemMessage(_L['Userdata is overdue, distribut failed, please try again.'])
 	end
@@ -1564,12 +1567,12 @@ function D.GetDoodadWnd(frame, dwDoodadID, bCreate)
 	end
 	local container = frame:Lookup('Scroll_DoodadList/WndContainer_DoodadList')
 	local wnd = container:LookupContent(0)
-	while wnd and wnd.dwDoodadID ~= dwDoodadID do
+	while wnd and wnd.doodadData.dwID ~= dwDoodadID do
 		wnd = wnd:GetNext()
 	end
 	if not wnd and bCreate then
 		wnd = container:AppendContentFromIni(GKP_LOOT_INIFILE, 'Wnd_Doodad')
-		wnd.dwDoodadID = dwDoodadID
+		wnd.doodadData = D.GetDoodadData(X.GetDoodad(dwDoodadID))
 	end
 	return wnd
 end
@@ -1801,6 +1804,15 @@ function D.ReloadFrame()
 			D.DrawLootList(dwDoodadID)
 		end
 	end
+end
+
+function D.GetDoodadData(doodad)
+	return {
+		dwID   = doodad.dwID,
+		szName = doodad.szName,
+		nX     = doodad.nX,
+		nY     = doodad.nY,
+	}
 end
 
 local ITEM_DATA_WEIGHT = {
