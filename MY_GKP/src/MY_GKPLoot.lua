@@ -2033,19 +2033,8 @@ X.RegisterEvent('SYNC_LOOT_LIST', function()
 	end
 	local frame = D.GetFrame()
 	local wnd = D.GetDoodadWnd(frame, arg0)
-	if not wnd and X.IsRestricted('MY_GKPLoot.ForceLoot') then
-		local bDungeonTreasure = false
-		local aItemData = D.GetDoodadLootInfo(arg0)
-		for _, v in ipairs(aItemData) do
-			if X.StringFindW(v.szName, _L['Dungeon treasure']) == 1 -- √ÿæ≥±¶œ‰
-			or v.szName == X.GetObjectName('ITEM_INFO', 5, 33011) then -- Ì∆Ì¬Õ¨–ƒ¿Ò∫–
-				bDungeonTreasure = true
-				break
-			end
-		end
-		if not bDungeonTreasure then
-			return
-		end
+	if not wnd and not X.IsInDungeonMap() and X.IsRestricted('MY_GKPLoot.ForceLoot') then
+		return
 	end
 	D.InsertLootList(arg0)
 end)

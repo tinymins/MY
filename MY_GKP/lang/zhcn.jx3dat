@@ -197,7 +197,6 @@ return {
 	['Reach %s'] = '达到%s',
 	['Config'] = '详细设置',
 	['Team Members: %d, %d agree %d%%'] = '团队共%d人，%d人已同意发放工资，当前比率%d%%。',
-	['Dungeon treasure'] = '秘境宝藏',
 	['Onekey distrib this group'] = '一键分配该组物品',
 	['Hold shift click to skip gkp record panel'] = '按住SHIFT点击可跳过价格记录界面',
 	['Auto append'] = '茗伊金团追加',
