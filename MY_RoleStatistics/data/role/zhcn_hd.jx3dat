@@ -216,6 +216,37 @@ return function(env)
 				return env.me.GetJusticeRemainSpace()
 			end,
 		},
+		-- 休闲点
+		{
+			szKey = 'contribution',
+			szTitle = '休闲点',
+			szTitleAbbr = '休闲',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 60,
+			szCompareIncreaseText = '获得休闲点%s点',
+			szCompareDecreaseText = '消耗休闲点%s点',
+			GetValue = function(prevVal, prevRec)
+				return env.me.nContribution
+			end,
+		},
+		-- 休闲点周余
+		{
+			szKey = 'contribution_remain',
+			szTitle = '休闲点周上限',
+			szTitleAbbr = '休闲周',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 60,
+			szRefreshCircle = 'weekly',
+			GetValue = function(prevVal, prevRec)
+				return env.me.GetContributionRemainSpace()
+			end,
+		},
 		-- 浪客笺
 		{
 			szKey = 'starve',

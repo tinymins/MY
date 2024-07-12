@@ -216,6 +216,37 @@ return function(env)
 				return env.me.GetJusticeRemainSpace()
 			end,
 		},
+		-- 休閑點
+		{
+			szKey = 'contribution',
+			szTitle = '休閑點',
+			szTitleAbbr = '休閑',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 60,
+			szCompareIncreaseText = '獲得休閑點%s點',
+			szCompareDecreaseText = '消耗休閑點%s點',
+			GetValue = function(prevVal, prevRec)
+				return env.me.nContribution
+			end,
+		},
+		-- 休閑點周餘
+		{
+			szKey = 'contribution_remain',
+			szTitle = '休閑點周上限',
+			szTitleAbbr = '休閑周',
+			bTable = true,
+			bRowTip = true,
+			bFloatTip = true,
+			bAlertChange = true,
+			nMinWidth = 60,
+			szRefreshCircle = 'weekly',
+			GetValue = function(prevVal, prevRec)
+				return env.me.GetContributionRemainSpace()
+			end,
+		},
 		-- 浪客箋
 		{
 			szKey = 'starve',
