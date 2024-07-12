@@ -373,7 +373,6 @@ function D.ResumeSysHeadTop()
 	X.SafeCall(_G.Addon_ShowPlayerBalloon, SYS_HEAD_TOP_STATE['PLAYER_BALLOON'])
 	SYS_HEAD_TOP_STATE = nil
 end
-X.RegisterExit(D.ResumeSysHeadTop)
 
 function D.Repaint()
 	for _, lb in pairs(LB_CACHE) do
@@ -957,5 +956,8 @@ X.RegisterUserSettingsRelease('MY_LifeBar', function()
 	D.bReady = false
 	D.Reset()
 end)
+
+X.RegisterExit(D.ResumeSysHeadTop)
+X.RegisterReload(D.ResumeSysHeadTop)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
