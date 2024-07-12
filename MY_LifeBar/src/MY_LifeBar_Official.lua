@@ -17,9 +17,6 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^25.0.0') then
 	return
 end
-if IsLocalFileExist(X.FormatPath({'config/restriction/lifebar.jx3dat', X.PATH_TYPE.GLOBAL})) then
-	return
-end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
@@ -117,7 +114,7 @@ local function SetCaptionColor(dwID, nR, nG, nB)
 	CACHE_CAPTION_COLOR[dwID] = tColor
 	ApplyCaptionColor(dwID)
 end
-X.RegisterEvent('TARGET_CHANGE', 'MY_LifeBar', function()
+X.RegisterEvent('TARGET_CHANGE', 'MY_LifeBar_Official', function()
 	-- arg0: dwPrevID, arg1: dwPrevType, arg2: dwID, arg3: dwType
 	local dwPrevID, dwID = arg0, arg2
 	ApplyCaptionColor(dwPrevID)
@@ -231,7 +228,7 @@ function D.DrawLifeBar(dwID)
 	end
 end
 
-X.BreatheCall('MY_LifeBar', function()
+X.BreatheCall('MY_LifeBar_Official', function()
 	for dwID, _ in pairs(COUNTDOWN_CACHE) do
 		D.DrawLifeBar(dwID)
 	end
@@ -266,7 +263,7 @@ X.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
 	end
 end)
 
-X.RegisterEvent({'PLAYER_ENTER_SCENE', 'NPC_ENTER_SCENE'}, 'MY_LifeBar', function()
+X.RegisterEvent({'PLAYER_ENTER_SCENE', 'NPC_ENTER_SCENE'}, 'MY_LifeBar_Official', function()
 	local dwID = arg0
 	X.DelayCall(function() ApplyCaption(dwID) end)
 	X.DelayCall(200, function() ApplyCaption(dwID) end)
