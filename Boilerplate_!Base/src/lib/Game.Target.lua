@@ -1672,7 +1672,7 @@ function X.InsertPlayerContextMenu(t, szName, dwID, szGlobalID)
 						szGlobalID = szGlobalID,
 					}
 				end
-				X.UI.OpenTextEditor(X.EncodeLUAData(tDebugInfo))
+				X.UI.OpenTextEditor(X.EncodeLUAData(tDebugInfo, '\t'))
 			end,
 		})
 	end
