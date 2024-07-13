@@ -31,6 +31,7 @@ return {
 	['Copy to chat input'] = '复制到聊天栏',
 	['View equipment'] = '查看装备',
 	['Edit in MY_PlayerRemark'] = '编辑角色备注',
+	['Copy debug information'] = '复制调试信息',
 	['Invalid player ID!']           = '您要查看装备的玩家ID不合法！',
 	['Peek other player failed!']    = '查看装备失败！',
 	['Can not find player to peek!'] = '您要查看的玩家不存在！',

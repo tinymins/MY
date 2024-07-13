@@ -1658,6 +1658,25 @@ function X.InsertPlayerContextMenu(t, szName, dwID, szGlobalID)
 		end
 	end
 
+	if IsCtrlKeyDown() then
+		table.insert(t, {
+			szOption = _L['Copy debug information'],
+			fnAction = function()
+				local tDebugInfo
+				if _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
+					tDebugInfo = _G.MY_Farbnamen.Get(szName)
+				else
+					tDebugInfo = {
+						szName = szName,
+						dwID = dwID,
+						szGlobalID = szGlobalID,
+					}
+				end
+				X.UI.OpenTextEditor(X.EncodeLUAData(tDebugInfo))
+			end,
+		})
+	end
+
 	return t
 end
 
