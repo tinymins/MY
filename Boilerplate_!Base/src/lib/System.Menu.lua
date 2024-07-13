@@ -13,8 +13,6 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/System.Menu')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
-do
-
 local function menuSorter(m1, m2)
 	return #m1 < #m2
 end
@@ -90,7 +88,9 @@ local function GenerateMenu(aList, bMainMenu, dwTarType, dwTarID)
 	return bMainMenu and {menu} or menu
 end
 
-do
+--------------------------------------------------------------------------------
+-- 玩家头像菜单
+--------------------------------------------------------------------------------
 local PLAYER_MENU, PLAYER_MENU_HASH = {}, {} -- 玩家头像菜单
 -- 注册玩家头像菜单
 -- 注册
@@ -106,9 +106,10 @@ function X.GetPlayerAddonMenu()
 	return GenerateMenu(PLAYER_MENU, true)
 end
 Player_AppendAddonMenu({X.GetPlayerAddonMenu})
-end
 
-do
+--------------------------------------------------------------------------------
+-- 工具栏菜单
+--------------------------------------------------------------------------------
 local TRACE_MENU, TRACE_MENU_HASH = {}, {} -- 工具栏菜单
 -- 注册工具栏菜单
 -- 注册
@@ -124,9 +125,10 @@ function X.GetTraceButtonAddonMenu()
 	return GenerateMenu(TRACE_MENU, true)
 end
 TraceButton_AppendAddonMenu({X.GetTraceButtonAddonMenu})
-end
 
-do
+--------------------------------------------------------------------------------
+-- 目标头像菜单
+--------------------------------------------------------------------------------
 local TARGET_MENU, TARGET_MENU_HASH = {}, {} -- 目标头像菜单
 -- 注册目标头像菜单
 -- 注册
@@ -142,9 +144,10 @@ local function GetTargetAddonMenu(dwTarID, dwTarType)
 	return GenerateMenu(TARGET_MENU, false, dwTarType, dwTarID)
 end
 Target_AppendAddonMenu({GetTargetAddonMenu})
-end
-end
 
+--------------------------------------------------------------------------------
+-- 玩家头像和工具栏菜单
+--------------------------------------------------------------------------------
 -- 注册玩家头像和工具栏菜单
 -- 注册
 -- (void) X.RegisterAddonMenu(Menu)
