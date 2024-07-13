@@ -654,6 +654,10 @@ function D.GetTip(szName)
 		end
 		-- µ÷ÊÔÐÅÏ¢
 		if IsCtrlKeyDown() then
+			if tInfo.dwRemoteID then
+				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
+				table.insert(tTip, GetFormatText(_L('Player RemoteID: %d', tInfo.dwRemoteID), 102))
+			end
 			table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 			table.insert(tTip, GetFormatText(_L('Player ID: %d', tInfo.dwID or 0), 102))
 			table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
