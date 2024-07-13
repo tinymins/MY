@@ -1322,6 +1322,21 @@ end)
 -- 	end
 -- end)
 
+X.RegisterChatPlayerAddonMenu('MY_Farbnamen', function(szName)
+	if not IsCtrlKeyDown() then
+		return
+	end
+	return {
+		{
+			szOption = _L['Copy debug information'],
+			fnAction = function()
+				local tInfo = D.Get(szName)
+				X.UI.OpenTextEditor(X.EncodeLUAData(tInfo, '\t'))
+			end,
+		},
+	}
+end)
+
 X.RegisterUserSettingsInit('MY_Farbnamen', function() D.bReady = true end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

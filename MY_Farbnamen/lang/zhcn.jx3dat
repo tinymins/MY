@@ -22,6 +22,7 @@ return {
     ['Unknown force'] = '未知门派',
     ['Unknown gender'] = '未知体型',
     ['Unknown camp'] = '未知阵营',
+    ['Copy debug information'] = '复制角色调试信息',
 
     ['Ancient database detected, do you want to migrate data from it?'] = '发现旧版染色数据，是否立即转换数据？',
     ['Migrate succeed!'] = '染色数据迁移成功！',
