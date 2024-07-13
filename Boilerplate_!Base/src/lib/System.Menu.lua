@@ -146,6 +146,25 @@ end
 Target_AppendAddonMenu({GetTargetAddonMenu})
 
 --------------------------------------------------------------------------------
+-- 聊天栏玩家名字菜单
+--------------------------------------------------------------------------------
+local CHAT_PLAYER_MENU, CHAT_PLAYER_MENU_HASH = {}, {} -- 聊天栏名字菜单
+-- 注册聊天栏玩家名字菜单
+-- 注册
+-- (void) X.RegisterChatPlayerAddonMenu(Menu)
+-- (void) X.RegisterChatPlayerAddonMenu(szName, tMenu)
+-- (void) X.RegisterChatPlayerAddonMenu(szName, fnMenu)
+-- 注销
+-- (void) X.RegisterChatPlayerAddonMenu(szName, false)
+function X.RegisterChatPlayerAddonMenu(arg0, arg1)
+	return RegisterMenu(CHAT_PLAYER_MENU, CHAT_PLAYER_MENU_HASH, arg0, arg1)
+end
+function X.GetChatPlayerAddonMenu(szName)
+	return GenerateMenu(CHAT_PLAYER_MENU, false, szName)
+end
+Chat_AppendPlayerMenu({X.GetChatPlayerAddonMenu})
+
+--------------------------------------------------------------------------------
 -- 玩家头像和工具栏菜单
 --------------------------------------------------------------------------------
 -- 注册玩家头像和工具栏菜单
