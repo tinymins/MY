@@ -952,6 +952,7 @@ function D.Get(xKey)
 			dwID         = tPlayer.dwID,
 			szName       = tPlayer.szName,
 			szGlobalID   = tPlayer.szGlobalID,
+			dwRemoteID   = tPlayer.dwRemoteID,
 			dwForceID    = tPlayer.dwForceID,
 			nRoleType    = tPlayer.nRoleType,
 			nLevel       = tPlayer.nLevel,
