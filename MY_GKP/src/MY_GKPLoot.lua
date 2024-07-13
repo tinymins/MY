@@ -209,6 +209,7 @@ local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 })
 local D = {
 	aDoodadID = {},
+	tDoodadInfo = {},
 }
 local ITEM_CONFIG = setmetatable({}, {
 	__index = function(_, k)
@@ -272,6 +273,7 @@ end)
 X.RegisterEvent('LOADING_END', 'MY_GKPLoot', function()
 	D.UpdateShielded()
 	D.aDoodadID = {}
+	D.tDoodadInfo = {}
 	ITEM_CONFIG.tFilterQuality = {}
 	ITEM_CONFIG.bNameFilter = false
 end)
@@ -587,6 +589,7 @@ function D.OnLButtonClick()
 		if IsCtrlKeyDown() then
 			D.CloseFrame()
 			D.aDoodadID = {}
+			D.tDoodadInfo = {}
 		else
 			D.RemoveLootList(this:GetParent().dwDoodadID)
 		end
@@ -1744,7 +1747,7 @@ function D.DrawLootList(dwDoodadID, bRemove)
 			hDoodad:Lookup('Text_Title'):SetAlpha(255)
 			hDoodad:Lookup('SFX'):Show()
 		end
-		hDoodad:Lookup('Text_Title'):SetText(szName .. ' (' .. nCount ..  ')')
+		hDoodad:Lookup('Text_Title'):SetText((szName or g_tStrings.STR_NAME_UNKNOWN) .. ' (' .. nCount ..  ')')
 		wnd:Lookup('Btn_Boss'):Enable(bDist)
 
 		-- ÐÞ¸ÄUI´óÐ¡
@@ -1950,10 +1953,14 @@ end
 function D.GetDoodadLootInfo(dwDoodadID)
 	local me = X.GetClientPlayer()
 	local d  = X.GetDoodad(dwDoodadID)
+	if d then
+		D.tDoodadInfo[dwDoodadID] = D.GetDoodadData(d)
+	end
+	local tDoodadInfo = D.tDoodadInfo[dwDoodadID]
 	local aItemData = {}
 	local bSpecial = false
-	local nMoney, szName = 0, ''
-	if me and d then
+	local nMoney, szName = 0, tDoodadInfo and tDoodadInfo.szName or nil
+	if me then
 		local nLootItemCount = X.GetDoodadLootItemCount(dwDoodadID) or 0
 		for i = 1, nLootItemCount do
 			local data = D.GetItemData(me, d, i)
@@ -1965,7 +1972,6 @@ function D.GetDoodadLootInfo(dwDoodadID)
 			end
 		end
 		nMoney = X.GetDoodadLootMoney(dwDoodadID) or 0
-		szName = d.szName
 	end
 	table.sort(aItemData, LootItemSorter)
 	return aItemData, nMoney, szName, bSpecial
