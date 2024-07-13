@@ -102,10 +102,10 @@ local PLAYER_MENU, PLAYER_MENU_HASH = {}, {} -- Íæ¼ÒÍ·Ïñ²Ëµ¥
 function X.RegisterPlayerAddonMenu(arg0, arg1)
 	return RegisterMenu(PLAYER_MENU, PLAYER_MENU_HASH, arg0, arg1)
 end
-local function GetPlayerAddonMenu(dwTarID, dwTarType)
-	return GenerateMenu(PLAYER_MENU, true, dwTarType, dwTarID)
+function X.GetPlayerAddonMenu()
+	return GenerateMenu(PLAYER_MENU, true)
 end
-Player_AppendAddonMenu({GetPlayerAddonMenu})
+Player_AppendAddonMenu({X.GetPlayerAddonMenu})
 end
 
 do
