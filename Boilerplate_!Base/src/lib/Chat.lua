@@ -356,7 +356,7 @@ local ChatLinkEvents = {
 		if not link then
 			link = element
 		end
-		PopupMenu(X.GetTargetContextMenu(TARGET.PLAYER, (X.UI(link):Text():gsub('[%[%]]', ''))))
+		PopupMenu(X.InsertPlayerContextMenu({}, (X.UI(link):Text():gsub('[%[%]]', ''))))
 	end,
 	OnCopyLClick = function(element, link)
 		if not link then
