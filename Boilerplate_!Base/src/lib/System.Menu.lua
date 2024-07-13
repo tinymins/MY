@@ -120,8 +120,8 @@ local TRACE_MENU, TRACE_MENU_HASH = {}, {} -- ¹¤¾ßÀ¸²Ëµ¥
 function X.RegisterTraceButtonAddonMenu(arg0, arg1)
 	return RegisterMenu(TRACE_MENU, TRACE_MENU_HASH, arg0, arg1)
 end
-function X.GetTraceButtonAddonMenu(dwTarID, dwTarType)
-	return GenerateMenu(TRACE_MENU, true, dwTarType, dwTarID)
+function X.GetTraceButtonAddonMenu()
+	return GenerateMenu(TRACE_MENU, true)
 end
 TraceButton_AppendAddonMenu({X.GetTraceButtonAddonMenu})
 end
