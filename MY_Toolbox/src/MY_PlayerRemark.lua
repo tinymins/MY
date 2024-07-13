@@ -404,6 +404,7 @@ local settings = {
 		{
 			fields = {
 				'Get',
+				OpenEditPanel = D.OpenPlayerRemarkEditPanel,
 			},
 			root = D,
 		},
@@ -420,15 +421,34 @@ X.RegisterTargetAddonMenu('MY_PlayerRemark', function()
 	local dwType, dwID = X.GetTarget()
 	if dwType == TARGET.PLAYER then
 		local kPlayer = X.GetObject(dwType, dwID)
+		local tInfo = MY_Farbnamen and MY_Farbnamen.Get(kPlayer.szName)
+		if not tInfo then
+			return
+		end
 		return {
 			szOption = _L['Edit player remark'],
 			fnAction = function()
 				local szName, szServerName = X.DisassemblePlayerGlobalName(kPlayer.szName, true)
-				local szGlobalID = X.GetPlayerGlobalID(dwID)
-				D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
+				D.OpenPlayerRemarkEditPanel(szServerName, tInfo.dwID, szName, tInfo.szGlobalID)
 			end
 		}
 	end
+end)
+
+X.RegisterChatPlayerAddonMenu('MY_PlayerRemark', function(szName)
+	local tInfo = MY_Farbnamen and MY_Farbnamen.Get(szName)
+	if not tInfo then
+		return
+	end
+	return {
+		{
+			szOption = _L['Edit player remark'],
+			fnAction = function()
+				local szName, szServerName = X.DisassemblePlayerGlobalName(szName, true)
+				D.OpenPlayerRemarkEditPanel(szServerName, tInfo.dwID, szName, tInfo.szGlobalID)
+			end,
+		},
+	}
 end)
 
 X.RegisterAddonMenu('MY_PlayerRemark', {

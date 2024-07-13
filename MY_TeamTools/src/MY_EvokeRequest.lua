@@ -67,7 +67,7 @@ end
 
 function D.OnRButtonClick()
 	if this.info then
-		PopupMenu(X.GetTargetContextMenu(TARGET.PLAYER, this.info.szName, this.info.dwID))
+		PopupMenu(X.InsertPlayerContextMenu({}, this.info.szName, this.info.dwID))
 	end
 end
 

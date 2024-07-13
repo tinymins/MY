@@ -548,7 +548,7 @@ function D.OnItemRButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		local dwType, dwID = this.dwType, this.dwID
-		local t = X.GetTargetContextMenu(dwType, this:Lookup('Handle_R/Handle_LMN/Text_Name'):GetText(), dwID)
+		local t = X.InsertPlayerContextMenu({}, this:Lookup('Handle_R/Handle_LMN/Text_Name'):GetText(), dwID)
 		if this.bDeletable then
 			table.insert(t, 1, {
 				szOption = _L['Delete focus'],
