@@ -1910,13 +1910,14 @@ local function GetItemDataType(data)
 	return 'OTHER'
 end
 
-function D.GetItemData(me, d, i)
-	local item, bNeedRoll, bDist, bBidding = X.GetDoodadLootItem(d.dwID, i)
+function D.GetItemData(dwDoodadID, nItemIndex)
+	local tDoodadInfo = D.tDoodadInfo[dwDoodadID]
+	local item, bNeedRoll, bDist, bBidding = X.GetDoodadLootItem(dwDoodadID, nItemIndex)
 	if item then
 		-- itemData
 		local data = {
-			dwDoodadID   = d.dwID        ,
-			szDoodadName = d.szName      ,
+			dwDoodadID   = dwDoodadID    ,
+			szDoodadName = tDoodadInfo and tDoodadInfo.szName or '',
 			item         = item          ,
 			szName       = X.GetItemNameByItem(item),
 			dwID         = item.dwID     ,
@@ -1951,7 +1952,6 @@ end
 
 -- ºÏ≤ÈŒÔ∆∑
 function D.GetDoodadLootInfo(dwDoodadID)
-	local me = X.GetClientPlayer()
 	local d  = X.GetDoodad(dwDoodadID)
 	if d then
 		D.tDoodadInfo[dwDoodadID] = D.GetDoodadData(d)
@@ -1959,19 +1959,17 @@ function D.GetDoodadLootInfo(dwDoodadID)
 	local tDoodadInfo = D.tDoodadInfo[dwDoodadID]
 	local aItemData = {}
 	local bSpecial = false
-	local nMoney, szName = 0, tDoodadInfo and tDoodadInfo.szName or nil
-	if me then
-		local nLootItemCount = X.GetDoodadLootItemCount(dwDoodadID) or 0
-		for i = 1, nLootItemCount do
-			local data = D.GetItemData(me, d, i)
-			if data then
-				if data.bSpecial then
-					bSpecial = true
-				end
-				table.insert(aItemData, data)
+	local nMoney = X.GetDoodadLootMoney(dwDoodadID) or 0
+	local szName = tDoodadInfo and tDoodadInfo.szName or nil
+	local nLootItemCount = X.GetDoodadLootItemCount(dwDoodadID) or 0
+	for i = 1, nLootItemCount do
+		local data = D.GetItemData(dwDoodadID, i)
+		if data then
+			if data.bSpecial then
+				bSpecial = true
 			end
+			table.insert(aItemData, data)
 		end
-		nMoney = X.GetDoodadLootMoney(dwDoodadID) or 0
 	end
 	table.sort(aItemData, LootItemSorter)
 	return aItemData, nMoney, szName, bSpecial
