@@ -924,9 +924,9 @@ function D.AddAusID(dwID, bTimes)
 		player.dwForceID,
 		player.nRoleType,
 		player.nLevel,
-		player.nX ~= 0 and player.szTitle or nil,
+		X.IIf(player.nX == 0, nil, player.szTitle),
 		player.nCamp,
-		X.IIf(IsRemotePlayer(dwID), nil, player.dwTongID),
+		X.IIf(IsRemotePlayer(dwID) or player.nX == 0, nil, player.dwTongID),
 		bTimes
 	)
 	return true
