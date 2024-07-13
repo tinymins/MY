@@ -1568,52 +1568,70 @@ function X.GetTargetTarget(object)
 end
 
 -- 获取指定名字的右键菜单
-function X.GetTargetContextMenu(dwType, szName, dwID)
-	local t = {}
-	if dwType == TARGET.PLAYER then
-		-- 复制
-		table.insert(t, {
-			szOption = _L['Copy'],
-			fnAction = function()
-				X.SendChat(X.GetClientPlayer().szName, '[' .. szName .. ']')
-			end,
-		})
-		-- 密聊 好友 邀请入帮 跟随
-		X.Call(InsertPlayerCommonMenu, t, dwID, szName)
-		-- insert invite team
-		if szName and InsertInviteTeamMenu then
-			InsertInviteTeamMenu(t, szName)
-		end
-		-- get dwID
-		if not dwID and _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
-			local tInfo = _G.MY_Farbnamen.Get(szName)
-			if tInfo then
+function X.InsertPlayerContextMenu(t, szName, dwID, szGlobalID)
+	-- 数据库获取 dwID, szGlobalID 补全信息
+	if (not dwID or not szGlobalID) and _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
+		local tInfo = _G.MY_Farbnamen.Get(szName)
+		if tInfo then
+			if not dwID then
 				dwID = tonumber(tInfo.dwID)
 			end
+			if not szGlobalID and X.IsGlobalID(tInfo.szGlobalID) then
+				szGlobalID = tInfo.szGlobalID
+			end
 		end
-		-- insert view equip
-		if dwID and X.GetClientPlayerID() ~= dwID then
-			table.insert(t, {
-				szOption = _L['View equipment'],
-				fnAction = function()
-					ViewInviteToPlayer(dwID)
-				end,
-			})
-		end
-		-- insert view arena
+	end
+	-- 跨服处理
+	local szOriginName, szServerName = X.DisassemblePlayerGlobalName(szName, true)
+	-- 复制
+	table.insert(t, {
+		szOption = _L['Copy to chat input'],
+		fnAction = function()
+			X.SendChat(X.GetClientPlayer().szName, '[' .. szName .. ']')
+		end,
+	})
+	-- 密聊 好友 邀请入帮 跟随
+	X.Call(InsertPlayerCommonMenu, t, dwID, szName)
+	-- 组队
+	if szName and InsertInviteTeamMenu then
+		InsertInviteTeamMenu(t, szName)
+	end
+	-- 查看装备
+	if (dwID and X.GetClientPlayerID() ~= dwID) or (szGlobalID and szGlobalID ~= X.GetClientPlayerGlobalID()) then
 		table.insert(t, {
-			szOption = g_tStrings.LOOKUP_CORPS,
-			-- fnDisable = function() return not X.GetPlayer(dwID) end,
+			szOption = _L['View equipment'],
 			fnAction = function()
-				X.UI.CloseFrame('ArenaCorpsPanel')
-				OpenArenaCorpsPanel(true, dwID)
+				if szServerName and X.IsGlobalID(szGlobalID) then
+					local dwServerID = X.GetServerIDByName(szServerName)
+					X.ViewOtherPlayerByGlobalID(dwServerID, szGlobalID)
+				elseif dwID then
+					X.ViewOtherPlayerByID(dwID)
+				end
 			end,
 		})
 	end
-	-- view qixue -- mark target
+	-- 查看名剑大会信息
+	table.insert(t, {
+		szOption = g_tStrings.LOOKUP_CORPS,
+		-- fnDisable = function() return not X.GetPlayer(dwID) end,
+		fnAction = function()
+			X.UI.CloseFrame('ArenaCorpsPanel')
+			OpenArenaCorpsPanel(true, dwID)
+		end,
+	})
+	-- 加入角色备注
+	if _G.MY_PlayerRemark and _G.MY_PlayerRemark.OpenEditPanel then
+		table.insert(t, {
+			szOption = _L['Edit in MY_PlayerRemark'],
+			fnAction = function()
+				_G.MY_PlayerRemark.OpenEditPanel(szServerName, dwID, szOriginName, szGlobalID)
+			end,
+		})
+	end
+	-- 奇穴 -- 标记
 	if dwID and InsertTargetMenu then
 		local tx = {}
-		InsertTargetMenu(tx, dwType, dwID, szName)
+		InsertTargetMenu(tx, TARGET.PLAYER, dwID, szName)
 		for _, v in ipairs(tx) do
 			if v.szOption == g_tStrings.LOOKUP_INFO or v.szOption == g_tStrings.STR_LOOKUP_MORE then
 				for _, vv in ipairs(v) do

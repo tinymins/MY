@@ -28,7 +28,9 @@ return {
 	['MClick to remove this line.\n'] = '中鍵刪除該行文本\n',
 	['RClick to repeat this line.\n'] = '右鍵發佈到當前頻道\n',
 
+	['Copy to chat input'] = '複製到聊天欄',
 	['View equipment'] = '查看裝備',
+	['Edit in MY_PlayerRemark'] = '編輯角色備注',
 	['Invalid player ID!']           = '您要查看裝備的玩家ID不合法！',
 	['Peek other player failed!']    = '查看裝備失敗！',
 	['Can not find player to peek!'] = '您要查看的玩家不存在！',
