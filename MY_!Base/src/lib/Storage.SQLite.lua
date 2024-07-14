@@ -180,16 +180,26 @@ function X.SQLiteExecute(db, szSQL, ...)
 	if select('#', ...) == 0 then
 		return db:Execute(szSQL)
 	end
-	return X.SQLitePrepareExecute(X.SQLitePrepare(db, szSQL), ...)
+	local stmt = X.SQLitePrepare(db, szSQL)
+	if not stmt then
+		return
+	end
+	return X.SQLitePrepareExecute(stmt, ...)
 end
 
 function X.SQLiteGetOne(db, szSQL, ...)
 	local stmt = X.SQLitePrepare(db, szSQL)
+	if not stmt then
+		return
+	end
 	return X.SQLitePrepareGetOne(stmt, ...)
 end
 
 function X.SQLiteGetAll(db, szSQL, ...)
 	local stmt = X.SQLitePrepare(db, szSQL)
+	if not stmt then
+		return
+	end
 	return X.SQLitePrepareGetAll(stmt, ...)
 end
 
