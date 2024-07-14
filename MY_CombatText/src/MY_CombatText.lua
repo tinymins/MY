@@ -238,6 +238,8 @@ local COMBAT_TEXT_TYPE_CLASS = {
 
 local COMBAT_TEXT_LEAVE  = {}
 local COMBAT_TEXT_FREE   = {}
+--  合并伤害 cache 记录方式是 dwTargetID + _ + szPoint = nValue
+local COMBAT_TEXT_COMBINE = {}
 local COMBAT_TEXT_SHADOW = {}
 local COMBAT_TEXT_QUEUE  = {}
 local COMBAT_TEXT_CACHE  = { -- buff的名字cache
@@ -331,6 +333,13 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		szLabel = _L['MY_CombatText'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
+	},
+	-- 显示合并文本（致命一击）
+	bEnableCombineText = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
 	},
 	-- $name 名字 $sn   技能名 $crit 会心 $val  数值
 	szSkill = {
@@ -455,9 +464,27 @@ function D.OnFrameCreate()
 			Log('[MY] CombatText cache beyond 10000 !!!')
 		end
 	end)
+	X.BreatheCall('COMBAT_TEXT_COMBINE', 200, function()
+		if not O.bEnableCombineText then
+			return
+		end
+		for k, v in pairs(COMBAT_TEXT_COMBINE) do
+			if v.nCount >= 3 then
+				local object = X.IsPlayer(v.dwTargetID) and X.GetPlayer(v.dwTargetID) or X.GetNpc(v.dwTargetID)
+				local _, fMaxLife = X.GetObjectLife(object)
+				if v.nValue > fMaxLife * 0.3 then
+					local shadow = D.GetFreeShadow()
+					if shadow then
+						D.CreateText(shadow, v.dwTargetID, _L['Critical Strike'] .. ' ' .. v.nValue, v.szPoint, COMBAT_TEXT_TYPE.CRITICAL_MSG, true, true)
+					end
+				end
+			end
+			COMBAT_TEXT_COMBINE[k] = nil
+		end
+	end)
 end
-
--- for i=1,5 do FireUIEvent('SKILL_EFFECT_TEXT',X.GetClientPlayerID(),1073741860,true,5,1111,111,1)end
+-- for i=1,5 do FireUIEvent('SKILL_EFFECT_TEXT',1073745690,MY.GetClientPlayerID(),true,5,1111,111,1)end
+-- for i=1,5 do FireUIEvent('SKILL_EFFECT_TEXT',MY.GetClientPlayerID(),1073745690,true,5,1111,111,1)end
 -- for i=1,5 do FireUIEvent('SKILL_EFFECT_TEXT',X.GetClientPlayerID(),1073741860,false,5,1111,111,1)end
 -- for i=1, 5 do FireEvent('SKILL_BUFF', X.GetClientPlayerID(), true, 103, 1) end
 -- FireUIEvent('SKILL_MISS', X.GetClientPlayerID(), X.GetClientPlayerID())
@@ -542,7 +569,6 @@ function D.FreeQueue()
 	}
 	setmetatable(COMBAT_TEXT_QUEUE, { __index = function(me) return me['TOP'] end, __newindex = function(me) return me['TOP'] end })
 end
-
 function D.OnFrameRender()
 	if not D.bReady then
 		return
@@ -695,7 +721,7 @@ D.OnFrameRender  = D.OnFrameRender
 
 function D.UpdateTrajectoryCount()
 	if D.bReady then
-		COMBAT_TEXT_UI_SCALE   = Station.GetUIScale()
+		COMBAT_TEXT_UI_SCALE   = Station.GetUIScale() * 0.6
 		COMBAT_TEXT_TRAJECTORY = O.fScale < 1.5
 			and math.floor(3.5 / COMBAT_TEXT_UI_SCALE / O.fScale)
 			or math.floor(3.5 / COMBAT_TEXT_UI_SCALE)
@@ -742,7 +768,7 @@ function D.GetTrajectory(dwTargetID, bCriticalStrike)
 	return nSort, szPoint
 end
 
-function D.CreateColorText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike, tCol)
+function D.CreateColorText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike, tCol, bIsCombineText)
 	local object, tPoint
 	local bIsPlayer = X.IsPlayer(dwTargetID)
 	if dwTargetID ~= COMBAT_TEXT_PLAYERID then
@@ -763,8 +789,8 @@ function D.CreateColorText(shadow, dwTargetID, szText, szPoint, eType, bCritical
 		object          = object,
 		tPoint          = tPoint,
 	}
-	if dat.bCriticalStrike then
-		if szPoint == 'TOP' then
+	if dat.bCriticalStrike or bIsCombineText then
+		if szPoint == 'TOP' and not bIsCombineText then
 			local nSort, point = D.GetTrajectory(dat.dwTargetID, true)
 			dat.nSort = nSort
 			dat.szPoint = point
@@ -777,8 +803,8 @@ function D.CreateColorText(shadow, dwTargetID, szText, szPoint, eType, bCritical
 	end
 end
 
-function D.CreateText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike)
-	return D.CreateColorText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike)
+function D.CreateText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike, bIsCombineText)
+	return D.CreateColorText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike, nil, bIsCombineText)
 end
 
 local SKILL_RESULT_TYPE_TO_COMBAT_TEXT_TYPE = X.KvpToObject({
@@ -923,6 +949,19 @@ function D.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nSkillResultType
 		szText = szText:gsub('$sn', szSkillName)
 		szText = szText:gsub('$val', (bStaticSign and X.IsNumber(nValue) and nValue > 0 and '+' or '') .. (nValue or ''))
 	end
+	local key = dwTargetID .. '_' .. szPoint
+	if not COMBAT_TEXT_COMBINE[key] then
+		COMBAT_TEXT_COMBINE[key] = {
+			dwTargetID = dwTargetID,
+			szPoint = szPoint,
+			nValue = 0,
+			nCount = 0,
+			aList = {}
+		}
+	end
+	COMBAT_TEXT_COMBINE[key].nValue = COMBAT_TEXT_COMBINE[key].nValue + (X.IsNumber(nValue) and nValue or 0)
+	COMBAT_TEXT_COMBINE[key].nCount = COMBAT_TEXT_COMBINE[key].nCount + 1
+	table.insert(COMBAT_TEXT_COMBINE[key].aList, szText)
 	D.CreateText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike)
 end
 
@@ -1034,16 +1073,20 @@ function D.CreateMessage(szText, tOptions)
 	D.CreateColorText(shadow, dwTargetID, szText, szPosition, eType, bCritical, tColor)
 end
 
-function D.GetFreeShadow()
-	for k, v in ipairs(COMBAT_TEXT_FREE) do
-		if v.free then
-			v.free = false
-			return v
+-- 获取的是否是合并的伤害
+function D.GetFreeShadow(bIsCombineText)
+	if not bIsCombineText then
+		for k, v in ipairs(COMBAT_TEXT_FREE) do
+			if v.free then
+				v.free = false
+				return v
+			end
 		end
 	end
-	if O.nMaxCount > 0 and #COMBAT_TEXT_FREE < O.nMaxCount then
+
+	if bIsCombineText or (O.nMaxCount > 0 and #COMBAT_TEXT_FREE < O.nMaxCount) then
 		local handle = D.handle
-		local sha = handle:AppendItemFromIni(COMBAT_TEXT_INIFILE, 'Shadow_Content')
+		local sha = handle:AppendItemFromIni(COMBAT_TEXT_INIFILE, bIsCombineText and 'Shadow_Content' or 'Shadow_Content_2')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
 		table.insert(COMBAT_TEXT_FREE, sha)
@@ -1091,6 +1134,7 @@ function D.CheckEnable()
 			D.FreeQueue()
 			X.UI.CloseFrame(ui)
 			X.BreatheCall('COMBAT_TEXT_CACHE', false)
+			X.BreatheCall('COMBAT_TEXT_COMBINE', false)
 			collectgarbage('collect')
 		end
 		D.ShowOfficialCombat()
@@ -1195,6 +1239,22 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	}):Width() + 5
+
+	-- 显示合并文本
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Show combine text'],
+		checked = O.bEnableCombineText,
+		tip = {
+			render = _L['Combine the same time combat text'],
+			position = X.UI.TIP_POSITION.TOP_BOTTOM,
+		},
+		onCheck = function(bCheck)
+			O.bEnableCombineText = bCheck
+		end,
+		autoEnable = IsEnabled,
+	}):Width() + 5
+
 	nY = nY + nDeltaY
 
 	nX = nPaddingX + 10
