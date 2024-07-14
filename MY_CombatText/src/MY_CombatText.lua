@@ -949,19 +949,21 @@ function D.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nSkillResultType
 		szText = szText:gsub('$sn', szSkillName)
 		szText = szText:gsub('$val', (bStaticSign and X.IsNumber(nValue) and nValue > 0 and '+' or '') .. (nValue or ''))
 	end
-	local key = dwTargetID .. '_' .. szPoint
-	if not COMBAT_TEXT_COMBINE[key] then
-		COMBAT_TEXT_COMBINE[key] = {
-			dwTargetID = dwTargetID,
-			szPoint = szPoint,
-			nValue = 0,
-			nCount = 0,
-			aList = {}
-		}
+	if O.bEnableCombineText then
+		local key = dwTargetID .. '_' .. szPoint
+		if not COMBAT_TEXT_COMBINE[key] then
+			COMBAT_TEXT_COMBINE[key] = {
+				dwTargetID = dwTargetID,
+				szPoint = szPoint,
+				nValue = 0,
+				nCount = 0,
+				aList = {}
+			}
+		end
+		COMBAT_TEXT_COMBINE[key].nValue = COMBAT_TEXT_COMBINE[key].nValue + (X.IsNumber(nValue) and nValue or 0)
+		COMBAT_TEXT_COMBINE[key].nCount = COMBAT_TEXT_COMBINE[key].nCount + 1
+		table.insert(COMBAT_TEXT_COMBINE[key].aList, szText)
 	end
-	COMBAT_TEXT_COMBINE[key].nValue = COMBAT_TEXT_COMBINE[key].nValue + (X.IsNumber(nValue) and nValue or 0)
-	COMBAT_TEXT_COMBINE[key].nCount = COMBAT_TEXT_COMBINE[key].nCount + 1
-	table.insert(COMBAT_TEXT_COMBINE[key].aList, szText)
 	D.CreateText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike)
 end
 
