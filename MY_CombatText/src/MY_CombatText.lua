@@ -473,7 +473,7 @@ function D.OnFrameCreate()
 				local object = X.IsPlayer(v.dwTargetID) and X.GetPlayer(v.dwTargetID) or X.GetNpc(v.dwTargetID)
 				local _, fMaxLife = X.GetObjectLife(object)
 				if v.nValue > fMaxLife * 0.3 then
-					local shadow = D.GetFreeShadow()
+					local shadow = D.GetFreeShadow(true)
 					if shadow then
 						D.CreateText(shadow, v.dwTargetID, _L['Critical Strike'] .. ' ' .. v.nValue, v.szPoint, COMBAT_TEXT_TYPE.CRITICAL_MSG, true, true)
 					end
