@@ -70,9 +70,13 @@ function D.RegisterFloatBar(szKey, tInfo)
 	D.RedrawAll()
 end
 
+function D.IsFloatBarRegistered(...)
+
+end
+
 function D.UpdateSize(frame)
 	local container = frame:Lookup('WndContainer_FloatBar')
-	local nW, nH = 0
+	local nW, nH = 0, 0
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
 		wnd:SetRelX(nW)
