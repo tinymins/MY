@@ -1,0 +1,3 @@
+return {
+	['FloatBar'] = '懸浮信息條',
+}
