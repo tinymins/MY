@@ -39,6 +39,7 @@ local function UpdateFrameVisualState(frame, eVisualState)
 		X.UI(frame):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MAXIMIZE)
 	elseif eVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then
 		X.UI(frame):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MINIMIZE)
+		frame:SetH(46)
 		frame:Lookup('', ''):SetH(46)
 		frame:Lookup('Btn_Drag'):Hide()
 	elseif eVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL then
