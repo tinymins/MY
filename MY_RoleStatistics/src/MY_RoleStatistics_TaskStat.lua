@@ -1200,37 +1200,35 @@ end
 
 -- ¸¡¶¯¿ò
 function D.ApplyFloatEntry(bFloatEntry)
-	local frame = Station.Lookup('Normal/Player')
-	if not frame then
-		return
-	end
-	local btn = frame:Lookup('Btn_MY_RoleStatistics_TaskEntry')
-	if X.IsNil(bFloatEntry) then
-		bFloatEntry = O.bFloatEntry
-	end
 	if bFloatEntry then
-		if btn then
+		if D.bFloatEntry then
 			return
 		end
-		local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_TaskEntry.ini', 'MY_RoleStatistics_TaskEntry')
-		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_TaskEntry')
-		btn:ChangeRelation(frame, true, true)
-		btn:SetRelPos(275, 80)
-		X.UI.CloseFrame(frameTemp)
-		btn.OnMouseEnter = function()
-			D.OutputFloatEntryTip(this)
-		end
-		btn.OnMouseLeave = function()
-			D.CloseFloatEntryTip()
-		end
-		btn.OnLButtonClick = function()
-			MY_RoleStatistics.Open('TaskStat')
-		end
+		X.UI.RegisterFloatBar('MY_RoleStatistics_TaskEntry', {
+			nPriority = 100.3,
+			fnCreate = function(wnd)
+				wnd:SetSize(26, 26)
+				local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_TaskEntry.ini', 'MY_RoleStatistics_TaskEntry')
+				local btn = frameTemp:Lookup('Btn_MY_RoleStatistics_TaskEntry')
+				btn:ChangeRelation(wnd, true, true)
+				btn:SetRelPos(3, 3)
+				X.UI.CloseFrame(frameTemp)
+				btn.OnMouseEnter = function()
+					D.OutputFloatEntryTip(this)
+				end
+				btn.OnMouseLeave = function()
+					D.CloseFloatEntryTip()
+				end
+				btn.OnLButtonClick = function()
+					MY_RoleStatistics.Open('TaskStat')
+				end
+			end,
+		})
 	else
-		if not btn then
+		if not D.bFloatEntry then
 			return
 		end
-		btn:Destroy()
+		X.UI.RegisterFloatBar('MY_RoleStatistics_TaskEntry', false)
 	end
 end
 

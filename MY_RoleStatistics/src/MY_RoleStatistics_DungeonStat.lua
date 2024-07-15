@@ -1164,38 +1164,39 @@ end
 
 -- ¸¡¶¯¿ò
 function D.ApplyFloatEntry(bFloatEntry)
-	local frame = Station.Lookup('Normal/Player')
-	if not frame then
-		return
-	end
-	local btn = frame:Lookup('Btn_MY_RoleStatistics_DungeonEntry')
 	if bFloatEntry then
-		if btn then
+		if D.bFloatEntry then
 			return
 		end
-		local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_DungeonEntry.ini', 'MY_RoleStatistics_DungeonEntry')
-		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_DungeonEntry')
-		btn:ChangeRelation(frame, true, true)
-		btn:SetRelPos(255, 80)
-		X.UI.CloseFrame(frameTemp)
-		btn.OnMouseEnter = function()
-			local rec = D.GetClientPlayerRec(true)
-			if not rec then
-				return
-			end
-			D.OutputRowTip(this, rec)
-		end
-		btn.OnMouseLeave = function()
-			D.CloseRowTip()
-		end
-		btn.OnLButtonClick = function()
-			MY_RoleStatistics.Open('DungeonStat')
-		end
+		X.UI.RegisterFloatBar('MY_RoleStatistics_DungeonEntry', {
+			nPriority = 100.2,
+			fnCreate = function(wnd)
+				wnd:SetSize(26, 26)
+				local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_DungeonEntry.ini', 'MY_RoleStatistics_DungeonEntry')
+				local btn = frameTemp:Lookup('Btn_MY_RoleStatistics_DungeonEntry')
+				btn:ChangeRelation(wnd, true, true)
+				btn:SetRelPos(3, 3)
+				X.UI.CloseFrame(frameTemp)
+				btn.OnMouseEnter = function()
+					local rec = D.GetClientPlayerRec(true)
+					if not rec then
+						return
+					end
+					D.OutputRowTip(this, rec)
+				end
+				btn.OnMouseLeave = function()
+					D.CloseRowTip()
+				end
+				btn.OnLButtonClick = function()
+					MY_RoleStatistics.Open('DungeonStat')
+				end
+			end,
+		})
 	else
-		if not btn then
+		if not D.bFloatEntry then
 			return
 		end
-		btn:Destroy()
+		X.UI.RegisterFloatBar('MY_RoleStatistics_DungeonEntry', false)
 	end
 end
 
