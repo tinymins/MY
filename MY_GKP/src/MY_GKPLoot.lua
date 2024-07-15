@@ -494,7 +494,7 @@ function D.OnFrameBreathe()
 		wnd:Lookup('', 'Handle_Compass'):FormatAllItemPos()
 		-- 移除不可交互的掉落
 		if bRemoveUndialogable and not bCanDialog then
-			D.RemoveLootList(wnd.dwDoodadID)
+			D.RemoveLootList(wnd.doodadData.dwID)
 		end
 		wnd = wnd:GetNext()
 	end
@@ -555,7 +555,7 @@ function D.OnMouseEnter()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local szXml = ''
-		local dwDoodadID = this:GetParent().dwDoodadID
+		local dwDoodadID = this:GetParent().doodadData.dwID
 		local aPartyMember = D.GetaPartyMember(dwDoodadID)
 		local p = MY_GKP_LOOT_BOSS and aPartyMember(MY_GKP_LOOT_BOSS)
 		if p then
@@ -591,11 +591,11 @@ function D.OnLButtonClick()
 			D.aDoodadID = {}
 			D.tDoodadInfo = {}
 		else
-			D.RemoveLootList(this:GetParent().dwDoodadID)
+			D.RemoveLootList(this:GetParent().doodadData.dwID)
 		end
 	elseif szName == 'Btn_Style' then
 		local wnd = this:GetParent()
-		local dwDoodadID = wnd.dwDoodadID
+		local dwDoodadID = wnd.doodadData.dwID
 		local menu = {
 			{
 				szOption = _L['Set Force Color'],
@@ -648,17 +648,17 @@ function D.OnLButtonClick()
 		table.insert(menu, D.GetAutoPickupMenu())
 		X.UI.PopupMenu(menu)
 	elseif szName == 'Btn_Boss' then
-		if not D.AuthCheck(this:GetParent().dwDoodadID) then
+		if not D.AuthCheck(this:GetParent().doodadData.dwID) then
 			return X.OutputAnnounceMessage(_L['You are not the distrubutor.'])
 		end
-		D.GetBossAction(this:GetParent().dwDoodadID, type(MY_GKP_LOOT_BOSS) == 'nil')
+		D.GetBossAction(this:GetParent().doodadData.dwID, type(MY_GKP_LOOT_BOSS) == 'nil')
 	end
 end
 
 function D.OnRButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Boss' then
-		D.GetBossAction(this:GetParent().dwDoodadID, true)
+		D.GetBossAction(this:GetParent().doodadData.dwID, true)
 	end
 end
 
