@@ -143,7 +143,10 @@ function D.OnFrameCreate()
 end
 
 function D.OnEvent(event)
-	if event == 'UI_SCALED' then
+	if event == 'LOADING_END' then
+		local frame = this
+		X.DelayCall(3000, function() frame:BringToTop() end)
+	elseif event == 'UI_SCALED' then
 		X.UI.SetFrameAnchor(this, O.anchor)
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
 		UpdateCustomModeWindow(this, _L['FloatBar'])
