@@ -1574,8 +1574,11 @@ function D.GetDoodadWnd(frame, dwDoodadID, bCreate)
 		wnd = wnd:GetNext()
 	end
 	if not wnd and bCreate then
-		wnd = container:AppendContentFromIni(GKP_LOOT_INIFILE, 'Wnd_Doodad')
-		wnd.doodadData = D.GetDoodadData(X.GetDoodad(dwDoodadID))
+		local tDoodadInfo = D.GetDoodadData(dwDoodadID)
+		if tDoodadInfo then
+			wnd = container:AppendContentFromIni(GKP_LOOT_INIFILE, 'Wnd_Doodad')
+			wnd.doodadData = tDoodadInfo
+		end
 	end
 	return wnd
 end
@@ -1809,13 +1812,17 @@ function D.ReloadFrame()
 	end
 end
 
-function D.GetDoodadData(doodad)
-	return {
-		dwID   = doodad.dwID,
-		szName = doodad.szName,
-		nX     = doodad.nX,
-		nY     = doodad.nY,
-	}
+function D.GetDoodadData(dwDoodadID)
+	local doodad = X.GetDoodad(dwDoodadID)
+	if doodad then
+		D.tDoodadInfo[dwDoodadID] = {
+			dwID   = doodad.dwID,
+			szName = doodad.szName,
+			nX     = doodad.nX,
+			nY     = doodad.nY,
+		}
+	end
+	return D.tDoodadInfo[dwDoodadID]
 end
 
 local ITEM_DATA_WEIGHT = {
@@ -1952,11 +1959,7 @@ end
 
 -- ºÏ≤ÈŒÔ∆∑
 function D.GetDoodadLootInfo(dwDoodadID)
-	local d  = X.GetDoodad(dwDoodadID)
-	if d then
-		D.tDoodadInfo[dwDoodadID] = D.GetDoodadData(d)
-	end
-	local tDoodadInfo = D.tDoodadInfo[dwDoodadID]
+	local tDoodadInfo = D.GetDoodadData(dwDoodadID)
 	local aItemData = {}
 	local bSpecial = false
 	local nMoney = X.GetDoodadLootMoney(dwDoodadID) or 0
