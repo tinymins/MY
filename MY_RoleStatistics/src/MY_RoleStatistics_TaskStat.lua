@@ -1207,11 +1207,11 @@ function D.ApplyFloatEntry(bFloatEntry)
 		X.UI.RegisterFloatBar('MY_RoleStatistics_TaskEntry', {
 			nPriority = 100.3,
 			fnCreate = function(wnd)
-				wnd:SetSize(26, 26)
+				wnd:SetSize(24, 24)
 				local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_TaskEntry.ini', 'MY_RoleStatistics_TaskEntry')
 				local btn = frameTemp:Lookup('Btn_MY_RoleStatistics_TaskEntry')
 				btn:ChangeRelation(wnd, true, true)
-				btn:SetRelPos(3, 3)
+				btn:SetRelPos(2, 2)
 				X.UI.CloseFrame(frameTemp)
 				btn.OnMouseEnter = function()
 					D.OutputFloatEntryTip(this)
