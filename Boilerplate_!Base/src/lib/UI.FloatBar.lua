@@ -135,6 +135,7 @@ function D.UpdateFloatBar(szKey)
 end
 
 function D.OnFrameCreate()
+	this:RegisterEvent('LOADING_END')
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
