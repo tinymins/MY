@@ -621,13 +621,15 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					if dwType == TARGET.PLAYER
 					and O.bFocusPlayerRemark
 					and MY_PlayerRemark
-					and MY_PlayerRemark.Get
-					and MY_PlayerRemark.Get(szName) then
-						table.insert(aVia, {
-							bDeletable = false,
-							szVia = _L['MY_PlayerRemark'],
-						})
-						bFocus = true
+					and MY_PlayerRemark.Get then
+						local tRemark = MY_PlayerRemark.Get(szName)
+						if tRemark then
+							table.insert(aVia, {
+								bDeletable = false,
+								szVia = _L['MY_PlayerRemark'] .. '\n' .. _L['PlayerRemark: '] .. tRemark.szRemark,
+							})
+							bFocus = true
+						end
 					end
 					-- ≈–∂œ∫√”—
 					if dwType == TARGET.PLAYER

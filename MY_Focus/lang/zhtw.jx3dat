@@ -92,6 +92,7 @@ return {
     ['Enemy focus'] = '敵對玩家自動焦點',
     ['Important npc focus'] = '重要NPC自動焦點',
     ['MY_PlayerRemark'] = '角色備注自動焦點',
+    ['PlayerRemark: '] = '備註：',
 
     ['Would you like to use MY focus?'] = '是否啟用焦點列表？',
     ['Use'] = '使用',
