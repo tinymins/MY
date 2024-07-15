@@ -1230,6 +1230,7 @@ function D.ApplyFloatEntry(bFloatEntry)
 		end
 		X.UI.RegisterFloatBar('MY_RoleStatistics_TaskEntry', false)
 	end
+	D.bFloatEntry = bFloatEntry
 end
 
 function D.UpdateFloatEntry()
