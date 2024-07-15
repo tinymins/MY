@@ -89,6 +89,7 @@ function D.UpdateSize(frame)
 	container:SetSize(nW, nH)
 	frame:SetSize(nW, nH)
 	frame:Lookup('', 'Image_Bg'):SetSize(nW, nH)
+	frame:BringToTop()
 	X.UI.SetFrameAnchor(frame, O.anchor)
 end
 
@@ -149,6 +150,7 @@ function D.OnEvent(event)
 		O.anchor = X.UI.GetFrameAnchor(this)
 		UpdateCustomModeWindow(this, _L['FloatBar'])
 	end
+	this:BringToTop()
 end
 
 --------------------------------------------------------------------------------
