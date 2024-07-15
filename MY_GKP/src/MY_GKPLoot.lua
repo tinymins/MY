@@ -1691,6 +1691,13 @@ function D.DrawLootList(dwDoodadID, bRemove)
 		if not wnd then
 			wnd = D.GetDoodadWnd(frame, dwDoodadID, true)
 		end
+		if not wnd then
+			D.RemoveLootList(dwDoodadID)
+			--[[#DEBUG BEGIN]]
+			X.OutputDebugMessage('MY_GKPLoot:DrawLootList', 'Doodad wnd does not exist!', X.DEBUG_LEVEL.LOG)
+			--[[#DEBUG END]]
+			return
+		end
 
 		-- ÐÞ¸ÄUIÔªËØ
 		local bDist = false
