@@ -13,6 +13,14 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/UI.Utils')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
+function X.UI.GetFrameAnchor(...)
+	return GetFrameAnchor(...)
+end
+
+function X.UI.SetFrameAnchor(frame, anchor)
+	frame:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
+end
+
 function X.UI.GetTreePath(raw)
 	local tTreePath = {}
 	if X.IsTable(raw) and raw.GetTreePath then
