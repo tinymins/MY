@@ -1265,7 +1265,7 @@ end
 
 -- ¸¡¶¯¿ò
 function D.ApplyFloatEntry(bFloatEntry)
-	local frame = Station.Lookup('Normal/SprintPower')
+	local frame = Station.Lookup('Normal/Player')
 	if not frame then
 		return
 	end
@@ -1280,7 +1280,7 @@ function D.ApplyFloatEntry(bFloatEntry)
 		local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_RoleEntry.ini', 'MY_RoleStatistics_RoleEntry')
 		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_RoleEntry')
 		btn:ChangeRelation(frame, true, true)
-		btn:SetRelPos(55, -8)
+		btn:SetRelPos(235, 80)
 		X.UI.CloseFrame(frameTemp)
 		btn.OnMouseEnter = function()
 			D.OutputFloatEntryTip(this)
@@ -1411,7 +1411,7 @@ X.RegisterReload('MY_RoleStatistics_RoleStat', function()
 	D.ApplyFloatEntry(false)
 end)
 
-X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_RoleStat', function()
+X.RegisterFrameCreate('Player', 'MY_RoleStatistics_RoleStat', function()
 	D.UpdateFloatEntry()
 end)
 

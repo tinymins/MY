@@ -1164,7 +1164,7 @@ end
 
 -- ¸¡¶¯¿ò
 function D.ApplyFloatEntry(bFloatEntry)
-	local frame = Station.Lookup('Normal/SprintPower')
+	local frame = Station.Lookup('Normal/Player')
 	if not frame then
 		return
 	end
@@ -1176,7 +1176,7 @@ function D.ApplyFloatEntry(bFloatEntry)
 		local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_DungeonEntry.ini', 'MY_RoleStatistics_DungeonEntry')
 		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_DungeonEntry')
 		btn:ChangeRelation(frame, true, true)
-		btn:SetRelPos(72, 13)
+		btn:SetRelPos(255, 80)
 		X.UI.CloseFrame(frameTemp)
 		btn.OnMouseEnter = function()
 			local rec = D.GetClientPlayerRec(true)
@@ -1329,7 +1329,7 @@ X.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', function()
 	D.FlushDB()
 end)
 
-X.RegisterFrameCreate('SprintPower', 'MY_RoleStatistics_DungeonStat', function()
+X.RegisterFrameCreate('Player', 'MY_RoleStatistics_DungeonStat', function()
 	D.UpdateFloatEntry()
 end)
 
