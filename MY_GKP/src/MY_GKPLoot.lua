@@ -210,6 +210,7 @@ local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 local D = {
 	aDoodadID = {},
 	tDoodadInfo = {},
+	tDoodadClosed = {},
 }
 local ITEM_CONFIG = setmetatable({}, {
 	__index = function(_, k)
@@ -274,6 +275,7 @@ X.RegisterEvent('LOADING_END', 'MY_GKPLoot', function()
 	D.UpdateShielded()
 	D.aDoodadID = {}
 	D.tDoodadInfo = {}
+	D.tDoodadClosed = {}
 	ITEM_CONFIG.tFilterQuality = {}
 	ITEM_CONFIG.bNameFilter = false
 end)
@@ -591,7 +593,7 @@ function D.OnLButtonClick()
 			D.aDoodadID = {}
 			D.tDoodadInfo = {}
 		else
-			D.RemoveLootList(this:GetParent().doodadData.dwID)
+			D.RemoveLootList(this:GetParent().doodadData.dwID, true)
 		end
 	elseif szName == 'Btn_Style' then
 		local wnd = this:GetParent()
@@ -1769,7 +1771,10 @@ function D.DrawLootList(dwDoodadID, bRemove)
 	end
 end
 
-function D.RemoveLootList(dwDoodadID)
+function D.RemoveLootList(dwDoodadID, bManually)
+	if bManually then
+		D.tDoodadClosed[dwDoodadID] = true
+	end
 	for i, v in ipairs(D.aDoodadID) do
 		if dwDoodadID == v then
 			table.remove(D.aDoodadID, i)
@@ -2044,6 +2049,7 @@ X.RegisterEvent('OPEN_DOODAD', function()
 	--[[#DEBUG BEGIN]]
 	X.OutputDebugMessage('MY_GKPLoot', 'Open Doodad: ' .. arg0, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
+	D.tDoodadClosed[arg0] = nil
 	D.InsertLootList(arg0)
 	D.HideSystemLoot()
 end)
@@ -2056,6 +2062,9 @@ X.RegisterEvent('SYNC_LOOT_LIST', function()
 	local frame = D.GetFrame()
 	local wnd = D.GetDoodadWnd(frame, arg0)
 	if not wnd and not X.IsInDungeonMap() and X.IsRestricted('MY_GKPLoot.ForceLoot') then
+		return
+	end
+	if D.tDoodadClosed[arg0] then
 		return
 	end
 	D.InsertLootList(arg0)
