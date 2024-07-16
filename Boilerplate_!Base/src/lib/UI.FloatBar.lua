@@ -19,7 +19,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
 		xSchema = X.Schema.FrameAnchor,
-		xDefaultValue = { x = 200, y = 250, s = 'TOPLEFT', r = 'TOPLEFT' },
+		xDefaultValue = { x = 160, y = 18, s = 'TOPLEFT', r = 'TOPLEFT' },
 	},
 })
 local D = {}
