@@ -99,6 +99,10 @@ X.RegisterEvent('LOADING_END', 'MY_ArenaHelper_ShowTargetModel', function()
 	end
 end)
 X.RegisterReload('MY_ArenaHelper_ShowTargetModel', function()
+	local bHasValue = X.IsBoolean(l_bShowNpc) and X.IsBoolean(l_bShowPlayer) and X.IsBoolean(l_bShowPartyOverride)
+	if not bHasValue then
+		return
+	end
 	X.SetNpcVisibility(l_bShowNpc)
 	X.SetPlayerVisibility(l_bShowPlayer, l_bShowPartyOverride)
 end)
