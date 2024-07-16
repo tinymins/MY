@@ -137,11 +137,11 @@ local function ResetCaption(dwID)
 end
 
 function D.PrioritySorter(a, b)
-	if not b.nPriority then
-		return true
-	end
 	if not a.nPriority then
 		return false
+	end
+	if not b.nPriority then
+		return true
 	end
 	return a.nPriority < b.nPriority
 end
