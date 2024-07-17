@@ -63,6 +63,10 @@ local function ApplyCaptionExtraText(dwID)
 	if not szExtraText then
 		return
 	end
+	if MY_LifeBar and MY_LifeBar.bEnabled then
+		rlcmd('reset caption ' .. dwID)
+		return
+	end
 	rlcmd('set caption extra text ' .. dwID .. ' ' .. szExtraText)
 end
 local function SetCaptionExtraText(dwID, szExtraText)
