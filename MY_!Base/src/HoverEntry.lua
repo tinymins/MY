@@ -143,7 +143,6 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		end,
 		autoEnable = function() return O.bEnable end,
 	}):AutoWidth():Width() + 5
-	nX, nY = nPaddingX, nY + 30
 
 	nLFY = nY + nLH
 	return nX, nY, nLFY
