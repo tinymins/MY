@@ -54,6 +54,11 @@ function PS.OnPanelActive(wnd)
 		nX, nY, nLFY = HoverEntry.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, LH, nX, nY, nLFY)
 	end
 
+	local FloatBar = _G[X.NSFormatString('{$NS}_FloatBar')]
+	if FloatBar then
+		nX, nY, nLFY = FloatBar.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, LH, nX, nY, nLFY)
+	end
+
 	ui:Append('Text', {
 		x = nPaddingX - 10, y = nY,
 		text = _L['User Settings'],

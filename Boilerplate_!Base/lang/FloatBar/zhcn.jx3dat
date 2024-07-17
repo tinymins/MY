@@ -1,3 +1,4 @@
 return {
 	['FloatBar'] = '悬浮信息条',
+	['Detach mode'] = '分离模式',
 }
