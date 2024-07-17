@@ -273,6 +273,7 @@ end)
 
 X.RegisterEvent('LOADING_END', 'MY_GKPLoot', function()
 	D.UpdateShielded()
+	D.CloseFrame()
 	D.aDoodadID = {}
 	D.tDoodadInfo = {}
 	D.tDoodadClosed = {}
