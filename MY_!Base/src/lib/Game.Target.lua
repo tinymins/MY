@@ -1507,7 +1507,19 @@ function X.IsSelf(dwSrcID, dwTarID)
 	return dwSrcID ~= 0 and dwSrcID == dwTarID and X.IsPlayer(dwSrcID) and X.IsPlayer(dwTarID)
 end
 
+local AUTHOR_GLOBAL_ID, AUTHOR_ROLE
 function X.IsAuthor(dwID, szName, szGlobalID)
+	if not AUTHOR_GLOBAL_ID or not AUTHOR_ROLE then
+		AUTHOR_GLOBAL_ID, AUTHOR_ROLE = {}, {}
+		for _, v in ipairs(X.PACKET_INFO.AUTHOR_ROLE_LIST) do
+			if X.IsGlobalID(v.szGlobalID) then
+				AUTHOR_GLOBAL_ID[v.szGlobalID] = true
+			end
+			if X.IsString(v.szName) and X.IsNumber(v.dwID) then
+				AUTHOR_ROLE[v.dwID] = v.szName
+			end
+		end
+	end
 	local kTarget = dwID and X.GetPlayer(dwID)
 	if kTarget then
 		if not szGlobalID then
@@ -1517,23 +1529,32 @@ function X.IsAuthor(dwID, szName, szGlobalID)
 			szName = kTarget.szName
 		end
 	end
-	if szGlobalID and X.PACKET_INFO.AUTHOR_GLOBAL_IDS[szGlobalID] then
+	if szGlobalID and AUTHOR_GLOBAL_ID[szGlobalID] then
 		return true
 	end
 	if dwID and (
-		X.PACKET_INFO.AUTHOR_ROLES[dwID] == szName
-			or X.PACKET_INFO.AUTHOR_ROLES[dwID] == X.ExtractPlayerOriginName(szName)
-			or X.PACKET_INFO.AUTHOR_ROLES[dwID] == X.ExtractPlayerBaseName(szName)
+		AUTHOR_ROLE[dwID] == szName
+			or AUTHOR_ROLE[dwID] == X.ExtractPlayerOriginName(szName)
+			or AUTHOR_ROLE[dwID] == X.ExtractPlayerBaseName(szName)
 	) then
 		return true
 	end
 	return false
 end
 
+local AUTHOR_PLAYER_NAME
 function X.IsAuthorPlayerName(szName)
-	return X.PACKET_INFO.AUTHOR_PROTECT_NAMES[szName]
-		or X.PACKET_INFO.AUTHOR_PROTECT_NAMES[X.ExtractPlayerOriginName(szName)]
-		or X.PACKET_INFO.AUTHOR_PROTECT_NAMES[X.ExtractPlayerBaseName(szName)]
+	if not AUTHOR_PLAYER_NAME then
+		AUTHOR_PLAYER_NAME = {}
+		for _, v in ipairs(X.PACKET_INFO.AUTHOR_ROLE_LIST) do
+			if X.IsString(v.szName) and v.dwID == '*' then
+				AUTHOR_PLAYER_NAME[v.szName] = true
+			end
+		end
+	end
+	return AUTHOR_PLAYER_NAME[szName]
+		or AUTHOR_PLAYER_NAME[X.ExtractPlayerOriginName(szName)]
+		or AUTHOR_PLAYER_NAME[X.ExtractPlayerBaseName(szName)]
 end
 
 --------------------------------------------------------------------------------

@@ -210,76 +210,16 @@ end
 
 local _L = X.LoadLangPack(_FRAMEWORK_ROOT_ .. 'lang/lib/')
 
-X.PACKET_INFO.NAME                  = _L.PLUGIN_NAME
-X.PACKET_INFO.SHORT_NAME            = _L.PLUGIN_SHORT_NAME
-X.PACKET_INFO.AUTHOR                = _L.PLUGIN_AUTHOR
-X.PACKET_INFO.AUTHOR_FEEDBACK       = _L.PLUGIN_AUTHOR_FEEDBACK
-X.PACKET_INFO.AUTHOR_FEEDBACK_URL   = _L.PLUGIN_AUTHOR_FEEDBACK_URL
-X.PACKET_INFO.AUTHOR_SIGNATURE      = _L.PLUGIN_AUTHOR_SIGNATURE
-X.PACKET_INFO.AUTHOR_HEADER         = GetFormatText(_L.PLUGIN_NAME .. ' ' .. _L['[Author]'], 8, 89, 224, 232)
-X.PACKET_INFO.AUTHOR_FAKE_HEADER    = GetFormatText(_L['[Fake author]'], 8, 255, 95, 159)
-X.PACKET_INFO.AUTHOR_ROLES          = {
-	[ 3007396] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 梦江南
-	[28564812] = string.char(0xDC, 0xF8, 0xD2, 0xC1, 0xD2, 0xC1), -- 茗伊伊 梦江南
-	[ 1600498] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 追风蹑影
-	[ 4664780] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 日月明尊
-	[17796954] = string.char(0xDC, 0xF8, 0xD2, 0xC1, 0x40, 0xB0, 0xD7, 0xB5, 0xDB, 0xB3, 0xC7), -- 茗伊@白帝城 梦江南
-	[     601] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 有人赴约
-	[    2202] = string.char(0xDC, 0xF8, 0xD2, 0xC1, 0xD2, 0xC1), -- 茗伊伊 有人赴约
-	[     690] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 山海相逢
-	[    1848] = string.char(0xDC, 0xF8, 0xD2, 0xC1, 0xD2, 0xC1), -- 茗伊伊 山海相逢
-	[     417] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 自当狂
-	[     974] = string.char(0xDC, 0xF8, 0xD2, 0xC1, 0xD2, 0xC1), -- 茗伊伊 自当狂
-	[      43] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 万象长安
-	[     125] = string.char(0xDC, 0xF8, 0xD2, 0xC1, 0xD2, 0xC1), -- 茗伊伊 万象长安
-	[    3848] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 眉间雪
-	[    6060] = string.char(0xDC, 0xF8, 0xD2, 0xC1, 0xD2, 0xC1), -- 茗伊伊 眉间雪
-	[     350] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 九万里
-	[     518] = string.char(0xDC, 0xF8, 0xD2, 0xC1, 0xD2, 0xC1), -- 茗伊伊 九万里
-	[  385183] = string.char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A), -- 茗伊1@隱世 傲血戰意
-	[ 8568269] = string.char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A), -- 茗伊 傲血戰意
-	[ 1452025] = string.char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A), -- 茗伊伊 巔峰再起
-	[    1028] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 缘起稻香@缘起一区
-	[     660] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 梦回长安@缘起一区
-	[     280] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 烟雨扬州@缘起一区
-	[     143] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 神都洛阳@缘起一区
-	[    1259] = string.char(0xDC, 0xF8, 0xD2, 0xC1), -- 茗伊 天宝盛世@缘起一区
-}
-X.PACKET_INFO.AUTHOR_GLOBAL_IDS     = {
-	['4647714815446365644'] = true, -- 乾坤一掷 茗伊
-	['4647714815446365650'] = true, -- 乾坤一掷 茗伊伊
-	['2900318160027211566'] = true, -- 唯我独尊 茗伊
-	['342273571684493800' ] = true, -- 唯我独尊 茗伊伊
-	['2990390152574185432'] = true, -- 天鹅坪 茗伊
-	['252201579145213206' ] = true, -- 天鹅坪 茗伊伊
-	['3945153273576625046'] = true, -- 幽月轮 茗伊
-	['3945153273576625053'] = true, -- 幽月轮 茗伊伊
-	['4431542033332598576'] = true, -- 斗转星移 茗伊
-	['270215977662693730' ] = true, -- 斗转星移 茗伊伊
-	['432345564230575012' ] = true, -- 梦江南 茗伊
-	['432345564256132428' ] = true, -- 梦江南 茗伊伊
-	['288230376168682411' ] = true, -- 破阵子 茗伊
-	['288230376154983398' ] = true, -- 破阵子 茗伊伊
-	['810647932948971397' ] = true, -- 绝代天骄 茗伊
-	['810647932954621200' ] = true, -- 绝代天骄 茗伊伊
-	['216172782136999278' ] = true, -- 蝶恋花 茗伊
-	['216172782126564848' ] = true, -- 蝶恋花 茗伊伊
-	['396316767212724712' ] = true, -- 长安城 茗伊
-	['396316767221969620' ] = true, -- 长安城 茗伊伊
-	['3963167672086075586'] = true, -- 青梅煮酒 茗伊
-	['3728980491462810295'] = true, -- 青梅煮酒 茗伊伊
-	['234187180631190792' ] = true, -- 飞龙在天 茗伊
-	['234187180639172085' ] = true, -- 飞龙在天 茗伊伊
-	['378302368729578857' ] = true, -- 龙争虎斗 茗伊
-	['378302368704986888' ] = true, -- 龙争虎斗 茗伊伊
-	['972777519522485610' ] = true, -- 剑胆琴心 茗伊
-	['972777519512290625' ] = true, -- 剑胆琴心 茗伊伊
-}
-X.PACKET_INFO.AUTHOR_PROTECT_NAMES  = {
-	[string.char(0xDC, 0xF8, 0xD2, 0xC1)] = true, -- 简体
-	[string.char(0xDC, 0xF8, 0xD2, 0xC1, 0xD2, 0xC1)] = true, -- 简体
-	[string.char(0XE8, 0X8C, 0X97, 0XE4, 0XBC, 0X8A)] = true, -- 繁体
-	[string.char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A)] = true, -- 繁体
+X.PACKET_INFO.NAME                = _L.PLUGIN_NAME
+X.PACKET_INFO.SHORT_NAME          = _L.PLUGIN_SHORT_NAME
+X.PACKET_INFO.AUTHOR              = _L.PLUGIN_AUTHOR
+X.PACKET_INFO.AUTHOR_FEEDBACK     = _L.PLUGIN_AUTHOR_FEEDBACK
+X.PACKET_INFO.AUTHOR_FEEDBACK_URL = _L.PLUGIN_AUTHOR_FEEDBACK_URL
+X.PACKET_INFO.AUTHOR_SIGNATURE    = _L.PLUGIN_AUTHOR_SIGNATURE
+X.PACKET_INFO.AUTHOR_ROLE_LIST    = {
+	-- { szGlobalID = '0', szHeader = '' },
+	-- { szName = '', dwID = 0, szHeader = '' },
+	-- { szName = '', dwID = 0, szGlobalID = '0', szHeader = '' },
 }
 
 -- 导出命名空间

@@ -24,17 +24,12 @@ X.RegisterInit(X.NSFormatString('{$NS}#AUTHOR_TIP'), function()
 	if not Farbnamen then
 		return
 	end
-	if Farbnamen.RegisterNameIDHeader then
-		for dwID, szName in X.pairs_c(X.PACKET_INFO.AUTHOR_ROLES) do
-			Farbnamen.RegisterNameIDHeader(szName, dwID, X.PACKET_INFO.AUTHOR_HEADER)
+	for _, v in X.pairs_c(X.PACKET_INFO.AUTHOR_ROLE_LIST) do
+		if v.szName and v.dwID and v.szTip and Farbnamen.RegisterNameIDHeader then
+			Farbnamen.RegisterNameIDHeader(v.szName, v.dwID, v.szHeader)
 		end
-		for szName, _ in X.pairs_c(X.PACKET_INFO.AUTHOR_PROTECT_NAMES) do
-			Farbnamen.RegisterNameIDHeader(szName, '*', X.PACKET_INFO.AUTHOR_FAKE_HEADER)
-		end
-	end
-	if Farbnamen.RegisterGlobalIDHeader then
-		for szGlobalID, _ in X.pairs_c(X.PACKET_INFO.AUTHOR_GLOBAL_IDS) do
-			Farbnamen.RegisterGlobalIDHeader(szGlobalID, X.PACKET_INFO.AUTHOR_HEADER)
+		if v.szGlobalID and v.szTip and Farbnamen.RegisterGlobalIDHeader then
+			Farbnamen.RegisterGlobalIDHeader(v.szGlobalID, v.szHeader)
 		end
 	end
 end)
