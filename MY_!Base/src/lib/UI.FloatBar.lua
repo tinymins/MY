@@ -56,6 +56,7 @@ function D.RegisterFloatBar(szKey, tInfo)
 		table.insert(FLOAT_BAR_LIST, {
 			szKey = szKey,
 			nPriority = tInfo.nPriority,
+			tAnchors = tInfo.tAnchors,
 			fnCreate = tInfo.fnCreate,
 			fnRender = tInfo.fnRender,
 		})
