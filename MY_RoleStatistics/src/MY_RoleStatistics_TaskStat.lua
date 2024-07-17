@@ -1206,6 +1206,7 @@ function D.ApplyFloatEntry(bFloatEntry)
 		end
 		X.UI.RegisterFloatBar('MY_RoleStatistics_TaskEntry', {
 			nPriority = 100.3,
+			tAnchor = { s = 'TOPLEFT', r = 'TOPLEFT', x = 370 - 5 + 72, y = 30 - 5 + 37 },
 			fnCreate = function(wnd)
 				wnd:SetSize(24, 24)
 				local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_TaskEntry.ini', 'MY_RoleStatistics_TaskEntry')
