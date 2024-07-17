@@ -271,4 +271,13 @@ end
 X.UI.RegisterFloatBar = D.RegisterFloatBar
 X.UI.UpdateFloatBar = D.UpdateFloatBar
 
+--------------------------------------------------------------------------------
+-- ÊÂ¼þ×¢²á
+--------------------------------------------------------------------------------
+
+X.RegisterUserSettingsInit(MODULE_NAME, function()
+	D.CreateAllFrame()
+	FireUIEvent(REDRAW_FLOAT_BAR)
+end)
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
