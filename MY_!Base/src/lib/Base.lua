@@ -209,6 +209,13 @@ function X.LoadLangPack(szLangFolder)
 end
 
 local _L = X.LoadLangPack(_FRAMEWORK_ROOT_ .. 'lang/lib/')
+local szHeader1 = GetFormatText(_L.PLUGIN_NAME .. ' ' .. _L['[Author]'], 8, 89, 224, 232)
+local szHeader2 = GetFormatText(_L['[Fake author]'], 8, 255, 95, 159)
+local szNameCN1 = string.char(0xDC, 0xF8, 0xD2, 0xC1)
+local szNameCN2 = string.char(0xDC, 0xF8, 0xD2, 0xC1, 0xD2, 0xC1)
+local szNameCN3 = string.char(0xDC, 0xF8, 0xD2, 0xC1, 0x40, 0xB0, 0xD7, 0xB5, 0xDB, 0xB3, 0xC7)
+local szNameTW1 = string.char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A)
+local szNameTW2 = string.char(0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A)
 
 X.PACKET_INFO.NAME                = _L.PLUGIN_NAME
 X.PACKET_INFO.SHORT_NAME          = _L.PLUGIN_SHORT_NAME
@@ -220,6 +227,63 @@ X.PACKET_INFO.AUTHOR_ROLE_LIST    = {
 	-- { szGlobalID = '0', szHeader = '' },
 	-- { szName = '', dwID = 0, szHeader = '' },
 	-- { szName = '', dwID = 0, szGlobalID = '0', szHeader = '' },
+	{ dwID =  3007396, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 梦江南
+	{ dwID = 28564812, szName = szNameCN2, szHeader = szHeader1 }, -- 茗伊伊 梦江南
+	{ dwID =  1600498, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 追风蹑影
+	{ dwID =  4664780, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 日月明尊
+	{ dwID = 17796954, szName = szNameCN3, szHeader = szHeader1 }, -- 茗伊@白帝城 梦江南
+	{ dwID =      601, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 有人赴约
+	{ dwID =     2202, szName = szNameCN2, szHeader = szHeader1 }, -- 茗伊伊 有人赴约
+	{ dwID =      690, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 山海相逢
+	{ dwID =     1848, szName = szNameCN2, szHeader = szHeader1 }, -- 茗伊伊 山海相逢
+	{ dwID =      417, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 自当狂
+	{ dwID =      974, szName = szNameCN2, szHeader = szHeader1 }, -- 茗伊伊 自当狂
+	{ dwID =       43, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 万象长安
+	{ dwID =      125, szName = szNameCN2, szHeader = szHeader1 }, -- 茗伊伊 万象长安
+	{ dwID =     3848, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 眉间雪
+	{ dwID =     6060, szName = szNameCN2, szHeader = szHeader1 }, -- 茗伊伊 眉间雪
+	{ dwID =      350, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 九万里
+	{ dwID =      518, szName = szNameCN2, szHeader = szHeader1 }, -- 茗伊伊 九万里
+	{ dwID =   385183, szName = szNameTW1, szHeader = szHeader1 }, -- 茗伊1@隱世 傲血戰意
+	{ dwID =  8568269, szName = szNameTW1, szHeader = szHeader1 }, -- 茗伊 傲血戰意
+	{ dwID =  1452025, szName = szNameTW2, szHeader = szHeader1 }, -- 茗伊伊 巔峰再起
+	{ dwID =     1028, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 缘起稻香@缘起一区
+	{ dwID =      660, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 梦回长安@缘起一区
+	{ dwID =      280, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 烟雨扬州@缘起一区
+	{ dwID =      143, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 神都洛阳@缘起一区
+	{ dwID =     1259, szName = szNameCN1, szHeader = szHeader1 }, -- 茗伊 天宝盛世@缘起一区
+	{ szGlobalID = '4647714815446365644', szHeader = szHeader1 }, -- 乾坤一掷 茗伊
+	{ szGlobalID = '4647714815446365650', szHeader = szHeader1 }, -- 乾坤一掷 茗伊伊
+	{ szGlobalID = '2900318160027211566', szHeader = szHeader1 }, -- 唯我独尊 茗伊
+	{ szGlobalID = '342273571684493800' , szHeader = szHeader1 }, -- 唯我独尊 茗伊伊
+	{ szGlobalID = '2990390152574185432', szHeader = szHeader1 }, -- 天鹅坪 茗伊
+	{ szGlobalID = '252201579145213206' , szHeader = szHeader1 }, -- 天鹅坪 茗伊伊
+	{ szGlobalID = '3945153273576625046', szHeader = szHeader1 }, -- 幽月轮 茗伊
+	{ szGlobalID = '3945153273576625053', szHeader = szHeader1 }, -- 幽月轮 茗伊伊
+	{ szGlobalID = '4431542033332598576', szHeader = szHeader1 }, -- 斗转星移 茗伊
+	{ szGlobalID = '270215977662693730' , szHeader = szHeader1 }, -- 斗转星移 茗伊伊
+	{ szGlobalID = '432345564230575012' , szHeader = szHeader1 }, -- 梦江南 茗伊
+	{ szGlobalID = '432345564256132428' , szHeader = szHeader1 }, -- 梦江南 茗伊伊
+	{ szGlobalID = '288230376168682411' , szHeader = szHeader1 }, -- 破阵子 茗伊
+	{ szGlobalID = '288230376154983398' , szHeader = szHeader1 }, -- 破阵子 茗伊伊
+	{ szGlobalID = '810647932948971397' , szHeader = szHeader1 }, -- 绝代天骄 茗伊
+	{ szGlobalID = '810647932954621200' , szHeader = szHeader1 }, -- 绝代天骄 茗伊伊
+	{ szGlobalID = '216172782136999278' , szHeader = szHeader1 }, -- 蝶恋花 茗伊
+	{ szGlobalID = '216172782126564848' , szHeader = szHeader1 }, -- 蝶恋花 茗伊伊
+	{ szGlobalID = '396316767212724712' , szHeader = szHeader1 }, -- 长安城 茗伊
+	{ szGlobalID = '396316767221969620' , szHeader = szHeader1 }, -- 长安城 茗伊伊
+	{ szGlobalID = '3963167672086075586', szHeader = szHeader1 }, -- 青梅煮酒 茗伊
+	{ szGlobalID = '3728980491462810295', szHeader = szHeader1 }, -- 青梅煮酒 茗伊伊
+	{ szGlobalID = '234187180631190792' , szHeader = szHeader1 }, -- 飞龙在天 茗伊
+	{ szGlobalID = '234187180639172085' , szHeader = szHeader1 }, -- 飞龙在天 茗伊伊
+	{ szGlobalID = '378302368729578857' , szHeader = szHeader1 }, -- 龙争虎斗 茗伊
+	{ szGlobalID = '378302368704986888' , szHeader = szHeader1 }, -- 龙争虎斗 茗伊伊
+	{ szGlobalID = '972777519522485610' , szHeader = szHeader1 }, -- 剑胆琴心 茗伊
+	{ szGlobalID = '972777519512290625' , szHeader = szHeader1 }, -- 剑胆琴心 茗伊伊
+	{ szName = szNameCN1, dwID = '*', szHeader = szHeader2 }, -- 简体 茗伊
+	{ szName = szNameCN2, dwID = '*', szHeader = szHeader2 }, -- 简体 茗伊伊
+	{ szName = szNameTW1, dwID = '*', szHeader = szHeader2 }, -- 繁体 茗伊
+	{ szName = szNameTW2, dwID = '*', szHeader = szHeader2 }, -- 繁体 茗伊伊
 }
 
 -- 导出命名空间
