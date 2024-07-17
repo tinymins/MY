@@ -59,6 +59,9 @@ function PS.OnPanelActive(wnd)
 		nX, nY, nLFY = FloatBar.OnPanelActivePartial(ui, nPaddingX, nPaddingY, W, H, LH, nX, nY, nLFY)
 	end
 
+	nX, nY = nPaddingX, nY + 30
+	nLFY = nY
+
 	ui:Append('Text', {
 		x = nPaddingX - 10, y = nY,
 		text = _L['User Settings'],
