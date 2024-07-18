@@ -70,7 +70,7 @@ function D.CheckEnable()
 		})
 		X.UI(frame):Append('Image', {
 			w = O.nSize, h = O.nSize,
-			image = X.PACKET_INFO.LOGO_UITEX,
+			image = X.PACKET_INFO.LOGO_IMAGE,
 			imageFrame = X.PACKET_INFO.LOGO_MAIN_FRAME,
 			onHover = function(bIn)
 				if bIn and O.bHoverMenu then

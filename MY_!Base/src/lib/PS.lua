@@ -447,7 +447,7 @@ function D.RedrawTabs(frame, szCategory)
 		end
 	end
 	if tWelcomeTab then
-		X.SwitchTab(tWelcomeTab.szKey)
+		X.SwitchTab(tWelcomeTab.szKey, true)
 	end
 end
 
@@ -624,7 +624,7 @@ function D.OnFrameCreate()
 	this:Lookup('', 'Text_Title'):SetText(_L('%s v%s Build %s', X.PACKET_INFO.NAME, X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD))
 	this:Lookup('', 'Text_Author'):SetText('-- by ' .. X.PACKET_INFO.AUTHOR_SIGNATURE)
 	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', X.PACKET_INFO.AUTHOR_FEEDBACK))
-	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_UITEX, X.PACKET_INFO.LOGO_MAIN_FRAME)
+	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_IMAGE, X.PACKET_INFO.LOGO_MAIN_FRAME)
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
 	X.UI(this):Size(D.OnSizeChange)
 	D.RedrawCategory(this)

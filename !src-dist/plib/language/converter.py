@@ -6,6 +6,7 @@ import re
 
 try:
     import psyco
+
     psyco.full()
 except:
     pass
@@ -13,22 +14,30 @@ except:
 from .mapping import zh2Hant, zh2Hans, zh2TW, zh2HK, zh2CN, zh2SG
 
 import sys
+
 py3k = sys.version_info >= (3, 0, 0)
 
 if py3k:
-    UEMPTY = ''
+    UEMPTY = ""
 else:
     _zh2Hant, _zh2Hans, _zh2TW, _zh2HK, _zh2CN, _zh2SG = {}, {}, {}, {}, {}, {}
-    for old, new in ((zh2Hant, _zh2Hant), (zh2Hans, _zh2Hans), (zh2TW, _zh2TW), (zh2HK, _zh2HK), (zh2CN, _zh2CN), (zh2SG, _zh2SG)):
+    for old, new in (
+        (zh2Hant, _zh2Hant),
+        (zh2Hans, _zh2Hans),
+        (zh2TW, _zh2TW),
+        (zh2HK, _zh2HK),
+        (zh2CN, _zh2CN),
+        (zh2SG, _zh2SG),
+    ):
         for k, v in old.items():
-            new[k.decode('utf8')] = v.decode('utf8')
+            new[k.decode("utf8")] = v.decode("utf8")
     zh2Hant = _zh2Hant
     zh2Hans = _zh2Hans
     zh2TW = _zh2TW
     zh2HK = _zh2HK
     zh2CN = _zh2CN
     zh2SG = _zh2SG
-    UEMPTY = ''.decode('utf8')
+    UEMPTY = "".decode("utf8")
 
 # states
 (START, END, FAIL, WAIT_TAIL) = list(range(4))
@@ -37,9 +46,9 @@ else:
 
 MAPS = {}
 
+
 class Node(object):
-    def __init__(self, from_word, to_word=None, is_tail=True,
-            have_child=False):
+    def __init__(self, from_word, to_word=None, is_tail=True, have_child=False):
         self.from_word = from_word
         if to_word is None:
             self.to_word = from_word
@@ -53,16 +62,21 @@ class Node(object):
         self.have_child = have_child
 
     def is_original_long_word(self):
-        return self.is_original and len(self.from_word)>1
+        return self.is_original and len(self.from_word) > 1
 
     def is_follow(self, chars):
         return chars != self.from_word[:-1]
 
     def __str__(self):
-        return '<Node, %s, %s, %s, %s>' % (repr(self.from_word),
-                repr(self.to_word), self.is_tail, self.have_child)
+        return "<Node, %s, %s, %s, %s>" % (
+            repr(self.from_word),
+            repr(self.to_word),
+            self.is_tail,
+            self.have_child,
+        )
 
     __repr__ = __str__
+
 
 class ConvertMap(object):
     def __init__(self, name, mapping=None):
@@ -76,21 +90,24 @@ class ConvertMap(object):
         have_child = {}
         max_key_length = 0
         for key in sorted(mapping.keys()):
-            if len(key)>1:
+            if len(key) > 1:
                 for i in range(1, len(key)):
                     parent_key = key[:i]
                     have_child[parent_key] = True
             have_child[key] = False
             max_key_length = max(max_key_length, len(key))
         for key in sorted(have_child.keys()):
-            convert_map[key] = (key in mapping, have_child[key],
-                    mapping.get(key, UEMPTY))
+            convert_map[key] = (
+                key in mapping,
+                have_child[key],
+                mapping.get(key, UEMPTY),
+            )
         self._map = convert_map
         self.max_key_length = max_key_length
 
     def __getitem__(self, k):
         try:
-            is_tail, have_child, to_word  = self._map[k]
+            is_tail, have_child, to_word = self._map[k]
             return Node(k, to_word, is_tail, have_child)
         except:
             return Node(k)
@@ -101,16 +118,21 @@ class ConvertMap(object):
     def __len__(self):
         return len(self._map)
 
+
 def registeryLanguageMap(name, mapping):
     global MAPS
-    MAPS[name] = { 'name': name, 'mapping': mapping, 'map': None }
+    MAPS[name] = {"name": name, "mapping": mapping, "map": None}
+
 
 def fetchLanguageMap(name):
-    if not MAPS[name]['map']:
-        MAPS[name]['map'] = ConvertMap(name, MAPS[name]['mapping'])
-    return MAPS[name]['map']
+    if not MAPS[name]["map"]:
+        MAPS[name]["map"] = ConvertMap(name, MAPS[name]["mapping"])
+    return MAPS[name]["map"]
 
-class StatesMachineException(Exception): pass
+
+class StatesMachineException(Exception):
+    pass
+
 
 class StatesMachine(object):
     def __init__(self):
@@ -126,7 +148,7 @@ class StatesMachine(object):
         return new
 
     def feed(self, char, map):
-        node = map[self.pool+char]
+        node = map[self.pool + char]
 
         if node.have_child:
             if node.is_tail:
@@ -176,8 +198,9 @@ class StatesMachine(object):
             self.state = START
             new = self.feed(char, map)
         elif self.state == FAIL:
-            raise StatesMachineException('Translate States Machine '
-                    'have error with input data %s' % node)
+            raise StatesMachineException(
+                "Translate States Machine " "have error with input data %s" % node
+            )
         return new
 
     def __len__(self):
@@ -185,8 +208,14 @@ class StatesMachine(object):
 
     def __str__(self):
         return '<StatesMachine %s, pool: "%s", state: %s, final: %s>' % (
-                id(self), self.pool, self.state, ''.join(self.final))
+            id(self),
+            self.pool,
+            self.state,
+            "".join(self.final),
+        )
+
     __repr__ = __str__
+
 
 class Converter(object):
     def __init__(self, to_encoding):
@@ -222,8 +251,9 @@ class Converter(object):
         self.final = []
 
     def end(self):
-        self.machines = [fsm for fsm in self.machines
-                if fsm.state == FAIL or fsm.state == END]
+        self.machines = [
+            fsm for fsm in self.machines if fsm.state == FAIL or fsm.state == END
+        ]
         self._clean()
 
     def convert(self, string):
@@ -234,51 +264,51 @@ class Converter(object):
         return self.get_result()
 
     def get_result(self):
-        return ''.join(self.final)
+        return "".join(self.final)
 
-registeryLanguageMap('zh-hant', zh2Hant)
-registeryLanguageMap('zh-hans', zh2Hans)
-registeryLanguageMap('zh-TW', zh2TW)
-registeryLanguageMap('zh-HK', zh2HK)
-registeryLanguageMap('zh-CN', zh2CN)
-registeryLanguageMap('zh-SG', zh2SG)
+
+registeryLanguageMap("zh-hant", zh2Hant)
+registeryLanguageMap("zh-hans", zh2Hans)
+registeryLanguageMap("zh-TW", zh2TW)
+registeryLanguageMap("zh-HK", zh2HK)
+registeryLanguageMap("zh-CN", zh2CN)
+registeryLanguageMap("zh-SG", zh2SG)
 del zh2Hant, zh2Hans, zh2TW, zh2HK, zh2CN, zh2SG
 
 
 def run():
     import sys
     from optparse import OptionParser
+
     parser = OptionParser()
-    parser.add_option('-e', type='string', dest='encoding',
-            help='encoding')
-    parser.add_option('-f', type='string', dest='file_in',
-            help='input file (- for stdin)')
-    parser.add_option('-t', type='string', dest='file_out',
-            help='output file')
+    parser.add_option("-e", type="string", dest="encoding", help="encoding")
+    parser.add_option(
+        "-f", type="string", dest="file_in", help="input file (- for stdin)"
+    )
+    parser.add_option("-t", type="string", dest="file_out", help="output file")
     (options, args) = parser.parse_args()
     if not options.encoding:
-        parser.error('encoding must be set')
+        parser.error("encoding must be set")
     if options.file_in:
-        if options.file_in == '-':
+        if options.file_in == "-":
             file_in = sys.stdin
         else:
             file_in = open(options.file_in)
     else:
         file_in = sys.stdin
     if options.file_out:
-        if options.file_out == '-':
+        if options.file_out == "-":
             file_out = sys.stdout
         else:
-            file_out = open(options.file_out, 'wb')
+            file_out = open(options.file_out, "wb")
     else:
         file_out = sys.stdout
 
     c = Converter(options.encoding)
     for line in file_in:
         # print >> file_out, c.convert(line.rstrip('\n').decode(
-        file_out.write(c.convert(line.rstrip('\n').decode(
-            'utf8')).encode('utf8'))
+        file_out.write(c.convert(line.rstrip("\n").decode("utf8")).encode("utf8"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()

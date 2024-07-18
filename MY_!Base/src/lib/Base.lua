@@ -54,12 +54,13 @@ local _ADDON_ROOT_            = _INTERFACE_ROOT_ .. _NAME_SPACE_ .. '/'
 local _DATA_ROOT_             = (_GAME_PROVIDER_ == 'remote' and (GetUserDataFolder() .. '/' .. GetUserAccount() .. '/interface/') or _INTERFACE_ROOT_) .. _NAME_SPACE_ .. '#DATA/'
 local _FRAMEWORK_ROOT_        = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_!Base/'
 local _UI_COMPONENT_ROOT_     = _FRAMEWORK_ROOT_ .. 'ui/components/'
-local _LOGO_UITEX_            = _FRAMEWORK_ROOT_ .. 'img/Logo.UITex'
+local _LOGO_IMAGE_            = _FRAMEWORK_ROOT_ .. 'img/Logo.UITex'
 local _LOGO_MAIN_FRAME_       = 0
 local _LOGO_MENU_FRAME_       = 1
 local _LOGO_MENU_HOVER_FRAME_ = 2
-local _POSTER_UITEX_          = _ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster.UITex'
-local _POSTER_FRAME_COUNT_    = 2
+local _POSTER_IMAGE_LIST_     = {
+	_ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster.UITex',
+}
 local _DEBUG_LEVEL_           = DEBUG_LEVEL[LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or 'NONE'] or DEBUG_LEVEL.NONE
 local _LOG_LEVEL_             = math.min(DEBUG_LEVEL[LoadLUAData(_DATA_ROOT_ .. 'log.level.jx3dat') or 'ERROR'] or DEBUG_LEVEL.ERROR, _DEBUG_LEVEL_)
 
@@ -86,12 +87,11 @@ local X = {
 		DATA_ROOT             = _DATA_ROOT_            ,
 		FRAMEWORK_ROOT        = _FRAMEWORK_ROOT_       ,
 		UI_COMPONENT_ROOT     = _UI_COMPONENT_ROOT_    ,
-		LOGO_UITEX            = _LOGO_UITEX_           ,
+		LOGO_IMAGE            = _LOGO_IMAGE_           ,
 		LOGO_MAIN_FRAME       = _LOGO_MAIN_FRAME_      ,
 		LOGO_MENU_FRAME       = _LOGO_MENU_FRAME_      ,
 		LOGO_MENU_HOVER_FRAME = _LOGO_MENU_HOVER_FRAME_,
-		POSTER_UITEX          = _POSTER_UITEX_         ,
-		POSTER_FRAME_COUNT    = _POSTER_FRAME_COUNT_   ,
+		POSTER_IMAGE_LIST     = _POSTER_IMAGE_LIST_    ,
 		DEBUG_LEVEL           = _DEBUG_LEVEL_          ,
 		LOG_LEVEL             = _LOG_LEVEL_            ,
 	},

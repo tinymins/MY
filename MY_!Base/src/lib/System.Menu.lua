@@ -62,7 +62,7 @@ local function GenerateMenu(aList, bMainMenu, dwTarType, dwTarID)
 			bCheck = true,
 			bChecked = X.IsPanelVisible(),
 
-			szIcon = X.PACKET_INFO.LOGO_UITEX,
+			szIcon = X.PACKET_INFO.LOGO_IMAGE,
 			nFrame = X.PACKET_INFO.LOGO_MENU_FRAME,
 			nMouseOverFrame = X.PACKET_INFO.LOGO_MENU_HOVER_FRAME,
 			szLayer = 'ICON_RIGHT',

@@ -6426,7 +6426,7 @@ function X.UI.CreateFrame(szName, opt)
 	end
 	frm = X.UI.OpenFrame(szIniFile, szName)
 	if not opt.simple and not opt.empty then
-		frm:Lookup('', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_UITEX, X.PACKET_INFO.LOGO_MAIN_FRAME)
+		frm:Lookup('', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_IMAGE, X.PACKET_INFO.LOGO_MAIN_FRAME)
 	end
 	frm:ChangeRelation(opt.level)
 	frm:Show()

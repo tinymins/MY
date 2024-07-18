@@ -22,7 +22,7 @@ local COMPONENT_SAMPLE = {
 	{'ColorBox Sized', 'ColorBox', { w = 'auto', h = COMPONENT_H, text = 'ColorBox', color = {255, 255, 0} }},
 	{'Handle', 'Handle', { w = COMPONENT_H, h = COMPONENT_H }},
 	{'Box', 'Box', { w = COMPONENT_H, h = COMPONENT_H, frame = 233 }},
-	{'Image', 'Image', { w = COMPONENT_H, h = COMPONENT_H, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT }},
+	{'Image', 'Image', { w = COMPONENT_H, h = COMPONENT_H, image = X.PACKET_INFO.POSTER_IMAGE_LIST[1], imageFrame = 0 }},
 	{
 		'WndFrame',
 		'WndButton',
