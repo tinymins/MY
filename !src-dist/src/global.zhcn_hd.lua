@@ -1179,6 +1179,7 @@ SetOnlineFrameAnchor = FunctionType
 SetParyMarkImage = FunctionType
 SetTarget = FunctionType
 SetTeamMark = FunctionType
+SetWorldMark = FunctionType
 SHARE_QUEST = TableType
 SHOP_SYSTEM_RESPOND_CODE = TableType
 SHOW_CARD_DECORATION_ERROR_CODE = TableType
