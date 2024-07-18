@@ -46,7 +46,7 @@ function PS.OnPanelActive(wnd)
 		and (GetTime() % #X.PACKET_INFO.POSTER_IMAGE_LIST + 1)
 		or (#X.PACKET_INFO.POSTER_IMAGE_LIST)
 	if nPosterIndex == D.nPosterIndex then
-		nPosterIndex = (nPosterIndex + 1) % X.PACKET_INFO.POSTER_IMAGE_LIST + 1
+		nPosterIndex = (nPosterIndex + 1) % #X.PACKET_INFO.POSTER_IMAGE_LIST + 1
 	end
 	D.nPosterIndex = nPosterIndex
 	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, w = 0, h = 0, color = { 140, 140, 140 } })
