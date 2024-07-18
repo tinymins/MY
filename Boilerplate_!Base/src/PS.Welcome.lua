@@ -46,6 +46,7 @@ function PS.OnPanelActive(wnd)
 	if nPosterIndex == D.nPosterIndex then
 		nPosterIndex = (nPosterIndex + 1) % X.PACKET_INFO.POSTER_FRAME_COUNT
 	end
+	D.nPosterIndex = nPosterIndex
 	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, w = 0, h = 0, color = { 140, 140, 140 } })
 	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, w = 0, h = 0, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = nPosterIndex })
 	ui:Append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
