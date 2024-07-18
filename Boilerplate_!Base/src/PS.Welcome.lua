@@ -43,14 +43,14 @@ function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
 	local nW, nH = ui:Size()
 	local nPosterIndex = D.nPosterIndex
-		and (GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT)
-		or (X.PACKET_INFO.POSTER_FRAME_COUNT - 1)
+		and (GetTime() % #X.PACKET_INFO.POSTER_IMAGE_LIST + 1)
+		or (#X.PACKET_INFO.POSTER_IMAGE_LIST)
 	if nPosterIndex == D.nPosterIndex then
-		nPosterIndex = (nPosterIndex + 1) % X.PACKET_INFO.POSTER_FRAME_COUNT
+		nPosterIndex = (nPosterIndex + 1) % X.PACKET_INFO.POSTER_IMAGE_LIST + 1
 	end
 	D.nPosterIndex = nPosterIndex
 	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, w = 0, h = 0, color = { 140, 140, 140 } })
-	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, w = 0, h = 0, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = nPosterIndex })
+	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, w = 0, h = 0, image = X.PACKET_INFO.POSTER_IMAGE_LIST[nPosterIndex], imageFrame = 0 })
 	ui:Append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
 	ui:Append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), alignHorizontal = 2 })
 	ui:Append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = GetSvrText(), alpha = 220 })
