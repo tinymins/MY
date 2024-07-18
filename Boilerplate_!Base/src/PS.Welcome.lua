@@ -42,7 +42,9 @@ end
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
 	local nW, nH = ui:Size()
-	local nPosterIndex = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT
+	local nPosterIndex = D.nPosterIndex
+		and (GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT)
+		or (X.PACKET_INFO.POSTER_FRAME_COUNT - 1)
 	if nPosterIndex == D.nPosterIndex then
 		nPosterIndex = (nPosterIndex + 1) % X.PACKET_INFO.POSTER_FRAME_COUNT
 	end
