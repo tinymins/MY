@@ -447,7 +447,7 @@ function D.RedrawTabs(frame, szCategory)
 		end
 	end
 	if tWelcomeTab then
-		X.SwitchTab(tWelcomeTab.szKey)
+		X.SwitchTab(tWelcomeTab.szKey, true)
 	end
 end
 
