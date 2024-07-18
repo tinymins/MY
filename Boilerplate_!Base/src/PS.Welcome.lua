@@ -13,6 +13,7 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/PS.Welcome')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/PS/')
 --------------------------------------------------------------------------------
 
+local D = {}
 local PS = { bWelcome = true, bHide = true }
 
 local function GetMemoryText()
@@ -41,8 +42,12 @@ end
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
 	local nW, nH = ui:Size()
+	local nPosterIndex = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT
+	if nPosterIndex == D.nPosterIndex then
+		nPosterIndex = (nPosterIndex + 1) % X.PACKET_INFO.POSTER_FRAME_COUNT
+	end
 	ui:Append('Shadow', { name = 'Shadow_Adv', x = 0, y = 0, w = 0, h = 0, color = { 140, 140, 140 } })
-	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, w = 0, h = 0, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = GetTime() % X.PACKET_INFO.POSTER_FRAME_COUNT })
+	ui:Append('Image', { name = 'Image_Adv', x = 0, y = 0, w = 0, h = 0, image = X.PACKET_INFO.POSTER_UITEX, imageFrame = nPosterIndex })
 	ui:Append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200, text = GetAdvText() })
 	ui:Append('Text', { name = 'Text_Memory', x = 10, y = 300, w = 150, alpha = 150, font = 162, text = GetMemoryText(), alignHorizontal = 2 })
 	ui:Append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = GetSvrText(), alpha = 220 })
