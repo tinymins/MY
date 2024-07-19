@@ -93,29 +93,51 @@ def __load_pinyin(src_file, remove_tone=False, dest_lang="zh-CN"):
 def __save_pinyin(dst_file, pinyin, encoding="gbk"):
     with codecs.open(dst_file, "w", encoding=encoding) as file:
         file.write("return function(string)\n")
-        file.write("  local char = string.char\n")
-        file.write("  return {\n")
+        file.write("\tlocal char = string.char\n")
+        file.write("\treturn {\n")
 
         # 遍历字典，转换每个汉字及其对应的拼音
         for char, py_list in pinyin.items():
             # 取第一个拼音作为代表（如果有多个拼音）
-            py = py_list[0]
             try:
                 # 将汉字编码为指定编码
                 encoded_char = char.encode(encoding)
-                encoded_py = py.encode(encoding)
+                encoded_py_list = []
+                failed_py_list = []
+                for s in py_list:
+                    try:
+                        encoded_py_list.append(s.encode(encoding))
+                    except UnicodeEncodeError:
+                        encoded_py_list.append(None)
+                        failed_py_list.append(s)
+                        continue
             except UnicodeEncodeError:
+                py = ",".join(py_list)
                 print(
-                    f"WARNING: Character {char}: {py} cannot be encoded in {encoding}."
+                    f"WARNING: Character {char} of {char}:{py} cannot be encoded in {encoding}."
                 )
                 continue
 
+            if len(failed_py_list) > 0:
+                py = ",".join(py_list)
+                failed_py = ",".join(failed_py_list)
+                print(
+                    f"WARNING: Character {failed_py} of {char}:{py} cannot be encoded in {encoding}."
+                )
+
             # 转换指定编码为十六进制，并格式化为Lua所需的形式
             hex_char = ", ".join(f"0x{byte:02x}" for byte in encoded_char)
-            hex_py = ", ".join(f"0x{byte:02x}" for byte in encoded_py)
-            file.write(f"    [char({hex_char})] = char({hex_py}), -- {char} => {py}\n")
+            file.write(f"\t\t[char({hex_char})] = {{ -- {char}\n")
 
-        file.write("  }\n")
+            for index, encoded_py in enumerate(encoded_py_list):
+                if encoded_py is None:
+                    continue
+                hex_py = ", ".join(f"0x{byte:02x}" for byte in encoded_py)
+                file.write(f"\t\t\tchar({hex_py}), -- {py_list[index]}\n")
+
+            file.write("\t\t},\n")
+
+        file.write("\t}\n")
         file.write("end\n")
 
 

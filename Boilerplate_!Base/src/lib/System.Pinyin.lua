@@ -16,6 +16,8 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -----------------------------------------------
 -- ºº×Ö×ªÆ´Òô
 -----------------------------------------------
+local TONE_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/tone.{$lang}.jx3dat'
+local TONELESS_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/toneless.{$lang}.jx3dat'
 local TONE_PINYIN, TONE_PINYIN_CONSONANT
 local TONELESS_PINYIN, TONELESS_PINYIN_CONSONANT
 
@@ -30,7 +32,7 @@ local function Han2Pinyin(szText, bTone)
 		tPinyin, tPinyinConsonant = TONELESS_PINYIN, TONELESS_PINYIN_CONSONANT
 	end
 	if not tPinyin then
-		tPinyin = X.SafeCall(X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/toneless.{$lang}.jx3dat', { passphrase = false }), string) or {}
+		tPinyin = select(2, X.SafeCall(X.LoadLUAData(bTone and TONE_PATH or TONELESS_PATH, { passphrase = false }), string)) or {}
 		tPinyinConsonant = {}
 		for c, v in pairs(tPinyin) do
 			local a, t = {}, {}
