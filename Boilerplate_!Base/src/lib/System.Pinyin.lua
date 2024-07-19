@@ -16,15 +16,23 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -----------------------------------------------
 -- ºº×Ö×ªÆ´Òô
 -----------------------------------------------
-do local PINYIN, PINYIN_CONSONANT
-function X.Han2Pinyin(szText)
+local TONE_PINYIN, TONE_PINYIN_CONSONANT
+local TONELESS_PINYIN, TONELESS_PINYIN_CONSONANT
+
+local function Han2Pinyin(szText, bTone)
 	if not X.IsString(szText) then
 		return
 	end
-	if not PINYIN then
-		PINYIN = X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/{$lang}.jx3dat', { passphrase = false })
-		local tPinyinConsonant = {}
-		for c, v in pairs(PINYIN) do
+	local tPinyin, tPinyinConsonant
+	if bTone then
+		tPinyin, tPinyinConsonant = TONE_PINYIN, TONE_PINYIN_CONSONANT
+	else
+		tPinyin, tPinyinConsonant = TONELESS_PINYIN, TONELESS_PINYIN_CONSONANT
+	end
+	if not tPinyin then
+		tPinyin = X.SafeCall(X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/toneless.{$lang}.jx3dat', { passphrase = false }), string) or {}
+		tPinyinConsonant = {}
+		for c, v in pairs(tPinyin) do
 			local a, t = {}, {}
 			for _, s in ipairs(v) do
 				s = s:sub(1, 1)
@@ -35,13 +43,17 @@ function X.Han2Pinyin(szText)
 			end
 			tPinyinConsonant[c] = a
 		end
-		PINYIN_CONSONANT = tPinyinConsonant
+		if bTone then
+			TONE_PINYIN, TONE_PINYIN_CONSONANT = tPinyin, tPinyinConsonant
+		else
+			TONELESS_PINYIN, TONELESS_PINYIN_CONSONANT = tPinyin, tPinyinConsonant
+		end
 	end
 	local aText = X.SplitString(szText, '')
 	local aFull, nFullCount = {''}, 1
 	local aConsonant, nConsonantCount = {''}, 1
 	for _, szChar in ipairs(aText) do
-		local aCharPinyin = PINYIN[szChar]
+		local aCharPinyin = tPinyin[szChar]
 		if aCharPinyin and #aCharPinyin > 0 then
 			for i = 2, #aCharPinyin do
 				for j = 1, nFullCount do
@@ -57,7 +69,7 @@ function X.Han2Pinyin(szText)
 				aFull[j] = aFull[j] .. szChar
 			end
 		end
-		local aCharPinyinConsonant = PINYIN_CONSONANT[szChar]
+		local aCharPinyinConsonant = tPinyinConsonant[szChar]
 		if aCharPinyinConsonant and #aCharPinyinConsonant > 0 then
 			for i = 2, #aCharPinyinConsonant do
 				for j = 1, nConsonantCount do
@@ -76,6 +88,19 @@ function X.Han2Pinyin(szText)
 	end
 	return aFull, aConsonant
 end
+
+function X.Han2Pinyin(szText)
+	if not X.IsString(szText) then
+		return
+	end
+	return Han2Pinyin(szText, false)
+end
+
+function X.Han2TonePinyin(szText)
+	if not X.IsString(szText) then
+		return
+	end
+	return Han2Pinyin(szText, true)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
