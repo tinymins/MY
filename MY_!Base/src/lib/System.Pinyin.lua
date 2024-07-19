@@ -16,8 +16,8 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -----------------------------------------------
 -- ºº×Ö×ªÆ´Òô
 -----------------------------------------------
-local TONE_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/tone.{$lang}.jx3dat'
-local TONELESS_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/toneless.{$lang}.jx3dat'
+local TONE_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/{$lang}.tone.jx3dat'
+local TONELESS_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/{$lang}.toneless.jx3dat'
 local TONE_PINYIN, TONE_PINYIN_CONSONANT
 local TONELESS_PINYIN, TONELESS_PINYIN_CONSONANT
 
@@ -36,7 +36,11 @@ local function Han2Pinyin(szText, bTone, szSplitter)
 		return
 	end
 	if szSplitter == true then
-		szSplitter = '\''
+		if bTone then
+			szSplitter = _L['\'']
+		else
+			szSplitter = '\''
+		end
 	elseif not X.IsString(szSplitter) then
 		szSplitter = ''
 	end

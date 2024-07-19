@@ -53,6 +53,8 @@ return {
 		['<='] = '不大於',
 	},
 
+	['\''] = '‘',
+
 	['Syntax error at line %d'] = '語法解析錯誤發生在第%d行',
 	['Unknown action at line %d'] = '未知的指令發生在第%d行',
 	['Unknown action skill at line %d'] = '未知的指令招式名稱發生在第%d行',

@@ -157,7 +157,7 @@ function X.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 	local xml = {}
 	-- ∆¥“Ù
 	if IsCtrlKeyDown() then
-		local szPinyin = X.Han2TonePinyin(tMemberInfo.szName, true)[1]
+		local szPinyin = X.Han2TonePinyin(X.ExtractPlayerBaseName(tMemberInfo.szName), true)[1]
 		if not X.IsEmpty(szPinyin) then
 			table.insert(xml, GetFormatText(szPinyin .. '\n', 80, r, g, b))
 		end
@@ -210,7 +210,7 @@ function X.OutputPlayerTip(Rect, dwID, szExtraXml)
 
 	-- ∆¥“Ù
 	if IsCtrlKeyDown() then
-		local szPinyin = X.Han2TonePinyin(player.szName, true)[1]
+		local szPinyin = X.Han2TonePinyin(X.ExtractPlayerBaseName(player.szName), true)[1]
 		if not X.IsEmpty(szPinyin) then
 			table.insert(t, GetFormatText(szPinyin .. '\n', 80, r, g, b))
 		end
