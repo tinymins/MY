@@ -622,7 +622,7 @@ function D.GetTip(szName)
 		end
 		-- ∆¥“Ù
 		if IsCtrlKeyDown() then
-			local szPinyin = X.Han2TonePinyin(tInfo.szName, true)[1]
+			local szPinyin = X.Han2TonePinyin(X.ExtractPlayerBaseName(tInfo.szName), true)[1]
 			if not X.IsEmpty(szPinyin) then
 				table.insert(tTip, GetFormatText(szPinyin .. '\n', 136))
 			end
