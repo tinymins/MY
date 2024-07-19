@@ -620,6 +620,13 @@ function D.GetTip(szName)
 				end
 			end
 		end
+		-- 拼音
+		if IsCtrlKeyDown() then
+			local szPinyin = X.Han2TonePinyin(tInfo.szName, true)[1]
+			if not X.IsEmpty(szPinyin) then
+				table.insert(tTip, GetFormatText(szPinyin .. '\n', 136))
+			end
+		end
 		-- 名称 等级
 		table.insert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
 		-- 是否同队伍
