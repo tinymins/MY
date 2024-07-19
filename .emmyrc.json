@@ -1,10 +1,8 @@
 {
 	"workspace": {
-		"ignoreDir": [
-			"Boilerplate_!Base/data/pinyin/"
-		],
-		"ignoreFiles": [
-			"zhtw.jx3dat"
+		"ignoreGlobs": [
+			"**/zhtw.jx3dat",
+			"**/*.zhtw.jx3dat"
 		]
 	}
 }
