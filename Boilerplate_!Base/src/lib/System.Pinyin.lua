@@ -36,7 +36,11 @@ local function Han2Pinyin(szText, bTone, szSplitter)
 		return
 	end
 	if szSplitter == true then
-		szSplitter = '\''
+		if bTone then
+			szSplitter = _L['\'']
+		else
+			szSplitter = '\''
+		end
 	elseif not X.IsString(szSplitter) then
 		szSplitter = ''
 	end
