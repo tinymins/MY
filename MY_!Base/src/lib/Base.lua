@@ -59,7 +59,11 @@ local _LOGO_MAIN_FRAME_       = 0
 local _LOGO_MENU_FRAME_       = 1
 local _LOGO_MENU_HOVER_FRAME_ = 2
 local _POSTER_IMAGE_LIST_     = {
-	_ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster.UITex',
+	_ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster_2013.UITex',
+	_ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster_2020.UITex',
+	_ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster_2024_1.UITex',
+	_ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster_2024_2.UITex',
+	_ADDON_ROOT_ .. _NAME_SPACE_ .. '_Resource/img/Poster_2024_3.UITex',
 }
 local _DEBUG_LEVEL_           = DEBUG_LEVEL[LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or 'NONE'] or DEBUG_LEVEL.NONE
 local _LOG_LEVEL_             = math.min(DEBUG_LEVEL[LoadLUAData(_DATA_ROOT_ .. 'log.level.jx3dat') or 'ERROR'] or DEBUG_LEVEL.ERROR, _DEBUG_LEVEL_)

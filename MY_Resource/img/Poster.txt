@@ -1,3 +1,0 @@
-Farme	Left	Top	Width	High	File
-0	0	0	512	256	D:\Game Files\Kingsoft\JX3_DATA\core\interfacesource\MY\!src-dist\psd\2013.tga
-1	0	258	512	256	D:\Game Files\Kingsoft\JX3_DATA\core\interfacesource\MY\!src-dist\psd\2020.tga

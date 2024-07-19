@@ -1,0 +1,2 @@
+Farme	Left	Top	Width	High	File
+0	0	0	1024	512	D:\Developments\SeasunGame\JX3_DATA\core\interfacesource\MY_ASSETS\PSD\2024_3.tga

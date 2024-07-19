@@ -1,0 +1,2 @@
+Farme	Left	Top	Width	High	File
+0	0	0	1024	512	E:\Game Files\SeasunGame\Game\JX3\bin\zhcn_hd\interface\MY\!src-dist\psd\2013.tga
