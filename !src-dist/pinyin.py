@@ -7,7 +7,7 @@ import re
 import requests
 from plib.language.converter import Converter
 
-TONG_MAP = {
+TONE_TO_TONELESS = {
     "ā": "a",
     "á": "a",
     "ǎ": "a",
@@ -47,11 +47,45 @@ TONG_MAP = {
     "ň": "n",
     "ǹ": "n",
 }
+TONELESS_TO_TONE = {
+    "a": "ａ",
+    "b": "ｂ",
+    "c": "ｃ",
+    "d": "ｄ",
+    "e": "ｅ",
+    "f": "ｆ",
+    "g": "ｇ",
+    "h": "ｈ",
+    "i": "ｉ",
+    "j": "ｊ",
+    "k": "ｋ",
+    "l": "ｌ",
+    "m": "ｍ",
+    "n": "ｎ",
+    "o": "ｏ",
+    "p": "ｐ",
+    "q": "ｑ",
+    "r": "ｒ",
+    "s": "ｓ",
+    "t": "ｔ",
+    "u": "ｕ",
+    "v": "ｖ",
+    "w": "ｗ",
+    "x": "ｘ",
+    "y": "ｙ",
+    "z": "ｚ",
+}
 
 
 def __remove_pinyin_tone(s):
-    for k in TONG_MAP:
-        s = s.replace(k, TONG_MAP[k])
+    for k in TONE_TO_TONELESS:
+        s = s.replace(k, TONE_TO_TONELESS[k])
+    return s
+
+
+def __add_pinyin_tone(s):
+    for k in TONELESS_TO_TONE:
+        s = s.replace(k, TONELESS_TO_TONE[k])
     return s
 
 
@@ -77,6 +111,8 @@ def __load_pinyin(src_file, remove_tone=False, dest_lang="zh-CN"):
                 char = g[2]
                 if remove_tone:
                     py = __remove_pinyin_tone(py)
+                else:
+                    py = __add_pinyin_tone(py)
                 char.encode(encoding="gbk", errors="strict")
                 py_list = []
                 for s in py.split(","):
