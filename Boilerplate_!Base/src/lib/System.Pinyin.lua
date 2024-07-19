@@ -21,9 +21,24 @@ local TONELESS_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/toneless.{$la
 local TONE_PINYIN, TONE_PINYIN_CONSONANT
 local TONELESS_PINYIN, TONELESS_PINYIN_CONSONANT
 
-local function Han2Pinyin(szText, bTone)
+local function ConcatPinyin(szText, szNext, szSplitter)
+	if szText == '' then
+		return szNext
+	end
+	if szNext == '' then
+		return szText
+	end
+	return szText .. szSplitter .. szNext
+end
+
+local function Han2Pinyin(szText, bTone, szSplitter)
 	if not X.IsString(szText) then
 		return
+	end
+	if szSplitter == true then
+		szSplitter = '\''
+	elseif not X.IsString(szSplitter) then
+		szSplitter = ''
 	end
 	local tPinyin, tPinyinConsonant
 	if bTone then
@@ -59,16 +74,16 @@ local function Han2Pinyin(szText, bTone)
 		if aCharPinyin and #aCharPinyin > 0 then
 			for i = 2, #aCharPinyin do
 				for j = 1, nFullCount do
-					table.insert(aFull, aFull[j] .. aCharPinyin[i])
+					table.insert(aFull, ConcatPinyin(aFull[j], aCharPinyin[i], szSplitter))
 				end
 			end
 			for j = 1, nFullCount do
-				aFull[j] = aFull[j] .. aCharPinyin[1]
+				aFull[j] = ConcatPinyin(aFull[j], aCharPinyin[1], szSplitter)
 			end
 			nFullCount = nFullCount * #aCharPinyin
 		else
 			for j = 1, nFullCount do
-				aFull[j] = aFull[j] .. szChar
+				aFull[j] = ConcatPinyin(aFull[j], szChar, szSplitter)
 			end
 		end
 		local aCharPinyinConsonant = tPinyinConsonant[szChar]
@@ -91,18 +106,18 @@ local function Han2Pinyin(szText, bTone)
 	return aFull, aConsonant
 end
 
-function X.Han2Pinyin(szText)
+function X.Han2Pinyin(szText, szSplitter)
 	if not X.IsString(szText) then
 		return
 	end
-	return Han2Pinyin(szText, false)
+	return Han2Pinyin(szText, false, szSplitter)
 end
 
-function X.Han2TonePinyin(szText)
+function X.Han2TonePinyin(szText, szSplitter)
 	if not X.IsString(szText) then
 		return
 	end
-	return Han2Pinyin(szText, true)
+	return Han2Pinyin(szText, true, szSplitter)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
