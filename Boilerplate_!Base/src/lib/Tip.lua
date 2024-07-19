@@ -157,7 +157,10 @@ function X.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 	local xml = {}
 	-- Æ´Òô
 	if IsCtrlKeyDown() then
-		table.insert(t, GetFormatText(X.Han2TonePinyin(tMemberInfo.szName, true) .. '\n', 80, r, g, b))
+		local szPinyin = X.Han2TonePinyin(tMemberInfo.szName, true)[1]
+		if not X.IsEmpty(szPinyin) then
+			table.insert(t, GetFormatText(szPinyin .. '\n', 80, r, g, b))
+		end
 	end
 	-- ÃÅÅÉ
 	table.insert(xml, GetFormatImage(szPath, nFrame, 22, 22))
@@ -207,7 +210,10 @@ function X.OutputPlayerTip(Rect, dwID, szExtraXml)
 
 	-- Æ´Òô
 	if IsCtrlKeyDown() then
-		table.insert(t, GetFormatText(X.Han2TonePinyin(player.szName, true) .. '\n', 80, r, g, b))
+		local szPinyin = X.Han2TonePinyin(player.szName, true)[1]
+		if not X.IsEmpty(szPinyin) then
+			table.insert(t, GetFormatText(szPinyin .. '\n', 80, r, g, b))
+		end
 	end
 	-- Ãû×Ö
 	table.insert(t, GetFormatText(FormatString(g_tStrings.STR_NAME_PLAYER, player.szName), 80, r, g, b))
@@ -285,7 +291,10 @@ function X.OutputNpcTemplateTip(Rect, dwNpcTemplateID, szExtraXml)
 	local szName = X.GetTemplateName(TARGET.NPC, dwNpcTemplateID) or tostring(dwNpcTemplateID)
 	-- Æ´Òô
 	if IsCtrlKeyDown() then
-		table.insert(t, GetFormatText(X.Han2TonePinyin(szName, true) .. '\n', 80, 255, 255, 0))
+		local szPinyin = X.Han2TonePinyin(szName, true)[1]
+		if not X.IsEmpty(szPinyin) then
+			table.insert(t, GetFormatText(szPinyin .. '\n', 80, 255, 255, 0))
+		end
 	end
 	-- Ãû×Ö
 	table.insert(t, GetFormatText(szName .. '\n', 80, 255, 255, 0))
@@ -322,7 +331,10 @@ function X.OutputNpcTip(Rect, dwID, szExtraXml)
 	local szName = X.GetObjectName(npc)
 	-- Æ´Òô
 	if IsCtrlKeyDown() then
-		table.insert(t, GetFormatText(X.Han2TonePinyin(szName, true) .. '\n', 80, r, g, b))
+		local szPinyin = X.Han2TonePinyin(szName, true)[1]
+		if not X.IsEmpty(szPinyin) then
+			table.insert(t, GetFormatText(szPinyin .. '\n', 80, r, g, b))
+		end
 	end
 	-- Ãû×Ö
 	table.insert(t, GetFormatText(szName .. '\n', 80, r, g, b))
@@ -381,7 +393,10 @@ function X.OutputDoodadTemplateTip(Rect, dwTemplateID, szExtraXml)
 	end
 	-- Æ´Òô
 	if IsCtrlKeyDown() then
-		table.insert(t, GetFormatText(X.Han2TonePinyin(szName, true) .. '\n', 65))
+		local szPinyin = X.Han2TonePinyin(szName, true)[1]
+		if not X.IsEmpty(szPinyin) then
+			table.insert(t, GetFormatText(szPinyin .. '\n', 65))
+		end
 	end
 	-- Ãû×Ö
 	table.insert(t, GetFormatText(szName .. '\n', 65))
@@ -416,7 +431,10 @@ function X.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 	end
 	-- Æ´Òô
 	if IsCtrlKeyDown() then
-		table.insert(t, GetFormatText(X.Han2TonePinyin(szDoodadName, true) .. '\n', 37))
+		local szPinyin = X.Han2TonePinyin(szDoodadName, true)[1]
+		if not X.IsEmpty(szPinyin) then
+			table.insert(t, GetFormatText(szPinyin .. '\n', 37))
+		end
 	end
 	-- Ãû×Ö
 	table.insert(t, GetFormatText(szDoodadName .. '\n', 37))
