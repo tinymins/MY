@@ -159,7 +159,7 @@ function X.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 	if IsCtrlKeyDown() then
 		local szPinyin = X.Han2TonePinyin(tMemberInfo.szName, true)[1]
 		if not X.IsEmpty(szPinyin) then
-			table.insert(t, GetFormatText(szPinyin .. '\n', 80, r, g, b))
+			table.insert(xml, GetFormatText(szPinyin .. '\n', 80, r, g, b))
 		end
 	end
 	-- цееи
