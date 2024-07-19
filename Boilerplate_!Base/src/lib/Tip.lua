@@ -199,6 +199,10 @@ function X.OutputPlayerTip(Rect, dwID, szExtraXml)
 	local me, t = X.GetClientPlayer(), {}
 	local r, g, b = GetForceFontColor(dwID, me.dwID)
 
+	-- 拼音
+	if IsCtrlKeyDown() then
+		table.insert(t, GetFormatText(X.Han2TonePinyin(player.szName, true) .. '\n', 80, r, g, b))
+	end
 	-- 名字
 	table.insert(t, GetFormatText(FormatString(g_tStrings.STR_NAME_PLAYER, player.szName), 80, r, g, b))
 	-- 称号
@@ -272,8 +276,12 @@ function X.OutputNpcTemplateTip(Rect, dwNpcTemplateID, szExtraXml)
 	end
 	local t = {}
 
+	local szName = X.GetTemplateName(TARGET.NPC, dwNpcTemplateID) or tostring(dwNpcTemplateID)
+	-- 拼音
+	if IsCtrlKeyDown() then
+		table.insert(t, GetFormatText(X.Han2TonePinyin(szName, true) .. '\n', 80, 255, 255, 0))
+	end
 	-- 名字
-	local szName = X.GetTemplateName(TARGET.NPC, dwNpcTemplateID) or dwNpcTemplateID
 	table.insert(t, GetFormatText(szName .. '\n', 80, 255, 255, 0))
 	-- 等级
 	if npc.nLevel - X.GetClientPlayer().nLevel > 10 then
@@ -305,8 +313,12 @@ function X.OutputNpcTip(Rect, dwID, szExtraXml)
 	local r, g, b = GetForceFontColor(dwID, me.dwID)
 	local t = {}
 
-	-- 名字
 	local szName = X.GetObjectName(npc)
+	-- 拼音
+	if IsCtrlKeyDown() then
+		table.insert(t, GetFormatText(X.Han2TonePinyin(szName, true) .. '\n', 80, r, g, b))
+	end
+	-- 名字
 	table.insert(t, GetFormatText(szName .. '\n', 80, r, g, b))
 	-- 称号
 	if npc.szTitle ~= '' then
@@ -357,11 +369,15 @@ function X.OutputDoodadTemplateTip(Rect, dwTemplateID, szExtraXml)
 		return
 	end
 	local t = {}
-	-- 名字
 	local szName = doodad.szName ~= '' and doodad.szName or dwTemplateID
 	if doodad.nKind == DOODAD_KIND.CORPSE then
 		szName = szName .. g_tStrings.STR_DOODAD_CORPSE
 	end
+	-- 拼音
+	if IsCtrlKeyDown() then
+		table.insert(t, GetFormatText(X.Han2TonePinyin(szName, true) .. '\n', 65))
+	end
+	-- 名字
 	table.insert(t, GetFormatText(szName .. '\n', 65))
 	table.insert(t, GetDoodadQuestTip(dwTemplateID))
 	-- 模版ID
@@ -388,11 +404,15 @@ function X.OutputDoodadTip(Rect, dwDoodadID, szExtraXml)
 	end
 
 	local player, t = X.GetClientPlayer(), {}
-	-- 名字
 	local szDoodadName = Table_GetDoodadName(doodad.dwTemplateID, doodad.dwNpcTemplateID)
 	if doodad.nKind == DOODAD_KIND.CORPSE then
 		szDoodadName = szDoodadName .. g_tStrings.STR_DOODAD_CORPSE
 	end
+	-- 拼音
+	if IsCtrlKeyDown() then
+		table.insert(t, GetFormatText(X.Han2TonePinyin(szDoodadName, true) .. '\n', 37))
+	end
+	-- 名字
 	table.insert(t, GetFormatText(szDoodadName .. '\n', 37))
 	-- 采集信息
 	if (doodad.nKind == DOODAD_KIND.CORPSE and not doodad.CanLoot(player.dwID)) or doodad.nKind == DOODAD_KIND.CRAFT_TARGET then
