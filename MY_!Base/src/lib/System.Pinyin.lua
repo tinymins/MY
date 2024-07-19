@@ -16,15 +16,40 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -----------------------------------------------
 -- ºº×Ö×ªÆ´Òô
 -----------------------------------------------
-do local PINYIN, PINYIN_CONSONANT
-function X.Han2Pinyin(szText)
+local TONE_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/tone.{$lang}.jx3dat'
+local TONELESS_PATH = X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/toneless.{$lang}.jx3dat'
+local TONE_PINYIN, TONE_PINYIN_CONSONANT
+local TONELESS_PINYIN, TONELESS_PINYIN_CONSONANT
+
+local function ConcatPinyin(szText, szNext, szSplitter)
+	if szText == '' then
+		return szNext
+	end
+	if szNext == '' then
+		return szText
+	end
+	return szText .. szSplitter .. szNext
+end
+
+local function Han2Pinyin(szText, bTone, szSplitter)
 	if not X.IsString(szText) then
 		return
 	end
-	if not PINYIN then
-		PINYIN = X.LoadLUAData(X.PACKET_INFO.FRAMEWORK_ROOT .. 'data/pinyin/{$lang}.jx3dat', { passphrase = false })
-		local tPinyinConsonant = {}
-		for c, v in pairs(PINYIN) do
+	if szSplitter == true then
+		szSplitter = '\''
+	elseif not X.IsString(szSplitter) then
+		szSplitter = ''
+	end
+	local tPinyin, tPinyinConsonant
+	if bTone then
+		tPinyin, tPinyinConsonant = TONE_PINYIN, TONE_PINYIN_CONSONANT
+	else
+		tPinyin, tPinyinConsonant = TONELESS_PINYIN, TONELESS_PINYIN_CONSONANT
+	end
+	if not tPinyin then
+		tPinyin = select(2, X.SafeCall(X.LoadLUAData(bTone and TONE_PATH or TONELESS_PATH, { passphrase = false }), string)) or {}
+		tPinyinConsonant = {}
+		for c, v in pairs(tPinyin) do
 			local a, t = {}, {}
 			for _, s in ipairs(v) do
 				s = s:sub(1, 1)
@@ -35,29 +60,33 @@ function X.Han2Pinyin(szText)
 			end
 			tPinyinConsonant[c] = a
 		end
-		PINYIN_CONSONANT = tPinyinConsonant
+		if bTone then
+			TONE_PINYIN, TONE_PINYIN_CONSONANT = tPinyin, tPinyinConsonant
+		else
+			TONELESS_PINYIN, TONELESS_PINYIN_CONSONANT = tPinyin, tPinyinConsonant
+		end
 	end
 	local aText = X.SplitString(szText, '')
 	local aFull, nFullCount = {''}, 1
 	local aConsonant, nConsonantCount = {''}, 1
 	for _, szChar in ipairs(aText) do
-		local aCharPinyin = PINYIN[szChar]
+		local aCharPinyin = tPinyin[szChar]
 		if aCharPinyin and #aCharPinyin > 0 then
 			for i = 2, #aCharPinyin do
 				for j = 1, nFullCount do
-					table.insert(aFull, aFull[j] .. aCharPinyin[i])
+					table.insert(aFull, ConcatPinyin(aFull[j], aCharPinyin[i], szSplitter))
 				end
 			end
 			for j = 1, nFullCount do
-				aFull[j] = aFull[j] .. aCharPinyin[1]
+				aFull[j] = ConcatPinyin(aFull[j], aCharPinyin[1], szSplitter)
 			end
 			nFullCount = nFullCount * #aCharPinyin
 		else
 			for j = 1, nFullCount do
-				aFull[j] = aFull[j] .. szChar
+				aFull[j] = ConcatPinyin(aFull[j], szChar, szSplitter)
 			end
 		end
-		local aCharPinyinConsonant = PINYIN_CONSONANT[szChar]
+		local aCharPinyinConsonant = tPinyinConsonant[szChar]
 		if aCharPinyinConsonant and #aCharPinyinConsonant > 0 then
 			for i = 2, #aCharPinyinConsonant do
 				for j = 1, nConsonantCount do
@@ -76,6 +105,19 @@ function X.Han2Pinyin(szText)
 	end
 	return aFull, aConsonant
 end
+
+function X.Han2Pinyin(szText, szSplitter)
+	if not X.IsString(szText) then
+		return
+	end
+	return Han2Pinyin(szText, false, szSplitter)
+end
+
+function X.Han2TonePinyin(szText, szSplitter)
+	if not X.IsString(szText) then
+		return
+	end
+	return Han2Pinyin(szText, true, szSplitter)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

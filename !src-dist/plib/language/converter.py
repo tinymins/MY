@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from copy import deepcopy
-import re
 
 try:
     import psyco
@@ -119,7 +118,7 @@ class ConvertMap(object):
         return len(self._map)
 
 
-def registeryLanguageMap(name, mapping):
+def registerLanguageMap(name, mapping):
     global MAPS
     MAPS[name] = {"name": name, "mapping": mapping, "map": None}
 
@@ -267,12 +266,12 @@ class Converter(object):
         return "".join(self.final)
 
 
-registeryLanguageMap("zh-hant", zh2Hant)
-registeryLanguageMap("zh-hans", zh2Hans)
-registeryLanguageMap("zh-TW", zh2TW)
-registeryLanguageMap("zh-HK", zh2HK)
-registeryLanguageMap("zh-CN", zh2CN)
-registeryLanguageMap("zh-SG", zh2SG)
+registerLanguageMap("zh-hant", zh2Hant)
+registerLanguageMap("zh-hans", zh2Hans)
+registerLanguageMap("zh-TW", zh2TW)
+registerLanguageMap("zh-HK", zh2HK)
+registerLanguageMap("zh-CN", zh2CN)
+registerLanguageMap("zh-SG", zh2SG)
 del zh2Hant, zh2Hans, zh2TW, zh2HK, zh2CN, zh2SG
 
 
