@@ -155,7 +155,13 @@ function X.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 	local r, g, b = X.GetForceColor(tMemberInfo.dwForceID, 'foreground')
 	local szPath, nFrame = GetForceImage(tMemberInfo.dwForceID)
 	local xml = {}
+	-- ∆¥“Ù
+	if IsCtrlKeyDown() then
+		table.insert(t, GetFormatText(X.Han2TonePinyin(tMemberInfo.szName, true) .. '\n', 80, r, g, b))
+	end
+	-- √≈≈…
 	table.insert(xml, GetFormatImage(szPath, nFrame, 22, 22))
+	-- √˚◊÷
 	table.insert(xml, GetFormatText(FormatString(g_tStrings.STR_NAME_PLAYER, tMemberInfo.szName), 80, r, g, b))
 	if tMemberInfo.bIsOnLine then
 		local p = X.GetPlayer(dwID)
