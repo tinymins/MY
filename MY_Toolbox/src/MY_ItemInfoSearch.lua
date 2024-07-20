@@ -271,8 +271,12 @@ function PS.OnPanelActive(wnd)
 			{
 				'onlclick',
 				function(id, text, data)
-					if data and IsCtrlKeyDown() then
-						X.InsertChatInput('iteminfo', data.dwTabType, data.dwIndex, data.dwRecipeID)
+					if data then
+						if IsCtrlKeyDown() then
+							X.InsertChatInput('iteminfo', data.dwTabType, data.dwIndex, data.dwRecipeID)
+						elseif IsAltKeyDown() then
+							Addon_ExteriorViewByItemInfo(data.dwTabType, data.dwIndex)
+						end
 					end
 					return false
 				end
