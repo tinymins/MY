@@ -57,10 +57,9 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_DungeonStat', _L['Genera
 		xDefaultValue = {
 			'name',
 			'force',
-			'week_team_dungeon',
+			'recommend_raid_dungeon',
 			'week_raid_dungeon',
-			'dungeon_427',
-			'dungeon_428',
+			'week_team_dungeon',
 			'time_days',
 		},
 	},
@@ -266,6 +265,22 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 				id = id,
 				szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_RAID_DUNGEON,
 				nMinWidth = DUNGEON_MIN_WIDTH * #X.GetActivityMap('WEEK_RAID_DUNGEON'),
+			}
+		end
+	elseif id == 'recommend_team_dungeon' then
+		if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+			return {
+				id = id,
+				szTitle = _L['Recommend: team dungeon'],
+				nMinWidth = DUNGEON_MIN_WIDTH * #X.GetRecommendDungeonMapList(false),
+			}
+		end
+	elseif id == 'recommend_raid_dungeon' then
+		if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+			return {
+				id = id,
+				szTitle = _L['Recommend: raid dungeon'],
+				nMinWidth = DUNGEON_MIN_WIDTH * #X.GetRecommendDungeonMapList(true),
 			}
 		end
 	else
@@ -570,6 +585,20 @@ function D.GetColumns()
 			end
 		elseif id == 'week_raid_dungeon' then
 			for _, map in ipairs(X.GetActivityMap('WEEK_RAID_DUNGEON')) do
+				local col = COLUMN_DICT[GetDungeonMapColumnID(map.dwID, id)]
+				if col then
+					table.insert(aCol, col)
+				end
+			end
+		elseif id == 'recommend_team_dungeon' then
+			for _, map in ipairs(X.GetRecommendDungeonMapList(false)) do
+				local col = COLUMN_DICT[GetDungeonMapColumnID(map.dwID, id)]
+				if col then
+					table.insert(aCol, col)
+				end
+			end
+		elseif id == 'recommend_raid_dungeon' then
+			for _, map in ipairs(X.GetRecommendDungeonMapList(true)) do
 				local col = COLUMN_DICT[GetDungeonMapColumnID(map.dwID, id)]
 				if col then
 					table.insert(aCol, col)
@@ -972,6 +1001,8 @@ function D.OnInitPage()
 				for _, szType in ipairs({
 					'week_team_dungeon',
 					'week_raid_dungeon',
+					'recommend_team_dungeon',
+					'recommend_raid_dungeon',
 				}) do
 					local col = COLUMN_DICT[szType]
 					if col then

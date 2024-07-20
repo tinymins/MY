@@ -82,6 +82,8 @@ return {
 	['r'] = '√',
     ['x'] = '×',
     ['Week routine: '] = '周常：',
+    ['Recommend: team dungeon'] = '推荐：小队秘境',
+    ['Recommend: raid dungeon'] = '推荐：团队秘境',
     ['---- %d players dungeon ----'] = '———— %d人秘境 ————',
 
     ['MY_RoleStatistics_TaskStat'] = '任务统计',
