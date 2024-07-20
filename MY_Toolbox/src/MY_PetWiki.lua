@@ -190,6 +190,24 @@ function D.HookPetFrame(frame)
 				end)
 			end)
 		end)
+		local hList = hPets:Lookup('Handle_ListAcquired')
+		if hList then
+			X.UI.HookHandleAppend(hList, function(_, hItem)
+				X.DelayCall(function()
+					local boxPet = hItem:IsValid() and hItem:Lookup('Box_PetItem')
+					if not boxPet then
+						return
+					end
+					X.SetMemberFunctionHook(
+						boxPet,
+						'OnItemLButtonClick',
+						'MY_PetWiki',
+						OnPetItemLButtonClick,
+						{ bAfterOrigin = true, bPassReturn = true, bHookReturn = true })
+					boxPet:RegisterEvent(ITEM_EVENT.LBUTTONCLICK)
+				end)
+			end)
+		end
 	end
 end
 
