@@ -58,6 +58,13 @@ function X.GetMapInfo(arg0)
 end
 end
 
+---获取一个地图的名字
+---@param dwMapID number @地图ID
+---@return string @地图名字
+function X.GetMapName(dwMapID)
+	return Table_GetMapName(dwMapID)
+end
+
 function X.GetMapNameList()
 	local aList, tMap = {}, {}
 	for k, v in X.ipairs_r(GetMapList()) do
