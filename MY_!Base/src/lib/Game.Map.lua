@@ -58,6 +58,13 @@ function X.GetMapInfo(arg0)
 end
 end
 
+---获取一个地图的名字
+---@param dwMapID number @地图ID
+---@return string @地图名字
+function X.GetMapName(dwMapID)
+	return Table_GetMapName(dwMapID)
+end
+
 function X.GetMapNameList()
 	local aList, tMap = {}, {}
 	for k, v in X.ipairs_r(GetMapList()) do
@@ -475,6 +482,53 @@ function X.GetDungeonMenu(tOptions)
 	end
 	return t
 end
+end
+
+-- 获取推荐的秘境地图列表
+---@param bRaid boolean @是否为团队秘境
+---@return table @推荐的秘境地图列表
+function X.GetRecommendDungeonMapList(bRaid)
+	local aMap, tMap = {}, {}
+	local me = X.GetClientPlayer()
+	if me and Table_GetNewDungeonList then
+		local tTeamDungeonList, tRaidDungeonList, tDivideList, tEnterMapList = Table_GetNewDungeonList(me.nLevel)
+		-- 小队秘境
+		if bRaid == nil or bRaid == false then
+			for _, tDungeon in ipairs(tTeamDungeonList) do
+				for szTypeName, tInfo in pairs(tDungeon) do
+					if X.IsTable(tInfo) then
+						if tInfo.bIsRecommend and not tMap[tInfo.dwMapID] then
+							table.insert(aMap, {
+								dwID = tInfo.dwMapID,
+								szName = X.GetMapName(tInfo.dwMapID),
+							})
+							tMap[tInfo.dwMapID] = true
+						end
+					end
+				end
+			end
+		end
+		-- 团队秘境
+		if bRaid == nil or bRaid == true then
+			for _, tDungeon in ipairs(tRaidDungeonList) do
+				for szTypeName, tInfo in pairs(tDungeon) do
+					if X.IsTable(tInfo) then
+						if tInfo.bIsRecommend and not tMap[tInfo.dwMapID] then
+							table.insert(aMap, {
+								dwID = tInfo.dwMapID,
+								szName = X.GetMapName(tInfo.dwMapID),
+							})
+							tMap[tInfo.dwMapID] = true
+						end
+					end
+				end
+			end
+		end
+	end
+	table.sort(aMap, function(a, b)
+		return a.dwID < b.dwID
+	end)
+	return aMap
 end
 
 function X.GetTypeGroupMap()
