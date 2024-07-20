@@ -147,7 +147,7 @@ end
 
 function D.TeamBuildingGetText(res, edit)
 	local szText = res[1]
-	if D.bReady and D.aBlockWords then
+	if D.bReady and D.aBlockWords and O.bBlockWords then
 		local szFilter = ''
 		for _, bw in ipairs(D.aBlockWords) do
 			if bw.bTeamBuilding
@@ -187,7 +187,7 @@ function D.OnTeamBuildingCreate(frame)
 end
 
 function D.ApplyTeamBuildingFilters()
-	if not D.bReady or not D.aBlockWords then
+	if not D.bReady or not D.aBlockWords or not O.bBlockWords then
 		return
 	end
 	local hList = Station.Lookup('Normal/TeamBuilding/PageSet_TeamBuild/Page_TeamFinding/WndScroll_TeamInfo', '')
