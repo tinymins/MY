@@ -245,7 +245,7 @@ function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 			bAlertWhenGroup = tInfo.bAlertWhenGroup
 		end
 	end
-	if IsRemotePlayer(dwID) then
+	if not dwID or IsRemotePlayer(dwID) then
 		dwID = 0
 	end
 
