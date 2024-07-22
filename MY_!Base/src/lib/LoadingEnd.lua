@@ -24,11 +24,11 @@ X.RegisterInit(X.NSFormatString('{$NS}#AUTHOR_TIP'), function()
 	if not Farbnamen then
 		return
 	end
-	for _, v in X.pairs_c(X.PACKET_INFO.AUTHOR_ROLE_LIST) do
-		if v.szName and v.dwID and v.szTip and Farbnamen.RegisterNameIDHeader then
+	for _, v in ipairs(X.PACKET_INFO.AUTHOR_ROLE_LIST) do
+		if v.szName and v.dwID and v.szHeader and Farbnamen.RegisterNameIDHeader then
 			Farbnamen.RegisterNameIDHeader(v.szName, v.dwID, v.szHeader)
 		end
-		if v.szGlobalID and v.szTip and Farbnamen.RegisterGlobalIDHeader then
+		if v.szGlobalID and v.szHeader and Farbnamen.RegisterGlobalIDHeader then
 			Farbnamen.RegisterGlobalIDHeader(v.szGlobalID, v.szHeader)
 		end
 	end
