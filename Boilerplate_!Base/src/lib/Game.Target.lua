@@ -1379,11 +1379,12 @@ end
 
 -- 获取帮会名称
 ---@param dwTongID number @帮会ID
+---@param nGetType? number @0 表示逻辑直接请求，一般是刷新player对象头顶显示, -1兼容老插件，不发送事件
 ---@return string @帮会名称
-function X.GetTongName(dwTongID)
+function X.GetTongName(dwTongID, nGetType)
 	local szTongName
 	if X.IsNumber(dwTongID) and dwTongID > 0 then
-		szTongName = GetTongClient().ApplyGetTongName(dwTongID, 253)
+		szTongName = GetTongClient().ApplyGetTongName(dwTongID, nGetType or 253)
 	else
 		szTongName = ''
 	end
@@ -1391,10 +1392,11 @@ function X.GetTongName(dwTongID)
 end
 
 -- 获取自身帮会名称
+---@param nGetType? number @0 表示逻辑直接请求，一般是刷新player对象头顶显示, -1兼容老插件，不发送事件
 ---@return string @帮会名称
-function X.GetClientPlayerTongName()
+function X.GetClientPlayerTongName(nGetType)
 	local dwTongID = (X.GetClientPlayer() or X.CONSTANT.EMPTY_TABLE).dwTongID
-	return X.GetTongName(dwTongID)
+	return X.GetTongName(dwTongID, nGetType)
 end
 
 -- 获取帮会成员
