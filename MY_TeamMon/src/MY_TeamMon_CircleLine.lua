@@ -24,7 +24,7 @@ X.RegisterRestriction('MY_TeamMon_CircleLine', { ['*'] = true })
 local TARGET = TARGET
 local INI_SHADOW          = X.PACKET_INFO.UI_COMPONENT_ROOT .. 'Shadow.ini'
 local CIRCLE_MAX_RADIUS   = 30    -- 最大的半径
-local CIRCLE_LINE_ALPHA   = 165   -- 线和边框最大透明度
+local CIRCLE_LINE_ALPHA   = 240   -- 线和边框最大透明度
 local CIRCLE_MAX_CIRCLE   = 2
 local CIRCLE_RESERT_DRAW  = false -- 全局重绘
 local CIRCLE_DEFAULT_DATA = { bEnable = true, nAngle = 80, nRadius = 4, col = { 0, 255, 0 }, bBorder = true }
@@ -207,9 +207,10 @@ function D.DrawObject(dwType, dwID, KObject)
 		if dwType == TARGET.NPC then
 			dwTarType, dwTarID = KObject.GetTarget()
 		end
-		local tar = X.GetObject(dwTarType, dwTarID)
-		if tar and dwTarType == TARGET.PLAYER and dwTarID ~= 0
-		and (not cache.bDrawLineOnlyStareMe or dwTarID == X.GetClientPlayerID()) then
+
+		local tar = X.GetObject(dwTarType, dwTarID) or X.GetClientPlayer()
+
+		if not cache.bDrawLineOnlyStareMe or dwTarID == X.GetClientPlayerID() then
 			if not cache.shaLine or cache.shaLine.dwTarID ~= dwTarID then
 				if not cache.shaLine then
 					cache.shaLine = H_LINE:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Line')
