@@ -1382,15 +1382,19 @@ end
 ---@return string @帮会名称
 function X.GetTongName(dwTongID)
 	local szTongName
-	if not dwTongID then
-		dwTongID = (X.GetClientPlayer() or X.CONSTANT.EMPTY_TABLE).dwTongID
-	end
-	if dwTongID and dwTongID ~= 0 then
+	if X.IsNumber(dwTongID) and dwTongID > 0 then
 		szTongName = GetTongClient().ApplyGetTongName(dwTongID, 253)
 	else
 		szTongName = ''
 	end
 	return szTongName
+end
+
+-- 获取自身帮会名称
+---@return string @帮会名称
+function X.GetClientPlayerTongName()
+	local dwTongID = (X.GetClientPlayer() or X.CONSTANT.EMPTY_TABLE).dwTongID
+	return X.GetTongName(dwTongID)
 end
 
 -- 获取帮会成员
