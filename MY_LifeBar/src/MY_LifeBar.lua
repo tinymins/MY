@@ -598,7 +598,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 			bShowName = IsSpecialNpcVisible(dwID, me, object)
 		end
 		if bShowName then
-			lb:SetName(szName)
+			lb:SetName(X.ExtractPlayerBaseName(szName))
 		end
 		lb:SetNameVisible(bShowName)
 		-- ÐÄ·¨
