@@ -368,11 +368,7 @@ function X.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgno
 	local me = X.GetClientPlayer()
 	if me then
 		szFind = szFind:gsub('$zj', me.szName)
-		local szTongName = ''
-		local tong = GetTongClient()
-		if tong and me.dwTongID ~= 0 then
-			szTongName = tong.ApplyGetTongName(me.dwTongID) or ''
-		end
+		local szTongName = X.GetTongName(me.dwTongID) or ''
 		szFind = szFind:gsub('$bh', szTongName)
 		szFind = szFind:gsub('$gh', szTongName)
 	end
