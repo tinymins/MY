@@ -1385,8 +1385,6 @@ function X.GetTongName(dwTongID, nGetType)
 	local szTongName
 	if X.IsNumber(dwTongID) and dwTongID > 0 then
 		szTongName = GetTongClient().ApplyGetTongName(dwTongID, nGetType or 253)
-	else
-		szTongName = ''
 	end
 	return szTongName
 end
