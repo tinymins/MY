@@ -896,7 +896,7 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 	-- 更新帮会信息
 	if tPlayer.dwID and tPlayer.szServerName == X.GetServerOriginName() then
 		if tPlayer.dwTongID and tPlayer.dwTongID ~= 0 then
-			local szTongName = GetTongClient().ApplyGetTongName(tPlayer.dwTongID, 254)
+			local szTongName = X.GetTongName(tPlayer.dwTongID, 254)
 			if szTongName and szTongName ~= '' then
 				D.RecordTongInfo(tPlayer.szServerName, tPlayer.dwTongID, szTongName, bTimes)
 			end

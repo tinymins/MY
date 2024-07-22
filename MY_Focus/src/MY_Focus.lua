@@ -516,7 +516,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		local dwTemplateID, szTong = -1, ''
 		if dwType == TARGET.PLAYER then
 			if KObject.dwTongID ~= 0 then
-				szTong = GetTongClient().ApplyGetTongName(KObject.dwTongID, 253)
+				szTong = X.GetTongName(KObject.dwTongID, 253)
 				if not szTong or szTong == '' then -- 解决目标刚进入场景的时候帮会获取不到的问题
 					X.DelayCall(300, function()
 						D.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)

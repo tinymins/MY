@@ -295,7 +295,7 @@ function D.GetTongName(dwTongID)
 		return
 	end
 	if not TONG_NAME_CACHE[dwTongID] then
-		TONG_NAME_CACHE[dwTongID] = GetTongClient().ApplyGetTongName(dwTongID)
+		TONG_NAME_CACHE[dwTongID] = X.GetTongName(dwTongID)
 	end
 	if TONG_NAME_CACHE[dwTongID] then
 		return TONG_NAME_CACHE[dwTongID]
