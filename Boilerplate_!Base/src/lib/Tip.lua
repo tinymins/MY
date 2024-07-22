@@ -169,8 +169,8 @@ function X.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 	if tMemberInfo.bIsOnLine then
 		local p = X.GetPlayer(dwID)
 		if p and p.dwTongID > 0 then
-			if GetTongClient().ApplyGetTongName(p.dwTongID) then
-				table.insert(xml, GetFormatText('[' .. GetTongClient().ApplyGetTongName(p.dwTongID) .. ']\n', 41))
+			if X.GetTongName(p.dwTongID) then
+				table.insert(xml, GetFormatText('[' .. X.GetTongName(p.dwTongID) .. ']\n', 41))
 			end
 		end
 		table.insert(xml, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, tMemberInfo.nLevel), 82))
@@ -223,7 +223,7 @@ function X.OutputPlayerTip(Rect, dwID, szExtraXml)
 	end
 	-- °ï»á
 	if player.dwTongID ~= 0 then
-		local szName = GetTongClient().ApplyGetTongName(player.dwTongID, 1)
+		local szName = X.GetTongName(player.dwTongID, 1)
 		if szName and szName ~= '' then
 			table.insert(t, GetFormatText('[' .. szName .. ']\n', 0))
 		end

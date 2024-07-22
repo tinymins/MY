@@ -126,7 +126,7 @@ X.RegisterBgMsg(X.NSFormatString('{$NS}_ABOUT'), function(_, data, nChannel, dwT
 	if data[1] == 'Author' then -- 版本检查 自用 可以绘制详细表格
 		local me, szTong = X.GetClientPlayer(), ''
 		if me.dwTongID > 0 then
-			szTong = GetTongClient().ApplyGetTongName(me.dwTongID) or 'Failed'
+			szTong = X.GetTongName(me.dwTongID) or 'Failed'
 		end
 		local szServer = select(2, GetUserServer())
 		X.SendBgMsg(nReplyChannel, X.NSFormatString('{$NS}_ABOUT'), {'info',
