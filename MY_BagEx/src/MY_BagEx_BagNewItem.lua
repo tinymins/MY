@@ -41,6 +41,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	},
 })
 local D = {}
+local INVENTORY_CACHE = {}
 local BAG_ITEM_CACHE = {}
 local EQUIP_ITEM_CACHE = {}
 local NEW_ITEM_FLAG_TIME = {}
@@ -67,6 +68,7 @@ function D.CreateBagItemCache()
 	X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(kItem, dwBox, dwX)
 		if kItem then
 			BAG_ITEM_CACHE[kItem.dwID] = kItem.bCanStack and kItem.nStackNum or 1
+			INVENTORY_CACHE[dwBox .. '_' .. dwX] = X.GetItemKey(kItem)
 		end
 	end)
 	EQUIP_ITEM_CACHE = {}
@@ -83,7 +85,8 @@ function D.OnBagItemUpdate(dwBox, dwX)
 	if kItem then
 		local bNewItem = not BAG_ITEM_CACHE[kItem.dwID]
 		local bFromEquip = EQUIP_ITEM_CACHE[kItem.dwID]
-		local bNewStack = BAG_ITEM_CACHE[kItem.dwID] and BAG_ITEM_CACHE[kItem.dwID] ~= (kItem.bCanStack and kItem.nStackNum or 1)
+		local bNewStack = (BAG_ITEM_CACHE[kItem.dwID] and BAG_ITEM_CACHE[kItem.dwID] ~= (kItem.bCanStack and kItem.nStackNum or 1))
+			or (INVENTORY_CACHE[dwBox .. '_' .. dwX] and INVENTORY_CACHE[dwBox .. '_' .. dwX] == X.GetItemKey(kItem))
 		if (not bNewItem and (not bNewStack or O.bIgnoreNewStackItem)) or bFromEquip then
 			local bNewFlag = NEW_ITEM_FLAG_TIME[kItem.dwID] and NEW_ITEM_FLAG_TIME[kItem.dwID] > GetCurrentTime()
 			if bNewFlag or bNewStack or bFromEquip then
