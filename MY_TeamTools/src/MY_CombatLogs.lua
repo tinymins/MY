@@ -917,7 +917,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		buttonStyle = 'OPTION',
 		autoEnable = function() return MY_CombatLogs.bEnable end,
 		menu = D.GetOptionsMenu,
-	}):AutoWidth():Width() + 5
+	}):Width() + 5
 
 	nLFY = nY + nLH
 	return nX, nY, nLFY
