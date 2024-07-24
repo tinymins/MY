@@ -26,7 +26,7 @@ FILE_MAPPING = {
     "package.ini": {"out": "package.ini.zh_TW", "type": "package"},
 }
 FILE_MAPPING_RE = [
-    {"pattern": r"(.*)\.zhcn\.jx3dat", "out": r"\1.zhtw.jx3dat", "type": "lang"},
+    # {"pattern": r"(.*)\.zhcn\.jx3dat", "out": r"\1.zhtw.jx3dat", "type": "lang"},
 ]
 FOLDER_MAPPING = {
     # 'zhcn': { 'out': 'zhtw', 'type': 'lang' },
