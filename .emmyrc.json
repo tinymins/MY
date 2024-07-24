@@ -2,7 +2,6 @@
 	"workspace": {
 		"ignoreGlobs": [
 			"**/zhtw.jx3dat",
-			"**/zhtw.*.jx3dat",
 			"**/*.zhtw.jx3dat"
 		]
 	}

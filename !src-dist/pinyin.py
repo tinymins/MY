@@ -187,7 +187,7 @@ if __name__ == "__main__":
                 __file__,
                 "..",
                 "..",
-                packet_name + "_!Base/data/pinyin/zhcn.toneless.jx3dat",
+                packet_name + "_!Base/data/pinyin/toneless.zhcn.jx3dat",
             )
         ),
         __load_pinyin(src_file, True),
@@ -199,7 +199,7 @@ if __name__ == "__main__":
                 __file__,
                 "..",
                 "..",
-                packet_name + "_!Base/data/pinyin/zhcn.tone.jx3dat",
+                packet_name + "_!Base/data/pinyin/tone.zhcn.jx3dat",
             )
         ),
         __load_pinyin(src_file, False),
@@ -211,7 +211,7 @@ if __name__ == "__main__":
                 __file__,
                 "..",
                 "..",
-                packet_name + "_!Base/data/pinyin/zhtw.toneless.jx3dat",
+                packet_name + "_!Base/data/pinyin/toneless.zhtw.jx3dat",
             )
         ),
         __load_pinyin(src_file, True, "zh-TW"),
@@ -223,7 +223,7 @@ if __name__ == "__main__":
                 __file__,
                 "..",
                 "..",
-                packet_name + "_!Base/data/pinyin/zhtw.tone.jx3dat",
+                packet_name + "_!Base/data/pinyin/tone.zhtw.jx3dat",
             )
         ),
         __load_pinyin(src_file, False, "zh-TW"),
