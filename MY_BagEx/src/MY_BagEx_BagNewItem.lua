@@ -67,8 +67,11 @@ function D.CreateBagItemCache()
 	BAG_ITEM_CACHE = {}
 	X.IterInventoryItem(X.CONSTANT.INVENTORY_TYPE.PACKAGE, function(kItem, dwBox, dwX)
 		if kItem then
+			INVENTORY_CACHE[dwBox .. '_' .. dwX] = {
+				szKey = X.GetItemKey(kItem),
+				nStackNum = (kItem.bCanStack and kItem.nStackNum or 1),
+			}
 			BAG_ITEM_CACHE[kItem.dwID] = kItem.bCanStack and kItem.nStackNum or 1
-			INVENTORY_CACHE[dwBox .. '_' .. dwX] = X.GetItemKey(kItem)
 		end
 	end)
 	EQUIP_ITEM_CACHE = {}
@@ -83,10 +86,13 @@ function D.OnBagItemUpdate(dwBox, dwX)
 	local me = X.GetClientPlayer()
 	local kItem = X.GetInventoryItem(me, dwBox, dwX)
 	if kItem then
-		local bNewItem = not BAG_ITEM_CACHE[kItem.dwID]
+		local szItemKey = X.GetItemKey(kItem)
+		local nStackNum = kItem.bCanStack and kItem.nStackNum or 1
+		local tInventoryItemInfo = INVENTORY_CACHE[dwBox .. '_' .. dwX]
+		local bNewItem = (not BAG_ITEM_CACHE[kItem.dwID]) and (not tInventoryItemInfo or tInventoryItemInfo.szKey ~= szItemKey)
 		local bFromEquip = EQUIP_ITEM_CACHE[kItem.dwID]
-		local bNewStack = (BAG_ITEM_CACHE[kItem.dwID] and BAG_ITEM_CACHE[kItem.dwID] ~= (kItem.bCanStack and kItem.nStackNum or 1))
-			or (INVENTORY_CACHE[dwBox .. '_' .. dwX] and INVENTORY_CACHE[dwBox .. '_' .. dwX] == X.GetItemKey(kItem))
+		local bNewStack = (BAG_ITEM_CACHE[kItem.dwID] and BAG_ITEM_CACHE[kItem.dwID] ~= nStackNum)
+			or (tInventoryItemInfo and tInventoryItemInfo.szItemKey == szItemKey and tInventoryItemInfo.nStackNum ~= nStackNum)
 		if (not bNewItem and (not bNewStack or O.bIgnoreNewStackItem)) or bFromEquip then
 			local bNewFlag = NEW_ITEM_FLAG_TIME[kItem.dwID] and NEW_ITEM_FLAG_TIME[kItem.dwID] > GetCurrentTime()
 			if bNewFlag or bNewStack or bFromEquip then
