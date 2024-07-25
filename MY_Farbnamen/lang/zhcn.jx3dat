@@ -15,6 +15,7 @@ return {
     ['Show analysis'] = '显示统计',
     ['[Teammate]'] = '〔队友〕',
     ['Load default setting'] = '恢复默认设置',
+    ['Player RemoteID: %d'] = '玩家跨服ID：%d',
     ['Player ID: %d'] = '玩家ID：%d',
     ['Player GUID: %s'] = '玩家唯一ID：%s',
     ['Cannot connect to database!!!'] = '无法连接到角色数据库！',

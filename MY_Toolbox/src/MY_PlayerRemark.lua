@@ -293,15 +293,17 @@ function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 	})
 	nY = nY + 30
 
-	nX = nPaddingX
-	ui:Append('Text', { x = nX, y = nY, text = _L['GUID:'] })
-	nX = nX + 80
-	ui:Append('WndEditBox', {
-		x = nX, y = nY, w = nRightW, h = 25,
-		text = szGlobalID,
-		multiline = false, enable = false, color = {200,200,200},
-	})
-	nY = nY + 30
+	if X.IsDebugClient(true) then
+		nX = nPaddingX
+		ui:Append('Text', { x = nX, y = nY, text = _L['GUID:'] })
+		nX = nX + 80
+		ui:Append('WndEditBox', {
+			x = nX, y = nY, w = nRightW, h = 25,
+			text = szGlobalID,
+			multiline = false, enable = false, color = {200,200,200},
+		})
+		nY = nY + 30
+	end
 
 	nX = nPaddingX
 	ui:Append('Text', { x = nX, y = nY, text = _L['Remark:'] })
