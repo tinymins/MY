@@ -136,6 +136,12 @@ local O = X.CreateUserSettingsModule('MY_Recount_UI', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bSimplifyValue = { -- 显示简化数值
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Recount'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
 	nDisplayMode = { -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
@@ -372,15 +378,15 @@ function D.UpdateUI(frame)
 		-- 数值显示
 		if MY_Recount_UI.bShowEffect then
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_R'):SetText(math.floor(p.nEffectValue / p.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_R'):SetText(MY_Recount.GetTargetShowValue(math.floor(p.nEffectValue / p.nTimeCount)) .. ' ' .. szUnit)
 			else
-				hItem:Lookup('Text_R'):SetText(p.nEffectValue)
+				hItem:Lookup('Text_R'):SetText(MY_Recount.GetTargetShowValue(p.nEffectValue))
 			end
 		else
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_R'):SetText(math.floor(p.nValue / p.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_R'):SetText(MY_Recount.GetTargetShowValue(math.floor(p.nValue / p.nTimeCount)) .. ' ' .. szUnit)
 			else
-				hItem:Lookup('Text_R'):SetText(p.nValue)
+				hItem:Lookup('Text_R'):SetText(MY_Recount.GetTargetShowValue(p.nValue))
 			end
 		end
 		hItem.data = p
@@ -705,6 +711,7 @@ local settings = {
 				'bShowPerSec',
 				'bShowEffect',
 				'bShowZeroVal',
+				'bSimplifyValue',
 				'nDisplayMode',
 				'nDrawInterval',
 				'bShowNodataTeammate',
@@ -727,6 +734,7 @@ local settings = {
 				'bShowPerSec',
 				'bShowEffect',
 				'bShowZeroVal',
+				'bSimplifyValue',
 				'nDisplayMode',
 				'nDrawInterval',
 				'bShowNodataTeammate',
@@ -743,6 +751,7 @@ local settings = {
 				bShowPerSec = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bShowEffect = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bShowZeroVal = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
+				bSimplifyValue = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				nDisplayMode = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 				bShowNodataTeammate = function() FireUIEvent('MY_RECOUNT_UI_CONFIG_UPDATE') end,
 			},

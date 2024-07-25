@@ -35,6 +35,7 @@ return {
     ['Group effect with same name'      ] = '合并同名技能效果',
     ['Hide anonymous effect'            ] = '隐藏没名字的记录',
     ['Show zero value effect'           ] = '显示零数值的记录',
+    ['Simplify value'                   ] = '精简显示数值记录',
     ['Theme'                            ] = '自定界面风格选择',
     ['Max history'                      ] = '最大历史记录设置',
 

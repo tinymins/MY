@@ -93,6 +93,13 @@ function D.GetTargetShowName(szName, bPlayer)
 	return szName
 end
 
+function D.GetTargetShowValue(nValue)
+	if MY_Recount_UI.bSimplifyValue then
+		return X.FormatNumberDot(nValue, 1, false, true)
+	end
+	return nValue
+end
+
 function D.IsImportantEffect(v)
 	if not v then
 		return false
@@ -256,6 +263,15 @@ function D.GetMenu()
 			bChecked = MY_Recount_UI.bShowZeroVal,
 			fnAction = function()
 				MY_Recount_UI.bShowZeroVal = not MY_Recount_UI.bShowZeroVal
+			end,
+			fnDisable = IsUIDisabled,
+		},
+		{
+			szOption = _L['Simplify value'],
+			bCheck = true,
+			bChecked = MY_Recount_UI.bSimplifyValue,
+			fnAction = function()
+				MY_Recount_UI.bSimplifyValue = not MY_Recount_UI.bSimplifyValue
 			end,
 			fnDisable = IsUIDisabled,
 		},
@@ -604,6 +620,7 @@ local settings = {
 				'GetHistoryMenu',
 				'GetPublishMenu',
 				'GetTargetShowName',
+				'GetTargetShowValue',
 				'IsImportantEffect',
 				'StatContainsImportantEffect',
 				'StatSkillContainsImportantEffect',
