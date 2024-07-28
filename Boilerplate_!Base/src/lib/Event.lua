@@ -845,6 +845,41 @@ end
 end
 
 --------------------------------------------------------------------------------
+-- 注册消息过滤
+--------------------------------------------------------------------------------
+-- Register:   X.RegisterMsgFilter(string szKey, function fnAction)
+-- Unregister: X.RegisterMsgFilter(string szKey, false)
+do
+local MSG_FILTER_EVENT = { szName = 'MsgFilter', bReturnValue = true }
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
+local function MsgFilterHandler(szMsg, nFont, bRich, r, g, b, szMsgType, dwTalkerID, szName, ...)
+	local aReturnValue = CommonEventFirer(MSG_FILTER_EVENT, szMsgType, szMsg, nFont, bRich, r, g, b, dwTalkerID, szName, ...)
+	for _, v in ipairs(aReturnValue) do
+		if v.aValue[1] then
+			return true
+		end
+	end
+	return false
+end
+function MSG_FILTER_EVENT.OnCreateEvent(szEvent)
+	if not szEvent then
+		return
+	end
+	RegisterMsgFilter(MsgFilterHandler, { szEvent })
+end
+function MSG_FILTER_EVENT.OnRemoveEvent(szEvent)
+	if not szEvent then
+		return
+	end
+	UnRegisterMsgFilter(MsgFilterHandler, { szEvent })
+end
+function X.RegisterMsgFilter(...)
+	return CommonEventRegister(MSG_FILTER_EVENT, ...)
+end
+end
+
+--------------------------------------------------------------------------------
 -- 注册协程
 --------------------------------------------------------------------------------
 do
