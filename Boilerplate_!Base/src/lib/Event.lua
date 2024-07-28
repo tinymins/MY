@@ -162,20 +162,33 @@ local function CommonEventRegister(E, xArg1, xArg2, xArg3)
 end
 X.CommonEventRegister = CommonEventRegister
 
-local function FireEventRec(E, p, ...)
+local function FireEventRec(E, p, aReturnValue, ...)
 	--[[#DEBUG BEGIN]]
 	local nTickCount = GetTickCount()
 	--[[#DEBUG END]]
-	local res, err, trace = X.XpCall(p.fnAction, ...)
-	if not res then
-		X.ErrorLog(err, 'On' .. E.szName .. ': ' .. p.szID, trace)
+	local aRes = {X.XpCall(p.fnAction, ...)}
+	if not aRes[1] then
+		X.ErrorLog(aRes[2], 'On' .. E.szName .. ': ' .. p.szID, aRes[3])
+	end
+	if aRes[1] and aReturnValue then
+		local aValue = {}
+		for k, v in pairs(aRes) do
+			if k > 1 then
+				aValue[k - 1] = v
+			end
+		end
+		table.insert(aReturnValue, {
+			szKey = p.szKey,
+			szID = p.szID,
+			aValue = aValue,
+		})
 	end
 	--[[#DEBUG BEGIN]]
 	nTickCount = GetTickCount() - nTickCount
 	if nTickCount > 50 then
 		X.OutputDebugMessage(
 			_L['PMTool'],
-			_L('%s function <%s> %s in %dms.', E.szName, p.szID, res and _L['succeed'] or _L['failed'], nTickCount),
+			_L('%s function <%s> %s in %dms.', E.szName, p.szID, aRes[1] and _L['succeed'] or _L['failed'], nTickCount),
 			X.DEBUG_LEVEL.PM_LOG)
 	end
 	if E.OnStat then
@@ -186,29 +199,31 @@ end
 
 local function CommonEventFirer(E, arg0, ...)
 	local szEvent = E.bSingleEvent and 'SINGLE_EVENT' or arg0
+	local aReturnValue = E.bReturnValue and {} or nil
 	if not E.tList or not szEvent then
-		return
+		return aReturnValue
 	end
 	if szEvent == '*' then
 		for szEvent, eve in pairs(E.tList) do
 			if szEvent ~= '*' then
 				for _, p in ipairs(eve.aList) do
-					FireEventRec(E, p, arg0, ...)
+					FireEventRec(E, p, aReturnValue, arg0, ...)
 				end
 			end
 		end
 	else
 		if E.tList[szEvent] then
 			for _, p in ipairs(E.tList[szEvent].aList) do
-				FireEventRec(E, p, arg0, ...)
+				FireEventRec(E, p, aReturnValue, arg0, ...)
 			end
 		end
 	end
 	if E.tList['*'] then
 		for _, p in ipairs(E.tList['*'].aList) do
-			FireEventRec(E, p, arg0, ...)
+			FireEventRec(E, p, aReturnValue, arg0, ...)
 		end
 	end
+	return aReturnValue
 end
 X.CommonEventFirer = CommonEventFirer
 end
@@ -787,7 +802,7 @@ end
 end
 
 --------------------------------------------------------------------------------
--- ×¢²áÁÄÌì¼àÌý
+-- ×¢²áÏûÏ¢¼àÌý
 --------------------------------------------------------------------------------
 -- Register:   X.RegisterMsgMonitor(string szKey, function fnAction)
 -- Unregister: X.RegisterMsgMonitor(string szKey, false)
