@@ -24,8 +24,9 @@ local O = X.CreateUserSettingsModule('MY_WhisperMention', _L['Chat'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szVersion = '20240728',
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
+		xDefaultValue = true,
 	},
 })
 local D = {
