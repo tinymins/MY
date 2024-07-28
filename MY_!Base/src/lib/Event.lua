@@ -880,6 +880,41 @@ end
 end
 
 --------------------------------------------------------------------------------
+-- 注册聊天过滤
+--------------------------------------------------------------------------------
+-- Register:   X.RegisterTalkFilter(string szKey, function fnAction)
+-- Unregister: X.RegisterTalkFilter(string szKey, false)
+do
+local TALK_FILTER_EVENT = { szName = 'TalkFilter', bReturnValue = true }
+local CommonEventFirer = X.CommonEventFirer
+local CommonEventRegister = X.CommonEventRegister
+local function TalkFilterHandler(nChannel, t, dwTalkerID, szName, bEcho, bOnlyShowBallon, bSecurity, bGMAccount, bCheater, dwTitleID, dwIdePetTemplateID, ...)
+	local aReturnValue = CommonEventFirer(TALK_FILTER_EVENT, nChannel, t, dwTalkerID, szName, bEcho, bOnlyShowBallon, bSecurity, bGMAccount, bCheater, dwTitleID, dwIdePetTemplateID, ...)
+	for _, v in ipairs(aReturnValue) do
+		if v.aValue[1] then
+			return true
+		end
+	end
+	return false
+end
+function TALK_FILTER_EVENT.OnCreateEvent(szEvent)
+	if not szEvent then
+		return
+	end
+	RegisterTalkFilter(TalkFilterHandler, { szEvent })
+end
+function TALK_FILTER_EVENT.OnRemoveEvent(szEvent)
+	if not szEvent then
+		return
+	end
+	UnRegisterTalkFilter(TalkFilterHandler, { szEvent })
+end
+function X.RegisterTalkFilter(...)
+	return CommonEventRegister(TALK_FILTER_EVENT, ...)
+end
+end
+
+--------------------------------------------------------------------------------
 -- 注册协程
 --------------------------------------------------------------------------------
 do
