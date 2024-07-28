@@ -8,7 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_Chat/MY_WhisperMetion'
+local MODULE_PATH = 'MY_Chat/MY_WhisperMention'
 local PLUGIN_NAME = 'MY_Chat'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_Chat'
@@ -20,7 +20,7 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
-local O = X.CreateUserSettingsModule('MY_WhisperMetion', _L['Chat'], {
+local O = X.CreateUserSettingsModule('MY_WhisperMention', _L['Chat'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
@@ -52,7 +52,7 @@ function D.Apply()
 			'MSG_NPC_YELL',
 			'MSG_NPC_PARTY',
 			'MSG_NPC_WHISPER',
-		}, 'MY_RedirectMetionToWhisper', function(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szName)
+		}, 'MY_RedirectMentionToWhisper', function(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szName)
 			local me = X.GetClientPlayer()
 			if not me or me.dwID == dwTalkerID then
 				return
@@ -75,7 +75,7 @@ function D.Apply()
 				OutputMessage('MSG_WHISPER', szMsg, bRich, nFont, {r, g, b}, dwTalkerID, szName)
 			end
 		end)
-		X.HookChatPanel('FILTER', 'MY_RedirectMetionToWhisper', function(h, szMsg, szChannel, dwTime)
+		X.HookChatPanel('FILTER', 'MY_RedirectMentionToWhisper', function(h, szMsg, szChannel, dwTime)
 			local tInfo = MY_Chat.ParseMessageInfo(szMsg)
 			if tInfo then
 				dwTime    = tInfo.dwTime
@@ -89,26 +89,26 @@ function D.Apply()
 			return true
 		end)
 	else
-		X.HookChatPanel('FILTER', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_NORMAL', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_PARTY', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_MAP', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_BATTLE_FILED', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_GUILD', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_GUILD_ALLIANCE', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_SCHOOL', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_WORLD', 'MY_RedirectMetionToWhisper',false)
-		X.RegisterMsgMonitor('MSG_TEAM', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_CAMP', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_GROUP', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_SEEK_MENTOR', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_FRIEND', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_IDENTITY', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_SYS', 'MY_RedirectMetionToWhisper',false)
-		X.RegisterMsgMonitor('MSG_NPC_NEARBY', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_NPC_YELL', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_NPC_PARTY', 'MY_RedirectMetionToWhisper', false)
-		X.RegisterMsgMonitor('MSG_NPC_WHISPER', 'MY_RedirectMetionToWhisper',false)
+		X.HookChatPanel('FILTER', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_NORMAL', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_PARTY', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_MAP', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_BATTLE_FILED', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_GUILD', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_GUILD_ALLIANCE', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_SCHOOL', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_WORLD', 'MY_RedirectMentionToWhisper',false)
+		X.RegisterMsgMonitor('MSG_TEAM', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_CAMP', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_GROUP', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_SEEK_MENTOR', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_FRIEND', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_IDENTITY', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_SYS', 'MY_RedirectMentionToWhisper',false)
+		X.RegisterMsgMonitor('MSG_NPC_NEARBY', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_NPC_YELL', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_NPC_PARTY', 'MY_RedirectMentionToWhisper', false)
+		X.RegisterMsgMonitor('MSG_NPC_WHISPER', 'MY_RedirectMentionToWhisper',false)
 	end
 end
 
@@ -116,7 +116,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, lineHe
 	nX = nPaddingX
 	ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
-		text = _L['Redirect metion to whisper'],
+		text = _L['Redirect mention to whisper'],
 		checked = O.bEnable,
 		onCheck = function(bChecked)
 			O.bEnable = bChecked
@@ -132,7 +132,7 @@ end
 --------------------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_WhisperMetion',
+	name = 'MY_WhisperMention',
 	exports = {
 		{
 			fields = {
@@ -141,13 +141,13 @@ local settings = {
 		},
 	},
 }
-MY_WhisperMetion = X.CreateModule(settings)
+MY_WhisperMention = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------------------------------
 
-X.RegisterUserSettingsInit('MY_WhisperMetion', D.Apply)
+X.RegisterUserSettingsInit('MY_WhisperMention', D.Apply)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
