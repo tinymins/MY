@@ -78,7 +78,7 @@ function D.OnMessageArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, 
 		end
 	end
 	if bEcho then
-		if D.bEnable then
+		if D.bEnable and dwTalkerID ~= me.dwID then
 			OutputMessage('MSG_WHISPER', szMsg, bRich, nFont, {r, g, b}, dwTalkerID, szName)
 		end
 		table.insert(D.aMentionMsg, {
