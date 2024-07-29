@@ -827,14 +827,12 @@ function D.OnItemRButtonClick()
 	local szName = this:GetName()
 	if szName == 'Handle_Item' or szName == 'Box_Item' then
 		local hItem = szName == 'Handle_Item' and this or this:GetParent()
-		local box   = hItem:Lookup('Box_Item')
 		local data = hItem.itemData
-		if not data.bDist then
+		if not data.bDist and not data.bBidding then
 			return
 		end
-		local me, team   = X.GetClientPlayer(), GetClientTeam()
 		local dwDoodadID = data.dwDoodadID
-		if not D.AuthCheck(dwDoodadID) then
+		if not D.AuthCheck(dwDoodadID, true) then
 			return
 		end
 		X.UI.PopupMenu(D.GetItemBiddingMenu(dwDoodadID, data))
@@ -1174,28 +1172,33 @@ function D.GetBossAction(dwDoodadID, bMenu)
 	end
 end
 
-function D.AuthCheck(dwDoodadID)
-	local me, team       = X.GetClientPlayer(), GetClientTeam()
-	local doodad         = X.GetDoodad(dwDoodadID)
-	if not doodad then
-		--[[#DEBUG BEGIN]]
-		X.OutputDebugMessage('MY_GKPLoot:AuthCheck', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
-		--[[#DEBUG END]]
-		return
+function D.AuthCheck(dwDoodadID, bIgnoreLootMode)
+	-- 需要自己是分配者
+	if not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then
+		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.ERROR_LOOT_DISTRIBUTE)
+		return false
 	end
-	local nLootMode      = team.nLootMode
-	local dwBelongTeamID = doodad.GetBelongTeamID()
-	if nLootMode ~= PARTY_LOOT_MODE.DISTRIBUTE and not X.IsDebugClient('MY_GKP') then -- 需要分配者模式
+	local team = GetClientTeam()
+	-- 需要分配者模式
+	local nLootMode = team.nLootMode
+	if not bIgnoreLootMode and nLootMode ~= PARTY_LOOT_MODE.DISTRIBUTE and not X.IsDebugClient('MY_GKP') then
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_DISTRIBUTE_LOOT)
 		return false
 	end
-	if not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then -- 需要自己是分配者
-		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.ERROR_LOOT_DISTRIBUTE)
-		return false
-	end
-	if dwBelongTeamID ~= team.dwTeamID then
-		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.ERROR_LOOT_DISTRIBUTE)
-		return false
+	-- 需要掉落所属是在自己队伍
+	if not X.IsInDungeonMap() then
+		local doodad = X.GetDoodad(dwDoodadID)
+		if not doodad then
+			--[[#DEBUG BEGIN]]
+			X.OutputDebugMessage('MY_GKPLoot:AuthCheck', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
+			--[[#DEBUG END]]
+			return
+		end
+		local dwBelongTeamID = doodad.GetBelongTeamID()
+		if dwBelongTeamID ~= team.dwTeamID then
+			OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.ERROR_LOOT_DISTRIBUTE)
+			return false
+		end
 	end
 	return true
 end
