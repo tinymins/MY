@@ -241,12 +241,12 @@ function X.TimeToDate(nTimestamp)
 	return date.year, date.month, date.day, date.hour, date.minute, date.second
 end
 
--- 格式化数字小数点
--- (string) X.FormatNumberDot(nValue, nDot, bDot, bSimple)
--- nValue  要格式化的数字
--- nDot    小数点位数
--- bDot    小数点不足补位0
--- bSimple 是否显示精简数值
+---格式化数字小数点
+---(string) X.FormatNumberDot(nValue, nDot, bDot, bSimple)
+---@param nValue number @要格式化的数字
+---@param nDot number @小数点位数
+---@param bDot boolean @小数点不足补位0
+---@param bSimple boolean @是否显示精简数值
 function X.FormatNumberDot(nValue, nDot, bDot, bSimple)
 	if not nDot then
 		nDot = 0
@@ -261,7 +261,7 @@ function X.FormatNumberDot(nValue, nDot, bDot, bSimple)
 			szUnit = g_tStrings.DIGTABLE.tCharDiH[2]
 		end
 	end
-	return math.floor(nValue * math.pow(2, nDot)) / math.pow(2, nDot) .. szUnit
+	return math.floor(nValue * math.pow(10, nDot)) / math.pow(10, nDot) .. szUnit
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
