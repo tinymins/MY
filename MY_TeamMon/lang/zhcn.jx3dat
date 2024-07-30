@@ -20,6 +20,18 @@ return {
 	['FadeOut time'] = '淡出时间',
 	['Preview'] = '预览',
 	['PVE everyday, Xuanjing everyday!'] = '每天一个本，周周见玄晶！',
+	-- MY_TeamMon_ScreenArrow.lua --
+	['MY_TeamMon_ScreenArrow'] = '头顶报警',
+	['Call Alert'] = '你被点名了',
+	['Draw School Color'] = '绘制门派颜色',
+	['less life/mana HeadAlert'] = '战斗中低血蓝头顶报警',
+	['Enable'] = '启用',
+	['[%s]'] = '【%s】',
+	['While HP less than'] = '血量低于',
+	['While MP less than'] = '蓝量低于',
+	['Manually add (One per line)'] = '手动添加BUFF名称（每行一个）',
+	['Manually add Npc Name (One per line)'] = '手动添加Npc名称（每行一个）',
+	['Screen Head Alarm'] = '头顶报警',
 	-- MY_TeamMon_UI.lua --
 	['Set countdown key'] = '设置倒计时唯一标识',
 	['Key supports template render: {$sender}, {$receiver}, {$1}'] = '唯一标识支持模板字符串：{$sender}, {$receiver}, {$1}',
