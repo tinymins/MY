@@ -140,7 +140,7 @@ local O = X.CreateUserSettingsModule('MY_Recount_UI', _L['Raid'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
+		xDefaultValue = true,
 	},
 	nDisplayMode = { -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
 		ePathType = X.PATH_TYPE.ROLE,
