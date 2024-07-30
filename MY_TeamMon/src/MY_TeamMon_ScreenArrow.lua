@@ -23,6 +23,12 @@ X.RegisterRestriction('MY_TeamMon_ScreenArrow', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule('MY_TeamMon_PartyBuffList', _L['Raid'], {
+	bEnable = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 	bAlert = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
@@ -151,14 +157,20 @@ local function setUIScale()
 end
 
 
--- for i=1, 2 do FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', 'TIME', GetClientPlayer().dwID, { col = { 255, 255, 255 }, txt = 'test' })end
-local function CreateScreenArrow(szClass, dwID, tArgs)
+-- for i=1, 2 do FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', GetClientPlayer().dwID, 'TIME', { col = { 255, 255, 255 }, szText = 'test' })end
+local function CreateScreenArrow(dwID, szType, tArgs)
+	if not D.IsEnabled() then
+		return
+	end
 	tArgs = tArgs or {}
-	SA:ctor(szClass, dwID, tArgs)
+	if SA:ctor(dwID, szType, tArgs) then
+		return true
+	end
+	return false
 end
 
 function D.IsEnabled()
-	return D.bReady and O.bAlert and not X.IsRestricted('MY_TeamMon_ScreenArrow')
+	return D.bReady and O.bEnable and not X.IsRestricted('MY_TeamMon_ScreenArrow')
 end
 
 function D.OnSort()
@@ -189,75 +201,75 @@ function D.OnBreathe()
 	local tTeamMark = team.dwTeamID > 0 and team.GetTeamMark() or EMPTY_TABLE
 	for dwType, tab in pairs(CACHE) do
 		for dwID, v in pairs(tab) do
-			local object, tInfo = select(2, D.GetObject(dwType, dwID))
-			if object then
-				local obj = D.GetAction(dwType, dwID)
-				local fLifePer = obj.dwType == TARGET.DOODAD and 1 or tInfo.nCurrentLife / math.max(tInfo.nMaxLife, tInfo.nCurrentLife, 1)
-				local fManaPer = obj.dwType == TARGET.DOODAD and 1 or tInfo.nCurrentMana / math.max(tInfo.nMaxMana, tInfo.nCurrentMana, 1)
+			local kTarget, tInfo = select(2, D.GetObject(dwType, dwID))
+			if kTarget then
+				local oo = D.GetAction(dwType, dwID)
+				local fLifePer = oo.dwType == TARGET.DOODAD and 1 or tInfo.nCurrentLife / math.max(tInfo.nMaxLife, tInfo.nCurrentLife, 1)
+				local fManaPer = oo.dwType == TARGET.DOODAD and 1 or tInfo.nCurrentMana / math.max(tInfo.nMaxMana, tInfo.nCurrentMana, 1)
 				local szName
 				if dwType == TARGET.DOODAD then
 					szName = tInfo.szName
 				elseif dwType == TARGET.NPC then
-					szName = X.GetTemplateName(TARGET.NPC, object.dwTemplateID)
+					szName = X.GetTemplateName(TARGET.NPC, kTarget.dwTemplateID)
 				else
-					szName = X.GetObjectName(object)
+					szName = X.GetObjectName(kTarget)
 				end
-				szName = obj.szName or szName
+				szName = oo.szName or szName
 				if tTeamMark[dwID] then
 					szName = szName .. _L('[%s]', X.CONSTANT.TEAM_MARK_NAME[tTeamMark[dwID]])
 				end
 				local txt = ''
-				if obj.szClass == 'BUFF' or obj.szClass == 'DEBUFF' then
+				if oo.szType == 'BUFF' or oo.szType == 'DEBUFF' then
 					-- local KBuff = GetBuff(obj.dwBuffID, object) -- 只判断dwID 反正不可能同时获得不同lv
-					local KBuff = object.GetBuff(obj.dwBuffID, 0) -- 只判断dwID 反正不可能同时获得不同lv
+					local KBuff = kTarget.GetBuff(oo.dwBuffID, 0) -- 只判断dwID 反正不可能同时获得不同lv
 					if KBuff then
 						local nSec = X.GetEndTime(KBuff.GetEndTime())
 						local szDuration = X.FormatDuration(math.min(nSec, 5999), 'PRIME')
 						if KBuff.nStackNum > 1 then
-							txt = string.format('%s(%d)_%s', obj.txt or X.GetBuffName(KBuff.dwID, KBuff.nLevel), KBuff.nStackNum, szDuration)
+							txt = string.format('%s(%d)_%s', oo.txt or X.GetBuffName(KBuff.dwID, KBuff.nLevel), KBuff.nStackNum, szDuration)
 						else
-							txt = string.format('%s_%s', obj.txt or X.GetBuffName(KBuff.dwID, KBuff.nLevel), szDuration)
+							txt = string.format('%s_%s', oo.txt or X.GetBuffName(KBuff.dwID, KBuff.nLevel), szDuration)
 						end
 					else
-						return obj:Free()
+						return oo:Free()
 					end
-				elseif obj.szClass == 'Life' or obj.szClass == 'Mana' then
-					if object.nMoveState == MOVE_STATE.ON_DEATH then
-						return obj:Free()
+				elseif oo.szType == 'Life' or oo.szType == 'Mana' then
+					if kTarget.nMoveState == MOVE_STATE.ON_DEATH then
+						return oo:Free()
 					end
-					if obj.szClass == 'Life' then
+					if oo.szType == 'Life' then
 						if fLifePer > O.fLifePer then
-							return obj:Free()
+							return oo:Free()
 						end
 						txt = g_tStrings.STR_SKILL_H_LIFE_COST .. string.format('%d/%d', tInfo.nCurrentLife, tInfo.nMaxLife)
-					elseif obj.szClass == 'Mana' then
+					elseif oo.szType == 'Mana' then
 						if fManaPer > O.fManaPer then
-							return obj:Free()
+							return oo:Free()
 						end
 						txt = g_tStrings.STR_SKILL_H_MANA_COST .. string.format('%d/%d', tInfo.nCurrentMana, tInfo.nMaxMana)
 					end
-				elseif obj.szClass == 'CASTING' then
-					local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(object)
+				elseif oo.szType == 'CASTING' then
+					local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(kTarget)
 					if nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 					or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
 					or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then
-						txt = obj.txt or X.GetSkillName(dwSkillID, dwSkillLevel)
+						txt = oo.txt or X.GetSkillName(dwSkillID, dwSkillLevel)
 						fManaPer = fCastPercent
 					else
-						return obj:Free()
+						return oo:Free()
 					end
-				elseif obj.szClass == 'NPC' or obj.szClass == 'DOODAD' then
-					txt = obj.txt or txt
-				elseif obj.szClass == 'TIME' then
-					if (GetTime() - obj.nNow) / 1000 > 5 then
-						return obj:Free()
+				elseif oo.szType == 'NPC' or oo.szType == 'DOODAD' then
+					txt = oo.txt or txt
+				elseif oo.szType == 'TIME' then
+					if (GetTime() - oo.nNow) / 1000 > 5 then
+						return oo:Free()
 					end
-					txt = obj.txt or _L['Call Alert']
+					txt = oo.txt or _L['Call Alert']
 				end
-				if not obj.init then
-					obj:DrawBackGround()
+				if not oo.init then
+					oo:DrawBackGround()
 				end
-				obj:DrawLifeBar(fLifePer, fManaPer):DrawText(txt, szName):DrowArrow()
+				oo:DrawLifeBar(fLifePer, fManaPer):DrawText(txt, szName):DrowArrow()
 			else
 				for _, vv in pairs(v) do
 					vv:Free()
@@ -278,28 +290,28 @@ function D.GetAction(dwType, dwID)
 	return obj:Show()
 end
 
-function D.GetObject(szClass, dwID)
-	local dwType, object, tInfo
-	if szClass == 'DOODAD' or szClass == TARGET.DOODAD then
+function D.GetObject(szType, dwID)
+	local dwType, kTarget, tInfo
+	if szType == 'DOODAD' or szType == TARGET.DOODAD then
 		dwType = TARGET.DOODAD
-		object = GetDoodad(dwID)
+		kTarget = GetDoodad(dwID)
 	elseif IsPlayer(dwID) then
 		dwType = TARGET.PLAYER
 		local me = GetClientPlayer()
 		if dwID == me.dwID then
-			object = me
+			kTarget = me
 		elseif X.IsParty(dwID) then
-			object = GetPlayer(dwID)
+			kTarget = GetPlayer(dwID)
 			tInfo  = GetClientTeam().GetMemberInfo(dwID)
 		else
-			object = GetPlayer(dwID)
+			kTarget = GetPlayer(dwID)
 		end
 	else
 		dwType = TARGET.NPC
-		object = GetNpc(dwID)
+		kTarget = GetNpc(dwID)
 	end
-	tInfo = tInfo and tInfo or object
-	return dwType, object, tInfo
+	tInfo = tInfo and tInfo or kTarget
+	return dwType, kTarget, tInfo
 end
 
 function D.RegisterFight()
@@ -330,26 +342,26 @@ function D.OnBreatheFight()
 		list[1] = me.dwID
 	end
 	for k, v in ipairs(list) do
-		local p, info = select(2, D.GetObject(TARGET.PLAYER, v))
-		if p and info then
-			if p.nMoveState == MOVE_STATE.ON_DEATH then
+		local kTarget, tInfo = select(2, D.GetObject(TARGET.PLAYER, v))
+		if kTarget and tInfo then
+			if kTarget.nMoveState == MOVE_STATE.ON_DEATH then
 				D.tCache['Mana'][v] = nil
 				D.tCache['Life'][v] = nil
 			else
-				local fLifePer = info.nCurrentLife / math.max(info.nMaxLife, info.nCurrentLife, 1)
-				local fManaPer = info.nCurrentMana / math.max(info.nMaxMana, info.nCurrentMana, 1)
+				local fLifePer = tInfo.nCurrentLife / math.max(tInfo.nMaxLife, tInfo.nCurrentLife, 1)
+				local fManaPer = tInfo.nCurrentMana / math.max(tInfo.nMaxMana, tInfo.nCurrentMana, 1)
 				if fLifePer < O.fLifePer then
 					if not D.tCache['Life'][v] then
 						D.tCache['Life'][v] = true
-						CreateScreenArrow('Life', v)
+						CreateScreenArrow(v, 'Life')
 					end
 				else
 					D.tCache['Life'][v] = nil
 				end
-				if fManaPer < O.fManaPer and (p.dwForceID < 7 or p.dwForceID == 22) then
+				if fManaPer < O.fManaPer and (kTarget.dwForceID < 7 or kTarget.dwForceID == 22) then
 					if not D.tCache['Mana'][v] then
 						D.tCache['Mana'][v] = true
-						CreateScreenArrow('Mana', v)
+						CreateScreenArrow(v, 'Mana')
 					end
 				else
 					D.tCache['Mana'][v] = nil
@@ -359,10 +371,10 @@ function D.OnBreatheFight()
 	end
 end
 
-function SA:ctor(szClass, dwID, tArgs)
-	local dwType, object = D.GetObject(szClass, dwID)
+function SA:ctor(dwID, szType, tArgs)
+	local dwType, kTarget = D.GetObject(szType, dwID)
 	if not X.IsDebugClient(true) and not X.IsInDungeonMap(true) then
-		if dwType == TARGET.NPC and object.bDialogFlag then
+		if dwType == TARGET.NPC and kTarget.bDialogFlag then
 			return
 		end
 	end
@@ -370,10 +382,10 @@ function SA:ctor(szClass, dwID, tArgs)
 	setmetatable(oo, self)
 	local ui      = HANDLE:New()
 	oo.szName   = tArgs.szName
-	oo.txt      = tArgs.txt
-	oo.col      = tArgs.col or SA_COLOR.ARROW[szClass]
+	oo.txt      = tArgs.szText
+	oo.col      = tArgs.col or SA_COLOR.ARROW[szType]
 	oo.dwBuffID = tArgs.dwID
-	oo.szClass  = szClass
+	oo.szType   = szType
 
 	oo.Arrow    = ui:Lookup(0)
 	oo.Text     = ui:Lookup(1)
@@ -389,7 +401,7 @@ function SA:ctor(szClass, dwID, tArgs)
 	oo.nTop     = 10
 	oo.dwID     = dwID
 	oo.dwType   = dwType
-	if szClass == 'TIME' then
+	if szType == 'TIME' then
 		oo.nNow = GetTime()
 	end
 	oo.Text:SetTriangleFan(GEOMETRY_TYPE.TEXT)
@@ -406,7 +418,7 @@ end
 function SA:DrawText( ... )
 	self.Text:ClearTriangleFanPoint()
 	local nTop = BASE_PEAK - (BASE_EDGE * 2)
-	local r, g, b = unpack(SA_COLOR.FONT[self.szClass])
+	local r, g, b = unpack(SA_COLOR.FONT[self.szType])
 	local i = 1
 	for k, v in ipairs({ ... }) do
 		if v and v ~= '' then
@@ -415,9 +427,9 @@ function SA:DrawText( ... )
 				self.Text:AppendDoodadID(self.dwID, r, g, b, 240, { 0, 0, 0, 0, top }, O.nFont, v, 1, 1.8)
 			else
 				if O.bDrawColor and self.dwType == TARGET.PLAYER and k ~= 1 then
-					local p = select(2, D.GetObject(self.szClass, self.dwID))
-					if p then
-						r, g, b = X.GetForceColor(p.dwForceID, 'foreground')
+					local kTarget = select(2, D.GetObject(self.szType, self.dwID))
+					if kTarget then
+						r, g, b = X.GetForceColor(kTarget.dwForceID, 'foreground')
 					end
 				end
 				self.Text:AppendCharacterID(self.dwID, true, r, g, b, 240, { 0, 0, 0, 0, top }, O.nFont, v, 1, 1.8)
@@ -486,7 +498,7 @@ function SA:DrawLifeBar(fLifePer, fManaPer)
 		if fManaPer > 0 then
 			local bcX, bcY = -BASE_WIDTH / 2 + BASE_EDGE, BASE_PEAK + height + BASE_EDGE
 			local r, g ,b = 50, 100, 255
-			if self.szClass == 'CASTING' then
+			if self.szType == 'CASTING' then
 				r, g ,b = 255, 128, 0
 			end
 			if self.dwType == TARGET.DOODAD then
@@ -572,29 +584,37 @@ function SA:Free()
 	HANDLE:Free(self.ui)
 end
 
-local PS = { szRestriction = 'DELTA' }
+local PS = { nPriority = 13, szRestriction = 'MY_TeamMon_ScreenArrow' }
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
 	local nPaddingX, nPaddingY = 30, 30
 	local nX, nY = nPaddingX, nPaddingY
 
-	nX, nY = ui:Append('Text', { x = nX, y = nY, text = _L['Screen Head Alarm'], font = 27 }):Pos('BOTTOMRIGHT')
+	nY = nY + ui:Append('Text', { x = nX, y = nY, text = _L['Screen head alarm'], font = 27 }):Height() + 5
 	nX = nPaddingX + 10
-	nX, nY = ui:Append('WndCheckBox', {
-		x = nX, y = nY + 10,
+	nX = nX + ui:Append('WndCheckBox',{
+		x = nX, y = nY,
+		text = _L['Enable'],
+		checked = O.bEnable,
+		onCheck = function(bChecked)
+			O.bEnable = bChecked
+		end
+	}):Width()
+	nY = nY + ui:Append('WndCheckBox', {
+		x = nX, y = nY,
 		text = _L['Draw School Color'],
 		checked = O.bDrawColor,
 		onCheck = function(bChecked)
 			O.bDrawColor = bChecked
 		end,
-	}):Pos('BOTTOMRIGHT')
+	}):Height()
 
 	nX = nPaddingX
 	nY = nY + 10
-	nX, nY = ui:Append('Text', { x = nX, y = nY + 5, text = _L['less life/mana HeadAlert'], font = 27 }):Pos('BOTTOMRIGHT')
+	nY = nY + ui:Append('Text', { x = nX, y = nY + 5, text = _L['Less life/mana head alert'], font = 27 }):Height() + 10
 	nX = nPaddingX + 10
-	nX = ui:Append('WndCheckBox',{
-		x = nX, y = nY + 10,
+	nX = nX + ui:Append('WndCheckBox',{
+		x = nX, y = nY,
 		text = _L['Enable'],
 		checked = O.bAlert,
 		onCheck = function(bChecked)
@@ -605,46 +625,45 @@ function PS.OnPanelActive(wnd)
 			else
 				D.KillBreathe()
 			end
-		end
-	}):Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndCheckBox', {
-		x = nX + 10, y = nY + 10,
-		text = _L['only Monitor self'],
+		end,
+		autoEnable = function() return O.bEnable and O.bAlert end,
+	}):Width() + 10
+	nY = nY + ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Only monitor self'],
 		checked = O.bOnlySelf,
 		onCheck = function(bChecked)
 			O.bOnlySelf = bChecked
 		end,
-		autoEnable = function() return O.bAlert end,
-	}):Pos('BOTTOMRIGHT')
+		autoEnable = function() return O.bEnable and O.bAlert end,
+	}):Height() + 10
 
-	nX = nPaddingX
-	nY = nY + 10
-	nX = ui:Append('Text', { text = _L['While HP less than'], x = nX, y = nY }):Pos('BOTTOMRIGHT')
-	nX = nX + 10
-	nX, nY = ui:Append('WndSlider', {
+	nX = nPaddingX + 10
+	nX = nX + ui:Append('Text', { text = _L['While HP less than'], x = nX, y = nY }):Width() + 10
+	nY = nY + ui:Append('WndSlider', {
 		x = nX, y = nY + 3,
 		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		range = {0, 100},
 		value = O.fLifePer * 100,
 		onChange = function(nVal) O.fLifePer = nVal / 100 end,
-		autoEnable = function() return O.bAlert end,
-	}):Pos('BOTTOMRIGHT')
+		autoEnable = function() return O.bEnable and O.bAlert end,
+	}):Height()
 
-	nX = nPaddingX
-	nX = ui:Append('Text', { text = _L['While MP less than'], x = nX, y = nY }):Pos('BOTTOMRIGHT')
+	nX = nPaddingX + 10
+	nX = nX + ui:Append('Text', { text = _L['While MP less than'], x = nX, y = nY }):Width()
 	nX = nX + 10
-	nX, nY = ui:Append('WndSlider', {
+	nY = nY + ui:Append('WndSlider', {
 		x = nX, y = nY + 3,
 		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		range = {0, 100},
 		value = O.fManaPer * 100,
 		onChange = function(nVal) O.fManaPer = nVal / 100 end,
-		autoEnable = function() return O.bAlert end,
-	}):Pos('BOTTOMRIGHT')
+		autoEnable = function() return O.bEnable and O.bAlert end,
+	}):Height()
 
 	nX = nPaddingX
 	nY = nY + 10
-	nX = ui:Append('WndButton', {
+	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY + 5,
 		text = g_tStrings.FONT,
 		onClick =  function()
@@ -652,14 +671,16 @@ function PS.OnPanelActive(wnd)
 				O.nFont = nFont
 			end)
 		end,
-	}):Pos('BOTTOMRIGHT')
+		autoEnable = function() return O.bEnable end,
+	}):Width()
 	nX = nX + 10
 	ui:Append('WndButton', {
 		x = nX, y = nY + 5,
-		text = _L['preview'],
+		text = _L['Preview'],
 		onClick = function()
-			CreateScreenArrow('TIME', GetClientPlayer().dwID, { text = _L('%s are welcome to use JH plug-in', GetUserRoleName()) })
+			CreateScreenArrow(GetClientPlayer().dwID, 'TIME', { szText = _L['PVE everyday, Xuanjing everyday!'] })
 		end,
+		autoEnable = function() return O.bEnable end,
 	})
 end
 X.RegisterPanel(_L['Raid'], 'MY_TeamMon_ScreenArrow', _L['MY_TeamMon_ScreenArrow'], 431, PS)
@@ -697,7 +718,11 @@ X.RegisterEvent('FIGHT_HINT', 'MY_TeamMon_ScreenArrow', D.RegisterFight)
 X.RegisterEvent('LOGIN_GAME', 'MY_TeamMon_ScreenArrow', D.Init)
 X.RegisterEvent('UI_SCALED' , 'MY_TeamMon_ScreenArrow', setUIScale)
 X.RegisterEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', 'MY_TeamMon_ScreenArrow', function()
-	CreateScreenArrow(arg0, arg1, arg2)
+	local dwID, szType, szKey, tArgs = arg0, arg1, arg2, arg3
+	if CreateScreenArrow(dwID, szType, tArgs) then
+		return
+	end
+	FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwID, szType, szKey, tArgs)
 end)
 
 X.RegisterUserSettingsInit('MY_TeamMon_ScreenArrow', function()

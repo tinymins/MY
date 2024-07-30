@@ -23,7 +23,7 @@ end
 
 local MY_TEAM_MON_REMOTE_DATA_ROOT = MY_TeamMon.MY_TEAM_MON_REMOTE_DATA_ROOT
 
-local PS = {}
+local PS = { nPriority = 11 }
 
 function PS.IsRestricted()
 	return X.IsRestricted('MY_TeamMon')

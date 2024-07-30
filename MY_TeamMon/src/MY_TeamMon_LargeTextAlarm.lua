@@ -196,7 +196,7 @@ end)
 -- ½çÃæ×¢²á
 --------------------------------------------------------------------------------
 
-local PS = { szRestriction = 'MY_TeamMon_LargeTextAlarm' }
+local PS = { nPriority = 12, szRestriction = 'MY_TeamMon_LargeTextAlarm' }
 function PS.OnPanelActive(frame)
 	local ui = X.UI(frame)
 	local nPaddingX, nPaddingY = 20, 20

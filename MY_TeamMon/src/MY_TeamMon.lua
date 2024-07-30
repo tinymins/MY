@@ -1087,12 +1087,11 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwOwner, szType, 'MY_TEAM_MON_BUFF_' .. data.dwID, {
+					FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', dwOwner, szType, 'MY_TEAM_MON_BUFF_' .. data.dwID, {
 						dwBuffID = data.dwID,
 						szText = szName,
 						col = data.col or (szType == 'BUFF' and {0, 255, 0} or {255, 0, 0}),
 					})
-					FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', szType, dwOwner, { dwID = data.dwID, col = data.col, text = szName })
 				end
 				if MY_TEAM_MON_CORE_PLAYERID == dwOwner then
 					if O.bPushBuffList and cfg.bBuffList then
@@ -1242,12 +1241,11 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 			end
 			-- 头顶报警
 			if O.bPushScreenHead and cfg.bScreenHead then
-				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCaster, 'CASTING', 'MY_TEAM_MON_CASTING_' .. data.dwID, {
+				FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', dwCaster, 'CASTING', 'MY_TEAM_MON_CASTING_' .. data.dwID, {
 					dwSkillID = dwCastID,
 					szText = szName,
 					col = data.col,
 				})
-				FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', 'CASTING', dwCaster, { text = szName, col = data.col })
 			end
 			-- 全屏泛光
 			if O.bPushFullScreen and cfg.bFullScreen then
@@ -1352,11 +1350,11 @@ function D.OnNpcEvent(npc, bEnter)
 					if not X.IsRestricted('MY_TeamMon.Note') then
 						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
 					end
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', npc.dwID, 'NPC', 'MY_TEAM_MON_NPC_' .. npc.dwID, {
+					FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', npc.dwID, 'NPC', 'MY_TEAM_MON_NPC_' .. npc.dwID, {
+						szName = szName,
 						szText = szNote,
 						col = data.col,
 					})
-					FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', 'NPC', npc.dwID, { text = szNote, col = data.col, szName = szName })
 				end
 			end
 			if nTime - CACHE.NPC_LIST[npc.dwTemplateID].nTime < 500 then -- 0.5秒内进入相同的NPC直接忽略
@@ -1499,11 +1497,11 @@ function D.OnDoodadEvent(doodad, bEnter)
 					if not X.IsRestricted('MY_TeamMon.Note') then
 						szNote = FilterCustomText(data.szNote, szSender, szReceiver) or szName
 					end
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', doodad.dwID, 'DOODAD', 'MY_TEAM_MON_DOODAD_' .. doodad.dwID, {
+					FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', doodad.dwID, 'DOODAD', 'MY_TEAM_MON_DOODAD_' .. doodad.dwID, {
+						szName = szName,
 						szText = szNote,
 						col = data.col,
 					})
-					FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', 'DOODAD', doodad.dwID, { text = szNote, col = data.col, szName = szName })
 				end
 			end
 			if nTime - CACHE.DOODAD_LIST[doodad.dwTemplateID].nTime < 500 then
@@ -1694,13 +1692,12 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwReceiverID, 'TIME', 'MY_TEAM_MON_TIME_' .. dwReceiverID, {
+					FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', dwReceiverID, 'TIME', 'MY_TEAM_MON_TIME_' .. dwReceiverID, {
 						nTime = GetTime() + 5000,
 						szText = _L('%s call name', szNpcName or g_tStrings.SYSTEM),
 						col = data.col,
 						bHideProgress = true,
 					})
-					FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', 'TIME', dwReceiverID, { text = _L('%s call name', szNpcName or g_tStrings.SYSTEM)})
 				end
 				if not X.IsRestricted('MY_TeamMon.AutoSelect') and cfg.bSelect then
 					SetTarget(TARGET.PLAYER, dwReceiverID)
@@ -1711,13 +1708,12 @@ function D.OnCallMessage(szEvent, szContent, dwNpcID, szNpcName)
 				end
 				-- 头顶报警
 				if O.bPushScreenHead and cfg.bScreenHead then
-					FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwNpcID or me.dwID, 'TIME', 'MY_TEAM_MON_TIME_' .. (dwNpcID or me.dwID), {
+					FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', dwNpcID or me.dwID, 'TIME', 'MY_TEAM_MON_TIME_' .. (dwNpcID or me.dwID), {
 						nTime = GetTime() + 5000,
 						szText = szText,
 						col = data.col,
 						bHideProgress = true,
 					})
-					FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', 'TIME', dwNpcID or me.dwID, { text = szText })
 				end
 			end
 			-- 中央报警
