@@ -450,15 +450,15 @@ function D.UpdateUI(frame)
 		-- ÓÒ²àÎÄ×Ö
 		if MY_Recount_UI.bShowEffect then
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nEffectValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_Me_R'):SetText(MY_Recount.GetTargetShowValue(math.floor(tMyRec.nEffectValue / tMyRec.nTimeCount)) .. ' ' .. szUnit)
 			else
-				hItem:Lookup('Text_Me_R'):SetText(tMyRec.nEffectValue)
+				hItem:Lookup('Text_Me_R'):SetText(MY_Recount.GetTargetShowValue(tMyRec.nEffectValue))
 			end
 		else
 			if MY_Recount_UI.bShowPerSec then
-				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_Me_R'):SetText(MY_Recount.GetTargetShowValue(math.floor(tMyRec.nValue / tMyRec.nTimeCount)) .. ' ' .. szUnit)
 			else
-				hItem:Lookup('Text_Me_R'):SetText(tMyRec.nValue)
+				hItem:Lookup('Text_Me_R'):SetText(MY_Recount.GetTargetShowValue(tMyRec.nValue))
 			end
 		end
 	else
