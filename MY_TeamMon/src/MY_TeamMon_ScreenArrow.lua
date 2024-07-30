@@ -626,7 +626,7 @@ function PS.OnPanelActive(wnd)
 				D.KillBreathe()
 			end
 		end,
-		autoEnable = function() return O.bEnable and O.bAlert end,
+		autoEnable = function() return O.bEnable end,
 	}):Width() + 10
 	nY = nY + ui:Append('WndCheckBox', {
 		x = nX, y = nY,
