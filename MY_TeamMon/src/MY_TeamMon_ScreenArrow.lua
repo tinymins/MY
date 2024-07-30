@@ -384,7 +384,7 @@ function SA:ctor(dwID, szType, tArgs)
 	oo.szName   = tArgs.szName
 	oo.txt      = tArgs.szText
 	oo.col      = tArgs.col or SA_COLOR.ARROW[szType]
-	oo.dwBuffID = tArgs.dwID
+	oo.dwBuffID = tArgs.dwBuffID
 	oo.szType   = szType
 
 	oo.Arrow    = ui:Lookup(0)
