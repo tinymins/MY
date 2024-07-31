@@ -73,7 +73,7 @@ local D = {
 	}
 }
 
-local UI_SCALED = 1
+local UI_SCALE = 1
 local FORCE_DRAW = false
 local HANDLE
 local CACHE = {
@@ -132,7 +132,7 @@ local SA_POINT = {}
 local BASE_POINT_START
 local function SetUIScale()
 	local dpi = Station.GetMaxUIScale()
-	UI_SCALED = Station.GetUIScale()
+	UI_SCALE = Station.GetUIScale()
 	FORCE_DRAW = true
 	BASE_PEAK = -60 * dpi * 0.5
 	BASE_WIDTH = 100 * dpi
@@ -430,7 +430,7 @@ function SA:DrawText( ... )
 	local i = 1
 	for k, v in ipairs({ ... }) do
 		if v and v ~= '' then
-			local top = nTop + i * -45 * UI_SCALED
+			local top = nTop + i * -45 * UI_SCALE
 			if self.dwType == TARGET.DOODAD then
 				self.Text:AppendDoodadID(self.dwID, r, g, b, 240, { 0, 0, 0, 0, top }, O.nFont, v, 1, 1.8)
 			else
