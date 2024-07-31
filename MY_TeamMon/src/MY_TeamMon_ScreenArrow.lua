@@ -627,11 +627,17 @@ function PS.OnPanelActive(wnd)
 			O.bDrawColor = bChecked
 		end,
 		autoEnable = function() return O.bEnable end,
-	}):Height()
+	}):Height() + 5
+
 	nX = nPaddingX + 10
+	nX = nX + ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L['UI scale'],
+		autoEnable = function() return O.bEnable end,
+	}):Width()
 	nY = nY + ui:Append('WndSlider', {
 		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 400 },
-		text = function(value) return _L('UI scale: %.1f%%.', value) end,
+		text = function(value) return _L('%.1f%%', value) end,
 		value = O.fUIScale * 100,
 		onChange = function(value)
 			O.fUIScale = value / 100
@@ -639,9 +645,16 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoEnable = function() return O.bEnable end,
 	}):Height()
+
+	nX = nPaddingX + 10
+	nX = nX + ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L['Text scale'],
+		autoEnable = function() return O.bEnable end,
+	}):Width()
 	nY = nY + ui:Append('WndSlider', {
 		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 400 },
-		text = function(value) return _L('Text scale: %.1f%%.', value) end,
+		text = function(value) return _L('%.1f%%', value) end,
 		value = O.fTextScale * 100,
 		onChange = function(value)
 			O.fTextScale = value / 100
@@ -677,26 +690,36 @@ function PS.OnPanelActive(wnd)
 			O.bOnlySelf = bChecked
 		end,
 		autoEnable = function() return O.bEnable and O.bAlert end,
-	}):Height() + 10
+	}):Height() + 5
 
 	nX = nPaddingX + 10
-	nX = nX + ui:Append('Text', { text = _L['While HP less than'], x = nX, y = nY }):Width() + 10
+	nX = nX + ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L['While HP less than'],
+		autoEnable = function() return O.bEnable and O.bAlert end,
+	}):Width() + 10
 	nY = nY + ui:Append('WndSlider', {
 		x = nX, y = nY + 3,
 		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		range = {0, 100},
+		text = function(value) return value .. '%' end,
 		value = O.fLifePer * 100,
 		onChange = function(nVal) O.fLifePer = nVal / 100 end,
 		autoEnable = function() return O.bEnable and O.bAlert end,
 	}):Height()
 
 	nX = nPaddingX + 10
-	nX = nX + ui:Append('Text', { text = _L['While MP less than'], x = nX, y = nY }):Width()
+	nX = nX + ui:Append('Text', {
+		x = nX, y = nY,
+		text = _L['While MP less than'],
+		autoEnable = function() return O.bEnable and O.bAlert end,
+	}):Width()
 	nX = nX + 10
 	nY = nY + ui:Append('WndSlider', {
 		x = nX, y = nY + 3,
 		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE,
 		range = {0, 100},
+		text = function(value) return value .. '%' end,
 		value = O.fManaPer * 100,
 		onChange = function(nVal) O.fManaPer = nVal / 100 end,
 		autoEnable = function() return O.bEnable and O.bAlert end,
