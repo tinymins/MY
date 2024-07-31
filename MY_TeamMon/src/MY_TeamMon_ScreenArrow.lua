@@ -73,6 +73,8 @@ local D = {
 	}
 }
 
+local UI_SCALED = 1
+local FORCE_DRAW = false
 local HANDLE
 local CACHE = {
 	[TARGET.DOODAD] = {},
@@ -128,8 +130,10 @@ local BASE_EDGE
 local SA_POINT_C = {}
 local SA_POINT = {}
 local BASE_POINT_START
-local function setUIScale()
+local function SetUIScale()
 	local dpi = Station.GetMaxUIScale()
+	UI_SCALED = Station.GetUIScale()
+	FORCE_DRAW = true
 	BASE_PEAK = -60 * dpi * 0.5
 	BASE_WIDTH = 100 * dpi
 	BASE_HEIGHT = 12 * dpi
@@ -269,7 +273,7 @@ function D.OnBreathe()
 					end
 					txt = oo.txt or _L['Call Alert']
 				end
-				if not oo.init then
+				if not oo.init or FORCE_DRAW then
 					oo:DrawBackGround()
 				end
 				oo:DrawLifeBar(fLifePer, fManaPer):DrawText(txt, szName):DrawArrow()
@@ -280,6 +284,7 @@ function D.OnBreathe()
 			end
 		end
 	end
+	FORCE_DRAW = false
 end
 
 function D.GetAction(dwType, dwID)
@@ -425,7 +430,7 @@ function SA:DrawText( ... )
 	local i = 1
 	for k, v in ipairs({ ... }) do
 		if v and v ~= '' then
-			local top = nTop + i * -45
+			local top = nTop + i * -45 * UI_SCALED
 			if self.dwType == TARGET.DOODAD then
 				self.Text:AppendDoodadID(self.dwID, r, g, b, 240, { 0, 0, 0, 0, top }, O.nFont, v, 1, 1.8)
 			else
@@ -444,11 +449,10 @@ function SA:DrawText( ... )
 end
 
 function SA:DrawBackGround()
-	for k, v in pairs({ self.BGB, self.BGI }) do
-		v:ClearTriangleFanPoint()
-	end
 	local bcX, bcY = -BASE_WIDTH / 2, BASE_PEAK
 	local doubleEdge = BASE_EDGE * 2
+	self.BGB:ClearTriangleFanPoint()
+	self.BGI:ClearTriangleFanPoint()
 	if self.dwType == TARGET.DOODAD then
 		self.BGB:AppendDoodadID(self.dwID, 255, 255, 255, 200, { 0, 0, 0, bcX, bcY })
 		self.BGB:AppendDoodadID(self.dwID, 255, 255, 255, 200, { 0, 0, 0, bcX + BASE_WIDTH, bcY })
@@ -477,7 +481,7 @@ end
 function SA:DrawLifeBar(fLifePer, fManaPer)
 	local height = BASE_HEIGHT / 2 - BASE_EDGE
 	local width = BASE_WIDTH - (BASE_EDGE * 2)
-	if fLifePer ~= self.fLifePer then
+	if fLifePer ~= self.fLifePer or FORCE_DRAW then
 		self.Life:ClearTriangleFanPoint()
 		if fLifePer > 0 then
 			local bcX, bcY = -BASE_WIDTH / 2 + BASE_EDGE, BASE_PEAK + BASE_EDGE
@@ -496,7 +500,7 @@ function SA:DrawLifeBar(fLifePer, fManaPer)
 		end
 		self.fLifePer = fLifePer
 	end
-	if fManaPer ~= self.fManaPer then
+	if fManaPer ~= self.fManaPer or FORCE_DRAW then
 		self.Mana:ClearTriangleFanPoint()
 		if fManaPer > 0 then
 			local bcX, bcY = -BASE_WIDTH / 2 + BASE_EDGE, BASE_PEAK + height + BASE_EDGE
@@ -719,7 +723,7 @@ end
 X.BreatheCall('MY_TeamMon_ScreenArrow', D.OnBreathe)
 X.RegisterEvent('FIGHT_HINT', 'MY_TeamMon_ScreenArrow', D.RegisterFight)
 X.RegisterEvent('LOGIN_GAME', 'MY_TeamMon_ScreenArrow', D.Init)
-X.RegisterEvent('UI_SCALED' , 'MY_TeamMon_ScreenArrow', setUIScale)
+X.RegisterEvent('UI_SCALED' , 'MY_TeamMon_ScreenArrow', SetUIScale)
 X.RegisterEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', 'MY_TeamMon_ScreenArrow', function()
 	local dwID, szType, szKey, tArgs = arg0, arg1, arg2, arg3
 	if CreateScreenArrow(dwID, szType, tArgs) then
