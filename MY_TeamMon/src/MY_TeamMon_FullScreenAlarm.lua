@@ -19,7 +19,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^25.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
-X.RegisterRestriction('MY_TeamMon_FullScreenAlarm', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_TeamMon_FullScreenAlarm', { ['*'] = false })
 --------------------------------------------------------------------------
 
 local GetBuff = X.GetBuff

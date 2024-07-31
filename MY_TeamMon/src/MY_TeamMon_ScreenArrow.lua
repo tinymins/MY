@@ -206,15 +206,18 @@ function D.OnBreathe()
 				local oo = D.GetAction(dwType, dwID)
 				local fLifePer = oo.dwType == TARGET.DOODAD and 1 or tInfo.nCurrentLife / math.max(tInfo.nMaxLife, tInfo.nCurrentLife, 1)
 				local fManaPer = oo.dwType == TARGET.DOODAD and 1 or tInfo.nCurrentMana / math.max(tInfo.nMaxMana, tInfo.nCurrentMana, 1)
-				local szName
-				if dwType == TARGET.DOODAD then
-					szName = tInfo.szName
-				elseif dwType == TARGET.NPC then
-					szName = X.GetTemplateName(TARGET.NPC, kTarget.dwTemplateID)
-				else
-					szName = X.GetObjectName(kTarget)
+				local szName = oo.szName
+				if not szName then
+					if dwType == TARGET.DOODAD then
+						szName = tInfo.szName
+					elseif dwType == TARGET.NPC then
+						szName = X.GetTemplateName(TARGET.NPC, kTarget.dwTemplateID)
+					else
+						szName = X.GetObjectName(kTarget)
+						szName = X.ExtractPlayerBaseName(szName)
+					end
+					oo.szName = szName
 				end
-				szName = oo.szName or szName
 				if tTeamMark[dwID] then
 					szName = szName .. _L('[%s]', X.CONSTANT.TEAM_MARK_NAME[tTeamMark[dwID]])
 				end
