@@ -511,6 +511,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		if not szName then
 			szName = X.GetObjectName(KObject, 'auto')
 		end
+		local szGlobalID = dwType == TARGET.PLAYER and X.GetPlayerGlobalID(dwID) or nil
 		local bFocus, aVia = false, {}
 		local dwMapID = X.GetMapID(true)
 		local dwTemplateID, szTong = -1, ''
@@ -622,7 +623,9 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					and O.bFocusPlayerRemark
 					and MY_PlayerRemark
 					and MY_PlayerRemark.Get then
-						local tRemark = MY_PlayerRemark.Get(szName)
+						local tRemark = szGlobalID
+							and MY_PlayerRemark.Get(szGlobalID)
+							or MY_PlayerRemark.Get(szName)
 						if tRemark then
 							table.insert(aVia, {
 								bDeletable = false,
@@ -634,7 +637,10 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					-- ≈–∂œ∫√”—
 					if dwType == TARGET.PLAYER
 					and O.bFocusFriend
-					and X.IsFellowship(dwID) then
+					and (
+						X.IsFellowship(dwID)
+						or (szGlobalID and X.IsFellowship(szGlobalID))
+					) then
 						table.insert(aVia, {
 							bDeletable = false,
 							szVia = _L['Friend focus'],
