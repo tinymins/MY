@@ -121,4 +121,22 @@ return {
     ['This function has been shielded by official except in dungeon'] = '應官方要求，該功能已停止在秘境外使用',
     ['Compressing: '] = '壓縮數據：',
 	['Reset config'] = '恢復默認設置',
+
+	-- MY_LifeBar_ScreenArrow.lua --
+	['MY_LifeBar_ScreenArrow'] = '頭頂報警',
+	['Call Alert'] = '你被點名了',
+	['Draw School Color'] = '繪製門派顏色',
+	['UI scale'] = '界面縮放',
+	['Text scale'] = '文字縮放',
+	['Less life/mana head alert'] = '戰鬥中低血藍頭頂報警',
+	['Enable'] = '啟用',
+	['[%s]'] = '【%s】',
+	['While HP less than'] = '血量低於',
+	['While MP less than'] = '藍量低於',
+	['Manually add (One per line)'] = '手動添加BUFF名稱（每行一個）',
+	['Manually add Npc Name (One per line)'] = '手動添加Npc名稱（每行一個）',
+	['Screen head alarm'] = '頭頂報警',
+	['Only monitor self'] = '僅監控自己',
+	['Preview'] = '預覽',
+	['PVE everyday, Xuanjing everyday!'] = '每天一個本，周周見玄晶！',
 }

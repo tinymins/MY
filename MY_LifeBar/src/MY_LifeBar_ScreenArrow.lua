@@ -9,71 +9,71 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_TeamMon/MY_TeamMon_ScreenArrow'
-local PLUGIN_NAME = 'MY_TeamMon'
+local MODULE_PATH = 'MY_LifeBar/MY_LifeBar_ScreenArrow'
+local PLUGIN_NAME = 'MY_LifeBar'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
-local MODULE_NAME = 'MY_TeamMon_ScreenArrow'
+local MODULE_NAME = 'MY_LifeBar_ScreenArrow'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 --------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^25.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
-X.RegisterRestriction('MY_TeamMon_ScreenArrow', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_LifeBar_ScreenArrow', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
-local O = X.CreateUserSettingsModule('MY_TeamMon_PartyBuffList', _L['Raid'], {
+local O = X.CreateUserSettingsModule('MY_LifeBar_ScreenArrow', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon'],
+		szLabel = _L['MY_LifeBar'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	fUIScale = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon'],
+		szLabel = _L['MY_LifeBar'],
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0.8,
 	},
 	fTextScale = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon'],
+		szLabel = _L['MY_LifeBar'],
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.35,
 	},
 	bAlert = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon'],
+		szLabel = _L['MY_LifeBar'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOnlySelf = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon'],
+		szLabel = _L['MY_LifeBar'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	fLifePer = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon'],
+		szLabel = _L['MY_LifeBar'],
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0.3,
 	},
 	fManaPer = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon'],
+		szLabel = _L['MY_LifeBar'],
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0.1,
 	},
 	nFont = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon'],
+		szLabel = _L['MY_LifeBar'],
 		xSchema = X.Schema.Number,
 		xDefaultValue = 186,
 	},
 	bDrawColor = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon'],
+		szLabel = _L['MY_LifeBar'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -173,7 +173,7 @@ local function SetUIScale()
 end
 
 
--- for i=1, 2 do FireUIEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', GetClientPlayer().dwID, 'TIME', { col = { 255, 255, 255 }, szText = 'test' })end
+-- for i=1, 2 do FireUIEvent('MY_LIFEBAR_COUNTDOWN', GetClientPlayer().dwID, 'TIME', { col = { 255, 255, 255 }, szText = 'test' })end
 local function CreateScreenArrow(dwID, szType, tArgs)
 	if not D.IsEnabled() then
 		return
@@ -186,7 +186,14 @@ local function CreateScreenArrow(dwID, szType, tArgs)
 end
 
 function D.IsEnabled()
-	return D.bReady and O.bEnable and not X.IsRestricted('MY_TeamMon_ScreenArrow')
+	return D.bReady and O.bEnable and not X.IsRestricted('MY_LifeBar_ScreenArrow')
+end
+
+function D.ProcessCountdown(dwID, szType, szKey, tArgs)
+	if CreateScreenArrow(dwID, szType, tArgs) then
+		return true
+	end
+	return false
 end
 
 function D.OnSort()
@@ -398,12 +405,19 @@ function SA:ctor(dwID, szType, tArgs)
 			return
 		end
 	end
+	local ui = HANDLE:New()
+	local col = tArgs.col
+	if col then
+		col = {X.HumanColor2RGB(tArgs.col)}
+	else
+		col = SA_COLOR.ARROW[szType]
+	end
+
 	local oo = {}
 	setmetatable(oo, self)
-	local ui      = HANDLE:New()
 	oo.szName   = tArgs.szName
 	oo.txt      = tArgs.szText
-	oo.col      = tArgs.col or SA_COLOR.ARROW[szType]
+	oo.col      = col
 	oo.dwBuffID = tArgs.dwBuffID
 	oo.szType   = szType
 
@@ -603,7 +617,7 @@ function SA:Free()
 	HANDLE:Free(self.ui)
 end
 
-local PS = { nPriority = 13, szRestriction = 'MY_TeamMon_ScreenArrow' }
+local PS = { nPriority = 13, szRestriction = 'MY_LifeBar_ScreenArrow' }
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
 	local nPaddingX, nPaddingY = 30, 30
@@ -747,7 +761,7 @@ function PS.OnPanelActive(wnd)
 		autoEnable = function() return O.bEnable end,
 	})
 end
-X.RegisterPanel(_L['Raid'], 'MY_TeamMon_ScreenArrow', _L['MY_TeamMon_ScreenArrow'], 431, PS)
+X.RegisterPanel(_L['Raid'], 'MY_LifeBar_ScreenArrow', _L['MY_LifeBar_ScreenArrow'], 431, PS)
 
 function D.Init()
 	HANDLE = X.UI.HandlePool(X.UI.GetShadowHandle('ScreenArrow'), FormatHandle(string.rep('<shadow></shadow>', 6)))
@@ -759,40 +773,34 @@ end
 --------------------------------------------------------------------------------
 do
 local settings = {
-	name = 'MY_TeamMon_ScreenArrow',
+	name = 'MY_LifeBar_ScreenArrow',
 	exports = {
 		{
 			preset = 'UIEvent',
 			fields = {
 				'IsEnabled',
+				'ProcessCountdown'
 			},
 			root = D,
 		},
 	},
 }
-MY_TeamMon_ScreenArrow = X.CreateModule(settings)
+MY_LifeBar_ScreenArrow = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------------------------------
 
-X.BreatheCall('MY_TeamMon_ScreenArrow', D.OnBreathe)
-X.RegisterEvent('FIGHT_HINT', 'MY_TeamMon_ScreenArrow', D.RegisterFight)
-X.RegisterEvent('LOGIN_GAME', 'MY_TeamMon_ScreenArrow', D.Init)
-X.RegisterEvent('UI_SCALED' , 'MY_TeamMon_ScreenArrow', SetUIScale)
-X.RegisterEvent('MY_TEAM_MON__SCREEN_ARROW__CREATE', 'MY_TeamMon_ScreenArrow', function()
-	local dwID, szType, szKey, tArgs = arg0, arg1, arg2, arg3
-	if CreateScreenArrow(dwID, szType, tArgs) then
-		return
-	end
-	FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwID, szType, szKey, tArgs)
-end)
+X.BreatheCall('MY_LifeBar_ScreenArrow', D.OnBreathe)
+X.RegisterEvent('FIGHT_HINT', 'MY_LifeBar_ScreenArrow', D.RegisterFight)
+X.RegisterEvent('LOGIN_GAME', 'MY_LifeBar_ScreenArrow', D.Init)
+X.RegisterEvent('UI_SCALED' , 'MY_LifeBar_ScreenArrow', SetUIScale)
 
-X.RegisterUserSettingsInit('MY_TeamMon_ScreenArrow', function()
+X.RegisterUserSettingsInit('MY_LifeBar_ScreenArrow', function()
 	D.bReady = true
 end)
-X.RegisterUserSettingsRelease('MY_TeamMon_ScreenArrow', function()
+X.RegisterUserSettingsRelease('MY_LifeBar_ScreenArrow', function()
 	D.bReady = false
 end)
 

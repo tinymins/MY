@@ -812,6 +812,9 @@ local function PrioritySorter(a, b)
 end
 X.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
 	local dwID, szType, szKey, tData = arg0, arg1, arg2, arg3
+	if MY_LifeBar_ScreenArrow.ProcessCountdown(dwID, szType, szKey, tData) then
+		return
+	end
 	if not COUNTDOWN_CACHE[dwID] then
 		COUNTDOWN_CACHE[dwID] = {}
 	end
