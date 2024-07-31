@@ -29,6 +29,18 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_PartyBuffList', _L['Raid'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	fUIScale = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = X.Schema.Number,
+		xDefaultValue = 0.8,
+	},
+	fTextScale = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_TeamMon'],
+		xSchema = X.Schema.Number,
+		xDefaultValue = 1.35,
+	},
 	bAlert = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
@@ -131,19 +143,19 @@ local SA_POINT_C = {}
 local SA_POINT = {}
 local BASE_POINT_START
 local function SetUIScale()
-	local dpi = Station.GetMaxUIScale()
+	local fScale = Station.GetMaxUIScale() * O.fUIScale
 	UI_SCALE = Station.GetUIScale()
 	FORCE_DRAW = true
-	BASE_PEAK = -60 * dpi * 0.5
-	BASE_WIDTH = 100 * dpi
-	BASE_HEIGHT = 12 * dpi
-	BASE_EDGE = dpi * 1.2
-	BASE_POINT_START = 15 * dpi
+	BASE_PEAK = -60 * fScale * 0.5
+	BASE_WIDTH = 100 * fScale
+	BASE_HEIGHT = 12 * fScale
+	BASE_EDGE = fScale * 1.2
+	BASE_POINT_START = 15 * fScale
 	SA_POINT_C = {}
 	SA_POINT = {}
 	for k, v in ipairs(BASE_SA_POINT_C) do
 		if k ~= 3 then
-			SA_POINT_C[k] = v * dpi
+			SA_POINT_C[k] = v * fScale
 		else
 			SA_POINT_C[k] = v
 		end
@@ -152,7 +164,7 @@ local function SetUIScale()
 		SA_POINT[k] = {}
 		for kk, vv in ipairs(v) do
 			if kk ~= 3 then
-				SA_POINT[k][kk] = vv * dpi
+				SA_POINT[k][kk] = vv * fScale
 			else
 				SA_POINT[k][kk] = vv
 			end
@@ -430,9 +442,9 @@ function SA:DrawText( ... )
 	local i = 1
 	for k, v in ipairs({ ... }) do
 		if v and v ~= '' then
-			local top = nTop + i * -45 * UI_SCALE
+			local top = nTop + i * -25 * O.fTextScale * UI_SCALE
 			if self.dwType == TARGET.DOODAD then
-				self.Text:AppendDoodadID(self.dwID, r, g, b, 240, { 0, 0, 0, 0, top }, O.nFont, v, 1, 1.8)
+				self.Text:AppendDoodadID(self.dwID, r, g, b, 240, { 0, 0, 0, 0, top }, O.nFont, v, 1, O.fTextScale)
 			else
 				if O.bDrawColor and self.dwType == TARGET.PLAYER and k ~= 1 then
 					local kTarget = select(2, D.GetObject(self.szType, self.dwID))
@@ -440,7 +452,7 @@ function SA:DrawText( ... )
 						r, g, b = X.GetForceColor(kTarget.dwForceID, 'foreground')
 					end
 				end
-				self.Text:AppendCharacterID(self.dwID, true, r, g, b, 240, { 0, 0, 0, 0, top }, O.nFont, v, 1, 1.8)
+				self.Text:AppendCharacterID(self.dwID, true, r, g, b, 240, { 0, 0, 0, 0, top }, O.nFont, v, 1, O.fTextScale)
 			end
 			i = i + 1
 		end
@@ -614,6 +626,28 @@ function PS.OnPanelActive(wnd)
 		onCheck = function(bChecked)
 			O.bDrawColor = bChecked
 		end,
+		autoEnable = function() return O.bEnable end,
+	}):Height()
+	nX = nPaddingX + 10
+	nY = nY + ui:Append('WndSlider', {
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 400 },
+		text = function(value) return _L('UI scale: %.1f%%.', value) end,
+		value = O.fUIScale * 100,
+		onChange = function(value)
+			O.fUIScale = value / 100
+			SetUIScale()
+		end,
+		autoEnable = function() return O.bEnable end,
+	}):Height()
+	nY = nY + ui:Append('WndSlider', {
+		x = nX, y = nY, sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = { 0, 400 },
+		text = function(value) return _L('Text scale: %.1f%%.', value) end,
+		value = O.fTextScale * 100,
+		onChange = function(value)
+			O.fTextScale = value / 100
+			SetUIScale()
+		end,
+		autoEnable = function() return O.bEnable end,
 	}):Height()
 
 	nX = nPaddingX

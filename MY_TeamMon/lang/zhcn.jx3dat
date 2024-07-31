@@ -24,6 +24,8 @@ return {
 	['MY_TeamMon_ScreenArrow'] = '头顶报警',
 	['Call Alert'] = '你被点名了',
 	['Draw School Color'] = '绘制门派颜色',
+	['UI scale: %.1f%%.'] = '界面缩放：%.1f%%。',
+	['Text scale: %.1f%%.'] = '文字缩放：%.1f%%。',
 	['Less life/mana head alert'] = '战斗中低血蓝头顶报警',
 	['Enable'] = '启用',
 	['[%s]'] = '【%s】',
