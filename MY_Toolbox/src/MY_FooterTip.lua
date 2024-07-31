@@ -78,7 +78,10 @@ function D.Apply()
 			or X.IsIsolated(tar) ~= X.IsIsolated(me) then
 				return
 			end
-			local tFellowship = X.GetFellowshipInfo(dwID)
+			local szGlobalID = X.GetPlayerGlobalID(tar)
+			local tFellowship = szGlobalID
+				and X.GetFellowshipInfo(szGlobalID)
+				or X.GetFellowshipInfo(dwID)
 			local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
 			if tFei then
 				if O.bFriendNav and Navigator_SetID then
