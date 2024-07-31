@@ -41,12 +41,30 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):AutoWidth():Width()
 
-	ui:Append('WndComboBox', {
+	nX = nX + ui:Append('WndComboBox', {
 		x = nX, y = nY, w = 200, text = _L['Distance type'], h = 24,
 		menu = function()
 			return X.GetDistanceTypeMenu(true, MY_TargetDirection.eDistanceType, function(p)
 				MY_TargetDirection.eDistanceType = p.szType
 			end)
+		end,
+	}):AutoWidth():Width()
+
+	ui:Append('WndComboBox', {
+		x = nX, y = nY, w = 200, text = _L['Long-distance reminder'], h = 24,
+		menu = function()
+			-- for 0 - 30
+			local tMenu = {}
+			for i = 0, 30 do
+				table.insert(tMenu, {
+					szOption = i == 0 and _L['No reminder'] or _L('Remind when distance is %d feet', i),
+					bCheck = true, bMCheck = true, bChecked = MY_TargetDirection.nDistanceFar == i,
+					fnAction = function()
+						MY_TargetDirection.nDistanceFar = i
+					end,
+				})
+			end
+			return tMenu
 		end,
 	}):AutoWidth()
 

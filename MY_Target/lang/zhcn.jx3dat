@@ -4,6 +4,9 @@ return {
 	['%.1f feet'] = '%.1f 尺',
 	['Show target direction'] = '显示目标方位指示',
 	['Distance type'] = '默认距离计算方式',
+	['Long-distance reminder'] = '远距离提醒',
+	['No reminder'] = '不提醒',
+	['Remind when distance is %d feet'] = '距离超过 %d 尺时提醒',
 
     ['MY_TargetFace'] = '目标面向',
     ['Options'] = '功能选项',

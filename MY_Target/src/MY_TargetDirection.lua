@@ -42,6 +42,13 @@ local O = X.CreateUserSettingsModule('MY_TargetDirection', _L['Target'], {
 		xSchema = X.Schema.String,
 		xDefaultValue = 'global',
 	},
+	--  ³¬Ô¶¾àÀë
+	nDistanceFar = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Target'],
+		xSchema = X.Schema.Number,
+		xDefaultValue = 0,
+	},
 })
 local D = {}
 
@@ -171,7 +178,14 @@ function D.OnFrameBreathe()
 		end
 		txtState:SetText(szState or '')
 		-- ¾àÀë
-		this:Lookup('', 'Handle_Main/Text_Distance'):SetText(_L('%.1f feet', X.GetDistance(me, tar, O.eDistanceType)))
+		local distanceText = this:Lookup('', 'Handle_Main/Text_Distance')
+		local nDistance = X.GetDistance(me, tar, O.eDistanceType)
+		distanceText:SetText(_L('%.1f feet', nDistance))
+		if O.nDistanceFar > 0 and nDistance > O.nDistanceFar then
+			distanceText:SetFontColor(255, 0, 0)
+		else
+			distanceText:SetFontColor(255, 255, 0)
+		end
 		this:Show()
 	else
 		this:Hide()
@@ -204,6 +218,7 @@ local settings = {
 				'bEnable',
 				'tAnchor',
 				'eDistanceType',
+				'nDistanceFar',
 			},
 			root = O,
 		},
@@ -218,6 +233,7 @@ local settings = {
 				'bEnable',
 				'tAnchor',
 				'eDistanceType',
+				'nDistanceFar',
 			},
 			triggers = {
 				bEnable = D.CheckEnable,
