@@ -272,7 +272,7 @@ function D.OnBreathe()
 				if not oo.init then
 					oo:DrawBackGround()
 				end
-				oo:DrawLifeBar(fLifePer, fManaPer):DrawText(txt, szName):DrowArrow()
+				oo:DrawLifeBar(fLifePer, fManaPer):DrawText(txt, szName):DrawArrow()
 			else
 				for _, vv in pairs(v) do
 					vv:Free()
@@ -521,7 +521,7 @@ function SA:DrawLifeBar(fLifePer, fManaPer)
 	return self
 end
 
-function SA:DrowArrow()
+function SA:DrawArrow()
 	local cX, cY, cA = unpack(SA_POINT_C)
 	cX, cY = cX * 0.7, cY * 0.7
 	local fX, fY = BASE_POINT_START, -BASE_PEAK - BASE_HEIGHT
