@@ -291,40 +291,6 @@ function D.InsertSceneLoot()
 	end
 end
 
-X.RegisterEvent('MY_RESTRICTION', 'MY_GKPLoot', function()
-	if arg0 and arg0 ~= 'MY_GKPLoot.FastLoot' then
-		return
-	end
-	D.UpdateShielded()
-end)
-
-X.RegisterEvent('LOADING_END', 'MY_GKPLoot', function()
-	D.UpdateShielded()
-	D.CloseFrame()
-	D.aDoodadID = {}
-	D.tDoodadInfo = {}
-	D.tDoodadClosed = {}
-	ITEM_CONFIG.tFilterQuality = {}
-	ITEM_CONFIG.bNameFilter = false
-	D.InsertSceneLoot()
-end)
-
-X.RegisterInit('MY_GKPLoot', function()
-	for _, k in ipairs({'tConfirm'}) do
-		if D[k] then
-			X.SafeCall(X.Set, O, k, D[k])
-			D[k] = nil
-		end
-	end
-	if D.tItemConfig and X.IsTable(D.tItemConfig) then
-		for k, v in pairs(D.tItemConfig) do
-			X.SafeCall(X.Set, O, k, v)
-		end
-		D.tItemConfig = nil
-	end
-	D.bReady = true
-end)
-
 function D.IsEnabled()
 	if not D.bReady then
 		return false
@@ -2057,81 +2023,6 @@ function D.AutoSetSystemLootVisible()
 	end
 end
 
-X.RegisterFrameCreate('LootList', 'MY_GKPLoot', function()
-	HookTableFunc(arg0, 'SetPoint', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
-	HookTableFunc(arg0, 'SetRelPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
-	HookTableFunc(arg0, 'SetAbsPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
-	HookTableFunc(arg0, 'CorrectPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
-end)
-
-X.RegisterFrameCreate('GoldTeamLootList', 'MY_GKPLoot', function()
-	HookTableFunc(arg0, 'SetPoint', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
-	HookTableFunc(arg0, 'SetRelPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
-	HookTableFunc(arg0, 'SetAbsPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
-	HookTableFunc(arg0, 'CorrectPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
-end)
-
-X.RegisterEvent('TEAM_AUTHORITY_CHANGED', 'MY_GKPLoot', D.AutoSetSystemLootVisible)
-
--- 摸箱子
-X.RegisterEvent('OPEN_DOODAD', function()
-	if not D.IsEnabled() then
-		return
-	end
-	if arg1 ~= X.GetClientPlayerID() then
-		return
-	end
-	local nM = X.GetDoodadLootMoney(arg0) or 0
-	if nM > 0 then
-		LootMoney(arg0)
-		PlaySound(SOUND.UI_SOUND, g_sound.PickupMoney)
-	end
-	local data = D.GetDoodadLootInfo(arg0)
-	if #data == 0 then
-		return D.DrawLootList(arg0, true)
-	end
-	--[[#DEBUG BEGIN]]
-	X.OutputDebugMessage('MY_GKPLoot', 'Open Doodad: ' .. arg0, X.DEBUG_LEVEL.LOG)
-	--[[#DEBUG END]]
-	D.tDoodadClosed[arg0] = nil
-	D.InsertLootList(arg0)
-	D.HideSystemLoot()
-end)
-
--- 刷新箱子
-X.RegisterEvent('SYNC_LOOT_LIST', function()
-	if not D.IsEnabled() then
-		return
-	end
-	local frame = D.GetFrame()
-	local wnd = D.GetDoodadWnd(frame, arg0)
-	if not wnd and not X.IsInDungeonMap() and X.IsRestricted('MY_GKPLoot.ForceLoot') then
-		return
-	end
-	if D.tDoodadClosed[arg0] then
-		return
-	end
-	D.InsertLootList(arg0)
-end)
-
-X.RegisterEvent('MY_GKP_LOOT_BOSS', function()
-	if not arg0 then
-		MY_GKP_LOOT_BOSS = nil
-		GKP_LOOT_RECENT = {}
-	else
-		local team = GetClientTeam()
-		if team then
-			for k, v in ipairs(team.GetTeamMemberList()) do
-				local info = GetClientTeam().GetMemberInfo(v)
-				if info.szName == arg0 then
-					MY_GKP_LOOT_BOSS = v
-					break
-				end
-			end
-		end
-	end
-end)
-
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)
 	nX, nY = nPaddingX, nLFY
 	ui:Append('Text', { text = _L['GKP Doodad helper'], x = nX, y = nY, font = 27 })
@@ -2330,5 +2221,118 @@ local settings = {
 }
 MY_GKPLoot = X.CreateModule(settings)
 end
+
+--------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_GKPLoot', function()
+	if arg0 and arg0 ~= 'MY_GKPLoot.FastLoot' then
+		return
+	end
+	D.UpdateShielded()
+end)
+
+X.RegisterEvent('LOADING_END', 'MY_GKPLoot', function()
+	D.UpdateShielded()
+	D.CloseFrame()
+	D.aDoodadID = {}
+	D.tDoodadInfo = {}
+	D.tDoodadClosed = {}
+	ITEM_CONFIG.tFilterQuality = {}
+	ITEM_CONFIG.bNameFilter = false
+	D.InsertSceneLoot()
+end)
+
+X.RegisterInit('MY_GKPLoot', function()
+	for _, k in ipairs({'tConfirm'}) do
+		if D[k] then
+			X.SafeCall(X.Set, O, k, D[k])
+			D[k] = nil
+		end
+	end
+	if D.tItemConfig and X.IsTable(D.tItemConfig) then
+		for k, v in pairs(D.tItemConfig) do
+			X.SafeCall(X.Set, O, k, v)
+		end
+		D.tItemConfig = nil
+	end
+	D.bReady = true
+end)
+
+X.RegisterFrameCreate('LootList', 'MY_GKPLoot', function()
+	HookTableFunc(arg0, 'SetPoint', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'SetRelPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'SetAbsPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'CorrectPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+end)
+
+X.RegisterFrameCreate('GoldTeamLootList', 'MY_GKPLoot', function()
+	HookTableFunc(arg0, 'SetPoint', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'SetRelPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'SetAbsPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+	HookTableFunc(arg0, 'CorrectPos', D.AutoSetSystemLootVisible, { bAfterOrigin = true })
+end)
+
+X.RegisterEvent('TEAM_AUTHORITY_CHANGED', 'MY_GKPLoot', D.AutoSetSystemLootVisible)
+
+-- 摸箱子
+X.RegisterEvent('OPEN_DOODAD', function()
+	if not D.IsEnabled() then
+		return
+	end
+	if arg1 ~= X.GetClientPlayerID() then
+		return
+	end
+	local nM = X.GetDoodadLootMoney(arg0) or 0
+	if nM > 0 then
+		LootMoney(arg0)
+		PlaySound(SOUND.UI_SOUND, g_sound.PickupMoney)
+	end
+	local data = D.GetDoodadLootInfo(arg0)
+	if #data == 0 then
+		return D.DrawLootList(arg0, true)
+	end
+	--[[#DEBUG BEGIN]]
+	X.OutputDebugMessage('MY_GKPLoot', 'Open Doodad: ' .. arg0, X.DEBUG_LEVEL.LOG)
+	--[[#DEBUG END]]
+	D.tDoodadClosed[arg0] = nil
+	D.InsertLootList(arg0)
+	D.HideSystemLoot()
+end)
+
+-- 刷新箱子
+X.RegisterEvent('SYNC_LOOT_LIST', function()
+	if not D.IsEnabled() then
+		return
+	end
+	local frame = D.GetFrame()
+	local wnd = D.GetDoodadWnd(frame, arg0)
+	if not wnd and not X.IsInDungeonMap() and X.IsRestricted('MY_GKPLoot.ForceLoot') then
+		return
+	end
+	if D.tDoodadClosed[arg0] then
+		return
+	end
+	D.InsertLootList(arg0)
+end)
+
+X.RegisterEvent('MY_GKP_LOOT_BOSS', function()
+	if not arg0 then
+		MY_GKP_LOOT_BOSS = nil
+		GKP_LOOT_RECENT = {}
+	else
+		local team = GetClientTeam()
+		if team then
+			for k, v in ipairs(team.GetTeamMemberList()) do
+				local info = GetClientTeam().GetMemberInfo(v)
+				if info.szName == arg0 then
+					MY_GKP_LOOT_BOSS = v
+					break
+				end
+			end
+		end
+	end
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
