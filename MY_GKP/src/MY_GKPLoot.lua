@@ -264,6 +264,33 @@ function D.UpdateShielded()
 		or 0
 end
 
+function D.InsertSceneLoot()
+	local GetInfo = X.GetGameAPI('GoldTeamBase_GetAllBiddingInfos')
+	local aInfo = GetInfo and GetInfo()
+	if not aInfo then
+		return
+	end
+	local aDoodadInfo, tDoodadID = {}, {}
+	for _, v in ipairs(aInfo) do
+		if not tDoodadID[v.dwDoodadID] then
+			table.insert(aDoodadInfo, {
+				dwDoodadID = v.dwDoodadID,
+				dwNpcTemplateID = v.dwNpcTemplateID,
+			})
+			tDoodadID[v.dwDoodadID] = true
+		end
+	end
+	for _, v in ipairs(aDoodadInfo) do
+		if not D.tDoodadInfo[v.dwDoodadID] then
+			D.tDoodadInfo[v.dwDoodadID] = {
+				dwID   = v.dwDoodadID,
+				szName = X.GetTemplateName(TARGET.NPC, v.dwNpcTemplateID) or '',
+			}
+		end
+		D.InsertLootList(v.dwDoodadID)
+	end
+end
+
 X.RegisterEvent('MY_RESTRICTION', 'MY_GKPLoot', function()
 	if arg0 and arg0 ~= 'MY_GKPLoot.FastLoot' then
 		return
@@ -279,6 +306,7 @@ X.RegisterEvent('LOADING_END', 'MY_GKPLoot', function()
 	D.tDoodadClosed = {}
 	ITEM_CONFIG.tFilterQuality = {}
 	ITEM_CONFIG.bNameFilter = false
+	D.InsertSceneLoot()
 end)
 
 X.RegisterInit('MY_GKPLoot', function()
@@ -461,40 +489,45 @@ function D.OnFrameBreathe()
 		end
 		wnd:Lookup('', 'Image_DoodadTitleBg'):SetFrame(bCanDialog and 0 or 3)
 		-- 目标距离
-		local nDistance = 0
-		if me then
+		local nDistance = -1
+		if me and doodadData.nX and doodadData.nY then
 			nDistance = math.floor(math.sqrt(math.pow(me.nX - doodadData.nX, 2) + math.pow(me.nY - doodadData.nY, 2)) * 10 / 64) / 10
 		end
-		wnd:Lookup('', 'Handle_Compass/Compass_Distance'):SetText(nDistance < 4 and '' or nDistance .. '"')
-		-- 自身面向
-		if me then
-			wnd:Lookup('', 'Handle_Compass/Image_Player'):Show()
-			wnd:Lookup('', 'Handle_Compass/Image_Player'):SetRotate( - me.nFaceDirection / 128 * math.pi)
-		end
-		-- 物品位置
-		local nRotate, nRadius = 0, 10.125
-		if me and nDistance > 0 then
-			-- 特判角度
-			if me.nX == doodadData.nX then
-				if me.nY > doodadData.nY then
-					nRotate = math.pi / 2
+		if nDistance == -1 then
+			wnd:Lookup('', 'Handle_Compass'):Hide()
+		else
+			wnd:Lookup('', 'Handle_Compass'):Show()
+			wnd:Lookup('', 'Handle_Compass/Compass_Distance'):SetText(nDistance < 4 and '' or nDistance .. '"')
+			-- 自身面向
+			if me then
+				wnd:Lookup('', 'Handle_Compass/Image_Player'):Show()
+				wnd:Lookup('', 'Handle_Compass/Image_Player'):SetRotate( - me.nFaceDirection / 128 * math.pi)
+			end
+			-- 物品位置
+			local nRotate, nRadius = 0, 10.125
+			if me and nDistance > 0 then
+				-- 特判角度
+				if me.nX == doodadData.nX then
+					if me.nY > doodadData.nY then
+						nRotate = math.pi / 2
+					else
+						nRotate = - math.pi / 2
+					end
 				else
-					nRotate = - math.pi / 2
+					nRotate = math.atan((me.nY - doodadData.nY) / (me.nX - doodadData.nX))
 				end
-			else
-				nRotate = math.atan((me.nY - doodadData.nY) / (me.nX - doodadData.nX))
+				if nRotate < 0 then
+					nRotate = nRotate + math.pi
+				end
+				if doodadData.nY < me.nY then
+					nRotate = math.pi + nRotate
+				end
 			end
-			if nRotate < 0 then
-				nRotate = nRotate + math.pi
-			end
-			if doodadData.nY < me.nY then
-				nRotate = math.pi + nRotate
-			end
+			local nX = nRadius + nRadius * math.cos(nRotate) + 2
+			local nY = nRadius - 3 - nRadius * math.sin(nRotate)
+			wnd:Lookup('', 'Handle_Compass/Image_PointGreen'):SetRelPos(nX, nY)
+			wnd:Lookup('', 'Handle_Compass'):FormatAllItemPos()
 		end
-		local nX = nRadius + nRadius * math.cos(nRotate) + 2
-		local nY = nRadius - 3 - nRadius * math.sin(nRotate)
-		wnd:Lookup('', 'Handle_Compass/Image_PointGreen'):SetRelPos(nX, nY)
-		wnd:Lookup('', 'Handle_Compass'):FormatAllItemPos()
 		-- 移除不可交互的掉落
 		if bRemoveUndialogable and not bCanDialog then
 			D.RemoveLootList(wnd.doodadData.dwID)
