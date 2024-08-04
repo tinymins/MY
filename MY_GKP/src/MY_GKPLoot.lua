@@ -767,7 +767,7 @@ function D.OnItemLButtonClick()
 			end
 		end
 		if data.bDist then
-			if not doodad then
+			if not doodad and not (X.IS_REMAKE and X.IsInDungeonMap()) then
 				--[[#DEBUG BEGIN]]
 				X.OutputDebugMessage('MY_GKPLoot:OnItemLButtonClick', 'Doodad does not exist!', X.DEBUG_LEVEL.WARNING)
 				--[[#DEBUG END]]
