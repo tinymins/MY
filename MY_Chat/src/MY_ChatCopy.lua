@@ -96,6 +96,13 @@ X.HookChatPanel('AFTER', 'MY_ChatCopy', function(h, i, szMsg, szChannel, dwTime,
 		if O.bChatCopyNoCopySysmsg and szChannel == 'SYS_MSG' then
 			return
 		end
+		-- check chat copy settings
+		local bChatCopy = true
+		local bChatQuickCopy = O.bChatQuickCopy == true
+		if szChannel == 'MSG_IDENTITY' then
+			bChatCopy = false
+			bChatQuickCopy = false
+		end
 		-- create timestamp text
 		local szTime = ''
 		if O.bChatCopy and (O.bChatCopyAlwaysShowMask or not O.bChatTime) then
@@ -106,7 +113,8 @@ X.HookChatPanel('AFTER', 'MY_ChatCopy', function(h, i, szMsg, szChannel, dwTime,
 			szTime = X.GetChatCopyXML(_L[' * '], {
 				r = _r, g = _g, b = _b, f = nFont,
 				richtext = szMsg,
-				rclick = O.bChatQuickCopy == true,
+				lclick = bChatCopy,
+				rclick = bChatQuickCopy,
 			})
 		elseif O.bChatCopyAlwaysWhite then
 			nR, nG, nB = 255, 255, 255
@@ -115,18 +123,22 @@ X.HookChatPanel('AFTER', 'MY_ChatCopy', function(h, i, szMsg, szChannel, dwTime,
 			if O.eChatTime == 'HOUR_MIN_SEC' then
 				szTime = szTime .. X.GetChatTimeXML(dwTime, {
 					r = nR, g = nG, b = nB, f = nFont,
-					s = '[%hh:%mm:%ss]', richtext = szMsg,
-					rclick = O.bChatQuickCopy == true,
+					s = '[%hh:%mm:%ss]',
+					richtext = szMsg,
+					lclick = bChatCopy,
+					rclick = bChatQuickCopy,
 				})
 			else
 				szTime = szTime .. X.GetChatTimeXML(dwTime, {
 					r = nR, g = nG, b = nB, f = nFont,
-					s = '[%hh:%mm]', richtext = szMsg,
-					rclick = O.bChatQuickCopy == true,
+					s = '[%hh:%mm]',
+					richtext = szMsg,
+					lclick = bChatCopy,
+					rclick = bChatQuickCopy,
 				})
 			end
 		end
-		-- insert timestrap text
+		-- insert timestamp text
 		h:InsertItemFromString(i, false, szTime)
 	end
 end)
