@@ -82,19 +82,17 @@ RegisterCustomData('MY_RideRequest.tAcceptCustom')
 local RIDE_MSG = {}
 local RIDE_LIST = {}
 
-for k, v in pairs({
-	['RIDE_CONTROLLER'     ] = {FOLLOW_TYPE.RIDE     , INVITE_FOLLOW_TYPE.BE_CONTROLLER},
-	['RIDE_FOLLOWER'       ] = {FOLLOW_TYPE.RIDE     , INVITE_FOLLOW_TYPE.BE_FOLLOWER  },
-	['HOLDHORSE_CONTROLLER'] = {FOLLOW_TYPE.HOLDHORSE, INVITE_FOLLOW_TYPE.BE_CONTROLLER},
-	['HOLDHORSE_FOLLOWER'  ] = {FOLLOW_TYPE.HOLDHORSE, INVITE_FOLLOW_TYPE.BE_FOLLOWER  },
-	['HOLDHANDS_CONTROLLER'] = {FOLLOW_TYPE.HOLDHANDS, INVITE_FOLLOW_TYPE.BE_CONTROLLER},
-	['HOLDHANDS_FOLLOWER'  ] = {FOLLOW_TYPE.HOLDHANDS, INVITE_FOLLOW_TYPE.BE_FOLLOWER  },
-	['CARRY_CONTROLLER'    ] = {FOLLOW_TYPE.CARRY    , INVITE_FOLLOW_TYPE.BE_CONTROLLER},
-	['CARRY_FOLLOWER'      ] = {FOLLOW_TYPE.CARRY    , INVITE_FOLLOW_TYPE.BE_FOLLOWER  },
-}) do
-	if v[1] and v[2] and g_tStrings.tInviteType[v[1]] and g_tStrings.tInviteType[v[1]][v[2]] then
-		RIDE_MSG[k] = g_tStrings.tInviteType[v[1]][v[2]]:gsub('<D0>', '^(.-)')
+do
+	local function CaptureRideMsgTpl(v)
+		if X.IsTable(v) then
+			for _, vv in pairs(v) do
+				CaptureRideMsgTpl(vv)
+			end
+		elseif X.IsString(v) then
+			table.insert(RIDE_MSG, (v:gsub('<D0>', '^(.-)')))
+		end
 	end
+	CaptureRideMsgTpl(g_tStrings.tInviteType)
 end
 
 function D.GetMenu()
@@ -299,15 +297,15 @@ function D.OnMessageBoxOpen()
 	if szMsgName == 'OnInviteFollow' then
 		local hContent = frame:Lookup('Wnd_All', 'Handle_Message')
 		local txt = hContent and hContent:Lookup(0)
-		local szMsg, szType, szName = txt and txt:GetType() == 'Text' and txt:GetText()
-		for k, szMsgTpl in pairs(RIDE_MSG) do
+		local szMsg, bRide, szName = txt and txt:GetType() == 'Text' and txt:GetText()
+		for _, szMsgTpl in ipairs(RIDE_MSG) do
 			szName = szMsg:match(szMsgTpl)
 			if szName then
-				szType = k
+				bRide = true
 				break
 			end
 		end
-		if szType then
+		if bRide then
 			local fnAccept = X.Get(frame:Lookup('Wnd_All/Btn_Option1'), 'fnAction')
 			local fnRefuse = X.Get(frame:Lookup('Wnd_All/Btn_Option2'), 'fnAction')
 			if fnAccept and fnRefuse then
