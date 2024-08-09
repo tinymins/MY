@@ -1015,13 +1015,19 @@ function X.ExecuteWithThis(context, fnAction, ...)
 end
 
 -- ≤‚ ‘”√
-if loadstring then
-function X.ProcessCommand(cmd)
-	local ls = loadstring('return ' .. cmd)
-	if ls then
-		return ls()
+function X.ExecuteInsideCommand(cmd)
+	if loadstring then
+		local ls = loadstring('return ' .. cmd)
+		if ls then
+			return ls()
+		end
 	end
 end
+
+function X.ExecuteAddonCommand(...)
+	if ExecuteScriptCommand then
+		return ExecuteScriptCommand(...)
+	end
 end
 
 -----------------------------------------------
