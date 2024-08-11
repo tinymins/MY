@@ -21,7 +21,7 @@ end
 --------------------------------------------------------------------------
 
 local NO_LOVER = {
-	xID = X.ENVIRONMENT.GAME_BRANCH == 'remake' and '0' or 0, -- 情缘 ID
+	xID = X.IS_REMAKE and '0' or 0, -- 情缘 ID
 	dwID = 0, -- 情缘 ID
 	szName = '', -- 情缘名字
 	szTitle = '', -- 我的结缘称号
@@ -555,7 +555,7 @@ function D.UpdateLocalLover()
 		X.DelayCall(1000, function()
 			D.UpdateLocalLover()
 		end)
-	elseif lover and X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+	elseif lover and X.IS_REMAKE then
 		-- 情缘版本迁移 V1 => V2
 		local xLoverID = X.GetRemoteStorage('MY_Love')
 		if X.IsNumber(xLoverID) and xLoverID ~= 0 and lover.xID ~= 0 and lover.xID ~= '0' then
@@ -782,7 +782,7 @@ function D.GetPlayerInfo(dwID)
 			nGender = kTarget.nGender,
 		}
 		-- 远程查看跨服好友需要手动补充后缀
-		if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+		if X.IS_REMAKE then
 			local szGlobalID = kTarget.GetGlobalID()
 			local tFei = X.GetFellowshipEntryInfo(szGlobalID)
 			if tFei then

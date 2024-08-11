@@ -217,7 +217,7 @@ X.RegisterFrameCreate('WorldMap', 'MY_ShenxingHelper__OpenAllMap', D.CheckOpenAl
 -- 防止神行CD被黑
 --------------------------------------------------------------------------
 function D.CheckAvoidBlackShenxingEnable()
-	if D.bReady and O.bAvoidBlackCD and X.ENVIRONMENT.GAME_BRANCH == 'classic' then
+	if D.bReady and O.bAvoidBlackCD and X.IS_CLASSIC then
 		X.RegisterEvent('DO_SKILL_CAST', 'MY_AvoidBlackShenxingCD', function()
 			local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 			if not(X.GetClientPlayerID() == dwID and
@@ -263,7 +263,7 @@ end
 -- 设置界面
 --------------------------------------------------------------------------
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
-	if X.ENVIRONMENT.GAME_BRANCH == 'classic' then
+	if X.IS_CLASSIC then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = 'auto',
 			text = _L['Avoid blacking shenxing cd'],

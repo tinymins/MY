@@ -35,7 +35,7 @@ function D.CanSeeLovePage(dwPlayerID, szPlayerName)
 	if MY_Love.IsShielded() then
 		return false
 	end
-	if X.ENVIRONMENT.GAME_BRANCH ~= 'remake' and IsRemotePlayer(dwPlayerID) then
+	if X.IS_CLASSIC and IsRemotePlayer(dwPlayerID) then
 		return false
 	end
 	return true
@@ -340,7 +340,7 @@ function D.OnPeekOtherPlayer()
 	if not D.CanSeeLovePage(dwPlayerID, tar.szName) then
 		return
 	end
-	if X.ENVIRONMENT.GAME_BRANCH == 'remake' then
+	if X.IS_REMAKE then
 		local szGlobalID = tar.GetGlobalID()
 		local tFei = X.GetFellowshipEntryInfo(szGlobalID)
 		if tFei then

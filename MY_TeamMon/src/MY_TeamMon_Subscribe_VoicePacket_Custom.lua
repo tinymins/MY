@@ -198,7 +198,7 @@ end
 -- Module exports
 --------------------------------------------------------------------------------
 do
-if X.ENVIRONMENT.GAME_BRANCH ~= 'remake' then
+if X.IS_REMAKE then
 local settings = {
 	name = 'MY_TeamMon_Subscribe_VoicePacket_Custom',
 	exports = {

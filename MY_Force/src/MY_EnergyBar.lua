@@ -543,7 +543,7 @@ function D.Apply()
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
-	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+	if X.IS_REMAKE then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY,
 			text = _L['Enable MY_EnergyBar'],

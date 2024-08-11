@@ -252,7 +252,7 @@ local COLUMN_LIST = {
 }
 local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 	if id == 'week_team_dungeon' then
-		if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+		if X.IS_REMAKE then
 			return {
 				id = id,
 				szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_TEAM_DUNGEON,
@@ -260,7 +260,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			}
 		end
 	elseif id == 'week_raid_dungeon' then
-		if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+		if X.IS_REMAKE then
 			return {
 				id = id,
 				szTitle = _L['Week routine: '] .. _L.ACTIVITY_WEEK_RAID_DUNGEON,
@@ -268,7 +268,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			}
 		end
 	elseif id == 'recommend_team_dungeon' then
-		if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+		if X.IS_REMAKE then
 			return {
 				id = id,
 				szTitle = _L['Recommend: team dungeon'],
@@ -276,7 +276,7 @@ local COLUMN_DICT = setmetatable({}, { __index = function(t, id)
 			}
 		end
 	elseif id == 'recommend_raid_dungeon' then
-		if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+		if X.IS_REMAKE then
 			return {
 				id = id,
 				szTitle = _L['Recommend: raid dungeon'],

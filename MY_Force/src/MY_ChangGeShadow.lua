@@ -116,7 +116,7 @@ function D.Apply()
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
-	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+	if X.IS_REMAKE then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = 'auto',
 			text = _L['Show changge shadow index'],

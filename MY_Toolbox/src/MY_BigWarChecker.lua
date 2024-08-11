@@ -147,7 +147,7 @@ local function GetTaskState(me, dwQuestID, dwNpcTemplateID)
 end
 
 X.RegisterEvent('LOADING_END', 'MY_BigWarChecker', function()
-	if X.ENVIRONMENT.GAME_BRANCH ~= 'classic' then
+	if X.IS_REMAKE then
 		return
 	end
 	local me = X.GetClientPlayer()

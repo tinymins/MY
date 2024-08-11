@@ -184,7 +184,7 @@ local FILTER_LIST = {
 	{ name = 'Drug'     , where = 'I.genre = 1 OR genre = 14' },
 	{ name = 'Material' , where = 'I.genre = 3' },
 	{ name = 'Book'     , where = 'I.genre = 4' },
-	{ name = 'Furniture', where = 'I.genre = 20', visible = X.ENVIRONMENT.GAME_BRANCH ~= 'classic' },
+	{ name = 'Furniture', where = 'I.genre = 20', visible = X.IS_REMAKE },
 	{ name = 'Grey'     , where = 'I.quality = 0' },
 	{ name = 'TimeLtd'  , where = 'I.exist_type <> -1 AND I.exist_type <> ' .. ITEM_EXIST_TYPE.PERMANENT },
 }

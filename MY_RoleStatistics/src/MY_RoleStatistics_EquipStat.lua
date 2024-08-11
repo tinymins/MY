@@ -416,11 +416,11 @@ function D.FlushDB()
 		lshoulder = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwLShoulderItemIndex) },
 		rshoulder = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwRShoulderItemIndex) },
 		backcloak = { ITEM_TABLE_TYPE.CUST_TRINKET, (me.dwBackCloakItemIndex) },
-		bag = { ITEM_TABLE_TYPE.CUST_TRINKET, X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.dwBagItemIndex or 0 },
-		glasses = { ITEM_TABLE_TYPE.CUST_TRINKET, X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.dwGlassesItemIndex or 0 },
-		lglove = { ITEM_TABLE_TYPE.CUST_TRINKET, X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.LGLOVE) or 0 },
-		rglove = { ITEM_TABLE_TYPE.CUST_TRINKET, X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetSelectPendent(KPENDENT_TYPE.RGLOVE) or 0 },
-		penpet = { ITEM_TABLE_TYPE.CUST_TRINKET, X.ENVIRONMENT.GAME_BRANCH ~= 'classic' and me.GetEquippedPendentPet() or 0 },
+		bag = { ITEM_TABLE_TYPE.CUST_TRINKET, X.IS_REMAKE and me.dwBagItemIndex or 0 },
+		glasses = { ITEM_TABLE_TYPE.CUST_TRINKET, X.IS_REMAKE and me.dwGlassesItemIndex or 0 },
+		lglove = { ITEM_TABLE_TYPE.CUST_TRINKET, X.IS_REMAKE and me.GetSelectPendent(KPENDENT_TYPE.LGLOVE) or 0 },
+		rglove = { ITEM_TABLE_TYPE.CUST_TRINKET, X.IS_REMAKE and me.GetSelectPendent(KPENDENT_TYPE.RGLOVE) or 0 },
+		penpet = { ITEM_TABLE_TYPE.CUST_TRINKET, X.IS_REMAKE and me.GetEquippedPendentPet() or 0 },
 	}))
 
 	X.SQLitePrepareExecute(
