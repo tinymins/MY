@@ -30,6 +30,11 @@ if SM_IsEnable then
 		_GAME_PROVIDER_ = 'remote'
 	end
 end
+-- 游戏代码分支
+local _GAME_API_BRANCH_ = _GAME_BRANCH_
+if _GAME_API_BRANCH_ == 'intl' then
+	_GAME_API_BRANCH_ = 'remake'
+end
 
 local DEBUG_LEVEL = {
 	PM_LOG  = 0,
@@ -102,6 +107,7 @@ local X = {
 			GAME_EDITION = _GAME_EDITION_,
 			GAME_VERSION = _GAME_VERSION_,
 			GAME_PROVIDER = _GAME_PROVIDER_,
+			GAME_API_BRANCH = _GAME_API_BRANCH_,
 			SERVER_ADDRESS = select(7, GetUserServer()),
 			SOUND_DRIVER = IsFileExist('bin64\\KG3DWwiseSoundX64.dll')
 				and 'WWISE'
