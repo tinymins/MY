@@ -120,7 +120,7 @@ local O = X.CreateUserSettingsModule('MY_GKP', _L['General'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue = false,
 	},
 })
 local D = {}
