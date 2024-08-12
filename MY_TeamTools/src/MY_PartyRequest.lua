@@ -385,9 +385,9 @@ function D.OnMessageBoxOpen()
 		if hBtn then
 			local hText = hBtn:Lookup('', 'Text_Option' .. i)
 			local szText = hText:GetText()
-			if szText == g_tStrings.STR_HOTKEY_SURE then
+			if szText == g_tStrings.STR_ACCEPT then
 				fnAccept = hBtn.fnAction
-			elseif szText == g_tStrings.STR_HOTKEY_CANCEL then
+			elseif szText == g_tStrings.STR_REFUSE then
 				fnRefuse = hBtn.fnAction
 			end
 		end
