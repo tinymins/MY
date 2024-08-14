@@ -32,7 +32,7 @@ local function InitDB()
 		return false
 	end
 	CPath.MakeDir(X.FormatPath({'userdata/player_remark/', X.PATH_TYPE.GLOBAL}))
-	DB = X.SQLiteConnect(_L['MY_PlayerRemark'], {'userdata/player_remark/player_remark.v3.db', X.PATH_TYPE.GLOBAL})
+	DB = X.SQLiteConnect(_L['MY_PlayerRemark'], {'userdata/player_remark/player_remark.v4.db', X.PATH_TYPE.GLOBAL})
 	if not DB then
 		local szMsg = _L['Cannot connect to database!!!']
 		if DB_ERR_COUNT > 0 then
@@ -58,18 +58,18 @@ local function InitDB()
 			guid NVARCHAR(20) NOT NULL,
 			remark NVARCHAR(255) NOT NULL,
 			extra TEXT NOT NULL,
-			PRIMARY KEY (server, id)
+			PRIMARY KEY (guid)
 		)
 	]])
-	X.SQLiteExecute(DB, 'CREATE UNIQUE INDEX IF NOT EXISTS player_info_server_name_u_idx ON PlayerRemark(server, name)')
-	X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS player_info_guid_idx ON PlayerRemark(guid)')
+	X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS player_info_server_id_idx ON PlayerRemark(server, id)')
+	X.SQLiteExecute(DB, 'CREATE INDEX IF NOT EXISTS player_info_server_name_idx ON PlayerRemark(server, name)')
 	DBP_W = X.SQLitePrepare(DB, 'REPLACE INTO PlayerRemark (server, id, name, guid, remark, extra) VALUES (?, ?, ?, ?, ?, ?)')
 	DBP_DN = X.SQLitePrepare(DB, 'DELETE FROM PlayerRemark WHERE server = ? AND name = ?')
 	DBP_DG = X.SQLitePrepare(DB, 'DELETE FROM PlayerRemark WHERE guid = ?')
-	DBP_R = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark')
-	DBP_RI = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE server = ? AND id = ?')
-	DBP_RN = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE server = ? AND name = ?')
-	DBP_RGI = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGlobalID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE guid = ?')
+	DBP_R = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGUID, remark as szRemark, extra as szExtra FROM PlayerRemark')
+	DBP_RI = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGUID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE server = ? AND id = ?')
+	DBP_RN = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGUID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE server = ? AND name = ?')
+	DBP_RGI = X.SQLitePrepare(DB, 'SELECT server as szServerName, id as dwID, name as szName, guid as szGUID, remark as szRemark, extra as szExtra FROM PlayerRemark WHERE guid = ?')
 
 	return true
 end
@@ -82,6 +82,20 @@ local function ReleaseDB()
 	DB:Release()
 end
 
+function D.IsGUID(szGUID)
+	if X.IsGlobalID(szGUID) then
+		return true
+	end
+	return X.IsString(szGUID) and string.match(szGUID, "^G#[\128-\255]+#%d+$") ~= nil
+end
+
+function D.GetPlayerGUID(szServer, dwID, szGUID)
+	if D.IsGUID(szGUID) then
+		return szGUID
+	end
+	return 'G#' .. szServer .. '#' .. dwID
+end
+
 function D.Migrate()
 	if not X.GetClientPlayer() then
 		--[[#DEBUG BEGIN]]
@@ -89,13 +103,14 @@ function D.Migrate()
 		--[[#DEBUG END]]
 		return
 	end
-	local szFilePath = X.FormatPath({'config/anmerkungen.jx3dat', X.PATH_TYPE.SERVER})
-	if not IsLocalFileExist(szFilePath) then
+	local szFilePathV2 = X.FormatPath({'config/anmerkungen.jx3dat', X.PATH_TYPE.SERVER})
+	local szFilePathV3 = X.FormatPath({'userdata/player_remark/player_remark.v3.db', X.PATH_TYPE.GLOBAL})
+	if not IsLocalFileExist(szFilePathV2) and not IsLocalFileExist(szFilePathV3) then
 		return
 	end
 	local szServerName = X.GetServerOriginName()
-	if IsLocalFileExist(szFilePath) then
-		local data = X.LoadLUAData(szFilePath)
+	if IsLocalFileExist(szFilePathV2) then
+		local data = X.LoadLUAData(szFilePathV2)
 		if data then
 			for _, v in pairs(data.data or {}) do
 				X.SQLitePrepareExecute(
@@ -103,7 +118,7 @@ function D.Migrate()
 					AnsiToUTF8(szServerName),
 					v.dwID,
 					AnsiToUTF8(v.szName),
-					'',
+					AnsiToUTF8(D.GetPlayerGUID(szServerName, v.dwID, '')),
 					AnsiToUTF8(v.szContent),
 					X.EncodeLUAData({
 						bTipWhenGroup = v.bTipWhenGroup,
@@ -112,7 +127,21 @@ function D.Migrate()
 				)
 			end
 		end
-		-- CPath.Move(szFilePath, szFilePath .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+		CPath.Move(szFilePathV2, szFilePathV2 .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
+	end
+	if IsLocalFileExist(szFilePathV3) then
+		local db = SQLite3_Open(szFilePathV3)
+		if db then
+			local aInfo = X.SQLiteGetAllANSI(db, 'SELECT * FROM PlayerRemark') or {}
+			for _, p in ipairs(aInfo) do
+				local tExtra = X.DecodeLUAData(p.extra) or {}
+				local bTipWhenGroup = tExtra.bTipWhenGroup
+				local bAlertWhenGroup = tExtra.bAlertWhenGroup
+				D.Set(p.server, p.id, p.name, p.guid, p.remark, bTipWhenGroup, bAlertWhenGroup)
+			end
+			db:Release()
+		end
+		CPath.Move(szFilePathV3, szFilePathV3 .. '.bak' .. X.FormatTime(GetCurrentTime(), '%yyyy%MM%dd%hh%mm%ss'))
 	end
 	FireUIEvent('MY_PLAYER_REMARK_UPDATE')
 end
@@ -135,7 +164,7 @@ function D.Get(xKey)
 	if X.IsNumber(xKey) then
 		local szServer = X.GetServerOriginName()
 		tInfo = X.SQLitePrepareGetOneANSI(DBP_RI, szServer, xKey)
-	elseif X.IsGlobalID(xKey) then
+	elseif D.IsGUID(xKey) then
 		tInfo = X.SQLitePrepareGetOneANSI(DBP_RGI, xKey)
 	elseif X.IsString(xKey) then
 		local szName, szServer = X.DisassemblePlayerGlobalName(xKey, true)
@@ -152,13 +181,14 @@ function D.Get(xKey)
 end
 
 -- 设置一个玩家的记录
-function D.Set(szServerName, dwID, szName, szGlobalID, szRemark, bTipWhenGroup, bAlertWhenGroup)
+function D.Set(szServerName, dwID, szName, szGUID, szRemark, bTipWhenGroup, bAlertWhenGroup)
+	local szGUID = D.GetPlayerGUID(szServerName, dwID, szGUID)
 	X.SQLitePrepareExecuteANSI(
 		DBP_W,
 		szServerName,
 		dwID,
 		szName,
-		szGlobalID,
+		szGUID,
 		szRemark,
 		X.EncodeLUAData({
 			bTipWhenGroup = bTipWhenGroup,
@@ -169,12 +199,12 @@ function D.Set(szServerName, dwID, szName, szGlobalID, szRemark, bTipWhenGroup, 
 end
 
 ---删除一个玩家的记录
-function D.Delete(szServerName, szName, szGlobalID)
+function D.Delete(szServerName, szName, szGUID)
 	if szServerName and szName then
 		X.SQLitePrepareExecuteANSI(DBP_DN, szServerName, szName)
 	end
-	if szGlobalID then
-		X.SQLitePrepareExecuteANSI(DBP_DG, szGlobalID)
+	if szGUID then
+		X.SQLitePrepareExecuteANSI(DBP_DG, szGUID)
 	end
 	FireUIEvent('MY_PLAYER_REMARK_UPDATE')
 end
@@ -226,10 +256,11 @@ function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 		return X.Alert(_L['MY_Farbnamen not detected! Please check addon load!'])
 	end
 	local szRemark, bTipWhenGroup, bAlertWhenGroup = '', false, false
+	local szGUID = D.GetPlayerGUID(szServerName, dwID, szGlobalID)
 	do
 		local tInfo
-		if not tInfo and X.IsGlobalID(szGlobalID) then
-			tInfo = D.Get(szGlobalID)
+		if not tInfo and D.IsGUID(szGUID) then
+			tInfo = D.Get(szGUID)
 		end
 		if not tInfo then
 			tInfo = D.Get(X.AssemblePlayerGlobalName(szName, szServerName))
@@ -240,6 +271,7 @@ function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 		if tInfo then
 			-- szServerName = tInfo.szServerName
 			dwID = X.IIf(IsRemotePlayer(dwID), tInfo.dwID, dwID)
+			szGUID = tInfo.szGUID
 			szRemark = tInfo.szRemark
 			bTipWhenGroup = tInfo.bTipWhenGroup
 			bAlertWhenGroup = tInfo.bAlertWhenGroup
@@ -299,7 +331,7 @@ function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 		nX = nX + 80
 		ui:Append('WndEditBox', {
 			x = nX, y = nY, w = nRightW, h = 25,
-			text = szGlobalID,
+			text = szGUID,
 			multiline = false, enable = false, color = {200,200,200},
 		})
 		nY = nY + 30
@@ -352,7 +384,7 @@ function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 				szServerName,
 				dwID,
 				szName,
-				szGlobalID,
+				szGUID,
 				szRemark,
 				bTipWhenGroup,
 				bAlertWhenGroup
@@ -374,7 +406,7 @@ function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 			D.Delete(
 				szServerName,
 				szName,
-				szGlobalID
+				szGUID
 			)
 			ui:Remove()
 		end,
@@ -528,7 +560,7 @@ function PS.OnPanelActive(wnd)
 		listBox = {{
 			'onlclick',
 			function(szID, szText, data, bSelected)
-				D.OpenPlayerRemarkEditPanel(data.szServerName, data.dwID, data.szName, data.szGlobalID)
+				D.OpenPlayerRemarkEditPanel(data.szServerName, data.dwID, data.szName, data.szGUID)
 				return false
 			end,
 		}},
