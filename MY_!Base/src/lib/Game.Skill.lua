@@ -28,8 +28,8 @@ function X.GetOTActionState(...)
 		return
 	end
 	local nType, dwSkillID, dwSkillLevel, fCastPercent
+	local eType = X.GetObjectType(KObject)
 	if X.IsNil(bNewAPI) then
-		local eType = X.GetObjectType(KObject)
 		if eType == 'PLAYER' or eType == 'NPC' then
 			bNewAPI = pcall(function()
 				if not KObject.GetSkillOTActionState then
@@ -38,11 +38,13 @@ function X.GetOTActionState(...)
 			end)
 		end
 	end
-	if bNewAPI then
-		nType, dwSkillID, dwSkillLevel, fCastPercent = KObject.GetSkillOTActionState()
-	else
-		nType, dwSkillID, dwSkillLevel, fCastPercent = KObject.GetSkillPrepareState()
-		nType = KObject.GetOTActionState()
+	if eType == 'PLAYER' or eType == 'NPC' then
+		if bNewAPI then
+			nType, dwSkillID, dwSkillLevel, fCastPercent = KObject.GetSkillOTActionState()
+		else
+			nType, dwSkillID, dwSkillLevel, fCastPercent = KObject.GetSkillPrepareState()
+			nType = KObject.GetOTActionState()
+		end
 	end
 	return nType, dwSkillID, dwSkillLevel, fCastPercent
 end
