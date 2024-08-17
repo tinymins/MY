@@ -20,6 +20,7 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 X.RegisterRestriction('MY_GKPLoot.FastLoot', { ['*'] = true })
 X.RegisterRestriction('MY_GKPLoot.ForceLoot', { ['*'] = true })
+X.RegisterRestriction('MY_GKPLoot.ForceTryAutoLoot', { ['*'] = true })
 X.RegisterRestriction('MY_GKPLoot.ShowUndialogable', { ['*'] = true })
 --------------------------------------------------------------------------
 
@@ -447,9 +448,14 @@ function D.OnFrameBreathe()
 		for i = 0, hList:GetItemCount() - 1 do
 			hItem = hList:Lookup(i)
 			if (not hItem.nAutoLootLFC or nLFC - hItem.nAutoLootLFC >= GKP_AUTO_LOOT_DEBOUNCE_TIME)
-			and D.IsItemAutoPickup(hItem.itemData, ITEM_CONFIG, doodadData, bCanDialog)
-			and not hItem.itemData.bDist and not hItem.itemData.bNeedRoll and not hItem.itemData.bBidding then
+			and not hItem.itemData.bDist and not hItem.itemData.bNeedRoll and not hItem.itemData.bBidding
+			and (
+				D.IsItemAutoPickup(hItem.itemData, ITEM_CONFIG, doodadData, bCanDialog)
+				or (not X.IsRestricted('MY_GKPLoot.ForceTryAutoLoot') and not hItem.itemData.bAutoLooted)
+			)
+			then
 				X.ExecuteWithThis(hItem, D.OnItemLButtonClick)
+				hItem.itemData.bAutoLooted = true
 				hItem.nAutoLootLFC = nLFC
 			end
 		end
