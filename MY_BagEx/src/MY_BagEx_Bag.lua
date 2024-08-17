@@ -35,6 +35,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	},
 	tLock = {
 		ePathType = X.PATH_TYPE.ROLE,
+		bUserData = true,
 		szLabel = _L['MY_BagEx'],
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
