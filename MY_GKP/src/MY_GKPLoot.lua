@@ -450,8 +450,12 @@ function D.OnFrameBreathe()
 			if (not hItem.nAutoLootLFC or nLFC - hItem.nAutoLootLFC >= GKP_AUTO_LOOT_DEBOUNCE_TIME)
 			and not hItem.itemData.bDist and not hItem.itemData.bNeedRoll and not hItem.itemData.bBidding
 			and (
-				D.IsItemAutoPickup(hItem.itemData, ITEM_CONFIG, doodadData, bCanDialog)
-				or (not X.IsRestricted('MY_GKPLoot.ForceTryAutoLoot') and not hItem.itemData.bAutoLooted)
+				D.IsItemAutoPickup(
+					hItem.itemData,
+					ITEM_CONFIG,
+					doodadData,
+					bCanDialog or (not X.IsRestricted('MY_GKPLoot.ForceTryAutoLoot') and not hItem.itemData.bAutoLooted)
+				)
 			)
 			then
 				X.ExecuteWithThis(hItem, D.OnItemLButtonClick)
