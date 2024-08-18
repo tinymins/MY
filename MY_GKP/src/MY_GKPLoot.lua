@@ -454,7 +454,7 @@ function D.OnFrameBreathe()
 					hItem.itemData,
 					ITEM_CONFIG,
 					doodadData,
-					bCanDialog or (not X.IsRestricted('MY_GKPLoot.ForceTryAutoLoot') and not hItem.itemData.bAutoLooted)
+					bCanDialog or ((not X.IsRestricted('MY_GKPLoot.ForceTryAutoLoot') and not hItem.itemData.bAutoLooted))
 				)
 			)
 			then
