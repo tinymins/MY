@@ -433,6 +433,7 @@ local function OnIdle()
 	TIME = nTime
 	CommonEventFirer(IDLE_EVENT)
 end
+X.RegisterEvent('LOADING_ENDING', OnIdle)
 X.RegisterEvent('BUFF_UPDATE', function()
 	if arg1 then
 		return
