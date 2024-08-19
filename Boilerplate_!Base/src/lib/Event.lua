@@ -448,7 +448,7 @@ X.RegisterEvent('BUFF_UPDATE', function()
 	end
 end)
 X.BreatheCall(X.NSFormatString('{$NS}#ON_IDLE'), function()
-	if Station.GetIdleTime() > 300000 then
+	if Station.GetIdleTime() > 60000 then
 		OnIdle()
 	end
 end)
