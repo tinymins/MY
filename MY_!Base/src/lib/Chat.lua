@@ -260,7 +260,12 @@ function X.CopyChatLine(hTime, bTextEditor, bRichText)
 						edit:InsertObj(szText, { type = 'designation', text = szText, id = p.dwID, prefix = p.bPrefix })
 					elseif szName =='eventlink' then
 						if szText and #szText > 0 then -- 过滤插件消息
-							edit:InsertObj(szText, { type = 'eventlink', name = p.szName, linkinfo = p.szLinkInfo })
+							local szName = p.szName
+							-- 过滤换行符
+							if X.IsRestricted('X.CHAT_CRLF') then
+								szName = X.StringReplaceW(szName, '\n', '')
+							end
+							edit:InsertObj(szText, { type = 'eventlink', name = szName, linkinfo = p.szLinkInfo })
 						end
 					else
 						if bBegin == false then

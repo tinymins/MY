@@ -433,6 +433,7 @@ local function OnIdle()
 	TIME = nTime
 	CommonEventFirer(IDLE_EVENT)
 end
+X.RegisterEvent('LOADING_ENDING', OnIdle)
 X.RegisterEvent('BUFF_UPDATE', function()
 	if arg1 then
 		return
@@ -447,7 +448,7 @@ X.RegisterEvent('BUFF_UPDATE', function()
 	end
 end)
 X.BreatheCall(X.NSFormatString('{$NS}#ON_IDLE'), function()
-	if Station.GetIdleTime() > 300000 then
+	if Station.GetIdleTime() > 60000 then
 		OnIdle()
 	end
 end)
