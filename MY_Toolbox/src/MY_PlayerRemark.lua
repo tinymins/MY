@@ -86,7 +86,7 @@ function D.IsGUID(szGUID)
 	if X.IsGlobalID(szGUID) then
 		return true
 	end
-	return X.IsString(szGUID) and string.match(szGUID, "^G#[\128-\255]+#%d+$") ~= nil
+	return X.IsString(szGUID) and string.match(szGUID, "^G#.+#%d+$") ~= nil
 end
 
 function D.GetPlayerGUID(szServer, dwID, szGUID)
