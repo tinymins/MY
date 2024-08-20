@@ -198,7 +198,6 @@ end
 -- Module exports
 --------------------------------------------------------------------------------
 do
-if X.IS_REMAKE then
 local settings = {
 	name = 'MY_TeamMon_Subscribe_VoicePacket_Custom',
 	exports = {
@@ -213,7 +212,6 @@ local settings = {
 	},
 }
 MY_TeamMon_Subscribe.RegisterModule('Subscribe_VoicePacket_Custom', _L['Voice packet custom'], X.CreateModule(settings))
-end
 end
 
 --------------------------------------------------------------------------------
