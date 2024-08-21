@@ -69,6 +69,9 @@ function D.CheckEnable()
 				end
 				local nBookID, nSegmentID, nItemID, nRecipeID = arg0, arg1, arg2, arg3
 				local dwTargetType = event == 'OPEN_BOOK_NOTIFY' and arg4 or nil
+				if X.IS_REMAKE and not dwTargetType then
+					dwTargetType = TARGET.ITEM
+				end
 				if me.IsBookMemorized(nBookID, nSegmentID) then
 					return
 				end
