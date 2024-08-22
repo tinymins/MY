@@ -395,7 +395,8 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 		local show = false
 		for k, v in ipairs(tThreat) do
 			if k > O.nMaxBarCount then break end
-			if MY_GetClientPlayerID() == v.id then
+			local dwMeID = MY_GetClientPlayerID()
+			if dwMeID == v.id then
 				if O.nOTAlertLevel > 0 and GetNpcIntensity(KGnpc) > 2 then
 					if this.bSelfTreatRank < O.nOTAlertLevel and v.val / nTopRank >= O.nOTAlertLevel then
 						X.OutputAnnounceMessage(_L('** You Threat more than %d, 120% is Out of Taunt! **', O.nOTAlertLevel * 100))
@@ -456,7 +457,10 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			else
 				local p = MY_GetNpc(v.id)
 				if p then
-					szName = X.GetObjectName(p)
+					szName = X.GetTemplateName(TARGET.NPC, p.dwTemplateID)
+					if p.dwEmployer == dwMeID then
+						r, g, b = 230, 230, 230
+					end
 				end
 			end
 			item:Lookup('Text_ThreatName'):SetText(v.sort .. '.' .. szName)
