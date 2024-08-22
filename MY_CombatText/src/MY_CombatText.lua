@@ -341,6 +341,12 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bDisabledPartnerText = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
 	-- $name 名字 $sn   技能名 $crit 会心 $val  数值
 	szSkill = {
 		ePathType = X.PATH_TYPE.ROLE,
@@ -882,6 +888,9 @@ function D.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nSkillResultType
 			KEmployer = X.GetPlayer(dwEmployerID)
 		end
 	end
+	if not bIsPlayer and O.bDisabledPartnerText and X.IsPartnerNpc(KCaster.dwTemplateID) then
+		return
+	end
 	-- 过滤他人数据
 	if (dwCasterID ~= COMBAT_TEXT_PLAYERID and dwTargetID ~= COMBAT_TEXT_PLAYERID and dwEmployerID ~= COMBAT_TEXT_PLAYERID)
 	and not O.bOtherCharacter then
@@ -970,7 +979,9 @@ function D.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nSkillResultType
 		szText = szText:gsub('$sn', szSkillName)
 		szText = szText:gsub('$val', (bStaticSign and X.IsNumber(nValue) and nValue > 0 and '+' or '') .. (nValue or ''))
 	end
-	D.AppendCombineTable(dwTargetID, szPoint, nValue, szText)
+	if COMBAT_TEXT_TYPE_CLASS[eType] ~= 'THERAPY' then
+		D.AppendCombineTable(dwTargetID, szPoint, nValue, szText)
+	end
 	D.CreateText(shadow, dwTargetID, szText, szPoint, eType, bCriticalStrike)
 end
 
@@ -1263,6 +1274,17 @@ function PS.OnPanelActive(frame)
 		end,
 		autoEnable = IsEnabled,
 	}):Width() + 5
+
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Disable partner text'],
+		checked = O.bDisabledPartnerText,
+		onCheck = function(bCheck)
+			O.bDisabledPartnerText = bCheck
+		end,
+		autoEnable = IsEnabled,
+	}):Width() + 5
+
 
 	nY = nY + nDeltaY
 

@@ -46,6 +46,7 @@ return {
 	['Critical Strike'] = '致命一击',
 	['Combine the same time combat text'] = '受伤/伤害超过目标最大血量35%时，合并一段时间的伤害，对万花玉石等爆DOT职业优化',
 	['Show combine text'] = '显示致命一击',
+	['Disable partner text'] = '隐藏侠客文本',
 	['Max count'] = '最大数量',
 	['Max same time combat text count limit'] = '最大同屏战斗文字数量',
 	['Limit to %d'] = '不超过%d个',
