@@ -6,7 +6,7 @@
 ---@type Boilerplate
 local X = Boilerplate
 --------------------------------------------------------------------------------
-local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Game.KObject.Tong')
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Game.Tong')
 --------------------------------------------------------------------------------
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
