@@ -883,13 +883,13 @@ function D.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nSkillResultType
 	local KCaster = bIsPlayer and X.GetPlayer(dwCasterID) or X.GetNpc(dwCasterID)
 	local KEmployer, dwEmployerID
 	if not bIsPlayer and KCaster then
+		if O.bDisabledPartnerText and X.IsPartnerNpc(KCaster.dwTemplateID) then
+			return
+		end
 		dwEmployerID = KCaster.dwEmployer
 		if dwEmployerID ~= 0 then -- NPC要算归属圈
 			KEmployer = X.GetPlayer(dwEmployerID)
 		end
-	end
-	if not bIsPlayer and O.bDisabledPartnerText and X.IsPartnerNpc(KCaster.dwTemplateID) then
-		return
 	end
 	-- 过滤他人数据
 	if (dwCasterID ~= COMBAT_TEXT_PLAYERID and dwTargetID ~= COMBAT_TEXT_PLAYERID and dwEmployerID ~= COMBAT_TEXT_PLAYERID)
