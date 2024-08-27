@@ -281,7 +281,7 @@ function X.GetFellowshipEntryInfo(xPlayerID)
 			dwForceID = card.dwForceID,
 			nCamp = card.nCamp,
 			szSignature = card.szSignature,
-			bOnline = info.isonline,
+			bOnline = info.bOnline,
 			dwMiniAvatarID = card.dwMiniAvatarID,
 			nSkinID = card.dwSkinID,
 			dwServerID = 0,
