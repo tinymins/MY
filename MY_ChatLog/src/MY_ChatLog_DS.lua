@@ -54,7 +54,7 @@ local function NewDB(szRoot, nMinTime, nMaxTime)
 	db:SetMinTime(nMinTime)
 	db:SetMaxTime(nMaxTime)
 	db:SetInfo('version', '2')
-	db:SetInfo('user_global_id', X.GetClientPlayer().GetGlobalID())
+	db:SetInfo('user_global_id', X.GetClientPlayerGlobalID())
 	return db
 end
 
@@ -116,7 +116,7 @@ function DS:InitDB(bFixProblem)
 					X.OutputDebugMessage(_L['MY_ChatLog'], 'Ignore unconnectable node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 					--[[#DEBUG END]]
 					db:Disconnect()
-				elseif db:GetInfo('user_global_id') ~= X.GetClientPlayer().GetGlobalID() then
+				elseif db:GetInfo('user_global_id') ~= X.GetClientPlayerGlobalID() then
 					--[[#DEBUG BEGIN]]
 					X.OutputDebugMessage(_L['MY_ChatLog'], 'Ignore foreign node ' .. db:ToString(), X.DEBUG_LEVEL.WARNING)
 					--[[#DEBUG END]]

@@ -263,7 +263,7 @@ function D.ImportDB(aPath)
 		if odb then
 			-- 老版分表机制
 			local szGlobalID = X.Get(X.SQLiteGetAll(odb, 'SELECT * FROM ChatLogInfo WHERE key = "userguid"'), {1, 'value'})
-			if szGlobalID == X.GetClientPlayer().GetGlobalID() then
+			if szGlobalID == X.GetClientPlayerGlobalID() then
 				for _, info in ipairs(X.SQLiteGetAll(odb, 'SELECT * FROM ChatLogIndex WHERE name IS NOT NULL ORDER BY stime ASC') or X.CONSTANT.EMPTY_TABLE) do
 					if info.etime == -1 then
 						info.etime = 0
@@ -286,7 +286,7 @@ function D.ImportDB(aPath)
 			end
 			-- 新版导出数据
 			local szGlobalID = X.Get(X.SQLiteGetAll(odb, 'SELECT value FROM ChatInfo WHERE key = "user_global_id"'), {1, 'value'}, ''):gsub('"', '')
-			if szGlobalID == X.GetClientPlayer().GetGlobalID() then
+			if szGlobalID == X.GetClientPlayerGlobalID() then
 				local szVersion = X.Get(X.SQLiteGetAll(odb, 'SELECT value FROM ChatInfo WHERE key = "version"'), {1, 'value'}, '')
 				local nCount = X.Get(X.SQLiteGetAll(odb, 'SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 				if nCount > 0 then

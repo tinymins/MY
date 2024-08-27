@@ -39,8 +39,8 @@ function D.OnInit()
 				X.DelayCall('MY_LOCK_TIP', 100000, function()
 					local state, nResetTime = Lock_State()
 					if state == 'PASSWORD_LOCK' then
-						local me = X.GetClientPlayer()
-						local szText = me and me.GetGlobalID and _L.LOCK_TIP[me.GetGlobalID()] or _L['You have been loged in for 2min, you can unlock bag locker now.']
+						local szGlobalID = X.GetClientPlayerGlobalID()
+						local szText = szGlobalID and _L.LOCK_TIP[szGlobalID] or _L['You have been loged in for 2min, you can unlock bag locker now.']
 						X.OutputSystemMessage(szText)
 						OutputWarningMessage('MSG_REWARD_GREEN', szText, 10)
 					end

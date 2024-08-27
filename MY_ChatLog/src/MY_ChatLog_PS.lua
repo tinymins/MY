@@ -286,7 +286,7 @@ function D.Export(szExportFile, aMsgType, nPerSec, onProgress)
 		db:SetMinTime(0)
 		db:SetMaxTime(math.huge)
 		db:SetInfo('version', '2')
-		db:SetInfo('user_global_id', X.GetClientPlayer().GetGlobalID())
+		db:SetInfo('user_global_id', X.GetClientPlayerGlobalID())
 		l_bExporting = true
 
 		local nPage, nPageCount = 0, math.ceil(ds:CountMsg(aMsgType, '') / EXPORT_SLICE)
