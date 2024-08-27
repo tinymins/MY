@@ -536,7 +536,7 @@ function D.GetLover()
 				dwAvatar = tFei.dwMiniAvatarID,
 				dwForceID = tFei.dwForceID,
 				nRoleType = tFei.nRoleType,
-				dwMapID = X.GetFellowshipMapID(tFellowship.xID),
+				dwMapID = X.GetFellowshipMapID(tFellowship.xID) or 0,
 				bOnline = X.IsFellowshipOnline(tFellowship.xID),
 			}
 			return 0
