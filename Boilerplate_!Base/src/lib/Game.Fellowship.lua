@@ -271,10 +271,10 @@ function X.GetFellowshipEntryInfo(xPlayerID)
 	end
 	local info = X.GetFellowshipInfo(xPlayerID)
 	local fcc = X.GetFellowshipCardClient()
-	local card = info and fcc and fcc.GetFellowshipCardInfo(info.id)
+	local card = info and fcc and fcc.GetFellowshipCardInfo(info.xID)
 	if card then
 		return {
-			dwID = info.id,
+			dwID = info.xID,
 			szName = card.szName,
 			nLevel = card.nLevel,
 			nRoleType = card.nRoleType,
