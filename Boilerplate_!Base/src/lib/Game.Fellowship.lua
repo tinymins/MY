@@ -224,7 +224,7 @@ function X.GetFellowshipMapID(xPlayerID)
 	end
 	local tFellowship = X.GetFellowshipInfo(xPlayerID)
 	local fcc = X.GetFellowshipCardClient()
-	local tCard = tFellowship and fcc and fcc.GetFellowshipCardInfo(tFellowship.id)
+	local tCard = tFellowship and fcc and fcc.GetFellowshipCardInfo(tFellowship.xID)
 	if tCard then
 		return tCard.dwMapID
 	end
