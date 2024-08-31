@@ -296,6 +296,25 @@ function D.OnBreathe()
 					oo:DrawBackGround()
 				end
 				oo:DrawLifeBar(fLifePer, fManaPer):DrawText(txt, szName):DrawArrow()
+				if X.IsPlayer(dwID) then
+					local dwMountKungfuID = -1
+					if dwID == X.GetClientPlayerID() then
+						dwMountKungfuID = UI_GetPlayerMountKungfuID()
+					else
+						local info = GetClientTeam().GetMemberInfo(dwID)
+						if info and not X.IsEmpty(info.dwMountKungfuID) then
+							dwMountKungfuID = info.dwMountKungfuID
+						else
+							local kungfu = kTarget.GetKungfuMount()
+							if kungfu then
+								dwMountKungfuID = kungfu.dwSkillID
+							end
+						end
+					end
+					rlcmd(string.format("set caption kungfu icon %u %u %u", dwID, 1, dwMountKungfuID))
+				end
+				-- 这里要想办法覆盖C++的颜色设置 C++代码上有个强制逻辑 优先级比rlcmd还高 估计是两个人写的
+				-- rlcmd(string.format("set caption color %u %u %u %u", dwID, 16711680, 0, 0))
 			else
 				for _, vv in pairs(v) do
 					vv:Free()
@@ -452,11 +471,12 @@ end
 function SA:DrawText( ... )
 	self.Text:ClearTriangleFanPoint()
 	local nTop = BASE_PEAK - (BASE_EDGE * 2)
-	local r, g, b = unpack(SA_COLOR.FONT[self.szType])
+	-- local r, g, b = unpack(SA_COLOR.FONT[self.szType])
+	local r, g, b = unpack(self.col)
 	local i = 1
 	for k, v in ipairs({ ... }) do
 		if v and v ~= '' then
-			local top = nTop + i * -25 * O.fTextScale * UI_SCALE
+			local top = nTop + i * -18 * O.fTextScale * UI_SCALE
 			if self.dwType == TARGET.DOODAD then
 				self.Text:AppendDoodadID(self.dwID, r, g, b, 240, { 0, 0, 0, 0, top }, O.nFont, v, 1, O.fTextScale)
 			else
@@ -603,6 +623,9 @@ function SA:Hide()
 end
 
 function SA:Free()
+	rlcmd(string.format("set caption kungfu icon %u %u", self.dwID, 0))
+	rlcmd(string.format("reset caption %u", self.dwID))
+
 	local tab = CACHE[self.dwType][self.dwID]
 	if #tab == 1 then
 		CACHE[self.dwType][self.dwID] = nil
