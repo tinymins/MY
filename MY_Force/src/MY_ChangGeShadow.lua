@@ -69,6 +69,10 @@ function D.Apply()
 				end
 				return
 			end
+			local me = X.GetClientPlayer()
+			if not me then
+				return
+			end
 			hList = frame:Lookup('Wnd_Bar', 'Handle_Skill')
 			nCount = hList:GetItemCount()
 			for i = 0, nCount - 1 do
@@ -78,7 +82,7 @@ function D.Apply()
 					hShaList:AppendItemFromString('<shadow></shadow>')
 					sha = hShaList:Lookup(i)
 				end
-				nDis = X.GetDistance(X.GetNpc(hItem.nNpcID))
+				nDis = X.GetTargetDistance(me, X.GetNpc(hItem.nNpcID))
 				if hItem.szState == 'disable' then
 					r, g, b = 191, 31, 31
 				else

@@ -792,7 +792,7 @@ function D.GetDisplayList()
 							bRuleFocus = false
 						end
 						if bRuleFocus and via.tRule.nMaxDistance ~= 0
-						and X.GetDistance(me, KObject, O.szDistanceType) > via.tRule.nMaxDistance then
+						and X.GetTargetDistance(me, KObject, O.szDistanceType) > via.tRule.nMaxDistance then
 							bRuleFocus = false
 						end
 						if bRuleFocus and not via.tRule.tRelation.bAll then

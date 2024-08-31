@@ -615,7 +615,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		-- æ‡¿Î
 		bShowDistance = Config.bShowDistance and (not Config.bShowDistanceOnlyTarget or bCurrentTarget)
 		if bShowDistance then
-			lb:SetDistance(X.GetDistance(object))
+			lb:SetDistance(X.GetTargetDistance(me, object))
 		end
 		lb:SetDistanceVisible(bShowDistance)
 		-- ∞Ôª·

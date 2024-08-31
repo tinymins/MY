@@ -27,7 +27,7 @@ local D = {}
 -----------------------------------------------
 local Station, SetTarget = Station, SetTarget
 local Target_GetTargetData = Target_GetTargetData
-local MY_GetDistance, MY_GetBuff, MY_GetEndTime, MY_GetObject = X.GetDistance, X.GetBuff, X.GetEndTime, X.GetObject
+local MY_GetBuff, MY_GetEndTime, MY_GetObject = X.GetBuff, X.GetEndTime, X.GetObject
 local CFG                    = MY_Cataclysm.CFG
 local CTM_BG_COLOR_MODE      = MY_Cataclysm.BG_COLOR_MODE
 -- global STR cache
@@ -1798,11 +1798,12 @@ function CTM:RefreshDistance()
 	if X.ENVIRONMENT.RUNTIME_OPTIMIZE and GetLogicFrameCount() % 8 ~= 0 then
 		return
 	end
+	local me = X.GetClientPlayer()
 	for k, v in pairs(CTM_CACHE) do
 		if v:IsValid() then
 			local p = X.GetPlayer(k) -- info.nPoX 刷新太慢了 对于治疗来说 这个太重要了
 			if p then
-				local nDistance = MY_GetDistance(p) -- 只计算平面 --??
+				local nDistance = MY.GetTargetDistance(me, p) -- 只计算平面 --??
 				if CFG.bEnableDistance then
 					local find
 					for kk, vv in ipairs(CFG.tDistanceLevel) do
@@ -2157,7 +2158,7 @@ function CTM:RefreshSputtering()
 						local info2 = team.GetMemberInfo(dwID2)
 						local player2 = X.GetPlayer(dwID2)
 						if player2 and not info2.bDeathFlag and info2.bIsOnLine
-						and X.GetDistance(player.nX, player.nY, player.nZ, player2.nX, player2.nY, player2.nZ, 'gwwean') <= CFG.nSputteringDistance then
+						and X.GetTargetDistance(player, player2, 'gwwean') <= CFG.nSputteringDistance then
 							nCount = nCount + 1
 						end
 					end

@@ -411,8 +411,9 @@ end
 function D.GetDoubleLoveItem(tFellowship, aUIID)
 	local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
 	if tFei then
+		local me = X.GetClientPlayer()
 		local kTarget = D.GetNearbyPlayerByName(tFei.szName)
-		if tFellowship.nAttraction >= D.nDoubleLoveAttraction and kTarget and X.IsParty(kTarget.dwID) and X.GetDistance(kTarget) <= 4 then
+		if tFellowship.nAttraction >= D.nDoubleLoveAttraction and kTarget and X.IsParty(kTarget.dwID) and X.GetTargetDistance(me, kTarget) <= 4 then
 			return D.GetBagItemPos(aUIID)
 		end
 	end

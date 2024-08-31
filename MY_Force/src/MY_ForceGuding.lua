@@ -275,7 +275,7 @@ function D.OnUseManaChange()
 			-- ’“∂¶
 			for k, _ in pairs(aList) do
 				local doo = X.GetDoodad(k)
-				if doo and X.GetDistance(doo) < 6 then
+				if doo and X.GetTargetDistance(me, doo) < 6 then
 					D.nManaFrame = GetLogicFrameCount()
 					X.InteractDoodad(doo.dwID)
 					X.OutputSystemMessage(_L['Auto eat GUDING'])

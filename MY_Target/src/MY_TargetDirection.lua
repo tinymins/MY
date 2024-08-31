@@ -179,7 +179,7 @@ function D.OnFrameBreathe()
 		txtState:SetText(szState or '')
 		-- ¾àÀë
 		local distanceText = this:Lookup('', 'Handle_Main/Text_Distance')
-		local nDistance = X.GetDistance(me, tar, O.eDistanceType)
+		local nDistance = X.GetTargetDistance(me, tar, O.eDistanceType)
 		distanceText:SetText(_L('%.1f feet', nDistance))
 		if O.nDistanceFar > 0 and nDistance > O.nDistanceFar then
 			distanceText:SetFontColor(255, 0, 0)
