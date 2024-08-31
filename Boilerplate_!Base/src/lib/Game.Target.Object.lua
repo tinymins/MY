@@ -120,12 +120,12 @@ end
 --    'always' 总是返回
 --    'never'  总是不返回
 local OBJECT_NAME = {
-	['PLAYER'   ] = X.CreateCache('LIB#GetObjectName#PLAYER.v'   ),
-	['NPC'      ] = X.CreateCache('LIB#GetObjectName#NPC.v'      ),
-	['DOODAD'   ] = X.CreateCache('LIB#GetObjectName#DOODAD.v'   ),
-	['ITEM'     ] = X.CreateCache('LIB#GetObjectName#ITEM.v'     ),
-	['ITEM_INFO'] = X.CreateCache('LIB#GetObjectName#ITEM_INFO.v'),
-	['UNKNOWN'  ] = X.CreateCache('LIB#GetObjectName#UNKNOWN.v'  ),
+	['PLAYER'   ] = X.CreateCache('LIB#GetObjectName#PLAYER'   , 'v'),
+	['NPC'      ] = X.CreateCache('LIB#GetObjectName#NPC'      , 'v'),
+	['DOODAD'   ] = X.CreateCache('LIB#GetObjectName#DOODAD'   , 'v'),
+	['ITEM'     ] = X.CreateCache('LIB#GetObjectName#ITEM'     , 'v'),
+	['ITEM_INFO'] = X.CreateCache('LIB#GetObjectName#ITEM_INFO', 'v'),
+	['UNKNOWN'  ] = X.CreateCache('LIB#GetObjectName#UNKNOWN'  , 'v'),
 }
 function X.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 	local KObject, szType, dwID, nExtraID, eRetID
