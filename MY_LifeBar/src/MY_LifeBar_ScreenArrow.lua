@@ -84,6 +84,7 @@ local D = {
 		['Mana'] = {},
 	}
 }
+local Config = MY_LifeBar_Config
 
 local UI_SCALE = 1
 local FORCE_DRAW = false
@@ -172,6 +173,7 @@ local function SetUIScale()
 	end
 end
 
+local function RGB2Dword(nR, nG, nB, nA) return (nA or 255) * 16777216 + nR * 65536 + nG * 256 + nB end
 
 -- for i=1, 2 do FireUIEvent('MY_LIFEBAR_COUNTDOWN', GetClientPlayer().dwID, 'TIME', { col = { 255, 255, 255 }, szText = 'test' })end
 local function CreateScreenArrow(dwID, szType, tArgs)
@@ -314,7 +316,11 @@ function D.OnBreathe()
 					rlcmd(string.format("set caption kungfu icon %u %u %u", dwID, 1, dwMountKungfuID))
 				end
 				-- 这里要想办法覆盖C++的颜色设置 C++代码上有个强制逻辑 优先级比rlcmd还高 估计是两个人写的
-				-- rlcmd(string.format("set caption color %u %u %u %u", dwID, 16711680, 0, 0))
+				local szRelation = X.GetRelation(UI_GetClientPlayerID(), dwID)
+				local aColor = Config('get', 'Color', szRelation, IsPlayer(dwID) and 'Player' or 'Npc')
+				if aColor then
+					rlcmd(string.format("set plugin caption color %u %u %u", dwID, 1, RGB2Dword(unpack(aColor))))
+				end
 			else
 				for _, vv in pairs(v) do
 					vv:Free()

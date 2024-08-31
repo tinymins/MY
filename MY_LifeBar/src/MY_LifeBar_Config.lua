@@ -17,9 +17,6 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^25.0.0') then
 	return
 end
-if not IsLocalFileExist(X.FormatPath({'config/restriction/lifebar.jx3dat', X.PATH_TYPE.GLOBAL})) then
-	return
-end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
