@@ -148,7 +148,7 @@ end
 ---@param nX2 userdata @点2的X坐标
 ---@param nY2 userdata @点2的Y坐标
 ---@param nZ2 userdata @点2的Z坐标
----@param szType string @距离计算方式：'euclidean': 欧氏距离 (default)； 'plane': 平面距离； 'gwwean': 郭氏距离； 'global': 使用全局配置；
+---@param szType? string @距离计算方式：'euclidean': 欧氏距离 (default)； 'plane': 平面距离； 'gwwean': 郭氏距离； 'global': 使用全局配置；
 ---@return number @距离计算结果
 function X.Get3DPointDistance(nX1, nY1, nZ1, nX2, nY2, nZ2, szType)
 	if not szType or szType == 'global' then
@@ -168,7 +168,7 @@ end
 ---@param nY1 userdata @点1的Y坐标
 ---@param nX2 userdata @点2的X坐标
 ---@param nY2 userdata @点2的Y坐标
----@param szType string @距离计算方式：'euclidean': 欧氏距离 (default)； 'plane': 平面距离； 'gwwean': 郭氏距离； 'global': 使用全局配置；
+---@param szType? string @距离计算方式：'euclidean': 欧氏距离 (default)； 'plane': 平面距离； 'gwwean': 郭氏距离； 'global': 使用全局配置；
 ---@return number @距离计算结果
 function X.Get2DPointDistance(nX1, nY1, nX2, nY2, szType)
 	return X.Get3DPointDistance(nX1, nY1, 0, nX2, nY2, 0, szType)
@@ -177,7 +177,7 @@ end
 -- 获取两个目标之间的距离
 ---@param kTar1 userdata @目标1
 ---@param kTar2 userdata @目标2
----@param szType string @距离计算方式：'euclidean': 欧氏距离 (default)； 'plane': 平面距离； 'gwwean': 郭氏距离； 'global': 使用全局配置；
+---@param szType? string @距离计算方式：'euclidean': 欧氏距离 (default)； 'plane': 平面距离； 'gwwean': 郭氏距离； 'global': 使用全局配置；
 ---@return number @距离计算结果
 function X.GetTargetDistance(kTar1, kTar2, szType)
 	return X.Get3DPointDistance(kTar1.nX, kTar1.nY, kTar1.nZ, kTar2.nX, kTar2.nY, kTar2.nZ, szType)
