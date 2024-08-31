@@ -121,9 +121,9 @@ function D.OnFrameCreate()
 end
 
 do
-local function SetObjectAvatar(img, tar, info, bInfo)
+local function SetObjectAvatar(img, tar, info)
 	if X.IsPlayer(tar.dwID) then
-		if bInfo and info.dwMountKungfuID then
+		if info and info.dwMountKungfuID then
 			img:FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 		else
 			local kungfu = tar.GetKungfuMount and tar.GetKungfuMount()
@@ -149,10 +149,11 @@ end
 function D.OnFrameBreathe()
 	local me = X.GetClientPlayer()
 	local dwType, dwID = X.GetTarget()
-	local tar, info, bInfo = X.GetObject(dwType, dwID)
+	local tar = X.GetTargetHandle(dwType, dwID)
+	local info = X.GetTeamMemberInfo(dwID)
 	if tar and tar.dwID ~= me.dwID then
 		-- Í·Ïñ
-		SetObjectAvatar(this:Lookup('', 'Handle_Main/Image_Force'), tar, info, bInfo)
+		SetObjectAvatar(this:Lookup('', 'Handle_Main/Image_Force'), tar, info)
 		-- ·½Î»
 		local dwRad1 = math.atan2(tar.nY - me.nY, tar.nX - me.nX)
 		local dwRad2 = me.nFaceDirection / 128 * math.pi

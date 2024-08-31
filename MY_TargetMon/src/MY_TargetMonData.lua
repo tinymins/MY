@@ -162,7 +162,7 @@ function D.GetTarget(eTarType, eMonType)
 	elseif eTarType == 'TARGET' then
 		return X.GetTarget()
 	elseif eTarType == 'TTARGET' then
-		local KTarget = X.GetObject(X.GetTarget())
+		local KTarget = X.GetTargetHandle(X.GetTarget())
 		if KTarget then
 			return X.GetTarget(KTarget)
 		end
@@ -479,7 +479,7 @@ function UpdateView()
 	local nViewIndex, nViewCount, nMonitorCount = 1, #VIEW_LIST_CACHE, 0
 	for _, dataset in ipairs(D.GetDatasetList()) do
 		local dwTarType, dwTarID = D.GetTarget(dataset.szTarget, dataset.szType)
-		local KObject = X.GetObject(dwTarType, dwTarID)
+		local KObject = X.GetTargetHandle(dwTarType, dwTarID)
 		local dwTarKungfuID = KObject
 			and (dwTarType == TARGET.PLAYER
 				and (KObject.GetKungfuMountID() or 0)
@@ -657,7 +657,7 @@ local function OnFrameCall()
 	-- 更新各目标BUFF数据
 	local nLogicFrame, info = GetLogicFrameCount()
 	for eType, _ in pairs(tExistBuffMonitorTargetType) do
-		local KObject = X.GetObject(D.GetTarget(eType, 'BUFF'))
+		local KObject = X.GetTargetHandle(D.GetTarget(eType, 'BUFF'))
 		if KObject then
 			local tCache = BUFF_CACHE[KObject.dwID]
 			if not tCache then
@@ -708,7 +708,7 @@ local function OnFrameCall()
 		end
 	end
 	for eType, _ in pairs(tExistSkillMonitorTargetType) do
-		local KObject = X.GetObject(D.GetTarget(eType, 'SKILL'))
+		local KObject = X.GetTargetHandle(D.GetTarget(eType, 'SKILL'))
 		if KObject then
 			local tSkill = {}
 			local aSkill = X.GetSkillMountList()
@@ -799,7 +799,7 @@ for i = 1, 5 do
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Hotkey cancel is only allowed for buff.'])
 					return
 				end
-				local KTarget = X.GetObject(D.GetTarget(tViewData.szTarget, tViewData.szType))
+				local KTarget = X.GetTargetHandle(D.GetTarget(tViewData.szTarget, tViewData.szType))
 				if not KTarget then
 					OutputMessage('MSG_ANNOUNCE_RED', _L['Cannot find target to cancel buff.'])
 					return

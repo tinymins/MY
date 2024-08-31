@@ -140,7 +140,8 @@ function D.UpdateItem(hItem, p)
 	local dwType, dwID = p.dwType, p.dwID
 	local szVia, tRule = p.szVia, p.tRule
 	local bDeletable = p.bDeletable
-	local KObject, info, bInfo = X.GetObject(dwType, dwID)
+	local KObject = X.GetTargetHandle(dwType, dwID)
+	local tMemberInfo = X.GetTeamMemberInfo(dwID)
 	local szName = tRule and X.ReplaceSensitiveWord(tRule.szDisplay)
 	if not szName or szName == '' then
 		szName = X.GetObjectName(KObject)
@@ -166,10 +167,10 @@ function D.UpdateItem(hItem, p)
 	-- 心法
 	hInfoList:Lookup('Handle_Kungfu'):Hide()
 	if dwType == TARGET.PLAYER then
-		if bInfo and info.dwMountKungfuID then
-			hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(X.GetKungfuName(info.dwMountKungfuID))
+		if tMemberInfo and tMemberInfo.dwMountKungfuID then
+			hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(X.GetKungfuName(tMemberInfo.dwMountKungfuID))
 			hInfoList:Lookup('Handle_Kungfu'):Show()
-			hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
+			hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(tMemberInfo.dwMountKungfuID, 1))
 		else
 			local kungfu = KObject.GetKungfuMount()
 			if kungfu then
@@ -228,8 +229,8 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_L/Handle_Compass'):Hide()
 		hItem:Lookup('Handle_L/Handle_School'):Show()
 		-- 心法图标
-		if bInfo and info.dwMountKungfuID then
-			hItem:Lookup('Handle_L/Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
+		if tMemberInfo and tMemberInfo.dwMountKungfuID then
+			hItem:Lookup('Handle_L/Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(tMemberInfo.dwMountKungfuID, 1))
 		else
 			local kungfu = KObject.GetKungfuMount()
 			if kungfu then
@@ -284,8 +285,8 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_R/Handle_LMN/Image_Mana'):SetPercentage(1)
 		hItem:Lookup('Handle_R/Handle_LMN/Text_Mana'):SetText('')
 	else
-		local fCurrentLife, fMaxLife = X.GetObjectLife(info)
-		local nCurrentMana, nMaxMana = info.nCurrentMana, info.nMaxMana
+		local fCurrentLife, fMaxLife = X.GetObjectLife(tMemberInfo)
+		local nCurrentMana, nMaxMana = tMemberInfo.nCurrentMana, tMemberInfo.nMaxMana
 		local szLife = X.FormatNumberDot(fCurrentLife, 1, false, true)
 		if fMaxLife > 0 then
 			local nPercent = math.floor(fCurrentLife / fMaxLife * 100)
@@ -318,7 +319,7 @@ function D.UpdateItem(hItem, p)
 	-- 目标的目标
 	if MY_Focus.bShowTarget and dwType ~= TARGET.DOODAD then
 		local tp, id = KObject.GetTarget()
-		local tar = X.GetObject(tp, id)
+		local tar = X.GetTargetHandle(tp, id)
 		if tar then
 			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText(X.GetObjectName(tar))
 		else
@@ -577,7 +578,7 @@ function D.OnItemRButtonClick()
 					'Type: ' .. dwType,
 					'ID: ' .. dwID,
 				}
-				local obj = X.GetObject(dwType, dwID)
+				local obj = X.GetTargetHandle(dwType, dwID)
 				if obj then
 					table.insert(aText, 'Name: ' .. X.GetObjectName(obj))
 					table.insert(aText, 'TemplateID: ' .. obj.dwTemplateID)

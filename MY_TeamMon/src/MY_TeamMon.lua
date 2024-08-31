@@ -859,7 +859,7 @@ function D.CheckScrutinyType(nScrutinyType, dwID)
 	elseif nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.ENEMY and not IsEnemy(MY_TEAM_MON_CORE_PLAYERID, dwID) then
 		return false
 	elseif nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.TARGET then
-		local obj = X.GetObject(X.GetTarget())
+		local obj = X.GetTargetHandle(X.GetTarget())
 		if not obj or obj and obj.dwID ~= dwID then
 			return false
 		end
@@ -874,6 +874,13 @@ function D.CheckKungFu(tKungFu)
 	return false
 end
 
+function D.GetTargetHandle(dwID)
+	if X.IsPlayer(dwID) then
+		return X.GetPlayer(dwID)
+	end
+	return X.GetNpc(dwID)
+end
+
 -- ÖÇÄÜ±ê¼ÇÂß¼­
 function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 	if not X.IsMarker() or bRestricted then
@@ -885,7 +892,7 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 		if szType == 'NPC' then
 			for nMark, bMark in ipairs(tMark) do
 				if bMark and tTeamMark[nMark] ~= dwCharacterID then
-					tar = tTeamMark[nMark] and tTeamMark[nMark] ~= 0 and X.GetObject(tTeamMark[nMark])
+					tar = tTeamMark[nMark] and tTeamMark[nMark] ~= 0 and D.GetTargetHandle(tTeamMark[nMark])
 					if not tar or tar.dwTemplateID ~= dwID then
 						return nMark, dwCharacterID
 					end
@@ -894,7 +901,7 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 		elseif szType == 'BUFF' or szType == 'DEBUFF' then
 			for nMark, bMark in ipairs(tMark) do
 				if bMark and tTeamMark[nMark] ~= dwCharacterID then
-					tar = tTeamMark[nMark] and tTeamMark[nMark] ~= 0 and X.GetObject(tTeamMark[nMark])
+					tar = tTeamMark[nMark] and tTeamMark[nMark] ~= 0 and D.GetTargetHandle(tTeamMark[nMark])
 					if not tar or not X.GetBuff(tar, dwID) then
 						return nMark, dwCharacterID
 					end
@@ -1182,7 +1189,7 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		local KObject = X.IsPlayer(dwCaster) and X.GetPlayer(dwCaster) or X.GetNpc(dwCaster)
 		if KObject then
 			szSender = X.GetObjectName(KObject)
-			szReceiver = X.GetObjectName(X.GetObject(KObject.GetTarget()), 'auto')
+			szReceiver = X.GetObjectName(X.GetTargetHandle(KObject.GetTarget()), 'auto')
 		else
 			szSender = X.GetObjectName(X.IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
 		end
@@ -1754,7 +1761,7 @@ function D.OnDeath(dwCharacterID, dwKiller)
 		local data = D.GetData('NPC', npc.dwTemplateID)
 		if data then
 			local dwTemplateID = npc.dwTemplateID
-			local szSender = X.GetObjectName(X.GetObject(dwKiller), 'auto')
+			local szSender = X.GetObjectName(D.GetTargetHandle(dwKiller), 'auto')
 			local szReceiver = X.GetObjectName(npc)
 			D.CountdownEvent(data, MY_TEAM_MON_TYPE.NPC_DEATH, szSender, szReceiver)
 			local bAllDeath = true

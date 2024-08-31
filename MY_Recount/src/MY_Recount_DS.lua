@@ -706,6 +706,14 @@ end
 --       # #       #   #         #   #   # # # # #     #   #                     #   # # # # # #      --
 --   # #     #   #       #     # # #     #       #   #       # # # # # # #       #             #      --
 -- ################################################################################################## --
+
+function D.GetTargetHandle(dwID)
+	if X.IsPlayer(dwID) then
+		return X.GetPlayer(dwID)
+	end
+	return X.GetNpc(dwID)
+end
+
 -- 记录一次LOG
 -- D.ProcessSkillEffect(dwCaster, dwTarget, nEffectType, dwID, dwLevel, nSkillResult, nResultCount, tResult)
 -- (number) dwCaster    : 释放者ID
@@ -719,9 +727,9 @@ end
 do local KCaster, dwCasterEmployer, KTarget, dwTargetEmployer, me, szEffectID, nTherapy, nEffectTherapy, nDamage, nEffectDamage, szType
 function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	-- 获取释放对象
-	KCaster, dwCasterEmployer = X.GetObject(dwCaster), nil
+	KCaster, dwCasterEmployer = D.GetTargetHandle(dwCaster), nil
 	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 and not X.IsPartnerNpc(KCaster.dwTemplateID) then -- 宠物的数据算在主人统计中，侠客除外
-		KCaster = X.GetObject(KCaster.dwEmployer)
+		KCaster = D.GetTargetHandle(KCaster.dwEmployer)
 	end
 	if not KCaster then
 		return
@@ -732,7 +740,7 @@ function D.ProcessSkillEffect(nLFC, nTime, nTick, dwCaster, dwTarget, nEffectTyp
 	dwCaster = KCaster.dwID
 
 	-- 获取承受对象
-	KTarget, dwTargetEmployer = X.GetObject(dwTarget), nil
+	KTarget, dwTargetEmployer = D.GetTargetHandle(dwTarget), nil
 	if not KTarget then
 		return
 	end
@@ -817,7 +825,7 @@ end
 
 do local KCaster
 function D.ProcessBuffUpdate(nLFC, nTime, nTick, dwCaster, dwTarget, dwBuffID, dwBuffLevel, nStackNum, bDelete, nEndFrame, bCanCancel)
-	KCaster = X.GetObject(dwCaster)
+	KCaster = D.GetTargetHandle(dwCaster)
 	if KCaster and not X.IsPlayer(dwCaster) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 and not X.IsPartnerNpc(KCaster.dwTemplateID) then -- 宠物的数据算在主人统计中，侠客除外
 		dwCaster = KCaster.dwEmployer
 	end

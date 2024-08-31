@@ -27,7 +27,7 @@ local D = {}
 -----------------------------------------------
 local Station, SetTarget = Station, SetTarget
 local Target_GetTargetData = Target_GetTargetData
-local MY_GetBuff, MY_GetEndTime, MY_GetObject = X.GetBuff, X.GetEndTime, X.GetObject
+local MY_GetBuff, MY_GetEndTime = X.GetBuff, X.GetEndTime
 local CFG                    = MY_Cataclysm.CFG
 local CTM_BG_COLOR_MODE      = MY_Cataclysm.BG_COLOR_MODE
 -- global STR cache
@@ -785,7 +785,7 @@ function CTM:RefreshTTarget()
 	if CFG.bShowTargetTargetAni then
 		local dwType, dwID = Target_GetTargetData()
 		if dwID then
-			local KObject = MY_GetObject(dwID)
+			local KObject = X.GetTargetHandle(dwType, dwID)
 			if KObject then
 				local dwTarType, dwTarID = KObject.GetTarget()
 				if dwTarType == TARGET.NPC and CHANGGE_REAL_SHADOW_CACHE[dwTarID] then

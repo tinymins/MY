@@ -439,7 +439,7 @@ function D.OnApplyRequest(event)
 	info.nClientVersionType = nClientVersionType
 	info.dwDelayTime = nil
 	-- ªÒ»°dwID
-	local tar = X.GetObject(TARGET.PLAYER, szName)
+	local tar = X.GetTargetHandle(TARGET.PLAYER, szName)
 	if not info.dwID and tar then
 		info.dwID = tar.dwID
 	end

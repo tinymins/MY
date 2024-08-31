@@ -177,7 +177,7 @@ function D.DrawObject(dwType, dwID, KObject)
 		return
 	end
 	if not KObject then
-		KObject = X.GetObject(dwType, dwID)
+		KObject = X.GetTargetHandle(dwType, dwID)
 	end
 	if not KObject then
 		return
@@ -208,7 +208,7 @@ function D.DrawObject(dwType, dwID, KObject)
 			dwTarType, dwTarID = KObject.GetTarget()
 		end
 
-		local tar = X.GetObject(dwTarType, dwTarID) or X.GetClientPlayer()
+		local tar = X.GetTargetHandle(dwTarType, dwTarID) or X.GetClientPlayer()
 
 		if not cache.bDrawLineOnlyStareMe or dwTarID == X.GetClientPlayerID() then
 			if not cache.shaLine or cache.shaLine.dwTarID ~= dwTarID then
@@ -253,7 +253,7 @@ function D.DrawObject(dwType, dwID, KObject)
 end
 
 function D.OnObjectEnterScene(dwType, dwID)
-	local tar = X.GetObject(dwType, dwID)
+	local tar = X.GetTargetHandle(dwType, dwID)
 	local rule = CIRCLE_RULE[dwType][tar.dwTemplateID]
 	if rule and (not rule.bDrawOnlyMyEmployer or dwType ~= TARGET.NPC or tar.dwEmployer == X.GetClientPlayerID()) then
 		local cache = setmetatable({}, { __index = rule })

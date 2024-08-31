@@ -539,7 +539,13 @@ X.RegisterEvent('SHOP_OPENSHOP', 'MY_ShareKnowledge__ShareShop', function()
 		return
 	end
 	local szNpcName = txtNpcName:GetText()
-	local KNpc = X.GetObject(TARGET.NPC, szNpcName)
+	local KNpc
+	for i, p in ipairs(X.GetNearNpc()) do
+		if X.GetNpcName(p.dwID) == szNpcName then
+			KNpc = p
+			break
+		end
+	end
 	if not KNpc then
 		return
 	end

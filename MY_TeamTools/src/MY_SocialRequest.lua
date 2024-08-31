@@ -133,7 +133,13 @@ function D.OnMessageBoxOpen()
 					X.Call(fnRefuse)
 				end
 				-- ªÒ»°dwID
-				local tar = X.GetObject(TARGET.PLAYER, szName)
+				local tar
+				for _, p in ipairs(X.GetNearPlayer()) do
+					if p.szName == szName then
+						tar = p
+						break
+					end
+				end
 				if not info.dwID and tar then
 					info.dwID = tar.dwID
 				end

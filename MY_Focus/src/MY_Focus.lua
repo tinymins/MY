@@ -391,7 +391,7 @@ function D.RemoveFocusPattern(szPattern)
 		-- 全字符匹配模式：检查是否在永久焦点中 没有则删除Handle （节约性能）
 		for i = #FOCUS_LIST, 1, -1 do
 			local p = FOCUS_LIST[i]
-			local KObject = X.GetObject(p.dwType, p.dwID)
+			local KObject = X.GetTargetHandle(p.dwType, p.dwID)
 			local dwTemplateID = p.dwType == TARGET.PLAYER and p.dwID or KObject.dwTemplateID
 			if KObject and X.GetObjectName(KObject, 'never') == szPattern
 			and not l_tTempFocusList[p.dwType][p.dwID]
@@ -409,7 +409,7 @@ end
 function D.SetFocusID(dwType, dwID, bSave)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
 	if bSave then
-		local KObject = X.GetObject(dwType, dwID)
+		local KObject = X.GetTargetHandle(dwType, dwID)
 		local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
 		if O.tStaticFocus[dwType][dwTemplateID] then
 			return
@@ -433,7 +433,7 @@ function D.RemoveFocusID(dwType, dwID)
 		l_tTempFocusList[dwType][dwID] = nil
 		D.OnObjectLeaveScene(dwType, dwID)
 	end
-	local KObject = X.GetObject(dwType, dwID)
+	local KObject = X.GetTargetHandle(dwType, dwID)
 	local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
 	if O.tStaticFocus[dwType][dwTemplateID] then
 		O.tStaticFocus[dwType][dwTemplateID] = nil
@@ -496,7 +496,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 	if not me then
 		return X.DelayCall(5000, function() D.OnObjectEnterScene(dwType, dwID) end)
 	end
-	local KObject = X.GetObject(dwType, dwID)
+	local KObject = X.GetTargetHandle(dwType, dwID)
 	if not KObject then
 		return
 	end
@@ -697,7 +697,7 @@ end
 
 -- 对象离开视野
 function D.OnObjectLeaveScene(dwType, dwID)
-	local KObject = X.GetObject(dwType, dwID)
+	local KObject = X.GetTargetHandle(dwType, dwID)
 	if KObject then
 		if dwType == TARGET.NPC then
 			if D.bReady and O.bFocusJJCParty
@@ -748,8 +748,8 @@ end
 function D.SortFocus(fn)
 	local p = X.GetClientPlayer()
 	fn = fn or function(p1, p2)
-		p1 = X.GetObject(p1.dwType, p1.dwID)
-		p2 = X.GetObject(p2.dwType, p2.dwID)
+		p1 = X.GetTargetHandle(p1.dwType, p1.dwID)
+		p2 = X.GetTargetHandle(p2.dwType, p2.dwID)
 		if p1 and p2 then
 			return math.pow(p.nX - p1.nX, 2) + math.pow(p.nY - p1.nY, 2) < math.pow(p.nX - p2.nX, 2) + math.pow(p.nY - p2.nY, 2)
 		end
@@ -776,7 +776,7 @@ function D.GetDisplayList()
 			if #t >= O.nMaxDisplay then
 				break
 			end
-			local KObject = X.GetObject(p.dwType, p.dwID)
+			local KObject = X.GetTargetHandle(p.dwType, p.dwID)
 			if KObject then
 				local fCurrentLife, fMaxLife
 				if p.dwType == TARGET.PLAYER or p.dwType == TARGET.NPC then

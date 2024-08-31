@@ -700,7 +700,7 @@ X.RegisterEvent('MY_PLAYER_FIGHT_HINT', function()
 	if not D.WillRecID(dwID) then
 		return
 	end
-	local KObject = X.GetObject(TARGET.PLAYER, dwID)
+	local KObject = X.GetTargetHandle(TARGET.PLAYER, dwID)
 	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = -1, -1, -1, -1
 	if KObject then
 		fCurrentLife, fMaxLife = X.GetObjectLife(KObject)
@@ -719,7 +719,7 @@ X.RegisterEvent('MY_NPC_FIGHT_HINT', function()
 	if not D.WillRecID(dwID) then
 		return
 	end
-	local KObject = X.GetObject(TARGET.NPC, dwID)
+	local KObject = X.GetTargetHandle(TARGET.NPC, dwID)
 	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = -1, -1, -1, -1
 	if KObject then
 		fCurrentLife, fMaxLife = X.GetObjectLife(KObject)

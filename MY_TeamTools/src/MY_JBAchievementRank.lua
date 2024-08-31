@@ -39,6 +39,13 @@ local BOSS_ACHIEVE_ACQUIRE_STATE = {} -- 当前地图首领击杀状态
 local DATA_FILE_OLD = {'data/boss_achieve_acquire.jx3dat', X.PATH_TYPE.ROLE}
 local DATA_FILE = {'userdata/achievement_rank_acquire.jx3dat', X.PATH_TYPE.ROLE}
 
+function D.GetTargetHandle(dwID)
+	if X.IsPlayer(dwID) then
+		return X.GetPlayer(dwID)
+	end
+	return X.GetNpc(dwID)
+end
+
 function D.LoadData()
 	local szPathOld = X.FormatPath(DATA_FILE_OLD)
 	local szPath = X.FormatPath(DATA_FILE)
@@ -74,9 +81,9 @@ X.RegisterEvent('SYS_MSG', function()
 		-- 技能最终产生的效果（生命值的变化）；
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
 		-- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResult：数值集合
-		local KCaster = X.GetObject(arg1)
+		local KCaster = D.GetTargetHandle(arg1)
 		if KCaster and not X.IsPlayer(arg1) and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
-			KCaster = X.GetObject(KCaster.dwEmployer)
+			KCaster = D.GetTargetHandle(KCaster.dwEmployer)
 		end
 		if KCaster and KCaster.dwID == X.GetClientPlayerID() then
 			D.dwDamage = D.dwDamage + (arg9[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0)

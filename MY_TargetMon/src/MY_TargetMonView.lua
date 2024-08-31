@@ -434,7 +434,7 @@ function MY_TargetMonView.OnItemRButtonClick()
 	local tViewData = frame.tViewData
 	if name == 'Box_Default' and tViewData.szType == 'BUFF' then
 		local hItem = this:GetParent():GetParent()
-		local KTarget = X.GetObject(MY_TargetMonData.GetTarget(tViewData.szTarget, tViewData.szType))
+		local KTarget = X.GetTargetHandle(MY_TargetMonData.GetTarget(tViewData.szTarget, tViewData.szType))
 		if not KTarget then
 			return
 		end

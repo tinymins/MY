@@ -120,9 +120,9 @@ function D.UpdateLine()
 	end
 	local me = X.GetClientPlayer()
 	local dwTarType, dwTarID = X.GetTarget(me)
-	local tar = X.GetObject(dwTarType, dwTarID)
+	local tar = X.GetTargetHandle(dwTarType, dwTarID)
 	local dwTTarType, dwTTarID = X.GetTarget(tar)
-	local ttar = X.GetObject(dwTTarType, dwTTarID)
+	local ttar = X.GetTargetHandle(dwTTarType, dwTTarID)
 	local dwTarLineSrcType, dwTarLineSrcID, dwTarLineDstType, dwTarLineDstID
 	local dwTTarLineSrcType, dwTTarLineSrcID, dwTTarLineDstType, dwTTarLineDstID
 	if not C.bRestricted then

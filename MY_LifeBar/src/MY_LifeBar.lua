@@ -711,7 +711,7 @@ local function onBreathe()
 	CheckInvalidRect(TARGET.PLAYER, me.dwID, me, me)
 	dwTarType, dwTarID = me.GetTarget()
 	if dwTarType == TARGET.PLAYER or dwTarType == TARGET.NPC then
-		KTar = X.GetObject(dwTarType, dwTarID)
+		KTar = X.GetTargetHandle(dwTarType, dwTarID)
 		if KTar then
 			CheckInvalidRect(dwTarType, dwTarID, me, KTar)
 		end
@@ -854,7 +854,7 @@ local function OnCharacterSay(dwID, nChannel, szMsg)
 		return
 	end
 	local dwType = X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
-	local object = X.GetObject(dwType, dwID)
+	local object = X.GetTargetHandle(dwType, dwID)
 	if not object then
 		return
 	end
