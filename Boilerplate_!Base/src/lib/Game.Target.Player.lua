@@ -283,11 +283,7 @@ end
 ---@param szName string @角色名
 ---@return string @去除跨服服务器后缀的角色名
 function X.ExtractPlayerOriginName(szName)
-	local nPos = X.StringFindW(szName, g_tStrings.STR_CONNECT)
-	if nPos then
-		szName = szName:sub(1, nPos - 1)
-	end
-	return szName
+	return (X.DisassemblePlayerGlobalName(szName))
 end
 
 -- 格式化基础角色名
