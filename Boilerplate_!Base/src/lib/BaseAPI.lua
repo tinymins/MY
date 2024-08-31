@@ -191,6 +191,25 @@ function X.GetItemInfo(dwTabType, dwTabIndex)
 	return GetItemInfo(dwTabType, dwTabIndex)
 end
 
+-- 获取目标对象
+---@param dwType number @目标类型
+---@param dwID number @目标ID
+---@return userdata | nil @目标对象，获取失败返回空
+function X.GetTargetHandle(dwType, dwID)
+	if GetTargetHandle then
+		return GetTargetHandle(dwType, dwID)
+	end
+	if dwType == TARGET.NPC then
+		return X.GetNpc(dwID)
+	end
+	if dwType == TARGET.PLAYER then
+		return X.GetPlayer(dwID)
+	end
+	if dwType == TARGET.DOODAD then
+		return X.GetDoodad(dwID)
+	end
+end
+
 local CLIENT_PLAYER_GLOBAL_ID
 function X.GetClientPlayerGlobalID()
 	if not CLIENT_PLAYER_GLOBAL_ID then
