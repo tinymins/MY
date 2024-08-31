@@ -245,7 +245,8 @@ function X.GetObjectName(arg0, arg1, arg2, arg3, arg4)
 						else
 							szEmpName = g_tStrings.STR_SOME_BODY
 						end
-						szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. szName
+						local szBaseName, szSuffixName, szServerName = X.DisassemblePlayerName(szEmpName)
+						szName = X.AssemblePlayerName(szBaseName .. g_tStrings.STR_PET_SKILL_LOG .. szName, szSuffixName, szServerName)
 					end
 				else
 					cache.bFull = true

@@ -124,7 +124,7 @@ local function OnGetPlayerEquipInfoPeekPlayer(player)
 			-- 五行石
 			local aSlotItem = {}
 			for i = 1, item.GetSlotCount() do
-				local nEnchantID = item.GetMountDiamondEnchantID(i - 1)
+				local nEnchantID = X.GetItemMountDiamondEnchantID(item, i - 1)
 				if nEnchantID and nEnchantID > 0 then
 					local dwTabType, dwTabIndex = GetDiamondInfoFromEnchantID(nEnchantID)
 					if dwTabType and dwTabIndex then
@@ -133,7 +133,7 @@ local function OnGetPlayerEquipInfoPeekPlayer(player)
 				end
 			end
 			-- 五彩石
-			local nEnchantID = item.GetMountFEAEnchantID()
+			local nEnchantID = X.GetItemMountFEAEnchantID(item)
 			if nEnchantID and nEnchantID ~= 0 then
 				local dwTabType, dwTabIndex = GetColorDiamondInfoFromEnchantID(nEnchantID)
 				if dwTabType and dwTabIndex then
