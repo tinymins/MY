@@ -141,4 +141,46 @@ function X.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 	return math.floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2 + (nZ1 / 8 - nZ2 / 8) ^ 2) ^ 0.5) / 64
 end
 
+-- 获取两个3D坐标点之间的距离
+---@param nX1 userdata @点1的X坐标
+---@param nY1 userdata @点1的Y坐标
+---@param nZ1 userdata @点1的Z坐标
+---@param nX2 userdata @点2的X坐标
+---@param nY2 userdata @点2的Y坐标
+---@param nZ2 userdata @点2的Z坐标
+---@param szType string @距离计算方式：'euclidean': 欧氏距离 (default)； 'plane': 平面距离； 'gwwean': 郭氏距离； 'global': 使用全局配置；
+---@return number @距离计算结果
+function X.Get3DPointDistance(nX1, nY1, nZ1, nX2, nY2, nZ2, szType)
+	if not szType or szType == 'global' then
+		szType = X.GetGlobalDistanceType()
+	end
+	if szType == 'plane' then
+		return math.floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2) ^ 0.5) / 64
+	end
+	if szType == 'gwwean' then
+		return math.max(math.floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2) ^ 0.5) / 64, math.floor(math.abs(nZ1 / 8 - nZ2 / 8)) / 64)
+	end
+	return math.floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2 + (nZ1 / 8 - nZ2 / 8) ^ 2) ^ 0.5) / 64
+end
+
+-- 获取两个2D坐标点之间的距离
+---@param nX1 userdata @点1的X坐标
+---@param nY1 userdata @点1的Y坐标
+---@param nX2 userdata @点2的X坐标
+---@param nY2 userdata @点2的Y坐标
+---@param szType string @距离计算方式：'euclidean': 欧氏距离 (default)； 'plane': 平面距离； 'gwwean': 郭氏距离； 'global': 使用全局配置；
+---@return number @距离计算结果
+function X.Get2DPointDistance(nX1, nY1, nX2, nY2, szType)
+	return X.Get3DPointDistance(nX1, nY1, 0, nX2, nY2, 0, szType)
+end
+
+-- 获取两个目标之间的距离
+---@param kTar1 userdata @目标1
+---@param kTar2 userdata @目标2
+---@param szType string @距离计算方式：'euclidean': 欧氏距离 (default)； 'plane': 平面距离； 'gwwean': 郭氏距离； 'global': 使用全局配置；
+---@return number @距离计算结果
+function X.GetTargetDistance(kTar1, kTar2, szType)
+	return X.Get3DPointDistance(kTar1.nX, kTar1.nY, kTar1.nZ, kTar2.nX, kTar2.nY, kTar2.nZ, szType)
+end
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
