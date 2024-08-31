@@ -115,7 +115,7 @@ X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#Bosslist'), function()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
 		local p = X.GetObject(dwType, dwID)
-		local szName = X.GetObjectName(p)
+		local szName = X.GetNpcName(p.dwID)
 		local dwMapID = X.GetClientPlayer().GetMapID()
 		local szMapName = Table_GetMapName(dwMapID)
 		local dwTemplateID = p.dwTemplateID
@@ -249,7 +249,7 @@ X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#ImportantNpclist'), funct
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
 		local p = X.GetObject(dwType, dwID)
-		local szName = X.GetObjectName(p)
+		local szName = X.GetNpcName(p.dwID)
 		local dwMapID = X.GetClientPlayer().GetMapID()
 		local szMapName = Table_GetMapName(dwMapID)
 		local dwTemplateID = p.dwTemplateID

@@ -1,0 +1,216 @@
+--------------------------------------------------------------------------------
+-- This file is part of the JX3 Plugin Project.
+-- @desc     : 游戏环境库
+-- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
+--------------------------------------------------------------------------------
+---@type Boilerplate
+local X = Boilerplate
+--------------------------------------------------------------------------------
+local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Game.KObject.Name')
+--------------------------------------------------------------------------------
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
+local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
+--------------------------------------------------------------------------------
+
+local CACHE = {}
+
+local function StandardizeOption(tOption)
+	if not tOption then
+		tOption = {}
+	end
+	if not tOption.eShowID then
+		tOption.eShowID = 'auto'
+	end
+	return tOption
+end
+
+local function FormatShowName(szName, szID, eShowID)
+	if szName == '' then
+		szName = nil
+	end
+	if eShowID == 'never' then
+		return szName
+	end
+	if not szName then
+		return szID
+	end
+	if eShowID == 'auto' then
+		return szName
+	end
+	if eShowID == 'always' then
+		return szName .. '(' .. szID .. ')'
+	end
+end
+
+local function CacheSet(szCacheID, xKey, szName)
+	if not CACHE[szCacheID] then
+		CACHE[szCacheID] = X.CreateCache('LIB#NameCache#' .. szCacheID, 'v')
+	end
+	CACHE[szCacheID][xKey] = {szName}
+end
+
+local function CacheGet(szCacheID, xKey)
+	return CACHE[szCacheID]
+		and CACHE[szCacheID][xKey]
+		and CACHE[szCacheID][xKey][1]
+		or nil
+end
+
+-- 获取指定玩家名称
+---@param dwID number @要获取的玩家角色ID
+---@param tOption? table @获取参数
+---@return string | nil @获取成功返回名称，失败返回空
+function X.GetPlayerName(dwID, tOption)
+	local tOption = StandardizeOption(tOption)
+	local szCacheID = 'PLAYER.' .. tOption.eShowID
+	local xKey = dwID
+	local szName = CacheGet(szCacheID, xKey)
+	if not szName then
+		local bCache = false
+		local kPlayer = X.GetPlayer(dwID)
+		if kPlayer then
+			szName = kPlayer and kPlayer.szName
+			bCache = szName ~= ''
+		end
+		szName = FormatShowName(szName, 'P' .. dwID, tOption.eShowID)
+		if bCache then
+			CacheSet(szCacheID, xKey, szName)
+		end
+	end
+	return szName
+end
+
+-- 获取指定系统角色名称
+---@param dwID number @要获取的系统角色ID
+---@param tOption? table @获取参数
+---@return string | nil @获取成功返回名称，失败返回空
+function X.GetNpcName(dwID, tOption)
+	local tOption = StandardizeOption(tOption)
+	local szCacheID = 'NPC.' .. tOption.eShowID
+	local xKey = dwID
+	local szName = CacheGet(szCacheID, xKey, szCacheID)
+	if not szName then
+		local bCache = false
+		local kNpc = X.GetNpc(dwID)
+		if kNpc then
+			szName = kNpc.szName
+			if X.IsEmpty(szName) then
+				szName = X.GetTemplateName(TARGET.NPC, kNpc.dwTemplateID)
+			end
+			if kNpc.dwEmployer and kNpc.dwEmployer ~= 0 then
+				if X.Table.IsSimplePlayer(kNpc.dwTemplateID) then -- 长歌影子
+					szName = X.GetPlayerName(X.GetPlayer(kNpc.dwEmployer), tOption)
+				elseif not X.IsEmpty(szName) then
+					local szEmpName
+					if X.IsPlayer(kNpc.dwEmployer) then
+						szEmpName = X.GetPlayerName(X.GetPlayer(kNpc.dwEmployer), { eShowID = 'never' })
+					else
+						szEmpName = X.GetNpcName(X.GetNpc(kNpc.dwEmployer), { eShowID = 'never' })
+					end
+					if szEmpName then
+						bCache = true
+					else
+						szEmpName = g_tStrings.STR_SOME_BODY
+					end
+					local szBaseName, szSuffixName, szServerName = X.DisassemblePlayerName(szEmpName)
+					szName = X.AssemblePlayerName(szBaseName .. g_tStrings.STR_PET_SKILL_LOG .. szName, szSuffixName, szServerName)
+				end
+			else
+				bCache = true
+			end
+		end
+		local szID = 'N' .. X.ConvertNpcID(dwID)
+		if kNpc then
+			szID = szID .. '@' .. kNpc.dwTemplateID
+		end
+		szName = FormatShowName(szName, szID, tOption.eShowID)
+		if bCache then
+			CacheSet(szCacheID, xKey, szName)
+		end
+	end
+	return szName
+end
+
+-- 获取指定交互物件名称
+---@param dwID number @要获取的交互物件ID
+---@param tOption? table @获取参数
+---@return string | nil @获取成功返回名称，失败返回空
+function X.GetDoodadName(dwID, tOption)
+	local tOption = StandardizeOption(tOption)
+	local szCacheID = 'DOODAD.' .. tOption.eShowID
+	local xKey = dwID
+	local szName = CacheGet(szCacheID, xKey)
+	if not szName then
+		local bCache = false
+		local kDoodad = X.GetDoodad(dwID)
+		if kDoodad then
+			szName = X.Table.GetDoodadTemplateName(kDoodad.dwTemplateID)
+			if szName then
+				szName = szName:gsub('^%s*(.-)%s*$', '%1')
+			end
+			bCache = true
+		end
+		szName = FormatShowName(szName, 'D' .. dwID, tOption.eShowID)
+		if bCache then
+			CacheSet(szCacheID, xKey, szName)
+		end
+	end
+	return szName
+end
+
+-- 获取指定物品名称
+---@param dwID number @要获取的物品ID
+---@param tOption? table @获取参数
+---@return string | nil @获取成功返回名称，失败返回空
+function X.GetItemName(dwID, tOption)
+	local tOption = StandardizeOption(tOption)
+	local szCacheID = 'ITEM.' .. tOption.eShowID
+	local xKey = dwID
+	local szName = CacheGet(szCacheID, xKey)
+	if not szName then
+		local bCache = false
+		local kItem = X.GetItem(dwID)
+		if kItem then
+			szName = X.GetItemNameByItem(kItem)
+			bCache = true
+		end
+		szName = FormatShowName(szName, 'I' .. dwID, tOption.eShowID)
+		if bCache then
+			CacheSet(szCacheID, xKey, szName)
+		end
+	end
+	return szName
+end
+
+-- 获取指定物品信息名称
+---@param dwTabType number @要获取的物品信息表类型
+---@param dwTabIndex number @要获取的物品信息表下标
+---@param nBookInfo? number @要获取的物品信息书籍信息
+---@param tOption? table @获取参数
+---@return string | nil @获取成功返回名称，失败返回空
+function X.GetItemInfoName(dwTabType, dwTabIndex, nBookInfo, tOption)
+	local tOption = StandardizeOption(tOption)
+	local szCacheID = 'ITEM_INFO.' .. tOption.eShowID
+	local xKey = dwTabType .. ':' .. dwTabIndex .. ':' .. (nBookInfo or 0)
+	local szName = CacheGet(szCacheID, xKey)
+	if not szName then
+		local bCache = false
+		local kItemInfo = X.GetItemInfo(dwTabType, dwTabIndex)
+		if kItemInfo then
+			szName = X.GetItemNameByItemInfo(kItemInfo)
+			bCache = true
+		end
+		local szID = dwTabType .. ':' .. dwTabIndex
+		if nBookInfo then
+			szID = szID .. ':' .. nBookInfo
+		end
+		szName = FormatShowName(szName, 'II' .. szID, tOption.eShowID)
+		if bCache then
+			CacheSet(szCacheID, xKey, szName)
+		end
+	end
+	return szName
+end
+
+--[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
