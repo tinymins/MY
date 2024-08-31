@@ -16,18 +16,8 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -----------------------------------------------
 -- 事件驱动自动回收的缓存机制
 -----------------------------------------------
-function X.CreateCache(szNameMode, aEvent)
+function X.CreateCache(szName, szMode, aEvent)
 	-- 处理参数
-	local szName, szMode
-	if X.IsString(szNameMode) then
-		local nPos = X.StringFindW(szNameMode, '.')
-		if nPos then
-			szName = string.sub(szNameMode, 1, nPos - 1)
-			szMode = string.sub(szNameMode, nPos + 1)
-		else
-			szName = szNameMode
-		end
-	end
 	if X.IsString(aEvent) then
 		aEvent = {aEvent}
 	elseif X.IsArray(aEvent) then

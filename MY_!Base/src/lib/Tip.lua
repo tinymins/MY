@@ -328,7 +328,7 @@ function X.OutputNpcTip(Rect, dwID, szExtraXml)
 	local r, g, b = GetForceFontColor(dwID, me.dwID)
 	local t = {}
 
-	local szName = X.GetObjectName(npc)
+	local szName = X.GetNpcName(npc.dwID)
 	-- ∆¥“Ù
 	if IsCtrlKeyDown() then
 		local szPinyin = X.Han2TonePinyin(szName, true)[1]

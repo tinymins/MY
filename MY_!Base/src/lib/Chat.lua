@@ -1015,7 +1015,7 @@ end
 -- parse name in talking message
 local function ParseName(t)
 	local me = X.GetClientPlayer()
-	local tar = X.GetObject(me.GetTarget())
+	local tar = X.GetTargetHandle(me.GetTarget())
 	for i, v in ipairs(t) do
 		if v.type == 'text' then
 			v.text = string.gsub(v.text, '%$zj', '[' .. me.szName .. ']')

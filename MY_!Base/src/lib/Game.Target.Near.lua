@@ -105,7 +105,7 @@ function X.GetObject(arg0, arg1, arg2)
 end
 
 do
-local CACHE = X.CreateCache('LIB#GetObjectType.v')
+local CACHE = X.CreateCache('LIB#GetObjectType', 'v')
 -- 伪需求 有空删了
 function X.GetObjectType(obj)
 	if not CACHE[obj] then

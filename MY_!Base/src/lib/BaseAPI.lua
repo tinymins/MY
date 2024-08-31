@@ -176,6 +176,40 @@ function X.GetDoodad(dwID)
 	return GetDoodad(dwID)
 end
 
+-- 获取物品对象
+---@param dwID number @物品ID
+---@return userdata | nil @物品对象，获取失败返回空
+function X.GetItem(dwID)
+	return GetItem(dwID)
+end
+
+-- 获取物品信息对象
+---@param dwTabType number @物品信息表类型
+---@param dwTabIndex number @物品信息表下标
+---@return userdata | nil @物品信息对象，获取失败返回空
+function X.GetItemInfo(dwTabType, dwTabIndex)
+	return GetItemInfo(dwTabType, dwTabIndex)
+end
+
+-- 获取目标对象
+---@param dwType number @目标类型
+---@param dwID number @目标ID
+---@return userdata | nil @目标对象，获取失败返回空
+function X.GetTargetHandle(dwType, dwID)
+	if GetTargetHandle then
+		return GetTargetHandle(dwType, dwID)
+	end
+	if dwType == TARGET.NPC then
+		return X.GetNpc(dwID)
+	end
+	if dwType == TARGET.PLAYER then
+		return X.GetPlayer(dwID)
+	end
+	if dwType == TARGET.DOODAD then
+		return X.GetDoodad(dwID)
+	end
+end
+
 local CLIENT_PLAYER_GLOBAL_ID
 function X.GetClientPlayerGlobalID()
 	if not CLIENT_PLAYER_GLOBAL_ID then

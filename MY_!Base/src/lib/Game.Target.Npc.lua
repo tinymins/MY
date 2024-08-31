@@ -114,11 +114,11 @@ X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#Bosslist'), function()
 	local dwType, dwID = X.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
-		local p = X.GetObject(dwType, dwID)
-		local szName = X.GetObjectName(p)
+		local kNpc = X.GetNpc(dwID)
+		local szName = X.GetNpcName(kNpc.dwID)
 		local dwMapID = X.GetClientPlayer().GetMapID()
 		local szMapName = Table_GetMapName(dwMapID)
-		local dwTemplateID = p.dwTemplateID
+		local dwTemplateID = kNpc.dwTemplateID
 		if X.IsBoss(dwMapID, dwTemplateID) then
 			return {
 				szOption = _L['Remove from BOSS list'],
@@ -248,8 +248,8 @@ X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#ImportantNpclist'), funct
 	local dwType, dwID = X.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
-		local p = X.GetObject(dwType, dwID)
-		local szName = X.GetObjectName(p)
+		local p = X.GetNpc(dwID)
+		local szName = X.GetNpcName(p.dwID)
 		local dwMapID = X.GetClientPlayer().GetMapID()
 		local szMapName = Table_GetMapName(dwMapID)
 		local dwTemplateID = p.dwTemplateID

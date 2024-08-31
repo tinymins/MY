@@ -238,7 +238,7 @@ function X.GetInventoryItemPos(eType, dwTabType, dwIndex, nBookID)
 	local dwRetBox, dwRetX = nil, nil
 	if X.IsString(dwTabType) then
 		X.IterInventoryItem(eType, function(kItem, dwBox, dwX)
-			if X.GetObjectName('ITEM', kItem) == dwTabType then
+			if X.GetItemName(kItem.dwID) == dwTabType then
 				dwRetBox, dwRetX = dwBox, dwX
 				return 0
 			end
