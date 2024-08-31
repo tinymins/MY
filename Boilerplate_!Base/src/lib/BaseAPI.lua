@@ -183,6 +183,14 @@ function X.GetItem(dwID)
 	return GetItem(dwID)
 end
 
+-- 获取物品信息对象
+---@param dwTabType number @物品信息表类型
+---@param dwTabIndex number @物品信息表下标
+---@return userdata | nil @物品信息对象，获取失败返回空
+function X.GetItemInfo(dwTabType, dwTabIndex)
+	return GetItemInfo(dwTabType, dwTabIndex)
+end
+
 local CLIENT_PLAYER_GLOBAL_ID
 function X.GetClientPlayerGlobalID()
 	if not CLIENT_PLAYER_GLOBAL_ID then
