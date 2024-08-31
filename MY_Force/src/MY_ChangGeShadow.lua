@@ -82,7 +82,8 @@ function D.Apply()
 					hShaList:AppendItemFromString('<shadow></shadow>')
 					sha = hShaList:Lookup(i)
 				end
-				nDis = X.GetTargetDistance(me, X.GetNpc(hItem.nNpcID))
+				local kNpc = X.GetNpc(hItem.nNpcID)
+				nDis = kNpc and X.GetTargetDistance(me, kNpc) or -1
 				if hItem.szState == 'disable' then
 					r, g, b = 191, 31, 31
 				else
