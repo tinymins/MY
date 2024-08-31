@@ -37,7 +37,7 @@ end
 -- (dwType, dwID) X.GetTargetTarget(object) -- 取得指定操作对象当前的目标的目标类型和ID
 function X.GetTargetTarget(object)
 	local nTarType, dwTarID = X.GetTarget(object)
-	local KTar = X.GetObject(nTarType, dwTarID)
+	local KTar = X.GetTargetHandle(nTarType, dwTarID)
 	if not KTar then
 		return
 	end
