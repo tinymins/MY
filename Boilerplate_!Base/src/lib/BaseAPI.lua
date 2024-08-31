@@ -176,6 +176,13 @@ function X.GetDoodad(dwID)
 	return GetDoodad(dwID)
 end
 
+-- 获取物品对象
+---@param dwID number @物品ID
+---@return userdata | nil @物品对象，获取失败返回空
+function X.GetItem(dwID)
+	return GetItem(dwID)
+end
+
 local CLIENT_PLAYER_GLOBAL_ID
 function X.GetClientPlayerGlobalID()
 	if not CLIENT_PLAYER_GLOBAL_ID then
