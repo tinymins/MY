@@ -285,8 +285,8 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_R/Handle_LMN/Image_Mana'):SetPercentage(1)
 		hItem:Lookup('Handle_R/Handle_LMN/Text_Mana'):SetText('')
 	else
-		local fCurrentLife, fMaxLife = X.GetObjectLife(tMemberInfo)
-		local nCurrentMana, nMaxMana = tMemberInfo.nCurrentMana, tMemberInfo.nMaxMana
+		local fCurrentLife, fMaxLife = X.GetObjectLife(tMemberInfo or KObject)
+		local nCurrentMana, nMaxMana = tMemberInfo and tMemberInfo.nCurrentMana or KObject.nCurrentMana, tMemberInfo and tMemberInfo.nMaxMana or KObject.nMaxMana
 		local szLife = X.FormatNumberDot(fCurrentLife, 1, false, true)
 		if fMaxLife > 0 then
 			local nPercent = math.floor(fCurrentLife / fMaxLife * 100)
