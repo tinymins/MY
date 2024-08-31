@@ -286,15 +286,47 @@ function X.ExtractPlayerOriginName(szName)
 	return (X.DisassemblePlayerGlobalName(szName))
 end
 
+-- 拼接角色完整名
+---@param szName string @角色原始名
+---@param szSuffix? string @角色后缀名
+---@param szServerName? string @角色服务器名
+---@return string @角色完整名
+function X.AssemblePlayerName(szName, szSuffix, szServerName)
+	if szSuffix then
+		szName = szName .. szSuffix
+	end
+	if szServerName then
+		szName = szName .. g_tStrings.STR_CONNECT .. szServerName
+	end
+	return szName
+end
+
+-- 拆分角色名、后缀、角色服务器
+---@param szGlobalName string @角色跨服名，本服可不加后缀
+---@param bFallbackServerName boolean @角色名不包含服务器时是否视为当前主服务器角色
+---@return string, string, string | nil @角色原始名, 角色后缀名, 角色所在服务器名
+function X.DisassemblePlayerName(szGlobalName, bFallbackServerName)
+	local nPos, szServerName = X.StringFindW(szGlobalName, g_tStrings.STR_CONNECT), nil
+	if nPos then
+		szServerName = szGlobalName:sub(nPos + #g_tStrings.STR_CONNECT)
+		szGlobalName = szGlobalName:sub(1, nPos - 1)
+	end
+	if bFallbackServerName and not szServerName then
+		szServerName = X.GetServerOriginName()
+	end
+	local nPos, szSuffix = X.StringFindW(szGlobalName, '@'), ''
+	if nPos then
+		szSuffix = szGlobalName:sub(nPos)
+		szGlobalName = szGlobalName:sub(1, nPos - 1)
+	end
+	return szGlobalName, szSuffix, szServerName
+end
+
 -- 格式化基础角色名
 ---@param szName string @角色名
 ---@return string @去除跨服服务器后缀和转服后缀的角色名
 function X.ExtractPlayerBaseName(szName)
-	local nPos = X.StringFindW(szName, '@')
-	if nPos then
-		szName = szName:sub(1, nPos - 1)
-	end
-	return X.ExtractPlayerOriginName(szName)
+	return (X.DisassemblePlayerName(szName))
 end
 
 --------------------------------------------------------------------------------
