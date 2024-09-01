@@ -491,7 +491,7 @@ function D.SyncSystemGKP()
 			dwForceID  = dwForceID or 0,
 			szPlayer   = v.szDestPlayerName or 0,
 			nMoney     = v.nPrice or 0,
-			szNpcName  = X.IsEmpty(v.dwNpcTemplateID) and _L['Add Manually'] or X.GetTemplateName(TARGET.NPC, v.dwNpcTemplateID),
+			szNpcName  = X.IsEmpty(v.dwNpcTemplateID) and _L['Add Manually'] or X.GetNpcTemplateName(v.dwNpcTemplateID),
 		}
 		if item then
 			local szName = X.GetItemName(v.dwItemID, { eShowID = 'never' })

@@ -1181,12 +1181,12 @@ function D.GetDataName(szType, data)
 		szName, nIcon = X.GetSkillName(data.dwID, data.nLevel)
 	elseif szType == 'NPC' then
 		if data.dwID then
-			szName = X.GetTemplateName(TARGET.NPC, data.dwID) or data.dwID
+			szName = X.GetNpcTemplateName(data.dwID) or data.dwID
 			nIcon = data.nFrame
 		end
 	elseif szType == 'DOODAD' then
 		local doodad = GetDoodadTemplate(data.dwID)
-		szName = X.GetTemplateName(TARGET.DOODAD, data.dwID) or data.dwID
+		szName = X.GetDoodadTemplateName(data.dwID) or data.dwID
 		nIcon  = doodad and MY_TEAM_MON__UI__DOODAD_ICON[doodad.nKind] or 13
 	elseif szType == 'TALK' or szType == 'CHAT' then
 		szName = data.szContent

@@ -457,7 +457,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			else
 				local p = MY_GetNpc(v.id)
 				if p then
-					local szTemplateName = X.GetTemplateName(TARGET.NPC, p.dwTemplateID)
+					local szTemplateName = X.GetNpcTemplateName(p.dwTemplateID)
 					if szTemplateName then
 						szName = szTemplateName
 					end

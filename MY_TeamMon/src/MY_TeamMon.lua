@@ -1570,7 +1570,7 @@ function D.OnDoodadAllLeave(dwTemplateID)
 	local data = D.GetData('DOODAD', dwTemplateID)
 	if data then
 		local szSender = nil
-		local szReceiver = X.GetTemplateName(TARGET.DOODAD, dwTemplateID)
+		local szReceiver = X.GetDoodadTemplateName(dwTemplateID)
 		D.CountdownEvent(data, MY_TEAM_MON_TYPE.DOODAD_ALLLEAVE, szSender, szReceiver)
 	end
 end
@@ -1785,7 +1785,7 @@ function D.OnNpcFight(dwTemplateID, bFight)
 	local data = D.GetData('NPC', dwTemplateID)
 	if data then
 		local szSender = nil
-		local szReceiver = X.GetTemplateName(TARGET.NPC, dwTemplateID)
+		local szReceiver = X.GetNpcTemplateName(dwTemplateID)
 		if bFight then
 			D.CountdownEvent(data, MY_TEAM_MON_TYPE.NPC_FIGHT, szSender, szReceiver)
 		elseif data.tCountdown then -- 脱离的时候清空下
@@ -1808,7 +1808,7 @@ function D.OnNpcInfoChange(szEvent, dwTemplateID, nPer, bIncrease)
 	if data and data.tCountdown then
 		local dwType = szEvent == 'MY_TEAM_MON_NPC_LIFE_CHANGE' and MY_TEAM_MON_TYPE.NPC_LIFE or MY_TEAM_MON_TYPE.NPC_MANA
 		local szSender = nil
-		local szReceiver = X.GetTemplateName(TARGET.NPC, dwTemplateID)
+		local szReceiver = X.GetNpcTemplateName(dwTemplateID)
 		for k, v in ipairs(data.tCountdown) do
 			if v.nClass == dwType then
 				local aHPCountdown = ParseHPCountdown(v.nTime)
@@ -1868,7 +1868,7 @@ function D.OnNpcAllLeave(dwTemplateID)
 	end
 	local data = D.GetData('NPC', dwTemplateID)
 	local szSender = nil
-	local szReceiver = X.GetTemplateName(TARGET.NPC, dwTemplateID)
+	local szReceiver = X.GetNpcTemplateName(dwTemplateID)
 	if data then
 		D.CountdownEvent(data, MY_TEAM_MON_TYPE.NPC_ALLLEAVE, szSender, szReceiver)
 	end

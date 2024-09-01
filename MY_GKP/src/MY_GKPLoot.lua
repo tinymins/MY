@@ -285,7 +285,7 @@ function D.InsertSceneLoot()
 		if not D.tDoodadInfo[v.dwDoodadID] then
 			D.tDoodadInfo[v.dwDoodadID] = {
 				dwID   = v.dwDoodadID,
-				szName = X.GetTemplateName(TARGET.NPC, v.dwNpcTemplateID) or '',
+				szName = X.GetNpcTemplateName(v.dwNpcTemplateID) or '',
 			}
 		end
 		D.InsertLootList(v.dwDoodadID)
