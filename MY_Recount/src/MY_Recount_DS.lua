@@ -1244,22 +1244,14 @@ end
 
 -- 确认对象数据已创建（未创建则创建）
 function D.InitObjectData(data, dwID, szChannel)
+	local dwType = X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
 	-- 名称缓存
 	if not data[DK.NAME_LIST][dwID] then
-		data[DK.NAME_LIST][dwID] = X.GetTargetName(X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, { eShowID = 'never' }) -- 名称缓存
+		data[DK.NAME_LIST][dwID] = X.GetTargetName(dwType, dwID, { eShowID = 'never' }) -- 名称缓存
 	end
 	-- 短名称缓存
-	if not data[DK.BASE_NAME_LIST][dwID] and data[DK.NAME_LIST][dwID] then
-		if X.IsPlayer(dwID) then
-			data[DK.BASE_NAME_LIST][dwID] = X.ExtractPlayerBaseName(data[DK.NAME_LIST][dwID])
-		else
-			local kNpc = X.GetNpc(dwID)
-			if kNpc and kNpc.dwEmployer ~= 0 then
-				local szEmployerName = X.GetTargetName(X.IsPlayer(kNpc.dwEmployer) and TARGET.PLAYER or TARGET.NPC, kNpc.dwEmployer, { eShowID = 'never' })
-				local szEmployerBaseName = X.ExtractPlayerBaseName(szEmployerName)
-				data[DK.BASE_NAME_LIST][dwID] = X.StringReplaceW(data[DK.NAME_LIST][dwID], szEmployerName, szEmployerBaseName)
-			end
-		end
+	if not data[DK.BASE_NAME_LIST][dwID] then
+		data[DK.BASE_NAME_LIST][dwID] = X.GetTargetName(dwType, dwID, { eShowID = 'never', eShowEmployer = 'suffix', bShowSuffix = false, bShowServerName = false })
 	end
 	-- 势力缓存
 	if not data[DK.FORCE_LIST][dwID] then

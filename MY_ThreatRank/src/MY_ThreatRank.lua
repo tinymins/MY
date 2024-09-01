@@ -457,10 +457,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			else
 				local p = MY_GetNpc(v.id)
 				if p then
-					local szTemplateName = X.GetNpcTemplateName(p.dwTemplateID)
-					if szTemplateName then
-						szName = szTemplateName
-					end
+					szName = X.GetNpcName(p.dwID, { eShowEmployer = 'suffix' })
 					if p.dwEmployer == dwMeID then
 						r, g, b = 230, 230, 230
 					end
