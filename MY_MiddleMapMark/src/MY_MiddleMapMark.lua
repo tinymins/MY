@@ -461,7 +461,7 @@ local function OnDoodadEnterScene()
 		return
 	end
 	-- avoid full number named doodad
-	local szName = X.GetDoodadName(doodad, { eShowID = 'never' })
+	local szName = X.GetDoodadName(doodad.dwID, { eShowID = 'never' })
 	if not szName or X.TrimString(szName) == '' then
 		return
 	end
