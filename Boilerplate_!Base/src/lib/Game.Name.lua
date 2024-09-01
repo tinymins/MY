@@ -15,6 +15,15 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 local CACHE = {}
 
+---@class GetNameOption @获取名称通用参数
+---@field eShowID '"auto"' | '"always"' | '"never"' @是否显示ID
+---@field eShowEmployer '"none"' | '"prefix"' | '"suffix"' @是否显示所有者
+---@field bShowSuffix boolean @是否显示转服后缀
+---@field bShowServerName boolean @是否显示跨服后缀
+
+-- 标准化查询参数
+---@param tOption GetNameOption | nil @传入的参数
+---@return GetNameOption @标准化之后的参数
 local function StandardizeOption(tOption)
 	if not tOption then
 		tOption = {}
@@ -24,6 +33,12 @@ local function StandardizeOption(tOption)
 	end
 	if not tOption.eShowEmployer then
 		tOption.eShowEmployer = 'prefix'
+	end
+	if tOption.bShowSuffix == nil then
+		tOption.bShowSuffix = true
+	end
+	if tOption.bShowServerName == nil then
+		tOption.bShowServerName = true
 	end
 	return tOption
 end
@@ -62,11 +77,11 @@ end
 
 -- 获取指定玩家名称
 ---@param dwID number @要获取的玩家角色ID
----@param tOption? table @获取参数
+---@param tOption? GetNameOption @获取参数
 ---@return string | nil @获取成功返回名称，失败返回空
 function X.GetPlayerName(dwID, tOption)
 	local tOption = StandardizeOption(tOption)
-	local szCacheID = 'PLAYER.' .. tOption.eShowID
+	local szCacheID = 'PLAYER.' .. tOption.eShowID .. '.' .. (tOption.bShowSuffix and '1' or '0') .. (tOption.bShowServerName and '1' or '0')
 	local xKey = dwID
 	local szName = CacheGet(szCacheID, xKey)
 	if not szName then
@@ -74,7 +89,23 @@ function X.GetPlayerName(dwID, tOption)
 		local kPlayer = X.GetPlayer(dwID)
 		if kPlayer then
 			szName = kPlayer and kPlayer.szName
-			bCache = szName ~= ''
+			if szName == '' then
+				szName = nil
+			else
+				bCache = true
+			end
+		end
+		if szName then
+			if not tOption.bShowSuffix or not tOption.bShowServerName then
+				local szBaseName, szSuffixName, szServerName = X.DisassemblePlayerName(szName)
+				if not tOption.bShowSuffix then
+					szSuffixName = ''
+				end
+				if not tOption.bShowServerName then
+					szServerName = nil
+				end
+				szName = X.AssemblePlayerName(szBaseName, szSuffixName, szServerName)
+			end
 		end
 		szName = FormatShowName(szName, 'P' .. dwID, tOption.eShowID)
 		if bCache then
@@ -86,7 +117,7 @@ end
 
 -- 获取指定系统角色名称
 ---@param dwID number @要获取的系统角色ID
----@param tOption? table @获取参数
+---@param tOption? GetNameOption @获取参数
 ---@return string | nil @获取成功返回名称，失败返回空
 function X.GetNpcName(dwID, tOption)
 	local tOption = StandardizeOption(tOption)
@@ -107,10 +138,12 @@ function X.GetNpcName(dwID, tOption)
 				elseif not X.IsEmpty(szName) then
 					local szEmpName
 					if tOption.eShowEmployer == 'prefix' or tOption.eShowEmployer == 'suffix' then
+						local tEmpOption = X.Clone(tOption)
+						tEmpOption.eShowID = 'never'
 						if X.IsPlayer(kNpc.dwEmployer) then
-							szEmpName = X.GetPlayerName(kNpc.dwEmployer, { eShowID = 'never' })
+							szEmpName = X.GetPlayerName(kNpc.dwEmployer, tEmpOption)
 						else
-							szEmpName = X.GetNpcName(kNpc.dwEmployer, { eShowID = 'never' })
+							szEmpName = X.GetNpcName(kNpc.dwEmployer, tEmpOption)
 						end
 						if szEmpName then
 							bCache = true
@@ -145,7 +178,7 @@ end
 
 -- 根据模板ID获取系统角色名称
 ---@param dwTemplateID number @要获取的系统角色模板ID
----@param tOption? table @获取参数
+---@param tOption? GetNameOption @获取参数
 ---@return string | nil @获取成功返回名称，失败返回空
 function X.GetNpcTemplateName(dwTemplateID, tOption)
 	local tOption = StandardizeOption(tOption)
@@ -174,7 +207,7 @@ end
 
 -- 根据模板ID获取交互物件名称
 ---@param dwTemplateID number @要获取的交互物件模板ID
----@param tOption? table @获取参数
+---@param tOption? GetNameOption @获取参数
 ---@return string | nil @获取成功返回名称，失败返回空
 function X.GetDoodadTemplateName(dwTemplateID, tOption)
 	local tOption = StandardizeOption(tOption)
@@ -203,7 +236,7 @@ end
 
 -- 获取指定交互物件名称
 ---@param dwID number @要获取的交互物件ID
----@param tOption? table @获取参数
+---@param tOption? GetNameOption @获取参数
 ---@return string | nil @获取成功返回名称，失败返回空
 function X.GetDoodadName(dwID, tOption)
 	local tOption = StandardizeOption(tOption)
@@ -231,7 +264,7 @@ end
 -- 获取指定目标名称
 ---@param dwType number @目标类型
 ---@param dwID number @目标ID
----@param tOption? table @获取参数
+---@param tOption? GetNameOption @获取参数
 ---@return string | nil @获取成功返回名称，失败返回空
 function X.GetTargetName(dwType, dwID, tOption)
 	if dwType == TARGET.NPC then
@@ -247,7 +280,7 @@ end
 
 -- 获取指定物品名称
 ---@param dwID number @要获取的物品ID
----@param tOption? table @获取参数
+---@param tOption? GetNameOption @获取参数
 ---@return string | nil @获取成功返回名称，失败返回空
 function X.GetItemName(dwID, tOption)
 	local tOption = StandardizeOption(tOption)
@@ -273,7 +306,7 @@ end
 ---@param dwTabType number @要获取的物品信息表类型
 ---@param dwTabIndex number @要获取的物品信息表下标
 ---@param nBookInfo? number @要获取的物品信息书籍信息
----@param tOption? table @获取参数
+---@param tOption? GetNameOption @获取参数
 ---@return string | nil @获取成功返回名称，失败返回空
 function X.GetItemInfoName(dwTabType, dwTabIndex, nBookInfo, tOption)
 	local tOption = StandardizeOption(tOption)
