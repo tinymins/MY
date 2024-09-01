@@ -145,8 +145,8 @@ function D.HookDomesticatePanel()
 							end
 							D.SetAutoFeed(dwCubTabType, dwCubTabIndex, dwFoodTabType, dwFoodTabIndex)
 
-							local szFoodName = X.GetObjectName('ITEM_INFO', dwFoodTabType, dwFoodTabIndex)
-							local szDomesticateName = X.GetObjectName('ITEM_INFO', dwCubTabType, dwCubTabIndex)
+							local szFoodName = X.GetItemInfoName(dwFoodTabType, dwFoodTabIndex)
+							local szDomesticateName = X.GetItemInfoName(dwCubTabType, dwCubTabIndex)
 							if D.IsAutoFeedValid(me) then
 								X.OutputSystemAnnounceMessage(_L('Set domesticate auto feed %s to %s succeed, will auto feed when hunger point reach %d.',
 									szFoodName,
@@ -189,7 +189,7 @@ function D.CheckAutoFeedEnable()
 				return
 			end
 			if domesticate.nGrowthLevel >= domesticate.nMaxGrowthLevel then
-				local szDomesticate = X.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+				local szDomesticate = X.GetItemInfoName(domesticate.dwCubTabType, domesticate.dwCubTabIndex)
 				X.OutputSystemAnnounceMessage(_L('Your domesticate %s is growth up!', szDomesticate))
 				return
 			end
@@ -209,8 +209,8 @@ function D.CheckAutoFeedEnable()
 				end)
 			end
 			if nRound > 0 and not bFeed then
-				local szFood = X.GetObjectName('ITEM_INFO', O.dwAutoFeedFoodTabType, O.dwAutoFeedFoodTabIndex)
-				local szDomesticate = X.GetObjectName('ITEM_INFO', O.dwAutoFeedCubTabType, O.dwAutoFeedCubTabIndex)
+				local szFood = X.GetItemInfoName(O.dwAutoFeedFoodTabType, O.dwAutoFeedFoodTabIndex)
+				local szDomesticate = X.GetItemInfoName(O.dwAutoFeedCubTabType, O.dwAutoFeedCubTabIndex)
 				X.OutputSystemAnnounceMessage(_L('No enough %s to feed %s!', szFood, szDomesticate))
 			end
 		end)
@@ -234,21 +234,21 @@ function D.CheckAlertEnable()
 				return
 			end
 			if domesticate.nGrowthLevel >= domesticate.nMaxGrowthLevel then
-				local szDomesticate = X.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+				local szDomesticate = X.GetItemInfoName(domesticate.dwCubTabType, domesticate.dwCubTabIndex)
 				OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s is growth up!', szDomesticate))
 				PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 				return
 			end
 			if O.nAlertNum == 0 then
 				if domesticate.nFullMeasure == 0 and domesticate.nGrowthLevel < domesticate.nMaxGrowthLevel then
-					local szDomesticate = X.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+					local szDomesticate = X.GetItemInfoName(domesticate.dwCubTabType, domesticate.dwCubTabIndex)
 					OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s is hungery!', szDomesticate))
 					PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 				end
 			else
 				local nMeasure = domesticate.nMaxFullMeasure - domesticate.nFullMeasure
 				if nMeasure >= O.nAlertNum and domesticate.nGrowthLevel < domesticate.nMaxGrowthLevel then
-					local szDomesticate = X.GetObjectName('ITEM_INFO', domesticate.dwCubTabType, domesticate.dwCubTabIndex)
+					local szDomesticate = X.GetItemInfoName(domesticate.dwCubTabType, domesticate.dwCubTabIndex)
 					OutputWarningMessage('MSG_WARNING_YELLOW', _L('Your domesticate %s available measure is %d point!', szDomesticate, nMeasure))
 					PlaySound(SOUND.UI_SOUND, g_sound.CloseAuction)
 				end

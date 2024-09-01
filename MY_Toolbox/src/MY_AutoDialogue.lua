@@ -123,7 +123,7 @@ do
 function D.DecodeDialogInfo(aInfo, dwTarType, dwTarID)
 	local szName, szMap = _L['Common'], _L['Common']
 	if dwTarID ~= X.GetClientPlayerID() then
-		szName = X.GetObjectName(X.GetTargetHandle(dwTarType, dwTarID), 'never') or _L['Common']
+		szName = X.GetTargetName(dwTarType, dwTarID, { eShowID = 'never' }) or _L['Common']
 		if dwTarType ~= TARGET.ITEM then
 			szMap = Table_GetMapName(X.GetClientPlayer().GetMapID())
 		end

@@ -432,7 +432,7 @@ function D.OnTargetUpdate(dwID, bForce)
 		if not npc then
 			return
 		end
-		local szName = X.GetObjectName(npc, 'never') or ''
+		local szName = X.GetNpcName(dwID, { eShowID = 'never' }) or ''
 		LOG_NAMING_COUNT[dwID].szName = szName
 		LOG_NAMING_COUNT[dwID].dwTemplateID = npc.dwTemplateID
 		D.InsertLog(LOG_TYPE.NPC_INFO, { dwID, szName, npc.dwTemplateID, npc.dwEmployer, npc.nX, npc.nY, npc.nZ, npc.nFaceDirection })

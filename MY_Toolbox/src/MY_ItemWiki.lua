@@ -52,7 +52,7 @@ function D.Open(dwTabType, dwTabIndex, nBookID)
 	if nBookID < 0 then
 		nBookID = nil
 	end
-	local szName = X.GetObjectName('ITEM_INFO', dwTabType, dwTabIndex, nBookID)
+	local szName = X.GetItemInfoName(dwTabType, dwTabIndex, nBookID)
 	if not szName then
 		return
 	end

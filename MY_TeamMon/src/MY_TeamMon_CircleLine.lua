@@ -235,7 +235,7 @@ function D.DrawObject(dwType, dwID, KObject)
 		end
 	end
 	if cache.bDrawName then
-		local szText = cache.szNote or X.GetObjectName(KObject)
+		local szText = cache.szNote or X.GetTargetName(dwType, dwID)
 		if not cache.shaName or cache.shaName.szText ~= szText then
 			if not cache.shaName then
 				cache.shaName = H_NAME:AppendItemFromIni(INI_SHADOW, 'Shadow', 'Shadow_Name')

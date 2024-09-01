@@ -144,7 +144,7 @@ function D.UpdateItem(hItem, p)
 	local tMemberInfo = X.GetTeamMemberInfo(dwID)
 	local szName = tRule and X.ReplaceSensitiveWord(tRule.szDisplay)
 	if not szName or szName == '' then
-		szName = X.GetObjectName(KObject)
+		szName = X.GetTargetName(dwType, dwID)
 	end
 	local player = X.GetClientPlayer()
 	if not KObject then
@@ -321,7 +321,7 @@ function D.UpdateItem(hItem, p)
 		local tp, id = KObject.GetTarget()
 		local tar = X.GetTargetHandle(tp, id)
 		if tar then
-			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText(X.GetObjectName(tar))
+			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText(X.GetTargetName(tp, id))
 		else
 			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText('')
 		end
@@ -580,7 +580,7 @@ function D.OnItemRButtonClick()
 				}
 				local obj = X.GetTargetHandle(dwType, dwID)
 				if obj then
-					table.insert(aText, 'Name: ' .. X.GetObjectName(obj))
+					table.insert(aText, 'Name: ' .. X.GetTargetName(dwType, dwID))
 					table.insert(aText, 'TemplateID: ' .. obj.dwTemplateID)
 					table.insert(aText, 'Pos: ' .. '[' .. X.GetMapID() .. '] ' .. obj.nX .. ', ' .. obj.nY .. ', ' .. obj.nZ)
 				end

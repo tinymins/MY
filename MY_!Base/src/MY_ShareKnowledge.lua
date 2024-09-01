@@ -343,7 +343,7 @@ X.RegisterEvent('OPEN_WINDOW', 'MY_ShareKnowledge__Npc', function()
 				mi = map and map.dwID, -- Map ID
 				mn = map and map.szName, -- Map Name
 				nt = npc.dwTemplateID, -- NPC Template ID
-				nn = X.GetObjectName(npc), -- NPC Name
+				nn = X.GetNpcName(npc.dwID), -- NPC Name
 			},
 			signature = X.SECRET['J3CX::SHARE_NPC_CHAT'],
 		})

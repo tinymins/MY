@@ -238,7 +238,7 @@ function D.OnBreathe()
 					elseif dwType == TARGET.NPC then
 						szName = X.GetTemplateName(TARGET.NPC, kTarget.dwTemplateID)
 					else
-						szName = X.GetObjectName(kTarget)
+						szName = X.GetTargetName(dwType, dwID)
 						szName = X.ExtractPlayerBaseName(szName)
 					end
 					oo.szName = szName

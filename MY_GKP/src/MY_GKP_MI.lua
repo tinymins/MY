@@ -420,7 +420,7 @@ X.RegisterEvent('TRADING_OPEN_NOTIFY', function() -- 交易开始
 	if not tar then
 		return
 	end
-	D.tTradingInfo = { dwPeerID = tar.dwID, dwForceID = tar.dwForceID, szPeerName = X.GetObjectName(tar) or 'Unknown' }
+	D.tTradingInfo = { dwPeerID = tar.dwID, dwForceID = tar.dwForceID, szPeerName = X.GetPlayerName(tar.dwID, { eShowID = 'never' }) or 'Unknown' }
 end)
 X.RegisterEvent('TRADING_UPDATE_CONFIRM', function() -- 交易确认
 	local dwID, bConfirm = arg0, arg1
@@ -494,7 +494,7 @@ function D.SyncSystemGKP()
 			szNpcName  = X.IsEmpty(v.dwNpcTemplateID) and _L['Add Manually'] or X.GetTemplateName(TARGET.NPC, v.dwNpcTemplateID),
 		}
 		if item then
-			local szName = X.GetObjectName('ITEM', v.dwItemID, 'never')
+			local szName = X.GetItemName(v.dwItemID, { eShowID = 'never' })
 			if szName then
 				tab.szName = szName
 			end
@@ -504,7 +504,7 @@ function D.SyncSystemGKP()
 			tab.nUiId = item.nUiId
 			tab.nQuality = item.nQuality
 		elseif itemInfo then
-			local szName = X.GetObjectName('ITEM_INFO', v.dwItemTabType, v.dwItemTabIndex, 'never')
+			local szName = X.GetItemInfoName(v.dwItemTabType, v.dwItemTabIndex, 0, { eShowID = 'never' })
 			if szName then
 				tab.szName = szName
 			end

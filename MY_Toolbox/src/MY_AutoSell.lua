@@ -56,17 +56,17 @@ local O = X.CreateUserSettingsModule('MY_AutoSell', _L['General'], {
 		szLabel = _L['MY_Toolbox'],
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {
-			[X.GetObjectName('ITEM_INFO', 5, 2863)] = true, -- 银叶子
-			[X.GetObjectName('ITEM_INFO', 5, 2864)] = true, -- 真银叶子
-			[X.GetObjectName('ITEM_INFO', 5, 2865)] = true, -- 大片真银叶子
-			[X.GetObjectName('ITEM_INFO', 5, 2866)] = true, -- 金粉末
-			[X.GetObjectName('ITEM_INFO', 5, 2867)] = true, -- 金叶子
-			[X.GetObjectName('ITEM_INFO', 5, 2868)] = true, -- 大片金叶子
-			[X.GetObjectName('ITEM_INFO', 5, 11682)] = true, -- 金条
-			[X.GetObjectName('ITEM_INFO', 5, 11683)] = true, -- 金块
-			[X.GetObjectName('ITEM_INFO', 5, 11640)] = true, -- 金砖
-			[X.GetObjectName('ITEM_INFO', 5, 17130)] = true, -- 银叶子·试炼之地
-			[X.GetObjectName('ITEM_INFO', 5, 22974)] = true, -- 破碎的金玄玉
+			[X.GetItemInfoName(5, 2863)] = true, -- 银叶子
+			[X.GetItemInfoName(5, 2864)] = true, -- 真银叶子
+			[X.GetItemInfoName(5, 2865)] = true, -- 大片真银叶子
+			[X.GetItemInfoName(5, 2866)] = true, -- 金粉末
+			[X.GetItemInfoName(5, 2867)] = true, -- 金叶子
+			[X.GetItemInfoName(5, 2868)] = true, -- 大片金叶子
+			[X.GetItemInfoName(5, 11682)] = true, -- 金条
+			[X.GetItemInfoName(5, 11683)] = true, -- 金块
+			[X.GetItemInfoName(5, 11640)] = true, -- 金砖
+			[X.GetItemInfoName(5, 17130)] = true, -- 银叶子·试炼之地
+			[X.GetItemInfoName(5, 22974)] = true, -- 破碎的金玄玉
 		},
 	},
 	tProtectItem = {
@@ -74,8 +74,8 @@ local O = X.CreateUserSettingsModule('MY_AutoSell', _L['General'], {
 		szLabel = _L['MY_Toolbox'],
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {
-			[X.GetObjectName('ITEM_INFO', 5, 789)] = true, -- 真丝肚兜
-			[X.GetObjectName('ITEM_INFO', 5, 797)] = true, -- 春宫图册
+			[X.GetItemInfoName(5, 789)] = true, -- 真丝肚兜
+			[X.GetItemInfoName(5, 797)] = true, -- 春宫图册
 		},
 	},
 })
@@ -106,7 +106,7 @@ function D.AutoSellItem(nNpcID, nShopID, bIgnoreGray)
 			local item = X.GetInventoryItem(me, dwBox, dwX)
 			if item and item.bCanTrade then
 				local bSell, szReason = false, ''
-				local szName = X.GetObjectName(item)
+				local szName = X.GetItemName(item.dwID)
 				if not O.tProtectItem[szName] then
 					if item.nQuality == 0 and O.bSellGray and not bIgnoreGray then
 						bSell = true

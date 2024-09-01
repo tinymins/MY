@@ -107,7 +107,7 @@ local MY_GetPlayer, MY_GetNpc, MY_IsPlayer, ApplyCharacterThreatRankList = X.Get
 local MY_GetClientPlayer, GetClientTeam = X.GetClientPlayer, GetClientTeam
 local MY_GetClientPlayerID, GetTime = UI_GetClientPlayerID, GetTime
 local HATRED_COLLECT = g_tStrings.HATRED_COLLECT
-local MY_GetObjName, MY_GetForceColor = X.GetObjectName, X.GetForceColor
+local MY_GetForceColor = X.GetForceColor
 local MY_GetBuff, MY_GetBuffName, MY_GetEndTime = X.GetBuff, X.GetBuffName, X.GetEndTime
 local GetNpcIntensity = GetNpcIntensity
 local GetTime = GetTime
@@ -197,7 +197,7 @@ function TS.OnFrameBreathe()
 		else
 			local lifeper = fCurrentLife / fMaxLife
 			this.CastBar:Hide()
-			this.txt:SetText(MY_GetObjName(p) .. string.format(' (%0.1f%%)', lifeper * 100))
+			this.txt:SetText(X.GetNpcName(p.dwID) .. string.format(' (%0.1f%%)', lifeper * 100))
 			this.Life:SetPercentage(lifeper)
 		end
 
@@ -234,7 +234,7 @@ function TS.OnFrameBreathe()
 						local team = GetClientTeam()
 						local szMember = team.GetClientTeamMemberName(p.dwDropTargetPlayerID)
 						local nGroup = team.GetMemberGroupIndex(p.dwDropTargetPlayerID) + 1
-						local name = MY_GetObjName(p)
+						local name = X.GetNpcName(p.dwID)
 						local oContent = {_L('Well done! %s in %d group first to attack %s!!', nGroup, szMember, name), r = 150, g = 250, b = 230}
 						local oTitle = {g_tStrings.HATRED_COLLECT, r = 150, g = 250, b = 230}
 						X.OutputSystemMessage(oTitle, oContent)

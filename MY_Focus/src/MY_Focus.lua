@@ -393,7 +393,7 @@ function D.RemoveFocusPattern(szPattern)
 			local p = FOCUS_LIST[i]
 			local KObject = X.GetTargetHandle(p.dwType, p.dwID)
 			local dwTemplateID = p.dwType == TARGET.PLAYER and p.dwID or KObject.dwTemplateID
-			if KObject and X.GetObjectName(KObject, 'never') == szPattern
+			if KObject and X.GetTargetName(p.dwType, p.dwID, { eShowID = 'never' }) == szPattern
 			and not l_tTempFocusList[p.dwType][p.dwID]
 			and not O.tStaticFocus[p.dwType][dwTemplateID] then
 				D.OnObjectLeaveScene(p.dwType, p.dwID)
@@ -501,7 +501,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		return
 	end
 
-	local szName = X.GetObjectName(KObject, 'never')
+	local szName = X.GetTargetName(dwType, dwID, { eShowID = 'never' })
 	-- 解决玩家刚进入视野时名字为空的问题
 	if (dwType == TARGET.PLAYER and not szName) or not me then -- 解决自身刚进入场景的时候的问题
 		X.DelayCall(300, function()
@@ -509,7 +509,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end)
 	else-- if szName then -- 判断是否需要焦点
 		if not szName then
-			szName = X.GetObjectName(KObject, 'auto')
+			szName = X.GetTargetName(dwType, dwID, { eShowID = 'auto' })
 		end
 		local szGlobalID = dwType == TARGET.PLAYER and X.GetPlayerGlobalID(dwID) or nil
 		local bFocus, aVia = false, {}
@@ -703,7 +703,7 @@ function D.OnObjectLeaveScene(dwType, dwID)
 			if D.bReady and O.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 			and X.IsInCompetitionMap() and not (IsEnemy(X.GetClientPlayerID(), dwID) and X.IsRestricted('MY_Focus.SHILDED_NPC')) then
-				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, X.GetObjectName(KObject, 'never'), _L['Auto focus party in arena'])
+				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, X.GetTargetName(dwType, dwID, { eShowID = 'never' }), _L['Auto focus party in arena'])
 			end
 		end
 	end

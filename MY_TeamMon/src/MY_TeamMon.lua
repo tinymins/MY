@@ -977,12 +977,8 @@ function D.GetSrcName(dwID)
 	if dwID == 0 then
 		return g_tStrings.COINSHOP_SOURCE_NULL
 	end
-	local KObject = X.IsPlayer(dwID) and X.GetPlayer(dwID) or X.GetNpc(dwID)
-	if KObject then
-		return X.GetObjectName(KObject)
-	else
-		return dwID
-	end
+	local dwType = X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
+	return X.GetTargetName(dwType, dwID) or dwID
 end
 
 -- local a=GetTime();for i=1, 10000 do FireUIEvent('BUFF_UPDATE',X.GetClientPlayerID(),false,1,true,i,1,1,1,1,0) end;Output(GetTime()-a)
@@ -1039,8 +1035,8 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 		else
 			cfg, nClass = data[MY_TEAM_MON_TYPE.BUFF_GET], MY_TEAM_MON_TYPE.BUFF_GET
 		end
-		local szSender = X.GetObjectName(X.IsPlayer(dwSkillSrcID) and TARGET.PLAYER or TARGET.NPC, dwSkillSrcID)
-		local szReceiver = X.GetObjectName(X.IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
+		local szSender = X.GetTargetName(X.IsPlayer(dwSkillSrcID) and TARGET.PLAYER or TARGET.NPC, dwSkillSrcID)
+		local szReceiver = X.GetTargetName(X.IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
 		D.CountdownEvent(data, nClass, szSender, szReceiver)
 		if cfg then
 			local szName, nIcon = X.GetBuffName(dwBuffID, nBuffLevel)
@@ -1188,10 +1184,10 @@ function D.OnSkillCast(dwCaster, dwCastID, dwLevel, szEvent)
 		local szSender, szReceiver
 		local KObject = X.IsPlayer(dwCaster) and X.GetPlayer(dwCaster) or X.GetNpc(dwCaster)
 		if KObject then
-			szSender = X.GetObjectName(KObject)
-			szReceiver = X.GetObjectName(X.GetTargetHandle(KObject.GetTarget()), 'auto')
+			szSender = X.GetTargetName(X.IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
+			szReceiver = X.GetTargetName(KObject.GetTarget())
 		else
-			szSender = X.GetObjectName(X.IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
+			szSender = X.GetTargetName(X.IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster)
 		end
 		if data.szName then
 			szName = FilterCustomText(data.szName, szSender, szReceiver)
@@ -1331,7 +1327,7 @@ function D.OnNpcEvent(npc, bEnter)
 			return
 		end
 		local szSender = nil
-		local szReceiver = X.GetObjectName(npc)
+		local szReceiver = X.GetNpcName(npc.dwID)
 		if bEnter then
 			cfg, nClass = data[MY_TEAM_MON_TYPE.NPC_ENTER], MY_TEAM_MON_TYPE.NPC_ENTER
 			nCount = CACHE.NPC_LIST[npc.dwTemplateID].nCount
@@ -1481,7 +1477,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 			return
 		end
 		local szSender = nil
-		local szReceiver = X.GetObjectName(doodad)
+		local szReceiver = X.GetDoodadName(doodad.dwID)
 		if bEnter then
 			cfg, nClass = data[MY_TEAM_MON_TYPE.DOODAD_ENTER], MY_TEAM_MON_TYPE.DOODAD_ENTER
 			nCount = CACHE.DOODAD_LIST[doodad.dwTemplateID].nCount
@@ -1761,8 +1757,8 @@ function D.OnDeath(dwCharacterID, dwKiller)
 		local data = D.GetData('NPC', npc.dwTemplateID)
 		if data then
 			local dwTemplateID = npc.dwTemplateID
-			local szSender = X.GetObjectName(D.GetTargetHandle(dwKiller), 'auto')
-			local szReceiver = X.GetObjectName(npc)
+			local szSender = X.GetTargetName(X.IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller, { eShowID = 'auto' })
+			local szReceiver = X.GetNpcName(npc.dwID)
 			D.CountdownEvent(data, MY_TEAM_MON_TYPE.NPC_DEATH, szSender, szReceiver)
 			local bAllDeath = true
 			if CACHE.NPC_LIST[dwTemplateID] then

@@ -74,16 +74,7 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 		or tResult[SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE]
 		or tResult[SKILL_RESULT_TYPE.POISON_DAMAGE]
 	then
-		local szCaster
-		if KCaster then
-			if X.IsPlayer(dwCaster) then
-				szCaster = KCaster.szName
-			else
-				szCaster = X.GetObjectName(KCaster)
-			end
-		else
-			szCaster = _L['OUTER GUEST']
-		end
+		local szCaster = X.GetTargetName(X.IsPlayer(dwCaster) and TARGET.PLAYER or TARGET.NPC, dwCaster, { eShowID = 'never' }) or _L['OUTER GUEST']
 		local key = dwTarget == PLAYER_ID and 'self' or dwTarget
 		if not DAMAGE_LOG[key] then
 			DAMAGE_LOG[key] = {}
@@ -100,17 +91,7 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 	end
 	-- ”–∑¥µØ…À∫¶
 	if tResult[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE] and X.IsPlayer(dwCaster) then
-		local szTarget
-		if KTarget then
-			if X.IsPlayer(dwTarget) then
-				szTarget = KTarget.szName
-			else
-				szTarget = X.GetObjectName(KTarget)
-			end
-		else
-			szTarget = _L['OUTER GUEST']
-		end
-
+		local szTarget = X.GetTargetName(X.IsPlayer(dwTarget) and TARGET.PLAYER or TARGET.NPC, dwTarget, { eShowID = 'never' }) or _L['OUTER GUEST']
 		local key = dwCaster == PLAYER_ID and 'self' or dwCaster
 		if not DAMAGE_LOG[key] then
 			DAMAGE_LOG[key] = {}
@@ -195,7 +176,7 @@ local function OnDeath(dwID, dwKiller)
 				end
 			end
 		end
-		local szKiller = X.GetObjectName(X.IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller, 'never')
+		local szKiller = X.GetTargetName(X.IsPlayer(dwKiller) and TARGET.PLAYER or TARGET.NPC, dwKiller, { eShowID = 'never' })
 		table.insert(DEATH_LOG[key], {
 			nCurrentTime = GetCurrentTime(),
 			data         = DAMAGE_LOG[key] or { szCaster = szKiller },

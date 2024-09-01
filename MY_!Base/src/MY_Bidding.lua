@@ -120,7 +120,7 @@ function D.ConfigToEditStruct(tConfig)
 		table.insert(aStruct, {
 			type = 'book',
 			version = 0,
-			text = '[' .. X.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID) .. ']',
+			text = '[' .. X.GetItemInfoName(tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID) .. ']',
 			tabtype = tConfig.dwTabType,
 			index = tConfig.dwTabIndex,
 			bookinfo = tConfig.nBookID,
@@ -135,7 +135,7 @@ function D.ConfigToEditStruct(tConfig)
 		table.insert(aStruct, {
 			type = 'iteminfo',
 			version = 0,
-			text = '[' .. X.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex) .. ']',
+			text = '[' .. X.GetItemInfoName(tConfig.dwTabType, tConfig.dwTabIndex) .. ']',
 			tabtype = tConfig.dwTabType,
 			index = tConfig.dwTabIndex,
 		})
@@ -239,7 +239,7 @@ function D.UpdateConfig(frame)
 	local h = wnd:Lookup('', '')
 	if tConfig.dwTabType and tConfig.dwTabIndex then
 		-- dwTabType, dwTabIndex, nBookID
-		local szItem = X.GetObjectName('ITEM_INFO', tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID)
+		local szItem = X.GetItemInfoName(tConfig.dwTabType, tConfig.dwTabIndex, tConfig.nBookID)
 		if tConfig.nCount and tConfig.nCount > 1 then
 			szItem = szItem .. ' x' .. (tConfig.nCount or 1)
 		end

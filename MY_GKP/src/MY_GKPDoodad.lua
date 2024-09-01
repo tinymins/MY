@@ -511,7 +511,7 @@ function D.UpdateHeadName()
 		local tar = X.GetDoodad(dwID)
 		local bShow = info.eRuleType ~= 'loot' or info.bCustom or info.bRecent
 		if bShow or D.bDebug then
-			local szName = X.GetObjectName(TARGET.DOODAD, dwID, 'never') or ''
+			local szName = X.GetDoodadName(dwID, { eShowID = 'never' }) or ''
 			local fYDelta = 128
 			local nR, nG, nB, nA, bDarken = r, g, b, 255, false
 			-- 将不可自动交互的颜色变暗
@@ -644,7 +644,7 @@ function D.OnOpenDoodad(dwID)
 	if doodad and (info.eRuleType ~= 'loot' or D.IsCustomDoodad(doodad) or D.IsRecentDoodad(doodad)) then
 		D.TryAdd(dwID)
 	end
-	X.OutputDebugMessage(_L['MY_GKPDoodad'], 'OnOpenDoodad [' .. X.GetObjectName(TARGET.DOODAD, dwID, 'always') .. ']', X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(_L['MY_GKPDoodad'], 'OnOpenDoodad [' .. X.GetDoodadName(dwID, { eShowID = 'always' }) .. ']', X.DEBUG_LEVEL.LOG)
 end
 
 -- save manual doodad
