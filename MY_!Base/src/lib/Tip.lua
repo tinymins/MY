@@ -288,7 +288,7 @@ function X.OutputNpcTemplateTip(Rect, dwNpcTemplateID, szExtraXml)
 	end
 	local t = {}
 
-	local szName = X.GetTemplateName(TARGET.NPC, dwNpcTemplateID) or tostring(dwNpcTemplateID)
+	local szName = X.GetNpcTemplateName(dwNpcTemplateID) or tostring(dwNpcTemplateID)
 	-- ∆¥“Ù
 	if IsCtrlKeyDown() then
 		local szPinyin = X.Han2TonePinyin(szName, true)[1]
