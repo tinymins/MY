@@ -33,10 +33,10 @@ local function PatternReplacer(szContent, tVar, bKeepNMTS, bReplaceSensitiveWord
 		aValue[k] = tonumber(v)
 	end
 	if szType == 'N' then
-		return X.GetTemplateName(TARGET.NPC, aValue[1])
+		return X.GetNpcTemplateName(aValue[1])
 	end
 	if szType == 'D' then
-		return X.GetTemplateName(TARGET.DOODAD, aValue[1])
+		return X.GetDoodadTemplateName(aValue[1])
 	end
 	if szType == 'S' then
 		return X.GetSkillName(aValue[1], aValue[2])

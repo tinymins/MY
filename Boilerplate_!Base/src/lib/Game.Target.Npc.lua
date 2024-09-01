@@ -241,7 +241,8 @@ function X.IsPartnerNpc(dwTemplateID)
 			PARTNER_NPC[v.szName] = true
 		end
 	end
-	return PARTNER_NPC[X.GetTemplateName(TARGET.NPC, dwTemplateID)] or false
+	local szName = X.GetNpcTemplateName(dwTemplateID)
+	return szName and PARTNER_NPC[szName] or false
 end
 
 X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#ImportantNpclist'), function()

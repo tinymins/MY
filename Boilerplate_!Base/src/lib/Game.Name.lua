@@ -96,7 +96,7 @@ function X.GetNpcName(dwID, tOption)
 		if kNpc then
 			szName = kNpc.szName
 			if X.IsEmpty(szName) then
-				szName = X.GetTemplateName(TARGET.NPC, kNpc.dwTemplateID)
+				szName = X.GetNpcTemplateName(kNpc.dwTemplateID)
 			end
 			if kNpc.dwEmployer and kNpc.dwEmployer ~= 0 then
 				if X.Table.IsSimplePlayer(kNpc.dwTemplateID) then -- 长歌影子
@@ -125,6 +125,64 @@ function X.GetNpcName(dwID, tOption)
 			szID = szID .. '@' .. kNpc.dwTemplateID
 		end
 		szName = FormatShowName(szName, szID, tOption.eShowID)
+		if bCache then
+			CacheSet(szCacheID, xKey, szName)
+		end
+	end
+	return szName
+end
+
+-- 根据模板ID获取系统角色名称
+---@param dwTemplateID number @要获取的系统角色模板ID
+---@param tOption? table @获取参数
+---@return string | nil @获取成功返回名称，失败返回空
+function X.GetNpcTemplateName(dwTemplateID, tOption)
+	local tOption = StandardizeOption(tOption)
+	local szCacheID = 'NPC_TEMPLATE.' .. tOption.eShowID
+	local xKey = dwTemplateID
+	local szName = CacheGet(szCacheID, xKey)
+	if not szName then
+		local bCache = false
+		szName = X.CONSTANT.NPC_NAME[dwTemplateID]
+			and X.RenderTemplateString(X.CONSTANT.NPC_NAME[dwTemplateID])
+			or Table_GetNpcTemplateName(dwTemplateID)
+		if szName then
+			szName = szName:gsub('^%s*(.-)%s*$', '%1')
+		end
+		if X.IsEmpty(szName) then
+			szName = nil
+		end
+		bCache = true
+		szName = FormatShowName(szName, 'NT' .. dwTemplateID, tOption.eShowID)
+		if bCache then
+			CacheSet(szCacheID, xKey, szName)
+		end
+	end
+	return szName
+end
+
+-- 根据模板ID获取交互物件名称
+---@param dwTemplateID number @要获取的交互物件模板ID
+---@param tOption? table @获取参数
+---@return string | nil @获取成功返回名称，失败返回空
+function X.GetDoodadTemplateName(dwTemplateID, tOption)
+	local tOption = StandardizeOption(tOption)
+	local szCacheID = 'DOODAD_TEMPLATE.' .. tOption.eShowID
+	local xKey = dwTemplateID
+	local szName = CacheGet(szCacheID, xKey)
+	if not szName then
+		local bCache = false
+		szName = X.CONSTANT.DOODAD_NAME[dwTemplateID]
+			and X.RenderTemplateString(X.CONSTANT.DOODAD_NAME[dwTemplateID])
+			or Table_GetDoodadTemplateName(dwTemplateID)
+		if szName then
+			szName = szName:gsub('^%s*(.-)%s*$', '%1')
+		end
+		if X.IsEmpty(szName) then
+			szName = nil
+		end
+		bCache = true
+		szName = FormatShowName(szName, 'DT' .. dwTemplateID, tOption.eShowID)
 		if bCache then
 			CacheSet(szCacheID, xKey, szName)
 		end
