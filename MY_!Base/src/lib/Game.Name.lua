@@ -22,6 +22,9 @@ local function StandardizeOption(tOption)
 	if not tOption.eShowID then
 		tOption.eShowID = 'auto'
 	end
+	if not tOption.eShowEmployer then
+		tOption.eShowEmployer = 'prefix'
+	end
 	return tOption
 end
 
@@ -87,7 +90,7 @@ end
 ---@return string | nil @获取成功返回名称，失败返回空
 function X.GetNpcName(dwID, tOption)
 	local tOption = StandardizeOption(tOption)
-	local szCacheID = 'NPC.' .. tOption.eShowID
+	local szCacheID = 'NPC.' .. tOption.eShowID .. '.' .. tOption.eShowEmployer
 	local xKey = dwID
 	local szName = CacheGet(szCacheID, xKey, szCacheID)
 	if not szName then
@@ -103,18 +106,26 @@ function X.GetNpcName(dwID, tOption)
 					szName = X.GetPlayerName(kNpc.dwEmployer, tOption)
 				elseif not X.IsEmpty(szName) then
 					local szEmpName
-					if X.IsPlayer(kNpc.dwEmployer) then
-						szEmpName = X.GetPlayerName(kNpc.dwEmployer, { eShowID = 'never' })
-					else
-						szEmpName = X.GetNpcName(kNpc.dwEmployer, { eShowID = 'never' })
+					if tOption.eShowEmployer == 'prefix' or tOption.eShowEmployer == 'suffix' then
+						if X.IsPlayer(kNpc.dwEmployer) then
+							szEmpName = X.GetPlayerName(kNpc.dwEmployer, { eShowID = 'never' })
+						else
+							szEmpName = X.GetNpcName(kNpc.dwEmployer, { eShowID = 'never' })
+						end
+						if szEmpName then
+							bCache = true
+						else
+							szEmpName = g_tStrings.STR_SOME_BODY
+						end
 					end
 					if szEmpName then
-						bCache = true
-					else
-						szEmpName = g_tStrings.STR_SOME_BODY
+						if tOption.eShowEmployer == 'prefix' then
+							local szBaseName, szSuffixName, szServerName = X.DisassemblePlayerName(szEmpName)
+							szName = X.AssemblePlayerName(szBaseName .. g_tStrings.STR_PET_SKILL_LOG .. szName, szSuffixName, szServerName)
+						else
+							szName = szName .. g_tStrings.STR_CONNECT .. szEmpName
+						end
 					end
-					local szBaseName, szSuffixName, szServerName = X.DisassemblePlayerName(szEmpName)
-					szName = X.AssemblePlayerName(szBaseName .. g_tStrings.STR_PET_SKILL_LOG .. szName, szSuffixName, szServerName)
 				end
 			else
 				bCache = true
