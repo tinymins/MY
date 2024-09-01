@@ -100,13 +100,13 @@ function X.GetNpcName(dwID, tOption)
 			end
 			if kNpc.dwEmployer and kNpc.dwEmployer ~= 0 then
 				if X.Table.IsSimplePlayer(kNpc.dwTemplateID) then -- ³¤¸èÓ°×Ó
-					szName = X.GetPlayerName(X.GetPlayer(kNpc.dwEmployer), tOption)
+					szName = X.GetPlayerName(kNpc.dwEmployer, tOption)
 				elseif not X.IsEmpty(szName) then
 					local szEmpName
 					if X.IsPlayer(kNpc.dwEmployer) then
-						szEmpName = X.GetPlayerName(X.GetPlayer(kNpc.dwEmployer), { eShowID = 'never' })
+						szEmpName = X.GetPlayerName(kNpc.dwEmployer, { eShowID = 'never' })
 					else
-						szEmpName = X.GetNpcName(X.GetNpc(kNpc.dwEmployer), { eShowID = 'never' })
+						szEmpName = X.GetNpcName(kNpc.dwEmployer, { eShowID = 'never' })
 					end
 					if szEmpName then
 						bCache = true
