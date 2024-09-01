@@ -217,6 +217,23 @@ function X.GetDoodadName(dwID, tOption)
 	return szName
 end
 
+-- 获取指定目标名称
+---@param dwType number @目标类型
+---@param dwID number @目标ID
+---@param tOption? table @获取参数
+---@return string | nil @获取成功返回名称，失败返回空
+function X.GetTargetName(dwType, dwID, tOption)
+	if dwType == TARGET.NPC then
+		return X.GetNpcName(dwID, tOption)
+	end
+	if dwType == TARGET.PLAYER then
+		return X.GetPlayerName(dwID, tOption)
+	end
+	if dwType == TARGET.DOODAD then
+		return X.GetDoodadName(dwID, tOption)
+	end
+end
+
 -- 获取指定物品名称
 ---@param dwID number @要获取的物品ID
 ---@param tOption? table @获取参数
