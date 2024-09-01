@@ -342,10 +342,10 @@ local ChatLinkEvents = {
 							OutputMessage('MSG_ANNOUNCE_RED', _L['Player is too far to peek!'])
 						end
 					end
-					if info.szGlobalID and dwServerID then
-						X.ViewOtherPlayerByGlobalID(dwServerID, info.szGlobalID, OnPeekOtherPlayerResult)
-					elseif info.dwID then
+					if info.szServerName == X.GetServerOriginName() and info.dwID then
 						X.ViewOtherPlayerByID(info.dwID, OnPeekOtherPlayerResult)
+					elseif info.szGlobalID and dwServerID then
+						X.ViewOtherPlayerByGlobalID(dwServerID, info.szGlobalID, OnPeekOtherPlayerResult)
 					end
 				end
 			end
