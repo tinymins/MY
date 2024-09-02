@@ -1805,7 +1805,7 @@ function CTM:RefreshDistance()
 		if v:IsValid() then
 			local p = X.GetPlayer(k) -- info.nPoX 刷新太慢了 对于治疗来说 这个太重要了
 			if p then
-				local nDistance = MY.GetTargetDistance(me, p) -- 只计算平面 --??
+				local nDistance = MY.GetCharacterDistance(me, p) -- 只计算平面 --??
 				if CFG.bEnableDistance then
 					local find
 					for kk, vv in ipairs(CFG.tDistanceLevel) do
@@ -2160,7 +2160,7 @@ function CTM:RefreshSputtering()
 						local info2 = team.GetMemberInfo(dwID2)
 						local player2 = X.GetPlayer(dwID2)
 						if player2 and not info2.bDeathFlag and info2.bIsOnLine
-						and X.GetTargetDistance(player, player2, 'gwwean') <= CFG.nSputteringDistance then
+						and X.GetCharacterDistance(player, player2, 'gwwean') <= CFG.nSputteringDistance then
 							nCount = nCount + 1
 						end
 					end

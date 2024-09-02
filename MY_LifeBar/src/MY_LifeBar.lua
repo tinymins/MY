@@ -113,7 +113,7 @@ local QUEST_TITLE_EFFECT = {
 local function UpdateTitleEffect(dwType, dwID)
 	local nEffectID = nil
 	if dwType == TARGET.PLAYER then
-		local nMark = X.GetTargetTeamMark(dwID)
+		local nMark = X.GetCharacterTeamMark(dwID)
 		if nMark and PARTY_TITLE_MARK_EFFECT_LIST[nMark] then
 			nEffectID = PARTY_TITLE_MARK_EFFECT_LIST[nMark]
 		end
@@ -143,8 +143,8 @@ local function UpdateTitleEffect(dwType, dwID)
 			-- or aQuestState.normal_notneedaccept_low or aQuestState.normal_notneedaccept_lower
 			-- or aQuestState.normal_notneedaccept_high or aQuestState.normal_notneedaccept_higher
 				nEffectID = QUEST_TITLE_EFFECT.normal_notneedaccept
-			elseif X.GetTargetTeamMark(dwID) and PARTY_TITLE_MARK_EFFECT_LIST[X.GetTargetTeamMark(dwID)] then -- party mark
-				nEffectID = PARTY_TITLE_MARK_EFFECT_LIST[X.GetTargetTeamMark(dwID)]
+			elseif X.GetCharacterTeamMark(dwID) and PARTY_TITLE_MARK_EFFECT_LIST[X.GetCharacterTeamMark(dwID)] then -- party mark
+				nEffectID = PARTY_TITLE_MARK_EFFECT_LIST[X.GetCharacterTeamMark(dwID)]
 			elseif aQuestState.normal_unaccept_high or aQuestState.repeat_unaccept_high or aQuestState.activity_unaccept_high then
 				nEffectID = QUEST_TITLE_EFFECT.unaccept_high
 			elseif aQuestState.normal_unaccept_low or aQuestState.repeat_unaccept_low or aQuestState.activity_unaccept_low then
@@ -615,7 +615,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		-- æ‡¿Î
 		bShowDistance = Config.bShowDistance and (not Config.bShowDistanceOnlyTarget or bCurrentTarget)
 		if bShowDistance then
-			lb:SetDistance(X.GetTargetDistance(me, object))
+			lb:SetDistance(X.GetCharacterDistance(me, object))
 		end
 		lb:SetDistanceVisible(bShowDistance)
 		-- ∞Ôª·

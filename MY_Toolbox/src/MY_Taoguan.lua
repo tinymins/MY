@@ -261,7 +261,7 @@ function D.BreakCanStateTransfer()
 	local npcTaoguan
 	for _, npc in ipairs(X.GetNearNpc()) do
 		if npc and npc.dwTemplateID == 6820 then
-			if X.GetTargetDistance(me, npc) < 4 then
+			if X.GetCharacterDistance(me, npc) < 4 then
 				npcTaoguan = npc
 				break
 			end
@@ -344,7 +344,7 @@ function D.OnDoodadEnter()
 		local me = X.GetClientPlayer()
 		local d = X.GetDoodad(arg0)
 		if me and d and d.szName == TAOGUAN and d.CanDialog(me)
-			and X.GetTargetDistance(me, d) < 4.1
+			and X.GetCharacterDistance(me, d) < 4.1
 		then
 			D.dwDoodadID = arg0
 			X.DelayCall(520, function()

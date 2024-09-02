@@ -918,7 +918,7 @@ function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
 	end
 	local fnAction = function()
 		local nMark, dwCharacterID = fnGetNextMark()
-		if nMark and dwCharacterID and X.SetTeamMarkTarget(nMark, dwCharacterID) then
+		if nMark and dwCharacterID and X.SetTeamMarkCharacter(nMark, dwCharacterID) then
 			return
 		end
 		D.OnSetMark(true) -- 标记失败 直接处理下一个

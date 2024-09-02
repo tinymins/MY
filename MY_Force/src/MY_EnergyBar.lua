@@ -343,7 +343,7 @@ function D.UpdateBomb(frame)
 				hBomb:Lookup(2):SetText(tostring(D.tBombMsg[i].nTime))
 				if D.tBombMsg[i].nBombNpcID then
 					local npc = X.GetNpc(D.tBombMsg[i].nBombNpcID)
-					local nDistance = npc and X.GetTargetDistance(me, npc, 'plane')
+					local nDistance = npc and X.GetCharacterDistance(me, npc, 'plane')
 					if nDistance and nDistance <= 30 then
 						hBomb:SetAlpha(255)
 					else

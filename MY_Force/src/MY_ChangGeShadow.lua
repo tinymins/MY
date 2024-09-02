@@ -83,7 +83,7 @@ function D.Apply()
 					sha = hShaList:Lookup(i)
 				end
 				local kNpc = X.GetNpc(hItem.nNpcID)
-				nDis = kNpc and X.GetTargetDistance(me, kNpc) or -1
+				nDis = kNpc and X.GetCharacterDistance(me, kNpc) or -1
 				if hItem.szState == 'disable' then
 					r, g, b = 191, 31, 31
 				else

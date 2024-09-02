@@ -99,7 +99,7 @@ function D.OnFrameBreathe()
 				buff = GetBuff(p, data.dwBuffID)
 			end
 			if p and info and buff then
-				local nDistance = X.GetTargetDistance(me, p)
+				local nDistance = X.GetCharacterDistance(me, p)
 				h:Lookup('Image_life'):SetPercentage(info.fCurrentLife64 / math.max(info.fMaxLife64, 1))
 				h:Lookup('Text_Name'):SetText(i + 1 .. ' ' .. info.szName)
 				if nDistance > DISTANCE then

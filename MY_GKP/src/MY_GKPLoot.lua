@@ -1603,7 +1603,7 @@ local function IsItemDataSuitable(data)
 	if not me then
 		return 'NOT_SUITABLE'
 	end
-	local aKungfu = X.ForceIDToKungfuIDs(me.dwForceID)
+	local aKungfu = X.GetForceKungfuList(me.dwForceID)
 	if data.szType == 'BOOK' then
 		local nBookID, nSegmentID = X.RecipeToSegmentID(data.item.nBookID)
 		if me.IsBookMemorized(nBookID, nSegmentID) then

@@ -95,7 +95,7 @@ function D.SyncMember(team, dwID, szName, state)
 		X.OutputSystemMessage(_L('Restore formation of %d group: %s', state.nGroup + 1, szName))
 	end
 	if O.bKeepMark and state.nMark then -- 如果这货之前有标记
-		X.SetTeamMarkTarget(state.nMark, dwID) -- 标记给他
+		X.SetTeamMarkCharacter(state.nMark, dwID) -- 标记给他
 		X.OutputSystemMessage(_L('Restore player marked as [%s]: %s', X.CONSTANT.TEAM_MARK_NAME[state.nMark] or '?', szName))
 	end
 end

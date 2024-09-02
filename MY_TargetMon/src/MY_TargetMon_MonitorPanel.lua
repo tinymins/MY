@@ -298,7 +298,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 				},
 			}
 			for _, force in ipairs(X.CONSTANT.FORCE_LIST) do
-				for i, dwKungfuID in ipairs(X.GetForceKungfuIDs(force.dwID) or {}) do
+				for i, dwKungfuID in ipairs(X.GetForceKungfuList(force.dwID) or {}) do
 					table.insert(menu, {
 						szOption = X.GetSkillName(dwKungfuID, 1),
 						rgb = {X.GetForceColor(force.dwID, 'foreground')},
@@ -354,7 +354,7 @@ function D.Open(szConfigUUID, szMonitorUUID)
 				},
 			}
 			for _, force in ipairs(X.CONSTANT.FORCE_LIST) do
-				for i, dwKungfuID in ipairs(X.GetForceKungfuIDs(force.dwID) or {}) do
+				for i, dwKungfuID in ipairs(X.GetForceKungfuList(force.dwID) or {}) do
 					table.insert(menu, {
 						szOption = X.GetSkillName(dwKungfuID, 1),
 						rgb = {X.GetForceColor(force.dwID, 'foreground')},

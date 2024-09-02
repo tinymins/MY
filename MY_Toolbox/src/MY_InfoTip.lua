@@ -203,7 +203,7 @@ local INFO_TIP_LIST = {
 			local p = X.GetTargetHandle(X.GetCharacterTarget(me))
 			local s = data.config.bPlaceholder and _L['No Target'] or ''
 			if me and p then
-				s = string.format(data.cache.formatString, X.GetTargetDistance(me, p))
+				s = string.format(data.cache.formatString, X.GetCharacterDistance(me, p))
 			end
 			return s
 		end,
