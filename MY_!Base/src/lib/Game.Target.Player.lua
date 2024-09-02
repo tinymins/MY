@@ -76,7 +76,7 @@ local function GeneClientPlayerInfo(bForce)
 		CLIENT_PLAYER_INFO.nCurrentLife      = me.nCurrentLife
 		CLIENT_PLAYER_INFO.nMaxLife          = me.nMaxLife
 		CLIENT_PLAYER_INFO.fCurrentLife64,
-		CLIENT_PLAYER_INFO.fMaxLife64        = X.GetTargetLife(me)
+		CLIENT_PLAYER_INFO.fMaxLife64        = X.GetCharacterLife(me)
 		CLIENT_PLAYER_INFO.nMaxLifeBase      = me.nMaxLifeBase
 		CLIENT_PLAYER_INFO.nCurrentMana      = me.nCurrentMana
 		CLIENT_PLAYER_INFO.nMaxMana          = me.nMaxMana
