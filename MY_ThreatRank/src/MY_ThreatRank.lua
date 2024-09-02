@@ -186,7 +186,7 @@ function TS.OnFrameBreathe()
 	if p then
 		ApplyCharacterThreatRankList(this.dwTargetID)
 		local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(p)
-		local fCurrentLife, fMaxLife = X.GetTargetLife(p)
+		local fCurrentLife, fMaxLife = X.GetCharacterLife(p)
 		if nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 		or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
 		or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then

@@ -72,7 +72,7 @@ local function onNpcEnterScene()
 	end
 	if npc.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID then
 		if not (IsEnemy(X.GetClientPlayerID(), arg0) and X.IsRestricted('MY_Cataclysm.CHANGGE_SHADOW')) then
-			local dwType, dwID = X.GetTargetTarget(me)
+			local dwType, dwID = X.GetCharacterTarget(me)
 			if dwType == TARGET.PLAYER and dwID == npc.dwEmployer then
 				X.SetClientPlayerTarget(TARGET.NPC, arg0)
 			end
@@ -88,7 +88,7 @@ local function onNpcLeaveScene()
 	local npc = X.GetNpc(arg0)
 	if CHANGGE_REAL_SHADOW_CACHE[arg0] then
 		if not (IsEnemy(X.GetClientPlayerID(), arg0) and X.IsRestricted('MY_Cataclysm.CHANGGE_SHADOW')) then
-			local dwType, dwID = X.GetTargetTarget(me)
+			local dwType, dwID = X.GetCharacterTarget(me)
 			if dwType == TARGET.NPC and dwID == arg0 then
 				X.SetClientPlayerTarget(TARGET.PLAYER, npc.dwEmployer)
 			end
@@ -203,7 +203,7 @@ local function OpenRaidDragPanel(dwMemberID)
 	local hImageLife = hMember:Lookup('Image_Health')
 	local hImageMana = hMember:Lookup('Image_Mana')
 	if tMemberInfo.bIsOnLine then
-		local fCurrentLife, fMaxLife = X.GetTargetLife(tMemberInfo)
+		local fCurrentLife, fMaxLife = X.GetCharacterLife(tMemberInfo)
 		if fMaxLife > 0 then
 			hImageLife:SetPercentage(fCurrentLife / fMaxLife)
 		end
@@ -441,7 +441,7 @@ function MY_CataclysmParty_Base.OnItemMouseEnter()
 		local function fnAction()
 			if not CTM_TEMP_TARGET_TYPE then
 				local me = X.GetClientPlayer()
-				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = X.GetTargetTarget(me)
+				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = X.GetCharacterTarget(me)
 			end
 			SetTarget(TARGET.PLAYER, dwID)
 		end
@@ -1924,11 +1924,11 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	-- 气血计算 因为sync 必须拿出来单独算
 	local obj = npc or player
 	local fLifePercentage
-	local fCurrentLife, fMaxLife = X.GetTargetLife(obj)
+	local fCurrentLife, fMaxLife = X.GetCharacterLife(obj)
 	if not fCurrentLife or fCurrentLife < - 1000
 	or fMaxLife == 1 or fCurrentLife == 1
 	or fCurrentLife == 255 or fMaxLife == 255 then -- obj sync err fix
-		fCurrentLife, fMaxLife = X.GetTargetLife(info)
+		fCurrentLife, fMaxLife = X.GetCharacterLife(info)
 	end
 	fMaxLife     = math.max(1, fMaxLife)
 	fCurrentLife = math.max(0, fCurrentLife)

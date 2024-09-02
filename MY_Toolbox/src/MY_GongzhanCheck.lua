@@ -42,7 +42,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 				-- 逻辑：两次遍历附近的人 第一次同步数据 第二次输出数据
 				local me = X.GetClientPlayer()
 				local nChannel = O.nGongzhanPublishChannel or PLAYER_TALK_CHANNEL.LOCAL_SYS
-				local dwTarType, dwTarID = X.GetTargetTarget(me)
+				local dwTarType, dwTarID = X.GetCharacterTarget(me)
 				local aPendingID = X.GetNearPlayerID() -- 等待扫描的玩家
 				local aProcessID = X.Clone(aPendingID) -- 等待输出的玩家
 				local aGongZhan = {} -- 扫描到的共战数据
@@ -63,7 +63,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 						end
 						if tar then
 							local me = X.GetClientPlayer()
-							local dwType, dwID = X.GetTargetTarget(me)
+							local dwType, dwID = X.GetCharacterTarget(me)
 							if dwType ~= TARGET.PLAYER or dwID ~= tar.dwID then -- 设置目标同步BUFF数据
 								X.SetClientPlayerTarget(TARGET.PLAYER, tar.dwID)
 							else
@@ -82,7 +82,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 						end
 						if tar then
 							local me = X.GetClientPlayer()
-							local dwType, dwID = X.GetTargetTarget(me)
+							local dwType, dwID = X.GetCharacterTarget(me)
 							if dwType ~= TARGET.PLAYER or dwID ~= tar.dwID then -- 先设置目标才能获取BUFF数据
 								X.SetClientPlayerTarget(TARGET.PLAYER, tar.dwID)
 							else

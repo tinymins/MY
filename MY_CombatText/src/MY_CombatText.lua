@@ -478,7 +478,7 @@ function D.OnFrameCreate()
 			if v.nCount >= 3 then
 				local object = X.IsPlayer(v.dwTargetID) and X.GetPlayer(v.dwTargetID) or X.GetNpc(v.dwTargetID)
 				if object then
-					local _, fMaxLife = X.GetTargetLife(object)
+					local _, fMaxLife = X.GetCharacterLife(object)
 					if v.nValue > fMaxLife * 0.35 then
 						local shadow = D.GetFreeShadow(true)
 						if shadow then

@@ -119,9 +119,9 @@ function D.UpdateLine()
 		return
 	end
 	local me = X.GetClientPlayer()
-	local dwTarType, dwTarID = X.GetTargetTarget(me)
+	local dwTarType, dwTarID = X.GetCharacterTarget(me)
 	local tar = X.GetTargetHandle(dwTarType, dwTarID)
-	local dwTTarType, dwTTarID = X.GetTargetTarget(tar)
+	local dwTTarType, dwTTarID = X.GetCharacterTarget(tar)
 	local ttar = X.GetTargetHandle(dwTTarType, dwTTarID)
 	local dwTarLineSrcType, dwTarLineSrcID, dwTarLineDstType, dwTarLineDstID
 	local dwTTarLineSrcType, dwTTarLineSrcID, dwTTarLineDstType, dwTTarLineDstID

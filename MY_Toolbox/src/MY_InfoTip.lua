@@ -200,7 +200,7 @@ local INFO_TIP_LIST = {
 		cache = {},
 		GetFormatString = function(data)
 			local me = X.GetClientPlayer()
-			local p = X.GetTargetHandle(X.GetTargetTarget(me))
+			local p = X.GetTargetHandle(X.GetCharacterTarget(me))
 			local s = data.config.bPlaceholder and _L['No Target'] or ''
 			if me and p then
 				s = string.format(data.cache.formatString, X.GetTargetDistance(me, p))

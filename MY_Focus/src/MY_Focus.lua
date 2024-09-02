@@ -780,7 +780,7 @@ function D.GetDisplayList()
 			if KObject then
 				local fCurrentLife, fMaxLife
 				if p.dwType == TARGET.PLAYER or p.dwType == TARGET.NPC then
-					fCurrentLife, fMaxLife = X.GetTargetLife(KObject)
+					fCurrentLife, fMaxLife = X.GetCharacterLife(KObject)
 				end
 				local bFocus, tRule, szVia, bDeletable = false
 				for _, via in ipairs(p.aVia) do
@@ -815,7 +815,7 @@ function D.GetDisplayList()
 						bDeletable = via.bDeletable
 					end
 				end
-				if bFocus and (p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER) and X.IsTargetIsolated(me) ~= X.IsTargetIsolated(KObject) then
+				if bFocus and (p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER) and X.IsCharacterIsolated(me) ~= X.IsCharacterIsolated(KObject) then
 					bFocus = false
 				end
 				if bFocus and O.bHideDeath then
@@ -1105,7 +1105,7 @@ end
 do
 local function onHotKey()
 	local me = X.GetClientPlayer()
-	local dwType, dwID = X.GetTargetTarget(me)
+	local dwType, dwID = X.GetCharacterTarget(me)
 	local aList = D.GetDisplayList()
 	local t = aList[1]
 	if not t then

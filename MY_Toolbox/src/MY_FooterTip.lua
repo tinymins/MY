@@ -75,7 +75,7 @@ function D.Apply()
 			local tar = X.GetPlayer(dwID)
 			local me = X.GetClientPlayer()
 			if not tar or not me
-			or X.IsTargetIsolated(tar) ~= X.IsTargetIsolated(me) then
+			or X.IsCharacterIsolated(tar) ~= X.IsCharacterIsolated(me) then
 				return
 			end
 			local szGlobalID = X.GetPlayerGlobalID(tar)
@@ -127,7 +127,7 @@ function D.Apply()
 			local me = X.GetClientPlayer()
 			if arg0 == X.GetClientPlayerID() then
 				for _, p in ipairs(X.GetNearPlayer()) do
-					if X.IsTargetIsolated(p) == X.IsTargetIsolated(me) then
+					if X.IsCharacterIsolated(p) == X.IsCharacterIsolated(me) then
 						OnPlayerEnter(p.dwID)
 					else
 						OnPlayerLeave(p.dwID)
@@ -136,7 +136,7 @@ function D.Apply()
 			else
 				local tar = X.GetPlayer(arg0)
 				if tar then
-					if X.IsTargetIsolated(tar) == X.IsTargetIsolated(me) then
+					if X.IsCharacterIsolated(tar) == X.IsCharacterIsolated(me) then
 						OnPlayerEnter(arg0)
 					else
 						OnPlayerLeave(arg0)
@@ -183,7 +183,7 @@ function D.Apply()
 			or me.dwTongID == 0
 			or me.dwID == tar.dwID
 			or tar.dwTongID ~= me.dwTongID
-			or X.IsTargetIsolated(tar) ~= X.IsTargetIsolated(me) then
+			or X.IsCharacterIsolated(tar) ~= X.IsCharacterIsolated(me) then
 				return
 			end
 			if tar.szName == '' then
@@ -229,7 +229,7 @@ function D.Apply()
 			local me = X.GetClientPlayer()
 			if arg0 == X.GetClientPlayerID() then
 				for _, p in ipairs(X.GetNearPlayer()) do
-					if X.IsTargetIsolated(p) == X.IsTargetIsolated(me) then
+					if X.IsCharacterIsolated(p) == X.IsCharacterIsolated(me) then
 						OnPlayerEnter(p.dwID)
 					else
 						OnPlayerLeave(p.dwID)
@@ -238,7 +238,7 @@ function D.Apply()
 			else
 				local tar = X.GetPlayer(arg0)
 				if tar then
-					if X.IsTargetIsolated(tar) == X.IsTargetIsolated(me) then
+					if X.IsCharacterIsolated(tar) == X.IsCharacterIsolated(me) then
 						OnPlayerEnter(arg0)
 					else
 						OnPlayerLeave(arg0)

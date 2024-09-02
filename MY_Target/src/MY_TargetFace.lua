@@ -140,7 +140,7 @@ end
 local function onBreathe()
 	local me = X.GetClientPlayer()
 	-- target face
-	local dwTarType, dwTarID = X.GetTargetTarget(me)
+	local dwTarType, dwTarID = X.GetCharacterTarget(me)
 	local tar = X.GetTargetHandle(dwTarType, dwTarID)
 	if O.bTargetFace and tar then
 		DrawShape(tar, C.shaTargetFace, O.nSectorDegree, O.nSectorRadius, O.nSectorAlpha, O.tTargetFaceColor)
@@ -156,7 +156,7 @@ local function onBreathe()
 		end
 	end
 	-- target target face
-	local dwTTarType, dwTTarID = X.GetTargetTarget(tar)
+	local dwTTarType, dwTTarID = X.GetCharacterTarget(tar)
 	local ttar = X.GetTargetHandle(dwTTarType, dwTTarID)
 	local bIsTarget = tar and dwTarID == dwTTarID
 	if O.bTTargetFace and ttar and (not O.bTargetFace or not bIsTarget) then

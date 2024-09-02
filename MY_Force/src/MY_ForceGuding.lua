@@ -254,7 +254,7 @@ function D.OnUseManaChange()
 			if not me then
 				return
 			end
-			local fCurrentLife, fMaxLife = X.GetTargetLife(me)
+			local fCurrentLife, fMaxLife = X.GetCharacterLife(me)
 			-- 不在地上
 			if me.bOnHorse or me.nMoveState ~= MOVE_STATE.ON_STAND then
 				return

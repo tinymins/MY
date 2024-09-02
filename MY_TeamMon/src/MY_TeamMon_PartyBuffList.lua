@@ -164,7 +164,7 @@ function D.OnItemMouseEnter()
 	if this:GetName() == 'Handle_Item' then
 		if O.bHoverSelect then
 			local me = X.GetClientPlayer()
-			TEMP_TARGET_TYPE, TEMP_TARGET_ID = X.GetTargetTarget(me)
+			TEMP_TARGET_TYPE, TEMP_TARGET_ID = X.GetCharacterTarget(me)
 			X.SetClientPlayerTarget(TARGET.PLAYER, this.data.dwID)
 		end
 		X.OutputBuffTip(this, this.data.dwBuffID, this.data.nLevel)
@@ -230,9 +230,9 @@ function D.GetPlayer(dwID)
 	end
 	if info then
 		if player then
-			info.fCurrentLife64, info.fMaxLife64 = X.GetTargetLife(player)
+			info.fCurrentLife64, info.fMaxLife64 = X.GetCharacterLife(player)
 		else
-			info.fCurrentLife64, info.fMaxLife64 = X.GetTargetLife(info)
+			info.fCurrentLife64, info.fMaxLife64 = X.GetCharacterLife(info)
 		end
 	end
 	return player, info

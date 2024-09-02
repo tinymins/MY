@@ -161,12 +161,12 @@ function D.GetTarget(eTarType, eMonType)
 		return TARGET.PLAYER, X.GetClientPlayerID()
 	elseif eTarType == 'TARGET' then
 		local me = X.GetClientPlayer()
-		return X.GetTargetTarget(me)
+		return X.GetCharacterTarget(me)
 	elseif eTarType == 'TTARGET' then
 		local me = X.GetClientPlayer()
-		local KTarget = X.GetTargetHandle(X.GetTargetTarget(me))
+		local KTarget = X.GetTargetHandle(X.GetCharacterTarget(me))
 		if KTarget then
-			return X.GetTargetTarget(KTarget)
+			return X.GetCharacterTarget(KTarget)
 		end
 	elseif TEAM_MARK[eTarType] then
 		local mark = X.GetTeamMark()

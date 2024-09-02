@@ -28,7 +28,7 @@ local function onHotKey()
 		TARGET_TYPE, TARGET_ID = nil
 	else
 		local me = X.GetClientPlayer()
-		TARGET_TYPE, TARGET_ID = X.GetTargetTarget(me)
+		TARGET_TYPE, TARGET_ID = X.GetCharacterTarget(me)
 		X.SetClientPlayerTarget(TARGET.PLAYER, X.GetClientPlayerID())
 	end
 end

@@ -285,7 +285,7 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_R/Handle_LMN/Image_Mana'):SetPercentage(1)
 		hItem:Lookup('Handle_R/Handle_LMN/Text_Mana'):SetText('')
 	else
-		local fCurrentLife, fMaxLife = X.GetTargetLife(tMemberInfo or KObject)
+		local fCurrentLife, fMaxLife = X.GetCharacterLife(tMemberInfo or KObject)
 		local nCurrentMana, nMaxMana = tMemberInfo and tMemberInfo.nCurrentMana or KObject.nCurrentMana, tMemberInfo and tMemberInfo.nMaxMana or KObject.nMaxMana
 		local szLife = X.FormatNumberDot(fCurrentLife, 1, false, true)
 		if fMaxLife > 0 then
@@ -327,8 +327,8 @@ function D.UpdateItem(hItem, p)
 		end
 	end
 	-- ¾«ÄÍ
-	local nSpirit, nMaxSpirit = X.GetTargetSpirit(KObject)
-	local nEndurance, nMaxEndurance = X.GetTargetEndurance(KObject)
+	local nSpirit, nMaxSpirit = X.GetCharacterSpirit(KObject)
+	local nEndurance, nMaxEndurance = X.GetCharacterEndurance(KObject)
 	if nSpirit and nMaxSpirit and nEndurance and nMaxEndurance then
 		hItem:Lookup('Handle_SpiritEndurance/Handle_SpiritEndurance_Taichi/Animate_SpiritEndurance_Taichi_SpiritBar'):SetAnimateType(ANIMATE.BOTTOM_TOP)
 		hItem:Lookup('Handle_SpiritEndurance/Handle_SpiritEndurance_Taichi/Animate_SpiritEndurance_Taichi_SpiritBar'):SetPercentage(nSpirit / nMaxSpirit)
@@ -413,7 +413,7 @@ function D.OnFrameBreathe()
 	if not D.IsShielded() then
 		if l_dwLockType and l_dwLockID and l_lockInDisplay then
 			local me = X.GetClientPlayer()
-			local dwType, dwID = X.GetTargetTarget(me)
+			local dwType, dwID = X.GetCharacterTarget(me)
 			if dwType ~= l_dwLockType or dwID ~= l_dwLockID then
 				X.SetClientPlayerTarget(l_dwLockType, l_dwLockID)
 			end
@@ -504,7 +504,7 @@ function D.OnItemMouseEnter()
 		this:Lookup('Image_Hover'):Show()
 		if MY_Focus.bHealHelper then
 			local me = X.GetClientPlayer()
-			TEMP_TARGET_TYPE, TEMP_TARGET_ID = X.GetTargetTarget(me)
+			TEMP_TARGET_TYPE, TEMP_TARGET_ID = X.GetCharacterTarget(me)
 			X.SetClientPlayerTarget(this.dwType, this.dwID)
 		end
 		D.OnItemRefreshTip()

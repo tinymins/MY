@@ -579,9 +579,9 @@ function D.GetPlayer(dwID)
 	end
 	if info then
 		if player then
-			info.fCurrentLife64, info.fMaxLife64 = X.GetTargetLife(player)
+			info.fCurrentLife64, info.fMaxLife64 = X.GetCharacterLife(player)
 		else
-			info.fCurrentLife64, info.fMaxLife64 = X.GetTargetLife(info)
+			info.fCurrentLife64, info.fMaxLife64 = X.GetCharacterLife(info)
 		end
 	end
 	return player, info
