@@ -92,35 +92,6 @@ function X.GetObjectEndurance(obj)
 end
 end
 
--- 根据模板ID获取NPC真实名称
-local NPC_NAME_CACHE, DOODAD_NAME_CACHE = {}, {}
-function X.GetTemplateName(dwType, dwTemplateID)
-	local CACHE = dwType == TARGET.NPC and NPC_NAME_CACHE or DOODAD_NAME_CACHE
-	local szName
-	if CACHE[dwTemplateID] then
-		szName = CACHE[dwTemplateID]
-	end
-	if not szName then
-		if dwType == TARGET.NPC then
-			szName = X.CONSTANT.NPC_NAME[dwTemplateID]
-				and X.RenderTemplateString(X.CONSTANT.NPC_NAME[dwTemplateID])
-				or Table_GetNpcTemplateName(dwTemplateID)
-		else
-			szName = X.CONSTANT.DOODAD_NAME[dwTemplateID]
-				and X.RenderTemplateString(X.CONSTANT.DOODAD_NAME[dwTemplateID])
-				or Table_GetDoodadTemplateName(dwTemplateID)
-		end
-		if szName then
-			szName = szName:gsub('^%s*(.-)%s*$', '%1')
-		end
-		CACHE[dwTemplateID] = szName or ''
-	end
-	if X.IsEmpty(szName) then
-		szName = nil
-	end
-	return szName
-end
-
 -- 求N2在N1的面向角  --  重载+2
 -- (number) X.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
 -- (number) X.GetFaceAngel(oN1, oN2, bAbs)
