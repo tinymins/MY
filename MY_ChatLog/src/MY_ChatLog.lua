@@ -287,7 +287,7 @@ function D.ImportDB(aPath)
 			-- 新版导出数据
 			local szGlobalID = X.Get(X.SQLiteGetAll(odb, 'SELECT value FROM ChatInfo WHERE key = "user_global_id"'), {1, 'value'}, ''):gsub('"', '')
 			if szGlobalID == X.GetClientPlayerGlobalID() then
-				local szVersion = X.Get(X.SQLiteGetAll(odb, 'SELECT value FROM ChatInfo WHERE key = "version"'), {1, 'value'}, '')
+				local szVersion = X.DecodeLUAData(X.Get(X.SQLiteGetAll(odb, 'SELECT value FROM ChatInfo WHERE key = "version"'), {1, 'value'}, '')) or ''
 				local nCount = X.Get(X.SQLiteGetAll(odb, 'SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
 				if nCount > 0 then
 					local szRoot, nOffset, nLimit, szNewPath, dbNew = D.GetRoot(), 0, 20000
@@ -306,7 +306,7 @@ function D.ImportDB(aPath)
 							for _, p in ipairs(aRes) do
 								if szVersion == '2' then
 									nImportCount = nImportCount + 1
-									dbNew:InsertMsg(p.channel, p.text, p.msg, p.talker, p.time, p.hash)
+									dbNew:InsertMsg(p.type, p.text, p.msg, p.talker, p.time, p.hash)
 								else
 									local szMsgType = V1_MSG_TYPE_MAP[p.channel]
 									if szMsgType then
