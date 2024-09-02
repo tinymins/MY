@@ -13,6 +13,16 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Game.KObject.Object')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
+-- 获取目标类型（仅支持NPC或玩家）
+---@param dwID number @目标ID
+---@return number @目标类型
+function X.GetTargetType(dwID)
+	if X.IsPlayer(dwID) then
+		return TARGET.PLAYER
+	end
+	return TARGET.NPC
+end
+
 -- 获取目标血量和最大血量
 function X.GetObjectLife(obj)
 	if not obj then
