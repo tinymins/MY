@@ -35,6 +35,30 @@ function X.GetCharacterHandle(dwID)
 	return X.GetNpc(dwID)
 end
 
+-- 通过名字搜索获取角色ID（仅支持NPC或玩家）
+---@param szName string @角色名字
+---@return number | nil @角色ID，获取失败返回 nil
+function X.SearchCharacterID(szName)
+	local dwID = X.SearchNearPlayerID(szName)
+	if dwID then
+		return dwID
+	end
+	local dwID = X.SearchNearNpcID(szName)
+	if dwID then
+		return dwID
+	end
+end
+
+-- 通过名字搜索获取角色对象（仅支持NPC或玩家）
+---@param szName string @角色名字
+---@return userdata | nil @角色对象，获取失败返回 nil
+function X.SearchCharacterHandle(szName)
+	local dwID = X.SearchCharacterID(szName)
+	if dwID then
+		return X.GetCharacterHandle(dwID)
+	end
+end
+
 -- 获取目标气血和最大气血
 ---@param kTar userdata @目标对象
 ---@return number @目标气血，最大气血
