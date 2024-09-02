@@ -25,6 +25,40 @@ function X.GetCharacterType(dwID)
 	return TARGET.NPC
 end
 
+-- 获取目标对象（仅支持NPC或玩家）
+---@param dwID number @目标ID
+---@return userdata | nil @目标对象，获取失败返回 nil
+function X.GetCharacterHandle(dwID)
+	if X.IsPlayer(dwID) then
+		return X.GetPlayer(dwID)
+	end
+	return X.GetNpc(dwID)
+end
+
+-- 通过名字搜索获取角色ID（仅支持NPC或玩家）
+---@param szName string @角色名字
+---@return number | nil @角色ID，获取失败返回 nil
+function X.SearchCharacterID(szName)
+	local dwID = X.SearchNearPlayerID(szName)
+	if dwID then
+		return dwID
+	end
+	local dwID = X.SearchNearNpcID(szName)
+	if dwID then
+		return dwID
+	end
+end
+
+-- 通过名字搜索获取角色对象（仅支持NPC或玩家）
+---@param szName string @角色名字
+---@return userdata | nil @角色对象，获取失败返回 nil
+function X.SearchCharacterHandle(szName)
+	local dwID = X.SearchCharacterID(szName)
+	if dwID then
+		return X.GetCharacterHandle(dwID)
+	end
+end
+
 -- 获取目标气血和最大气血
 ---@param kTar userdata @目标对象
 ---@return number @目标气血，最大气血
@@ -157,6 +191,13 @@ function X.IsCharacterIsolated(kTar)
 		return false
 	end
 	return kTar.bIsolated
+end
+
+-- 获取自身目标
+---@return number, number @自身的目标类型, 自身的目标ID
+function X.GetClientPlayerTarget()
+	local me = X.GetClientPlayer()
+	return X.GetCharacterTarget(me)
 end
 
 -- 根据 dwType 类型和 dwID 设置目标

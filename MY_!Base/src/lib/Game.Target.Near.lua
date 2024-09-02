@@ -61,6 +61,17 @@ function X.GetNearNpcTable()
 end
 end
 
+-- 通过名字搜索附近 NPC ID，有多个返回第一个
+---@param szName string @名字
+---@return number | nil @搜索到的 NPC ID，没搜到返回 nil
+function X.SearchNearNpcID(szName)
+	for _, p in ipairs(NEARBY_NPC) do
+		if p.szName == szName then
+			return p.dwID
+		end
+	end
+end
+
 -- 获取附近PET列表
 -- (table) X.GetNearPet(void)
 function X.GetNearPet(nLimit)
@@ -174,6 +185,17 @@ if IsDebugClient() then
 function X.GetNearPlayerTable()
 	return NEARBY_PLAYER
 end
+end
+
+-- 通过名字搜索附近玩家 ID，有多个返回第一个
+---@param szName string @名字
+---@return number | nil @搜索到的玩家 ID，没搜到返回 nil
+function X.SearchNearPlayerID(szName)
+	for _, p in ipairs(NEARBY_PLAYER) do
+		if p.szName == szName then
+			return p.dwID
+		end
+	end
 end
 
 -- 获取附近物品列表
