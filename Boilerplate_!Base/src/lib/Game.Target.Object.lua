@@ -23,26 +23,30 @@ function X.GetTargetType(dwID)
 	return TARGET.NPC
 end
 
--- 获取目标血量和最大血量
-function X.GetObjectLife(obj)
-	if not obj then
+-- 获取目标气血和最大气血
+---@param kTar userdata @目标对象
+---@return number @目标气血，最大气血
+function X.GetTargetLife(kTar)
+	if not kTar then
 		return
 	end
-	return X.IS_REMAKE and obj.fCurrentLife64 or obj.nCurrentLife,
-		X.IS_REMAKE and obj.fMaxLife64 or obj.nMaxLife
+	return X.IS_REMAKE and kTar.fCurrentLife64 or kTar.nCurrentLife,
+		X.IS_REMAKE and kTar.fMaxLife64 or kTar.nMaxLife
 end
 
 -- 获取目标内力和最大内力
-function X.GetObjectMana(obj)
-	if not obj then
+---@param kTar userdata @目标对象
+---@return number @目标内力，最大内力
+function X.GetTargetMana(kTar)
+	if not kTar then
 		return
 	end
-	return obj.nCurrentMana, obj.nMaxMana
+	return kTar.nCurrentMana, kTar.nMaxMana
 end
 
 do
 local CACHE = {}
-local function GetObjectSceneIndex(dwID)
+local function GetTargetSceneIndex(dwID)
 	local me = X.GetClientPlayer()
 	if not me then
 		return
@@ -70,10 +74,10 @@ local function GetObjectSceneIndex(dwID)
 end
 
 -- 获取目标精力和最大精力
----@param obj userdata | string @目标对象或目标ID
+---@param kTar userdata | number @目标对象或目标ID
 ---@return number @目标精力，最大精力
-function X.GetObjectSpirit(obj)
-	local scene, nType, nIndex = GetObjectSceneIndex(X.IsUserdata(obj) and obj.dwID or obj)
+function X.GetTargetSpirit(kTar)
+	local scene, nType, nIndex = GetTargetSceneIndex(X.IsUserdata(kTar) and kTar.dwID or kTar)
 	if scene and nType and nIndex then
 		return scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 4),
 			scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 8)
@@ -81,10 +85,10 @@ function X.GetObjectSpirit(obj)
 end
 
 -- 获取目标耐力和最大耐力
----@param obj userdata | string @目标对象或目标ID
+---@param obj userdata | number @目标对象或目标ID
 ---@return number @目标耐力，最大耐力
-function X.GetObjectEndurance(obj)
-	local scene, nType, nIndex = GetObjectSceneIndex(X.IsUserdata(obj) and obj.dwID or obj)
+function X.GetTargetEndurance(obj)
+	local scene, nType, nIndex = GetTargetSceneIndex(X.IsUserdata(obj) and obj.dwID or obj)
 	if scene and nType and nIndex then
 		return scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 12),
 			scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 16)
