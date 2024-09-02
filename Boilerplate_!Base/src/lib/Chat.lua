@@ -325,7 +325,17 @@ local ChatLinkEvents = {
 		elseif IsCtrlKeyDown() then
 			X.CopyChatItem(link)
 		elseif IsShiftKeyDown() then
-			X.SetTarget(TARGET.PLAYER, X.UI(link):Text())
+			local dwID
+			local szName = X.UI(link):Text():gsub('[%[%]]', '')
+			for _, p in ipairs(X.GetNearPlayer()) do
+				if szName == p.szName then
+					dwID = p.dwID
+					break
+				end
+			end
+			if dwID then
+				X.SetTarget(TARGET.PLAYER, dwID)
+			end
 		elseif IsAltKeyDown() then
 			if _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
 				local info = _G.MY_Farbnamen.Get((X.UI(link):Text():gsub('[%[%]]', '')))

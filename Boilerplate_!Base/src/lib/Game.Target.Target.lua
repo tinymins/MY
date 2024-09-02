@@ -47,56 +47,10 @@ end
 X.RegisterRestriction('X.SET_TARGET', { ['*'] = true, intl = false })
 
 -- 根据 dwType 类型和 dwID 设置目标
--- (void) X.SetTarget([number dwType, ]number dwID)
--- (void) X.SetTarget([number dwType, ]string szName)
--- dwType   -- *可选* 目标类型
--- dwID     -- 目标 ID
-function X.SetTarget(arg0, arg1)
-	local dwType, dwID, szNames
-	if X.IsUserdata(arg0) then
-		dwType, dwID = TARGET[X.GetObjectType(arg0)], arg0.dwID
-	elseif X.IsString(arg0) then
-		szNames = arg0
-	elseif X.IsNumber(arg0) then
-		if X.IsNil(arg1) then
-			dwID = arg0
-		elseif X.IsString(arg1) then
-			dwType, szNames = arg0, arg1
-		elseif X.IsNumber(arg1) then
-			dwType, dwID = arg0, arg1
-		end
-	end
-	if not dwID and not szNames then
-		return
-	end
-	if dwID and not dwType then
-		dwType = X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
-	end
-	if szNames then
-		local tTarget = {}
-		for _, szName in pairs(X.SplitString(szNames:gsub('[%[%]]', ''), '|')) do
-			tTarget[szName] = true
-		end
-		if not dwID and (not dwType or dwType == TARGET.NPC) then
-			for _, p in ipairs(X.GetNearNpc()) do
-				if tTarget[p.szName] then
-					dwType, dwID = TARGET.NPC, p.dwID
-					break
-				end
-			end
-		end
-		if not dwID and (not dwType or dwType == TARGET.PLAYER) then
-			for _, p in ipairs(X.GetNearPlayer()) do
-				if tTarget[p.szName] then
-					dwType, dwID = TARGET.PLAYER, p.dwID
-					break
-				end
-			end
-		end
-	end
-	if not dwType or not dwID then
-		return false
-	end
+---@param dwType number @目标类型
+---@param dwID number @目标ID
+---@return boolean @是否成功调用
+function X.SetTarget(dwType, dwID)
 	if dwType == TARGET.PLAYER then
 		if X.IsInShieldedMap() and not X.IsParty(dwID) and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
