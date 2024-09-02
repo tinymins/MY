@@ -96,33 +96,31 @@ function X.GetTargetEndurance(obj)
 end
 end
 
--- 求N2在N1的面向角  --  重载+2
--- (number) X.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
--- (number) X.GetFaceAngel(oN1, oN2, bAbs)
--- @param nX    N1的X坐标
--- @param nY    N1的Y坐标
--- @param nFace N1的面向[0, 255]
--- @param nTX   N2的X坐标
--- @param nTY   N2的Y坐标
--- @param bAbs  返回角度是否只允许正数
--- @param oN1   N1对象
--- @param oN2   N2对象
--- @return nil    参数错误
--- @return number 面向角(-180, 180]
-function X.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
-	if type(nY) == 'userdata' and type(nX) == 'userdata' then
-		nX, nY, nFace, nTX, nTY, bAbs = nX.nX, nX.nY, nX.nFaceDirection, nY.nX, nY.nY, nFace
+-- 求坐标2在坐标1的面向角
+---@param nX1 number @坐标1的X坐标
+---@param nY1 number @坐标1的Y坐标
+---@param nFace1 number @坐标1的面向[0, 255]
+---@param nX2 number @坐标2的X坐标
+---@param nY2 number @坐标2的Y坐标
+---@param bAbs boolean @只允许返回正数角度
+---@return number @面向角(-180, 180]
+function X.GetPointFaceAngel(nX1, nY1, nFace1, nX2, nY2, bAbs)
+	local nFace = (nFace1 * 2 * math.pi / 255) - math.pi
+	local nSight = (nX1 == nX2 and ((nY1 > nY2 and math.pi / 2) or - math.pi / 2)) or math.atan((nY2 - nY1) / (nX2 - nX1))
+	local nAngel = ((nSight - nFace) % (math.pi * 2) - math.pi) / math.pi * 180
+	if bAbs then
+		nAngel = math.abs(nAngel)
 	end
-	if type(nX) == 'number' and type(nY) == 'number' and type(nFace) == 'number'
-	and type(nTX) == 'number' and type(nTY) == 'number' then
-		local nFace = (nFace * 2 * math.pi / 255) - math.pi
-		local nSight = (nX == nTX and ((nY > nTY and math.pi / 2) or - math.pi / 2)) or math.atan((nTY - nY) / (nTX - nX))
-		local nAngel = ((nSight - nFace) % (math.pi * 2) - math.pi) / math.pi * 180
-		if bAbs then
-			nAngel = math.abs(nAngel)
-		end
-		return nAngel
-	end
+	return nAngel
+end
+
+-- 求目标2在目标1的面向角
+---@param kTar1 userdata @目标1
+---@param kTar2 userdata @目标2
+---@param bAbs boolean @只允许返回正数角度
+---@return number @面向角(-180, 180]
+function X.GetTargetFaceAngel(kTar1, kTar2, bAbs)
+	return X.GetPointFaceAngel(kTar1.nX, kTar1.nY, kTar1.nFaceDirection, kTar2.nX, kTar2.nY, bAbs)
 end
 
 --------------------------------------------------------------------------------
