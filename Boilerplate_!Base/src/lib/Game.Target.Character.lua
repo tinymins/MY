@@ -193,6 +193,13 @@ function X.IsCharacterIsolated(kTar)
 	return kTar.bIsolated
 end
 
+-- 获取自身目标
+---@return number, number @自身的目标类型, 自身的目标ID
+function X.GetClientPlayerTarget()
+	local me = X.GetClientPlayer()
+	return X.GetCharacterTarget(me)
+end
+
 -- 根据 dwType 类型和 dwID 设置目标
 ---@param dwType number @目标类型
 ---@param dwID number @目标ID
