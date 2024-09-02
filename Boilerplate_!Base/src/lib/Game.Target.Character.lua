@@ -25,6 +25,16 @@ function X.GetCharacterType(dwID)
 	return TARGET.NPC
 end
 
+-- 获取目标对象（仅支持NPC或玩家）
+---@param dwID number @目标ID
+---@return userdata | nil @目标对象，获取失败返回 nil
+function X.GetCharacterHandle(dwID)
+	if X.IsPlayer(dwID) then
+		return X.GetPlayer(dwID)
+	end
+	return X.GetNpc(dwID)
+end
+
 -- 获取目标气血和最大气血
 ---@param kTar userdata @目标对象
 ---@return number @目标气血，最大气血
