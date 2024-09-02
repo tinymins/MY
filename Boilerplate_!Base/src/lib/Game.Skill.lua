@@ -289,7 +289,7 @@ function X.GetSchoolForceID(dwSchoolID)
 end
 end
 
-function X.GetTargetSkillIDs(tar)
+function X.GetPlayerSkillIDs(tar)
 	local aSchoolID, aSkillID = tar.GetSchoolList(), {}
 	for _, dwSchoolID in ipairs(aSchoolID) do
 		local dwForceID = X.GetSchoolForceID(dwSchoolID)
@@ -309,7 +309,7 @@ function X.GetSkillMountList(bIncludePassive)
 	if not LIST then
 		LIST, LIST_ALL = {}, {}
 		local me = X.GetClientPlayer()
-		local aList = X.GetTargetSkillIDs(me)
+		local aList = X.GetPlayerSkillIDs(me)
 		for _, dwID in ipairs(aList) do
 			local nLevel = me.GetSkillLevel(dwID)
 			if nLevel > 0 then

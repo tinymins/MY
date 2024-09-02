@@ -58,7 +58,7 @@ end
 ---@param nMark number @标记索引
 ---@param dwID number @目标ID
 ---@return boolean @是否成功
-function X.SetTeamMarkTarget(nMark, dwID)
+function X.SetTeamMarkCharacter(nMark, dwID)
 	local npc = not X.IsPlayer(dwID) and X.GetNpc(dwID) or nil
 	if npc and X.IsShieldedNpc(npc.dwTemplateID) then
 		return false
@@ -78,7 +78,7 @@ end
 -- 获取标记目标
 ---@param nMark number @标记索引
 ---@return number @目标ID
-function X.GetTeamMarkTarget(nMark)
+function X.GetTeamMarkCharacter(nMark)
 	local tMark = X.GetTeamMark()
 	return tMark[nMark]
 end
@@ -86,7 +86,7 @@ end
 -- 获取目标标记
 ---@param dwID number @目标ID
 ---@return number @标记索引
-function X.GetTargetTeamMark(dwID)
+function X.GetCharacterTeamMark(dwID)
 	if not X.IsInParty() then
 		return
 	end

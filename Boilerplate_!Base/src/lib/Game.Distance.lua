@@ -107,7 +107,7 @@ end
 ---@param kTar2 userdata @目标2
 ---@param szType? string @距离计算方式：'euclidean': 欧氏距离 (default)； 'plane': 平面距离； 'gwwean': 郭氏距离； 'global': 使用全局配置；
 ---@return number @距离计算结果
-function X.GetTargetDistance(kTar1, kTar2, szType)
+function X.GetCharacterDistance(kTar1, kTar2, szType)
 	return X.Get3DPointDistance(kTar1.nX, kTar1.nY, kTar1.nZ, kTar2.nX, kTar2.nY, kTar2.nZ, szType)
 end
 

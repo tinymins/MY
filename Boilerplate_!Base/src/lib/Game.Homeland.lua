@@ -111,7 +111,7 @@ function X.GetNearFurniture(nDis)
 	local me = X.GetClientPlayer()
 	if X.IsFunction(GetNearbyFurnitureInfoList) and X.IsFunction(HomeLand_GetFurniture2GameID) then
 		for _, p in ipairs(GetNearbyFurnitureInfoList('ui get objects info v_0', nDis)) do
-			if X.GetTargetDistance(me, p, 'plane') <= nPlaneDis then
+			if X.GetCharacterDistance(me, p, 'plane') <= nPlaneDis then
 				local dwID = X.NumberBitShl(p.BaseId, 32, 64) + p.InstID
 				local info = not tID[dwID] and X.GetFurnitureInfo('nRepresentID', p.RepresentID)
 				if info then
