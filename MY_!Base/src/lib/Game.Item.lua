@@ -95,10 +95,7 @@ local m_MountTypeToWeapon = X.KvpToObject({
 	--WEAPON_DETAIL.MACH_DART = 机关暗器
 	--WEAPON_DETAIL.SLING_SHOT = 投掷
 })
-function X.IsItemFitKungfu(kItemInfo, ...)
-	if X.GetObjectType(kItemInfo) == 'ITEM' then
-		kItemInfo = GetItemInfo(kItemInfo.dwTabType, kItemInfo.dwIndex)
-	end
+function X.IsItemInfoFitKungfu(kItemInfo, ...)
 	local kungfu = ...
 	local me = X.GetClientPlayer()
 	if select('#', ...) == 0 then
@@ -156,6 +153,11 @@ function X.IsItemFitKungfu(kItemInfo, ...)
 		end
 	end
 end
+end
+
+function X.IsItemFitKungfu(kItem, ...)
+	local kItemInfo = GetItemInfo(kItem.dwTabType, kItem.dwIndex)
+	return X.IsItemInfoFitKungfu(kItemInfo, ...)
 end
 
 -- 获取物品精炼等级

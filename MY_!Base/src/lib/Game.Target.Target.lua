@@ -13,94 +13,250 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Game.KObject.Target')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
+-- 获取目标类型（仅支持NPC或玩家）
+---@param dwID number @目标ID
+---@return number @目标类型
+function X.GetTargetType(dwID)
+	if X.IsPlayer(dwID) then
+		return TARGET.PLAYER
+	end
+	return TARGET.NPC
+end
+
+-- 获取目标气血和最大气血
+---@param kTar userdata @目标对象
+---@return number @目标气血，最大气血
+function X.GetTargetLife(kTar)
+	if not kTar then
+		return
+	end
+	return X.IS_REMAKE and kTar.fCurrentLife64 or kTar.nCurrentLife,
+		X.IS_REMAKE and kTar.fMaxLife64 or kTar.nMaxLife
+end
+
+-- 获取目标内力和最大内力
+---@param kTar userdata @目标对象
+---@return number @目标内力，最大内力
+function X.GetTargetMana(kTar)
+	if not kTar then
+		return
+	end
+	return kTar.nCurrentMana, kTar.nMaxMana
+end
+
+do
+local CACHE = {}
+local function GetTargetSceneIndex(dwID)
+	local me = X.GetClientPlayer()
+	if not me then
+		return
+	end
+	if not X.IsMonsterMap(me.GetMapID()) then
+		return
+	end
+	local scene = me.GetScene()
+	if not scene then
+		return
+	end
+	local nType = X.IsPlayer(dwID) and 0 or 1
+	local nIndex = CACHE[dwID]
+	if not nIndex or scene.GetTempCustomUnsigned4(1, nIndex * 20 + 1) ~= dwID then
+		for i = 0, 9 do
+			local nOffset = i * 20 + 1
+			if scene.GetTempCustomUnsigned4(nType, nOffset) == dwID then
+				CACHE[dwID] = i
+				nIndex = i
+				break
+			end
+		end
+	end
+	return scene, nType, nIndex
+end
+
+-- 获取目标精力和最大精力
+---@param kTar userdata | number @目标对象或目标ID
+---@return number @目标精力，最大精力
+function X.GetTargetSpirit(kTar)
+	local scene, nType, nIndex = GetTargetSceneIndex(X.IsUserdata(kTar) and kTar.dwID or kTar)
+	if scene and nType and nIndex then
+		return scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 4),
+			scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 8)
+	end
+end
+
+-- 获取目标耐力和最大耐力
+---@param obj userdata | number @目标对象或目标ID
+---@return number @目标耐力，最大耐力
+function X.GetTargetEndurance(obj)
+	local scene, nType, nIndex = GetTargetSceneIndex(X.IsUserdata(obj) and obj.dwID or obj)
+	if scene and nType and nIndex then
+		return scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 12),
+			scene.GetTempCustomUnsigned4(nType, nIndex * 20 + 1 + 16)
+	end
+end
+end
+
+-- 求坐标2在坐标1的面向角
+---@param nX1 number @坐标1的X坐标
+---@param nY1 number @坐标1的Y坐标
+---@param nFace1 number @坐标1的面向[0, 255]
+---@param nX2 number @坐标2的X坐标
+---@param nY2 number @坐标2的Y坐标
+---@param bAbs boolean @只允许返回正数角度
+---@return number @面向角(-180, 180]
+function X.GetPointFaceAngel(nX1, nY1, nFace1, nX2, nY2, bAbs)
+	local nFace = (nFace1 * 2 * math.pi / 255) - math.pi
+	local nSight = (nX1 == nX2 and ((nY1 > nY2 and math.pi / 2) or - math.pi / 2)) or math.atan((nY2 - nY1) / (nX2 - nX1))
+	local nAngel = ((nSight - nFace) % (math.pi * 2) - math.pi) / math.pi * 180
+	if bAbs then
+		nAngel = math.abs(nAngel)
+	end
+	return nAngel
+end
+
+-- 求目标2在目标1的面向角
+---@param kTar1 userdata @目标1
+---@param kTar2 userdata @目标2
+---@param bAbs boolean @只允许返回正数角度
+---@return number @面向角(-180, 180]
+function X.GetTargetFaceAngel(kTar1, kTar2, bAbs)
+	return X.GetPointFaceAngel(kTar1.nX, kTar1.nY, kTar1.nFaceDirection, kTar2.nX, kTar2.nY, bAbs)
+end
+
+--------------------------------------------------------------------------------
+-- 角色状态
+--------------------------------------------------------------------------------
+
+-- 获取目标是否无敌
+---@param kTar userdata @要获取的目标
+---@return boolean @目标是否无敌
+function X.IsTargetInvincible(kTar)
+	if X.GetBuff(kTar, 961) then
+		return true
+	end
+	return false
+end
+
+-- 获取目标是否被隔离
+---@param kTar userdata @要获取的目标
+---@return boolean @目标是否被隔离
+function X.IsTargetIsolated(kTar)
+	if X.IS_CLASSIC then
+		return false
+	end
+	return kTar.bIsolated
+end
+
+--------------------------------------------------------------------------------
+-- 角色模型屏蔽状态
+--------------------------------------------------------------------------------
+
+do
+local CURRENT_NPC_SHOW_ALL = true
+local CURRENT_PLAYER_SHOW_ALL = true
+local CURRENT_PLAYER_SHOW_PARTY_OVERRIDE = false
+X.RegisterEvent('ON_REPRESENT_CMD', 'LIB#PLAYER_DISPLAY_MODE', function()
+	if arg0 == 'show npc' then
+		CURRENT_NPC_SHOW_ALL = true
+	elseif arg0 == 'hide npc' then
+		CURRENT_NPC_SHOW_ALL = false
+	elseif arg0 == 'show player' then
+		CURRENT_PLAYER_SHOW_ALL = true
+	elseif arg0 == 'hide player' then
+		CURRENT_PLAYER_SHOW_ALL = false
+	elseif arg0 == 'show or hide party player 1' then
+		CURRENT_PLAYER_SHOW_PARTY_OVERRIDE = true
+	elseif arg0 == 'show or hide party player 0' then
+		CURRENT_PLAYER_SHOW_PARTY_OVERRIDE = false
+	end
+end)
+
+--- 获取 NPC 显示状态
+---@return boolean @NPC 是否显示
+function X.GetNpcVisibility()
+	return CURRENT_NPC_SHOW_ALL
+end
+
+--- 设置 NPC 显示状态
+---@param bShow boolean @NPC 是否显示
+function X.SetNpcVisibility(bShow)
+	if bShow then
+		rlcmd('show npc')
+	else
+		rlcmd('hide npc')
+	end
+end
+
+--- 获取玩家显示状态
+---@return boolean, boolean @玩家是否显示 @队友是否强制显示
+function X.GetPlayerVisibility()
+	if UIGetPlayerDisplayMode and PLAYER_DISPLAY_MODE then
+		local eMode = UIGetPlayerDisplayMode()
+		if eMode == PLAYER_DISPLAY_MODE.ALL then
+			return true, true
+		end
+		if eMode == PLAYER_DISPLAY_MODE.ONLY_PARTY then
+			return false, true
+		end
+		if eMode == PLAYER_DISPLAY_MODE.ONLY_SELF then
+			return false, false
+		end
+		return true, false
+	end
+	return CURRENT_PLAYER_SHOW_ALL, CURRENT_PLAYER_SHOW_PARTY_OVERRIDE
+end
+
+--- 设置玩家显示状态
+---@param bShowAll boolean @玩家是否显示
+---@param bShowPartyOverride boolean @队友是否强制显示
+function X.SetPlayerVisibility(bShowAll, bShowPartyOverride)
+	if UISetPlayerDisplayMode and PLAYER_DISPLAY_MODE then
+		if bShowAll then
+			return UISetPlayerDisplayMode(PLAYER_DISPLAY_MODE.ALL)
+		end
+		if bShowPartyOverride then
+			return UISetPlayerDisplayMode(PLAYER_DISPLAY_MODE.ONLY_PARTY)
+		end
+		return UISetPlayerDisplayMode(PLAYER_DISPLAY_MODE.ONLY_SELF)
+	end
+	if bShowAll then
+		rlcmd('show player')
+	else
+		rlcmd('hide player')
+	end
+	if bShowPartyOverride then
+		rlcmd('show or hide party player 1')
+	else
+		rlcmd('show or hide party player 0')
+	end
+end
+end
+
 --------------------------------------------------------------------------------
 -- 目标获取相关接口
 --------------------------------------------------------------------------------
 
--- 取得目标类型和ID
--- (dwType, dwID) X.GetTarget()       -- 取得自己当前的目标类型和ID
--- (dwType, dwID) X.GetTarget(object) -- 取得指定操作对象当前的目标类型和ID
-function X.GetTarget(...)
-	local object = ...
-	if select('#', ...) == 0 then
-		object = X.GetClientPlayer()
+-- 取得指定目标的目标类型和ID
+---@param kTar userdata @指定的目标
+---@return number, number @目标的目标类型, 目标的目标ID
+function X.GetTargetTarget(kTar)
+	if kTar and kTar.GetTarget then
+		return kTar.GetTarget()
 	end
-	if object and object.GetTarget then
-		return object.GetTarget()
-	else
-		return TARGET.NO_TARGET, 0
-	end
-end
-
--- 取得目标的目标类型和ID
--- (dwType, dwID) X.GetTargetTarget()       -- 取得自己当前的目标的目标类型和ID
--- (dwType, dwID) X.GetTargetTarget(object) -- 取得指定操作对象当前的目标的目标类型和ID
-function X.GetTargetTarget(object)
-	local nTarType, dwTarID = X.GetTarget(object)
-	local KTar = X.GetTargetHandle(nTarType, dwTarID)
-	if not KTar then
-		return
-	end
-	return X.GetTarget(KTar)
+	return TARGET.NO_TARGET, 0
 end
 
 X.RegisterRestriction('X.SET_TARGET', { ['*'] = true, intl = false })
 
 -- 根据 dwType 类型和 dwID 设置目标
--- (void) X.SetTarget([number dwType, ]number dwID)
--- (void) X.SetTarget([number dwType, ]string szName)
--- dwType   -- *可选* 目标类型
--- dwID     -- 目标 ID
-function X.SetTarget(arg0, arg1)
-	local dwType, dwID, szNames
-	if X.IsUserdata(arg0) then
-		dwType, dwID = TARGET[X.GetObjectType(arg0)], arg0.dwID
-	elseif X.IsString(arg0) then
-		szNames = arg0
-	elseif X.IsNumber(arg0) then
-		if X.IsNil(arg1) then
-			dwID = arg0
-		elseif X.IsString(arg1) then
-			dwType, szNames = arg0, arg1
-		elseif X.IsNumber(arg1) then
-			dwType, dwID = arg0, arg1
-		end
-	end
-	if not dwID and not szNames then
-		return
-	end
-	if dwID and not dwType then
-		dwType = X.IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC
-	end
-	if szNames then
-		local tTarget = {}
-		for _, szName in pairs(X.SplitString(szNames:gsub('[%[%]]', ''), '|')) do
-			tTarget[szName] = true
-		end
-		if not dwID and (not dwType or dwType == TARGET.NPC) then
-			for _, p in ipairs(X.GetNearNpc()) do
-				if tTarget[p.szName] then
-					dwType, dwID = TARGET.NPC, p.dwID
-					break
-				end
-			end
-		end
-		if not dwID and (not dwType or dwType == TARGET.PLAYER) then
-			for _, p in ipairs(X.GetNearPlayer()) do
-				if tTarget[p.szName] then
-					dwType, dwID = TARGET.PLAYER, p.dwID
-					break
-				end
-			end
-		end
-	end
-	if not dwType or not dwID then
-		return false
-	end
+---@param dwType number @目标类型
+---@param dwID number @目标ID
+---@return boolean @是否成功调用
+function X.SetClientPlayerTarget(dwType, dwID)
 	if dwType == TARGET.PLAYER then
 		if X.IsInShieldedMap() and not X.IsParty(dwID) and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			X.OutputDebugMessage('SetTarget', 'Set target to player is forbiden in current map.', X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('SetClientPlayerTarget', 'Set target to player is forbiden in current map.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
@@ -108,14 +264,14 @@ function X.SetTarget(arg0, arg1)
 		local npc = X.GetNpc(dwID)
 		if npc and not npc.IsSelectable() and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			X.OutputDebugMessage('SetTarget', 'Set target to unselectable npc.', X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('SetClientPlayerTarget', 'Set target to unselectable npc.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
 	elseif dwType == TARGET.DOODAD then
 		if X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			X.OutputDebugMessage('SetTarget', 'Set target to doodad.', X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('SetClientPlayerTarget', 'Set target to doodad.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end

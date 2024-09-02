@@ -111,7 +111,8 @@ function X.IsBoss(dwMapID, dwTemplateID)
 end
 
 X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#Bosslist'), function()
-	local dwType, dwID = X.GetTarget()
+	local me = X.GetClientPlayer()
+	local dwType, dwID = X.GetTargetTarget(me)
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
 		local kNpc = X.GetNpc(dwID)
@@ -246,7 +247,8 @@ function X.IsPartnerNpc(dwTemplateID)
 end
 
 X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#ImportantNpclist'), function()
-	local dwType, dwID = X.GetTarget()
+	local me = X.GetClientPlayer()
+	local dwType, dwID = X.GetTargetTarget(me)
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
 		local p = X.GetNpc(dwID)

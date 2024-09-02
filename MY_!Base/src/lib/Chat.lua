@@ -325,7 +325,17 @@ local ChatLinkEvents = {
 		elseif IsCtrlKeyDown() then
 			X.CopyChatItem(link)
 		elseif IsShiftKeyDown() then
-			X.SetTarget(TARGET.PLAYER, X.UI(link):Text())
+			local dwID
+			local szName = X.UI(link):Text():gsub('[%[%]]', '')
+			for _, p in ipairs(X.GetNearPlayer()) do
+				if szName == p.szName then
+					dwID = p.dwID
+					break
+				end
+			end
+			if dwID then
+				X.SetClientPlayerTarget(TARGET.PLAYER, dwID)
+			end
 		elseif IsAltKeyDown() then
 			if _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
 				local info = _G.MY_Farbnamen.Get((X.UI(link):Text():gsub('[%[%]]', '')))
@@ -342,10 +352,10 @@ local ChatLinkEvents = {
 							OutputMessage('MSG_ANNOUNCE_RED', _L['Player is too far to peek!'])
 						end
 					end
-					if info.szGlobalID and dwServerID then
-						X.ViewOtherPlayerByGlobalID(dwServerID, info.szGlobalID, OnPeekOtherPlayerResult)
-					elseif info.dwID then
+					if info.szServerName == X.GetServerOriginName() and info.dwID then
 						X.ViewOtherPlayerByID(info.dwID, OnPeekOtherPlayerResult)
+					elseif info.szGlobalID and dwServerID then
+						X.ViewOtherPlayerByGlobalID(dwServerID, info.szGlobalID, OnPeekOtherPlayerResult)
 					end
 				end
 			end
@@ -1015,7 +1025,7 @@ end
 -- parse name in talking message
 local function ParseName(t)
 	local me = X.GetClientPlayer()
-	local tar = X.GetTargetHandle(me.GetTarget())
+	local tar = X.GetTargetHandle(X.GetTargetTarget(me))
 	for i, v in ipairs(t) do
 		if v.type == 'text' then
 			v.text = string.gsub(v.text, '%$zj', '[' .. me.szName .. ']')
