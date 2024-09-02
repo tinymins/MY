@@ -127,40 +127,24 @@ end
 -- 角色状态
 --------------------------------------------------------------------------------
 
--- 获取对象是否无敌
--- (mixed) X.IsInvincible([object KObject])
--- @return <nil >: invalid KObject
--- @return <bool>: object invincible state
-function X.IsInvincible(...)
-	local KObject = ...
-	if select('#', ...) == 0 then
-		KObject = X.GetClientPlayer()
-	end
-	if not KObject then
-		return nil
-	elseif X.GetBuff(KObject, 961) then
+-- 获取目标是否无敌
+---@param kTar userdata @要获取的目标
+---@return boolean @目标是否无敌
+function X.IsTargetInvincible(kTar)
+	if X.GetBuff(kTar, 961) then
 		return true
-	else
-		return false
 	end
+	return false
 end
 
--- 获取对象是否被隔离
--- (mixed) X.IsIsolated([object KObject])
--- @return <nil >: invalid KObject
--- @return <bool>: object isolated state
-function X.IsIsolated(...)
-	local KObject = ...
-	if select('#', ...) == 0 then
-		KObject = X.GetClientPlayer()
-	end
-	if not KObject then
-		return false
-	end
+-- 获取目标是否被隔离
+---@param kTar userdata @要获取的目标
+---@return boolean @目标是否被隔离
+function X.IsTargetIsolated(kTar)
 	if X.IS_CLASSIC then
 		return false
 	end
-	return KObject.bIsolated
+	return kTar.bIsolated
 end
 
 --------------------------------------------------------------------------------
