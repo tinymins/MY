@@ -491,11 +491,11 @@ function D.OnFrameBreathe()
 				local npc = X.GetNpc(dwNpcID)
 				if npc then
 					-- if bTempTarget then
-					-- 	X.SetTarget(TARGET.NPC, vv)
-					-- 	X.SetTarget(dwType, dwID)
+					-- 	X.SetClientPlayerTarget(TARGET.NPC, vv)
+					-- 	X.SetClientPlayerTarget(dwType, dwID)
 					-- end
 					-- 血量变化检查
-					local fCurrentLife, fMaxLife = X.GetObjectLife(npc)
+					local fCurrentLife, fMaxLife = X.GetTargetLife(npc)
 					if fMaxLife > 1 then
 						local nLife = math.floor(fCurrentLife / fMaxLife * 100)
 						if tab.nLife ~= nLife then
@@ -859,7 +859,8 @@ function D.CheckScrutinyType(nScrutinyType, dwID)
 	elseif nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.ENEMY and not IsEnemy(MY_TEAM_MON_CORE_PLAYERID, dwID) then
 		return false
 	elseif nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.TARGET then
-		local obj = X.GetTargetHandle(X.GetTarget())
+		local me = X.GetClientPlayer()
+		local obj = X.GetTargetHandle(X.GetTargetTarget(me))
 		if not obj or obj and obj.dwID ~= dwID then
 			return false
 		end

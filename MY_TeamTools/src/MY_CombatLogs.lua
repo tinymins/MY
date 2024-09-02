@@ -469,8 +469,8 @@ function D.OnTargetInformationUpdate(dwType, dwID)
 		tar = X.GetDoodad(dwID)
 	end
 	if tar then
-		local nLife, nMaxLife = X.GetObjectLife(tar)
-		local nMana, nMaxMana = X.GetObjectMana(tar)
+		local nLife, nMaxLife = X.GetTargetLife(tar)
+		local nMana, nMaxMana = X.GetTargetMana(tar)
 		local nDamageAbsorbValue = tar.nDamageAbsorbValue
 		D.InsertLog(LOG_TYPE.TARGET_INFORMATION, {
 			dwType, dwID,
@@ -703,7 +703,7 @@ X.RegisterEvent('MY_PLAYER_FIGHT_HINT', function()
 	local KObject = X.GetTargetHandle(TARGET.PLAYER, dwID)
 	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = -1, -1, -1, -1
 	if KObject then
-		fCurrentLife, fMaxLife = X.GetObjectLife(KObject)
+		fCurrentLife, fMaxLife = X.GetTargetLife(KObject)
 		nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 	end
 	D.OnTargetUpdate(dwID, true)
@@ -722,7 +722,7 @@ X.RegisterEvent('MY_NPC_FIGHT_HINT', function()
 	local KObject = X.GetTargetHandle(TARGET.NPC, dwID)
 	local fCurrentLife, fMaxLife, nCurrentMana, nMaxMana = -1, -1, -1, -1
 	if KObject then
-		fCurrentLife, fMaxLife = X.GetObjectLife(KObject)
+		fCurrentLife, fMaxLife = X.GetTargetLife(KObject)
 		nCurrentMana, nMaxMana = KObject.nCurrentMana, KObject.nMaxMana
 	end
 	D.OnTargetUpdate(dwID, true)

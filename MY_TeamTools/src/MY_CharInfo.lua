@@ -184,7 +184,8 @@ end
 
 do
 local function GetInfoPanelMenu()
-	local dwType, dwID = X.GetTarget()
+	local me = X.GetClientPlayer()
+	local dwType, dwID = X.GetTargetTarget(me)
 	if dwType == TARGET.PLAYER and dwID ~= X.GetClientPlayerID() then
 		return {
 			szOption = g_tStrings.STR_LOOK .. g_tStrings.STR_EQUIP_ATTR,

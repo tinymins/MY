@@ -452,7 +452,8 @@ end
 --------------------------------------------------------------------------------
 
 X.RegisterTargetAddonMenu('MY_PlayerRemark', function()
-	local dwType, dwID = X.GetTarget()
+	local me = X.GetClientPlayer()
+	local dwType, dwID = X.GetTargetTarget(me)
 	if dwType == TARGET.PLAYER then
 		local kPlayer = X.GetTargetHandle(dwType, dwID)
 		local tInfo = MY_Farbnamen and MY_Farbnamen.Get(kPlayer.szName)

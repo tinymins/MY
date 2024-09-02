@@ -24,11 +24,12 @@ do
 local TARGET_TYPE, TARGET_ID
 local function onHotKey()
 	if TARGET_TYPE then
-		X.SetTarget(TARGET_TYPE, TARGET_ID)
+		X.SetClientPlayerTarget(TARGET_TYPE, TARGET_ID)
 		TARGET_TYPE, TARGET_ID = nil
 	else
-		TARGET_TYPE, TARGET_ID = X.GetTarget()
-		X.SetTarget(TARGET.PLAYER, X.GetClientPlayerID())
+		local me = X.GetClientPlayer()
+		TARGET_TYPE, TARGET_ID = X.GetTargetTarget(me)
+		X.SetClientPlayerTarget(TARGET.PLAYER, X.GetClientPlayerID())
 	end
 end
 X.RegisterHotKey('MY_AutoLoopMeAndTarget', _L['Loop target between me and target'], onHotKey)

@@ -146,14 +146,14 @@ function D.OnItemLButtonDown()
 		if O.bHoverSelect then
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 		end
-		X.SetTarget(TARGET.PLAYER, this.data.dwID)
+		X.SetClientPlayerTarget(TARGET.PLAYER, this.data.dwID)
 	end
 end
 
 function D.OnItemMouseLeave()
 	if this:GetName() == 'Handle_Item' then
 		if O.bHoverSelect and TEMP_TARGET_TYPE and TEMP_TARGET_ID then
-			X.SetTarget(TEMP_TARGET_TYPE, TEMP_TARGET_ID)
+			X.SetClientPlayerTarget(TEMP_TARGET_TYPE, TEMP_TARGET_ID)
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 		end
 		HideTip()
@@ -163,8 +163,9 @@ end
 function D.OnItemMouseEnter()
 	if this:GetName() == 'Handle_Item' then
 		if O.bHoverSelect then
-			TEMP_TARGET_TYPE, TEMP_TARGET_ID = X.GetTarget()
-			X.SetTarget(TARGET.PLAYER, this.data.dwID)
+			local me = X.GetClientPlayer()
+			TEMP_TARGET_TYPE, TEMP_TARGET_ID = X.GetTargetTarget(me)
+			X.SetClientPlayerTarget(TARGET.PLAYER, this.data.dwID)
 		end
 		X.OutputBuffTip(this, this.data.dwBuffID, this.data.nLevel)
 	end
@@ -229,9 +230,9 @@ function D.GetPlayer(dwID)
 	end
 	if info then
 		if player then
-			info.fCurrentLife64, info.fMaxLife64 = X.GetObjectLife(player)
+			info.fCurrentLife64, info.fMaxLife64 = X.GetTargetLife(player)
 		else
-			info.fCurrentLife64, info.fMaxLife64 = X.GetObjectLife(info)
+			info.fCurrentLife64, info.fMaxLife64 = X.GetTargetLife(info)
 		end
 	end
 	return player, info

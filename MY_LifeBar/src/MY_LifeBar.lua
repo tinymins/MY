@@ -482,7 +482,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 	bSpecialNpcVisible = nil
 	bCurrentTarget = dwID == dwTarID
 	-- 显示标记判断
-	if bVisible and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and X.IsIsolated(me) ~= X.IsIsolated(object) then
+	if bVisible and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and X.IsTargetIsolated(me) ~= X.IsTargetIsolated(object) then
 		bVisible = false
 	end
 	-- 距离判断
@@ -514,7 +514,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		dwTarType, dwTarID = me.GetTarget()
 		relation = D.GetRelation(me.dwID, dwID, me, object)
 		force = D.GetForce(dwType, dwID, object)
-		fCurrentLife, fMaxLife = X.GetObjectLife(info)
+		fCurrentLife, fMaxLife = X.GetTargetLife(info)
 		bFullLife = fCurrentLife == fMaxLife
 		nPriority = OBJECT_SCREEN_POS_Y_CACHE[dwID] or 0 -- 默认根据屏幕坐标排序
 		if Config.bMineOnTop and dwType == TARGET.PLAYER and dwID == me.dwID then -- 自身永远最前
@@ -636,7 +636,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		lb:SetTitleVisible(bShowTitle)
 		-- 血条部分
 		if not fCurrentLife or fMaxLife == 0 then
-			fCurrentLife, fMaxLife = X.GetObjectLife(object)
+			fCurrentLife, fMaxLife = X.GetTargetLife(object)
 		end
 		lb:SetLife(fCurrentLife, fMaxLife)
 		bShowLife = szName ~= '' and GetConfigComputeValue('ShowLife', relation, force, bFight, bPet, bCurrentTarget, bFullLife)

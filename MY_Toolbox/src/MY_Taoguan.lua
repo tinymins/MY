@@ -278,7 +278,7 @@ function D.BreakCanStateTransfer()
 		return
 	end
 	-- 找到罐子了，设为目标
-	X.SetTarget(TARGET.NPC, npcTaoguan.dwID)
+	X.SetClientPlayerTarget(TARGET.NPC, npcTaoguan.dwID)
 	-- 需要用小金锤，砸他丫的
 	if D.nPoint >= O.nUseXiaojinchui then
 		if D.UseBagItem(XIAOJINCHUI, O.bPauseNoXiaojinchui) then

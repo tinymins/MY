@@ -89,7 +89,8 @@ local function ApplyCaptionColor(dwID)
 	end
 	local KTarget, dwColor = (X.IsPlayer(dwID) and X.GetPlayer or X.GetNpc)(dwID), tColor.dwColor
 	if KTarget then
-		if dwID == select(2, X.GetTarget()) then
+		local me = X.GetClientPlayer()
+		if dwID == select(2, X.GetTargetTarget(me)) then
 			if KTarget.nMoveState == MOVE_STATE.ON_DEATH then
 				dwColor = tColor.dwDeathTargetColor
 			else

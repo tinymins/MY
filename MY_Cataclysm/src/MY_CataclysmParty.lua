@@ -72,9 +72,9 @@ local function onNpcEnterScene()
 	end
 	if npc.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID then
 		if not (IsEnemy(X.GetClientPlayerID(), arg0) and X.IsRestricted('MY_Cataclysm.CHANGGE_SHADOW')) then
-			local dwType, dwID = X.GetTarget()
+			local dwType, dwID = X.GetTargetTarget(me)
 			if dwType == TARGET.PLAYER and dwID == npc.dwEmployer then
-				X.SetTarget(TARGET.NPC, arg0)
+				X.SetClientPlayerTarget(TARGET.NPC, arg0)
 			end
 		end
 		CHANGGE_REAL_SHADOW_CACHE[npc.dwEmployer] = arg0
@@ -84,12 +84,13 @@ end
 X.RegisterEvent('NPC_ENTER_SCENE', 'MY_Cataclysm', onNpcEnterScene)
 
 local function onNpcLeaveScene()
+	local me = X.GetClientPlayer()
 	local npc = X.GetNpc(arg0)
 	if CHANGGE_REAL_SHADOW_CACHE[arg0] then
 		if not (IsEnemy(X.GetClientPlayerID(), arg0) and X.IsRestricted('MY_Cataclysm.CHANGGE_SHADOW')) then
-			local dwType, dwID = X.GetTarget()
+			local dwType, dwID = X.GetTargetTarget(me)
 			if dwType == TARGET.NPC and dwID == arg0 then
-				X.SetTarget(TARGET.PLAYER, npc.dwEmployer)
+				X.SetClientPlayerTarget(TARGET.PLAYER, npc.dwEmployer)
 			end
 		end
 		CHANGGE_REAL_SHADOW_CACHE[CHANGGE_REAL_SHADOW_CACHE[arg0]] = nil
@@ -129,7 +130,7 @@ local function SetTarget(dwType, dwID)
 	if CHANGGE_REAL_SHADOW_CACHE[dwID] then
 		dwType, dwID = TARGET.NPC, CHANGGE_REAL_SHADOW_CACHE[dwID]
 	end
-	X.SetTarget(dwType, dwID)
+	X.SetClientPlayerTarget(dwType, dwID)
 end
 
 local function CanTarget(dwID)
@@ -202,7 +203,7 @@ local function OpenRaidDragPanel(dwMemberID)
 	local hImageLife = hMember:Lookup('Image_Health')
 	local hImageMana = hMember:Lookup('Image_Mana')
 	if tMemberInfo.bIsOnLine then
-		local fCurrentLife, fMaxLife = X.GetObjectLife(tMemberInfo)
+		local fCurrentLife, fMaxLife = X.GetTargetLife(tMemberInfo)
 		if fMaxLife > 0 then
 			hImageLife:SetPercentage(fCurrentLife / fMaxLife)
 		end
@@ -439,7 +440,8 @@ function MY_CataclysmParty_Base.OnItemMouseEnter()
 		X.DelayCall('MY_Cataclysm_TempTarget', false)
 		local function fnAction()
 			if not CTM_TEMP_TARGET_TYPE then
-				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = X.GetTarget()
+				local me = X.GetClientPlayer()
+				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = X.GetTargetTarget(me)
 			end
 			SetTarget(TARGET.PLAYER, dwID)
 		end
@@ -1922,11 +1924,11 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	-- 气血计算 因为sync 必须拿出来单独算
 	local obj = npc or player
 	local fLifePercentage
-	local fCurrentLife, fMaxLife = X.GetObjectLife(obj)
+	local fCurrentLife, fMaxLife = X.GetTargetLife(obj)
 	if not fCurrentLife or fCurrentLife < - 1000
 	or fMaxLife == 1 or fCurrentLife == 1
 	or fCurrentLife == 255 or fMaxLife == 255 then -- obj sync err fix
-		fCurrentLife, fMaxLife = X.GetObjectLife(info)
+		fCurrentLife, fMaxLife = X.GetTargetLife(info)
 	end
 	fMaxLife     = math.max(1, fMaxLife)
 	fCurrentLife = math.max(0, fCurrentLife)

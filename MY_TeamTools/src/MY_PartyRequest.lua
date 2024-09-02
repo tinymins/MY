@@ -281,8 +281,8 @@ function D.OnPeekPlayer(dwID, eState, kPlayer)
 	if eState == X.CONSTANT.PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 		local me = X.GetClientPlayer()
 		local dwTarType, dwTarID = me.GetTarget()
-		X.SetTarget(TARGET.PLAYER, dwID)
-		X.SetTarget(dwTarType, dwTarID)
+		X.SetClientPlayerTarget(TARGET.PLAYER, dwID)
+		X.SetClientPlayerTarget(dwTarType, dwTarID)
 		local p = X.GetPlayer(dwID)
 		if p then
 			local mnt = p.GetKungfuMount()
