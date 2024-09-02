@@ -17,31 +17,14 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -- 目标获取相关接口
 --------------------------------------------------------------------------------
 
--- 取得目标类型和ID
--- (dwType, dwID) X.GetTarget()       -- 取得自己当前的目标类型和ID
--- (dwType, dwID) X.GetTarget(object) -- 取得指定操作对象当前的目标类型和ID
-function X.GetTarget(...)
-	local object = ...
-	if select('#', ...) == 0 then
-		object = X.GetClientPlayer()
+-- 取得指定目标的目标类型和ID
+---@param kTar userdata @指定的目标
+---@return number, number @目标的目标类型, 目标的目标ID
+function X.GetTargetTarget(kTar)
+	if kTar and kTar.GetTarget then
+		return kTar.GetTarget()
 	end
-	if object and object.GetTarget then
-		return object.GetTarget()
-	else
-		return TARGET.NO_TARGET, 0
-	end
-end
-
--- 取得目标的目标类型和ID
--- (dwType, dwID) X.GetTargetTarget()       -- 取得自己当前的目标的目标类型和ID
--- (dwType, dwID) X.GetTargetTarget(object) -- 取得指定操作对象当前的目标的目标类型和ID
-function X.GetTargetTarget(object)
-	local nTarType, dwTarID = X.GetTarget(object)
-	local KTar = X.GetTargetHandle(nTarType, dwTarID)
-	if not KTar then
-		return
-	end
-	return X.GetTarget(KTar)
+	return TARGET.NO_TARGET, 0
 end
 
 X.RegisterRestriction('X.SET_TARGET', { ['*'] = true, intl = false })
@@ -50,11 +33,11 @@ X.RegisterRestriction('X.SET_TARGET', { ['*'] = true, intl = false })
 ---@param dwType number @目标类型
 ---@param dwID number @目标ID
 ---@return boolean @是否成功调用
-function X.SetTarget(dwType, dwID)
+function X.SetClientPlayerTarget(dwType, dwID)
 	if dwType == TARGET.PLAYER then
 		if X.IsInShieldedMap() and not X.IsParty(dwID) and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			X.OutputDebugMessage('SetTarget', 'Set target to player is forbiden in current map.', X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('SetClientPlayerTarget', 'Set target to player is forbiden in current map.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
@@ -62,14 +45,14 @@ function X.SetTarget(dwType, dwID)
 		local npc = X.GetNpc(dwID)
 		if npc and not npc.IsSelectable() and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			X.OutputDebugMessage('SetTarget', 'Set target to unselectable npc.', X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('SetClientPlayerTarget', 'Set target to unselectable npc.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end
 	elseif dwType == TARGET.DOODAD then
 		if X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
-			X.OutputDebugMessage('SetTarget', 'Set target to doodad.', X.DEBUG_LEVEL.WARNING)
+			X.OutputDebugMessage('SetClientPlayerTarget', 'Set target to doodad.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
 			return false
 		end

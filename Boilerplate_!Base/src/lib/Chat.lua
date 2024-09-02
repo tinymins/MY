@@ -334,7 +334,7 @@ local ChatLinkEvents = {
 				end
 			end
 			if dwID then
-				X.SetTarget(TARGET.PLAYER, dwID)
+				X.SetClientPlayerTarget(TARGET.PLAYER, dwID)
 			end
 		elseif IsAltKeyDown() then
 			if _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
@@ -1025,7 +1025,7 @@ end
 -- parse name in talking message
 local function ParseName(t)
 	local me = X.GetClientPlayer()
-	local tar = X.GetTargetHandle(me.GetTarget())
+	local tar = X.GetTargetHandle(X.GetTargetTarget(me))
 	for i, v in ipairs(t) do
 		if v.type == 'text' then
 			v.text = string.gsub(v.text, '%$zj', '[' .. me.szName .. ']')
