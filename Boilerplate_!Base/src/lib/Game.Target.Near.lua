@@ -66,7 +66,7 @@ end
 ---@return number | nil @搜索到的 NPC ID，没搜到返回 nil
 function X.SearchNearNpcID(szName)
 	for _, p in ipairs(NEARBY_NPC) do
-		if p.szName == szName then
+		if p.szName == szName or p.dwID == szName then
 			return p.dwID
 		end
 	end
@@ -192,7 +192,7 @@ end
 ---@return number | nil @搜索到的玩家 ID，没搜到返回 nil
 function X.SearchNearPlayerID(szName)
 	for _, p in ipairs(NEARBY_PLAYER) do
-		if p.szName == szName then
+		if p.szName == szName or p.dwID == szName then
 			return p.dwID
 		end
 	end
