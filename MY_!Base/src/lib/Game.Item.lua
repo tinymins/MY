@@ -95,14 +95,9 @@ local m_MountTypeToWeapon = X.KvpToObject({
 	--WEAPON_DETAIL.MACH_DART = 机关暗器
 	--WEAPON_DETAIL.SLING_SHOT = 投掷
 })
-function X.IsItemInfoFitKungfu(kItemInfo, ...)
-	local kungfu = ...
+function X.IsItemInfoFitKungfu(kItemInfo, dwKungfuID)
 	local me = X.GetClientPlayer()
-	if select('#', ...) == 0 then
-		kungfu = me.GetKungfuMount()
-	elseif X.IsNumber(kungfu) then
-		kungfu = GetSkill(kungfu, me.GetSkillLevel(kungfu) or 1)
-	end
+	local kungfu = GetSkill(dwKungfuID, me.GetSkillLevel(dwKungfuID) or 1)
 	if kItemInfo.nSub == X.CONSTANT.EQUIPMENT_SUB.MELEE_WEAPON then
 		if not kungfu then
 			return false
@@ -155,9 +150,9 @@ function X.IsItemInfoFitKungfu(kItemInfo, ...)
 end
 end
 
-function X.IsItemFitKungfu(kItem, ...)
+function X.IsItemFitKungfu(kItem, dwKungfuID)
 	local kItemInfo = GetItemInfo(kItem.dwTabType, kItem.dwIndex)
-	return X.IsItemInfoFitKungfu(kItemInfo, ...)
+	return X.IsItemInfoFitKungfu(kItemInfo, dwKungfuID)
 end
 
 -- 获取物品精炼等级
