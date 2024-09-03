@@ -1614,7 +1614,7 @@ local function IsItemDataSuitable(data)
 		local szSuit = X.DoesEquipmentSuit(data.item, true) and 'SUITABLE' or 'NOT_SUITABLE'
 		if szSuit == 'SUITABLE' then
 			if data.szType == 'EQUIPMENT' or data.szType == 'WEAPON' then
-				szSuit = X.IsItemFitKungfu(data.item) and 'SUITABLE' or 'NOT_SUITABLE'
+				szSuit = X.IsItemFitKungfu(data.item, me.GetKungfuMountID()) and 'SUITABLE' or 'NOT_SUITABLE'
 				if szSuit == 'NOT_SUITABLE' and O.bShow2ndKungfuLoot then
 					for _, dwKungfuID in ipairs(aKungfu) do
 						if X.IsItemFitKungfu(data.item, dwKungfuID) then
