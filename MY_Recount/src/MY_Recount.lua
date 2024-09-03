@@ -27,7 +27,7 @@ local DK_REC_STAT_TARGET = MY_Recount_DS.DK_REC_STAT_TARGET
 local SKILL_RESULT = MY_Recount_DS.SKILL_RESULT
 local SKILL_RESULT_NAME = MY_Recount_DS.SKILL_RESULT_NAME
 
-local MAX_HISTORY_DISP = 50
+local MAX_HISTORY_DISP = 200
 
 local STAT_TYPE = { -- 统计类型
 	DPS  = 1, -- 输出统计
