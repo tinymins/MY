@@ -560,7 +560,17 @@ function D.OnItemRefreshTip()
 		local szChannel = STAT_TYPE_KEY[MY_Recount_UI.nChannel]
 		local tRec = MY_Recount_DS.GetMergeTargetData(DataDisplay, szChannel, id, O.bGroupSameNpc, O.bGroupSameEffect)
 		if tRec then
-			local szXml = GetFormatText((DataDisplay[DK.NAME_LIST][id] or id) .. '\n', 60, 255, 45, 255)
+			local szTitle = DataDisplay[DK.NAME_LIST][id] or id
+			local nTitleR, nTitleG, nTitleB = 255, 45, 255
+			local dwForceID = MY_Recount_DS.GetForceAusID(DataDisplay, id)
+			if dwForceID then
+				local szForceName = g_tStrings.tForceTitle[dwForceID]
+				if szForceName then
+					nTitleR, nTitleG, nTitleB = X.GetForceColor(dwForceID, 'foreground')
+					szTitle = szTitle .. g_tStrings.STR_PREV_PARENTHESES .. szForceName .. g_tStrings.STR_END_PARENTHESES
+				end
+			end
+			local szXml = GetFormatText(szTitle .. '\n', 60, nTitleR, nTitleG, nTitleB)
 			local szColon = g_tStrings.STR_COLON
 			local t = {}
 			for szEffectID, p in pairs(tRec[DK_REC_STAT.SKILL]) do
