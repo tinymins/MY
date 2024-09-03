@@ -414,7 +414,7 @@ function D.GetHistoryMenu()
 		end,
 	}}
 
-	local tt, nCount = { bInline = true, nMaxHeight = 450 }, 0
+	local tt, nCount = { bInline = true, nMaxHeight = 456 }, 0
 	for _, file in ipairs(MY_Recount_DS.GetHistoryFiles()) do
 		if nCount >= MAX_HISTORY_DISP then
 			break
@@ -453,6 +453,19 @@ function D.GetHistoryMenu()
 		nCount = nCount + 1
 	end
 	table.insert(t, tt)
+
+	table.insert(t, {
+		szOption = _L['Load history file'],
+		fnAction = function()
+			local szRoot = MY_Recount_DS.GetHistoryRoot()
+			local szFilePath = GetOpenFileName(_L['Please select recount history file.'], 'Recount File(*.fstt.jx3dat)\0*.fstt.jx3dat\0\0', szRoot)
+			if not X.IsEmpty(szFilePath) then
+				local data = MY_Recount_DS.Get(szFilePath)
+				D.SetDisplayData(data)
+				X.UI.ClosePopupMenu()
+			end
+		end,
+	})
 
 	table.insert(t, { bDevide = true })
 	table.insert(t, {

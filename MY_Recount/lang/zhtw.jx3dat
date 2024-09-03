@@ -23,6 +23,9 @@ return {
     ['Display only player record'] = '只顯示玩家記錄',
     ['Display all record'] = '顯示所有記錄',
 
+    ['Load history file'] = '載入自定義歷史文件',
+    ['Please select recount history file.'] = '請選擇您要載入的歷史戰鬥統計文件。',
+
     ['Save history on exit'] = '退出游戲時保存數據',
     ['Save history immediately'] = '脫離戰鬥時保存數據',
 

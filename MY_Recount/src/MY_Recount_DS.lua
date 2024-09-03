@@ -440,6 +440,10 @@ local AsyncSaveLuaData = _G.AsyncSaveLuaData or SaveLUAData
 --           # #               #           #         #           # # # # #         # # # # # # # #
 -- ##################################################################################################
 
+function D.GetHistoryRoot()
+	return X.FormatPath(DS_ROOT)
+end
+
 -- 加载历史数据列表
 function D.GetHistoryFiles()
 	local aFiles = {}
@@ -2006,6 +2010,7 @@ local settings = {
 				DK_REC_STAT_TARGET = DK_REC_STAT_TARGET,
 				DK_REC_STAT_TARGET_DETAIL = DK_REC_STAT_TARGET_DETAIL,
 				DK_REC_STAT_TARGET_SKILL = DK_REC_STAT_TARGET_SKILL,
+				'GetHistoryRoot',
 				'GetHistoryFiles',
 				'Get',
 				'Del',
