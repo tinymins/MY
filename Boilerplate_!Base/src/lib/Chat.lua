@@ -1656,10 +1656,10 @@ RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShow
 	if X.GetClientPlayerID() == dwTalkerID then
 		return
 	end
-	if not X.IsAuthorPlayerName(szName) or X.IsAuthor(dwTalkerID, szName, szGlobalID) then
+	if not X.IsAuthorPlayerName(szName) or X.IsAuthorPlayer(dwTalkerID, szName, szGlobalID) then
 		return
 	end
-	if X.IsParty(dwTalkerID) or X.IsFellowship(dwTalkerID) then
+	if X.IsTeammate(dwTalkerID) or X.IsFellowship(dwTalkerID) then
 		if GetStringCRC(GetCurrentTime()) % 10 >= 2 then
 			return
 		end

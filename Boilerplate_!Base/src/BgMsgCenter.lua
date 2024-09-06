@@ -68,7 +68,7 @@ X.RegisterBgMsg(X.NSFormatString('{$NS}_VERSION_CHECK'), function(_, oData, nCha
 		return
 	end
 	local bSilent = oData[1]
-	if not bSilent and X.IsInParty() then
+	if not bSilent and X.IsClientPlayerInParty() then
 		X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed %s v%s', X.PACKET_INFO.NAME, X.PACKET_INFO.VERSION))
 	end
 	local nReplyChannel = D.GetReplyChannel(nChannel, szTalkerName)
@@ -91,7 +91,7 @@ X.RegisterBgMsg('RL', function(_, data, nChannel, dwTalkerID, szTalkerName, bIsS
 			X.Confirm(_L('[%s] want to see your info, OK?', szTalkerName), function()
 				local me = X.GetClientPlayer()
 				local nGongZhan = X.GetBuff(me, 3219) and 1 or 0
-				local bEx = X.IsAuthor(me.dwID) and 'Author' or 'Player'
+				local bEx = X.IsAuthorPlayer(me.dwID) and 'Author' or 'Player'
 				X.SendBgMsg(nReplyChannel, 'RL', {'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx}, true)
 			end)
 		end
@@ -101,13 +101,13 @@ end)
 -- 查看完整属性
 X.RegisterBgMsg('CHAR_INFO', function(_, data, nChannel, dwTalkerID, szTalkerName, bIsSelf)
 	if not bIsSelf and data[2] == X.GetClientPlayerID() then
-		local nReplyChannel = X.IsParty(dwTalkerID)
+		local nReplyChannel = X.IsTeammate(dwTalkerID)
 			and PLAYER_TALK_CHANNEL.RAID
 			or D.GetReplyChannel(nChannel, szTalkerName)
 		if data[1] == 'ASK'  then
 			if not _G.MY_CharInfo or _G.MY_CharInfo.bEnable or data[3] == 'DEBUG' then
 				local aInfo = X.GetClientPlayerCharInfo()
-				if not X.IsParty(dwTalkerID) and not data[3] == 'DEBUG' then
+				if not X.IsTeammate(dwTalkerID) and not data[3] == 'DEBUG' then
 					for _, v in ipairs(aInfo) do
 						v.tip = nil
 					end
@@ -163,7 +163,7 @@ do
 
 	-- 点击进入某地图（进入前）
 	local function OnSwitchMap(dwMapID, dwSubID, aMapCopy, dwTime)
-		if not X.IsInParty() then
+		if not X.IsClientPlayerInParty() then
 			return
 		end
 		l_nEnteringMapID = dwMapID
@@ -188,7 +188,7 @@ do
 
 	-- 成功进入某地图并加载完成（进入后）
 	local function OnEnterMap(dwMapID, dwSubID, aMapCopy, dwTime, dwSwitchTime, nCopyIndex)
-		if not X.IsInParty() then
+		if not X.IsClientPlayerInParty() then
 			return
 		end
 		--[[#DEBUG BEGIN]]

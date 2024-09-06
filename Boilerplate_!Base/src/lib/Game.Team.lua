@@ -13,32 +13,58 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Game.Team')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
-function X.IsMarker(...)
-	local dwID = select('#', ...) == 0 and X.GetClientPlayerID() or ...
+-- 获取一个角色是否是队伍标记者
+---@param dwID number @角色ID
+---@return boolean @角色是否是队伍标记者
+function X.IsPlayerTeamMarker(dwID)
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) == dwID
 end
 
-function X.IsLeader(...)
-	local dwID = select('#', ...) == 0 and X.GetClientPlayerID() or ...
+-- 获取当前角色是否是队伍标记者
+---@return boolean @角色是否是队伍标记者
+function X.IsClientPlayerTeamMarker()
+	local dwID = X.GetClientPlayerID()
+	return X.IsPlayerTeamMarker(dwID)
+end
+
+-- 获取一个角色是否是队伍队长
+---@param dwID number @角色ID
+---@return boolean @角色是否是队伍队长
+function X.IsPlayerTeamLeader(dwID)
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) == dwID
 end
 
-function X.IsDistributor(...)
-	local dwID = select('#', ...) == 0 and X.GetClientPlayerID() or ...
+-- 获取当前角色是否是队伍队长
+---@return boolean @角色是否是队伍队长
+function X.IsClientPlayerTeamLeader()
+	local dwID = X.GetClientPlayerID()
+	return X.IsPlayerTeamLeader(dwID)
+end
+
+-- 获取一个角色是否是队伍分配者
+---@param dwID number @角色ID
+---@return boolean @角色是否是队伍分配者
+function X.IsPlayerTeamDistributor(dwID)
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) == dwID
 end
-X.IsDistributer = X.IsDistributor
+
+-- 获取当前角色是否是队伍分配者
+---@return boolean @角色是否是队伍分配者
+function X.IsClientPlayerTeamDistributor()
+	local dwID = X.GetClientPlayerID()
+	return X.IsPlayerTeamDistributor(dwID)
+end
 
 -- 判断自己在不在队伍里
--- (bool) X.IsInParty()
-function X.IsInParty()
+-- (bool) X.IsClientPlayerInParty()
+function X.IsClientPlayerInParty()
 	local me = X.GetClientPlayer()
 	return me and me.IsInParty()
 end
 
 -- 判断自己在不在团队里
--- (bool) X.IsInRaid()
-function X.IsInRaid()
+-- (bool) X.IsClientPlayerInRaid()
+function X.IsClientPlayerInRaid()
 	local me = X.GetClientPlayer()
 	return me and me.IsInRaid()
 end
@@ -69,7 +95,7 @@ end
 -- 获取所有标记目标
 ---@return table @所有标记目标
 function X.GetTeamMark()
-	if not X.IsInParty() then
+	if not X.IsClientPlayerInParty() then
 		return X.CONSTANT.EMPTY_TABLE
 	end
 	return GetClientTeam().GetTeamMark() or X.CONSTANT.EMPTY_TABLE
@@ -87,7 +113,7 @@ end
 ---@param dwID number @目标ID
 ---@return number @标记索引
 function X.GetCharacterTeamMark(dwID)
-	if not X.IsInParty() then
+	if not X.IsClientPlayerInParty() then
 		return
 	end
 	return GetClientTeam().GetMarkIndex(dwID)

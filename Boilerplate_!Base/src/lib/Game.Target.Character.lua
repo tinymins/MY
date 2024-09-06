@@ -206,7 +206,7 @@ end
 ---@return boolean @是否成功调用
 function X.SetClientPlayerTarget(dwType, dwID)
 	if dwType == TARGET.PLAYER then
-		if X.IsInShieldedMap() and not X.IsParty(dwID) and X.IsRestricted('X.SET_TARGET') then
+		if X.IsInShieldedMap() and not X.IsTeammate(dwID) and X.IsRestricted('X.SET_TARGET') then
 			--[[#DEBUG BEGIN]]
 			X.OutputDebugMessage('SetClientPlayerTarget', 'Set target to player is forbiden in current map.', X.DEBUG_LEVEL.WARNING)
 			--[[#DEBUG END]]
