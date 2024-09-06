@@ -801,6 +801,9 @@ function D.GetPlayerInfo(xKey)
 		if tPlayer.szName and tPlayer.szServerName then
 			PLAYER_INFO[X.AssemblePlayerGlobalName(tPlayer.szName, tPlayer.szServerName)] = tPlayer
 		end
+		if X.IS_CLASSIC and tPlayer.dwTime < 1725552000 then
+			tPlayer.szGlobalID = '0'
+		end
 		if X.IsGlobalID(tPlayer.szGlobalID) then
 			PLAYER_INFO[tPlayer.szGlobalID] = tPlayer
 		end
