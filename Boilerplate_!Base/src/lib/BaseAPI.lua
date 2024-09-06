@@ -191,6 +191,20 @@ function X.GetItemInfo(dwTabType, dwTabIndex)
 	return GetItemInfo(dwTabType, dwTabIndex)
 end
 
+-- 获取玩家是否是跨服状态
+---@param dwID number @玩家ID
+---@return boolean @该玩家是否处于跨服状态
+function X.IsPlayerCrossServer(dwID)
+	return IsRemotePlayer(dwID)
+end
+
+-- 获取当前玩家是否是跨服状态
+---@return boolean @当前玩家是否处于跨服状态
+function X.IsClientPlayerCrossServer()
+	local dwID = X.GetClientPlayerID()
+	return X.IsPlayerCrossServer(dwID)
+end
+
 -- 获取目标对象
 ---@param dwType number @目标类型
 ---@param dwID number @目标ID

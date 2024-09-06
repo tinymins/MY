@@ -51,7 +51,7 @@ local function GeneClientPlayerInfo(bForce)
 		if not CLIENT_PLAYER_INFO then
 			CLIENT_PLAYER_INFO = {}
 		end
-		if not IsRemotePlayer(me.dwID) then -- 确保不在战场
+		if not X.IsPlayerCrossServer(me.dwID) then -- 确保不在战场
 			CLIENT_PLAYER_INFO.dwID   = me.dwID
 			CLIENT_PLAYER_INFO.szName = me.szName
 		end
@@ -141,7 +141,7 @@ function X.GetClientPlayerName()
 		return GetUserRoleName()
 	end
 	local me = X.GetClientPlayer()
-	if me and not IsRemotePlayer(me.dwID) then
+	if me and not X.IsPlayerCrossServer(me.dwID) then
 		PLAYER_NAME = me.szName
 	end
 	return PLAYER_NAME
@@ -209,7 +209,7 @@ local PLAYER_GLOBAL_ID = {}
 local function RequestTeammateGlobalID()
 	local me = X.GetClientPlayer()
 	local team = GetClientTeam()
-	if not me or IsRemotePlayer(me.dwID) or not team or not me.IsInParty() then
+	if not me or X.IsPlayerCrossServer(me.dwID) or not team or not me.IsInParty() then
 		return
 	end
 	local nTime = GetTime()

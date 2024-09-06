@@ -234,7 +234,6 @@ end
 ---@param xPlayerID number @要获取的玩家唯一ID（缘起为 dwID）
 ---@return table @玩家的基本信息
 function X.GetFellowshipEntryInfo(xPlayerID)
-	local me = X.GetClientPlayer()
 	local smc = X.GetSocialManagerClient()
 	if smc then
 		if FELLOWSHIP_ROLE_ENTRY_UPDATE == false then
@@ -256,7 +255,7 @@ function X.GetFellowshipEntryInfo(xPlayerID)
 				dwServerID = tPei.dwCenterID,
 			}
 			local szServerName = X.GetServerNameByID(tPei.dwServerID)
-			if szServerName and (szServerName ~= X.GetServerOriginName() or IsRemotePlayer(me.dwID)) then
+			if szServerName and (szServerName ~= X.GetServerOriginName() or X.IsClientPlayerCrossServer()) then
 				tPei.szName = tPei.szName .. g_tStrings.STR_CONNECT .. szServerName
 			end
 			FELLOWSHIP_ROLE_ENTRY_UPDATE = true
