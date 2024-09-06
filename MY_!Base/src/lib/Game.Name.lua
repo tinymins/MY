@@ -130,7 +130,7 @@ function X.GetNpcName(dwID, tOption)
 		if kNpc then
 			szName = kNpc.szName
 			if X.IsEmpty(szName) then
-				szName = X.GetNpcTemplateName(kNpc.dwTemplateID)
+				szName = X.GetNpcTemplateName(kNpc.dwTemplateID, { eShowID = 'never' })
 			end
 			if kNpc.dwEmployer and kNpc.dwEmployer ~= 0 then
 				if X.Table.IsSimplePlayer(kNpc.dwTemplateID) then -- ³¤¸èÓ°×Ó
