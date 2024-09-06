@@ -20,18 +20,18 @@ local D = {}
 ---------------------------------------------------------------------------------------------
 -- 界面开关
 ---------------------------------------------------------------------------------------------
-function X.GetFrame()
+function D.GetFrame()
 	return Station.SearchFrame(FRAME_NAME)
 end
 
-function X.OpenPanel()
+function D.OpenPanel()
 	if not X.AssertVersion('', '', '*') then
 		return
 	end
 	if not X.IsInitialized() then
 		return
 	end
-	local frame = X.GetFrame()
+	local frame = X.PS.GetFrame()
 	if not frame then
 		frame = X.UI.OpenFrame(INI_PATH, FRAME_NAME)
 		frame:Hide()
@@ -41,32 +41,32 @@ function X.OpenPanel()
 	return frame
 end
 
-function X.ClosePanel()
-	local frame = X.GetFrame()
+function D.ClosePanel()
+	local frame = X.PS.GetFrame()
 	if not frame then
 		return
 	end
-	X.SwitchTab('Welcome')
-	X.HidePanel(false, true)
+	X.PS.SwitchTab('Welcome')
+	X.PS.HidePanel(false, true)
 	X.UI.CloseFrame(frame)
 end
 
-function X.ReopenPanel()
-	if not X.IsPanelOpened() then
+function D.ReopenPanel()
+	if not X.PS.IsPanelOpened() then
 		return
 	end
-	local bVisible = X.IsPanelVisible()
-	local szCurrentTabID = X.GetCurrentTabID()
-	X.ClosePanel()
-	X.OpenPanel()
+	local bVisible = X.PS.IsPanelVisible()
+	local szCurrentTabID = X.PS.GetCurrentTabID()
+	X.PS.ClosePanel()
+	X.PS.OpenPanel()
 	if szCurrentTabID then
-		X.SwitchTab(szCurrentTabID)
+		X.PS.SwitchTab(szCurrentTabID)
 	end
-	X.TogglePanel(bVisible, true, true)
+	X.PS.TogglePanel(bVisible, true, true)
 end
 
-function X.ShowPanel(bMute, bNoAnimate)
-	local frame = X.OpenPanel()
+function D.ShowPanel(bMute, bNoAnimate)
+	local frame = X.PS.OpenPanel()
 	if not frame then
 		return
 	end
@@ -88,11 +88,11 @@ function X.ShowPanel(bMute, bNoAnimate)
 		end
 	end
 	frame:BringToTop()
-	X.RegisterEsc(X.PACKET_INFO.NAME_SPACE, X.IsPanelVisible, function() X.HidePanel() end)
+	X.RegisterEsc(X.PACKET_INFO.NAME_SPACE, X.PS.IsPanelVisible, function() X.PS.HidePanel() end)
 end
 
-function X.HidePanel(bMute, bNoAnimate)
-	local frame = X.GetFrame()
+function D.HidePanel(bMute, bNoAnimate)
+	local frame = X.PS.GetFrame()
 	if not frame then
 		return
 	end
@@ -119,24 +119,24 @@ function X.HidePanel(bMute, bNoAnimate)
 	X.UI.ClosePopupMenu()
 end
 
-function X.TogglePanel(bVisible, ...)
+function D.TogglePanel(bVisible, ...)
 	if bVisible == nil then
-		if X.IsPanelVisible() then
-			X.HidePanel()
+		if X.PS.IsPanelVisible() then
+			X.PS.HidePanel()
 		else
-			X.ShowPanel()
-			X.FocusPanel()
+			X.PS.ShowPanel()
+			X.PS.FocusPanel()
 		end
 	elseif bVisible then
-		X.ShowPanel(...)
-		X.FocusPanel()
+		X.PS.ShowPanel(...)
+		X.PS.FocusPanel()
 	else
-		X.HidePanel(...)
+		X.PS.HidePanel(...)
 	end
 end
 
-function X.FocusPanel(bForce)
-	local frame = X.GetFrame()
+function D.FocusPanel(bForce)
+	local frame = X.PS.GetFrame()
 	if not frame then
 		return
 	end
@@ -146,13 +146,13 @@ function X.FocusPanel(bForce)
 	Station.SetFocusWindow(frame)
 end
 
-function X.IsPanelVisible()
-	local frame = X.GetFrame()
+function D.IsPanelVisible()
+	local frame = X.PS.GetFrame()
 	return frame and frame:IsVisible()
 end
 
-function X.IsPanelOpened()
-	return not not X.GetFrame()
+function D.IsPanelOpened()
+	return not not X.PS.GetFrame()
 end
 
 ---------------------------------------------------------------------------------------------
@@ -170,7 +170,7 @@ local PANEL_CATEGORY_LIST = {
 }
 local PANEL_TAB_LIST = {}
 
-function X.GetPanelCategoryList()
+function D.GetPanelCategoryList()
 	return X.Clone(PANEL_CATEGORY_LIST)
 end
 
@@ -184,9 +184,9 @@ local function IsTabRestricted(tTab)
 	return false
 end
 
--- X.SwitchCategory(szCategory)
-function X.SwitchCategory(szCategory)
-	local frame = X.GetFrame()
+-- X.PS.SwitchCategory(szCategory)
+function D.SwitchCategory(szCategory)
+	local frame = X.PS.GetFrame()
 	if not frame then
 		return
 	end
@@ -204,8 +204,8 @@ function X.SwitchCategory(szCategory)
 	end
 end
 
-function X.SwitchTab(szKey, bForceUpdate)
-	local frame = X.GetFrame()
+function D.SwitchTab(szKey, bForceUpdate)
+	local frame = X.PS.GetFrame()
 	if not frame then
 		return
 	end
@@ -226,7 +226,7 @@ function X.SwitchTab(szKey, bForceUpdate)
 	end
 	-- 判断主分类是否正确
 	if tTab.szCategory and frame.szCurrentCategoryName ~= tTab.szCategory then
-		X.SwitchCategory(tTab.szCategory)
+		X.PS.SwitchCategory(tTab.szCategory)
 	end
 	-- 判断标签页是否已激活
 	if frame.szCurrentTabKey == tTab.szKey and not bForceUpdate then
@@ -282,14 +282,14 @@ function X.SwitchTab(szKey, bForceUpdate)
 	frame.szCurrentTabKey = szKey
 end
 
-function X.RedrawTab(szKey)
-	if X.GetCurrentTabID() == szKey then
-		X.SwitchTab(szKey, true)
+function D.RedrawTab(szKey)
+	if X.PS.GetCurrentTabID() == szKey then
+		X.PS.SwitchTab(szKey, true)
 	end
 end
 
-function X.GetCurrentTabID()
-	local frame = X.GetFrame()
+function D.GetCurrentTabID()
+	local frame = X.PS.GetFrame()
 	if not frame then
 		return
 	end
@@ -297,7 +297,7 @@ function X.GetCurrentTabID()
 end
 
 -- 注册选项卡
--- (void) X.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
+-- (void) X.PS.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 -- szCategory      选项卡所在分类
 -- szKey           选项卡唯一 KEY
 -- szName          选项卡按钮标题
@@ -308,8 +308,8 @@ end
 --   options.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
 --   options.OnPanelDeactive(wnd)    选项卡取消激活
 -- }
--- Ex： X.RegisterPanel('测试', 'Test', '测试标签', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd) end })
-function X.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
+-- Ex： X.PS.RegisterPanel('测试', 'Test', '测试标签', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', { OnPanelActive = function(wnd) end })
+function D.RegisterPanel(szCategory, szKey, szName, szIconTex, options)
 	-- 分类不存在则创建
 	if not options.bHide then
 		local bExist = false
@@ -407,7 +407,7 @@ function D.RedrawCategory(frame, szCategory)
 		end
 	end
 	container:FormatAllContentPos()
-	X.SwitchCategory(szCategory)
+	X.PS.SwitchCategory(szCategory)
 end
 
 function D.RedrawTabs(frame, szCategory)
@@ -447,7 +447,7 @@ function D.RedrawTabs(frame, szCategory)
 		end
 	end
 	if tWelcomeTab then
-		X.SwitchTab(tWelcomeTab.szKey, true)
+		X.PS.SwitchTab(tWelcomeTab.szKey, true)
 	end
 end
 
@@ -542,7 +542,7 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
-		X.ClosePanel()
+		X.PS.ClosePanel()
 	elseif name == 'Btn_Weibo' then
 		X.OpenBrowser(X.PACKET_INFO.AUTHOR_FEEDBACK_URL)
 	end
@@ -551,7 +551,7 @@ end
 function D.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Tab' then
-		X.SwitchTab(this.szKey)
+		X.PS.SwitchTab(this.szKey)
 	end
 end
 
@@ -660,6 +660,39 @@ function D.OnScrollBarPosChanged()
 		scrollY = scrollY == 0 and 0 or -scrollY / scale
 		wnd.OnPanelScroll(wnd, scrollX, scrollY)
 	end
+end
+
+--------------------------------------------------------------------------------
+-- 模块导出
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = X.NSFormatString('{$NS}.PS'),
+	exports = {
+		{
+			fields = {
+				'GetFrame',
+				'OpenPanel',
+				'ClosePanel',
+				'ReopenPanel',
+				'ShowPanel',
+				'HidePanel',
+				'TogglePanel',
+				'FocusPanel',
+				'IsPanelVisible',
+				'IsPanelOpened',
+				'GetPanelCategoryList',
+				'SwitchCategory',
+				'SwitchTab',
+				'RedrawTab',
+				'GetCurrentTabID',
+				'RegisterPanel',
+			},
+			root = D,
+		},
+	},
+}
+X.PS = X.CreateModule(settings)
 end
 
 --------------------------------------------------------------------------------

@@ -200,6 +200,6 @@ function PS.OnPanelActive(frame)
 	ui:Append('WndEditBox', { name = 'Edit_Result', x = nX + 10, y = nY + 150, limit = 9999, w = 480, h = 200, multiline = true, text = O.szResult })
 end
 
-X.RegisterPanel(_L['Development'], 'Dev_UIFindStation', _L['Dev_UIFindStation'], 2791, PS)
+X.PS.RegisterPanel(_L['Development'], 'Dev_UIFindStation', _L['Dev_UIFindStation'], 2791, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
