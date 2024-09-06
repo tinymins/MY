@@ -1,7 +1,7 @@
 return {
 	['Global config'] = '全局設置',
 	['Notify center'] = '消息中心',
-	['Show in minimap'] = '顯示小地圖入口',
+	['Show in float bar'] = '顯示浮動入口',
 	['Order desc'] = '逆序顯示',
 	['Disable dismiss'] = '禁止消息自動消失',
 

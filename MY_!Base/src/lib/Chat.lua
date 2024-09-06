@@ -1637,7 +1637,7 @@ end
 -- ∑¿÷π…Ω’Ø
 RegisterTalkFilter(function(nChannel, aSay, dwTalkerID, szName, bEcho, bOnlyShowBallon, bSecurity, bGMAccount, bCheater, dwTitleID, dwIdePetTemplateID)
 	local szGlobalID
-	if IsRemotePlayer(dwTalkerID) then
+	if X.IsPlayerCrossServer(dwTalkerID) then
 		if not X.IsAuthorPlayerName(szName) then
 			return
 		end

@@ -16,6 +16,7 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/UI.Notify')
 local MODULE_NAME = X.NSFormatString('{$NS}_Notify')
 local PLUGIN_NAME = X.NSFormatString('{$NS}_Notify')
 local PLUGIN_ROOT = X.PACKET_INFO.FRAMEWORK_ROOT
+local ENTRY_INI_PATH = PLUGIN_ROOT .. 'ui/NotifyFloatBar.ini'
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/Notify/')
 
 local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
@@ -97,52 +98,7 @@ function D.OpenPanel()
 	X.UI.OpenFrame(INI_PATH, FRAME_NAME)
 end
 
-function D.HookEntry()
-	local container = Station.Lookup('Normal/TopMenu/WndContainer_ListOther')
-	if not container then
-		return
-	end
-	local wItem = container:Lookup('Wnd_News_XJ')
-	if not wItem then
-		return
-	end
-	wItem:Lookup('Btn_News_XJ').OnMouseEnter = function()
-		local szXml = GetFormatText(_L['Addon notification'], 59)
-			.. X.CONSTANT.XML_LINE_BREAKER
-			.. GetFormatText(_L['Click to view addon notification.'], 162)
-		X.OutputTip(this, szXml, true, X.UI.TIP_POSITION.RIGHT_LEFT_AND_BOTTOM_TOP)
-	end
-	wItem:Lookup('Btn_News_XJ').OnLButtonClick = function()
-		local menu = {}
-		for _, p in pairs(wItem.tPacket) do
-			if p.nTotal > 0 then
-				table.insert(menu, {
-					szOption = p.szName .. (p.nUnread and '  (' .. p.nUnread .. ')' or ''),
-					fnAction = p.fnAction,
-				})
-			end
-		end
-		if #menu == 1 then
-			menu[1].fnAction()
-		else
-			PopupMenu(menu)
-		end
-	end
-end
-
 function D.UpdateEntry()
-	-- local container = Station.Lookup('Normal/TopMenu/WndContainer_List')
-	-- if not container then
-	-- 	return
-	-- end
-	local container = Station.Lookup('Normal/TopMenu/WndContainer_ListOther')
-	if not container then
-		return
-	end
-	local wItem = container:Lookup('Wnd_News_XJ')
-	if not wItem then
-		return
-	end
 	-- 计算数量
 	local nTotal, nUnread = 0, 0
 	if O.bEntry then
@@ -153,78 +109,36 @@ function D.UpdateEntry()
 		end
 		nTotal = #NOTIFY_LIST
 	end
-	if not wItem.tPacket then
-		wItem.tPacket = {}
-	end
-	if nTotal > 0 then
-		wItem.tPacket[X.PACKET_INFO.NAME_SPACE] = {
-			szName = X.PACKET_INFO.NAME,
-			nTotal = nTotal,
-			nUnread = nUnread,
-			fnAction = D.OpenPanel,
-		}
-	else
-		wItem.tPacket[X.PACKET_INFO.NAME_SPACE] = nil
-	end
 	-- 重新绘制
-	local bShow, nUnread = false, 0
-	for _, p in pairs(wItem.tPacket) do
-		if p.nTotal > 0 then
-			bShow = true
-		end
-		nUnread = nUnread + p.nUnread
-	end
+	local bShow = nTotal > 0
 	if bShow then
-		-- if not wItem then
-		-- 	wItem = container:AppendContentFromIni(ENTRY_INI_PATH, 'Wnd_' .. FRAME_NAME .. 'Icon')
-		-- 	-- container:SetW(container:GetW() + wItem:GetW())
-		-- 	local h = wItem:Lookup('Wnd_' .. FRAME_NAME .. 'Icon_Inner', '')
-		-- 	h:Lookup('Image_' .. FRAME_NAME .. 'Icon'):SetAlpha(230)
-		-- 	h.OnItemMouseEnter = function() this:Lookup('Image_' .. FRAME_NAME .. 'Icon'):SetAlpha(255) end
-		-- 	h.OnItemMouseLeave = function() this:Lookup('Image_' .. FRAME_NAME .. 'Icon'):SetAlpha(230) end
-		-- 	h.OnItemLButtonDown = function() this:Lookup('Image_' .. FRAME_NAME .. 'Icon'):SetAlpha(230) end
-		-- 	h.OnItemLButtonUp = function() this:Lookup('Image_' .. FRAME_NAME .. 'Icon'):SetAlpha(255) end
-		-- 	h.OnItemLButtonClick = function() D.OpenPanel() end
-		-- 	container:FormatAllContentPos()
-		-- end
-		-- wItem:Lookup('Wnd_' .. FRAME_NAME .. 'Icon_Inner', 'Handle_' .. FRAME_NAME .. 'Icon_Num'):SetVisible(nUnread > 0)
-		-- wItem:Lookup('Wnd_' .. FRAME_NAME .. 'Icon_Inner', 'Handle_' .. FRAME_NAME .. 'Icon_Num/Text_' .. FRAME_NAME .. 'Icon_Num'):SetText(nUnread)
-		wItem:Show()
-		wItem:Lookup('Btn_News_XJ', 'Image_Red_Pot'):SetVisible(nUnread > 0)
-		container:FormatAllContentPos()
+		X.UI.RegisterFloatBar(FRAME_NAME, {
+			nPriority = 0,
+			tAnchor = { s = 'TOPRIGHT', r = 'TOPRIGHT', x = -180, y = -2 },
+			fnCreate = function(hWnd)
+				hWnd:SetSize(24, 24)
+				local frameTemp = X.UI.OpenFrame(ENTRY_INI_PATH, FRAME_NAME .. '_Entry')
+				local hBtn = frameTemp:Lookup('Btn_News_XJ')
+				hBtn:ChangeRelation(hWnd, true, true)
+				hBtn:SetRelPos(2, 2)
+				X.UI.CloseFrame(frameTemp)
+				hBtn.OnMouseEnter = function()
+					local szXml = GetFormatText(_L['Addon notification'], 59)
+						.. X.CONSTANT.XML_LINE_BREAKER
+						.. GetFormatText(_L['Click to view addon notification.'], 162)
+					X.OutputTip(this, szXml, true, X.UI.TIP_POSITION.RIGHT_LEFT_AND_BOTTOM_TOP)
+				end
+				hBtn.OnMouseLeave = function()
+					X.HideTip()
+				end
+				hBtn.OnLButtonClick = function()
+					D.OpenPanel()
+				end
+			end,
+		})
 	else
-		-- if wItem then
-		-- 	-- container:SetW(container:GetW() - wItem:GetW())
-		-- 	wItem:Destroy()
-		-- 	container:FormatAllContentPos()
-		-- end
-		wItem:Hide()
-		container:FormatAllContentPos()
+		X.UI.RegisterFloatBar(FRAME_NAME, false)
 	end
-end
-
-function D.UnhookEntry()
-	local container = Station.Lookup('Normal/TopMenu/WndContainer_ListOther')
-	if not container then
-		return
-	end
-	local wItem = container:Lookup('Wnd_News_XJ')
-	if not wItem then
-		return
-	end
-	wItem.tPacket = nil
-	wItem:Hide()
-	wItem:Lookup('Btn_News_XJ').OnMouseEnter = nil
-	wItem:Lookup('Btn_News_XJ').OnLButtonClick = nil
-	-- local container = Station.Lookup('Normal/TopMenu/WndContainer_List')
-	-- if not container then
-	-- 	return
-	-- end
-	-- local wItem = container:Lookup('Wnd_' .. FRAME_NAME .. 'Icon')
-	-- if wItem then
-	-- 	wItem:Destroy()
-	-- 	container:FormatAllContentPos()
-	-- end
 end
 
 function D.DrawNotifies(bAutoClose)
@@ -389,11 +303,24 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		x = nPaddingX - 10, y = nY,
 		text = _L['Notify center'],
 		color = { 255, 255, 0 },
+		onClick = function()
+			X.CreateNotify({
+				szKey = 'TestNotifySystem',
+				szMsg = GetFormatText('Test Notify System!!!'),
+				fnAction = function()
+					X.OutputAnnounceMessage('Notify System Callback!')
+					X.DismissNotify('TestNotifySystem')
+				end,
+				bPlaySound = true,
+				szSound = PLUGIN_ROOT .. 'audio/Notify.ogg',
+				bPopupPreview = true,
+			})
+		end,
 	}):AutoWidth()
 	nY = nY + 30
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200, h = 25,
-		text = _L['Show in minimap'],
+		text = _L['Show in float bar'],
 		checked = O.bEntry,
 		onCheck = function(bChecked)
 			O.bEntry = bChecked
@@ -446,12 +373,10 @@ end
 --------------------------------------------------------------------------------
 
 X.RegisterInit(FRAME_NAME, function()
-	D.HookEntry()
 	D.UpdateEntry()
 end)
 X.RegisterUserSettingsInit(MODULE_NAME, function()
 	D.UpdateEntry()
 end)
-X.RegisterReload(FRAME_NAME, D.UnhookEntry)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
