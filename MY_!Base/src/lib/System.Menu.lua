@@ -57,16 +57,16 @@ local function GenerateMenu(aList, bMainMenu, dwTarType, dwTarID)
 	if bMainMenu then
 		menu = {
 			szOption = X.PACKET_INFO.NAME,
-			fnAction = X.TogglePanel,
+			fnAction = X.PS.TogglePanel,
 			rgb = X.PACKET_INFO.MENU_COLOR,
 			bCheck = true,
-			bChecked = X.IsPanelVisible(),
+			bChecked = X.PS.IsPanelVisible(),
 
 			szIcon = X.PACKET_INFO.LOGO_IMAGE,
 			nFrame = X.PACKET_INFO.LOGO_MENU_FRAME,
 			nMouseOverFrame = X.PACKET_INFO.LOGO_MENU_HOVER_FRAME,
 			szLayer = 'ICON_RIGHT',
-			fnClickIcon = X.TogglePanel,
+			fnClickIcon = X.PS.TogglePanel,
 		}
 	end
 	for _, p in ipairs(aList) do
@@ -177,6 +177,123 @@ Chat_AppendPlayerMenu({X.GetChatPlayerAddonMenu})
 function X.RegisterAddonMenu(...)
 	X.RegisterPlayerAddonMenu(...)
 	X.RegisterTraceButtonAddonMenu(...)
+end
+
+--------------------------------------------------------------------------------
+-- 其它右键菜单
+--------------------------------------------------------------------------------
+
+-- 获取指定名字的右键菜单
+function X.InsertPlayerContextMenu(t, szName, dwID, szGlobalID)
+	-- 数据库获取 dwID, szGlobalID 补全信息
+	if (not dwID or not szGlobalID) and _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
+		local tInfo = _G.MY_Farbnamen.Get(szName)
+		if tInfo then
+			if not dwID then
+				dwID = tonumber(tInfo.dwID)
+			end
+			if not szGlobalID and X.IsGlobalID(tInfo.szGlobalID) then
+				szGlobalID = tInfo.szGlobalID
+			end
+		end
+	end
+	-- 跨服处理
+	local szOriginName, szServerName = X.DisassemblePlayerGlobalName(szName, true)
+	-- 复制
+	table.insert(t, {
+		szOption = _L['Copy to chat input'],
+		fnAction = function()
+			X.SendChat(X.GetClientPlayer().szName, '[' .. szName .. ']')
+		end,
+	})
+	-- 密聊 好友 邀请入帮 跟随
+	X.Call(InsertPlayerCommonMenu, t, dwID, szName)
+	-- 组队
+	if szName and InsertInviteTeamMenu then
+		InsertInviteTeamMenu(t, szName)
+	end
+	-- 查看装备
+	if (dwID and X.GetClientPlayerID() ~= dwID) or (szGlobalID and szGlobalID ~= X.GetClientPlayerGlobalID()) then
+		table.insert(t, {
+			szOption = _L['View equipment'],
+			fnAction = function()
+				if szServerName and X.IsGlobalID(szGlobalID) then
+					local dwServerID = X.GetServerIDByName(szServerName)
+					X.ViewOtherPlayerByGlobalID(dwServerID, szGlobalID)
+				elseif dwID then
+					X.ViewOtherPlayerByID(dwID)
+				end
+			end,
+		})
+	end
+	-- 查看名剑大会信息
+	table.insert(t, {
+		szOption = g_tStrings.LOOKUP_CORPS,
+		-- fnDisable = function() return not X.GetPlayer(dwID) end,
+		fnAction = function()
+			X.UI.CloseFrame('ArenaCorpsPanel')
+			OpenArenaCorpsPanel(true, dwID)
+		end,
+	})
+	-- 加入角色备注
+	if _G.MY_PlayerRemark and _G.MY_PlayerRemark.OpenEditPanel then
+		table.insert(t, {
+			szOption = _L['Edit in MY_PlayerRemark'],
+			fnAction = function()
+				_G.MY_PlayerRemark.OpenEditPanel(szServerName, dwID, szOriginName, szGlobalID)
+			end,
+		})
+	end
+	-- 奇穴 -- 标记
+	if dwID and InsertTargetMenu then
+		local tx = {}
+		InsertTargetMenu(tx, TARGET.PLAYER, dwID, szName)
+		for _, v in ipairs(tx) do
+			if v.szOption == g_tStrings.LOOKUP_INFO or v.szOption == g_tStrings.STR_LOOKUP_MORE then
+				for _, vv in ipairs(v) do
+					if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then -- 查看奇穴
+						table.insert(t, vv)
+						break
+					end
+				end
+				break
+			end
+		end
+		for _, v in ipairs(tx) do
+			if v.szOption == g_tStrings.STR_ARENA_INVITE_TARGET -- 邀请入名剑队
+			or v.szOption == g_tStrings.LOOKUP_INFO             -- 查看更多信息
+			or v.szOption == g_tStrings.STR_LOOKUP_MORE         -- 查看更多
+			or v.szOption == g_tStrings.CHANNEL_MENTOR          -- 师徒
+			or v.szOption == g_tStrings.STR_ADD_SHANG           -- 发布悬赏
+			or v.szOption == g_tStrings.STR_MARK_TARGET         -- 标记目标
+			or v.szOption == g_tStrings.STR_MAKE_TRADDING       -- 交易
+			or v.szOption == g_tStrings.REPORT_RABOT            -- 举报外挂
+			then
+				table.insert(t, v)
+			end
+		end
+	end
+
+	if IsCtrlKeyDown() and X.IsDebugClient(true) then
+		table.insert(t, {
+			szOption = _L['Copy debug information'],
+			fnAction = function()
+				local tDebugInfo
+				if _G.MY_Farbnamen and _G.MY_Farbnamen.Get then
+					tDebugInfo = _G.MY_Farbnamen.Get(szName)
+				else
+					tDebugInfo = {
+						szName = szName,
+						dwID = dwID,
+						szGlobalID = szGlobalID,
+					}
+				end
+				X.UI.OpenTextEditor(X.EncodeLUAData(tDebugInfo, '\t'))
+			end,
+		})
+	end
+
+	return t
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

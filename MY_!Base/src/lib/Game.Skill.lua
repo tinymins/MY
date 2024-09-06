@@ -19,7 +19,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 -- 获取对象运功状态
 do local bNewAPI
-function X.GetOTActionState(...)
+function X.GetCharacterOTActionState(...)
 	local KObject = ...
 	if select('#', ...) == 0 then
 		KObject = X.GetClientPlayer()
@@ -46,8 +46,8 @@ end
 end
 
 -- 获取对象当前是否可读条
--- (bool) X.CanOTAction([object KObject])
-function X.CanOTAction(...)
+-- (bool) X.CanCharacterOTAction([object KObject])
+function X.CanCharacterOTAction(...)
 	local KObject = ...
 	if select('#', ...) == 0 then
 		KObject = X.GetClientPlayer()

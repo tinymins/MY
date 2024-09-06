@@ -20,7 +20,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -- 判断是不是队友
 ---@param xKey number | string @角色ID、角色名、角色唯一ID
 ---@return boolean @该角色是不是队友
-function X.IsParty(xKey)
+function X.IsTeammate(xKey)
 	if X.IsString(xKey) then
 		if xKey == X.GetClientPlayerName() or xKey == X.GetClientPlayerGlobalID() then
 			return true
@@ -60,7 +60,7 @@ end
 ---@param dwSelfID number @来源角色ID
 ---@param dwPeerID number @目标角色ID
 ---@return "'Self'"|"'Party'"|"'Neutrality'"|"'Foe'"|"'Enemy'"|"'Ally'" @目标角色相对来源角色的关系
-function X.GetRelation(dwSelfID, dwPeerID)
+function X.GetCharacterRelation(dwSelfID, dwPeerID)
 	if not dwPeerID then
 		dwPeerID = dwSelfID
 		dwSelfID = X.GetControlPlayerID()
@@ -71,7 +71,7 @@ function X.GetRelation(dwSelfID, dwPeerID)
 			dwPeerID = npc.dwEmployer
 		end
 	end
-	if X.IsSelf(dwSelfID, dwPeerID) then
+	if X.IsCharacterRelationSelf(dwSelfID, dwPeerID) then
 		return 'Self'
 	end
 	local dwSrcID, dwTarID = dwSelfID, dwPeerID
@@ -99,11 +99,11 @@ end
 ---@param dwSelfID number @来源角色ID
 ---@param dwPeerID number @目标角色ID
 ---@return boolean @目标角色相对来源角色是不是红名
-function X.IsEnemy(dwSelfID, dwPeerID)
-	return X.GetRelation(dwSelfID, dwPeerID) == 'Enemy'
+function X.IsCharacterRelationEnemy(dwSelfID, dwPeerID)
+	return X.GetCharacterRelation(dwSelfID, dwPeerID) == 'Enemy'
 end
 
-function X.IsSelf(dwSrcID, dwTarID)
+function X.IsCharacterRelationSelf(dwSrcID, dwTarID)
 	if X.IsFunction(IsSelf) then
 		return IsSelf(dwSrcID, dwTarID)
 	end
@@ -111,7 +111,7 @@ function X.IsSelf(dwSrcID, dwTarID)
 end
 
 local AUTHOR_GLOBAL_ID, AUTHOR_ROLE
-function X.IsAuthor(dwID, szName, szGlobalID)
+function X.IsAuthorPlayer(dwID, szName, szGlobalID)
 	if not AUTHOR_GLOBAL_ID or not AUTHOR_ROLE then
 		AUTHOR_GLOBAL_ID, AUTHOR_ROLE = {}, {}
 		for _, v in ipairs(X.PACKET_INFO.AUTHOR_ROLE_LIST) do
