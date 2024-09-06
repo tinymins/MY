@@ -66,10 +66,11 @@ function D.GetItemDesc(kItem)
 		nStackNum = kItem.nStackNum,
 		nCurrentDurability = kItem.nCurrentDurability,
 		bBind = kItem.bBind,
+		nLeftTime = kItem.GetLeftExistTime(),
 	}
 end
 
-function D.IsSameItemDesc(a, b, bIgnoreStackNum)
+function D.IsSameItemDesc(a, b, bIgnoreExtendProps)
 	if X.IsEmpty(a) and X.IsEmpty(b) then
 		return true
 	end
@@ -82,8 +83,13 @@ function D.IsSameItemDesc(a, b, bIgnoreStackNum)
 	if a.nGenre == ITEM_GENRE.BOOK and a.nBookID ~= b.nBookID then
 		return false
 	end
-	if not bIgnoreStackNum and a.bCanStack and a.nStackNum ~= b.nStackNum then
-		return false
+	if not bIgnoreExtendProps then
+		if a.bCanStack and a.nStackNum ~= b.nStackNum then
+			return false
+		end
+		if a.nLeftTime ~= b.nLeftTime then
+			return false
+		end
 	end
 	if a.bBind ~= b.bBind then
 		return false
@@ -112,6 +118,17 @@ function D.ItemDescSorter(a, b)
 	end
 	if X.IsEmpty(b) then
 		return true
+	end
+	-- 限时物品放后面
+	local bLeftTimeA = a.nLeftTime ~= 0
+	local bLeftTimeB = b.nLeftTime ~= 0
+	if bLeftTimeA ~= bLeftTimeB then
+		if bLeftTimeA then
+			return false
+		end
+		if bLeftTimeB then
+			return true
+		end
 	end
 	-- 类型不同按类型排序
 	local nGenreA = D.aGenre[a.nGenre] or (100 + a.nGenre)
@@ -153,6 +170,12 @@ function D.ItemDescSorter(a, b)
 	end
 	if a.nGenre == ITEM_GENRE.BOOK and a.nBookID ~= b.nBookID then
 		return a.nBookID < b.nBookID
+	end
+	-- 相同限时物品先消失的放前面
+	local nLeftTimeA = a.nLeftTime
+	local nLeftTimeB = b.nLeftTime
+	if nLeftTimeA ~= nLeftTimeB then
+		return nLeftTimeA < nLeftTimeB
 	end
 	-- 按堆叠数量排序
 	if b.bCanStack then
@@ -198,6 +221,7 @@ function D.DecodeItemDescList(szBin)
 					nDetail = kItemInfo.nDetail,
 					nQuality = kItemInfo.nQuality,
 					bCanStack = kItemInfo.bCanStack,
+					nLeftTime = 0,
 				}
 			else
 				aItemDesc[nIndex] = {}
