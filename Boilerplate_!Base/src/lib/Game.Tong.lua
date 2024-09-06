@@ -45,7 +45,7 @@ end
 ---@return string @°ï»áÃû³Æ
 function X.GetTongName(dwTongID, nGetType)
 	local szTongName
-	if X.IsNumber(dwTongID) and dwTongID > 0 then
+	if X.IsNumber(dwTongID) and dwTongID > 0 and not X.IsClientPlayerCrossServer() then
 		szTongName = GetTongClient().ApplyGetTongName(dwTongID, nGetType or 253)
 	end
 	return szTongName
