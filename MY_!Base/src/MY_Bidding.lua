@@ -34,7 +34,7 @@ function D.Open(tConfig)
 	if not tConfig.szKey then
 		tConfig.szKey = X.GetUUID()
 	end
-	if not X.IsDistributor() then
+	if not X.IsClientPlayerTeamDistributor() then
 		return X.OutputSystemAnnounceMessage(_L['You are not distributor!'])
 	end
 	if not D.CheckChatLock() then
@@ -285,7 +285,7 @@ function D.SwitchCustomBidding(frame, bCustom)
 end
 
 function D.UpdateAuthourize(frame)
-	local bDistributor = X.IsDistributor()
+	local bDistributor = X.IsClientPlayerTeamDistributor()
 	if not bDistributor then
 		D.SwitchConfig(frame, false)
 	end
@@ -516,14 +516,14 @@ function MY_BiddingBase.OnLButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
 	if name == 'Btn_Close' then
-		if X.IsDistributor() then
+		if X.IsClientPlayerTeamDistributor() then
 			return X.OutputSystemAnnounceMessage(_L['You are distributor, Please finish this bidding!'])
 		end
 		X.Confirm(_L['Sure cancel this bidding? You will not able to bidding this item.'], function()
 			X.UI.CloseFrame(frame)
 		end)
 	elseif name == 'Btn_Option' then
-		if not X.IsDistributor() then
+		if not X.IsClientPlayerTeamDistributor() then
 			return X.OutputSystemAnnounceMessage(_L['You are not distributor!'])
 		end
 		local szKey = D.GetKey(frame)
@@ -550,7 +550,7 @@ function MY_BiddingBase.OnLButtonClick()
 		menu.nMinWidth = wnd:GetW()
 		X.UI.PopupMenu(menu)
 	elseif name == 'WndButton_ConfigSubmit' then
-		if not X.IsDistributor() then
+		if not X.IsClientPlayerTeamDistributor() then
 			return X.OutputSystemAnnounceMessage(_L['You are not distributor!'])
 		end
 		if not D.CheckChatLock() then
@@ -786,7 +786,7 @@ end
 function MY_BiddingBase.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_RowItemDelete' then
-		if not X.IsDistributor() then
+		if not X.IsClientPlayerTeamDistributor() then
 			return X.OutputSystemAnnounceMessage(_L['You are not distributor!'])
 		end
 		if not D.CheckChatLock() then
@@ -803,7 +803,7 @@ function MY_BiddingBase.OnItemLButtonClick()
 		table.insert(aSay, { type = 'name', name = rec.szTalkerName })
 		table.insert(aSay, { type = 'text', text = _L[' \'s invalid price .'] })
 		X.Confirm(_L('Sure to delete %s\'s bidding record?', rec.szTalkerName), function()
-			if not X.IsDistributor() then
+			if not X.IsClientPlayerTeamDistributor() then
 				return X.OutputSystemAnnounceMessage(_L['You are not distributor!'])
 			end
 			X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_BIDDING_DELETE', { szKey = szKey, dwTalkerID = rec.dwTalkerID })

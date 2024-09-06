@@ -104,9 +104,9 @@ function D.CreateFrame(szInitYY, szInitNote)
 			simple = true, close = true, resize = true,
 			minWidth = 320, minHeight = 195,
 			setting = function()
-				X.ShowPanel()
-				X.FocusPanel()
-				X.SwitchTab('MY_TeamTools')
+				X.PS.ShowPanel()
+				X.PS.FocusPanel()
+				X.PS.SwitchTab('MY_TeamTools')
 			end,
 			onSizeChange = FormatAllContentPos,
 		})
@@ -120,7 +120,7 @@ function D.CreateFrame(szInitYY, szInitNote)
 			onClick = function()
 				if IsPopupMenuOpened() then
 					X.UI(this):Autocomplete('close')
-				elseif X.IsLeader() then
+				elseif X.IsClientPlayerTeamLeader() then
 					X.UI(this):Autocomplete('search', '')
 				end
 			end,
@@ -129,7 +129,7 @@ function D.CreateFrame(szInitYY, szInitNote)
 				if D.szYY == szText then
 					return
 				end
-				if X.IsLeader() then
+				if X.IsClientPlayerTeamLeader() then
 					if not X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 						D.szYY = szText
 						X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'Edit', szText, ui:Children('#Message'):Text()})
@@ -143,7 +143,7 @@ function D.CreateFrame(szInitYY, szInitNote)
 				{
 					'option', 'beforeSearch', function(text)
 						local source = {}
-						if X.IsLeader() then
+						if X.IsClientPlayerTeamLeader() then
 							D.tList = D.GetList()
 							for k, v in pairs(D.tList) do
 								table.insert(source, k)
@@ -165,13 +165,13 @@ function D.CreateFrame(szInitYY, szInitNote)
 		}):Width() + 5
 		y = y + ui:Append('WndButton', {
 			name = 'Btn_YY',
-			x = x, y = y, text = X.IsLeader()
+			x = x, y = y, text = X.IsClientPlayerTeamLeader()
 				and (X.ENVIRONMENT.GAME_LANG == 'zhcn' and _L['Paste YY'] or _L['Paste DC'])
 				or (X.ENVIRONMENT.GAME_LANG == 'zhcn' and _L['Copy YY'] or _L['Copy DC']),
 			buttonStyle = 'FLAT',
 			onClick = function()
 				local yy = ui:Children('#YY'):Text()
-				if X.IsLeader() then
+				if X.IsClientPlayerTeamLeader() then
 					if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 						return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 					end
@@ -207,7 +207,7 @@ function D.CreateFrame(szInitYY, szInitNote)
 				if D.szNote == szText then
 					return
 				end
-				if X.IsLeader() then
+				if X.IsClientPlayerTeamLeader() then
 					if not X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 						D.szNote = szText
 						X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'Edit', ui:Children('#YY'):Text(), szText})
@@ -265,7 +265,7 @@ function D.CreateFrame(szInitYY, szInitNote)
 					ui:Remove()
 				end
 			elseif szEvent == 'PARTY_ADD_MEMBER' then
-				if X.IsLeader() then
+				if X.IsClientPlayerTeamLeader() then
 					if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 						return
 					end
@@ -274,7 +274,7 @@ function D.CreateFrame(szInitYY, szInitNote)
 			elseif szEvent == 'UI_SCALED' then
 				ui:Anchor(O.anchor)
 			elseif szEvent == 'TEAM_AUTHORITY_CHANGED' then
-				ui:Fetch('Btn_YY'):Text(X.IsLeader() and _L['Paste YY'] or _L['Copy YY'])
+				ui:Fetch('Btn_YY'):Text(X.IsClientPlayerTeamLeader() and _L['Paste YY'] or _L['Copy YY'])
 			end
 		end
 		frame.OnFrameDragSetPosEnd = function()
@@ -298,8 +298,8 @@ function D.OpenFrame()
 		return X.OutputAnnounceMessage(_L['TeamNotice is disabled in this map.'])
 	end
 	O.bEnable = true
-	if X.IsInParty() then
-		if X.IsLeader() then
+	if X.IsClientPlayerInParty() then
+		if X.IsClientPlayerTeamLeader() then
 			D.CreateFrame()
 		else
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
@@ -315,7 +315,7 @@ X.RegisterEvent('PARTY_LEVEL_UP_RAID', 'TEAM_NOTICE', function()
 	if X.IsInZombieMap() then
 		return
 	end
-	if X.IsLeader() then
+	if X.IsClientPlayerTeamLeader() then
 		X.Confirm(_L['Edit team info?'], function()
 			O.bEnable = true
 			D.OpenFrame()
@@ -327,7 +327,7 @@ X.RegisterEvent('FIRST_LOADING_END', 'TEAM_NOTICE', function()
 		return
 	end
 	-- 不存在队长不队长的问题了
-	if X.IsInParty() then
+	if X.IsClientPlayerInParty() then
 		X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'ASK'}, true)
 	end
 end)
@@ -359,7 +359,7 @@ X.RegisterEvent('ON_BG_CHANNEL_MSG', 'LR_TeamNotice', function()
 	if szMsgID ~= 'LR_TeamNotice' or bSelf then
 		return
 	end
-	if not X.IsLeader(dwID) then
+	if not X.IsClientPlayerTeamLeader(dwID) then
 		return
 	end
 	local szCmd, szText = aMsg[1], aMsg[2]
@@ -376,12 +376,12 @@ X.RegisterBgMsg('TI', function(_, data, nChannel, dwID, szName, bIsSelf)
 		local me = X.GetClientPlayer()
 		local team = GetClientTeam()
 		if team then
-			if data[1] == 'ASK' and X.IsLeader() then
+			if data[1] == 'ASK' and X.IsClientPlayerTeamLeader() then
 				if D.GetFrame() then
 					X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', {'reply', szName, D.szYY, D.szNote}, true)
 				end
 			else
-				if not X.IsLeader(dwID) then
+				if not X.IsPlayerTeamLeader(dwID) then
 					return
 				end
 				if data[1] == 'Edit' then
@@ -398,7 +398,7 @@ X.RegisterAddonMenu(function()
 	return {{
 		szOption = _L['Team Message'],
 		fnDisable = function()
-			return not X.IsInParty()
+			return not X.IsClientPlayerInParty()
 		end,
 		fnAction = D.OpenFrame,
 	}}

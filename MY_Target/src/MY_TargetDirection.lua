@@ -160,9 +160,9 @@ function D.OnFrameBreathe()
 		this:Lookup('', 'Handle_Main/Image_Arrow'):SetRotate(1.5 * math.pi + dwRad2 - dwRad1)
 		-- ÑÕÉ«
 		local nFrame = 4
-		if me.IsInParty() and X.IsParty(tar.dwID) then
+		if me.IsInParty() and X.IsTeammate(tar.dwID) then
 			nFrame = 3
-		elseif X.IsEnemy(me.dwID, tar.dwID) then
+		elseif X.IsCharacterRelationEnemy(me.dwID, tar.dwID) then
 			nFrame = 1
 		elseif IsAlly(me.dwID, tar.dwID) then
 			nFrame = 2

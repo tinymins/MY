@@ -630,7 +630,7 @@ function D.GetTip(szName)
 		-- 名称 等级
 		table.insert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
 		-- 是否同队伍
-		if X.GetClientPlayerID() ~= tInfo.dwID and X.IsParty(tInfo.dwID) then
+		if X.GetClientPlayerID() ~= tInfo.dwID and X.IsTeammate(tInfo.dwID) then
 			table.insert(tTip, GetFormatText(_L['[Teammate]'], nil, 0, 255, 0))
 		end
 		table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)

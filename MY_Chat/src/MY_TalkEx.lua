@@ -498,6 +498,6 @@ function PS.OnPanelDeactive()
 	X.BreatheCall('MY_TalkEx__Enable', false)
 end
 
-X.RegisterPanel(_L['Chat'], 'TalkEx', _L['MY_TalkEx'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', PS)
+X.PS.RegisterPanel(_L['Chat'], 'TalkEx', _L['MY_TalkEx'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

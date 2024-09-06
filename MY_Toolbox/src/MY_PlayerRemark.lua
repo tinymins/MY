@@ -211,7 +211,7 @@ end
 
 -- 当有玩家进队时
 function D.CheckPartyPlayer(dwID)
-	local bLeader = X.IsLeader(dwID)
+	local bLeader = X.IsPlayerTeamLeader(dwID)
 	local tMember = X.GetTeamMemberInfo(dwID)
 	local tPlayer = D.Get(tMember.szGlobalID or tMember.szName)
 	if tPlayer then
@@ -489,9 +489,9 @@ end)
 X.RegisterAddonMenu('MY_PlayerRemark', {
 	szOption = _L['View player remark'],
 	fnAction = function()
-		X.ShowPanel()
-		X.FocusPanel()
-		X.SwitchTab('MY_PlayerRemark')
+		X.PS.ShowPanel()
+		X.PS.FocusPanel()
+		X.PS.SwitchTab('MY_PlayerRemark')
 	end,
 })
 
@@ -535,8 +535,8 @@ X.RegisterEvent('GLOBAL_ROOM_MEMBER_CHANGE', 'MY_PlayerRemark', function()
 end)
 
 X.RegisterEvent('MY_PLAYER_REMARK_UPDATE', 'MY_PlayerRemark', function()
-	if X.GetCurrentTabID() == 'MY_PlayerRemark' then
-		X.SwitchTab('MY_PlayerRemark', true)
+	if X.PS.GetCurrentTabID() == 'MY_PlayerRemark' then
+		X.PS.SwitchTab('MY_PlayerRemark', true)
 	end
 end)
 
@@ -574,6 +574,6 @@ function PS.OnPanelActive(wnd)
 		})
 	end
 end
-X.RegisterPanel(_L['Target'], 'MY_PlayerRemark', _L['Player remark'], 'ui/Image/button/ShopButton.UITex|12', PS)
+X.PS.RegisterPanel(_L['Target'], 'MY_PlayerRemark', _L['Player remark'], 'ui/Image/button/ShopButton.UITex|12', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

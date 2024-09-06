@@ -253,6 +253,6 @@ function PS.OnPanelActive(wnd)
 	nX = nPaddingX + 10
 	ui:Append('Text', { x = nX, y = nY, w = nW, text = _L['MY_RoleStatistics TIPS'], font = 27, multiline = true, alignVertical = 0 })
 end
-X.RegisterPanel(_L['General'], 'MY_RoleStatistics', _L['MY_RoleStatistics'], 13491, PS)
+X.PS.RegisterPanel(_L['General'], 'MY_RoleStatistics', _L['MY_RoleStatistics'], 13491, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

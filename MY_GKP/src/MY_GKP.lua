@@ -207,7 +207,7 @@ end
 -- 发放工资
 function D.Bidding(nMoney)
 	local team = GetClientTeam()
-	if not X.IsDistributor() then
+	if not X.IsClientPlayerTeamDistributor() then
 		return X.Alert(_L['You are not the distrubutor.'])
 	end
 	local nGold = nMoney

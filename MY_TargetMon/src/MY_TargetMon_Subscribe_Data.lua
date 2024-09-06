@@ -534,9 +534,9 @@ function D.SyncTeam(info)
 	local function CheckSharePerms()
 		if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 			X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
-		elseif not X.IsInParty() then
+		elseif not X.IsClientPlayerInParty() then
 			X.Alert(_L['You are not in the team.'])
-		elseif not X.IsLeader() and not X.IsDebugClient(true) then
+		elseif not X.IsClientPlayerTeamLeader() and not X.IsDebugClient(true) then
 			X.Alert(_L['You are not team leader.'])
 		elseif not info then
 			MY.OutputAnnounceMessage(_L['Please select one dataset first!'])

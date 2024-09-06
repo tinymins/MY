@@ -173,7 +173,7 @@ function D.DrawLifeBar(dwID)
 				end
 			end
 		elseif tCountDownItem.szType == 'CASTING' then
-			local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(KTarget)
+			local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetCharacterOTActionState(KTarget)
 			if dwSkillID == tCountDownItem.dwSkillID
 			and (
 				nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE

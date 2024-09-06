@@ -418,7 +418,7 @@ end
 X.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
 
 -- ×¢²áÃæ°å
-X.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/UICommon/PlugIn.UITex|1', {
+X.PS.RegisterPanel(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/UICommon/PlugIn.UITex|1', {
 	IsRestricted = function()
 		return not X.IsDebugClient('Dev_Snaplines')
 	end,

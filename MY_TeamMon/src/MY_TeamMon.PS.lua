@@ -284,6 +284,6 @@ function PS.OnPanelActive(wnd)
 	}):AutoWidth():Pos('BOTTOMRIGHT')
 end
 
-X.RegisterPanel(_L['Raid'], 'MY_TeamMon', _L['MY_TeamMon'], 'ui/Image/UICommon/FBlist.uitex|34', PS)
+X.PS.RegisterPanel(_L['Raid'], 'MY_TeamMon', _L['MY_TeamMon'], 'ui/Image/UICommon/FBlist.uitex|34', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -353,14 +353,14 @@ end)
 -- 			bDefault = true,
 -- 			fnAction = function()
 -- 				MY_Serendipity.bEnable = true
--- 				X.RedrawTab(nil)
+-- 				X.PS.RedrawTab(nil)
 -- 			end,
 -- 		},
 -- 		{
 -- 			szOption = _L['No'],
 -- 			fnAction = function()
 -- 				MY_Serendipity.bEnable = false
--- 				X.RedrawTab(nil)
+-- 				X.PS.RedrawTab(nil)
 -- 			end,
 -- 		},
 -- 	})
@@ -378,14 +378,14 @@ end)
 -- 			bDefault = true,
 -- 			fnAction = function()
 -- 				MY_Serendipity.bAutoShare = true
--- 				X.RedrawTab(nil)
+-- 				X.PS.RedrawTab(nil)
 -- 			end,
 -- 		},
 -- 		{
 -- 			szOption = _L['No'],
 -- 			fnAction = function()
 -- 				MY_Serendipity.bAutoShare = false
--- 				X.RedrawTab(nil)
+-- 				X.PS.RedrawTab(nil)
 -- 			end,
 -- 		},
 -- 	})
@@ -404,14 +404,14 @@ end)
 -- 			bDefault = true,
 -- 			fnAction = function()
 -- 				MY_Serendipity.bSilentMode = true
--- 				X.RedrawTab(nil)
+-- 				X.PS.RedrawTab(nil)
 -- 			end,
 -- 		},
 -- 		{
 -- 			szOption = _L['No'],
 -- 			fnAction = function()
 -- 				MY_Serendipity.bSilentMode = false
--- 				X.RedrawTab(nil)
+-- 				X.PS.RedrawTab(nil)
 -- 			end,
 -- 		},
 -- 	})

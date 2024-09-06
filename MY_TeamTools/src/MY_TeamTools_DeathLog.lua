@@ -23,7 +23,7 @@ local D = {}
 local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_TeamTools_DeathLog.ini'
 local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
 local GetCurrentTime = GetCurrentTime
-local MY_IsParty, MY_GetSkillName, MY_GetBuffName = X.IsParty, X.GetSkillName, X.GetBuffName
+local MY_IsParty, MY_GetSkillName, MY_GetBuffName = X.IsTeammate, X.GetSkillName, X.GetBuffName
 
 local MAX_COUNT  = 5
 local PLAYER_ID  = 0

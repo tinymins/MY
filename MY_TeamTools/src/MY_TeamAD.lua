@@ -67,7 +67,7 @@ function PS.OnPanelActive(wnd)
 			GetUserInput(_L['Save Advertising Name'],function(text)
 				table.insert(O.tADList, { key = text, text = txt, ad = data })
 				D.SaveLUAData()
-				X.SwitchTab('MY_TeamAD', true)
+				X.PS.SwitchTab('MY_TeamAD', true)
 			end, nil, nil, nil, nil, 5)
 		end
 	end):Pos('BOTTOMRIGHT')
@@ -105,7 +105,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						table.remove(O.tADList, k)
 						D.SaveLUAData()
-						X.SwitchTab('MY_TeamAD', true)
+						X.PS.SwitchTab('MY_TeamAD', true)
 					end,
 				}}
 				return menu
@@ -122,6 +122,6 @@ function PS.OnPanelActive(wnd)
 		}):Pos('BOTTOMRIGHT') + 10
 	end
 end
-X.RegisterPanel(_L['Raid'], 'MY_TeamAD', _L['MY_TeamAD'], 5958, PS)
+X.PS.RegisterPanel(_L['Raid'], 'MY_TeamAD', _L['MY_TeamAD'], 5958, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -331,7 +331,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 						szOption = _L['Delete'],
 						fnAction = function()
 							D.Delete(i)
-							X.SwitchTab('MY_TeamTools', true)
+							X.PS.SwitchTab('MY_TeamTools', true)
 						end,
 					},
 					{
@@ -342,7 +342,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 								if not X.IsEmpty(text) then
 									v.name = text
 									D.SaveLUAData()
-									X.SwitchTab('MY_TeamTools', true)
+									X.PS.SwitchTab('MY_TeamTools', true)
 								end
 							end, nil, nil, nil, nil, 50)
 						end,
@@ -381,7 +381,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 		onClick = function()
 			GetUserInput(_L['Save team name'], function(text)
 				D.Save(nil, text)
-				X.SwitchTab('MY_TeamTools', true)
+				X.PS.SwitchTab('MY_TeamTools', true)
 			end, nil, nil, nil, nil, 50)
 		end,
 	}):Pos('BOTTOMRIGHT')

@@ -442,6 +442,6 @@ function PS.OnPanelActive(frame)
 	nY = nY + 28
 	nX, nY = MY_ChangGeShadow.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 end
-X.RegisterPanel(_L['Target'], 'MY_Force', _L['MY_Force'], 327, PS)
+X.PS.RegisterPanel(_L['Target'], 'MY_Force', _L['MY_Force'], 327, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

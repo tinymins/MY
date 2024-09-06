@@ -251,7 +251,7 @@ X.RegisterBgMsg('MY_GKP', function(_, data, nChannel, dwID, szName, bIsSelf)
 						local handle = ui:Append('Handle', { w = 230, h = 20, x = x + 30, y = y + 70 + 30 * n + 5, handleStyle = 3 })[1]
 						handle:AppendItemFromString(GetFormatText(_L['Total Auction:'], 41) .. D.GetMoneyTipText(nMoney))
 						handle:FormatAllItemPos()
-						if X.IsDistributor() and X.IS_REMAKE then
+						if X.IsClientPlayerTeamDistributor() and X.IS_REMAKE then
 							ui:Append('WndButton', {
 								w = 91, h = 26, x = x + 620, y = y + 70 + 30 * n + 5, text = _L['salary'],
 								buttonStyle = 'SKEUOMORPHISM',
@@ -398,7 +398,7 @@ function D.MoneyUpdate(nGold, nSilver, nCopper)
 		dwMapID   = X.GetClientPlayer().GetMapID()
 	})
 	if MY_GKP.bMoneyTalk and szPeerName ~= 'System'
-	and (not MY_GKP.bMoneyTalkOnlyDistributor or X.IsDistributor(D.tTradingInfo.dwID) or X.IsDistributor()) then
+	and (not MY_GKP.bMoneyTalkOnlyDistributor or X.IsPlayerTeamDistributor(D.tTradingInfo.dwID) or X.IsClientPlayerTeamDistributor()) then
 		if nGold > 0 then
 			X.SendChat(PLAYER_TALK_CHANNEL.RAID, {
 				D.GetFormatLink(_L['Received']),

@@ -91,6 +91,6 @@ function PS.OnPanelActive(wnd)
 	MY_GongzhanCheck.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	MY_LockFrame.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 end
-X.RegisterPanel(_L['General'], 'MY_Toolbox', _L['MY_Toolbox'], 134, PS)
+X.PS.RegisterPanel(_L['General'], 'MY_Toolbox', _L['MY_Toolbox'], 134, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

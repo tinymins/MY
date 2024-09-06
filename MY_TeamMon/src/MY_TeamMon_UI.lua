@@ -642,11 +642,11 @@ function D.OnItemRButtonClick()
 			D.MoveData(t.dwMapID, t.nIndex, dwMapID, IsCtrlKeyDown())
 		end)
 		table.insert(menu, { bDevide = true })
-		table.insert(menu, { szOption = _L['Share data'], bDisable = not X.IsInParty(), fnAction = function()
+		table.insert(menu, { szOption = _L['Share data'], bDisable = not X.IsClientPlayerInParty(), fnAction = function()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
-			if X.IsLeader() or X.IsDebugClient(true) then
+			if X.IsClientPlayerTeamLeader() or X.IsDebugClient(true) then
 				MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAM_MON_SHARE', {MY_TEAM_MON__UI__SELECT_TYPE, t.dwMapID, t})
 				X.OutputAnnounceMessage(g_tStrings.STR_MAIL_SUCCEED)
 			else

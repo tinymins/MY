@@ -126,9 +126,9 @@ function Framework.OnLButtonClick()
 		table.insert(menu, {
 			szOption = _L['Option'],
 			fnAction = function()
-				X.ShowPanel()
-				X.FocusPanel()
-				X.SwitchTab('MY_TeamTools')
+				X.PS.ShowPanel()
+				X.PS.FocusPanel()
+				X.PS.SwitchTab('MY_TeamTools')
 			end,
 		})
 		local tFloatEntryMenu = { szOption = _L['Float panel'] }
@@ -222,7 +222,7 @@ function Framework.OnFrameCreate()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	-- ±êÌâÐÞ¸Ä
 	local szTitle = X.PACKET_INFO.NAME .. ' - ' .. _L['MY_TeamTools']
-	if X.IsInParty() then
+	if X.IsClientPlayerInParty() then
 		local team = GetClientTeam()
 		local info = team.GetMemberInfo(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
 		szTitle = _L('%s\'s Team', info.szName) .. ' (' .. team.GetTeamSize() .. '/' .. team.nGroupNum * 5  .. ')'

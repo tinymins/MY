@@ -36,12 +36,12 @@ function D.CreateSnapshot()
 		return
 	end
 	if X.IsEmpty(O.szTeam) then
-		X.ShowPanel()
-		X.SwitchTab('MY_JX3BOX')
+		X.PS.ShowPanel()
+		X.PS.SwitchTab('MY_JX3BOX')
 		return X.Alert(_L['Please input team name/id.'])
 	end
 	local aTeammate = {}
-	local team = X.IsInParty() and GetClientTeam()
+	local team = X.IsClientPlayerInParty() and GetClientTeam()
 	if team then
 		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 			local info = team.GetMemberInfo(dwTarID)

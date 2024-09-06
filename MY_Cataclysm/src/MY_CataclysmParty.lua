@@ -291,7 +291,7 @@ function MY_CataclysmParty_Base.OnItemLButtonDrag()
 	end
 	local team = GetClientTeam()
 	local me = X.GetClientPlayer()
-	if (IsAltKeyDown() or CFG.bEditMode) and me.IsInRaid() and X.IsLeader() then
+	if (IsAltKeyDown() or CFG.bEditMode) and me.IsInRaid() and X.IsClientPlayerTeamLeader() then
 		CTM_DRAG = true
 		CTM_DRAG_ID = dwID
 		CTM_CLICK_DISMISS = true
@@ -509,13 +509,13 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 		szIcon = szPath,
 		nFrame = nFrame
 	})
-	if X.IsLeader() and me.IsInRaid() then
+	if X.IsClientPlayerTeamLeader() and me.IsInRaid() then
 		table.insert(menu, { bDevide = true })
 		InsertChangeGroupMenu(menu, dwID)
 	end
 	local info = CTM:GetMemberInfo(dwID)
 	if dwID ~= me.dwID then
-		if X.IsLeader() then
+		if X.IsClientPlayerTeamLeader() then
 			table.insert(menu, { bDevide = true })
 		end
 		InsertTeammateMenu(menu, dwID)
@@ -559,7 +559,7 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 	else
 		table.insert(menu, { bDevide = true })
 		InsertPlayerMenu(menu, dwID)
-		if X.IsLeader() then
+		if X.IsClientPlayerTeamLeader() then
 			table.insert(menu, { bDevide = true })
 			table.insert(menu, {
 				szOption = _L['Take back all permissions'],
@@ -828,7 +828,7 @@ function CTM:RefreshBossTarget()
 	local tKeep = {}
 	if CFG.bShowBossTarget then
 		for dwNpcID, npc in pairs(CTM_BOSS_CACHE) do
-			local dwTarID = (X.IsEnemy(X.GetClientPlayerID(), dwNpcID) and npc.bFightState)
+			local dwTarID = (X.IsCharacterRelationEnemy(X.GetClientPlayerID(), dwNpcID) and npc.bFightState)
 				and (CTM_NPC_THREAT_TARGET[dwNpcID] or select(2, npc.GetTarget()))
 				or nil
 			if dwTarID then
@@ -1059,7 +1059,7 @@ function CTM:KungFuSwitch(dwID)
 			X.BreatheCall(key, function()
 				local player = X.GetPlayer(dwID)
 				if player and img and img:IsValid() then
-					local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(player)
+					local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetCharacterOTActionState(player)
 					if (nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 					or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE) and fCastPercent then
 						local alpha = 255 * (math.abs((fCastPercent * 300) % 32 - 7) + 4) / 12
@@ -2224,7 +2224,7 @@ function CTM:StartTeamVote(eType)
 				if eType == 'raid_ready' then
 					bAwait = false
 				elseif eType == 'wage_agree' then
-					bAwait = not X.IsDistributor()
+					bAwait = not X.IsClientPlayerTeamDistributor()
 				end
 			end
 			if bAwait then

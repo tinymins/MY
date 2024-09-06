@@ -343,7 +343,7 @@ function D.OnTargetUpdate(dwID, bForce)
 		return
 	end
 	local bIsPlayer = X.IsPlayer(dwID)
-	if bIsPlayer and not X.IsParty(dwID) and not X.IsInArenaMap() and not X.IsInBattlefieldMap() then
+	if bIsPlayer and not X.IsTeammate(dwID) and not X.IsInArenaMap() and not X.IsInBattlefieldMap() then
 		return
 	end
 	if not bIsPlayer then

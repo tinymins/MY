@@ -316,7 +316,7 @@ function D.OnMessageBoxOpen()
 				end
 				info.szName = szName
 				info.szDesc = szMsg
-				info.bParty      = X.IsParty(szName)
+				info.bParty      = X.IsTeammate(szName)
 				info.bFriend     = X.IsFellowship(szName)
 				info.bTongMember = X.IsTongMember(szName)
 				info.fnAccept = function()

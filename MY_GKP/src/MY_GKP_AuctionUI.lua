@@ -212,7 +212,7 @@ function D.Open(ds, tab, szMode)
 		tab.szPlayer  = szPlayer
 		tab.dwForceID = dwForceID or tab.dwForceID or 0
 		if tab and type(item) == 'userdata' and szMode ~= 'EDIT' then
-			if X.IsDistributor() then
+			if X.IsClientPlayerTeamDistributor() then
 				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 					X.OutputSystemAnnounceMessage(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else
@@ -229,7 +229,7 @@ function D.Open(ds, tab, szMode)
 			tab.szName = hName:Text()
 			tab.dwForceID = dwForceID or tab.dwForceID or 0
 			tab.bEdit = true
-			if X.IsDistributor() then
+			if X.IsClientPlayerTeamDistributor() then
 				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 					X.OutputSystemAnnounceMessage(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else
@@ -243,7 +243,7 @@ function D.Open(ds, tab, szMode)
 				X.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', {'edit', tab}, true)
 			end
 		else
-			if X.IsDistributor() then
+			if X.IsClientPlayerTeamDistributor() then
 				if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 					X.OutputSystemAnnounceMessage(_L['Please unlock talk lock, otherwise gkp will not able to sync to teammate.'])
 				else

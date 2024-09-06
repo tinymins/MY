@@ -672,6 +672,6 @@ function PS.OnPanelActive(wnd)
 		})
 	end
 end
-X.RegisterPanel(_L['System'], 'MY_InfoTip', _L['MY_InfoTip'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', PS)
+X.PS.RegisterPanel(_L['System'], 'MY_InfoTip', _L['MY_InfoTip'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

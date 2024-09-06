@@ -109,7 +109,7 @@ end
 -- skill cast log
 function D.OnSkillCast(dwCaster, dwSkillID, dwLevel, szEvent)
 	local player = X.GetPlayer(dwCaster)
-	if player and dwSkillID == D.dwSkillID and (dwCaster == X.GetClientPlayerID() or X.IsParty(dwCaster)) then
+	if player and dwSkillID == D.dwSkillID and (dwCaster == X.GetClientPlayerID() or X.IsTeammate(dwCaster)) then
 		table.insert(D.tCast, { dwCaster = dwCaster, dwTime = GetTime(), szEvent = szEvent })
 		--[[#DEBUG BEGIN]]
 		D.OutputDebugMessage('[' .. player.szName .. '] cast [' .. X.GetSkillName(dwSkillID, dwLevel) .. '#' .. szEvent .. ']')
@@ -264,7 +264,7 @@ function D.OnUseManaChange()
 				return
 			end
 			-- 在读条
-			if X.GetOTActionState(me) ~= X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE then
+			if X.GetCharacterOTActionState(me) ~= X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE then
 				return
 			end
 			-- 吃不了

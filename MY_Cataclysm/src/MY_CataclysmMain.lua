@@ -339,18 +339,18 @@ end
 
 function D.InsertDistributeMenu(tMenu)
 	local aDistributeMenu = {}
-	InsertDistributeMenu(aDistributeMenu, not X.IsDistributor())
+	InsertDistributeMenu(aDistributeMenu, not X.IsClientPlayerTeamDistributor())
 	for _, menu in ipairs(aDistributeMenu) do
 		if menu.szOption == g_tStrings.STR_LOOT_LEVEL then
 			table.insert(menu, 1, {
-				bDisable = not X.IsDistributor(),
+				bDisable = not X.IsClientPlayerTeamDistributor(),
 				szOption = g_tStrings.STR_WHITE,
 				nFont = 79, rgb = {GetItemFontColorByQuality(1)},
 				bMCheck = true, bChecked = GetClientTeam().nRollQuality == 1,
 				fnAction = function() GetClientTeam().SetTeamRollQuality(1) end,
 			})
 			table.insert(menu, 1, {
-				bDisable = not X.IsDistributor(),
+				bDisable = not X.IsClientPlayerTeamDistributor(),
 				szOption = g_tStrings.STR_GRAY,
 				nFont = 79, rgb = {GetItemFontColorByQuality(0)},
 				bMCheck = true, bChecked = GetClientTeam().nRollQuality == 0,
@@ -498,7 +498,7 @@ function D.CreateControlBar()
 	local szIniFile    = INI_ROOT .. 'MY_CataclysmMain_Button.ini'
 	container:Clear()
 	-- 团队工具 团队告示
-	if X.IsInParty() then
+	if X.IsClientPlayerInParty() then
 		container:AppendContentFromIni(szIniFile, 'Wnd_TeamTools')
 		container:AppendContentFromIni(szIniFile, 'Wnd_TeamNotice')
 	end
@@ -516,15 +516,15 @@ function D.CreateControlBar()
 		container:AppendContentFromIni(szIniFile, 'WndButton_GKP')
 	end
 	-- 世界标记
-	if X.IsLeader() then
+	if X.IsClientPlayerTeamLeader() then
 		container:AppendContentFromIni(szIniFile, 'WndButton_WorldMark')
 	end
 	-- 召请玩家
-	if X.IsLeader() and EnvokeAllTeammates then
+	if X.IsClientPlayerTeamLeader() and EnvokeAllTeammates then
 		container:AppendContentFromIni(szIniFile, 'Wnd_EnvokeAllTeammates')
 	end
 	-- 倒计时
-	if X.IsLeader() and MY_TeamCountdown then
+	if X.IsClientPlayerTeamLeader() and MY_TeamCountdown then
 		container:AppendContentFromIni(szIniFile, 'Wnd_TeamCountdown')
 	end
 	-- 语音按钮
@@ -825,11 +825,11 @@ function D.OnEvent(szEvent)
 		MY_CataclysmParty:CallRefreshImages(arg1, false, true, nil, true)
 		MY_CataclysmParty:CallDrawHPMP(arg1, true)
 	elseif szEvent == 'UPDATE_PLAYER_SCHOOL_ID' then
-		if X.IsParty(arg0) then
+		if X.IsTeammate(arg0) then
 			MY_CataclysmParty:CallRefreshImages(arg0, false, true)
 		end
 	elseif szEvent == 'PLAYER_STATE_UPDATE' then
-		if X.IsParty(arg0) then
+		if X.IsTeammate(arg0) then
 			MY_CataclysmParty:CallDrawHPMP(arg0, true)
 		end
 	elseif szEvent == 'PARTY_SET_MEMBER_ONLINE_FLAG' then
@@ -1058,7 +1058,7 @@ function D.UpdateOTAction(frame)
 	end
 	local hPrepare = frame:Lookup('', 'Handle_Prepare')
 	if KOTTarget then
-		local nType, dwSkillID, dwSkillLevel, fProgress = X.GetOTActionState(KOTTarget)
+		local nType, dwSkillID, dwSkillLevel, fProgress = X.GetCharacterOTActionState(KOTTarget)
 		if nType ~= X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE and fProgress and dwSkillID and dwSkillID ~= 0 and dwSkillLevel then
 			hPrepare:Lookup('Text_Prepare'):SetText(X.GetSkillName(dwSkillID, dwSkillLevel) or '')
 			hPrepare:Lookup('Image_Prepare'):SetPercentage(fProgress)
@@ -1112,7 +1112,7 @@ function D.OnLButtonClick()
 				szOption = g_tStrings.STR_RAID_MENU_READY_CONFIRM,
 				{
 					szOption = g_tStrings.STR_RAID_READY_CONFIRM_START,
-					bDisable = not X.IsLeader(),
+					bDisable = not X.IsClientPlayerTeamLeader(),
 					fnAction = function()
 						Send_RaidReadyConfirm()
 						MY_CataclysmParty:StartTeamVote('raid_ready')
@@ -1126,7 +1126,7 @@ function D.OnLButtonClick()
 			table.insert(menu, { bDevide = true })
 		end
 		-- 分配
-		D.InsertDistributeMenu(menu, not X.IsDistributor())
+		D.InsertDistributeMenu(menu, not X.IsClientPlayerTeamDistributor())
 		if MY_TeamCountdown then
 			table.insert(menu, { szOption = _L['Open team countdown'], fnAction = function()
 				MY_TeamCountdown.Open()
@@ -1135,7 +1135,7 @@ function D.OnLButtonClick()
 		table.insert(menu, { bDevide = true })
 		if me.IsInRaid() then
 			-- 编辑模式
-			table.insert(menu, { szOption = string.gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt'), bDisable = not X.IsLeader() or not me.IsInRaid(), bCheck = true, bChecked = CFG.bEditMode, fnAction = function()
+			table.insert(menu, { szOption = string.gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt'), bDisable = not X.IsClientPlayerTeamLeader() or not me.IsInRaid(), bCheck = true, bChecked = CFG.bEditMode, fnAction = function()
 				CFG.bEditMode = not CFG.bEditMode
 				X.UI.ClosePopupMenu()
 			end })
@@ -1143,7 +1143,7 @@ function D.OnLButtonClick()
 			table.insert(menu, { bDevide = true })
 			D.InsertForceCountMenu(menu)
 			-- 团队快照上传
-			if X.IsLeader() and X.IsTable(MY_JBTeamSnapshot) and X.IsFunction(MY_JBTeamSnapshot.CreateSnapshot) then
+			if X.IsClientPlayerTeamLeader() and X.IsTable(MY_JBTeamSnapshot) and X.IsFunction(MY_JBTeamSnapshot.CreateSnapshot) then
 				table.insert(menu, {
 					szOption = _L['Upload team snapshot'],
 					fnAction = function()
@@ -1154,9 +1154,9 @@ function D.OnLButtonClick()
 			table.insert(menu, { bDevide = true })
 		end
 		table.insert(menu, { szOption = _L['Interface settings'], rgb = { 255, 255, 0 }, fnAction = function()
-			X.ShowPanel()
-			X.FocusPanel()
-			X.SwitchTab('MY_Cataclysm')
+			X.PS.ShowPanel()
+			X.PS.FocusPanel()
+			X.PS.SwitchTab('MY_Cataclysm')
 		end })
 		if X.IsDebugClient(true) then
 			table.insert(menu, { bDevide = true })
@@ -1202,13 +1202,13 @@ function D.OnLButtonClick()
 		end
 		MY_TeamMon_Subscribe.OpenPanel()
 	elseif szName == 'WndButton_LootMode' or szName == 'WndButton_LootQuality' then
-		if X.IsDistributor() then
+		if X.IsClientPlayerTeamDistributor() then
 			local menu = {}
 			if szName == 'WndButton_LootMode' then
-				D.InsertDistributeMenu(menu, not X.IsDistributor())
+				D.InsertDistributeMenu(menu, not X.IsClientPlayerTeamDistributor())
 				PopupMenu(menu[1])
 			elseif szName == 'WndButton_LootQuality' then
-				D.InsertDistributeMenu(menu, not X.IsDistributor())
+				D.InsertDistributeMenu(menu, not X.IsClientPlayerTeamDistributor())
 				PopupMenu(menu[2])
 			end
 		else
@@ -1351,7 +1351,7 @@ function D.ConfirmRestoreConfig()
 			fnAction = function()
 				D.SetConfig(X.Clone(CTM_CONFIG_OFFICIAL), true)
 				D.CheckEnableTeamPanel()
-				X.SwitchTab('MY_Cataclysm', true)
+				X.PS.SwitchTab('MY_Cataclysm', true)
 			end,
 		},
 		{
@@ -1359,7 +1359,7 @@ function D.ConfirmRestoreConfig()
 			fnAction = function()
 				D.SetConfig(X.Clone(CTM_CONFIG_CATACLYSM), true)
 				D.CheckEnableTeamPanel()
-				X.SwitchTab('MY_Cataclysm', true)
+				X.PS.SwitchTab('MY_Cataclysm', true)
 			end,
 		},
 		{
@@ -1495,7 +1495,7 @@ X.RegisterTutorial({
 		fnAction = function()
 			MY_Cataclysm.bEnable = true
 			D.CheckEnableTeamPanel()
-			X.RedrawTab('MY_Cataclysm')
+			X.PS.RedrawTab('MY_Cataclysm')
 		end,
 	},
 	{
@@ -1503,7 +1503,7 @@ X.RegisterTutorial({
 		fnAction = function()
 			MY_Cataclysm.bEnable = false
 			D.CheckEnableTeamPanel()
-			X.RedrawTab('MY_Cataclysm')
+			X.PS.RedrawTab('MY_Cataclysm')
 		end,
 	},
 })

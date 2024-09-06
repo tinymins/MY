@@ -74,6 +74,6 @@ end
 function PS.OnPanelScroll(wnd, scrollX, scrollY)
 	wnd:Lookup('WndWindow_Wrapper'):SetRelPos(scrollX, scrollY)
 end
-X.RegisterPanel(_L['Target'], 'MY_TargetMon', _L['Target monitor'], 'ui/Image/ChannelsPanel/NewChannels.UITex|141', PS)
+X.PS.RegisterPanel(_L['Target'], 'MY_TargetMon', _L['Target monitor'], 'ui/Image/ChannelsPanel/NewChannels.UITex|141', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

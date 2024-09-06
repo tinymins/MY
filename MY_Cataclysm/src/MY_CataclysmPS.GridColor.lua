@@ -49,7 +49,7 @@ function PS.OnPanelActive(frame)
 			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
-			X.SwitchTab('MY_Cataclysm_GridColor', true)
+			X.PS.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}):AutoWidth():Width()
 
@@ -64,7 +64,7 @@ function PS.OnPanelActive(frame)
 			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
-			X.SwitchTab('MY_Cataclysm_GridColor', true)
+			X.PS.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}):AutoWidth():Width() + 5
 
@@ -79,7 +79,7 @@ function PS.OnPanelActive(frame)
 			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
-			X.SwitchTab('MY_Cataclysm_GridColor', true)
+			X.PS.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}):AutoWidth():Width() + 5
 
@@ -94,7 +94,7 @@ function PS.OnPanelActive(frame)
 			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
-			X.SwitchTab('MY_Cataclysm_GridColor', true)
+			X.PS.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}):AutoWidth():Width() + 5
 
@@ -106,7 +106,7 @@ function PS.OnPanelActive(frame)
 			if MY_CataclysmMain.GetFrame() then
 				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
-			X.SwitchTab('MY_Cataclysm_GridColor', true)
+			X.PS.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}):AutoWidth():Height() + 5
 
@@ -137,7 +137,7 @@ function PS.OnPanelActive(frame)
 						CFG.tDistanceLevel = tDistanceLevel
 						CFG.tDistanceCol = tDistanceCol
 						CFG.tDistanceAlpha = tDistanceAlpha
-						X.SwitchTab('MY_Cataclysm_GridColor', true)
+						X.PS.SwitchTab('MY_Cataclysm_GridColor', true)
 					end
 				end)
 			end,
@@ -343,6 +343,6 @@ function PS.OnPanelActive(frame)
 		}):AutoWidth():Width() + 5
 	end
 end
-X.RegisterPanel(_L['Raid'], 'MY_Cataclysm_GridColor', _L['Grid Color'], 'ui/Image/UICommon/RaidTotal.uitex|71', PS)
+X.PS.RegisterPanel(_L['Raid'], 'MY_Cataclysm_GridColor', _L['Grid Color'], 'ui/Image/UICommon/RaidTotal.uitex|71', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

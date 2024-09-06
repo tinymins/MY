@@ -175,9 +175,9 @@ function D.GetHTML(rec)
 end
 
 function D.OnNotifyCB()
-	X.ShowPanel()
-	X.FocusPanel()
-	X.SwitchTab('MY_ChatMonitor')
+	X.PS.ShowPanel()
+	X.PS.FocusPanel()
+	X.PS.SwitchTab('MY_ChatMonitor')
 	X.DismissNotify('MY_ChatMonitor')
 end
 
@@ -558,7 +558,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						GetUserInputNumber(O.nMaxRecord, 1000, nil, function(val)
 							O.nMaxRecord = val or O.nMaxRecord
-						end, nil, function() return not X.IsPanelVisible() end)
+						end, nil, function() return not X.PS.IsPanelVisible() end)
 					end,
 				},
 				{
@@ -608,7 +608,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						O.bDistinctServer = not O.bDistinctServer
 						D.LoadData()
-						X.SwitchTab('MY_ChatMonitor', true)
+						X.PS.SwitchTab('MY_ChatMonitor', true)
 					end,
 					bCheck = true,
 					bChecked = O.bDistinctServer
@@ -661,6 +661,6 @@ function PS.OnPanelDeactive()
 	l_uiBoard = nil
 end
 
-X.RegisterPanel(_L['Chat'], 'MY_ChatMonitor', _L['MY_ChatMonitor'], 'UI/Image/Minimap/Minimap.UITex|197', PS)
+X.PS.RegisterPanel(_L['Chat'], 'MY_ChatMonitor', _L['MY_ChatMonitor'], 'UI/Image/Minimap/Minimap.UITex|197', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

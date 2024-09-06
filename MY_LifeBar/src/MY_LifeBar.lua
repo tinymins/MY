@@ -259,7 +259,7 @@ end
 
 function D.GetRelation(dwSrcID, dwTarID, KSrc, KTar)
 	if Config.nCamp == -1 or not X.IsPlayer(dwTarID) then
-		return X.GetRelation(dwSrcID, dwTarID)
+		return X.GetCharacterRelation(dwSrcID, dwTarID)
 	else
 		if not KTar then
 			return 'Neutrality'
@@ -544,7 +544,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 					end
 				end
 			elseif tData.szType == 'CASTING' then
-				local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(object)
+				local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetCharacterOTActionState(object)
 				if dwSkillID == tData.dwSkillID
 				and (
 					nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE

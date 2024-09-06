@@ -796,7 +796,7 @@ function D.GetDisplayList()
 							bRuleFocus = false
 						end
 						if bRuleFocus and not via.tRule.tRelation.bAll then
-							if X.IsEnemy(me.dwID, KObject.dwID) then
+							if X.IsCharacterRelationEnemy(me.dwID, KObject.dwID) then
 								bRuleFocus = via.tRule.tRelation.bEnemy
 							else
 								bRuleFocus = via.tRule.tRelation.bAlly
@@ -1131,7 +1131,7 @@ X.RegisterTutorial({
 		fnAction = function()
 			O.bEnable = true
 			MY_FocusUI.Open()
-			X.RedrawTab('MY_Focus')
+			X.PS.RedrawTab('MY_Focus')
 		end,
 	},
 	{
@@ -1139,7 +1139,7 @@ X.RegisterTutorial({
 		fnAction = function()
 			O.bEnable = false
 			MY_FocusUI.Close()
-			X.RedrawTab('MY_Focus')
+			X.PS.RedrawTab('MY_Focus')
 		end,
 	},
 })

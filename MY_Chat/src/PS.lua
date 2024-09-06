@@ -38,6 +38,6 @@ function PS.OnPanelActive(wnd)
 	nX, nY = MY_WhisperMention.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLineH)
 	nX, nY = MY_ChatEmotion.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLineH)
 end
-X.RegisterPanel(_L['Chat'], 'MY_ChatSwitch', _L['chat helper'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', PS)
+X.PS.RegisterPanel(_L['Chat'], 'MY_ChatSwitch', _L['chat helper'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

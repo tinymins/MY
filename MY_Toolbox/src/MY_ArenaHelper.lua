@@ -57,7 +57,7 @@ local function RestoreTeam()
 	local me, team = X.GetClientPlayer(), GetClientTeam()
 	if not l_tTeamInfo
 	or not O.bRestoreAuthorityInfo
-	or not X.IsLeader()
+	or not X.IsClientPlayerTeamLeader()
 	or not me.IsInParty() or not X.IsInArenaMap() then
 		return
 	end

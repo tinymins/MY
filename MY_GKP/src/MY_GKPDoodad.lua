@@ -552,7 +552,7 @@ end
 function D.AutoInteractDoodad()
 	local me = X.GetClientPlayer()
 	-- auto interact
-	if not me or X.GetOTActionState(me) ~= X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
+	if not me or X.GetCharacterOTActionState(me) ~= X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_IDLE
 		or (me.nMoveState ~= MOVE_STATE.ON_STAND and me.nMoveState ~= MOVE_STATE.ON_FLOAT)
 		-- or IsDialoguePanelOpened()
 	then
@@ -584,7 +584,7 @@ function D.AutoInteractDoodad()
 			then -- 任务和普通道具尝试 5 次
 				bIntr = bAllowAutoIntr
 				-- 宴席只能吃队友的
-				if doodad.dwOwnerID ~= 0 and X.IsPlayer(doodad.dwOwnerID) and not X.IsParty(doodad.dwOwnerID) then
+				if doodad.dwOwnerID ~= 0 and X.IsPlayer(doodad.dwOwnerID) and not X.IsTeammate(doodad.dwOwnerID) then
 					bIntr = false
 				end
 				if bIntr then
@@ -621,7 +621,7 @@ end
 
 function D.CloseLootWindow()
 	local me = X.GetClientPlayer()
-	if me and X.GetOTActionState(me) == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
+	if me and X.GetCharacterOTActionState(me) == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
 		me.OnCloseLootWindow()
 	end
 end
@@ -1152,6 +1152,6 @@ function PS.OnPanelActive(frame)
 		})
 	end
 end
-X.RegisterPanel(_L['General'], 'MY_GKPDoodad', _L['MY_GKPLoot'], 90, PS)
+X.PS.RegisterPanel(_L['General'], 'MY_GKPDoodad', _L['MY_GKPLoot'], 90, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

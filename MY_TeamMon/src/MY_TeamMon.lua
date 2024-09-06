@@ -854,7 +854,7 @@ end
 function D.CheckScrutinyType(nScrutinyType, dwID)
 	if nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.SELF and dwID ~= MY_TEAM_MON_CORE_PLAYERID then
 		return false
-	elseif nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.TEAM and (not X.IsParty(dwID) and dwID ~= MY_TEAM_MON_CORE_PLAYERID) then
+	elseif nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.TEAM and (not X.IsTeammate(dwID) and dwID ~= MY_TEAM_MON_CORE_PLAYERID) then
 		return false
 	elseif nScrutinyType == MY_TEAM_MON_SCRUTINY_TYPE.ENEMY and not IsEnemy(MY_TEAM_MON_CORE_PLAYERID, dwID) then
 		return false
@@ -884,7 +884,7 @@ end
 
 -- 智能标记逻辑
 function D.SetTeamMark(szType, tMark, dwCharacterID, dwID, nLevel)
-	if not X.IsMarker() or bRestricted then
+	if not X.IsClientPlayerTeamMarker() or bRestricted then
 		return
 	end
 	local function fnGetNextMark()
@@ -1086,7 +1086,7 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 					D.SetTeamMark(szType, cfg.tMark, dwOwner, dwBuffID, nBuffLevel)
 				end
 				-- 重要Buff列表
-				if O.bPushPartyBuffList and X.IsPlayer(dwOwner) and cfg.bPartyBuffList and (X.IsParty(dwOwner) or MY_TEAM_MON_CORE_PLAYERID == dwOwner) then
+				if O.bPushPartyBuffList and X.IsPlayer(dwOwner) and cfg.bPartyBuffList and (X.IsTeammate(dwOwner) or MY_TEAM_MON_CORE_PLAYERID == dwOwner) then
 					FireUIEvent('MY_TEAM_MON__PARTY_BUFF_LIST', dwOwner, data.dwID, data.nLevel, data.nIcon)
 				end
 				-- 头顶报警

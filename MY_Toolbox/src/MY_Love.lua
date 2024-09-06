@@ -413,7 +413,7 @@ function D.GetDoubleLoveItem(tFellowship, aUIID)
 	if tFei then
 		local me = X.GetClientPlayer()
 		local kTarget = D.GetNearbyPlayerByName(tFei.szName)
-		if tFellowship.nAttraction >= D.nDoubleLoveAttraction and kTarget and X.IsParty(kTarget.dwID) and X.GetCharacterDistance(me, kTarget) <= 4 then
+		if tFellowship.nAttraction >= D.nDoubleLoveAttraction and kTarget and X.IsTeammate(kTarget.dwID) and X.GetCharacterDistance(me, kTarget) <= 4 then
 			return D.GetBagItemPos(aUIID)
 		end
 	end
@@ -433,7 +433,7 @@ function D.UseDoubleLoveItem(tFellowship, aUIID, fnCallback)
 			if not me then
 				return 0
 			end
-			local nType = X.GetOTActionState(me)
+			local nType = X.GetCharacterOTActionState(me)
 			if nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_ITEM_SKILL
 			or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then -- otActionItemSkill
 				nFinishTime = GetTime() + 500
@@ -762,7 +762,7 @@ function D.FixLover()
 		return X.Alert(_L['Repair feature only supports mutual love!'])
 	end
 	local kTarget = D.GetNearbyPlayerByXID(D.lover.xID)
-	if not kTarget or not X.IsParty(kTarget.dwID) then
+	if not kTarget or not X.IsTeammate(kTarget.dwID) then
 		return X.Alert(_L['Both sides must in a team to be repaired!'])
 	end
 	X.SendBgMsg(D.lover.szName, 'MY_LOVE', {'FIX1', {
@@ -812,11 +812,11 @@ function D.RequestOtherLover(dwID, nX, nY, fnAutoClose)
 	end
 	local me = X.GetClientPlayer()
 	local szName = tPlayerInfo.szName
-	if nX == true or X.IsParty(dwID) or X.IsAuthor(me.dwID) then
+	if nX == true or X.IsTeammate(dwID) or X.IsAuthorPlayer(me.dwID) then
 		if not D.tOtherLover[szName] then
 			D.tOtherLover[szName] = {}
 		end
-		if tPlayerInfo.bFightState and not X.IsParty(dwID) then
+		if tPlayerInfo.bFightState and not X.IsTeammate(dwID) then
 			FireUIEvent('MY_LOVE_OTHER_UPDATE', szName)
 			FireUIEvent('MY_LOVE_PV_ACTIVE_CHANGE', dwID, false)
 			return X.OutputSystemAnnounceMessage(_L('[%s] is in fighting, no time for you.', szName))
@@ -825,7 +825,7 @@ function D.RequestOtherLover(dwID, nX, nY, fnAutoClose)
 		D.tOtherLover[szName] = {}
 		FireUIEvent('MY_LOVE_OTHER_UPDATE', szName)
 		-- ÔÙË¢ÐÂ
-		X.SendBgMsg(szName, 'MY_LOVE', {'VIEW', X.IsAuthor(me.dwID) and 'Author' or 'Player'})
+		X.SendBgMsg(szName, 'MY_LOVE', {'VIEW', X.IsAuthorPlayer(me.dwID) and 'Author' or 'Player'})
 	else
 		local tMsg = {
 			x = nX, y = nY,
@@ -1013,7 +1013,7 @@ local function OnBgTalk(_, aData, nChannel, dwTalkerID, szTalkerName, bSelf)
 	local tFei = tFellowship and X.GetFellowshipEntryInfo(tFellowship.xID)
 	local szKey, data = aData[1], aData[2]
 	if szKey == 'VIEW' then
-		if X.IsParty(dwTalkerID) or data == 'Author' or O.bAutoReplyLover then
+		if X.IsTeammate(dwTalkerID) or data == 'Author' or O.bAutoReplyLover then
 			D.tViewer[dwTalkerID] = szTalkerName
 			D.ReplyLove()
 		elseif not X.GetClientPlayer().bFightState and not O.bQuiet then

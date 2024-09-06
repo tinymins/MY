@@ -221,7 +221,7 @@ X.RegisterEvent({
 	for dwAchieveID, bAcquired in pairs(BOSS_ACHIEVE_ACQUIRE_STATE) do
 		if not bAcquired and me.IsAchievementAcquired(dwAchieveID) then
 			local aTeammate, szLeader = {}, ''
-			local team = X.IsInParty() and GetClientTeam()
+			local team = X.IsClientPlayerInParty() and GetClientTeam()
 			if team then
 				-- ¶Ó³¤
 				local dwLeader = team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER)

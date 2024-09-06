@@ -415,7 +415,7 @@ end
 
 function D.CloseLootWindow()
 	local me = X.GetClientPlayer()
-	if me and X.GetOTActionState(me) == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
+	if me and X.GetCharacterOTActionState(me) == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_PICKING then
 		me.OnCloseLootWindow()
 	end
 end
@@ -641,8 +641,8 @@ function D.OnLButtonClick()
 			{
 				szOption = _L['Config'],
 				fnAction = function()
-					X.ShowPanel()
-					X.SwitchTab('MY_GKPDoodad')
+					X.PS.ShowPanel()
+					X.PS.SwitchTab('MY_GKPDoodad')
 				end,
 			},
 			{
@@ -1183,7 +1183,7 @@ end
 
 function D.AuthCheck(dwDoodadID, bIgnoreLootMode)
 	-- 需要自己是分配者
-	if not X.IsDistributor() and not X.IsDebugClient('MY_GKP') then
+	if not X.IsClientPlayerTeamDistributor() and not X.IsDebugClient('MY_GKP') then
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.ERROR_LOOT_DISTRIBUTE)
 		return false
 	end

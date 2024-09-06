@@ -260,7 +260,7 @@ function D.UpdateUI(frame)
 		end
 	end
 	-- 全程没数据的队友
-	if X.IsInParty() and MY_Recount_UI.bShowNodataTeammate then
+	if X.IsClientPlayerInParty() and MY_Recount_UI.bShowNodataTeammate then
 		local list = GetClientTeam().GetTeamMemberList()
 		for _, dwID in ipairs(list) do
 			local info = GetClientTeam().GetMemberInfo(dwID)

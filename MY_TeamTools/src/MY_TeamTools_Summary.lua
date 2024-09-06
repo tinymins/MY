@@ -25,7 +25,7 @@ local D = {
 	tDeath  = {},
 }
 local SZ_INI = X.PACKET_INFO.ROOT .. 'MY_TeamTools/ui/MY_TeamTools_Summary.ini'
-local MY_IsParty, MY_GetSkillName, MY_GetBuffName = X.IsParty, X.GetSkillName, X.GetBuffName
+local MY_IsParty, MY_GetSkillName, MY_GetBuffName = X.IsTeammate, X.GetSkillName, X.GetBuffName
 
 local RT_EQUIP_TOTAL = {
 	'MELEE_WEAPON', -- «·Ω£ ≤ÿΩ£»° BIG_SWORD ÷ÿΩ£
@@ -813,7 +813,7 @@ function D.GetTeamData(page)
 	local me    = X.GetClientPlayer()
 	local team  = GetClientTeam()
 	local aList = {}
-	local bIsInParty = X.IsInParty()
+	local bIsInParty = X.IsClientPlayerInParty()
 	local bCDProgressMap = X.IsCDProgressMap(RT_MAP_ID)
 	local aProgressMapBoss = bCDProgressMap and X.GetMapCDProgressInfo(RT_MAP_ID)
 	local aRequestMapCopyID = {}

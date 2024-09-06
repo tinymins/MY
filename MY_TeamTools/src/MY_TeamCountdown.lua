@@ -31,7 +31,7 @@ local O = X.CreateUserSettingsModule('MY_TeamCountdown', _L['Raid'], {
 local D = {}
 
 function D.Open()
-	if not X.IsLeader() then
+	if not X.IsClientPlayerTeamLeader() then
 		X.OutputAnnounceMessage(_L['You are not leader!'])
 		return
 	end
@@ -97,12 +97,12 @@ end
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------------------------------
 X.RegisterBgMsg('MY_TeamCountdown', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
-	if not X.IsLeader(dwTalkerID) then
+	if not X.IsClientPlayerTeamLeader(dwTalkerID) then
 		return
 	end
 	local nCountdown = data[1]
 	if X.IsNumber(nCountdown) and nCountdown >= 1 and nCountdown <= 10 then
-		if X.IsLeader() then
+		if X.IsClientPlayerTeamLeader() then
 			X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['[TeamCountdown] Fight Countdown Begin!'])
 		end
 		X.BreatheCall('MY_TeamCountdown', 1000, function()
@@ -115,7 +115,7 @@ X.RegisterBgMsg('MY_TeamCountdown', function(_, data, nChannel, dwTalkerID, szTa
 				nB = 0,
 				szAnimation = 'ZOOM_IN_FADE_IN_OUT',
 			})
-			if X.IsLeader() then
+			if X.IsClientPlayerTeamLeader() then
 				X.SendChat(
 					PLAYER_TALK_CHANNEL.RAID,
 					nCountdown == 0

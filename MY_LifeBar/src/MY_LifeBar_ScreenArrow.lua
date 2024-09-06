@@ -277,7 +277,7 @@ function D.OnBreathe()
 						txt = g_tStrings.STR_SKILL_H_MANA_COST .. string.format('%d/%d', tInfo.nCurrentMana, tInfo.nMaxMana)
 					end
 				elseif oo.szType == 'CASTING' then
-					local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(kTarget)
+					local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetCharacterOTActionState(kTarget)
 					if nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 					or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
 					or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE then
@@ -316,7 +316,7 @@ function D.OnBreathe()
 					rlcmd(string.format("set caption kungfu icon %u %u %u", dwID, 1, dwMountKungfuID))
 				end
 				-- 这里要想办法覆盖C++的颜色设置 C++代码上有个强制逻辑 优先级比rlcmd还高 估计是两个人写的
-				local szRelation = X.GetRelation(UI_GetClientPlayerID(), dwID)
+				local szRelation = X.GetCharacterRelation(UI_GetClientPlayerID(), dwID)
 				local aColor = Config('get', 'Color', szRelation, IsPlayer(dwID) and 'Player' or 'Npc')
 				if aColor then
 					rlcmd(string.format("set plugin caption color %u %u %u", dwID, 1, RGB2Dword(unpack(aColor))))
@@ -352,7 +352,7 @@ function D.GetObject(szType, dwID)
 		local me = GetClientPlayer()
 		if dwID == me.dwID then
 			kTarget = me
-		elseif X.IsParty(dwID) then
+		elseif X.IsTeammate(dwID) then
 			kTarget = GetPlayer(dwID)
 			tInfo  = GetClientTeam().GetMemberInfo(dwID)
 		else
@@ -790,7 +790,7 @@ function PS.OnPanelActive(wnd)
 		autoEnable = function() return O.bEnable end,
 	})
 end
-X.RegisterPanel(_L['Raid'], 'MY_LifeBar_ScreenArrow', _L['MY_LifeBar_ScreenArrow'], 431, PS)
+X.PS.RegisterPanel(_L['Raid'], 'MY_LifeBar_ScreenArrow', _L['MY_LifeBar_ScreenArrow'], 431, PS)
 
 function D.Init()
 	HANDLE = X.UI.HandlePool(X.UI.GetShadowHandle('ScreenArrow'), FormatHandle(string.rep('<shadow></shadow>', 6)))

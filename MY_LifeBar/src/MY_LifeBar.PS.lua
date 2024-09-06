@@ -100,7 +100,7 @@ function PS.OnPanelActive(wnd)
 		onClick = function()
 			GetUserInput(_L['Please input ancient config name:'], function(szText)
 				Config('load', szText)
-				X.SwitchTab('MY_LifeBar', true)
+				X.PS.SwitchTab('MY_LifeBar', true)
 			end, nil, nil, nil, 'common')
 		end,
 		autoEnable = function() return D.IsEnabled() end,
@@ -1035,6 +1035,6 @@ function PS.OnPanelDeactive()
 	X.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', 'MY_LifeBarPS')
 	X.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE', 'MY_LifeBarPS')
 end
-X.RegisterPanel(_L['General'], 'MY_LifeBar', _L['MY_LifeBar'], 2148, PS)
+X.PS.RegisterPanel(_L['General'], 'MY_LifeBar', _L['MY_LifeBar'], 2148, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

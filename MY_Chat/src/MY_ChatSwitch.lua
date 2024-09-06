@@ -608,9 +608,9 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Option' then
-		X.ShowPanel()
-		X.FocusPanel()
-		X.SwitchTab('MY_ChatSwitch')
+		X.PS.ShowPanel()
+		X.PS.FocusPanel()
+		X.PS.SwitchTab('MY_ChatSwitch')
 	end
 end
 

@@ -185,7 +185,7 @@ function TS.OnFrameBreathe()
 	local p = MY_GetNpc(this.dwTargetID)
 	if p then
 		ApplyCharacterThreatRankList(this.dwTargetID)
-		local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetOTActionState(p)
+		local nType, dwSkillID, dwSkillLevel, fCastPercent = X.GetCharacterOTActionState(p)
 		local fCurrentLife, fMaxLife = X.GetCharacterLife(p)
 		if nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 		or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
@@ -250,9 +250,9 @@ end
 function TS.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Setting' then
-		X.ShowPanel()
-		X.FocusPanel()
-		X.SwitchTab('MY_ThreatRank')
+		X.PS.ShowPanel()
+		X.PS.FocusPanel()
+		X.PS.SwitchTab('MY_ThreatRank')
 	end
 end
 
@@ -467,7 +467,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			item:Lookup('Text_ThreatName'):SetFontScheme(dat[6][1])
 			item:Lookup('Text_ThreatName'):SetFontColor(r, g, b)
 			if O.bForceIcon then
-				local info = X.IsParty(v.id) and MY_IsPlayer(v.id) and team.GetMemberInfo(v.id)
+				local info = X.IsTeammate(v.id) and MY_IsPlayer(v.id) and team.GetMemberInfo(v.id)
 				if info then
 					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 				elseif MY_IsPlayer(v.id) then
@@ -710,6 +710,6 @@ function PS.OnPanelActive(frame)
 		autoEnable = IsEnabled,
 	})
 end
-X.RegisterPanel(_L['Target'], 'MY_ThreatRank', g_tStrings.HATRED_COLLECT, 632, PS)
+X.PS.RegisterPanel(_L['Target'], 'MY_ThreatRank', g_tStrings.HATRED_COLLECT, 632, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

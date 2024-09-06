@@ -258,6 +258,6 @@ function PS.OnPanelActive(wnd)
 	}):Width() + 5
 	nY = nY + 28
 end
-X.RegisterPanel(_L['General'], 'MY_GKP', _L['GKP Golden Team Record'], 2490, PS)
+X.PS.RegisterPanel(_L['General'], 'MY_GKP', _L['GKP Golden Team Record'], 2490, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

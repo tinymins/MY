@@ -71,7 +71,7 @@ local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 	return table_r(var, level or 0, indent)
 end
 
-X.RegisterPanel(_L['Development'], 'Dev_VarWatch', _L['VarWatch'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
+X.PS.RegisterPanel(_L['Development'], 'Dev_VarWatch', _L['VarWatch'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
 	IsRestricted = function()
 		return not X.IsDebugClient('Dev_VarWatch')
 	end,

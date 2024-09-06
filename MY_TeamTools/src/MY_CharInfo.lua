@@ -152,7 +152,7 @@ function D.ViewCharInfoToPlayer(dwID)
 		return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 	end
 	local nChannel, szName
-	if X.IsParty(dwID) then
+	if X.IsTeammate(dwID) then
 		local team = GetClientTeam()
 		local info = team.GetMemberInfo(dwID)
 		if info then

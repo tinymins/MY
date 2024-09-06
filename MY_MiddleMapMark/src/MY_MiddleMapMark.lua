@@ -895,6 +895,6 @@ function PS.OnPanelResize(wnd)
 	ui:Children('#WndEdit_Search'):Size(nW - 26, 25)
 end
 
-X.RegisterPanel(_L['General'], 'MY_MiddleMapMark', _L['middle map mark'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)
+X.PS.RegisterPanel(_L['General'], 'MY_MiddleMapMark', _L['middle map mark'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

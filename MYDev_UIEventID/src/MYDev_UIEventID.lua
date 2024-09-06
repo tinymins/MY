@@ -69,7 +69,7 @@ _C.SetEventID = function(ui, nEventID)
 	end
 end
 
-X.RegisterPanel(_L['Development'], 'Dev_UIEventID', _L['UIEventID'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
+X.PS.RegisterPanel(_L['Development'], 'Dev_UIEventID', _L['UIEventID'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
 IsRestricted = function()
 	return not X.IsDebugClient('Dev_UIEventID')
 end,

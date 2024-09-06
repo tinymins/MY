@@ -215,7 +215,7 @@ do
 		local dwTime = GetCurrentTime()
 		local dwMapID, dwID = this.tInfo.MapID, this.tInfo.ID
 		-- 秘境可重置且是队长则会弹出重置提示框 走 crossmap_dungeon_reset 流程
-		if X.IsDungeonResetable(dwMapID) and X.IsLeader() then
+		if X.IsDungeonResetable(dwMapID) and X.IsClientPlayerTeamLeader() then
 			l_nSwitchMapID, l_nSwitchSubID = dwMapID, dwID
 		else
 			X.GetMapSaveCopy(dwMapID, function(aMapCopy)

@@ -237,6 +237,6 @@ function PS.OnPanelActive(wnd)
 	nX = nPaddingX + 10
 	ui:Append('Text', { x = nX, y = nY, w = nW - nX * 2, text = _L['MY_Logoff TIPS'], font = 27, multiline = true, alignVertical = 0 })
 end
-X.RegisterPanel(_L['System'], 'Logoff', _L['Express logoff'], 'UI/Image/UICommon/LoginSchool.UITex|24', PS)
+X.PS.RegisterPanel(_L['System'], 'Logoff', _L['Express logoff'], 'UI/Image/UICommon/LoginSchool.UITex|24', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

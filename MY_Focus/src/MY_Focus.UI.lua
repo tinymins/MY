@@ -198,7 +198,7 @@ function D.UpdateItem(hItem, p)
 	-- ±Íº«
 	hInfoList:Lookup('Handle_Mark'):Hide()
 	local KTeam = GetClientTeam()
-	if KTeam and X.IsInParty() and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) then
+	if KTeam and X.IsClientPlayerInParty() and (dwType == TARGET.NPC or dwType == TARGET.PLAYER) then
 		local tMark = KTeam.GetTeamMark()
 		if tMark then
 			local nMarkID = tMark[dwID]
@@ -247,7 +247,7 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen'):Hide()
 		if player and nDistance > 0 then
 			local h
-			if (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and X.IsEnemy(X.GetClientPlayerID(), dwID) then
+			if (dwType == TARGET.NPC or dwType == TARGET.PLAYER) and X.IsCharacterRelationEnemy(X.GetClientPlayerID(), dwID) then
 				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointRed')
 			else
 				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen')
@@ -304,7 +304,7 @@ function D.UpdateItem(hItem, p)
 	end
 	-- ∂¡Ãı
 	if dwType ~= TARGET.DOODAD then
-		local nType, dwSkillID, dwSkillLevel, fProgress = X.GetOTActionState(KObject)
+		local nType, dwSkillID, dwSkillLevel, fProgress = X.GetCharacterOTActionState(KObject)
 		if (nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 			or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
 			or nType == X.CONSTANT.CHARACTER_OTACTION_TYPE.ANCIENT_ACTION_PREPARE)
@@ -567,9 +567,9 @@ function D.OnItemRButtonClick()
 			table.insert(t, 1, {
 				szOption = _L['Option'],
 				fnAction = function()
-					X.ShowPanel()
-					X.FocusPanel()
-					X.SwitchTab('MY_Focus')
+					X.PS.ShowPanel()
+					X.PS.FocusPanel()
+					X.PS.SwitchTab('MY_Focus')
 				end,
 			})
 		end
@@ -611,9 +611,9 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Setting' then
-		X.ShowPanel()
-		X.FocusPanel()
-		X.SwitchTab('MY_Focus')
+		X.PS.ShowPanel()
+		X.PS.FocusPanel()
+		X.PS.SwitchTab('MY_Focus')
 	elseif name == 'Btn_Close' then
 		D.Close()
 	end

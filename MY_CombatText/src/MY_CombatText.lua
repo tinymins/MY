@@ -1546,9 +1546,9 @@ function PS.OnPanelActive(frame)
 		checked = O.bCritical,
 		onCheck = function(bCheck)
 			O.bCritical = bCheck
-			X.ShowPanel()
-			X.FocusPanel()
-			X.SwitchTab('MY_CombatText', true)
+			X.PS.ShowPanel()
+			X.PS.FocusPanel()
+			X.PS.SwitchTab('MY_CombatText', true)
 		end,
 		autoEnable = IsEnabled,
 	}):Width() + 10
@@ -1558,9 +1558,9 @@ function PS.OnPanelActive(frame)
 		buttonStyle = 'FLAT',
 		onClick = function()
 			O('reset', { 'tColor', 'tCriticalColor' })
-			X.ShowPanel()
-			X.FocusPanel()
-			X.SwitchTab('MY_CombatText', true)
+			X.PS.ShowPanel()
+			X.PS.FocusPanel()
+			X.PS.SwitchTab('MY_CombatText', true)
 		end,
 		autoEnable = IsEnabled,
 	}):Width() + 10
@@ -1680,7 +1680,7 @@ function PS.OnPanelActive(frame)
 		})
 	end
 end
-X.RegisterPanel(_L['System'], 'MY_CombatText', _L['MY_CombatText'], 2041, PS)
+X.PS.RegisterPanel(_L['System'], 'MY_CombatText', _L['MY_CombatText'], 2041, PS)
 
 --------------------------------------------------------------------------------
 -- ÊÂ¼þ×¢²á

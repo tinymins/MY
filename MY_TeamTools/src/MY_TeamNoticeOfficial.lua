@@ -35,8 +35,8 @@ function D.OpenFrame()
 	if not D.bEnable then
 		return
 	end
-	if X.IsInParty() then
-		if X.IsLeader() then
+	if X.IsClientPlayerInParty() then
+		if X.IsClientPlayerTeamLeader() then
 			NoticeBoard_Open(1)
 		else
 			D.ApplyNoticeBoard()
@@ -118,7 +118,7 @@ X.RegisterEvent('FIRST_LOADING_END', 'TEAM_NOTICE', function()
 		return
 	end
 	-- 不存在队长不队长的问题了
-	if X.IsInParty() then
+	if X.IsClientPlayerInParty() then
 		D.ApplyNoticeBoard()
 	end
 end)
