@@ -19,11 +19,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 -- 获取对象运功状态
 do local bNewAPI
-function X.GetCharacterOTActionState(...)
-	local KObject = ...
-	if select('#', ...) == 0 then
-		KObject = X.GetClientPlayer()
-	end
+function X.GetCharacterOTActionState(KObject)
 	if not KObject then
 		return
 	end
@@ -45,17 +41,23 @@ function X.GetCharacterOTActionState(...)
 end
 end
 
+function X.GetClientPlayerOTActionState()
+	local KObject = X.GetClientPlayer()
+	return X.GetCharacterOTActionState(KObject)
+end
+
 -- 获取对象当前是否可读条
 -- (bool) X.CanCharacterOTAction([object KObject])
-function X.CanCharacterOTAction(...)
-	local KObject = ...
-	if select('#', ...) == 0 then
-		KObject = X.GetClientPlayer()
-	end
+function X.CanCharacterOTAction(KObject)
 	if not KObject then
 		return
 	end
 	return KObject.nMoveState == MOVE_STATE.ON_STAND or KObject.nMoveState == MOVE_STATE.ON_FLOAT
+end
+
+function X.CanClientPlayerOTAction()
+	local KObject = X.GetClientPlayer()
+	return X.CanCharacterOTAction(KObject)
 end
 
 -- 通过技能名称获取技能信息
