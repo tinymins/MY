@@ -66,7 +66,7 @@ function D.GetItemDesc(kItem)
 		nStackNum = kItem.nStackNum,
 		nCurrentDurability = kItem.nCurrentDurability,
 		bBind = kItem.bBind,
-		nLeftTime = kItem.GetLeftExistTime(),
+		nExpireTime = kItem.GetLeftExistTime() == 0 and 0 or (GetCurrentTime() + kItem.GetLeftExistTime()),
 	}
 end
 
@@ -87,7 +87,7 @@ function D.IsSameItemDesc(a, b, bIgnoreExtendProps)
 		if a.bCanStack and a.nStackNum ~= b.nStackNum then
 			return false
 		end
-		if a.nLeftTime ~= b.nLeftTime then
+		if a.nExpireTime ~= b.nExpireTime then
 			return false
 		end
 	end
@@ -120,13 +120,13 @@ function D.ItemDescSorter(a, b)
 		return true
 	end
 	-- 限时物品放后面
-	local bLeftTimeA = a.nLeftTime ~= 0
-	local bLeftTimeB = b.nLeftTime ~= 0
-	if bLeftTimeA ~= bLeftTimeB then
-		if bLeftTimeA then
+	local bExpireTimeA = a.nExpireTime ~= 0
+	local bExpireTimeB = b.nExpireTime ~= 0
+	if bExpireTimeA ~= bExpireTimeB then
+		if bExpireTimeA then
 			return false
 		end
-		if bLeftTimeB then
+		if bExpireTimeB then
 			return true
 		end
 	end
@@ -172,10 +172,10 @@ function D.ItemDescSorter(a, b)
 		return a.nBookID < b.nBookID
 	end
 	-- 相同限时物品先消失的放前面
-	local nLeftTimeA = a.nLeftTime
-	local nLeftTimeB = b.nLeftTime
-	if nLeftTimeA ~= nLeftTimeB then
-		return nLeftTimeA < nLeftTimeB
+	local nExpireTimeA = a.nExpireTime == 0 and math.huge or a.nExpireTime
+	local nExpireTimeB = b.nExpireTime == 0 and math.huge or b.nExpireTime
+	if nExpireTimeA ~= nExpireTimeB then
+		return nExpireTimeA < nExpireTimeB
 	end
 	-- 按堆叠数量排序
 	if b.bCanStack then
@@ -221,7 +221,7 @@ function D.DecodeItemDescList(szBin)
 					nDetail = kItemInfo.nDetail,
 					nQuality = kItemInfo.nQuality,
 					bCanStack = kItemInfo.bCanStack,
-					nLeftTime = 0,
+					nExpireTime = 0,
 				}
 			else
 				aItemDesc[nIndex] = {}
