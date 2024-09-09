@@ -541,12 +541,12 @@ function D.UpdateList(page)
 		local item = page.hPlayerList:Lookup(i)
 		if item and item:IsValid() then
 			if MY_TeamTools.szStatRange == 'RAID' then
-				if not MY.IsParty(item.dwID) then
+				if not X.IsTeammate(item.dwID) then
 					page.hPlayerList:RemoveItem(item)
 					page.hPlayerList:FormatAllItemPos()
 				end
 			elseif MY_TeamTools.szStatRange == 'ROOM' then
-				if not MY.IsRoommate(item.szGlobalID) then
+				if not X.IsRoommate(item.szGlobalID) then
 					page.hPlayerList:RemoveItem(item)
 					page.hPlayerList:FormatAllItemPos()
 				end
