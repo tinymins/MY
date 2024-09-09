@@ -148,6 +148,9 @@ end
 
 function D.OnFrameBreathe()
 	local me = X.GetClientPlayer()
+	if not me then
+		return
+	end
 	local dwType, dwID = X.GetCharacterTarget(me)
 	local tar = X.GetTargetHandle(dwType, dwID)
 	local info = X.GetTeamMemberInfo(dwID)
