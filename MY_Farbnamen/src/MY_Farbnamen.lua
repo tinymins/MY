@@ -1310,7 +1310,7 @@ X.RegisterEvent('PLAYER_CHAT', function ()
 	local nLevel        = arg13
 	local nCamp         = arg14
 	local nRoleType     = arg15
-	if not dwSenderID or not szSenderName or not dwForceID then
+	if not dwSenderID or not szSenderName or not dwForceID or not X.IsGlobalID(szGlobalID) then
 		return
 	end
 	if szGlobalID == X.GetClientPlayerGlobalID() then -- 密聊频道自己发言回显数据对不上
