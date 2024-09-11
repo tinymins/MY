@@ -264,5 +264,5 @@ RegisterEvent(NS .. '_BASE_LOADING_END', function()
 		D.RemoveBreathe()
 	end
 
-	_G[NS].RegisterPanel(_L['Development'], 'LuaWatcher', _L['LuaWatcher'], 'ui/Image/UICommon/BattleFiled.UITex|7', PS)
+	_G[NS].PS.RegisterPanel(_L['Development'], 'LuaWatcher', _L['LuaWatcher'], 'ui/Image/UICommon/BattleFiled.UITex|7', PS)
 end)
