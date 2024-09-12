@@ -79,10 +79,18 @@ local DATA_CACHE_LEAF_FLAG = {}
 local FLUSH_TIME = 0
 local DATABASE_CONNECTION_ESTABLISHED = false
 
+local function GetDB(inst, info)
+	if info.bUserData then
+		return inst.pUserDataDB
+	end
+	if info.bNoPreset then
+		return inst.pNoPresetSettingsDB
+	end
+	return inst.pSettingsDB
+end
+
 local function SetInstanceInfoData(inst, info, data, version)
-	local db = info.bUserData
-		and inst.pUserDataDB
-		or inst.pSettingsDB
+	local db = GetDB(inst, info)
 	if db then
 		--[[#DEBUG BEGIN]]
 		local nStartTick = GetTime()
@@ -95,9 +103,7 @@ local function SetInstanceInfoData(inst, info, data, version)
 end
 
 local function GetInstanceInfoData(inst, info)
-	local db = info.bUserData
-		and inst.pUserDataDB
-		or inst.pSettingsDB
+	local db = GetDB(inst, info)
 	--[[#DEBUG BEGIN]]
 	local nStartTick = GetTime()
 	--[[#DEBUG END]]
@@ -112,9 +118,7 @@ local function GetInstanceInfoData(inst, info)
 end
 
 local function DeleteInstanceInfoData(inst, info)
-	local db = info.bUserData
-		and inst.pUserDataDB
-		or inst.pSettingsDB
+	local db = GetDB(inst, info)
 	if db then
 		db:Delete(info.szDataKey)
 	end
@@ -135,23 +139,30 @@ function X.ConnectUserSettingsDB()
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
-			local szSettingsRoot = szDBPresetRoot or X.FormatPath({'config/', ePathType})
-			if not szDBPresetRoot then
-				CPath.MakeDir(szSettingsRoot)
+			-- 角色独有配置
+			local szNoPresetSettingsRoot = X.FormatPath({'config/', ePathType})
+			CPath.MakeDir(szNoPresetSettingsRoot)
+			local pNoPresetSettingsDB = X.NoSQLiteConnect(szNoPresetSettingsRoot .. 'settings.db')
+			if not pNoPresetSettingsDB then
+				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect user role settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
 			end
-			local pSettingsDB = X.NoSQLiteConnect(
-				szDBPresetRoot
-					and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
-					or (szSettingsRoot .. 'settings.db')
-			)
-			local pUserDataDB = X.NoSQLiteConnect(X.FormatPath({'userdata/userdata.db', ePathType}))
+			-- 普通配置
+			local pSettingsDB = pNoPresetSettingsDB
+			if szDBPresetRoot then
+				pSettingsDB = X.NoSQLiteConnect(szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
+			end
 			if not pSettingsDB then
 				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect user settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
 			end
+			-- 用户数据
+			local szUserDataRoot = X.FormatPath({'userdata/', ePathType})
+			CPath.MakeDir(szUserDataRoot)
+			local pUserDataDB = X.NoSQLiteConnect(szUserDataRoot .. 'userdata.db')
 			if not pUserDataDB then
 				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect userdata database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
 			end
 			DATABASE_INSTANCE[ePathType] = {
+				pNoPresetSettingsDB = pNoPresetSettingsDB,
 				pSettingsDB = pSettingsDB,
 				-- bSettingsDBCommit = false,
 				pUserDataDB = pUserDataDB,
@@ -254,7 +265,8 @@ end
 -- @param {table} tOption 自定义配置项
 --   {PATH_TYPE} tOption.ePathType 配置项保存位置（当前角色、当前服务器、全局）
 --   {string} tOption.szDataKey 配置项入库时的键值，一般不需要手动指定，默认与配置项全局键值一致
---   {string} tOption.bUserData 配置项是否为角色数据项，为真将忽略预设方案重定向，禁止共用
+--   {string} tOption.bUserData 配置项是否为角色数据项，为真将忽略预设方案重定向，禁止共用，禁止导入导出
+--   {string} tOption.bNoPreset 配置项是否忽略预设方案重定向，为真将即为不共享的角色配置项，禁止共用
 --   {string} tOption.szGroup 配置项分组组标题，用于导入导出显示，禁止导入导出请留空
 --   {string} tOption.szLabel 配置标题，用于导入导出显示，禁止导入导出请留空
 --   {string} tOption.szVersion 数据版本号，加载数据时会丢弃版本不一致的数据
@@ -263,11 +275,12 @@ end
 --   {boolean} tOption.bDataSet 是否为配置项组（如用户多套自定义偏好），配置项组在读写时需要额外传入一个组下配置项唯一键值（即多套自定义偏好中某一项的名字）
 --   {table} tOption.tDataSetDefaultValue 数据默认值（仅当 bDataSet 为真时生效，用于设置配置项组不同默认值）
 function X.RegisterUserSettings(szKey, tOption)
-	local ePathType, szDataKey, bUserData, szGroup, szLabel, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue
+	local ePathType, szDataKey, bUserData, bNoPreset, szGroup, szLabel, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue
 	if X.IsTable(tOption) then
 		ePathType = tOption.ePathType
 		szDataKey = tOption.szDataKey
 		bUserData = tOption.bUserData
+		bNoPreset = tOption.bNoPreset
 		szGroup = tOption.szGroup
 		szLabel = tOption.szLabel
 		szVersion = tOption.szVersion
@@ -338,6 +351,7 @@ function X.RegisterUserSettings(szKey, tOption)
 		szKey = szKey,
 		ePathType = ePathType,
 		bUserData = bUserData,
+		bNoPreset = bNoPreset,
 		szDataKey = szDataKey,
 		szGroup = szGroup,
 		szLabel = szLabel,
