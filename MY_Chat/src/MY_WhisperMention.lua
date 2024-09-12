@@ -26,7 +26,7 @@ local O = X.CreateUserSettingsModule('MY_WhisperMention', _L['Chat'], {
 		szLabel = _L['MY_Chat'],
 		szVersion = '20240728',
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue =  X.IS_REMAKE,
 	},
 })
 local D = {
