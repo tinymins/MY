@@ -373,9 +373,11 @@ function X.ExportUserSettings(aKey)
 	local tKvp = {}
 	for _, szKey in ipairs(aKey) do
 		local info = USER_SETTINGS_INFO[szKey]
-		local inst = info and DATABASE_INSTANCE[info.ePathType]
-		if inst then
-			tKvp[szKey] = GetInstanceInfoData(inst, info)
+		if info and not info.bUserData then
+			local inst = DATABASE_INSTANCE[info.ePathType]
+			if inst then
+				tKvp[szKey] = GetInstanceInfoData(inst, info)
+			end
 		end
 	end
 	return tKvp
@@ -384,12 +386,16 @@ end
 function X.ImportUserSettings(tKvp)
 	local nSuccess = 0
 	for szKey, xValue in pairs(tKvp) do
-		local info = X.IsTable(xValue) and USER_SETTINGS_INFO[szKey]
-		local inst = info and DATABASE_INSTANCE[info.ePathType]
-		if inst then
-			SetInstanceInfoData(inst, info, xValue.d, xValue.v)
-			nSuccess = nSuccess + 1
-			DATA_CACHE[szKey] = nil
+		if X.IsTable(xValue) then
+			local info = USER_SETTINGS_INFO[szKey]
+			if info and not info.bUserData then
+				local inst = DATABASE_INSTANCE[info.ePathType]
+				if inst then
+					SetInstanceInfoData(inst, info, xValue.d, xValue.v)
+					nSuccess = nSuccess + 1
+					DATA_CACHE[szKey] = nil
+				end
+			end
 		end
 	end
 	X.CommonEventFirer(USER_SETTINGS_INIT_EVENT)
