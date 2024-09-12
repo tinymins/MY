@@ -1,4 +1,5 @@
 return {
 	['FloatBar'] = '懸浮信息條',
 	['Detach mode'] = '分離模式',
+	['Global config'] = '全局設置',
 }
