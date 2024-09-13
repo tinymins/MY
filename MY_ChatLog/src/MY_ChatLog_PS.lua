@@ -711,7 +711,12 @@ function PS.OnPanelActive(wnd)
 			local file = GetOpenFileName(_L['Please select your chatlog database file.'], 'Database File(*.db)\0*.db\0\0', szRoot)
 			if not X.IsEmpty(file) then
 				X.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
-						X.Alert(_L('%d chatlogs imported!', MY_ChatLog.ImportDB(file)))
+					local nImport, bOthersFound = MY_ChatLog.ImportDB(file)
+					local szText = _L('%d chatlogs imported!', nImport)
+					if bOthersFound then
+						szText = szText .. _L['Others chat log found, please do not import other role chat log!']
+					end
+					X.Alert(szText)
 				end)
 			end
 		end,

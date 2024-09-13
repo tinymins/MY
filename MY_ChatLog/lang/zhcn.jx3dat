@@ -32,6 +32,7 @@ return {
     ['Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '数据库已损坏，需要修复后方可使用，但是修复可能造成客户端失去响应、角色掉线，请耐心等待，勿随意结束客户端，是否立即修复？',
     ['Please select your chatlog database file.'] = '请选择需要导入的聊天记录文件',
     ['%d chatlogs imported!'] = '成功导入%d条聊天记录',
+    ['Others chat log found, please do not import other role chat log!'] = '检测到导入数据中存在其他角色的聊天记录，已忽略该部分，请不要导入其他角色的聊天记录！',
     ['Import chatlog'] = '导入聊天记录',
     ['Upgrade succeed!'] = '升级成功！',
     ['You\'ve achieved'] = '你完成了隐元秘鉴',

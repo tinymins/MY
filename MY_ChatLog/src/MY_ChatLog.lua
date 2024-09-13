@@ -258,6 +258,7 @@ function D.ImportDB(aPath)
 	D.ReleaseDB()
 	-- 开始导入
 	local nImportCount = 0
+	local bOthersFound = false
 	for _, szPath in ipairs(aPath) do
 		local odb = X.SQLiteConnect(_L['MY_ChatLog'], szPath)
 		if odb then
@@ -283,9 +284,11 @@ function D.ImportDB(aPath)
 					db:Flush()
 					db:Disconnect()
 				end
+			elseif X.IsGlobalID(szGlobalID) then
+				bOthersFound = true
 			end
 			-- 新版导出数据
-			local szGlobalID = X.Get(X.SQLiteGetAll(odb, 'SELECT value FROM ChatInfo WHERE key = "user_global_id"'), {1, 'value'}, ''):gsub('"', '')
+			local szGlobalID = X.DecodeLUAData(X.Get(X.SQLiteGetAll(odb, 'SELECT value FROM ChatInfo WHERE key = "user_global_id"'), {1, 'value'}, '')) or ''
 			if szGlobalID == X.GetClientPlayerGlobalID() then
 				local szVersion = X.DecodeLUAData(X.Get(X.SQLiteGetAll(odb, 'SELECT value FROM ChatInfo WHERE key = "version"'), {1, 'value'}, '')) or ''
 				local nCount = X.Get(X.SQLiteGetAll(odb, 'SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
@@ -321,6 +324,8 @@ function D.ImportDB(aPath)
 						nOffset = nOffset + nLimit
 					end
 				end
+			elseif X.IsGlobalID(szGlobalID) then
+				bOthersFound = true
 			end
 			odb:Release()
 		end
@@ -330,7 +335,7 @@ function D.ImportDB(aPath)
 	ds:InitDB(true)
 	ds:OptimizeDB()
 	ds:ReleaseDB()
-	return nImportCount
+	return nImportCount, bOthersFound
 end
 
 function D.OptimizeDB()
