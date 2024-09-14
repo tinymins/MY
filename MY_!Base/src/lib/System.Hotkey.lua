@@ -184,7 +184,7 @@ end
 
 X.RegisterInit(X.NSFormatString('{$NS}#BIND_HOTKEY'), function()
 	-- hotkey
-	Hotkey.AddBinding(X.NSFormatString('{$NS}_Total'), _L['Toggle main panel'], X.PACKET_INFO.NAME, X.PS.TogglePanel, nil)
+	Hotkey.AddBinding(X.NSFormatString('{$NS}_Total'), _L['Toggle main panel'], X.PACKET_INFO.NAME, X.Panel.Toggle, nil)
 	for _, v in ipairs(HOTKEY_CACHE) do
 		Hotkey.AddBinding(v.szName, v.szTitle, '', v.fnDown, v.fnUp)
 	end

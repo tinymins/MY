@@ -79,7 +79,7 @@ function D.Open(bImport)
 	end
 	-- ≈≈–Ú
 	local tGroupRank = {}
-	for i, category in ipairs(X.PS.GetPanelCategoryList()) do
+	for i, category in ipairs(X.Panel.GetCategoryList()) do
 		tGroupRank[category.szName] = i
 	end
 	table.sort(aGroup, function(g1, g2) return (tGroupRank[g1.szGroup] or math.huge) < (tGroupRank[g2.szGroup] or math.huge) end)

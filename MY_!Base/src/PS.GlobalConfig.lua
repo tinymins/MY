@@ -81,7 +81,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						X.SetUserSettingsPresetID('')
 						X.UI.ClosePopupMenu()
-						X.PS.SwitchTab('GlobalConfig', true)
+						X.Panel.SwitchTab('GlobalConfig', true)
 					end,
 					bCheck = true, bChecked = szCurrentID == '',
 					{
@@ -89,7 +89,7 @@ function PS.OnPanelActive(wnd)
 						fnAction = function()
 							X.SetUserSettingsPresetID('', true)
 							X.UI.ClosePopupMenu()
-							X.PS.SwitchTab('GlobalConfig', true)
+							X.Panel.SwitchTab('GlobalConfig', true)
 						end,
 						bCheck = true, bChecked = szDefaultID == '',
 					},
@@ -105,7 +105,7 @@ function PS.OnPanelActive(wnd)
 						fnAction = function()
 							X.SetUserSettingsPresetID(szID)
 							X.UI.ClosePopupMenu()
-							X.PS.SwitchTab('GlobalConfig', true)
+							X.Panel.SwitchTab('GlobalConfig', true)
 						end,
 						bCheck = true, bChecked = szCurrentID == szID,
 						{
@@ -113,7 +113,7 @@ function PS.OnPanelActive(wnd)
 							fnAction = function()
 								X.SetUserSettingsPresetID(szID, true)
 								X.UI.ClosePopupMenu()
-								X.PS.SwitchTab('GlobalConfig', true)
+								X.Panel.SwitchTab('GlobalConfig', true)
 							end,
 							bCheck = true, bChecked = szDefaultID == szID,
 						},
@@ -125,7 +125,7 @@ function PS.OnPanelActive(wnd)
 								X.ReleaseUserSettingsDB()
 								X.ConnectUserSettingsDB()
 								X.UI.ClosePopupMenu()
-								X.PS.SwitchTab('GlobalConfig', true)
+								X.Panel.SwitchTab('GlobalConfig', true)
 							end,
 						})
 					else
@@ -234,6 +234,6 @@ function PS.OnPanelDeactive()
 	X.BreatheCall('GlobalConfig', false)
 end
 
-X.PS.RegisterPanel(_L['System'], 'GlobalConfig', _L['GlobalConfig'], 'ui\\Image\\Minimap\\Minimap.UITex|181', PS)
+X.Panel.Register(_L['System'], 'GlobalConfig', _L['GlobalConfig'], 'ui\\Image\\Minimap\\Minimap.UITex|181', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
