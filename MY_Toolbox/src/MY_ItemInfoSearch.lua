@@ -298,6 +298,6 @@ function PS.OnPanelDeactive()
 	D.StopSearch()
 end
 
-X.PS.RegisterPanel(_L['General'], 'MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)
+X.Panel.Register(_L['General'], 'MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

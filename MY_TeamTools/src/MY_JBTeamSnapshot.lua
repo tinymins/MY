@@ -36,8 +36,8 @@ function D.CreateSnapshot()
 		return
 	end
 	if X.IsEmpty(O.szTeam) then
-		X.PS.ShowPanel()
-		X.PS.SwitchTab('MY_JX3BOX')
+		X.Panel.Show()
+		X.Panel.SwitchTab('MY_JX3BOX')
 		return X.Alert(_L['Please input team name/id.'])
 	end
 	local aTeammate = {}

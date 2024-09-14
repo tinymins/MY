@@ -171,7 +171,7 @@ function PS.OnPanelActive(wnd)
 					GetUserInputNumber(tData.tLife.nValue, 100, nil, function(val)
 						tData.tLife.nValue = val
 						MY_Focus.SetFocusPattern(tData.szPattern, tData)
-					end, nil, function() return not X.PS.IsPanelVisible() end)
+					end, nil, function() return not X.Panel.IsVisible() end)
 				end,
 				fnDisable = function() return not tData.tLife.bEnable end,
 			},
@@ -193,7 +193,7 @@ function PS.OnPanelActive(wnd)
 				GetUserInput(_L['Please input max distance, leave blank to disable:'], function(val)
 					tData.nMaxDistance = tonumber(val) or 0
 					MY_Focus.SetFocusPattern(tData.szPattern, tData)
-				end, nil, function() return not X.PS.IsPanelVisible() end, nil, tData.nMaxDistance)
+				end, nil, function() return not X.Panel.IsVisible() end, nil, tData.nMaxDistance)
 			end,
 		}
 		table.insert(t, t1)
@@ -213,7 +213,7 @@ function PS.OnPanelActive(wnd)
 				GetUserInput(_L['Please input display name, leave blank to use its own name:'], function(val)
 					tData.szDisplay = val
 					MY_Focus.SetFocusPattern(tData.szPattern, tData)
-				end, nil, function() return not X.PS.IsPanelVisible() end, nil, tData.szDisplay)
+				end, nil, function() return not X.Panel.IsVisible() end, nil, tData.szDisplay)
 			end,
 		}
 		table.insert(t, t1)
@@ -512,6 +512,6 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 end
-X.PS.RegisterPanel(_L['Target'], 'MY_Focus', _L['Focus list'], 'ui/Image/button/SystemButton_1.UITex|9', PS)
+X.Panel.Register(_L['Target'], 'MY_Focus', _L['Focus list'], 'ui/Image/button/SystemButton_1.UITex|9', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

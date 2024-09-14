@@ -489,9 +489,9 @@ end)
 X.RegisterAddonMenu('MY_PlayerRemark', {
 	szOption = _L['View player remark'],
 	fnAction = function()
-		X.PS.ShowPanel()
-		X.PS.FocusPanel()
-		X.PS.SwitchTab('MY_PlayerRemark')
+		X.Panel.Show()
+		X.Panel.Focus()
+		X.Panel.SwitchTab('MY_PlayerRemark')
 	end,
 })
 
@@ -535,8 +535,8 @@ X.RegisterEvent('GLOBAL_ROOM_MEMBER_CHANGE', 'MY_PlayerRemark', function()
 end)
 
 X.RegisterEvent('MY_PLAYER_REMARK_UPDATE', 'MY_PlayerRemark', function()
-	if X.PS.GetCurrentTabID() == 'MY_PlayerRemark' then
-		X.PS.SwitchTab('MY_PlayerRemark', true)
+	if X.Panel.GetCurrentTabID() == 'MY_PlayerRemark' then
+		X.Panel.SwitchTab('MY_PlayerRemark', true)
 	end
 end)
 
@@ -574,6 +574,6 @@ function PS.OnPanelActive(wnd)
 		})
 	end
 end
-X.PS.RegisterPanel(_L['Target'], 'MY_PlayerRemark', _L['Player remark'], 'ui/Image/button/ShopButton.UITex|12', PS)
+X.Panel.Register(_L['Target'], 'MY_PlayerRemark', _L['Player remark'], 'ui/Image/button/ShopButton.UITex|12', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

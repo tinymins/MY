@@ -277,6 +277,6 @@ function PS.OnPanelDeactive()
 	O.bPanelActive = false
 end
 
-X.PS.RegisterPanel(_L['Target'], 'MY_Love', _L['MY_Love'], 329, PS)
+X.Panel.Register(_L['Target'], 'MY_Love', _L['MY_Love'], 329, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -126,9 +126,9 @@ function Framework.OnLButtonClick()
 		table.insert(menu, {
 			szOption = _L['Option'],
 			fnAction = function()
-				X.PS.ShowPanel()
-				X.PS.FocusPanel()
-				X.PS.SwitchTab('MY_TeamTools')
+				X.Panel.Show()
+				X.Panel.Focus()
+				X.Panel.SwitchTab('MY_TeamTools')
 			end,
 		})
 		local tFloatEntryMenu = { szOption = _L['Float panel'] }

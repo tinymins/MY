@@ -167,9 +167,9 @@ local D = {}
 -- 打开面板
 -- (void) D.OpenPanel()
 function D.OpenPanel()
-	X.PS.ShowPanel()
-	X.PS.FocusPanel()
-	X.PS.SwitchTab('RollMonitor')
+	X.Panel.Show()
+	X.Panel.Focus()
+	X.Panel.SwitchTab('RollMonitor')
 end
 
 -- 清空ROLL点
@@ -529,6 +529,6 @@ function PS.OnPanelDeactive()
 	X.BreatheCall('MY_RollMonitorRedraw', false)
 end
 
-X.PS.RegisterPanel(_L['General'], 'RollMonitor', _L['roll monitor'], 287, PS)
+X.Panel.Register(_L['General'], 'RollMonitor', _L['roll monitor'], 287, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

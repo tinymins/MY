@@ -68,7 +68,7 @@ local function OpenBuffRuleEditor(rec)
 		end
 	end, function()
 		CFG.aBuffList = CFG.aBuffList
-		X.PS.SwitchTab('MY_Cataclysm_BuffMonitor', true)
+		X.Panel.SwitchTab('MY_Cataclysm_BuffMonitor', true)
 	end)
 end
 
@@ -119,7 +119,7 @@ function PS.OnPanelActive(frame)
 						MY_CataclysmMain.UpdateBuffListCache()
 						ui:Remove()
 						X.DelayCall('MY_Cataclysm_Reload', 300, D.ReloadCataclysmPanel)
-						X.PS.SwitchTab('MY_Cataclysm_BuffMonitor', true)
+						X.Panel.SwitchTab('MY_Cataclysm_BuffMonitor', true)
 					end,
 				})
 			end,
@@ -287,6 +287,6 @@ end
 function PS.OnPanelDeactive()
 	l_list = nil
 end
-X.PS.RegisterPanel(_L['Raid'], 'MY_Cataclysm_BuffMonitor', _L['Buff settings'], 'ui/Image/UICommon/RaidTotal.uitex|65', PS)
+X.Panel.Register(_L['Raid'], 'MY_Cataclysm_BuffMonitor', _L['Buff settings'], 'ui/Image/UICommon/RaidTotal.uitex|65', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

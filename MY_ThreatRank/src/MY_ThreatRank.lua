@@ -250,9 +250,9 @@ end
 function TS.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Setting' then
-		X.PS.ShowPanel()
-		X.PS.FocusPanel()
-		X.PS.SwitchTab('MY_ThreatRank')
+		X.Panel.Show()
+		X.Panel.Focus()
+		X.Panel.SwitchTab('MY_ThreatRank')
 	end
 end
 
@@ -710,6 +710,6 @@ function PS.OnPanelActive(frame)
 		autoEnable = IsEnabled,
 	})
 end
-X.PS.RegisterPanel(_L['Target'], 'MY_ThreatRank', g_tStrings.HATRED_COLLECT, 632, PS)
+X.Panel.Register(_L['Target'], 'MY_ThreatRank', g_tStrings.HATRED_COLLECT, 632, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

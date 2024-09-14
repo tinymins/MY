@@ -82,6 +82,6 @@ function PS.OnPanelActive(wnd)
 	nX, nY = MY_TeamCountdown.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 	nX, nY = MY_TeamRestore.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY)
 end
-X.PS.RegisterPanel(_L['Raid'], 'MY_TeamTools', _L['MY_TeamTools'], 5962, PS)
+X.Panel.Register(_L['Raid'], 'MY_TeamTools', _L['MY_TeamTools'], 5962, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

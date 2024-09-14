@@ -38,7 +38,7 @@ function PS.OnPanelActive(frame)
 			GetUserInput(_L['Please input ancient config name:'], function(szText)
 				MY_CataclysmMain.LoadAncientConfigure(szText)
 				MY_CataclysmMain.CheckEnableTeamPanel()
-				X.PS.SwitchTab('MY_Cataclysm', true)
+				X.Panel.SwitchTab('MY_Cataclysm', true)
 			end, nil, nil, nil, 'common')
 		end,
 	}):Width() + 5
@@ -358,6 +358,6 @@ function PS.OnPanelActive(frame)
 	})
 	nY = nY + 25
 end
-X.PS.RegisterPanel(_L['Raid'], 'MY_Cataclysm', _L['Cataclysm'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)
+X.Panel.Register(_L['Raid'], 'MY_Cataclysm', _L['Cataclysm'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

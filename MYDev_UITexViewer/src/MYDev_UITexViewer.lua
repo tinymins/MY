@@ -94,7 +94,7 @@ _Cache.OnPanelDeactive = function(wnd)
 	collectgarbage('collect')
 end
 
-X.PS.RegisterPanel(_L['Development'], 'Dev_UITexViewer', _L['UITexViewer'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
+X.Panel.Register(_L['Development'], 'Dev_UITexViewer', _L['UITexViewer'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
 	IsRestricted = function()
 		return not X.IsDebugClient('Dev_UITexViewer')
 	end,

@@ -567,9 +567,9 @@ function D.OnItemRButtonClick()
 			table.insert(t, 1, {
 				szOption = _L['Option'],
 				fnAction = function()
-					X.PS.ShowPanel()
-					X.PS.FocusPanel()
-					X.PS.SwitchTab('MY_Focus')
+					X.Panel.Show()
+					X.Panel.Focus()
+					X.Panel.SwitchTab('MY_Focus')
 				end,
 			})
 		end
@@ -611,9 +611,9 @@ end
 function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Setting' then
-		X.PS.ShowPanel()
-		X.PS.FocusPanel()
-		X.PS.SwitchTab('MY_Focus')
+		X.Panel.Show()
+		X.Panel.Focus()
+		X.Panel.SwitchTab('MY_Focus')
 	elseif name == 'Btn_Close' then
 		D.Close()
 	end

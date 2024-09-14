@@ -74,6 +74,6 @@ function PS.OnPanelActive(wnd)
 	nX, nY, nLFY = MY_JBTeamSnapshot.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, LH, nX, nY, nLFY)
 end
 
-X.PS.RegisterPanel(_L['Raid'], 'MY_JX3BOX', _L['Team Platform'], 5962, PS)
+X.Panel.Register(_L['Raid'], 'MY_JX3BOX', _L['Team Platform'], 5962, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

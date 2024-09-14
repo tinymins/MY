@@ -590,10 +590,10 @@ function PS.OnPanelActive(wnd)
 		text = _L['Restore default config'],
 		onClick = function()
 			O('reset')
-			X.PS.SwitchTab('MY_Taoguan', true)
+			X.Panel.SwitchTab('MY_Taoguan', true)
 		end,
 	}):Pos('BOTTOMRIGHT')
 end
-X.PS.RegisterPanel(_L['Target'], 'MY_Taoguan', _L[MODULE_NAME], 119, PS)
+X.Panel.Register(_L['Target'], 'MY_Taoguan', _L[MODULE_NAME], 119, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

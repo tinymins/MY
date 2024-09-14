@@ -790,7 +790,7 @@ function PS.OnPanelActive(wnd)
 		autoEnable = function() return O.bEnable end,
 	})
 end
-X.PS.RegisterPanel(_L['Raid'], 'MY_LifeBar_ScreenArrow', _L['MY_LifeBar_ScreenArrow'], 431, PS)
+X.Panel.Register(_L['Raid'], 'MY_LifeBar_ScreenArrow', _L['MY_LifeBar_ScreenArrow'], 431, PS)
 
 function D.Init()
 	HANDLE = X.UI.HandlePool(X.UI.GetShadowHandle('ScreenArrow'), FormatHandle(string.rep('<shadow></shadow>', 6)))

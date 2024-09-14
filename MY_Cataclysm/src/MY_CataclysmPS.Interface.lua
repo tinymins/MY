@@ -203,6 +203,6 @@ function PS.OnPanelActive(frame)
 		end,
 	}):AutoWidth():Height() + 3
 end
-X.PS.RegisterPanel(_L['Raid'], 'MY_Cataclysm_Interface', _L['Interface settings'], 'ui/Image/UICommon/RaidTotal.uitex|74', PS)
+X.Panel.Register(_L['Raid'], 'MY_Cataclysm_Interface', _L['Interface settings'], 'ui/Image/UICommon/RaidTotal.uitex|74', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

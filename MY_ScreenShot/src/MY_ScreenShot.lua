@@ -286,6 +286,6 @@ function PS.OnPanelDeactive()
 	X.BreatheCall('MY_ScreenShot_Hotkey_Check', false)
 end
 
-X.PS.RegisterPanel(_L['System'], 'ScreenShot', _L['screenshot helper'], 'UI/Image/UICommon/Commonpanel.UITex|9', PS)
+X.Panel.Register(_L['System'], 'ScreenShot', _L['screenshot helper'], 'UI/Image/UICommon/Commonpanel.UITex|9', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

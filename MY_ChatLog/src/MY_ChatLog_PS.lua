@@ -723,6 +723,6 @@ function PS.OnPanelActive(wnd)
 	})
 	nY = nY + nDeltaY
 end
-X.PS.RegisterPanel(_L['Chat'], 'ChatLog', _L['MY_ChatLog'], 'ui/Image/button/SystemButton.UITex|43', PS)
+X.Panel.Register(_L['Chat'], 'ChatLog', _L['MY_ChatLog'], 'ui/Image/button/SystemButton.UITex|43', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -281,9 +281,9 @@ function MY_GKP_UI.OnFrameCreate()
 		x = 955, y = 54, w = 20, h = 20,
 		buttonStyle = 'OPTION',
 		onClick = function()
-			X.PS.ShowPanel()
-			X.PS.FocusPanel()
-			X.PS.SwitchTab('MY_GKP')
+			X.Panel.Show()
+			X.Panel.Focus()
+			X.Panel.SwitchTab('MY_GKP')
 		end,
 	})
 	ui:Append('WndButton', {

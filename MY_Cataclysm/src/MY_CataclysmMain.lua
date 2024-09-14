@@ -1154,9 +1154,9 @@ function D.OnLButtonClick()
 			table.insert(menu, { bDevide = true })
 		end
 		table.insert(menu, { szOption = _L['Interface settings'], rgb = { 255, 255, 0 }, fnAction = function()
-			X.PS.ShowPanel()
-			X.PS.FocusPanel()
-			X.PS.SwitchTab('MY_Cataclysm')
+			X.Panel.Show()
+			X.Panel.Focus()
+			X.Panel.SwitchTab('MY_Cataclysm')
 		end })
 		if X.IsDebugClient(true) then
 			table.insert(menu, { bDevide = true })
@@ -1351,7 +1351,7 @@ function D.ConfirmRestoreConfig()
 			fnAction = function()
 				D.SetConfig(X.Clone(CTM_CONFIG_OFFICIAL), true)
 				D.CheckEnableTeamPanel()
-				X.PS.SwitchTab('MY_Cataclysm', true)
+				X.Panel.SwitchTab('MY_Cataclysm', true)
 			end,
 		},
 		{
@@ -1359,7 +1359,7 @@ function D.ConfirmRestoreConfig()
 			fnAction = function()
 				D.SetConfig(X.Clone(CTM_CONFIG_CATACLYSM), true)
 				D.CheckEnableTeamPanel()
-				X.PS.SwitchTab('MY_Cataclysm', true)
+				X.Panel.SwitchTab('MY_Cataclysm', true)
 			end,
 		},
 		{
@@ -1495,7 +1495,7 @@ X.RegisterTutorial({
 		fnAction = function()
 			MY_Cataclysm.bEnable = true
 			D.CheckEnableTeamPanel()
-			X.PS.RedrawTab('MY_Cataclysm')
+			X.Panel.RedrawTab('MY_Cataclysm')
 		end,
 	},
 	{
@@ -1503,7 +1503,7 @@ X.RegisterTutorial({
 		fnAction = function()
 			MY_Cataclysm.bEnable = false
 			D.CheckEnableTeamPanel()
-			X.PS.RedrawTab('MY_Cataclysm')
+			X.Panel.RedrawTab('MY_Cataclysm')
 		end,
 	},
 })

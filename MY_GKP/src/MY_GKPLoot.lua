@@ -641,8 +641,8 @@ function D.OnLButtonClick()
 			{
 				szOption = _L['Config'],
 				fnAction = function()
-					X.PS.ShowPanel()
-					X.PS.SwitchTab('MY_GKPDoodad')
+					X.Panel.Show()
+					X.Panel.SwitchTab('MY_GKPDoodad')
 				end,
 			},
 			{

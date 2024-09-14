@@ -104,9 +104,9 @@ function D.CreateFrame(szInitYY, szInitNote)
 			simple = true, close = true, resize = true,
 			minWidth = 320, minHeight = 195,
 			setting = function()
-				X.PS.ShowPanel()
-				X.PS.FocusPanel()
-				X.PS.SwitchTab('MY_TeamTools')
+				X.Panel.Show()
+				X.Panel.Focus()
+				X.Panel.SwitchTab('MY_TeamTools')
 			end,
 			onSizeChange = FormatAllContentPos,
 		})

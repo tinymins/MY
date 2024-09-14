@@ -234,7 +234,7 @@ function PS.OnPanelActive(wnd)
 		nPaddingY = nPaddingY + 60
 	end
 end
-X.PS.RegisterPanel(_L['System'], 'MY_Font', _L['MY_Font'], 'ui/Image/UICommon/CommonPanel7.UITex|36', PS)
+X.Panel.Register(_L['System'], 'MY_Font', _L['MY_Font'], 'ui/Image/UICommon/CommonPanel7.UITex|36', PS)
 
 -- ≥ı ºªØ…Ë÷√
 do

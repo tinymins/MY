@@ -1152,6 +1152,6 @@ function PS.OnPanelActive(frame)
 		})
 	end
 end
-X.PS.RegisterPanel(_L['General'], 'MY_GKPDoodad', _L['MY_GKPLoot'], 90, PS)
+X.Panel.Register(_L['General'], 'MY_GKPDoodad', _L['MY_GKPLoot'], 90, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

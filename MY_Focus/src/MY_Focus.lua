@@ -1131,7 +1131,7 @@ X.RegisterTutorial({
 		fnAction = function()
 			O.bEnable = true
 			MY_FocusUI.Open()
-			X.PS.RedrawTab('MY_Focus')
+			X.Panel.RedrawTab('MY_Focus')
 		end,
 	},
 	{
@@ -1139,7 +1139,7 @@ X.RegisterTutorial({
 		fnAction = function()
 			O.bEnable = false
 			MY_FocusUI.Close()
-			X.PS.RedrawTab('MY_Focus')
+			X.Panel.RedrawTab('MY_Focus')
 		end,
 	},
 })

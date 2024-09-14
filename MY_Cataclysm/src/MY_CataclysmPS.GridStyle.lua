@@ -310,6 +310,6 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 25
 end
-X.PS.RegisterPanel(_L['Raid'], 'MY_Cataclysm_GridStyle', _L['Grid Style'], 'ui/Image/UICommon/RaidTotal.uitex|68', PS)
+X.Panel.Register(_L['Raid'], 'MY_Cataclysm_GridStyle', _L['Grid Style'], 'ui/Image/UICommon/RaidTotal.uitex|68', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

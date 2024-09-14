@@ -352,6 +352,6 @@ function PS.OnPanelActive(wnd)
 		})
 	end
 end
-X.PS.RegisterPanel(_L['Target'], 'MY_Target', _L['MY_Target'], 2136, PS)
+X.Panel.Register(_L['Target'], 'MY_Target', _L['MY_Target'], 2136, PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
