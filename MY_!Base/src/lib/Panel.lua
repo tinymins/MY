@@ -667,7 +667,7 @@ end
 --------------------------------------------------------------------------------
 do
 local settings = {
-	name = X.NSFormatString('{$NS}.PS'),
+	name = X.NSFormatString('{$NS}.Panel'),
 	exports = {
 		{
 			fields = {
