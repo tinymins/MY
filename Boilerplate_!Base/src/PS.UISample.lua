@@ -324,6 +324,6 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndWindow', { x = 0, y = nY + COMPONENT_H, w = W, h = H / 3 })
 end
 
-X.PS.RegisterPanel(_L['Development'], 'UISample', _L['UI SAMPLE'], '', PS)
+X.Panel.Register(_L['Development'], 'UISample', _L['UI SAMPLE'], '', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -206,7 +206,7 @@ function PS.OnPanelActive(wnd)
 						X.IsDebugClient('Dev_UIFindStation', true, true)
 						X.IsDebugClient('Dev_DebugLogs', true, true)
 						X.OutputSystemAnnounceMessage(_L['Debug tools has been enabled...'])
-						X.PS.ReopenPanel()
+						X.Panel.Reopen()
 						X.UI.ClosePopupMenu()
 					end,
 				})
@@ -247,6 +247,6 @@ function PS.OnPanelBreathe(wnd)
 	ui:Fetch('Text_Memory'):Text(GetMemoryText())
 end
 
-X.PS.RegisterPanel(nil, 'Welcome', _L['Welcome'], '', PS)
+X.Panel.Register(nil, 'Welcome', _L['Welcome'], '', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

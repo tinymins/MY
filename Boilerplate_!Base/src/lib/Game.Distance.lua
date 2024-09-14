@@ -58,8 +58,8 @@ function X.GetDistanceTypeMenu(bGlobal, eValue, fnAction)
 			t1.nMouseOverFrame = 106
 			t1.szLayer = 'ICON_RIGHTMOST'
 			t1.fnClickIcon = function()
-				X.PS.ShowPanel()
-				X.PS.SwitchTab('GlobalConfig')
+				X.Panel.Show()
+				X.Panel.SwitchTab('GlobalConfig')
 				X.UI.ClosePopupMenu()
 			end
 		end

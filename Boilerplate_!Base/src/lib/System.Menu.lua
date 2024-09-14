@@ -57,16 +57,16 @@ local function GenerateMenu(aList, bMainMenu, dwTarType, dwTarID)
 	if bMainMenu then
 		menu = {
 			szOption = X.PACKET_INFO.NAME,
-			fnAction = X.PS.TogglePanel,
+			fnAction = X.Panel.Toggle,
 			rgb = X.PACKET_INFO.MENU_COLOR,
 			bCheck = true,
-			bChecked = X.PS.IsPanelVisible(),
+			bChecked = X.Panel.IsVisible(),
 
 			szIcon = X.PACKET_INFO.LOGO_IMAGE,
 			nFrame = X.PACKET_INFO.LOGO_MENU_FRAME,
 			nMouseOverFrame = X.PACKET_INFO.LOGO_MENU_HOVER_FRAME,
 			szLayer = 'ICON_RIGHT',
-			fnClickIcon = X.PS.TogglePanel,
+			fnClickIcon = X.Panel.Toggle,
 		}
 	end
 	for _, p in ipairs(aList) do

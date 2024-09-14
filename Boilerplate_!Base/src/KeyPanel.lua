@@ -206,7 +206,7 @@ function PS.OnPanelActive(wnd)
 	})
 end
 
-X.PS.RegisterPanel(_L['Development'], 'KeyPanel', _L['KeyPanel'], 'ui/Image/UICommon/ActivityList1.UITex|51', PS)
+X.Panel.Register(_L['Development'], 'KeyPanel', _L['KeyPanel'], 'ui/Image/UICommon/ActivityList1.UITex|51', PS)
 
 --------------------------------------------------------------------------------
 -- ÊÂ¼þ×¢²á

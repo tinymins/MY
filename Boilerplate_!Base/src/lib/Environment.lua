@@ -87,8 +87,8 @@ function X.IsRestricted(szKey, ...)
 			szEvent = szEvent .. '.' .. szKey
 		end
 		X.DelayCall(szEvent, 75, function()
-			if X.PS.IsPanelOpened() then
-				X.PS.ReopenPanel()
+			if X.Panel.IsOpened() then
+				X.Panel.Reopen()
 			end
 			DELAY_EVENT[szEvent] = nil
 			FireUIEvent(X.NSFormatString('{$NS}_RESTRICTION'), szKey)
@@ -135,8 +135,8 @@ function X.IsDebugClient(szKey, bDebug, bSet)
 			szEvent = szEvent .. '#' .. szKey
 		end
 		X.DelayCall(szEvent, 75, function()
-			if X.PS.IsPanelOpened() then
-				X.PS.ReopenPanel()
+			if X.Panel.IsOpened() then
+				X.Panel.Reopen()
 			end
 			DELAY_EVENT[szEvent] = nil
 			FireUIEvent(X.NSFormatString('{$NS}_DEBUG'), szKey)
