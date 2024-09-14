@@ -28,6 +28,9 @@ end
 do
 local VISIBLE = true
 function D.OnFrameBreathe()
+	if not Station then
+		return
+	end
 	if Station.IsVisible() then
 		if not VISIBLE then
 			local h = this:Lookup('', '')
