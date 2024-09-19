@@ -2263,15 +2263,23 @@ function CTM:ChangeTeamVoteState(eType, dwID, status)
 		h:Lookup(opt.awaitPath):Hide()
 		if status == 'resolve' and opt.resolvePath then
 			local key = 'MY_CATACLYSM_READY_' .. eType .. '_' .. dwID
-			h:Lookup(opt.resolvePath):Show()
-			h:Lookup(opt.resolvePath):SetAlpha(240)
+			local hResolve = h:Lookup(opt.resolvePath)
+			hResolve:Show()
+			hResolve:SetAlpha(240)
 			X.BreatheCall(key, function()
-				if h:Lookup(opt.resolvePath):IsValid() then
-					local nAlpha = math.max(h:Lookup(opt.resolvePath):GetAlpha() - 15, 0)
-					h:Lookup(opt.resolvePath):SetAlpha(nAlpha)
-					if nAlpha <= 0 then
-						X.BreatheCall(key, false)
-					end
+				if not X.IsElement(h) then
+					X.BreatheCall(key, false)
+					return
+				end
+				local hResolve = h:Lookup(opt.resolvePath)
+				if not X.IsElement(hResolve) then
+					X.BreatheCall(key, false)
+					return
+				end
+				local nAlpha = math.max(hResolve:GetAlpha() - 15, 0)
+				hResolve:SetAlpha(nAlpha)
+				if nAlpha <= 0 then
+					X.BreatheCall(key, false)
 				end
 			end)
 		elseif status == 'reject' then
