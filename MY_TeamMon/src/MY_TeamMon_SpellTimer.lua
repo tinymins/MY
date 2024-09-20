@@ -298,7 +298,7 @@ function ST:ctor(nType, szKey, tParam)
 		oo.ui.time           = oo.ui:Lookup('TimeLeft')
 		oo.ui.txt            = oo.ui:Lookup('SkillName')
 		oo.ui.img            = oo.ui:Lookup('Image')
-		oo.ui.sha            = oo.ui:Lookup('shadow')
+		oo.ui.sha            = oo.ui:Lookup('Shadow')
 		oo.ui.sfx            = oo.ui:Lookup('SFX')
 		oo.ui.obj            = oo
 		ST_CACHE[nType][szKey] = oo.ui
