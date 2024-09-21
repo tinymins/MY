@@ -546,7 +546,10 @@ local CONSTANT = {
 			__index = function(t, k)
 				local c
 				if GetKungfuSchoolColor then
-					c = GetKungfuSchoolColor(k)
+					local r, g, b = GetKungfuSchoolColor(k)
+					if r and g and b then
+						c = { r, g, b }
+					end
 				end
 				return c or { 225, 225, 225 }
 			end,
