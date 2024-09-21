@@ -906,6 +906,7 @@ MoneyOptMult = FunctionType
 MoneyOptSub = FunctionType
 MoneyToGoldSilverAndCopper = FunctionType
 MoneyToGoldSilverAndCopper64 = FunctionType
+MONSTER_MAP_ID = NumberType
 MORPH_TYPE = TableType
 MOVE_STATE = TableType
 MOVIE = TableType

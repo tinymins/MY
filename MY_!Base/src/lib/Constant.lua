@@ -544,7 +544,11 @@ local CONSTANT = {
 		}),
 		{
 			__index = function(t, k)
-				return { 225, 225, 225 }
+				local c
+				if GetKungfuSchoolColor then
+					c = GetKungfuSchoolColor(k)
+				end
+				return c or { 225, 225, 225 }
 			end,
 			__metatable = true,
 		}),
