@@ -573,7 +573,11 @@ local CONSTANT = {
 		}),
 		{
 			__index = function(t, k)
-				return { 200, 200, 200 } -- NPC 以及未知门派
+				local c
+				if ForceUI_GetFightColor then
+					c = ForceUI_GetFightColor(k)
+				end
+				return c or { 200, 200, 200 } -- NPC 以及未知门派
 			end,
 			__metatable = true,
 		}),
