@@ -107,6 +107,16 @@ function X.IsRestricted(szKey, ...)
 end
 end
 
+-- 断言一个附加功能点是否可用
+---@param szKey string? @附加功能点名称
+---@return boolean @附加功能点是否可用
+function X.AssertDLC(szKey)
+	if not szKey then
+		szKey = 'common'
+	end
+	return IsLocalFileExist(X.FormatPath({'config/restriction/'.. szKey .. '.jx3dat', X.PATH_TYPE.GLOBAL}))
+end
+
 -- 获取是否测试客户端
 -- (bool) X.IsDebugClient()
 -- (bool) X.IsDebugClient(bool bManually = false)
