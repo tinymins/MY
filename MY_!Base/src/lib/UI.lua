@@ -6444,7 +6444,7 @@ function X.UI.CreateFrame(szName, opt)
 			end
 			X.UI.CloseFrame(frm)
 			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-			X.RegisterEsc('Frame_Close_' .. szName)
+			X.RegisterEsc('Frame_Close_' .. szName, false)
 		end)
 	end
 	if opt.simple then

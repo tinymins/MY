@@ -115,7 +115,7 @@ function D.Hide(bMute, bNoAnimate)
 	if not bMute then
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
-	X.RegisterEsc(X.PACKET_INFO.NAME_SPACE)
+	X.RegisterEsc(X.PACKET_INFO.NAME_SPACE, false)
 	X.UI.ClosePopupMenu()
 end
 

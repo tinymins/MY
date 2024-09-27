@@ -13,21 +13,19 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/System.UI')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
--- register global esc key down action
--- (void) X.RegisterEsc(szID, fnCondition, fnAction, bTopmost) -- register global esc event handle
--- (void) X.RegisterEsc(szID, nil, nil, bTopmost)              -- unregister global esc event handle
--- (string)szID        -- an UUID (if this UUID has been register before, the old will be recovered)
--- (function)fnCondition -- a function returns if fnAction will be execute
--- (function)fnAction    -- inf fnCondition() is true then fnAction will be called
--- (boolean)bTopmost    -- this param equals true will be called in high priority
-function X.RegisterEsc(szID, fnCondition, fnAction, bTopmost)
+-- 注册全局 ESC 按钮事件
+---@param szKey string @唯一标识字符串（如果有相同标识旧的会被覆盖）
+---@param fnCondition function | false @判断函数，返回真表示执行 fnAction，传入 false 表示取消注册
+---@param fnAction function @事件执行函数
+---@param bTopmost boolean? @该 ESC 注册为高优先级
+function X.RegisterEsc(szKey, fnCondition, fnAction, bTopmost)
 	if fnCondition and fnAction then
 		if RegisterGlobalEsc then
-			RegisterGlobalEsc(X.PACKET_INFO.NAME_SPACE .. '#' .. szID, fnCondition, fnAction, bTopmost)
+			RegisterGlobalEsc(X.PACKET_INFO.NAME_SPACE .. '#' .. szKey, fnCondition, fnAction, bTopmost)
 		end
-	else
+	elseif fnCondition == false then
 		if UnRegisterGlobalEsc then
-			UnRegisterGlobalEsc(X.PACKET_INFO.NAME_SPACE .. '#' .. szID, bTopmost)
+			UnRegisterGlobalEsc(X.PACKET_INFO.NAME_SPACE .. '#' .. szKey, bTopmost)
 		end
 	end
 end
