@@ -16,7 +16,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 -- 注册全局 ESC 按钮事件
 ---@param szKey string @唯一标识字符串（如果有相同标识旧的会被覆盖）
 ---@param fnCondition function | false @判断函数，返回真表示执行 fnAction，传入 false 表示取消注册
----@param fnAction function @事件执行函数
+---@param fnAction function? @事件执行函数
 ---@param bTopmost boolean? @该 ESC 注册为高优先级
 function X.RegisterEsc(szKey, fnCondition, fnAction, bTopmost)
 	if fnCondition and fnAction then
