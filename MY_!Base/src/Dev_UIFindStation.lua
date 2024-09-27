@@ -153,7 +153,7 @@ end
 local PS = {}
 
 function PS.IsRestricted()
-	return not X.IsDebugClient('Dev_UIFindStation')
+	return not X.IsDebugging('Dev_UIFindStation')
 end
 
 function PS.OnPanelActive(frame)

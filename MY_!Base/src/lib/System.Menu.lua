@@ -274,7 +274,7 @@ function X.InsertPlayerContextMenu(t, szName, dwID, szGlobalID)
 		end
 	end
 
-	if IsCtrlKeyDown() and X.IsDebugClient(true) then
+	if IsCtrlKeyDown() and X.IsDebugging() then
 		table.insert(t, {
 			szOption = _L['Copy debug information'],
 			fnAction = function()

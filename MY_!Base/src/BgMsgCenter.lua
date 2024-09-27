@@ -77,7 +77,7 @@ end)
 
 -- 测试用（调试工具）
 X.RegisterBgMsg(X.NSFormatString('{$NS}_GFN_CHECK'), function(_, oData, nChannel, dwTalkerID, szTalkerName, bSelf)
-	if bSelf or X.IsDebugClient(true) then
+	if bSelf or X.IsDebugging() then
 		return
 	end
 	X.SendBgMsg(szTalkerName, X.NSFormatString('{$NS}_GFN_REPLY'), {oData[1], X.XpCall(X.Get(_G, oData[2]), select(3, X.Unpack(oData)))}, true)
@@ -152,7 +152,7 @@ X.RegisterBgMsg(X.NSFormatString('{$NS}_ABOUT'), function(_, data, nChannel, dwT
 	elseif data[1] == 'RESTRICTION' then
 		X.IsRestricted(data[2], data[3])
 	elseif data[1] == 'DEBUG' then
-		X.IsDebugClient(data[2], data[3], data[4])
+		X.SetDebugging(data[2], data[3])
 	end
 end)
 

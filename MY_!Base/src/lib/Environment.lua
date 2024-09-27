@@ -67,7 +67,8 @@ function X.RegisterRestriction(szKey, tBranchRestricted)
 end
 
 -- 获取功能在当前分支是否已屏蔽
--- X.IsRestricted('SomeFunc')
+---@param szKey string @功能名称
+---@return boolean @功能是否被屏蔽
 function X.IsRestricted(szKey, ...)
 	if select('#', ...) == 1 then
 		-- 设置值
@@ -107,70 +108,66 @@ function X.IsRestricted(szKey, ...)
 end
 end
 
--- 断言一个附加功能点是否可用
----@param szKey string? @附加功能点名称
----@return boolean @附加功能点是否可用
-function X.AssertDLC(szKey)
-	if IsDebugClient() then
-		return true
-	end
-	if not szKey then
-		szKey = 'common'
-	end
-	return IsLocalFileExist(X.FormatPath({'config/restriction/'.. szKey .. '.jx3dat', X.PATH_TYPE.GLOBAL}))
+-- 获取是否测试客户端
+---@return boolean @是否测试客户端
+function X.IsDebugClient()
+	return IsDebugClient()
 end
 
--- 获取是否测试客户端
--- (bool) X.IsDebugClient()
--- (bool) X.IsDebugClient(bool bManually = false)
--- (bool) X.IsDebugClient(string szKey[, bool bDebug, bool bSet])
 do
 local DELAY_EVENT = {}
 local DEBUG = { ['*'] = X.PACKET_INFO.DEBUG_LEVEL <= X.DEBUG_LEVEL.DEBUG }
-function X.IsDebugClient(szKey, bDebug, bSet)
+-- 获取特定功能是否处于测试状态
+---@param szKey string? @特定功能名称
+---@param bDebug boolean? @当传入 szKey 时表示设置特定功能是否处于测试状态，当未传入 szKey 时表示获取
+---@return boolean @特定功能是否处于测试状态
+function X.IsDebugging(szKey)
 	if not X.IsString(szKey) then
-		szKey, bDebug, bSet = '*', szKey, bDebug
+		szKey = '*'
 	end
-	if bSet then
-		-- 通用禁止设为空
-		if szKey == '*' and X.IsNil(bDebug) then
-			return
+	if not X.IsNil(DEBUG['!']) then
+		return DEBUG['!']
+	end
+	if not X.IsNil(DEBUG[szKey]) then
+		return DEBUG[szKey]
+	end
+	return DEBUG['*']
+end
+
+-- 设置特定功能是否处于测试状态
+---@param szKey string? @特定功能名称
+---@param bDebug boolean? @设置特定功能是否处于测试状态
+function X.SetDebugging(szKey, bDebug)
+	if not X.IsString(szKey) then
+		szKey, bDebug = '*', szKey
+	end
+	-- 通用禁止设为空
+	if szKey == '*' and X.IsNil(bDebug) then
+		return
+	end
+	-- 设置值
+	if DEBUG[szKey] == bDebug then
+		return
+	end
+	DEBUG[szKey] = bDebug
+	-- 发起事件通知
+	local szEvent = X.NSFormatString('{$NS}#DEBUG')
+	if szKey == '*' or szKey == '!' then
+		for k, _ in pairs(DELAY_EVENT) do
+			X.DelayCall(k, false)
 		end
-		-- 设置值
-		if DEBUG[szKey] == bDebug then
-			return
-		end
-		DEBUG[szKey] = bDebug
-		-- 发起事件通知
-		local szEvent = X.NSFormatString('{$NS}#DEBUG')
-		if szKey == '*' or szKey == '!' then
-			for k, _ in pairs(DELAY_EVENT) do
-				X.DelayCall(k, false)
-			end
-			szKey = nil
-		else
-			szEvent = szEvent .. '#' .. szKey
-		end
-		X.DelayCall(szEvent, 75, function()
-			if X.Panel.IsOpened() then
-				X.Panel.Reopen()
-			end
-			DELAY_EVENT[szEvent] = nil
-			FireUIEvent(X.NSFormatString('{$NS}_DEBUG'), szKey)
-		end)
-		DELAY_EVENT[szEvent] = true
+		szKey = nil
 	else
-		if not X.IsNil(DEBUG['!']) then
-			return DEBUG['!']
-		end
-		if szKey == '*' and not bDebug then
-			return IsDebugClient()
-		end
-		if not X.IsNil(DEBUG[szKey]) then
-			return DEBUG[szKey]
-		end
-		return DEBUG['*']
+		szEvent = szEvent .. '#' .. szKey
 	end
+	X.DelayCall(szEvent, 75, function()
+		if X.Panel.IsOpened() then
+			X.Panel.Reopen()
+		end
+		DELAY_EVENT[szEvent] = nil
+		FireUIEvent(X.NSFormatString('{$NS}_DEBUG'), szKey)
+	end)
+	DELAY_EVENT[szEvent] = true
 end
 end
 

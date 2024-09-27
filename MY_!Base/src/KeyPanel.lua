@@ -104,7 +104,7 @@ end
 local PS = {}
 
 function PS.IsRestricted()
-	return not X.IsDebugClient('Dev_KeyPanel') or not X.SECRET['HASH::AUTH_KEY_CODE']
+	return not X.IsDebugging('Dev_KeyPanel') or not X.SECRET['HASH::AUTH_KEY_CODE']
 end
 
 function PS.OnPanelActive(wnd)

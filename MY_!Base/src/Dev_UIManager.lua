@@ -64,7 +64,7 @@ if not SHARED_MEMORY.UI_MANAGER then
 	SHARED_MEMORY.UI_MANAGER = {}
 end
 table.insert(SHARED_MEMORY.UI_MANAGER, function()
-	if not X.IsDebugClient('Dev_UIManager') then
+	if not X.IsDebugging('Dev_UIManager') then
 		return
 	end
 	local menu = { szOption = _L['Dev_UIManager'] }
