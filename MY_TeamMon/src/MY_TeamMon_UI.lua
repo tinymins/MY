@@ -3428,7 +3428,12 @@ end
 X.RegisterEvent('MY_TEAM_MON__UI__FREE_CACHE', function()
 	MY_TEAM_MON__UI__SEARCH_CACHE = {}
 end)
-X.RegisterAddonMenu({ szOption = _L['MY_TeamMon'], fnAction = D.TogglePanel })
+X.RegisterAddonMenu(function()
+	if X.IsRestricted('MY_TeamMon') then
+		return
+	end
+	return { szOption = _L['MY_TeamMon'], fnAction = D.TogglePanel }
+end)
 X.RegisterHotKey('MY_TeamMon_UI', _L['Open/close MY_TeamMon'], D.TogglePanel)
 
 --------------------------------------------------------------------------------
