@@ -35,8 +35,8 @@ local O = {
 
 -- refresh ps
 function D.RefreshPS()
-	if O.bPanelActive and MY.IsPanelOpened() then
-		MY.SwitchTab('MY_Love', true)
+	if O.bPanelActive and X.Panel.IsOpened() then
+		X.Panel.SwitchTab('MY_Love', true)
 	end
 end
 X.RegisterEvent('MY_LOVE_UPDATE', 'MY_Love__PS', D.RefreshPS)
