@@ -5,12 +5,14 @@ local PLUGIN_NAME = 'MY_Toolbox'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ItemInfoSearch'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+X.RegisterRestriction('MY_ItemInfoSearch', { ['*'] = false, exp = true })
+--------------------------------------------------------------------------------
 local CACHE = {}
 local ITEM_TYPE_MAX, BOOK_SEGMENT_COUNT, SEARCH_STEP_COUNT
 local SEARCH, RESULT, MAX_DISP = '', {}, 500
@@ -187,7 +189,7 @@ function D.Search(szSearch, fnProgress, fnCallback)
 	end)
 end
 
-local PS = { nPriority = 4 }
+local PS = { nPriority = 4, szRestriction = 'MY_ItemInfoSearch' }
 
 function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
