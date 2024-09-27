@@ -67,7 +67,8 @@ function X.RegisterRestriction(szKey, tBranchRestricted)
 end
 
 -- 获取功能在当前分支是否已屏蔽
--- X.IsRestricted('SomeFunc')
+---@param szKey string @功能名称
+---@return boolean @功能是否被屏蔽
 function X.IsRestricted(szKey, ...)
 	if select('#', ...) == 1 then
 		-- 设置值
@@ -105,19 +106,6 @@ function X.IsRestricted(szKey, ...)
 		return RESTRICTION[szKey] or false
 	end
 end
-end
-
--- 断言一个附加功能点是否可用
----@param szKey string? @附加功能点名称
----@return boolean @附加功能点是否可用
-function X.AssertDLC(szKey)
-	if IsDebugClient() then
-		return true
-	end
-	if not szKey then
-		szKey = 'common'
-	end
-	return IsLocalFileExist(X.FormatPath({'config/restriction/'.. szKey .. '.jx3dat', X.PATH_TYPE.GLOBAL}))
 end
 
 -- 获取是否测试客户端
