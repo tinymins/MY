@@ -47,11 +47,11 @@ local RESTRICTION = {}
 function X.RegisterRestriction(szKey, tBranchRestricted)
 	local bRestricted = nil
 	if X.IsTable(tBranchRestricted) then
-		elseif X.IsBoolean(tBranchRestricted[X.ENVIRONMENT.GAME_EDITION]) then
+		if X.IsBoolean(tBranchRestricted[X.ENVIRONMENT.GAME_EDITION]) then
 			bRestricted = tBranchRestricted[X.ENVIRONMENT.GAME_EDITION]
 		elseif X.IsBoolean(tBranchRestricted.exp) and X.IS_EXP then
 			bRestricted = tBranchRestricted.exp
-		if X.IsBoolean(tBranchRestricted[X.ENVIRONMENT.GAME_BRANCH]) then
+		elseif X.IsBoolean(tBranchRestricted[X.ENVIRONMENT.GAME_BRANCH]) then
 			bRestricted = tBranchRestricted[X.ENVIRONMENT.GAME_BRANCH]
 		elseif X.IsBoolean(tBranchRestricted['*']) then
 			bRestricted = tBranchRestricted['*']
