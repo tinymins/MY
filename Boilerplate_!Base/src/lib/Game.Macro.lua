@@ -44,7 +44,7 @@ local MACRO_CONDITION_DATATYPE = {
 }
 function X.IsMacroValid(szMacro)
 	-- /cast [nobuff:太极] 太极无极
-	local bDebug = X.IsDebugClient(X.NSFormatString('{$NS}_Macro'))
+	local bDebug = X.IsDebugging(X.NSFormatString('{$NS}_Macro'))
 	for nLine, szLine in ipairs(X.SplitString(szMacro, '\n')) do
 		szLine = X.TrimString(szLine)
 		if not X.IsEmpty(szLine) then

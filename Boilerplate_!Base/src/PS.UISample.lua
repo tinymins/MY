@@ -294,7 +294,7 @@ local COMPONENT_SAMPLE = {
 local PS = {}
 
 function PS.IsRestricted()
-	return not X.IsDebugClient('Dev_UISample')
+	return not X.IsDebugging('Dev_UISample')
 end
 
 -- PS.OnPanelActive(wnd)

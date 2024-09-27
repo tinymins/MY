@@ -191,7 +191,7 @@ RegisterEvent(NS .. '_BASE_LOADING_END', function()
 		if bInitRunning then
 			return false
 		end
-		return not _G[NS].IsDebugClient('Dev_LuaWatcher')
+		return not _G[NS].IsDebugging('Dev_LuaWatcher')
 	end
 
 	function PS.OnPanelActive(wnd)

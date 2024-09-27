@@ -1224,7 +1224,7 @@ local function SignChatData(aSay, uuid, me)
 	local dwTime = GetCurrentTime()
 	local szLinkInfo = X.EncodeJSON({
 		_ = dwTime,
-		a = X.IsDebugClient(true) and 1 or nil,
+		a = X.IsDebugging() and 1 or nil,
 		via = X.PACKET_INFO.NAME_SPACE,
 		uuid = uuid and tostring(uuid),
 	})

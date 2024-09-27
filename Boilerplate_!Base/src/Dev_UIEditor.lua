@@ -546,7 +546,7 @@ if not SHARED_MEMORY.UI_EDITOR then
 	SHARED_MEMORY.UI_EDITOR = {}
 end
 table.insert(SHARED_MEMORY.UI_EDITOR, function()
-	if not X.IsDebugClient('Dev_UIEditor') then
+	if not X.IsDebugging('Dev_UIEditor') then
 		return
 	end
 	return {{ szOption = _L['Dev_UIEditor'], fnAction = D.CreateFrame }}

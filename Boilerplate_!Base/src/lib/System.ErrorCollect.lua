@@ -23,7 +23,7 @@ if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 	local function SaveErrorMessage()
 		X.SaveLUAData(FILE_PATH, ERROR_MSG, { encoder = 'luatext', passphrase = false, crc = false, indent = '\t' })
 	end
-	local BROKEN_KGUI = IsDebugClient() and not X.IsDebugServer() and not X.IsDebugClient(true)
+	local BROKEN_KGUI = IsDebugClient() and not X.IsDebugServer() and not X.IsDebugging()
 	local BROKEN_KGUI_ECHO = false
 	RegisterEvent('CALL_LUA_ERROR', function()
 		if BROKEN_KGUI_ECHO then

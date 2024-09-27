@@ -188,7 +188,7 @@ function X.OutputTeamMemberTip(Rect, dwID, szExtraXml)
 	end
 	if IsCtrlKeyDown() then
 		table.insert(xml, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, dwID), 102))
-		local szGUID = X.IsDebugClient(true) and X.GetPlayerGlobalID(dwID)
+		local szGUID = X.IsDebugging() and X.GetPlayerGlobalID(dwID)
 		if szGUID then
 			table.insert(xml, GetFormatText('GUID: ' .. szGUID .. '\n', 102))
 		end

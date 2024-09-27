@@ -12,7 +12,7 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/DebugLogs')
 --------------------------------------------------------------------------------
 
 X.RegisterEvent('OPEN_WINDOW', X.NSFormatString('{$NS}_DebugLogs'), function()
-	if not X.IsDebugClient(true) and not X.IsDebugClient('Dev_DebugLogs') then
+	if not X.IsDebugging() and not X.IsDebugging('Dev_DebugLogs') then
 		return
 	end
 	X.Log('Event: OPEN_WINDOW')
@@ -23,7 +23,7 @@ X.RegisterEvent('OPEN_WINDOW', X.NSFormatString('{$NS}_DebugLogs'), function()
 end)
 
 X.RegisterEvent('ON_WARNING_MESSAGE', X.NSFormatString('{$NS}_DebugLogs'), function()
-	if not X.IsDebugClient(true) and not X.IsDebugClient('Dev_DebugLogs') then
+	if not X.IsDebugging() and not X.IsDebugging('Dev_DebugLogs') then
 		return
 	end
 	X.Log('Event: ON_WARNING_MESSAGE')
@@ -34,7 +34,7 @@ X.RegisterEvent('ON_WARNING_MESSAGE', X.NSFormatString('{$NS}_DebugLogs'), funct
 end)
 
 X.RegisterMsgMonitor('MSG_NPC_NEARBY', X.NSFormatString('{$NS}_DebugLogs'), function(szChannel, szMsg, nFont, bRich)
-	if not X.IsDebugClient(true) and not X.IsDebugClient('Dev_DebugLogs') then
+	if not X.IsDebugging() and not X.IsDebugging('Dev_DebugLogs') then
 		return
 	end
 	if bRich then
