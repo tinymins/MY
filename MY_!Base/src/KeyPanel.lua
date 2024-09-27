@@ -63,7 +63,7 @@ function D.OnKeyPanelBtnLButtonUp()
 	local szCmd = aParam[4]
 	if szCmd == 'R' then
 		for _, szKey in ipairs(aParam[5]) do
-			X.IsRestricted(szKey, false)
+			X.SetRestricted(szKey, false)
 		end
 	end
 	frame:Destroy()

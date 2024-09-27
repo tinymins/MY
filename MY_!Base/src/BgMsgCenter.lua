@@ -150,7 +150,7 @@ X.RegisterBgMsg(X.NSFormatString('{$NS}_ABOUT'), function(_, data, nChannel, dwT
 	elseif data[1] == 'TeamDistribute' then
 		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwTalkerID)
 	elseif data[1] == 'RESTRICTION' then
-		X.IsRestricted(data[2], data[3])
+		X.SetRestricted(data[2], data[3])
 	elseif data[1] == 'DEBUG' then
 		X.SetDebugging(data[2], data[3])
 	end
