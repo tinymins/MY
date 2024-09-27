@@ -111,6 +111,9 @@ end
 ---@param szKey string? @附加功能点名称
 ---@return boolean @附加功能点是否可用
 function X.AssertDLC(szKey)
+	if IsDebugClient() then
+		return true
+	end
 	if not szKey then
 		szKey = 'common'
 	end
