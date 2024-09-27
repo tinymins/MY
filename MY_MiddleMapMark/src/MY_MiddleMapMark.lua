@@ -13,16 +13,15 @@ local PLUGIN_NAME = 'MY_MiddleMapMark'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_MiddleMapMark'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 	return
 end
-if X.IS_EXP and not X.AssertDLC('MY_MiddleMapMark') then
-	return
-end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
+X.RegisterRestriction('MY_MiddleMapMark', { ['*'] = false, exp = true })
 X.RegisterRestriction('MY_MiddleMapMark.MapRestriction', { ['*'] = true })
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 X.CreateDataRoot(X.PATH_TYPE.GLOBAL)
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
 local DB = X.SQLiteConnect(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v5.db', X.PATH_TYPE.GLOBAL})
@@ -594,10 +593,14 @@ function D.HookEdit()
 	if edit then
 		HookTableFunc(edit, 'OnEditChanged', D.OnEditChanged, { bAfterOrigin = true })
 	end
+	D.Search(true)
 end
 X.RegisterFrameCreate('MiddleMap', 'MY_MiddleMapMark', D.HookEdit)
 
 function D.Hook()
+	if X.IsRestricted('MY_MiddleMapMark') then
+		return
+	end
 	D.HookEdit()
 	HookTableFunc(MiddleMap, 'ShowMap', D.ShowMap, { bAfterOrigin = true })
 	HookTableFunc(MiddleMap, 'UpdateCurrentMap', D.UpdateCurrentMap, { bAfterOrigin = true })
@@ -619,6 +622,14 @@ function D.Unhook()
 	UnhookTableFunc(MiddleMap, 'OnMouseLeave', D.OnMouseLeave)
 end
 X.RegisterReload('MY_MiddleMapMark', D.Unhook)
+
+X.RegisterEvent('MY_RESTRICTION', function()
+	if arg0 and arg0 ~= 'MY_MiddleMapMark' then
+		return
+	end
+	D.Unhook()
+	D.Hook()
+end)
 
 function D.GetEditSearch()
 	return Station.Lookup('Topmost1/MiddleMap/Wnd_NormalMap/Wnd_Tool/Edit_Search')
@@ -776,7 +787,7 @@ end
 ---------------------------------------------------------------
 -- Ö÷Ãæ°åËÑË÷
 ---------------------------------------------------------------
-local PS = { nPriority = 4.1 }
+local PS = { nPriority = 4.1, szRestriction = 'MY_MiddleMapMark' }
 function PS.OnPanelActive(wnd)
 	D.Migration()
 

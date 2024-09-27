@@ -18,11 +18,7 @@ local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 	return
 end
--- if X.IS_EXP and not X.AssertDLC('MY_TargetMon') then
--- 	return
--- end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
-X.RegisterRestriction('MY_TargetMon.MapRestriction', { ['*'] = true })
 --------------------------------------------------------------------------
 local D = {}
 local BUFF_CACHE = {} -- 下标为目标ID的目标BUFF缓存数组 反正ID不可能是doodad不会冲突
@@ -482,7 +478,7 @@ do
 local fUIScale, fFontScaleBase
 function UpdateView()
 	local nViewIndex, nViewCount, nMonitorCount = 1, #VIEW_LIST_CACHE, 0
-	for _, dataset in ipairs(D.GetDatasetList()) do
+	for _, dataset in ipairs(X.IsRestricted('MY_TargetMon') and X.CONSTANT.EMPTY_TABLE or D.GetDatasetList()) do
 		local dwTarType, dwTarID = D.GetTarget(dataset.szTarget, dataset.szType)
 		local KObject = X.GetTargetHandle(dwTarType, dwTarID)
 		local dwTarKungfuID = KObject
@@ -867,6 +863,12 @@ X.RegisterEvent('LOADING_ENDING', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY', 'MY_TargetMonData', onTargetMonReload)
 X.RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY', 'MY_TargetMonData', onTargetMonReload)
+X.RegisterEvent('MY_RESTRICTION', function()
+	if arg0 and arg0 ~= 'MY_TargetMon' then
+		return
+	end
+	onTargetMonReload()
+end)
 
 X.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_TargetMonData', function()
 	local dwID = arg0

@@ -13,12 +13,12 @@ local PLUGIN_NAME = 'MY_LifeBar'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_LifeBar'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function SchemaRelationForce(itemschema)
 	return X.Schema.Map(

@@ -14,16 +14,14 @@ local PLUGIN_NAME = 'MY_TeamMon'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_TeamMon_CircleLine'
 local _L = X.LoadLangPack(PLUGIN_ROOT .. '/lang/')
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 	return
 end
--- if X.IS_EXP and not X.AssertDLC('MY_TeamMon') then
--- 	return
--- end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+--------------------------------------------------------------------------------
 X.RegisterRestriction('MY_TeamMon_CircleLine', { ['*'] = true })
---------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local TARGET = TARGET
 local INI_SHADOW          = X.PACKET_INFO.UI_COMPONENT_ROOT .. 'Shadow.ini'
 local CIRCLE_MAX_RADIUS   = 30    -- ×î´óµÄ°ë¾¶
