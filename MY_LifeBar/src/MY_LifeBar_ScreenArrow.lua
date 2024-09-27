@@ -298,7 +298,7 @@ function D.OnBreathe()
 					oo:DrawBackGround()
 				end
 				oo:DrawLifeBar(fLifePer, fManaPer):DrawText(txt, szName):DrawArrow()
-				if X.IsPlayer(dwID) then
+				if dwType == TARGET.PLAYER then
 					local dwMountKungfuID = -1
 					if dwID == X.GetClientPlayerID() then
 						dwMountKungfuID = UI_GetPlayerMountKungfuID()
