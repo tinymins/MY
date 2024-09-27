@@ -667,7 +667,7 @@ function D.GetTip(szName)
 			end
 			table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 			table.insert(tTip, GetFormatText(_L('Player ID: %d', tInfo.dwID or 0), 102))
-			if X.IsDebugClient(true) then
+			if X.IsDebugging() then
 				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 				table.insert(tTip, GetFormatText(_L('Player GUID: %s', tInfo.szGlobalID or 0), 102))
 			end
@@ -1335,7 +1335,7 @@ end)
 -- end)
 
 X.RegisterChatPlayerAddonMenu('MY_Farbnamen', function(szName)
-	if not (IsCtrlKeyDown() and X.IsDebugClient(true)) then
+	if not (IsCtrlKeyDown() and X.IsDebugging()) then
 		return
 	end
 	return {

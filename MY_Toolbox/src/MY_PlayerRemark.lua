@@ -325,7 +325,7 @@ function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 	})
 	nY = nY + 30
 
-	if X.IsDebugClient(true) then
+	if X.IsDebugging() then
 		nX = nPaddingX
 		ui:Append('Text', { x = nX, y = nY, text = _L['GUID:'] })
 		nX = nX + 80

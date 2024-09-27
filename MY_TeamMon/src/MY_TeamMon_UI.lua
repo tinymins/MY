@@ -196,7 +196,7 @@ function D.OnFrameCreate()
 		end,
 	})
 	-- debug
-	if X.IsDebugClient(true) then
+	if X.IsDebugging() then
 		ui:Append('WndButton', { text = 'Reload', x = 10, y = 10, onClick = ReloadUIAddon })
 		ui:Append('WndButton', {
 			name = 'On', text = 'Enable', x = 110, y = 10, enable = not MY_TeamMon.bEnable,
@@ -649,7 +649,7 @@ function D.OnItemRButtonClick()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
-			if X.IsClientPlayerTeamLeader() or X.IsDebugClient(true) then
+			if X.IsClientPlayerTeamLeader() or X.IsDebugging() then
 				MY_TeamMon.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_TEAM_MON_SHARE', {MY_TEAM_MON__UI__SELECT_TYPE, t.dwMapID, t})
 				X.OutputAnnounceMessage(g_tStrings.STR_MAIL_SUCCEED)
 			else

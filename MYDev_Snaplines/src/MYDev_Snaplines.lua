@@ -420,7 +420,7 @@ X.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
 -- ×¢²áÃæ°å
 X.Panel.Register(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/UICommon/PlugIn.UITex|1', {
 	IsRestricted = function()
-		return not X.IsDebugClient('Dev_Snaplines')
+		return not X.IsDebugging('Dev_Snaplines')
 	end,
 	OnPanelActive = function(wnd)
 		local ui = X.UI(wnd)

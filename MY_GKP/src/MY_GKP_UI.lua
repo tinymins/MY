@@ -139,7 +139,7 @@ function D.DrawAuctionPage(frame, szKey, szSort)
 			item:RegisterEvent(32)
 			if bMainInstance then
 				item.OnItemRButtonClick = function()
-					if not X.IsClientPlayerTeamDistributor() and not X.IsDebugClient('MY_GKP') then
+					if not X.IsClientPlayerTeamDistributor() and not X.IsDebugging('MY_GKP') then
 						return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 					end
 					MY_GKP_AuctionUI.Open(this:GetRoot().ds, v, 'EDIT')
@@ -193,7 +193,7 @@ function D.DrawAuctionPage(frame, szKey, szSort)
 			end
 			if bMainInstance then
 				wnd:Lookup('WndButton_Delete').OnLButtonClick = function()
-					if not X.IsClientPlayerTeamDistributor() and not X.IsDebugClient('MY_GKP') then
+					if not X.IsClientPlayerTeamDistributor() and not X.IsDebugging('MY_GKP') then
 						return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 					end
 					v.bDelete = not v.bDelete
@@ -291,7 +291,7 @@ function MY_GKP_UI.OnFrameCreate()
 		x = 20, y = 660, w = 120, text = _L['Add Manually'],
 		buttonStyle = 'FLAT_LACE_BORDER',
 		onClick = function()
-			if not X.IsClientPlayerTeamDistributor() and not X.IsDebugClient('MY_GKP') then -- debug
+			if not X.IsClientPlayerTeamDistributor() and not X.IsDebugging('MY_GKP') then -- debug
 				return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			MY_GKP_AuctionUI.Open(this:GetRoot().ds)
@@ -307,14 +307,14 @@ function MY_GKP_UI.OnFrameCreate()
 		onClick = function()
 			local ds = this:GetRoot().ds
 			local me = X.GetClientPlayer()
-			if not me.IsInParty() and not X.IsDebugClient('MY_GKP') then
+			if not me.IsInParty() and not X.IsDebugging('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
 			local team = GetClientTeam()
 			if X.IsEmpty(ds:GetAuctionList()) then
 				return X.Alert('MY_GKP_UI', _L['No Record'])
 			end
-			if not X.IsClientPlayerTeamDistributor() and not X.IsDebugClient('MY_GKP') then
+			if not X.IsClientPlayerTeamDistributor() and not X.IsDebugging('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			GetUserInput(_L['Total Amount of People with Output Settle Account'],function(num)
@@ -423,7 +423,7 @@ function MY_GKP_UI.OnFrameCreate()
 			end
 			local ds = this:GetRoot().ds
 			local me = X.GetClientPlayer()
-			if not me.IsInParty() and not X.IsDebugClient('MY_GKP') then
+			if not me.IsInParty() and not X.IsDebugging('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
 			local tAuction = ds:GetAuctionPlayerSum()
@@ -431,7 +431,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if X.IsEmpty(tAuction) then
 				return X.Alert('MY_GKP_UI', _L['No Record'])
 			end
-			if not X.IsClientPlayerTeamDistributor() and not X.IsDebugClient('MY_GKP') then
+			if not X.IsClientPlayerTeamDistributor() and not X.IsDebugging('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			-- 处理数据
@@ -466,10 +466,10 @@ function MY_GKP_UI.OnFrameCreate()
 			end
 			local ds = this:GetRoot().ds
 			local me = X.GetClientPlayer()
-			if not me.IsInParty() and not X.IsDebugClient('MY_GKP') then
+			if not me.IsInParty() and not X.IsDebugging('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not in the team.'])
 			end
-			if not X.IsClientPlayerTeamDistributor() and not X.IsDebugClient('MY_GKP') then
+			if not X.IsClientPlayerTeamDistributor() and not X.IsDebugging('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
 			local tAuction = ds:GetAuctionPlayerSum()
@@ -621,7 +621,7 @@ function MY_GKP_UI.OnFrameCreate()
 			local me = X.GetClientPlayer()
 			if not me.IsInParty() then
 				X.Alert('MY_GKP_UI', _L['You are not in the team.'])
-			elseif not X.IsClientPlayerTeamDistributor() and not X.IsDebugClient('MY_GKP') then
+			elseif not X.IsClientPlayerTeamDistributor() and not X.IsDebugging('MY_GKP') then
 				X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			else
 				local menu = MY_GKP.GetTeamMemberMenu(function(v)

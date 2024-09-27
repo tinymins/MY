@@ -539,7 +539,7 @@ function D.SyncTeam(info)
 			X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 		elseif not X.IsClientPlayerInParty() then
 			X.Alert(_L['You are not in the team.'])
-		elseif not X.IsClientPlayerTeamLeader() and not X.IsDebugClient(true) then
+		elseif not X.IsClientPlayerTeamLeader() and not X.IsDebugging() then
 			X.Alert(_L['You are not team leader.'])
 		elseif not info then
 			MY.OutputAnnounceMessage(_L['Please select one dataset first!'])

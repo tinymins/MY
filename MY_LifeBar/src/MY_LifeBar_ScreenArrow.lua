@@ -425,7 +425,7 @@ end
 
 function SA:ctor(dwID, szType, tArgs)
 	local dwType, kTarget = D.GetObject(szType, dwID)
-	if not X.IsDebugClient(true) and not X.IsInDungeonMap(true) then
+	if not X.IsDebugging() and not X.IsInDungeonMap(true) then
 		if dwType == TARGET.NPC and kTarget.bDialogFlag then
 			return
 		end

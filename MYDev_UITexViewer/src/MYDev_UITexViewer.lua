@@ -96,7 +96,7 @@ end
 
 X.Panel.Register(_L['Development'], 'Dev_UITexViewer', _L['UITexViewer'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
 	IsRestricted = function()
-		return not X.IsDebugClient('Dev_UITexViewer')
+		return not X.IsDebugging('Dev_UITexViewer')
 	end,
 	OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = _Cache.OnPanelDeactive
 })

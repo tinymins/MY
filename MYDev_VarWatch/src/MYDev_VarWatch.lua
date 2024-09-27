@@ -73,7 +73,7 @@ end
 
 X.Panel.Register(_L['Development'], 'Dev_VarWatch', _L['VarWatch'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
 	IsRestricted = function()
-		return not X.IsDebugClient('Dev_VarWatch')
+		return not X.IsDebugging('Dev_VarWatch')
 	end,
 	OnPanelActive = function(wnd)
 		local ui = X.UI(wnd)

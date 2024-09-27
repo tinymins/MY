@@ -1183,14 +1183,14 @@ end
 
 function D.AuthCheck(dwDoodadID, bIgnoreLootMode)
 	-- 需要自己是分配者
-	if not X.IsClientPlayerTeamDistributor() and not X.IsDebugClient('MY_GKP') then
+	if not X.IsClientPlayerTeamDistributor() and not X.IsDebugging('MY_GKP') then
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.ERROR_LOOT_DISTRIBUTE)
 		return false
 	end
 	local team = GetClientTeam()
 	-- 需要分配者模式
 	local nLootMode = team.nLootMode
-	if not bIgnoreLootMode and nLootMode ~= PARTY_LOOT_MODE.DISTRIBUTE and not X.IsDebugClient('MY_GKP') then
+	if not bIgnoreLootMode and nLootMode ~= PARTY_LOOT_MODE.DISTRIBUTE and not X.IsDebugging('MY_GKP') then
 		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.GOLD_CHANGE_DISTRIBUTE_LOOT)
 		return false
 	end

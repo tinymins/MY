@@ -1158,7 +1158,7 @@ function D.OnLButtonClick()
 			X.Panel.Focus()
 			X.Panel.SwitchTab('MY_Cataclysm')
 		end })
-		if X.IsDebugClient(true) then
+		if X.IsDebugging() then
 			table.insert(menu, { bDevide = true })
 			table.insert(menu, { szOption = 'DEBUG', bCheck = true, bChecked = DEBUG, fnAction = function()
 				DEBUG = not DEBUG

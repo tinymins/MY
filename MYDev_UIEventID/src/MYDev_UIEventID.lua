@@ -71,7 +71,7 @@ end
 
 X.Panel.Register(_L['Development'], 'Dev_UIEventID', _L['UIEventID'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
 IsRestricted = function()
-	return not X.IsDebugClient('Dev_UIEventID')
+	return not X.IsDebugging('Dev_UIEventID')
 end,
 OnPanelActive = function(wnd)
 	local ui = X.UI(wnd)
