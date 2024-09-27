@@ -24,6 +24,9 @@ local INI_FILE = X.PACKET_INFO.ROOT .. 'MY_TargetMon/ui/MY_TargetMon_PS.ini'
 local D = {}
 
 function D.OpenPanel()
+	if X.IsRestricted('MY_TargetMon') then
+		return
+	end
 	X.UI.OpenFrame(INI_FILE, 'MY_TargetMon_PS')
 end
 

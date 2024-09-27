@@ -3404,6 +3404,9 @@ function D.TogglePanel()
 	end
 end
 function D.OpenPanel(szType)
+	if X.IsRestricted('MY_TeamMon') then
+		return
+	end
 	if not D.IsOpened() then
 		if szType then
 			MY_TEAM_MON__UI__SELECT_TYPE = szType

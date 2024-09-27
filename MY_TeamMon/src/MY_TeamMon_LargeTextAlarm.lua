@@ -20,7 +20,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
-X.RegisterRestriction('MY_TeamMon_LargeTextAlarm', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_TeamMon_LargeTextAlarm', { ['*'] = true, intl = false, exp = true })
 --------------------------------------------------------------------------------
 
 local INI_FILE = X.PACKET_INFO.ROOT ..  'MY_TeamMon/ui/MY_TeamMon_LargeTextAlarm.ini'
