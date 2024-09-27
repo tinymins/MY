@@ -794,6 +794,7 @@ X.Panel.Register(_L['Raid'], 'MY_LifeBar_ScreenArrow', _L['MY_LifeBar_ScreenArro
 
 function D.Init()
 	HANDLE = X.UI.HandlePool(X.UI.GetShadowHandle('ScreenArrow'), FormatHandle(string.rep('<shadow></shadow>', 6)))
+	SetUIScale()
 	X.BreatheCall('ScreenArrow_Sort', 500, D.OnSort)
 end
 
