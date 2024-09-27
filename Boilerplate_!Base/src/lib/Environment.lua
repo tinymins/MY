@@ -66,45 +66,47 @@ function X.RegisterRestriction(szKey, tBranchRestricted)
 	RESTRICTION[szKey] = bRestricted
 end
 
+-- 设置功能在当前分支是否已屏蔽
+---@param szKey string @功能名称
+---@param bRestricted boolean @功能是否被屏蔽
+function X.SetRestricted(szKey, bRestricted)
+	-- 设置值
+	if not X.IsNil(bRestricted) then
+		bRestricted = not not bRestricted
+	end
+	if RESTRICTION[szKey] == bRestricted then
+		return
+	end
+	RESTRICTION[szKey] = bRestricted
+	-- 发起事件通知
+	local szEvent = X.NSFormatString('{$NS}.RESTRICTION')
+	if szKey == '!' then
+		for k, _ in pairs(DELAY_EVENT) do
+			X.DelayCall(k, false)
+		end
+		DELAY_EVENT = {}
+		szKey = nil
+	else
+		szEvent = szEvent .. '.' .. szKey
+	end
+	X.DelayCall(szEvent, 75, function()
+		if X.Panel.IsOpened() then
+			X.Panel.Reopen()
+		end
+		DELAY_EVENT[szEvent] = nil
+		FireUIEvent(X.NSFormatString('{$NS}_RESTRICTION'), szKey)
+	end)
+	DELAY_EVENT[szEvent] = true
+end
+
 -- 获取功能在当前分支是否已屏蔽
 ---@param szKey string @功能名称
 ---@return boolean @功能是否被屏蔽
-function X.IsRestricted(szKey, ...)
-	if select('#', ...) == 1 then
-		-- 设置值
-		local bRestricted = ...
-		if not X.IsNil(bRestricted) then
-			bRestricted = not not bRestricted
-		end
-		if RESTRICTION[szKey] == bRestricted then
-			return
-		end
-		RESTRICTION[szKey] = bRestricted
-		-- 发起事件通知
-		local szEvent = X.NSFormatString('{$NS}.RESTRICTION')
-		if szKey == '!' then
-			for k, _ in pairs(DELAY_EVENT) do
-				X.DelayCall(k, false)
-			end
-			DELAY_EVENT = {}
-			szKey = nil
-		else
-			szEvent = szEvent .. '.' .. szKey
-		end
-		X.DelayCall(szEvent, 75, function()
-			if X.Panel.IsOpened() then
-				X.Panel.Reopen()
-			end
-			DELAY_EVENT[szEvent] = nil
-			FireUIEvent(X.NSFormatString('{$NS}_RESTRICTION'), szKey)
-		end)
-		DELAY_EVENT[szEvent] = true
-	else
-		if not X.IsNil(RESTRICTION['!']) then
-			return RESTRICTION['!']
-		end
-		return RESTRICTION[szKey] or false
+function X.IsRestricted(szKey)
+	if not X.IsNil(RESTRICTION['!']) then
+		return RESTRICTION['!']
 	end
+	return RESTRICTION[szKey] or false
 end
 end
 
