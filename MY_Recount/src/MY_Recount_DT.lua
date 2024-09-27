@@ -151,7 +151,7 @@ function MY_Recount_DT.OnFrameCreate()
 		if frame and frame:IsValid() then
 			return true
 		else
-			X.RegisterEsc(frame:GetName())
+			X.RegisterEsc(frame:GetName(), false)
 		end
 	end
 	local function onEsc()
@@ -159,7 +159,7 @@ function MY_Recount_DT.OnFrameCreate()
 			frame.szSelectedSkill  = nil
 			frame.szSelectedTarget = nil
 		else
-			X.RegisterEsc(frame:GetName())
+			X.RegisterEsc(frame:GetName(), false)
 			X.UI.CloseFrame(frame)
 		end
 	end
@@ -459,7 +459,7 @@ end
 function MY_Recount_DT.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
-		X.RegisterEsc(this:GetRoot():GetTreePath())
+		X.RegisterEsc(this:GetRoot():GetTreePath(), false)
 		X.UI.CloseFrame(this:GetRoot())
 	elseif name == 'Btn_Switch' then
 		if this:GetRoot().szPrimarySort == DK_REC_STAT.SKILL then

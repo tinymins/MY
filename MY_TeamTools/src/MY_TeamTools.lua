@@ -277,7 +277,7 @@ function Framework.OnFrameDestroy()
 		end
 	end
 	PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-	X.RegisterEsc('MY_TeamTools')
+	X.RegisterEsc('MY_TeamTools', false)
 end
 
 function Framework.OnEvent(event)

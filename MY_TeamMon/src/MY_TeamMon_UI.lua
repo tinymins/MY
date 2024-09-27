@@ -3421,7 +3421,7 @@ function D.ClosePanel()
 		FireUIEvent('MY_TEAM_MON__UI__FREE_CACHE')
 		X.UI.CloseFrame(D.GetFrame())
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-		X.RegisterEsc('MY_TeamMon')
+		X.RegisterEsc('MY_TeamMon', false)
 	end
 end
 

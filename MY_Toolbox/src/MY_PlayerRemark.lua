@@ -292,7 +292,7 @@ function D.OpenPlayerRemarkEditPanel(szServerName, dwID, szName, szGlobalID)
 	})
 
 	ui:Remove(function()
-		X.RegisterEsc('MY_PlayerRemark_Edit_' .. GetStringCRC(szServerName) ..  '_' .. dwID)
+		X.RegisterEsc('MY_PlayerRemark_Edit_' .. GetStringCRC(szServerName) ..  '_' .. dwID, false)
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end)
 
