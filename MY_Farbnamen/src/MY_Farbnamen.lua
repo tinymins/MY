@@ -801,7 +801,8 @@ function D.GetPlayerInfo(xKey)
 		if tPlayer.szName and tPlayer.szServerName then
 			PLAYER_INFO[X.AssemblePlayerGlobalName(tPlayer.szName, tPlayer.szServerName)] = tPlayer
 		end
-		if X.IS_CLASSIC and tPlayer.dwTime < 1725552000 then
+		-- 缘起兼容
+		if X.IS_CLASSIC then
 			tPlayer.szGlobalID = '0'
 		end
 		if X.IsGlobalID(tPlayer.szGlobalID) then
@@ -857,6 +858,10 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 		elseif not szServerName and dwID ~= 0 and not IsRemotePlayer(dwID) then
 			szServerName = X.GetServerOriginName()
 		end
+	end
+	-- 缘起兼容
+	if X.IS_CLASSIC then
+		szGlobalID = '0'
 	end
 	-- 更新角色信息缓存
 	local tPlayer
