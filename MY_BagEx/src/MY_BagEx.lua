@@ -174,7 +174,7 @@ function D.ItemDescSorter(a, b)
 	-- 相同限时物品先消失的放前面
 	local nExpireTimeA = a.nExpireTime == 0 and math.huge or a.nExpireTime
 	local nExpireTimeB = b.nExpireTime == 0 and math.huge or b.nExpireTime
-	if nExpireTimeA ~= nExpireTimeB then
+	if not X.IsEquals(nExpireTimeA, nExpireTimeB) then
 		return nExpireTimeA < nExpireTimeB
 	end
 	-- 按堆叠数量排序
