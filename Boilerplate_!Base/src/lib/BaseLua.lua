@@ -219,28 +219,33 @@ function X.IsEmpty(var)
 end
 
 -- 深度判断相等
----@param o1 any @需要判断的数据1
----@param o2 any @需要判断的数据2
+---@param var1 any @需要判断的数据1
+---@param var2 any @需要判断的数据2
 ---@return boolean @是否相等
-function X.IsEquals(o1, o2)
-	if o1 == o2 then
+function X.IsEquals(var1, var2)
+	if var1 == var2 then
 		return true
-	elseif type(o1) ~= type(o2) then
+	end
+	if type(var1) ~= type(var2) then
 		return false
-	elseif type(o1) == 'number' then
-		if X.IsHugeNumber(o1) and X.IsHugeNumber(o2) then
+	end
+	local tp = type(var1)
+	if tp == 'number' then
+		if X.IsHugeNumber(var1) and X.IsHugeNumber(var2) then
 			return true
 		end
-	elseif type(o1) == 'table' then
+		return false
+	end
+	if tp == 'table' then
 		local t = {}
-		for k, v in pairs(o1) do
-			if X.IsEquals(o1[k], o2[k]) then
+		for k, v in pairs(var1) do
+			if X.IsEquals(var1[k], var2[k]) then
 				t[k] = true
 			else
 				return false
 			end
 		end
-		for k, v in pairs(o2) do
+		for k, v in pairs(var2) do
 			if not t[k] then
 				return false
 			end
