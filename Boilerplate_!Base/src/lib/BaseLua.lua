@@ -227,6 +227,10 @@ function X.IsEquals(o1, o2)
 		return true
 	elseif type(o1) ~= type(o2) then
 		return false
+	elseif type(o1) == 'number' then
+		if X.IsHugeNumber(o1) and X.IsHugeNumber(o2) then
+			return true
+		end
 	elseif type(o1) == 'table' then
 		local t = {}
 		for k, v in pairs(o1) do
