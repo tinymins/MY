@@ -397,7 +397,7 @@ function PS.OnPanelActive(wnd)
 
 	-- 颜色设置
 	ui:Append('WndComboBox', {
-		x = nX, y = nY, text = _L['Color config'],
+		x = nX, y = nY, w = 220, text = _L['Color config'],
 		menu = function()
 			local t = {}
 			local tColor = Config.Color
@@ -616,7 +616,7 @@ function PS.OnPanelActive(wnd)
 
 	-- 显示名字
 	ui:Append('WndComboBox', {
-		x = nX, y = nY, text = _L['Name display config'],
+		x = nX, y = nY, w = 220, text = _L['Name display config'],
 		menu = function()
 			return GeneBooleanPopupMenu('ShowName', _L['Player name display'], _L['Npc name display'])
 		end,
@@ -626,7 +626,7 @@ function PS.OnPanelActive(wnd)
 
 	-- 称号
 	ui:Append('WndComboBox', {
-		x = nX, y = nY, text = _L['Title display config'],
+		x = nX, y = nY, w = 220, text = _L['Title display config'],
 		menu = function()
 			return GeneBooleanPopupMenu('ShowTitle', _L['Player title display'], _L['Npc title display'])
 		end,
@@ -636,7 +636,7 @@ function PS.OnPanelActive(wnd)
 
 	-- 帮会
 	ui:Append('WndComboBox', {
-		x = nX, y = nY, text = _L['Tong display config'],
+		x = nX, y = nY, w = 220, text = _L['Tong display config'],
 		menu = function()
 			return GeneBooleanPopupMenu('ShowTong', _L['Player tong display'])
 		end,
@@ -646,7 +646,7 @@ function PS.OnPanelActive(wnd)
 
 	-- 血条设置
 	ui:Append('WndComboBox', {
-		x = nX, y = nY, text = _L['Lifebar display config'],
+		x = nX, y = nY, w = 220, text = _L['Lifebar display config'],
 		menu = function()
 			local t = GeneBooleanPopupMenu('ShowLife', _L['Player lifebar display'], _L['Npc lifebar display'])
 			table.insert(t, { bDevide = true })
@@ -672,7 +672,7 @@ function PS.OnPanelActive(wnd)
 
 	-- 显示血量%
 	ui:Append('WndComboBox', {
-		x = nX, y = nY, text = _L['Lifepercentage display config'],
+		x = nX, y = nY, w = 220, text = _L['Lifepercentage display config'],
 		menu = function()
 			local t = GeneBooleanPopupMenu('ShowLifePer', _L['Player lifepercentage display'], _L['Npc lifepercentage display'])
 			table.insert(t, { bDevide = true })
@@ -692,7 +692,7 @@ function PS.OnPanelActive(wnd)
 
 	-- 显示对话泡泡
 	ui:Append('WndComboBox', {
-		x = nX, y = nY, text = _L['Balloon display config'],
+		x = nX, y = nY, w = 220, text = _L['Balloon display config'],
 		menu = function()
 			local t = {}
 			local tShowBalloon = Config.ShowBalloon
@@ -772,7 +772,7 @@ function PS.OnPanelActive(wnd)
 
 	-- 当前阵营
 	ui:Append('WndComboBox', {
-		x = nX, y = nY, text = _L['Set current camp'],
+		x = nX, y = nY, w = 220, text = _L['Set current camp'],
 		menu = function()
 			return {{
 				szOption = _L['Auto detect'],
@@ -826,7 +826,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoEnable = function() return D.IsEnabled() end,
 	})
-	ui:Append('Text', { text = _L['Lifebar border color'], x = nX + 27, y = nY - 2 })
+	ui:Append('Text', { text = _L['Lifebar border color'], x = nX + 25, y = nY + 2 })
 
 	nX = nPaddingX
 	nY = nY + nLH - 10
@@ -934,7 +934,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	ui:Append('WndButton', {
-		x = nX + 180, y = nY, w = 'auto',
+		x = nX + 180, y = nY, w = 25, h = 25,
 		buttonStyle = 'OPTION',
 		menu = function()
 			local m = { szOption = _L['Decimal number'] }
