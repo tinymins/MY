@@ -334,8 +334,10 @@ function D.Export(szExportFile, aMsgType, nPerSec, onProgress)
 			for i, rec in ipairs(data) do
 				local f = GetMsgFont(rec.szMsgType)
 				local r, g, b = unpack(MSG_TYPE_COLOR[rec.szMsgType])
+				Log(szExportFile, '<div class="message-item">')
 				Log(szExportFile, convertXml2Html(X.GetChatTimeXML(rec.nTime, {r=r, g=g, b=b, f=f, s='[%yyyy/%MM/%dd][%hh:%mm:%ss]'})))
 				Log(szExportFile, convertXml2Html(rec.szMsg))
+				Log(szExportFile, '</div>')
 			end
 			if onProgress then
 				onProgress(_L['exporting'], nPage / nPageCount)
