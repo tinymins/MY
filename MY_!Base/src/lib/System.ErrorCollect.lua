@@ -13,15 +13,23 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/System.ErrorCollect')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
-do
-local FILE_PATH = {'temporary/lua_error.jx3dat', X.PATH_TYPE.GLOBAL}
-local LAST_ERROR_MSG = X.LoadLUAData(FILE_PATH, { passphrase = false }) or {}
-local ERROR_MSG = {}
+local ERROR_FILE = X.FormatPath({'temporary/lua_error.jx3dat', X.PATH_TYPE.GLOBAL})
+local ERROR_LIST = X.LoadLUAData(ERROR_FILE, { passphrase = false })
+local MAX_MSG_COUNT = 30
+
+if not (X.IsTable(ERROR_LIST) and ERROR_LIST.VERSION == 1) then
+	ERROR_LIST = { VERSION = 1 }
+end
 
 if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 	local KEY = '/' .. X.StringReplaceW(X.PACKET_INFO.ROOT, '\\', '/'):gsub('/+$', ''):gsub('^.*/', ''):lower() .. '/'
 	local function SaveErrorMessage()
-		X.SaveLUAData(FILE_PATH, ERROR_MSG, { encoder = 'luatext', passphrase = false, crc = false, indent = '\t' })
+		X.SaveLUAData(ERROR_FILE, ERROR_LIST, {
+			encoder = 'luatext',
+			passphrase = false,
+			crc = false,
+			indent = '\t',
+		})
 	end
 	local BROKEN_KGUI = IsDebugClient() and not X.IsDebugServer() and not X.IsDebugging()
 	local BROKEN_KGUI_ECHO = false
@@ -39,7 +47,19 @@ if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 				BROKEN_KGUI_ECHO = false
 			end
 			X.Log('CALL_LUA_ERROR', szMsg)
-			table.insert(ERROR_MSG, szMsg)
+			local tError = {}
+			for i, v in ipairs(ERROR_LIST) do
+				if v.szMsg == szMsg then
+					tError = table.remove(ERROR_LIST, i)
+				end
+			end
+			tError.szMsg = szMsg
+			tError.nCount = (tError.nCount or 0) + 1
+			tError.szTime = X.FormatTime(GetCurrentTime(), '%yyyy/%MM/%dd %hh:%mm:%ss')
+			for i = #ERROR_LIST, MAX_MSG_COUNT do
+				table.remove(ERROR_LIST, 1)
+			end
+			table.insert(ERROR_LIST, tError)
 		end
 		SaveErrorMessage()
 	end)
@@ -47,16 +67,15 @@ if not X.ENVIRONMENT.RUNTIME_OPTIMIZE then
 end
 
 function X.GetAddonErrorMessage()
-	local szMsg = table.concat(LAST_ERROR_MSG, '\n\n')
-	if not X.IsEmpty(szMsg) then
-		szMsg = szMsg .. '\n\n'
+	local aMsg = {}
+	for _, v in X.ipairs_r(ERROR_LIST) do
+		table.insert(aMsg,  v.szTime .. ' x' .. v.nCount .. '\n' .. v.szMsg)
 	end
-	return szMsg .. table.concat(ERROR_MSG, '\n\n')
+	return table.concat(aMsg, '\n\n')
 end
 
 function X.GetAddonErrorMessageFilePath()
-	return X.FormatPath(FILE_PATH)
-end
+	return ERROR_FILE
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
