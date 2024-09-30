@@ -71,6 +71,14 @@ local DBD_RI = X.SQLitePrepare(DB, 'SELECT templateid, poskey, mapid, x, y, z, n
 local DBD_RN = X.SQLitePrepare(DB, 'SELECT templateid, poskey, mapid, x, y, z, name FROM DoodadInfo WHERE name LIKE ?')
 local DBD_RNM = X.SQLitePrepare(DB, 'SELECT templateid, poskey, mapid, x, y, z, name FROM DoodadInfo WHERE name LIKE ? AND mapid = ?')
 
+local O = X.CreateUserSettingsModule('MY_MiddleMapMark', _L['General'], {
+	bMiddleMapSearch = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_MiddleMapMark'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
+})
 local D = {}
 
 ---------------------------------------------------------------
@@ -598,7 +606,7 @@ end
 X.RegisterFrameCreate('MiddleMap', 'MY_MiddleMapMark', D.HookEdit)
 
 function D.Hook()
-	if X.IsRestricted('MY_MiddleMapMark') then
+	if X.IsRestricted('MY_MiddleMapMark') or not O.bMiddleMapSearch then
 		return
 	end
 	D.HookEdit()
@@ -851,9 +859,26 @@ function PS.OnPanelActive(wnd)
 	ui:Append('WndEditBox', {
 		name = 'WndEdit_Search',
 		x = nX, y = nY,
-		w = nW, h = 25,
+		w = nW - 25, h = 25,
 		onChange = function(szText)
 			UpdateList(szText)
+		end,
+	})
+	ui:Append('WndButton', {
+		x = nX + nW - 25, y = nY, w = 25, h = 25,
+		buttonStyle = 'OPTION',
+		menu = function()
+			return {
+				{
+					szOption = _L['Show search in middle map panel'],
+					bCheck = true, bChecked = O.bMiddleMapSearch,
+					fnAction = function()
+						O.bMiddleMapSearch = not O.bMiddleMapSearch
+						D.Unhook()
+						D.Hook()
+					end,
+				},
+			}
 		end,
 	})
 	nY = nY + 25
@@ -909,6 +934,6 @@ function PS.OnPanelResize(wnd)
 	ui:Children('#WndEdit_Search'):Size(nW - 26, 25)
 end
 
-X.Panel.Register(_L['General'], 'MY_MiddleMapMark', _L['middle map mark'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)
+X.Panel.Register(_L['General'], 'MY_MiddleMapMark', _L['MY_MiddleMapMark'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
