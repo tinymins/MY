@@ -15,7 +15,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 local ERROR_FILE = X.FormatPath({'temporary/lua_error.jx3dat', X.PATH_TYPE.GLOBAL})
 local ERROR_LIST = X.LoadLUAData(ERROR_FILE, { passphrase = false })
-local MAX_MSG_COUNT = 100
+local MAX_MSG_COUNT = 30
 
 if not (X.IsTable(ERROR_LIST) and ERROR_LIST.VERSION == 1) then
 	ERROR_LIST = { VERSION = 1 }
