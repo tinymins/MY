@@ -145,7 +145,7 @@ local SA_POINT_C = {}
 local SA_POINT = {}
 local BASE_POINT_START
 local function SetUIScale()
-	local fScale = Station.GetMaxUIScale() * O.fUIScale
+	local fScale = Station.GetMaxUIScale() * (D.bReady and O.fUIScale or 0.8)
 	UI_SCALE = Station.GetUIScale()
 	FORCE_DRAW = true
 	BASE_PEAK = -60 * fScale * 0.5
