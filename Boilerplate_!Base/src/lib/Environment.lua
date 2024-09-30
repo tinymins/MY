@@ -121,7 +121,6 @@ local DELAY_EVENT = {}
 local DEBUG = { ['*'] = X.PACKET_INFO.DEBUG_LEVEL <= X.DEBUG_LEVEL.DEBUG }
 -- 获取特定功能是否处于测试状态
 ---@param szKey string? @特定功能名称
----@param bDebug boolean? @当传入 szKey 时表示设置特定功能是否处于测试状态，当未传入 szKey 时表示获取
 ---@return boolean @特定功能是否处于测试状态
 function X.IsDebugging(szKey)
 	if not X.IsString(szKey) then
