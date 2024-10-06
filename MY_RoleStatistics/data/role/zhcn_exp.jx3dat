@@ -117,6 +117,9 @@ return function(env)
 				if not v2 then
 					return 1
 				end
+				if v1.current == v2.current then
+					return 0
+				end
 				return v1.current > v2.current and 1 or -1
 			end,
 			GetFormatText = function(v, rec)
@@ -157,6 +160,9 @@ return function(env)
 				end
 				if not v2 then
 					return 1
+				end
+				if v1.current == v2.current then
+					return 0
 				end
 				return v1.current > v2.current and 1 or -1
 			end,
