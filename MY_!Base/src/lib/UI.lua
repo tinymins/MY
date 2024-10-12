@@ -367,6 +367,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onCustomLayout            then ui:CustomLayout     (arg.onCustomLayout, arg.customLayoutPoint       ) end
 		if arg.onColumnsChange           then ui:Columns          (arg.onColumnsChange                             ) end
 		if arg.onSortChange              then ui:Sort             (arg.onSortChange                                ) end
+		if arg.onRemove                  then ui:Remove           (arg.onRemove                                    ) end
 		if arg.events             ~= nil then for _, v in ipairs(arg.events      ) do ui:Event       (X.Unpack(v)) end end
 		if arg.uiEvents           ~= nil then for _, v in ipairs(arg.uiEvents    ) do ui:UIEvent     (X.Unpack(v)) end end
 		if arg.listBox            ~= nil then for _, v in ipairs(arg.listBox     ) do ui:ListBox     (X.Unpack(v)) end end
@@ -6432,21 +6433,24 @@ function X.UI.CreateFrame(szName, opt)
 	frm:ChangeRelation(opt.level)
 	frm:Show()
 	local ui = X.UI(frm)
+	local function RemoveFrame()
+		if X.UI(frm):Remove():Count() == 0 then
+			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+			return true
+		end
+		return false
+	end
 	-- init frame
 	if opt.esc then
-		X.RegisterEsc('Frame_Close_' .. szName, function()
-			return true
-		end, function()
-			if frm.OnCloseButtonClick then
-				local status, res = X.CallWithThis(frm, frm.OnCloseButtonClick)
-				if status and res then
-					return
+		X.RegisterEsc(
+			'Frame_Close_' .. szName,
+			function() return true end,
+			function()
+				if RemoveFrame() then
+					X.RegisterEsc('Frame_Close_' .. szName, false)
 				end
 			end
-			X.UI.CloseFrame(frm)
-			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-			X.RegisterEsc('Frame_Close_' .. szName, false)
-		end)
+		)
 	end
 	if opt.simple then
 		SetComponentProp(frm, 'simple', true)
@@ -6455,9 +6459,7 @@ function X.UI.CreateFrame(szName, opt)
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
 		else
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close').OnLButtonClick = function()
-				if X.UI(frm):Remove():Count() == 0 then
-					PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-				end
+				RemoveFrame()
 			end
 		end
 		if not opt.setting then
