@@ -1523,6 +1523,9 @@ function D.OpenSettingPanel(data, szType)
 	local function RedrawPanel()
 		D.OpenSettingPanel(data, szType)
 	end
+	X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_UI__OpenSettingPanel', function()
+		RedrawPanel()
+	end)
 	local function GetPatternName()
 		if szType == 'BUFF' or szType == 'DEBUFF' then
 			return '{$B' .. data.dwID .. '}'
@@ -1807,7 +1810,12 @@ function D.OpenSettingPanel(data, szType)
 	elseif szType == 'CHAT' then
 		nIcon = 439
 	end
-	local ui = X.UI.CreateFrame('MY_TeamMon_SettingPanel', { w = 770, h = 450, text = szName, close = true, focus = true, esc = true })
+	local ui = X.UI.CreateFrame('MY_TeamMon_SettingPanel', {
+		w = 770, h = 450, text = szName, close = true, focus = true, esc = true,
+		onRemove = function()
+			X.RegisterEvent('MY_RESTRICTION', 'MY_TeamMon_UI__OpenSettingPanel', false)
+		end,
+	})
 	local frame = Station.Lookup('Normal/MY_TeamMon_SettingPanel')
 	ui:Event('MY_TEAM_MON__UI__DATA_RELOAD', function() ui:Remove() end)
 	ui:Event('MY_TEAM_MON__UI__SWITCH_PAGE', function() ui:Remove() end)
