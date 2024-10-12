@@ -3289,9 +3289,9 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 			end,
 		}):Pos('BOTTOMRIGHT')
-		nY = nY + 10
 		-- È¦È¦ÁÐ±í
-		if data.aCircle then
+		if not X.IsEmpty(data.aCircle) then
+			nY = nY + 10
 			for k, circle in ipairs(data.aCircle) do
 				nX = ui:Append('Shadow', {
 					x = 35, y = nY + 3, w = 23, h = 23,
@@ -3367,9 +3367,10 @@ function D.OpenSettingPanel(data, szType)
 				}):Pos('BOTTOMRIGHT')
 				nY = nY + 30
 			end
+			nY = nY + 10
 		end
 		nX = ui:Append('WndButton', {
-			x = 30, y = nY + 10,
+			x = 30, y = nY,
 			text = _L['Add circle'],
 			buttonStyle = 'FLAT',
 			enable = not (data.aCircle and #data.aCircle > 10),
