@@ -44,8 +44,6 @@ local MY_TEAM_MON__UI__GLOBAL_SEARCH = false
 local MY_TEAM_MON__UI__SEARCH_CACHE  = {}
 local MY_TEAM_MON__UI__PANEL_ANCHOR  = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 local MY_TEAM_MON__UI__ANCHOR        = {}
-local CHECKBOX_HEIGHT        = 30
-local BUTTON2_HEIGHT         = 30
 local D = {}
 
 local MY_TEAM_MON__UI__DOODAD_ICON = {
@@ -915,7 +913,7 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 	local nX, nY = ui:Append('Text', { x = 20, y = 50, text = _L['Includes'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX = 20
 	for k, v in ipairs(MY_TEAM_MON__UI__TYPE) do
-		nX = ui:Append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }):AutoWidth():Pos('BOTTOMRIGHT')
+		nX = ui:Append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }):Pos('BOTTOMRIGHT')
 	end
 	nY = 110
 	nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['File name'], font = 27 }):Pos('BOTTOMRIGHT')
@@ -946,21 +944,21 @@ function D.OpenImportPanel(szDefault, szTitle, fnAction)
 		onCheck = function()
 			szMode = 'REPLACE'
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndRadioBox', {
 		x = nX + 5, y = nY,
 		text = _L['Merge priority new file'], group = 'type',
 		onCheck = function()
 			szMode = 'MERGE_OVERWRITE'
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndRadioBox', {
 		x = nX + 5, y = nY,
 		text = _L['Merge priority old file'], group = 'type',
 		onCheck = function()
 			szMode = 'MERGE_SKIP'
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
 		buttonStyle = 'FLAT_LACE_BORDER',
@@ -1016,7 +1014,7 @@ function D.OpenExportPanel()
 	local nX, nY = ui:Append('Text', { x = 20, y = 50, text = _L['Includes'], font = 27 }):Pos('BOTTOMRIGHT')
 	nX = 20
 	for k, v in ipairs(MY_TEAM_MON__UI__TYPE) do
-		nX = ui:Append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }):AutoWidth():Pos('BOTTOMRIGHT')
+		nX = ui:Append('WndCheckBox', { name = v, x = nX + 5, y = nY, checked = true, text = _L[v] }):Pos('BOTTOMRIGHT')
 	end
 	nY = 110
 	local szAuthor = X.GetClientPlayerName()
@@ -1049,7 +1047,7 @@ function D.OpenExportPanel()
 		onCheck = function()
 			szFormat = 'LUA_ENCRYPTED'
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndRadioBox', {
 		x = nX + 5, y = nY,
 		text = _L['Lua plain'], group = 'type',
@@ -1057,7 +1055,7 @@ function D.OpenExportPanel()
 		onCheck = function()
 			szFormat = 'LUA'
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndRadioBox', {
 		x = nX + 5, y = nY,
 		text = _L['Lua formated'], group = 'type',
@@ -1065,7 +1063,7 @@ function D.OpenExportPanel()
 		onCheck = function()
 			szFormat = 'LUA_FORMATTED'
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 	nX = ui:Append('WndRadioBox', {
 		x = nX + 5, y = nY,
 		text = _L['JSON'], group = 'type',
@@ -1073,7 +1071,7 @@ function D.OpenExportPanel()
 		onCheck = function()
 			szFormat = 'JSON'
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 	nX, nY = ui:Append('WndRadioBox', {
 		x = nX + 5, y = nY,
 		text = _L['JSON formated'], group = 'type',
@@ -1081,7 +1079,7 @@ function D.OpenExportPanel()
 		onCheck = function()
 			szFormat = 'JSON_FORMATTED'
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	}):Pos('BOTTOMRIGHT')
 	ui:Append('WndButton', {
 		x = 285, y = nY + 30, text = g_tStrings.STR_HOTKEY_SURE,
 		buttonStyle = 'FLAT_LACE_BORDER',
@@ -1522,6 +1520,9 @@ end
 
 -- 设置面板
 function D.OpenSettingPanel(data, szType)
+	local function RedrawPanel()
+		D.OpenSettingPanel(data, szType)
+	end
 	local function GetPatternName()
 		if szType == 'BUFF' or szType == 'DEBUFF' then
 			return '{$B' .. data.dwID .. '}'
@@ -1909,25 +1910,28 @@ function D.OpenSettingPanel(data, szType)
 		end
 	end):Click(fnClickBox)
 
+	local CAPTION_MARGIN_TOP, CAPTION_MARGIN_BOTTOM = 4, 3
 	if szType == 'BUFF' or szType == 'DEBUFF' then
 		-- 通用
-		nX, nY = ui:Append('Text', { x = 20, y = nY, text = g_tStrings.CHANNEL_COMMON, font = 27 }):Pos('BOTTOMRIGHT')
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = g_tStrings.CHANNEL_COMMON, font = 27 })
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
 
 		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
 		uiContainer:Append('WndComboBox', {
-			w = 200, text = _L['Scrutiny type'],
+			text = _L['Scrutiny type'],
 			menu = function()
 				return GetScrutinyTypeMenu(data)
 			end,
-		}):AutoWidth()
+		})
 		uiContainer:Append('WndComboBox', {
-			w = 200, text = _L['Self kungfu requirement'],
+			text = _L['Self kungfu requirement'],
 			menu = function()
 				return GetKungFuMenu(data)
 			end,
-		}):AutoWidth()
+		})
 		uiContainer:Append('WndWindow', { w = 5, h = 30 })
-		uiContainer:Append('WndDummyWrapper'):Append('Text', { y = -3, text = _L['Buffcount achieve'] }):AutoWidth()
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Buffcount achieve'] })
 		uiContainer:Append('WndEditBox', {
 			w = 30, h = 26,
 			text = data.nCount or 1, editType = X.UI.EDIT_TYPE.NUMBER,
@@ -1938,7 +1942,7 @@ function D.OpenSettingPanel(data, szType)
 				end
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):AutoWidth()
+		})
 		uiContainer:Append('WndCheckBox', {
 			checked = data.bCheckLevel, text = _L['Check level'],
 			onCheck = function(bCheck)
@@ -1946,27 +1950,27 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 				FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
 			end,
-		}):AutoWidth()
-		nY = nY + uiContainer:Height() + 5
+		})
+		nY = nY + uiContainer:Height()
 
 		-- 获得气劲
 		local cfg = data[MY_TEAM_MON_TYPE.BUFF_GET] or {}
-		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
-		uiContainer:Append('WndDummyWrapper'):Append('Text', { y = -2, w = 'auto', text = _L['Get buff'], font = 27 }):AutoWidth()
-		uiContainer:Append('WndComboBox', {
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Get buff'], font = 27 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
 			w = 'auto', h = 25,
 			text = _L['Mark'],
 			menu = function()
 				return GetMarkMenu(MY_TEAM_MON_TYPE.BUFF_GET)
 			end,
 		})
-		uiContainer:Append('WndComboBox', {
-			w = 60, h = 25, text = _L['Voice'],
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			h = 25, text = _L['Voice'],
 			menu = function()
 				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_GET, true)
 			end,
-		}):AutoWidth()
-		nY = nY + uiContainer:Height()
+		})
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
 
 		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
 		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
@@ -1974,20 +1978,20 @@ function D.OpenSettingPanel(data, szType)
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bTeamChannel', bCheck)
 			end,
-		}):AutoWidth()
+		})
 		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 			checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bWhisperChannel', bCheck)
 			end,
-		}):AutoWidth()
+		})
 		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 				checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bCenterAlarm', bCheck)
 				end,
-			}):AutoWidth()
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
@@ -1995,7 +1999,7 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bBigFontAlarm', bCheck)
 				end,
-			}):AutoWidth()
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
@@ -2007,7 +2011,7 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bScreenHead', bCheck)
 				end,
-			}):AutoWidth()
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
@@ -2015,7 +2019,7 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bFullScreen', bCheck)
 				end,
-			}):AutoWidth()
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_PartyBuffList') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
@@ -2023,7 +2027,7 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bPartyBuffList', bCheck)
 				end,
-			}):AutoWidth()
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_BuffList') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
@@ -2031,53 +2035,53 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bBuffList', bCheck)
 				end,
-			}):AutoWidth()
+			})
 		end
 		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 			checked = cfg.bTeamPanel, text = _L['Team panel'],
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bTeamPanel', bCheck)
-				ui:Children('#bOnlySelfSrc'):Enable(bCheck)
 				FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
+				RedrawPanel()
 			end,
-		}):AutoWidth()
+		})
 		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
-			name = 'bOnlySelfSrc',
-			checked = cfg.bOnlySelfSrc, text = _L['Only source self'], enable = cfg.bTeamPanel == true,
+			checked = cfg.bOnlySelfSrc, text = _L['Only source self'],
+			enable = cfg.bTeamPanel == true,
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bOnlySelfSrc', bCheck)
 			end,
-		}):AutoWidth()
+		})
 		if not X.IsRestricted('MY_TeamMon.AutoSelect') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 				checked = cfg.bSelect, text = _L['Auto Select'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bSelect', bCheck)
 				end,
-			}):AutoWidth()
+			})
 			if szType == 'BUFF' then
 				uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 					checked = cfg.bAutoCancel, text = _L['Auto Cancel Buff'],
 					onCheck = function(bCheck)
 						SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bAutoCancel', bCheck)
 					end,
-				}):AutoWidth()
+				})
 			end
 		end
-		nY = nY + uiContainer:Height() + 5
+		nY = nY + uiContainer:Height()
 
 		-- 失去气劲
 		local cfg = data[MY_TEAM_MON_TYPE.BUFF_LOSE] or {}
-		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
-		uiContainer:Append('WndDummyWrapper'):Append('Text', { y = -2, w = 'auto', text = _L['Lose buff'], font = 27 }):AutoWidth()
-		uiContainer:Append('WndComboBox', {
-			w = 'auto', h = 25,
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Lose buff'], font = 27 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			h = 25,
 			text = _L['Voice'],
 			menu = function()
 				return GetVoiceMenu(MY_TEAM_MON_TYPE.BUFF_LOSE, true)
 			end,
 		})
-		nY = nY + uiContainer:Height()
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
 
 		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
 		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
@@ -2085,20 +2089,20 @@ function D.OpenSettingPanel(data, szType)
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bTeamChannel', bCheck)
 			end,
-		}):AutoWidth()
+		})
 		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 			checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bWhisperChannel', bCheck)
 			end,
-		}):AutoWidth()
+		})
 		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 				checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bCenterAlarm', bCheck)
 				end,
-			}):AutoWidth()
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
@@ -2106,138 +2110,153 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bBigFontAlarm', bCheck)
 				end,
-			}):AutoWidth()
+			})
 		end
-		nY = nY + uiContainer:Height() + 5
+		nY = nY + uiContainer:Height()
 	elseif szType == 'CASTING' then
-		nX, nY = ui:Append('Text', { x = 20, y = nY, text = g_tStrings.CHANNEL_COMMON, font = 27 }):Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndComboBox', {
-			x = 30, y = nY + 2, text = _L['Scrutiny type'],
+		-- 通用
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = g_tStrings.CHANNEL_COMMON, font = 27 })
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			text = _L['Scrutiny type'],
 			menu = function()
 				return GetScrutinyTypeMenu(data)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 2, text = _L['Self kungfu requirement'],
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			text = _L['Self kungfu requirement'],
 			menu = function()
 				return GetKungFuMenu(data)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = data.bCheckLevel, text = _L['Check level'],
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = data.bCheckLevel, text = _L['Check level'],
 			onCheck = function(bCheck)
 				data.bCheckLevel = bCheck and true or nil
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 				FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = data.bMonTarget, text = _L['Show target name'],
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = data.bMonTarget, text = _L['Show target name'],
 			onCheck = function(bCheck)
 				data.bMonTarget = bCheck and true or nil
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		})
+		nY = nY + uiContainer:Height()
 
 		-- 招式成功释放
 		local cfg = data[MY_TEAM_MON_TYPE.SKILL_END] or {}
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Skills cast succeed'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 160, h = 25, text = _L['Mark'],
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Skills cast succeed'], font = 27 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			h = 25, text = _L['Mark'],
 			menu = function()
 				return GetMarkMenu(MY_TEAM_MON_TYPE.SKILL_END)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			h = 25, text = _L['Voice'],
 			menu = function()
 				return GetVoiceMenu(MY_TEAM_MON_TYPE.SKILL_END)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
+		})
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.SKILL_END, 'bTeamChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.SKILL_END, 'bWhisperChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		})
 		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.SKILL_END, 'bCenterAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.SKILL_END, 'bBigFontAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
+			})
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.SKILL_END, 'bFullScreen', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
-		nY = nY + CHECKBOX_HEIGHT
+		nY = nY + uiContainer:Height()
+
 		-- local tRecipeKey = me.GetSkillRecipeKey(data.dwID, data.nLevel)
 		-- tSkillInfo = GetSkillInfo(tRecipeKey)
 		-- if tSkillInfo and tSkillInfo.CastTime ~= 0 then
 			-- 招式开始运功
 			local cfg = data[MY_TEAM_MON_TYPE.SKILL_BEGIN] or {}
-			nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Skills began to cast'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-			nX = ui:Append('WndComboBox', {
-				x = nX + 5, y = nY + 8, w = 160, h = 25, text = _L['Mark'],
+			local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+			uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Skills began to cast'], font = 27 })
+			uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+				h = 25, text = _L['Mark'],
 				menu = function()
 					return GetMarkMenu(MY_TEAM_MON_TYPE.SKILL_BEGIN)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
-			nX, nY = ui:Append('WndComboBox', {
-				x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+			})
+			uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+				h = 25, text = _L['Voice'],
 				menu = function()
 					return GetVoiceMenu(MY_TEAM_MON_TYPE.SKILL_BEGIN)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
-			nX = ui:Append('WndCheckBox', {
-				x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
+			})
+			nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+			local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bTeamChannel', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
+			})
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bWhisperChannel', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 			if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
-				nX = ui:Append('WndCheckBox', {
-					x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+				uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+					checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 					onCheck = function(bCheck)
 						SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bCenterAlarm', bCheck)
 					end,
-				}):AutoWidth():Pos('BOTTOMRIGHT')
+				})
 			end
 			if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
-				nX = ui:Append('WndCheckBox', {
-					x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
+				uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+					checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 					onCheck = function(bCheck)
 						SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bBigFontAlarm', bCheck)
 					end,
-				}):AutoWidth():Pos('BOTTOMRIGHT')
+				})
 			end
 			if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
-				nX = ui:Append('WndCheckBox', {
-					x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+				uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+					checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 					tip = {
 						render = _L['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'],
 						position = X.UI.TIP_POSITION.BOTTOM_TOP,
@@ -2245,30 +2264,35 @@ function D.OpenSettingPanel(data, szType)
 					onCheck = function(bCheck)
 						SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bScreenHead', bCheck)
 					end,
-				}):AutoWidth():Pos('BOTTOMRIGHT')
+				})
 			end
 			if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
-				nX = ui:Append('WndCheckBox', {
-					x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
+				uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+					checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 					onCheck = function(bCheck)
 						SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bFullScreen', bCheck)
 					end,
-				}):AutoWidth():Pos('BOTTOMRIGHT')
+				})
 			end
-			nY = nY + CHECKBOX_HEIGHT
+			nY = nY + uiContainer:Height()
 		-- end
 	elseif szType == 'NPC' then
 		-- 通用
-		nX, nY = ui:Append('Text', { x = 20, y = nY, text = g_tStrings.CHANNEL_COMMON, font = 27 }):Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndComboBox', {
-			x = 30, y = nY + 2, text = _L['Self kungfu requirement'],
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = g_tStrings.CHANNEL_COMMON, font = 27 })
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			text = _L['Self kungfu requirement'],
 			menu = function()
 				return GetKungFuMenu(data)
 			end,
-		}):Pos('BOTTOMRIGHT')
-		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Count achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndEditBox', {
-			x = nX + 2, y = nY + 2, w = 30, h = 26,
+		})
+		uiContainer:Append('WndWindow', { w = 5, h = 25 })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Count achieve'] })
+		uiContainer:Append('WndDummyWrapper'):Append('WndEditBox', {
+			w = 30, h = 26,
 			text = data.nCount or 1, editType = X.UI.EDIT_TYPE.NUMBER,
 			onChange = function(nNum)
 				data.nCount = tonumber(nNum)
@@ -2277,65 +2301,67 @@ function D.OpenSettingPanel(data, szType)
 				end
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = data.bAllLeave, text = _L['Must all leave scene'],
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = data.bAllLeave, text = _L['Must all leave scene'],
 			onCheck = function(bCheck)
 				data.bAllLeave = bCheck and true or nil
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-				if bCheck then
-					ui:Children('#NPC_LEAVE_TEXT'):Text(_L['All leave scene'])
-				else
-					ui:Children('#NPC_LEAVE_TEXT'):Text(_L['Leave scene'])
-				end
+				RedrawPanel()
 			end,
-		}):Pos('BOTTOMRIGHT')
+		})
+		nY = nY + uiContainer:Height()
+
 		-- 进入场景
 		local cfg = data[MY_TEAM_MON_TYPE.NPC_ENTER] or {}
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Enter scene'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 160, h = 25, text = _L['Mark'],
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Enter scene'], font = 27 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			h = 25, text = _L['Mark'],
 			menu = function()
 				return GetMarkMenu(MY_TEAM_MON_TYPE.NPC_ENTER)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			h = 25, text = _L['Voice'],
 			menu = function()
 				return GetVoiceMenu(MY_TEAM_MON_TYPE.NPC_ENTER)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
+		})
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bTeamChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bWhisperChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		})
 		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bCenterAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bBigFontAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 				tip = {
 					render = _L['Requires MY_LifeBar loaded.'],
 					position = X.UI.TIP_POSITION.BOTTOM_TOP,
@@ -2343,70 +2369,76 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bScreenHead', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bFullScreen', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
-		nY = nY + CHECKBOX_HEIGHT
+		nY = nY + uiContainer:Height()
 
 		-- 离开场景
 		local cfg = data[MY_TEAM_MON_TYPE.NPC_LEAVE] or {}
-		nX = ui:Append('Text', {
-			name = 'NPC_LEAVE_TEXT', x = 20, y = nY + 5,
-			text = data.bAllLeave and _L['All leave scene'] or _L['Leave scene'], font = 27,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = data.bAllLeave and _L['All leave scene'] or _L['Leave scene'], font = 27 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			h = 25, text = _L['Voice'],
 			menu = function()
 				return GetVoiceMenu(MY_TEAM_MON_TYPE.NPC_LEAVE)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
+		})
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.NPC_LEAVE, 'bTeamChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.NPC_LEAVE, 'bWhisperChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		})
 		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.NPC_LEAVE, 'bCenterAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.NPC_LEAVE, 'bBigFontAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
-		nY = nY + CHECKBOX_HEIGHT
+		nY = nY + uiContainer:Height()
 	elseif szType == 'DOODAD' then
-		nX, nY = ui:Append('Text', { x = 20, y = nY, text = g_tStrings.CHANNEL_COMMON, font = 27 }):Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndComboBox', {
-			x = 30, y = nY + 2, text = _L['Self kungfu requirement'],
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = g_tStrings.CHANNEL_COMMON, font = 27 })
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			text = _L['Self kungfu requirement'],
 			menu = function()
 				return GetKungFuMenu(data)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('Text', { x = nX + 5, y = nY, text = _L['Count achieve'] }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndEditBox', {
-			x = nX + 2, y = nY + 2, w = 30, h = 26, text = data.nCount or 1, editType = X.UI.EDIT_TYPE.NUMBER,
+		})
+		uiContainer:Append('WndWindow', { w = 5, h = 25 })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Count achieve'] })
+		uiContainer:Append('WndDummyWrapper'):Append('WndEditBox', {
+			w = 30, h = 26, text = data.nCount or 1, editType = X.UI.EDIT_TYPE.NUMBER,
 			onChange = function(nNum)
 				data.nCount = tonumber(nNum)
 				if data.nCount == 1 then
@@ -2414,60 +2446,61 @@ function D.OpenSettingPanel(data, szType)
 				end
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = data.bAllLeave, text = _L['Must all leave scene'],
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = data.bAllLeave, text = _L['Must all leave scene'],
 			onCheck = function(bCheck)
 				data.bAllLeave = bCheck and true or nil
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
-				if bCheck then
-					ui:Children('#DOODAD_LEAVE_TEXT'):Text(_L['All leave scene'])
-				else
-					ui:Children('#DOODAD_LEAVE_TEXT'):Text(_L['Leave scene'])
-				end
+				RedrawPanel()
 			end,
-		}):Pos('BOTTOMRIGHT')
+		})
+		nY = nY + uiContainer:Height()
 
 		-- 进入场景
 		local cfg = data[MY_TEAM_MON_TYPE.DOODAD_ENTER] or {}
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Enter scene'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Enter scene'], font = 27 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			h = 25, text = _L['Voice'],
 			menu = function()
 				return GetVoiceMenu(MY_TEAM_MON_TYPE.DOODAD_ENTER)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
+		})
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bTeamChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bWhisperChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		})
 		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bCenterAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bBigFontAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 				tip = {
 				render = _L['Requires MY_LifeBar loaded.'],
 				position = X.UI.TIP_POSITION.BOTTOM_TOP,
@@ -2475,63 +2508,66 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bScreenHead', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bFullScreen', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
-		nY = nY + CHECKBOX_HEIGHT
+		nY = nY + uiContainer:Height()
 
 		-- 离开场景
 		local cfg = data[MY_TEAM_MON_TYPE.DOODAD_LEAVE] or {}
-		nX = ui:Append('Text', {
-			name = 'DOODAD_LEAVE_TEXT', x = 20, y = nY + 5,
-			text = data.bAllLeave and _L['All leave scene'] or _L['Leave scene'], font = 27,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = data.bAllLeave and _L['All leave scene'] or _L['Leave scene'], font = 27 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
 			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
 			menu = function()
 				return GetVoiceMenu(MY_TEAM_MON_TYPE.DOODAD_LEAVE)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = 30, y = nY, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
+		})
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.DOODAD_LEAVE, 'bTeamChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.DOODAD_LEAVE, 'bWhisperChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		})
 		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.DOODAD_LEAVE, 'bCenterAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.DOODAD_LEAVE, 'bBigFontAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
-		nY = nY + CHECKBOX_HEIGHT
+		nY = nY + uiContainer:Height()
 	elseif szType == 'TALK' then
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Alert content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndEditBox', {
-			x = nX + 5, y = nY + 8, text = data.szNote, w = 650, h = 25,
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Alert content'], font = 27 })
+		uiContainer:Append('WndWindow', { w = 5, h = 25 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndEditBox', {
+			text = data.szNote, w = 650, h = 25,
 			onChange = function(text)
 				local szText = X.TrimString(text)
 				if szText == '' then
@@ -2545,10 +2581,14 @@ function D.OpenSettingPanel(data, szType)
 				render = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
 				position = X.UI.TIP_POSITION.RIGHT_LEFT,
 			},
-		}):Pos('BOTTOMRIGHT')
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Speaker'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndEditBox', {
-			x = nX + 5, y = nY + 8, text = data.szTarget or _L['Warning box'], w = 650, h = 25,
+		})
+		nY = nY + uiContainer:Height()
+
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Speaker'], font = 27 })
+		uiContainer:Append('WndWindow', { w = 5, h = 25 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndEditBox', {
+			text = data.szTarget or _L['Warning box'], w = 650, h = 25,
 			onChange = function(text)
 				local szText = X.TrimString(text)
 				if szText == '' or szText == _L['Warning box'] then
@@ -2559,20 +2599,27 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):Pos('BOTTOMRIGHT')
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		_, nY = ui:Append('WndEditBox', {
-			x = nX + 5, y = nY + 8, text = data.szContent, w = 650, h = 55, multiline = true,
+		})
+		nY = nY + uiContainer:Height()
+
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Content'], font = 27 })
+		uiContainer:Append('WndWindow', { w = 5, h = 25 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndEditBox', {
+			text = data.szContent, w = 650, h = 55, multiline = true,
 			onChange = function(text)
 				data.szContent = X.TrimString(text)
 				FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):Pos('BOTTOMRIGHT')
-		nX = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = 540, y = nY + 3, w = 50,
-			text = _L['Partical search'],
+		})
+		nY = nY + uiContainer:Height()
+
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Content'], font = 27, alpha = 0 })
+		uiContainer:Append('WndWindow', { w = 5, h = 25 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			h = 25, text = _L['Partical search'],
 			tip = {
 				render = _L['Supports match partical.'],
 				position = X.UI.TIP_POSITION.BOTTOM_TOP,
@@ -2583,10 +2630,9 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndCheckBox', {
-			x = 640, y = nY + 3, w = 50,
-			text = _L['Regexp match'],
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			h = 25, text = _L['Regexp match'],
 			tip = {
 				render = _L['Supports backreference in note string, format: {$index}.'],
 				position = X.UI.TIP_POSITION.BOTTOM_TOP,
@@ -2597,48 +2643,55 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		})
+		uiContainer:Append('WndWindow', { w = 20, h = 25 })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 })
+		nY = nY + uiContainer:Height()
 
 		-- 触发喊话
 		local cfg = data[MY_TEAM_MON_TYPE.TALK_MONITOR] or {}
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger talk'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Trigger talk'], font = 27 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			h = 25, text = _L['Voice'],
 			menu = function()
 				return GetVoiceMenu(MY_TEAM_MON_TYPE.TALK_MONITOR)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = 30, y = nY + 10, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
+		})
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bTeamChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY + 10, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bWhisperChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		})
 		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bCenterAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bBigFontAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 				tip = {
 					render = _L['Requires MY_LifeBar loaded.'],
 					position = X.UI.TIP_POSITION.BOTTOM_TOP,
@@ -2646,21 +2699,23 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bScreenHead', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bFullScreen', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
-		nY = nY + CHECKBOX_HEIGHT
+		nY = nY + uiContainer:Height()
 	elseif szType == 'CHAT' then
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Alert content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndEditBox', {
-			x = nX + 5, y = nY + 8, text = data.szNote, w = 650, h = 25,
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Alert content'], font = 27 })
+		uiContainer:Append('WndWindow', { w = 5, h = 25 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndEditBox', {
+			text = data.szNote, w = 650, h = 25,
 			onChange = function(text)
 				local szText = X.TrimString(text)
 				if szText == '' then
@@ -2674,19 +2729,26 @@ function D.OpenSettingPanel(data, szType)
 				render = _L['Notice: Pattern can be used here in order to skip sensitive word scan. Currently supports:\n1. {$B188} Buff name which id is 188\n2. {$S188} Skill name which id is 188\n3. {$N188} Npc name which template id is 188\n4. {$D188} Doodad name which template id is 188\n5. {$me} Self name\n6. {$sender} Sender name, likes caller name\n7. {$receiver} Receiver name, likes teammate be called'],
 				position = X.UI.TIP_POSITION.RIGHT_LEFT,
 			},
-		}):Pos('BOTTOMRIGHT')
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Chat content'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		_, nY = ui:Append('WndEditBox', {
-			x = nX + 5, y = nY + 8, text = data.szContent, w = 650, h = 85, multiline = true,
+		})
+		nY = nY + uiContainer:Height()
+
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Chat content'], font = 27 })
+		uiContainer:Append('WndWindow', { w = 5, h = 25 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndEditBox', {
+			text = data.szContent, w = 650, h = 85, multiline = true,
 			onChange = function(text)
 				data.szContent = text:gsub('\r', '')
 				FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):Pos('BOTTOMRIGHT')
-		nX = ui:Append('Text', { x = nX, y = nY, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 }):Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = 540, y = nY + 3, w = 50,
+		})
+		nY = nY + uiContainer:Height()
+
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Chat content'], font = 27, alpha = 0 })
+		uiContainer:Append('WndWindow', { w = 5, h = 25 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 			text = _L['Partical search'],
 			tip = {
 				render = _L['Supports match partical.'],
@@ -2698,9 +2760,8 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndCheckBox', {
-			x = 640, y = nY + 3, w = 50,
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 			text = _L['Regexp match'],
 			tip = {
 				render = _L['Supports backreference in note string, format: {$index}.'],
@@ -2712,48 +2773,55 @@ function D.OpenSettingPanel(data, szType)
 				FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		})
+		uiContainer:Append('WndWindow', { w = 20, h = 25 })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Tips: {$me} behalf of self, {$team} behalf of team.'], alpha = 200 })
+		nY = nY + uiContainer:Height()
 
 		-- 触发系统喊话
 		local cfg = data[MY_TEAM_MON_TYPE.CHAT_MONITOR] or {}
-		nX = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Trigger chat'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = ui:Append('WndComboBox', {
-			x = nX + 5, y = nY + 8, w = 60, h = 25, text = _L['Voice'],
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Trigger chat'], font = 27 })
+		uiContainer:Append('WndDummyWrapper'):Append('WndComboBox', {
+			h = 25, text = _L['Voice'],
 			menu = function()
 				return GetVoiceMenu(MY_TEAM_MON_TYPE.CHAT_MONITOR)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = 30, y = nY + 10, checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
+		})
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+		local uiContainer = ui:Append('WndContainer', { x = 30, y = nY, w = nW - 30 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bTeamChannel, text = _L['Team channel alarm'], color = GetMsgFontColor('MSG_TEAM', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bTeamChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
-		nX = ui:Append('WndCheckBox', {
-			x = nX + 5, y = nY + 10, checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
+		})
+		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+			checked = cfg.bWhisperChannel, text = _L['Whisper channel alarm'], color = GetMsgFontColor('MSG_WHISPER', true),
 			onCheck = function(bCheck)
 				SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bWhisperChannel', bCheck)
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		})
 		if not X.IsRestricted('MY_TeamMon_CenterAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY + 10, checked = cfg.bCenterAlarm, text = _L['Center alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bCenterAlarm, text = _L['Center alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bCenterAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_LargeTextAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY + 10, checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bBigFontAlarm, text = _L['Large text alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bBigFontAlarm', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_ScreenHeadAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY + 10, checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bScreenHead, text = _L['Lifebar alarm'],
 				tip = {
 					render = _L['Requires MY_LifeBar loaded.'],
 					position = X.UI.TIP_POSITION.BOTTOM_TOP,
@@ -2761,21 +2829,24 @@ function D.OpenSettingPanel(data, szType)
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bScreenHead', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
 		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
-			nX = ui:Append('WndCheckBox', {
-				x = nX + 5, y = nY + 10, checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bFullScreen', bCheck)
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			})
 		end
-		nY = nY + CHECKBOX_HEIGHT
+		nY = nY + uiContainer:Height()
 	end
 	-- 补充报警内容
 	if szType ~= 'TALK' and szType ~= 'CHAT' then
-		nX, nY = ui:Append('Text', { x = 20, y = nY, text = _L['Add content'], font = 27 }):Pos('BOTTOMRIGHT')
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Add content'], font = 27 })
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
 		nX, nY = ui:Append('WndEditBox', {
 			x = 30, y = nY, text = data.szNote, w = 650, h = 25, limit = 10,
 			onChange = function(text)
@@ -2791,7 +2862,10 @@ function D.OpenSettingPanel(data, szType)
 	end
 	-- 倒计时
 	if not X.IsRestricted('MY_TeamMon_SpellTimer') then
-		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Countdown'], font = 27 }):Pos('BOTTOMRIGHT')
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Countdown'], font = 27 })
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
 		for k, v in ipairs(data.tCountdown or {}) do
 			-- 类型
 			nX = ui:Append('WndComboBox', {
@@ -2933,7 +3007,7 @@ function D.OpenSettingPanel(data, szType)
 					render = _L['Raid talk warning'],
 					position = X.UI.TIP_POSITION.BOTTOM_TOP,
 				},
-			}):AutoWidth():Pos('BOTTOMRIGHT')
+			}):Pos('BOTTOMRIGHT')
 			-- 普通倒计时时间/分段倒计时
 			ui:Append('WndEditBox', {
 				name = 'CountdownTime' .. k,
@@ -3077,8 +3151,8 @@ function D.OpenSettingPanel(data, szType)
 			}):Pos('BOTTOMRIGHT')
 			FormatElPosByCountdownType(v, ui, k)
 		end
-		nX = ui:Append('WndButton', {
-			x = 30, y = nY + 10,
+		nX, nY = ui:Append('WndButton', {
+			x = 30, y = nY + (X.IsEmpty(data.tCountdown) and 0 or 10),
 			text = _L['Add countdown'],
 			buttonStyle = 'FLAT',
 			enable = not (data.tCountdown and #data.tCountdown > 10),
@@ -3101,52 +3175,54 @@ function D.OpenSettingPanel(data, szType)
 				D.OpenSettingPanel(data, szType)
 			end,
 		}):Pos('BOTTOMRIGHT')
-		nY = nY + 35
 	end
 	-- 圈圈连线
 	if (szType == 'NPC' or szType == 'DOODAD') and not X.IsRestricted('MY_TeamMon_CircleLine') then
-		nX, nY = ui:Append('Text', { x = 20, y = nY + 5, text = _L['Circle and line'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-		nX, nY = 30, nY + 5
+		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+		uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Circle and line'], font = 27 })
+		nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+		nX = 30
 		if szType == 'NPC' then
 			nX = ui:Append('WndCheckBox', {
-				x = nX, y = nY, w = 160, h = 25, text = _L['Only my employer'],
+				x = nX, y = nY, h = 25, text = _L['Only my employer'],
 				checked = data.bDrawOnlyMyEmployer,
 				onCheck = function(bCheck)
 					data.bDrawOnlyMyEmployer = bCheck and true or nil
 					FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 					FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
+			}):Pos('BOTTOMRIGHT') + 5
 		end
 		nX = ui:Append('WndCheckBox', {
-			x = nX, y = nY, w = 160, h = 25, text = _L['Draw line'],
+			x = nX, y = nY, h = 25, text = _L['Draw line'],
 			checked = data.bDrawLine,
 			onCheck = function(bCheck)
 				data.bDrawLine = bCheck and true or nil
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 				FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT') + 5
+		}):Pos('BOTTOMRIGHT') + 5
 		if szType == 'NPC' then
 			nX = ui:Append('WndCheckBox', {
-				x = nX, y = nY, w = 160, h = 25, text = _L['Only when stare me'],
+				x = nX, y = nY, h = 25, text = _L['Only when stare me'],
 				checked = data.bDrawLineOnlyStareMe,
 				onCheck = function(bCheck)
 					data.bDrawLineOnlyStareMe = bCheck and true or nil
 					FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 					FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 				end,
-			}):AutoWidth():Pos('BOTTOMRIGHT') + 5
+			}):Pos('BOTTOMRIGHT') + 5
 		end
 		nX, nY = ui:Append('WndCheckBox', {
-			x = nX, y = nY, w = 160, h = 25, text = _L['Draw name'],
+			x = nX, y = nY, h = 25, text = _L['Draw name'],
 			checked = data.bDrawName,
 			onCheck = function(bCheck)
 				data.bDrawName = bCheck and true or nil
 				FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 				FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 			end,
-		}):AutoWidth():Pos('BOTTOMRIGHT')
+		}):Pos('BOTTOMRIGHT')
 		nY = nY + 10
 		-- 圈圈列表
 		if data.aCircle then
@@ -3172,7 +3248,7 @@ function D.OpenSettingPanel(data, szType)
 						FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 					end,
 				}):Pos('BOTTOMRIGHT')
-				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Degree'] }):AutoWidth():Pos('BOTTOMRIGHT')
+				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Degree'] }):Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndEditBox', {
 					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nRadius, editType = X.UI.EDIT_TYPE.NUMBER,
 					onChange = function(nNum)
@@ -3181,7 +3257,7 @@ function D.OpenSettingPanel(data, szType)
 						FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 					end,
 				}):Pos('BOTTOMRIGHT')
-				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Meter'] }):AutoWidth():Pos('BOTTOMRIGHT')
+				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Meter'] }):Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndEditBox', {
 					x = nX + 10, y = nY + 2, w = 80, h = 26, text = circle.nAlpha, editType = X.UI.EDIT_TYPE.NUMBER,
 					onChange = function(nNum)
@@ -3190,7 +3266,7 @@ function D.OpenSettingPanel(data, szType)
 						FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 					end,
 				}):Pos('BOTTOMRIGHT')
-				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Alpha'] }):AutoWidth():Pos('BOTTOMRIGHT')
+				nX = ui:Append('Text', { x = nX, y = nY, text = _L['Alpha'] }):Pos('BOTTOMRIGHT')
 				nX = ui:Append('WndCheckBox', {
 					x = nX + 10, y = nY + 1,
 					text = _L['Draw Border'],
@@ -3200,7 +3276,7 @@ function D.OpenSettingPanel(data, szType)
 						FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 						FireUIEvent('MY_TEAM_MON__CIRCLE_LINE__RELOAD')
 					end,
-				}):AutoWidth():Pos('BOTTOMRIGHT')
+				}):Pos('BOTTOMRIGHT')
 				nX = ui:Append('Image', {
 					x = nX + 5, y = nY + 1,
 					w = 26, h = 26,
@@ -3223,7 +3299,7 @@ function D.OpenSettingPanel(data, szType)
 					end,
 					image = file, imageFrame = 86,
 				}):Pos('BOTTOMRIGHT')
-				nY = nY + CHECKBOX_HEIGHT
+				nY = nY + 30
 			end
 		end
 		nX = ui:Append('WndButton', {
@@ -3251,10 +3327,13 @@ function D.OpenSettingPanel(data, szType)
 	-- 焦点列表
 	if MY_Focus then
 		if szType == 'NPC' or szType == 'DOODAD' then
-			nX, nY = ui:Append('Text', { x = 20, y = nY + 10, text = _L['Focuslist'], font = 27 }):Pos('BOTTOMRIGHT')
-			nX, nY = 30, nY + 10
+			local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+			uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Focuslist'], font = 27 })
+			nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+			nX = 30
 			for _, p in ipairs(data.aFocus or X.CONSTANT.EMPTY_TABLE) do
-				nX = nX + ui:Append('WndButton', {
+				local uiBtn = ui:Append('WndButton', {
 					x = nX, y = nY, w = 100,
 					text = MY_Focus.FormatRuleText(p, true),
 					buttonStyle = 'FLAT',
@@ -3281,13 +3360,14 @@ function D.OpenSettingPanel(data, szType)
 							FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
 						end, true)
 					end,
-				}):Width() + 5
+				})
+				nX = nX + uiBtn:Width() + 5
 				if nX + 130 > nW then
 					nX = 30
-					nY = nY + BUTTON2_HEIGHT
+					nY = nY + uiBtn:Height() + 3
 				end
 			end
-			nX = ui:Append('WndButton', {
+			nY = nY + ui:Append('WndButton', {
 				x = nX, y = nY, w = 100,
 				text = _L['Add focus'],
 				buttonStyle = 'FLAT',
@@ -3300,17 +3380,19 @@ function D.OpenSettingPanel(data, szType)
 					FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 					FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
 				end,
-			}):Width() + 5
-			nY = nY + BUTTON2_HEIGHT
+			}):Height() + 3
 		end
 	end
 	-- 团队面板条件监控
 	if MY_Cataclysm then
 		if szType == 'BUFF' or szType == 'DEBUFF' then
-			nX, nY = ui:Append('Text', { x = 20, y = nY + 10, text = _L['Team panel buff rule list'], font = 27 }):Pos('BOTTOMRIGHT')
-			nX, nY = 30, nY + 10
+			local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
+			uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Team panel buff rule list'], font = 27 })
+			nY = nY + uiContainer:Height() + CAPTION_MARGIN_TOP + CAPTION_MARGIN_BOTTOM
+
+			nX = 30
 			for _, p in ipairs(data.aCataclysmBuff or X.CONSTANT.EMPTY_TABLE) do
-				nX = nX + ui:Append('WndButton', {
+				local uiBtn = ui:Append('WndButton', {
 					x = nX, y = nY, w = 100,
 					text = MY_Cataclysm.EncodeBuffRule(p, true),
 					buttonStyle = 'FLAT',
@@ -3337,14 +3419,15 @@ function D.OpenSettingPanel(data, szType)
 							FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
 						end, nil, true)
 					end,
-				}):Width() + 5
+				})
+				nX = nX + uiBtn:Width() + 5
 				if nX + 130 > nW then
 					nX = 30
-					nY = nY + BUTTON2_HEIGHT
+					nY = nY + uiBtn:Height() + 3
 				end
 			end
-			nX = ui:Append('WndButton', {
-				x = nX, y = nY, w = 100,
+			nY = nY + ui:Append('WndButton', {
+				x = nX, y = nY,
 				text = _L['Add buff rule'],
 				buttonStyle = 'FLAT',
 				onClick = function()
@@ -3356,8 +3439,7 @@ function D.OpenSettingPanel(data, szType)
 					FireUIEvent('MY_TEAM_MON_DATA_MODIFY')
 					FireUIEvent('MY_TEAM_MON_DATA_RELOAD', { [szType] = true })
 				end,
-			}):Width() + 5
-			nY = nY + BUTTON2_HEIGHT
+			}):Height() + 3
 		end
 	end
 	-- nX = ui:Append('WndButton', {
