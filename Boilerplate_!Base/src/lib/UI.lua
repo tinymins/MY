@@ -367,6 +367,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onCustomLayout            then ui:CustomLayout     (arg.onCustomLayout, arg.customLayoutPoint       ) end
 		if arg.onColumnsChange           then ui:Columns          (arg.onColumnsChange                             ) end
 		if arg.onSortChange              then ui:Sort             (arg.onSortChange                                ) end
+		if arg.onRemove                  then ui:Remove           (arg.onRemove                                    ) end
 		if arg.events             ~= nil then for _, v in ipairs(arg.events      ) do ui:Event       (X.Unpack(v)) end end
 		if arg.uiEvents           ~= nil then for _, v in ipairs(arg.uiEvents    ) do ui:UIEvent     (X.Unpack(v)) end end
 		if arg.listBox            ~= nil then for _, v in ipairs(arg.listBox     ) do ui:ListBox     (X.Unpack(v)) end end
