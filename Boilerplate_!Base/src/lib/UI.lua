@@ -4579,6 +4579,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			local bAutoWidth = GetComponentProp(parent, 'AutoWidth')
 			local bAutoHeight = GetComponentProp(parent, 'AutoHeight')
 			if bAutoWidth or bAutoHeight then
+				parent:FormatAllContentPos()
 				SetComponentSize(parent, bAutoWidth and 'auto' or nil, bAutoHeight and 'auto' or nil)
 			end
 		end
