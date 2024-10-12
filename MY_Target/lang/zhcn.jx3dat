@@ -39,5 +39,5 @@ return {
 	["Halt"] = "眩晕",
 	["Freeze"] = "定身",
 
-	['Smart select target'] = '智能 TAB 目标选择',
+	['Smart select target'] = '目标选择增强',
 }
