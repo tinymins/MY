@@ -3457,7 +3457,7 @@ function D.OpenSettingPanel(data, szType)
 			nX = 30
 			for _, p in ipairs(data.aCataclysmBuff or X.CONSTANT.EMPTY_TABLE) do
 				local uiBtn = ui:Append('WndButton', {
-					x = nX, y = nY, w = 100,
+					x = nX, y = nY, w = 100, h = 28,
 					text = MY_Cataclysm.EncodeBuffRule(p, true),
 					buttonStyle = 'FLAT',
 					onClick = function()
