@@ -8,4 +8,5 @@ default=1
 lua_0=src/MY_TargetDirection.lua
 lua_1=src/MY_TargetFace.lua
 lua_2=src/MY_TargetLine.lua
-lua_3=src/MY_Target.PS.lua
+lua_3=src/MY_TargetSelect.lua
+lua_4=src/MY_Target.PS.lua

@@ -38,4 +38,6 @@ return {
 	['Slower'] = '減速',
 	["Halt"] = "眩暈",
 	["Freeze"] = "定身",
+
+	['Smart select target'] = '智能 TAB 目標選擇',
 }
