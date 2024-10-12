@@ -1074,12 +1074,12 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 			if O.bPushVoiceAlarm and cfg.szVoice and (not cfg.bVoiceSelfOnly or dwOwner == MY_TEAM_MON_CORE_PLAYERID) then
 				FireUIEvent('MY_TEAM_MON__VOICE_ALARM', cfg.szVoice)
 			end
+			if not X.IsRestricted('MY_TeamMon.AutoSelect') and cfg.bSelect then
+				SetTarget(X.IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
+			end
 
 			-- 获得处理
 			if nClass == MY_TEAM_MON_TYPE.BUFF_GET then
-				if cfg.bSelect then
-					SetTarget(X.IsPlayer(dwOwner) and TARGET.PLAYER or TARGET.NPC, dwOwner)
-				end
 				if cfg.bAutoCancel and MY_TEAM_MON_CORE_PLAYERID == dwOwner then
 					X.CancelBuff(X.GetClientPlayer(), dwBuffID)
 				end
@@ -1557,6 +1557,9 @@ function D.OnDoodadEvent(doodad, bEnter)
 			end
 
 			if nClass == MY_TEAM_MON_TYPE.DOODAD_ENTER then
+				if not X.IsRestricted('MY_TeamMon.AutoSelect') and cfg.bSelect then
+					SetTarget(TARGET.DOODAD, doodad.dwID)
+				end
 				if O.bPushFullScreen and cfg.bFullScreen then
 					FireUIEvent('MY_TEAM_MON__FULL_SCREEN_ALARM__CREATE', 'DOODAD', { nTime  = 3, col = data.col, bFlash = true })
 				end

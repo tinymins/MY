@@ -2112,6 +2112,14 @@ function D.OpenSettingPanel(data, szType)
 				end,
 			})
 		end
+		if not X.IsRestricted('MY_TeamMon.AutoSelect') then
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bSelect, text = _L['Auto Select'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.BUFF_LOSE, 'bSelect', bCheck)
+				end,
+			})
+		end
 		nY = nY + uiContainer:Height()
 	elseif szType == 'CASTING' then
 		-- Õ®”√
@@ -2202,6 +2210,14 @@ function D.OpenSettingPanel(data, szType)
 				end,
 			})
 		end
+		if not X.IsRestricted('MY_TeamMon.AutoSelect') then
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bSelect, text = _L['Auto Select'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.SKILL_END, 'bSelect', bCheck)
+				end,
+			})
+		end
 		nY = nY + uiContainer:Height()
 
 		-- local tRecipeKey = me.GetSkillRecipeKey(data.dwID, data.nLevel)
@@ -2271,6 +2287,14 @@ function D.OpenSettingPanel(data, szType)
 					checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 					onCheck = function(bCheck)
 						SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bFullScreen', bCheck)
+					end,
+				})
+			end
+			if not X.IsRestricted('MY_TeamMon.AutoSelect') then
+				uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+					checked = cfg.bSelect, text = _L['Auto Select'],
+					onCheck = function(bCheck)
+						SetDataClass(MY_TEAM_MON_TYPE.SKILL_BEGIN, 'bSelect', bCheck)
 					end,
 				})
 			end
@@ -2376,6 +2400,14 @@ function D.OpenSettingPanel(data, szType)
 				checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bFullScreen', bCheck)
+				end,
+			})
+		end
+		if not X.IsRestricted('MY_TeamMon.AutoSelect') then
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bSelect, text = _L['Auto Select'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.NPC_ENTER, 'bSelect', bCheck)
 				end,
 			})
 		end
@@ -2515,6 +2547,14 @@ function D.OpenSettingPanel(data, szType)
 				checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bFullScreen', bCheck)
+				end,
+			})
+		end
+		if not X.IsRestricted('MY_TeamMon.AutoSelect') then
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bSelect, text = _L['Auto Select'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.DOODAD_ENTER, 'bSelect', bCheck)
 				end,
 			})
 		end
@@ -2709,6 +2749,14 @@ function D.OpenSettingPanel(data, szType)
 				end,
 			})
 		end
+		if not X.IsRestricted('MY_TeamMon.AutoSelect') then
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bSelect, text = _L['Auto Select'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.TALK_MONITOR, 'bSelect', bCheck)
+				end,
+			})
+		end
 		nY = nY + uiContainer:Height()
 	elseif szType == 'CHAT' then
 		local uiContainer = ui:Append('WndContainer', { x = 20, y = nY, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
@@ -2836,6 +2884,14 @@ function D.OpenSettingPanel(data, szType)
 				checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)
 					SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bFullScreen', bCheck)
+				end,
+			})
+		end
+		if not X.IsRestricted('MY_TeamMon.AutoSelect') then
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bSelect, text = _L['Auto Select'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.CHAT_MONITOR, 'bSelect', bCheck)
 				end,
 			})
 		end

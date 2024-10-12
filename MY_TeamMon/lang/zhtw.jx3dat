@@ -112,6 +112,8 @@ return {
 	['Buff list'] = '自身氣勁列表',
 	['Team panel'] = '團隊面板',
 	['Only source self'] = '僅顯示來源自己的氣勁',
+	['Auto Select'] = '自動選中目標',
+	['Auto Cancel Buff'] = '自動卸除氣勁',
 	['Requires MY_LifeBar loaded.'] = '需載入並啟用頭頂血條',
 	['Requires MY_LifeBar loaded.\nDue to official logic, only target is visible.'] = '需載入並啟用頭頂血條\n由於官方限制，僅目標運功狀態可顯示',
 	['Voice alarm function'] = '語音報警功能選項',
