@@ -2211,6 +2211,8 @@ function D.OpenSettingPanel(data, szType)
 					SetDataClass(MY_TEAM_MON_TYPE.SKILL_END, 'bBigFontAlarm', bCheck)
 				end,
 			})
+		end
+		if not X.IsRestricted('MY_TeamMon_FullScreenAlarm') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 				checked = cfg.bFullScreen, text = _L['Fullscreen alarm'],
 				onCheck = function(bCheck)

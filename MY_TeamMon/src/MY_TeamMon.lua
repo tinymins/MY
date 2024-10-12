@@ -28,7 +28,7 @@ X.RegisterRestriction('MY_TeamMon.HiddenSkill', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.HiddenDoodad', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.Note', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.AutoSelect', { ['*'] = true })
-X.RegisterRestriction('MY_TeamMon_ScreenHeadAlarm', { ['*'] = false, classic = true })
+X.RegisterRestriction('MY_TeamMon_ScreenHeadAlarm', { ['*'] = false })
 --------------------------------------------------------------------------
 
 local MY_SplitString, MY_TrimString = X.SplitString, X.TrimString

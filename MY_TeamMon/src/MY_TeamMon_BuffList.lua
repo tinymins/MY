@@ -20,7 +20,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
-X.RegisterRestriction('MY_TeamMon_BuffList', { ['*'] = false, classic = true, exp = true })
+X.RegisterRestriction('MY_TeamMon_BuffList', { ['*'] = false, exp = true })
 --------------------------------------------------------------------------------
 
 local GetBuff = X.GetBuff
