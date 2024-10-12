@@ -6440,6 +6440,9 @@ function X.UI.CreateFrame(szName, opt)
 		end
 		return false
 	end
+	if X.IsFunction(opt.close) then
+		X.UI(frm):Remove(opt.close)
+	end
 	-- init frame
 	if opt.esc then
 		X.RegisterEsc(
