@@ -50,7 +50,6 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 		szLabel = _L['MY_ChatFilter'],
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {
-			['MSG_SYS'           ] = false,
 			['MSG_NORMAL'        ] = true,
 			['MSG_PARTY'         ] = false,
 			['MSG_MAP'           ] = true,
@@ -139,7 +138,7 @@ X.HookChatPanel('FILTER', 'MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 			szChannel = szEchoChannel
 		end
 	end
-	if D.bReady and O.bFilterDuplicate and O.tApplyDuplicateChannels[szChannel] then
+	if D.bReady and O.bFilterDuplicate and O.tApplyDuplicateChannels[szChannel] and szChannel ~= 'MSG_SYS' then
 		if not aXMLNode then
 			aXMLNode = X.XMLDecode(szMsg)
 			aSay = X.ParseChatData(aXMLNode)
