@@ -701,7 +701,7 @@ function D.Search(bForce)
 	l_renderTime = GetTime()
 	l_dwMapID, l_nMapIndex, l_szKeyword = dwMapID, nMapIndex, szKeyword
 
-	local hInner = frame:Lookup('', 'Handle_Inner')
+	local hInner = frame:Lookup('', 'Handle_Border/Handle_Map/Handle_Inner')
 	local nW, nH = hInner:GetSize()
 	local hMMM = hInner:Lookup('Handle_MY_MMM')
 	if not hMMM then
