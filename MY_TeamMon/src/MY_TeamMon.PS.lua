@@ -173,15 +173,17 @@ function PS.OnPanelActive(wnd)
 		end,
 	}):Pos('BOTTOMRIGHT')
 
-	nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
-	nX, nY = ui:Append('WndCheckBox', {
-		x = nPaddingX + 10, y = nY, text = _L['Team panel bind show buff'],
-		checked = MY_TeamMon.bPushTeamPanel,
-		onCheck = function(bCheck)
-			MY_TeamMon.bPushTeamPanel = bCheck
-			FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
-		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT')
+	if not X.IsRestricted('MY_TeamMon.Cataclysm') then
+		nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Team panel bind show buff'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')
+		nX, nY = ui:Append('WndCheckBox', {
+			x = nPaddingX + 10, y = nY, text = _L['Team panel bind show buff'],
+			checked = MY_TeamMon.bPushTeamPanel,
+			onCheck = function(bCheck)
+				MY_TeamMon.bPushTeamPanel = bCheck
+				FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
+			end,
+		}):AutoWidth():Pos('BOTTOMRIGHT')
+	end
 
 	if not X.IsRestricted('MY_TeamMon_BuffList') then
 		nX, nY = ui:Append('Text', { x = nPaddingX, y = nY + 5, text = _L['Buff list'], font = 27 }):AutoWidth():Pos('BOTTOMRIGHT')

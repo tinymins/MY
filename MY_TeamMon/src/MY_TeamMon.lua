@@ -21,7 +21,8 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 local bRestricted = false
-X.RegisterRestriction('MY_TeamMon', { ['*'] = false, exp = true })
+X.RegisterRestriction('MY_TeamMon', { ['*'] = false })
+X.RegisterRestriction('MY_TeamMon.Cataclysm', { ['*'] = false, exp = true })
 X.RegisterRestriction('MY_TeamMon.MapRestriction', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.HiddenBuff', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.HiddenSkill', { ['*'] = true })
@@ -1116,7 +1117,10 @@ function D.OnBuff(dwOwner, bDelete, bCanCancel, dwBuffID, nCount, nBuffLevel, dw
 					end
 				end
 				-- 添加到团队面板
-				if O.bPushTeamPanel and cfg.bTeamPanel and (not cfg.bOnlySelfSrc or dwSkillSrcID == MY_TEAM_MON_CORE_PLAYERID) and X.IsEmpty(data.aCataclysmBuff) then
+				if O.bPushTeamPanel and cfg.bTeamPanel
+				and (not cfg.bOnlySelfSrc or dwSkillSrcID == MY_TEAM_MON_CORE_PLAYERID)
+				and X.IsEmpty(data.aCataclysmBuff)
+				and not X.IsRestricted('MY_TeamMon.Cataclysm') then
 					FireUIEvent('MY_RAID_REC_BUFF', dwOwner, {
 						dwID      = data.dwID,
 						nLevel    = data.bCheckLevel and data.nLevel or 0,

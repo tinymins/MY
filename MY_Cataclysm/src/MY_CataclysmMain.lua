@@ -760,7 +760,7 @@ local function OnBuffUpdate(dwOwnerID, dwID, nLevel, nStackNum, dwSrcID)
 			nStackNum = nStackNum,
 		})
 	end
-	if MY_IsVisibleBuff(dwID, nLevel) then
+	if MY_IsVisibleBuff(dwID, nLevel) and not X.IsRestricted('MY_Cataclysm_BuffMonitor') then
 		local szName = MY_GetBuffName(dwID, nLevel)
 		RecBuffWithTabs(BUFF_LIST[dwID], dwOwnerID, dwID, dwSrcID)
 		RecBuffWithTabs(BUFF_LIST[szName], dwOwnerID, dwID, dwSrcID)

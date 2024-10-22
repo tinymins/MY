@@ -2045,21 +2045,23 @@ function D.OpenSettingPanel(data, szType)
 				end,
 			})
 		end
-		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
-			checked = cfg.bTeamPanel, text = _L['Team panel'],
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bTeamPanel', bCheck)
-				FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
-				RedrawPanel()
-			end,
-		})
-		uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
-			checked = cfg.bOnlySelfSrc, text = _L['Only source self'],
-			enable = cfg.bTeamPanel == true,
-			onCheck = function(bCheck)
-				SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bOnlySelfSrc', bCheck)
-			end,
-		})
+		if not X.IsRestricted('MY_TeamMon.Cataclysm') then
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bTeamPanel, text = _L['Team panel'],
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bTeamPanel', bCheck)
+					FireUIEvent('MY_TEAM_MON_CREATE_CACHE')
+					RedrawPanel()
+				end,
+			})
+			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
+				checked = cfg.bOnlySelfSrc, text = _L['Only source self'],
+				enable = cfg.bTeamPanel == true,
+				onCheck = function(bCheck)
+					SetDataClass(MY_TEAM_MON_TYPE.BUFF_GET, 'bOnlySelfSrc', bCheck)
+				end,
+			})
+		end
 		if not X.IsRestricted('MY_TeamMon.AutoSelect') then
 			uiContainer:Append('WndDummyWrapper'):Append('WndCheckBox', {
 				checked = cfg.bSelect, text = _L['Auto Select'],
@@ -3451,7 +3453,7 @@ function D.OpenSettingPanel(data, szType)
 		end
 	end
 	-- 团队面板条件监控
-	if MY_Cataclysm then
+	if MY_Cataclysm and not X.IsRestricted('MY_Cataclysm_BuffMonitor') then
 		if szType == 'BUFF' or szType == 'DEBUFF' then
 			local uiContainer = ui:Append('WndContainer', { x = 20, y = nY + CAPTION_MARGIN_TOP, w = nW - 20 * 2, h = 'auto', containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP })
 			uiContainer:Append('WndDummyWrapper'):Append('Text', { h = 25, alignVertical = 1, text = _L['Team panel buff rule list'], font = 27 })
