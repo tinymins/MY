@@ -101,7 +101,7 @@ function D.CanItemDescStack(a, b)
 	if X.IsEmpty(a) or X.IsEmpty(b) then
 		return false
 	end
-	if a.dwTabType ~= b.dwTabType or a.dwTabIndex ~= b.dwTabIndex then
+	if a.dwTabType ~= b.dwTabType or a.dwTabIndex ~= b.dwTabIndex or a.bBind ~= b.bBind then
 		return false
 	end
 	if a.nGenre == ITEM_GENRE.BOOK and a.nBookID ~= b.nBookID then

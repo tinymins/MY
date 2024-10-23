@@ -49,7 +49,7 @@ function D.Operate()
 				end
 				local kItem = not MY_BagEx_Bag.IsItemBoxLocked(dwBox, dwX) and X.GetInventoryItem(me, dwBox, dwX)
 				if kItem and kItem.bCanStack and kItem.nStackNum < kItem.nMaxStackNum and me.GetTradeItemLeftTime(kItem.dwID) == 0 then
-					local szKey = X.GetItemKey(kItem)
+					local szKey = X.GetItemKey(kItem) .. '_' .. (kItem.bBind and '1' or '0')
 					local nLeftExistTime = bStackLeftExistTime and 0 or kItem.GetLeftExistTime()
 					local tPos = tList[szKey] and tList[szKey][nLeftExistTime]
 					if tPos then

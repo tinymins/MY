@@ -42,7 +42,7 @@ function D.Operate()
 		for dwX = 0, X.GetInventoryBoxSize(dwBox) - 1 do
 			local kItem = X.GetInventoryItem(me, dwBox, dwX)
 			if kItem and kItem.bCanStack and kItem.nStackNum < kItem.nMaxStackNum then
-				local szKey = X.GetItemKey(kItem)
+				local szKey = X.GetItemKey(kItem) .. '_' .. (kItem.bBind and '1' or '0')
 				local tPos = tList[szKey]
 				if tPos then
 					local dwBox1, dwX1 = tPos.dwBox, tPos.dwX
