@@ -40,7 +40,7 @@ if RegisterMsgHook then
 end
 
 local function ParseMessageInfo(...)
-	local szInfo
+	local szInfo, szRawMessage
 	if X.IsElement((...)) then
 		local h, i, j = ...
 		for i = i, j do
@@ -55,6 +55,7 @@ local function ParseMessageInfo(...)
 		local i, j = szMsg:find('"MY_Chat::[^"]+"')
 		if i then
 			szInfo = szMsg:sub(i + 1, j - 1)
+			szRawMessage = szMsg:gsub('^<null[^>]+></null>', '')
 		end
 	end
 	if szInfo then
@@ -68,6 +69,7 @@ local function ParseMessageInfo(...)
 			szChannel    = aInfo[6]          ,
 			dwTalkerID   = tonumber(aInfo[7]),
 			szTalkerName = aInfo[8]          ,
+			szRawMessage = szRawMessage      ,
 		}
 		return tInfo
 	end
