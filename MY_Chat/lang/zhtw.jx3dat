@@ -69,6 +69,7 @@ return {
     ['Auto hide chat panel'] = '自動隱藏聊天欄',
     ['Auto switch talk channel when into battle field'] = '進出戰場、名劍大會時自動切換團隊/戰場頻道',
     ['Redirect mention to whisper'] = '記錄其他頻道提及我的點名內容到密聊頻道',
+    ['Filter official mention'] = '屏蔽官方點名記錄功能',
 
     ['Resize emotion'] = '統一表情尺寸',
     ['Size: %d'] = '大小：%dpx。',

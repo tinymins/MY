@@ -28,11 +28,23 @@ local O = X.CreateUserSettingsModule('MY_WhisperMention', _L['Chat'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
+	bDisableOfficial = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Chat'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = false,
+	},
 })
 local D = {
 	bEnable = false,
+	bDisableOfficial = false,
 	aMentionMsg = {},
 }
+
+function D.SyncSettings()
+	D.bEnable = O.bEnable
+	D.bDisableOfficial = O.bDisableOfficial
+end
 
 function D.Apply()
 	if D.bEnable then
@@ -105,25 +117,40 @@ function D.OnMentionMsgGC()
 end
 
 function D.OnMsgFilter(szMsgType, szMsg, nFont, bRich, r, g, b, dwTalkerID, szName)
-	szMsg = D.ClearMsg(szMsg)
-	for _, v in ipairs(D.aMentionMsg) do
-		if dwTalkerID == v.dwTalkerID and szMsg == v.szMsg and v.dwTime + 1 > GetCurrentTime() then
-			return true
+	if D.bEnable or D.bDisableOfficial then
+		szMsg = D.ClearMsg(szMsg)
+		for _, v in ipairs(D.aMentionMsg) do
+			if dwTalkerID == v.dwTalkerID and szMsg == v.szMsg and v.dwTime + 1 > GetCurrentTime() then
+				return true
+			end
 		end
 	end
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, lineHeight)
 	nX = nPaddingX
-	ui:Append('WndCheckBox', {
+	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Redirect mention to whisper'],
 		checked = O.bEnable,
 		onCheck = function(bChecked)
 			O.bEnable = bChecked
+			D.SyncSettings()
 			D.Apply()
 		end,
-	})
+	}):Width() + 5
+	if X.IS_REMAKE then
+		nX = ui:Append('WndCheckBox', {
+			x = nX, y = nY, w = 'auto',
+			text = _L['Filter official mention'],
+			checked = O.bDisableOfficial,
+			onCheck = function(bChecked)
+				O.bDisableOfficial = bChecked
+				D.SyncSettings()
+			end,
+			autoEnable = function() return not O.bEnable end,
+		}):Width() + 5
+	end
 	nY = nY + lineHeight
 	return nX, nY
 end
@@ -177,7 +204,7 @@ X.RegisterMsgMonitor(
 X.RegisterMsgFilter('MSG_WHISPER', 'MY_WhisperMention', D.OnMsgFilter)
 
 X.RegisterUserSettingsInit('MY_WhisperMention', function()
-	D.bEnable = O.bEnable
+	D.SyncSettings()
 	D.Apply()
 end)
 X.RegisterUserSettingsRelease('MY_WhisperMention', function()
