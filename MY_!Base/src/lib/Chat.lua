@@ -1296,7 +1296,11 @@ function X.SendChat(nChannel, szText, tOptions)
 	end
 	-- Ç©Ãû²¢·¢ËÍ
 	local aSignSay = SignChatData(aSay, tOptions.uuid, me)
-	me.Talk(nChannel, szTarget, aSignSay)
+	if X.IS_REMAKE then
+		me.Talk(nChannel, szTarget, aSignSay, true)
+	else
+		me.Talk(nChannel, szTarget, aSignSay)
+	end
 end
 end
 
