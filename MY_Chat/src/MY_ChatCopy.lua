@@ -83,6 +83,19 @@ X.HookChatPanel('AFTER', 'MY_ChatCopy', function(h, i, szMsg, szChannel, dwTime,
 			nG            = tInfo.nG
 			nB            = tInfo.nB
 			szChannel     = tInfo.szChannel
+		else
+			-- 最近历史密聊兼容
+			local el = h:Lookup(i)
+			local szText = el:GetType() == 'Text' and el:GetText()
+			if szText then
+				local szYear, szMonth, szDay, szHour, szMinute, szRawText = szText:match('^%[(%d+)%.(%d+)%.(%d+)%s(%d+):(%d+)%](.*)$')
+				if szYear then
+					dwTime = X.DateToTime(tonumber(szYear), tonumber(szMonth), tonumber(szDay), tonumber(szHour), tonumber(szMinute), 0)
+					if O.bChatTime then
+						el:SetText(szRawText)
+					end
+				end
+			end
 		end
 		for ii = i, h:GetItemCount() - 1 do
 			local el = h:Lookup(ii)
@@ -105,7 +118,7 @@ X.HookChatPanel('AFTER', 'MY_ChatCopy', function(h, i, szMsg, szChannel, dwTime,
 		end
 		-- create timestamp text
 		local szTime = ''
-		if O.bChatCopy and (O.bChatCopyAlwaysShowMask or not O.bChatTime) then
+		if O.bChatCopy and (O.bChatCopyAlwaysShowMask or not (O.bChatTime and dwTime)) then
 			local _r, _g, _b = nR, nG, nB
 			if O.bChatCopyAlwaysWhite then
 				_r, _g, _b = 255, 255, 255
@@ -119,11 +132,15 @@ X.HookChatPanel('AFTER', 'MY_ChatCopy', function(h, i, szMsg, szChannel, dwTime,
 		elseif O.bChatCopyAlwaysWhite then
 			nR, nG, nB = 255, 255, 255
 		end
-		if O.bChatTime then
+		if O.bChatTime and dwTime then
+			local szDateFormat = ''
+			if math.ceil(dwTime / 86400) ~= math.ceil(GetCurrentTime() / 86400) then
+				szDateFormat = '[%yyyy/%MM/%dd]'
+			end
 			if O.eChatTime == 'HOUR_MIN_SEC' then
 				szTime = szTime .. X.GetChatTimeXML(dwTime, {
 					r = nR, g = nG, b = nB, f = nFont,
-					s = '[%hh:%mm:%ss]',
+					s = szDateFormat .. '[%hh:%mm:%ss]',
 					richtext = szMsg,
 					lclick = bChatCopy,
 					rclick = bChatQuickCopy,
@@ -131,7 +148,7 @@ X.HookChatPanel('AFTER', 'MY_ChatCopy', function(h, i, szMsg, szChannel, dwTime,
 			else
 				szTime = szTime .. X.GetChatTimeXML(dwTime, {
 					r = nR, g = nG, b = nB, f = nFont,
-					s = '[%hh:%mm]',
+					s = szDateFormat .. '[%hh:%mm]',
 					richtext = szMsg,
 					lclick = bChatCopy,
 					rclick = bChatQuickCopy,
