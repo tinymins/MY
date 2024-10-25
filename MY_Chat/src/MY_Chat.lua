@@ -54,7 +54,7 @@ local function ParseMessageInfo(...)
 		local szMsg = ...
 		local i, j = szMsg:find('"MY_Chat::[^"]+"')
 		if i then
-			szInfo = szMsg:sub(i + 1, j - 1)
+			szInfo = szMsg:sub(i + 1 + 10, j - 1)
 			szRawMessage = szMsg:gsub('^<null[^>]+></null>', '')
 		end
 	end
