@@ -27,16 +27,20 @@ if RegisterMsgHook then
 				szMsg = GetFormatText(szMsg, nFont, r, g, b)
 				bRich = true
 			end
-			szMsg = '<null name="MY_Chat::'
+			szMsg = '<text> name="MY_Chat" script="this.name=\'MY_Chat\';this.data=\''
 				.. GetCurrentTime()
 				.. '/' .. (nFont or '') .. '/' .. (r or '') .. '/' .. (g or '') .. '/' .. (b or '')
 				.. '/' .. (szType or '') .. '/' .. (dwTalkerID or '') .. '/' .. (szName or '')
-				.. '" lockshowhide=1></null>'
+				.. '\'" text="" lockshowhide=1</text>'
 				.. szMsg
 			return szMsg, nFont, bRich, r, g, b
 		end,
 		X.Clone(X.CONSTANT.MSG_TYPE_LIST)
 	)
+end
+
+local function UnwrapRawMessage(szMsg)
+	return szMsg:gsub('^<text>[^>]*name="MY_Chat"[^>]*</text>', '')
 end
 
 local function ParseMessageInfo(...)
@@ -45,17 +49,17 @@ local function ParseMessageInfo(...)
 		local h, i, j = ...
 		for i = i, j do
 			local el = h:Lookup(i)
-			if el:GetType() == 'Null' and el:GetName():find('^MY_Chat::.+$') then
-				szInfo = el:GetName():sub(10)
+			if el:GetType() == 'Text' and el:GetName() == 'MY_Chat' then
+				szInfo = el.data
 				break
 			end
 		end
 	elseif X.IsString((...)) then
 		local szMsg = ...
-		local i, j = szMsg:find('"MY_Chat::[^"]+"')
-		if i then
-			szInfo = szMsg:sub(i + 1 + 10, j - 1)
-			szRawMessage = szMsg:gsub('^<null[^>]+></null>', '')
+		local szMatch = szMsg:match('script="this.name=\'MY_Chat\';this.data=\'([^\']+)\'"')
+		if szMatch then
+			szInfo = szMatch
+			szRawMessage = UnwrapRawMessage(szMsg)
 		end
 	end
 	if szInfo then
@@ -85,6 +89,7 @@ local settings = {
 		{
 			fields = {
 				ParseMessageInfo = ParseMessageInfo,
+				UnwrapRawMessage = UnwrapRawMessage,
 			},
 		},
 	},

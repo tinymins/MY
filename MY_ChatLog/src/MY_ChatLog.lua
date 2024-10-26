@@ -414,6 +414,9 @@ function D.RegisterMsgMonitor()
 					end
 				end
 			end
+			if MY_Chat and MY_Chat.UnwrapRawMessage then
+				szMsg = MY_Chat.UnwrapRawMessage(szMsg)
+			end
 			if MAIN_DS then
 				MAIN_DS:InsertMsg(szMsgType, szText, szMsg, szTalker, GetCurrentTime())
 				if D.bReady and O.bRealtimeCommit and not X.IsRestricted('MY_ChatLog.RealtimeCommit') then

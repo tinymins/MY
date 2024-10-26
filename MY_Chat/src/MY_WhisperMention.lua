@@ -69,7 +69,7 @@ function D.Apply()
 end
 
 function D.ClearMsg(szMsg)
-	return (szMsg:gsub('<null.+/null>', ''))
+	return MY_Chat.UnwrapRawMessage(szMsg)
 end
 
 function D.OnMessageArrive(szChannel, szMsg, nFont, bRich, r, g, b, dwTalkerID, szName)
