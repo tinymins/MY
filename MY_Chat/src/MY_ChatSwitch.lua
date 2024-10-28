@@ -450,10 +450,10 @@ function D.ApplyBattlefieldChannelSwitch()
 			local bIsBattleField = (X.GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
 			local nChannel, szName = EditBox_GetChannel()
 			if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
-				O.JJCAutoSwitchChatChannel_OrgChannel = nChannel
+				D.nJJCAutoSwitchChatChannel_OrgChannel = nChannel
 				X.SwitchChatChannel(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
 			elseif not bIsBattleField and nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
-				X.SwitchChatChannel(O.JJCAutoSwitchChatChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
+				X.SwitchChatChannel(D.nJJCAutoSwitchChatChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
 			end
 		end)
 	else
