@@ -615,6 +615,7 @@ GetRepairAllItemsPrice = FunctionType
 GetReputeLimit = FunctionType
 GetRequire = FunctionType
 GetRequireIndex = FunctionType
+GetRLFPS = FunctionType
 GetRootPath = FunctionType
 GetScene = FunctionType
 GetSelfStateString = FunctionType
