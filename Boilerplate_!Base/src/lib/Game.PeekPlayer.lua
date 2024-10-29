@@ -217,7 +217,7 @@ end
 do
 local function PeekPlayer(dwID)
 	--[[#DEBUG BEGIN]]
-	X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'TelentInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
+	X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'TalentInfo Peek player: ' .. dwID, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 	if X.IS_CLASSIC then
 		X.SafeCall(PeekOtherPlayerTalent, dwID)
@@ -229,7 +229,7 @@ local EVENT_KEY = nil
 local PEEK_PLAYER_TALENT_STATE = {}
 local PEEK_PLAYER_TALENT_TIME = {}
 local PEEK_PLAYER_TALENT_CALLBACK = {}
-local function OnGetPlayerTalnetInfoPeekPlayer(player)
+local function OnGetPlayerTalentInfoPeekPlayer(player)
 	if not PEEK_PLAYER_TALENT_CALLBACK[player.dwID] then
 		return
 	end
@@ -290,13 +290,13 @@ function X.GetPlayerTalentInfo(dwID, bForcePeek, fnAction)
 	table.insert(PEEK_PLAYER_TALENT_CALLBACK[dwID], fnAction)
 	-- 自身判定
 	if dwID == X.GetClientPlayerID() then
-		OnGetPlayerTalnetInfoPeekPlayer(X.GetClientPlayer())
+		OnGetPlayerTalentInfoPeekPlayer(X.GetClientPlayer())
 		return
 	end
 	-- 缓存判定
 	local player = X.GetPlayer(dwID)
 	if player and PEEK_PLAYER_TALENT_STATE[dwID] == 'SUCCESS' and not bForcePeek then
-		OnGetPlayerTalnetInfoPeekPlayer(player)
+		OnGetPlayerTalentInfoPeekPlayer(player)
 		return
 	end
 	-- 防抖限制
@@ -312,7 +312,7 @@ function X.GetPlayerTalentInfo(dwID, bForcePeek, fnAction)
 			if player then
 				PEEK_PLAYER_TALENT_STATE[dwID] = 'SUCCESS'
 				PEEK_PLAYER_TALENT_TIME[dwID] = GetTime()
-				OnGetPlayerTalnetInfoPeekPlayer(player)
+				OnGetPlayerTalentInfoPeekPlayer(player)
 			end
 		end)
 	end
