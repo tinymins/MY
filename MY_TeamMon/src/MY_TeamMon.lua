@@ -214,14 +214,16 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 	bPushScreenHead = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue = X.IS_REMAKE,
 	},
 	bPushCenterAlarm = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue = X.IS_REMAKE,
 	},
 	bPushVoiceAlarm = {
 		ePathType = X.PATH_TYPE.ROLE,
@@ -244,8 +246,9 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 	bPushFullScreen = { -- 全屏泛光
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue = X.IS_REMAKE,
 	},
 	bPushTeamChannel = { -- 团队报警
 		ePathType = X.PATH_TYPE.ROLE,
@@ -262,14 +265,16 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 	bPushBuffList = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue = X.IS_REMAKE,
 	},
 	bPushPartyBuffList = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue = X.IS_REMAKE,
 	},
 	bShowVoicePacketRecommendation = {
 		ePathType = X.PATH_TYPE.ROLE,
