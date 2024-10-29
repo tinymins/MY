@@ -859,10 +859,6 @@ function D.RecordPlayerInfo(szServerName, dwID, szName, szGlobalID, dwForceID, n
 			szServerName = X.GetServerOriginName()
 		end
 	end
-	-- 缘起兼容
-	if X.IS_CLASSIC then
-		szGlobalID = '0'
-	end
 	-- 更新角色信息缓存
 	local tPlayer
 	if X.IsGlobalID(szGlobalID) then
