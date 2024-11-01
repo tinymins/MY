@@ -183,7 +183,7 @@ local MSG_TYPE_MENU = X.Clone(_G.UI_CHANNEL_POPUP_SETTING_TABLE) or {
 	{
 		szOption = g_tStrings.CHANNEL,
 		'MSG_NORMAL', 'MSG_PARTY', 'MSG_MAP', 'MSG_BATTLE_FILED', 'MSG_GUILD',
-		'MSG_GUILD_ALLIANCE', 'MSG_SCHOOL', 'MSG_WORLD', 'MSG_TEAM', 'MSG_CAMP',
+		'MSG_GUILD_ALLIANCE', 'MSG_SCHOOL', 'MSG_WORLD', 'MSG_TEAM', 'MSG_ROOM', 'MSG_CAMP',
 		'MSG_SEEK_MENTOR', 'MSG_FRIEND', 'MSG_GROUP', 'MSG_WHISPER', 'MSG_IDENTITY', 'MSG_JJC_BULLET_SCREEN', 'MSG_BATTLE_FIELD_SIDE', 'MSG_STORY_NPC', 'MSG_STORY_PLAYER', 'MSG_SSG_WHISPER',
 	},
 	{
@@ -545,10 +545,13 @@ local CONSTANT = {
 		{
 			__index = function(t, k)
 				local c
-				if GetKungfuSchoolColor then
-					local r, g, b = GetKungfuSchoolColor(k)
-					if r and g and b then
-						c = { r, g, b }
+				if GetKungfuSchoolColor and Table_ForceToSchool then
+					local dwSchoolID = Table_ForceToSchool(k)
+					if dwSchoolID then
+						local r, g, b = GetKungfuSchoolColor(dwSchoolID)
+						if r and g and b then
+							c = { r, g, b }
+						end
 					end
 				end
 				return c or { 225, 225, 225 }
@@ -709,6 +712,7 @@ local CONSTANT = {
 		{ PLAYER_TALK_CHANNEL.WHISPER          , 'MSG_WHISPER'           },
 		{ PLAYER_TALK_CHANNEL.NEARBY           , 'MSG_NORMAL'            },
 		{ PLAYER_TALK_CHANNEL.TEAM             , 'MSG_PARTY'             },
+		{ PLAYER_TALK_CHANNEL.ROOM             , 'MSG_ROOM'              },
 		{ PLAYER_TALK_CHANNEL.TONG             , 'MSG_GUILD'             },
 		{ PLAYER_TALK_CHANNEL.TONG_ALLIANCE    , 'MSG_GUILD_ALLIANCE'    },
 		{ PLAYER_TALK_CHANNEL.TONG_SYS         , 'MSG_GUILD'             },
