@@ -41,6 +41,7 @@ local FORCE_TYPE = (function()
 		YAO_ZONG  = 212, -- 药宗
 		DAO_ZONG  = 213, -- 刀宗
 		WAN_LING  = 214, -- 万灵
+		DUAN_SHI  = 215, -- 段氏
 	})
 	local res = {}
 	for k, v in X.pairs_c(FORCE_TYPE) do
@@ -72,6 +73,7 @@ local FORCE_LIST = {
 	{ dwID = FORCE_TYPE.YAO_ZONG , szUITex = 'ui\\Image\\PlayerAvatar\\beitianyaozong.dds', nFrame = -2, bAnimate = false }, -- 药宗
 	{ dwID = FORCE_TYPE.DAO_ZONG , szUITex = 'ui\\Image\\PlayerAvatar\\daozong.dds'       , nFrame = -2, bAnimate = false }, -- 刀宗
 	{ dwID = FORCE_TYPE.WAN_LING , szUITex = 'ui\\Image\\PlayerAvatar\\wanling.tga'       , nFrame = -2, bAnimate = false }, -- 万灵
+	{ dwID = FORCE_TYPE.DUAN_SHI , szUITex = 'ui\\Image\\PlayerAvatar\\DuanShi.tga'       , nFrame = -2, bAnimate = false }, -- 段氏
 }
 for i, v in X.ipairs_r(FORCE_LIST) do
 	if not v.dwID or not g_tStrings.tForceTitle[v.dwID] then
@@ -112,6 +114,7 @@ local KUNGFU_TYPE = (function()
 		WU_FANG   = 10627, -- 药宗 无方
 		GU_FENG   = 10698, -- 刀宗 孤峰诀
 		SHAN_HAI  = 10756, -- 万灵 山海心诀
+		ZHOU_TIAN = 10786, -- 段氏 周天功
 	}
 	local res = {}
 	for k, v in pairs(KUNGFU_TYPE) do
@@ -146,6 +149,7 @@ local KUNGFU_LIST = {
 	{ dwID = KUNGFU_TYPE.MO_WEN   , dwForceID = FORCE_TYPE.CHANG_GE , nIcon = 7071 , szUITex = 'ui/Image/icon/skill_0514_27.UITex'     , nFrame = 0  }, -- 长歌 莫问
 	{ dwID = KUNGFU_TYPE.TAI_XUAN , dwForceID = FORCE_TYPE.YAN_TIAN , nIcon = 13894, szUITex = 'ui/image/icon/skill_20_9_14_1.uitex'   , nFrame = 0  }, -- 衍天 太玄经
 	{ dwID = KUNGFU_TYPE.WU_FANG  , dwForceID = FORCE_TYPE.YAO_ZONG , nIcon = 15594, szUITex = 'ui/image/icon/skill_21_9_10_2.UITex '  , nFrame = 0  }, -- 药宗 无方
+	{ dwID = KUNGFU_TYPE.DUAN_SHI , dwForceID = FORCE_TYPE.DUAN_SHI , nIcon = 22823, szUITex = 'ui/Image/icon/skill/Duanshi/skill_ds_8_28_1.UITex', nFrame = 0 }, -- 段氏 周天功
 	-- 外功
 	{ dwID = KUNGFU_TYPE.FEN_SHAN , dwForceID = FORCE_TYPE.CANG_YUN , nIcon = 6314 , szUITex = 'ui/Image/icon/Skill_CangY_32.UITex'    , nFrame = 0  }, -- 苍云 分山劲
 	{ dwID = KUNGFU_TYPE.JING_YU  , dwForceID = FORCE_TYPE.TANG_MEN , nIcon = 3165 , szUITex = 'ui/Image/icon/skill_tangm_01.UITex'    , nFrame = 0  }, -- 唐门 惊羽诀
