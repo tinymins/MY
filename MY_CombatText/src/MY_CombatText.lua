@@ -396,6 +396,12 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		xSchema = X.Schema.Map(X.Schema.OneOf(X.Schema.String, X.Schema.Number), X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {},
 	},
+	bSimplifyValue = { -- 显示简化数值
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_CombatText'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 })
 local D = {}
 
@@ -421,6 +427,13 @@ function D.GetColor(eType, bCritical)
 		or O.tColor[eType]
 		or COMBAT_TEXT_COLOR[eType]
 		or { 255, 255, 255 }
+end
+
+function D.GetTargetShowValue(nValue)
+	if MY_Recount_UI.bSimplifyValue then
+		return X.FormatNumberDot(nValue, 1, false, true)
+	end
+	return nValue
 end
 
 function D.HideOfficialCombat()
@@ -482,7 +495,15 @@ function D.OnFrameCreate()
 					if v.nValue > fMaxLife * 0.35 then
 						local shadow = D.GetFreeShadow(true)
 						if shadow then
-							D.CreateText(shadow, v.dwTargetID, _L['Critical Strike'] .. ' ' .. v.nValue, v.szPoint, COMBAT_TEXT_TYPE.CRITICAL_MSG, true, true)
+							D.CreateText(
+								shadow,
+								v.dwTargetID,
+								_L['Critical Strike'] .. ' ' .. D.GetTargetShowValue(v.nValue),
+								v.szPoint,
+								COMBAT_TEXT_TYPE.CRITICAL_MSG,
+								true,
+								true
+							)
 						end
 					end
 				end
@@ -977,7 +998,7 @@ function D.OnSkillText(dwCasterID, dwTargetID, bCriticalStrike, nSkillResultType
 		szText = szText:gsub('(%s?)$crit(%s?)', (bCriticalStrike and '%1'.. g_tStrings.STR_CS_NAME .. '%2' or ''))
 		szText = szText:gsub('$name', szCasterName)
 		szText = szText:gsub('$sn', szSkillName)
-		szText = szText:gsub('$val', (bStaticSign and X.IsNumber(nValue) and nValue > 0 and '+' or '') .. (nValue or ''))
+		szText = szText:gsub('$val', (bStaticSign and X.IsNumber(nValue) and nValue > 0 and '+' or '') .. (nValue and D.GetTargetShowValue(nValue) or ''))
 	end
 	if COMBAT_TEXT_TYPE_CLASS[eType] ~= 'THERAPY' then
 		D.AppendCombineTable(dwTargetID, szPoint, nValue, szText)
@@ -1055,7 +1076,7 @@ function D.OnCommonHealth(dwCharacterID, nDeltaLife)
 			szPoint = 'BOTTOM_RIGHT'
 		end
 	end
-	local szText = nDeltaLife > 0 and '+' .. nDeltaLife or nDeltaLife
+	local szText = (nDeltaLife > 0 and '+' or '') .. D.GetTargetShowValue(nDeltaLife)
 	local eType  = nDeltaLife > 0 and COMBAT_TEXT_TYPE.THERAPY or COMBAT_TEXT_TYPE.DAMAGE
 	D.CreateText(shadow, dwCharacterID, szText, szPoint, eType, false)
 end
@@ -1491,32 +1512,37 @@ function PS.OnPanelActive(frame)
 	nY = nY + nDeltaY
 
 	nX = nPaddingX + 10
-	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 190, text = _L['$name not me'], checked = O.bCasterNotI,
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['$name not me'], checked = O.bCasterNotI,
 		onCheck = function(bCheck)
 			O.bCasterNotI = bCheck
 		end,
 		autoEnable = IsEnabled,
-	})
-	nX = nX + 190
+	}):Width()
 
-	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 110, text = _L['$sn shorten(2)'], checked = O.bSnShorten2,
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['$sn shorten(2)'], checked = O.bSnShorten2,
 		onCheck = function(bCheck)
 			O.bSnShorten2 = bCheck
 		end,
 		autoEnable = IsEnabled,
-	})
-	nX = nX + 110
+	}):Width()
 
-	ui:Append('WndCheckBox', {
-		x = nX, y = nY, w = 140, text = _L['Therapy effective only'], checked = O.bTherapyEffectiveOnly,
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Simplify value'], checked = O.bSimplifyValue,
+		onCheck = function(bCheck)
+			O.bSimplifyValue = bCheck
+		end,
+		autoEnable = IsEnabled,
+	}):Width()
+
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, text = _L['Therapy effective only'], checked = O.bTherapyEffectiveOnly,
 		onCheck = function(bCheck)
 			O.bTherapyEffectiveOnly = bCheck
 		end,
 		autoEnable = IsEnabled,
-	})
-	nX = nX + 140
+	}):Width()
 
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, h = 24,

@@ -70,6 +70,7 @@ return {
 	['Tips: $name means caster\'s name, $sn means skill name, $crit means critical, $val means value.'] = '小提示：$name代表释放者名字，$sn招式名，$crit会心，$val数值。',
 	['$name not me'] = '$name为自己时不显示',
 	['$sn shorten(2)'] = '简写招式名',
+	['Simplify value'] = '精简数值',
 	['Therapy effective only'] = '仅显示有效治疗',
 	['Font edit'] = '字体修改',
 	['Current font: %d'] = '当前字体：%d',
