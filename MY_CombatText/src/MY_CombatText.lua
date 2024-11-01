@@ -1518,7 +1518,7 @@ function PS.OnPanelActive(frame)
 			O.bCasterNotI = bCheck
 		end,
 		autoEnable = IsEnabled,
-	}):Width()
+	}):Width() + 5
 
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, text = _L['$sn shorten(2)'], checked = O.bSnShorten2,
@@ -1526,7 +1526,7 @@ function PS.OnPanelActive(frame)
 			O.bSnShorten2 = bCheck
 		end,
 		autoEnable = IsEnabled,
-	}):Width()
+	}):Width() + 5
 
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, text = _L['Simplify value'], checked = O.bSimplifyValue,
@@ -1534,7 +1534,7 @@ function PS.OnPanelActive(frame)
 			O.bSimplifyValue = bCheck
 		end,
 		autoEnable = IsEnabled,
-	}):Width()
+	}):Width() + 5
 
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, text = _L['Therapy effective only'], checked = O.bTherapyEffectiveOnly,
@@ -1542,7 +1542,7 @@ function PS.OnPanelActive(frame)
 			O.bTherapyEffectiveOnly = bCheck
 		end,
 		autoEnable = IsEnabled,
-	}):Width()
+	}):Width() + 5
 
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, h = 24,
@@ -1558,16 +1558,16 @@ function PS.OnPanelActive(frame)
 			position = X.UI.TIP_POSITION.TOP_BOTTOM,
 		},
 		autoEnable = IsEnabled,
-	}):Width() + 10
+	}):Width() + 5
 	nY = nY + nDeltaY
 
 	nX = nPaddingX
 	nY = nY + nChapterPaddingTop
-	nX = nX + ui:Append('Text', { x = nX, y = nY, w = 'auto', text = _L['Color edit'], font = 27, autoEnable = IsEnabled }):Width() + 10
+	nX = nX + ui:Append('Text', { x = nX, y = nY, h = 24, text = _L['Color edit'], font = 27, autoEnable = IsEnabled }):Width() + 10
 	nX = nX + 10
 
 	nX = nX + ui:Append('WndCheckBox', {
-		x = nX, y = nY + 2, w = 'auto',
+		x = nX, y = nY + 2, h = 24,
 		text = _L['Distinct critical color'],
 		checked = O.bCritical,
 		onCheck = function(bCheck)
@@ -1611,7 +1611,7 @@ function PS.OnPanelActive(frame)
 		end
 		local uiCritical
 		ui:Append('Shadow', {
-			x = nX, y = nY + 8, color = D.GetColor(eType, false), w = 15, h = 15,
+			x = nX, y = nY, color = D.GetColor(eType, false), w = 15, h = 15,
 			onClick = function()
 				local this = this
 				X.UI.OpenColorPicker(function(r, g, b)
@@ -1628,7 +1628,7 @@ function PS.OnPanelActive(frame)
 		nX = nX + 20
 		if O.bCritical then
 			uiCritical = ui:Append('Shadow', {
-				x = nX, y = nY + 8, color = D.GetColor(eType, true), w = 15, h = 15,
+				x = nX, y = nY, color = D.GetColor(eType, true), w = 15, h = 15,
 				tip = {
 					render = _L['Critical color'],
 					position = X.UI.TIP_POSITION.BOTTOM_TOP,
@@ -1646,7 +1646,7 @@ function PS.OnPanelActive(frame)
 			nX = nX + 20
 		end
 		nX = nX + math.max(ui:Append('Text', {
-			x = nX, y = nY, w = 'auto',
+			x = nX, y = nY, h = 15,
 			text = COMBAT_TEXT_TYPE_NAME[eType],
 			autoEnable = IsEnabled,
 		}):Width() + 10, 100)
@@ -1675,7 +1675,7 @@ function PS.OnPanelActive(frame)
 			nY = nY + 25
 		end
 		ui:Append('Shadow', {
-			x = nX, y = nY + 8, color = D.GetColor(eType, false), w = 15, h = 15,
+			x = nX, y = nY, color = D.GetColor(eType, false), w = 15, h = 15,
 			onClick = function()
 				local this = this
 				X.UI.OpenColorPicker(function(r, g, b)
@@ -1688,7 +1688,7 @@ function PS.OnPanelActive(frame)
 		})
 		nX = nX + 20
 		nX = nX + math.max(ui:Append('Text', {
-			x = nX, y = nY, w = 'auto',
+			x = nX, y = nY, h = 15,
 			text = COMBAT_TEXT_TYPE_NAME[eType],
 			autoEnable = IsEnabled,
 		}):Width() + 10, 100)
