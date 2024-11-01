@@ -242,21 +242,24 @@ function X.TimeToDate(nTimestamp)
 end
 
 ---格式化数字小数点
----(string) X.FormatNumberDot(nValue, nDot, bDot, bSimple)
+---(string) X.FormatNumberDot(nValue, nDot, bDot, nMin)
 ---@param nValue number @要格式化的数字
----@param nDot number @小数点位数
----@param bDot boolean @小数点不足补位0
----@param bSimple boolean @是否显示精简数值
-function X.FormatNumberDot(nValue, nDot, bDot, bSimple)
+---@param nDot number? @小数点位数
+---@param bDot boolean? @小数点不足补位0
+---@param nMin number? @数值超过多少显示精简数值
+function X.FormatNumberDot(nValue, nDot, bDot, nMin)
 	if not nDot then
 		nDot = 0
 	end
+	if not nMin then
+		nMin = 100000
+	end
 	local szUnit = ''
-	if bSimple then
+	if nValue >= nMin then
 		if nValue >= 100000000 then
 			nValue = nValue / 100000000
 			szUnit = g_tStrings.DIGTABLE.tCharDiH[3]
-		elseif nValue > 100000 then
+		elseif nValue > 10000 then
 			nValue = nValue / 10000
 			szUnit = g_tStrings.DIGTABLE.tCharDiH[2]
 		end
