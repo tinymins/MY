@@ -545,10 +545,13 @@ local CONSTANT = {
 		{
 			__index = function(t, k)
 				local c
-				if GetKungfuSchoolColor then
-					local r, g, b = GetKungfuSchoolColor(k)
-					if r and g and b then
-						c = { r, g, b }
+				if GetKungfuSchoolColor and Table_ForceToSchool then
+					local dwSchoolID = Table_ForceToSchool(k)
+					if dwSchoolID then
+						local r, g, b = GetKungfuSchoolColor(dwSchoolID)
+						if r and g and b then
+							c = { r, g, b }
+						end
 					end
 				end
 				return c or { 225, 225, 225 }
