@@ -8,4 +8,4 @@
 
 * 团队面板心法简化文字 `Boilerplate_!Base\lang\lib\zhcn.jx3dat` `KUNGFU_TYPE_LABEL_ABBR`
 * 全局门派配色 `Boilerplate_!Base\src\lib\Constant.lua` `FORCE_BACKGROUND_COLOR` `FORCE_FOREGROUND_COLOR`
-* 全局门派心法枚举 `Boilerplate_!Base\src\lib\Constant.lua` `FORCE_TYPE` `KUNGFU_TYPE` `KUNGFU_TYPE`
+* 全局门派心法枚举 `Boilerplate_!Base\src\lib\Constant.lua` `FORCE_TYPE` `KUNGFU_TYPE` `KUNGFU_LIST`
