@@ -430,7 +430,7 @@ function D.GetColor(eType, bCritical)
 end
 
 function D.GetTargetShowValue(nValue)
-	if MY_Recount_UI.bSimplifyValue then
+	if O.bSimplifyValue then
 		return X.FormatNumberDot(nValue, 1, false, 10000)
 	end
 	return nValue
