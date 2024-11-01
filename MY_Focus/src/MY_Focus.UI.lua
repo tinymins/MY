@@ -287,7 +287,7 @@ function D.UpdateItem(hItem, p)
 	else
 		local fCurrentLife, fMaxLife = X.GetCharacterLife(tMemberInfo or KObject)
 		local nCurrentMana, nMaxMana = tMemberInfo and tMemberInfo.nCurrentMana or KObject.nCurrentMana, tMemberInfo and tMemberInfo.nMaxMana or KObject.nMaxMana
-		local szLife = X.FormatNumberDot(fCurrentLife, 1, false, true)
+		local szLife = X.FormatNumberDot(fCurrentLife, 1)
 		if fMaxLife > 0 then
 			local nPercent = math.floor(fCurrentLife / fMaxLife * 100)
 			if nPercent > 100 then
@@ -299,7 +299,7 @@ function D.UpdateItem(hItem, p)
 		end
 		if nMaxMana > 0 then
 			hItem:Lookup('Handle_R/Handle_LMN/Image_Mana'):SetPercentage(nCurrentMana / nMaxMana)
-			hItem:Lookup('Handle_R/Handle_LMN/Text_Mana'):SetText(X.FormatNumberDot(nCurrentMana, 1, false, true) .. '/' .. X.FormatNumberDot(nMaxMana, 1, false, true))
+			hItem:Lookup('Handle_R/Handle_LMN/Text_Mana'):SetText(X.FormatNumberDot(nCurrentMana, 1) .. '/' .. X.FormatNumberDot(nMaxMana, 1))
 		end
 	end
 	-- ∂¡Ãı

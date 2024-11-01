@@ -431,7 +431,7 @@ end
 
 function D.GetTargetShowValue(nValue)
 	if MY_Recount_UI.bSimplifyValue then
-		return X.FormatNumberDot(nValue, 1, false, true)
+		return X.FormatNumberDot(nValue, 1, false, 10000)
 	end
 	return nValue
 end
