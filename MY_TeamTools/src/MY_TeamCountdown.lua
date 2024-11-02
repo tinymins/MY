@@ -97,12 +97,12 @@ end
 -- ÊÂ¼þ×¢²á
 --------------------------------------------------------------------------------
 X.RegisterBgMsg('MY_TeamCountdown', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
-	if not X.IsClientPlayerTeamLeader(dwTalkerID) then
+	if not X.IsPlayerTeamLeader(dwTalkerID) then
 		return
 	end
 	local nCountdown = data[1]
 	if X.IsNumber(nCountdown) and nCountdown >= 1 and nCountdown <= 10 then
-		if X.IsClientPlayerTeamLeader() then
+				if X.IsClientPlayerTeamLeader() then
 			X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['[TeamCountdown] Fight Countdown Begin!'])
 		end
 		X.BreatheCall('MY_TeamCountdown', 1000, function()
