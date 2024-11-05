@@ -19,7 +19,8 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 X.RegisterRestriction('MY_GKPLoot.FastLoot', { ['*'] = true })
-X.RegisterRestriction('MY_GKPLoot.ForceLoot', { ['*'] = true, classic = false })
+X.RegisterRestriction('MY_GKPLoot.ForceLootOutsideDungeon', { ['*'] = true })
+X.RegisterRestriction('MY_GKPLoot.ForceLootInsideDungeon', { ['*'] = false, classic = true })
 X.RegisterRestriction('MY_GKPLoot.ForceTryAutoLoot', { ['*'] = true })
 X.RegisterRestriction('MY_GKPLoot.ShowUndialogable', { ['*'] = true })
 --------------------------------------------------------------------------
@@ -2348,8 +2349,16 @@ X.RegisterEvent('SYNC_LOOT_LIST', function()
 	end
 	local frame = D.GetFrame()
 	local wnd = D.GetDoodadWnd(frame, arg0)
-	if not wnd and not X.IsInDungeonMap() and X.IsRestricted('MY_GKPLoot.ForceLoot') then
-		return
+	if not wnd then
+		if X.IsInDungeonMap() then
+			if X.IsRestricted('MY_GKPLoot.ForceLootInsideDungeon') then
+				return
+			end
+		else
+			if X.IsRestricted('MY_GKPLoot.ForceLootOutsideDungeon') then
+				return
+			end
+		end
 	end
 	if D.tDoodadClosed[arg0] then
 		return
