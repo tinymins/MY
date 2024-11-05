@@ -254,7 +254,8 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		szVersion = '20241105',
+		xDefaultValue = false,
 	},
 	bRender = {
 		ePathType = X.PATH_TYPE.ROLE,
