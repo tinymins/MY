@@ -177,6 +177,7 @@ return {
 	['Auto pickup book'] = '自动拾取书籍',
 	['Will be reset when loading'] = '仅过图前有效',
 	['Show 2nd kungfu fit icon'] = '显示第二心法装备推荐图标',
+	['Sort loot list by weight'] = '按照价值高低排序掉落物品',
 	['Confirm when distribute'] = '分配时二次确认',
 	['Category'] = '分类',
 	['Huangbaba' ] = '玄晶',

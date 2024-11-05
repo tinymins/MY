@@ -103,6 +103,12 @@ local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bSortLoot = { -- 按照价值高低排序掉落物品
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = true,
+	},
 	tConfirm = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
@@ -1990,7 +1996,9 @@ function D.GetDoodadLootInfo(dwDoodadID)
 			table.insert(aItemData, data)
 		end
 	end
-	table.sort(aItemData, LootItemSorter)
+	if O.bSortLoot then
+		table.sort(aItemData, LootItemSorter)
+	end
 	return aItemData, nMoney, szName, bSpecial
 end
 
@@ -2118,6 +2126,17 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 		checked = O.bShow2ndKungfuLoot,
 		onCheck = function()
 			O.bShow2ndKungfuLoot = not O.bShow2ndKungfuLoot
+			FireUIEvent('MY_GKP_LOOT_RELOAD')
+		end,
+		autoEnable = function() return O.bOn end,
+	}):Width() + 10
+
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Sort loot list by weight'],
+		checked = O.bSortLoot,
+		onCheck = function()
+			O.bSortLoot = not O.bSortLoot
 			FireUIEvent('MY_GKP_LOOT_RELOAD')
 		end,
 		autoEnable = function() return O.bOn end,
