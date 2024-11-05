@@ -63,10 +63,6 @@ local function ApplyCaptionExtraText(dwID)
 	if not szExtraText then
 		return
 	end
-	if MY_LifeBar and MY_LifeBar.bEnabled then
-		rlcmd('reset caption ' .. dwID)
-		return
-	end
 	rlcmd('set caption extra text ' .. dwID .. ' ' .. szExtraText)
 end
 local function SetCaptionExtraText(dwID, szExtraText)
@@ -239,11 +235,7 @@ X.BreatheCall('MY_LifeBar_Official', function()
 	end
 end)
 
-X.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
-	local dwID, szType, szKey, tData = arg0, arg1, arg2, arg3
-	if MY_LifeBar_ScreenArrow.ProcessCountdown(dwID, szType, szKey, tData) then
-		return
-	end
+function D.ProcessCountdown(dwID, szType, szKey, tData)
 	if not COUNTDOWN_CACHE[dwID] then
 		COUNTDOWN_CACHE[dwID] = {}
 	end
@@ -269,7 +261,26 @@ X.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
 		COUNTDOWN_CACHE[dwID] = nil
 		ResetCaption(dwID)
 	end
-end)
+end
+
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_LifeBar_Official',
+	exports = {
+		{
+			preset = 'UIEvent',
+			fields = {
+				'ProcessCountdown'
+			},
+			root = D,
+		},
+	},
+}
+MY_LifeBar_Official = X.CreateModule(settings)
+end
 
 X.RegisterEvent({'PLAYER_ENTER_SCENE', 'NPC_ENTER_SCENE'}, 'MY_LifeBar_Official', function()
 	local dwID = arg0

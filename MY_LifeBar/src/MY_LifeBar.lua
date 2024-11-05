@@ -812,10 +812,9 @@ local function PrioritySorter(a, b)
 	end
 	return a.nPriority < b.nPriority
 end
-X.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
-	local dwID, szType, szKey, tData = arg0, arg1, arg2, arg3
-	if MY_LifeBar_ScreenArrow.ProcessCountdown(dwID, szType, szKey, tData) then
-		return
+function D.ProcessCountdown(dwID, szType, szKey, tData)
+	if not D.IsEnabled() then
+		return false
 	end
 	if not COUNTDOWN_CACHE[dwID] then
 		COUNTDOWN_CACHE[dwID] = {}
@@ -841,7 +840,8 @@ X.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
 	elseif #COUNTDOWN_CACHE[dwID] == 0 then
 		COUNTDOWN_CACHE[dwID] = nil
 	end
-end)
+	return true
+end
 
 -----------------------------------------------------------------------------------------
 -- ¶Ô»°ÅÝÅÝ
@@ -946,6 +946,17 @@ end)
 
 X.RegisterEvent('PLAYER_SAY', function()
 	OnCharacterSay(arg1, arg2, arg0)
+end)
+
+X.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
+	local dwID, szType, szKey, tData = arg0, arg1, arg2, arg3
+	if MY_LifeBar_ScreenArrow.ProcessCountdown(dwID, szType, szKey, tData) then
+		return
+	end
+	if D.ProcessCountdown(dwID, szType, szKey, tData) then
+		return
+	end
+	MY_LifeBar_Official.ProcessCountdown(dwID, szType, szKey, tData)
 end)
 
 X.RegisterEvent({'FIRST_SYNC_USER_PREFERENCES_END', 'RELOAD_UI_ADDON_END'}, function()
