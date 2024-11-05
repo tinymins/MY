@@ -610,15 +610,6 @@ function D.OnLButtonClick()
 		local dwDoodadID = wnd.doodadData.dwID
 		local menu = {
 			{
-				szOption = _L['Set Force Color'],
-				bCheck = true, bChecked = O.bSetColor,
-				fnAction = function()
-					O.bSetColor = not O.bSetColor
-					FireUIEvent('MY_GKP_LOOT_RELOAD')
-				end,
-			},
-			{ bDevide = true },
-			{
 				szOption = _L['Link All Item'],
 				fnAction = function()
 					local aItemData = D.GetDoodadLootInfo(dwDoodadID)
@@ -2104,6 +2095,17 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
 
 	nX, nY = nPaddingX + 10, nY + nLH
+
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY,
+		text = _L['Set Force Color'],
+		checked = O.bSetColor,
+		onCheck = function()
+			O.bSetColor = not O.bSetColor
+			FireUIEvent('MY_GKP_LOOT_RELOAD')
+		end,
+		autoEnable = function() return O.bOn end,
+	}):AutoWidth():Width() + 10
 
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY,
