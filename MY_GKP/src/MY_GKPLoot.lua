@@ -2029,15 +2029,17 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 	ui:Append('Text', { text = _L['GKP Doodad helper'], x = nX, y = nY, font = 27 })
 
 	nX, nY = nPaddingX + 10, nY + nLH
-	nX = ui:Append('WndCheckBox', {
+
+	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Enable MY_GKPLoot'],
 		checked = O.bOn,
 		onCheck = function(bChecked)
 			O.bOn = bChecked
 		end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-	nX = ui:Append('WndCheckBox', {
+	}):Width() + 10
+
+	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Team dungeon'],
 		checked = O.bInTeamDungeon,
@@ -2050,8 +2052,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		autoEnable = function() return O.bOn end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-	nX = ui:Append('WndCheckBox', {
+	}):Width() + 10
+
+	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Raid dungeon'],
 		checked = O.bInRaidDungeon,
@@ -2064,8 +2067,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		autoEnable = function() return O.bOn end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-	nX = ui:Append('WndCheckBox', {
+	}):Width() + 10
+
+	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Battlefield'],
 		checked = O.bInBattlefield,
@@ -2078,8 +2082,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		autoEnable = function() return O.bOn end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
-	nX = ui:Append('WndCheckBox', {
+	}):Width() + 10
+
+	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY,
 		text = _L['Other map'],
 		checked = O.bInOtherMap,
@@ -2092,7 +2097,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			position = X.UI.TIP_POSITION.BOTTOM_TOP,
 		},
 		autoEnable = function() return O.bOn end,
-	}):AutoWidth():Pos('BOTTOMRIGHT') + 10
+	}):Width() + 10
 
 	nX, nY = nPaddingX + 10, nY + nLH
 
@@ -2105,7 +2110,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			FireUIEvent('MY_GKP_LOOT_RELOAD')
 		end,
 		autoEnable = function() return O.bOn end,
-	}):AutoWidth():Width() + 10
+	}):Width() + 10
 
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY,
@@ -2116,11 +2121,12 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			FireUIEvent('MY_GKP_LOOT_RELOAD')
 		end,
 		autoEnable = function() return O.bOn end,
-	}):AutoWidth():Width() + 10
+	}):Width() + 10
 
 	nX, nY = nPaddingX + 10, nY + nLH
+
 	nX = nX + ui:Append('WndComboBox', {
-		x = nX, y = nY, w = 200,
+		x = nX, y = nY,
 		text = _L['Confirm when distribute'],
 		menuLClick = function()
 			local t = {}
@@ -2166,19 +2172,22 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, n
 			return t
 		end,
 		autoEnable = function() return O.bOn end,
-	}):AutoWidth():Width() + 5
+	}):Width() + 5
+
 	nX = nX + ui:Append('WndComboBox', {
-		x = nX, y = nY, w = 200,
+		x = nX, y = nY,
 		text = _L['Loot item filter'],
 		menu = D.GetFilterMenu,
 		autoEnable = function() return O.bOn end,
-	}):AutoWidth():Width() + 5
+	}):Width() + 5
+
 	nX = nX + ui:Append('WndComboBox', {
-		x = nX, y = nY, w = 200,
+		x = nX, y = nY,
 		text = _L['Auto pickup'],
 		menu = D.GetAutoPickupMenu,
 		autoEnable = function() return O.bOn end,
-	}):AutoWidth():Width() + 5
+	}):Width() + 5
+
 	nLFY = nY + nLH
 
 	return nX, nY, nLFY
