@@ -382,6 +382,9 @@ local function Rerender()
 end
 
 local function AutomaticRerender()
+	if X.IsRestricted('MY_MiddleMapMark') or not O.bMiddleMapSearch then
+		return
+	end
 	if GetTime() - l_renderTime > MAX_RENDER_INTERVAL then
 		Rerender()
 	elseif not X.DelayCall('MY_MiddleMapMark_Refresh') then
