@@ -365,6 +365,7 @@ local AWAYTIME_TYPE = {
 	DEATH          = 0,
 	OFFLINE        = 1,
 	HALFWAY_JOINED = 2,
+	LEAVE_TEAM     = 3,
 }
 local VERSION = 2
 
@@ -1677,6 +1678,13 @@ X.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- ¿ªÕ½É¨Ãè¶ÓÓÑ ¼ÇÂ¼¿ªÕ½¾ÍËÀµ
 			end
 		end
 	end
+end)
+-- ÖÐÍ¾ÓÐÈËÍË¶Ó
+X.RegisterEvent('PARTY_DELETE_MEMBER', function()
+	if not Data or not D.bReady or not O.bEnable then
+		return
+	end
+	D.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.LEAVE_TEAM, true)
 end)
 -- ÖÐÍ¾ÓÐÈË½ø¶Ó ²¹ÉÏÔÝÀë¼ÇÂ¼
 X.RegisterEvent('PARTY_ADD_MEMBER', function()
