@@ -882,6 +882,17 @@ function PS.OnPanelActive(wnd)
 						D.Hook()
 					end,
 				},
+				{
+					szOption = _L['Clear current map data'],
+					fnAction = function()
+						local dwMapID = X.GetClientPlayer().GetMapID()
+						X.Confirm(_L('Current map (%s) npc and doodad record will be deleted, are you sure?', X.GetMapName(dwMapID) or dwMapID), function()
+							X.SQLitePrepareExecute(DBN_DM, dwMapID)
+							X.SQLitePrepareExecute(DBD_DM, dwMapID)
+							Rerender()
+						end)
+					end,
+				},
 			}
 		end,
 	})

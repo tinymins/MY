@@ -2,6 +2,8 @@ return {
     ['MY_MiddleMapMark'] = '地圖搜索',
     ['MY middle map mark'] = '茗伊插件·地圖搜索',
     ['Show search in middle map panel'] = '啟用地圖界面輸入框搜索功能',
+    ['Clear current map data'] = '清除當前地圖數據緩存',
+    ['Current map (%s) npc and doodad record will be deleted, are you sure?'] = '當前地圖(%s)的系統角色坐標、交互物品坐標信息都將被刪除，確認刪除嗎？',
     ['Type to search, use comma to split.'] = '輸入文字進行搜索，半形逗號分隔多個搜索項。\n如：皇竹草,甜象草',
     ['[Read]'] = '[已閱讀]',
     ['[Not read]'] = '[未閱讀]',
