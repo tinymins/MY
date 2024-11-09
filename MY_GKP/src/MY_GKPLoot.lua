@@ -226,6 +226,8 @@ local ITEM_CONFIG = setmetatable({}, {
 			or k == 'tNameFilter'
 			or k == 'bFilterBookRead'
 			or k == 'bFilterBookHave'
+			or k == 'tFilterQuality'
+			or k == 'bNameFilter'
 			or k == 'bAutoPickupFilterBookRead'
 			or k == 'bAutoPickupFilterBookHave'
 			or k == 'bAutoPickupTaskItem'
@@ -237,8 +239,7 @@ local ITEM_CONFIG = setmetatable({}, {
 		then
 			return O[k]
 		end
-		if k == 'tFilterQuality'
-			or k == 'bNameFilter'
+		if k == 'bHideFiltered'
 		then
 			return D[k]
 		end
@@ -248,6 +249,8 @@ local ITEM_CONFIG = setmetatable({}, {
 			or k == 'tNameFilter'
 			or k == 'bFilterBookRead'
 			or k == 'bFilterBookHave'
+			or k == 'tFilterQuality'
+			or k == 'bNameFilter'
 			or k == 'bAutoPickupFilterBookRead'
 			or k == 'bAutoPickupFilterBookHave'
 			or k == 'bAutoPickupTaskItem'
@@ -258,8 +261,7 @@ local ITEM_CONFIG = setmetatable({}, {
 			or k == 'tAutoPickupFilters'
 		then
 			O[k] = v
-		elseif k == 'tFilterQuality'
-			or k == 'bNameFilter'
+		elseif k == 'bHideFiltered'
 		then
 			D[k] = v
 		end
@@ -455,6 +457,7 @@ function D.OnFrameBreathe()
 		for i = 0, hList:GetItemCount() - 1 do
 			hItem = hList:Lookup(i)
 			if (not hItem.nAutoLootLFC or nLFC - hItem.nAutoLootLFC >= GKP_AUTO_LOOT_DEBOUNCE_TIME)
+			and hItem:GetName() == 'Handle_Item'
 			and not hItem.itemData.bDist and not hItem.itemData.bNeedRoll and not hItem.itemData.bBidding
 			and (
 				D.IsItemAutoPickup(
@@ -690,9 +693,9 @@ end
 
 function D.OnItemMouseEnter()
 	local szName = this:GetName()
-	if szName == 'Handle_Item' or szName == 'Box_Item' then
-		local hItem = szName == 'Handle_Item' and this or this:GetParent()
-		local box   = hItem:Lookup('Box_Item')
+	if szName == 'Handle_Item' or szName == 'Box_Item' or szName == 'Handle_FilterItem' or szName == 'Box_FilterItem' then
+		local hItem = (szName == 'Handle_Item' or szName == 'Handle_FilterItem') and this or this:GetParent()
+		local box   = hItem:Lookup('Box_Item') or hItem:Lookup('Box_FilterItem')
 		if IsAltKeyDown() and not IsCtrlKeyDown() and not IsShiftKeyDown() then
 			X.OutputTip(this, X.EncodeLUAData(hItem.itemData, '  ') .. '\n' .. X.EncodeLUAData({
 				nUiId = hItem.itemData.item.nUiId,
@@ -726,7 +729,9 @@ function D.OnItemMouseEnter()
 		local hList = hItem:GetParent()
 		for i = 0, hList:GetItemCount() - 1 do
 			local h = hList:Lookup(i)
-			h:Lookup('Shadow_Highlight'):SetVisible(h.itemData.szType == hItem.itemData.szType)
+			if h:GetName() == 'Handle_Item' then
+				h:Lookup('Shadow_Highlight'):SetVisible(h.itemData.szType == hItem.itemData.szType)
+			end
 		end
 		X.OutputTip(hItem, GetFormatText(_L['Onekey distrib this group'], 136), true)
 	end
@@ -760,9 +765,9 @@ function D.OnItemLButtonClick()
 	if IsCtrlKeyDown() or IsAltKeyDown() then
 		return
 	end
-	if szName == 'Handle_Item' or szName == 'Box_Item' then
-		local hItem      = szName == 'Handle_Item' and this or this:GetParent()
-		local box        = hItem:Lookup('Box_Item')
+	if szName == 'Handle_Item' or szName == 'Box_Item' or szName == 'Handle_FilterItem' or szName == 'Box_FilterItem' then
+		local hItem      = (szName == 'Handle_Item' or szName == 'Handle_FilterItem') and this or this:GetParent()
+		local box        = hItem:Lookup('Box_Item') or hItem:Lookup('Box_FilterItem')
 		local data       = hItem.itemData
 		local me, team   = X.GetClientPlayer(), GetClientTeam()
 		local dwDoodadID = data.dwDoodadID
@@ -805,7 +810,7 @@ function D.OnItemLButtonClick()
 		local aItemData = {}
 		for i = 0, hList:GetItemCount() - 1 do
 			local h = hList:Lookup(i)
-			if h.itemData.szType == hItem.itemData.szType then
+			if h:GetName() == 'Handle_Item' and h.itemData.szType == hItem.itemData.szType then
 				table.insert(aItemData, h.itemData)
 			end
 		end
@@ -832,8 +837,9 @@ end
 -- 右键拍卖
 function D.OnItemRButtonClick()
 	local szName = this:GetName()
-	if szName == 'Handle_Item' or szName == 'Box_Item' then
-		local hItem = szName == 'Handle_Item' and this or this:GetParent()
+	if szName == 'Handle_Item' or szName == 'Box_Item' or szName == 'Handle_FilterItem' or szName == 'Box_FilterItem' then
+		local hItem = (szName == 'Handle_Item' or szName == 'Handle_FilterItem') and this or this:GetParent()
+		local box   = hItem:Lookup('Box_Item') or hItem:Lookup('Box_FilterItem')
 		local data = hItem.itemData
 		if not data.bDist and not data.bBidding then
 			return
@@ -849,6 +855,26 @@ end
 function D.GetFilterMenu()
 	local t = {
 		szOption = _L['Loot item filter'],
+		-- 隐藏过滤物品
+		{
+			szOption = _L['Hide filter items'],
+			bCheck = true,
+			bChecked = ITEM_CONFIG.bHideFiltered,
+			fnAction = function()
+				ITEM_CONFIG.bHideFiltered = not ITEM_CONFIG.bHideFiltered
+				D.ReloadFrame()
+			end,
+			fnMouseEnter = function()
+				local nX, nY = this:GetAbsX(), this:GetAbsY()
+				local nW, nH = this:GetW(), this:GetH()
+				local szText = GetFormatText(_L['Hide all filter items instead of collapse display them, will be reset after loading.'], nil, 255, 255, 0)
+				OutputTip(szText, 600, {nX, nY, nW, nH}, ALW.RIGHT_LEFT)
+			end,
+			fnMouseLeave = function()
+				HideTip()
+			end,
+		},
+		X.CONSTANT.MENU_DIVIDER,
 		-- 过滤已读书籍
 		{
 			szOption = _L['Filter book read'],
@@ -883,11 +909,6 @@ function D.GetFilterMenu()
 	-- 品级过滤
 	local t1 = {
 		szOption = _L['Quality filter'],
-		{
-			szOption = _L['Will be reset when loading'],
-			bDisable = true,
-		},
-		X.CONSTANT.MENU_DIVIDER,
 	}
 	for i, p in ipairs(GKP_ITEM_QUALITIES) do
 		table.insert(t1, {
@@ -897,6 +918,7 @@ function D.GetFilterMenu()
 			bChecked = ITEM_CONFIG.tFilterQuality[p.nQuality],
 			fnAction = function()
 				ITEM_CONFIG.tFilterQuality[p.nQuality] = not ITEM_CONFIG.tFilterQuality[p.nQuality]
+				ITEM_CONFIG.tFilterQuality = ITEM_CONFIG.tFilterQuality
 				D.ReloadFrame()
 			end,
 		})
@@ -905,10 +927,6 @@ function D.GetFilterMenu()
 	-- 名称过滤
 	local t1 = {
 		szOption = _L['Name filter'],
-		{
-			szOption = _L['Will be disable when loading'],
-			bDisable = true,
-		},
 		{
 			szOption = _L['Enable'],
 			bCheck = true, bChecked = ITEM_CONFIG.bNameFilter,
@@ -1535,6 +1553,10 @@ function D.GetItemBiddingMenu(dwDoodadID, data)
 	return menu
 end
 
+function D.GetListWidth()
+	return O.bVertical and 270 or (52 * 8)
+end
+
 function D.AdjustFrame(frame)
 	local scroll = frame:Lookup('Scroll_DoodadList')
 	local scrollbar = scroll:Lookup('ScrolBar_DoodadList')
@@ -1556,7 +1578,7 @@ function D.AdjustFrame(frame)
 end
 
 function D.AdjustWnd(wnd)
-	local nInnerW = O.bVertical and 270 or (52 * 8)
+	local nInnerW = D.GetListWidth()
 	local nOuterW = O.bVertical and nInnerW or (nInnerW + 10)
 	local hDoodad = wnd:Lookup('', '')
 	local hList = hDoodad:Lookup('Handle_ItemList')
@@ -1671,11 +1693,20 @@ function D.DrawLootList(dwDoodadID, bRemove)
 			LootMoney(dwDoodadID)
 		end
 		local nCount = #aItemData
+		local aNormalItemData = aItemData
+		local aFilterItemData = {}
 		if not X.IsEmpty(config.tFilterQuality) or config.bFilterBookRead or config.bFilterBookHave or config.bFilterGrayItem then
 			nCount = 0
+			aNormalItemData = {}
 			for i, v in ipairs(aItemData) do
 				if D.IsItemDisplay(v, config) then
 					nCount = nCount + 1
+					table.insert(aNormalItemData, v)
+				else
+					if not ITEM_CONFIG.bHideFiltered then
+						nCount = nCount + 1
+					end
+					table.insert(aFilterItemData, v)
 				end
 			end
 		end
@@ -1715,54 +1746,76 @@ function D.DrawLootList(dwDoodadID, bRemove)
 		local hDoodad = wnd:Lookup('', '')
 		local hList = hDoodad:Lookup('Handle_ItemList')
 		hList:Clear()
-		for i, itemData in ipairs(aItemData) do
+		for i, itemData in ipairs(aNormalItemData) do
 			local item = itemData.item
-			if D.IsItemDisplay(itemData, config) then
-				local szName = X.GetItemNameByItem(item)
-				local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, 'Handle_Item')
-				local box = h:Lookup('Box_Item')
-				local txt = h:Lookup('Text_Item')
-				txt:SetText(szName)
-				txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
-				if O.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
-					for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
-						if szName:find(szForceTitle) then
-							txt:SetFontColor(X.GetForceColor(dwForceID))
-							break
-						end
+			local szName = X.GetItemNameByItem(item)
+			local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, 'Handle_Item')
+			local box = h:Lookup('Box_Item')
+			local txt = h:Lookup('Text_Item')
+			txt:SetText(szName)
+			txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
+			if O.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
+				for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
+					if szName:find(szForceTitle) then
+						txt:SetFontColor(X.GetForceColor(dwForceID))
+						break
 					end
 				end
-				if O.bVertical then
-					local szSuit = IsItemDataSuitable(itemData)
-					h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
-						and (i == 1 or aItemData[i - 1].szType ~= itemData.szType or not aItemData[i - 1].bDist))
-					h:Lookup('Image_Suitable'):SetVisible(szSuit == 'SUITABLE')
-					h:Lookup('Image_MaybeSuitable'):SetVisible(szSuit == 'MAYBE_SUITABLE')
-					h:Lookup('Image_Better'):SetVisible(szSuit == 'BETTER')
-					h:Lookup('Image_Spliter'):SetVisible(i ~= #aItemData)
-				else
-					txt:Hide()
-					box:SetSize(48, 48)
-					box:SetRelPos(2, 2)
-					h:SetSize(52, 52)
-					h:FormatAllItemPos()
-					h:Lookup('Image_GroupDistrib'):Hide()
-					h:Lookup('Image_Spliter'):Hide()
-					h:Lookup('Image_Hover'):SetSize(0, 0)
-				end
+			end
+			if O.bVertical then
+				local szSuit = IsItemDataSuitable(itemData)
+				h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
+					and (i == 1 or aNormalItemData[i - 1].szType ~= itemData.szType or not aNormalItemData[i - 1].bDist))
+				h:Lookup('Image_Suitable'):SetVisible(szSuit == 'SUITABLE')
+				h:Lookup('Image_MaybeSuitable'):SetVisible(szSuit == 'MAYBE_SUITABLE')
+				h:Lookup('Image_Better'):SetVisible(szSuit == 'BETTER')
+				h:Lookup('Image_Spliter'):SetVisible(i ~= #aNormalItemData)
+			else
+				txt:Hide()
+				box:SetSize(48, 48)
+				box:SetRelPos(2, 2)
+				h:SetSize(52, 52)
+				h:FormatAllItemPos()
+				h:Lookup('Image_GroupDistrib'):Hide()
+				h:Lookup('Image_Spliter'):Hide()
+				h:Lookup('Image_Hover'):SetSize(0, 0)
+			end
+			UpdateBoxObject(box, UI_OBJECT_ITEM_ONLY_ID, item.dwID)
+			-- box:SetOverText(3, '')
+			-- box:SetOverTextFontScheme(3, 15)
+			-- box:SetOverTextPosition(3, ITEM_POSITION.LEFT_TOP)
+			if GKP_LOOT_RECENT[item.nUiId] then
+				box:SetObjectStaring(true)
+			end
+			if itemData.bDist then
+				bDist = true
+			end
+			h.itemData = itemData
+			h.nAutoLootLFC = nil
+		end
+		if #aFilterItemData > 0 and not ITEM_CONFIG.bHideFiltered then
+			local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, 'Handle_ItemFiltered')
+			local hFL = h:Lookup('Handle_FilterItemList')
+			hFL:Clear()
+			for i, itemData in ipairs(aFilterItemData) do
+				local item = itemData.item
+				local hFI = hFL:AppendItemFromIni(GKP_LOOT_INIFILE, 'Handle_FilterItem')
+				local box = hFI:Lookup('Box_FilterItem')
 				UpdateBoxObject(box, UI_OBJECT_ITEM_ONLY_ID, item.dwID)
-				-- box:SetOverText(3, '')
-				-- box:SetOverTextFontScheme(3, 15)
-				-- box:SetOverTextPosition(3, ITEM_POSITION.LEFT_TOP)
 				if GKP_LOOT_RECENT[item.nUiId] then
 					box:SetObjectStaring(true)
 				end
 				if itemData.bDist then
 					bDist = true
 				end
-				h.itemData = itemData
-				h.nAutoLootLFC = nil
+				hFI.itemData = itemData
 			end
+			local nW = D.GetListWidth()
+			hFL:SetW(nW - 8)
+			hFL:FormatAllItemPos()
+			hFL:SetSizeByAllItemSize()
+			h:SetSizeByAllItemSize()
+			hFL:SetW(nW)
 		end
 		if bSpecial then
 			hDoodad:Lookup('Image_DoodadBg'):FromUITex('ui/Image/OperationActivity/RedEnvelope2.uitex', 14)
@@ -2280,8 +2333,7 @@ X.RegisterEvent('LOADING_END', 'MY_GKPLoot', function()
 	D.aDoodadID = {}
 	D.tDoodadInfo = {}
 	D.tDoodadClosed = {}
-	ITEM_CONFIG.tFilterQuality = {}
-	ITEM_CONFIG.bNameFilter = false
+	ITEM_CONFIG.bHideFiltered = false
 	D.InsertSceneLoot()
 end)
 
