@@ -341,8 +341,15 @@ function D.IsItemDisplay(itemData, config)
 		return false
 	end
 	-- 名称过滤
-	if config.bNameFilter and config.tNameFilter[itemData.szName] then
-		return false
+	if config.bNameFilter then
+		if config.tNameFilter[itemData.szName] then
+			return false
+		end
+		for k, v in pairs(config.tNameFilter) do
+			if v and k:sub(1, 1) == '^' and itemData.szName:find(k) then
+				return false
+			end
+		end
 	end
 	-- 过滤已读、已有书籍
 	if (config.bFilterBookRead or config.bFilterBookHave) and itemData.nGenre == ITEM_GENRE.BOOK then
