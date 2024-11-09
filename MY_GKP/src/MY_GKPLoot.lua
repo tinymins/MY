@@ -37,6 +37,7 @@ local GKP_LOOT_ZIBABA_QUALITY = X.CONSTANT.ITEM_QUALITY.PURPLE -- 小铁品级
 
 local GKP_LOOT_RECENT = {} -- 记录上次物品或物品组分配给了谁
 local GKP_ITEM_QUALITIES = {
+	{ nQuality = X.CONSTANT.ITEM_QUALITY.GRAY   , szTitle = g_tStrings.STR_GRAY                },
 	{ nQuality = X.CONSTANT.ITEM_QUALITY.WHITE  , szTitle = g_tStrings.STR_WHITE               },
 	{ nQuality = X.CONSTANT.ITEM_QUALITY.GREEN  , szTitle = g_tStrings.STR_ROLLQUALITY_GREEN   },
 	{ nQuality = X.CONSTANT.ITEM_QUALITY.BLUE   , szTitle = g_tStrings.STR_ROLLQUALITY_BLUE    },
@@ -128,13 +129,9 @@ local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
 		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Boolean),
-		xDefaultValue = {},
-	},
-	bFilterGrayItem = {
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_GKPLoot'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
+		xDefaultValue = {
+			[X.CONSTANT.ITEM_QUALITY.GRAY] = true,
+		},
 	},
 	bNameFilter = {
 		ePathType = X.PATH_TYPE.ROLE,
@@ -222,8 +219,7 @@ local D = {
 }
 local ITEM_CONFIG = setmetatable({}, {
 	__index = function(_, k)
-		if k == 'bFilterGrayItem'
-			or k == 'tNameFilter'
+		if k == 'tNameFilter'
 			or k == 'bFilterBookRead'
 			or k == 'bFilterBookHave'
 			or k == 'tFilterQuality'
@@ -245,8 +241,7 @@ local ITEM_CONFIG = setmetatable({}, {
 		end
 	end,
 	__newindex = function(_, k, v)
-		if k == 'bFilterGrayItem'
-			or k == 'tNameFilter'
+		if k == 'tNameFilter'
 			or k == 'bFilterBookRead'
 			or k == 'bFilterBookHave'
 			or k == 'tFilterQuality'
@@ -337,6 +332,7 @@ function D.CanDialog(tar, dwDoodadID)
 end
 
 function D.IsItemDisplay(itemData, config)
+	-- 按品质过滤
 	if X.IsTable(config.tFilterQuality) and config.tFilterQuality[itemData.nQuality] then
 		return false
 	end
@@ -367,10 +363,6 @@ function D.IsItemDisplay(itemData, config)
 				return false
 			end
 		end
-	end
-	-- 过滤灰色物品
-	if config.bFilterGrayItem and itemData.nQuality == X.CONSTANT.ITEM_QUALITY.GRAY then
-		return false
 	end
 	return true
 end
@@ -882,37 +874,8 @@ function D.GetFilterMenu()
 			end,
 		},
 		X.CONSTANT.MENU_DIVIDER,
-		-- 过滤已读书籍
-		{
-			szOption = _L['Filter book read'],
-			bCheck = true,
-			bChecked = O.bFilterBookRead,
-			fnAction = function()
-				O.bFilterBookRead = not O.bFilterBookRead
-				D.ReloadFrame()
-			end,
-		},
-		-- 过滤已有书籍
-		{
-			szOption = _L['Filter book have'],
-			bCheck = true,
-			bChecked = O.bFilterBookHave,
-			fnAction = function()
-				O.bFilterBookHave = not O.bFilterBookHave
-				D.ReloadFrame()
-			end,
-		},
-		-- 过滤灰色物品
-		{
-			szOption = _L['Filter gray item'],
-			bCheck = true,
-			bChecked = O.bFilterGrayItem,
-			fnAction = function()
-				O.bFilterGrayItem = not O.bFilterGrayItem
-				D.ReloadFrame()
-			end,
-		},
 	}
+
 	-- 品级过滤
 	local t1 = {
 		szOption = _L['Quality filter'],
@@ -931,6 +894,7 @@ function D.GetFilterMenu()
 		})
 	end
 	table.insert(t, t1)
+
 	-- 名称过滤
 	local t1 = {
 		szOption = _L['Name filter'],
@@ -984,6 +948,29 @@ function D.GetFilterMenu()
 		fnDisable = function() return not ITEM_CONFIG.bNameFilter end,
 	})
 	table.insert(t, t1)
+
+	-- 过滤已读书籍
+	table.insert(t, {
+		szOption = _L['Filter book read'],
+		bCheck = true,
+		bChecked = O.bFilterBookRead,
+		fnAction = function()
+			O.bFilterBookRead = not O.bFilterBookRead
+			D.ReloadFrame()
+		end,
+	})
+
+	-- 过滤已有书籍
+	table.insert(t, {
+		szOption = _L['Filter book have'],
+		bCheck = true,
+		bChecked = O.bFilterBookHave,
+		fnAction = function()
+			O.bFilterBookHave = not O.bFilterBookHave
+			D.ReloadFrame()
+		end,
+	})
+
 	return t
 end
 
@@ -1702,7 +1689,7 @@ function D.DrawLootList(dwDoodadID, bRemove)
 		local nCount = #aItemData
 		local aNormalItemData = aItemData
 		local aFilterItemData = {}
-		if not X.IsEmpty(config.tFilterQuality) or config.bFilterBookRead or config.bFilterBookHave or config.bFilterGrayItem then
+		if not X.IsEmpty(config.tFilterQuality) or config.bFilterBookRead or config.bFilterBookHave then
 			nCount = 0
 			aNormalItemData = {}
 			for i, v in ipairs(aItemData) do

@@ -168,7 +168,6 @@ return {
 	['Quality filter'] = '品级过滤',
 	['Filter book read'] = '过滤已读书籍',
 	['Filter book have'] = '过滤已有书籍',
-	['Filter gray item'] = '过滤灰色物品',
 	['Name filter'] = '名称过滤',
 	['Enable'] = '启用',
 	['Add'] = '添加',
