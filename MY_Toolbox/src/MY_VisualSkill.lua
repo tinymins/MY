@@ -46,8 +46,35 @@ local O = X.CreateUserSettingsModule('MY_VisualSkill', _L['General'], {
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = X.Clone(DEFAULT_ANCHOR),
 	},
+	aIgnoreSkill = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Toolbox'],
+		xSchema = X.Schema.Collection(X.Schema.Number),
+		xDefaultValue = {
+			10   , -- (10)    ºáÉ¨Ç§¾ü           ºáÉ¨Ç§¾ü
+			11   , -- (11)    ÆÕÍ¨¹¥»÷-¹÷¹¥»÷     ÁùºÏ¹÷
+			12   , -- (12)    ÆÕÍ¨¹¥»÷-Ç¹¹¥»÷     Ã·»¨Ç¹·¨
+			13   , -- (13)    ÆÕÍ¨¹¥»÷-½£¹¥»÷     Èý²ñ½£·¨
+			14   , -- (14)    ÆÕÍ¨¹¥»÷-È­Ì×¹¥»÷   ³¤È­
+			15   , -- (15)    ÆÕÍ¨¹¥»÷-Ë«±ø¹¥»÷   Á¬»·Ë«µ¶
+			16   , -- (16)    ÆÕÍ¨¹¥»÷-±Ê¹¥»÷     ÅÐ¹Ù±Ê·¨
+			1795 , -- (1795)  ÆÕÍ¨¹¥»÷-ÖØ½£¹¥»÷   ËÄ¼¾½£·¨
+			2183 , -- (2183)  ÆÕÍ¨¹¥»÷-³æµÑ¹¥»÷   ´ó»ÄµÑ·¨
+			3121 , -- (3121)  ÆÕÍ¨¹¥»÷-¹­¹¥»÷     î¸·çïÚ·¨
+			4326 , -- (4326)  ÆÕÍ¨¹¥»÷-Ë«µ¶¹¥»÷   ´óÄ®µ¶·¨
+			13039, -- (13039) ÆÕÍ¨¹¥»÷_¶Üµ¶¹¥»÷   ¾íÑ©µ¶
+			14063, -- (14063) ÆÕÍ¨¹¥»÷_ÇÙ¹¥»÷     ÎåÒôÁùÂÉ
+			16010, -- (16010) ÆÕÍ¨¹¥»÷_°ÁËªµ¶¹¥»÷  Ëª·çµ¶·¨
+			19712, -- (19712) ÆÕÍ¨¹¥»÷_ÅîÀ³É¡¹¥»÷  Æ®Ò£É¡»÷
+			31636, -- (31636) ÆÕÍ¨¹¥»÷-ÔÆµ¶       ÔÆµ¶
+			17   , -- (17)    ½­ºþ-·ÀÉíÎäÒÕ-´ò×ø  ´ò×ø
+			18   , -- (18)    Ì¤ÔÆ               Ì¤ÔÆ
+		},
+	},
 })
-local D = {}
+local D = {
+	tIgnoreSkill = {},
+}
 
 local BOX_WIDTH = 46
 local BOX_ANIMATION_TIME = 300
@@ -75,26 +102,13 @@ local BOX_SLIDEOUT_DISTANCE = 200
 -- 	[13228] = true, -- (13228)  ÁÙ´¨ÁÐÉ½ÕóÊÍ·Å  ÁÙ´¨ÁÐÉ½Õó
 -- 	[13275] = true, -- (13275)  ·æÁèºá¾øÕóÊ©·Å  ·æÁèºá¾øÕó
 -- }
-local COMMON_SKILL = {
-	[10   ] = true, -- (10)    ºáÉ¨Ç§¾ü           ºáÉ¨Ç§¾ü
-	[11   ] = true, -- (11)    ÆÕÍ¨¹¥»÷-¹÷¹¥»÷     ÁùºÏ¹÷
-	[12   ] = true, -- (12)    ÆÕÍ¨¹¥»÷-Ç¹¹¥»÷     Ã·»¨Ç¹·¨
-	[13   ] = true, -- (13)    ÆÕÍ¨¹¥»÷-½£¹¥»÷     Èý²ñ½£·¨
-	[14   ] = true, -- (14)    ÆÕÍ¨¹¥»÷-È­Ì×¹¥»÷   ³¤È­
-	[15   ] = true, -- (15)    ÆÕÍ¨¹¥»÷-Ë«±ø¹¥»÷   Á¬»·Ë«µ¶
-	[16   ] = true, -- (16)    ÆÕÍ¨¹¥»÷-±Ê¹¥»÷     ÅÐ¹Ù±Ê·¨
-	[1795 ] = true, -- (1795)  ÆÕÍ¨¹¥»÷-ÖØ½£¹¥»÷   ËÄ¼¾½£·¨
-	[2183 ] = true, -- (2183)  ÆÕÍ¨¹¥»÷-³æµÑ¹¥»÷   ´ó»ÄµÑ·¨
-	[3121 ] = true, -- (3121)  ÆÕÍ¨¹¥»÷-¹­¹¥»÷     î¸·çïÚ·¨
-	[4326 ] = true, -- (4326)  ÆÕÍ¨¹¥»÷-Ë«µ¶¹¥»÷   ´óÄ®µ¶·¨
-	[13039] = true, -- (13039) ÆÕÍ¨¹¥»÷_¶Üµ¶¹¥»÷   ¾íÑ©µ¶
-	[14063] = true, -- (14063) ÆÕÍ¨¹¥»÷_ÇÙ¹¥»÷     ÎåÒôÁùÂÉ
-	[16010] = true, -- (16010) ÆÕÍ¨¹¥»÷_°ÁËªµ¶¹¥»÷  Ëª·çµ¶·¨
-	[19712] = true, -- (19712) ÆÕÍ¨¹¥»÷_ÅîÀ³É¡¹¥»÷  Æ®Ò£É¡»÷
-	[31636] = true, -- (31636) ÆÕÍ¨¹¥»÷-ÔÆµ¶       ÔÆµ¶
-	[17   ] = true, -- (17)    ½­ºþ-·ÀÉíÎäÒÕ-´ò×ø  ´ò×ø
-	[18   ] = true, -- (18)    Ì¤ÔÆ               Ì¤ÔÆ
-}
+
+function D.UpdateUserSettings()
+	D.tIgnoreSkill = {}
+	for _, v in ipairs(O.aIgnoreSkill) do
+		D.tIgnoreSkill[v] = true
+	end
+end
 
 function D.UpdateAnchor(frame)
 	local anchor = O.anchor
@@ -194,7 +208,7 @@ function D.OnSkillCast(frame, dwSkillID, dwSkillLevel)
 		return
 	end
 	-- ÆÕ¹¥ÆÁ±Î
-	if COMMON_SKILL[dwSkillID] then
+	if D.tIgnoreSkill[dwSkillID] then
 		return
 	end
 	-- ÌØÊâÍ¼±ê¼¼ÄÜÆÁ±Î
@@ -330,7 +344,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		end,
 	}):Width() + 5
 
-	ui:Append('WndSlider', {
+	nX = nX + ui:Append('WndSlider', {
 		x = nX, y = nY,
 		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = {1, 32},
 		value = MY_VisualSkill.nVisualSkillBoxCount,
@@ -339,7 +353,65 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		onChange = function(val)
 			MY_VisualSkill.nVisualSkillBoxCount = val
 		end,
-	})
+	}):Width() + 5
+
+	nX = nX + ui:Append('WndComboBox', {
+		x = nX, y = nY, h = 24,
+		text = _L['Ignore skill list'],
+		menu = function()
+			local menu = {}
+			for nIndex, dwSkillID in ipairs(O.aIgnoreSkill) do
+				table.insert(menu, {
+					szOption = dwSkillID .. ' - ' .. (X.GetSkillName(dwSkillID) or '?'),
+					szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+					nFrame = 49,
+					nMouseOverFrame = 51,
+					nIconWidth = 17,
+					nIconHeight = 17,
+					szLayer = 'ICON_RIGHTMOST',
+					fnClickIcon = function()
+						local aIgnoreSkill = {}
+						for i, v in ipairs(O.aIgnoreSkill) do
+							if not (i == nIndex and v == dwSkillID) then
+								table.insert(aIgnoreSkill, v)
+							end
+						end
+						O.aIgnoreSkill = aIgnoreSkill
+						D.UpdateUserSettings()
+						X.UI.ClosePopupMenu()
+					end,
+				})
+			end
+			if #menu > 0 then
+				table.insert(menu, X.CONSTANT.MENU_DIVIDER)
+			end
+			table.insert(menu, {
+				szOption = _L['Add'],
+				fnAction = function ()
+					GetUserInput(_L['Please input skill id'], function(szID)
+						local dwID = tonumber(szID)
+						if dwID then
+							local aIgnoreSkill = {}
+							for i, v in ipairs(O.aIgnoreSkill) do
+								if v == dwID then
+									return
+								end
+								table.insert(aIgnoreSkill, v)
+							end
+							table.insert(aIgnoreSkill, dwID)
+							O.aIgnoreSkill = aIgnoreSkill
+							D.UpdateUserSettings()
+						else
+							X.OutputSystemAnnounceMessage(_L['Invalid skill id'])
+						end
+					end, nil, nil, nil, '')
+				end,
+			})
+			return menu
+		end,
+	}):Width() + 5
+
+
 	nX = nPaddingX
 	nY = nY + nLH
 	return nX, nY
@@ -395,6 +467,7 @@ end
 
 X.RegisterUserSettingsInit('MY_VisualSkill', function()
 	D.bReady = true
+	D.UpdateUserSettings()
 	D.Reload()
 end)
 

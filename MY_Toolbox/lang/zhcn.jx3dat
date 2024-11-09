@@ -61,6 +61,10 @@ return {
     ['Visual skill'] = '显示历史招式列表',
     ['Penetrable UI'] = '界面穿透',
     ['Display %d skills.'] = '显示%d格。',
+    ['Ignore skill list'] = '配置隐藏招式',
+    ['Add'] = '添加',
+    ['Please input skill id'] = '请输入招式ID',
+    ['Invalid skill id'] = '不合法的招式ID',
 
     -- MY_ShenxingHelper
     ['MY_ShenxingHelper'] = '神行保护',
