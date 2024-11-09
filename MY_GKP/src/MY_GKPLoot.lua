@@ -630,7 +630,7 @@ function D.OnLButtonClick()
 					X.SendChat(PLAYER_TALK_CHANNEL.RAID, t)
 				end,
 			},
-			{ bDevide = true },
+			X.CONSTANT.MENU_DIVIDER,
 			{
 				szOption = _L['switch styles'],
 				fnAction = function()
@@ -638,7 +638,10 @@ function D.OnLButtonClick()
 					FireUIEvent('MY_GKP_LOOT_RELOAD')
 				end,
 			},
-			{ bDevide = true },
+			X.CONSTANT.MENU_DIVIDER,
+			D.GetFilterMenu(),
+			D.GetAutoPickupMenu(),
+			X.CONSTANT.MENU_DIVIDER,
 			{
 				szOption = _L['Config'],
 				fnAction = function()
@@ -656,9 +659,6 @@ function D.OnLButtonClick()
 		if IsCtrlKeyDown() then
 			table.insert(menu, 1, { szOption = dwDoodadID, bDisable = true })
 		end
-		table.insert(menu, X.CONSTANT.MENU_DIVIDER)
-		table.insert(menu, D.GetFilterMenu())
-		table.insert(menu, D.GetAutoPickupMenu())
 		X.UI.PopupMenu(menu)
 	elseif szName == 'Btn_Boss' then
 		if not D.AuthCheck(this:GetParent().doodadData.dwID) then
@@ -1189,7 +1189,7 @@ function D.GetBossAction(dwDoodadID, bMenu)
 			MY_GKP_LOOT_BOSS = v.dwID
 			fnAction()
 		end, false, true)
-		table.insert(menu, 1, { bDevide = true })
+		table.insert(menu, 1, X.CONSTANT.MENU_DIVIDER)
 		table.insert(menu, 1, { szOption = _L['select equip boss'], bDisable = true })
 		X.UI.PopupMenu(menu)
 	else
@@ -1471,7 +1471,7 @@ function D.GetDistributeMenu(aItemData, szAutoDistType)
 	end
 	local menu = {
 		{ szOption = table.concat(aItemName, g_tStrings.STR_PAUSE), bDisable = true },
-		{ bDevide = true }
+		X.CONSTANT.MENU_DIVIDER
 	}
 	local dwAutoDistID
 	if szAutoDistType then
@@ -1480,7 +1480,7 @@ function D.GetDistributeMenu(aItemData, szAutoDistType)
 			local member = aPartyMember(dwAutoDistID)
 			if member then
 				table.insert(menu, GetMemberMenu(member, aItemData, szAutoDistType, aDoodadID))
-				table.insert(menu, { bDevide = true })
+				table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 			end
 		end
 	end
@@ -1494,7 +1494,7 @@ end
 function D.GetItemBiddingMenu(dwDoodadID, data)
 	local menu = {}
 	table.insert(menu, { szOption = data.szName , bDisable = true })
-	table.insert(menu, { bDevide = true })
+	table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 	table.insert(menu, {
 		szOption = 'Roll',
 		fnAction = function()
@@ -1508,7 +1508,7 @@ function D.GetItemBiddingMenu(dwDoodadID, data)
 			return 0
 		end
 	})
-	table.insert(menu, { bDevide = true })
+	table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 	for k, v in ipairs(MY_GKP.aScheme) do
 		if v[3] then
 			table.insert(menu, {
