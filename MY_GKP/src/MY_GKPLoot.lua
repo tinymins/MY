@@ -1809,11 +1809,28 @@ function D.DrawLootList(dwDoodadID, bRemove)
 				hFI.itemData = itemData
 			end
 			local nW = D.GetListWidth()
-			hFL:SetW(nW - 8)
-			hFL:FormatAllItemPos()
-			hFL:SetSizeByAllItemSize()
-			h:SetSizeByAllItemSize()
-			hFL:SetW(nW)
+			if O.bVertical then
+				hFL:SetW(nW - 8)
+				hFL:FormatAllItemPos()
+				hFL:SetSizeByAllItemSize()
+				h:FormatAllItemPos()
+				h:SetSizeByAllItemSize()
+				h:SetW(nW)
+			else
+				local nRemainW = nW - (#aNormalItemData * 52) % nW
+				local nMaxRemainFilterItem = math.floor(nRemainW / 26) * 2
+				if nMaxRemainFilterItem >= #aFilterItemData then
+					hFL:SetW(nRemainW)
+				else
+					hFL:SetW(nW - 8)
+				end
+				hFL:SetRelPos(0, 0)
+				hFL:FormatAllItemPos()
+				hFL:SetSizeByAllItemSize()
+				h:Lookup('Image_FilterSpliter'):Hide()
+				h:FormatAllItemPos()
+				h:SetSize(hFL:GetSize())
+			end
 		end
 		if bSpecial then
 			hDoodad:Lookup('Image_DoodadBg'):FromUITex('ui/Image/OperationActivity/RedEnvelope2.uitex', 14)
