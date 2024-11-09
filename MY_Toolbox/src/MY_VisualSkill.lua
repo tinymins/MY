@@ -232,7 +232,25 @@ function D.OnFrameCreate()
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	this:RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT')
+	this:SetMousePenetrable(O.bPenetrable)
 	D.OnEvent('UI_SCALED')
+end
+
+function D.OnItemMouseEnter()
+	local name = this:GetName()
+	if name == 'Box_Skill' then
+		local dwSkillID, dwSkillLevel = this:GetObjectData()
+		X.OutputSkillTip(this, dwSkillID, dwSkillLevel)
+		this:SetObjectMouseOver(true)
+	end
+end
+
+function D.OnItemMouseLeave()
+	local name = this:GetName()
+	if name == 'Box_Skill' then
+		X.HideTip()
+		this:SetObjectMouseOver(false)
+	end
 end
 
 function D.OnEvent(event)
@@ -303,6 +321,15 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		end,
 	}):Width() + 5
 
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Penetrable UI'],
+		checked = MY_VisualSkill.bPenetrable,
+		onCheck = function(bChecked)
+			MY_VisualSkill.bPenetrable = bChecked
+		end,
+	}):Width() + 5
+
 	ui:Append('WndSlider', {
 		x = nX, y = nY,
 		sliderStyle = X.UI.SLIDER_STYLE.SHOW_VALUE, range = {1, 32},
@@ -352,6 +379,7 @@ local settings = {
 			},
 			triggers = {
 				bEnable              = D.Reload,
+				bPenetrable          = D.Reload,
 				nVisualSkillBoxCount = D.Reload,
 			},
 			root = O,

@@ -59,6 +59,7 @@ return {
     -- MY_VisualSkill
     ['MY_VisualSkill'] = '历史招式',
     ['Visual skill'] = '显示历史招式列表',
+    ['Penetrable UI'] = '界面穿透',
     ['Display %d skills.'] = '显示%d格。',
 
     -- MY_ShenxingHelper
