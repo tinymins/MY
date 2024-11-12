@@ -1755,12 +1755,8 @@ function D.DrawLootList(dwDoodadID, bRemove)
 				end
 			end
 			if O.bVertical then
-				local szSuit = IsItemDataSuitable(itemData)
 				h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
 					and (i == 1 or aNormalItemData[i - 1].szType ~= itemData.szType or not aNormalItemData[i - 1].bDist))
-				h:Lookup('Image_Suitable'):SetVisible(szSuit == 'SUITABLE')
-				h:Lookup('Image_MaybeSuitable'):SetVisible(szSuit == 'MAYBE_SUITABLE')
-				h:Lookup('Image_Better'):SetVisible(szSuit == 'BETTER')
 				h:Lookup('Image_Spliter'):SetVisible(i ~= #aNormalItemData)
 			else
 				txt:SetRelPos(2, 2)
@@ -1770,12 +1766,20 @@ function D.DrawLootList(dwDoodadID, bRemove)
 				txt:SetFontScheme(8)
 				box:SetSize(48, 48)
 				box:SetRelPos(2, 2)
+				h:Lookup('Image_Suitable'):SetRelPos(0, 35)
+				h:Lookup('Image_MaybeSuitable'):SetRelPos(0, 35)
+				h:Lookup('Image_Better'):SetRelPos(0, 32)
+				h:Lookup('Image_Better'):SetH(22)
 				h:SetSize(52, 52)
 				h:FormatAllItemPos()
 				h:Lookup('Image_GroupDistrib'):Hide()
 				h:Lookup('Image_Spliter'):Hide()
 				h:Lookup('Image_Hover'):SetSize(0, 0)
 			end
+			local szSuit = IsItemDataSuitable(itemData)
+			h:Lookup('Image_Suitable'):SetVisible(szSuit == 'SUITABLE')
+			h:Lookup('Image_MaybeSuitable'):SetVisible(szSuit == 'MAYBE_SUITABLE')
+			h:Lookup('Image_Better'):SetVisible(szSuit == 'BETTER')
 			txt:SetText(szName)
 			txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
 			UpdateBoxObject(box, UI_OBJECT_ITEM_ONLY_ID, item.dwID)
