@@ -2019,6 +2019,7 @@ function D.GetItemData(dwDoodadID, nItemIndex)
 		-- itemData
 		local data = {
 			dwDoodadID   = dwDoodadID    ,
+			nItemIndex   = nItemIndex    ,
 			szDoodadName = tDoodadInfo and tDoodadInfo.szName or '',
 			item         = item          ,
 			szName       = X.GetItemNameByItem(item),
@@ -2048,8 +2049,12 @@ function D.GetItemData(dwDoodadID, nItemIndex)
 	end
 end
 
-local function LootItemSorter(data1, data2)
+local function LootItemWeightSorter(data1, data2)
 	return data1.nWeight < data2.nWeight
+end
+
+local function LootItemIndexSorter(data1, data2)
+	return data1.nItemIndex > data2.nItemIndex
 end
 
 -- ºÏ≤ÈŒÔ∆∑
@@ -2070,7 +2075,9 @@ function D.GetDoodadLootInfo(dwDoodadID)
 		end
 	end
 	if O.bSortLoot then
-		table.sort(aItemData, LootItemSorter)
+		table.sort(aItemData, LootItemWeightSorter)
+	else
+		table.sort(aItemData, LootItemIndexSorter)
 	end
 	return aItemData, nMoney, szName, bSpecial
 end
