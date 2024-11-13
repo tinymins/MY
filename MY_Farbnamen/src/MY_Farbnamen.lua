@@ -620,15 +620,19 @@ function D.GetTip(szName)
 				end
 			end
 		end
+		local szName = tInfo.szName
+		if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
+			szName = MY_ChatMosaics.MosaicsString(szName)
+		end
 		-- 拼音
 		if IsCtrlKeyDown() then
-			local szPinyin = X.Han2TonePinyin(X.ExtractPlayerBaseName(tInfo.szName), true)[1]
+			local szPinyin = X.Han2TonePinyin(X.ExtractPlayerBaseName(szName), true)[1]
 			if not X.IsEmpty(szPinyin) then
 				table.insert(tTip, GetFormatText(szPinyin .. '\n', 136))
 			end
 		end
 		-- 名称 等级
-		table.insert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
+		table.insert(tTip, GetFormatText(('%s(%d)'):format(szName, tInfo.nLevel), 136))
 		-- 是否同队伍
 		if X.GetClientPlayerID() ~= tInfo.dwID and X.IsTeammate(tInfo.dwID) then
 			table.insert(tTip, GetFormatText(_L['[Teammate]'], nil, 0, 255, 0))
@@ -641,7 +645,11 @@ function D.GetTip(szName)
 		end
 		-- 帮会
 		if tInfo.szTongName and #tInfo.szTongName > 0 then
-			table.insert(tTip, GetFormatText('[' .. tInfo.szTongName .. ']', 136))
+			local szTongName = tInfo.szTongName
+			if MY_ChatMosaics and MY_ChatMosaics.MosaicsString then
+				szTongName = MY_ChatMosaics.MosaicsString(szTongName)
+			end
+			table.insert(tTip, GetFormatText('[' .. szTongName .. ']', 136))
 			table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
 		end
 		-- 门派 体型 阵营
