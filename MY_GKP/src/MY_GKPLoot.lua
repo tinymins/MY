@@ -108,8 +108,9 @@ local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 	bSortLoot = { -- 按照价值高低排序掉落物品
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szVersion = '20241113',
 		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
+		xDefaultValue = false,
 	},
 	tConfirm = {
 		ePathType = X.PATH_TYPE.ROLE,
