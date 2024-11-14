@@ -1747,14 +1747,6 @@ function D.DrawLootList(dwDoodadID, bRemove)
 			local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, 'Handle_Item')
 			local box = h:Lookup('Box_Item')
 			local txt = h:Lookup('Text_Item')
-			if O.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
-				for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
-					if szName:find(szForceTitle) then
-						txt:SetFontColor(X.GetForceColor(dwForceID))
-						break
-					end
-				end
-			end
 			if O.bVertical then
 				h:Lookup('Image_GroupDistrib'):SetVisible(itemData.bDist
 					and (i == 1 or aNormalItemData[i - 1].szType ~= itemData.szType or not aNormalItemData[i - 1].bDist))
@@ -1789,6 +1781,14 @@ function D.DrawLootList(dwDoodadID, bRemove)
 			-- box:SetOverTextPosition(3, ITEM_POSITION.LEFT_TOP)
 			if GKP_LOOT_RECENT[item.nUiId] then
 				box:SetObjectStaring(true)
+			end
+			if O.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
+				for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
+					if szName:find(szForceTitle) then
+						txt:SetFontColor(X.GetForceColor(dwForceID))
+						break
+					end
+				end
 			end
 			if itemData.bDist then
 				bDist = true
