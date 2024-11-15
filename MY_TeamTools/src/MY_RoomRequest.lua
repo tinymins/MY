@@ -263,7 +263,7 @@ function D.OnPeekPlayer(szGlobalID, eState, kPlayer)
 end
 
 function D.PeekPlayer(szGlobalID, dwServerID)
-	X.PeekOtherPlayerByGlobalID(szGlobalID, dwServerID, D.OnPeekPlayer)
+	X.PeekOtherPlayerByGlobalID(dwServerID, szGlobalID, D.OnPeekPlayer)
 end
 
 function D.AcceptRequest(info)
