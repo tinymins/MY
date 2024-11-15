@@ -188,9 +188,16 @@ function X.IsDebugServer()
 end
 
 function X.IsMobileClient(nClientVersionType)
+	if IsMobileClient then
+		return IsMobileClient(nClientVersionType)
+	end
 	return nClientVersionType == X.CONSTANT.CLIENT_VERSION_TYPE.MOBILE_ANDROID
 		or nClientVersionType == X.CONSTANT.CLIENT_VERSION_TYPE.MOBILE_IOS
 		or nClientVersionType == X.CONSTANT.CLIENT_VERSION_TYPE.MOBILE_PC
+		or nClientVersionType == X.CONSTANT.CLIENT_VERSION_TYPE.MOBILE_OHOS
+		or nClientVersionType == X.CONSTANT.CLIENT_VERSION_TYPE.MOBILE_MAC
+		or nClientVersionType == X.CONSTANT.CLIENT_VERSION_TYPE.MOBILE_WLCLOUD_ANDROID
+		or nClientVersionType == X.CONSTANT.CLIENT_VERSION_TYPE.MOBILE_WLCLOUD_IOS
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
