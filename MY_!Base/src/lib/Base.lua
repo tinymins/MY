@@ -51,8 +51,8 @@ local CODE_PAGE = {
 }
 
 local _NAME_SPACE_            = 'MY'
-local _BUILD_                 = '20241111'
-local _VERSION_               = '27.0.8'
+local _BUILD_                 = '20241115'
+local _VERSION_               = '27.0.9'
 local _MENU_COLOR_            = {255, 165, 79}
 local _INTERFACE_ROOT_        = 'Interface/'
 local _ADDON_ROOT_            = _INTERFACE_ROOT_ .. _NAME_SPACE_ .. '/'
