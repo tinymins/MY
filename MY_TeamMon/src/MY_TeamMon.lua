@@ -127,8 +127,9 @@ local MY_TEAM_MON_SHARE_QUEUE  = {}
 local MY_TEAM_MON_MARK_QUEUE   = {}
 local MY_TEAM_MON_MARK_IDLE    = true -- 标记空闲
 
-local MY_TEAM_MON_SHIELDED_TOTAL        = false -- 标记当前在功能限制状态 限制所有功能监听
-local MY_TEAM_MON_SHIELDED_OTHER_PLAYER = false -- 标记当前在可能发生PVP战斗的地图 限制他人战斗功能监听
+local MY_TEAM_MON_SHIELDED_TOTAL             = false -- 标记当前在功能限制状态 限制所有功能监听
+local MY_TEAM_MON_SHIELDED_OTHER_PLAYER      = false -- 标记当前在可能发生PVP战斗的地图 限制他人战斗功能监听
+local MY_TEAM_MON_SHIELDED_ENTER_LEAVE_SCENE = false -- 标记当前在功能限制状态 限制场景目标进出功能监听
 ----
 local MY_TEAM_MON_LEFT_BRACKET      = _L['[']
 local MY_TEAM_MON_RIGHT_BRACKET     = _L[']']
@@ -702,12 +703,15 @@ function D.UpdateShieldStatus()
 	local bRestricted = X.IsRestricted('MY_TeamMon.MapRestriction')
 	local bShieldedTotal = bRestricted and X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()
 	local bShieldedOtherPlayer = bRestricted and not X.IsInDungeonMap()
+	local bShieldedEnterLeaveScene = bRestricted and not X.IsInPubgMap()
 	if not MY_TEAM_MON_SHIELDED_TOTAL and bShieldedTotal then
 		X.OutputSystemMessage(_L['MY_TeamMon is blocked in current kungfu, temporary disabled.'])
 	elseif not MY_TEAM_MON_SHIELDED_OTHER_PLAYER and bShieldedOtherPlayer then
 		X.OutputSystemMessage(_L['MY_TeamMon is shielded other player in this map, temporary disabled.'])
 	end
-	MY_TEAM_MON_SHIELDED_TOTAL, MY_TEAM_MON_SHIELDED_OTHER_PLAYER = bShieldedTotal, bShieldedOtherPlayer
+	MY_TEAM_MON_SHIELDED_TOTAL = bShieldedTotal
+	MY_TEAM_MON_SHIELDED_OTHER_PLAYER = bShieldedOtherPlayer
+	MY_TEAM_MON_SHIELDED_ENTER_LEAVE_SCENE = bShieldedEnterLeaveScene
 end
 
 local function CreateCache(szType, tab)
@@ -1329,7 +1333,7 @@ function D.OnNpcEvent(npc, bEnter)
 			end
 		end
 	end
-	if MY_TEAM_MON_SHIELDED_TOTAL then
+	if MY_TEAM_MON_SHIELDED_TOTAL or MY_TEAM_MON_SHIELDED_ENTER_LEAVE_SCENE then
 		return
 	end
 	if data then
@@ -1479,7 +1483,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 			end
 		end
 	end
-	if MY_TEAM_MON_SHIELDED_TOTAL then
+	if MY_TEAM_MON_SHIELDED_TOTAL or MY_TEAM_MON_SHIELDED_ENTER_LEAVE_SCENE then
 		return
 	end
 	if data then
@@ -1578,7 +1582,7 @@ function D.OnDoodadEvent(doodad, bEnter)
 end
 
 function D.OnDoodadAllLeave(dwTemplateID)
-	if MY_TEAM_MON_SHIELDED_TOTAL then
+	if MY_TEAM_MON_SHIELDED_TOTAL or MY_TEAM_MON_SHIELDED_ENTER_LEAVE_SCENE then
 		return
 	end
 	local data = D.GetData('DOODAD', dwTemplateID)
@@ -1877,7 +1881,7 @@ end
 
 -- NPC 全部消失的倒计时处理
 function D.OnNpcAllLeave(dwTemplateID)
-	if MY_TEAM_MON_SHIELDED_TOTAL then
+	if MY_TEAM_MON_SHIELDED_TOTAL or MY_TEAM_MON_SHIELDED_ENTER_LEAVE_SCENE then
 		return
 	end
 	local data = D.GetData('NPC', dwTemplateID)
