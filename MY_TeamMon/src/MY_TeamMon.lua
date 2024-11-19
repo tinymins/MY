@@ -700,14 +700,23 @@ end
 
 -- 更新当前地图使用条件
 function D.UpdateShieldStatus()
-	local bRestricted = X.IsRestricted('MY_TeamMon.MapRestriction')
-	local bShieldedTotal = bRestricted and X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()
-	local bShieldedOtherPlayer = bRestricted and not X.IsInDungeonMap()
-	local bShieldedEnterLeaveScene = bRestricted and not X.IsInPubgMap()
-	if not MY_TEAM_MON_SHIELDED_TOTAL and bShieldedTotal then
-		X.OutputSystemMessage(_L['MY_TeamMon is blocked in current kungfu, temporary disabled.'])
-	elseif not MY_TEAM_MON_SHIELDED_OTHER_PLAYER and bShieldedOtherPlayer then
-		X.OutputSystemMessage(_L['MY_TeamMon is shielded other player in this map, temporary disabled.'])
+	local bShieldedTotal = false
+	local bShieldedOtherPlayer = false
+	local bShieldedEnterLeaveScene = false
+	if X.IsRestricted('MY_TeamMon.MapRestriction') then
+		-- 地图限制判断
+		if X.IsInPubgMap() or (X.IsInCompetitionMap() and X.IsClientPlayerMountMobileKungfu()) then
+			bShieldedTotal = true
+		end
+		if not X.IsInDungeonMap() then
+			bShieldedOtherPlayer = true
+		end
+		-- 地图限制提示
+		if not MY_TEAM_MON_SHIELDED_TOTAL and bShieldedTotal then
+			X.OutputSystemMessage(_L['MY_TeamMon is blocked in current kungfu, temporary disabled.'])
+		elseif not MY_TEAM_MON_SHIELDED_OTHER_PLAYER and bShieldedOtherPlayer then
+			X.OutputSystemMessage(_L['MY_TeamMon is shielded other player in this map, temporary disabled.'])
+		end
 	end
 	MY_TEAM_MON_SHIELDED_TOTAL = bShieldedTotal
 	MY_TEAM_MON_SHIELDED_OTHER_PLAYER = bShieldedOtherPlayer
