@@ -8,7 +8,7 @@
 --------------------------------------------------------------------------------
 local X = MY
 --------------------------------------------------------------------------------
-local MODULE_PATH = 'MY_ChatLog/MY_ChatLog_PS'
+local MODULE_PATH = 'MY_ChatLog/MY_ChatLog.PS'
 local PLUGIN_NAME = 'MY_ChatLog'
 local PLUGIN_ROOT = X.PACKET_INFO.ROOT .. PLUGIN_NAME
 local MODULE_NAME = 'MY_ChatLog'
