@@ -229,7 +229,11 @@ a.content {
 				if (part.type === 'namelink') {
 					contentHtml += '<a class="namelink force-' + part.force_id + '">' + part.name + '</a>';
 				} else if (part.type === 'text') {
-					contentHtml += '<span style="color:' + part.color + '">' + part.text + '</span>';
+					contentHtml += '<span';
+					if (part.color) {
+						contentHtml += ' style="color:' + part.color + '"';
+					}
+					contentHtml += '>' + part.text + '</span>';
 				} else if (part.type === 'emotion') {
 					contentHtml += '<span class="emotion emotion_' + part.id + '"></span>';
 				}
@@ -364,7 +368,7 @@ local function convertXml2MessageJSON(szXml)
 	local aMessage = {}
 	if aXMLNode then
 		local text, name, force, r, g, b, color
-		for _, node in ipairs(aXMLNode) do
+		for i, node in ipairs(aXMLNode) do
 			text = X.XMLGetNodeData(node, 'text')
 			name = X.XMLGetNodeData(node, 'name')
 			if text then
@@ -393,7 +397,7 @@ local function convertXml2MessageJSON(szXml)
 					table.insert(aMessage, {
 						type = 'text',
 						text = text,
-						color = color or '#FFFFFF',
+						color = color,
 					})
 				end
 			elseif name and name:sub(1, 8) == 'emotion_' then
@@ -402,6 +406,16 @@ local function convertXml2MessageJSON(szXml)
 					type = 'emotion',
 					id = emotion_id,
 				})
+			else
+				-- 金钱单位等图片解析
+				local aSay = X.ParseChatData({ node })
+				local item = aSay and aSay[1]
+				if item and item.text then
+					table.insert(aMessage, {
+						type = 'text',
+						text = item.text,
+					})
+				end
 			end
 		end
 	end
