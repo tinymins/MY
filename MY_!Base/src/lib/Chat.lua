@@ -296,6 +296,9 @@ function X.CopyChatLine(hTime, bTextEditor, bRichText)
 					end
 				else
 					local szImg, nFrame = p:GetImagePath()
+					if X.IsString(szImg) then
+						path = X.StringLowerW(X.NormalizePath(szImg))
+					end
 					if szImg == 'ui\\image\\common\\money.uitex' and nFrame == 0 then
 						edit:InsertText(_L['Gold'])
 					elseif szImg == 'ui\\image\\common\\money.uitex' and nFrame == 2 then
@@ -693,6 +696,9 @@ local function ParseChatData(oData, tOption, aContent, bIgnoreRange)
 			else -- 货币单位
 				local path = X.XMLGetNodeData(node, 'path')
 				local frame = X.XMLGetNodeData(node, 'frame')
+				if X.IsString(path) then
+					path = X.StringLowerW(X.NormalizePath(path))
+				end
 				if path == 'ui\\image\\common\\money.uitex' and frame == 0 then
 					table.insert(aContent, {
 						type = 'text',
@@ -816,6 +822,9 @@ local function ParseChatData(oData, tOption, aContent, bIgnoreRange)
 				end
 			else -- 货币单位
 				local path, frame = elem:GetImagePath()
+				if X.IsString(path) then
+					path = X.StringLowerW(X.NormalizePath(path))
+				end
 				if path == 'ui\\image\\common\\money.uitex' and frame == 0 then
 					table.insert(aContent, {
 						type = 'text',
