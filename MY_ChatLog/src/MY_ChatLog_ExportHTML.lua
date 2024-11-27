@@ -428,11 +428,14 @@ function D.Start(szExportFile, aMsgType, nPerSec, onProgress)
 			if r and g and b then
 				color = ('#%02X%02X%02X'):format(r, g, b)
 			end
+			local aXMLNode = X.XMLDecode(rec.szMsg)
+			local aSay = X.ParseChatData(aXMLNode)
+			local szText = X.StringifyChatText(aSay)
 			local msg = {
 				time = rec.nTime,
 				talker = rec.szTalker or '',
 				color = color,
-				text = X.FormatTime(rec.nTime, '[%yyyy/%MM/%dd][%hh:%mm:%ss]') .. X.GetPureText(rec.szMsg),
+				text = X.FormatTime(rec.nTime, '[%yyyy/%MM/%dd][%hh:%mm:%ss]') .. szText,
 				parts = convertXml2MessageJSON(rec.szMsg)
 			}
 			if nPage ~= 0 or i ~= 1 then
