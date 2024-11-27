@@ -105,6 +105,7 @@ a.content {
 }
 .message-item {
 	display: flex;
+	align-items: center;
 }
 {{$emotionStyles}}
 .emotion {
