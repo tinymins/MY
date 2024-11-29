@@ -12,6 +12,9 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Storage.UserSettings')
 --------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
+--- 思维导图
+--- https://www.processon.com/view/link/67495e06ef5dd571a450dddb?cid=61ffb4506376890390cf80e2 访问密码：ot1K
+--------------------------------------------------------------------------------
 
 local USER_SETTINGS_UPDATE_EVENT = {
 	szName = 'UserSettingsUpdate',
@@ -79,6 +82,7 @@ local DATABASE_TYPE_PRESET_FILE_MIGRATE = {
 local DATABASE_INSTANCE = {}
 local USER_SETTINGS_INFO = {}
 local USER_SETTINGS_LIST = {}
+local USER_SETTINGS_LOCATION_OVERRIDE = {}
 local DATA_CACHE = {}
 local DATA_CACHE_LEAF_FLAG = {}
 local FLUSH_TIME = 0
@@ -88,8 +92,14 @@ local function GetDB(inst, info)
 	if info.bUserData then
 		return inst.pUserDataDB
 	end
-	if info.bPersonal then
-		return inst.pPersonalSettingsDB
+	if info.eLocationOverride == X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.ROLE then
+		return inst.pRoleSettingsDB
+	end
+	if info.eLocationOverride == X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.SERVER then
+		return inst.pServerSettingsDB
+	end
+	if info.eLocationOverride == X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.GLOBAL then
+		return inst.pGlobalSettingsDB
 	end
 	return inst.pSettingsDB
 end
@@ -138,6 +148,7 @@ function X.ConnectUserSettingsDB()
 		return
 	end
 	-- 角色共享方案
+	X.LoadUserSettingsLocationOverride()
 	local szID, szDBPresetRoot = X.GetUserSettingsPresetID(), nil
 	if not X.IsEmpty(szID) then
 		szDBPresetRoot = X.FormatPath({'config/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL})
@@ -154,34 +165,39 @@ function X.ConnectUserSettingsDB()
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
-			-- 角色独有配置
-			local szPersonalSettingsRoot = X.FormatPath({'config/', ePathType})
-			CPath.MakeDir(szPersonalSettingsRoot)
-			local pPersonalSettingsDB = X.NoSQLiteConnect(szPersonalSettingsRoot .. 'settings.db')
-			if not pPersonalSettingsDB then
-				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect user role settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
-			end
-			-- 普通配置
-			local pSettingsDB = pPersonalSettingsDB
-			if szDBPresetRoot then
-				pSettingsDB = X.NoSQLiteConnect(szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType])
-			end
-			if not pSettingsDB then
-				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect user settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
-			end
 			-- 用户数据
-			local szUserDataRoot = X.FormatPath({'userdata/', ePathType})
-			CPath.MakeDir(szUserDataRoot)
-			local pUserDataDB = X.NoSQLiteConnect(szUserDataRoot .. 'userdata.db')
+			local pUserDataDB = X.NoSQLiteConnect({'userdata/userdata.db', ePathType})
 			if not pUserDataDB then
 				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect userdata database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
 			end
+			-- 普通配置/方案共享
+			local pSettingsDB = X.NoSQLiteConnect(szDBPresetRoot and (szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType]) or {'config/settings.db', ePathType})
+			if not pSettingsDB then
+				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect user settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
+			end
+			-- 角色独有
+			local pRoleSettingsDB = X.NoSQLiteConnect({'config/settings.db', X.PATH_TYPE.ROLE})
+			if not pRoleSettingsDB then
+				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect user role settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
+			end
+			-- 服务器共享
+			local pServerSettingsDB = X.NoSQLiteConnect({'config/settings.db', X.PATH_TYPE.SERVER})
+			if not pServerSettingsDB then
+				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect user role settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
+			end
+			-- 全局共享
+			local pGlobalSettingsDB = X.NoSQLiteConnect({'config/settings.db', X.PATH_TYPE.GLOBAL})
+			if not pGlobalSettingsDB then
+				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect user role settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
+			end
 			DATABASE_INSTANCE[ePathType] = {
-				pPersonalSettingsDB = pPersonalSettingsDB,
-				pSettingsDB = pSettingsDB,
-				-- bSettingsDBCommit = false,
 				pUserDataDB = pUserDataDB,
 				-- bUserDataDBCommit = false,
+				pSettingsDB = pSettingsDB,
+				-- bSettingsDBCommit = false,
+				pRoleSettingsDB = pRoleSettingsDB,
+				pServerSettingsDB = pServerSettingsDB,
+				pGlobalSettingsDB = pGlobalSettingsDB,
 			}
 		end
 	end
@@ -275,26 +291,69 @@ function X.RemoveUserSettingsPreset(szID)
 	CPath.DelDir(X.FormatPath({'config/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL}))
 end
 
+-- 加载配置项存储位置重定向设置
+function X.LoadUserSettingsLocationOverride()
+	for k, _ in pairs(USER_SETTINGS_LOCATION_OVERRIDE) do
+		USER_SETTINGS_LOCATION_OVERRIDE[k] = nil
+	end
+	local tLocationOverride = X.LoadLUAData({'config/usersettings-location-override.jx3dat', X.PATH_TYPE.ROLE})
+	if X.IsTable(tLocationOverride) then
+		for k, v in pairs(tLocationOverride) do
+			if X.IsString(k) and X.IsNumber(v) then
+				USER_SETTINGS_LOCATION_OVERRIDE[k] = v
+			end
+		end
+	end
+end
+
+-- 保存配置项存储位置重定向设置
+function X.SaveUserSettingsLocationOverride()
+	X.SaveLUAData({'config/usersettings-location-override.jx3dat', X.PATH_TYPE.ROLE}, USER_SETTINGS_LOCATION_OVERRIDE)
+end
+
+-- 获取指定配置项是否被设定为角色不同步设置
+---@param szKey string @配置项唯一标识符
+---@return number @是否被设定为角色不同步设置
+function X.GetUserSettingsLocationOverride(szKey)
+	local info = USER_SETTINGS_INFO[szKey]
+	if not info then
+		assert(false, 'GetUserSettingsLocationOverride KEY(' .. X.EncodeLUAData(szKey) .. '): `Key` has not been registered.')
+	end
+	return info.eLocationOverride
+end
+
+-- 设置指定配置项存储位置重定向设置
+---@param szKey string @配置项唯一标识符
+---@param eLocation number @配置项存储位置重定向设置 X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE
+function X.SetUserSettingsLocationOverride(szKey, eLocation)
+	local info = USER_SETTINGS_INFO[szKey]
+	if not info then
+		assert(false, 'SetUserSettingsLocationOverride KEY(' .. X.EncodeLUAData(szKey) .. '): `Key` has not been registered.')
+	end
+	USER_SETTINGS_LOCATION_OVERRIDE[szKey] = eLocation
+	X.DelayCall('LIB.SetUserSettingsLocationOverride', X.SaveUserSettingsLocationOverride)
+	X.ReloadUserSettings(szKey)
+end
+
 -- 注册单个用户配置项
 -- @param {string} szKey 配置项全局唯一键
 -- @param {table} tOption 自定义配置项
 --   {PATH_TYPE} tOption.ePathType 配置项保存位置（当前角色、当前服务器、全局）
 --   {string} tOption.szDataKey 配置项入库时的键值，一般不需要手动指定，默认与配置项全局键值一致
---   {string} tOption.bPersonal 配置项是否忽略预设方案重定向，为真将即为不共享的角色配置项，禁止共用
---   {string} tOption.bUserData 配置项是否为角色数据项，为真将忽略预设方案重定向，禁止共用，禁止导入导出
+--   {boolean} tOption.bUserData 配置项是否为角色数据项，为真将忽略预设方案重定向，禁止共用，禁止导入导出
 --   {string} tOption.szGroup 配置项分组组标题，用于导入导出显示，禁止导入导出请留空
 --   {string} tOption.szLabel 配置标题，用于导入导出显示，禁止导入导出请留空
 --   {string} tOption.szVersion 数据版本号，加载数据时会丢弃版本不一致的数据
 --   {any} tOption.xDefaultValue 数据默认值
+--   {number} tOption.eDefaultLocationOverride 配置项默认存储位置重定向设置，用于默认不参与方案共享的配置项
 --   {schema} tOption.xSchema 数据类型约束对象，通过 Schema 库生成
 --   {boolean} tOption.bDataSet 是否为配置项组（如用户多套自定义偏好），配置项组在读写时需要额外传入一个组下配置项唯一键值（即多套自定义偏好中某一项的名字）
 --   {table} tOption.tDataSetDefaultValue 数据默认值（仅当 bDataSet 为真时生效，用于设置配置项组不同默认值）
 function X.RegisterUserSettings(szKey, tOption)
-	local ePathType, szDataKey, bPersonal, bUserData, szGroup, szLabel, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue
+	local ePathType, szDataKey, bUserData, szGroup, szLabel, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue, eDefaultLocationOverride
 	if X.IsTable(tOption) then
 		ePathType = tOption.ePathType
 		szDataKey = tOption.szDataKey
-		bPersonal = tOption.bPersonal
 		bUserData = tOption.bUserData
 		szGroup = tOption.szGroup
 		szLabel = tOption.szLabel
@@ -303,6 +362,7 @@ function X.RegisterUserSettings(szKey, tOption)
 		xSchema = tOption.xSchema
 		bDataSet = tOption.bDataSet
 		tDataSetDefaultValue = tOption.tDataSetDefaultValue
+		eDefaultLocationOverride = tOption.eDefaultLocationOverride
 	end
 	if not ePathType then
 		ePathType = X.PATH_TYPE.ROLE
@@ -365,7 +425,6 @@ function X.RegisterUserSettings(szKey, tOption)
 	local tInfo = {
 		szKey = szKey,
 		ePathType = ePathType,
-		bPersonal = bPersonal,
 		bUserData = bUserData,
 		szDataKey = szDataKey,
 		szGroup = szGroup,
@@ -375,13 +434,27 @@ function X.RegisterUserSettings(szKey, tOption)
 		xSchema = xSchema,
 		bDataSet = bDataSet,
 		tDataSetDefaultValue = tDataSetDefaultValue,
+		eDefaultLocationOverride = eDefaultLocationOverride,
 	}
+	setmetatable(tInfo, {
+		__index = function(t, k)
+			if k == 'eLocationOverride' then
+				return USER_SETTINGS_LOCATION_OVERRIDE[szKey]
+					or t.eDefaultLocationOverride
+					or X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.PRESET
+			end
+		end,
+	})
 	USER_SETTINGS_INFO[szKey] = tInfo
 	table.insert(USER_SETTINGS_LIST, tInfo)
 end
 
 function X.GetRegisterUserSettingsList()
-	return X.Clone(USER_SETTINGS_LIST)
+	local aList = {}
+	for _, v in ipairs(USER_SETTINGS_LIST) do
+		table.insert(aList, setmetatable({}, { __index = v }))
+	end
+	return aList
 end
 
 function X.ExportUserSettings(aKey)
@@ -592,6 +665,7 @@ function X.ReloadUserSettings(szKey, ...)
 		root[key] = nil
 	end
 	X.GetUserSettings(szKey, ...)
+	X.CommonEventFirer(USER_SETTINGS_UPDATE_EVENT, szKey)
 end
 
 -- 删除用户配置项值（恢复默认值）
