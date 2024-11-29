@@ -199,5 +199,16 @@ return {
 	['No custom setting found, nothing to export.'] = '选中的配置项尚未进行自定义配置，默认配置无需导出。',
 	['%d settings exported, file saved in %s.'] = '成功导出 %d 条配置项，文件位于：%s。',
 
+	['User Settings Location Override'] = '插件设置项高级共享方案设置',
+	['Settings description'] = '设置项描述',
+	['Preset'] = '默认',
+	['Preset mean follow preset location.'] = '默认位置：跟随插件“系统-全局设置”中“插件设置项方案选择”的状态',
+	['Role'] = '角色',
+	['Role: always follow role.'] = '角色独有：无视方案设置，使用角色独有配置，不与其他角色共享。',
+	['Server'] = '服务器',
+	['Server: always follow server.'] = '服务器共享：无视方案设置，使用同服务器共享配置。',
+	['Global'] = '全局',
+	['Global: always follow global.'] = '全局共享：无视方案设置，使用全局共享配置。',
+
 	['Global config'] = '全局设置',
 }

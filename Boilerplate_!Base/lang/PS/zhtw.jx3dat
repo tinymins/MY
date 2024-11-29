@@ -36,6 +36,7 @@ return {
 	['Enable debug tools'] = '啟用調試工具',
 	['Debug tools has been enabled...'] = '測試工具已激活_(:彡」∠)_',
 	['Flush data'] = '保存數據',
+	['Location override'] = '高級設置',
 	['Export data'] = '導出配置',
 	['Import data'] = '導入配置',
 	['Backup folder'] = '查看導出',
