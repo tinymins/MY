@@ -183,7 +183,7 @@ end
 
 -- 获取父层目录 注意文件和文件夹获取父层的区别
 function X.GetParentPath(szPath)
-	return X.NormalizePath(szPath):gsub('/[^/]*$', '')
+	return (X.NormalizePath(szPath):gsub('/[^/]*$', ''))
 end
 
 do local CREATED = {}
