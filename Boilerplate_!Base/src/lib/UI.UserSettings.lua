@@ -241,7 +241,7 @@ function D.OpenLocationOverridePanel()
 				alignVertical = 'middle',
 				render = function(value, record, index)
 					if record.eLocationOverride == X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.PRESET then
-						return GetFormatText('y', 162, 255, 255, 255)
+						return GetFormatText(_L['y'], 162, 255, 255, 255)
 					end
 					return ''
 				end,
@@ -258,7 +258,7 @@ function D.OpenLocationOverridePanel()
 				alignVertical = 'middle',
 				render = function(value, record, index)
 					if record.eLocationOverride == X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.ROLE then
-						return GetFormatText('y', 162, 255, 255, 255)
+						return GetFormatText(_L['y'], 162, 255, 255, 255)
 					end
 					return ''
 				end,
@@ -275,7 +275,7 @@ function D.OpenLocationOverridePanel()
 				alignVertical = 'middle',
 				render = function(value, record, index)
 					if record.eLocationOverride == X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.SERVER then
-						return GetFormatText('y', 162, 255, 255, 255)
+						return GetFormatText(_L['y'], 162, 255, 255, 255)
 					end
 					return ''
 				end,
@@ -292,7 +292,7 @@ function D.OpenLocationOverridePanel()
 				alignVertical = 'middle',
 				render = function(value, record, index)
 					if record.eLocationOverride == X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.GLOBAL then
-						return GetFormatText('y', 162, 255, 255, 255)
+						return GetFormatText(_L['y'], 162, 255, 255, 255)
 					end
 					return ''
 				end,

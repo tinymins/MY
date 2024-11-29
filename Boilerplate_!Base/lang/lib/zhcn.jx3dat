@@ -201,6 +201,7 @@ return {
 
 	['User Settings Location Override'] = '插件设置项高级共享方案设置',
 	['Settings description'] = '设置项描述',
+	['y'] = '√',
 	['Preset'] = '默认',
 	['Preset mean follow preset location.'] = '默认位置：跟随插件“系统-全局设置”中“插件设置项方案选择”的状态',
 	['Role'] = '角色',
