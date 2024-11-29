@@ -212,5 +212,5 @@ return {
 	['Global: always follow global.'] = '全局共享：無視方案設置，使用全局共享配置。',
 
 	['Global config'] = '全局設置',
-	['Global - Distance type'] = '全局設置·默認距離計算方式',
+	['Distance type'] = '默認距離計算方式',
 }
