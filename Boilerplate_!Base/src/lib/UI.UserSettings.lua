@@ -16,7 +16,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 local D = {}
 local FRAME_NAME = X.NSFormatString('{$NS}_UserSettings')
 
-function D.Open(bImport)
+function D.OpenImportExport(bImport)
 	local tSettings = {}
 	if bImport then
 		local szRoot = X.FormatPath({'export/settings', X.PATH_TYPE.GLOBAL})
@@ -177,6 +177,14 @@ function D.Open(bImport)
 	uiFrame:Anchor('CENTER')
 end
 
+function D.OpenExportPanel()
+	D.OpenImportExport(false)
+end
+
+function D.OpenImportPanel()
+	D.OpenImportExport(true)
+end
+
 --------------------------------------------------------------------------------
 -- 全局导出
 --------------------------------------------------------------------------------
@@ -187,7 +195,8 @@ local settings = {
 		{
 			preset = 'UIEvent',
 			fields = {
-				'Open',
+				'OpenExportPanel',
+				'OpenImportPanel',
 			},
 			root = D,
 		},
@@ -196,12 +205,7 @@ local settings = {
 _G[FRAME_NAME] = X.CreateModule(settings)
 end
 
-function X.OpenUserSettingsExportPanel()
-	D.Open()
-end
-
-function X.OpenUserSettingsImportPanel()
-	D.Open(true)
-end
+X.OpenUserSettingsExportPanel = D.OpenExportPanel
+X.OpenUserSettingsImportPanel = D.OpenImportPanel
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
