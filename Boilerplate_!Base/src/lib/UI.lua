@@ -354,6 +354,10 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onRowLClick        ~= nil then ui:RowLClick        (arg.onRowLClick                                 ) end
 		if arg.onRowMClick        ~= nil then ui:RowMClick        (arg.onRowMClick                                 ) end
 		if arg.onRowRClick        ~= nil then ui:RowRClick        (arg.onRowRClick                                 ) end
+		if arg.onCellClick        ~= nil then ui:CellClick        (arg.onCellClick                                 ) end
+		if arg.onCellLClick       ~= nil then ui:CellLClick       (arg.onCellLClick                                ) end
+		if arg.onCellMClick       ~= nil then ui:CellMClick       (arg.onCellMClick                                ) end
+		if arg.onCellRClick       ~= nil then ui:CellRClick       (arg.onCellRClick                                ) end
 		if arg.onColorPick        ~= nil then ui:ColorPick        (arg.onColorPick                                 ) end
 		if arg.checked            ~= nil then ui:Check            (arg.checked                                     ) end
 		if arg.onCheck            ~= nil then ui:Check            (arg.onCheck                                     ) end
@@ -1448,13 +1452,14 @@ local function InitComponent(raw, szType)
 					hRowColumns:Clear()
 					hRow:Lookup('Image_RowBg'):SetVisible(nRowIndex % 2 == 1)
 					for nColumnIndex, col in ipairs(aColumns) do
+						local xValue = rec[col.key]
 						local hItem = hRowColumns:AppendItemFromIni(X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndTable.ini', 'Handle_Item') -- 外部居中层
 						local hItemContent = hItem:Lookup('Handle_ItemContent') -- 内部文本布局层
 						local szXml
 						if col.render then
-							szXml = col.render(rec[col.key], rec, nRowIndex)
+							szXml = col.render(xValue, rec, nRowIndex)
 						else
-							szXml = GetFormatText(rec[col.key])
+							szXml = GetFormatText(xValue)
 						end
 						hItemContent:AppendItemFromString(szXml)
 						-- 单元格 Tip
@@ -1476,13 +1481,26 @@ local function InitComponent(raw, szType)
 								local nOffset = nX < nRawX and nRawX - nX or 0
 								tipProps.rect.x = nX + nOffset
 								tipProps.rect.w = nW - nOffset
-								OutputAdvanceTip(tipProps, rec[col.key], rec, nRowIndex)
+								OutputAdvanceTip(tipProps, xValue, rec, nRowIndex)
 							end
 							hItem.OnItemMouseOut = function()
 								HideAdvanceTip(tipProps)
 							end
 							hItem:RegisterEvent(X.UI.ITEM_EVENT.MOUSE_ENTER_LEAVE)
 						end
+						-- 单元格点击
+						hItem.OnItemLButtonClick = function()
+							X.SafeCall(GetComponentProp(raw, 'CellLClick'), xValue, rec, nRowIndex, col, nColumnIndex)
+						end
+						hItem:RegisterEvent(X.UI.ITEM_EVENT.L_BUTTON_CLICK)
+						hItem.OnItemMButtonClick = function()
+							X.SafeCall(GetComponentProp(raw, 'CellMClick'), xValue, rec, nRowIndex, col, nColumnIndex)
+						end
+						hItem:RegisterEvent(X.UI.ITEM_EVENT.M_BUTTON_CLICK)
+						hItem.OnItemRButtonClick = function()
+							X.SafeCall(GetComponentProp(raw, 'CellRClick'), xValue, rec, nRowIndex, col, nColumnIndex)
+						end
+						hItem:RegisterEvent(X.UI.ITEM_EVENT.R_BUTTON_CLICK)
 					end
 					hRow.OnItemMouseEnter = function()
 						local nX, nY = raw:GetAbsX(), this:GetAbsY()
@@ -1514,7 +1532,11 @@ local function InitComponent(raw, szType)
 						}) do
 							local hL = raw:Lookup('', szPath)
 							for i = 0, hL:GetItemCount() - 1 do
-								hL:Lookup(i):Lookup('Image_RowHover'):Hide()
+								local hLI = hL:Lookup(i)
+								local hImg = X.IsElement(hLI) and hLI:Lookup('Image_RowHover')
+								if X.IsElement(hImg) then
+									hImg:Hide()
+								end
 							end
 						end
 					end
@@ -6102,6 +6124,77 @@ function OO:RowRClick(fnClick)
 					X.ExecuteWithThis(raw, fnClick, ...)
 				end
 				SetComponentProp(raw, 'RowRClick', fnAction)
+			end
+		end
+	end
+	return self
+end
+
+-- 单元格绑定鼠标单击事件
+-- @param {function(eButton: X.UI.MOUSE_BUTTON, record: table, index: number)} fnAction 鼠标单击事件回调函数
+function OO:CellClick(fnClick)
+	if X.IsFunction(fnClick) then
+		self:CellLClick(function(...) fnClick(X.UI.MOUSE_BUTTON.LEFT, ...) end)
+		self:CellMClick(function(...) fnClick(X.UI.MOUSE_BUTTON.MIDDLE, ...) end)
+		self:CellRClick(function(...) fnClick(X.UI.MOUSE_BUTTON.RIGHT, ...) end)
+	end
+	return self
+end
+
+-- 单元格鼠标左键单击事件
+-- @param {function(record: table, index: number)} fnAction 鼠标单击事件回调函数
+function OO:CellLClick(fnClick)
+	self:_checksum()
+	if X.IsFunction(fnClick) then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndTable' then
+				local fnAction = function(...)
+					if X.UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
+						return
+					end
+					X.ExecuteWithThis(raw, fnClick, ...)
+				end
+				SetComponentProp(raw, 'CellLClick', fnAction)
+			end
+		end
+	end
+	return self
+end
+
+-- 单元格鼠标中键单击事件
+-- @param {function(record: table, index: number)} fnAction 鼠标单击事件回调函数
+function OO:CellMClick(fnClick)
+	self:_checksum()
+	if X.IsFunction(fnClick) then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndTable' then
+				local fnAction = function(...)
+					if X.UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
+						return
+					end
+					X.ExecuteWithThis(raw, fnClick, ...)
+				end
+				SetComponentProp(raw, 'CellMClick', fnAction)
+			end
+		end
+	end
+	return self
+end
+
+-- 单元格鼠标右键单击事件
+-- @param {function(record: table, index: number)} fnAction 鼠标单击事件回调函数
+function OO:CellRClick(fnClick)
+	self:_checksum()
+	if X.IsFunction(fnClick) then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndTable' then
+				local fnAction = function(...)
+					if X.UI.IsDragDropOpened() or GetComponentProp(raw, 'bEnable') == false then
+						return
+					end
+					X.ExecuteWithThis(raw, fnClick, ...)
+				end
+				SetComponentProp(raw, 'CellRClick', fnAction)
 			end
 		end
 	end
