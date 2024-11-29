@@ -68,7 +68,7 @@ local DATABASE_TYPE_LIST = { X.PATH_TYPE.ROLE, X.PATH_TYPE.SERVER, X.PATH_TYPE.G
 local DATABASE_TYPE_HASH = X.ArrayToObject(DATABASE_TYPE_LIST)
 local DATABASE_TYPE_PRESET_FILE = {
 	[X.PATH_TYPE.ROLE] = 'role',
-	[X.PATH_TYPE.SERVER] = 'server',
+	[X.PATH_TYPE.SERVER] = 'server.{$server_origin}',
 	[X.PATH_TYPE.GLOBAL] = 'global',
 }
 local DATABASE_INSTANCE = {}
