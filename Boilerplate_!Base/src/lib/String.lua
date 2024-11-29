@@ -210,6 +210,25 @@ function X.GetParentURI(szURI)
 	return szURI:gsub('[/][^/]*$', '')
 end
 
+-- 拼接 URI 字符串
+---@vararg string @需要拼接的 URI 部分
+---@return string @拼接后的 URI
+function X.ConcatURI(...)
+	local aPath = {...}
+	local szPath = ''
+	for _, s in ipairs(aPath) do
+		s = tostring(s):gsub('^[/]+', '')
+		if s ~= '' then
+			szPath = szPath:gsub('[/]+$', '')
+			if szPath ~= '' then
+				szPath = szPath .. '/'
+			end
+			szPath = szPath .. s
+		end
+	end
+	return szPath
+end
+
 -- 用于对整个 URI 进行编码：方法不会对下列字符编码 [a-zA-Z0-9-_.!~*'():/?#]
 ---@param data string @需要编码的数据
 ---@return string @编码后的数据
