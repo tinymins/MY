@@ -203,6 +203,13 @@ function X.KGUIEncrypt(szText)
 end
 X.KE = X.KGUIEncrypt
 
+-- 获取 URI 父层目录
+---@param szURI string @需要获取父层目录的 URI
+---@return string @父层目录
+function X.GetParentURI(szURI)
+	return szURI:gsub('[/][^/]*$', '')
+end
+
 -- 用于对整个 URI 进行编码：方法不会对下列字符编码 [a-zA-Z0-9-_.!~*'():/?#]
 ---@param data string @需要编码的数据
 ---@return string @编码后的数据
