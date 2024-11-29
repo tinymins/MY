@@ -67,9 +67,14 @@ end
 local DATABASE_TYPE_LIST = { X.PATH_TYPE.ROLE, X.PATH_TYPE.SERVER, X.PATH_TYPE.GLOBAL }
 local DATABASE_TYPE_HASH = X.ArrayToObject(DATABASE_TYPE_LIST)
 local DATABASE_TYPE_PRESET_FILE = {
-	[X.PATH_TYPE.ROLE] = 'role',
-	[X.PATH_TYPE.SERVER] = 'server.{$server_origin}',
-	[X.PATH_TYPE.GLOBAL] = 'global',
+	[X.PATH_TYPE.ROLE] = 'role/settings.db',
+	[X.PATH_TYPE.SERVER] = 'server/{$server_origin}.db',
+	[X.PATH_TYPE.GLOBAL] = 'global/settings.db',
+}
+local DATABASE_TYPE_PRESET_FILE_MIGRATE = {
+	['role.db'] = X.PATH_TYPE.ROLE,
+	['server.db'] = X.PATH_TYPE.SERVER,
+	['global.db'] = X.PATH_TYPE.GLOBAL,
 }
 local DATABASE_INSTANCE = {}
 local USER_SETTINGS_INFO = {}
@@ -132,10 +137,20 @@ function X.ConnectUserSettingsDB()
 	if DATABASE_CONNECTION_ESTABLISHED then
 		return
 	end
+	-- 角色共享方案
 	local szID, szDBPresetRoot = X.GetUserSettingsPresetID(), nil
 	if not X.IsEmpty(szID) then
 		szDBPresetRoot = X.FormatPath({'config/settings/' .. szID .. '/', X.PATH_TYPE.GLOBAL})
 		CPath.MakeDir(szDBPresetRoot)
+		-- 兼容老数据结构
+		for k, v in pairs(DATABASE_TYPE_PRESET_FILE_MIGRATE) do
+			local szSrcPath = X.FormatPath(szDBPresetRoot .. k)
+			local szDstPath = X.FormatPath(szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[v])
+			if IsLocalFileExist(szSrcPath) then
+				CPath.MakeDir(X.GetParentPath(szDstPath))
+				CPath.Move(szSrcPath, szDstPath)
+			end
+		end
 	end
 	for _, ePathType in ipairs(DATABASE_TYPE_LIST) do
 		if not DATABASE_INSTANCE[ePathType] then
@@ -149,7 +164,7 @@ function X.ConnectUserSettingsDB()
 			-- 普通配置
 			local pSettingsDB = pPersonalSettingsDB
 			if szDBPresetRoot then
-				pSettingsDB = X.NoSQLiteConnect(szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType] .. '.db')
+				pSettingsDB = X.NoSQLiteConnect(szDBPresetRoot .. DATABASE_TYPE_PRESET_FILE[ePathType])
 			end
 			if not pSettingsDB then
 				X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'Connect user settings database failed!!! ' .. ePathType, X.DEBUG_LEVEL.ERROR)
