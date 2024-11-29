@@ -35,7 +35,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	},
 	tLock = {
 		ePathType = X.PATH_TYPE.ROLE,
-		bPersonal = true,
+		eDefaultLocationOverride = X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.ROLE,
 		szLabel = _L['MY_BagEx'],
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
