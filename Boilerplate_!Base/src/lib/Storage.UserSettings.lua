@@ -343,6 +343,7 @@ end
 --   {boolean} tOption.bUserData 配置项是否为角色数据项，为真将忽略预设方案重定向，禁止共用，禁止导入导出
 --   {string} tOption.szGroup 配置项分组组标题，用于导入导出显示，禁止导入导出请留空
 --   {string} tOption.szLabel 配置标题，用于导入导出显示，禁止导入导出请留空
+--   {string} tOption.szDescription 配置描述，用于设置存储位置重定向显示描述
 --   {string} tOption.szVersion 数据版本号，加载数据时会丢弃版本不一致的数据
 --   {any} tOption.xDefaultValue 数据默认值
 --   {number} tOption.eDefaultLocationOverride 配置项默认存储位置重定向设置，用于默认不参与方案共享的配置项
@@ -350,13 +351,14 @@ end
 --   {boolean} tOption.bDataSet 是否为配置项组（如用户多套自定义偏好），配置项组在读写时需要额外传入一个组下配置项唯一键值（即多套自定义偏好中某一项的名字）
 --   {table} tOption.tDataSetDefaultValue 数据默认值（仅当 bDataSet 为真时生效，用于设置配置项组不同默认值）
 function X.RegisterUserSettings(szKey, tOption)
-	local ePathType, szDataKey, bUserData, szGroup, szLabel, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue, eDefaultLocationOverride
+	local ePathType, szDataKey, bUserData, szGroup, szLabel, szDescription, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue, eDefaultLocationOverride
 	if X.IsTable(tOption) then
 		ePathType = tOption.ePathType
 		szDataKey = tOption.szDataKey
 		bUserData = tOption.bUserData
 		szGroup = tOption.szGroup
 		szLabel = tOption.szLabel
+		szDescription = tOption.szDescription
 		szVersion = tOption.szVersion
 		xDefaultValue = tOption.xDefaultValue
 		xSchema = tOption.xSchema
@@ -429,6 +431,7 @@ function X.RegisterUserSettings(szKey, tOption)
 		szDataKey = szDataKey,
 		szGroup = szGroup,
 		szLabel = szLabel,
+		szDescription = szDescription,
 		szVersion = szVersion,
 		xDefaultValue = xDefaultValue,
 		xSchema = xSchema,

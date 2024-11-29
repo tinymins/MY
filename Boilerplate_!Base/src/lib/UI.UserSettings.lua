@@ -186,7 +186,8 @@ function D.OpenImportPanel()
 end
 
 function D.OpenLocationOverridePanel()
-	local W, H = 600, 600
+	local bDebug = IsCtrlKeyDown()
+	local W, H = 800, 600
 	local uiFrame = X.UI.CreateFrame(FRAME_NAME, {
 		w = W, h = H,
 		text = _L['User Settings Location Override'],
@@ -197,8 +198,17 @@ function D.OpenLocationOverridePanel()
 	local function GetDataSource()
 		local aDataSource = {}
 		for _, v in ipairs(X.GetRegisterUserSettingsList()) do
+			local szDescription = v.szKey
+			if v.szDescription then
+				if bDebug then
+					szDescription = v.szDescription .. ' (' .. szDescription .. ')'
+				else
+					szDescription = v.szDescription
+				end
+			end
 			table.insert(aDataSource, {
 				szKey = v.szKey,
+				szDescription = szDescription,
 				eLocationOverride = v.eLocationOverride,
 			})
 		end
@@ -210,9 +220,9 @@ function D.OpenLocationOverridePanel()
 		w = W - 10 * 2, h = H - 50 - 10,
 		columns = {
 			{
-				key = 'szKey',
+				key = 'szDescription',
 				title = ' ' .. _L['Settings description'],
-				width = 380,
+				width = 580,
 				alignHorizontal = 'left',
 				alignVertical = 'middle',
 				render = function(value, record, index)
