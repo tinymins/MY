@@ -197,20 +197,22 @@ function D.OpenLocationOverridePanel()
 	local uiTable = nil
 	local function GetDataSource()
 		local aDataSource = {}
-		for _, v in ipairs(X.GetRegisterUserSettingsList()) do
-			local szDescription = v.szKey
-			if v.szDescription then
-				if bDebug then
-					szDescription = v.szDescription .. ' (' .. szDescription .. ')'
-				else
-					szDescription = v.szDescription
+		for _, us in ipairs(X.GetRegisterUserSettingsList()) do
+			if not us.bUserData then
+				local szDescription = us.szKey
+				if us.szDescription then
+					if bDebug then
+						szDescription = us.szDescription .. ' (' .. szDescription .. ')'
+					else
+						szDescription = us.szDescription
+					end
 				end
+				table.insert(aDataSource, {
+					szKey = us.szKey,
+					szDescription = szDescription,
+					eLocationOverride = us.eLocationOverride,
+				})
 			end
-			table.insert(aDataSource, {
-				szKey = v.szKey,
-				szDescription = szDescription,
-				eLocationOverride = v.eLocationOverride,
-			})
 		end
 		return aDataSource
 	end
