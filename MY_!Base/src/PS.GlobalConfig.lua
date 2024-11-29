@@ -166,6 +166,14 @@ function PS.OnPanelActive(wnd)
 
 	nX = nX + ui:Append('WndButtonBox', {
 		x = nX, y = nY, h = 30,
+		text = _L['Location override'],
+		onClick = function()
+			X.OpenUserSettingsLocationOverridePanel()
+		end,
+	}):AutoWidth():Width() + 5
+
+	nX = nX + ui:Append('WndButtonBox', {
+		x = nX, y = nY, h = 30,
 		text = _L['Export data'],
 		onClick = function()
 			X.OpenUserSettingsExportPanel()

@@ -18,6 +18,7 @@ local O = X.CreateUserSettingsModule('LIB', _L['System'], {
 	szDistanceType = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = _L['Global - Distance type'],
 		xSchema = X.Schema.OneOf('gwwean', 'euclidean','plane'),
 		xDefaultValue = 'gwwean',
 	},

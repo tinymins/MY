@@ -16,7 +16,7 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 local D = {}
 local FRAME_NAME = X.NSFormatString('{$NS}_UserSettings')
 
-function D.Open(bImport)
+function D.OpenImportExport(bImport)
 	local tSettings = {}
 	if bImport then
 		local szRoot = X.FormatPath({'export/settings', X.PATH_TYPE.GLOBAL})
@@ -177,6 +177,147 @@ function D.Open(bImport)
 	uiFrame:Anchor('CENTER')
 end
 
+function D.OpenExportPanel()
+	D.OpenImportExport(false)
+end
+
+function D.OpenImportPanel()
+	D.OpenImportExport(true)
+end
+
+function D.OpenLocationOverridePanel()
+	local bDebug = IsCtrlKeyDown()
+	local W, H = 800, 600
+	local uiFrame = X.UI.CreateFrame(FRAME_NAME, {
+		w = W, h = H,
+		text = _L['User Settings Location Override'],
+		esc = true,
+	})
+
+	local uiTable = nil
+	local function GetDataSource()
+		local aDataSource = {}
+		for _, us in ipairs(X.GetRegisterUserSettingsList()) do
+			if not us.bUserData then
+				local szDescription = us.szKey
+				if us.szDescription then
+					if bDebug then
+						szDescription = us.szDescription .. ' (' .. szDescription .. ')'
+					else
+						szDescription = us.szDescription
+					end
+				end
+				table.insert(aDataSource, {
+					szKey = us.szKey,
+					szDescription = szDescription,
+					eLocationOverride = us.eLocationOverride,
+				})
+			end
+		end
+		return aDataSource
+	end
+
+	uiTable = uiFrame:Append('WndTable', {
+		x = 10, y = 50,
+		w = W - 10 * 2, h = H - 50 - 10,
+		columns = {
+			{
+				key = 'szDescription',
+				title = ' ' .. _L['Settings description'],
+				width = 580,
+				alignHorizontal = 'left',
+				alignVertical = 'middle',
+				render = function(value, record, index)
+					return GetFormatText(' ' .. value, 162, 255, 255, 255)
+				end,
+			},
+			{
+				key = 'preset',
+				title = _L['Preset'],
+				titleTip = {
+					render = GetFormatText(_L['Preset mean follow preset location.'], 162, 255, 255, 0),
+					rich = true,
+				},
+				width = 50,
+				alignHorizontal = 'center',
+				alignVertical = 'middle',
+				render = function(value, record, index)
+					if record.eLocationOverride == X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.PRESET then
+						return GetFormatText(_L['y'], 162, 255, 255, 255)
+					end
+					return ''
+				end,
+			},
+			{
+				key = 'role',
+				title = _L['Role'],
+				titleTip = {
+					render = GetFormatText(_L['Role: always follow role.'], 162, 255, 255, 0),
+					rich = true,
+				},
+				width = 50,
+				alignHorizontal = 'center',
+				alignVertical = 'middle',
+				render = function(value, record, index)
+					if record.eLocationOverride == X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.ROLE then
+						return GetFormatText(_L['y'], 162, 255, 255, 255)
+					end
+					return ''
+				end,
+			},
+			{
+				key = 'server',
+				title = _L['Server'],
+				titleTip = {
+					render = GetFormatText(_L['Server: always follow server.'], 162, 255, 255, 0),
+					rich = true,
+				},
+				width = 50,
+				alignHorizontal = 'center',
+				alignVertical = 'middle',
+				render = function(value, record, index)
+					if record.eLocationOverride == X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.SERVER then
+						return GetFormatText(_L['y'], 162, 255, 255, 255)
+					end
+					return ''
+				end,
+			},
+			{
+				key = 'global',
+				title = _L['Global'],
+				titleTip = {
+					render = GetFormatText(_L['Global: always follow global.'], 162, 255, 255, 0),
+					rich = true,
+				},
+				width = 50,
+				alignHorizontal = 'center',
+				alignVertical = 'middle',
+				render = function(value, record, index)
+					if record.eLocationOverride == X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.GLOBAL then
+						return GetFormatText(_L['y'], 162, 255, 255, 255)
+					end
+					return ''
+				end,
+			},
+		},
+		dataSource = GetDataSource(),
+		onCellLClick = function(xVal, tRow, nRowIndex, tCol, nColumnIndex)
+			if tCol.key == 'preset' then
+				X.SetUserSettingsLocationOverride(tRow.szKey, X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.PRESET)
+			elseif tCol.key == 'role' then
+				X.SetUserSettingsLocationOverride(tRow.szKey, X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.ROLE)
+			elseif tCol.key == 'server' then
+				X.SetUserSettingsLocationOverride(tRow.szKey, X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.SERVER)
+			elseif tCol.key == 'global' then
+				X.SetUserSettingsLocationOverride(tRow.szKey, X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.GLOBAL)
+			end
+			uiTable:DataSource(GetDataSource())
+		end,
+	})
+
+	uiFrame:Anchor('CENTER')
+end
+
 --------------------------------------------------------------------------------
 -- 全局导出
 --------------------------------------------------------------------------------
@@ -187,7 +328,9 @@ local settings = {
 		{
 			preset = 'UIEvent',
 			fields = {
-				'Open',
+				'OpenExportPanel',
+				'OpenImportPanel',
+				'OpenLocationOverridePanel',
 			},
 			root = D,
 		},
@@ -196,12 +339,8 @@ local settings = {
 _G[FRAME_NAME] = X.CreateModule(settings)
 end
 
-function X.OpenUserSettingsExportPanel()
-	D.Open()
-end
-
-function X.OpenUserSettingsImportPanel()
-	D.Open(true)
-end
+X.OpenUserSettingsExportPanel = D.OpenExportPanel
+X.OpenUserSettingsImportPanel = D.OpenImportPanel
+X.OpenUserSettingsLocationOverridePanel = D.OpenLocationOverridePanel
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

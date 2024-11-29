@@ -109,6 +109,7 @@ end
 function X.SQLiteConnect(szCaption, oPath, fnAction)
 	-- 尝试连接数据库
 	local szPath = X.FormatPath(oPath)
+	CPath.MakeDir(X.GetParentPath(szPath))
 	--[[#DEBUG BEGIN]]
 	X.OutputDebugMessage(szCaption, 'Connect database: ' .. szPath, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]

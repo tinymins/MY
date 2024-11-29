@@ -199,5 +199,18 @@ return {
 	['No custom setting found, nothing to export.'] = '選中的配置項尚未進行自定義配置，默認配置無需導出。',
 	['%d settings exported, file saved in %s.'] = '成功導出 %d 條配置項，文件位於：%s。',
 
+	['User Settings Location Override'] = '插件設置項高級共享方案設置',
+	['Settings description'] = '設置項描述',
+	['y'] = '√',
+	['Preset'] = '默認',
+	['Preset mean follow preset location.'] = '默認位置：跟隨插件“系統-全局設置”中“插件設置項方案選擇”的狀態',
+	['Role'] = '角色',
+	['Role: always follow role.'] = '角色獨有：無視方案設置，使用角色獨有配置，不與其他角色共享。',
+	['Server'] = '伺服器',
+	['Server: always follow server.'] = '伺服器共享：無視方案設置，使用同伺服器共享配置。',
+	['Global'] = '全局',
+	['Global: always follow global.'] = '全局共享：無視方案設置，使用全局共享配置。',
+
 	['Global config'] = '全局設置',
+	['Global - Distance type'] = '全局設置·默認距離計算方式',
 }

@@ -880,6 +880,12 @@ local CONSTANT = {
 		PERFECT    = 10, -- 沉浸
 		EXPLORE    =  9, -- 探索 // 比 PERFECT 要高，但是枚举值却小一点
 	}),
+	USER_SETTINGS_LOCATION_OVERRIDE = X.FreezeTable({
+		PRESET = 0,
+		ROLE   = 1,
+		SERVER = 2,
+		GLOBAL = 3,
+	}),
 	ZHEN_PAI = PickBranch({
 		classic = TALENT_TAB or KvpToObject({
 			{

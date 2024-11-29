@@ -42,6 +42,7 @@ return {
 	['Enable debug tools'] = '启用调试工具',
 	['Debug tools has been enabled...'] = '测试工具已激活_(:彡」∠)_',
 	['Flush data'] = '保存数据',
+	['Location override'] = '高级设置',
 	['Export data'] = '导出配置',
 	['Import data'] = '导入配置',
 	['Backup folder'] = '查看导出',
