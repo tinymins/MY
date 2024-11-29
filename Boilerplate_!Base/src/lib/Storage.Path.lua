@@ -150,6 +150,9 @@ function X.GetLUADataPath(oFilePath)
 	return szFilePath
 end
 
+-- 拼接路径字符串
+---@vararg string @需要拼接的路径字符串部分
+---@return string @拼接后的路径字符串
 function X.ConcatPath(...)
 	local aPath = {...}
 	local szPath = ''
@@ -166,7 +169,9 @@ function X.ConcatPath(...)
 	return szPath
 end
 
--- 替换目录分隔符为反斜杠，并且删除目录中的.\与..\
+-- 标准化路径字符串目录分隔符为反斜杠，并且删除目录中的\.\与\..\
+---@param szPath string @要处理的目录字符串
+---@return string @标准化后的路径字符串
 function X.NormalizePath(szPath)
 	szPath = szPath:gsub('/', '\\')
 	szPath = szPath:gsub('\\%.\\', '\\')
@@ -182,8 +187,10 @@ function X.NormalizePath(szPath)
 end
 
 -- 获取父层目录 注意文件和文件夹获取父层的区别
+---@param szPath string @需要获取父层目录的路径
+---@return string @父层目录
 function X.GetParentPath(szPath)
-	return (X.NormalizePath(szPath):gsub('/[^/]*$', ''))
+	return (X.NormalizePath(szPath):gsub('[\\][^\\]*$', ''))
 end
 
 do local CREATED = {}
