@@ -188,9 +188,17 @@ end
 
 -- 获取父层目录 注意文件和文件夹获取父层的区别
 ---@param szPath string @需要获取父层目录的路径
----@return string @父层目录
+---@return string @父层目录，不带结尾目录分隔符
 function X.GetParentPath(szPath)
-	return (X.NormalizePath(szPath):gsub('[\\][^\\]*$', ''))
+	local szPath = X.NormalizePath(szPath)
+	if not szPath:find('\\') then
+		return '.'
+	end
+	local szParent = szPath:gsub('\\[^\\]+\\*$', '')
+	if #szParent == 2 and szParent:sub(2, 2) == ':' then
+		szParent = szParent .. '\\'
+	end
+	return szParent
 end
 
 do local CREATED = {}

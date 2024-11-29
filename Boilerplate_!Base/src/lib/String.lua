@@ -205,9 +205,17 @@ X.KE = X.KGUIEncrypt
 
 -- 获取 URI 父层目录
 ---@param szURI string @需要获取父层目录的 URI
----@return string @父层目录
+---@return string @父层目录，不带结尾目录分隔符
 function X.GetParentURI(szURI)
-	return szURI:gsub('[/][^/]*$', '')
+	local szURI = X.NormalizeURI(szURI)
+	if not szURI:find('/') then
+		return '.'
+	end
+	local szParent = szURI:gsub('/[^/]+/*$', '')
+	if szParent == '' and szURI:sub(1, 1) == '/' then
+		szParent = '/'
+	end
+	return szParent
 end
 
 -- 拼接 URI 字符串
