@@ -229,6 +229,22 @@ function X.ConcatURI(...)
 	return szPath
 end
 
+-- 标准化 URI 字符串删除 URI 中的/./与/../
+---@param szURI string @要处理的 URI 字符串
+---@return string @标准化后的 URI 字符串
+function X.NormalizeURI(szURI)
+	szURI = szURI:gsub('/%./', '/')
+	local nPos1, nPos2
+	while true do
+		nPos1, nPos2 = szURI:find('[^/]*/%.%./')
+		if not nPos1 then
+			break
+		end
+		szURI = szURI:sub(1, nPos1 - 1) .. szURI:sub(nPos2 + 1)
+	end
+	return szURI
+end
+
 -- 用于对整个 URI 进行编码：方法不会对下列字符编码 [a-zA-Z0-9-_.!~*'():/?#]
 ---@param data string @需要编码的数据
 ---@return string @编码后的数据
