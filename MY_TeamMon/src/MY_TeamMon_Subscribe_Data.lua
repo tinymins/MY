@@ -263,7 +263,7 @@ function D.GetAttachRawURL(szAttach, szURL)
 	if not szURL then
 		return
 	end
-	return X.NormalizePath(X.ConcatPath(X.GetParentPath(szURL), szAttach))
+	return X.NormalizeURI(X.ConcatURI(X.GetParentURI(szURL), szAttach))
 end
 -- 根据描述文件中的相对文件地址 计算绝对 GIT 仓库源文件下载地址
 function D.GetAttachBlobURL(szAttach, szURL)
@@ -277,7 +277,7 @@ function D.GetAttachBlobURL(szAttach, szURL)
 	if not szURL then
 		return
 	end
-	return X.NormalizePath(X.ConcatPath(X.GetParentPath(szURL), szAttach))
+	return X.NormalizeURI(X.ConcatURI(X.GetParentURI(szURL), szAttach))
 end
 end
 
