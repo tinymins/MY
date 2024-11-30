@@ -828,6 +828,9 @@ function X.CreateUserSettingsModule(szModule, szGroupLabel, tSettings)
 	end
 	local tProxy = {}
 	for k, v in pairs(tSettings) do
+		if tSettings.szKey then
+			k = tSettings.szKey
+		end
 		local szKey = szModule .. '.' .. k
 		local tOption = X.Clone(v)
 		if tOption.szDataKey then
