@@ -4,6 +4,7 @@ return {
 	['Show in float bar'] = '顯示浮動入口',
 	['Order desc'] = '逆序顯示',
 	['Disable dismiss'] = '禁止消息自動消失',
+	['UI anchor'] = '界面位置',
 
 	['Addon notification'] = '插件消息',
 	['Click to view addon notification.'] = '點擊可查看插件的新消息。',
