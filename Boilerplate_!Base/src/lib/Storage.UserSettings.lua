@@ -351,11 +351,12 @@ end
 --   {boolean} tOption.bDataSet 是否为配置项组（如用户多套自定义偏好），配置项组在读写时需要额外传入一个组下配置项唯一键值（即多套自定义偏好中某一项的名字）
 --   {table} tOption.tDataSetDefaultValue 数据默认值（仅当 bDataSet 为真时生效，用于设置配置项组不同默认值）
 function X.RegisterUserSettings(szKey, tOption)
-	local ePathType, szDataKey, bUserData, szGroup, szLabel, szDescription, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue, eDefaultLocationOverride
+	local ePathType, szDataKey, bUserData, bNoExport, szGroup, szLabel, szDescription, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue, eDefaultLocationOverride
 	if X.IsTable(tOption) then
 		ePathType = tOption.ePathType
 		szDataKey = tOption.szDataKey
 		bUserData = tOption.bUserData
+		bNoExport = tOption.bNoExport or tOption.bUserData
 		szGroup = tOption.szGroup
 		szLabel = tOption.szLabel
 		szDescription = tOption.szDescription
@@ -428,6 +429,7 @@ function X.RegisterUserSettings(szKey, tOption)
 		szKey = szKey,
 		ePathType = ePathType,
 		bUserData = bUserData,
+		bNoExport = bNoExport,
 		szDataKey = szDataKey,
 		szGroup = szGroup,
 		szLabel = szLabel,
@@ -464,7 +466,7 @@ function X.ExportUserSettings(aKey)
 	local tKvp = {}
 	for _, szKey in ipairs(aKey) do
 		local info = USER_SETTINGS_INFO[szKey]
-		if info and not info.bUserData then
+		if info and not info.bNoExport then
 			local inst = DATABASE_INSTANCE[info.ePathType]
 			if inst then
 				tKvp[szKey] = GetInstanceInfoData(inst, info)
@@ -479,7 +481,7 @@ function X.ImportUserSettings(tKvp)
 	for szKey, xValue in pairs(tKvp) do
 		if X.IsTable(xValue) then
 			local info = USER_SETTINGS_INFO[szKey]
-			if info and not info.bUserData then
+			if info and not info.bNoExport then
 				local inst = DATABASE_INSTANCE[info.ePathType]
 				if inst then
 					SetInstanceInfoData(inst, info, xValue.d, xValue.v)

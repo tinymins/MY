@@ -43,7 +43,7 @@ function D.OpenImportExport(bImport)
 	local nW = uiContainer:ContainerWidth()
 	local aGroup, tItemAll = {}, {}
 	for _, us in ipairs(X.GetRegisterUserSettingsList()) do
-		if us.szGroup and us.szLabel and not us.bUserData and (not bImport or tSettings[us.szKey]) then
+		if us.szGroup and us.szLabel and not us.bNoExport and (not bImport or tSettings[us.szKey]) then
 			local tGroup
 			for _, v in ipairs(aGroup) do
 				if v.szGroup == us.szGroup then
