@@ -2,4 +2,6 @@ return {
 	['FloatBar'] = '懸浮信息條',
 	['Detach mode'] = '分離模式',
 	['Global config'] = '全局設置',
+	['Combined anchor'] = '一體模式浮動窗位置',
+	['Detach mode anchor'] = '分離模式浮動窗位置',
 }
