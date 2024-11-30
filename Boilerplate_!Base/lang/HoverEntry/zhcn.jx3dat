@@ -1,6 +1,9 @@
 return {
 	['HoverEntry'] = '悬浮入口',
 	['Global config'] = '全局设置',
+	['Enable state'] = '启用状态',
 	['Hover popup'] = '鼠标滑过立即弹出',
+	['Size'] = '大小',
 	['Size: %d'] = '大小：%d',
+	['UI anchor'] = '界面位置',
 }

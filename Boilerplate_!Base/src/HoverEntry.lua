@@ -19,24 +19,40 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = X.MakeCaption({
+			_L['HoverEntry'],
+			_L['Enable state'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nSize = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = X.MakeCaption({
+			_L['HoverEntry'],
+			_L['Size'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},
 	anchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = X.MakeCaption({
+			_L['HoverEntry'],
+			_L['UI anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = -362, y = -78, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
 	},
 	bHoverMenu = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = X.MakeCaption({
+			_L['HoverEntry'],
+			_L['Hover popup'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
