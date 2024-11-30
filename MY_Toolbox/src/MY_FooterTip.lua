@@ -24,36 +24,60 @@ local O = X.CreateUserSettingsModule('MY_FooterTip', _L['General'], {
 	bFriend = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_FooterTip'],
+			_L['Friend headtop tips'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFriendNav = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_FooterTip'],
+			_L['Friend headtop tips nav'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFriendDungeonHide = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_FooterTip'],
+			_L['Friend headtop hide in dungeon'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bTongMember = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_FooterTip'],
+			_L['Tong member headtop tips'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTongMemberNav = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_FooterTip'],
+			_L['Tong member headtop tips nav'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTongMemberDungeonHide = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_FooterTip'],
+			_L['Tong member headtop hide in dungeon'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

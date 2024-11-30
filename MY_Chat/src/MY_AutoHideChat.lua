@@ -31,6 +31,9 @@ local O = X.CreateUserSettingsModule('MY_Chat', _L['Chat'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['Auto hide chat panel'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

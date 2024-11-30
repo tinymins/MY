@@ -41,42 +41,63 @@ local O = X.CreateUserSettingsModule('MY_Love', _L['Target'], {
 	bQuiet = { -- 免打扰（拒绝其它人的查看请求）
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Love'],
+		szDescription = X.MakeCaption({
+			_L['Enable quiet mode'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	szNone = { -- 没情缘时显示的字
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Love'],
+		szDescription = X.MakeCaption({
+			_L['Non-love display'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = _L['Singleton'],
 	},
 	szJabber = { -- 搭讪用语
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Love'],
+		szDescription = X.MakeCaption({
+			_L['Quick to accost text'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = _L['Hi, I seem to meet you somewhere ago'],
 	},
 	szSign = { -- 情缘宣言（个性签名）
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Love'],
+		szDescription = X.MakeCaption({
+			_L['Love signature'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	bAutoFocus = { -- 自动焦点
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Love'],
+		szDescription = X.MakeCaption({
+			_L['Auto focus lover'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bHookPlayerView = { -- 在查看装备界面上显示情缘
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Love'],
+		szDescription = X.MakeCaption({
+			_L['Enable player view panel hook'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoReplyLover = { -- 无需确认即可查看我的情缘
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Love'],
+		szDescription = X.MakeCaption({
+			_L['Other view my lover without ask'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

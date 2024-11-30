@@ -28,42 +28,70 @@ local O = X.CreateUserSettingsModule('MY_AutoDialogue', _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoDialogue'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bEchoOn = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoDialogue'],
+			_L['Echo when autochat'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoClose = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoDialogue'],
+			_L['Close after auto chat'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bEnableShift = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoDialogue'],
+			_L['Disable when shift key pressed'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoSelectSg = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoDialogue'],
+			_L['Auto chat when only one selection'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoSelectSp = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoDialogue'],
+			_L['Auto chat when only one space selection'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSkipQuestTalk = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoDialogue'],
+			_L['Skip quest talk'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

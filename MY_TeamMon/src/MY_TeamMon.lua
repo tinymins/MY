@@ -203,18 +203,27 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Enable MY_TeamMon'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bCommon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Use common data'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bPushScreenHead = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Lifebar alarm'],
+		}),
 		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = X.IS_REMAKE,
@@ -222,6 +231,9 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 	bPushCenterAlarm = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Center alarm'],
+		}),
 		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = X.IS_REMAKE,
@@ -229,24 +241,36 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 	bPushVoiceAlarm = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Voice alarm'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bPushBigFontAlarm = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Large text alarm'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bPushTeamPanel = { -- 面板buff监控
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Team panel bind show buff'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bPushFullScreen = { -- 全屏泛光
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Fullscreen alarm'],
+		}),
 		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = X.IS_REMAKE,
@@ -254,18 +278,27 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 	bPushTeamChannel = { -- 团队报警
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Team channel alarm'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bPushWhisperChannel = { -- 密聊报警
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Whisper channel alarm'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bPushBuffList = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Buff list'],
+		}),
 		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = X.IS_REMAKE,
@@ -273,6 +306,9 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 	bPushPartyBuffList = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Party buff list'],
+		}),
 		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = X.IS_REMAKE,
@@ -280,6 +316,9 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 	bShowVoicePacketRecommendation = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['Show voice recommendation confirm on load data'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

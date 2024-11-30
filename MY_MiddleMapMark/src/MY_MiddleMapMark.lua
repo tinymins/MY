@@ -75,6 +75,9 @@ local O = X.CreateUserSettingsModule('MY_MiddleMapMark', _L['General'], {
 	bMiddleMapSearch = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_MiddleMapMark'],
+		szDescription = X.MakeCaption({
+			_L['Show search in middle map panel'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

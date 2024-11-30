@@ -27,126 +27,189 @@ local O = X.CreateUserSettingsModule('MY_GKPDoodad', _L['General'], {
 	bOpenLoot = { -- 自动打开掉落
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Enable auto pickup'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOpenLootEvenFight = { -- 战斗中也打开
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Pickup in fight'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowName = { -- 显示物品名称
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Show the head name'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tNameColor = { -- 头顶名称颜色
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Head name color'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 196, 64, 255 },
 	},
 	nNameFont = { -- 头顶名称字体
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Head name font'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 40,
 	},
 	fNameScale = { -- 头顶名称缩放
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Head name font scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	bMiniFlag = { -- 显示小地图标记
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Display minimap flag'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bInteract = { -- 自动采集
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Auto craft'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bInteractEvenFight = { -- 战斗中也采集
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Interact in fight'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tCraft = { -- 草药、矿石列表
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Craft list'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 	bMiningDoodad = { -- 采金物品
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Mining doodad'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bHerbalismDoodad = { -- 神农物品
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Herbalism doodad'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSkinningDoodad = { -- 庖丁物品
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Skinning doodad'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bQuestDoodad = { -- 任务物品
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Quest doodad'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bReadInscriptionDoodad = { -- 已读碑铭
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Read inscription doodad'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bUnreadInscriptionDoodad = { -- 未读碑铭
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Unread inscription doodad'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOtherDoodad = { -- 其它物品
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Other doodad'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAllDoodad = { -- 全部
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['All doodad'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bCustom = { -- 启用自定义
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Customs (split by | )'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	szCustom = { -- 自定义列表
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Custom list'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	bRecent = { -- 启用自动最近5分钟采集
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Recent doodad'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

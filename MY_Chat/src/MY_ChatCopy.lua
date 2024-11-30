@@ -23,48 +23,80 @@ local O = X.CreateUserSettingsModule('MY_ChatCopy', _L['Chat'], {
 	bChatCopy = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatCopy'],
+			_L['chat copy'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bChatQuickCopy = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatCopy'],
+			_L['Right click quick copy chat'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bChatTime = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatCopy'],
+			_L['chat time'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	eChatTime = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatCopy'],
+			_L['chat time format'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = 'HOUR_MIN_SEC',
 	},
 	bChatCopyAlwaysShowMask = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatCopy'],
+			_L['always show *'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bChatCopyAlwaysWhite = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatCopy'],
+			_L['always be white'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bChatCopyNoCopySysmsg = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatCopy'],
+			_L['hide system msg copy'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bChatNamelinkEx = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatCopy'],
+			_L['Chat panel namelink ext function'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

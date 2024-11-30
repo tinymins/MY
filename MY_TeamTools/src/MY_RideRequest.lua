@@ -24,54 +24,90 @@ local O = X.CreateUserSettingsModule('MY_RideRequest', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideRequest'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bRefuseOthers = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideRequest'],
+			_L['Auto refuse others'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bRefuseUnknown = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideRequest'],
+			_L['Auto refuse unknown'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptTong = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideRequest'],
+			_L['Auto accept tong member'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptParty = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideRequest'],
+			_L['Auto accept party'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptFriend = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideRequest'],
+			_L['Auto accept friend'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptAll = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideRequest'],
+			_L['Auto accept all'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAcceptCustom = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideRequest'],
+			_L['Auto accept specific names'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAcceptCustom = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideRequest'],
+			_L['Auto accept specific names list'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},

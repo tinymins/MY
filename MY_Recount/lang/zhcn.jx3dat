@@ -8,6 +8,7 @@ return {
 
     ['Absorb statistics'] = '化解统计',
 
+    ['Current recount display channel'] = '当前战斗统计显示类型',
     ['Switch recount mode'] = '切换统计类型',
     ['Filter short fight'] = '过滤短时战斗',
     ['No time limit'] = '无时间限制',

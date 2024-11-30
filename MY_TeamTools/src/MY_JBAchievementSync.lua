@@ -23,6 +23,10 @@ local O = X.CreateUserSettingsModule('MY_JBAchievementSync', _L['Raid'], {
 	bAuto = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_JBAchievementSync'],
+			_L['Auto sync achievement on exit'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

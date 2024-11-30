@@ -1,4 +1,5 @@
 return {
+    ['MYDev_Snaplines'] = '元素輔助',
     ['Snaplines'] = '元素輔助',
     ['Snaplines - ShowTip'] = '元素輔助 - 顯示信息',
     ['Snaplines - ShowData'] = '元素輔助 - 顯示數據',

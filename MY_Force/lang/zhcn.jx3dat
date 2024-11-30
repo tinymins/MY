@@ -23,6 +23,10 @@ return {
     ['Display GUDING of teammate, change color'] = '突出显示团队里的仙王蛊鼎，设置颜色',
     ['Auto talk in team channel after puting GUDING'] = '喊话提醒队友来吃',
     ['Talk message'] = '喊话内容',
+    ['Name color'] = '名字颜色',
+    ['Automatic eat GUDING when'] = '当血蓝条件满足设定自动吃蛊鼎',
+    ['Mana Mp'] = '蓝',
+    ['Mana Hp'] = '血',
     ['Automatic eat GUDING when mana below '] = '自动吃蛊鼎，当蓝低于',
     [', or life below '] = '，或血低于',
 
@@ -32,5 +36,6 @@ return {
     ['Show distance'] = '显示距离',
     ['Show countdown'] = '显示时间',
     ['Scale: %d%%.'] = '缩放: %d%%',
+    ['Scale'] = '缩放',
     ['Changge force only'] = '仅长歌可用',
 }

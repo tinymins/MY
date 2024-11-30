@@ -41,6 +41,7 @@ return {
 	['Full win'] = '全勝',
 
     -- JBAchievementSync.lua
+    ['MY_JBAchievementSync'] = '成就同步',
     ['Sync achievement'] = '同步成就',
     ['Auto sync achievement on exit'] = '下線自動同步成就',
     ['Sync success.'] = '同步成功',
@@ -82,6 +83,7 @@ return {
 
     -- MY_JBTeam.lua
     ['Quick team'] = '快捷入團',
+    ['Team name/id'] = '團名/ID',
     ['Team name/id:'] = '團名/ID：',
     ['Apply join team'] = '申請入團',
     ['Processing, please wait.'] = '操作中，請稍後。',

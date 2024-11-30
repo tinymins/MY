@@ -311,6 +311,7 @@ return {
     -- MY_TargetMon.PS.lua
 	['Data save mode'] = '数据保存模式',
     ['View render config'] = '界面渲染设置',
+    ['View render interval'] = '渲染频率',
     ['View render interval: every %d frame'] = '渲染频率：每%d帧渲染一次。',
 	['Use common data'] = '使用通用数据（即当前角色和其他角色共用同一个数据）',
     ['Data settings'] = '数据设置',

@@ -2,9 +2,8 @@ return {
     ['MY_ScreenShot'] = '截图助手',
     ['screenshot helper'] = '截图助手',
 
-    ['Check to use global config, otherwise use private setting.'] = '勾选该项则该角色使用公共设定，取消勾选则该角色使用单独设定。',
-    ['auto hide ui while shot screen'] = '截图自动隐藏UI',
-    ['Check it if you want to hide ui automatic.'] = '勾选该项则截图时自动隐藏UI。',
+    ['auto hide ui while shot screen'] = '截图自动隐藏游戏界面',
+    ['Check it if you want to hide ui automatic.'] = '勾选该项则截图时自动隐藏游戏界面。',
     ['file format'] = '截图格式',
     ['set quality (0-100)'] = '设置截图精度(0-100)',
     ['Set screenshot quality(0-100): the larger number, the image will use more hdd space.'] = '设置截图精度(0-100)：越大越清晰，图片也会越占空间。',
@@ -12,8 +11,8 @@ return {
     ['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'] = '设置截图文件夹，截图文件将保存到设置的目录中，仅支持绝对路径。\n如：D:/剑网三截图文件夹/\n注：为空则保存到默认文件夹',
 
     ['shotscreen'] = '截图',
-    ['shotscreen without ui'] = '隐藏UI截图',
-    ['shotscreen with ui'] = '显示UI截图',
+    ['shotscreen without ui'] = '隐藏游戏界面截图',
+    ['shotscreen with ui'] = '显示游戏界面截图',
 
     ['Shot screen succeed, file saved as %s .'] = '截图成功，文件已保存：%s',
     ['Shotscreen destination folder error: %s not exist. File has been save to default folder.'] = '截图文件夹设置错误：%s目录不存在。截图将保存到默认文件夹。',
@@ -21,6 +20,4 @@ return {
 	['>> Set hotkey <<'] = '>> 设置快捷键 <<',
     ['set default screenshot tool'] = '设置为默认截图工具',
     ['as default already'] = '已设为默认截图工具',
-
-	['Use global config'] = '使用所有角色公共设置',
 }

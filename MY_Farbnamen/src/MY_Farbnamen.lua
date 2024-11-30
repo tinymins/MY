@@ -28,18 +28,27 @@ local O = X.CreateUserSettingsModule('MY_Farbnamen', _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Farbnamen'],
+		szDescription = X.MakeCaption({
+			_L['Enable MY_Farbnamen'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bInsertIcon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Farbnamen'],
+		szDescription = X.MakeCaption({
+			_L['Insert force icon'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nInsertIconSize = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Farbnamen'],
+		szDescription = X.MakeCaption({
+			_L['Icon size'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 20,
 	},

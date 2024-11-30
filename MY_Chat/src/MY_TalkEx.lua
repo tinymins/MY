@@ -27,48 +27,72 @@ local O = X.CreateUserSettingsModule('MY_TalkEx', _L['Chat'], {
 	szTalkText = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
+		szDescription = X.MakeCaption({
+			_L['Talk text'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	aTalkChannel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
+		szDescription = X.MakeCaption({
+			_L['Talk channel'],
+		}),
 		xSchema = X.Schema.Collection(X.Schema.Number),
 		xDefaultValue = {},
 	},
 	nTrickChannel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
+		szDescription = X.MakeCaption({
+			_L['Trick channel'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = PLAYER_TALK_CHANNEL.RAID,
 	},
 	szTrickFilter = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
+		szDescription = X.MakeCaption({
+			_L['Trick filter'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = 'RAID',
 	},
 	nTrickForce = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
+		szDescription = X.MakeCaption({
+			_L['Trick force'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = X.CONSTANT.FORCE_TYPE.CHUN_YANG,
 	},
 	szTrickTextBegin = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
+		szDescription = X.MakeCaption({
+			_L['Trick text begin'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = _L['$zj look around and have a little thought.'],
 	},
 	szTrickText = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
+		szDescription = X.MakeCaption({
+			_L['Trick text'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = _L['$zj epilate $mb\'s feather clearly.'],
 	},
 	szTrickTextEnd = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TalkEx'],
+		szDescription = X.MakeCaption({
+			_L['Trick text end'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = _L['$zj collected the feather epilated just now and wanted it sold well.'],
 	},

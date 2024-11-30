@@ -46,6 +46,8 @@ return {
     ['hh:mm'] = '時：分',
     ['hh:mm:ss'] = '時：分：秒',
     ['channel setting'] = '頻道設置',
+    ['away message'] = '暫離消息',
+    ['busy message'] = '勿擾消息',
 
     ['always show *'] = '總是顯示※號',
     ['always be white'] = '永遠顯示為白色',
@@ -58,6 +60,7 @@ return {
     ['MOSAICS_CHAR'] = '…',
     ['chat mosaics'] = '聊天打馬',
     ['chat mosaics (mosaics names in chat panel)'] = '聊天打馬（聊天欄中名字打上馬賽克）',
+    ['mosaics mode'] = '打馬模式',
     ['no mosaics on my own name'] = '自己的名字不打馬',
     ['part mosaics A (mosaics except 1st and last character)'] = '打馬模式壹（第一個字不打馬）',
     ['part mosaics B (mosaics except 1st character)'         ] = '打馬模式貳（最後一個字不打馬）',
@@ -72,6 +75,7 @@ return {
     ['Filter official mention'] = '屏蔽官方點名記錄功能',
 
     ['Resize emotion'] = '統一表情尺寸',
+    ['Emotion size'] = '表情尺寸',
     ['Size: %d'] = '大小：%dpx。',
 
     -- MY_TalkEx.lua
@@ -106,12 +110,23 @@ return {
     ['$zj epilate $mb\'s feather clearly.'] = '$zj麻利的拔光了$mb的羊毛。',
     ['$zj collected the feather epilated just now and wanted it sold well.'] = '$zj收拾了一下背包里的羊毛，希望今年能賣個好價錢。',
 
+    ['Talk text'] = '喊話輸入框',
+    ['Talk channel'] = '喊話頻道',
+    ['Trick channel'] = '調侃發送頻道',
+    ['Trick filter'] = '調侃對象範圍過濾器',
+    ['Trick force'] = '調侃門派過濾器',
+    ['Trick text begin'] = '調侃內容輸入框：第一句',
+    ['Trick text'] = '調侃內容輸入框：調侃內容',
+    ['Trick text end'] = '調侃內容輸入框：最後一句',
+
     -- MY_ChatBlock, MY_ChatFilter
     ['MY_ChatBlock'] = '聊天過濾',
     ['MY_ChatFilter'] = '刷屏屏蔽',
 
     ['Channels'] = '頻道設置',
     ['Enable'] = '啟用',
+    ['Enable state'] = '啟用狀態',
+    ['BlockWords'] = '屏蔽詞設置',
     ['Team building'] = '團隊招募',
     ['From tong name'] = '所屬幫會',
     ['If talker\'s tong name equals with keyword, chat message will be blocked, only apply for target you\'ve met.'] = '如果發言者幫會名稱與關鍵字相同則過濾發言，注意該功能僅對遇見過的俠士生效。',

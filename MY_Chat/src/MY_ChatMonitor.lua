@@ -45,6 +45,9 @@ local O = X.CreateUserSettingsModule('MY_ChatMonitor', _L['Chat'], {
 	aKeyword = {
 		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_ChatMonitor'],
+		szDescription = X.MakeCaption({
+			_L['key words:'] .. _L['Click to config monitors'],
+		}),
 		xSchema = X.Schema.Collection(X.Schema.Record({
 			szKeyword = X.Schema.String,
 			bEnable = X.Schema.Boolean,
@@ -61,36 +64,54 @@ local O = X.CreateUserSettingsModule('MY_ChatMonitor', _L['Chat'], {
 	bCapture = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
+		szDescription = X.MakeCaption({
+			_L['start'] .. '/' .. _L['stop'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nMaxRecord = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
+		szDescription = X.MakeCaption({
+			_L['max record count'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},
 	bShowPreview = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
+		szDescription = X.MakeCaption({
+			_L['show message preview box'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bPlaySound = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
+		szDescription = X.MakeCaption({
+			_L['play new message alert sound'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bRedirectSysChannel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
+		szDescription = X.MakeCaption({
+			_L['output to system channel'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bIgnoreSame = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
+		szDescription = X.MakeCaption({
+			_L['ignore same message'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -103,18 +124,27 @@ local O = X.CreateUserSettingsModule('MY_ChatMonitor', _L['Chat'], {
 	bDistinctServer = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
+		szDescription = X.MakeCaption({
+			_L['Distinct server'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	szTimestrap = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
+		szDescription = X.MakeCaption({
+			_L['timestrap format'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '[%hh:%mm:%ss]',
 	},
 	anchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMonitor'],
+		szDescription = X.MakeCaption({
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
 	},

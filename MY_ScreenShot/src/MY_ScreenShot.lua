@@ -23,89 +23,43 @@ local SCREENSHOT_MODE = {
 	SHOW_UI = 1,
 	HIDE_UI = 2,
 }
-local OR = X.CreateUserSettingsModule('MY_ScreenShot', _L['System'], {
-	bUseGlobalConfig = {
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_ScreenShot'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
-	},
-	szFileExName_Global = {
+local O = X.CreateUserSettingsModule('MY_ScreenShot', _L['System'], {
+	szFileExName = {
 		ePathType = X.PATH_TYPE.GLOBAL,
-		szDataKey = 'szFileExName',
 		szLabel = _L['MY_ScreenShot'],
+		szDescription = X.MakeCaption({
+			_L['file format'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = 'jpg',
 	},
-	nQuality_Global = {
+	nQuality = {
 		ePathType = X.PATH_TYPE.GLOBAL,
-		szDataKey = 'nQuality',
 		szLabel = _L['MY_ScreenShot'],
+		szDescription = X.MakeCaption({
+			_L['set quality (0-100)'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 100,
 	},
-	bAutoHideUI_Global = {
+	bAutoHideUI = {
 		ePathType = X.PATH_TYPE.GLOBAL,
-		szDataKey = 'bAutoHideUI',
 		szLabel = _L['MY_ScreenShot'],
+		szDescription = X.MakeCaption({
+			_L['auto hide ui while shot screen'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
-	szFilePath_Global = {
+	szFilePath = {
 		ePathType = X.PATH_TYPE.GLOBAL,
-		szDataKey = 'szFilePath',
 		szLabel = _L['MY_ScreenShot'],
+		szDescription = X.MakeCaption({
+			_L['set folder'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
-	szFileExName_Role = {
-		ePathType = X.PATH_TYPE.ROLE,
-		szDataKey = 'szFileExName',
-		szLabel = _L['MY_ScreenShot'],
-		xSchema = X.Schema.String,
-		xDefaultValue = 'jpg',
-	},
-	nQuality_Role = {
-		ePathType = X.PATH_TYPE.ROLE,
-		szDataKey = 'nQuality',
-		szLabel = _L['MY_ScreenShot'],
-		xSchema = X.Schema.Number,
-		xDefaultValue = 100,
-	},
-	bAutoHideUI_Role = {
-		ePathType = X.PATH_TYPE.ROLE,
-		szDataKey = 'bAutoHideUI',
-		szLabel = _L['MY_ScreenShot'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = false,
-	},
-	szFilePath_Role = {
-		ePathType = X.PATH_TYPE.ROLE,
-		szDataKey = 'szFilePath',
-		szLabel = _L['MY_ScreenShot'],
-		xSchema = X.Schema.String,
-		xDefaultValue = '',
-	},
-})
-local O = setmetatable({}, {
-	__index = function(_, k)
-		if k == 'bUseGlobalConfig' then
-			return OR[k]
-		end
-		if OR.bUseGlobalConfig then
-			return OR[k .. '_Global']
-		end
-		return OR[k .. '_Role']
-	end,
-	__newindex = function(_, k, v)
-		if k == 'bUseGlobalConfig' then
-			OR[k] = v
-		elseif OR.bUseGlobalConfig then
-			OR[k .. '_Global'] = v
-		else
-			OR[k .. '_Role'] = v
-		end
-	end,
 })
 local D = {}
 
@@ -177,20 +131,6 @@ function PS.OnPanelActive(wnd)
 		ui:Children('#WndSlider_Quality'):Value(O.nQuality)
 		ui:Children('#WndEditBox_SsRoot'):Text(O.szFilePath)
 	end
-
-	ui:Append('WndCheckBox', {
-		name = 'WndCheckBox_UseGlobal',
-		x = 30, y = 30, w = 200,
-		text = _L['Use global config'],
-		tip = {
-			render = _L['Check to use global config, otherwise use private setting.'],
-			position = X.UI.TIP_POSITION.TOP_BOTTOM,
-		},
-		checked = O.bUseGlobalConfig,
-		onCheck = function(bChecked)
-			O.bUseGlobalConfig = bChecked fnRefreshPanel(ui)
-		end,
-	})
 
 	ui:Append('WndCheckBox', {
 		name = 'WndCheckBox_HideUI',

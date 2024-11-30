@@ -24,18 +24,30 @@ local O = X.CreateUserSettingsModule('MY_AchievementWiki', _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AchievementWiki'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nW = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AchievementWiki'],
+			_L['UI Width'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 850,
 	},
 	nH = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AchievementWiki'],
+			_L['UI Height'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 610,
 	},

@@ -26,6 +26,9 @@ local O = X.CreateUserSettingsModule('MY_Force', _L['Target'], {
 	bAlertPet = { -- 五毒宠物消失提醒
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['Alert when pet disappear unexpectedly (for 5D)'],
+		}),
 		xSchema = X.Schema.Boolean,
 		szVersion = '20221109',
 		xDefaultValue = false,
@@ -33,30 +36,45 @@ local O = X.CreateUserSettingsModule('MY_Force', _L['Target'], {
 	bMarkPet = { -- 五毒宠物标记
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['Mark pet'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFeedHorse = { -- 提示喂马
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['Alert when horse is hungry'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bWarningDebuff = { -- 警告 debuff 类型
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['Alert when my same type of debuff reached a certain number '],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nDebuffNum = { -- debuff 类型达到几个时警告
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['Alert when my same type of debuff reached a certain number '],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 3,
 	},
 	bAlertWanted = { -- 在线被悬赏时提醒自己
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['Alert when I am wanted publishing online'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

@@ -26,7 +26,14 @@ return {
     ['Show tip at right bottom'] = '目标信息显示在屏幕右下角',
     ['Right click list to delete'] = '右键点击列表可删除',
 
+    ['Minimize'] = '最小化状态',
+    ['Max display count'] = '最大显示数量',
+    ['Scale-x'] = '界面X轴缩放',
+    ['Scale-y'] = '界面Y轴缩放',
+
     ['Auto focus'              ] = '启用默认焦点',
+    ['Auto focus data'         ] = '默认焦点数据',
+    ['Static focus data'       ] = '永久焦点数据',
     ['Add'                     ] = '添加',
     ['Add auto focus'          ] = '添加默认焦点',
     ['Namelist manager'        ] = '管理默认焦点',

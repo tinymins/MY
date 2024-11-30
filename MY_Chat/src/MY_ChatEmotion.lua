@@ -23,12 +23,20 @@ local O = X.CreateUserSettingsModule('MY_ChatEmotion', _L['Chat'], {
 	bFixSize = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatEmotion'],
+			_L['Resize emotion'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nSize = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatEmotion'],
+			_L['Emotion size'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 20,
 	},

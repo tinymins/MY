@@ -24,66 +24,118 @@ end
 local O = X.CreateUserSettingsModule('MYDev_Snaplines', {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['enable tree path view'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDetectBox = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['auto detect box'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowWndSnaplines = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['show wnd snaplines'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowWndTip = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['show wnd tip'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowItemTip = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['show item tip'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowItemSnaplines = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['show item snaplines'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowTip = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['show tip'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowData = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['show data'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	rgbWndSnaplines = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['show wnd snaplines'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = {0, 0, 0},
 	},
 	rgbItemSnaplines = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['show item snaplines'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = {0, 255, 0},
 	},
 	rgbTip = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['show tip'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = {255, 255, 0},
 	},
 	nTipFont = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['font'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 40,
 	},
 	bAutoScale = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_Snaplines'],
+		szDescription = X.MakeCaption({
+			_L['auto scale'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

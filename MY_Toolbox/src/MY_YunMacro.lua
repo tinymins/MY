@@ -25,6 +25,10 @@ local O = X.CreateUserSettingsModule('MY_YunMacro', _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_YunMacro'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

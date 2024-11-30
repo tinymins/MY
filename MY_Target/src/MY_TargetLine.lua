@@ -28,54 +28,94 @@ local O = X.CreateUserSettingsModule('MY_TargetLine', _L['Target'], {
 	bTarget = { -- 启用目标追踪线
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetLine'],
+			_L['Display the line from self to target'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTargetRL = { -- 启用新版连线
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetLine'],
+			_L['Display the line from self to target'],
+			_L['New style'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bTTarget = { -- 显示目标与目标的目标连接线
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetLine'],
+			_L['Display the line target self to target target'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTTargetRL = { -- 启用新版连线
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetLine'],
+			_L['Display the line target self to target target'],
+			_L['New style'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAtHead = { -- 连接线从头部开始
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetLine'],
+			_L['From head to head'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nLineWidth = { -- 连接线宽度
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetLine'],
+			_L['Line width'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 3,
 	},
 	nLineAlpha = { -- 连接线不透明度
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetLine'],
+			_L['Line alpha'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 150,
 	},
 	tTargetColor = { -- 颜色
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetLine'],
+			_L['Display the line from self to target'],
+			_L['Change color'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 0, 255, 0 },
 	},
 	tTTargetColor = { -- 颜色
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetLine'],
+			_L['Display the line target self to target target'],
+			_L['Change color'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 255, 0, 0 },
 	},

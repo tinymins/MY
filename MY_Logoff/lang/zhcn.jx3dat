@@ -21,6 +21,7 @@ return {
 
     ['Idle logoff'] = '暂离登出',
     ['Enable'] = '启用',
+    ['Auto logoff when keep idle for'] = '暂离后自动返回登录界面',
     ['Auto logoff when keep idle for %dmin.'] = '暂离%s分钟后将自动返回登录界面。',
 
     ['Tips'] = '说明',

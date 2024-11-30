@@ -25,30 +25,50 @@ local O = X.CreateUserSettingsModule('MY_VisualSkill', _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_VisualSkill'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bPenetrable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_VisualSkill'],
+			_L['Penetrable UI'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nVisualSkillBoxCount = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_VisualSkill'],
+			_L['Display skills count'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 5,
 	},
 	anchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_VisualSkill'],
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = X.Clone(DEFAULT_ANCHOR),
 	},
 	aIgnoreSkill = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_VisualSkill'],
+			_L['Ignore skill list'],
+		}),
 		xSchema = X.Schema.Collection(X.Schema.Number),
 		xDefaultValue = {
 			10   , -- (10)    ºáÉ¨Ç§¾ü           ºáÉ¨Ç§¾ü

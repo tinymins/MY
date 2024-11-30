@@ -23,6 +23,10 @@ local O = X.CreateUserSettingsModule('MY_JBTeamSnapshot', _L['Raid'], {
 	szTeam = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_JBTeamSnapshot'],
+			_L['Team name/id'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},

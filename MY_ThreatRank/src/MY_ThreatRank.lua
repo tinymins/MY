@@ -24,78 +24,117 @@ local O = X.CreateUserSettingsModule('MY_ThreatRank', _L['Target'], {
 	bEnable = { -- 开启
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			_L['Enable ThreatScrutiny'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bInDungeon = { -- 只有秘境内才开启
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			_L['Only in the map type is Dungeon Enable plug-in'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nBGAlpha = { -- 背景透明度
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			g_tStrings.STR_RAID_MENU_BG_ALPHA,
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},
 	nMaxBarCount = { -- 最大列表
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			g_tStrings.STR_SHOW_HATRE_COUNTS,
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 7,
 	},
 	bForceColor = { -- 根据门派着色
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bForceIcon = { -- 显示门派图标 团队时显示心法
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			g_tStrings.STR_SHOW_KUNGFU,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nOTAlertLevel = { -- OT提醒
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			_L['OT Alert'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	bOTAlertSound = { -- OT 播放声音
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			_L['OT Alert Sound'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSpecialSelf = { -- 特殊颜色显示自己
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			_L['Special Self'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bTopTarget = { -- 置顶当前目标
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			_L['Top Target'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowPercent = { -- 是否为显示百分比模式
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			_L['Show percent'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	tAnchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'TOPRIGHT', r = 'TOPRIGHT', x = -300, y = 300 },
 	},
 	nStyle = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ThreatRank'],
+		szDescription = X.MakeCaption({
+			_L['Style Select'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},

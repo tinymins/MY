@@ -31,18 +31,30 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_BuffList', _L['Raid'], {
 	tAnchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_BuffList'],
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'TOPLEFT', r = 'CENTER', x = 300, y = -200 },
 	},
 	nCount = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_BuffList'],
+			_L['Max buff count'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 8,
 	},
 	fScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_BuffList'],
+			_L['Buff size'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},

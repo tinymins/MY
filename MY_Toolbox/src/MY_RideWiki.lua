@@ -24,18 +24,30 @@ local O = X.CreateUserSettingsModule('MY_RideWiki', _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideWiki'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nW = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideWiki'],
+			_L['UI Width'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 850,
 	},
 	nH = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_RideWiki'],
+			_L['UI Height'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 610,
 	},

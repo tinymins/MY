@@ -119,6 +119,8 @@ return {
 	['Voice alarm function'] = '语音报警功能选项',
 	['Show voice recommendation confirm on load data'] = '加载数据时显示推荐语音包',
 	['Prefer use official voice'] = '优先播放官方语音',
+	['OfficialVoicePacketID'] = '当前官方语音包ID',
+	['CustomVoicePacketID'] = '当前自定义语音包ID',
 	['Add countdown'] = '添加倒计时',
 	['Press CTRL click for advance menu'] = '按住CTRL点击可查看高级选项',
 	['Please select type'] = '请选择类型',
@@ -267,6 +269,7 @@ return {
 	['Add buff rule'] = '添加条件监控',
 	['Never show decimal.'] = '从不显示小数点。',
 	['Always show decimal.'] = '总是显示小数点。',
+	['Show countdown decimal settings'] = '倒计时小数点设置',
 	['Show countdown decimal when duration below: %ds.'] = '倒计时剩余%d秒时显示小数点。',
 	-- MY_TeamMon_Subscribe.lua --
 	['MY_TeamMon_Subscribe'] = '团队监控·数据订阅',
@@ -325,6 +328,7 @@ return {
 	['Please input meta address:'] = '请输入订阅地址，添加多个使用分号分隔：',
 
 	-- MY_TeamMon_VoiceAlarm.lua
+	['MY_TeamMon_VoiceAlarm'] = '语音包',
 	['Current loaded data recommend voice packet %s, do you want to download and use?'] = '当前数据推荐使用语音包：%s，是否下载并启用推荐的语音包？',
 	['Official voice packet download success, but your settings prefer use custom voice packet, do you want to change it?'] = '官方语音包下载成功，但当前设置为优先使用非官方语音包，是否一键修改为优先使用官方语音包？',
 	['Custom voice packet download success, but your settings prefer use official voice packet, do you want to change it?'] = '语音包下载成功，但当前设置为优先使用官方语音包，是否一键修改为优先使用非官方语音包？',

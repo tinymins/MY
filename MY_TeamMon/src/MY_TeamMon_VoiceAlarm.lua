@@ -24,36 +24,50 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_VoiceAlarm', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_VoiceAlarm'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bPreferOfficial=  {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_VoiceAlarm'],
+			_L['Prefer use official voice'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	dwOfficialVoicePacketID = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_VoiceAlarm'],
+			_L['OfficialVoicePacketID'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	szOfficialVoicePacketVersion = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon'],
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	dwCustomVoicePacketID = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_VoiceAlarm'],
+			_L['CustomVoicePacketID'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	szCustomVoicePacketVersion = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_TeamMon'],
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},

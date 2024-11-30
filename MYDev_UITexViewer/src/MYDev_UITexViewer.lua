@@ -22,6 +22,10 @@ end
 local O = X.CreateUserSettingsModule('MYDev_UITexViewer', {
 	szUITexPath = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MYDev_UITexViewer'],
+		szDescription = X.MakeCaption({
+			_L['UITexPath'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},

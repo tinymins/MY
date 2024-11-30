@@ -37,18 +37,27 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	bRealtimeCommit = { -- 实时写入数据库
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatLog'],
+		szDescription = X.MakeCaption({
+			_L['Realtime database commit'],
+		}),
 		xSchema = IsDebugClient() and X.Schema.Boolean or false,
 		xDefaultValue = false,
 	},
 	bAutoConnectDB = { -- 登录时自动连接数据库
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatLog'],
+		szDescription = X.MakeCaption({
+			_L['Auto connect database'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	aChannel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatLog'],
+		szDescription = X.MakeCaption({
+			_L['Channel settings'],
+		}),
 		xSchema = X.Schema.Collection(
 			X.Schema.Record({
 				szKey = X.Schema.String,
@@ -96,12 +105,20 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	tUncheckedChannel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatLog'],
+		szDescription = X.MakeCaption({
+			_L['UI Channel Check State'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
+		eDefaultLocationOverride = X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.ROLE,
 	},
 	tExcludeFilter = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatLog'],
+		szDescription = X.MakeCaption({
+			_L['Chat log filter'],
+			_L['Exclude'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Collection(X.Schema.Record({
 			szText = X.Schema.String,
 			bPattern = X.Schema.Boolean,
@@ -126,6 +143,10 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	tIncludeFilter = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatLog'],
+		szDescription = X.MakeCaption({
+			_L['Chat log filter'],
+			_L['Include'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Collection(X.Schema.Record({
 			szText = X.Schema.String,
 			bPattern = X.Schema.Boolean,

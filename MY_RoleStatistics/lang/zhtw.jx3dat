@@ -24,6 +24,7 @@ return {
     },
     ['Switch compact mode'] = '切換緊湊模式',
     ['Hide equipped item'] = '隱藏身上裝備',
+    ['Unchecked Names'] = '界面角色打鉤狀態',
 
     ['%d pages'] = '共%d頁',
     ['%d results'] = '共%d個結果',
@@ -53,6 +54,8 @@ return {
 
     ['Press ENTER to search...'] = '輸入回車鍵搜索...',
     ['Columns'] = '顯示列',
+    ['Sort'] = '排序列',
+    ['Sort Order'] = '排序方式',
     ['Click to move up.'] = '滑鼠點擊可上移當前選項。',
     ['Click to move up, Hold SHIFT to move down.'] = '滑鼠點擊可上移當前選項，按住 SHIFT 點擊可下移當前選項。',
     ['Hold SHIFT click to move down.'] = '按住 SHIFT 滑鼠點擊可下移當前選項。',

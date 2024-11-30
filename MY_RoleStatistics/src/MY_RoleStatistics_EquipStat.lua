@@ -184,12 +184,20 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_EquipStat', _L['General'
 	bCompactMode = {
 		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_EquipStat'],
+			_L['Switch compact mode'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFloatEntry = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_EquipStat'],
+			_L['Float panel'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -201,12 +209,15 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_EquipStat', _L['General'
 	bSaveDB = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_EquipStat'],
+			_L['Save DB'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

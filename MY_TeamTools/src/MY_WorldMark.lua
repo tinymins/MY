@@ -39,6 +39,10 @@ local O = X.CreateUserSettingsModule('MY_WorldMark', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_WorldMark'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

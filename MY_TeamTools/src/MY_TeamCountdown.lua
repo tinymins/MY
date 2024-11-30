@@ -24,6 +24,10 @@ local O = X.CreateUserSettingsModule('MY_TeamCountdown', _L['Raid'], {
 	nCountdown = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamCountdown'],
+			_L['Team countdown seconds'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 5,
 	},

@@ -134,23 +134,41 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'],
 	bCompactMode = {
 		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_BagStat'],
+			_L['Switch compact mode'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bHideEquipped = {
 		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_BagStat'],
+			_L['Hide equipped item'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tUncheckedNames = {
 		ePathType = X.PATH_TYPE.GLOBAL,
+		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_BagStat'],
+			_L['Unchecked Names'],
+		}),
+		bNoExport = true,
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 	bFloatEntry = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_BagStat'],
+			_L['Float panel'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -162,12 +180,15 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_BagStat', _L['General'],
 	bSaveDB = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_BagStat'],
+			_L['Save DB'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

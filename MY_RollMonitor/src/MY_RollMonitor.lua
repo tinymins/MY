@@ -127,36 +127,54 @@ local O = X.CreateUserSettingsModule('MY_RollMonitor', _L['General'], {
 	nSortType = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
+		szDescription = X.MakeCaption({
+			_L['record mode'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nTimeLimit = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
+		szDescription = X.MakeCaption({
+			_L['valid time'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = -1,
 	},
 	nPublish = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
+		szDescription = X.MakeCaption({
+			_L['publish setting'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nPublishChannel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
+		szDescription = X.MakeCaption({
+			_L['publish channel'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = PLAYER_TALK_CHANNEL.RAID,
 	},
 	bPublishUnroll = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
+		szDescription = X.MakeCaption({
+			_L['publish unroll'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bPublishRestart = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RollMonitor'],
+		szDescription = X.MakeCaption({
+			_L['publish while restart'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

@@ -119,6 +119,8 @@ return {
 	['Voice alarm function'] = '語音報警功能選項',
 	['Show voice recommendation confirm on load data'] = '載入數據時顯示推薦語音包',
 	['Prefer use official voice'] = '優先播放官方語音',
+	['OfficialVoicePacketID'] = '當前官方語音包ID',
+	['CustomVoicePacketID'] = '當前自定義語音包ID',
 	['Add countdown'] = '添加倒計時',
 	['Press CTRL click for advance menu'] = '按住CTRL點擊可查看高級選項',
 	['Please select type'] = '請選擇類型',
@@ -267,6 +269,7 @@ return {
 	['Add buff rule'] = '添加條件監控',
 	['Never show decimal.'] = '從不顯示小數點。',
 	['Always show decimal.'] = '總是顯示小數點。',
+	['Show countdown decimal settings'] = '倒計時小數點設置',
 	['Show countdown decimal when duration below: %ds.'] = '倒計時剩餘%d秒時顯示小數點。',
 	-- MY_TeamMon_Subscribe.lua --
 	['MY_TeamMon_Subscribe'] = '團隊監控·數據訂閱',

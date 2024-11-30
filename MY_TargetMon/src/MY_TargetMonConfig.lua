@@ -27,12 +27,18 @@ local O = X.CreateUserSettingsModule('MY_TargetMon', _L['Target'], {
 	bCommon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TargetMon'],
+		szDescription = X.MakeCaption({
+			_L['Use common data'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nInterval = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TargetMon'],
+		szDescription = X.MakeCaption({
+			_L['View render interval'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},

@@ -374,30 +374,45 @@ local O = X.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
 	bEnable = { -- 数据记录总开关 防止官方SB技能BUFF脚本瞎几把写超高频太卡甩锅给界面逻辑
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Enable recording'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSaveHistoryOnExit = { -- 退出游戏时保存历史数据
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Save history on exit'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSaveHistoryOnExFi = { -- 脱离战斗时保存历史数据
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Save history immediately'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nMaxHistory = { -- 最大历史数据数量
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Max history'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 10,
 	},
 	nMinFightTime = { -- 最小战斗时间
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Filter short fight'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},

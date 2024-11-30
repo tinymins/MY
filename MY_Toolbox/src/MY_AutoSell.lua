@@ -24,36 +24,60 @@ local O = X.CreateUserSettingsModule('MY_AutoSell', _L['General'], {
 	bEnable = { -- 打开商店后自动售出总开关,
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoSell'],
+			_L['Auto sell when open shop'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSellGray = { -- 自动出售灰色物品,
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoSell'],
+			_L['Sell grey items'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSellWhiteBook = { -- 自动出售已读白书,
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoSell'],
+			_L['Sell read white books'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSellGreenBook = { -- 自动出售已读绿书,
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoSell'],
+			_L['Sell read green books'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSellBlueBook = { -- 自动出售已读蓝书,
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoSell'],
+			_L['Sell read blue books'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tSellItem = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoSell'],
+			_L['Auto sell by name'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {
 			[X.GetItemInfoName(5, 2863)] = true, -- 银叶子
@@ -72,6 +96,10 @@ local O = X.CreateUserSettingsModule('MY_AutoSell', _L['General'], {
 	tProtectItem = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_AutoSell'],
+			_L['Protect specified items'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {
 			[X.GetItemInfoName(5, 789)] = true, -- 真丝肚兜

@@ -24,12 +24,18 @@ local O = X.CreateUserSettingsModule('MY_Logoff', _L['System'], {
 	bIdleOff = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Logoff'],
+		szDescription = X.MakeCaption({
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nIdleOffTime = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Logoff'],
+		szDescription = X.MakeCaption({
+			_L['Auto logoff when keep idle for'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},

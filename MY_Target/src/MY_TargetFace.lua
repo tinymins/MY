@@ -26,78 +26,134 @@ local O = X.CreateUserSettingsModule('MY_TargetFace', _L['Target'], {
 	bTargetFace = { -- 是否画出目标面向
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['Display the sector of target facing'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTTargetFace = { -- 是否画出目标的目标的面向
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['Display the sector of target target facing'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nSectorDegree = { -- 扇形角度
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['The sector angle'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 110,
 	},
 	nSectorRadius = { -- 扇形半径（尺）
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['The sector radius'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 6,
 	},
 	nSectorAlpha = { -- 扇形透明度
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['The sector transparency'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},
 	tTargetFaceColor = { -- 目标面向颜色
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['Display the sector of target facing'],
+			_L['Color'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 255, 0, 128 },
 	},
 	tTTargetFaceColor = { -- 目标的目标面向颜色
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['Display the sector of target target facing'],
+			_L['Color'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 0, 128, 255 },
 	},
 	bTargetShape = { -- 目标脚底圈圈
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['Display the foot shape of target'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTTargetShape = { -- 目标的目标脚底圈圈
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['Display the foot shape of target target'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nShapeRadius = { -- 脚底圈圈半径
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['The foot shape radius'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	nShapeAlpha = { -- 脚底圈圈透明度
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['The foot shape transparency'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 100,
 	},
 	tTargetShapeColor = { -- 目标脚底圈圈颜色
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['Display the foot shape of target'],
+			_L['Color'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 255, 0, 0 },
 	},
 	tTTargetShapeColor = { -- 目标的目标脚底圈圈颜色
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetFace'],
+			_L['Display the foot shape of target target'],
+			_L['Color'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 0, 0, 255 },
 	},

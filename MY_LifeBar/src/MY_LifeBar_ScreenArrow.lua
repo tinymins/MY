@@ -27,54 +27,95 @@ local O = X.CreateUserSettingsModule('MY_LifeBar_ScreenArrow', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
+		szDescription = X.MakeCaption({
+			_L['MY_LifeBar_ScreenArrow'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	fUIScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
+		szDescription = X.MakeCaption({
+			_L['MY_LifeBar_ScreenArrow'],
+			_L['UI scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0.8,
 	},
 	fTextScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
+		szDescription = X.MakeCaption({
+			_L['MY_LifeBar_ScreenArrow'],
+			_L['Text scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.35,
 	},
 	bAlert = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
+		szDescription = X.MakeCaption({
+			_L['MY_LifeBar_ScreenArrow'],
+			_L['Less life/mana head alert'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOnlySelf = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
+		szDescription = X.MakeCaption({
+			_L['MY_LifeBar_ScreenArrow'],
+			_L['Less life/mana head alert'],
+			_L['Only monitor self'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	fLifePer = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
+		szDescription = X.MakeCaption({
+			_L['MY_LifeBar_ScreenArrow'],
+			_L['Less life/mana head alert'],
+			_L['While HP less than'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0.3,
 	},
 	fManaPer = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
+		szDescription = X.MakeCaption({
+			_L['MY_LifeBar_ScreenArrow'],
+			_L['Less life/mana head alert'],
+			_L['While MP less than'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0.1,
 	},
 	nFont = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
+		szDescription = X.MakeCaption({
+			_L['MY_LifeBar_ScreenArrow'],
+			_L['Less life/mana head alert'],
+			g_tStrings.FONT,
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 186,
 	},
 	bDrawColor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
+		szDescription = X.MakeCaption({
+			_L['MY_LifeBar_ScreenArrow'],
+			_L['Draw School Color'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

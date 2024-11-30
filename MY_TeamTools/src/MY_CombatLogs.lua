@@ -24,60 +24,100 @@ local O = X.CreateUserSettingsModule('MY_CombatLogs', _L['Raid'], {
 	bEnable = { -- 数据记录总开关
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_CombatLogs'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nMaxHistory = { -- 最大历史数据数量
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_CombatLogs'],
+			_L['Max history'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 300,
 	},
 	nMinFightTime = { -- 最小战斗时间
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_CombatLogs'],
+			_L['Min fight time'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 30,
 	},
 	bEnableInDungeon = { -- 在秘境中启用
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_CombatLogs'],
+			_L['Enable in dungeon'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bEnableInArena = { -- 在名剑大会中启用
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_CombatLogs'],
+			_L['Enable in arena'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bEnableInBattleField = { -- 在战场中启用
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_CombatLogs'],
+			_L['Enable in battlefield'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bEnableInOtherMaps = { -- 在其他类型地图中启用
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_CombatLogs'],
+			_L['Enable in other maps'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bNearbyAll = { -- 保存附近所有角色事件记录
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_CombatLogs'],
+			_L['Save all nearby records'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bTargetInformation = { -- 保存角色状态数据
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_CombatLogs'],
+			_L['PVP mode'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nTargetInformationThrottle = { -- 保存角色状态数据节流时间间隔
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_CombatLogs'],
+			_L['Target Information Throttle Time'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 200,
 	},

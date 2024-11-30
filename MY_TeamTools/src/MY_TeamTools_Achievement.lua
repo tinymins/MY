@@ -24,6 +24,10 @@ local O = X.CreateUserSettingsModule('MY_TeamTools_Achievement', _L['Raid'], {
 	bIntelligentHide = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamTools_Achievement'],
+			_L['Intelligent hide'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

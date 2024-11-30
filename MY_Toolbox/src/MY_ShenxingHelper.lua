@@ -25,18 +25,30 @@ local O = X.CreateUserSettingsModule('MY_ShenxingHelper', _L['General'], {
 	bAncientMap = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_ShenxingHelper'],
+			_L['Shenxing to ancient maps'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bOpenAllMap = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_ShenxingHelper'],
+			_L['Force open all map shenxing'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAvoidBlackCD = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_ShenxingHelper'],
+			_L['Avoid blacking shenxing cd'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

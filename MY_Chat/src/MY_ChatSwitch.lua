@@ -23,24 +23,40 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	bDisplayPanel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatSwitch'],
+			_L['display panel'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	anchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatSwitch'],
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = 10, y = -60, s = 'BOTTOMLEFT', r = 'BOTTOMLEFT' },
 	},
 	bLockPostion = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatSwitch'],
+			_L['lock postion'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tChennalVisible = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatSwitch'],
+			_L['channel setting'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
@@ -63,12 +79,20 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	szAway = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatSwitch'],
+			_L['away message'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	szBusy = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatSwitch'],
+			_L['busy message'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
@@ -84,15 +108,13 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 			tCount = {},
 		},
 	},
-	bAlertBeforeClear = {
-		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_Chat'],
-		xSchema = X.Schema.Boolean,
-		xDefaultValue = true,
-	},
 	bAutoSwitchBfChannel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChatSwitch'],
+			_L['Auto switch talk channel when into battle field'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

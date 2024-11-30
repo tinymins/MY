@@ -38,4 +38,9 @@ return {
     ['Current online '] = '本次登錄',
     [','] = '，',
     ['.'] = '。',
+
+    ['Sort'] = '排序列',
+    ['Sort Order'] = '排序方式',
+    ['Float panel'] = '界面浮動圖標',
+    ['Summary Ignore ID'] = '統計忽略角色設置',
 }

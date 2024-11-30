@@ -26,6 +26,17 @@ end
 -- 寄忧谷 -- 下一次有五倍几率砸中年兽陶罐
 -- 醉生 -- 下一次砸年兽陶罐失败则不损失积分
 
+local TAOGUAN = X.GetItemNameByUIID(74224) -- 年兽陶罐
+local XIAOJINCHUI = X.GetItemNameByUIID(65611) -- 小金锤
+local XIAOYINCHUI = X.GetItemNameByUIID(65609) -- 小银锤
+local MEILIANGYUQIAN = X.GetItemNameByUIID(65589) -- 梅良玉签
+local XINGYUNXIANGNANG = X.GetItemNameByUIID(65578) -- 幸运香囊
+local XINGYUNJINNANG = X.GetItemNameByUIID(65581) -- 幸运锦囊
+local RUYIXIANGNANG = X.GetItemNameByUIID(65579) -- 如意香囊
+local RUYIJINNANG = X.GetItemNameByUIID(65582) -- 如意锦囊
+local JIYOUGU = X.GetItemNameByUIID(65580) -- 寄忧谷
+local ZUISHENG = X.GetItemNameByUIID(65583) -- 醉生
+
 local FILTER_ITEM = {}
 do
 	local data = X.LoadLUAData(PLUGIN_ROOT .. '/data/taoguan/{$lang}.jx3dat')
@@ -42,108 +53,162 @@ local O = X.CreateUserSettingsModule('MY_Taoguan', _L['Target'], {
 	nPausePoint = { -- 停砸分数线
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L['Stop simple broken can when score reaches'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 327680,
 	},
 	bUseTaoguan = { -- 必要时使用背包的陶罐
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L['Put can if needed?'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bNoYinchuiUseJinchui = { -- 没小银锤时使用小金锤
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L('When no %s use %s?', XIAOYINCHUI, XIAOJINCHUI),
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nUseXiaojinchui = { -- 优先使用小金锤的分数
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L('Use %s when score reaches', XIAOJINCHUI),
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 320,
 	},
 	bPauseNoXiaojinchui = { -- 缺少小金锤时停砸
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L['Stop break when no item'] .. XIAOJINCHUI,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nUseXingyunXiangnang = { -- 开始吃幸运香囊的分数
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L('Use %s when score reaches', XINGYUNXIANGNANG),
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},
 	bPauseNoXingyunXiangnang = { -- 缺少幸运香囊时停砸
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L['Stop break when no item'] .. XINGYUNXIANGNANG,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nUseXingyunJinnang = { -- 开始吃幸运锦囊的分数
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L('Use %s when score reaches', XINGYUNJINNANG),
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},
 	bPauseNoXingyunJinnang = { -- 缺少幸运锦囊时停砸
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L['Stop break when no item'] .. XINGYUNJINNANG,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nUseRuyiXiangnang = { -- 开始吃如意香囊的分数
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L('Use %s when score reaches', RUYIXIANGNANG),
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},
 	bPauseNoRuyiXiangnang = { -- 缺少如意香囊时停砸
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L['Stop break when no item'] .. RUYIXIANGNANG,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nUseRuyiJinnang = { -- 开始吃如意锦囊的分数
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L('Use %s when score reaches', RUYIJINNANG),
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},
 	bPauseNoRuyiJinnang = { -- 缺少如意锦囊时停砸
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L['Stop break when no item'] .. RUYIJINNANG,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nUseJiyougu = { -- 开始吃寄忧谷的分数
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L('Use %s when score reaches', JIYOUGU),
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1280,
 	},
 	bPauseNoJiyougu = { -- 缺少寄忧谷时停砸
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L['Stop break when no item'] .. JIYOUGU,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nUseZuisheng = { -- 开始吃醉生的分数
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L('Use %s when score reaches', ZUISHENG),
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1280,
 	},
 	bPauseNoZuisheng = { -- 缺少醉生时停砸
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L['Stop break when no item'] .. ZUISHENG,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	tFilterItem = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Taoguan'],
+		szDescription = X.MakeCaption({
+			_L['Pickup filters'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = FILTER_ITEM_DEFAULT,
 	},
@@ -152,16 +217,6 @@ local O = X.CreateUserSettingsModule('MY_Taoguan', _L['Target'], {
 ---------------------------------------------------------------------
 -- 本地函数和变量
 ---------------------------------------------------------------------
-local TAOGUAN = X.GetItemNameByUIID(74224) -- 年兽陶罐
-local XIAOJINCHUI = X.GetItemNameByUIID(65611) -- 小金锤
-local XIAOYINCHUI = X.GetItemNameByUIID(65609) -- 小银锤
-local MEILIANGYUQIAN = X.GetItemNameByUIID(65589) -- 梅良玉签
-local XINGYUNXIANGNANG = X.GetItemNameByUIID(65578) -- 幸运香囊
-local XINGYUNJINNANG = X.GetItemNameByUIID(65581) -- 幸运锦囊
-local RUYIXIANGNANG = X.GetItemNameByUIID(65579) -- 如意香囊
-local RUYIJINNANG = X.GetItemNameByUIID(65582) -- 如意锦囊
-local JIYOUGU = X.GetItemNameByUIID(65580) -- 寄忧谷
-local ZUISHENG = X.GetItemNameByUIID(65583) -- 醉生
 local ITEM_CD = 1 * X.ENVIRONMENT.GAME_FPS + 8 -- 吃药CD
 local HAMMER_CD = 5 * X.ENVIRONMENT.GAME_FPS + 8 -- 锤子CD
 local MAX_POINT_POW = 16 -- 分数最高倍数（2^n）

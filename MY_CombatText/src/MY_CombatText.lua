@@ -253,6 +253,9 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Enable combat text'],
+		}),
 		xSchema = X.Schema.Boolean,
 		szVersion = '20241105',
 		xDefaultValue = false,
@@ -260,78 +263,117 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 	bRender = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Enable render'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	fScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Font size'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nStyle = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Critical style'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nMaxAlpha = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			g_tStrings.STR_QUESTTRACE_CHANGE_ALPHA,
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 240,
 	},
 	nMaxCount = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Max count'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 300,
 	},
 	nTime = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Hold time'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 40,
 	},
 	nFadeIn = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Fade in time'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 4,
 	},
 	nFadeOut = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Fade out time'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 8,
 	},
 	nFont = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Font edit'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 19,
 	},
 	bImmunity = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Disable immunity'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOtherCharacter = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Only show my related combat text'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bCritical = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Distinct critical color'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOptimizeRoguelike = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Optimize in roguelike'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -339,12 +381,18 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 	bEnableCombineText = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Show combine text'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDisabledPartnerText = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Disable partner text'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -352,54 +400,81 @@ local O = X.CreateUserSettingsModule('MY_CombatText', _L['System'], {
 	szSkill = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Skill style'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '$sn' .. g_tStrings.STR_COLON .. '$crit $val',
 	},
 	szTherapy = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Therapy style'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '$sn' .. g_tStrings.STR_COLON .. '$crit +$val',
 	},
 	szDamage = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Damage style'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '$sn' .. g_tStrings.STR_COLON .. '$crit -$val',
 	},
 	bCasterNotI = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['$name not me'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSnShorten2 = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['$sn shorten(2)'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTherapyEffectiveOnly = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Therapy effective only'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
-	tColor = { -- 文字类型颜色
+	tColor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Color edit'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.OneOf(X.Schema.String, X.Schema.Number), X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {},
 	},
-	tCriticalColor = { -- 会心文字类型颜色
+	tCriticalColor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Critical color'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.OneOf(X.Schema.String, X.Schema.Number), X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {},
 	},
-	bSimplifyValue = { -- 显示简化数值
+	bSimplifyValue = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_CombatText'],
+		szDescription = X.MakeCaption({
+			_L['Simplify value'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

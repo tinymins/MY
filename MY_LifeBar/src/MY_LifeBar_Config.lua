@@ -49,292 +49,423 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	eCss = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['CSS Style'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	fDesignUIScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Design UI Scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nDesignFontOffset = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Design Font Offset'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
-
 	nCamp = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Current Camp'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = -1,
 	},
 	bOnlyInArena = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Enable Only in Arena'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOnlyInDungeon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Enable Only in Dungeon'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bOnlyInBattleField = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Enable Only in Battlefield'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
-
 	nTextOffsetY = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Text Offset Y'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 38,
 	},
 	nTextLineHeight = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Text Line Height'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 20,
 	},
 	fTextScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Text Scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.2,
 	},
 	fTextSpacing = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Text Spacing'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
-
 	bShowSpecialNpc = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Special NPC'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowSpecialNpcOnlyEnemy = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Special NPC Only Enemy'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowObjectID = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Object ID'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowObjectIDOnlyUnnamed = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Object ID Only Unnamed'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowKungfu = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Kungfu'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowDistance = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Distance'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowDistanceOnlyTarget = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Distance Only for Target'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nDistanceDecimal = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Distance Decimal'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
-
 	nLifeWidth = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Bar Width'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 52,
 	},
 	nLifeHeight = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Bar Height'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	nLifePadding = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Bar Padding'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nLifeOffsetX = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Bar Offset X'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nLifeOffsetY = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Bar Offset Y'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 12,
 	},
 	nLifeBorder = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Bar Border'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	nLifeBorderR = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Bar Border Red'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nLifeBorderG = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Bar Border Green'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nLifeBorderB = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Bar Border Blue'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	szLifeDirection = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Bar Direction'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = 'LEFT_RIGHT',
 	},
-
 	nLifePerOffsetX = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Percentage Offset X'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nLifePerOffsetY = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Life Percentage Offset Y'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 8,
 	},
-
 	fTitleEffectScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Title Effect Scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0.7,
 	},
 	nTitleEffectOffsetY = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Title Effect Offset Y'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nBalloonOffsetY = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Balloon Offset Y'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = -20,
 	},
-
 	nAlpha = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Alpha'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 255,
 	},
 	nFont = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Font'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 7,
 	},
 	nDistance = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Distance'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 80 * 80 * 64 * 64,
 	},
 	nVerticalDistance = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Vertical Distance'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 50 * 8 * 64,
 	},
-
 	bHideLifePercentageWhenFight = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Hide Life Percentage When Fight'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bHideLifePercentageDecimal = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Hide Life Percentage Decimal'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
-
 	fGlobalUIScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Global UI Scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	bSystemUIScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['System UI Scale'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowWhenUIHide = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show When UI Hide'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bMineOnTop = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Mine On Top'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bTargetOnTop = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Target On Top'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bScreenPosSort = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Screen Position Sort'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
-
 	Color = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Color Configuration'],
+		}),
 		xSchema = SchemaRelationForce(X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {
 			Self = X.KvpToObject({ -- ×Ô¼º
@@ -455,6 +586,9 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	ShowName = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Name Configuration'],
+		}),
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
@@ -490,6 +624,9 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	ShowTong = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Tong Configuration'],
+		}),
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
@@ -513,6 +650,9 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	ShowTitle = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Title Configuration'],
+		}),
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
@@ -548,6 +688,9 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	ShowLife = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Life Configuration'],
+		}),
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
@@ -583,6 +726,9 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	ShowLifePer = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Life Percentage Configuration'],
+		}),
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
@@ -618,6 +764,9 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	ShowBalloon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Show Balloon Configuration'],
+		}),
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 		})),
@@ -648,6 +797,9 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	BalloonChannel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L[PLUGIN_NAME],
+		szDescription = X.MakeCaption({
+			_L['Balloon Channel Configuration'],
+		}),
 		xSchema = X.Schema.Map(
 			X.Schema.String,
 			X.Schema.Record({

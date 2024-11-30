@@ -24,30 +24,45 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	bFilterDuplicate = { -- 屏蔽重复聊天
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatFilter'],
+		szDescription = X.MakeCaption({
+			_L['filter duplicate chat'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bFilterDuplicateIgnoreID = { -- 不同玩家重复聊天也屏蔽
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatFilter'],
+		szDescription = X.MakeCaption({
+			_L['filter duplicate chat ignore id'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFilterDuplicateContinuous = { -- 仅屏蔽连续的重复聊天
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatFilter'],
+		szDescription = X.MakeCaption({
+			_L['only filter continuous duplicate chat'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bFilterDuplicateAddonTalk = { -- 屏蔽UUID相同的插件消息
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatFilter'],
+		szDescription = X.MakeCaption({
+			_L['filter duplicate addon message'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	tApplyDuplicateChannels = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatFilter'],
+		szDescription = X.MakeCaption({
+			_L['select duplicate channels'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {
 			['MSG_NORMAL'        ] = true,

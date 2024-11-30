@@ -24,42 +24,72 @@ local O = X.CreateUserSettingsModule('MY_ForceGuding', _L['Target'], {
 	bEnable = { -- 总开关
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['MY_ForceGuding'],
+			_L['Display GUDING of teammate, change color'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoSay = { -- 摆鼎后自动说话
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['MY_ForceGuding'],
+			_L['Auto talk in team channel after puting GUDING'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	szSay = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['MY_ForceGuding'],
+			_L['Talk message'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = _L['I have put the GUDING, hurry to eat if you lack of mana. *la la la*'],
 	},
 	color = { -- 名称颜色，默认绿色
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['MY_ForceGuding'],
+			_L['Name color'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 255, 0, 128 },
 	},
 	bUseMana = { -- 路过时自动吃毒锅
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['MY_ForceGuding'],
+			_L['Automatic eat GUDING when'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nManaMp = { -- 自动吃的 MP 百分比
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['MY_ForceGuding'],
+			_L['Automatic eat GUDING when'],
+			_L['Mana Mp'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},
 	nManaHp = { -- 自动吃的 HP 百分比
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['MY_ForceGuding'],
+			_L['Automatic eat GUDING when'],
+			_L['Mana Hp'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 80,
 	},

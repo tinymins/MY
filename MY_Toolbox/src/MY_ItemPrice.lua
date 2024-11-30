@@ -25,18 +25,30 @@ local O = X.CreateUserSettingsModule('MY_ItemPrice', _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_ItemPrice'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nW = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_ItemPrice'],
+			_L['UI Width'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 480,
 	},
 	nH = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_ItemPrice'],
+			_L['UI Height'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 640,
 	},

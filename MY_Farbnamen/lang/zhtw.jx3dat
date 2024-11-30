@@ -2,6 +2,7 @@ return {
     ['MY_Farbnamen'] = '門派染色',
     ['Enable MY_Farbnamen'] = '啟用門派染色',
     ['Insert force icon'] = '顯示門派圖標',
+    ['Icon size'] = '圖標大小',
     ['Icon size: %dpx'] = '圖標大小：%dpx',
     ['Are you sure to reset farbnamen data? All character\'s data cache will be removed.'] = '確定要清空門派染色本地緩存數據嗎？\n緩存數據記錄著您曾經遇見過的所有俠士的門派、等級和幫會等基本信息，清空後聊天欄短時間內染色可能不全。（原因是未曾有過一面之緣的俠士本地無法從緩存中獲得基礎信息，也就無法染色）',
 	['Reset data'] = '重置數據',

@@ -49,65 +49,99 @@ local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 	bOn = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Enable MY_GKPLoot'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bInTeamDungeon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Team dungeon'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bInRaidDungeon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Raid dungeon'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bInBattlefield = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Battlefield'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bInOtherMap = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Other map'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	anchor = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = 0, y = 0, s = 'CENTER', r = 'CENTER' },
 	},
 	bVertical = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['switch styles'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSetColor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Set Force Color'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nConfirmQuality = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Confirm when distribute'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 3,
 	},
 	bShow2ndKungfuLoot = { -- 显示第二心法装备推荐提示图标
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Show 2nd kungfu fit icon'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSortLoot = { -- 按照价值高低排序掉落物品
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Sort loot list by weight'],
+		}),
 		szVersion = '20241113',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
@@ -115,6 +149,9 @@ local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 	tConfirm = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Confirm when distribute'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {
 			Huangbaba  = true,
@@ -129,6 +166,10 @@ local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 	tFilterQuality = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Loot item filter'],
+			_L['Quality filter'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Boolean),
 		xDefaultValue = {
 			[X.CONSTANT.ITEM_QUALITY.GRAY] = true,
@@ -137,60 +178,100 @@ local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 	bNameFilter = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Loot item filter'],
+			_L['Name filter'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tNameFilter = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Loot item filter'],
+			_L['Name filter list'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 	bFilterBookRead = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Loot item filter'],
+			_L['Filter book read'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bFilterBookHave = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Loot item filter'],
+			_L['Filter book have'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoPickupFilterBookRead = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Auto pickup'],
+			_L['Filter book read'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoPickupFilterBookHave = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Auto pickup'],
+			_L['Filter book have'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoPickupTaskItem = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Auto pickup'],
+			_L['Auto pickup quest item'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoPickupBook = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Auto pickup'],
+			_L['Auto pickup book'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoPickupQuality = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Auto pickup'],
+			_L['Auto pickup by item quality'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAutoPickupQuality = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Auto pickup'],
+			_L['Auto pickup by item quality data'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Boolean),
 		xDefaultValue = (function()
 			local t = {}
@@ -203,12 +284,20 @@ local O = X.CreateUserSettingsModule('MY_GKPLoot', _L['General'], {
 	tAutoPickupNames = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Auto pickup'],
+			_L['Auto pickup names'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 	tAutoPickupFilters = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKPLoot'],
+		szDescription = X.MakeCaption({
+			_L['Auto pickup'],
+			_L['Auto pickup filters'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},

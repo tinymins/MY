@@ -24,6 +24,10 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General']
 	aColumn = {
 		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_RoleStat'],
+			_L['Columns'],
+		}),
 		xSchema = X.Schema.Collection(X.Schema.String),
 		xDefaultValue = {
 			'name',
@@ -42,18 +46,30 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General']
 	szSort = {
 		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_RoleStat'],
+			_L['Sort'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = 'time_days',
 	},
 	szSortOrder = {
 		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_RoleStat'],
+			_L['Sort Order'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = 'desc',
 	},
 	aAlertColumn = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_RoleStat'],
+			_L['Columns alert when esc'],
+		}),
 		xSchema = X.Schema.Collection(X.Schema.String),
 		xDefaultValue = {
 			'money',
@@ -76,12 +92,20 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General']
 	},
 	tSummaryIgnoreGUID = {
 		ePathType = X.PATH_TYPE.ROLE,
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_RoleStat'],
+			_L['Summary Ignore ID'],
+		}),
 		xSchema = X.Schema.Any,
 		xDefaultValue = {},
 	},
 	bFloatEntry = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_RoleStat'],
+			_L['Float panel'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -93,12 +117,15 @@ local O = X.CreateUserSettingsModule('MY_RoleStatistics_RoleStat', _L['General']
 	bSaveDB = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_RoleStatistics'],
+		szDescription = X.MakeCaption({
+			_L['MY_RoleStatistics_RoleStat'],
+			_L['Save DB'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAdviceSaveDB = {
 		ePathType = X.PATH_TYPE.ROLE,
-		szLabel = _L['MY_RoleStatistics'],
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

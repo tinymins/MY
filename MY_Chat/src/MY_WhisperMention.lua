@@ -24,6 +24,10 @@ local O = X.CreateUserSettingsModule('MY_WhisperMention', _L['Chat'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_WhisperMention'],
+			_L['Redirect mention to whisper'],
+		}),
 		szVersion = '20241023',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
@@ -31,6 +35,10 @@ local O = X.CreateUserSettingsModule('MY_WhisperMention', _L['Chat'], {
 	bDisableOfficial = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_WhisperMention'],
+			_L['Filter official mention'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

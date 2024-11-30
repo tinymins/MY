@@ -24,18 +24,30 @@ local O = X.CreateUserSettingsModule('MY_PetWiki', _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_PetWiki'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nW = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_PetWiki'],
+			_L['UI Width'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 850,
 	},
 	nH = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_PetWiki'],
+			_L['UI Height'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 610,
 	},

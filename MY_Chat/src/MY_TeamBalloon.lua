@@ -28,6 +28,10 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Chat'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamBalloon'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

@@ -25,6 +25,10 @@ local O = X.CreateUserSettingsModule('MY_CharInfo', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamTools'],
+		szDescription = X.MakeCaption({
+			_L['MY_CharInfo'],
+			_L['Allow view charinfo'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

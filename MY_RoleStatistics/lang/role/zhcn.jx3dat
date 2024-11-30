@@ -38,4 +38,10 @@ return {
     ['Current online '] = '本次登录',
     [','] = '，',
     ['.'] = '。',
+
+    ['Save DB'] = '统计当前角色',
+    ['Sort'] = '排序列',
+    ['Sort Order'] = '排序方式',
+    ['Float panel'] = '界面浮动图标',
+    ['Summary Ignore ID'] = '统计忽略角色设置',
 }

@@ -23,54 +23,81 @@ local O = X.CreateUserSettingsModule('MY_GKP', _L['General'], {
 	bOn = { -- enable
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Popup Record for Distributor'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bMoneyTalk = { -- 金钱变动喊话
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Enable Money Trend'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bMoneyTalkOnlyDistributor = { -- 金钱变动喊话仅分配者
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Money trend only distributor'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAlertMessage = { -- 进入秘境提醒清空数据
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Remind Wipe Data When Enter Dungeon'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bMoneySystem = { -- 记录系统金钱变动
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Track Money Trend in the System'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDisplayEmptyRecords = { -- show 0 record
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Clause with 0 Gold as Record'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoSync = { -- 自动接收分配者的同步信息
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Automatic Reception with Record From Distributor'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowGoldBrick = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Show Gold Brick'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	aSubsidies = { -- 补贴方案
 		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Allowance Protocols'],
+		}),
 		xSchema = X.Schema.Collection(X.Schema.Tuple(
 			X.Schema.String,
 			X.Schema.OneOf(X.Schema.String, X.Schema.Number),
@@ -88,6 +115,9 @@ local O = X.CreateUserSettingsModule('MY_GKP', _L['General'], {
 	aScheme = { -- 拍卖方案
 		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Auction Protocols'],
+		}),
 		xSchema = X.Schema.Collection(X.Schema.Tuple(
 			X.Schema.Number,
 			X.Schema.Number,
@@ -113,12 +143,18 @@ local O = X.CreateUserSettingsModule('MY_GKP', _L['General'], {
 	bSyncSystem = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Sync system reception'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bNewBidding = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_GKP'],
+		szDescription = X.MakeCaption({
+			_L['Prefer use new bidding panel'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

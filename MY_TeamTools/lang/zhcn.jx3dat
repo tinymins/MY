@@ -100,6 +100,7 @@ return {
 	['Auto accept same camp'] = '自动通过相同阵营角色',
 	['Auto accept all'] = '自动通过所有人',
 	['Auto accept specific names'] = '自动通过指定角色',
+	['Auto accept specific names list'] = '自动通过指定角色具体角色名',
 	['Add'] = '添加',
 	['Please input custom name, multiple split with ",[]":'] = '请输入自定义角色名称，多个角色名请使用半角逗号或方括号分隔：',
 	['Auto refuse %s(%s %d%s) party request, equip score: %d, go to MY/raid/teamtools panel if you want to turn off this feature.']
@@ -268,6 +269,7 @@ return {
     ['Check to save all nearby records, otherwise only save records related to me'] = '勾选则保存附近所有角色的事件记录，否则仅记录与自身有关的事件记录',
 	['PVP mode'] = '启用角色对抗模式',
     ['Save target information on event\n(Only in arena)'] = '记录各类事件发生时的角色坐标面向气血内力等基础信息（仅在名剑大会中生效）',
+	['Target Information Throttle Time'] = '保存角色状态数据节流时间间隔',
     ['Max history'] = '最大历史记录数量',
     ['Min fight time'] = '最小战斗时间限制',
     ['%s second(s)'] = '%s秒',

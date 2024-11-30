@@ -54,12 +54,18 @@ local O = X.CreateUserSettingsModule('MY_ChatBlock', _L['Chat'], {
 	bBlockWords = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatBlock'],
+		szDescription = X.MakeCaption({
+			_L['Enable state'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	aBlockWords = {
 		ePathType = X.PATH_TYPE.GLOBAL,
 		szLabel = _L['MY_ChatBlock'],
+		szDescription = X.MakeCaption({
+			_L['BlockWords'],
+		}),
 		xSchema = X.Schema.Collection(X.Schema.Record({
 			uuid = X.Schema.Optional(X.Schema.String),
 			szKeyword = X.Schema.String,

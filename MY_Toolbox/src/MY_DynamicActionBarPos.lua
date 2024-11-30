@@ -24,12 +24,20 @@ local O = X.CreateUserSettingsModule('MY_DynamicActionBarPos', _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_DynamicActionBarPos'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	tAnchors = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_DynamicActionBarPos'],
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.FrameAnchor),
 		xDefaultValue = {},
 	},

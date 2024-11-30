@@ -24,24 +24,40 @@ local O = X.CreateUserSettingsModule('MY_ChangGeShadow', _L['Target'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChangGeShadow'],
+			_L['Show changge shadow index'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowDistance = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChangGeShadow'],
+			_L['Show distance'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowCD = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChangGeShadow'],
+			_L['Show countdown'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	fScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Force'],
+		szDescription = X.MakeCaption({
+			_L['MY_ChangGeShadow'],
+			_L['Scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.5,
 	},

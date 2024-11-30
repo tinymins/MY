@@ -29,30 +29,50 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_LargeTextAlarm', _L['Raid'], {
 	tAnchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_LargeTextAlarm'],
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },
 	},
 	fScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_LargeTextAlarm'],
+			_L['Font scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.5,
 	},
 	fPause = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_LargeTextAlarm'],
+			_L['Pause time'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	fFadeOut = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_LargeTextAlarm'],
+			_L['FadeOut time'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0.3,
 	},
 	dwFontScheme = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_LargeTextAlarm'],
+			g_tStrings.FONT,
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 23,
 	},

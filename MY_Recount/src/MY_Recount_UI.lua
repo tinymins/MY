@@ -67,96 +67,144 @@ local O = X.CreateUserSettingsModule('MY_Recount_UI', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Enable UI'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	anchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = 0, y = -70, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
 	},
 	nCss = { -- 当前样式表
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Theme'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nChannel = { -- 当前显示的统计模式
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Current recount display channel'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = STAT_TYPE.DPS,
 	},
 	bAwayMode = { -- 计算DPS时是否减去暂离时间
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Uncount awaytime'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bSysTimeMode = { -- 使用官方战斗统计计时方式
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Use system time count'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bGroupSameNpc = { -- 是否合并同名NPC数据
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Group npc with same name'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bGroupSameEffect = { -- 是否合并同名效果
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Group effect with same name'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bHideAnonymous = { -- 隐藏没名字的数据
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Hide anonymous effect'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowPerSec = { -- 显示为每秒数据（反之显示总和）
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Display as per second'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowEffect = { -- 显示有效伤害/治疗
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Display effective value'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowZeroVal = { -- 显示零值记录
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Show zero value effect'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bSimplifyValue = { -- 显示简化数值
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Simplify value'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nDisplayMode = { -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Switch recount mode'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = DISPLAY_MODE.BOTH,
 	},
 	nDrawInterval = { -- UI重绘周期（帧）
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Redraw interval'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = X.ENVIRONMENT.GAME_FPS / 2,
 	},
 	bShowNodataTeammate = { -- 显示没有数据的队友
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Show nodata teammate'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

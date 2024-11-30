@@ -78,6 +78,9 @@ local O = X.CreateUserSettingsModule('MY_Recount', _L['Raid'], {
 	nPublishMode = { -- 发布模式
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Recount'],
+		szDescription = X.MakeCaption({
+			_L['Publish mode'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = PUBLISH_MODE.EFFECT,
 	},

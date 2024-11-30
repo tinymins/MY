@@ -26,30 +26,50 @@ local O = X.CreateUserSettingsModule('MY_DynamicItem', _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_DynamicItem'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowBg = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_DynamicItem'],
+			_L['Show background'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nNum = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_DynamicItem'],
+			_L['Box number'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 16,
 	},
 	nCol = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_DynamicItem'],
+			_L['Col number'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 16,
 	},
 	anchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_DynamicItem'],
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'BOTTOMCENTER', r = 'BOTTOMCENTER', x = 26, y = -226 },
 	},

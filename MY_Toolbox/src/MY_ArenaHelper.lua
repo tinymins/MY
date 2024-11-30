@@ -24,24 +24,40 @@ local O = X.CreateUserSettingsModule('MY_ArenaHelper', _L['General'], {
 	bRestoreAuthorityInfo = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_ArenaHelper'],
+			_L['Auto restore team info in arena'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAutoShowModel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_ArenaHelper'],
+			_L['Auto cancel hide player in arena'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoShowModelBattlefield = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_ArenaHelper'],
+			_L['Auto cancel hide player in battlefield'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoShowModelPubg = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Toolbox'],
+		szDescription = X.MakeCaption({
+			_L['MY_ArenaHelper'],
+			_L['Auto cancel hide player in pubg'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

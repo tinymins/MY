@@ -23,6 +23,10 @@ return {
     ['Display GUDING of teammate, change color'] = '突出顯示團隊里的仙王蠱鼎，設置顏色',
     ['Auto talk in team channel after puting GUDING'] = '喊話提醒隊友來吃',
     ['Talk message'] = '喊話內容',
+    ['Name color'] = '名字顏色',
+    ['Automatic eat GUDING when'] = '當血藍條件滿足設定自動吃蠱鼎',
+    ['Mana Mp'] = '藍',
+    ['Mana Hp'] = '血',
     ['Automatic eat GUDING when mana below '] = '自動吃蠱鼎，當藍低於',
     [', or life below '] = '，或血低於',
 
@@ -32,5 +36,6 @@ return {
     ['Show distance'] = '顯示距離',
     ['Show countdown'] = '顯示時間',
     ['Scale: %d%%.'] = '縮放: %d%%',
+    ['Scale'] = '縮放',
     ['Changge force only'] = '僅長歌可用',
 }

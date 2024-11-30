@@ -30,12 +30,20 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_PartyBuffList', _L['Raid'], {
 	bHoverSelect = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_PartyBuffList'],
+			_L['Mouse enter select'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAnchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_PartyBuffList'],
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 400, y = 0 },
 	},

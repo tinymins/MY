@@ -5,7 +5,6 @@ return {
 	['Interface settings'] = '界面設置',
 	['Upload team snapshot'] = '團隊快照上傳',
 	['Cataclysm'] = '團隊面板',
-	['UI Anchor'] = '界面位置',
 	['Please hold down Ctrl, change it'] = '請按住Ctrl來更改分配模式。',
 	['Enable Cataclysm Team Panel'] = '啟用團隊面板',
 	['Only in team'] = '只在團隊中顯示',

@@ -30,18 +30,30 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_SpellTimer', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_SpellTimer'],
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	tAnchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_SpellTimer'],
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'TOPRIGHT', r = 'CENTER', x = -250, y = -300 },
 	},
 	nBelowDecimal = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_SpellTimer'],
+			_L['Show countdown decimal settings'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},

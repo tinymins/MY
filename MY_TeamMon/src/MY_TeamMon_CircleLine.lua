@@ -46,12 +46,20 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_CircleLine', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_CircleLine'],
+			_L['Enable circle'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBorder = { -- 全局的边框模式 边框会造成卡
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_TeamMon'],
+		szDescription = X.MakeCaption({
+			_L['MY_TeamMon_CircleLine'],
+			_L['Circle border'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

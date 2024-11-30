@@ -23,18 +23,27 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 	tIgnoreNames = { -- 忽略名单
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMosaics'],
+		szDescription = X.MakeCaption({
+			_L['unmosaics names (split by comma)'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},
 	nMosaicsMode = { -- 局部打码模式
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMosaics'],
+		szDescription = X.MakeCaption({
+			_L['mosaics mode'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 4,
 	},
 	bIgnoreOwnName = { -- 不打码自己的名字
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_ChatMosaics'],
+		szDescription = X.MakeCaption({
+			_L['no mosaics on my own name'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

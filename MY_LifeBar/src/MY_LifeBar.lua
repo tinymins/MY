@@ -214,12 +214,18 @@ local O = X.CreateUserSettingsModule('MY_LifeBar', _L['General'], {
 	bEnabled = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
+		szDescription = X.MakeCaption({
+			_L['Enable'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAutoHideSysHeadtop = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_LifeBar'],
+		szDescription = X.MakeCaption({
+			_L['Auto hide system headtop'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

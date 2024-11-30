@@ -27,18 +27,30 @@ local O = X.CreateUserSettingsModule('MY_TargetDirection', _L['Target'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetDirection'],
+			_L['Show target direction'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAnchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetDirection'],
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 250, y = 100 },
 	},
 	eDistanceType = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetDirection'],
+			_L['Distance type'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = 'global',
 	},
@@ -46,6 +58,10 @@ local O = X.CreateUserSettingsModule('MY_TargetDirection', _L['Target'], {
 	nDistanceFar = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Target'],
+		szDescription = X.MakeCaption({
+			_L['MY_TargetDirection'],
+			_L['Long-distance reminder'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
