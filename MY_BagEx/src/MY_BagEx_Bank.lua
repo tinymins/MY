@@ -24,12 +24,20 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_BagEx'],
+		szDescription = X.MakeCaption({
+			_L['Bank'],
+			_L['Bank package sort and stack'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bConfirm = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_BagEx'],
+		szDescription = X.MakeCaption({
+			_L['Bank'],
+			_L['Sort need confirm'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -37,6 +45,10 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		ePathType = X.PATH_TYPE.ROLE,
 		eDefaultLocationOverride = X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.ROLE,
 		szLabel = _L['MY_BagEx'],
+		szDescription = X.MakeCaption({
+			_L['Bank'],
+			_L['Lock cells data'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.String, X.Schema.Boolean),
 		xDefaultValue = {},
 	},

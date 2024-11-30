@@ -8,11 +8,15 @@ return {
     ['Compare with bag'] = '对比背包',
 
     -- MY_BagEx_BagNewItem.lua --
+    ['Bag new item'] = '背包新物品',
     ['Put new bag item to bottom'] = '背包新获得物品放置到最后面',
     ['Avoid locked bag box'] = '避开锁定的背包格子',
     ['Ignore exist item'] = '不移动已存在的堆叠物品',
 
     -- MY_BagEx_Bag.lua --
+    ['Bag'] = '背包',
+    ['Sort need confirm'] = '整理需要二次确认',
+    ['Lock cells data'] = '锁定格子位置',
     ['Bag package sort and stack'] = '背包整理、堆叠、锁定',
     ['Need confirm'] = '需要二次确认',
 
@@ -45,6 +49,9 @@ return {
     ['Lock'] = '锁定',
 
     -- MY_BagEx_Bank.lua --
+    ['Bank'] = '仓库',
+    ['Sort need confirm'] = '整理需要二次确认',
+    ['Lock cells data'] = '锁定格子位置',
     ['Bank package sort and stack'] = '仓库整理、堆叠、锁定',
     ['Need confirm'] = '需要二次确认',
 
@@ -75,6 +82,8 @@ return {
     ['Lock'] = '锁定',
 
     -- MY_BagEx_GuildBank.lua --
+    ['GuildBank'] = '帮会仓库',
+    ['Sort need confirm'] = '整理需要二次确认',
     ['Guild package sort and stack'] = '帮会仓库整理与堆叠',
     ['Need confirm'] = '需要二次确认',
 

@@ -24,18 +24,30 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	bNewToBottom = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_BagEx'],
+		szDescription = X.MakeCaption({
+			_L['Bag new item'],
+			_L['Put new bag item to bottom'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAvoidLock = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_BagEx'],
+		szDescription = X.MakeCaption({
+			_L['Bag new item'],
+			_L['Avoid locked bag box'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bIgnoreNewStackItem = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_BagEx'],
+		szDescription = X.MakeCaption({
+			_L['Bag new item'],
+			_L['Ignore exist item'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

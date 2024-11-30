@@ -24,6 +24,9 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_BagEx'],
+		szDescription = X.MakeCaption({
+			_L['Generic package searcher and filters'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

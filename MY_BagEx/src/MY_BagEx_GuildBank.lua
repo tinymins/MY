@@ -24,12 +24,20 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_BagEx'],
+		szDescription = X.MakeCaption({
+			_L['GuildBank'],
+			_L['Guild package sort and stack'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bConfirm = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_BagEx'],
+		szDescription = X.MakeCaption({
+			_L['GuildBank'],
+			_L['Sort need confirm'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
