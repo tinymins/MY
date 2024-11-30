@@ -78,4 +78,8 @@ return {
 	['ACTIVITY_WEEK_TEAM_DUNGEON'] = '武林通鉴·秘境',
 	['ACTIVITY_WEEK_RAID_DUNGEON'] = '武林通鉴·团队秘境',
 	['ACTIVITY_WEEK_PUBLIC_QUEST'] = '武林通鉴·公共任务',
+
+	['UI Anchor'] = '界面位置',
+	['UI Width'] = '界面宽度',
+	['UI Height'] = '界面高度',
 }
