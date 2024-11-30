@@ -24,438 +24,747 @@ local O = X.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 	bEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Enable Cataclysm Team Panel'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	eCss = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['configure'],
+			_L['Raid style preset'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
 	eFrameStyle = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Interface settings'],
+			_L['Interface style'],
+		}),
 		xSchema = X.Schema.String,
 		xDefaultValue = 'CATACLYSM',
 	},
 	bDrag = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			g_tStrings.WINDOW_LOCK,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowInRaid = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Only in team'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bEditMode = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			(string.gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt')),
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowAllGrid = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['Show AllGrid'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tAnchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['UI Anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'LEFTCENTER', r = 'LEFTCENTER', x = 100, y = -200 },
 	},
 	nAutoLinkMode = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Interface settings'],
+			_L['Arrangement'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 5,
 	},
 	nBGColorMode = { -- 0 不着色 1 根据距离 2 根据门派
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			g_tStrings.BACK_COLOR,
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nColoredName = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['Name'],
+			_L['Colored by...'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nNameVAlignment = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['Name'],
+			_L['V alignment'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nNameHAlignment = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['Name'],
+			_L['H alignment'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	nHPShownMode2 = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['HP'],
+			_L['Show mode'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	nHPShownNumMode = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['HP'],
+			_L['Show number mode'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 3,
 	},
 	nHPVAlignment = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['HP'],
+			_L['V alignment'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	nHPHAlignment = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['HP'],
+			_L['H alignment'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	bShowHPDecimal = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['HP'],
+			_L['Show Decimal'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBuffAboveMana = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Over mana bar'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nShowMP = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['Show ManaCount'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bHPHitAlert = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Attack Warning'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nShowIcon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['Show Icon Mode'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
 	bShowDistance = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Show distance'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowBossTarget = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Show Boss target'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowBossFocus = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Show Boss focus'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bEnableDistance = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Color'],
+			g_tStrings.STR_RAID_DISTANCE,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bEnableImportantSkill = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Show important skill'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowTargetTargetAni = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Show target\'s target'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nNameFont = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['Name'],
+			_L['Name font'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 40,
 	},
 	nLifeFont = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['HP'],
+			_L['Life font'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 15,
 	},
 	nManaFont = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['Mana'],
+			g_tStrings.STR_SKILL_MANA .. g_tStrings.FONT,
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 190,
 	},
 	fNameFontScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['Name'],
+			_L['Font scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.05,
 	},
 	fLifeFontScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['HP'],
+			_L['Font scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.05,
 	},
 	fManaFontScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Style'],
+			_L['Mana'],
+			_L['Font scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	nMaxShowBuff = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Max count'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 4,
 	},
 	bLifeGradient = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Color'],
+			_L['LifeBar Gradient'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bManaGradient = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Color'],
+			_L['ManaBar Gradient'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	nAlpha = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Interface settings'],
+			g_tStrings.STR_ALPHA,
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 220,
 	},
 	fBuffScale = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Buff scale'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
 	bAutoBuffSize = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Auto scale'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bAltView = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Alt view player'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bAltViewInFight = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Alt view player'],
+			_L['Disable in fight'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bHideTipInFight = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Don\'t show tip in fight'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowTipAtRightBottom = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Show tip at right bottom'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bTempTargetEnable = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			g_tStrings.STR_RAID_TARGET_ASSIST,
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	nTempTargetDelay = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Target assist delay setting'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
 	fScaleX = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Interface settings'],
+			_L['Interface Width'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.1,
 	},
 	fScaleY = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Interface settings'],
+			_L['Interface Height'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.0,
 	},
 	nDrawInterval = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Faster Refresh (Greater performance loss)'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 4,
 	},
 	bFasterHP = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Ultimate Refresh HP (Greater performance loss)'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bStaring = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Buff Staring'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bShowBuffTime = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Show Buff Time'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowBuffNum = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Show Buff Num'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowBuffReminder = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Show Buff Reminder'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBuffAltPublish = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Alt Click Publish'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBuffPushToOfficial = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Push buff to official'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBuffDataOfficial = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Enable official data'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bBuffDataTeamMon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Enable MY_TeamMon data'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowAttention = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Show attention shadow'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowCaution = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Show caution animate'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowScreenHead = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Show screen head'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowGroupNumber = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Interface settings'],
+			_L['Show Group Number'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
 	bShowEffect = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['ZuiWu Effect'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false, -- 五毒醉舞提示 万花距离提示 晚点做
 	},
 	bShowSputtering = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Show central party member tag'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	tSputteringFontColor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Set sputtering font color'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 79, 255, 108 },
 	},
 	nSputteringFontAlpha = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Set sputtering font alpha'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 192,
 	},
 	tSputteringShadowColor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Set sputtering shadow color'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 79, 255, 108 },
 	},
 	nSputteringShadowAlpha = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Set sputtering shadow alpha'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 192,
 	},
 	nSputteringDistance = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['MY_Cataclysm'],
+			_L['Set sputtering distance'],
+		}),
 		xSchema = X.Schema.Number,
 		xDefaultValue = 15,
 	},
 	aBuffList = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Buff settings'],
+			_L['Buff list'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Any),
 		xDefaultValue = {},
 	},
 	tDistanceLevel = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Color'],
+			_L['Edit Distance Level'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 20, 22, 200 },
 	},
 	tManaColor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Color'],
+			_L['Mana'],
+			g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR,
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = { 0, 96, 255 },
 	},
 	tDistanceCol = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Color'],
+			_L['Distance color'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {
 			{ 0,   180, 52  }, -- 绿
@@ -469,6 +778,10 @@ local O = X.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 	tOtherCol = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Color'],
+			_L['Other color'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {
 			{ 255, 255, 255 },
@@ -479,6 +792,10 @@ local O = X.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 	tDistanceAlpha = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Color'],
+			_L['Distance alpha'],
+		}),
 		xSchema = X.Schema.Map(X.Schema.Number, X.Schema.Number),
 		xDefaultValue = {
 			255,
@@ -489,6 +806,10 @@ local O = X.CreateUserSettingsModule('MY_Cataclysm', _L['Raid'], {
 	tOtherAlpha = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Cataclysm'],
+		szDescription = X.MakeCaption({
+			_L['Grid Color'],
+			_L['Other alpha'],
+		}),
 		xSchema = X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number),
 		xDefaultValue = {
 			0,
