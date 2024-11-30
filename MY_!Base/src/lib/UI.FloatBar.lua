@@ -18,18 +18,30 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	bDetach = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = X.MakeCaption({
+			_L['FloatBar'],
+			_L['Detach mode'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	anchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = X.MakeCaption({
+			_L['FloatBar'],
+			_L['Combined anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = 160, y = 18, s = 'TOPLEFT', r = 'TOPLEFT' },
 	},
 	tAnchors = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = X.MakeCaption({
+			_L['FloatBar'],
+			_L['Detach mode anchor'],
+		}),
 		bDataSet = true,
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = -0xffff, y = -0xffff, s = 'TOPLEFT', r = 'TOPLEFT' },

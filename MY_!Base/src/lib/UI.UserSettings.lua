@@ -199,13 +199,29 @@ function D.OpenLocationOverridePanel()
 		local aDataSource = {}
 		for _, us in ipairs(X.GetRegisterUserSettingsList()) do
 			if not us.bUserData then
-				local szDescription = us.szKey
-				if us.szDescription then
-					if bDebug then
-						szDescription = us.szDescription .. ' (' .. szDescription .. ')'
-					else
-						szDescription = us.szDescription
+				local szDescription = ''
+				if us.szGroup then
+					if szDescription ~= '' then
+						szDescription = szDescription .. g_tStrings.STR_CONNECT
 					end
+					szDescription = szDescription .. us.szGroup
+				end
+				if us.szLabel then
+					if szDescription ~= '' then
+						szDescription = szDescription .. g_tStrings.STR_CONNECT
+					end
+					szDescription = szDescription .. us.szLabel
+				end
+				if us.szDescription then
+					if szDescription ~= '' then
+						szDescription = szDescription .. g_tStrings.STR_CONNECT
+					end
+					szDescription = szDescription .. us.szDescription
+				end
+				if szDescription == '' then
+					szDescription = us.szKey
+				elseif bDebug or not us.szDescription then
+					szDescription = szDescription .. ' (' .. us.szKey .. ')'
 				end
 				table.insert(aDataSource, {
 					szKey = us.szKey,
