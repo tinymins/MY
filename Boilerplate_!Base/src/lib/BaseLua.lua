@@ -570,6 +570,15 @@ function X.ApplyPatch(oBase, oPatch, bNew)
 	return oPatch
 end
 
+-- 通过标题部分创建标题，默认使用 · 连接分段
+---@param aParts string[] @分段标题
+---@param szConnect? string @连接字符串
+---@return string @创建后的完整标题
+function X.MakeCaption(aParts, szConnect)
+	szConnect = szConnect or g_tStrings.STR_CONNECT
+	return table.concat(aParts, szConnect)
+end
+
 -----------------------------------------------
 -- 选代器
 -----------------------------------------------
