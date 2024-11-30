@@ -200,6 +200,7 @@ return {
 	['%d settings exported, file saved in %s.'] = '成功導出 %d 條配置項，文件位於：%s。',
 
 	['User Settings Location Override'] = '插件設置項高級共享方案設置',
+	['Search'] = '搜索',
 	['Settings description'] = '設置項描述',
 	['y'] = '√',
 	['Preset'] = '方案',

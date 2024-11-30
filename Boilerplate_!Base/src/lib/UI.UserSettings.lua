@@ -187,18 +187,43 @@ end
 
 function D.OpenLocationOverridePanel()
 	local bDebug = IsCtrlKeyDown()
-	local W, H = 800, 600
+	local W, H = 800, 640
+	local aSearch, uiTable, GetDataSource, UpdateTable
+
 	local uiFrame = X.UI.CreateFrame(FRAME_NAME, {
 		w = W, h = H,
 		text = _L['User Settings Location Override'],
 		esc = true,
 	})
 
-	local uiTable = nil
-	local function GetDataSource()
+	uiFrame:Append('WndEditBox', {
+		x = 10, y = 50, w = W - 10 * 2, h = 25,
+		placeholder = _L['Search'],
+		onChange = function(szText)
+			szText = X.TrimString(szText)
+			if szText == '' then
+				aSearch = nil
+			else
+				aSearch = X.SplitString(szText, ' ', true)
+			end
+			X.DelayCall('LIB.UserSettings.Search', 200, UpdateTable)
+		end,
+	})
+
+	local function IsUsVisible(us)
+		if us.bUserData then
+			return false
+		end
+		if X.IsEmpty(us.szDescription) and not bDebug then
+			return false
+		end
+		return true
+	end
+
+	function GetDataSource()
 		local aDataSource = {}
 		for _, us in ipairs(X.GetRegisterUserSettingsList()) do
-			if not us.bUserData and (not X.IsEmpty(us.szDescription) or bDebug) then
+			if IsUsVisible(us) then
 				local szDescription = ''
 				if us.szGroup then
 					if szDescription ~= '' then
@@ -233,9 +258,30 @@ function D.OpenLocationOverridePanel()
 		return aDataSource
 	end
 
+	local function IsDsVisible(d)
+		if aSearch then
+			for _, s in ipairs(aSearch) do
+				if not X.StringFindW(d.szDescription, s) then
+					return false
+				end
+			end
+		end
+		return true
+	end
+
+	function UpdateTable()
+		local aDataSource = {}
+		for _, d in ipairs(GetDataSource()) do
+			if IsDsVisible(d) then
+				table.insert(aDataSource, d)
+			end
+		end
+		uiTable:DataSource(aDataSource)
+	end
+
 	uiTable = uiFrame:Append('WndTable', {
-		x = 10, y = 50,
-		w = W - 10 * 2, h = H - 50 - 10,
+		x = 10, y = 77,
+		w = W - 10 * 2, h = H - 75 - 30,
 		columns = {
 			{
 				key = 'szDescription',
@@ -316,7 +362,6 @@ function D.OpenLocationOverridePanel()
 				end,
 			},
 		},
-		dataSource = GetDataSource(),
 		onCellLClick = function(xVal, tRow, nRowIndex, tCol, nColumnIndex)
 			if tCol.key == 'preset' then
 				X.SetUserSettingsLocationOverride(tRow.szKey, X.CONSTANT.USER_SETTINGS_LOCATION_OVERRIDE.PRESET)
@@ -332,6 +377,8 @@ function D.OpenLocationOverridePanel()
 	})
 
 	uiFrame:Anchor('CENTER')
+
+	UpdateTable()
 end
 
 --------------------------------------------------------------------------------
