@@ -23,24 +23,40 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['System'], {
 	anchor = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = X.MakeCaption({
+			_L['Notify center'],
+			_L['UI anchor'],
+		}),
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
 	},
 	bEntry = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = X.MakeCaption({
+			_L['Notify center'],
+			_L['Show in float bar'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDesc = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = X.MakeCaption({
+			_L['Notify center'],
+			_L['Order desc'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
 	bDisableDismiss = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['Global config'],
+		szDescription = X.MakeCaption({
+			_L['Notify center'],
+			_L['Disable dismiss'],
+		}),
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
