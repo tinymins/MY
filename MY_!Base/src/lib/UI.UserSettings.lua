@@ -187,14 +187,7 @@ end
 
 function D.OpenLocationOverridePanel()
 	local bDebug = IsCtrlKeyDown()
-	local W, H = 800, 640
-	local aSearch, uiTable, uiCount, GetDataSource, UpdateTable
-
-	local uiFrame = X.UI.CreateFrame(FRAME_NAME, {
-		w = W, h = H,
-		text = _L['User Settings Location Override'],
-		esc = true,
-	})
+	local aSearch, uiFrame, uiTable, uiCount, GetDataSource, UpdateTable
 
 	local function IsUsVisible(us)
 		if us.bUserData then
@@ -229,11 +222,6 @@ function D.OpenLocationOverridePanel()
 					end
 					szDescription = szDescription .. us.szDescription
 				end
-				if szDescription == '' then
-					szDescription = us.szKey
-				elseif not us.szDescription or bDebug then
-					szDescription = szDescription .. ' (' .. us.szKey .. ')'
-				end
 				table.insert(aDataSource, {
 					szKey = us.szKey,
 					szDescription = szDescription,
@@ -248,7 +236,9 @@ function D.OpenLocationOverridePanel()
 		if aSearch then
 			for _, s in ipairs(aSearch) do
 				if not X.StringFindW(d.szDescription, s) then
-					return false
+					if not bDebug or not X.StringFindW(d.szKey, s) then
+						return false
+					end
 				end
 			end
 		end
@@ -266,8 +256,19 @@ function D.OpenLocationOverridePanel()
 		uiCount:Text(_L('Total: %d', #aDataSource))
 	end
 
+	local W, H = 800, 640
 	local nPaddingX = 10
 	local nX, nY = nPaddingX, 50
+
+	if bDebug then
+		W = W + 400
+	end
+
+	uiFrame = X.UI.CreateFrame(FRAME_NAME, {
+		w = W, h = H,
+		text = _L['User Settings Location Override'],
+		esc = true,
+	})
 
 	nY = nY + uiFrame:Append('WndEditBox', {
 		x = nX - 2, y = nY, w = W - nPaddingX * 2 + 4, h = 25,
@@ -287,6 +288,20 @@ function D.OpenLocationOverridePanel()
 		x = nX, y = nY,
 		w = W - nPaddingX * 2, h = H - nY - 35,
 		columns = {
+			X.Unpack(
+				bDebug
+					and {{
+						key = 'szKey',
+						title = ' ' .. 'KEY',
+						width = 400,
+						alignHorizontal = 'left',
+						alignVertical = 'middle',
+						render = function(value, record, index)
+							return GetFormatText(' ' .. value, 162, 255, 255, 255)
+						end,
+					}}
+					or {}
+			),
 			{
 				key = 'szDescription',
 				title = ' ' .. _L['Settings description'],
