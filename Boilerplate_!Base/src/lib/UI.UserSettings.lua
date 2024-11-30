@@ -198,7 +198,7 @@ function D.OpenLocationOverridePanel()
 	local function GetDataSource()
 		local aDataSource = {}
 		for _, us in ipairs(X.GetRegisterUserSettingsList()) do
-			if not us.bUserData then
+			if not us.bUserData and (not X.IsEmpty(us.szDescription) or bDebug) then
 				local szDescription = ''
 				if us.szGroup then
 					if szDescription ~= '' then
@@ -220,7 +220,7 @@ function D.OpenLocationOverridePanel()
 				end
 				if szDescription == '' then
 					szDescription = us.szKey
-				elseif bDebug or not us.szDescription then
+				elseif not us.szDescription then
 					szDescription = szDescription .. ' (' .. us.szKey .. ')'
 				end
 				table.insert(aDataSource, {
