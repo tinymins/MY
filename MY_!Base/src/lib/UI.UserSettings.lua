@@ -43,7 +43,7 @@ function D.OpenImportExport(bImport)
 	local nW = uiContainer:ContainerWidth()
 	local aGroup, tItemAll = {}, {}
 	for _, us in ipairs(X.GetRegisterUserSettingsList()) do
-		if us.szGroup and us.szLabel and not us.bUserData and (not bImport or tSettings[us.szKey]) then
+		if us.szGroup and us.szLabel and not us.bNoExport and (not bImport or tSettings[us.szKey]) then
 			local tGroup
 			for _, v in ipairs(aGroup) do
 				if v.szGroup == us.szGroup then
@@ -188,26 +188,12 @@ end
 function D.OpenLocationOverridePanel()
 	local bDebug = IsCtrlKeyDown()
 	local W, H = 800, 640
-	local aSearch, uiTable, GetDataSource, UpdateTable
+	local aSearch, uiTable, uiCount, GetDataSource, UpdateTable
 
 	local uiFrame = X.UI.CreateFrame(FRAME_NAME, {
 		w = W, h = H,
 		text = _L['User Settings Location Override'],
 		esc = true,
-	})
-
-	uiFrame:Append('WndEditBox', {
-		x = 10, y = 50, w = W - 10 * 2, h = 25,
-		placeholder = _L['Search'],
-		onChange = function(szText)
-			szText = X.TrimString(szText)
-			if szText == '' then
-				aSearch = nil
-			else
-				aSearch = X.SplitString(szText, ' ', true)
-			end
-			X.DelayCall('LIB.UserSettings.Search', 200, UpdateTable)
-		end,
 	})
 
 	local function IsUsVisible(us)
@@ -245,7 +231,7 @@ function D.OpenLocationOverridePanel()
 				end
 				if szDescription == '' then
 					szDescription = us.szKey
-				elseif not us.szDescription then
+				elseif not us.szDescription or bDebug then
 					szDescription = szDescription .. ' (' .. us.szKey .. ')'
 				end
 				table.insert(aDataSource, {
@@ -277,11 +263,29 @@ function D.OpenLocationOverridePanel()
 			end
 		end
 		uiTable:DataSource(aDataSource)
+		uiCount:Text(_L('Total: %d', #aDataSource))
 	end
 
+	local nPaddingX = 10
+	local nX, nY = nPaddingX, 50
+
+	nY = nY + uiFrame:Append('WndEditBox', {
+		x = nX - 2, y = nY, w = W - nPaddingX * 2 + 4, h = 25,
+		placeholder = _L['Search'],
+		onChange = function(szText)
+			szText = X.TrimString(szText)
+			if szText == '' then
+				aSearch = nil
+			else
+				aSearch = X.SplitString(szText, ' ', true)
+			end
+			X.DelayCall('LIB.UserSettings.Search', 200, UpdateTable)
+		end,
+	}):Height() + 2
+
 	uiTable = uiFrame:Append('WndTable', {
-		x = 10, y = 77,
-		w = W - 10 * 2, h = H - 75 - 30,
+		x = nX, y = nY,
+		w = W - nPaddingX * 2, h = H - nY - 35,
 		columns = {
 			{
 				key = 'szDescription',
@@ -375,6 +379,15 @@ function D.OpenLocationOverridePanel()
 			uiTable:DataSource(GetDataSource())
 		end,
 	})
+	nY = nY + uiTable:Height()
+
+	uiCount = uiFrame:Append('Text', {
+		x = nX, y = nY,
+		w = W - nPaddingX * 2, h = 25,
+		r = 192, g = 192, b = 192,
+		alignHorizontal = X.UI.ALIGN_HORIZONTAL.CENTER,
+	})
+	nY = nY + uiCount:Height()
 
 	uiFrame:Anchor('CENTER')
 

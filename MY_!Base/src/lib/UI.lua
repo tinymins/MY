@@ -112,6 +112,16 @@ X.UI.TIP_POSITION = X.FreezeTable({
 	BOTTOM_TOP                = ALW.BOTTOM_TOP,
 	RIGHT_LEFT_AND_BOTTOM_TOP = ALW.RIGHT_LEFT_AND_BOTTOM_TOP,
 })
+X.UI.ALIGN_HORIZONTAL = X.FreezeTable({
+	LEFT   = 0,
+	CENTER = 1,
+	RIGHT  = 2,
+})
+X.UI.ALIGN_VERTICAL = X.FreezeTable({
+	TOP    = 0,
+	MIDDLE = 1,
+	BOTTOM = 2,
+})
 X.UI.TIP_HIDE_WAY = X.FreezeTable({
 	NO_HIDE      = 100,
 	HIDE         = 101,
