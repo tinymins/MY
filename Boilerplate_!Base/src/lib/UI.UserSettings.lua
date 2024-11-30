@@ -245,7 +245,7 @@ function D.OpenLocationOverridePanel()
 				end
 				if szDescription == '' then
 					szDescription = us.szKey
-				elseif not us.szDescription then
+				elseif not us.szDescription or bDebug then
 					szDescription = szDescription .. ' (' .. us.szKey .. ')'
 				end
 				table.insert(aDataSource, {
