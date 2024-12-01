@@ -141,12 +141,28 @@ function D.RedrawList()
 	container:SetH(nSumH)
 	container:FormatAllContentPos()
 	frame:Lookup('', 'Image_Bg'):SetH(nSumH + 4)
+	frame:Lookup('', 'Image_Glassmorphism'):SetH(nSumH + 4 + 30)
+	frame:Lookup('', 'Image_Glassmorphism_Bg'):SetH(nSumH + 4 + 30)
 	frame:SetH(nSumH + 30 + 4)
 end
 
 function D.OnFrameCreate()
-	this:SetPoint('CENTER', 0, -200, 'CENTER', 0, 0)
+	-- ÁðÁ§·ç¸ñ
+	if X.UI.IS_GLASSMORPHISM then
+		this:Lookup('', 'Image_Bg'):Hide()
+		this:Lookup('', 'Image_Title'):Hide()
+		this:Lookup('', 'Text_Title'):SetRelY(5)
+		this:Lookup('Btn_Close'):SetRelY(6)
+		this:Lookup('', ''):FormatAllItemPos()
+	else
+		this:Lookup('', 'Image_Glassmorphism'):Hide()
+		this:Lookup('', 'Image_Glassmorphism_Bg'):Hide()
+		this:Lookup('', 'Image_Glassmorphism_Title_Bg'):Hide()
+		this:Lookup('', 'Image_Glassmorphism_Title_TextureL'):Hide()
+		this:Lookup('', 'Image_Glassmorphism_Title_TextureR'):Hide()
+	end
 	this:Lookup('', 'Text_Title'):SetText(_L['Request list'])
+	this:SetPoint('CENTER', 0, -200, 'CENTER', 0, 0)
 	X.RegisterEsc(X.NSFormatString('{$NS}_PartyRequest'), D.GetFrame, D.Close)
 end
 
