@@ -548,17 +548,22 @@ local CONSTANT = {
 		}),
 		{
 			__index = function(t, k)
-				local c
+				local tColor
 				if GetKungfuSchoolColor and Table_ForceToSchool then
-					local dwSchoolID = Table_ForceToSchool(k)
-					if dwSchoolID then
-						local r, g, b = GetKungfuSchoolColor(dwSchoolID)
-						if r and g and b then
-							c = { r, g, b }
+					local bSuccess, dwSchoolID = X.SafeCall(Table_ForceToSchool, k)
+					if bSuccess and dwSchoolID then
+						local bSuccess, nR, nG, nB = X.SafeCall(GetKungfuSchoolColor, dwSchoolID)
+						if bSuccess and nR and nG and nB then
+							tColor = { nR, nG, nB }
 						end
 					end
 				end
-				return c or { 225, 225, 225 }
+				-- NPC 以及未知门派
+				if not tColor then
+					tColor = { 225, 225, 225 }
+				end
+				t[k] = tColor
+				return tColor
 			end,
 			__metatable = true,
 		}),
@@ -587,11 +592,19 @@ local CONSTANT = {
 		}),
 		{
 			__index = function(t, k)
-				local c
+				local tColor
 				if ForceUI_GetFightColor then
-					c = ForceUI_GetFightColor(k)
+					local bSuccess, tRetColor = X.SafeCall(ForceUI_GetFightColor, k)
+					if bSuccess and tRetColor then
+						tColor = tRetColor
+					end
 				end
-				return c or { 200, 200, 200 } -- NPC 以及未知门派
+				-- NPC 以及未知门派
+				if not tColor then
+					tColor = { 200, 200, 200 }
+				end
+				t[k] = tColor
+				return tColor
 			end,
 			__metatable = true,
 		}),
