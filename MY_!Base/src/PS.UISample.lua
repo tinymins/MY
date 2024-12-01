@@ -13,6 +13,52 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/PS.UISample')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
+--------------------------------------------------------------------------------
+-- ×¢²áÇëÇó
+--------------------------------------------------------------------------------
+X.UI.RegisterRequest('SampleRequest', {
+	szIconUITex = 'ui\\Image\\button\\SystemButton.UITex',
+	nIconFrame = 55,
+	Drawer = function(container, info)
+		local ui = X.UI(container):Append('WndWindow', { w = 450, h = 50 })
+
+		ui:Append('WndButton', {
+			name = 'Btn_Accept',
+			x = 326, y = 9, w = 60, h = 34,
+			buttonStyle = 'FLAT',
+			text = g_tStrings.STR_ACCEPT,
+			onClick = function()
+				X.UI.RemoveRequest('SampleRequest', info.szKey)
+			end,
+		})
+		ui:Append('WndButton', {
+			name = 'Btn_Refuse',
+			x = 393, y = 9, w = 60, h = 34,
+			buttonStyle = 'FLAT',
+			text = g_tStrings.STR_REFUSE,
+			onClick = function()
+				X.UI.RemoveRequest('SampleRequest', info.szKey)
+			end,
+		})
+		container.info = info
+
+		return ui:Raw()
+	end,
+	GetTip = function(info)
+		return GetFormatText(info.szDesc)
+	end,
+	GetIcon = function(info, szImage, nFrame)
+		return 'FromIconID', 591
+	end,
+	GetMenu = function()
+		return {}
+	end,
+	OnClear = function()
+		-- Output('Clear!')
+	end,
+})
+
+
 local COMPONENT_H = 25
 local COMPONENT_SAMPLE = {
 	{'Shadow', 'Shadow', { w = COMPONENT_H, h = COMPONENT_H, color = { 255, 255, 255 } }},
@@ -60,6 +106,35 @@ local COMPONENT_SAMPLE = {
 			w = 'auto', h = COMPONENT_H, name = 'WndButton_CreateUIBrowser', text = 'Create',
 			onClick = function()
 				X.UI.OpenBrowser('https://jx3.xoyo.com')
+			end,
+		},
+	},
+	{
+		'UI.CreateNotify',
+		'WndButton',
+		{
+			w = 'auto', h = COMPONENT_H, name = 'WndButton_CreateNotify', text = 'Create',
+			onClick = function()
+				X.CreateNotify({
+					szKey = 'DEMO',
+					szMsg = GetFormatText('DEMO!!!'),
+					fnAction = function() end,
+					bPlaySound = true,
+					bPopupPreview = true,
+				})
+			end,
+		},
+	},
+	{
+		'UI.CreateRequest',
+		'WndButton',
+		{
+			w = 'auto', h = COMPONENT_H, name = 'WndButton_CreateRequest', text = 'Create',
+			onClick = function()
+				X.UI.ReplaceRequest('SampleRequest', 'DEMO_KEY', {
+					szKey = 'DEMO_KEY',
+					szDesc = 'Description for DEMO!!!'
+				})
 			end,
 		},
 	},
