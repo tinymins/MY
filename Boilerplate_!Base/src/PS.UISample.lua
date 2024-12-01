@@ -64,6 +64,22 @@ local COMPONENT_SAMPLE = {
 		},
 	},
 	{
+		'UI.CreateNotify',
+		'WndButton',
+		{
+			w = 'auto', h = COMPONENT_H, name = 'WndButton_CreateNotify', text = 'Create',
+			onClick = function()
+				X.CreateNotify({
+					szKey = 'DEMO',
+					szMsg = GetFormatText('DEMO!!!'),
+					fnAction = function() end,
+					bPlaySound = true,
+					bPopupPreview = true,
+				})
+			end,
+		},
+	},
+	{
 		'UI.TextEditor',
 		'WndButton',
 		{

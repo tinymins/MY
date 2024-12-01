@@ -207,9 +207,33 @@ function D.DrawNotifies(bAutoClose)
 end
 
 function D.OnFrameCreate()
-	D.DrawNotifies()
+	-- ÁðÁ§·ç¸ñ
+	if X.UI.IS_GLASSMORPHISM then
+		this:Lookup('', 'Image_BgTL_Conner'):Hide()
+		this:Lookup('', 'Image_BgTL_Flex'):Hide()
+		this:Lookup('', 'Image_BgTL_Center'):Hide()
+		this:Lookup('', 'Image_BgTR_Center'):Hide()
+		this:Lookup('', 'Image_BgTR_Flex'):Hide()
+		this:Lookup('', 'Image_BgTR_Conner'):Hide()
+		this:Lookup('', 'Image_BgCL'):Hide()
+		this:Lookup('', 'Image_BgCC'):Hide()
+		this:Lookup('', 'Image_BgCR'):Hide()
+		this:Lookup('', 'Image_BgBL'):Hide()
+		this:Lookup('', 'Image_BgBC'):Hide()
+		this:Lookup('', 'Image_BgBR'):Hide()
+		this:Lookup('', 'Text_Title'):SetRelY(2)
+		this:Lookup('Btn_Close'):SetRelY(7)
+		this:Lookup('', ''):FormatAllItemPos()
+	else
+		this:Lookup('', 'Image_Glassmorphism'):Hide()
+		this:Lookup('', 'Image_Glassmorphism_Bg'):Hide()
+		this:Lookup('', 'Image_Glassmorphism_Title_Bg'):Hide()
+		this:Lookup('', 'Image_Glassmorphism_Title_TextureL'):Hide()
+		this:Lookup('', 'Image_Glassmorphism_Title_TextureR'):Hide()
+	end
 	this:Lookup('', 'Text_Title'):SetText(X.PACKET_INFO.NAME .. ' - ' .. _L['Notify center'])
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+	D.DrawNotifies()
 end
 
 function D.OnItemLButtonClick()
