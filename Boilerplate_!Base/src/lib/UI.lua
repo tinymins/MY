@@ -4237,9 +4237,13 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		local imgBgCL = hnd:Lookup('Image_BgCL')
 		local imgBgCC = hnd:Lookup('Image_BgCC')
 		local imgBgCR = hnd:Lookup('Image_BgCR')
-		if imgGlassmorphismBg and imgGlassmorphismTitleBg and imgGlassmorphism and imgGlassmorphismTitleTextureL and imgGlassmorphismTitleTextureR then
+		if imgGlassmorphism then
 			imgGlassmorphism:SetSize(nWidth, nHeight)
+		end
+		if imgGlassmorphismBg then
 			imgGlassmorphismBg:SetSize(nWidth, nHeight)
+		end
+		if imgGlassmorphismTitleBg and imgGlassmorphismTitleTextureL and imgGlassmorphismTitleTextureR then
 			imgGlassmorphismTitleBg:SetW(nWidth)
 			-- imgTitleTextureL
 			imgGlassmorphismTitleTextureR:SetRelX(nWidth - imgGlassmorphismTitleTextureR:GetW())
@@ -4935,6 +4939,8 @@ function OO:FrameVisualState(...)
 					-- 处理视觉变化
 					local wndTotal = raw:Lookup('Wnd_Total')
 					local shaBg = raw:Lookup('', 'Shadow_Bg')
+					local imgGlassmorphism = raw:Lookup('', 'Image_Glassmorphism')
+					local imgGlassmorphismBg = raw:Lookup('', 'Image_Glassmorphism_Bg')
 					local btnDrag = raw:Lookup('Btn_Drag')
 					if eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化
 						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
@@ -4943,6 +4949,12 @@ function OO:FrameVisualState(...)
 						end
 						if shaBg then
 							shaBg:Hide()
+						end
+						if imgGlassmorphism then
+							imgGlassmorphism:Hide()
+						end
+						if imgGlassmorphismBg then
+							imgGlassmorphismBg:Hide()
 						end
 						if GetComponentProp(raw, 'simple') then
 							raw:SetH(30)
@@ -4962,8 +4974,14 @@ function OO:FrameVisualState(...)
 						if wndTotal then
 							wndTotal:Show()
 						end
-						if shaBg then
+						if shaBg and not X.UI.IS_GLASSMORPHISM then
 							shaBg:Show()
+						end
+						if imgGlassmorphism and X.UI.IS_GLASSMORPHISM then
+							imgGlassmorphism:Show()
+						end
+						if imgGlassmorphismBg and X.UI.IS_GLASSMORPHISM then
+							imgGlassmorphismBg:Show()
 						end
 						raw:SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
 						raw:Lookup('', ''):SetH(GetComponentProp(raw, 'nFrameVisualStateRestoreHeight'))
@@ -6570,6 +6588,13 @@ function X.UI.CreateFrame(szName, opt)
 	end
 	if opt.simple then
 		SetComponentProp(frm, 'simple', true)
+		-- 琉璃风格
+		if X.UI.IS_GLASSMORPHISM then
+			frm:Lookup('', 'Shadow_Bg'):Hide()
+		else
+			frm:Lookup('', 'Image_Glassmorphism'):Hide()
+			frm:Lookup('', 'Image_Glassmorphism_Bg'):Hide()
+		end
 		-- top right buttons
 		if not opt.close then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
@@ -6628,6 +6653,8 @@ function X.UI.CreateFrame(szName, opt)
 				h = math.max(h, opt.minHeight)
 				frm:Lookup('Btn_Drag'):SetRelPos(w - 16, h - 16)
 				frm:Lookup('', 'Shadow_Bg'):SetSize(w, h)
+				frm:Lookup('', 'Image_Glassmorphism'):SetSize(w, h)
+				frm:Lookup('', 'Image_Glassmorphism_Bg'):SetSize(w, h)
 			end
 			frm:Lookup('Btn_Drag').OnDragButtonBegin = function()
 				frm:Lookup('', 'Image_Title'):Hide()
@@ -6651,13 +6678,38 @@ function X.UI.CreateFrame(szName, opt)
 		end
 		-- frame properties
 		if opt.alpha then
+			if not X.UI.IS_GLASSMORPHISM then
+				frm:Lookup('', 'Shadow_Bg'):SetAlpha(opt.alpha / 255 * 200)
+			end
 			frm:Lookup('', 'Image_Title'):SetAlpha(opt.alpha * 1.4)
-			frm:Lookup('', 'Shadow_Bg'):SetAlpha(opt.alpha /255 * 200)
 		end
 	elseif not opt.empty then
 		SetComponentProp(frm, 'intact', true)
 		SetComponentProp(frm, 'minWidth', opt.minWidth or 128)
 		SetComponentProp(frm, 'minHeight', opt.minHeight or 160)
+		-- 琉璃风格
+		if X.UI.IS_GLASSMORPHISM then
+			frm:Lookup('', 'Image_BgTL_Conner'):Hide()
+			frm:Lookup('', 'Image_BgTL_Flex'):Hide()
+			frm:Lookup('', 'Image_BgTL_Center'):Hide()
+			frm:Lookup('', 'Image_BgTR_Center'):Hide()
+			frm:Lookup('', 'Image_BgTR_Flex'):Hide()
+			frm:Lookup('', 'Image_BgTR_Conner'):Hide()
+			frm:Lookup('', 'Image_BgCL'):Hide()
+			frm:Lookup('', 'Image_BgCC'):Hide()
+			frm:Lookup('', 'Image_BgCR'):Hide()
+			frm:Lookup('', 'Image_BgBL'):Hide()
+			frm:Lookup('', 'Image_BgBC'):Hide()
+			frm:Lookup('', 'Image_BgBR'):Hide()
+			frm:Lookup('', 'Text_Title'):SetRelY(0)
+			frm:Lookup('WndContainer_TitleBtnR'):SetRelY(0)
+		else
+			frm:Lookup('', 'Image_Glassmorphism'):Hide()
+			frm:Lookup('', 'Image_Glassmorphism_Bg'):Hide()
+			frm:Lookup('', 'Image_Glassmorphism_Title_Bg'):Hide()
+			frm:Lookup('', 'Image_Glassmorphism_Title_TextureL'):Hide()
+			frm:Lookup('', 'Image_Glassmorphism_Title_TextureR'):Hide()
+		end
 		-- top right buttons
 		if opt.close == false then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
