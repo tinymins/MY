@@ -395,7 +395,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function(szMsgType)
 						X.Confirm(_L('Are you sure to clear msg type chat log of %s? All chat logs in this msg type will be lost.', MY_ChatLog.MSG_TYPE_TITLE[szMsgType] or g_tStrings.tChannelName[szMsgType] or szMsgType), function()
 							local ds = MY_ChatLog_DS(MY_ChatLog.GetRoot())
-							ds:DeleteMsgInterval({szMsgType}, '', 0, math.huge)
+							ds:DeleteMsgByCondition({szMsgType}, '', 0, math.huge)
 						end)
 						X.UI.ClosePopupMenu()
 					end,

@@ -201,7 +201,7 @@ function DS:InitDB(bFixProblem)
 							db1:InsertMsg(rec.szMsgType, rec.szText, rec.szMsg, rec.szTalker, rec.nTime, rec.szHash)
 						end
 						db1:Flush()
-						db2:DeleteMsgInterval(nil, nil, 0, db1:GetMaxTime())
+						db2:DeleteMsgByCondition(nil, nil, 0, db1:GetMaxTime())
 						db2:SetMinTime(db1:GetMaxTime())
 						--[[#DEBUG BEGIN]]
 						X.OutputDebugMessage(_L['MY_ChatLog'], 'Fix noncontinuously time by moving data from ' .. db2:ToString() .. ' to ' .. db1:ToString(), X.DEBUG_LEVEL.LOG)
@@ -506,7 +506,7 @@ function DS:DeleteMsg(szHash, nTime)
 	return self
 end
 
-function DS:DeleteMsgInterval(aMsgType, szSearch, nMinTime, nMaxTime)
+function DS:DeleteMsgByCondition(aMsgType, szSearch, nMinTime, nMaxTime)
 	if self:InitDB() then
 		self:FlushDB()
 		szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
@@ -514,7 +514,7 @@ function DS:DeleteMsgInterval(aMsgType, szSearch, nMinTime, nMaxTime)
 		for _, db in ipairs(self.aDB) do
 			if (X.IsEmpty(nMaxTime) or X.IsHugeNumber(nMaxTime) or db:GetMinTime() <= nMaxTime)
 			and (X.IsEmpty(nMinTime) or db:GetMaxTime() >= nMinTime) then
-				db:DeleteMsgInterval(aMsgType, szuSearch, nMinTime, nMaxTime)
+				db:DeleteMsgByCondition(aMsgType, szuSearch, nMinTime, nMaxTime)
 			end
 		end
 	end

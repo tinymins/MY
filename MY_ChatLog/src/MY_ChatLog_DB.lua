@@ -380,7 +380,7 @@ function DB:DeleteMsg(szHash, nTime)
 	end
 end
 
-function DB:DeleteMsgInterval(aMsgType, szSearch, nMinTime, nMaxTime)
+function DB:DeleteMsgByCondition(aMsgType, szSearch, nMinTime, nMaxTime)
 	if not self:Connect() then
 		return false
 	end

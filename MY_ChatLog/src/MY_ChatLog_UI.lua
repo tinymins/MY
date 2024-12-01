@@ -146,7 +146,7 @@ function D.OnRButtonClick()
 			rgb = {255, 0, 0},
 			fnAction = function()
 				X.Confirm(_L('Are you sure to clear channel chat log of %s? All chat logs in this channel will be lost.', hWnd.szTitle), function()
-					hFrame.ds:DeleteMsgInterval(aMsgType, szSearch, 0, math.huge)
+					hFrame.ds:DeleteMsgByCondition(aMsgType, szSearch, 0, math.huge)
 				end)
 				X.UI.ClosePopupMenu()
 			end,

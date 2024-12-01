@@ -486,7 +486,7 @@ function D.FlushDB(bCheckExceed)
 			local aMsg = MAIN_DS:SelectMsg(aMsgType, nil, nil, nil, nCount - p.nLimit, 1)
 			if aMsg and aMsg[1] then
 				bExceed = true
-				MAIN_DS:DeleteMsgInterval(aMsgType, '', 0, aMsg[1].nTime)
+				MAIN_DS:DeleteMsgByCondition(aMsgType, '', 0, aMsg[1].nTime)
 			end
 		end
 	end
