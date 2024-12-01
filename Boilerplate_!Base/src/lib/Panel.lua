@@ -239,9 +239,9 @@ function D.SwitchTab(szKey, bForceUpdate)
 	local scrollTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
 	for i = 0, scrollTabs:GetItemCount() - 1 do
 		if scrollTabs:Lookup(i).szKey == szKey then
-			scrollTabs:Lookup(i):Lookup('Image_Bg_Active'):Show()
+			scrollTabs:Lookup(i):Lookup('Image_Tab_Bg_Active'):Show()
 		else
-			scrollTabs:Lookup(i):Lookup('Image_Bg_Active'):Hide()
+			scrollTabs:Lookup(i):Lookup('Image_Tab_Bg_Active'):Hide()
 		end
 	end
 	-- 事件处理、界面绘制
@@ -425,9 +425,9 @@ function D.RedrawTabs(frame, szCategory)
 			else
 				hTab:Lookup('Image_TabIcon'):FromTextureFile(tTab.szIconTex)
 			end
-			hTab:Lookup('Image_Bg'):FromUITex(IMG_PATH, 0)
-			hTab:Lookup('Image_Bg_Active'):FromUITex(IMG_PATH, 1)
-			hTab:Lookup('Image_Bg_Hover'):FromUITex(IMG_PATH, 2)
+			hTab:Lookup('Image_Tab_Bg'):FromUITex(IMG_PATH, 0)
+			hTab:Lookup('Image_Tab_Bg_Active'):FromUITex(IMG_PATH, 1)
+			hTab:Lookup('Image_Tab_Bg_Hover'):FromUITex(IMG_PATH, 2)
 		end
 	end
 	scroll:FormatAllItemPos()
@@ -617,6 +617,28 @@ function D.OnDragButton()
 end
 
 function D.OnFrameCreate()
+	if X.UI.IS_GLASSMORPHISM then
+		this:Lookup('', 'Image_BgTL_Conner'):Hide()
+		this:Lookup('', 'Image_BgTR_Conner'):Hide()
+		this:Lookup('', 'Image_BgTL_Flex'):Hide()
+		this:Lookup('', 'Image_BgTR_Flex'):Hide()
+		this:Lookup('', 'Image_BgTL_Center'):Hide()
+		this:Lookup('', 'Image_BgTR_Center'):Hide()
+		this:Lookup('', 'Image_BgBL'):Hide()
+		this:Lookup('', 'Image_BgBC'):Hide()
+		this:Lookup('', 'Image_BgBR'):Hide()
+		this:Lookup('', 'Image_BgCL'):Hide()
+		this:Lookup('', 'Image_BgCC'):Hide()
+		this:Lookup('', 'Image_BgCR'):Hide()
+		this:Lookup('', 'Text_Title'):SetRelY(7)
+		this:Lookup('WndContainer_TitleBtnR'):SetRelY(7)
+	else
+		this:Lookup('', 'Image_Glassmorphism'):Hide()
+		this:Lookup('', 'Image_Bg'):Hide()
+		this:Lookup('', 'Image_Title_Bg'):Hide()
+		this:Lookup('', 'Image_Title_TextureL'):Hide()
+		this:Lookup('', 'Image_Title_TextureR'):Hide()
+	end
 	this.MAIN_SCROLL = this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
 	this.MAIN_WND = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
 	this.MAIN_HANDLE = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel', '')
