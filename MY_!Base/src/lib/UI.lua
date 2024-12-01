@@ -182,6 +182,7 @@ X.UI.FRAME_VISUAL_STATE = X.FreezeTable({
 	MAXIMIZE = 2, -- 最大化
 })
 X.UI.LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
+X.UI.IS_GLASSMORPHISM = IsFileExist('ui\\Image\\denglu\\Sign_BdCommon.UITex')
 
 local BUTTON_STYLE_CONFIG = {
 	DEFAULT = {
@@ -4219,6 +4220,11 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hnd = raw:Lookup('', '')
 		-- 处理窗口背景自适应缩放
+		local imgGlassmorphism = hnd:Lookup('Image_Glassmorphism')
+		local imgBg = hnd:Lookup('Image_Bg')
+		local imgTitleBg = hnd:Lookup('Image_Title_Bg')
+		local imgTitleTextureL = hnd:Lookup('Image_Title_TextureL')
+		local imgTitleTextureR = hnd:Lookup('Image_Title_TextureR')
 		local imgBgTLConner = hnd:Lookup('Image_BgTL_Conner')
 		local imgBgTRConner = hnd:Lookup('Image_BgTR_Conner')
 		local imgBgTLFlex = hnd:Lookup('Image_BgTL_Flex')
@@ -4231,6 +4237,13 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		local imgBgCL = hnd:Lookup('Image_BgCL')
 		local imgBgCC = hnd:Lookup('Image_BgCC')
 		local imgBgCR = hnd:Lookup('Image_BgCR')
+		if imgBg and imgTitleBg and imgGlassmorphism and imgTitleTextureL and imgTitleTextureR then
+			imgGlassmorphism:SetSize(nWidth, nHeight)
+			imgBg:SetSize(nWidth, nHeight)
+			imgTitleBg:SetW(nWidth)
+			-- imgTitleTextureL
+			imgTitleTextureR:SetRelX(nWidth - imgTitleTextureR:GetW())
+		end
 		if imgBgTLConner and imgBgTLFlex and imgBgTLCenter
 		and imgBgTRConner and imgBgTRFlex and imgBgTRCenter
 		and imgBgBL and imgBgBC and imgBgBR and imgBgCL and imgBgCC and imgBgCR then
@@ -4285,7 +4298,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			-- 处理窗口其它组件
 			local btnClose = raw:Lookup('Btn_Close')
 			if btnClose then
-				btnClose:SetRelPos(nWidth - 35, 15)
+				btnClose:SetRelX(nWidth - 35)
 			end
 			local btnDrag = raw:Lookup('Btn_Drag')
 			if btnDrag then
@@ -4293,7 +4306,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			end
 			local btnMax = raw:Lookup('CheckBox_Maximize')
 			if btnMax then
-				btnMax:SetRelPos(nWidth - 63, 15)
+				btnMax:SetRelX(nWidth - 63)
 			end
 			local containerR = raw:Lookup('WndContainer_TitleBtnR')
 			if containerR then
