@@ -29,6 +29,7 @@ local PAGE_AMOUNT = 150
 local MSG_TYPE_COLOR = MY_ChatLog.MSG_TYPE_COLOR
 
 function D.SetDS(hFrame, szRoot)
+	hFrame.szRoot = szRoot
 	hFrame.ds = MY_ChatLog_DS(szRoot)
 	D.UpdatePage(hFrame)
 end
@@ -40,7 +41,6 @@ function D.OnFrameCreate()
 	hWndMain:SetRelPos(20, 55)
 	X.UI.CloseFrame(hFrameTemp)
 
-	this.tUncheckedChannel = X.Clone(MY_ChatLog.tUncheckedChannel)
 	local container = this:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatChanel/WndContainer_ChatChanel')
 	container:Clear()
 	for _, info in pairs(MY_ChatLog.aChannel) do
@@ -48,7 +48,6 @@ function D.OnFrameCreate()
 		wnd.szTitle = info.szTitle
 		wnd.szKey = info.szKey
 		wnd.aMsgType = info.aMsgType
-		wnd:Lookup('CheckBox_ChatChannel'):Check(not this.tUncheckedChannel[info.szKey], WNDEVENT_FIRETYPE.PREVENT)
 		wnd:Lookup('CheckBox_ChatChannel', 'Text_ChatChannel'):SetText(info.szTitle)
 		wnd:Lookup('CheckBox_ChatChannel', 'Text_ChatChannel'):SetFontColor(unpack(MSG_TYPE_COLOR[info.aMsgType[1]]))
 	end
@@ -112,33 +111,36 @@ end
 
 function D.OnLButtonClick()
 	local name = this:GetName()
+	local hFrame = this:GetRoot()
 	if name == 'Btn_Close' then
 		X.UI.CloseFrame(this:GetRoot())
 	elseif name == 'Btn_Only' then
 		local wnd = this:GetParent()
-		local parent = wnd:GetParent()
-		for i = 0, parent:GetAllContentCount() - 1 do
-			local wnd = parent:LookupContent(i)
-			wnd:Lookup('CheckBox_ChatChannel'):Check(false, WNDEVENT_FIRETYPE.PREVENT)
+		for _, info in pairs(MY_ChatLog.aChannel) do
+			if wnd.szKey == info.szKey then
+				hFrame.tUncheckedChannel[info.szKey] = nil
+			else
+				hFrame.tUncheckedChannel[info.szKey] = true
+			end
 		end
-		wnd:Lookup('CheckBox_ChatChannel'):Check(true)
+		D.OnConditionChange(hFrame)
+		D.UpdatePage(hFrame)
 	elseif name == 'Btn_ChatChannelAll' then
-		local parent = this:GetParent():Lookup('WndScroll_ChatChanel/WndContainer_ChatChanel')
-		for i = 0, parent:GetAllContentCount() - 1 do
-			local wnd = parent:LookupContent(i)
-			wnd:Lookup('CheckBox_ChatChannel'):Check(true, WNDEVENT_FIRETYPE.PREVENT)
+		for _, info in pairs(MY_ChatLog.aChannel) do
+			hFrame.tUncheckedChannel[info.szKey] = nil
 		end
-		this:GetRoot().nCurrentPage = nil
-		this:GetRoot().nLastClickIndex = nil
-		D.UpdatePage(this:GetRoot())
+		hFrame.nCurrentPage = nil
+		hFrame.nLastClickIndex = nil
+		D.OnConditionChange(hFrame)
+		D.UpdatePage(hFrame)
 	end
 end
 
 function D.OnRButtonClick()
 	local name = this:GetName()
+	local hFrame = this:GetRoot()
 	if name == 'CheckBox_ChatChannel' then
 		local hWnd = this:GetParent()
-		local hFrame = this:GetRoot()
 		local aMsgType = hWnd.aMsgType
 		local szSearch = hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Search/Edit_Search'):GetText()
 		X.UI.PopupMenu({{
@@ -155,15 +157,29 @@ function D.OnRButtonClick()
 end
 
 function D.OnCheckBoxCheck()
-	this:GetRoot().nCurrentPage = nil
-	this:GetRoot().nLastClickIndex = nil
-	D.UpdatePage(this:GetRoot())
+	local name = this:GetName()
+	local hFrame = this:GetRoot()
+	if name == 'CheckBox_ChatChannel' then
+		local wnd = this:GetParent()
+		hFrame.nCurrentPage = nil
+		hFrame.nLastClickIndex = nil
+		hFrame.tUncheckedChannel[wnd.szKey] = nil
+		D.OnConditionChange(hFrame)
+		D.UpdatePage(hFrame)
+	end
 end
 
 function D.OnCheckBoxUncheck()
-	this:GetRoot().nCurrentPage = nil
-	this:GetRoot().nLastClickIndex = nil
-	D.UpdatePage(this:GetRoot())
+	local name = this:GetName()
+	local hFrame = this:GetRoot()
+	if name == 'CheckBox_ChatChannel' then
+		local wnd = this:GetParent()
+		hFrame.nCurrentPage = nil
+		hFrame.nLastClickIndex = nil
+		hFrame.tUncheckedChannel[wnd.szKey] = true
+		D.OnConditionChange(hFrame)
+		D.UpdatePage(hFrame)
+	end
 end
 
 function D.OnItemMouseIn()
@@ -185,11 +201,12 @@ end
 
 function D.OnItemLButtonClick()
 	local name = this:GetName()
+	local hFrame = this:GetRoot()
 	if name == 'Handle_Index' then
-		this:GetRoot().nCurrentPage = this.nPage
-		D.UpdatePage(this:GetRoot())
+		hFrame.nCurrentPage = this.nPage
+		D.UpdatePage(hFrame)
 	elseif name == 'Handle_ChatLog' then
-		local nLastClickIndex = this:GetRoot().nLastClickIndex
+		local nLastClickIndex = hFrame.nLastClickIndex
 		if IsCtrlKeyDown() then
 			this:Lookup('Shadow_ChatLogSelect'):SetVisible(not this:Lookup('Shadow_ChatLogSelect'):IsVisible())
 		elseif IsShiftKeyDown() then
@@ -212,7 +229,7 @@ function D.OnItemLButtonClick()
 			end
 			this:Lookup('Shadow_ChatLogSelect'):Show()
 		end
-		this:GetRoot().nLastClickIndex = this:GetIndex()
+		hFrame.nLastClickIndex = this:GetIndex()
 	end
 end
 
@@ -281,9 +298,24 @@ function D.OnItemRButtonClick()
 					X.CopyChatLine(this:Lookup('Handle_ChatLog_Msg'):Lookup(0), true)
 				end,
 			},
+			{
+				szOption = _L['View this message in all messages'],
+				fnAction = function()
+					X.UI.ClosePopupMenu()
+					local nMsgIndex = frame.ds:FindMsgIndex(nil, '', 0, math.huge, this.nTime, this.szHash)
+					if nMsgIndex == -1 then
+						return
+					end
+					D.Open(frame.szRoot, nil, '', 0, math.huge, nMsgIndex)
+				end,
+			},
 		}
 		PopupMenu(menu)
 	end
+end
+
+function D.OnConditionChange(hFrame)
+	MY_ChatLog.tUncheckedChannel = X.Clone(hFrame.tUncheckedChannel)
 end
 
 function D.UpdatePage(hFrame, bKeepScroll)
@@ -313,14 +345,12 @@ function D.UpdatePage(hFrame, bKeepScroll)
 	local aMsgType = {}
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
-		if wnd:Lookup('CheckBox_ChatChannel'):IsCheckBoxChecked() then
+		if not hFrame.tUncheckedChannel[wnd.szKey] then
 			for _, szMsgType in ipairs(wnd.aMsgType) do
 				table.insert(aMsgType, szMsgType)
 			end
-			hFrame.tUncheckedChannel[wnd.szKey] = nil
-		else
-			hFrame.tUncheckedChannel[wnd.szKey] = true
 		end
+		wnd:Lookup('CheckBox_ChatChannel'):Check(not hFrame.tUncheckedChannel[wnd.szKey], WNDEVENT_FIRETYPE.PREVENT)
 	end
 	local szSearch = hFrame:Lookup('Wnd_Total/Wnd_Main/Wnd_Search/Edit_Search'):GetText()
 	local nCount = hFrame.ds:CountMsg(aMsgType, szSearch)
@@ -428,9 +458,7 @@ function D.UpdatePage(hFrame, bKeepScroll)
 			hItem.nTime = rec.nTime
 			hItem.szText = rec.szText
 			hItem.szMsgType = rec.szMsgType
-			if not hFrame.nLastClickIndex then
-				hItem:Lookup('Shadow_ChatLogSelect'):Hide()
-			end
+			hItem:Lookup('Shadow_ChatLogSelect'):SetVisible(hFrame.nLastClickIndex == i - 1)
 			hItem:Show()
 		else
 			hItem:Hide()
@@ -443,14 +471,35 @@ function D.UpdatePage(hFrame, bKeepScroll)
 			scroll:SetScrollPos(scroll:GetStepCount())
 		end
 	else
-		scroll:SetScrollPos(bInit and scroll:GetStepCount() or 0)
+		if hFrame.nScrollIndex then
+			local nW, nH = handle:GetAllItemSize()
+			local nScrollY = nH - handle:GetH()
+			local nY = 0
+			for i = 0, hFrame.nScrollIndex - 1 do
+				nY = nY + handle:Lookup(i):GetH()
+			end
+			scroll:SetScrollPos(math.floor(scroll:GetStepCount() * nY / nScrollY))
+		else
+			scroll:SetScrollPos(bInit and scroll:GetStepCount() or 0)
+		end
 	end
-	MY_ChatLog.tUncheckedChannel = X.Clone(hFrame.tUncheckedChannel)
 end
 
-function D.Open(szRoot)
+function D.Open(szRoot, aChannel, szSearch, nMinTime, nMaxTime, nInitMsgIndex)
 	if not MY_ChatLog.InitDB() then
 		return
+	end
+	local tUncheckedChannel
+	if aChannel then
+		tUncheckedChannel = {}
+		for _, info in pairs(MY_ChatLog.aChannel) do
+			tUncheckedChannel[info.szKey] = true
+		end
+		for _, szKey in ipairs(aChannel) do
+			tUncheckedChannel[szKey] = nil
+		end
+	else
+		tUncheckedChannel = X.Clone(MY_ChatLog.tUncheckedChannel)
 	end
 	-- ´´½¨´°Ìå
 	local hFrame = X.UI.CreateFrame('MY_ChatLog_UI', {
@@ -472,6 +521,13 @@ function D.Open(szRoot)
 		nIndex = nIndex + 1
 	end
 	hFrame:SetName('MY_ChatLog_UI#' .. nIndex)
+	hFrame.nMinTime = nMinTime or 0
+	hFrame.nMaxTime = nMaxTime or math.huge
+	hFrame.szSearch = szSearch or ''
+	hFrame.tUncheckedChannel = tUncheckedChannel
+	hFrame.nCurrentPage = nInitMsgIndex and (math.floor(nInitMsgIndex / PAGE_AMOUNT) + 1) or nil
+	hFrame.nScrollIndex = nInitMsgIndex and (nInitMsgIndex % PAGE_AMOUNT) or nil
+	hFrame.nLastClickIndex = hFrame.nScrollIndex
 	D.SetDS(hFrame, szRoot)
 end
 

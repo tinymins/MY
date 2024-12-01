@@ -57,6 +57,7 @@ return {
     ['Total %d pages'] = '共%d页',
     ['Delete record'] = '删除该条记录',
     ['Copy this record'] = '复制该条消息',
+    ['View this message in all messages'] = '定位该条消息',
     ['Open chatlog'] = '打开聊天记录',
     ['MY - MY_ChatLog'] = '茗伊插件集 - 聊天记录',
     ['Press enter to search ...'] = '输入回车键搜索...',
