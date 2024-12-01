@@ -1,5 +1,6 @@
 return {
     ['MYDev_UITexViewer'] = '圖像資源',
     ['UITexViewer'] = '圖像資源',
+    ['UITexPath'] = '圖像資源地址',
     ['(left click to generate xml)'] = '(左鍵點擊可生成XML)',
 }

@@ -500,6 +500,7 @@ return {
     ['MY_DialogNameLink'] = '其它',
 
     -- MY_AutoDiamond.lua
+    ['MY_AutoDiamond'] = '精煉合成',
     ['Show batch refine diamond in casting panel'] = '在精煉界面顯示按當前配方重覆合成選項',
     ['Will continue produce until counter reaches or casting failed.'] = '填寫次數，將在合成五行石時，重覆當前配方，直到填寫的次數歸零、或者合成操作異常。',
     ['Total: %d, success: %d (%.2f%%), failure: %d (%.2f%%)'] = '總：%d　成功：%d (%.2f%%)　失敗：%d (%.2f%%)',
