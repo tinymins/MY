@@ -499,6 +499,22 @@ function DS:SelectMsg(aMsgType, szSearch, nMinTime, nMaxTime, nOffset, nLimit, b
 	return aResult
 end
 
+function DS:FindMsgIndex(aMsgType, szSearch, nMinTime, nMaxTime, nTime, szHash)
+	szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
+	if nMinTime > nTime or nMaxTime < nTime then
+		return -1
+	end
+	local nIndex = self:CountMsg(aMsgType, szSearch, nMinTime, nTime - 1)
+	local aMsg = self:SelectMsg(aMsgType, szSearch, nTime, nTime)
+	for _, v in ipairs(aMsg) do
+		if v.szHash == szHash then
+			return nIndex
+		end
+		nIndex = nIndex + 1
+	end
+	return -1
+end
+
 function DS:DeleteMsg(szHash, nTime)
 	if nTime and not X.IsEmpty(szHash) then
 		table.insert(self.aDeleteQueue, {szHash = szHash, nTime = nTime})
