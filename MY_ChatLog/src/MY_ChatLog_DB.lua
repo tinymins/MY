@@ -311,7 +311,7 @@ function DB:CountMsg(aMsgType, szSearch, nMinTime, nMaxTime)
 	local tCount = self.tCountCache[szKey]
 	if not tCount then
 		local aResult
-		if X.IsEmpty(szSearch) then
+		if X.IsEmpty(szSearch) and not bMinTime and not bMaxTime then
 			aResult = X.SQLiteGetAll(self.db, 'SELECT type AS szMsgType, COUNT(*) AS nCount FROM ChatLog GROUP BY type')
 		elseif bMinTime or bMaxTime then
 			local szSQL = 'SELECT type AS szMsgType, COUNT(*) AS nCount FROM ChatLog'
@@ -323,7 +323,9 @@ function DB:CountMsg(aMsgType, szSearch, nMinTime, nMaxTime)
 		end
 		tCount = {}
 		for _, rec in ipairs(aResult) do
-			tCount[rec.szMsgType] = rec.nCount
+			if rec.szMsgType then
+				tCount[rec.szMsgType] = rec.nCount
+			end
 		end
 		self.tCountCache[szKey] = tCount
 	end
