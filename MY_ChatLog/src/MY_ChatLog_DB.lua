@@ -58,21 +58,21 @@ local function AppendCommonWhere(szSQL, aValue, aMsgType, szSearch, nMinTime, nM
 		end
 		szWhere = szWhere .. ' (' .. table.concat(aWhere, ' OR ') .. ')'
 	end
-	if not X.IsEmpty(nMinTime) then
+	if X.IsNumber(nMinTime) and nMinTime > 0 then
 		if #szWhere > 0 then
 			szWhere = szWhere .. ' AND'
 		end
 		szWhere = szWhere .. ' (time >= ?)'
 		table.insert(aValue, nMinTime)
 	end
-	if not X.IsEmpty(nMaxTime) and not X.IsHugeNumber(nMaxTime) then
+	if X.IsNumber(nMaxTime) and not X.IsHugeNumber(nMaxTime) then
 		if #szWhere > 0 then
 			szWhere = szWhere .. ' AND'
 		end
 		szWhere = szWhere .. ' (time <= ?)'
 		table.insert(aValue, nMaxTime)
 	end
-	if not X.IsEmpty(szSearch) then
+	if X.IsString(szSearch) and not X.IsEmpty(szSearch) then
 		if #szWhere > 0 then
 			szWhere = szWhere .. ' AND'
 		end
@@ -294,8 +294,8 @@ function DB:CountMsg(aMsgType, szSearch, nMinTime, nMaxTime)
 		return 0
 	end
 	szSearch, nMinTime, nMaxTime = FormatCommonParam(szSearch, nMinTime, nMaxTime)
-	local bMinTime = not X.IsEmpty(nMinTime) and self:GetMinTime() >= nMinTime
-	local bMaxTime = not X.IsEmpty(nMaxTime) and not X.IsHugeNumber(nMaxTime) and self:GetMaxTime() >= nMaxTime
+	local bMinTime = X.IsNumber(nMinTime) and nMinTime > self:GetMinTime()
+	local bMaxTime = X.IsNumber(nMaxTime) and nMaxTime < self:GetMaxTime()
 	if not aMsgType and X.IsEmpty(szSearch) and not bMinTime and not bMaxTime then
 		if not self.nCountCache then
 			self.nCountCache = X.Get(X.SQLiteGetAll(self.db, 'SELECT COUNT(*) AS nCount FROM ChatLog'), {1, 'nCount'}, 0)
@@ -307,7 +307,7 @@ function DB:CountMsg(aMsgType, szSearch, nMinTime, nMaxTime)
 	end
 	local szKey = szSearch
 		.. '_' .. (bMinTime and nMinTime or '0')
-		.. '_' .. (bMaxTime and nMaxTime or '0')
+		.. '_' .. (bMaxTime and nMaxTime or 'inf')
 	local tCount = self.tCountCache[szKey]
 	if not tCount then
 		local aResult
