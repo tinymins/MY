@@ -448,7 +448,7 @@ function D.UpdateUI(frame)
 	-- ³õÊ¼»¯ÑÕÉ«
 	if not hItem.bInited then
 		hItem.OnItemRefreshTip = D.OnItemRefreshTip
-		local dwForceID = X.GetClientPlayerInfo().dwForceID
+		local dwForceID = MY_ChatMosaics.bEnabled and X.CONSTANT.FORCE_TYPE.JIANG_HU or X.GetClientPlayerInfo().dwForceID
 		if dwForceID then
 			local css = FORCE_BAR_CSS[O.nCss][dwForceID] or {}
 			if css.image and css.frame then -- uitex, frame
@@ -473,7 +473,7 @@ function D.UpdateUI(frame)
 			hItem.bInited = true
 		end
 	end
-	if tMyRec then
+	if tMyRec and not MY_ChatMosaics.bEnabled then
 		local fPerBack, fPerFore = 0, 0
 		if nMaxValue > 0 then
 			if MY_Recount_UI.bShowPerSec then
