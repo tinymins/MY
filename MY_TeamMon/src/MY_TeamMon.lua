@@ -206,6 +206,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Enable MY_TeamMon'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -215,6 +216,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Use common data'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -224,6 +226,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Lifebar alarm'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = X.IS_REMAKE,
@@ -234,6 +237,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Center alarm'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = X.IS_REMAKE,
@@ -244,6 +248,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Voice alarm'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -253,6 +258,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Large text alarm'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -262,6 +268,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Team panel bind show buff'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -271,6 +278,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Fullscreen alarm'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = X.IS_REMAKE,
@@ -281,6 +289,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Team channel alarm'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -290,6 +299,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Whisper channel alarm'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -299,6 +309,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Buff list'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = X.IS_REMAKE,
@@ -309,6 +320,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Party buff list'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		szVersion = '20241029',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = X.IS_REMAKE,
@@ -319,6 +331,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon', _L['Raid'], {
 		szDescription = X.MakeCaption({
 			_L['Show voice recommendation confirm on load data'],
 		}),
+		szRestriction = 'MY_TeamMon',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

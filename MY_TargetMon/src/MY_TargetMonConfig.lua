@@ -30,6 +30,7 @@ local O = X.CreateUserSettingsModule('MY_TargetMon', _L['Target'], {
 		szDescription = X.MakeCaption({
 			_L['Use common data'],
 		}),
+		szRestriction = 'MY_TargetMon',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -39,6 +40,7 @@ local O = X.CreateUserSettingsModule('MY_TargetMon', _L['Target'], {
 		szDescription = X.MakeCaption({
 			_L['View render interval'],
 		}),
+		szRestriction = 'MY_TargetMon',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},

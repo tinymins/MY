@@ -52,6 +52,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['CSS Style'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.String,
 		xDefaultValue = '',
 	},
@@ -61,6 +62,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Design UI Scale'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
@@ -70,6 +72,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Design Font Offset'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
@@ -79,6 +82,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Current Camp'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = -1,
 	},
@@ -88,6 +92,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Enable Only in Arena'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -97,6 +102,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Enable Only in Dungeon'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -106,6 +112,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Enable Only in Battlefield'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -115,6 +122,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Text Offset Y'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 38,
 	},
@@ -124,6 +132,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Text Line Height'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 20,
 	},
@@ -133,6 +142,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Text Scale'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1.2,
 	},
@@ -142,6 +152,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Text Spacing'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
@@ -151,6 +162,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Special NPC'],
 		}),
+		szRestriction = 'MY_LifeBar.SpecialNpc',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -160,6 +172,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Special NPC Only Enemy'],
 		}),
+		szRestriction = 'MY_LifeBar.SpecialNpc',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -169,6 +182,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Object ID'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -178,6 +192,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Object ID Only Unnamed'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -187,6 +202,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Kungfu'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -196,6 +212,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Distance'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -205,6 +222,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Distance Only for Target'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -214,6 +232,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Distance Decimal'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
@@ -223,6 +242,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Bar Width'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 52,
 	},
@@ -232,6 +252,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Bar Height'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
@@ -241,6 +262,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Bar Padding'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
@@ -250,6 +272,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Bar Offset X'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
@@ -259,6 +282,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Bar Offset Y'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 12,
 	},
@@ -268,6 +292,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Bar Border'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 2,
 	},
@@ -277,6 +302,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Bar Border Red'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
@@ -286,6 +312,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Bar Border Green'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
@@ -295,6 +322,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Bar Border Blue'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
@@ -304,6 +332,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Bar Direction'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.String,
 		xDefaultValue = 'LEFT_RIGHT',
 	},
@@ -313,6 +342,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Percentage Offset X'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
@@ -322,6 +352,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Life Percentage Offset Y'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 8,
 	},
@@ -331,6 +362,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Title Effect Scale'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0.7,
 	},
@@ -340,6 +372,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Title Effect Offset Y'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 0,
 	},
@@ -349,6 +382,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Balloon Offset Y'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = -20,
 	},
@@ -358,6 +392,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Alpha'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 255,
 	},
@@ -367,6 +402,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Font'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 7,
 	},
@@ -376,6 +412,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Distance'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 80 * 80 * 64 * 64,
 	},
@@ -385,6 +422,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Vertical Distance'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 50 * 8 * 64,
 	},
@@ -394,6 +432,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Hide Life Percentage When Fight'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -403,6 +442,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Hide Life Percentage Decimal'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -412,6 +452,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Global UI Scale'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Number,
 		xDefaultValue = 1,
 	},
@@ -421,6 +462,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['System UI Scale'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -430,6 +472,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show When UI Hide'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -439,6 +482,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Mine On Top'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -448,6 +492,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Target On Top'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -457,6 +502,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Screen Position Sort'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -466,6 +512,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Color Configuration'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = SchemaRelationForce(X.Schema.Tuple(X.Schema.Number, X.Schema.Number, X.Schema.Number)),
 		xDefaultValue = {
 			Self = X.KvpToObject({ -- ×Ô¼º
@@ -589,6 +636,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Name Configuration'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
@@ -627,6 +675,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Tong Configuration'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
@@ -653,6 +702,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Title Configuration'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
@@ -691,6 +741,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Life Configuration'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
@@ -729,6 +780,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Life Percentage Configuration'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 			bOnlyFighting = X.Schema.Boolean,
@@ -767,6 +819,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show Balloon Configuration'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = SchemaRelationForce(X.Schema.Record({
 			bEnable = X.Schema.Boolean,
 		})),
@@ -800,6 +853,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Balloon Channel Configuration'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Map(
 			X.Schema.String,
 			X.Schema.Record({

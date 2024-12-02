@@ -40,6 +40,7 @@ local O = X.CreateUserSettingsModule(MODULE_NAME, _L['Chat'], {
 		szDescription = X.MakeCaption({
 			_L['Realtime database commit'],
 		}),
+		szRestriction = 'MY_ChatLog.DEVELOP',
 		xSchema = IsDebugClient() and X.Schema.Boolean or false,
 		xDefaultValue = false,
 	},

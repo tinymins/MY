@@ -93,6 +93,7 @@ local O = X.CreateUserSettingsModule('MY_GKPDoodad', _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Auto craft'],
 		}),
+		szRestriction = 'MY_GKPDoodad.MapRestriction',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -102,6 +103,7 @@ local O = X.CreateUserSettingsModule('MY_GKPDoodad', _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Interact in fight'],
 		}),
+		szRestriction = 'MY_GKPDoodad.MapRestriction',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

@@ -29,6 +29,7 @@ local O = X.CreateUserSettingsModule('MY_AutoMemorizeBook', _L['General'], {
 			_L['MY_AutoMemorizeBook'],
 			_L['Enable'],
 		}),
+		szRestriction = 'MY_AutoMemorizeBook',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

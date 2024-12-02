@@ -217,6 +217,7 @@ local O = X.CreateUserSettingsModule('MY_LifeBar', _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Enable'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},
@@ -226,6 +227,7 @@ local O = X.CreateUserSettingsModule('MY_LifeBar', _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Auto hide system headtop'],
 		}),
+		szRestriction = 'MY_LifeBar',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},

@@ -30,6 +30,7 @@ local O = X.CreateUserSettingsModule('MY_FriendTipLocation', _L['General'], {
 			_L['MY_FriendTipLocation'],
 			_L['Enable'],
 		}),
+		szRestriction = 'MY_FriendTipLocation',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

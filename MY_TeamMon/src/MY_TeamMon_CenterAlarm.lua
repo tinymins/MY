@@ -32,6 +32,7 @@ local O = X.CreateUserSettingsModule('MY_TeamMon_CenterAlarm', _L['Raid'], {
 			_L['MY_TeamMon_CenterAlarm'],
 			_L['UI Anchor'],
 		}),
+		szRestriction = 'MY_TeamMon_CenterAlarm',
 		xSchema = X.Schema.FrameAnchor,
 		xDefaultValue = { s = 'CENTER', r = 'CENTER', x = 0, y = 350 },
 	},

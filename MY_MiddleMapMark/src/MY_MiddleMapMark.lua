@@ -78,6 +78,7 @@ local O = X.CreateUserSettingsModule('MY_MiddleMapMark', _L['General'], {
 		szDescription = X.MakeCaption({
 			_L['Show search in middle map panel'],
 		}),
+		szRestriction = 'MY_MiddleMapMark',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = false,
 	},

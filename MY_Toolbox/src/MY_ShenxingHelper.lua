@@ -18,7 +18,9 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
-X.RegisterRestriction('MY_ShenxingHelper', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_ShenxingHelper.AncientMap', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_ShenxingHelper.OpenAllMap', { ['*'] = true, intl = false })
+X.RegisterRestriction('MY_ShenxingHelper.AvoidBlackCD', { ['*'] = false, remake = true })
 --------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule('MY_ShenxingHelper', _L['General'], {
@@ -29,6 +31,7 @@ local O = X.CreateUserSettingsModule('MY_ShenxingHelper', _L['General'], {
 			_L['MY_ShenxingHelper'],
 			_L['Shenxing to ancient maps'],
 		}),
+		szRestriction = 'MY_ShenxingHelper.AncientMap',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -39,6 +42,7 @@ local O = X.CreateUserSettingsModule('MY_ShenxingHelper', _L['General'], {
 			_L['MY_ShenxingHelper'],
 			_L['Force open all map shenxing'],
 		}),
+		szRestriction = 'MY_ShenxingHelper.OpenAllMap',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -49,6 +53,7 @@ local O = X.CreateUserSettingsModule('MY_ShenxingHelper', _L['General'], {
 			_L['MY_ShenxingHelper'],
 			_L['Avoid blacking shenxing cd'],
 		}),
+		szRestriction = 'MY_ShenxingHelper.AvoidBlackCD',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
@@ -229,7 +234,7 @@ X.RegisterFrameCreate('WorldMap', 'MY_ShenxingHelper__OpenAllMap', D.CheckOpenAl
 -- 防止神行CD被黑
 --------------------------------------------------------------------------
 function D.CheckAvoidBlackShenxingEnable()
-	if D.bReady and O.bAvoidBlackCD and X.IS_CLASSIC then
+	if D.bReady and O.bAvoidBlackCD and not X.IsRestricted('MY_ShenxingHelper.AvoidBlackCD') then
 		X.RegisterEvent('DO_SKILL_CAST', 'MY_AvoidBlackShenxingCD', function()
 			local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 			if not(X.GetClientPlayerID() == dwID and
@@ -275,7 +280,7 @@ end
 -- 设置界面
 --------------------------------------------------------------------------
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
-	if X.IS_CLASSIC then
+	if not X.IsRestricted('MY_ShenxingHelper.AvoidBlackCD') then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = 'auto',
 			text = _L['Avoid blacking shenxing cd'],
@@ -290,7 +295,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		}):Width() + 5
 	end
 
-	if not X.IsRestricted('MY_ShenxingHelper') then
+	if not X.IsRestricted('MY_ShenxingHelper.AncientMap') then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = 'auto',
 			text = _L['Shenxing to ancient maps'],
@@ -299,7 +304,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 				MY_ShenxingHelper.bAncientMap = bChecked
 			end,
 		}):Width() + 5
+	end
 
+	if not X.IsRestricted('MY_ShenxingHelper.OpenAllMap') then
 		nX = nX + ui:Append('WndCheckBox', {
 			x = nX, y = nY, w = 'auto',
 			text = _L['Force open all map shenxing'],

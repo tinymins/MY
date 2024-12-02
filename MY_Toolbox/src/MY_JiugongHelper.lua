@@ -29,6 +29,7 @@ local O = X.CreateUserSettingsModule('MY_JiugongHelper', _L['General'], {
 			_L['MY_JiugongHelper'],
 			_L['Enable'],
 		}),
+		szRestriction = 'MY_JiugongHelper',
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
