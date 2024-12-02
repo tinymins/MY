@@ -43,7 +43,11 @@ function D.OpenImportExport(bImport)
 	local nW = uiContainer:ContainerWidth()
 	local aGroup, tItemAll = {}, {}
 	for _, us in ipairs(X.GetRegisterUserSettingsList()) do
-		if us.szGroup and us.szLabel and not us.bNoExport and (not bImport or tSettings[us.szKey]) then
+		if us.szGroup and us.szLabel
+			and not us.bNoExport
+			and (not bImport or tSettings[us.szKey])
+			and (not us.szRestriction or not X.IsRestricted(us.szRestriction))
+		then
 			local tGroup
 			for _, v in ipairs(aGroup) do
 				if v.szGroup == us.szGroup then
@@ -194,6 +198,9 @@ function D.OpenLocationOverridePanel()
 			return false
 		end
 		if X.IsEmpty(us.szDescription) and not bDebug then
+			return false
+		end
+		if us.szRestriction and X.IsRestricted(us.szRestriction) then
 			return false
 		end
 		return true
