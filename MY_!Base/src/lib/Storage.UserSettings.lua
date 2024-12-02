@@ -351,7 +351,7 @@ end
 --   {boolean} tOption.bDataSet 是否为配置项组（如用户多套自定义偏好），配置项组在读写时需要额外传入一个组下配置项唯一键值（即多套自定义偏好中某一项的名字）
 --   {table} tOption.tDataSetDefaultValue 数据默认值（仅当 bDataSet 为真时生效，用于设置配置项组不同默认值）
 function X.RegisterUserSettings(szKey, tOption)
-	local ePathType, szDataKey, bUserData, bNoExport, szGroup, szLabel, szDescription, szVersion, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue, eDefaultLocationOverride
+	local ePathType, szDataKey, bUserData, bNoExport, szGroup, szLabel, szDescription, szVersion, szRestriction, xDefaultValue, xSchema, bDataSet, tDataSetDefaultValue, eDefaultLocationOverride
 	if X.IsTable(tOption) then
 		ePathType = tOption.ePathType
 		szDataKey = tOption.szDataKey
@@ -360,6 +360,7 @@ function X.RegisterUserSettings(szKey, tOption)
 		szGroup = tOption.szGroup
 		szLabel = tOption.szLabel
 		szDescription = tOption.szDescription
+		szRestriction = tOption.szRestriction
 		szVersion = tOption.szVersion
 		xDefaultValue = tOption.xDefaultValue
 		xSchema = tOption.xSchema
@@ -434,6 +435,7 @@ function X.RegisterUserSettings(szKey, tOption)
 		szGroup = szGroup,
 		szLabel = szLabel,
 		szDescription = szDescription,
+		szRestriction = szRestriction,
 		szVersion = szVersion,
 		xDefaultValue = xDefaultValue,
 		xSchema = xSchema,
