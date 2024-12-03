@@ -399,6 +399,10 @@ function D.RedrawCategory(frame, szCategory)
 		end
 		if bExist then
 			local chkCategory = container:AppendContentFromIni(INI_PATH, 'CheckBox_Category')
+			if X.UI.IS_GLASSMORPHISM then
+				chkCategory:Lookup('', 'Image_CategorySplitter'):Hide()
+				chkCategory:SetAnimation('ui\\Image\\denglu\\Sign1.UITex', 99, 30, 99, 99, 30, 30, 30, 29, 99, 99)
+			end
 			if not szCategory then
 				szCategory = tCategory.szName
 			end
@@ -473,7 +477,8 @@ function D.OnSizeChange()
 	local hWndTotal = wnd:Lookup('', '')
 	wnd:Lookup('', ''):SetSize(nWidth, nHeight)
 	hWndTotal:Lookup('Image_Breaker'):SetSize(6, nHeight - 340)
-	hWndTotal:Lookup('Image_TabBg'):SetSize(nWidth - 2, 33)
+	hWndTotal:Lookup('Image_TabBg'):SetW(nWidth - 2)
+	hWndTotal:Lookup('Image_Glassmorphism_TabBg'):SetW(nWidth - 2)
 	hWndTotal:Lookup('Handle_DBClick'):SetSize(nWidth, 54)
 
 	local bHideTabs = nWidth < 550
@@ -632,12 +637,16 @@ function D.OnFrameCreate()
 		this:Lookup('', 'Image_BgCR'):Hide()
 		this:Lookup('', 'Text_Title'):SetRelY(7)
 		this:Lookup('WndContainer_TitleBtnR'):SetRelY(7)
+		this:Lookup('Wnd_Total', 'Image_TabBg'):Hide()
+		this:Lookup('Wnd_Total/WndContainer_Category'):SetRelY(47)
+		this:Lookup('Wnd_Total/WndContainer_Category', 'Image_CategorySplitterL'):Hide()
 	else
 		this:Lookup('', 'Image_Glassmorphism'):Hide()
 		this:Lookup('', 'Image_Glassmorphism_Bg'):Hide()
 		this:Lookup('', 'Image_Glassmorphism_Title_Bg'):Hide()
 		this:Lookup('', 'Image_Glassmorphism_Title_TextureL'):Hide()
 		this:Lookup('', 'Image_Glassmorphism_Title_TextureR'):Hide()
+		this:Lookup('Wnd_Total', 'Image_Glassmorphism_TabBg'):Hide()
 	end
 	this.MAIN_SCROLL = this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
 	this.MAIN_WND = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
