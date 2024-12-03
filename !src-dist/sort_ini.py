@@ -1,4 +1,5 @@
 import sys
+import os
 import configparser
 
 
@@ -42,9 +43,28 @@ def sort_ini_file(file_path):
             f.write("\n")
 
 
+def process_directory(directory):
+    # 遍历目录，寻找所有符合条件的 .ini 文件并进行排序
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.lower().endswith(".ini") and file[0].isupper():
+                file_path = os.path.join(root, file)
+                sort_ini_file(file_path)
+                print(f"Sorted: {file_path}")
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: drag an ini file onto this script")
+        print("Usage: drag a .ini file or a directory onto this script.")
     else:
-        ini_file = sys.argv[1]
-        sort_ini_file(ini_file)
+        path = sys.argv[1]
+        if os.path.isfile(path):
+            if path.lower().endswith(".ini") and os.path.basename(path)[0].isupper():
+                sort_ini_file(path)
+                print(f"Sorted: {path}")
+            else:
+                print("The file is not an ini file with a capitalized filename.")
+        elif os.path.isdir(path):
+            process_directory(path)
+        else:
+            print("Invalid path.")
