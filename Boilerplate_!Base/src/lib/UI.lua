@@ -4242,61 +4242,69 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hnd = raw:Lookup('', '')
 		-- 处理窗口背景自适应缩放
-		local imgGlassmorphism = hnd:Lookup('Image_Glassmorphism')
-		local imgGlassmorphismBg = hnd:Lookup('Image_Glassmorphism_Bg')
-		local imgGlassmorphismTitleBg = hnd:Lookup('Image_Glassmorphism_Title_Bg')
-		local imgGlassmorphismTitleTextureL = hnd:Lookup('Image_Glassmorphism_Title_TextureL')
-		local imgGlassmorphismTitleTextureR = hnd:Lookup('Image_Glassmorphism_Title_TextureR')
-		local imgBgTLConner = hnd:Lookup('Image_BgTL_Conner')
-		local imgBgTRConner = hnd:Lookup('Image_BgTR_Conner')
-		local imgBgTLFlex = hnd:Lookup('Image_BgTL_Flex')
-		local imgBgTRFlex = hnd:Lookup('Image_BgTR_Flex')
-		local imgBgTLCenter = hnd:Lookup('Image_BgTL_Center')
-		local imgBgTRCenter = hnd:Lookup('Image_BgTR_Center')
-		local imgBgBL = hnd:Lookup('Image_BgBL')
-		local imgBgBC = hnd:Lookup('Image_BgBC')
-		local imgBgBR = hnd:Lookup('Image_BgBR')
-		local imgBgCL = hnd:Lookup('Image_BgCL')
-		local imgBgCC = hnd:Lookup('Image_BgCC')
-		local imgBgCR = hnd:Lookup('Image_BgCR')
-		if imgGlassmorphism then
-			imgGlassmorphism:SetSize(nWidth, nHeight)
+		local hGlassmorphismBgHandle = hnd:Lookup('Handle_GlassmorphismBg')
+		if hGlassmorphismBgHandle then
+			local imgGlassmorphism = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism')
+			local imgGlassmorphismBg = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Bg')
+			local imgGlassmorphismTitleBg = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Title_Bg')
+			local imgGlassmorphismTitleTextureL = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Title_TextureL')
+			local imgGlassmorphismTitleTextureR = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Title_TextureR')
+			if imgGlassmorphism then
+				imgGlassmorphism:SetSize(nWidth, nHeight)
+			end
+			if imgGlassmorphismBg then
+				imgGlassmorphismBg:SetSize(nWidth, nHeight - 33)
+			end
+			if imgGlassmorphismTitleBg and imgGlassmorphismTitleTextureL and imgGlassmorphismTitleTextureR then
+				imgGlassmorphismTitleBg:SetW(nWidth)
+				-- imgTitleTextureL
+				imgGlassmorphismTitleTextureR:SetRelX(nWidth - imgGlassmorphismTitleTextureR:GetW())
+			end
+			hGlassmorphismBgHandle:FormatAllItemPos()
 		end
-		if imgGlassmorphismBg then
-			imgGlassmorphismBg:SetSize(nWidth, nHeight)
-		end
-		if imgGlassmorphismTitleBg and imgGlassmorphismTitleTextureL and imgGlassmorphismTitleTextureR then
-			imgGlassmorphismTitleBg:SetW(nWidth)
-			-- imgTitleTextureL
-			imgGlassmorphismTitleTextureR:SetRelX(nWidth - imgGlassmorphismTitleTextureR:GetW())
-		end
-		if imgBgTLConner and imgBgTLFlex and imgBgTLCenter
-		and imgBgTRConner and imgBgTRFlex and imgBgTRCenter
-		and imgBgBL and imgBgBC and imgBgBR and imgBgCL and imgBgCC and imgBgCR then
-			local fScale = nWidth < 426 and (nWidth / 426) or 1
-			local nTH = 70 * fScale
-			local nTConnerW = 213 * fScale
-			imgBgTLConner:SetSize(nTConnerW, nTH)
-			imgBgTRConner:SetSize(nTConnerW, nTH)
-			local nTFlexW = math.max(0, (nWidth - (nWidth >= 674 and 674 or 426)) / 2)
-			imgBgTLFlex:SetSize(nTFlexW, nTH)
-			imgBgTRFlex:SetSize(nTFlexW, nTH)
-			local nTCenterW = nWidth >= 674 and (124 * fScale) or 0
-			imgBgTLCenter:SetSize(nTCenterW, nTH)
-			imgBgTRCenter:SetSize(nTCenterW, nTH)
-			local nBLW, nBRW = math.ceil(124 * fScale), math.ceil(8 * fScale)
-			local nBCW, nBH = nWidth - nBLW - nBRW + 1, 85 * fScale -- 不知道为什么差一像素 但是加上就好了
-			imgBgBL:SetSize(nBLW, nBH)
-			imgBgBC:SetSize(nBCW, nBH)
-			imgBgBR:SetSize(nBRW, nBH)
-			local nCEdgeW = math.ceil(8 * fScale)
-			local nCCW, nCH = nWidth - 2 * nCEdgeW + 1, nHeight - nTH - nBH -- 不知道为什么差一像素 但是加上就好了
-			imgBgCL:SetSize(nCEdgeW, nCH)
-			imgBgCC:SetSize(nCCW, nCH)
-			imgBgCR:SetSize(nCEdgeW, nCH)
-			imgBgCL:SetRelY(nTH)
-			imgBgBL:SetRelY(nTH + nCH)
-			hnd:FormatAllItemPos()
+		local hClassicBgHandle = hnd:Lookup('Handle_ClassicBg')
+		if hClassicBgHandle then
+			local imgBgTLConner = hClassicBgHandle:Lookup('Image_BgTL_Conner')
+			local imgBgTRConner = hClassicBgHandle:Lookup('Image_BgTR_Conner')
+			local imgBgTLFlex = hClassicBgHandle:Lookup('Image_BgTL_Flex')
+			local imgBgTRFlex = hClassicBgHandle:Lookup('Image_BgTR_Flex')
+			local imgBgTLCenter = hClassicBgHandle:Lookup('Image_BgTL_Center')
+			local imgBgTRCenter = hClassicBgHandle:Lookup('Image_BgTR_Center')
+			local imgBgBL = hClassicBgHandle:Lookup('Image_BgBL')
+			local imgBgBC = hClassicBgHandle:Lookup('Image_BgBC')
+			local imgBgBR = hClassicBgHandle:Lookup('Image_BgBR')
+			local imgBgCL = hClassicBgHandle:Lookup('Image_BgCL')
+			local imgBgCC = hClassicBgHandle:Lookup('Image_BgCC')
+			local imgBgCR = hClassicBgHandle:Lookup('Image_BgCR')
+			if imgBgTLConner and imgBgTLFlex and imgBgTLCenter
+			and imgBgTRConner and imgBgTRFlex and imgBgTRCenter
+			and imgBgBL and imgBgBC and imgBgBR and imgBgCL and imgBgCC and imgBgCR then
+				local fScale = nWidth < 426 and (nWidth / 426) or 1
+				local nTH = 70 * fScale
+				local nTConnerW = 213 * fScale
+				imgBgTLConner:SetSize(nTConnerW, nTH)
+				imgBgTRConner:SetSize(nTConnerW, nTH)
+				local nTFlexW = math.max(0, (nWidth - (nWidth >= 674 and 674 or 426)) / 2)
+				imgBgTLFlex:SetSize(nTFlexW, nTH)
+				imgBgTRFlex:SetSize(nTFlexW, nTH)
+				local nTCenterW = nWidth >= 674 and (124 * fScale) or 0
+				imgBgTLCenter:SetSize(nTCenterW, nTH)
+				imgBgTRCenter:SetSize(nTCenterW, nTH)
+				local nBLW, nBRW = math.ceil(124 * fScale), math.ceil(8 * fScale)
+				local nBCW, nBH = nWidth - nBLW - nBRW + 1, 85 * fScale -- 不知道为什么差一像素 但是加上就好了
+				imgBgBL:SetSize(nBLW, nBH)
+				imgBgBC:SetSize(nBCW, nBH)
+				imgBgBR:SetSize(nBRW, nBH)
+				local nCEdgeW = math.ceil(8 * fScale)
+				local nCCW, nCH = nWidth - 2 * nCEdgeW + 1, nHeight - nTH - nBH -- 不知道为什么差一像素 但是加上就好了
+				imgBgCL:SetSize(nCEdgeW, nCH)
+				imgBgCC:SetSize(nCCW, nCH)
+				imgBgCR:SetSize(nCEdgeW, nCH)
+				imgBgCL:SetRelY(nTH)
+				imgBgBL:SetRelY(nTH + nCH)
+				hnd:FormatAllItemPos()
+			end
+			hClassicBgHandle:FormatAllItemPos()
 		end
 		-- 按分类处理其他
 		if GetComponentProp(raw, 'simple') then
@@ -6711,26 +6719,11 @@ function X.UI.CreateFrame(szName, opt)
 		SetComponentProp(frm, 'minHeight', opt.minHeight or 160)
 		-- 琉璃风格
 		if X.UI.IS_GLASSMORPHISM then
-			frm:Lookup('', 'Image_BgTL_Conner'):Hide()
-			frm:Lookup('', 'Image_BgTL_Flex'):Hide()
-			frm:Lookup('', 'Image_BgTL_Center'):Hide()
-			frm:Lookup('', 'Image_BgTR_Center'):Hide()
-			frm:Lookup('', 'Image_BgTR_Flex'):Hide()
-			frm:Lookup('', 'Image_BgTR_Conner'):Hide()
-			frm:Lookup('', 'Image_BgCL'):Hide()
-			frm:Lookup('', 'Image_BgCC'):Hide()
-			frm:Lookup('', 'Image_BgCR'):Hide()
-			frm:Lookup('', 'Image_BgBL'):Hide()
-			frm:Lookup('', 'Image_BgBC'):Hide()
-			frm:Lookup('', 'Image_BgBR'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg'):Hide()
 			frm:Lookup('', 'Text_Title'):SetRelY(0)
 			frm:Lookup('WndContainer_TitleBtnR'):SetRelY(0)
 		else
-			frm:Lookup('', 'Image_Glassmorphism'):Hide()
-			frm:Lookup('', 'Image_Glassmorphism_Bg'):Hide()
-			frm:Lookup('', 'Image_Glassmorphism_Title_Bg'):Hide()
-			frm:Lookup('', 'Image_Glassmorphism_Title_TextureL'):Hide()
-			frm:Lookup('', 'Image_Glassmorphism_Title_TextureR'):Hide()
+			frm:Lookup('', 'Handle_GlassmorphismBg'):Hide()
 		end
 		-- top right buttons
 		if opt.close == false then

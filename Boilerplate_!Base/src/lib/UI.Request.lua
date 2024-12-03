@@ -142,7 +142,7 @@ function D.RedrawList()
 	container:FormatAllContentPos()
 	frame:Lookup('', 'Image_Bg'):SetH(nSumH + 4)
 	frame:Lookup('', 'Image_Glassmorphism'):SetH(nSumH + 4 + 30)
-	frame:Lookup('', 'Image_Glassmorphism_Bg'):SetH(nSumH + 4 + 30)
+	frame:Lookup('', 'Image_Glassmorphism_Bg'):SetH(nSumH + 4)
 	frame:SetH(nSumH + 30 + 4)
 end
 
