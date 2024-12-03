@@ -241,6 +241,23 @@ local BUTTON_STYLE_CONFIG = {
 		nDisableGroup = 56,
 	},
 }
+if X.UI.IS_GLASSMORPHISM then
+	BUTTON_STYLE_CONFIG.DEFAULT = {
+		nWidth = 100,
+		nHeight = 26,
+		nMarginBottom = 0,
+		nPaddingTop = 3,
+		nPaddingRight = 9,
+		nPaddingBottom = 3,
+		nPaddingLeft = 11,
+		szImage = 'ui\\Image\\denglu\\Sign1.UITex',
+		nNormalGroup = 32,
+		nMouseOverGroup = 33,
+		nMouseDownGroup = 34,
+		nDisableGroup = 35,
+	}
+	BUTTON_STYLE_CONFIG.FLAT_RADIUS = BUTTON_STYLE_CONFIG.DEFAULT
+end
 local function GetButtonStyleName(raw)
 	local szImage = X.StringLowerW(raw:GetAnimatePath())
 	local nNormalGroup = raw:GetAnimateGroupNormal()
@@ -2494,6 +2511,11 @@ function OO:Append(arg0, arg1)
 		end
 		if not tArg.h then
 			tArg.h = 'auto'
+		end
+	end
+	if szType == 'WndButton' or szType == 'WndButtonBox' then
+		if not tArg.buttonStyle then
+			tArg.buttonStyle = 'DEFAULT'
 		end
 	end
 	return ApplyUIArguments(ui, tArg)
