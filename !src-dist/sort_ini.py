@@ -1,46 +1,69 @@
 import sys
 import os
-import configparser
+
+
+def sort_lines(lines):
+    # 根据特定顺序处理 lines，确保 _WndType 和 _Parent 的行在开头
+    fixed_order = [
+        line
+        for line in lines
+        if line.startswith("._WndType=") or line.startswith("._Parent=")
+    ]
+    # 过滤出其他行并排序
+    other_lines = [line for line in lines if line not in fixed_order and line.strip()]
+    other_lines.sort(key=lambda s: s.strip().lower())
+    # 合并结果，留下空行在末尾
+    return fixed_order + other_lines + [line for line in lines if not line.strip()]
 
 
 def sort_ini_file(file_path):
-    # 使用 ConfigParser 读取 ini 文件
-    config = configparser.ConfigParser(
-        allow_no_value=True, delimiters=("="), strict=False
-    )
-
-    # 用于维护读取项的顺序
-    config.optionxform = str
-
-    # 读取 ini 文件，指定编码为 GBK
+    # 读取整个文件内容
     with open(file_path, "r", encoding="gbk") as f:
-        config.read_file(f)
+        lines = f.readlines()
 
-    # 对每个节进行排序
-    sorted_sections = []
-    for section in config.sections():
-        items = config.items(section)
+    sorted_lines = []
+    current_section_lines = []
+    section_header = None
+    inter_section_newlines = []  # 用于存储节之间的空行
 
-        # 特殊处理 _WndType 和 _Parent
-        fixed_items = [item for item in items if item[0] in ("._WndType", "._Parent")]
-        other_items = sorted(
-            item for item in items if item[0] not in ("._WndType", "._Parent")
-        )
+    for line in lines:
+        # 移除首尾空白字符以处理
+        stripped_line = line.strip()
 
-        # 将固定项和排序过的其他项合并
-        sorted_items = fixed_items + other_items
-        sorted_sections.append((section, sorted_items))
+        # 检查是否为节标题
+        if stripped_line.startswith("[") and stripped_line.endswith("]"):
+            # 处理先前的节（如果有）
+            if section_header:
+                # 对当前节的行进行排序并保存
+                sorted_section_lines = sort_lines(current_section_lines)
+                sorted_lines.append(section_header)
+                sorted_lines.extend(sorted_section_lines)
 
-    # 将排序结果写回文件
+            # 添加节间空行
+            sorted_lines.extend(inter_section_newlines)
+            inter_section_newlines = []
+
+            # 更新当前节
+            section_header = line
+            current_section_lines = []
+
+        elif section_header:
+            # 在一个节内部，直接加入行
+            current_section_lines.append(line)
+
+        else:
+            # 节之间的空行
+            inter_section_newlines.append(line)
+
+    # 对最后一个节进行排序
+    if section_header:
+        sorted_section_lines = sort_lines(current_section_lines)
+        sorted_lines.append(section_header)
+        sorted_lines.extend(sorted_section_lines)
+
+    # 将排序后的内容写回文件
     with open(file_path, "w", encoding="gbk") as f:
-        for section, items in sorted_sections:
-            f.write(f"[{section}]\n")
-            for key, value in items:
-                if value is None:
-                    f.write(f"{key}=\n")
-                else:
-                    f.write(f"{key}={value}\n")
-            f.write("\n")
+        f.writelines(sorted_lines)
 
 
 def process_directory(directory):
