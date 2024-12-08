@@ -175,7 +175,7 @@ function PS.OnPanelActive(frame)
 	}):AutoWidth()
 	ui:Append('Text', { x = nX + 0, y = nY + 92, text = _L['Find by text'], font = 27 })
 
-	local nX = nPaddingX + 10
+	nX = nPaddingX + 10
 	nX = nX + ui:Append('Text', {
 		x = nX, y = nY + 120,
 		text = _L['Keyword: '],
@@ -186,6 +186,7 @@ function PS.OnPanelActive(frame)
 		limit = 256,
 		text = O.szQuery,
 	}):Width() + 5
+
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY + 120,
 		text = _L['Search'],
@@ -197,7 +198,9 @@ function PS.OnPanelActive(frame)
 		end,
 	}):Width() + 5
 	ui:Append('Text', { x = nX, y = nY + 120, text = _L['(Supports Lua regex)'] })
-	ui:Append('WndEditBox', { name = 'Edit_Result', x = nX + 10, y = nY + 150, limit = 9999, w = 480, h = 200, multiline = true, text = O.szResult })
+
+	nX = nPaddingX + 10
+	ui:Append('WndEditBox', { name = 'Edit_Result', x = nX, y = nY + 150, limit = 9999, w = 480, h = 200, multiline = true, text = O.szResult })
 end
 
 X.Panel.Register(_L['Development'], 'Dev_UIFindStation', _L['Dev_UIFindStation'], 2791, PS)
