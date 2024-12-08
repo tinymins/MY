@@ -12,7 +12,8 @@ def sort_lines(lines):
     ]
     # 过滤出其他行并排序
     other_lines = [line for line in lines if line not in fixed_order and line.strip()]
-    other_lines.sort(key=lambda s: s.strip().lower())
+    # 区分大小写进行排序
+    other_lines.sort(key=lambda s: s.strip())
     # 合并结果，留下空行在末尾
     return fixed_order + other_lines + [line for line in lines if not line.strip()]
 
