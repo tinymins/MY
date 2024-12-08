@@ -76,18 +76,23 @@ def process_directory(directory):
                 print(f"Sorted: {file_path}")
 
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: drag a .ini file or a directory onto this script.")
-    else:
+def main():
+    if len(sys.argv) == 2:
         path = sys.argv[1]
-        if os.path.isfile(path):
-            if path.lower().endswith(".ini") and os.path.basename(path)[0].isupper():
-                sort_ini_file(path)
-                print(f"Sorted: {path}")
-            else:
-                print("The file is not an ini file with a capitalized filename.")
-        elif os.path.isdir(path):
-            process_directory(path)
+    else:
+        path = input("Please enter the path to the .ini file or directory: ").strip()
+
+    if os.path.isfile(path):
+        if path.lower().endswith(".ini") and os.path.basename(path)[0].isupper():
+            sort_ini_file(path)
+            print(f"Sorted: {path}")
         else:
-            print("Invalid path.")
+            print("The file is not an ini file with a capitalized filename.")
+    elif os.path.isdir(path):
+        process_directory(path)
+    else:
+        print("Invalid path.")
+
+
+if __name__ == "__main__":
+    main()
