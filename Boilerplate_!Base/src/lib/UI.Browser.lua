@@ -193,7 +193,8 @@ local function OnResizePanel()
 	this:Lookup('Wnd_Total/Wnd_Controls/Btn_GoTo'):SetRelX(nWidth - 56)
 	this:Lookup('WndContainer_TitleBtnR'):SetRelX(nWidth - 6 - this:Lookup('WndContainer_TitleBtnR'):GetW())
 	this:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
-	this:Lookup('Btn_Drag'):SetRelPos(nWidth - 18, nHeight - 20)
+	local hBtnDrag = this:Lookup('Btn_Drag')
+	hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW(), nHeight - hBtnDrag:GetH())
 	local nTitleWidth = nWidth - 45 - 10
 	local pWnd = this:Lookup('WndContainer_TitleBtnR'):GetFirstChild()
 	while pWnd do

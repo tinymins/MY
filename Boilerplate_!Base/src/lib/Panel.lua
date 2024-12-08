@@ -193,7 +193,7 @@ function D.SwitchCategory(szCategory)
 
 	local container = frame:Lookup('Wnd_Total/WndContainer_Category')
 	local chk = container:GetFirstChild()
-	while(chk and chk.szCategory ~= szCategory) do
+	while (chk and chk.szCategory ~= szCategory) do
 		chk = chk:GetNext()
 	end
 	if not chk then
@@ -226,7 +226,7 @@ function D.SwitchTab(szKey, bForceUpdate)
 	end
 	-- 判断主分类是否正确
 	if tTab.szCategory and frame.szCurrentCategoryName ~= tTab.szCategory then
-		X.Panel.SwitchCategory(tTab.szCategory)
+		D.SwitchCategory(tTab.szCategory)
 	end
 	-- 判断标签页是否已激活
 	if frame.szCurrentTabKey == tTab.szKey and not bForceUpdate then
@@ -401,7 +401,7 @@ function D.RedrawCategory(frame, szCategory)
 			local chkCategory = container:AppendContentFromIni(INI_PATH, 'CheckBox_Category')
 			if X.UI.IS_GLASSMORPHISM then
 				chkCategory:Lookup('', 'Image_CategorySplitter'):Hide()
-				chkCategory:SetAnimation('ui\\Image\\denglu\\Sign1.UITex', 99, 30, 99, 99, 30, 30, 30, 29, 99, 99)
+				chkCategory:SetAnimation('ui\\Image\\UItimate\\UICommon\\Button4.UITex', 14, 20, 14, 14, 20, 20, 20, 19, 14, 14)
 			end
 			if not szCategory then
 				szCategory = tCategory.szName
@@ -411,7 +411,7 @@ function D.RedrawCategory(frame, szCategory)
 		end
 	end
 	container:FormatAllContentPos()
-	X.Panel.SwitchCategory(szCategory)
+	D.SwitchCategory(szCategory)
 end
 
 function D.RedrawTabs(frame, szCategory)
@@ -421,7 +421,23 @@ function D.RedrawTabs(frame, szCategory)
 		if tTab.szCategory == szCategory and not tTab.bHide and not IsTabRestricted(tTab) then
 			local hTab = scroll:AppendItemFromIni(INI_PATH, 'Handle_Tab')
 			hTab.szKey = tTab.szKey
-			hTab:Lookup('Text_Tab'):SetText(tTab.szName)
+			if X.UI.IS_GLASSMORPHISM then
+				hTab:Lookup('Image_TabIcon'):SetRelPos(5, 5)
+				hTab:Lookup('Image_TabIcon'):SetSize(28, 28)
+				hTab:Lookup('Image_Tab_Bg'):FromUITex('ui\\Image\\UItimate\\UICommon\\Button9.UITex', 0)
+				hTab:Lookup('Image_Tab_Bg'):SetH(34)
+				hTab:Lookup('Image_Tab_Bg_Active'):FromUITex('ui\\Image\\UItimate\\UICommon\\Button9.UITex', 2)
+				hTab:Lookup('Image_Tab_Bg_Active'):SetH(34)
+				hTab:Lookup('Image_Tab_Bg_Hover'):FromUITex('ui\\Image\\UItimate\\UICommon\\Button9.UITex', 1)
+				hTab:Lookup('Image_Tab_Bg_Hover'):SetH(34)
+				hTab:Lookup('Text_Tab'):SetSize(128, 32)
+				hTab:Lookup('Text_Tab'):SetRelPos(36, 3)
+				hTab:SetH(35)
+			else
+				hTab:Lookup('Image_Tab_Bg'):FromUITex(IMG_PATH, 0)
+				hTab:Lookup('Image_Tab_Bg_Active'):FromUITex(IMG_PATH, 1)
+				hTab:Lookup('Image_Tab_Bg_Hover'):FromUITex(IMG_PATH, 2)
+			end
 			if tTab.szIconTex == 'FromIconID' then
 				hTab:Lookup('Image_TabIcon'):FromIconID(tTab.dwIconFrame)
 			elseif tTab.dwIconFrame then
@@ -429,9 +445,8 @@ function D.RedrawTabs(frame, szCategory)
 			else
 				hTab:Lookup('Image_TabIcon'):FromTextureFile(tTab.szIconTex)
 			end
-			hTab:Lookup('Image_Tab_Bg'):FromUITex(IMG_PATH, 0)
-			hTab:Lookup('Image_Tab_Bg_Active'):FromUITex(IMG_PATH, 1)
-			hTab:Lookup('Image_Tab_Bg_Hover'):FromUITex(IMG_PATH, 2)
+			hTab:Lookup('Text_Tab'):SetText(tTab.szName)
+			hTab:FormatAllItemPos()
 		end
 	end
 	scroll:FormatAllItemPos()
@@ -462,41 +477,44 @@ function D.OnSizeChange()
 	end
 	-- fix size
 	local nWidth, nHeight = frame:GetSize()
+	local nMainWidth, nMainHeight
 	local hTotal = frame:Lookup('', '')
 	hTotal:Lookup('Text_Author'):SetRelY(nHeight - 25 - 30)
+	hTotal:Lookup('Handle_ClassicBg/Image_Classic_TabBg'):SetW(nWidth - 2)
+	hTotal:Lookup('Handle_GlassmorphismBg/Image_Glassmorphism_TabBg'):SetW(nWidth - 2)
 	hTotal:FormatAllItemPos()
 	local wnd = frame:Lookup('Wnd_Total')
-	wnd:Lookup('WndContainer_Category'):SetSize(nWidth - 22, 32)
+	wnd:Lookup('WndContainer_Category'):SetW(nWidth - 22)
 	wnd:Lookup('WndContainer_Category'):FormatAllContentPos()
-	wnd:Lookup('Btn_Weibo'):SetRelPos(nWidth - 135, 55)
-	wnd:Lookup('WndScroll_Tabs'):SetSize(171, nHeight - 102)
-	wnd:Lookup('WndScroll_Tabs', ''):SetSize(171, nHeight - 102)
+	wnd:Lookup('Btn_Weibo'):SetRelX(nWidth - 170)
+	wnd:Lookup('WndScroll_Tabs'):SetH(nHeight - 102)
+	wnd:Lookup('WndScroll_Tabs', ''):SetH(nHeight - 102)
 	wnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
-	wnd:Lookup('WndScroll_Tabs/ScrollBar_Tabs'):SetSize(16, nHeight - 111)
+	wnd:Lookup('WndScroll_Tabs/ScrollBar_Tabs'):SetH(nHeight - 111)
 
 	local hWndTotal = wnd:Lookup('', '')
 	wnd:Lookup('', ''):SetSize(nWidth, nHeight)
-	hWndTotal:Lookup('Image_Breaker'):SetSize(6, nHeight - 340)
-	hWndTotal:Lookup('Image_TabBg'):SetW(nWidth - 2)
-	hWndTotal:Lookup('Image_Glassmorphism_TabBg'):SetW(nWidth - 2)
-	hWndTotal:Lookup('Handle_DBClick'):SetSize(nWidth, 54)
+	hWndTotal:Lookup('Image_Breaker'):SetH(nHeight - 106)
+	hWndTotal:Lookup('Handle_DBClick'):SetW(nWidth)
 
 	local bHideTabs = nWidth < 550
 	wnd:Lookup('WndScroll_Tabs'):SetVisible(not bHideTabs)
 	hWndTotal:Lookup('Image_Breaker'):SetVisible(not bHideTabs)
 
 	if bHideTabs then
-		nWidth = nWidth + 181
+		nMainWidth = nWidth - 10
 		wnd:Lookup('WndScroll_MainPanel'):SetRelX(5)
 	else
-		wnd:Lookup('WndScroll_MainPanel'):SetRelX(186)
+		nMainWidth = nWidth - 218
+		wnd:Lookup('WndScroll_MainPanel'):SetRelX(213)
 	end
+	nMainHeight = nHeight - 100
 
-	wnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 191, nHeight - 100)
-	frame.MAIN_SCROLL:SetSize(20, nHeight - 100)
-	frame.MAIN_SCROLL:SetRelPos(nWidth - 209, 0)
-	frame.MAIN_WND:SetSize(nWidth - 201, nHeight - 100)
-	frame.MAIN_HANDLE:SetSize(nWidth - 201, nHeight - 100)
+	wnd:Lookup('WndScroll_MainPanel'):SetSize(nMainWidth, nMainHeight)
+	frame.MAIN_SCROLL:SetH(nMainHeight)
+	frame.MAIN_SCROLL:SetRelX(nMainWidth - 10)
+	frame.MAIN_WND:SetSize(nMainWidth - 10, nMainHeight)
+	frame.MAIN_HANDLE:SetSize(nMainWidth - 10, nMainHeight)
 	local hWndMainPanel = frame.MAIN_WND
 	if hWndMainPanel.OnPanelResize then
 		local res, err, trace = X.XpCall(hWndMainPanel.OnPanelResize, hWndMainPanel)
@@ -624,14 +642,47 @@ end
 function D.OnFrameCreate()
 	if X.UI.IS_GLASSMORPHISM then
 		this:Lookup('', 'Handle_ClassicBg'):Hide()
-		this:Lookup('', 'Text_Title'):SetRelY(4)
+		this:Lookup('', 'Text_Title'):SetRelY(0)
 		this:Lookup('WndContainer_TitleBtnR'):SetRelY(7)
-		this:Lookup('Wnd_Total', 'Image_TabBg'):Hide()
-		this:Lookup('Wnd_Total/WndContainer_Category'):SetRelY(47)
+		this:Lookup('Wnd_Total/WndContainer_Category'):SetRelPos(0, 49)
+		this:Lookup('Wnd_Total/WndContainer_Category'):SetH(30)
 		this:Lookup('Wnd_Total/WndContainer_Category', 'Image_CategorySplitterL'):Hide()
+		this:Lookup('Wnd_Total', 'Image_Breaker'):FromUITex('ui\\Image\\UItimate\\UICommon\\Common.UITex', 7)
+		this:Lookup('Wnd_Total', 'Image_Breaker'):SetW(3)
+		this:Lookup('Wnd_Total/WndScroll_Tabs/ScrollBar_Tabs/Btn_Tabs'):SetAnimatePath('ui\\Image\\UItimate\\UICommon\\Button.UITex')
+		this:Lookup('Wnd_Total/WndScroll_Tabs/ScrollBar_Tabs/Btn_Tabs'):SetAnimateGroupNormal(47)
+		this:Lookup('Wnd_Total/WndScroll_Tabs/ScrollBar_Tabs/Btn_Tabs'):SetAnimateGroupMouseOver(48)
+		this:Lookup('Wnd_Total/WndScroll_Tabs/ScrollBar_Tabs/Btn_Tabs'):SetAnimateGroupMouseDown(49)
+		this:Lookup('Wnd_Total/WndScroll_Tabs/ScrollBar_Tabs/Btn_Tabs'):SetAnimateGroupDisable(50)
+		this:Lookup('Wnd_Total/WndScroll_Tabs/ScrollBar_Tabs/Btn_Tabs'):SetAlpha(255)
+		this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel/Btn_MainPanel'):SetAnimatePath('ui\\Image\\UItimate\\UICommon\\Button.UITex')
+		this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel/Btn_MainPanel'):SetAnimateGroupNormal(47)
+		this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel/Btn_MainPanel'):SetAnimateGroupMouseOver(48)
+		this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel/Btn_MainPanel'):SetAnimateGroupMouseDown(49)
+		this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel/Btn_MainPanel'):SetAnimateGroupDisable(50)
+		this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel/Btn_MainPanel'):SetAlpha(255)
+		this:Lookup('Wnd_Total/Btn_Weibo'):SetH(24)
+		this:Lookup('Wnd_Total/Btn_Weibo'):SetRelY(54)
+		this:Lookup('Wnd_Total/Btn_Weibo'):SetAnimatePath('ui\\Image\\UItimate\\UICommon\\Plugins.UITex')
+		this:Lookup('Wnd_Total/Btn_Weibo'):SetAnimateGroupNormal(0)
+		this:Lookup('Wnd_Total/Btn_Weibo'):SetAnimateGroupMouseOver(1)
+		this:Lookup('Wnd_Total/Btn_Weibo'):SetAnimateGroupMouseDown(2)
+		this:Lookup('Wnd_Total/Btn_Weibo'):SetAnimateGroupDisable(3)
+		this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetH(24)
+		this:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetSize(16, 16)
+		this:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetAnimatePath('ui\\Image\\UItimate\\UICommon\\Button.UITex')
+		this:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetAnimateGroupNormal(35)
+		this:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetAnimateGroupMouseOver(36)
+		this:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetAnimateGroupMouseDown(37)
+		this:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetAnimateGroupDisable(38)
+		this:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):SetAnimation('ui\\Image\\UItimate\\UICommon\\Button4.UITex', 22, 18, 21, 1, 24, 20, 19, 23, 1, 21)
+		this:Lookup('Btn_Drag'):SetAnimatePath('ui\\Image\\UItimate\\UICommon\\Button.UITex')
+		this:Lookup('Btn_Drag'):SetAnimateGroupNormal(141)
+		this:Lookup('Btn_Drag'):SetAnimateGroupMouseOver(142)
+		this:Lookup('Btn_Drag'):SetAnimateGroupMouseDown(143)
+		this:Lookup('Btn_Drag'):SetAnimateGroupDisable(144)
 	else
 		this:Lookup('', 'Handle_GlassmorphismBg'):Hide()
-		this:Lookup('Wnd_Total', 'Image_Glassmorphism_TabBg'):Hide()
 	end
 	this.MAIN_SCROLL = this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
 	this.MAIN_WND = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
@@ -644,7 +695,7 @@ function D.OnFrameCreate()
 	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
 	X.UI(this):Size(D.OnSizeChange)
 	D.RedrawCategory(this)
-	D.ResizePanel(this, 960 * fScale, 630 * fScale)
+	D.ResizePanel(this, 980 * fScale, 640 * fScale)
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:CorrectPos()
 	this:RegisterEvent('UI_SCALED')

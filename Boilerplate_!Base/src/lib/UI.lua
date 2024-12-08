@@ -4264,18 +4264,18 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		end
 		local hClassicBgHandle = hnd:Lookup('Handle_ClassicBg')
 		if hClassicBgHandle then
-			local imgBgTLConner = hClassicBgHandle:Lookup('Image_BgTL_Conner')
-			local imgBgTRConner = hClassicBgHandle:Lookup('Image_BgTR_Conner')
-			local imgBgTLFlex = hClassicBgHandle:Lookup('Image_BgTL_Flex')
-			local imgBgTRFlex = hClassicBgHandle:Lookup('Image_BgTR_Flex')
-			local imgBgTLCenter = hClassicBgHandle:Lookup('Image_BgTL_Center')
-			local imgBgTRCenter = hClassicBgHandle:Lookup('Image_BgTR_Center')
-			local imgBgBL = hClassicBgHandle:Lookup('Image_BgBL')
-			local imgBgBC = hClassicBgHandle:Lookup('Image_BgBC')
-			local imgBgBR = hClassicBgHandle:Lookup('Image_BgBR')
-			local imgBgCL = hClassicBgHandle:Lookup('Image_BgCL')
-			local imgBgCC = hClassicBgHandle:Lookup('Image_BgCC')
-			local imgBgCR = hClassicBgHandle:Lookup('Image_BgCR')
+			local imgBgTLConner = hClassicBgHandle:Lookup('Image_Classic_BgTL_Conner')
+			local imgBgTRConner = hClassicBgHandle:Lookup('Image_Classic_BgTR_Conner')
+			local imgBgTLFlex = hClassicBgHandle:Lookup('Image_Classic_BgTL_Flex')
+			local imgBgTRFlex = hClassicBgHandle:Lookup('Image_Classic_BgTR_Flex')
+			local imgBgTLCenter = hClassicBgHandle:Lookup('Image_Classic_BgTL_Center')
+			local imgBgTRCenter = hClassicBgHandle:Lookup('Image_Classic_BgTR_Center')
+			local imgBgBL = hClassicBgHandle:Lookup('Image_Classic_BgBL')
+			local imgBgBC = hClassicBgHandle:Lookup('Image_Classic_BgBC')
+			local imgBgBR = hClassicBgHandle:Lookup('Image_Classic_BgBR')
+			local imgBgCL = hClassicBgHandle:Lookup('Image_Classic_BgCL')
+			local imgBgCC = hClassicBgHandle:Lookup('Image_Classic_BgCC')
+			local imgBgCR = hClassicBgHandle:Lookup('Image_Classic_BgCR')
 			if imgBgTLConner and imgBgTLFlex and imgBgTLCenter
 			and imgBgTRConner and imgBgTRFlex and imgBgTRCenter
 			and imgBgBL and imgBgBC and imgBgBR and imgBgCL and imgBgCC and imgBgCR then
@@ -4319,14 +4319,15 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			raw:Lookup('', 'Shadow_Bg'):SetSize(nWidth, nHeight)
 			raw:Lookup('WndContainer_TitleBtnR'):SetSize(nWidth, 30)
 			raw:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
-			raw:Lookup('Btn_Drag'):SetRelPos(nWidth - 16, nHeight - 16)
+			local hBtnDrag = raw:Lookup('Btn_Drag')
+			hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW(), nHeight - hBtnDrag:GetH())
 			raw:SetSize(nWidth, nHeight)
 			raw:SetDragArea(0, 0, nWidth, 30)
 			hnd:SetSize(nWidth, nHeight)
 			wnd:SetSize(nWidth, nHeight - 30)
 		elseif GetComponentProp(raw, 'intact') or raw == X.Panel.GetFrame() then
 			hnd:SetSize(nWidth, nHeight)
-			hnd:Lookup('Text_Title'):SetW(nWidth - 90)
+			hnd:Lookup('Text_Title'):SetW(nWidth)
 			hnd:Lookup('Text_Author'):SetW(nWidth - 31)
 			hnd:Lookup('Text_Author'):SetRelY(nHeight - 41)
 			-- 处理窗口其它组件
@@ -4334,9 +4335,9 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			if btnClose then
 				btnClose:SetRelX(nWidth - 35)
 			end
-			local btnDrag = raw:Lookup('Btn_Drag')
-			if btnDrag then
-				btnDrag:SetRelPos(nWidth - 18, nHeight - 20)
+			local hBtnDrag = raw:Lookup('Btn_Drag')
+			if hBtnDrag then
+				hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW(), nHeight - hBtnDrag:GetH())
 			end
 			local btnMax = raw:Lookup('CheckBox_Maximize')
 			if btnMax then
@@ -6774,7 +6775,8 @@ function X.UI.CreateFrame(szName, opt)
 				h = math.min(h, nClientH - nFrameY)
 				w = math.max(w, GetComponentProp(frm, 'minWidth')) -- frame size must larger than its min size
 				h = math.max(h, GetComponentProp(frm, 'minHeight'))
-				frm:Lookup('Btn_Drag'):SetRelPos(w - 16, h - 16)
+				local hBtnDrag = frm:Lookup('Btn_Drag')
+				hBtnDrag:SetRelPos(w - hBtnDrag:GetW(), h - hBtnDrag:GetH())
 				frm:Lookup('Wnd_DragBg', 'Shadow_DragBg'):SetSize(w, h)
 			end
 			frm:Lookup('Btn_Drag').OnDragButtonBegin = function()
