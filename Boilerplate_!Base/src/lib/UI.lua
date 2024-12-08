@@ -4365,6 +4365,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			raw:SetSize(nWidth, nHeight)
 			hnd:SetSize(nWidth, nHeight)
 		end
+		hnd:FormatAllItemPos()
 	elseif componentType == 'WndButton' or componentType == 'WndButtonBox' then
 		local btn = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
@@ -6723,6 +6724,35 @@ function X.UI.CreateFrame(szName, opt)
 			frm:Lookup('', 'Handle_ClassicBg'):Hide()
 			frm:Lookup('', 'Text_Title'):SetRelY(0)
 			frm:Lookup('WndContainer_TitleBtnR'):SetRelY(0)
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetSize(16, 16)
+			X.UI.SetButtonUITex(
+				frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'),
+				'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+				35,
+				36,
+				37,
+				38
+			)
+			X.UI.SetCheckBoxUITex(
+				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'),
+				'ui\\Image\\UItimate\\UICommon\\Button4.UITex',
+				22,
+				23,
+				24,
+				21,
+				18,
+				19,
+				20,
+				1
+			)
+			X.UI.SetButtonUITex(
+				frm:Lookup('Btn_Drag'),
+				'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+				141,
+				142,
+				143,
+				144
+			)
 		else
 			frm:Lookup('', 'Handle_GlassmorphismBg'):Hide()
 		end
