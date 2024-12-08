@@ -235,8 +235,8 @@ end
 ---@param nCheckedAndEnableWhenMouseOver number @选中、启用状态时鼠标移入时图素（勾选+划过）
 ---@param nUnChecking number @选中、按下时图素（勾选+按下）
 ---@param nCheckAndDisable number @选中、禁用状态时图素（勾选+禁用）
----@param nUncheckedAndDisableWhenMouseOver number @未选中、禁用状态时鼠标移入时图素，默认取未选中、禁用状态时图素
----@param nCheckedAndDisableWhenMouseOver number @选中、禁用状态时鼠标移入时图素，默认取选中、禁用状态时图素
+---@param nUncheckedAndDisableWhenMouseOver? number @未选中、禁用状态时鼠标移入时图素，默认取未选中、禁用状态时图素
+---@param nCheckedAndDisableWhenMouseOver? number @选中、禁用状态时鼠标移入时图素，默认取选中、禁用状态时图素
 function X.UI.SetCheckBoxUITex(
 	hWndCheckBox,
 	szImagePath,
