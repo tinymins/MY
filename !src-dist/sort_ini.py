@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 
 
 def sort_lines(lines):
@@ -92,6 +93,8 @@ def main():
         process_directory(path)
     else:
         print("Invalid path.")
+    print("Finished!!! Process will be exit in 10 seconds.")
+    time.sleep(10)
 
 
 if __name__ == "__main__":
