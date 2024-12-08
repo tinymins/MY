@@ -201,6 +201,55 @@ function X.UI.FormatUIEventMask(stopPropagation, callFrameBinding)
 	return ret
 end
 
+-- 设置复选框控件图素
+-- 分为两个维度：(未勾选, 勾选) x (正常, 划过, 按下, 禁用)
+---@param hWndCheckBox userdata @复选框控件句柄
+---@param szImagePath string @图素地址
+---@param nUnCheckAndEnable number @未选中、启用状态时图素（未勾选+正常）
+---@param nUncheckedAndEnableWhenMouseOver number @未选中、启用状态时鼠标移入时图素（未勾选+划过）
+---@param nChecking number @未选中、按下时图素（未勾选+按下）
+---@param nUnCheckAndDisable number @未选中、禁用状态时图素（未勾选+禁用）
+---@param nCheckAndEnable number @选中、启用状态时图素（勾选+正常）
+---@param nCheckedAndEnableWhenMouseOver number @选中、启用状态时鼠标移入时图素（勾选+划过）
+---@param nUnChecking number @选中、按下时图素（勾选+按下）
+---@param nCheckAndDisable number @选中、禁用状态时图素（勾选+禁用）
+---@param nUncheckedAndDisableWhenMouseOver number @未选中、禁用状态时鼠标移入时图素，默认取未选中、禁用状态时图素
+---@param nCheckedAndDisableWhenMouseOver number @选中、禁用状态时鼠标移入时图素，默认取选中、禁用状态时图素
+function X.UI.SetCheckBoxUITex(
+	hWndCheckBox,
+	szImagePath,
+	nUnCheckAndEnable,
+	nUncheckedAndEnableWhenMouseOver,
+	nChecking,
+	nUnCheckAndDisable,
+	nCheckAndEnable,
+	nCheckedAndEnableWhenMouseOver,
+	nUnChecking,
+	nCheckAndDisable,
+	nUncheckedAndDisableWhenMouseOver,
+	nCheckedAndDisableWhenMouseOver
+)
+	if not nUncheckedAndDisableWhenMouseOver then
+		nUncheckedAndDisableWhenMouseOver = nUnCheckAndDisable
+	end
+	if not nCheckedAndDisableWhenMouseOver then
+		nCheckedAndDisableWhenMouseOver = nCheckAndDisable
+	end
+	return hWndCheckBox:SetAnimation(
+		szImagePath,
+		nUnCheckAndEnable,
+		nCheckAndEnable,
+		nUnCheckAndDisable,
+		nCheckAndDisable,
+		nChecking,
+		nUnChecking,
+		nCheckedAndEnableWhenMouseOver,
+		nUncheckedAndEnableWhenMouseOver,
+		nCheckedAndDisableWhenMouseOver,
+		nUncheckedAndDisableWhenMouseOver
+	)
+end
+
 X.UI.UpdateItemInfoBoxObject = _G.UpdateItemInfoBoxObject or UpdataItemInfoBoxObject
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
