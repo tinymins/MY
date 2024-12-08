@@ -69,10 +69,13 @@ local _POSTER_IMAGE_LIST_     = {
 local _DEBUG_LEVEL_           = DEBUG_LEVEL[LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or 'NONE'] or DEBUG_LEVEL.NONE
 local _LOG_LEVEL_             = math.min(DEBUG_LEVEL[LoadLUAData(_DATA_ROOT_ .. 'log.level.jx3dat') or 'ERROR'] or DEBUG_LEVEL.ERROR, _DEBUG_LEVEL_)
 
+---@type Boilerplate_UI
+local UI = {}
+
 -- 基础库命名空间
 ---@type Boilerplate
 local X = {
-	UI = {},
+	UI = UI,
 	DEBUG_LEVEL = DEBUG_LEVEL,
 	CODE_PAGE = CODE_PAGE,
 	PATH_TYPE = {
@@ -232,3 +235,6 @@ X.PACKET_INFO.AUTHOR_ROLE_LIST    = {
 -- 导出命名空间
 ---@class Boilerplate
 Boilerplate = X
+
+---@class Boilerplate_UI
+Boilerplate_UI = UI
