@@ -201,6 +201,28 @@ function X.UI.FormatUIEventMask(stopPropagation, callFrameBinding)
 	return ret
 end
 
+-- 设置按钮控件图素
+---@param hWndCheckBox userdata @按钮框控件句柄
+---@param szImagePath string @图素地址
+---@param nNormal number @正常状态下图素
+---@param nMouseOver number @鼠标划过时图素
+---@param nMouseDown number @鼠标按下时图素
+---@param nDisable number @禁用时图素
+function X.UI.SetButtonUITex(
+	hButton,
+	szImagePath,
+	nNormal,
+	nMouseOver,
+	nMouseDown,
+	nDisable
+)
+	hButton:SetAnimatePath(szImagePath)
+	hButton:SetAnimateGroupNormal(nNormal)
+	hButton:SetAnimateGroupMouseOver(nMouseOver)
+	hButton:SetAnimateGroupMouseDown(nMouseDown)
+	hButton:SetAnimateGroupDisable(nDisable)
+end
+
 -- 设置复选框控件图素
 -- 分为两个维度：(未勾选, 勾选) x (正常, 划过, 按下, 禁用)
 ---@param hWndCheckBox userdata @复选框控件句柄
