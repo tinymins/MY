@@ -256,7 +256,20 @@ if X.UI.IS_GLASSMORPHISM then
 		nMouseDownGroup = 34,
 		nDisableGroup = 35,
 	}
-	BUTTON_STYLE_CONFIG.FLAT_RADIUS = BUTTON_STYLE_CONFIG.DEFAULT
+	BUTTON_STYLE_CONFIG.FLAT_RADIUS = {
+		nWidth = 100,
+		nHeight = 26,
+		nMarginBottom = 0,
+		nPaddingTop = 0,
+		nPaddingRight = 10,
+		nPaddingBottom = 0,
+		nPaddingLeft = 10,
+		szImage = 'ui\\Image\\UItimate\\UICommon\\Plugins.UITex',
+		nNormalGroup = 0,
+		nMouseOverGroup = 1,
+		nMouseDownGroup = 2,
+		nDisableGroup = 3,
+	}
 end
 local function GetButtonStyleName(raw)
 	local szImage = X.StringLowerW(raw:GetAnimatePath())
