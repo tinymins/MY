@@ -353,6 +353,8 @@ local function ApplyUIArguments(ui, arg)
 		if arg.buttonStyle        ~= nil then ui:ButtonStyle      (arg.buttonStyle                                 ) end -- must before :Size()
 		if arg.editType           ~= nil then ui:EditType         (arg.editType                                    ) end
 		if arg.appearance         ~= nil then ui:Appearance       (arg.appearance                                  ) end
+		if arg.frameLeftControl   ~= nil then ui:FrameLeftControl (arg.frameLeftControl                            ) end
+		if arg.frameRightControl  ~= nil then ui:FrameRightControl(arg.frameRightControl                           ) end
 		if arg.visible            ~= nil then ui:Visible          (arg.visible                                     ) end
 		if arg.autoVisible        ~= nil then ui:Visible          (arg.autoVisible                                 ) end
 		if arg.enable             ~= nil then ui:Enable           (arg.enable                                      ) end
@@ -5258,6 +5260,56 @@ function OO:FrameVisualState(...)
 		local raw = self.raws[1]
 		if raw and GetComponentType(raw) == 'WndFrame' then
 			return GetComponentProp(raw, 'eFrameVisualState') or X.UI.FRAME_VISUAL_STATE.NORMAL
+		end
+	end
+	return self
+end
+
+-- (self) Instance:FrameLeftControl(function[] aControl)
+function OO:FrameLeftControl(aControl)
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		if GetComponentType(raw) == 'WndFrame' then
+			local hContainer = raw:Lookup('WndContainer_TitleBtnL')
+			if hContainer and aControl then
+				for i = hContainer:GetAllContentCount() - 1, 0, -1 do
+					local hWnd = hContainer:LookupContent(i)
+					if hWnd.bCustom then
+						hWnd:Destroy()
+					end
+				end
+				for _, fnRender in ipairs(aControl) do
+					local hWnd = X.UI(hContainer):Append('WndWindow', { w = hContainer:GetH(), h = hContainer:GetH() }):Raw()
+					hWnd.bCustom = true
+					fnRender(hWnd)
+				end
+				hContainer:FormatAllContentPos()
+			end
+		end
+	end
+	return self
+end
+
+-- (self) Instance:FrameRightControl(function[] aControl)
+function OO:FrameRightControl(aControl)
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		if GetComponentType(raw) == 'WndFrame' then
+			local hContainer = raw:Lookup('WndContainer_TitleBtnR')
+			if hContainer and aControl then
+				for i = hContainer:GetAllContentCount() - 1, 0, -1 do
+					local hWnd = hContainer:LookupContent(i)
+					if hWnd.bCustom then
+						hWnd:Destroy()
+					end
+				end
+				for _, fnRender in ipairs(aControl) do
+					local hWnd = X.UI(hContainer):Append('WndWindow', { w = hContainer:GetH(), h = hContainer:GetH() }):Raw()
+					hWnd.bCustom = true
+					fnRender(hWnd)
+				end
+				hContainer:FormatAllContentPos()
+			end
 		end
 	end
 	return self
