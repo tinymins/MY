@@ -34,30 +34,11 @@ local function UpdateControls(frame, action, url)
 	frame:Lookup('Wnd_Total/Wnd_Controls/Btn_GoForward'):Enable(wndWeb:CanGoForward())
 end
 
-local function UpdateFrameVisualState(frame, eVisualState)
-	if eVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then
-		X.UI(frame):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MAXIMIZE)
-	elseif eVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then
-		X.UI(frame):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MINIMIZE)
-		frame:SetH(46)
-		frame:Lookup('', ''):SetH(46)
-		frame:Lookup('Btn_Drag'):Hide()
-	elseif eVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL then
-		X.UI(frame):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
-		frame:Lookup('', ''):SetH(frame:GetH())
-		frame:Lookup('Btn_Drag'):Show()
-	end
-end
-
-function D.OnFrameCreate()
-	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
-end
-
 function D.OnLButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
 	local options = OPTIONS[frame] or {}
-	if name == 'Btn_Refresh' or name == 'Btn_Refresh2' then
+	if name == 'Btn_Refresh' then
 		UpdateControls(frame, 'refresh')
 	elseif name == 'Btn_GoBack' then
 		UpdateControls(frame, 'back')
@@ -65,78 +46,8 @@ function D.OnLButtonClick()
 		UpdateControls(frame, 'forward')
 	elseif name == 'Btn_GoTo' then
 		UpdateControls(frame, 'go')
-	elseif name == 'Btn_OuterOpen' then
-		X.OpenBrowser(options.openurl or frame:Lookup('Wnd_Total/Wnd_Controls/Edit_Input'):GetText(), 'outer')
 	elseif name == 'Btn_Close' then
 		X.UI.CloseBrowser(frame)
-	end
-end
-
-function D.OnItemLButtonDBClick()
-	local name = this:GetName()
-	local frame = this:GetRoot()
-	if name == 'Handle_DBClick' or name == 'Handle_DBClick2' then
-		if X.UI(frame):FrameVisualState() == X.UI.FRAME_VISUAL_STATE.MINIMIZE then
-			UpdateFrameVisualState(frame, X.UI.FRAME_VISUAL_STATE.NORMAL)
-		else
-			frame:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
-		end
-	end
-end
-
-function D.OnCheckBoxCheck()
-	local name = this:GetName()
-	local frame = this:GetRoot()
-	if name == 'CheckBox_Maximize' then
-		UpdateFrameVisualState(frame, X.UI.FRAME_VISUAL_STATE.MAXIMIZE)
-	elseif name == 'CheckBox_Minimize' then
-		UpdateFrameVisualState(frame, X.UI.FRAME_VISUAL_STATE.MINIMIZE)
-	end
-end
-
-function D.OnCheckBoxUncheck()
-	local name = this:GetName()
-	local frame = this:GetRoot()
-	if name == 'CheckBox_Maximize' then
-		UpdateFrameVisualState(frame, X.UI.FRAME_VISUAL_STATE.NORMAL)
-	elseif name == 'CheckBox_Minimize' then
-		UpdateFrameVisualState(frame, X.UI.FRAME_VISUAL_STATE.NORMAL)
-	end
-end
-
-function D.OnMouseEnter()
-	local name = this:GetName()
-	if name == 'Btn_Drag' then
-		Cursor.Switch(CURSOR.LEFTTOP_RIGHTBOTTOM)
-	end
-end
-
-function D.OnMouseLeave()
-	local name = this:GetName()
-	if name == 'Btn_Drag' then
-		Cursor.Switch(CURSOR.NORMAL)
-	end
-end
-
-function D.OnDragButtonBegin()
-	local name = this:GetName()
-	local frame = this:GetRoot()
-	if name == 'Btn_Drag' then
-		this.fDragX, this.fDragY = Station.GetMessagePos()
-		this.fDragW, this.fDragH = X.UI(frame):Size()
-	end
-end
-
-function D.OnDragButton()
-	local name = this:GetName()
-	local frame = this:GetRoot()
-	if name == 'Btn_Drag' then
-		local nX, nY = Station.GetMessagePos()
-		local nDeltaX, nDeltaY = nX - this.fDragX, nY - this.fDragY
-		local nMinW, nMinH = X.UI(frame):MinSize()
-		local nW = math.max(this.fDragW + nDeltaX, nMinW or 10)
-		local nH = math.max(this.fDragH + nDeltaY, nMinH or 10)
-		X.UI(frame):Size(nW, nH)
 	end
 end
 
@@ -164,7 +75,7 @@ function D.OnWebLoadEnd()
 end
 
 function D.OnTitleChanged()
-	this:GetRoot():Lookup('', 'Text_Title'):SetText(this:GetLocationName())
+	this:GetRoot().uiTitle:Text(this:GetLocationName())
 end
 
 function D.OnHistoryChanged()
@@ -176,39 +87,22 @@ function D.GetFrame(szKey)
 end
 
 local function OnResizePanel()
-	local h = this:Lookup('', '')
-	local nWidth, nHeight = this:GetSize()
-	local nHeaderHeight = h:Lookup('Image_TitleBg'):GetH()
-	this:SetSize(nWidth, nHeight)
-	this:Lookup('Wnd_Total'):SetSize(nWidth, nHeight)
-	this:Lookup('Wnd_Total', ''):SetSize(nWidth, nHeight)
-	this:Lookup('Wnd_Total', 'Handle_DBClick2'):SetW(nWidth)
-	this:Lookup('Wnd_Total/Wnd_Web'):SetRelPos(0, nHeaderHeight)
-	this:Lookup('Wnd_Total/Wnd_Web'):SetSize(nWidth, nHeight - nHeaderHeight)
-	this:Lookup('Wnd_Total/Wnd_Web/WndWeb'):SetRelPos(5, 0)
-	this:Lookup('Wnd_Total/Wnd_Web/WndWeb'):SetSize(nWidth - 8, nHeight - nHeaderHeight - 5)
-	this:Lookup('Wnd_Total/Wnd_Controls'):SetW(nWidth)
-	this:Lookup('Wnd_Total/Wnd_Controls', 'Image_Edit'):SetW(nWidth - 241)
-	this:Lookup('Wnd_Total/Wnd_Controls/Edit_Input'):SetW(nWidth - 251)
-	this:Lookup('Wnd_Total/Wnd_Controls/Btn_GoTo'):SetRelX(nWidth - 56)
-	this:Lookup('WndContainer_TitleBtnR'):SetRelX(nWidth - 6 - this:Lookup('WndContainer_TitleBtnR'):GetW())
-	this:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
-	local hBtnDrag = this:Lookup('Btn_Drag')
-	hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW(), nHeight - hBtnDrag:GetH())
-	local nTitleWidth = nWidth - 45 - 10
-	local pWnd = this:Lookup('WndContainer_TitleBtnR'):GetFirstChild()
-	while pWnd do
-		nTitleWidth = nTitleWidth - pWnd:GetW()
-		pWnd = pWnd:GetNext()
-	end
-	h:Lookup('Text_Title'):SetW(nTitleWidth)
-	h:Lookup('Image_TitleBg'):SetW(nWidth - 4)
-	h:Lookup('Handle_DBClick'):SetW(nWidth)
-	h:SetSize(nWidth, nHeight)
-	this:SetDragArea(0, 0, nWidth, nHeaderHeight)
+	local frame = this
+	local nWidth, nHeight = frame:GetSize()
+	local nHeaderHeight = frame.uiTitleBg:Height()
+	frame:Lookup('Wnd_Total/Wnd_Web'):SetRelPos(0, nHeaderHeight)
+	frame:Lookup('Wnd_Total/Wnd_Web'):SetSize(nWidth, nHeight - nHeaderHeight)
+	frame:Lookup('Wnd_Total/Wnd_Web/WndWeb'):SetRelPos(5, 0)
+	frame:Lookup('Wnd_Total/Wnd_Web/WndWeb'):SetSize(nWidth - 8, nHeight - nHeaderHeight - 5)
+	frame:Lookup('Wnd_Total/Wnd_Controls'):SetW(nWidth)
+	frame:Lookup('Wnd_Total/Wnd_Controls', 'Image_Edit'):SetW(nWidth - 241)
+	frame:Lookup('Wnd_Total/Wnd_Controls/Edit_Input'):SetW(nWidth - 251)
+	frame:Lookup('Wnd_Total/Wnd_Controls/Btn_GoTo'):SetRelX(nWidth - 56)
+	frame.uiTitle:Width(nWidth - 200)
+	frame.uiTitleBg:Width(nWidth - 4)
 	-- reset position
-	local an = GetFrameAnchor(this)
-	this:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+	local an = GetFrameAnchor(frame)
+	frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
 end
 
 function D.Open(url, options)
@@ -226,34 +120,92 @@ function D.Open(url, options)
 	if WINDOWS[szKey] then
 		X.UI.CloseFrame(WINDOWS[szKey])
 	end
-	WINDOWS[szKey] = X.UI.OpenFrame(X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', FRAME_NAME)
+	local ui = X.UI.CreateFrame(FRAME_NAME, {
+		text = '',
+		resize = true,
+		minimize = true,
+		maximize = true,
+		esc = true,
+		frameRightControl = (function()
+			local aControl = {}
+			if options.controls == false then
+				table.insert(aControl, function(hWnd)
+					X.UI(hWnd):Append('WndButton', {
+						y = 3, w = 24, h = 24,
+						buttonStyle = {
+							szImage = 'ui\\Image\\Common\\DialogueLabel.UITex',
+							nNormalGroup = 14,
+							nMouseOverGroup = 15,
+							nMouseDownGroup = 16,
+							nDisableGroup = 17,
+						},
+						onClick = function()
+							UpdateControls(this:GetRoot(), 'refresh')
+						end,
+					})
+				end)
+			end
+			table.insert(aControl, function(hWnd)
+				X.UI(hWnd):Append('WndButton', {
+					y = 5, w = 22, h = 22,
+					buttonStyle = {
+						szImage = 'ui\\Image\\UICommon\\Camera3.UITex',
+						nNormalGroup = 23,
+						nMouseOverGroup = 24,
+						nMouseDownGroup = 25,
+						nDisableGroup = 32,
+					},
+					onClick = function()
+						X.OpenBrowser(options.openurl or this:GetRoot():Lookup('Wnd_Total/Wnd_Controls/Edit_Input'):GetText(), 'outer')
+					end,
+				})
+			end)
+			return aControl
+		end)(),
+		onFrameVisualStateChange = function()
+			local ui = X.UI(this)
+			local nW, nH = ui:ContainerSize()
+			local eVisualState = ui:FrameVisualState()
+			if eVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then
+			elseif eVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then
+				this:SetH(46)
+				this:Lookup('', ''):SetH(46)
+			elseif eVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL then
+			end
+		end,
+	})
+	local frame = ui:Raw()
+	frame.uiTitleBg = ui:Append('Image', {
+		x = 2, y = 2, w = 767, h = 75,
+		imageType = X.UI.IMAGE_TYPE.LEFT_CENTER_RIGHT,
+		image = 'ui\\Image\\UICommon\\ActivePopularize.UITex', imageFrame = 48,
+	})
+	local uiWndStatic = ui:Append('WndWindow')
+	uiWndStatic:Raw():ChangeRelation(frame, true, true)
+	uiWndStatic:Append('Image', {
+		x = 18, y = 15, w = 22, h = 22,
+		image = 'ui\\Image\\Minimap\\Minimap.UITex', imageFrame = 184,
+	})
+	frame.uiTitle = uiWndStatic:Append('Text', { x = 45, y = 11, w = 600, h = 30 })
+	X.UI.AppendFromIni(frame:Lookup('Wnd_Total'), X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', 'Wnd_Total', true)
+
+	frame:SetName(FRAME_NAME .. '#' .. szKey)
+	WINDOWS[szKey] = frame
 	OPTIONS[WINDOWS[szKey]] = options
 	--[[#DEBUG BEGIN]]
 	X.OutputDebugMessage(X.PACKET_INFO.NAME_SPACE, 'UI.OpenBrowser #' .. szKey .. ': ' .. url, X.DEBUG_LEVEL.LOG)
 	--[[#DEBUG END]]
 
-	local frame = WINDOWS[szKey]
-	frame:SetName(FRAME_NAME .. '#' .. szKey)
-	-- ÁðÁ§·ç¸ñ
-	if X.UI.IS_GLASSMORPHISM then
-		frame:Lookup('', 'Handle_ClassicBg'):Hide()
-		frame:Lookup('', 'Image_Logo'):SetRelY(7)
-		frame:Lookup('', 'Text_Title'):SetRelY(2)
-		frame:Lookup('WndContainer_TitleBtnR'):SetRelY(7)
-	else
-		frame:Lookup('', 'Handle_GlassmorphismBg'):Hide()
-	end
 	if options.layer then
 		frame:ChangeRelation(options.layer)
 	end
-	local ui = X.UI(frame)
 	if options.driver == 'ie' then
-		ui:Fetch('Wnd_Web'):Append('WndWebPage', { name = 'WndWeb' })
+		ui:Fetch('Wnd_Web'):Append('WndWebPage', { name = 'WndWeb', w = 100, h = 100 })
 	else --if options.driver == 'chrome' then
-		ui:Fetch('Wnd_Web'):Append('WndWebCef', { name = 'WndWeb' })
+		ui:Fetch('Wnd_Web'):Append('WndWebCef', { name = 'WndWeb', w = 100, h = 100 })
 	end
 	if ui:Fetch('Wnd_Web/WndWeb'):Count() == 0 then
-		ui:Fetch('Wnd_Web'):Append('WndWebPage', { name = 'WndWeb' })
+		ui:Fetch('Wnd_Web'):Append('WndWebPage', { name = 'WndWeb', w = 100, h = 100 })
 	end
 	if ui:Fetch('Wnd_Web/WndWeb'):Count() == 0 then
 		X.OutputDebugMessage(X.NSFormatString('{$NS}.UI.Browser'), 'Create WndWebPage/WndWebCef failed!', X.DEBUG_LEVEL.ERROR)
@@ -262,25 +214,14 @@ function D.Open(url, options)
 	end
 	if options.controls == false then
 		frame:Lookup('Wnd_Total/Wnd_Controls'):Hide()
-		frame:Lookup('', 'Image_TitleBg'):SetH(48)
-	else
-		frame:Lookup('WndContainer_TitleBtnR/Wnd_Refresh2'):Destroy()
+		frame.uiTitleBg:Height(48)
 	end
 	if options.readonly then
 		frame:Lookup('Wnd_Total/Wnd_Controls/Edit_Input'):Enable(false)
 	end
-	frame:Lookup('', 'Text_Title'):SetText(options.title or '')
+	frame.uiTitle:Text(options.title or '')
 	frame:Lookup('Wnd_Total/Wnd_Controls/Edit_Input'):SetText(url)
 	frame:Lookup('Wnd_Total/Wnd_Controls/Edit_Input'):SetCaretPos(0)
-
-	local nContainerWidth = 1
-	local pWnd = frame:Lookup('WndContainer_TitleBtnR'):GetFirstChild()
-	while pWnd do
-		nContainerWidth = nContainerWidth + pWnd:GetW()
-		pWnd = pWnd:GetNext()
-	end
-	frame:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
-	frame:Lookup('WndContainer_TitleBtnR'):SetW(nContainerWidth)
 
 	ui:MinSize(290, 150)
 	ui:Size(OnResizePanel)
