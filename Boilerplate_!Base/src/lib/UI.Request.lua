@@ -26,7 +26,30 @@ end
 function D.Open()
 	local frame = D.GetFrame()
 	if not frame then
-		frame = X.UI.OpenFrame(INI_PATH, FRAME_NAME)
+		frame = X.UI.CreateFrame(FRAME_NAME, {
+			level = 'Normal2',
+			text = _L['Request list'],
+			w = 525, h = 88, simple = true,
+			onSettingsClick = function()
+				local menu = {}
+				for _, v in pairs(REQUEST_HANDLER) do
+					if v.GetMenu then
+						table.insert(menu, v.GetMenu())
+					end
+				end
+				if #menu > 0 then
+					PopupMenu(menu)
+				end
+			end,
+			onRemove = function()
+				D.Close()
+				return true
+			end,
+		}):Raw()
+		X.UI.AppendFromIni(frame, INI_PATH, 'Scroll_Request')
+		X.RegisterEsc(X.NSFormatString('{$NS}_PartyRequest'), D.GetFrame, D.Close)
+		frame:SetPoint('CENTER', 0, -350, 'CENTER', 0, 0)
+		frame:CorrectPos()
 	end
 	return frame
 end
@@ -100,7 +123,7 @@ function D.RedrawList()
 		return
 	end
 	local scroll = frame:Lookup('Scroll_Request')
-	local scrollbar = scroll:Lookup('ScrolBar_Request')
+	local scrollbar = scroll:Lookup('ScrollBar_Request')
 	local container = scroll:Lookup('WndContainer_Request')
 	local nSumH = 0
 	container:Clear()
@@ -136,34 +159,11 @@ function D.RedrawList()
 		nSumH = nSumH + nH
 	end
 	nSumH = math.min(nSumH, 475)
-	scroll:SetH(nSumH)
+	scroll:SetH(nSumH + 1)
 	scrollbar:SetH(nSumH - 2)
-	container:SetH(nSumH)
+	container:SetH(nSumH + 1)
 	container:FormatAllContentPos()
-	frame:Lookup('', 'Image_Bg'):SetH(nSumH + 4)
-	frame:Lookup('', 'Image_Glassmorphism'):SetH(nSumH + 4 + 30)
-	frame:Lookup('', 'Image_Glassmorphism_Bg'):SetH(nSumH + 4)
-	frame:SetH(nSumH + 30 + 4)
-end
-
-function D.OnFrameCreate()
-	-- ÁðÁ§·ç¸ñ
-	if X.UI.IS_GLASSMORPHISM then
-		this:Lookup('', 'Image_Bg'):Hide()
-		this:Lookup('', 'Image_Title'):Hide()
-		this:Lookup('', 'Text_Title'):SetRelY(5)
-		this:Lookup('Btn_Close'):SetRelY(6)
-		this:Lookup('', ''):FormatAllItemPos()
-	else
-		this:Lookup('', 'Image_Glassmorphism'):Hide()
-		this:Lookup('', 'Image_Glassmorphism_Bg'):Hide()
-		this:Lookup('', 'Image_Glassmorphism_Title_Bg'):Hide()
-		this:Lookup('', 'Image_Glassmorphism_Title_TextureL'):Hide()
-		this:Lookup('', 'Image_Glassmorphism_Title_TextureR'):Hide()
-	end
-	this:Lookup('', 'Text_Title'):SetText(_L['Request list'])
-	this:SetPoint('CENTER', 0, -200, 'CENTER', 0, 0)
-	X.RegisterEsc(X.NSFormatString('{$NS}_PartyRequest'), D.GetFrame, D.Close)
+	X.UI(frame):Height(nSumH + scroll:GetRelY() + 3)
 end
 
 function D.OnItemMouseEnter()
@@ -184,23 +184,6 @@ function D.OnItemMouseLeave()
 	local name = this:GetName()
 	if name == 'Image_TypeIcon' then
 		HideTip()
-	end
-end
-
-function D.OnLButtonClick()
-	local name = this:GetName()
-	if name == 'Btn_Setting' then
-		local menu = {}
-		for _, v in pairs(REQUEST_HANDLER) do
-			if v.GetMenu then
-				table.insert(menu, v.GetMenu())
-			end
-		end
-		if #menu > 0 then
-			PopupMenu(menu)
-		end
-	elseif name == 'Btn_Close' then
-		D.Close()
 	end
 end
 

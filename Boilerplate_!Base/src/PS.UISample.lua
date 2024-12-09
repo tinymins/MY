@@ -50,9 +50,9 @@ X.UI.RegisterRequest('SampleRequest', {
 	GetIcon = function(info, szImage, nFrame)
 		return 'FromIconID', 591
 	end,
-	GetMenu = function()
-		return {}
-	end,
+	-- GetMenu = function()
+	-- 	return {}
+	-- end,
 	OnClear = function()
 		-- Output('Clear!')
 	end,
