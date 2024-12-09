@@ -28,6 +28,7 @@ return {
 	['Ctrl + LClick to distrubute all lootable items to Equipment Boss.'] = '按住Ctrl點擊滑鼠左鍵分配所有物品給散件老闆。',
 	['Click to select Equipment Boss.'] = '點擊選擇散件老闆。',
 
+	['MY_GKP_Chat'] = '金團拍賣',
 	['No Pick up Object, Please confirm that in the Dungeon.'] = '沒有拾取對象，請確認在同一地圖。',
 	['Stop Bidding'] = '拍賣結束',
 	['--- Stop Bidding ---'] = '------  拍賣結束  ------',

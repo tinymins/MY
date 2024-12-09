@@ -22,11 +22,6 @@ end
 
 local Chat = {}
 MY_GKP_Chat = {}
-function MY_GKP_Chat.OnFrameCreate()
-	this:RegisterEvent('DISTRIBUTE_ITEM')
-	this:RegisterEvent('DOODAD_LEAVE_SCENE')
-	this.box = this:Lookup('', 'Box')
-end
 
 function MY_GKP_Chat.OnEvent(szEvent)
 	if szEvent == 'DISTRIBUTE_ITEM' then
@@ -79,7 +74,7 @@ function MY_GKP.DistributionItem()
 	end
 	local szName = string.match(h:Lookup(i + 3):GetText(), '%[(.*)%]')
 	local me     = Station.Lookup('Normal/MY_GKP_Chat')
-	local box    = me:Lookup('', 'Box')
+	local box    = me:Lookup('Wnd_Bg', 'Box')
 	local data   = box.data
 	local aPartyMember = MY_GKPLoot.GetaPartyMember(data.dwDoodadID)
 	local member = aPartyMember(szName)
@@ -93,10 +88,11 @@ end
 function Chat.OpenFrame(item, menu, data)
 	local frame = Chat.GetFrame()
 	if not frame then
-		frame = X.UI.OpenFrame(X.PACKET_INFO.ROOT .. 'MY_GKP/ui/MY_GKP_Chat.ini', 'MY_GKP_Chat')
-		local ui = X.UI(frame):Anchor('CENTER')
+		local ui = X.UI.CreateFrame('MY_GKP_Chat', { w = 500, h = 355, simple = true, text = _L['MY_GKP_Chat'] })
+		frame = ui:Raw()
+		X.UI.AppendFromIni(frame, X.PACKET_INFO.ROOT .. 'MY_GKP/ui/MY_GKP_Chat.ini', 'Wnd_Total', true)
 		ui:Append('WndButton', {
-			x = 380, y = 38,
+			x = 380, y = 5,
 			text = _L['Stop Bidding'],
 			buttonStyle = 'FLAT',
 			onClick = function()
@@ -104,10 +100,12 @@ function Chat.OpenFrame(item, menu, data)
 				X.DelayCall(1000, function() UnRegisterMsgMonitor(Chat.OnMsgArrive) end)
 			end,
 		})
-		ui:Children('#Btn_Close'):Click(Chat.CloseFrame)
+		frame.box = frame:Lookup('Wnd_Bg', 'Box')
+		frame:RegisterEvent('DISTRIBUTE_ITEM')
+		frame:RegisterEvent('DOODAD_LEAVE_SCENE')
 	end
-	local box = frame:Lookup('', 'Box')
-	local txt = frame:Lookup('', 'Text')
+	local box = frame:Lookup('Wnd_Bg', 'Box')
+	local txt = frame:Lookup('Wnd_Bg', 'Text')
 	txt:SetText(X.GetItemNameByItem(item))
 	txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
 	local h = frame:Lookup('WndScroll_Chat'):Lookup('', '')
@@ -127,7 +125,7 @@ function Chat.CloseFrame(bCheck)
 	local frame = Chat.GetFrame()
 	if frame then
 		if type(bCheck) == 'userdata' then
-			local box = frame:Lookup('', 'Box')
+			local box = frame:Lookup('Wnd_Bg', 'Box')
 			local nUiId, nVersion, dwTabType, dwIndex = select(2, box:GetObject())
 			if bCheck.nUiId ~= nUiId or bCheck.nVersion ~= nVersion or bCheck.dwTabType ~= dwTabType or bCheck.dwIndex ~= dwIndex then
 				return
