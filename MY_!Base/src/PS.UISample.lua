@@ -50,9 +50,9 @@ X.UI.RegisterRequest('SampleRequest', {
 	GetIcon = function(info, szImage, nFrame)
 		return 'FromIconID', 591
 	end,
-	GetMenu = function()
-		return {}
-	end,
+	-- GetMenu = function()
+	-- 	return {}
+	-- end,
 	OnClear = function()
 		-- Output('Clear!')
 	end,
@@ -165,6 +165,31 @@ local COMPONENT_SAMPLE = {
 	-- WndScrollWindowBox
 	{'WndSlider', 'WndSlider', { w = 200, h = COMPONENT_H, font = 162, text = 'WndSlider' }},
 	{'WndSlider Sized', 'WndSlider', { w = 600, h = COMPONENT_H, sliderWidth = 400, font = 162, text = 'WndSlider' }},
+	{
+		'WndTabs/WndTab',
+		'WndButton',
+		{
+			w = 100, h = COMPONENT_H, name = 'WndButton_CreateTabs', text = 'Create',
+			onClick = function()
+				local ui = X.UI.CreateFrame('SampleTabsFrame', {
+					w = 800, h = 500,
+					minimize = true,
+					maximize = true,
+					resize = false,
+				})
+				local uiTabs = ui:Append('WndTabs', {
+					x = 0, y = 50,
+					w = 800, h = 35,
+				})
+				for i = 1, 5 do
+					uiTabs:Append('WndTab', {
+						w = 100, h = 35,
+						text = 'SAMPLE-' .. i,
+					})
+				end
+			end,
+		},
+	},
 	-- WndWebCef
 	-- WndWebPage
 	-- WndWindow

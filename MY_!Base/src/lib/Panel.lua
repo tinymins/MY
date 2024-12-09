@@ -12,7 +12,6 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/PS')
 --------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
-local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT ..'ui/PS.ini'
 local IMG_PATH = X.PACKET_INFO.FRAMEWORK_ROOT ..'img/PS.UITex'
 local FRAME_NAME = X.NSFormatString('{$NS}_PS')
 
@@ -31,42 +30,52 @@ function D.Open()
 	if not X.IsInitialized() then
 		return
 	end
-	local frame = X.Panel.GetFrame()
+	local frame = D.GetFrame()
 	if not frame then
-		frame = X.UI.OpenFrame(INI_PATH, FRAME_NAME)
+		frame = X.UI.CreateFrame(FRAME_NAME, {
+			maximize = true,
+			resize = true,
+			minWidth = 400,
+			minHeight = 400,
+			onRemove = function()
+				D.Hide()
+				return true
+			end,
+		}):Raw()
 		frame:Hide()
 		frame.bVisible = false
+		D.InitPanel(frame)
 		X.CheckTutorial()
 	end
 	return frame
 end
 
 function D.Close()
-	local frame = X.Panel.GetFrame()
+	local frame = D.GetFrame()
 	if not frame then
 		return
 	end
-	X.Panel.SwitchTab('Welcome')
-	X.Panel.Hide(false, true)
+	D.SwitchTab('Welcome')
+	D.Hide(false, true)
 	X.UI.CloseFrame(frame)
 end
 
 function D.Reopen()
-	if not X.Panel.IsOpened() then
+	if not D.IsOpened() then
 		return
 	end
-	local bVisible = X.Panel.IsVisible()
-	local szCurrentTabID = X.Panel.GetCurrentTabID()
-	X.Panel.Close()
-	X.Panel.Open()
+	local bVisible = D.IsVisible()
+	local szCurrentTabID = D.GetCurrentTabID()
+	D.Close()
+	D.Open()
 	if szCurrentTabID then
-		X.Panel.SwitchTab(szCurrentTabID)
+		D.SwitchTab(szCurrentTabID)
 	end
-	X.Panel.Toggle(bVisible, true, true)
+	D.Toggle(bVisible, true, true)
 end
 
 function D.Show(bMute, bNoAnimate)
-	local frame = X.Panel.Open()
+	local frame = D.Open()
 	if not frame then
 		return
 	end
@@ -88,11 +97,11 @@ function D.Show(bMute, bNoAnimate)
 		end
 	end
 	frame:BringToTop()
-	X.RegisterEsc(X.PACKET_INFO.NAME_SPACE, X.Panel.IsVisible, function() X.Panel.Hide() end)
+	X.RegisterEsc(X.PACKET_INFO.NAME_SPACE, D.IsVisible, function() D.Hide() end)
 end
 
 function D.Hide(bMute, bNoAnimate)
-	local frame = X.Panel.GetFrame()
+	local frame = D.GetFrame()
 	if not frame then
 		return
 	end
@@ -121,22 +130,22 @@ end
 
 function D.Toggle(bVisible, ...)
 	if bVisible == nil then
-		if X.Panel.IsVisible() then
-			X.Panel.Hide()
+		if D.IsVisible() then
+			D.Hide()
 		else
-			X.Panel.Show()
-			X.Panel.Focus()
+			D.Show()
+			D.Focus()
 		end
 	elseif bVisible then
-		X.Panel.Show(...)
-		X.Panel.Focus()
+		D.Show(...)
+		D.Focus()
 	else
-		X.Panel.Hide(...)
+		D.Hide(...)
 	end
 end
 
 function D.Focus(bForce)
-	local frame = X.Panel.GetFrame()
+	local frame = D.GetFrame()
 	if not frame then
 		return
 	end
@@ -147,12 +156,12 @@ function D.Focus(bForce)
 end
 
 function D.IsVisible()
-	local frame = X.Panel.GetFrame()
+	local frame = D.GetFrame()
 	return frame and frame:IsVisible()
 end
 
 function D.IsOpened()
-	return not not X.Panel.GetFrame()
+	return not not D.GetFrame()
 end
 
 ---------------------------------------------------------------------------------------------
@@ -184,28 +193,26 @@ local function IsTabRestricted(tTab)
 	return false
 end
 
--- X.Panel.SwitchCategory(szCategory)
 function D.SwitchCategory(szCategory)
-	local frame = X.Panel.GetFrame()
+	local frame = D.GetFrame()
 	if not frame then
 		return
 	end
 
-	local container = frame:Lookup('Wnd_Total/WndContainer_Category')
-	local chk = container:GetFirstChild()
-	while(chk and chk.szCategory ~= szCategory) do
-		chk = chk:GetNext()
+	local uiCheckCategory
+	frame.uiCategories:Children('.WndTab'):Each(function(uiCategory)
+		if uiCategory:Data('Category') == szCategory then
+			uiCheckCategory = uiCategory
+		end
+	end)
+	if not uiCheckCategory then
+		uiCheckCategory = frame.uiCategories:Children('.WndTab'):First()
 	end
-	if not chk then
-		chk = container:GetFirstChild()
-	end
-	if chk then
-		chk:Check(true)
-	end
+	uiCheckCategory:Check(true)
 end
 
 function D.SwitchTab(szKey, bForceUpdate)
-	local frame = X.Panel.GetFrame()
+	local frame = D.GetFrame()
 	if not frame then
 		return
 	end
@@ -226,7 +233,7 @@ function D.SwitchTab(szKey, bForceUpdate)
 	end
 	-- 判断主分类是否正确
 	if tTab.szCategory and frame.szCurrentCategoryName ~= tTab.szCategory then
-		X.Panel.SwitchCategory(tTab.szCategory)
+		D.SwitchCategory(tTab.szCategory)
 	end
 	-- 判断标签页是否已激活
 	if frame.szCurrentTabKey == tTab.szKey and not bForceUpdate then
@@ -236,18 +243,14 @@ function D.SwitchTab(szKey, bForceUpdate)
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
 	-- 处理标签页背景选中状态
-	local scrollTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
-	for i = 0, scrollTabs:GetItemCount() - 1 do
-		if scrollTabs:Lookup(i).szKey == szKey then
-			scrollTabs:Lookup(i):Lookup('Image_Tab_Bg_Active'):Show()
-		else
-			scrollTabs:Lookup(i):Lookup('Image_Tab_Bg_Active'):Hide()
-		end
-	end
+	frame.uiTabs:Find('#Wnd_Tab'):Each(function(uiWnd)
+		uiWnd:Children('#Image_Tab_Bg_Active'):Visible(
+			uiWnd:Data('Key') == szKey
+		)
+	end)
 	-- 事件处理、界面绘制
 	-- get main panel
 	local wnd = frame.MAIN_WND
-	local scroll = frame.MAIN_SCROLL
 	-- fire custom registered on switch event
 	if wnd.OnPanelDeactive then
 		local res, err, trace = X.XpCall(wnd.OnPanelDeactive, wnd)
@@ -262,7 +265,7 @@ function D.SwitchTab(szKey, bForceUpdate)
 	wnd.OnPanelBreathe  = nil
 	wnd.OnPanelDeactive = nil
 	-- reset main panel status
-	scroll:SetScrollPos(0)
+	frame.uiMain:Scroll(0)
 	wnd:Clear()
 	wnd:Lookup('', ''):Clear()
 	wnd:SetContainerType(X.UI.WND_CONTAINER_STYLE.CUSTOM)
@@ -283,13 +286,13 @@ function D.SwitchTab(szKey, bForceUpdate)
 end
 
 function D.RedrawTab(szKey)
-	if X.Panel.GetCurrentTabID() == szKey then
-		X.Panel.SwitchTab(szKey, true)
+	if D.GetCurrentTabID() == szKey then
+		D.SwitchTab(szKey, true)
 	end
 end
 
 function D.GetCurrentTabID()
-	local frame = X.Panel.GetFrame()
+	local frame = D.GetFrame()
 	if not frame then
 		return
 	end
@@ -382,13 +385,75 @@ end
 ---------------------------------------------------------------------------------------------
 -- 窗口函数
 ---------------------------------------------------------------------------------------------
+
+function D.InitPanel(frame)
+	local ui = X.UI(frame)
+	frame.uiCategories = ui:Append('WndTabs', {
+		x = 0, y = 49,
+		w = 960, h = 30,
+	})
+	frame.uiBtnAbout = ui:Append('WndButton', {
+		x = 796, y = X.UI.IS_GLASSMORPHISM and 53 or 46,
+		w = 140, h = X.UI.IS_GLASSMORPHISM and 25 or 40,
+		buttonStyle = 'FLAT_RADIUS',
+		text = _L('Author @%s', X.PACKET_INFO.AUTHOR_FEEDBACK),
+		onClick = function()
+			X.OpenBrowser(X.PACKET_INFO.AUTHOR_FEEDBACK_URL)
+		end,
+	})
+	frame.uiBtnAboutIcon = ui:Append('Image', {
+		x = 796, y = 5, w = 80, h = 80,
+		image = X.PACKET_INFO.LOGO_IMAGE,
+		imageFrame = X.PACKET_INFO.LOGO_MAIN_FRAME,
+	})
+	frame.uiTabs = ui:Append('WndScrollWindowBox', {
+		name = 'WndScrollWindowBox_Tabs',
+		x = 15, y = 91,
+		w = 183, h = 520,
+		padding = 0,
+		image = 'NULL',
+		containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP,
+	})
+	if X.UI.IS_GLASSMORPHISM then
+		frame.uiImageTabsSplitter = ui:Append('Image', {
+			x = 195, y = 93, w = 3, h = 518,
+			image = 'ui\\Image\\UItimate\\UICommon\\Common.UITex',
+			imageFrame = 7,
+		})
+	else
+		frame.uiImageTabsSplitter = ui:Append('Image', {
+			x = 195, y = 93, w = 6, h = 518,
+			image = 'ui\\Image\\UICommon\\CommonPanel.UITex',
+			imageFrame = 43,
+		})
+	end
+	frame.uiMain = ui:Append('WndScrollWindowBox', {
+		name = 'WndScrollWindowBox_Main',
+		x = 213, y = 91,
+		w = 746, h = 520,
+		padding = 0,
+		image = 'NULL',
+		containerType = X.UI.WND_CONTAINER_STYLE.LEFT_TOP,
+	})
+	frame.MAIN_WND = frame.uiMain:Raw():Lookup('WndContainer_Scroll')
+	ui:Text(_L('%s v%s Build %s', X.PACKET_INFO.NAME, X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD))
+	ui:Find('#Text_Author'):Text('-- by ' .. X.PACKET_INFO.AUTHOR_SIGNATURE)
+	X.UI(frame):Size(D.OnSizeChange)
+	D.RedrawCategory(frame)
+	local fScale = 1 + math.max(Font.GetOffset() * 0.03, 0)
+	D.ResizePanel(frame, 980 * fScale, 640 * fScale)
+	frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+	frame:CorrectPos()
+	frame:RegisterEvent('UI_SCALED')
+end
+
 function D.ResizePanel(frame, nWidth, nHeight)
 	X.UI(frame):Size(nWidth, nHeight)
 end
 
 function D.RedrawCategory(frame, szCategory)
-	local container = frame:Lookup('Wnd_Total/WndContainer_Category')
-	container:Clear()
+	frame.uiCategories:Clear()
+	frame.uiCategories:Append('WndWindow', { w = 20, h = 30 })
 	for _, tCategory in ipairs(PANEL_CATEGORY_LIST) do
 		local bExist = false
 		for _, tTab in ipairs(PANEL_TAB_LIST) do
@@ -398,43 +463,92 @@ function D.RedrawCategory(frame, szCategory)
 			end
 		end
 		if bExist then
-			local chkCategory = container:AppendContentFromIni(INI_PATH, 'CheckBox_Category')
-			if X.UI.IS_GLASSMORPHISM then
-				chkCategory:Lookup('', 'Image_CategorySplitter'):Hide()
-				chkCategory:SetAnimation('ui\\Image\\denglu\\Sign1.UITex', 99, 30, 99, 99, 30, 30, 30, 29, 99, 99)
-			end
-			if not szCategory then
-				szCategory = tCategory.szName
-			end
-			chkCategory.szCategory = tCategory.szName
-			chkCategory:Lookup('', 'Text_Category'):SetText(tCategory.szName)
+			local uiTab = frame.uiCategories:Append('WndTab', {
+				w = 100, h = 30,
+				text = tCategory.szName,
+				onCheck = function()
+					frame.szCurrentCategoryName = tCategory.szName
+					PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+					D.RedrawTabs(frame, tCategory.szName)
+				end,
+			})
+			uiTab:Data('Category', tCategory.szName)
 		end
 	end
-	container:FormatAllContentPos()
-	X.Panel.SwitchCategory(szCategory)
+	D.SwitchCategory(szCategory)
 end
 
 function D.RedrawTabs(frame, szCategory)
-	local scroll = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
-	scroll:Clear()
+	frame.uiTabs:Clear()
 	for _, tTab in ipairs(PANEL_TAB_LIST) do
 		if tTab.szCategory == szCategory and not tTab.bHide and not IsTabRestricted(tTab) then
-			local hTab = scroll:AppendItemFromIni(INI_PATH, 'Handle_Tab')
-			hTab.szKey = tTab.szKey
-			hTab:Lookup('Text_Tab'):SetText(tTab.szName)
-			if tTab.szIconTex == 'FromIconID' then
-				hTab:Lookup('Image_TabIcon'):FromIconID(tTab.dwIconFrame)
-			elseif tTab.dwIconFrame then
-				hTab:Lookup('Image_TabIcon'):FromUITex(tTab.szIconTex, tTab.dwIconFrame)
+			local uiTab = frame.uiTabs:Append('WndWindow', {
+				name = 'Wnd_Tab',
+				w = 168, h = X.UI.IS_GLASSMORPHISM and 35 or 52,
+				onHover = function(bIn)
+					X.UI(this):Fetch('Image_Tab_Bg_Hover'):Visible(bIn)
+				end,
+				onClick = function()
+					D.SwitchTab(tTab.szKey)
+				end,
+			})
+			local uiIcon
+			if X.UI.IS_GLASSMORPHISM then
+				uiTab:Append('Image', {
+					name = 'Image_Tab_Bg',
+					x = 0, y = 0, w = 168, h = 34,
+					image = 'ui\\Image\\UItimate\\UICommon\\Button9.UITex', imageFrame = 0,
+				})
+				uiTab:Append('Image', {
+					name = 'Image_Tab_Bg_Active',
+					x = 0, y = 0, w = 168, h = 34, visible = tTab.szKey == frame.szCurrentTabKey,
+					image = 'ui\\Image\\UItimate\\UICommon\\Button9.UITex', imageFrame = 2,
+				})
+				uiTab:Append('Image', {
+					name = 'Image_Tab_Bg_Hover',
+					x = 0, y = 0, w = 168, h = 34, visible = false,
+					image = 'ui\\Image\\UItimate\\UICommon\\Button9.UITex', imageFrame = 1,
+				})
+				uiTab:Append('Text', {
+					name = 'Text_Tab',
+					x = 36, y = 3, w = 128, h = 32,
+					text = tTab.szName,
+				})
+				uiIcon = uiTab:Append('Image', { name = 'Image_TabIcon', x = 5, y = 5, w = 28, h = 28 })
 			else
-				hTab:Lookup('Image_TabIcon'):FromTextureFile(tTab.szIconTex)
+				uiTab:Append('Image', {
+					name = 'Image_Tab_Bg',
+					x = 0, y = 0, w = 168, h = 50,
+					image = IMG_PATH, imageFrame = 0,
+				})
+				uiTab:Append('Image', {
+					name = 'Image_Tab_Bg_Active',
+					x = 0, y = 0, w = 168, h = 50, visible = tTab.szKey == frame.szCurrentTabKey,
+					image = IMG_PATH, imageFrame = 1,
+				})
+				uiTab:Append('Image', {
+					name = 'Image_Tab_Bg_Hover',
+					x = 0, y = 0, w = 168, h = 50, visible = false,
+					image = IMG_PATH, imageFrame = 2,
+				})
+				uiTab:Append('Text', {
+					name = 'Text_Tab',
+					x = 66, y = 16, w = 97, h = 20,
+					text = tTab.szName,
+				})
+				uiIcon = uiTab:Append('Image', { x = 15, y = 7, w = 38, h = 38 })
 			end
-			hTab:Lookup('Image_Tab_Bg'):FromUITex(IMG_PATH, 0)
-			hTab:Lookup('Image_Tab_Bg_Active'):FromUITex(IMG_PATH, 1)
-			hTab:Lookup('Image_Tab_Bg_Hover'):FromUITex(IMG_PATH, 2)
+			if tTab.szIconTex == 'FromIconID' then
+				uiIcon:Icon(tTab.dwIconFrame)
+			elseif tTab.dwIconFrame then
+				uiIcon:Image(tTab.szIconTex, tTab.dwIconFrame)
+			else
+				uiIcon:Image(tTab.szIconTex)
+			end
+			uiTab:Data('Key', tTab.szKey)
 		end
 	end
-	scroll:FormatAllItemPos()
+
 	local tWelcomeTab
 	for _, tTab in ipairs(PANEL_TAB_LIST) do
 		if tTab.szCategory == szCategory and tTab.bWelcome and not IsTabRestricted(tTab) then
@@ -451,7 +565,7 @@ function D.RedrawTabs(frame, szCategory)
 		end
 	end
 	if tWelcomeTab then
-		X.Panel.SwitchTab(tWelcomeTab.szKey, true)
+		D.SwitchTab(tWelcomeTab.szKey, true)
 	end
 end
 
@@ -462,41 +576,19 @@ function D.OnSizeChange()
 	end
 	-- fix size
 	local nWidth, nHeight = frame:GetSize()
-	local hTotal = frame:Lookup('', '')
-	hTotal:Lookup('Text_Author'):SetRelY(nHeight - 25 - 30)
-	hTotal:FormatAllItemPos()
-	local wnd = frame:Lookup('Wnd_Total')
-	wnd:Lookup('WndContainer_Category'):SetSize(nWidth - 22, 32)
-	wnd:Lookup('WndContainer_Category'):FormatAllContentPos()
-	wnd:Lookup('Btn_Weibo'):SetRelPos(nWidth - 135, 55)
-	wnd:Lookup('WndScroll_Tabs'):SetSize(171, nHeight - 102)
-	wnd:Lookup('WndScroll_Tabs', ''):SetSize(171, nHeight - 102)
-	wnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
-	wnd:Lookup('WndScroll_Tabs/ScrollBar_Tabs'):SetSize(16, nHeight - 111)
-
-	local hWndTotal = wnd:Lookup('', '')
-	wnd:Lookup('', ''):SetSize(nWidth, nHeight)
-	hWndTotal:Lookup('Image_Breaker'):SetSize(6, nHeight - 340)
-	hWndTotal:Lookup('Image_TabBg'):SetW(nWidth - 2)
-	hWndTotal:Lookup('Image_Glassmorphism_TabBg'):SetW(nWidth - 2)
-	hWndTotal:Lookup('Handle_DBClick'):SetSize(nWidth, 54)
-
 	local bHideTabs = nWidth < 550
-	wnd:Lookup('WndScroll_Tabs'):SetVisible(not bHideTabs)
-	hWndTotal:Lookup('Image_Breaker'):SetVisible(not bHideTabs)
+	local nMainWidth = bHideTabs and (nWidth - 10) or (nWidth - 225)
+	local nMainHeight = nHeight - 100
+	frame.uiCategories:Width(nWidth)
+	frame.uiBtnAbout:Left(nWidth - 160)
+	frame.uiBtnAboutIcon:Left(nWidth - 160)
+	frame.uiTabs:Height(nMainHeight)
+	frame.uiTabs:Visible(not bHideTabs)
+	frame.uiImageTabsSplitter:Height(nHeight - 106)
+	frame.uiImageTabsSplitter:Visible(not bHideTabs)
+	frame.uiMain:Left(bHideTabs and 5 or 213)
+	frame.uiMain:Size(nMainWidth, nMainHeight)
 
-	if bHideTabs then
-		nWidth = nWidth + 181
-		wnd:Lookup('WndScroll_MainPanel'):SetRelX(5)
-	else
-		wnd:Lookup('WndScroll_MainPanel'):SetRelX(186)
-	end
-
-	wnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 191, nHeight - 100)
-	frame.MAIN_SCROLL:SetSize(20, nHeight - 100)
-	frame.MAIN_SCROLL:SetRelPos(nWidth - 209, 0)
-	frame.MAIN_WND:SetSize(nWidth - 201, nHeight - 100)
-	frame.MAIN_HANDLE:SetSize(nWidth - 201, nHeight - 100)
 	local hWndMainPanel = frame.MAIN_WND
 	if hWndMainPanel.OnPanelResize then
 		local res, err, trace = X.XpCall(hWndMainPanel.OnPanelResize, hWndMainPanel)
@@ -526,11 +618,16 @@ function D.OnSizeChange()
 	frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
 end
 
-function D.OnItemLButtonDBClick()
-	local name = this:GetName()
-	if name == 'Handle_DBClick' then
-		this:GetRoot():Lookup('CheckBox_Maximize'):ToggleCheck()
+function D.OnPanelScroll()
+	local wnd = this:GetRoot().MAIN_WND
+	if not wnd.OnPanelScroll then
+		return
 	end
+	local scale = Station.GetUIScale()
+	local scrollX, scrollY = wnd:GetStartRelPos()
+	scrollX = scrollX == 0 and 0 or -scrollX / scale
+	scrollY = scrollY == 0 and 0 or -scrollY / scale
+	wnd.OnPanelScroll(wnd, scrollX, scrollY)
 end
 
 function D.OnMouseWheel()
@@ -544,127 +641,6 @@ function D.OnMouseWheel()
 	return true
 end
 
-function D.OnLButtonClick()
-	local name = this:GetName()
-	if name == 'Btn_Close' then
-		X.Panel.Close()
-	elseif name == 'Btn_Weibo' then
-		X.OpenBrowser(X.PACKET_INFO.AUTHOR_FEEDBACK_URL)
-	end
-end
-
-function D.OnItemLButtonClick()
-	local name = this:GetName()
-	if name == 'Handle_Tab' then
-		X.Panel.SwitchTab(this.szKey)
-	end
-end
-
-function D.OnCheckBoxCheck()
-	local name = this:GetName()
-	if name == 'CheckBox_Category' then
-		local frame = this:GetRoot()
-		local container = this:GetParent()
-		local el = container:GetFirstChild()
-		while el do
-			if el ~= this then
-				el:Check(false)
-			end
-			el = el:GetNext()
-		end
-		frame.szCurrentCategoryName = this.szCategory
-		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
-		D.RedrawTabs(frame, this.szCategory)
-	elseif name == 'CheckBox_Maximize' then
-		local frame = this:GetRoot()
-		local ui = X.UI(frame)
-		frame.tMaximizeAnchor = ui:Anchor()
-		frame.nMaximizeW, frame.nMaximizeH = ui:Size()
-		ui:Pos(0, 0)
-			:Event('UI_SCALED', 'FRAME_MAXIMIZE_RESIZE', function()
-				ui:Size(Station.GetClientSize())
-			end)
-			:Drag(false)
-		D.ResizePanel(frame, Station.GetClientSize())
-	end
-end
-
-function D.OnCheckBoxUncheck()
-	local name = this:GetName()
-	if name == 'CheckBox_Maximize' then
-		local frame = this:GetRoot()
-		D.ResizePanel(frame, frame.nMaximizeW, frame.nMaximizeH)
-		X.UI(this:GetRoot())
-			:Event('UI_SCALED', 'FRAME_MAXIMIZE_RESIZE', false)
-			:Drag(true)
-			:Anchor(frame.tMaximizeAnchor)
-	end
-end
-
-function D.OnDragButtonBegin()
-	local name = this:GetName()
-	if name == 'Btn_Drag' then
-		this.fDragX, this.fDragY = Station.GetMessagePos()
-		this.fDragW, this.fDragH = X.UI(this:GetRoot()):Size()
-	end
-end
-
-function D.OnDragButton()
-	local name = this:GetName()
-	if name == 'Btn_Drag' then
-		HideTip()
-		local nX, nY = Station.GetMessagePos()
-		local nDeltaX, nDeltaY = nX - this.fDragX, nY - this.fDragY
-		local nW = math.max(this.fDragW + nDeltaX, 500)
-		local nH = math.max(this.fDragH + nDeltaY, 300)
-		D.ResizePanel(this:GetRoot(), nW, nH)
-	end
-end
-
-function D.OnFrameCreate()
-	if X.UI.IS_GLASSMORPHISM then
-		this:Lookup('', 'Image_BgTL_Conner'):Hide()
-		this:Lookup('', 'Image_BgTR_Conner'):Hide()
-		this:Lookup('', 'Image_BgTL_Flex'):Hide()
-		this:Lookup('', 'Image_BgTR_Flex'):Hide()
-		this:Lookup('', 'Image_BgTL_Center'):Hide()
-		this:Lookup('', 'Image_BgTR_Center'):Hide()
-		this:Lookup('', 'Image_BgBL'):Hide()
-		this:Lookup('', 'Image_BgBC'):Hide()
-		this:Lookup('', 'Image_BgBR'):Hide()
-		this:Lookup('', 'Image_BgCL'):Hide()
-		this:Lookup('', 'Image_BgCC'):Hide()
-		this:Lookup('', 'Image_BgCR'):Hide()
-		this:Lookup('', 'Text_Title'):SetRelY(7)
-		this:Lookup('WndContainer_TitleBtnR'):SetRelY(7)
-		this:Lookup('Wnd_Total', 'Image_TabBg'):Hide()
-		this:Lookup('Wnd_Total/WndContainer_Category'):SetRelY(47)
-		this:Lookup('Wnd_Total/WndContainer_Category', 'Image_CategorySplitterL'):Hide()
-	else
-		this:Lookup('', 'Image_Glassmorphism'):Hide()
-		this:Lookup('', 'Image_Glassmorphism_Bg'):Hide()
-		this:Lookup('', 'Image_Glassmorphism_Title_Bg'):Hide()
-		this:Lookup('', 'Image_Glassmorphism_Title_TextureL'):Hide()
-		this:Lookup('', 'Image_Glassmorphism_Title_TextureR'):Hide()
-		this:Lookup('Wnd_Total', 'Image_Glassmorphism_TabBg'):Hide()
-	end
-	this.MAIN_SCROLL = this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
-	this.MAIN_WND = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
-	this.MAIN_HANDLE = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel', '')
-	local fScale = 1 + math.max(Font.GetOffset() * 0.03, 0)
-	this:Lookup('', 'Text_Title'):SetText(_L('%s v%s Build %s', X.PACKET_INFO.NAME, X.PACKET_INFO.VERSION, X.PACKET_INFO.BUILD))
-	this:Lookup('', 'Text_Author'):SetText('-- by ' .. X.PACKET_INFO.AUTHOR_SIGNATURE)
-	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L('Author @%s', X.PACKET_INFO.AUTHOR_FEEDBACK))
-	this:Lookup('Wnd_Total/Btn_Weibo', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_IMAGE, X.PACKET_INFO.LOGO_MAIN_FRAME)
-	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
-	X.UI(this):Size(D.OnSizeChange)
-	D.RedrawCategory(this)
-	D.ResizePanel(this, 960 * fScale, 630 * fScale)
-	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-	this:CorrectPos()
-	this:RegisterEvent('UI_SCALED')
-end
-
 function D.OnFrameBreathe()
 	if this.MAIN_WND and this.MAIN_WND.OnPanelBreathe then
 		X.Call(this.MAIN_WND.OnPanelBreathe, this.MAIN_WND)
@@ -673,23 +649,14 @@ end
 
 function D.OnEvent(event)
 	if event == 'UI_SCALED' then
-		X.ExecuteWithThis(this.MAIN_SCROLL, X.OnScrollBarPosChanged)
 		D.OnSizeChange()
+		D.OnPanelScroll()
 	end
 end
 
 function D.OnScrollBarPosChanged()
-	local name = this:GetName()
-	if name == 'ScrollBar_MainPanel' then
-		local wnd = this:GetRoot().MAIN_WND
-		if not wnd.OnPanelScroll then
-			return
-		end
-		local scale = Station.GetUIScale()
-		local scrollX, scrollY = wnd:GetStartRelPos()
-		scrollX = scrollX == 0 and 0 or -scrollX / scale
-		scrollY = scrollY == 0 and 0 or -scrollY / scale
-		wnd.OnPanelScroll(wnd, scrollX, scrollY)
+	if this:GetParent():GetName() == 'WndScrollWindowBox_Main' then
+		D.OnPanelScroll()
 	end
 end
 

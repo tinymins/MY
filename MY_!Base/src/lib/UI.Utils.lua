@@ -13,6 +13,69 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/UI.Utils')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
+function X.UI.GetFreeTempFrameName()
+	local nTempFrame = 0
+	local szTempFrame
+	repeat
+		szTempFrame = X.NSFormatString('{$NS}_TempWnd#') .. nTempFrame
+		nTempFrame = nTempFrame + 1
+	until not Station.SearchFrame(szTempFrame)
+	return szTempFrame
+end
+
+function X.UI.RecursiveLookup(hEl, szName)
+	if hEl:GetName() == szName then
+		return hEl
+	end
+	if hEl:GetBaseType() == 'Wnd' then
+		local hChild = hEl:GetFirstChild()
+		while hChild do
+			local hFind = X.UI.RecursiveLookup(hChild, szName)
+			if hFind then
+				return hFind
+			end
+			hChild = hChild:GetNext()
+		end
+		local hHandle = hEl:Lookup('', '')
+		if hHandle then
+			local hFind = X.UI.RecursiveLookup(hHandle, szName)
+			if hFind then
+				return hFind
+			end
+		end
+	elseif hEl:GetType() == 'Handle' then
+		for i = 0, hEl:GetItemCount() - 1 do
+			local hFind = X.UI.RecursiveLookup(hEl:Lookup(i), szName)
+			if hFind then
+				return hFind
+			end
+		end
+	end
+end
+
+function X.UI.AppendFromIni(hParent, szIni, szName, bOnlyChild)
+	local szParentBaseType = hParent:GetBaseType()
+	if szParentBaseType ~= 'Wnd' then
+		return
+	end
+	local hFrame = X.UI.OpenFrame(szIni, X.UI.GetFreeTempFrameName())
+	local hEl = X.UI.RecursiveLookup(hFrame, szName)
+	if hEl and hEl:GetBaseType() == szParentBaseType then
+		if bOnlyChild then
+			while true do
+				local hChild = hEl:GetFirstChild()
+				if not hChild then
+					break
+				end
+				hChild:ChangeRelation(hParent, true, true)
+			end
+		else
+			hEl:ChangeRelation(hParent, true, true)
+		end
+	end
+	Wnd.CloseWindow(hFrame)
+end
+
 function X.UI.GetFrameAnchor(...)
 	return GetFrameAnchor(...)
 end
@@ -199,6 +262,77 @@ function X.UI.FormatUIEventMask(stopPropagation, callFrameBinding)
 		ret = ret + 2 --10
 	end
 	return ret
+end
+
+-- 设置按钮控件图素
+---@param hWndCheckBox userdata @按钮框控件句柄
+---@param szImagePath string @图素地址
+---@param nNormal number @正常状态下图素
+---@param nMouseOver number @鼠标划过时图素
+---@param nMouseDown number @鼠标按下时图素
+---@param nDisable number @禁用时图素
+function X.UI.SetButtonUITex(
+	hButton,
+	szImagePath,
+	nNormal,
+	nMouseOver,
+	nMouseDown,
+	nDisable
+)
+	hButton:SetAnimatePath(szImagePath)
+	hButton:SetAnimateGroupNormal(nNormal)
+	hButton:SetAnimateGroupMouseOver(nMouseOver)
+	hButton:SetAnimateGroupMouseDown(nMouseDown)
+	hButton:SetAnimateGroupDisable(nDisable)
+end
+
+-- 设置复选框控件图素
+-- 分为两个维度：(未勾选, 勾选) x (正常, 划过, 按下, 禁用)
+---@param hWndCheckBox userdata @复选框控件句柄
+---@param szImagePath string @图素地址
+---@param nUnCheckAndEnable number @未选中、启用状态时图素（未勾选+正常）
+---@param nUncheckedAndEnableWhenMouseOver number @未选中、启用状态时鼠标移入时图素（未勾选+划过）
+---@param nChecking number @未选中、按下时图素（未勾选+按下）
+---@param nUnCheckAndDisable number @未选中、禁用状态时图素（未勾选+禁用）
+---@param nCheckAndEnable number @选中、启用状态时图素（勾选+正常）
+---@param nCheckedAndEnableWhenMouseOver number @选中、启用状态时鼠标移入时图素（勾选+划过）
+---@param nUnChecking number @选中、按下时图素（勾选+按下）
+---@param nCheckAndDisable number @选中、禁用状态时图素（勾选+禁用）
+---@param nUncheckedAndDisableWhenMouseOver? number @未选中、禁用状态时鼠标移入时图素，默认取未选中、禁用状态时图素
+---@param nCheckedAndDisableWhenMouseOver? number @选中、禁用状态时鼠标移入时图素，默认取选中、禁用状态时图素
+function X.UI.SetCheckBoxUITex(
+	hWndCheckBox,
+	szImagePath,
+	nUnCheckAndEnable,
+	nUncheckedAndEnableWhenMouseOver,
+	nChecking,
+	nUnCheckAndDisable,
+	nCheckAndEnable,
+	nCheckedAndEnableWhenMouseOver,
+	nUnChecking,
+	nCheckAndDisable,
+	nUncheckedAndDisableWhenMouseOver,
+	nCheckedAndDisableWhenMouseOver
+)
+	if not nUncheckedAndDisableWhenMouseOver then
+		nUncheckedAndDisableWhenMouseOver = nUnCheckAndDisable
+	end
+	if not nCheckedAndDisableWhenMouseOver then
+		nCheckedAndDisableWhenMouseOver = nCheckAndDisable
+	end
+	return hWndCheckBox:SetAnimation(
+		szImagePath,
+		nUnCheckAndEnable,
+		nCheckAndEnable,
+		nUnCheckAndDisable,
+		nCheckAndDisable,
+		nChecking,
+		nUnChecking,
+		nCheckedAndEnableWhenMouseOver,
+		nUncheckedAndEnableWhenMouseOver,
+		nCheckedAndDisableWhenMouseOver,
+		nUncheckedAndDisableWhenMouseOver
+	)
 end
 
 X.UI.UpdateItemInfoBoxObject = _G.UpdateItemInfoBoxObject or UpdataItemInfoBoxObject

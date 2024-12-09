@@ -256,7 +256,20 @@ if X.UI.IS_GLASSMORPHISM then
 		nMouseDownGroup = 34,
 		nDisableGroup = 35,
 	}
-	BUTTON_STYLE_CONFIG.FLAT_RADIUS = BUTTON_STYLE_CONFIG.DEFAULT
+	BUTTON_STYLE_CONFIG.FLAT_RADIUS = {
+		nWidth = 100,
+		nHeight = 26,
+		nMarginBottom = 0,
+		nPaddingTop = 0,
+		nPaddingRight = 10,
+		nPaddingBottom = 0,
+		nPaddingLeft = 10,
+		szImage = 'ui\\Image\\UItimate\\UICommon\\Plugins.UITex',
+		nNormalGroup = 0,
+		nMouseOverGroup = 1,
+		nMouseDownGroup = 2,
+		nDisableGroup = 3,
+	}
 end
 local function GetButtonStyleName(raw)
 	local szImage = X.StringLowerW(raw:GetAnimatePath())
@@ -275,6 +288,14 @@ local function GetButtonStyleName(raw)
 	end
 end
 local function GetButtonStyleConfig(eButtonStyle)
+	if X.IsTable(eButtonStyle)
+	and eButtonStyle.szImage
+	and eButtonStyle.nNormalGroup
+	and eButtonStyle.nMouseOverGroup
+	and eButtonStyle.nMouseDownGroup
+	and eButtonStyle.nDisableGroup then
+		return eButtonStyle
+	end
 	local GetStyleConfig = X.Get(_G, {X.NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleConfig'})
 	return X.IsFunction(GetStyleConfig)
 		and GetStyleConfig(eButtonStyle)
@@ -340,6 +361,8 @@ local function ApplyUIArguments(ui, arg)
 		if arg.buttonStyle        ~= nil then ui:ButtonStyle      (arg.buttonStyle                                 ) end -- must before :Size()
 		if arg.editType           ~= nil then ui:EditType         (arg.editType                                    ) end
 		if arg.appearance         ~= nil then ui:Appearance       (arg.appearance                                  ) end
+		if arg.frameLeftControl   ~= nil then ui:FrameLeftControl (arg.frameLeftControl                            ) end
+		if arg.frameRightControl  ~= nil then ui:FrameRightControl(arg.frameRightControl                           ) end
 		if arg.visible            ~= nil then ui:Visible          (arg.visible                                     ) end
 		if arg.autoVisible        ~= nil then ui:Visible          (arg.autoVisible                                 ) end
 		if arg.enable             ~= nil then ui:Enable           (arg.enable                                      ) end
@@ -358,6 +381,10 @@ local function ApplyUIArguments(ui, arg)
 		if arg.sort or arg.sortOrder     then ui:Sort             (arg.sort, arg.sortOrder                         ) end
 		if arg.dataSource                then ui:DataSource       (arg.dataSource                                  ) end
 		if arg.summary                   then ui:Summary          (arg.summary                                     ) end
+		if arg.padding ~= nil            then ui:Padding        (arg.padding, arg.padding, arg.padding, arg.padding) end
+		if arg.paddingTop ~= nil or arg.paddingRight ~= nil or arg.paddingBottom ~= nil or arg.paddingLeft ~= nil then
+			ui:Padding(arg.paddingTop, arg.paddingRight, arg.paddingBottom, arg.paddingLeft)
+		end
 		if arg.sliderWidth ~= nil or arg.sliderHeight ~= nil then -- must after :Text() because w/h can be 'auto', must before :Size() because size depends on this
 			ui:SliderSize(arg.sliderWidth, arg.sliderHeight)
 		end
@@ -497,6 +524,8 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll')
 		elseif componentType == 'Handle' or componentType == 'CheckBox' or componentType == 'ColorBox' then
 			element = raw
+		elseif componentType == 'WndTabs' then
+			return
 		elseif componentBaseType == 'Wnd' then
 			local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 			if wnd then
@@ -510,9 +539,14 @@ local function GetComponentElement(raw, elementType)
 			element = GetComponentElement(raw, 'MAIN_HANDLE')
 		elseif componentType == 'WndScrollWindowBox' then
 			element = GetComponentElement(raw, 'CONTAINER')
+		elseif componentType == 'WndTabs' then
+			element = raw
 		end
 	elseif elementType == 'CHECKBOX' then -- 获取复选框UI实例
-		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' or componentType == 'CheckBox' then
+		if componentType == 'WndCheckBox'
+		or componentType == 'WndRadioBox'
+		or componentType == 'WndTab'
+		or componentType == 'CheckBox' then
 			element = raw
 		end
 	elseif elementType == 'COMBO_BOX' then -- 获取下拉框UI实例
@@ -523,6 +557,8 @@ local function GetComponentElement(raw, elementType)
 		if componentType == 'WndScrollWindowBox' then
 			element = raw:Lookup('WndContainer_Scroll')
 		elseif componentType == 'WndContainer' then
+			element = raw
+		elseif componentType == 'WndTabs' then
 			element = raw
 		end
 	elseif elementType == 'EDIT' then -- 获取输入框UI实例
@@ -562,6 +598,8 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll/Text_Default')
 		elseif componentType == 'WndFrame' then
 			element = raw:Lookup('', 'Text_Title') or raw:Lookup('', 'Text_Default')
+		elseif componentType == 'WndTab' then
+			element = raw:Lookup('', 'Text_WndTab')
 		elseif componentType == 'Handle' or componentType == 'CheckBox' or componentType == 'ColorBox' then
 			element = raw:Lookup('Text_Default')
 		elseif componentType == 'Text' then
@@ -1791,6 +1829,34 @@ local function InitComponent(raw, szType)
 			scrollY:ScrollNext(Station.GetMessageWheelDelta() * 10)
 			return 1
 		end
+	elseif szType == 'WndTabs' then
+		if X.UI.IS_GLASSMORPHISM then
+			raw:Lookup('', 'Image_WndTabs_Classic_Bg'):Hide()
+			raw:Lookup('', 'Image_WndTabs_Classic_SplitterL'):Hide()
+		else
+			raw:Lookup('', 'Image_WndTabs_Glassmorphism_Bg'):Hide()
+		end
+	elseif szType == 'WndTab' then
+		if X.UI.IS_GLASSMORPHISM then
+			raw:Lookup('', 'Image_WndTab_Splitter'):Hide()
+			raw:SetAnimation('ui\\Image\\UItimate\\UICommon\\Button4.UITex', 14, 20, 14, 14, 20, 20, 20, 19, 14, 14)
+		end
+		X.UI(raw):UIEvent('OnLButtonUp', function()
+			if not this:IsEnabled() or not this:IsMouseIn() then
+				return
+			end
+			local group = GetComponentProp(this, 'group')
+			local p = this:GetParent():GetFirstChild()
+			while p do
+				if p ~= this and GetComponentType(p) == 'WndTab' then
+					local g = GetComponentProp(p, 'group')
+					if g == group and p:IsCheckBoxChecked() then
+						p:Check(false)
+					end
+				end
+				p = p:GetNext()
+			end
+		end)
 	elseif szType == 'CheckBox' then
 		raw:RegisterEvent(831)
 		local function UpdateCheckState(raw)
@@ -2405,7 +2471,7 @@ end
 
 -- xml string
 local _tItemXML = {
-	['Text'] = '<text>w=150 h=30 valign=1 font=162 eventid=371 </text>',
+	['Text'] = '<text>w=150 h=30 valign=1 font=162 autoetc=1 showall=0 </text>',
 	['Image'] = '<image>w=100 h=100 </image>',
 	['Box'] = '<box>w=48 h=48 eventid=525311 </box>',
 	['Shadow'] = '<shadow>w=15 h=15 eventid=277 </shadow>',
@@ -2450,6 +2516,7 @@ function OO:Append(arg0, arg1)
 				for i = startIndex, h:GetItemCount() - 1 do
 					el = h:Lookup(i)
 					if szType then
+						el:SetName(szType)
 						InitComponent(el, szType)
 					end
 					ui = ui:Add(el)
@@ -2527,13 +2594,14 @@ end
 function OO:Clear()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
-		if raw.Clear then
-			raw:Clear()
+		local h = GetComponentElement(raw, 'MAIN_HANDLE')
+		if h then
+			h:Clear()
+			h:FormatAllItemPos()
 		end
-		raw = GetComponentElement(raw, 'MAIN_HANDLE')
-		if raw then
-			raw:Clear()
-			raw:FormatAllItemPos()
+		local h = GetComponentElement(raw, 'MAIN_CONTAINER')
+		if h then
+			h:Clear()
 		end
 	end
 	return self
@@ -4242,61 +4310,69 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hnd = raw:Lookup('', '')
 		-- 处理窗口背景自适应缩放
-		local imgGlassmorphism = hnd:Lookup('Image_Glassmorphism')
-		local imgGlassmorphismBg = hnd:Lookup('Image_Glassmorphism_Bg')
-		local imgGlassmorphismTitleBg = hnd:Lookup('Image_Glassmorphism_Title_Bg')
-		local imgGlassmorphismTitleTextureL = hnd:Lookup('Image_Glassmorphism_Title_TextureL')
-		local imgGlassmorphismTitleTextureR = hnd:Lookup('Image_Glassmorphism_Title_TextureR')
-		local imgBgTLConner = hnd:Lookup('Image_BgTL_Conner')
-		local imgBgTRConner = hnd:Lookup('Image_BgTR_Conner')
-		local imgBgTLFlex = hnd:Lookup('Image_BgTL_Flex')
-		local imgBgTRFlex = hnd:Lookup('Image_BgTR_Flex')
-		local imgBgTLCenter = hnd:Lookup('Image_BgTL_Center')
-		local imgBgTRCenter = hnd:Lookup('Image_BgTR_Center')
-		local imgBgBL = hnd:Lookup('Image_BgBL')
-		local imgBgBC = hnd:Lookup('Image_BgBC')
-		local imgBgBR = hnd:Lookup('Image_BgBR')
-		local imgBgCL = hnd:Lookup('Image_BgCL')
-		local imgBgCC = hnd:Lookup('Image_BgCC')
-		local imgBgCR = hnd:Lookup('Image_BgCR')
-		if imgGlassmorphism then
-			imgGlassmorphism:SetSize(nWidth, nHeight)
+		local hGlassmorphismBgHandle = hnd:Lookup('Handle_GlassmorphismBg')
+		if hGlassmorphismBgHandle then
+			local imgGlassmorphism = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism')
+			local imgGlassmorphismBg = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Bg')
+			local imgGlassmorphismTitleBg = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Title_Bg')
+			local imgGlassmorphismTitleTextureL = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Title_TextureL')
+			local imgGlassmorphismTitleTextureR = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Title_TextureR')
+			if imgGlassmorphism then
+				imgGlassmorphism:SetSize(nWidth, nHeight)
+			end
+			if imgGlassmorphismBg then
+				imgGlassmorphismBg:SetSize(nWidth, nHeight - 33)
+			end
+			if imgGlassmorphismTitleBg and imgGlassmorphismTitleTextureL and imgGlassmorphismTitleTextureR then
+				imgGlassmorphismTitleBg:SetW(nWidth)
+				-- imgTitleTextureL
+				imgGlassmorphismTitleTextureR:SetRelX(nWidth - imgGlassmorphismTitleTextureR:GetW())
+			end
+			hGlassmorphismBgHandle:FormatAllItemPos()
 		end
-		if imgGlassmorphismBg then
-			imgGlassmorphismBg:SetSize(nWidth, nHeight)
-		end
-		if imgGlassmorphismTitleBg and imgGlassmorphismTitleTextureL and imgGlassmorphismTitleTextureR then
-			imgGlassmorphismTitleBg:SetW(nWidth)
-			-- imgTitleTextureL
-			imgGlassmorphismTitleTextureR:SetRelX(nWidth - imgGlassmorphismTitleTextureR:GetW())
-		end
-		if imgBgTLConner and imgBgTLFlex and imgBgTLCenter
-		and imgBgTRConner and imgBgTRFlex and imgBgTRCenter
-		and imgBgBL and imgBgBC and imgBgBR and imgBgCL and imgBgCC and imgBgCR then
-			local fScale = nWidth < 426 and (nWidth / 426) or 1
-			local nTH = 70 * fScale
-			local nTConnerW = 213 * fScale
-			imgBgTLConner:SetSize(nTConnerW, nTH)
-			imgBgTRConner:SetSize(nTConnerW, nTH)
-			local nTFlexW = math.max(0, (nWidth - (nWidth >= 674 and 674 or 426)) / 2)
-			imgBgTLFlex:SetSize(nTFlexW, nTH)
-			imgBgTRFlex:SetSize(nTFlexW, nTH)
-			local nTCenterW = nWidth >= 674 and (124 * fScale) or 0
-			imgBgTLCenter:SetSize(nTCenterW, nTH)
-			imgBgTRCenter:SetSize(nTCenterW, nTH)
-			local nBLW, nBRW = math.ceil(124 * fScale), math.ceil(8 * fScale)
-			local nBCW, nBH = nWidth - nBLW - nBRW + 1, 85 * fScale -- 不知道为什么差一像素 但是加上就好了
-			imgBgBL:SetSize(nBLW, nBH)
-			imgBgBC:SetSize(nBCW, nBH)
-			imgBgBR:SetSize(nBRW, nBH)
-			local nCEdgeW = math.ceil(8 * fScale)
-			local nCCW, nCH = nWidth - 2 * nCEdgeW + 1, nHeight - nTH - nBH -- 不知道为什么差一像素 但是加上就好了
-			imgBgCL:SetSize(nCEdgeW, nCH)
-			imgBgCC:SetSize(nCCW, nCH)
-			imgBgCR:SetSize(nCEdgeW, nCH)
-			imgBgCL:SetRelY(nTH)
-			imgBgBL:SetRelY(nTH + nCH)
-			hnd:FormatAllItemPos()
+		local hClassicBgHandle = hnd:Lookup('Handle_ClassicBg')
+		if hClassicBgHandle then
+			local imgBgTLConner = hClassicBgHandle:Lookup('Image_Classic_BgTL_Conner')
+			local imgBgTRConner = hClassicBgHandle:Lookup('Image_Classic_BgTR_Conner')
+			local imgBgTLFlex = hClassicBgHandle:Lookup('Image_Classic_BgTL_Flex')
+			local imgBgTRFlex = hClassicBgHandle:Lookup('Image_Classic_BgTR_Flex')
+			local imgBgTLCenter = hClassicBgHandle:Lookup('Image_Classic_BgTL_Center')
+			local imgBgTRCenter = hClassicBgHandle:Lookup('Image_Classic_BgTR_Center')
+			local imgBgBL = hClassicBgHandle:Lookup('Image_Classic_BgBL')
+			local imgBgBC = hClassicBgHandle:Lookup('Image_Classic_BgBC')
+			local imgBgBR = hClassicBgHandle:Lookup('Image_Classic_BgBR')
+			local imgBgCL = hClassicBgHandle:Lookup('Image_Classic_BgCL')
+			local imgBgCC = hClassicBgHandle:Lookup('Image_Classic_BgCC')
+			local imgBgCR = hClassicBgHandle:Lookup('Image_Classic_BgCR')
+			if imgBgTLConner and imgBgTLFlex and imgBgTLCenter
+			and imgBgTRConner and imgBgTRFlex and imgBgTRCenter
+			and imgBgBL and imgBgBC and imgBgBR and imgBgCL and imgBgCC and imgBgCR then
+				local fScale = nWidth < 426 and (nWidth / 426) or 1
+				local nTH = 70 * fScale
+				local nTConnerW = 213 * fScale
+				imgBgTLConner:SetSize(nTConnerW, nTH)
+				imgBgTRConner:SetSize(nTConnerW, nTH)
+				local nTFlexW = math.max(0, (nWidth - (nWidth >= 674 and 674 or 426)) / 2)
+				imgBgTLFlex:SetSize(nTFlexW, nTH)
+				imgBgTRFlex:SetSize(nTFlexW, nTH)
+				local nTCenterW = nWidth >= 674 and (124 * fScale) or 0
+				imgBgTLCenter:SetSize(nTCenterW, nTH)
+				imgBgTRCenter:SetSize(nTCenterW, nTH)
+				local nBLW, nBRW = math.ceil(124 * fScale), math.ceil(8 * fScale)
+				local nBCW, nBH = nWidth - nBLW - nBRW + 1, 85 * fScale -- 不知道为什么差一像素 但是加上就好了
+				imgBgBL:SetSize(nBLW, nBH)
+				imgBgBC:SetSize(nBCW, nBH)
+				imgBgBR:SetSize(nBRW, nBH)
+				local nCEdgeW = math.ceil(8 * fScale)
+				local nCCW, nCH = nWidth - 2 * nCEdgeW + 1, nHeight - nTH - nBH -- 不知道为什么差一像素 但是加上就好了
+				imgBgCL:SetSize(nCEdgeW, nCH)
+				imgBgCC:SetSize(nCCW, nCH)
+				imgBgCR:SetSize(nCEdgeW, nCH)
+				imgBgCL:SetRelY(nTH)
+				imgBgBL:SetRelY(nTH + nCH)
+				hnd:FormatAllItemPos()
+			end
+			hClassicBgHandle:FormatAllItemPos()
 		end
 		-- 按分类处理其他
 		if GetComponentProp(raw, 'simple') then
@@ -4307,18 +4383,27 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 				p = p:GetNext()
 			end
 			raw:Lookup('', 'Text_Title'):SetSize(nWidth - nWidthTitleBtnR, 30)
-			raw:Lookup('', 'Image_Title'):SetSize(nWidth, 30)
-			raw:Lookup('', 'Shadow_Bg'):SetSize(nWidth, nHeight)
+			raw:Lookup('', 'Handle_ClassicBg/Shadow_Classic_Bg'):SetSize(nWidth, nHeight)
+			raw:Lookup('', 'Handle_ClassicBg/Image_Classic_TitleBg'):SetSize(nWidth, 30)
 			raw:Lookup('WndContainer_TitleBtnR'):SetSize(nWidth, 30)
 			raw:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
-			raw:Lookup('Btn_Drag'):SetRelPos(nWidth - 16, nHeight - 16)
+			local hBtnDrag = raw:Lookup('Btn_Drag')
+			if X.UI.IS_GLASSMORPHISM then
+				hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW(), nHeight - hBtnDrag:GetH())
+			else
+				hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW() - 8, nHeight - hBtnDrag:GetH() - 8)
+			end
+			local hDragBg = raw:Lookup('Wnd_DragBg', 'Shadow_DragBg')
+			if hDragBg then
+				hDragBg:SetSize(nWidth, nHeight)
+			end
 			raw:SetSize(nWidth, nHeight)
 			raw:SetDragArea(0, 0, nWidth, 30)
 			hnd:SetSize(nWidth, nHeight)
 			wnd:SetSize(nWidth, nHeight - 30)
-		elseif GetComponentProp(raw, 'intact') or raw == X.Panel.GetFrame() then
+		elseif GetComponentProp(raw, 'intact') then
 			hnd:SetSize(nWidth, nHeight)
-			hnd:Lookup('Text_Title'):SetW(nWidth - 90)
+			hnd:Lookup('Text_Title'):SetW(nWidth)
 			hnd:Lookup('Text_Author'):SetW(nWidth - 31)
 			hnd:Lookup('Text_Author'):SetRelY(nHeight - 41)
 			-- 处理窗口其它组件
@@ -4326,9 +4411,17 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			if btnClose then
 				btnClose:SetRelX(nWidth - 35)
 			end
-			local btnDrag = raw:Lookup('Btn_Drag')
-			if btnDrag then
-				btnDrag:SetRelPos(nWidth - 18, nHeight - 20)
+			local hBtnDrag = raw:Lookup('Btn_Drag')
+			if hBtnDrag then
+				if X.UI.IS_GLASSMORPHISM then
+					hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW(), nHeight - hBtnDrag:GetH())
+				else
+					hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW() - 8, nHeight - hBtnDrag:GetH() - 8)
+				end
+			end
+			local hDragBg = raw:Lookup('Wnd_DragBg', 'Shadow_DragBg')
+			if hDragBg then
+				hDragBg:SetSize(nWidth, nHeight)
 			end
 			local btnMax = raw:Lookup('CheckBox_Maximize')
 			if btnMax then
@@ -4356,6 +4449,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			raw:SetSize(nWidth, nHeight)
 			hnd:SetSize(nWidth, nHeight)
 		end
+		hnd:FormatAllItemPos()
 	elseif componentType == 'WndButton' or componentType == 'WndButtonBox' then
 		local btn = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
@@ -4449,6 +4543,19 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		txt:SetRelPos(nHeight + 1, 2)
 		hdl:SetSize(nWidth, nHeight)
 		hdl:FormatAllItemPos()
+	elseif componentType == 'WndTabs' then
+		raw:SetSize(nWidth, nHeight)
+		raw:Lookup('', ''):SetSize(nWidth, nHeight)
+		raw:Lookup('', 'Image_WndTabs_Classic_Bg'):SetSize(nWidth - 1, nHeight + 3)
+		raw:Lookup('', 'Image_WndTabs_Classic_SplitterL'):SetH(nHeight - 2)
+		raw:Lookup('', 'Image_WndTabs_Glassmorphism_Bg'):SetSize(nWidth, nHeight - 3)
+	elseif componentType == 'WndTab' then
+		raw:SetSize(nWidth, nHeight)
+		raw:Lookup('', ''):SetSize(nWidth, nHeight)
+		raw:Lookup('', 'Text_WndTab'):SetSize(nWidth, nHeight)
+		raw:Lookup('', 'Image_WndTab_Splitter'):SetH(nHeight)
+		raw:Lookup('', 'Image_WndTab_Splitter'):SetRelX(nWidth - 1)
+		raw:Lookup('', ''):FormatAllItemPos()
 	elseif componentType == 'CheckBox' then
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local img = GetComponentElement(raw, 'IMAGE')
@@ -4565,22 +4672,35 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		end
 		hList:FormatAllItemPos()
 	elseif componentType == 'WndScrollHandleBox' then
+		local nPaddingTop = GetComponentProp(raw, 'nPaddingTop') or 10
+		local nPaddingRight = GetComponentProp(raw, 'nPaddingRight') or 15
+		local nPaddingBottom = GetComponentProp(raw, 'nPaddingBottom') or 10
+		local nPaddingLeft = GetComponentProp(raw, 'nPaddingLeft') or 15
 		raw:SetSize(nWidth, nHeight)
 		raw:Lookup('', ''):SetSize(nWidth, nHeight)
 		raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
-		raw:Lookup('', 'Handle_Padding'):SetSize(nWidth - 30, nHeight - 20)
-		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):SetSize(nWidth - 30, nHeight - 20)
+		raw:Lookup('', 'Handle_Padding'):SetRelPos(nPaddingLeft, nPaddingTop)
+		raw:Lookup('', 'Handle_Padding'):SetSize(nWidth - nPaddingRight - nPaddingLeft, nHeight - nPaddingTop - nPaddingBottom)
+		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):SetSize(nWidth - nPaddingRight - nPaddingLeft, nHeight - nPaddingTop - nPaddingBottom)
 		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):FormatAllItemPos()
-		raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
-		raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
+		raw:Lookup('WndScrollBar'):SetRelPos(nWidth - 15, nPaddingTop)
+		raw:Lookup('WndScrollBar'):SetH(nHeight - nPaddingTop - nPaddingBottom)
 	elseif componentType == 'WndScrollWindowBox' then
+		local nPaddingTop = GetComponentProp(raw, 'nPaddingTop') or 10
+		local nPaddingRight = GetComponentProp(raw, 'nPaddingRight') or 15
+		local nPaddingBottom = GetComponentProp(raw, 'nPaddingBottom') or 10
+		local nPaddingLeft = GetComponentProp(raw, 'nPaddingLeft') or 15
 		raw:SetSize(nWidth, nHeight)
 		raw:Lookup('', ''):SetSize(nWidth, nHeight)
 		raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
-		raw:Lookup('WndContainer_Scroll'):SetSize(nWidth - 30, nHeight - 20)
+		raw:Lookup('WndContainer_Scroll'):SetRelPos(nPaddingLeft, nPaddingTop)
+		raw:Lookup('WndContainer_Scroll'):SetSize(nWidth - nPaddingRight - nPaddingLeft, nHeight - nPaddingTop - nPaddingBottom)
 		raw:Lookup('WndContainer_Scroll'):FormatAllContentPos()
-		raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
-		raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
+		raw:Lookup('WndContainer_Scroll', ''):SetRelPos(nPaddingLeft, nPaddingTop)
+		raw:Lookup('WndContainer_Scroll', ''):SetSize(nWidth - nPaddingRight - nPaddingLeft, nHeight - nPaddingTop - nPaddingBottom)
+		raw:Lookup('WndContainer_Scroll', ''):FormatAllItemPos()
+		raw:Lookup('WndScrollBar'):SetRelPos(nWidth - 15, nPaddingTop)
+		raw:Lookup('WndScrollBar'):SetH(nHeight - nPaddingTop - nPaddingBottom)
 	elseif componentType == 'WndSlider' then
 		local hWnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hHandle = GetComponentElement(raw, 'MAIN_HANDLE')
@@ -4706,6 +4826,121 @@ function OO:Size(...)
 			end
 		end
 		return w, h
+	end
+end
+
+-- (number, number, number, number) Instance:Padding()
+-- (self) Instance:Padding(nPaddingTop, nPaddingRight, nPaddingBottom, nPaddingLeft)
+function OO:Padding(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nPaddingTop, nPaddingRight, nPaddingBottom, nPaddingLeft = ...
+		if not nPaddingBottom then
+			nPaddingBottom = nPaddingTop
+		end
+		if not nPaddingLeft then
+			nPaddingLeft = nPaddingRight
+		end
+		for _, raw in ipairs(self.raws) do
+			if nPaddingTop then
+				SetComponentProp(raw, 'nPaddingTop', nPaddingTop)
+			end
+			if nPaddingRight then
+				SetComponentProp(raw, 'nPaddingRight', nPaddingRight)
+			end
+			if nPaddingBottom then
+				SetComponentProp(raw, 'nPaddingBottom', nPaddingBottom)
+			end
+			if nPaddingLeft then
+				SetComponentProp(raw, 'nPaddingLeft', nPaddingLeft)
+			end
+			SetComponentSize(raw)
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'nPaddingTop'),
+				GetComponentProp(raw, 'nPaddingRight'),
+				GetComponentProp(raw, 'nPaddingBottom'),
+				GetComponentProp(raw, 'nPaddingLeft')
+		end
+	end
+end
+
+-- (number) Instance:PaddingTop()
+-- (self) Instance:PaddingTop(nPaddingTop)
+function OO:PaddingTop(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nPaddingTop = ...
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'nPaddingTop', nPaddingTop)
+			SetComponentSize(raw)
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'nPaddingTop')
+		end
+	end
+end
+
+-- (number) Instance:PaddingRight()
+-- (self) Instance:PaddingRight(nPaddingRight)
+function OO:PaddingRight(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nPaddingRight = ...
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'nPaddingRight', nPaddingRight)
+			SetComponentSize(raw)
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'nPaddingRight')
+		end
+	end
+end
+
+-- (number) Instance:PaddingBottom()
+-- (self) Instance:PaddingBottom(nPaddingBottom)
+function OO:PaddingBottom(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nPaddingBottom = ...
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'nPaddingBottom', nPaddingBottom)
+			SetComponentSize(raw)
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'nPaddingBottom')
+		end
+	end
+end
+
+-- (number) Instance:PaddingLeft()
+-- (self) Instance:PaddingLeft(nPaddingLeft)
+function OO:PaddingLeft(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nPaddingLeft = ...
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'nPaddingLeft', nPaddingLeft)
+			SetComponentSize(raw)
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'nPaddingLeft')
+		end
 	end
 end
 
@@ -5049,6 +5284,56 @@ function OO:FrameVisualState(...)
 		local raw = self.raws[1]
 		if raw and GetComponentType(raw) == 'WndFrame' then
 			return GetComponentProp(raw, 'eFrameVisualState') or X.UI.FRAME_VISUAL_STATE.NORMAL
+		end
+	end
+	return self
+end
+
+-- (self) Instance:FrameLeftControl(function[] aControl)
+function OO:FrameLeftControl(aControl)
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		if GetComponentType(raw) == 'WndFrame' then
+			local hContainer = raw:Lookup('WndContainer_TitleBtnL')
+			if hContainer and aControl then
+				for i = hContainer:GetAllContentCount() - 1, 0, -1 do
+					local hWnd = hContainer:LookupContent(i)
+					if hWnd.bCustom then
+						hWnd:Destroy()
+					end
+				end
+				for _, fnRender in ipairs(aControl) do
+					local hWnd = X.UI(hContainer):Append('WndWindow', { w = hContainer:GetH(), h = hContainer:GetH() }):Raw()
+					hWnd.bCustom = true
+					fnRender(hWnd)
+				end
+				hContainer:FormatAllContentPos()
+			end
+		end
+	end
+	return self
+end
+
+-- (self) Instance:FrameRightControl(function[] aControl)
+function OO:FrameRightControl(aControl)
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		if GetComponentType(raw) == 'WndFrame' then
+			local hContainer = raw:Lookup('WndContainer_TitleBtnR')
+			if hContainer and aControl then
+				for i = hContainer:GetAllContentCount() - 1, 0, -1 do
+					local hWnd = hContainer:LookupContent(i)
+					if hWnd.bCustom then
+						hWnd:Destroy()
+					end
+				end
+				for _, fnRender in ipairs(aControl) do
+					local hWnd = X.UI(hContainer):Append('WndWindow', { w = hContainer:GetH(), h = hContainer:GetH() }):Raw()
+					hWnd.bCustom = true
+					fnRender(hWnd)
+				end
+				hContainer:FormatAllContentPos()
+			end
 		end
 	end
 	return self
@@ -6553,11 +6838,28 @@ end)
 -- end
 
 ---------------------------------------------------
--- create new frame
--- (ui) X.UI.CreateFrame(string szName, table opt)
--- @param string szName: the ID of frame
--- @param table  opt   : options
+-- 窗体操作
 ---------------------------------------------------
+
+---@class UI_CreateFrame_Options @创建窗体参数
+---@field level '"Normal" | "Lowest" | "Topmost" | "Normal1" | "Lowest1" | "Topmost1" | "Normal2" | "Lowest2" | "Topmost2"' @层级
+---@field simple boolean @是否为简单窗体
+---@field empty boolean @是否为空白窗体
+---@field esc boolean @是否注册全局ESC关闭窗体
+---@field close boolean @是否显示关闭按钮
+---@field minimize boolean @是否允许最小化
+---@field maximize boolean @是否允许最大化
+---@field minWidth number @最小宽度
+---@field minHeight number @最小高度
+---@field resize boolean @是否允许拖拽改变大小
+---@field alpha number @窗体透明度
+---@field anchor FrameAnchor @窗体位置
+---@field onSettingsClick function @设置按钮回调，不传不显示
+---@field onFrameVisualStateChange function @窗体最大最小化状态发生变化时回调
+
+-- 创建窗体
+---@param szName string @要创建的窗体名字
+---@param opt? UI_CreateFrame_Options @参数
 function X.UI.CreateFrame(szName, opt)
 	if not X.IsTable(opt) then
 		opt = {}
@@ -6610,42 +6912,86 @@ function X.UI.CreateFrame(szName, opt)
 	end
 	if opt.simple then
 		SetComponentProp(frm, 'simple', true)
+		SetComponentProp(frm, 'minWidth', opt.minWidth or 100)
+		SetComponentProp(frm, 'minHeight', opt.minHeight or 50)
 		-- 琉璃风格
 		if X.UI.IS_GLASSMORPHISM then
-			frm:Lookup('', 'Shadow_Bg'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg'):Hide()
 		else
-			frm:Lookup('', 'Image_Glassmorphism'):Hide()
-			frm:Lookup('', 'Image_Glassmorphism_Bg'):Hide()
+			frm:Lookup('', 'Handle_GlassmorphismBg'):Hide()
 		end
+		if not opt.onSettingsClick then
+			frm:Lookup('WndContainer_TitleBtnL/Wnd_Setting'):Destroy()
+		else
+			frm:Lookup('WndContainer_TitleBtnL/Wnd_Setting/Btn_Setting').OnLButtonClick = opt.onSettingsClick
+		end
+		-- frame properties
+		if opt.alpha then
+			frm:Lookup('', 'Handle_ClassicBg/Shadow_Classic_Bg'):SetAlpha(opt.alpha / 255 * 200)
+			frm:Lookup('', 'Handle_ClassicBg/Image_Classic_TitleBg'):SetAlpha(opt.alpha * 1.4)
+		end
+	elseif not opt.empty then
+		SetComponentProp(frm, 'intact', true)
+		SetComponentProp(frm, 'minWidth', opt.minWidth or 128)
+		SetComponentProp(frm, 'minHeight', opt.minHeight or 160)
+		-- 琉璃风格
+		if X.UI.IS_GLASSMORPHISM then
+			frm:Lookup('', 'Handle_ClassicBg'):Hide()
+			frm:Lookup('', 'Text_Title'):SetRelY(0)
+			frm:Lookup('WndContainer_TitleBtnR'):SetRelY(0)
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetSize(16, 16)
+			X.UI.SetButtonUITex(
+				frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'),
+				'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+				35,
+				36,
+				37,
+				38
+			)
+			X.UI.SetCheckBoxUITex(
+				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'),
+				'ui\\Image\\UItimate\\UICommon\\Button4.UITex',
+				22,
+				23,
+				24,
+				21,
+				18,
+				19,
+				20,
+				1
+			)
+			X.UI.SetButtonUITex(
+				frm:Lookup('Btn_Drag'),
+				'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+				141,
+				142,
+				143,
+				144
+			)
+		else
+			frm:Lookup('', 'Handle_GlassmorphismBg'):Hide()
+		end
+	end
+	if not opt.empty then
 		-- top right buttons
-		if not opt.close then
+		if opt.close == false then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
 		else
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close').OnLButtonClick = function()
 				RemoveFrame()
 			end
 		end
-		if not opt.setting then
-			frm:Lookup('WndContainer_TitleBtnL/Wnd_Setting'):Destroy()
-		else
-			frm:Lookup('WndContainer_TitleBtnL/Wnd_Setting/Btn_Setting').OnLButtonClick = opt.setting
-		end
-		if opt.onFrameVisualStateChange then
-			X.UI(frm):UIEvent('OnFrameVisualStateChange', opt.onFrameVisualStateChange)
-		end
-		if not opt.minimize then
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
-		else
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxCheck = function()
-				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MINIMIZE)
-			end
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxUncheck = function()
-				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
-			end
-		end
 		if not opt.maximize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
 		else
+			local hDBClick = frm:Lookup('', 'Handle_DBClick')
+				or frm:Lookup('Wnd_Total', 'Handle_DBClick')
+			hDBClick.OnItemLButtonDBClick = function()
+				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
+			end
+			frm:Lookup('WndContainer_TitleBtnL').OnLButtonDBClick = function()
+				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
+			end
 			frm:Lookup('WndContainer_TitleBtnR').OnLButtonDBClick = function()
 				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
 			end
@@ -6656,93 +7002,6 @@ function X.UI.CreateFrame(szName, opt)
 				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
 			end
 		end
-		frm:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
-		-- drag resize button
-		opt.minWidth  = opt.minWidth or 100
-		opt.minHeight = opt.minHeight or 50
-		if not opt.resize then
-			frm:Lookup('Btn_Drag'):Hide()
-		else
-			SetComponentProp(frm, 'bDragResize', true)
-			frm:Lookup('Btn_Drag').OnDragButton = function()
-				local x, y = Station.GetMessagePos()
-				local nClientW, nClientH = Station.GetClientSize()
-				local nFrameX, nFrameY = frm:GetRelPos()
-				local w, h = x - nFrameX, y - nFrameY
-				w = math.min(w, nClientW - nFrameX) -- frame size should not larger than client size
-				h = math.min(h, nClientH - nFrameY)
-				w = math.max(w, opt.minWidth) -- frame size must larger than its min size
-				h = math.max(h, opt.minHeight)
-				frm:Lookup('Btn_Drag'):SetRelPos(w - 16, h - 16)
-				frm:Lookup('', 'Shadow_Bg'):SetSize(w, h)
-				frm:Lookup('', 'Image_Glassmorphism'):SetSize(w, h)
-				frm:Lookup('', 'Image_Glassmorphism_Bg'):SetSize(w, h)
-			end
-			frm:Lookup('Btn_Drag').OnDragButtonBegin = function()
-				frm:Lookup('', 'Image_Title'):Hide()
-				frm:Lookup('', 'Text_Title'):Hide()
-				frm:Lookup('Wnd_Total'):Hide()
-				frm:Lookup('WndContainer_TitleBtnL'):Hide()
-				frm:Lookup('WndContainer_TitleBtnR'):Hide()
-			end
-			frm:Lookup('Btn_Drag').OnDragButtonEnd = function()
-				frm:Lookup('', 'Image_Title'):Show()
-				frm:Lookup('', 'Text_Title'):Show()
-				frm:Lookup('Wnd_Total'):Show()
-				frm:Lookup('WndContainer_TitleBtnL'):Show()
-				frm:Lookup('WndContainer_TitleBtnR'):Show()
-				local nW, nH = this:GetRelPos()
-				nW = math.max(nW + 16, opt.minWidth)
-				nH = math.max(nH + 16, opt.minHeight)
-				X.UI(frm):Size(nW, nH)
-			end
-			frm:Lookup('Btn_Drag'):RegisterLButtonDrag()
-		end
-		-- frame properties
-		if opt.alpha then
-			if not X.UI.IS_GLASSMORPHISM then
-				frm:Lookup('', 'Shadow_Bg'):SetAlpha(opt.alpha / 255 * 200)
-			end
-			frm:Lookup('', 'Image_Title'):SetAlpha(opt.alpha * 1.4)
-		end
-	elseif not opt.empty then
-		SetComponentProp(frm, 'intact', true)
-		SetComponentProp(frm, 'minWidth', opt.minWidth or 128)
-		SetComponentProp(frm, 'minHeight', opt.minHeight or 160)
-		-- 琉璃风格
-		if X.UI.IS_GLASSMORPHISM then
-			frm:Lookup('', 'Image_BgTL_Conner'):Hide()
-			frm:Lookup('', 'Image_BgTL_Flex'):Hide()
-			frm:Lookup('', 'Image_BgTL_Center'):Hide()
-			frm:Lookup('', 'Image_BgTR_Center'):Hide()
-			frm:Lookup('', 'Image_BgTR_Flex'):Hide()
-			frm:Lookup('', 'Image_BgTR_Conner'):Hide()
-			frm:Lookup('', 'Image_BgCL'):Hide()
-			frm:Lookup('', 'Image_BgCC'):Hide()
-			frm:Lookup('', 'Image_BgCR'):Hide()
-			frm:Lookup('', 'Image_BgBL'):Hide()
-			frm:Lookup('', 'Image_BgBC'):Hide()
-			frm:Lookup('', 'Image_BgBR'):Hide()
-			frm:Lookup('', 'Text_Title'):SetRelY(0)
-			frm:Lookup('WndContainer_TitleBtnR'):SetRelY(0)
-		else
-			frm:Lookup('', 'Image_Glassmorphism'):Hide()
-			frm:Lookup('', 'Image_Glassmorphism_Bg'):Hide()
-			frm:Lookup('', 'Image_Glassmorphism_Title_Bg'):Hide()
-			frm:Lookup('', 'Image_Glassmorphism_Title_TextureL'):Hide()
-			frm:Lookup('', 'Image_Glassmorphism_Title_TextureR'):Hide()
-		end
-		-- top right buttons
-		if opt.close == false then
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
-		else
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close').OnLButtonClick = function()
-				X.UI(frm):Remove()
-			end
-		end
-		if opt.onFrameVisualStateChange then
-			X.UI(frm):UIEvent('OnFrameVisualStateChange', opt.onFrameVisualStateChange)
-		end
 		if not opt.minimize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
 		else
@@ -6753,58 +7012,74 @@ function X.UI.CreateFrame(szName, opt)
 				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
 			end
 		end
-		if not opt.maximize then
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
-		else
-			frm:Lookup('Wnd_Total', 'Handle_DBClick').OnItemLButtonDBClick = function()
-				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
-			end
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxCheck = function()
-				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MAXIMIZE)
-			end
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxUncheck = function()
-				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
-			end
+		if opt.onFrameVisualStateChange then
+			X.UI(frm):UIEvent('OnFrameVisualStateChange', opt.onFrameVisualStateChange)
 		end
-		frm:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
 		-- drag resize button
 		if not opt.resize then
 			frm:Lookup('Btn_Drag'):Hide()
 		else
 			SetComponentProp(frm, 'bDragResize', true)
+			frm:Lookup('Btn_Drag').OnMouseEnter = function()
+				Cursor.Switch(CURSOR.LEFTTOP_RIGHTBOTTOM)
+			end
+			frm:Lookup('Btn_Drag').OnMouseLeave = function()
+				Cursor.Switch(CURSOR.NORMAL)
+			end
 			frm:Lookup('Btn_Drag').OnDragButton = function()
-				local x, y = Station.GetMessagePos()
+				local nX, nY = Station.GetMessagePos()
 				local nClientW, nClientH = Station.GetClientSize()
 				local nFrameX, nFrameY = frm:GetRelPos()
-				local w, h = x - nFrameX, y - nFrameY
-				w = math.min(w, nClientW - nFrameX) -- frame size should not larger than client size
-				h = math.min(h, nClientH - nFrameY)
-				w = math.max(w, GetComponentProp(frm, 'minWidth')) -- frame size must larger than its min size
-				h = math.max(h, GetComponentProp(frm, 'minHeight'))
-				frm:Lookup('Btn_Drag'):SetRelPos(w - 16, h - 16)
-				frm:Lookup('Wnd_DragBg', 'Shadow_DragBg'):SetSize(w, h)
+				local nW, nH = nX - nFrameX, nY - nFrameY
+				nW = math.min(nW, nClientW - nFrameX) -- frame size should not larger than client size
+				nH = math.min(nH, nClientH - nFrameY)
+				nW = math.max(nW, GetComponentProp(frm, 'minWidth')) -- frame size must larger than its min size
+				nH = math.max(nH, GetComponentProp(frm, 'minHeight'))
+				local hBtnDrag = frm:Lookup('Btn_Drag')
+				if X.UI.IS_GLASSMORPHISM then
+					hBtnDrag:SetRelPos(nW - hBtnDrag:GetW(), nH - hBtnDrag:GetH())
+				else
+					hBtnDrag:SetRelPos(nW - hBtnDrag:GetW() - 8, nH - hBtnDrag:GetH() - 8)
+				end
+				frm:Lookup('Wnd_DragBg', 'Shadow_DragBg'):SetSize(nW, nH)
 			end
 			frm:Lookup('Btn_Drag').OnDragButtonBegin = function()
 				frm:Lookup('Wnd_DragBg'):Show()
 				frm:Lookup('', ''):Hide()
 				frm:Lookup('Wnd_Total'):Hide()
+				frm:Lookup('WndContainer_TitleBtnL'):Hide()
 				frm:Lookup('WndContainer_TitleBtnR'):Hide()
 			end
 			frm:Lookup('Btn_Drag').OnDragButtonEnd = function()
 				frm:Lookup('Wnd_DragBg'):Hide()
 				frm:Lookup('', ''):Show()
 				frm:Lookup('Wnd_Total'):Show()
+				frm:Lookup('WndContainer_TitleBtnL'):Show()
 				frm:Lookup('WndContainer_TitleBtnR'):Show()
-				local nW, nH = this:GetRelPos()
-				nW = math.max(nW + 16, GetComponentProp(frm, 'minWidth'))
-				nH = math.max(nH + 16, GetComponentProp(frm, 'minHeight'))
+				local nW = this:GetRelX() + this:GetW()
+				local nH = this:GetRelY() + this:GetH()
+				if X.UI.IS_GLASSMORPHISM then
+				else
+					nW = nW + 8
+					nH = nH + 8
+				end
+				nW = math.max(nW, GetComponentProp(frm, 'minWidth'))
+				nH = math.max(nH, GetComponentProp(frm, 'minHeight'))
 				X.UI(frm):Size(nW, nH)
 			end
 			frm:Lookup('Btn_Drag'):RegisterLButtonDrag()
 		end
+		frm:Lookup('WndContainer_TitleBtnL'):FormatAllContentPos()
+		frm:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
 	end
 	if not opt.anchor and not (opt.x and opt.y) then
 		opt.anchor = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
+	end
+	if not opt.w then
+		opt.w = frm:GetW()
+	end
+	if not opt.h then
+		opt.h = frm:GetH()
 	end
 	return ApplyUIArguments(ui, opt)
 end
