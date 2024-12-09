@@ -73,7 +73,7 @@ local _POSTER_IMAGE_LIST_     = {
 local _DEBUG_LEVEL_           = DEBUG_LEVEL[LoadLUAData(_DATA_ROOT_ .. 'debug.level.jx3dat') or 'NONE'] or DEBUG_LEVEL.NONE
 local _LOG_LEVEL_             = math.min(DEBUG_LEVEL[LoadLUAData(_DATA_ROOT_ .. 'log.level.jx3dat') or 'ERROR'] or DEBUG_LEVEL.ERROR, _DEBUG_LEVEL_)
 
----@type Boilerplate_UI
+---@type MY_UI
 local UI = {}
 
 -- »ù´¡¿âÃüÃû¿Õ¼ä
