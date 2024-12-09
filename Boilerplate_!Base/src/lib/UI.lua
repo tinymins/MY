@@ -2493,6 +2493,7 @@ function OO:Append(arg0, arg1)
 				for i = startIndex, h:GetItemCount() - 1 do
 					el = h:Lookup(i)
 					if szType then
+						el:SetName(szType)
 						InitComponent(el, szType)
 					end
 					ui = ui:Add(el)
