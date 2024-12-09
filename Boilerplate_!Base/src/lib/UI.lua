@@ -6950,6 +6950,12 @@ function X.UI.CreateFrame(szName, opt)
 			frm:Lookup('Btn_Drag'):Hide()
 		else
 			SetComponentProp(frm, 'bDragResize', true)
+			frm:Lookup('Btn_Drag').OnMouseEnter = function()
+				Cursor.Switch(CURSOR.LEFTTOP_RIGHTBOTTOM)
+			end
+			frm:Lookup('Btn_Drag').OnMouseLeave = function()
+				Cursor.Switch(CURSOR.NORMAL)
+			end
 			frm:Lookup('Btn_Drag').OnDragButton = function()
 				local x, y = Station.GetMessagePos()
 				local nClientW, nClientH = Station.GetClientSize()
@@ -7072,6 +7078,12 @@ function X.UI.CreateFrame(szName, opt)
 			frm:Lookup('Btn_Drag'):Hide()
 		else
 			SetComponentProp(frm, 'bDragResize', true)
+			frm:Lookup('Btn_Drag').OnMouseEnter = function()
+				Cursor.Switch(CURSOR.LEFTTOP_RIGHTBOTTOM)
+			end
+			frm:Lookup('Btn_Drag').OnMouseLeave = function()
+				Cursor.Switch(CURSOR.NORMAL)
+			end
 			frm:Lookup('Btn_Drag').OnDragButton = function()
 				local x, y = Station.GetMessagePos()
 				local nClientW, nClientH = Station.GetClientSize()
