@@ -4657,7 +4657,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		raw:Lookup('', 'Handle_Padding'):SetSize(nWidth - nPaddingRight - nPaddingLeft, nHeight - nPaddingTop - nPaddingBottom)
 		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):SetSize(nWidth - nPaddingRight - nPaddingLeft, nHeight - nPaddingTop - nPaddingBottom)
 		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):FormatAllItemPos()
-		raw:Lookup('WndScrollBar'):SetRelPos(nWidth - 20, nPaddingTop)
+		raw:Lookup('WndScrollBar'):SetRelPos(nWidth - 15, nPaddingTop)
 		raw:Lookup('WndScrollBar'):SetH(nHeight - nPaddingTop - nPaddingBottom)
 	elseif componentType == 'WndScrollWindowBox' then
 		local nPaddingTop = GetComponentProp(raw, 'nPaddingTop') or 10
@@ -4673,7 +4673,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		raw:Lookup('WndContainer_Scroll', ''):SetRelPos(nPaddingLeft, nPaddingTop)
 		raw:Lookup('WndContainer_Scroll', ''):SetSize(nWidth - nPaddingRight - nPaddingLeft, nHeight - nPaddingTop - nPaddingBottom)
 		raw:Lookup('WndContainer_Scroll', ''):FormatAllItemPos()
-		raw:Lookup('WndScrollBar'):SetRelPos(nWidth - 20, nPaddingTop)
+		raw:Lookup('WndScrollBar'):SetRelPos(nWidth - 15, nPaddingTop)
 		raw:Lookup('WndScrollBar'):SetH(nHeight - nPaddingTop - nPaddingBottom)
 	elseif componentType == 'WndSlider' then
 		local hWnd = GetComponentElement(raw, 'MAIN_WINDOW')
