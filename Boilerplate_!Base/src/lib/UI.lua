@@ -6948,18 +6948,18 @@ function X.UI.CreateFrame(szName, opt)
 				37,
 				38
 			)
-			X.UI.SetCheckBoxUITex(
-				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'),
-				'ui\\Image\\UItimate\\UICommon\\Button4.UITex',
-				22,
-				23,
-				24,
-				21,
-				18,
-				19,
-				20,
-				1
-			)
+			-- X.UI.SetCheckBoxUITex(
+			-- 	frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'),
+			-- 	'ui\\Image\\UItimate\\UICommon\\Button4.UITex',
+			-- 	22,
+			-- 	23,
+			-- 	24,
+			-- 	21,
+			-- 	18,
+			-- 	19,
+			-- 	20,
+			-- 	1
+			-- )
 			X.UI.SetButtonUITex(
 				frm:Lookup('Btn_Drag'),
 				'ui\\Image\\UItimate\\UICommon\\Button.UITex',
