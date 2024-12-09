@@ -175,18 +175,17 @@ function D.Open(url, options)
 		end,
 	})
 	local frame = ui:Raw()
-	frame.uiTitleBg = ui:Append('Image', {
+	local uiStatic = X.UI(frame:Lookup('', ''))
+	frame.uiTitleBg = uiStatic:Append('Image', {
 		x = 2, y = 2, w = 767, h = 75,
 		imageType = X.UI.IMAGE_TYPE.LEFT_CENTER_RIGHT,
 		image = 'ui\\Image\\UICommon\\ActivePopularize.UITex', imageFrame = 48,
 	})
-	local uiWndStatic = ui:Append('WndWindow')
-	uiWndStatic:Raw():ChangeRelation(frame, true, true)
-	uiWndStatic:Append('Image', {
+	uiStatic:Append('Image', {
 		x = 18, y = 15, w = 22, h = 22,
 		image = 'ui\\Image\\Minimap\\Minimap.UITex', imageFrame = 184,
 	})
-	frame.uiTitle = uiWndStatic:Append('Text', { x = 45, y = 11, w = 600, h = 30 })
+	frame.uiTitle = uiStatic:Append('Text', { x = 45, y = 11, w = 600, h = 30 })
 	X.UI.AppendFromIni(frame:Lookup('Wnd_Total'), X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', 'Wnd_Total', true)
 
 	frame:SetName(FRAME_NAME .. '#' .. szKey)
