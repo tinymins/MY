@@ -13,6 +13,69 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/UI.Utils')
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
 
+function X.UI.GetFreeTempFrameName()
+	local nTempFrame = 0
+	local szTempFrame
+	repeat
+		szTempFrame = X.NSFormatString('{$NS}_TempWnd#') .. nTempFrame
+		nTempFrame = nTempFrame + 1
+	until not Station.SearchFrame(szTempFrame)
+	return szTempFrame
+end
+
+function X.UI.RecursiveLookup(hEl, szName)
+	if hEl:GetName() == szName then
+		return hEl
+	end
+	if hEl:GetBaseType() == 'Wnd' then
+		local hChild = hEl:GetFirstChild()
+		while hChild do
+			local hFind = X.UI.RecursiveLookup(hChild, szName)
+			if hFind then
+				return hFind
+			end
+			hChild = hChild:GetNext()
+		end
+		local hHandle = hEl:Lookup('', '')
+		if hHandle then
+			local hFind = X.UI.RecursiveLookup(hHandle, szName)
+			if hFind then
+				return hFind
+			end
+		end
+	elseif hEl:GetType() == 'Handle' then
+		for i = 0, hEl:GetItemCount() - 1 do
+			local hFind = X.UI.RecursiveLookup(hEl:Lookup(i), szName)
+			if hFind then
+				return hFind
+			end
+		end
+	end
+end
+
+function X.UI.AppendFromIni(hParent, szIni, szName, bOnlyChild)
+	local szParentBaseType = hParent:GetBaseType()
+	if szParentBaseType ~= 'Wnd' then
+		return
+	end
+	local hFrame = X.UI.OpenFrame(szIni, X.UI.GetFreeTempFrameName())
+	local hEl = X.UI.RecursiveLookup(hFrame, szName)
+	if hEl and hEl:GetBaseType() == szParentBaseType then
+		if bOnlyChild then
+			while true do
+				local hChild = hEl:GetFirstChild()
+				if not hChild then
+					break
+				end
+				hChild:ChangeRelation(hParent, true, true)
+			end
+		else
+			hEl:ChangeRelation(hParent, true, true)
+		end
+	end
+	Wnd.CloseWindow(hFrame)
+end
+
 function X.UI.GetFrameAnchor(...)
 	return GetFrameAnchor(...)
 end
