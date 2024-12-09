@@ -358,6 +358,10 @@ local function ApplyUIArguments(ui, arg)
 		if arg.sort or arg.sortOrder     then ui:Sort             (arg.sort, arg.sortOrder                         ) end
 		if arg.dataSource                then ui:DataSource       (arg.dataSource                                  ) end
 		if arg.summary                   then ui:Summary          (arg.summary                                     ) end
+		if arg.padding ~= nil            then ui:Padding        (arg.padding, arg.padding, arg.padding, arg.padding) end
+		if arg.paddingTop ~= nil or arg.paddingRight ~= nil or arg.paddingBottom ~= nil or arg.paddingLeft ~= nil then
+			ui:Padding(arg.paddingTop, arg.paddingRight, arg.paddingBottom, arg.paddingLeft)
+		end
 		if arg.sliderWidth ~= nil or arg.sliderHeight ~= nil then -- must after :Text() because w/h can be 'auto', must before :Size() because size depends on this
 			ui:SliderSize(arg.sliderWidth, arg.sliderHeight)
 		end
@@ -4622,22 +4626,35 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		end
 		hList:FormatAllItemPos()
 	elseif componentType == 'WndScrollHandleBox' then
+		local nPaddingTop = GetComponentProp(raw, 'nPaddingTop') or 10
+		local nPaddingRight = GetComponentProp(raw, 'nPaddingRight') or 15
+		local nPaddingBottom = GetComponentProp(raw, 'nPaddingBottom') or 10
+		local nPaddingLeft = GetComponentProp(raw, 'nPaddingLeft') or 15
 		raw:SetSize(nWidth, nHeight)
 		raw:Lookup('', ''):SetSize(nWidth, nHeight)
 		raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
-		raw:Lookup('', 'Handle_Padding'):SetSize(nWidth - 30, nHeight - 20)
-		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):SetSize(nWidth - 30, nHeight - 20)
+		raw:Lookup('', 'Handle_Padding'):SetRelPos(nPaddingLeft, nPaddingTop)
+		raw:Lookup('', 'Handle_Padding'):SetSize(nWidth - nPaddingRight - nPaddingLeft, nHeight - nPaddingTop - nPaddingBottom)
+		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):SetSize(nWidth - nPaddingRight - nPaddingLeft, nHeight - nPaddingTop - nPaddingBottom)
 		raw:Lookup('', 'Handle_Padding/Handle_Scroll'):FormatAllItemPos()
-		raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
-		raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
+		raw:Lookup('WndScrollBar'):SetRelPos(nWidth - 20, nPaddingTop)
+		raw:Lookup('WndScrollBar'):SetH(nHeight - nPaddingTop - nPaddingBottom)
 	elseif componentType == 'WndScrollWindowBox' then
+		local nPaddingTop = GetComponentProp(raw, 'nPaddingTop') or 10
+		local nPaddingRight = GetComponentProp(raw, 'nPaddingRight') or 15
+		local nPaddingBottom = GetComponentProp(raw, 'nPaddingBottom') or 10
+		local nPaddingLeft = GetComponentProp(raw, 'nPaddingLeft') or 15
 		raw:SetSize(nWidth, nHeight)
 		raw:Lookup('', ''):SetSize(nWidth, nHeight)
 		raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
-		raw:Lookup('WndContainer_Scroll'):SetSize(nWidth - 30, nHeight - 20)
+		raw:Lookup('WndContainer_Scroll'):SetRelPos(nPaddingLeft, nPaddingTop)
+		raw:Lookup('WndContainer_Scroll'):SetSize(nWidth - nPaddingRight - nPaddingLeft, nHeight - nPaddingTop - nPaddingBottom)
 		raw:Lookup('WndContainer_Scroll'):FormatAllContentPos()
-		raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
-		raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
+		raw:Lookup('WndContainer_Scroll', ''):SetRelPos(nPaddingLeft, nPaddingTop)
+		raw:Lookup('WndContainer_Scroll', ''):SetSize(nWidth - nPaddingRight - nPaddingLeft, nHeight - nPaddingTop - nPaddingBottom)
+		raw:Lookup('WndContainer_Scroll', ''):FormatAllItemPos()
+		raw:Lookup('WndScrollBar'):SetRelPos(nWidth - 20, nPaddingTop)
+		raw:Lookup('WndScrollBar'):SetH(nHeight - nPaddingTop - nPaddingBottom)
 	elseif componentType == 'WndSlider' then
 		local hWnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hHandle = GetComponentElement(raw, 'MAIN_HANDLE')
@@ -4763,6 +4780,121 @@ function OO:Size(...)
 			end
 		end
 		return w, h
+	end
+end
+
+-- (number, number, number, number) Instance:Padding()
+-- (self) Instance:Padding(nPaddingTop, nPaddingRight, nPaddingBottom, nPaddingLeft)
+function OO:Padding(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nPaddingTop, nPaddingRight, nPaddingBottom, nPaddingLeft = ...
+		if not nPaddingBottom then
+			nPaddingBottom = nPaddingTop
+		end
+		if not nPaddingLeft then
+			nPaddingLeft = nPaddingRight
+		end
+		for _, raw in ipairs(self.raws) do
+			if nPaddingTop then
+				SetComponentProp(raw, 'nPaddingTop', nPaddingTop)
+			end
+			if nPaddingRight then
+				SetComponentProp(raw, 'nPaddingRight', nPaddingRight)
+			end
+			if nPaddingBottom then
+				SetComponentProp(raw, 'nPaddingBottom', nPaddingBottom)
+			end
+			if nPaddingLeft then
+				SetComponentProp(raw, 'nPaddingLeft', nPaddingLeft)
+			end
+			SetComponentSize(raw)
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'nPaddingTop'),
+				GetComponentProp(raw, 'nPaddingRight'),
+				GetComponentProp(raw, 'nPaddingBottom'),
+				GetComponentProp(raw, 'nPaddingLeft')
+		end
+	end
+end
+
+-- (number) Instance:PaddingTop()
+-- (self) Instance:PaddingTop(nPaddingTop)
+function OO:PaddingTop(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nPaddingTop = ...
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'nPaddingTop', nPaddingTop)
+			SetComponentSize(raw)
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'nPaddingTop')
+		end
+	end
+end
+
+-- (number) Instance:PaddingRight()
+-- (self) Instance:PaddingRight(nPaddingRight)
+function OO:PaddingRight(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nPaddingRight = ...
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'nPaddingRight', nPaddingRight)
+			SetComponentSize(raw)
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'nPaddingRight')
+		end
+	end
+end
+
+-- (number) Instance:PaddingBottom()
+-- (self) Instance:PaddingBottom(nPaddingBottom)
+function OO:PaddingBottom(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nPaddingBottom = ...
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'nPaddingBottom', nPaddingBottom)
+			SetComponentSize(raw)
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'nPaddingBottom')
+		end
+	end
+end
+
+-- (number) Instance:PaddingLeft()
+-- (self) Instance:PaddingLeft(nPaddingLeft)
+function OO:PaddingLeft(...)
+	self:_checksum()
+	if select('#', ...) > 0 then
+		local nPaddingLeft = ...
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'nPaddingLeft', nPaddingLeft)
+			SetComponentSize(raw)
+		end
+		return self
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'nPaddingLeft')
+		end
 	end
 end
 
