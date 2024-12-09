@@ -20,12 +20,11 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------
 
-local Chat = {}
-MY_GKP_Chat = {}
+local D = {}
 
-function MY_GKP_Chat.OnEvent(szEvent)
+function D.OnEvent(szEvent)
 	if szEvent == 'DISTRIBUTE_ITEM' then
-		Chat.CloseFrame(GetItem(arg1))
+		D.CloseFrame(GetItem(arg1))
 	elseif szEvent == 'DOODAD_LEAVE_SCENE' then
 		if arg0 == this.box.data.dwDoodadID then
 			X.UI.CloseFrame(this)
@@ -34,8 +33,8 @@ function MY_GKP_Chat.OnEvent(szEvent)
 end
 
 -- OnMsgArrive
-function Chat.OnMsgArrive(szMsg)
-	local frame = Chat.GetFrame()
+function D.OnMsgArrive(szMsg)
+	local frame = D.GetFrame()
 	if frame then
 		local hScroll = frame:Lookup('WndScroll_Chat')
 		local h = hScroll:Lookup('', '')
@@ -62,7 +61,7 @@ function Chat.OnMsgArrive(szMsg)
 	end
 end
 
-function Chat.GetFrame()
+function D.GetFrame()
 	return Station.Lookup('Normal/MY_GKP_Chat')
 end
 
@@ -85,8 +84,8 @@ function MY_GKP.DistributionItem()
 	end
 end
 
-function Chat.OpenFrame(item, menu, data)
-	local frame = Chat.GetFrame()
+function D.OpenFrame(item, menu, data)
+	local frame = D.GetFrame()
 	if not frame then
 		local ui = X.UI.CreateFrame('MY_GKP_Chat', { w = 500, h = 355, simple = true, text = _L['MY_GKP_Chat'] })
 		frame = ui:Raw()
@@ -97,7 +96,7 @@ function Chat.OpenFrame(item, menu, data)
 			buttonStyle = 'FLAT',
 			onClick = function()
 				X.SendChat(PLAYER_TALK_CHANNEL.RAID, _L['--- Stop Bidding ---'])
-				X.DelayCall(1000, function() UnRegisterMsgMonitor(Chat.OnMsgArrive) end)
+				X.DelayCall(1000, function() UnRegisterMsgMonitor(D.OnMsgArrive) end)
 			end,
 		})
 		frame.box = frame:Lookup('Wnd_Bg', 'Box')
@@ -111,7 +110,7 @@ function Chat.OpenFrame(item, menu, data)
 	local h = frame:Lookup('WndScroll_Chat'):Lookup('', '')
 	h:Clear()
 	UpdataItemInfoBoxObject(box, item.nVersion, item.dwTabType, item.dwIndex, (item.nGenre == ITEM_GENRE.BOOK and item.nBookID) or (item.bCanStack and item.nStackNum) or nil)
-	RegisterMsgMonitor(Chat.OnMsgArrive, { 'MSG_TEAM' })
+	RegisterMsgMonitor(D.OnMsgArrive, { 'MSG_TEAM' })
 	box.OnItemLButtonClick = function()
 		if IsCtrlKeyDown() or IsAltKeyDown() then
 			return
@@ -121,8 +120,8 @@ function Chat.OpenFrame(item, menu, data)
 	box.data = data
 end
 
-function Chat.CloseFrame(bCheck)
-	local frame = Chat.GetFrame()
+function D.CloseFrame(bCheck)
+	local frame = D.GetFrame()
 	if frame then
 		if type(bCheck) == 'userdata' then
 			local box = frame:Lookup('Wnd_Bg', 'Box')
@@ -131,15 +130,29 @@ function Chat.CloseFrame(bCheck)
 				return
 			end
 		end
-		UnRegisterMsgMonitor(Chat.OnMsgArrive)
+		UnRegisterMsgMonitor(D.OnMsgArrive)
 		X.UI.CloseFrame(frame)
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
 end
 
-local ui = {
-	OpenFrame = Chat.OpenFrame
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_GKP_Chat',
+	exports = {
+		{
+			preset = 'UIEvent',
+			fields = {
+				'OpenFrame',
+			},
+			root = D,
+		},
+	},
 }
-setmetatable(MY_GKP_Chat, { __index = ui, __newindex = function() end, __metatable = true })
+MY_GKP_Chat = X.CreateModule(settings)
+end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
