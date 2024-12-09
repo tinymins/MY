@@ -7075,6 +7075,12 @@ function X.UI.CreateFrame(szName, opt)
 	if not opt.anchor and not (opt.x and opt.y) then
 		opt.anchor = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 	end
+	if not opt.w then
+		opt.w = frm:GetW()
+	end
+	if not opt.h then
+		opt.h = frm:GetH()
+	end
 	return ApplyUIArguments(ui, opt)
 end
 
