@@ -510,6 +510,8 @@ local function GetComponentElement(raw, elementType)
 			element = GetComponentElement(raw, 'MAIN_HANDLE')
 		elseif componentType == 'WndScrollWindowBox' then
 			element = GetComponentElement(raw, 'CONTAINER')
+		elseif componentType == 'WndTabs' then
+			element = raw
 		end
 	elseif elementType == 'CHECKBOX' then -- 获取复选框UI实例
 		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' or componentType == 'CheckBox' then
@@ -523,6 +525,8 @@ local function GetComponentElement(raw, elementType)
 		if componentType == 'WndScrollWindowBox' then
 			element = raw:Lookup('WndContainer_Scroll')
 		elseif componentType == 'WndContainer' then
+			element = raw
+		elseif componentType == 'WndTabs' then
 			element = raw
 		end
 	elseif elementType == 'EDIT' then -- 获取输入框UI实例
@@ -562,6 +566,8 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll/Text_Default')
 		elseif componentType == 'WndFrame' then
 			element = raw:Lookup('', 'Text_Title') or raw:Lookup('', 'Text_Default')
+		elseif componentType == 'WndTab' then
+			element = raw:Lookup('', 'Text_WndTab')
 		elseif componentType == 'Handle' or componentType == 'CheckBox' or componentType == 'ColorBox' then
 			element = raw:Lookup('Text_Default')
 		elseif componentType == 'Text' then
@@ -1791,6 +1797,34 @@ local function InitComponent(raw, szType)
 			scrollY:ScrollNext(Station.GetMessageWheelDelta() * 10)
 			return 1
 		end
+	elseif szType == 'WndTabs' then
+		if X.UI.IS_GLASSMORPHISM then
+			raw:Lookup('', 'Image_WndTabs_Classic_Bg'):Hide()
+			raw:Lookup('', 'Image_WndTabs_Classic_SplitterL'):Hide()
+		else
+			raw:Lookup('', 'Image_WndTabs_Glassmorphism_Bg'):Hide()
+		end
+	elseif szType == 'WndTab' then
+		if X.UI.IS_GLASSMORPHISM then
+			raw:Lookup('', 'Image_WndTab_Splitter'):Hide()
+			raw:SetAnimation('ui\\Image\\UItimate\\UICommon\\Button4.UITex', 14, 20, 14, 14, 20, 20, 20, 19, 14, 14)
+		end
+		X.UI(raw):UIEvent('OnLButtonUp', function()
+			if not this:IsEnabled() or not this:IsMouseIn() then
+				return
+			end
+			local group = GetComponentProp(this, 'group')
+			local p = this:GetParent():GetFirstChild()
+			while p do
+				if p ~= this and GetComponentType(p) == 'WndTab' then
+					local g = GetComponentProp(p, 'group')
+					if g == group and p:IsCheckBoxChecked() then
+						p:Check(false)
+					end
+				end
+				p = p:GetNext()
+			end
+		end)
 	elseif szType == 'CheckBox' then
 		raw:RegisterEvent(831)
 		local function UpdateCheckState(raw)
@@ -4459,6 +4493,19 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		txt:SetRelPos(nHeight + 1, 2)
 		hdl:SetSize(nWidth, nHeight)
 		hdl:FormatAllItemPos()
+	elseif componentType == 'WndTabs' then
+		raw:SetSize(nWidth, nHeight)
+		raw:Lookup('', ''):SetSize(nWidth, nHeight)
+		raw:Lookup('', 'Image_WndTabs_Classic_Bg'):SetSize(nWidth - 1, nHeight + 3)
+		raw:Lookup('', 'Image_WndTabs_Classic_SplitterL'):SetH(nHeight - 2)
+		raw:Lookup('', 'Image_WndTabs_Glassmorphism_Bg'):SetSize(nWidth, nHeight - 3)
+	elseif componentType == 'WndTab' then
+		raw:SetSize(nWidth, nHeight)
+		raw:Lookup('', ''):SetSize(nWidth, nHeight)
+		raw:Lookup('', 'Text_WndTab'):SetSize(nWidth, nHeight)
+		raw:Lookup('', 'Image_WndTab_Splitter'):SetH(nHeight)
+		raw:Lookup('', 'Image_WndTab_Splitter'):SetRelX(nWidth - 1)
+		raw:Lookup('', ''):FormatAllItemPos()
 	elseif componentType == 'CheckBox' then
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 		local img = GetComponentElement(raw, 'IMAGE')
