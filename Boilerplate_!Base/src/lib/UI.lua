@@ -288,6 +288,14 @@ local function GetButtonStyleName(raw)
 	end
 end
 local function GetButtonStyleConfig(eButtonStyle)
+	if X.IsTable(eButtonStyle)
+	and eButtonStyle.szImage
+	and eButtonStyle.nNormalGroup
+	and eButtonStyle.nMouseOverGroup
+	and eButtonStyle.nMouseDownGroup
+	and eButtonStyle.nDisableGroup then
+		return eButtonStyle
+	end
 	local GetStyleConfig = X.Get(_G, {X.NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleConfig'})
 	return X.IsFunction(GetStyleConfig)
 		and GetStyleConfig(eButtonStyle)
