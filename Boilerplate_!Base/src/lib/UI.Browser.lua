@@ -168,8 +168,8 @@ function D.Open(url, options)
 			local eVisualState = ui:FrameVisualState()
 			if eVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then
 			elseif eVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then
-				this:SetH(46)
-				this:Lookup('', ''):SetH(46)
+				this:SetH(X.UI.IS_GLASSMORPHISM and 33 or 46)
+				this:Lookup('', ''):SetH(X.UI.IS_GLASSMORPHISM and 33 or 46)
 			elseif eVisualState == X.UI.FRAME_VISUAL_STATE.NORMAL then
 			end
 		end,
@@ -178,14 +178,17 @@ function D.Open(url, options)
 	local uiStatic = X.UI(frame:Lookup('', ''))
 	frame.uiTitleBg = uiStatic:Append('Image', {
 		x = 2, y = 2, w = 767, h = 75,
-		imageType = X.UI.IMAGE_TYPE.LEFT_CENTER_RIGHT,
+		imageType = X.UI.IMAGE_TYPE.LEFT_CENTER_RIGHT, visible = not X.UI.IS_GLASSMORPHISM,
 		image = 'ui\\Image\\UICommon\\ActivePopularize.UITex', imageFrame = 48,
 	})
 	uiStatic:Append('Image', {
-		x = 18, y = 15, w = 22, h = 22,
+		x = 18, y = X.UI.IS_GLASSMORPHISM and 7 or 15, w = 22, h = 22,
 		image = 'ui\\Image\\Minimap\\Minimap.UITex', imageFrame = 184,
 	})
-	frame.uiTitle = uiStatic:Append('Text', { x = 45, y = 11, w = 600, h = 30 })
+	frame.uiTitle = uiStatic:Append('Text', {
+		x = 45, y = X.UI.IS_GLASSMORPHISM and 2 or 11,
+		w = 600, h = 30,
+	})
 	X.UI.AppendFromIni(frame:Lookup('Wnd_Total'), X.PACKET_INFO.FRAMEWORK_ROOT .. 'ui/Browser.ini', 'Wnd_Total', true)
 
 	frame:SetName(FRAME_NAME .. '#' .. szKey)
