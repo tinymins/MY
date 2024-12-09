@@ -4383,7 +4383,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			raw:SetDragArea(0, 0, nWidth, 30)
 			hnd:SetSize(nWidth, nHeight)
 			wnd:SetSize(nWidth, nHeight - 30)
-		elseif GetComponentProp(raw, 'intact') or raw == X.Panel.GetFrame() then
+		elseif GetComponentProp(raw, 'intact') then
 			hnd:SetSize(nWidth, nHeight)
 			hnd:Lookup('Text_Title'):SetW(nWidth)
 			hnd:Lookup('Text_Author'):SetW(nWidth - 31)
