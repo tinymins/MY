@@ -38,8 +38,6 @@ local STAT_TYPE_NAME = MY_Recount.STAT_TYPE_NAME
 local SKILL_RESULT = MY_Recount.SKILL_RESULT
 local SKILL_RESULT_NAME = MY_Recount.SKILL_RESULT_NAME
 
-MY_Recount_DT = class()
-
 function D.InsertFromText(aTabTalk, h)
 	local aText = {}
 	for i = 0, h:GetItemCount() - 1 do
@@ -133,40 +131,7 @@ function D.GetDetailMenu(frame)
 	return t
 end
 
-function MY_Recount_DT.OnFrameCreate()
-	local frame = this
-	local id, nChannel = this:GetName():match('^MY_Recount_DT#([^_]+)_(%d+)$')
-	frame.id = tonumber(id) or id
-	frame.nChannel = tonumber(nChannel)
-	frame.bFirstRendering = true
-	frame.szPrimarySort = ((frame.nChannel == STAT_TYPE.DPS or frame.nChannel == STAT_TYPE.HPS) and DK_REC_STAT.SKILL) or DK_REC_STAT.TARGET
-	frame.szSecondarySort = ((frame.nChannel == STAT_TYPE.DPS or frame.nChannel == STAT_TYPE.HPS) and DK_REC_STAT.TARGET) or DK_REC_STAT.SKILL
-	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_5'):SetText(g_tStrings.STR_HIT_NAME)
-	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_6'):SetText(g_tStrings.STR_CS_NAME)
-	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
-	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
-	frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-
-	local function canEsc()
-		if frame and frame:IsValid() then
-			return true
-		else
-			X.RegisterEsc(frame:GetName(), false)
-		end
-	end
-	local function onEsc()
-		if frame.szSelectedSkill or frame.szSelectedTarget then
-			frame.szSelectedSkill  = nil
-			frame.szSelectedTarget = nil
-		else
-			X.RegisterEsc(frame:GetName(), false)
-			X.UI.CloseFrame(frame)
-		end
-	end
-	X.RegisterEsc(frame:GetName(), canEsc, onEsc)
-end
-
-function MY_Recount_DT.OnFrameBreathe()
+function D.OnFrameBreathe()
 	if this.nLastRedrawFrame
 	and GetLogicFrameCount() - this.nLastRedrawFrame > 0
 	and GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount_UI.nDrawInterval then
@@ -183,7 +148,7 @@ function MY_Recount_DT.OnFrameBreathe()
 
 	-- 更新标题
 	local szName = X.IsString(id) and id or MY_Recount_DS.GetNameAusID(DataDisplay, id)
-	this:Lookup('', 'Text_Default'):SetText(szName .. ' ' .. STAT_TYPE_NAME[this.nChannel])
+	this:Lookup('Wnd_Bg', 'Text_Default'):SetText(szName .. ' ' .. STAT_TYPE_NAME[this.nChannel])
 
 	-- 获取数据
 	local tData = MY_Recount_DS.GetMergeTargetData(DataDisplay, szChannel, id, MY_Recount_UI.bGroupSameNpc, MY_Recount_UI.bGroupSameEffect)
@@ -280,7 +245,7 @@ function MY_Recount_DT.OnFrameBreathe()
 	hList:FormatAllItemPos()
 
 	if szSelected and tData[szPrimarySort][szSelected] then
-		this:Lookup('', 'Handle_Spliter'):Show()
+		this:Lookup('Wnd_Bg', 'Handle_Spliter'):Show()
 		--------------- 二、技能释放结果列表更新 -----------------
 		-- 数据收集
 		local aResult, nCountSum, bShowZeroVal = {}, 0
@@ -450,13 +415,13 @@ function MY_Recount_DT.OnFrameBreathe()
 
 end
 
-function MY_Recount_DT.OnEvent(event)
+function D.OnEvent(event)
 	if event == 'ON_MY_MOSAICS_RESET' then
 		this.nLastRedrawFrame = nil
 	end
 end
 
-function MY_Recount_DT.OnLButtonClick()
+function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		X.RegisterEsc(this:GetRoot():GetTreePath(), false)
@@ -477,7 +442,7 @@ function MY_Recount_DT.OnLButtonClick()
 	end
 end
 
-function MY_Recount_DT.OnItemLButtonDown()
+function D.OnItemLButtonDown()
 	local name = this:GetName()
 	if name == 'Handle_SkillItem' then
 		if this:GetRoot().szPrimarySort == DK_REC_STAT.SKILL then
@@ -489,7 +454,7 @@ function MY_Recount_DT.OnItemLButtonDown()
 	end
 end
 
-function MY_Recount_DT.OnItemRButtonClick()
+function D.OnItemRButtonClick()
 	local name = this:GetName()
 	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == DK_REC_STAT.TARGET)
 	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == DK_REC_STAT.SKILL) then
@@ -500,7 +465,7 @@ function MY_Recount_DT.OnItemRButtonClick()
 			table.insert(menu, {
 				szOption = STAT_TYPE_NAME[STAT_TYPE[k]],
 				fnAction = function()
-					X.UI.OpenFrame(SZ_INI, 'MY_Recount_DT#' .. szKey .. '_' .. STAT_TYPE[k])
+					D.Open(szKey, STAT_TYPE[k])
 				end,
 			})
 		end
@@ -508,16 +473,69 @@ function MY_Recount_DT.OnItemRButtonClick()
 	end
 end
 
-function MY_Recount_DT.OnItemLButtonDBClick()
+function D.OnItemLButtonDBClick()
 	local name = this:GetName()
 	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == DK_REC_STAT.TARGET)
 	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == DK_REC_STAT.SKILL) then
-		X.UI.OpenFrame(SZ_INI, 'MY_Recount_DT#' .. this.szKey .. '_' .. this:GetRoot().nChannel)
+		D.Open(this.szKey, this:GetRoot().nChannel)
 	end
 end
 
-function MY_Recount_DT_Open(id, nChannel)
-	X.UI.OpenFrame(SZ_INI, 'MY_Recount_DT#' .. id .. '_' .. nChannel)
+function D.Open(id, nChannel)
+	local szFrameName = 'MY_Recount_DT#' .. id .. '_' .. nChannel
+	if Station.SearchFrame(szFrameName) then
+		return
+	end
+	local frame = X.UI.CreateFrame('MY_Recount_DT', { text = '', simple = true, close = false, w = 480, h = 387 }):Raw()
+	X.UI.AppendFromIni(frame, SZ_INI, 'Wnd_Total', true)
+	frame:SetName(szFrameName)
+	frame.id = tonumber(id) or id
+	frame.nChannel = tonumber(nChannel)
+	frame.bFirstRendering = true
+	frame.szPrimarySort = ((frame.nChannel == STAT_TYPE.DPS or frame.nChannel == STAT_TYPE.HPS) and DK_REC_STAT.SKILL) or DK_REC_STAT.TARGET
+	frame.szSecondarySort = ((frame.nChannel == STAT_TYPE.DPS or frame.nChannel == STAT_TYPE.HPS) and DK_REC_STAT.TARGET) or DK_REC_STAT.SKILL
+	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_5'):SetText(g_tStrings.STR_HIT_NAME)
+	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_6'):SetText(g_tStrings.STR_CS_NAME)
+	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
+	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
+	frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+
+	local function canEsc()
+		if frame and frame:IsValid() then
+			return true
+		else
+			X.RegisterEsc(szFrameName, false)
+		end
+	end
+	local function onEsc()
+		if frame.szSelectedSkill or frame.szSelectedTarget then
+			frame.szSelectedSkill  = nil
+			frame.szSelectedTarget = nil
+		else
+			X.RegisterEsc(szFrameName, false)
+			X.UI.CloseFrame(frame)
+		end
+	end
+	X.RegisterEsc(szFrameName, canEsc, onEsc)
+end
+
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_Recount_DT',
+	exports = {
+		{
+			preset = 'UIEvent',
+			fields = {
+				'Open',
+			},
+			root = D,
+		},
+	},
+}
+MY_Recount_DT = X.CreateModule(settings)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

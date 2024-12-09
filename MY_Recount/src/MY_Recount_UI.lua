@@ -587,7 +587,7 @@ function D.OnItemLButtonClick()
 		name = 'Handle_LI_' .. X.GetClientPlayerID()
 	end
 	if id and name:find('Handle_LI_') == 1 then
-		MY_Recount_DT_Open(id, MY_Recount_UI.nChannel)
+		MY_Recount_DT.Open(id, MY_Recount_UI.nChannel)
 	end
 end
 
