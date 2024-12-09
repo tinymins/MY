@@ -272,15 +272,35 @@ end
 ----------------------------------------------------------------------<
 function D.InitFrame(frame)
 	X.UI.AppendFromIni(frame, SZ_INI, 'Wnd_Total', true)
-	frame.hRecordContainer = frame:Lookup('PageSet_Menu/Page_GKP_Record/WndScroll_GKP_Record/WndContainer_Record_List')
-	frame.hAccountContainer = frame:Lookup('PageSet_Menu/Page_GKP_Account/WndScroll_GKP_Account/WndContainer_Account_List')
+	frame.hRecordContainer = frame:Lookup('Page_GKP_Record/WndScroll_GKP_Record/WndContainer_Record_List')
+	frame.hAccountContainer = frame:Lookup('Page_GKP_Account/WndScroll_GKP_Account/WndContainer_Account_List')
 	local ui = X.UI(frame)
+	frame:Lookup('Page_GKP_Record'):Show()
+	frame:Lookup('Page_GKP_Account'):Hide()
+	ui:Text(_L['GKP Golden Team Record']):Anchor('CENTER')
 	ui:Append('Image', {
 		x = 10, y = -10,
 		w = 36, h = 36,
 		image = 'ui\\Image\\UICommon\\CommonPanel.UITex', imageFrame = 88,
 	})
-	ui:Text(_L['GKP Golden Team Record']):Anchor('CENTER')
+	local uiTabs = ui:Append('WndTabs', {
+		x = 0, y = 40, w = frame:GetW(), h = 35,
+	})
+	uiTabs:Append('WndTab', {
+		w = 150, h = 35,
+		text = g_tStrings.GOLD_BID_RECORD_STATIC_TITLE,
+		checked = true,
+		onCheck = function(bChecked)
+			frame:Lookup('Page_GKP_Record'):SetVisible(bChecked)
+		end,
+	})
+	uiTabs:Append('WndTab', {
+		w = 150, h = 35,
+		text = g_tStrings.GOLD_BID_RPAY_STATIC_TITLE,
+		onCheck = function(bChecked)
+			frame:Lookup('Page_GKP_Account'):SetVisible(bChecked)
+		end,
+	})
 	ui:Append('WndButton', {
 		x = 955, y = 54, w = 20, h = 20,
 		buttonStyle = 'OPTION',
@@ -681,11 +701,8 @@ function D.InitFrame(frame)
 		end,
 	})
 
-	local hPageSet = X.UI(frame:Lookup('PageSet_Menu'))
-	hPageSet:Children('#WndCheck_GKP_Record'):Children('#Text_GKP_Record'):Text(g_tStrings.GOLD_BID_RECORD_STATIC_TITLE)
-	hPageSet:Children('#WndCheck_GKP_Account'):Children('#Text_GKP_Account'):Text(g_tStrings.GOLD_BID_RPAY_STATIC_TITLE)
 	-- ÅÅĞò
-	local page = frame:Lookup('PageSet_Menu/Page_GKP_Record')
+	local page = frame:Lookup('Page_GKP_Record')
 	local t = {
 		{'#',         false},
 		{'szPlayer',  _L['Gainer']},
@@ -718,7 +735,7 @@ function D.InitFrame(frame)
 	end
 
 	-- ÅÅĞò2
-	local page = frame:Lookup('PageSet_Menu/Page_GKP_Account')
+	local page = frame:Lookup('Page_GKP_Account')
 	local t = {
 		{'#',        false},
 		{'szPlayer', _L['Transation Target']},
