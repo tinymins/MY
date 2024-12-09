@@ -501,6 +501,8 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll')
 		elseif componentType == 'Handle' or componentType == 'CheckBox' or componentType == 'ColorBox' then
 			element = raw
+		elseif componentType == 'WndTabs' then
+			return
 		elseif componentBaseType == 'Wnd' then
 			local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 			if wnd then
@@ -518,7 +520,10 @@ local function GetComponentElement(raw, elementType)
 			element = raw
 		end
 	elseif elementType == 'CHECKBOX' then -- 获取复选框UI实例
-		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' or componentType == 'CheckBox' then
+		if componentType == 'WndCheckBox'
+		or componentType == 'WndRadioBox'
+		or componentType == 'WndTab'
+		or componentType == 'CheckBox' then
 			element = raw
 		end
 	elseif elementType == 'COMBO_BOX' then -- 获取下拉框UI实例
