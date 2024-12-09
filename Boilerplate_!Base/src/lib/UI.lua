@@ -6762,11 +6762,28 @@ end)
 -- end
 
 ---------------------------------------------------
--- create new frame
--- (ui) X.UI.CreateFrame(string szName, table opt)
--- @param string szName: the ID of frame
--- @param table  opt   : options
+-- 窗体操作
 ---------------------------------------------------
+
+---@class UI_CreateFrame_Options @创建窗体参数
+---@field level '"Normal" | "Lowest" | "Topmost" | "Normal1" | "Lowest1" | "Topmost1" | "Normal2" | "Lowest2" | "Topmost2"' @层级
+---@field simple boolean @是否为简单窗体
+---@field empty boolean @是否为空白窗体
+---@field esc boolean @是否注册全局ESC关闭窗体
+---@field close boolean @是否显示关闭按钮
+---@field setting boolean @是否显示设置按钮
+---@field minimize boolean @是否允许最小化
+---@field maximize boolean @是否允许最大化
+---@field minWidth number @最小宽度
+---@field minHeight number @最小高度
+---@field resize boolean @是否允许拖拽改变大小
+---@field alpha number @窗体透明度
+---@field anchor FrameAnchor @窗体位置
+---@field onFrameVisualStateChange function @窗体最大最小化状态发生变化时回调
+
+-- 创建窗体
+---@param szName string @要创建的窗体名字
+---@param opt? UI_CreateFrame_Options @参数
 function X.UI.CreateFrame(szName, opt)
 	if not X.IsTable(opt) then
 		opt = {}
