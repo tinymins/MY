@@ -36,6 +36,8 @@ function D.Open()
 		frame = X.UI.CreateFrame(FRAME_NAME, {
 			maximize = true,
 			resize = true,
+			minWidth = 400,
+			minHeight = 400,
 			onRemove = function()
 				D.Hide()
 				return true
@@ -576,7 +578,7 @@ function D.OnSizeChange()
 	-- fix size
 	local nWidth, nHeight = frame:GetSize()
 	local bHideTabs = nWidth < 550
-	local nMainWidth = bHideTabs and (nWidth - 10) or (nWidth - 218)
+	local nMainWidth = bHideTabs and (nWidth - 10) or (nWidth - 225)
 	local nMainHeight = nHeight - 100
 	frame.uiCategories:Width(nWidth)
 	frame.uiBtnAbout:Left(nWidth - 160)
@@ -586,7 +588,7 @@ function D.OnSizeChange()
 	frame.uiImageTabsSplitter:Height(nHeight - 106)
 	frame.uiImageTabsSplitter:Visible(not bHideTabs)
 	frame.uiMain:Left(bHideTabs and 5 or 213)
-	frame.uiMain:Size(nMainWidth - 10, nMainHeight)
+	frame.uiMain:Size(nMainWidth, nMainHeight)
 
 	local hWndMainPanel = frame.MAIN_WND
 	if hWndMainPanel.OnPanelResize then
