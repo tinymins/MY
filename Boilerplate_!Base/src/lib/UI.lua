@@ -2570,13 +2570,14 @@ end
 function OO:Clear()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
-		if raw.Clear then
-			raw:Clear()
+		local h = GetComponentElement(raw, 'MAIN_HANDLE')
+		if h then
+			h:Clear()
+			h:FormatAllItemPos()
 		end
-		raw = GetComponentElement(raw, 'MAIN_HANDLE')
-		if raw then
-			raw:Clear()
-			raw:FormatAllItemPos()
+		local h = GetComponentElement(raw, 'MAIN_CONTAINER')
+		if h then
+			h:Clear()
 		end
 	end
 	return self
