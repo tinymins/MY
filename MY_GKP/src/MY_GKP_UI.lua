@@ -27,8 +27,6 @@ local D = {
 	GetFormatLink = MY_GKP.GetFormatLink,
 }
 
-MY_GKP_UI = class()
-
 function D.SetDS(frame, szFilePath)
 	frame.ds = MY_GKP_DS(szFilePath)
 	if frame.ds then
@@ -74,7 +72,7 @@ end
 function D.DrawStat(frame)
 	local a, b = frame.ds:GetAuctionSum()
 	local c, d = frame.ds:GetPaymentSum()
-	local hStat = frame:Lookup('', 'Handle_Record_Stat')
+	local hStat = frame:Lookup('Wnd_Bg', 'Handle_Record_Stat')
 	local szXml = GetFormatText(_L['Reall Salary:'], 41) .. D.GetMoneyTipText(a + b)
 	if X.IsClientPlayerTeamDistributor() or not X.IsClientPlayerInParty() then
 		if c + d < 0 then
@@ -272,10 +270,16 @@ end
 ---------------------------------------------------------------------->
 -- 窗体创建时会被调用
 ----------------------------------------------------------------------<
-function MY_GKP_UI.OnFrameCreate()
-	this.hRecordContainer = this:Lookup('PageSet_Menu/Page_GKP_Record/WndScroll_GKP_Record/WndContainer_Record_List')
-	this.hAccountContainer = this:Lookup('PageSet_Menu/Page_GKP_Account/WndScroll_GKP_Account/WndContainer_Account_List')
-	local ui = X.UI(this)
+function D.InitFrame(frame)
+	X.UI.AppendFromIni(frame, SZ_INI, 'Wnd_Total', true)
+	frame.hRecordContainer = frame:Lookup('PageSet_Menu/Page_GKP_Record/WndScroll_GKP_Record/WndContainer_Record_List')
+	frame.hAccountContainer = frame:Lookup('PageSet_Menu/Page_GKP_Account/WndScroll_GKP_Account/WndContainer_Account_List')
+	local ui = X.UI(frame)
+	ui:Append('Image', {
+		x = 10, y = -10,
+		w = 36, h = 36,
+		image = 'ui\\Image\\UICommon\\CommonPanel.UITex', imageFrame = 88,
+	})
 	ui:Text(_L['GKP Golden Team Record']):Anchor('CENTER')
 	ui:Append('WndButton', {
 		x = 955, y = 54, w = 20, h = 20,
@@ -294,7 +298,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if not X.IsClientPlayerTeamDistributor() and not X.IsDebugging('MY_GKP') then -- debug
 				return X.Alert('MY_GKP_UI', _L['You are not the distrubutor.'])
 			end
-			MY_GKP_AuctionUI.Open(this:GetRoot().ds)
+			MY_GKP_AuctionUI.Open(frame:GetRoot().ds)
 		end,
 	})
 	local nW = 980
@@ -305,7 +309,7 @@ function MY_GKP_UI.OnFrameCreate()
 		x = nX, y = 620, w = 120, text = g_tStrings.GOLD_TEAM_SYLARY_LIST,
 		buttonStyle = 'FLAT_LACE_BORDER',
 		onClick = function()
-			local ds = this:GetRoot().ds
+			local ds = frame:GetRoot().ds
 			local me = X.GetClientPlayer()
 			if not me.IsInParty() and not X.IsDebugging('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not in the team.'])
@@ -421,7 +425,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
-			local ds = this:GetRoot().ds
+			local ds = frame:GetRoot().ds
 			local me = X.GetClientPlayer()
 			if not me.IsInParty() and not X.IsDebugging('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not in the team.'])
@@ -464,7 +468,7 @@ function MY_GKP_UI.OnFrameCreate()
 			if X.IsSafeLocked(SAFE_LOCK_EFFECT_TYPE.TALK) then
 				return X.Alert('TALK_LOCK', _L['Please unlock talk lock first.'])
 			end
-			local ds = this:GetRoot().ds
+			local ds = frame:GetRoot().ds
 			local me = X.GetClientPlayer()
 			if not me.IsInParty() and not X.IsDebugging('MY_GKP') then
 				return X.Alert('MY_GKP_UI', _L['You are not in the team.'])
@@ -551,7 +555,7 @@ function MY_GKP_UI.OnFrameCreate()
 				table.insert(menu, {
 					szOption = info.filename .. '.gkp',
 					fnAction = function()
-						MY_GKP_Open(info.fullpath)
+						D.Open(info.fullpath)
 					end,
 					szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 					nFrame = 49,
@@ -578,7 +582,7 @@ function MY_GKP_UI.OnFrameCreate()
 						X.FormatPath({'userdata/gkp', X.PATH_TYPE.ROLE})
 					)
 					if not X.IsEmpty(file) then
-						MY_GKP_Open(file)
+						D.Open(file)
 					end
 				end,
 			})
@@ -651,7 +655,7 @@ function MY_GKP_UI.OnFrameCreate()
 		x = nX, y = 660, w = 120, text = _L['Set record caption'],
 		buttonStyle = 'FLAT_LACE_BORDER',
 		menu = function()
-			local ds = this:GetRoot().ds
+			local ds = frame:GetRoot().ds
 			GetUserInput(_L['Please input new caption'],function(szText)
 				if X.IsEmpty(szText) then
 					return
@@ -667,7 +671,7 @@ function MY_GKP_UI.OnFrameCreate()
 		x = nX, y = 660, w = 120, text = _L['Set current record'],
 		buttonStyle = 'FLAT_LACE_BORDER',
 		menu = function()
-			local frame = this:GetRoot()
+			local frame = frame:GetRoot()
 			X.Confirm(_L['Are you sure to cover the current information with the last record data?'], function()
 				MY_GKP_MI.LoadHistory(frame.ds:GetFilePath())
 				MY_GKP_MI.OpenPanel()
@@ -677,11 +681,11 @@ function MY_GKP_UI.OnFrameCreate()
 		end,
 	})
 
-	local hPageSet = ui:Children('#PageSet_Menu')
+	local hPageSet = X.UI(frame:Lookup('PageSet_Menu'))
 	hPageSet:Children('#WndCheck_GKP_Record'):Children('#Text_GKP_Record'):Text(g_tStrings.GOLD_BID_RECORD_STATIC_TITLE)
 	hPageSet:Children('#WndCheck_GKP_Account'):Children('#Text_GKP_Account'):Text(g_tStrings.GOLD_BID_RPAY_STATIC_TITLE)
 	-- 排序
-	local page = this:Lookup('PageSet_Menu/Page_GKP_Record')
+	local page = frame:Lookup('PageSet_Menu/Page_GKP_Record')
 	local t = {
 		{'#',         false},
 		{'szPlayer',  _L['Gainer']},
@@ -697,7 +701,7 @@ function MY_GKP_UI.OnFrameCreate()
 			txt:SetText(v[2])
 			txt.OnItemLButtonClick = function()
 				local sort = txt.sort or 'asc'
-				D.DrawAuctionPage(this:GetRoot(), v[1], sort)
+				D.DrawAuctionPage(frame:GetRoot(), v[1], sort)
 				if sort == 'asc' then
 					txt.sort = 'desc'
 				else
@@ -714,7 +718,7 @@ function MY_GKP_UI.OnFrameCreate()
 	end
 
 	-- 排序2
-	local page = this:Lookup('PageSet_Menu/Page_GKP_Account')
+	local page = frame:Lookup('PageSet_Menu/Page_GKP_Account')
 	local t = {
 		{'#',        false},
 		{'szPlayer', _L['Transation Target']},
@@ -731,7 +735,7 @@ function MY_GKP_UI.OnFrameCreate()
 			txt:SetText(v[2])
 			txt.OnItemLButtonClick = function()
 				local sort = txt.sort or 'asc'
-				D.DrawPaymentPage(this:GetRoot(), v[1], sort)
+				D.DrawPaymentPage(frame:GetRoot(), v[1], sort)
 				if sort == 'asc' then
 					txt.sort = 'desc'
 				else
@@ -747,21 +751,21 @@ function MY_GKP_UI.OnFrameCreate()
 		end
 	end
 
-	this.SetDS = D.SetDS
-	this:RegisterEvent('MY_GKP_DATA_UPDATE')
-	this:RegisterEvent('MY_GKP_SEND_BEGIN')
-	this:RegisterEvent('MY_GKP_SEND_FINISH')
+	frame.SetDS = D.SetDS
+	frame:RegisterEvent('MY_GKP_DATA_UPDATE')
+	frame:RegisterEvent('MY_GKP_SEND_BEGIN')
+	frame:RegisterEvent('MY_GKP_SEND_FINISH')
 end
 
-function MY_GKP_UI.OnFrameShow()
+function D.OnFrameShow()
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
 
-function MY_GKP_UI.OnFrameHide()
+function D.OnFrameHide()
 	PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 end
 
-function MY_GKP_UI.OnEvent(event)
+function D.OnEvent(event)
 	if event == 'MY_GKP_DATA_UPDATE' then
 		if arg0 == '' or arg0 == this.ds:GetFilePath() then
 			if arg1 == 'MAP' or arg1 == 'TIME' or arg1 == 'ALL' then
@@ -786,21 +790,21 @@ function MY_GKP_UI.OnEvent(event)
 	end
 end
 
-function MY_GKP_UI.OnFrameKeyDown()
+function D.OnFrameKeyDown()
 	if GetKeyName(Station.GetMessageKey()) == 'Esc' then
 		X.UI.CloseFrame(this:GetRoot())
 		return 1
 	end
 end
 
-function MY_GKP_UI.OnLButtonClick()
+function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		X.UI.CloseFrame(this:GetRoot())
 	end
 end
 
-function MY_GKP_UI.OnItemLButtonDown()
+function D.OnItemLButtonDown()
 	local szName = this:GetName()
 	if szName == 'Text_Name' then
 		if IsCtrlKeyDown() then
@@ -809,7 +813,7 @@ function MY_GKP_UI.OnItemLButtonDown()
 	end
 end
 
-function MY_GKP_UI.OnItemMouseEnter()
+function D.OnItemMouseEnter()
 	local frame = this:GetRoot()
 	if this:GetName() == 'Text_Name' then
 		local data = this.data
@@ -852,13 +856,13 @@ function MY_GKP_UI.OnItemMouseEnter()
 	end
 end
 
-function MY_GKP_UI.OnItemMouseLeave()
+function D.OnItemMouseLeave()
 	HideTip()
 end
 
 do
 local nIndex = 0
-function MY_GKP_Open(szFilePath)
+function D.Open(szFilePath)
 	local szName = 'MY_GKP'
 	local ds = MY_GKP_DS(szFilePath)
 	if ds == MY_GKP_MI.GetDS() then
@@ -873,10 +877,32 @@ function MY_GKP_Open(szFilePath)
 		nIndex = nIndex + 1
 		szName = szName .. '#' .. nIndex
 	end
-	local frame = X.UI.OpenFrame(SZ_INI, szName)
+	local ui = X.UI.CreateFrame('MY_GKP_UI', { w = 1000, h = 700 })
+	local frame = ui:Raw()
+	D.InitFrame(frame)
+	frame:SetName(szName)
 	frame:SetDS(szFilePath)
 	frame:BringToTop()
 end
+end
+
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_GKP_UI',
+	exports = {
+		{
+			preset = 'UIEvent',
+			fields = {
+				'Open',
+			},
+			root = D,
+		},
+	},
+}
+MY_GKP_UI = X.CreateModule(settings)
 end
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]

@@ -567,7 +567,7 @@ X.RegisterInit('MY_GKP_MI__SyncSystemGKP', D.SyncSystemGKP)
 -- Ö÷½çÃæ
 ----------------------------------------------------------------------<
 function D.OpenPanel()
-	MY_GKP_Open(D.GetDS():GetFilePath())
+	MY_GKP_UI.Open(D.GetDS():GetFilePath())
 end
 
 function D.ClosePanel()
