@@ -111,7 +111,13 @@ function X.DismissNotify(...)
 end
 
 function D.OpenPanel()
-	X.UI.OpenFrame(INI_PATH, FRAME_NAME)
+	local ui = X.UI.CreateFrame(FRAME_NAME, {
+		text = X.PACKET_INFO.NAME .. ' - ' .. _L['Notify center'],
+		w = 760, h = 600,
+	})
+	local frame = ui:Raw()
+	X.UI.AppendFromIni(frame:Lookup('Wnd_Total'), INI_PATH, 'WndScroll_Notify')
+	D.DrawNotifies()
 end
 
 function D.UpdateEntry()
@@ -161,7 +167,7 @@ function D.DrawNotifies(bAutoClose)
 	if bAutoClose and #NOTIFY_LIST == 0 then
 		return X.UI.CloseFrame(FRAME_NAME)
 	end
-	local hList = Station.Lookup('Normal/' .. FRAME_NAME .. '/Window_Main/WndScroll_Notify', 'Handle_Notifies')
+	local hList = Station.Lookup('Normal/' .. FRAME_NAME .. '/Wnd_Total/WndScroll_Notify', 'Handle_Notifies')
 	if not hList then
 		return
 	end
@@ -207,18 +213,7 @@ function D.DrawNotifies(bAutoClose)
 end
 
 function D.OnFrameCreate()
-	-- ÁðÁ§·ç¸ñ
-	if X.UI.IS_GLASSMORPHISM then
-		this:Lookup('', 'Handle_ClassicBg'):Hide()
-		this:Lookup('', 'Text_Title'):SetRelY(2)
-		this:Lookup('Btn_Close'):SetRelY(7)
-		this:Lookup('', ''):FormatAllItemPos()
-	else
-		this:Lookup('', 'Handle_GlassmorphismBg'):Hide()
-	end
-	this:Lookup('', 'Text_Title'):SetText(X.PACKET_INFO.NAME .. ' - ' .. _L['Notify center'])
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-	D.DrawNotifies()
 end
 
 function D.OnItemLButtonClick()
