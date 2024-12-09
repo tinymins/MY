@@ -12,7 +12,6 @@ local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/PS')
 --------------------------------------------------------------------------------
 local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 --------------------------------------------------------------------------------
-local INI_PATH = X.PACKET_INFO.FRAMEWORK_ROOT ..'ui/PS.ini'
 local IMG_PATH = X.PACKET_INFO.FRAMEWORK_ROOT ..'img/PS.UITex'
 local FRAME_NAME = X.NSFormatString('{$NS}_PS')
 
