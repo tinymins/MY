@@ -108,6 +108,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('MY_TEAM_MON__UI__DATA_RELOAD')
 	this:RegisterEvent('MY_TEAM_MON__UI__SELECT_MAP')
 	this:RegisterEvent('UI_SCALED')
+	X.UI.AppendFromIni(this:Lookup('Wnd_Total'), MY_TEAM_MON__UI__INI_FILE, 'Wnd_Total', true)
 	-- Esc
 	X.RegisterEsc('MY_TeamMon', D.IsOpened, D.ClosePanel)
 	-- CreateItemData
@@ -118,18 +119,18 @@ function D.OnFrameCreate()
 	-- tree
 	this.hTreeN = this:CreateItemData(MY_TEAM_MON__UI__INI_FILE, 'Handle_TreeNode')
 	this.hTreeI = this:CreateItemData(MY_TEAM_MON__UI__INI_FILE, 'Handle_TreeItem')
-	this.hTreeH = this:Lookup('PageSet_Main/WndScroll_Tree', '')
-	this.hTreeS = this:Lookup('PageSet_Main/WndScroll_Tree/Btn_Tree_All')
+	this.hTreeH = this:Lookup('Wnd_Total/PageSet_Main/WndScroll_Tree', '')
+	this.hTreeS = this:Lookup('Wnd_Total/PageSet_Main/WndScroll_Tree/Btn_Tree_All')
 
 	MY_TEAM_MON__UI__SEARCH = nil -- ÷ÿ÷√À—À˜
 	MY_TEAM_MON__UI__MAP_SEARCH = nil -- ÷ÿ÷√À—À˜
 	MY_TEAM_MON__UI__GLOBAL_SEARCH = false
 	MY_TEAM_MON__UI__DRAG = false
 
-	this.hPageSet = this:Lookup('PageSet_Main')
+	this.hPageSet = this:Lookup('Wnd_Total/PageSet_Main')
 
-	this:Lookup('PageSet_Main/Wnd_SearchMap/Edit_SearchMap'):SetPlaceholderText(_L['Search map'])
-	this:Lookup('PageSet_Main/Wnd_SearchContent/Edit_SearchContent'):SetPlaceholderText(_L['Search content'])
+	this:Lookup('Wnd_Total/PageSet_Main/Wnd_SearchMap/Edit_SearchMap'):SetPlaceholderText(_L['Search map'])
+	this:Lookup('Wnd_Total/PageSet_Main/Wnd_SearchContent/Edit_SearchContent'):SetPlaceholderText(_L['Search content'])
 
 	local ui = X.UI(this)
 	ui:Text(_L['MY_TeamMon config panel'])
@@ -332,11 +333,11 @@ function D.UpdateBG()
 	local DungeonInfo = X.GetGameTable('DungeonInfo', true)
 	local info = X.IsNumber(MY_TEAM_MON__UI__SELECT_MAP) and DungeonInfo and DungeonInfo:Search(MY_TEAM_MON__UI__SELECT_MAP)
 	if MY_TEAM_MON__UI__SELECT_TYPE ~= 'TALK' and MY_TEAM_MON__UI__SELECT_TYPE ~= 'CHAT' and info and info.szDungeonImage2 then
-		frame:Lookup('', 'Handle_BG'):Show()
-		frame:Lookup('', 'Handle_BG/Image_BG'):FromUITex(info.szDungeonImage2, 0)
-		frame:Lookup('', 'Handle_BG/Text_BgTitle'):SetText(info.szLayer3Name .. g_tStrings.STR_CONNECT .. info.szOtherName)
+		frame:Lookup('Wnd_Bg', ''):Show()
+		frame:Lookup('Wnd_Bg', 'Image_BG'):FromUITex(info.szDungeonImage2, 0)
+		frame:Lookup('Wnd_Bg', 'Text_BgTitle'):SetText(info.szLayer3Name .. g_tStrings.STR_CONNECT .. info.szOtherName)
 	else
-		frame:Lookup('', 'Handle_BG'):Hide()
+		frame:Lookup('Wnd_Bg', ''):Hide()
 	end
 end
 
@@ -3562,7 +3563,9 @@ function D.OpenPanel(szType)
 		if szType then
 			MY_TEAM_MON__UI__SELECT_TYPE = szType
 		end
-		X.UI.OpenFrame(MY_TEAM_MON__UI__INI_FILE, 'MY_TeamMon_UI')
+		X.UI.CreateFrame('MY_TeamMon_UI', {
+			w = 1070, h = 680,
+		})
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
 end
