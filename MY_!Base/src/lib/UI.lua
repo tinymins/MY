@@ -4388,10 +4388,11 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			raw:Lookup('WndContainer_TitleBtnR'):SetSize(nWidth, 30)
 			raw:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
 			local hBtnDrag = raw:Lookup('Btn_Drag')
-			if X.UI.IS_GLASSMORPHISM then
-				hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW(), nHeight - hBtnDrag:GetH())
-			else
-				hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW() - 8, nHeight - hBtnDrag:GetH() - 8)
+			if hBtnDrag then
+				hBtnDrag:SetRelPos(
+					nWidth - hBtnDrag:GetW() - (hBtnDrag.nVisualOffsetX or 0),
+					nHeight - hBtnDrag:GetH() - (hBtnDrag.nVisualOffsetY or 0)
+				)
 			end
 			local hDragBg = raw:Lookup('Wnd_DragBg', 'Shadow_DragBg')
 			if hDragBg then
@@ -4413,11 +4414,10 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			end
 			local hBtnDrag = raw:Lookup('Btn_Drag')
 			if hBtnDrag then
-				if X.UI.IS_GLASSMORPHISM then
-					hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW(), nHeight - hBtnDrag:GetH())
-				else
-					hBtnDrag:SetRelPos(nWidth - hBtnDrag:GetW() - 8, nHeight - hBtnDrag:GetH() - 8)
-				end
+				hBtnDrag:SetRelPos(
+					nWidth - hBtnDrag:GetW() + (hBtnDrag.nVisualOffsetX or 0),
+					nHeight - hBtnDrag:GetH() + (hBtnDrag.nVisualOffsetY or 0)
+				)
 			end
 			local hDragBg = raw:Lookup('Wnd_DragBg', 'Shadow_DragBg')
 			if hDragBg then
@@ -7016,58 +7016,60 @@ function X.UI.CreateFrame(szName, opt)
 			X.UI(frm):UIEvent('OnFrameVisualStateChange', opt.onFrameVisualStateChange)
 		end
 		-- drag resize button
+		local hBtnDrag = frm:Lookup('Btn_Drag')
 		if not opt.resize then
-			frm:Lookup('Btn_Drag'):Hide()
+			hBtnDrag:Hide()
 		else
 			SetComponentProp(frm, 'bDragResize', true)
-			frm:Lookup('Btn_Drag').OnMouseEnter = function()
+			if X.UI.IS_GLASSMORPHISM then
+				hBtnDrag.nVisualOffsetX = 0
+				hBtnDrag.nVisualOffsetY = 0
+			else
+				hBtnDrag.nVisualOffsetX = -8
+				hBtnDrag.nVisualOffsetY = -8
+			end
+			hBtnDrag.OnMouseEnter = function()
 				Cursor.Switch(CURSOR.LEFTTOP_RIGHTBOTTOM)
 			end
-			frm:Lookup('Btn_Drag').OnMouseLeave = function()
+			hBtnDrag.OnMouseLeave = function()
 				Cursor.Switch(CURSOR.NORMAL)
 			end
-			frm:Lookup('Btn_Drag').OnDragButton = function()
+			hBtnDrag.OnDragButton = function()
 				local nX, nY = Station.GetMessagePos()
 				local nClientW, nClientH = Station.GetClientSize()
 				local nFrameX, nFrameY = frm:GetRelPos()
-				local nW, nH = nX - nFrameX, nY - nFrameY
+				local nW, nH = nX - nFrameX + this.nOffsetX, nY - nFrameY + this.nOffsetY
 				nW = math.min(nW, nClientW - nFrameX) -- frame size should not larger than client size
 				nH = math.min(nH, nClientH - nFrameY)
 				nW = math.max(nW, GetComponentProp(frm, 'minWidth')) -- frame size must larger than its min size
 				nH = math.max(nH, GetComponentProp(frm, 'minHeight'))
-				local hBtnDrag = frm:Lookup('Btn_Drag')
-				if X.UI.IS_GLASSMORPHISM then
-					hBtnDrag:SetRelPos(nW - hBtnDrag:GetW(), nH - hBtnDrag:GetH())
-				else
-					hBtnDrag:SetRelPos(nW - hBtnDrag:GetW() - 8, nH - hBtnDrag:GetH() - 8)
-				end
-				frm:Lookup('Wnd_DragBg', 'Shadow_DragBg'):SetSize(nW, nH)
+				this:SetRelPos(nW - this:GetW(), nH - this:GetH())
+				frm:Lookup('Wnd_DragBg', 'Shadow_DragBg'):SetSize(nW - this.nVisualOffsetX, nH - this.nVisualOffsetY)
 			end
-			frm:Lookup('Btn_Drag').OnDragButtonBegin = function()
+			hBtnDrag.OnDragButtonBegin = function()
+				-- 由于开始拖拽位置不可能完全是按钮右下角，所以需要记录按下时相对于按钮右下角的偏移，让拖拽手感更加平滑
+				local nX, nY = Station.GetMessagePos()
+				this.nOffsetX = this:GetAbsX() + this:GetW() - nX
+				this.nOffsetY = this:GetAbsY() + this:GetH() - nY
 				frm:Lookup('Wnd_DragBg'):Show()
 				frm:Lookup('', ''):Hide()
 				frm:Lookup('Wnd_Total'):Hide()
 				frm:Lookup('WndContainer_TitleBtnL'):Hide()
 				frm:Lookup('WndContainer_TitleBtnR'):Hide()
 			end
-			frm:Lookup('Btn_Drag').OnDragButtonEnd = function()
+			hBtnDrag.OnDragButtonEnd = function()
 				frm:Lookup('Wnd_DragBg'):Hide()
 				frm:Lookup('', ''):Show()
 				frm:Lookup('Wnd_Total'):Show()
 				frm:Lookup('WndContainer_TitleBtnL'):Show()
 				frm:Lookup('WndContainer_TitleBtnR'):Show()
-				local nW = this:GetRelX() + this:GetW()
-				local nH = this:GetRelY() + this:GetH()
-				if X.UI.IS_GLASSMORPHISM then
-				else
-					nW = nW + 8
-					nH = nH + 8
-				end
+				local nW = this:GetRelX() + this:GetW() - this.nVisualOffsetX
+				local nH = this:GetRelY() + this:GetH() - this.nVisualOffsetY
 				nW = math.max(nW, GetComponentProp(frm, 'minWidth'))
 				nH = math.max(nH, GetComponentProp(frm, 'minHeight'))
 				X.UI(frm):Size(nW, nH)
 			end
-			frm:Lookup('Btn_Drag'):RegisterLButtonDrag()
+			hBtnDrag:RegisterLButtonDrag()
 		end
 		frm:Lookup('WndContainer_TitleBtnL'):FormatAllContentPos()
 		frm:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
