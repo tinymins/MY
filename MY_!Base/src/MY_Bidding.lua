@@ -27,6 +27,56 @@ function D.CheckChatLock()
 	return true
 end
 
+function D.CreateFrame(szKey)
+	local szFrameName = 'MY_Bidding#' .. szKey
+	if Station.SearchFrame(szFrameName) then
+		return
+	end
+	local ui, frame
+	ui = X.UI.CreateFrame('MY_Bidding', {
+		w = 565, h = 480,
+		text = _L['Bidding'],
+		onRemove = function()
+			if X.IsClientPlayerTeamDistributor() then
+				X.OutputSystemAnnounceMessage(_L['You are distributor, Please finish this bidding!'])
+			else
+				X.Confirm(_L['Sure cancel this bidding? You will not able to bidding this item.'], function()
+					X.UI.CloseFrame(frame)
+				end)
+			end
+			return true
+		end,
+	})
+	frame = ui:Raw()
+	if not frame then
+		return
+	end
+	frame:SetName('MY_Bidding#' .. szKey)
+	X.UI.AppendFromIni(frame, INI_PATH, 'Wnd_Total', true)
+	frame:Lookup('Wnd_Config', 'Handle_ConfigName/Text_ConfigName_Title'):SetText(_L['Bidding item:'])
+	frame:Lookup('Wnd_Config', 'Handle_ConfigPriceMin/Text_ConfigPriceMin_Title'):SetText(_L['Min price:'])
+	frame:Lookup('Wnd_Config', 'Handle_ConfigPriceStep/Text_ConfigPriceStep_Title'):SetText(_L['Min price step:'])
+	frame:Lookup('Wnd_Config', 'Handle_ConfigNumber/Text_ConfigNumber_Title'):SetText(_L['Target bidding number:'])
+	frame:Lookup('Wnd_Config/WndButton_ConfigSubmit', 'Text_ConfigSubmit'):SetText(_L['Sure'])
+	frame:Lookup('Wnd_Config/WndButton_ConfigCancel', 'Text_ConfigCancel'):SetText(_L['Cancel'])
+	frame:Lookup('Wnd_Bidding/WndButton_Bidding', 'Text_ButtonBidding'):SetText(_L['Show price'])
+	frame:Lookup('Wnd_Bidding/WndButton_BiddingP', 'Text_ButtonBiddingP'):SetText(_L['P'])
+	frame:Lookup('Wnd_Bidding/WndButton_Publish', 'Text_Publish'):SetText(_L['Publish'])
+	frame:Lookup('Wnd_Bidding/WndButton_Finish', 'Text_Finish'):SetText(_L['Finish'])
+	frame:Lookup('WndScroll_Bidding', 'Handle_BiddingColumns/Handle_BiddingColumnName/Text_BiddingColumnName_Title'):SetText(_L['Name'])
+	frame:Lookup('WndScroll_Bidding', 'Handle_BiddingColumns/Handle_BiddingColumnPrice/Text_BiddingColumnPrice_Title'):SetText(_L['Price'])
+	frame:Lookup('WndScroll_Bidding', 'Handle_BiddingColumns/Handle_BiddingColumnTime/Text_BiddingColumnTime_Title'):SetText(_L['Time'])
+	frame:RegisterEvent('PARTY_DISBAND')
+	frame:RegisterEvent('PARTY_DELETE_MEMBER')
+	frame:RegisterEvent('TEAM_AUTHORITY_CHANGED')
+	frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, -100)
+	D.SwitchConfig(frame, false)
+	D.SwitchCustomBidding(frame, false)
+	D.UpdateAuthourize(frame)
+	D.UpdateList(frame)
+	return frame
+end
+
 function D.Open(tConfig)
 	if not tConfig then
 		tConfig = {}
@@ -45,7 +95,7 @@ function D.Open(tConfig)
 			tConfig = tConfig,
 			aRecord = {},
 		}
-		local frame = X.UI.OpenFrame(INI_PATH, 'MY_Bidding#' .. tConfig.szKey)
+		local frame = D.CreateFrame(tConfig.szKey)
 		if not frame then
 			return
 		end
@@ -366,141 +416,11 @@ function D.GetMoneyChatText(nGold)
 	return _L('%d gold', nGold)
 end
 
---------------------------------------------------------------------------------
--- 全局导出
---------------------------------------------------------------------------------
-do
-local settings = {
-	name = 'MY_Bidding',
-	exports = {
-		{
-			fields = {
-				Open = D.Open,
-				Close = D.Close,
-			},
-		},
-	},
-}
-MY_Bidding = X.CreateModule(settings)
-end
-
--------------------------------------------------------------------------------------------------------
--- 背景通信
--------------------------------------------------------------------------------------------------------
-X.RegisterBgMsg('MY_BIDDING_START', function(_, tConfig, nChannel, dwTalkerID, szTalkerName, bSelf)
-	BIDDING_CACHE[tConfig.szKey] = {
-		tConfig = tConfig,
-		aRecord = {},
-	}
-	local frame = X.UI.OpenFrame(INI_PATH, 'MY_Bidding#' .. tConfig.szKey)
-	if not frame then
-		return
-	end
-	D.UpdateConfig(frame)
-end)
-
-X.RegisterBgMsg('MY_BIDDING_CONFIG', function(_, tConfig, nChannel, dwTalkerID, szTalkerName, bSelf)
-	if BIDDING_CACHE[tConfig.szKey] then
-		BIDDING_CACHE[tConfig.szKey].tConfig = tConfig
-	end
-	local frame = D.GetFrame(tConfig.szKey)
-	if not frame then
-		return
-	end
-	D.UpdateConfig(frame)
-end)
-
-X.RegisterBgMsg('MY_BIDDING_ACTION', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
-	if not BIDDING_CACHE[data.szKey] then
-		return
-	end
-	table.insert(BIDDING_CACHE[data.szKey].aRecord, {
-		dwTalkerID = dwTalkerID,
-		szTalkerName = szTalkerName,
-		nPrice = data.nPrice,
-		dwTime = GetCurrentTime(),
-		dwTick = GetTickCount(),
-		dwKungfu = GetClientTeam().GetMemberInfo(dwTalkerID).dwMountKungfuID,
-	})
-	local frame = D.GetFrame(data.szKey)
-	if not frame then
-		return
-	end
-	D.UpdateList(frame)
-end)
-
-X.RegisterBgMsg('MY_BIDDING_P', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
-	if not BIDDING_CACHE[data.szKey] then
-		return
-	end
-	for _, p in ipairs(BIDDING_CACHE[data.szKey].aRecord) do
-		if p.dwTalkerID == dwTalkerID then
-			p.bP = true
-		end
-	end
-	local frame = D.GetFrame(data.szKey)
-	if not frame then
-		return
-	end
-	D.UpdateList(frame)
-end)
-
-X.RegisterBgMsg('MY_BIDDING_DELETE', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
-	if not BIDDING_CACHE[data.szKey] then
-		return
-	end
-	local aRecord = BIDDING_CACHE[data.szKey].aRecord
-	for i, p in X.ipairs_r(aRecord) do
-		if p.dwTalkerID == data.dwTalkerID then
-			table.remove(aRecord, i)
-		end
-	end
-	local frame = D.GetFrame(data.szKey)
-	if not frame then
-		return
-	end
-	D.UpdateList(frame)
-end)
-
-X.RegisterBgMsg('MY_BIDDING_FINISH', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
-	if not BIDDING_CACHE[data.szKey] then
-		return
-	end
-	BIDDING_CACHE[data.szKey] = nil
-	D.Close(data.szKey)
-end)
-
 -------------------------------------------------------------------------------------------------------
 -- 界面事件
 -------------------------------------------------------------------------------------------------------
-MY_BiddingBase = class()
 
-function MY_BiddingBase.OnFrameCreate()
-	this:Lookup('', 'Text_Title'):SetText(_L['Bidding'])
-	this:Lookup('Wnd_Config', 'Handle_ConfigName/Text_ConfigName_Title'):SetText(_L['Bidding item:'])
-	this:Lookup('Wnd_Config', 'Handle_ConfigPriceMin/Text_ConfigPriceMin_Title'):SetText(_L['Min price:'])
-	this:Lookup('Wnd_Config', 'Handle_ConfigPriceStep/Text_ConfigPriceStep_Title'):SetText(_L['Min price step:'])
-	this:Lookup('Wnd_Config', 'Handle_ConfigNumber/Text_ConfigNumber_Title'):SetText(_L['Target bidding number:'])
-	this:Lookup('Wnd_Config/WndButton_ConfigSubmit', 'Text_ConfigSubmit'):SetText(_L['Sure'])
-	this:Lookup('Wnd_Config/WndButton_ConfigCancel', 'Text_ConfigCancel'):SetText(_L['Cancel'])
-	this:Lookup('Wnd_Bidding/WndButton_Bidding', 'Text_ButtonBidding'):SetText(_L['Show price'])
-	this:Lookup('Wnd_Bidding/WndButton_BiddingP', 'Text_ButtonBiddingP'):SetText(_L['P'])
-	this:Lookup('Wnd_Bidding/WndButton_Publish', 'Text_Publish'):SetText(_L['Publish'])
-	this:Lookup('Wnd_Bidding/WndButton_Finish', 'Text_Finish'):SetText(_L['Finish'])
-	this:Lookup('WndScroll_Bidding', 'Handle_BiddingColumns/Handle_BiddingColumnName/Text_BiddingColumnName_Title'):SetText(_L['Name'])
-	this:Lookup('WndScroll_Bidding', 'Handle_BiddingColumns/Handle_BiddingColumnPrice/Text_BiddingColumnPrice_Title'):SetText(_L['Price'])
-	this:Lookup('WndScroll_Bidding', 'Handle_BiddingColumns/Handle_BiddingColumnTime/Text_BiddingColumnTime_Title'):SetText(_L['Time'])
-	this:RegisterEvent('PARTY_DISBAND')
-	this:RegisterEvent('PARTY_DELETE_MEMBER')
-	this:RegisterEvent('TEAM_AUTHORITY_CHANGED')
-	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, -100)
-	D.SwitchConfig(this, false)
-	D.SwitchCustomBidding(this, false)
-	D.UpdateAuthourize(this)
-	D.UpdateList(this)
-end
-
-function MY_BiddingBase.OnEvent(event)
+function D.OnEvent(event)
 	if event == 'PARTY_DISBAND' then
 		X.UI.CloseFrame(this)
 	elseif event == 'PARTY_DELETE_MEMBER' then
@@ -512,17 +432,10 @@ function MY_BiddingBase.OnEvent(event)
 	end
 end
 
-function MY_BiddingBase.OnLButtonClick()
+function D.OnLButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
-	if name == 'Btn_Close' then
-		if X.IsClientPlayerTeamDistributor() then
-			return X.OutputSystemAnnounceMessage(_L['You are distributor, Please finish this bidding!'])
-		end
-		X.Confirm(_L['Sure cancel this bidding? You will not able to bidding this item.'], function()
-			X.UI.CloseFrame(frame)
-		end)
-	elseif name == 'Btn_Option' then
+	if name == 'Btn_Option' then
 		if not X.IsClientPlayerTeamDistributor() then
 			return X.OutputSystemAnnounceMessage(_L['You are not distributor!'])
 		end
@@ -694,7 +607,7 @@ function MY_BiddingBase.OnLButtonClick()
 	end
 end
 
-function MY_BiddingBase.OnRButtonClick()
+function D.OnRButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
 	if name == 'WndButton_Bidding' then
@@ -756,7 +669,7 @@ function MY_BiddingBase.OnRButtonClick()
 	end
 end
 
-function MY_BiddingBase.OnItemRefreshTip()
+function D.OnItemRefreshTip()
 	local name = this:GetName()
 	if name == 'Handle_ButtonBidding' then
 		local frame = this:GetRoot()
@@ -776,14 +689,14 @@ function MY_BiddingBase.OnItemRefreshTip()
 	end
 end
 
-function MY_BiddingBase.OnItemMouseLeave()
+function D.OnItemMouseLeave()
 	local name = this:GetName()
 	if name == 'Handle_ButtonBidding' then
 		HideTip()
 	end
 end
 
-function MY_BiddingBase.OnItemLButtonClick()
+function D.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_RowItemDelete' then
 		if not X.IsClientPlayerTeamDistributor() then
@@ -811,6 +724,112 @@ function MY_BiddingBase.OnItemLButtonClick()
 		end)
 	end
 end
+
+--------------------------------------------------------------------------------
+-- 全局导出
+--------------------------------------------------------------------------------
+do
+local settings = {
+	name = 'MY_Bidding',
+	exports = {
+		{
+			preset = 'UIEvent',
+			fields = {
+				Open = D.Open,
+				Close = D.Close,
+			},
+			root = D,
+		},
+	},
+}
+MY_Bidding = X.CreateModule(settings)
+end
+
+-------------------------------------------------------------------------------------------------------
+-- 背景通信
+-------------------------------------------------------------------------------------------------------
+X.RegisterBgMsg('MY_BIDDING_START', function(_, tConfig, nChannel, dwTalkerID, szTalkerName, bSelf)
+	BIDDING_CACHE[tConfig.szKey] = {
+		tConfig = tConfig,
+		aRecord = {},
+	}
+	local frame = D.CreateFrame(tConfig.szKey)
+	if not frame then
+		return
+	end
+	D.UpdateConfig(frame)
+end)
+
+X.RegisterBgMsg('MY_BIDDING_CONFIG', function(_, tConfig, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if BIDDING_CACHE[tConfig.szKey] then
+		BIDDING_CACHE[tConfig.szKey].tConfig = tConfig
+	end
+	local frame = D.GetFrame(tConfig.szKey)
+	if not frame then
+		return
+	end
+	D.UpdateConfig(frame)
+end)
+
+X.RegisterBgMsg('MY_BIDDING_ACTION', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if not BIDDING_CACHE[data.szKey] then
+		return
+	end
+	table.insert(BIDDING_CACHE[data.szKey].aRecord, {
+		dwTalkerID = dwTalkerID,
+		szTalkerName = szTalkerName,
+		nPrice = data.nPrice,
+		dwTime = GetCurrentTime(),
+		dwTick = GetTickCount(),
+		dwKungfu = GetClientTeam().GetMemberInfo(dwTalkerID).dwMountKungfuID,
+	})
+	local frame = D.GetFrame(data.szKey)
+	if not frame then
+		return
+	end
+	D.UpdateList(frame)
+end)
+
+X.RegisterBgMsg('MY_BIDDING_P', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if not BIDDING_CACHE[data.szKey] then
+		return
+	end
+	for _, p in ipairs(BIDDING_CACHE[data.szKey].aRecord) do
+		if p.dwTalkerID == dwTalkerID then
+			p.bP = true
+		end
+	end
+	local frame = D.GetFrame(data.szKey)
+	if not frame then
+		return
+	end
+	D.UpdateList(frame)
+end)
+
+X.RegisterBgMsg('MY_BIDDING_DELETE', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if not BIDDING_CACHE[data.szKey] then
+		return
+	end
+	local aRecord = BIDDING_CACHE[data.szKey].aRecord
+	for i, p in X.ipairs_r(aRecord) do
+		if p.dwTalkerID == data.dwTalkerID then
+			table.remove(aRecord, i)
+		end
+	end
+	local frame = D.GetFrame(data.szKey)
+	if not frame then
+		return
+	end
+	D.UpdateList(frame)
+end)
+
+X.RegisterBgMsg('MY_BIDDING_FINISH', function(_, data, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if not BIDDING_CACHE[data.szKey] then
+		return
+	end
+	BIDDING_CACHE[data.szKey] = nil
+	D.Close(data.szKey)
+end)
 
 X.RegisterAddonMenu('MY_Bidding', { szOption = _L['Create bidding'], fnAction = D.Open })
 
