@@ -27,7 +27,9 @@ function D.OpenPanel()
 	if X.IsRestricted('MY_TargetMon') then
 		return
 	end
-	X.UI.OpenFrame(INI_FILE, 'MY_TargetMon_PS')
+	X.UI.CreateFrame('MY_TargetMon_PS', {
+		w = 1060, h = 660,
+	})
 end
 
 function D.ClosePanel()
@@ -140,6 +142,7 @@ function D.CreateMonitor(frame, nIndex)
 end
 
 function D.OnFrameCreate()
+	X.UI.AppendFromIni(this:Lookup('Wnd_Total'), INI_FILE, 'Wnd_Total', true)
 	this:Lookup('', 'Text_Title'):SetText(_L['MY_TargetMon_PS'])
 	this:Lookup('Wnd_Total/Btn_CreateDataset', 'Text_CreateDataset'):SetText(_L['Create Config'])
 	this:Lookup('Wnd_Total/Btn_ImportExportDataset', 'Text_ImportExportDataset'):SetText(_L['Import Export'])

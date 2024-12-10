@@ -333,11 +333,11 @@ function D.UpdateBG()
 	local DungeonInfo = X.GetGameTable('DungeonInfo', true)
 	local info = X.IsNumber(MY_TEAM_MON__UI__SELECT_MAP) and DungeonInfo and DungeonInfo:Search(MY_TEAM_MON__UI__SELECT_MAP)
 	if MY_TEAM_MON__UI__SELECT_TYPE ~= 'TALK' and MY_TEAM_MON__UI__SELECT_TYPE ~= 'CHAT' and info and info.szDungeonImage2 then
-		frame:Lookup('Wnd_Bg', ''):Show()
-		frame:Lookup('Wnd_Bg', 'Image_BG'):FromUITex(info.szDungeonImage2, 0)
-		frame:Lookup('Wnd_Bg', 'Text_BgTitle'):SetText(info.szLayer3Name .. g_tStrings.STR_CONNECT .. info.szOtherName)
+		frame:Lookup('Wnd_Total/Wnd_Bg', 'Handle_BG'):Show()
+		frame:Lookup('Wnd_Total/Wnd_Bg', 'Handle_BG/Image_BG'):FromUITex(info.szDungeonImage2, 0)
+		frame:Lookup('Wnd_Total/Wnd_Bg', 'Handle_BG/Text_BgTitle'):SetText(info.szLayer3Name .. g_tStrings.STR_CONNECT .. info.szOtherName)
 	else
-		frame:Lookup('Wnd_Bg', ''):Hide()
+		frame:Lookup('Wnd_Total/Wnd_Bg', 'Handle_BG'):Hide()
 	end
 end
 
