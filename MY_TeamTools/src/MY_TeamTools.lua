@@ -21,7 +21,8 @@ end
 --------------------------------------------------------------------------
 
 local D = {
-	aModule = {},
+	aFloatEntry = {},
+	aSaveDB = {},
 	nActivePageIndex = nil,
 	szStatRange = 'RAID',
 }
@@ -30,9 +31,22 @@ local SZ_INI = PLUGIN_ROOT .. '/ui/MY_TeamTools.ini'
 local SZ_MOD_INI = PLUGIN_ROOT .. '/ui/MY_TeamTools.Mod.ini'
 
 function D.Open(szModule)
-	local frame = X.UI.OpenFrame(SZ_INI, 'MY_TeamTools')
-	frame:BringToTop()
-	D.ActivePage(frame, szModule or 1, true)
+	local ui = X.UI.CreateFrame('MY_TeamTools', {
+		w = 1096, h = 700,
+		close = true,
+		text = X.PACKET_INFO.NAME .. _L.SPLIT_DOT .. _L['MY_TeamTools'],
+		anchor = 'CENTER',
+		onSizeChange = function()
+			local ui = X.UI(this)
+			local nW, nH = ui:Size()
+			ui:Children('#Btn_Option'):Left(nW - 40)
+			ui:Children('#PageSet_All'):Size(nW, nH - 48)
+			D.PageSetModule.BroadcastPageEvent(this, 'OnResizePage')
+		end,
+	})
+	local frame = ui:Raw()
+	D.PageSetModule.DrawUI(frame)
+	D.PageSetModule.ActivePage(frame, szModule or 1, true)
 end
 
 function D.Close()
@@ -52,72 +66,24 @@ function D.Toggle()
 end
 
 -- 注册子模块
-function D.RegisterModule(szID, szName, env)
-	for i, v in X.ipairs_r(D.aModule) do
-		if v.szID == szID then
-			table.remove(D.aModule, i)
-		end
+function D.RegisterModule(szKey, szName, tModule)
+	if not D.PageSetModule or not szName or not tModule then
+		return
 	end
-	if szName and env then
-		table.insert(D.aModule, {
-			szID = szID,
-			szName = szName,
-			env = env,
-		})
+	if tModule.szFloatEntry then
+		table.insert(D.aFloatEntry, { szName = szName, szKey = tModule.szFloatEntry })
 	end
+	if tModule.szSaveDB then
+		table.insert(D.aSaveDB, { szName = szName, szKey = tModule.szSaveDB })
+	end
+	D.PageSetModule.RegisterModule(szKey, szName, tModule)
 	if D.IsOpened() then
 		D.Close()
 		D.Open()
 	end
 end
 
--- 初始化主界面 绘制分页按钮
-function D.InitPageSet(frame)
-	frame.bInitPageset = true
-	local pageset = frame:Lookup('PageSet_All')
-	for i, m in ipairs(D.aModule) do
-		local frameMod = X.UI.OpenFrame(SZ_MOD_INI, 'MY_TeamToolsMod')
-		local checkbox = frameMod:Lookup('PageSet_Total/WndCheck_Default')
-		local page = frameMod:Lookup('PageSet_Total/Page_Default')
-		checkbox:ChangeRelation(pageset, true, true)
-		page:ChangeRelation(pageset, true, true)
-		X.UI.CloseFrame(frameMod)
-		pageset:AddPage(page, checkbox)
-		checkbox:Show()
-		checkbox:Lookup('', 'Text_CheckDefault'):SetText(m.szName)
-		checkbox:SetRelX(checkbox:GetRelX() + checkbox:GetW() * (i - 1))
-		checkbox.nIndex = i
-		page.nIndex = i
-	end
-	frame.bInitPageset = nil
-end
-
-function D.ActivePage(frame, szModule, bFirst)
-	local pageset = frame:Lookup('PageSet_All')
-	local pageActive = pageset:GetActivePage()
-	local nActiveIndex, nToIndex = pageActive.nIndex, nil
-	for i, m in ipairs(D.aModule) do
-		if m.szID == szModule or i == szModule or i == D.nActivePageIndex then
-			nToIndex = i
-		end
-	end
-	if bFirst and not nToIndex then
-		nToIndex = 1
-	end
-	if nToIndex then
-		if nToIndex == nActiveIndex then
-			local _this = this
-			this = pageset
-			Framework.OnActivePage()
-			this = _this
-		else
-			pageset:ActivePage(nToIndex - 1)
-		end
-		D.nActivePageIndex = nToIndex
-	end
-end
-
-function Framework.OnLButtonClick()
+function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		D.Close()
@@ -132,31 +98,27 @@ function Framework.OnLButtonClick()
 			end,
 		})
 		local tFloatEntryMenu = { szOption = _L['Float panel'] }
-		for _, m in ipairs(D.aModule) do
-			if m and m.env.szFloatEntry then
-				table.insert(tFloatEntryMenu, {
-					szOption = m.szName,
-					bCheck = true, bChecked = X.Get(_G, m.env.szFloatEntry),
-					fnAction = function()
-						X.Set(_G, m.env.szFloatEntry, not X.Get(_G, m.env.szFloatEntry))
-					end,
-				})
-			end
+		for _, m in ipairs(D.aFloatEntry) do
+			table.insert(tFloatEntryMenu, {
+				szOption = m.szName,
+				bCheck = true, bChecked = X.Get(_G, m.szKey),
+				fnAction = function()
+					X.Set(_G, m.szKey, not X.Get(_G, m.szKey))
+				end,
+			})
 		end
 		if #tFloatEntryMenu > 0 then
 			table.insert(menu, tFloatEntryMenu)
 		end
 		local tSaveDBMenu = { szOption = _L['Save DB'] }
-		for _, m in ipairs(D.aModule) do
-			if m and m.env.szSaveDB then
-				table.insert(tSaveDBMenu, {
-					szOption = m.szName,
-					bCheck = true, bChecked = X.Get(_G, m.env.szSaveDB),
-					fnAction = function()
-						X.Set(_G, m.env.szSaveDB, not X.Get(_G, m.env.szSaveDB))
-					end,
-				})
-			end
+		for _, m in ipairs(D.aSaveDB) do
+			table.insert(tSaveDBMenu, {
+				szOption = m.szName,
+				bCheck = true, bChecked = X.Get(_G, m.szKey),
+				fnAction = function()
+					X.Set(_G, m.szKey, not X.Get(_G, m.szKey))
+				end,
+			})
 		end
 		if #tSaveDBMenu > 0 then
 			table.insert(menu, tSaveDBMenu)
@@ -172,68 +134,29 @@ function Framework.OnLButtonClick()
 	end
 end
 
-function Framework.OnActivePage()
-	local frame = this:GetRoot()
-	if frame.bInitPageset then
-		return
-	end
-	local name = this:GetName()
-	if name == 'PageSet_All' then
-		local page = this:GetActivePage()
-		if page.nIndex then
-			if X.IsElement(frame.pActivePage) then
-				local m = D.aModule[frame.pActivePage.nIndex]
-				if m and m.env.OnDeactivePage then
-					local _this = this
-					this = frame.pActivePage
-					m.env.OnDeactivePage()
-					this = _this
-				end
-			end
-			local m = D.aModule[page.nIndex]
-			if not page.bInit then
-				if m and m.env.OnInitPage then
-					local _this = this
-					this = page
-					m.env.OnInitPage()
-					this = _this
-				end
-				page.bInit = true
-			end
-			if m and m.env.OnActivePage then
-				local _this = this
-				this = page
-				m.env.OnActivePage()
-				this = _this
-			end
-			frame:Lookup('WndComboBox_Mode'):SetVisible(m and m.env and m.env.bStatRange or false)
-			frame.pActivePage = page
-			D.nActivePageIndex = page.nIndex
-		end
-	end
-end
-
-function Framework.OnFrameCreate()
-	D.InitPageSet(this)
+function D.OnFrameCreate()
 	this:BringToTop()
 	this:RegisterEvent('PARTY_ADD_MEMBER')
 	this:RegisterEvent('PARTY_DELETE_MEMBER')
 	this:RegisterEvent('TEAM_AUTHORITY_CHANGED')
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-	-- 标题修改
-	local szTitle = X.PACKET_INFO.NAME .. ' - ' .. _L['MY_TeamTools']
-	if X.IsClientPlayerInParty() then
-		local team = GetClientTeam()
-		local info = team.GetMemberInfo(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
-		szTitle = _L('%s\'s Team', info.szName) .. ' (' .. team.GetTeamSize() .. '/' .. team.nGroupNum * 5  .. ')'
-	end
-	this:Lookup('', 'Text_Title'):SetText(szTitle)
+	local frame = this
+	local ui = X.UI(frame)
+	ui:Append('WndPageSet', {
+		name = 'PageSet_All',
+		x = 0, y = 48, w = 1096, h = 700 - 48,
+	})
+	ui:Append('WndButton', {
+		name = 'Btn_Option',
+		x = 1056, y = 54, w = 20, h = 20,
+		buttonStyle = 'OPTION',
+	})
 	-- 模式选择
 	local aStatRange = {
 		{ szKey = 'RAID', szName = _L['Raid Stat'] },
 		{ szKey = 'ROOM', szName = _L['Room Stat'] },
 	}
-	X.UI(this):Append('WndComboBox', {
+	ui:Append('WndComboBox', {
 		name = 'WndComboBox_Mode',
 		x = 930, y = 52, w = 110, h = 26,
 		text = (function()
@@ -261,26 +184,25 @@ function Framework.OnFrameCreate()
 			return menu
 		end,
 	})
+	-- 标题修改
+	local szTitle = X.PACKET_INFO.NAME .. ' - ' .. _L['MY_TeamTools']
+	if X.IsClientPlayerInParty() then
+		local team = GetClientTeam()
+		local info = team.GetMemberInfo(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
+		szTitle = _L('%s\'s Team', info.szName) .. ' (' .. team.GetTeamSize() .. '/' .. team.nGroupNum * 5  .. ')'
+	end
+	frame:Lookup('', 'Text_Title'):SetText(szTitle)
 	-- 注册关闭
 	X.RegisterEsc('MY_TeamTools', D.IsOpened, D.Close)
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
 
-function Framework.OnFrameDestroy()
-	if X.IsElement(this.pActivePage) then
-		local m = D.aModule[this.pActivePage.nIndex]
-		if m and m.env.OnDeactivePage then
-			local _this = this
-			this = this.pActivePage
-			m.env.OnDeactivePage()
-			this = _this
-		end
-	end
+function D.OnFrameDestroy()
 	PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	X.RegisterEsc('MY_TeamTools', false)
 end
 
-function Framework.OnEvent(event)
+function D.OnEvent(event)
 	-- update title
 	if event == 'PARTY_ADD_MEMBER'
 		or event == 'PARTY_DELETE_MEMBER'
@@ -295,100 +217,7 @@ function Framework.OnEvent(event)
 	end
 end
 
--- 全局广播模块事件
-for _, szEvent in ipairs({
-	'OnFrameCreate',
-	'OnFrameDestroy',
-	'OnFrameBreathe',
-	'OnFrameRender',
-	'OnFrameDragEnd',
-	'OnFrameDragSetPosEnd',
-	'OnEvent',
-}) do
-	D[szEvent] = function(...)
-		if Framework[szEvent] then
-			Framework[szEvent](...)
-		end
-		local page = this:Lookup('PageSet_All'):GetFirstChild()
-		while page do
-			if page:GetName() == 'Page_Default' and page.bInit then
-				local m = D.aModule[page.nIndex]
-				if m and m.env[szEvent] then
-					local _this = this
-					this = page
-					m.env[szEvent](...)
-					this = _this
-				end
-			end
-			page = page:GetNext()
-		end
-	end
-end
-
--- 根据元素位置转发对应模块事件
-for _, szEvent in ipairs({
-	'OnSetFocus',
-	'OnKillFocus',
-	'OnItemLButtonDown',
-	'OnItemMButtonDown',
-	'OnItemRButtonDown',
-	'OnItemLButtonUp',
-	'OnItemMButtonUp',
-	'OnItemRButtonUp',
-	'OnItemLButtonClick',
-	'OnItemMButtonClick',
-	'OnItemRButtonClick',
-	'OnItemMouseEnter',
-	'OnItemMouseLeave',
-	'OnItemRefreshTip',
-	'OnItemMouseWheel',
-	'OnItemLButtonDrag',
-	'OnItemLButtonDragEnd',
-	'OnLButtonDown',
-	'OnLButtonUp',
-	'OnLButtonClick',
-	'OnLButtonHold',
-	'OnMButtonDown',
-	'OnMButtonUp',
-	'OnMButtonClick',
-	'OnMButtonHold',
-	'OnRButtonDown',
-	'OnRButtonUp',
-	'OnRButtonClick',
-	'OnRButtonHold',
-	'OnMouseEnter',
-	'OnMouseLeave',
-	'OnScrollBarPosChanged',
-	'OnEditChanged',
-	'OnEditSpecialKeyDown',
-	'OnCheckBoxCheck',
-	'OnCheckBoxUncheck',
-	'OnActivePage',
-}) do
-	D[szEvent] = function(...)
-		local szPrefix = 'Normal/MY_Statistics/PageSet_All/Page_Default'
-		local page, nLimit = this, 50
-		while page and page:GetName() ~= 'Page_Default' and page:GetTreePath() ~= szPrefix do
-			if nLimit > 0 then
-				page = page:GetParent()
-				nLimit = nLimit - 1
-			else
-				page = nil
-			end
-		end
-		if page and page ~= this then
-			local m = D.aModule[page.nIndex]
-			if m and m.env[szEvent] then
-				return m.env[szEvent](...)
-			end
-		else
-			if Framework[szEvent] then
-				return Framework[szEvent](...)
-			end
-		end
-	end
-end
-
+D.PageSetModule = X.UI.CreatePageSetModule(D, 'Wnd_Total/PageSet_All')
 --------------------------------------------------------------------------------
 -- 全局导出
 --------------------------------------------------------------------------------
@@ -397,18 +226,21 @@ local settings = {
 	name = 'MY_TeamTools',
 	exports = {
 		{
+			root = D,
 			fields = {
+				'szStatRange',
 				Open = D.Open,
 				Close = D.Close,
 				IsOpened = D.IsOpened,
 				Toggle = D.Toggle,
 				RegisterModule = D.RegisterModule,
 			},
-		},
-		{
-			root = D,
-			fields = {
-				'szStatRange',
+			interceptors = {
+				['*'] = function(k)
+					if D.PageSetModule and D.PageSetModule.tModuleAPI[k] then
+						return D.PageSetModule.tModuleAPI[k]
+					end
+				end,
 			},
 			preset = 'UIEvent'
 		},
