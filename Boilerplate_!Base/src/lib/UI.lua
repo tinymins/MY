@@ -6889,8 +6889,12 @@ function X.UI.CreateFrame(szName, opt)
 		frm:Lookup('', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_IMAGE, X.PACKET_INFO.LOGO_MAIN_FRAME)
 	end
 	frm:ChangeRelation(opt.level)
-	frm:Lookup('', 'Text_Title'):SetText('')
-	frm:Lookup('', 'Text_Author'):SetText('')
+	if frm:Lookup('', 'Text_Title') then
+		frm:Lookup('', 'Text_Title'):SetText('')
+	end
+	if frm:Lookup('', 'Text_Author') then
+		frm:Lookup('', 'Text_Author'):SetText('')
+	end
 	frm:Show()
 	local ui = X.UI(frm)
 	local function RemoveFrame()
