@@ -7030,7 +7030,7 @@ function X.UI.CreateFrame(szName, opt)
 				local nX, nY = Station.GetMessagePos()
 				local nClientW, nClientH = Station.GetClientSize()
 				local nFrameX, nFrameY = frm:GetRelPos()
-				local nW, nH = nX - nFrameX, nY - nFrameY
+				local nW, nH = nX - nFrameX + this.nOffsetX, nY - nFrameY + this.nOffsetY
 				nW = math.min(nW, nClientW - nFrameX) -- frame size should not larger than client size
 				nH = math.min(nH, nClientH - nFrameY)
 				nW = math.max(nW, GetComponentProp(frm, 'minWidth')) -- frame size must larger than its min size
@@ -7044,6 +7044,10 @@ function X.UI.CreateFrame(szName, opt)
 				frm:Lookup('Wnd_DragBg', 'Shadow_DragBg'):SetSize(nW, nH)
 			end
 			frm:Lookup('Btn_Drag').OnDragButtonBegin = function()
+				-- 由于开始拖拽位置不可能完全是按钮右下角，所以需要记录按下时相对于按钮右下角的偏移，让拖拽手感更加平滑
+				local nX, nY = Station.GetMessagePos()
+				this.nOffsetX = this:GetAbsX() + this:GetW() - nX
+				this.nOffsetY = this:GetAbsY() + this:GetH() - nY
 				frm:Lookup('Wnd_DragBg'):Show()
 				frm:Lookup('', ''):Hide()
 				frm:Lookup('Wnd_Total'):Hide()
