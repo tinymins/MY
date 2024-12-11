@@ -121,6 +121,15 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 		Exports.DrawUI(this)
 	end
 
+	function PageSetEvent.OnFrameDestroy()
+		if X.IsElement(this.pActivePage) then
+			local m = Modules[this.pActivePage.nIndex]
+			if m and m.tModule.OnDeactivePage then
+				X.SafeCallWithThis(this.pActivePage, m.tModule.OnDeactivePage)
+			end
+		end
+	end
+
 	-- 广播给子模块
 	function Exports.BroadcastPageEvent(frame, szEvent, ...)
 		local ps = frame:Lookup(szPageSetPath)
@@ -183,6 +192,12 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 			end
 			local page = ps:GetActivePage()
 			if page.nIndex then
+				if X.IsElement(this.pActivePage) then
+					local m = Modules[this.pActivePage.nIndex]
+					if m and m.tModule.OnDeactivePage then
+						X.SafeCallWithThis(page, m.tModule.OnDeactivePage)
+					end
+				end
 				local m = Modules[page.nIndex]
 				if not page.bInit then
 					if m and m.tModule.OnInitPage then
@@ -193,6 +208,7 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 				if m and m.tModule.OnActivePage then
 					X.SafeCallWithThis(page, m.tModule.OnActivePage)
 				end
+				this.pActivePage = page
 			end
 		end
 	end
