@@ -138,8 +138,11 @@ function D.OnFrameCreate()
 	for k, v in ipairs(MY_TEAM_MON__UI__TYPE) do
 		this.hPageSet:Lookup('CheckBox_' .. v, 'Text_Page_' .. v):SetText(_L[v])
 		X.UI.AdaptComponentAppearance(this.hPageSet:Lookup('CheckBox_' .. v), 'WndTab')
+		X.UI.AdaptComponentAppearance(this.hPageSet:Lookup('Page_' .. v .. '/WndScroll_' .. v .. '_L/Btn_' .. v .. '_L_ALL'))
+		X.UI.AdaptComponentAppearance(this.hPageSet:Lookup('Page_' .. v .. '/WndScroll_' .. v .. '_R/Btn_' .. v .. '_R_ALL'))
 	end
 	X.UI.AdaptComponentAppearance(this:Lookup('Wnd_Total/Wnd_Bg', 'Image_TabBg'))
+	X.UI.AdaptComponentAppearance(this.hPageSet:Lookup('WndScroll_Tree/Btn_Tree_All'))
 
 	ui:Append('WndButton', {
 		x = 900, y = 52, w = 140, h = 27,

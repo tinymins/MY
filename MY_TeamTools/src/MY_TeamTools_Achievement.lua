@@ -733,6 +733,7 @@ function D.OnInitPage()
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(this, true, true)
 	X.UI.CloseFrame(frameTemp)
+	X.UI.AdaptComponentAppearance(wnd:Lookup('WndScroll_Stat/Scroll_Stat_All'))
 
 	local nX = 20
 	nX = nX + X.UI(wnd):Append('WndAutocomplete', {

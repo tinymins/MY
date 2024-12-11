@@ -611,6 +611,7 @@ function D.OnInitPage()
 	wnd:ChangeRelation(this, true, true)
 	wnd:SetRelPos(0, 0)
 	X.UI.CloseFrame(frameTemp)
+	X.UI.AdaptComponentAppearance(wnd:Lookup('WndScroll_Subscribe/Scroll_Subscribe'))
 
 	wnd:Lookup('', 'Text_Break1'):SetText(_L['Author'])
 	wnd:Lookup('', 'Text_Break2'):SetText(_L['Title'])

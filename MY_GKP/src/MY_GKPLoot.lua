@@ -529,6 +529,7 @@ function D.OnFrameCreate()
 	local a = O.anchor
 	this:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	this:Lookup('Scroll_DoodadList/WndContainer_DoodadList'):Clear()
+	X.UI.AdaptComponentAppearance(this:Lookup('Scroll_DoodadList/ScrolBar_DoodadList'))
 	D.AdjustFrame(this)
 end
 

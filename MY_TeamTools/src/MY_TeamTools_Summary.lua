@@ -997,6 +997,7 @@ function D.OnInitPage()
 	local wnd = frameTemp:Lookup('Wnd_Summary')
 	wnd:ChangeRelation(this, true, true)
 	X.UI.CloseFrame(frameTemp)
+	X.UI.AdaptComponentAppearance(wnd:Lookup('Scroll_Player/ScrolBarl_Player_All'))
 
 	local page = this
 	local frame = page:GetRoot()

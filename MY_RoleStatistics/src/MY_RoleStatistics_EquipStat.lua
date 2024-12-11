@@ -731,6 +731,8 @@ function D.OnInitPage()
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(this, true, true)
 	X.UI.CloseFrame(frameTemp)
+	X.UI.AdaptComponentAppearance(wnd:Lookup('WndScroll_Name/Scroll_Name'))
+	X.UI.AdaptComponentAppearance(wnd:Lookup('Wnd_ItemPage/WndScroll_EquipInfo/Scroll_EquipInfo'))
 
 	local container = wnd:Lookup('Wnd_ItemPage/WndScroll_PageNum/WndContainer_PageNum')
 	container:Clear()

@@ -40,6 +40,8 @@ function D.OnFrameCreate()
 	hWndMain:ChangeRelation(this:Lookup('Wnd_Total'), true, true)
 	hWndMain:SetRelPos(20, 55)
 	X.UI.CloseFrame(hFrameTemp)
+	X.UI.AdaptComponentAppearance(this:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatChanel/Scroll_ChatChanel'))
+	X.UI.AdaptComponentAppearance(this:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatLog/Scroll_ChatLog'))
 
 	local container = this:Lookup('Wnd_Total/Wnd_Main/WndScroll_ChatChanel/WndContainer_ChatChanel')
 	container:Clear()

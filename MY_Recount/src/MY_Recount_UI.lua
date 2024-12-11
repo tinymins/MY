@@ -541,6 +541,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('MY_RECOUNT_CSS_UPDATE')
 	this:RegisterEvent('MY_RECOUNT_DISP_DATA_UPDATE')
 	this:RegisterEvent('MY_RECOUNT_UI_CONFIG_UPDATE')
+	X.UI.AdaptComponentAppearance(this:Lookup('Wnd_Main/Scroll_List'))
 end
 
 function D.OnEvent(event)

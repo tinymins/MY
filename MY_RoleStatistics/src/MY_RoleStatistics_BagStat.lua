@@ -818,6 +818,8 @@ function D.OnInitPage()
 	local wnd = frameTemp:Lookup('Wnd_Total')
 	wnd:ChangeRelation(this, true, true)
 	X.UI.CloseFrame(frameTemp)
+	X.UI.AdaptComponentAppearance(wnd:Lookup('WndScroll_Name/Scroll_Name'))
+	X.UI.AdaptComponentAppearance(wnd:Lookup('WndScroll_Item/Scroll_Item'))
 
 	local page = this
 	local ui = X.UI(page)

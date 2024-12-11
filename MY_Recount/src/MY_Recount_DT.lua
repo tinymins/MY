@@ -499,6 +499,9 @@ function D.Open(id, nChannel)
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
 	frame:RegisterEvent('ON_MY_MOSAICS_RESET')
 	frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+	X.UI.AdaptComponentAppearance(frame:Lookup('WndScroll_Skill/Scroll_Skill_List'))
+	X.UI.AdaptComponentAppearance(frame:Lookup('WndScroll_Detail/Scroll_Detail_List'))
+	X.UI.AdaptComponentAppearance(frame:Lookup('WndScroll_Target/Scroll_Target_List'))
 
 	local function canEsc()
 		if frame and frame:IsValid() then

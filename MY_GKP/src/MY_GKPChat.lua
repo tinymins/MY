@@ -102,6 +102,7 @@ function D.OpenFrame(item, menu, data)
 		frame.box = frame:Lookup('Wnd_Bg', 'Box')
 		frame:RegisterEvent('DISTRIBUTE_ITEM')
 		frame:RegisterEvent('DOODAD_LEAVE_SCENE')
+		X.UI.AdaptComponentAppearance(frame:Lookup('WndScroll_Chat/Scroll_All'))
 	end
 	local box = frame:Lookup('Wnd_Bg', 'Box')
 	local txt = frame:Lookup('Wnd_Bg', 'Text')
