@@ -64,6 +64,7 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 			local checkbox = frameTemp and frameTemp:Lookup('PageSet_Total/WndCheck_Default')
 			local page = frameTemp and frameTemp:Lookup('PageSet_Total/Page_Default')
 			if checkbox and page then
+				X.UI.AdaptComponentAppearance(checkbox, 'WndTab')
 				checkbox:ChangeRelation(ps, true, true)
 				page:ChangeRelation(ps, true, true)
 				X.UI.CloseFrame(frameTemp)
