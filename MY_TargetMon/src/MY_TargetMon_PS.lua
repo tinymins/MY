@@ -28,6 +28,7 @@ function D.OpenPanel()
 		return
 	end
 	X.UI.CreateFrame('MY_TargetMon_PS', {
+		text = _L['MY_TargetMon_PS'],
 		w = 1060, h = 660,
 	})
 end
@@ -148,6 +149,9 @@ function D.OnFrameCreate()
 	this:Lookup('Wnd_Total/Btn_ImportExportDataset', 'Text_ImportExportDataset'):SetText(_L['Import Export'])
 	this:Lookup('Wnd_Total/Btn_CreateMonitor', 'Text_CreateMonitor'):SetText(_L['Create Monitor'])
 	this:Lookup('Wnd_Total/Wnd_SearchMonitor/Edit_SearchMonitor'):SetPlaceholderText(_L['Search Monitor'])
+	X.UI.AdaptComponentAppearance(this:Lookup('Wnd_Total/Btn_CreateDataset'))
+	X.UI.AdaptComponentAppearance(this:Lookup('Wnd_Total/Btn_ImportExportDataset'))
+	X.UI.AdaptComponentAppearance(this:Lookup('Wnd_Total/Btn_CreateMonitor'))
 	this:RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_RELOAD')
 	this:RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_CONFIG_MODIFY')
 	this:RegisterEvent('MY_TARGET_MON_CONFIG__DATASET_MONITOR_MODIFY')

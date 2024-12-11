@@ -210,6 +210,8 @@ function D.OnInitPage()
 	local wnd = frameTemp:Lookup('Wnd_EnterMap')
 	wnd:Lookup('Btn_All', 'Text_BtnAll'):SetText(_L['Show all'])
 	wnd:Lookup('Btn_Clear', 'Text_BtnClear'):SetText(_L['Clear record'])
+	X.UI.AdaptComponentAppearance(wnd:Lookup('Btn_All'))
+	X.UI.AdaptComponentAppearance(wnd:Lookup('Btn_Clear'))
 	wnd:ChangeRelation(this, true, true)
 	X.UI.CloseFrame(frameTemp)
 

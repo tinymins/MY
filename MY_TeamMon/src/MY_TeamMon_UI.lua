@@ -134,9 +134,13 @@ function D.OnFrameCreate()
 
 	local ui = X.UI(this)
 	ui:Text(_L['MY_TeamMon config panel'])
+
 	for k, v in ipairs(MY_TEAM_MON__UI__TYPE) do
 		this.hPageSet:Lookup('CheckBox_' .. v, 'Text_Page_' .. v):SetText(_L[v])
+		X.UI.AdaptComponentAppearance(this.hPageSet:Lookup('CheckBox_' .. v), 'WndTab')
 	end
+	X.UI.AdaptComponentAppearance(this:Lookup('Wnd_Total/Wnd_Bg', 'Image_TabBg'))
+
 	ui:Append('WndButton', {
 		x = 900, y = 52, w = 140, h = 27,
 		text = g_tStrings.SYS_MENU,
@@ -3564,7 +3568,7 @@ function D.OpenPanel(szType)
 			MY_TEAM_MON__UI__SELECT_TYPE = szType
 		end
 		X.UI.CreateFrame('MY_TeamMon_UI', {
-			w = 1070, h = 680,
+			w = 1070, h = 685,
 		})
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
