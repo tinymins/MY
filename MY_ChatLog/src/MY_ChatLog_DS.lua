@@ -481,7 +481,9 @@ function DS:SelectMsg(aMsgType, szSearch, nMinTime, nMaxTime, nOffset, nLimit, b
 			if nLimit == 0 then
 				break
 			end
-			if (not tMsgType or tMsgType[rec.szMsgType])
+			if rec.nTime >= nMinTime
+			and rec.nTime <= nMaxTime
+			and (not tMsgType or tMsgType[rec.szMsgType])
 			and (szSearch == '' or X.StringFindW(rec.szText, szSearch) or X.StringFindW(rec.szTalker, szSearch)) then
 				if nOffset > 0 then
 					nOffset = nOffset - 1
