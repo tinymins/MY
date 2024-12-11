@@ -253,7 +253,7 @@ local function InsertElementDetailTip(hElem, tTip)
 		table.insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'Shadow' then
 		table.insert(tTip, _L('ShadowColor: %s', table.concat({ hElem:GetShadowColor() }, ', ')))
-		table.insert(tTip, _L('ColorRGB: %s, %s, %s', table.concat({ hElem:GetColorRGB() }, ', ')))
+		table.insert(tTip, _L('ColorRGB: %s', table.concat({ hElem:GetColorRGB() }, ', ')))
 		table.insert(tTip, _L('IsTriangleFan: %s', tostring(hElem:IsTriangleFan())))
 		table.insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'Animate' then
@@ -469,141 +469,183 @@ MYDev_Snaplines.ReloadUI = function()
 end
 X.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
 
--- ×¢²áÃæ°å
-X.Panel.Register(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/UICommon/PlugIn.UITex|1', {
-	IsRestricted = function()
-		return not X.IsDebugging('Dev_Snaplines')
-	end,
-	OnPanelActive = function(wnd)
-		local ui = X.UI(wnd)
-		local nW, nH = ui:Size()
-		local nX, nY = 20, 20
+local PS = {}
 
-		ui:Append('WndCheckBox', 'WndCheckBox_ShowTreePath')
-		  :Pos(nX, nY):Width(300)
-		  :Text(_L['enable tree path view']):Check(O.bEnable or false)
-		  :Check(function(bCheck)
+function PS.IsRestricted()
+	return not X.IsDebugging('Dev_Snaplines')
+end
+
+function PS.OnPanelActive(wnd)
+	local ui = X.UI(wnd)
+	local nPaddingX, nPaddingY = 20, 20
+	local nX, nY = nPaddingX, nPaddingY
+	local nW, nH = ui:Size()
+
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 300, h = 25,
+		text = _L['enable tree path view'],
+		checked = O.bEnable or false,
+		onCheck = function(bCheck)
 			O.bEnable = bCheck
 			MYDev_Snaplines.ReloadUI()
-		end)
-		nY = nY + 40
+		end
+	})
+	nY = nY + 40
 
-		ui:Append('WndCheckBox', 'WndCheckBox_ShowTip')
-		  :Pos(nX, nY):Width(200)
-		  :Text(_L['show tip']):Check(O.bShowTip or false)
-		  :Check(function(bCheck)
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200, h = 25,
+		text = _L['show tip'],
+		checked = O.bShowTip or false,
+		onCheck = function(bCheck)
 			O.bShowTip = bCheck
 			MYDev_Snaplines.ReloadUI()
-		end)
-		nX = nX + 200
-		ui:Append('Shadow', 'Shadow_TipColor'):Pos(nX, nY)
-		  :Size(20, 20):Color(O.rgbTip or {255,255,255})
-		  :Click(function()
+		end
+	})
+	nX = nX + 200
+
+	ui:Append('Shadow', {
+		x = nX, y = nY + 3, w = 20, h = 20,
+		color = O.rgbTip or {255, 255, 255},
+		onClick = function()
 			local me = this
 			X.UI.OpenColorPicker(function(r, g, b)
 				X.UI(me):Color(r, g, b)
-				O.rgbTip = { r, g, b }
+				O.rgbTip = {r, g, b}
 				MYDev_Snaplines.ReloadUI()
 			end)
-		  end)
-		nX = nX + 40
-		ui:Append('WndButton', 'WndButton_TipFont'):Pos(nX, nY)
-		  :Width(50):Text(_L['font'])
-		  :Click(function()
+		end
+	})
+	nX = nX + 40
+
+	ui:Append('WndButton', {
+		x = nX, y = nY, h = 25,
+		text = _L['font'],
+		onClick = function()
 			X.UI.OpenFontPicker(function(f)
 				O.nTipFont = f
 				MYDev_Snaplines.ReloadUI()
 			end)
-		  end)
-		nX = 20
-		nY = nY + 40
-		ui:Append('WndCheckBox', 'WndCheckBox_ShowData')
-		  :Pos(nX, nY):Width(200)
-		  :Text(_L['show data']):Check(O.bShowData or false)
-		  :Check(function(bCheck)
+		end
+	})
+	nX = nPaddingX
+	nY = nY + 40
+
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200, h = 25,
+		text = _L['show data'],
+		checked = O.bShowData or false,
+		onCheck = function(bCheck)
 			O.bShowData = bCheck
 			MYDev_Snaplines.ReloadUI()
-		end)
-		nY = nY + 40
+		end
+	})
+	nY = nY + 40
 
-		ui:Append('WndCheckBox', 'WndCheckBox_ShowWndTip')
-		  :Pos(nX, nY):Width(200)
-		  :Text(_L['show wnd tip']):Check(O.bShowWndTip or false)
-		  :Check(function(bCheck)
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200, h = 25,
+		text = _L['show wnd tip'],
+		checked = O.bShowWndTip or false,
+		onCheck = function(bCheck)
 			O.bShowWndTip = bCheck
 			MYDev_Snaplines.ReloadUI()
-		end)
-		nY = nY + 40
-		ui:Append('WndCheckBox', 'WndCheckBox_ShowItemTip')
-		  :Pos(nX, nY):Width(200)
-		  :Text(_L['show item tip']):Check(O.bShowItemTip or false)
-		  :Check(function(bCheck)
+		end
+	})
+	nY = nY + 40
+
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200, h = 25,
+		text = _L['show item tip'],
+		checked = O.bShowItemTip or false,
+		onCheck = function(bCheck)
 			O.bShowItemTip = bCheck
 			MYDev_Snaplines.ReloadUI()
-		end)
-		nY = nY + 40
+		end
+	})
+	nY = nY + 40
 
-		ui:Append('WndCheckBox', 'WndCheckBox_ShowWndSnaplines')
-		  :Pos(nX, nY):Width(200)
-		  :Text(_L['show wnd snaplines']):Check(O.bShowWndSnaplines or false)
-		  :Check(function(bCheck)
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200, h = 25,
+		text = _L['show wnd snaplines'],
+		checked = O.bShowWndSnaplines or false,
+		onCheck = function(bCheck)
 			O.bShowWndSnaplines = bCheck
 			MYDev_Snaplines.ReloadUI()
-		end)
-		nX = nX + 200
-		ui:Append('Shadow', 'Shadow_WndSnaplinesColor'):Pos(nX, nY)
-		  :Size(20, 20):Color(O.rgbWndSnaplines or {255,255,255})
-		  :Click(function()
+		end
+	})
+	nX = nX + 200
+
+	ui:Append('Shadow', {
+		x = nX, y = nY + 3, w = 20, h = 20,
+		color = O.rgbWndSnaplines or {255, 255, 255},
+		onClick = function()
 			local me = this
 			X.UI.OpenColorPicker(function(r, g, b)
 				X.UI(me):Color(r, g, b)
-				O.rgbWndSnaplines = { r, g, b }
+				O.rgbWndSnaplines = {r, g, b}
 				MYDev_Snaplines.ReloadUI()
 			end)
-		  end)
-		nX = 20
-		nY = nY + 40
+		end
+	})
+	nX = nPaddingX
+	nY = nY + 40
 
-		ui:Append('WndCheckBox', 'WndCheckBox_ShowItemSnaplines')
-		  :Pos(nX, nY):Width(200)
-		  :Text(_L['show item snaplines']):Check(O.bShowItemSnaplines or false)
-		  :Check(function(bCheck)
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200, h = 25,
+		text = _L['show item snaplines'],
+		checked = O.bShowItemSnaplines or false,
+		onCheck = function(bCheck)
 			O.bShowItemSnaplines = bCheck
 			MYDev_Snaplines.ReloadUI()
-		end)
-		nX = nX + 200
-		ui:Append('Shadow', 'Shadow_ItemSnaplinesColor'):Pos(nX, nY)
-		  :Size(20, 20):Color(O.rgbItemSnaplines or {255,255,255})
-		  :Click(function()
+		end
+	})
+	nX = nX + 200
+
+	ui:Append('Shadow', {
+		x = nX, y = nY + 3, w = 20, h = 20,
+		color = O.rgbItemSnaplines or {255, 255, 255},
+		onClick = function()
 			local me = this
 			X.UI.OpenColorPicker(function(r, g, b)
 				X.UI(me):Color(r, g, b)
-				O.rgbItemSnaplines = { r, g, b }
+				O.rgbItemSnaplines = {r, g, b}
 				MYDev_Snaplines.ReloadUI()
 			end)
-		  end)
-		nX = 20
-		nY = nY + 40
+		end
+	})
+	nX = nPaddingX
+	nY = nY + 40
 
-		ui:Append('WndCheckBox', 'WndCheckBox_AutoDetectBox')
-		  :Pos(nX, nY):Width(200)
-		  :Text(_L['auto detect box']):Check(O.bDetectBox or false)
-		  :Check(function(bCheck)
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200, h = 25,
+		text = _L['auto detect box'],
+		checked = O.bDetectBox or false,
+		onCheck = function(bCheck)
 			O.bDetectBox = bCheck
-		end)
-		nY = nY + 40
+		end
+	})
+	nY = nY + 40
 
-		ui:Append('WndCheckBox', {
-			x = nX, y = nY, w = 200, text = _L['auto scale'], checked = O.bAutoScale,
-			onCheck = function(bCheck) O.bAutoScale = bCheck end
-		})
-		nY = nY + 40
+	ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 200, h = 25,
+		text = _L['auto scale'],
+		checked = O.bAutoScale,
+		onCheck = function(bCheck)
+			O.bAutoScale = bCheck
+		end
+	})
+	nY = nY + 40
 
-		ui:Append('Text', 'Text_SetHotkey'):Pos(nW-140, 20):Color(255,255,0)
-		  :Text(_L['>> set hotkey <<'])
-		  :Click(function() X.SetHotKey() end)
-	end
-})
+	ui:Append('Text', {
+		x = nW - 140, y = 20, w = 140, h = 25,
+		color = {255, 255, 0},
+		text = _L['>> set hotkey <<'],
+		onClick = function() X.SetHotKey() end
+	})
+end
+
+-- ×¢²áÃæ°å
+X.Panel.Register(_L['Development'], 'Dev_Snaplines', _L['Snaplines'], 'ui/Image/UICommon/PlugIn.UITex|1', PS)
+
 -- ×¢²á¿ì½İ¼ü
 X.RegisterHotKey('MY_Dev_Snaplines'         , _L['Snaplines']           , function() O.bEnable   = not O.bEnable   MYDev_Snaplines.ReloadUI() end, nil)
 X.RegisterHotKey('MY_Dev_Snaplines_ShowTip' , _L['Snaplines - ShowTip'] , function() O.bShowTip  = not O.bShowTip  MYDev_Snaplines.ReloadUI() end, nil)
