@@ -429,7 +429,9 @@ function DS:CountMsg(aMsgType, szSearch, nMinTime, nMaxTime)
 	end
 	local tMsgType = aMsgType and X.FlipObjectKV(aMsgType)
 	for _, rec in ipairs(self.aInsertQueueAnsi) do
-		if (not tMsgType or tMsgType[rec.szMsgType])
+		if rec.nTime >= nMinTime
+		and rec.nTime <= nMaxTime
+		and (not tMsgType or tMsgType[rec.szMsgType])
 		and (szSearch == '' or X.StringFindW(rec.szText, szSearch) or X.StringFindW(rec.szTalker, szSearch)) then
 			nCount = nCount + 1
 		end
