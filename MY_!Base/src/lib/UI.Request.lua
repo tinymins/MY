@@ -47,9 +47,10 @@ function D.Open()
 			end,
 		}):Raw()
 		X.UI.AppendFromIni(frame, INI_PATH, 'Scroll_Request')
-		X.RegisterEsc(X.NSFormatString('{$NS}_PartyRequest'), D.GetFrame, D.Close)
+		X.UI.AdaptComponentAppearance(frame:Lookup('Scroll_Request/ScrollBar_Request'))
 		frame:SetPoint('CENTER', 0, -350, 'CENTER', 0, 0)
 		frame:CorrectPos()
+		X.RegisterEsc(X.NSFormatString('{$NS}_PartyRequest'), D.GetFrame, D.Close)
 	end
 	return frame
 end
