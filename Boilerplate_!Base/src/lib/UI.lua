@@ -4445,7 +4445,8 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 				wnd:SetSize(nWidth, nHeight)
 				wnd:Lookup('', ''):SetSize(nWidth, nHeight)
 			end
-			local hdb = wnd:Lookup('', 'Handle_DBClick')
+			local hdb = raw:Lookup('', 'Handle_DBClick')
+				or raw:Lookup('Wnd_Total', 'Handle_DBClick')
 			if hdb then
 				hdb:SetW(nWidth)
 			end
