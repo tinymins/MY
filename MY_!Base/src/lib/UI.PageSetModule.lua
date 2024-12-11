@@ -185,15 +185,16 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 	end
 
 	function PageSetEvent.OnActivePage()
-		if this:GetRoot():Lookup(szPageSetPath) == this then
+		local frame = this:GetRoot()
+		if frame:Lookup(szPageSetPath) == this then
 			local ps = this
 			if ps.bInitPageSet then
 				return
 			end
 			local page = ps:GetActivePage()
 			if page.nIndex then
-				if X.IsElement(this.pActivePage) then
-					local m = Modules[this.pActivePage.nIndex]
+				if X.IsElement(frame.pActivePage) then
+					local m = Modules[frame.pActivePage.nIndex]
 					if m and m.tModule.OnDeactivePage then
 						X.SafeCallWithThis(page, m.tModule.OnDeactivePage)
 					end
@@ -208,7 +209,7 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 				if m and m.tModule.OnActivePage then
 					X.SafeCallWithThis(page, m.tModule.OnActivePage)
 				end
-				this.pActivePage = page
+				frame.pActivePage = page
 			end
 		end
 	end
