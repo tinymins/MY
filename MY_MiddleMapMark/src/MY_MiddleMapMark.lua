@@ -873,6 +873,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	ui:Append('WndButton', {
+		name = 'WndButton_Settings',
 		x = nX + nW - 25, y = nY, w = 25, h = 25,
 		buttonStyle = 'OPTION',
 		menu = function()
@@ -948,9 +949,10 @@ function PS.OnPanelResize(wnd)
 	local nX, nY = ui:Pos()
 	local nW, nH = ui:Size()
 
-	ui:Children('#WndListBox_1'):Size(nW - 32, nH - 50)
-	ui:Children('#Image_Progress'):Size(nW - 30, 4)
-	ui:Children('#WndEdit_Search'):Size(nW - 26, 25)
+	ui:Children('#WndEdit_Search'):Width(nW - 25)
+	ui:Children('#WndButton_Settings'):Left(nX + nW - 25)
+	ui:Children('#Image_Progress'):Width(nW)
+	ui:Children('#WndListBox_1'):Size(nW, nH - ui:Children('#Image_Progress'):Top() - 4)
 end
 
 X.Panel.Register(_L['General'], 'MY_MiddleMapMark', _L['MY_MiddleMapMark'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)
