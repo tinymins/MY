@@ -117,6 +117,7 @@ function D.OpenPanel()
 	})
 	local frame = ui:Raw()
 	X.UI.AppendFromIni(frame:Lookup('Wnd_Total'), INI_PATH, 'WndScroll_Notify')
+	X.UI.AdaptComponentAppearance(frame:Lookup('Wnd_Total/WndScroll_Notify/Scroll_Notify'))
 	D.DrawNotifies()
 end
 

@@ -1010,6 +1010,11 @@ local function InitComponent(raw, szType)
 			end
 		end)
 		SetComponentProp(raw, 'listboxOptions', { multiSelect = false })
+		X.UI.AdaptComponentAppearance(raw:Lookup('Scroll_Default'))
+	elseif szType == 'WndScrollHandleBox' then
+		X.UI.AdaptComponentAppearance(raw:Lookup('WndScrollBar'))
+	elseif szType == 'WndScrollWindowBox' then
+		X.UI.AdaptComponentAppearance(raw:Lookup('WndScrollBar'))
 	elseif szType == 'WndTable' then
 		-- 初始化变量
 		SetComponentProp(raw, 'ScrollX', 'auto')
@@ -1829,6 +1834,8 @@ local function InitComponent(raw, szType)
 			scrollY:ScrollNext(Station.GetMessageWheelDelta() * 10)
 			return 1
 		end
+		X.UI.AdaptComponentAppearance(raw:Lookup('Scroll_X'))
+		X.UI.AdaptComponentAppearance(raw:Lookup('Scroll_Y'))
 	elseif szType == 'WndPageSet' then
 		X.UI.AdaptComponentAppearance(raw:Lookup('', 'Image_TabBg'))
 	elseif szType == 'WndTabs' then

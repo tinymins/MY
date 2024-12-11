@@ -355,6 +355,17 @@ function X.UI.AdaptComponentAppearance(hEl, szExtra)
 					34,
 					35
 				)
+			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 31 then -- 滚动条按钮
+				X.UI.SetButtonUITex(
+					hEl,
+					'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+					47,
+					48,
+					49,
+					50
+				)
+			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 47 then -- 滚动条上按钮
+			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 51 then -- 滚动条下按钮
 			end
 		elseif szType == 'WndCheckBox' then
 			if szExtra == 'WndTab' then
@@ -368,6 +379,15 @@ function X.UI.AdaptComponentAppearance(hEl, szExtra)
 					end
 				end
 				hEl:SetAnimation('ui\\Image\\UItimate\\UICommon\\Button4.UITex', 14, 20, 14, 14, 20, 20, 20, 19, 14, 14)
+			end
+		elseif szType == 'WndNewScrollBar' then
+			X.UI.AdaptComponentAppearance(hEl:GetFirstChild())
+			local hSibling = hEl:GetParent():GetFirstChild()
+			while hSibling do
+				if hSibling:GetType() == 'WndButton' then
+					X.UI.AdaptComponentAppearance(hSibling)
+				end
+				hSibling = hSibling:GetNext()
 			end
 		elseif szType == 'Image' then
 			local szPath = X.StringLowerW((hEl:GetImagePath()))
