@@ -344,7 +344,9 @@ function X.UI.AdaptComponentAppearance(hEl, szExtra)
 		if szType == 'WndButton' then
 			local szPath = X.StringLowerW(hEl:GetAnimatePath())
 			local nFrame = hEl:GetAnimateGroupNormal()
-			if szPath == 'ui\\image\\uicommon\\logincommon.uitex' and nFrame == 54 then
+			if (szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 25)
+			or (szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 35)
+			or (szPath == 'ui\\image\\uicommon\\logincommon.uitex' and nFrame == 54) then
 				X.UI.SetButtonUITex(
 					hEl,
 					'ui\\Image\\denglu\\Sign1.UITex',
