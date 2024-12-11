@@ -1829,6 +1829,8 @@ local function InitComponent(raw, szType)
 			scrollY:ScrollNext(Station.GetMessageWheelDelta() * 10)
 			return 1
 		end
+	elseif szType == 'WndPageSet' then
+		X.UI.AdaptComponentAppearance(raw:Lookup('', 'Image_TabBg'))
 	elseif szType == 'WndTabs' then
 		if X.UI.IS_GLASSMORPHISM then
 			raw:Lookup('', 'Image_WndTabs_Classic_Bg'):Hide()

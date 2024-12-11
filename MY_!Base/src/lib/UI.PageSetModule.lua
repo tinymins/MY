@@ -64,6 +64,7 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 			local checkbox = frameTemp and frameTemp:Lookup('PageSet_Total/WndCheck_Default')
 			local page = frameTemp and frameTemp:Lookup('PageSet_Total/Page_Default')
 			if checkbox and page then
+				X.UI.AdaptComponentAppearance(checkbox, 'WndTab')
 				checkbox:ChangeRelation(ps, true, true)
 				page:ChangeRelation(ps, true, true)
 				X.UI.CloseFrame(frameTemp)
@@ -118,6 +119,15 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 
 	function PageSetEvent.OnFrameCreate()
 		Exports.DrawUI(this)
+	end
+
+	function PageSetEvent.OnFrameDestroy()
+		if X.IsElement(this.pActivePage) then
+			local m = Modules[this.pActivePage.nIndex]
+			if m and m.tModule.OnDeactivePage then
+				X.SafeCallWithThis(this.pActivePage, m.tModule.OnDeactivePage)
+			end
+		end
 	end
 
 	-- 广播给子模块
@@ -182,6 +192,12 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 			end
 			local page = ps:GetActivePage()
 			if page.nIndex then
+				if X.IsElement(this.pActivePage) then
+					local m = Modules[this.pActivePage.nIndex]
+					if m and m.tModule.OnDeactivePage then
+						X.SafeCallWithThis(page, m.tModule.OnDeactivePage)
+					end
+				end
 				local m = Modules[page.nIndex]
 				if not page.bInit then
 					if m and m.tModule.OnInitPage then
@@ -192,6 +208,7 @@ function X.UI.CreatePageSetModule(NS, szPageSetPath)
 				if m and m.tModule.OnActivePage then
 					X.SafeCallWithThis(page, m.tModule.OnActivePage)
 				end
+				this.pActivePage = page
 			end
 		end
 	end

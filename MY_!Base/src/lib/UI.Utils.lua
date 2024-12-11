@@ -335,6 +335,50 @@ function X.UI.SetCheckBoxUITex(
 	)
 end
 
+-- 适配组件样式（经典/琉璃）
+---@param hEl userdata @组件句柄
+---@param szExtra? string @组件额外信息
+function X.UI.AdaptComponentAppearance(hEl, szExtra)
+	local szType = hEl:GetType()
+	if X.UI.IS_GLASSMORPHISM then
+		if szType == 'WndButton' then
+			local szPath = X.StringLowerW(hEl:GetAnimatePath())
+			local nFrame = hEl:GetAnimateGroupNormal()
+			if szPath == 'ui\\image\\uicommon\\logincommon.uitex' and nFrame == 54 then
+				X.UI.SetButtonUITex(
+					hEl,
+					'ui\\Image\\denglu\\Sign1.UITex',
+					32,
+					33,
+					34,
+					35
+				)
+			end
+		elseif szType == 'WndCheckBox' then
+			if szExtra == 'WndTab' then
+				local h = hEl:Lookup('', '')
+				for i = 0, h:GetItemCount() - 1 do
+					local hChild = h:Lookup(i)
+					if hChild:GetType() == 'Image'
+					and X.StringLowerW((hChild:GetImagePath())) == 'ui\\image\\uicommon\\activepopularize2.uitex'
+					and hChild:GetFrame() == 44 then
+						hChild:Hide()
+					end
+				end
+				hEl:SetAnimation('ui\\Image\\UItimate\\UICommon\\Button4.UITex', 14, 20, 14, 14, 20, 20, 20, 19, 14, 14)
+			end
+		elseif szType == 'Image' then
+			local szPath = X.StringLowerW((hEl:GetImagePath()))
+			local nFrame = hEl:GetFrame()
+			if szPath == 'ui\\image\\uicommon\\activepopularize2.uitex' and nFrame == 46 then
+				hEl:FromUITex('ui\\Image\\UItimate\\UICommon\\Button4.UITex', 21)
+				hEl:SetRelY(hEl:GetRelY() - 3)
+				hEl:SetAbsY(hEl:GetAbsY() - 3)
+			end
+		end
+	end
+end
+
 X.UI.UpdateItemInfoBoxObject = _G.UpdateItemInfoBoxObject or UpdataItemInfoBoxObject
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
