@@ -205,4 +205,8 @@ X.RegisterInit('MY_BagEx_BagNewItem', function()
 	D.CreateBagItemCache()
 end)
 
+X.RegisterFrameDestroy('BigBagPanel', 'MY_BagEx_BagNewItem', function()
+	NEW_ITEM_FLAG_TIME = {}
+end)
+
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
