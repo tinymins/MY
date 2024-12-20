@@ -67,7 +67,9 @@ function X.GetCharacterRelation(dwSelfID, dwPeerID)
 	end
 	if not X.IsPlayer(dwPeerID) then
 		local npc = X.GetNpc(dwPeerID)
-		if npc and npc.dwEmployer ~= 0 and X.GetPlayer(npc.dwEmployer) then
+		if npc
+		and npc.dwEmployer ~= 0 and X.GetPlayer(npc.dwEmployer)
+		and not X.IsPartnerNpc(npc.dwTemplateID) then
 			dwPeerID = npc.dwEmployer
 		end
 	end

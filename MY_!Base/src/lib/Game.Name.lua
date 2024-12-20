@@ -17,7 +17,7 @@ local CACHE = {}
 
 ---@class GetNameOption @获取名称通用参数
 ---@field eShowID '"auto"' | '"always"' | '"never"' @是否显示ID
----@field eShowEmployer '"none"' | '"prefix"' | '"suffix"' @是否显示所有者
+---@field eShowEmployer '"none"' | '"auto"' | '"prefix"' | '"suffix"' @是否显示所有者
 ---@field bShowSuffix boolean @是否显示转服后缀
 ---@field bShowServerName boolean @是否显示跨服后缀
 
@@ -32,7 +32,7 @@ local function StandardizeOption(tOption)
 		tOption.eShowID = 'auto'
 	end
 	if not tOption.eShowEmployer then
-		tOption.eShowEmployer = 'prefix'
+		tOption.eShowEmployer = 'auto'
 	end
 	if tOption.bShowSuffix == nil then
 		tOption.bShowSuffix = true
@@ -137,7 +137,7 @@ function X.GetNpcName(dwID, tOption)
 					szName = X.GetPlayerName(kNpc.dwEmployer, tOption)
 				elseif not X.IsEmpty(szName) then
 					local szEmpName
-					if tOption.eShowEmployer == 'prefix' or tOption.eShowEmployer == 'suffix' then
+					if tOption.eShowEmployer == 'auto' or tOption.eShowEmployer == 'prefix' or tOption.eShowEmployer == 'suffix' then
 						local tEmpOption = X.Clone(tOption)
 						tEmpOption.eShowID = 'never'
 						if X.IsPlayer(kNpc.dwEmployer) then
@@ -152,7 +152,7 @@ function X.GetNpcName(dwID, tOption)
 						end
 					end
 					if szEmpName then
-						if tOption.eShowEmployer == 'prefix' then
+						if tOption.eShowEmployer == 'prefix' or (tOption.eShowEmployer == 'auto' and not X.IsPartnerNpc(kNpc.dwTemplateID)) then
 							local szBaseName, szSuffixName, szServerName = X.DisassemblePlayerName(szEmpName)
 							szName = X.AssemblePlayerName(szBaseName .. g_tStrings.STR_PET_SKILL_LOG .. szName, szSuffixName, szServerName)
 						else
