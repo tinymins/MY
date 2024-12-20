@@ -4386,7 +4386,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		-- 按分类处理其他
 		if GetComponentProp(raw, 'simple') then
 			local nWidthTitleBtnR = 0
-			local p = raw:Lookup('WndContainer_TitleBtnR'):GetFirstChild()
+			local p = raw:Lookup('WndContainer_FrameRightControl'):GetFirstChild()
 			while p do
 				nWidthTitleBtnR = nWidthTitleBtnR + (p:GetSize())
 				p = p:GetNext()
@@ -4394,8 +4394,8 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			raw:Lookup('', 'Text_Title'):SetSize(nWidth - nWidthTitleBtnR, 30)
 			raw:Lookup('', 'Handle_ClassicBg/Shadow_Classic_Bg'):SetSize(nWidth, nHeight)
 			raw:Lookup('', 'Handle_ClassicBg/Image_Classic_TitleBg'):SetSize(nWidth, 30)
-			raw:Lookup('WndContainer_TitleBtnR'):SetSize(nWidth, 30)
-			raw:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
+			raw:Lookup('WndContainer_FrameRightControl'):SetSize(nWidth, 30)
+			raw:Lookup('WndContainer_FrameRightControl'):FormatAllContentPos()
 			local hBtnDrag = raw:Lookup('Btn_Drag')
 			if hBtnDrag then
 				hBtnDrag:SetRelPos(
@@ -4436,7 +4436,7 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			if btnMax then
 				btnMax:SetRelX(nWidth - 63)
 			end
-			local containerR = raw:Lookup('WndContainer_TitleBtnR')
+			local containerR = raw:Lookup('WndContainer_FrameRightControl')
 			if containerR then
 				containerR:SetSize(nWidth - 4, 30)
 				containerR:FormatAllContentPos()
@@ -5183,13 +5183,13 @@ function OO:FrameVisualState(...)
 				if GetComponentType(raw) == 'WndFrame' and GetComponentProp(raw, 'eFrameVisualState') ~= eNextVisualState then
 					local eCurrentVisualState = GetComponentProp(raw, 'eFrameVisualState') or X.UI.FRAME_VISUAL_STATE.NORMAL
 					-- 更新界面按钮状态
-					local chkMaximize = raw:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
+					local chkMaximize = raw:Lookup('WndContainer_FrameRightControl/Wnd_Maximize/CheckBox_Maximize')
 					if eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE then
 						if chkMaximize then
 							chkMaximize:Check(false, WNDEVENT_FIRETYPE.PREVENT)
 						end
 					elseif eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then
-						raw:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize'):Check(false, WNDEVENT_FIRETYPE.PREVENT)
+						raw:Lookup('WndContainer_FrameRightControl/Wnd_Minimize/CheckBox_Minimize'):Check(false, WNDEVENT_FIRETYPE.PREVENT)
 					end
 					-- 恢复默认窗体状态
 					if (eNextVisualState == X.UI.FRAME_VISUAL_STATE.MAXIMIZE and eCurrentVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE)
@@ -5304,7 +5304,7 @@ function OO:FrameLeftControl(aControl)
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		if GetComponentType(raw) == 'WndFrame' then
-			local hContainer = raw:Lookup('WndContainer_TitleBtnL')
+			local hContainer = raw:Lookup('WndContainer_FrameLeftControl')
 			if hContainer and aControl then
 				for i = hContainer:GetAllContentCount() - 1, 0, -1 do
 					local hWnd = hContainer:LookupContent(i)
@@ -5329,7 +5329,7 @@ function OO:FrameRightControl(aControl)
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		if GetComponentType(raw) == 'WndFrame' then
-			local hContainer = raw:Lookup('WndContainer_TitleBtnR')
+			local hContainer = raw:Lookup('WndContainer_FrameRightControl')
 			if hContainer and aControl then
 				for i = hContainer:GetAllContentCount() - 1, 0, -1 do
 					local hWnd = hContainer:LookupContent(i)
@@ -6937,9 +6937,9 @@ function X.UI.CreateFrame(szName, opt)
 			frm:Lookup('', 'Handle_GlassmorphismBg'):Hide()
 		end
 		if not opt.onSettingsClick then
-			frm:Lookup('WndContainer_TitleBtnL/Wnd_Setting'):Destroy()
+			frm:Lookup('WndContainer_FrameLeftControl/Wnd_Setting'):Destroy()
 		else
-			frm:Lookup('WndContainer_TitleBtnL/Wnd_Setting/Btn_Setting').OnLButtonClick = opt.onSettingsClick
+			frm:Lookup('WndContainer_FrameLeftControl/Wnd_Setting/Btn_Setting').OnLButtonClick = opt.onSettingsClick
 		end
 		-- frame properties
 		if opt.alpha then
@@ -6954,21 +6954,21 @@ function X.UI.CreateFrame(szName, opt)
 		if X.UI.IS_GLASSMORPHISM then
 			frm:Lookup('', 'Handle_ClassicBg'):Hide()
 			frm:Lookup('', 'Text_Title'):SetRelY(0)
-			frm:Lookup('WndContainer_TitleBtnR'):SetRelY(0)
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetSize(16, 16)
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetRelY(9)
+			frm:Lookup('WndContainer_FrameRightControl'):SetRelY(0)
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Close/Btn_Close'):SetSize(16, 16)
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Close/Btn_Close'):SetRelY(9)
 			X.UI.SetButtonUITex(
-				frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'),
+				frm:Lookup('WndContainer_FrameRightControl/Wnd_Close/Btn_Close'),
 				'ui\\Image\\UItimate\\UICommon\\Button.UITex',
 				35,
 				36,
 				37,
 				38
 			)
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):SetRelY(7)
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):SetAlpha(255)
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Maximize/CheckBox_Maximize'):SetRelY(7)
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Maximize/CheckBox_Maximize'):SetAlpha(255)
 			X.UI.SetCheckBoxUITex(
-				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'),
+				frm:Lookup('WndContainer_FrameRightControl/Wnd_Maximize/CheckBox_Maximize'),
 				'ui\\Image\\Common\\DialogueLabel.UITex',
 				32,
 				33,
@@ -6979,9 +6979,9 @@ function X.UI.CreateFrame(szName, opt)
 				34,
 				32
 			)
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize'):SetAlpha(255)
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Minimize/CheckBox_Minimize'):SetAlpha(255)
 			X.UI.SetCheckBoxUITex(
-				frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize'),
+				frm:Lookup('WndContainer_FrameRightControl/Wnd_Minimize/CheckBox_Minimize'),
 				'ui\\Image\\UItimate\\UICommon\\Button.UITex',
 				177,
 				178,
@@ -7007,40 +7007,40 @@ function X.UI.CreateFrame(szName, opt)
 	if not opt.empty then
 		-- top right buttons
 		if opt.close == false then
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Close'):Destroy()
 		else
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close').OnLButtonClick = function()
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Close/Btn_Close').OnLButtonClick = function()
 				RemoveFrame()
 			end
 		end
 		if not opt.maximize then
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Maximize'):Destroy()
 		else
 			local hDBClick = frm:Lookup('', 'Handle_DBClick')
 				or frm:Lookup('Wnd_Total', 'Handle_DBClick')
 			hDBClick.OnItemLButtonDBClick = function()
-				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
+				frm:Lookup('WndContainer_FrameRightControl/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
 			end
-			frm:Lookup('WndContainer_TitleBtnL').OnLButtonDBClick = function()
-				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
+			frm:Lookup('WndContainer_FrameLeftControl').OnLButtonDBClick = function()
+				frm:Lookup('WndContainer_FrameRightControl/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
 			end
-			frm:Lookup('WndContainer_TitleBtnR').OnLButtonDBClick = function()
-				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
+			frm:Lookup('WndContainer_FrameRightControl').OnLButtonDBClick = function()
+				frm:Lookup('WndContainer_FrameRightControl/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
 			end
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxCheck = function()
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxCheck = function()
 				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MAXIMIZE)
 			end
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxUncheck = function()
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxUncheck = function()
 				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
 			end
 		end
 		if not opt.minimize then
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Minimize'):Destroy()
 		else
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxCheck = function()
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxCheck = function()
 				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MINIMIZE)
 			end
-			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxUncheck = function()
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxUncheck = function()
 				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.NORMAL)
 			end
 		end
@@ -7086,15 +7086,15 @@ function X.UI.CreateFrame(szName, opt)
 				frm:Lookup('Wnd_DragBg'):Show()
 				frm:Lookup('', ''):Hide()
 				frm:Lookup('Wnd_Total'):Hide()
-				frm:Lookup('WndContainer_TitleBtnL'):Hide()
-				frm:Lookup('WndContainer_TitleBtnR'):Hide()
+				frm:Lookup('WndContainer_FrameLeftControl'):Hide()
+				frm:Lookup('WndContainer_FrameRightControl'):Hide()
 			end
 			hBtnDrag.OnDragButtonEnd = function()
 				frm:Lookup('Wnd_DragBg'):Hide()
 				frm:Lookup('', ''):Show()
 				frm:Lookup('Wnd_Total'):Show()
-				frm:Lookup('WndContainer_TitleBtnL'):Show()
-				frm:Lookup('WndContainer_TitleBtnR'):Show()
+				frm:Lookup('WndContainer_FrameLeftControl'):Show()
+				frm:Lookup('WndContainer_FrameRightControl'):Show()
 				local nW = this:GetRelX() + this:GetW() - this.nVisualOffsetX
 				local nH = this:GetRelY() + this:GetH() - this.nVisualOffsetY
 				nW = math.max(nW, GetComponentProp(frm, 'minWidth'))
@@ -7103,8 +7103,8 @@ function X.UI.CreateFrame(szName, opt)
 			end
 			hBtnDrag:RegisterLButtonDrag()
 		end
-		frm:Lookup('WndContainer_TitleBtnL'):FormatAllContentPos()
-		frm:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
+		frm:Lookup('WndContainer_FrameLeftControl'):FormatAllContentPos()
+		frm:Lookup('WndContainer_FrameRightControl'):FormatAllContentPos()
 	end
 	if not opt.anchor and not (opt.x and opt.y) then
 		opt.anchor = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
