@@ -131,7 +131,7 @@ function D.Open(url, options)
 			if options.controls == false then
 				table.insert(aControl, function(hWnd)
 					X.UI(hWnd):Append('WndButton', {
-						y = 3, w = 24, h = 24,
+						y = X.UI.IS_GLASSMORPHISM and 5 or 3, w = 24, h = 24,
 						buttonStyle = {
 							szImage = 'ui\\Image\\Common\\DialogueLabel.UITex',
 							nNormalGroup = 14,

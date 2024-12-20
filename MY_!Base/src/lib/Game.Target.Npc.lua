@@ -231,19 +231,18 @@ function X.IsShieldedNpc(dwTemplateID, szType)
 	return bShieldFocus or bShieldSpeak
 end
 
-local PARTNER_NPC
+local PARTNER_NPC = {}
+X.RegisterEvent('NPC_ENTER_SCENE', 'LIB.PARTNER_NPC', function()
+	local npc = X.GetNpc(arg0)
+	if npc and npc.nSpecies == X.CONSTANT.NPC_SPECIES_TYPE.NPC_ASSISTED then
+		PARTNER_NPC[npc.dwTemplateID] = true
+	end
+end)
 ---获取一个NPC模板ID是否是侠客
 ---@param dwTemplateID number @模板ID
 ---@return boolean @是否是侠客
 function X.IsPartnerNpc(dwTemplateID)
-	if not PARTNER_NPC then
-		PARTNER_NPC = {}
-		for _, v in ipairs(X.Table.GetAllPartnerNpcInfo() or {}) do
-			PARTNER_NPC[v.szName] = true
-		end
-	end
-	local szName = X.GetNpcTemplateName(dwTemplateID)
-	return szName and PARTNER_NPC[szName] or false
+	return PARTNER_NPC[dwTemplateID] or false
 end
 
 X.RegisterTargetAddonMenu(X.NSFormatString('{$NS}#Game#ImportantNpclist'), function()
