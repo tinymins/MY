@@ -6956,6 +6956,7 @@ function X.UI.CreateFrame(szName, opt)
 			frm:Lookup('', 'Text_Title'):SetRelY(0)
 			frm:Lookup('WndContainer_TitleBtnR'):SetRelY(0)
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetSize(16, 16)
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'):SetRelY(9)
 			X.UI.SetButtonUITex(
 				frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close'),
 				'ui\\Image\\UItimate\\UICommon\\Button.UITex',
@@ -6964,18 +6965,33 @@ function X.UI.CreateFrame(szName, opt)
 				37,
 				38
 			)
-			-- X.UI.SetCheckBoxUITex(
-			-- 	frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'),
-			-- 	'ui\\Image\\UItimate\\UICommon\\Button4.UITex',
-			-- 	22,
-			-- 	23,
-			-- 	24,
-			-- 	21,
-			-- 	18,
-			-- 	19,
-			-- 	20,
-			-- 	1
-			-- )
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):SetRelY(7)
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):SetAlpha(255)
+			X.UI.SetCheckBoxUITex(
+				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'),
+				'ui\\Image\\Common\\DialogueLabel.UITex',
+				32,
+				33,
+				33,
+				32,
+				35,
+				34,
+				34,
+				32
+			)
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize'):SetAlpha(255)
+			X.UI.SetCheckBoxUITex(
+				frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize'),
+				'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+				177,
+				178,
+				179,
+				180,
+				177,
+				178,
+				179,
+				180
+			)
 			X.UI.SetButtonUITex(
 				frm:Lookup('Btn_Drag'),
 				'ui\\Image\\UItimate\\UICommon\\Button.UITex',
