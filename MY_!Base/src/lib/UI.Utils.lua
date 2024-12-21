@@ -379,6 +379,21 @@ function X.UI.AdaptComponentAppearance(hEl, szExtra)
 					end
 				end
 				hEl:SetAnimation('ui\\Image\\UItimate\\UICommon\\Button4.UITex', 14, 20, 14, 14, 20, 20, 20, 19, 14, 14)
+			elseif szExtra == 'WndCheckBox' then
+				X.UI.SetCheckBoxUITex(
+					hEl,
+					'ui\\Image\\UItimate\\UICommon\\Button4.UITex',
+					4,
+					5,
+					6,
+					7,
+					0,
+					1,
+					2,
+					3,
+					7,
+					3
+				)
 			end
 		elseif szType == 'WndNewScrollBar' then
 			X.UI.AdaptComponentAppearance(hEl:GetFirstChild())

@@ -819,7 +819,11 @@ local function InitComponent(raw, szType)
 			scroll:ScrollNext(-Station.GetMessageWheelDelta())
 			return 1
 		end
-	elseif szType=='WndEditBox' then
+	elseif szType == 'WndCheckBox' then
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.AdaptComponentAppearance(raw, 'WndCheckBox')
+		end
+	elseif szType == 'WndEditBox' then
 		local edt = raw:Lookup('WndEdit_Default')
 		edt.OnEditSpecialKeyDown = function()
 			local nMessageKey = Station.GetMessageKey()
@@ -834,7 +838,7 @@ local function InitComponent(raw, szType)
 				return 1
 			end
 		end
-	elseif szType=='WndAutocomplete' then
+	elseif szType == 'WndAutocomplete' then
 		local edt = raw:Lookup('WndEdit_Default')
 		edt.OnSetFocus = function()
 			local opt = GetComponentProp(raw, 'autocompleteOptions')
