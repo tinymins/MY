@@ -187,6 +187,8 @@ return {
 
 	['Your KGUI is not official, please fix client and try again.'] = '当前客户端 KGUI 非官方最新发布版，功能可能受损，请尝试修复客户端后再次尝试确认是否仍然存在问题。',
 
+	['Due to official limit, frame minimize will cause wrong glassmorphism area, waiting for seasungame to fix it.'] = '由于官方琉璃模糊效果尚未完善，窗体最小化后可能会出现错误的窗口模糊区域问题，请等待官方修复该问题。',
+
 	['Request list'] = '请求列表',
 	['Clear list and close?'] = '清空列表并关闭？',
 

@@ -7042,6 +7042,9 @@ function X.UI.CreateFrame(szName, opt)
 			frm:Lookup('WndContainer_FrameRightControl/Wnd_Minimize'):Destroy()
 		else
 			frm:Lookup('WndContainer_FrameRightControl/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxCheck = function()
+				if X.UI.IS_GLASSMORPHISM then
+					X.OutputSystemMessage(_L['Due to official limit, frame minimize will cause wrong glassmorphism area, waiting for seasungame to fix it.'])
+				end
 				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MINIMIZE)
 			end
 			frm:Lookup('WndContainer_FrameRightControl/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxUncheck = function()
