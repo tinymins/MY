@@ -30,26 +30,37 @@ local O = X.CreateUserSettingsModule('MYDev_UITexViewer', {
 		xDefaultValue = '',
 	},
 })
-local _Cache = {}
-MYDev_UITexViewer = {}
+local D = {}
 
-_Cache.OnPanelActive = function(wnd)
+local PS = {}
+
+function PS.IsRestricted()
+	return not X.IsDebugging('Dev_UITexViewer')
+end
+
+function PS.OnPanelActive(wnd)
 	local ui = X.UI(wnd)
 	local w, h = ui:Size()
 	local x, y = 20, 20
 
-	_Cache.tUITexList = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MYDev_UITexViewer/data/data.jx3dat') or {}
+	D.tUITexList = X.LoadLUAData(X.PACKET_INFO.ROOT .. 'MYDev_UITexViewer/data/data.jx3dat') or {}
 
-	local uiBoard = ui:Append('WndScrollHandleBox', 'WndScrollHandleBox_ImageList')
-	  :HandleStyle(3):Pos(x, y+25):Size(w-21, h - 70)
+	local uiBoard = ui:Append('WndScrollHandleBox', {
+		name = 'WndScrollHandleBox_ImageList',
+		x = x, y = y + 25, w = w - 21, h = h - 70,
+		handleStyle = 3,
+	})
 
-	local uiEdit = ui:Append('WndEditBox', 'WndEdit_Copy')
-	  :Pos(x, h-30):Size(w-20, 25):Multiline(true)
+	local uiEdit = ui:Append('WndEditBox', {
+		name = 'WndEdit_Copy',
+		x = x, y = h - 30, w = w - 20, h = 25,
+		multiline = true,
+	})
 
-	ui:Append('WndAutocomplete', 'WndAutocomplete_UITexPath')
-	  :Pos(x, y):Size(w-20, 25):Text(O.szUITexPath)
-	  :Change(function(szText)
-		local tInfo = KG_Table.Load(szText .. '.txt', {
+	local function DrawBoard()
+		local szPath = O.szUITexPath:gsub('/', '\\'):gsub('\\\\', '\\'):gsub('%.UITex$', ''):gsub('%.uitex$', '')
+
+		local tInfo = KG_Table.Load(szPath .. '.txt', {
 		-- 图片文件帧信息表的表头名字
 			{f = 'i', t = 'nFrame' },             -- 图片帧 ID
 			{f = 'i', t = 'nLeft'  },             -- 帧位置: 距离左侧像素(X位置)
@@ -62,7 +73,6 @@ _Cache.OnPanelActive = function(wnd)
 			return
 		end
 
-		O.szUITexPath = szText:gsub('\\\\', '\\'):gsub('%.UITex$', ''):gsub('%.uitex$', '')
 		uiBoard:Clear()
 		for i = 0, 256 do
 			local tLine = tInfo:Search(i)
@@ -71,38 +81,55 @@ _Cache.OnPanelActive = function(wnd)
 			end
 
 			if tLine.nWidth ~= 0 and tLine.nHeight ~= 0 then
-				uiBoard:Append('<image>eventid=277 name="Image_'..i..'"</image>')
-				  :Image(szText .. '.UITex', tLine.nFrame)
-				  :Size(tLine.nWidth, tLine.nHeight)
-				  :Alpha(220)
-				  :Hover(function(bIn) X.UI(this):Alpha((bIn and 255) or 220) end)
-				  :Tip(szText .. '.UITex#' .. i .. '\n' .. tLine.nWidth .. 'x' .. tLine.nHeight .. '\n' .. _L['(left click to generate xml)'], X.UI.TIP_POSITION.TOP_BOTTOM)
-				  :Click(function() uiEdit:Text('<image>w='..tLine.nWidth..' h='..tLine.nHeight..' path="' .. szText .. '.UITex" frame=' .. i ..'</image>') end)
+				uiBoard:Append('Image', {
+					name = 'Image_' .. i,
+					w = tLine.nWidth, h = tLine.nHeight,
+					alpha = 220,
+					image = szPath .. '.UITex', imageFrame = tLine.nFrame,
+					tip = {
+						render = szPath .. '.UITex#' .. i .. '\n' .. tLine.nWidth .. 'x' .. tLine.nHeight .. '\n' .. _L['(left click to generate xml)'],
+						position = X.UI.TIP_POSITION.TOP_BOTTOM,
+					},
+					onHover = function(bIn)
+						X.UI(this):Alpha((bIn and 255) or 220)
+					end,
+					onClick = function()
+						uiEdit:Text('<image>w='..tLine.nWidth..' h='..tLine.nHeight..' path="' .. szPath .. '.UITex" frame=' .. i ..'</image>')
+					end,
+				})
 			end
 		end
-	  end)
-	  :Click(function(nButton)
-		if IsPopupMenuOpened() then
-			X.UI(this):Autocomplete('close')
-		else
-			X.UI(this):Autocomplete('search', '')
-		end
-	  end)
-	  :Autocomplete('option', 'maxOption', 20)
-	  :Autocomplete('option', 'source', _Cache.tUITexList)
-	  :Change()
+	end
+
+	ui:Append('WndAutocomplete', {
+		name = 'WndAutocomplete_UITexPath',
+		x = x, y = y, w = w - 20, h = 25,
+		text = O.szUITexPath,
+		onChange = function(szText)
+			O.szUITexPath = szText
+			DrawBoard()
+		end,
+		onClick = function(nButton)
+			if IsPopupMenuOpened() then
+				X.UI(this):Autocomplete('close')
+			else
+				X.UI(this):Autocomplete('search', '')
+			end
+		end,
+		autocomplete = {
+			{'option', 'maxOption', 20},
+			{'option', 'source', D.tUITexList},
+		},
+	})
+
+	DrawBoard()
 end
 
-_Cache.OnPanelDeactive = function(wnd)
-	_Cache.tUITexList = nil
+function PS.OnPanelDeactive(wnd)
+	D.tUITexList = nil
 	collectgarbage('collect')
 end
 
-X.Panel.Register(_L['Development'], 'Dev_UITexViewer', _L['UITexViewer'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
-	IsRestricted = function()
-		return not X.IsDebugging('Dev_UITexViewer')
-	end,
-	OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = _Cache.OnPanelDeactive
-})
+X.Panel.Register(_L['Development'], 'Dev_UITexViewer', _L['UITexViewer'], 'ui/Image/UICommon/BattleFiled.UITex|7', PS)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
