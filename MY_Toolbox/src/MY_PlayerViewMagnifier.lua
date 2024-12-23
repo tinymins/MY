@@ -23,9 +23,13 @@ end
 local function onFrameCreate()
 	local config
 	if arg0:GetName() == 'PlayerView' then
-		config = { x = 35, y = 8, w = 30, h = 30 }
+		config = X.UI.IS_GLASSMORPHISM
+			and { x = 30, y = 3, w = 25, h = 25 }
+			or { x = 35, y = 8, w = 30, h = 30 }
 	elseif arg0:GetName() == 'ExteriorView' then
-		config = { x = 20, y = 15, w = 40, h = 40 }
+		config = X.UI.IS_GLASSMORPHISM
+			and { x = 15, y = 3, w = 25, h = 25 }
+			or { x = 20, y = 15, w = 40, h = 40 }
 	end
 	if config then
 		local frame, ui, nOriX, nOriY, nOriW, nOriH = arg0, X.UI(arg0), 0, 0, 0, 0
@@ -67,6 +71,24 @@ local function onFrameCreate()
 			end,
 			tip = _L['Click to disable MY player view magnifier'],
 		})
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.SetButtonUITex(
+				ui:Children('#Btn_MY_MagnifierUp'):Raw(),
+				'ui\\Image\\UItimate\\UICommon\\Button2.UITex',
+				37,
+				38,
+				39,
+				40
+			)
+			X.UI.SetButtonUITex(
+				ui:Children('#Btn_MY_MagnifierDown'):Raw(),
+				'ui\\Image\\UItimate\\UICommon\\Button2.UITex',
+				41,
+				42,
+				43,
+				44
+			)
+		end
 		X.RegisterEvent('UI_SCALED', 'MY_PlayerViewMagnifier' .. arg0:GetName(), function()
 			if not frame or not frame:IsValid() then
 				return 0
