@@ -62,7 +62,7 @@ _Cache.OnPanelActive = function(wnd)
 			return
 		end
 
-		O.szUITexPath = szText
+		O.szUITexPath = szText:gsub('\\\\', '\\'):gsub('%.UITex$', ''):gsub('%.uitex$', '')
 		uiBoard:Clear()
 		for i = 0, 256 do
 			local tLine = tInfo:Search(i)
