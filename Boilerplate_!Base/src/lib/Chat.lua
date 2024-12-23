@@ -297,7 +297,7 @@ function X.CopyChatLine(hTime, bTextEditor, bRichText)
 				else
 					local szImg, nFrame = p:GetImagePath()
 					if X.IsString(szImg) then
-						path = X.StringLowerW(X.NormalizePath(szImg))
+						szImg = X.StringLowerW(X.NormalizePath(szImg))
 					end
 					if szImg == 'ui\\image\\common\\money.uitex' and nFrame == 0 then
 						edit:InsertText(_L['Gold'])
