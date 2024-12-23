@@ -90,6 +90,11 @@ function D.CreateList(frame)
 		if frame.fScaleX and frame.fScaleY then
 			hItem:Scale(frame.fScaleX, frame.fScaleY)
 		end
+		if X.UI.IS_GLASSMORPHISM then
+			hItem:Lookup('Handle_L/Handle_Compass/Image_Player'):SetSize(35, 35)
+			hItem:Lookup('Handle_L/Handle_Compass/Image_Player'):SetRelPos(2.5, -0.8)
+			hItem:FormatAllItemPos()
+		end
 		hItem:Hide()
 	end
 	hList:FormatAllItemPos()
