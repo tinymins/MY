@@ -5210,8 +5210,8 @@ function OO:FrameVisualState(...)
 					-- 处理视觉变化
 					local wndTotal = raw:Lookup('Wnd_Total')
 					local shaBg = raw:Lookup('', 'Shadow_Bg')
-					local imgGlassmorphism = raw:Lookup('Handle_GlassmorphismBg', 'Image_Glassmorphism')
-					local imgGlassmorphismBg = raw:Lookup('Handle_GlassmorphismBg', 'Image_Glassmorphism_Bg')
+					local imgGlassmorphism = raw:Lookup('', 'Handle_GlassmorphismBg/Image_Glassmorphism')
+					local imgGlassmorphismBg = raw:Lookup('', 'Handle_GlassmorphismBg/Image_Glassmorphism_Bg')
 					local btnDrag = raw:Lookup('Btn_Drag')
 					if eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化
 						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
