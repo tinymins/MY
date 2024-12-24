@@ -1565,15 +1565,30 @@ local function InitComponent(raw, szType)
 						end
 						-- 单元格点击
 						hItem.OnItemLButtonClick = function()
-							X.SafeCall(GetComponentProp(raw, 'CellLClick'), xValue, rec, nRowIndex, col, nColumnIndex)
+							local fnAction = GetComponentProp(raw, 'CellLClick')
+							if not fnAction then
+								X.SafeCallWithThis(hRow, hRow.OnItemLButtonClick)
+								return
+							end
+							X.SafeCall(fnAction, xValue, rec, nRowIndex, col, nColumnIndex)
 						end
 						hItem:RegisterEvent(X.UI.ITEM_EVENT.L_BUTTON_CLICK)
 						hItem.OnItemMButtonClick = function()
-							X.SafeCall(GetComponentProp(raw, 'CellMClick'), xValue, rec, nRowIndex, col, nColumnIndex)
+							local fnAction = GetComponentProp(raw, 'CellMClick')
+							if not fnAction then
+								X.SafeCallWithThis(hRow, hRow.OnItemMButtonClick)
+								return
+							end
+							X.SafeCall(fnAction, xValue, rec, nRowIndex, col, nColumnIndex)
 						end
 						hItem:RegisterEvent(X.UI.ITEM_EVENT.M_BUTTON_CLICK)
 						hItem.OnItemRButtonClick = function()
-							X.SafeCall(GetComponentProp(raw, 'CellRClick'), xValue, rec, nRowIndex, col, nColumnIndex)
+							local fnAction = GetComponentProp(raw, 'CellRClick')
+							if not fnAction then
+								X.SafeCallWithThis(hRow, hRow.OnItemRButtonClick)
+								return
+							end
+							X.SafeCall(fnAction, xValue, rec, nRowIndex, col, nColumnIndex)
 						end
 						hItem:RegisterEvent(X.UI.ITEM_EVENT.R_BUTTON_CLICK)
 					end
