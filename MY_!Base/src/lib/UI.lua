@@ -5210,8 +5210,8 @@ function OO:FrameVisualState(...)
 					-- 处理视觉变化
 					local wndTotal = raw:Lookup('Wnd_Total')
 					local shaBg = raw:Lookup('', 'Shadow_Bg')
-					local imgGlassmorphism = raw:Lookup('', 'Image_Glassmorphism')
-					local imgGlassmorphismBg = raw:Lookup('', 'Image_Glassmorphism_Bg')
+					local imgGlassmorphism = raw:Lookup('Handle_GlassmorphismBg', 'Image_Glassmorphism')
+					local imgGlassmorphismBg = raw:Lookup('Handle_GlassmorphismBg', 'Image_Glassmorphism_Bg')
 					local btnDrag = raw:Lookup('Btn_Drag')
 					if eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化
 						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
@@ -5229,6 +5229,7 @@ function OO:FrameVisualState(...)
 						end
 						if GetComponentProp(raw, 'simple') then
 							raw:SetH(30)
+							raw:Lookup('', ''):SetH(30)
 						elseif GetComponentProp(raw, 'intact') then
 							raw:SetH(54)
 							raw:Lookup('', ''):SetH(54)
@@ -7042,9 +7043,6 @@ function X.UI.CreateFrame(szName, opt)
 			frm:Lookup('WndContainer_FrameRightControl/Wnd_Minimize'):Destroy()
 		else
 			frm:Lookup('WndContainer_FrameRightControl/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxCheck = function()
-				if X.UI.IS_GLASSMORPHISM then
-					X.OutputSystemMessage(_L['Due to official limit, frame minimize will cause wrong glassmorphism area, waiting for seasungame to fix it.'])
-				end
 				X.UI(frm):FrameVisualState(X.UI.FRAME_VISUAL_STATE.MINIMIZE)
 			end
 			frm:Lookup('WndContainer_FrameRightControl/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxUncheck = function()
