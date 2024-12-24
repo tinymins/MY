@@ -5229,6 +5229,7 @@ function OO:FrameVisualState(...)
 						end
 						if GetComponentProp(raw, 'simple') then
 							raw:SetH(30)
+							raw:Lookup('', ''):SetH(30)
 						elseif GetComponentProp(raw, 'intact') then
 							raw:SetH(54)
 							raw:Lookup('', ''):SetH(54)
