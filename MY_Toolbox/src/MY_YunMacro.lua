@@ -68,6 +68,9 @@ function D.Hook()
 				success = function(szHTML)
 					local res, err = X.DecodeJSON(szHTML)
 					if res then
+						if res.msg then
+							return X.Alert('MY_YunMacro', res.msg)
+						end
 						local bValid, szErrID, nLine, szErrMsg = X.IsMacroValid(res.data)
 						if bValid then
 							res.desc = X.ReplaceSensitiveWord(res.desc)
