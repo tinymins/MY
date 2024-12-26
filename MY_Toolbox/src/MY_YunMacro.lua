@@ -41,16 +41,22 @@ function D.Hook()
 		return
 	end
 	local edtName = frame:Lookup('Edit_Name')
+	local imgNameBg = frame:Lookup('', 'Image_NameBg')
 	local edtDesc = frame:Lookup('Edit_Desc')
 	local edtMacro = frame:Lookup('Edit_Content')
 	local btnNew = frame:Lookup('Btn_New')
 	local hIconList = frame:Lookup('', 'Handle_Icon')
 	local nX = edtName:GetRelX() + edtName:GetW() + 10
 	local nY = edtName:GetRelY() - 4
+	local nH = edtName:GetH()
+	if imgNameBg then
+		nY = imgNameBg:GetRelY()
+		nH = imgNameBg:GetH()
+	end
 	nX = nX + X.UI(frame):Append('WndButton', {
 		name = 'Btn_YunMacro_Update',
 		x = nX, y = nY,
-		w = 'auto', h = edtName:GetH(),
+		w = 'auto', h = nH,
 		text = _L['Sync yun macro'],
 		onClick = function()
 			local szName = X.TrimString(edtName:GetText())
@@ -113,7 +119,7 @@ function D.Hook()
 	X.UI(frame):Append('WndButton', {
 		name = 'Btn_YunMacro_Details',
 		x = nX, y = nY,
-		w = 'auto', h = edtName:GetH(),
+		w = 'auto', h = nH,
 		text = _L['Show yun macro details'],
 		onClick = function()
 			local szName = X.TrimString(edtName:GetText())
