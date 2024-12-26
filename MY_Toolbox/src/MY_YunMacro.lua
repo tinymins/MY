@@ -80,9 +80,16 @@ function D.Hook()
 					end
 					if res.icon then
 						for i = 0, hIconList:GetItemCount() - 1 do
-							hIconList:Lookup(i):SetObjectInUse(false)
+							local h = hIconList:Lookup(i)
+							if h:GetType() == 'Handle' then
+								h = h:Lookup('Box_Icon')
+							end
+							h:SetObjectInUse(false)
 						end
 						local box = hIconList:Lookup(0)
+						if box:GetType() == 'Handle' then
+							box = box:Lookup('Box_Icon')
+						end
 						box:SetObjectInUse(true)
 						box:SetObjectIcon(res.icon)
 						box.nIconID = res.icon
