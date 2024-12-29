@@ -219,6 +219,10 @@ function D.CorrectBoxCount(frame)
 	D.UpdateAnimation(frame, 1)
 end
 
+function D.UpdatePenetrable(frame)
+	frame:SetMousePenetrable(O.bPenetrable)
+end
+
 function D.OnSkillCast(frame, dwSkillID, dwSkillLevel)
 	-- 获取技能信息
 	local szSkillName, dwIconID = X.GetSkillName(dwSkillID, dwSkillLevel)
@@ -261,6 +265,7 @@ function D.OnFrameCreate()
 	hList.nIndexBase = 0
 	hList.nCount = 0
 	D.CorrectBoxCount(this)
+	D.UpdatePenetrable(this)
 	this:RegisterEvent('RENDER_FRAME_UPDATE')
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('DO_SKILL_CAST')
@@ -268,7 +273,6 @@ function D.OnFrameCreate()
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	this:RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT')
-	this:SetMousePenetrable(O.bPenetrable)
 	D.OnEvent('UI_SCALED')
 end
 
@@ -339,6 +343,7 @@ function D.Reload()
 		local frame = D.GetFrame()
 		if frame then
 			D.CorrectBoxCount(frame)
+			D.UpdatePenetrable(frame)
 		else
 			D.Open()
 		end
