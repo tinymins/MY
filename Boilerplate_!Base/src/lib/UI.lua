@@ -4340,11 +4340,11 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		-- 处理窗口背景自适应缩放
 		local hGlassmorphismBgHandle = hnd:Lookup('Handle_GlassmorphismBg')
 		if hGlassmorphismBgHandle then
-			local imgGlassmorphism = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism')
-			local imgGlassmorphismBg = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Bg')
-			local imgGlassmorphismTitleBg = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Title_Bg')
-			local imgGlassmorphismTitleTextureL = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Title_TextureL')
-			local imgGlassmorphismTitleTextureR = hGlassmorphismBgHandle:Lookup('Image_Glassmorphism_Title_TextureR')
+			local imgGlassmorphism = hGlassmorphismBgHandle:Lookup('Image_GlassmorphismBg_Glass')
+			local imgGlassmorphismBg = hGlassmorphismBgHandle:Lookup('Image_GlassmorphismBg')
+			local imgGlassmorphismTitleBg = hGlassmorphismBgHandle:Lookup('Image_GlassmorphismBg_Title')
+			local imgGlassmorphismTitleTextureL = hGlassmorphismBgHandle:Lookup('Image_GlassmorphismBg_Title_TextureL')
+			local imgGlassmorphismTitleTextureR = hGlassmorphismBgHandle:Lookup('Image_GlassmorphismBg_Title_TextureR')
 			if imgGlassmorphism then
 				imgGlassmorphism:SetSize(nWidth, nHeight)
 			end
@@ -4358,20 +4358,20 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 			end
 			hGlassmorphismBgHandle:FormatAllItemPos()
 		end
-		local hClassicBgHandle = hnd:Lookup('Handle_ClassicBg')
+		local hClassicBgHandle = hnd:Lookup('Handle_ClassicBg_Intact')
 		if hClassicBgHandle then
-			local imgBgTLConner = hClassicBgHandle:Lookup('Image_Classic_BgTL_Conner')
-			local imgBgTRConner = hClassicBgHandle:Lookup('Image_Classic_BgTR_Conner')
-			local imgBgTLFlex = hClassicBgHandle:Lookup('Image_Classic_BgTL_Flex')
-			local imgBgTRFlex = hClassicBgHandle:Lookup('Image_Classic_BgTR_Flex')
-			local imgBgTLCenter = hClassicBgHandle:Lookup('Image_Classic_BgTL_Center')
-			local imgBgTRCenter = hClassicBgHandle:Lookup('Image_Classic_BgTR_Center')
-			local imgBgBL = hClassicBgHandle:Lookup('Image_Classic_BgBL')
-			local imgBgBC = hClassicBgHandle:Lookup('Image_Classic_BgBC')
-			local imgBgBR = hClassicBgHandle:Lookup('Image_Classic_BgBR')
-			local imgBgCL = hClassicBgHandle:Lookup('Image_Classic_BgCL')
-			local imgBgCC = hClassicBgHandle:Lookup('Image_Classic_BgCC')
-			local imgBgCR = hClassicBgHandle:Lookup('Image_Classic_BgCR')
+			local imgBgTLConner = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TLConner')
+			local imgBgTRConner = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TRConner')
+			local imgBgTLFlex = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TLFlex')
+			local imgBgTRFlex = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TRFlex')
+			local imgBgTLCenter = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TLCenter')
+			local imgBgTRCenter = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TRCenter')
+			local imgBgBL = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_BL')
+			local imgBgBC = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_BC')
+			local imgBgBR = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_BR')
+			local imgBgCL = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_CL')
+			local imgBgCC = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_CC')
+			local imgBgCR = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_CR')
 			if imgBgTLConner and imgBgTLFlex and imgBgTLCenter
 			and imgBgTRConner and imgBgTRFlex and imgBgTRCenter
 			and imgBgBL and imgBgBC and imgBgBR and imgBgCL and imgBgCC and imgBgCR then
@@ -4411,8 +4411,8 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 				p = p:GetNext()
 			end
 			raw:Lookup('', 'Text_Title'):SetSize(nWidth - nWidthTitleBtnR, 30)
-			raw:Lookup('', 'Handle_ClassicBg/Shadow_Classic_Bg'):SetSize(nWidth, nHeight)
-			raw:Lookup('', 'Handle_ClassicBg/Image_Classic_TitleBg'):SetSize(nWidth, 30)
+			raw:Lookup('', 'Handle_ClassicBg_Intact/Shadow_Classic_Bg'):SetSize(nWidth, nHeight)
+			raw:Lookup('', 'Handle_ClassicBg_Intact/Image_Classic_TitleBg'):SetSize(nWidth, 30)
 			raw:Lookup('WndContainer_FrameRightControl'):SetSize(nWidth, 30)
 			raw:Lookup('WndContainer_FrameRightControl'):FormatAllContentPos()
 			local hBtnDrag = raw:Lookup('Btn_Drag')
@@ -5225,8 +5225,8 @@ function OO:FrameVisualState(...)
 					-- 处理视觉变化
 					local wndTotal = raw:Lookup('Wnd_Total')
 					local shaBg = raw:Lookup('', 'Shadow_Bg')
-					local imgGlassmorphism = raw:Lookup('', 'Handle_GlassmorphismBg/Image_Glassmorphism')
-					local imgGlassmorphismBg = raw:Lookup('', 'Handle_GlassmorphismBg/Image_Glassmorphism_Bg')
+					local imgGlassmorphism = raw:Lookup('', 'Handle_GlassmorphismBg/Image_GlassmorphismBg_Glass')
+					local imgGlassmorphismBg = raw:Lookup('', 'Handle_GlassmorphismBg/Image_GlassmorphismBg')
 					local btnDrag = raw:Lookup('Btn_Drag')
 					if eNextVisualState == X.UI.FRAME_VISUAL_STATE.MINIMIZE then -- 最小化
 						SetComponentProp(raw, 'eFrameVisualState', eNextVisualState)
@@ -6952,7 +6952,7 @@ function X.UI.CreateFrame(szName, opt)
 		SetComponentProp(frm, 'minHeight', opt.minHeight or 50)
 		-- 琉璃风格
 		if X.UI.IS_GLASSMORPHISM then
-			frm:Lookup('', 'Handle_ClassicBg'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg_Intact'):Hide()
 		else
 			frm:Lookup('', 'Handle_GlassmorphismBg'):Hide()
 		end
@@ -6963,8 +6963,8 @@ function X.UI.CreateFrame(szName, opt)
 		end
 		-- frame properties
 		if opt.alpha then
-			frm:Lookup('', 'Handle_ClassicBg/Shadow_Classic_Bg'):SetAlpha(opt.alpha / 255 * 200)
-			frm:Lookup('', 'Handle_ClassicBg/Image_Classic_TitleBg'):SetAlpha(opt.alpha * 1.4)
+			frm:Lookup('', 'Handle_ClassicBg_Intact/Shadow_Classic_Bg'):SetAlpha(opt.alpha / 255 * 200)
+			frm:Lookup('', 'Handle_ClassicBg_Intact/Image_Classic_TitleBg'):SetAlpha(opt.alpha * 1.4)
 		end
 	elseif not opt.empty then
 		SetComponentProp(frm, 'intact', true)
@@ -6972,7 +6972,7 @@ function X.UI.CreateFrame(szName, opt)
 		SetComponentProp(frm, 'minHeight', opt.minHeight or 160)
 		-- 琉璃风格
 		if X.UI.IS_GLASSMORPHISM then
-			frm:Lookup('', 'Handle_ClassicBg'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg_Intact'):Hide()
 			frm:Lookup('', 'Text_Title'):SetRelY(0)
 			frm:Lookup('WndContainer_FrameRightControl'):SetRelY(0)
 			frm:Lookup('WndContainer_FrameRightControl/Wnd_Close/Btn_Close'):SetSize(16, 16)
