@@ -117,7 +117,7 @@ function D.CreateFrame(szInitYY, szInitNote)
 			w = O.nWidth, h = O.nHeight,
 			text = _L['Team Message'],
 			anchor = O.anchor,
-			simple = true, close = true, resize = true,
+			theme = X.UI.FRAME_THEME.SIMPLE, close = true, resize = true,
 			minWidth = 320, minHeight = 195,
 			setting = function()
 				X.Panel.Show()

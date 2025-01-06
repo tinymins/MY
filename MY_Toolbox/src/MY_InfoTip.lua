@@ -762,7 +762,7 @@ function D.ReinitUI()
 		local ui = X.UI('Normal/MY_InfoTip_' .. data.id)
 		if data.config.bEnable then
 			if ui:Count() == 0 then
-				ui = X.UI.CreateFrame('MY_InfoTip_' .. data.id, { empty = true })
+				ui = X.UI.CreateFrame('MY_InfoTip_' .. data.id, { theme = X.UI.FRAME_THEME.EMPTY })
 					:Size(220,30)
 					:Event(
 						'UI_SCALED',

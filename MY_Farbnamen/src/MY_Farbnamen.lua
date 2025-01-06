@@ -1017,7 +1017,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		szJoinWhere = ' WHERE PlayerInfo.time > ' .. (GetCurrentTime() - nTimeLimit) .. ' '
 	end
 	local ui = X.UI.CreateFrame('MY_Farbnamen__Analysis', {
-		simple = true, close = true,
+		theme = X.UI.FRAME_THEME.SIMPLE, close = true,
 		text = szTitle,
 	})
 	local nPaddingX = 20

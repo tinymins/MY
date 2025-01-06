@@ -51,7 +51,7 @@ function D.Reload(bGlobal)
 	X.UI('Normal/' .. NAME):Remove()
 	if CFG.bEnable then
 		X.UI.CreateFrame(NAME, {
-			simple = true, alpha = 140,
+			theme = X.UI.FRAME_THEME.SIMPLE, alpha = 140,
 			maximize = true, minimize = true, resize = true,
 			minWidth = 180, minHeight = 100,
 			onSizeChange = function()

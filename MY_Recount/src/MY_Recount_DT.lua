@@ -486,7 +486,7 @@ function D.Open(id, nChannel)
 	if Station.SearchFrame(szFrameName) then
 		return
 	end
-	local frame = X.UI.CreateFrame('MY_Recount_DT', { text = '', simple = true, close = false, w = 480, h = 387 }):Raw()
+	local frame = X.UI.CreateFrame('MY_Recount_DT', { text = '', theme = X.UI.FRAME_THEME.SIMPLE, close = false, w = 480, h = 387 }):Raw()
 	X.UI.AppendFromIni(frame, SZ_INI, 'Wnd_Total', true)
 	frame:SetName(szFrameName)
 	frame.id = tonumber(id) or id

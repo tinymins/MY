@@ -32,7 +32,7 @@ function D.ExportConfirm()
 		return X.OutputSystemMessage(_L['Already exporting, please wait.'])
 	end
 	local ui = X.UI.CreateFrame('MY_ChatLog_Export', {
-		simple = true, esc = true, close = true, w = 140,
+		theme = X.UI.FRAME_THEME.SIMPLE, esc = true, close = true, w = 140,
 		level = 'Normal1', text = _L['Export chatlog'], alpha = 233,
 	})
 	local btnSure

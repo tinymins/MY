@@ -87,7 +87,7 @@ end
 function D.OpenFrame(item, menu, data)
 	local frame = D.GetFrame()
 	if not frame then
-		local ui = X.UI.CreateFrame('MY_GKP_Chat', { w = 500, h = 355, simple = true, text = _L['MY_GKP_Chat'] })
+		local ui = X.UI.CreateFrame('MY_GKP_Chat', { w = 500, h = 355, theme = X.UI.FRAME_THEME.SIMPLE, text = _L['MY_GKP_Chat'] })
 		frame = ui:Raw()
 		X.UI.AppendFromIni(frame, X.PACKET_INFO.ROOT .. 'MY_GKP/ui/MY_GKP_Chat.ini', 'Wnd_Total', true)
 		ui:Append('WndButton', {
