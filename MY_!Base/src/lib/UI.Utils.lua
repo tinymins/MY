@@ -114,7 +114,7 @@ function X.UI.GetTempElement(szType, szKey)
 	end
 	if not cache or not ui or ui:Count() == 0 then
 		cache = {}
-		ui = X.UI.CreateFrame(X.NSFormatString('{$NS}#TempElement'), { empty = true }):Hide()
+		ui = X.UI.CreateFrame(X.NSFormatString('{$NS}#TempElement'), { theme = X.UI.FRAME_THEME.EMPTY }):Hide()
 	end
 	local szName = szType .. '_' .. szKey
 	local raw = cache[szName]

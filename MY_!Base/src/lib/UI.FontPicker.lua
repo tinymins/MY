@@ -15,7 +15,11 @@ local _L = X.LoadLangPack(X.PACKET_INFO.FRAMEWORK_ROOT .. 'lang/lib/')
 
 -- 打开字体选择
 function X.UI.OpenFontPicker(callback, t)
-	local ui, i = X.UI.CreateFrame(X.NSFormatString('{$NS}_Font_Picker'), { simple = true, close = true, esc = true, text = _L['Font Picker'] }), 0
+	local ui, i = X.UI.CreateFrame(X.NSFormatString('{$NS}_Font_Picker'), {
+		theme = X.UI.FRAME_THEME.SIMPLE,
+		close = true, esc = true,
+		text = _L['Font Picker'],
+	}), 0
 	while 1 do
 		local font = i
 		local txt = ui:Append('Text', {

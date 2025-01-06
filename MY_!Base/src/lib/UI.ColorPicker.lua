@@ -18,8 +18,13 @@ function X.UI.OpenColorPicker(callback, t)
 	if t then
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
-	local ui = X.UI.CreateFrame(X.NSFormatString('{$NS}_ColorTable'), { simple = true, close = true, esc = true })
-		:Size(900, 500):Text(_L['Color Picker']):Anchor({s='CENTER', r='CENTER', x=0, y=0})
+	local ui = X.UI.CreateFrame(X.NSFormatString('{$NS}_ColorTable'), {
+		theme = X.UI.FRAME_THEME.SIMPLE,
+		anchor = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 },
+		w = 900, h = 500,
+		close = true, esc = true,
+		text = _L['Color Picker'],
+	})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			this:SetAlpha(255)
@@ -155,7 +160,13 @@ function X.UI.OpenColorPickerEx(fnAction)
 		return math.floor(r * 255), math.floor(g * 255), math.floor(b * 255)
 	end
 
-	local wnd = X.UI.CreateFrame(X.NSFormatString('{$NS}_ColorPickerEx'), { w = 346, h = 430, text = _L['Color Picker Pro'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 })
+	local wnd = X.UI.CreateFrame(X.NSFormatString('{$NS}_ColorPickerEx'), {
+		theme = X.UI.FRAME_THEME.SIMPLE,
+		x = fX + 15, y = fY + 15,
+		w = 346, h = 430,
+		text = _L['Color Picker Pro'],
+		close = true, esc = true,
+	})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			wnd:Children('#Select'):Color(r, g, b)

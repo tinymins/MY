@@ -70,12 +70,13 @@ local COMPONENT_SAMPLE = {
 	{'Box', 'Box', { w = COMPONENT_H, h = COMPONENT_H, frame = 233 }},
 	{'Image', 'Image', { w = COMPONENT_H, h = COMPONENT_H, image = X.PACKET_INFO.POSTER_IMAGE_LIST[1], imageFrame = 0 }},
 	{
-		'WndFrame',
+		'WndFrame Intact (Default)',
 		'WndButton',
 		{
 			w = 100, h = COMPONENT_H, name = 'WndButton_CreateFrame', text = 'Create',
 			onClick = function()
-				X.UI.CreateFrame('SampleFrame', {
+				X.UI.CreateFrame('IntactFrame', {
+					text = 'Intact Frame Sample',
 					minimize = true,
 					maximize = true,
 					resize = true,
@@ -89,8 +90,26 @@ local COMPONENT_SAMPLE = {
 		{
 			w = 'auto', h = COMPONENT_H, name = 'WndButton_CreateSimpleFrame', text = 'Create',
 			onClick = function()
-				X.UI.CreateFrame('SampleFrame', {
-					simple = true,
+				X.UI.CreateFrame('SimpleFrame', {
+					text = 'Simple Frame Sample',
+					theme = X.UI.FRAME_THEME.SIMPLE,
+					close = true,
+					minimize = true,
+					maximize = true,
+					resize = true,
+				})
+			end,
+		},
+	},
+	{
+		'WndFrame Float',
+		'WndButton',
+		{
+			w = 'auto', h = COMPONENT_H, name = 'WndButton_CreateSimpleFrame', text = 'Create',
+			onClick = function()
+				X.UI.CreateFrame('FloatFrame', {
+					text = 'Float Frame Sample',
+					theme = X.UI.FRAME_THEME.FLOAT,
 					close = true,
 					minimize = true,
 					maximize = true,

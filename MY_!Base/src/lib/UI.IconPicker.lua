@@ -81,10 +81,11 @@ function X.UI.OpenIconPicker(fnAction, nCurrentIconID)
 	end
 	local nMaxIconID, aBox, aTxt = MAX_ICON_ID, {}, {}
 	local ui = X.UI.CreateFrame(X.NSFormatString('{$NS}_IconPanel'), {
+		theme = X.UI.FRAME_THEME.SIMPLE,
 		w = ICON_COLUMN_COUNT * 50 + 20,
 		h = ICON_ROW_COUNT * 70 + 90,
+		close = true, esc = true,
 		text = _L['Icon Picker'],
-		simple = true, close = true, esc = true,
 	})
 	local function OnSelectIcon(nIconID)
 		if fnAction then

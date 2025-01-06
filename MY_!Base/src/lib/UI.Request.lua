@@ -28,8 +28,9 @@ function D.Open()
 	if not frame then
 		frame = X.UI.CreateFrame(FRAME_NAME, {
 			level = 'Normal2',
+			theme = X.UI.FRAME_THEME.SIMPLE,
+			w = 525, h = 88,
 			text = _L['Request list'],
-			w = 525, h = 88, simple = true,
 			onSettingsClick = function()
 				local menu = {}
 				for _, v in pairs(REQUEST_HANDLER) do
