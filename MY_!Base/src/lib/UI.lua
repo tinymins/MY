@@ -6992,8 +6992,8 @@ function X.UI.CreateFrame(szName, opt)
 			frm:Lookup('', 'Handle_ClassicBg_Float'):Hide()
 			frm:Lookup('', 'Text_Title'):SetRelY(0)
 			frm:Lookup('WndContainer_FrameRightControl'):SetRelY(0)
-			frm:Lookup('WndContainer_FrameRightControl/Wnd_Close/Btn_Close'):SetSize(16, 16)
-			frm:Lookup('WndContainer_FrameRightControl/Wnd_Close/Btn_Close'):SetRelY(9)
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Close/Btn_Close'):SetSize(30, 30)
+			frm:Lookup('WndContainer_FrameRightControl/Wnd_Close/Btn_Close'):SetRelPos(-7, 2)
 			X.UI.SetButtonUITex(
 				frm:Lookup('WndContainer_FrameRightControl/Wnd_Close/Btn_Close'),
 				'ui\\Image\\UItimate\\UICommon\\Button.UITex',
