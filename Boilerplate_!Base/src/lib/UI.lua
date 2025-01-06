@@ -181,6 +181,12 @@ X.UI.FRAME_VISUAL_STATE = X.FreezeTable({
 	MINIMIZE = 1, -- 最小化
 	MAXIMIZE = 2, -- 最大化
 })
+X.UI.FRAME_THEME = X.FreezeTable({
+	INTACT = 'intact', -- 完整窗体
+	SIMPLE = 'simple', -- 简单窗体
+	FLOAT  = 'float' , -- 浮动窗体
+	EMPTY  = 'empty' , -- 空白窗体
+})
 X.UI.LAYER_LIST = {'Lowest', 'Lowest1', 'Lowest2', 'Normal', 'Normal1', 'Normal2', 'Topmost', 'Topmost1', 'Topmost2'}
 X.UI.IS_GLASSMORPHISM = IsFileExist('ui\\Image\\denglu\\Sign_BdCommon.UITex')
 
@@ -4337,14 +4343,15 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 	if componentType == 'WndFrame' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hnd = raw:Lookup('', '')
+		local eTheme = GetComponentProp(raw, 'theme')
 		-- 处理窗口背景自适应缩放
-		local hGlassmorphismBgHandle = hnd:Lookup('Handle_GlassmorphismBg')
-		if hGlassmorphismBgHandle then
-			local imgGlassmorphism = hGlassmorphismBgHandle:Lookup('Image_GlassmorphismBg_Glass')
-			local imgGlassmorphismBg = hGlassmorphismBgHandle:Lookup('Image_GlassmorphismBg')
-			local imgGlassmorphismTitleBg = hGlassmorphismBgHandle:Lookup('Image_GlassmorphismBg_Title')
-			local imgGlassmorphismTitleTextureL = hGlassmorphismBgHandle:Lookup('Image_GlassmorphismBg_Title_TextureL')
-			local imgGlassmorphismTitleTextureR = hGlassmorphismBgHandle:Lookup('Image_GlassmorphismBg_Title_TextureR')
+		local hBgHandle = hnd:Lookup('Handle_GlassmorphismBg')
+		if hBgHandle then
+			local imgGlassmorphism = hBgHandle:Lookup('Image_GlassmorphismBg_Glass')
+			local imgGlassmorphismBg = hBgHandle:Lookup('Image_GlassmorphismBg')
+			local imgGlassmorphismTitleBg = hBgHandle:Lookup('Image_GlassmorphismBg_Title')
+			local imgGlassmorphismTitleTextureL = hBgHandle:Lookup('Image_GlassmorphismBg_Title_TextureL')
+			local imgGlassmorphismTitleTextureR = hBgHandle:Lookup('Image_GlassmorphismBg_Title_TextureR')
 			if imgGlassmorphism then
 				imgGlassmorphism:SetSize(nWidth, nHeight)
 			end
@@ -4356,22 +4363,22 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 				-- imgTitleTextureL
 				imgGlassmorphismTitleTextureR:SetRelX(nWidth - imgGlassmorphismTitleTextureR:GetW())
 			end
-			hGlassmorphismBgHandle:FormatAllItemPos()
+			hBgHandle:FormatAllItemPos()
 		end
-		local hClassicBgHandle = hnd:Lookup('Handle_ClassicBg_Intact')
-		if hClassicBgHandle then
-			local imgBgTLConner = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TLConner')
-			local imgBgTRConner = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TRConner')
-			local imgBgTLFlex = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TLFlex')
-			local imgBgTRFlex = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TRFlex')
-			local imgBgTLCenter = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TLCenter')
-			local imgBgTRCenter = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_TRCenter')
-			local imgBgBL = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_BL')
-			local imgBgBC = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_BC')
-			local imgBgBR = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_BR')
-			local imgBgCL = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_CL')
-			local imgBgCC = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_CC')
-			local imgBgCR = hClassicBgHandle:Lookup('Image_ClassicBg_Intact_CR')
+		local hBgHandle = hnd:Lookup('Handle_ClassicBg_Intact')
+		if hBgHandle then
+			local imgBgTLConner = hBgHandle:Lookup('Image_ClassicBg_Intact_TLConner')
+			local imgBgTRConner = hBgHandle:Lookup('Image_ClassicBg_Intact_TRConner')
+			local imgBgTLFlex = hBgHandle:Lookup('Image_ClassicBg_Intact_TLFlex')
+			local imgBgTRFlex = hBgHandle:Lookup('Image_ClassicBg_Intact_TRFlex')
+			local imgBgTLCenter = hBgHandle:Lookup('Image_ClassicBg_Intact_TLCenter')
+			local imgBgTRCenter = hBgHandle:Lookup('Image_ClassicBg_Intact_TRCenter')
+			local imgBgBL = hBgHandle:Lookup('Image_ClassicBg_Intact_BL')
+			local imgBgBC = hBgHandle:Lookup('Image_ClassicBg_Intact_BC')
+			local imgBgBR = hBgHandle:Lookup('Image_ClassicBg_Intact_BR')
+			local imgBgCL = hBgHandle:Lookup('Image_ClassicBg_Intact_CL')
+			local imgBgCC = hBgHandle:Lookup('Image_ClassicBg_Intact_CC')
+			local imgBgCR = hBgHandle:Lookup('Image_ClassicBg_Intact_CR')
 			if imgBgTLConner and imgBgTLFlex and imgBgTLCenter
 			and imgBgTRConner and imgBgTRFlex and imgBgTRCenter
 			and imgBgBL and imgBgBC and imgBgBR and imgBgCL and imgBgCC and imgBgCR then
@@ -4400,85 +4407,101 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 				imgBgBL:SetRelY(nTH + nCH)
 				hnd:FormatAllItemPos()
 			end
-			hClassicBgHandle:FormatAllItemPos()
+			hBgHandle:FormatAllItemPos()
 		end
+		local hBgHandle = hnd:Lookup('Handle_ClassicBg_Simple')
+		if hBgHandle then
+			local imgBg = hBgHandle:Lookup('Image_ClassicBg_Simple')
+			local imgBgTitle = hBgHandle:Lookup('Image_ClassicBg_Simple_Title')
+			if imgBg then
+				imgBg:SetSize(nWidth, nHeight)
+			end
+			if imgBgTitle then
+				imgBgTitle:SetW(nWidth)
+			end
+		end
+		local hBgHandle = hnd:Lookup('Handle_ClassicBg_Float')
+		if hBgHandle then
+			local shaBg = hBgHandle:Lookup('Shadow_ClassicBg_Float')
+			local imgBgTitle = hBgHandle:Lookup('Image_ClassicBg_Float_Title')
+			if shaBg then
+				shaBg:SetSize(nWidth, nHeight)
+			end
+			if imgBgTitle then
+				imgBgTitle:SetW(nWidth)
+			end
+		end
+		-- 处理窗口其它组件
+		local hBtnDrag = raw:Lookup('Btn_Drag')
+		if hBtnDrag then
+			hBtnDrag:SetRelPos(
+				nWidth - hBtnDrag:GetW() + (hBtnDrag.nVisualOffsetX or 0),
+				nHeight - hBtnDrag:GetH() + (hBtnDrag.nVisualOffsetY or 0)
+			)
+		end
+		local hDragBg = raw:Lookup('Wnd_DragBg', 'Shadow_DragBg')
+		if hDragBg then
+			hDragBg:SetSize(nWidth, nHeight)
+		end
+		local containerL = raw:Lookup('WndContainer_FrameRightControl')
+		if containerL then
+			containerL:SetW(nWidth - 4)
+			containerL:FormatAllContentPos()
+		end
+		local containerR = raw:Lookup('WndContainer_FrameRightControl')
+		if containerR then
+			containerR:SetW(nWidth - 4)
+			containerR:FormatAllContentPos()
+		end
+		local nWndY = 0
+		if eTheme == X.UI.FRAME_THEME.SIMPLE then
+			nWndY = 33
+		elseif eTheme == X.UI.FRAME_THEME.FLOAT then
+			nWndY = 30
+		end
+		if wnd then
+			wnd:SetRelY(nWndY)
+			wnd:SetSize(nWidth, nHeight - nWndY)
+			wnd:Lookup('', ''):SetSize(nWidth, nHeight - nWndY)
+		end
+		local hdb = raw:Lookup('', 'Handle_DBClick')
+			or raw:Lookup('Wnd_Total', 'Handle_DBClick')
+		if hdb then
+			hdb:SetW(nWidth)
+		end
+		local txtTitle = raw:Lookup('', 'Text_Title')
+		if txtTitle then
+			txtTitle:SetW(nWidth)
+		end
+		local txtAuthor = hnd:Lookup('Text_Author')
+		if txtAuthor then
+			txtAuthor:SetW(nWidth - 31)
+			txtAuthor:SetRelY(nHeight - 41)
+		end
+		hnd:SetSize(nWidth, nHeight)
+		raw:SetSize(nWidth, nHeight)
+		raw:SetDragArea(0, 0, nWidth, (X.UI.IS_GLASSMORPHISM and eTheme == X.UI.FRAME_THEME.INTACT) and 55 or 33)
 		-- 按分类处理其他
-		if GetComponentProp(raw, 'simple') then
+		if eTheme == X.UI.FRAME_THEME.SIMPLE then
 			local nWidthTitleBtnR = 0
 			local p = raw:Lookup('WndContainer_FrameRightControl'):GetFirstChild()
 			while p do
 				nWidthTitleBtnR = nWidthTitleBtnR + (p:GetSize())
 				p = p:GetNext()
 			end
-			raw:Lookup('', 'Text_Title'):SetSize(nWidth - nWidthTitleBtnR, 30)
-			raw:Lookup('', 'Handle_ClassicBg_Intact/Shadow_Classic_Bg'):SetSize(nWidth, nHeight)
-			raw:Lookup('', 'Handle_ClassicBg_Intact/Image_Classic_TitleBg'):SetSize(nWidth, 30)
-			raw:Lookup('WndContainer_FrameRightControl'):SetSize(nWidth, 30)
-			raw:Lookup('WndContainer_FrameRightControl'):FormatAllContentPos()
-			local hBtnDrag = raw:Lookup('Btn_Drag')
-			if hBtnDrag then
-				hBtnDrag:SetRelPos(
-					nWidth - hBtnDrag:GetW() - (hBtnDrag.nVisualOffsetX or 0),
-					nHeight - hBtnDrag:GetH() - (hBtnDrag.nVisualOffsetY or 0)
-				)
-			end
-			local hDragBg = raw:Lookup('Wnd_DragBg', 'Shadow_DragBg')
-			if hDragBg then
-				hDragBg:SetSize(nWidth, nHeight)
-			end
-			raw:SetSize(nWidth, nHeight)
-			raw:SetDragArea(0, 0, nWidth, 30)
-			hnd:SetSize(nWidth, nHeight)
-			wnd:SetSize(nWidth, nHeight - 30)
-		elseif GetComponentProp(raw, 'intact') then
-			hnd:SetSize(nWidth, nHeight)
-			hnd:Lookup('Text_Title'):SetW(nWidth)
-			hnd:Lookup('Text_Author'):SetW(nWidth - 31)
-			hnd:Lookup('Text_Author'):SetRelY(nHeight - 41)
-			-- 处理窗口其它组件
-			local btnClose = raw:Lookup('Btn_Close')
-			if btnClose then
-				btnClose:SetRelX(nWidth - 35)
-			end
-			local hBtnDrag = raw:Lookup('Btn_Drag')
-			if hBtnDrag then
-				hBtnDrag:SetRelPos(
-					nWidth - hBtnDrag:GetW() + (hBtnDrag.nVisualOffsetX or 0),
-					nHeight - hBtnDrag:GetH() + (hBtnDrag.nVisualOffsetY or 0)
-				)
-			end
-			local hDragBg = raw:Lookup('Wnd_DragBg', 'Shadow_DragBg')
-			if hDragBg then
-				hDragBg:SetSize(nWidth, nHeight)
-			end
-			local btnMax = raw:Lookup('CheckBox_Maximize')
-			if btnMax then
-				btnMax:SetRelX(nWidth - 63)
-			end
-			local containerR = raw:Lookup('WndContainer_FrameRightControl')
-			if containerR then
-				containerR:SetSize(nWidth - 4, 30)
-				containerR:FormatAllContentPos()
-			end
-			if wnd then
-				wnd:SetSize(nWidth, nHeight)
-				wnd:Lookup('', ''):SetSize(nWidth, nHeight)
-			end
-			local hdb = raw:Lookup('', 'Handle_DBClick')
-				or raw:Lookup('Wnd_Total', 'Handle_DBClick')
-			if hdb then
-				hdb:SetW(nWidth)
-			end
-			raw:SetSize(nWidth, nHeight)
-			raw:SetDragArea(0, 0, nWidth, 55)
-			-- reset position
-			local an = GetFrameAnchor(raw)
-			raw:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
-		else
-			raw:SetSize(nWidth, nHeight)
-			hnd:SetSize(nWidth, nHeight)
+		end
+		local btnMax = raw:Lookup('CheckBox_Maximize')
+		if btnMax then
+			btnMax:SetRelX(nWidth - 63)
+		end
+		local btnClose = raw:Lookup('Btn_Close')
+		if btnClose then
+			btnClose:SetRelX(nWidth - 35)
 		end
 		hnd:FormatAllItemPos()
+		-- reset position
+		local an = GetFrameAnchor(raw)
+		raw:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
 	elseif componentType == 'WndButton' or componentType == 'WndButtonBox' then
 		local btn = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
@@ -5242,10 +5265,14 @@ function OO:FrameVisualState(...)
 						if imgGlassmorphismBg then
 							imgGlassmorphismBg:Hide()
 						end
-						if GetComponentProp(raw, 'simple') then
+						local eTheme = GetComponentProp(raw, 'theme')
+						if X.UI.IS_GLASSMORPHISM then
+							raw:SetH(33)
+							raw:Lookup('', ''):SetH(33)
+						elseif eTheme == X.UI.FRAME_THEME.SIMPLE or eTheme == X.UI.FRAME_THEME.FLOAT then
 							raw:SetH(30)
 							raw:Lookup('', ''):SetH(30)
-						elseif GetComponentProp(raw, 'intact') then
+						elseif eTheme == X.UI.FRAME_THEME.INTACT then
 							raw:SetH(54)
 							raw:Lookup('', ''):SetH(54)
 						end
@@ -6873,8 +6900,7 @@ end)
 
 ---@class UI_CreateFrame_Options @创建窗体参数
 ---@field level '"Normal" | "Lowest" | "Topmost" | "Normal1" | "Lowest1" | "Topmost1" | "Normal2" | "Lowest2" | "Topmost2"' @层级
----@field simple boolean @是否为简单窗体
----@field empty boolean @是否为空白窗体
+---@field theme X.UI.FRAME_THEME @窗体样式
 ---@field esc boolean @是否注册全局ESC关闭窗体
 ---@field close boolean @是否显示关闭按钮
 ---@field minimize boolean @是否允许最小化
@@ -6901,21 +6927,22 @@ function X.UI.CreateFrame(szName, opt)
 	) then
 		opt.level = 'Normal'
 	end
+	if not opt.theme then
+		opt.theme = X.UI.FRAME_THEME.INTACT
+	end
 	-- calc ini file path
 	local szIniFile = X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndFrame.ini'
-	if opt.simple then
-		szIniFile = X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndFrameSimple.ini'
-	elseif opt.empty then
+	if opt.theme == X.UI.FRAME_THEME.EMPTY then
 		szIniFile = X.PACKET_INFO.UI_COMPONENT_ROOT .. 'WndFrameEmpty.ini'
 	end
 
 	-- close and reopen exist frame
-	local frm = Station.Lookup(opt.level .. '/' .. szName)
+	local frm = Station.SearchFrame(szName)
 	if frm then
 		X.UI.CloseFrame(frm)
 	end
 	frm = X.UI.OpenFrame(szIniFile, szName)
-	if not opt.simple and not opt.empty then
+	if opt.theme == X.UI.FRAME_THEME.INTACT then
 		frm:Lookup('', 'Image_Icon'):FromUITex(X.PACKET_INFO.LOGO_IMAGE, X.PACKET_INFO.LOGO_MAIN_FRAME)
 	end
 	frm:ChangeRelation(opt.level)
@@ -6946,33 +6973,23 @@ function X.UI.CreateFrame(szName, opt)
 			end
 		)
 	end
-	if opt.simple then
-		SetComponentProp(frm, 'simple', true)
+	SetComponentProp(frm, 'theme', opt.theme)
+	if opt.theme == X.UI.FRAME_THEME.SIMPLE then
 		SetComponentProp(frm, 'minWidth', opt.minWidth or 100)
 		SetComponentProp(frm, 'minHeight', opt.minHeight or 50)
-		-- 琉璃风格
-		if X.UI.IS_GLASSMORPHISM then
-			frm:Lookup('', 'Handle_ClassicBg_Intact'):Hide()
-		else
-			frm:Lookup('', 'Handle_GlassmorphismBg'):Hide()
-		end
-		if not opt.onSettingsClick then
-			frm:Lookup('WndContainer_FrameLeftControl/Wnd_Setting'):Destroy()
-		else
-			frm:Lookup('WndContainer_FrameLeftControl/Wnd_Setting/Btn_Setting').OnLButtonClick = opt.onSettingsClick
-		end
-		-- frame properties
-		if opt.alpha then
-			frm:Lookup('', 'Handle_ClassicBg_Intact/Shadow_Classic_Bg'):SetAlpha(opt.alpha / 255 * 200)
-			frm:Lookup('', 'Handle_ClassicBg_Intact/Image_Classic_TitleBg'):SetAlpha(opt.alpha * 1.4)
-		end
-	elseif not opt.empty then
-		SetComponentProp(frm, 'intact', true)
+	elseif opt.theme == X.UI.FRAME_THEME.FLOAT then
+		SetComponentProp(frm, 'minWidth', opt.minWidth or 100)
+		SetComponentProp(frm, 'minHeight', opt.minHeight or 50)
+	elseif opt.theme == X.UI.FRAME_THEME.INTACT then
 		SetComponentProp(frm, 'minWidth', opt.minWidth or 128)
 		SetComponentProp(frm, 'minHeight', opt.minHeight or 160)
+	end
+	if opt.theme ~= X.UI.FRAME_THEME.EMPTY then
 		-- 琉璃风格
 		if X.UI.IS_GLASSMORPHISM then
 			frm:Lookup('', 'Handle_ClassicBg_Intact'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg_Simple'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg_Float'):Hide()
 			frm:Lookup('', 'Text_Title'):SetRelY(0)
 			frm:Lookup('WndContainer_FrameRightControl'):SetRelY(0)
 			frm:Lookup('WndContainer_FrameRightControl/Wnd_Close/Btn_Close'):SetSize(16, 16)
@@ -7020,12 +7037,31 @@ function X.UI.CreateFrame(szName, opt)
 				143,
 				144
 			)
-		else
+		elseif opt.theme == X.UI.FRAME_THEME.INTACT then
 			frm:Lookup('', 'Handle_GlassmorphismBg'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg_Simple'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg_Float'):Hide()
+		elseif opt.theme == X.UI.FRAME_THEME.SIMPLE then
+			frm:Lookup('', 'Handle_GlassmorphismBg'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg_Intact'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg_Float'):Hide()
+		elseif opt.theme == X.UI.FRAME_THEME.FLOAT then
+			frm:Lookup('', 'Handle_GlassmorphismBg'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg_Intact'):Hide()
+			frm:Lookup('', 'Handle_ClassicBg_Simple'):Hide()
 		end
-	end
-	if not opt.empty then
-		-- top right buttons
+		if not X.UI.IS_GLASSMORPHISM and (opt.theme == X.UI.FRAME_THEME.SIMPLE or opt.theme == X.UI.FRAME_THEME.FLOAT) then
+			frm:Lookup('', 'Text_Title'):SetRelY(0)
+			frm:Lookup('WndContainer_FrameLeftControl'):SetRelY(0)
+			frm:Lookup('WndContainer_FrameRightControl'):SetRelY(0)
+		end
+		-- left control buttons
+		if not opt.onSettingsClick then
+			frm:Lookup('WndContainer_FrameLeftControl/Wnd_Setting'):Destroy()
+		else
+			frm:Lookup('WndContainer_FrameLeftControl/Wnd_Setting/Btn_Setting').OnLButtonClick = opt.onSettingsClick
+		end
+		-- right control buttons
 		if opt.close == false then
 			frm:Lookup('WndContainer_FrameRightControl/Wnd_Close'):Destroy()
 		else
@@ -7076,9 +7112,15 @@ function X.UI.CreateFrame(szName, opt)
 			if X.UI.IS_GLASSMORPHISM then
 				hBtnDrag.nVisualOffsetX = 0
 				hBtnDrag.nVisualOffsetY = 0
-			else
+			elseif opt.theme == X.UI.FRAME_THEME.INTACT then
 				hBtnDrag.nVisualOffsetX = -8
 				hBtnDrag.nVisualOffsetY = -8
+			elseif opt.theme == X.UI.FRAME_THEME.SIMPLE then
+				hBtnDrag.nVisualOffsetX = -1
+				hBtnDrag.nVisualOffsetY = -1
+			elseif opt.theme == X.UI.FRAME_THEME.FLOAT then
+				hBtnDrag.nVisualOffsetX = 0
+				hBtnDrag.nVisualOffsetY = 0
 			end
 			hBtnDrag.OnMouseEnter = function()
 				Cursor.Switch(CURSOR.LEFTTOP_RIGHTBOTTOM)
@@ -7093,8 +7135,8 @@ function X.UI.CreateFrame(szName, opt)
 				local nW, nH = nX - nFrameX + this.nOffsetX, nY - nFrameY + this.nOffsetY
 				nW = math.min(nW, nClientW - nFrameX) -- frame size should not larger than client size
 				nH = math.min(nH, nClientH - nFrameY)
-				nW = math.max(nW, GetComponentProp(frm, 'minWidth')) -- frame size must larger than its min size
-				nH = math.max(nH, GetComponentProp(frm, 'minHeight'))
+				nW = math.max(nW, GetComponentProp(frm, 'minWidth') or 0) -- frame size must larger than its min size
+				nH = math.max(nH, GetComponentProp(frm, 'minHeight') or 0)
 				this:SetRelPos(nW - this:GetW(), nH - this:GetH())
 				frm:Lookup('Wnd_DragBg', 'Shadow_DragBg'):SetSize(nW - this.nVisualOffsetX, nH - this.nVisualOffsetY)
 			end
@@ -7117,8 +7159,8 @@ function X.UI.CreateFrame(szName, opt)
 				frm:Lookup('WndContainer_FrameRightControl'):Show()
 				local nW = this:GetRelX() + this:GetW() - this.nVisualOffsetX
 				local nH = this:GetRelY() + this:GetH() - this.nVisualOffsetY
-				nW = math.max(nW, GetComponentProp(frm, 'minWidth'))
-				nH = math.max(nH, GetComponentProp(frm, 'minHeight'))
+				nW = math.max(nW, GetComponentProp(frm, 'minWidth') or 0)
+				nH = math.max(nH, GetComponentProp(frm, 'minHeight') or 0)
 				X.UI(frm):Size(nW, nH)
 			end
 			hBtnDrag:RegisterLButtonDrag()

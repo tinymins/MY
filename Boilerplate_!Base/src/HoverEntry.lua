@@ -80,7 +80,7 @@ function D.CheckEnable()
 	X.UI.CloseFrame(FRAME_NAME)
 	if O.bEnable then
 		local frame = X.UI.CreateFrame(FRAME_NAME, {
-			empty = true,
+			theme = X.UI.FRAME_THEME.EMPTY,
 			w = O.nSize, h = O.nSize,
 			anchor = O.anchor,
 		})

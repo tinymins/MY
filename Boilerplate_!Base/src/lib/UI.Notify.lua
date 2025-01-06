@@ -273,7 +273,8 @@ local function OnInit()
 	end
 	-- init tip frame
 	l_uiFrame = X.UI.CreateFrame(TIP_FRAME_NAME, {
-		level = 'Topmost', empty = true,
+		level = 'Topmost',
+		theme = X.UI.FRAME_THEME.EMPTY,
 		w = 250, h = 150, visible = false,
 		anchor = O.anchor,
 		events = {{ 'UI_SCALED', function() l_uiFrame:Anchor(O.anchor) end }},
