@@ -235,6 +235,12 @@ function D.HookPlayerViewPanel()
 			checkbox:SetRelPos(nX, nY)
 			checkbox:SetW(nW)
 			checkbox:Lookup('', 'Text_LoveCaptical'):SetW(nW)
+			if X.UI.IS_GLASSMORPHISM then
+				page:Lookup('', 'Handle_ClassicBg'):Hide()
+				page:Lookup('', 'Image_LIcon'):Hide()
+				page:Lookup('', 'Text_LTitle'):SetRelY(3)
+				X.UI.AdaptComponentAppearance(page:Lookup('Btn_LoveYou'))
+			end
 			-- ¼ÆËãpageµÄXÖµ
 			local nX = 0
 			local hPageBattle = mPage:Lookup('Wnd_PageBattle', '')
