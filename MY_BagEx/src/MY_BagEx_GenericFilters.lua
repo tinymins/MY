@@ -215,9 +215,14 @@ local function Hook()
 	local frame = Station.Lookup('Normal/BigBagPanel')
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
+		local nX, nY = 60, 30
+		if X.UI.IS_GLASSMORPHISM then
+			nX, nY = 44, 7
+		end
 		X.UI(frame):Append('WndEditBox', {
 			name = 'WndEditBox_KeyWord',
-			w = 100, h = 21, x = 60, y = 30,
+			w = 100, h = 21, x = nX, y = nY,
+			appearance = 'SEARCH_LEFT',
 			text = l_szBagFilter,
 			placeholder = _L['Search'],
 			onChange = function(txt)

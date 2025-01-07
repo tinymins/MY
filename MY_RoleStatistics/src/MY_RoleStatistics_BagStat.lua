@@ -1076,10 +1076,24 @@ function D.ApplyFloatEntry(bFloatEntry)
 		if btn then
 			return
 		end
+		local nX, nY = 90, 7
+		if X.UI.IS_GLASSMORPHISM then
+			nX, nY = 14, 3
+		end
 		local frameTemp = X.UI.OpenFrame(PLUGIN_ROOT .. '/ui/MY_RoleStatistics_BagEntry.ini', 'MY_RoleStatistics_BagEntry')
 		btn = frameTemp:Lookup('Btn_MY_RoleStatistics_BagEntry')
 		btn:ChangeRelation(frame, true, true)
-		btn:SetRelPos(90, 7)
+		btn:SetRelPos(nX, nY)
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.SetButtonUITex(
+				btn,
+				'ui\\image\\UItimate\\UICommon\\Button11.UITex',
+				0,
+				1,
+				2,
+				3
+			)
+		end
 		X.UI.CloseFrame(frameTemp)
 		btn.OnLButtonClick = function()
 			MY_RoleStatistics.Open('BagStat')
