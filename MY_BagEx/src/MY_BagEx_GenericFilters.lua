@@ -215,21 +215,22 @@ local function Hook()
 	local frame = Station.Lookup('Normal/BigBagPanel')
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
-		local nX, nY = 60, 30
+		local nX, nY, nH = 60, 30, 21
 		if X.UI.IS_GLASSMORPHISM then
-			nX, nY = 44, 7
+			nX, nY, nH = 45, 7, 25
 		end
 		X.UI(frame):Append('WndEditBox', {
 			name = 'WndEditBox_KeyWord',
-			w = 100, h = 21, x = nX, y = nY,
+			w = 80 + nH, h = nH, x = nX, y = nY,
 			appearance = 'SEARCH_LEFT',
 			text = l_szBagFilter,
 			placeholder = _L['Search'],
+			alignVertical = X.UI.ALIGN_VERTICAL.MIDDLE,
 			onChange = function(txt)
 				local nLen = txt:len()
-				nLen = math.max(nLen, 10)
-				nLen = math.min(nLen, 20)
-				X.UI(this):Width(nLen * 10)
+				nLen = math.max(nLen, 8)
+				nLen = math.min(nLen, 16)
+				X.UI(this):Width(nLen * 10 + nH)
 				l_szBagFilter = txt
 				DoFilterBag()
 			end,
