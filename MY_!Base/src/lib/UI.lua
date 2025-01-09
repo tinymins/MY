@@ -327,6 +327,17 @@ local EDIT_BOX_APPEARANCE_CONFIG = {
 		szIconAlign = 'RIGHT',
 	},
 }
+if X.UI.IS_GLASSMORPHISM then
+	EDIT_BOX_APPEARANCE_CONFIG.SEARCH_LEFT = {
+		szIconImage = 'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+		nIconImageFrame = 121,
+		nIconWidth = 20,
+		nIconHeight = 20,
+		nIconAlpha = 180,
+		nIconPaddingTop = 1,
+		szIconAlign = 'LEFT',
+	}
+end
 
 -- TODO: local REGISTERED_COMPONENT = {}
 
@@ -843,6 +854,9 @@ local function InitComponent(raw, szType)
 				Station.SetFocusWindow(edt:GetRoot())
 				return 1
 			end
+		end
+		if X.UI.IS_GLASSMORPHISM then
+			raw:Lookup('', 'Image_Default'):FromUITex('ui\\Image\\UItimate\\UICommon\\Common.UITex', 0)
 		end
 	elseif szType == 'WndAutocomplete' then
 		local edt = raw:Lookup('WndEdit_Default')
@@ -4678,24 +4692,26 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		hdl:SetSize(nWidth, nHeight)
 		img:SetSize(nWidth, nHeight)
 		if tStyle.szIconImage then
-			local nIconW, nIconH = tStyle.nIconWidth, tStyle.nIconHeight
+			local nIconW, nIconH, nIconPaddingX = tStyle.nIconWidth, tStyle.nIconHeight, 2
 			if nIconH > nHeight then
 				nIconW = nIconW * nHeight / nIconH
 				nIconH = nHeight
+			else
+				nIconPaddingX = math.max(nIconPaddingX, (nHeight - nIconH) / 2)
 			end
 			ico:Show()
 			ico:FromUITex(tStyle.szIconImage, tStyle.nIconImageFrame)
 			ico:SetAlpha(tStyle.nIconAlpha or 255)
 			ico:SetSize(nIconW, nIconH)
 			if tStyle.szIconAlign == 'LEFT' then
-				ico:SetRelX(0)
-				edt:SetRelX(nIconW)
+				ico:SetRelX(nIconPaddingX)
+				edt:SetRelX(nIconPaddingX + nIconW)
 			else
 				ico:SetRelX(nWidth - nIconW)
 				edt:SetRelX(4)
 			end
-			ico:SetRelY((nHeight - nIconH) / 2)
-			edt:SetSize(nWidth - 4 - nIconW, nHeight - 4)
+			ico:SetRelY((nHeight - nIconH) / 2 + (tStyle.nIconPaddingTop or 0))
+			edt:SetSize(nWidth - 4 - nIconPaddingX - nIconW, nHeight - 4)
 		else
 			ico:Hide()
 			edt:SetRelX(4)
@@ -5793,8 +5809,14 @@ function OO:Align(alignHorizontal, alignVertical)
 				if alignHorizontal and raw.SetHAlign then
 					raw:SetHAlign(alignHorizontal)
 				end
+				if alignHorizontal and raw.SetPlaceholderHAlign then
+					raw:SetPlaceholderHAlign(alignHorizontal)
+				end
 				if alignVertical and raw.SetVAlign then
 					raw:SetVAlign(alignVertical)
+				end
+				if alignVertical and raw.SetPlaceholderVAlign then
+					raw:SetPlaceholderVAlign(alignVertical)
 				end
 				if raw.FormatTextForDraw then
 					raw:FormatTextForDraw()
