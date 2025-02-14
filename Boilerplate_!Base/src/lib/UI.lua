@@ -276,6 +276,15 @@ if X.UI.IS_GLASSMORPHISM then
 		nMouseDownGroup = 2,
 		nDisableGroup = 3,
 	}
+	BUTTON_STYLE_CONFIG.OPTION = {
+		nWidth = 22,
+		nHeight = 22,
+		szImage = 'ui\\Image\\UItimate\\UICommon\\MainbarPanel.UITex',
+		nNormalGroup = 0,
+		nMouseOverGroup = 1,
+		nMouseDownGroup = 2,
+		nDisableGroup = 3,
+	}
 end
 local function GetButtonStyleName(raw)
 	local szImage = X.StringLowerW(raw:GetAnimatePath() or '')
