@@ -369,7 +369,15 @@ function X.UI.AdaptComponentAppearance(hEl, szExtra)
 					50
 				)
 			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 47 then -- 滚动条上按钮
-			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 51 then -- 滚动条下按钮
+			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 51 then -- 滚动条下按钮、下拉框按钮
+				X.UI.SetButtonUITex(
+					hEl,
+					'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+					67,
+					68,
+					69,
+					70
+				)
 			end
 		elseif szType == 'WndCheckBox' then
 			if szExtra == 'WndTab' then

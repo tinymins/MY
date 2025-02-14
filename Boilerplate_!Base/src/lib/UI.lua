@@ -840,6 +840,10 @@ local function InitComponent(raw, szType)
 		if X.UI.IS_GLASSMORPHISM then
 			X.UI.AdaptComponentAppearance(raw, 'WndCheckBox')
 		end
+	elseif szType == 'WndComboBox' then
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.AdaptComponentAppearance(raw, 'WndComboBox')
+		end
 	elseif szType == 'WndEditBox' then
 		local edt = raw:Lookup('WndEdit_Default')
 		edt.OnEditSpecialKeyDown = function()
@@ -858,7 +862,14 @@ local function InitComponent(raw, szType)
 		if X.UI.IS_GLASSMORPHISM then
 			raw:Lookup('', 'Image_Default'):FromUITex('ui\\Image\\UItimate\\UICommon\\Common.UITex', 0)
 		end
+	elseif szType == 'WndEditComboBox' then
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.AdaptComponentAppearance(raw:Lookup('Btn_ComboBox'))
+		end
 	elseif szType == 'WndAutocomplete' then
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.AdaptComponentAppearance(raw:Lookup('Btn_ComboBox'))
+		end
 		local edt = raw:Lookup('WndEdit_Default')
 		edt.OnSetFocus = function()
 			local opt = GetComponentProp(raw, 'autocompleteOptions')
@@ -4688,7 +4699,11 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		hdl:FormatAllItemPos()
 		local w, h = cmb:GetSize()
 		edt:SetSize(nWidth - 10 - w, nHeight - 4)
-		cmb:SetRelPos(nWidth - w - 5, (nHeight - h - 1) / 2 + 1)
+		if X.UI.IS_GLASSMORPHISM then
+			cmb:SetRelPos(nWidth - w - 5, (nHeight - h - 1) / 2 - 1)
+		else
+			cmb:SetRelPos(nWidth - w - 5, (nHeight - h - 1) / 2 + 1)
+		end
 	elseif componentType == 'WndRadioBox' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
