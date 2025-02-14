@@ -2541,48 +2541,42 @@ function OO:Append(arg0, arg1)
 	end
 	self:_checksum()
 
-	local ui, szXml, szType, tArg = X.UI()
+	local ui = X.UI()
+	local szComponentName, szXML, tArg
 	if arg0:find('%<') then
-		szXml = arg0
+		szXML = arg0
 	else
-		szType = arg0
-		szXml = _tItemXML[szType]
+		szComponentName = arg0
+		szXML = _tItemXML[szComponentName]
 		if X.IsTable(arg1) then
 			tArg = arg1
 		elseif X.IsString(arg1) then
 			tArg = { name = arg1 }
 		end
 	end
-	if szXml then -- append from xml
+	if szXML then -- append from xml
 		local startIndex, el
 		for _, raw in ipairs(self.raws) do
 			local h = GetComponentElement(raw, 'MAIN_HANDLE')
 			if h then
 				startIndex = h:GetItemCount()
-				h:AppendItemFromString(szXml)
+				h:AppendItemFromString(szXML)
 				h:FormatAllItemPos()
 				for i = startIndex, h:GetItemCount() - 1 do
 					el = h:Lookup(i)
-					if szType then
-						el:SetName(szType)
-						InitComponent(el, szType)
+					if szComponentName then
+						el:SetName(szComponentName)
+						InitComponent(el, szComponentName)
 					end
 					ui = ui:Add(el)
 				end
 			end
 		end
-	elseif szType then -- append from ini file
+	elseif szComponentName then -- append from ini file
 		for _, raw in ipairs(self.raws) do
 			local parentWnd = GetComponentElement(raw, 'MAIN_WINDOW')
 			local parentHandle = GetComponentElement(raw, 'MAIN_HANDLE')
-			local szFile, szComponent = szType, szType
-			if string.find(szFile, '^[^<>?:]*%.ini:%w+$') then
-				szType = string.gsub(szFile, '^[^<>?]*%.ini:', '')
-				szFile = string.sub(szFile, 0, -#szType - 2)
-				szComponent = szFile:gsub('$.*[/\\]', ''):gsub('^[^<>?]*[/\\]', ''):sub(0, -5)
-			else
-				szFile = X.PACKET_INFO.UI_COMPONENT_ROOT .. szFile .. '.ini'
-			end
+			local szFile = X.PACKET_INFO.UI_COMPONENT_ROOT .. szComponentName .. '.ini'
 			local frame = X.UI.OpenFrame(szFile, X.NSFormatString('{$NS}_TempWnd#') .. _nTempWndCount)
 			if not frame then
 				return X.OutputDebugMessage(X.NSFormatString('{$NS}#UI#Append'), _L('Unable to open ini file [%s]', szFile), X.DEBUG_LEVEL.ERROR)
@@ -2590,11 +2584,11 @@ function OO:Append(arg0, arg1)
 			_nTempWndCount = _nTempWndCount + 1
 			-- start ui append
 			raw = nil
-			if szType:sub(1, 3) == 'Wnd' then
+			if szComponentName:sub(1, 3) == 'Wnd' then
 				if parentWnd then -- KWndWindow
-					raw = frame:Lookup(szComponent)
+					raw = frame:Lookup(szComponentName)
 					if raw then
-						InitComponent(raw, szType)
+						InitComponent(raw, szComponentName)
 						raw:ChangeRelation(parentWnd, true, true)
 						if parentWnd:GetType() == 'WndContainer' then
 							parentWnd:FormatAllContentPos()
@@ -2603,9 +2597,9 @@ function OO:Append(arg0, arg1)
 				end
 			else
 				if parentHandle then
-					raw = parentHandle:AppendItemFromIni(szFile, szComponent)
+					raw = parentHandle:AppendItemFromIni(szFile, szComponentName)
 					if raw then -- KItemNull
-						InitComponent(raw, szType)
+						InitComponent(raw, szComponentName)
 						parentHandle:FormatAllItemPos()
 					end
 				end
@@ -2614,7 +2608,7 @@ function OO:Append(arg0, arg1)
 				ui = ui:Add(raw)
 				X.UI(raw):Hover(OnCommonComponentHover):Change(OnCommonComponentMouseEnter)
 			else
-				X.OutputDebugMessage(X.NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponent), X.DEBUG_LEVEL.ERROR)
+				X.OutputDebugMessage(X.NSFormatString('{$NS}#UI#Append'), _L('Can not find wnd or item component [%s:%s]', szFile, szComponentName), X.DEBUG_LEVEL.ERROR)
 			end
 			X.UI.CloseFrame(frame)
 		end
@@ -2628,12 +2622,25 @@ function OO:Append(arg0, arg1)
 			tArg.h = 'auto'
 		end
 	end
-	if szType == 'WndButton' or szType == 'WndButtonBox' then
+	if szComponentName == 'WndButton' or szComponentName == 'WndButtonBox' then
 		if not tArg.buttonStyle then
 			tArg.buttonStyle = 'DEFAULT'
 		end
 	end
 	return ApplyUIArguments(ui, tArg)
+end
+
+-- append from ini
+-- Instance:AppendFromIni(szIni, szName, bOnlyChild)
+function OO:AppendFromIni(szIni, szName, bOnlyChild)
+	self:_checksum()
+	local ui = X.UI()
+	for _, raw in ipairs(self.raws) do
+		for _, v in ipairs(X.UI.AppendFromIni(raw, szIni, szName, bOnlyChild) or X.CONSTANT.EMPTY_TABLE) do
+			ui = ui:Add(v)
+		end
+	end
+	return ui
 end
 
 -- clear

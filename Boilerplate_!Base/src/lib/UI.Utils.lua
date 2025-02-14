@@ -60,6 +60,7 @@ function X.UI.AppendFromIni(hParent, szIni, szName, bOnlyChild)
 	end
 	local hFrame = X.UI.OpenFrame(szIni, X.UI.GetFreeTempFrameName())
 	local hEl = X.UI.RecursiveLookup(hFrame, szName)
+	local aEl = {}
 	if hEl and hEl:GetBaseType() == szParentBaseType then
 		if bOnlyChild then
 			while true do
@@ -68,12 +69,15 @@ function X.UI.AppendFromIni(hParent, szIni, szName, bOnlyChild)
 					break
 				end
 				hChild:ChangeRelation(hParent, true, true)
+				table.insert(aEl, hChild)
 			end
 		else
 			hEl:ChangeRelation(hParent, true, true)
+			table.insert(aEl, hEl)
 		end
 	end
 	Wnd.CloseWindow(hFrame)
+	return aEl
 end
 
 function X.UI.GetFrameAnchor(...)
