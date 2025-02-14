@@ -1,6 +1,7 @@
 return {
     ['MY_Farbnamen'] = '门派染色',
     ['Enable MY_Farbnamen'] = '启用门派染色',
+    ['Save talker information to database'] = '缓存门派染色数据到本地磁盘',
     ['Insert force icon'] = '显示门派图标',
     ['Icon size'] = '图标大小',
     ['Icon size: %dpx'] = '图标大小：%dpx',
@@ -13,6 +14,7 @@ return {
 	['Export data'] = '导出数据',
     ['Copy .db file to share.'] = '复制该.db文件即可完成染色数据导出。',
     ['Cache data deleted.'] = '缓存已清除。',
+    ['Save to database'] = '缓存到本地磁盘',
     ['Show analysis'] = '显示统计',
     ['[Teammate]'] = '〔队友〕',
     ['Load default setting'] = '恢复默认设置',

@@ -34,6 +34,15 @@ local O = X.CreateUserSettingsModule('MY_Farbnamen', _L['General'], {
 		xSchema = X.Schema.Boolean,
 		xDefaultValue = true,
 	},
+	bSaveDB = {
+		ePathType = X.PATH_TYPE.ROLE,
+		szLabel = _L['MY_Farbnamen'],
+		szDescription = X.MakeCaption({
+			_L['Save talker information to database'],
+		}),
+		xSchema = X.Schema.Boolean,
+		xDefaultValue = X.IS_CLASSIC,
+	},
 	bInsertIcon = {
 		ePathType = X.PATH_TYPE.ROLE,
 		szLabel = _L['MY_Farbnamen'],
@@ -54,6 +63,7 @@ local O = X.CreateUserSettingsModule('MY_Farbnamen', _L['General'], {
 	},
 })
 local D = {
+	bSaveDB = false,
 	tForceString = X.Clone(g_tStrings.tForceTitle),
 	tRoleType    = {
 		[ROLE_TYPE.STANDARD_MALE  ] = _L['Man'],
@@ -70,6 +80,9 @@ local DB_ERR_COUNT, DB_MAX_ERR_COUNT = 0, 5
 local DB, DBP_W, DBP_RI, DBP_RN, DBP_RGI, DBT_W, DBT_RI
 
 local function InitDB()
+	if not D.bSaveDB then
+		return false
+	end
 	if DB then
 		return true
 	end
@@ -209,7 +222,6 @@ local function InitDB()
 	end
 	return true
 end
-InitDB()
 
 function D.Import(aFilePath, bTimes)
 	if X.IsString(aFilePath) then
@@ -720,7 +732,7 @@ local TONG_INFO     = {} -- 帮会数据缓存
 local TONG_INFO_W   = {} -- 帮会修改数据缓存（UTF8）
 
 function D.Flush()
-	if not InitDB() then
+	if not D.bSaveDB or not InitDB() then
 		return
 	end
 	if DBP_W then
@@ -1169,6 +1181,19 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nPaddingX + 25
 	nY = nY + nLH
 
+	nX = nPaddingX + 25
+	nX = nX + ui:Append('WndCheckBox', {
+		x = nX, y = nY, w = 'auto',
+		text = _L['Save to database'],
+		checked = O.bSaveDB,
+		onCheck = function()
+			O.bSaveDB = not O.bSaveDB
+		end,
+	}):Width() + 5
+
+	nX = nPaddingX + 25
+	nY = nY + nLH
+
 	nX = nX + ui:Append('WndButton', {
 		x = nX, y = nY, w = 'auto',
 		buttonStyle = 'FLAT',
@@ -1211,7 +1236,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			return menu
 		end,
 		autoEnable = function()
-			return O.bEnable
+			return O.bEnable and O.bSaveDB
 		end,
 	}):Width() + 5
 
@@ -1229,7 +1254,7 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			end)
 		end,
 		autoEnable = function()
-			return O.bEnable
+			return O.bEnable and O.bSaveDB
 		end,
 	}):Width() + 5
 
@@ -1248,6 +1273,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 				end)
 			end
 		end,
+		autoEnable = function()
+			return O.bEnable and O.bSaveDB
+		end,
 	}):Width() + 5
 
 	nX = nX + ui:Append('WndButton', {
@@ -1257,6 +1285,9 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		onClick = function()
 			X.OpenFolder(X.GetAbsolutePath({'cache/farbnamen/farbnamen.v7.db', X.PATH_TYPE.GLOBAL}))
 			X.Alert(_L['Copy .db file to share.'])
+		end,
+		autoEnable = function()
+			return O.bEnable and O.bSaveDB
 		end,
 	}):Width() + 5
 
@@ -1367,6 +1398,15 @@ X.RegisterChatPlayerAddonMenu('MY_Farbnamen', function(szName)
 	}
 end)
 
-X.RegisterUserSettingsInit('MY_Farbnamen', function() D.bReady = true end)
+X.RegisterUserSettingsInit('MY_Farbnamen', function()
+	D.bReady = true
+	D.bSaveDB = O.bSaveDB
+end)
+X.RegisterUserSettingsRelease('MY_Farbnamen', function()
+	D.bReady = false
+end)
+X.RegisterUserSettingsUpdate('MY_Farbnamen', function()
+	D.bSaveDB = O.bSaveDB
+end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
