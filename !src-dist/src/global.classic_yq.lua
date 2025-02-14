@@ -1296,6 +1296,7 @@ Table_GetNpcTypeInfoMap = FunctionType
 Table_GetOfficalFaceList = FunctionType
 Table_GetOneIdentityInfo = FunctionType
 Table_GetOneKindAdventure = FunctionType
+Table_GetOnePhotoRewards = FunctionType
 Table_GetOperActyByActivityID = FunctionType
 Table_GetOperActyDes = FunctionType
 Table_GetOperActyInfo = FunctionType
