@@ -799,6 +799,17 @@ end
 local function InitComponent(raw, szType)
 	SetComponentType(raw, szType)
 	if szType == 'WndSlider' then
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.SetButtonUITex(
+				raw:Lookup('WndNewScrollBar_Default/Btn_Slider'),
+				'ui\\image\\uitimate\\uicommon\\button.uitex',
+				145,
+				146,
+				147,
+				148
+			)
+			raw:Lookup('', 'Image_BG'):FromUITex('ui\\image\\uitimate\\uicommon\\common.uitex', 11)
+		end
 		local scroll = raw:Lookup('WndNewScrollBar_Default')
 		SetComponentProp(raw, 'bShowPercentage', true)
 		SetComponentProp(raw, 'nSliderMin', 0)
@@ -4816,15 +4827,29 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		local hHandle = GetComponentElement(raw, 'MAIN_HANDLE')
 		local hSlider = GetComponentElement(raw, 'SLIDER')
 		local hText = GetComponentElement(raw, 'TEXT')
+		local hBtn = hSlider:Lookup('Btn_Slider')
 		local hImage = hHandle:Lookup('Image_BG')
 		local nWidth = nWidth or math.max(nWidth, (nInnerWidth or 0) + 5)
 		local nHeight = nHeight or math.max(nHeight, (nInnerHeight or 0) + 5)
 		local nRawWidth, nRawHeight = hSlider:GetSize()
+		local nImageHeight = nRawHeight - 2
+		if X.UI.IS_GLASSMORPHISM then
+			nRawHeight = nHeight * 0.8
+			nImageHeight = 8
+			hSlider:SetH(nRawHeight)
+			hBtn:SetSize(nRawHeight / 0.75, nRawHeight)
+			hBtn:SetAlpha(255)
+		end
 		hWnd:SetSize(nWidth, nHeight)
 		hHandle:SetSize(nWidth, nHeight)
 		hText:SetSize(nWidth - nRawWidth - 5, nHeight)
 		hSlider:SetRelY((nHeight - nRawHeight) / 2)
-		hImage:SetRelY(hSlider:GetRelY() + 1)
+		if X.UI.IS_GLASSMORPHISM then
+			hImage:SetRelY((nHeight - nImageHeight) / 2)
+		else
+			hImage:SetRelY((nHeight - nImageHeight) / 2 - 1)
+		end
+		hImage:SetH(nImageHeight)
 		hHandle:FormatAllItemPos()
 	elseif componentType == 'WndTable' then
 		raw:SetSize(nWidth, nHeight)
@@ -5217,6 +5242,10 @@ function OO:SliderSize(...)
 					hSlider:SetSize(nWidth, nHeight)
 					hSlider:SetRelY(hSlider:GetRelY() - (nHeight - nOriginHeight) / 2)
 					local nBtnWidth = math.min(34, nWidth * 0.6)
+					local nBtnHeight = nHeight
+					if X.UI.IS_GLASSMORPHISM then
+						nBtnHeight = nBtnWidth
+					end
 					hButton:SetSize(nBtnWidth, nHeight)
 					hButton:SetRelX((nWidth - nBtnWidth) * hSlider:GetScrollPos() / hSlider:GetStepCount())
 					hText:SetRelX(nWidth + 5)
