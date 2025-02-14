@@ -1405,7 +1405,7 @@ end)
 X.RegisterUserSettingsRelease('MY_Farbnamen', function()
 	D.bReady = false
 end)
-X.RegisterUserSettingsUpdate('MY_Farbnamen', function()
+X.RegisterUserSettingsUpdate('MY_Farbnamen.bSaveDB', function()
 	D.bSaveDB = O.bSaveDB
 end)
 
