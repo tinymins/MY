@@ -44,7 +44,7 @@ local function onFrameCreate()
 			ui:Find('.Text'):FontScale(fAbsCoefficient)
 			frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 		end
-		ui:Append(PLUGIN_ROOT .. '/ui/Btn_MagnifierUp.ini:WndButton', {
+		ui:AppendFromIni(PLUGIN_ROOT .. '/ui/Btn_MagnifierUp.ini', 'Btn_MagnifierUp', {
 			name = 'Btn_MY_MagnifierUp',
 			x = config.x, y = config.y, w = config.w, h = config.h,
 			onClick = function()
@@ -56,7 +56,7 @@ local function onFrameCreate()
 			end,
 			tip = _L['Click to enable MY player view magnifier'],
 		})
-		ui:Append(X.PACKET_INFO.ROOT .. 'MY_Toolbox/ui/Btn_MagnifierDown.ini:WndButton', {
+		ui:AppendFromIni(X.PACKET_INFO.ROOT .. 'MY_Toolbox/ui/Btn_MagnifierDown.ini', 'Btn_MagnifierDown', {
 			name = 'Btn_MY_MagnifierDown',
 			x = config.x, y = config.y, w = config.w, h = config.h, visible = false,
 			onClick = function()
