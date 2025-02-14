@@ -2632,7 +2632,10 @@ end
 
 -- append from ini
 -- Instance:AppendFromIni(szIni, szName, bOnlyChild)
-function OO:AppendFromIni(szIni, szName, bOnlyChild)
+function OO:AppendFromIni(szIni, szName, bOnlyChild, tArg)
+	if X.IsTable(bOnlyChild) then
+		bOnlyChild, tArg = nil, bOnlyChild
+	end
 	self:_checksum()
 	local ui = X.UI()
 	for _, raw in ipairs(self.raws) do
@@ -2640,7 +2643,7 @@ function OO:AppendFromIni(szIni, szName, bOnlyChild)
 			ui = ui:Add(v)
 		end
 	end
-	return ui
+	return ApplyUIArguments(ui, tArg)
 end
 
 -- clear
