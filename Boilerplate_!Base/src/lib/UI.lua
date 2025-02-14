@@ -255,12 +255,12 @@ if X.UI.IS_GLASSMORPHISM then
 		nPaddingTop = 3,
 		nPaddingRight = 9,
 		nPaddingBottom = 3,
-		nPaddingLeft = 11,
-		szImage = 'ui\\Image\\denglu\\Sign1.UITex',
-		nNormalGroup = 32,
-		nMouseOverGroup = 33,
-		nMouseDownGroup = 34,
-		nDisableGroup = 35,
+		nPaddingLeft = 9,
+		szImage = 'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+		nNormalGroup = 14,
+		nMouseOverGroup = 15,
+		nMouseDownGroup = 16,
+		nDisableGroup = 17,
 	}
 	BUTTON_STYLE_CONFIG.FLAT_RADIUS = {
 		nWidth = 100,
