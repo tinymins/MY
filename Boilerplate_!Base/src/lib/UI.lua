@@ -278,8 +278,8 @@ if X.UI.IS_GLASSMORPHISM then
 	}
 end
 local function GetButtonStyleName(raw)
-	local szImage = X.StringLowerW(raw:GetAnimatePath())
-	local nNormalGroup = raw:GetAnimateGroupNormal()
+	local szImage = X.StringLowerW(raw:GetAnimatePath() or '')
+	local nNormalGroup = raw:GetAnimateGroupNormal() or -1
 	local GetStyleName = X.Get(_G, {X.NSFormatString('{$NS}_Resource'), 'GetWndButtonStyleName'})
 	if X.IsFunction(GetStyleName) then
 		local eStyle = GetStyleName(szImage, nNormalGroup)
