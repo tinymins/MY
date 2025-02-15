@@ -423,6 +423,19 @@ function X.UI.AdaptComponentAppearance(hEl, szExtra)
 					7,
 					3
 				)
+			elseif szExtra == 'WndRadioBox' then
+				X.UI.SetCheckBoxUITex(
+					hEl,
+					'ui\\Image\\UItimate\\UICommon\\Button4.UITex',
+					8,
+					9,
+					10,
+					26,
+					11,
+					12,
+					13,
+					27
+				)
 			end
 		elseif szType == 'WndNewScrollBar' then
 			X.UI.AdaptComponentAppearance(hEl:GetFirstChild())

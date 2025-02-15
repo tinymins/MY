@@ -860,6 +860,10 @@ local function InitComponent(raw, szType)
 		if X.UI.IS_GLASSMORPHISM then
 			X.UI.AdaptComponentAppearance(raw, 'WndCheckBox')
 		end
+	elseif szType == 'WndRadioBox' then
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.AdaptComponentAppearance(raw, 'WndRadioBox')
+		end
 	elseif szType == 'WndComboBox' then
 		if X.UI.IS_GLASSMORPHISM then
 			X.UI.AdaptComponentAppearance(raw, 'WndComboBox')
@@ -1938,6 +1942,31 @@ local function InitComponent(raw, szType)
 			end
 		end)
 	elseif szType == 'CheckBox' then
+		if X.UI.IS_GLASSMORPHISM then
+			raw:Lookup('Image_Default'):FromUITex('ui\\Image\\UItimate\\UICommon\\Button4.UITex', 0)
+		end
+		local tStateFrame =
+			X.UI.IS_GLASSMORPHISM
+			and {
+				nUnCheckAndEnable = 4,
+				nUncheckedAndEnableWhenMouseOver = 5,
+				nChecking = 6,
+				nUnCheckAndDisable = 7,
+				nCheckAndEnable = 0,
+				nCheckedAndEnableWhenMouseOver = 1,
+				nUnChecking = 2,
+				nCheckAndDisable = 3,
+			}
+			or {
+				nUnCheckAndEnable = 5,
+				nUncheckedAndEnableWhenMouseOver = 98,
+				nChecking = 5,
+				nUnCheckAndDisable = 90,
+				nCheckAndEnable = 6,
+				nCheckedAndEnableWhenMouseOver = 7,
+				nUnChecking = 6,
+				nCheckAndDisable = 91,
+			}
 		raw:RegisterEvent(831)
 		local function UpdateCheckState(raw)
 			if not X.IsElement(raw) then
@@ -1948,16 +1977,16 @@ local function InitComponent(raw, szType)
 				return
 			end
 			if GetComponentProp(raw, 'bDisabled') then
-				img:SetFrame(GetComponentProp(raw, 'bChecked') and 91 or 90)
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and tStateFrame.nCheckAndDisable or tStateFrame.nUnCheckAndDisable)
 				raw:SetAlpha(255)
 			elseif GetComponentProp(raw, 'bDown') then
-				img:SetFrame(GetComponentProp(raw, 'bChecked') and 6 or 5)
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and tStateFrame.nUnChecking or tStateFrame.nChecking)
 				raw:SetAlpha(190)
 			elseif GetComponentProp(raw, 'bIn') then
-				img:SetFrame(GetComponentProp(raw, 'bChecked') and 7 or 98)
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and tStateFrame.nCheckedAndEnableWhenMouseOver or tStateFrame.nUncheckedAndEnableWhenMouseOver)
 				raw:SetAlpha(255)
 			else
-				img:SetFrame(GetComponentProp(raw, 'bChecked') and 6 or 5)
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and tStateFrame.nCheckAndEnable or tStateFrame.nUnCheckAndEnable)
 				raw:SetAlpha(255)
 			end
 		end
@@ -2006,6 +2035,7 @@ local function InitComponent(raw, szType)
 		raw.IsEnabled = function()
 			return not GetComponentProp(raw, 'bDisabled')
 		end
+		UpdateCheckState(raw)
 	elseif szType == 'Shadow' or szType == 'ColorBox' then
 		SetComponentProp(raw, 'OnColorPickCBs', {})
 		raw:RegisterEvent(831)
