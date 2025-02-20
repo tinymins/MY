@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# pip3 install semver
+
 """
 新版本打包自动化脚本
 
