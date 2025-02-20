@@ -66,11 +66,11 @@ def __copy_non_build_files(addon: str) -> None:
 
 def __build_addon(packet: str, addon: str) -> None:
     """
-    处理子插件源码压缩与合并。
+    处理子插件源码构建与合并。
     主要步骤：
       1. 读取 info.ini 中定义的 Lua 入口文件列表；
       2. 预处理源码（移除调试代码、嵌入敏感数据等）；
-      3. 生成中间文件和配置（使用squishy工具压缩合并），
+      3. 生成中间文件和配置（使用squishy工具构建合并）；
       4. 插入模块加载代码，并更新 info.ini 文件。
 
     参数：
@@ -78,7 +78,7 @@ def __build_addon(packet: str, addon: str) -> None:
         addon: 子插件目录名称
     """
     print("--------------------------------")
-    print("正在压缩子插件：%s" % addon)
+    print("正在构建子插件：%s" % addon)
     file_count: int = 0
     converter: Converter = Converter("zh-TW")
     srcname: str = "src." + TIME_TAG + ".lua"
@@ -108,9 +108,9 @@ def __build_addon(packet: str, addon: str) -> None:
                 parts: List[str] = line.strip().split("=")
                 # 处理以 "lua_" 开头的项
                 if parts and parts[0].startswith("lua_"):
-                    # 如已有压缩文件（如 src.*.lua），则跳过以免重复压缩
+                    # 如已有构建文件（如 src.*.lua），则跳过以免重复构建
                     if parts[1].startswith("src.") and parts[1].endswith(".lua"):
-                        print("已压缩，无需重复处理...")
+                        print("已构建，无需重复处理...")
                         return
                     # 新增模块：增加计数，生成临时文件
                     file_count += 1
@@ -159,12 +159,12 @@ def __build_addon(packet: str, addon: str) -> None:
                     ).replace("\\", "/")
                     squishy.write(f'Module "{file_count}" "{rel_dist_file}"\n')
 
-    # 调用squishy工具合并压缩（使用minify full压缩级别）
+    # 调用squishy工具合并构建（使用minify full压缩级别）
     os.popen('lua "./!src-dist/tools/react/squish" --minify-level=full').read()
     # 删除临时生成的squishy配置文件
     os.remove("squishy")
 
-    # 插入模块加载代码到压缩合并后的目标文件中
+    # 插入模块加载代码到构建合并后的目标文件中
     out_file: str = os.path.join(packet_dist_path, srcname)
     try:
         with open(out_file, "r+", encoding="gbk") as src:
@@ -182,9 +182,9 @@ def __build_addon(packet: str, addon: str) -> None:
     except Exception as e:
         utils.exit_with_message(f"更新构建文件 {out_file} 失败：{e}")
 
-    print("压缩完成。")
+    print("构建完成。")
 
-    # 更新 info.ini 文件，将 lua_0 的入口文件名改为压缩后的文件名
+    # 更新 info.ini 文件，将 lua_0 的入口文件名改为构建后的文件名
     info_content: str = ""
     with codecs.open(info_ini_path, "r", encoding="gbk") as f_info:
         for line in f_info:
