@@ -359,7 +359,7 @@ function X.UI.AdaptComponentAppearance(hEl, szExtra)
 					34,
 					35
 				)
-			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 31 then -- 滚动条按钮
+			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 31 then -- 纵向滚动条按钮
 				X.UI.SetButtonUITex(
 					hEl,
 					'ui\\Image\\UItimate\\UICommon\\Button.UITex',
@@ -369,7 +369,32 @@ function X.UI.AdaptComponentAppearance(hEl, szExtra)
 					50
 				)
 			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 47 then -- 滚动条上按钮
-			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 51 then -- 滚动条下按钮
+				X.UI.SetButtonUITex(
+					hEl,
+					'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+					63,
+					64,
+					65,
+					66
+				)
+			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 51 then -- 滚动条下按钮、下拉框按钮
+				X.UI.SetButtonUITex(
+					hEl,
+					'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+					67,
+					68,
+					69,
+					70
+				)
+			elseif szPath == 'ui\\image\\uicommon\\commonpanel.uitex' and nFrame == 105 then -- 横向滚动条按钮
+				X.UI.SetButtonUITex(
+					hEl,
+					'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+					79,
+					80,
+					81,
+					82
+				)
 			end
 		elseif szType == 'WndCheckBox' then
 			if szExtra == 'WndTab' then
@@ -397,6 +422,19 @@ function X.UI.AdaptComponentAppearance(hEl, szExtra)
 					3,
 					7,
 					3
+				)
+			elseif szExtra == 'WndRadioBox' then
+				X.UI.SetCheckBoxUITex(
+					hEl,
+					'ui\\Image\\UItimate\\UICommon\\Button4.UITex',
+					8,
+					9,
+					10,
+					26,
+					11,
+					12,
+					13,
+					27
 				)
 			end
 		elseif szType == 'WndNewScrollBar' then

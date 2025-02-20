@@ -255,12 +255,12 @@ if X.UI.IS_GLASSMORPHISM then
 		nPaddingTop = 3,
 		nPaddingRight = 9,
 		nPaddingBottom = 3,
-		nPaddingLeft = 11,
-		szImage = 'ui\\Image\\denglu\\Sign1.UITex',
-		nNormalGroup = 32,
-		nMouseOverGroup = 33,
-		nMouseDownGroup = 34,
-		nDisableGroup = 35,
+		nPaddingLeft = 9,
+		szImage = 'ui\\Image\\UItimate\\UICommon\\Button.UITex',
+		nNormalGroup = 14,
+		nMouseOverGroup = 15,
+		nMouseDownGroup = 16,
+		nDisableGroup = 17,
 	}
 	BUTTON_STYLE_CONFIG.FLAT_RADIUS = {
 		nWidth = 100,
@@ -271,6 +271,15 @@ if X.UI.IS_GLASSMORPHISM then
 		nPaddingBottom = 0,
 		nPaddingLeft = 10,
 		szImage = 'ui\\Image\\UItimate\\UICommon\\Plugins.UITex',
+		nNormalGroup = 0,
+		nMouseOverGroup = 1,
+		nMouseDownGroup = 2,
+		nDisableGroup = 3,
+	}
+	BUTTON_STYLE_CONFIG.OPTION = {
+		nWidth = 22,
+		nHeight = 22,
+		szImage = 'ui\\Image\\UItimate\\UICommon\\MainbarPanel.UITex',
 		nNormalGroup = 0,
 		nMouseOverGroup = 1,
 		nMouseDownGroup = 2,
@@ -790,6 +799,17 @@ end
 local function InitComponent(raw, szType)
 	SetComponentType(raw, szType)
 	if szType == 'WndSlider' then
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.SetButtonUITex(
+				raw:Lookup('WndNewScrollBar_Default/Btn_Slider'),
+				'ui\\image\\uitimate\\uicommon\\button.uitex',
+				145,
+				146,
+				147,
+				148
+			)
+			raw:Lookup('', 'Image_BG'):FromUITex('ui\\image\\uitimate\\uicommon\\common.uitex', 11)
+		end
 		local scroll = raw:Lookup('WndNewScrollBar_Default')
 		SetComponentProp(raw, 'bShowPercentage', true)
 		SetComponentProp(raw, 'nSliderMin', 0)
@@ -840,6 +860,14 @@ local function InitComponent(raw, szType)
 		if X.UI.IS_GLASSMORPHISM then
 			X.UI.AdaptComponentAppearance(raw, 'WndCheckBox')
 		end
+	elseif szType == 'WndRadioBox' then
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.AdaptComponentAppearance(raw, 'WndRadioBox')
+		end
+	elseif szType == 'WndComboBox' then
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.AdaptComponentAppearance(raw, 'WndComboBox')
+		end
 	elseif szType == 'WndEditBox' then
 		local edt = raw:Lookup('WndEdit_Default')
 		edt.OnEditSpecialKeyDown = function()
@@ -858,7 +886,14 @@ local function InitComponent(raw, szType)
 		if X.UI.IS_GLASSMORPHISM then
 			raw:Lookup('', 'Image_Default'):FromUITex('ui\\Image\\UItimate\\UICommon\\Common.UITex', 0)
 		end
+	elseif szType == 'WndEditComboBox' then
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.AdaptComponentAppearance(raw:Lookup('Btn_ComboBox'))
+		end
 	elseif szType == 'WndAutocomplete' then
+		if X.UI.IS_GLASSMORPHISM then
+			X.UI.AdaptComponentAppearance(raw:Lookup('Btn_ComboBox'))
+		end
 		local edt = raw:Lookup('WndEdit_Default')
 		edt.OnSetFocus = function()
 			local opt = GetComponentProp(raw, 'autocompleteOptions')
@@ -1085,7 +1120,8 @@ local function InitComponent(raw, szType)
 			hTotal:FormatAllItemPos()
 			raw:Lookup('Scroll_X'):SetW(nRawWidth)
 			raw:Lookup('Scroll_X'):SetRelY(nRawHeight - 10)
-			raw:Lookup('Scroll_X/Btn_Scroll_X'):SetW(math.min(200, math.max(100, nRawWidth / 3)))
+			local nMaxScrollXBtnW = X.UI.IS_GLASSMORPHISM and 60 or 200
+			raw:Lookup('Scroll_X/Btn_Scroll_X'):SetW(math.min(nMaxScrollXBtnW, math.max(100, nRawWidth / 3)))
 			raw:Lookup('Scroll_Y'):SetH(nRawHeight - 32)
 			raw:Lookup('Scroll_Y'):SetRelX(nRawWidth - 12)
 			raw:Lookup('Scroll_Y/Btn_Scroll_Y'):SetH(math.min(80, math.max(40, (nRawHeight - 10) / 3)))
@@ -1906,6 +1942,31 @@ local function InitComponent(raw, szType)
 			end
 		end)
 	elseif szType == 'CheckBox' then
+		if X.UI.IS_GLASSMORPHISM then
+			raw:Lookup('Image_Default'):FromUITex('ui\\Image\\UItimate\\UICommon\\Button4.UITex', 0)
+		end
+		local tStateFrame =
+			X.UI.IS_GLASSMORPHISM
+			and {
+				nUnCheckAndEnable = 4,
+				nUncheckedAndEnableWhenMouseOver = 5,
+				nChecking = 6,
+				nUnCheckAndDisable = 7,
+				nCheckAndEnable = 0,
+				nCheckedAndEnableWhenMouseOver = 1,
+				nUnChecking = 2,
+				nCheckAndDisable = 3,
+			}
+			or {
+				nUnCheckAndEnable = 5,
+				nUncheckedAndEnableWhenMouseOver = 98,
+				nChecking = 5,
+				nUnCheckAndDisable = 90,
+				nCheckAndEnable = 6,
+				nCheckedAndEnableWhenMouseOver = 7,
+				nUnChecking = 6,
+				nCheckAndDisable = 91,
+			}
 		raw:RegisterEvent(831)
 		local function UpdateCheckState(raw)
 			if not X.IsElement(raw) then
@@ -1916,16 +1977,16 @@ local function InitComponent(raw, szType)
 				return
 			end
 			if GetComponentProp(raw, 'bDisabled') then
-				img:SetFrame(GetComponentProp(raw, 'bChecked') and 91 or 90)
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and tStateFrame.nCheckAndDisable or tStateFrame.nUnCheckAndDisable)
 				raw:SetAlpha(255)
 			elseif GetComponentProp(raw, 'bDown') then
-				img:SetFrame(GetComponentProp(raw, 'bChecked') and 6 or 5)
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and tStateFrame.nUnChecking or tStateFrame.nChecking)
 				raw:SetAlpha(190)
 			elseif GetComponentProp(raw, 'bIn') then
-				img:SetFrame(GetComponentProp(raw, 'bChecked') and 7 or 98)
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and tStateFrame.nCheckedAndEnableWhenMouseOver or tStateFrame.nUncheckedAndEnableWhenMouseOver)
 				raw:SetAlpha(255)
 			else
-				img:SetFrame(GetComponentProp(raw, 'bChecked') and 6 or 5)
+				img:SetFrame(GetComponentProp(raw, 'bChecked') and tStateFrame.nCheckAndEnable or tStateFrame.nUnCheckAndEnable)
 				raw:SetAlpha(255)
 			end
 		end
@@ -1974,6 +2035,7 @@ local function InitComponent(raw, szType)
 		raw.IsEnabled = function()
 			return not GetComponentProp(raw, 'bDisabled')
 		end
+		UpdateCheckState(raw)
 	elseif szType == 'Shadow' or szType == 'ColorBox' then
 		SetComponentProp(raw, 'OnColorPickCBs', {})
 		raw:RegisterEvent(831)
@@ -4688,7 +4750,11 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		hdl:FormatAllItemPos()
 		local w, h = cmb:GetSize()
 		edt:SetSize(nWidth - 10 - w, nHeight - 4)
-		cmb:SetRelPos(nWidth - w - 5, (nHeight - h - 1) / 2 + 1)
+		if X.UI.IS_GLASSMORPHISM then
+			cmb:SetRelPos(nWidth - w - 5, (nHeight - h - 1) / 2 - 1)
+		else
+			cmb:SetRelPos(nWidth - w - 5, (nHeight - h - 1) / 2 + 1)
+		end
 	elseif componentType == 'WndRadioBox' then
 		local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 		local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
@@ -4792,15 +4858,29 @@ local function SetComponentSize(raw, nWidth, nHeight, nInnerWidth, nInnerHeight)
 		local hHandle = GetComponentElement(raw, 'MAIN_HANDLE')
 		local hSlider = GetComponentElement(raw, 'SLIDER')
 		local hText = GetComponentElement(raw, 'TEXT')
+		local hBtn = hSlider:Lookup('Btn_Slider')
 		local hImage = hHandle:Lookup('Image_BG')
 		local nWidth = nWidth or math.max(nWidth, (nInnerWidth or 0) + 5)
 		local nHeight = nHeight or math.max(nHeight, (nInnerHeight or 0) + 5)
 		local nRawWidth, nRawHeight = hSlider:GetSize()
+		local nImageHeight = nRawHeight - 2
+		if X.UI.IS_GLASSMORPHISM then
+			nRawHeight = nHeight * 0.8
+			nImageHeight = 8
+			hSlider:SetH(nRawHeight)
+			hBtn:SetSize(nRawHeight / 0.75, nRawHeight)
+			hBtn:SetAlpha(255)
+		end
 		hWnd:SetSize(nWidth, nHeight)
 		hHandle:SetSize(nWidth, nHeight)
 		hText:SetSize(nWidth - nRawWidth - 5, nHeight)
 		hSlider:SetRelY((nHeight - nRawHeight) / 2)
-		hImage:SetRelY(hSlider:GetRelY() + 1)
+		if X.UI.IS_GLASSMORPHISM then
+			hImage:SetRelY((nHeight - nImageHeight) / 2)
+		else
+			hImage:SetRelY((nHeight - nImageHeight) / 2 - 1)
+		end
+		hImage:SetH(nImageHeight)
 		hHandle:FormatAllItemPos()
 	elseif componentType == 'WndTable' then
 		raw:SetSize(nWidth, nHeight)
@@ -5193,6 +5273,10 @@ function OO:SliderSize(...)
 					hSlider:SetSize(nWidth, nHeight)
 					hSlider:SetRelY(hSlider:GetRelY() - (nHeight - nOriginHeight) / 2)
 					local nBtnWidth = math.min(34, nWidth * 0.6)
+					local nBtnHeight = nHeight
+					if X.UI.IS_GLASSMORPHISM then
+						nBtnHeight = nBtnWidth
+					end
 					hButton:SetSize(nBtnWidth, nHeight)
 					hButton:SetRelX((nWidth - nBtnWidth) * hSlider:GetScrollPos() / hSlider:GetStepCount())
 					hText:SetRelX(nWidth + 5)
