@@ -21,7 +21,22 @@ from plib.environment import get_current_packet_id, get_interface_path, get_pack
 from plib.language.converter import Converter
 import plib.environment as env
 
-TIME_TAG = time.strftime("%Y%m%d%H%M%S", time.localtime())
+
+def __get_git_time_tag():
+    """获取Git提交哈希和提交时间作为时间标签"""
+    try:
+        commit_hash = os.popen("git rev-parse --short HEAD").read().strip()
+        commit_date = (
+            os.popen("git log -1 --format=%cd --date=format:%Y%m%d%H%M%S")
+            .read()
+            .strip()
+        )
+        return f"{commit_date}-{commit_hash}"
+    except:
+        return time.strftime("%Y%m%d%H%M%S", time.localtime())
+
+
+TIME_TAG = __get_git_time_tag()
 
 
 def __rm_temporary(packet, addon):
