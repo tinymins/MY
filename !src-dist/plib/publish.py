@@ -7,50 +7,56 @@
 
 import argparse
 import codecs
-import glob
 import luadata
 import os
 import re
 import semver
 import shutil
 import time
-
 import plib.utils as utils
 import plib.git as git
-from plib.environment import get_current_packet_id, get_interface_path, get_packet_path
+from plib.environment import (
+    get_current_packet_id,
+    get_interface_path,
+    get_packet_path,
+    get_packet_dist_path,
+    get_git_time_tag,
+)
 from plib.language.converter import Converter
 import plib.environment as env
 
 
-def __get_git_time_tag():
-    """获取Git提交哈希和提交时间作为时间标签"""
-    try:
-        commit_hash = os.popen("git rev-parse --short HEAD").read().strip()
-        commit_date = (
-            os.popen("git log -1 --format=%cd --date=format:%Y%m%d%H%M%S")
-            .read()
-            .strip()
-        )
-        return f"{commit_date}-{commit_hash}"
-    except:
-        return time.strftime("%Y%m%d%H%M%S", time.localtime())
+TIME_TAG = get_git_time_tag()
 
 
-TIME_TAG = __get_git_time_tag()
-
-
-def __rm_temporary(packet, addon):
+def __copy_non_build_files(addon):
     """
-    Delete temporary files
+    将子插件目录下除 *.lua、info.ini、info.ini.zh_TW 之外的所有文件复制到新构建目录中，
+    保持原来的目录结构。
     """
-    ancientFileList = glob.glob("./%s/src*.lua" % addon, recursive=False)
-    for filePath in ancientFileList:
-        os.remove(filePath)
-    if os.path.isdir("./%s/dist" % addon):
-        shutil.rmtree("./%s/dist" % addon)
+    addon_dist_path = os.path.join(get_packet_dist_path(), addon)
+    for root, dirs, files in os.walk(addon):
+        # 计算相对于子插件目录的相对路径
+        rel_path = os.path.relpath(root, addon)
+        for file in files:
+            # 对于 lua 文件跳过
+            if file.endswith(".lua"):
+                continue
+            # 对于当前目录中的 info.ini 文件跳过
+            if root == os.path.abspath(addon) or os.path.samefile(root, addon):
+                if file.endswith(".lua") or file in ["info.ini", "info.ini.zh_TW"]:
+                    continue
+            # 目标目录保持结构
+            dest_dir = (
+                os.path.join(addon_dist_path, rel_path)
+                if rel_path != "."
+                else addon_dist_path
+            )
+            os.makedirs(dest_dir, exist_ok=True)
+            shutil.copy2(os.path.join(root, file), os.path.join(dest_dir, file))
 
 
-def __compress(packet, addon):
+def __build_addon(packet, addon):
     """
     Compress and concat addon source into one file.
 
@@ -66,16 +72,24 @@ def __compress(packet, addon):
         secret = luadata.read("secret.jx3dat") or {}
     except:
         secret = {}
-    # Delete old files
-    __rm_temporary(packet, addon)
+
     """
     Prepare source
     """
+    # 构造新的输出目录：./!src-dist/dist/子插件
+    packet_dist_path = os.path.join(get_packet_dist_path(), addon)
+    os.makedirs(os.path.join(packet_dist_path, "dist"), exist_ok=True)
     # Generate squishy file and execute squish
-    os.makedirs("./%s/dist" % addon)
     with open("squishy", "w") as squishy:
-        squishy.write('Output "./%s/%s"\n' % (addon, srcname))
-        for line in open("%s/info.ini" % addon):
+        # 输出到新构建目录中
+        squishy.write(
+            'Output "./%s/%s"\n'
+            % (
+                os.path.relpath(packet_dist_path, os.getcwd()).replace("\\", "/"),
+                srcname,
+            )
+        )
+        for line in open(os.path.join(addon, "info.ini")):
             parts = line.strip().split("=")
             if parts[0].find("lua_") == 0:
                 # If path like src.*.lua means already compressed
@@ -88,7 +102,8 @@ def __compress(packet, addon):
                 file_count = file_count + 1
                 # Load source code
                 source_file = os.path.join(addon, parts[1])
-                dist_file = os.path.join(".", addon, "dist", f"{file_count}.lua")
+                # 构造目标临时文件路径在新目录下
+                dist_file = os.path.join(packet_dist_path, "dist", f"{file_count}.lua")
                 source_code = codecs.open(source_file, "r", encoding="gbk").read()
                 # Remove debug codes
                 source_code = re.sub(
@@ -126,55 +141,94 @@ def __compress(packet, addon):
                 codecs.open(dist_file, "w", encoding="gbk").write(source_code)
                 # Append source module path
                 squishy.write(
-                    'Module "%d" "%s"\n' % (file_count, dist_file.replace("\\", "/"))
+                    'Module "%d" "%s"\n'
+                    % (
+                        file_count,
+                        os.path.relpath(dist_file, os.getcwd()).replace("\\", "/"),
+                    )
                 )
+
     """
     Build & Clean
     """
     # Do squishy build
     os.popen('lua "./!src-dist/tools/react/squish" --minify-level=full').read()
-    # Remove temporary files
+    # Remove temporary file "squishy"
     os.remove("squishy")
+
     """
     Implant module loader
     """
-    # Modify dist file for loading modules
-    with open("./%s/%s" % (addon, srcname), "r+") as src:
+    # 从构建目录下读取构建结果
+    out_file = os.path.join(packet_dist_path, srcname)
+    with open(out_file, "r+") as src:
         content = src.read()
         src.seek(0, 0)
         src.write("local package={preload={}}\n")
         src.write(content)
-    with open("./%s/%s" % (addon, srcname), "a") as src:
+    with open(out_file, "a") as src:
         src.write("\nfor _, k in ipairs({")
         for i in range(1, file_count + 1):
             src.write("'%d'," % i)
         src.write("}) do package.preload[k]() end\n")
         src.write('Log("[ADDON] Module %s v%s loaded.")' % (addon, TIME_TAG))
     print("Compress done...")
+
     """
     Update info.*.ini
     """
-    # Modify info.ini file
+    # 读取原来的 info.ini，修改后写入到构建目录下
     info_content = ""
-    for _, line in enumerate(codecs.open("%s/info.ini" % addon, "r", encoding="gbk")):
+    info_ini_path = os.path.join(addon, "info.ini")
+    for _, line in enumerate(codecs.open(info_ini_path, "r", encoding="gbk")):
         parts = line.split("=")
         if parts[0].find("lua_") == 0:
             if parts[0] == "lua_0":
                 info_content = info_content + "lua_0=" + srcname + "\n"
         else:
             info_content = info_content + line
-    with codecs.open("%s/info.ini" % addon, "w", encoding="gbk") as f:
+    target_info = os.path.join(packet_dist_path, "info.ini")
+    with codecs.open(target_info, "w", encoding="gbk") as f:
         f.write(info_content)
-    with codecs.open("%s/info.ini.zh_TW" % addon, "w", encoding="utf8") as f:
+    with codecs.open(
+        os.path.join(packet_dist_path, "info.ini.zh_TW"), "w", encoding="utf8"
+    ) as f:
         f.write(converter.convert(info_content))
     print("Update info done...")
+
+
+def __build(packet: str):
+    # 删除旧版构建结果
+    dist_path = get_packet_dist_path()
+    if os.path.isdir(dist_path):
+        shutil.rmtree(dist_path)
+    os.makedirs(dist_path, exist_ok=True)
+    # 复制静态文件
+    for addon in os.listdir("./"):
+        if addon in [
+            ".7zipignore",
+            ".7zipignore-classic",
+            ".7zipignore-remake",
+            "package.ini",
+            "package.ini.zh_TW",
+            "README.md",
+            "LICENSE",
+        ]:
+            shutil.copy2(addon, os.path.join("!src-dist", "dist", addon))
+    # 处理子插件
+    for addon in os.listdir("./"):
+        if os.path.exists(os.path.join("./", addon, "info.ini")):
+            __build_addon(packet, addon)
+            # 复制其他文件到新构建目录，下述函数仅复制非 *.lua、info.ini系列文件
+            __copy_non_build_files(addon)
 
 
 def __get_version_info(packet, diff_ver):
     """Get version information"""
     # Read version from Base.lua
     current_version = ""
-    for line in open("%s_!Base/src/lib/Base.lua" % packet):
+    base_file = f"{packet}_!Base/src/lib/Base.lua"
+    for line in open(base_file):
         if line[0:16] == "local _VERSION_ ":
             current_version = re.sub(r"(?is)^local _VERSION_\s+=", "", line).strip()[
                 1:-1
@@ -334,7 +388,7 @@ def __7zip(packet, file_name, base_message, base_hash, extra_ignore_file):
     # Prepare for 7z compressing
     print("zipping...")
     os.system(
-        'start /wait /b ./!src-dist/bin/7z.exe a -t7z "'
+        'cd ./!src-dist/dist && start /wait /b ../bin/7z.exe a -t7z "'
         + file_name
         + '" -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@.7zipignore'
         + cmd_suffix
@@ -348,65 +402,51 @@ def __7zip(packet, file_name, base_message, base_hash, extra_ignore_file):
     )
 
 
-def run(diff_ver, is_source):
-    print("> DIFF VERSION: %s" % (diff_ver or "auto"))
-    print("> RELEASE MODE: %s" % ("source" if is_source else "dist"))
-    packet = get_current_packet_id()
-    packet_path = get_packet_path()
-    version_info = __get_version_info(packet, diff_ver)
-
-    if diff_ver and version_info.get("previous_hash") == "":
-        print("Error: Specified diff commit not found (release: %s)." % diff_ver)
-        exit()
-
-    if not is_source:
-        # Checkout stable and reset with master
-        if git.get_current_branch() == "master":
-            utils.assert_exit(
-                git.is_clean(), "Error: master branch has uncommitted file change(s)!"
-            )
-            os.system("git checkout stable || git checkout -b stable")
-            os.system("git rebase master")
-            os.system("git reset master")
-            os.system(
-                'code "%s"'
-                % os.path.join(packet_path, "./%s_!Base/src/lib/Base.lua" % packet)
-            )
-            os.system('code "%s"' % os.path.join(packet_path, "./CHANGELOG.md"))
-            utils.exit_with_message(
-                "Switched to stable branch. Please commit release info and then run this script again!"
-            )
-
-        # Commit release message
-        if git.get_current_branch() == "stable" and not git.is_clean():
-            os.system("git reset master")
-            version_info = __get_version_info(packet, diff_ver)
-            utils.assert_exit(
-                version_info.get("max") == ""
-                or semver.compare(version_info.get("current"), version_info.get("max"))
-                == 1,
-                "Error: current version(%s) must be larger than max history version(%s)!"
-                % (version_info.get("current"), version_info.get("max")),
-            )
-            os.system(
-                'git add * && git commit -m "release: %s"' % version_info.get("current")
-            )
-
-        # Check if branch
+def __prepublish(packet, packet_path, diff_ver):
+    # Checkout stable and reset with master
+    if git.get_current_branch() == "master":
         utils.assert_exit(
-            git.is_clean(),
-            "Error: resolve conflict and remove uncommitted changes first!",
+            git.is_clean(), "Error: master branch has uncommitted file change(s)!"
         )
-        utils.assert_exit(
-            git.get_current_branch() == "stable",
-            "Error: current branch is not on stable!",
+        os.system("git checkout stable || git checkout -b stable")
+        os.system("git rebase master")
+        os.system("git reset master")
+        os.system(
+            'code "%s"'
+            % os.path.join(packet_path, "./%s_!Base/src/lib/Base.lua" % packet)
+        )
+        os.system('code "%s"' % os.path.join(packet_path, "./CHANGELOG.md"))
+        utils.exit_with_message(
+            "Switched to stable branch. Please commit release info and then run this script again!"
         )
 
-    # Compress and concat source file
-    for addon in os.listdir("./"):
-        if os.path.exists(os.path.join("./", addon, "info.ini")):
-            __compress(packet, addon)
+    # Commit release message
+    if git.get_current_branch() == "stable" and not git.is_clean():
+        os.system("git reset master")
+        version_info = __get_version_info(packet, diff_ver)
+        utils.assert_exit(
+            version_info.get("max") == ""
+            or semver.compare(version_info.get("current"), version_info.get("max"))
+            == 1,
+            "Error: current version(%s) must be larger than max history version(%s)!"
+            % (version_info.get("current"), version_info.get("max")),
+        )
+        os.system(
+            'git add * && git commit -m "release: %s"' % version_info.get("current")
+        )
 
+    # Check if branch
+    utils.assert_exit(
+        git.is_clean(),
+        "Error: resolve conflict and remove uncommitted changes first!",
+    )
+    utils.assert_exit(
+        git.get_current_branch() == "stable",
+        "Error: current branch is not on stable!",
+    )
+
+
+def __pack(packet, packet_path, version_info):
     dist_root = os.path.abspath(os.path.join(get_interface_path(), os.pardir))
     if os.path.isfile(os.path.abspath(os.path.join(dist_root, "gameupdater.exe"))):
         dist_root = os.path.abspath(os.path.join(packet_path, "!src-dist", "dist"))
@@ -471,14 +511,26 @@ def run(diff_ver, is_source):
     __make_changelog(packet, packet_path, "classic")
     __7zip(packet, file_name_fmt % "classic-", "", "", ".7zipignore-classic")
 
-    # Remove temporary files
-    for addon in os.listdir("./"):
-        if os.path.exists(os.path.join("./", addon, "info.ini")):
-            __rm_temporary(packet, addon)
 
-    # Revert source code modify by compressing
-    if not is_source:
-        os.system("git reset HEAD --hard")
+def run(mode, diff_ver=None, is_source=False):
+    print("> DIFF VERSION: %s" % (diff_ver or "auto"))
+    print("> RELEASE MODE: %s" % mode)
+    packet = get_current_packet_id()
+    packet_path = get_packet_path()
+    version_info = __get_version_info(packet, diff_ver)
+
+    if diff_ver and version_info.get("previous_hash") == "":
+        print("Error: Specified diff commit not found (release: %s)." % diff_ver)
+        exit()
+
+    if mode == "publish":
+        __prepublish(packet, packet_path, diff_ver)
+
+    __build(packet)
+
+    if mode == "publish":
+        __pack(packet, packet_path, version_info)
         os.system("git checkout master")
+
     time.sleep(5)
     print("Exiting...")

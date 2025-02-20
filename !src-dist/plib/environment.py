@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 
 
 def is_interface_path(path):
@@ -30,6 +31,11 @@ def get_packet_path(name=None):
         return os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, os.pardir))
 
 
+def get_packet_dist_path() -> str:
+    """返回构建结果目标目录"""
+    return os.path.join(get_packet_path(), "!src-dist", "dist")
+
+
 def set_packet_as_cwd(name=None):
     packet_path = get_packet_path(name)
     if packet_path is None:
@@ -42,3 +48,17 @@ def get_current_packet_id():
         os.path.join(__file__, os.pardir, os.pardir, os.pardir)
     )
     return os.path.basename(packet_path)
+
+
+def get_git_time_tag():
+    """获取Git提交哈希和提交时间作为时间标签"""
+    try:
+        commit_hash = os.popen("git rev-parse --short HEAD").read().strip()
+        commit_date = (
+            os.popen("git log -1 --format=%cd --date=format:%Y%m%d%H%M%S")
+            .read()
+            .strip()
+        )
+        return f"{commit_date}-{commit_hash}"
+    except:
+        return time.strftime("%Y%m%d%H%M%S", time.localtime())
