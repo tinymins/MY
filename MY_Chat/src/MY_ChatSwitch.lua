@@ -700,8 +700,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			O.bLockPostion = bChecked
 			D.ReInitUI()
 		end,
-		isdisable = function()
-			return not O.bDisplayPanel
+		autoEnable = function()
+			return O.bDisplayPanel
 		end,
 	})
 	nY = nY + nLH
@@ -729,8 +729,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 			end
 			return t
 		end,
-		isdisable = function()
-			return not O.bDisplayPanel
+		autoEnable = function()
+			return O.bDisplayPanel
 		end,
 	})
 	nY = nY + nLH

@@ -297,8 +297,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		onCheck = function(bChecked)
 			O.bChatCopyAlwaysShowMask = bChecked
 		end,
-		isdisable = function()
-			return not O.bChatCopy
+		autoEnable = function()
+			return O.bChatCopy
 		end,
 	})
 	nY = nY + nLH
@@ -310,8 +310,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		onCheck = function(bChecked)
 			O.bChatCopyAlwaysWhite = bChecked
 		end,
-		isdisable = function()
-			return not O.bChatCopy
+		autoEnable = function()
+			return O.bChatCopy
 		end,
 	})
 	nY = nY + nLH
@@ -323,8 +323,8 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 		onCheck = function(bChecked)
 			O.bChatCopyNoCopySysmsg = bChecked
 		end,
-		isdisable = function()
-			return not O.bChatCopy
+		autoEnable = function()
+			return O.bChatCopy
 		end,
 	})
 	nY = nY + nLH
