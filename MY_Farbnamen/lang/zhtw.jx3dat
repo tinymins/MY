@@ -15,6 +15,7 @@ return {
     ['Copy .db file to share.'] = '複製該.db文件即可完成染色數據導出。',
     ['Cache data deleted.'] = '緩存已清除。',
     ['Save to database'] = '緩存到本地磁碟',
+	['This feature has been disabled on HDD disk machine for performance issues.'] = '檢測到游戲所在磁碟為機械硬碟，由於磁碟吞吐量限制，該功能無法正常啟用，請將游戲移動到固態硬碟後再嘗試開啟。',
     ['Show analysis'] = '顯示統計',
     ['[Teammate]'] = '〔隊友〕',
     ['Load default setting'] = '恢復默認設置',

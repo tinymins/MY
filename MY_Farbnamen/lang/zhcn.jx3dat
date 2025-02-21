@@ -15,6 +15,7 @@ return {
     ['Copy .db file to share.'] = '复制该.db文件即可完成染色数据导出。',
     ['Cache data deleted.'] = '缓存已清除。',
     ['Save to database'] = '缓存到本地磁盘',
+	['This feature has been disabled on HDD disk machine for performance issues.'] = '检测到游戏所在磁盘为机械硬盘，由于磁盘吞吐量限制，该功能无法正常启用，请将游戏移动到固态硬盘后再尝试开启。',
     ['Show analysis'] = '显示统计',
     ['[Teammate]'] = '〔队友〕',
     ['Load default setting'] = '恢复默认设置',

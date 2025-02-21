@@ -18,6 +18,8 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+X.RegisterRestriction('MY_Farbnamen.BanHDD', { ['*'] = true, intl = false })
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- 设置和数据
@@ -447,6 +449,11 @@ function D.Migration()
 			end
 			X.Alert(_L['Migrate succeed!'])
 		end)
+end
+
+function D.UpdateSaveDB()
+	local bBan = X.IsRestricted('MY_Farbnamen.BanHDD') and X.GetDiskType() == 'HDD'
+	D.bSaveDB = not bBan and D.bReady and O.bSaveDB
 end
 
 ---------------------------------------------------------------
@@ -1143,6 +1150,8 @@ end
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	D.Migration()
 
+	local bBan = X.IsRestricted('MY_Farbnamen.BanHDD') and X.GetDiskType() == 'HDD'
+
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Enable MY_Farbnamen'],
@@ -1185,10 +1194,15 @@ function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nX, nY, nLH)
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 'auto',
 		text = _L['Save to database'],
-		checked = O.bSaveDB,
+		checked = not bBan and O.bSaveDB,
 		onCheck = function()
 			O.bSaveDB = not O.bSaveDB
 		end,
+		enable = not bBan,
+		tip = bBan and {
+			render = _L['This feature has been disabled on HDD disk machine for performance issues.'],
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
+		} or nil,
 	}):Width() + 5
 
 	nX = nPaddingX + 25
@@ -1400,13 +1414,20 @@ end)
 
 X.RegisterUserSettingsInit('MY_Farbnamen', function()
 	D.bReady = true
-	D.bSaveDB = O.bSaveDB
+	D.UpdateSaveDB()
 end)
 X.RegisterUserSettingsRelease('MY_Farbnamen', function()
 	D.bReady = false
 end)
 X.RegisterUserSettingsUpdate('MY_Farbnamen.bSaveDB', function()
-	D.bSaveDB = O.bSaveDB
+	D.UpdateSaveDB()
+end)
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_Farbnamen.BanHDD', function()
+	if arg0 and arg0 ~= 'MY_Farbnamen.BanHDD' then
+		return
+	end
+	D.UpdateSaveDB()
 end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
