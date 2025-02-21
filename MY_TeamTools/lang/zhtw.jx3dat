@@ -261,6 +261,7 @@ return {
 
     -- MY_CombatLogs.lua
     ['MY_CombatLogs'] = '戰鬥事件記錄',
+	['This feature has been disabled on HDD disk machine for performance issues.'] = '檢測到游戲所在磁碟為機械硬碟，由於磁碟吞吐量限制，該功能無法正常啟用，請將游戲移動到固態硬碟後再嘗試開啟。',
     ['Enable in dungeon'] = '在秘境地圖中啟用',
     ['Enable in arena'] = '在名劍大會中啟用',
     ['Enable in battlefield'] = '在戰場地圖中啟用',

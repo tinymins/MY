@@ -18,6 +18,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 	return
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
+X.RegisterRestriction('MY_CombatLogs.BanHDD', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local O = X.CreateUserSettingsModule('MY_CombatLogs', _L['Raid'], {
@@ -178,6 +179,9 @@ local LOG_TYPE = {
 -- ¸üÐÂÆôÓÃ×´Ì¬
 function D.UpdateEnable()
 	local bEnable = D.bReady and O.bEnable
+	if X.IsRestricted('MY_CombatLogs.BanHDD') and X.GetDiskType() == 'HDD' then
+		bEnable = false
+	end
 	if bEnable then
 		if X.IsInDungeonMap() then
 			bEnable = O.bEnableInDungeon
@@ -818,13 +822,29 @@ X.RegisterEvent('PARTY_ADD_MEMBER', function()
 end)
 
 function D.GetOptionsMenu()
+	local bBan = X.IsRestricted('MY_CombatLogs.BanHDD') and X.GetDiskType() == 'HDD'
+	local fnMouseEnter = bBan
+		and function()
+			local nX, nY = this:GetAbsX(), this:GetAbsY()
+			local nW, nH = this:GetW(), this:GetH()
+			OutputTip(GetFormatText(_L['This feature has been disabled on HDD disk machine for performance issues.'], nil, 255, 255, 0), 600, {nX, nY, nW, nH}, ALW.BOTTOM_TOP)
+		end
+		or nil
+	local fnMouseLeave = bBan
+		and function()
+			HideTip()
+		end
+		or nil
 	local menu = {
 		szOption = _L['MY_CombatLogs'],
 		bCheck = true,
-		bChecked = MY_CombatLogs.bEnable,
+		bChecked = not bBan and MY_CombatLogs.bEnable,
 		fnAction = function()
 			MY_CombatLogs.bEnable = not MY_CombatLogs.bEnable
 		end,
+		fnMouseEnter = fnMouseEnter,
+		fnMouseLeave = fnMouseLeave,
+		fnDisable = function() return bBan end,
 	}
 	table.insert(menu, {
 		szOption = _L['Enable in dungeon'],
@@ -833,7 +853,7 @@ function D.GetOptionsMenu()
 		fnAction = function()
 			MY_CombatLogs.bEnableInDungeon = not MY_CombatLogs.bEnableInDungeon
 		end,
-		fnDisable = function() return not MY_CombatLogs.bEnable end,
+		fnDisable = function() return bBan or not MY_CombatLogs.bEnable end,
 	})
 	table.insert(menu, {
 		szOption = _L['Enable in arena'],
@@ -842,7 +862,7 @@ function D.GetOptionsMenu()
 		fnAction = function()
 			MY_CombatLogs.bEnableInArena = not MY_CombatLogs.bEnableInArena
 		end,
-		fnDisable = function() return not MY_CombatLogs.bEnable end,
+		fnDisable = function() return bBan or not MY_CombatLogs.bEnable end,
 	})
 	table.insert(menu, {
 		szOption = _L['Enable in battlefield'],
@@ -851,7 +871,7 @@ function D.GetOptionsMenu()
 		fnAction = function()
 			MY_CombatLogs.bEnableInBattleField = not MY_CombatLogs.bEnableInBattleField
 		end,
-		fnDisable = function() return not MY_CombatLogs.bEnable end,
+		fnDisable = function() return bBan or not MY_CombatLogs.bEnable end,
 	})
 	table.insert(menu, {
 		szOption = _L['Enable in other maps'],
@@ -860,7 +880,7 @@ function D.GetOptionsMenu()
 		fnAction = function()
 			MY_CombatLogs.bEnableInOtherMaps = not MY_CombatLogs.bEnableInOtherMaps
 		end,
-		fnDisable = function() return not MY_CombatLogs.bEnable end,
+		fnDisable = function() return bBan or not MY_CombatLogs.bEnable end,
 	})
 	table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 	table.insert(menu, {
@@ -878,7 +898,7 @@ function D.GetOptionsMenu()
 		fnMouseLeave = function()
 			HideTip()
 		end,
-		fnDisable = function() return not MY_CombatLogs.bEnable end,
+		fnDisable = function() return bBan or not MY_CombatLogs.bEnable end,
 	})
 	table.insert(menu, {
 		szOption = _L['PVP mode'],
@@ -895,12 +915,12 @@ function D.GetOptionsMenu()
 		fnMouseLeave = function()
 			HideTip()
 		end,
-		fnDisable = function() return not MY_CombatLogs.bEnable end,
+		fnDisable = function() return bBan or not MY_CombatLogs.bEnable end,
 	})
 	table.insert(menu, X.CONSTANT.MENU_DIVIDER)
 	local m0 = {
 		szOption = _L['Max history'],
-		fnDisable = function() return not MY_CombatLogs.bEnable end,
+		fnDisable = function() return bBan or not MY_CombatLogs.bEnable end,
 	}
 	for _, i in ipairs({10, 20, 30, 50, 100, 200, 300, 500, 1000, 2000, 5000}) do
 		table.insert(m0, {
@@ -916,7 +936,7 @@ function D.GetOptionsMenu()
 	table.insert(menu, m0)
 	local m0 = {
 		szOption = _L['Min fight time'],
-		fnDisable = function() return not MY_CombatLogs.bEnable end,
+		fnDisable = function() return bBan or not MY_CombatLogs.bEnable end,
 	}
 	for _, i in ipairs({10, 20, 30, 60, 90, 120, 180, 240}) do
 		table.insert(m0, {
@@ -937,16 +957,23 @@ function D.GetOptionsMenu()
 			X.OpenFolder(szRoot)
 			X.UI.OpenTextEditor(szRoot)
 		end,
-		fnDisable = function() return not MY_CombatLogs.bEnable end,
+		fnDisable = function() return bBan or not MY_CombatLogs.bEnable end,
 	})
 	return menu
 end
 
 function D.OnPanelActivePartial(ui, nPaddingX, nPaddingY, nW, nH, nLH, nX, nY, nLFY)
+	local bBan = X.IsRestricted('MY_CombatLogs.BanHDD') and X.GetDiskType() == 'HDD'
+
 	nX = nX + ui:Append('WndCheckBox', {
 		x = nX, y = nY, w = 200,
 		text = _L['MY_CombatLogs'],
-		checked = MY_CombatLogs.bEnable,
+		checked = not bBan and MY_CombatLogs.bEnable,
+		enable = not bBan,
+		tip = bBan and {
+			render = _L['This feature has been disabled on HDD disk machine for performance issues.'],
+			position = X.UI.TIP_POSITION.BOTTOM_TOP,
+		} or nil,
 		onCheck = function(bChecked)
 			MY_CombatLogs.bEnable = bChecked
 		end,
@@ -1035,6 +1062,13 @@ end)
 
 X.RegisterUserSettingsRelease('MY_CombatLogs', function()
 	D.bReady = false
+end)
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_CombatLogs.BanHDD', function()
+	if arg0 and arg0 ~= 'MY_CombatLogs.BanHDD' then
+		return
+	end
+	D.UpdateEnable()
 end)
 
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'FINISH')--[[#DEBUG END]]
