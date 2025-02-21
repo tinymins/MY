@@ -19,6 +19,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 X.RegisterRestriction('MY_ChatLog.DEVELOP', { ['*'] = true })
+X.RegisterRestriction('MY_ChatLog.BanHDD', { ['*'] = true, intl = false })
 --------------------------------------------------------------------------
 
 local MSG_TYPE_CUSTOM = {
@@ -219,6 +220,12 @@ local V1_MSG_TYPE_MAP = {
 	[23] = 'MSG_SSG_WHISPER',
 }
 
+function D.UpdateEnable()
+	local bBan = X.IsRestricted('MY_ChatLog.BanHDD') and X.GetDiskType() == 'HDD'
+	D.bEnable = not bBan
+	D.RegisterMsgMonitor()
+end
+
 function D.GetRoot()
 	local szRoot = X.FormatPath({'userdata/chat_log/', X.PATH_TYPE.ROLE})
 	if not IsLocalFileExist(szRoot) then
@@ -400,6 +407,9 @@ function D.RegisterMsgMonitor()
 	for szMsgType, _ in pairs(REGISTER_MONITOR_MSG_TYPE) do
 		X.RegisterMsgMonitor(szMsgType, 'MY_ChatLog', false)
 	end
+	if not D.bEnable then
+		return
+	end
 	local tMsgType = {}
 	for _, info in ipairs(MY_ChatLog.aChannel) do
 		for _, szMsgType in ipairs(info.aMsgType) do
@@ -442,7 +452,7 @@ function D.RegisterMsgMonitor()
 			if MAIN_DS then
 				MAIN_DS:InsertMsg(szMsgType, szText, szMsg, szTalker, GetCurrentTime())
 				if D.bReady and O.bRealtimeCommit and not X.IsRestricted('MY_ChatLog.RealtimeCommit') then
-					MAIN_DS:FlushDB()
+					D.FlushDB()
 				end
 			else
 				table.insert(UNSAVED_MSG_LIST, {szMsgType, szText, szMsg, szTalker, GetCurrentTime()})
@@ -456,12 +466,16 @@ function D.OnInit()
 	if not X.GetClientPlayer() then
 		return X.DelayCall(500, D.OnInit)
 	end
-	if O.bAutoConnectDB then
+	D.UpdateEnable()
+	if D.bEnable and O.bAutoConnectDB then
 		D.InitDB('ask')
 	end
 end
 
 function D.FlushDB(bCheckExceed)
+	if not D.bEnable then
+		return
+	end
 	if not D.InitDB('silent') then
 		return
 	end
@@ -567,20 +581,18 @@ end
 
 X.RegisterEvent('LOADING_ENDING', 'MY_ChatLog_Save', function()
 	if MAIN_DS then
-		MAIN_DS:FlushDB()
+		D.FlushDB()
 	end
 end)
 
 X.RegisterIdle('MY_ChatLog_Save', function()
 	if MAIN_DS and not X.IsRestricted('MY_ChatLog.DEVELOP') then
-		MAIN_DS:FlushDB()
+		D.FlushDB()
 	end
 end)
 
 X.RegisterInit('MY_ChatLog_InitDB', D.OnInit)
 X.RegisterExit('MY_ChatLog_Release', D.ReleaseDB)
-
-X.RegisterInit('MY_ChatLog_InitMsgMonitor', D.RegisterMsgMonitor)
 
 X.RegisterUserSettingsInit('MY_ChatLog', function()
 	D.bReady = true
@@ -588,6 +600,13 @@ X.RegisterUserSettingsInit('MY_ChatLog', function()
 end)
 X.RegisterUserSettingsRelease('MY_ChatLog', function()
 	D.bReady = false
+end)
+
+X.RegisterEvent('MY_RESTRICTION', 'MY_ChatLog.BanHDD', function()
+	if arg0 and arg0 ~= 'MY_ChatLog.BanHDD' then
+		return
+	end
+	D.UpdateEnable()
 end)
 
 X.RegisterEvent('DISCONNECT', 'MY_ChatLog_Release', function()

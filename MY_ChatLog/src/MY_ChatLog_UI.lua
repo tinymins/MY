@@ -491,6 +491,9 @@ function D.Open(szRoot, aChannel, szSearch, nMinTime, nMaxTime, nInitMsgIndex)
 	if not MY_ChatLog.InitDB() then
 		return
 	end
+	if X.IsRestricted('MY_ChatLog.BanHDD') and X.GetDiskType() == 'HDD' then
+		X.Alert(_L['New chat save feature has been disabled on HDD disk machine for performance issues, now on readonly mode.'])
+	end
 	local tUncheckedChannel
 	if aChannel then
 		tUncheckedChannel = {}
