@@ -175,9 +175,9 @@ def __build_addon(packet: str, addon: str) -> None:
         with open(out_file, "a", encoding="gbk") as src:
             mod_list: str = ",".join([f"'{i}'" for i in range(1, file_count + 1)])
             # 循环加载各模块
-            src.write(
-                f"\nfor _, k in ipairs([{mod_list}]) do package.preload[k]() end\n"
-            )
+            src.write("\nfor _, k in ipairs({")
+            src.write(mod_list)
+            src.write("}) do package.preload[k]() end\n")
             src.write(f'Log("[ADDON] Module {addon} v{TIME_TAG} loaded.")')
     except Exception as e:
         utils.exit_with_message(f"更新构建文件 {out_file} 失败：{e}")
