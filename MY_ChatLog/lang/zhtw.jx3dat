@@ -59,7 +59,7 @@ return {
     ['Copy this record'] = '複製該條消息',
     ['View this message in all messages'] = '定位該條消息',
     ['Open chatlog'] = '打開聊天記錄',
-	['New chat save feature has been disabled on HDD disk machine for performance issues, now on readonly mode.'] = '檢測到游戲所在磁碟為機械硬碟，由於磁碟吞吐量限制，新消息保存無法正常啟用，將游戲移動到固態硬碟後將自動恢復，當前進入只讀模式顯示歷史聊天記錄。',
+	['New chat save feature has been disabled on HDD disk machine for performance issues, now on readonly mode.'] = '檢測到游戲所在磁碟為機械硬碟，由於磁碟吞吐量限制，當前處於只讀模式，無法保存新消息，僅可瀏覽歷史聊天記錄。',
     ['MY - MY_ChatLog'] = '茗伊插件集 - 聊天記錄',
     ['Press enter to search ...'] = '輸入回車鍵搜索...',
     ['Clear channel chat log'] = '清空該分類聊天記錄',
