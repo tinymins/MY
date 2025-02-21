@@ -524,6 +524,7 @@ GetCurrentProcessID = FunctionType
 GetCurrentTime = FunctionType
 GetDesignationPrefixInfo = FunctionType
 GetDiamondInfoFromEnchantID = FunctionType
+GetDiskType = FunctionType
 GetDoodad = FunctionType
 GetDoodadQuestTip = FunctionType
 GetDoodadTemplate = FunctionType

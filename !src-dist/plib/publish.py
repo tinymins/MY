@@ -360,6 +360,7 @@ def __make_changelog(packet: str, packet_path: str, branch: str) -> None:
         packet_path: 包所在的路径
         branch: 分支名称（如 remake、classic）
     """
+    packet_dist_path = get_packet_dist_path()
     changelog_src: str = os.path.join(packet_path, "CHANGELOG.md")
     with open(changelog_src, "r", encoding="utf8") as input_file:
         input_lines: List[str] = input_file.readlines()
@@ -397,7 +398,7 @@ def __make_changelog(packet: str, packet_path: str, branch: str) -> None:
     for i, line in enumerate(output_lines):
         if line.startswith("## "):
             output_lines[i] = line[3:]
-    changelog_target: str = os.path.join(packet_path, f"{packet}_CHANGELOG.txt")
+    changelog_target: str = os.path.join(packet_dist_path, f"{packet}_CHANGELOG.txt")
     with open(changelog_target, "w", encoding="gbk") as output_file:
         output_file.writelines(output_lines)
 

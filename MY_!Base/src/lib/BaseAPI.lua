@@ -121,6 +121,22 @@ function X.GetServerIDByName(szServerName)
 	return SERVER_ID_NAME[szServerName]
 end
 
+-- 获取磁盘类型
+---@return string @磁盘类型，如 'SSD', 'HDD', 'OTHER', 'UNKNOWN'
+function X.GetDiskType()
+	local nType = GetDiskType and GetDiskType() or nil
+	if nType == 0 then
+		return 'SSD'
+	end
+	if nType == 1 then
+		return 'HDD'
+	end
+	if nType == 2 then
+		return 'OTHER'
+	end
+	return 'UNKNOWN'
+end
+
 -- 获取 ID 是否为玩家（区别于 NPC）
 ---@param dwID number @ID
 ---@return boolean @是否为玩家
