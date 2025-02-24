@@ -3,7 +3,7 @@
 -- @desc     : 悬浮功能入口
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
----@type Boilerplate
+---@class (partial) Boilerplate
 local X = Boilerplate
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/HoverEntry')

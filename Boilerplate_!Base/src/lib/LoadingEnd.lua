@@ -3,7 +3,7 @@
 -- @desc     : 基础库加载完成处理
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
----@type Boilerplate
+---@class (partial) Boilerplate
 local X = Boilerplate
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/LoadingEnd')

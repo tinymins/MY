@@ -3,7 +3,7 @@
 -- @desc     : 时间周期函数模块
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
----@type Boilerplate
+---@class (partial) Boilerplate
 local X = Boilerplate
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Interval')
