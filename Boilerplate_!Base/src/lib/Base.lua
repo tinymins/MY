@@ -233,8 +233,8 @@ X.PACKET_INFO.AUTHOR_ROLE_LIST    = {
 }
 
 -- 导出命名空间
----@class Boilerplate
+---@class (partial) Boilerplate
 Boilerplate = X
 
----@class Boilerplate_UI
+---@class (partial) Boilerplate_UI
 Boilerplate_UI = UI
