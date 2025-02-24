@@ -7,7 +7,7 @@
 -- Sourced from http://en.wikipedia.org/wiki/Base64
 -- https://github.com/toastdriven/lua-base64/blob/master/base64.lua
 --------------------------------------------------------------------------------
----@type MY
+---@class (partial) MY
 local X = MY
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/Base64')

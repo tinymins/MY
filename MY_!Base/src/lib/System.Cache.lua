@@ -3,7 +3,7 @@
 -- @desc     : ÏµÍ³º¯Êý¿â¡¤»º´æ
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
----@type MY
+---@class (partial) MY
 local X = MY
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/System.Cache')

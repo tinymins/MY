@@ -3,7 +3,7 @@
 -- @desc     : 插件库自定义函数
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
----@type MY
+---@class (partial) MY
 local X = MY
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/lib/PacketExtend')

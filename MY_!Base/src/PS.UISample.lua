@@ -3,7 +3,7 @@
 -- @desc     : 界面组件库示例
 -- @copyright: Copyright (c) 2009 Kingsoft Co., Ltd.
 --------------------------------------------------------------------------------
----@type MY
+---@class (partial) MY
 local X = MY
 --------------------------------------------------------------------------------
 local MODULE_PATH = X.NSFormatString('{$NS}_!Base/PS.UISample')
@@ -179,7 +179,10 @@ local COMPONENT_SAMPLE = {
 	{'WndEditBox Right Search', 'WndEditBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditBox', appearance = 'SEARCH_RIGHT' }},
 	{'WndEditComboBox', 'WndEditComboBox', { w = 200, h = COMPONENT_H, font = 162, text = 'WndEditComboBox' }},
 	-- WndListBox
-	{'WndRadioBox', 'WndRadioBox', { w = 'auto', h = 'auto', font = 162, text = 'WndRadioBox' }},
+	{'WndRadioBox', 'WndRadioBox', { w = 'auto', h = 'auto', font = 162, text = 'WndRadioBox No Group' }},
+	{'WndRadioBox', 'WndRadioBox', { w = 'auto', h = 'auto', font = 162, text = 'WndRadioBox No Group' }},
+	{'WndRadioBox', 'WndRadioBox', { w = 'auto', h = 'auto', group = '1', font = 162, text = 'WndRadioBox Group1' }},
+	{'WndRadioBox', 'WndRadioBox', { w = 'auto', h = 'auto', group = '1', font = 162, text = 'WndRadioBox Group1' }},
 	-- WndScrollHandleBox
 	-- WndScrollWindowBox
 	{'WndSlider', 'WndSlider', { w = 200, h = COMPONENT_H, font = 162, text = 'WndSlider' }},
