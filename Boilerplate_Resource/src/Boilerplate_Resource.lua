@@ -18,7 +18,6 @@ end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
 
-X.
 local C, D = {}, {}
 
 C.aSound = {
