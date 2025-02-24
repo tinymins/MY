@@ -301,8 +301,8 @@ X.PACKET_INFO.AUTHOR_ROLE_LIST    = {
 }
 
 -- 导出命名空间
----@class MY
+---@class (partial) MY
 MY = X
 
----@class MY_UI
+---@class (partial) MY_UI
 MY_UI = UI
