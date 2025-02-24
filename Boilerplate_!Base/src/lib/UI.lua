@@ -864,6 +864,22 @@ local function InitComponent(raw, szType)
 		if X.UI.IS_GLASSMORPHISM then
 			X.UI.AdaptComponentAppearance(raw, 'WndRadioBox')
 		end
+		X.UI(raw):UIEvent('OnLButtonUp', function()
+			if not this:IsEnabled() then
+				return
+			end
+			local group = GetComponentProp(raw, 'group')
+			local p = raw:GetParent():GetFirstChild()
+			while p do
+				if p ~= raw and GetComponentType(p) == 'WndRadioBox' then
+					local g = GetComponentProp(p, 'group')
+					if g and g == group and p:IsCheckBoxChecked() then
+						p:Check(false)
+					end
+				end
+				p = p:GetNext()
+			end
+		end)
 	elseif szType == 'WndComboBox' then
 		if X.UI.IS_GLASSMORPHISM then
 			X.UI.AdaptComponentAppearance(raw, 'WndComboBox')
@@ -968,23 +984,6 @@ local function InitComponent(raw, szType)
 			maxOption    = 0    ,  -- the max number of displayed options (0 means no limitation)
 			source       = {}   ,  -- option list
 		})
-	elseif szType == 'WndRadioBox' then
-		X.UI(raw):UIEvent('OnLButtonUp', function()
-			if not this:IsEnabled() then
-				return
-			end
-			local group = GetComponentProp(raw, 'group')
-			local p = raw:GetParent():GetFirstChild()
-			while p do
-				if p ~= raw and GetComponentType(p) == 'WndRadioBox' then
-					local g = GetComponentProp(p, 'group')
-					if g and g == group and p:IsCheckBoxChecked() then
-						p:Check(false)
-					end
-				end
-				p = p:GetNext()
-			end
-		end)
 	elseif szType == 'WndListBox' then
 		local scroll = raw:Lookup('', 'Handle_Scroll')
 		SetComponentProp(raw, 'OnListItemHandleMouseEnter', function()
