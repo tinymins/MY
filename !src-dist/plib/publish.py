@@ -438,6 +438,8 @@ def __7zip(
             "package.ini.*": True,
             f"{packet}_CHANGELOG.txt": True,
         }
+        print("")
+        print("--------------------------------")
         print("文件变更列表：")
         filelist: List[str] = (
             os.popen(f"git diff {base_hash} HEAD --name-status")
@@ -464,6 +466,7 @@ def __7zip(
             cmd_suffix += f' "{path}"'
         print("")
 
+    print("--------------------------------")
     print("正在压缩打包...")
     # 调用系统命令压缩包（通过 start /wait 保证依次完成）
     cmd: str = (
@@ -473,9 +476,9 @@ def __7zip(
         + cmd_suffix
     )
     os.system(cmd)
-    print("压缩打包完成！")
+    print(f'压缩打包完成："{file_name}"。')
     if base_hash:
-        print(f'基于提交信息 "{base_message}({base_hash})"。')
+        print(f'基于提交信息："{base_message}({base_hash})"。')
     else:
         print("全量打包。")
 
