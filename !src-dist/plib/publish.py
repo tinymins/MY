@@ -27,9 +27,6 @@ from plib.environment import (
 )
 from plib.language.converter import Converter
 
-# 采用当前Git提交时间戳作为标识
-TIME_TAG: str = git.get_head_time_tag()
-
 
 def __copy_non_build_files(addon: str) -> None:
     """
@@ -64,7 +61,7 @@ def __copy_non_build_files(addon: str) -> None:
             shutil.copy2(os.path.join(root, file), os.path.join(dest_dir, file))
 
 
-def __build_addon(packet: str, addon: str) -> None:
+def __build_addon(packet: str, addon: str, time_tag: str) -> None:
     """
     处理子插件源码构建与合并。
     主要步骤：
@@ -81,7 +78,7 @@ def __build_addon(packet: str, addon: str) -> None:
     print("正在构建子插件：%s" % addon)
     file_count: int = 0
     converter: Converter = Converter("zh-TW")
-    srcname: str = "src." + TIME_TAG + ".lua"
+    srcname: str = "src." + time_tag + ".lua"
 
     # 尝试加载敏感数据（如果存在）
     try:
@@ -178,7 +175,7 @@ def __build_addon(packet: str, addon: str) -> None:
             src.write("\nfor _, k in ipairs({")
             src.write(mod_list)
             src.write("}) do package.preload[k]() end\n")
-            src.write(f'Log("[ADDON] Module {addon} v{TIME_TAG} loaded.")')
+            src.write(f'Log("[ADDON] Module {addon} v{time_tag} loaded.")')
     except Exception as e:
         utils.exit_with_message(f"更新构建文件 {out_file} 失败：{e}")
 
@@ -215,6 +212,9 @@ def __build(packet: str) -> None:
     参数：
         packet: 包标识
     """
+    # 获取当前 Git 最新提交版本信息
+    time_tag = git.get_head_time_tag()
+
     # 删除旧构建结果
     dist_path: str = get_packet_dist_path()
     if os.path.isdir(dist_path):
@@ -234,13 +234,14 @@ def __build(packet: str) -> None:
     for item in os.listdir("./"):
         if item in ignore_files and os.path.isfile(item):
             shutil.copy2(item, os.path.join("!src-dist", "dist", item))
+
     # 遍历当前目录中所有子目录，存在 info.ini 的目录认为是子插件
     for item in os.listdir("./"):
         addon_path: str = os.path.join(".", item)
         if os.path.isdir(addon_path) and os.path.exists(
             os.path.join(addon_path, "info.ini")
         ):
-            __build_addon(packet, item)
+            __build_addon(packet, item, time_tag)
             __copy_non_build_files(item)
 
 
@@ -540,6 +541,9 @@ def __pack(packet: str, packet_path: str, version_info: Dict[str, str]) -> None:
         packet_path: 包所在的目录
         version_info: 各版本信息字典（包含当前、上一个版本相关信息）
     """
+    # 获取当前 Git 最新提交版本信息
+    time_tag = git.get_head_time_tag()
+
     # 根据运行环境确定压缩包输出目录
     dist_root: str = os.path.abspath(os.path.join(get_interface_path(), os.pardir))
     if os.path.isfile(os.path.abspath(os.path.join(dist_root, "gameupdater.exe"))):
@@ -552,7 +556,7 @@ def __pack(packet: str, packet_path: str, version_info: Dict[str, str]) -> None:
         file_name_fmt: str = os.path.abspath(
             os.path.join(
                 dist_root,
-                f"{packet}_{TIME_TAG}_v{version_info.get('current')}.%sdiff-{version_info.get('previous_hash')}-{version_info.get('current_hash')}.7z",
+                f"{packet}_{time_tag}_v{version_info.get('current')}.%sdiff-{version_info.get('previous_hash')}-{version_info.get('current_hash')}.7z",
             )
         )
         base_message: str = version_info.get("previous_message")
@@ -579,7 +583,8 @@ def __pack(packet: str, packet_path: str, version_info: Dict[str, str]) -> None:
     # 全量包打包流程
     file_name_fmt = os.path.abspath(
         os.path.join(
-            dist_root, f"{packet}_{TIME_TAG}_v{version_info.get('current')}.%sfull.7z"
+            dist_root,
+            f"{packet}_{time_tag}_v{version_info.get('current')}.%sfull.7z",
         )
     )
     __make_changelog(packet, packet_path, "remake")
