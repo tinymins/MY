@@ -45,10 +45,10 @@ local function CreateWebPageFrame()
 	return szRequestID, hFrame
 end
 
-local Curl_Create = pcall(_G.Curl_Create, '') and _G.Curl_Create or nil
-local CURL_HttpRqst = pcall(_G.CURL_HttpRqst, '') and _G.CURL_HttpRqst or nil
-local CURL_HttpPost = (pcall(_G.CURL_HttpPostEx, 'TEST', '') and _G.CURL_HttpPostEx)
-	or (pcall(_G.CURL_HttpPost, 'TEST', '') and _G.CURL_HttpPost)
+local Curl_Create = pcall(_G.Curl_Create, 'http://127.0.0.1/') and _G.Curl_Create or nil
+local CURL_HttpRqst = pcall(_G.CURL_HttpRqst, 'http://127.0.0.1/') and _G.CURL_HttpRqst or nil
+local CURL_HttpPost = (pcall(_G.CURL_HttpPostEx, 'TEST', 'http://127.0.0.1/') and _G.CURL_HttpPostEx)
+	or (pcall(_G.CURL_HttpPost, 'TEST', 'http://127.0.0.1/') and _G.CURL_HttpPost)
 	or nil
 
 function X.CanAjax(driver, method)
