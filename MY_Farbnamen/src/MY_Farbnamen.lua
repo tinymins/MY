@@ -687,6 +687,18 @@ function D.GetTip(szName)
 			(D.tCampString[tInfo.nCamp] or tInfo.nCamp or  _L['Unknown camp']), 136
 		))
 		table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
+		-- ≈º”ˆÕ≥º∆
+		if IsCtrlKeyDown() then
+			if X.IsEmpty(tInfo.nMetCount) or X.IsEmpty(tInfo.dwUpdateTime) then
+				table.insert(tTip, GetFormatText(_L('Met stat: never met'), 136))
+				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
+			else
+				table.insert(tTip, GetFormatText(_L('Met count: %s', tInfo.nMetCount), 136))
+				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
+				table.insert(tTip, GetFormatText(_L('Last met time: %s', X.FormatTime(tInfo.dwUpdateTime, '%yyyy/%MM/%dd %hh:%mm:%ss')), 136))
+				table.insert(tTip, X.CONSTANT.XML_LINE_BREAKER)
+			end
+		end
 		-- ÀÊ…Ì±„º„
 		if MY_PlayerRemark and MY_PlayerRemark.Get then
 			local tPlayer = MY_PlayerRemark.Get(tInfo.szGlobalID) or MY_PlayerRemark.Get(tInfo.dwID)
@@ -1007,6 +1019,8 @@ function D.Get(xKey)
 			nLevel       = tPlayer.nLevel,
 			szTitle      = tPlayer.szTitle,
 			nCamp        = tPlayer.nCamp,
+			nMetCount    = tPlayer.nTimes,
+			dwUpdateTime = tPlayer.dwTime,
 			dwTongID     = tPlayer.dwTongID,
 			szTongName   = tTong and tTong.szName or '',
 			rgb          = X.IsNumber(tPlayer.dwForceID) and { X.GetForceColor(tPlayer.dwForceID, 'foreground') } or { 255, 255, 255 },
