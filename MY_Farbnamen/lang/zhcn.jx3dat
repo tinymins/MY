@@ -36,8 +36,10 @@ return {
     ['Migrate succeed!'] = '染色数据迁移成功！',
 
     ['MY_Farbnamen__Analysis'] = '茗伊插件集·角色统计',
-    ['Total player count: %d'] = '角色总数量：%d个',
-    ['Total tong count: %d'] = '帮会总数量：%d个',
+    ['All server total player count: %d'] = '所有服务器角色总数量：%d个',
+    ['All server total tong count: %d'] = '所有服务器帮会总数量：%d个',
+    ['Current server total player count: %d'] = '当前服务器角色总数量：%d个',
+    ['Current server total tong count: %d'] = '当前服务器帮会总数量：%d个',
     ['Total'] = '汇总',
     ['By Camp'] = '按阵营',
     ['By Force'] = '按门派',

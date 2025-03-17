@@ -1130,18 +1130,30 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		end,
 	})
 
+	local nAllPlayerCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM PlayerInfo]] .. szWhere), {1, 'count'}, 0)
+	local nAllTongCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM TongInfo]] .. szWhere), {1, 'count'}, 0)
 	local nPlayerCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM PlayerInfo]] .. szWhere .. [[ AND server = ?]], szServer), {1, 'count'}, 0)
 	local nTongCount = X.Get(X.SQLiteGetAllANSI(DB, [[SELECT COUNT(*) AS count FROM TongInfo]] .. szWhere .. [[ AND server = ?]], szServer), {1, 'count'}, 0)
 
 	nY = 0
 	uiWndTotal:Append('Text', {
 		x = nX, y = nY,
-		text = _L('Total player count: %d', nPlayerCount),
+		text = _L('All server total player count: %d', nAllPlayerCount),
 	})
 	nY = nY + nDeltaY
 	uiWndTotal:Append('Text', {
 		x = nX, y = nY,
-		text = _L('Total tong count: %d', nTongCount),
+		text = _L('All server total tong count: %d', nAllTongCount),
+	})
+	nY = nY + nDeltaY
+	uiWndTotal:Append('Text', {
+		x = nX, y = nY,
+		text = _L('Current server total player count: %d', nPlayerCount),
+	})
+	nY = nY + nDeltaY
+	uiWndTotal:Append('Text', {
+		x = nX, y = nY,
+		text = _L('Current server total tong count: %d', nTongCount),
 	})
 
 	nY = nY + 430
