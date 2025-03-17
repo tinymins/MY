@@ -22,7 +22,7 @@ end
 --------------------------------------------------------------------------------
 local bRestricted = false
 X.RegisterRestriction('MY_TeamMon', { ['*'] = false })
-X.RegisterRestriction('MY_TeamMon.Cataclysm', { ['*'] = false, exp = true })
+X.RegisterRestriction('MY_TeamMon.Cataclysm', { ['*'] = false, exp = false })
 X.RegisterRestriction('MY_TeamMon.MapRestriction', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.HiddenBuff', { ['*'] = true })
 X.RegisterRestriction('MY_TeamMon.HiddenSkill', { ['*'] = true })

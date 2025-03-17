@@ -20,7 +20,7 @@ if not X.AssertVersion(MODULE_NAME, _L[MODULE_NAME], '^27.0.0') then
 end
 --[[#DEBUG BEGIN]]X.ReportModuleLoading(MODULE_PATH, 'START')--[[#DEBUG END]]
 --------------------------------------------------------------------------------
-X.RegisterRestriction('MY_TargetMon', { ['*'] = false, exp = true })
+X.RegisterRestriction('MY_TargetMon', { ['*'] = false, exp = false })
 X.RegisterRestriction('MY_TargetMon.MapRestriction', { ['*'] = true })
 --------------------------------------------------------------------------------
 local O = X.CreateUserSettingsModule('MY_TargetMon', _L['Target'], {
