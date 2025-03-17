@@ -1268,7 +1268,8 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 				alignHorizontal = 'left',
 				sorter = true,
 				render = function(value, record, index)
-					return GetFormatText(' ' .. (value or ''), 162, 255, 255, 255)
+					return GetFormatText(' ')
+						.. X.RenderChatLink(D.Render(GetFormatText(value or '', 162, 255, 255, 255, nil, nil, 'namelink_0')))
 				end,
 			},
 			{
