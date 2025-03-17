@@ -1083,6 +1083,11 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		w = 640, h = 480,
 		visible = false,
 	})
+	local uiWndMetCount = ui:Append('WndWindow', {
+		x = 0, y = 50,
+		w = 640, h = 480,
+		visible = false,
+	})
 
 	uiTabs:Append('WndTab', {
 		w = 100, h = 35,
@@ -1111,6 +1116,13 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		text = _L['By Tong'],
 		onCheck = function(bChecked)
 			uiWndTong:Visible(bChecked)
+		end,
+	})
+	uiTabs:Append('WndTab', {
+		w = 100, h = 35,
+		text = _L['By Met Count'],
+		onCheck = function(bChecked)
+			uiWndMetCount:Visible(bChecked)
 		end,
 	})
 
@@ -1207,7 +1219,7 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 			{
 				key = 'name',
 				title = ' ' .. _L['Tong'],
-				width = 200,
+				width = 300,
 				alignHorizontal = 'left',
 				sorter = true,
 				render = function(value, record, index)
@@ -1237,6 +1249,34 @@ function D.ShowAnalysis(nTimeLimit, szSubTitle)
 		]]) or {},
 		summary = { summary = true, count = nPlayerCount },
 		sort = 'count',
+		sortOrder = 'desc',
+	})
+
+	uiWndMetCount:Append('WndTable', {
+		x = 20, y = 0,
+		w = 600, h = 400,
+		columns = {
+			{
+				key = 'name',
+				title = ' ' .. _L['Name'],
+				width = 300,
+				alignHorizontal = 'left',
+				sorter = true,
+				render = function(value, record, index)
+					return GetFormatText(' ' .. (value or ''), 162, 255, 255, 255)
+				end,
+			},
+			{
+				key = 'times',
+				title = ' ' .. _L['Met Count'],
+				sorter = true,
+				render = function(value, record, index)
+					return GetFormatText(' ' .. _L('%d times', value), 162, 255, 255, 255)
+				end,
+			},
+		},
+		dataSource = X.SQLiteGetAllANSI(DB, [[SELECT name, times FROM PlayerInfo]] .. szWhere .. [[ ORDER BY times DESC LIMIT 500]]) or {},
+		sort = 'times',
 		sortOrder = 'desc',
 	})
 
